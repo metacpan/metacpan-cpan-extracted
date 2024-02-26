@@ -1,0 +1,137 @@
+# PODNAME: RDF::Cowl::Lib::Gen::Class::ObjPropRangeAxiom
+# ABSTRACT: Generated docs for RDF::Cowl::ObjPropRangeAxiom
+
+## DO NOT EDIT
+## Generated via maint/tt/Class.pod.tt
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+RDF::Cowl::Lib::Gen::Class::ObjPropRangeAxiom - Generated docs for RDF::Cowl::ObjPropRangeAxiom
+
+=head1 VERSION
+
+version 1.0.0
+
+=head1 MAIN MODULE
+
+L<RDF::Cowl::ObjPropRangeAxiom>
+
+=head1 CONSTRUCTORS
+
+=head2 new
+
+B<Signature>:
+
+  RDF::Cowl::ObjPropRangeAxiom->new(CowlAnyClsExp $range, Maybe[ CowlVector ] $annot)
+
+B<Params>:
+
+  CowlAnyObjPropExp $prop 
+  CowlAnyClsExp $range 
+  Maybe[ CowlVector ] $annot I<[optional]>
+
+Documentation:
+
+  Returns a retained object property range axiom.
+  
+  @param prop The object property.
+  @param range Range of the object property.
+  @param annot [optional] The annotations.
+  @return Retained axiom. Throws exception on error.
+
+Throws exception on error.
+
+=over 2
+
+B<C function name>: C<< cowl_obj_prop_range_axiom >>
+
+=back
+
+=head1 METHODS
+
+=head2 get_prop
+
+B<Signature>:
+
+  $self->get_prop()
+
+B<Params>:
+
+  CowlObjPropRangeAxiom $axiom 
+
+Documentation:
+
+  Gets the object property.
+  
+  @param axiom The axiom.
+  @return The object property.
+
+=over 2
+
+B<C function name>: C<< cowl_obj_prop_range_axiom_get_prop >>
+
+=back
+
+=head2 get_range
+
+B<Signature>:
+
+  $self->get_range()
+
+B<Params>:
+
+  CowlObjPropRangeAxiom $axiom 
+
+Documentation:
+
+  Gets the range of the object property.
+  
+  @param axiom The axiom.
+  @return Range of the object property.
+
+=over 2
+
+B<C function name>: C<< cowl_obj_prop_range_axiom_get_range >>
+
+=back
+
+=head2 get_annot
+
+B<Signature>:
+
+  $self->get_annot()
+
+B<Params>:
+
+  CowlObjPropRangeAxiom $axiom 
+
+Documentation:
+
+  Gets the annotations of the specified axiom.
+  
+  @param axiom The axiom.
+  @return The annotations.
+
+=over 2
+
+B<C function name>: C<< cowl_obj_prop_range_axiom_get_annot >>
+
+=back
+
+=head1 AUTHOR
+
+Zakariyya Mughal <zmughal@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 by Auto-Parallel Technologies, Inc..
+
+This is free software, licensed under Eclipse Public License - v 2.0.
+
+=cut

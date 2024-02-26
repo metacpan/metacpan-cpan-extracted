@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Dyo - Package for language Jola-Fonyi
 
 package Locale::CLDR::Locales::Dyo;
 # This file auto generated from Data\common\main\dyo.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -215,14 +215,14 @@ has 'characters' => (
 		no warnings 'experimental::regex_sets';
 		return {
 			auxiliary => qr{[z]},
-			index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ñ', 'Ŋ', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y'],
-			main => qr{[a á b c d e é f g h i í j k l m n ñ ŋ o ó p q r s t u ú v w x y]},
+			index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'NÑ', 'Ŋ', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y'],
+			main => qr{[aá b c d eé f g h ií j k l m nñ ŋ oó p q r s t uú v w x y]},
 			numbers => qr{[  \- ‑ , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
 : sub {
-		return { index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ñ', 'Ŋ', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y'], };
+		return { index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'NÑ', 'Ŋ', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y'], };
 },
 );
 
@@ -279,28 +279,6 @@ has 'number_symbols' => (
 			'group' => q( ),
 		},
 	} }
-);
-
-has 'number_formats' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		decimalFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0.###',
-				},
-			},
-		},
-		percentFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0%',
-				},
-			},
-		},
-} },
 );
 
 has 'number_currency_formats' => (
@@ -666,17 +644,12 @@ has 'datetime_formats_available_formats' => (
 	default		=> sub { {
 		'generic' => {
 			Ed => q{E d},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
 			MEd => q{E d/M},
-			MMM => q{LLL},
 			MMMEd => q{E d MMM},
 			MMMd => q{d MMM},
 			Md => q{d/M},
-			d => q{d},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
 			ms => q{m:ss},
 			y => q{y},
 			yM => q{M/y},
@@ -690,19 +663,13 @@ has 'datetime_formats_available_formats' => (
 		},
 		'gregorian' => {
 			Ed => q{E d},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
 			MEd => q{E d/M},
-			MMM => q{LLL},
 			MMMEd => q{E d MMM},
 			MMMd => q{d MMM},
 			Md => q{d/M},
-			d => q{d},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
 			ms => q{m:ss},
-			y => q{y},
 			yM => q{M/y},
 			yMEd => q{E d/M/y},
 			yMMM => q{MMM y},

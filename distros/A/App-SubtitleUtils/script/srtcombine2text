@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-23'; # DATE
+our $DATE = '2024-01-13'; # DATE
 our $DIST = 'App-SubtitleUtils'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/SubtitleUtils/srtcombine2text",
@@ -38,7 +38,7 @@ srtcombine2text - Combine the text of two subtitle files (e.g. for different lan
 
 =head1 VERSION
 
-This document describes version 0.012 of srtcombine2text (from Perl distribution App-SubtitleUtils), released on 2022-11-23.
+This document describes version 0.013 of srtcombine2text (from Perl distribution App-SubtitleUtils), released on 2024-01-13.
 
 =head1 SYNOPSIS
 
@@ -46,7 +46,7 @@ B<srtcombine2text> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>
 
 B<srtcombine2text> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<srtcombine2text> [B<L<--filename1|/"--filename1=s*">>=I<L<filename|Sah::Schema::filename>>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- E<lt>I<L<filename2|/"--filename2=s*">>E<gt>
+B<srtcombine2text> [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- E<lt>I<L<filename1|/"--filename1=s*">>E<gt> E<lt>I<L<filename2|/"--filename2=s*">>E<gt>
 
 
 
@@ -84,7 +84,7 @@ Can also be specified as the 1st command-line argument.
 (No description)
 
 
-Can also be specified as the 1st command-line argument.
+Can also be specified as the 2nd command-line argument.
 
 =back
 
@@ -200,7 +200,7 @@ For fish and zsh, install L<shcompgen> as described above.
 
 =head1 EXAMPLES
 
-=head2 Display English and French subtitles together (2)
+=head2 Display English and French subtitles together
 
  % srtcombine2text azur-et-asmar.en.srt azur-et-asmar.fr.srt
 
@@ -236,7 +236,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2022, 2021, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

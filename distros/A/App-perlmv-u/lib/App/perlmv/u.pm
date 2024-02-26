@@ -1,11 +1,13 @@
 package App::perlmv::u;
 
-our $DATE = '2021-05-25'; # DATE
-our $VERSION = '0.006'; # VERSION
-
 use strict;
 use warnings;
 use Log::ger;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-11-20'; # DATE
+our $DIST = 'App-perlmv-u'; # DIST
+our $VERSION = '0.007'; # VERSION
 
 our %SPEC;
 
@@ -71,7 +73,7 @@ _
     },
 };
 sub move_multiple {
-    require File::MoreUtil;
+    require File::Util::Test;
 
     my %args = @_;
 
@@ -84,7 +86,7 @@ sub move_multiple {
             $dest{$dest}++;
             for my $k ($src, $dest) {
                 unless (exists $exists{$k}) {
-                    $exists{$k} = File::MoreUtil::file_exists($k);
+                    $exists{$k} = File::Util::Test::file_exists($k);
                 }
             }
         }
@@ -183,7 +185,7 @@ _
 };
 sub perlmv {
     require Cwd;
-    require File::MoreUtil;
+    require File::Util::Test;
     require String::Elide::FromArray;
 
     my %args = @_;
@@ -196,11 +198,11 @@ sub perlmv {
     for my $file (@{ $args{files} }) {
         my $absfile = Cwd::abs_path($file);
         if (!defined($absfile) ||
-                !File::MoreUtil::file_exists($absfile)) {
+                !File::Util::Test::file_exists($absfile)) {
             return [412, "File '$file' does not exist"];
         }
         unless ($compiled_code) {
-            $compiled_code = eval "sub { $args{eval} }";
+            $compiled_code = eval "sub { $args{eval} }"; ## no critic: BuiltinFunctions::ProhibitStringyEval
             die "Can't compile '$args{eval}': $@" if $@;
         }
         my $new;
@@ -222,7 +224,7 @@ sub perlmv {
         my $i = 0;
         while (1) {
             $absnew = $absnew0 . ($i ? ".$i" : "");
-            last unless File::MoreUtil::file_exists($absnew) ||
+            last unless File::Util::Test::file_exists($absnew) ||
                 $exists{$absnew};
             $i++;
         }
@@ -384,7 +386,7 @@ App::perlmv::u - Rename files using Perl code, with undo/redo
 
 =head1 VERSION
 
-This document describes version 0.006 of App::perlmv::u (from Perl distribution App-perlmv-u), released on 2021-05-25.
+This document describes version 0.007 of App::perlmv::u (from Perl distribution App-perlmv-u), released on 2023-11-20.
 
 =head1 DESCRIPTION
 
@@ -407,12 +409,12 @@ No arguments.
 
 Returns an enveloped result (an array).
 
-First element ($status_code) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-($reason) is a string containing error message, or "OK" if status is
-200. Third element ($payload) is optional, the actual result. Fourth
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
 element (%result_meta) is called result metadata and is optional, a hash
-that contains extra information.
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -432,12 +434,12 @@ No arguments.
 
 Returns an enveloped result (an array).
 
-First element ($status_code) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-($reason) is a string containing error message, or "OK" if status is
-200. Third element ($payload) is optional, the actual result. Fourth
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
 element (%result_meta) is called result metadata and is optional, a hash
-that contains extra information.
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -499,12 +501,12 @@ For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 Returns an enveloped result (an array).
 
-First element ($status_code) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-($reason) is a string containing error message, or "OK" if status is
-200. Third element ($payload) is optional, the actual result. Fourth
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
 element (%result_meta) is called result metadata and is optional, a hash
-that contains extra information.
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -541,6 +543,8 @@ If it is also the same as the original filename, the file is not renamed.
 
 =item * B<files>* => I<array[pathname]>
 
+(No description)
+
 
 =back
 
@@ -556,12 +560,12 @@ Pass -dry_run=E<gt>1 to enable simulation mode.
 
 Returns an enveloped result (an array).
 
-First element ($status_code) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-($reason) is a string containing error message, or "OK" if status is
-200. Third element ($payload) is optional, the actual result. Fourth
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
 element (%result_meta) is called result metadata and is optional, a hash
-that contains extra information.
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -581,12 +585,12 @@ No arguments.
 
 Returns an enveloped result (an array).
 
-First element ($status_code) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-($reason) is a string containing error message, or "OK" if status is
-200. Third element ($payload) is optional, the actual result. Fourth
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
 element (%result_meta) is called result metadata and is optional, a hash
-that contains extra information.
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -608,17 +612,19 @@ Arguments ('*' denotes required arguments):
 
 =item * B<ignore_errors> => I<bool>
 
+(No description)
+
 
 =back
 
 Returns an enveloped result (an array).
 
-First element ($status_code) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-($reason) is a string containing error message, or "OK" if status is
-200. Third element ($payload) is optional, the actual result. Fourth
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
 element (%result_meta) is called result metadata and is optional, a hash
-that contains extra information.
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -630,14 +636,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-perlmv
 
 Source repository is at L<https://github.com/perlancar/perl-App-perlmv-u>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-perlmv-u>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<App::perlmv>
@@ -646,11 +644,37 @@ L<App::perlmv>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2021, 2017 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-perlmv-u>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

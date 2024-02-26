@@ -6,11 +6,10 @@ use warnings;
 
 use Test::More;
 
-plan tests => 3;
+plan tests => 2;
 
 my @module_files = (
-    'Config/Structured.pm',
-    'Config/Structured/Deserializer.pm'
+    'Config/Structured.pm'
 );
 
 

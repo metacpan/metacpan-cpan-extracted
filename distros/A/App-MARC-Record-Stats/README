@@ -1,0 +1,47 @@
+NAME
+    marc-record-stats - Tool to work with MARC::Record::Stats on MARC
+    dataset.
+
+SYNOPSIS
+     marc-record-stats [-h] [-i format] [--version] marc_file
+
+DESCRIPTION
+    It supports MARC XML files now.
+
+ARGUMENTS
+    *       "-h"
+
+            Print help.
+
+    *       "-i format"
+
+            Input MARC format.
+
+            Possible formats are:
+
+            *   xml
+
+    *       "--version"
+
+            Print version of script.
+
+    *       "marc_file"
+
+            MARC file name for statistics.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/App-MARC-Record-Stats>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2024 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

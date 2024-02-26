@@ -2,9 +2,9 @@ NAME
     Acme::CPANModules::TableData - List of modules related to TableData
 
 VERSION
-    This document describes version 0.001 of Acme::CPANModules::TableData
+    This document describes version 0.002 of Acme::CPANModules::TableData
     (from Perl distribution Acme-CPANModules-TableData), released on
-    2023-12-29.
+    2024-01-22.
 
 DESCRIPTION
     TableData is a way to package 2-dimensional table data as a Perl/CPAN
@@ -32,6 +32,14 @@ DESCRIPTION
     fsql (from App::fsql) allows you to query "TableData::*" modules (as
     well as CSV/TSV/JSON/YAML files) using SQL.
 
+    Sah schemas
+
+    Sah::Schemas::TableData
+
+    Tie
+
+    Tie::Array::TableData
+
     Miscelaneous
 
     Perinci::Sub::Gen::AccessTable accepts TableData module.
@@ -49,6 +57,10 @@ ACME::CPANMODULES ENTRIES
     App::fsql
         Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
+    Sah::Schemas::TableData
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    Tie::Array::TableData
     Perinci::Sub::Gen::AccessTable
         Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
@@ -121,7 +133,8 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2024, 2023 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

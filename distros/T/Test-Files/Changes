@@ -1,10 +1,40 @@
 Revision history for Perl extension Test::Files.
 
-0.15 Tue Dec  1 08:22:14 CET 2020
+0.23 2024-02-25
+    - Fixed list of required modules.
+
+0.22 2024-02-25
+    - Test on special devices skipped if they are not supported by the current OS or such devices do not exist.
+
+0.21 2024-02-24
+    - Test on special devices skipped if they are not supported by the current OS.
+
+0.20 2024-02-22
+    - Symlink to directory passed as argument to any function dealing with directories is now accepted.
+
+0.19 2024-02-22
+    - Implemented support of the special variable $. if it is needed in the filter function.
+
+0.18 2024-02-21
+    - Improved documentation.
+
+0.17 2024-02-21
+    - Improved documentation.
+
+0.16 2024-02-17
+    - Introduced generic approach of both files, file with string, and directories comparison.
+    - Implemented support of file comparison by size and by existence.
+    - Implemented find_ok() function.
+    - Added option STYLE for a more flexible and convenient presentation of comparison results.
+    - Applied Test::Expander in tests for more simplicity and conenience.
+
+0.15 2020-12-01
+    Tue Dec  1 08:22:14 CET 2020
     - Got rid of index built-in causing severe issues during test coverage
       determination due to a still unfixed bug in Devel::Cover.
 
-0.14 Wed Mar 28 10:14:05 CDT 2007
+0.14 2007-03-28
+    Wed Mar 28 10:14:05 CDT 2007
     - Removed use Test::More from Test::Files package, which was causing
       chatter during TODO tests that confused the harness.
       Thanks to Julien Beasley for pointing out the problem and to
@@ -13,10 +43,12 @@ Revision history for Perl extension Test::Files.
 Apologies to all CPAN users for omitting the following change entry from
 the 0.13 distribution.
 
-0.13 Wed Feb 14 09:45:54 CST 2007
+0.13 2007-02-14
+    Wed Feb 14 09:45:54 CST 2007
     - Added file_filter_ok, like the other filter functions.
 
-0.12 Wed Mar  1 16:35:30 PST 2006
+0.12 2006-03-01
+    Wed Mar  1 16:35:30 PST 2006
     Thanks to Robin Barker for help with all of the changes for this release.
     - Added solaris to the list of unix style operating systems in tests 06
       and 07.
@@ -25,7 +57,8 @@ the 0.13 distribution.
     - Corrected base_dir skip test in compare_dirs_only_ok.  A recent
       change in File::Spec invalidated the old approach.
 
-0.11  Mon Nov  7 17:01:59 CST 2005
+0.11 2005-11-07
+    Mon Nov  7 17:01:59 CST 2005
     - Added Algorithm::Diff to the prereq list in Makefile.PL (Text::Diff
       already requires it, but I wanted to make it more explicit).
     - Corrected docs to explain that compare_dirs_ok and
@@ -36,7 +69,8 @@ the 0.13 distribution.
       dir_contains_ok or dir_contains_only-ok, if they want to ensure
       that the first directory is complete.
 
-0.10  Mon Sep  5 10:57:12 CDT 2005
+0.10 2005-09-05
+    Mon Sep  5 10:57:12 CDT 2005
     - Converted to File::Spec inside the module and in the test suite.
     - Added compare_filter_ok which works like compare_dirs_filter_ok,
       but for single comparisons.
@@ -44,7 +78,8 @@ the 0.13 distribution.
       to report tables of diff output when text contents of files it is
       comparing differ.
 
-0.05  Mon Oct 20 15:13:50 CDT 2003
+0.05 2003-10-20
+    Mon Oct 20 15:13:50 CDT 2003
     - Corrected diagnostic output in compare_dirs* so that each missing file
       is listed on its own line.  Previously, they were juxtaposed on one
       line, including very pleasant #'s for decoration.
@@ -59,7 +94,8 @@ the 0.13 distribution.
     - Sorted the list of missing files in compare_dirs* so that I can test
       the error message (and the new vesion is neater).
 
-0.04  Fri Oct 17 09:14:20 CDT 2003
+0.04 2003-10-17
+    Fri Oct 17 09:14:20 CDT 2003
     - Added compare_dirs_filter_ok which works like compare_dirs_ok, but sends
       each line of input through a caller supplied filter function first.
       This allows you to remove things like timestamps which though different
@@ -70,7 +106,8 @@ the 0.13 distribution.
       on, but had no affect on the Files.pm code.
     - Improved the documentation (well I think it as in improvement)
 
-0.03  Wed Oct 15 10:02:49 CDT 2003
+0.03 2003-10-15
+    Wed Oct 15 10:02:49 CDT 2003
     - Made various refactorings to increase code reuse.
     - Changed from using Test::Differences to using Text::Diff.  This has
       two advantages:
@@ -80,9 +117,10 @@ the 0.13 distribution.
          while reporting a single error.
     - Added compare_dirs_ok which compares all files in a pair of directory,
       failing with diff diagnostics if any disagree.
-    
 
-0.02  Mon Oct 13 15:03:17 CDT 2003
+
+0.02 2003-10-13
+    Mon Oct 13 15:03:17 CDT 2003
     - Added dir_contains_ok which checks a directory for the presence of
       named files.
     - Added dir_only_contains_ok which makes sure that a directory has
@@ -92,7 +130,7 @@ the 0.13 distribution.
     - Corrected diagnostic output so it works like other Test:: modules.
       Previously, I had folded some error output into the test name
 
-0.01  Thu Oct  9 13:14:55 2003
-	- original version; created by h2xs 1.22 with options
-		-AXn Test::Files -b 5.6.0
-
+0.01 2003-10-09
+    Thu Oct  9 13:14:55 2003
+    - original version; created by h2xs 1.22 with options
+    -AXn Test::Files -b 5.6.0

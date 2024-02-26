@@ -3,9 +3,9 @@
 package TableDataBundle::Perl::CPAN::Release;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-11-26'; # DATE
+our $DATE = '2023-12-28'; # DATE
 our $DIST = 'TableDataBundle-Perl-CPAN-Release'; # DIST
-our $VERSION = '20231126.0'; # VERSION
+our $VERSION = '20231228.0'; # VERSION
 
 1;
 # ABSTRACT: Collection of TableData:: modules that contain CPAN releases data
@@ -22,7 +22,7 @@ TableDataBundle::Perl::CPAN::Release - Collection of TableData:: modules that co
 
 =head1 VERSION
 
-This document describes version 20231126.0 of TableDataBundle::Perl::CPAN::Release (from Perl distribution TableDataBundle-Perl-CPAN-Release), released on 2023-11-26.
+This document describes version 20231228.0 of TableDataBundle::Perl::CPAN::Release (from Perl distribution TableDataBundle-Perl-CPAN-Release), released on 2023-12-28.
 
 =head1 DESCRIPTION
 

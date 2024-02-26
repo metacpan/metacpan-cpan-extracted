@@ -8,9 +8,9 @@ use Log::ger;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-10-03'; # DATE
+our $DATE = '2023-11-03'; # DATE
 our $DIST = 'Business-ID-POM'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 our @EXPORT_OK = qw(parse_pom_reg_code);
 
@@ -40,7 +40,7 @@ _
     },
     examples => [
         {args=>{code=>'MD240935001200027'}},
-        {args=>{code=>'MD 224510107115'}},
+        {args=>{code=>'BPOM RI MD 224510107115'}},
         {args=>{code=>'DBL9624502804A1'}},
         {args=>{code=>'NC14191300159'}},
         {args=>{code=>'POM TR092699241'}},
@@ -59,7 +59,7 @@ sub parse_pom_reg_code {
     $code = uc($code);
     $code =~ s/[^0-9A-Z]+//g;
 
-    $code =~ s/^POM//;
+    $code =~ s/^B?POM(RI)?//;
 
     $code =~ /\A([A-Z]+)([0-9A-Z]+)\z/
         or return [400, "Invalid syntax, code needs to be letters followed by digits/letters"];
@@ -80,6 +80,7 @@ sub parse_pom_reg_code {
             $res->{food_province_code} = $3;
             $res->{food_company_code} = $4;
             $res->{food_company_product_code} = $5;
+            $res->{number_id} = "(Kode Kemasan $1) (Jenis Pangan $2) (Kode Provinsi $3) (Kode Perusahaan $5) (Nomor Urut $5)";
         } elsif (length $res->{number} == 15) {
             $res->{number} =~ /\A([0-9]{1})([0-9]{1})([0-9]{2})([0-9]{2})([0-9]{4})([0-9]{5})\z/
                 or return [400, "MD/ML number needs to be 15-digit number"];
@@ -93,6 +94,7 @@ sub parse_pom_reg_code {
             $res->{food_type_code} = $4;
             $res->{food_company_product_code} = $5;
             $res->{food_company_code} = $6;
+            $res->{number_id} = "(Kode Risiko $1 ($res->{food_risk_id})) (Kode Kemasan $2) (Kode Provinsi $3) (Jenis Pangan $4) (Nomor Urut $5) (Kode Perusahaan $6)";
         } else {
             return [400, "MD/ML number needs to be 12- or 15-digit number"];
         }
@@ -270,7 +272,7 @@ Business::ID::POM - Parse food/drug registration code published by the Indonesia
 
 =head1 VERSION
 
-This document describes version 0.005 of Business::ID::POM (from Perl distribution Business-ID-POM), released on 2023-10-03.
+This document describes version 0.006 of Business::ID::POM (from Perl distribution Business-ID-POM), released on 2023-11-03.
 
 =head1 DESCRIPTION
 
@@ -330,13 +332,14 @@ Result:
      food_risk_id              => "T - Tinggi",
      food_type_code            => 35,
      number                    => 240935001200027,
+     number_id                 => "(Kode Risiko 2 (T - Tinggi)) (Kode Kemasan 4) (Kode Provinsi 09) (Jenis Pangan 35) (Nomor Urut 0012) (Kode Perusahaan 00027)",
    },
    {},
  ]
 
 =item * Example #2:
 
- parse_pom_reg_code(code => "MD 224510107115");
+ parse_pom_reg_code(code => "BPOM RI MD 224510107115");
 
 Result:
 
@@ -353,6 +356,7 @@ Result:
      food_province_code        => 10,
      food_type_code            => 245,
      number                    => 224510107115,
+     number_id                 => "(Kode Kemasan 2) (Jenis Pangan 245) (Kode Provinsi 10) (Kode Perusahaan 115) (Nomor Urut 115)",
    },
    {},
  ]

@@ -14,7 +14,7 @@ MarpaX::ESLIF::Recognizer::Interface - MarpaX::ESLIF's recognizer interface
 
 =head1 VERSION
 
-version 6.0.29
+version 6.0.33.3
 
 =head1 DESCRIPTION
 
@@ -78,7 +78,7 @@ Absolute position tracking must be on if you plan to use one of the lastComplete
 
 =item $recognizerInterface->setRecognizer($recognizer)
 
-This method is I<not> required, and only necessary if you want to use the current recognizer instance in a callback. Recognizer callbacks all run in the interface namespace, and the current recognizer might be unknown to you if you used the L<MarpaX::ESLIF::Grammar::parse>, or ambiguous if you are sharing recognizers, using e.g. L<MarpaX::ESLIF::Recognizer::newFrom>.
+This method is I<not> required, and only necessary if you want to use the current recognizer instance in a callback. Recognizer callbacks all run in the interface namespace, and the current recognizer might be unknown to you if you used the L<MarpaX::ESLIF::Grammar|MarpaX::ESLIF::Grammar> parse method, or ambiguous if you are sharing recognizers, using e.g. L<MarpaX::ESLIF::Recognizer|MarpaX::ESLIF::Recognizer> newFrom method.
 
 If the method C<setRecognizer> exists in this interface, ESLIF will call it with a special L<MarpaX::ESLIF::Recognizer> instance, that is shallowing the current recognizer.
 
@@ -86,6 +86,24 @@ It is then advisable to do a C<getRecognizer> method to retreive the value, e:g:
 
   sub setRecognizer { my ($self, $recognizer) = @_; $self->{recognizer} = $recognizer; }
   sub getRecognizer { my ($self) = shift; $self->{recognizer} }
+
+=item $recognizerInterface->resolver($action)
+
+This method is I<not> required, and only necessary if you want to use callbacks without polluting a package stash.
+
+Recognizer callbacks to perl are are resolved this way:
+
+=over
+
+=item
+
+If the resolved method exist, it is used to get the callback for a given action C<$action>.
+
+=item
+
+If the return value of the resolver is a code reference, it is used. Else it will be assumed that the callback is available in package's stash.
+
+=back
 
 =back
 

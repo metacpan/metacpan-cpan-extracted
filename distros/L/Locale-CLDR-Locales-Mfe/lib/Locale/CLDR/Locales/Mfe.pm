@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Mfe - Package for language Morisyen
 
 package Locale::CLDR::Locales::Mfe;
 # This file auto generated from Data\common\main\mfe.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -341,34 +341,6 @@ EOT
 );
 
 
-has 'quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{“},
-);
-
-has 'quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{”},
-);
-
-has 'alternate_quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{‘},
-);
-
-has 'alternate_quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{’},
-);
-
 has 'yesstr' => (
 	is			=> 'ro',
 	isa			=> RegexpRef,
@@ -615,9 +587,14 @@ has 'currencies' => (
 				'currency' => q(liv Sainte-Hélène),
 			},
 		},
-		'SLL' => {
+		'SLE' => {
 			display_name => {
 				'currency' => q(leonn Sierra-Leone),
+			},
+		},
+		'SLL' => {
+			display_name => {
+				'currency' => q(leonn Sierra-Leone \(1964—2022\)),
 			},
 		},
 		'SOS' => {
@@ -934,7 +911,6 @@ has 'datetime_formats_available_formats' => (
 			MMdd => q{dd/MM},
 			Md => q{d/M},
 			ms => q{m:ss},
-			y => q{y},
 			yM => q{M/y},
 			yMEd => q{E d/M/y},
 			yMM => q{MM/y},
@@ -953,19 +929,6 @@ has 'datetime_formats_append_item' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			'Day' => '{0} ({2}: {1})',
-			'Day-Of-Week' => '{0} {1}',
-			'Era' => '{1} {0}',
-			'Hour' => '{0} ({2}: {1})',
-			'Minute' => '{0} ({2}: {1})',
-			'Month' => '{0} ({2}: {1})',
-			'Quarter' => '{0} ({2}: {1})',
-			'Second' => '{0} ({2}: {1})',
-			'Timezone' => '{0} {1}',
-			'Week' => '{0} ({2}: {1})',
-			'Year' => '{1} {0}',
-		},
 	} },
 );
 

@@ -1,8 +1,9 @@
 Build.PL
 lib/Locale/CLDR/Locales/Ko.pm
-lib/Locale/CLDR/Locales/Ko/Any.pm
-lib/Locale/CLDR/Locales/Ko/Any/Kp.pm
-lib/Locale/CLDR/Locales/Ko/Any/Kr.pm
+lib/Locale/CLDR/Locales/Ko/Kore.pm
+lib/Locale/CLDR/Locales/Ko/Kore/Cn.pm
+lib/Locale/CLDR/Locales/Ko/Kore/Kp.pm
+lib/Locale/CLDR/Locales/Ko/Kore/Kr.pm
 MANIFEST			This list of files
 README
 t/00-load.t

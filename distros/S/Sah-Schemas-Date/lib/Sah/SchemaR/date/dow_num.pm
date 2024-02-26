@@ -1,8 +1,8 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::date::dow_num;
 
-our $DATE = '2022-10-12'; # DATE
-our $VERSION = '0.018'; # VERSION
+our $DATE = '2023-12-09'; # DATE
+our $VERSION = '0.019'; # VERSION
 
 our $rschema = do{my$var={base=>"int",clsets_after_base=>[{description=>"\nSee also related schemas that coerce from other locales, e.g.\n<pm:Sah::Schema::date::dow_num::id> (Indonesian),\n<pm:Sah::Schema::date::dow_num::en_or_id> (English/Indonesian), etc.\n\n",examples=>[{summary=>"Empty string",valid=>0,value=>""},{summary=>"Not in 1-7",valid=>0,value=>0},{valid=>1,value=>1},{valid=>1,validated_value=>2,value=>"Tue"},{summary=>"Not a known English day-of-week name",valid=>0,value=>"foo"},{valid=>1,value=>7},{summary=>"Not in 1-7",valid=>0,value=>8}],max=>7,min=>1,summary=>"Day-of-week number (1-7, 1=Monday, like DateTime), coercible from English day-of-week name (Mo/mon/MONDAY), e.g. 1 or \"Mon\"","x.completion"=>["date_dow_num"],"x.perl.coerce_rules"=>["From_str::convert_en_dow_name_to_num"]}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["int"],type=>"int",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
@@ -21,7 +21,7 @@ Sah::SchemaR::date::dow_num - Day-of-week number (1-7, 1=Monday, like DateTime),
 
 =head1 VERSION
 
-This document describes version 0.018 of Sah::SchemaR::date::dow_num (from Perl distribution Sah-Schemas-Date), released on 2022-10-12.
+This document describes version 0.019 of Sah::SchemaR::date::dow_num (from Perl distribution Sah-Schemas-Date), released on 2023-12-09.
 
 =head1 DESCRIPTION
 
@@ -61,7 +61,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2019 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020, 2019 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

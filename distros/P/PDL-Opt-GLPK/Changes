@@ -1,0 +1,12 @@
+Revision history for PDL-Opt-GLPK
+
+0.03	2024-02-25 20:34 CET
+		Refactoring and cleanup
+
+0.02    2024-02-22 10:30 CET
+        - fixed filename length for output files
+        - add resources
+
+0.01    2024-02-21 21:23 CET
+        First version, released on an unsuspecting world.
+

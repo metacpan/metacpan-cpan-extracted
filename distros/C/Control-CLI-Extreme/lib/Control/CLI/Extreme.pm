@@ -7,7 +7,7 @@ use Carp;
 use Control::CLI qw( :all );
 
 my $Package = __PACKAGE__;
-our $VERSION = '1.10';
+our $VERSION = '1.11';
 our @ISA = qw(Control::CLI);
 our %EXPORT_TAGS = (
 		use	=> [qw(useTelnet useSsh useSerial useIPv6)],
@@ -55,7 +55,9 @@ my %LoginPatterns = ( # Patterns to check for during device login (Telnet/Serial
 	wlan9100banner	=>	'Avaya Wi-Fi Access Point',
 	xos		=>	'ExtremeXOS',
 	switchEngine	=>	'Extreme Networks Switch Engine',
-	isw		=>	'Product: ISW',
+	isw		=>	'Product: ISW ',
+	isw2		=>	'Product: ISW-4W-4WS-4X',
+	iswMarvell	=>	'Product: ISW-24W-4X',
 	slx		=>	'Welcome to the Extreme SLX-OS Software'
 );
 my %Prm = ( # Hash containing list of named parameters returned by attributes
@@ -67,6 +69,7 @@ my %Prm = ( # Hash containing list of named parameters returned by attributes
 	xirrus	=>	'WLAN9100',
 	xos	=>	'ExtremeXOS',
 	isw	=>	'ISW',
+	iswMarv	=>	'ISWmarvell',
 	s200	=>	'Series200',
 	wing	=>	'Wing',
 	slx	=>	'SLX',
@@ -134,6 +137,12 @@ my %Attribute = (
 
 	$Prm{isw}	=> [
 			'is_isw',
+			'is_isw_marvell',
+			],
+
+	$Prm{iswMarv}	=> [
+			'is_isw',
+			'is_isw_marvell',
 			],
 
 	$Prm{wing}	=> [
@@ -192,8 +201,9 @@ my %InitPrompt = ( # Initial prompt pattern expected at login
 	$Prm{sr}		=>	'\x0d? *\x0d([^\n\x0d\x0a]+?)()((?:\/[\w\d\s-]+(?: \(\d+\/\d+\))?)*)# $',
 	$Prm{trpz}		=>	'([^\n\x0d\x0a]+)[>#] $',
 	$Prm{xirrus}		=>	'(?:\x10\x00)?([^\n\x0d\x0a]+?)()(?:\((.+?)\))?# $',
-	$Prm{xos}		=>	'(?:! )?(?:\* )?(?:\([^\n\x0d\x0a\)]+\) )?([^\n\x0d\x0a]+)\.\d+ [>#] $',
+	$Prm{xos}		=>	'(?:! )?(?:\* )?(?:\([^\n\x0d\x0a\)]+\) )?([^\n\x0d\x0a]+)\.\d+ [>#=] $',
 	$Prm{isw}		=>	'([^\n\x0d\x0a]{1,50}?)()(?:\((.+?)\))?[>#] $',
+	$Prm{iswMarv}		=>	'([^\n\x0d\x0a]{1,50}?)()(?:\((.+?)\))?[>#%]$',
 	$Prm{s200}		=>	'\(([^\n\x0d\x0a\)]+)\) ()(?:\((.+?)\))?[>#]$',
 	$Prm{wing}		=>	'([^\n\x0d\x0a\)]+?)()(?:\((.+?)\))?\*?[>#]$',
 	$Prm{slx}		=>	'([^\n\x0d\x0a\)]+)()(?:\((.+?)\))?# $',
@@ -210,8 +220,9 @@ my %Prompt = ( # Prompt pattern templates; SWITCHNAME gets replaced with actual 
 	$Prm{sr}		=>	'\x0d? *\x0dSWITCHNAME((?:\/[\w\d\s-]+(?: \(\d+\/\d+\))?)*)# $',
 	$Prm{trpz}		=>	'SWITCHNAME[>#] $',
 	$Prm{xirrus}		=>	'(?:\x10\x00)?SWITCHNAME(?:\((.+?)\))?# $',
-	$Prm{xos}		=>	'(?:! )?(?:\* )?(?:\([^\n\x0d\x0a\)]+\) )?SWITCHNAME\.\d+ [>#] $',
+	$Prm{xos}		=>	'(?:! )?(?:\* )?(?:\([^\n\x0d\x0a\)]+\) )?SWITCHNAME\.\d+ [>#=] $',
 	$Prm{isw}		=>	'SWITCHNAME(?:\((.+?)\))?[>#] $',
+	$Prm{iswMarv}		=>	'SWITCHNAME(?:\((.+?)\))?[>#%]$',
 	$Prm{s200}		=>	'\(SWITCHNAME\) (?:\((.+?)\))?[>#]$',
 	$Prm{wing}		=>	'SWITCHNAME(?:\((.+?)\))?\*?[>#]$',
 	$Prm{slx}		=>	'SWITCHNAME(?:\((.+?)\))?# $',
@@ -237,6 +248,7 @@ my %MorePrompt = ( # Regular expression character like ()[]. need to be backslas
 	$Prm{xirrus}		=>	'--MORE--\x10?',
 	$Prm{xos}		=>	'\e\[7mPress <SPACE> to continue or <Q> to quit:(?:\e\[m)?',
 	$Prm{isw}		=>	'-- more --, next page: Space, continue: g, quit: \^C',
+	$Prm{iswMarv}		=>	'Press any key to continue ... \[ \'a\': show all at once, \'d\' : discard output \]',
 	$Prm{s200}		=>	'--More-- or \(q\)uit',
 	$Prm{wing}		=>	'--More-- ',
 	$Prm{slx}		=>	'(?:\e\[7m)?(?:--More--|\(END\))(?:\e\[27m)?',
@@ -259,6 +271,7 @@ my %MorePromptDelay = ( # Only when a possible more prompt can be matched as sub
 
 our %MoreSkipWithin = ( # Only on family type switches where possible, set to the character used to skip subsequent more prompts
 	$Prm{isw}		=>	'g',
+	$Prm{iswMarv}		=>	'a',
 	$Prm{wing}		=>	'r',
 );
 
@@ -350,6 +363,10 @@ our %ErrorPatterns = ( # Patterns which indicated the last command sent generate
 					. '\s+\^\n.+'
 					. '|% Incomplete command.'
 					. '|% Invalid .+'						# ISW3(config)#% interface vlan 101; ISW3(config-if-vlan)#% ip igmp snooping : % Invalid IGMP VLAN 101!
+					. '|% No such .+'						# ISW5(config)#% interface 10GigabitEthernet 1/6 : % No such interface: 10GigabitEthernet 1/6
+				. ')',
+	$Prm{iswMarv}		=>	'^('
+					. 'Syntax Error\.'
 				. ')',
 	$Prm{s200}		=>	'^('
 					. '\s+\^\n.+'
@@ -374,7 +391,31 @@ our %ErrorPatterns = ( # Patterns which indicated the last command sent generate
 					. '|: incorrect password'
 				. ')',
 );
-our $CmdConfirmPrompt = '[\(\[] *(?:[yY](?:es)? *(?:[\\\/]|or) *[nN]o?|[nN]o? *(?:[\\\/]|or) *[yY](?:es)?|y - .+?, n - .+?, <cr> - .+?) *[\)\]](?: *(?:[?:]|\? ?:) *| )$'; # Y/N prompt
+our $CmdConfirmPrompt = '(?:' # Y/N prompt
+				. '[\(\[] *(?:'
+						. '[yY](?:es)? *(?:[\\\/]|or) *[nN]o?'
+						. '|[nN]o? *(?:[\\\/]|or) *[yY](?:es)?'
+						. '|y - .+?, n - .+?, <cr> - .+'
+					. '?) *[\)\]](?: *(?:[?:]|\? ?:) *| )'
+				. '|Y - Yes, N - No: ' # ISWmarvell
+			. ')$';
+our %CmdConfirmSendY = ( # How to feed "y" to above confirmation prompt: 1 = print("y"); 0 = put("y")
+	$Prm{bstk}		=>	1,
+	$Prm{pers}		=>	1,
+	$Prm{xlr}		=>	1,
+	$Prm{sr}		=>	1,
+	$Prm{trpz}		=>	1,
+	$Prm{xirrus}		=>	1,
+	$Prm{xos}		=>	1,
+	$Prm{isw}		=>	1,
+	$Prm{iswMarv}		=>	0,
+	$Prm{s200}		=>	1,
+	$Prm{wing}		=>	1,
+	$Prm{slx}		=>	1,
+	$Prm{hive}		=>	1,
+	$Prm{ipanema}		=>	1,
+	$Prm{generic}		=>	1,
+);
 our $CmdInitiatedPrompt = '[?:=]\h*(?:\(.+?\)\h*)?$'; # Prompt for additional user info
 our $WakeConsole = "\n"; # Sequence to send when connecting to console to wake device
 
@@ -417,7 +458,6 @@ sub new {
 	my $invocant = shift;
 	my $class = ref($invocant) || $invocant;
 	my (%args, %cliArgs);
-	my $debugLevel = $Default{debug};
 	if (@_ == 1) { # Method invoked with just the connection type argument
 		$cliArgs{use} = shift;
 	}
@@ -1561,10 +1601,15 @@ sub poll_login { # Method to handle login for poll methods (used for both blocki
 							$self->debugMsg(8,"login() Detected family_type = $login->{family_type}\n");
 							$self->_setFamilyTypeAttrib($login->{family_type}, is_nncli => 0, is_xos => 1, is_switch_engine => 1);
 						}
-						elsif ($key eq 'isw') {
+						elsif ($key eq 'isw' || $key eq 'isw2') {
 							$login->{family_type} = $Prm{isw};
 							$self->debugMsg(8,"login() Detected family_type = $login->{family_type}\n");
-							$self->_setFamilyTypeAttrib($login->{family_type}, is_nncli => 1, is_isw => 1, baudrate => 115200);
+							$self->_setFamilyTypeAttrib($login->{family_type}, is_nncli => 1, is_isw => 1, is_isw_marvell => 0, baudrate => 115200);
+						}
+						elsif ($key eq 'iswMarvell') {
+							$login->{family_type} = $Prm{iswMarv};
+							$self->debugMsg(8,"login() Detected family_type = $login->{family_type}\n");
+							$self->_setFamilyTypeAttrib($login->{family_type}, is_nncli => 1, is_isw => 1, is_isw_marvell => 1, baudrate => 115200);
 						}
 						elsif ($key eq 'slx') {
 							$login->{family_type} = $Prm{slx};
@@ -1937,12 +1982,13 @@ sub poll_cmd { # Method to handle cmd for poll methods (used for both blocking &
 		}
 
 		if (length $output) { # Clean up patterns
-			$output =~ s/^(?:\x08 \x08)+//;					# Remove backspace chars following a more prompt, if any
-			$output =~ s/^\x08+ +\x08+//;     				# Remove backspace chars following a more prompt, if any (Wing and SLX)
-			$output =~ s/\x08+ +\x08+//	 if $familyType eq $Prm{hive};	# On HiveOS, these are not necessarily at the beginning of the line
-			$output =~ s/^\x0d *\x0d//	 if $familyType eq $Prm{s200};	# Remove Secure Router CR+spaces+0+CR sequence following more prompt
-			$output =~ s/^\x0d *\x00\x0d//	 if $familyType eq $Prm{sr};	# Remove Secure Router CR+spaces+0+CR sequence following more prompt
-			$output =~ s/^(?:\e\[D \e\[D)+// if $familyType eq $Prm{isw};	# Remove ISW escape sequences following more prompt
+			$output =~ s/^(?:\x08 \x08)+//;					  # Remove backspace chars following a more prompt, if any
+			$output =~ s/^\x08+ +\x08+//;     				  # Remove backspace chars following a more prompt, if any (Wing and SLX)
+			$output =~ s/\x08+ +\x08+//	 if $familyType eq $Prm{hive};	  # On HiveOS, these are not necessarily at the beginning of the line
+			$output =~ s/^\x0d *\x0d//	 if $familyType eq $Prm{s200};	  # Remove Secure Router CR+spaces+0+CR sequence following more prompt
+			$output =~ s/^\x0d *\x00\x0d//	 if $familyType eq $Prm{sr};	  # Remove Secure Router CR+spaces+0+CR sequence following more prompt
+			$output =~ s/^(?:\e\[D \e\[D)+// if $familyType eq $Prm{isw};	  # Remove ISW escape sequences following more prompt
+			$output =~ s/^\x0d\e\[K\x0d//	 if $familyType eq $Prm{iswMarv}; # Remove ISWmarvell escape sequences following more prompt
 			if ($familyType eq $Prm{slx}) {
 				$output =~ s/(?:(?:\e\[[58]D|\x0d)?\e\[K|(?:\e\[\dD|\x08)*\x0d {8}(?:\e\[\dD|\x08)*\x0d?|\x08{8} {8}\x08{8})//; # Remove SLX escape sequence following more prompt or final END prompt (Telnet/ssh | Console)
 				$output =~ s/ ?\e\[\d+;\d+H//g; # Remove SLX escape sequences on Console output of some command
@@ -2012,7 +2058,7 @@ sub poll_cmd { # Method to handle cmd for poll methods (used for both blocking &
 			}
 			$cmd->{outputNewline} = '' if $newLineLastLine; # Either way (\n gobbled or not) we clear it
 			my $char;
-			if (defined $MoreSkipWithin{$familyType} && $cmd->{more_pages} == 0) { # On ISW we have an option to skip more paging
+			if (defined $MoreSkipWithin{$familyType} && $cmd->{more_pages} == 0) { # On ISW/Wing we have an option to skip more paging
 				$char = $MoreSkipWithin{$familyType};
 				$self->debugMsg(8,"\ncmd() More prompt detected; skipping subsequent by feeding '$char'\n");
 			}
@@ -2034,8 +2080,14 @@ sub poll_cmd { # Method to handle cmd for poll methods (used for both blocking &
 				return $self->poll_return($self->error("$pkgsub: Y/N confirm prompt timeout"));
 			}
 			$self->debugMsg(8,"\ncmd() Y/N prompt detected; feeding 'Y'\n");
-			$self->print(line => 'y', errmode => 'return')
-				or return $self->poll_return($self->error("$pkgsub: Unable to confirm at Y/N prompt // ".$self->errmsg));
+			if ($CmdConfirmSendY{$familyType}) {
+				$self->print(line => 'y', errmode => 'return')
+					or return $self->poll_return($self->error("$pkgsub: Unable to confirm at Y/N prompt // ".$self->errmsg));
+			}
+			else {
+				$self->put(line => 'y', errmode => 'return')
+					or return $self->poll_return($self->error("$pkgsub: Unable to confirm at Y/N prompt // ".$self->errmsg));
+			}
 			return $self->poll_return(0) unless $self->{POLL}{blocking};
 			next CMDLOOP;
 		}
@@ -2775,6 +2827,26 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 		};
 		($attrib->{attribute} eq 'slots' || $attrib->{attribute} eq 'ports') && do {
 			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, ['do show interface * veriphy']);
+			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
+			$self->_setSlotPortHashAttrib($outref);
+			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
+			return $self->poll_return(1);
+		};
+	}
+	elsif ($familyType eq $Prm{iswMarv}) {
+		($attrib->{attribute} eq 'model' || $attrib->{attribute} eq 'sysname' || $attrib->{attribute} eq 'base_mac' ||
+		 $attrib->{attribute} eq 'sw_version')&& do {
+			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, ['show version']);
+			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
+			$$outref =~ /MAC Address     : (.+)/g && $self->_setBaseMacAttrib($1);
+			$$outref =~ /System Name     : (.+)/g && $self->_setAttrib('sysname', $1);
+			$$outref =~ /Board Type      : (.+)/g && $self->_setModelAttrib($1);
+			$$outref =~ /Software Version: V(.+)/g && $self->_setAttrib('sw_version', $1);
+			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
+			return $self->poll_return(1);
+		};
+		($attrib->{attribute} eq 'slots' || $attrib->{attribute} eq 'ports') && do {
+			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, [undef, 'show interface all status']);
 			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
 			$self->_setSlotPortHashAttrib($outref);
 			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
@@ -3617,6 +3689,12 @@ sub poll_device_more_paging { # Method to handle device_more_paging for poll met
 		return $self->poll_return($ok) unless $ok;
 		return $self->poll_return($self->error("$pkgsub: Failed to set more-paging mode")) unless $$resref;
 	}
+	elsif ($familyType eq $Prm{iswMarv}) {
+		$devMorePage->{cmdString} = $devMorePage->{enable} ? '1' : '0' unless defined $devMorePage->{cmdString};
+		my ($ok, undef, $resref) = $self->cmdConfig($pkgsub, '', "setenv pagefilter $devMorePage->{cmdString}");
+		return $self->poll_return($ok) unless $ok;
+		return $self->poll_return($self->error("$pkgsub: Failed to set more-paging mode")) unless $$resref;
+	}
 	elsif ($familyType eq $Prm{wing}) {
 		$devMorePage->{cmdString} = $devMorePage->{enable} ? '24' : '0' unless defined $devMorePage->{cmdString};
 		my ($ok, undef, $resref) = $self->cmdPrivExec($pkgsub, undef, ($self->config_context ? 'do ':'') . "terminal length $devMorePage->{cmdString}");
@@ -3840,7 +3918,7 @@ sub cmdConfig { # If nncli send command in Config mode and restore mode on exit;
 		}
 		if ($cmdConfig->{stage} < 3) { # 3rd stage
 			if ($cmdConfig->{privExec} = !$self->config_context) { # This needs to match '(config[-if])' or SecureRouter '/configure' or '(conf-if..)' SLX
-				my $configCmd = $familyType eq 'WLAN9100' || $familyType eq 'Series200' ? 'config' : 'config term';
+				my $configCmd = $familyType eq 'WLAN9100' || $familyType eq 'Series200' || $familyType eq 'ISWmarvell' ? 'config' : 'config term';
 				($ok, undef, $resref) = $self->poll_cmd($pkgsub, $configCmd);
 				return $ok unless $ok;
 				return ($ok, '', $resref) unless $$resref; # Never return undef output with true $ok
@@ -3856,7 +3934,8 @@ sub cmdConfig { # If nncli send command in Config mode and restore mode on exit;
 		}
 		if ($cmdConfig->{stage} < 5) { # 5th stage
 			if ($cmdConfig->{privExec}) {
-				$ok = $self->poll_cmd($pkgsub, 'end'); # We don't bother getting $resref here...
+				my $exitConfigCmd = $familyType eq 'ISWmarvell' ? 'exit' : 'end';
+				$ok = $self->poll_cmd($pkgsub, $exitConfigCmd); # We don't bother getting $resref here...
 				return $ok unless $ok;
 				# ... because even if $$resref was false, we want to fall through
 			}
@@ -4069,9 +4148,9 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'do show version | include ISW'); # Must add do, as we may be in config mode
 		return $ok unless $ok;
 		$discDevice->{stage}++; # Move to next stage on next cycle
-		if ($$outref =~ /^(Product   |Board Type)       : (.+)(?:, PoE Switch)?/m) {
+		if ($$outref =~ /^(?:Product   |Board Type)       : (.+)(?:, PoE Switch)?/m) {
 			my $model = $1;
-			$self->_setFamilyTypeAttrib($Prm{isw}, is_nncli => 1, is_isw => 1, baudrate => 115200);
+			$self->_setFamilyTypeAttrib($Prm{isw}, is_nncli => 1, is_isw => 1, is_isw_marvell => 0, baudrate => 115200);
 			$self->_setModelAttrib($model);
 			$self->{LASTPROMPT} =~ /$InitPrompt{$Prm{isw}}/;
 			$self->_setDevicePrompts($Prm{isw}, $1);
@@ -4079,6 +4158,18 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 		}
 	}
 	if ($discDevice->{stage} < 8) { # Next stage
+		# ISWmarvell detection command
+		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'show env');
+		return $ok unless $ok;
+		$discDevice->{stage}++; # Move to next stage on next cycle
+		if ($$outref =~ /^Page Filter Enabled\t\t: (?:enable|disable)/m) {
+			$self->_setFamilyTypeAttrib($Prm{iswMarv}, is_nncli => 1, is_isw => 1, is_isw_marvell => 1, baudrate => 115200);
+			$self->{LASTPROMPT} =~ /$InitPrompt{$Prm{iswMarv}}/;
+			$self->_setDevicePrompts($Prm{iswMarv}, $1);
+			return (1, $Prm{iswMarv});
+		}
+	}
+	if ($discDevice->{stage} < 9) { # Next stage
 		# Wing detection command
 		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'show version | include version|Extreme|MAC|uptime');
 		return $ok unless $ok;
@@ -4094,12 +4185,12 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 			return (1, $Prm{wing});
 		}
 	}
-	if ($discDevice->{stage} < 9) { # Next stage
+	if ($discDevice->{stage} < 10) { # Next stage
 		# HiveOS detection command
 		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'show version');
 		return $ok unless $ok;
 		$discDevice->{stage}++; # Move to next stage on next cycle
-		if ($$outref =~ /^Version:            HiveOS (\S+) build-\d+/m) {
+		if ($$outref =~ /^Version:            HiveOS (\S+) build-/m) {
 			$self->_setFamilyTypeAttrib($Prm{hive}, is_nncli => 0, is_hiveos => 1, baudrate => 9600, sw_version => $1);
 			$self->_setModelAttrib($1) if $$outref =~ /^Platform:\s+(\S+)/m;
 			$self->_setAttrib('fw_version', $1) if $$outref =~ /^Bootloader ver:     v(\S+)/m;
@@ -4108,7 +4199,7 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 			return (1, $Prm{hive});
 		}
 	}
-	if ($discDevice->{stage} < 10) { # Next stage
+	if ($discDevice->{stage} < 11) { # Next stage
 		# Ipanema detection command
 		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'ipconfig -d');
 		return $ok unless $ok;
@@ -4121,7 +4212,7 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 			return (1, $Prm{ipanema});
 		}
 	}
-	if ($discDevice->{stage} < 11) { # Next stage
+	if ($discDevice->{stage} < 12) { # Next stage
 		# Series200 detection command
 		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'show slot');
 		return $ok unless $ok;
@@ -4135,7 +4226,7 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 			return (1, $Prm{s200});
 		}
 	}
-	if ($discDevice->{stage} < 12) { # Next stage
+	if ($discDevice->{stage} < 13) { # Next stage
 		# PassportERS-cli detection command
 		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'show bootconfig info');
 		return $ok unless $ok;
@@ -4149,7 +4240,7 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 			return (1, $Prm{pers});
 		}
 	}
-	if ($discDevice->{stage} < 13) { # Next stage
+	if ($discDevice->{stage} < 14) { # Next stage
 		# WLAN 9100 detection command
 		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'show contact-info');
 		return $ok unless $ok;
@@ -4163,7 +4254,7 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 			return (1, $Prm{xirrus});
 		}
 	}
-	if ($discDevice->{stage} < 14) { # Next stage
+	if ($discDevice->{stage} < 15) { # Next stage
 		# Secure Router detection command
 		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'show chassis');
 		return $ok unless $ok;
@@ -4177,7 +4268,7 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 			return (1, $Prm{sr});
 		}
 	}
-	if ($discDevice->{stage} < 15) { # Next stage
+	if ($discDevice->{stage} < 16) { # Next stage
 		# WLAN 2300 detection command
 		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'show system');
 		return $ok unless $ok;
@@ -4193,7 +4284,7 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 			return (1, $Prm{trpz});
 		}
 	}
-	if ($discDevice->{stage} < 16) { # Next stage
+	if ($discDevice->{stage} < 17) { # Next stage
 		# Accelar detection command
 		my ($ok, $outref) = $self->poll_cmd($pkgsub, 'show sys perf');
 		return $ok unless $ok;
@@ -4350,7 +4441,7 @@ sub _setSlotPortHashAttrib { # Set the Slot & Port attributes where the port att
 	# Get current attribute if partly stored
 	@slots = @{$self->{$Package}{ATTRIB}{'slots'}} if $self->{$Package}{ATTRIBFLAG}{'slots'};
 	%ports = %{$self->{$Package}{ATTRIB}{'ports'}} if $self->{$Package}{ATTRIBFLAG}{'ports'};
-	while ($$outref =~ /^(FastEthernet|(?:\d+)?GigabitEthernet) (\d\/\d{1,2})/mg) {
+	while ($$outref =~ /^ ?(FastEthernet|(?:\d+)?GigabitEthernet) ((?:\d\/)?\d{1,2})/mg) {
 		if (!defined $currentHash || $1 ne $currentHash) { # New hash
 			$currentHash = $1;
 			push(@slots, $currentHash) unless grep {$_ eq $currentHash} @slots;
@@ -4395,7 +4486,7 @@ sub _setModelAttrib { # Set & re-format the Model attribute
 		# Try and reformat the model number into something like WAP-9132
 		$model =~ s/(\D+)(\d+)/$1-$2/;		# From show chassis
 	}
-	elsif ($self->{$Package}{ATTRIB}{'family_type'} eq $Prm{isw}) {
+	elsif ($self->{$Package}{ATTRIB}{'family_type'} eq $Prm{isw} || $self->{$Package}{ATTRIB}{'family_type'} eq $Prm{iswMarv}) {
 		# Try and reformat the model number into something like ISW_8-10/100P_4-SFP
 		$model =~ s/, (?:PoE )?Switch$//;
 		$model =~ s/ /_/g;		# From: ISW 8-10/100P, 4-SFP
@@ -4696,7 +4787,7 @@ XOS Summit switches
 
 =item *
 
-Universal Hardware (FabricEngine & SwitchEngine) 5320, 5420, 5520, 5720, 7520, 7720
+Universal Hardware (FabricEngine & SwitchEngine) 4120, 4220, 5320, 5420, 5520, 5720, 7520, 7720, 7520, 7720
 
 =item *
 
@@ -5567,7 +5658,11 @@ B<PassportERS> : Any of Passport/ERS-1600, Passport/ERS-8x00, VOSS VSPs (VSP-900
 
 =item *
 
-B<ISW> : ISW industrial switches
+B<ISW> : ISW industrial switches (not using Marvell chipset)
+
+=item *
+
+B<ISWmarvell> : ISW industrial switches using Marvell chipset
 
 =item *
 
@@ -5627,7 +5722,7 @@ I<base_mac>: Base MAC address of the device in string format xx-xx-xx-xx-xx-xx. 
 =item *
 
 I<is_acli>: Flag; true(1) for Cisco like acli mode which has PrivExec & Config modes; false(0) otherwise.
-So for family types B<BaystackERS>, B<SecureRouter>, B<WLAN2300>, B<WLAN9100>, B<ISW>, B<Wing>, B<Series200>, B<SLX> and B<PassportERS> (the latter in acli mode) this flag is true.
+So for family types B<BaystackERS>, B<SecureRouter>, B<WLAN2300>, B<WLAN9100>, B<ISW>, B<ISWmarvell>, B<Wing>, B<Series200>, B<SLX> and B<PassportERS> (the latter in acli mode) this flag is true.
 Whereas for family types B<ExtremeXOS>, B<Accelar>, B<generic> and B<PassportERS> (the latter in cli mode) this flag is false.
 
 =item *
@@ -5839,13 +5934,17 @@ I<is_oob_connected>: Flag; true(1) if the connection to the device is to the oob
 
 
 
-Attributes which only apply to B<ISW> family type:
+Attributes which only apply to B<ISW> and B<ISWmarvell> family types:
 
 =over 4
 
 =item *
 
 I<is_isw>: Flag; true(1) if the device is an ISW industrial switch; false(0) otherwise.
+
+=item *
+
+I<is_isw_marvell>: Flag; true(1) if the device is an ISW industrial switch using Marvell ASIC (currently only the ISW-24W-4X); false(0) otherwise.
 
 =back
 
@@ -7076,7 +7175,7 @@ L<http://search.cpan.org/dist/Control-CLI-Extreme/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2023 Ludovico Stevens.
+Copyright 2024 Ludovico Stevens.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

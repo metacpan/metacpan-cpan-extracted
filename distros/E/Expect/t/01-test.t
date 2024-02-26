@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 14;
+use Test::More tests => 15;
 use File::Temp qw(tempdir);
 use Expect;
 use Config;
@@ -11,6 +11,7 @@ use Config;
 
 my $tempdir = tempdir( CLEANUP => 1 );
 my $Perl = $^X;
+
 
 subtest perl => sub {
 	diag "Basic tests...";
@@ -444,6 +445,13 @@ subtest respawn => sub {
     like $@, qr/^Cannot reuse an object with an already spawned command/;
 };
 
+subtest "regexp ref" => sub {
+	plan tests => 1;
+
+	my $exp = Expect->spawn("$Perl -v");
+	$exp->log_user(0);
+	is( $exp->expect( 10, qr/L.*[WH]all/ ), 1 );
+  };
 
 use Test::Builder;
 my $Test = Test::Builder->new;

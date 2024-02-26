@@ -19,7 +19,7 @@ name: Tie-Array-TableData
 provides:
   Tie::Array::TableData:
     file: lib/Tie/Array/TableData.pm
-    version: '0.001'
+    version: '0.003'
 requires:
   Module::Load::Util: '0.009'
   Role::Tiny: '0'
@@ -30,7 +30,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Tie-Array-TableData
   homepage: https://metacpan.org/release/Tie-Array-TableData
   repository: git://github.com/perlancar/perl-Tie-Array-TableData.git
-version: '0.001'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.038002'

@@ -1,7 +1,7 @@
 Build.PL
 lib/Locale/CLDR/Locales/Mai.pm
-lib/Locale/CLDR/Locales/Mai/Any.pm
-lib/Locale/CLDR/Locales/Mai/Any/In.pm
+lib/Locale/CLDR/Locales/Mai/Deva.pm
+lib/Locale/CLDR/Locales/Mai/Deva/In.pm
 MANIFEST			This list of files
 README
 t/00-load.t

@@ -2,9 +2,9 @@
 package Log::ger::Format;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-10-29'; # DATE
+our $DATE = '2023-12-29'; # DATE
 our $DIST = 'Log-ger'; # DIST
-our $VERSION = '0.041'; # VERSION
+our $VERSION = '0.042'; # VERSION
 
 use parent qw(Log::ger::Plugin);
 
@@ -25,7 +25,7 @@ Log::ger::Format - Use a format plugin
 
 =head1 VERSION
 
-version 0.041
+version 0.042
 
 =head1 SYNOPSIS
 

@@ -11,14 +11,27 @@ package Spreadsheet::Edit::Log;
 
 # Allow "use <thismodule. VERSION ..." in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
-our $VERSION = '1000.013'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-01-23'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1000.014'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2024-02-18'; # DATE from Dist::Zilla::Plugin::OurDate
 
 use Carp;
 
 use Exporter 5.57 ();
 our @EXPORT = qw/fmt_call log_call fmt_methcall log_methcall
                  nearest_call abbrev_call_fn_ln_subname/;
+
+my %backup_defaults = (
+  logdest         => \*STDERR,
+  is_public_api   => sub{ $_[1][3] =~ /(?:::|^)[a-z][^:]*$/ },
+
+  #fmt_object      => sub{ addrvis($_[1]) },
+  # Just show the address, sans class::name.  Note addrvis now wraps it in <...>
+  fmt_object      => sub{ addrvis(refaddr($_[1])) },
+);
+
+sub set_logdest(*) {
+  $backup_defaults{logdest} = $_[0];
+}
 
 my $default_pfx = '$lno';
 
@@ -63,7 +76,8 @@ sub _btwTN($$@) {
   if (ref($N) eq "") {
     foreach (2..$N) { $pfx .= "«" }
   }
-  print STDERR "${pfx}: $_\n";
+  my $fh = $backup_defaults{logdest};
+  print $fh "${pfx}: $_\n";
 }
 
 sub _genbtw_funcs($$) {
@@ -110,10 +124,10 @@ sub import {
   goto &Exporter::import
 }
 
-our @EXPORT_OK = qw/btw btwN oops/;
+our @EXPORT_OK = qw/btw btwN oops set_logdest/;
 
 
-use Scalar::Util qw/reftype refaddr blessed weaken/;
+use Scalar::Util qw/reftype refaddr blessed weaken openhandle/;
 use List::Util qw/first any all/;
 use File::Basename qw/dirname basename/;
 
@@ -129,19 +143,12 @@ sub oops(@) {
     @_=($pfx, @_);
   }
   push @_,"\n" unless $_[-1] =~ /\R\z/;
+  STDOUT->flush if openhandle(*STDOUT);
+  STDERR->flush if openhandle(*STDERR);
   goto &Carp::confess
 }
 
 use Data::Dumper::Interp qw/dvis vis visq avis hvis visnew addrvis u/;
-
-my %backup_defaults = (
-  logdest         => \*STDERR,
-  is_public_api   => sub{ $_[1][3] =~ /(?:::|^)[a-z][^:]*$/ },
-
-  #fmt_object      => sub{ addrvis($_[1]) },
-  # Just show the address, sans class::name.  Note addrvis now wraps it in <...>
-  fmt_object      => sub{ addrvis(refaddr($_[1])) },
-);
 
 # Return ref to hash of effective options (READ-ONLY).
 # If the first argument is a hashref it is shifted off and
@@ -378,7 +385,7 @@ The "public" function/method name shown is not necessarily the immediate caller 
 Prints the result of calling C<fmt_call> with the same arguments.
 
 The message is written to STDERR unless
-C<< logdest => FILEHANDLE >> is included in I<OPTIONS>.
+C<< logdest => FILEHANDLE >> is included in I<OPTIONS> or C<set_logdest()> is called.
 
 =head2 $msgstring = fmt_call {OPTIONS}, [INPUTS], [RESULTS]
 
@@ -509,7 +516,8 @@ overridden by C<{OPTIONS}> passed in individual calls).
 
 These print internal debug messages (not related to the log functions above).
 
-C<btw> prints a message to STDERR preceeded by "linenum:"
+C<btw> prints a message to STDERR (or as specified via C<set_logdest>)
+preceeded by "linenum:"
 giving the line number I<of the call to btw>.
 A newline is appended to the message unless the last STRING already
 ends with a newline.
@@ -540,6 +548,11 @@ Prepends "\n<your package name> oops:\n" to the message and then
 chains to Carp::confess for backtrace and death.
 
 Not exported by default.
+
+=head2 set_logdest($filehandle or *FILEHANDLE)
+
+Sets the filehandle (STDERR by default) for log messages and
+output from btw*.
 
 =head1 SEE ALSO
 

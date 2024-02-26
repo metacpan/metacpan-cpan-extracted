@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ak - Package for language Akan
 
 package Locale::CLDR::Locales::Ak;
 # This file auto generated from Data\common\main\ak.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -622,7 +622,6 @@ has 'characters' => (
 			auxiliary => qr{[c j q v z]},
 			index => ['A', 'B', 'C', 'D', 'E', 'Ɛ', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'Ɔ', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
 			main => qr{[a b d e ɛ f g h i k l m n o ɔ p r s t u w y]},
-			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -631,34 +630,6 @@ EOT
 },
 );
 
-
-has 'quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{“},
-);
-
-has 'quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{”},
-);
-
-has 'alternate_quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{‘},
-);
-
-has 'alternate_quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{’},
-);
 
 has 'yesstr' => (
 	is			=> 'ro',
@@ -672,18 +643,6 @@ has 'nostr' => (
 	isa			=> RegexpRef,
 	init_arg	=> undef,
 	default		=> sub { qr'^(?i:Daabi|D|no|n)$' }
-);
-
-has 'number_symbols' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'latn' => {
-			'decimal' => q(.),
-			'group' => q(,),
-		},
-	} }
 );
 
 has 'number_currency_formats' => (
@@ -924,9 +883,14 @@ has 'currencies' => (
 				'currency' => q(St Helena Pɔn),
 			},
 		},
-		'SLL' => {
+		'SLE' => {
 			display_name => {
 				'currency' => q(Leone),
+			},
+		},
+		'SLL' => {
+			display_name => {
+				'currency' => q(Leone \(1964—2022\)),
 			},
 		},
 		'SOS' => {
@@ -1100,10 +1064,6 @@ has 'day_periods' => (
 					'am' => q{AN},
 					'pm' => q{EW},
 				},
-				'wide' => {
-					'am' => q{AN},
-					'pm' => q{EW},
-				},
 			},
 		},
 	} },
@@ -1157,10 +1117,10 @@ has 'time_formats' => (
 		'generic' => {
 		},
 		'gregorian' => {
-			'full' => q{h:mm:ss a zzzz},
-			'long' => q{h:mm:ss a z},
-			'medium' => q{h:mm:ss a},
-			'short' => q{h:mm a},
+			'full' => q{h:mm:ss a zzzz},
+			'long' => q{h:mm:ss a z},
+			'medium' => q{h:mm:ss a},
+			'short' => q{h:mm a},
 		},
 	} },
 );
@@ -1183,19 +1143,11 @@ has 'datetime_formats_available_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
 			MEd => q{E, M/d},
-			MMM => q{LLL},
 			MMMEd => q{E, MMM d},
 			MMMMEd => q{E, MMMM d},
-			MMMMd => q{MMMM d},
-			MMMd => q{MMM d},
 			Md => q{M/d},
-			d => q{d},
-			hm => q{h:mm a},
-			ms => q{mm:ss},
+			hm => q{h:mm a},
 			y => q{y},
 			yM => q{M/y},
 			yMEd => q{E, M/d/y},
@@ -1207,20 +1159,11 @@ has 'datetime_formats_available_formats' => (
 			yQQQQ => q{QQQQ y},
 		},
 		'gregorian' => {
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
 			MEd => q{E, M/d},
-			MMM => q{LLL},
 			MMMEd => q{E, MMM d},
 			MMMMEd => q{E, MMMM d},
-			MMMMd => q{MMMM d},
-			MMMd => q{MMM d},
 			Md => q{M/d},
-			d => q{d},
-			hm => q{h:mm a},
-			ms => q{mm:ss},
-			y => q{y},
+			hm => q{h:mm a},
 			yM => q{M/y},
 			yMEd => q{E, M/d/y},
 			yMMM => q{MMM y},

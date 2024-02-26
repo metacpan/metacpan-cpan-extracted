@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.014;
 
-our $VERSION = '5.04';
+our $VERSION = '5.05';
 
 use utf8;
 use DateTime;
@@ -584,14 +584,14 @@ B<hafas-m> [B<-s> I<service>] [B<-l> I<language>] B<!>I<query>|I<journeyID>
 
 =head1 VERSION
 
-version 5.04
+version 5.05
 
 =head1 DESCRIPTION
 
-hafas-m is an interface to HAFAS arrival/departure monitors such as the one
-available at L<https://reiseauskunft.bahn.de//bin/bhftafel.exe/dn>.
+hafas-m is an interface to HAFAS public transport services such as the one
+operated by Deutsche Bahn.
 
-It has three operating modes that depend on the contents of its argument.
+It has four operating modes that depend on the contents of its argument.
 
 =head2 Arrival/Departure Monitor (I<station>)
 
@@ -619,7 +619,7 @@ codes. Output format:
 Occupancy indicators are, from least occupied to fully booked: B<.> B<o>
 B<*> B<!>.
 
-=head2 Location Search (B<!>I<query>|I<lat>B<:>I<lon>)
+=head2 Location Search (B<?>I<query>|I<lat>B<:>I<lon>)
 
 List stations that match I<query> or that are located in the vicinity of
 I<lat>B<:>I<lon> geocoordinates with EVA ID and name.

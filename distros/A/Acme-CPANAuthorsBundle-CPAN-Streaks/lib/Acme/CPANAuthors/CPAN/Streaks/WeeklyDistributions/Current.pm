@@ -4,24 +4,19 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-02-01'; # DATE
+our $DATE = '2024-02-21'; # DATE
 our $DIST = 'Acme-CPANAuthorsBundle-CPAN-Streaks'; # DIST
-our $VERSION = '20240201.0'; # VERSION
+our $VERSION = '20240221.0'; # VERSION
 
 use Acme::CPANAuthors::Register (
     'PERLANCAR' => '',
-    'LEONT' => '',
-    'ARISTOTLE' => '',
-    'GENE' => '',
-    'MSIMERSON' => '',
-    'OLEG' => '',
-    'SANKO' => '',
+    'BRIANDFOY' => '',
     'SKIM' => '',
-    'XMOLEX' => '',
-    'ABALAMA' => '',
-    'ATRODO' => '',
-    'DERIV' => '',
-    'NHORNE' => '',
+    'ASB' => '',
+    'JANW' => '',
+    'RAWLEYFOW' => '',
+    'ZMUGHAL' => '',
+    'TYRRMINAL' => '',
 );
 
 
@@ -40,30 +35,25 @@ Acme::CPANAuthors::CPAN::Streaks::WeeklyDistributions::Current - Authors with on
 
 =head1 VERSION
 
-This document describes version 20240201.0 of Acme::CPANAuthors::CPAN::Streaks::WeeklyDistributions::Current (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-02-01.
+This document describes version 20240221.0 of Acme::CPANAuthors::CPAN::Streaks::WeeklyDistributions::Current (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-02-21.
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-Current standings (as of 2024-02-01, produced by L<cpan-streaks>):
+Current standings (as of 2024-02-21, produced by L<cpan-streaks>):
 
   +-----------+-----+------------+-------------+
   | author    | len | start_date | status      |
   +-----------+-----+------------+-------------+
-  | PERLANCAR | 493 | 2014-08-24 | ongoing     |
-  | LEONT     |   2 | 2024-01-21 | ongoing     |
-  | ARISTOTLE |   1 | 2024-01-21 | might-break |
-  | GENE      |   1 | 2024-01-21 | might-break |
-  | MSIMERSON |   1 | 2024-01-21 | might-break |
-  | OLEG      |   1 | 2024-01-21 | might-break |
-  | SANKO     |   1 | 2024-01-21 | might-break |
-  | SKIM      |   1 | 2024-01-21 | might-break |
-  | XMOLEX    |   1 | 2024-01-21 | might-break |
-  | ABALAMA   |   1 | 2024-01-28 | ongoing     |
-  | ATRODO    |   1 | 2024-01-28 | ongoing     |
-  | DERIV     |   1 | 2024-01-28 | ongoing     |
-  | NHORNE    |   1 | 2024-01-28 | ongoing     |
+  | PERLANCAR | 496 | 2014-08-24 | ongoing     |
+  | BRIANDFOY |   2 | 2024-02-04 | might-break |
+  | SKIM      |   2 | 2024-02-04 | might-break |
+  | ASB       |   1 | 2024-02-11 | might-break |
+  | JANW      |   1 | 2024-02-11 | might-break |
+  | RAWLEYFOW |   1 | 2024-02-11 | might-break |
+  | ZMUGHAL   |   1 | 2024-02-11 | might-break |
+  | TYRRMINAL |   1 | 2024-02-18 | ongoing     |
   +-----------+-----+------------+-------------+
 
 =head1 HOMEPAGE

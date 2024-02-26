@@ -1,8 +1,8 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::date::month_num;
 
-our $DATE = '2022-10-12'; # DATE
-our $VERSION = '0.018'; # VERSION
+our $DATE = '2023-12-09'; # DATE
+our $VERSION = '0.019'; # VERSION
 
 our $rschema = do{my$var={base=>"int",clsets_after_base=>[{description=>"\nSee also related schemas that coerce from other locales, e.g.\n<pm:Sah::Schema::date::month_num::id> (Indonesian),\n<pm:Sah::Schema::date::month_num::en_or_id> (English/Indonesian), etc.\n\n",examples=>[{summary=>"Empty string",valid=>0,value=>""},{summary=>"Not between 1-12",valid=>0,value=>0},{valid=>1,value=>1},{valid=>1,validated_value=>6,value=>"JUN"},{valid=>1,value=>12},{summary=>"Not between 1-12",valid=>0,value=>13}],max=>12,min=>1,summary=>"Month number, coercible from English month names (Dec/DECEMBER), e.g. 2 or \"Feb\"","x.completion"=>["date_month_num"],"x.perl.coerce_rules"=>["From_str::convert_en_month_name_to_num"]}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["int"],type=>"int",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
@@ -21,7 +21,7 @@ Sah::SchemaR::date::month_num - Month number, coercible from English month names
 
 =head1 VERSION
 
-This document describes version 0.018 of Sah::SchemaR::date::month_num (from Perl distribution Sah-Schemas-Date), released on 2022-10-12.
+This document describes version 0.019 of Sah::SchemaR::date::month_num (from Perl distribution Sah-Schemas-Date), released on 2023-12-09.
 
 =head1 DESCRIPTION
 
@@ -61,7 +61,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2019 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020, 2019 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

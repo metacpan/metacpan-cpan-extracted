@@ -8,9 +8,9 @@ use Exporter qw(import);
 use File::chdir;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-05'; # DATE
+our $DATE = '2024-01-06'; # DATE
 our $DIST = 'App-ThisDist'; # DIST
-our $VERSION = '0.022'; # VERSION
+our $VERSION = '0.023'; # VERSION
 
 our @EXPORT_OK = qw(this_dist this_mod);
 
@@ -226,6 +226,7 @@ sub this_dist {
         $detailinfo->{dist_version} = $distver;
         $detailinfo;
     } else {
+        return unless defined $distname;
         $extract_version ? "$distname ".(defined $distver ? $distver : "?") : $distname;
     }
 }
@@ -258,7 +259,7 @@ App::ThisDist - Print Perl {distribution,module,author,...} associated with curr
 
 =head1 VERSION
 
-This document describes version 0.022 of App::ThisDist (from Perl distribution App-ThisDist), released on 2024-01-05.
+This document describes version 0.023 of App::ThisDist (from Perl distribution App-ThisDist), released on 2024-01-06.
 
 =head1 DESCRIPTION
 

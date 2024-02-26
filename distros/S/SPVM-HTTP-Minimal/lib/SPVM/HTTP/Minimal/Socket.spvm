@@ -183,8 +183,12 @@ class HTTP::Minimal::Socket {
     }
     
     $response->{protocol} = $protocol;
-    $response->{status} = $status;
+    $response->{status} = Fn->to_int($status);
     $response->{reason} = $reason;
+    
+    if ($status && $status->[0] == '2') {
+      $response->{success} = 1;
+    }
   }
   
   private method read_response_headers : HTTP::Minimal::Headers ($response : HTTP::Minimal::Message::Response) {

@@ -1,0 +1,8 @@
+0.002   2024-01-23  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename module/dist SortKey::Num::{by_,}length.
+
+
+0.001   2024-01-23  Released-By: PERLANCAR
+
+        - First release.

@@ -139,3 +139,5 @@ sub compare_files {
 	close FILEB;
 	return $a eq $b
 }
+
+

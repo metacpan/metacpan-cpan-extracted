@@ -1,5 +1,8 @@
 Revision history for Perl extension Net::IRR.
 
+0.10 Feb 22 2024
+  - Bugfix: infinite loop if socket is disconnected
+
 0.08 Mar 30 2010
   - Changed dependency from Net::TCP to IO::Socket::INET.
 

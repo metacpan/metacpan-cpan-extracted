@@ -2,7 +2,7 @@ package CPAN::Changes::HasEntries;
 use strict;
 use warnings;
 
-our $VERSION = '0.500002';
+our $VERSION = '0.500003';
 $VERSION =~ tr/_//d;
 
 use Sub::Quote qw(qsub);
@@ -88,3 +88,6 @@ sub remove_entry {
 
 require CPAN::Changes::Entry;
 1;
+__END__
+
+=for Pod::Coverage .*

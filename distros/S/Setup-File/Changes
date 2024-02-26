@@ -1,4 +1,9 @@
-0.23    2017-07-10 (PERLANCAR)
+0.240   2023-11-21  Released-By: PERLANCAR; Urgency: medium
+
+        - Update module name: File::MoreUtil -> File::Util::Test.
+
+
+0.23    2017-07-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -7,7 +12,7 @@
 	- Replace Log::Any with Log::ger.
 
 
-0.22    2015-09-04 (PERLANCAR)
+0.22    2015-09-04  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -16,14 +21,14 @@
 	  requirement.
 
 
-0.21    2015-08-18 (PERLANCAR)
+0.21    2015-08-18  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Switch from Log::Any to Log::Any::IfLOG.
 
 
-0.20    2014-12-05 (PERLANCAR)
+0.20    2014-12-05  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -31,34 +36,34 @@
 	  File::MoreUtil.
 
 
-0.19    2014-05-02 (SHARYANTO)
+0.19    2014-05-02  Released-By: SHARYANTO
 
         - No functional changes.
 
         - Remove use of autodie to avoid failure reports [CT].
 
 
-0.18    2014-05-02 (SHARYANTO)
+0.18    2014-05-02  Released-By: SHARYANTO
 
         - No functional changes.
 
         - Make tests pass again by requiring fixed Perinci::Tx::Manager 0.49.
 
 
-0.17    2012-09-04 (SHARYANTO)
+0.17    2012-09-04  Released-By: SHARYANTO
 
         - Adjust to Rinci 1.1.29 and Perinci::Tx::Manager 0.40 (descriptive
           check_state result message and dry-run message).
 
 
-0.16    2012-08-31 (SHARYANTO)
+0.16    2012-08-31  Released-By: SHARYANTO
 
         - mkfile() creates file with mode 0644 instead of default umask. mkdir()
           creates dir with mode 0755 instead of default umask. This is more
           predictable and uniform across systems.
 
 
-0.15    2012-08-29 (SHARYANTO)
+0.15    2012-08-29  Released-By: SHARYANTO
 
         [ENHANCEMENTS]
 
@@ -73,13 +78,13 @@
           put fully-qualified function names to the actions).
 
 
-0.14    2012-03-28 (SHARYANTO)
+0.14    2012-03-28  Released-By: SHARYANTO
 
         - No functional changes. Split specification to Setup dist. Split
           Test::Setup to its own dist.
 
 
-0.13    2012-03-28 (SHARYANTO)
+0.13    2012-03-28  Released-By: SHARYANTO
 
         - Refactor: create Test::Setup to reduce repetition when testing setup
           functions (testing dry-run, do, undo, redo, ...). Convert all test
@@ -93,12 +98,12 @@
         - build: Replace PodWeaver SubSpec plugin with Perinci.
 
 
-0.12    2012-03-02 (SHARYANTO)
+0.12    2012-03-02  Released-By: SHARYANTO
 
         - No functional changes. Change references to Sub::Spec now to Rinci.
 
 
-0.11    2012-01-26 (SHARYANTO)
+0.11    2012-01-26  Released-By: SHARYANTO
 
         - A small fix: make it clear that gen_content_code and
           check_content_code work with *reference* to content (but
@@ -106,22 +111,22 @@
           [undocumented], for flexibility).
 
 
-0.10    2011-12-29 (SHARYANTO)
+0.10    2011-12-29  Released-By: SHARYANTO
 
         - No functional changes. Update/small fixes to documentation.
 
 
-0.09    2011-05-18 (SHARYANTO)
+0.09    2011-05-18  Released-By: SHARYANTO
 
         - No functional changes. Tweak log messages.
 
 
-0.08    2011-05-18 (SHARYANTO)
+0.08    2011-05-18  Released-By: SHARYANTO
 
         - No functional changes. Changed logging levels.
 
 
-0.07    2011-05-18 (SHARYANTO)
+0.07    2011-05-18  Released-By: SHARYANTO
 
         [ENHANCEMENTS]
 
@@ -129,12 +134,12 @@
           gen_content_code/check_content_code).
 
 
-0.06    2011-05-17 (SHARYANTO)
+0.06    2011-05-17  Released-By: SHARYANTO
 
         - No functional changes. POD touches/fixes, improve error message.
 
 
-0.05    2011-04-28 (SHARYANTO)
+0.05    2011-04-28  Released-By: SHARYANTO
 
         [INCOMPATIBLE CHANGES]
 
@@ -150,7 +155,7 @@
         - Some fixes.
 
 
-0.04    2011-04-27 (SHARYANTO)
+0.04    2011-04-27  Released-By: SHARYANTO
 
         [ENHANCEMENTS]
 
@@ -160,7 +165,7 @@
           changed.
 
 
-0.03    2011-04-21 (SHARYANTO)
+0.03    2011-04-21  Released-By: SHARYANTO
 
         - No functional changes.
 
@@ -169,7 +174,7 @@
         - Rename module Setup::Dir -> Setup::File::Dir.
 
 
-0.02    2011-04-18 (SHARYANTO)
+0.02    2011-04-18  Released-By: SHARYANTO
 
         [BUG FIXES]
 
@@ -180,6 +185,6 @@
         - Change terminology: undo/redo info -> undo/redo data.
 
 
-0.01    2011-04-15 (SHARYANTO)
+0.01    2011-04-15  Released-By: SHARYANTO
 
         - First release (tests incomplete).

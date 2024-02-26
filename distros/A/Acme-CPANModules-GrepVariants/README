@@ -1,11 +1,11 @@
 NAME
-    Acme::CPANModules::GrepVariants - Grep-like CLI utilities available on
-    CPAN
+    Acme::CPANModules::GrepVariants - List of grep-like CLI utilities
+    available on CPAN
 
 VERSION
-    This document describes version 0.009 of Acme::CPANModules::GrepVariants
+    This document describes version 0.012 of Acme::CPANModules::GrepVariants
     (from Perl distribution Acme-CPANModules-GrepVariants), released on
-    2021-11-26.
+    2024-01-18.
 
 DESCRIPTION
     This list catalogs various grep-like tools.
@@ -83,10 +83,18 @@ DESCRIPTION
     terms into a chain of look-ahead patterns like described above. This
     allows you to use the standard grep.
 
-    3. Variants: alternate ways of specifying regex
+    3. Variants: alternate ways of specifying things to search for
 
-    Instead of specifying a pattern, with rpgrep (from App::rpgrep) you can
-    specify a pattern name in a Regexp::Pattern::* module instead.
+    Instead of specifying a regexp pattern directly, with rpgrep (from
+    App::rpgrep) you can specify a pattern name in a Regexp::Pattern::*
+    module instead.
+
+    With wcgrep (from App::wcgrep) you can search using wildcard pattern
+    instead of regex, which is admittedly more limited than regex.
+
+    grep-similar-text (from App::grep::similar::text lets you specify a text
+    and it will only show lines from input that are similar to the provided
+    text.
 
     4a. Variants: alternate source: repository (version control system)
     content and history
@@ -114,19 +122,19 @@ DESCRIPTION
 
     podgrep (from pmtools) greps from POD sections of Perl source.
 
-    4b. Variants: alternate source: CSV
+    4c. Variants: alternate source: CSV
 
     csvgrep (from csvgrep)
 
     csv-grep (from App::CSVUtils) allows you to apply Perl code against rows
     of CSV.
 
-    4c. Variants: alternate source: word lists
+    4d. Variants: alternate source: word lists
 
     wordlist (from App::wordlist) greps words from wordlist modules (modules
     that contains word lists, see WordList).
 
-    4d. Variants: other alternate sources
+    4e. Variants: other alternate sources
 
     grep-from-bash-history (from App::BashHistoryUtils).
 
@@ -161,104 +169,77 @@ DESCRIPTION
     dategrep (from App::dategrep) prints lines matching a date range.
 
 ACME::CPANMODULES ENTRIES
-    *   PerlPowerTools - BSD utilities written in pure Perl
-
+    PerlPowerTools
         Author: BDFOY <https://metacpan.org/author/BDFOY>
 
-    *   ack
-
-    *   App::Gre - A grep clone using Perl regexp's with better file
-        filtering, defaults, speed, and presentation
-
+    ack
+    App::Gre
         Author: JACOBG <https://metacpan.org/author/JACOBG>
 
-    *   App::abgrep - Print lines matching a pattern
-
+    App::abgrep
         Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   App::Greple - extensible grep with lexical expression and region
-        handling
-
+    App::Greple
         Author: UTASHIRO <https://metacpan.org/author/UTASHIRO>
 
-    *   App::GrepUtils - CLI utilities related to the Unix command 'grep'
-
+    App::GrepUtils
         Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   App::rpgrep - Print lines matching a Regexp::Pattern pattern
-
+    App::rpgrep
         Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Regexp::Pattern - Convention/framework for modules that contain
-        collection of regexes
-
+    Regexp::Pattern
         Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   App::pmgrep - Print lines from installed Perl module sources
-        matching a pattern
-
+    App::wcgrep
         Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   App::cpangrep - Grep CPAN from the command-line using grep.cpan.me
+    App::grep::similar::text
+    App::pmgrep
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
+    App::cpangrep
         Author: TSIBLEY <https://metacpan.org/author/TSIBLEY>
 
-    *   App::Grepl - PPI-powered grep
-
+    App::Grepl
         Author: OVID <https://metacpan.org/author/OVID>
 
-    *   PPI - Parse, Analyze and Manipulate Perl (without perl)
+    PPI Author: MITHALDU <https://metacpan.org/author/MITHALDU>
 
-        Author: MITHALDU <https://metacpan.org/author/MITHALDU>
-
-    *   pmtools - Perl Module Tools
-
+    pmtools
         Author: MLFISHER <https://metacpan.org/author/MLFISHER>
 
-    *   csvgrep
-
+    csvgrep
         Author: NEILB <https://metacpan.org/author/NEILB>
 
-    *   App::CSVUtils - CLI utilities related to CSV
-
+    App::CSVUtils
         Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   App::wordlist - Grep words from WordList::*
-
+    App::wordlist
         Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   App::BashHistoryUtils - CLI utilities related to bash history file
-
+    App::BashHistoryUtils
         Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   App::IODUtils - IOD utilities
-
+    App::IODUtils
         Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   App::INIUtils - INI utilities
-
+    App::INIUtils
         Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   App::CryptoCurrencyUtils - CLI utilities related to cryptocurrencies
-
+    App::CryptoCurrencyUtils
         Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   App::JsonLogUtils - Command line utilities for dealing with
-        JSON-formatted log files
-
+    App::JsonLogUtils
         Author: JEFFOBER <https://metacpan.org/author/JEFFOBER>
 
-    *   App::PDFUtils - Command-line utilities related to PDF files
-
+    App::PDFUtils
         Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Archive::Tar - module for manipulations of tar archives
-
+    Archive::Tar
         Author: BINGOS <https://metacpan.org/author/BINGOS>
 
-    *   App::grep::url - Print lines having URL(s) (optionally of certain
-        criteria) in them
-
+    App::grep::url
         Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
 FAQ
@@ -323,13 +304,13 @@ CONTRIBUTING
 
     If you want to build the distribution (e.g. to try to install it locally
     on your system), you can install Dist::Zilla,
-    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
-    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
-    steps required beyond that are considered a bug and can be reported to
-    me.
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2020 by perlancar
+    This software is copyright (c) 2024, 2023, 2021, 2020 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

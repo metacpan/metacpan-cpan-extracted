@@ -1,3 +1,8 @@
+0.046   2023-12-11  Released-By: PERLANCAR; Urgency: medium
+
+        - Allow prefixing each line in multiline code with comment.
+
+
 0.045   2021-06-07  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Tweak regex to avoid overeager removal of newline.

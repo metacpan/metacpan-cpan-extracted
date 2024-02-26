@@ -399,6 +399,14 @@ Expected parameters should be passed as a hash and include:
 
     If specified, only events where all of these labels were removed are returned.
 
+- `addedTags`
+
+    If specified, only events where all of these tags were added are returned.
+
+- `removedTags`
+
+    If specified, only events where all of these tags were removed are returned.
+
 - `reportTypes`
 - `cursor`
 
@@ -463,6 +471,14 @@ Expected parameters include:
 - `limit`
 
     Minimum of 1, maximum is 100, the default is 50.
+
+- `tags`
+
+    List of tags.
+
+- `excludeTags`
+
+    List of tags to exclude.
 
 - `cursor`
 

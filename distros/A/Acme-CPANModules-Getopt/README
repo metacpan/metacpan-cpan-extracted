@@ -1,44 +1,133 @@
 NAME
-    Acme::CPANModules::Getopt - Modules that parse command-line options
+    Acme::CPANModules::Getopt - List of modules that parse command-line
+    options
 
 VERSION
-    This document describes version 0.002 of Acme::CPANModules::Getopt (from
-    Perl distribution Acme-CPANModules-Getopt), released on 2020-11-21.
+    This document describes version 0.003 of Acme::CPANModules::Getopt (from
+    Perl distribution Acme-CPANModules-Getopt), released on 2023-10-29.
 
-FEATURE COMPARISON MATRIX OF MODULES INCLUDED IN THIS ACME::CPANMODULES MODULE
-     ┌───────────────────────────┬───────────────┬──────────────────┬──────────────────────┬───────────────┬──────────┬────────────────┐
-     │ module                    │ auto_help *1) │ auto_version *2) │ uses_getopt_long *3) │ uses_spec *4) │ file *5) │ subcommand *6) │
-     ├───────────────────────────┼───────────────┼──────────────────┼──────────────────────┼───────────────┼──────────┼────────────────┤
-     │ Getopt::Std               │ no *7)        │ no *8)           │ no                   │ yes           │ N/A      │ N/A            │
-     │ Getopt::Long              │ yes           │ yes              │ yes                  │ yes           │ N/A      │ N/A            │
-     │ Getopt::Tiny              │ no            │ no               │ no                   │ yes           │ N/A      │ N/A            │
-     │ Getopt::Long::Descriptive │ yes           │ no               │ yes                  │ yes           │ N/A      │ N/A            │
-     │ Getopt::Long::More        │ yes           │ yes              │ yes                  │ yes           │ no       │ no             │
-     │ Getopt::Simple            │ yes           │ yes              │ yes                  │ yes           │ N/A      │ N/A            │
-     │ Getopt::Compact           │ yes           │ yes              │ yes                  │ yes           │ N/A      │ N/A            │
-     │ Opt::Imistic              │ no            │ no               │ no                   │ no            │ N/A      │ N/A            │
-     │ Getopt::Valid             │ yes           │ yes              │ yes                  │ yes           │ N/A      │ N/A            │
-     │ Getopt::Std::Strict       │ no            │ no               │ no                   │ yes           │ N/A      │ N/A            │
-     │ Getopt::Declare           │ yes           │ yes              │ no                   │ yes           │ N/A      │ N/A            │
-     │ Getopt::Euclid            │ yes           │ yes              │ no                   │ yes           │ N/A      │ N/A            │
-     │ Docopt                    │ yes           │ yes              │ no                   │ yes           │ N/A      │ N/A            │
-     │ Getopt::Auto              │ yes           │ yes              │ no                   │ yes           │ N/A      │ N/A            │
-     │ Getopt::Lucid             │ no            │ no               │ no                   │ yes           │ N/A      │ N/A            │
-     │ Getopt::ArgvFile          │ yes           │ yes              │ yes                  │ yes           │ yes      │ N/A            │
-     │ App::Options              │ yes           │ yes              │ no                   │ yes           │ yes      │ N/A            │
-     │ MooseX::Getopt            │ yes           │ yes              │ yes *9)              │ yes           │ no *10)  │ N/A            │
-     │ MooX::Options             │ yes           │ no               │ yes *11)             │ yes           │ yes      │ N/A            │
-     │ Getopt::Attribute         │ yes           │ yes              │ yes                  │ yes           │ N/A      │ N/A            │
-     │ Getopt::Modular           │ yes           │ yes              │ yes                  │ yes           │ N/A      │ N/A            │
-     │ Smart::Options            │ yes           │ no               │ no                   │ yes           │ yes      │ yes            │
-     │ Getopt::ArgParse          │ no            │ no               │ yes                  │ yes           │ N/A      │ yes            │
-     │ Getopt::Kingpin           │ yes           │ yes              │ no                   │ yes           │ N/A      │ yes            │
-     │ Getopt::Complete          │ no            │ no               │ no                   │ yes           │ N/A      │ N/A            │
-     │ Getopt::Long::Complete    │ yes           │ yes              │ yes                  │ yes           │ N/A      │ N/A            │
-     │ Getopt::Long::Subcommand  │ yes           │ yes              │ yes                  │ yes           │ N/A      │ yes            │
-     │ Getopt::Long::Less        │ no            │ no               │ no                   │ yes           │ N/A      │ N/A            │
-     │ Getopt::Long::EvenLess    │ no            │ no               │ no                   │ yes           │ N/A      │ N/A            │
-     └───────────────────────────┴───────────────┴──────────────────┴──────────────────────┴───────────────┴──────────┴────────────────┘
+ACME::CPANMODULES ENTRIES
+    Getopt::Std
+        Author: RJBS <https://metacpan.org/author/RJBS>
+
+    Getopt::Long
+        Author: JV <https://metacpan.org/author/JV>
+
+    Getopt::Tiny
+        Author: MUIR <https://metacpan.org/author/MUIR>
+
+    Getopt::Long::Descriptive
+        Author: RJBS <https://metacpan.org/author/RJBS>
+
+    Getopt::Long::More
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    Getopt::Simple
+        Author: RSAVAGE <https://metacpan.org/author/RSAVAGE>
+
+    Getopt::Compact
+        Author: ASW <https://metacpan.org/author/ASW>
+
+    Opt::Imistic
+        Author: ALTREUS <https://metacpan.org/author/ALTREUS>
+
+    Getopt::Valid
+        Author: UKAUTZ <https://metacpan.org/author/UKAUTZ>
+
+    Getopt::Std::Strict
+        Author: LEOCHARRE <https://metacpan.org/author/LEOCHARRE>
+
+    Getopt::Declare
+        Author: FANGLY <https://metacpan.org/author/FANGLY>
+
+    Getopt::Euclid
+        Author: BIGPRESH <https://metacpan.org/author/BIGPRESH>
+
+    Docopt
+        Author: TOKUHIROM <https://metacpan.org/author/TOKUHIROM>
+
+    Getopt::Auto
+        Author: GLEACH <https://metacpan.org/author/GLEACH>
+
+    Getopt::Lucid
+        Author: DAGOLDEN <https://metacpan.org/author/DAGOLDEN>
+
+    Getopt::ArgvFile
+        Author: JSTENZEL <https://metacpan.org/author/JSTENZEL>
+
+    App::Options
+        Author: SPADKINS <https://metacpan.org/author/SPADKINS>
+
+    MooseX::Getopt
+        Author: ETHER <https://metacpan.org/author/ETHER>
+
+    MooX::Options
+        Author: REHSACK <https://metacpan.org/author/REHSACK>
+
+    Getopt::Attribute
+        Author: MARCEL <https://metacpan.org/author/MARCEL>
+
+    Getopt::Modular
+        Author: DMCBRIDE <https://metacpan.org/author/DMCBRIDE>
+
+    Smart::Options
+        Author: MIKIHOSHI <https://metacpan.org/author/MIKIHOSHI>
+
+    Getopt::ArgParse
+        Author: MYTRAM <https://metacpan.org/author/MYTRAM>
+
+    Getopt::Kingpin
+        Author: TAKASAGO <https://metacpan.org/author/TAKASAGO>
+
+    Getopt::Complete
+        Author: NNUTTER <https://metacpan.org/author/NNUTTER>
+
+    Getopt::Long::Complete
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    Getopt::Long::Subcommand
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    Getopt::Long::Less
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    Getopt::Long::EvenLess
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+ACME::CPANMODULES FEATURE COMPARISON MATRIX
+     +---------------------------+---------------+------------------+----------------------+---------------+----------+----------------+
+     | module                    | auto_help *1) | auto_version *2) | uses_getopt_long *3) | uses_spec *4) | file *5) | subcommand *6) |
+     +---------------------------+---------------+------------------+----------------------+---------------+----------+----------------+
+     | Getopt::Std               | no *7)        | no *8)           | no                   | yes           | N/A      | N/A            |
+     | Getopt::Long              | yes           | yes              | yes                  | yes           | N/A      | N/A            |
+     | Getopt::Tiny              | no            | no               | no                   | yes           | N/A      | N/A            |
+     | Getopt::Long::Descriptive | yes           | no               | yes                  | yes           | N/A      | N/A            |
+     | Getopt::Long::More        | yes           | yes              | yes                  | yes           | no       | no             |
+     | Getopt::Simple            | yes           | yes              | yes                  | yes           | N/A      | N/A            |
+     | Getopt::Compact           | yes           | yes              | yes                  | yes           | N/A      | N/A            |
+     | Opt::Imistic              | no            | no               | no                   | no            | N/A      | N/A            |
+     | Getopt::Valid             | yes           | yes              | yes                  | yes           | N/A      | N/A            |
+     | Getopt::Std::Strict       | no            | no               | no                   | yes           | N/A      | N/A            |
+     | Getopt::Declare           | yes           | yes              | no                   | yes           | N/A      | N/A            |
+     | Getopt::Euclid            | yes           | yes              | no                   | yes           | N/A      | N/A            |
+     | Docopt                    | yes           | yes              | no                   | yes           | N/A      | N/A            |
+     | Getopt::Auto              | yes           | yes              | no                   | yes           | N/A      | N/A            |
+     | Getopt::Lucid             | no            | no               | no                   | yes           | N/A      | N/A            |
+     | Getopt::ArgvFile          | yes           | yes              | yes                  | yes           | yes      | N/A            |
+     | App::Options              | yes           | yes              | no                   | yes           | yes      | N/A            |
+     | MooseX::Getopt            | yes           | yes              | yes *9)              | yes           | no *10)  | N/A            |
+     | MooX::Options             | yes           | no               | yes *9)              | yes           | yes      | N/A            |
+     | Getopt::Attribute         | yes           | yes              | yes                  | yes           | N/A      | N/A            |
+     | Getopt::Modular           | yes           | yes              | yes                  | yes           | N/A      | N/A            |
+     | Smart::Options            | yes           | no               | no                   | yes           | yes      | yes            |
+     | Getopt::ArgParse          | no            | no               | yes                  | yes           | N/A      | yes            |
+     | Getopt::Kingpin           | yes           | yes              | no                   | yes           | N/A      | yes            |
+     | Getopt::Complete          | no            | no               | no                   | yes           | N/A      | N/A            |
+     | Getopt::Long::Complete    | yes           | yes              | yes                  | yes           | N/A      | N/A            |
+     | Getopt::Long::Subcommand  | yes           | yes              | yes                  | yes           | N/A      | yes            |
+     | Getopt::Long::Less        | no            | no               | no                   | yes           | N/A      | N/A            |
+     | Getopt::Long::EvenLess    | no            | no               | no                   | yes           | N/A      | N/A            |
+     +---------------------------+---------------+------------------+----------------------+---------------+----------+----------------+
 
     Notes:
 
@@ -57,72 +146,23 @@ FEATURE COMPARISON MATRIX OF MODULES INCLUDED IN THIS ACME::CPANMODULES MODULE
     9. Uses Getopt::Long::Descriptive
     10. Needs separate module: MooseX::ConfigFromFile or
     MooseX::SimpleConfig
-    11. Uses Getopt::Long::Descriptive
-
-MODULES INCLUDED IN THIS ACME::CPANMODULES MODULE
-    *   Getopt::Std
-
-    *   Getopt::Long
-
-    *   Getopt::Tiny
-
-    *   Getopt::Long::Descriptive
-
-    *   Getopt::Long::More
-
-    *   Getopt::Simple
-
-    *   Getopt::Compact
-
-    *   Opt::Imistic
-
-    *   Getopt::Valid
-
-    *   Getopt::Std::Strict
-
-    *   Getopt::Declare
-
-    *   Getopt::Euclid
-
-    *   Docopt
-
-    *   Getopt::Auto
-
-    *   Getopt::Lucid
-
-    *   Getopt::ArgvFile
-
-    *   App::Options
-
-    *   MooseX::Getopt
-
-    *   MooX::Options
-
-    *   Getopt::Attribute
-
-    *   Getopt::Modular
-
-    *   Smart::Options
-
-    *   Getopt::ArgParse
-
-    *   Getopt::Kingpin
-
-    *   Getopt::Complete
-
-    *   Getopt::Long::Complete
-
-    *   Getopt::Long::Subcommand
-
-    *   Getopt::Long::Less
-
-    *   Getopt::Long::EvenLess
 
 FAQ
+  What is an Acme::CPANModules::* module?
+    An Acme::CPANModules::* module, like this module, contains just a list
+    of module names that share a common characteristics. It is a way to
+    categorize modules and document CPAN. See Acme::CPANModules for more
+    details.
+
   What are ways to use this Acme::CPANModules module?
     Aside from reading this Acme::CPANModules module's POD documentation,
-    you can install all the listed modules (entries) using cpanmodules CLI
-    (from App::cpanmodules distribution):
+    you can install all the listed modules (entries) using cpanm-cpanmodules
+    script (from App::cpanm::cpanmodules distribution):
+
+     % cpanm-cpanmodules -n Getopt
+
+    Alternatively you can use the cpanmodules CLI (from App::cpanmodules
+    distribution):
 
         % cpanmodules ls-entries Getopt | cpanm -n
 
@@ -136,7 +176,9 @@ FAQ
 
     This Acme::CPANModules module also helps lcpan produce a more meaningful
     result for "lcpan related-mods" command when it comes to finding related
-    modules for the modules listed in this Acme::CPANModules module.
+    modules for the modules listed in this Acme::CPANModules module. See
+    App::lcpan::Cmd::related_mods for more details on how "related modules"
+    are found.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -146,14 +188,6 @@ SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-Acme-CPANModules-Getopt>.
 
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Geto
-    pt>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
 SEE ALSO
     Acme::CPANModules - about the Acme::CPANModules namespace
 
@@ -162,9 +196,33 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020 by perlancar@cpan.org.
+    This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Geto
+    pt>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

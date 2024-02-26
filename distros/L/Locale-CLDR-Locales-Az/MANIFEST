@@ -1,5 +1,9 @@
 Build.PL
 lib/Locale/CLDR/Locales/Az.pm
+lib/Locale/CLDR/Locales/Az/Arab.pm
+lib/Locale/CLDR/Locales/Az/Arab/Iq.pm
+lib/Locale/CLDR/Locales/Az/Arab/Ir.pm
+lib/Locale/CLDR/Locales/Az/Arab/Tr.pm
 lib/Locale/CLDR/Locales/Az/Cyrl.pm
 lib/Locale/CLDR/Locales/Az/Cyrl/Az.pm
 lib/Locale/CLDR/Locales/Az/Latn.pm

@@ -3,11 +3,10 @@ abstract: 'Parse food/drug registration code published by the Indonesian Nationa
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
-  Business::ID::NPWP: '0'
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Test::More: '0.98'
+  Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -20,7 +19,7 @@ name: Business-ID-POM
 provides:
   Business::ID::POM:
     file: lib/Business/ID/POM.pm
-    version: '0.005'
+    version: '0.006'
 requires:
   Exporter: '5.57'
   Log::ger: '0.038'
@@ -31,7 +30,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Business-ID-POM
   homepage: https://metacpan.org/release/Business-ID-POM
   repository: git://github.com/perlancar/perl-Business-ID-POM.git
-version: '0.005'
+version: '0.006'
 x_Dist_Zilla:
   perl:
     version: '5.038000'
@@ -111,7 +110,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.608'
+      version: '0.609'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'

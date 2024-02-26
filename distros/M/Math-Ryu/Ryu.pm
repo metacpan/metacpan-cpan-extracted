@@ -60,12 +60,13 @@ require Exporter;
 *import = \&Exporter::import;
 require DynaLoader;
 
-our $VERSION = '1.0';
+our $VERSION = '1.01';
 
 DynaLoader::bootstrap Math::Ryu $VERSION;
 
 my @tagged = qw(
   d2s ld2s q2s nv2s
+  pn pnv sn snv
   n2s
   s2d
   fmtpy
@@ -75,6 +76,9 @@ my @tagged = qw(
 @Math::Ryu::EXPORT = ();
 @Math::Ryu::EXPORT_OK = @tagged;
 %Math::Ryu::EXPORT_TAGS = (all => \@tagged);
+
+my $double_inf = 2 ** 1500;
+my $double_nan = $double_inf / $double_inf;
 
 sub dl_load_flags {0} # Prevent DynaLoader from complaining and croaking
 
@@ -109,100 +113,102 @@ sub n2s {
 }
 
 sub fmtpy {
-  # Format the string returned by ld2s according to the way
-  # that python3 does it.
+  # The given argument will be either 'Infinity', '-Infinity', 'NaN'
+  # or a finite value of the form "mantissaEexponent".
+  # The mantissa portion will include a decimal point (with that decimal
+  # point being the second character in the mantissa) unless the
+  # mantissa consists of only one decimal significant decimal digit,
+  # in which case there is no decimal point and the mantissa consists
+  # solely of that digit.
 
-  my $sinput = shift;
-  return $sinput unless $sinput =~ /E|N/i;
-
-  if($sinput =~ /inf|nan/i) {
-    $sinput =~ s/inity?//i;
-    return lc($sinput);
-  }
-  if($sinput =~ /^\-?0E0$/) {
-    $sinput =~ s/E/./;
-    return $sinput;
-  }
-
-  my ($man, $exp) = split /E/i, $sinput;
-
+  my $s = shift;
   my $sign = '';
-  # Remove the leading '-' and reinstate it later.
-  $sign = '-' if $man =~ s/^\-//;
+  my $bitpos = 0;
 
-  return $sign . _fmt($man, $exp);
+  $sign = '-' if $s =~ s/^\-//;
+
+  $bitpos = 1 if substr($s, 1, 1) eq '.'; # else there isn't a decimal point.
+
+  if($bitpos) {
+    # Mantissa's second character is the decimal point.
+    # Split into mantissa and exponent
+    my @parts = split /E/i, $s;
+    if($parts[1] > 0 && $parts[1] < MAX_DEC_DIG) {
+      # We want, eg,  a value like 1.1E-3 to be returned as "0.0011".
+      my $zero_pad = $parts[1] - (length($parts[0]) - 2);
+      if($zero_pad >= 0 && ($zero_pad + length($parts[0])) < MAX_DEC_DIG + 1 ) {
+        substr($parts[0], 1, 1, '');
+        return $sign . $parts[0] . ('0' x $zero_pad) . '.0';
+      }
+      elsif($zero_pad < 0) {
+        # We want, eg,  a value like 1.23625E2 to be returned as "123.625".
+        # relocate the decimal point
+        substr($parts[0], 1, 1, '');
+        substr($parts[0], $zero_pad, 0, '.');
+        return $sign . $parts[0];
+      }
+    }
+
+    # Return as is, except that we replace the 'E' with 'e', ensuring also
+    # that the exponent is preceded by a '+' or '-' sign, and that
+    # negative exponents consist of at least 2 digits.
+    $s =~ s/e/e\+/i if $parts[1] > 0;
+    if ($parts[1] < -4 || $parts[1] >= 0) {
+      $s =~ s/E0$//i;
+      substr($s, -1, 0, '0') if substr($s, -2, 1) eq '-'; # pad exponent with a leading '0'.
+      return $sign . lc($s);
+    }
+    # Return, eg 6.25E1 as "0.625"
+    substr($parts[0], 1, 1, ''); # remove decimal point.
+    return $sign . '0.' . ('0' x (abs($parts[1]) - 1)) . $parts[0] ;
+  }
+  else {
+    # Return '-inf', 'inf', or 'nan' if (and as) appropriate.
+    return $sign . lc(substr($s, 0, 3)) if $s =~ /n/i;
+
+    # Append '.0' to the mantissa and return it if the exponent is 0.
+    return $sign . $s . '.0' if $s =~ s/E0$//i;
+    my @parts = split /E/i, $s;
+
+    # Return as is, except that we replace the 'E' with 'e', ensuring also
+    # that the exponent is preceded by a '+' or '-' sign, and that
+    # negative exponents consist of at least 2 digits.
+    $s =~ s/e/e\+/i if $parts[1] > 0;
+    return $sign . lc($s) if ($parts[1] < -4 || $parts[1] > 0);
+
+    # Return, eg, 6E-3 as "0.006".
+    return $sign . '0.' . ('0' x (abs($parts[1]) - 1)) . $parts[0] ;
+  }
 }
 
-sub _fmt {
+sub s2d {
+  die "s2d() is available only to perls whose NV is of type 'double'"
+    unless MAX_DEC_DIG == 17;
+  my $str = shift;
+  return $double_inf  if $str =~ /^(\s+|\+)?inf/i;
+  return -$double_inf if $str =~ /^(\s+)?\-inf/i;
+  return $double_nan  if $str =~ /^(\-|\+)?nan/i;
+  return _s2d($str);
+}
 
-  my ($man, $exp, $ret) = (shift, shift, 0);
-  return $man if !$exp;
+sub pn {
+  my $arg = shift;
+  print n2s($arg);
+}
 
-  # Note that $man, as called by fmtjs() and fmtpy()
-  # has no leading '-' or '+' sign.
+sub sn {
+  my $arg = shift;
+  print n2s($arg), "\n";
+}
 
-  if($man =~ /\./) {
-    my @parts = split /\./, $man;
-    $exp -= length($parts[1]);
-    $man = $parts[0] . $parts[1]
-  }
+sub pnv {
+  my $nv = shift;
+  print nv2s($nv);
+}
 
-  # $man is now an integer and "${man}e${exp}" represents
-  # the absolute value of the original string.
-
-  #my $critical = $exp; # Formatting is based around the value of $exp;
-  my $man_len = length($man);
-
-  if($exp < -3) {
-    #print "DEBUG: BLOCK 1 $man $exp\n";
-    my $leading_zeros = $man_len + $exp;
-    if($leading_zeros <= 0 && $leading_zeros >= -3) {
-      return '0.' . ('0' x abs($leading_zeros)) . $man;
-    }
-
-    # Present scientific notation MANeEXP
-    if(abs($exp) < $man_len - 1) {
-      substr($man, $exp, 0, '.');
-      return $man;
-    }
-    elsif($man_len > 1) {
-      # insert decimal point
-      substr($man, 1, 0, '.');
-      $exp += $man_len - 1;
-    }
-    return $man . sprintf "e%03d", $exp;
-  }
-
-  if($exp <= 0) {
-    # Show no exponent - just M
-    #print "DEBUG: BLOCK 2 $man $exp\n";
-    if(!$exp) {$man .= '.0'}
-    else {substr($man, $exp, 0, '.')}
-    $man =~ s/^\./0./;
-    return $man;
-  }
-
-  if($exp < MAX_DEC_DIG) {
-    # Present scientific notation MANeEXP or
-    # VAL.0 when appropriate.
-    # insert decimal point.
-    #print "DEBUG: BLOCK 3 $man $exp\n";
-    my $zero_pad = 0;
-    $zero_pad = $exp if $exp + $man_len < MAX_DEC_DIG;
-    if($zero_pad > 0) {
-     return $man . ('0' x $zero_pad) . '.0';
-    }
-    $exp += $man_len - 1;
-    substr($man, 1, 0, '.');
-  }
-  elsif($man_len != 1) {
-    $exp += $man_len - 1;
-    substr($man, 1, 0, '.');
-    #print "DEBUG: BLOCK 4\n";
-  }
-
-  #print "DEBUG: BLOCK 5\n";
-  return $man . 'e+' . $exp;
+sub snv {
+  my $nv = shift;
+  print nv2s($nv), "\n";
 }
 
 1;

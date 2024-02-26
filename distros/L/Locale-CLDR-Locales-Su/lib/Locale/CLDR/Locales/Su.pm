@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Su - Package for language Sundanese
 
 package Locale::CLDR::Locales::Su;
 # This file auto generated from Data\common\main\su.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -224,22 +224,6 @@ has 'algorithmic_number_format_data' => (
     } },
 );
 
-# Need to add code for Key type pattern
-sub display_name_pattern {
-	my ($self, $name, $region, $script, $variant) = @_;
-
-	my $display_pattern = '{0} ({1})';
-	$display_pattern =~s/\{0\}/$name/g;
-	my $subtags = join '{0}, {1}', grep {$_} (
-		$region,
-		$script,
-		$variant,
-	);
-
-	$display_pattern =~s/\{1\}/$subtags/g;
-	return $display_pattern;
-}
-
 has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
@@ -323,6 +307,7 @@ has 'display_name_region' => (
  			'DE' => 'Jérman',
  			'FR' => 'Prancis',
  			'GB' => 'Britania Raya',
+ 			'ID' => 'Indonesia',
  			'IN' => 'India',
  			'IT' => 'Italia',
  			'JP' => 'Jepang',
@@ -391,16 +376,15 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{[á à ă â å ä ã ā æ ç è ĕ ê ë ē í ì ĭ î ï ī ñ ó ò ŏ ô ö ø ō œ ú ù ŭ û ü ū ÿ]},
-			index => ['A', 'B', 'C', 'D', 'E', 'É', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
-			main => qr{[a b c d e é f g h i j k l m n o p q r s t u v w x y z]},
-			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
-			punctuation => qr{[\- ‐ ‑ – — , ; \: ! ? . … ' ‘ ’ " “ ” ( ) \[ \] § @ * / \& # † ‡ ′ ″]},
+			auxiliary => qr{[áàăâåäãā æ ç èĕêëē íìĭîïī ñ óòŏôöøō œ úùŭûüū ÿ]},
+			index => ['A', 'B', 'C', 'D', 'EÉ', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
+			main => qr{[a b c d eé f g h i j k l m n o p q r s t u v w x y z]},
+			punctuation => qr{[\- ‐‑ – — , ; \: ! ? . … '‘’ "“” ( ) \[ \] § @ * / \& # † ‡ ′ ″]},
 		};
 	},
 EOT
 : sub {
-		return { index => ['A', 'B', 'C', 'D', 'E', 'É', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'], };
+		return { index => ['A', 'B', 'C', 'D', 'EÉ', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'], };
 },
 );
 
@@ -477,10 +461,8 @@ has 'listPatterns' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-				start => q({0}, {1}),
-				middle => q({0}, {1}),
 				end => q({0}, sareng {1}),
-				2 => q({0} & {1}),
+				2 => q({0} sareng {1}),
 		} }
 );
 
@@ -492,25 +474,9 @@ has 'number_symbols' => (
 		'latn' => {
 			'decimal' => q(,),
 			'group' => q(.),
-			'plusSign' => q(+),
 			'timeSeparator' => q(.),
 		},
 	} }
-);
-
-has 'number_formats' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		decimalFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0.###',
-				},
-			},
-		},
-} },
 );
 
 has 'number_currency_formats' => (
@@ -536,28 +502,24 @@ has 'currencies' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'BRL' => {
-			symbol => 'R$',
 			display_name => {
 				'currency' => q(Real Brasil),
 				'other' => q(real Brasil),
 			},
 		},
 		'CNY' => {
-			symbol => 'CN¥',
 			display_name => {
 				'currency' => q(Yuan Tiongkok),
 				'other' => q(yuan Tiongkok),
 			},
 		},
 		'EUR' => {
-			symbol => '€',
 			display_name => {
 				'currency' => q(Euro),
 				'other' => q(euro),
 			},
 		},
 		'GBP' => {
-			symbol => '£',
 			display_name => {
 				'currency' => q(Pound Inggris),
 				'other' => q(pound Inggris),
@@ -571,7 +533,6 @@ has 'currencies' => (
 			},
 		},
 		'INR' => {
-			symbol => '₹',
 			display_name => {
 				'currency' => q(Rupee India),
 				'other' => q(rupee India),
@@ -585,7 +546,6 @@ has 'currencies' => (
 			},
 		},
 		'RUB' => {
-			symbol => 'RUB',
 			display_name => {
 				'currency' => q(Rubel Rusia),
 				'other' => q(rubel Rusia),
@@ -634,25 +594,6 @@ has 'calendar_months' => (
 							
 						],
 					},
-					narrow => {
-						nonleap => [
-							'J',
-							'P',
-							'M',
-							'A',
-							'M',
-							'J',
-							'J',
-							'A',
-							'S',
-							'O',
-							'N',
-							'D'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'Januari',
@@ -688,25 +629,6 @@ has 'calendar_months' => (
 							'O',
 							'N',
 							'D'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'Januari',
-							'Pébruari',
-							'Maret',
-							'April',
-							'Méi',
-							'Juni',
-							'Juli',
-							'Agustus',
-							'Séptémber',
-							'Oktober',
-							'Nopémber',
-							'Désémber'
 						],
 						leap => [
 							
@@ -733,15 +655,6 @@ has 'calendar_days' => (
 						sat => 'Sap',
 						sun => 'Mng'
 					},
-					narrow => {
-						mon => 'S',
-						tue => 'S',
-						wed => 'R',
-						thu => 'K',
-						fri => 'J',
-						sat => 'S',
-						sun => 'M'
-					},
 					wide => {
 						mon => 'Senén',
 						tue => 'Salasa',
@@ -753,15 +666,6 @@ has 'calendar_days' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						mon => 'Sen',
-						tue => 'Sal',
-						wed => 'Reb',
-						thu => 'Kem',
-						fri => 'Jum',
-						sat => 'Sap',
-						sun => 'Mng'
-					},
 					narrow => {
 						mon => 'S',
 						tue => 'S',
@@ -770,15 +674,6 @@ has 'calendar_days' => (
 						fri => 'J',
 						sat => 'S',
 						sun => 'M'
-					},
-					wide => {
-						mon => 'Senén',
-						tue => 'Salasa',
-						wed => 'Rebo',
-						thu => 'Kemis',
-						fri => 'Jumaah',
-						sat => 'Saptu',
-						sun => 'Minggu'
 					},
 				},
 			},
@@ -804,11 +699,6 @@ has 'calendar_quarters' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {0 => 'K1',
-						1 => 'K2',
-						2 => 'K3',
-						3 => 'K4'
-					},
 					wide => {0 => 'kuartal ka-1',
 						1 => 'kuartal ka-2',
 						2 => 'kuartal ka-3',
@@ -877,14 +767,14 @@ has 'datetime_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-			'full' => q{{1} 'jam' {0}},
-			'long' => q{{1} 'jam' {0}},
+			'full' => q{{1}, {0}},
+			'long' => q{{1}, {0}},
 			'medium' => q{{1}, {0}},
 			'short' => q{{1}, {0}},
 		},
 		'gregorian' => {
-			'full' => q{{1} 'jam' {0}},
-			'long' => q{{1} 'jam' {0}},
+			'full' => q{{1}, {0}},
+			'long' => q{{1}, {0}},
 			'medium' => q{{1}, {0}},
 			'short' => q{{1}, {0}},
 		},
@@ -902,10 +792,9 @@ has 'datetime_formats_available_formats' => (
 			EBhm => q{E h.mm B},
 			EBhms => q{E h.mm.ss B},
 			EHm => q{E HH.mm},
-			EHms => q{E HH:mm:ss},
 			Ed => q{E d},
-			Ehm => q{E h.mm a},
-			Ehms => q{E h.mm.ss a},
+			Ehm => q{E h.mm a},
+			Ehms => q{E h.mm.ss a},
 			Gy => q{y G},
 			GyMMM => q{MMM y G},
 			GyMMMEd => q{E, d MMM y G},
@@ -915,17 +804,16 @@ has 'datetime_formats_available_formats' => (
 			Hms => q{HH.mm.ss},
 			Hmsv => q{HH.mm.ss v},
 			Hmv => q{HH.mm v},
-			M => q{L},
 			MEd => q{E, d/M},
 			MMMEd => q{E, d MMM},
 			MMMMd => q{d MMMM},
 			MMMd => q{d MMM},
 			Md => q{d/M},
-			h => q{h a},
-			hm => q{h.mm a},
-			hms => q{h.mm.ss a},
-			hmsv => q{h.mm.ss a v},
-			hmv => q{h.mm a v},
+			h => q{h a},
+			hm => q{h.mm a},
+			hms => q{h.mm.ss a},
+			hmsv => q{h.mm.ss a v},
+			hmv => q{h.mm a v},
 			ms => q{mm.ss},
 			yM => q{M/y},
 			yMEd => q{E, d/M/y},
@@ -953,12 +841,6 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			fallback => '{0} – {1}',
-		},
-		'gregorian' => {
-			fallback => '{0} – {1}',
-		},
 	} },
 );
 
@@ -967,7 +849,6 @@ has 'time_zone_names' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default	=> sub { {
-		fallbackFormat => q({1} ({0})),
 		'America_Central' => {
 			long => {
 				'daylight' => q#Waktu Usum Panas Tengah#,

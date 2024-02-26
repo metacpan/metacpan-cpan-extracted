@@ -345,9 +345,6 @@ FUNCTIONS
         newly created filehandle for the file (or "undef" in case of an
         error).
 
-        The pathname passed to "aio_open" must be absolute. See API NOTES,
-        above, for an explanation.
-
         The $flags argument is a bitmask. See the "Fcntl" module for a list.
         They are the same as used by "sysopen".
 
@@ -509,9 +506,6 @@ FUNCTIONS
         The callback will be called after the stat and the results will be
         available using "stat _" or "-s _" and other tests (with the
         exception of "-B" and "-T").
-
-        The pathname passed to "aio_stat" must be absolute. See API NOTES,
-        above, for an explanation.
 
         Currently, the stats are always 64-bit-stats, i.e. instead of
         returning an error when stat'ing a large file, the results will be
@@ -865,8 +859,7 @@ FUNCTIONS
 
         Implementation notes.
 
-        The "aio_readdir" cannot be avoided, but "stat()"'ing every entry
-        can.
+        The "aio_readdir" cannot be avoided, but stat()'ing every entry can.
 
         If readdir returns file type information, then this is used directly
         to find directories.

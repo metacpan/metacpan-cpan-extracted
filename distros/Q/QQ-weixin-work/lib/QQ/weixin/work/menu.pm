@@ -8,7 +8,7 @@ QQ::weixin::work::menu
 
 =head1 DESCRIPTION
 
-应用管理
+应用管理-自定义菜单
 
 =cut
 
@@ -19,14 +19,15 @@ use LWP::UserAgent;
 use JSON;
 use utf8;
 
-our $VERSION = '0.06';
+our $VERSION = '0.10';
 our @EXPORT = qw/ create get delete /;
 
 =head1 FUNCTION
 
 =head2 create(access_token, agentid, hash);
 
-设置应用
+创建菜单
+最后更新：2021/03/18
 
 =head2 SYNOPSIS
 
@@ -135,7 +136,7 @@ L<https://developer.work.weixin.qq.com/document/path/90231>
 
 =head4 参数说明：
 
-    参数	必须	说明
+	参数	必须	说明
     access_token	是	调用接口凭证
     agentid	是	企业应用的id
     button	是	一级菜单数组，个数应为1~3个
@@ -187,6 +188,7 @@ sub create {
 =head2 get(access_token,agentid);
 
 获取菜单
+最后更新：2019/02/28
 
 =head2 SYNOPSIS
 
@@ -196,7 +198,7 @@ L<https://developer.work.weixin.qq.com/document/path/90232>
 
 =head4 参数说明：
 
-    参数	            必须	说明
+	参数	            必须	说明
     access_token	是	调用接口凭证
     agentid	是	应用id
 
@@ -230,6 +232,7 @@ sub get {
 =head2 delete(access_token,agentid);
 
 删除菜单
+最后更新：2019/02/28
 
 =head2 SYNOPSIS
 
@@ -239,7 +242,7 @@ L<https://work.weixin.qq.com/api/doc/90000/90135/90233>
 
 =head4 参数说明：
 
-    参数	            必须	说明
+	参数	            必须	说明
     access_token	是	调用接口凭证
     agentid	是	应用id
 
@@ -249,10 +252,10 @@ L<https://work.weixin.qq.com/api/doc/90000/90135/90233>
 
 =head3 RETURN 返回结果：
 
-  {
-    "errcode":0,
-    "errmsg":"ok"
-  }
+	{
+	   "errcode":0,
+	   "errmsg":"ok"
+	}
 
 =cut
 

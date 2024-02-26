@@ -2,7 +2,15 @@ package Catalyst::ActionRole::Methods;
 
 use Moose::Role;
 
-our $VERSION = '0.004';
+our $VERSION = '0.103';
+
+around 'list_extra_info' => sub {
+    my $orig = shift;
+    my $self = shift;
+    my $info = $self->$orig( @_ );
+    $info->{'HTTP_METHOD'} = [ $self->get_allowed_methods( $self->class, undef, $self->name ) ];
+    $info;
+};
 
 around 'dispatch', sub {
     my $orig = shift;
@@ -10,107 +18,63 @@ around 'dispatch', sub {
     my $c    = shift;
 
     my $return = $self->$orig($c, @_);
-    my $rest_method = $self->name . "_" . uc( $c->request->method );
-    my $sub_return = $self->_dispatch_rest_method( $c, $rest_method );
 
-    return defined($sub_return) ? $sub_return : $return;
-};
+    my $class = $self->class;
+    my $controller = $c->component( $class );
+    my $method_name = $self->name;
+    my $req_method = $c->request->method;
+    my $suffix = uc $req_method;
+    my ( $rest_method, $code );
 
-around 'list_extra_info' => sub {
-  my ($orig, $self, @args) = @_;
-  my @allowed_methods = sort $self->get_allowed_methods($self->class,undef,$self->name);
-  return +{
-    %{ $self->$orig(@args) }, 
-    HTTP_METHODS => \@allowed_methods,
-  };
-};
- 
-sub _dispatch_rest_method {
-    my $self        = shift;
-    my $c           = shift;
-    my $rest_method = shift;
+    {
+        $rest_method = $method_name . '_' . $suffix;
 
-    my $req         = $c->request;
-    my $controller = $c->component( $self->class );
-    my ($code, $name);
-  
-    # Common case, for foo_GET etc
-    if ( $code = $controller->action_for($rest_method) ) {
-      return $c->forward( $code,  $req->args ); # Forward to foo_GET if it's an action
+        if ( $code = $controller->action_for( $rest_method ) ) {
+            my $sub_return = $c->forward( $code, $c->request->args );
+            return defined $sub_return ? $sub_return : $return;
+        } elsif ( $code = $controller->can( $rest_method ) ) {
+            # nothing to do
+        } elsif ( 'OPTIONS' eq $suffix ) {
+            $c->response->status( 204 );
+        } elsif ( 'HEAD' eq $suffix ) {
+            $suffix = 'GET';
+            redo;
+        } elsif ( 'not_implemented' eq $suffix ) {
+            ( my $enc_req_method = $req_method ) =~ s[(["'&<>])]{ '&#'.(ord $1).';' }ge;
+            $c->response->status( 405 );
+            $c->response->content_type( 'text/html' );
+            $c->response->body(
+                '<!DOCTYPE html><title>405 Method Not Allowed</title>'
+                . "<p>The requested method $enc_req_method is not allowed for this URL.</p>"
+            );
+        } else {
+            $suffix = 'not_implemented';
+            redo;
+        }
     }
-    elsif ($code = $controller->can($rest_method)) {
-        $name = $rest_method; # Stash name and code to run 'foo_GET' like an action below.
+
+    if ( not $code ) {
+        my @allowed = $self->get_allowed_methods( $class, $c, $method_name );
+        $c->response->header( Allow => @allowed ? \@allowed : '' );
     }
- 
-    # Generic handling for foo_*
-    if (!$code) {
-        my $code_action = {
-            OPTIONS => sub {
-                $name = $rest_method;
-                $code = sub { $self->_return_options($self->name, @_) };
-            },
-            HEAD => sub {
-              $rest_method =~ s{_HEAD$}{_GET}i;
-              $self->_dispatch_rest_method($c, $rest_method);
-            },
-            default => sub {
-                # Otherwise, not implemented.
-                $name = $self->name . "_not_implemented";
-                $code = $controller->can($name) # User method
-                    # Generic not implemented
-                    || sub { $self->_return_not_implemented($self->name, @_) };
-            },
-        };
-        my ( $http_method, $action_name ) = ( $rest_method, $self->name );
-        $http_method =~ s{\Q$action_name\E\_}{};
-        my $respond = ($code_action->{$http_method}
-                       || $code_action->{'default'})->();
-        return $respond unless $name;
-    }
- 
+
     # localise stuff so we can dispatch the action 'as normal, but get
     # different stats shown, and different code run.
     # Also get the full path for the action, and make it look like a forward
-    local $self->{code} = $code;
-    my @name = split m{/}, $self->reverse;
-    $name[-1] = $name;
-    local $self->{reverse} = "-> " . join('/', @name);
- 
-    $c->execute( $self->class, $self, @{ $req->args } );
-}
- 
+    local $self->{'code'} = $code || sub {};
+    ( local $self->{'reverse'} = "-> $self->{'reverse'}" ) =~ s{[^/]+\z}{$rest_method};
+
+    my $sub_return = $c->execute( $class, $self, @{ $c->request->args } );
+    defined $sub_return ? $sub_return : $return;
+};
+
 sub get_allowed_methods {
     my ( $self, $controller, $c, $name ) = @_;
-    my $class = ref($controller) ? ref($controller) : $controller;
-    my $methods = {
-      map { /^$name\_(.+)$/ ? ( $1 => 1 ) : () }
-        ($class->meta->get_all_method_names )
-    };
-    $methods->{'HEAD'} = 1 if $methods->{'GET'};
-    delete $methods->{'not_implemented'};
-    return sort keys %$methods;
-}
- 
-sub _return_options {
-    my ( $self, $method_name, $controller, $c) = @_;
-    my @allowed = $self->get_allowed_methods($controller, $c, $method_name);
-    $c->response->content_type('text/plain');
-    $c->response->status(200);
-    $c->response->header( 'Allow' => @allowed ? \@allowed : '' );
-    $c->response->body(q{});
-}
- 
-sub _return_not_implemented {
-    my ( $self, $method_name, $controller, $c ) = @_;
- 
-    my @allowed = $self->get_allowed_methods($controller, $c, $method_name);
-    $c->response->content_type('text/plain');
-    $c->response->status(405);
-    $c->response->header( 'Allow' => @allowed ? \@allowed : '' );
-    $c->response->body( "Method "
-          . $c->request->method
-          . " not implemented for "
-          . $c->uri_for( $method_name ) );
+    my $class = ref $controller || $controller; # backcompat
+    my %methods = map /^\Q$name\E\_(.+)()$/, $class->meta->get_all_method_names;
+    $methods{'HEAD'} = 1 if exists $methods{'GET'};
+    delete $methods{'not_implemented'};
+    sort keys %methods;
 }
 
 1;
@@ -127,88 +91,115 @@ Catalyst::ActionRole::Methods - Dispatch by HTTP Methods
 
 =head1 SYNOPSIS
 
-    package MyApp::Controller::Example;
+ sub foo : Local Does('Methods') {
+   my ($self, $c, $arg) = @_;
+   # called first, regardless of HTTP request method
+ }
 
-    use Moose;
-    use MooseX::MethodAttributes;
+ sub foo_GET : Action {
+   my ($self, $c, $arg) = @_;
+   # called next, but only for GET requests
+   # this is passed the same @_ as its generic action
+ }
 
-    extends 'Catalyst::Controller';
+ sub foo_POST { # does not need to be an action
+   my ($self, $c, $arg) = @_;
+   # likewise for POST requests
+ }
 
-    sub myaction :Chained(/) Does('Methods') CaptureArgs(1) {
-      my ($self, $c, $arg) = @_;
-      # When this action is matched, first execute this action's
-      # body, then an action matching the HTTP method or the not
-      # implemented one if needed.
-    }
-
-      sub myaction_GET :Action {
-        my ($self, $c, $arg) = @_;
-        # Note that if the 'parent' action has args or capture-args, those are
-        # made available to a matching method action.
-      }
-
-      sub myaction_POST {
-        my ($self, $c, $arg) = @_;
-        # We match the subroutine name whether its an action or not.  If you
-        # make it an action, as in the _GET above, you are allowed to apply
-        # action roles (which is the main advantage to this AFAIK).
-      }
-
-      sub myaction_not_implemented {
-        my ($self, $c, $arg) = @_;
-        # There's a sane default for this, but you can override as needed.
-      }
-
-      sub next_action_in_chain_1 :Chained(myaction) Args(0) { ... }
-
-      sub next_action_in_chain_2 :Chained(myaction) Args(0) { ... }
-
-    __PACKAGE__->meta->make_immutable;
+ sub foo_not_implemented { # fallback
+   my ($self, $c, $arg) = @_;
+   # only needed if you want to override the default 405 response
+ }
 
 =head1 DESCRIPTION
 
-This is a L<Moose::Role> version of the classic L<Catalyst::Action::REST> action
-class.  The intention is to offer some of the popular functionality that comes
-with L<Catalyst::Action::REST> in a more modular, 'build what you need' package.
+This is a L<Catalyst> extension which adds additional dispatch based on the
+HTTP method, in the same way L<Catalyst::Action::REST> does:
 
-Bulk of this documentation and test cases derive from L<Catalyst::Action::REST>
-with the current author's gratitude.
+An action which does this role will be matched and run as usual. But after it
+returns, a sub-action will also run, which will be identified by taking the
+name of the main action and appending an underscore and the HTTP request method
+name. This sub-action is passed the same captures and args as the main action.
 
-This Action Role handles doing automatic method dispatching for requests.  It
-takes a normal Catalyst action, and changes the dispatch to append an
-underscore and method name.  First it will try dispatching to an action with
-the generated name, and failing that it will try to dispatch to a regular
-method.
+You can also write the sub-action as a plain method without declaring it as an
+action. Probably the only advantage of declaring it as an action is that other
+action roles can then be applied to it.
 
-    sub foo :Local :Does('Methods') {
-      ... do setup for HTTP method specific handlers ...
-    }
- 
-    sub foo_GET {
-      ... do something for GET requests ...
-    }
- 
-    # alternatively use an Action
-    sub foo_PUT : Action {
-      ... do something for PUT requests ...
-    }
- 
-For example, in the example above, calling GET on "/foo" would result in
-the foo_GET method being dispatched.
- 
-If a method is requested that is not implemented, this action will
-return a status 405 (Method Not Found).  It will populate the "Allow" header
-with the list of implemented request methods.  You can override this behavior
-by implementing a custom 405 handler like so:
- 
-   sub foo_not_implemented {
-      ... handle not implemented methods ...
-   }
- 
-If you do not provide an _OPTIONS subroutine, we will automatically respond
-with a 200 OK.  The "Allow" header will be populated with the list of
-implemented request methods. If you do not provide an _HEAD either, we will
-auto dispatch to the _GET one in case it exists.
+There are several fallbacks if a sub-action for the current request method does
+not exist:
+
+=over 3
+
+=item 1.
+
+C<HEAD> requests will try to use the sub-action for C<GET>.
+
+=item 2.
+
+C<OPTIONS> requests will set up a 204 (No Content) response.
+
+=item 3.
+
+The C<not_implemented> sub-action is tried as a last resort.
+
+=item 4.
+
+Finally, a 405 (Method Not Found) response is set up.
+
+=back
+
+Both fallback responses include an C<Allow> header which will be populated from
+the available sub-actions.
+
+Note that this action role only I<adds> dispatch. It does not affect matching!
+The main action will always run if it otherwise matches the request, even if no
+suitable sub-action exists and a 405 is generated. Nor does it affect chaining.
+All subsequent actions in a chain will still run, along with their sub-actions.
+
+=head1 INTERACTION WITH CHAINED DISPATCH
+
+The fact that this is an action role which is attached to individual actions
+has some odd and unintuitive consequences when combining it with Chained
+dispatch, particularly when it is used in multiple actions in the same chain.
+This example will not work well at all:
+
+ sub foo : Chained(/) CaptureArgs(1) Does('Methods') { ... }
+ sub foo_GET { ... }
+
+ sub bar : Chained(foo) Args(0) { ... }
+ sub bar_POST { ... }
+
+Because each action does its own isolated C<Methods> sub-dispatch, a C<GET>
+request to this chain will run C<foo>, then C<foo_GET>, then C<bar>, then
+set up a 405 response due to the absence of C<bar_GET>. And because C<bar> only
+has a sub-action for C<POST>, that is all the C<Allow> header will contain.
+
+Worse (maybe), a C<POST> will run C<foo>, then set up a 405 response with an
+C<Allow> list of just C<GET>, but then still run C<bar> and C<bar_POST>.
+
+This means it is never useful for an action which is further along a chain to
+have I<more> sub-actions than any earlier action.
+
+Having I<fewer> sub-actions can be useful: if the earlier part of the chain is
+shared with other chains then each chain can handle a different set of request
+methods:
+
+ sub foo : Chained(/) CaptureArgs(1) Does('Methods') { ... }
+ sub foo_GET { ... }
+ sub foo_POST { ... }
+
+ sub bar : Chained(foo) Args(0) { ... }
+ sub bar_GET { ... }
+
+ sub quux : Chained(foo) Args(0) { ... }
+ sub quux_POST { ... }
+
+In this example, the C</foo/bar> chain will handle only C<GET> while the
+C</foo/quux> chain will handle only C<POST>. If you later wanted to make
+C</foo/quux> also handle C<GET> then you would only need to add C<quux_GET>
+because there is already a C<foo_GET>. But to make C</foo/bar> handle C<PUT>,
+you would need to add both C<foo_PUT> I<and> C<bar_PUT>.
 
 =head1 VERSUS Catalyst::Action::REST
 
@@ -301,56 +292,36 @@ Returns a list of the allowed methods.
 This method overrides the default dispatch mechanism to the re-dispatching
 mechanism described above.
 
-=head1 AUTHOR
-
-  John Napiorkowski <jnapiork@cpan.org>
-
-Author list from L<Catalyst::Action::REST>
- 
-  Adam Jacob E<lt>adam@stalecoffee.orgE<gt>, with lots of help from mst and jrockway
-  Marchex, Inc. paid me while I developed this module. (L<http://www.marchex.com>)
- 
 =head1 CONTRIBUTORS
 
-The following contributor list was copied from L<Catalyst::Action::REST>
-from where the bulk of this code was copied.
+This module is based on code, tests and documentation extracted out of
+L<Catalyst::Action::REST>, which was originally developed by Adam Jacob
+with lots of help from mst and jrockway, while being paid by Marchex, Inc
+(http://www.marchex.com).
+
+The following people also contributed to parts copied from that package:
  
 Tomas Doran (t0m) E<lt>bobtfish@bobtfish.netE<gt>
  
-John Goulah
- 
-Christopher Laco
- 
-Daisuke Maki E<lt>daisuke@endeworks.jpE<gt>
- 
-Hans Dieter Pearcey
- 
-Brian Phillips E<lt>bphillips@cpan.orgE<gt>
- 
 Dave Rolsky E<lt>autarch@urth.orgE<gt>
- 
-Luke Saunders
  
 Arthur Axel "fREW" Schmidt E<lt>frioux@gmail.comE<gt>
  
 J. Shirley E<lt>jshirley@gmail.comE<gt>
  
-Gavin Henry E<lt>ghenry@surevoip.co.ukE<gt>
- 
-Gerv http://www.gerv.net/
- 
-Colin Newell <colin@opusvl.com>
- 
 Wallace Reis E<lt>wreis@cpan.orgE<gt>
  
-André Walker (andrewalker) <andre@cpan.org>
- 
-=head1 COPYRIGHT
- 
-Copyright (c) 2006-2015 the above named AUTHOR and CONTRIBUTORS
- 
-=head1 LICENSE
- 
-You may distribute this code under the same terms as Perl itself.
- 
+=head1 AUTHOR
+
+Aristotle Pagaltzis <pagaltzis@gmx.de>
+
+John Napiorkowski <jjnapiork@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2024 by Aristotle Pagaltzis.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =cut

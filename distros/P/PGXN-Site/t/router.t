@@ -409,7 +409,7 @@ test_psgi $app => sub {
     for my $uri ('/feedback', '/feedback/') {
         ok my $res = $cb->(GET $uri), "Fetch $uri";
         is $res->code, 200, 'Should get 200 response';
-        like $res->content, qr{\Q<h1>Feedback</h1>}, 'The body should look correct';
+        like $res->content, qr{\Q<h1 id="feedback">Feedback</h1>}, 'The body should look correct';
     }
 };
 
@@ -419,7 +419,7 @@ test_psgi $app => sub {
     for my $uri ('/about', '/about/') {
         ok my $res = $cb->(GET $uri), "Fetch $uri";
         is $res->code, 200, 'Should get 200 response';
-        like $res->content, qr{\Q<h1>About PGXN</h1>}, 'The body should look correct';
+        like $res->content, qr{\Q<h1 id="aboutpgxn">About PGXN</h1>}, 'The body should look correct';
     }
 };
 
@@ -439,7 +439,7 @@ test_psgi $app => sub {
     for my $uri ('/faq', '/faq/') {
         ok my $res = $cb->(GET $uri), "Fetch $uri";
         is $res->code, 200, 'Should get 200 response';
-        like $res->content, qr{\Q<h1>Frequently Asked Questions</h1>},
+        like $res->content, qr{\Q<h1 id="frequentlyaskedquestions">Frequently Asked Questions</h1>},
             'The body should look correct';
     }
 };
@@ -450,7 +450,7 @@ test_psgi $app => sub {
     for my $uri ('/mirroring', '/mirroring/') {
         ok my $res = $cb->(GET $uri), "Fetch $uri";
         is $res->code, 200, 'Should get 200 response';
-        like $res->content, qr{\Q<h1>Mirroring PGXN</h1>},
+        like $res->content, qr{\Q<h1 id="mirroringpgxn">Mirroring PGXN</h1>},
             'The body should look correct';
     }
 };

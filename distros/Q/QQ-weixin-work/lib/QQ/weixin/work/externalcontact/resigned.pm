@@ -19,7 +19,7 @@ use LWP::UserAgent;
 use JSON;
 use utf8;
 
-our $VERSION = '0.06';
+our $VERSION = '0.10';
 our @EXPORT = qw/ transfer_customer transfer_result /;
 
 =head1 FUNCTION
@@ -27,6 +27,7 @@ our @EXPORT = qw/ transfer_customer transfer_result /;
 =head2 transfer_customer(access_token, hash);
 
 分配离职成员的客户
+最后更新：2023/12/01
 
 =head2 SYNOPSIS
 
@@ -50,18 +51,21 @@ L<https://developer.work.weixin.qq.com/document/path/94081>
 
 =head4 参数说明：
 
-    参数	            必须	说明
+	参数	            必须	说明
     access_token	是	调用接口凭证
 	handover_userid	是	原跟进成员的userid
 	takeover_userid	是	接替成员的userid
 	external_userid	是	客户的external_userid列表，最多一次转移100个客户
+
+提示
+原跟进成员离职时间不能超过1年且离职前一年内至少登录过一次企业微信; 接替成员最近一年内至少登陆过一次企业微信。
 
 handover_userid必须是已离职用户。
 external_userid必须是handover_userid的客户（即配置了客户联系功能的成员所添加的联系人）。
 
 =head4 权限说明：
 
-企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
+企业需要使用配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
 第三方应用需拥有“企业客户权限->客户联系->离职分配”权限
 接替成员必须在此第三方应用或自建应用的可见范围内。
 接替成员需要配置了客户联系功能。
@@ -87,7 +91,7 @@ external_userid必须是handover_userid的客户（即配置了客户联系功�
 
 =head4 RETURN 参数说明：
 
-    参数	        说明
+	参数	        说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	customer.external_userid	客户的external_userid
@@ -117,6 +121,7 @@ sub transfer_customer {
 =head2 transfer_result(access_token, hash);
 
 查询客户接替状态
+最后更新：2021/03/24
 
 =head2 SYNOPSIS
 
@@ -176,7 +181,7 @@ L<https://developer.work.weixin.qq.com/document/path/94082>
 
 =head4 RETURN 参数说明：
 
-    参数	        说明
+	参数	        说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	customer.external_userid	转接客户的外部联系人userid

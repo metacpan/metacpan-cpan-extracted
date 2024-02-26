@@ -3,9 +3,9 @@ package Data::Sah::ValueBundle::Date;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-30'; # DATE
+our $DATE = '2023-12-09'; # DATE
 our $DIST = 'Data-Sah-ValueBundle-Date'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: Default value rules related to dates (and times)
@@ -22,7 +22,7 @@ Data::Sah::ValueBundle::Date - Default value rules related to dates (and times)
 
 =head1 VERSION
 
-This document describes version 0.002 of Data::Sah::ValueBundle::Date (from Perl distribution Data-Sah-ValueBundle-Date), released on 2023-03-30.
+This document describes version 0.003 of Data::Sah::ValueBundle::Date (from Perl distribution Data-Sah-ValueBundle-Date), released on 2023-12-09.
 
 =head1 HOMEPAGE
 

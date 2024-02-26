@@ -4,101 +4,83 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-02-01'; # DATE
+our $DATE = '2024-02-21'; # DATE
 our $DIST = 'Acme-CPANAuthorsBundle-CPAN-Streaks'; # DIST
-our $VERSION = '20240201.0'; # VERSION
+our $VERSION = '20240221.0'; # VERSION
 
 use Acme::CPANAuthors::Register (
     'PERLANCAR' => '',
-    'ETHER' => '',
-    'PEVANS' => '',
     'BDFOY' => '',
-    'KUERBIS' => '',
-    'NLNETLABS' => '',
-    'VVELOX' => '',
-    'TINITA' => '',
-    'OLIVER' => '',
-    'SANKO' => '',
-    'TIMLEGGE' => '',
-    'KARASIK' => '',
-    'CRLCU' => '',
-    'DAMI' => '',
-    'JIMAVERA' => '',
-    'SISYPHUS' => '',
-    'DCANTRELL' => '',
-    'LEONT' => '',
-    'SHLOMIF' => '',
-    'WYANT' => '',
-    'DDICK' => '',
-    'GARU' => '',
-    'RKAPL' => '',
-    'ABALAMA' => '',
-    'ARISTOTLE' => '',
-    'BKB' => '',
-    'JMATES' => '',
     'JV' => '',
     'KIMOTO' => '',
-    'LEEJO' => '',
-    'MATHIAS' => '',
     'OALDERS' => '',
     'SKIM' => '',
-    'TURNERJW' => '',
-    'UTASHIRO' => '',
-    'ABH' => '',
-    'ANELSON' => '',
-    'ASLEWIS' => '',
-    'BIGPRESH' => '',
-    'CGPAN' => '',
-    'CHEVALIER' => '',
-    'DAVECROSS' => '',
-    'DEXTER' => '',
-    'DOMM' => '',
-    'DSKOLL' => '',
-    'EZIMUEL' => '',
-    'FSEITZ' => '',
-    'GENE' => '',
-    'GNUSTAVO' => '',
-    'GSG' => '',
-    'GUILLEM' => '',
-    'IKEGAMI' => '',
-    'ISHIGAKI' => '',
-    'JEFFA' => '',
-    'JUERD' => '',
-    'LION' => '',
-    'LNATION' => '',
-    'MBRADSHAW' => '',
-    'MSCHOUT' => '',
-    'MSIMERSON' => '',
-    'NJFRANCK' => '',
-    'OLEG' => '',
-    'RJET' => '',
-    'SALVA' => '',
-    'SHOGO' => '',
-    'SULLR' => '',
-    'TEAM' => '',
-    'VOEGELAS' => '',
-    'VOLKENING' => '',
-    'WSNYDER' => '',
-    'XMOLEX' => '',
+    'NHORNE' => '',
     'AJNN' => '',
-    'ASPOSE' => '',
-    'ATRODO' => '',
-    'BIGFOOT' => '',
-    'BINGOS' => '',
     'BPS' => '',
-    'DERF' => '',
-    'DERIV' => '',
-    'ETJ' => '',
-    'EXIFTOOL' => '',
-    'GHE' => '',
-    'GLLORE' => '',
-    'HOCHSTEN' => '',
     'JDEGUEST' => '',
     'JRM' => '',
     'MANWAR' => '',
-    'NHORNE' => '',
-    'SYBER' => '',
-    'TANIGUCHI' => '',
+    'DWHEELER' => '',
+    'VVELOX' => '',
+    'BRIANDFOY' => '',
+    'PLICEASE' => '',
+    'HOUSTON' => '',
+    'RAWLEYFOW' => '',
+    'SANKO' => '',
+    'SISYPHUS' => '',
+    'AJWOOD' => '',
+    'ARISTOTLE' => '',
+    'ASB' => '',
+    'BKB' => '',
+    'CUKEBOT' => '',
+    'DAMI' => '',
+    'DART' => '',
+    'FELIPE' => '',
+    'GRABZIT' => '',
+    'HANJE' => '',
+    'HESCO' => '',
+    'HMBRAND' => '',
+    'INGY' => '',
+    'JANW' => '',
+    'JAVONET' => '',
+    'JCRISTY' => '',
+    'JHTHORSEN' => '',
+    'JONASBN' => '',
+    'KUERBIS' => '',
+    'MIKKOI' => '',
+    'MSIMERSON' => '',
+    'NEZUMI' => '',
+    'NLNETLABS' => '',
+    'OLIVER' => '',
+    'PLAIN' => '',
+    'TEAM' => '',
+    'TIMKA' => '',
+    'UTASHIRO' => '',
+    'WOUTER' => '',
+    'ZMUGHAL' => '',
+    'ABALAMA' => '',
+    'CRORAA' => '',
+    'DAKKAR' => '',
+    'ETHER' => '',
+    'ETJ' => '',
+    'FASTLY' => '',
+    'GBROWN' => '',
+    'JDDPAUSE' => '',
+    'JGNI' => '',
+    'JIMAVERA' => '',
+    'JSF' => '',
+    'KJETILK' => '',
+    'KRYDE' => '',
+    'LITCHIE' => '',
+    'MLEHMANN' => '',
+    'OETIKER' => '',
+    'OODLER' => '',
+    'PMQS' => '',
+    'RKAPL' => '',
+    'SREZIC' => '',
+    'TYRRMINAL' => '',
+    'VOLKENING' => '',
 );
 
 
@@ -117,107 +99,89 @@ Acme::CPANAuthors::CPAN::Streaks::WeeklyReleases::Current - Authors with ongoing
 
 =head1 VERSION
 
-This document describes version 20240201.0 of Acme::CPANAuthors::CPAN::Streaks::WeeklyReleases::Current (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-02-01.
+This document describes version 20240221.0 of Acme::CPANAuthors::CPAN::Streaks::WeeklyReleases::Current (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-02-21.
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-Current standings (as of 2024-02-01, produced by L<cpan-streaks>):
+Current standings (as of 2024-02-21, produced by L<cpan-streaks>):
 
   +-----------+-----+------------+-------------+
   | author    | len | start_date | status      |
   +-----------+-----+------------+-------------+
-  | PERLANCAR | 493 | 2014-08-24 | ongoing     |
-  | ETHER     |  97 | 2022-03-20 | might-break |
-  | PEVANS    |  31 | 2023-07-02 | ongoing     |
-  | BDFOY     |  14 | 2023-10-29 | ongoing     |
-  | KUERBIS   |   6 | 2023-12-17 | might-break |
-  | NLNETLABS |   5 | 2023-12-24 | might-break |
-  | VVELOX    |   5 | 2023-12-24 | might-break |
-  | TINITA    |   5 | 2023-12-31 | ongoing     |
-  | OLIVER    |   4 | 2023-12-31 | might-break |
-  | SANKO     |   4 | 2023-12-31 | might-break |
-  | TIMLEGGE  |   4 | 2023-12-31 | might-break |
-  | KARASIK   |   4 | 2024-01-07 | ongoing     |
-  | CRLCU     |   3 | 2024-01-07 | might-break |
-  | DAMI      |   3 | 2024-01-07 | might-break |
-  | JIMAVERA  |   3 | 2024-01-07 | might-break |
-  | SISYPHUS  |   3 | 2024-01-07 | might-break |
-  | DCANTRELL |   3 | 2024-01-14 | ongoing     |
-  | LEONT     |   3 | 2024-01-14 | ongoing     |
-  | SHLOMIF   |   3 | 2024-01-14 | ongoing     |
-  | WYANT     |   3 | 2024-01-14 | ongoing     |
-  | DDICK     |   2 | 2024-01-14 | might-break |
-  | GARU      |   2 | 2024-01-14 | might-break |
-  | RKAPL     |   2 | 2024-01-14 | might-break |
-  | ABALAMA   |   2 | 2024-01-21 | ongoing     |
-  | ARISTOTLE |   2 | 2024-01-21 | ongoing     |
-  | BKB       |   2 | 2024-01-21 | ongoing     |
-  | JMATES    |   2 | 2024-01-21 | ongoing     |
-  | JV        |   2 | 2024-01-21 | ongoing     |
-  | KIMOTO    |   2 | 2024-01-21 | ongoing     |
-  | LEEJO     |   2 | 2024-01-21 | ongoing     |
-  | MATHIAS   |   2 | 2024-01-21 | ongoing     |
-  | OALDERS   |   2 | 2024-01-21 | ongoing     |
-  | SKIM      |   2 | 2024-01-21 | ongoing     |
-  | TURNERJW  |   2 | 2024-01-21 | ongoing     |
-  | UTASHIRO  |   2 | 2024-01-21 | ongoing     |
-  | ABH       |   1 | 2024-01-21 | might-break |
-  | ANELSON   |   1 | 2024-01-21 | might-break |
-  | ASLEWIS   |   1 | 2024-01-21 | might-break |
-  | BIGPRESH  |   1 | 2024-01-21 | might-break |
-  | CGPAN     |   1 | 2024-01-21 | might-break |
-  | CHEVALIER |   1 | 2024-01-21 | might-break |
-  | DAVECROSS |   1 | 2024-01-21 | might-break |
-  | DEXTER    |   1 | 2024-01-21 | might-break |
-  | DOMM      |   1 | 2024-01-21 | might-break |
-  | DSKOLL    |   1 | 2024-01-21 | might-break |
-  | EZIMUEL   |   1 | 2024-01-21 | might-break |
-  | FSEITZ    |   1 | 2024-01-21 | might-break |
-  | GENE      |   1 | 2024-01-21 | might-break |
-  | GNUSTAVO  |   1 | 2024-01-21 | might-break |
-  | GSG       |   1 | 2024-01-21 | might-break |
-  | GUILLEM   |   1 | 2024-01-21 | might-break |
-  | IKEGAMI   |   1 | 2024-01-21 | might-break |
-  | ISHIGAKI  |   1 | 2024-01-21 | might-break |
-  | JEFFA     |   1 | 2024-01-21 | might-break |
-  | JUERD     |   1 | 2024-01-21 | might-break |
-  | LION      |   1 | 2024-01-21 | might-break |
-  | LNATION   |   1 | 2024-01-21 | might-break |
-  | MBRADSHAW |   1 | 2024-01-21 | might-break |
-  | MSCHOUT   |   1 | 2024-01-21 | might-break |
-  | MSIMERSON |   1 | 2024-01-21 | might-break |
-  | NJFRANCK  |   1 | 2024-01-21 | might-break |
-  | OLEG      |   1 | 2024-01-21 | might-break |
-  | RJET      |   1 | 2024-01-21 | might-break |
-  | SALVA     |   1 | 2024-01-21 | might-break |
-  | SHOGO     |   1 | 2024-01-21 | might-break |
-  | SULLR     |   1 | 2024-01-21 | might-break |
-  | TEAM      |   1 | 2024-01-21 | might-break |
-  | VOEGELAS  |   1 | 2024-01-21 | might-break |
-  | VOLKENING |   1 | 2024-01-21 | might-break |
-  | WSNYDER   |   1 | 2024-01-21 | might-break |
-  | XMOLEX    |   1 | 2024-01-21 | might-break |
-  | AJNN      |   1 | 2024-01-28 | ongoing     |
-  | ASPOSE    |   1 | 2024-01-28 | ongoing     |
-  | ATRODO    |   1 | 2024-01-28 | ongoing     |
-  | BIGFOOT   |   1 | 2024-01-28 | ongoing     |
-  | BINGOS    |   1 | 2024-01-28 | ongoing     |
-  | BPS       |   1 | 2024-01-28 | ongoing     |
-  | DERF      |   1 | 2024-01-28 | ongoing     |
-  | DERIV     |   1 | 2024-01-28 | ongoing     |
-  | ETJ       |   1 | 2024-01-28 | ongoing     |
-  | EXIFTOOL  |   1 | 2024-01-28 | ongoing     |
-  | GHE       |   1 | 2024-01-28 | ongoing     |
-  | GLLORE    |   1 | 2024-01-28 | ongoing     |
-  | HOCHSTEN  |   1 | 2024-01-28 | ongoing     |
-  | JDEGUEST  |   1 | 2024-01-28 | ongoing     |
-  | JRM       |   1 | 2024-01-28 | ongoing     |
-  | MANWAR    |   1 | 2024-01-28 | ongoing     |
-  | NHORNE    |   1 | 2024-01-28 | ongoing     |
-  | SYBER     |   1 | 2024-01-28 | ongoing     |
-  | TANIGUCHI |   1 | 2024-01-28 | ongoing     |
+  | PERLANCAR | 496 | 2014-08-24 | ongoing     |
+  | BDFOY     |  16 | 2023-10-29 | might-break |
+  | JV        |   5 | 2024-01-21 | ongoing     |
+  | KIMOTO    |   5 | 2024-01-21 | ongoing     |
+  | OALDERS   |   5 | 2024-01-21 | ongoing     |
+  | SKIM      |   4 | 2024-01-21 | might-break |
+  | NHORNE    |   4 | 2024-01-28 | ongoing     |
+  | AJNN      |   3 | 2024-01-28 | might-break |
+  | BPS       |   3 | 2024-01-28 | might-break |
+  | JDEGUEST  |   3 | 2024-01-28 | might-break |
+  | JRM       |   3 | 2024-01-28 | might-break |
+  | MANWAR    |   3 | 2024-01-28 | might-break |
+  | DWHEELER  |   3 | 2024-02-04 | ongoing     |
+  | VVELOX    |   3 | 2024-02-04 | ongoing     |
+  | BRIANDFOY |   2 | 2024-02-04 | might-break |
+  | PLICEASE  |   2 | 2024-02-04 | might-break |
+  | HOUSTON   |   2 | 2024-02-11 | ongoing     |
+  | RAWLEYFOW |   2 | 2024-02-11 | ongoing     |
+  | SANKO     |   2 | 2024-02-11 | ongoing     |
+  | SISYPHUS  |   2 | 2024-02-11 | ongoing     |
+  | AJWOOD    |   1 | 2024-02-11 | might-break |
+  | ARISTOTLE |   1 | 2024-02-11 | might-break |
+  | ASB       |   1 | 2024-02-11 | might-break |
+  | BKB       |   1 | 2024-02-11 | might-break |
+  | CUKEBOT   |   1 | 2024-02-11 | might-break |
+  | DAMI      |   1 | 2024-02-11 | might-break |
+  | DART      |   1 | 2024-02-11 | might-break |
+  | FELIPE    |   1 | 2024-02-11 | might-break |
+  | GRABZIT   |   1 | 2024-02-11 | might-break |
+  | HANJE     |   1 | 2024-02-11 | might-break |
+  | HESCO     |   1 | 2024-02-11 | might-break |
+  | HMBRAND   |   1 | 2024-02-11 | might-break |
+  | INGY      |   1 | 2024-02-11 | might-break |
+  | JANW      |   1 | 2024-02-11 | might-break |
+  | JAVONET   |   1 | 2024-02-11 | might-break |
+  | JCRISTY   |   1 | 2024-02-11 | might-break |
+  | JHTHORSEN |   1 | 2024-02-11 | might-break |
+  | JONASBN   |   1 | 2024-02-11 | might-break |
+  | KUERBIS   |   1 | 2024-02-11 | might-break |
+  | MIKKOI    |   1 | 2024-02-11 | might-break |
+  | MSIMERSON |   1 | 2024-02-11 | might-break |
+  | NEZUMI    |   1 | 2024-02-11 | might-break |
+  | NLNETLABS |   1 | 2024-02-11 | might-break |
+  | OLIVER    |   1 | 2024-02-11 | might-break |
+  | PLAIN     |   1 | 2024-02-11 | might-break |
+  | TEAM      |   1 | 2024-02-11 | might-break |
+  | TIMKA     |   1 | 2024-02-11 | might-break |
+  | UTASHIRO  |   1 | 2024-02-11 | might-break |
+  | WOUTER    |   1 | 2024-02-11 | might-break |
+  | ZMUGHAL   |   1 | 2024-02-11 | might-break |
+  | ABALAMA   |   1 | 2024-02-18 | ongoing     |
+  | CRORAA    |   1 | 2024-02-18 | ongoing     |
+  | DAKKAR    |   1 | 2024-02-18 | ongoing     |
+  | ETHER     |   1 | 2024-02-18 | ongoing     |
+  | ETJ       |   1 | 2024-02-18 | ongoing     |
+  | FASTLY    |   1 | 2024-02-18 | ongoing     |
+  | GBROWN    |   1 | 2024-02-18 | ongoing     |
+  | JDDPAUSE  |   1 | 2024-02-18 | ongoing     |
+  | JGNI      |   1 | 2024-02-18 | ongoing     |
+  | JIMAVERA  |   1 | 2024-02-18 | ongoing     |
+  | JSF       |   1 | 2024-02-18 | ongoing     |
+  | KJETILK   |   1 | 2024-02-18 | ongoing     |
+  | KRYDE     |   1 | 2024-02-18 | ongoing     |
+  | LITCHIE   |   1 | 2024-02-18 | ongoing     |
+  | MLEHMANN  |   1 | 2024-02-18 | ongoing     |
+  | OETIKER   |   1 | 2024-02-18 | ongoing     |
+  | OODLER    |   1 | 2024-02-18 | ongoing     |
+  | PMQS      |   1 | 2024-02-18 | ongoing     |
+  | RKAPL     |   1 | 2024-02-18 | ongoing     |
+  | SREZIC    |   1 | 2024-02-18 | ongoing     |
+  | TYRRMINAL |   1 | 2024-02-18 | ongoing     |
+  | VOLKENING |   1 | 2024-02-18 | ongoing     |
   +-----------+-----+------------+-------------+
 
 =head1 HOMEPAGE

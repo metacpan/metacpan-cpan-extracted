@@ -17,12 +17,13 @@ name: Control-CLI-Extreme
 provides:
   Control::CLI::Extreme:
     file: lib/Control/CLI/Extreme.pm
-    version: '1.10'
+    version: '1.11'
 requires:
   Control::CLI: '2.02'
   perl: v5.6.0
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Control-CLI-Extreme
+  bugtracker: https://github.com/lgastevens/Control-CLI-Extreme/issues
   license: http://dev.perl.org/licenses/
-version: '1.10'
+  repository: https://github.com/lgastevens/Control-CLI-Extreme
+version: '1.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

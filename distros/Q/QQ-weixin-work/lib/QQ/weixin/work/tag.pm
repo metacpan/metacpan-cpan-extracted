@@ -19,7 +19,7 @@ use LWP::UserAgent;
 use JSON;
 use utf8;
 
-our $VERSION = '0.06';
+our $VERSION = '0.10';
 our @EXPORT = qw/ create update delete get addtagusers deltagusers list /;
 
 =head1 FUNCTION
@@ -27,6 +27,7 @@ our @EXPORT = qw/ create update delete get addtagusers deltagusers list /;
 =head2 create(access_token, hash);
 
 创建标签
+最后更新：2020/06/08
 
 =head2 SYNOPSIS
 
@@ -91,6 +92,7 @@ sub create {
 =head2 update(access_token, hash);
 
 更新标签名字
+最后更新：2020/04/02
 
 =head2 SYNOPSIS
 
@@ -151,6 +153,7 @@ sub update {
 =head2 delete(access_token, tagid);
 
 删除标签
+最后更新：2020/04/02
 
 =head2 SYNOPSIS
 
@@ -203,6 +206,7 @@ sub delete {
 =head2 get(access_token, tagid);
 
 获取标签成员
+最后更新：2021/08/11
 
 =head2 SYNOPSIS
 
@@ -243,7 +247,7 @@ L<https://developer.work.weixin.qq.com/document/path/90213>
     tagname	标签名
     userlist	标签中包含的成员列表
     userid	成员帐号
-    name	成员名称，此字段从2019年12月30日起，对新创建第三方应用不再返回，2020年6月30日起，对所有历史第三方应用不再返回，后续第三方仅通讯录应用可获取，第三方页面需要通过通讯录展示组件来展示名字
+    name	成员名称，代开发自建应用需要管理员授权才返回该字段；此字段从2019年12月30日起，对新创建第三方应用不再返回，2020年6月30日起，对所有历史第三方应用不再返回，后续第三方仅通讯录应用可获取，第三方页面需要通过通讯录展示组件来展示名字
     partylist	标签中包含的部门id列表
 
 =cut
@@ -268,6 +272,7 @@ sub get {
 =head2 addtagusers(access_token, hash);
 
 增加标签成员
+最后更新：2020/12/07
 
 =head2 SYNOPSIS
 
@@ -324,7 +329,7 @@ L<https://developer.work.weixin.qq.com/document/path/90214>
 
 =head4 RETURN 参数说明
 
-    参数	            说明
+	参数	            说明
     errcode	        返回码
     errmsg	        对返回码的文本描述内容
     invalidlist	    非法的成员帐号列表
@@ -352,6 +357,7 @@ sub addtagusers {
 =head2 deltagusers(access_token, hash);
 
 删除标签成员
+最后更新：2020/04/02
 
 =head2 SYNOPSIS
 
@@ -369,7 +375,7 @@ L<https://developer.work.weixin.qq.com/document/path/90215>
 
 =head4 参数说明：
 
-    参数	            必须	说明
+	参数	            必须	说明
     access_token	是	调用接口凭证
     tagid	        是	标签ID
     userlist	否	企业成员ID列表，注意：userlist、partylist不能同时为空，单次请求长度不超过1000
@@ -434,6 +440,7 @@ sub deltagusers {
 =head2 list(access_token);
 
 获取标签列表
+最后更新：2018/03/13
 
 =head2 SYNOPSIS
 

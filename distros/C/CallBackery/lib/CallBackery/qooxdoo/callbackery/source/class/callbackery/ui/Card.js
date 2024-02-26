@@ -26,7 +26,7 @@ qx.Class.define("callbackery.ui.Card", {
         this.__dataCache   = {};
 
         this.__actions = [];
-        cfg.action.forEach(function(action) {
+        cfg.action.forEach(action => {
             if (action.addToContextMenu) {
                 this.__actions.push(action);
             }
@@ -111,7 +111,7 @@ qx.Class.define("callbackery.ui.Card", {
             this._setLayout(layout);
 
             // add form elements
-            formCfg.forEach(function(cfg) {
+            formCfg.forEach(cfg => {
                 var labelCfg = cfg.label;
                 var fieldCfg = cfg.field;
 
@@ -124,12 +124,12 @@ qx.Class.define("callbackery.ui.Card", {
                         font         : 'cardLabel'
                     });
                     if (labelCfg.set) {
+                        ['value','tooltip'].forEach(key => {
+                            if (key in labelCfg.set){
+                                labelCfg.set[key] = this.xtr(labelCfg.set[key]);
+                            }
+                        });
                         label.set(labelCfg.set);
-                        // canot use set({}) with xtr().
-                        // TODO: fix xtr() return
-                        if (labelCfg.set.value) {
-                            label.setValue(this.xtr(labelCfg.set.value));
-                        }
                     }
                     this._add(label, labelCfg.addSet);
                 }
@@ -145,6 +145,11 @@ qx.Class.define("callbackery.ui.Card", {
                     var fieldClass = qx.Bootstrap.getByName(className);
                     var field = new fieldClass;
                     if (fieldCfg.set) {
+                        ['placeholder','tooltip'].forEach(key => {
+                            if (key in fieldCfg.set){
+                                fieldCfg.set[key] = this.xtr(fieldCfg.set[key]);
+                            }
+                        });
                         field.set(fieldCfg.set);
                     }
                     var event;
@@ -216,7 +221,7 @@ qx.Class.define("callbackery.ui.Card", {
             }, this);
 
             // add action buttons
-            this.__actions.forEach(function(action) {
+            this.__actions.forEach(action => {
                 var btn = this.__createButton(this.xtr(action.label), action.buttonSet.icon);
                 btn.addListener('execute', function() {
                     this.__parentForm.setSelection(this.__dataCache);

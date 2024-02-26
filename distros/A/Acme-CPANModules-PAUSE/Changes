@@ -1,3 +1,10 @@
+0.003   2023-10-29  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Tweak Abstract (add 'List of ...') to follow convention.
+
+
 0.002   2021-09-12  Released-By: PERLANCAR; Urgency: medium
 
 	- Add entries: Dist::Zilla::Plugin::UploadToCPAN::WWWPAUSESimple,

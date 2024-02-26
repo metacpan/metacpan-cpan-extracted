@@ -1,0 +1,10 @@
+[% IF code.size -%]
+[% class %]
+	: [% path %]
+[% FOREACH c IN code -%]
+	[% c %]
+[% END -%]
+[% END -%]
+[%#-
+# vim: ft=tt2
+-%]

@@ -1,16 +1,47 @@
-<%init>
-my $queue = $m->notes('queue');
+% my $queue = $m->notes('queue');
+% my $pages = $DECODED_ARGS->{'form_config'}{'formtools-pages'};
+% for my $page ( sort { $pages->{$a}{'sort_order'} <=> $pages->{$b}{'sort_order'} } keys %$pages ) {
+<%perl>
+    my @fields;
+    my @elements = @{ $pages->{$page}{'content'} };
+    for my $element (@elements) {
+        my $input_name;
+        my $name;
+        if ( $name = $element->{'input-name'} ) {
+            next if ( $element->{'type'} // '' ) eq 'hidden';
+            $input_name = $name;
+        }
+        elsif ( $name = $element->{'arguments'}{'name'} ) {
+            next if ( $element->{'arguments'}{'render_as'} // '' ) eq 'hidden';
+            if ( RT::Extension::FormTools::is_core_field($name) ) {
+                $input_name = $name;
+            }
+            else {
+                my $cf = RT::CustomField->new( $session{'CurrentUser'} );
+                $cf->LoadByName( Name => $name, Queue => $queue->Id );
+                $cf->LoadByName( Name => $name, Queue => 0 ) unless $cf->Id;
+                if ( $cf->Id ) {
+                    $input_name = GetCustomFieldInputName(
+                        Object      => RT::Ticket->new( $session{CurrentUser} ),
+                        CustomField => $cf,
+                    );
+                }
+            }
+        }
 
-my %all_fields = %$DECODED_ARGS;
-</%init>
-% foreach my $field (keys %all_fields) {
-% next if $field =~ /-Magic/;
-% my $cf = RT::CustomField->new($session{'CurrentUser'});
-% if ($field =~ /CustomField-(\d+)/) {
-% my $id = $1;
-%$cf->Load($id);
-<& /Elements/LabeledValue, Label => $cf->Name, ValueSpanClass => 'current-value', Value => ref ($all_fields{$field}) ? join(', ',@{$all_fields{$field}}) : $all_fields{$field} &>
-% } elsif (RT::Extension::FormTools::is_core_field($field)) {
-<& /Elements/LabeledValue, Label => loc("Content"), ValueSpanClass => 'current-value', Value => $all_fields{$field} &>
-%}
+        if ($input_name) {
+            push @fields, { name => $name, value => $DECODED_ARGS->{$input_name} };
+        }
+    }
+</%perl>
+
+% if( @fields ) {
+<h4><% $pages->{ $page }{'name'} %></h4>
+<div>
+% foreach my $field (@fields) {
+<& /Elements/LabeledValue, Label => loc($field->{name}), ValueSpanClass => 'current-value', Value => ref $field->{value} ? join(', ', @{$field->{value}}) : $field->{value} &>
 % }
+</div><br />
+% }
+% }
+

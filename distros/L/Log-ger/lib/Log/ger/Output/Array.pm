@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-10-29'; # DATE
+our $DATE = '2023-12-29'; # DATE
 our $DIST = 'Log-ger'; # DIST
-our $VERSION = '0.041'; # VERSION
+our $VERSION = '0.042'; # VERSION
 
 sub meta { +{
     v => 2,
@@ -48,7 +48,7 @@ Log::ger::Output::Array - Log to array
 
 =head1 VERSION
 
-version 0.041
+version 0.042
 
 =head1 SYNOPSIS
 

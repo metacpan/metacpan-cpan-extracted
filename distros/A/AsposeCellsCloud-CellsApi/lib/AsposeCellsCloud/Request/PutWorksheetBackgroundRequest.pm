@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# PutWorksheetBackgroundRequest.name : The workbook name.  ,
+# PutWorksheetBackgroundRequest.name : The file name.  ,
 # PutWorksheetBackgroundRequest.sheetName : The worksheet name.  ,
 # PutWorksheetBackgroundRequest.picPath : picture full filename.  ,
-# PutWorksheetBackgroundRequest.folder : Original workbook folder.  ,
-# PutWorksheetBackgroundRequest.storageName : Storage name.  ,
+# PutWorksheetBackgroundRequest.folder : The folder where the file is situated.  ,
+# PutWorksheetBackgroundRequest.storageName : The storage name where the file is situated.  ,
 # PutWorksheetBackgroundRequest.File : File to upload   
 
 {
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_worksheet_background' } = { 
-    	summary => 'Sets background image in worksheet.',
+    	summary => 'Set background image in the worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -145,7 +145,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -166,14 +166,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},

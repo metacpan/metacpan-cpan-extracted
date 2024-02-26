@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use File::Basename;
 use Config;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Exporter;
 our @ISA = qw(Exporter);
@@ -78,7 +78,7 @@ if (platformPermitted) {
 my $no_gtk = 0;
 my %gtksettings = ();
 my %groups = (main => [[''], {}]);
-my $app_name = basename($0);
+my $app_name = '';
 my $marker;
 
 my @basegtkeys = qw(
@@ -157,8 +157,8 @@ my @basegtkeys = qw(
 my @contentwidgets = qw(
 	Entry
 	FloatEntry
-	PodText
 	Spinbox
+	PodText
 	Text
 	TextUndo
 	TextEditor
@@ -199,11 +199,11 @@ my %contentoptions = qw(
 );
 
 my %listoptions = qw(
-	background           content_view_bg
+	background       content_view_bg
 	highlightColor			theme_bg_color
 );
 
-appName($0);
+appName('');
 
 =head1 SYNOPSIS
 
@@ -258,43 +258,25 @@ In working with colors it assumes 8-bit color depth.
 
 =item B<$delete_output>
 
-=over 4
-
 Usefull for testing and debugging. B<export2xrdb> exports to a file which then is sent to xrdb. 
 It checks if this file should be deleted when done. Default value is 1.
 
-=back
-
 =item B<$gtkpath>
-
-=over 4
 
 Usefull for testing. Default value is ~/.config/gtk-3.0/. That is the location where the
 Gtk configuration files reside. This variable is not defined when on Windows or Mac.
 
-=back
-
 =item B<$out_file>
-
-=over 4
 
 Default value ~/.tkgtksettings. Used by B<export2xrdb>. This variable is not defined
 on Windows or Mac.
 
-=back
-
 =item B<$verbose>
-
-=over 4
 
 Usefull for testing and debugging. Default value is 0. If set B<Tk::GtkSettings> will 
 complain about everything not in order. Otherwise it will quietly fail.
 
-=back
-
 =item B<alterColor>(I<$hexcolor>, I<$offset>)
-
-=over 4
 
 Adjusts $hexcolor by $offset. It takes every color chanel and adds or substracts $offset.
 If the channel value is greater than 127 it will substract, otherwise it will add.
@@ -480,7 +462,7 @@ Same as B<export2file>, however the file is always '~/.Xdefaults'.
 =cut
 
 sub export2Xdefaults {
-	export2file('~/.Xdefaults');
+	export2file( $ENV{HOME} . '/.Xdefaults');
 }
 
 =item B<export2Xresources>(?I<$removeflag>?)
@@ -494,7 +476,7 @@ Same as B<export2file>, however the file is always '~/.Xresources'.
 =cut
 
 sub export2Xresources {
-	export2file('~/.Xresources');
+	export2file( $ENV{HOME} . '/.Xresources');
 }
 
 =item B<export2xrdb>
@@ -850,9 +832,13 @@ sub initDefaults {
 	loadGtkInfo;
 	gtkKey('tk-active-background', alterColor(gtkKey('theme_bg_color'), 30));
 	gtkKey('tk-through-color', alterColor(gtkKey('theme_bg_color'), 30));
+
 	for (keys %mainoptions) {
 		groupOption('main', $_, $mainoptions{$_})
 	}
+	my $iconlib = gtkKey('gtk-icon-theme-name');
+	groupOption('main', 'iconTheme', $iconlib) if defined $iconlib;
+
 	my @cw = @contentwidgets;
 	my %co = %contentoptions;
 	groupAdd('content', \@cw, \%co);
@@ -1102,3 +1088,13 @@ If you find any bugs, please contact the author.
 
 1;
 __END__
+
+
+
+
+
+
+
+
+
+

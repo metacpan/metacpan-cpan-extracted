@@ -1,4 +1,14 @@
-0.005   2017-06-09 (PERLANCAR)
+0.007   2023-11-09  Released-By: PERLANCAR; Urgency: high
+
+        - [bugfix] Fix method call.
+
+
+0.006   2023-11-09  Released-By: PERLANCAR; Urgency: medium
+
+        - [refactor] Use the extracted Dist::Zilla::Role::GetSharedFileURL.
+
+
+0.005   2017-06-09  Released-By: PERLANCAR
 
 	- Replace api.metacpan.org URL because MetaCPAN v0 API has been
 	  shut down.
@@ -6,7 +16,7 @@
 	- [doc] Fix Synopsis [RT#122009].
 
 
-0.004   2016-07-16 (PERLANCAR)
+0.004   2016-07-16  Released-By: PERLANCAR
 
         - [Removed] Remove check_exists configuration.
 
@@ -14,19 +24,19 @@
           location1|location2.
 
 
-0.003   2016-07-13 (PERLANCAR)
+0.003   2016-07-13  Released-By: PERLANCAR
 
 	- Add configuration: check_exists, change default to not check that
 	  file exists.
 
 
-0.002   2016-07-13 (PERLANCAR)
+0.002   2016-07-13  Released-By: PERLANCAR
 
 	- Implement hosting=data.
 
 	- Add configuration: {include,exclude}_{files,file_pattern}.
 
 
-0.001   2016-07-13 (PERLANCAR)
+0.001   2016-07-13  Released-By: PERLANCAR
 
          - First release.

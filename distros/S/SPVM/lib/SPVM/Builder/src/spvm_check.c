@@ -193,7 +193,7 @@ void SPVM_CHECK_check_basic_types_relation(SPVM_COMPILER* compiler) {
   // Outer class
   for (int32_t basic_type_id = compiler->basic_types_base_id; basic_type_id < compiler->basic_types->length; basic_type_id++) {
     SPVM_BASIC_TYPE* basic_type = SPVM_LIST_get(compiler->basic_types, basic_type_id);
-    if (basic_type->is_anon) {
+    if (basic_type->is_anon && !strstr(basic_type->name, "eval::anon::")) {
       
       char* found_ptr = strstr(basic_type->name, "::anon::");
       assert(found_ptr);
@@ -598,7 +598,7 @@ void SPVM_CHECK_check_basic_types_method(SPVM_COMPILER* compiler) {
         }
       }
       
-      assert(method->current_basic_type->class_file);
+      assert(method->current_basic_type->file);
       
       // Add variable declarations if the block does not exist
       if (!method->op_block) {
@@ -646,16 +646,21 @@ void SPVM_CHECK_check_basic_types_ast(SPVM_COMPILER* compiler) {
     
     SPVM_BASIC_TYPE_add_constant_string(compiler, basic_type, basic_type->name, strlen(basic_type->name));
     
+    if (basic_type->file) {
+      SPVM_BASIC_TYPE_add_constant_string(compiler, basic_type, basic_type->file, strlen(basic_type->file));
+    }
+    
     if (basic_type->class_dir) {
       SPVM_BASIC_TYPE_add_constant_string(compiler, basic_type, basic_type->class_dir, strlen(basic_type->class_dir));
     }
+    
     if (basic_type->class_rel_file) {
       SPVM_BASIC_TYPE_add_constant_string(compiler, basic_type, basic_type->class_rel_file, strlen(basic_type->class_rel_file));
     }
+    
     if (basic_type->version_string) {
       SPVM_BASIC_TYPE_add_constant_string(compiler, basic_type, basic_type->version_string, strlen(basic_type->version_string));
     }
-    
     
     for (int32_t class_var_index = 0; class_var_index < basic_type->class_vars->length; class_var_index++) {
       SPVM_CLASS_VAR* class_var = SPVM_LIST_get(basic_type->class_vars, class_var_index);
@@ -1104,7 +1109,7 @@ void SPVM_CHECK_check_ast_check_op_types(SPVM_COMPILER* compiler, SPVM_BASIC_TYP
               const char* unresolved_basic_type_name_maybe_alias = op_type->uv.type->unresolved_basic_type_name;
               
               SPVM_HASH* alias_symtable = NULL;
-              if (basic_type->is_anon) {
+              if (basic_type->is_anon && basic_type->outer) {
                 alias_symtable = basic_type->outer->alias_symtable;
               }
               else {

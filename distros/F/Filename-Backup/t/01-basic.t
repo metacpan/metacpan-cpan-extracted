@@ -27,7 +27,7 @@ is_deeply(check_backup_filename(filename=>"foo.txt.rej"),
 # ci
 is_deeply(check_backup_filename(filename=>"foo.BAK"),
                 {original_filename=>'foo'});
-is_deeply(check_backup_filename(filename=>"foo.BAK", ci=>0), 0);
+is_deeply(check_backup_filename(filename=>"foo.BAK", ignore_case=>0), 0);
 
 DONE_TESTING:
 done_testing;

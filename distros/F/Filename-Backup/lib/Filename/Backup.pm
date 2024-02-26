@@ -1,14 +1,16 @@
 package Filename::Backup;
 
-our $DATE = '2016-10-19'; # DATE
-our $VERSION = '0.03'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
-require Exporter;
-our @ISA       = qw(Exporter);
+use Exporter qw(import);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-12-15'; # DATE
+our $DIST = 'Filename-Backup'; # DIST
+our $VERSION = '0.04'; # VERSION
+
 our @EXPORT_OK = qw(check_backup_filename);
 
 our %SPEC;
@@ -40,7 +42,7 @@ _
             pos => 0,
         },
         # XXX recurse?
-        ci => {
+        ignore_case => {
             summary => 'Whether to match case-insensitively',
             schema  => 'bool',
             default => 1,
@@ -59,6 +61,17 @@ on.
 
 _
     },
+    examples => [
+        {
+            args=>{filename => 'foo.bar'},
+        },
+        {
+            args=>{filename => 'foo.bak'},
+        },
+        {
+            args=>{filename => 'foo.Bak', ignore_case => 0},
+        },
+    ],
 };
 sub check_backup_filename {
     my %args = @_;
@@ -72,7 +85,7 @@ sub check_backup_filename {
     }
 
     $filename =~ /(~|\.\w+)\z/ or return 0;
-    my $ci = $args{ci} // 1;
+    my $ci = $args{ignore_case} // 1;
 
     my $suffix = $1;
 
@@ -113,7 +126,7 @@ Filename::Backup - Check whether filename indicates being a backup file
 
 =head1 VERSION
 
-This document describes version 0.03 of Filename::Backup (from Perl distribution Filename-Backup), released on 2016-10-19.
+This document describes version 0.04 of Filename::Backup (from Perl distribution Filename-Backup), released on 2023-12-15.
 
 =head1 SYNOPSIS
 
@@ -131,9 +144,31 @@ This document describes version 0.03 of Filename::Backup (from Perl distribution
 =head1 FUNCTIONS
 
 
-=head2 check_backup_filename(%args) -> bool|hash
+=head2 check_backup_filename
+
+Usage:
+
+ check_backup_filename(%args) -> bool|hash
 
 Check whether filename indicates being a backup file.
+
+Examples:
+
+=over
+
+=item * Example #1:
+
+ check_backup_filename(filename => "foo.bar"); # -> 0
+
+=item * Example #2:
+
+ check_backup_filename(filename => "foo.bak"); # -> { original_filename => "foo" }
+
+=item * Example #3:
+
+ check_backup_filename(filename => "foo.Bak", ignore_case => 0); # -> 0
+
+=back
 
 This function is not exported by default, but exportable.
 
@@ -141,11 +176,14 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<ci> => I<bool> (default: 1)
+=item * B<filename>* => I<str>
+
+(No description)
+
+=item * B<ignore_case> => I<bool> (default: 1)
 
 Whether to match case-insensitively.
 
-=item * B<filename>* => I<str>
 
 =back
 
@@ -166,14 +204,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Filename-B
 
 Source repository is at L<https://github.com/perlancar/perl-Filename-Backup>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Filename-Backup>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Filename::Archive>
@@ -184,11 +214,37 @@ L<Filename::Compressed>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Filename-Backup>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

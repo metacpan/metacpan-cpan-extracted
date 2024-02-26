@@ -33,13 +33,14 @@
       "runtime" : {
          "requires" : {
             "JSON" : "0",
+            "LWP" : "0",
             "MIME::Base64" : "0",
-            "URL::Encode" : "0",
-            "WWW::Curl::Easy" : "0"
+            "Test::NoWarnings" : "0",
+            "URL::Encode" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.02",
+   "version" : "1.06",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

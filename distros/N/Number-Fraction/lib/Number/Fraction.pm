@@ -94,7 +94,7 @@ makes C<$f3> a copy of C<$f1>
 
 creates a fraction with a denominator of 0 and a numerator of 1.
 
-If you use the alterative syntax of
+If you use the alternative syntax of
 
   use Number::Fraction ':constants';
 
@@ -186,9 +186,9 @@ use warnings;
 
 use Carp;
 use Moo;
-use MooX::Types::MooseLike::Base qw/Int/;
+use Types::Standard qw/Int/;
 
-our $VERSION = '3.0.4';
+our $VERSION = '3.1.0';
 
 my $_mixed = 0;
 

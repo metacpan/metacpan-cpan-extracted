@@ -53,13 +53,14 @@ if(eval 'require IP::Country') {
 my $test_requires = {
 	'Test::Carp' => 0,
 	'Test::Most' => 0,
+	'Test::Needs' => 0,
 	'Test::NoWarnings' => 0,
 	'Test::Requires' => 0,
 	# 'Test::Kwalitee' => 0,
 	'autodie' => 0,
 	'IPC::System::Simple' => 0,
 	'Test::Compile' => 0,
-	'Test::Without::Module' => 0,
+	'Test::Without::Module' => 0
 };
 
 if($online_tests) {
@@ -127,12 +128,11 @@ sub are_online
 	return 0 if($ENV{'AUTOMATED_TESTING'});
 	return 0 if(!-t STDIN);
 
-	my $s = IO::Socket::INET->new(
+	if(my $s = IO::Socket::INET->new(
 		# PeerAddr => 'www.ripe.net:43',
 		PeerAddr => 'whois.apnic.net:43',
 		Timeout => 5
-	);
-	if($s) {
+	)) {
 		if($ENV{'PERL_MM_USE_DEFAULT'}) {
 			close($s);
 			return 1;

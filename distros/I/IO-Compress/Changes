@@ -1,6 +1,18 @@
 CHANGES
 -------
 
+  2.207 18 February 2024
+
+      * Add bin/zipdetails 4.000
+      
+      * Merge pull request #51 from rwp0/rwp0/fix-indirect-syntax
+        Thu Nov 23 12:17:30 2023 +0000
+        f1c70d0ef8ed7a91daae6a3ea6b10dc486db4463
+
+      * Fix indirect syntax
+        Mon Nov 6 13:23:07 2023 +0100
+        7bd8408ef428024985e39f1275875a5f0812fbbf
+
   2.206 25 July 2023
 
       * 2.206

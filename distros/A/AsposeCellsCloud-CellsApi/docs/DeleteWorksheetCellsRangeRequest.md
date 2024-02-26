@@ -8,7 +8,7 @@ use AsposeCellsCloud::Request::DeleteWorksheetCellsRange;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**name** | **string** | The workbook name. |
+**name** | **string** | The file name. |
 **sheet_name** | **string** | The worksheet name. |
 **range** | **string** | The range object. |
 **shift** | **string** | Represent the shift options when deleting a range of cells(Down/Left/None/Right/Up). |

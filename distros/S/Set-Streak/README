@@ -3,8 +3,8 @@ NAME
     consecutive sets)
 
 VERSION
-    This document describes version 0.003 of Set::Streak (from Perl
-    distribution Set-Streak), released on 2023-11-24.
+    This document describes version 0.004 of Set::Streak (from Perl
+    distribution Set-Streak), released on 2023-12-09.
 
 FUNCTIONS
   gen_longest_streaks_table
@@ -64,9 +64,25 @@ FUNCTIONS
         If you set this option to true, streaks that have the status of
         "broken" are not returned.
 
+    *   min_len => *posint*
+
+        Minimum length of streak to return.
+
+    *   raw => *true*
+
+        Instead of streaks table, return the raw streaks hash.
+
     *   sets* => *aoaos*
 
         (No description)
+
+    *   start_period => *posint*
+
+        (No description)
+
+    *   streaks => *hash*
+
+        Initialize streaks hash with this.
 
     Return value: (any)
 

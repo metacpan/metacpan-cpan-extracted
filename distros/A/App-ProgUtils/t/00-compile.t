@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 10 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/ProgUtils.pm'
@@ -20,7 +20,8 @@ my @scripts = (
     'script/progless',
     'script/proglist',
     'script/progman',
-    'script/progpath'
+    'script/progpath',
+    'script/scriptlist'
 );
 
 # no fake home requested

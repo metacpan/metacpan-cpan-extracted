@@ -1,0 +1,162 @@
+# PODNAME: RDF::Cowl::Lib::Gen::Class::ObjCard
+# ABSTRACT: Generated docs for RDF::Cowl::ObjCard
+
+## DO NOT EDIT
+## Generated via maint/tt/Class.pod.tt
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+RDF::Cowl::Lib::Gen::Class::ObjCard - Generated docs for RDF::Cowl::ObjCard
+
+=head1 VERSION
+
+version 1.0.0
+
+=head1 MAIN MODULE
+
+L<RDF::Cowl::ObjCard>
+
+=head1 CONSTRUCTORS
+
+=head2 new
+
+B<Signature>:
+
+  RDF::Cowl::ObjCard->new(CowlAnyObjPropExp $prop, Maybe[ CowlAnyClsExp ] $filler, Ulib_uint $cardinality)
+
+B<Params>:
+
+  CowlCardType $type 
+  CowlAnyObjPropExp $prop 
+  Maybe[ CowlAnyClsExp ] $filler I<[optional]>
+  Ulib_uint $cardinality 
+
+Documentation:
+
+  Returns a retained object property cardinality restriction.
+  
+  @param type The type.
+  @param prop The object property.
+  @param filler [optional] Filler of the restriction.
+  @param cardinality Cardinality of the restriction.
+  @return Retained restriction. Throws exception on error.
+
+Throws exception on error.
+
+=over 2
+
+B<C function name>: C<< cowl_obj_card >>
+
+=back
+
+=head1 METHODS
+
+=head2 get_type
+
+B<Signature>:
+
+  $self->get_type()
+
+B<Params>:
+
+  CowlObjCard $restr 
+
+Documentation:
+
+  Gets the type of the specified object property cardinality restriction.
+  
+  @param restr The restriction.
+  @return The type.
+
+=over 2
+
+B<C function name>: C<< cowl_obj_card_get_type >>
+
+=back
+
+=head2 get_prop
+
+B<Signature>:
+
+  $self->get_prop()
+
+B<Params>:
+
+  CowlObjCard $restr 
+
+Documentation:
+
+  Gets the property of the restriction.
+  
+  @param restr The restriction.
+  @return The property.
+
+=over 2
+
+B<C function name>: C<< cowl_obj_card_get_prop >>
+
+=back
+
+=head2 get_filler
+
+B<Signature>:
+
+  $self->get_filler()
+
+B<Params>:
+
+  CowlObjCard $restr 
+
+Documentation:
+
+  Gets the filler of the restriction.
+  
+  @param restr The restriction.
+  @return The filler.
+
+=over 2
+
+B<C function name>: C<< cowl_obj_card_get_filler >>
+
+=back
+
+=head2 get_cardinality
+
+B<Signature>:
+
+  $self->get_cardinality()
+
+B<Params>:
+
+  CowlObjCard $restr 
+
+Documentation:
+
+  Gets the cardinality of the restriction.
+  
+  @param restr The restriction.
+  @return The cardinality.
+
+=over 2
+
+B<C function name>: C<< cowl_obj_card_get_cardinality >>
+
+=back
+
+=head1 AUTHOR
+
+Zakariyya Mughal <zmughal@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 by Auto-Parallel Technologies, Inc..
+
+This is free software, licensed under Eclipse Public License - v 2.0.
+
+=cut

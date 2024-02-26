@@ -2,11 +2,12 @@ use strict;
 use warnings qw(all);
 use 5.022;
 
-use Test::More;
+use Test2::V0;
 
 use Config::Structured;
+use IO::All;
 
-use File::Slurp qw(slurp);
+use ok 'Config::Structured';
 
 my @f = (
   {conf => 't/conf/perl/config.conf', def => 't/conf/perl/config.conf.def'},
@@ -14,15 +15,16 @@ my @f = (
   {conf => 't/conf/yml/config.yml',   def => 't/conf/yml/definition.yml'},
 );
 
-plan tests => 1 + 4 * @f;
-
-use_ok('Config::Structured', 'Loaded Config::Structured');
-
 foreach my $f (@f) {
   ok(my $conf = Config::Structured->new(structure => $f->{def}, config => $f->{conf}), 'Initialized with filenames');
   is($conf->db->pass, 'app_pass', 'Check conf->db->pass value');
 
-  ok(my $fconf = Config::Structured->new(structure => scalar slurp($f->{def}), config => scalar slurp($f->{conf})),
-    'Initialized with data');
+  ok(
+    my $fconf =
+      Config::Structured->new(structure => scalar io->file($f->{def})->slurp, config => scalar io->file($f->{conf})->slurp),
+    'Initialized with data'
+  );
   is($fconf->db->pass, 'app_pass', 'Check fconf->db->pass value');
 }
+
+done_testing;

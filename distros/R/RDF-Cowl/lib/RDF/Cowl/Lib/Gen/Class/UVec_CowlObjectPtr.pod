@@ -1,0 +1,546 @@
+# PODNAME: RDF::Cowl::Lib::Gen::Class::UVec_CowlObjectPtr
+# ABSTRACT: Generated docs for RDF::Cowl::Ulib::UVec_CowlObjectPtr
+
+## DO NOT EDIT
+## Generated via maint/tt/Class.pod.tt
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+RDF::Cowl::Lib::Gen::Class::UVec_CowlObjectPtr - Generated docs for RDF::Cowl::Ulib::UVec_CowlObjectPtr
+
+=head1 VERSION
+
+version 1.0.0
+
+=head1 MAIN MODULE
+
+L<RDF::Cowl::Ulib::UVec_CowlObjectPtr>
+
+=head1 METHODS
+
+=head2 reserve
+
+B<Signature>:
+
+  $self->reserve(Ulib_uint $size)
+
+B<Params>:
+
+  UVec_CowlObjectPtr $vec 
+  Ulib_uint $size 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uvec_reserve_CowlObjectPtr >>
+
+=back
+
+=head2 set_range
+
+B<Signature>:
+
+  $self->set_range(CowlObjectPtr $array, Ulib_uint $start, Ulib_uint $n)
+
+B<Params>:
+
+  UVec_CowlObjectPtr $vec 
+  CowlObjectPtr $array 
+  Ulib_uint $start 
+  Ulib_uint $n 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uvec_set_range_CowlObjectPtr >>
+
+=back
+
+=head2 copy
+
+B<Signature>:
+
+  $self->copy(UVec_CowlObjectPtr $dest)
+
+B<Params>:
+
+  UVec_CowlObjectPtr $src 
+  UVec_CowlObjectPtr $dest 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uvec_copy_CowlObjectPtr >>
+
+=back
+
+=head2 copy_to_array
+
+B<Signature>:
+
+  $self->copy_to_array(CowlObjectPtr $array[])
+
+B<Params>:
+
+  UVec_CowlObjectPtr $vec 
+  CowlObjectPtr $array[] 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uvec_copy_to_array_CowlObjectPtr >>
+
+=back
+
+=head2 shrink
+
+B<Signature>:
+
+  $self->shrink()
+
+B<Params>:
+
+  UVec_CowlObjectPtr $vec 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uvec_shrink_CowlObjectPtr >>
+
+=back
+
+=head2 push
+
+B<Signature>:
+
+  $self->push(CowlObjectPtr $item)
+
+B<Params>:
+
+  UVec_CowlObjectPtr $vec 
+  CowlObjectPtr $item 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uvec_push_CowlObjectPtr >>
+
+=back
+
+=head2 pop
+
+B<Signature>:
+
+  $self->pop()
+
+B<Params>:
+
+  UVec_CowlObjectPtr $vec 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uvec_pop_CowlObjectPtr >>
+
+=back
+
+=head2 remove_at
+
+B<Signature>:
+
+  $self->remove_at(Ulib_uint $idx)
+
+B<Params>:
+
+  UVec_CowlObjectPtr $vec 
+  Ulib_uint $idx 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uvec_remove_at_CowlObjectPtr >>
+
+=back
+
+=head2 insert_at
+
+B<Signature>:
+
+  $self->insert_at(Ulib_uint $idx, CowlObjectPtr $item)
+
+B<Params>:
+
+  UVec_CowlObjectPtr $vec 
+  Ulib_uint $idx 
+  CowlObjectPtr $item 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uvec_insert_at_CowlObjectPtr >>
+
+=back
+
+=head2 remove_all
+
+B<Signature>:
+
+  $self->remove_all()
+
+B<Params>:
+
+  UVec_CowlObjectPtr $vec 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uvec_remove_all_CowlObjectPtr >>
+
+=back
+
+=head2 reverse
+
+B<Signature>:
+
+  $self->reverse()
+
+B<Params>:
+
+  UVec_CowlObjectPtr $vec 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uvec_reverse_CowlObjectPtr >>
+
+=back
+
+=head2 index_of
+
+B<Signature>:
+
+  $self->index_of(CowlObjectPtr $item)
+
+B<Params>:
+
+  UVec_CowlObjectPtr $vec 
+  CowlObjectPtr $item 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uvec_index_of_CowlObjectPtr >>
+
+=back
+
+=head2 index_of_reverse
+
+B<Signature>:
+
+  $self->index_of_reverse(CowlObjectPtr $item)
+
+B<Params>:
+
+  UVec_CowlObjectPtr $vec 
+  CowlObjectPtr $item 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uvec_index_of_reverse_CowlObjectPtr >>
+
+=back
+
+=head2 remove
+
+B<Signature>:
+
+  $self->remove(CowlObjectPtr $item)
+
+B<Params>:
+
+  UVec_CowlObjectPtr $vec 
+  CowlObjectPtr $item 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uvec_remove_CowlObjectPtr >>
+
+=back
+
+=head2 equals
+
+B<Signature>:
+
+  $self->equals(UVec_CowlObjectPtr $other)
+
+B<Params>:
+
+  UVec_CowlObjectPtr $vec 
+  UVec_CowlObjectPtr $other 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uvec_equals_CowlObjectPtr >>
+
+=back
+
+=head2 push_unique
+
+B<Signature>:
+
+  $self->push_unique(CowlObjectPtr $item)
+
+B<Params>:
+
+  UVec_CowlObjectPtr $vec 
+  CowlObjectPtr $item 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uvec_push_unique_CowlObjectPtr >>
+
+=back
+
+=head2 data
+
+B<Signature>:
+
+  $self->data()
+
+B<Params>:
+
+  UVec_CowlObjectPtr $vec 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uvec_data_CowlObjectPtr >>
+
+=back
+
+=head2 size
+
+B<Signature>:
+
+  $self->size()
+
+B<Params>:
+
+  UVec_CowlObjectPtr $vec 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uvec_size_CowlObjectPtr >>
+
+=back
+
+=head2 last
+
+B<Signature>:
+
+  $self->last()
+
+B<Params>:
+
+  UVec_CowlObjectPtr $vec 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uvec_last_CowlObjectPtr >>
+
+=back
+
+=head2 get_range
+
+B<Signature>:
+
+  $self->get_range(Ulib_uint $start, Ulib_uint $len)
+
+B<Params>:
+
+  UVec_CowlObjectPtr $vec 
+  Ulib_uint $start 
+  Ulib_uint $len 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uvec_get_range_CowlObjectPtr >>
+
+=back
+
+=head2 get_range_from
+
+B<Signature>:
+
+  $self->get_range_from(Ulib_uint $start)
+
+B<Params>:
+
+  UVec_CowlObjectPtr $vec 
+  Ulib_uint $start 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uvec_get_range_from_CowlObjectPtr >>
+
+=back
+
+=head2 deinit
+
+B<Signature>:
+
+  $self->deinit()
+
+B<Params>:
+
+  UVec_CowlObjectPtr $vec 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uvec_deinit_CowlObjectPtr >>
+
+=back
+
+=head2 move
+
+B<Signature>:
+
+  $self->move()
+
+B<Params>:
+
+  UVec_CowlObjectPtr $vec 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uvec_move_CowlObjectPtr >>
+
+=back
+
+=head2 expand
+
+B<Signature>:
+
+  $self->expand(Ulib_uint $size)
+
+B<Params>:
+
+  UVec_CowlObjectPtr $vec 
+  Ulib_uint $size 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uvec_expand_CowlObjectPtr >>
+
+=back
+
+=head2 append
+
+B<Signature>:
+
+  $self->append(UVec_CowlObjectPtr $src)
+
+B<Params>:
+
+  UVec_CowlObjectPtr $vec 
+  UVec_CowlObjectPtr $src 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uvec_append_CowlObjectPtr >>
+
+=back
+
+=head2 append_array
+
+B<Signature>:
+
+  $self->append_array(CowlObjectPtr $src, Ulib_uint $n)
+
+B<Params>:
+
+  UVec_CowlObjectPtr $vec 
+  CowlObjectPtr $src 
+  Ulib_uint $n 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uvec_append_array_CowlObjectPtr >>
+
+=back
+
+=head2 contains
+
+B<Signature>:
+
+  $self->contains(CowlObjectPtr $item)
+
+B<Params>:
+
+  UVec_CowlObjectPtr $vec 
+  CowlObjectPtr $item 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uvec_contains_CowlObjectPtr >>
+
+=back
+
+=head1 AUTHOR
+
+Zakariyya Mughal <zmughal@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 by Auto-Parallel Technologies, Inc..
+
+This is free software, licensed under Eclipse Public License - v 2.0.
+
+=cut

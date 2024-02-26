@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Gv - Package for language Manx
 
 package Locale::CLDR::Locales::Gv;
 # This file auto generated from Data\common\main\gv.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -65,8 +65,8 @@ has 'characters' => (
 		no warnings 'experimental::regex_sets';
 		return {
 			index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
-			main => qr{[a b c ç d e f g h i j k l m n o p q r s t u v w x y z]},
-			punctuation => qr{[\- ‐ ‑ – — , ; \: ! ? . … ' ‘ ’ " “ ” ( ) \[ \] § @ * / \& # † ‡ ′ ″]},
+			main => qr{[a b cç d e f g h i j k l m n o p q r s t u v w x y z]},
+			punctuation => qr{[\- ‐‑ – — , ; \: ! ? . … '‘’ "“” ( ) \[ \] § @ * / \& # † ‡ ′ ″]},
 		};
 	},
 EOT
@@ -181,10 +181,6 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'am' => q{a.m.},
-					'pm' => q{p.m.},
-				},
-				'wide' => {
 					'am' => q{a.m.},
 					'pm' => q{p.m.},
 				},

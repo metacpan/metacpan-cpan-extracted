@@ -1,4 +1,4 @@
-package At::Lexicon::app::bsky::actor 0.17 {
+package At::Lexicon::app::bsky::actor 0.18 {
     use v5.38;
     no warnings 'experimental::class', 'experimental::builtin';    # Be quiet.
     use feature 'class';
@@ -213,20 +213,26 @@ package At::Lexicon::app::bsky::actor 0.17 {
     }
 
     class At::Lexicon::app::bsky::actor::savedFeedsPref {
-        field $type : param($type);    # record field
-        field $pinned : param;         # array, at-uri, required
-        field $saved : param;          # array, at-uri, required
+        field $type : param($type);             # record field
+        field $pinned : param;                  # array, at-uri, required
+        field $saved : param;                   # array, at-uri, required
+        field $timelineIndex : param //= ();    # integer
         ADJUST {
             $pinned = [ map { $_ = URI->new($_) unless builtin::blessed $_ } @$pinned ];
             $saved  = [ map { $_ = URI->new($_) unless builtin::blessed $_ } @$saved ];
         }
 
         # perlclass does not have :reader yet
-        method pinned {$pinned}
-        method saved  {$saved}
+        method pinned        {$pinned}
+        method saved         {$saved}
+        method timelineIndex {$timelineIndex}
 
         method _raw() {
-            +{ '$type' => $type, pinned => [ map { $_->as_string } @$pinned ], saved => [ map { $_->as_string } @$saved ] };
+            +{  '$type' => $type,
+                pinned  => [ map { $_->as_string } @$pinned ],
+                saved   => [ map { $_->as_string } @$saved ],
+                defined $timelineIndex ? ( timelineIndex => $timelineIndex ) : ()
+            };
         }
     }
 

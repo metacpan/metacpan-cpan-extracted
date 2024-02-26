@@ -2,29 +2,26 @@ use v5.36;
 
 package App::Gimei::Generator;
 
+use Data::Gimei;
+
 use Class::Tiny qw(
   word_class
   gender
   word_subtype
-  render
-  cache
+  rendering
 );
-use Data::Gimei;
 
-sub BUILDARGS {
-    my ( $class, %args ) = @_;
-
+sub BUILDARGS ( $class, %args ) {
     for my $arg (qw/word_class/) {
         die "$arg arg required" unless exists $args{$arg};
     }
 
-    $args{render} //= 'kanji';
+    $args{rendering} //= 'kanji';
 
     return \%args;
 }
 
-sub execute {
-    my ( $self, $cache ) = @_;
+sub execute ( $self, $cache ) {
     my ($word);
 
     my $key = $self->word_class . ( $self->gender // '' );
@@ -42,7 +39,7 @@ sub execute {
         $word = $word->$call();
     }
 
-    my $call = $word->can( $self->render );
+    my $call = $word->can( $self->rendering );
     $word = $word->$call();
 
     return $word;

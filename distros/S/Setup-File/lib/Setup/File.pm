@@ -1,18 +1,19 @@
 package Setup::File;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.23'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
 
+use Exporter qw(import);
 use File::Trash::Undoable;
-use File::MoreUtil qw(dir_empty);
+use File::Util::Test qw(dir_empty);
 
-require Exporter;
-our @ISA       = qw(Exporter);
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-11-21'; # DATE
+our $DIST = 'Setup-File'; # DIST
+our $VERSION = '0.240'; # VERSION
+
 our @EXPORT_OK = qw(setup_file);
 
 our %SPEC;
@@ -162,7 +163,8 @@ sub mkdir {
     my $path      = $args{path};
     defined($path) or return [400, "Please specify path"];
     my $allow_sym = $args{allow_symlink} // 0;
-    my $mode      = $args{mode} // 0755; # XXX use umask
+    # XXX use umask
+    my $mode      = $args{mode} // 0755; ## no critic: ValuesAndExpressions::ProhibitLeadingZeros
     return [412, "Invalid mode '$mode', please use numeric only"]
         if $mode =~ /\D/;
 
@@ -256,7 +258,7 @@ sub chmod {
     return [412, "$path is a symlink"] if !$follow_sym && $is_sym;
     my $exists    = $is_sym || (-e _);
     my @st        = stat($path);
-    my $cur_mode  = $st[2] & 07777 if $exists;
+    my $cur_mode; $cur_mode = $st[2] & 07777 if $exists; ## no critic: ValuesAndExpressions::ProhibitLeadingZeros
     if (!$args{-tx_recovery} && defined($orig_mode) && defined($cur_mode) &&
             $cur_mode != $orig_mode && !$args{-confirm}) {
         return [331, "File $path has changed permission mode, confirm chmod?"];
@@ -720,7 +722,7 @@ sub mkfile {
             unless defined($ct);
         my $res;
         if (defined $args{check_content_func}) {
-            no strict 'refs';
+            no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
             $fix_content = !(*{$args{check_content_func}}{CODE}->(\$ct));
         } elsif (defined $args{content_md5}) {
             $fix_content = Digest::MD5::md5_hex($ct) ne $args{content_md5};
@@ -747,7 +749,7 @@ sub mkfile {
             log_info("(DRY) File $path should be created");
             my $ct = "";
             if (defined $args{gen_content_func}) {
-                no strict 'refs';
+                no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
                 $ct = *{$args{gen_content_func}}{CODE}->(\$ct);
             } elsif (defined $args{content}) {
                 $ct = $args{content};
@@ -777,14 +779,14 @@ sub mkfile {
         if ($fix_content || !$exists) {
             my $ct = "";
             if (defined $args{gen_content_func}) {
-                no strict 'refs';
+                no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
                 $ct = *{$args{gen_content_func}}{CODE}->(\$ct);
             } elsif (defined $args{content}) {
                 $ct = $args{content};
             }
             log_info("Creating file $path ...");
             if (eval { File::Slurper::write_text($path, $ct); 1 }) {
-                CORE::chmod(0644, $path);
+                CORE::chmod(0644, $path); ## no critic: ValuesAndExpressions::ProhibitLeadingZeros
                 return [200, "OK"];
             } else {
                 return [500, "Can't write_file($path): $!"];
@@ -828,7 +830,7 @@ sub _setup_file_or_dir {
 
     my $is_sym     = (-l $path);
     my $sym_exists = (-e _);
-    my $sym_target = readlink($path) if $is_sym;
+    my $sym_target; $sym_target = readlink($path) if $is_sym;
     my @st         = stat($path); # stricture complains about _
     my $exists     = (-e _);
     my $is_file    = (-f _);
@@ -911,7 +913,7 @@ sub _setup_file_or_dir {
             unshift @undo, $act_trash_n;
         } else {
             # get the undo actions from the mk action
-            no strict 'refs';
+            no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
             my $res =
             *{$act_mk->[0]}{CODE}->(
                 %{$act_mk->[1]},
@@ -929,7 +931,7 @@ sub _setup_file_or_dir {
         }
 
         if (defined $args{mode}) {
-            my $cur_mode = @st ? $st[2] & 07777 : undef;
+            my $cur_mode; $cur_mode = @st ? $st[2] & 07777 : undef; ## no critic: ValuesAndExpressions::ProhibitLeadingZeros
             push @do, ["chmod" => {
                 path=>$path, mode=>$args{mode}}];
             unshift @undo, ["chmod" => {
@@ -1187,7 +1189,7 @@ Setup::File - Setup file (existence, mode, permission, content)
 
 =head1 VERSION
 
-This document describes version 0.23 of Setup::File (from Perl distribution Setup-File), released on 2017-07-10.
+This document describes version 0.240 of Setup::File (from Perl distribution Setup-File), released on 2023-11-21.
 
 =head1 FUNCTIONS
 
@@ -1196,7 +1198,7 @@ This document describes version 0.23 of Setup::File (from Perl distribution Setu
 
 Usage:
 
- chmod(%args) -> [status, msg, result, meta]
+ chmod(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Set file's permission mode.
 
@@ -1229,7 +1231,8 @@ If set, confirm if current mode is not the same as this.
 
 =item * B<path>* => I<str>
 
-Path to file/directory.
+Path to fileE<sol>directory.
+
 
 =back
 
@@ -1239,43 +1242,44 @@ Special arguments:
 
 =item * B<-tx_action> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_action_id> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_recovery> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_rollback> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_v> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
+
 
 
 =head2 chown
 
 Usage:
 
- chown(%args) -> [status, msg, result, meta]
+ chown(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Set file's ownership.
 
@@ -1316,7 +1320,8 @@ Numeric UID or username.
 
 =item * B<path>* => I<str>
 
-Path to file/directory.
+Path to fileE<sol>directory.
+
 
 =back
 
@@ -1326,43 +1331,44 @@ Special arguments:
 
 =item * B<-tx_action> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_action_id> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_recovery> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_rollback> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_v> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
+
 
 
 =head2 mkdir
 
 Usage:
 
- mkdir(%args) -> [status, msg, result, meta]
+ mkdir(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Create directory.
 
@@ -1393,6 +1399,7 @@ Set mode for the newly created directory.
 
 Path to directory.
 
+
 =back
 
 Special arguments:
@@ -1401,45 +1408,46 @@ Special arguments:
 
 =item * B<-tx_action> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_action_id> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_recovery> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_rollback> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_v> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
+
 
 
 =head2 mkfile
 
 Usage:
 
- mkfile(%args) -> [status, msg, result, meta]
+ mkfile(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-Create file (and/or set content).
+Create file (andE<sol>or set content).
 
 Fixed state: C<path> exists, is a file, and content is correct.
 
@@ -1509,6 +1517,9 @@ Path to file.
 
 =item * B<suffix> => I<str>
 
+(No description)
+
+
 =back
 
 Special arguments:
@@ -1517,43 +1528,44 @@ Special arguments:
 
 =item * B<-tx_action> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_action_id> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_recovery> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_rollback> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_v> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
+
 
 
 =head2 rmdir
 
 Usage:
 
- rmdir(%args) -> [status, msg, result, meta]
+ rmdir(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Delete directory.
 
@@ -1590,6 +1602,9 @@ Caller can confirm by passing special argument C<-confirm>.
 
 =item * B<path>* => I<str>
 
+(No description)
+
+
 =back
 
 Special arguments:
@@ -1598,43 +1613,44 @@ Special arguments:
 
 =item * B<-tx_action> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_action_id> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_recovery> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_rollback> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_v> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
+
 
 
 =head2 rmfile
 
 Usage:
 
- rmfile(%args) -> [status, msg, result, meta]
+ rmfile(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Delete file.
 
@@ -1674,9 +1690,12 @@ Alternatively, you can use C<orig_content> (for shorter content).
 
 =item * B<path>* => I<str>
 
+(No description)
+
 =item * B<suffix> => I<str>
 
 Use this suffix when trashing.
+
 
 =back
 
@@ -1686,43 +1705,44 @@ Special arguments:
 
 =item * B<-tx_action> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_action_id> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_recovery> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_rollback> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_v> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
+
 
 
 =head2 setup_dir
 
 Usage:
 
- setup_dir(%args) -> [status, msg, result, meta]
+ setup_dir(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Setup directory (existence, mode, permission).
 
@@ -1792,6 +1812,7 @@ If undef, dir need not exist. If set to 0, dir must not exist and will be
 deleted if it does. If set to 1, dir must exist and will be created if it
 doesn't.
 
+
 =back
 
 Special arguments:
@@ -1800,43 +1821,44 @@ Special arguments:
 
 =item * B<-tx_action> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_action_id> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_recovery> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_rollback> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_v> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
+
 
 
 =head2 setup_file
 
 Usage:
 
- setup_file(%args) -> [status, msg, result, meta]
+ setup_file(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Setup file (existence, mode, permission, content).
 
@@ -1937,6 +1959,7 @@ If undef, file need not exist. If set to 0, file must not exist and will be
 deleted if it does. If set to 1, file must exist and will be created if it
 doesn't.
 
+
 =back
 
 Special arguments:
@@ -1945,34 +1968,34 @@ Special arguments:
 
 =item * B<-tx_action> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_action_id> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_recovery> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_rollback> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_v> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1991,14 +2014,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Setup-File
 
 Source repository is at L<https://github.com/perlancar/perl-Setup-File>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Setup-File>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Setup>
@@ -2011,11 +2026,43 @@ L<Setup::File::Symlink>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2015, 2014, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2017, 2015, 2014, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Setup-File>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2::Util;
-our $VERSION = '0.77'; # VERSION
+our $VERSION = '0.78'; # VERSION
 
 use Crypt::OpenSSL::Random qw(random_pseudo_bytes);
 
@@ -11,10 +11,15 @@ use Exporter qw(import);
 
 our @EXPORT_OK = qw(
     generate_id
+    deprecation_warning
 );
 
 sub generate_id {
     return 'NETSAML2_' . unpack 'H*', random_pseudo_bytes(32);
+}
+
+sub deprecation_warning {
+    warn "Net::SAML2 deprecation warning: " . shift . "\n";
 }
 
 
@@ -32,7 +37,7 @@ Net::SAML2::Util - Utility functions for Net::SAML2
 
 =head1 VERSION
 
-version 0.77
+version 0.78
 
 =head1 SYNOPSIS
 
@@ -45,6 +50,10 @@ version 0.77
 =head2 sub generate_id {}
 
 Generate a NETSAML2 Request Id
+
+=head2 sub deprecation_warning {}
+
+Show a warning that a Deprecated feature is being used
 
 =head1 AUTHORS
 

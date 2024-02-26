@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,13 +59,13 @@ sub new {
 
 
 # Run Operation Request
-# PutWorksheetPivotTableFilterRequest.name : The workbook name.  ,
+# PutWorksheetPivotTableFilterRequest.name : The file name.  ,
 # PutWorksheetPivotTableFilterRequest.sheetName : The worksheet name.  ,
 # PutWorksheetPivotTableFilterRequest.pivotTableIndex : Gets the PivotTable report by index.  ,
-# PutWorksheetPivotTableFilterRequest.filter : Pivot filter description.  ,
-# PutWorksheetPivotTableFilterRequest.needReCalculate : Whether the specific pivot table calculate(true/false).  ,
-# PutWorksheetPivotTableFilterRequest.folder : Original workbook folder.  ,
-# PutWorksheetPivotTableFilterRequest.storageName : Storage name.   
+# PutWorksheetPivotTableFilterRequest.filter : PivotFilter Pivot filter description.  ,
+# PutWorksheetPivotTableFilterRequest.needReCalculate : Whether the specific PivotTable calculate(true/false).  ,
+# PutWorksheetPivotTableFilterRequest.folder : The folder where the file is situated.  ,
+# PutWorksheetPivotTableFilterRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -76,7 +76,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_worksheet_pivot_table_filter' } = { 
-    	summary => 'Adds a pivot filter for piovt table index',
+    	summary => 'Add a pivot filter to the PivotTable.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -149,7 +149,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -170,28 +170,28 @@ __PACKAGE__->method_documentation({
      'filter' => {
      	datatype => 'PivotFilter',
      	base_name => 'filter',
-     	description => 'Pivot filter description.',
+     	description => 'PivotFilter Pivot filter description.',
      	format => '',
      	read_only => '',
      		},
      'need_re_calculate' => {
      	datatype => 'string',
      	base_name => 'needReCalculate',
-     	description => 'Whether the specific pivot table calculate(true/false).',
+     	description => 'Whether the specific PivotTable calculate(true/false).',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

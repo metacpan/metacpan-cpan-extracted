@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2::SP;
-our $VERSION = '0.77'; # VERSION
+our $VERSION = '0.78'; # VERSION
 
 use Moose;
 
@@ -19,6 +19,7 @@ use Net::SAML2::Protocol::LogoutRequest;
 use Net::SAML2::Util ();
 use URN::OASIS::SAML2 qw(:bindings :urn);
 use XML::Generator;
+use Net::SAML2::Types qw(XsdID);
 
 # ABSTRACT: SAML Service Provider object
 
@@ -26,7 +27,16 @@ use XML::Generator;
 
 
 has 'url'    => (isa => Uri, is => 'ro', required => 1, coerce => 1);
-has 'id'     => (isa => 'Str', is => 'ro', required => 1);
+
+has '_id' => (
+    isa      => XsdID,
+    is       => 'ro',
+    builder  => '_build_id',
+    init_arg => 'id'
+);
+
+has 'issuer' => (isa => 'Str', is => 'ro', required => 1);
+
 has 'cert'   => (isa => 'Str', is => 'ro', required => 1, predicate => 'has_cert');
 has 'key'    => (isa => 'Str', is => 'ro', required => 1);
 has 'cacert' => (isa => 'Str', is => 'rw', required => 0, predicate => 'has_cacert');
@@ -65,6 +75,12 @@ around BUILDARGS => sub {
     my $self = shift;
 
     my %args = @_;
+
+    if (!exists $args{issuer} && exists $args{id}) {
+      Net::SAML2::Util::deprecation_warning
+        "id has been renamed to issuer and should be used instead";
+      $args{issuer} = delete $args{id};
+    }
 
     if (!$args{single_logout_service}) {
         #warn "Deprecation warning, please upgrade your code to use ..";
@@ -140,6 +156,28 @@ around BUILDARGS => sub {
     return $self->$orig(%args);
 };
 
+sub _build_id {
+    my $self = shift;
+
+    # This allows current clients to override the builder without changing
+    # their code
+    if (my $f = $self->can('generate_sp_desciptor_id')) {
+        Net::SAML2::Util::deprecation_warning
+          "generate_sp_desciptor_id has been deprecated, please override " .
+          "_build_id yourself or supply the ID to the constructor";
+          return $f->();
+    }
+    return Net::SAML2::Util::generate_id();
+}
+
+sub id {
+    my $self = shift;
+    Net::SAML2::Util::deprecation_warning
+      "id() has been renamed to issuer()";
+    return $self->issuer;
+}
+
+
 sub _build_encryption_key_text {
     my ($self) = @_;
 
@@ -169,7 +207,7 @@ sub authn_request {
 
     return Net::SAML2::Protocol::AuthnRequest->new(
         issueinstant        => DateTime->now,
-        issuer              => $self->id,
+        issuer              => $self->issuer,
         destination         => $destination,
         nameidpolicy_format => $nameid_format || '',
         %params,
@@ -182,7 +220,7 @@ sub logout_request {
     my ($self, $destination, $nameid, $nameid_format, $session, $params) = @_;
 
     my $logout_req = Net::SAML2::Protocol::LogoutRequest->new(
-        issuer      => $self->id,
+        issuer      => $self->issuer,
         destination => $destination,
         nameid      => $nameid,
         session     => $session,
@@ -208,7 +246,7 @@ sub logout_response {
 
     my $status_uri = Net::SAML2::Protocol::LogoutResponse->status_uri($status);
     my $logout_req = Net::SAML2::Protocol::LogoutResponse->new(
-        issuer      => $self->id,
+        issuer      => $self->issuer,
         destination => $destination,
         status      => $status_uri,
         response_to => $response_to,
@@ -222,7 +260,7 @@ sub artifact_request {
     my ($self, $destination, $artifact) = @_;
 
     my $artifact_request = Net::SAML2::Protocol::ArtifactResolve->new(
-        issuer       => $self->id,
+        issuer       => $self->issuer,
         destination  => $destination,
         artifact     => $artifact,
         issueinstant => DateTime->now,
@@ -316,12 +354,6 @@ sub post_binding {
 }
 
 
-sub generate_sp_desciptor_id {
-    my $self = shift;
-    return Net::SAML2::Util::generate_id();
-}
-
-
 my $md = ['md' => URN_METADATA];
 my $ds = ['ds' => URN_SIGNATURE];
 
@@ -338,8 +370,8 @@ sub generate_metadata {
     return $x->xml( $x->EntityDescriptor(
         $md,
         {
-            entityID => $self->id,
-            ID       => $self->generate_sp_desciptor_id(),
+            entityID => $self->issuer,
+            ID       => $self->_id,
         },
         $x->SPSSODescriptor(
             $md,
@@ -444,11 +476,31 @@ sub metadata {
             sig_hash    => 'sha256',
             digest_hash => 'sha256',
             x509        => 1,
-            ns          => { md => 'urn:oasis:names:tc:SAML:2.0:metadata' },
+            ns          => { md => URN_METADATA },
             id_attr     => '/md:EntityDescriptor[@ID]',
         }
     );
-    return $signer->sign($metadata);
+    my $md = $signer->sign($metadata);
+
+    my $xp = XML::LibXML::XPathContext->new(
+        XML::LibXML->load_xml(string =>$md)
+    );
+    $xp->registerNs('md', URN_METADATA);
+    $xp->registerNs('dsig', URN_SIGNATURE);
+
+    my $nodes = $xp->findnodes('/md:EntityDescriptor[@ID]');
+    my $rootnode = $nodes->get_node(1);
+
+    my $child = $rootnode->firstChild;
+    return $md if $child->nodeName() eq 'dsig:Signature';
+
+    $nodes = $xp->findnodes('//dsig:Signature');
+    my $signode = $nodes->get_node(1);
+
+    $signode->unbindNode;
+    $rootnode->insertBefore($signode, $child);
+
+    return '<?xml version="1.0" encoding="UTF-8"?>' . $rootnode->toString;
 }
 
 
@@ -478,16 +530,16 @@ Net::SAML2::SP - SAML Service Provider object
 
 =head1 VERSION
 
-version 0.77
+version 0.78
 
 =head1 SYNOPSIS
 
-  my $sp = Net::SAML2::SP->new(
-    id   => 'http://localhost:3000',
-    url  => 'http://localhost:3000',
-    cert => 'sign-nopw-cert.pem',
-    key => 'sign-nopw-key.pem',
-  );
+my $sp = Net::SAML2::SP->new(
+    issuer => 'http://localhost:3000',
+    url    => 'http://localhost:3000',
+    cert   => 'sign-nopw-cert.pem',
+    key    => 'sign-nopw-key.pem',
+);
 
 =head1 METHODS
 
@@ -499,6 +551,10 @@ Arguments:
 
 =over
 
+=item B<id>
+
+The ID attribute used in the EntityDescription tag
+
 =item B<url>
 
 Base for all SP service URLs
@@ -507,7 +563,7 @@ Base for all SP service URLs
 
 The error URI. Can be relative to the base URI or a regular URI
 
-=item B<id>
+=item B<issuer>
 
 SP's identity URI.
 
@@ -692,10 +748,6 @@ XXX UA
 =head2 post_binding( )
 
 Returns a POST binding object for this SP.
-
-=head2 generate_sp_desciptor_id ( )
-
-Returns the Net::SAML2 unique ID from Net::SAML2::Util::generate_id.
 
 =head2 generate_metadata( )
 

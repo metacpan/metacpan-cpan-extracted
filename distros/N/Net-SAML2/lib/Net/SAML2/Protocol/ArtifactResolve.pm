@@ -1,6 +1,6 @@
 package Net::SAML2::Protocol::ArtifactResolve;
 use Moose;
-our $VERSION = '0.77'; # VERSION
+our $VERSION = '0.78'; # VERSION
 
 use MooseX::Types::URI qw/ Uri /;
 use URN::OASIS::SAML2 qw(:urn);
@@ -65,7 +65,7 @@ Net::SAML2::Protocol::ArtifactResolve - ArtifactResolve protocol class
 
 =head1 VERSION
 
-version 0.77
+version 0.78
 
 =head1 SYNOPSIS
 

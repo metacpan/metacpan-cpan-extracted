@@ -28,13 +28,13 @@ is_deeply ($months, [qw( 1 2 3 4 5 6 7 8 9 10 11 12 )], 'Islamic Month stand alo
 my $days = $locale->day_format_wide();
 is_deeply ($days, [qw( mandag tirsdag onsdag torsdag fredag lørdag søndag )], 'Islamic Day format wide');
 $days = $locale->day_format_abbreviated();
-is_deeply ($days, [qw( man. tir. ons. tor. fre. lør. søn. )], 'Islamic Day format abbreviated');
+is_deeply ($days, [qw( man. tirs. ons. tors. fre. lør. søn. )], 'Islamic Day format abbreviated');
 $days = $locale->day_format_narrow();
 is_deeply ($days, [qw( M T O T F L S )], 'Islamic Day format narrow');
 $days = $locale->day_stand_alone_wide();
 is_deeply ($days, [qw( mandag tirsdag onsdag torsdag fredag lørdag søndag )], 'Islamic Day stand alone wide');
 $days = $locale->day_stand_alone_abbreviated();
-is_deeply ($days, [qw( man tir ons tor fre lør søn  )], 'Islamic Day stand alone abbreviated');
+is_deeply ($days, [qw( man. tirs. ons. tors. fre. lør. søn.  )], 'Islamic Day stand alone abbreviated');
 $days = $locale->day_stand_alone_narrow();
 is_deeply ($days, [qw( M T O T F L S )], 'Islamic Day stand alone narrow');
 

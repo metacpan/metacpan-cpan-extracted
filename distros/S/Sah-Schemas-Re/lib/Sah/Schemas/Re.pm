@@ -3,9 +3,9 @@ package Sah::Schemas::Re;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-09-09'; # DATE
+our $DATE = '2023-12-20'; # DATE
 our $DIST = 'Sah-Schemas-Re'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 1;
 # ABSTRACT: Various regular-expression schemas
@@ -22,7 +22,7 @@ Sah::Schemas::Re - Various regular-expression schemas
 
 =head1 VERSION
 
-This document describes version 0.005 of Sah::Schemas::Re (from Perl distribution Sah-Schemas-Re), released on 2023-09-09.
+This document describes version 0.006 of Sah::Schemas::Re (from Perl distribution Sah-Schemas-Re), released on 2023-12-20.
 
 =head1 SAH SCHEMAS
 
@@ -49,6 +49,12 @@ Basically, if string is of the form of C</.../> or C<qr(...)>, then you could
 specify metacharacters as if you are writing a literal regexp pattern in Perl.
 Otherwise, your string will be C<quotemeta()>-ed first then compiled to Regexp
 object. This means in the second case you cannot specify metacharacters.
+
+What's the difference between this schema and C<str_or_re> (from
+L<Sah::Schemas::Str>)? Both this schema and C<str_or_re> accept string, but
+this schema will still coerce strings not in the form of C</.../> or C<qr(...)> to
+regexp object, while C<str_or_re> will leave the string as-is. In other words,
+this schema always converts input to Regexp object while C<str_or_re> does not.
 
 
 =item * L<re_or_code_from_str|Sah::Schema::re_or_code_from_str>

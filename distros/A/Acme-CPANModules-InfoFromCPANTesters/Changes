@@ -1,0 +1,24 @@
+0.004   2023-10-31  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename module/dist
+          Acme-CPANModules-{PERLANCAR-,}InfoFromCPANTesters.
+
+        - Tweak abstract (add 'List of ...') to follow convention.
+
+
+0.003   2020-10-19  Released-By: PERLANCAR; Urgency: medium
+
+	- Add Acme::CPAN::Testers::DevelCheckOS.
+
+
+0.002   2020-10-10  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Rebuild with updated POD::Weaver::Plugin::Acme::CPANModules
+          (0.005) to tweak generated POD.
+
+
+0.001   2020-10-10  Released-By: PERLANCAR
+
+        - First release.

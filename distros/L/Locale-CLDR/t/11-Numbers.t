@@ -6,7 +6,7 @@ use warnings;
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
 
-use Test::More tests => 17;
+use Test::More tests => 31;
 use Test::Exception;
 
 use ok 'Locale::CLDR';
@@ -73,3 +73,25 @@ is($locale->format_number('-0.0', 'spellout-numbering'), 'minus zero point zero'
 is($locale->format_number(123456, 'roman-lower'), '123,456', 'Roman Number grater than max value');
 is($locale->format_number(1234, 'roman-lower'), 'mccxxxiv', 'Roman Number');
 is($locale->format_number(123, 'digits-ordinal'), '123rd', 'Ordinal Numbers');
+
+# Now with number override
+$locale = Locale::CLDR->new('en-u-numbers-adlm');
+is_deeply([$locale->get_digits], [qw(𞥐 𞥑 𞥒 𞥓 𞥔 𞥕 𞥖 𞥗 𞥘 𞥙)], 'Get digits en with Adlam didgits');
+is($locale->format_number(12345.6, '###,##0.###'), '𞥑𞥒,𞥓𞥔𞥕.𞥖', 'Format a number with Adlam didgits');
+is($locale->format_number(12345.6, '###,#00%'), '𞥑,𞥒𞥓𞥔,𞥕𞥖𞥐%', 'Format a percent with Adlam didgits');
+is($locale->format_number(12345.6, '###,#00‰'), '𞥑𞥒,𞥓𞥔𞥕,𞥖𞥐𞥐‰', 'Format a per thousand with Adlam didgits' );
+is($locale->format_number(12345678, '#,####,00%'), '𞥑𞥒𞥓𞥔,𞥕𞥖𞥗𞥘,𞥐𞥐%', 'Format percent with different grouping with Adlam didgits');
+
+# Negative numbers
+is($locale->format_number(-12345.6, '###,##0.###'), '-𞥑𞥒,𞥓𞥔𞥕.𞥖', 'Format a negative number with Adlam didgits');
+is($locale->format_number(-12345.6, '###,#00%'), '-𞥑,𞥒𞥓𞥔,𞥕𞥖𞥐%', 'Format a negative percent with Adlam didgits');
+is($locale->format_number(-12345.6, '###,#00‰'), '-𞥑𞥒,𞥓𞥔𞥕,𞥖𞥐𞥐‰', 'Format a negative per thousand with Adlam didgits' );
+is($locale->format_number(-12345678, '#,####,00%'), '-𞥑𞥒𞥓𞥔,𞥕𞥖𞥗𞥘,𞥐𞥐%', 'Format negative percent with different grouping with Adlam didgits');
+
+
+# RBNF
+is($locale->format_number(0, 'spellout-numbering-year'), 'zero', 'RBNF: Spell out year 0 with Adlam didgits');
+is($locale->format_number('-0.0', 'spellout-numbering'), 'minus zero point zero', 'RBNF: Spell out -0.0 with Adlam didgits');
+is($locale->format_number(123456, 'roman-lower'), '𞥑𞥒𞥓,𞥔𞥕𞥖', 'Roman Number grater than max value with Adlam didgits');
+is($locale->format_number(1234, 'roman-lower'), 'mccxxxiv', 'Roman Number with Adlam didgits');
+is($locale->format_number(123, 'digits-ordinal'), '𞥑𞥒𞥓rd', 'Ordinal Numbers with Adlam didgits');

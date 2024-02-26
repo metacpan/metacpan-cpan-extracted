@@ -1,8 +1,8 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::re_or_code_from_str;
 
-our $DATE = '2023-09-09'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2023-12-20'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 our $rschema = do{my$var={base=>"any",clsets_after_base=>[{description=>"\nEither Regexp object or coderef is accepted.\n\nCoercion from string for Regexp is available if string is of the form of `/.../`\nor `qr(...)`; it will be compiled into a Regexp object. If the regex pattern\ninside `/.../` or `qr(...)` is invalid, value will be rejected. Currently,\nunlike in normal Perl, for the `qr(...)` form, only parentheses `(` and `)` are\nallowed as the delimiter. Currently modifiers `i`, `m`, and `s` after the second\n`/` are allowed.\n\nCoercion from string for coderef is available if string matches the regex\n`qr/\\Asub\\s*\\{.*\\}\\z/s`, then it will be eval'ed into a coderef. If the code\nfails to compile, the value will be rejected. Note that this means you accept\narbitrary code from the user to execute! Please make sure first and foremost\nthat this is acceptable in your case. Currently string is eval'ed in the `main`\npackage, without `use strict` or `use warnings`.\n\nUnlike the default behavior of the `re` Sah type, coercion from other string not\nin the form of `/.../` or `qr(...)` is not available. Thus, such values will be\nrejected.\n\nThis schema is handy if you want to accept regex or coderef from the\ncommand-line.\n\n",examples=>[{summary=>"Not to regex or code",valid=>0,value=>""},{summary=>"Not a regex or code",valid=>0,value=>"a"},{summary=>"Not a regex or code",valid=>0,value=>{}},{valid=>1,value=>qr()},{valid=>1,value=>sub{package Sah::Schema::re_or_code_from_str;use strict}},{valid=>1,validated_value=>qr(),value=>"//"},{summary=>"Not converted to regex",valid=>0,value=>"/foo"},{summary=>"Not converted to regex",valid=>0,value=>"qr(foo"},{summary=>"Not converted to regex",valid=>0,value=>"qr(foo("},{summary=>"Not converted to regex",valid=>0,value=>"qr/foo/"},{valid=>1,validated_value=>qr(foo.*),value=>"/foo.*/"},{valid=>1,validated_value=>qr(foo.*),value=>"qr(foo.*)"},{valid=>1,validated_value=>qr(foo)si,value=>"/foo/is"},{valid=>1,validated_value=>qr(foo)si,value=>"qr(foo)is"},{summary=>"Invalid regex",valid=>0,value=>"/foo[/"},{code_validate=>sub{package Sah::Schema::re_or_code_from_str;use strict;ref $_[0] eq 'CODE' & !defined($_[0]->())},valid=>1,value=>"sub {}"},{code_validate=>sub{package Sah::Schema::re_or_code_from_str;use strict;$_[0]->() eq 'foo' if ref $_[0] eq 'CODE'},valid=>1,value=>"sub{\"foo\"}"},{summary=>"Not converted to code",valid=>0,value=>"sub {"},{summary=>"Code does not compile",valid=>0,value=>"sub {1=2}"}],of=>[["obj::re"],["code"]],prefilters=>["Str::maybe_convert_to_re","Str::maybe_eval"],summary=>"Regex (convertable from string of the form `/.../`) or coderef (convertable from string of the form `sub { ... }`)"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["any"],type=>"any",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
@@ -21,7 +21,7 @@ Sah::SchemaR::re_or_code_from_str - Regex (convertable from string of the form `
 
 =head1 VERSION
 
-This document describes version 0.005 of Sah::SchemaR::re_or_code_from_str (from Perl distribution Sah-Schemas-Re), released on 2023-09-09.
+This document describes version 0.006 of Sah::SchemaR::re_or_code_from_str (from Perl distribution Sah-Schemas-Re), released on 2023-12-20.
 
 =head1 DESCRIPTION
 

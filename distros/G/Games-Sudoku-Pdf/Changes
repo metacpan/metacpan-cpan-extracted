@@ -1,0 +1,19 @@
+
+Changes for Games::Sudoku::Pdf
+
+v0.03 2024-02-26
+
+	Fix: Removed one forgotten global 'size' parameter to PDF::Table.
+
+v0.02 2024-02-25
+
+	Omitted the time zone offset minutes, together with the trailing apostrophe.
+	This way we stay conformant with iso and adobe standards and PDF::API2 before v2.044 won't croak.
+	Global 'size' and 'justify' replaced by 'column_props', which has better compatibility across PDF::Table versions.
+	Changed the shebang in exe script from '/usr/bin/env perl' to just 'perl'. (Slaven Rezic)
+	Renamed sudoku2pdf.pl to sudoku2pdf to make it look command-like.
+	Fixed parameter name in example.pl.
+
+v0.01 2024-02-24
+
+	Initial Release.

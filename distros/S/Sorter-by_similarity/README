@@ -2,17 +2,15 @@ NAME
     Sorter::by_similarity - Sort by most similar to a reference string
 
 VERSION
-    This document describes version 0.001 of Sorter::by_similarity (from
-    Perl distribution Sorter-by_similarity), released on 2024-01-22.
+    This document describes version 0.004 of Sorter::by_similarity (from
+    Perl distribution Sorter-by_similarity), released on 2024-01-24.
 
 SYNOPSIS
      use Sorter::by_similarity;
 
      my $sorter = Sorter::by_similarity::gen_sorter(string => 'foo');
-     my @sorted = $sorter->("food", "foolish", "foo", "bar"); #
-
-     # or, in one go
-     my @sorted = sort_by_similarity(0, 0, {string=>"foo"}, "food", "foolish", "foo", "bar");
+     my @sorted = $sorter->("food", "foolish", "foo", "bar");
+     # => ("foo", "food", "bar", "foolish")
 
 DESCRIPTION
 HOMEPAGE

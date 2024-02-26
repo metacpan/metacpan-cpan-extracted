@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Nus - Package for language Nuer
 
 package Locale::CLDR::Locales::Nus;
 # This file auto generated from Data\common\main\nus.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -158,8 +158,7 @@ has 'characters' => (
 		no warnings 'experimental::regex_sets';
 		return {
 			index => ['A', 'B', 'C', 'D', 'E', 'Ɛ', 'F', 'G', 'Ɣ', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ŋ', 'O', 'Ɔ', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
-			main => qr{[a ä {a̱} b c d e ë {e̱} ɛ {ɛ̈} {ɛ̱} {ɛ̱̈} f g ɣ h i ï {i̱} j k l m n ŋ o ö {o̱} ɔ {ɔ̈} {ɔ̱} p q r s t u v w x y z]},
-			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			main => qr{[aä{a̱} b c d eë{e̱} ɛ{ɛ̈}{ɛ̱}{ɛ̱̈} f g ɣ h iï{i̱} j k l m n ŋ oö{o̱} ɔ{ɔ̈}{ɔ̱} p q r s t u v w x y z]},
 		};
 	},
 EOT
@@ -168,34 +167,6 @@ EOT
 },
 );
 
-
-has 'quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{“},
-);
-
-has 'quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{”},
-);
-
-has 'alternate_quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{‘},
-);
-
-has 'alternate_quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{’},
-);
 
 has 'yesstr' => (
 	is			=> 'ro',
@@ -209,40 +180,6 @@ has 'nostr' => (
 	isa			=> RegexpRef,
 	init_arg	=> undef,
 	default		=> sub { qr'^(?i:Ëëy|Ë|no|n)$' }
-);
-
-has 'number_symbols' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'latn' => {
-			'decimal' => q(.),
-			'group' => q(,),
-		},
-	} }
-);
-
-has 'number_formats' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		decimalFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0.###',
-				},
-			},
-		},
-		percentFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0%',
-				},
-			},
-		},
-} },
 );
 
 has 'number_currency_formats' => (
@@ -426,10 +363,6 @@ has 'day_periods' => (
 					'am' => q{RW},
 					'pm' => q{TŊ},
 				},
-				'wide' => {
-					'am' => q{RW},
-					'pm' => q{TŊ},
-				},
 			},
 		},
 	} },
@@ -483,10 +416,10 @@ has 'time_formats' => (
 		'generic' => {
 		},
 		'gregorian' => {
-			'full' => q{zzzz h:mm:ss a},
-			'long' => q{z h:mm:ss a},
-			'medium' => q{h:mm:ss a},
-			'short' => q{h:mm a},
+			'full' => q{zzzz h:mm:ss a},
+			'long' => q{z h:mm:ss a},
+			'medium' => q{h:mm:ss a},
+			'short' => q{h:mm a},
 		},
 	} },
 );
@@ -510,17 +443,12 @@ has 'datetime_formats_available_formats' => (
 	default		=> sub { {
 		'generic' => {
 			Ed => q{E d},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
 			MEd => q{E، d-M},
-			MMM => q{LLL},
 			MMMEd => q{E d MMM},
 			MMMd => q{d MMM},
 			Md => q{d/M},
-			d => q{d},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
 			ms => q{m:ss},
 			y => q{y},
 			yM => q{M/y},
@@ -534,19 +462,13 @@ has 'datetime_formats_available_formats' => (
 		},
 		'gregorian' => {
 			Ed => q{E d},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
 			MEd => q{E، d-M},
-			MMM => q{LLL},
 			MMMEd => q{E d MMM},
 			MMMd => q{d MMM},
 			Md => q{d/M},
-			d => q{d},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
 			ms => q{m:ss},
-			y => q{y},
 			yM => q{M/y},
 			yMEd => q{E، d/M/y},
 			yMMM => q{MMM y},

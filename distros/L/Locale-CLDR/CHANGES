@@ -187,6 +187,25 @@ All dates are in ISO 8601 Format
 0.34.4 2023-12-02
     Fixed recursion with likely_subtags
 
-0.40.0
+0.40.0 2024-01-27
     Updated to use version 40 of CLDR
-    Added method to return all the installed locales as a prerequisite of locating the best match between installed locales and a requested locale 
+    Added method to return all the installed locales as a prerequisite of locating the best match between installed locales and a requested locale
+
+0.44.0
+    Updated to use version 44 of CLDR
+    *WARNING* There are several language packs that have as parents locales in other language packs. You wont notice
+    this if you are installing from CPAN with one of the CPAN clients but if you are installing manually you will have
+    to resolve these dependancies
+    *WARNING* The locale data no longer uses Any as a place holder for missing script data. Where this was used in earlier
+    versions the default script as defined by the CLDR data is used. This may have an inpact on the nameing of locales and
+    if you use the locale data without using Locale::CLDR
+    *WARNING* The Unicode cosortium has changed some of the identifieres used by units. If you are no longer getting
+    values back for unit data check the id.
+    Thanks to changes in the CLDR data, split words is now correctly splitting the trailing whitespace off words.
+    likley_subtag() will now return the likley language rather than 'und'.
+    If you ask for an accountcy number format in a locale that doesn't have one the code will return the standard format
+    Corrected spellings of some comments and variables
+    Added code to correctly parse an extension string added to a locale using the -u- mechanism
+    Fixed code to allow an extension to have multiple values
+    Added code so that the parent of a module can be altered on the fly to allow for segmentations to have a different parent than the rest of the module
+    Added Chinease segmentation test to test the above 

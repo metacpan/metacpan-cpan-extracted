@@ -8,7 +8,7 @@ use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 use Getopt::Std;
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Constructor.
 sub new {
@@ -85,7 +85,7 @@ __END__
 
 =head1 NAME
 
-App::ISBN::Format - Base class for cpan-get script.
+App::ISBN::Format - Base class for isbn-format script.
 
 =head1 SYNOPSIS
 
@@ -122,6 +122,8 @@ Returns 1 for error, 0 for success.
 
 =head1 EXAMPLE
 
+=for comment filename=format_example_isbn.pl
+
  use strict;
  use warnings;
 
@@ -157,12 +159,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2022 Michal Josef Špaček
+© 2022-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

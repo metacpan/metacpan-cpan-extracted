@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ses - Package for language Koyraboro Senni
 
 package Locale::CLDR::Locales::Ses;
 # This file auto generated from Data\common\main\ses.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -330,45 +330,17 @@ has 'characters' => (
 		no warnings 'experimental::regex_sets';
 		return {
 			auxiliary => qr{[v]},
-			index => ['A', 'Ã', 'B', 'C', 'D', 'E', 'Ẽ', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ɲ', 'Ŋ', 'O', 'Õ', 'P', 'Q', 'R', 'S', 'Š', 'T', 'U', 'W', 'X', 'Y', 'Z', 'Ž'],
-			main => qr{[a ã b c d e ẽ f g h i j k l m n ɲ ŋ o õ p q r s š t u w x y z ž]},
+			index => ['AÃ', 'B', 'C', 'D', 'EẼ', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ɲ', 'Ŋ', 'OÕ', 'P', 'Q', 'R', 'SŠ', 'T', 'U', 'W', 'X', 'Y', 'ZŽ'],
+			main => qr{[aã b c d eẽ f g h i j k l m n ɲ ŋ oõ p q r sš t u w x y zž]},
 			numbers => qr{[  \- ‑ . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
 : sub {
-		return { index => ['A', 'Ã', 'B', 'C', 'D', 'E', 'Ẽ', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ɲ', 'Ŋ', 'O', 'Õ', 'P', 'Q', 'R', 'S', 'Š', 'T', 'U', 'W', 'X', 'Y', 'Z', 'Ž'], };
+		return { index => ['AÃ', 'B', 'C', 'D', 'EẼ', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ɲ', 'Ŋ', 'OÕ', 'P', 'Q', 'R', 'SŠ', 'T', 'U', 'W', 'X', 'Y', 'ZŽ'], };
 },
 );
 
-
-has 'quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{“},
-);
-
-has 'quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{”},
-);
-
-has 'alternate_quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{‘},
-);
-
-has 'alternate_quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{’},
-);
 
 has 'yesstr' => (
 	is			=> 'ro',
@@ -632,9 +604,14 @@ has 'currencies' => (
 				'currency' => q(Seŋ Helena Fraŋ),
 			},
 		},
-		'SLL' => {
+		'SLE' => {
 			display_name => {
 				'currency' => q(Leeon),
+			},
+		},
+		'SLL' => {
+			display_name => {
+				'currency' => q(Leeon \(1964—2022\)),
 			},
 		},
 		'SOS' => {
@@ -856,10 +833,6 @@ has 'day_periods' => (
 					'am' => q{Adduha},
 					'pm' => q{Aluula},
 				},
-				'wide' => {
-					'am' => q{Adduha},
-					'pm' => q{Aluula},
-				},
 			},
 		},
 	} },
@@ -971,7 +944,6 @@ has 'datetime_formats_available_formats' => (
 			MMdd => q{dd/MM},
 			Md => q{d/M},
 			ms => q{m:ss},
-			y => q{y},
 			yM => q{M/y},
 			yMEd => q{E d/M/y},
 			yMM => q{MM/y},
@@ -990,19 +962,6 @@ has 'datetime_formats_append_item' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			'Day' => '{0} ({2}: {1})',
-			'Day-Of-Week' => '{0} {1}',
-			'Era' => '{1} {0}',
-			'Hour' => '{0} ({2}: {1})',
-			'Minute' => '{0} ({2}: {1})',
-			'Month' => '{0} ({2}: {1})',
-			'Quarter' => '{0} ({2}: {1})',
-			'Second' => '{0} ({2}: {1})',
-			'Timezone' => '{0} {1}',
-			'Week' => '{0} ({2}: {1})',
-			'Year' => '{1} {0}',
-		},
 	} },
 );
 

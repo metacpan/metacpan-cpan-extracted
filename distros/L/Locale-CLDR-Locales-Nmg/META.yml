@@ -22,16 +22,16 @@ name: Locale-CLDR-Locales-Nmg
 provides:
   Locale::CLDR::Locales::Nmg:
     file: lib/Locale/CLDR/Locales/Nmg.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Nmg::Any:
-    file: lib/Locale/CLDR/Locales/Nmg/Any.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Nmg::Any::Cm:
-    file: lib/Locale/CLDR/Locales/Nmg/Any/Cm.pm
-    version: v0.40.1
+    version: v0.44.0
+  Locale::CLDR::Locales::Nmg::Latn:
+    file: lib/Locale/CLDR/Locales/Nmg/Latn.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Nmg::Latn::Cm:
+    file: lib/Locale/CLDR/Locales/Nmg/Latn/Cm.pm
+    version: v0.44.0
 requires:
   DateTime: '0.72'
-  Locale::CLDR: v0.40.1
+  Locale::CLDR: v0.44.0
   Moo: '2'
   MooX::ClassAttribute: '0.011'
   Type::Tiny: '0'
@@ -41,5 +41,5 @@ resources:
   bugtracker: https://github.com/ThePilgrim/perlcldr/issues
   homepage: https://github.com/ThePilgrim/perlcldr
   repository: https://github.com/ThePilgrim/perlcldr.git
-version: v0.40.1
+version: v0.44.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

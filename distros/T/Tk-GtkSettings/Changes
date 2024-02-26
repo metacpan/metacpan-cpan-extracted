@@ -1,8 +1,28 @@
 Revision history for Perl extension Tk::GtkSettings.
 
-0.01  Sun Feb  6 18:10:57 2022
-	- original version; created by h2xs 1.23 with options
-		-X Tk::GtkSettings
+0.07  Feb 26 2024
+	- adjusted some default settings
+	- fixed a coupleof bugs
+	- added the tkgtk script
+
+0.06  Jun 29 2023
+	- Repaired failure when executable has extension
+	- Updated documentation
+	- Added NoteBook to the menu group
+
+0.05 June 1 2023
+	- Modified some default settings
+	- Restricted functionality on unpermitted systems, no more errors.
+
+0.04
+	- Corrected errors in documentation
+	- Fixed generateOutput now handles correct value if gtk key not exists
+	- Attempted to deal with multiple formats of the keys in gtk colors.css
+	- Fixed decoding gtk font names
+
+0.03  May 18 2022
+	- Fixed generateOUtput, now 'main' group is handled first
+	- Corrected a typo and some errors in documentation
 
 0.02  May 17 2022
 	- Fixed incorrect handling of appNmae
@@ -11,21 +31,8 @@ Revision history for Perl extension Tk::GtkSettings.
 	- Updated dependencies in Makefile.pl
 	- Added repository to Makefile.pl
 
-0.03  May 18 2022
-	- Fixed generateOUtput, now 'main' group is handled first
-	- Corrected a typo and some errors in documentation
+0.01  Sun Feb  6 18:10:57 2022
+	- original version; created by h2xs 1.23 with options
+		-X Tk::GtkSettings
 
-0.04
-	- Corrected errors in documentation
-	- Fixed generateOutput now handles correct value if gtk key not exists
-	- Attempted to deal with multiple formats of the keys in gtk colors.css
-	- Fixed decoding gtk font names
 
-0.05 June 1 2023
-	- Modified some default settings
-	- Restricted functionality on unpermitted systems, no more errors.
-
-0.06  Jun 29 2023
-	- Repaired failure when executable has extension
-	- Updated documentation
-	- Added NoteBook to the menu group

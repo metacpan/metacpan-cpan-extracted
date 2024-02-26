@@ -27,7 +27,7 @@ B<Note:> I<For this module the term 'pattern' refers to a 9x9 matrix, holding th
   $generator = get_sudoku_builder( $solution );
   $sudokuHash = &$generator();
 
-  use Games::Sudoku::PatternSolver::PlayerIF qw( sudoku_html_page );
+  use Games::Sudoku::PatternSolver::Html qw( sudoku_html_page );
 
   @list = ( [$sudokuHash->{strPuzzle}, "<descriptive text with properties, rating, source, etc.>"], ... )
   $htmlpage = sudoku_html_page( \@list )
@@ -41,7 +41,7 @@ L<Games::Sudoku::PatternSolver> can solve any standard 9x9 puzzle.
 It is unique in that it tries to find a combination of 9 out of 46656 unique patterns in which a number may be placed on the grid. 
 And if a faulty puzzle has very many solutions the solver will find them all, given sufficient time and computer memory and $MAX_SOLUTIONS is false.
 
- solve( <puzzle> )
+=head3 solve( <puzzle> )
 
 The input can be an 81-character string with zeroes or non-digits for empty cells, it can be 81 individual values, an arrayref with these or a 9x9 AoA.
 
@@ -134,7 +134,6 @@ This helper module implements just the first and basic most strategies known to 
 The 'hidden singles' and 'naked singles' directly force a value into a specific cell. And the just slightly more sophisticated 'locked sets' and 'locked candidates' rule out certain values in some cells.
 Because of the vast gain in speed (on average) switching off the logic is only reasonable for bechmarking the unamended pattern matching algorithm.
 
-
 =head2 PatternSolver::Generator
 
 L<Games::Sudoku::PatternSolver::Generator> creates Sudoku puzzles with random properties.
@@ -155,14 +154,6 @@ It is amazing to see how many very different puzzles can be produced from a sing
 Absolutely random solution grids may be produced from a sub returned by C<get_grid_builder()>.
 A boolean parameter <shuffle> passed to this sub, determines if the first row in the grids produced will always be 1 .. 9. (But is not minlexed!)
 
-=head2 PatternSolver::PlayerIF
-
-  sudoku_html_page( arrayref ) returns a scalar html page, playable in a browser
-
-Its parameter is an array of arrays, each entry consisting of 2 items: a 81 character puzzle string and any descriptive text for the list entry.
-You may put as many puzzles as you like into the array, they can all be played from the one, javascript-driven static page.
-Can also be used to play lists with numerous 9x9 Sudoku from other sources.
-
 =head2 PatternSolver::Patterns
 
 Internal module to access the serialized patterns. 
@@ -174,7 +165,7 @@ The method C<init_patterns()> could be used to re-create the file with the 46656
 
 =item * L<examples/solve.pl>
 
-Basic use of L<PatternSolver::solve()|/"solve()">.
+Basic use of L<PatternSolver::solve()|/"solve-puzzle">.
 
 =item * L<examples/play.pl>
 
@@ -233,8 +224,6 @@ With the default setting $LOOSE_MODE=1 PatternSolver and Generator can solve and
 =item * L<Algorithm::Combinatorics>
 
 =item * L<Time::HiRes>
-
-=item * L<HTML::Template>
 
 =back
 

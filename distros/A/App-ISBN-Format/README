@@ -34,7 +34,7 @@ EXAMPLE2
      isbn-format 9788025343363
 
      # Output:
-     # 9788025343364 -> 978-80-253-4336-4
+     # 9788025343363 -> 978-80-253-4336-4
 
 EXAMPLE3
      isbn-format 978802534336
@@ -51,10 +51,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2022 Michal Josef Špaček
+    © 2022-2024 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.02
+    0.03
 

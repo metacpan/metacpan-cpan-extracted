@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Sr::Latn::Me - Package for language Serbian
 
 package Locale::CLDR::Locales::Sr::Latn::Me;
 # This file auto generated from Data\common\main\sr_Latn_ME.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -41,7 +41,6 @@ has 'display_name_language' => (
  				'moh' => 'mohok',
  				'nqo' => 'n’ko',
  				'shi' => 'južni šilha',
- 				'tzm' => 'centralnoatlaski tamašek',
  				'xh' => 'isikosa',
  				'zgh' => 'standardni marokanski tamašek',
  				'zu' => 'isizulu',
@@ -86,33 +85,18 @@ has 'calendar_months' => (
 				'format' => {
 					abbreviated => {
 						nonleap => [
-							undef(),
-							undef(),
+							'jan',
+							'feb',
 							'mart',
-							undef(),
+							'apr',
 							'maj',
 							'jun',
 							'jul',
-							undef(),
-							'sept'
-						],
-						leap => [
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							undef(),
-							undef(),
-							'mart',
-							undef(),
-							'maj',
-							'jun',
-							'jul',
-							undef(),
-							'sept'
+							'avg',
+							'sept',
+							'okt',
+							'nov',
+							'dec'
 						],
 						leap => [
 							
@@ -130,17 +114,6 @@ has 'calendar_days' => (
 	default		=> sub { {
 			'gregorian' => {
 				'format' => {
-					wide => {
-						mon => 'ponedeljak',
-						tue => 'utorak',
-						wed => 'srijeda',
-						thu => 'četvrtak',
-						fri => 'petak',
-						sat => 'subota',
-						sun => 'nedjelja'
-					},
-				},
-				'stand-alone' => {
 					wide => {
 						mon => 'ponedeljak',
 						tue => 'utorak',
@@ -233,13 +206,13 @@ has 'day_periods' => (
 			'format' => {
 				'abbreviated' => {
 					'afternoon1' => q{po pod.},
-					'am' => q{prije podne},
+					'am' => q{prije podne},
 					'evening1' => q{veče},
 					'midnight' => q{ponoć},
 					'morning1' => q{jutro},
 					'night1' => q{noću},
 					'noon' => q{podne},
-					'pm' => q{po podne},
+					'pm' => q{po podne},
 				},
 				'narrow' => {
 					'afternoon1' => q{po pod.},
@@ -255,10 +228,6 @@ has 'day_periods' => (
 				},
 			},
 			'stand-alone' => {
-				'abbreviated' => {
-					'am' => q{prije podne},
-					'pm' => q{po podne},
-				},
 				'narrow' => {
 					'am' => q{a},
 					'pm' => q{p},
@@ -350,8 +319,8 @@ has 'datetime_formats_interval' => (
 	default		=> sub { {
 		'generic' => {
 			MMMEd => {
-				M => q{E, d. MMM – E, d. MMM},
-				d => q{E, d. MMM – E, d. MMM},
+				M => q{E, d. MMM – E, d. MMM},
+				d => q{E, d. MMM – E, d. MMM},
 			},
 		},
 	} },

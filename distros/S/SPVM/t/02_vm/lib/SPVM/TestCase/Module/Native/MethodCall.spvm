@@ -13,6 +13,119 @@ class TestCase::Module::Native::MethodCall {
   our $CALL_CALLBACK_VALUE : rw int;
   our $CALL_CLASS_METHOD_VALUE : rw int;
   
+  static method new_class_method : int () {
+    
+    {
+      my $class_method_call = Native::MethodCall->new_class_method("TestCase::Module::Native::MethodCall", "add_byte");
+      
+      {
+        my $ret = $class_method_call->call([(object)(byte)Fn->BYTE_MIN, (byte)1]);
+        
+        unless ($ret is_type Byte) {
+          return 0;
+        }
+        
+        unless ((byte)$ret == Fn->BYTE_MIN + 1) {
+          return 0;
+        }
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method new_instance_method_static : int () {
+    
+    {
+      {
+        my $point = Point->new(1, 2);
+        
+        my $instance_method_call = Native::MethodCall->new_instance_method_static("Point", "clear");
+        
+        $instance_method_call->call([(object)$point]);
+        
+        unless ($point->x == 0) {
+          return 0;
+        }
+        
+        unless ($point->y == 0) {
+          return 0;
+        }
+        
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method call_instance_method_static : int () {
+    
+    {
+      {
+        my $point = Point->new(1, 2);
+        
+        Native::MethodCall->call_instance_method_static("Point", "clear", [(object)$point]);
+        
+        unless ($point->x == 0) {
+          return 0;
+        }
+        
+        unless ($point->y == 0) {
+          return 0;
+        }
+        
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method new_instance_method : int () {
+    
+    {
+      {
+        my $point = Point->new(1, 2);
+        
+        my $instance_method_call = Native::MethodCall->new_instance_method($point, "clear");
+        
+        $instance_method_call->call([(object)$point]);
+        
+        unless ($point->x == 0) {
+          return 0;
+        }
+        
+        unless ($point->y == 0) {
+          return 0;
+        }
+        
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method call_instance_method : int () {
+    
+    {
+      {
+        my $point = Point->new(1, 2);
+        
+        Native::MethodCall->call_instance_method("clear", [$point]);
+        
+        unless ($point->x == 0) {
+          return 0;
+        }
+        
+        unless ($point->y == 0) {
+          return 0;
+        }
+        
+      }
+    }
+    
+    return 1;
+  }
+  
   static method call : int () {
     
     {
@@ -516,6 +629,11 @@ class TestCase::Module::Native::MethodCall {
     return 1;
   }
   
+  static method one : int () {
+    
+    return 1;
+  }
+  
   static method add_byte : byte ($arg0 : byte, $arg1 : byte) {
     
     my $ret = (byte)($arg0 + $arg1);
@@ -837,13 +955,13 @@ class TestCase::Module::Native::MethodCall {
     return 1;
   }
   
-  static method call_class_method : int () {
+  static method call_class_method_for_env : int () {
     
     {
       TestCase::Module::Native::MethodCall->SET_CALL_CLASS_METHOD_VALUE(0);
       
       my $error_id = -1;
-      Native::MethodCall->call_class_method("TestCase::Module::Native::MethodCall", "set_class_var", \$error_id);
+      Native::MethodCall->call_class_method_for_env("TestCase::Module::Native::MethodCall", "set_class_var", \$error_id);
       
       unless ($error_id == 0) {
         return 0;
@@ -858,7 +976,7 @@ class TestCase::Module::Native::MethodCall {
       TestCase::Module::Native::MethodCall->SET_CALL_CLASS_METHOD_VALUE(0);
       my $error_id = -1;
       my $stack = Native->get_current_stack;
-      Native::MethodCall->call_class_method("TestCase::Module::Native::MethodCall", "set_class_var", \$error_id, $stack);
+      Native::MethodCall->call_class_method_for_env("TestCase::Module::Native::MethodCall", "set_class_var", \$error_id, $stack);
       
       unless ($error_id == 0) {
         return 0;
@@ -875,7 +993,7 @@ class TestCase::Module::Native::MethodCall {
       my $error_id = -1;
       my $stack = Native->get_current_stack;
       my $env = Native->get_current_env;
-      Native::MethodCall->call_class_method("TestCase::Module::Native::MethodCall", "set_class_var", \$error_id, $stack, $env);
+      Native::MethodCall->call_class_method_for_env("TestCase::Module::Native::MethodCall", "set_class_var", \$error_id, $stack, $env);
       
       unless ($error_id == 0) {
         return 0;
@@ -895,4 +1013,28 @@ class TestCase::Module::Native::MethodCall {
     $CALL_CLASS_METHOD_VALUE = 1;
   }
   
+  static method call_class_method : int () {
+    
+    {
+      my $ret = Native::MethodCall->call_class_method("TestCase::Module::Native::MethodCall", "add_byte", [(object)(byte)Fn->BYTE_MIN, (byte)1]);
+      
+      unless ($ret is_type Byte) {
+        return 0;
+      }
+      
+      unless ((byte)$ret == Fn->BYTE_MIN + 1) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ret = Native::MethodCall->call_class_method("TestCase::Module::Native::MethodCall", "one");
+      
+      unless ((int)$ret == 1) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
 }

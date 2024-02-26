@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Transaction;
 # ABSTRACT: Logical container for an atomic unit of work
-$Neo4j::Driver::Transaction::VERSION = '0.44';
+$Neo4j::Driver::Transaction::VERSION = '0.45';
 
 use Carp qw(croak);
 our @CARP_NOT = qw(
@@ -296,7 +296,7 @@ Neo4j::Driver::Transaction - Logical container for an atomic unit of work
 
 =head1 VERSION
 
-version 0.44
+version 0.45
 
 =head1 SYNOPSIS
 

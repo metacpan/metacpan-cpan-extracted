@@ -1,5 +1,8 @@
 Revision history for CPAN module Expect
 
+1.36 2024-02-23
+    - Made timeouts optional and added qr// regex support
+
 1.35 2017-05-18
     - Added AUTHOR key, listing all maintainers
 

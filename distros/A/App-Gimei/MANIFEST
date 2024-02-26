@@ -8,6 +8,7 @@ cpanfile
 cpanfile.snapshot
 lib/App/Gimei.pm
 lib/App/Gimei/Generator.pm
+lib/App/Gimei/Generators.pm
 lib/App/Gimei/Parser.pm
 lib/App/Gimei/Runner.pm
 minil.toml

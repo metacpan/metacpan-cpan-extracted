@@ -4,7 +4,7 @@ CGI::Lingua - Create a multilingual web page
 
 # VERSION
 
-Version 0.65
+Version 0.66
 
 # SYNOPSIS
 
@@ -235,10 +235,6 @@ You can also look for information at:
 
     [http://matrix.cpantesters.org/?dist=CGI-Lingua](http://matrix.cpantesters.org/?dist=CGI-Lingua)
 
-- CPAN Ratings
-
-    [http://cpanratings.perl.org/d/CGI-Lingua](http://cpanratings.perl.org/d/CGI-Lingua)
-
 - CPAN Testers Dependencies
 
     [http://deps.cpantesters.org/?module=CGI::Lingua](http://deps.cpantesters.org/?module=CGI::Lingua)
@@ -247,6 +243,6 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2010-2023 Nigel Horne.
+Copyright 2010-2024 Nigel Horne.
 
 This program is released under the following licence: GPL2

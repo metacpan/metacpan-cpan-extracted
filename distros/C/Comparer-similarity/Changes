@@ -1,0 +1,17 @@
+0.003   2024-01-24  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [dist][bugfix] Fix spec dependency to Comparer.
+
+
+0.002   2024-01-24  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename module/dist Comparer::{by_,}similarity.
+
+        - [doc] Tweak Synopsis.
+
+
+0.001   2024-01-23  Released-By: PERLANCAR
+
+        - First release.

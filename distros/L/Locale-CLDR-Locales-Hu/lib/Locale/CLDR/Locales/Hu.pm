@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Hu - Package for language Hungarian
 
 package Locale::CLDR::Locales::Hu;
 # This file auto generated from Data\common\main\hu.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -667,22 +667,6 @@ has 'algorithmic_number_format_data' => (
     } },
 );
 
-# Need to add code for Key type pattern
-sub display_name_pattern {
-	my ($self, $name, $region, $script, $variant) = @_;
-
-	my $display_pattern = '{0} ({1})';
-	$display_pattern =~s/\{0\}/$name/g;
-	my $subtags = join '{0}, {1}', grep {$_} (
-		$region,
-		$script,
-		$variant,
-	);
-
-	$display_pattern =~s/\{1\}/$subtags/g;
-	return $display_pattern;
-}
-
 has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
@@ -708,7 +692,9 @@ has 'display_name_language' => (
  				'am' => 'amhara',
  				'an' => 'aragonéz',
  				'ang' => 'óangol',
+ 				'ann' => 'obolo',
  				'anp' => 'angika',
+ 				'apc' => 'levantei arab',
  				'ar' => 'arab',
  				'ar_001' => 'modern szabványos arab',
  				'arc' => 'arámi',
@@ -720,6 +706,7 @@ has 'display_name_language' => (
  				'as' => 'asszámi',
  				'asa' => 'asu',
  				'ast' => 'asztúr',
+ 				'atj' => 'attikamek',
  				'av' => 'avar',
  				'awa' => 'awádi',
  				'ay' => 'ajmara',
@@ -737,6 +724,7 @@ has 'display_name_language' => (
  				'bez' => 'bena',
  				'bfd' => 'bafut',
  				'bg' => 'bolgár',
+ 				'bgc' => 'haryanvi',
  				'bgn' => 'nyugati beludzs',
  				'bho' => 'bodzspuri',
  				'bi' => 'bislama',
@@ -778,13 +766,21 @@ has 'display_name_language' => (
  				'chy' => 'csejen',
  				'ckb' => 'közép-ázsiai kurd',
  				'ckb@alt=variant' => 'kurd, szoráni',
+ 				'clc' => 'csilkotin',
  				'co' => 'korzikai',
  				'cop' => 'kopt',
  				'cr' => 'krí',
+ 				'crg' => 'micsif',
  				'crh' => 'krími tatár',
+ 				'crj' => 'délkeleti krí',
+ 				'crk' => 'síksági krí',
+ 				'crl' => 'északkeleti krí',
+ 				'crm' => 'moose krí',
+ 				'crr' => 'karolinai algonkin',
  				'crs' => 'szeszelva kreol francia',
  				'cs' => 'cseh',
  				'csb' => 'kasub',
+ 				'csw' => 'mocsári krí',
  				'cu' => 'egyházi szláv',
  				'cv' => 'csuvas',
  				'cy' => 'walesi',
@@ -820,7 +816,9 @@ has 'display_name_language' => (
  				'en_AU' => 'ausztrál angol',
  				'en_CA' => 'kanadai angol',
  				'en_GB' => 'brit angol',
+ 				'en_GB@alt=short' => 'angol (UK)',
  				'en_US' => 'amerikai angol',
+ 				'en_US@alt=short' => 'angol (USA)',
  				'enm' => 'közép angol',
  				'eo' => 'eszperantó',
  				'es' => 'spanyol',
@@ -877,8 +875,11 @@ has 'display_name_language' => (
  				'hai' => 'haida',
  				'hak' => 'hakka kínai',
  				'haw' => 'hawaii',
+ 				'hax' => 'déli haida',
  				'he' => 'héber',
  				'hi' => 'hindi',
+ 				'hi_Latn' => 'hindi (latin)',
+ 				'hi_Latn@alt=variant' => 'hinglish',
  				'hil' => 'ilokano',
  				'hit' => 'hettita',
  				'hmn' => 'hmong',
@@ -889,6 +890,7 @@ has 'display_name_language' => (
  				'ht' => 'haiti kreol',
  				'hu' => 'magyar',
  				'hup' => 'hupa',
+ 				'hur' => 'halkomelem',
  				'hy' => 'örmény',
  				'hz' => 'herero',
  				'ia' => 'interlingva',
@@ -899,6 +901,7 @@ has 'display_name_language' => (
  				'ig' => 'igbó',
  				'ii' => 'szecsuán ji',
  				'ik' => 'inupiak',
+ 				'ikt' => 'nyugat-kanadai inuit',
  				'ilo' => 'ilokó',
  				'inh' => 'ingus',
  				'io' => 'idó',
@@ -926,6 +929,7 @@ has 'display_name_language' => (
  				'kea' => 'kabuverdianu',
  				'kfo' => 'koro',
  				'kg' => 'kongo',
+ 				'kgp' => 'kaingang',
  				'kha' => 'kaszi',
  				'kho' => 'kotanéz',
  				'khq' => 'kojra-csíni',
@@ -956,6 +960,7 @@ has 'display_name_language' => (
  				'kut' => 'kutenai',
  				'kv' => 'komi',
  				'kw' => 'korni',
+ 				'kwk' => 'kwakʼwala',
  				'ky' => 'kirgiz',
  				'la' => 'latin',
  				'lad' => 'ladino',
@@ -967,13 +972,16 @@ has 'display_name_language' => (
  				'lg' => 'ganda',
  				'li' => 'limburgi',
  				'lij' => 'ligur',
+ 				'lil' => 'lillooet',
  				'lkt' => 'lakota',
+ 				'lmo' => 'lombard',
  				'ln' => 'lingala',
  				'lo' => 'lao',
  				'lol' => 'mongó',
  				'lou' => 'louisianai kreol',
  				'loz' => 'lozi',
  				'lrc' => 'északi luri',
+ 				'lsm' => 'samia',
  				'lt' => 'litván',
  				'lu' => 'luba-katanga',
  				'lua' => 'luba-lulua',
@@ -1009,6 +1017,7 @@ has 'display_name_language' => (
  				'mn' => 'mongol',
  				'mnc' => 'mandzsu',
  				'mni' => 'manipuri',
+ 				'moe' => 'innu-aimun',
  				'moh' => 'mohawk',
  				'mos' => 'moszi',
  				'mr' => 'maráthi',
@@ -1057,11 +1066,16 @@ has 'display_name_language' => (
  				'nzi' => 'nzima',
  				'oc' => 'okszitán',
  				'oj' => 'ojibva',
+ 				'ojb' => 'északnyugati odzsibva',
+ 				'ojc' => 'középvidéki odzsibva',
+ 				'ojs' => 'odzsi-krí',
+ 				'ojw' => 'nyugati odzsibva',
+ 				'oka' => 'okanagan',
  				'om' => 'oromo',
  				'or' => 'odia',
  				'os' => 'oszét',
  				'osa' => 'osage',
- 				'ota' => 'ottomán török',
+ 				'ota' => 'oszmán-török',
  				'pa' => 'pandzsábi',
  				'pag' => 'pangaszinan',
  				'pal' => 'pahlavi',
@@ -1072,8 +1086,10 @@ has 'display_name_language' => (
  				'peo' => 'óperzsa',
  				'phn' => 'főniciai',
  				'pi' => 'pali',
+ 				'pis' => 'pidzsin',
  				'pl' => 'lengyel',
  				'pon' => 'pohnpei',
+ 				'pqm' => 'maliseet-passamaquoddy',
  				'prg' => 'porosz',
  				'pro' => 'óprovánszi',
  				'ps' => 'pastu',
@@ -1125,6 +1141,7 @@ has 'display_name_language' => (
  				'sid' => 'szidamó',
  				'sk' => 'szlovák',
  				'sl' => 'szlovén',
+ 				'slh' => 'déli lushootseed',
  				'sm' => 'szamoai',
  				'sma' => 'déli számi',
  				'smj' => 'lulei számi',
@@ -1141,6 +1158,7 @@ has 'display_name_language' => (
  				'ss' => 'sziszuati',
  				'ssy' => 'szahó',
  				'st' => 'déli szeszotó',
+ 				'str' => 'szorosmenti salish',
  				'su' => 'szundanéz',
  				'suk' => 'szukuma',
  				'sus' => 'szuszu',
@@ -1151,14 +1169,18 @@ has 'display_name_language' => (
  				'swb' => 'comorei',
  				'syc' => 'klasszikus szír',
  				'syr' => 'szír',
+ 				'szl' => 'sziléziai',
  				'ta' => 'tamil',
+ 				'tce' => 'déli tutchone',
  				'te' => 'telugu',
  				'tem' => 'temne',
  				'teo' => 'teszó',
  				'ter' => 'terenó',
  				'tet' => 'tetum',
  				'tg' => 'tadzsik',
+ 				'tgx' => 'tagish',
  				'th' => 'thai',
+ 				'tht' => 'tahltan',
  				'ti' => 'tigrinya',
  				'tig' => 'tigré',
  				'tiv' => 'tiv',
@@ -1171,12 +1193,14 @@ has 'display_name_language' => (
  				'tn' => 'szecsuáni',
  				'to' => 'tongai',
  				'tog' => 'nyugati nyasza',
+ 				'tok' => 'toki pona',
  				'tpi' => 'tok pisin',
  				'tr' => 'török',
  				'trv' => 'tarokó',
  				'ts' => 'conga',
  				'tsi' => 'csimsiáni',
  				'tt' => 'tatár',
+ 				'ttm' => 'északi tutchone',
  				'tum' => 'tumbuka',
  				'tvl' => 'tuvalu',
  				'tw' => 'twi',
@@ -1194,6 +1218,7 @@ has 'display_name_language' => (
  				'uz' => 'üzbég',
  				'vai' => 'vai',
  				've' => 'venda',
+ 				'vec' => 'velencei',
  				'vi' => 'vietnámi',
  				'vo' => 'volapük',
  				'vot' => 'votják',
@@ -1215,6 +1240,7 @@ has 'display_name_language' => (
  				'ybb' => 'jemba',
  				'yi' => 'jiddis',
  				'yo' => 'joruba',
+ 				'yrl' => 'nheengatu',
  				'yue' => 'kantoni',
  				'yue@alt=menu' => 'kantoni kínai',
  				'za' => 'zsuang',
@@ -1249,7 +1275,9 @@ has 'display_name_script' => (
 	default		=> sub {
 		sub {
 			my %scripts = (
-			'Arab' => 'Arab',
+			'Adlm' => 'Adlam',
+ 			'Aghb' => 'Kaukázusi albaniai',
+ 			'Arab' => 'Arab',
  			'Arab@alt=variant' => 'Perzsa-arab',
  			'Aran' => 'Nasztalik',
  			'Armi' => 'Birodalmi arámi',
@@ -1270,6 +1298,7 @@ has 'display_name_script' => (
  			'Cham' => 'Csám',
  			'Cher' => 'Cseroki',
  			'Copt' => 'Kopt',
+ 			'Cpmn' => 'Ciprusi-minószi',
  			'Cprt' => 'Ciprusi',
  			'Cyrl' => 'Cirill',
  			'Cyrs' => 'Óegyházi szláv cirill',
@@ -1296,6 +1325,7 @@ has 'display_name_script' => (
  			'Hant@alt=stand-alone' => 'Hagyományos kínai',
  			'Hebr' => 'Héber',
  			'Hira' => 'Hiragana',
+ 			'Hluw' => 'Anatóliai hieroglifák',
  			'Hmng' => 'Pahawh hmong',
  			'Hrkt' => 'Katakana vagy hiragana',
  			'Hung' => 'Ómagyar',
@@ -1331,6 +1361,7 @@ has 'display_name_script' => (
  			'Moon' => 'Moon',
  			'Mtei' => 'Meitei mayek',
  			'Mymr' => 'Burmai',
+ 			'Nbat' => 'Nabateus',
  			'Nkoo' => 'N’ko',
  			'Ogam' => 'Ogham',
  			'Olck' => 'Ol chiki',
@@ -1347,6 +1378,7 @@ has 'display_name_script' => (
  			'Prti' => 'Feliratos parthian',
  			'Qaag' => 'Zawgyi',
  			'Rjng' => 'Redzsang',
+ 			'Rohg' => 'Hanifi',
  			'Roro' => 'Rongorongo',
  			'Runr' => 'Runikus',
  			'Samr' => 'Szamaritán',
@@ -1489,6 +1521,7 @@ has 'display_name_region' => (
  			'CN' => 'Kína',
  			'CO' => 'Kolumbia',
  			'CP' => 'Clipperton-sziget',
+ 			'CQ' => 'Sark',
  			'CR' => 'Costa Rica',
  			'CU' => 'Kuba',
  			'CV' => 'Zöld-foki Köztársaság',
@@ -1555,6 +1588,7 @@ has 'display_name_region' => (
  			'IM' => 'Man-sziget',
  			'IN' => 'India',
  			'IO' => 'Brit Indiai-óceáni Terület',
+ 			'IO@alt=chagos' => 'Chagos-szigetcsoport',
  			'IQ' => 'Irak',
  			'IR' => 'Irán',
  			'IS' => 'Izland',
@@ -1621,6 +1655,7 @@ has 'display_name_region' => (
  			'NR' => 'Nauru',
  			'NU' => 'Niue',
  			'NZ' => 'Új-Zéland',
+ 			'NZ@alt=variant' => 'Aotearoa (Új-Zéland)',
  			'OM' => 'Omán',
  			'PA' => 'Panama',
  			'PE' => 'Peru',
@@ -1828,9 +1863,9 @@ has 'display_name_type' => (
  				'gregorian' => q{Gergely-naptár},
  				'hebrew' => q{Héber naptár},
  				'indian' => q{Indiai nemzeti naptár},
- 				'islamic' => q{Iszlám naptár},
- 				'islamic-civil' => q{Iszlám civil naptár},
- 				'islamic-umalqura' => q{Iszlám Umm al-Qura naptár},
+ 				'islamic' => q{Hidzsra naptár},
+ 				'islamic-civil' => q{Hidzsra naptár (táblázatos, polgári)},
+ 				'islamic-umalqura' => q{Hidzsra naptár (Umm al-Qura)},
  				'iso8601' => q{ISO-8601 naptár},
  				'japanese' => q{Japán naptár},
  				'persian' => q{Perzsa naptár},
@@ -1875,6 +1910,7 @@ has 'display_name_type' => (
  				'stroke' => q{Vonássorrend},
  				'traditional' => q{Hagyományos},
  				'unihan' => q{Szótővonás rendezési sorrend},
+ 				'zhuyin' => q{Zujin rendezési sorrend},
  			},
  			'colnormalization' => {
  				'no' => q{Rendezés normalizálás nélkül},
@@ -1922,6 +1958,7 @@ has 'display_name_type' => (
  				'armn' => q{Örmény számok},
  				'armnlow' => q{Örmény kisbetűs számok},
  				'beng' => q{Bengáli számjegyek},
+ 				'cakm' => q{Csakma számjegyek},
  				'deva' => q{Dévanágari számjegyek},
  				'ethi' => q{Etióp számok},
  				'finance' => q{Pénzügyi számok},
@@ -1937,6 +1974,7 @@ has 'display_name_type' => (
  				'hant' => q{Hagyományos kínai számok},
  				'hantfin' => q{Hagyományos kínai pénzügyi számok},
  				'hebr' => q{Héber számok},
+ 				'java' => q{Jávai számjegyek},
  				'jpan' => q{Japán számok},
  				'jpanfin' => q{Japán pénzügyi számok},
  				'khmr' => q{Khmer számjegyek},
@@ -1945,8 +1983,10 @@ has 'display_name_type' => (
  				'latn' => q{Nyugati számjegyek},
  				'mlym' => q{Malajálam számjegyek},
  				'mong' => q{Mongol számjegyek},
+ 				'mtei' => q{Meitei Mayek számjegyek},
  				'mymr' => q{Mianmari számjegyek},
  				'native' => q{Natív számjegyek},
+ 				'olck' => q{Ol Chiki számjegyek},
  				'orya' => q{Orija számjegyek},
  				'roman' => q{Római számok},
  				'romanlow' => q{Római kisbetűs számok},
@@ -2000,16 +2040,16 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{[à ă â å ä ã ā æ ç è ĕ ê ë ē ì ĭ î ï ī ñ ò ŏ ô ø ō œ q ù ŭ û ū w x y ÿ]},
-			index => ['A', 'Á', 'B', 'C', '{CS}', 'D', '{DZ}', '{DZS}', 'E', 'É', 'F', 'G', '{GY}', 'H', 'I', 'Í', 'J', 'K', 'L', '{LY}', 'M', 'N', '{NY}', 'O', 'Ó', 'Ö', 'Ő', 'P', 'Q', 'R', 'S', '{SZ}', 'T', '{TY}', 'U', 'Ú', 'Ü', 'Ű', 'V', 'W', 'X', 'Y', 'Z', '{ZS}'],
-			main => qr{[a á b c {cs} {ccs} d {dz} {ddz} {dzs} {ddzs} e é f g {gy} {ggy} h i í j k l {ly} {lly} m n {ny} {nny} o ó ö ő p r s {sz} {ssz} t {ty} {tty} u ú ü ű v z {zs} {zzs}]},
+			auxiliary => qr{[àăâåäãā æ ç èĕêëē ìĭîïī ñ òŏôøō œ q ùŭûū w x yÿ]},
+			index => ['AÁ', 'B', 'C', '{CS}', 'D', '{DZ}', '{DZS}', 'EÉ', 'F', 'G', '{GY}', 'H', 'IÍ', 'J', 'K', 'L', '{LY}', 'M', 'N', '{NY}', 'OÓ', 'ÖŐ', 'P', 'Q', 'R', 'S', '{SZ}', 'T', '{TY}', 'UÚ', 'ÜŰ', 'V', 'W', 'X', 'Y', 'Z', '{ZS}'],
+			main => qr{[aá b c {cs} {ccs} d {dz} {ddz} {dzs} {ddzs} eé f g {gy} {ggy} h ií j k l {ly} {lly} m n {ny} {nny} oó öő p r s {sz} {ssz} t {ty} {tty} uú üű v z {zs} {zzs}]},
 			numbers => qr{[  \- ‑ , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
-			punctuation => qr{[\- ‑ – , ; \: ! ? . … ' ’ " ” „ « » ( ) \[ \] \{ \} ⟨ ⟩ § @ * / \& # ~ ⁒]},
+			punctuation => qr{[\- ‑ – , ; \: ! ? . … '’ "”„ « » ( ) \[ \] \{ \} ⟨ ⟩ § @ * / \& # ~ ⁒]},
 		};
 	},
 EOT
 : sub {
-		return { index => ['A', 'Á', 'B', 'C', '{CS}', 'D', '{DZ}', '{DZS}', 'E', 'É', 'F', 'G', '{GY}', 'H', 'I', 'Í', 'J', 'K', 'L', '{LY}', 'M', 'N', '{NY}', 'O', 'Ó', 'Ö', 'Ő', 'P', 'Q', 'R', 'S', '{SZ}', 'T', '{TY}', 'U', 'Ú', 'Ü', 'Ű', 'V', 'W', 'X', 'Y', 'Z', '{ZS}'], };
+		return { index => ['AÁ', 'B', 'C', '{CS}', 'D', '{DZ}', '{DZS}', 'EÉ', 'F', 'G', '{GY}', 'H', 'IÍ', 'J', 'K', 'L', '{LY}', 'M', 'N', '{NY}', 'OÓ', 'ÖŐ', 'P', 'Q', 'R', 'S', '{SZ}', 'T', '{TY}', 'UÚ', 'ÜŰ', 'V', 'W', 'X', 'Y', 'Z', '{ZS}'], };
 },
 );
 
@@ -2020,21 +2060,10 @@ has 'ellipsis' => (
 	init_arg	=> undef,
 	default		=> sub {
 		return {
-			'final' => '{0}…',
-			'initial' => '…{0}',
-			'medial' => '{0}…{1}',
 			'word-final' => '{0}…',
 			'word-initial' => '…{0}',
-			'word-medial' => '{0} … {1}',
 		};
 	},
-);
-
-has 'more_information' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{?},
 );
 
 has 'quote_start' => (
@@ -2042,13 +2071,6 @@ has 'quote_start' => (
 	isa			=> Str,
 	init_arg	=> undef,
 	default		=> qq{„},
-);
-
-has 'quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{”},
 );
 
 has 'alternate_quote_start' => (
@@ -2063,17 +2085,6 @@ has 'alternate_quote_end' => (
 	isa			=> Str,
 	init_arg	=> undef,
 	default		=> qq{«},
-);
-
-has 'duration_units' => (
-	is			=> 'ro',
-	isa			=> HashRef[Str],
-	init_arg	=> undef,
-	default		=> sub { {
-				hm => 'h:mm',
-				hms => 'h:mm:ss',
-				ms => 'm:ss',
-			} }
 );
 
 has 'units' => (
@@ -2211,12 +2222,28 @@ has 'units' => (
 						'1' => q(yocto{0}),
 					},
 					# Long Unit Identifier
+					'10p-27' => {
+						'1' => q(ronto{0}),
+					},
+					# Core Unit Identifier
+					'27' => {
+						'1' => q(ronto{0}),
+					},
+					# Long Unit Identifier
 					'10p-3' => {
 						'1' => q(milli{0}),
 					},
 					# Core Unit Identifier
 					'3' => {
 						'1' => q(milli{0}),
+					},
+					# Long Unit Identifier
+					'10p-30' => {
+						'1' => q(quecto{0}),
+					},
+					# Core Unit Identifier
+					'30' => {
+						'1' => q(quecto{0}),
 					},
 					# Long Unit Identifier
 					'10p-6' => {
@@ -2291,12 +2318,28 @@ has 'units' => (
 						'1' => q(yotta{0}),
 					},
 					# Long Unit Identifier
+					'10p27' => {
+						'1' => q(ronna{0}),
+					},
+					# Core Unit Identifier
+					'10p27' => {
+						'1' => q(ronna{0}),
+					},
+					# Long Unit Identifier
 					'10p3' => {
 						'1' => q(kilo{0}),
 					},
 					# Core Unit Identifier
 					'10p3' => {
 						'1' => q(kilo{0}),
+					},
+					# Long Unit Identifier
+					'10p30' => {
+						'1' => q(quetta{0}),
+					},
+					# Core Unit Identifier
+					'10p30' => {
+						'1' => q(quetta{0}),
 					},
 					# Long Unit Identifier
 					'10p6' => {
@@ -2316,13 +2359,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'acceleration-g-force' => {
-						'name' => q(g gyorsulás),
 						'one' => q({0} g gyorsulás),
 						'other' => q({0} g gyorsulás),
 					},
 					# Core Unit Identifier
 					'g-force' => {
-						'name' => q(g gyorsulás),
 						'one' => q({0} g gyorsulás),
 						'other' => q({0} g gyorsulás),
 					},
@@ -2340,37 +2381,31 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'angle-arc-minute' => {
-						'name' => q(ívperc),
 						'one' => q({0} ívperc),
 						'other' => q({0} ívperc),
 					},
 					# Core Unit Identifier
 					'arc-minute' => {
-						'name' => q(ívperc),
 						'one' => q({0} ívperc),
 						'other' => q({0} ívperc),
 					},
 					# Long Unit Identifier
 					'angle-arc-second' => {
-						'name' => q(ívmásodperc),
 						'one' => q({0} ívmásodperc),
 						'other' => q({0} ívmásodperc),
 					},
 					# Core Unit Identifier
 					'arc-second' => {
-						'name' => q(ívmásodperc),
 						'one' => q({0} ívmásodperc),
 						'other' => q({0} ívmásodperc),
 					},
 					# Long Unit Identifier
 					'angle-degree' => {
-						'name' => q(fok),
 						'one' => q({0} fok),
 						'other' => q({0} fok),
 					},
 					# Core Unit Identifier
 					'degree' => {
-						'name' => q(fok),
 						'one' => q({0} fok),
 						'other' => q({0} fok),
 					},
@@ -2467,14 +2502,12 @@ has 'units' => (
 						'name' => q(négyzetkilométer),
 						'one' => q({0} négyzetkilométer),
 						'other' => q({0} négyzetkilométer),
-						'per' => q({0}/km²),
 					},
 					# Core Unit Identifier
 					'square-kilometer' => {
 						'name' => q(négyzetkilométer),
 						'one' => q({0} négyzetkilométer),
 						'other' => q({0} négyzetkilométer),
-						'per' => q({0}/km²),
 					},
 					# Long Unit Identifier
 					'area-square-meter' => {
@@ -2517,6 +2550,16 @@ has 'units' => (
 						'other' => q({0} négyzetyard),
 					},
 					# Long Unit Identifier
+					'concentr-item' => {
+						'one' => q({0} item),
+						'other' => q({0} item),
+					},
+					# Core Unit Identifier
+					'item' => {
+						'one' => q({0} item),
+						'other' => q({0} item),
+					},
+					# Long Unit Identifier
 					'concentr-karat' => {
 						'name' => q(karát),
 						'one' => q({0} karát),
@@ -2542,13 +2585,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'concentr-millimole-per-liter' => {
-						'name' => q(millimól/liter),
 						'one' => q({0} millimól/liter),
 						'other' => q({0} millimól/liter),
 					},
 					# Core Unit Identifier
 					'millimole-per-liter' => {
-						'name' => q(millimól/liter),
 						'one' => q({0} millimól/liter),
 						'other' => q({0} millimól/liter),
 					},
@@ -2566,37 +2607,31 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'concentr-percent' => {
-						'name' => q(százalék),
 						'one' => q({0} százalék),
 						'other' => q({0} százalék),
 					},
 					# Core Unit Identifier
 					'percent' => {
-						'name' => q(százalék),
 						'one' => q({0} százalék),
 						'other' => q({0} százalék),
 					},
 					# Long Unit Identifier
 					'concentr-permille' => {
-						'name' => q(ezrelék),
 						'one' => q({0} ezrelék),
 						'other' => q({0} ezrelék),
 					},
 					# Core Unit Identifier
 					'permille' => {
-						'name' => q(ezrelék),
 						'one' => q({0} ezrelék),
 						'other' => q({0} ezrelék),
 					},
 					# Long Unit Identifier
 					'concentr-permillion' => {
-						'name' => q(részecske/millió),
 						'one' => q({0} részecske/millió),
 						'other' => q({0} részecske/millió),
 					},
 					# Core Unit Identifier
 					'permillion' => {
-						'name' => q(részecske/millió),
 						'one' => q({0} részecske/millió),
 						'other' => q({0} részecske/millió),
 					},
@@ -2661,40 +2696,22 @@ has 'units' => (
 						'other' => q({0} mérföld/birodalmi gallon),
 					},
 					# Long Unit Identifier
-					'coordinate' => {
-						'east' => q({0} K),
-						'north' => q({0} É),
-						'south' => q({0} D),
-						'west' => q({0} Ny),
-					},
-					# Core Unit Identifier
-					'coordinate' => {
-						'east' => q({0} K),
-						'north' => q({0} É),
-						'south' => q({0} D),
-						'west' => q({0} Ny),
-					},
-					# Long Unit Identifier
 					'digital-bit' => {
-						'name' => q(bit),
 						'one' => q({0} bit),
 						'other' => q({0} bit),
 					},
 					# Core Unit Identifier
 					'bit' => {
-						'name' => q(bit),
 						'one' => q({0} bit),
 						'other' => q({0} bit),
 					},
 					# Long Unit Identifier
 					'digital-byte' => {
-						'name' => q(bájt),
 						'one' => q({0} bájt),
 						'other' => q({0} bájt),
 					},
 					# Core Unit Identifier
 					'byte' => {
-						'name' => q(bájt),
 						'one' => q({0} bájt),
 						'other' => q({0} bájt),
 					},
@@ -2820,17 +2837,23 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'duration-day' => {
-						'name' => q(nap),
 						'one' => q({0} nap),
 						'other' => q({0} nap),
-						'per' => q({0}/nap),
 					},
 					# Core Unit Identifier
 					'day' => {
-						'name' => q(nap),
 						'one' => q({0} nap),
 						'other' => q({0} nap),
-						'per' => q({0}/nap),
+					},
+					# Long Unit Identifier
+					'duration-day-person' => {
+						'one' => q({0} nap),
+						'other' => q({0} nap),
+					},
+					# Core Unit Identifier
+					'day-person' => {
+						'one' => q({0} nap),
+						'other' => q({0} nap),
 					},
 					# Long Unit Identifier
 					'duration-decade' => {
@@ -2898,14 +2921,12 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'duration-month' => {
-						'name' => q(hónap),
 						'one' => q({0} hónap),
 						'other' => q({0} hónap),
 						'per' => q({0}/hónap),
 					},
 					# Core Unit Identifier
 					'month' => {
-						'name' => q(hónap),
 						'one' => q({0} hónap),
 						'other' => q({0} hónap),
 						'per' => q({0}/hónap),
@@ -2923,6 +2944,18 @@ has 'units' => (
 						'other' => q({0} nanoszekundum),
 					},
 					# Long Unit Identifier
+					'duration-quarter' => {
+						'name' => q(negyedév),
+						'one' => q({0} negyedév),
+						'other' => q({0} negyedév),
+					},
+					# Core Unit Identifier
+					'quarter' => {
+						'name' => q(negyedév),
+						'one' => q({0} negyedév),
+						'other' => q({0} negyedév),
+					},
+					# Long Unit Identifier
 					'duration-second' => {
 						'name' => q(másodperc),
 						'one' => q({0} másodperc),
@@ -2938,31 +2971,23 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'duration-week' => {
-						'name' => q(hét),
 						'one' => q({0} hét),
 						'other' => q({0} hét),
-						'per' => q({0}/hét),
 					},
 					# Core Unit Identifier
 					'week' => {
-						'name' => q(hét),
 						'one' => q({0} hét),
 						'other' => q({0} hét),
-						'per' => q({0}/hét),
 					},
 					# Long Unit Identifier
 					'duration-year' => {
-						'name' => q(év),
 						'one' => q({0} év),
 						'other' => q({0} év),
-						'per' => q({0}/év),
 					},
 					# Core Unit Identifier
 					'year' => {
-						'name' => q(év),
 						'one' => q({0} év),
 						'other' => q({0} év),
-						'per' => q({0}/év),
 					},
 					# Long Unit Identifier
 					'electric-ampere' => {
@@ -3122,13 +3147,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'force-kilowatt-hour-per-100-kilometer' => {
-						'name' => q(kWh/100 km),
 						'one' => q({0} kWh/100 km),
 						'other' => q({0} kWh/100 km),
 					},
 					# Core Unit Identifier
 					'kilowatt-hour-per-100-kilometer' => {
-						'name' => q(kWh/100 km),
 						'one' => q({0} kWh/100 km),
 						'other' => q({0} kWh/100 km),
 					},
@@ -3205,18 +3228,6 @@ has 'units' => (
 						'other' => q({0} megahertz),
 					},
 					# Long Unit Identifier
-					'graphics-dot' => {
-						'name' => q(képpont),
-						'one' => q(képpont),
-						'other' => q({0} képpont),
-					},
-					# Core Unit Identifier
-					'dot' => {
-						'name' => q(képpont),
-						'one' => q(képpont),
-						'other' => q({0} képpont),
-					},
-					# Long Unit Identifier
 					'graphics-dot-per-centimeter' => {
 						'name' => q(pont per centiméter),
 						'one' => q({0} pont per centiméter),
@@ -3266,13 +3277,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'graphics-pixel' => {
-						'name' => q(képpont),
 						'one' => q({0} képpont),
 						'other' => q({0} képpont),
 					},
 					# Core Unit Identifier
 					'pixel' => {
-						'name' => q(képpont),
 						'one' => q({0} képpont),
 						'other' => q({0} képpont),
 					},
@@ -3351,55 +3360,21 @@ has 'units' => (
 						'other' => q({0} földsugár),
 					},
 					# Long Unit Identifier
-					'length-fathom' => {
-						'name' => q(öl),
-						'one' => q({0} öl),
-						'other' => q({0} öl),
-					},
-					# Core Unit Identifier
-					'fathom' => {
-						'name' => q(öl),
-						'one' => q({0} öl),
-						'other' => q({0} öl),
-					},
-					# Long Unit Identifier
-					'length-foot' => {
-						'name' => q(láb),
-						'one' => q({0} láb),
-						'other' => q({0} láb),
-						'per' => q({0}/láb),
-					},
-					# Core Unit Identifier
-					'foot' => {
-						'name' => q(láb),
-						'one' => q({0} láb),
-						'other' => q({0} láb),
-						'per' => q({0}/láb),
-					},
-					# Long Unit Identifier
 					'length-furlong' => {
-						'name' => q(furlong),
 						'one' => q({0} furlong),
 						'other' => q({0} furlong),
 					},
 					# Core Unit Identifier
 					'furlong' => {
-						'name' => q(furlong),
 						'one' => q({0} furlong),
 						'other' => q({0} furlong),
 					},
 					# Long Unit Identifier
 					'length-inch' => {
-						'name' => q(hüvelyk),
-						'one' => q({0} hüvelyk),
-						'other' => q({0} hüvelyk),
 						'per' => q({0}/hüvelyk),
 					},
 					# Core Unit Identifier
 					'inch' => {
-						'name' => q(hüvelyk),
-						'one' => q({0} hüvelyk),
-						'other' => q({0} hüvelyk),
 						'per' => q({0}/hüvelyk),
 					},
 					# Long Unit Identifier
@@ -3415,18 +3390,6 @@ has 'units' => (
 						'one' => q({0} kilométer),
 						'other' => q({0} kilométer),
 						'per' => q({0}/kilométer),
-					},
-					# Long Unit Identifier
-					'length-light-year' => {
-						'name' => q(fényév),
-						'one' => q({0} fényév),
-						'other' => q({0} fényév),
-					},
-					# Core Unit Identifier
-					'light-year' => {
-						'name' => q(fényév),
-						'one' => q({0} fényév),
-						'other' => q({0} fényév),
 					},
 					# Long Unit Identifier
 					'length-meter' => {
@@ -3540,25 +3503,21 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-point' => {
-						'name' => q(pont),
 						'one' => q({0} pont),
 						'other' => q({0} pont),
 					},
 					# Core Unit Identifier
 					'point' => {
-						'name' => q(pont),
 						'one' => q({0} pont),
 						'other' => q({0} pont),
 					},
 					# Long Unit Identifier
 					'length-solar-radius' => {
-						'name' => q(Nap-sugár),
 						'one' => q({0} Nap-sugár),
 						'other' => q({0} Nap-sugár),
 					},
 					# Core Unit Identifier
 					'solar-radius' => {
-						'name' => q(Nap-sugár),
 						'one' => q({0} Nap-sugár),
 						'other' => q({0} Nap-sugár),
 					},
@@ -3659,18 +3618,6 @@ has 'units' => (
 						'other' => q({0} Föld-tömeg),
 					},
 					# Long Unit Identifier
-					'mass-grain' => {
-						'name' => q(grain),
-						'one' => q({0} grain),
-						'other' => q({0} grain),
-					},
-					# Core Unit Identifier
-					'grain' => {
-						'name' => q(grain),
-						'one' => q({0} grain),
-						'other' => q({0} grain),
-					},
-					# Long Unit Identifier
 					'mass-gram' => {
 						'name' => q(gramm),
 						'one' => q({0} gramm),
@@ -3697,18 +3644,6 @@ has 'units' => (
 						'one' => q({0} kilogramm),
 						'other' => q({0} kilogramm),
 						'per' => q({0}/kilogramm),
-					},
-					# Long Unit Identifier
-					'mass-metric-ton' => {
-						'name' => q(metrikus tonna),
-						'one' => q({0} metrikus tonna),
-						'other' => q({0} metrikus tonna),
-					},
-					# Core Unit Identifier
-					'metric-ton' => {
-						'name' => q(metrikus tonna),
-						'one' => q({0} metrikus tonna),
-						'other' => q({0} metrikus tonna),
 					},
 					# Long Unit Identifier
 					'mass-microgram' => {
@@ -3811,6 +3746,18 @@ has 'units' => (
 						'other' => q({0} amerikai tonna),
 					},
 					# Long Unit Identifier
+					'mass-tonne' => {
+						'name' => q(metrikus tonna),
+						'one' => q({0} metrikus tonna),
+						'other' => q({0} metrikus tonna),
+					},
+					# Core Unit Identifier
+					'tonne' => {
+						'name' => q(metrikus tonna),
+						'one' => q({0} metrikus tonna),
+						'other' => q({0} metrikus tonna),
+					},
+					# Long Unit Identifier
 					'per' => {
 						'1' => q({0} per {1}),
 					},
@@ -3921,6 +3868,16 @@ has 'units' => (
 						'name' => q(atmoszféra),
 						'one' => q({0} atmoszféra),
 						'other' => q({0} atmoszféra),
+					},
+					# Long Unit Identifier
+					'pressure-bar' => {
+						'one' => q({0} bar),
+						'other' => q({0} bar),
+					},
+					# Core Unit Identifier
+					'bar' => {
+						'one' => q({0} bar),
+						'other' => q({0} bar),
 					},
 					# Long Unit Identifier
 					'pressure-hectopascal' => {
@@ -4019,6 +3976,18 @@ has 'units' => (
 						'other' => q({0} font per négyzethüvelyk),
 					},
 					# Long Unit Identifier
+					'speed-beaufort' => {
+						'name' => q(Beaufort),
+						'one' => q(Beaufort {0}),
+						'other' => q(Beaufort {0}),
+					},
+					# Core Unit Identifier
+					'beaufort' => {
+						'name' => q(Beaufort),
+						'one' => q(Beaufort {0}),
+						'other' => q(Beaufort {0}),
+					},
+					# Long Unit Identifier
 					'speed-kilometer-per-hour' => {
 						'name' => q(kilométer per óra),
 						'one' => q({0} kilométer per óra),
@@ -4092,15 +4061,13 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'temperature-generic' => {
-						'name' => q(°),
-						'one' => q({0}°),
-						'other' => q({0}°),
+						'one' => q({0} fok),
+						'other' => q({0} fok),
 					},
 					# Core Unit Identifier
 					'generic' => {
-						'name' => q(°),
-						'one' => q({0}°),
-						'other' => q({0}°),
+						'one' => q({0} fok),
+						'other' => q({0} fok),
 					},
 					# Long Unit Identifier
 					'temperature-kelvin' => {
@@ -4149,30 +4116,6 @@ has 'units' => (
 						'name' => q(hold-láb),
 						'one' => q({0} hold-láb),
 						'other' => q({0} hold-láb),
-					},
-					# Long Unit Identifier
-					'volume-barrel' => {
-						'name' => q(hordó),
-						'one' => q({0} hordó),
-						'other' => q({0} hordó),
-					},
-					# Core Unit Identifier
-					'barrel' => {
-						'name' => q(hordó),
-						'one' => q({0} hordó),
-						'other' => q({0} hordó),
-					},
-					# Long Unit Identifier
-					'volume-bushel' => {
-						'name' => q(véka),
-						'one' => q({0} véka),
-						'other' => q({0} véka),
-					},
-					# Core Unit Identifier
-					'bushel' => {
-						'name' => q(véka),
-						'one' => q({0} véka),
-						'other' => q({0} véka),
 					},
 					# Long Unit Identifier
 					'volume-centiliter' => {
@@ -4311,30 +4254,6 @@ has 'units' => (
 						'other' => q({0} deciliter),
 					},
 					# Long Unit Identifier
-					'volume-dessert-spoon' => {
-						'name' => q(desszertkanál),
-						'one' => q({0} desszertkanál),
-						'other' => q({0} desszertkanál),
-					},
-					# Core Unit Identifier
-					'dessert-spoon' => {
-						'name' => q(desszertkanál),
-						'one' => q({0} desszertkanál),
-						'other' => q({0} desszertkanál),
-					},
-					# Long Unit Identifier
-					'volume-dessert-spoon-imperial' => {
-						'name' => q(bir. desszertkanál),
-						'one' => q({0} bir. desszertkanál),
-						'other' => q({0} bir. desszertkanál),
-					},
-					# Core Unit Identifier
-					'dessert-spoon-imperial' => {
-						'name' => q(bir. desszertkanál),
-						'one' => q({0} bir. desszertkanál),
-						'other' => q({0} bir. desszertkanál),
-					},
-					# Long Unit Identifier
 					'volume-dram' => {
 						'name' => q(dram),
 						'one' => q({0} dram),
@@ -4345,18 +4264,6 @@ has 'units' => (
 						'name' => q(dram),
 						'one' => q({0} dram),
 						'other' => q({0} dram),
-					},
-					# Long Unit Identifier
-					'volume-drop' => {
-						'name' => q(csepp),
-						'one' => q({0} csepp),
-						'other' => q({0} csepp),
-					},
-					# Core Unit Identifier
-					'drop' => {
-						'name' => q(csepp),
-						'one' => q({0} csepp),
-						'other' => q({0} csepp),
 					},
 					# Long Unit Identifier
 					'volume-fluid-ounce' => {
@@ -4423,18 +4330,6 @@ has 'units' => (
 						'other' => q({0} hektoliter),
 					},
 					# Long Unit Identifier
-					'volume-jigger' => {
-						'name' => q(adagolópohár),
-						'one' => q({0} adagolópohár),
-						'other' => q({0} adagolópohár),
-					},
-					# Core Unit Identifier
-					'jigger' => {
-						'name' => q(adagolópohár),
-						'one' => q({0} adagolópohár),
-						'other' => q({0} adagolópohár),
-					},
-					# Long Unit Identifier
 					'volume-liter' => {
 						'name' => q(liter),
 						'one' => q({0} liter),
@@ -4471,18 +4366,6 @@ has 'units' => (
 						'name' => q(milliliter),
 						'one' => q({0} milliliter),
 						'other' => q({0} milliliter),
-					},
-					# Long Unit Identifier
-					'volume-pinch' => {
-						'name' => q(csipet),
-						'one' => q({0} csipet),
-						'other' => q({0} csipet),
-					},
-					# Core Unit Identifier
-					'pinch' => {
-						'name' => q(csipet),
-						'one' => q({0} csipet),
-						'other' => q({0} csipet),
 					},
 					# Long Unit Identifier
 					'volume-pint' => {
@@ -4559,108 +4442,6 @@ has 'units' => (
 				},
 				'narrow' => {
 					# Long Unit Identifier
-					'' => {
-						'name' => q(irány),
-					},
-					# Core Unit Identifier
-					'' => {
-						'name' => q(irány),
-					},
-					# Long Unit Identifier
-					'1024p1' => {
-						'1' => q(Ki{0}),
-					},
-					# Core Unit Identifier
-					'1024p1' => {
-						'1' => q(Ki{0}),
-					},
-					# Long Unit Identifier
-					'1024p2' => {
-						'1' => q(Mi{0}),
-					},
-					# Core Unit Identifier
-					'1024p2' => {
-						'1' => q(Mi{0}),
-					},
-					# Long Unit Identifier
-					'1024p3' => {
-						'1' => q(Gi{0}),
-					},
-					# Core Unit Identifier
-					'1024p3' => {
-						'1' => q(Gi{0}),
-					},
-					# Long Unit Identifier
-					'1024p4' => {
-						'1' => q(Ti{0}),
-					},
-					# Core Unit Identifier
-					'1024p4' => {
-						'1' => q(Ti{0}),
-					},
-					# Long Unit Identifier
-					'1024p5' => {
-						'1' => q(Pi{0}),
-					},
-					# Core Unit Identifier
-					'1024p5' => {
-						'1' => q(Pi{0}),
-					},
-					# Long Unit Identifier
-					'1024p6' => {
-						'1' => q(Ei{0}),
-					},
-					# Core Unit Identifier
-					'1024p6' => {
-						'1' => q(Ei{0}),
-					},
-					# Long Unit Identifier
-					'1024p7' => {
-						'1' => q(Zi{0}),
-					},
-					# Core Unit Identifier
-					'1024p7' => {
-						'1' => q(Zi{0}),
-					},
-					# Long Unit Identifier
-					'1024p8' => {
-						'1' => q(Yi{0}),
-					},
-					# Core Unit Identifier
-					'1024p8' => {
-						'1' => q(Yi{0}),
-					},
-					# Long Unit Identifier
-					'acceleration-g-force' => {
-						'one' => q({0} G),
-						'other' => q({0} G),
-					},
-					# Core Unit Identifier
-					'g-force' => {
-						'one' => q({0} G),
-						'other' => q({0} G),
-					},
-					# Long Unit Identifier
-					'angle-arc-minute' => {
-						'one' => q({0}′),
-						'other' => q({0}′),
-					},
-					# Core Unit Identifier
-					'arc-minute' => {
-						'one' => q({0}′),
-						'other' => q({0}′),
-					},
-					# Long Unit Identifier
-					'angle-arc-second' => {
-						'one' => q({0}″),
-						'other' => q({0}″),
-					},
-					# Core Unit Identifier
-					'arc-second' => {
-						'one' => q({0}″),
-						'other' => q({0}″),
-					},
-					# Long Unit Identifier
 					'angle-degree' => {
 						'one' => q({0}°),
 						'other' => q({0}°),
@@ -4681,56 +4462,6 @@ has 'units' => (
 						'other' => q({0} ac),
 					},
 					# Long Unit Identifier
-					'area-hectare' => {
-						'one' => q({0} ha),
-						'other' => q({0} ha),
-					},
-					# Core Unit Identifier
-					'hectare' => {
-						'one' => q({0} ha),
-						'other' => q({0} ha),
-					},
-					# Long Unit Identifier
-					'area-square-foot' => {
-						'one' => q({0} ft²),
-						'other' => q({0} ft²),
-					},
-					# Core Unit Identifier
-					'square-foot' => {
-						'one' => q({0} ft²),
-						'other' => q({0} ft²),
-					},
-					# Long Unit Identifier
-					'area-square-kilometer' => {
-						'one' => q({0} km²),
-						'other' => q({0} km²),
-					},
-					# Core Unit Identifier
-					'square-kilometer' => {
-						'one' => q({0} km²),
-						'other' => q({0} km²),
-					},
-					# Long Unit Identifier
-					'area-square-meter' => {
-						'one' => q({0} m²),
-						'other' => q({0} m²),
-					},
-					# Core Unit Identifier
-					'square-meter' => {
-						'one' => q({0} m²),
-						'other' => q({0} m²),
-					},
-					# Long Unit Identifier
-					'area-square-mile' => {
-						'one' => q({0} mi²),
-						'other' => q({0} mi²),
-					},
-					# Core Unit Identifier
-					'square-mile' => {
-						'one' => q({0} mi²),
-						'other' => q({0} mi²),
-					},
-					# Long Unit Identifier
 					'concentr-millimole-per-liter' => {
 						'name' => q(mmol/l),
 					},
@@ -4741,14 +4472,10 @@ has 'units' => (
 					# Long Unit Identifier
 					'concentr-percent' => {
 						'name' => q(%),
-						'one' => q({0}%),
-						'other' => q({0}%),
 					},
 					# Core Unit Identifier
 					'percent' => {
 						'name' => q(%),
-						'one' => q({0}%),
-						'other' => q({0}%),
 					},
 					# Long Unit Identifier
 					'concentr-permille' => {
@@ -4768,301 +4495,51 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
-						'name' => q(l/100 km),
 						'one' => q({0} l/100 km),
 						'other' => q({0} l/100 km),
 					},
 					# Core Unit Identifier
 					'liter-per-100-kilometer' => {
-						'name' => q(l/100 km),
 						'one' => q({0} l/100 km),
 						'other' => q({0} l/100 km),
 					},
 					# Long Unit Identifier
-					'coordinate' => {
-						'east' => q({0} K),
-						'north' => q({0} É),
-						'south' => q({0} D),
-						'west' => q({0} Ny),
-					},
-					# Core Unit Identifier
-					'coordinate' => {
-						'east' => q({0} K),
-						'north' => q({0} É),
-						'south' => q({0} D),
-						'west' => q({0} Ny),
-					},
-					# Long Unit Identifier
 					'digital-byte' => {
+						'name' => q(B),
 						'one' => q({0} B),
 						'other' => q({0} B),
 					},
 					# Core Unit Identifier
 					'byte' => {
+						'name' => q(B),
 						'one' => q({0} B),
 						'other' => q({0} B),
 					},
 					# Long Unit Identifier
-					'duration-century' => {
-						'name' => q(sz.),
-						'one' => q({0} sz.),
-						'other' => q({0} sz.),
-					},
-					# Core Unit Identifier
-					'century' => {
-						'name' => q(sz.),
-						'one' => q({0} sz.),
-						'other' => q({0} sz.),
-					},
-					# Long Unit Identifier
-					'duration-day' => {
-						'name' => q(nap),
-						'one' => q({0} nap),
-						'other' => q({0} nap),
-						'per' => q({0}/nap),
-					},
-					# Core Unit Identifier
-					'day' => {
-						'name' => q(nap),
-						'one' => q({0} nap),
-						'other' => q({0} nap),
-						'per' => q({0}/nap),
-					},
-					# Long Unit Identifier
-					'duration-hour' => {
-						'name' => q(ó),
-						'one' => q({0} ó),
-						'other' => q({0} ó),
-					},
-					# Core Unit Identifier
-					'hour' => {
-						'name' => q(ó),
-						'one' => q({0} ó),
-						'other' => q({0} ó),
-					},
-					# Long Unit Identifier
-					'duration-millisecond' => {
-						'name' => q(ms),
-						'one' => q({0} ms),
-						'other' => q({0} ms),
-					},
-					# Core Unit Identifier
-					'millisecond' => {
-						'name' => q(ms),
-						'one' => q({0} ms),
-						'other' => q({0} ms),
-					},
-					# Long Unit Identifier
-					'duration-minute' => {
-						'name' => q(p),
-						'one' => q({0} p),
-						'other' => q({0} p),
-					},
-					# Core Unit Identifier
-					'minute' => {
-						'name' => q(p),
-						'one' => q({0} p),
-						'other' => q({0} p),
-					},
-					# Long Unit Identifier
 					'duration-month' => {
-						'name' => q(hónap),
 						'one' => q({0} h.),
 						'other' => q({0} h.),
 					},
 					# Core Unit Identifier
 					'month' => {
-						'name' => q(hónap),
 						'one' => q({0} h.),
 						'other' => q({0} h.),
 					},
 					# Long Unit Identifier
-					'duration-second' => {
-						'name' => q(mp),
-						'one' => q({0} mp),
-						'other' => q({0} mp),
-						'per' => q({0}/mp),
+					'graphics-megapixel' => {
+						'name' => q(MP),
 					},
 					# Core Unit Identifier
-					'second' => {
-						'name' => q(mp),
-						'one' => q({0} mp),
-						'other' => q({0} mp),
-						'per' => q({0}/mp),
+					'megapixel' => {
+						'name' => q(MP),
 					},
 					# Long Unit Identifier
-					'duration-week' => {
-						'name' => q(hét),
-						'one' => q({0} hét),
-						'other' => q({0} hét),
+					'graphics-pixel' => {
+						'name' => q(px),
 					},
 					# Core Unit Identifier
-					'week' => {
-						'name' => q(hét),
-						'one' => q({0} hét),
-						'other' => q({0} hét),
-					},
-					# Long Unit Identifier
-					'duration-year' => {
-						'name' => q(év),
-						'one' => q({0} év),
-						'other' => q({0} év),
-					},
-					# Core Unit Identifier
-					'year' => {
-						'name' => q(év),
-						'one' => q({0} év),
-						'other' => q({0} év),
-					},
-					# Long Unit Identifier
-					'force-kilowatt-hour-per-100-kilometer' => {
-						'name' => q(kWh/100 km),
-						'one' => q({0} kWh/100 km),
-						'other' => q({0} kWh/100 km),
-					},
-					# Core Unit Identifier
-					'kilowatt-hour-per-100-kilometer' => {
-						'name' => q(kWh/100 km),
-						'one' => q({0} kWh/100 km),
-						'other' => q({0} kWh/100 km),
-					},
-					# Long Unit Identifier
-					'length-centimeter' => {
-						'name' => q(cm),
-						'one' => q({0} cm),
-						'other' => q({0} cm),
-						'per' => q({0}/cm),
-					},
-					# Core Unit Identifier
-					'centimeter' => {
-						'name' => q(cm),
-						'one' => q({0} cm),
-						'other' => q({0} cm),
-						'per' => q({0}/cm),
-					},
-					# Long Unit Identifier
-					'length-decimeter' => {
-						'name' => q(dm),
-						'one' => q({0} dm),
-						'other' => q({0} dm),
-					},
-					# Core Unit Identifier
-					'decimeter' => {
-						'name' => q(dm),
-						'one' => q({0} dm),
-						'other' => q({0} dm),
-					},
-					# Long Unit Identifier
-					'length-foot' => {
-						'name' => q(láb),
-						'one' => q({0} láb),
-						'other' => q({0} láb),
-						'per' => q({0}/láb),
-					},
-					# Core Unit Identifier
-					'foot' => {
-						'name' => q(láb),
-						'one' => q({0} láb),
-						'other' => q({0} láb),
-						'per' => q({0}/láb),
-					},
-					# Long Unit Identifier
-					'length-inch' => {
-						'name' => q(hüvelyk),
-						'one' => q({0} hüvelyk),
-						'other' => q({0} hüvelyk),
-						'per' => q({0}/in),
-					},
-					# Core Unit Identifier
-					'inch' => {
-						'name' => q(hüvelyk),
-						'one' => q({0} hüvelyk),
-						'other' => q({0} hüvelyk),
-						'per' => q({0}/in),
-					},
-					# Long Unit Identifier
-					'length-kilometer' => {
-						'name' => q(km),
-						'one' => q({0} km),
-						'other' => q({0} km),
-						'per' => q({0}/km),
-					},
-					# Core Unit Identifier
-					'kilometer' => {
-						'name' => q(km),
-						'one' => q({0} km),
-						'other' => q({0} km),
-						'per' => q({0}/km),
-					},
-					# Long Unit Identifier
-					'length-light-year' => {
-						'one' => q({0} fényév),
-						'other' => q({0} fényév),
-					},
-					# Core Unit Identifier
-					'light-year' => {
-						'one' => q({0} fényév),
-						'other' => q({0} fényév),
-					},
-					# Long Unit Identifier
-					'length-meter' => {
-						'name' => q(m),
-						'one' => q({0} m),
-						'other' => q({0} m),
-						'per' => q({0}/m),
-					},
-					# Core Unit Identifier
-					'meter' => {
-						'name' => q(m),
-						'one' => q({0} m),
-						'other' => q({0} m),
-						'per' => q({0}/m),
-					},
-					# Long Unit Identifier
-					'length-mile' => {
-						'name' => q(mf),
-						'one' => q({0} mf),
-						'other' => q({0} mf),
-					},
-					# Core Unit Identifier
-					'mile' => {
-						'name' => q(mf),
-						'one' => q({0} mf),
-						'other' => q({0} mf),
-					},
-					# Long Unit Identifier
-					'length-mile-scandinavian' => {
-						'name' => q(mil),
-						'one' => q({0} mil),
-						'other' => q({0} mil),
-					},
-					# Core Unit Identifier
-					'mile-scandinavian' => {
-						'name' => q(mil),
-						'one' => q({0} mil),
-						'other' => q({0} mil),
-					},
-					# Long Unit Identifier
-					'length-millimeter' => {
-						'name' => q(mm),
-						'one' => q({0} mm),
-						'other' => q({0} mm),
-					},
-					# Core Unit Identifier
-					'millimeter' => {
-						'name' => q(mm),
-						'one' => q({0} mm),
-						'other' => q({0} mm),
-					},
-					# Long Unit Identifier
-					'length-picometer' => {
-						'one' => q({0} pm),
-						'other' => q({0} pm),
-					},
-					# Core Unit Identifier
-					'picometer' => {
-						'one' => q({0} pm),
-						'other' => q({0} pm),
+					'pixel' => {
+						'name' => q(px),
 					},
 					# Long Unit Identifier
 					'length-point' => {
@@ -5073,316 +4550,82 @@ has 'units' => (
 						'name' => q(pt),
 					},
 					# Long Unit Identifier
-					'length-yard' => {
-						'name' => q(yd),
-						'one' => q({0} yd),
-						'other' => q({0} yd),
+					'length-solar-radius' => {
+						'name' => q(R☉),
 					},
 					# Core Unit Identifier
-					'yard' => {
-						'name' => q(yd),
-						'one' => q({0} yd),
-						'other' => q({0} yd),
+					'solar-radius' => {
+						'name' => q(R☉),
 					},
 					# Long Unit Identifier
 					'mass-gram' => {
 						'name' => q(g),
-						'one' => q({0} g),
-						'other' => q({0} g),
-						'per' => q({0}/g),
 					},
 					# Core Unit Identifier
 					'gram' => {
 						'name' => q(g),
-						'one' => q({0} g),
-						'other' => q({0} g),
-						'per' => q({0}/g),
-					},
-					# Long Unit Identifier
-					'mass-kilogram' => {
-						'name' => q(kg),
-						'one' => q({0} kg),
-						'other' => q({0} kg),
-						'per' => q({0}/kg),
-					},
-					# Core Unit Identifier
-					'kilogram' => {
-						'name' => q(kg),
-						'one' => q({0} kg),
-						'other' => q({0} kg),
-						'per' => q({0}/kg),
 					},
 					# Long Unit Identifier
 					'mass-ounce' => {
-						'name' => q(oz),
 						'one' => q({0} oz),
 						'other' => q({0} uncia),
-						'per' => q({0}/oz),
 					},
 					# Core Unit Identifier
 					'ounce' => {
-						'name' => q(oz),
 						'one' => q({0} oz),
 						'other' => q({0} uncia),
-						'per' => q({0}/oz),
 					},
 					# Long Unit Identifier
 					'mass-pound' => {
-						'name' => q(lb),
 						'one' => q({0} lb),
 						'other' => q({0} font),
-						'per' => q({0}/lb),
 					},
 					# Core Unit Identifier
 					'pound' => {
-						'name' => q(lb),
 						'one' => q({0} lb),
 						'other' => q({0} font),
-						'per' => q({0}/lb),
-					},
-					# Long Unit Identifier
-					'mass-stone' => {
-						'name' => q(st),
-						'one' => q({0} st),
-						'other' => q({0} st),
-					},
-					# Core Unit Identifier
-					'stone' => {
-						'name' => q(st),
-						'one' => q({0} st),
-						'other' => q({0} st),
-					},
-					# Long Unit Identifier
-					'per' => {
-						'1' => q({0}/{1}),
-					},
-					# Core Unit Identifier
-					'per' => {
-						'1' => q({0}/{1}),
-					},
-					# Long Unit Identifier
-					'power-horsepower' => {
-						'one' => q({0} LE),
-						'other' => q({0} LE),
-					},
-					# Core Unit Identifier
-					'horsepower' => {
-						'one' => q({0} LE),
-						'other' => q({0} LE),
-					},
-					# Long Unit Identifier
-					'power-kilowatt' => {
-						'one' => q({0} kW),
-						'other' => q({0} kW),
-					},
-					# Core Unit Identifier
-					'kilowatt' => {
-						'one' => q({0} kW),
-						'other' => q({0} kW),
-					},
-					# Long Unit Identifier
-					'power-watt' => {
-						'one' => q({0} W),
-						'other' => q({0} W),
-					},
-					# Core Unit Identifier
-					'watt' => {
-						'one' => q({0} W),
-						'other' => q({0} W),
-					},
-					# Long Unit Identifier
-					'power2' => {
-						'one' => q({0}²),
-						'other' => q({0}²),
-					},
-					# Core Unit Identifier
-					'power2' => {
-						'one' => q({0}²),
-						'other' => q({0}²),
-					},
-					# Long Unit Identifier
-					'power3' => {
-						'one' => q({0}³),
-						'other' => q({0}³),
-					},
-					# Core Unit Identifier
-					'power3' => {
-						'one' => q({0}³),
-						'other' => q({0}³),
-					},
-					# Long Unit Identifier
-					'pressure-hectopascal' => {
-						'name' => q(hPa),
-						'one' => q({0} hPa),
-						'other' => q({0} hPa),
-					},
-					# Core Unit Identifier
-					'hectopascal' => {
-						'name' => q(hPa),
-						'one' => q({0} hPa),
-						'other' => q({0} hPa),
 					},
 					# Long Unit Identifier
 					'pressure-inch-ofhg' => {
 						'name' => q(Hgin),
-						'one' => q({0} inHg),
-						'other' => q({0} inHg),
 					},
 					# Core Unit Identifier
 					'inch-ofhg' => {
 						'name' => q(Hgin),
-						'one' => q({0} inHg),
-						'other' => q({0} inHg),
 					},
 					# Long Unit Identifier
-					'pressure-millibar' => {
-						'one' => q({0} mb),
-						'other' => q({0} mb),
+					'speed-beaufort' => {
+						'one' => q(B{0}),
+						'other' => q(B{0}),
 					},
 					# Core Unit Identifier
-					'millibar' => {
-						'one' => q({0} mb),
-						'other' => q({0} mb),
+					'beaufort' => {
+						'one' => q(B{0}),
+						'other' => q(B{0}),
 					},
 					# Long Unit Identifier
-					'pressure-millimeter-ofhg' => {
-						'name' => q(Hgmm),
-						'one' => q({0} Hgmm),
-						'other' => q({0} Hgmm),
+					'volume-dram' => {
+						'name' => q(fl.dr.),
+						'one' => q({0} fl.dr.),
+						'other' => q({0} fl.dr.),
 					},
 					# Core Unit Identifier
-					'millimeter-ofhg' => {
-						'name' => q(Hgmm),
-						'one' => q({0} Hgmm),
-						'other' => q({0} Hgmm),
+					'dram' => {
+						'name' => q(fl.dr.),
+						'one' => q({0} fl.dr.),
+						'other' => q({0} fl.dr.),
 					},
 					# Long Unit Identifier
-					'pressure-pound-force-per-square-inch' => {
-						'name' => q(psi),
-						'one' => q({0} psi),
-						'other' => q({0} psi),
+					'volume-pinch' => {
+						'name' => q(csi),
+						'one' => q({0} csi),
+						'other' => q({0} csi),
 					},
 					# Core Unit Identifier
-					'pound-force-per-square-inch' => {
-						'name' => q(psi),
-						'one' => q({0} psi),
-						'other' => q({0} psi),
-					},
-					# Long Unit Identifier
-					'speed-kilometer-per-hour' => {
-						'name' => q(km/h),
-						'one' => q({0} km/h),
-						'other' => q({0} km/h),
-					},
-					# Core Unit Identifier
-					'kilometer-per-hour' => {
-						'name' => q(km/h),
-						'one' => q({0} km/h),
-						'other' => q({0} km/h),
-					},
-					# Long Unit Identifier
-					'speed-meter-per-second' => {
-						'name' => q(m/s),
-						'one' => q({0} m/s),
-						'other' => q({0} m/s),
-					},
-					# Core Unit Identifier
-					'meter-per-second' => {
-						'name' => q(m/s),
-						'one' => q({0} m/s),
-						'other' => q({0} m/s),
-					},
-					# Long Unit Identifier
-					'speed-mile-per-hour' => {
-						'name' => q(mph),
-						'one' => q({0} mph),
-						'other' => q({0} mph),
-					},
-					# Core Unit Identifier
-					'mile-per-hour' => {
-						'name' => q(mph),
-						'one' => q({0} mph),
-						'other' => q({0} mph),
-					},
-					# Long Unit Identifier
-					'temperature-celsius' => {
-						'name' => q(°C),
-						'one' => q({0} °C),
-						'other' => q({0} °C),
-					},
-					# Core Unit Identifier
-					'celsius' => {
-						'name' => q(°C),
-						'one' => q({0} °C),
-						'other' => q({0} °C),
-					},
-					# Long Unit Identifier
-					'temperature-fahrenheit' => {
-						'name' => q(°F),
-						'one' => q({0} °F),
-						'other' => q({0} °F),
-					},
-					# Core Unit Identifier
-					'fahrenheit' => {
-						'name' => q(°F),
-						'one' => q({0} °F),
-						'other' => q({0} °F),
-					},
-					# Long Unit Identifier
-					'temperature-generic' => {
-						'name' => q(°),
-						'one' => q({0}°),
-						'other' => q({0}°),
-					},
-					# Core Unit Identifier
-					'generic' => {
-						'name' => q(°),
-						'one' => q({0}°),
-						'other' => q({0}°),
-					},
-					# Long Unit Identifier
-					'temperature-kelvin' => {
-						'name' => q(K),
-						'one' => q({0} K),
-						'other' => q({0} K),
-					},
-					# Core Unit Identifier
-					'kelvin' => {
-						'name' => q(K),
-						'one' => q({0} K),
-						'other' => q({0} K),
-					},
-					# Long Unit Identifier
-					'volume-cubic-kilometer' => {
-						'one' => q({0} km³),
-						'other' => q({0} km³),
-					},
-					# Core Unit Identifier
-					'cubic-kilometer' => {
-						'one' => q({0} km³),
-						'other' => q({0} km³),
-					},
-					# Long Unit Identifier
-					'volume-cubic-mile' => {
-						'one' => q({0} mi³),
-						'other' => q({0} mi³),
-					},
-					# Core Unit Identifier
-					'cubic-mile' => {
-						'one' => q({0} mi³),
-						'other' => q({0} mi³),
-					},
-					# Long Unit Identifier
-					'volume-liter' => {
-						'name' => q(l),
-						'one' => q({0} l),
-						'other' => q({0} l),
-					},
-					# Core Unit Identifier
-					'liter' => {
-						'name' => q(l),
-						'one' => q({0} l),
-						'other' => q({0} l),
+					'pinch' => {
+						'name' => q(csi),
+						'one' => q({0} csi),
+						'other' => q({0} csi),
 					},
 				},
 				'short' => {
@@ -5395,116 +4638,28 @@ has 'units' => (
 						'name' => q(irány),
 					},
 					# Long Unit Identifier
-					'1024p1' => {
-						'1' => q(Ki{0}),
-					},
-					# Core Unit Identifier
-					'1024p1' => {
-						'1' => q(Ki{0}),
-					},
-					# Long Unit Identifier
-					'1024p2' => {
-						'1' => q(Mi{0}),
-					},
-					# Core Unit Identifier
-					'1024p2' => {
-						'1' => q(Mi{0}),
-					},
-					# Long Unit Identifier
-					'1024p3' => {
-						'1' => q(Gi{0}),
-					},
-					# Core Unit Identifier
-					'1024p3' => {
-						'1' => q(Gi{0}),
-					},
-					# Long Unit Identifier
-					'1024p4' => {
-						'1' => q(Ti{0}),
-					},
-					# Core Unit Identifier
-					'1024p4' => {
-						'1' => q(Ti{0}),
-					},
-					# Long Unit Identifier
-					'1024p5' => {
-						'1' => q(Pi{0}),
-					},
-					# Core Unit Identifier
-					'1024p5' => {
-						'1' => q(Pi{0}),
-					},
-					# Long Unit Identifier
-					'1024p6' => {
-						'1' => q(Ei{0}),
-					},
-					# Core Unit Identifier
-					'1024p6' => {
-						'1' => q(Ei{0}),
-					},
-					# Long Unit Identifier
-					'1024p7' => {
-						'1' => q(Zi{0}),
-					},
-					# Core Unit Identifier
-					'1024p7' => {
-						'1' => q(Zi{0}),
-					},
-					# Long Unit Identifier
-					'1024p8' => {
-						'1' => q(Yi{0}),
-					},
-					# Core Unit Identifier
-					'1024p8' => {
-						'1' => q(Yi{0}),
-					},
-					# Long Unit Identifier
 					'acceleration-g-force' => {
 						'name' => q(g gyorsulás),
-						'one' => q({0} G),
-						'other' => q({0} G),
 					},
 					# Core Unit Identifier
 					'g-force' => {
 						'name' => q(g gyorsulás),
-						'one' => q({0} G),
-						'other' => q({0} G),
-					},
-					# Long Unit Identifier
-					'acceleration-meter-per-square-second' => {
-						'name' => q(m/s²),
-						'one' => q({0} m/s²),
-						'other' => q({0} m/s²),
-					},
-					# Core Unit Identifier
-					'meter-per-square-second' => {
-						'name' => q(m/s²),
-						'one' => q({0} m/s²),
-						'other' => q({0} m/s²),
 					},
 					# Long Unit Identifier
 					'angle-arc-minute' => {
 						'name' => q(ívperc),
-						'one' => q({0}′),
-						'other' => q({0}′),
 					},
 					# Core Unit Identifier
 					'arc-minute' => {
 						'name' => q(ívperc),
-						'one' => q({0}′),
-						'other' => q({0}′),
 					},
 					# Long Unit Identifier
 					'angle-arc-second' => {
 						'name' => q(ívmásodperc),
-						'one' => q({0}″),
-						'other' => q({0}″),
 					},
 					# Core Unit Identifier
 					'arc-second' => {
 						'name' => q(ívmásodperc),
-						'one' => q({0}″),
-						'other' => q({0}″),
 					},
 					# Long Unit Identifier
 					'angle-degree' => {
@@ -5517,18 +4672,6 @@ has 'units' => (
 						'name' => q(fok),
 						'one' => q({0} fok),
 						'other' => q({0} fok),
-					},
-					# Long Unit Identifier
-					'angle-radian' => {
-						'name' => q(rad),
-						'one' => q({0} rad),
-						'other' => q({0} rad),
-					},
-					# Core Unit Identifier
-					'radian' => {
-						'name' => q(rad),
-						'one' => q({0} rad),
-						'other' => q({0} rad),
 					},
 					# Long Unit Identifier
 					'angle-revolution' => {
@@ -5557,120 +4700,10 @@ has 'units' => (
 					# Long Unit Identifier
 					'area-hectare' => {
 						'name' => q(ha),
-						'one' => q({0} ha),
-						'other' => q({0} ha),
 					},
 					# Core Unit Identifier
 					'hectare' => {
 						'name' => q(ha),
-						'one' => q({0} ha),
-						'other' => q({0} ha),
-					},
-					# Long Unit Identifier
-					'area-square-centimeter' => {
-						'name' => q(cm²),
-						'one' => q({0} cm²),
-						'other' => q({0} cm²),
-						'per' => q({0}/cm²),
-					},
-					# Core Unit Identifier
-					'square-centimeter' => {
-						'name' => q(cm²),
-						'one' => q({0} cm²),
-						'other' => q({0} cm²),
-						'per' => q({0}/cm²),
-					},
-					# Long Unit Identifier
-					'area-square-foot' => {
-						'name' => q(ft²),
-						'one' => q({0} ft²),
-						'other' => q({0} ft²),
-					},
-					# Core Unit Identifier
-					'square-foot' => {
-						'name' => q(ft²),
-						'one' => q({0} ft²),
-						'other' => q({0} ft²),
-					},
-					# Long Unit Identifier
-					'area-square-inch' => {
-						'name' => q(in²),
-						'one' => q({0} in²),
-						'other' => q({0} in²),
-						'per' => q({0}/in²),
-					},
-					# Core Unit Identifier
-					'square-inch' => {
-						'name' => q(in²),
-						'one' => q({0} in²),
-						'other' => q({0} in²),
-						'per' => q({0}/in²),
-					},
-					# Long Unit Identifier
-					'area-square-kilometer' => {
-						'name' => q(km²),
-						'one' => q({0} km²),
-						'other' => q({0} km²),
-						'per' => q({0}/km²),
-					},
-					# Core Unit Identifier
-					'square-kilometer' => {
-						'name' => q(km²),
-						'one' => q({0} km²),
-						'other' => q({0} km²),
-						'per' => q({0}/km²),
-					},
-					# Long Unit Identifier
-					'area-square-meter' => {
-						'name' => q(m²),
-						'one' => q({0} m²),
-						'other' => q({0} m²),
-						'per' => q({0}/m²),
-					},
-					# Core Unit Identifier
-					'square-meter' => {
-						'name' => q(m²),
-						'one' => q({0} m²),
-						'other' => q({0} m²),
-						'per' => q({0}/m²),
-					},
-					# Long Unit Identifier
-					'area-square-mile' => {
-						'name' => q(mi²),
-						'one' => q({0} mi²),
-						'other' => q({0} mi²),
-						'per' => q({0}/mi²),
-					},
-					# Core Unit Identifier
-					'square-mile' => {
-						'name' => q(mi²),
-						'one' => q({0} mi²),
-						'other' => q({0} mi²),
-						'per' => q({0}/mi²),
-					},
-					# Long Unit Identifier
-					'area-square-yard' => {
-						'name' => q(yd²),
-						'one' => q({0} yd²),
-						'other' => q({0} yd²),
-					},
-					# Core Unit Identifier
-					'square-yard' => {
-						'name' => q(yd²),
-						'one' => q({0} yd²),
-						'other' => q({0} yd²),
-					},
-					# Long Unit Identifier
-					'concentr-karat' => {
-						'name' => q(kt),
-						'one' => q({0} kt),
-						'other' => q({0} kt),
-					},
-					# Core Unit Identifier
-					'karat' => {
-						'name' => q(kt),
-						'one' => q({0} kt),
-						'other' => q({0} kt),
 					},
 					# Long Unit Identifier
 					'concentr-milligram-ofglucose-per-deciliter' => {
@@ -5699,38 +4732,26 @@ has 'units' => (
 					# Long Unit Identifier
 					'concentr-percent' => {
 						'name' => q(százalék),
-						'one' => q({0}%),
-						'other' => q({0}%),
 					},
 					# Core Unit Identifier
 					'percent' => {
 						'name' => q(százalék),
-						'one' => q({0}%),
-						'other' => q({0}%),
 					},
 					# Long Unit Identifier
 					'concentr-permille' => {
 						'name' => q(ezrelék),
-						'one' => q({0}‰),
-						'other' => q({0}‰),
 					},
 					# Core Unit Identifier
 					'permille' => {
 						'name' => q(ezrelék),
-						'one' => q({0}‰),
-						'other' => q({0}‰),
 					},
 					# Long Unit Identifier
 					'concentr-permillion' => {
 						'name' => q(részecske/millió),
-						'one' => q({0} ppm),
-						'other' => q({0} ppm),
 					},
 					# Core Unit Identifier
 					'permillion' => {
 						'name' => q(részecske/millió),
-						'one' => q({0} ppm),
-						'other' => q({0} ppm),
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
@@ -5795,18 +4816,6 @@ has 'units' => (
 						'west' => q({0} Ny),
 					},
 					# Long Unit Identifier
-					'digital-bit' => {
-						'name' => q(bit),
-						'one' => q({0} bit),
-						'other' => q({0} bit),
-					},
-					# Core Unit Identifier
-					'bit' => {
-						'name' => q(bit),
-						'one' => q({0} bit),
-						'other' => q({0} bit),
-					},
-					# Long Unit Identifier
 					'digital-byte' => {
 						'name' => q(bájt),
 						'one' => q({0} bájt),
@@ -5817,114 +4826,6 @@ has 'units' => (
 						'name' => q(bájt),
 						'one' => q({0} bájt),
 						'other' => q({0} bájt),
-					},
-					# Long Unit Identifier
-					'digital-gigabit' => {
-						'name' => q(Gb),
-						'one' => q({0} Gb),
-						'other' => q({0} Gb),
-					},
-					# Core Unit Identifier
-					'gigabit' => {
-						'name' => q(Gb),
-						'one' => q({0} Gb),
-						'other' => q({0} Gb),
-					},
-					# Long Unit Identifier
-					'digital-gigabyte' => {
-						'name' => q(GB),
-						'one' => q({0} GB),
-						'other' => q({0} GB),
-					},
-					# Core Unit Identifier
-					'gigabyte' => {
-						'name' => q(GB),
-						'one' => q({0} GB),
-						'other' => q({0} GB),
-					},
-					# Long Unit Identifier
-					'digital-kilobit' => {
-						'name' => q(kb),
-						'one' => q({0} kb),
-						'other' => q({0} kb),
-					},
-					# Core Unit Identifier
-					'kilobit' => {
-						'name' => q(kb),
-						'one' => q({0} kb),
-						'other' => q({0} kb),
-					},
-					# Long Unit Identifier
-					'digital-kilobyte' => {
-						'name' => q(kB),
-						'one' => q({0} kB),
-						'other' => q({0} kB),
-					},
-					# Core Unit Identifier
-					'kilobyte' => {
-						'name' => q(kB),
-						'one' => q({0} kB),
-						'other' => q({0} kB),
-					},
-					# Long Unit Identifier
-					'digital-megabit' => {
-						'name' => q(Mb),
-						'one' => q({0} Mb),
-						'other' => q({0} Mb),
-					},
-					# Core Unit Identifier
-					'megabit' => {
-						'name' => q(Mb),
-						'one' => q({0} Mb),
-						'other' => q({0} Mb),
-					},
-					# Long Unit Identifier
-					'digital-megabyte' => {
-						'name' => q(MB),
-						'one' => q({0} MB),
-						'other' => q({0} MB),
-					},
-					# Core Unit Identifier
-					'megabyte' => {
-						'name' => q(MB),
-						'one' => q({0} MB),
-						'other' => q({0} MB),
-					},
-					# Long Unit Identifier
-					'digital-petabyte' => {
-						'name' => q(PB),
-						'one' => q({0} PB),
-						'other' => q({0} PB),
-					},
-					# Core Unit Identifier
-					'petabyte' => {
-						'name' => q(PB),
-						'one' => q({0} PB),
-						'other' => q({0} PB),
-					},
-					# Long Unit Identifier
-					'digital-terabit' => {
-						'name' => q(Tb),
-						'one' => q({0} Tb),
-						'other' => q({0} Tb),
-					},
-					# Core Unit Identifier
-					'terabit' => {
-						'name' => q(Tb),
-						'one' => q({0} Tb),
-						'other' => q({0} Tb),
-					},
-					# Long Unit Identifier
-					'digital-terabyte' => {
-						'name' => q(TB),
-						'one' => q({0} TB),
-						'other' => q({0} TB),
-					},
-					# Core Unit Identifier
-					'terabyte' => {
-						'name' => q(TB),
-						'one' => q({0} TB),
-						'other' => q({0} TB),
 					},
 					# Long Unit Identifier
 					'duration-century' => {
@@ -5979,30 +4880,6 @@ has 'units' => (
 						'per' => q({0}/ó),
 					},
 					# Long Unit Identifier
-					'duration-microsecond' => {
-						'name' => q(μs),
-						'one' => q({0} μs),
-						'other' => q({0} μs),
-					},
-					# Core Unit Identifier
-					'microsecond' => {
-						'name' => q(μs),
-						'one' => q({0} μs),
-						'other' => q({0} μs),
-					},
-					# Long Unit Identifier
-					'duration-millisecond' => {
-						'name' => q(ms),
-						'one' => q({0} ms),
-						'other' => q({0} ms),
-					},
-					# Core Unit Identifier
-					'millisecond' => {
-						'name' => q(ms),
-						'one' => q({0} ms),
-						'other' => q({0} ms),
-					},
-					# Long Unit Identifier
 					'duration-minute' => {
 						'name' => q(p),
 						'one' => q({0} p),
@@ -6031,16 +4908,18 @@ has 'units' => (
 						'per' => q({0}/hó),
 					},
 					# Long Unit Identifier
-					'duration-nanosecond' => {
-						'name' => q(ns),
-						'one' => q({0} ns),
-						'other' => q({0} ns),
+					'duration-quarter' => {
+						'name' => q(n.év),
+						'one' => q({0} n.év),
+						'other' => q({0} n.év),
+						'per' => q({0}/n.év),
 					},
 					# Core Unit Identifier
-					'nanosecond' => {
-						'name' => q(ns),
-						'one' => q({0} ns),
-						'other' => q({0} ns),
+					'quarter' => {
+						'name' => q(n.év),
+						'one' => q({0} n.év),
+						'other' => q({0} n.év),
+						'per' => q({0}/n.év),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
@@ -6087,62 +4966,26 @@ has 'units' => (
 					# Long Unit Identifier
 					'electric-ampere' => {
 						'name' => q(A),
-						'one' => q({0} A),
-						'other' => q({0} A),
 					},
 					# Core Unit Identifier
 					'ampere' => {
 						'name' => q(A),
-						'one' => q({0} A),
-						'other' => q({0} A),
-					},
-					# Long Unit Identifier
-					'electric-milliampere' => {
-						'name' => q(mA),
-						'one' => q({0} mA),
-						'other' => q({0} mA),
-					},
-					# Core Unit Identifier
-					'milliampere' => {
-						'name' => q(mA),
-						'one' => q({0} mA),
-						'other' => q({0} mA),
 					},
 					# Long Unit Identifier
 					'electric-ohm' => {
 						'name' => q(Ω),
-						'one' => q({0} Ω),
-						'other' => q({0} Ω),
 					},
 					# Core Unit Identifier
 					'ohm' => {
 						'name' => q(Ω),
-						'one' => q({0} Ω),
-						'other' => q({0} Ω),
 					},
 					# Long Unit Identifier
 					'electric-volt' => {
 						'name' => q(V),
-						'one' => q({0} V),
-						'other' => q({0} V),
 					},
 					# Core Unit Identifier
 					'volt' => {
 						'name' => q(V),
-						'one' => q({0} V),
-						'other' => q({0} V),
-					},
-					# Long Unit Identifier
-					'energy-calorie' => {
-						'name' => q(cal),
-						'one' => q({0} cal),
-						'other' => q({0} cal),
-					},
-					# Core Unit Identifier
-					'calorie' => {
-						'name' => q(cal),
-						'one' => q({0} cal),
-						'other' => q({0} cal),
 					},
 					# Long Unit Identifier
 					'energy-foodcalorie' => {
@@ -6159,50 +5002,10 @@ has 'units' => (
 					# Long Unit Identifier
 					'energy-joule' => {
 						'name' => q(J),
-						'one' => q({0} J),
-						'other' => q({0} J),
 					},
 					# Core Unit Identifier
 					'joule' => {
 						'name' => q(J),
-						'one' => q({0} J),
-						'other' => q({0} J),
-					},
-					# Long Unit Identifier
-					'energy-kilocalorie' => {
-						'name' => q(kcal),
-						'one' => q({0} kcal),
-						'other' => q({0} kcal),
-					},
-					# Core Unit Identifier
-					'kilocalorie' => {
-						'name' => q(kcal),
-						'one' => q({0} kcal),
-						'other' => q({0} kcal),
-					},
-					# Long Unit Identifier
-					'energy-kilojoule' => {
-						'name' => q(kJ),
-						'one' => q({0} kJ),
-						'other' => q({0} kJ),
-					},
-					# Core Unit Identifier
-					'kilojoule' => {
-						'name' => q(kJ),
-						'one' => q({0} kJ),
-						'other' => q({0} kJ),
-					},
-					# Long Unit Identifier
-					'energy-kilowatt-hour' => {
-						'name' => q(kWh),
-						'one' => q({0} kWh),
-						'other' => q({0} kWh),
-					},
-					# Core Unit Identifier
-					'kilowatt-hour' => {
-						'name' => q(kWh),
-						'one' => q({0} kWh),
-						'other' => q({0} kWh),
 					},
 					# Long Unit Identifier
 					'energy-therm-us' => {
@@ -6229,62 +5032,12 @@ has 'units' => (
 						'other' => q({0} kWh/100 km),
 					},
 					# Long Unit Identifier
-					'frequency-gigahertz' => {
-						'name' => q(GHz),
-						'one' => q({0} GHz),
-						'other' => q({0} GHz),
-					},
-					# Core Unit Identifier
-					'gigahertz' => {
-						'name' => q(GHz),
-						'one' => q({0} GHz),
-						'other' => q({0} GHz),
-					},
-					# Long Unit Identifier
-					'frequency-hertz' => {
-						'name' => q(Hz),
-						'one' => q({0} Hz),
-						'other' => q({0} Hz),
-					},
-					# Core Unit Identifier
-					'hertz' => {
-						'name' => q(Hz),
-						'one' => q({0} Hz),
-						'other' => q({0} Hz),
-					},
-					# Long Unit Identifier
-					'frequency-kilohertz' => {
-						'name' => q(kHz),
-						'one' => q({0} kHz),
-						'other' => q({0} kHz),
-					},
-					# Core Unit Identifier
-					'kilohertz' => {
-						'name' => q(kHz),
-						'one' => q({0} kHz),
-						'other' => q({0} kHz),
-					},
-					# Long Unit Identifier
-					'frequency-megahertz' => {
-						'name' => q(MHz),
-						'one' => q({0} MHz),
-						'other' => q({0} MHz),
-					},
-					# Core Unit Identifier
-					'megahertz' => {
-						'name' => q(MHz),
-						'one' => q({0} MHz),
-						'other' => q({0} MHz),
-					},
-					# Long Unit Identifier
 					'graphics-dot' => {
-						'name' => q(képpont),
 						'one' => q({0} képpont),
 						'other' => q({0} képpont),
 					},
 					# Core Unit Identifier
 					'dot' => {
-						'name' => q(képpont),
 						'one' => q({0} képpont),
 						'other' => q({0} képpont),
 					},
@@ -6292,25 +5045,25 @@ has 'units' => (
 					'graphics-dot-per-centimeter' => {
 						'name' => q(dpcm),
 						'one' => q({0} dpcm),
-						'other' => q({0} ppcm),
+						'other' => q({0} dpcm),
 					},
 					# Core Unit Identifier
 					'dot-per-centimeter' => {
 						'name' => q(dpcm),
 						'one' => q({0} dpcm),
-						'other' => q({0} ppcm),
+						'other' => q({0} dpcm),
 					},
 					# Long Unit Identifier
-					'graphics-em' => {
-						'name' => q(em),
-						'one' => q({0} em),
-						'other' => q({0} em),
+					'graphics-dot-per-inch' => {
+						'name' => q(dpi),
+						'one' => q({0} dpi),
+						'other' => q({0} dpi),
 					},
 					# Core Unit Identifier
-					'em' => {
-						'name' => q(em),
-						'one' => q({0} em),
-						'other' => q({0} em),
+					'dot-per-inch' => {
+						'name' => q(dpi),
+						'one' => q({0} dpi),
+						'other' => q({0} dpi),
 					},
 					# Long Unit Identifier
 					'graphics-megapixel' => {
@@ -6341,32 +5094,6 @@ has 'units' => (
 						'other' => q({0} CsE),
 					},
 					# Long Unit Identifier
-					'length-centimeter' => {
-						'name' => q(cm),
-						'one' => q({0} cm),
-						'other' => q({0} cm),
-						'per' => q({0}/cm),
-					},
-					# Core Unit Identifier
-					'centimeter' => {
-						'name' => q(cm),
-						'one' => q({0} cm),
-						'other' => q({0} cm),
-						'per' => q({0}/cm),
-					},
-					# Long Unit Identifier
-					'length-decimeter' => {
-						'name' => q(dm),
-						'one' => q({0} dm),
-						'other' => q({0} dm),
-					},
-					# Core Unit Identifier
-					'decimeter' => {
-						'name' => q(dm),
-						'one' => q({0} dm),
-						'other' => q({0} dm),
-					},
-					# Long Unit Identifier
 					'length-fathom' => {
 						'name' => q(öl),
 						'one' => q({0} öl),
@@ -6395,42 +5122,22 @@ has 'units' => (
 					# Long Unit Identifier
 					'length-furlong' => {
 						'name' => q(furlong),
-						'one' => q({0} fur),
-						'other' => q({0} fur),
 					},
 					# Core Unit Identifier
 					'furlong' => {
 						'name' => q(furlong),
-						'one' => q({0} fur),
-						'other' => q({0} fur),
 					},
 					# Long Unit Identifier
 					'length-inch' => {
 						'name' => q(hüvelyk),
 						'one' => q({0} hüvelyk),
 						'other' => q({0} hüvelyk),
-						'per' => q({0}/in),
 					},
 					# Core Unit Identifier
 					'inch' => {
 						'name' => q(hüvelyk),
 						'one' => q({0} hüvelyk),
 						'other' => q({0} hüvelyk),
-						'per' => q({0}/in),
-					},
-					# Long Unit Identifier
-					'length-kilometer' => {
-						'name' => q(km),
-						'one' => q({0} km),
-						'other' => q({0} km),
-						'per' => q({0}/km),
-					},
-					# Core Unit Identifier
-					'kilometer' => {
-						'name' => q(km),
-						'one' => q({0} km),
-						'other' => q({0} km),
-						'per' => q({0}/km),
 					},
 					# Long Unit Identifier
 					'length-light-year' => {
@@ -6447,28 +5154,10 @@ has 'units' => (
 					# Long Unit Identifier
 					'length-meter' => {
 						'name' => q(m),
-						'one' => q({0} m),
-						'other' => q({0} m),
-						'per' => q({0}/m),
 					},
 					# Core Unit Identifier
 					'meter' => {
 						'name' => q(m),
-						'one' => q({0} m),
-						'other' => q({0} m),
-						'per' => q({0}/m),
-					},
-					# Long Unit Identifier
-					'length-micrometer' => {
-						'name' => q(μm),
-						'one' => q({0} μm),
-						'other' => q({0} μm),
-					},
-					# Core Unit Identifier
-					'micrometer' => {
-						'name' => q(μm),
-						'one' => q({0} μm),
-						'other' => q({0} μm),
 					},
 					# Long Unit Identifier
 					'length-mile' => {
@@ -6495,76 +5184,12 @@ has 'units' => (
 						'other' => q({0} mil),
 					},
 					# Long Unit Identifier
-					'length-millimeter' => {
-						'name' => q(mm),
-						'one' => q({0} mm),
-						'other' => q({0} mm),
-					},
-					# Core Unit Identifier
-					'millimeter' => {
-						'name' => q(mm),
-						'one' => q({0} mm),
-						'other' => q({0} mm),
-					},
-					# Long Unit Identifier
-					'length-nanometer' => {
-						'name' => q(nm),
-						'one' => q({0} nm),
-						'other' => q({0} nm),
-					},
-					# Core Unit Identifier
-					'nanometer' => {
-						'name' => q(nm),
-						'one' => q({0} nm),
-						'other' => q({0} nm),
-					},
-					# Long Unit Identifier
-					'length-nautical-mile' => {
-						'name' => q(nmi),
-						'one' => q({0} nmi),
-						'other' => q({0} nmi),
-					},
-					# Core Unit Identifier
-					'nautical-mile' => {
-						'name' => q(nmi),
-						'one' => q({0} nmi),
-						'other' => q({0} nmi),
-					},
-					# Long Unit Identifier
-					'length-parsec' => {
-						'name' => q(pc),
-						'one' => q({0} pc),
-						'other' => q({0} pc),
-					},
-					# Core Unit Identifier
-					'parsec' => {
-						'name' => q(pc),
-						'one' => q({0} pc),
-						'other' => q({0} pc),
-					},
-					# Long Unit Identifier
-					'length-picometer' => {
-						'name' => q(pm),
-						'one' => q({0} pm),
-						'other' => q({0} pm),
-					},
-					# Core Unit Identifier
-					'picometer' => {
-						'name' => q(pm),
-						'one' => q({0} pm),
-						'other' => q({0} pm),
-					},
-					# Long Unit Identifier
 					'length-point' => {
 						'name' => q(pont),
-						'one' => q({0} pt),
-						'other' => q({0} pt),
 					},
 					# Core Unit Identifier
 					'point' => {
 						'name' => q(pont),
-						'one' => q({0} pt),
-						'other' => q({0} pt),
 					},
 					# Long Unit Identifier
 					'length-solar-radius' => {
@@ -6573,30 +5198,6 @@ has 'units' => (
 					# Core Unit Identifier
 					'solar-radius' => {
 						'name' => q(Nap-sugár),
-					},
-					# Long Unit Identifier
-					'length-yard' => {
-						'name' => q(yd),
-						'one' => q({0} yd),
-						'other' => q({0} yd),
-					},
-					# Core Unit Identifier
-					'yard' => {
-						'name' => q(yd),
-						'one' => q({0} yd),
-						'other' => q({0} yd),
-					},
-					# Long Unit Identifier
-					'light-lux' => {
-						'name' => q(lx),
-						'one' => q({0} lx),
-						'other' => q({0} lx),
-					},
-					# Core Unit Identifier
-					'lux' => {
-						'name' => q(lx),
-						'one' => q({0} lx),
-						'other' => q({0} lx),
 					},
 					# Long Unit Identifier
 					'mass-carat' => {
@@ -6611,154 +5212,6 @@ has 'units' => (
 						'other' => q({0} Kt),
 					},
 					# Long Unit Identifier
-					'mass-grain' => {
-						'name' => q(grain),
-						'one' => q({0} grain),
-						'other' => q({0} grain),
-					},
-					# Core Unit Identifier
-					'grain' => {
-						'name' => q(grain),
-						'one' => q({0} grain),
-						'other' => q({0} grain),
-					},
-					# Long Unit Identifier
-					'mass-gram' => {
-						'name' => q(gram),
-						'one' => q({0} g),
-						'other' => q({0} g),
-						'per' => q({0}/g),
-					},
-					# Core Unit Identifier
-					'gram' => {
-						'name' => q(gram),
-						'one' => q({0} g),
-						'other' => q({0} g),
-						'per' => q({0}/g),
-					},
-					# Long Unit Identifier
-					'mass-kilogram' => {
-						'name' => q(kg),
-						'one' => q({0} kg),
-						'other' => q({0} kg),
-						'per' => q({0}/kg),
-					},
-					# Core Unit Identifier
-					'kilogram' => {
-						'name' => q(kg),
-						'one' => q({0} kg),
-						'other' => q({0} kg),
-						'per' => q({0}/kg),
-					},
-					# Long Unit Identifier
-					'mass-metric-ton' => {
-						'name' => q(t),
-						'one' => q({0} t),
-						'other' => q({0} t),
-					},
-					# Core Unit Identifier
-					'metric-ton' => {
-						'name' => q(t),
-						'one' => q({0} t),
-						'other' => q({0} t),
-					},
-					# Long Unit Identifier
-					'mass-microgram' => {
-						'name' => q(μg),
-						'one' => q({0} μg),
-						'other' => q({0} μg),
-					},
-					# Core Unit Identifier
-					'microgram' => {
-						'name' => q(μg),
-						'one' => q({0} μg),
-						'other' => q({0} μg),
-					},
-					# Long Unit Identifier
-					'mass-milligram' => {
-						'name' => q(mg),
-						'one' => q({0} mg),
-						'other' => q({0} mg),
-					},
-					# Core Unit Identifier
-					'milligram' => {
-						'name' => q(mg),
-						'one' => q({0} mg),
-						'other' => q({0} mg),
-					},
-					# Long Unit Identifier
-					'mass-ounce' => {
-						'name' => q(oz),
-						'one' => q({0} oz),
-						'other' => q({0} oz),
-						'per' => q({0}/oz),
-					},
-					# Core Unit Identifier
-					'ounce' => {
-						'name' => q(oz),
-						'one' => q({0} oz),
-						'other' => q({0} oz),
-						'per' => q({0}/oz),
-					},
-					# Long Unit Identifier
-					'mass-ounce-troy' => {
-						'name' => q(oz t),
-						'one' => q({0} oz t),
-						'other' => q({0} oz t),
-					},
-					# Core Unit Identifier
-					'ounce-troy' => {
-						'name' => q(oz t),
-						'one' => q({0} oz t),
-						'other' => q({0} oz t),
-					},
-					# Long Unit Identifier
-					'mass-pound' => {
-						'name' => q(lb),
-						'one' => q({0} lb),
-						'other' => q({0} lb),
-						'per' => q({0}/lb),
-					},
-					# Core Unit Identifier
-					'pound' => {
-						'name' => q(lb),
-						'one' => q({0} lb),
-						'other' => q({0} lb),
-						'per' => q({0}/lb),
-					},
-					# Long Unit Identifier
-					'mass-ton' => {
-						'name' => q(tn),
-						'one' => q({0} tn),
-						'other' => q({0} tn),
-					},
-					# Core Unit Identifier
-					'ton' => {
-						'name' => q(tn),
-						'one' => q({0} tn),
-						'other' => q({0} tn),
-					},
-					# Long Unit Identifier
-					'per' => {
-						'1' => q({0}/{1}),
-					},
-					# Core Unit Identifier
-					'per' => {
-						'1' => q({0}/{1}),
-					},
-					# Long Unit Identifier
-					'power-gigawatt' => {
-						'name' => q(GW),
-						'one' => q({0} GW),
-						'other' => q({0} GW),
-					},
-					# Core Unit Identifier
-					'gigawatt' => {
-						'name' => q(GW),
-						'one' => q({0} GW),
-						'other' => q({0} GW),
-					},
-					# Long Unit Identifier
 					'power-horsepower' => {
 						'name' => q(LE),
 						'one' => q({0} LE),
@@ -6771,118 +5224,20 @@ has 'units' => (
 						'other' => q({0} LE),
 					},
 					# Long Unit Identifier
-					'power-kilowatt' => {
-						'name' => q(kW),
-						'one' => q({0} kW),
-						'other' => q({0} kW),
-					},
-					# Core Unit Identifier
-					'kilowatt' => {
-						'name' => q(kW),
-						'one' => q({0} kW),
-						'other' => q({0} kW),
-					},
-					# Long Unit Identifier
-					'power-megawatt' => {
-						'name' => q(MW),
-						'one' => q({0} MW),
-						'other' => q({0} MW),
-					},
-					# Core Unit Identifier
-					'megawatt' => {
-						'name' => q(MW),
-						'one' => q({0} MW),
-						'other' => q({0} MW),
-					},
-					# Long Unit Identifier
-					'power-milliwatt' => {
-						'name' => q(mW),
-						'one' => q({0} mW),
-						'other' => q({0} mW),
-					},
-					# Core Unit Identifier
-					'milliwatt' => {
-						'name' => q(mW),
-						'one' => q({0} mW),
-						'other' => q({0} mW),
-					},
-					# Long Unit Identifier
 					'power-watt' => {
 						'name' => q(W),
-						'one' => q({0} W),
-						'other' => q({0} W),
 					},
 					# Core Unit Identifier
 					'watt' => {
 						'name' => q(W),
-						'one' => q({0} W),
-						'other' => q({0} W),
-					},
-					# Long Unit Identifier
-					'power2' => {
-						'one' => q({0}²),
-						'other' => q({0}²),
-					},
-					# Core Unit Identifier
-					'power2' => {
-						'one' => q({0}²),
-						'other' => q({0}²),
-					},
-					# Long Unit Identifier
-					'power3' => {
-						'one' => q({0}³),
-						'other' => q({0}³),
-					},
-					# Core Unit Identifier
-					'power3' => {
-						'one' => q({0}³),
-						'other' => q({0}³),
-					},
-					# Long Unit Identifier
-					'pressure-atmosphere' => {
-						'name' => q(atm),
-						'one' => q({0} atm),
-						'other' => q({0} atm),
-					},
-					# Core Unit Identifier
-					'atmosphere' => {
-						'name' => q(atm),
-						'one' => q({0} atm),
-						'other' => q({0} atm),
-					},
-					# Long Unit Identifier
-					'pressure-hectopascal' => {
-						'name' => q(hPa),
-						'one' => q({0} hPa),
-						'other' => q({0} hPa),
-					},
-					# Core Unit Identifier
-					'hectopascal' => {
-						'name' => q(hPa),
-						'one' => q({0} hPa),
-						'other' => q({0} hPa),
-					},
-					# Long Unit Identifier
-					'pressure-inch-ofhg' => {
-						'name' => q(inHg),
-						'one' => q({0} inHg),
-						'other' => q({0} inHg),
-					},
-					# Core Unit Identifier
-					'inch-ofhg' => {
-						'name' => q(inHg),
-						'one' => q({0} inHg),
-						'other' => q({0} inHg),
 					},
 					# Long Unit Identifier
 					'pressure-millibar' => {
-						'name' => q(mbar),
 						'one' => q({0} mb),
 						'other' => q({0} mb),
 					},
 					# Core Unit Identifier
 					'millibar' => {
-						'name' => q(mbar),
 						'one' => q({0} mb),
 						'other' => q({0} mb),
 					},
@@ -6899,66 +5254,6 @@ has 'units' => (
 						'other' => q({0} Hgmm),
 					},
 					# Long Unit Identifier
-					'pressure-pascal' => {
-						'name' => q(Pa),
-						'one' => q({0} Pa),
-						'other' => q({0} Pa),
-					},
-					# Core Unit Identifier
-					'pascal' => {
-						'name' => q(Pa),
-						'one' => q({0} Pa),
-						'other' => q({0} Pa),
-					},
-					# Long Unit Identifier
-					'pressure-pound-force-per-square-inch' => {
-						'name' => q(psi),
-						'one' => q({0} psi),
-						'other' => q({0} psi),
-					},
-					# Core Unit Identifier
-					'pound-force-per-square-inch' => {
-						'name' => q(psi),
-						'one' => q({0} psi),
-						'other' => q({0} psi),
-					},
-					# Long Unit Identifier
-					'speed-kilometer-per-hour' => {
-						'name' => q(km/h),
-						'one' => q({0} km/h),
-						'other' => q({0} km/h),
-					},
-					# Core Unit Identifier
-					'kilometer-per-hour' => {
-						'name' => q(km/h),
-						'one' => q({0} km/h),
-						'other' => q({0} km/h),
-					},
-					# Long Unit Identifier
-					'speed-knot' => {
-						'name' => q(kn),
-						'one' => q({0} kn),
-						'other' => q({0} kn),
-					},
-					# Core Unit Identifier
-					'knot' => {
-						'name' => q(kn),
-						'one' => q({0} kn),
-						'other' => q({0} kn),
-					},
-					# Long Unit Identifier
-					'speed-meter-per-second' => {
-						'name' => q(m/s),
-						'one' => q({0} m/s),
-						'other' => q({0} m/s),
-					},
-					# Core Unit Identifier
-					'meter-per-second' => {
-						'name' => q(m/s),
-						'one' => q({0} m/s),
-						'other' => q({0} m/s),
-					},
-					# Long Unit Identifier
 					'speed-mile-per-hour' => {
 						'name' => q(mph),
 						'one' => q({0} mph),
@@ -6972,51 +5267,23 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'temperature-celsius' => {
-						'name' => q(°C),
 						'one' => q({0} °C),
 						'other' => q({0} °C),
 					},
 					# Core Unit Identifier
 					'celsius' => {
-						'name' => q(°C),
 						'one' => q({0} °C),
 						'other' => q({0} °C),
 					},
 					# Long Unit Identifier
 					'temperature-fahrenheit' => {
-						'name' => q(°F),
 						'one' => q({0} °F),
 						'other' => q({0} °F),
 					},
 					# Core Unit Identifier
 					'fahrenheit' => {
-						'name' => q(°F),
 						'one' => q({0} °F),
 						'other' => q({0} °F),
-					},
-					# Long Unit Identifier
-					'temperature-generic' => {
-						'name' => q(°),
-						'one' => q({0}°),
-						'other' => q({0}°),
-					},
-					# Core Unit Identifier
-					'generic' => {
-						'name' => q(°),
-						'one' => q({0}°),
-						'other' => q({0}°),
-					},
-					# Long Unit Identifier
-					'temperature-kelvin' => {
-						'name' => q(K),
-						'one' => q({0} K),
-						'other' => q({0} K),
-					},
-					# Core Unit Identifier
-					'kelvin' => {
-						'name' => q(K),
-						'one' => q({0} K),
-						'other' => q({0} K),
 					},
 					# Long Unit Identifier
 					'torque-newton-meter' => {
@@ -7029,18 +5296,6 @@ has 'units' => (
 						'name' => q(Nm),
 						'one' => q({0} Nm),
 						'other' => q({0} Nm),
-					},
-					# Long Unit Identifier
-					'volume-acre-foot' => {
-						'name' => q(ac ft),
-						'one' => q({0} ac ft),
-						'other' => q({0} ac ft),
-					},
-					# Core Unit Identifier
-					'acre-foot' => {
-						'name' => q(ac ft),
-						'one' => q({0} ac ft),
-						'other' => q({0} ac ft),
 					},
 					# Long Unit Identifier
 					'volume-barrel' => {
@@ -7077,94 +5332,6 @@ has 'units' => (
 						'name' => q(cl),
 						'one' => q({0} cl),
 						'other' => q({0} cl),
-					},
-					# Long Unit Identifier
-					'volume-cubic-centimeter' => {
-						'name' => q(cm³),
-						'one' => q({0} cm³),
-						'other' => q({0} cm³),
-						'per' => q({0}/cm³),
-					},
-					# Core Unit Identifier
-					'cubic-centimeter' => {
-						'name' => q(cm³),
-						'one' => q({0} cm³),
-						'other' => q({0} cm³),
-						'per' => q({0}/cm³),
-					},
-					# Long Unit Identifier
-					'volume-cubic-foot' => {
-						'name' => q(ft³),
-						'one' => q({0} ft³),
-						'other' => q({0} ft³),
-					},
-					# Core Unit Identifier
-					'cubic-foot' => {
-						'name' => q(ft³),
-						'one' => q({0} ft³),
-						'other' => q({0} ft³),
-					},
-					# Long Unit Identifier
-					'volume-cubic-inch' => {
-						'name' => q(in³),
-						'one' => q({0} in³),
-						'other' => q({0} in³),
-					},
-					# Core Unit Identifier
-					'cubic-inch' => {
-						'name' => q(in³),
-						'one' => q({0} in³),
-						'other' => q({0} in³),
-					},
-					# Long Unit Identifier
-					'volume-cubic-kilometer' => {
-						'name' => q(km³),
-						'one' => q({0} km³),
-						'other' => q({0} km³),
-					},
-					# Core Unit Identifier
-					'cubic-kilometer' => {
-						'name' => q(km³),
-						'one' => q({0} km³),
-						'other' => q({0} km³),
-					},
-					# Long Unit Identifier
-					'volume-cubic-meter' => {
-						'name' => q(m³),
-						'one' => q({0} m³),
-						'other' => q({0} m³),
-						'per' => q({0}/m³),
-					},
-					# Core Unit Identifier
-					'cubic-meter' => {
-						'name' => q(m³),
-						'one' => q({0} m³),
-						'other' => q({0} m³),
-						'per' => q({0}/m³),
-					},
-					# Long Unit Identifier
-					'volume-cubic-mile' => {
-						'name' => q(mi³),
-						'one' => q({0} mi³),
-						'other' => q({0} mi³),
-					},
-					# Core Unit Identifier
-					'cubic-mile' => {
-						'name' => q(mi³),
-						'one' => q({0} mi³),
-						'other' => q({0} mi³),
-					},
-					# Long Unit Identifier
-					'volume-cubic-yard' => {
-						'name' => q(yd³),
-						'one' => q({0} yd³),
-						'other' => q({0} yd³),
-					},
-					# Core Unit Identifier
-					'cubic-yard' => {
-						'name' => q(yd³),
-						'one' => q({0} yd³),
-						'other' => q({0} yd³),
 					},
 					# Long Unit Identifier
 					'volume-cup' => {
@@ -7329,16 +5496,10 @@ has 'units' => (
 					# Long Unit Identifier
 					'volume-liter' => {
 						'name' => q(l),
-						'one' => q({0} l),
-						'other' => q({0} l),
-						'per' => q({0}/l),
 					},
 					# Core Unit Identifier
 					'liter' => {
 						'name' => q(l),
-						'one' => q({0} l),
-						'other' => q({0} l),
-						'per' => q({0}/l),
 					},
 					# Long Unit Identifier
 					'volume-megaliter' => {
@@ -7375,42 +5536,6 @@ has 'units' => (
 						'name' => q(csipet),
 						'one' => q({0} csipet),
 						'other' => q({0} csipet),
-					},
-					# Long Unit Identifier
-					'volume-pint' => {
-						'name' => q(pt),
-						'one' => q({0} pt),
-						'other' => q({0} pt),
-					},
-					# Core Unit Identifier
-					'pint' => {
-						'name' => q(pt),
-						'one' => q({0} pt),
-						'other' => q({0} pt),
-					},
-					# Long Unit Identifier
-					'volume-pint-metric' => {
-						'name' => q(mpt),
-						'one' => q({0} mpt),
-						'other' => q({0} mpt),
-					},
-					# Core Unit Identifier
-					'pint-metric' => {
-						'name' => q(mpt),
-						'one' => q({0} mpt),
-						'other' => q({0} mpt),
-					},
-					# Long Unit Identifier
-					'volume-quart' => {
-						'name' => q(qt),
-						'one' => q({0} qt),
-						'other' => q({0} qt),
-					},
-					# Core Unit Identifier
-					'quart' => {
-						'name' => q(qt),
-						'one' => q({0} qt),
-						'other' => q({0} qt),
 					},
 					# Long Unit Identifier
 					'volume-quart-imperial' => {
@@ -7471,32 +5596,16 @@ has 'listPatterns' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-				start => q({0}, {1}),
-				middle => q({0}, {1}),
 				end => q({0} és {1}),
 				2 => q({0} és {1}),
 		} }
-);
-
-has 'default_numbering_system' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> 'latn',
-);
-
-has native_numbering_system => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> 'latn',
 );
 
 has 'minimum_grouping_digits' => (
 	is			=>'ro',
 	isa			=> Int,
 	init_arg	=> undef,
-	default		=> 1,
+	default		=> 2,
 );
 
 has 'number_symbols' => (
@@ -7506,17 +5615,7 @@ has 'number_symbols' => (
 	default		=> sub { {
 		'latn' => {
 			'decimal' => q(,),
-			'exponential' => q(E),
 			'group' => q( ),
-			'infinity' => q(∞),
-			'list' => q(;),
-			'minusSign' => q(-),
-			'nan' => q(NaN),
-			'perMille' => q(‰),
-			'percentSign' => q(%),
-			'plusSign' => q(+),
-			'superscriptingExponent' => q(×),
-			'timeSeparator' => q(:),
 		},
 	} }
 );
@@ -7527,59 +5626,6 @@ has 'number_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		decimalFormat => {
-			'default' => {
-				'1000' => {
-					'one' => '0 E',
-					'other' => '0 E',
-				},
-				'10000' => {
-					'one' => '00 E',
-					'other' => '00 E',
-				},
-				'100000' => {
-					'one' => '000 E',
-					'other' => '000 E',
-				},
-				'1000000' => {
-					'one' => '0 M',
-					'other' => '0 M',
-				},
-				'10000000' => {
-					'one' => '00 M',
-					'other' => '00 M',
-				},
-				'100000000' => {
-					'one' => '000 M',
-					'other' => '000 M',
-				},
-				'1000000000' => {
-					'one' => '0 Mrd',
-					'other' => '0 Mrd',
-				},
-				'10000000000' => {
-					'one' => '00 Mrd',
-					'other' => '00 Mrd',
-				},
-				'100000000000' => {
-					'one' => '000 Mrd',
-					'other' => '000 Mrd',
-				},
-				'1000000000000' => {
-					'one' => '0 B',
-					'other' => '0 B',
-				},
-				'10000000000000' => {
-					'one' => '00 B',
-					'other' => '00 B',
-				},
-				'100000000000000' => {
-					'one' => '000 B',
-					'other' => '000 B',
-				},
-				'standard' => {
-					'default' => '#,##0.###',
-				},
-			},
 			'long' => {
 				'1000' => {
 					'one' => '0 ezer',
@@ -7681,20 +5727,6 @@ has 'number_formats' => (
 				},
 			},
 		},
-		percentFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0%',
-				},
-			},
-		},
-		scientificFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#E0',
-				},
-			},
-		},
 } },
 );
 
@@ -7706,9 +5738,6 @@ has 'number_currency_formats' => (
 		'latn' => {
 			'pattern' => {
 				'default' => {
-					'accounting' => {
-						'positive' => '#,##0.00 ¤',
-					},
 					'standard' => {
 						'positive' => '#,##0.00 ¤',
 					},
@@ -7726,91 +5755,61 @@ has 'currencies' => (
 		'ADP' => {
 			display_name => {
 				'currency' => q(Andorrai peseta),
-				'one' => q(Andorrai peseta),
-				'other' => q(Andorrai peseta),
 			},
 		},
 		'AED' => {
-			symbol => 'AED',
 			display_name => {
 				'currency' => q(EAE-dirham),
-				'one' => q(EAE-dirham),
-				'other' => q(EAE-dirham),
 			},
 		},
 		'AFA' => {
 			display_name => {
 				'currency' => q(afgán afghani \(1927–2002\)),
-				'one' => q(afgán afghani \(1927–2002\)),
-				'other' => q(afgán afghani \(1927–2002\)),
 			},
 		},
 		'AFN' => {
-			symbol => 'AFN',
 			display_name => {
 				'currency' => q(afgán afghani),
-				'one' => q(afgán afghani),
-				'other' => q(afgán afghani),
 			},
 		},
 		'ALK' => {
 			display_name => {
 				'currency' => q(albán lek \(1946–1965\)),
-				'one' => q(albán lek \(1946–1965\)),
-				'other' => q(albán lek \(1946–1965\)),
 			},
 		},
 		'ALL' => {
-			symbol => 'ALL',
 			display_name => {
 				'currency' => q(albán lek),
-				'one' => q(albán lek),
-				'other' => q(albán lek),
 			},
 		},
 		'AMD' => {
-			symbol => 'AMD',
 			display_name => {
 				'currency' => q(örmény dram),
-				'one' => q(örmény dram),
-				'other' => q(örmény dram),
 			},
 		},
 		'ANG' => {
-			symbol => 'ANG',
 			display_name => {
 				'currency' => q(holland antilláki forint),
-				'one' => q(holland antilláki forint),
-				'other' => q(holland antilláki forint),
 			},
 		},
 		'AOA' => {
-			symbol => 'AOA',
 			display_name => {
 				'currency' => q(angolai kwanza),
-				'one' => q(angolai kwanza),
-				'other' => q(angolai kwanza),
 			},
 		},
 		'AOK' => {
 			display_name => {
 				'currency' => q(Angolai kwanza \(1977–1990\)),
-				'one' => q(Angolai kwanza \(1977–1990\)),
-				'other' => q(Angolai kwanza \(1977–1990\)),
 			},
 		},
 		'AON' => {
 			display_name => {
 				'currency' => q(Angolai új kwanza \(1990–2000\)),
-				'one' => q(Angolai új kwanza \(1990–2000\)),
-				'other' => q(Angolai új kwanza \(1990–2000\)),
 			},
 		},
 		'AOR' => {
 			display_name => {
 				'currency' => q(Angolai kwanza reajustado \(1995–1999\)),
-				'one' => q(Angolai kwanza reajustado \(1995–1999\)),
-				'other' => q(Angolai kwanza reajustado \(1995–1999\)),
 			},
 		},
 		'ARA' => {
@@ -7823,255 +5822,173 @@ has 'currencies' => (
 		'ARP' => {
 			display_name => {
 				'currency' => q(Argentín peso \(1983–1985\)),
-				'one' => q(Argentín peso \(1983–1985\)),
-				'other' => q(Argentín peso \(1983–1985\)),
 			},
 		},
 		'ARS' => {
-			symbol => 'ARS',
 			display_name => {
 				'currency' => q(argentin peso),
-				'one' => q(argentin peso),
-				'other' => q(argentin peso),
 			},
 		},
 		'ATS' => {
 			display_name => {
 				'currency' => q(Osztrák schilling),
-				'one' => q(Osztrák schilling),
-				'other' => q(Osztrák schilling),
 			},
 		},
 		'AUD' => {
 			symbol => 'AUD',
 			display_name => {
 				'currency' => q(ausztrál dollár),
-				'one' => q(ausztrál dollár),
-				'other' => q(ausztrál dollár),
 			},
 		},
 		'AWG' => {
-			symbol => 'AWG',
 			display_name => {
 				'currency' => q(arubai florin),
-				'one' => q(arubai florin),
-				'other' => q(arubai florin),
 			},
 		},
 		'AZM' => {
 			display_name => {
 				'currency' => q(azerbajdzsáni manat \(1993–2006\)),
-				'one' => q(azerbajdzsáni manat \(1993–2006\)),
-				'other' => q(azerbajdzsáni manat \(1993–2006\)),
 			},
 		},
 		'AZN' => {
-			symbol => 'AZN',
 			display_name => {
 				'currency' => q(azerbajdzsáni manat),
-				'one' => q(azerbajdzsáni manat),
-				'other' => q(azerbajdzsáni manat),
 			},
 		},
 		'BAD' => {
 			display_name => {
 				'currency' => q(Bosznia-hercegovinai dínár \(1992–1994\)),
-				'one' => q(Bosznia-hercegovinai dínár \(1992–1994\)),
-				'other' => q(Bosznia-hercegovinai dínár \(1992–1994\)),
 			},
 		},
 		'BAM' => {
-			symbol => 'BAM',
 			display_name => {
 				'currency' => q(bosznia-hercegovinai konvertibilis márka),
-				'one' => q(bosznia-hercegovinai konvertibilis márka),
-				'other' => q(bosznia-hercegovinai konvertibilis márka),
 			},
 		},
 		'BAN' => {
 			display_name => {
 				'currency' => q(bosznia-hercegovinai új dínár \(1994–1997\)),
-				'one' => q(bosznia-hercegovinai új dínár \(1994–1997\)),
-				'other' => q(bosznia-hercegovinai új dínár \(1994–1997\)),
 			},
 		},
 		'BBD' => {
-			symbol => 'BBD',
 			display_name => {
 				'currency' => q(barbadosi dollár),
-				'one' => q(barbadosi dollár),
-				'other' => q(barbadosi dollár),
 			},
 		},
 		'BDT' => {
-			symbol => 'BDT',
 			display_name => {
 				'currency' => q(bangladesi taka),
-				'one' => q(bangladesi taka),
-				'other' => q(bangladesi taka),
 			},
 		},
 		'BEC' => {
 			display_name => {
 				'currency' => q(Belga frank \(konvertibilis\)),
-				'one' => q(Belga frank \(konvertibilis\)),
-				'other' => q(Belga frank \(konvertibilis\)),
 			},
 		},
 		'BEF' => {
 			display_name => {
 				'currency' => q(Belga frank),
-				'one' => q(Belga frank),
-				'other' => q(Belga frank),
 			},
 		},
 		'BEL' => {
 			display_name => {
 				'currency' => q(Belga frank \(pénzügyi\)),
-				'one' => q(Belga frank \(pénzügyi\)),
-				'other' => q(Belga frank \(pénzügyi\)),
 			},
 		},
 		'BGL' => {
 			display_name => {
 				'currency' => q(Bolgár kemény leva),
-				'one' => q(Bolgár kemény leva),
-				'other' => q(Bolgár kemény leva),
 			},
 		},
 		'BGM' => {
 			display_name => {
 				'currency' => q(bolgár szocialista leva),
-				'one' => q(bolgár szocialista leva),
-				'other' => q(bolgár szocialista leva),
 			},
 		},
 		'BGN' => {
-			symbol => 'BGN',
 			display_name => {
 				'currency' => q(bolgár új leva),
-				'one' => q(bolgár új leva),
-				'other' => q(bolgár új leva),
 			},
 		},
 		'BGO' => {
 			display_name => {
 				'currency' => q(bolgár leva \(1879–1952\)),
-				'one' => q(bolgár leva \(1879–1952\)),
-				'other' => q(bolgár leva \(1879–1952\)),
 			},
 		},
 		'BHD' => {
-			symbol => 'BHD',
 			display_name => {
 				'currency' => q(bahreini dinár),
-				'one' => q(bahreini dinár),
-				'other' => q(bahreini dinár),
 			},
 		},
 		'BIF' => {
-			symbol => 'BIF',
 			display_name => {
 				'currency' => q(burundi frank),
-				'one' => q(burundi frank),
-				'other' => q(burundi frank),
 			},
 		},
 		'BMD' => {
-			symbol => 'BMD',
 			display_name => {
 				'currency' => q(bermudai dollár),
-				'one' => q(bermudai dollár),
-				'other' => q(bermudai dollár),
 			},
 		},
 		'BND' => {
-			symbol => 'BND',
 			display_name => {
 				'currency' => q(brunei dollár),
-				'one' => q(brunei dollár),
-				'other' => q(brunei dollár),
 			},
 		},
 		'BOB' => {
-			symbol => 'BOB',
 			display_name => {
 				'currency' => q(bolíviai boliviano),
-				'one' => q(bolíviai boliviano),
-				'other' => q(bolíviai boliviano),
 			},
 		},
 		'BOP' => {
 			display_name => {
 				'currency' => q(Bolíviai peso),
-				'one' => q(Bolíviai peso),
-				'other' => q(Bolíviai peso),
 			},
 		},
 		'BOV' => {
 			display_name => {
 				'currency' => q(Bolíviai mvdol),
-				'one' => q(Bolíviai mvdol),
-				'other' => q(Bolíviai mvdol),
 			},
 		},
 		'BRB' => {
 			display_name => {
 				'currency' => q(Brazi cruzeiro novo \(1967–1986\)),
-				'one' => q(Brazi cruzeiro novo \(1967–1986\)),
-				'other' => q(Brazi cruzeiro novo \(1967–1986\)),
 			},
 		},
 		'BRC' => {
 			display_name => {
 				'currency' => q(Brazi cruzado \(1986–1989\)),
-				'one' => q(Brazi cruzado \(1986–1989\)),
-				'other' => q(Brazi cruzado \(1986–1989\)),
 			},
 		},
 		'BRE' => {
 			display_name => {
 				'currency' => q(Brazil cruzeiro \(1990–1993\)),
-				'one' => q(Brazil cruzeiro \(1990–1993\)),
-				'other' => q(Brazil cruzeiro \(1990–1993\)),
 			},
 		},
 		'BRL' => {
 			symbol => 'BRL',
 			display_name => {
 				'currency' => q(brazil real),
-				'one' => q(brazil real),
-				'other' => q(brazil real),
 			},
 		},
 		'BRN' => {
 			display_name => {
 				'currency' => q(Brazil cruzado novo \(1989–1990\)),
-				'one' => q(Brazil cruzado novo \(1989–1990\)),
-				'other' => q(Brazil cruzado novo \(1989–1990\)),
 			},
 		},
 		'BRR' => {
 			display_name => {
 				'currency' => q(Brazil cruzeiro \(1993–1994\)),
-				'one' => q(Brazil cruzeiro \(1993–1994\)),
-				'other' => q(Brazil cruzeiro \(1993–1994\)),
 			},
 		},
 		'BSD' => {
-			symbol => 'BSD',
 			display_name => {
 				'currency' => q(bahamai dollár),
-				'one' => q(bahamai dollár),
-				'other' => q(bahamai dollár),
 			},
 		},
 		'BTN' => {
-			symbol => 'BTN',
 			display_name => {
 				'currency' => q(bhutáni ngultrum),
-				'one' => q(bhutáni ngultrum),
-				'other' => q(bhutáni ngultrum),
 			},
 		},
 		'BUK' => {
@@ -8082,11 +5999,8 @@ has 'currencies' => (
 			},
 		},
 		'BWP' => {
-			symbol => 'BWP',
 			display_name => {
 				'currency' => q(botswanai pula),
-				'one' => q(botswanai pula),
-				'other' => q(botswanai pula),
 			},
 		},
 		'BYB' => {
@@ -8097,43 +6011,30 @@ has 'currencies' => (
 			},
 		},
 		'BYN' => {
-			symbol => 'BYN',
+			symbol => 'р.',
 			display_name => {
 				'currency' => q(belarusz rubel),
-				'one' => q(belarusz rubel),
-				'other' => q(belarusz rubel),
 			},
 		},
 		'BYR' => {
-			symbol => 'BYR',
 			display_name => {
 				'currency' => q(fehérorosz rubel \(2000–2016\)),
-				'one' => q(fehérorosz rubel \(2000–2016\)),
-				'other' => q(fehérorosz rubel \(2000–2016\)),
 			},
 		},
 		'BZD' => {
-			symbol => 'BZD',
 			display_name => {
 				'currency' => q(belize-i dollár),
-				'one' => q(belize-i dollár),
-				'other' => q(belize-i dollár),
 			},
 		},
 		'CAD' => {
 			symbol => 'CAD',
 			display_name => {
 				'currency' => q(kanadai dollár),
-				'one' => q(kanadai dollár),
-				'other' => q(kanadai dollár),
 			},
 		},
 		'CDF' => {
-			symbol => 'CDF',
 			display_name => {
 				'currency' => q(kongói frank),
-				'one' => q(kongói frank),
-				'other' => q(kongói frank),
 			},
 		},
 		'CHE' => {
@@ -8142,11 +6043,8 @@ has 'currencies' => (
 			},
 		},
 		'CHF' => {
-			symbol => 'CHF',
 			display_name => {
 				'currency' => q(svájci frank),
-				'one' => q(svájci frank),
-				'other' => q(svájci frank),
 			},
 		},
 		'CHW' => {
@@ -8160,35 +6058,24 @@ has 'currencies' => (
 			},
 		},
 		'CLP' => {
-			symbol => 'CLP',
 			display_name => {
 				'currency' => q(chilei peso),
-				'one' => q(chilei peso),
-				'other' => q(chilei peso),
 			},
 		},
 		'CNH' => {
-			symbol => 'CNH',
 			display_name => {
 				'currency' => q(kínai jüan \(offshore\)),
-				'one' => q(kínai jüan \(offshore\)),
-				'other' => q(kínai jüan \(offshore\)),
 			},
 		},
 		'CNY' => {
 			symbol => 'CNY',
 			display_name => {
 				'currency' => q(kínai jüan),
-				'one' => q(kínai jüan),
-				'other' => q(kínai jüan),
 			},
 		},
 		'COP' => {
-			symbol => 'COP',
 			display_name => {
 				'currency' => q(kolumbiai peso),
-				'one' => q(kolumbiai peso),
-				'other' => q(kolumbiai peso),
 			},
 		},
 		'COU' => {
@@ -8197,11 +6084,8 @@ has 'currencies' => (
 			},
 		},
 		'CRC' => {
-			symbol => 'CRC',
 			display_name => {
 				'currency' => q(Costa Rica-i colon),
-				'one' => q(Costa Rica-i colon),
-				'other' => q(Costa Rica-i colon),
 			},
 		},
 		'CSD' => {
@@ -8219,27 +6103,18 @@ has 'currencies' => (
 			},
 		},
 		'CUC' => {
-			symbol => 'CUC',
 			display_name => {
 				'currency' => q(kubai konvertibilis peso),
-				'one' => q(kubai konvertibilis peso),
-				'other' => q(kubai konvertibilis peso),
 			},
 		},
 		'CUP' => {
-			symbol => 'CUP',
 			display_name => {
 				'currency' => q(kubai peso),
-				'one' => q(kubai peso),
-				'other' => q(kubai peso),
 			},
 		},
 		'CVE' => {
-			symbol => 'CVE',
 			display_name => {
 				'currency' => q(Zöld-foki escudo),
-				'one' => q(Zöld-foki escudo),
-				'other' => q(Zöld-foki escudo),
 			},
 		},
 		'CYP' => {
@@ -8248,11 +6123,8 @@ has 'currencies' => (
 			},
 		},
 		'CZK' => {
-			symbol => 'CZK',
 			display_name => {
 				'currency' => q(cseh korona),
-				'one' => q(cseh korona),
-				'other' => q(cseh korona),
 			},
 		},
 		'DDM' => {
@@ -8266,35 +6138,23 @@ has 'currencies' => (
 			},
 		},
 		'DJF' => {
-			symbol => 'DJF',
 			display_name => {
 				'currency' => q(dzsibuti frank),
-				'one' => q(dzsibuti frank),
-				'other' => q(dzsibuti frank),
 			},
 		},
 		'DKK' => {
-			symbol => 'DKK',
 			display_name => {
 				'currency' => q(dán korona),
-				'one' => q(dán korona),
-				'other' => q(dán korona),
 			},
 		},
 		'DOP' => {
-			symbol => 'DOP',
 			display_name => {
 				'currency' => q(dominikai peso),
-				'one' => q(dominikai peso),
-				'other' => q(dominikai peso),
 			},
 		},
 		'DZD' => {
-			symbol => 'DZD',
 			display_name => {
 				'currency' => q(algériai dínár),
-				'one' => q(algériai dínár),
-				'other' => q(algériai dínár),
 			},
 		},
 		'ECS' => {
@@ -8310,29 +6170,23 @@ has 'currencies' => (
 		'EEK' => {
 			display_name => {
 				'currency' => q(Észt korona),
+				'one' => q(észt korona),
+				'other' => q(észt korona),
 			},
 		},
 		'EGP' => {
-			symbol => 'EGP',
 			display_name => {
 				'currency' => q(egyiptomi font),
-				'one' => q(egyiptomi font),
-				'other' => q(egyiptomi font),
 			},
 		},
 		'ERN' => {
-			symbol => 'ERN',
 			display_name => {
 				'currency' => q(eritreai nakfa),
-				'one' => q(eritreai nakfa),
-				'other' => q(eritreai nakfa),
 			},
 		},
 		'ESA' => {
 			display_name => {
 				'currency' => q(spanyol peseta \(A–kontó\)),
-				'one' => q(spanyol peseta \(A–kontó\)),
-				'other' => q(spanyol peseta \(A–kontó\)),
 			},
 		},
 		'ESB' => {
@@ -8348,19 +6202,14 @@ has 'currencies' => (
 			},
 		},
 		'ETB' => {
-			symbol => 'ETB',
 			display_name => {
 				'currency' => q(etiópiai birr),
-				'one' => q(etiópiai birr),
-				'other' => q(etiópiai birr),
 			},
 		},
 		'EUR' => {
 			symbol => 'EUR',
 			display_name => {
 				'currency' => q(euró),
-				'one' => q(euró),
-				'other' => q(euró),
 			},
 		},
 		'FIM' => {
@@ -8369,19 +6218,13 @@ has 'currencies' => (
 			},
 		},
 		'FJD' => {
-			symbol => 'FJD',
 			display_name => {
 				'currency' => q(fidzsi dollár),
-				'one' => q(fidzsi dollár),
-				'other' => q(fidzsi dollár),
 			},
 		},
 		'FKP' => {
-			symbol => 'FKP',
 			display_name => {
 				'currency' => q(falkland-szigeteki font),
-				'one' => q(falkland-szigeteki font),
-				'other' => q(falkland-szigeteki font),
 			},
 		},
 		'FRF' => {
@@ -8393,8 +6236,6 @@ has 'currencies' => (
 			symbol => 'GBP',
 			display_name => {
 				'currency' => q(angol font),
-				'one' => q(angol font),
-				'other' => q(angol font),
 			},
 		},
 		'GEK' => {
@@ -8403,11 +6244,8 @@ has 'currencies' => (
 			},
 		},
 		'GEL' => {
-			symbol => 'GEL',
 			display_name => {
 				'currency' => q(grúz lari),
-				'one' => q(grúz lari),
-				'other' => q(grúz lari),
 			},
 		},
 		'GHC' => {
@@ -8416,35 +6254,23 @@ has 'currencies' => (
 			},
 		},
 		'GHS' => {
-			symbol => 'GHS',
 			display_name => {
 				'currency' => q(ghánai cedi),
-				'one' => q(ghánai cedi),
-				'other' => q(ghánai cedi),
 			},
 		},
 		'GIP' => {
-			symbol => 'GIP',
 			display_name => {
 				'currency' => q(gibraltári font),
-				'one' => q(gibraltári font),
-				'other' => q(gibraltári font),
 			},
 		},
 		'GMD' => {
-			symbol => 'GMD',
 			display_name => {
 				'currency' => q(gambiai dalasi),
-				'one' => q(gambiai dalasi),
-				'other' => q(gambiai dalasi),
 			},
 		},
 		'GNF' => {
-			symbol => 'GNF',
 			display_name => {
 				'currency' => q(guineai frank),
-				'one' => q(guineai frank),
-				'other' => q(guineai frank),
 			},
 		},
 		'GNS' => {
@@ -8467,11 +6293,8 @@ has 'currencies' => (
 			},
 		},
 		'GTQ' => {
-			symbol => 'GTQ',
 			display_name => {
 				'currency' => q(guatemalai quetzal),
-				'one' => q(guatemalai quetzal),
-				'other' => q(guatemalai quetzal),
 			},
 		},
 		'GWE' => {
@@ -8485,27 +6308,19 @@ has 'currencies' => (
 			},
 		},
 		'GYD' => {
-			symbol => 'GYD',
 			display_name => {
 				'currency' => q(guyanai dollár),
-				'one' => q(guyanai dollár),
-				'other' => q(guyanai dollár),
 			},
 		},
 		'HKD' => {
 			symbol => 'HKD',
 			display_name => {
 				'currency' => q(hongkongi dollár),
-				'one' => q(hongkongi dollár),
-				'other' => q(hongkongi dollár),
 			},
 		},
 		'HNL' => {
-			symbol => 'HNL',
 			display_name => {
 				'currency' => q(hodurasi lempira),
-				'one' => q(hodurasi lempira),
-				'other' => q(hodurasi lempira),
 			},
 		},
 		'HRD' => {
@@ -8516,35 +6331,24 @@ has 'currencies' => (
 			},
 		},
 		'HRK' => {
-			symbol => 'HRK',
 			display_name => {
 				'currency' => q(horvát kuna),
-				'one' => q(horvát kuna),
-				'other' => q(horvát kuna),
 			},
 		},
 		'HTG' => {
-			symbol => 'HTG',
 			display_name => {
 				'currency' => q(haiti gourde),
-				'one' => q(haiti gourde),
-				'other' => q(haiti gourde),
 			},
 		},
 		'HUF' => {
 			symbol => 'Ft',
 			display_name => {
 				'currency' => q(magyar forint),
-				'one' => q(magyar forint),
-				'other' => q(magyar forint),
 			},
 		},
 		'IDR' => {
-			symbol => 'IDR',
 			display_name => {
 				'currency' => q(indonéz rúpia),
-				'one' => q(indonéz rúpia),
-				'other' => q(indonéz rúpia),
 			},
 		},
 		'IEP' => {
@@ -8561,40 +6365,27 @@ has 'currencies' => (
 			symbol => 'ILS',
 			display_name => {
 				'currency' => q(izraeli új sékel),
-				'one' => q(izraeli új sékel),
-				'other' => q(izraeli új sékel),
 			},
 		},
 		'INR' => {
 			symbol => 'INR',
 			display_name => {
 				'currency' => q(indiai rúpia),
-				'one' => q(indiai rúpia),
-				'other' => q(indiai rúpia),
 			},
 		},
 		'IQD' => {
-			symbol => 'IQD',
 			display_name => {
 				'currency' => q(iraki dínár),
-				'one' => q(iraki dínár),
-				'other' => q(iraki dínár),
 			},
 		},
 		'IRR' => {
-			symbol => 'IRR',
 			display_name => {
 				'currency' => q(iráni rial),
-				'one' => q(iráni rial),
-				'other' => q(iráni rial),
 			},
 		},
 		'ISK' => {
-			symbol => 'ISK',
 			display_name => {
 				'currency' => q(izlandi korona),
-				'one' => q(izlandi korona),
-				'other' => q(izlandi korona),
 			},
 		},
 		'ITL' => {
@@ -8605,146 +6396,95 @@ has 'currencies' => (
 			},
 		},
 		'JMD' => {
-			symbol => 'JMD',
 			display_name => {
 				'currency' => q(jamaicai dollár),
-				'one' => q(jamaicai dollár),
-				'other' => q(jamaicai dollár),
 			},
 		},
 		'JOD' => {
-			symbol => 'JOD',
 			display_name => {
 				'currency' => q(jordániai dínár),
-				'one' => q(jordániai dínár),
-				'other' => q(jordániai dínár),
 			},
 		},
 		'JPY' => {
 			symbol => '¥',
 			display_name => {
 				'currency' => q(japán jen),
-				'one' => q(japán jen),
-				'other' => q(japán jen),
 			},
 		},
 		'KES' => {
-			symbol => 'KES',
 			display_name => {
 				'currency' => q(kenyai shilling),
-				'one' => q(kenyai shilling),
-				'other' => q(kenyai shilling),
 			},
 		},
 		'KGS' => {
-			symbol => 'KGS',
 			display_name => {
 				'currency' => q(kirgizisztáni szom),
-				'one' => q(kirgizisztáni szom),
-				'other' => q(kirgizisztáni szom),
 			},
 		},
 		'KHR' => {
-			symbol => 'KHR',
 			display_name => {
 				'currency' => q(kambodzsai riel),
-				'one' => q(kambodzsai riel),
-				'other' => q(kambodzsai riel),
 			},
 		},
 		'KMF' => {
-			symbol => 'KMF',
 			display_name => {
 				'currency' => q(comorei frank),
-				'one' => q(comorei frank),
-				'other' => q(comorei frank),
 			},
 		},
 		'KPW' => {
-			symbol => 'KPW',
 			display_name => {
 				'currency' => q(észak-koreai won),
-				'one' => q(észak-koreai won),
-				'other' => q(észak-koreai won),
 			},
 		},
 		'KRW' => {
 			symbol => 'KRW',
 			display_name => {
 				'currency' => q(dél-koreai won),
-				'one' => q(dél-koreai won),
-				'other' => q(dél-koreai won),
 			},
 		},
 		'KWD' => {
-			symbol => 'KWD',
 			display_name => {
 				'currency' => q(kuvaiti dínár),
-				'one' => q(kuvaiti dínár),
-				'other' => q(kuvaiti dínár),
 			},
 		},
 		'KYD' => {
-			symbol => 'KYD',
 			display_name => {
 				'currency' => q(kajmán-szigeteki dollár),
-				'one' => q(kajmán-szigeteki dollár),
-				'other' => q(kajmán-szigeteki dollár),
 			},
 		},
 		'KZT' => {
-			symbol => 'KZT',
 			display_name => {
 				'currency' => q(kazahsztáni tenge),
-				'one' => q(kazahsztáni tenge),
-				'other' => q(kazahsztáni tenge),
 			},
 		},
 		'LAK' => {
-			symbol => 'LAK',
 			display_name => {
 				'currency' => q(laoszi kip),
-				'one' => q(laoszi kip),
-				'other' => q(laoszi kip),
 			},
 		},
 		'LBP' => {
-			symbol => 'LBP',
 			display_name => {
 				'currency' => q(libanoni font),
-				'one' => q(libanoni font),
-				'other' => q(libanoni font),
 			},
 		},
 		'LKR' => {
-			symbol => 'LKR',
 			display_name => {
 				'currency' => q(Srí Lanka-i rúpia),
-				'one' => q(Srí Lanka-i rúpia),
-				'other' => q(Srí Lanka-i rúpia),
 			},
 		},
 		'LRD' => {
-			symbol => 'LRD',
 			display_name => {
 				'currency' => q(libériai dollár),
-				'one' => q(libériai dollár),
-				'other' => q(libériai dollár),
 			},
 		},
 		'LSL' => {
 			display_name => {
 				'currency' => q(lesothoi loti),
-				'one' => q(lesothoi loti),
-				'other' => q(lesothoi loti),
 			},
 		},
 		'LTL' => {
-			symbol => 'LTL',
 			display_name => {
 				'currency' => q(litvániai litas),
-				'one' => q(litvániai litas),
-				'other' => q(litvániai litas),
 			},
 		},
 		'LTT' => {
@@ -8768,11 +6508,8 @@ has 'currencies' => (
 			},
 		},
 		'LVL' => {
-			symbol => 'LVL',
 			display_name => {
 				'currency' => q(lett lats),
-				'one' => q(lett lats),
-				'other' => q(lett lats),
 			},
 		},
 		'LVR' => {
@@ -8781,19 +6518,13 @@ has 'currencies' => (
 			},
 		},
 		'LYD' => {
-			symbol => 'LYD',
 			display_name => {
 				'currency' => q(líbiai dínár),
-				'one' => q(líbiai dínár),
-				'other' => q(líbiai dínár),
 			},
 		},
 		'MAD' => {
-			symbol => 'MAD',
 			display_name => {
 				'currency' => q(marokkói dirham),
-				'one' => q(marokkói dirham),
-				'other' => q(marokkói dirham),
 			},
 		},
 		'MAF' => {
@@ -8804,24 +6535,16 @@ has 'currencies' => (
 		'MDC' => {
 			display_name => {
 				'currency' => q(moldáv kupon),
-				'one' => q(moldáv kupon),
-				'other' => q(moldáv kupon),
 			},
 		},
 		'MDL' => {
-			symbol => 'MDL',
 			display_name => {
 				'currency' => q(moldován lei),
-				'one' => q(moldován lei),
-				'other' => q(moldován lei),
 			},
 		},
 		'MGA' => {
-			symbol => 'MGA',
 			display_name => {
 				'currency' => q(madagaszkári ariary),
-				'one' => q(madagaszkári ariary),
-				'other' => q(madagaszkári ariary),
 			},
 		},
 		'MGF' => {
@@ -8830,18 +6553,13 @@ has 'currencies' => (
 			},
 		},
 		'MKD' => {
-			symbol => 'MKD',
 			display_name => {
 				'currency' => q(macedon dínár),
-				'one' => q(macedon dínár),
-				'other' => q(macedon dínár),
 			},
 		},
 		'MKN' => {
 			display_name => {
 				'currency' => q(macedón dénár \(1992–1993\)),
-				'one' => q(macedón dénár \(1992–1993\)),
-				'other' => q(macedón dénár \(1992–1993\)),
 			},
 		},
 		'MLF' => {
@@ -8850,42 +6568,28 @@ has 'currencies' => (
 			},
 		},
 		'MMK' => {
-			symbol => 'MMK',
 			display_name => {
 				'currency' => q(mianmari kyat),
-				'one' => q(mianmari kyat),
-				'other' => q(mianmari kyat),
 			},
 		},
 		'MNT' => {
-			symbol => 'MNT',
 			display_name => {
 				'currency' => q(mongóliai tugrik),
-				'one' => q(mongóliai tugrik),
-				'other' => q(mongóliai tugrik),
 			},
 		},
 		'MOP' => {
-			symbol => 'MOP',
 			display_name => {
 				'currency' => q(makaói pataca),
-				'one' => q(makaói pataca),
-				'other' => q(makaói pataca),
 			},
 		},
 		'MRO' => {
-			symbol => 'MRO',
 			display_name => {
 				'currency' => q(mauritániai ouguiya \(1973–2017\)),
-				'one' => q(mauritániai ouguiya \(1973–2017\)),
-				'other' => q(mauritániai ouguiya \(1973–2017\)),
 			},
 		},
 		'MRU' => {
 			display_name => {
 				'currency' => q(mauritániai ouguiya),
-				'one' => q(mauritániai ouguiya),
-				'other' => q(mauritániai ouguiya),
 			},
 		},
 		'MTL' => {
@@ -8903,53 +6607,43 @@ has 'currencies' => (
 			},
 		},
 		'MUR' => {
-			symbol => 'MUR',
 			display_name => {
 				'currency' => q(mauritiusi rúpia),
-				'one' => q(mauritiusi rúpia),
-				'other' => q(mauritiusi rúpia),
 			},
 		},
 		'MVR' => {
-			symbol => 'MVR',
 			display_name => {
 				'currency' => q(maldív-szigeteki rufiyaa),
-				'one' => q(maldív-szigeteki rufiyaa),
-				'other' => q(maldív-szigeteki rufiyaa),
 			},
 		},
 		'MWK' => {
-			symbol => 'MWK',
 			display_name => {
 				'currency' => q(malawi kwacha),
-				'one' => q(malawi kwacha),
-				'other' => q(malawi kwacha),
 			},
 		},
 		'MXN' => {
 			symbol => 'MXN',
 			display_name => {
 				'currency' => q(mexikói peso),
-				'one' => q(mexikói peso),
-				'other' => q(mexikói peso),
 			},
 		},
 		'MXP' => {
 			display_name => {
 				'currency' => q(Mexikói ezüst peso \(1861–1992\)),
+				'one' => q(mexikói ezüst peso \(1861–1992\)),
+				'other' => q(mexikói ezüst peso \(1861–1992\)),
 			},
 		},
 		'MXV' => {
 			display_name => {
 				'currency' => q(Mexikói Unidad de Inversion \(UDI\)),
+				'one' => q(mexikói befektetési egység \(UDI\)),
+				'other' => q(mexikói befektetési egység \(UDI\)),
 			},
 		},
 		'MYR' => {
-			symbol => 'MYR',
 			display_name => {
 				'currency' => q(malajziai ringgit),
-				'one' => q(malajziai ringgit),
-				'other' => q(malajziai ringgit),
 			},
 		},
 		'MZE' => {
@@ -8963,40 +6657,30 @@ has 'currencies' => (
 			},
 		},
 		'MZN' => {
-			symbol => 'MZN',
 			display_name => {
 				'currency' => q(mozambiki metikális),
-				'one' => q(mozambiki metikális),
-				'other' => q(mozambiki metikális),
 			},
 		},
 		'NAD' => {
-			symbol => 'NAD',
 			display_name => {
 				'currency' => q(namíbiai dollár),
-				'one' => q(namíbiai dollár),
-				'other' => q(namíbiai dollár),
 			},
 		},
 		'NGN' => {
-			symbol => 'NGN',
 			display_name => {
 				'currency' => q(nigériai naira),
-				'one' => q(nigériai naira),
-				'other' => q(nigériai naira),
 			},
 		},
 		'NIC' => {
 			display_name => {
 				'currency' => q(Nikaraguai cordoba),
+				'one' => q(nicaraguai córdoba \(1988–1911\)),
+				'other' => q(nicaraguai córdoba \(1988–1911\)),
 			},
 		},
 		'NIO' => {
-			symbol => 'NIO',
 			display_name => {
 				'currency' => q(nicaraguai córdoba),
-				'one' => q(nicaraguai córdoba),
-				'other' => q(nicaraguai córdoba),
 			},
 		},
 		'NLG' => {
@@ -9005,43 +6689,29 @@ has 'currencies' => (
 			},
 		},
 		'NOK' => {
-			symbol => 'NOK',
 			display_name => {
 				'currency' => q(norvég korona),
-				'one' => q(norvég korona),
-				'other' => q(norvég korona),
 			},
 		},
 		'NPR' => {
-			symbol => 'NPR',
 			display_name => {
 				'currency' => q(nepáli rúpia),
-				'one' => q(nepáli rúpia),
-				'other' => q(nepáli rúpia),
 			},
 		},
 		'NZD' => {
 			symbol => 'NZD',
 			display_name => {
 				'currency' => q(új-zélandi dollár),
-				'one' => q(új-zélandi dollár),
-				'other' => q(új-zélandi dollár),
 			},
 		},
 		'OMR' => {
-			symbol => 'OMR',
 			display_name => {
 				'currency' => q(ománi rial),
-				'one' => q(ománi rial),
-				'other' => q(ománi rial),
 			},
 		},
 		'PAB' => {
-			symbol => 'PAB',
 			display_name => {
 				'currency' => q(panamai balboa),
-				'one' => q(panamai balboa),
-				'other' => q(panamai balboa),
 			},
 		},
 		'PEI' => {
@@ -9050,11 +6720,8 @@ has 'currencies' => (
 			},
 		},
 		'PEN' => {
-			symbol => 'PEN',
 			display_name => {
 				'currency' => q(perui sol),
-				'one' => q(perui sol),
-				'other' => q(perui sol),
 			},
 		},
 		'PES' => {
@@ -9063,35 +6730,24 @@ has 'currencies' => (
 			},
 		},
 		'PGK' => {
-			symbol => 'PGK',
 			display_name => {
 				'currency' => q(pápua új-guineai kina),
-				'one' => q(pápua új-guineai kina),
-				'other' => q(pápua új-guineai kina),
 			},
 		},
 		'PHP' => {
 			symbol => 'PHP',
 			display_name => {
 				'currency' => q(fülöp-szigeteki peso),
-				'one' => q(fülöp-szigeteki peso),
-				'other' => q(fülöp-szigeteki peso),
 			},
 		},
 		'PKR' => {
-			symbol => 'PKR',
 			display_name => {
 				'currency' => q(pakisztáni rúpia),
-				'one' => q(pakisztáni rúpia),
-				'other' => q(pakisztáni rúpia),
 			},
 		},
 		'PLN' => {
-			symbol => 'PLN',
 			display_name => {
 				'currency' => q(lengyel zloty),
-				'one' => q(lengyel zloty),
-				'other' => q(lengyel zloty),
 			},
 		},
 		'PLZ' => {
@@ -9109,19 +6765,13 @@ has 'currencies' => (
 			},
 		},
 		'PYG' => {
-			symbol => 'PYG',
 			display_name => {
 				'currency' => q(paraguayi guarani),
-				'one' => q(paraguayi guarani),
-				'other' => q(paraguayi guarani),
 			},
 		},
 		'QAR' => {
-			symbol => 'QAR',
 			display_name => {
 				'currency' => q(katari rial),
-				'one' => q(katari rial),
-				'other' => q(katari rial),
 			},
 		},
 		'RHD' => {
@@ -9134,117 +6784,76 @@ has 'currencies' => (
 		'ROL' => {
 			display_name => {
 				'currency' => q(román lej \(1952–2006\)),
-				'one' => q(román lej \(1952–2006\)),
-				'other' => q(román lej \(1952–2006\)),
 			},
 		},
 		'RON' => {
-			symbol => 'RON',
 			display_name => {
 				'currency' => q(román lej),
-				'one' => q(román lej),
-				'other' => q(román lej),
 			},
 		},
 		'RSD' => {
-			symbol => 'RSD',
 			display_name => {
 				'currency' => q(szerb dínár),
-				'one' => q(szerb dínár),
-				'other' => q(szerb dínár),
 			},
 		},
 		'RUB' => {
-			symbol => 'RUB',
 			display_name => {
 				'currency' => q(orosz rubel),
-				'one' => q(orosz rubel),
-				'other' => q(orosz rubel),
 			},
 		},
 		'RUR' => {
 			display_name => {
 				'currency' => q(orosz rubel \(1991–1998\)),
-				'one' => q(orosz rubel \(1991–1998\)),
-				'other' => q(orosz rubel \(1991–1998\)),
 			},
 		},
 		'RWF' => {
-			symbol => 'RWF',
 			display_name => {
 				'currency' => q(ruandai frank),
-				'one' => q(ruandai frank),
-				'other' => q(ruandai frank),
 			},
 		},
 		'SAR' => {
-			symbol => 'SAR',
 			display_name => {
 				'currency' => q(szaúdi riyal),
-				'one' => q(szaúdi riyal),
-				'other' => q(szaúdi riyal),
 			},
 		},
 		'SBD' => {
-			symbol => 'SBD',
 			display_name => {
 				'currency' => q(salamon-szigeteki dollár),
-				'one' => q(salamon-szigeteki dollár),
-				'other' => q(salamon-szigeteki dollár),
 			},
 		},
 		'SCR' => {
-			symbol => 'SCR',
 			display_name => {
 				'currency' => q(seychelle-szigeteki rúpia),
-				'one' => q(seychelle-szigeteki rúpia),
-				'other' => q(seychelle-szigeteki rúpia),
 			},
 		},
 		'SDD' => {
 			display_name => {
 				'currency' => q(Szudáni dínár \(1992–2007\)),
-				'one' => q(Szudáni dínár \(1992–2007\)),
-				'other' => q(Szudáni dínár \(1992–2007\)),
 			},
 		},
 		'SDG' => {
-			symbol => 'SDG',
 			display_name => {
 				'currency' => q(szudáni font),
-				'one' => q(szudáni font),
-				'other' => q(szudáni font),
 			},
 		},
 		'SDP' => {
 			display_name => {
 				'currency' => q(Szudáni font \(1957–1998\)),
-				'one' => q(Szudáni font \(1957–1998\)),
-				'other' => q(Szudáni font \(1957–1998\)),
 			},
 		},
 		'SEK' => {
-			symbol => 'SEK',
 			display_name => {
 				'currency' => q(svéd korona),
-				'one' => q(svéd korona),
-				'other' => q(svéd korona),
 			},
 		},
 		'SGD' => {
-			symbol => 'SGD',
 			display_name => {
 				'currency' => q(szingapúri dollár),
-				'one' => q(szingapúri dollár),
-				'other' => q(szingapúri dollár),
 			},
 		},
 		'SHP' => {
-			symbol => 'SHP',
 			display_name => {
 				'currency' => q(Szent Ilona-i font),
-				'one' => q(Szent Ilona-i font),
-				'other' => q(Szent Ilona-i font),
 			},
 		},
 		'SIT' => {
@@ -9261,28 +6870,24 @@ has 'currencies' => (
 				'other' => q(szlovák korona),
 			},
 		},
-		'SLL' => {
-			symbol => 'SLL',
+		'SLE' => {
 			display_name => {
 				'currency' => q(Sierra Leone-i leone),
-				'one' => q(Sierra Leone-i leone),
-				'other' => q(Sierra Leone-i leone),
+			},
+		},
+		'SLL' => {
+			display_name => {
+				'currency' => q(Sierra Leone-i leone \(1964—2022\)),
 			},
 		},
 		'SOS' => {
-			symbol => 'SOS',
 			display_name => {
 				'currency' => q(szomáli shilling),
-				'one' => q(szomáli shilling),
-				'other' => q(szomáli shilling),
 			},
 		},
 		'SRD' => {
-			symbol => 'SRD',
 			display_name => {
 				'currency' => q(suriname-i dollár),
-				'one' => q(suriname-i dollár),
-				'other' => q(suriname-i dollár),
 			},
 		},
 		'SRG' => {
@@ -9291,27 +6896,18 @@ has 'currencies' => (
 			},
 		},
 		'SSP' => {
-			symbol => 'SSP',
 			display_name => {
 				'currency' => q(dél-szudáni font),
-				'one' => q(dél-szudáni font),
-				'other' => q(dél-szudáni font),
 			},
 		},
 		'STD' => {
-			symbol => 'STD',
 			display_name => {
 				'currency' => q(São Tomé és Príncipe-i dobra \(1977–2017\)),
-				'one' => q(São Tomé és Príncipe-i dobra \(1977–2017\)),
-				'other' => q(São Tomé és Príncipe-i dobra \(1977–2017\)),
 			},
 		},
 		'STN' => {
-			symbol => 'STN',
 			display_name => {
 				'currency' => q(São Tomé és Príncipe-i dobra),
-				'one' => q(São Tomé és Príncipe-i dobra),
-				'other' => q(São Tomé és Príncipe-i dobra),
 			},
 		},
 		'SUR' => {
@@ -9324,30 +6920,23 @@ has 'currencies' => (
 		'SVC' => {
 			display_name => {
 				'currency' => q(Salvadori colón),
+				'one' => q(salvadori colón),
+				'other' => q(salvadori colón),
 			},
 		},
 		'SYP' => {
-			symbol => 'SYP',
 			display_name => {
 				'currency' => q(szíriai font),
-				'one' => q(szíriai font),
-				'other' => q(szíriai font),
 			},
 		},
 		'SZL' => {
-			symbol => 'SZL',
 			display_name => {
 				'currency' => q(szvázi lilangeni),
-				'one' => q(szvázi lilangeni),
-				'other' => q(szvázi lilangeni),
 			},
 		},
 		'THB' => {
-			symbol => 'THB',
 			display_name => {
 				'currency' => q(thai baht),
-				'one' => q(thai baht),
-				'other' => q(thai baht),
 			},
 		},
 		'TJR' => {
@@ -9356,42 +6945,28 @@ has 'currencies' => (
 			},
 		},
 		'TJS' => {
-			symbol => 'TJS',
 			display_name => {
 				'currency' => q(tádzsikisztáni somoni),
-				'one' => q(tádzsikisztáni somoni),
-				'other' => q(tádzsikisztáni somoni),
 			},
 		},
 		'TMM' => {
 			display_name => {
 				'currency' => q(türkmenisztáni manat \(1993–2009\)),
-				'one' => q(türkmenisztáni manat \(1993–2009\)),
-				'other' => q(türkmenisztáni manat \(1993–2009\)),
 			},
 		},
 		'TMT' => {
-			symbol => 'TMT',
 			display_name => {
 				'currency' => q(türkmenisztáni manat),
-				'one' => q(türkmenisztáni manat),
-				'other' => q(türkmenisztáni manat),
 			},
 		},
 		'TND' => {
-			symbol => 'TND',
 			display_name => {
 				'currency' => q(tunéziai dínár),
-				'one' => q(tunéziai dínár),
-				'other' => q(tunéziai dínár),
 			},
 		},
 		'TOP' => {
-			symbol => 'TOP',
 			display_name => {
 				'currency' => q(tongai paanga),
-				'one' => q(tongai paanga),
-				'other' => q(tongai paanga),
 			},
 		},
 		'TPE' => {
@@ -9404,48 +6979,32 @@ has 'currencies' => (
 		'TRL' => {
 			display_name => {
 				'currency' => q(török líra \(1922–2005\)),
-				'one' => q(török líra \(1922–2005\)),
-				'other' => q(török líra \(1922–2005\)),
 			},
 		},
 		'TRY' => {
-			symbol => 'TRY',
 			display_name => {
 				'currency' => q(török líra),
-				'one' => q(török líra),
-				'other' => q(török líra),
 			},
 		},
 		'TTD' => {
-			symbol => 'TTD',
 			display_name => {
 				'currency' => q(Trinidad és Tobago-i dollár),
-				'one' => q(Trinidad és Tobago-i dollár),
-				'other' => q(Trinidad és Tobago-i dollár),
 			},
 		},
 		'TWD' => {
 			symbol => 'TWD',
 			display_name => {
 				'currency' => q(tajvani új dollár),
-				'one' => q(tajvani új dollár),
-				'other' => q(tajvani új dollár),
 			},
 		},
 		'TZS' => {
-			symbol => 'TZS',
 			display_name => {
 				'currency' => q(tanzániai shilling),
-				'one' => q(tanzániai shilling),
-				'other' => q(tanzániai shilling),
 			},
 		},
 		'UAH' => {
-			symbol => 'UAH',
 			display_name => {
 				'currency' => q(ukrán hrivnya),
-				'one' => q(ukrán hrivnya),
-				'other' => q(ukrán hrivnya),
 			},
 		},
 		'UAK' => {
@@ -9458,41 +7017,36 @@ has 'currencies' => (
 		'UGS' => {
 			display_name => {
 				'currency' => q(Ugandai shilling \(1966–1987\)),
-				'one' => q(Ugandai shilling \(1966–1987\)),
-				'other' => q(Ugandai shilling \(1966–1987\)),
 			},
 		},
 		'UGX' => {
-			symbol => 'UGX',
 			display_name => {
 				'currency' => q(ugandai shilling),
-				'one' => q(ugandai shilling),
-				'other' => q(ugandai shilling),
 			},
 		},
 		'USD' => {
 			symbol => 'USD',
 			display_name => {
 				'currency' => q(USA-dollár),
-				'one' => q(USA-dollár),
-				'other' => q(USA-dollár),
 			},
 		},
 		'USN' => {
 			display_name => {
 				'currency' => q(USA dollár \(következő napi\)),
+				'one' => q(USA-dollár \(következő napi\)),
+				'other' => q(USA-dollár \(következő napi\)),
 			},
 		},
 		'USS' => {
 			display_name => {
 				'currency' => q(USA dollár \(aznapi\)),
+				'one' => q(USA-dollár \(aznapi\)),
+				'other' => q(USA-dollár \(aznapi\)),
 			},
 		},
 		'UYI' => {
 			display_name => {
 				'currency' => q(Uruguayi peso en unidades indexadas),
-				'one' => q(Uruguayi peso en unidades indexadas),
-				'other' => q(Uruguayi peso en unidades indexadas),
 			},
 		},
 		'UYP' => {
@@ -9503,7 +7057,6 @@ has 'currencies' => (
 			},
 		},
 		'UYU' => {
-			symbol => 'UYU',
 			display_name => {
 				'currency' => q(uruguay-i peso),
 				'one' => q(uruguayi peso),
@@ -9511,73 +7064,49 @@ has 'currencies' => (
 			},
 		},
 		'UZS' => {
-			symbol => 'UZS',
 			display_name => {
 				'currency' => q(üzbegisztáni szum),
-				'one' => q(üzbegisztáni szum),
-				'other' => q(üzbegisztáni szum),
 			},
 		},
 		'VEB' => {
 			display_name => {
 				'currency' => q(Venezuelai bolivar \(1871–2008\)),
-				'one' => q(Venezuelai bolivar \(1871–2008\)),
-				'other' => q(Venezuelai bolivar \(1871–2008\)),
 			},
 		},
 		'VEF' => {
-			symbol => 'VEF',
 			display_name => {
 				'currency' => q(venezuelai bolivar \(2008–2018\)),
-				'one' => q(venezuelai bolivar \(2008–2018\)),
-				'other' => q(venezuelai bolivar \(2008–2018\)),
 			},
 		},
 		'VES' => {
-			symbol => 'VES',
 			display_name => {
 				'currency' => q(venezuelai bolivar),
-				'one' => q(venezuelai bolivar),
-				'other' => q(venezuelai bolivar),
 			},
 		},
 		'VND' => {
 			symbol => 'VND',
 			display_name => {
 				'currency' => q(vietnámi dong),
-				'one' => q(vietnámi dong),
-				'other' => q(vietnámi dong),
 			},
 		},
 		'VNN' => {
 			display_name => {
 				'currency' => q(vietnámi dong \(1978–1985\)),
-				'one' => q(vietnámi dong \(1978–1985\)),
-				'other' => q(vietnámi dong \(1978–1985\)),
 			},
 		},
 		'VUV' => {
-			symbol => 'VUV',
 			display_name => {
 				'currency' => q(vanuatui vatu),
-				'one' => q(vanuatui vatu),
-				'other' => q(vanuatui vatu),
 			},
 		},
 		'WST' => {
-			symbol => 'WST',
 			display_name => {
 				'currency' => q(nyugat-szamoai tala),
-				'one' => q(nyugat-szamoai tala),
-				'other' => q(nyugat-szamoai tala),
 			},
 		},
 		'XAF' => {
-			symbol => 'FCFA',
 			display_name => {
 				'currency' => q(CFA frank BEAC),
-				'one' => q(CFA frank BEAC),
-				'other' => q(CFA frank BEAC),
 			},
 		},
 		'XAG' => {
@@ -9593,37 +7122,27 @@ has 'currencies' => (
 		'XBA' => {
 			display_name => {
 				'currency' => q(Európai kompozit egység),
-				'one' => q(Európai kompozit egység),
-				'other' => q(Európai kompozit egység),
 			},
 		},
 		'XBB' => {
 			display_name => {
 				'currency' => q(Európai monetáris egység),
-				'one' => q(Európai monetáris egység),
-				'other' => q(Európai monetáris egység),
 			},
 		},
 		'XBC' => {
 			display_name => {
 				'currency' => q(Európai kontó egység \(XBC\)),
-				'one' => q(Európai kontó egység \(XBC\)),
-				'other' => q(Európai kontó egység \(XBC\)),
 			},
 		},
 		'XBD' => {
 			display_name => {
 				'currency' => q(Európai kontó egység \(XBD\)),
-				'one' => q(Európai kontó egység \(XBD\)),
-				'other' => q(Európai kontó egység \(XBD\)),
 			},
 		},
 		'XCD' => {
 			symbol => 'XCD',
 			display_name => {
 				'currency' => q(kelet-karibi dollár),
-				'one' => q(kelet-karibi dollár),
-				'other' => q(kelet-karibi dollár),
 			},
 		},
 		'XDR' => {
@@ -9649,11 +7168,8 @@ has 'currencies' => (
 			},
 		},
 		'XOF' => {
-			symbol => 'F CFA',
 			display_name => {
 				'currency' => q(CFA frank BCEAO),
-				'one' => q(CFA frank BCEAO),
-				'other' => q(CFA frank BCEAO),
 			},
 		},
 		'XPD' => {
@@ -9664,11 +7180,8 @@ has 'currencies' => (
 			},
 		},
 		'XPF' => {
-			symbol => 'CFPF',
 			display_name => {
 				'currency' => q(csendes-óceáni valutaközösségi frank),
-				'one' => q(csendes-óceáni valutaközösségi frank),
-				'other' => q(csendes-óceáni valutaközösségi frank),
 			},
 		},
 		'XPT' => {
@@ -9701,11 +7214,8 @@ has 'currencies' => (
 			},
 		},
 		'YER' => {
-			symbol => 'YER',
 			display_name => {
 				'currency' => q(jemeni rial),
-				'one' => q(jemeni rial),
-				'other' => q(jemeni rial),
 			},
 		},
 		'YUD' => {
@@ -9732,8 +7242,6 @@ has 'currencies' => (
 		'YUR' => {
 			display_name => {
 				'currency' => q(jugoszláv reformált dinár \(1992–1993\)),
-				'one' => q(jugoszláv reformált dinár \(1992–1993\)),
-				'other' => q(jugoszláv reformált dinár \(1992–1993\)),
 			},
 		},
 		'ZAL' => {
@@ -9742,25 +7250,18 @@ has 'currencies' => (
 			},
 		},
 		'ZAR' => {
-			symbol => 'ZAR',
 			display_name => {
 				'currency' => q(dél-afrikai rand),
-				'one' => q(dél-afrikai rand),
-				'other' => q(dél-afrikai rand),
 			},
 		},
 		'ZMK' => {
-			symbol => 'ZMK',
 			display_name => {
 				'currency' => q(Zambiai kwacha \(1968–2012\)),
 			},
 		},
 		'ZMW' => {
-			symbol => 'ZMW',
 			display_name => {
 				'currency' => q(zambiai kwacha),
-				'one' => q(zambiai kwacha),
-				'other' => q(zambiai kwacha),
 			},
 		},
 		'ZRN' => {
@@ -9776,8 +7277,6 @@ has 'currencies' => (
 		'ZWD' => {
 			display_name => {
 				'currency' => q(Zimbabwei dollár \(1980–2008\)),
-				'one' => q(Zimbabwei dollár \(1980–2008\)),
-				'other' => q(Zimbabwei dollár \(1980–2008\)),
 			},
 		},
 		'ZWL' => {
@@ -9788,8 +7287,6 @@ has 'currencies' => (
 		'ZWR' => {
 			display_name => {
 				'currency' => q(Zimbabwei dollár \(2008\)),
-				'one' => q(Zimbabwei dollár \(2008\)),
-				'other' => q(Zimbabwei dollár \(2008\)),
 			},
 		},
 	} },
@@ -9822,46 +7319,8 @@ has 'calendar_months' => (
 							
 						],
 					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'1',
@@ -9885,46 +7344,6 @@ has 'calendar_months' => (
 			},
 			'coptic' => {
 				'format' => {
-					abbreviated => {
-						nonleap => [
-							'Thot',
-							'Paophi',
-							'Athür',
-							'Koiak',
-							'Tübi',
-							'Mehir',
-							'Phamenóth',
-							'Pharmuthi',
-							'Pakhónsz',
-							'Pauni',
-							'Epip',
-							'Meszoré',
-							'Pi Kogi Enavot'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12',
-							'13'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'Thot',
@@ -9940,134 +7359,6 @@ has 'calendar_months' => (
 							'Epip',
 							'Meszoré',
 							'Pi Kogi Enavot'
-						],
-						leap => [
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'Thot',
-							'Paophi',
-							'Athür',
-							'Koiak',
-							'Tübi',
-							'Mehir',
-							'Phamenóth',
-							'Pharmuthi',
-							'Pakhónsz',
-							'Pauni',
-							'Epip',
-							'Meszoré',
-							'Pi Kogi Enavot'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'Thot',
-							'Paophi',
-							'Athür',
-							'Koiak',
-							'Tübi',
-							'Mehir',
-							'Phamenóth',
-							'Pharmuthi',
-							'Pakhónsz',
-							'Pauni',
-							'Epip',
-							'Meszoré',
-							'Pi Kogi Enavot'
-						],
-						leap => [
-							
-						],
-					},
-				},
-			},
-			'ethiopic' => {
-				'format' => {
-					abbreviated => {
-						nonleap => [
-							'Meskerem',
-							'Tekemt',
-							'Hedar',
-							'Tahsas',
-							'Ter',
-							'Yekatit',
-							'Megabit',
-							'Miazia',
-							'Genbot',
-							'Sene',
-							'Hamle',
-							'Nehasse',
-							'Pagumen'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12',
-							'13'
-						],
-						leap => [
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'Meskerem',
-							'Tekemt',
-							'Hedar',
-							'Tahsas',
-							'Ter',
-							'Yekatit',
-							'Megabit',
-							'Miazia',
-							'Genbot',
-							'Sene',
-							'Hamle',
-							'Nehasse',
-							'Pagumen'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'Meskerem',
-							'Tekemt',
-							'Hedar',
-							'Tahsas',
-							'Ter',
-							'Yekatit',
-							'Megabit',
-							'Miazia',
-							'Genbot',
-							'Sene',
-							'Hamle',
-							'Nehasse',
-							'Pagumen'
 						],
 						leap => [
 							
@@ -10096,25 +7387,6 @@ has 'calendar_months' => (
 							
 						],
 					},
-					narrow => {
-						nonleap => [
-							'J',
-							'F',
-							'M',
-							'Á',
-							'M',
-							'J',
-							'J',
-							'A',
-							'Sz',
-							'O',
-							'N',
-							'D'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'január',
@@ -10136,25 +7408,6 @@ has 'calendar_months' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'jan.',
-							'febr.',
-							'márc.',
-							'ápr.',
-							'máj.',
-							'jún.',
-							'júl.',
-							'aug.',
-							'szept.',
-							'okt.',
-							'nov.',
-							'dec.'
-						],
-						leap => [
-							
-						],
-					},
 					narrow => {
 						nonleap => [
 							'J',
@@ -10169,25 +7422,6 @@ has 'calendar_months' => (
 							'O',
 							'N',
 							'D'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'január',
-							'február',
-							'március',
-							'április',
-							'május',
-							'június',
-							'július',
-							'augusztus',
-							'szeptember',
-							'október',
-							'november',
-							'december'
 						],
 						leap => [
 							
@@ -10197,32 +7431,6 @@ has 'calendar_months' => (
 			},
 			'hebrew' => {
 				'format' => {
-					abbreviated => {
-						nonleap => [
-							'Tisri',
-							'Hesván',
-							'Kiszlév',
-							'Tévész',
-							'Svát',
-							'Ádár I',
-							'Ádár',
-							'Niszán',
-							'Ijár',
-							'Sziván',
-							'Tamuz',
-							'Áv',
-							'Elul'
-						],
-						leap => [
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'Tisri',
@@ -10246,142 +7454,6 @@ has 'calendar_months' => (
 							undef(),
 							undef(),
 							undef(),
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'Tisri',
-							'Hesván',
-							'Kiszlév',
-							'Tévész',
-							'Svát',
-							'Ádár I',
-							'Ádár',
-							'Niszán',
-							'Ijár',
-							'Sziván',
-							'Tamuz',
-							'Áv',
-							'Elul'
-						],
-						leap => [
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'Tisri',
-							'Hesván',
-							'Kiszlév',
-							'Tévész',
-							'Svát',
-							'Ádár I',
-							'Ádár',
-							'Niszán',
-							'Ijár',
-							'Sziván',
-							'Tamuz',
-							'Áv',
-							'Elul'
-						],
-						leap => [
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							
-						],
-					},
-				},
-			},
-			'indian' => {
-				'format' => {
-					abbreviated => {
-						nonleap => [
-							'Chaitra',
-							'Vaisakha',
-							'Jyaistha',
-							'Asadha',
-							'Sravana',
-							'Bhadra',
-							'Asvina',
-							'Kartika',
-							'Agrahayana',
-							'Pausa',
-							'Magha',
-							'Phalguna'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'Chaitra',
-							'Vaisakha',
-							'Jyaistha',
-							'Asadha',
-							'Sravana',
-							'Bhadra',
-							'Asvina',
-							'Kartika',
-							'Agrahayana',
-							'Pausa',
-							'Magha',
-							'Phalguna'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'Chaitra',
-							'Vaisakha',
-							'Jyaistha',
-							'Asadha',
-							'Sravana',
-							'Bhadra',
-							'Asvina',
-							'Kartika',
-							'Agrahayana',
-							'Pausa',
-							'Magha',
-							'Phalguna'
-						],
-						leap => [
 							
 						],
 					},
@@ -10429,25 +7501,6 @@ has 'calendar_months' => (
 					},
 				},
 				'stand-alone' => {
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'Moharrem',
@@ -10471,84 +7524,6 @@ has 'calendar_months' => (
 			},
 			'persian' => {
 				'format' => {
-					abbreviated => {
-						nonleap => [
-							'farvardin',
-							'ordibehesht',
-							'khordad',
-							'tir',
-							'mordad',
-							'shahrivar',
-							'mehr',
-							'aban',
-							'azar',
-							'dey',
-							'bahman',
-							'esfand'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'farvardin',
-							'ordibehesht',
-							'khordad',
-							'tir',
-							'mordad',
-							'shahrivar',
-							'mehr',
-							'aban',
-							'azar',
-							'dey',
-							'bahman',
-							'esfand'
-						],
-						leap => [
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'farvardin',
-							'ordibehesht',
-							'khordad',
-							'tir',
-							'mordad',
-							'shahrivar',
-							'mehr',
-							'aban',
-							'azar',
-							'dey',
-							'bahman',
-							'esfand'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'farvardin',
@@ -10589,24 +7564,6 @@ has 'calendar_days' => (
 						sat => 'Szo',
 						sun => 'V'
 					},
-					narrow => {
-						mon => 'H',
-						tue => 'K',
-						wed => 'Sz',
-						thu => 'Cs',
-						fri => 'P',
-						sat => 'Sz',
-						sun => 'V'
-					},
-					short => {
-						mon => 'H',
-						tue => 'K',
-						wed => 'Sze',
-						thu => 'Cs',
-						fri => 'P',
-						sat => 'Szo',
-						sun => 'V'
-					},
 					wide => {
 						mon => 'hétfő',
 						tue => 'kedd',
@@ -10618,15 +7575,6 @@ has 'calendar_days' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						mon => 'H',
-						tue => 'K',
-						wed => 'Sze',
-						thu => 'Cs',
-						fri => 'P',
-						sat => 'Szo',
-						sun => 'V'
-					},
 					narrow => {
 						mon => 'H',
 						tue => 'K',
@@ -10635,24 +7583,6 @@ has 'calendar_days' => (
 						fri => 'P',
 						sat => 'Sz',
 						sun => 'V'
-					},
-					short => {
-						mon => 'H',
-						tue => 'K',
-						wed => 'Sze',
-						thu => 'Cs',
-						fri => 'P',
-						sat => 'Szo',
-						sun => 'V'
-					},
-					wide => {
-						mon => 'hétfő',
-						tue => 'kedd',
-						wed => 'szerda',
-						thu => 'csütörtök',
-						fri => 'péntek',
-						sat => 'szombat',
-						sun => 'vasárnap'
 					},
 				},
 			},
@@ -10812,39 +7742,6 @@ has 'day_period_data' => (
 				}
 				last SWITCH;
 				}
-			if ($_ eq 'ethiopic') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'morning1' if $time >= 600
-						&& $time < 900;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'night2' if $time >= 400
-						&& $time < 600;
-				}
-				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'morning1' if $time >= 600
-						&& $time < 900;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'night2' if $time >= 400
-						&& $time < 600;
-				}
-				last SWITCH;
-				}
 			if ($_ eq 'generic') {
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
@@ -10912,39 +7809,6 @@ has 'day_period_data' => (
 				last SWITCH;
 				}
 			if ($_ eq 'hebrew') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'morning1' if $time >= 600
-						&& $time < 900;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'night2' if $time >= 400
-						&& $time < 600;
-				}
-				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'morning1' if $time >= 600
-						&& $time < 900;
-					return 'morning2' if $time >= 900
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'night2' if $time >= 400
-						&& $time < 600;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'indian') {
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
@@ -11137,21 +8001,8 @@ has 'day_periods' => (
 					'noon' => q{dél},
 					'pm' => q{du.},
 				},
-				'narrow' => {
-					'afternoon1' => q{du.},
-					'am' => q{de.},
-					'evening1' => q{este},
-					'midnight' => q{éjfél},
-					'morning1' => q{reggel},
-					'morning2' => q{de.},
-					'night1' => q{éjjel},
-					'night2' => q{hajnal},
-					'noon' => q{dél},
-					'pm' => q{du.},
-				},
 				'wide' => {
 					'afternoon1' => q{délután},
-					'am' => q{de.},
 					'evening1' => q{este},
 					'midnight' => q{éjfél},
 					'morning1' => q{reggel},
@@ -11159,45 +8010,16 @@ has 'day_periods' => (
 					'night1' => q{éjjel},
 					'night2' => q{hajnal},
 					'noon' => q{dél},
-					'pm' => q{du.},
 				},
 			},
 			'stand-alone' => {
-				'abbreviated' => {
-					'afternoon1' => q{du.},
-					'am' => q{de.},
-					'evening1' => q{este},
-					'midnight' => q{éjfél},
-					'morning1' => q{reggel},
-					'morning2' => q{de.},
-					'night1' => q{éjjel},
-					'night2' => q{hajnal},
-					'noon' => q{dél},
-					'pm' => q{du.},
-				},
-				'narrow' => {
-					'afternoon1' => q{du.},
-					'am' => q{de.},
-					'evening1' => q{este},
-					'midnight' => q{éjfél},
-					'morning1' => q{reggel},
-					'morning2' => q{de.},
-					'night1' => q{éjjel},
-					'night2' => q{hajnal},
-					'noon' => q{dél},
-					'pm' => q{du.},
-				},
 				'wide' => {
 					'afternoon1' => q{délután},
-					'am' => q{de.},
 					'evening1' => q{este},
-					'midnight' => q{éjfél},
 					'morning1' => q{reggel},
 					'morning2' => q{délelőtt},
 					'night1' => q{éjjel},
 					'night2' => q{hajnal},
-					'noon' => q{dél},
-					'pm' => q{du.},
 				},
 			},
 		},
@@ -11213,42 +8035,10 @@ has 'eras' => (
 			abbreviated => {
 				'0' => 'BK'
 			},
-			narrow => {
-				'0' => 'BK'
-			},
-			wide => {
-				'0' => 'BK'
-			},
 		},
 		'chinese' => {
 		},
 		'coptic' => {
-			abbreviated => {
-				'0' => 'ERA0',
-				'1' => 'ERA1'
-			},
-			narrow => {
-				'0' => 'ERA0',
-				'1' => 'ERA1'
-			},
-			wide => {
-				'0' => 'ERA0',
-				'1' => 'ERA1'
-			},
-		},
-		'ethiopic' => {
-			abbreviated => {
-				'0' => 'ERA0',
-				'1' => 'ERA1'
-			},
-			narrow => {
-				'0' => 'ERA0',
-				'1' => 'ERA1'
-			},
-			wide => {
-				'0' => 'ERA0',
-				'1' => 'ERA1'
-			},
 		},
 		'generic' => {
 		},
@@ -11270,23 +8060,9 @@ has 'eras' => (
 			abbreviated => {
 				'0' => 'TÉ'
 			},
-			narrow => {
-				'0' => 'TÉ'
-			},
-			wide => {
-				'0' => 'TÉ'
-			},
-		},
-		'indian' => {
 		},
 		'islamic' => {
 			abbreviated => {
-				'0' => 'MF'
-			},
-			narrow => {
-				'0' => 'MF'
-			},
-			wide => {
 				'0' => 'MF'
 			},
 		},
@@ -11296,16 +8072,7 @@ has 'eras' => (
 		},
 		'roc' => {
 			abbreviated => {
-				'0' => 'R.O.C. előtt',
-				'1' => 'R.O.C.'
-			},
-			narrow => {
-				'0' => 'R.O.C. előtt',
-				'1' => 'R.O.C.'
-			},
-			wide => {
-				'0' => 'R.O.C. előtt',
-				'1' => 'R.O.C.'
+				'0' => 'R.O.C. előtt'
 			},
 		},
 	} },
@@ -11322,8 +8089,6 @@ has 'date_formats' => (
 		},
 		'coptic' => {
 		},
-		'ethiopic' => {
-		},
 		'generic' => {
 			'full' => q{G y. MMMM d., EEEE},
 			'long' => q{G y. MMMM d.},
@@ -11337,8 +8102,6 @@ has 'date_formats' => (
 			'short' => q{y. MM. dd.},
 		},
 		'hebrew' => {
-		},
-		'indian' => {
 		},
 		'islamic' => {
 		},
@@ -11366,8 +8129,6 @@ has 'time_formats' => (
 		},
 		'coptic' => {
 		},
-		'ethiopic' => {
-		},
 		'generic' => {
 		},
 		'gregorian' => {
@@ -11377,8 +8138,6 @@ has 'time_formats' => (
 			'short' => q{H:mm},
 		},
 		'hebrew' => {
-		},
-		'indian' => {
 		},
 		'islamic' => {
 		},
@@ -11402,8 +8161,6 @@ has 'datetime_formats' => (
 		},
 		'coptic' => {
 		},
-		'ethiopic' => {
-		},
 		'generic' => {
 			'full' => q{{1} {0}},
 			'long' => q{{1} {0}},
@@ -11417,8 +8174,6 @@ has 'datetime_formats' => (
 			'short' => q{{1} {0}},
 		},
 		'hebrew' => {
-		},
-		'indian' => {
 		},
 		'islamic' => {
 		},
@@ -11440,11 +8195,8 @@ has 'datetime_formats_available_formats' => (
 			Bh => q{B h},
 			Bhm => q{B h:mm},
 			Bhms => q{B h:mm:ss},
-			E => q{ccc},
 			EBhm => q{E h:mm},
 			EBhms => q{E h:mm:ss},
-			EHm => q{E HH:mm},
-			EHms => q{E HH:mm:ss},
 			Ed => q{d., E},
 			Ehm => q{E h:mm},
 			Ehms => q{E h:mm:ss},
@@ -11456,18 +8208,14 @@ has 'datetime_formats_available_formats' => (
 			H => q{H},
 			Hm => q{H:mm},
 			Hms => q{H:mm:ss},
-			M => q{L},
 			MEd => q{M. d., E},
-			MMM => q{LLL},
 			MMMEd => q{MMM d., E},
 			MMMMd => q{MMMM d.},
 			MMMd => q{MMM d.},
 			Md => q{M. d.},
-			d => q{d},
-			h => q{a h},
-			hm => q{a h:mm},
-			hms => q{a h:mm:ss},
-			ms => q{mm:ss},
+			h => q{a h},
+			hm => q{a h:mm},
+			hms => q{a h:mm:ss},
 			y => q{G y.},
 			yyyy => q{G y.},
 			yyyyM => q{G y. MM.},
@@ -11484,14 +8232,11 @@ has 'datetime_formats_available_formats' => (
 			Bh => q{B h},
 			Bhm => q{B h:mm},
 			Bhms => q{B h:mm:ss},
-			E => q{ccc},
 			EBhm => q{E B h:mm},
 			EBhms => q{E B h:mm:ss},
-			EHm => q{E HH:mm},
-			EHms => q{E HH:mm:ss},
 			Ed => q{d., E},
-			Ehm => q{E h:mm a},
-			Ehms => q{E h:mm:ss a},
+			Ehm => q{E h:mm a},
+			Ehms => q{E h:mm:ss a},
 			Gy => q{G y.},
 			GyMMM => q{G y. MMM},
 			GyMMMEd => q{G y. MMM d., E},
@@ -11500,24 +8245,18 @@ has 'datetime_formats_available_formats' => (
 			H => q{H},
 			Hm => q{H:mm},
 			Hms => q{H:mm:ss},
-			Hmsv => q{HH:mm:ss v},
-			Hmv => q{HH:mm v},
-			M => q{L},
 			MEd => q{M. d., E},
-			MMM => q{LLL},
 			MMMEd => q{MMM d., E},
 			MMMMW => q{MMMM W. 'hete'},
 			MMMMd => q{MMMM d.},
 			MMMd => q{MMM d.},
 			Md => q{M. d.},
-			d => q{d},
-			h => q{a h},
-			hm => q{a h:mm},
-			hms => q{a h:mm:ss},
-			hmsv => q{a h:mm:ss v},
-			hmv => q{a h:mm v},
+			h => q{a h},
+			hm => q{a h:mm},
+			hms => q{a h:mm:ss},
+			hmsv => q{a h:mm:ss v},
+			hmv => q{a h:mm v},
 			mmss => q{mm:ss},
-			ms => q{mm:ss},
 			y => q{y.},
 			yM => q{y. M.},
 			yMEd => q{y. MM. dd., E},
@@ -11538,9 +8277,6 @@ has 'datetime_formats_append_item' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			'Timezone' => '{0} {1}',
-		},
 	} },
 );
 
@@ -11551,7 +8287,7 @@ has 'datetime_formats_interval' => (
 	default		=> sub { {
 		'generic' => {
 			Bhm => {
-				m => q{h:mm – h:mm B},
+				m => q{h:mm – h:mm B},
 			},
 			H => {
 				H => q{H–H},
@@ -11571,80 +8307,79 @@ has 'datetime_formats_interval' => (
 				M => q{M–M.},
 			},
 			MEd => {
-				M => q{MM. dd., E – MM. dd., E},
-				d => q{MM. dd., E – MM. dd., E},
+				M => q{MM. dd., E – MM. dd., E},
+				d => q{MM. dd., E – MM. dd., E},
 			},
 			MMM => {
 				M => q{MMM–MMM},
 			},
 			MMMEd => {
-				M => q{MMM d., E – MMM d., E},
-				d => q{MMM d., E – d., E},
+				M => q{MMM d., E – MMM d., E},
+				d => q{MMM d., E – d., E},
 			},
 			MMMd => {
-				M => q{MMM d. – MMM d.},
+				M => q{MMM d. – MMM d.},
 				d => q{MMM d–d.},
 			},
 			Md => {
-				M => q{MM. dd. – MM. dd.},
+				M => q{MM. dd. – MM. dd.},
 				d => q{MM. dd–dd.},
 			},
 			d => {
 				d => q{d–d.},
 			},
-			fallback => '{0} – {1}',
 			h => {
-				a => q{a h – a h},
-				h => q{a h–h},
+				a => q{a h – a h},
+				h => q{a h–h},
 			},
 			hm => {
-				a => q{a h:mm – a h:mm},
-				h => q{a h:mm–h:mm},
-				m => q{a h:mm–h:mm},
+				a => q{a h:mm – a h:mm},
+				h => q{a h:mm–h:mm},
+				m => q{a h:mm–h:mm},
 			},
 			hmv => {
-				a => q{a h:mm – a h:mm v},
-				h => q{a h:mm–h:mm v},
-				m => q{a h:mm–h:mm v},
+				a => q{a h:mm – a h:mm v},
+				h => q{a h:mm–h:mm v},
+				m => q{a h:mm–h:mm v},
 			},
 			hv => {
-				a => q{a h – a h v},
-				h => q{a h–h v},
+				a => q{a h – a h v},
+				h => q{a h–h v},
 			},
 			y => {
 				y => q{G y–y.},
 			},
 			yM => {
 				M => q{G y. MM–MM.},
-				y => q{G y. MM. – y. MM.},
+				y => q{G y. MM. – y. MM.},
 			},
 			yMEd => {
-				M => q{G y. MM. dd., E – MM. dd., E},
-				d => q{G y. MM. dd., E – dd., E},
-				y => q{G y. MM. dd., E – y. MM. dd., E},
+				M => q{G y. MM. dd., E – MM. dd., E},
+				d => q{G y. MM. dd., E – dd., E},
+				y => q{G y. MM. dd., E – y. MM. dd., E},
 			},
 			yMMM => {
 				M => q{G y. MMM–MMM},
-				y => q{G y. MMM – y. MMM},
+				y => q{G y. MMM – y. MMM},
 			},
 			yMMMEd => {
-				M => q{G y. MMM d., E – MMM d., E},
-				d => q{G y. MMM d., E – MMM d., E},
-				y => q{G y. MMM d., E – y. MMM d., E},
+				M => q{G y. MMM d., E – MMM d., E},
+				d => q{G y. MMM d., E – MMM d., E},
+				y => q{G y. MMM d., E – y. MMM d., E},
 			},
 			yMMMM => {
 				M => q{G y. MMMM–MMMM},
-				y => q{G y. MMMM – y. MMMM},
+				y => q{G y. MMMM – y. MMMM},
 			},
 			yMMMd => {
-				M => q{G y. MMM d. – MMM d.},
+				M => q{G y. MMM d. – MMM d.},
 				d => q{G y. MMM d–d.},
-				y => q{G y. MMM d. – y. MMM d.},
+				y => q{G y. MMM d. – y. MMM d.},
 			},
 			yMd => {
-				M => q{G y. MM. dd. – MM. dd.},
+				M => q{G y. MM. dd. – MM. dd.},
 				d => q{G y. MM. dd–dd.},
-				y => q{G y. MM. dd. – y. MM. dd.},
+				y => q{G y. MM. dd. – y. MM. dd.},
 			},
 		},
 		'gregorian' => {
@@ -11666,80 +8401,76 @@ has 'datetime_formats_interval' => (
 				M => q{M–M.},
 			},
 			MEd => {
-				M => q{M. d., E – M. d., E},
-				d => q{M. dd., E – M. d., E},
+				M => q{M. d., E – M. d., E},
+				d => q{M. dd., E – M. d., E},
 			},
 			MMM => {
 				M => q{MMM–MMM},
 			},
 			MMMEd => {
-				M => q{MMM d., E – MMM d., E},
-				d => q{MMM d., E – d., E},
+				M => q{MMM d., E – MMM d., E},
+				d => q{MMM d., E – d., E},
 			},
 			MMMd => {
-				M => q{MMM d. – MMM d.},
+				M => q{MMM d. – MMM d.},
 				d => q{MMM d–d.},
 			},
 			Md => {
-				M => q{M. d. – M. d.},
+				M => q{M. d. – M. d.},
 				d => q{M. d–d.},
 			},
 			d => {
 				d => q{d–d.},
 			},
-			fallback => '{0} – {1}',
 			h => {
-				a => q{a h – a h},
-				h => q{a h–h},
+				a => q{a h – a h},
+				h => q{a h–h},
 			},
 			hm => {
-				a => q{a h:mm – a h:mm},
-				h => q{a h:mm–h:mm},
-				m => q{a h:mm–h:mm},
+				a => q{a h:mm – a h:mm},
+				h => q{a h:mm–h:mm},
+				m => q{a h:mm–h:mm},
 			},
 			hmv => {
-				a => q{a h:mm – a h:mm v},
-				h => q{a h:mm–h:mm v},
-				m => q{a h:mm–h:mm v},
+				a => q{a h:mm – a h:mm v},
+				h => q{a h:mm–h:mm v},
+				m => q{a h:mm–h:mm v},
 			},
 			hv => {
-				a => q{a h – a h v},
-				h => q{a h–h v},
-			},
-			y => {
-				y => q{y–y},
+				a => q{a h – a h v},
+				h => q{a h–h v},
 			},
 			yM => {
 				M => q{y. MM–MM.},
-				y => q{y. MM. – y. MM.},
+				y => q{y. MM. – y. MM.},
 			},
 			yMEd => {
-				M => q{y. MM. dd., E – MM. dd., E},
-				d => q{y. MM. dd., E – dd., E},
-				y => q{y. MM. dd., E – y. MM. dd., E},
+				M => q{y. MM. dd., E – MM. dd., E},
+				d => q{y. MM. dd., E – dd., E},
+				y => q{y. MM. dd., E – y. MM. dd., E},
 			},
 			yMMM => {
 				M => q{y. MMM–MMM},
-				y => q{y. MMM – y. MMM},
+				y => q{y. MMM – y. MMM},
 			},
 			yMMMEd => {
-				M => q{y. MMM d., E – MMM d., E},
-				d => q{y. MMM d., E – d., E},
-				y => q{y. MMM d., E – y. MMM d., E},
+				M => q{y. MMM d., E – MMM d., E},
+				d => q{y. MMM d., E – d., E},
+				y => q{y. MMM d., E – y. MMM d., E},
 			},
 			yMMMM => {
 				M => q{y. MMMM–MMMM},
-				y => q{y. MMMM – y. MMMM},
+				y => q{y. MMMM – y. MMMM},
 			},
 			yMMMd => {
-				M => q{y. MMM d. – MMM d.},
+				M => q{y. MMM d. – MMM d.},
 				d => q{y. MMM d–d.},
-				y => q{y. MMM d. – y. MMM d.},
+				y => q{y. MMM d. – y. MMM d.},
 			},
 			yMd => {
-				M => q{y. MM. dd. – MM. dd.},
+				M => q{y. MM. dd. – MM. dd.},
 				d => q{y. MM. dd–dd.},
-				y => q{y. MM. dd. – y. MM. dd.},
+				y => q{y. MM. dd. – y. MM. dd.},
 			},
 		},
 	} },
@@ -11767,13 +8498,9 @@ has 'time_zone_names' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default	=> sub { {
-		hourFormat => q(+HH:mm;-HH:mm),
-		gmtFormat => q(GMT{0}),
-		gmtZeroFormat => q(GMT),
 		regionFormat => q({0} idő),
 		regionFormat => q({0} nyári idő),
 		regionFormat => q({0} zónaidő),
-		fallbackFormat => q({1} ({0})),
 		'Acre' => {
 			long => {
 				'daylight' => q#Acre nyári idő#,
@@ -11786,12 +8513,6 @@ has 'time_zone_names' => (
 				'standard' => q#afganisztáni idő#,
 			},
 		},
-		'Africa/Abidjan' => {
-			exemplarCity => q#Abidjan#,
-		},
-		'Africa/Accra' => {
-			exemplarCity => q#Accra#,
-		},
 		'Africa/Addis_Ababa' => {
 			exemplarCity => q#Addisz-Abeba#,
 		},
@@ -11801,41 +8522,8 @@ has 'time_zone_names' => (
 		'Africa/Asmera' => {
 			exemplarCity => q#Asmera#,
 		},
-		'Africa/Bamako' => {
-			exemplarCity => q#Bamako#,
-		},
-		'Africa/Bangui' => {
-			exemplarCity => q#Bangui#,
-		},
-		'Africa/Banjul' => {
-			exemplarCity => q#Banjul#,
-		},
-		'Africa/Bissau' => {
-			exemplarCity => q#Bissau#,
-		},
-		'Africa/Blantyre' => {
-			exemplarCity => q#Blantyre#,
-		},
-		'Africa/Brazzaville' => {
-			exemplarCity => q#Brazzaville#,
-		},
-		'Africa/Bujumbura' => {
-			exemplarCity => q#Bujumbura#,
-		},
 		'Africa/Cairo' => {
 			exemplarCity => q#Kairó#,
-		},
-		'Africa/Casablanca' => {
-			exemplarCity => q#Casablanca#,
-		},
-		'Africa/Ceuta' => {
-			exemplarCity => q#Ceuta#,
-		},
-		'Africa/Conakry' => {
-			exemplarCity => q#Conakry#,
-		},
-		'Africa/Dakar' => {
-			exemplarCity => q#Dakar#,
 		},
 		'Africa/Dar_es_Salaam' => {
 			exemplarCity => q#Dar es-Salaam#,
@@ -11843,104 +8531,20 @@ has 'time_zone_names' => (
 		'Africa/Djibouti' => {
 			exemplarCity => q#Dzsibuti#,
 		},
-		'Africa/Douala' => {
-			exemplarCity => q#Douala#,
-		},
 		'Africa/El_Aaiun' => {
 			exemplarCity => q#El-Ajún#,
-		},
-		'Africa/Freetown' => {
-			exemplarCity => q#Freetown#,
-		},
-		'Africa/Gaborone' => {
-			exemplarCity => q#Gaborone#,
-		},
-		'Africa/Harare' => {
-			exemplarCity => q#Harare#,
-		},
-		'Africa/Johannesburg' => {
-			exemplarCity => q#Johannesburg#,
-		},
-		'Africa/Juba' => {
-			exemplarCity => q#Juba#,
-		},
-		'Africa/Kampala' => {
-			exemplarCity => q#Kampala#,
 		},
 		'Africa/Khartoum' => {
 			exemplarCity => q#Kartúm#,
 		},
-		'Africa/Kigali' => {
-			exemplarCity => q#Kigali#,
-		},
-		'Africa/Kinshasa' => {
-			exemplarCity => q#Kinshasa#,
-		},
-		'Africa/Lagos' => {
-			exemplarCity => q#Lagos#,
-		},
-		'Africa/Libreville' => {
-			exemplarCity => q#Libreville#,
-		},
-		'Africa/Lome' => {
-			exemplarCity => q#Lome#,
-		},
-		'Africa/Luanda' => {
-			exemplarCity => q#Luanda#,
-		},
-		'Africa/Lubumbashi' => {
-			exemplarCity => q#Lubumbashi#,
-		},
-		'Africa/Lusaka' => {
-			exemplarCity => q#Lusaka#,
-		},
 		'Africa/Malabo' => {
 			exemplarCity => q#Malabó#,
-		},
-		'Africa/Maputo' => {
-			exemplarCity => q#Maputo#,
-		},
-		'Africa/Maseru' => {
-			exemplarCity => q#Maseru#,
-		},
-		'Africa/Mbabane' => {
-			exemplarCity => q#Mbabane#,
-		},
-		'Africa/Mogadishu' => {
-			exemplarCity => q#Mogadishu#,
-		},
-		'Africa/Monrovia' => {
-			exemplarCity => q#Monrovia#,
-		},
-		'Africa/Nairobi' => {
-			exemplarCity => q#Nairobi#,
-		},
-		'Africa/Ndjamena' => {
-			exemplarCity => q#Ndjamena#,
-		},
-		'Africa/Niamey' => {
-			exemplarCity => q#Niamey#,
-		},
-		'Africa/Nouakchott' => {
-			exemplarCity => q#Nouakchott#,
-		},
-		'Africa/Ouagadougou' => {
-			exemplarCity => q#Ouagadougou#,
-		},
-		'Africa/Porto-Novo' => {
-			exemplarCity => q#Porto-Novo#,
 		},
 		'Africa/Sao_Tome' => {
 			exemplarCity => q#São Tomé#,
 		},
-		'Africa/Tripoli' => {
-			exemplarCity => q#Tripoli#,
-		},
 		'Africa/Tunis' => {
 			exemplarCity => q#Tunisz#,
-		},
-		'Africa/Windhoek' => {
-			exemplarCity => q#Windhoek#,
 		},
 		'Africa_Central' => {
 			long => {
@@ -11985,116 +8589,32 @@ has 'time_zone_names' => (
 				'standard' => q#amazóniai téli idő#,
 			},
 		},
-		'America/Adak' => {
-			exemplarCity => q#Adak#,
-		},
-		'America/Anchorage' => {
-			exemplarCity => q#Anchorage#,
-		},
-		'America/Anguilla' => {
-			exemplarCity => q#Anguilla#,
-		},
-		'America/Antigua' => {
-			exemplarCity => q#Antigua#,
-		},
 		'America/Araguaina' => {
 			exemplarCity => q#Araguaína#,
-		},
-		'America/Argentina/La_Rioja' => {
-			exemplarCity => q#La Rioja#,
 		},
 		'America/Argentina/Rio_Gallegos' => {
 			exemplarCity => q#Río Gallegos#,
 		},
-		'America/Argentina/Salta' => {
-			exemplarCity => q#Salta#,
-		},
-		'America/Argentina/San_Juan' => {
-			exemplarCity => q#San Juan#,
-		},
-		'America/Argentina/San_Luis' => {
-			exemplarCity => q#San Luis#,
-		},
 		'America/Argentina/Tucuman' => {
 			exemplarCity => q#Tucumán#,
-		},
-		'America/Argentina/Ushuaia' => {
-			exemplarCity => q#Ushuaia#,
-		},
-		'America/Aruba' => {
-			exemplarCity => q#Aruba#,
 		},
 		'America/Asuncion' => {
 			exemplarCity => q#Asunción#,
 		},
-		'America/Bahia' => {
-			exemplarCity => q#Bahia#,
-		},
 		'America/Bahia_Banderas' => {
 			exemplarCity => q#Bahia Banderas#,
-		},
-		'America/Barbados' => {
-			exemplarCity => q#Barbados#,
 		},
 		'America/Belem' => {
 			exemplarCity => q#Belém#,
 		},
-		'America/Belize' => {
-			exemplarCity => q#Belize#,
-		},
-		'America/Blanc-Sablon' => {
-			exemplarCity => q#Blanc-Sablon#,
-		},
-		'America/Boa_Vista' => {
-			exemplarCity => q#Boa Vista#,
-		},
 		'America/Bogota' => {
 			exemplarCity => q#Bogotá#,
-		},
-		'America/Boise' => {
-			exemplarCity => q#Boise#,
-		},
-		'America/Buenos_Aires' => {
-			exemplarCity => q#Buenos Aires#,
-		},
-		'America/Cambridge_Bay' => {
-			exemplarCity => q#Cambridge Bay#,
-		},
-		'America/Campo_Grande' => {
-			exemplarCity => q#Campo Grande#,
-		},
-		'America/Cancun' => {
-			exemplarCity => q#Cancún#,
-		},
-		'America/Caracas' => {
-			exemplarCity => q#Caracas#,
-		},
-		'America/Catamarca' => {
-			exemplarCity => q#Catamarca#,
-		},
-		'America/Cayenne' => {
-			exemplarCity => q#Cayenne#,
 		},
 		'America/Cayman' => {
 			exemplarCity => q#Kajmán-szigetek#,
 		},
-		'America/Chicago' => {
-			exemplarCity => q#Chicago#,
-		},
-		'America/Chihuahua' => {
-			exemplarCity => q#Chihuahua#,
-		},
-		'America/Coral_Harbour' => {
-			exemplarCity => q#Atikokan#,
-		},
 		'America/Cordoba' => {
 			exemplarCity => q#Córdoba#,
-		},
-		'America/Costa_Rica' => {
-			exemplarCity => q#Costa Rica#,
-		},
-		'America/Creston' => {
-			exemplarCity => q#Creston#,
 		},
 		'America/Cuiaba' => {
 			exemplarCity => q#Cuiabá#,
@@ -12102,26 +8622,8 @@ has 'time_zone_names' => (
 		'America/Curacao' => {
 			exemplarCity => q#Curaçao#,
 		},
-		'America/Danmarkshavn' => {
-			exemplarCity => q#Danmarkshavn#,
-		},
-		'America/Dawson' => {
-			exemplarCity => q#Dawson#,
-		},
-		'America/Dawson_Creek' => {
-			exemplarCity => q#Dawson Creek#,
-		},
-		'America/Denver' => {
-			exemplarCity => q#Denver#,
-		},
-		'America/Detroit' => {
-			exemplarCity => q#Detroit#,
-		},
 		'America/Dominica' => {
 			exemplarCity => q#Dominika#,
-		},
-		'America/Edmonton' => {
-			exemplarCity => q#Edmonton#,
 		},
 		'America/Eirunepe' => {
 			exemplarCity => q#Eirunepé#,
@@ -12129,173 +8631,17 @@ has 'time_zone_names' => (
 		'America/El_Salvador' => {
 			exemplarCity => q#Salvador#,
 		},
-		'America/Fort_Nelson' => {
-			exemplarCity => q#Fort Nelson#,
-		},
-		'America/Fortaleza' => {
-			exemplarCity => q#Fortaleza#,
-		},
-		'America/Glace_Bay' => {
-			exemplarCity => q#Glace Bay#,
-		},
-		'America/Godthab' => {
-			exemplarCity => q#Nuuk#,
-		},
-		'America/Goose_Bay' => {
-			exemplarCity => q#Goose Bay#,
-		},
-		'America/Grand_Turk' => {
-			exemplarCity => q#Grand Turk#,
-		},
-		'America/Grenada' => {
-			exemplarCity => q#Grenada#,
-		},
-		'America/Guadeloupe' => {
-			exemplarCity => q#Guadeloupe#,
-		},
-		'America/Guatemala' => {
-			exemplarCity => q#Guatemala#,
-		},
-		'America/Guayaquil' => {
-			exemplarCity => q#Guayaquil#,
-		},
-		'America/Guyana' => {
-			exemplarCity => q#Guyana#,
-		},
-		'America/Halifax' => {
-			exemplarCity => q#Halifax#,
-		},
 		'America/Havana' => {
 			exemplarCity => q#Havanna#,
-		},
-		'America/Hermosillo' => {
-			exemplarCity => q#Hermosillo#,
-		},
-		'America/Indiana/Knox' => {
-			exemplarCity => q#Knox, Indiana#,
-		},
-		'America/Indiana/Marengo' => {
-			exemplarCity => q#Marengo, Indiana#,
-		},
-		'America/Indiana/Petersburg' => {
-			exemplarCity => q#Petersburg, Indiana#,
-		},
-		'America/Indiana/Tell_City' => {
-			exemplarCity => q#Tell City, Indiana#,
-		},
-		'America/Indiana/Vevay' => {
-			exemplarCity => q#Vevay, Indiana#,
-		},
-		'America/Indiana/Vincennes' => {
-			exemplarCity => q#Vincennes, Indiana#,
-		},
-		'America/Indiana/Winamac' => {
-			exemplarCity => q#Winamac, Indiana#,
-		},
-		'America/Indianapolis' => {
-			exemplarCity => q#Indianapolis#,
-		},
-		'America/Inuvik' => {
-			exemplarCity => q#Inuvik#,
-		},
-		'America/Iqaluit' => {
-			exemplarCity => q#Iqaluit#,
-		},
-		'America/Jamaica' => {
-			exemplarCity => q#Jamaica#,
-		},
-		'America/Jujuy' => {
-			exemplarCity => q#Jujuy#,
-		},
-		'America/Juneau' => {
-			exemplarCity => q#Juneau#,
-		},
-		'America/Kentucky/Monticello' => {
-			exemplarCity => q#Monticello, Kentucky#,
-		},
-		'America/Kralendijk' => {
-			exemplarCity => q#Kralendijk#,
-		},
-		'America/La_Paz' => {
-			exemplarCity => q#La Paz#,
-		},
-		'America/Lima' => {
-			exemplarCity => q#Lima#,
-		},
-		'America/Los_Angeles' => {
-			exemplarCity => q#Los Angeles#,
-		},
-		'America/Louisville' => {
-			exemplarCity => q#Louisville#,
-		},
-		'America/Lower_Princes' => {
-			exemplarCity => q#Lower Prince’s Quarter#,
 		},
 		'America/Maceio' => {
 			exemplarCity => q#Maceió#,
 		},
-		'America/Managua' => {
-			exemplarCity => q#Managua#,
-		},
-		'America/Manaus' => {
-			exemplarCity => q#Manaus#,
-		},
-		'America/Marigot' => {
-			exemplarCity => q#Marigot#,
-		},
-		'America/Martinique' => {
-			exemplarCity => q#Martinique#,
-		},
-		'America/Matamoros' => {
-			exemplarCity => q#Matamoros#,
-		},
 		'America/Mazatlan' => {
 			exemplarCity => q#Mazatlán#,
 		},
-		'America/Mendoza' => {
-			exemplarCity => q#Mendoza#,
-		},
-		'America/Menominee' => {
-			exemplarCity => q#Menominee#,
-		},
-		'America/Merida' => {
-			exemplarCity => q#Mérida#,
-		},
-		'America/Metlakatla' => {
-			exemplarCity => q#Metlakatla#,
-		},
 		'America/Mexico_City' => {
 			exemplarCity => q#Mexikóváros#,
-		},
-		'America/Miquelon' => {
-			exemplarCity => q#Miquelon#,
-		},
-		'America/Moncton' => {
-			exemplarCity => q#Moncton#,
-		},
-		'America/Monterrey' => {
-			exemplarCity => q#Monterrey#,
-		},
-		'America/Montevideo' => {
-			exemplarCity => q#Montevideo#,
-		},
-		'America/Montserrat' => {
-			exemplarCity => q#Montserrat#,
-		},
-		'America/Nassau' => {
-			exemplarCity => q#Nassau#,
-		},
-		'America/New_York' => {
-			exemplarCity => q#New York#,
-		},
-		'America/Nipigon' => {
-			exemplarCity => q#Nipigon#,
-		},
-		'America/Nome' => {
-			exemplarCity => q#Nome#,
-		},
-		'America/Noronha' => {
-			exemplarCity => q#Noronha#,
 		},
 		'America/North_Dakota/Beulah' => {
 			exemplarCity => q#Beulah, Észak-Dakota#,
@@ -12306,128 +8652,17 @@ has 'time_zone_names' => (
 		'America/North_Dakota/New_Salem' => {
 			exemplarCity => q#New Salem, Észak-Dakota#,
 		},
-		'America/Ojinaga' => {
-			exemplarCity => q#Ojinaga#,
-		},
-		'America/Panama' => {
-			exemplarCity => q#Panama#,
-		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#Pangnirtung#,
-		},
-		'America/Paramaribo' => {
-			exemplarCity => q#Paramaribo#,
-		},
-		'America/Phoenix' => {
-			exemplarCity => q#Phoenix#,
-		},
-		'America/Port-au-Prince' => {
-			exemplarCity => q#Port-au-Prince#,
-		},
-		'America/Port_of_Spain' => {
-			exemplarCity => q#Port of Spain#,
-		},
-		'America/Porto_Velho' => {
-			exemplarCity => q#Porto Velho#,
-		},
-		'America/Puerto_Rico' => {
-			exemplarCity => q#Puerto Rico#,
-		},
-		'America/Punta_Arenas' => {
-			exemplarCity => q#Punta Arenas#,
-		},
-		'America/Rainy_River' => {
-			exemplarCity => q#Rainy River#,
-		},
-		'America/Rankin_Inlet' => {
-			exemplarCity => q#Rankin Inlet#,
-		},
-		'America/Recife' => {
-			exemplarCity => q#Recife#,
-		},
-		'America/Regina' => {
-			exemplarCity => q#Regina#,
-		},
-		'America/Resolute' => {
-			exemplarCity => q#Resolute#,
-		},
 		'America/Rio_Branco' => {
 			exemplarCity => q#Río Branco#,
 		},
 		'America/Santa_Isabel' => {
 			exemplarCity => q#Santa Isabel#,
 		},
-		'America/Santarem' => {
-			exemplarCity => q#Santarem#,
-		},
-		'America/Santiago' => {
-			exemplarCity => q#Santiago#,
-		},
-		'America/Santo_Domingo' => {
-			exemplarCity => q#Santo Domingo#,
-		},
 		'America/Sao_Paulo' => {
 			exemplarCity => q#São Paulo#,
 		},
-		'America/Scoresbysund' => {
-			exemplarCity => q#Ittoqqortoormiit#,
-		},
-		'America/Sitka' => {
-			exemplarCity => q#Sitka#,
-		},
 		'America/St_Barthelemy' => {
 			exemplarCity => q#Saint-Barthélemy#,
-		},
-		'America/St_Johns' => {
-			exemplarCity => q#St. John’s#,
-		},
-		'America/St_Kitts' => {
-			exemplarCity => q#St. Kitts#,
-		},
-		'America/St_Lucia' => {
-			exemplarCity => q#St. Lucia#,
-		},
-		'America/St_Thomas' => {
-			exemplarCity => q#St. Thomas#,
-		},
-		'America/St_Vincent' => {
-			exemplarCity => q#St. Vincent#,
-		},
-		'America/Swift_Current' => {
-			exemplarCity => q#Swift Current#,
-		},
-		'America/Tegucigalpa' => {
-			exemplarCity => q#Tegucigalpa#,
-		},
-		'America/Thule' => {
-			exemplarCity => q#Thule#,
-		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#Thunder Bay#,
-		},
-		'America/Tijuana' => {
-			exemplarCity => q#Tijuana#,
-		},
-		'America/Toronto' => {
-			exemplarCity => q#Toronto#,
-		},
-		'America/Tortola' => {
-			exemplarCity => q#Tortola#,
-		},
-		'America/Vancouver' => {
-			exemplarCity => q#Vancouver#,
-		},
-		'America/Whitehorse' => {
-			exemplarCity => q#Whitehorse#,
-		},
-		'America/Winnipeg' => {
-			exemplarCity => q#Winnipeg#,
-		},
-		'America/Yakutat' => {
-			exemplarCity => q#Yakutat#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#Yellowknife#,
 		},
 		'America_Central' => {
 			long => {
@@ -12464,36 +8699,6 @@ has 'time_zone_names' => (
 				'standard' => q#Anadíri zónaidő#,
 			},
 		},
-		'Antarctica/Casey' => {
-			exemplarCity => q#Casey#,
-		},
-		'Antarctica/Davis' => {
-			exemplarCity => q#Davis#,
-		},
-		'Antarctica/DumontDUrville' => {
-			exemplarCity => q#Dumont d’Urville#,
-		},
-		'Antarctica/Macquarie' => {
-			exemplarCity => q#Macquarie#,
-		},
-		'Antarctica/Mawson' => {
-			exemplarCity => q#Mawson#,
-		},
-		'Antarctica/McMurdo' => {
-			exemplarCity => q#McMurdo#,
-		},
-		'Antarctica/Palmer' => {
-			exemplarCity => q#Palmer#,
-		},
-		'Antarctica/Rothera' => {
-			exemplarCity => q#Rothera#,
-		},
-		'Antarctica/Syowa' => {
-			exemplarCity => q#Syowa#,
-		},
-		'Antarctica/Troll' => {
-			exemplarCity => q#Troll#,
-		},
 		'Antarctica/Vostok' => {
 			exemplarCity => q#Vosztok#,
 		},
@@ -12524,9 +8729,6 @@ has 'time_zone_names' => (
 				'generic' => q#arab idő#,
 				'standard' => q#arab téli idő#,
 			},
-		},
-		'Arctic/Longyearbyen' => {
-			exemplarCity => q#Longyearbyen#,
 		},
 		'Argentina' => {
 			long => {
@@ -12579,23 +8781,11 @@ has 'time_zone_names' => (
 		'Asia/Bahrain' => {
 			exemplarCity => q#Bahrein#,
 		},
-		'Asia/Baku' => {
-			exemplarCity => q#Baku#,
-		},
-		'Asia/Bangkok' => {
-			exemplarCity => q#Bangkok#,
-		},
-		'Asia/Barnaul' => {
-			exemplarCity => q#Barnaul#,
-		},
 		'Asia/Beirut' => {
 			exemplarCity => q#Bejrút#,
 		},
 		'Asia/Bishkek' => {
 			exemplarCity => q#Biskek#,
-		},
-		'Asia/Brunei' => {
-			exemplarCity => q#Brunei#,
 		},
 		'Asia/Calcutta' => {
 			exemplarCity => q#Kalkutta#,
@@ -12606,53 +8796,29 @@ has 'time_zone_names' => (
 		'Asia/Choibalsan' => {
 			exemplarCity => q#Csojbalszan#,
 		},
-		'Asia/Colombo' => {
-			exemplarCity => q#Colombo#,
-		},
 		'Asia/Damascus' => {
 			exemplarCity => q#Damaszkusz#,
 		},
 		'Asia/Dhaka' => {
 			exemplarCity => q#Dakka#,
 		},
-		'Asia/Dili' => {
-			exemplarCity => q#Dili#,
-		},
 		'Asia/Dubai' => {
-			exemplarCity => q#Dubai#,
+			exemplarCity => q#Dubaj#,
 		},
 		'Asia/Dushanbe' => {
-			exemplarCity => q#Dushanbe#,
-		},
-		'Asia/Famagusta' => {
-			exemplarCity => q#Famagusta#,
+			exemplarCity => q#Dusanbe#,
 		},
 		'Asia/Gaza' => {
 			exemplarCity => q#Gáza#,
 		},
-		'Asia/Hebron' => {
-			exemplarCity => q#Hebron#,
-		},
 		'Asia/Hong_Kong' => {
 			exemplarCity => q#Hongkong#,
-		},
-		'Asia/Hovd' => {
-			exemplarCity => q#Hovd#,
 		},
 		'Asia/Irkutsk' => {
 			exemplarCity => q#Irkutszk#,
 		},
-		'Asia/Jakarta' => {
-			exemplarCity => q#Jakarta#,
-		},
-		'Asia/Jayapura' => {
-			exemplarCity => q#Jayapura#,
-		},
 		'Asia/Jerusalem' => {
 			exemplarCity => q#Jeruzsálem#,
-		},
-		'Asia/Kabul' => {
-			exemplarCity => q#Kabul#,
 		},
 		'Asia/Kamchatka' => {
 			exemplarCity => q#Kamcsatka#,
@@ -12669,9 +8835,6 @@ has 'time_zone_names' => (
 		'Asia/Krasnoyarsk' => {
 			exemplarCity => q#Krasznojarszk#,
 		},
-		'Asia/Kuala_Lumpur' => {
-			exemplarCity => q#Kuala Lumpur#,
-		},
 		'Asia/Kuching' => {
 			exemplarCity => q#Kucseng#,
 		},
@@ -12687,14 +8850,8 @@ has 'time_zone_names' => (
 		'Asia/Makassar' => {
 			exemplarCity => q#Makasar#,
 		},
-		'Asia/Manila' => {
-			exemplarCity => q#Manila#,
-		},
 		'Asia/Muscat' => {
-			exemplarCity => q#Muscat#,
-		},
-		'Asia/Nicosia' => {
-			exemplarCity => q#Nicosia#,
+			exemplarCity => q#Maszkat#,
 		},
 		'Asia/Novokuznetsk' => {
 			exemplarCity => q#Novokuznyeck#,
@@ -12704,15 +8861,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Omsk' => {
 			exemplarCity => q#Omszk#,
-		},
-		'Asia/Oral' => {
-			exemplarCity => q#Oral#,
-		},
-		'Asia/Phnom_Penh' => {
-			exemplarCity => q#Phnom Penh#,
-		},
-		'Asia/Pontianak' => {
-			exemplarCity => q#Pontianak#,
 		},
 		'Asia/Pyongyang' => {
 			exemplarCity => q#Phenjan#,
@@ -12725,9 +8873,6 @@ has 'time_zone_names' => (
 		},
 		'Asia/Qyzylorda' => {
 			exemplarCity => q#Kizilorda#,
-		},
-		'Asia/Rangoon' => {
-			exemplarCity => q#Yangon#,
 		},
 		'Asia/Riyadh' => {
 			exemplarCity => q#Rijád#,
@@ -12766,7 +8911,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Teherán#,
 		},
 		'Asia/Thimphu' => {
-			exemplarCity => q#Thimphu#,
+			exemplarCity => q#Timpu#,
 		},
 		'Asia/Tokyo' => {
 			exemplarCity => q#Tokió#,
@@ -12778,7 +8923,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Ulánbátor#,
 		},
 		'Asia/Urumqi' => {
-			exemplarCity => q#Ürümqi#,
+			exemplarCity => q#Ürümcsi#,
 		},
 		'Asia/Ust-Nera' => {
 			exemplarCity => q#Uszty-Nyera#,
@@ -12808,9 +8953,6 @@ has 'time_zone_names' => (
 		'Atlantic/Azores' => {
 			exemplarCity => q#Azori-szigetek#,
 		},
-		'Atlantic/Bermuda' => {
-			exemplarCity => q#Bermuda#,
-		},
 		'Atlantic/Canary' => {
 			exemplarCity => q#Kanári-szigetek#,
 		},
@@ -12819,9 +8961,6 @@ has 'time_zone_names' => (
 		},
 		'Atlantic/Faeroe' => {
 			exemplarCity => q#Feröer#,
-		},
-		'Atlantic/Madeira' => {
-			exemplarCity => q#Madeira#,
 		},
 		'Atlantic/Reykjavik' => {
 			exemplarCity => q#Reykjavík#,
@@ -12832,44 +8971,8 @@ has 'time_zone_names' => (
 		'Atlantic/St_Helena' => {
 			exemplarCity => q#Szent Ilona#,
 		},
-		'Atlantic/Stanley' => {
-			exemplarCity => q#Stanley#,
-		},
-		'Australia/Adelaide' => {
-			exemplarCity => q#Adelaide#,
-		},
-		'Australia/Brisbane' => {
-			exemplarCity => q#Brisbane#,
-		},
-		'Australia/Broken_Hill' => {
-			exemplarCity => q#Broken Hill#,
-		},
 		'Australia/Currie' => {
 			exemplarCity => q#Currie#,
-		},
-		'Australia/Darwin' => {
-			exemplarCity => q#Darwin#,
-		},
-		'Australia/Eucla' => {
-			exemplarCity => q#Eucla#,
-		},
-		'Australia/Hobart' => {
-			exemplarCity => q#Hobart#,
-		},
-		'Australia/Lindeman' => {
-			exemplarCity => q#Lindeman#,
-		},
-		'Australia/Lord_Howe' => {
-			exemplarCity => q#Lord Howe#,
-		},
-		'Australia/Melbourne' => {
-			exemplarCity => q#Melbourne#,
-		},
-		'Australia/Perth' => {
-			exemplarCity => q#Perth#,
-		},
-		'Australia/Sydney' => {
-			exemplarCity => q#Sydney#,
 		},
 		'Australia_Central' => {
 			long => {
@@ -12949,6 +9052,11 @@ has 'time_zone_names' => (
 				'standard' => q#zöld-foki-szigeteki téli idő#,
 			},
 		},
+		'Casey' => {
+			long => {
+				'standard' => q#casey-i idő#,
+			},
+		},
 		'Chamorro' => {
 			long => {
 				'standard' => q#chamorrói téli idő#,
@@ -12984,7 +9092,7 @@ has 'time_zone_names' => (
 		},
 		'Christmas' => {
 			long => {
-				'standard' => q#karácsony-szigeti téli idő#,
+				'standard' => q#karácsony-szigeti idő#,
 			},
 		},
 		'Cocos' => {
@@ -13051,9 +9159,6 @@ has 'time_zone_names' => (
 		'Europe/Amsterdam' => {
 			exemplarCity => q#Amszterdam#,
 		},
-		'Europe/Andorra' => {
-			exemplarCity => q#Andorra#,
-		},
 		'Europe/Astrakhan' => {
 			exemplarCity => q#Asztrahán#,
 		},
@@ -13062,9 +9167,6 @@ has 'time_zone_names' => (
 		},
 		'Europe/Belgrade' => {
 			exemplarCity => q#Belgrád#,
-		},
-		'Europe/Berlin' => {
-			exemplarCity => q#Berlin#,
 		},
 		'Europe/Bratislava' => {
 			exemplarCity => q#Pozsony#,
@@ -13075,20 +9177,13 @@ has 'time_zone_names' => (
 		'Europe/Bucharest' => {
 			exemplarCity => q#Bukarest#,
 		},
-		'Europe/Budapest' => {
-			exemplarCity => q#Budapest#,
-		},
 		'Europe/Busingen' => {
 			exemplarCity => q#Büsingen#,
-		},
-		'Europe/Chisinau' => {
-			exemplarCity => q#Chisinau#,
 		},
 		'Europe/Copenhagen' => {
 			exemplarCity => q#Koppenhága#,
 		},
 		'Europe/Dublin' => {
-			exemplarCity => q#Dublin#,
 			long => {
 				'daylight' => q#ír nyári idő#,
 			},
@@ -13096,20 +9191,11 @@ has 'time_zone_names' => (
 		'Europe/Gibraltar' => {
 			exemplarCity => q#Gibraltár#,
 		},
-		'Europe/Guernsey' => {
-			exemplarCity => q#Guernsey#,
-		},
-		'Europe/Helsinki' => {
-			exemplarCity => q#Helsinki#,
-		},
 		'Europe/Isle_of_Man' => {
 			exemplarCity => q#Man-sziget#,
 		},
 		'Europe/Istanbul' => {
 			exemplarCity => q#Isztanbul#,
-		},
-		'Europe/Jersey' => {
-			exemplarCity => q#Jersey#,
 		},
 		'Europe/Kaliningrad' => {
 			exemplarCity => q#Kalinyingrád#,
@@ -13117,17 +9203,10 @@ has 'time_zone_names' => (
 		'Europe/Kiev' => {
 			exemplarCity => q#Kijev#,
 		},
-		'Europe/Kirov' => {
-			exemplarCity => q#Kirov#,
-		},
 		'Europe/Lisbon' => {
 			exemplarCity => q#Lisszabon#,
 		},
-		'Europe/Ljubljana' => {
-			exemplarCity => q#Ljubljana#,
-		},
 		'Europe/London' => {
-			exemplarCity => q#London#,
 			long => {
 				'daylight' => q#brit nyári idő#,
 			},
@@ -13135,47 +9214,26 @@ has 'time_zone_names' => (
 		'Europe/Luxembourg' => {
 			exemplarCity => q#Luxemburg#,
 		},
-		'Europe/Madrid' => {
-			exemplarCity => q#Madrid#,
-		},
 		'Europe/Malta' => {
 			exemplarCity => q#Málta#,
-		},
-		'Europe/Mariehamn' => {
-			exemplarCity => q#Mariehamn#,
 		},
 		'Europe/Minsk' => {
 			exemplarCity => q#Minszk#,
 		},
-		'Europe/Monaco' => {
-			exemplarCity => q#Monaco#,
-		},
 		'Europe/Moscow' => {
 			exemplarCity => q#Moszkva#,
-		},
-		'Europe/Oslo' => {
-			exemplarCity => q#Oslo#,
 		},
 		'Europe/Paris' => {
 			exemplarCity => q#Párizs#,
 		},
-		'Europe/Podgorica' => {
-			exemplarCity => q#Podgorica#,
-		},
 		'Europe/Prague' => {
 			exemplarCity => q#Prága#,
-		},
-		'Europe/Riga' => {
-			exemplarCity => q#Riga#,
 		},
 		'Europe/Rome' => {
 			exemplarCity => q#Róma#,
 		},
 		'Europe/Samara' => {
 			exemplarCity => q#Szamara#,
-		},
-		'Europe/San_Marino' => {
-			exemplarCity => q#San Marino#,
 		},
 		'Europe/Sarajevo' => {
 			exemplarCity => q#Szarajevó#,
@@ -13187,13 +9245,10 @@ has 'time_zone_names' => (
 			exemplarCity => q#Szimferopol#,
 		},
 		'Europe/Skopje' => {
-			exemplarCity => q#Skopje#,
+			exemplarCity => q#Szkopje#,
 		},
 		'Europe/Sofia' => {
 			exemplarCity => q#Szófia#,
-		},
-		'Europe/Stockholm' => {
-			exemplarCity => q#Stockholm#,
 		},
 		'Europe/Tallinn' => {
 			exemplarCity => q#Tallin#,
@@ -13207,17 +9262,11 @@ has 'time_zone_names' => (
 		'Europe/Uzhgorod' => {
 			exemplarCity => q#Ungvár#,
 		},
-		'Europe/Vaduz' => {
-			exemplarCity => q#Vaduz#,
-		},
 		'Europe/Vatican' => {
 			exemplarCity => q#Vatikán#,
 		},
 		'Europe/Vienna' => {
 			exemplarCity => q#Bécs#,
-		},
-		'Europe/Vilnius' => {
-			exemplarCity => q#Vilnius#,
 		},
 		'Europe/Volgograd' => {
 			exemplarCity => q#Volgográd#,
@@ -13229,7 +9278,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Zágráb#,
 		},
 		'Europe/Zaporozhye' => {
-			exemplarCity => q#Zaporozsje#,
+			exemplarCity => q#Zaporizzsja#,
 		},
 		'Europe/Zurich' => {
 			exemplarCity => q#Zürich#,
@@ -13384,12 +9433,6 @@ has 'time_zone_names' => (
 				'standard' => q#indiai téli idő#,
 			},
 		},
-		'Indian/Antananarivo' => {
-			exemplarCity => q#Antananarivo#,
-		},
-		'Indian/Chagos' => {
-			exemplarCity => q#Chagos#,
-		},
 		'Indian/Christmas' => {
 			exemplarCity => q#Karácsony-sziget#,
 		},
@@ -13399,20 +9442,8 @@ has 'time_zone_names' => (
 		'Indian/Comoro' => {
 			exemplarCity => q#Komoró#,
 		},
-		'Indian/Kerguelen' => {
-			exemplarCity => q#Kerguelen#,
-		},
-		'Indian/Mahe' => {
-			exemplarCity => q#Mahe#,
-		},
 		'Indian/Maldives' => {
 			exemplarCity => q#Maldív-szigetek#,
-		},
-		'Indian/Mauritius' => {
-			exemplarCity => q#Mauritius#,
-		},
-		'Indian/Mayotte' => {
-			exemplarCity => q#Mayotte#,
 		},
 		'Indian/Reunion' => {
 			exemplarCity => q#Réunion#,
@@ -13681,35 +9712,17 @@ has 'time_zone_names' => (
 				'standard' => q#omszki téli idő#,
 			},
 		},
-		'Pacific/Apia' => {
-			exemplarCity => q#Apia#,
-		},
-		'Pacific/Auckland' => {
-			exemplarCity => q#Auckland#,
-		},
-		'Pacific/Bougainville' => {
-			exemplarCity => q#Bougainville#,
-		},
 		'Pacific/Chatham' => {
 			exemplarCity => q#Chatham-szigetek#,
 		},
 		'Pacific/Easter' => {
 			exemplarCity => q#Húsvét-szigetek#,
 		},
-		'Pacific/Efate' => {
-			exemplarCity => q#Efate#,
-		},
 		'Pacific/Enderbury' => {
 			exemplarCity => q#Enderbury#,
 		},
-		'Pacific/Fakaofo' => {
-			exemplarCity => q#Fakaofo#,
-		},
 		'Pacific/Fiji' => {
 			exemplarCity => q#Fidzsi#,
-		},
-		'Pacific/Funafuti' => {
-			exemplarCity => q#Funafuti#,
 		},
 		'Pacific/Galapagos' => {
 			exemplarCity => q#Galapagos-szigetek#,
@@ -13717,17 +9730,8 @@ has 'time_zone_names' => (
 		'Pacific/Gambier' => {
 			exemplarCity => q#Gambier-szigetek#,
 		},
-		'Pacific/Guadalcanal' => {
-			exemplarCity => q#Guadalcanal#,
-		},
-		'Pacific/Guam' => {
-			exemplarCity => q#Guam#,
-		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#Honolulu#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#Johnston#,
 		},
 		'Pacific/Kiritimati' => {
 			exemplarCity => q#Kiritimati-sziget#,
@@ -13747,56 +9751,17 @@ has 'time_zone_names' => (
 		'Pacific/Midway' => {
 			exemplarCity => q#Midway-szigetek#,
 		},
-		'Pacific/Nauru' => {
-			exemplarCity => q#Nauru#,
-		},
-		'Pacific/Niue' => {
-			exemplarCity => q#Niue#,
-		},
-		'Pacific/Norfolk' => {
-			exemplarCity => q#Norfolk#,
-		},
-		'Pacific/Noumea' => {
-			exemplarCity => q#Noumea#,
-		},
-		'Pacific/Pago_Pago' => {
-			exemplarCity => q#Pago Pago#,
-		},
-		'Pacific/Palau' => {
-			exemplarCity => q#Palau#,
-		},
 		'Pacific/Pitcairn' => {
 			exemplarCity => q#Pitcairn-szigetek#,
 		},
 		'Pacific/Ponape' => {
 			exemplarCity => q#Ponape-szigetek#,
 		},
-		'Pacific/Port_Moresby' => {
-			exemplarCity => q#Port Moresby#,
-		},
-		'Pacific/Rarotonga' => {
-			exemplarCity => q#Rarotonga#,
-		},
-		'Pacific/Saipan' => {
-			exemplarCity => q#Saipan#,
-		},
-		'Pacific/Tahiti' => {
-			exemplarCity => q#Tahiti#,
-		},
-		'Pacific/Tarawa' => {
-			exemplarCity => q#Tarawa#,
-		},
-		'Pacific/Tongatapu' => {
-			exemplarCity => q#Tongatapu#,
-		},
 		'Pacific/Truk' => {
 			exemplarCity => q#Truk#,
 		},
 		'Pacific/Wake' => {
 			exemplarCity => q#Wake-sziget#,
-		},
-		'Pacific/Wallis' => {
-			exemplarCity => q#Wallis#,
 		},
 		'Pakistan' => {
 			long => {

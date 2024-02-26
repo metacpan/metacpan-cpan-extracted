@@ -1,4 +1,4 @@
-package EAI::Common 1.908;
+package EAI::Common 1.911;
 
 use strict; use feature 'unicode_strings'; use warnings; no warnings 'uninitialized';
 use Exporter qw(import); use EAI::DateUtil; use Data::Dumper qw(Dumper); use Getopt::Long qw(:config no_ignore_case); use Log::Log4perl qw(get_logger); use MIME::Lite (); use Scalar::Util qw(looks_like_number);
@@ -17,7 +17,7 @@ my %hashCheck = (
 		process => {},
 		task => {},
 	},
-	config => { # parameter category for site global settings, defined in site.config and other associated configs loaded at INIT
+	config => { # parameter category for site global settings, usually defined in site.config and other associated configs loaded at INIT
 		checkLogExistDelay => {}, # ref to hash {Test => 2, Dev => 3, "" => 0}, mapping to set delays for checkLogExist per environment in $execute{env}, this can be further overriden per job (and environment) in checkLookup.
 		checkLookup => {}, # ref to datastructure {"scriptname.pl + optional addToScriptName" => {errmailaddress => "",errmailsubject => "",timeToCheck =>"", freqToCheck => "", logFileToCheck => "", logcheck => "",logRootPath =>""},...} used for logchecker, each entry of the hash lookup table defines a log to be checked, defining errmailaddress to receive error mails, errmailsubject, timeToCheck as earliest time to check for existence in log, freqToCheck as frequency of checks (daily/monthly/etc), logFileToCheck as the name of the logfile to check, logcheck as the regex to check in the logfile and logRootPath as the folder where the logfile is found. lookup key: $execute{scriptname} + $execute{addToScriptName}
 		errmailaddress => "", # default mail address for central logcheck/errmail sending 
@@ -43,7 +43,7 @@ my %hashCheck = (
 		process => {},
 		task => {},
 	},
-	execute => { # hash of parameters for current task execution which is not set by the user but can be used to set other parameters and control the flow
+	execute => { # hash of parameters for current task execution. This is not to be set by the user, but can be used to as information to set other parameters and control the flow
 		alreadyMovedOrDeleted => {}, # hash for checking the already moved or deleted local files, to avoid moving/deleting them again at cleanup
 		addToScriptName => "", # this can be set to be added to the scriptname for config{checkLookup} keys, e.g. some passed parameter.
 		env => "", # Prod, Test, Dev, whatever is defined as the lookup value in folderEnvironmentMapping. homedir as fetched from the File::basename::dirname of the executing script using /^.*[\\\/](.*?)$/ is used as the key for looking up this value.
@@ -79,76 +79,79 @@ my %hashCheck = (
 	},
 	DB => { # DB specific configs
 		addID => {}, # this hash can be used to additionaly set a constant to given fields: Fieldname => Fieldvalue
-		additionalLookup => "", # query used in getAdditionalDBData to retrieve lookup information from DB using readFromDBHash
+		additionalLookup => "", # query used in getAdditionalDBData to retrieve lookup information from DB using EAI::DB::readFromDBHash
 		additionalLookupKeys => [], # used for getAdditionalDBData, list of field names to be used as the keys of the returned hash
-		cutoffYr2000 => 60, # when storing date data with 2 year digits in dumpDataIntoDB/storeInDB, this is the cutoff where years are interpreted as 19XX (> cutoffYr2000) or 20XX (<= cutoffYr2000)
-		columnnames => [], # returned column names from readFromDB and readFromDBHash, this is used in writeFileFromDB to pass column information from database to writeText
+		countPercent => 0, # percentage of progress in EAI::DB::storeInDB where indicator should be output (e.g. 10 for all 10% of progress). progress indicator is disabled if false.
+		cutoffYr2000 => 60, # when storing date data with 2 year digits in dumpDataIntoDB/EAI::DB::storeInDB, this is the cutoff where years are interpreted as 19XX (> cutoffYr2000) or 20XX (<= cutoffYr2000)
+		columnnames => [], # returned column names from EAI::DB::readFromDB and EAI::DB::readFromDBHash, this is used in writeFileFromDB to pass column information from database to writeText
 		database => "", # database to be used for connecting
-		debugKeyIndicator => "", # used in dumpDataIntoDB/storeInDB as an indicator for keys for debugging information if primkey not given (errors are shown with this key information). Format is the same as for primkey
-		deleteBeforeInsertSelector => "", # used in dumpDataIntoDB/storeInDB to delete specific data defined by keydata before an insert (first occurrence in data is used for key values). Format is the same as for primkey ("key1 = ? ...")
-		dontWarnOnNotExistingFields => 0, # suppress warnings in dumpDataIntoDB/storeInDB for not existing fields
-		dontKeepContent => 1, # if table should be completely cleared before inserting data in dumpDataIntoDB/storeInDB
-		doUpdateBeforeInsert => 1, # invert insert/update sequence in dumpDataIntoDB/storeInDB, insert only done when upsert flag is set
+		debugKeyIndicator => "", # used in dumpDataIntoDB/EAI::DB::storeInDB as an indicator for keys for debugging information if primkey not given (errors are shown with this key information). Format is the same as for primkey
+		deleteBeforeInsertSelector => "", # used in dumpDataIntoDB/EAI::DB::storeInDB to delete specific data defined by keydata before an insert (first occurrence in data is used for key values). Format is the same as for primkey ("key1 = ? ...")
+		dontWarnOnNotExistingFields => 0, # suppress warnings in dumpDataIntoDB/EAI::DB::storeInDB for not existing fields
+		dontKeepContent => 1, # if table should be completely cleared before inserting data in dumpDataIntoDB/EAI::DB::storeInDB
+		doUpdateBeforeInsert => 1, # invert insert/update sequence in dumpDataIntoDB/EAI::DB::storeInDB, insert only done when upsert flag is set
 		DSN => '', # DSN String for DB connection
-		incrementalStore => 1, # when storing data with dumpDataIntoDB/storeInDB, avoid setting empty columns to NULL
-		ignoreDuplicateErrs => 1, # ignore any duplicate errors in dumpDataIntoDB/storeInDB
-		keyfields => [], # used for readFromDBHash, list of field names to be used as the keys of the returned hash
+		incrementalStore => 1, # when storing data with dumpDataIntoDB/EAI::DB::storeInDB, avoid setting empty columns to NULL
+		ignoreDuplicateErrs => 1, # ignore any duplicate errors in dumpDataIntoDB/EAI::DB::storeInDB
+		keyfields => [], # used for EAI::DB::readFromDBHash, list of field names to be used as the keys of the returned hash
 		longreadlen => 1024, # used for setting database handles LongReadLen parameter for DB connection, if not set defaults to 1024
 		lookups => {}, # similar to $config{sensitive}, a hash lookup table ({"prefix" => {remoteHost=>""},...} or {"prefix" => {remoteHost=>{Prod => "", Test => ""}},...}) for centrally looking up DSN Settings depending on $DB{prefix}. Overrides $DB{DSN} set in config, but is overriden by script-level settings in %common.
 		noDBTransaction => 1, # don't use a DB transaction for dumpDataIntoDB
 		noDumpIntoDB => 1, # if files from this load should not be dumped to the database
-		postDumpExecs => [], # array for execs done in dumpDataIntoDB after postDumpProcessing and before commit/rollback: [{execs => ['',''], condition => ''}]. doInDB all execs if condition (evaluated string or anonymous sub: condition => sub {...}) is fulfilled
-		postDumpProcessing => "", # done in dumpDataIntoDB after storeInDB, execute perl code in postDumpProcessing (evaluated string or anonymous sub: postDumpProcessing => sub {...})
-		postReadProcessing => "", # done in writeFileFromDB after readFromDB, execute perl code in postReadProcessing (evaluated string or anonymous sub: postReadProcessing => sub {...})
+		port => {}, # port to be added to server in environment hash lookup: {Prod => "", Test => ""}
+		postDumpExecs => [], # array for DB executions done in dumpDataIntoDB after postDumpProcessing and before commit/rollback: [{execs => ['',''], condition => ''}]. For all execs a doInDB is executed if condition (evaluated string or anonymous sub: condition => sub {...}) is fulfilled
+		postDumpProcessing => "", # done in dumpDataIntoDB after EAI::DB::storeInDB, execute perl code in postDumpProcessing (evaluated string or anonymous sub: postDumpProcessing => sub {...})
+		postReadProcessing => "", # done in writeFileFromDB after EAI::DB::readFromDB, execute perl code in postReadProcessing (evaluated string or anonymous sub: postReadProcessing => sub {...})
 		prefix => "", # key for sensitive information (e.g. pwd and user) in config{sensitive} or system wide DSN in config{DB}{prefix}{DSN}. respects environment in $execute{env} if configured.
-		primkey => "", # primary key indicator to be used for update statements, format: "key1 = ? AND key2 = ? ..."
+		primkey => "", # primary key indicator to be used for update statements, format: "key1 = ? AND key2 = ? ...". Not necessary for dumpDataIntoDB/storeInDB if dontKeepContent is set to 1, here the whole table content is removed before storing
 		pwd => "", # for password setting, either directly (insecure -> visible) or via sensitive lookup
-		query => "", # query statement used for readFromDB and readFromDBHash
-		schemaName => "", # schemaName used in dumpDataIntoDB/storeInDB, if tableName contains dot the extracted schema from tableName overrides this. Needed for datatype information!
+		query => "", # query statement used for EAI::DB::readFromDB and EAI::DB::readFromDBHash
+		schemaName => "", # schemaName used in dumpDataIntoDB/EAI::DB::storeInDB, if tableName contains dot the extracted schema from tableName overrides this. Needed for datatype information!
 		server => {}, # DB Server in environment hash lookup: {Prod => "", Test => ""}
-		tablename => "", # the table where data is stored in dumpDataIntoDB/storeInDB
-		upsert => 1, # in dumpDataIntoDB/storeInDB, should an update be done after the insert failed (because of duplicate keys) or insert after the update failed (because of key not exists)?
-		user => "", # for user setting, either directly (insecure -> visible) or via sensitive lookup
+		tablename => "", # the table where data is stored in dumpDataIntoDB/EAI::DB::storeInDB
+		upsert => 1, # in dumpDataIntoDB/EAI::DB::storeInDB, should both update and insert be done. doUpdateBeforeInsert=0: after the insert failed (because of duplicate keys) or doUpdateBeforeInsert=1: insert after the update failed (because of key not exists)?
+		user => "", # for setting username in db connection, either directly (insecure -> visible) or via sensitive lookup
 	},
-	File => { # File parsing specific configs
+	File => { # File fetching and parsing specific configs. File{filename} is also used for FTP
 		avoidRenameForRedo => 1, # when redoing, usually the cutoff (datetime/redo info) is removed following a pattern. set this flag to avoid this
-		columns => {}, # for writeText: Hash of data fields, that are to be written (in order of keys)
-		columnskip => {}, # for writeText: boolean hash of column names that should be skipped when writing the file ({column1ToSkip => 1, column2ToSkip => 1, ...})
+		columns => {}, # for EAI::File::writeText: Hash of data fields, that are to be written (in order of keys)
+		columnskip => {}, # for EAI::File::writeText: boolean hash of column names that should be skipped when writing the file ({column1ToSkip => 1, column2ToSkip => 1, ...})
+		countPercent => 0, # percentage of progress in EAI::File::readText where indicator should be output (e.g. 10 for all 10% of progress). progress indicator is disabled if false.
 		dontKeepHistory => 1, # if up- or downloaded file should not be moved into historyFolder but be deleted
 		dontMoveIntoHistory => 1, # if up- or downloaded file should not be moved into historyFolder but be kept in homedir
 		emptyOK => 0, # flag to specify whether empty files should not invoke an error message. Also needed to mark an empty file as processed in EAI::Wrap::markProcessed
 		extract => 1, # flag to specify whether to extract files from archive package (zip)
 		extension => "", # the extension of the file to be read (optional, used for redoFile)
 		fieldCode => {}, # additional field based processing code: fieldCode => {field1 => 'perl code', ..}, invoked if key equals either header (as in format_header) or targetheader (as in format_targetheader) or invoked for all fields if key is empty {"" => 'perl code'}. set $EAI::File::skipLineAssignment to true (1) if current line should be skipped from data. perl code can be an evaluated string or an anonymous sub: field1 => sub {...}
-		filename => "", # the name of the file to be read
-		firstLineProc => "", # processing done in reading the first line of text files
-		format_allowLinefeedInData => 1, # line feeds in values don't create artificial new lines/records, only works for csv quoted data
-		format_autoheader => 1, # assumption: header exists in file and format_header should be derived from there. only for readText
-		format_beforeHeader => "", # additional String to be written before the header in write text
-		format_dateColumns => [], # numeric array of columns that contain date values (special parsing) in excel files
+		filename => "", # the name of the file to be read, can also be a glob spec to retrieve multiple files. This information is also used for FTP and retrieval and local file copying.
+		firstLineProc => "", # processing done when reading the first line of text files in EAI::File::readText (used to retrieve information from a header line, like reference date etc.). The line is available in $_.
+		format_allowLinefeedInData => 1, # line feeds in values don't create artificial new lines/records, only works for csv quoted data in EAI::File::readText
+		format_autoheader => 1, # assumption: header exists in file and format_header should be derived from there. only for EAI::File::readText
+		format_beforeHeader => "", # additional String to be written before the header in EAI::File::writeText
+		format_dateColumns => [], # numeric array of columns that contain date values (special parsing) in excel files (EAI::File::readExcel)
 		format_decimalsep => "", # decimal separator used in numbers of sourcefile (defaults to . if not given)
-		format_defaultsep => "", # default separator when format_sep not given (usually in site.config), if not given, "\t" is used as default.
+		format_defaultsep => "", # default separator when format_sep not given (usually in site.config), if no separator is given (not needed for EAI::File::readExcel/EAI::File::readXML), "\t" is used for parsing format_header and format_targetheader.
 		format_encoding => "", # text encoding of the file in question (e.g. :encoding(utf8))
 		format_headerColumns => [], # optional numeric array of columns that contain data in excel files (defaults to all columns starting with first column up to format_targetheader length)
 		format_header => "", # format_sep separated string containing header fields (optional in excel files, only used to check against existing header row)
-		format_headerskip => 1, # skip until row-number for checking header row against format_header in excel files
+		format_headerskip => 1, # skip until row-number for checking header row against format_header in EAI::File::readExcel
 		format_eol => "", # for quoted csv specify special eol character (allowing newlines in values)
-		format_fieldXpath => {}, # for XML reading, hash with field => xpath to content association entries
+		format_fieldXpath => {}, # for EAI::File::readXML, hash with field => xpath to content association entries
 		format_fix => 1, # for text writing, specify whether fixed length format should be used (requires format_padding)
-		format_namespaces => {}, # for XML reading, hash with alias => namespace association entries
+		format_namespaces => {}, # for EAI::File::readXML, hash with alias => namespace association entries
 		format_padding => {}, # for text writing, hash with field number => padding to be applied for fixed length format
 		format_poslen => [], # array of array defining positions and lengths [[pos1,len1],[pos2,len2]...[posN,lenN]] of data in fixed length format text files (if format_sep == "fix")
 		format_quotedcsv => 1, # special parsing/writing of quoted csv data using Text::CSV
-		format_sep => "", # separator string for csv format, regex for split for other separated formats. Also needed for splitting up format_header and format_targetheader (Excel and XML-formats use tab as default separator here).
-		format_sepHead => "", # special separator for header row in write text, overrides format_sep
-		format_skip => "", # either numeric or string, skip until row-number if numeric or appearance of string otherwise in reading textfile
-		format_stopOnEmptyValueColumn => 1, # for excel reading, stop row parsing when a cell with this column number is empty (denotes end of data, to avoid very long parsing).
-		format_suppressHeader => 1, # for textfile writing, suppress output of header
+		format_sep => "", # separator string for EAI::File::readText and EAI::File::writeText csv formats, a regex for splitting other separated formats. If format_sep is not explicitly given as a regex here (=> qr//), then it is assumed to be a regex by split, however this causes surprising effects with regex metacharacters (should be quoted, such as qr/\|/)! Also used for splitting format_header and format_targetheader (Excel and XML-formats use tab as default separator here).
+		format_sepHead => "", # special separator for header row in EAI::File::writeText, overrides format_sep
+		format_skip => "", # either numeric or string, skip until row-number if numeric or appearance of string otherwise in reading textfile. If numeric, format_skip can also be used in EAI::File::readExcel
+		format_stopOnEmptyValueColumn => 1, # for EAI::File::readExcel, stop row parsing when a cell with this column number is empty (denotes end of data, to avoid very long parsing).
+		format_suppressHeader => 1, # for text and excel file writing, suppress output of header
 		format_targetheader => "", # format_sep separated string containing target header fields (= the field names in target/database table). optional for XML and tabular textfiles, defaults to format_header if not given there.
 		format_thousandsep => "", # thousand separator used in numbers of sourcefile (defaults to , if not given)
-		format_worksheetID => 1, # worksheet number for excel reading, this should always work
-		format_worksheet => "", # alternatively the worksheet name can be passed, this only works for new excel format (xlsx)
-		format_xlformat => "xlsx|xls", # excel format for parsing, also specifies excel parsing
+		format_worksheetID => 1, # worksheet number for EAI::File::readExcel, this should always work
+		format_worksheet => "", # alternatively the worksheet name can be passed for EAI::File::readExcel, this only works for new excel format (xlsx)
+		format_xlformat => "xlsx|xls", # excel format for parsing, also specifies that excel parsing should be done
 		format_xpathRecordLevel => "", # xpath for level where data nodes are located in xml
 		format_XML => 1, # specify xml parsing
 		lineCode => "", # additional line based processing code, invoked after whole line has been read (evaluated string or anonymous sub: lineCode => sub {...})
@@ -174,8 +177,8 @@ my %hashCheck = (
 		localDir => "", # optional: local folder for files to be placed, if not given files are downloaded into current folder
 		lookups => {}, # similar to $config{sensitive}, a hash lookup table ({"prefix" => {remoteHost=>""},...} or {"prefix" => {remoteHost=>{Prod => "", Test => ""}},...}) for centrally looking up remoteHost and port settings depending on $FTP{prefix}.
 		maxConnectionTries => 5, # maximum number of tries for connecting in login procedure
-		noDirectRemoteDirChange => 1, # if no direct change into absolute paths (/some/path/to/change/into) ist possible then set this to 1, this separates the change into setcwd(undef) and setcwd(remoteDir)
-		onlyArchive => 0, # only archive/remove on the FTP server, requires archiveDir to be set
+		noDirectRemoteDirChange => 1, # if no direct change into absolute paths (/some/path/to/change/into) ist possible then set this to 1, this does a separated change into setcwd(undef) and setcwd(remoteDir)
+		onlyArchive => 0, # only archive/remove given files on the FTP server, requires archiveDir to be set
 		path => "", # additional relative FTP path (under remoteDir which is set at login), where the file(s) is/are located
 		port => 22, # ftp/sftp port (leave empty for default port 22 when using Net::SFTP::Foreign, or port 21 when using Net::FTP)
 		prefix => "ftp", # key for sensitive information (e.g. pwd and user) in config{sensitive} or system wide remoteHost/port in config{FTP}{prefix}{remoteHost} or config{FTP}{prefix}{port}. respects environment in $execute{env} if configured.
@@ -194,6 +197,7 @@ my %hashCheck = (
 	process => { # used to pass information within each process (data, additionalLookupData, filenames, hadErrors or commandline parameters starting with interactive) and for additional configurations not suitable for DB, File or FTP (e.g. uploadCMD* and onlyExecFor)
 		additionalLookupData => {}, # additional data retrieved from database with EAI::Wrap::getAdditionalDBData
 		archivefilenames => [], # in case a zip archive package is retrieved, the filenames of these packages are kept here, necessary for cleanup at the end of the process
+		countPercent => 0, # percentage for counting File text reading and DB storing, if > 0 on each reaching of the percentage in countPercent a progress is shown (e.g. every 10% if countPercent = 10)
 		data => [], # loaded data: array (rows) of hash refs (columns)
 		filenames => [], # names of files that were retrieved and checked to be locally available for that load, can be more than the defined file in File->filename (due to glob spec or zip archive package)
 		filesProcessed => {}, # hash for checking the processed files, necessary for cleanup at the end of the whole task
@@ -205,7 +209,7 @@ my %hashCheck = (
 		uploadCMDPath => "", # path of upload command
 		uploadCMDLogfile => "", # logfile where command given in uploadCMD writes output (for error handling)
 	},
-	task => { # contains parameters used on the task script level
+	task => { # contains parameters used on the task script level, only available for %common parameter hash.
 		customHistoryTimestamp => "", # optional custom timestamp to be added to filenames moved to History/HistoryUpload/FTP archive, if not given, get_curdatetime is used (YYYYMMDD_hhmmss)
 		execOnly => "", # do not execute loads where $common{task}{execOnly} !~ $load->{process}{onlyExecFor}. Empty onlyExecFor loads are always executed regardless of $common{task}{execOnly}
 		ignoreNoTest => 0, # ignore the notest file in the process-script folder, usually preventing all runs that are not in production
@@ -257,7 +261,7 @@ sub readConfigFile ($) {
 		die("Error parsing config file $configfilename for script $execute{homedir}/$execute{scriptname}: $@") if $@;
 		die("Error executing config file $configfilename for script $execute{homedir}/$execute{scriptname}: $!") unless defined $return;
 	}
-	print STDOUT "read $configfilename\n";
+	print STDOUT "included $configfilename\n";
 }
 
 # get key info from $config{sensitive}{$prefix}{$key}. Also checks if $config{sensitive}{$prefix}{$key} is a hash, then get info from $config{sensitive}{$prefix}{$key}{$execute{env}}
@@ -471,8 +475,8 @@ sub getLogFPath {
 	return $LogFPath;
 };
 
-# MailFilter is used for filtering error logs (called in log.config) if error was already sent by mail (otherwise floods)...
-my $alreadySent = 0;
+# MailFilter is used for filtering error logs (called in log.config) if a log error was already sent by mail (otherwise floods)...this is reset on retry because of error
+our $alreadySent = 0;
 sub MailFilter {
 	my %p = @_;
 	return (!$alreadySent and ($p{log4p_level} eq "ERROR" or $p{log4p_level} eq "FATAL") ? $alreadySent = 1 : 0);
@@ -530,15 +534,26 @@ sub setupLogging {
 	$logConfig = $EAI_WRAP_CONFIG_PATH."/log.config" if (! -e $logConfig); # fall back to main config log.config
 	die "log.config neither in $logConfig nor in ".$EAI_WRAP_CONFIG_PATH."/log.config" if (! -e $logConfig);
 	Log::Log4perl::init($logConfig);
+	# workaround for utf8 problems with Win32::Console::ANSI
+	if ($^O =~ /MSWin/) {
+		my $test = \*STDOUT; bless $test, 'IO::Handle';
+		my $testcopy = IO::Handle->new_from_fd($test, ">");
+		$test->fdopen($testcopy, ">");
+	}
 	my $logger = get_logger();
 	$logger->warn($noLogFolderErr) if $noLogFolderErr; # log later when emergency log folder was set...
 	my $logAppender = Log::Log4perl->appenders()->{"FILE"}->{"appender"} if Log::Log4perl->appenders() and Log::Log4perl->appenders()->{"FILE"};
 	if ($logAppender) {
 		my $logprefix = get_curdate();
-		eval {$logprefix = $config{logprefixForLastLogfile}->()} if $config{logprefixForLastLogfile};
-		$logger->warn("error getting logprefix from \$config{logprefixForLastLogfile}: $@") if $@;
-		# if mail is watched next day, the rolled file is in $LogFPathDayBefore. Depending on appender, either append ".1" to filename or prepend $logprefix to it (default assumed date rotator, with current date in format yyyymmdd)
-		$LogFPathDayBefore = $logFolder."/".($logAppender->isa("Log::Dispatch::FileRotate") ? "" : $logprefix.".").$extendedScriptname.".log".($logAppender->isa("Log::Dispatch::FileRotate") ? ".1" : "");
+		unless ($logAppender->isa("Log::Dispatch::FileRotate")) {
+			$@ = ""; # reset bogus error messages from Log::Log4perl::init
+			eval {$logprefix = $config{logprefixForLastLogfile}->()} if $config{logprefixForLastLogfile};
+			$logger->warn("error getting logprefix from \$config{logprefixForLastLogfile}: $@") if $@;
+			# if mail is watched next day, the rolled file is in $LogFPathDayBefore. Depending on appender, either append ".1" to filename or prepend $logprefix to it (default assume a date rotator, with current date in format yyyymmdd)
+			$LogFPathDayBefore = "$logFolder/$logprefix.$extendedScriptname.log";
+		} else {
+			$LogFPathDayBefore = "$logFolder/$extendedScriptname.log.1";
+		}
 	}
 	if ($config{smtpServer}) {
 		# remove explicitly enumerated lookups (1:scriptname.pl, 2:scriptname.pl), the first such entry will be taken here

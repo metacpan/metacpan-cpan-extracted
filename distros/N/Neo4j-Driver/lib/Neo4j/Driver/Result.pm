@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Result;
 # ABSTRACT: Result of running a Cypher statement (a stream of records)
-$Neo4j::Driver::Result::VERSION = '0.44';
+$Neo4j::Driver::Result::VERSION = '0.45';
 
 use parent 'Neo4j::Driver::StatementResult';
 
@@ -199,6 +199,18 @@ sub stats {
 }
 
 
+sub _bool_values {
+	no if $^V ge v5.36, 'warnings', 'experimental::builtin';
+	if ( $^V ge v5.36 && ! $ENV{NO_NEO4J_CORE_BOOLS} ) {
+		return builtin::false(), builtin::true();
+	}
+	else {
+		require JSON::PP;
+		return JSON::PP::false(), JSON::PP::true();
+	}
+}
+
+
 1;
 
 __END__
@@ -213,7 +225,7 @@ Neo4j::Driver::Result - Result of running a Cypher statement (a stream of record
 
 =head1 VERSION
 
-version 0.44
+version 0.45
 
 =head1 SYNOPSIS
 

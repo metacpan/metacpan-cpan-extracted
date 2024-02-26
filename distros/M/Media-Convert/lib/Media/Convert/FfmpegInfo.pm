@@ -2,6 +2,7 @@ package Media::Convert::FfmpegInfo;
 
 use MooseX::Singleton;
 use SemVer;
+use JSON::MaybeXS;
 
 has 'codecs' => (
 	is => 'ro',
@@ -52,15 +53,16 @@ has version => (
 );
 
 sub _build_version {
-	open my $ffmpeg, "-|", "ffmpeg -version 2>/dev/null";
-	foreach my $line(<$ffmpeg>) {
-		if($line =~ /ffmpeg version ([0-9.]+)/) {
-			my $ver = $1;
-			while(scalar(split /\./, $ver) < 3) {
-				$ver .= ".0";
-			}
-			return SemVer->new($ver);
+	open my $ffprobe, "-|", "ffprobe -loglevel quiet -show_program_version -print_format json";
+	local $/ = undef;
+	my $json = decode_json(<$ffprobe>);
+	my $version = $json->{program_version}{version};
+	if($version =~ /([0-9.]+)/) {
+		my $ver = $1;
+		while(scalar(split /\./, $ver) < 3) {
+			$ver .= ".0";
 		}
+		return SemVer->new($ver);
 	}
 }
 

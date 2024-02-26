@@ -1,0 +1,137 @@
+# PODNAME: RDF::Cowl::Lib::Gen::Class::NAryIndAxiom
+# ABSTRACT: Generated docs for RDF::Cowl::NAryIndAxiom
+
+## DO NOT EDIT
+## Generated via maint/tt/Class.pod.tt
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+RDF::Cowl::Lib::Gen::Class::NAryIndAxiom - Generated docs for RDF::Cowl::NAryIndAxiom
+
+=head1 VERSION
+
+version 1.0.0
+
+=head1 MAIN MODULE
+
+L<RDF::Cowl::NAryIndAxiom>
+
+=head1 CONSTRUCTORS
+
+=head2 new
+
+B<Signature>:
+
+  RDF::Cowl::NAryIndAxiom->new(CowlVector $individuals, Maybe[ CowlVector ] $annot)
+
+B<Params>:
+
+  CowlNAryAxiomType $type 
+  CowlVector $individuals 
+  Maybe[ CowlVector ] $annot I<[optional]>
+
+Documentation:
+
+  Returns a retained N-ary individual axiom.
+  
+  @param type The type.
+  @param individuals The individuals.
+  @param annot [optional] The annotations.
+  @return Retained axiom. Throws exception on error.
+
+Throws exception on error.
+
+=over 2
+
+B<C function name>: C<< cowl_nary_ind_axiom >>
+
+=back
+
+=head1 METHODS
+
+=head2 get_type
+
+B<Signature>:
+
+  $self->get_type()
+
+B<Params>:
+
+  CowlNAryIndAxiom $axiom 
+
+Documentation:
+
+  Gets the type of the specified N-ary individual axiom.
+  
+  @param axiom The axiom.
+  @return The type.
+
+=over 2
+
+B<C function name>: C<< cowl_nary_ind_axiom_get_type >>
+
+=back
+
+=head2 get_individuals
+
+B<Signature>:
+
+  $self->get_individuals()
+
+B<Params>:
+
+  CowlNAryIndAxiom $axiom 
+
+Documentation:
+
+  Gets the individuals of the specified N-ary individual axiom.
+  
+  @param axiom The axiom.
+  @return The individuals.
+
+=over 2
+
+B<C function name>: C<< cowl_nary_ind_axiom_get_individuals >>
+
+=back
+
+=head2 get_annot
+
+B<Signature>:
+
+  $self->get_annot()
+
+B<Params>:
+
+  CowlNAryIndAxiom $axiom 
+
+Documentation:
+
+  Gets the annotations of the specified axiom.
+  
+  @param axiom The axiom.
+  @return The annotations.
+
+=over 2
+
+B<C function name>: C<< cowl_nary_ind_axiom_get_annot >>
+
+=back
+
+=head1 AUTHOR
+
+Zakariyya Mughal <zmughal@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 by Auto-Parallel Technologies, Inc..
+
+This is free software, licensed under Eclipse Public License - v 2.0.
+
+=cut

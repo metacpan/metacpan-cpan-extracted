@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -35,7 +35,7 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
-use AsposeCellsCloud::Object::SaveOptions; 
+use AsposeCellsCloud::Object::PaginatedSaveOptions; 
 
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
@@ -125,6 +125,132 @@ __PACKAGE__->class_documentation({description => 'Represents the options of savi
 
 
 __PACKAGE__->method_documentation({
+     'default_font' => {
+     	datatype => 'string',
+     	base_name => 'DefaultFont',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'check_workbook_default_font' => {
+     	datatype => 'boolean',
+     	base_name => 'CheckWorkbookDefaultFont',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'check_font_compatibility' => {
+     	datatype => 'boolean',
+     	base_name => 'CheckFontCompatibility',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'is_font_substitution_char_granularity' => {
+     	datatype => 'boolean',
+     	base_name => 'IsFontSubstitutionCharGranularity',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'one_page_per_sheet' => {
+     	datatype => 'boolean',
+     	base_name => 'OnePagePerSheet',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'all_columns_in_one_page_per_sheet' => {
+     	datatype => 'boolean',
+     	base_name => 'AllColumnsInOnePagePerSheet',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'ignore_error' => {
+     	datatype => 'boolean',
+     	base_name => 'IgnoreError',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'output_blank_page_when_nothing_to_print' => {
+     	datatype => 'boolean',
+     	base_name => 'OutputBlankPageWhenNothingToPrint',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'page_index' => {
+     	datatype => 'int',
+     	base_name => 'PageIndex',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'page_count' => {
+     	datatype => 'int',
+     	base_name => 'PageCount',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'printing_page_type' => {
+     	datatype => 'string',
+     	base_name => 'PrintingPageType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'gridline_type' => {
+     	datatype => 'string',
+     	base_name => 'GridlineType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'text_cross_type' => {
+     	datatype => 'string',
+     	base_name => 'TextCrossType',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'default_edit_language' => {
+     	datatype => 'string',
+     	base_name => 'DefaultEditLanguage',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'emf_render_setting' => {
+     	datatype => 'string',
+     	base_name => 'EmfRenderSetting',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'merge_areas' => {
+     	datatype => 'boolean',
+     	base_name => 'MergeAreas',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'sort_external_names' => {
+     	datatype => 'boolean',
+     	base_name => 'SortExternalNames',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'update_smart_art' => {
+     	datatype => 'boolean',
+     	base_name => 'UpdateSmartArt',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
      'save_format' => {
      	datatype => 'string',
      	base_name => 'SaveFormat',
@@ -184,6 +310,24 @@ __PACKAGE__->method_documentation({
 });
 
 __PACKAGE__->swagger_types( {
+    'default_font' => 'string',
+    'check_workbook_default_font' => 'boolean',
+    'check_font_compatibility' => 'boolean',
+    'is_font_substitution_char_granularity' => 'boolean',
+    'one_page_per_sheet' => 'boolean',
+    'all_columns_in_one_page_per_sheet' => 'boolean',
+    'ignore_error' => 'boolean',
+    'output_blank_page_when_nothing_to_print' => 'boolean',
+    'page_index' => 'int',
+    'page_count' => 'int',
+    'printing_page_type' => 'string',
+    'gridline_type' => 'string',
+    'text_cross_type' => 'string',
+    'default_edit_language' => 'string',
+    'emf_render_setting' => 'string',
+    'merge_areas' => 'boolean',
+    'sort_external_names' => 'boolean',
+    'update_smart_art' => 'boolean',
     'save_format' => 'string',
     'cached_file_folder' => 'string',
     'clear_data' => 'boolean',
@@ -195,6 +339,24 @@ __PACKAGE__->swagger_types( {
 } );
 
 __PACKAGE__->attribute_map( {
+    'default_font' => 'DefaultFont',
+    'check_workbook_default_font' => 'CheckWorkbookDefaultFont',
+    'check_font_compatibility' => 'CheckFontCompatibility',
+    'is_font_substitution_char_granularity' => 'IsFontSubstitutionCharGranularity',
+    'one_page_per_sheet' => 'OnePagePerSheet',
+    'all_columns_in_one_page_per_sheet' => 'AllColumnsInOnePagePerSheet',
+    'ignore_error' => 'IgnoreError',
+    'output_blank_page_when_nothing_to_print' => 'OutputBlankPageWhenNothingToPrint',
+    'page_index' => 'PageIndex',
+    'page_count' => 'PageCount',
+    'printing_page_type' => 'PrintingPageType',
+    'gridline_type' => 'GridlineType',
+    'text_cross_type' => 'TextCrossType',
+    'default_edit_language' => 'DefaultEditLanguage',
+    'emf_render_setting' => 'EmfRenderSetting',
+    'merge_areas' => 'MergeAreas',
+    'sort_external_names' => 'SortExternalNames',
+    'update_smart_art' => 'UpdateSmartArt',
     'save_format' => 'SaveFormat',
     'cached_file_folder' => 'CachedFileFolder',
     'clear_data' => 'ClearData',

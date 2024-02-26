@@ -1,10 +1,10 @@
 {
    "abstract" : "Give Tk applications the looks of Gtk applications",
    "author" : [
-      "Hans Jeuken <jeuken.hans@gmail.com>"
+      "Hans Jeuken <hanje@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -46,6 +46,6 @@
          "web" : "https://github.com/haje61/Tk-GtkSettings"
       }
    },
-   "version" : "0.06",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.07",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

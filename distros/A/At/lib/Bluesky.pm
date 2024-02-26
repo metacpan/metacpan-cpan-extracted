@@ -1,4 +1,4 @@
-package Bluesky 0.17 {
+package Bluesky 0.18 {
     use v5.38;
     no warnings 'experimental::class', 'experimental::builtin';    # Be quiet.
     use feature 'class';

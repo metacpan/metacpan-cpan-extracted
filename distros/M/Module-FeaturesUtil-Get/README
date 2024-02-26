@@ -3,13 +3,14 @@ NAME
     Module::Features specification)
 
 VERSION
-    This document describes version 0.005 of Module::FeaturesUtil::Get (from
-    Perl distribution Module-FeaturesUtil-Get), released on 2021-07-31.
+    This document describes version 0.006 of Module::FeaturesUtil::Get (from
+    Perl distribution Module-FeaturesUtil-Get), released on 2023-11-11.
 
 SYNOPSIS
      use Module::FeaturesUtil::Get qw(
          get_features_decl
          get_feature_val
+         get_feature_defhash
          module_declares_feature
      );
 
@@ -76,6 +77,19 @@ FUNCTIONS
     This routine will also NOT check the validity of feature value against
     the specification's schema.
 
+  get_feature_defhash
+    Usage:
+
+     my $defhash = get_feature_defhash($module_name, $feature_set_name, $feature_name);
+
+    Example:
+
+     $defhash = get_feature_defhash('Text::Table::Sprintf', 'TextTable', 'can_halign'; # => {value=>1, summary=>'Only support l (left) and r (right), not c (center)'}
+
+    Get a single feature declaration defhash.
+
+    Features declaration is retrieved using "get_features_decl".
+
   module_declares_feature
     Usage:
 
@@ -95,14 +109,6 @@ SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-Module-FeaturesUtil-Get>.
 
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Module-FeaturesUtil-G
-    et>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
 SEE ALSO
     Module::Features
 
@@ -114,9 +120,34 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021 by perlancar@cpan.org.
+    This software is copyright (c) 2023, 2021 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Module-FeaturesUtil-G
+    et>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

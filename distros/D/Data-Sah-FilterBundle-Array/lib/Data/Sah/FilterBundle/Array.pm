@@ -3,9 +3,9 @@ package Data::Sah::FilterBundle::Array;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-17'; # DATE
+our $DATE = '2024-02-06'; # DATE
 our $DIST = 'Data-Sah-FilterBundle-Array'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: More array-related Sah filters
@@ -22,7 +22,7 @@ Data::Sah::FilterBundle::Array - More array-related Sah filters
 
 =head1 VERSION
 
-This document describes version 0.001 of Data::Sah::FilterBundle::Array (from Perl distribution Data-Sah-FilterBundle-Array), released on 2024-01-17.
+This document describes version 0.002 of Data::Sah::FilterBundle::Array (from Perl distribution Data-Sah-FilterBundle-Array), released on 2024-02-06.
 
 =head1 DESCRIPTION
 
@@ -31,6 +31,8 @@ This distribution contains the following L<Sah> filter rule modules:
 =over
 
 =item * L<Data::Sah::Filter::perl::Array::dupenum>
+
+=item * L<Data::Sah::Filter::perl::Array::arrayify>
 
 =item * L<Data::Sah::Filter::perl::Array::dupestr>
 

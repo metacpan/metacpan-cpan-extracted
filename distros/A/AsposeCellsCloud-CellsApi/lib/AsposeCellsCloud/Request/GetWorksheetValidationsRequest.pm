@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -61,8 +61,8 @@ sub new {
 # Run Operation Request
 # GetWorksheetValidationsRequest.name : The workbook name.  ,
 # GetWorksheetValidationsRequest.sheetName : The worksheet name.  ,
-# GetWorksheetValidationsRequest.folder : Original workbook folder.  ,
-# GetWorksheetValidationsRequest.storageName : Storage name.   
+# GetWorksheetValidationsRequest.folder : The folder where the file is situated.  ,
+# GetWorksheetValidationsRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -73,7 +73,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_validations' } = { 
-    	summary => 'Get validations description in worksheet.',
+    	summary => 'Retrieve descriptions of validations in the worksheet.',
         params => $params,
         returns => 'ValidationsResponse',
     };
@@ -144,14 +144,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

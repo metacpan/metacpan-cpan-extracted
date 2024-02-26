@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Dz - Package for language Dzongkha
 
 package Locale::CLDR::Locales::Dz;
 # This file auto generated from Data\common\main\dz.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -657,7 +657,6 @@ has 'display_name_code_patterns' => (
 		{
 			'language' => 'ཁ་སྐད་: {0}',
  			'script' => 'ཡིག་གཟུགས་: {0}',
- 			'region' => '{0}',
 
 		}
 	},
@@ -676,7 +675,7 @@ has 'characters' => (
 			index => ['ཀ', 'ཁ', 'ག', 'ང', 'ཅ', 'ཆ', 'ཇ', 'ཉ', 'ཏ', 'ཐ', 'ད', 'ན', 'པ', 'ཕ', 'བ', 'མ', 'ཙ', 'ཚ', 'ཛ', 'ཝ', 'ཞ', 'ཟ', 'འ', 'ཡ', 'ར', 'ལ', 'ཤ', 'ས', 'ཧ', 'ཨ'],
 			main => qr{[ཀ ཁ ག ང ཅ ཆ ཇ ཉ ཏ ཐ ད ན པ ཕ བ མ ཙ ཚ ཛ ཝ ཞ ཟ འ ཡ ར ལ ཤ ས ཧ ཨ ི ུ ེ ོ ྐ ྑ ྒ ྔ ྗ ྙ ྟ ྠ ྡ ྣ ྤ ྥ ྦ ྨ ྩ ྪ ྫ ྭ ྱ ྲ ླ ྵ ྶ ྷ]},
 			numbers => qr{[\- ‑ , . % ‰ + 0༠ 1༡ 2༢ 3༣ 4༤ 5༥ 6༦ 7༧ 8༨ 9༩]},
-			punctuation => qr{[\- ‐ ‑ – — , ; \: ! ? . … ' ‘ ’ " “ ” ( ) \[ \] ༼ ༽ § @ * / \& # † ‡ ༄ ༅ ༆ ༈ ༉ ༊ ࿐ ࿑ ༒ ࿒ ࿓ ࿔ ༶ ྾ ྿ ༌ ། ༎ ༏ ༐ ༑ ༔ ༴]},
+			punctuation => qr{[\- ‐‑ – — , ; \: ! ? . … '‘’ "“” ( ) \[ \] ༼ ༽ § @ * / \& # † ‡ ༄ ༅ ༆ ༈ ༉ ༊ ࿐ ࿑ ༒ ࿒ ࿓ ࿔ ༶ ྾ ྿ ༌།༎༏༐༑༔༴]},
 		};
 	},
 EOT
@@ -699,41 +698,6 @@ has 'ellipsis' => (
 	},
 );
 
-has 'more_information' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{?},
-);
-
-has 'quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{“},
-);
-
-has 'quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{”},
-);
-
-has 'alternate_quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{‘},
-);
-
-has 'alternate_quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{’},
-);
-
 has 'units' => (
 	is			=> 'ro',
 	isa			=> HashRef[HashRef[HashRef[Str]]],
@@ -742,72 +706,58 @@ has 'units' => (
 				'long' => {
 					# Long Unit Identifier
 					'duration-day' => {
-						'name' => q(ཉིན་ཞག་),
 						'other' => q(ཉིན་ཞག་ {0}),
 					},
 					# Core Unit Identifier
 					'day' => {
-						'name' => q(ཉིན་ཞག་),
 						'other' => q(ཉིན་ཞག་ {0}),
 					},
 					# Long Unit Identifier
 					'duration-hour' => {
-						'name' => q(ཆུ་ཚོད་),
 						'other' => q(ཆུ་ཚོད་ {0}),
 					},
 					# Core Unit Identifier
 					'hour' => {
-						'name' => q(ཆུ་ཚོད་),
 						'other' => q(ཆུ་ཚོད་ {0}),
 					},
 					# Long Unit Identifier
 					'duration-minute' => {
-						'name' => q(སྐར་མ་),
 						'other' => q(སྐར་མ་ {0}),
 					},
 					# Core Unit Identifier
 					'minute' => {
-						'name' => q(སྐར་མ་),
 						'other' => q(སྐར་མ་ {0}),
 					},
 					# Long Unit Identifier
 					'duration-month' => {
-						'name' => q(ཟླཝ་),
 						'other' => q(ཟླཝ་ {0}),
 					},
 					# Core Unit Identifier
 					'month' => {
-						'name' => q(ཟླཝ་),
 						'other' => q(ཟླཝ་ {0}),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
-						'name' => q(སྐར་ཆ་),
 						'other' => q(སྐར་ཆ་ {0}),
 					},
 					# Core Unit Identifier
 					'second' => {
-						'name' => q(སྐར་ཆ་),
 						'other' => q(སྐར་ཆ་ {0}),
 					},
 					# Long Unit Identifier
 					'duration-week' => {
-						'name' => q(བངུན་ཕྲག་),
 						'other' => q(བངུན་ཕྲག་ {0}),
 					},
 					# Core Unit Identifier
 					'week' => {
-						'name' => q(བངུན་ཕྲག་),
 						'other' => q(བངུན་ཕྲག་ {0}),
 					},
 					# Long Unit Identifier
 					'duration-year' => {
-						'name' => q(ལོ་འཁོར་),
 						'other' => q(ལོ་འཁོར་ {0}),
 					},
 					# Core Unit Identifier
 					'year' => {
-						'name' => q(ལོ་འཁོར་),
 						'other' => q(ལོ་འཁོར་ {0}),
 					},
 				},
@@ -917,29 +867,9 @@ has 'number_symbols' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'latn' => {
-			'decimal' => q(.),
-			'exponential' => q(E),
-			'group' => q(,),
-			'infinity' => q(∞),
-			'list' => q(;),
-			'minusSign' => q(-),
-			'nan' => q(NaN),
-			'perMille' => q(‰),
-			'percentSign' => q(%),
-			'plusSign' => q(+),
-		},
 		'tibt' => {
-			'decimal' => q(.),
-			'exponential' => q(E),
-			'group' => q(,),
 			'infinity' => q(གྲངས་མེད),
-			'list' => q(;),
-			'minusSign' => q(-),
 			'nan' => q(ཨང་མད),
-			'perMille' => q(‰),
-			'percentSign' => q(%),
-			'plusSign' => q(+),
 		},
 	} }
 );
@@ -1037,13 +967,6 @@ has 'number_formats' => (
 				},
 			},
 		},
-		scientificFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#E0',
-				},
-			},
-		},
 } },
 );
 
@@ -1096,7 +1019,6 @@ has 'currencies' => (
 			},
 		},
 		'BRL' => {
-			symbol => 'R$',
 			display_name => {
 				'currency' => q(བྲ་ཛིལ་གྱི་དངུལ་ རེ་ཡལ),
 			},
@@ -1108,7 +1030,6 @@ has 'currencies' => (
 			},
 		},
 		'CAD' => {
-			symbol => 'CA$',
 			display_name => {
 				'currency' => q(ཀེ་ན་ཌ་གི་དངུལ་ ཌོ་ལར),
 			},
@@ -1124,7 +1045,6 @@ has 'currencies' => (
 			},
 		},
 		'CNY' => {
-			symbol => 'CN¥',
 			display_name => {
 				'currency' => q(རྒྱ་ནག་གི་དངུལ་ ཡུ་ཝཱན),
 			},
@@ -1155,19 +1075,16 @@ has 'currencies' => (
 			},
 		},
 		'EUR' => {
-			symbol => '€',
 			display_name => {
 				'currency' => q(ཡུ་རོ༌དངུལ་),
 			},
 		},
 		'GBP' => {
-			symbol => '£',
 			display_name => {
 				'currency' => q(བྲི་ཊིཤ་ པ་འུནཌ་ ཨིས་ཊར་ལིང),
 			},
 		},
 		'HKD' => {
-			symbol => 'HK$',
 			display_name => {
 				'currency' => q(ཧོང་ཀོང་གི་དངུལ་ ཌོ་ལར),
 			},
@@ -1184,7 +1101,6 @@ has 'currencies' => (
 			},
 		},
 		'INR' => {
-			symbol => '₹',
 			display_name => {
 				'currency' => q(རྒྱ་གར་གྱི་དངུལ་ རུ་པི),
 			},
@@ -1215,7 +1131,6 @@ has 'currencies' => (
 			},
 		},
 		'JPY' => {
-			symbol => 'JP¥',
 			display_name => {
 				'currency' => q(ཇཱ་པཱན་གྱི་དངུལ་ ཡེན),
 			},
@@ -1297,7 +1212,6 @@ has 'currencies' => (
 			},
 		},
 		'MXN' => {
-			symbol => 'MX$',
 			display_name => {
 				'currency' => q(མེཀ་སི་ཀོ་གི་དངུལ་ པེ་སོ),
 			},
@@ -1318,7 +1232,6 @@ has 'currencies' => (
 			},
 		},
 		'NZD' => {
-			symbol => 'NZ$',
 			display_name => {
 				'currency' => q(ནིའུ་ཛི་ལེནཌ་གི་དངུལ་ ཌོ་ལར),
 			},
@@ -1405,7 +1318,6 @@ has 'currencies' => (
 			},
 		},
 		'TWD' => {
-			symbol => 'NT$',
 			display_name => {
 				'currency' => q(ཊཱའི་ཝཱན་གི་དངུལ ཌོ་ལར),
 			},
@@ -1421,7 +1333,6 @@ has 'currencies' => (
 			},
 		},
 		'USD' => {
-			symbol => 'US$',
 			display_name => {
 				'currency' => q(ཡུ་ཨེས་ ཌོ་ལར),
 			},
@@ -1612,24 +1523,6 @@ has 'calendar_days' => (
 						sat => 'ཉི་',
 						sun => 'ཟླ་'
 					},
-					narrow => {
-						mon => 'མིར',
-						tue => 'ལྷག',
-						wed => 'ཕུར',
-						thu => 'སངྶ',
-						fri => 'སྤེན',
-						sat => 'ཉི',
-						sun => 'ཟླ'
-					},
-					short => {
-						mon => 'མིར་',
-						tue => 'ལྷག་',
-						wed => 'ཕུར་',
-						thu => 'སངས་',
-						fri => 'སྤེན་',
-						sat => 'ཉི་',
-						sun => 'ཟླ་'
-					},
 					wide => {
 						mon => 'གཟའ་མིག་དམར་',
 						tue => 'གཟའ་ལྷག་པ་',
@@ -1641,15 +1534,6 @@ has 'calendar_days' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						mon => 'མིར་',
-						tue => 'ལྷག་',
-						wed => 'ཕུར་',
-						thu => 'སངས་',
-						fri => 'སྤེན་',
-						sat => 'ཉི་',
-						sun => 'ཟླ་'
-					},
 					narrow => {
 						mon => 'མིར',
 						tue => 'ལྷག',
@@ -1658,24 +1542,6 @@ has 'calendar_days' => (
 						fri => 'སྤེན',
 						sat => 'ཉི',
 						sun => 'ཟླ'
-					},
-					short => {
-						mon => 'མིར་',
-						tue => 'ལྷག་',
-						wed => 'ཕུར་',
-						thu => 'སངས་',
-						fri => 'སྤེན་',
-						sat => 'ཉི་',
-						sun => 'ཟླ་'
-					},
-					wide => {
-						mon => 'གཟའ་མིག་དམར་',
-						tue => 'གཟའ་ལྷག་པ་',
-						wed => 'གཟའ་ཕུར་བུ་',
-						thu => 'གཟའ་པ་སངས་',
-						fri => 'གཟའ་སྤེན་པ་',
-						sat => 'གཟའ་ཉི་མ་',
-						sun => 'གཟའ་ཟླ་བ་'
 					},
 				},
 			},
@@ -1694,11 +1560,6 @@ has 'calendar_quarters' => (
 						2 => 'བཞི་དཔྱ་༣',
 						3 => 'བཞི་དཔྱ་༤'
 					},
-					narrow => {0 => '༡',
-						1 => '༢',
-						2 => '༣',
-						3 => '༤'
-					},
 					wide => {0 => 'བཞི་དཔྱ་དང་པ་',
 						1 => 'བཞི་དཔྱ་གཉིས་པ་',
 						2 => 'བཞི་དཔྱ་གསུམ་པ་',
@@ -1706,20 +1567,10 @@ has 'calendar_quarters' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {0 => 'བཞི་དཔྱ་༡',
-						1 => 'བཞི་དཔྱ་༢',
-						2 => 'བཞི་དཔྱ་༣',
-						3 => 'བཞི་དཔྱ་༤'
-					},
 					narrow => {0 => '༡',
 						1 => '༢',
 						2 => '༣',
 						3 => '༤'
-					},
-					wide => {0 => 'བཞི་དཔྱ་དང་པ་',
-						1 => 'བཞི་དཔྱ་གཉིས་པ་',
-						2 => 'བཞི་དཔྱ་གསུམ་པ་',
-						3 => 'བཞི་དཔྱ་བཞི་པ་'
 					},
 				},
 			},
@@ -1737,14 +1588,6 @@ has 'day_periods' => (
 					'am' => q{སྔ་ཆ་},
 					'pm' => q{ཕྱི་ཆ་},
 				},
-				'narrow' => {
-					'am' => q{སྔ་ཆ་},
-					'pm' => q{ཕྱི་ཆ་},
-				},
-				'wide' => {
-					'am' => q{སྔ་ཆ་},
-					'pm' => q{ཕྱི་ཆ་},
-				},
 			},
 		},
 	} },
@@ -1758,10 +1601,6 @@ has 'eras' => (
 		'generic' => {
 		},
 		'gregorian' => {
-			abbreviated => {
-				'0' => 'BCE',
-				'1' => 'CE'
-			},
 		},
 	} },
 );
@@ -1829,64 +1668,37 @@ has 'datetime_formats_available_formats' => (
 	default		=> sub { {
 		'generic' => {
 			Ed => q{d E},
-			Gy => q{G y},
 			GyMMM => q{G y སྤྱི་ཟླ་MMM},
 			GyMMMEd => q{གཟའ་E, G ལོy ཟླ་MMM ཚེ་d},
-			GyMMMd => q{G y MMM d},
 			H => q{ཆུ་ཚོད་HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
 			MEd => q{E, M-d},
 			MMM => q{སྤྱི་LLL},
 			MMMEd => q{E, སྤྱི་LLL ཚེ་d},
 			MMMd => q{སྤྱི་LLL ཚེ་d},
 			Md => q{M-d},
-			d => q{d},
 			h => q{ཆུ་ཚོད་h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			ms => q{mm:ss},
-			y => q{G y},
-			yyyy => q{G y},
 			yyyyM => q{G y-M},
 			yyyyMEd => q{E, G y-M-d},
 			yyyyMMM => q{G y སྤྱི་ཟླ་MMM},
 			yyyyMMMEd => q{གཟའ་E, G ལོy ཟླ་MMM ཚེ་d},
-			yyyyMMMd => q{G y MMM d},
 			yyyyMd => q{G y-M-d},
-			yyyyQQQ => q{G y QQQ},
-			yyyyQQQQ => q{G y QQQQ},
 		},
 		'gregorian' => {
 			Ed => q{d E},
-			Gy => q{G y},
 			GyMMM => q{G y སྤྱི་ཟླ་MMM},
 			GyMMMEd => q{གཟའ་E, G ལོy ཟླ་MMM ཚེ་d},
-			GyMMMd => q{G y MMM d},
 			H => q{ཆུ་ཚོད་HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
 			MEd => q{E, M-d},
 			MMM => q{སྤྱི་LLL},
 			MMMEd => q{E, སྤྱི་LLL ཚེ་d},
 			MMMd => q{སྤྱི་LLL ཚེ་d},
 			Md => q{M-d},
-			d => q{d},
 			h => q{ཆུ་ཚོད་h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			ms => q{mm:ss},
-			y => q{y},
 			yM => q{y-M},
 			yMEd => q{E, y-M-d},
 			yMMM => q{y སྤྱི་ཟླ་MMM},
 			yMMMEd => q{གཟའ་E, ལོy ཟླ་MMM ཚེ་d},
-			yMMMd => q{y MMM d},
 			yMd => q{y-M-d},
-			yQQQ => q{y QQQ},
-			yQQQQ => q{y QQQQ},
 		},
 	} },
 );
@@ -1905,20 +1717,6 @@ has 'datetime_formats_interval' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-			H => {
-				H => q{HH–HH},
-			},
-			Hm => {
-				H => q{HH:mm–HH:mm},
-				m => q{HH:mm–HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm–HH:mm v},
-				m => q{HH:mm–HH:mm v},
-			},
-			Hv => {
-				H => q{HH–HH v},
-			},
 			M => {
 				M => q{སྤྱི་ཟླ་M–M},
 			},
@@ -1941,31 +1739,7 @@ has 'datetime_formats_interval' => (
 				M => q{སྤྱི་ཟླ་MM ཚེས་dd–ཟླ་MM ཚེས་dd},
 				d => q{སྤྱི་ཟླ་M ཚེས་dd/dd},
 			},
-			d => {
-				d => q{d–d},
-			},
 			fallback => '{0} – {1}',
-			h => {
-				a => q{h a – h a},
-				h => q{h–h a},
-			},
-			hm => {
-				a => q{h:mm a – h:mm a},
-				h => q{h:mm–h:mm a},
-				m => q{h:mm–h:mm a},
-			},
-			hmv => {
-				a => q{h:mm a – h:mm a v},
-				h => q{h:mm–h:mm a v},
-				m => q{h:mm–h:mm a v},
-			},
-			hv => {
-				a => q{h a – h a v},
-				h => q{h–h a v},
-			},
-			y => {
-				y => q{G y–y},
-			},
 			yM => {
 				M => q{G y-MM – MM},
 				y => q{G y-MM – y-MM},
@@ -2000,20 +1774,6 @@ has 'datetime_formats_interval' => (
 			},
 		},
 		'gregorian' => {
-			H => {
-				H => q{HH–HH},
-			},
-			Hm => {
-				H => q{HH:mm–HH:mm},
-				m => q{HH:mm–HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm–HH:mm v},
-				m => q{HH:mm–HH:mm v},
-			},
-			Hv => {
-				H => q{HH–HH v},
-			},
 			M => {
 				M => q{སྤྱི་ཟླ་M–M},
 			},
@@ -2036,34 +1796,9 @@ has 'datetime_formats_interval' => (
 				M => q{སྤྱི་ཟླ་MM ཚེས་dd–ཟླ་MM ཚེས་dd},
 				d => q{སྤྱི་ཟླ་M ཚེས་dd/dd},
 			},
-			d => {
-				d => q{d–d},
-			},
 			fallback => '{0} – {1}',
-			h => {
-				a => q{h a – h a},
-				h => q{h–h a},
-			},
-			hm => {
-				a => q{h:mm a – h:mm a},
-				h => q{h:mm–h:mm a},
-				m => q{h:mm–h:mm a},
-			},
-			hmv => {
-				a => q{h:mm a – h:mm a v},
-				h => q{h:mm–h:mm a v},
-				m => q{h:mm–h:mm a v},
-			},
-			hv => {
-				a => q{h a – h a v},
-				h => q{h–h a v},
-			},
-			y => {
-				y => q{y–y},
-			},
 			yM => {
 				M => q{y-MM – MM},
-				y => q{y-MM – y-MM},
 			},
 			yMEd => {
 				M => q{E, y-MM-dd – E, y-MM-dd},
@@ -2091,7 +1826,6 @@ has 'datetime_formats_interval' => (
 			yMd => {
 				M => q{y-MM-dd – MM-dd},
 				d => q{y-MM-dd – dd},
-				y => q{y-MM-dd – y-MM-dd},
 			},
 		},
 	} },
@@ -2102,7 +1836,6 @@ has 'time_zone_names' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default	=> sub { {
-		hourFormat => q(+HH:mm;-HH:mm),
 		gmtFormat => q(ཇི་ཨེམ་ཏི་{0}),
 		gmtZeroFormat => q(ཇི་ཨེམ་ཊི་),
 		regionFormat => q({0}་ཆུ་ཚོད།),

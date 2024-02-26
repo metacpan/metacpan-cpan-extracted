@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-17'; # DATE
+our $DATE = '2024-01-18'; # DATE
 our $DIST = 'App-LevenshteinUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our %SPEC;
 
@@ -84,7 +84,7 @@ App::LevenshteinUtils - CLI utilities related to Levenshtein algorithm
 
 =head1 VERSION
 
-This document describes version 0.001 of App::LevenshteinUtils (from Perl distribution App-LevenshteinUtils), released on 2024-01-17.
+This document describes version 0.002 of App::LevenshteinUtils (from Perl distribution App-LevenshteinUtils), released on 2024-01-18.
 
 =head1 DESCRIPTION
 
@@ -151,6 +151,11 @@ Source repository is at L<https://github.com/perlancar/perl-App-LevenshteinUtils
 =head1 SEE ALSO
 
 L<Bencher::Scenario::LevenshteinModules>
+
+L<App::TextSimilarityUtils>
+
+L<complete-array-elem> from L<App::CompleteCLIs>, a CLI for L<Complete::Util>'s
+C<complete_array_elem>.
 
 =head1 AUTHOR
 

@@ -1,5 +1,7 @@
 Revision history for Compress-BGZF
 
+0.007001  2024-02-19
+          Add missing Test::Fatal prereq
 0.007     2024-02-09
           Can now emulate htslib EOF empty blocks
           Increased test suite coverage

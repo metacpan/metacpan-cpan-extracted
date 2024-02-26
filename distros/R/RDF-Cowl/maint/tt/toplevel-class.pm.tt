@@ -1,0 +1,15 @@
+package RDF::Cowl::[% class_suffix %];
+# ABSTRACT: «TODO»
+
+use strict;
+use warnings;
+use RDF::Cowl::Lib qw(arg);
+
+my $ffi = RDF::Cowl::Lib->ffi;
+
+require RDF::Cowl::Lib::Gen::Class::[% class_suffix %] unless $RDF::Cowl::no_gen;
+
+1;
+[%#-
+# vim: ft=tt2
+-%]

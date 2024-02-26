@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,7 +59,7 @@ sub new {
 
 
 # Run Operation Request
-# PostWorksheetCellsRangeRowHeightRequest.name : The workbook name.  ,
+# PostWorksheetCellsRangeRowHeightRequest.name : The file name.  ,
 # PostWorksheetCellsRangeRowHeightRequest.sheetName : The worksheet name.  ,
 # PostWorksheetCellsRangeRowHeightRequest.range : The range object.  ,
 # PostWorksheetCellsRangeRowHeightRequest.value : Sets the column height of this range.  ,
@@ -142,7 +142,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},

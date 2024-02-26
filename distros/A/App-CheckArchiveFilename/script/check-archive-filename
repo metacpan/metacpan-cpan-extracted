@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-08-27'; # DATE
+our $DATE = '2023-12-15'; # DATE
 our $DIST = 'App-CheckArchiveFilename'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CheckArchiveFilename/check_archive_filename",
@@ -38,7 +38,7 @@ check-archive-filename - Return information about archive & compressor types fro
 
 =head1 VERSION
 
-This document describes version 0.007 of check-archive-filename (from Perl distribution App-CheckArchiveFilename), released on 2023-08-27.
+This document describes version 0.008 of check-archive-filename (from Perl distribution App-CheckArchiveFilename), released on 2023-12-15.
 
 =head1 SYNOPSIS
 
@@ -47,6 +47,10 @@ B<check-archive-filename> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h
 B<check-archive-filename> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
 B<check-archive-filename> [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- E<lt>I<L<filenames|/"--filenames-json=s">>E<gt> ...
+
+
+
+See examples in the L</EXAMPLES> section.
 
 =head1 OPTIONS
 
@@ -182,6 +186,19 @@ It is also recommended to install L<shcompgen> (see above).
 =head2 other shells
 
 For fish and zsh, install L<shcompgen> as described above.
+
+=head1 EXAMPLES
+
+=head2 Example #1
+
+ % check-archive-filename foo.bar qux.Zip quux.tar.xz
+ +-------------+------------+---------------+--------------+-----------------+-------------------+----------------+-------------------------+
+ | filename    | is_archive | is_compressed | archive_name | compressor_name | compressor_suffix | archive_suffix | filename_without_suffix |
+ +-------------+------------+---------------+--------------+-----------------+-------------------+----------------+-------------------------+
+ | foo.bar     |          0 |               |              |                 |                   |                |                         |
+ | qux.Zip     |          1 |               | Zip          |                 |                   | .Zip           | qux                     |
+ | quux.tar.xz |          1 |             1 | tar          | XZ              | .xz               | .tar           | quux                    |
+ +-------------+------------+---------------+--------------+-----------------+-------------------+----------------+-------------------------+
 
 =head1 HOMEPAGE
 

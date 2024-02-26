@@ -7,9 +7,9 @@ package Require::HookChain::timestamp::std;
 # END IFUNBUILT
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-23'; # DATE
+our $DATE = '2023-12-05'; # DATE
 our $DIST = 'Require-HookChain'; # DIST
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 our %Timestamps; # key=module name, value=epoch
 
@@ -43,7 +43,7 @@ Require::HookChain::timestamp::std - Record timestamp of each module's loading
 
 =head1 VERSION
 
-This document describes version 0.015 of Require::HookChain::timestamp::std (from Perl distribution Require-HookChain), released on 2023-07-23.
+This document describes version 0.016 of Require::HookChain::timestamp::std (from Perl distribution Require-HookChain), released on 2023-12-05.
 
 =head1 SYNOPSIS
 

@@ -114,8 +114,10 @@ sub differ {
 
 my $font;
 sub fonthandlercallback {
-    my ( $self, $pdf, $style ) = @_;
-    my $key = join("|", map { $_ // "normal" } @{$style}{qw(font-family font-style font-weight)});
+    my ( $self, %args ) = @_;
+    my $pdf   = $args{pdf};
+    my $style = $args{style};
+    my $key   = join("|", map { $_ // "normal" } @{$style}{qw(font-family font-style font-weight)});
     $fccalls->{$key}++;
     $font //= $pdf->font('Times-Roman');
 }

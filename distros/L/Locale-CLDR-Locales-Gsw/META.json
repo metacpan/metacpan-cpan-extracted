@@ -34,7 +34,7 @@
       "runtime" : {
          "requires" : {
             "DateTime" : "0.72",
-            "Locale::CLDR" : "v0.40.1",
+            "Locale::CLDR" : "v0.44.0",
             "Moo" : "2",
             "MooX::ClassAttribute" : "0.011",
             "Type::Tiny" : "0",
@@ -46,23 +46,23 @@
    "provides" : {
       "Locale::CLDR::Locales::Gsw" : {
          "file" : "lib/Locale/CLDR/Locales/Gsw.pm",
-         "version" : "v0.40.1"
+         "version" : "v0.44.0"
       },
-      "Locale::CLDR::Locales::Gsw::Any" : {
-         "file" : "lib/Locale/CLDR/Locales/Gsw/Any.pm",
-         "version" : "v0.40.1"
+      "Locale::CLDR::Locales::Gsw::Latn" : {
+         "file" : "lib/Locale/CLDR/Locales/Gsw/Latn.pm",
+         "version" : "v0.44.0"
       },
-      "Locale::CLDR::Locales::Gsw::Any::Ch" : {
-         "file" : "lib/Locale/CLDR/Locales/Gsw/Any/Ch.pm",
-         "version" : "v0.40.1"
+      "Locale::CLDR::Locales::Gsw::Latn::Ch" : {
+         "file" : "lib/Locale/CLDR/Locales/Gsw/Latn/Ch.pm",
+         "version" : "v0.44.0"
       },
-      "Locale::CLDR::Locales::Gsw::Any::Fr" : {
-         "file" : "lib/Locale/CLDR/Locales/Gsw/Any/Fr.pm",
-         "version" : "v0.40.1"
+      "Locale::CLDR::Locales::Gsw::Latn::Fr" : {
+         "file" : "lib/Locale/CLDR/Locales/Gsw/Latn/Fr.pm",
+         "version" : "v0.44.0"
       },
-      "Locale::CLDR::Locales::Gsw::Any::Li" : {
-         "file" : "lib/Locale/CLDR/Locales/Gsw/Any/Li.pm",
-         "version" : "v0.40.1"
+      "Locale::CLDR::Locales::Gsw::Latn::Li" : {
+         "file" : "lib/Locale/CLDR/Locales/Gsw/Latn/Li.pm",
+         "version" : "v0.44.0"
       }
    },
    "release_status" : "stable",
@@ -75,6 +75,6 @@
          "url" : "https://github.com/ThePilgrim/perlcldr.git"
       }
    },
-   "version" : "v0.40.1",
+   "version" : "v0.44.0",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

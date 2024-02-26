@@ -1,4 +1,4 @@
-package At::Lexicon::com::atproto::admin 0.17 {
+package At::Lexicon::com::atproto::admin 0.18 {
 
     #~ https://github.com/bluesky-social/atproto/blob/main/lexicons/com/atproto/admin/defs.json
     use v5.38;
@@ -29,7 +29,6 @@ package At::Lexicon::com::atproto::admin 0.17 {
         field $creatorHandle : param //= ();    # string, required
         field $subjectHandle : param //= ();    # string, required
         ADJUST {
-            #~ $event     = At::_topkg( $event->{'$type'} )->new(%$event)     if !builtin::blessed $event   && defined $event->{'$type'};
             use Carp;
             Carp::confess 'unknown event'
                 unless $event->{'$type'} eq 'com.atproto.admin.defs#modEventTakedown' ||
@@ -41,7 +40,9 @@ package At::Lexicon::com::atproto::admin 0.17 {
                 $event->{'$type'} eq 'com.atproto.admin.defs#modEventEscalate'        ||
                 $event->{'$type'} eq 'com.atproto.admin.defs#modEventMute'            ||
                 $event->{'$type'} eq 'com.atproto.admin.defs#modEventEmail'           ||
-                $event->{'$type'} eq 'com.atproto.admin.defs#modEventResolveAppeal';
+                $event->{'$type'} eq 'com.atproto.admin.defs#modEventResolveAppeal'   ||
+                $event->{'$type'} eq 'com.atproto.admin.defs#modEventTag';
+            $event     = At::_topkg( $event->{'$type'} )->new(%$event)     if !builtin::blessed $event   && defined $event->{'$type'};
             $subject   = At::_topkg( $subject->{'$type'} )->new(%$subject) if !builtin::blessed $subject && defined $subject->{'$type'};
             $createdBy = At::Protocol::DID->new( uri => $createdBy )             unless builtin::blessed $createdBy;
             $createdAt = At::Protocol::Timestamp->new( timestamp => $createdAt ) unless builtin::blessed $createdAt;
@@ -77,7 +78,6 @@ package At::Lexicon::com::atproto::admin 0.17 {
         field $createdBy : param;       # DID, required
         field $createdAt : param;       # Datetime, required
         ADJUST {
-            #~ $event        = At::_topkg( $event->{'$type'} )->new(%$event)     if !builtin::blessed $event   && defined $event->{'$type'};
             use Carp;
             Carp::confess 'unknown event'
                 unless $event->{'$type'} eq 'com.atproto.admin.defs#modEventTakedown' ||
@@ -89,7 +89,9 @@ package At::Lexicon::com::atproto::admin 0.17 {
                 $event->{'$type'} eq 'com.atproto.admin.defs#modEventEscalate'        ||
                 $event->{'$type'} eq 'com.atproto.admin.defs#modEventMute'            ||
                 $event->{'$type'} eq 'com.atproto.admin.defs#modEventEmail'           ||
-                $event->{'$type'} eq 'com.atproto.admin.defs#modEventResolveAppeal';
+                $event->{'$type'} eq 'com.atproto.admin.defs#modEventResolveAppeal'   ||
+                $event->{'$type'} eq 'com.atproto.admin.defs#modEventTag';
+            $event        = At::_topkg( $event->{'$type'} )->new(%$event)     if !builtin::blessed $event   && defined $event->{'$type'};
             $subject      = At::_topkg( $subject->{'$type'} )->new(%$subject) if !builtin::blessed $subject && defined $subject->{'$type'};
             $subjectBlobs = [ map { $_ = At::Lexicon::com::atproto::admin::blobView->new(%$_) unless builtin::blessed $_ } @$subjectBlobs ];
             $createdBy    = At::Protocol::DID->new( uri => $createdBy )             unless builtin::blessed $createdBy;
@@ -106,7 +108,7 @@ package At::Lexicon::com::atproto::admin 0.17 {
 
         method _raw() {
             +{  id          => $id,
-                event       => $event,
+                event       => $event->_raw,
                 subject     => $subject->_raw,
                 subjectBlob => [ map { $_->_raw } @$subjectBlobs ],
                 createdBy   => $createdBy->_raw,
@@ -114,6 +116,188 @@ package At::Lexicon::com::atproto::admin 0.17 {
             };
         }
     };
+
+    class At::Lexicon::com::atproto::admin::modEventTakedown 1 {
+        field $type : param($type);        # record field
+        field $comment : param;            # string
+        field $durationInHours : param;    # int
+        ADJUST { }
+
+        # perlclass does not have :reader yet
+        method comment         {$comment}
+        method durationInHours {$durationInHours}
+
+        method _raw() {
+            +{  '$type' => $type,
+                defined $comment ? ( comment => $comment ) : (), defined $durationInHours ? ( durationInHours => $durationInHours ) : ()
+            };
+        }
+    }
+
+    class At::Lexicon::com::atproto::admin::modEventReverseTakedown 1 {
+        field $type : param($type);    # record field
+        field $comment : param;        # string
+        ADJUST { }
+
+        # perlclass does not have :reader yet
+        method comment {$comment}
+
+        method _raw() {
+            +{ '$type' => $type, defined $comment ? ( comment => $comment ) : () };
+        }
+    }
+
+    class At::Lexicon::com::atproto::admin::modEventResolveAppeal 1 {
+        field $type : param($type);    # record field
+        field $comment : param;        # string
+        ADJUST { }
+
+        # perlclass does not have :reader yet
+        method comment {$comment}
+
+        method _raw() {
+            +{ '$type' => $type, defined $comment ? ( comment => $comment ) : () };
+        }
+    }
+
+    class At::Lexicon::com::atproto::admin::modEventComment 1 {
+        field $type : param($type);      # record field
+        field $comment : param;          # string, required
+        field $sticky : param //= ();    # bool
+        ADJUST { $sticky = !!$sticky if defined $sticky && builtin::blessed $sticky }
+
+        # perlclass does not have :reader yet
+        method comment {$comment}
+        method sticky  {$sticky}
+
+        method _raw() {
+            +{ '$type' => $type, comment => $comment, defined $sticky ? ( sticky => \!!$sticky ) : () };
+        }
+    }
+
+    class At::Lexicon::com::atproto::admin::modEventReport 1 {
+        field $type : param($type);       # record field
+        field $reportType : param;        # ::atproto::moderation::reasonType, required
+        field $comment : param //= ();    # string
+        ADJUST {
+            $reportType = At::Lexicon::com::atproto::moderation::reasonType->new(%$reportType) unless builtin::blessed $$reportType;
+        }
+
+        # perlclass does not have :reader yet
+        method reportType {$reportType}
+        method comment    {$comment}
+
+        method _raw() {
+            +{ '$type' => $type, reportType => $reportType->_raw, defined $comment ? ( comment => $comment ) : () };
+        }
+    }
+
+    class At::Lexicon::com::atproto::admin::modEventLabel 1 {
+        field $type : param($type);        # record field
+        field $createLabelVals : param;    # array of strings, required
+        field $negateLabelVals : param;    # array of strings, required
+        field $comment : param //= ();     # string
+        ADJUST { }
+
+        # perlclass does not have :reader yet
+        method createLabelVals {$createLabelVals}
+        method negateLabelVals {$negateLabelVals}
+        method comment         {$comment}
+
+        method _raw() {
+            +{  '$type'         => $type,
+                createLabelVals => $createLabelVals,
+                negateLabelVals => $negateLabelVals,
+                defined $comment ? ( comment => $comment ) : ()
+            };
+        }
+    }
+
+    class At::Lexicon::com::atproto::admin::modEventAcknowledge 1 {
+        field $type : param($type);       # record field
+        field $comment : param //= ();    # string
+        ADJUST { }
+
+        # perlclass does not have :reader yet
+        method comment {$comment}
+
+        method _raw() {
+            +{ '$type' => $type, defined $comment ? ( comment => $comment ) : () };
+        }
+    }
+
+    class At::Lexicon::com::atproto::admin::modEventEscalate 1 {
+        field $type : param($type);       # record field
+        field $comment : param //= ();    # string
+        ADJUST { }
+
+        # perlclass does not have :reader yet
+        method comment {$comment}
+
+        method _raw() {
+            +{ '$type' => $type, defined $comment ? ( comment => $comment ) : () };
+        }
+    }
+
+    class At::Lexicon::com::atproto::admin::modEventMute 1 {
+        field $type : param($type);        # record field
+        field $durationInHours : param;    # int, required
+        field $comment : param //= ();     # string
+        ADJUST { }
+
+        # perlclass does not have :reader yet
+        method durationInHours {$durationInHours}
+        method comment         {$comment}
+
+        method _raw() {
+            +{ '$type' => $type, durationInHours => $durationInHours, defined $comment ? ( comment => $comment ) : () };
+        }
+    }
+
+    class At::Lexicon::com::atproto::admin::modEventUnmute 1 {
+        field $type : param($type);       # record field
+        field $comment : param //= ();    # string
+        ADJUST { }
+
+        # perlclass does not have :reader yet
+        method comment {$comment}
+
+        method _raw() {
+            +{ '$type' => $type, defined $comment ? ( comment => $comment ) : () };
+        }
+    }
+
+    class At::Lexicon::com::atproto::admin::modEventEmail 1 {
+        field $type : param($type);       # record field
+        field $subjectLine : param;       # string, required
+        field $comment : param //= ();    # string
+        ADJUST { }
+
+        # perlclass does not have :reader yet
+        method subjectLine {$subjectLine}
+        method comment     {$comment}
+
+        method _raw() {
+            +{ '$type' => $type, subjectLine => $subjectLine, defined $comment ? ( comment => $comment ) : () };
+        }
+    }
+
+    class At::Lexicon::com::atproto::admin::modEventTag 1 {
+        field $type : param($type);       # record field
+        field $add : param;               # array of strings, required
+        field $remove : param;            # array of strings, required
+        field $comment : param //= ();    # string
+        ADJUST { }
+
+        # perlclass does not have :reader yet
+        method add     {$add}
+        method remove  {$remove}
+        method comment {$comment}
+
+        method _raw() {
+            +{ '$type' => $type, add => $add, remove => $remove, defined $comment ? ( comment => $comment ) : () };
+        }
+    }
 
     class At::Lexicon::com::atproto::admin::reportView 1 {
         field $id : param;                          # int, required

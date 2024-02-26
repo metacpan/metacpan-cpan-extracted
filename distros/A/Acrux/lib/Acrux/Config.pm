@@ -165,7 +165,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Config::General qw//;
 use Cwd qw/getcwd/;
@@ -188,7 +188,7 @@ sub new {
     my $self  = bless {
             default => $args->{defaults} || $args->{default} || {},
             file    => $args->{file} // '',
-            root    => $args->{root} // '', # base path to files and directories
+            root    => $args->{root} // '', # base path to default files/directories
             dirs    => $args->{dirs} || [],
             noload  => $args->{noload} || 0,
             options => {},
@@ -198,14 +198,14 @@ sub new {
             files   => [],
             orig    => $args->{options} || $args->{opts} || {},
         }, $class;
-    my $myroot = getcwd();
+    my $myroot = length($self->{root}) ? $self->{root} : getcwd();
 
     # Set dirs
     my @dirs = ();
     foreach my $dir (as_array($self->{dirs})) {
         unless (File::Spec->file_name_is_absolute($dir)) { # rel
-            $dir = length($self->{root})
-                ? File::Spec->rel2abs($dir, $self->{root})
+            $dir = length($myroot)
+                ? File::Spec->rel2abs($dir, $myroot)
                 : File::Spec->rel2abs($dir);
         }
         push @dirs, $dir if -e $dir;
@@ -214,15 +214,10 @@ sub new {
 
     # Set config file
     my $file = $self->{file};
-    unless (length $file) {
-        $file = File::Spec->catfile(
-            length($self->{root}) ? $self->{root} : $myroot,
-            sprintf("%s.conf", basename($0))
-        );
-    }
+       $file = sprintf("%s.conf", basename($0)) unless length $file;
     unless (File::Spec->file_name_is_absolute($file)) { # rel
-        $file = length($self->{root})
-                ? File::Spec->rel2abs($file, $self->{root})
+        $file = length($myroot)
+                ? File::Spec->rel2abs($file, $myroot)
                 : File::Spec->rel2abs($file);
     }
     $self->{file} = $file;

@@ -42,18 +42,17 @@
       },
       "test" : {
          "requires" : {
-            "Business::ID::NPWP" : "0",
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Test::More" : "0.98"
+            "Test::More" : "0"
          }
       }
    },
    "provides" : {
       "Business::ID::POM" : {
          "file" : "lib/Business/ID/POM.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
@@ -68,7 +67,7 @@
          "web" : "https://github.com/perlancar/perl-Business-ID-POM"
       }
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038000"
@@ -168,7 +167,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.608"
+            "version" : "0.609"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",

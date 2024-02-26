@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Sd::Deva - Package for language Sindhi
 
 package Locale::CLDR::Locales::Sd::Deva;
 # This file auto generated from Data\common\main\sd_Deva.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -23,7 +23,7 @@ use if $^V ge v5.12.0, feature => 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
-extends('Locale::CLDR::Locales::Sd');
+extends('Locale::CLDR::Locales::Root');
 has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
@@ -111,6 +111,7 @@ has 'display_name_region' => (
  			'IN' => 'भारत',
  			'IT' => 'इटली',
  			'JP' => 'जापान',
+ 			'PK' => 'पाकिस्तान',
  			'RU' => 'रशिया',
  			'US' => 'अमेरिका',
  			'ZZ' => 'अणजातल इलाइको',
@@ -180,8 +181,7 @@ has 'characters' => (
 		return {
 			auxiliary => qr{[‌‍]},
 			main => qr{[़ ं अ आ इ ई उ ऊ ए ऐ ओ औ क ख ग ॻ घ ङ च छ ज ॼ झ ञ ट ठ ड ॾ ढ ण त थ द ध न प फ ब ॿ भ म य र ल व श ष स ह ा ि ी ु ू ृ ॄ ॅ े ै ॉ ो ौ ्]},
-			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
-			punctuation => qr{[\- ‐ ‑ – — , ; \: ! ? . … ' ‘ ’ " “ ” ( ) \[ \] § @ * / \& # † ‡ ′ ″]},
+			punctuation => qr{[\- ‐‑ – — , ; \: ! ? . … '‘’ "“” ( ) \[ \] § @ * / \& # † ‡ ′ ″]},
 		};
 	},
 EOT
@@ -190,25 +190,6 @@ EOT
 },
 );
 
-
-has 'duration_units' => (
-	is			=> 'ro',
-	isa			=> HashRef[Str],
-	init_arg	=> undef,
-	default		=> sub { {
-				hm => 'h:mm',
-				hms => 'h:mm:ss',
-				ms => 'm:ss',
-			} }
-);
-
-has 'units' => (
-	is			=> 'ro',
-	isa			=> HashRef[HashRef[HashRef[Str]]],
-	init_arg	=> undef,
-	default		=> sub { {
-			} }
-);
 
 has 'yesstr' => (
 	is			=> 'ro',
@@ -224,20 +205,6 @@ has 'nostr' => (
 	default		=> sub { qr'^(?i:न|न|no|n)$' }
 );
 
-has 'default_numbering_system' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> 'latn',
-);
-
-has native_numbering_system => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> 'latn',
-);
-
 has 'currencies' => (
 	is			=> 'ro',
 	isa			=> HashRef,
@@ -251,7 +218,6 @@ has 'currencies' => (
 			},
 		},
 		'CNY' => {
-			symbol => 'CN¥',
 			display_name => {
 				'currency' => q(चीनी युआनु),
 				'one' => q(चीनी युआनु),
@@ -264,7 +230,6 @@ has 'currencies' => (
 			},
 		},
 		'GBP' => {
-			symbol => '£',
 			display_name => {
 				'currency' => q(बरतानवी पाउंडु),
 				'one' => q(बरतानवी पाउंडु),
@@ -287,7 +252,6 @@ has 'currencies' => (
 			},
 		},
 		'RUB' => {
-			symbol => '₽',
 			display_name => {
 				'currency' => q(रशियनु रुबलु),
 				'one' => q(रशियनु रुबलु),
@@ -369,7 +333,7 @@ has 'calendar_months' => (
 							'जुलाई',
 							'अगस्ट',
 							'सप्टेंबर',
-							'ऑक्टोबर',
+							'ओक्टोबर',
 							'नवंबर',
 							'डिसंबर'
 						],
@@ -457,15 +421,6 @@ has 'calendar_days' => (
 						sat => 'छंछ',
 						sun => 'आर्त'
 					},
-					narrow => {
-						mon => 'सू',
-						tue => 'मं',
-						wed => 'बु॒',
-						thu => 'वि',
-						fri => 'जु',
-						sat => 'छं',
-						sun => 'आ'
-					},
 					wide => {
 						mon => 'सूमर',
 						tue => 'मंगलु',
@@ -516,16 +471,6 @@ has 'calendar_quarters' => (
 	default		=> sub { {
 			'gregorian' => {
 				'format' => {
-					abbreviated => {0 => 'पहिंरी टिमाही',
-						1 => 'बीं॒ टिमाही',
-						2 => 'टीं टिमाही',
-						3 => 'चोथीं टिमाही'
-					},
-					narrow => {0 => '1',
-						1 => '2',
-						2 => '3',
-						3 => '4'
-					},
 					wide => {0 => 'पहिंरी टिमाही',
 						1 => 'बीं॒ टिमाही',
 						2 => 'टीं टिमाही',
@@ -534,16 +479,6 @@ has 'calendar_quarters' => (
 				},
 				'stand-alone' => {
 					abbreviated => {0 => 'पहिरीं टिमाही',
-						1 => 'बीं॒ टिमाही',
-						2 => 'टीं टिमाही',
-						3 => 'चोथीं टिमाही'
-					},
-					narrow => {0 => '1',
-						1 => '2',
-						2 => '3',
-						3 => '4'
-					},
-					wide => {0 => 'पहिंरी टिमाही',
 						1 => 'बीं॒ टिमाही',
 						2 => 'टीं टिमाही',
 						3 => 'चोथीं टिमाही'
@@ -561,8 +496,8 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'wide' => {
-					'am' => q{मंझंदि खां पहिंरियों},
-					'pm' => q{मंझंदि खां पोइ},
+					'am' => q{सुबुह जा},
+					'pm' => q{शाम जा},
 				},
 			},
 		},
@@ -627,14 +562,14 @@ has 'datetime_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-			'full' => q{{1} ते {0}},
-			'long' => q{{1} ते {0}},
+			'full' => q{{1}, {0}},
+			'long' => q{{1}, {0}},
 			'medium' => q{{1}, {0}},
 			'short' => q{{1}, {0}},
 		},
 		'gregorian' => {
-			'full' => q{{1} ते {0}},
-			'long' => q{{1} ते {0}},
+			'full' => q{{1}, {0}},
+			'long' => q{{1}, {0}},
 			'medium' => q{{1}, {0}},
 			'short' => q{{1}, {0}},
 		},
@@ -647,35 +582,15 @@ has 'datetime_formats_available_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'gregorian' => {
-			Bh => q{h B},
-			Bhm => q{h:mm B},
-			Bhms => q{h:mm:ss B},
-			EBhm => q{E h:mm B},
-			EBhms => q{E h:mm:ss B},
-			EHm => q{E HH:mm},
-			EHms => q{E HH:mm:ss},
 			Ed => q{d E},
-			Ehm => q{E h:mm a},
-			Ehms => q{E h:mm:ss a},
 			Gy => q{y G},
 			GyMMM => q{MMM y G},
 			GyMMMEd => q{E, MMM d, y G},
 			GyMMMd => q{MMM d, y G},
 			GyMd => q{M/d/y GGGGG},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			Hmsv => q{HH:mm:ss v},
-			Hmv => q{HH:mm v},
 			MEd => q{E, M/d},
 			MMMEd => q{E, MMM d},
 			Md => q{M/d},
-			h => q{h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			hmsv => q{h:mm:ss a v},
-			hmv => q{h:mm a v},
-			ms => q{mm:ss},
 			yM => q{M/y},
 			yMEd => q{E, M/d/y},
 			yMMM => q{MMM y},
@@ -716,10 +631,11 @@ has 'time_zone_names' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default	=> sub { {
+		gmtFormat => q(जीएमटी{0}),
+		gmtZeroFormat => q(जीएमटी),
 		regionFormat => q({0} वक्त),
 		regionFormat => q({0} दीं॒ह जो वक्त),
 		regionFormat => q({0} मअयारी वक्त),
-		fallbackFormat => q({1} ({0})),
 		'America_Central' => {
 			long => {
 				'daylight' => q#मरकज़ी दीं॒ह जो वक्त#,

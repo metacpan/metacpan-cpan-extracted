@@ -742,8 +742,22 @@ sub _probe_vstream_id {
 
 =head2 extra_params
 
-Add extra parameters. This should be used sparingly, rather add some
+Add extra (output) parameters. This should be used sparingly, rather add some
 abstraction.
+
+=head3 handles
+
+=over
+
+=item *
+
+add_param (adds an extra parameter)
+
+=item *
+
+drop_param (delete a parameter)
+
+=back
 
 =cut
 
@@ -763,6 +777,47 @@ sub _probe_extra_params {
 	my $self = shift;
 	if($self->has_reference) {
 		return $self->reference->extra_params;
+	}
+	return {};
+}
+
+=head2 input_params
+
+Add extra input parameters. This should be used sparingly, rather add
+some abstraction.
+
+=head3 handles
+
+=over
+
+=item *
+
+add_input_param (adds an extra parameter)
+
+=item *
+
+drop_input_param (delete a parameter)
+
+=back
+
+=cut
+
+has 'input_params' => (
+	traits => ['Hash'],
+	isa => 'HashRef[Str]',
+	is => 'ro',
+	handles => {
+		add_input_param => 'set',
+		drop_input_param => 'delete',
+	},
+	builder => "_probe_input_params",
+	lazy => 1,
+);
+
+sub _probe_input_params {
+	my $self = shift;
+	if($self->has_reference) {
+		return $self->reference->input_params;
 	}
 	return {};
 }
@@ -816,6 +871,13 @@ sub readopts {
 	if($self->has_time_offset) {
 		push @opts, ("-itsoffset", $self->time_offset);
 	}
+
+	if(scalar(keys(%{$self->input_params})) > 0) {
+		foreach my $param(keys %{$self->input_params}) {
+			push @opts, ("-$param", $self->input_params->{$param});
+		}
+	}
+
 	push @opts, ("-i", $self->url);
 	return @opts;
 }

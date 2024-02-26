@@ -1,0 +1,185 @@
+#ifndef CMAKE_HELPERS_INTTYPES_H
+#  define CMAKE_HELPERS_INTTYPES_H
+
+#cmakedefine HAVE_SYS_INTTYPES_H @HAVE_SYS_INTTYPES_H@
+
+#  ifdef HAVE_SYS_INTTYPES_H
+#    include <sys/inttypes.h>
+#  else /* HAVE_SYS_INTTYPES_H */
+
+/* Inspired by https://gasnet.lbl.gov/amudp/dist/portable_inttypes.h */
+
+#    include <stdint.h> /* NO CHECK because this is part of our repair process that makes sure that stdint.h exist */
+#cmakedefine HAVE_C99MODIFIERS @HAVE_C99MODIFIERS@
+#    ifdef HAVE_C99MODIFIERS
+#      define HAVE_C99_FORMAT_SPECIFIERS 1
+#    else
+#      define HAVE_C99_FORMAT_SPECIFIERS 0
+#    endif
+#cmakedefine HAVE_SIZEOF_CHAR @HAVE_SIZEOF_CHAR@
+#cmakedefine HAVE_SIZEOF_SHORT @HAVE_SIZEOF_SHORT@
+#cmakedefine HAVE_SIZEOF_INT @HAVE_SIZEOF_INT@
+#cmakedefine HAVE_SIZEOF_LONG_LONG @HAVE_SIZEOF_LONG_LONG@
+#cmakedefine HAVE_SIZEOF_VOID_STAR @HAVE_SIZEOF_VOID_STAR@
+#cmakedefine HAVE_SIZEOF_SIZE_T @HAVE_SIZEOF_SIZE_T@
+#cmakedefine HAVE_SIZEOF_PTRDIFF_T @HAVE_SIZEOF_PTRDIFF_T@
+
+#    if HAVE_C99_FORMAT_SPECIFIERS || (!defined(HAVE_C99_FORMAT_SPECIFIERS) && __STDC_VERSION__ >= 199901L)
+/* prefer libc-provided length modifiers added in C99 if we can determine they are available */
+#      ifndef __PRISZ_PREFIX
+#        define __PRISZ_PREFIX "z"
+#      endif
+#      ifndef __PRIPD_PREFIX
+#        define __PRIPD_PREFIX "t"
+#      endif
+#    endif
+#    if !defined(__PRISZ_PREFIX) && defined(HAVE_SIZEOF_SIZE_T) /* use configure info when available */
+#      if defined(HAVE_SIZEOF_INT) && (SIZEOF_SIZE_T == SIZEOF_INT)
+#        define __PRISZ_PREFIX 
+#      elif defined(HAVE_SIZEOF_LONG) && (SIZEOF_SIZE_T == SIZEOF_LONG)
+#        define __PRISZ_PREFIX "l"
+#      elif defined(HAVE_SIZEOF_LONG_LONG) && (SIZEOF_SIZE_T == SIZEOF_LONG_LONG)
+#        define __PRISZ_PREFIX "ll"
+#      endif
+#    endif
+#    if !defined(__PRIPD_PREFIX) && defined(HAVE_SIZEOF_PTRDIFF_T) /* use configure info when available */
+#      if defined(HAVE_SIZEOF_INT) && (SIZEOF_PTRDIFF_T == SIZEOF_INT)
+#        define __PRIPD_PREFIX 
+#      elif defined(HAVE_SIZEOF_LONG) && (SIZEOF_PTRDIFF_T == SIZEOF_LONG)
+#        define __PRIPD_PREFIX "l"
+#      elif defined(HAVE_SIZEOF_LONG_LONG) && (SIZEOF_PTRDIFF_T == SIZEOF_LONG_LONG)
+#        define __PRIPD_PREFIX "ll"
+#      endif
+#    endif
+#    if !defined(__PRI64_PREFIX) /* use configure info when available */
+#      if defined(HAVE_SIZEOF_LONG) && (SIZEOF_LONG == 8)
+#        define __PRI64_PREFIX  "l"
+#      elif defined(HAVE_SIZEOF_INT) && (SIZEOF_INT == 8)
+#       define __PRI64_PREFIX 
+#      elif defined(HAVE_SIZEOF_LONG_LONG) && (SIZEOF_LONG_LONG == 8)
+#        define __PRI64_PREFIX  "ll"
+#      endif
+#    endif
+#    if !defined(__PRIPTR_PREFIX) && defined(HAVE_SIZEOF_VOID_STAR) /* use configure info when available */
+#      if defined(HAVE_SIZEOF_LONG) && (SIZEOF_VOID_STAR == SIZEOF_LONG)
+#        define __PRIPTR_PREFIX  "l"
+#      elif defined(HAVE_SIZEOF_INT) && (SIZEOF_VOID_STAR == SIZEOF_INT)
+#        define __PRIPTR_PREFIX 
+#      elif defined(HAVE_SIZEOF_LONG_LONG) && (SIZEOF_VOID_STAR == SIZEOF_LONG_LONG)
+#        define __PRIPTR_PREFIX  "ll"
+#      endif
+#    endif
+#    ifndef PRIi64
+#      define PRIi64 __PRI64_PREFIX "i"
+#    endif
+#    ifndef PRId64
+#      define PRId64 __PRI64_PREFIX "d"
+#    endif
+#    ifndef PRIu64
+#      define PRIu64 __PRI64_PREFIX "u"
+#    endif
+#    ifndef PRIo64
+#      define PRIo64 __PRI64_PREFIX "o"
+#    endif
+#    ifndef PRIx64
+#      define PRIx64 __PRI64_PREFIX "x"
+#    endif
+#      ifndef PRIX64
+#    define PRIX64 __PRI64_PREFIX "X"
+#    endif
+
+#    ifndef PRIiPTR
+#      define PRIiPTR __PRIPTR_PREFIX "i"
+#    endif
+#    ifndef PRIdPTR
+#      define PRIdPTR __PRIPTR_PREFIX "d"
+#    endif
+#    ifndef PRIuPTR
+#      define PRIuPTR __PRIPTR_PREFIX "u"
+#    endif
+#    ifndef PRIoPTR
+#      define PRIoPTR __PRIPTR_PREFIX "o"
+#    endif
+#    ifndef PRIxPTR
+#      define PRIxPTR __PRIPTR_PREFIX "x"
+#    endif
+#    ifndef PRIXPTR
+#      define PRIXPTR __PRIPTR_PREFIX "X"
+#    endif
+
+#    ifdef __PRISZ_PREFIX /* these are best-effort definitions - see above */
+#      ifndef PRIiSZ
+#        define PRIiSZ __PRISZ_PREFIX "i"
+#      endif
+#      ifndef PRIdSZ
+#        define PRIdSZ __PRISZ_PREFIX "d"
+#      endif
+#      ifndef PRIuSZ
+#        define PRIuSZ __PRISZ_PREFIX "u"
+#      endif
+#      ifndef PRIoSZ
+#        define PRIoSZ __PRISZ_PREFIX "o"
+#      endif
+#      ifndef PRIxSZ
+#        define PRIxSZ __PRISZ_PREFIX "x"
+#      endif
+#      ifndef PRIXSZ
+#        define PRIXSZ __PRISZ_PREFIX "X"
+#      endif
+#    endif
+
+#    ifdef __PRIPD_PREFIX /* these are best-effort definitions - see above */
+#      ifndef PRIiPD
+#        define PRIiPD __PRIPD_PREFIX "i"
+#      endif
+#      ifndef PRIdPD
+#        define PRIdPD __PRIPD_PREFIX "d"
+#      endif
+#      ifndef PRIuPD
+#        define PRIuPD __PRIPD_PREFIX "u"
+#      endif
+#      ifndef PRIoPD
+#        define PRIoPD __PRIPD_PREFIX "o"
+#      endif
+#      ifndef PRIxPD
+#        define PRIxPD __PRIPD_PREFIX "x"
+#      endif
+#      ifndef PRIXPD
+#        define PRIXPD __PRIPD_PREFIX "X"
+#      endif
+#    endif
+
+#    ifndef SCNi64
+#      define SCNi64 __PRI64_PREFIX "i"
+#    endif
+#    ifndef SCNd64
+#      define SCNd64 __PRI64_PREFIX "d"
+#    endif
+#    ifndef SCNu64
+#      define SCNu64 __PRI64_PREFIX "u"
+#    endif
+#    ifndef SCNo64
+#      define SCNo64 __PRI64_PREFIX "o"
+#    endif
+#    ifndef SCNx64
+#      define SCNx64 __PRI64_PREFIX "x"
+#    endif
+
+#    ifndef SCNiPTR
+#      define SCNiPTR __PRIPTR_PREFIX "i"
+#    endif
+#    ifndef SCNdPTR
+#      define SCNdPTR __PRIPTR_PREFIX "d"
+#    endif
+#    ifndef SCNuPTR
+#      define SCNuPTR __PRIPTR_PREFIX "u"
+#    endif
+#    ifndef SCNoPTR
+#      define SCNoPTR __PRIPTR_PREFIX "o"
+#    endif
+#    ifndef SCNxPTR
+#      define SCNxPTR __PRIPTR_PREFIX "x"
+#    endif
+#  endif /* HAVE_SYS_INTTYPES_H */
+
+#endif /* CMAKE_HELPERS_INTTYPES_H */

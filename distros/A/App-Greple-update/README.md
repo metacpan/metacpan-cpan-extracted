@@ -19,7 +19,7 @@ Options:
 
 # VERSION
 
-Version 1.02
+Version 1.03
 
 # DESCRIPTION
 
@@ -55,6 +55,11 @@ Consult it for more practical use case.
     are printed.
 
     File is not touched as far as its content does not change.
+
+    The file is also not updated if the output is empty.  This is to
+    prevent the contents of the file from being erased if none of the
+    match strings are included.  If you want to intentionally empty a
+    file, you need to think of another way.
 
 - **--with-backup**\[=_suffix_\]
 

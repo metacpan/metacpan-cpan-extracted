@@ -2,8 +2,8 @@ NAME
     App::TextTableUtils - CLI utilities related to text tables
 
 VERSION
-    This document describes version 0.009 of App::TextTableUtils (from Perl
-    distribution App-TextTableUtils), released on 2023-03-10.
+    This document describes version 0.010 of App::TextTableUtils (from Perl
+    distribution App-TextTableUtils), released on 2023-12-03.
 
 DESCRIPTION
     This distributions provides the following command-line utilities related

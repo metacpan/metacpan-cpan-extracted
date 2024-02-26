@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/Data/Sah/Filter/perl/Array/dupenum.pm','lib/Data/Sah/Filter/perl/Array/dupestr.pm','lib/Data/Sah/FilterBundle/Array.pm'];
+my $filenames = ['lib/Data/Sah/Filter/perl/Array/arrayify.pm','lib/Data/Sah/Filter/perl/Array/dupenum.pm','lib/Data/Sah/Filter/perl/Array/dupestr.pm','lib/Data/Sah/FilterBundle/Array.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

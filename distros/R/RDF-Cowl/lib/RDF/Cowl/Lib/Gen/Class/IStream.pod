@@ -1,0 +1,333 @@
+# PODNAME: RDF::Cowl::Lib::Gen::Class::IStream
+# ABSTRACT: Generated docs for RDF::Cowl::IStream
+
+## DO NOT EDIT
+## Generated via maint/tt/Class.pod.tt
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+RDF::Cowl::Lib::Gen::Class::IStream - Generated docs for RDF::Cowl::IStream
+
+=head1 VERSION
+
+version 1.0.0
+
+=head1 MAIN MODULE
+
+L<RDF::Cowl::IStream>
+
+=head1 METHODS
+
+=head2 get_manager
+
+B<Signature>:
+
+  $self->get_manager()
+
+B<Params>:
+
+  CowlIStream $stream 
+
+Documentation:
+
+  Gets the manager of this ontology input stream.
+  
+  @param stream The ontology input stream.
+  @return The manager.
+
+=over 2
+
+B<C function name>: C<< cowl_istream_get_manager >>
+
+=back
+
+=head2 get_sym_table
+
+B<Signature>:
+
+  $self->get_sym_table()
+
+B<Params>:
+
+  CowlIStream $stream 
+
+Documentation:
+
+  Gets the symbol table of this ontology input stream.
+  
+  @param stream The ontology input stream.
+  @return The symbol table.
+
+=over 2
+
+B<C function name>: C<< cowl_istream_get_sym_table >>
+
+=back
+
+=head2 handle_iri
+
+B<Signature>:
+
+  $self->handle_iri(CowlIRI $iri)
+
+B<Params>:
+
+  CowlIStream $stream 
+  CowlIRI $iri 
+
+Documentation:
+
+  Handles the specified ontology IRI.
+  
+  @param stream The ontology input stream.
+  @param iri The ontology IRI.
+  @return Return code.
+
+=over 2
+
+B<C function name>: C<< cowl_istream_handle_iri >>
+
+=back
+
+=head2 handle_version
+
+B<Signature>:
+
+  $self->handle_version(CowlIRI $version)
+
+B<Params>:
+
+  CowlIStream $stream 
+  CowlIRI $version 
+
+Documentation:
+
+  Handles the specified ontology version IRI.
+  
+  @param stream The ontology input stream.
+  @param version The version IRI.
+  @return Return code.
+
+=over 2
+
+B<C function name>: C<< cowl_istream_handle_version >>
+
+=back
+
+=head2 handle_import
+
+B<Signature>:
+
+  $self->handle_import(CowlIRI $import)
+
+B<Params>:
+
+  CowlIStream $stream 
+  CowlIRI $import 
+
+Documentation:
+
+  Handles the specified import IRI.
+  
+  @param stream The ontology input stream.
+  @param import The import IRI.
+  @return Return code.
+
+=over 2
+
+B<C function name>: C<< cowl_istream_handle_import >>
+
+=back
+
+=head2 handle_annot
+
+B<Signature>:
+
+  $self->handle_annot(CowlAnnotation $annot)
+
+B<Params>:
+
+  CowlIStream $stream 
+  CowlAnnotation $annot 
+
+Documentation:
+
+  Handles the specified ontology annotation.
+  
+  @param stream The ontology input stream.
+  @param annot The annotation.
+  @return Return code.
+
+=over 2
+
+B<C function name>: C<< cowl_istream_handle_annot >>
+
+=back
+
+=head2 handle_axiom
+
+B<Signature>:
+
+  $self->handle_axiom(CowlAnyAxiom $axiom)
+
+B<Params>:
+
+  CowlIStream $stream 
+  CowlAnyAxiom $axiom 
+
+Documentation:
+
+  Handles the specified axiom.
+  
+  @param stream The ontology input stream.
+  @param axiom The axiom.
+  @return Return code.
+
+=over 2
+
+B<C function name>: C<< cowl_istream_handle_axiom >>
+
+=back
+
+=head2 process_path
+
+B<Signature>:
+
+  $self->process_path(UString $path)
+
+B<Params>:
+
+  CowlIStream $stream 
+  UString $path 
+
+Documentation:
+
+  Streams through the ontology at the specified path.
+  
+  @param stream The ontology input stream.
+  @param path The file path.
+  @return Return code.
+
+=over 2
+
+B<C function name>: C<< cowl_istream_process_path >>
+
+=back
+
+=head2 process_file
+
+B<Signature>:
+
+  $self->process_file(InstanceOf["FFI::C::File"] $file)
+
+B<Params>:
+
+  CowlIStream $stream 
+  InstanceOf["FFI::C::File"] $file 
+
+Documentation:
+
+  Streams through the ontology read from the specified file.
+  
+  @param stream The ontology input stream.
+  @param file The file.
+  @return Return code.
+
+=over 2
+
+B<C function name>: C<< cowl_istream_process_file >>
+
+=back
+
+=head2 process_string
+
+B<Signature>:
+
+  $self->process_string(UString $string)
+
+B<Params>:
+
+  CowlIStream $stream 
+  UString $string 
+
+Documentation:
+
+  Streams through the ontology read from the specified string.
+  
+  @param stream The ontology input stream.
+  @param string The string.
+  @return Return code.
+
+=over 2
+
+B<C function name>: C<< cowl_istream_process_string >>
+
+=back
+
+=head2 process_stream
+
+B<Signature>:
+
+  $self->process_stream(UIStream $istream)
+
+B<Params>:
+
+  CowlIStream $stream 
+  UIStream $istream 
+
+Documentation:
+
+  Streams through the ontology read from the specified input stream.
+  
+  @param stream The ontology input stream.
+  @param istream The input stream.
+  @return Return code.
+
+=over 2
+
+B<C function name>: C<< cowl_istream_process_stream >>
+
+=back
+
+=head2 process_ontology
+
+B<Signature>:
+
+  $self->process_ontology(CowlOntology $ontology)
+
+B<Params>:
+
+  CowlIStream $stream 
+  CowlOntology $ontology 
+
+Documentation:
+
+  Streams through the specified ontology.
+  
+  @param stream The ontology input stream.
+  @param ontology The ontology.
+  @return Return code.
+
+=over 2
+
+B<C function name>: C<< cowl_istream_process_ontology >>
+
+=back
+
+=head1 AUTHOR
+
+Zakariyya Mughal <zmughal@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 by Auto-Parallel Technologies, Inc..
+
+This is free software, licensed under Eclipse Public License - v 2.0.
+
+=cut

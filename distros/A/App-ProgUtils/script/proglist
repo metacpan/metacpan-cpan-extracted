@@ -8,9 +8,9 @@ use App::ProgUtils;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-09'; # DATE
+our $DATE = '2023-12-03'; # DATE
 our $DIST = 'App-ProgUtils'; # DIST
-our $VERSION = '0.203'; # VERSION
+our $VERSION = '0.204'; # VERSION
 
 our %SPEC;
 
@@ -23,23 +23,33 @@ $SPEC{proglist} = {
             req => 0,
             pos => 0,
         },
+        type => {
+            schema => ['str*', in=>[qw/script binary/]],
+        },
     },
     examples => [
-        {
-            summary => 'List all programs that have "font" in their name',
-            argv => [qw/font/],
-            test => 0,
-            'x.doc.show_result'=>0,
-        },
         {
             summary => 'List all programs',
             argv => [],
             test => 0,
             'x.doc.show_result'=>0,
         },
+        {
+            summary => 'List all binaries that have "font" in their name',
+            argv => [qw/font --type=binary/],
+            test => 0,
+            'x.doc.show_result'=>0,
+        },
+        {
+            summary => 'List all scripts that have "csv" in their name',
+            argv => [qw/csv --type=script/],
+            test => 0,
+            'x.doc.show_result'=>0,
+        },
     ],
     links => [
         {url=>'prog:list-all-programs-in-path'},
+        {url=>'prog:scriptlist'},
     ],
 };
 sub proglist {
@@ -56,6 +66,11 @@ sub proglist {
             next if $e eq '.' || $e eq '..';
             next if -d $e;
             next unless $e =~ $re;
+            if ($args{type}) {
+                my $is_bin = -B "$dir/$e";
+                next if $args{type} eq 'script' &&  $is_bin;
+                next if $args{type} eq 'binary' && !$is_bin;
+            }
             push @res, $e;
         }
     }
@@ -83,11 +98,15 @@ proglist - List programs matching query
 
 =head1 VERSION
 
-This document describes version 0.203 of proglist (from Perl distribution App-ProgUtils), released on 2022-08-09.
+This document describes version 0.204 of proglist (from Perl distribution App-ProgUtils), released on 2023-12-03.
 
 =head1 SYNOPSIS
 
-% B<proglist> [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] -- [I<query>]
+B<proglist> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<proglist> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<proglist> [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--type|/"--type=s">>=I<str>] -- [I<L<query|/"--query=s">>]
 
 
 
@@ -103,7 +122,16 @@ C<*> marks required options.
 
 =item B<--query>=I<s>
 
+(No description)
+
+
 Can also be specified as the 1st command-line argument.
+
+=item B<--type>=I<s>
+
+Valid values:
+
+ ["script","binary"]
 
 =back
 
@@ -219,13 +247,17 @@ For fish and zsh, install L<shcompgen> as described above.
 
 =head1 EXAMPLES
 
-=head2 List all programs that have "font" in their name
-
- % proglist font
-
 =head2 List all programs
 
  % proglist
+
+=head2 List all binaries that have "font" in their name
+
+ % proglist font '--type=binary'
+
+=head2 List all scripts that have "csv" in their name
+
+ % proglist csv '--type=script'
 
 =head1 HOMEPAGE
 
@@ -238,6 +270,8 @@ Source repository is at L<https://github.com/perlancar/perl-App-ProgUtils>.
 =head1 SEE ALSO
 
 L<list-all-programs-in-path>.
+
+L<scriptlist>.
 
 =head1 AUTHOR
 
@@ -256,13 +290,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2019, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020, 2019, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

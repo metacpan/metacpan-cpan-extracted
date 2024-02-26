@@ -6,32 +6,6 @@ my $class = Module::Build->subclass(
     class => 'PGXN::Build',
     code => q{
         sub valid_licenses { { postgresql => 'PostgreSQL' } }
-        sub process_mmd_files {
-            require Text::MultiMarkdown;
-            my $self  = shift;
-            my $m     = Text::MultiMarkdown->new(
-                img_ids     => 0,
-                heading_ids => 0,
-            );
-            my $files = $self->_find_file_by_type('mmd', 'lib');
-
-            while (my ($file, $to) = each %$files) {
-                $to =~ s{[.]mmd$}{.html};
-                $to = File::Spec->catfile($self->blib, $to);
-                unless ($self->up_to_date( $file, $to )) {
-                    File::Path::mkpath(File::Basename::dirname($to), 0, oct(777));
-                    $self->log_verbose("Converting $file -> $to\n");
-                    open my $in,  '<:utf8', $file or die "Cannot open $file: $!\n";
-                    chmod 0666, $to;
-                    open my $out, '>:utf8', $to   or die "Cannot open $to: $!\n";
-                    local $/;
-                    print $out $m->markdown(<$in>);
-                    close $in;
-                    chmod 0444, $to;
-
-                }
-            }
-        }
         sub ACTION_tarball_name { print shift->dist_dir . ".tar.gz\n" }
         sub ACTION_latest_changes {
             my $self = shift;
@@ -60,10 +34,6 @@ my $build = $class->new(
     license            => 'postgresql',
     script_files       => 'bin',
     configure_requires => { 'Module::Build' => '0.4209' },
-    build_requires     => {
-        'Module::Build'       => '0.4209',
-        'Text::MultiMarkdown' => 0,
-    },
     requires => {
         'Carp'                         => 0,
         'Data::Dump'                   => '1.17',
@@ -121,5 +91,5 @@ my $build = $class->new(
     },
 );
 
-$build->add_build_element($_) for qw(css gif png jpg js mmd eps svg json ico);
+$build->add_build_element($_) for qw(css gif png jpg js html eps svg json ico);
 $build->create_build_script;

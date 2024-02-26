@@ -14,7 +14,7 @@ MarpaX::ESLIF::Bindings - MarpaX::ESLIF's Bindings
 
 =head1 VERSION
 
-version 6.0.29
+version 6.0.33.3
 
 =head1 DESCRIPTION
 

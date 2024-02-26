@@ -2,14 +2,16 @@ NAME
     Data::Sah::FilterBundle::Array - More array-related Sah filters
 
 VERSION
-    This document describes version 0.001 of Data::Sah::FilterBundle::Array
+    This document describes version 0.002 of Data::Sah::FilterBundle::Array
     (from Perl distribution Data-Sah-FilterBundle-Array), released on
-    2024-01-17.
+    2024-02-06.
 
 DESCRIPTION
     This distribution contains the following Sah filter rule modules:
 
     *   Data::Sah::Filter::perl::Array::dupenum
+
+    *   Data::Sah::Filter::perl::Array::arrayify
 
     *   Data::Sah::Filter::perl::Array::dupestr
 

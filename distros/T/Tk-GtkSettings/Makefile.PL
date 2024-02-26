@@ -8,17 +8,19 @@ WriteMakefile(
         'File::Copy' => 0,
     }, # e.g., Module::Name => 1.1
     ABSTRACT_FROM     => 'lib/Tk/GtkSettings.pm', # retrieve abstract from module
-    AUTHOR            => 'Hans Jeuken <jeuken.hans@gmail.com>',
+    AUTHOR            => 'Hans Jeuken <hanje@cpan.org>',
     LICENSE           => 'perl',
+    EXE_FILES => ['bin/tkgtk'],
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
       'meta-spec' => { version => 2 },
           resources => {
               repository => {
                  type => 'git',
-		 url  => 'git://github.com/haje61/Tk-GtkSettings.git',
+                 url  => 'git://github.com/haje61/Tk-GtkSettings.git',
                  web  => 'https://github.com/haje61/Tk-GtkSettings',
               },
           }})
       : ()
     ),
 );
+

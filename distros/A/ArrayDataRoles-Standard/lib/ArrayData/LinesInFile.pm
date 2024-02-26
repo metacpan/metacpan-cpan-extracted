@@ -9,7 +9,7 @@ with 'ArrayDataRole::Source::LinesInFile';
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2024-01-15'; # DATE
 our $DIST = 'ArrayDataRoles-Standard'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 1;
 # ABSTRACT: Get array data from a file/filehandle, one line per element
@@ -26,7 +26,7 @@ ArrayData::LinesInFile - Get array data from a file/filehandle, one line per ele
 
 =head1 VERSION
 
-This document describes version 0.008 of ArrayData::LinesInFile (from Perl distribution ArrayDataRoles-Standard), released on 2024-01-15.
+This document describes version 0.009 of ArrayData::LinesInFile (from Perl distribution ArrayDataRoles-Standard), released on 2024-01-15.
 
 =head1 SYNOPSIS
 

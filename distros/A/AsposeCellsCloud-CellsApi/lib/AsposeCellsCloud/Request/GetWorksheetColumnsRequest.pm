@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,12 +59,12 @@ sub new {
 
 
 # Run Operation Request
-# GetWorksheetColumnsRequest.name : The workbook name.  ,
+# GetWorksheetColumnsRequest.name : The file name.  ,
 # GetWorksheetColumnsRequest.sheetName : The worksheet name.  ,
-# GetWorksheetColumnsRequest.offset : Original workbook folder.  ,
-# GetWorksheetColumnsRequest.count : Storage name.  ,
-# GetWorksheetColumnsRequest.folder : The workdook folder.  ,
-# GetWorksheetColumnsRequest.storageName :    
+# GetWorksheetColumnsRequest.offset : The workdook folder.  ,
+# GetWorksheetColumnsRequest.count :   ,
+# GetWorksheetColumnsRequest.folder : The folder where the file is situated.  ,
+# GetWorksheetColumnsRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_columns' } = { 
-    	summary => 'Get worksheet columns description.',
+    	summary => 'Retrieve descriptions of worksheet columns.',
         params => $params,
         returns => 'ColumnsResponse',
     };
@@ -140,7 +140,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -154,28 +154,28 @@ __PACKAGE__->method_documentation({
      'offset' => {
      	datatype => 'int',
      	base_name => 'offset',
-     	description => 'Original workbook folder.',
+     	description => 'The workdook folder.',
      	format => '',
      	read_only => '',
      		},
      'count' => {
      	datatype => 'int',
      	base_name => 'count',
-     	description => 'Storage name.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'The workdook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

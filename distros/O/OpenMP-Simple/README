@@ -1,5 +1,5 @@
 This archive contains the distribution OpenMP-Simple,
-version 0.0.3:
+version 0.0.5:
 
   Provides some DWIM helpers for using OpenMP via C<Inline::C>.
 

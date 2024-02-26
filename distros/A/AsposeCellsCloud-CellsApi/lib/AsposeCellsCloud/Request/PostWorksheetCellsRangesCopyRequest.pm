@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,9 +59,9 @@ sub new {
 
 
 # Run Operation Request
-# PostWorksheetCellsRangesCopyRequest.name : The workbook name.  ,
+# PostWorksheetCellsRangesCopyRequest.name : The file name.  ,
 # PostWorksheetCellsRangesCopyRequest.sheetName : The worksheet name.  ,
-# PostWorksheetCellsRangesCopyRequest.rangeOperate : copydata,copystyle,copyto,copyvalue  ,
+# PostWorksheetCellsRangesCopyRequest.rangeOperate : RangeCopyRequestcopydata,copystyle,copyto,copyvalue  ,
 # PostWorksheetCellsRangesCopyRequest.folder : Original workbook folder.  ,
 # PostWorksheetCellsRangesCopyRequest.storageName : Storage name.   
 
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_worksheet_cells_ranges_copy' } = { 
-    	summary => 'Copys content to destination range from source range in worksheet.',
+    	summary => 'Copy content from the source range to the destination range in the worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -137,7 +137,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -151,7 +151,7 @@ __PACKAGE__->method_documentation({
      'range_operate' => {
      	datatype => 'RangeCopyRequest',
      	base_name => 'rangeOperate',
-     	description => 'copydata,copystyle,copyto,copyvalue',
+     	description => 'RangeCopyRequestcopydata,copystyle,copyto,copyvalue',
      	format => '',
      	read_only => '',
      		},

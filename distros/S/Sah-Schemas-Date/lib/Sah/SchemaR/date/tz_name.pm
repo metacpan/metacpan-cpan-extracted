@@ -1,13 +1,13 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::date::tz_name;
 
-our $DATE = '2022-10-12'; # DATE
-our $VERSION = '0.018'; # VERSION
+our $DATE = '2023-12-09'; # DATE
+our $VERSION = '0.019'; # VERSION
 
-our $rschema = do{my$var={base=>"str",clsets_after_base=>[{description=>"\nCurrently no validation for valid timezone names. But completion is provided.\n\n",examples=>[{valid=>1,value=>"Asia/Jakarta"}],summary=>"Timezone name (validity not checked), e.g. Asia/Jakarta","x.completion"=>sub{package Sah::Schema::date::tz_name;use strict;require Complete::TZ;my(%args) = @_;Complete::TZ::complete_tz('word', $args{'word'})}}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
+our $rschema = do{my$var={base=>"str",clsets_after_base=>[{description=>"\nCurrently no validation for valid timezone names. But completion is provided.\n\n",examples=>[{valid=>1,value=>"Asia/Jakarta"}],summary=>"Timezone name (validity not checked), e.g. \"Asia/Jakarta\"","x.completion"=>sub{package Sah::Schema::date::tz_name;use strict;require Complete::TZ;my(%args) = @_;Complete::TZ::complete_tz('word', $args{'word'})}}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
 1;
-# ABSTRACT: Timezone name (validity not checked), e.g. Asia/Jakarta
+# ABSTRACT: Timezone name (validity not checked), e.g. "Asia/Jakarta"
 
 __END__
 
@@ -17,11 +17,11 @@ __END__
 
 =head1 NAME
 
-Sah::SchemaR::date::tz_name - Timezone name (validity not checked), e.g. Asia/Jakarta
+Sah::SchemaR::date::tz_name - Timezone name (validity not checked), e.g. "Asia/Jakarta"
 
 =head1 VERSION
 
-This document describes version 0.018 of Sah::SchemaR::date::tz_name (from Perl distribution Sah-Schemas-Date), released on 2022-10-12.
+This document describes version 0.019 of Sah::SchemaR::date::tz_name (from Perl distribution Sah-Schemas-Date), released on 2023-12-09.
 
 =head1 DESCRIPTION
 
@@ -61,7 +61,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2019 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020, 2019 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

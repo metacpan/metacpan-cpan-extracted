@@ -1,11 +1,25 @@
 # Net::EANSearch
 
-A Perl module for EAN and ISBN lookup and validation using the API on https://www.ean-search.org
+A Perl module for EAN and ISBN lookup and validation using the EAN / ISBN API on https://www.ean-search.org
+
+You can
+- lookup EAN barcodes
+- lookup ISBNs (ISBN-10 or ISBN-13)
+- search for products by name or keyword (eg. to find the EAN)
+- search a product category by name or key word
+- search for all EANs with a certain prefix
+- verify if an EAN or ISBN-13 is valid
+- lookup the country where an EAN was issued
+- generate PNG barcode images
 
 # INSTALLATION
 
-To install this module type the following:
+Install from CPAN
+```sh
+cpan -i Net::EANSearch
+```
 
+Or do a manual install by typing the following:
 ```sh
    perl Makefile.PL
    make
@@ -17,15 +31,14 @@ To install this module type the following:
 
 This module requires these other Perl modules:
 
-- WWW::Curl::Easy
+- LWP
 - JSON
 - URL::Encode
 - MIME::Base64
+- Test::NoWarnings
 
 
 # COPYRIGHT AND LICENCE
-
-Put the correct copyright and licence information here.
 
 Copyright (C) 2024 by Relaxed Communications GmbH (info@relaxedcommunications.com)
 
@@ -34,12 +47,13 @@ it under the same terms as Perl itself, either Perl version 5.30.0 or,
 at your option, any later version of Perl 5 you may have available.
 
 
+# EXAMPLE
+
 ```perl
 #!/usr/bin/perl
 use strict;
 use warnings;
 
-use lib '.';
 use Net::EANSearch;
 
 my $API_TOKEN = $ENV{EAN_SEARCH_API_TOKEN};
@@ -98,4 +112,5 @@ print "EAN $ean is " . ($ok ? 'valid' : 'invalid') . "\n";
 $ean = '1234567890123';
 $ok = $eansearch->verifyChecksum($ean);
 print "EAN $ean is " . ($ok ? 'valid' : 'invalid') . "\n";
+```
 

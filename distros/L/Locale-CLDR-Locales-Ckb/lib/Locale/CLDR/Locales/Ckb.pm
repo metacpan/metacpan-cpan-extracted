@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ckb - Package for language Central Kurdish
 
 package Locale::CLDR::Locales::Ckb;
 # This file auto generated from Data\common\main\ckb.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -117,7 +117,6 @@ has 'display_name_language' => (
  				'en_GB' => 'ئینگلیزیی بریتانیایی',
  				'en_GB@alt=short' => 'ئینگلیزی (GB)',
  				'en_US' => 'ئینگلیزیی ئەمەریکایی',
- 				'en_US@alt=short' => 'ئینگلیزیی ئەمەریکایی',
  				'eo' => 'ئێسپیرانتۆ',
  				'es' => 'ئیسپانی',
  				'et' => 'ئیستۆنی',
@@ -889,15 +888,16 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{[‎‏ ً ٌ ٍ َ ُ ِ ّ ْ ء آ أ ؤ إ ة ث ذ ص ض ط ظ ك ه ى ي]},
-			index => ['ئ', 'ا', 'ب', 'پ', 'ت', 'ج', 'چ', 'ح', 'خ', 'د', 'ر', 'ز', 'ڕ', 'ژ', 'س', 'ش', 'ع', 'غ', 'ف', 'ڤ', 'ق', 'ک', 'گ', 'ل', 'ڵ', 'م', 'ن', 'ھ', 'ە', 'و', 'ۆ', 'ی', 'ێ'],
-			main => qr{[ئ ا ب پ ت ج چ ح خ د ر ز ڕ ژ س ش ع غ ف ڤ ق ک گ ل ڵ م ن ھ ە و ۆ ی ێ]},
+			auxiliary => qr{[‎‏ ً ٌ ٍ َ ُ ِ ّ ْ ء آ أ ؤ إ ة ث ذ ص ض ط ظ ك ھ ى ي]},
+			index => ['ئ', 'ا', 'ب', 'پ', 'ت', 'ج', 'چ', 'ح', 'خ', 'د', 'ر', 'ز', 'ڕ', 'ژ', 'س', 'ش', 'ع', 'غ', 'ف', 'ڤ', 'ق', 'ک', 'گ', 'ل', 'ڵ', 'م', 'ن', 'ه', 'ە', 'و', 'ۆ', 'ی', 'ێ'],
+			main => qr{[ئ ا ب پ ت ج چ ح خ د ر ز ڕ ژ س ش ع غ ف ڤ ق ک گ ل ڵ م ن ه ە و ۆ ی ێ]},
 			numbers => qr{[‎‏ \- ‑ , ٫ ٬ . % ٪ ‰ ؉ + 0٠ 1١ 2٢ 3٣ 4٤ 5٥ 6٦ 7٧ 8٨ 9٩]},
+			punctuation => qr{[\- ‐‑ – — ، ؛ \: ! ؟ . … ' " « » ( ) \[ \]]},
 		};
 	},
 EOT
 : sub {
-		return { index => ['ئ', 'ا', 'ب', 'پ', 'ت', 'ج', 'چ', 'ح', 'خ', 'د', 'ر', 'ز', 'ڕ', 'ژ', 'س', 'ش', 'ع', 'غ', 'ف', 'ڤ', 'ق', 'ک', 'گ', 'ل', 'ڵ', 'م', 'ن', 'ھ', 'ە', 'و', 'ۆ', 'ی', 'ێ'], };
+		return { index => ['ئ', 'ا', 'ب', 'پ', 'ت', 'ج', 'چ', 'ح', 'خ', 'د', 'ر', 'ز', 'ڕ', 'ژ', 'س', 'ش', 'ع', 'غ', 'ف', 'ڤ', 'ق', 'ک', 'گ', 'ل', 'ڵ', 'م', 'ن', 'ه', 'ە', 'و', 'ۆ', 'ی', 'ێ'], };
 },
 );
 
@@ -937,41 +937,18 @@ has native_numbering_system => (
 	default		=> 'arab',
 );
 
-has 'minimum_grouping_digits' => (
-	is			=>'ro',
-	isa			=> Int,
-	init_arg	=> undef,
-	default		=> 1,
-);
-
 has 'number_symbols' => (
 	is			=> 'ro',
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
 		'arab' => {
-			'decimal' => q(٫),
-			'exponential' => q(اس),
-			'group' => q(٬),
-			'infinity' => q(∞),
 			'minusSign' => q(‏-),
-			'nan' => q(NaN),
-			'perMille' => q(؉),
 			'percentSign' => q(٪),
 			'plusSign' => q(‏+),
-			'superscriptingExponent' => q(×),
 		},
 		'latn' => {
-			'decimal' => q(.),
-			'exponential' => q(E),
-			'group' => q(,),
-			'infinity' => q(∞),
-			'minusSign' => q(-),
-			'nan' => q(NaN),
-			'perMille' => q(‰),
-			'percentSign' => q(%),
 			'plusSign' => q(‎+),
-			'superscriptingExponent' => q(×),
 		},
 	} }
 );
@@ -981,53 +958,10 @@ has 'number_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		decimalFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0.###',
-				},
-			},
-		},
 		percentFormat => {
 			'default' => {
 				'standard' => {
-					'default' => '#,##0%',
-				},
-			},
-		},
-		scientificFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#E0',
-				},
-			},
-		},
-} },
-);
-
-has 'number_currency_formats' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'arab' => {
-			'pattern' => {
-				'default' => {
-					'standard' => {
-						'positive' => '#,##0.00 ¤',
-					},
-				},
-			},
-		},
-		'latn' => {
-			'pattern' => {
-				'default' => {
-					'accounting' => {
-						'positive' => '¤ #,##0.00',
-					},
-					'standard' => {
-						'positive' => '¤ #,##0.00',
-					},
+					'default' => '#,##0 %',
 				},
 			},
 		},
@@ -1057,8 +991,6 @@ has 'currencies' => (
 		'CAD' => {
 			display_name => {
 				'currency' => q(دۆلاری کەنەدی),
-				'one' => q(دۆلاری کەنەدی),
-				'other' => q(دۆلاری کەنەدی),
 			},
 		},
 		'DZD' => {
@@ -1138,44 +1070,6 @@ has 'calendar_months' => (
 	default		=> sub { {
 			'gregorian' => {
 				'format' => {
-					abbreviated => {
-						nonleap => [
-							'کانوونی دووەم',
-							'شوبات',
-							'ئازار',
-							'نیسان',
-							'ئایار',
-							'حوزەیران',
-							'تەمووز',
-							'ئاب',
-							'ئەیلوول',
-							'تشرینی یەکەم',
-							'تشرینی دووەم',
-							'کانونی یەکەم'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'ک',
-							'ش',
-							'ئ',
-							'ن',
-							'ئ',
-							'ح',
-							'ت',
-							'ئ',
-							'ئ',
-							'ت',
-							'ت',
-							'ک'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'کانوونی دووەم',
@@ -1197,25 +1091,6 @@ has 'calendar_months' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'کانوونی دووەم',
-							'شوبات',
-							'ئازار',
-							'نیسان',
-							'ئایار',
-							'حوزەیران',
-							'تەمووز',
-							'ئاب',
-							'ئەیلوول',
-							'تشرینی یەکەم',
-							'تشرینی دووەم',
-							'کانونی یەکەم'
-						],
-						leap => [
-							
-						],
-					},
 					narrow => {
 						nonleap => [
 							'ک',
@@ -1230,25 +1105,6 @@ has 'calendar_months' => (
 							'ت',
 							'ت',
 							'ک'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'کانوونی دووەم',
-							'شوبات',
-							'ئازار',
-							'نیسان',
-							'ئایار',
-							'حوزەیران',
-							'تەمووز',
-							'ئاب',
-							'ئەیلوول',
-							'تشرینی یەکەم',
-							'تشرینی دووەم',
-							'کانونی یەکەم'
 						],
 						leap => [
 							
@@ -1258,65 +1114,6 @@ has 'calendar_months' => (
 			},
 			'persian' => {
 				'format' => {
-					abbreviated => {
-						nonleap => [
-							'خاکەلێوە',
-							'بانەمەڕ',
-							'جۆزەردان',
-							'پووشپەڕ',
-							'گەلاوێژ',
-							'خەرمانان',
-							'ڕەزبەر',
-							'خەزەڵوەر',
-							'سەرماوەز',
-							'بەفرانبار',
-							'ڕێبەندان',
-							'رەشەمێ'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'خاکەلێوە',
-							'بانەمەڕ',
-							'جۆزەردان',
-							'پووشپەڕ',
-							'گەلاوێژ',
-							'خەرمانان',
-							'ڕەزبەر',
-							'خەزەڵوەر',
-							'سەرماوەز',
-							'بەفرانبار',
-							'ڕێبەندان',
-							'رەشەمێ'
-						],
-						leap => [
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'خاکەلێوە',
-							'بانەمەڕ',
-							'جۆزەردان',
-							'پووشپەڕ',
-							'گەلاوێژ',
-							'خەرمانان',
-							'ڕەزبەر',
-							'خەزەڵوەر',
-							'سەرماوەز',
-							'بەفرانبار',
-							'ڕێبەندان',
-							'رەشەمێ'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'خاکەلێوە',
@@ -1348,24 +1145,6 @@ has 'calendar_days' => (
 	default		=> sub { {
 			'gregorian' => {
 				'format' => {
-					abbreviated => {
-						mon => 'دووشەممە',
-						tue => 'سێشەممە',
-						wed => 'چوارشەممە',
-						thu => 'پێنجشەممە',
-						fri => 'ھەینی',
-						sat => 'شەممە',
-						sun => 'یەکشەممە'
-					},
-					narrow => {
-						mon => 'د',
-						tue => 'س',
-						wed => 'چ',
-						thu => 'پ',
-						fri => 'ھ',
-						sat => 'ش',
-						sun => 'ی'
-					},
 					short => {
 						mon => '٢ش',
 						tue => '٣ش',
@@ -1386,15 +1165,6 @@ has 'calendar_days' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						mon => 'دووشەممە',
-						tue => 'سێشەممە',
-						wed => 'چوارشەممە',
-						thu => 'پێنجشەممە',
-						fri => 'ھەینی',
-						sat => 'شەممە',
-						sun => 'یەکشەممە'
-					},
 					narrow => {
 						mon => 'د',
 						tue => 'س',
@@ -1403,24 +1173,6 @@ has 'calendar_days' => (
 						fri => 'ھ',
 						sat => 'ش',
 						sun => 'ی'
-					},
-					short => {
-						mon => '٢ش',
-						tue => '٣ش',
-						wed => '٤ش',
-						thu => '٥ش',
-						fri => 'ھ',
-						sat => 'ش',
-						sun => '١ش'
-					},
-					wide => {
-						mon => 'دووشەممە',
-						tue => 'سێشەممە',
-						wed => 'چوارشەممە',
-						thu => 'پێنجشەممە',
-						fri => 'ھەینی',
-						sat => 'شەممە',
-						sun => 'یەکشەممە'
 					},
 				},
 			},
@@ -1439,11 +1191,6 @@ has 'calendar_quarters' => (
 						2 => 'چ٣',
 						3 => 'چ٤'
 					},
-					narrow => {0 => '١',
-						1 => '٢',
-						2 => '٣',
-						3 => '٤'
-					},
 					wide => {0 => 'چارەکی یەکەم',
 						1 => 'چارەکی دووەم',
 						2 => 'چارەکی سێەم',
@@ -1451,20 +1198,10 @@ has 'calendar_quarters' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {0 => 'چ١',
-						1 => 'چ٢',
-						2 => 'چ٣',
-						3 => 'چ٤'
-					},
 					narrow => {0 => '١',
 						1 => '٢',
 						2 => '٣',
 						3 => '٤'
-					},
-					wide => {0 => 'چارەکی یەکەم',
-						1 => 'چارەکی دووەم',
-						2 => 'چارەکی سێەم',
-						3 => 'چارەکی چوارەم'
 					},
 				},
 			},
@@ -1479,28 +1216,6 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'am' => q{ب.ن},
-					'pm' => q{د.ن},
-				},
-				'narrow' => {
-					'am' => q{ب.ن},
-					'pm' => q{د.ن},
-				},
-				'wide' => {
-					'am' => q{ب.ن},
-					'pm' => q{د.ن},
-				},
-			},
-			'stand-alone' => {
-				'abbreviated' => {
-					'am' => q{ب.ن},
-					'pm' => q{د.ن},
-				},
-				'narrow' => {
-					'am' => q{ب.ن},
-					'pm' => q{د.ن},
-				},
-				'wide' => {
 					'am' => q{ب.ن},
 					'pm' => q{د.ن},
 				},
@@ -1524,10 +1239,6 @@ has 'eras' => (
 			narrow => {
 				'0' => 'پ.ن',
 				'1' => 'ز'
-			},
-			wide => {
-				'0' => 'پێش زایین',
-				'1' => 'زایینی'
 			},
 		},
 		'persian' => {
@@ -1603,80 +1314,31 @@ has 'datetime_formats_available_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-			E => q{ccc},
 			Ed => q{E dھەم},
-			Gy => q{G y},
-			GyMMM => q{G y MMM},
-			GyMMMEd => q{G y MMM d, E},
-			GyMMMd => q{G y MMM d},
-			M => q{L},
 			MEd => q{E، M/d},
-			MMM => q{LLL},
 			MMMEd => q{E، dی MMM},
-			MMMMd => q{MMMM d},
 			MMMd => q{dی MMM},
-			Md => q{MM-dd},
-			d => q{d},
 			h => q{hی a},
-			y => q{G y},
 			yM => q{M/y},
 			yMEd => q{E، d/M/y},
 			yMMM => q{MMMی y},
 			yMMMEd => q{E، dی MMMی y},
 			yMMMd => q{dی MMMی y},
 			yMd => q{d/M/y},
-			yyyy => q{G y},
-			yyyyM => q{GGGGG y-MM},
-			yyyyMEd => q{GGGGG y-MM-dd, E},
-			yyyyMMM => q{G y MMM},
-			yyyyMMMEd => q{G y MMM d, E},
-			yyyyMMMM => q{G y MMMM},
-			yyyyMMMd => q{G y MMM d},
-			yyyyMd => q{GGGGG y-MM-dd},
-			yyyyQQQ => q{G y QQQ},
-			yyyyQQQQ => q{G y QQQQ},
 		},
 		'gregorian' => {
-			E => q{ccc},
-			EHm => q{E HH:mm},
-			EHms => q{E HH:mm:ss},
 			Ed => q{E dھەم},
-			Ehm => q{E h:mm a},
-			Ehms => q{E h:mm:ss a},
-			Gy => q{G y},
-			GyMMM => q{G y MMM},
-			GyMMMEd => q{G y MMM d, E},
-			GyMMMd => q{G y MMM d},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			Hmsv => q{HH:mm:ss v},
-			Hmv => q{HH:mm v},
-			M => q{L},
 			MEd => q{E، M/d},
-			MMM => q{LLL},
 			MMMEd => q{E، dی MMM},
 			MMMMW => q{هەفتەی W ی MMMM},
-			MMMMd => q{MMMM d},
 			MMMd => q{dی MMM},
-			Md => q{MM-dd},
-			d => q{d},
 			h => q{hی a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			hmsv => q{h:mm:ss a v},
-			hmv => q{h:mm a v},
-			ms => q{mm:ss},
-			y => q{y},
 			yM => q{M/y},
 			yMEd => q{E، d/M/y},
 			yMMM => q{MMMی y},
 			yMMMEd => q{E، dی MMMی y},
-			yMMMM => q{y MMMM},
 			yMMMd => q{dی MMMی y},
 			yMd => q{d/M/y},
-			yQQQ => q{y QQQ},
-			yQQQQ => q{y QQQQ},
 			yw => q{هەفتەی w ی Y},
 		},
 	} },
@@ -1687,9 +1349,6 @@ has 'datetime_formats_append_item' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			'Timezone' => '{0} {1}',
-		},
 	} },
 );
 
@@ -1699,9 +1358,6 @@ has 'datetime_formats_interval' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-			M => {
-				M => q{MM–MM},
-			},
 			MEd => {
 				M => q{E، M/d – E، M/d},
 				d => q{E، M/d – E، M/d},
@@ -1710,28 +1366,12 @@ has 'datetime_formats_interval' => (
 				M => q{MMM–MMM},
 			},
 			MMMEd => {
-				M => q{MMM d, E – MMM d, E},
 				d => q{E، dی MMM – E، dی MMM},
 			},
 			MMMd => {
-				M => q{MMM d – MMM d},
 				d => q{d–dی MMM},
 			},
-			Md => {
-				M => q{MM-dd – MM-dd},
-				d => q{MM-dd – MM-dd},
-			},
-			d => {
-				d => q{d–d},
-			},
 			fallback => '{0} – {1}',
-			y => {
-				y => q{G y–y},
-			},
-			yM => {
-				M => q{GGGGG y-MM – y-MM},
-				y => q{GGGGG y-MM – y-MM},
-			},
 			yMEd => {
 				M => q{E، d/M/y – E، d/M/y},
 				d => q{E، d/M/y – E، d/M/y},
@@ -1741,23 +1381,12 @@ has 'datetime_formats_interval' => (
 				M => q{MMM–MMMی y},
 				y => q{MMMی y – MMMی y},
 			},
-			yMMMEd => {
-				M => q{G y MMM d, E – MMM d, E},
-				d => q{G y MMM d, E – MMM d, E},
-				y => q{G y MMM d, E – y MMM d, E},
-			},
-			yMMMM => {
-				M => q{G y MMMM–MMMM},
-				y => q{G y MMMM – y MMMM},
-			},
 			yMMMd => {
 				M => q{dی MMM – dی MMMی y},
 				d => q{d–dی MMMی y},
 				y => q{dی MMMMی y – dی MMMMی y},
 			},
 			yMd => {
-				M => q{GGGGG y-MM-dd – y-MM-dd},
-				d => q{GGGGG y-MM-dd – y-MM-dd},
 				y => q{d/M/y – d/M/y},
 			},
 		},
@@ -1775,6 +1404,7 @@ has 'datetime_formats_interval' => (
 			MMMd => {
 				d => q{d–dی MMM},
 			},
+			fallback => '{0} – {1}',
 			yMEd => {
 				M => q{E، d/M/y – E، d/M/y},
 				d => q{E، d/M/y – E، d/M/y},
@@ -1796,6 +1426,18 @@ has 'datetime_formats_interval' => (
 	} },
 );
 
+has 'time_zone_names' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default	=> sub { {
+		gmtFormat => q(گرینیچ {0}),
+		gmtZeroFormat => q(گرینیچ),
+		regionFormat => q(بەکاتی {0}),
+		regionFormat => q(کاتی {0} هاوینە),
+		regionFormat => q(کاتی {0} فەرمی),
+	 } }
+);
 no Moo;
 
 1;

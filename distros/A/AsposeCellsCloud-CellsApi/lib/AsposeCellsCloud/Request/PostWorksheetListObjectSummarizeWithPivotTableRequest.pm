@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,13 +59,13 @@ sub new {
 
 
 # Run Operation Request
-# PostWorksheetListObjectSummarizeWithPivotTableRequest.name : The workbook name.  ,
+# PostWorksheetListObjectSummarizeWithPivotTableRequest.name : The file name.  ,
 # PostWorksheetListObjectSummarizeWithPivotTableRequest.sheetName : The worksheet name.  ,
-# PostWorksheetListObjectSummarizeWithPivotTableRequest.listObjectIndex : List object index.  ,
-# PostWorksheetListObjectSummarizeWithPivotTableRequest.destsheetName : Target work sheet name.  ,
+# PostWorksheetListObjectSummarizeWithPivotTableRequest.listObjectIndex : The list object index.  ,
+# PostWorksheetListObjectSummarizeWithPivotTableRequest.destsheetName : The target worksheet name.  ,
 # PostWorksheetListObjectSummarizeWithPivotTableRequest.createPivotTableRequest : Create pivot table request.  ,
-# PostWorksheetListObjectSummarizeWithPivotTableRequest.folder : Original workbook folder.  ,
-# PostWorksheetListObjectSummarizeWithPivotTableRequest.storageName : Storage name.   
+# PostWorksheetListObjectSummarizeWithPivotTableRequest.folder : The folder where the file is situated.  ,
+# PostWorksheetListObjectSummarizeWithPivotTableRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -76,7 +76,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_worksheet_list_object_summarize_with_pivot_table' } = { 
-    	summary => 'Creates pivot table with list object in worksheet.',
+    	summary => 'Create a pivot table with a list object in the worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -149,7 +149,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -163,14 +163,14 @@ __PACKAGE__->method_documentation({
      'list_object_index' => {
      	datatype => 'int',
      	base_name => 'listObjectIndex',
-     	description => 'List object index.',
+     	description => 'The list object index.',
      	format => '',
      	read_only => '',
      		},
      'destsheet_name' => {
      	datatype => 'string',
      	base_name => 'destsheetName',
-     	description => 'Target work sheet name.',
+     	description => 'The target worksheet name.',
      	format => '',
      	read_only => '',
      		},
@@ -184,14 +184,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

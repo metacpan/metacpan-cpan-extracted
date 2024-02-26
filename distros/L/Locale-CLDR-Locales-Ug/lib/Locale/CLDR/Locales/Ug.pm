@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ug - Package for language Uyghur
 
 package Locale::CLDR::Locales::Ug;
 # This file auto generated from Data\common\main\ug.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -24,22 +24,6 @@ use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
 extends('Locale::CLDR::Locales::Root');
-# Need to add code for Key type pattern
-sub display_name_pattern {
-	my ($self, $name, $region, $script, $variant) = @_;
-
-	my $display_pattern = '{0} ({1})';
-	$display_pattern =~s/\{0\}/$name/g;
-	my $subtags = join '{0}، {1}', grep {$_} (
-		$region,
-		$script,
-		$variant,
-	);
-
-	$display_pattern =~s/\{1\}/$subtags/g;
-	return $display_pattern;
-}
-
 has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
@@ -170,9 +154,7 @@ has 'display_name_language' => (
  				'en_AU' => 'ئاۋسترالىيە ئىنگلىزچە',
  				'en_CA' => 'كانادا ئىنگلىزچە',
  				'en_GB' => 'ئەنگلىيە ئىنگلىزچە',
- 				'en_GB@alt=short' => 'ئەنگلىيە ئىنگلىزچە',
  				'en_US' => 'ئامېرىكا ئىنگلىزچە',
- 				'en_US@alt=short' => 'ئامېرىكا ئىنگلىزچە',
  				'enm' => 'ئوتتۇرا ئەسىر ئىنگلىزچە',
  				'eo' => 'ئېسپرانتوچە',
  				'es' => 'ئىسپانچە',
@@ -1278,7 +1260,6 @@ has 'characters' => (
 			auxiliary => qr{[‎‏ ئ]},
 			index => ['{ئا}', '{ئه}', '{ئو}', '{ئۇ}', '{ئۆ}', '{ئۈ}', '{ئې}', '{ئى}', 'ا', 'ە', 'ب', 'پ', 'ت', 'ج', 'چ', 'خ', 'د', 'ر', 'ز', 'ژ', 'س', 'ش', 'غ', 'ف', 'ق', 'ك', 'گ', 'ڭ', 'ل', 'م', 'ن', 'ھ', 'و', 'ۇ', 'ۆ', 'ۈ', 'ۋ', 'ې', 'ى', 'ي'],
 			main => qr{[{ئا} {ئه} {ئو} {ئۇ} {ئۆ} {ئۈ} {ئې} {ئى} ا ە ب پ ت ج چ خ د ر ز ژ س ش غ ف ق ك گ ڭ ل م ن ھ و ۇ ۆ ۈ ۋ ې ى ي]},
-			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -1324,537 +1305,221 @@ has 'units' => (
 				'long' => {
 					# Long Unit Identifier
 					'acceleration-g-force' => {
-						'name' => q(ئېغىرلىق كۈچى),
 						'one' => q({0} ئېغىرلىق كۈچى),
 						'other' => q({0} ئېغىرلىق كۈچى),
 					},
 					# Core Unit Identifier
 					'g-force' => {
-						'name' => q(ئېغىرلىق كۈچى),
 						'one' => q({0} ئېغىرلىق كۈچى),
 						'other' => q({0} ئېغىرلىق كۈچى),
 					},
 					# Long Unit Identifier
-					'angle-degree' => {
-						'name' => q(گىرادۇس),
-						'one' => q({0} گىرادۇس),
-						'other' => q({0} گىرادۇس),
-					},
-					# Core Unit Identifier
-					'degree' => {
-						'name' => q(گىرادۇس),
-						'one' => q({0} گىرادۇس),
-						'other' => q({0} گىرادۇس),
-					},
-					# Long Unit Identifier
-					'area-acre' => {
-						'name' => q(ئىنگلىز موسى),
-						'one' => q({0} ئىنگلىز موسى),
-						'other' => q({0} ئىنگلىز موسى),
-					},
-					# Core Unit Identifier
-					'acre' => {
-						'name' => q(ئىنگلىز موسى),
-						'one' => q({0} ئىنگلىز موسى),
-						'other' => q({0} ئىنگلىز موسى),
-					},
-					# Long Unit Identifier
 					'area-hectare' => {
-						'name' => q(hectares),
 						'one' => q({0} گېكتار),
 						'other' => q({0} hectares),
 					},
 					# Core Unit Identifier
 					'hectare' => {
-						'name' => q(hectares),
 						'one' => q({0} گېكتار),
 						'other' => q({0} hectares),
 					},
 					# Long Unit Identifier
-					'area-square-foot' => {
-						'name' => q(كۋادرات فۇت),
-						'one' => q({0} كۋادرات فۇت),
-						'other' => q({0} كۋادرات فۇت),
-					},
-					# Core Unit Identifier
-					'square-foot' => {
-						'name' => q(كۋادرات فۇت),
-						'one' => q({0} كۋادرات فۇت),
-						'other' => q({0} كۋادرات فۇت),
-					},
-					# Long Unit Identifier
 					'area-square-kilometer' => {
-						'name' => q(كۋادرات كىلومېتىر),
 						'one' => q({0} كۋادرات كىلومېتىر),
 						'other' => q({0} كۋادرات كىلومېتىر),
 					},
 					# Core Unit Identifier
 					'square-kilometer' => {
-						'name' => q(كۋادرات كىلومېتىر),
 						'one' => q({0} كۋادرات كىلومېتىر),
 						'other' => q({0} كۋادرات كىلومېتىر),
 					},
 					# Long Unit Identifier
 					'area-square-meter' => {
-						'name' => q(كۋادرات مېتىر),
 						'one' => q({0} كۋادرات مېتىر),
 						'other' => q({0} كۋادرات مېتىر),
 					},
 					# Core Unit Identifier
 					'square-meter' => {
-						'name' => q(كۋادرات مېتىر),
 						'one' => q({0} كۋادرات مېتىر),
 						'other' => q({0} كۋادرات مېتىر),
 					},
 					# Long Unit Identifier
-					'area-square-mile' => {
-						'name' => q(كۋادرات مىل),
-						'one' => q({0} كۋادرات مىل),
-						'other' => q({0} كۋادرات مىل),
-					},
-					# Core Unit Identifier
-					'square-mile' => {
-						'name' => q(كۋادرات مىل),
-						'one' => q({0} كۋادرات مىل),
-						'other' => q({0} كۋادرات مىل),
-					},
-					# Long Unit Identifier
-					'duration-day' => {
-						'name' => q(كۈن),
-						'one' => q({0} كۈن),
-						'other' => q({0} كۈن),
-					},
-					# Core Unit Identifier
-					'day' => {
-						'name' => q(كۈن),
-						'one' => q({0} كۈن),
-						'other' => q({0} كۈن),
-					},
-					# Long Unit Identifier
-					'duration-hour' => {
-						'name' => q(سائەت),
-						'one' => q({0} سائەت),
-						'other' => q({0} سائەت),
-					},
-					# Core Unit Identifier
-					'hour' => {
-						'name' => q(سائەت),
-						'one' => q({0} سائەت),
-						'other' => q({0} سائەت),
-					},
-					# Long Unit Identifier
 					'duration-millisecond' => {
-						'name' => q(مىللى سېكۇنت),
 						'one' => q({0} مىللى سېكۇنت),
 						'other' => q({0} مىللى سېكۇنت),
 					},
 					# Core Unit Identifier
 					'millisecond' => {
-						'name' => q(مىللى سېكۇنت),
 						'one' => q({0} مىللى سېكۇنت),
 						'other' => q({0} مىللى سېكۇنت),
 					},
 					# Long Unit Identifier
-					'duration-minute' => {
-						'name' => q(مىنۇت),
-						'one' => q({0} مىنۇت),
-						'other' => q({0} مىنۇت),
-					},
-					# Core Unit Identifier
-					'minute' => {
-						'name' => q(مىنۇت),
-						'one' => q({0} مىنۇت),
-						'other' => q({0} مىنۇت),
-					},
-					# Long Unit Identifier
-					'duration-month' => {
-						'name' => q(ئاي),
-						'one' => q({0} ئاي),
-						'other' => q({0} ئاي),
-					},
-					# Core Unit Identifier
-					'month' => {
-						'name' => q(ئاي),
-						'one' => q({0} ئاي),
-						'other' => q({0} ئاي),
-					},
-					# Long Unit Identifier
-					'duration-second' => {
-						'name' => q(سېكۇنت),
-						'one' => q({0} سېكۇنت),
-						'other' => q({0} سېكۇنت),
-					},
-					# Core Unit Identifier
-					'second' => {
-						'name' => q(سېكۇنت),
-						'one' => q({0} سېكۇنت),
-						'other' => q({0} سېكۇنت),
-					},
-					# Long Unit Identifier
-					'duration-week' => {
-						'name' => q(ھەپتە),
-						'one' => q({0} ھەپتە),
-						'other' => q({0} ھەپتە),
-					},
-					# Core Unit Identifier
-					'week' => {
-						'name' => q(ھەپتە),
-						'one' => q({0} ھەپتە),
-						'other' => q({0} ھەپتە),
-					},
-					# Long Unit Identifier
-					'duration-year' => {
-						'name' => q(يىل),
-						'one' => q({0} يىل),
-						'other' => q({0} يىل),
-					},
-					# Core Unit Identifier
-					'year' => {
-						'name' => q(يىل),
-						'one' => q({0} يىل),
-						'other' => q({0} يىل),
-					},
-					# Long Unit Identifier
-					'length-centimeter' => {
-						'name' => q(سانتىمېتىر),
-						'one' => q({0} سانتىمېتىر),
-						'other' => q({0} سانتىمېتىر),
-					},
-					# Core Unit Identifier
-					'centimeter' => {
-						'name' => q(سانتىمېتىر),
-						'one' => q({0} سانتىمېتىر),
-						'other' => q({0} سانتىمېتىر),
-					},
-					# Long Unit Identifier
 					'length-foot' => {
-						'name' => q(فۇت),
 						'one' => q({0} فۇت),
 						'other' => q({0} فۇت),
 					},
 					# Core Unit Identifier
 					'foot' => {
-						'name' => q(فۇت),
 						'one' => q({0} فۇت),
 						'other' => q({0} فۇت),
 					},
 					# Long Unit Identifier
 					'length-inch' => {
-						'name' => q(ديۇيم),
 						'one' => q({0} ديۇيم),
 						'other' => q({0} ديۇيم),
 					},
 					# Core Unit Identifier
 					'inch' => {
-						'name' => q(ديۇيم),
 						'one' => q({0} ديۇيم),
 						'other' => q({0} ديۇيم),
 					},
 					# Long Unit Identifier
-					'length-kilometer' => {
-						'name' => q(كىلومېتىر),
-						'one' => q({0} كىلومېتىر),
-						'other' => q({0} كىلومېتىر),
-					},
-					# Core Unit Identifier
-					'kilometer' => {
-						'name' => q(كىلومېتىر),
-						'one' => q({0} كىلومېتىر),
-						'other' => q({0} كىلومېتىر),
-					},
-					# Long Unit Identifier
-					'length-light-year' => {
-						'name' => q(يورۇقلۇق يىلى),
-						'one' => q({0} يورۇقلۇق يىلى),
-						'other' => q({0} يورۇقلۇق يىلى),
-					},
-					# Core Unit Identifier
-					'light-year' => {
-						'name' => q(يورۇقلۇق يىلى),
-						'one' => q({0} يورۇقلۇق يىلى),
-						'other' => q({0} يورۇقلۇق يىلى),
-					},
-					# Long Unit Identifier
-					'length-meter' => {
-						'name' => q(مېتىر),
-						'one' => q({0} مېتىر),
-						'other' => q({0} مېتىر),
-					},
-					# Core Unit Identifier
-					'meter' => {
-						'name' => q(مېتىر),
-						'one' => q({0} مېتىر),
-						'other' => q({0} مېتىر),
-					},
-					# Long Unit Identifier
-					'length-mile' => {
-						'name' => q(مىل),
-						'one' => q({0} مىل),
-						'other' => q({0} مىل),
-					},
-					# Core Unit Identifier
-					'mile' => {
-						'name' => q(مىل),
-						'one' => q({0} مىل),
-						'other' => q({0} مىل),
-					},
-					# Long Unit Identifier
-					'length-millimeter' => {
-						'name' => q(مىللىمېتىر),
-						'one' => q({0} مىللىمېتىر),
-						'other' => q({0} مىللىمېتىر),
-					},
-					# Core Unit Identifier
-					'millimeter' => {
-						'name' => q(مىللىمېتىر),
-						'one' => q({0} مىللىمېتىر),
-						'other' => q({0} مىللىمېتىر),
-					},
-					# Long Unit Identifier
-					'length-picometer' => {
-						'name' => q(پىكومېتىر),
-						'one' => q({0} پىكومېتىر),
-						'other' => q({0} پىكومېتىر),
-					},
-					# Core Unit Identifier
-					'picometer' => {
-						'name' => q(پىكومېتىر),
-						'one' => q({0} پىكومېتىر),
-						'other' => q({0} پىكومېتىر),
-					},
-					# Long Unit Identifier
-					'length-yard' => {
-						'name' => q(يارد),
-						'one' => q({0} يارد),
-						'other' => q({0} يارد),
-					},
-					# Core Unit Identifier
-					'yard' => {
-						'name' => q(يارد),
-						'one' => q({0} يارد),
-						'other' => q({0} يارد),
-					},
-					# Long Unit Identifier
 					'mass-gram' => {
-						'name' => q(گرام),
 						'one' => q({0} گرام),
 						'other' => q({0} گرام),
 					},
 					# Core Unit Identifier
 					'gram' => {
-						'name' => q(گرام),
 						'one' => q({0} گرام),
 						'other' => q({0} گرام),
 					},
 					# Long Unit Identifier
 					'mass-kilogram' => {
-						'name' => q(كىلوگرام),
 						'one' => q({0} كىلوگرام),
 						'other' => q({0} كىلوگرام),
 					},
 					# Core Unit Identifier
 					'kilogram' => {
-						'name' => q(كىلوگرام),
 						'one' => q({0} كىلوگرام),
 						'other' => q({0} كىلوگرام),
 					},
 					# Long Unit Identifier
-					'mass-ounce' => {
-						'name' => q(ئۇنسىيە),
-						'one' => q({0} ئۇنسىيە),
-						'other' => q({0} ئۇنسىيە),
-					},
-					# Core Unit Identifier
-					'ounce' => {
-						'name' => q(ئۇنسىيە),
-						'one' => q({0} ئۇنسىيە),
-						'other' => q({0} ئۇنسىيە),
-					},
-					# Long Unit Identifier
-					'mass-pound' => {
-						'name' => q(قاداق),
-						'one' => q({0} قاداق),
-						'other' => q({0} قاداق),
-					},
-					# Core Unit Identifier
-					'pound' => {
-						'name' => q(قاداق),
-						'one' => q({0} قاداق),
-						'other' => q({0} قاداق),
-					},
-					# Long Unit Identifier
-					'per' => {
-						'1' => q({0}/{1}),
-					},
-					# Core Unit Identifier
-					'per' => {
-						'1' => q({0}/{1}),
-					},
-					# Long Unit Identifier
-					'power-horsepower' => {
-						'name' => q(ئات كۈچى),
-						'one' => q({0} ئات كۈچى),
-						'other' => q({0} ئات كۈچى),
-					},
-					# Core Unit Identifier
-					'horsepower' => {
-						'name' => q(ئات كۈچى),
-						'one' => q({0} ئات كۈچى),
-						'other' => q({0} ئات كۈچى),
-					},
-					# Long Unit Identifier
 					'power-kilowatt' => {
-						'name' => q(كىلوۋات),
 						'one' => q({0} كىلوۋات),
 						'other' => q({0} كىلوۋات),
 					},
 					# Core Unit Identifier
 					'kilowatt' => {
-						'name' => q(كىلوۋات),
 						'one' => q({0} كىلوۋات),
 						'other' => q({0} كىلوۋات),
 					},
 					# Long Unit Identifier
 					'power-watt' => {
-						'name' => q(ۋات),
 						'one' => q({0} ۋات),
 						'other' => q({0} ۋات),
 					},
 					# Core Unit Identifier
 					'watt' => {
-						'name' => q(ۋات),
 						'one' => q({0} ۋات),
 						'other' => q({0} ۋات),
 					},
 					# Long Unit Identifier
 					'pressure-hectopascal' => {
-						'name' => q(يۈز پاسكال),
 						'one' => q({0} يۈز پاسكال),
 						'other' => q({0} يۈز پاسكال),
 					},
 					# Core Unit Identifier
 					'hectopascal' => {
-						'name' => q(يۈز پاسكال),
 						'one' => q({0} يۈز پاسكال),
 						'other' => q({0} يۈز پاسكال),
 					},
 					# Long Unit Identifier
 					'pressure-inch-ofhg' => {
-						'name' => q(ديۇيم سىماب تۈۋرۇكى),
 						'one' => q({0} ديۇيم سىماب تۈۋرۇكى),
 						'other' => q({0} ديۇيم سىماب تۈۋرۇكى),
 					},
 					# Core Unit Identifier
 					'inch-ofhg' => {
-						'name' => q(ديۇيم سىماب تۈۋرۇكى),
 						'one' => q({0} ديۇيم سىماب تۈۋرۇكى),
 						'other' => q({0} ديۇيم سىماب تۈۋرۇكى),
 					},
 					# Long Unit Identifier
 					'pressure-millibar' => {
-						'name' => q(مىللىبار),
 						'one' => q({0} مىللىبار),
 						'other' => q({0} مىللىبار),
 					},
 					# Core Unit Identifier
 					'millibar' => {
-						'name' => q(مىللىبار),
 						'one' => q({0} مىللىبار),
 						'other' => q({0} مىللىبار),
 					},
 					# Long Unit Identifier
 					'speed-kilometer-per-hour' => {
-						'name' => q(كىلومېتىر ھەر سائەت),
 						'one' => q({0} كىلومېتىر ھەر سائەت),
 						'other' => q({0} كىلومېتىر ھەر سائەت),
 					},
 					# Core Unit Identifier
 					'kilometer-per-hour' => {
-						'name' => q(كىلومېتىر ھەر سائەت),
 						'one' => q({0} كىلومېتىر ھەر سائەت),
 						'other' => q({0} كىلومېتىر ھەر سائەت),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
-						'name' => q(مېتىر ھەر سېكۇنت),
 						'one' => q({0} مېتىر ھەر سېكۇنت),
 						'other' => q({0} مېتىر ھەر سېكۇنت),
 					},
 					# Core Unit Identifier
 					'meter-per-second' => {
-						'name' => q(مېتىر ھەر سېكۇنت),
 						'one' => q({0} مېتىر ھەر سېكۇنت),
 						'other' => q({0} مېتىر ھەر سېكۇنت),
 					},
 					# Long Unit Identifier
 					'speed-mile-per-hour' => {
-						'name' => q(مىل ھەر سائەت),
 						'one' => q({0} مىل ھەر سائەت),
 						'other' => q({0} مىل ھەر سائەت),
 					},
 					# Core Unit Identifier
 					'mile-per-hour' => {
-						'name' => q(مىل ھەر سائەت),
 						'one' => q({0} مىل ھەر سائەت),
 						'other' => q({0} مىل ھەر سائەت),
 					},
 					# Long Unit Identifier
 					'temperature-celsius' => {
-						'name' => q(سېلسىيە گرادۇس),
 						'one' => q({0} سېلسىيە گرادۇس),
 						'other' => q({0} سېلسىيە گرادۇس),
 					},
 					# Core Unit Identifier
 					'celsius' => {
-						'name' => q(سېلسىيە گرادۇس),
 						'one' => q({0} سېلسىيە گرادۇس),
 						'other' => q({0} سېلسىيە گرادۇس),
 					},
 					# Long Unit Identifier
 					'temperature-fahrenheit' => {
-						'name' => q(فارېنگېيت گرادۇس),
 						'one' => q({0} فارېنگېيت گرادۇس),
 						'other' => q({0} فارېنگېيت گرادۇس),
 					},
 					# Core Unit Identifier
 					'fahrenheit' => {
-						'name' => q(فارېنگېيت گرادۇس),
 						'one' => q({0} فارېنگېيت گرادۇس),
 						'other' => q({0} فارېنگېيت گرادۇس),
 					},
 					# Long Unit Identifier
 					'volume-cubic-kilometer' => {
-						'name' => q(كۇب كىلومېتىر),
 						'one' => q({0} كۇب كىلومېتىر),
 						'other' => q({0} كۇب كىلومېتىر),
 					},
 					# Core Unit Identifier
 					'cubic-kilometer' => {
-						'name' => q(كۇب كىلومېتىر),
 						'one' => q({0} كۇب كىلومېتىر),
 						'other' => q({0} كۇب كىلومېتىر),
 					},
 					# Long Unit Identifier
 					'volume-cubic-mile' => {
-						'name' => q(كۇب مىل),
 						'one' => q({0} كۇب مىل),
 						'other' => q({0} كۇب مىل),
 					},
 					# Core Unit Identifier
 					'cubic-mile' => {
-						'name' => q(كۇب مىل),
 						'one' => q({0} كۇب مىل),
 						'other' => q({0} كۇب مىل),
 					},
 					# Long Unit Identifier
 					'volume-liter' => {
-						'name' => q(لىتېر),
 						'one' => q({0} لىتېر),
 						'other' => q({0} لىتېر),
 					},
 					# Core Unit Identifier
 					'liter' => {
-						'name' => q(لىتېر),
 						'one' => q({0} لىتېر),
 						'other' => q({0} لىتېر),
 					},
@@ -1921,16 +1586,6 @@ has 'units' => (
 						'other' => q({0}mi²),
 					},
 					# Long Unit Identifier
-					'duration-day' => {
-						'one' => q({0} كۈن),
-						'other' => q({0} كۈن),
-					},
-					# Core Unit Identifier
-					'day' => {
-						'one' => q({0} كۈن),
-						'other' => q({0} كۈن),
-					},
-					# Long Unit Identifier
 					'duration-hour' => {
 						'one' => q({0}h),
 						'other' => q({0}h),
@@ -1961,16 +1616,6 @@ has 'units' => (
 						'other' => q({0}m),
 					},
 					# Long Unit Identifier
-					'duration-month' => {
-						'one' => q({0} ئاي),
-						'other' => q({0} ئاي),
-					},
-					# Core Unit Identifier
-					'month' => {
-						'one' => q({0} ئاي),
-						'other' => q({0} ئاي),
-					},
-					# Long Unit Identifier
 					'duration-second' => {
 						'one' => q({0}s),
 						'other' => q({0}s),
@@ -1979,26 +1624,6 @@ has 'units' => (
 					'second' => {
 						'one' => q({0}s),
 						'other' => q({0}s),
-					},
-					# Long Unit Identifier
-					'duration-week' => {
-						'one' => q({0} ھەپتە),
-						'other' => q({0} ھەپتە),
-					},
-					# Core Unit Identifier
-					'week' => {
-						'one' => q({0} ھەپتە),
-						'other' => q({0} ھەپتە),
-					},
-					# Long Unit Identifier
-					'duration-year' => {
-						'one' => q({0} يىل),
-						'other' => q({0} يىل),
-					},
-					# Core Unit Identifier
-					'year' => {
-						'one' => q({0} يىل),
-						'other' => q({0} يىل),
 					},
 					# Long Unit Identifier
 					'length-centimeter' => {
@@ -2241,16 +1866,6 @@ has 'units' => (
 						'other' => q({0}°),
 					},
 					# Long Unit Identifier
-					'temperature-fahrenheit' => {
-						'one' => q({0}°F),
-						'other' => q({0}°F),
-					},
-					# Core Unit Identifier
-					'fahrenheit' => {
-						'one' => q({0}°F),
-						'other' => q({0}°F),
-					},
-					# Long Unit Identifier
 					'volume-cubic-kilometer' => {
 						'one' => q({0}km³),
 						'other' => q({0}km³),
@@ -2285,14 +1900,10 @@ has 'units' => (
 					# Long Unit Identifier
 					'acceleration-g-force' => {
 						'name' => q(ئېغىرلىق كۈچى),
-						'one' => q({0} G),
-						'other' => q({0} G),
 					},
 					# Core Unit Identifier
 					'g-force' => {
 						'name' => q(ئېغىرلىق كۈچى),
-						'one' => q({0} G),
-						'other' => q({0} G),
 					},
 					# Long Unit Identifier
 					'angle-degree' => {
@@ -2345,26 +1956,18 @@ has 'units' => (
 					# Long Unit Identifier
 					'area-square-kilometer' => {
 						'name' => q(كۋادرات كىلومېتىر),
-						'one' => q({0} km²),
-						'other' => q({0} km²),
 					},
 					# Core Unit Identifier
 					'square-kilometer' => {
 						'name' => q(كۋادرات كىلومېتىر),
-						'one' => q({0} km²),
-						'other' => q({0} km²),
 					},
 					# Long Unit Identifier
 					'area-square-meter' => {
 						'name' => q(كۋادرات مېتىر),
-						'one' => q({0} m²),
-						'other' => q({0} m²),
 					},
 					# Core Unit Identifier
 					'square-meter' => {
 						'name' => q(كۋادرات مېتىر),
-						'one' => q({0} m²),
-						'other' => q({0} m²),
 					},
 					# Long Unit Identifier
 					'area-square-mile' => {
@@ -2597,26 +2200,18 @@ has 'units' => (
 					# Long Unit Identifier
 					'mass-gram' => {
 						'name' => q(گرام),
-						'one' => q({0} g),
-						'other' => q({0} g),
 					},
 					# Core Unit Identifier
 					'gram' => {
 						'name' => q(گرام),
-						'one' => q({0} g),
-						'other' => q({0} g),
 					},
 					# Long Unit Identifier
 					'mass-kilogram' => {
 						'name' => q(كىلوگرام),
-						'one' => q({0} kg),
-						'other' => q({0} kg),
 					},
 					# Core Unit Identifier
 					'kilogram' => {
 						'name' => q(كىلوگرام),
-						'one' => q({0} kg),
-						'other' => q({0} kg),
 					},
 					# Long Unit Identifier
 					'mass-ounce' => {
@@ -2643,14 +2238,6 @@ has 'units' => (
 						'other' => q({0} قاداق),
 					},
 					# Long Unit Identifier
-					'per' => {
-						'1' => q({0}/{1}),
-					},
-					# Core Unit Identifier
-					'per' => {
-						'1' => q({0}/{1}),
-					},
-					# Long Unit Identifier
 					'power-horsepower' => {
 						'name' => q(ئات كۈچى),
 						'one' => q({0} ئات كۈچى),
@@ -2665,26 +2252,18 @@ has 'units' => (
 					# Long Unit Identifier
 					'power-kilowatt' => {
 						'name' => q(كىلوۋات),
-						'one' => q({0} kW),
-						'other' => q({0} kW),
 					},
 					# Core Unit Identifier
 					'kilowatt' => {
 						'name' => q(كىلوۋات),
-						'one' => q({0} kW),
-						'other' => q({0} kW),
 					},
 					# Long Unit Identifier
 					'power-watt' => {
 						'name' => q(ۋات),
-						'one' => q({0} W),
-						'other' => q({0} W),
 					},
 					# Core Unit Identifier
 					'watt' => {
 						'name' => q(ۋات),
-						'one' => q({0} W),
-						'other' => q({0} W),
 					},
 					# Long Unit Identifier
 					'pressure-hectopascal' => {
@@ -2701,26 +2280,18 @@ has 'units' => (
 					# Long Unit Identifier
 					'pressure-inch-ofhg' => {
 						'name' => q(ديۇيم سىماب تۈۋرۇكى),
-						'one' => q({0} inHg),
-						'other' => q({0} inHg),
 					},
 					# Core Unit Identifier
 					'inch-ofhg' => {
 						'name' => q(ديۇيم سىماب تۈۋرۇكى),
-						'one' => q({0} inHg),
-						'other' => q({0} inHg),
 					},
 					# Long Unit Identifier
 					'pressure-millibar' => {
 						'name' => q(مىللىبار),
-						'one' => q({0} mbar),
-						'other' => q({0} mbar),
 					},
 					# Core Unit Identifier
 					'millibar' => {
 						'name' => q(مىللىبار),
-						'one' => q({0} mbar),
-						'other' => q({0} mbar),
 					},
 					# Long Unit Identifier
 					'speed-kilometer-per-hour' => {
@@ -2761,62 +2332,42 @@ has 'units' => (
 					# Long Unit Identifier
 					'temperature-celsius' => {
 						'name' => q(سېلسىيە گرادۇس),
-						'one' => q({0}°C),
-						'other' => q({0}°C),
 					},
 					# Core Unit Identifier
 					'celsius' => {
 						'name' => q(سېلسىيە گرادۇس),
-						'one' => q({0}°C),
-						'other' => q({0}°C),
 					},
 					# Long Unit Identifier
 					'temperature-fahrenheit' => {
 						'name' => q(فارېنگېيت گرادۇس),
-						'one' => q({0}°F),
-						'other' => q({0}°F),
 					},
 					# Core Unit Identifier
 					'fahrenheit' => {
 						'name' => q(فارېنگېيت گرادۇس),
-						'one' => q({0}°F),
-						'other' => q({0}°F),
 					},
 					# Long Unit Identifier
 					'volume-cubic-kilometer' => {
 						'name' => q(كۇب كىلومېتىر),
-						'one' => q({0} km³),
-						'other' => q({0} km³),
 					},
 					# Core Unit Identifier
 					'cubic-kilometer' => {
 						'name' => q(كۇب كىلومېتىر),
-						'one' => q({0} km³),
-						'other' => q({0} km³),
 					},
 					# Long Unit Identifier
 					'volume-cubic-mile' => {
 						'name' => q(كۇب مىل),
-						'one' => q({0} mi³),
-						'other' => q({0} mi³),
 					},
 					# Core Unit Identifier
 					'cubic-mile' => {
 						'name' => q(كۇب مىل),
-						'one' => q({0} mi³),
-						'other' => q({0} mi³),
 					},
 					# Long Unit Identifier
 					'volume-liter' => {
 						'name' => q(لىتېر),
-						'one' => q({0} l),
-						'other' => q({0} l),
 					},
 					# Core Unit Identifier
 					'liter' => {
 						'name' => q(لىتېر),
-						'one' => q({0} l),
-						'other' => q({0} l),
 					},
 				},
 			} }
@@ -2841,8 +2392,6 @@ has 'listPatterns' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-				start => q({0}, {1}),
-				middle => q({0}, {1}),
 				end => q({0}, and {1}),
 				2 => q({0} and {1}),
 		} }
@@ -2855,85 +2404,12 @@ has native_numbering_system => (
 	default		=> 'arabext',
 );
 
-has 'number_symbols' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'latn' => {
-			'decimal' => q(.),
-			'exponential' => q(E),
-			'group' => q(,),
-			'infinity' => q(∞),
-			'minusSign' => q(-),
-			'nan' => q(NaN),
-			'perMille' => q(‰),
-			'percentSign' => q(%),
-			'plusSign' => q(+),
-			'superscriptingExponent' => q(×),
-		},
-	} }
-);
-
 has 'number_formats' => (
 	is			=> 'ro',
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
 		decimalFormat => {
-			'default' => {
-				'1000' => {
-					'one' => '0مىڭ',
-					'other' => '0مىڭ',
-				},
-				'10000' => {
-					'one' => '00مىڭ',
-					'other' => '00مىڭ',
-				},
-				'100000' => {
-					'one' => '000مىڭ',
-					'other' => '000مىڭ',
-				},
-				'1000000' => {
-					'one' => '0مىليون',
-					'other' => '0مىليون',
-				},
-				'10000000' => {
-					'one' => '00مىليون',
-					'other' => '00مىليون',
-				},
-				'100000000' => {
-					'one' => '000مىليون',
-					'other' => '000مىليون',
-				},
-				'1000000000' => {
-					'one' => '0مىليارد',
-					'other' => '0مىليارد',
-				},
-				'10000000000' => {
-					'one' => '00مىليارد',
-					'other' => '00مىليارد',
-				},
-				'100000000000' => {
-					'one' => '000مىليارد',
-					'other' => '000مىليارد',
-				},
-				'1000000000000' => {
-					'one' => '0T',
-					'other' => '0T',
-				},
-				'10000000000000' => {
-					'one' => '00T',
-					'other' => '00T',
-				},
-				'100000000000000' => {
-					'one' => '000T',
-					'other' => '000T',
-				},
-				'standard' => {
-					'default' => '#,##0.###',
-				},
-			},
 			'long' => {
 				'1000' => {
 					'one' => '0 مىڭ',
@@ -3021,32 +2497,6 @@ has 'number_formats' => (
 					'one' => '000مىليارد',
 					'other' => '000مىليارد',
 				},
-				'1000000000000' => {
-					'one' => '0T',
-					'other' => '0T',
-				},
-				'10000000000000' => {
-					'one' => '00T',
-					'other' => '00T',
-				},
-				'100000000000000' => {
-					'one' => '000T',
-					'other' => '000T',
-				},
-			},
-		},
-		percentFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0%',
-				},
-			},
-		},
-		scientificFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#E0',
-				},
 			},
 		},
 } },
@@ -3081,15 +2531,11 @@ has 'currencies' => (
 		'ADP' => {
 			display_name => {
 				'currency' => q(ئاندورران پېسېتاسى),
-				'one' => q(ئاندورران پېسېتاسى),
-				'other' => q(ئاندورران پېسېتاسى),
 			},
 		},
 		'AED' => {
 			display_name => {
 				'currency' => q(ئەرەب بىرلەشمە خەلىپىلىكى دەرھەمى),
-				'one' => q(ئەرەب بىرلەشمە خەلىپىلىكى دەرھەمى),
-				'other' => q(ئەرەب بىرلەشمە خەلىپىلىكى دەرھەمى),
 			},
 		},
 		'AFA' => {
@@ -3102,43 +2548,31 @@ has 'currencies' => (
 		'AFN' => {
 			display_name => {
 				'currency' => q(ئافغان ئافغانى),
-				'one' => q(ئافغان ئافغانى),
-				'other' => q(ئافغان ئافغانى),
 			},
 		},
 		'ALK' => {
 			display_name => {
 				'currency' => q(ئالبانىيە لېكى \(1946–1965\)),
-				'one' => q(ئالبانىيە لېكى \(1946–1965\)),
-				'other' => q(ئالبانىيە لېكى \(1946–1965\)),
 			},
 		},
 		'ALL' => {
 			display_name => {
 				'currency' => q(ئالبانىيە لېكى),
-				'one' => q(ئالبانىيە لېكى),
-				'other' => q(ئالبانىيە لېكى),
 			},
 		},
 		'AMD' => {
 			display_name => {
 				'currency' => q(ئەرمېنىيە دىرامى),
-				'one' => q(ئەرمېنىيە دىرامى),
-				'other' => q(ئەرمېنىيە دىرامى),
 			},
 		},
 		'ANG' => {
 			display_name => {
 				'currency' => q(گوللاندىيەگە قاراشلىق ئانتىللېن گۇلدېنى),
-				'one' => q(گوللاندىيەگە قاراشلىق ئانتىللېن گۇلدېنى),
-				'other' => q(گوللاندىيەگە قاراشلىق ئانتىللېن گۇلدېنى),
 			},
 		},
 		'AOA' => {
 			display_name => {
 				'currency' => q(ئانگولا كۇۋانزاسى),
-				'one' => q(ئانگولا كۇۋانزاسى),
-				'other' => q(ئانگولا كۇۋانزاسى),
 			},
 		},
 		'AOK' => {
@@ -3151,1795 +2585,1288 @@ has 'currencies' => (
 		'AON' => {
 			display_name => {
 				'currency' => q(ئانگولا يېڭى كۇۋانزاسى \(1990–2000\)),
-				'one' => q(ئانگولا يېڭى كۇۋانزاسى \(1990–2000\)),
-				'other' => q(ئانگولا يېڭى كۇۋانزاسى \(1990–2000\)),
 			},
 		},
 		'AOR' => {
 			display_name => {
 				'currency' => q(ئانگولا قايتا تەڭشەلگەن كۇۋانزاسى \(1995–1999\)),
-				'one' => q(ئانگولا قايتا تەڭشەلگەن كۇۋانزاسى \(1995–1999\)),
-				'other' => q(ئانگولا قايتا تەڭشەلگەن كۇۋانزاسى \(1995–1999\)),
 			},
 		},
 		'ARA' => {
 			display_name => {
 				'currency' => q(ئارگېنتىنا ئاۋسترالى),
-				'one' => q(ئارگېنتىنا ئاۋسترالى),
-				'other' => q(ئارگېنتىنا ئاۋسترالى),
 			},
 		},
 		'ARL' => {
 			display_name => {
 				'currency' => q(ئارگېنتىنا پېسو لېيى \(1970–1983\)),
-				'one' => q(ئارگېنتىنا پېسو لېيى \(1970–1983\)),
-				'other' => q(ئارگېنتىنا پېسو لېيى \(1970–1983\)),
 			},
 		},
 		'ARM' => {
 			display_name => {
 				'currency' => q(ئارگېنتىنا پېسوسى \(1881–1970\)),
-				'one' => q(ئارگېنتىنا پېسوسى \(1881–1970\)),
-				'other' => q(ئارگېنتىنا پېسوسى \(1881–1970\)),
 			},
 		},
 		'ARP' => {
 			display_name => {
 				'currency' => q(ئارگېنتىنا پېسوسى \(1983–1985\)),
-				'one' => q(ئارگېنتىنا پېسوسى \(1983–1985\)),
-				'other' => q(ئارگېنتىنا پېسوسى \(1983–1985\)),
 			},
 		},
 		'ARS' => {
 			display_name => {
 				'currency' => q(ئارگېنتىنا پېسوسى),
-				'one' => q(ئارگېنتىنا پېسوسى),
-				'other' => q(ئارگېنتىنا پېسوسى),
 			},
 		},
 		'ATS' => {
 			display_name => {
 				'currency' => q(ئاۋسترىيە شىللىڭى),
-				'one' => q(ئاۋسترىيە شىللىڭى),
-				'other' => q(ئاۋسترىيە شىللىڭى),
 			},
 		},
 		'AUD' => {
 			display_name => {
 				'currency' => q(ئاۋسترالىيە دوللىرى),
-				'one' => q(ئاۋسترالىيە دوللىرى),
-				'other' => q(ئاۋسترالىيە دوللىرى),
 			},
 		},
 		'AWG' => {
 			display_name => {
 				'currency' => q(ئارۇبان فىلورۇنى),
-				'one' => q(ئارۇبان فىلورۇنى),
-				'other' => q(ئارۇبان فىلورۇنى),
 			},
 		},
 		'AZM' => {
 			display_name => {
 				'currency' => q(ئەزەربەيجان ماناتى \(1993–2006\)),
-				'one' => q(ئەزەربەيجان ماناتى \(1993–2006\)),
-				'other' => q(ئەزەربەيجان ماناتى \(1993–2006\)),
 			},
 		},
 		'AZN' => {
 			display_name => {
 				'currency' => q(ئەزەربەيجان ماناتى),
-				'one' => q(ئەزەربەيجان ماناتى),
-				'other' => q(ئەزەربەيجان ماناتى),
 			},
 		},
 		'BAD' => {
 			display_name => {
 				'currency' => q(بوسنىيە-خېرتسېگوۋىنا دىنارى \(1992–1994\)),
-				'one' => q(بوسنىيە-خېرتسېگوۋىنا دىنارى \(1992–1994\)),
-				'other' => q(بوسنىيە-خېرتسېگوۋىنا دىنارى \(1992–1994\)),
 			},
 		},
 		'BAM' => {
 			display_name => {
 				'currency' => q(بوسنىيە-خېرتسېگوۋىنا ئالماشتۇرۇشچان ماركى),
-				'one' => q(بوسنىيە-خېرتسېگوۋىنا ئالماشتۇرۇشچان ماركى),
-				'other' => q(بوسنىيە-خېرتسېگوۋىنا ئالماشتۇرۇشچان ماركى),
 			},
 		},
 		'BAN' => {
 			display_name => {
 				'currency' => q(بوسنىيە-خېرتسېگوۋىنا يېڭى دىنارى \(1994–1997\)),
-				'one' => q(بوسنىيە-خېرتسېگوۋىنا يېڭى دىنارى \(1994–1997\)),
-				'other' => q(بوسنىيە-خېرتسېگوۋىنا يېڭى دىنارى \(1994–1997\)),
 			},
 		},
 		'BBD' => {
 			display_name => {
 				'currency' => q(باربادوس دوللىرى),
-				'one' => q(باربادوس دوللىرى),
-				'other' => q(باربادوس دوللىرى),
 			},
 		},
 		'BDT' => {
 			display_name => {
 				'currency' => q(باڭلادىش تاكاسى),
-				'one' => q(باڭلادىش تاكاسى),
-				'other' => q(باڭلادىش تاكاسى),
 			},
 		},
 		'BEC' => {
 			display_name => {
 				'currency' => q(بېلگىيە فرانكى \(ئالماشتۇرۇشچان\)),
-				'one' => q(بېلگىيە فرانكى \(ئالماشتۇرۇشچان\)),
-				'other' => q(بېلگىيە فرانكى \(ئالماشتۇرۇشچان\)),
 			},
 		},
 		'BEF' => {
 			display_name => {
 				'currency' => q(بېلگىيە فرانكى),
-				'one' => q(بېلگىيە فرانكى),
-				'other' => q(بېلگىيە فرانكى),
 			},
 		},
 		'BEL' => {
 			display_name => {
 				'currency' => q(بېلگىيە فرانكى \(پۇل–مۇئامىلە\)),
-				'one' => q(بېلگىيە فرانكى \(پۇل–مۇئامىلە\)),
-				'other' => q(بېلگىيە فرانكى \(پۇل–مۇئامىلە\)),
 			},
 		},
 		'BGL' => {
 			display_name => {
 				'currency' => q(بۇلغارىيە قاتتىق لېۋاسى),
-				'one' => q(بۇلغارىيە قاتتىق لېۋاسى),
-				'other' => q(بۇلغارىيە قاتتىق لېۋاسى),
 			},
 		},
 		'BGM' => {
 			display_name => {
 				'currency' => q(بۇلغارىيە ئىجتىمائىي لېۋاسى),
-				'one' => q(بۇلغارىيە ئىجتىمائىي لېۋاسى),
-				'other' => q(بۇلغارىيە ئىجتىمائىي لېۋاسى),
 			},
 		},
 		'BGN' => {
 			display_name => {
 				'currency' => q(بۇلغارىيە لېۋاسى),
-				'one' => q(بۇلغارىيە لېۋاسى),
-				'other' => q(بۇلغارىيە لېۋاسى),
 			},
 		},
 		'BGO' => {
 			display_name => {
 				'currency' => q(بۇلغارىيە لېۋاسى \(1879–1952\)),
-				'one' => q(بۇلغارىيە لېۋاسى \(1879–1952\)),
-				'other' => q(بۇلغارىيە لېۋاسى \(1879–1952\)),
 			},
 		},
 		'BHD' => {
 			display_name => {
 				'currency' => q(بەھرەين دىنارى),
-				'one' => q(بەھرەين دىنارى),
-				'other' => q(بەھرەين دىنارى),
 			},
 		},
 		'BIF' => {
 			display_name => {
 				'currency' => q(بۇرۇندى فرانكى),
-				'one' => q(بۇرۇندى فرانكى),
-				'other' => q(بۇرۇندى فرانكى),
 			},
 		},
 		'BMD' => {
 			display_name => {
 				'currency' => q(بېرمۇدا دوللىرى),
-				'one' => q(بېرمۇدا دوللىرى),
-				'other' => q(بېرمۇدا دوللىرى),
 			},
 		},
 		'BND' => {
 			display_name => {
 				'currency' => q(بىرۇنېي دوللىرى),
-				'one' => q(بىرۇنېي دوللىرى),
-				'other' => q(بىرۇنېي دوللىرى),
 			},
 		},
 		'BOB' => {
 			display_name => {
 				'currency' => q(بولىۋىيە بولىۋىيانوسى),
-				'one' => q(بولىۋىيە بولىۋىيانوسى),
-				'other' => q(بولىۋىيە بولىۋىيانوسى),
 			},
 		},
 		'BOL' => {
 			display_name => {
 				'currency' => q(بولىۋىيە بولىۋىيانوسى \(1863–1963\)),
-				'one' => q(بولىۋىيە بولىۋىيانوسى \(1863–1963\)),
-				'other' => q(بولىۋىيە بولىۋىيانوسى \(1863–1963\)),
 			},
 		},
 		'BOP' => {
 			display_name => {
 				'currency' => q(بولىۋىيە پىسوسى),
-				'one' => q(بولىۋىيە پىسوسى),
-				'other' => q(بولىۋىيە پىسوسى),
 			},
 		},
 		'BOV' => {
 			display_name => {
 				'currency' => q(بولىۋىيە مۇدولى),
-				'one' => q(بولىۋىيە مۇدولى),
-				'other' => q(بولىۋىيە مۇدولى),
 			},
 		},
 		'BRB' => {
 			display_name => {
 				'currency' => q(بىرازىلىيە يېڭى كرۇزېروسى \(1967–1986\)),
-				'one' => q(بىرازىلىيە يېڭى كرۇزېروسى \(1967–1986\)),
-				'other' => q(بىرازىلىيە يېڭى كرۇزېروسى \(1967–1986\)),
 			},
 		},
 		'BRC' => {
 			display_name => {
 				'currency' => q(بىرازىلىيە كرۇزادوسى \(1986–1989\)),
-				'one' => q(بىرازىلىيە كرۇزادوسى \(1986–1989\)),
-				'other' => q(بىرازىلىيە كرۇزادوسى \(1986–1989\)),
 			},
 		},
 		'BRE' => {
 			display_name => {
 				'currency' => q(بىرازىلىيە يېڭى كرۇزېروسى \(1990–1993\)),
-				'one' => q(بىرازىلىيە يېڭى كرۇزېروسى \(1990–1993\)),
-				'other' => q(بىرازىلىيە يېڭى كرۇزېروسى \(1990–1993\)),
 			},
 		},
 		'BRL' => {
 			display_name => {
 				'currency' => q(بىرازىلىيە رىيالى),
-				'one' => q(بىرازىلىيە رىيالى),
-				'other' => q(بىرازىلىيە رىيالى),
 			},
 		},
 		'BRN' => {
 			display_name => {
 				'currency' => q(بىرازىلىيە يېڭى كرۇزادوسى \(1989–1990\)),
-				'one' => q(بىرازىلىيە يېڭى كرۇزادوسى \(1989–1990\)),
-				'other' => q(بىرازىلىيە يېڭى كرۇزادوسى \(1989–1990\)),
 			},
 		},
 		'BRR' => {
 			display_name => {
 				'currency' => q(بىرازىلىيە كرۇزېروسى \(1993–1994\)),
-				'one' => q(بىرازىلىيە كرۇزېروسى \(1993–1994\)),
-				'other' => q(بىرازىلىيە كرۇزېروسى \(1993–1994\)),
 			},
 		},
 		'BRZ' => {
 			display_name => {
 				'currency' => q(بىرازىلىيە كرۇزېروسى \(1942–1967\)),
-				'one' => q(بىرازىلىيە كرۇزېروسى \(1942–1967\)),
-				'other' => q(بىرازىلىيە كرۇزېروسى \(1942–1967\)),
 			},
 		},
 		'BSD' => {
 			display_name => {
 				'currency' => q(باھاما دوللىرى),
-				'one' => q(باھاما دوللىرى),
-				'other' => q(باھاما دوللىرى),
 			},
 		},
 		'BTN' => {
 			display_name => {
 				'currency' => q(بۇتان نگۇلترۇمى),
-				'one' => q(بۇتان نگۇلترۇمى),
-				'other' => q(بۇتان نگۇلترۇمى),
 			},
 		},
 		'BUK' => {
 			display_name => {
 				'currency' => q(بىرما كىياتى),
-				'one' => q(بىرما كىياتى),
-				'other' => q(بىرما كىياتى),
 			},
 		},
 		'BWP' => {
 			display_name => {
 				'currency' => q(بوتسۋانا پۇلاسى),
-				'one' => q(بوتسۋانا پۇلاسى),
-				'other' => q(بوتسۋانا پۇلاسى),
 			},
 		},
 		'BYB' => {
 			display_name => {
 				'currency' => q(بېلارۇسىيە يېڭى رۇبلىسى \(1994–1999\)),
-				'one' => q(بېلارۇسىيە يېڭى رۇبلىسى \(1994–1999\)),
-				'other' => q(بېلارۇسىيە يېڭى رۇبلىسى \(1994–1999\)),
 			},
 		},
 		'BYN' => {
 			display_name => {
 				'currency' => q(بېلارۇسىيە رۇبلىسى),
-				'one' => q(بېلارۇسىيە رۇبلىسى),
-				'other' => q(بېلارۇسىيە رۇبلىسى),
 			},
 		},
 		'BYR' => {
 			display_name => {
 				'currency' => q(بېلارۇسىيە رۇبلىسى \(۲۰۰۰–۲۰۱۶\)),
-				'one' => q(بېلارۇسىيە رۇبلىسى \(۲۰۰۰–۲۰۱۶\)),
-				'other' => q(بېلارۇسىيە رۇبلىسى \(۲۰۰۰–۲۰۱۶\)),
 			},
 		},
 		'BZD' => {
 			display_name => {
 				'currency' => q(بېلىز دوللىرى),
-				'one' => q(بېلىز دوللىرى),
-				'other' => q(بېلىز دوللىرى),
 			},
 		},
 		'CAD' => {
 			display_name => {
 				'currency' => q(كانادا دوللىرى),
-				'one' => q(كانادا دوللىرى),
-				'other' => q(كانادا دوللىرى),
 			},
 		},
 		'CDF' => {
 			display_name => {
 				'currency' => q(كونگو فرانكى),
-				'one' => q(كونگو فرانكى),
-				'other' => q(كونگو فرانكى),
 			},
 		},
 		'CHE' => {
 			display_name => {
 				'currency' => q(WIR ياۋرو),
-				'one' => q(WIR ياۋرو),
-				'other' => q(WIR ياۋرو),
 			},
 		},
 		'CHF' => {
 			display_name => {
 				'currency' => q(شىۋېتسىيە فرانكى),
-				'one' => q(شىۋېتسىيە فرانكى),
-				'other' => q(شىۋېتسىيە فرانكى),
 			},
 		},
 		'CHW' => {
 			display_name => {
 				'currency' => q(WIR فرانكى),
-				'one' => q(WIR فرانكى),
-				'other' => q(WIR فرانكى),
 			},
 		},
 		'CLE' => {
 			display_name => {
 				'currency' => q(چىلى ئېسكۇدوسى),
-				'one' => q(چىلى ئېسكۇدوسى),
-				'other' => q(چىلى ئېسكۇدوسى),
 			},
 		},
 		'CLF' => {
 			display_name => {
 				'currency' => q(چىلى ھېسابات بىرلىكى \(UF\)),
-				'one' => q(چىلى ھېسابات بىرلىكى \(UF\)),
-				'other' => q(چىلى ھېسابات بىرلىكى \(UF\)),
 			},
 		},
 		'CLP' => {
 			display_name => {
 				'currency' => q(چىلى پېسوسى),
-				'one' => q(چىلى پېسوسى),
-				'other' => q(چىلى پېسوسى),
 			},
 		},
 		'CNX' => {
 			display_name => {
 				'currency' => q(جۇڭگو خەلق بانكىسى دوللىرى),
-				'one' => q(جۇڭگو خەلق بانكىسى دوللىرى),
-				'other' => q(جۇڭگو خەلق بانكىسى دوللىرى),
 			},
 		},
 		'CNY' => {
 			symbol => '￥',
 			display_name => {
 				'currency' => q(جۇڭگو يۈەنى),
-				'one' => q(جۇڭگو يۈەنى),
-				'other' => q(جۇڭگو يۈەنى),
 			},
 		},
 		'COP' => {
 			display_name => {
 				'currency' => q(كولومبىيە پېسوسى),
-				'one' => q(كولومبىيە پېسوسى),
-				'other' => q(كولومبىيە پېسوسى),
 			},
 		},
 		'COU' => {
 			display_name => {
 				'currency' => q(كولومبىيە ھەقىقىي قىممەت بىرلىكى),
-				'one' => q(كولومبىيە ھەقىقىي قىممەت بىرلىكى),
-				'other' => q(كولومبىيە ھەقىقىي قىممەت بىرلىكى),
 			},
 		},
 		'CRC' => {
 			display_name => {
 				'currency' => q(كوستارىكا كولونى),
-				'one' => q(كوستارىكا كولونى),
-				'other' => q(كوستارىكا كولونى),
 			},
 		},
 		'CSD' => {
 			display_name => {
 				'currency' => q(سېربىيە دىنارى \(2002–2006\)),
-				'one' => q(سېربىيە دىنارى \(2002–2006\)),
-				'other' => q(سېربىيە دىنارى \(2002–2006\)),
 			},
 		},
 		'CSK' => {
 			display_name => {
 				'currency' => q(چېخسىلوۋاكىيە قاتتىق كورۇناسى),
-				'one' => q(چېخسىلوۋاكىيە قاتتىق كورۇناسى),
-				'other' => q(چېخسىلوۋاكىيە قاتتىق كورۇناسى),
 			},
 		},
 		'CUC' => {
 			display_name => {
 				'currency' => q(كۇبا ئالماشتۇرۇشچان پېسوسى),
-				'one' => q(كۇبا ئالماشتۇرۇشچان پېسوسى),
-				'other' => q(كۇبا ئالماشتۇرۇشچان پېسوسى),
 			},
 		},
 		'CUP' => {
 			display_name => {
 				'currency' => q(كۇبا پېسوسى),
-				'one' => q(كۇبا پېسوسى),
-				'other' => q(كۇبا پېسوسى),
 			},
 		},
 		'CVE' => {
 			display_name => {
 				'currency' => q(يېشىل تۇمشۇق ئېسكۇدوسى),
-				'one' => q(يېشىل تۇمشۇق ئېسكۇدوسى),
-				'other' => q(يېشىل تۇمشۇق ئېسكۇدوسى),
 			},
 		},
 		'CYP' => {
 			display_name => {
 				'currency' => q(سىپرۇس فوند ستېرلىڭى),
-				'one' => q(سىپرۇس فوند ستېرلىڭى),
-				'other' => q(سىپرۇس فوند ستېرلىڭى),
 			},
 		},
 		'CZK' => {
 			display_name => {
 				'currency' => q(چېخ جۇمھۇرىيىتى كورۇناسى),
-				'one' => q(چېخ جۇمھۇرىيىتى كورۇناسى),
-				'other' => q(چېخ جۇمھۇرىيىتى كورۇناسى),
 			},
 		},
 		'DDM' => {
 			display_name => {
 				'currency' => q(شەرقىي گېرمانىيە ماركى),
-				'one' => q(شەرقىي گېرمانىيە ماركى),
-				'other' => q(شەرقىي گېرمانىيە ماركى),
 			},
 		},
 		'DEM' => {
 			display_name => {
 				'currency' => q(گېرمانىيە ماركى),
-				'one' => q(گېرمانىيە ماركى),
-				'other' => q(گېرمانىيە ماركى),
 			},
 		},
 		'DJF' => {
 			display_name => {
 				'currency' => q(جىبۇتى فرانكى),
-				'one' => q(جىبۇتى فرانكى),
-				'other' => q(جىبۇتى فرانكى),
 			},
 		},
 		'DKK' => {
 			display_name => {
 				'currency' => q(دانىيە كرونى),
-				'one' => q(دانىيە كرونى),
-				'other' => q(دانىيە كرونى),
 			},
 		},
 		'DOP' => {
 			display_name => {
 				'currency' => q(دومىنىكا پېسوسى),
-				'one' => q(دومىنىكا پېسوسى),
-				'other' => q(دومىنىكا پېسوسى),
 			},
 		},
 		'DZD' => {
 			display_name => {
 				'currency' => q(ئالجىرىيە دىنارى),
-				'one' => q(ئالجىرىيە دىنارى),
-				'other' => q(ئالجىرىيە دىنارى),
 			},
 		},
 		'ECS' => {
 			display_name => {
 				'currency' => q(ئېكۋادور سۇكرېسى),
-				'one' => q(ئېكۋادور سۇكرېسى),
-				'other' => q(ئېكۋادور سۇكرېسى),
 			},
 		},
 		'ECV' => {
 			display_name => {
 				'currency' => q(ئېكۋادور تۇراقلىق قىممەت بىرلىكى),
-				'one' => q(ئېكۋادور تۇراقلىق قىممەت بىرلىكى),
-				'other' => q(ئېكۋادور تۇراقلىق قىممەت بىرلىكى),
 			},
 		},
 		'EEK' => {
 			display_name => {
 				'currency' => q(ئېستونىيە كرۇنى),
-				'one' => q(ئېستونىيە كرۇنى),
-				'other' => q(ئېستونىيە كرۇنى),
 			},
 		},
 		'EGP' => {
 			display_name => {
 				'currency' => q(مىسىر فوند سىتېرلىڭى),
-				'one' => q(مىسىر فوند سىتېرلىڭى),
-				'other' => q(مىسىر فوند سىتېرلىڭى),
 			},
 		},
 		'ERN' => {
 			display_name => {
 				'currency' => q(ئېرىترېيە ناكفاسى),
-				'one' => q(ئېرىترېيە ناكفاسى),
-				'other' => q(ئېرىترېيە ناكفاسى),
 			},
 		},
 		'ESA' => {
 			display_name => {
 				'currency' => q(ئىسپانىيە پېسېتاسى \(A ھېسابات\)),
-				'one' => q(ئىسپانىيە پېسېتاسى \(A ھېسابات\)),
-				'other' => q(ئىسپانىيە پېسېتاسى \(A ھېسابات\)),
 			},
 		},
 		'ESB' => {
 			display_name => {
 				'currency' => q(ئىسپانىيە پېسېتاسى \(ئالماشتۇرۇش ھېساباتى\)),
-				'one' => q(ئىسپانىيە پېسېتاسى \(ئالماشتۇرۇش ھېساباتى\)),
-				'other' => q(ئىسپانىيە پېسېتاسى \(ئالماشتۇرۇش ھېساباتى\)),
 			},
 		},
 		'ESP' => {
 			display_name => {
 				'currency' => q(ئىسپانىيە پېسېتاسى),
-				'one' => q(ئىسپانىيە پېسېتاسى),
-				'other' => q(ئىسپانىيە پېسېتاسى),
 			},
 		},
 		'ETB' => {
 			display_name => {
 				'currency' => q(ئېفىيوپىيە بىررى),
-				'one' => q(ئېفىيوپىيە بىررى),
-				'other' => q(ئېفىيوپىيە بىررى),
 			},
 		},
 		'EUR' => {
 			display_name => {
 				'currency' => q(ياۋرو),
-				'one' => q(ياۋرو),
-				'other' => q(ياۋرو),
 			},
 		},
 		'FIM' => {
 			display_name => {
 				'currency' => q(فىنلاندىيە مارككاسى),
-				'one' => q(فىنلاندىيە مارككاسى),
-				'other' => q(فىنلاندىيە مارككاسى),
 			},
 		},
 		'FJD' => {
 			display_name => {
 				'currency' => q(فىجى دوللىرى),
-				'one' => q(فىجى دوللىرى),
-				'other' => q(فىجى دوللىرى),
 			},
 		},
 		'FKP' => {
 			display_name => {
 				'currency' => q(فالكلاند ئاراللىرى فوند سىتېرلىڭى),
-				'one' => q(فالكلاند ئاراللىرى فوند سىتېرلىڭى),
-				'other' => q(فالكلاند ئاراللىرى فوند سىتېرلىڭى),
 			},
 		},
 		'FRF' => {
 			display_name => {
 				'currency' => q(فىرانسىيە فرانكى),
-				'one' => q(فىرانسىيە فرانكى),
-				'other' => q(فىرانسىيە فرانكى),
 			},
 		},
 		'GBP' => {
 			display_name => {
 				'currency' => q(ئەنگلىيە فوند سىتېرلىڭى),
-				'one' => q(ئەنگلىيە فوند سىتېرلىڭى),
-				'other' => q(ئەنگلىيە فوند سىتېرلىڭى),
 			},
 		},
 		'GEK' => {
 			display_name => {
 				'currency' => q(گىرۇزىيە كۇپون لارىتى),
-				'one' => q(گىرۇزىيە كۇپون لارىتى),
-				'other' => q(گىرۇزىيە كۇپون لارىتى),
 			},
 		},
 		'GEL' => {
 			display_name => {
 				'currency' => q(گىرۇزىيە لارىسى),
-				'one' => q(گىرۇزىيە لارىسى),
-				'other' => q(گىرۇزىيە لارىسى),
 			},
 		},
 		'GHC' => {
 			display_name => {
 				'currency' => q(گانا سېدىسى \(1979–2007\)),
-				'one' => q(گانا سېدىسى \(1979–2007\)),
-				'other' => q(گانا سېدىسى \(1979–2007\)),
 			},
 		},
 		'GHS' => {
 			display_name => {
 				'currency' => q(گانا سېدىسى),
-				'one' => q(گانا سېدىسى),
-				'other' => q(گانا سېدىسى),
 			},
 		},
 		'GIP' => {
 			display_name => {
 				'currency' => q(جەبىلتارىق فوند سىتېرلىڭى),
-				'one' => q(جەبىلتارىق فوند سىتېرلىڭى),
-				'other' => q(جەبىلتارىق فوند سىتېرلىڭى),
 			},
 		},
 		'GMD' => {
 			display_name => {
 				'currency' => q(گامبىيە دالاسى),
-				'one' => q(گامبىيە دالاسى),
-				'other' => q(گامبىيە دالاسى),
 			},
 		},
 		'GNF' => {
 			display_name => {
 				'currency' => q(گىۋىنېيە فرانكى),
-				'one' => q(گىۋىنېيە فرانكى),
-				'other' => q(گىۋىنېيە فرانكى),
 			},
 		},
 		'GNS' => {
 			display_name => {
 				'currency' => q(گىۋىنېيە سىلىسى),
-				'one' => q(گىۋىنېيە سىلىسى),
-				'other' => q(گىۋىنېيە سىلىسى),
 			},
 		},
 		'GQE' => {
 			display_name => {
 				'currency' => q(ئېكۋاتور گىۋىنېيە ئېكۋېلېسى),
-				'one' => q(ئېكۋاتور گىۋىنېيە ئېكۋېلېسى),
-				'other' => q(ئېكۋاتور گىۋىنېيە ئېكۋېلېسى),
 			},
 		},
 		'GRD' => {
 			display_name => {
 				'currency' => q(گىرېتسىيە دراخماسى),
-				'one' => q(گىرېتسىيە دراخماسى),
-				'other' => q(گىرېتسىيە دراخماسى),
 			},
 		},
 		'GTQ' => {
 			display_name => {
 				'currency' => q(گىۋاتېمالا كۇۋېتزالى),
-				'one' => q(گىۋاتېمالا كۇۋېتزالى),
-				'other' => q(گىۋاتېمالا كۇۋېتزالى),
 			},
 		},
 		'GWE' => {
 			display_name => {
 				'currency' => q(پورتۇگالىيە گىۋىنېيە ئېسكۇدوسى),
-				'one' => q(پورتۇگالىيە گىۋىنېيە ئېسكۇدوسى),
-				'other' => q(پورتۇگالىيە گىۋىنېيە ئېسكۇدوسى),
 			},
 		},
 		'GWP' => {
 			display_name => {
 				'currency' => q(گىۋىنېيە-بىسسائۇ پېسوسى),
-				'one' => q(گىۋىنېيە-بىسسائۇ پېسوسى),
-				'other' => q(گىۋىنېيە-بىسسائۇ پېسوسى),
 			},
 		},
 		'GYD' => {
 			display_name => {
 				'currency' => q(گىۋىئانا دوللىرى),
-				'one' => q(گىۋىئانا دوللىرى),
-				'other' => q(گىۋىئانا دوللىرى),
 			},
 		},
 		'HKD' => {
 			display_name => {
 				'currency' => q(شياڭگاڭ دوللىرى),
-				'one' => q(شياڭگاڭ دوللىرى),
-				'other' => q(شياڭگاڭ دوللىرى),
 			},
 		},
 		'HNL' => {
 			display_name => {
 				'currency' => q(ھوندۇراس لېمپىراسى),
-				'one' => q(ھوندۇراس لېمپىراسى),
-				'other' => q(ھوندۇراس لېمپىراسى),
 			},
 		},
 		'HRD' => {
 			display_name => {
 				'currency' => q(كىرودىيە دىنارى),
-				'one' => q(كىرودىيە دىنارى),
-				'other' => q(كىرودىيە دىنارى),
 			},
 		},
 		'HRK' => {
 			display_name => {
 				'currency' => q(كىرودىيە كۇناسى),
-				'one' => q(كىرودىيە كۇناسى),
-				'other' => q(كىرودىيە كۇناسى),
 			},
 		},
 		'HTG' => {
 			display_name => {
 				'currency' => q(ھايتى گۇردېسى),
-				'one' => q(ھايتى گۇردېسى),
-				'other' => q(ھايتى گۇردېسى),
 			},
 		},
 		'HUF' => {
 			display_name => {
 				'currency' => q(ۋېنگىرىيە فورېنتى),
-				'one' => q(ۋېنگىرىيە فورېنتى),
-				'other' => q(ۋېنگىرىيە فورېنتى),
 			},
 		},
 		'IDR' => {
 			display_name => {
 				'currency' => q(ھىندونېزىيە رۇپىيەسى),
-				'one' => q(ھىندونېزىيە رۇپىيەسى),
-				'other' => q(ھىندونېزىيە رۇپىيەسى),
 			},
 		},
 		'IEP' => {
 			display_name => {
 				'currency' => q(ئىرېلاندىيە فوندستېرلىڭى),
-				'one' => q(ئىرېلاندىيە فوندستېرلىڭى),
-				'other' => q(ئىرېلاندىيە فوندستېرلىڭى),
 			},
 		},
 		'ILP' => {
 			display_name => {
 				'currency' => q(ئىسرائىلىيە فوندستېرلىڭى),
-				'one' => q(ئىسرائىلىيە فوندستېرلىڭى),
-				'other' => q(ئىسرائىلىيە فوندستېرلىڭى),
 			},
 		},
 		'ILR' => {
 			display_name => {
 				'currency' => q(ئىسرائىل شېكېلى \(1980–1985\)),
-				'one' => q(ئىسرائىل شېكېلى \(1980–1985\)),
-				'other' => q(ئىسرائىل شېكېلى \(1980–1985\)),
 			},
 		},
 		'ILS' => {
 			display_name => {
 				'currency' => q(ئىسرائىل يېڭى شېكېلى),
-				'one' => q(ئىسرائىل يېڭى شېكېلى),
-				'other' => q(ئىسرائىل يېڭى شېكېلى),
 			},
 		},
 		'INR' => {
 			display_name => {
 				'currency' => q(ھىندىستان رۇپىسى),
-				'one' => q(ھىندىستان رۇپىسى),
-				'other' => q(ھىندىستان رۇپىسى),
 			},
 		},
 		'IQD' => {
 			display_name => {
 				'currency' => q(ئىراق دىنارى),
-				'one' => q(ئىراق دىنارى),
-				'other' => q(ئىراق دىنارى),
 			},
 		},
 		'IRR' => {
 			display_name => {
 				'currency' => q(ئىران رىيالى),
-				'one' => q(ئىران رىيالى),
-				'other' => q(ئىران رىيالى),
 			},
 		},
 		'ISJ' => {
 			display_name => {
 				'currency' => q(ئىسلاندىيە كروناسى \(1918–1981\)),
-				'one' => q(ئىسلاندىيە كروناسى \(1918–1981\)),
-				'other' => q(ئىسلاندىيە كروناسى \(1918–1981\)),
 			},
 		},
 		'ISK' => {
 			display_name => {
 				'currency' => q(ئىسلاندىيە كروناسى),
-				'one' => q(ئىسلاندىيە كروناسى),
-				'other' => q(ئىسلاندىيە كروناسى),
 			},
 		},
 		'ITL' => {
 			display_name => {
 				'currency' => q(ئىتالىيە لىراسى),
-				'one' => q(ئىتالىيە لىراسى),
-				'other' => q(ئىتالىيە لىراسى),
 			},
 		},
 		'JMD' => {
 			display_name => {
 				'currency' => q(يامايكا دوللىرى),
-				'one' => q(يامايكا دوللىرى),
-				'other' => q(يامايكا دوللىرى),
 			},
 		},
 		'JOD' => {
 			display_name => {
 				'currency' => q(ئىيوردانىيە دىنارى),
-				'one' => q(ئىيوردانىيە دىنارى),
-				'other' => q(ئىيوردانىيە دىنارى),
 			},
 		},
 		'JPY' => {
 			display_name => {
 				'currency' => q(ياپونىيە يېنى),
-				'one' => q(ياپونىيە يېنى),
-				'other' => q(ياپونىيە يېنى),
 			},
 		},
 		'KES' => {
 			display_name => {
 				'currency' => q(كېنىيە شىللىڭى),
-				'one' => q(كېنىيە شىللىڭى),
-				'other' => q(كېنىيە شىللىڭى),
 			},
 		},
 		'KGS' => {
 			display_name => {
 				'currency' => q(قىرغىزىستان سومى),
-				'one' => q(قىرغىزىستان سومى),
-				'other' => q(قىرغىزىستان سومى),
 			},
 		},
 		'KHR' => {
 			display_name => {
 				'currency' => q(كامبودژا رىئېلى),
-				'one' => q(كامبودژا رىئېلى),
-				'other' => q(كامبودژا رىئېلى),
 			},
 		},
 		'KMF' => {
 			display_name => {
 				'currency' => q(كومورو فرانكى),
-				'one' => q(كومورو فرانكى),
-				'other' => q(كومورو فرانكى),
 			},
 		},
 		'KPW' => {
 			display_name => {
 				'currency' => q(شىمالىي كورېيە ۋونى),
-				'one' => q(شىمالىي كورېيە ۋونى),
-				'other' => q(شىمالىي كورېيە ۋونى),
 			},
 		},
 		'KRH' => {
 			display_name => {
 				'currency' => q(جەنۇبىي كورېيە خۋانى \(1953–1962\)),
-				'one' => q(جەنۇبىي كورېيە خۋانى \(1953–1962\)),
-				'other' => q(جەنۇبىي كورېيە خۋانى \(1953–1962\)),
 			},
 		},
 		'KRO' => {
 			display_name => {
 				'currency' => q(جەنۇبىي كورېيە ۋونى \(1945–1953\)),
-				'one' => q(جەنۇبىي كورېيە ۋونى \(1945–1953\)),
-				'other' => q(جەنۇبىي كورېيە ۋونى \(1945–1953\)),
 			},
 		},
 		'KRW' => {
 			display_name => {
 				'currency' => q(جەنۇبىي كورېيە ۋونى),
-				'one' => q(جەنۇبىي كورېيە ۋونى),
-				'other' => q(جەنۇبىي كورېيە ۋونى),
 			},
 		},
 		'KWD' => {
 			display_name => {
 				'currency' => q(كۇۋەيت دىنارى),
-				'one' => q(كۇۋەيت دىنارى),
-				'other' => q(كۇۋەيت دىنارى),
 			},
 		},
 		'KYD' => {
 			display_name => {
 				'currency' => q(كايمان ئاراللىرى دوللىرى),
-				'one' => q(كايمان ئاراللىرى دوللىرى),
-				'other' => q(كايمان ئاراللىرى دوللىرى),
 			},
 		},
 		'KZT' => {
 			display_name => {
 				'currency' => q(قازاقىستان تەڭگىسى),
-				'one' => q(قازاقىستان تەڭگىسى),
-				'other' => q(قازاقىستان تەڭگىسى),
 			},
 		},
 		'LAK' => {
 			display_name => {
 				'currency' => q(لائوس كىپى),
-				'one' => q(لائوس كىپى),
-				'other' => q(لائوس كىپى),
 			},
 		},
 		'LBP' => {
 			display_name => {
 				'currency' => q(لىۋان فوند سىتېرلىڭى),
-				'one' => q(لىۋان فوند سىتېرلىڭى),
-				'other' => q(لىۋان فوند سىتېرلىڭى),
 			},
 		},
 		'LKR' => {
 			display_name => {
 				'currency' => q(سىرىلانكا رۇپىسى),
-				'one' => q(سىرىلانكا رۇپىسى),
-				'other' => q(سىرىلانكا رۇپىسى),
 			},
 		},
 		'LRD' => {
 			display_name => {
 				'currency' => q(لىبېرىيە دوللىرى),
-				'one' => q(لىبېرىيە دوللىرى),
-				'other' => q(لىبېرىيە دوللىرى),
 			},
 		},
 		'LSL' => {
 			display_name => {
 				'currency' => q(لېسوتو لوتىسى),
-				'one' => q(لېسوتو لوتىسى),
-				'other' => q(لېسوتو لوتىسى),
 			},
 		},
 		'LTL' => {
 			display_name => {
 				'currency' => q(لىتۋا لىتاسى),
-				'one' => q(لىتۋا لىتاسى),
-				'other' => q(لىتۋا لىتاسى),
 			},
 		},
 		'LTT' => {
 			display_name => {
 				'currency' => q(لىتۋا تالوناسى),
-				'one' => q(لىتۋا تالوناسى),
-				'other' => q(لىتۋا تالوناسى),
 			},
 		},
 		'LUC' => {
 			display_name => {
 				'currency' => q(ليۇكسېمبۇرگ ئالماشتۇرۇشچان پېسوسى),
-				'one' => q(ليۇكسېمبۇرگ ئالماشتۇرۇشچان پېسوسى),
-				'other' => q(ليۇكسېمبۇرگ ئالماشتۇرۇشچان پېسوسى),
 			},
 		},
 		'LUF' => {
 			display_name => {
 				'currency' => q(ليۇكسېمبۇرگ فرانكى),
-				'one' => q(ليۇكسېمبۇرگ فرانكى),
-				'other' => q(ليۇكسېمبۇرگ فرانكى),
 			},
 		},
 		'LUL' => {
 			display_name => {
 				'currency' => q(لىيۇكسېمبۇرگ پۇل-مۇئامىلە فرانكى),
-				'one' => q(لىيۇكسېمبۇرگ پۇل-مۇئامىلە فرانكى),
-				'other' => q(لىيۇكسېمبۇرگ پۇل-مۇئامىلە فرانكى),
 			},
 		},
 		'LVL' => {
 			display_name => {
 				'currency' => q(لاتۋىيە لاتى),
-				'one' => q(لاتۋىيە لاتى),
-				'other' => q(لاتۋىيە لاتى),
 			},
 		},
 		'LVR' => {
 			display_name => {
 				'currency' => q(لاتۋىيە رۇبلىسى),
-				'one' => q(لاتۋىيە رۇبلىسى),
-				'other' => q(لاتۋىيە رۇبلىسى),
 			},
 		},
 		'LYD' => {
 			display_name => {
 				'currency' => q(لىۋىيە دىنارى),
-				'one' => q(لىۋىيە دىنارى),
-				'other' => q(لىۋىيە دىنارى),
 			},
 		},
 		'MAD' => {
 			display_name => {
 				'currency' => q(ماراكەش دىرھەمى),
-				'one' => q(ماراكەش دىرھەمى),
-				'other' => q(ماراكەش دىرھەمى),
 			},
 		},
 		'MAF' => {
 			display_name => {
 				'currency' => q(ماراكەش فرانكى),
-				'one' => q(ماراكەش فرانكى),
-				'other' => q(ماراكەش فرانكى),
 			},
 		},
 		'MCF' => {
 			display_name => {
 				'currency' => q(موناكو فرانكى),
-				'one' => q(موناكو فرانكى),
-				'other' => q(موناكو فرانكى),
 			},
 		},
 		'MDC' => {
 			display_name => {
 				'currency' => q(مولدوۋا كۇپونى),
-				'one' => q(مولدوۋا كۇپونى),
-				'other' => q(مولدوۋا كۇپونى),
 			},
 		},
 		'MDL' => {
 			display_name => {
 				'currency' => q(مولدوۋا لېۋى),
-				'one' => q(مولدوۋا لېۋى),
-				'other' => q(مولدوۋا لېۋى),
 			},
 		},
 		'MGA' => {
 			display_name => {
 				'currency' => q(ماداغاسقار ئارىئارىسى),
-				'one' => q(ماداغاسقار ئارىئارىسى),
-				'other' => q(ماداغاسقار ئارىئارىسى),
 			},
 		},
 		'MGF' => {
 			display_name => {
 				'currency' => q(ماداغاسقار فرانكى),
-				'one' => q(ماداغاسقار فرانكى),
-				'other' => q(ماداغاسقار فرانكى),
 			},
 		},
 		'MKD' => {
 			display_name => {
 				'currency' => q(ماكېدونىيە دىنارى),
-				'one' => q(ماكېدونىيە دىنارى),
-				'other' => q(ماكېدونىيە دىنارى),
 			},
 		},
 		'MKN' => {
 			display_name => {
 				'currency' => q(ماكېدونىيە دىنارى \(1992–1993\)),
-				'one' => q(ماكېدونىيە دىنارى \(1992–1993\)),
-				'other' => q(ماكېدونىيە دىنارى \(1992–1993\)),
 			},
 		},
 		'MLF' => {
 			display_name => {
 				'currency' => q(مالى فرانكى),
-				'one' => q(مالى فرانكى),
-				'other' => q(مالى فرانكى),
 			},
 		},
 		'MMK' => {
 			display_name => {
 				'currency' => q(مىيانمار كىياتى),
-				'one' => q(مىيانمار كىياتى),
-				'other' => q(مىيانمار كىياتى),
 			},
 		},
 		'MNT' => {
 			display_name => {
 				'currency' => q(موڭغۇلىيە تۈگرىكى),
-				'one' => q(موڭغۇلىيە تۈگرىكى),
-				'other' => q(موڭغۇلىيە تۈگرىكى),
 			},
 		},
 		'MOP' => {
 			display_name => {
 				'currency' => q(ئاۋمېن پاتاكاسى),
-				'one' => q(ئاۋمېن پاتاكاسى),
-				'other' => q(ئاۋمېن پاتاكاسى),
 			},
 		},
 		'MRO' => {
 			display_name => {
 				'currency' => q(ماۋرىتانىيە ئۇگىيەسى \(1973–2017\)),
-				'one' => q(ماۋرىتانىيە ئۇگىيەسى \(1973–2017\)),
-				'other' => q(ماۋرىتانىيە ئۇگىيەسى \(1973–2017\)),
 			},
 		},
 		'MRU' => {
 			display_name => {
 				'currency' => q(ماۋرىتانىيە ئۇگىيەسى),
-				'one' => q(ماۋرىتانىيە ئۇگىيەسى),
-				'other' => q(ماۋرىتانىيە ئۇگىيەسى),
 			},
 		},
 		'MTL' => {
 			display_name => {
 				'currency' => q(مالتا لىراسى),
-				'one' => q(مالتا لىراسى),
-				'other' => q(مالتا لىراسى),
 			},
 		},
 		'MTP' => {
 			display_name => {
 				'currency' => q(مالتا فوندستېرلىڭى),
-				'one' => q(مالتا فوندستېرلىڭى),
-				'other' => q(مالتا فوندستېرلىڭى),
 			},
 		},
 		'MUR' => {
 			display_name => {
 				'currency' => q(ماۋرىتىئۇس رۇپىسى),
-				'one' => q(ماۋرىتىئۇس رۇپىسى),
-				'other' => q(ماۋرىتىئۇس رۇپىسى),
 			},
 		},
 		'MVP' => {
 			display_name => {
 				'currency' => q(مالدىۋى رۇپىسى),
-				'one' => q(مالدىۋى رۇپىسى),
-				'other' => q(مالدىۋى رۇپىسى),
 			},
 		},
 		'MVR' => {
 			display_name => {
 				'currency' => q(مالدىۋى رۇفىياسى),
-				'one' => q(مالدىۋى رۇفىياسى),
-				'other' => q(مالدىۋى رۇفىياسى),
 			},
 		},
 		'MWK' => {
 			display_name => {
 				'currency' => q(مالاۋى كۋاچاسى),
-				'one' => q(مالاۋى كۋاچاسى),
-				'other' => q(مالاۋى كۋاچاسى),
 			},
 		},
 		'MXN' => {
 			display_name => {
 				'currency' => q(مېكسىكا پېسوسى),
-				'one' => q(مېكسىكا پېسوسى),
-				'other' => q(مېكسىكا پېسوسى),
 			},
 		},
 		'MXP' => {
 			display_name => {
 				'currency' => q(مېكسىكا كۈمۈش پېسوسى \(1861–1992\)),
-				'one' => q(مېكسىكا كۈمۈش پېسوسى \(1861–1992\)),
-				'other' => q(مېكسىكا كۈمۈش پېسوسى \(1861–1992\)),
 			},
 		},
 		'MXV' => {
 			display_name => {
 				'currency' => q(مېكسىكا مەبلەغ بىرلىكى),
-				'one' => q(مېكسىكا مەبلەغ بىرلىكى),
-				'other' => q(مېكسىكا مەبلەغ بىرلىكى),
 			},
 		},
 		'MYR' => {
 			display_name => {
 				'currency' => q(مالايشىيا رىڭگىتى),
-				'one' => q(مالايشىيا رىڭگىتى),
-				'other' => q(مالايشىيا رىڭگىتى),
 			},
 		},
 		'MZE' => {
 			display_name => {
 				'currency' => q(موزامبىك ئېسكۇدوسى),
-				'one' => q(موزامبىك ئېسكۇدوسى),
-				'other' => q(موزامبىك ئېسكۇدوسى),
 			},
 		},
 		'MZM' => {
 			display_name => {
 				'currency' => q(موزامبىك مېتىكالى \(1980–2006\)),
-				'one' => q(موزامبىك مېتىكالى \(1980–2006\)),
-				'other' => q(موزامبىك مېتىكالى \(1980–2006\)),
 			},
 		},
 		'MZN' => {
 			display_name => {
 				'currency' => q(موزامبىك مېتىكالى),
-				'one' => q(موزامبىك مېتىكالى),
-				'other' => q(موزامبىك مېتىكالى),
 			},
 		},
 		'NAD' => {
 			display_name => {
 				'currency' => q(نامىبىيە دوللىرى),
-				'one' => q(نامىبىيە دوللىرى),
-				'other' => q(نامىبىيە دوللىرى),
 			},
 		},
 		'NGN' => {
 			display_name => {
 				'currency' => q(نىگېرىيە نايراسى),
-				'one' => q(نىگېرىيە نايراسى),
-				'other' => q(نىگېرىيە نايراسى),
 			},
 		},
 		'NIC' => {
 			display_name => {
 				'currency' => q(نىگېرىيە كوردوباسى \(1988–1991\)),
-				'one' => q(نىگېرىيە كوردوباسى \(1988–1991\)),
-				'other' => q(نىگېرىيە كوردوباسى \(1988–1991\)),
 			},
 		},
 		'NIO' => {
 			display_name => {
 				'currency' => q(نىگېرىيە كوردوباسى),
-				'one' => q(نىگېرىيە كوردوباسى),
-				'other' => q(نىگېرىيە كوردوباسى),
 			},
 		},
 		'NLG' => {
 			display_name => {
 				'currency' => q(گوللاندىيە گۈلدىنى),
-				'one' => q(گوللاندىيە گۈلدىنى),
-				'other' => q(گوللاندىيە گۈلدىنى),
 			},
 		},
 		'NOK' => {
 			display_name => {
 				'currency' => q(نورۋېگىيە كرونى),
-				'one' => q(نورۋېگىيە كرونى),
-				'other' => q(نورۋېگىيە كرونى),
 			},
 		},
 		'NPR' => {
 			display_name => {
 				'currency' => q(نېپال رۇپىسى),
-				'one' => q(نېپال رۇپىسى),
-				'other' => q(نېپال رۇپىسى),
 			},
 		},
 		'NZD' => {
 			display_name => {
 				'currency' => q(يېڭى زېلاندىيە دوللىرى),
-				'one' => q(يېڭى زېلاندىيە دوللىرى),
-				'other' => q(يېڭى زېلاندىيە دوللىرى),
 			},
 		},
 		'OMR' => {
 			display_name => {
 				'currency' => q(ئومان رىيالى),
-				'one' => q(ئومان رىيالى),
-				'other' => q(ئومان رىيالى),
 			},
 		},
 		'PAB' => {
 			display_name => {
 				'currency' => q(پاناما بالبوئاسى),
-				'one' => q(پاناما بالبوئاسى),
-				'other' => q(پاناما بالبوئاسى),
 			},
 		},
 		'PEI' => {
 			display_name => {
 				'currency' => q(پېرۇ ئىنتىسى),
-				'one' => q(پېرۇ ئىنتىسى),
-				'other' => q(پېرۇ ئىنتىسى),
 			},
 		},
 		'PEN' => {
 			display_name => {
 				'currency' => q(پېرۇ سولى),
-				'one' => q(پېرۇ سولى),
-				'other' => q(پېرۇ سولى),
 			},
 		},
 		'PES' => {
 			display_name => {
 				'currency' => q(پېرۇ سولى \(1863–1965\)),
-				'one' => q(پېرۇ سولى \(1863–1965\)),
-				'other' => q(پېرۇ سولى \(1863–1965\)),
 			},
 		},
 		'PGK' => {
 			display_name => {
 				'currency' => q(پاپۇئا يېڭى گىۋىنېيە كىناسى),
-				'one' => q(پاپۇئا يېڭى گىۋىنېيە كىناسى),
-				'other' => q(پاپۇئا يېڭى گىۋىنېيە كىناسى),
 			},
 		},
 		'PHP' => {
 			display_name => {
 				'currency' => q(فىلىپپىن پېسوسى),
-				'one' => q(فىلىپپىن پېسوسى),
-				'other' => q(فىلىپپىن پېسوسى),
 			},
 		},
 		'PKR' => {
 			display_name => {
 				'currency' => q(پاكىستان رۇپىسى),
-				'one' => q(پاكىستان رۇپىسى),
-				'other' => q(پاكىستان رۇپىسى),
 			},
 		},
 		'PLN' => {
 			display_name => {
 				'currency' => q(پولشا زىلوتى),
-				'one' => q(پولشا زىلوتى),
-				'other' => q(پولشا زىلوتى),
 			},
 		},
 		'PLZ' => {
 			display_name => {
 				'currency' => q(پولشا زىلوتى \(1950–1995\)),
-				'one' => q(پولشا زىلوتى \(1950–1995\)),
-				'other' => q(پولشا زىلوتى \(1950–1995\)),
 			},
 		},
 		'PTE' => {
 			display_name => {
 				'currency' => q(پورتۇگالىيە ئېسكۇدوسى),
-				'one' => q(پورتۇگالىيە ئېسكۇدوسى),
-				'other' => q(پورتۇگالىيە ئېسكۇدوسى),
 			},
 		},
 		'PYG' => {
 			display_name => {
 				'currency' => q(پاراگۋاي گۇئارانىسى),
-				'one' => q(پاراگۋاي گۇئارانىسى),
-				'other' => q(پاراگۋاي گۇئارانىسى),
 			},
 		},
 		'QAR' => {
 			display_name => {
 				'currency' => q(قاتار رىيالى),
-				'one' => q(قاتار رىيالى),
-				'other' => q(قاتار رىيالى),
 			},
 		},
 		'RHD' => {
 			display_name => {
 				'currency' => q(رودېزىيە دوللىرى),
-				'one' => q(رودېزىيە دوللىرى),
-				'other' => q(رودېزىيە دوللىرى),
 			},
 		},
 		'ROL' => {
 			display_name => {
 				'currency' => q(رۇمىنىيە لېيى \(1952–2006\)),
-				'one' => q(رۇمىنىيە لېيى \(1952–2006\)),
-				'other' => q(رۇمىنىيە لېيى \(1952–2006\)),
 			},
 		},
 		'RON' => {
 			display_name => {
 				'currency' => q(رۇمىنىيە لېيى),
-				'one' => q(رۇمىنىيە لېيى),
-				'other' => q(رۇمىنىيە لېيى),
 			},
 		},
 		'RSD' => {
 			display_name => {
 				'currency' => q(سېربىيە دىنارى),
-				'one' => q(سېربىيە دىنارى),
-				'other' => q(سېربىيە دىنارى),
 			},
 		},
 		'RUB' => {
 			display_name => {
 				'currency' => q(رۇسىيە رۇبلىسى),
-				'one' => q(رۇسىيە رۇبلىسى),
-				'other' => q(رۇسىيە رۇبلىسى),
 			},
 		},
 		'RUR' => {
 			display_name => {
 				'currency' => q(رۇسىيە رۇبلىسى \(1991–1998\)),
-				'one' => q(رۇسىيە رۇبلىسى \(1991–1998\)),
-				'other' => q(رۇسىيە رۇبلىسى \(1991–1998\)),
 			},
 		},
 		'RWF' => {
 			display_name => {
 				'currency' => q(رۋاندا فرانكى),
-				'one' => q(رۋاندا فرانكى),
-				'other' => q(رۋاندا فرانكى),
 			},
 		},
 		'SAR' => {
 			display_name => {
 				'currency' => q(سەئۇدى رىيالى),
-				'one' => q(سەئۇدى رىيالى),
-				'other' => q(سەئۇدى رىيالى),
 			},
 		},
 		'SBD' => {
 			display_name => {
 				'currency' => q(سولومون ئاراللىرى دوللىرى),
-				'one' => q(سولومون ئاراللىرى دوللىرى),
-				'other' => q(سولومون ئاراللىرى دوللىرى),
 			},
 		},
 		'SCR' => {
 			display_name => {
 				'currency' => q(سېيشېل رۇپىسى),
-				'one' => q(سېيشېل رۇپىسى),
-				'other' => q(سېيشېل رۇپىسى),
 			},
 		},
 		'SDD' => {
 			display_name => {
 				'currency' => q(سۇدان دىنارى \(1992–2007\)),
-				'one' => q(سۇدان دىنارى \(1992–2007\)),
-				'other' => q(سۇدان دىنارى \(1992–2007\)),
 			},
 		},
 		'SDG' => {
 			display_name => {
 				'currency' => q(سۇدان فوندستېرلىڭى),
-				'one' => q(سۇدان فوندستېرلىڭى),
-				'other' => q(سۇدان فوندستېرلىڭى),
 			},
 		},
 		'SDP' => {
 			display_name => {
 				'currency' => q(سۇدان فوندستېرلىڭى \(1957–1998\)),
-				'one' => q(سۇدان فوندستېرلىڭى \(1957–1998\)),
-				'other' => q(سۇدان فوندستېرلىڭى \(1957–1998\)),
 			},
 		},
 		'SEK' => {
 			display_name => {
 				'currency' => q(شىۋېتسىيە كروناسى),
-				'one' => q(شىۋېتسىيە كروناسى),
-				'other' => q(شىۋېتسىيە كروناسى),
 			},
 		},
 		'SGD' => {
 			display_name => {
 				'currency' => q(سىنگاپور دوللىرى),
-				'one' => q(سىنگاپور دوللىرى),
-				'other' => q(سىنگاپور دوللىرى),
 			},
 		},
 		'SHP' => {
 			display_name => {
 				'currency' => q(ساينىت-ھېلېنا فوندستېرلىڭى),
-				'one' => q(ساينىت-ھېلېنا فوندستېرلىڭى),
-				'other' => q(ساينىت-ھېلېنا فوندستېرلىڭى),
 			},
 		},
 		'SIT' => {
 			display_name => {
 				'currency' => q(سىلوۋېنىيە تولارى),
-				'one' => q(سىلوۋېنىيە تولارى),
-				'other' => q(سىلوۋېنىيە تولارى),
 			},
 		},
 		'SKK' => {
 			display_name => {
 				'currency' => q(سىلوۋاكىيە كورۇناسى),
-				'one' => q(سىلوۋاكىيە كورۇناسى),
-				'other' => q(سىلوۋاكىيە كورۇناسى),
+			},
+		},
+		'SLE' => {
+			display_name => {
+				'currency' => q(سېررالېئون لېئونېسى),
 			},
 		},
 		'SLL' => {
 			display_name => {
-				'currency' => q(سېررالېئون لېئونېسى),
-				'one' => q(سېررالېئون لېئونېسى),
-				'other' => q(سېررالېئون لېئونېسى),
+				'currency' => q(سېررالېئون لېئونېسى - 1964-2022),
 			},
 		},
 		'SOS' => {
 			display_name => {
 				'currency' => q(سومالى شىللىڭى),
-				'one' => q(سومالى شىللىڭى),
-				'other' => q(سومالى شىللىڭى),
 			},
 		},
 		'SRD' => {
 			display_name => {
 				'currency' => q(سۇرىنام دوللىرى),
-				'one' => q(سۇرىنام دوللىرى),
-				'other' => q(سۇرىنام دوللىرى),
 			},
 		},
 		'SRG' => {
 			display_name => {
 				'currency' => q(سۇرىنام گۈلدىنى),
-				'one' => q(سۇرىنام گۈلدىنى),
-				'other' => q(سۇرىنام گۈلدىنى),
 			},
 		},
 		'SSP' => {
 			display_name => {
 				'currency' => q(جەنۇبىي سۇدان فوندستېرلىڭى),
-				'one' => q(جەنۇبىي سۇدان فوندستېرلىڭى),
-				'other' => q(جەنۇبىي سۇدان فوندستېرلىڭى),
 			},
 		},
 		'STD' => {
 			display_name => {
 				'currency' => q(سان-تومې ۋە پىرىنسىپى دوبراسى \(1977–2017\)),
-				'one' => q(سان-تومې ۋە پىرىنسىپى دوبراسى \(1977–2017\)),
-				'other' => q(سان-تومې ۋە پىرىنسىپى دوبراسى \(1977–2017\)),
 			},
 		},
 		'STN' => {
 			display_name => {
 				'currency' => q(سان-تومې ۋە پىرىنسىپى دوبراسى),
-				'one' => q(سان-تومې ۋە پىرىنسىپى دوبراسى),
-				'other' => q(سان-تومې ۋە پىرىنسىپى دوبراسى),
 			},
 		},
 		'SUR' => {
 			display_name => {
 				'currency' => q(سوۋىت رۇبلىسى),
-				'one' => q(سوۋىت رۇبلىسى),
-				'other' => q(سوۋىت رۇبلىسى),
 			},
 		},
 		'SVC' => {
 			display_name => {
 				'currency' => q(سالۋادور كولونى),
-				'one' => q(سالۋادور كولونى),
-				'other' => q(سالۋادور كولونى),
 			},
 		},
 		'SYP' => {
 			display_name => {
 				'currency' => q(سۈرىيە فوندستېرلىڭى),
-				'one' => q(سۈرىيە فوندستېرلىڭى),
-				'other' => q(سۈرىيە فوندستېرلىڭى),
 			},
 		},
 		'SZL' => {
 			display_name => {
 				'currency' => q(سىۋېزىلاند لىلانگېنى),
-				'one' => q(سىۋېزىلاند لىلانگېنى),
-				'other' => q(سىۋېزىلاند لىلانگېنى),
 			},
 		},
 		'THB' => {
 			display_name => {
 				'currency' => q(تايلاند باختى),
-				'one' => q(تايلاند باختى),
-				'other' => q(تايلاند باختى),
 			},
 		},
 		'TJR' => {
 			display_name => {
 				'currency' => q(تاجىكىستان رۇبلىسى),
-				'one' => q(تاجىكىستان رۇبلىسى),
-				'other' => q(تاجىكىستان رۇبلىسى),
 			},
 		},
 		'TJS' => {
 			display_name => {
 				'currency' => q(تاجىكىستان سومونىسى),
-				'one' => q(تاجىكىستان سومونىسى),
-				'other' => q(تاجىكىستان سومونىسى),
 			},
 		},
 		'TMM' => {
 			display_name => {
 				'currency' => q(تۈركمەنىستان ماناتى \(1993–2009\)),
-				'one' => q(تۈركمەنىستان ماناتى \(1993–2009\)),
-				'other' => q(تۈركمەنىستان ماناتى \(1993–2009\)),
 			},
 		},
 		'TMT' => {
 			display_name => {
 				'currency' => q(تۈركمەنىستان ماناتى),
-				'one' => q(تۈركمەنىستان ماناتى),
-				'other' => q(تۈركمەنىستان ماناتى),
 			},
 		},
 		'TND' => {
 			display_name => {
 				'currency' => q(تۇنىس دىنارى),
-				'one' => q(تۇنىس دىنارى),
-				'other' => q(تۇنىس دىنارى),
 			},
 		},
 		'TOP' => {
 			display_name => {
 				'currency' => q(تونگا پائانگاسى),
-				'one' => q(تونگا پائانگاسى),
-				'other' => q(تونگا پائانگاسى),
 			},
 		},
 		'TPE' => {
 			display_name => {
 				'currency' => q(تىمور ئېسكۇدوسى),
-				'one' => q(تىمور ئېسكۇدوسى),
-				'other' => q(تىمور ئېسكۇدوسى),
 			},
 		},
 		'TRL' => {
 			display_name => {
 				'currency' => q(تۈركىيە لىراسى \(1922–2005\)),
-				'one' => q(تۈركىيە لىراسى \(1922–2005\)),
-				'other' => q(تۈركىيە لىراسى \(1922–2005\)),
 			},
 		},
 		'TRY' => {
 			display_name => {
 				'currency' => q(تۈركىيە لىراسى),
-				'one' => q(تۈركىيە لىراسى),
-				'other' => q(تۈركىيە لىراسى),
 			},
 		},
 		'TTD' => {
 			display_name => {
 				'currency' => q(تىرىنىداد ۋە توباگو دوللىرى),
-				'one' => q(تىرىنىداد ۋە توباگو دوللىرى),
-				'other' => q(تىرىنىداد ۋە توباگو دوللىرى),
 			},
 		},
 		'TWD' => {
 			display_name => {
 				'currency' => q(يېڭى تەيۋەن دوللىرى),
-				'one' => q(يېڭى تەيۋەن دوللىرى),
-				'other' => q(يېڭى تەيۋەن دوللىرى),
 			},
 		},
 		'TZS' => {
 			display_name => {
 				'currency' => q(تانزانىيە شىللىڭى),
-				'one' => q(تانزانىيە شىللىڭى),
-				'other' => q(تانزانىيە شىللىڭى),
 			},
 		},
 		'UAH' => {
 			display_name => {
 				'currency' => q(ئۇكرائىنا خرىۋناسى),
-				'one' => q(ئۇكرائىنا خرىۋناسى),
-				'other' => q(ئۇكرائىنا خرىۋناسى),
 			},
 		},
 		'UAK' => {
 			display_name => {
 				'currency' => q(ئۇكرائىنا كاربوۋانېتسى),
-				'one' => q(ئۇكرائىنا كاربوۋانېتسى),
-				'other' => q(ئۇكرائىنا كاربوۋانېتسى),
 			},
 		},
 		'UGS' => {
 			display_name => {
 				'currency' => q(ئۇگاندا شىللىڭى \(1966–1987\)),
-				'one' => q(ئۇگاندا شىللىڭى \(1966–1987\)),
-				'other' => q(ئۇگاندا شىللىڭى \(1966–1987\)),
 			},
 		},
 		'UGX' => {
 			display_name => {
 				'currency' => q(ئۇگاندا شىللىڭى),
-				'one' => q(ئۇگاندا شىللىڭى),
-				'other' => q(ئۇگاندا شىللىڭى),
 			},
 		},
 		'USD' => {
 			symbol => '$',
 			display_name => {
 				'currency' => q(ئامېرىكا دوللىرى),
-				'one' => q(ئامېرىكا دوللىرى),
-				'other' => q(ئامېرىكا دوللىرى),
 			},
 		},
 		'USN' => {
 			display_name => {
 				'currency' => q(ئامېرىكا دوللىرى \(كېيىنكى كۈن\)),
-				'one' => q(ئامېرىكا دوللىرى \(كېيىنكى كۈن\)),
-				'other' => q(ئامېرىكا دوللىرى \(كېيىنكى كۈن\)),
 			},
 		},
 		'USS' => {
 			display_name => {
 				'currency' => q(ئامېرىكا دوللىرى \(ئوخشاش كۈن\)),
-				'one' => q(ئامېرىكا دوللىرى \(ئوخشاش كۈن\)),
-				'other' => q(ئامېرىكا دوللىرى \(ئوخشاش كۈن\)),
 			},
 		},
 		'UYI' => {
 			display_name => {
 				'currency' => q(ئۇرۇگۋاي پېسوسى \(ئىندېكىسلاش بىرلىكى\)),
-				'one' => q(ئۇرۇگۋاي پېسوسى \(ئىندېكىسلاش بىرلىكى\)),
-				'other' => q(ئۇرۇگۋاي پېسوسى \(ئىندېكىسلاش بىرلىكى\)),
 			},
 		},
 		'UYP' => {
 			display_name => {
 				'currency' => q(ئۇرۇگۋاي پېسوسى \(1975–1993\)),
-				'one' => q(ئۇرۇگۋاي پېسوسى \(1975–1993\)),
-				'other' => q(ئۇرۇگۋاي پېسوسى \(1975–1993\)),
 			},
 		},
 		'UYU' => {
 			display_name => {
 				'currency' => q(ئۇرۇگۋاي پېسوسى),
-				'one' => q(ئۇرۇگۋاي پېسوسى),
-				'other' => q(ئۇرۇگۋاي پېسوسى),
 			},
 		},
 		'UZS' => {
 			display_name => {
 				'currency' => q(ئۆزبېكىستان سومى),
-				'one' => q(ئۆزبېكىستان سومى),
-				'other' => q(ئۆزبېكىستان سومى),
 			},
 		},
 		'VEB' => {
 			display_name => {
 				'currency' => q(ۋېنېزۇئېلا بولىۋارى \(1871–2008\)),
-				'one' => q(ۋېنېزۇئېلا بولىۋارى \(1871–2008\)),
-				'other' => q(ۋېنېزۇئېلا بولىۋارى \(1871–2008\)),
 			},
 		},
 		'VEF' => {
 			display_name => {
 				'currency' => q(ۋېنېزۇئېلا بولىۋارى \(2008–2018\)),
-				'one' => q(ۋېنېزۇئېلا بولىۋارى \(2008–2018\)),
-				'other' => q(ۋېنېزۇئېلا بولىۋارى \(2008–2018\)),
 			},
 		},
 		'VES' => {
 			display_name => {
 				'currency' => q(ۋېنېزۇئېلا بولىۋارى),
-				'one' => q(ۋېنېزۇئېلا بولىۋارى),
-				'other' => q(ۋېنېزۇئېلا بولىۋارى),
 			},
 		},
 		'VND' => {
 			display_name => {
 				'currency' => q(ۋىيېتنام دوڭى),
-				'one' => q(ۋىيېتنام دوڭى),
-				'other' => q(ۋىيېتنام دوڭى),
 			},
 		},
 		'VNN' => {
 			display_name => {
 				'currency' => q(ۋىيېتنام دوڭى \(1978–1985\)),
-				'one' => q(ۋىيېتنام دوڭى \(1978–1985\)),
-				'other' => q(ۋىيېتنام دوڭى \(1978–1985\)),
 			},
 		},
 		'VUV' => {
 			display_name => {
 				'currency' => q(ۋانۇئاتۇ ۋاتۇسى),
-				'one' => q(ۋانۇئاتۇ ۋاتۇسى),
-				'other' => q(ۋانۇئاتۇ ۋاتۇسى),
 			},
 		},
 		'WST' => {
 			display_name => {
 				'currency' => q(ساموئا تالاسى),
-				'one' => q(ساموئا تالاسى),
-				'other' => q(ساموئا تالاسى),
 			},
 		},
 		'XAF' => {
 			display_name => {
 				'currency' => q(ئافرىقا قىتئەسى پۇل-مۇئامىلە ئىتتىپاقى فرانكى),
-				'one' => q(ئافرىقا قىتئەسى پۇل-مۇئامىلە ئىتتىپاقى فرانكى),
-				'other' => q(ئافرىقا قىتئەسى پۇل-مۇئامىلە ئىتتىپاقى فرانكى),
 			},
 		},
 		'XAG' => {
@@ -4959,71 +3886,51 @@ has 'currencies' => (
 		'XBA' => {
 			display_name => {
 				'currency' => q(ياۋروپا مۇرەككەپ بىرلىكى),
-				'one' => q(ياۋروپا مۇرەككەپ بىرلىكى),
-				'other' => q(ياۋروپا مۇرەككەپ بىرلىكى),
 			},
 		},
 		'XBB' => {
 			display_name => {
 				'currency' => q(ياۋروپا پۇل بىرلىكى \(XBB\)),
-				'one' => q(ياۋروپا پۇل بىرلىكى \(XBB\)),
-				'other' => q(ياۋروپا پۇل بىرلىكى \(XBB\)),
 			},
 		},
 		'XBC' => {
 			display_name => {
 				'currency' => q(ياۋروپا ھېسابات بىرلىكى \(XBC\)),
-				'one' => q(ياۋروپا ھېسابات بىرلىكى \(XBC\)),
-				'other' => q(ياۋروپا ھېسابات بىرلىكى \(XBC\)),
 			},
 		},
 		'XBD' => {
 			display_name => {
 				'currency' => q(ياۋروپا ھېسابات بىرلىكى \(XBD\)),
-				'one' => q(ياۋروپا ھېسابات بىرلىكى \(XBD\)),
-				'other' => q(ياۋروپا ھېسابات بىرلىكى \(XBD\)),
 			},
 		},
 		'XCD' => {
 			display_name => {
 				'currency' => q(شەرقىي كارىب دوللىرى),
-				'one' => q(شەرقىي كارىب دوللىرى),
-				'other' => q(شەرقىي كارىب دوللىرى),
 			},
 		},
 		'XDR' => {
 			display_name => {
 				'currency' => q(ئالاھىدە پۇل ئېلىش ھوقۇقى),
-				'one' => q(ئالاھىدە پۇل ئېلىش ھوقۇقى),
-				'other' => q(ئالاھىدە پۇل ئېلىش ھوقۇقى),
 			},
 		},
 		'XEU' => {
 			display_name => {
 				'currency' => q(ياۋروپا پۇل بىرلىكى),
-				'one' => q(ياۋروپا پۇل بىرلىكى),
-				'other' => q(ياۋروپا پۇل بىرلىكى),
 			},
 		},
 		'XFO' => {
 			display_name => {
 				'currency' => q(فىرانسىيە ئالتۇن فرانكى),
-				'one' => q(فىرانسىيە ئالتۇن فرانكى),
-				'other' => q(فىرانسىيە ئالتۇن فرانكى),
 			},
 		},
 		'XFU' => {
 			display_name => {
 				'currency' => q(فىرانسىيە UIC فرانكى),
-				'one' => q(فىرانسىيە UIC فرانكى),
-				'other' => q(فىرانسىيە UIC فرانكى),
 			},
 		},
 		'XOF' => {
 			display_name => {
 				'currency' => q(ئافرىقا قىتئەسى پۇل-مۇئامىلە ئىتتىپاقى فرانكى \(BCEAO\)),
-				'one' => q(ئافرىقا قىتئەسى پۇل-مۇئامىلە ئىتتىپاقى فرانكى \(BCEAO\)),
-				'other' => q(ئافرىقا قىتئەسى پۇل-مۇئامىلە ئىتتىپاقى فرانكى \(BCEAO\)),
 			},
 		},
 		'XPD' => {
@@ -5036,8 +3943,6 @@ has 'currencies' => (
 		'XPF' => {
 			display_name => {
 				'currency' => q(تىنچ ئوكيان پۇل-مۇئامىلە ئورتاق گەۋدىسى فرانكى),
-				'one' => q(تىنچ ئوكيان پۇل-مۇئامىلە ئورتاق گەۋدىسى فرانكى),
-				'other' => q(تىنچ ئوكيان پۇل-مۇئامىلە ئورتاق گەۋدىسى فرانكى),
 			},
 		},
 		'XPT' => {
@@ -5057,22 +3962,16 @@ has 'currencies' => (
 		'XSU' => {
 			display_name => {
 				'currency' => q(سۇكرې),
-				'one' => q(سۇكرې),
-				'other' => q(سۇكرې),
 			},
 		},
 		'XTS' => {
 			display_name => {
 				'currency' => q(پۇل سىناش بىرلىكى),
-				'one' => q(پۇل سىناش بىرلىكى),
-				'other' => q(پۇل سىناش بىرلىكى),
 			},
 		},
 		'XUA' => {
 			display_name => {
 				'currency' => q(ئاسىيا تەرەققىيات بانكىسى ھېسابات بىرلىكى),
-				'one' => q(ئاسىيا تەرەققىيات بانكىسى ھېسابات بىرلىكى),
-				'other' => q(ئاسىيا تەرەققىيات بانكىسى ھېسابات بىرلىكى),
 			},
 		},
 		'XXX' => {
@@ -5085,106 +3984,76 @@ has 'currencies' => (
 		'YDD' => {
 			display_name => {
 				'currency' => q(يەمەن دىنارى),
-				'one' => q(يەمەن دىنارى),
-				'other' => q(يەمەن دىنارى),
 			},
 		},
 		'YER' => {
 			display_name => {
 				'currency' => q(يەمەن رىيالى),
-				'one' => q(يەمەن رىيالى),
-				'other' => q(يەمەن رىيالى),
 			},
 		},
 		'YUD' => {
 			display_name => {
 				'currency' => q(يۇگوسلاۋىيە قاتتىق دىنارى \(1966–1990\)),
-				'one' => q(يۇگوسلاۋىيە قاتتىق دىنارى \(1966–1990\)),
-				'other' => q(يۇگوسلاۋىيە قاتتىق دىنارى \(1966–1990\)),
 			},
 		},
 		'YUM' => {
 			display_name => {
 				'currency' => q(يۇگوسلاۋىيە يېڭى دىنارى \(1994–2002\)),
-				'one' => q(يۇگوسلاۋىيە يېڭى دىنارى \(1994–2002\)),
-				'other' => q(يۇگوسلاۋىيە يېڭى دىنارى \(1994–2002\)),
 			},
 		},
 		'YUN' => {
 			display_name => {
 				'currency' => q(يۇگوسلاۋىيە ئالماشتۇرۇشچان دىنارى \(1990–1992\)),
-				'one' => q(يۇگوسلاۋىيە ئالماشتۇرۇشچان دىنارى \(1990–1992\)),
-				'other' => q(يۇگوسلاۋىيە ئالماشتۇرۇشچان دىنارى \(1990–1992\)),
 			},
 		},
 		'YUR' => {
 			display_name => {
 				'currency' => q(يۇگوسلاۋىيە ئىسلاھات دىنارى \(1992–1993\)),
-				'one' => q(يۇگوسلاۋىيە ئىسلاھات دىنارى \(1992–1993\)),
-				'other' => q(يۇگوسلاۋىيە ئىسلاھات دىنارى \(1992–1993\)),
 			},
 		},
 		'ZAL' => {
 			display_name => {
 				'currency' => q(جەنۇبىي ئافرىقا راندى \(پۇل–مۇئامىلە\)),
-				'one' => q(جەنۇبىي ئافرىقا راندى \(پۇل–مۇئامىلە\)),
-				'other' => q(جەنۇبىي ئافرىقا راندى \(پۇل–مۇئامىلە\)),
 			},
 		},
 		'ZAR' => {
 			display_name => {
 				'currency' => q(جەنۇبىي ئافرىقا راندى),
-				'one' => q(جەنۇبىي ئافرىقا راندى),
-				'other' => q(جەنۇبىي ئافرىقا راندى),
 			},
 		},
 		'ZMK' => {
 			display_name => {
 				'currency' => q(زامبىيە كۋاچاسى \(1968–2012\)),
-				'one' => q(زامبىيە كۋاچاسى \(1968–2012\)),
-				'other' => q(زامبىيە كۋاچاسى \(1968–2012\)),
 			},
 		},
 		'ZMW' => {
 			display_name => {
 				'currency' => q(زامبىيە كۋاچاسى),
-				'one' => q(زامبىيە كۋاچاسى),
-				'other' => q(زامبىيە كۋاچاسى),
 			},
 		},
 		'ZRN' => {
 			display_name => {
 				'currency' => q(زايىر يېڭى زايىرى \(1993–1998\)),
-				'one' => q(زايىر يېڭى زايىرى \(1993–1998\)),
-				'other' => q(زايىر يېڭى زايىرى \(1993–1998\)),
 			},
 		},
 		'ZRZ' => {
 			display_name => {
 				'currency' => q(زايىر زايىرى \(1971–1993\)),
-				'one' => q(زايىر زايىرى \(1971–1993\)),
-				'other' => q(زايىر زايىرى \(1971–1993\)),
 			},
 		},
 		'ZWD' => {
 			display_name => {
 				'currency' => q(زىمبابۋې دوللىرى \(1980–2008\)),
-				'one' => q(زىمبابۋې دوللىرى \(1980–2008\)),
-				'other' => q(زىمبابۋې دوللىرى \(1980–2008\)),
 			},
 		},
 		'ZWL' => {
 			display_name => {
 				'currency' => q(زىمبابۋې دوللىرى \(2009\)),
-				'one' => q(زىمبابۋې دوللىرى \(2009\)),
-				'other' => q(زىمبابۋې دوللىرى \(2009\)),
 			},
 		},
 		'ZWR' => {
 			display_name => {
 				'currency' => q(زىمبابۋې دوللىرى \(2008\)),
-				'one' => q(زىمبابۋې دوللىرى \(2008\)),
-				'other' => q(زىمبابۋې دوللىرى \(2008\)),
 			},
 		},
 	} },
@@ -5240,84 +4109,6 @@ has 'calendar_months' => (
 			},
 			'gregorian' => {
 				'format' => {
-					abbreviated => {
-						nonleap => [
-							'يانۋار',
-							'فېۋرال',
-							'مارت',
-							'ئاپرېل',
-							'ماي',
-							'ئىيۇن',
-							'ئىيۇل',
-							'ئاۋغۇست',
-							'سېنتەبىر',
-							'ئۆكتەبىر',
-							'نويابىر',
-							'دېكابىر'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'يانۋار',
-							'فېۋرال',
-							'مارت',
-							'ئاپرېل',
-							'ماي',
-							'ئىيۇن',
-							'ئىيۇل',
-							'ئاۋغۇست',
-							'سېنتەبىر',
-							'ئۆكتەبىر',
-							'نويابىر',
-							'دېكابىر'
-						],
-						leap => [
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'يانۋار',
-							'فېۋرال',
-							'مارت',
-							'ئاپرېل',
-							'ماي',
-							'ئىيۇن',
-							'ئىيۇل',
-							'ئاۋغۇست',
-							'سېنتەبىر',
-							'ئۆكتەبىر',
-							'نويابىر',
-							'دېكابىر'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'يانۋار',
@@ -5400,15 +4191,6 @@ has 'calendar_days' => (
 						sat => 'شە',
 						sun => 'يە'
 					},
-					narrow => {
-						mon => 'د',
-						tue => 'س',
-						wed => 'چ',
-						thu => 'پ',
-						fri => 'ج',
-						sat => 'ش',
-						sun => 'ي'
-					},
 					short => {
 						mon => 'د',
 						tue => 'س',
@@ -5429,15 +4211,6 @@ has 'calendar_days' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						mon => 'دۈ',
-						tue => 'سە',
-						wed => 'چا',
-						thu => 'پە',
-						fri => 'جۈ',
-						sat => 'شە',
-						sun => 'يە'
-					},
 					narrow => {
 						mon => 'د',
 						tue => 'س',
@@ -5446,24 +4219,6 @@ has 'calendar_days' => (
 						fri => 'ج',
 						sat => 'ش',
 						sun => 'ي'
-					},
-					short => {
-						mon => 'د',
-						tue => 'س',
-						wed => 'چ',
-						thu => 'پ',
-						fri => 'ج',
-						sat => 'ش',
-						sun => 'ي'
-					},
-					wide => {
-						mon => 'دۈشەنبە',
-						tue => 'سەيشەنبە',
-						wed => 'چارشەنبە',
-						thu => 'پەيشەنبە',
-						fri => 'جۈمە',
-						sat => 'شەنبە',
-						sun => 'يەكشەنبە'
 					},
 				},
 			},
@@ -5481,28 +4236,6 @@ has 'calendar_quarters' => (
 						1 => '2-پەسىل',
 						2 => '3-پەسىل',
 						3 => '4-پەسىل'
-					},
-					narrow => {0 => '1',
-						1 => '2',
-						2 => '3',
-						3 => '4'
-					},
-					wide => {0 => 'بىرىنچى پەسىل',
-						1 => 'ئىككىنچى پەسىل',
-						2 => 'ئۈچىنچى پەسىل',
-						3 => 'تۆتىنچى پەسىل'
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {0 => '1-پەسىل',
-						1 => '2-پەسىل',
-						2 => '3-پەسىل',
-						3 => '4-پەسىل'
-					},
-					narrow => {0 => '1',
-						1 => '2',
-						2 => '3',
-						3 => '4'
 					},
 					wide => {0 => 'بىرىنچى پەسىل',
 						1 => 'ئىككىنچى پەسىل',
@@ -5534,20 +4267,6 @@ has 'day_periods' => (
 					'pm' => q{چۈشتىن كېيىن},
 				},
 			},
-			'stand-alone' => {
-				'abbreviated' => {
-					'am' => q{چ.ب},
-					'pm' => q{چ.ك},
-				},
-				'narrow' => {
-					'am' => q{چ.ب},
-					'pm' => q{چ.ك},
-				},
-				'wide' => {
-					'am' => q{چ.ب},
-					'pm' => q{چ.ك},
-				},
-			},
 		},
 	} },
 );
@@ -5558,12 +4277,6 @@ has 'eras' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'buddhist' => {
-			abbreviated => {
-				'0' => 'BE'
-			},
-			narrow => {
-				'0' => 'BE'
-			},
 			wide => {
 				'0' => 'بۇددا يىلنامەسى'
 			},
@@ -5574,21 +4287,10 @@ has 'eras' => (
 		},
 		'gregorian' => {
 			abbreviated => {
-				'0' => 'BCE',
-				'1' => 'مىلادىيە'
-			},
-			narrow => {
-				'0' => 'BCE',
 				'1' => 'مىلادىيە'
 			},
 			wide => {
-				'0' => 'مىلادىيەدىن بۇرۇن',
-				'1' => 'مىلادىيە'
-			},
-		},
-		'hebrew' => {
-			abbreviated => {
-				'0' => 'AM'
+				'0' => 'مىلادىيەدىن بۇرۇن'
 			},
 		},
 		'islamic' => {
@@ -5600,12 +4302,10 @@ has 'eras' => (
 		},
 		'roc' => {
 			abbreviated => {
-				'0' => 'Before R.O.C.',
 				'1' => 'مىنگو'
 			},
 			wide => {
-				'0' => 'جۇڭخۇا مىنگودىن بۇرۇن',
-				'1' => 'مىنگو'
+				'0' => 'جۇڭخۇا مىنگودىن بۇرۇن'
 			},
 		},
 	} },
@@ -5635,8 +4335,6 @@ has 'date_formats' => (
 			'long' => q{d-MMMM، y},
 			'medium' => q{d-MMM، y},
 			'short' => q{y-MM-dd},
-		},
-		'hebrew' => {
 		},
 		'islamic' => {
 			'full' => q{EEEE، d MMMM، y G},
@@ -5672,8 +4370,6 @@ has 'time_formats' => (
 			'medium' => q{HH:mm:ss},
 			'short' => q{HH:mm},
 		},
-		'hebrew' => {
-		},
 		'islamic' => {
 		},
 		'japanese' => {
@@ -5704,8 +4400,6 @@ has 'datetime_formats' => (
 			'medium' => q{{1}، {0}},
 			'short' => q{{1}، {0}},
 		},
-		'hebrew' => {
-		},
 		'islamic' => {
 		},
 		'japanese' => {
@@ -5726,13 +4420,9 @@ has 'datetime_formats_available_formats' => (
 			GyMMM => q{MMM y G},
 			GyMMMEd => q{E، MMM d، y G},
 			GyMMMd => q{MMM d، y G},
-			M => q{L},
 			MEd => q{E، M/d},
-			MMM => q{LLL},
 			MMMEd => q{E، MMM d},
-			MMMd => q{MMM d},
 			Md => q{M/d},
-			d => q{d},
 			y => q{y G},
 			yyyy => q{y G},
 			yyyyM => q{M/y GGGGG},
@@ -5745,55 +4435,28 @@ has 'datetime_formats_available_formats' => (
 			yyyyQQQQ => q{QQQQ y G},
 		},
 		'gregorian' => {
-			E => q{ccc},
-			EHm => q{E HH:mm},
-			EHms => q{E HH:mm:ss},
 			Ed => q{d E},
-			Ehm => q{E h:mm a},
-			Ehms => q{E h:mm:ss a},
 			Gy => q{y G},
 			GyMMM => q{y MMM G},
 			GyMMMEd => q{y d-MMM، E G},
 			GyMMMd => q{y d-MMM G},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			Hmsv => q{HH:mm:ss v},
-			Hmv => q{HH:mm v},
-			M => q{L},
 			MEd => q{d-M، E},
-			MMM => q{LLL},
 			MMMEd => q{d-MMM، E},
 			MMMMW => q{MMMM، W-ھەپتە},
 			MMMMd => q{d-MMMM},
 			MMMd => q{d-MMM},
 			Md => q{d-M},
-			d => q{d},
-			h => q{h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			hmsv => q{h:mm:ss a v},
-			hmv => q{h:mm a v},
-			ms => q{mm:ss},
-			y => q{y},
 			yM => q{M-y},
 			yMEd => q{y-d-M، E},
-			yMMM => q{y MMM},
 			yMMMEd => q{y d-MMM، E},
-			yMMMM => q{y MMMM},
 			yMMMd => q{y d-MMM},
 			yMd => q{y-d-M},
-			yQQQ => q{y QQQ},
-			yQQQQ => q{y QQQQ},
 			yw => q{Y، w-ھەپتە},
 		},
 		'islamic' => {
-			M => q{L},
 			Md => q{d/‏M},
-			d => q{d},
 			yyyyM => q{M‏/y G},
 			yyyyMEd => q{E، d/‏M/‏y G},
-			yyyyMMM => q{MMM y G},
 			yyyyMd => q{d‏/M‏/y G},
 		},
 	} },
@@ -5804,9 +4467,6 @@ has 'datetime_formats_append_item' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			'Timezone' => '{0} {1}',
-		},
 	} },
 );
 
@@ -5831,7 +4491,6 @@ has 'datetime_formats_interval' => (
 				d => q{E، MMM d – E، MMM d},
 			},
 			MMMd => {
-				M => q{MMM d – MMM d},
 				d => q{MMM d – d},
 			},
 			Md => {
@@ -5908,7 +4567,6 @@ has 'datetime_formats_interval' => (
 				d => q{E، MMM d – E، MMM d},
 			},
 			MMMd => {
-				M => q{MMM d – MMM d},
 				d => q{MMM d – d},
 			},
 			Md => {
@@ -5920,21 +4578,17 @@ has 'datetime_formats_interval' => (
 			},
 			fallback => '{0} – {1}',
 			h => {
-				a => q{h a – h a},
 				h => q{h – h a},
 			},
 			hm => {
-				a => q{h:mm a – h:mm a},
 				h => q{h:mm – h:mm a},
 				m => q{h:mm – h:mm a},
 			},
 			hmv => {
-				a => q{h:mm a – h:mm a v},
 				h => q{h:mm – h:mm a v},
 				m => q{h:mm – h:mm a v},
 			},
 			hv => {
-				a => q{h a – h a v},
 				h => q{h – h a v},
 			},
 			y => {
@@ -6009,12 +4663,9 @@ has 'time_zone_names' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default	=> sub { {
-		hourFormat => q(+HH:mm;-HH:mm),
-		gmtFormat => q(GMT{0}),
 		regionFormat => q({0} ۋاقتى),
 		regionFormat => q({0} يازلىق ۋاقتى),
 		regionFormat => q({0} ئۆلچەملىك ۋاقتى),
-		fallbackFormat => q({1} ({0})),
 		'Acre' => {
 			long => {
 				'daylight' => q#ئاكرى يازلىق ۋاقتى#,

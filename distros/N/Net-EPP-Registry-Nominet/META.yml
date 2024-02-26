@@ -25,7 +25,7 @@ requires:
   Net::EPP: '0.19'
   perl: '5.008000'
 resources:
-  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Net-EPP-Registry-Nominet
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Net-EPP-Registry-Nominet
   repository: git://gitlab.com/openstrike/nominet-epp.git
-version: '0.08'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

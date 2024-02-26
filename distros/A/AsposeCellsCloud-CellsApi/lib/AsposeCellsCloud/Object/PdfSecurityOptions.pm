@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -146,13 +146,6 @@ __PACKAGE__->method_documentation({
      	format => '',
      	read_only => '',
      		},
-     'extract_content_permission_obsolete' => {
-     	datatype => 'boolean',
-     	base_name => 'ExtractContentPermissionObsolete',
-     	description => '',
-     	format => '',
-     	read_only => '',
-     		},
      'fill_forms_permission' => {
      	datatype => 'boolean',
      	base_name => 'FillFormsPermission',
@@ -201,7 +194,6 @@ __PACKAGE__->swagger_types( {
     'annotations_permission' => 'boolean',
     'assemble_document_permission' => 'boolean',
     'extract_content_permission' => 'boolean',
-    'extract_content_permission_obsolete' => 'boolean',
     'fill_forms_permission' => 'boolean',
     'full_quality_print_permission' => 'boolean',
     'modify_document_permission' => 'boolean',
@@ -214,7 +206,6 @@ __PACKAGE__->attribute_map( {
     'annotations_permission' => 'AnnotationsPermission',
     'assemble_document_permission' => 'AssembleDocumentPermission',
     'extract_content_permission' => 'ExtractContentPermission',
-    'extract_content_permission_obsolete' => 'ExtractContentPermissionObsolete',
     'fill_forms_permission' => 'FillFormsPermission',
     'full_quality_print_permission' => 'FullQualityPrintPermission',
     'modify_document_permission' => 'ModifyDocumentPermission',

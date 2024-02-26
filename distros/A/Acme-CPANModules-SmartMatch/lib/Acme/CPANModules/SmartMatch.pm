@@ -5,9 +5,9 @@ use warnings;
 use Acme::CPANModulesUtil::Misc;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-09'; # DATE
+our $DATE = '2023-11-05'; # DATE
 our $DIST = 'Acme-CPANModules-SmartMatch'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 my $text = <<'_';
 **About smart match**
@@ -20,7 +20,7 @@ statement. Smart matching was indeed introduced along the new `switch` in perl
 
 What can smart match do? A whole lot. It can do string equality like `eq` if
 given a string on the left hand side and a string on the right hand side. Or it
-can do numeri equality like `==` when both sides are numbers. It can do regex
+can do numeric equality like `==` when both sides are numbers. It can do regex
 matching like `=~` if the left hand side is a scalar and the right hand side is
 a regexp.
 
@@ -49,7 +49,7 @@ can be a string, or a number, or a bool, or all.
 
 In perl 5.18 (2013), 6 years after being introduced and used by programmers
 without warning, smart match was declared as experimental, which is weird if you
-think about it. You now have to add `use experimental "smartmatch"' to silence
+think about it. You now have to add `use experimental "smartmatch"` to silence
 the warning. What happens to the `switch` statement then? Since it's tied to
 smart matching, it also gets the same fate: became experimental in 5.18.
 
@@ -104,7 +104,7 @@ Acme::CPANModules::SmartMatch - List of modules to do smart matching
 
 =head1 VERSION
 
-This document describes version 0.002 of Acme::CPANModules::SmartMatch (from Perl distribution Acme-CPANModules-SmartMatch), released on 2023-07-09.
+This document describes version 0.003 of Acme::CPANModules::SmartMatch (from Perl distribution Acme-CPANModules-SmartMatch), released on 2023-11-05.
 
 =head1 DESCRIPTION
 
@@ -118,7 +118,7 @@ statement. Smart matching was indeed introduced along the new C<switch> in perl
 
 What can smart match do? A whole lot. It can do string equality like C<eq> if
 given a string on the left hand side and a string on the right hand side. Or it
-can do numeri equality like C<==> when both sides are numbers. It can do regex
+can do numeric equality like C<==> when both sides are numbers. It can do regex
 matching like C<=~> if the left hand side is a scalar and the right hand side is
 a regexp.
 
@@ -146,8 +146,8 @@ B<The roadmap to removal>
 
 In perl 5.18 (2013), 6 years after being introduced and used by programmers
 without warning, smart match was declared as experimental, which is weird if you
-think about it. You now have to add C<use experimental "smartmatch"' to silence
-the warning. What happens to the>switch` statement then? Since it's tied to
+think about it. You now have to add C<use experimental "smartmatch"> to silence
+the warning. What happens to the C<switch> statement then? Since it's tied to
 smart matching, it also gets the same fate: became experimental in 5.18.
 
 In perl 5.38 (2023) smart match is deprecated. You can no longer silence the

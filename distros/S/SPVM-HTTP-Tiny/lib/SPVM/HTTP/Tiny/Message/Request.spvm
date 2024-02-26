@@ -1,0 +1,34 @@
+# Copyright (c) 2023 [--user-name]
+# MIT License
+
+class HTTP::Tiny::Message::Request extends HTTP::Tiny::Message {
+  allow HTTP::Tiny;
+  allow HTTP::Tiny::Handle;
+  
+  use HTTP::Tiny::Headers;
+  
+  # Fields
+  has method : ro string;
+  has url : ro HTTP::Tiny::URL;
+  
+  # Class Methods
+  private static method new : HTTP::Tiny::Message::Request ($options : object[]) {
+    
+    my $options_h = Hash->new($options);
+    
+    my $self = new HTTP::Tiny::Message::Request;
+    
+    $self->{method} = $options_h->delete_or_default_string("method", undef);
+    
+    $self->{url} = (HTTP::Tiny::URL)$options_h->delete_or_default("url", undef);
+    
+    $self->{headers} = (HTTP::Tiny::Headers)$options_h->delete_or_default("headers", undef);
+    
+    for my $name (@{$options_h->keys}) {
+      die "The \"$name\" option is not available.";
+    }
+    
+    return $self;
+  }
+  
+}

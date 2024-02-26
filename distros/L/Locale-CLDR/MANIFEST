@@ -6,10 +6,11 @@ lib/Locale/CLDR/Collator.pm
 lib/Locale/CLDR/CollatorBase.pm
 lib/Locale/CLDR/Currencies.pm
 lib/Locale/CLDR/EraBoundries.pm
+lib/Locale/CLDR/LanguageMatching.pm
 lib/Locale/CLDR/LikelySubtags.pm
 lib/Locale/CLDR/Locales/En.pm
-lib/Locale/CLDR/Locales/En/Any.pm
-lib/Locale/CLDR/Locales/En/Any/Us.pm
+lib/Locale/CLDR/Locales/En/Latn.pm
+lib/Locale/CLDR/Locales/En/Latn/Us.pm
 lib/Locale/CLDR/Locales/Root.pm
 lib/Locale/CLDR/MeasurementSystem.pm
 lib/Locale/CLDR/NumberFormatter.pm

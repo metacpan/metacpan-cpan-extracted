@@ -1,7 +1,7 @@
 Build.PL
 lib/Locale/CLDR/Locales/Jgo.pm
-lib/Locale/CLDR/Locales/Jgo/Any.pm
-lib/Locale/CLDR/Locales/Jgo/Any/Cm.pm
+lib/Locale/CLDR/Locales/Jgo/Latn.pm
+lib/Locale/CLDR/Locales/Jgo/Latn/Cm.pm
 MANIFEST			This list of files
 README
 t/00-load.t

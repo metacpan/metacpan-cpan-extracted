@@ -51,7 +51,9 @@
             "App::tabledata" : "0",
             "App::td" : "0",
             "Perinci::Sub::Gen::AccessTable" : "0",
-            "TableData" : "0"
+            "Sah::Schemas::TableData" : "0",
+            "TableData" : "0",
+            "Tie::Array::TableData" : "0"
          }
       },
       "x_mentions" : {
@@ -60,14 +62,16 @@
             "App::tabledata" : "0",
             "App::td" : "0",
             "Perinci::Sub::Gen::AccessTable" : "0",
-            "TableData" : "0"
+            "Sah::Schemas::TableData" : "0",
+            "TableData" : "0",
+            "Tie::Array::TableData" : "0"
          }
       }
    },
    "provides" : {
       "Acme::CPANModules::TableData" : {
          "file" : "lib/Acme/CPANModules/TableData.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -82,7 +86,7 @@
          "web" : "https://github.com/perlancar/perl-Acme-CPANModules-TableData"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038002"

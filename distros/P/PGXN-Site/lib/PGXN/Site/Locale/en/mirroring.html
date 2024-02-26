@@ -1,0 +1,63 @@
+<h1 id="mirroringpgxn">Mirroring PGXN</h1>
+
+<p>Hosting a PGXN mirror is simple. All you need is:</p>
+
+<ul>
+<li>A reasonably fast internet connection</li>
+<li>Space for storage</li>
+<li>An <a href="https://rsync.samba.org">rsync</a> client</li>
+<li>A web server</li>
+</ul>
+
+<p>The <code>rsync</code> address for the PGXN root mirror is <code>rsync://master.pgxn.org/pgxn</code>.</p>
+
+<p>Once you have the <code>rsync</code> client installed on your system and the disk space
+mapped out, add an entry to your crontab like so:</p>
+
+<pre><code class="cron">0 20 * * * /usr/bin/rsync -az --delete rsync://master.pgxn.org/pgxn /usr/local/pgxn
+</code></pre>
+
+<p>On Windows, use AT like so:</p>
+
+<pre><code>AT 20:00 /every:M,T,W,Th,F,S,Su &quot;C:\Program Files\Rsync\rsync -az --delete rsync://master.pgxn.org/pgxn C:\Projects\PGXN&quot;
+</code></pre>
+
+<p>Please do not sync more than once every hour. And realistically you only need to
+sync once or twice a day. Next, set up a web server to serve the mirror. If your
+rsync is already in the subdirectory of a web server root, you should be golden.
+Otherwise you need a static file web server; perhaps the simplest is this <a href="https://docs.python.org/3/library/http.server.html">Python
+one-liner</a> serving on port 8080:</p>
+
+<pre><code class="sh">python -m http.server 8080
+</code></pre>
+
+<p>If you’re using <a href="https://httpd.apache.org">Apache</a>, you can set up a virtual host like so (assuming that
+you’re <code>rsync</code>ing to <code>/usr/local/pgxn</code>):</p>
+
+<pre><code class="apache">&lt;VirtualHost *:80&gt;
+  DocumentRoot /usr/local/pgxn
+  ServerName pgxn.example.org
+  CustomLog /var/log/httpd/access_log combined
+  &lt;Directory /usr/local/pgxn&gt;
+    AllowOverride All
+    Allow from all
+    Options +Indexes
+  &lt;/Directory&gt;
+&lt;/VirtualHost&gt;
+</code></pre>
+
+<p>For <a href="https://nginx.org">Nginx</a>, you set set up a virtual host like this:</p>
+
+<pre><code class="nginx">server {
+    listen       80;
+    server_name  pgxn.example.org;
+    charset      utf-8;
+    location / {
+        root   /var/local/pgxn;
+        index  index.html;
+    }
+}
+</code></pre>
+
+<p>If you’d like to register your mirror, <a href="mailto:[_1]">send us email</a> with all the details and
+we’ll get you registered.</p>

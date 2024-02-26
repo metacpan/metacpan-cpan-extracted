@@ -1,6 +1,18 @@
 Revision history for Perl extension PGXN::API
 
-0.20.0
+0.20.1  2024-02-15T22:18:14Z
+      - Fixed a bug where a testing extension's version and abstract was not
+        properly indexed when there was no stable extension (and also unstable
+        would not be indexed if there was no testing).
+      - Fixed a bug where a user's JSON file was not updated for a testing
+        release when there were no previous stable releases, or for an unstable
+        release when there wer not previous testing releases.
+      - The indexer now recognizes plain text files ending in `.txt` or `.text`
+        as documentation files to be indexed. They're parsed by the default
+        Text::Markup::None parser, which wraps their contents in a `<pre>`
+        block (#13).
+
+0.20.0  2024-02-09T17:36:10Z
       - Removed the `Capfile` and `eg` directory. Examples for managing PGXN
         can now be found in the pgxn/pgxn-ops GitHub repository.
       - Switched from Text::Markdown to CommonMark for parsing and formatting
@@ -13,8 +25,8 @@ Revision history for Perl extension PGXN::API
         specified via the `docfile` key in its `provides` object, even if
         it's a README (#10).
       - The indexer will now index a testing release if there are no stable
-        releases, and will index an unstable release if there are neither stable
-        nor testing releases (#2).
+        releases, and will index an unstable release if there are neither
+        stable nor testing releases (#2).
       - Updated the SemVer regex when parsing rsync output to the official
         version published in https://regex101.com/r/vkijKf/ (#16).
       - Fix unzipping of distributions to ensure that all directories are

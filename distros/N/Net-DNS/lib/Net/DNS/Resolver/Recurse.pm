@@ -2,7 +2,7 @@ package Net::DNS::Resolver::Recurse;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: Recurse.pm 1959 2024-01-17 08:55:01Z willem $)[2];
+our $VERSION = (qw$Id: Recurse.pm 1965 2024-02-14 09:19:32Z willem $)[2];
 
 
 =head1 NAME
@@ -94,11 +94,9 @@ sub _send {
 	my $query = $self->_make_query_packet(@q);
 
 	unless ($root) {
-		$self->_diag("resolver priming query");
+		$self->_diag('resolver priming query');
 		$self->nameservers( scalar(@hints) ? @hints : $self->_hints );
-		my $packet = $self->SUPER::send(qw(. NS));
-		$self->_referral($packet);
-		$self->_callback($packet);
+		$self->_referral( $self->SUPER::send(qw(. NS)) );
 		$root = $self->{persistent}->{'.'};
 	}
 
@@ -119,8 +117,8 @@ sub _recurse {
 			$self->nameservers(@$iplist);
 		} else {
 			$self->_diag("recover missing glue for $ns");
-			local $SIG{__WARN__} = sub { };		# silence warnings
-			next unless scalar( my @ip = $self->nameservers($ns) );
+			next if substr( lc($ns), -length($apex) ) eq $apex;
+			my @ip = $self->nameservers($ns);
 			$$cache{$ns} = \@ip;
 		}
 		$query->header->id(undef);

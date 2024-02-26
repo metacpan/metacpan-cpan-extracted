@@ -89,7 +89,7 @@ Default: no special options
 
 Sets the root directory to configuration files and directories location
 
-Default: C<config_root> command line option or C<root> application argument
+Default: C<configroot> command line option or C<root> application argument
 or C</etc/$moniker> otherwise
 
 =head1 METHODS
@@ -136,7 +136,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use parent 'Acme::Crux::Plugin';
 
@@ -162,19 +162,19 @@ sub register {
     my $defaults = as_hash_ref($args->{defaults} || $args->{default}) || {};
 
     # Config root dir: PLGARGS || OPTS || ORIG || DEFS
-    my $root = $args->{root} || $app->getopt("config_root") || $app->root;
+    my $root = $args->{root} || $app->getopt("config_root") || $app->getopt("configroot") || $app->root;
 
     # Additional config directories: PLGARGS || DEFS
     my $dirs = as_array_ref($args->{dirs});
 
     # Create instance
     my $config = Acrux::Config->new(
-        file => $file,
-        options => $options,
-        noload => $noload,
-        defaults => $defaults,
-        root => $root,
-        dirs => $dirs,
+        file        => $file,
+        options     => $options,
+        noload      => $noload,
+        defaults    => $defaults,
+        root        => $root,
+        dirs        => $dirs,
     );
     if (my $err = $config->error) {
         if ($app->debugmode) {

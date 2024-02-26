@@ -22,7 +22,7 @@ my $pi = HiPi::RaspberryPi->new();
 ok( $pi->is_raspberry(), 'Pi says Raspberry Pi' );
 
 # board info
-ok( $pi->hardware =~ /^BCM(27|28)/, 'hardware check as expected' );
+ok( $pi->hardware =~ /\ABCM2835\Z|\ARP1\Z/, 'hardware check as expected' );
 ok( $pi->processor =~ /^BCM(2835|2836|2837|2711|2712)/, 'processor check as expected' );
 
 } # END OF SKIP MAIN

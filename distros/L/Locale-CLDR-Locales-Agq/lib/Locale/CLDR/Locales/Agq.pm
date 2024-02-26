@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Agq - Package for language Aghem
 
 package Locale::CLDR::Locales::Agq;
 # This file auto generated from Data\common\main\agq.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -331,7 +331,7 @@ has 'characters' => (
 		return {
 			auxiliary => qr{[q r x]},
 			index => ['A', 'B', 'C', 'D', 'E', 'Ɛ', 'F', 'G', 'H', 'I', 'Ɨ', 'K', 'L', 'M', 'N', 'Ŋ', 'O', 'Ɔ', 'P', 'S', 'T', 'U', 'Ʉ', 'V', 'W', 'Y', 'Z', 'ʔ'],
-			main => qr{[a à â ǎ ā b c d e è ê ě ē ɛ {ɛ̀} {ɛ̂} {ɛ̌} {ɛ̄} f g h i ì î ǐ ī ɨ {ɨ̀} {ɨ̂} {ɨ̌} {ɨ̄} k l m n ŋ o ò ô ǒ ō ɔ {ɔ̀} {ɔ̂} {ɔ̌} {ɔ̄} p s t u ù û ǔ ū ʉ {ʉ̀} {ʉ̂} {ʉ̌} {ʉ̄} v w y z ʔ]},
+			main => qr{[aàâǎā b c d eèêěē ɛ{ɛ̀}{ɛ̂}{ɛ̌}{ɛ̄} f g h iìîǐī ɨ{ɨ̀}{ɨ̂}{ɨ̌}{ɨ̄} k l m n ŋ oòôǒō ɔ{ɔ̀}{ɔ̂}{ɔ̌}{ɔ̄} p s t uùûǔū ʉ{ʉ̀}{ʉ̂}{ʉ̌}{ʉ̄} v w y z ʔ]},
 			numbers => qr{[  \- ‑ , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
@@ -349,25 +349,11 @@ has 'quote_start' => (
 	default		=> qq{„},
 );
 
-has 'quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{”},
-);
-
 has 'alternate_quote_start' => (
 	is			=> 'ro',
 	isa			=> Str,
 	init_arg	=> undef,
 	default		=> qq{‚},
-);
-
-has 'alternate_quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{’},
 );
 
 has 'yesstr' => (
@@ -394,28 +380,6 @@ has 'number_symbols' => (
 			'group' => q( ),
 		},
 	} }
-);
-
-has 'number_formats' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		decimalFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0.###',
-				},
-			},
-		},
-		percentFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0%',
-				},
-			},
-		},
-} },
 );
 
 has 'number_currency_formats' => (
@@ -650,9 +614,14 @@ has 'currencies' => (
 				'currency' => q(Bɔ̀ŋ è Sɛ̀n Èlenà),
 			},
 		},
-		'SLL' => {
+		'SLE' => {
 			display_name => {
 				'currency' => q(Lyɔ̂ŋ),
+			},
+		},
+		'SLL' => {
+			display_name => {
+				'currency' => q(Lyɔ̂ŋ \(1964—2022\)),
 			},
 		},
 		'SOS' => {
@@ -869,10 +838,6 @@ has 'day_periods' => (
 					'am' => q{a.g},
 					'pm' => q{a.k},
 				},
-				'wide' => {
-					'am' => q{a.g},
-					'pm' => q{a.k},
-				},
 			},
 		},
 	} },
@@ -953,17 +918,12 @@ has 'datetime_formats_available_formats' => (
 	default		=> sub { {
 		'generic' => {
 			Ed => q{d E},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
 			MEd => q{E d/M},
-			MMM => q{LLL},
 			MMMEd => q{E d MMM},
 			MMMd => q{d MMM},
 			Md => q{d/M},
-			d => q{d},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
 			ms => q{m:ss},
 			y => q{y},
 			yM => q{M/y},
@@ -977,19 +937,13 @@ has 'datetime_formats_available_formats' => (
 		},
 		'gregorian' => {
 			Ed => q{d E},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
 			MEd => q{E d/M},
-			MMM => q{LLL},
 			MMMEd => q{E d MMM},
 			MMMd => q{d MMM},
 			Md => q{d/M},
-			d => q{d},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
 			ms => q{m:ss},
-			y => q{y},
 			yM => q{M/y},
 			yMEd => q{E d/M/y},
 			yMMM => q{MMM y},

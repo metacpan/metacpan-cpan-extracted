@@ -19,7 +19,7 @@ name: App-LevenshteinUtils
 provides:
   App::LevenshteinUtils:
     file: lib/App/LevenshteinUtils.pm
-    version: '0.001'
+    version: '0.002'
 recommends:
   Text::Fuzzy: '0'
   Text::Levenshtein: '0'
@@ -38,7 +38,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-LevenshteinUtils
   homepage: https://metacpan.org/release/App-LevenshteinUtils
   repository: git://github.com/perlancar/perl-App-LevenshteinUtils.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.038002'

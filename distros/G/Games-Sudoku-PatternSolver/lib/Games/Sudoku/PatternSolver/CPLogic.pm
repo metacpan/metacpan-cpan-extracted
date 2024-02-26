@@ -76,11 +76,6 @@ sub apply_logic {
 
     $last_filled += hidden_singles($puzzle);
     $last_filled +=  naked_singles($puzzle);
-    # TO_DO: (???) Add even more advanced techniques (skyscraper, xy-wing, ...) 
-    # NOTE: All these advanced techniques seem to be a hassle to implement.
-    # Speedwise, not very much is gained. And only if more singles can be put in afterwards.
-    # At least they give clues to the puzzle's difficulty.
-    # NOTE2: still, solving 10000 from hard_sudokus.txt ($MAX_SOLUTIONS = 0; full traversal) became 20% faster by doing locked_candidates first
 
     unless ($last_filled) {
       #### last; # skip further efforts to reduce the candidates (advanced methods)
@@ -126,6 +121,7 @@ sub apply_logic {
 
   $puzzle->{logicFilled} = $filled_total;
   $puzzle->{candidatesDropped} = $dropped_total;
+  $puzzle->{candidateVectors} = \%Candidate_Vectors;
   $puzzle->{droppingCandidatesDidHelp} = $dropping_candidates_did_help;
   $puzzle->{logicSteps} = $steps_taken;
 
@@ -277,8 +273,6 @@ sub locked_sets {
   return $dropped;
 }
 
-# a rare example (#941 from hard_sudokus.txt) where locked_candidates() can help to eventually solve without backtracking:
-# 175000000030500009000600080000000900060097005408060070300000007084050600000000420
 sub locked_candidates {
   my ($puzzle) = @_;
 

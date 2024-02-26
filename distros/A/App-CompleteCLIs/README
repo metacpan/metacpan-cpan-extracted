@@ -3,8 +3,8 @@ NAME
     Complete::* modules
 
 VERSION
-    This document describes version 0.152 of App::CompleteCLIs (from Perl
-    distribution App-CompleteCLIs), released on 2023-01-19.
+    This document describes version 0.153 of App::CompleteCLIs (from Perl
+    distribution App-CompleteCLIs), released on 2023-12-01.
 
 SYNOPSIS
 DESCRIPTION
@@ -12,121 +12,66 @@ DESCRIPTION
     "Complete::*" modules. They are meant for convenient testing of the
     various "complete_*" functions on the command-line.
 
-    *   complete-acme-metasyntactic-meta-category
-
-    *   complete-acme-metasyntactic-meta-theme
-
-    *   complete-acme-metasyntactic-meta-theme-and-category
-
-    *   complete-array-elem
-
-    *   complete-chrome-profile-name
-
-    *   complete-country-code
-
-    *   complete-currency-code
-
-    *   complete-cwalitee-indicator
-
-    *   complete-dist
-
-    *   complete-dzil-bundle
-
-    *   complete-dzil-plugin
-
-    *   complete-dzil-role
-
-    *   complete-env
-
-    *   complete-env-elem
-
-    *   complete-file
-
-    *   complete-firefox-profile-name
-
-    *   complete-float
-
-    *   complete-from-schema
-
-    *   complete-gid
-
-    *   complete-group
-
-    *   complete-hash-key
-
-    *   complete-idx-listed-stock-code
-
-    *   complete-int
-
-    *   complete-kernel
-
-    *   complete-known-host
-
-    *   complete-known-mac
-
-    *   complete-language-code
-
-    *   complete-locale
-
-    *   complete-manpage
-
-    *   complete-manpage-section
-
-    *   complete-module
-
-    *   complete-path-env-elem
-
-    *   complete-perl-builtin-function
-
-    *   complete-perl-builtin-symbol
-
-    *   complete-perl-version
-
-    *   complete-perlmv-scriptlet
-
-    *   complete-pid
-
-    *   complete-pod
-
-    *   complete-ppr-subpattern
-
-    *   complete-proc-name
-
-    *   complete-program
-
-    *   complete-random-string
-
-    *   complete-rclone-remote
-
-    *   complete-regexp-pattern-module
-
-    *   complete-regexp-pattern-pattern
-
-    *   complete-riap-url
-
-    *   complete-riap-url-clientless
-
-    *   complete-service-name
-
-    *   complete-service-port
-
-    *   complete-tz-name
-
-    *   complete-tz-offset
-
-    *   complete-uid
-
-    *   complete-user
-
-    *   complete-vivaldi-profile-name
-
-    *   complete-weaver-bundle
-
-    *   complete-weaver-plugin
-
-    *   complete-weaver-role
-
-    *   complete-weaver-section
+    1. complete-acme-metasyntactic-meta-category
+    2. complete-acme-metasyntactic-meta-theme
+    3. complete-acme-metasyntactic-meta-theme-and-category
+    4. complete-array-elem
+    5. complete-chrome-profile-name
+    6. complete-color-name
+    7. complete-color-rgb24-hexcode
+    8. complete-country-code
+    9. complete-currency-code
+    10. complete-cwalitee-indicator
+    11. complete-dist
+    12. complete-dzil-bundle
+    13. complete-dzil-plugin
+    14. complete-dzil-role
+    15. complete-env
+    16. complete-env-elem
+    17. complete-file
+    18. complete-firefox-profile-name
+    19. complete-float
+    20. complete-from-schema
+    21. complete-gid
+    22. complete-group
+    23. complete-hash-key
+    24. complete-idx-listed-stock-code
+    25. complete-int
+    26. complete-kernel
+    27. complete-known-host
+    28. complete-known-mac
+    29. complete-language-code
+    30. complete-locale
+    31. complete-manpage
+    32. complete-manpage-section
+    33. complete-module
+    34. complete-path-env-elem
+    35. complete-perl-builtin-function
+    36. complete-perl-builtin-symbol
+    37. complete-perl-version
+    38. complete-perlmv-scriptlet
+    39. complete-pid
+    40. complete-pod
+    41. complete-ppr-subpattern
+    42. complete-proc-name
+    43. complete-program
+    44. complete-random-string
+    45. complete-rclone-remote
+    46. complete-regexp-pattern-module
+    47. complete-regexp-pattern-pattern
+    48. complete-riap-url
+    49. complete-riap-url-clientless
+    50. complete-service-name
+    51. complete-service-port
+    52. complete-tz-name
+    53. complete-tz-offset
+    54. complete-uid
+    55. complete-user
+    56. complete-vivaldi-profile-name
+    57. complete-weaver-bundle
+    58. complete-weaver-plugin
+    59. complete-weaver-role
+    60. complete-weaver-section
 
 HOMEPAGE
     Please visit the project's homepage at

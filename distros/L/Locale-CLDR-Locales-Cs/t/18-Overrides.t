@@ -97,16 +97,16 @@ $day_period_data = $locale->get_day_period('1800');
 is($day_period_data, 'več.', 'Islamic Day period data PM');
 
 my $date_format = $locale->date_format_full;
-is($date_format, "EEEE d. MMMM y G", 'Islamic Date Format Full');
+is($date_format, "EEEE d. MMMM y", 'Islamic Date Format Full');
 $date_format = $locale->date_format_long;
-is($date_format, "d. MMMM y G", 'Islamic Date Format Long');
+is($date_format, "d. MMMM y", 'Islamic Date Format Long');
 $date_format = $locale->date_format_medium;
-is($date_format, 'd. M. y G', 'Islamic Date Format Medium');
+is($date_format, 'd. M. y', 'Islamic Date Format Medium');
 $date_format = $locale->date_format_short;
-is($date_format, 'dd.MM.yy GGGGG', 'Islamic Date Format Short');
+is($date_format, 'dd.MM.yy', 'Islamic Date Format Short');
 
 my $time_format = $locale->time_format_full;
-is($time_format, 'H:mm:ss zzzz', 'Islamic Time Format Full');
+is($time_format, 'H:mm:ss, zzzz', 'Islamic Time Format Full');
 $time_format = $locale->time_format_long;
 is($time_format, 'H:mm:ss z', 'Islamic Time Format Long');
 $time_format = $locale->time_format_medium;
@@ -115,13 +115,13 @@ $time_format = $locale->time_format_short;
 is($time_format, 'H:mm', 'Islamic Time Format Short');
 
 my $date_time_format = $locale->datetime_format_full;
-is($date_time_format, "EEEE d. MMMM y G H:mm:ss zzzz", 'Islamic Date Time Format Full');
+is($date_time_format, "EEEE d. MMMM y H:mm:ss, zzzz", 'Islamic Date Time Format Full');
 $date_time_format = $locale->datetime_format_long;
-is($date_time_format, "d. MMMM y G H:mm:ss z", 'Islamic Date Time Format Long');
+is($date_time_format, "d. MMMM y H:mm:ss z", 'Islamic Date Time Format Long');
 $date_time_format = $locale->datetime_format_medium;
-is($date_time_format, 'd. M. y G H:mm:ss', 'Islamic Date Time Format Medium');
+is($date_time_format, 'd. M. y H:mm:ss', 'Islamic Date Time Format Medium');
 $date_time_format = $locale->datetime_format_short;
-is($date_time_format, 'dd.MM.yy GGGGG H:mm', 'Islamic Date Time Format Short');
+is($date_time_format, 'dd.MM.yy H:mm', 'Islamic Date Time Format Short');
 
 is ($locale->prefers_24_hour_time(), 1, 'Islamic Prefers 24 hour time');
 is ($locale->first_day_of_week(), 1, 'Islamic First day of week');

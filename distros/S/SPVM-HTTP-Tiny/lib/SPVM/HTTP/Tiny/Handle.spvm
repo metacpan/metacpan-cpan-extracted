@@ -1,0 +1,337 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class HTTP::Tiny::Handle {
+  allow HTTP::Tiny;
+  
+  use HTTP::Tiny::Message::Request;
+  use HTTP::Tiny::Message::Response;
+  
+  use Fn;
+  use StringBuffer;
+  use Format;
+  use Regex;
+  use Regex::ReplaceInfo;
+  use IO::Socket::INET;
+  
+  # Enumerations
+  private enum {
+    READ_BUFFER_SIZE = 4086,
+  }
+  
+  # Fields
+  has timeout : double;
+  
+  has socket : IO::Socket;
+  
+  has response_buffer : StringBuffer;
+  
+  private static method new : HTTP::Tiny::Handle ($options : object[]) {
+    
+    my $options_h = Hash->new($options);
+    
+    my $self = new HTTP::Tiny::Handle;
+    
+    # The response_buffer field
+    my $response_buffer = StringBuffer->new;
+    $self->{response_buffer} = $response_buffer;
+    
+    # The timeout field
+    my $timeout = $options_h->delete_or_default_double("timeout", 60.0);
+    $self->{timeout} = $timeout;
+    
+    return $self;
+  }
+  
+  private method connect : HTTP::Tiny::Handle ($request : HTTP::Tiny::Message::Request) {
+    
+    my $url = $request->url;
+    my $scheme = $url->{scheme};
+    my $host = $url->{host};
+    my $port = $url->{port};
+    
+    my $timeout = $self->{timeout};
+    
+    my $socket = (IO::Socket)undef;
+    
+    if ($scheme eq "http") {
+      $socket = IO::Socket::INET->new({
+        PeerAddr  => $host,
+        PeerPort  => $port,
+        Timeout   => $timeout,
+      });
+    }
+    elsif ($scheme eq "https") {
+      if (require IO::Socket::SSL) {
+        $socket = IO::Socket::SSL->new({
+          PeerAddr  => $host,
+          PeerPort  => $port,
+          Timeout   => $timeout,
+        });
+      }
+      else {
+        die "IO::Socket::SSL is required for HTTPS access.";
+      }
+    }
+    else {
+      die "The scheme $scheme is not supported.";
+    }
+    
+    $self->{socket} = $socket;
+    
+    return $self;
+  }
+  
+  private method write_request : void ($request : HTTP::Tiny::Message::Request) {
+    
+    $self->write_request_line($request);
+    
+    $self->write_request_headers($request);
+    
+    $self->write("\r\n");
+  }
+  
+  private method write_request_line : void ($request : HTTP::Tiny::Message::Request) {
+    
+    my $method = $request->{method};
+    
+    my $url = $request->{url};
+    
+    my $path = $url->{path};
+    
+    my $request_line = "$method $path HTTP/1.1\r\n";
+    
+    $self->write($request_line);
+  }
+  
+  private method write_request_headers : void ($request : HTTP::Tiny::Message::Request) {
+    
+    my $method = $request->{method};
+    my $url = $request->{url};
+    my $url_string = $url->to_string;
+    my $headers = $request->{headers};
+    
+    # HTTP Headers
+    {
+      # host
+      unless ($headers->header("host")) {
+        my $host = $url->{host};
+        my $port = $url->{port};
+        if ($port < 0) {
+          $port = 80;
+        }
+        my $host_port = "$host:$port";
+        $headers->add("host" => $host_port);
+      }
+      
+      # connection
+      unless ($headers->header("connection")) {
+        $headers->add("connection" => "close");
+      }
+    }
+    
+    my $header_lines = $headers->to_string;
+    
+    $self->write($header_lines);
+  }
+  
+  private method write : void ($buffer : string) {
+    
+    my $socket = $self->{socket};
+    
+    $socket->write($buffer);
+  }
+  
+  private method read_response : HTTP::Tiny::Message::Response () {
+    
+    my $response = HTTP::Tiny::Message::Response->new;
+    
+    $self->read_status_line($response);
+    
+    $self->read_response_headers($response);
+    
+    $self->read_response_body($response);
+    
+    return $response;
+  }
+  
+  private method read_status_line : void ($response : HTTP::Tiny::Message::Response) {
+    
+    my $status_line = $self->readline;
+    
+    my $status_line_re = Regex->new("\A(HTTP\/(0*\d+\.0*\d+))[\x09\x20]+([0-9]{3})(?:[\x09\x20]+([^\r\n]*))?\r?\n");
+    
+    my $protocol = (string)undef;
+    my $version = (string)undef;
+    my $status = (string)undef;
+    my $reason = (string)undef;
+    if (my $match = $status_line_re->match($status_line)) {
+      $protocol = $match->cap1;
+      $version = $match->cap2;
+      $status = $match->cap3;
+      $reason = $match->cap4;
+      unless ($reason) {
+        $reason = "";
+      }
+    }
+    else {
+      die "Malformed Status-Line: " . $self->to_printable($status_line);
+    }
+    
+    unless (Regex->new("0*1\.0*[01]")->match($version)) {
+      die "Unsupported HTTP protocol: $protocol";
+    }
+    
+    $response->{protocol} = $protocol;
+    $response->{status} = Fn->to_int($status);
+    $response->{reason} = $reason;
+    
+    if ($status && $status->[0] == '2') {
+      $response->{success} = 1;
+    }
+  }
+  
+  private method read_response_headers : HTTP::Tiny::Headers ($response : HTTP::Tiny::Message::Response) {
+    my $headers = $response->headers;
+    
+    my $empty_line_re = Regex->new("\A\r?\n\z");
+    my $header_line_re = Regex->new("\A([^\x00-\x1F\x7F:]+):[\x09\x20]*([^\r\n]*)");
+    while (1) {
+      my $line = $self->readline;
+      
+      if (my $match = $header_line_re->match($line)){
+        my $name = Fn->lc($match->cap1);
+        my $value = $match->cap2;
+        $headers->add($name, $value);
+      }
+      elsif ($empty_line_re->match($line)) {
+        last;
+      }
+      else {
+        die "Malformed header line: " . $self->to_printable($line);
+      }
+    }
+    
+    $response->{headers} = $headers;
+  }
+  
+  private method readline : string () {
+    
+    my $handle = $self->{socket};
+    
+    my $read_buffer = (mutable string)new_string_len &READ_BUFFER_SIZE;
+    
+    my $line_re = Regex->new("\A([^\r\n]*\r?\n)");
+    my $line = (string)undef;
+    while (1) {
+      my $response_content = $self->{response_buffer}->to_string;
+      
+      my $replace_info_ref = new Regex::ReplaceInfo[1];
+      $response_content = $line_re->replace($response_content, "", 0, -1, {info => $replace_info_ref});
+      $self->{response_buffer} = StringBuffer->new($response_content);
+      
+      my $match = $replace_info_ref->[0]->match;
+      
+      if ($match) {
+        $line = $match->cap1;
+        last;
+      }
+      
+      my $read_length = $handle->read($read_buffer, &READ_BUFFER_SIZE);
+      
+      if ($read_length == 0) {
+        last;
+      }
+      elsif ($read_length > 0) {
+        $self->{response_buffer}->push($read_buffer, 0, $read_length);
+      }
+    }
+    
+    unless ($line) {
+      die "Unexpected end of stream while looking for line";
+    }
+    
+    return $line;
+  }
+  
+  private method read_response_body : int ($response : HTTP::Tiny::Message::Response) {
+    
+    my $content_length_string = $response->headers->header("Content-Length");
+    my $content_length = Fn->to_long($content_length_string);
+    
+    if ($content_length >= 0) {
+      my $length = $content_length;
+      while ($length > 0) {
+        my $read_length = -1L;
+        if ($length > &READ_BUFFER_SIZE) {
+          $read_length = &READ_BUFFER_SIZE;
+        }
+        else {
+          $read_length = $length;
+        }
+        
+        my $buffer = $self->read((int)$read_length);
+        
+        $response->{content_buffer}->push($buffer);
+        
+        $length -= length $buffer;
+      }
+    }
+    else {
+      die "[Unexpected Error]";
+    }
+    
+    return $self->{response_buffer}->length == 0;
+  }
+  
+  private method read : string ($length : int, $allow_partial : int = 0) {
+    
+    my $leftover_length = $self->{response_buffer}->length;
+    my $leftover = "";
+    
+    if ($leftover_length) {
+      my $take = 0;
+      if ($leftover_length < $length) {
+        $take = $leftover_length;
+      }
+      else {
+        $take = $length;
+      }
+      $leftover = Fn->substr($self->{response_buffer}->to_string, 0, $take);
+      
+      $self->{response_buffer}->replace(0, $take, "");
+      $length -= $take;
+    }
+    
+    my $buffer = (mutable string)new_string_len(&READ_BUFFER_SIZE);
+    
+    while ($length > 0) {
+      my $socket = $self->{socket};
+      
+      $socket->read($buffer, length $buffer - $leftover_length, $leftover_length);
+    }
+    
+    if ($length && !$allow_partial) {
+      die "Unexpected end of stream";
+    }
+    
+    my $ret = $leftover . $buffer;
+    
+    return $ret;
+  }
+  
+  private method to_printable : string ($string : string) {
+    my $printable_string = Regex->new("([^\x20-\x7E])")->replace($string, method : string ($re : Regex, $match : Regex::Match) {
+      
+      my $replaced = Format->sprintf("\\x%.2X", [(object)Fn->ord($match->cap1)]);
+      
+      return $replaced;
+    });
+    
+    return $printable_string;
+  }
+  
+  method _find_CA_file : int () {
+    return 0;
+  }
+}

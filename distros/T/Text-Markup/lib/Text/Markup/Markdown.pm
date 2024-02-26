@@ -7,7 +7,7 @@ use Text::Markup;
 use File::BOM qw(open_bom);
 use Text::Markdown ();
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 sub import {
     # Replace the regex if passed one.

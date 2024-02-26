@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -60,9 +60,9 @@ sub new {
 
 # Run Operation Request
 # PutDocumentPropertyRequest.name : The workbook name.  ,
-# PutDocumentPropertyRequest.property : Gets or sets the value of the property.  ,
-# PutDocumentPropertyRequest.folder : Original workbook folder.  ,
-# PutDocumentPropertyRequest.storageName : Storage name.   
+# PutDocumentPropertyRequest.property : Get or set the value of the property.  ,
+# PutDocumentPropertyRequest.folder : The folder where the file is situated.  ,
+# PutDocumentPropertyRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -73,7 +73,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_document_property' } = { 
-    	summary => 'Sets/creates a sdocument property.',
+    	summary => 'Set or add an Excel property.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -137,21 +137,21 @@ __PACKAGE__->method_documentation({
      'property' => {
      	datatype => 'CellsDocumentProperty',
      	base_name => 'property',
-     	description => 'Gets or sets the value of the property.',
+     	description => 'Get or set the value of the property.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

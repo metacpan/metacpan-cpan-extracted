@@ -35,6 +35,6 @@ $t->reset_iterator;
 is_deeply($t->get_item_at_pos(0), [1968, [ [1968,86,'Greetings'] ]]);
 is_deeply($t->get_item_at_pos(1), [1969, [ ]]);
 is_deeply($t->get_item_at_pos(2), [1970, [ [1970,17,'Bloody Mama'], [1970,73,'Hi,Mom!'] ]]);
-is($t->get_row_count, 49);
+is($t->get_row_count, 56);
 
 done_testing;

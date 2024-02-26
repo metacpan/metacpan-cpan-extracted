@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,7 +59,7 @@ sub new {
 
 
 # Run Operation Request
-# PutWorksheetCellsRangeRequest.name : The workbook name.  ,
+# PutWorksheetCellsRangeRequest.name : The file name.  ,
 # PutWorksheetCellsRangeRequest.sheetName : The worksheet name.  ,
 # PutWorksheetCellsRangeRequest.range : The range object.  ,
 # PutWorksheetCellsRangeRequest.shift : Represent the shift options when deleting a range of cells(Down/Left/None/Right/Up).  ,
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_worksheet_cells_range' } = { 
-    	summary => 'Inserts a range of cells and shift cells according to the shift option.',
+    	summary => 'Insert a range of cells and shift existing cells based on the specified shift option.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -140,7 +140,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},

@@ -19,7 +19,7 @@ name: Graphics-ColorNames-FoodColor
 provides:
   Graphics::ColorNames::FoodColor:
     file: lib/Graphics/ColorNames/FoodColor.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   integer: '0'
   strict: '0'
@@ -28,7 +28,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Graphics-ColorNames-FoodColor
   homepage: https://metacpan.org/release/Graphics-ColorNames-FoodColor
   repository: git://github.com/perlancar/perl-Graphics-ColorNames-FoodColor.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.038002'

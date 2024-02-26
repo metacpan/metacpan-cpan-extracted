@@ -1,0 +1,37 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class HTTP::Tiny::Message::Response extends HTTP::Tiny::Message {
+  allow HTTP::Tiny::Handle;
+  allow HTTP::Tiny;
+  
+  use HTTP::Tiny::Headers;
+  
+  # Fields
+  has protocol : ro string;
+  
+  has status : ro int;
+  
+  has success : ro byte;
+  
+  has reason : ro string;
+  
+  has content_buffer : StringBuffer;
+  
+  # Class Methods
+  private static method new : HTTP::Tiny::Message::Response () {
+    
+    my $self = new HTTP::Tiny::Message::Response;
+    
+    $self->{content_buffer} = StringBuffer->new;
+    
+    $self->{headers} = HTTP::Tiny::Headers->new;
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  method content : string () {
+    return $self->{content_buffer}->to_string;
+  }
+}

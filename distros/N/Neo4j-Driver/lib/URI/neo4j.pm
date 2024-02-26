@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 package URI::neo4j;
-$URI::neo4j::VERSION = '0.44';
+$URI::neo4j::VERSION = '0.45';
 
 use parent 'URI::_server';
 

@@ -7,7 +7,7 @@ use warnings;
 
 =head1 NAME
 
-JavaScript::QuickJS::Function
+JavaScript::QuickJS::Function - JavaScript `Function` in Perl
 
 =head1 SYNOPSIS
 

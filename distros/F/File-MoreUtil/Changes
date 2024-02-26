@@ -1,3 +1,15 @@
+0.628   2023-11-02  Released-By: PERLANCAR; Urgency: high
+
+        - [bugfix] Fix testing the correct path in get_*{files,subdirs}.
+
+        - Add functions: get_dir_only_{file,subdir}.
+
+
+0.627   2023-11-02  Released-By: PERLANCAR; Urgency: medium
+
+        - Add functions: dir_only_has_{,dot_,non_dot_}subdirs.
+
+
 0.626   2022-08-08  Released-By: PERLANCAR; Urgency: medium
 
         - Add functions: dir_only_has_{files,dot_files,non_dot_files}.

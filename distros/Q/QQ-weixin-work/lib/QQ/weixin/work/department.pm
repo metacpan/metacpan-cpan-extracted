@@ -21,7 +21,7 @@ use LWP::UserAgent;
 use JSON;
 use utf8;
 
-our $VERSION = '0.06';
+our $VERSION = '0.10';
 our @EXPORT = qw/ create update delete list simplelist get /;
 
 =head1 FUNCTION
@@ -29,6 +29,7 @@ our @EXPORT = qw/ create update delete list simplelist get /;
 =head2 create(access_token, hash);
 
 创建部门
+最后更新：2023/08/15
 
 =head3 SYNOPSIS
 
@@ -57,8 +58,6 @@ L<https://developer.work.weixin.qq.com/document/path/90205>
     id	否	部门id，32位整型，指定时必须大于1。若不填该参数，将自动生成id
 
 =head3 权限说明
-
-应用须拥有父部门的管理权限。
 
 第三方仅通讯录应用可以调用。
 
@@ -101,6 +100,7 @@ sub create {
 =head2 update(access_token, hash);
 
 更新部门
+最后更新：2023/08/15
 
 =head3 SYNOPSIS
 
@@ -171,6 +171,7 @@ sub update {
 =head2 delete(access_token, id);
 
 删除部门
+最后更新：2020/03/30
 
 =head3 SYNOPSIS
 
@@ -225,6 +226,7 @@ sub delete {
 =head2 list(access_token, id);
 
 获取部门列表
+最后更新：2022/08/05
 
 =head3 SYNOPSIS
 
@@ -304,6 +306,7 @@ sub list {
 =head2 simplelist(access_token, id);
 
 获取子部门ID列表
+最后更新：2023/09/06
 
 =head3 SYNOPSIS
 
@@ -377,6 +380,7 @@ sub simplelist {
 =head2 get(access_token, id);
 
 获取单个部门详情
+最后更新：2023/09/06
 
 =head3 SYNOPSIS
 
@@ -393,9 +397,9 @@ L<https://developer.work.weixin.qq.com/document/path/95351>
 =head3 权限说明
 
 	应用类型	权限说明
-	第三方普通应用	若企业授权了组织架构信息权限，可获取企业所有部门ID、部门负责人、父部门ID; 若未授权组织架构信息权限，只能拉取token对应的应用的可见范围内部门详情
-	第三方通讯录应用	可获取企业所有部门详情
-	代开发自建应用	只能拉取token对应的应用的权限范围内的部门详情
+	第三方普通应用	若企业授权了“组织架构信息”权限，可获取企业所有部门ID、部门负责人、父部门ID; 若未授权“组织架构信息”权限，只能拉取token对应的应用的可见范围内部门详情
+	第三方通讯录应用	可获取企业所有部门详情，部门名字除外
+	代开发自建应用	若企业授权了“组织架构信息”-“部门及父部门ID、部门负责人”权限，可获取企业所有部门id; 若未授权“组织架构信息”-“部门及父部门ID、部门负责人”权限，只能拉取token对应的应用的权限范围内的部门列表
 	普通自建应用	只能拉取token对应的应用的权限范围内的部门详情
 	通讯录同步助手	可获取企业所有部门详情
 

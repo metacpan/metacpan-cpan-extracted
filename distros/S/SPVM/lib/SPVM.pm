@@ -5,7 +5,7 @@ use warnings;
 
 use SPVM::Global;
 
-our $VERSION = "0.989072";
+our $VERSION = "0.989080";
 
 require XSLoader;
 XSLoader::load('SPVM', $VERSION);
@@ -38,7 +38,47 @@ SPVM has not yet reached a stable release of version 1.0. For now, there is curr
 
 =head1 Usage
 
-A class of SPVM:
+=head2 One Liner
+
+Run a one liner using L<spvm> command.
+
+  # Hello World!
+  spvm -e 'say "Hello World!";';
+
+Run a one liner with loading a class.
+
+  # foo,bar,baz
+  spvm -M Fn -e 'say Fn->join(",", ["foo", "bar", "baz"]);'
+
+=head2 Executing A SPVM Program
+
+Write a L<SPVM class|SPVM::Document::Language::Class> to print "Hello World!" using L<the say operator|SPVM::Document::Language::Operators/"say Operator">.
+
+  # lib/SPVM/HelloWorld.spvm
+  class HelloWorld {
+    static method main : void () {
+      
+      say "Hello World!";
+    }
+  }
+
+Run the SPVM program using L<spvm> command.
+
+  spvm -I lib/SPVM HelloWorld
+
+=head2 Generating An Executable File
+
+Generate an executable file using L<spvmcc> command.
+
+  spvmcc -B ~/.spvm_build -o ./hello --no-config -I lib/SPVM HelloWorld
+
+Run the executable file.
+
+  ./hello
+
+=head2 Calling A SPVM Method from Perl
+
+Write a SPVM class.
 
   # lib/SPVM/MyMath.spvm
   class MyMath {
@@ -53,7 +93,7 @@ A class of SPVM:
     }
   }
 
-Calling a SPVM method from Perl:
+Write a Perl program calling a SPVM method using L<exchange APIs|SPVM::ExchangeAPI>.
 
   # sum.pl
   use FindBin;
@@ -61,14 +101,22 @@ Calling a SPVM method from Perl:
   
   use SPVM 'MyMath';
   
-  # Call method
   my $total = SPVM::MyMath->sum([3, 6, 8, 9]);
+  
+  print "$total\n";
+
+Run the Perl program.
+
+  # Run
+  perl sum.pl
 
 =head1 Features
 
-=over2 
+=over 2
 
 =item * L<Native threads|SPVM::Thread> and L<goroutines|SPVM::Go>.
+
+=item * L<Executing SPVM programs|spvm>
 
 =item * L<Generating an executable file|spvmcc>
 
@@ -76,7 +124,7 @@ Calling a SPVM method from Perl:
 
 =item * Static types, type inference and L<static analysis|SPVM::Native::Compiler>.
 
-=item * L<C/C++ binding|SPVM::Document::NativeClass> and L<resource system|SPVM::Document::Resource> for C/C++ libraries.
+=item * L<C and C++ binding|SPVM::Document::NativeClass> and L<resource system|SPVM::Document::Resource> for C and C++ libraries.
 
 =item * L<Perl binding for SPVM methods|SPVM::ExchangeAPI>.
 
@@ -86,103 +134,123 @@ Calling a SPVM method from Perl:
 
 =back
 
+=head1 Tutorial
+
+=over 2
+
+=item * L<SPVM Tutorial|https://github.com/yuki-kimoto/SPVM/wiki/Tutorial>
+
+=back
+
 =head1 Documents
 
 =over 2
 
-=item * L<Tutorial|https://github.com/yuki-kimoto/SPVM/wiki/Tutorial> - SPVM Tutorial
+=item * L<Language Specification|SPVM::Document::Language>
 
-=item * L<Language Specification|SPVM::Document::Language> - SPVM Language Specification
+=over 2
 
-=item * L<Standard Modules|SPVM::Document::Modules> - SPVM Standard Modules
+=item * L<Lexical Tokenization|SPVM::Document::Language::Tokenization>
 
-=item * L<ExchangeAPI|SPVM::ExchangeAPI> - Exchange APIs
+=item * L<Syntax Parsing|SPVM::Document::Language::SyntaxParsing>
 
-=item * L<Native Class|SPVM::Document::NativeClass> - Native Class
+=item * L<Class Definition|SPVM::Document::Language::Class>
 
-=item * L<Native APIs|SPVM::Document::NativeAPI> - Native APIs
+=item * L<Types|SPVM::Document::Language::Types>
 
-=item * L<Resource|SPVM::Document::Resource> - Resource
+=item * L<Statements|SPVM::Document::Language::Statements>
 
-=item * L<spvmcc> - Creating Executable File
+=item * L<Operators|SPVM::Document::Language::Operators>
 
-=item * L<spvmdist> - Creating SPVM Distribution
+=item * L<Exception Handling|SPVM::Document::Language::ExceptionHandling>
 
-=item * L<Benchmark|https://github.com/yuki-kimoto/SPVM/wiki/Benchmark> - SPVM Performance Benchmarks
+=item * L<Garbage Collection|SPVM::Document::Language::GarbageCollection>
+
+=item * L<System Setting|SPVM::Document::Language::System>
 
 =back
 
-=head1 Loading SPVM Class
-  
-  # Load a SPVM class
-  use SPVM 'SomeClass';
-  
-  # Load only SPVM module
-  use SPVM ();
+=item * L<Exchange APIs|SPVM::ExchangeAPI>
 
-The C<use> statement loads a L<SPVM> class.
+=item * L<Native Classes|SPVM::Document::NativeClass>
 
-A SPVM class is loaded and is bound to a Perl module.
+=item * L<Native Class Configurations|SPVM::Builder::Config>
 
-The bound Perl class name is prefixed with C<SPVM::>.
+=item * L<Native APIs|SPVM::Document::NativeAPI>
 
-Exceptions:
+=over 2
 
-If the SPVM module cannot be loaded, an exception is thrown.
+=item * L<Runtime Native APIs|SPVM::Document::NativeAPI::Runtime>
 
-Examples:
+=item * L<Basic Type Native APIs|SPVM::Document::NativeAPI::BasicType>
 
-  use SPVM 'Int';
-  
-  my $int_object = SPVM::Int->new(3);
-  my $value = $int_object->value.
+=item * L<Class Variable Native APIs|SPVM::Document::NativeAPI::ClassVariable>
 
-=head1 Functions
+=item * L<Field Native APIs|SPVM::Document::NativeAPI::Field>
 
-=head2 api
+=item * L<Method Native APIs|SPVM::Document::NativeAPI::Method>
 
-  my $api = SPVM::api();
+=item * L<Argument Native APIs|SPVM::Document::NativeAPI::Argument>
 
-Gets the global L<SPVM::ExchangeAPI> object for this Perl interpreter.
+=item * L<Type Native APIs|SPVM::Document::NativeAPI::Type>
 
-=head1 Environment Variables
+=item * L<Compiler Native APIs|SPVM::Document::NativeAPI::Compiler>
 
-If an environment variable is an empty string, it is treated as an undefined value.
+=item * L<Class File Native APIs|SPVM::Document::NativeAPI::ClassFile>
 
-=head2 SPVM_BUILD_DIR
+=item * L<String Buffer Native APIs|SPVM::Document::NativeAPI::StringBuffer>
 
-A directory for files generated by the compiler and linker.
+=item * L<Allocatord Native APIs|SPVM::Document::NativeAPI::Allocator>
 
-C source codes for precompilation, dynamic link libraries and object files are stored into this directory.
+=item * L<Mutex Native APIs|SPVM::Document::NativeAPI::Mutex>
 
-These files are output when attempting to build a module containing methods with the C<native> attribute or the C<precompile> attribute.
+=item * L<Internal Native APIs|SPVM::Document::NativeAPI::Internal>
 
-If these files are output and the directory given by the C<SPVM_BUILD_DIR> environment variable does not exist, an exception is thrown.
-Examples:
+=back
 
-  # bash
-  export SPVM_BUILD_DIR=~/.spvm_build
-  
-  # csh
-  setenv SPVM_BUILD_DIR ~/.spvm_build
+=item * L<Resources|SPVM::Document::Resource>
 
-=head2 SPVM_CC_DEBUG
+=item * L<Environment Variables|SPVM::Document::EnvironmentVariables>
 
-If the C<SPVM_CC_DEBUG> environement variable is a true value of Perl, debug messages and messages from the L<SPVM native class|SPVM::Document::NativeClass> compiler and linker are printed to stderr.
+=head1 Commands
 
-=head2 SPVM_CC_QUIET
+=over 2
 
-If the C<SPVM_CC_QUIET> environement variable is a true value of Perl, messages the L<SPVM native class|SPVM::Document::NativeClass> compiler and linker are not printed to stderr.
+=item * L<spvm - Executing SPVM Programs|spvm>
 
-If it is defined and a false value of Perl, the messages are printed.
+=item * L<spvmcc - Generating Executable Files|spvmcc>
 
-This setting has a higher priority than the L<quiet|SPVM::Builder::Config/"quiet"> field of the L<SPVM::Builder::Config> module.
+=item * L<spvmdist - Distributing SPVM Modules|spvmdist>
 
-=head2 SPVM_CC_FORCE
+=back
 
-If the C<SPVM_CC_FORCE> environement variable is a true value of Perl, the compilation and link by the L<SPVM native class|SPVM::Document::NativeClass> compiler and linker are forced.
+=head1 Modules
 
-This setting has a higher priority than the L<force|SPVM::Builder::Config/"force"> field of the L<SPVM::Builder::Config> module.
+=over 2
+
+=item * L<Standard Modules|SPVM::Document::Modules>
+
+=item * L<CPAN Modules|https://github.com/yuki-kimoto/SPVM/wiki/CPAN-Modules>
+
+=back
+
+=head1 Examples
+
+=over 2
+
+=item * L<SPVM Test Cases|https://github.com/yuki-kimoto/SPVM/tree/doc/t/02_vm/lib/SPVM/TestCase>
+
+=item * L<Binding C/C++ Libraries|https://github.com/yuki-kimoto/SPVM/tree/doc/examples/native>
+
+=back
+
+=head1 Wiki
+
+=over 2
+
+=item * L<Wiki|https://github.com/yuki-kimoto/SPVM/wiki>
+
+=back
 
 =head1 Repository
 

@@ -1,12 +1,12 @@
 package Locale::CLDR::Transformations::Any::Zawgyi::My;
 # This file auto generated from Data\common\transforms\my-t-my-s0-zawgyi.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -171,7 +171,7 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
-					replace => q([်|ၽ]),
+					replace => q([်ၽ]),
 					result  => q(\u103B),
 					revisit => 0,
 				},
@@ -199,7 +199,7 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
-					replace => q([ွ|ႇ]),
+					replace => q([ွႇ]),
 					result  => q(\u103E),
 					revisit => 0,
 				},

@@ -1,8 +1,8 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::obj::re;
 
-our $DATE = '2023-09-09'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2023-12-20'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 our $rschema = do{my$var={base=>"obj",clsets_after_base=>[{description=>"\nThis schema can be used as a stricter version of the `re` type. Unlike `re`,\nthis schema only accepts `Regexp` object and not string.\n\n",examples=>[{valid=>1,value=>qr()},{valid=>1,value=>qr(^abc$)i},{summary=>"Not a Regexp object",valid=>0,value=>"^abc\$"}],isa=>"Regexp",summary=>"Regexp object"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["obj"],type=>"obj",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
@@ -21,7 +21,7 @@ Sah::SchemaR::obj::re - Regexp object
 
 =head1 VERSION
 
-This document describes version 0.005 of Sah::SchemaR::obj::re (from Perl distribution Sah-Schemas-Re), released on 2023-09-09.
+This document describes version 0.006 of Sah::SchemaR::obj::re (from Perl distribution Sah-Schemas-Re), released on 2023-12-20.
 
 =head1 DESCRIPTION
 

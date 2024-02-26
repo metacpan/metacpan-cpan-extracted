@@ -1,0 +1,431 @@
+# PODNAME: RDF::Cowl::Lib::Gen::Class::Manager
+# ABSTRACT: Generated docs for RDF::Cowl::Manager
+
+## DO NOT EDIT
+## Generated via maint/tt/Class.pod.tt
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+RDF::Cowl::Lib::Gen::Class::Manager - Generated docs for RDF::Cowl::Manager
+
+=head1 VERSION
+
+version 1.0.0
+
+=head1 MAIN MODULE
+
+L<RDF::Cowl::Manager>
+
+=head1 CONSTRUCTORS
+
+=head2 new
+
+B<Signature>:
+
+  RDF::Cowl::Manager->new()
+
+Documentation:
+
+  Returns a retained manager that uses the default reader and writer.
+  
+  @return Retained manager. Throws exception on error.
+  
+  @note You can specify the default reader and writer
+        via `cowl_set_reader()` and `cowl_set_writer()`.
+
+Throws exception on error.
+
+=over 2
+
+B<C function name>: C<< cowl_manager >>
+
+=back
+
+=head1 METHODS
+
+=head2 set_reader
+
+B<Signature>:
+
+  $self->set_reader(CowlReader $reader)
+
+B<Params>:
+
+  CowlManager $manager 
+  CowlReader $reader 
+
+Documentation:
+
+  Sets the reader.
+  
+  @param manager The manager.
+  @param reader The reader.
+
+=over 2
+
+B<C function name>: C<< cowl_manager_set_reader >>
+
+=back
+
+=head2 set_writer
+
+B<Signature>:
+
+  $self->set_writer(CowlWriter $writer)
+
+B<Params>:
+
+  CowlManager $manager 
+  CowlWriter $writer 
+
+Documentation:
+
+  Sets the writer.
+  
+  @param manager The manager.
+  @param writer The writer.
+
+=over 2
+
+B<C function name>: C<< cowl_manager_set_writer >>
+
+=back
+
+=head2 set_import_loader
+
+B<Signature>:
+
+  $self->set_import_loader(CowlImportLoader $loader)
+
+B<Params>:
+
+  CowlManager $manager 
+  CowlImportLoader $loader 
+
+Documentation:
+
+  Sets the import loader.
+  
+  @param manager The manager.
+  @param loader The import loader.
+
+=over 2
+
+B<C function name>: C<< cowl_manager_set_import_loader >>
+
+=back
+
+=head2 set_error_handler
+
+B<Signature>:
+
+  $self->set_error_handler(CowlErrorHandler $handler)
+
+B<Params>:
+
+  CowlManager $manager 
+  CowlErrorHandler $handler 
+
+Documentation:
+
+  Sets the error handler.
+  
+  @param manager The manager.
+  @param handler The error handler.
+
+=over 2
+
+B<C function name>: C<< cowl_manager_set_error_handler >>
+
+=back
+
+=head2 get_ontology
+
+B<Signature>:
+
+  $self->get_ontology(CowlOntologyId $id)
+
+B<Params>:
+
+  CowlManager $manager 
+  CowlOntologyId $id 
+
+Documentation:
+
+  Gets the ontology with the specified identifier.
+  If no existing ontology has the specified identifier, a new ontology is returned.
+  
+  @param manager The manager.
+  @param id The ontology identifier.
+  @return Ontology with the specified identifier.
+
+=over 2
+
+B<C function name>: C<< cowl_manager_get_ontology >>
+
+=back
+
+=head2 read_path
+
+B<Signature>:
+
+  $self->read_path(UString $path)
+
+B<Params>:
+
+  CowlManager $manager 
+  UString $path 
+
+Documentation:
+
+  Reads an ontology from the file at the specified path.
+  
+  @param manager The manager.
+  @param path The file path.
+  @return The read ontology. Throws exception on error.
+
+Throws exception on error.
+
+=over 2
+
+B<C function name>: C<< cowl_manager_read_path >>
+
+=back
+
+=head2 read_string
+
+B<Signature>:
+
+  $self->read_string(UString $string)
+
+B<Params>:
+
+  CowlManager $manager 
+  UString $string 
+
+Documentation:
+
+  Reads an ontology from the specified string.
+  
+  @param manager The manager.
+  @param string The input string.
+  @return The read ontology. Throws exception on error.
+
+Throws exception on error.
+
+=over 2
+
+B<C function name>: C<< cowl_manager_read_string >>
+
+=back
+
+=head2 read_stream
+
+B<Signature>:
+
+  $self->read_stream(UIStream $stream)
+
+B<Params>:
+
+  CowlManager $manager 
+  UIStream $stream 
+
+Documentation:
+
+  Reads an ontology from the specified input stream.
+  
+  @param manager The manager.
+  @param stream The input stream.
+  @return The read ontology. Throws exception on error.
+  
+  @note The stream is not released by the manager, you must do it yourself.
+
+Throws exception on error.
+
+=over 2
+
+B<C function name>: C<< cowl_manager_read_stream >>
+
+=back
+
+=head2 write_path
+
+B<Signature>:
+
+  $self->write_path(CowlOntology $ontology, UString $path)
+
+B<Params>:
+
+  CowlManager $manager 
+  CowlOntology $ontology 
+  UString $path 
+
+Documentation:
+
+  Writes the ontology to the file at the specified path.
+  
+  @param manager The manager.
+  @param ontology The ontology.
+  @param path The file path.
+  @return Return code.
+
+=over 2
+
+B<C function name>: C<< cowl_manager_write_path >>
+
+=back
+
+=head2 write_strbuf
+
+B<Signature>:
+
+  $self->write_strbuf(CowlOntology $ontology, UStrBuf $buf)
+
+B<Params>:
+
+  CowlManager $manager 
+  CowlOntology $ontology 
+  UStrBuf $buf 
+
+Documentation:
+
+  Writes the ontology to the specified string buffer.
+  
+  @param manager The manager.
+  @param ontology The ontology.
+  @param buf The string buffer.
+  @return Return code.
+
+=over 2
+
+B<C function name>: C<< cowl_manager_write_strbuf >>
+
+=back
+
+=head2 write_stream
+
+B<Signature>:
+
+  $self->write_stream(CowlOntology $ontology, UOStream $stream)
+
+B<Params>:
+
+  CowlManager $manager 
+  CowlOntology $ontology 
+  UOStream $stream 
+
+Documentation:
+
+  Writes the ontology to the specified output stream.
+  
+  @param manager The manager.
+  @param ontology The ontology.
+  @param stream The output stream.
+  @return Return code.
+  
+  @note The stream is not released by the manager, you must do it yourself.
+
+=over 2
+
+B<C function name>: C<< cowl_manager_write_stream >>
+
+=back
+
+=head2 get_istream
+
+B<Signature>:
+
+  $self->get_istream(CowlIStreamHandlers $handlers)
+
+B<Params>:
+
+  CowlManager $manager 
+  CowlIStreamHandlers $handlers 
+
+Documentation:
+
+  Returns an ontology input stream.
+  
+  @param manager The manager.
+  @param handlers The handlers.
+  @return Ontology input stream.
+
+=over 2
+
+B<C function name>: C<< cowl_manager_get_istream >>
+
+=back
+
+=head2 get_istream_to_ontology
+
+B<Signature>:
+
+  $self->get_istream_to_ontology(CowlOntology $ontology)
+
+B<Params>:
+
+  CowlManager $manager 
+  CowlOntology $ontology 
+
+Documentation:
+
+  Returns an ontology input stream that stores constructs in the specified ontology.
+  
+  @param manager The manager.
+  @param ontology The ontology.
+  @return Ontology input stream.
+
+=over 2
+
+B<C function name>: C<< cowl_manager_get_istream_to_ontology >>
+
+=back
+
+=head2 get_ostream
+
+B<Signature>:
+
+  $self->get_ostream(UOStream $stream)
+
+B<Params>:
+
+  CowlManager $manager 
+  UOStream $stream 
+
+Documentation:
+
+  Returns an ontology output stream.
+  
+  @param manager The manager.
+  @param stream The output stream.
+  @return Ontology output stream.
+
+=over 2
+
+B<C function name>: C<< cowl_manager_get_ostream >>
+
+=back
+
+=for comment # cowl_manager_read_file
+# See manual binding definition.
+
+=for comment # cowl_manager_write_file
+# See manual binding definition.
+
+=head1 AUTHOR
+
+Zakariyya Mughal <zmughal@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 by Auto-Parallel Technologies, Inc..
+
+This is free software, licensed under Eclipse Public License - v 2.0.
+
+=cut

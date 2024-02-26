@@ -1,5 +1,9 @@
 Revision history for Perl module Getopt::Class
 
+v1.0.0 2024-02-23T03:56:26+0900
+    - Added types uri and uri-array, improved documentation and added some missing code.
+    - Changed this distribution to major stable release.
+
 v0.104.3 2024-02-06T13:49:28+0900
 
 v0.104.2 2023-10-11T16:58:23+0900

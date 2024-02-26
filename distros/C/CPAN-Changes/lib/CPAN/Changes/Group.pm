@@ -2,7 +2,7 @@ package CPAN::Changes::Group;
 use strict;
 use warnings;
 
-our $VERSION = '0.500002';
+our $VERSION = '0.500003';
 $VERSION =~ tr/_//d;
 
 use Sub::Quote qw(qsub);
@@ -15,12 +15,17 @@ has _entry => (
   handles => {
     is_empty => 'has_entries',
     add_changes => 'add_entry',
-    name => 'text',
   },
   lazy => 1,
   default => qsub q{ CPAN::Changes::Entry->new(text => '') },
   predicate => 1,
 );
+
+sub name {
+  my $self = shift;
+  my $entry = $self->_entry;
+  return $entry->can('text') ? $entry->text : '';
+}
 
 sub _maybe_entry {
   my $self = shift;
@@ -56,8 +61,12 @@ sub changes {
 
 sub set_changes {
   my ($self, @changes) = @_;
-  my $entry = $self->_entry->clone(entries => \@changes);
-  $self->_entry($entry);
+  $self->clear_changes;
+  my $entry = $self->_entry;
+  for my $change (@changes) {
+    $entry->add_entry($change);
+  }
+  return;
 }
 
 sub clear_changes {

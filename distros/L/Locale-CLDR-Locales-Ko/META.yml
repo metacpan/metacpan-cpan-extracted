@@ -22,19 +22,22 @@ name: Locale-CLDR-Locales-Ko
 provides:
   Locale::CLDR::Locales::Ko:
     file: lib/Locale/CLDR/Locales/Ko.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Ko::Any:
-    file: lib/Locale/CLDR/Locales/Ko/Any.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Ko::Any::Kp:
-    file: lib/Locale/CLDR/Locales/Ko/Any/Kp.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Ko::Any::Kr:
-    file: lib/Locale/CLDR/Locales/Ko/Any/Kr.pm
-    version: v0.40.1
+    version: v0.44.0
+  Locale::CLDR::Locales::Ko::Kore:
+    file: lib/Locale/CLDR/Locales/Ko/Kore.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Ko::Kore::Cn:
+    file: lib/Locale/CLDR/Locales/Ko/Kore/Cn.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Ko::Kore::Kp:
+    file: lib/Locale/CLDR/Locales/Ko/Kore/Kp.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Ko::Kore::Kr:
+    file: lib/Locale/CLDR/Locales/Ko/Kore/Kr.pm
+    version: v0.44.0
 requires:
   DateTime: '0.72'
-  Locale::CLDR: v0.40.1
+  Locale::CLDR: v0.44.0
   Moo: '2'
   MooX::ClassAttribute: '0.011'
   Type::Tiny: '0'
@@ -44,5 +47,5 @@ resources:
   bugtracker: https://github.com/ThePilgrim/perlcldr/issues
   homepage: https://github.com/ThePilgrim/perlcldr
   repository: https://github.com/ThePilgrim/perlcldr.git
-version: v0.40.1
+version: v0.44.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

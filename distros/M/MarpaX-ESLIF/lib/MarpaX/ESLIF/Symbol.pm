@@ -102,7 +102,7 @@ sub _EQ {
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '6.0.29'; # VERSION
+our $VERSION = '6.0.33.3'; # VERSION
 
 
 1;
@@ -119,7 +119,7 @@ MarpaX::ESLIF::Symbol - MarpaX::ESLIF's symbol
 
 =head1 VERSION
 
-version 6.0.29
+version 6.0.33.3
 
 =head1 SYNOPSIS
 
@@ -135,7 +135,7 @@ version 6.0.29
   my $metaSymbol = MarpaX::ESLIF::Symbol->new($eslif, type => 'meta',
                                                       grammar => MarpaX::ESLIF::Grammar->new(
                                                                    $eslif,
-                                                                   "<something> ::= <SOMETHING>\n<SOMETHING> ~ 'that'")
+                                                                   "<something> ::= <SOMETHING>\n<SOMETHING> ~ 'that'"),
                                                       symbol => 'SOMETHING');
   #
   # For regex, a substitution pattern is supported

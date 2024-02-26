@@ -1,26 +1,27 @@
 package Text::Chart;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-10'; # DATE
-our $DIST = 'Text-Chart'; # DIST
-our $VERSION = '0.041'; # VERSION
-
 use 5.010001;
 use strict;
 use utf8;
 use warnings;
+use Log::ger;
 
+use Exporter qw(import);
 use List::MoreUtils qw(minmax);
 use Scalar::Util qw(looks_like_number);
 
-require Exporter;
-our @ISA       = qw(Exporter);
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2024-02-06'; # DATE
+our $DIST = 'Text-Chart'; # DIST
+our $VERSION = '0.042'; # VERSION
+
 our @EXPORT_OK = qw(gen_text_chart);
 
 our %SPEC;
 
 our @CHART_TYPES = (
-    #'bar',
+    'raw',
+    'bar',
     #'column',
     'sparkline',
     #hsparkline
@@ -59,7 +60,7 @@ sub _find_first_numcol {
         }
         return $col if $is_numeric;
     }
-    return undef;
+    return undef; ## no critic: Subroutines::ProhibitExplicitReturnUndef
 }
 
 sub _find_first_nonnumcol {
@@ -79,7 +80,7 @@ sub _find_first_nonnumcol {
         }
         return $col if $is_nonnum;
     }
-    return undef;
+    return undef; ## no critic: Subroutines::ProhibitExplicitReturnUndef
 }
 
 $SPEC{gen_text_chart} = {
@@ -94,8 +95,7 @@ $SPEC{gen_text_chart} = {
                 ['array*' => of => 'hash*'],
             ]],
             req => 1,
-            pos => 1,
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 Either in the form of array of numbers, example:
 
@@ -119,7 +119,7 @@ column named `data`. Array of arrays will have columns named `column0`,
 `column1` and so on. Array of hashes will have columns named according to the
 hash keys.
 
-_
+MARKDOWN
         },
         spec => {
             summary => 'Table specification, according to TableDef',
@@ -131,34 +131,42 @@ _
             req => 1,
         },
         label_column => {
-            summary => 'Which column contains data labels',
-            schema => 'str*',
-            description => <<'_',
+            summary => 'Which column(s) contain data labels',
+            schema => 'str_or_aos1::arrayified',
+            description => <<'MARKDOWN',
 
 If not specified, the first non-numeric column will be selected.
 
-_
+The number of label columns must match that of data columns.
+
+MARKDOWN
+            'x.chart_types' => ['bar'],
         },
         data_column => {
             summary => 'Which column(s) contain data to plot',
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 Multiple data columns are supported.
 
-_
-            schema => ['any*' => of => [
-                'str*',
-                ['array*' => of => 'str*'],
-            ]],
+MARKDOWN
+            schema => 'str_or_aos1::arrayified',
         },
         chart_height => {
             schema => 'float*',
+            'x.chart_types' => ['sparkline'],
         },
         chart_width => {
             schema => 'float*',
+            'x.chart_types' => ['bar'],
         },
-        # XXX show_data_label
-        # XXX show_data_value
+        show_data_label => {
+            schema => 'bool*',
+            'x.chart_types' => ['bar'],
+        },
+        show_data_value => {
+            schema => 'bool*',
+            'x.chart_types' => ['bar'],
+        },
         # XXX data_formats
         # XXX show_x_axis
         # XXX show_y_axis
@@ -192,19 +200,100 @@ sub gen_text_chart {
         }
     }
 
-    my $label_column = $args{label_column};
-    if (!defined($label_column)) {
-        my $col = _find_first_nonnumcol($tbl);
-        die "There is no non-numeric column for label"
-            if $args{show_data_label} && !defined($col);
-        $label_column = $col;
+    my @label_columns;
+    {
+        my $lc = $args{label_column};
+        if (defined $lc) {
+            @label_columns = ref($lc) eq 'ARRAY' ? @$lc : ($lc);
+        } else {
+            my $col = _find_first_nonnumcol($tbl);
+            die "There is no non-numeric column for data" unless defined $col;
+            @label_columns = ($col);
+        }
+        if (@label_columns != @data_columns) {
+            die "Number of data columns (".scalar(@data_columns).") does not match number of label columns (".scalar(@label_columns).")";
+        }
     }
 
     my $buf = "";
 
     my $type = $args{type} or die "Please specify 'type'";
     my $chart_height = $args{chart_height};
-    if ($type eq 'sparkline') {
+    my $chart_width = $args{chart_width};
+
+    if ($type eq 'raw') {
+
+        my @resrows;
+        for my $rowidx (0 .. $tbl->row_count-1) {
+            my $resrow = {};
+            my $origrow = $tbl->row_as_hos($rowidx);
+            for my $i (0 .. @data_columns-1) {
+                $resrow->{"data$i"} = $origrow->{$data_columns[$i]};
+                $resrow->{"label$i"} = $origrow->{$label_columns[$i]};
+            }
+            push @resrows, $resrow;
+        }
+        require JSON::MaybeXS;
+        $buf = JSON::MaybeXS::encode_json([200, "OK", \@resrows]);
+
+    } elsif ($type eq 'bar') {
+        $chart_width //= 75;
+
+        # calculate maximum label width
+        my $max_label_width = 0;
+        for my $col (@label_columns) {
+            my $coldata = [map {$_//''} @{ _get_column_data($tbl, $col) }];
+            for my $data (@$coldata) {
+                my $len = length($data);
+                $max_label_width = $len if $max_label_width < $len;
+            }
+        }
+
+        # get maximum value & maximum width for each data column
+        my @max; # index: colnum
+        my $max_value_width = 0;
+        for my $colidx (0 .. @data_columns-1) {
+            my $coldata = [map {$_//0} @{ _get_column_data($tbl, $data_columns[$colidx]) }];
+            for my $data (@$coldata) {
+                $max[$colidx] = $data if !defined($max[$colidx]) || $max[$colidx] < $data;
+                my $len = length($data);
+                $max_value_width = $len if $max_value_width < $len;
+            }
+        }
+
+        my $bar_width = $chart_width
+            - ($args{show_data_label} ? $max_label_width+1 : 0) # "label|"
+            - ($args{show_data_value} ? $max_value_width+2 : 0) # "(val)"
+            ;
+        $bar_width = 1 if $bar_width < 1;
+
+        # which characters to use to draw:
+        my @chars = ('*','=', 'o', 'X', '.', '+', 'x');
+
+        # draw
+        for my $rowidx (0 .. $tbl->row_count-1) {
+            my $row = $tbl->row_as_hos($rowidx);
+            for my $colidx (0 .. @data_columns-1) {
+                my $char = $chars[ $colidx % @chars ];
+                $buf .= sprintf("%-${max_label_width}s|", $row->{$label_columns[$colidx]}) if $args{show_data_label};
+
+                my $width;
+                my $val = $row->{$data_columns[$colidx]};
+                if (!$max[$colidx]) {
+                    $width = 0;
+                } else {
+                    $width = int($bar_width * ($val / $max[$colidx]));
+                }
+                $buf .= sprintf("%-${bar_width}s", $char x $width);
+
+                $buf .= sprintf("(%${max_value_width}s)", $val) if $args{show_data_value};
+
+                $buf .= "\n";
+            }
+            $buf .= "\n" if @data_columns > 1;
+        } # for row
+
+    } elsif ($type eq 'sparkline') {
         $chart_height //= 1;
         for my $col (@data_columns) {
             my $coldata = [map {$_//0} @{ _get_column_data($tbl, $col) }];
@@ -261,7 +350,7 @@ Text::Chart - Generate text-based chart
 
 =head1 VERSION
 
-This document describes version 0.041 of Text::Chart (from Perl distribution Text-Chart), released on 2021-04-10.
+This document describes version 0.042 of Text::Chart (from Perl distribution Text-Chart), released on 2024-02-06.
 
 =head1 SYNOPSIS
 
@@ -320,20 +409,14 @@ Result:
   *     *      *     *     *
  Andi  Budi  Cinta  Dewi  Edi
 
-C<Sparkline chart:>
+B<Sparkline chart:>
 
- my $res = gen_text_chart(
-     data => [["Andi",1], ["Budi",5], ["Cinta",3], ["Dewi",9], ["Edi",2]],
-     type => 'column',
-     show_data_label => 1,
- );
+Via L<tchart> (from L<App::tchart>) CLI:
 
- my $res = gen_text_chart(
-     data => [1.5, 0.5, 3.5, 2.5, 5.5, 4.5, 7.5, 6.5],
-     type => 'sparkline',
- );
+ % tchart -d sales -t sparkline < celine-dion-album-sales.json
+ ▂▂▅██▄▄▂▁▂▁
 
-Result:
+B<Horizontal sparkline chart:>
 
  XXX
 
@@ -343,9 +426,7 @@ C<Plotting multiple data columns:>
 
 =head1 DESCRIPTION
 
-B<THIS IS AN EARLY RELEASE, MANY FEATURES ARE NOT YET IMPLEMENTED.> Currently
-only sparkline chart is implemented. Showing data labels and data values are not
-yet implemented.
+B<THIS IS AN EARLY RELEASE, MANY FEATURES ARE NOT YET IMPLEMENTED.>
 
 This module lets you generate text-based charts.
 
@@ -368,7 +449,11 @@ Arguments ('*' denotes required arguments):
 
 =item * B<chart_height> => I<float>
 
+(No description)
+
 =item * B<chart_width> => I<float>
+
+(No description)
 
 =item * B<data>* => I<array[num]|array[array]|array[hash]>
 
@@ -396,17 +481,27 @@ column named C<data>. Array of arrays will have columns named C<column0>,
 C<column1> and so on. Array of hashes will have columns named according to the
 hash keys.
 
-=item * B<data_column> => I<str|array[str]>
+=item * B<data_column> => I<str_or_aos1::arrayified>
 
 Which column(s) contain data to plot.
 
 Multiple data columns are supported.
 
-=item * B<label_column> => I<str>
+=item * B<label_column> => I<str_or_aos1::arrayified>
 
-Which column contains data labels.
+Which column(s) contain data labels.
 
 If not specified, the first non-numeric column will be selected.
+
+The number of label columns must match that of data columns.
+
+=item * B<show_data_label> => I<bool>
+
+(No description)
+
+=item * B<show_data_value> => I<bool>
+
+(No description)
 
 =item * B<spec> => I<hash>
 
@@ -438,14 +533,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Text-Chart
 
 Source repository is at L<https://github.com/perlancar/perl-Text-Chart>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Chart>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Text::Graph>, a mature CPAN module for doing text-based graphs. Before writing
@@ -463,11 +550,43 @@ L<App::tchart>, a CLI for Text::Chart.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2017, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2024, 2017, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Chart>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

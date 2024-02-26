@@ -11,7 +11,7 @@ my %MF = (
 		'meta-spec' => { version => 2 },
 		resources   => {
 			bugtracker => {
-				web => 'http://rt.cpan.org/Public/Dist/Display.html?Name=Net-EPP-Registry-Nominet'
+				web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Net-EPP-Registry-Nominet'
 			},
 			repository => {
 				type => 'git',

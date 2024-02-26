@@ -7,9 +7,9 @@ use FFI::CheckLib ();
 use FFI::Platypus;
 use Cpanel::JSON::XS ();
 
-our $VERSION = '0.1.36';
+our $VERSION = '0.1.38';
 
-our $libyamlscript_version = '0.1.36';
+our $libyamlscript_version = '0.1.38';
 
 
 #------------------------------------------------------------------------------
@@ -101,7 +101,7 @@ sub find_libyamlscript {
         /usr/local/lib64
         /usr/lib
         /usr/lib64
-    );
+    ), "$ENV{HOME}/.local/lib";
     for my $path (@paths) {
         if (-e "$path/$name") {
             return "$path/$name";

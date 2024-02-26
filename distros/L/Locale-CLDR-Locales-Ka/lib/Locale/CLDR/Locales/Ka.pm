@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ka - Package for language Georgian
 
 package Locale::CLDR::Locales::Ka;
 # This file auto generated from Data\common\main\ka.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -347,22 +347,6 @@ has 'algorithmic_number_format_data' => (
     } },
 );
 
-# Need to add code for Key type pattern
-sub display_name_pattern {
-	my ($self, $name, $region, $script, $variant) = @_;
-
-	my $display_pattern = '{0} ({1})';
-	$display_pattern =~s/\{0\}/$name/g;
-	my $subtags = join '{0}, {1}', grep {$_} (
-		$region,
-		$script,
-		$variant,
-	);
-
-	$display_pattern =~s/\{1\}/$subtags/g;
-	return $display_pattern;
-}
-
 has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
@@ -387,16 +371,19 @@ has 'display_name_language' => (
  				'am' => 'ამჰარული',
  				'an' => 'არაგონული',
  				'ang' => 'ძველი ინგლისური',
+ 				'ann' => 'ობოლო',
  				'anp' => 'ანგიკა',
  				'ar' => 'არაბული',
  				'ar_001' => 'თანამედროვე სტანდარტული არაბული',
  				'arc' => 'არამეული',
  				'arn' => 'მაპუდუნგუნი',
  				'arp' => 'არაპაჰო',
+ 				'ars' => 'ნაჯის არაბული',
  				'arw' => 'არავაკი',
  				'as' => 'ასამური',
  				'asa' => 'ასუ',
  				'ast' => 'ასტურიული',
+ 				'atj' => 'ატიკამეკი',
  				'av' => 'ხუნძური',
  				'awa' => 'ავადი',
  				'ay' => 'აიმარა',
@@ -411,6 +398,7 @@ has 'display_name_language' => (
  				'bem' => 'ბემბა',
  				'bez' => 'ბენა',
  				'bg' => 'ბულგარული',
+ 				'bgc' => 'ჰარიანვი',
  				'bgn' => 'დასავლეთ ბელუჯი',
  				'bho' => 'ბოჯპური',
  				'bi' => 'ბისლამა',
@@ -442,13 +430,21 @@ has 'display_name_language' => (
  				'chr' => 'ჩეროკი',
  				'chy' => 'ჩეიენი',
  				'ckb' => 'ცენტრალური ქურთული',
+ 				'clc' => 'ჩილკოტინი',
  				'co' => 'კორსიკული',
  				'cop' => 'კოპტური',
  				'cr' => 'კრი',
+ 				'crg' => 'მიჩიფი',
  				'crh' => 'ყირიმულ-თურქული',
+ 				'crj' => 'სამხრეთ-აღმოსავლეთის კრი',
+ 				'crk' => 'დაბლობის კრი',
+ 				'crl' => 'ჩრდილო-აღმოსავლეთის კრი',
+ 				'crm' => 'მუსური კრი',
+ 				'crr' => 'კაროლინური ალგონკინი',
  				'crs' => 'სესელვა-კრეოლური ფრანგული',
  				'cs' => 'ჩეხური',
  				'csb' => 'კაშუბური',
+ 				'csw' => 'ჭაობის კრი',
  				'cu' => 'საეკლესიო სლავური',
  				'cv' => 'ჩუვაშური',
  				'cy' => 'უელსური',
@@ -483,7 +479,7 @@ has 'display_name_language' => (
  				'en_AU' => 'ავსტრალიური ინგლისური',
  				'en_CA' => 'კანადური ინგლისური',
  				'en_GB' => 'ბრიტანული ინგლისური',
- 				'en_GB@alt=short' => 'ინგლისური (გაერთ. სამეფო)',
+ 				'en_GB@alt=short' => 'ინგლისური (გაერთიანებული სამეფო)',
  				'en_US' => 'ამერიკული ინგლისური',
  				'en_US@alt=short' => 'აშშ ინგლისური',
  				'enm' => 'საშუალო ინგლისური',
@@ -506,6 +502,7 @@ has 'display_name_language' => (
  				'fr' => 'ფრანგული',
  				'fr_CA' => 'კანადური ფრანგული',
  				'fr_CH' => 'შვეიცარიული ფრანგული',
+ 				'frc' => 'კაჟუნური ფრანგული',
  				'frm' => 'საშუალო ფრანგული',
  				'fro' => 'ძველი ფრანგული',
  				'frr' => 'ჩრდილოფრიზიული',
@@ -533,9 +530,12 @@ has 'display_name_language' => (
  				'gv' => 'მენური',
  				'gwi' => 'გვიჩინი',
  				'ha' => 'ჰაუსა',
+ 				'hai' => 'ჰაიდა',
  				'haw' => 'ჰავაიური',
+ 				'hax' => 'სამხრეთული ჰაიდა',
  				'he' => 'ებრაული',
  				'hi' => 'ჰინდი',
+ 				'hi_Latn@alt=variant' => 'ჰინგლისური',
  				'hil' => 'ჰილიგაინონი',
  				'hit' => 'ხეთური',
  				'hmn' => 'ჰმონგი',
@@ -544,6 +544,7 @@ has 'display_name_language' => (
  				'ht' => 'ჰაიტიური კრეოლი',
  				'hu' => 'უნგრული',
  				'hup' => 'ჰუპა',
+ 				'hur' => 'ჰალკომელემი',
  				'hy' => 'სომხური',
  				'hz' => 'ჰერერო',
  				'ia' => 'ინტერლინგუალური',
@@ -553,6 +554,7 @@ has 'display_name_language' => (
  				'ie' => 'ინტერლინგი',
  				'ig' => 'იგბო',
  				'ii' => 'სიჩუანის ი',
+ 				'ikt' => 'დასავლეთ-კანადური ინუკტიტუტი',
  				'ilo' => 'ილოკო',
  				'inh' => 'ინგუშური',
  				'io' => 'იდო',
@@ -578,6 +580,7 @@ has 'display_name_language' => (
  				'kea' => 'კაბუვერდიანუ',
  				'kfo' => 'კორო',
  				'kg' => 'კონგო',
+ 				'kgp' => 'კაინგანგი',
  				'kha' => 'ხასი',
  				'khq' => 'კოირა-ჩიინი',
  				'ki' => 'კიკუიუ',
@@ -607,6 +610,7 @@ has 'display_name_language' => (
  				'kut' => 'კუტენაი',
  				'kv' => 'კომი',
  				'kw' => 'კორნული',
+ 				'kwk' => 'კვაკვალა',
  				'ky' => 'ყირგიზული',
  				'la' => 'ლათინური',
  				'lad' => 'ლადინო',
@@ -617,12 +621,15 @@ has 'display_name_language' => (
  				'lez' => 'ლეზგიური',
  				'lg' => 'განდა',
  				'li' => 'ლიმბურგული',
+ 				'lil' => 'ლილიეტი',
  				'lkt' => 'ლაკოტა',
  				'ln' => 'ლინგალა',
  				'lo' => 'ლაოსური',
  				'lol' => 'მონგო',
+ 				'lou' => 'ლუიზიანას კრეოლური',
  				'loz' => 'ლოზი',
  				'lrc' => 'ჩრდილოეთ ლური',
+ 				'lsm' => 'სამია',
  				'lt' => 'ლიეტუვური',
  				'lu' => 'ლუბა-კატანგა',
  				'lua' => 'ლუბა-ლულუა',
@@ -656,6 +663,7 @@ has 'display_name_language' => (
  				'mn' => 'მონღოლური',
  				'mnc' => 'მანჯურიული',
  				'mni' => 'მანიპური',
+ 				'moe' => 'ინუ-აიმუნი',
  				'moh' => 'მოჰაუკური',
  				'mos' => 'მოსი',
  				'mr' => 'მარათჰი',
@@ -703,6 +711,11 @@ has 'display_name_language' => (
  				'nzi' => 'ნზიმა',
  				'oc' => 'ოქსიტანური',
  				'oj' => 'ოჯიბვე',
+ 				'ojb' => 'ჩრდილო-დასავლეთის ოჯიბვა',
+ 				'ojc' => 'ცენტრალური ოჯიბვე',
+ 				'ojs' => 'ოჯი-კრი',
+ 				'ojw' => 'დასავლეთის ოჯიბვა',
+ 				'oka' => 'ოკანაგანი',
  				'om' => 'ორომო',
  				'or' => 'ორია',
  				'os' => 'ოსური',
@@ -716,7 +729,9 @@ has 'display_name_language' => (
  				'peo' => 'ძველი სპარსული',
  				'phn' => 'ფინიკიური',
  				'pi' => 'პალი',
+ 				'pis' => 'პიჯინი',
  				'pl' => 'პოლონური',
+ 				'pqm' => 'მალისეტ-პასამაკვოდი',
  				'prg' => 'პრუსიული',
  				'pro' => 'ძველი პროვანსული',
  				'ps' => 'პუშტუ',
@@ -766,6 +781,7 @@ has 'display_name_language' => (
  				'si' => 'სინჰალური',
  				'sk' => 'სლოვაკური',
  				'sl' => 'სლოვენური',
+ 				'slh' => 'სამხრეთული ლუშუციდი',
  				'sm' => 'სამოა',
  				'sma' => 'სამხრეთსამური',
  				'smj' => 'ლულე-საამური',
@@ -780,6 +796,7 @@ has 'display_name_language' => (
  				'ss' => 'სუატი',
  				'ssy' => 'საჰო',
  				'st' => 'სამხრეთ სოთოს ენა',
+ 				'str' => 'სტრეიტს სალიში',
  				'su' => 'სუნდური',
  				'suk' => 'სუკუმა',
  				'sux' => 'შუმერული',
@@ -790,23 +807,29 @@ has 'display_name_language' => (
  				'syc' => 'კლასიკური სირიული',
  				'syr' => 'სირიული',
  				'ta' => 'ტამილური',
+ 				'tce' => 'სამხრეთ ტუჩონი',
  				'te' => 'ტელუგუ',
  				'tem' => 'ტინმე',
  				'teo' => 'ტესო',
  				'tet' => 'ტეტუმი',
  				'tg' => 'ტაჯიკური',
- 				'th' => 'ტაი',
+ 				'tgx' => 'ტაგიში',
+ 				'th' => 'ტაილანდური',
+ 				'tht' => 'ტალტანი',
  				'ti' => 'ტიგრინია',
  				'tig' => 'თიგრე',
  				'tk' => 'თურქმენული',
  				'tlh' => 'კლინგონი',
+ 				'tli' => 'ტლინგიტი',
  				'tn' => 'ტსვანა',
  				'to' => 'ტონგანური',
+ 				'tok' => 'ტოკი-პონა',
  				'tpi' => 'ტოკ-პისინი',
  				'tr' => 'თურქული',
  				'trv' => 'ტაროკო',
  				'ts' => 'ტსონგა',
  				'tt' => 'თათრული',
+ 				'ttm' => 'ჩრდილოეთ ტუჩონი',
  				'tum' => 'ტუმბუკა',
  				'tvl' => 'ტუვალუ',
  				'tw' => 'თუი',
@@ -833,6 +856,7 @@ has 'display_name_language' => (
  				'war' => 'ვარაი',
  				'wbp' => 'ვალპირი',
  				'wo' => 'ვოლოფური',
+ 				'wuu' => 'ვუ',
  				'xal' => 'ყალმუხური',
  				'xh' => 'ქჰოსა',
  				'xog' => 'სოგა',
@@ -840,6 +864,7 @@ has 'display_name_language' => (
  				'ybb' => 'იემბა',
  				'yi' => 'იდიში',
  				'yo' => 'იორუბა',
+ 				'yrl' => 'ნენგატუ',
  				'yue' => 'კანტონური',
  				'yue@alt=menu' => 'ჩინური, კანტონური',
  				'zbl' => 'ბლისსიმბოლოები',
@@ -872,8 +897,10 @@ has 'display_name_script' => (
 	default		=> sub {
 		sub {
 			my %scripts = (
-			'Afak' => 'აფაკა',
+			'Adlm' => 'ადლამი',
+ 			'Afak' => 'აფაკა',
  			'Arab' => 'არაბული',
+ 			'Aran' => 'ნასტალიქი',
  			'Armi' => 'იმპერიული არამეული',
  			'Armn' => 'სომხური',
  			'Avst' => 'ავესტური',
@@ -889,7 +916,7 @@ has 'display_name_script' => (
  			'Bugi' => 'ლონტარა',
  			'Buhd' => 'ბუჰიდი',
  			'Cakm' => 'ჩაკმა',
- 			'Cans' => 'კანადური სილაბური',
+ 			'Cans' => 'გაერთიანებული კანადური სილაბური',
  			'Cari' => 'კარიული',
  			'Cham' => 'ჩამი',
  			'Cher' => 'ჩეროკი',
@@ -987,6 +1014,7 @@ has 'display_name_script' => (
  			'Plrd' => 'პოლარდისი',
  			'Prti' => 'მონუმენტური პართული',
  			'Rjng' => 'რეჯანგი',
+ 			'Rohg' => 'ჰანიფი',
  			'Roro' => 'რონგორონგო',
  			'Runr' => 'რუნული',
  			'Samr' => 'სამარიული',
@@ -1017,7 +1045,7 @@ has 'display_name_script' => (
  			'Tfng' => 'ტიფინაღი',
  			'Tglg' => 'ბაიბაინი',
  			'Thaa' => 'თაანა',
- 			'Thai' => 'ტაი',
+ 			'Thai' => 'ტაილანდური',
  			'Tibt' => 'ტიბეტური',
  			'Tirh' => 'ტირჰუტა',
  			'Ugar' => 'უგარითული',
@@ -1202,6 +1230,7 @@ has 'display_name_region' => (
  			'IM' => 'მენის კუნძული',
  			'IN' => 'ინდოეთი',
  			'IO' => 'ბრიტანეთის ტერიტორია ინდოეთის ოკეანეში',
+ 			'IO@alt=chagos' => 'ჩაგოსის არქიპელაგი',
  			'IQ' => 'ერაყი',
  			'IR' => 'ირანი',
  			'IS' => 'ისლანდია',
@@ -1268,6 +1297,7 @@ has 'display_name_region' => (
  			'NR' => 'ნაურუ',
  			'NU' => 'ნიუე',
  			'NZ' => 'ახალი ზელანდია',
+ 			'NZ@alt=variant' => 'აოტეროა (ახალი ზელანდია)',
  			'OM' => 'ომანი',
  			'PA' => 'პანამა',
  			'PE' => 'პერუ',
@@ -1312,7 +1342,6 @@ has 'display_name_region' => (
  			'SX' => 'სინტ-მარტენი',
  			'SY' => 'სირია',
  			'SZ' => 'სვაზილენდი',
- 			'SZ@alt=variant' => 'სვაზილანდი',
  			'TA' => 'ტრისტან-და-კუნია',
  			'TC' => 'თერქს-ქაიქოსის კუნძულები',
  			'TD' => 'ჩადი',
@@ -1469,8 +1498,9 @@ has 'display_name_type' => (
  				'gregorian' => q{გრიგორიანული კალენდარი},
  				'hebrew' => q{ებრაული კალენდარი},
  				'indian' => q{ინდოეთის ეროვნული კალენდარი},
- 				'islamic' => q{ისლამური კალენდარი},
- 				'islamic-civil' => q{ისლამური სამოქალაქო კალენდარი},
+ 				'islamic' => q{ჰიჯრის კალენდარი},
+ 				'islamic-civil' => q{ჰიჯრის სამოქალაქო კალენდარი (ტაბულარული)},
+ 				'islamic-umalqura' => q{ჰიჯრის კალენდარი (უმ-ალ-ქურა)},
  				'iso8601' => q{ISO-8601 კალენდარი},
  				'japanese' => q{იაპონური კალენდარი},
  				'persian' => q{სპარსული კალენდარი},
@@ -1519,6 +1549,7 @@ has 'display_name_type' => (
  				'armnlow' => q{სომხური ქვედა რეგისტრის რიცხვები},
  				'bali' => q{ბალიური ციფრები},
  				'beng' => q{ბენგალური ციფრები},
+ 				'cakm' => q{ჩაკმა ციფრები},
  				'cham' => q{ჩამური ციფრები},
  				'deva' => q{დევანაგარის ციფრები},
  				'ethi' => q{ეთიოპიური რიცხვები},
@@ -1612,7 +1643,7 @@ has 'characters' => (
 			index => ['ა', 'ბ', 'გ', 'დ', 'ე', 'ვ', 'ზ', 'თ', 'ი', 'კ', 'ლ', 'მ', 'ნ', 'ო', 'პ', 'ჟ', 'რ', 'ს', 'ტ', 'უ', 'ფ', 'ქ', 'ღ', 'ყ', 'შ', 'ჩ', 'ც', 'ძ', 'წ', 'ჭ', 'ხ', 'ჯ', 'ჰ'],
 			main => qr{[ა ბ გ დ ე ვ ზ თ ი კ ლ მ ნ ო პ ჟ რ ს ტ უ ფ ქ ღ ყ შ ჩ ც ძ წ ჭ ხ ჯ ჰ]},
 			numbers => qr{[  \- ‑ , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
-			punctuation => qr{[\- ‐ ‑ – — , ; \: ! ? . … ჻ ' ‘ ‚ “ „ « » ( ) \[ \] \{ \} § @ * / \& # † ‡ ′ ″ №]},
+			punctuation => qr{[\- ‐‑ – — , ; \: ! ? . … ჻ '‘‚ “„ « » ( ) \[ \] \{ \} § @ * / \& # † ‡ ′ ″ №]},
 		};
 	},
 EOT
@@ -1621,29 +1652,6 @@ EOT
 },
 );
 
-
-has 'ellipsis' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub {
-		return {
-			'final' => '{0}…',
-			'initial' => '…{0}',
-			'medial' => '{0}…{1}',
-			'word-final' => '{0} …',
-			'word-initial' => '… {0}',
-			'word-medial' => '{0} … {1}',
-		};
-	},
-);
-
-has 'more_information' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{?},
-);
 
 has 'quote_start' => (
 	is			=> 'ro',
@@ -1671,17 +1679,6 @@ has 'alternate_quote_end' => (
 	isa			=> Str,
 	init_arg	=> undef,
 	default		=> qq{»},
-);
-
-has 'duration_units' => (
-	is			=> 'ro',
-	isa			=> HashRef[Str],
-	init_arg	=> undef,
-	default		=> sub { {
-				hm => 'h:mm',
-				hms => 'h:mm:ss',
-				ms => 'm:ss',
-			} }
 );
 
 has 'units' => (
@@ -1803,20 +1800,12 @@ has 'units' => (
 						'1' => q(სანტი{0}),
 					},
 					# Long Unit Identifier
-					'10p-21' => {
-						'1' => q(ზეპტო{0}),
+					'10p-27' => {
+						'1' => q(რონტო{0}),
 					},
 					# Core Unit Identifier
-					'21' => {
-						'1' => q(ზეპტო{0}),
-					},
-					# Long Unit Identifier
-					'10p-24' => {
-						'1' => q(იოქტო{0}),
-					},
-					# Core Unit Identifier
-					'24' => {
-						'1' => q(იოქტო{0}),
+					'27' => {
+						'1' => q(რონტო{0}),
 					},
 					# Long Unit Identifier
 					'10p-3' => {
@@ -1825,6 +1814,14 @@ has 'units' => (
 					# Core Unit Identifier
 					'3' => {
 						'1' => q(მილი{0}),
+					},
+					# Long Unit Identifier
+					'10p-30' => {
+						'1' => q(ქვექტო{0}),
+					},
+					# Core Unit Identifier
+					'30' => {
+						'1' => q(ქვექტო{0}),
 					},
 					# Long Unit Identifier
 					'10p-6' => {
@@ -1843,14 +1840,6 @@ has 'units' => (
 						'1' => q(ნანო{0}),
 					},
 					# Long Unit Identifier
-					'10p1' => {
-						'1' => q(დეკა{0}),
-					},
-					# Core Unit Identifier
-					'10p1' => {
-						'1' => q(დეკა{0}),
-					},
-					# Long Unit Identifier
 					'10p12' => {
 						'1' => q(ტერა{0}),
 					},
@@ -1867,28 +1856,12 @@ has 'units' => (
 						'1' => q(პეტა{0}),
 					},
 					# Long Unit Identifier
-					'10p18' => {
-						'1' => q(ექსა{0}),
-					},
-					# Core Unit Identifier
-					'10p18' => {
-						'1' => q(ექსა{0}),
-					},
-					# Long Unit Identifier
 					'10p2' => {
 						'1' => q(ჰეკტო{0}),
 					},
 					# Core Unit Identifier
 					'10p2' => {
 						'1' => q(ჰეკტო{0}),
-					},
-					# Long Unit Identifier
-					'10p21' => {
-						'1' => q(ზეტა{0}),
-					},
-					# Core Unit Identifier
-					'10p21' => {
-						'1' => q(ზეტა{0}),
 					},
 					# Long Unit Identifier
 					'10p24' => {
@@ -1899,12 +1872,28 @@ has 'units' => (
 						'1' => q(იოტა{0}),
 					},
 					# Long Unit Identifier
+					'10p27' => {
+						'1' => q(რონა{0}),
+					},
+					# Core Unit Identifier
+					'10p27' => {
+						'1' => q(რონა{0}),
+					},
+					# Long Unit Identifier
 					'10p3' => {
 						'1' => q(კილო{0}),
 					},
 					# Core Unit Identifier
 					'10p3' => {
 						'1' => q(კილო{0}),
+					},
+					# Long Unit Identifier
+					'10p30' => {
+						'1' => q(ქვეტა{0}),
+					},
+					# Core Unit Identifier
+					'10p30' => {
+						'1' => q(ქვეტა{0}),
 					},
 					# Long Unit Identifier
 					'10p6' => {
@@ -1937,60 +1926,28 @@ has 'units' => (
 					# Long Unit Identifier
 					'acceleration-meter-per-square-second' => {
 						'name' => q(მეტრი კვადრატულ წამში),
-						'one' => q({0} მ/წმ²),
-						'other' => q({0} მ/წმ²),
 					},
 					# Core Unit Identifier
 					'meter-per-square-second' => {
 						'name' => q(მეტრი კვადრატულ წამში),
-						'one' => q({0} მ/წმ²),
-						'other' => q({0} მ/წმ²),
-					},
-					# Long Unit Identifier
-					'angle-arc-minute' => {
-						'name' => q(მინუტი),
-						'one' => q({0} მინუტი),
-						'other' => q({0} მინუტი),
-					},
-					# Core Unit Identifier
-					'arc-minute' => {
-						'name' => q(მინუტი),
-						'one' => q({0} მინუტი),
-						'other' => q({0} მინუტი),
-					},
-					# Long Unit Identifier
-					'angle-arc-second' => {
-						'name' => q(სეკუნდი),
-						'one' => q({0} სეკუნდი),
-						'other' => q({0} სეკუნდი),
-					},
-					# Core Unit Identifier
-					'arc-second' => {
-						'name' => q(სეკუნდი),
-						'one' => q({0} სეკუნდი),
-						'other' => q({0} სეკუნდი),
 					},
 					# Long Unit Identifier
 					'angle-degree' => {
-						'name' => q(გრადუსი),
 						'one' => q({0} გრადუსი),
 						'other' => q({0} გრადუსი),
 					},
 					# Core Unit Identifier
 					'degree' => {
-						'name' => q(გრადუსი),
 						'one' => q({0} გრადუსი),
 						'other' => q({0} გრადუსი),
 					},
 					# Long Unit Identifier
 					'angle-radian' => {
-						'name' => q(რადიანი),
 						'one' => q({0} რადიანი),
 						'other' => q({0} რადიანი),
 					},
 					# Core Unit Identifier
 					'radian' => {
-						'name' => q(რადიანი),
 						'one' => q({0} რადიანი),
 						'other' => q({0} რადიანი),
 					},
@@ -2005,30 +1962,6 @@ has 'units' => (
 						'name' => q(ბრუნვა),
 						'one' => q({0} ბრუნვა),
 						'other' => q({0} ბრუნვა),
-					},
-					# Long Unit Identifier
-					'area-acre' => {
-						'name' => q(აკრი),
-						'one' => q({0} აკრი),
-						'other' => q({0} აკრი),
-					},
-					# Core Unit Identifier
-					'acre' => {
-						'name' => q(აკრი),
-						'one' => q({0} აკრი),
-						'other' => q({0} აკრი),
-					},
-					# Long Unit Identifier
-					'area-dunam' => {
-						'name' => q(დუნამი),
-						'one' => q({0} დუნამი),
-						'other' => q({0} დუნამი),
-					},
-					# Core Unit Identifier
-					'dunam' => {
-						'name' => q(დუნამი),
-						'one' => q({0} დუნამი),
-						'other' => q({0} დუნამი),
 					},
 					# Long Unit Identifier
 					'area-hectare' => {
@@ -2138,25 +2071,21 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'concentr-item' => {
-						'name' => q(ერთეული),
 						'one' => q({0} ერთეული),
 						'other' => q({0} ერთეული),
 					},
 					# Core Unit Identifier
 					'item' => {
-						'name' => q(ერთეული),
 						'one' => q({0} ერთეული),
 						'other' => q({0} ერთეული),
 					},
 					# Long Unit Identifier
 					'concentr-karat' => {
-						'name' => q(კარატი),
 						'one' => q({0} კარატი),
 						'other' => q({0} კარატი),
 					},
 					# Core Unit Identifier
 					'karat' => {
-						'name' => q(კარატი),
 						'one' => q({0} კარატი),
 						'other' => q({0} კარატი),
 					},
@@ -2283,30 +2212,6 @@ has 'units' => (
 						'west' => q({0} დასავლეთით),
 					},
 					# Long Unit Identifier
-					'digital-bit' => {
-						'name' => q(ბიტი),
-						'one' => q({0} ბიტი),
-						'other' => q({0} ბიტი),
-					},
-					# Core Unit Identifier
-					'bit' => {
-						'name' => q(ბიტი),
-						'one' => q({0} ბიტი),
-						'other' => q({0} ბიტი),
-					},
-					# Long Unit Identifier
-					'digital-byte' => {
-						'name' => q(ბაიტი),
-						'one' => q({0} ბაიტი),
-						'other' => q({0} ბაიტი),
-					},
-					# Core Unit Identifier
-					'byte' => {
-						'name' => q(ბაიტი),
-						'one' => q({0} ბაიტი),
-						'other' => q({0} ბაიტი),
-					},
-					# Long Unit Identifier
 					'digital-gigabit' => {
 						'name' => q(გიგაბიტი),
 						'one' => q({0} გიგაბიტი),
@@ -2344,13 +2249,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'digital-kilobyte' => {
-						'name' => q(კილობაიტი),
 						'one' => q({0} კილობაიტი),
 						'other' => q({0} კილობაიტი),
 					},
 					# Core Unit Identifier
 					'kilobyte' => {
-						'name' => q(კილობაიტი),
 						'one' => q({0} კილობაიტი),
 						'other' => q({0} კილობაიტი),
 					},
@@ -2380,13 +2283,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'digital-petabyte' => {
-						'name' => q(პბაიტი),
 						'one' => q({0} პბაიტი),
 						'other' => q({0} პეტაბაიტი),
 					},
 					# Core Unit Identifier
 					'petabyte' => {
-						'name' => q(პბაიტი),
 						'one' => q({0} პბაიტი),
 						'other' => q({0} პეტაბაიტი),
 					},
@@ -2428,29 +2329,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'duration-day' => {
-						'name' => q(დღე),
-						'one' => q({0} დღე),
-						'other' => q({0} დღე),
 						'per' => q({0} დღეში),
 					},
 					# Core Unit Identifier
 					'day' => {
-						'name' => q(დღე),
-						'one' => q({0} დღე),
-						'other' => q({0} დღე),
 						'per' => q({0} დღეში),
-					},
-					# Long Unit Identifier
-					'duration-decade' => {
-						'name' => q(დეკადა),
-						'one' => q({0} დეკადა),
-						'other' => q({0} დეკადა),
-					},
-					# Core Unit Identifier
-					'decade' => {
-						'name' => q(დეკადა),
-						'one' => q({0} დეკადა),
-						'other' => q({0} დეკადა),
 					},
 					# Long Unit Identifier
 					'duration-hour' => {
@@ -2506,16 +2389,10 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'duration-month' => {
-						'name' => q(თვე),
-						'one' => q({0} თვე),
-						'other' => q({0} თვე),
 						'per' => q({0} თვეში),
 					},
 					# Core Unit Identifier
 					'month' => {
-						'name' => q(თვე),
-						'one' => q({0} თვე),
-						'other' => q({0} თვე),
 						'per' => q({0} თვეში),
 					},
 					# Long Unit Identifier
@@ -2529,6 +2406,20 @@ has 'units' => (
 						'name' => q(ნანოწამი),
 						'one' => q({0} ნანოწამი),
 						'other' => q({0} ნანოწამი),
+					},
+					# Long Unit Identifier
+					'duration-quarter' => {
+						'name' => q(კვარტალი),
+						'one' => q({0} კვარტალი),
+						'other' => q({0} კვარტალი),
+						'per' => q({0}/კვარტალში),
+					},
+					# Core Unit Identifier
+					'quarter' => {
+						'name' => q(კვარტალი),
+						'one' => q({0} კვარტალი),
+						'other' => q({0} კვარტალი),
+						'per' => q({0}/კვარტალში),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
@@ -2575,14 +2466,10 @@ has 'units' => (
 					# Long Unit Identifier
 					'electric-ampere' => {
 						'name' => q(ამპერი),
-						'one' => q({0} ა),
-						'other' => q({0} ა),
 					},
 					# Core Unit Identifier
 					'ampere' => {
 						'name' => q(ამპერი),
-						'one' => q({0} ა),
-						'other' => q({0} ა),
 					},
 					# Long Unit Identifier
 					'electric-milliampere' => {
@@ -2598,25 +2485,21 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'electric-ohm' => {
-						'name' => q(ომი),
 						'one' => q({0} ომი),
 						'other' => q({0} ომი),
 					},
 					# Core Unit Identifier
 					'ohm' => {
-						'name' => q(ომი),
 						'one' => q({0} ომი),
 						'other' => q({0} ომი),
 					},
 					# Long Unit Identifier
 					'electric-volt' => {
-						'name' => q(ვოლტი),
 						'one' => q({0} ვოლტი),
 						'other' => q({0} ვოლტი),
 					},
 					# Core Unit Identifier
 					'volt' => {
-						'name' => q(ვოლტი),
 						'one' => q({0} ვოლტი),
 						'other' => q({0} ვოლტი),
 					},
@@ -2670,13 +2553,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'energy-joule' => {
-						'name' => q(ჯოული),
 						'one' => q({0} ჯოული),
 						'other' => q({0} ჯოული),
 					},
 					# Core Unit Identifier
 					'joule' => {
-						'name' => q(ჯოული),
 						'one' => q({0} ჯოული),
 						'other' => q({0} ჯოული),
 					},
@@ -2715,30 +2596,6 @@ has 'units' => (
 						'name' => q(კილოვატ-საათი),
 						'one' => q({0} კილოვატ-საათი),
 						'other' => q({0} კილოვატ-საათი),
-					},
-					# Long Unit Identifier
-					'energy-therm-us' => {
-						'name' => q(აშშ თერმი),
-						'one' => q({0} აშშ თერმი),
-						'other' => q({0} აშშ თერმი),
-					},
-					# Core Unit Identifier
-					'therm-us' => {
-						'name' => q(აშშ თერმი),
-						'one' => q({0} აშშ თერმი),
-						'other' => q({0} აშშ თერმი),
-					},
-					# Long Unit Identifier
-					'force-kilowatt-hour-per-100-kilometer' => {
-						'name' => q(კვტსთ/100კმ),
-						'one' => q({0} კვტსთ/100კმ),
-						'other' => q({0} კვტსთ/100კმ),
-					},
-					# Core Unit Identifier
-					'kilowatt-hour-per-100-kilometer' => {
-						'name' => q(კვტსთ/100კმ),
-						'one' => q({0} კვტსთ/100კმ),
-						'other' => q({0} კვტსთ/100კმ),
 					},
 					# Long Unit Identifier
 					'frequency-gigahertz' => {
@@ -2827,14 +2684,10 @@ has 'units' => (
 					# Long Unit Identifier
 					'graphics-em' => {
 						'name' => q(ტიპოგრაფიული ემი),
-						'one' => q({0} ემი),
-						'other' => q({0} ემი),
 					},
 					# Core Unit Identifier
 					'em' => {
 						'name' => q(ტიპოგრაფიული ემი),
-						'one' => q({0} ემი),
-						'other' => q({0} ემი),
 					},
 					# Long Unit Identifier
 					'graphics-megapixel' => {
@@ -2935,18 +2788,6 @@ has 'units' => (
 						'other' => q({0} დედამიწის რადიუსი),
 					},
 					# Long Unit Identifier
-					'length-fathom' => {
-						'name' => q(ფატომი),
-						'one' => q({0} ფატომი),
-						'other' => q({0} ფატომი),
-					},
-					# Core Unit Identifier
-					'fathom' => {
-						'name' => q(ფატომი),
-						'one' => q({0} ფატომი),
-						'other' => q({0} ფატომი),
-					},
-					# Long Unit Identifier
 					'length-foot' => {
 						'name' => q(ფუტი),
 						'one' => q({0} ფუტი),
@@ -2961,29 +2802,11 @@ has 'units' => (
 						'per' => q({0} ფუტში),
 					},
 					# Long Unit Identifier
-					'length-furlong' => {
-						'name' => q(ფურლონგი),
-						'one' => q({0} ფურლონგი),
-						'other' => q({0} ფურლონგი),
-					},
-					# Core Unit Identifier
-					'furlong' => {
-						'name' => q(ფურლონგი),
-						'one' => q({0} ფურლონგი),
-						'other' => q({0} ფურლონგი),
-					},
-					# Long Unit Identifier
 					'length-inch' => {
-						'name' => q(დუიმი),
-						'one' => q({0} დუიმი),
-						'other' => q({0} დუიმი),
 						'per' => q({0} დუიმში),
 					},
 					# Core Unit Identifier
 					'inch' => {
-						'name' => q(დუიმი),
-						'one' => q({0} დუიმი),
-						'other' => q({0} დუიმი),
 						'per' => q({0} დუიმში),
 					},
 					# Long Unit Identifier
@@ -3039,18 +2862,6 @@ has 'units' => (
 						'other' => q({0} მიკრომეტრი),
 					},
 					# Long Unit Identifier
-					'length-mile' => {
-						'name' => q(მილი),
-						'one' => q({0} მილი),
-						'other' => q({0} მილი),
-					},
-					# Core Unit Identifier
-					'mile' => {
-						'name' => q(მილი),
-						'one' => q({0} მილი),
-						'other' => q({0} მილი),
-					},
-					# Long Unit Identifier
 					'length-mile-scandinavian' => {
 						'name' => q(სკანდინავიური მილი),
 						'one' => q({0} სკანდინავიური მილი),
@@ -3088,13 +2899,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-nautical-mile' => {
-						'name' => q(საზღვაო მილი),
 						'one' => q({0} საზღვაო მილი),
 						'other' => q({0} საზღვაო მილი),
 					},
 					# Core Unit Identifier
 					'nautical-mile' => {
-						'name' => q(საზღვაო მილი),
 						'one' => q({0} საზღვაო მილი),
 						'other' => q({0} საზღვაო მილი),
 					},
@@ -3147,18 +2956,6 @@ has 'units' => (
 						'other' => q({0} მზის რადიუსი),
 					},
 					# Long Unit Identifier
-					'length-yard' => {
-						'name' => q(იარდი),
-						'one' => q({0} იარდი),
-						'other' => q({0} იარდი),
-					},
-					# Core Unit Identifier
-					'yard' => {
-						'name' => q(იარდი),
-						'one' => q({0} იარდი),
-						'other' => q({0} იარდი),
-					},
-					# Long Unit Identifier
 					'light-candela' => {
 						'name' => q(კანდელა),
 						'one' => q({0} კანდელა),
@@ -3183,18 +2980,6 @@ has 'units' => (
 						'other' => q({0} ლუმენი),
 					},
 					# Long Unit Identifier
-					'light-lux' => {
-						'name' => q(ლუქსი),
-						'one' => q({0} ლუქსი),
-						'other' => q({0} ლუქსი),
-					},
-					# Core Unit Identifier
-					'lux' => {
-						'name' => q(ლუქსი),
-						'one' => q({0} ლუქსი),
-						'other' => q({0} ლუქსი),
-					},
-					# Long Unit Identifier
 					'light-solar-luminosity' => {
 						'name' => q(მზის სხივიერობა),
 						'one' => q({0} მზის სხივიერობა),
@@ -3208,25 +2993,21 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'mass-carat' => {
-						'name' => q(კარატი),
 						'one' => q({0} კარატი),
 						'other' => q({0} კარატი),
 					},
 					# Core Unit Identifier
 					'carat' => {
-						'name' => q(კარატი),
 						'one' => q({0} კარატი),
 						'other' => q({0} კარატი),
 					},
 					# Long Unit Identifier
 					'mass-dalton' => {
-						'name' => q(დალტონი),
 						'one' => q({0} დალტონი),
 						'other' => q({0} დალტონი),
 					},
 					# Core Unit Identifier
 					'dalton' => {
-						'name' => q(დალტონი),
 						'one' => q({0} დალტონი),
 						'other' => q({0} დალტონი),
 					},
@@ -3243,56 +3024,28 @@ has 'units' => (
 						'other' => q({0} დედამიწის მასა),
 					},
 					# Long Unit Identifier
-					'mass-grain' => {
-						'name' => q(გრანი),
-						'one' => q({0} გრანი),
-						'other' => q({0} გრანი),
-					},
-					# Core Unit Identifier
-					'grain' => {
-						'name' => q(გრანი),
-						'one' => q({0} გრანი),
-						'other' => q({0} გრანი),
-					},
-					# Long Unit Identifier
 					'mass-gram' => {
-						'name' => q(გრამი),
 						'one' => q({0} გრამი),
 						'other' => q({0} გრამი),
 						'per' => q({0} გრამში),
 					},
 					# Core Unit Identifier
 					'gram' => {
-						'name' => q(გრამი),
 						'one' => q({0} გრამი),
 						'other' => q({0} გრამი),
 						'per' => q({0} გრამში),
 					},
 					# Long Unit Identifier
 					'mass-kilogram' => {
-						'name' => q(კილოგრამი),
 						'one' => q({0} კილოგრამი),
 						'other' => q({0} კილოგრამი),
 						'per' => q({0} კილოგრამში),
 					},
 					# Core Unit Identifier
 					'kilogram' => {
-						'name' => q(კილოგრამი),
 						'one' => q({0} კილოგრამი),
 						'other' => q({0} კილოგრამი),
 						'per' => q({0} კილოგრამში),
-					},
-					# Long Unit Identifier
-					'mass-metric-ton' => {
-						'name' => q(მეტრული ტონა),
-						'one' => q({0} მეტრული ტონა),
-						'other' => q({0} მეტრული ტონა),
-					},
-					# Core Unit Identifier
-					'metric-ton' => {
-						'name' => q(მეტრული ტონა),
-						'one' => q({0} მეტრული ტონა),
-						'other' => q({0} მეტრული ტონა),
 					},
 					# Long Unit Identifier
 					'mass-microgram' => {
@@ -3320,40 +3073,34 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'mass-ounce' => {
-						'name' => q(უნცია),
 						'one' => q({0} უნცია),
 						'other' => q({0} უნცია),
 						'per' => q({0} უნციაში),
 					},
 					# Core Unit Identifier
 					'ounce' => {
-						'name' => q(უნცია),
 						'one' => q({0} უნცია),
 						'other' => q({0} უნცია),
 						'per' => q({0} უნციაში),
 					},
 					# Long Unit Identifier
 					'mass-ounce-troy' => {
-						'name' => q(ტრუას უნცია),
 						'one' => q({0} ტრუას უნცია),
 						'other' => q({0} ტრუას უნცია),
 					},
 					# Core Unit Identifier
 					'ounce-troy' => {
-						'name' => q(ტრუას უნცია),
 						'one' => q({0} ტრუას უნცია),
 						'other' => q({0} ტრუას უნცია),
 					},
 					# Long Unit Identifier
 					'mass-pound' => {
-						'name' => q(ფუნტი),
 						'one' => q({0} ფუნტი),
 						'other' => q({0} ფუნტი),
 						'per' => q({0} ფუნტში),
 					},
 					# Core Unit Identifier
 					'pound' => {
-						'name' => q(ფუნტი),
 						'one' => q({0} ფუნტი),
 						'other' => q({0} ფუნტი),
 						'per' => q({0} ფუნტში),
@@ -3371,36 +3118,26 @@ has 'units' => (
 						'other' => q({0} მზის მასა),
 					},
 					# Long Unit Identifier
-					'mass-stone' => {
-						'name' => q(სტოუნი),
-						'one' => q({0} სტოუნი),
-						'other' => q({0} სტოუნი),
-					},
-					# Core Unit Identifier
-					'stone' => {
-						'name' => q(სტოუნი),
-						'one' => q({0} სტოუნი),
-						'other' => q({0} სტოუნი),
-					},
-					# Long Unit Identifier
 					'mass-ton' => {
-						'name' => q(ტონა),
 						'one' => q({0} ტონა),
 						'other' => q({0} ტ),
 					},
 					# Core Unit Identifier
 					'ton' => {
-						'name' => q(ტონა),
 						'one' => q({0} ტონა),
 						'other' => q({0} ტ),
 					},
 					# Long Unit Identifier
-					'per' => {
-						'1' => q({0}/{1}),
+					'mass-tonne' => {
+						'name' => q(მეტრული ტონა),
+						'one' => q({0} მეტრული ტონა),
+						'other' => q({0} მეტრული ტონა),
 					},
 					# Core Unit Identifier
-					'per' => {
-						'1' => q({0}/{1}),
+					'tonne' => {
+						'name' => q(მეტრული ტონა),
+						'one' => q({0} მეტრული ტონა),
+						'other' => q({0} მეტრული ტონა),
 					},
 					# Long Unit Identifier
 					'power-gigawatt' => {
@@ -3511,18 +3248,6 @@ has 'units' => (
 						'other' => q({0} ატმოსფერო),
 					},
 					# Long Unit Identifier
-					'pressure-bar' => {
-						'name' => q(ბარი),
-						'one' => q({0} ბარი),
-						'other' => q({0} ბარი),
-					},
-					# Core Unit Identifier
-					'bar' => {
-						'name' => q(ბარი),
-						'one' => q({0} ბარი),
-						'other' => q({0} ბარი),
-					},
-					# Long Unit Identifier
 					'pressure-hectopascal' => {
 						'name' => q(ჰექტოპასკალი),
 						'one' => q({0} ჰექტოპასკალი),
@@ -3619,6 +3344,18 @@ has 'units' => (
 						'other' => q({0} ფუნტი კვადრატულ დუიმზე),
 					},
 					# Long Unit Identifier
+					'speed-beaufort' => {
+						'name' => q(ბოფორტი),
+						'one' => q(ბოფორტი {0}),
+						'other' => q(ბოფორტი {0}),
+					},
+					# Core Unit Identifier
+					'beaufort' => {
+						'name' => q(ბოფორტი),
+						'one' => q(ბოფორტი {0}),
+						'other' => q(ბოფორტი {0}),
+					},
+					# Long Unit Identifier
 					'speed-kilometer-per-hour' => {
 						'name' => q(კილომეტრი საათში),
 						'one' => q({0} კილომეტრი საათში),
@@ -3691,18 +3428,6 @@ has 'units' => (
 						'other' => q({0} გრადუსი ფარენჰეიტით),
 					},
 					# Long Unit Identifier
-					'temperature-generic' => {
-						'name' => q(°),
-						'one' => q({0}°),
-						'other' => q({0}°),
-					},
-					# Core Unit Identifier
-					'generic' => {
-						'name' => q(°),
-						'one' => q({0}°),
-						'other' => q({0}°),
-					},
-					# Long Unit Identifier
 					'temperature-kelvin' => {
 						'name' => q(კელვინის გრადუსი),
 						'one' => q({0} კელვინი),
@@ -3727,18 +3452,6 @@ has 'units' => (
 						'other' => q({0} ნიუტონ-მეტრი),
 					},
 					# Long Unit Identifier
-					'torque-pound-force-foot' => {
-						'name' => q(ფუნტი-ფუტი),
-						'one' => q({0} ფუნტი-ფუტი),
-						'other' => q({0} ფუნტი-ფუტი),
-					},
-					# Core Unit Identifier
-					'pound-force-foot' => {
-						'name' => q(ფუნტი-ფუტი),
-						'one' => q({0} ფუნტი-ფუტი),
-						'other' => q({0} ფუნტი-ფუტი),
-					},
-					# Long Unit Identifier
 					'volume-acre-foot' => {
 						'name' => q(აკრი-ფუტი),
 						'one' => q({0} აკრი-ფუტი),
@@ -3752,27 +3465,13 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'volume-barrel' => {
-						'name' => q(ბარელი),
 						'one' => q({0} ბარელი),
 						'other' => q({0} ბარელი),
 					},
 					# Core Unit Identifier
 					'barrel' => {
-						'name' => q(ბარელი),
 						'one' => q({0} ბარელი),
 						'other' => q({0} ბარელი),
-					},
-					# Long Unit Identifier
-					'volume-bushel' => {
-						'name' => q(ბუშელი),
-						'one' => q({0} ბუშელი),
-						'other' => q({0} ბუშელი),
-					},
-					# Core Unit Identifier
-					'bushel' => {
-						'name' => q(ბუშელი),
-						'one' => q({0} ბუშელი),
-						'other' => q({0} ბუშელი),
 					},
 					# Long Unit Identifier
 					'volume-centiliter' => {
@@ -3826,13 +3525,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'volume-cubic-kilometer' => {
-						'name' => q(კუბური კილომეტრი),
 						'one' => q({0} კუბური კილომეტრი),
 						'other' => q({0} კუბური კილომეტრი),
 					},
 					# Core Unit Identifier
 					'cubic-kilometer' => {
-						'name' => q(კუბური კილომეტრი),
 						'one' => q({0} კუბური კილომეტრი),
 						'other' => q({0} კუბური კილომეტრი),
 					},
@@ -3852,13 +3549,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'volume-cubic-mile' => {
-						'name' => q(კუბური მილი),
 						'one' => q({0} კუბური მილი),
 						'other' => q({0} კუბური მილი),
 					},
 					# Core Unit Identifier
 					'cubic-mile' => {
-						'name' => q(კუბური მილი),
 						'one' => q({0} კუბური მილი),
 						'other' => q({0} კუბური მილი),
 					},
@@ -3873,18 +3568,6 @@ has 'units' => (
 						'name' => q(კუბური იარდი),
 						'one' => q({0} კუბური იარდი),
 						'other' => q({0} კუბური იარდი),
-					},
-					# Long Unit Identifier
-					'volume-cup' => {
-						'name' => q(ჭიქა),
-						'one' => q({0} ჭიქა),
-						'other' => q({0} ჭიქა),
-					},
-					# Core Unit Identifier
-					'cup' => {
-						'name' => q(ჭიქა),
-						'one' => q({0} ჭიქა),
-						'other' => q({0} ჭიქა),
 					},
 					# Long Unit Identifier
 					'volume-cup-metric' => {
@@ -3911,26 +3594,12 @@ has 'units' => (
 						'other' => q({0} დეცილიტრი),
 					},
 					# Long Unit Identifier
-					'volume-dessert-spoon' => {
-						'name' => q(დესერტის კოვზი),
-						'one' => q({0} დესერტის კოვზი),
-						'other' => q({0} დესერტის კოვზი),
-					},
-					# Core Unit Identifier
-					'dessert-spoon' => {
-						'name' => q(დესერტის კოვზი),
-						'one' => q({0} დესერტის კოვზი),
-						'other' => q({0} დესერტის კოვზი),
-					},
-					# Long Unit Identifier
 					'volume-dessert-spoon-imperial' => {
-						'name' => q(ბრიტ. დესერტის კოვზი),
 						'one' => q({0} ბრიტ. დესერტის კოვზი),
 						'other' => q({0} ბრიტ. დესერტის კოვზი),
 					},
 					# Core Unit Identifier
 					'dessert-spoon-imperial' => {
-						'name' => q(ბრიტ. დესერტის კოვზი),
 						'one' => q({0} ბრიტ. დესერტის კოვზი),
 						'other' => q({0} ბრიტ. დესერტის კოვზი),
 					},
@@ -3945,18 +3614,6 @@ has 'units' => (
 						'name' => q(ბრიტანული თხევადი დრაქმა),
 						'one' => q({0} ბრიტანული თხევადი დრაქმა),
 						'other' => q({0} ბრიტანული თხევადი დრაქმა),
-					},
-					# Long Unit Identifier
-					'volume-drop' => {
-						'name' => q(წვეთი),
-						'one' => q({0} წვეთი),
-						'other' => q({0} წვეთი),
-					},
-					# Core Unit Identifier
-					'drop' => {
-						'name' => q(წვეთი),
-						'one' => q({0} წვეთი),
-						'other' => q({0} წვეთი),
 					},
 					# Long Unit Identifier
 					'volume-fluid-ounce' => {
@@ -3984,16 +3641,10 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'volume-gallon' => {
-						'name' => q(გალონი),
-						'one' => q({0} გალონი),
-						'other' => q({0} გალონი),
 						'per' => q({0} გალონში),
 					},
 					# Core Unit Identifier
 					'gallon' => {
-						'name' => q(გალონი),
-						'one' => q({0} გალონი),
-						'other' => q({0} გალონი),
 						'per' => q({0} გალონში),
 					},
 					# Long Unit Identifier
@@ -4001,14 +3652,12 @@ has 'units' => (
 						'name' => q(იმპ. გალონი),
 						'one' => q({0} იმპ. გალონი),
 						'other' => q({0} იმპ. გალონი),
-						'per' => q({0}/იმპ. გალ.),
 					},
 					# Core Unit Identifier
 					'gallon-imperial' => {
 						'name' => q(იმპ. გალონი),
 						'one' => q({0} იმპ. გალონი),
 						'other' => q({0} იმპ. გალონი),
-						'per' => q({0}/იმპ. გალ.),
 					},
 					# Long Unit Identifier
 					'volume-hectoliter' => {
@@ -4023,27 +3672,13 @@ has 'units' => (
 						'other' => q({0} ჰექტოლიტრი),
 					},
 					# Long Unit Identifier
-					'volume-jigger' => {
-						'name' => q(ჯიგერი),
-						'one' => q({0} ჯიგერი),
-						'other' => q({0} ჯიგერი),
-					},
-					# Core Unit Identifier
-					'jigger' => {
-						'name' => q(ჯიგერი),
-						'one' => q({0} ჯიგერი),
-						'other' => q({0} ჯიგერი),
-					},
-					# Long Unit Identifier
 					'volume-liter' => {
-						'name' => q(ლიტრი),
 						'one' => q({0} ლიტრი),
 						'other' => q({0} ლიტრი),
 						'per' => q({0} ლიტრში),
 					},
 					# Core Unit Identifier
 					'liter' => {
-						'name' => q(ლიტრი),
 						'one' => q({0} ლიტრი),
 						'other' => q({0} ლიტრი),
 						'per' => q({0} ლიტრში),
@@ -4073,30 +3708,6 @@ has 'units' => (
 						'other' => q({0} მილილიტრი),
 					},
 					# Long Unit Identifier
-					'volume-pinch' => {
-						'name' => q(მწიკვი),
-						'one' => q({0} მწიკვი),
-						'other' => q({0} მწიკვი),
-					},
-					# Core Unit Identifier
-					'pinch' => {
-						'name' => q(მწიკვი),
-						'one' => q({0} მწიკვი),
-						'other' => q({0} მწიკვი),
-					},
-					# Long Unit Identifier
-					'volume-pint' => {
-						'name' => q(პინტა),
-						'one' => q({0} პინტა),
-						'other' => q({0} პინტა),
-					},
-					# Core Unit Identifier
-					'pint' => {
-						'name' => q(პინტა),
-						'one' => q({0} პინტა),
-						'other' => q({0} პინტა),
-					},
-					# Long Unit Identifier
 					'volume-pint-metric' => {
 						'name' => q(მეტრული პინტა),
 						'one' => q({0} მეტრული პინტა),
@@ -4107,18 +3718,6 @@ has 'units' => (
 						'name' => q(მეტრული პინტა),
 						'one' => q({0} მეტრული პინტა),
 						'other' => q({0} მეტრული პინტა),
-					},
-					# Long Unit Identifier
-					'volume-quart' => {
-						'name' => q(კვარტა),
-						'one' => q({0} კვარტა),
-						'other' => q({0} კვარტა),
-					},
-					# Core Unit Identifier
-					'quart' => {
-						'name' => q(კვარტა),
-						'one' => q({0} კვარტა),
-						'other' => q({0} კვარტა),
 					},
 					# Long Unit Identifier
 					'volume-quart-imperial' => {
@@ -4159,248 +3758,6 @@ has 'units' => (
 				},
 				'narrow' => {
 					# Long Unit Identifier
-					'' => {
-						'name' => q(მიმართულება),
-					},
-					# Core Unit Identifier
-					'' => {
-						'name' => q(მიმართულება),
-					},
-					# Long Unit Identifier
-					'1024p1' => {
-						'1' => q(კი{0}),
-					},
-					# Core Unit Identifier
-					'1024p1' => {
-						'1' => q(კი{0}),
-					},
-					# Long Unit Identifier
-					'1024p2' => {
-						'1' => q(მე{0}),
-					},
-					# Core Unit Identifier
-					'1024p2' => {
-						'1' => q(მე{0}),
-					},
-					# Long Unit Identifier
-					'1024p3' => {
-						'1' => q(გი{0}),
-					},
-					# Core Unit Identifier
-					'1024p3' => {
-						'1' => q(გი{0}),
-					},
-					# Long Unit Identifier
-					'1024p4' => {
-						'1' => q(ტე{0}),
-					},
-					# Core Unit Identifier
-					'1024p4' => {
-						'1' => q(ტე{0}),
-					},
-					# Long Unit Identifier
-					'1024p5' => {
-						'1' => q(პე{0}),
-					},
-					# Core Unit Identifier
-					'1024p5' => {
-						'1' => q(პე{0}),
-					},
-					# Long Unit Identifier
-					'1024p6' => {
-						'1' => q(ექს{0}),
-					},
-					# Core Unit Identifier
-					'1024p6' => {
-						'1' => q(ექს{0}),
-					},
-					# Long Unit Identifier
-					'1024p7' => {
-						'1' => q(ზე{0}),
-					},
-					# Core Unit Identifier
-					'1024p7' => {
-						'1' => q(ზე{0}),
-					},
-					# Long Unit Identifier
-					'1024p8' => {
-						'1' => q(იო{0}),
-					},
-					# Core Unit Identifier
-					'1024p8' => {
-						'1' => q(იო{0}),
-					},
-					# Long Unit Identifier
-					'10p-1' => {
-						'1' => q(დ{0}),
-					},
-					# Core Unit Identifier
-					'1' => {
-						'1' => q(დ{0}),
-					},
-					# Long Unit Identifier
-					'10p-12' => {
-						'1' => q(პკ{0}),
-					},
-					# Core Unit Identifier
-					'12' => {
-						'1' => q(პკ{0}),
-					},
-					# Long Unit Identifier
-					'10p-15' => {
-						'1' => q(ფ{0}),
-					},
-					# Core Unit Identifier
-					'15' => {
-						'1' => q(ფ{0}),
-					},
-					# Long Unit Identifier
-					'10p-18' => {
-						'1' => q(ა{0}),
-					},
-					# Core Unit Identifier
-					'18' => {
-						'1' => q(ა{0}),
-					},
-					# Long Unit Identifier
-					'10p-2' => {
-						'1' => q(ს{0}),
-					},
-					# Core Unit Identifier
-					'2' => {
-						'1' => q(ს{0}),
-					},
-					# Long Unit Identifier
-					'10p-21' => {
-						'1' => q(ზეპტო{0}),
-					},
-					# Core Unit Identifier
-					'21' => {
-						'1' => q(ზეპტო{0}),
-					},
-					# Long Unit Identifier
-					'10p-24' => {
-						'1' => q(იოქტო{0}),
-					},
-					# Core Unit Identifier
-					'24' => {
-						'1' => q(იოქტო{0}),
-					},
-					# Long Unit Identifier
-					'10p-3' => {
-						'1' => q(მ{0}),
-					},
-					# Core Unit Identifier
-					'3' => {
-						'1' => q(მ{0}),
-					},
-					# Long Unit Identifier
-					'10p-6' => {
-						'1' => q(მკ{0}),
-					},
-					# Core Unit Identifier
-					'6' => {
-						'1' => q(მკ{0}),
-					},
-					# Long Unit Identifier
-					'10p-9' => {
-						'1' => q(ნ{0}),
-					},
-					# Core Unit Identifier
-					'9' => {
-						'1' => q(ნ{0}),
-					},
-					# Long Unit Identifier
-					'10p1' => {
-						'1' => q(დეკა{0}),
-					},
-					# Core Unit Identifier
-					'10p1' => {
-						'1' => q(დეკა{0}),
-					},
-					# Long Unit Identifier
-					'10p12' => {
-						'1' => q(ტ{0}),
-					},
-					# Core Unit Identifier
-					'10p12' => {
-						'1' => q(ტ{0}),
-					},
-					# Long Unit Identifier
-					'10p15' => {
-						'1' => q(პტ{0}),
-					},
-					# Core Unit Identifier
-					'10p15' => {
-						'1' => q(პტ{0}),
-					},
-					# Long Unit Identifier
-					'10p18' => {
-						'1' => q(ექსა{0}),
-					},
-					# Core Unit Identifier
-					'10p18' => {
-						'1' => q(ექსა{0}),
-					},
-					# Long Unit Identifier
-					'10p2' => {
-						'1' => q(ჰ{0}),
-					},
-					# Core Unit Identifier
-					'10p2' => {
-						'1' => q(ჰ{0}),
-					},
-					# Long Unit Identifier
-					'10p21' => {
-						'1' => q(ზეტა{0}),
-					},
-					# Core Unit Identifier
-					'10p21' => {
-						'1' => q(ზეტა{0}),
-					},
-					# Long Unit Identifier
-					'10p24' => {
-						'1' => q(ი{0}),
-					},
-					# Core Unit Identifier
-					'10p24' => {
-						'1' => q(ი{0}),
-					},
-					# Long Unit Identifier
-					'10p3' => {
-						'1' => q(კ{0}),
-					},
-					# Core Unit Identifier
-					'10p3' => {
-						'1' => q(კ{0}),
-					},
-					# Long Unit Identifier
-					'10p6' => {
-						'1' => q(M{0}),
-					},
-					# Core Unit Identifier
-					'10p6' => {
-						'1' => q(M{0}),
-					},
-					# Long Unit Identifier
-					'10p9' => {
-						'1' => q(გ{0}),
-					},
-					# Core Unit Identifier
-					'10p9' => {
-						'1' => q(გ{0}),
-					},
-					# Long Unit Identifier
-					'acceleration-g-force' => {
-						'one' => q({0} ინ. ძ.),
-						'other' => q({0} ინ. ძ.),
-					},
-					# Core Unit Identifier
-					'g-force' => {
-						'one' => q({0} ინ. ძ.),
-						'other' => q({0} ინ. ძ.),
-					},
-					# Long Unit Identifier
 					'angle-arc-minute' => {
 						'one' => q({0} წთ),
 						'other' => q({0} წთ),
@@ -4421,134 +3778,14 @@ has 'units' => (
 						'other' => q({0} წმ),
 					},
 					# Long Unit Identifier
-					'angle-degree' => {
-						'one' => q({0}°),
-						'other' => q({0}°),
-					},
-					# Core Unit Identifier
-					'degree' => {
-						'one' => q({0}°),
-						'other' => q({0}°),
-					},
-					# Long Unit Identifier
-					'area-acre' => {
-						'one' => q({0} აკრი),
-						'other' => q({0} აკრი),
-					},
-					# Core Unit Identifier
-					'acre' => {
-						'one' => q({0} აკრი),
-						'other' => q({0} აკრი),
-					},
-					# Long Unit Identifier
-					'area-hectare' => {
-						'one' => q({0} ჰა),
-						'other' => q({0} ჰა),
-					},
-					# Core Unit Identifier
-					'hectare' => {
-						'one' => q({0} ჰა),
-						'other' => q({0} ჰა),
-					},
-					# Long Unit Identifier
-					'area-square-foot' => {
-						'one' => q({0} ფტ²),
-						'other' => q({0} ფტ²),
-					},
-					# Core Unit Identifier
-					'square-foot' => {
-						'one' => q({0} ფტ²),
-						'other' => q({0} ფტ²),
-					},
-					# Long Unit Identifier
-					'area-square-kilometer' => {
-						'one' => q({0} კმ²),
-						'other' => q({0} კმ²),
-					},
-					# Core Unit Identifier
-					'square-kilometer' => {
-						'one' => q({0} კმ²),
-						'other' => q({0} კმ²),
-					},
-					# Long Unit Identifier
-					'area-square-meter' => {
-						'one' => q({0} მ²),
-						'other' => q({0} მ²),
-					},
-					# Core Unit Identifier
-					'square-meter' => {
-						'one' => q({0} მ²),
-						'other' => q({0} მ²),
-					},
-					# Long Unit Identifier
-					'area-square-mile' => {
-						'one' => q({0} მილი²),
-						'other' => q({0} მილი²),
-					},
-					# Core Unit Identifier
-					'square-mile' => {
-						'one' => q({0} მილი²),
-						'other' => q({0} მილი²),
-					},
-					# Long Unit Identifier
-					'concentr-item' => {
-						'one' => q({0} ერთეული),
-						'other' => q({0} ერთეული),
-					},
-					# Core Unit Identifier
-					'item' => {
-						'one' => q({0} ერთეული),
-						'other' => q({0} ერთეული),
-					},
-					# Long Unit Identifier
-					'concentr-percent' => {
-						'name' => q(%),
-						'one' => q({0}%),
-						'other' => q({0}%),
-					},
-					# Core Unit Identifier
-					'percent' => {
-						'name' => q(%),
-						'one' => q({0}%),
-						'other' => q({0}%),
-					},
-					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
-						'name' => q(ლ/100კმ),
 						'one' => q({0}ლ/100კმ),
 						'other' => q({0}ლ/100კმ),
 					},
 					# Core Unit Identifier
 					'liter-per-100-kilometer' => {
-						'name' => q(ლ/100კმ),
 						'one' => q({0}ლ/100კმ),
 						'other' => q({0}ლ/100კმ),
-					},
-					# Long Unit Identifier
-					'coordinate' => {
-						'east' => q({0}აღმ.),
-						'north' => q({0}ჩრდ.),
-						'south' => q({0} სამხრ.),
-						'west' => q({0} დას.),
-					},
-					# Core Unit Identifier
-					'coordinate' => {
-						'east' => q({0}აღმ.),
-						'north' => q({0}ჩრდ.),
-						'south' => q({0} სამხრ.),
-						'west' => q({0} დას.),
-					},
-					# Long Unit Identifier
-					'duration-day' => {
-						'name' => q(დღე),
-						'one' => q({0} დღე),
-						'other' => q({0} დღე),
-					},
-					# Core Unit Identifier
-					'day' => {
-						'name' => q(დღე),
-						'one' => q({0} დღე),
-						'other' => q({0} დღე),
 					},
 					# Long Unit Identifier
 					'duration-hour' => {
@@ -4563,108 +3800,32 @@ has 'units' => (
 						'other' => q({0}სთ),
 					},
 					# Long Unit Identifier
-					'duration-millisecond' => {
-						'name' => q(მწმ),
-						'one' => q({0} მწმ),
-						'other' => q({0} მწმ),
-					},
-					# Core Unit Identifier
-					'millisecond' => {
-						'name' => q(მწმ),
-						'one' => q({0} მწმ),
-						'other' => q({0} მწმ),
-					},
-					# Long Unit Identifier
 					'duration-minute' => {
-						'name' => q(წთ),
 						'one' => q({0}წთ),
 						'other' => q({0}წთ),
 					},
 					# Core Unit Identifier
 					'minute' => {
-						'name' => q(წთ),
 						'one' => q({0}წთ),
 						'other' => q({0}წთ),
 					},
 					# Long Unit Identifier
 					'duration-month' => {
-						'name' => q(თვე),
-						'one' => q({0} თვე),
-						'other' => q({0} თვე),
+						'per' => q({0}/თ.),
 					},
 					# Core Unit Identifier
 					'month' => {
-						'name' => q(თვე),
-						'one' => q({0} თვე),
-						'other' => q({0} თვე),
+						'per' => q({0}/თ.),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
-						'name' => q(წმ),
 						'one' => q({0}წმ),
 						'other' => q({0}წმ),
 					},
 					# Core Unit Identifier
 					'second' => {
-						'name' => q(წმ),
 						'one' => q({0}წმ),
 						'other' => q({0}წმ),
-					},
-					# Long Unit Identifier
-					'duration-week' => {
-						'name' => q(კვრ),
-						'one' => q({0} კვრ),
-						'other' => q({0} კვრ),
-					},
-					# Core Unit Identifier
-					'week' => {
-						'name' => q(კვრ),
-						'one' => q({0} კვრ),
-						'other' => q({0} კვრ),
-					},
-					# Long Unit Identifier
-					'duration-year' => {
-						'name' => q(წ),
-						'one' => q({0} წ),
-						'other' => q({0} წ),
-					},
-					# Core Unit Identifier
-					'year' => {
-						'name' => q(წ),
-						'one' => q({0} წ),
-						'other' => q({0} წ),
-					},
-					# Long Unit Identifier
-					'force-kilowatt-hour-per-100-kilometer' => {
-						'one' => q({0} კვტსთ/100კმ),
-						'other' => q({0} კვტსთ/100კმ),
-					},
-					# Core Unit Identifier
-					'kilowatt-hour-per-100-kilometer' => {
-						'one' => q({0} კვტსთ/100კმ),
-						'other' => q({0} კვტსთ/100კმ),
-					},
-					# Long Unit Identifier
-					'length-centimeter' => {
-						'name' => q(სმ),
-						'one' => q({0} სმ),
-						'other' => q({0} სმ),
-					},
-					# Core Unit Identifier
-					'centimeter' => {
-						'name' => q(სმ),
-						'one' => q({0} სმ),
-						'other' => q({0} სმ),
-					},
-					# Long Unit Identifier
-					'length-foot' => {
-						'one' => q({0} ფტ),
-						'other' => q({0} ფტ),
-					},
-					# Core Unit Identifier
-					'foot' => {
-						'one' => q({0} ფტ),
-						'other' => q({0} ფტ),
 					},
 					# Long Unit Identifier
 					'length-inch' => {
@@ -4677,90 +3838,22 @@ has 'units' => (
 						'other' => q({0} დმ),
 					},
 					# Long Unit Identifier
-					'length-kilometer' => {
-						'name' => q(კმ),
-						'one' => q({0} კმ),
-						'other' => q({0} კმ),
-					},
-					# Core Unit Identifier
-					'kilometer' => {
-						'name' => q(კმ),
-						'one' => q({0} კმ),
-						'other' => q({0} კმ),
-					},
-					# Long Unit Identifier
-					'length-light-year' => {
-						'one' => q({0} სწ),
-						'other' => q({0} სწ),
-					},
-					# Core Unit Identifier
-					'light-year' => {
-						'one' => q({0} სწ),
-						'other' => q({0} სწ),
-					},
-					# Long Unit Identifier
 					'length-meter' => {
-						'name' => q(მ),
 						'one' => q({0}მ),
 						'other' => q({0}მ),
 					},
 					# Core Unit Identifier
 					'meter' => {
-						'name' => q(მ),
 						'one' => q({0}მ),
 						'other' => q({0}მ),
 					},
 					# Long Unit Identifier
-					'length-mile' => {
-						'one' => q({0} მილი),
-						'other' => q({0} მილი),
-					},
-					# Core Unit Identifier
-					'mile' => {
-						'one' => q({0} მილი),
-						'other' => q({0} მილი),
-					},
-					# Long Unit Identifier
-					'length-millimeter' => {
-						'name' => q(მმ),
-						'one' => q({0} მმ),
-						'other' => q({0} მმ),
-					},
-					# Core Unit Identifier
-					'millimeter' => {
-						'name' => q(მმ),
-						'one' => q({0} მმ),
-						'other' => q({0} მმ),
-					},
-					# Long Unit Identifier
-					'length-picometer' => {
-						'one' => q({0} პმ),
-						'other' => q({0} პმ),
-					},
-					# Core Unit Identifier
-					'picometer' => {
-						'one' => q({0} პმ),
-						'other' => q({0} პმ),
-					},
-					# Long Unit Identifier
-					'length-yard' => {
-						'one' => q({0} იარდი),
-						'other' => q({0} იარდი),
-					},
-					# Core Unit Identifier
-					'yard' => {
-						'one' => q({0} იარდი),
-						'other' => q({0} იარდი),
-					},
-					# Long Unit Identifier
 					'mass-gram' => {
-						'name' => q(გრამი),
 						'one' => q({0}გ),
 						'other' => q({0}გ),
 					},
 					# Core Unit Identifier
 					'gram' => {
-						'name' => q(გრამი),
 						'one' => q({0}გ),
 						'other' => q({0}გ),
 					},
@@ -4777,32 +3870,34 @@ has 'units' => (
 						'other' => q({0}კგ),
 					},
 					# Long Unit Identifier
-					'mass-ounce' => {
-						'one' => q({0} უნც),
-						'other' => q({0} უნც),
+					'mass-microgram' => {
+						'one' => q({0}მკგ),
+						'other' => q({0}მკგ),
 					},
 					# Core Unit Identifier
-					'ounce' => {
-						'one' => q({0} უნც),
-						'other' => q({0} უნც),
+					'microgram' => {
+						'one' => q({0}მკგ),
+						'other' => q({0}მკგ),
 					},
 					# Long Unit Identifier
-					'mass-pound' => {
-						'one' => q({0} ფნტ),
-						'other' => q({0} ფნტ),
+					'mass-milligram' => {
+						'one' => q({0}მგ),
+						'other' => q({0}მგ),
 					},
 					# Core Unit Identifier
-					'pound' => {
-						'one' => q({0} ფნტ),
-						'other' => q({0} ფნტ),
+					'milligram' => {
+						'one' => q({0}მგ),
+						'other' => q({0}მგ),
 					},
 					# Long Unit Identifier
-					'per' => {
-						'1' => q({0}/{1}),
+					'mass-ton' => {
+						'one' => q({0}ტ),
+						'other' => q({0}ტ),
 					},
 					# Core Unit Identifier
-					'per' => {
-						'1' => q({0}/{1}),
+					'ton' => {
+						'one' => q({0}ტ),
+						'other' => q({0}ტ),
 					},
 					# Long Unit Identifier
 					'power-horsepower' => {
@@ -4815,70 +3910,6 @@ has 'units' => (
 						'other' => q({0}ცხ.ძ.),
 					},
 					# Long Unit Identifier
-					'power-kilowatt' => {
-						'one' => q({0} კვტ),
-						'other' => q({0} კვტ),
-					},
-					# Core Unit Identifier
-					'kilowatt' => {
-						'one' => q({0} კვტ),
-						'other' => q({0} კვტ),
-					},
-					# Long Unit Identifier
-					'power-watt' => {
-						'one' => q({0} ვტ),
-						'other' => q({0} ვტ),
-					},
-					# Core Unit Identifier
-					'watt' => {
-						'one' => q({0} ვტ),
-						'other' => q({0} ვტ),
-					},
-					# Long Unit Identifier
-					'power2' => {
-						'1' => q({0}²),
-						'one' => q({0}²),
-						'other' => q({0}²),
-					},
-					# Core Unit Identifier
-					'power2' => {
-						'1' => q({0}²),
-						'one' => q({0}²),
-						'other' => q({0}²),
-					},
-					# Long Unit Identifier
-					'power3' => {
-						'1' => q({0}³),
-						'one' => q({0}³),
-						'other' => q({0}³),
-					},
-					# Core Unit Identifier
-					'power3' => {
-						'1' => q({0}³),
-						'one' => q({0}³),
-						'other' => q({0}³),
-					},
-					# Long Unit Identifier
-					'pressure-hectopascal' => {
-						'one' => q({0} ჰპა),
-						'other' => q({0} ჰპა),
-					},
-					# Core Unit Identifier
-					'hectopascal' => {
-						'one' => q({0} ჰპა),
-						'other' => q({0} ჰპა),
-					},
-					# Long Unit Identifier
-					'pressure-inch-ofhg' => {
-						'one' => q({0} ვრც. დმ.),
-						'other' => q({0} ვრც. დმ.),
-					},
-					# Core Unit Identifier
-					'inch-ofhg' => {
-						'one' => q({0} ვრც. დმ.),
-						'other' => q({0} ვრც. დმ.),
-					},
-					# Long Unit Identifier
 					'pressure-millibar' => {
 						'one' => q({0} მბრ),
 						'other' => q({0} მბრ),
@@ -4889,88 +3920,12 @@ has 'units' => (
 						'other' => q({0} მბრ),
 					},
 					# Long Unit Identifier
-					'speed-kilometer-per-hour' => {
-						'name' => q(კმ/სთ),
-						'one' => q({0} კმ/სთ),
-						'other' => q({0} კმ/სთ),
-					},
-					# Core Unit Identifier
-					'kilometer-per-hour' => {
-						'name' => q(კმ/სთ),
-						'one' => q({0} კმ/სთ),
-						'other' => q({0} კმ/სთ),
-					},
-					# Long Unit Identifier
-					'speed-meter-per-second' => {
-						'one' => q({0} მ/წმ),
-						'other' => q({0} მ/წმ),
-					},
-					# Core Unit Identifier
-					'meter-per-second' => {
-						'one' => q({0} მ/წმ),
-						'other' => q({0} მ/წმ),
-					},
-					# Long Unit Identifier
-					'speed-mile-per-hour' => {
-						'one' => q({0} მილი/სთ),
-						'other' => q({0} მილი/სთ),
-					},
-					# Core Unit Identifier
-					'mile-per-hour' => {
-						'one' => q({0} მილი/სთ),
-						'other' => q({0} მილი/სთ),
-					},
-					# Long Unit Identifier
-					'temperature-celsius' => {
-						'name' => q(°C),
-						'one' => q({0}°C),
-						'other' => q({0}°C),
-					},
-					# Core Unit Identifier
-					'celsius' => {
-						'name' => q(°C),
-						'one' => q({0}°C),
-						'other' => q({0}°C),
-					},
-					# Long Unit Identifier
-					'temperature-fahrenheit' => {
-						'one' => q({0}°F),
-						'other' => q({0}°F),
-					},
-					# Core Unit Identifier
-					'fahrenheit' => {
-						'one' => q({0}°F),
-						'other' => q({0}°F),
-					},
-					# Long Unit Identifier
-					'volume-cubic-kilometer' => {
-						'one' => q({0} კმ³),
-						'other' => q({0} კმ³),
-					},
-					# Core Unit Identifier
-					'cubic-kilometer' => {
-						'one' => q({0} კმ³),
-						'other' => q({0} კმ³),
-					},
-					# Long Unit Identifier
-					'volume-cubic-mile' => {
-						'one' => q({0} მილი³),
-						'other' => q({0} მილი³),
-					},
-					# Core Unit Identifier
-					'cubic-mile' => {
-						'one' => q({0} მილი³),
-						'other' => q({0} მილი³),
-					},
-					# Long Unit Identifier
 					'volume-liter' => {
-						'name' => q(ლიტრი),
 						'one' => q({0}ლ),
 						'other' => q({0}ლ),
 					},
 					# Core Unit Identifier
 					'liter' => {
-						'name' => q(ლიტრი),
 						'one' => q({0}ლ),
 						'other' => q({0}ლ),
 					},
@@ -5105,12 +4060,28 @@ has 'units' => (
 						'1' => q(იოქტო{0}),
 					},
 					# Long Unit Identifier
+					'10p-27' => {
+						'1' => q(რ{0}),
+					},
+					# Core Unit Identifier
+					'27' => {
+						'1' => q(რ{0}),
+					},
+					# Long Unit Identifier
 					'10p-3' => {
 						'1' => q(მ{0}),
 					},
 					# Core Unit Identifier
 					'3' => {
 						'1' => q(მ{0}),
+					},
+					# Long Unit Identifier
+					'10p-30' => {
+						'1' => q(ქ{0}),
+					},
+					# Core Unit Identifier
+					'30' => {
+						'1' => q(ქ{0}),
 					},
 					# Long Unit Identifier
 					'10p-6' => {
@@ -5185,6 +4156,14 @@ has 'units' => (
 						'1' => q(ი{0}),
 					},
 					# Long Unit Identifier
+					'10p27' => {
+						'1' => q(რა{0}),
+					},
+					# Core Unit Identifier
+					'10p27' => {
+						'1' => q(რა{0}),
+					},
+					# Long Unit Identifier
 					'10p3' => {
 						'1' => q(კ{0}),
 					},
@@ -5193,12 +4172,12 @@ has 'units' => (
 						'1' => q(კ{0}),
 					},
 					# Long Unit Identifier
-					'10p6' => {
-						'1' => q(M{0}),
+					'10p30' => {
+						'1' => q(ქა{0}),
 					},
 					# Core Unit Identifier
-					'10p6' => {
-						'1' => q(M{0}),
+					'10p30' => {
+						'1' => q(ქა{0}),
 					},
 					# Long Unit Identifier
 					'10p9' => {
@@ -5259,14 +4238,10 @@ has 'units' => (
 					# Long Unit Identifier
 					'angle-degree' => {
 						'name' => q(გრადუსი),
-						'one' => q({0}°),
-						'other' => q({0}°),
 					},
 					# Core Unit Identifier
 					'degree' => {
 						'name' => q(გრადუსი),
-						'one' => q({0}°),
-						'other' => q({0}°),
 					},
 					# Long Unit Identifier
 					'angle-radian' => {
@@ -5425,14 +4400,14 @@ has 'units' => (
 					# Long Unit Identifier
 					'concentr-item' => {
 						'name' => q(ერთეული),
-						'one' => q({0} ერთეული),
-						'other' => q({0} ერთეული),
+						'one' => q({0} ერთე.),
+						'other' => q({0} ერთე.),
 					},
 					# Core Unit Identifier
 					'item' => {
 						'name' => q(ერთეული),
-						'one' => q({0} ერთეული),
-						'other' => q({0} ერთეული),
+						'one' => q({0} ერთე.),
+						'other' => q({0} ერთე.),
 					},
 					# Long Unit Identifier
 					'concentr-karat' => {
@@ -5471,40 +4446,12 @@ has 'units' => (
 						'other' => q({0} მმოლ/ლ),
 					},
 					# Long Unit Identifier
-					'concentr-percent' => {
-						'name' => q(%),
-						'one' => q({0}%),
-						'other' => q({0}%),
-					},
-					# Core Unit Identifier
-					'percent' => {
-						'name' => q(%),
-						'one' => q({0}%),
-						'other' => q({0}%),
-					},
-					# Long Unit Identifier
-					'concentr-permille' => {
-						'name' => q(‰),
-						'one' => q({0}‰),
-						'other' => q({0}‰),
-					},
-					# Core Unit Identifier
-					'permille' => {
-						'name' => q(‰),
-						'one' => q({0}‰),
-						'other' => q({0}‰),
-					},
-					# Long Unit Identifier
 					'concentr-permillion' => {
 						'name' => q(ნაწილი/მილიონზე),
-						'one' => q({0} ppm),
-						'other' => q({0} ppm),
 					},
 					# Core Unit Identifier
 					'permillion' => {
 						'name' => q(ნაწილი/მილიონზე),
-						'one' => q({0} ppm),
-						'other' => q({0} ppm),
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
@@ -5605,18 +4552,6 @@ has 'units' => (
 						'other' => q({0} გბიტი),
 					},
 					# Long Unit Identifier
-					'digital-gigabyte' => {
-						'name' => q(GB),
-						'one' => q({0} GB),
-						'other' => q({0} GB),
-					},
-					# Core Unit Identifier
-					'gigabyte' => {
-						'name' => q(GB),
-						'one' => q({0} GB),
-						'other' => q({0} GB),
-					},
-					# Long Unit Identifier
 					'digital-kilobit' => {
 						'name' => q(კბიტი),
 						'one' => q({0} კბიტი),
@@ -5651,18 +4586,6 @@ has 'units' => (
 						'name' => q(მბიტი),
 						'one' => q({0} მბიტი),
 						'other' => q({0} მბიტი),
-					},
-					# Long Unit Identifier
-					'digital-megabyte' => {
-						'name' => q(MB),
-						'one' => q({0} MB),
-						'other' => q({0} MB),
-					},
-					# Core Unit Identifier
-					'megabyte' => {
-						'name' => q(MB),
-						'one' => q({0} MB),
-						'other' => q({0} MB),
 					},
 					# Long Unit Identifier
 					'digital-petabyte' => {
@@ -5815,6 +4738,20 @@ has 'units' => (
 						'name' => q(ნწმ),
 						'one' => q({0} ნწმ),
 						'other' => q({0} ნწმ),
+					},
+					# Long Unit Identifier
+					'duration-quarter' => {
+						'name' => q(კვარტ),
+						'one' => q({0} კვარტ),
+						'other' => q({0} კვარტ),
+						'per' => q({0}/კვარტ),
+					},
+					# Core Unit Identifier
+					'quarter' => {
+						'name' => q(კვარტ),
+						'one' => q({0} კვარტ),
+						'other' => q({0} კვარტ),
+						'per' => q({0}/კვარტ),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
@@ -6076,15 +5013,15 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'graphics-dot' => {
-						'name' => q(წერტილი),
-						'one' => q({0} წერტილი),
-						'other' => q({0} წერტილი),
+						'name' => q(წერტ.),
+						'one' => q({0} წერტ.),
+						'other' => q({0} წერტ.),
 					},
 					# Core Unit Identifier
 					'dot' => {
-						'name' => q(წერტილი),
-						'one' => q({0} წერტილი),
-						'other' => q({0} წერტილი),
+						'name' => q(წერტ.),
+						'one' => q({0} წერტ.),
+						'other' => q({0} წერტ.),
 					},
 					# Long Unit Identifier
 					'graphics-dot-per-centimeter' => {
@@ -6557,18 +5494,6 @@ has 'units' => (
 						'per' => q({0}/კგ),
 					},
 					# Long Unit Identifier
-					'mass-metric-ton' => {
-						'name' => q(მტ),
-						'one' => q({0} მტ),
-						'other' => q({0} მტ),
-					},
-					# Core Unit Identifier
-					'metric-ton' => {
-						'name' => q(მტ),
-						'one' => q({0} მტ),
-						'other' => q({0} მტ),
-					},
-					# Long Unit Identifier
 					'mass-microgram' => {
 						'name' => q(მკგ),
 						'one' => q({0} მკგ),
@@ -6657,12 +5582,16 @@ has 'units' => (
 						'other' => q({0} ტ),
 					},
 					# Long Unit Identifier
-					'per' => {
-						'1' => q({0}/{1}),
+					'mass-tonne' => {
+						'name' => q(მტ),
+						'one' => q({0} მტ),
+						'other' => q({0} მტ),
 					},
 					# Core Unit Identifier
-					'per' => {
-						'1' => q({0}/{1}),
+					'tonne' => {
+						'name' => q(მტ),
+						'one' => q({0} მტ),
+						'other' => q({0} მტ),
 					},
 					# Long Unit Identifier
 					'power-gigawatt' => {
@@ -6735,30 +5664,6 @@ has 'units' => (
 						'name' => q(ვტ),
 						'one' => q({0} ვტ),
 						'other' => q({0} ვტ),
-					},
-					# Long Unit Identifier
-					'power2' => {
-						'1' => q({0}²),
-						'one' => q({0}²),
-						'other' => q({0}²),
-					},
-					# Core Unit Identifier
-					'power2' => {
-						'1' => q({0}²),
-						'one' => q({0}²),
-						'other' => q({0}²),
-					},
-					# Long Unit Identifier
-					'power3' => {
-						'1' => q({0}³),
-						'one' => q({0}³),
-						'other' => q({0}³),
-					},
-					# Core Unit Identifier
-					'power3' => {
-						'1' => q({0}³),
-						'one' => q({0}³),
-						'other' => q({0}³),
 					},
 					# Long Unit Identifier
 					'pressure-atmosphere' => {
@@ -6927,54 +5832,6 @@ has 'units' => (
 						'name' => q(მილი/სთ),
 						'one' => q({0} მილი/სთ),
 						'other' => q({0} მილი/სთ),
-					},
-					# Long Unit Identifier
-					'temperature-celsius' => {
-						'name' => q(°C),
-						'one' => q({0}°C),
-						'other' => q({0}°C),
-					},
-					# Core Unit Identifier
-					'celsius' => {
-						'name' => q(°C),
-						'one' => q({0}°C),
-						'other' => q({0}°C),
-					},
-					# Long Unit Identifier
-					'temperature-fahrenheit' => {
-						'name' => q(°F),
-						'one' => q({0}°F),
-						'other' => q({0}°F),
-					},
-					# Core Unit Identifier
-					'fahrenheit' => {
-						'name' => q(°F),
-						'one' => q({0}°F),
-						'other' => q({0}°F),
-					},
-					# Long Unit Identifier
-					'temperature-generic' => {
-						'name' => q(°),
-						'one' => q({0}°),
-						'other' => q({0}°),
-					},
-					# Core Unit Identifier
-					'generic' => {
-						'name' => q(°),
-						'one' => q({0}°),
-						'other' => q({0}°),
-					},
-					# Long Unit Identifier
-					'temperature-kelvin' => {
-						'name' => q(K),
-						'one' => q({0} K),
-						'other' => q({0} K),
-					},
-					# Core Unit Identifier
-					'kelvin' => {
-						'name' => q(K),
-						'one' => q({0} K),
-						'other' => q({0} K),
 					},
 					# Long Unit Identifier
 					'torque-newton-meter' => {
@@ -7441,25 +6298,9 @@ has 'listPatterns' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-				start => q({0}, {1}),
-				middle => q({0}, {1}),
-				end => q({0}, {1}),
-				2 => q({0}, {1}),
+				end => q({0} და {1}),
+				2 => q({0} და {1}),
 		} }
-);
-
-has 'default_numbering_system' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> 'latn',
-);
-
-has native_numbering_system => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> 'latn',
 );
 
 has traditional_numbering_system => (
@@ -7483,17 +6324,8 @@ has 'number_symbols' => (
 	default		=> sub { {
 		'latn' => {
 			'decimal' => q(,),
-			'exponential' => q(E),
 			'group' => q( ),
-			'infinity' => q(∞),
-			'list' => q(;),
-			'minusSign' => q(-),
 			'nan' => q(არ არის რიცხვი),
-			'perMille' => q(‰),
-			'percentSign' => q(%),
-			'plusSign' => q(+),
-			'superscriptingExponent' => q(×),
-			'timeSeparator' => q(:),
 		},
 	} }
 );
@@ -7504,59 +6336,6 @@ has 'number_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		decimalFormat => {
-			'default' => {
-				'1000' => {
-					'one' => '0 ათ'.'',
-					'other' => '0 ათ'.'',
-				},
-				'10000' => {
-					'one' => '00 ათ'.'',
-					'other' => '00 ათ'.'',
-				},
-				'100000' => {
-					'one' => '000 ათ'.'',
-					'other' => '000 ათ'.'',
-				},
-				'1000000' => {
-					'one' => '0 მლნ'.'',
-					'other' => '0 მლნ'.'',
-				},
-				'10000000' => {
-					'one' => '00 მლნ'.'',
-					'other' => '00 მლნ'.'',
-				},
-				'100000000' => {
-					'one' => '000 მლნ'.'',
-					'other' => '000 მლნ'.'',
-				},
-				'1000000000' => {
-					'one' => '0 მლრდ'.'',
-					'other' => '0 მლრდ'.'',
-				},
-				'10000000000' => {
-					'one' => '00 მლრდ'.'',
-					'other' => '00 მლრდ'.'',
-				},
-				'100000000000' => {
-					'one' => '000 მლრ'.'',
-					'other' => '000 მლრ'.'',
-				},
-				'1000000000000' => {
-					'one' => '0 ტრლ'.'',
-					'other' => '0 ტრლ'.'',
-				},
-				'10000000000000' => {
-					'one' => '00 ტრლ'.'',
-					'other' => '00 ტრლ'.'',
-				},
-				'100000000000000' => {
-					'one' => '000 ტრლ'.'',
-					'other' => '000 ტრლ'.'',
-				},
-				'standard' => {
-					'default' => '#,##0.###',
-				},
-			},
 			'long' => {
 				'1000' => {
 					'one' => '0 ათასი',
@@ -7658,20 +6437,6 @@ has 'number_formats' => (
 				},
 			},
 		},
-		percentFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0%',
-				},
-			},
-		},
-		scientificFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#E0',
-				},
-			},
-		},
 } },
 );
 
@@ -7683,9 +6448,6 @@ has 'number_currency_formats' => (
 		'latn' => {
 			'pattern' => {
 				'default' => {
-					'accounting' => {
-						'positive' => '#,##0.00 ¤',
-					},
 					'standard' => {
 						'positive' => '#,##0.00 ¤',
 					},
@@ -7706,11 +6468,8 @@ has 'currencies' => (
 			},
 		},
 		'AED' => {
-			symbol => 'AED',
 			display_name => {
 				'currency' => q(არაბთა გაერთიანებული საამიროების დირჰამი),
-				'one' => q(არაბთა გაერთიანებული საამიროების დირჰამი),
-				'other' => q(არაბთა გაერთიანებული საამიროების დირჰამი),
 			},
 		},
 		'AFA' => {
@@ -7719,31 +6478,21 @@ has 'currencies' => (
 			},
 		},
 		'AFN' => {
-			symbol => 'AFN',
 			display_name => {
 				'currency' => q(ავღანური ავღანი),
-				'one' => q(ავღანური ავღანი),
-				'other' => q(ავღანური ავღანი),
 			},
 		},
 		'ALL' => {
-			symbol => 'ALL',
 			display_name => {
 				'currency' => q(ალბანური ლეკი),
-				'one' => q(ალბანური ლეკი),
-				'other' => q(ალბანური ლეკი),
 			},
 		},
 		'AMD' => {
-			symbol => 'AMD',
 			display_name => {
 				'currency' => q(სომხური დრამი),
-				'one' => q(სომხური დრამი),
-				'other' => q(სომხური დრამი),
 			},
 		},
 		'ANG' => {
-			symbol => 'ANG',
 			display_name => {
 				'currency' => q(ნიდერლანდების ანტილების გულდენი),
 				'one' => q(ნიდრელანდების ანტილიის გულდენი),
@@ -7751,11 +6500,8 @@ has 'currencies' => (
 			},
 		},
 		'AOA' => {
-			symbol => 'AOA',
 			display_name => {
 				'currency' => q(ანგოლური კვანზა),
-				'one' => q(ანგოლური კვანზა),
-				'other' => q(ანგოლური კვანზა),
 			},
 		},
 		'AOK' => {
@@ -7784,11 +6530,8 @@ has 'currencies' => (
 			},
 		},
 		'ARS' => {
-			symbol => 'ARS',
 			display_name => {
 				'currency' => q(არგენტინული პესო),
-				'one' => q(არგენტინული პესო),
-				'other' => q(არგენტინული პესო),
 			},
 		},
 		'ATS' => {
@@ -7800,16 +6543,11 @@ has 'currencies' => (
 			symbol => 'AUD',
 			display_name => {
 				'currency' => q(ავსტრალიური დოლარი),
-				'one' => q(ავსტრალიური დოლარი),
-				'other' => q(ავსტრალიური დოლარი),
 			},
 		},
 		'AWG' => {
-			symbol => 'AWG',
 			display_name => {
 				'currency' => q(არუბანული გულდენი),
-				'one' => q(არუბანული გულდენი),
-				'other' => q(არუბანული გულდენი),
 			},
 		},
 		'AZM' => {
@@ -7818,11 +6556,8 @@ has 'currencies' => (
 			},
 		},
 		'AZN' => {
-			symbol => 'AZN',
 			display_name => {
 				'currency' => q(აზერბაიჯანული მანათი),
-				'one' => q(აზერბაიჯანული მანათი),
-				'other' => q(აზერბაიჯანული მანათი),
 			},
 		},
 		'BAD' => {
@@ -7831,27 +6566,18 @@ has 'currencies' => (
 			},
 		},
 		'BAM' => {
-			symbol => 'BAM',
 			display_name => {
 				'currency' => q(ბოსნია და ჰერცოგოვინას კონვერტირებადი მარკა),
-				'one' => q(ბოსნია და ჰერცოგოვინას კონვერტირებადი მარკა),
-				'other' => q(ბოსნია და ჰერცოგოვინას კონვერტირებადი მარკა),
 			},
 		},
 		'BBD' => {
-			symbol => 'BBD',
 			display_name => {
 				'currency' => q(ბარბადოსული დოლარი),
-				'one' => q(ბარბადოსული დოლარი),
-				'other' => q(ბარბადოსული დოლარი),
 			},
 		},
 		'BDT' => {
-			symbol => 'BDT',
 			display_name => {
 				'currency' => q(ბანგლადეშური ტაკა),
-				'one' => q(ბანგლადეშური ტაკა),
-				'other' => q(ბანგლადეშური ტაკა),
 			},
 		},
 		'BEC' => {
@@ -7875,51 +6601,33 @@ has 'currencies' => (
 			},
 		},
 		'BGN' => {
-			symbol => 'BGN',
 			display_name => {
 				'currency' => q(ბულგარული ლევი),
-				'one' => q(ბულგარული ლევი),
-				'other' => q(ბულგარული ლევი),
 			},
 		},
 		'BHD' => {
-			symbol => 'BHD',
 			display_name => {
 				'currency' => q(ბაჰრეინული დინარი),
-				'one' => q(ბაჰრეინული დინარი),
-				'other' => q(ბაჰრეინული დინარი),
 			},
 		},
 		'BIF' => {
-			symbol => 'BIF',
 			display_name => {
 				'currency' => q(ბურუნდიული ფრანკი),
-				'one' => q(ბურუნდიული ფრანკი),
-				'other' => q(ბურუნდიული ფრანკი),
 			},
 		},
 		'BMD' => {
-			symbol => 'BMD',
 			display_name => {
 				'currency' => q(ბერმუდული დოლარი),
-				'one' => q(ბერმუდული დოლარი),
-				'other' => q(ბერმუდული დოლარი),
 			},
 		},
 		'BND' => {
-			symbol => 'BND',
 			display_name => {
 				'currency' => q(ბრუნეული დოლარი),
-				'one' => q(ბრუნეული დოლარი),
-				'other' => q(ბრუნეული დოლარი),
 			},
 		},
 		'BOB' => {
-			symbol => 'BOB',
 			display_name => {
 				'currency' => q(ბოლივიური ბოლივიანო),
-				'one' => q(ბოლივიური ბოლივიანო),
-				'other' => q(ბოლივიური ბოლივიანო),
 			},
 		},
 		'BOP' => {
@@ -7943,11 +6651,8 @@ has 'currencies' => (
 			},
 		},
 		'BRL' => {
-			symbol => 'R$',
 			display_name => {
 				'currency' => q(ბრაზილიური რეალი),
-				'one' => q(ბრაზილიური რეალი),
-				'other' => q(ბრაზილიური რეალი),
 			},
 		},
 		'BRN' => {
@@ -7961,27 +6666,18 @@ has 'currencies' => (
 			},
 		},
 		'BSD' => {
-			symbol => 'BSD',
 			display_name => {
 				'currency' => q(ბაჰამური დოლარი),
-				'one' => q(ბაჰამური დოლარი),
-				'other' => q(ბაჰამური დოლარი),
 			},
 		},
 		'BTN' => {
-			symbol => 'BTN',
 			display_name => {
 				'currency' => q(ბუტანური ნგულტრუმი),
-				'one' => q(ბუტანური ნგულტრუმი),
-				'other' => q(ბუტანური ნგულტრუმი),
 			},
 		},
 		'BWP' => {
-			symbol => 'BWP',
 			display_name => {
 				'currency' => q(ბოცვანური პულა),
-				'one' => q(ბოცვანური პულა),
-				'other' => q(ბოცვანური პულა),
 			},
 		},
 		'BYB' => {
@@ -7990,67 +6686,44 @@ has 'currencies' => (
 			},
 		},
 		'BYN' => {
-			symbol => 'BYN',
+			symbol => 'р.',
 			display_name => {
 				'currency' => q(ბელორუსული რუბლი),
-				'one' => q(ბელორუსული რუბლი),
-				'other' => q(ბელორუსული რუბლი),
 			},
 		},
 		'BYR' => {
-			symbol => 'BYR',
 			display_name => {
 				'currency' => q(ბელორუსული რუბლი \(2000–2016\)),
-				'one' => q(ბელორუსული რუბლი \(2000–2016\)),
-				'other' => q(ბელორუსული რუბლი \(2000–2016\)),
 			},
 		},
 		'BZD' => {
-			symbol => 'BZD',
 			display_name => {
 				'currency' => q(ბელიზის დოლარი),
-				'one' => q(ბელიზის დოლარი),
-				'other' => q(ბელიზის დოლარი),
 			},
 		},
 		'CAD' => {
-			symbol => 'CA$',
 			display_name => {
 				'currency' => q(კანადური დოლარი),
-				'one' => q(კანადური დოლარი),
-				'other' => q(კანადური დოლარი),
 			},
 		},
 		'CDF' => {
-			symbol => 'CDF',
 			display_name => {
 				'currency' => q(კონგოს ფრანკი),
-				'one' => q(კონგოს ფრანკი),
-				'other' => q(კონგოს ფრანკი),
 			},
 		},
 		'CHF' => {
-			symbol => 'CHF',
 			display_name => {
 				'currency' => q(შვეიცარიული ფრანკი),
-				'one' => q(შვეიცარიული ფრანკი),
-				'other' => q(შვეიცარიული ფრანკი),
 			},
 		},
 		'CLP' => {
-			symbol => 'CLP',
 			display_name => {
 				'currency' => q(ჩილეს პესო),
-				'one' => q(ჩილეს პესო),
-				'other' => q(ჩილეს პესო),
 			},
 		},
 		'CNH' => {
-			symbol => 'CNH',
 			display_name => {
 				'currency' => q(ჩინური იუანი \(ოფშორი\)),
-				'one' => q(ჩინური იუანი \(ოფშორი\)),
-				'other' => q(ჩინური იუანი \(ოფშორი\)),
 			},
 		},
 		'CNY' => {
@@ -8062,15 +6735,11 @@ has 'currencies' => (
 			},
 		},
 		'COP' => {
-			symbol => 'COP',
 			display_name => {
 				'currency' => q(კოლუმბიური პესო),
-				'one' => q(კოლუმბიური პესო),
-				'other' => q(კოლუმბიური პესო),
 			},
 		},
 		'CRC' => {
-			symbol => 'CRC',
 			display_name => {
 				'currency' => q(კოსტა-რიკული კოლონი),
 				'one' => q(კოსტა-რიკული კოლონი),
@@ -8088,27 +6757,18 @@ has 'currencies' => (
 			},
 		},
 		'CUC' => {
-			symbol => 'CUC',
 			display_name => {
 				'currency' => q(კუბური კონვერტირებადი პესო),
-				'one' => q(კუბური კონვერტირებადი პესო),
-				'other' => q(კუბური კონვერტირებადი პესო),
 			},
 		},
 		'CUP' => {
-			symbol => 'CUP',
 			display_name => {
 				'currency' => q(კუბური პესო),
-				'one' => q(კუბური პესო),
-				'other' => q(კუბური პესო),
 			},
 		},
 		'CVE' => {
-			symbol => 'CVE',
 			display_name => {
 				'currency' => q(კაბო-ვერდეს ესკუდო),
-				'one' => q(კაბო-ვერდეს ესკუდო),
-				'other' => q(კაბო-ვერდეს ესკუდო),
 			},
 		},
 		'CYP' => {
@@ -8117,11 +6777,8 @@ has 'currencies' => (
 			},
 		},
 		'CZK' => {
-			symbol => 'CZK',
 			display_name => {
 				'currency' => q(ჩეხური კრონა),
-				'one' => q(ჩეხური კრონა),
-				'other' => q(ჩეხური კრონა),
 			},
 		},
 		'DDM' => {
@@ -8135,35 +6792,23 @@ has 'currencies' => (
 			},
 		},
 		'DJF' => {
-			symbol => 'DJF',
 			display_name => {
 				'currency' => q(ჯიბუტის ფრანკი),
-				'one' => q(ჯიბუტის ფრანკი),
-				'other' => q(ჯიბუტის ფრანკი),
 			},
 		},
 		'DKK' => {
-			symbol => 'DKK',
 			display_name => {
 				'currency' => q(დანიური კრონა),
-				'one' => q(დანიური კრონა),
-				'other' => q(დანიური კრონა),
 			},
 		},
 		'DOP' => {
-			symbol => 'DOP',
 			display_name => {
 				'currency' => q(დომინიკური პესო),
-				'one' => q(დომინიკური პესო),
-				'other' => q(დომინიკური პესო),
 			},
 		},
 		'DZD' => {
-			symbol => 'DZD',
 			display_name => {
 				'currency' => q(ალჟირული დინარი),
-				'one' => q(ალჟირული დინარი),
-				'other' => q(ალჟირული დინარი),
 			},
 		},
 		'EEK' => {
@@ -8172,19 +6817,13 @@ has 'currencies' => (
 			},
 		},
 		'EGP' => {
-			symbol => 'EGP',
 			display_name => {
 				'currency' => q(ეგვიპტური გირვანქა),
-				'one' => q(ეგვიპტური გირვანქა),
-				'other' => q(ეგვიპტური გირვანქა),
 			},
 		},
 		'ERN' => {
-			symbol => 'ERN',
 			display_name => {
 				'currency' => q(ერიტრეის ნაკფა),
-				'one' => q(ერიტრეის ნაკფა),
-				'other' => q(ერიტრეის ნაკფა),
 			},
 		},
 		'ESP' => {
@@ -8193,19 +6832,13 @@ has 'currencies' => (
 			},
 		},
 		'ETB' => {
-			symbol => 'ETB',
 			display_name => {
 				'currency' => q(ეთიოპიური ბირი),
-				'one' => q(ეთიოპიური ბირი),
-				'other' => q(ეთიოპიური ბირი),
 			},
 		},
 		'EUR' => {
-			symbol => '€',
 			display_name => {
 				'currency' => q(ევრო),
-				'one' => q(ევრო),
-				'other' => q(ევრო),
 			},
 		},
 		'FIM' => {
@@ -8214,19 +6847,13 @@ has 'currencies' => (
 			},
 		},
 		'FJD' => {
-			symbol => 'FJD',
 			display_name => {
 				'currency' => q(ფიჯის დოლარი),
-				'one' => q(ფიჯის დოლარი),
-				'other' => q(ფიჯის დოლარი),
 			},
 		},
 		'FKP' => {
-			symbol => 'FKP',
 			display_name => {
 				'currency' => q(ფოლკლენდის კუნძულების ფუნტი),
-				'one' => q(ფოლკლენდის კუნძულების ფუნტი),
-				'other' => q(ფოლკლენდის კუნძულების ფუნტი),
 			},
 		},
 		'FRF' => {
@@ -8235,11 +6862,8 @@ has 'currencies' => (
 			},
 		},
 		'GBP' => {
-			symbol => '£',
 			display_name => {
 				'currency' => q(ბრიტანული გირვანქა სტერლინგი),
-				'one' => q(ბრიტანული გირვანქა სტერლინგი),
-				'other' => q(ბრიტანული გირვანქა სტერლინგი),
 			},
 		},
 		'GEK' => {
@@ -8251,40 +6875,26 @@ has 'currencies' => (
 			symbol => '₾',
 			display_name => {
 				'currency' => q(ქართული ლარი),
-				'one' => q(ქართული ლარი),
-				'other' => q(ქართული ლარი),
 			},
 		},
 		'GHS' => {
-			symbol => 'GHS',
 			display_name => {
 				'currency' => q(განური სედი),
-				'one' => q(განური სედი),
-				'other' => q(განური სედი),
 			},
 		},
 		'GIP' => {
-			symbol => 'GIP',
 			display_name => {
 				'currency' => q(გიბრალტარული ფუნტი),
-				'one' => q(გიბრალტარული ფუნტი),
-				'other' => q(გიბრალტარული ფუნტი),
 			},
 		},
 		'GMD' => {
-			symbol => 'GMD',
 			display_name => {
 				'currency' => q(გამბიური დალასი),
-				'one' => q(გამბიური დალასი),
-				'other' => q(გამბიური დალასი),
 			},
 		},
 		'GNF' => {
-			symbol => 'GNF',
 			display_name => {
 				'currency' => q(გვინეური ფრანკი),
-				'one' => q(გვინეური ფრანკი),
-				'other' => q(გვინეური ფრანკი),
 			},
 		},
 		'GRD' => {
@@ -8293,11 +6903,8 @@ has 'currencies' => (
 			},
 		},
 		'GTQ' => {
-			symbol => 'GTQ',
 			display_name => {
 				'currency' => q(გვატემალური კეტსალი),
-				'one' => q(გვატემალური კეტსალი),
-				'other' => q(გვატემალური კეტსალი),
 			},
 		},
 		'GWE' => {
@@ -8306,27 +6913,19 @@ has 'currencies' => (
 			},
 		},
 		'GYD' => {
-			symbol => 'GYD',
 			display_name => {
 				'currency' => q(გაიანური დოლარი),
-				'one' => q(გაიანური დოლარი),
-				'other' => q(გაიანური დოლარი),
 			},
 		},
 		'HKD' => {
 			symbol => 'HKD',
 			display_name => {
 				'currency' => q(ჰონკონგის დოლარი),
-				'one' => q(ჰონკონგის დოლარი),
-				'other' => q(ჰონკონგის დოლარი),
 			},
 		},
 		'HNL' => {
-			symbol => 'HNL',
 			display_name => {
 				'currency' => q(ჰონდურასული ლემპირა),
-				'one' => q(ჰონდურასული ლემპირა),
-				'other' => q(ჰონდურასული ლემპირა),
 			},
 		},
 		'HRD' => {
@@ -8335,35 +6934,23 @@ has 'currencies' => (
 			},
 		},
 		'HRK' => {
-			symbol => 'HRK',
 			display_name => {
 				'currency' => q(ხორვატული კუნა),
-				'one' => q(ხორვატული კუნა),
-				'other' => q(ხორვატული კუნა),
 			},
 		},
 		'HTG' => {
-			symbol => 'HTG',
 			display_name => {
 				'currency' => q(ჰაიტური გურდი),
-				'one' => q(ჰაიტური გურდი),
-				'other' => q(ჰაიტური გურდი),
 			},
 		},
 		'HUF' => {
-			symbol => 'HUF',
 			display_name => {
 				'currency' => q(უნგრული ფორინტი),
-				'one' => q(უნგრული ფორინტი),
-				'other' => q(უნგრული ფორინტი),
 			},
 		},
 		'IDR' => {
-			symbol => 'IDR',
 			display_name => {
 				'currency' => q(ინდონეზიური რუპია),
-				'one' => q(ინდონეზიური რუპია),
-				'other' => q(ინდონეზიური რუპია),
 			},
 		},
 		'IEP' => {
@@ -8375,40 +6962,27 @@ has 'currencies' => (
 			symbol => 'ILS',
 			display_name => {
 				'currency' => q(ისრაელის ახალი შეკელი),
-				'one' => q(ისრაელის ახალი შეკელი),
-				'other' => q(ისრაელის ახალი შეკელი),
 			},
 		},
 		'INR' => {
 			symbol => 'INR',
 			display_name => {
 				'currency' => q(ინდური რუპია),
-				'one' => q(ინდური რუპია),
-				'other' => q(ინდური რუპია),
 			},
 		},
 		'IQD' => {
-			symbol => 'IQD',
 			display_name => {
 				'currency' => q(ერაყული დინარი),
-				'one' => q(ერაყული დინარი),
-				'other' => q(ერაყული დინარი),
 			},
 		},
 		'IRR' => {
-			symbol => 'IRR',
 			display_name => {
 				'currency' => q(ირანული რიალი),
-				'one' => q(ირანული რიალი),
-				'other' => q(ირანული რიალი),
 			},
 		},
 		'ISK' => {
-			symbol => 'ISK',
 			display_name => {
 				'currency' => q(ისლანდიური კრონა),
-				'one' => q(ისლანდიური კრონა),
-				'other' => q(ისლანდიური კრონა),
 			},
 		},
 		'ITL' => {
@@ -8417,146 +6991,95 @@ has 'currencies' => (
 			},
 		},
 		'JMD' => {
-			symbol => 'JMD',
 			display_name => {
 				'currency' => q(იამაიკური დოლარი),
-				'one' => q(იამაიკური დოლარი),
-				'other' => q(იამაიკური დოლარი),
 			},
 		},
 		'JOD' => {
-			symbol => 'JOD',
 			display_name => {
 				'currency' => q(იორდანიული დოლარი),
-				'one' => q(იორდანიული დოლარი),
-				'other' => q(იორდანიული დოლარი),
 			},
 		},
 		'JPY' => {
 			symbol => 'JPY',
 			display_name => {
 				'currency' => q(იაპონური იენი),
-				'one' => q(იაპონური იენი),
-				'other' => q(იაპონური იენი),
 			},
 		},
 		'KES' => {
-			symbol => 'KES',
 			display_name => {
 				'currency' => q(კენიური შილინგი),
-				'one' => q(კენიური შილინგი),
-				'other' => q(კენიური შილინგი),
 			},
 		},
 		'KGS' => {
-			symbol => 'KGS',
 			display_name => {
 				'currency' => q(ყირგიზული სომი),
-				'one' => q(ყირგიზული სომი),
-				'other' => q(ყირგიზული სომი),
 			},
 		},
 		'KHR' => {
-			symbol => 'KHR',
 			display_name => {
 				'currency' => q(კამბოჯური რიელი),
-				'one' => q(კამბოჯური რიელი),
-				'other' => q(კამბოჯური რიელი),
 			},
 		},
 		'KMF' => {
-			symbol => 'KMF',
 			display_name => {
 				'currency' => q(კომორული ფრანკი),
-				'one' => q(კომორული ფრანკი),
-				'other' => q(კომორული ფრანკი),
 			},
 		},
 		'KPW' => {
-			symbol => 'KPW',
 			display_name => {
 				'currency' => q(ჩრდილოეთ კორეული ვონი),
-				'one' => q(ჩრდილოეთ კორეული ვონი),
-				'other' => q(ჩრდილოეთ კორეული ვონი),
 			},
 		},
 		'KRW' => {
 			symbol => 'KRW',
 			display_name => {
 				'currency' => q(სამხრეთ კორეული ვონი),
-				'one' => q(სამხრეთ კორეული ვონი),
-				'other' => q(სამხრეთ კორეული ვონი),
 			},
 		},
 		'KWD' => {
-			symbol => 'KWD',
 			display_name => {
 				'currency' => q(ქუვეითური დინარი),
-				'one' => q(ქუვეითური დინარი),
-				'other' => q(ქუვეითური დინარი),
 			},
 		},
 		'KYD' => {
-			symbol => 'KYD',
 			display_name => {
 				'currency' => q(კაიმანის კუნძულების დოლარი),
-				'one' => q(კაიმანის კუნძულების დოლარი),
-				'other' => q(კაიმანის კუნძულების დოლარი),
 			},
 		},
 		'KZT' => {
-			symbol => 'KZT',
 			display_name => {
 				'currency' => q(ყაზახური ტენგე),
-				'one' => q(ყაზახური ტენგე),
-				'other' => q(ყაზახური ტენგე),
 			},
 		},
 		'LAK' => {
-			symbol => 'LAK',
 			display_name => {
 				'currency' => q(ლაოსური კიპი),
-				'one' => q(ლაოსური კიპი),
-				'other' => q(ლაოსური კიპი),
 			},
 		},
 		'LBP' => {
-			symbol => 'LBP',
 			display_name => {
 				'currency' => q(ლიბანური ფუნტი),
-				'one' => q(ლიბანური ფუნტი),
-				'other' => q(ლიბანური ფუნტი),
 			},
 		},
 		'LKR' => {
-			symbol => 'LKR',
 			display_name => {
 				'currency' => q(შრი-ლანკური რუპია),
-				'one' => q(შრი-ლანკური რუპია),
-				'other' => q(შრი-ლანკური რუპია),
 			},
 		},
 		'LRD' => {
-			symbol => 'LRD',
 			display_name => {
 				'currency' => q(ლიბერიული დოლარი),
-				'one' => q(ლიბერიული დოლარი),
-				'other' => q(ლიბერიული დოლარი),
 			},
 		},
 		'LSL' => {
 			display_name => {
 				'currency' => q(ლესოთოს ლოტი),
-				'one' => q(ლესოთოს ლოტი),
-				'other' => q(ლესოთოს ლოტი),
 			},
 		},
 		'LTL' => {
-			symbol => 'LTL',
 			display_name => {
 				'currency' => q(ლიტვური ლიტა),
-				'one' => q(ლიტვური ლიტა),
-				'other' => q(ლიტვური ლიტა),
 			},
 		},
 		'LTT' => {
@@ -8580,11 +7103,8 @@ has 'currencies' => (
 			},
 		},
 		'LVL' => {
-			symbol => 'LVL',
 			display_name => {
 				'currency' => q(ლატვიური ლატი),
-				'one' => q(ლატვიური ლატი),
-				'other' => q(ლატვიური ლატი),
 			},
 		},
 		'LVR' => {
@@ -8593,19 +7113,13 @@ has 'currencies' => (
 			},
 		},
 		'LYD' => {
-			symbol => 'LYD',
 			display_name => {
 				'currency' => q(ლიბიური დინარი),
-				'one' => q(ლიბიური დინარი),
-				'other' => q(ლიბიური დინარი),
 			},
 		},
 		'MAD' => {
-			symbol => 'MAD',
 			display_name => {
 				'currency' => q(მაროკოს დირჰამი),
-				'one' => q(მაროკოს დირჰამი),
-				'other' => q(მაროკოს დირჰამი),
 			},
 		},
 		'MAF' => {
@@ -8614,19 +7128,13 @@ has 'currencies' => (
 			},
 		},
 		'MDL' => {
-			symbol => 'MDL',
 			display_name => {
 				'currency' => q(მოლდოვური ლეუ),
-				'one' => q(მოლდოვური ლეუ),
-				'other' => q(მოლდოვური ლეუ),
 			},
 		},
 		'MGA' => {
-			symbol => 'MGA',
 			display_name => {
 				'currency' => q(მადაგასკარის არიარი),
-				'one' => q(მადაგასკარის არიარი),
-				'other' => q(მადაგასკარის არიარი),
 			},
 		},
 		'MGF' => {
@@ -8635,11 +7143,8 @@ has 'currencies' => (
 			},
 		},
 		'MKD' => {
-			symbol => 'MKD',
 			display_name => {
 				'currency' => q(მაკედონიური დინარი),
-				'one' => q(მაკედონიური დინარი),
-				'other' => q(მაკედონიური დინარი),
 			},
 		},
 		'MLF' => {
@@ -8648,43 +7153,28 @@ has 'currencies' => (
 			},
 		},
 		'MMK' => {
-			symbol => 'MMK',
 			display_name => {
 				'currency' => q(მიანმარის კიატი),
-				'one' => q(მიანმარის კიატი),
-				'other' => q(მიანმარის კიატი),
 			},
 		},
 		'MNT' => {
-			symbol => 'MNT',
 			display_name => {
 				'currency' => q(მონღოლური ტუგრიკი),
-				'one' => q(მონღოლური ტუგრიკი),
-				'other' => q(მონღოლური ტუგრიკი),
 			},
 		},
 		'MOP' => {
-			symbol => 'MOP',
 			display_name => {
 				'currency' => q(მაკაუს პატაკა),
-				'one' => q(მაკაუს პატაკა),
-				'other' => q(მაკაუს პატაკა),
 			},
 		},
 		'MRO' => {
-			symbol => 'MRO',
 			display_name => {
 				'currency' => q(მავრიტანული უგია \(1973–2017\)),
-				'one' => q(მავრიტანული უგია \(1973–2017\)),
-				'other' => q(მავრიტანული უგია \(1973–2017\)),
 			},
 		},
 		'MRU' => {
-			symbol => 'MRU',
 			display_name => {
 				'currency' => q(მავრიტანული უგია),
-				'one' => q(მავრიტანული უგია),
-				'other' => q(მავრიტანული უგია),
 			},
 		},
 		'MTL' => {
@@ -8698,35 +7188,23 @@ has 'currencies' => (
 			},
 		},
 		'MUR' => {
-			symbol => 'MUR',
 			display_name => {
 				'currency' => q(მავრიტანული რუპია),
-				'one' => q(მავრიტანული რუპია),
-				'other' => q(მავრიტანული რუპია),
 			},
 		},
 		'MVR' => {
-			symbol => 'MVR',
 			display_name => {
 				'currency' => q(მალდივური რუფია),
-				'one' => q(მალდივური რუფია),
-				'other' => q(მალდივური რუფია),
 			},
 		},
 		'MWK' => {
-			symbol => 'MWK',
 			display_name => {
 				'currency' => q(მალავიური კვაჩა),
-				'one' => q(მალავიური კვაჩა),
-				'other' => q(მალავიური კვაჩა),
 			},
 		},
 		'MXN' => {
-			symbol => 'MX$',
 			display_name => {
 				'currency' => q(მექსიკური პესო),
-				'one' => q(მექსიკური პესო),
-				'other' => q(მექსიკური პესო),
 			},
 		},
 		'MXP' => {
@@ -8735,18 +7213,13 @@ has 'currencies' => (
 			},
 		},
 		'MYR' => {
-			symbol => 'MYR',
 			display_name => {
 				'currency' => q(მალაიზიური რინგიტი),
-				'one' => q(მალაიზიური რინგიტი),
-				'other' => q(მალაიზიური რინგიტი),
 			},
 		},
 		'MZE' => {
 			display_name => {
 				'currency' => q(მოზამბიკური ესკუდო),
-				'one' => q(მოზამბიკური ესკუდო),
-				'other' => q(მოზამბიკური ესკუდო),
 			},
 		},
 		'MZM' => {
@@ -8755,27 +7228,18 @@ has 'currencies' => (
 			},
 		},
 		'MZN' => {
-			symbol => 'MZN',
 			display_name => {
 				'currency' => q(მოზამბიკური მეტიკალი),
-				'one' => q(მოზამბიკური მეტიკალი),
-				'other' => q(მოზამბიკური მეტიკალი),
 			},
 		},
 		'NAD' => {
-			symbol => 'NAD',
 			display_name => {
 				'currency' => q(ნამიბიური დოლარი),
-				'one' => q(ნამიბიური დოლარი),
-				'other' => q(ნამიბიური დოლარი),
 			},
 		},
 		'NGN' => {
-			symbol => 'NGN',
 			display_name => {
 				'currency' => q(ნიგერიული ნაირა),
-				'one' => q(ნიგერიული ნაირა),
-				'other' => q(ნიგერიული ნაირა),
 			},
 		},
 		'NIC' => {
@@ -8784,11 +7248,8 @@ has 'currencies' => (
 			},
 		},
 		'NIO' => {
-			symbol => 'NIO',
 			display_name => {
 				'currency' => q(ნიკარაგუას ოქროს კორდობა),
-				'one' => q(ნიკარაგუას ოქროს კორდობა),
-				'other' => q(ნიკარაგუას ოქროს კორდობა),
 			},
 		},
 		'NLG' => {
@@ -8797,43 +7258,29 @@ has 'currencies' => (
 			},
 		},
 		'NOK' => {
-			symbol => 'NOK',
 			display_name => {
 				'currency' => q(ნორვეგიული კრონა),
-				'one' => q(ნორვეგიული კრონა),
-				'other' => q(ნორვეგიული კრონა),
 			},
 		},
 		'NPR' => {
-			symbol => 'NPR',
 			display_name => {
 				'currency' => q(ნეპალური რუპია),
-				'one' => q(ნეპალური რუპია),
-				'other' => q(ნეპალური რუპია),
 			},
 		},
 		'NZD' => {
 			symbol => 'NZD',
 			display_name => {
 				'currency' => q(ახალი ზელანდიის დოლარი),
-				'one' => q(ახალი ზელანდიის დოლარი),
-				'other' => q(ახალი ზელანდიის დოლარი),
 			},
 		},
 		'OMR' => {
-			symbol => 'OMR',
 			display_name => {
 				'currency' => q(ომანის რიალი),
-				'one' => q(ომანის რიალი),
-				'other' => q(ომანის რიალი),
 			},
 		},
 		'PAB' => {
-			symbol => 'PAB',
 			display_name => {
 				'currency' => q(პანამური ბალბოა),
-				'one' => q(პანამური ბალბოა),
-				'other' => q(პანამური ბალბოა),
 			},
 		},
 		'PEI' => {
@@ -8842,11 +7289,8 @@ has 'currencies' => (
 			},
 		},
 		'PEN' => {
-			symbol => 'PEN',
 			display_name => {
 				'currency' => q(პერუს სოლი),
-				'one' => q(პერუს სოლი),
-				'other' => q(პერუს სოლი),
 			},
 		},
 		'PES' => {
@@ -8855,35 +7299,24 @@ has 'currencies' => (
 			},
 		},
 		'PGK' => {
-			symbol => 'PGK',
 			display_name => {
 				'currency' => q(პაპუა-ახალი გვინეის კინა),
-				'one' => q(პაპუა-ახალი გვინეის კინა),
-				'other' => q(პაპუა-ახალი გვინეის კინა),
 			},
 		},
 		'PHP' => {
 			symbol => 'PHP',
 			display_name => {
 				'currency' => q(ფილიპინური პესო),
-				'one' => q(ფილიპინური პესო),
-				'other' => q(ფილიპინური პესო),
 			},
 		},
 		'PKR' => {
-			symbol => 'PKR',
 			display_name => {
 				'currency' => q(პაკისტანური რუპია),
-				'one' => q(პაკისტანური რუპია),
-				'other' => q(პაკისტანური რუპია),
 			},
 		},
 		'PLN' => {
-			symbol => 'PLN',
 			display_name => {
 				'currency' => q(პოლონური ზლოტი),
-				'one' => q(პოლონური ზლოტი),
-				'other' => q(პოლონური ზლოტი),
 			},
 		},
 		'PLZ' => {
@@ -8897,19 +7330,13 @@ has 'currencies' => (
 			},
 		},
 		'PYG' => {
-			symbol => 'PYG',
 			display_name => {
 				'currency' => q(პარაგვაული გუარანი),
-				'one' => q(პარაგვაული გუარანი),
-				'other' => q(პარაგვაული გუარანი),
 			},
 		},
 		'QAR' => {
-			symbol => 'QAR',
 			display_name => {
 				'currency' => q(კატარის რიალი),
-				'one' => q(კატარის რიალი),
-				'other' => q(კატარის რიალი),
 			},
 		},
 		'RHD' => {
@@ -8923,27 +7350,18 @@ has 'currencies' => (
 			},
 		},
 		'RON' => {
-			symbol => 'RON',
 			display_name => {
 				'currency' => q(რუმინული ლეუ),
-				'one' => q(რუმინული ლეუ),
-				'other' => q(რუმინული ლეუ),
 			},
 		},
 		'RSD' => {
-			symbol => 'RSD',
 			display_name => {
 				'currency' => q(სერბული დინარი),
-				'one' => q(სერბული დინარი),
-				'other' => q(სერბული დინარი),
 			},
 		},
 		'RUB' => {
-			symbol => 'RUB',
 			display_name => {
 				'currency' => q(რუსული რუბლი),
-				'one' => q(რუსული რუბლი),
-				'other' => q(რუსული რუბლი),
 			},
 		},
 		'RUR' => {
@@ -8952,35 +7370,23 @@ has 'currencies' => (
 			},
 		},
 		'RWF' => {
-			symbol => 'RWF',
 			display_name => {
 				'currency' => q(რუანდული ფრანკი),
-				'one' => q(რუანდული ფრანკი),
-				'other' => q(რუანდული ფრანკი),
 			},
 		},
 		'SAR' => {
-			symbol => 'SAR',
 			display_name => {
 				'currency' => q(საუდის არაბეთის რიალი),
-				'one' => q(საუდის არაბეთის რიალი),
-				'other' => q(საუდის არაბეთის რიალი),
 			},
 		},
 		'SBD' => {
-			symbol => 'SBD',
 			display_name => {
 				'currency' => q(სოლომონის კუნძულების დოლარი),
-				'one' => q(სოლომონის კუნძულების დოლარი),
-				'other' => q(სოლომონის კუნძულების დოლარი),
 			},
 		},
 		'SCR' => {
-			symbol => 'SCR',
 			display_name => {
 				'currency' => q(სეიშელური რუპია),
-				'one' => q(სეიშელური რუპია),
-				'other' => q(სეიშელური რუპია),
 			},
 		},
 		'SDD' => {
@@ -8989,11 +7395,8 @@ has 'currencies' => (
 			},
 		},
 		'SDG' => {
-			symbol => 'SDG',
 			display_name => {
 				'currency' => q(სუდანური ფუნტი),
-				'one' => q(სუდანური ფუნტი),
-				'other' => q(სუდანური ფუნტი),
 			},
 		},
 		'SDP' => {
@@ -9002,51 +7405,38 @@ has 'currencies' => (
 			},
 		},
 		'SEK' => {
-			symbol => 'SEK',
 			display_name => {
 				'currency' => q(შვედური კრონა),
-				'one' => q(შვედური კრონა),
-				'other' => q(შვედური კრონა),
 			},
 		},
 		'SGD' => {
-			symbol => 'SGD',
 			display_name => {
 				'currency' => q(სინგაპურის დოლარი),
-				'one' => q(სინგაპურის დოლარი),
-				'other' => q(სინგაპურის დოლარი),
 			},
 		},
 		'SHP' => {
-			symbol => 'SHP',
 			display_name => {
 				'currency' => q(წმ. ელენეს კუნძულის ფუნტი),
-				'one' => q(წმ. ელენეს კუნძულის ფუნტი),
-				'other' => q(წმ. ელენეს კუნძულის ფუნტი),
+			},
+		},
+		'SLE' => {
+			display_name => {
+				'currency' => q(სიერა-ლეონეს ლეონე),
 			},
 		},
 		'SLL' => {
-			symbol => 'SLL',
 			display_name => {
-				'currency' => q(სიერა-ლეონეს ლეონე),
-				'one' => q(სიერა-ლეონეს ლეონე),
-				'other' => q(სიერა-ლეონეს ლეონე),
+				'currency' => q(სიერა-ლეონეს ლეონე \(1964—2022\)),
 			},
 		},
 		'SOS' => {
-			symbol => 'SOS',
 			display_name => {
 				'currency' => q(სომალური შილინგი),
-				'one' => q(სომალური შილინგი),
-				'other' => q(სომალური შილინგი),
 			},
 		},
 		'SRD' => {
-			symbol => 'SRD',
 			display_name => {
 				'currency' => q(სურინამული დოლარი),
-				'one' => q(სურინამული დოლარი),
-				'other' => q(სურინამული დოლარი),
 			},
 		},
 		'SRG' => {
@@ -9055,27 +7445,18 @@ has 'currencies' => (
 			},
 		},
 		'SSP' => {
-			symbol => 'SSP',
 			display_name => {
 				'currency' => q(სამხრეთ სუდანური ფუნტი),
-				'one' => q(სამხრეთ სუდანური ფუნტი),
-				'other' => q(სამხრეთ სუდანური ფუნტი),
 			},
 		},
 		'STD' => {
-			symbol => 'STD',
 			display_name => {
 				'currency' => q(სან-ტომე და პრინსიპის დობრა \(1977–2017\)),
-				'one' => q(სან-ტომე და პრინსიპის დობრა \(1977–2017\)),
-				'other' => q(სან-ტომე და პრინსიპის დობრა \(1977–2017\)),
 			},
 		},
 		'STN' => {
-			symbol => 'STN',
 			display_name => {
 				'currency' => q(სან-ტომე და პრინსიპის დობრა),
-				'one' => q(სან-ტომე და პრინსიპის დობრა),
-				'other' => q(სან-ტომე და პრინსიპის დობრა),
 			},
 		},
 		'SUR' => {
@@ -9084,7 +7465,6 @@ has 'currencies' => (
 			},
 		},
 		'SYP' => {
-			symbol => 'SYP',
 			display_name => {
 				'currency' => q(სირიული ფუნტი),
 				'one' => q(სირიული გირვანქა),
@@ -9092,19 +7472,13 @@ has 'currencies' => (
 			},
 		},
 		'SZL' => {
-			symbol => 'SZL',
 			display_name => {
 				'currency' => q(სვაზილენდის ლილანგენი),
-				'one' => q(სვაზილენდის ლილანგენი),
-				'other' => q(სვაზილენდის ლილანგენი),
 			},
 		},
 		'THB' => {
-			symbol => 'THB',
 			display_name => {
 				'currency' => q(ტაილანდური ბატი),
-				'one' => q(ტაილანდური ბატი),
-				'other' => q(ტაილანდური ბატი),
 			},
 		},
 		'TJR' => {
@@ -9113,11 +7487,8 @@ has 'currencies' => (
 			},
 		},
 		'TJS' => {
-			symbol => 'TJS',
 			display_name => {
 				'currency' => q(ტაჯიკური სომონი),
-				'one' => q(ტაჯიკური სომონი),
-				'other' => q(ტაჯიკური სომონი),
 			},
 		},
 		'TMM' => {
@@ -9126,15 +7497,11 @@ has 'currencies' => (
 			},
 		},
 		'TMT' => {
-			symbol => 'TMT',
 			display_name => {
 				'currency' => q(თურქმენეთის მანათი),
-				'one' => q(თურქმენეთის მანათი),
-				'other' => q(თურქმენეთის მანათი),
 			},
 		},
 		'TND' => {
-			symbol => 'TND',
 			display_name => {
 				'currency' => q(ტუნისური დინარი),
 				'one' => q(ტუნისის დინარი),
@@ -9142,11 +7509,8 @@ has 'currencies' => (
 			},
 		},
 		'TOP' => {
-			symbol => 'TOP',
 			display_name => {
 				'currency' => q(ტონგანური პაანგა),
-				'one' => q(ტონგანური პაანგა),
-				'other' => q(ტონგანური პაანგა),
 			},
 		},
 		'TRL' => {
@@ -9155,43 +7519,29 @@ has 'currencies' => (
 			},
 		},
 		'TRY' => {
-			symbol => 'TRY',
 			display_name => {
 				'currency' => q(ახალი თურქული ლირა),
-				'one' => q(ახალი თურქული ლირა),
-				'other' => q(ახალი თურქული ლირა),
 			},
 		},
 		'TTD' => {
-			symbol => 'TTD',
 			display_name => {
 				'currency' => q(ტრინიდად და ტობაგოს დოლარი),
-				'one' => q(ტრინიდად და ტობაგოს დოლარი),
-				'other' => q(ტრინიდად და ტობაგოს დოლარი),
 			},
 		},
 		'TWD' => {
 			symbol => 'NT$',
 			display_name => {
 				'currency' => q(ტაივანური ახალი დოლარი),
-				'one' => q(ტაივანური ახალი დოლარი),
-				'other' => q(ტაივანური ახალი დოლარი),
 			},
 		},
 		'TZS' => {
-			symbol => 'TZS',
 			display_name => {
 				'currency' => q(ტანზანიური შილინგი),
-				'one' => q(ტანზანიური შილინგი),
-				'other' => q(ტანზანიური შილინგი),
 			},
 		},
 		'UAH' => {
-			symbol => 'UAH',
 			display_name => {
 				'currency' => q(უკრაინული გრივნა),
-				'one' => q(უკრაინული გრივნა),
-				'other' => q(უკრაინული გრივნა),
 			},
 		},
 		'UAK' => {
@@ -9205,19 +7555,13 @@ has 'currencies' => (
 			},
 		},
 		'UGX' => {
-			symbol => 'UGX',
 			display_name => {
 				'currency' => q(უგანდური შილინგი),
-				'one' => q(უგანდური შილინგი),
-				'other' => q(უგანდური შილინგი),
 			},
 		},
 		'USD' => {
-			symbol => 'US$',
 			display_name => {
 				'currency' => q(აშშ დოლარი),
-				'one' => q(აშშ დოლარი),
-				'other' => q(აშშ დოლარი),
 			},
 		},
 		'USN' => {
@@ -9236,19 +7580,13 @@ has 'currencies' => (
 			},
 		},
 		'UYU' => {
-			symbol => 'UYU',
 			display_name => {
 				'currency' => q(ურუგვაის პესო),
-				'one' => q(ურუგვაის პესო),
-				'other' => q(ურუგვაის პესო),
 			},
 		},
 		'UZS' => {
-			symbol => 'UZS',
 			display_name => {
 				'currency' => q(უზბეკური სუმი),
-				'one' => q(უზბეკური სუმი),
-				'other' => q(უზბეკური სუმი),
 			},
 		},
 		'VEB' => {
@@ -9257,31 +7595,22 @@ has 'currencies' => (
 			},
 		},
 		'VEF' => {
-			symbol => 'VEF',
 			display_name => {
 				'currency' => q(ვენესუელის ბოლივარი \(2008–2018\)),
-				'one' => q(ვენესუელის ბოლივარი \(2008–2018\)),
-				'other' => q(ვენესუელის ბოლივარი \(2008–2018\)),
 			},
 		},
 		'VES' => {
-			symbol => 'VES',
 			display_name => {
 				'currency' => q(ვენესუელის ბოლივარი),
-				'one' => q(ვენესუელის ბოლივარი),
-				'other' => q(ვენესუელის ბოლივარი),
 			},
 		},
 		'VND' => {
 			symbol => 'VND',
 			display_name => {
 				'currency' => q(ვიეტნამური დონგი),
-				'one' => q(ვიეტნამური დონგი),
-				'other' => q(ვიეტნამური დონგი),
 			},
 		},
 		'VUV' => {
-			symbol => 'VUV',
 			display_name => {
 				'currency' => q(ვანუატუს ვატუ),
 				'one' => q(ვანატუს ვატუ),
@@ -9289,19 +7618,13 @@ has 'currencies' => (
 			},
 		},
 		'WST' => {
-			symbol => 'WST',
 			display_name => {
 				'currency' => q(სამოური ტალა),
-				'one' => q(დასავლეთ სამოას ტალა),
-				'other' => q(სამოური ტალა),
 			},
 		},
 		'XAF' => {
-			symbol => 'FCFA',
 			display_name => {
 				'currency' => q(ცენტრალურ აფრიკული CFA ფრანკი),
-				'one' => q(ცენტრალურ აფრიკული CFA ფრანკი),
-				'other' => q(ცენტრალურ აფრიკული CFA ფრანკი),
 			},
 		},
 		'XAG' => {
@@ -9320,11 +7643,8 @@ has 'currencies' => (
 			},
 		},
 		'XCD' => {
-			symbol => 'EC$',
 			display_name => {
 				'currency' => q(აღმოსავლეთ კარიბიული დოლარი),
-				'one' => q(აღმოსავლეთ კარიბიული დოლარი),
-				'other' => q(აღმოსავლეთ კარიბიული დოლარი),
 			},
 		},
 		'XEU' => {
@@ -9338,19 +7658,13 @@ has 'currencies' => (
 			},
 		},
 		'XOF' => {
-			symbol => 'F CFA',
 			display_name => {
 				'currency' => q(დასავლეთ აფრიკული CFA ფრანკი),
-				'one' => q(დასავლეთ აფრიკული CFA ფრანკი),
-				'other' => q(დასავლეთ აფრიკული CFA ფრანკი),
 			},
 		},
 		'XPF' => {
-			symbol => 'CFPF',
 			display_name => {
 				'currency' => q(CFP ფრანკი),
-				'one' => q(CFP ფრანკი),
-				'other' => q(CFP ფრანკი),
 			},
 		},
 		'XXX' => {
@@ -9366,11 +7680,8 @@ has 'currencies' => (
 			},
 		},
 		'YER' => {
-			symbol => 'YER',
 			display_name => {
 				'currency' => q(იემენის რეალი),
-				'one' => q(იემენის რეალი),
-				'other' => q(იემენის რეალი),
 			},
 		},
 		'YUD' => {
@@ -9389,27 +7700,18 @@ has 'currencies' => (
 			},
 		},
 		'ZAR' => {
-			symbol => 'ZAR',
 			display_name => {
 				'currency' => q(სამხრეთ აფრიკული რანდი),
-				'one' => q(სამხრეთ აფრიკული რანდი),
-				'other' => q(სამხრეთ აფრიკული რანდი),
 			},
 		},
 		'ZMK' => {
-			symbol => 'ZMK',
 			display_name => {
 				'currency' => q(ზამბიური კვაჭა \(1968–2012\)),
-				'one' => q(ზამბიური კვაჭა \(1968–2012\)),
-				'other' => q(ზამბიური კვაჭა \(1968–2012\)),
 			},
 		},
 		'ZMW' => {
-			symbol => 'ZMW',
 			display_name => {
 				'currency' => q(ზამბიური კვაჭა),
-				'one' => q(ზამბიური კვაჭა),
-				'other' => q(ზამბიური კვაჭა),
 			},
 		},
 		'ZRN' => {
@@ -9457,25 +7759,6 @@ has 'calendar_months' => (
 							
 						],
 					},
-					narrow => {
-						nonleap => [
-							'ი',
-							'თ',
-							'მ',
-							'ა',
-							'მ',
-							'ი',
-							'ი',
-							'ა',
-							'ს',
-							'ო',
-							'ნ',
-							'დ'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'იანვარი',
@@ -9497,25 +7780,6 @@ has 'calendar_months' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'იან',
-							'თებ',
-							'მარ',
-							'აპრ',
-							'მაი',
-							'ივნ',
-							'ივლ',
-							'აგვ',
-							'სექ',
-							'ოქტ',
-							'ნოე',
-							'დეკ'
-						],
-						leap => [
-							
-						],
-					},
 					narrow => {
 						nonleap => [
 							'ი',
@@ -9530,25 +7794,6 @@ has 'calendar_months' => (
 							'ო',
 							'ნ',
 							'დ'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'იანვარი',
-							'თებერვალი',
-							'მარტი',
-							'აპრილი',
-							'მაისი',
-							'ივნისი',
-							'ივლისი',
-							'აგვისტო',
-							'სექტემბერი',
-							'ოქტომბერი',
-							'ნოემბერი',
-							'დეკემბერი'
 						],
 						leap => [
 							
@@ -9558,86 +7803,6 @@ has 'calendar_months' => (
 			},
 			'hebrew' => {
 				'format' => {
-					abbreviated => {
-						nonleap => [
-							'თიშრეი',
-							'ხეშვანი',
-							'ქისლევი',
-							'ტევეთი',
-							'შვატი',
-							'ადარი I',
-							'ადარი',
-							'ნისანი',
-							'იარი',
-							'სივანი',
-							'თამუზი',
-							'ავი',
-							'ელული'
-						],
-						leap => [
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'თიშრეი',
-							'ხეშვანი',
-							'ქისლევი',
-							'ტევეთი',
-							'შვატი',
-							'ადარი I',
-							'ადარი',
-							'ნისანი',
-							'იარი',
-							'სივანი',
-							'თამუზი',
-							'ავი',
-							'ელული'
-						],
-						leap => [
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'თიშრეი',
-							'ხეშვანი',
-							'ქისლევი',
-							'ტევეთი',
-							'შვატი',
-							'ადარი I',
-							'ადარი',
-							'ნისანი',
-							'იარი',
-							'სივანი',
-							'თამუზი',
-							'ავი',
-							'ელული'
-						],
-						leap => [
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'თიშრეი',
@@ -9687,84 +7852,6 @@ has 'calendar_months' => (
 							
 						],
 					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'მუჰარამი',
-							'საფარი',
-							'რაბი ულ-ავალი',
-							'რაბი ულ-ახირი',
-							'ჯუმადა ულ-ავალი',
-							'ჯუმადა ულ-ახირი',
-							'რაჯაბი',
-							'შაბანი',
-							'რამადანი',
-							'შავალი',
-							'ზულ-კაადა',
-							'ზულ-ჰიჯა'
-						],
-						leap => [
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'მუჰ.',
-							'საფ.',
-							'რაბ. I',
-							'რაბ. II',
-							'ჯუმ. I',
-							'ჯუმ. II',
-							'რაჯ.',
-							'შაბ.',
-							'რამ.',
-							'შავ.',
-							'ზულ-კ.',
-							'ზულ-ჰ.'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'მუჰარამი',
@@ -9788,103 +7875,6 @@ has 'calendar_months' => (
 			},
 			'persian' => {
 				'format' => {
-					abbreviated => {
-						nonleap => [
-							'ფარვარდინი',
-							'ორდიბეჰეშთი',
-							'ხორდადი',
-							'თირი',
-							'მორდადი',
-							'შაჰრივარი',
-							'მეჰრი',
-							'აბანი',
-							'აზარი',
-							'დეი',
-							'ბაჰმანი',
-							'ესფანდი'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'ფარვარდინი',
-							'ორდიბეჰეშთი',
-							'ხორდადი',
-							'თირი',
-							'მორდადი',
-							'შაჰრივარი',
-							'მეჰრი',
-							'აბანი',
-							'აზარი',
-							'დეი',
-							'ბაჰმანი',
-							'ესფანდი'
-						],
-						leap => [
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'ფარვარდინი',
-							'ორდიბეჰეშთი',
-							'ხორდადი',
-							'თირი',
-							'მორდადი',
-							'შაჰრივარი',
-							'მეჰრი',
-							'აბანი',
-							'აზარი',
-							'დეი',
-							'ბაჰმანი',
-							'ესფანდი'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'ფარვარდინი',
@@ -9925,15 +7915,6 @@ has 'calendar_days' => (
 						sat => 'შაბ',
 						sun => 'კვი'
 					},
-					narrow => {
-						mon => 'ო',
-						tue => 'ს',
-						wed => 'ო',
-						thu => 'ხ',
-						fri => 'პ',
-						sat => 'შ',
-						sun => 'კ'
-					},
 					short => {
 						mon => 'ორ',
 						tue => 'სმ',
@@ -9954,15 +7935,6 @@ has 'calendar_days' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						mon => 'ორშ',
-						tue => 'სამ',
-						wed => 'ოთხ',
-						thu => 'ხუთ',
-						fri => 'პარ',
-						sat => 'შაბ',
-						sun => 'კვი'
-					},
 					narrow => {
 						mon => 'ო',
 						tue => 'ს',
@@ -9971,24 +7943,6 @@ has 'calendar_days' => (
 						fri => 'პ',
 						sat => 'შ',
 						sun => 'კ'
-					},
-					short => {
-						mon => 'ორ',
-						tue => 'სმ',
-						wed => 'ოთ',
-						thu => 'ხთ',
-						fri => 'პრ',
-						sat => 'შბ',
-						sun => 'კვ'
-					},
-					wide => {
-						mon => 'ორშაბათი',
-						tue => 'სამშაბათი',
-						wed => 'ოთხშაბათი',
-						thu => 'ხუთშაბათი',
-						fri => 'პარასკევი',
-						sat => 'შაბათი',
-						sun => 'კვირა'
 					},
 				},
 			},
@@ -10006,28 +7960,6 @@ has 'calendar_quarters' => (
 						1 => 'II კვ.',
 						2 => 'III კვ.',
 						3 => 'IV კვ.'
-					},
-					narrow => {0 => '1',
-						1 => '2',
-						2 => '3',
-						3 => '4'
-					},
-					wide => {0 => 'I კვარტალი',
-						1 => 'II კვარტალი',
-						2 => 'III კვარტალი',
-						3 => 'IV კვარტალი'
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {0 => 'I კვ.',
-						1 => 'II კვ.',
-						2 => 'III კვ.',
-						3 => 'IV კვ.'
-					},
-					narrow => {0 => '1',
-						1 => '2',
-						2 => '3',
-						3 => '4'
 					},
 					wide => {0 => 'I კვარტალი',
 						1 => 'II კვარტალი',
@@ -10192,65 +8124,33 @@ has 'day_periods' => (
 			'format' => {
 				'abbreviated' => {
 					'afternoon1' => q{ნაშუადღ.},
-					'am' => q{AM},
 					'evening1' => q{საღ.},
 					'midnight' => q{შუაღამეს},
 					'morning1' => q{დილ.},
 					'night1' => q{ღამ.},
 					'noon' => q{შუადღ.},
-					'pm' => q{PM},
 				},
 				'narrow' => {
-					'afternoon1' => q{ნაშუადღ.},
 					'am' => q{a},
-					'evening1' => q{საღ.},
-					'midnight' => q{შუაღამეს},
-					'morning1' => q{დილ.},
-					'night1' => q{ღამ.},
-					'noon' => q{შუადღ.},
 					'pm' => q{p},
 				},
 				'wide' => {
 					'afternoon1' => q{ნაშუადღევს},
-					'am' => q{AM},
 					'evening1' => q{საღამოს},
 					'midnight' => q{შუაღამეს},
 					'morning1' => q{დილით},
 					'night1' => q{ღამით},
 					'noon' => q{შუადღეს},
-					'pm' => q{PM},
 				},
 			},
 			'stand-alone' => {
 				'abbreviated' => {
 					'afternoon1' => q{ნაშუადღევი},
-					'am' => q{AM},
 					'evening1' => q{საღამო},
 					'midnight' => q{შუაღამე},
 					'morning1' => q{დილა},
 					'night1' => q{ღამე},
 					'noon' => q{შუადღე},
-					'pm' => q{PM},
-				},
-				'narrow' => {
-					'afternoon1' => q{ნაშუადღევი},
-					'am' => q{AM},
-					'evening1' => q{საღამო},
-					'midnight' => q{შუაღამე},
-					'morning1' => q{დილა},
-					'night1' => q{ღამე},
-					'noon' => q{შუადღე},
-					'pm' => q{PM},
-				},
-				'wide' => {
-					'afternoon1' => q{ნაშუადღევი},
-					'am' => q{AM},
-					'evening1' => q{საღამო},
-					'midnight' => q{შუაღამე},
-					'morning1' => q{დილა},
-					'night1' => q{ღამე},
-					'noon' => q{შუადღე},
-					'pm' => q{PM},
 				},
 			},
 		},
@@ -10275,19 +8175,10 @@ has 'eras' => (
 			},
 		},
 		'hebrew' => {
-			abbreviated => {
-				'0' => 'AM'
-			},
 		},
 		'islamic' => {
-			abbreviated => {
-				'0' => 'AH'
-			},
 		},
 		'persian' => {
-			abbreviated => {
-				'0' => 'AP'
-			},
 		},
 	} },
 );
@@ -10372,37 +8263,17 @@ has 'datetime_formats_available_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-			Bh => q{h B},
-			Bhm => q{h:mm B},
-			Bhms => q{h:mm:ss B},
-			E => q{ccc},
-			EBhm => q{E h:mm B},
-			EBhms => q{E h:mm:ss B},
-			EHm => q{E HH:mm},
-			EHms => q{E HH:mm:ss},
 			Ed => q{d E},
-			Ehm => q{E h:mm a},
-			Ehms => q{E h:mm:ss a},
 			Gy => q{y G},
 			GyMMM => q{MMM, y G},
 			GyMMMEd => q{E, d MMM, y G},
 			GyMMMd => q{d MMM, y G},
 			GyMd => q{d.M.y GGGGG},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
 			MEd => q{E, d.M},
-			MMM => q{LLL},
 			MMMEd => q{E, d MMM},
 			MMMMd => q{d MMMM},
 			MMMd => q{d MMM},
 			Md => q{d.M},
-			d => q{d},
-			h => q{h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			ms => q{mm:ss},
 			y => q{y G},
 			yyyy => q{y G},
 			yyyyM => q{M.y G},
@@ -10416,12 +8287,6 @@ has 'datetime_formats_available_formats' => (
 			yyyyQQQQ => q{QQQQ, y G},
 		},
 		'gregorian' => {
-			Bh => q{h B},
-			Bhm => q{h:mm B},
-			Bhms => q{h:mm:ss B},
-			E => q{ccc},
-			EBhm => q{E h:mm B},
-			EBhms => q{E h:mm:ss B},
 			EHm => q{E, HH:mm},
 			EHms => q{E, HH:mm:ss},
 			Ed => q{d E},
@@ -10432,27 +8297,12 @@ has 'datetime_formats_available_formats' => (
 			GyMMMEd => q{E, d MMM. y G},
 			GyMMMd => q{d MMM. y G},
 			GyMd => q{d.M.y GGGGG},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			Hmsv => q{HH:mm:ss v},
-			Hmv => q{HH:mm v},
-			M => q{L},
 			MEd => q{E, d.M},
-			MMM => q{LLL},
 			MMMEd => q{E, d MMM},
 			MMMMW => q{MMMMს კვირა W},
 			MMMMd => q{d MMMM},
 			MMMd => q{d MMM},
 			Md => q{d.M},
-			d => q{d},
-			h => q{h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			hmsv => q{h:mm:ss a v},
-			hmv => q{h:mm a v},
-			ms => q{mm:ss},
-			y => q{y},
 			yM => q{M.y},
 			yMEd => q{E, d.M.y},
 			yMMM => q{MMM. y},
@@ -10472,9 +8322,6 @@ has 'datetime_formats_append_item' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			'Timezone' => '{0} {1}',
-		},
 	} },
 );
 
@@ -10485,36 +8332,10 @@ has 'datetime_formats_interval' => (
 	default		=> sub { {
 		'generic' => {
 			Bh => {
-				B => q{h B – h B},
 				h => q{h – h B},
 			},
 			Bhm => {
-				B => q{h:mm B – h:mm B},
 				h => q{h:mm – h:mm B},
-				m => q{h:mm–h:mm B},
-			},
-			Gy => {
-				G => q{G y – G y},
-				y => q{G y–y},
-			},
-			GyM => {
-				G => q{GGGGG y-MM – GGGGG y-MM},
-				M => q{GGGGG y-MM – y-MM},
-				y => q{GGGGG y-MM – y-MM},
-			},
-			H => {
-				H => q{HH–HH},
-			},
-			Hm => {
-				H => q{HH:mm–HH:mm},
-				m => q{HH:mm–HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm–HH:mm v},
-				m => q{HH:mm–HH:mm v},
-			},
-			Hv => {
-				H => q{HH–HH v},
 			},
 			M => {
 				M => q{M–M},
@@ -10538,28 +8359,7 @@ has 'datetime_formats_interval' => (
 				M => q{dd.MM. – dd.MM.},
 				d => q{dd.MM. – dd.MM.},
 			},
-			d => {
-				d => q{d–d},
-			},
 			fallback => '{0} – {1}',
-			h => {
-				a => q{h a – h a},
-				h => q{h–h a},
-			},
-			hm => {
-				a => q{h:mm a – h:mm a},
-				h => q{h:mm–h:mm a},
-				m => q{h:mm–h:mm a},
-			},
-			hmv => {
-				a => q{h:mm a – h:mm a v},
-				h => q{h:mm–h:mm a v},
-				m => q{h:mm–h:mm a v},
-			},
-			hv => {
-				a => q{h a – h a v},
-				h => q{h–h a v},
-			},
 			y => {
 				y => q{y–y G},
 			},
@@ -10597,33 +8397,6 @@ has 'datetime_formats_interval' => (
 			},
 		},
 		'gregorian' => {
-			Bh => {
-				B => q{h B – h B},
-				h => q{h–h B},
-			},
-			Bhm => {
-				B => q{h:mm B – h:mm B},
-				h => q{h:mm–h:mm B},
-				m => q{h:mm–h:mm B},
-			},
-			Gy => {
-				G => q{G y – G y},
-				y => q{G y–y},
-			},
-			H => {
-				H => q{HH–HH},
-			},
-			Hm => {
-				H => q{HH:mm–HH:mm},
-				m => q{HH:mm–HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm–HH:mm v},
-				m => q{HH:mm–HH:mm v},
-			},
-			Hv => {
-				H => q{HH–HH v},
-			},
 			M => {
 				M => q{M–M},
 			},
@@ -10646,31 +8419,7 @@ has 'datetime_formats_interval' => (
 				M => q{dd.MM. – dd.MM.},
 				d => q{dd.MM. – dd.MM.},
 			},
-			d => {
-				d => q{d–d},
-			},
 			fallback => '{0} – {1}',
-			h => {
-				a => q{h a – h a},
-				h => q{h–h a},
-			},
-			hm => {
-				a => q{h:mm a – h:mm a},
-				h => q{h:mm–h:mm a},
-				m => q{h:mm–h:mm a},
-			},
-			hmv => {
-				a => q{h:mm a – h:mm a v},
-				h => q{h:mm–h:mm a v},
-				m => q{h:mm–h:mm a v},
-			},
-			hv => {
-				a => q{h a – h a v},
-				h => q{h–h a v},
-			},
-			y => {
-				y => q{y–y},
-			},
 			yM => {
 				M => q{MM.y – MM.y},
 				y => q{MM.y – MM.y},
@@ -10712,13 +8461,9 @@ has 'time_zone_names' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default	=> sub { {
-		hourFormat => q(+HH:mm;-HH:mm),
-		gmtFormat => q(GMT{0}),
-		gmtZeroFormat => q(GMT),
 		regionFormat => q(დრო: {0}),
 		regionFormat => q({0} ზაფხულის დრო),
 		regionFormat => q({0} სტანდარტული დრო),
-		fallbackFormat => q({1} ({0})),
 		'Afghanistan' => {
 			long => {
 				'standard' => q#ავღანეთის დრო#,
@@ -11014,6 +8759,9 @@ has 'time_zone_names' => (
 		},
 		'America/Chihuahua' => {
 			exemplarCity => q#ჩიჰუაჰუა#,
+		},
+		'America/Ciudad_Juarez' => {
+			exemplarCity => q#სიუდად-ხუარესი#,
 		},
 		'America/Coral_Harbour' => {
 			exemplarCity => q#ატიკოკანი#,
@@ -12591,6 +10339,9 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Johnston' => {
 			exemplarCity => q#ჯონსტონი#,
+		},
+		'Pacific/Kanton' => {
+			exemplarCity => q#კანტონი#,
 		},
 		'Pacific/Kiritimati' => {
 			exemplarCity => q#კირიტიმატი#,

@@ -1,7 +1,7 @@
 Build.PL
 lib/Locale/CLDR/Locales/My.pm
-lib/Locale/CLDR/Locales/My/Any.pm
-lib/Locale/CLDR/Locales/My/Any/Mm.pm
+lib/Locale/CLDR/Locales/My/Mymr.pm
+lib/Locale/CLDR/Locales/My/Mymr/Mm.pm
 MANIFEST			This list of files
 README
 t/00-load.t

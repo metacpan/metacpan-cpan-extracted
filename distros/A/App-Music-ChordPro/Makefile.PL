@@ -29,14 +29,19 @@ WriteMakefile
  ABSTRACT         => "A lyrics and chords formatting program",
  VERSION	  => $version,
  AUTHOR	          => 'Johan Vromans <jvromans@squirrel.nl>',
- LICENSE	  => "perl",
+ LICENSE	  => "perl_5",
  MIN_PERL_VERSION => 5.026000,
  INSTALLDIRS	  => 'site',
  EXE_FILES	  => [ map { "script/$_" } @bins ],
  PL_FILES	  => {
 		       'script/ppchordpro.PL' => [ map { "script/$_" } @bins ]
 		     },
-
+ MAN3PODS	  => {
+    'lib/ChordPro.pm'        => 'blib/man3/ChordPro.3pm',
+    'lib/ChordPro/A2Crd.pm'  => 'blib/man3/ChordPro::A2Crd.3pm',
+    'lib/ChordPro/Config.pm' => 'blib/man3/ChordPro::Config.3pm',
+    'lib/ChordPro/Wx.pm'     => 'blib/man3/ChordPro::Wx.3pm',
+		     },
  # Always require PDF::API2 or PDF::Builder and Text::Layout.
  PREREQ_PM      => {
 		    @pdfapi,
@@ -75,12 +80,20 @@ WriteMakefile
 		   },
 
  META_MERGE => {
-     resources => {
-	 license    => "https://dev.perl.org/licenses/",
-	 homepage   => "https://www.chordpro.org",
-	 repository => "https://github.com/sciurius/chordpro",
-	 bugtracker => "https://github.com/sciurius/chordpro/issues",
-     },
+     'meta-spec'  => { version => 2, },
+     resources    => {
+       license    => [ "https://dev.perl.org/licenses/" ],
+       homepage   => 'https://chordpro.org',
+       repository => {
+	 url => 'git://github.com/ChordPro/chordpro.git',
+	 web => 'https://github.com/ChordPro/chordpro',
+	 type => 'git',
+       },
+       bugtracker => {
+	 web => "https://github.com/ChordPro/chordpro/issues",
+	 mailto => "info@chordpro.org",
+       },
+    },
      provides => {
 	 chordpro => { file => "script/chordpro",
 		       version => $version },

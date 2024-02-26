@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Type::DateTime;
 # ABSTRACT: Represents a Neo4j temporal instant value
-$Neo4j::Driver::Type::DateTime::VERSION = '0.44';
+$Neo4j::Driver::Type::DateTime::VERSION = '0.45';
 
 # For documentation, see Neo4j::Driver::Types.
 
@@ -14,29 +14,22 @@ use parent 'Neo4j::Types::DateTime';
 use parent 'Neo4j::Driver::Type::Temporal';
 
 
-use Test::More ();  # debug crash on Win32
-my $TestingWin32 = $ENV{HARNESS_ACTIVE} && $^O =~ /Win32/;  # debug crash on Win32
 sub _parse {
 	my ($self) = @_;
 	
 	if ( ! exists $self->{T} ) {  # JSON format
 		$self->{T} = $self->{data};
 	}
-Test::More::diag "INSIDE DateTime _parse $self->{T}" if $TestingWin32;  # debug crash on Win32
 	
 	my ($days, $hours, $mins, $secs, $nanos, $tz) = $self->{T} =~ m/^(?:([-+]?[0-9]{4,}-[0-9]{2}-[0-9]{2}))?T?(?:([0-9]{2}):([0-9]{2}):([0-9]{2})(?:[,.]([0-9]+))?)?(.*)$/;
 	
 	if (defined $days) {
-Test::More::diag "BEFORE require Time::Piece" if $TestingWin32;  # debug crash on Win32
 		require Time::Piece;
-Test::More::diag "BEFORE strptime" if $TestingWin32;  # debug crash on Win32
 		my $t = Time::Piece->strptime($1, '%Y-%m-%d');
-Test::More::diag "BEFORE Time::Piece mjd" if $TestingWin32;  # debug crash on Win32
 		$days = $t->mjd - 40587;
 	}
 	$self->{days} = $days;
 	
-Test::More::diag "BEFORE _parse secs" if $TestingWin32;  # debug crash on Win32
 	if (defined $secs) {
 		$secs = $hours * 3600 + $mins * 60 + $secs;
 		if (defined $nanos) {
@@ -48,7 +41,6 @@ Test::More::diag "BEFORE _parse secs" if $TestingWin32;  # debug crash on Win32
 			$nanos = 0;
 		}
 		
-Test::More::diag "BEFORE _parse tz" if $TestingWin32;  # debug crash on Win32
 		if ($tz eq 'Z') {
 			$self->{tz_name} = 'Etc/GMT';
 			$self->{tz_offset} = 0;
@@ -68,7 +60,6 @@ Test::More::diag "BEFORE _parse tz" if $TestingWin32;  # debug crash on Win32
 	}
 	$self->{seconds} = $secs;
 	$self->{nanoseconds} = $nanos;
-Test::More::diag "END DateTime _parse" if $TestingWin32;  # debug crash on Win32
 }
 
 

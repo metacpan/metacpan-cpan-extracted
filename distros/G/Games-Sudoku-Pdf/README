@@ -1,0 +1,10 @@
+
+ Games::Sudoku::Pdf - Produce pdf files from your digital Sudoku sources or collections. 
+
+ An easy way to create pdf files of 9x9 Sudoku puzzles from your input.
+ Sixteen variants of 9x9 Sudoku are supported. (See the output of scripts/example.pl.)
+ Specify the page format and puzzle arrangement (columns x rows) per page 
+ while the positioning and scaling is done automatically.
+ A command line script is available for convenience.
+
+ Steffen Heinrich, Feb. 2024

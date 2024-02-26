@@ -12,11 +12,12 @@ BEGIN {
 }
 
 SKIP: {
-	skip 'Database not installed', 5 if(!-r 'lib/Genealogy/Wills/database/wills.sql');
+	skip 'Database not installed', 5 if(!-r 'lib/Genealogy/Wills/data/wills.sql');
 
+	Database::Abstraction::init('directory' => 'lib/Genealogy/Wills/data');
 	if($ENV{'TEST_VERBOSE'}) {
 		use Data::Dumper;
-		Genealogy::Wills::DB::init(logger => MyLogger->new());
+		Database::Abstraction::init(logger => MyLogger->new());
 	}
 	my $search = new_ok('Genealogy::Wills');
 

@@ -1,12 +1,12 @@
 package Locale::CLDR::ValidCodes;
 # This file auto generated from Data\common\supplemental\supplementalMetadata.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -210,7 +210,7 @@ has 'valid_languages' => (
  aji
  ajn
  ajp
- ajt
+ ajs
  ajw
  ajz
  ak
@@ -905,6 +905,7 @@ has 'valid_languages' => (
  boy
  boz
  bpa
+ bpc
  bpd
  bpe
  bpg
@@ -1358,6 +1359,7 @@ has 'valid_languages' => (
  cnl
  cno
  cnp
+ cnq
  cns
  cnt
  cnu
@@ -1473,7 +1475,6 @@ has 'valid_languages' => (
  cua
  cub
  cuc
- cug
  cuh
  cui
  cuj
@@ -1734,6 +1735,7 @@ has 'valid_languages' => (
  dsn
  dso
  dsq
+ dsz
  dta
  dtb
  dtd
@@ -1815,6 +1817,7 @@ has 'valid_languages' => (
  efi
  ega
  egl
+ egm
  ego
  egx
  egy
@@ -2243,6 +2246,7 @@ has 'valid_languages' => (
  gos
  got
  gou
+ gov
  gow
  gox
  goy
@@ -2646,6 +2650,7 @@ has 'valid_languages' => (
  imo
  imr
  ims
+ imt
  imy
  inb
  inc
@@ -3521,7 +3526,6 @@ has 'valid_languages' => (
  lah
  lai
  laj
- lak
  lal
  lam
  lan
@@ -3617,6 +3621,7 @@ has 'valid_languages' => (
  lgl
  lgm
  lgn
+ lgo
  lgq
  lgr
  lgt
@@ -3731,7 +3736,6 @@ has 'valid_languages' => (
  lnl
  lnm
  lnn
- lno
  lns
  lnu
  lnw
@@ -3767,6 +3771,7 @@ has 'valid_languages' => (
  lpn
  lpo
  lpx
+ lqr
  lra
  lrc
  lre
@@ -3783,6 +3788,7 @@ has 'valid_languages' => (
  lrz
  lsa
  lsb
+ lsc
  lsd
  lse
  lsh
@@ -3796,6 +3802,7 @@ has 'valid_languages' => (
  lss
  lst
  lsv
+ lsw
  lsy
  lt
  ltc
@@ -4933,6 +4940,7 @@ has 'valid_languages' => (
  nwm
  nwo
  nwr
+ nww
  nwx
  nwy
  nxa
@@ -5017,6 +5025,7 @@ has 'valid_languages' => (
  oht
  ohu
  oia
+ oie
  oin
  oj
  ojb
@@ -5259,6 +5268,7 @@ has 'valid_languages' => (
  phg
  phh
  phi
+ phj
  phk
  phl
  phm
@@ -5279,7 +5289,6 @@ has 'valid_languages' => (
  pif
  pig
  pih
- pii
  pij
  pil
  pim
@@ -5501,6 +5510,7 @@ has 'valid_languages' => (
  pyu
  pyx
  pyy
+ pzh
  pzn
  qu
  qua
@@ -5614,6 +5624,7 @@ has 'valid_languages' => (
  rhg
  rhp
  ria
+ rib
  rif
  ril
  rim
@@ -5656,6 +5667,7 @@ has 'valid_languages' => (
  rmx
  rmz
  rn
+ rnb
  rnd
  rng
  rnl
@@ -5684,8 +5696,10 @@ has 'valid_languages' => (
  rro
  rrt
  rsb
+ rsk
  rsl
  rsm
+ rsn
  rtc
  rth
  rtm
@@ -5982,7 +5996,6 @@ has 'valid_languages' => (
  sma
  smb
  smc
- smd
  smf
  smg
  smh
@@ -6004,7 +6017,6 @@ has 'valid_languages' => (
  smy
  smz
  sn
- snb
  snc
  sne
  snf
@@ -6547,6 +6559,7 @@ has 'valid_languages' => (
  toh
  toi
  toj
+ tok
  tol
  tom
  too
@@ -6793,6 +6806,7 @@ has 'valid_languages' => (
  uga
  ugb
  uge
+ ugh
  ugn
  ugo
  ugy
@@ -6850,6 +6864,7 @@ has 'valid_languages' => (
  unu
  unx
  unz
+ uon
  upi
  upv
  ur
@@ -6890,7 +6905,6 @@ has 'valid_languages' => (
  utr
  utu
  uum
- uun
  uur
  uuu
  uve
@@ -7043,6 +7057,7 @@ has 'valid_languages' => (
  wdg
  wdj
  wdk
+ wdt
  wdu
  wdy
  wea
@@ -7163,7 +7178,6 @@ has 'valid_languages' => (
  woy
  wpc
  wrb
- wrd
  wrg
  wrh
  wri
@@ -7215,10 +7229,10 @@ has 'valid_languages' => (
  www
  wxa
  wxw
- wya
  wyb
  wyi
  wym
+ wyn
  wyr
  wyy
  xaa
@@ -7277,6 +7291,7 @@ has 'valid_languages' => (
  xdk
  xdm
  xdo
+ xdq
  xdy
  xeb
  xed
@@ -7306,6 +7321,7 @@ has 'valid_languages' => (
  xhc
  xhd
  xhe
+ xhm
  xhr
  xht
  xhu
@@ -7803,6 +7819,7 @@ has 'valid_languages' => (
  zbu
  zbw
  zca
+ zcd
  zch
  zdj
  zea
@@ -8558,6 +8575,7 @@ has 'valid_scripts' => (
  Jpan
  Kali
  Kana
+ Kawi
  Khar
  Khmr
  Khoj
@@ -8591,6 +8609,7 @@ has 'valid_scripts' => (
  Mtei
  Mult
  Mymr
+ Nagm
  Nand
  Narb
  Nbat
@@ -8657,9 +8676,9 @@ has 'valid_scripts' => (
  Xsux
  Yezi
  Yiii
+ Zanb
  Aran
  Qaag
- Zanb
  Zinh
  Zmth
  Zsye
@@ -8780,6 +8799,7 @@ has 'valid_regions' => (
  CN
  CO
  CP
+ CQ
  CR
  CU
  CV
@@ -9130,6 +9150,8 @@ has 'valid_variants' => (
  lemosin
  lengadoc
  lipaw
+ ltg1929
+ ltg2007
  luna1918
  metelko
  monoton
@@ -9251,7 +9273,6 @@ has 'valid_currencies' => (
  GYD
  HKD
  HNL
- HRK
  HTG
  HUF
  IDR
@@ -9318,7 +9339,7 @@ has 'valid_currencies' => (
  SEK
  SGD
  SHP
- SLL
+ SLE
  SOS
  SRD
  SSP
@@ -10623,6 +10644,7 @@ has 'valid_subdivisions' => (
  etga
  etha
  etor
+ etsi
  etsn
  etso
  etti
@@ -10738,12 +10760,14 @@ has 'valid_subdivisions' => (
  fr67
  fr68
  fr69
+ fr69m
+ fr6ae
  fr70
  fr71
  fr72
  fr73
  fr74
- fr75
+ fr75c
  fr76
  fr77
  fr78
@@ -10856,6 +10880,7 @@ has 'valid_subdivisions' => (
  gbeln
  gbels
  gbenf
+ gbeng
  gberw
  gbery
  gbess
@@ -10920,6 +10945,7 @@ has 'valid_subdivisions' => (
  gbnet
  gbnfk
  gbngm
+ gbnir
  gbnlk
  gbnln
  gbnmd
@@ -10952,6 +10978,7 @@ has 'valid_subdivisions' => (
  gbsaw
  gbsay
  gbscb
+ gbsct
  gbsfk
  gbsft
  gbsgc
@@ -10994,6 +11021,7 @@ has 'valid_subdivisions' => (
  gbwkf
  gbwll
  gbwln
+ gbwls
  gbwlv
  gbwnd
  gbwnm
@@ -11117,28 +11145,28 @@ has 'valid_subdivisions' => (
  grk
  grl
  grm
- gtav
- gtbv
- gtcm
- gtcq
- gtes
- gtgu
- gthu
- gtiz
- gtja
- gtju
- gtpe
- gtpr
- gtqc
- gtqz
- gtre
- gtsa
- gtsm
- gtso
- gtsr
- gtsu
- gtto
- gtza
+ gt01
+ gt02
+ gt03
+ gt04
+ gt05
+ gt06
+ gt07
+ gt08
+ gt09
+ gt10
+ gt11
+ gt12
+ gt13
+ gt14
+ gt15
+ gt16
+ gt17
+ gt18
+ gt19
+ gt20
+ gt21
+ gt22
  gwba
  gwbl
  gwbm
@@ -11376,6 +11404,7 @@ has 'valid_subdivisions' => (
  iqdq
  iqka
  iqki
+ iqkr
  iqma
  iqmu
  iqna
@@ -11428,20 +11457,17 @@ has 'valid_subdivisions' => (
  isaku
  isarn
  isasa
- isbfj
  isbla
  isblo
  isbog
  isbol
  isdab
  isdav
- isdju
  iseom
  iseyf
  isfjd
  isfjl
  isfla
- isfld
  isflr
  isgar
  isgog
@@ -11462,6 +11488,7 @@ has 'valid_subdivisions' => (
  iskop
  islan
  ismos
+ ismul
  ismyr
  isnor
  isrge
@@ -11474,7 +11501,6 @@ has 'valid_subdivisions' => (
  issdn
  issdv
  issel
- issey
  issfa
  isshf
  isskf
@@ -12037,125 +12063,49 @@ has 'valid_subdivisions' => (
  lurm
  luvd
  luwi
- lv001
  lv002
- lv003
- lv004
- lv005
- lv006
  lv007
- lv008
- lv009
- lv010
  lv011
- lv012
- lv013
- lv014
  lv015
  lv016
- lv017
- lv018
- lv019
- lv020
- lv021
  lv022
- lv023
- lv024
- lv025
  lv026
- lv027
- lv028
- lv029
- lv030
- lv031
- lv032
  lv033
- lv034
- lv035
- lv036
- lv037
- lv038
- lv039
- lv040
  lv041
  lv042
- lv043
- lv044
- lv045
- lv046
  lv047
- lv048
- lv049
  lv050
- lv051
  lv052
- lv053
  lv054
- lv055
  lv056
- lv057
  lv058
  lv059
- lv060
- lv061
  lv062
- lv063
- lv064
- lv065
- lv066
  lv067
  lv068
- lv069
- lv070
- lv071
- lv072
  lv073
- lv074
- lv075
- lv076
  lv077
- lv078
- lv079
  lv080
- lv081
- lv082
- lv083
- lv084
- lv085
- lv086
  lv087
  lv088
  lv089
- lv090
  lv091
- lv092
- lv093
  lv094
- lv095
- lv096
  lv097
- lv098
  lv099
- lv100
  lv101
  lv102
- lv103
- lv104
- lv105
  lv106
- lv107
- lv108
- lv109
- lv110
+ lv111
+ lv112
+ lv113
  lvdgv
  lvjel
- lvjkb
  lvjur
  lvlpx
  lvrez
  lvrix
  lvven
- lvvmr
  lyba
  lybu
  lydr
@@ -12894,6 +12844,7 @@ has 'valid_subdivisions' => (
  paem
  paky
  panb
+ pant
  peama
  peanc
  peapu
@@ -14515,6 +14466,7 @@ has 'valid_subdivisions' => (
  cnzzzz
  cozzzz
  cpzzzz
+ cqzzzz
  crzzzz
  cuzzzz
  cvzzzz
@@ -14736,173 +14688,184 @@ has 'valid_units' => (
 	init_arg	=> undef,
 	default	=> sub {[qw( acceleration-g-force
  acceleration-meter-per-square-second
+ angle-revolution
+ angle-radian
+ angle-degree
  angle-arc-minute
  angle-arc-second
- angle-degree
- angle-radian
- angle-revolution
- area-acre
+ area-square-kilometer
  area-hectare
+ area-square-meter
  area-square-centimeter
+ area-square-mile
+ area-acre
+ area-square-yard
  area-square-foot
  area-square-inch
- area-square-kilometer
- area-square-meter
- area-square-mile
- area-square-yard
  area-dunam
  concentr-karat
  concentr-milligram-ofglucose-per-deciliter
  concentr-millimole-per-liter
+ concentr-item
+ concentr-permillion
  concentr-percent
  concentr-permille
  concentr-permyriad
- concentr-permillion
  concentr-mole
- concentr-item
- concentr-portion
- concentr-ofglucose
- consumption-liter-per-100-kilometer
  consumption-liter-per-kilometer
+ consumption-liter-per-100-kilometer
  consumption-mile-per-gallon
  consumption-mile-per-gallon-imperial
- digital-bit
- digital-byte
- digital-gigabit
- digital-gigabyte
- digital-kilobit
- digital-kilobyte
- digital-megabit
- digital-megabyte
  digital-petabyte
- digital-terabit
  digital-terabyte
+ digital-terabit
+ digital-gigabyte
+ digital-gigabit
+ digital-megabyte
+ digital-megabit
+ digital-kilobyte
+ digital-kilobit
+ digital-byte
+ digital-bit
  duration-century
  duration-decade
+ duration-year
+ duration-year-person
+ duration-quarter
+ duration-month
+ duration-month-person
+ duration-week
+ duration-week-person
  duration-day
  duration-day-person
  duration-hour
- duration-microsecond
- duration-millisecond
  duration-minute
- duration-month
- duration-month-person
- duration-nanosecond
  duration-second
- duration-week
- duration-week-person
- duration-year
- duration-year-person
+ duration-millisecond
+ duration-microsecond
+ duration-nanosecond
  electric-ampere
  electric-milliampere
  electric-ohm
  electric-volt
+ energy-kilocalorie
  energy-calorie
  energy-foodcalorie
- energy-joule
- energy-kilocalorie
  energy-kilojoule
+ energy-joule
  energy-kilowatt-hour
  energy-electronvolt
- energy-therm-us
  energy-british-thermal-unit
+ energy-therm-us
  force-pound-force
  force-newton
  force-kilowatt-hour-per-100-kilometer
  frequency-gigahertz
- frequency-hertz
- frequency-kilohertz
  frequency-megahertz
- graphics-dot
- graphics-dot-per-centimeter
- graphics-dot-per-inch
+ frequency-kilohertz
+ frequency-hertz
  graphics-em
- graphics-megapixel
  graphics-pixel
+ graphics-megapixel
  graphics-pixel-per-centimeter
  graphics-pixel-per-inch
- length-100-kilometer
- length-astronomical-unit
- length-centimeter
- length-decimeter
- length-fathom
- length-foot
- length-furlong
- length-inch
- length-kilometer
- length-light-year
- length-meter
- length-micrometer
- length-mile
- length-mile-scandinavian
- length-millimeter
- length-nanometer
- length-nautical-mile
- length-parsec
- length-picometer
- length-point
- length-yard
+ graphics-dot-per-centimeter
+ graphics-dot-per-inch
+ graphics-dot
  length-earth-radius
+ length-kilometer
+ length-meter
+ length-decimeter
+ length-centimeter
+ length-millimeter
+ length-micrometer
+ length-nanometer
+ length-picometer
+ length-mile
+ length-yard
+ length-foot
+ length-inch
+ length-parsec
+ length-light-year
+ length-astronomical-unit
+ length-furlong
+ length-fathom
+ length-nautical-mile
+ length-mile-scandinavian
+ length-point
  length-solar-radius
+ light-lux
  light-candela
  light-lumen
- light-lux
  light-solar-luminosity
- mass-carat
- mass-grain
- mass-gram
+ mass-tonne
  mass-kilogram
- mass-metric-ton
- mass-microgram
+ mass-gram
  mass-milligram
+ mass-microgram
+ mass-ton
+ mass-stone
+ mass-pound
  mass-ounce
  mass-ounce-troy
- mass-pound
- mass-stone
- mass-ton
+ mass-carat
  mass-dalton
  mass-earth-mass
  mass-solar-mass
+ mass-grain
  power-gigawatt
- power-horsepower
- power-kilowatt
  power-megawatt
- power-milliwatt
+ power-kilowatt
  power-watt
- pressure-atmosphere
- pressure-hectopascal
+ power-milliwatt
+ power-horsepower
+ pressure-millimeter-ofhg
+ pressure-pound-force-per-square-inch
  pressure-inch-ofhg
  pressure-bar
  pressure-millibar
- pressure-millimeter-ofhg
- pressure-pound-force-per-square-inch
+ pressure-atmosphere
  pressure-pascal
+ pressure-hectopascal
  pressure-kilopascal
  pressure-megapascal
- pressure-ofhg
  speed-kilometer-per-hour
- speed-knot
  speed-meter-per-second
  speed-mile-per-hour
+ speed-knot
+ temperature-generic
  temperature-celsius
  temperature-fahrenheit
- temperature-generic
  temperature-kelvin
  torque-pound-force-foot
  torque-newton-meter
- volume-acre-foot
- volume-bushel
- volume-centiliter
- volume-cubic-centimeter
- volume-cubic-foot
- volume-cubic-inch
  volume-cubic-kilometer
  volume-cubic-meter
+ volume-cubic-centimeter
  volume-cubic-mile
  volume-cubic-yard
- volume-cup
- volume-cup-metric
+ volume-cubic-foot
+ volume-cubic-inch
+ volume-megaliter
+ volume-hectoliter
+ volume-liter
  volume-deciliter
+ volume-centiliter
+ volume-milliliter
+ volume-pint-metric
+ volume-cup-metric
+ volume-acre-foot
+ volume-bushel
+ volume-gallon
+ volume-gallon-imperial
+ volume-quart
+ volume-pint
+ volume-cup
+ volume-fluid-ounce
+ volume-fluid-ounce-imperial
+ volume-tablespoon
+ volume-teaspoon
+ volume-barrel
  volume-dessert-spoon
  volume-dessert-spoon-imperial
  volume-drop
@@ -14910,20 +14873,50 @@ has 'valid_units' => (
  volume-jigger
  volume-pinch
  volume-quart-imperial
- volume-fluid-ounce
- volume-fluid-ounce-imperial
- volume-gallon
- volume-gallon-imperial
- volume-hectoliter
- volume-liter
- volume-megaliter
- volume-milliliter
- volume-pint
- volume-pint-metric
- volume-quart
- volume-tablespoon
- volume-teaspoon
- volume-barrel
+ angle-steradian
+ concentr-portion
+ concentr-ofglucose
+ concentr-katal
+ duration-fortnight
+ electric-coulomb
+ electric-farad
+ electric-henry
+ electric-siemens
+ energy-calorie-it
+ energy-british-thermal-unit-it
+ energy-becquerel
+ energy-sievert
+ energy-gray
+ force-kilogram-force
+ length-100-kilometer
+ length-rod
+ length-chain
+ magnetic-tesla
+ magnetic-weber
+ mass-slug
+ pressure-ofhg
+ speed-beaufort
+ temperature-rankine
+ volume-pint-imperial
+ pressure-gasoline-energy-density
+ length-rin
+ length-sun
+ length-shaku-length
+ length-shaku-cloth
+ length-ken
+ length-jo-jp
+ length-ri-jp
+ area-bu-jp
+ area-se-jp
+ area-cho
+ volume-kosaji
+ volume-osaji
+ volume-cup-jp
+ volume-shaku
+ volume-sai
+ volume-to-jp
+ volume-koku
+ mass-fun
  acceleration-meter-per-second-squared
  consumption-liter-per-100kilometers
  concentr-part-per-million
@@ -14933,6 +14926,7 @@ has 'valid_units' => (
  proportion-karat
  torque-pound-foot
  concentr-milligram-per-deciliter
+ mass-metric-ton
  	)]},
 );
 
@@ -15273,6 +15267,7 @@ has 'valid_keys' => (
 			'shp',
 			'sit',
 			'skk',
+			'sle',
 			'sll',
 			'sos',
 			'srd',
@@ -15310,6 +15305,7 @@ has 'valid_keys' => (
 			'uyw',
 			'uzs',
 			'veb',
+			'ved',
 			'vef',
 			'ves',
 			'vnd',
@@ -15381,6 +15377,7 @@ has 'valid_keys' => (
 			'null',
 			'remove',
 			'zawgyi',
+			'morse',
 		],
 		dx	=> [
 			'SCRIPT_CODE',
@@ -15521,6 +15518,7 @@ has 'valid_keys' => (
 			'normal',
 			'breakall',
 			'keepall',
+			'phrase',
 		],
 		m0	=> [
 			'alaloc',
@@ -15547,12 +15545,30 @@ has 'valid_keys' => (
 			'names',
 			'iast',
 			'ewts',
+			'aethiopi',
+			'betamets',
+			'beta-metsehaf',
+			'iesjes',
+			'ies-jes',
+			'es3842',
+			'lambdin',
+			'gurage',
+			'gutgarts',
+			'sera',
+			'tekieali',
+			'tekie-alibekit',
+			'xaleget',
 		],
 		ms	=> [
 			'metric',
 			'ussystem',
 			'uksystem',
 			'imperial',
+		],
+		mu	=> [
+			'celsius',
+			'kelvin',
+			'fahrenhe',
 		],
 		nu	=> [
 			'adlm',
@@ -15594,6 +15610,7 @@ has 'valid_keys' => (
 			'jpanfin',
 			'jpanyear',
 			'kali',
+			'kawi',
 			'khmr',
 			'knda',
 			'lana',
@@ -15615,6 +15632,7 @@ has 'valid_keys' => (
 			'mymr',
 			'mymrshan',
 			'mymrtlng',
+			'nagm',
 			'native',
 			'newa',
 			'nkoo',
@@ -15658,6 +15676,7 @@ has 'valid_keys' => (
 			'npinyin',
 			'numericPinyin',
 			'zawgyi',
+			'morse',
 		],
 		sd	=> [
 			'SUBDIVISION_CODE',
@@ -15748,9 +15767,8 @@ has 'valid_keys' => (
 			'aueuc',
 			'Australia/Eucla',
 			'auhba',
-			'Australia/Hobart Australia/Tasmania',
+			'Australia/Hobart Australia/Tasmania Australia/Currie',
 			'aukns',
-			'Australia/Currie',
 			'auldc',
 			'Australia/Lindeman',
 			'auldh',
@@ -15838,9 +15856,8 @@ has 'valid_keys' => (
 			'cacfq',
 			'America/Creston',
 			'caedm',
-			'America/Edmonton Canada/Mountain',
+			'America/Edmonton Canada/Mountain America/Yellowknife',
 			'caffs',
-			'America/Rainy_River',
 			'cafne',
 			'America/Fort_Nelson',
 			'caglb',
@@ -15850,13 +15867,11 @@ has 'valid_keys' => (
 			'cahal',
 			'America/Halifax Canada/Atlantic',
 			'caiql',
-			'America/Iqaluit',
+			'America/Iqaluit America/Pangnirtung',
 			'camon',
 			'America/Moncton',
 			'camtr',
-			'America/Montreal',
 			'capnt',
-			'America/Pangnirtung',
 			'careb',
 			'America/Resolute',
 			'careg',
@@ -15864,15 +15879,13 @@ has 'valid_keys' => (
 			'casjf',
 			'America/St_Johns Canada/Newfoundland',
 			'canpg',
-			'America/Nipigon',
 			'cathu',
-			'America/Thunder_Bay',
 			'cator',
-			'America/Toronto Canada/Eastern',
+			'America/Toronto America/Montreal Canada/Eastern America/Nipigon America/Thunder_Bay',
 			'cavan',
 			'America/Vancouver Canada/Pacific',
 			'cawnp',
-			'America/Winnipeg Canada/Central',
+			'America/Winnipeg Canada/Central America/Rainy_River',
 			'caybx',
 			'America/Blanc-Sablon',
 			'caycb',
@@ -15890,7 +15903,6 @@ has 'valid_keys' => (
 			'cayyn',
 			'America/Swift_Current',
 			'cayzf',
-			'America/Yellowknife',
 			'cayzs',
 			'America/Coral_Harbour America/Atikokan',
 			'cccck',
@@ -16205,6 +16217,8 @@ has 'valid_keys' => (
 			'America/Chihuahua',
 			'mxcun',
 			'America/Cancun',
+			'mxcjs',
+			'America/Ciudad_Juarez',
 			'mxhmo',
 			'America/Hermosillo',
 			'mxmam',
@@ -16222,9 +16236,8 @@ has 'valid_keys' => (
 			'mxpvr',
 			'America/Bahia_Banderas',
 			'mxstis',
-			'America/Santa_Isabel',
 			'mxtij',
-			'America/Tijuana America/Ensenada Mexico/BajaNorte',
+			'America/Tijuana America/Ensenada Mexico/BajaNorte America/Santa_Isabel',
 			'mykch',
 			'Asia/Kuching',
 			'mykul',
@@ -16434,19 +16447,16 @@ has 'valid_keys' => (
 			'tzdar',
 			'Africa/Dar_es_Salaam',
 			'uaiev',
-			'Europe/Kiev',
+			'Europe/Kiev Europe/Kyiv Europe/Zaporozhye Europe/Uzhgorod',
 			'uaozh',
-			'Europe/Zaporozhye',
 			'uasip',
 			'Europe/Simferopol',
 			'uauzh',
-			'Europe/Uzhgorod',
 			'ugkla',
 			'Africa/Kampala',
 			'umawk',
 			'Pacific/Wake',
 			'umjon',
-			'Pacific/Johnston',
 			'ummdy',
 			'Pacific/Midway',
 			'unk',
@@ -16466,7 +16476,7 @@ has 'valid_keys' => (
 			'usdet',
 			'America/Detroit US/Michigan',
 			'ushnl',
-			'Pacific/Honolulu US/Hawaii',
+			'Pacific/Honolulu US/Hawaii Pacific/Johnston',
 			'usind',
 			'America/Indianapolis America/Fort_Wayne America/Indiana/Indianapolis US/East-Indiana',
 			'usinvev',
@@ -16731,6 +16741,7 @@ has 'language_aliases' => (
 	'nns' => 'nbr',
 	'agp' => 'apf',
 	'ais' => 'ami',
+	'ajt' => 'aeb',
 	'baz' => 'nvo',
 	'bhk' => 'fbl',
 	'bic' => 'bir',
@@ -16760,6 +16771,7 @@ has 'language_aliases' => (
 	'kpp' => 'jkm',
 	'kxl' => 'kru',
 	'kzh' => 'dgl',
+	'lak' => 'ksp',
 	'leg' => 'enl',
 	'mgx' => 'jbk',
 	'mnt' => 'wnn',
@@ -16775,6 +16787,8 @@ has 'language_aliases' => (
 	'rmr' => 'emx',
 	'sap' => 'aqt',
 	'sgl' => 'isk',
+	'smd' => 'kmb',
+	'snb' => 'iba',
 	'sul' => 'sgd',
 	'sum' => 'ulw',
 	'tgg' => 'bjp',

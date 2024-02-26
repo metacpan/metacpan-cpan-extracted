@@ -1,6 +1,6 @@
 // abc2svg - cmdline.js - command line
 //
-// Copyright (C) 2014-2021 Jean-Francois Moine
+// Copyright (C) 2014-2023 Jean-Francois Moine
 //
 // This file is part of abc2svg.
 //
@@ -50,7 +50,7 @@ var user = {
 			if (file[i + 1] == '\n')
 				file =  file.replace(/\r\n/g, '\n')	// M$
 			else
-				fike =  file.replace(/\r/g, '\n')	// Mac
+				file =  file.replace(/\r/g, '\n')	// Mac
 		}
 
 		// load the required modules (synchronous)
@@ -81,13 +81,6 @@ function do_file(fn) {
 	}
 //	if (typeof(utf_convert) == "function")
 //		file = utf_convert(file)
-
-	if (fn.slice(-4) == ".mei") {
-		if (!abc.mei2mus)
-			abc2svg.abort(new Error("No MEI support"));
-		abc.mei2mus(file)
-		return
-	}
 
 	// generate
 	try {

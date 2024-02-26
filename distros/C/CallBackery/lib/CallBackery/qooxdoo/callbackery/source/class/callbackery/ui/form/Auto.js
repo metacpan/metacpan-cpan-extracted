@@ -59,7 +59,7 @@ qx.Class.define("callbackery.ui.form.Auto", {
         var tm = this._typeMap = {};
         var that = this;
         var formKeyIdx = 0;
-        structure.forEach(function(s){
+        structure.forEach(s => {
             var options = {};
             // value binding in qooxdoo does not like keys
             // with strange characters ... (like -)
@@ -72,7 +72,7 @@ qx.Class.define("callbackery.ui.form.Auto", {
                 this._keyToFormKey[s.key] = formKey;
                 this._formKeyToKey[formKey] = s.key;
             }
-            ['note','copyOnTap','copyFailMsg','copySuccessMsg'].forEach(function(prop){
+            ['note','copyOnTap','copyFailMsg','copySuccessMsg'].forEach(prop => {
                 if (s[prop]){
                     options[prop] = qx.lang.Type.isString(s[prop]) 
                     || qx.lang.Type.isArray(s[prop]) ?
@@ -167,9 +167,9 @@ qx.Class.define("callbackery.ui.form.Auto", {
                 case 'comboBox':
                     control = new qx.ui.form.ComboBox();
                     var ctrl = this._boxCtrl[s.key] = new qx.data.controller.List(null, control);
-                    cfg.structure.forEach(function(item){
+                    cfg.structure.forEach(item => {
                         item = item != null ? this.xtr(item) : null;
-                    },this);
+                    });
                     var sbModel = qx.data.marshal.Json.createModel(cfg.structure || []);
                     ctrl.setModel(sbModel);
                     break;
@@ -203,11 +203,11 @@ qx.Class.define("callbackery.ui.form.Auto", {
                 if (s.set.filter){
                     s.set.filter = RegExp(s.filter);
                 }
-                ['placeholder','tooltip','label'].forEach(function(key){
+                ['placeholder','tooltip','label'].forEach(key => {
                     if (key in s.set){
                        s.set[key] = this.xtr(s.set[key]);
                     }
-                }, this);
+                });
                 control.set(s.set);
             }
 
@@ -263,7 +263,7 @@ qx.Class.define("callbackery.ui.form.Auto", {
                     }
                 });
             }
-        },this);
+        });
 
         var model = this._model = formCtrl.createModel(true);
 
@@ -364,11 +364,11 @@ qx.Class.define("callbackery.ui.form.Auto", {
                 }]);
             }
             else {
-                data.forEach(function(item,i){
+                data.forEach((item,i) => {
                     item.title = item.title != null 
                         ? this.xtr(item.title) 
                         : null;
-                },this);
+                });
                 model = qx.data.marshal.Json.createModel(data);
             }
             let lookup = {};

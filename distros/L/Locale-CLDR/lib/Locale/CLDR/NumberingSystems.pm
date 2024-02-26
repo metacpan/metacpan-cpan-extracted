@@ -1,12 +1,12 @@
 package Locale::CLDR::NumberingSystems;
 # This file auto generated from Data\common\supplemental\numberingSystems.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -172,6 +172,10 @@ has 'numbering_system' => (
 			type	=> 'numeric',
 			data	=> [qw(꤀ ꤁ ꤂ ꤃ ꤄ ꤅ ꤆ ꤇ ꤈ ꤉)],
 		},
+		'kawi'	=> {
+			type	=> 'numeric',
+			data	=> [qw(𑽐 𑽑 𑽒 𑽓 𑽔 𑽕 𑽖 𑽗 𑽘 𑽙)],
+		},
 		'khmr'	=> {
 			type	=> 'numeric',
 			data	=> [qw(០ ១ ២ ៣ ៤ ៥ ៦ ៧ ៨ ៩)],
@@ -255,6 +259,10 @@ has 'numbering_system' => (
 		'mymrtlng'	=> {
 			type	=> 'numeric',
 			data	=> [qw(꧰ ꧱ ꧲ ꧳ ꧴ ꧵ ꧶ ꧷ ꧸ ꧹)],
+		},
+		'nagm'	=> {
+			type	=> 'numeric',
+			data	=> [qw(𞓰 𞓱 𞓲 𞓳 𞓴 𞓵 𞓶 𞓷 𞓸 𞓹)],
 		},
 		'newa'	=> {
 			type	=> 'numeric',
@@ -369,18 +377,37 @@ has 'numbering_system' => (
 
 has '_default_numbering_system' => (
 	is			=> 'ro',
-	isa			=> Str,
+	isa			=> ArrayRef,
 	init_arg	=> undef,
-	default	=> '',
+	default	=> sub {[]},
 	clearer	=> '_clear_default_nu',
 	writer	=> '_set_default_numbering_system',
 );
 
 sub _set_default_nu {
     my ($self, $system) = @_;
-    my $default = $self->_default_numbering_system // '';
-    $self->_set_default_numbering_system("$default$system");
+    $system = [ $system ] unless ref $system;
+    die "Unknown numbering system $system\n"
+        unless exists $self->numbering_system->{$system->[0]};
+    $self->_set_default_numbering_system($system);
 }
+
+around _default_numbering_system => sub {
+    my ($orij, $self) = @_;
+
+    if (wantarray) {
+        return @{$self->$orij};
+    }
+    else {
+        return $self->$orij->[0];
+    }
+};
+
+around _set_default_numbering_system => sub {
+    my ($orij, $self, $value) = @_;
+    $value = [ $value ] unless ref $value;
+    return $self->$orij($value);
+};
 
 sub _test_default_nu {
     my $self = shift;

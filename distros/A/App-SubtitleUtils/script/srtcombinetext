@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-23'; # DATE
+our $DATE = '2024-01-13'; # DATE
 our $DIST = 'App-SubtitleUtils'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/SubtitleUtils/srtcombinetext",
@@ -38,7 +38,7 @@ srtcombinetext - Combine the text of two or more subtitle files (e.g. for differ
 
 =head1 VERSION
 
-This document describes version 0.012 of srtcombinetext (from Perl distribution App-SubtitleUtils), released on 2022-11-23.
+This document describes version 0.013 of srtcombinetext (from Perl distribution App-SubtitleUtils), released on 2024-01-13.
 
 =head1 SYNOPSIS
 
@@ -254,7 +254,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2022, 2021, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,12 +1,12 @@
 package Locale::CLDR::Transformations::Any::Malayalam::Interindic;
 # This file auto generated from Data\common\transforms\Malayalam-InterIndic.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -558,6 +558,41 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(൯),
 					result  => q(\uE06F),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(ൺ),
+					result  => q(\uE023\uE04D),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(ൻ),
+					result  => q(\uE028\uE04D),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(ർ),
+					result  => q(\uE030\uE04D),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(ൽ),
+					result  => q(\uE032\uE04D),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(ൾ),
+					result  => q(\uE033\uE04D),
 					revisit => 0,
 				},
 			]

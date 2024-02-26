@@ -3,8 +3,8 @@ NAME
     module release archive, e.g. a CPAN release tarball
 
 VERSION
-    This document describes version 0.001 of Filename::Perl::Release (from
-    Perl distribution Filename-Perl-Release), released on 2023-08-27.
+    This document describes version 0.002 of Filename::Perl::Release (from
+    Perl distribution Filename-Perl-Release), released on 2023-12-16.
 
 SYNOPSIS
      use Filename::Perl::Release qw(check_perl_release_filename);
@@ -26,6 +26,25 @@ FUNCTIONS
 
     Check whether filename looks like a perl module release archive, e.g. a
     CPAN release tarball.
+
+    Examples:
+
+    *   Example #1:
+
+         check_perl_release_filename(filename => "foo.bar"); # -> 0
+
+    *   Example #2:
+
+         check_perl_release_filename(filename => "qux-quux-0.123.tar.gz");
+
+        Result:
+
+         {
+           archive_suffix => ".tar",
+           distribution => "qux-quux",
+           module => "qux::quux",
+           version => 0.123,
+         }
 
     This function is not exported by default, but exportable.
 

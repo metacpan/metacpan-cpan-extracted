@@ -1,0 +1,843 @@
+# PODNAME: RDF::Cowl::Lib::Gen::Class::Ontology
+# ABSTRACT: Generated docs for RDF::Cowl::Ontology
+
+## DO NOT EDIT
+## Generated via maint/tt/Class.pod.tt
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+RDF::Cowl::Lib::Gen::Class::Ontology - Generated docs for RDF::Cowl::Ontology
+
+=head1 VERSION
+
+version 1.0.0
+
+=head1 MAIN MODULE
+
+L<RDF::Cowl::Ontology>
+
+=head1 METHODS
+
+=head2 get_manager
+
+B<Signature>:
+
+  $self->get_manager()
+
+B<Params>:
+
+  CowlOntology $onto 
+
+Documentation:
+
+  Gets the manager of this ontology.
+  
+  @param onto The ontology.
+  @return The manager.
+
+=over 2
+
+B<C function name>: C<< cowl_ontology_get_manager >>
+
+=back
+
+=head2 get_sym_table
+
+B<Signature>:
+
+  $self->get_sym_table()
+
+B<Params>:
+
+  CowlOntology $onto 
+
+Documentation:
+
+  Gets the symbol table of this ontology.
+  
+  @param onto The ontology.
+  @return The symbol table.
+
+=over 2
+
+B<C function name>: C<< cowl_ontology_get_sym_table >>
+
+=back
+
+=head2 get_id
+
+B<Signature>:
+
+  $self->get_id()
+
+B<Params>:
+
+  CowlOntology $onto 
+
+Documentation:
+
+  Gets the ontology ID.
+  
+  @param onto The ontology.
+  @return The ontology ID.
+
+=over 2
+
+B<C function name>: C<< cowl_ontology_get_id >>
+
+=back
+
+=head2 set_iri
+
+B<Signature>:
+
+  $self->set_iri(CowlIRI $iri)
+
+B<Params>:
+
+  CowlOntology $onto 
+  CowlIRI $iri 
+
+Documentation:
+
+  Sets the IRI of the ontology.
+  
+  @param onto The ontology.
+  @param iri The IRI.
+
+=over 2
+
+B<C function name>: C<< cowl_ontology_set_iri >>
+
+=back
+
+=head2 set_version
+
+B<Signature>:
+
+  $self->set_version(CowlIRI $version)
+
+B<Params>:
+
+  CowlOntology $onto 
+  CowlIRI $version 
+
+Documentation:
+
+  Sets the version IRI of the ontology.
+  
+  @param onto The ontology.
+  @param version The version IRI.
+
+=over 2
+
+B<C function name>: C<< cowl_ontology_set_version >>
+
+=back
+
+=head2 get_annot
+
+B<Signature>:
+
+  $self->get_annot()
+
+B<Params>:
+
+  CowlOntology $onto 
+
+Documentation:
+
+  Gets the annotations of the specified ontology.
+  
+  @param onto The ontology.
+  @return The annotations.
+
+=over 2
+
+B<C function name>: C<< cowl_ontology_get_annot >>
+
+=back
+
+=head2 add_annot
+
+B<Signature>:
+
+  $self->add_annot(CowlAnnotation $annot)
+
+B<Params>:
+
+  CowlOntology $onto 
+  CowlAnnotation $annot 
+
+Documentation:
+
+  Adds an annotation to the ontology.
+  
+  @param onto The ontology.
+  @param annot The annotation.
+  @return Return code.
+
+=over 2
+
+B<C function name>: C<< cowl_ontology_add_annot >>
+
+=back
+
+=head2 remove_annot
+
+B<Signature>:
+
+  $self->remove_annot(CowlAnnotation $annot)
+
+B<Params>:
+
+  CowlOntology $onto 
+  CowlAnnotation $annot 
+
+Documentation:
+
+  Removes an annotation from the ontology.
+  
+  @param onto The ontology.
+  @param annot The annotation.
+
+=over 2
+
+B<C function name>: C<< cowl_ontology_remove_annot >>
+
+=back
+
+=head2 get_import
+
+B<Signature>:
+
+  $self->get_import(CowlIRI $iri)
+
+B<Params>:
+
+  CowlOntology $onto 
+  CowlIRI $iri 
+
+Documentation:
+
+  Gets an imported ontology given its import IRI.
+  
+  @param onto The ontology.
+  @param iri Import IRI.
+  @return Imported ontology.
+
+=over 2
+
+B<C function name>: C<< cowl_ontology_get_import >>
+
+=back
+
+=head2 get_import_iri
+
+B<Signature>:
+
+  $self->get_import_iri(CowlOntology $import)
+
+B<Params>:
+
+  CowlOntology $onto 
+  CowlOntology $import 
+
+Documentation:
+
+  Gets the import IRI of an imported ontology.
+  
+  @param onto The ontology.
+  @param import The imported ontology.
+  @return Import IRI.
+
+=over 2
+
+B<C function name>: C<< cowl_ontology_get_import_iri >>
+
+=back
+
+=head2 add_import
+
+B<Signature>:
+
+  $self->add_import(CowlIRI $import)
+
+B<Params>:
+
+  CowlOntology $onto 
+  CowlIRI $import 
+
+Documentation:
+
+  Adds an import to the ontology.
+  
+  @param onto The ontology.
+  @param import IRI of the imported ontology.
+  @return Return code.
+
+=over 2
+
+B<C function name>: C<< cowl_ontology_add_import >>
+
+=back
+
+=head2 remove_import
+
+B<Signature>:
+
+  $self->remove_import(CowlIRI $import)
+
+B<Params>:
+
+  CowlOntology $onto 
+  CowlIRI $import 
+
+Documentation:
+
+  Removes an import from the ontology.
+  
+  @param onto The ontology.
+  @param import IRI of the imported ontology.
+
+=over 2
+
+B<C function name>: C<< cowl_ontology_remove_import >>
+
+=back
+
+=head2 add_axiom
+
+B<Signature>:
+
+  $self->add_axiom(CowlAnyAxiom $axiom)
+
+B<Params>:
+
+  CowlOntology $onto 
+  CowlAnyAxiom $axiom 
+
+Documentation:
+
+  Adds an axiom to the ontology.
+  
+  @param onto The ontology.
+  @param axiom The axiom.
+  @return Return code.
+
+=over 2
+
+B<C function name>: C<< cowl_ontology_add_axiom >>
+
+=back
+
+=head2 remove_axiom
+
+B<Signature>:
+
+  $self->remove_axiom(CowlAnyAxiom $axiom)
+
+B<Params>:
+
+  CowlOntology $onto 
+  CowlAnyAxiom $axiom 
+
+Documentation:
+
+  Removes an axiom from the ontology.
+  
+  @param onto The ontology.
+  @param axiom The axiom.
+
+=over 2
+
+B<C function name>: C<< cowl_ontology_remove_axiom >>
+
+=back
+
+=head2 axiom_count
+
+B<Signature>:
+
+  $self->axiom_count(BoolLike|InstanceOf["boolean"] $imports)
+
+B<Params>:
+
+  CowlOntology $onto 
+  BoolLike|InstanceOf["boolean"] $imports 
+
+Documentation:
+
+  Gets the number of axioms in the ontology.
+  
+  @param onto The ontology.
+  @param imports If true, the query recurses over imported ontologies.
+  @return Number of axioms.
+
+=over 2
+
+B<C function name>: C<< cowl_ontology_axiom_count >>
+
+=back
+
+=head2 imports_count
+
+B<Signature>:
+
+  $self->imports_count(BoolLike|InstanceOf["boolean"] $imports)
+
+B<Params>:
+
+  CowlOntology $onto 
+  BoolLike|InstanceOf["boolean"] $imports 
+
+Documentation:
+
+  Gets the number of imported ontologies.
+  
+  @param onto The ontology.
+  @param imports If true, the query recurses over imported ontologies.
+  @return Number of imports.
+
+=over 2
+
+B<C function name>: C<< cowl_ontology_imports_count >>
+
+=back
+
+=head2 axiom_count_for_type
+
+B<Signature>:
+
+  $self->axiom_count_for_type(CowlAxiomType $type, BoolLike|InstanceOf["boolean"] $imports)
+
+B<Params>:
+
+  CowlOntology $onto 
+  CowlAxiomType $type 
+  BoolLike|InstanceOf["boolean"] $imports 
+
+Documentation:
+
+  Gets the number of axioms of the specified type.
+  
+  @param onto The ontology.
+  @param type The axiom type.
+  @param imports If true, the query recurses over imported ontologies.
+  @return Number of axioms.
+
+=over 2
+
+B<C function name>: C<< cowl_ontology_axiom_count_for_type >>
+
+=back
+
+=head2 axiom_count_for_primitive
+
+B<Signature>:
+
+  $self->axiom_count_for_primitive(CowlAnyPrimitive $primitive, BoolLike|InstanceOf["boolean"] $imports)
+
+B<Params>:
+
+  CowlOntology $onto 
+  CowlAnyPrimitive $primitive 
+  BoolLike|InstanceOf["boolean"] $imports 
+
+Documentation:
+
+  Gets the number of axioms referencing the specified primitive.
+  
+  @param onto The ontology.
+  @param primitive The primitive.
+  @param imports If true, the query recurses over imported ontologies.
+  @return Number of axioms.
+
+=over 2
+
+B<C function name>: C<< cowl_ontology_axiom_count_for_primitive >>
+
+=back
+
+=head2 primitives_count
+
+B<Signature>:
+
+  $self->primitives_count(CowlPrimitiveFlags $flags, BoolLike|InstanceOf["boolean"] $imports)
+
+B<Params>:
+
+  CowlOntology $onto 
+  CowlPrimitiveFlags $flags 
+  BoolLike|InstanceOf["boolean"] $imports 
+
+Documentation:
+
+  Gets the number of primitives.
+  
+  @param onto The ontology.
+  @param flags Primitive flags.
+  @param imports If true, the query recurses over imported ontologies.
+  @return Number of primitives.
+
+=over 2
+
+B<C function name>: C<< cowl_ontology_primitives_count >>
+
+=back
+
+=head2 has_primitive
+
+B<Signature>:
+
+  $self->has_primitive(CowlAnyPrimitive $primitive, BoolLike|InstanceOf["boolean"] $imports)
+
+B<Params>:
+
+  CowlOntology $onto 
+  CowlAnyPrimitive $primitive 
+  BoolLike|InstanceOf["boolean"] $imports 
+
+Documentation:
+
+  Checks if the specified primitive is referenced by an axiom in the ontology.
+  
+  @param onto The ontology.
+  @param primitive The primitive.
+  @param imports If true, the query recurses over imported ontologies.
+  @return True if the primitive is referenced by an axiom, false otherwise.
+
+=over 2
+
+B<C function name>: C<< cowl_ontology_has_primitive >>
+
+=back
+
+=head2 has_axiom
+
+B<Signature>:
+
+  $self->has_axiom(CowlAnyAxiom $axiom, BoolLike|InstanceOf["boolean"] $imports)
+
+B<Params>:
+
+  CowlOntology $onto 
+  CowlAnyAxiom $axiom 
+  BoolLike|InstanceOf["boolean"] $imports 
+
+Documentation:
+
+  Checks whether the ontology contains the specified axiom.
+  
+  @param onto The ontology.
+  @param axiom The axiom.
+  @param imports If true, the query recurses over imported ontologies.
+  @return True if the ontology contains the axiom, false otherwise.
+
+=over 2
+
+B<C function name>: C<< cowl_ontology_has_axiom >>
+
+=back
+
+=head2 iterate_primitives
+
+B<Signature>:
+
+  $self->iterate_primitives(CowlPrimitiveFlags $flags, CowlIterator $iter, BoolLike|InstanceOf["boolean"] $imports)
+
+B<Params>:
+
+  CowlOntology $onto 
+  CowlPrimitiveFlags $flags 
+  CowlIterator $iter 
+  BoolLike|InstanceOf["boolean"] $imports 
+
+Documentation:
+
+  Iterates over the primitives referenced by the specified ontology.
+  
+  @param onto The ontology.
+  @param flags Primitive flags.
+  @param iter The iterator.
+  @param imports If true, the query recurses over imported ontologies.
+  @return True if the iteration was completed, false if it was stopped.
+
+=over 2
+
+B<C function name>: C<< cowl_ontology_iterate_primitives >>
+
+=back
+
+=head2 iterate_imports
+
+B<Signature>:
+
+  $self->iterate_imports(CowlIterator $iter, BoolLike|InstanceOf["boolean"] $imports)
+
+B<Params>:
+
+  CowlOntology $onto 
+  CowlIterator $iter 
+  BoolLike|InstanceOf["boolean"] $imports 
+
+Documentation:
+
+  Iterates over the imported ontologies.
+  
+  @param onto The ontology.
+  @param iter The iterator.
+  @param imports If true, the query recurses over imported ontologies.
+  @return True if the iteration was completed, false if it was stopped.
+
+=over 2
+
+B<C function name>: C<< cowl_ontology_iterate_imports >>
+
+=back
+
+=head2 iterate_import_iris
+
+B<Signature>:
+
+  $self->iterate_import_iris(CowlIterator $iter, BoolLike|InstanceOf["boolean"] $imports)
+
+B<Params>:
+
+  CowlOntology $onto 
+  CowlIterator $iter 
+  BoolLike|InstanceOf["boolean"] $imports 
+
+Documentation:
+
+  Iterates over the import IRIs.
+  
+  @param onto The ontology.
+  @param iter The iterator.
+  @param imports If true, the query recurses over imported ontologies.
+  @return True if the iteration was completed, false if it was stopped.
+
+=over 2
+
+B<C function name>: C<< cowl_ontology_iterate_import_iris >>
+
+=back
+
+=head2 iterate_axioms
+
+B<Signature>:
+
+  $self->iterate_axioms(CowlIterator $iter, BoolLike|InstanceOf["boolean"] $imports)
+
+B<Params>:
+
+  CowlOntology $onto 
+  CowlIterator $iter 
+  BoolLike|InstanceOf["boolean"] $imports 
+
+Documentation:
+
+  Iterates over the axioms in the ontology.
+  
+  @param onto The ontology.
+  @param iter The iterator.
+  @param imports If true, the query recurses over imported ontologies.
+  @return True if the iteration was completed, false if it was stopped.
+
+=over 2
+
+B<C function name>: C<< cowl_ontology_iterate_axioms >>
+
+=back
+
+=head2 iterate_axioms_of_type
+
+B<Signature>:
+
+  $self->iterate_axioms_of_type(CowlAxiomType $type, CowlIterator $iter, BoolLike|InstanceOf["boolean"] $imports)
+
+B<Params>:
+
+  CowlOntology $onto 
+  CowlAxiomType $type 
+  CowlIterator $iter 
+  BoolLike|InstanceOf["boolean"] $imports 
+
+Documentation:
+
+  Iterates over the axioms of a certain type.
+  
+  @param onto The ontology.
+  @param type The axiom type.
+  @param iter The iterator.
+  @param imports If true, the query recurses over imported ontologies.
+  @return True if the iteration was completed, false if it was stopped.
+
+=over 2
+
+B<C function name>: C<< cowl_ontology_iterate_axioms_of_type >>
+
+=back
+
+=head2 iterate_axioms_for_primitive
+
+B<Signature>:
+
+  $self->iterate_axioms_for_primitive(CowlAnyPrimitive $primitive, CowlIterator $iter, BoolLike|InstanceOf["boolean"] $imports)
+
+B<Params>:
+
+  CowlOntology $onto 
+  CowlAnyPrimitive $primitive 
+  CowlIterator $iter 
+  BoolLike|InstanceOf["boolean"] $imports 
+
+Documentation:
+
+  Iterates over the axioms referencing the specified primitive.
+  
+  @param onto The ontology.
+  @param primitive The primitive.
+  @param iter The iterator.
+  @param imports If true, the query recurses over imported ontologies.
+  @return True if the iteration was completed, false if it was stopped.
+
+=over 2
+
+B<C function name>: C<< cowl_ontology_iterate_axioms_for_primitive >>
+
+=back
+
+=head2 iterate_sub_classes
+
+B<Signature>:
+
+  $self->iterate_sub_classes(CowlClass $owl_class, CowlIterator $iter, BoolLike|InstanceOf["boolean"] $imports)
+
+B<Params>:
+
+  CowlOntology $onto 
+  CowlClass $owl_class 
+  CowlIterator $iter 
+  BoolLike|InstanceOf["boolean"] $imports 
+
+Documentation:
+
+  Iterates over the subclasses of the specified class.
+  
+  @param onto The ontology.
+  @param owl_class The class.
+  @param iter The iterator.
+  @param imports If true, the query recurses over imported ontologies.
+  @return True if the iteration was completed, false if it was stopped.
+
+=over 2
+
+B<C function name>: C<< cowl_ontology_iterate_sub_classes >>
+
+=back
+
+=head2 iterate_super_classes
+
+B<Signature>:
+
+  $self->iterate_super_classes(CowlClass $owl_class, CowlIterator $iter, BoolLike|InstanceOf["boolean"] $imports)
+
+B<Params>:
+
+  CowlOntology $onto 
+  CowlClass $owl_class 
+  CowlIterator $iter 
+  BoolLike|InstanceOf["boolean"] $imports 
+
+Documentation:
+
+  Iterates over the superclasses of the specified class.
+  
+  @param onto The ontology.
+  @param owl_class The class.
+  @param iter The iterator.
+  @param imports If true, the query recurses over imported ontologies.
+  @return True if the iteration was completed, false if it was stopped.
+
+=over 2
+
+B<C function name>: C<< cowl_ontology_iterate_super_classes >>
+
+=back
+
+=head2 iterate_eq_classes
+
+B<Signature>:
+
+  $self->iterate_eq_classes(CowlClass $owl_class, CowlIterator $iter, BoolLike|InstanceOf["boolean"] $imports)
+
+B<Params>:
+
+  CowlOntology $onto 
+  CowlClass $owl_class 
+  CowlIterator $iter 
+  BoolLike|InstanceOf["boolean"] $imports 
+
+Documentation:
+
+  Iterates over the equivalent classes of the specified class.
+  
+  @param onto The ontology.
+  @param owl_class The class.
+  @param iter The iterator.
+  @param imports If true, the query recurses over imported ontologies.
+  @return True if the iteration was completed, false if it was stopped.
+
+=over 2
+
+B<C function name>: C<< cowl_ontology_iterate_eq_classes >>
+
+=back
+
+=head2 iterate_types
+
+B<Signature>:
+
+  $self->iterate_types(CowlAnyIndividual $ind, CowlIterator $iter, BoolLike|InstanceOf["boolean"] $imports)
+
+B<Params>:
+
+  CowlOntology $onto 
+  CowlAnyIndividual $ind 
+  CowlIterator $iter 
+  BoolLike|InstanceOf["boolean"] $imports 
+
+Documentation:
+
+  Iterates over the types of the specified individual.
+  
+  @param onto The ontology.
+  @param ind The individual.
+  @param iter The iterator.
+  @param imports If true, the query recurses over imported ontologies.
+  @return True if the iteration was completed, false if it was stopped.
+
+=over 2
+
+B<C function name>: C<< cowl_ontology_iterate_types >>
+
+=back
+
+=head1 AUTHOR
+
+Zakariyya Mughal <zmughal@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 by Auto-Parallel Technologies, Inc..
+
+This is free software, licensed under Eclipse Public License - v 2.0.
+
+=cut

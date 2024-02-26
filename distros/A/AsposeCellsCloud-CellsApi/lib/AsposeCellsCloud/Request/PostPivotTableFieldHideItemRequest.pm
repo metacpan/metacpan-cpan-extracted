@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,16 +59,16 @@ sub new {
 
 
 # Run Operation Request
-# PostPivotTableFieldHideItemRequest.name : The workbook name.  ,
+# PostPivotTableFieldHideItemRequest.name : The file name.  ,
 # PostPivotTableFieldHideItemRequest.sheetName : The worksheet name.  ,
-# PostPivotTableFieldHideItemRequest.pivotTableIndex : Gets the PivotTable report by index.  ,
+# PostPivotTableFieldHideItemRequest.pivotTableIndex : The PivotTable index.  ,
 # PostPivotTableFieldHideItemRequest.pivotFieldType : Represents PivotTable field type(Undefined/Row/Column/Page/Data).  ,
-# PostPivotTableFieldHideItemRequest.fieldIndex : Gets the PivotField Object at the specific index.  ,
-# PostPivotTableFieldHideItemRequest.itemIndex : The index of the pivotItem in the pivotField.  ,
+# PostPivotTableFieldHideItemRequest.fieldIndex : The pivot field index.  ,
+# PostPivotTableFieldHideItemRequest.itemIndex : The index of the pivot item in the pivot field.  ,
 # PostPivotTableFieldHideItemRequest.isHide : Whether the specific PivotItem is hidden(true/false).  ,
-# PostPivotTableFieldHideItemRequest.needReCalculate : Whether the specific pivot table calculate(true/false).  ,
-# PostPivotTableFieldHideItemRequest.folder : Original workbook folder.  ,
-# PostPivotTableFieldHideItemRequest.storageName : Storage name.   
+# PostPivotTableFieldHideItemRequest.needReCalculate : Whether the specific PivotTable calculate(true/false).  ,
+# PostPivotTableFieldHideItemRequest.folder : The folder where the file is situated.  ,
+# PostPivotTableFieldHideItemRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -79,7 +79,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_pivot_table_field_hide_item' } = { 
-    	summary => 'Hides pivot field item in pivot table.',
+    	summary => 'Hide a pivot field item in the PivotTable.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -162,7 +162,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -176,7 +176,7 @@ __PACKAGE__->method_documentation({
      'pivot_table_index' => {
      	datatype => 'int',
      	base_name => 'pivotTableIndex',
-     	description => 'Gets the PivotTable report by index.',
+     	description => 'The PivotTable index.',
      	format => '',
      	read_only => '',
      		},
@@ -190,14 +190,14 @@ __PACKAGE__->method_documentation({
      'field_index' => {
      	datatype => 'int',
      	base_name => 'fieldIndex',
-     	description => 'Gets the PivotField Object at the specific index.',
+     	description => 'The pivot field index.',
      	format => '',
      	read_only => '',
      		},
      'item_index' => {
      	datatype => 'int',
      	base_name => 'itemIndex',
-     	description => 'The index of the pivotItem in the pivotField.',
+     	description => 'The index of the pivot item in the pivot field.',
      	format => '',
      	read_only => '',
      		},
@@ -211,21 +211,21 @@ __PACKAGE__->method_documentation({
      'need_re_calculate' => {
      	datatype => 'string',
      	base_name => 'needReCalculate',
-     	description => 'Whether the specific pivot table calculate(true/false).',
+     	description => 'Whether the specific PivotTable calculate(true/false).',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

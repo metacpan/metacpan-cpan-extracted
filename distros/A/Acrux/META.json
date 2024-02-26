@@ -34,6 +34,7 @@
       "runtime" : {
          "requires" : {
             "Config::General" : "2",
+            "Sub::Util" : "1.41",
             "Sys::Syslog" : "0",
             "perl" : "5.020"
          }
@@ -51,6 +52,6 @@
          "web" : "https://sourceforge.net/p/acrux/code/ci/master/tree/"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

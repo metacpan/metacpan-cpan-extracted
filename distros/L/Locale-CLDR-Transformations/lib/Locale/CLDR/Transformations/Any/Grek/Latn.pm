@@ -1,12 +1,12 @@
 package Locale::CLDR::Transformations::Any::Grek::Latn;
 # This file auto generated from Data\common\transforms\Greek-Latin.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -26,7 +26,7 @@ has 'transforms' => (
 	isa => ArrayRef,
 	init_arg => undef,
 	default => sub { [
-		qr/(?^umi:\G[\;µ·ÄËÏÖÜäëïöüÿ-āĒ-ēĪ-īŌ-ōŪ-ūŸǕ-ǜǞ-ǣǬ-ǭȪ-ȭȰ-ȳ̄̈̓-̔͂-ͅͺ;Ά-ΊΌΎ-ΡΣ-ώϐ-ϗϛϝϟϡϣϥϧϩϫϭϯ-ϵϷ-߻ЁЇёїӒ-ӓӚ-ӟӢ-ӧӪ-ӱӴ-ӵӸ-ӹḔ-ḗḠ-ḡḦ-ḧḮ-ḯḸ-ḹṎ-ṓṜ-ṝṺ-ṻẄ-ẅẌ-ẍẗἀ-ἕἘ-Ἕἠ-ὅὈ-Ὅὐ-ὗὙὛὝὟ-ώᾀ-ᾴᾶ-ᾼι῁-ῄῆ-ῌ῏-ΐῖ-Ί῟-Ῥῲ-ῴῶ-ῼΩϹ])/,
+		qr/(?^umi:\G[΄´\;µ·ÄËÏÖÜäëïöüÿ-āĒ-ēĪ-īŌ-ōŪ-ūŸǕ-ǜǞ-ǣǬ-ǭȪ-ȭȰ-ȳ̄̈̓-̔͂-ͅͺ;Ά-ΊΌΎ-ΡΣ-ώϐ-ϗϛϝϟϡϣϥϧϩϫϭϯ-ϵϷ-߻ЁЇёїӒ-ӓӚ-ӟӢ-ӧӪ-ӱӴ-ӵӸ-ӹḔ-ḗḠ-ḡḦ-ḧḮ-ḯḸ-ḹṎ-ṓṜ-ṝṺ-ṻẄ-ẅẌ-ẍẗἀ-ἕἘ-Ἕἠ-ὅὈ-Ὅὐ-ὗὙὛὝὟ-ώᾀ-ᾴᾶ-ᾼι῁-ῄῆ-ῌ῏-ΐῖ-Ί῟-Ῥῲ-ῴῶ-ῼΩϹ])/,
 		{
 			type => 'transform',
 			data => [
@@ -58,6 +58,13 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(·),
 					result  => q(\:),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(΄),
+					result  => q(´),
 					revisit => 0,
 				},
 				{

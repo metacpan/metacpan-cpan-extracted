@@ -3,9 +3,9 @@ package Sah::Schema::code_from_str;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-09-05'; # DATE
+our $DATE = '2023-12-20'; # DATE
 our $DIST = 'Sah-Schemas-Code'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our $schema = [
     code => {
@@ -20,6 +20,13 @@ your case.
 By default `eval()` is performed in the `main` namespace and without stricture
 or warnings. See the parameterized version <pm:Sah::PSchema::code_from_str> if
 you want to customize the `eval()`.
+
+What's the difference between this schema and `str_or_code` (from
+<pm:Sah::Schemas::Str>)? Both this schema and `str_or_code` accept string, but
+this schema will directly compile any input string while `str_or_code` will only
+convert string to code if it is in the form of `sub { ... }`. In other words,
+this schema will always produce coderef, while `str_or_code` can produce strings
+also.
 
 MARKDOWN
 
@@ -45,7 +52,7 @@ Sah::Schema::code_from_str - Coderef from string
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::Schema::code_from_str (from Perl distribution Sah-Schemas-Code), released on 2023-09-05.
+This document describes version 0.003 of Sah::Schema::code_from_str (from Perl distribution Sah-Schemas-Code), released on 2023-12-20.
 
 =for Pod::Coverage ^(.+)$
 
@@ -174,6 +181,13 @@ your case.
 By default C<eval()> is performed in the C<main> namespace and without stricture
 or warnings. See the parameterized version L<Sah::PSchema::code_from_str> if
 you want to customize the C<eval()>.
+
+What's the difference between this schema and C<str_or_code> (from
+L<Sah::Schemas::Str>)? Both this schema and C<str_or_code> accept string, but
+this schema will directly compile any input string while C<str_or_code> will only
+convert string to code if it is in the form of C<sub { ... }>. In other words,
+this schema will always produce coderef, while C<str_or_code> can produce strings
+also.
 
 =head1 HOMEPAGE
 

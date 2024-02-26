@@ -14,7 +14,7 @@ use List::Util      qw(any);
 use List::MoreUtils qw(uniq lastval);
 use Scalar::Util    qw(weaken);
 
-our $VERSION = '1.94';
+our $VERSION = '1.96';
 
 Travel::Status::DE::IRIS::Result->mk_ro_accessors(
 	qw(arrival arrival_delay arrival_has_realtime arrival_is_additional arrival_is_cancelled arrival_hidden
@@ -55,22 +55,21 @@ my %translation = (
 	20 => 'Tiere im Gleis',                           # xlsx: missing
 	21 => 'Warten auf Anschlussreisende',
 	22 => 'Witterungsbedingte Beeinträchtigung',
-	23 => 'Feuerwehreinsatz auf Bahngelände',         # xlsx: missing
+	23 => 'Betriebsstabilisierung',
 	24 => 'Verspätung im Ausland',
 	25 => 'Bereitstellung weiterer Wagen',
 	26 => 'Abhängen von Wagen',
 	28 => 'Gegenstände auf der Strecke',
 	29 => 'Ersatzverkehr mit Bus ist eingerichtet',
 	31 => 'Bauarbeiten',
-	32 => 'Verzögerung beim Ein-/Ausstieg'
-	,    # xlsx: "Unterstützung beim Ein- und Ausstieg"
+	32 => 'Längere Haltezeit am Bahnhof',
 	33 => 'Defekt an der Oberleitung',    # xlsx: "Reparatur an der Oberleitung"
 	34 => 'Defekt an einem Signal',       # xlsx: "Reparatur an einem Signal"
 	35 => 'Streckensperrung',
-	36 => 'Defekt am Zug',                # xlsx: "Reparatur am Zug"
-	37 => 'Defekt am Wagen',              # xlsx: missing
+	36 => 'Technische Störung am Zug',
+	37 => 'Kurzfristiger Fahrzeugausfall',
 	38 => 'Defekt an der Strecke',        # xlsx: "Reparatur an der Strecke"
-	39 => 'Anhängen von zusätzlichen Wagen',    # xlsx: missing
+	39 => 'Stau / Hohes Verkehrsaufkommen',
 	40 => 'Defektes Stellwerk',
 	41 => 'Defekt an einem Bahnübergang'
 	,    # xlsx: "Technischer Defekt an einem Bahnüburgang"
@@ -78,13 +77,10 @@ my %translation = (
 	,    # xlsx: "Vorübergehend verminderte Geschwindigkeit auf der Strecke"
 	43 => 'Verspätung eines vorausfahrenden Zuges',
 	44 => 'Warten auf einen entgegenkommenden Zug',
+	45 => 'Vorfahrt eines anderen Zuges',
+	46 => 'Vorfahrt eines anderen Zuges',
 
-	# TODO for Oct 2021: switch 45, 46 to "Vorfahrt eines anderen Zuges"
-	45 => 'Überholung durch anderen Zug', # xlsx: "Vorfahrt eines anderen Zuges"
-	46 => 'Warten auf freie Einfahrt',    # xlsx: "Vorfahrt eines anderen Zuges"
-
-	47 =>
-	  'Verspätete Bereitstellung', # xlsx: "Verspätete Bereitstellung des Zuges"
+	47 => 'Verspätete Bereitstellung',
 	48 => 'Verspätung aus vorheriger Fahrt',
 	49 => 'Kurzfristiger Personalausfall',
 	50 => 'Kurzfristige Erkrankung von Personal',
@@ -92,16 +88,16 @@ my %translation = (
 	52 => 'Streik',
 	53 => 'Unwetterauswirkungen',
 	54 => 'Verfügbarkeit der Gleise derzeit eingeschränkt',
-	55 => 'Defekt an einem anderen Zug',
+	55 => 'Technischer Defekt an einem anderen Zug',
 	56 => 'Warten auf Anschlussreisende',                     # aus einem Bus
 	57 => 'Zusätzlicher Halt', # xslx: "Zusätzlicher Halt zum Ein- und Ausstieg"
 	58 => 'Umleitung',         # xlsx: "Umleitung des Zuges"
 	59 => 'Schnee und Eis',
 	60 => 'Witterungsbedingt verminderte Geschwindigkeit',
 	61 => 'Defekte Tür',
-	62 => 'Behobener Defekt am Zug',                         # r 36
+	62 => 'Behobener Defekt am Zug',
 	63 => 'Technische Untersuchung am Zug',
-	64 => 'Defekt an einer Weiche',    # xlsx: "Reparatur an der Weiche"
+	64 => 'Defekt an einer Weiche',
 	65 => 'Erdrutsch',
 	66 => 'Hochwasser',
 	67 => 'Behördliche Maßnahme',
@@ -111,10 +107,10 @@ my %translation = (
 	70 => 'WLAN nicht verfügbar',
 	71 => 'WLAN in einzelnen Wagen nicht verfügbar',
 	72 => 'Info/Entertainment nicht verfügbar',
-	73 => 'Heute: Mehrzweckabteil vorne',                   # r 74
-	74 => 'Heute: Mehrzweckabteil hinten',                  # r 73
-	75 => 'Heute: 1. Klasse vorne',                         # r 76
-	76 => 'Heute: 1. Klasse hinten',                        # r 75
+	73 => 'Heute: Mehrzweckabteil vorne',
+	74 => 'Heute: Mehrzweckabteil hinten',
+	75 => 'Heute: 1. Klasse vorne',
+	76 => 'Heute: 1. Klasse hinten',
 	77 => '1. Klasse fehlt',
 	78 => 'Ersatzverkehr mit Bus ist eingerichtet',
 	79 => 'Mehrzweckabteil fehlt',
@@ -122,20 +118,20 @@ my %translation = (
 	81 => 'Fahrzeugtausch',
 	82 => 'Mehrere Wagen fehlen',
 	83 => 'Defekte fahrzeuggebundene Einstiegshilfe',
-	84 => 'Zug verkehrt richtig gereiht',                   # r 80 82 85
+	84 => 'Zug verkehrt richtig gereiht',
 	85 => 'Ein Wagen fehlt',
 	86 => 'Gesamter Zug ohne Reservierung',
 	87 => 'Einzelne Wagen ohne Reservierung',
-	88 => 'Keine Qualitätsmängel',    # r 80 82 83 85 86 87 90 91 92 93 96 97 98
-	89 => 'Reservierungen sind wieder vorhanden',    # -> 86 87
+	88 => 'Keine Qualitätsmängel',
+	89 => 'Reservierungen sind wieder vorhanden',
 	90 => 'Kein gastronomisches Angebot',
 	91 => 'Fahrradmitnahme nicht möglich',
 	92 => 'Eingeschränkte Fahrradbeförderung',
 	93 => 'Behindertengerechte Einrichtung fehlt',
 	94 => 'Ersatzbewirtschaftung',
 	95 => 'Universal-WC fehlt',
-	96 => 'Der Zug ist stark überbesetzt',           # r 97
-	97 => 'Der Zug ist überbesetzt',                 # r 96
+	96 => 'Überbesetzung mit Kulanzleistungen',
+	97 => 'Überbesetzung ohne Kulanzleistungen',
 	98 => 'Sonstige Qualitätsmängel',
 	99 => 'Verzögerungen im Betriebsablauf',
 
@@ -282,11 +278,11 @@ sub superseded_messages {
 		74 => [73],
 		75 => [76],
 		76 => [75],
-		84 => [ 80, 82, 85 ],
-		88 => [ 80, 82, 83, 85, 86, 87, 90, 91, 92, 93, 96, 97, 98 ],
+		84 => [ 73, 74, 75, 76, 80 ],
+		88 => [
+			70, 71, 72, 77, 79, 82, 83, 85, 90, 91, 92, 93, 94, 95, 96, 97, 98
+		],
 		89 => [ 86, 87 ],
-		96 => [97],
-		97 => [96],
 	);
 
 	return @{ $superseded{$msg} // [] };
@@ -943,7 +939,7 @@ arrival/departure received by Travel::Status::DE::IRIS
 
 =head1 VERSION
 
-version 1.94
+version 1.96
 
 =head1 DESCRIPTION
 
@@ -1340,264 +1336,6 @@ train. Returns undef if B<is_wing> is false.
 
 Returns a new Travel::Status::DE::IRIS::Result object.
 You usually do not need to call this.
-
-=back
-
-=head1 MESSAGES
-
-A dump of all messages entered for the result is available. Each message
-consists of a timestamp (when it was entered), a type (d for delay reasons,
-q for other train-related information) and a value (numeric ID).
-
-At the time of this writing, the following messages are known:
-
-=over
-
-=item d  2 : "Polizeiliche Ermittlung"
-
-=item d  3 : "Feuerwehreinsatz neben der Strecke"
-
-=item d  5 : "E<Auml>rztliche Versorgung eines Fahrgastes"
-
-=item d  6 : "BetE<auml>tigen der Notbremse"
-
-Source: Correlation between IRIS and DB RIS (bahn.de).
-
-=item d  7 : "Personen im Gleis"
-
-=item d  8 : "Notarzteinsatz am Gleis"
-
-=item d  9 : "Streikauswirkungen"
-
-=item d 10 : "Ausgebrochene Tiere im Gleis"
-
-=item d 11 : "Unwetter"
-
-=item d 13 : "Pass- und Zollkontrolle"
-
-Source: Correlation between IRIS and DB RIS (bahn.de).
-
-=item d 15 : "BeeintrE<auml>chtigung durch Vandalismus"
-
-=item d 16 : "EntschE<auml>rfung einer Fliegerbombe"
-
-=item d 17 : "BeschE<auml>digung einer BrE<uuml>cke"
-
-=item d 18 : "UmgestE<uuml>rzter Baum im Gleis"
-
-=item d 19 : "Unfall an einem BahnE<uuml>bergang"
-
-=item d 20 : "Tiere im Gleis"
-
-=item d 21 : "Warten auf weitere Reisende"
-
-=item d 22 : "Witterungsbedingte StE<ouml>rung"
-
-=item d 23 : "Feuerwehreinsatz auf BahngelE<auml>nde"
-
-=item d 24 : "VerspE<auml>tung aus dem Ausland"
-
-=item d 25 : "Warten auf verspE<auml>tete Zugteile"
-
-=item d 28 : "GegenstE<auml>nde im Gleis"
-
-=item d 29 : "Ersatzverkehr mit Bus ist eingerichtet"
-
-=item d 31 : "Bauarbeiten"
-
-=item d 32 : "VerzE<ouml>gerung beim Ein-/Ausstieg"
-
-=item d 33 : "OberleitungsstE<ouml>rung"
-
-=item d 34 : "SignalstE<ouml>rung"
-
-=item d 35 : "Streckensperrung"
-
-=item d 36 : "Technische StE<ouml>rung am Zug"
-
-=item d 37 : "Technische StE<ouml>rung am Wagen"
-
-=item d 38 : "Technische StE<ouml>rung an der Strecke"
-
-=item d 39 : "AnhE<auml>ngen von zusE<auml>tzlichen Wagen"
-
-=item d 40 : "StellwerksstE<ouml>rung/-ausfall"
-
-=item d 41 : "StE<ouml>rung an einem BahnE<uuml>bergang"
-
-=item d 42 : "AuE<szlig>erplanmE<auml>E<szlig>ige GeschwindigkeitsbeschrE<auml>nkung"
-
-=item d 43 : "VerspE<auml>tung eines vorausfahrenden Zuges"
-
-=item d 44 : "Warten auf einen entgegenkommenden Zug"
-
-=item d 45 : "E<Uuml>berholung durch anderen Zug"
-
-=item d 46 : "Warten auf freie Einfahrt"
-
-=item d 47 : "VerspE<auml>tete Bereitstellung"
-
-=item d 48 : "VerspE<auml>tung aus vorheriger Fahrt"
-
-=item d 55 : "Technische StE<ouml>rung an einem anderen Zug"
-
-Source: Correlation between IRIS and DB RIS (bahn.de).
-
-=item d 56 : "Warten auf FahrgE<auml>ste aus einem Bus"
-
-Source: Correlation between IRIS and DB RIS (bahn.de).
-
-=item d 57 : "ZusE<auml>tzlicher Halt"
-
-Source: Correlation between IRIS and DB RIS (bahn.de).
-
-=item d 58 : "Umleitung"
-
-Source: Correlation between IRIS and DB RIS (bahn.de). Several entries, related
-to "Notarzteinsatz am Gleis".
-
-=item d 59 : "Schnee und Eis"
-
-Source: Correlation between IRIS and DB RIS (bahn.de).
-
-=item d 60 : "Reduzierte Geschwindigkeit wegen Sturm"
-
-Source: Correlation between IRIS and DB RIS (bahn.de).
-
-=item d 61 : "TE<uuml>rstE<ouml>rung"
-
-Source: Correlation between IRIS and DB RIS (bahn.de).
-
-=item d 62 : "Behobene technische StE<ouml>rung am Zug"
-
-Source: Correlation between IRIS and DB RIS (bahn.de).
-
-=item d 63 : "Technische Untersuchung am Zug"
-
-=item d 64 : "WeichenstE<ouml>rung"
-
-Source: correlation between IRIS and DB RIS (bahn.de).
-
-=item d 65 : "Erdrutsch"
-
-Source: correlation between IRIS and DB RIS (bahn.de).
-
-=item d 66 : "Hochwasser"
-
-Source: correlation between IRIS and DB RIS (bahn.de).
-
-=item f 67 : "BehE<ouml>rdliche Anordnung"
-
-Source: L<https://twitter.com/DodoMedia/status/1238816272240070659>.
-
-=item q 70 : "WLAN nicht verfE<uuml>gbar"
-
-Source: correlation between IRIS and DB RIS (bahn.de).
-
-=item q 71 : "WLAN in einzelnen Wagen nicht verfE<uuml>gbar"
-
-=item q 72 : "Info/Entertainment nicht verfE<uuml>gbar"
-
-=item q 73 : "Mehrzweckabteil vorne"
-
-Source: correlation between IRIS and DB RIS (bahn.de).
-
-=item q 74 : "Mehrzweckabteil hinten"
-
-Source: correlation between IRIS and DB RIS (bahn.de).
-
-=item q 75 : "1. Klasse vorne"
-
-Source: correlation between IRIS and DB RIS (bahn.de).
-
-=item q 76 : "1. Klasse hinten"
-
-Source: correlation between IRIS and DB RIS (bahn.de).
-
-=item q 77 : "Ohne 1. Klasse"
-
-Source: correlation between IRIS and DB RIS (bahn.de).
-
-=item q 78 : "Ersatzverkehr mit Bus ist eingerichtet"
-
-=item q 79 : "Ohne Mehrzweckabteil"
-
-Source: correlation between IRIS and DB RIS (bahn.de).
-
-=item q 80 : "Abweichende Wagenreihung"
-
-Verified by L<https://iris.noncd.db.de/irisWebclient/Configuration>.
-
-=item q 81 : "Fahrzeugtausch"
-
-=item q 82 : "Mehrere Wagen fehlen"
-
-Verified by L<https://iris.noncd.db.de/irisWebclient/Configuration>.
-
-=item q 83 : "StE<ouml>rung der fahrzeuggebundenen Einstiegshilfe"
-
-=item q 84 : "Zug verkehrt richtig gereiht"
-
-Obsoletes messages 80, 82, 85.
-Verified by L<https://iris.noncd.db.de/irisWebclient/Configuration>.
-
-=item q 85 : "Ein Wagen fehlt"
-
-Verified by L<https://iris.noncd.db.de/irisWebclient/Configuration>.
-
-=item q 86 : "Keine Reservierungsanzeige"
-
-Verified by L<https://iris.noncd.db.de/irisWebclient/Configuration>.
-
-=item q 87 : "Einzelne Wagen ohne Reservierungsanzeige"
-
-Verified by L<https://iris.noncd.db.de/irisWebclient/Configuration>.
-
-=item q 88 : "Keine QualitE<auml>tsmE<auml>ngel"
-
-Obsoletes messages 80, 82, 83, 85, 86, 87, 90, 91, 92, 93, 96, 97, 98.
-Verified by L<https://iris.noncd.db.de/irisWebclient/Configuration>.
-
-=item q 89 : "Reservierungen sind wieder vorhanden"
-
-Obsoletes messages 86, 87.
-Verified by L<https://iris.noncd.db.de/irisWebclient/Configuration>.
-
-=item q 90 : "Kein gastronomisches Angebot"
-
-Verified by L<https://iris.noncd.db.de/irisWebclient/Configuration>.
-
-=item q 91 : "EingeschrE<auml>nkte FahrradbefE<ouml>rderung"
-
-=item q 92 : "Keine FahrradbefE<ouml>rderung"
-
-=item q 93 : "Fehlende oder gestE<ouml>rte behindertengerechte Einrichtung"
-
-Verified by L<https://iris.noncd.db.de/irisWebclient/Configuration>.
-Might also mean "Kein rollstuhlgerechtes WC" (source: frubi).
-
-=item q 94 : "Ersatzbewirtschaftung"
-
-Estimated from a comparison with bahn.de/ris messages. Needs to be verified.
-
-=item q 95 : "Ohne behindertengerechtes WC"
-
-Estimated from a comparison with bahn.de/iris messages.
-
-=item q 96 : "Der Zug ist stark E<uuml>berbesetzt"
-
-Verified by L<https://iris.noncd.db.de/irisWebclient/Configuration>.
-
-=item q 97 : "Der Zug ist E<uuml>berbesetzt"
-
-Verified by L<https://iris.noncd.db.de/irisWebclient/Configuration>.
-
-=item q 98 : "Sonstige QualitE<auml>tsmE<auml>ngel"
-
-Verified by L<https://iris.noncd.db.de/irisWebclient/Configuration>.
-Might also mean "Kein rollstuhlgerechter Wagen" (source: frubi).
-
-=item d 99 : "VerzE<ouml>gerungen im Betriebsablauf"
 
 =back
 

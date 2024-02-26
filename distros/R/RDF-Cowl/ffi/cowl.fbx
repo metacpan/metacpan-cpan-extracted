@@ -1,0 +1,4 @@
+{
+  alien => ['Alien::Cowl'],
+  source => ['ffi/*.c'],
+};

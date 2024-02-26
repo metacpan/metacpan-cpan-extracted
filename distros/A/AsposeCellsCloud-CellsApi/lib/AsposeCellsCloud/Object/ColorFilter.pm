@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Color filter.',
                                   class => 'ColorFilter',
                                   required => [], # TODO
 }                                 );
@@ -128,7 +128,7 @@ __PACKAGE__->method_documentation({
      'filter_by_fill_color' => {
      	datatype => 'boolean',
      	base_name => 'FilterByFillColor',
-     	description => 'Flag indicating whether filter by the cell`s fill color. ',
+     	description => 'Whether filter by the cell`s fill color.            ',
      	format => '',
      	read_only => '',
      		},

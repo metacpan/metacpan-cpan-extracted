@@ -1,5 +1,8 @@
 Revision history for Test-BinaryData
 
+0.016     2024-02-22 22:46:35-05:00 America/New_York
+        - avoid warnings when is_binary inputs are of differing lengths
+
 0.015     2022-12-31 15:59:13-05:00 America/New_York
         - update packaging and metadata
         - minimum required Perl is now v5.12

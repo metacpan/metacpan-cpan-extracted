@@ -3,9 +3,9 @@ package Bencher::Scenarios::Tie;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-12-26'; # DATE
+our $DATE = '2023-12-27'; # DATE
 our $DIST = 'Bencher-Scenarios-Tie'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: Scenarios to benchmark tie() mechanism
@@ -22,13 +22,17 @@ Bencher::Scenarios::Tie - Scenarios to benchmark tie() mechanism
 
 =head1 VERSION
 
-This document describes version 0.001 of Bencher::Scenarios::Tie (from Perl distribution Bencher-Scenarios-Tie), released on 2023-12-26.
+This document describes version 0.002 of Bencher::Scenarios::Tie (from Perl distribution Bencher-Scenarios-Tie), released on 2023-12-27.
 
 =head1 DESCRIPTION
 
 This distribution contains the following L<Bencher> scenario modules:
 
 =over
+
+=item * L<Bencher::Scenario::Tie::Hash>
+
+=item * L<Bencher::Scenario::Tie::Array>
 
 =item * L<Bencher::Scenario::Tie::Scalar>
 

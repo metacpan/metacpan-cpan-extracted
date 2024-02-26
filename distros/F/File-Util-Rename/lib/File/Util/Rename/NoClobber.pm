@@ -8,9 +8,9 @@ use Exporter 'import';
 use File::Util::Rename ();
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-22'; # DATE
+our $DATE = '2024-02-12'; # DATE
 our $DIST = 'File-Util-Rename'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our @EXPORT_OK = qw(
                        rename_noclobber
@@ -33,7 +33,7 @@ File::Util::Rename::NoClobber - Rename files, avoid clobbering existing files
 
 =head1 VERSION
 
-This document describes version 0.001 of File::Util::Rename::NoClobber (from Perl distribution File-Util-Rename), released on 2024-01-22.
+This document describes version 0.002 of File::Util::Rename::NoClobber (from Perl distribution File-Util-Rename), released on 2024-02-12.
 
 =head1 DESCRIPTION
 

@@ -56,13 +56,13 @@ is_deeply( [ sort @list ], [ 't/3/bonk', 't/bonk', 't/honk'], "object" );
 my @d;
 path_find( "t", sub { 
         my( $entry, $dir, $full, $depth ) = @_;
-        # warn "full=$full depth=$depth";
-        push @d, $depth;
+        # diag( "full=$full depth=$depth" );
+        push @d, $full;
         return 1;
     }, "*" );
 
-is( 0+@d, 5, "5 directories" );
-is_deeply( [sort @d], [ 0, 0, 0, 1, 2 ], "Depth gauge" );
+is( 0+@d, 5, "5 directories" ) or diag join ', ', @d;
+is_deeply( [sort @d], [ qw( t/1 t/1/2 t/1/2/3 t/2 t/3 ) ], "Depth gauge" ) or diag join ', ', sort @d;
 
 @list = path_find( "t", sub{1}, sub {
         my( $entry, $dir, $full, $depth ) = @_;

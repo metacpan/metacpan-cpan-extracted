@@ -1,5 +1,5 @@
 {
-   "abstract" : "Modules that manipulate hashes",
+   "abstract" : "List of modules that manipulate hashes",
    "author" : [
       "perlancar <perlancar@cpan.org>"
    ],
@@ -74,7 +74,7 @@
    "provides" : {
       "Acme::CPANModules::HashUtilities" : {
          "file" : "lib/Acme/CPANModules/HashUtilities.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
@@ -89,7 +89,7 @@
          "web" : "https://github.com/perlancar/perl-Acme-CPANModules-HashUtilities"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038000"

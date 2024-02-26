@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-09-05'; # DATE
+our $DATE = '2023-12-20'; # DATE
 our $DIST = 'Sah-Schemas-Code'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 sub meta {
     +{
@@ -59,7 +59,7 @@ Data::Sah::Filter::perl::Code::eval - Eval a string inside 'sub { ... }' and ret
 
 =head1 VERSION
 
-This document describes version 0.002 of Data::Sah::Filter::perl::Code::eval (from Perl distribution Sah-Schemas-Code), released on 2023-09-05.
+This document describes version 0.003 of Data::Sah::Filter::perl::Code::eval (from Perl distribution Sah-Schemas-Code), released on 2023-12-20.
 
 =head1 DESCRIPTION
 

@@ -1,3 +1,11 @@
+0.004   2023-12-09  Released-By: PERLANCAR; Urgency: medium
+
+        - Add argument: min_len.
+
+        - Add options to allow seeding streaks hash and continue from later
+          periods.
+
+
 0.003   2023-11-24  Released-By: PERLANCAR; Urgency: low
 
         - Fix Rinci metadata (schema for 'exclude_broken').

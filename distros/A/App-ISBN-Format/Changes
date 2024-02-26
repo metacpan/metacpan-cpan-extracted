@@ -1,3 +1,10 @@
+0.03 2024-02-25T20:07:26+01:00
+ - Add tests.
+ - Fix typo in doc.
+ - Rename example file to better name.
+ - Update Module::Install to 1.21 version.
+ - Update copyright years.
+
 0.02 2022-02-15T00:13:22+01:00
  - Add missing newline in help.
  - Fix check of ISBN length.

@@ -1,0 +1,146 @@
+Release history for Text-Tabs
+
+2024.001 Fri 16 Feb 2024
+  - No functional changes
+  - Cleaned up, reformatted, backfilled Changes
+
+2023.0511 Wed 10 May 2023
+  - No functional changes
+  - Correct issue tracker link in package metadata
+
+2023.0510 Tue 09 May 2023
+  - Fix for a warning introduced in Text::Wrap in post-5.6 perls
+
+2023.0509 Tue 09 May 2023
+  - Minimum perl version requirement increase to 5.6.1
+  - Fully correct Unicode support in Perl 5.6
+  - Fix for failure to wrap very long words with overflow. [RT #124024]
+    Thanks for the report to Andrew Beverley
+  - Fix for failure to handle combining marks at the start of line/string. [RT #148291]
+    Thanks for the report to Mario Paumann
+  - Correct handling of non-breaking spaces when wrapping. [RT #95823]
+    Requested by Kent Fredric, who is dearly missed
+
+2021.0814 Sat 14 Aug 2021
+  - No functional changes
+  - Missing changelog entry
+
+2021.0813 Fri 13 Aug 2021
+  - No warnings on undef inputs (broken in 2021.0726)
+
+2021.0804 Wed 04 Aug 2021
+  - No functional changes
+  - Removal of reference benchmark from test suite (moved to xt/bench)
+
+2021.0726 Mon 26 Jul 2021
+  - Unicode support on all supported versions of Perl
+  - Full strict and warnings cleanliness
+  - Packaging cleanups
+
+2021.0717 Sat 17 Jul 2021
+  - Packaging fixes
+  - Explicitly declared strictures and warnings everywhere,
+    for new -Dusedefaultstrict perls
+
+2013.0523 Thu 23 May 2013
+  - Packaging tweak (MakeMaker NAME set to Text-Wrap)
+
+2013.0522 Thu 23 May 2013
+  - Documentation typo fixes
+
+2013.0426 Sat 27 Apr 2013
+  - License change to qualify as "open source"
+  [FIXES]
+  - Fix for another "this shouldn't happen" exception [RT #79766]
+  - Removal of "my $_" occurences [RT #81698]
+
+2012.0818 Sat 18 Aug 2012
+  - Repackaged with files missing from previous release
+  - Documentation fixes
+
+2012.0815 Sat 18 Aug 2012
+  - Bifurcated codebase for support of older perls
+  [INCOMPATIBLE CHANGE]
+  - Unicode support for perls that have \X. Contributed by Tom Christiansen
+
+2009.0305 Fri 06 Mar 2009
+  - Automatic increment of $columns when unavoidable
+  [FIXES]
+  - Documentation improvements by David Landgren
+  - Test improvements by Dave Mitchel
+
+2006.1117 Fri 17 Nov 2006
+  - Text::Wrap switch to warnings::warnif. Requested by Rafael Garcia-Suarez
+  - Removal of obsolete bugs section in documentation. Requested by Aristotle Pagaltzis
+
+2006.0711 Tue 11 Jul 2006
+  [FIXES]
+  - Fix for another "this shouldn't happen" exception. Reported by Dan Jacobson
+
+2006.0705 Thu 06 Jul 2006
+  [FIXES]
+  - Documentation improvements by Dan Jaobson [perl #30229] and Gabor Blasko
+  - Wrapping for long words under $break [perl #34902]
+  - Wrapping under $columns=1. Reported by belg4mit
+
+2005.0824 Wed 24 Aug 2005
+  - Separate line ending configuration for computed linebreaks
+  - Faster tab expansion. Thanks to Aristotle Pagaltzis
+  [FIXES]
+  - Wrapping for long words. [perl #17141]
+    Patch by Slaven Rezić. Submitted by Jarkko Hietaniemi
+  - Documentation improvements. Thanks to Matthew Durante and Don Buchholz
+
+2001.0929 Sun 30 Sep 2001
+  - Configurable word definition in Text::Wrap. Thanks to Philip Newton
+  - Configurable line ending in Text::Wrap. Requested by Joel Earl
+  [FIXES]
+  - Retention of tainting on input strings in output string. Thanks to Philip Newton
+  [INCOMPATIBLE CHANGE]
+  - No automatic unexpand of Text::Wrap output.
+    Contributed by Drew Degentesh. Also reported by Sweth Chandramouli
+
+2001.0131 Wed 01 Feb 2001
+  - Faster wrapping using m/\G/ instead of s///
+  - New $Text::Wrap::huge option to split overlong words.
+    Requested by James Hoagland and John Porter
+  - Documentation improvements by Rich Bowen
+  [FIXES]
+  - No extraneous whitespace when passed multiple strings.
+    Thanks to Michael Schwern
+
+98.112902 Sun 29 Nov 1998
+  [INCOMPATIBLE CHANGE]
+  - Merge of Text::Fill into Text::Wrap
+
+98.112801 Sat 28 Nov 1998
+  - First release with a CHANGELOG.
+    Thanks for the inspiration taken from patches and rewrites of Text::Wrap
+    submitted by Ivan Brawley, Jacqui Caren, Jeff Kowalski, Allen Smith,
+    Sullivan N. Beck
+  - New module Text::Fill
+  [INCOMPATIBLE CHANGE]
+  - Configurable handling of overlong words via $Text::Wrap::huge
+  - Default overlong word handling changed to throwing an exception
+
+97.011701 Sat 18 Jan 1997
+  [INCOMPATIBLE CHANGE]
+  - Splitting of overlong words at end of line
+
+96.121201 Fri 13 Dec 1996
+  [FIXES]
+  - No "Scalar value @l[0] better written as $l[0]" warning
+
+96.090101 Mon 02 Sep 1996
+  [INCOMPATIBLE CHANGE]
+  - Removal of Text::Wrap::fill
+
+96.082801 Thu 29 Aug 1996
+  - New Text::Wrap::fill for wrapping multiple paragraphs
+
+96.051501 Thu 16 May 1996
+  [FIXES]
+  - No loss of trailing empty lines in unexpand
+
+96.050901 Tue 26 Aug 1997
+  - [Belatedly uploaded (!)] Initial release

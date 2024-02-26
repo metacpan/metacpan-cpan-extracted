@@ -167,8 +167,8 @@ check_test(
 );
 
 my $wide_diag = <<'END_COMPARISON';
-value for 'have' contains wide bytes
-value for 'want' contains wide bytes
+value for 'have' contains wide codepoints
+value for 'want' contains wide codepoints
 END_COMPARISON
 
 check_test(

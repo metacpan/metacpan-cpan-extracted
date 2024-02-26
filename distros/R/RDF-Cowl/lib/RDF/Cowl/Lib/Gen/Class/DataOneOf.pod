@@ -1,0 +1,87 @@
+# PODNAME: RDF::Cowl::Lib::Gen::Class::DataOneOf
+# ABSTRACT: Generated docs for RDF::Cowl::DataOneOf
+
+## DO NOT EDIT
+## Generated via maint/tt/Class.pod.tt
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+RDF::Cowl::Lib::Gen::Class::DataOneOf - Generated docs for RDF::Cowl::DataOneOf
+
+=head1 VERSION
+
+version 1.0.0
+
+=head1 MAIN MODULE
+
+L<RDF::Cowl::DataOneOf>
+
+=head1 CONSTRUCTORS
+
+=head2 new
+
+B<Signature>:
+
+  RDF::Cowl::DataOneOf->new()
+
+B<Params>:
+
+  CowlVector $values 
+
+Documentation:
+
+  Returns a retained literal enumeration.
+  
+  @param values The enumeration values.
+  @return Retained literal enumeration. Throws exception on error.
+
+Throws exception on error.
+
+=over 2
+
+B<C function name>: C<< cowl_data_one_of >>
+
+=back
+
+=head1 METHODS
+
+=head2 get_values
+
+B<Signature>:
+
+  $self->get_values()
+
+B<Params>:
+
+  CowlDataOneOf $range 
+
+Documentation:
+
+  Gets the values of the specified literal enumeration.
+  
+  @param range The literal enumeration.
+  @return The values.
+
+=over 2
+
+B<C function name>: C<< cowl_data_one_of_get_values >>
+
+=back
+
+=head1 AUTHOR
+
+Zakariyya Mughal <zmughal@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 by Auto-Parallel Technologies, Inc..
+
+This is free software, licensed under Eclipse Public License - v 2.0.
+
+=cut

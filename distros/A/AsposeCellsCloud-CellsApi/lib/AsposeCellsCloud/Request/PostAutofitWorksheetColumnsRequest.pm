@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,13 +59,13 @@ sub new {
 
 
 # Run Operation Request
-# PostAutofitWorksheetColumnsRequest.name :   ,
-# PostAutofitWorksheetColumnsRequest.sheetName :   ,
-# PostAutofitWorksheetColumnsRequest.startColumn :   ,
-# PostAutofitWorksheetColumnsRequest.endColumn :   ,
+# PostAutofitWorksheetColumnsRequest.name : The file name.  ,
+# PostAutofitWorksheetColumnsRequest.sheetName : The worksheet name.  ,
+# PostAutofitWorksheetColumnsRequest.startColumn : The start column index.  ,
+# PostAutofitWorksheetColumnsRequest.endColumn : The end column index.  ,
 # PostAutofitWorksheetColumnsRequest.onlyAuto :   ,
-# PostAutofitWorksheetColumnsRequest.folder :   ,
-# PostAutofitWorksheetColumnsRequest.storageName :    
+# PostAutofitWorksheetColumnsRequest.folder : The folder where the file is situated.  ,
+# PostAutofitWorksheetColumnsRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -76,7 +76,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_autofit_worksheet_columns' } = { 
-    	summary => '',
+    	summary => 'Autofit columns in the worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -145,28 +145,28 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'start_column' => {
      	datatype => 'int',
      	base_name => 'startColumn',
-     	description => '',
+     	description => 'The start column index.',
      	format => '',
      	read_only => '',
      		},
      'end_column' => {
      	datatype => 'int',
      	base_name => 'endColumn',
-     	description => '',
+     	description => 'The end column index.',
      	format => '',
      	read_only => '',
      		},
@@ -180,14 +180,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

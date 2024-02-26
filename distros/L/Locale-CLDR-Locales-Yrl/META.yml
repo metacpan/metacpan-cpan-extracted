@@ -22,22 +22,22 @@ name: Locale-CLDR-Locales-Yrl
 provides:
   Locale::CLDR::Locales::Yrl:
     file: lib/Locale/CLDR/Locales/Yrl.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Yrl::Any:
-    file: lib/Locale/CLDR/Locales/Yrl/Any.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Yrl::Any::Br:
-    file: lib/Locale/CLDR/Locales/Yrl/Any/Br.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Yrl::Any::Co:
-    file: lib/Locale/CLDR/Locales/Yrl/Any/Co.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Yrl::Any::Ve:
-    file: lib/Locale/CLDR/Locales/Yrl/Any/Ve.pm
-    version: v0.40.1
+    version: v0.44.0
+  Locale::CLDR::Locales::Yrl::Latn:
+    file: lib/Locale/CLDR/Locales/Yrl/Latn.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Yrl::Latn::Br:
+    file: lib/Locale/CLDR/Locales/Yrl/Latn/Br.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Yrl::Latn::Co:
+    file: lib/Locale/CLDR/Locales/Yrl/Latn/Co.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Yrl::Latn::Ve:
+    file: lib/Locale/CLDR/Locales/Yrl/Latn/Ve.pm
+    version: v0.44.0
 requires:
   DateTime: '0.72'
-  Locale::CLDR: v0.40.1
+  Locale::CLDR: v0.44.0
   Moo: '2'
   MooX::ClassAttribute: '0.011'
   Type::Tiny: '0'
@@ -47,5 +47,5 @@ resources:
   bugtracker: https://github.com/ThePilgrim/perlcldr/issues
   homepage: https://github.com/ThePilgrim/perlcldr
   repository: https://github.com/ThePilgrim/perlcldr.git
-version: v0.40.1
+version: v0.44.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

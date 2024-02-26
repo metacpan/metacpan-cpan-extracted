@@ -1,6 +1,12 @@
 Revision history for Perl extension Path::Find.
 
 
+0.04  Fri Feb 23 2024
+    - Actually found the problem and fixed it: t/2 was missing from MANIFEST
+
+0.03  Fri Feb 23 2024
+    - Added some cookie crumbs to the test
+
 0.02  Fri Jul  7 15:34 2023
     - Forgot HONK.T
 

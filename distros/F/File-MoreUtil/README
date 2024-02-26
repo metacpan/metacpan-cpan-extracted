@@ -2,8 +2,8 @@ NAME
     File::MoreUtil - File-related utilities
 
 VERSION
-    This document describes version 0.626 of File::MoreUtil (from Perl
-    distribution File-MoreUtil), released on 2022-08-08.
+    This document describes version 0.628 of File::MoreUtil (from Perl
+    distribution File-MoreUtil), released on 2023-11-02.
 
 SYNOPSIS
      use File::MoreUtil qw(
@@ -17,6 +17,12 @@ SYNOPSIS
          dir_has_non_subdirs
          dir_has_dot_subdirs
          dir_has_non_dot_subdirs
+         dir_only_has_files
+         dir_only_has_dot_files
+         dir_only_has_non_dot_files
+         dir_only_has_subdirs
+         dir_only_has_dot_subdirs
+         dir_only_has_non_dot_subdirs
 
          get_dir_entries
          get_dir_dot_entries
@@ -27,6 +33,8 @@ SYNOPSIS
          get_dir_files
          get_dir_dot_files
          get_dir_non_dot_files
+         get_dir_only_file
+         get_dir_only_subdir
      );
 
      print "file exists" if file_exists("/path/to/file/or/dir");
@@ -204,6 +212,30 @@ FUNCTIONS
     in it *and* does not have anything else. See "dir_has_files" for the
     definition of plain files.
 
+  dir_only_has_subdirs
+    Usage:
+
+     dir_only_has_subdirs($dir) => BOOL
+
+    Will return true if $dir exists and has one or more subdirectories in it
+    *and* does not have anything else.
+
+  dir_only_has_dot_subdirs
+    Usage:
+
+     dir_only_has_dot_subdirs($dir) => BOOL
+
+    Will return true if $dir exists and has one or more dot subdirectories
+    in it *and* does not have anything else.
+
+  dir_only_has_non_dot_subdirs
+    Usage:
+
+     dir_only_has_non_dot_subdirs($dir) => BOOL
+
+    Will return true if $dir exists and has one or more plain non-dot
+    subdirectories in it *and* does not have anything else.
+
   get_dir_entries
     Usage:
 
@@ -325,6 +357,22 @@ FUNCTIONS
 
      my @non_dot_subdirnames = do { opendir my $dh, $dir; grep { !/\A\./ && -d } readdir $dh };
 
+  get_dir_only_file
+    Usage:
+
+     my $filename = get_dir_only_file([ $dir ]);
+
+    Return filename inside directory $dir (or current directory if
+    unspecified) only if $dir has a single plain file and nothing else.
+
+  get_dir_only_subdir
+    Usage:
+
+     my $subdirname = get_dir_only_subdir([ $dir ]);
+
+    Return subdirectory name inside directory $dir (or current directory if
+    unspecified) only if $dir has a single subdirectory and nothing else.
+
 FAQ
   Where is file_empty()?
     For checking if some path exists, is a plain file, and is empty (content
@@ -339,7 +387,7 @@ HOMEPAGE
 
 SOURCE
     Source repository is at
-    <https://github.com/perlancar/perl-SHARYANTO-File-Util>.
+    <https://github.com/perlancar/perl-File-MoreUtil>.
 
 SEE ALSO
     App::FileTestUtils includes CLI's for functions like "dir_empty", etc.
@@ -367,8 +415,8 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022, 2020, 2019, 2017, 2015, 2014, 2013
-    by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2023, 2021, 2020, 2019, 2017, 2015, 2014,
+    2013 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -1,4 +1,4 @@
-# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2017, 2020 Kevin Ryde
+# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2017, 2020, 2023, 2024 Kevin Ryde
 
 # This file is part of Upfiles.
 #
@@ -46,7 +46,7 @@ use Regexp::Common 'no_defaults','Emacs';
 use FindBin;
 my $progname = $FindBin::Script;
 
-our $VERSION = 15;
+our $VERSION = 16;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
@@ -238,6 +238,7 @@ sub ftp {
   my ($self) = @_;
   my $protocol = $self->{'protocol'};
   my $options = $self->{'options'};
+  ### $options
 
   # Here $key becomes ftp, ftp.TLS, ftps or sftp and a corresponding type of
   # lazy connection is cached.  The two ftp or ftp.TLS could be merged by
@@ -256,6 +257,7 @@ sub ftp {
             Module::Load::load($class);
             $class->new (verbose    => $self->{'verbose'},
                          copy_time  => $options->{'copy_utime'}?1:0, # for SFTP
+                         Passive    => $options->{'passive'}?1:0,
                          ($protocol eq 'ftps'
                           ? (use_SSL => 1)
                           : (use_TLS => $options->{'use_TLS'})),
@@ -1129,7 +1131,7 @@ L<http://user42.tuxfamily.org/upfiles/index.html>
 
 =head1 LICENSE
 
-Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2017, 2020 Kevin Ryde
+Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2017, 2020, 2023, 2024 Kevin Ryde
 
 Upfiles is free software; you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software

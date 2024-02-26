@@ -1,3 +1,18 @@
+0.117   2023-11-11  Released-By: PERLANCAR; Urgency: medium
+
+        - Pull Text::Table::Sprintf 0.007 as dependency.
+
+
+0.116   2023-11-11  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Mention about new alignment feature in Text::Table::Sprintf
+          0.007.
+
+        - [doc] Typo in option name in Synopsis.
+
+
 0.115   2022-07-03  Released-By: PERLANCAR; Urgency: medium
 
         - [bugfix] Update features for Text::Table::Org backend (caption =>

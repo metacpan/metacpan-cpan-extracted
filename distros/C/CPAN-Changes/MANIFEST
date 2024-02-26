@@ -131,6 +131,7 @@ t/add-release.t
 t/attach_group_nodup.t
 t/corpus.t
 t/dates.t
+t/group.t
 t/legacy/delete_empty_groups.t
 t/legacy/dist-zilla-changes.t
 t/legacy/moo_lazy_subclass.t

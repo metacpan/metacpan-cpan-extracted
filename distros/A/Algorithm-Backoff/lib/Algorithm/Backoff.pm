@@ -1,13 +1,15 @@
 package Algorithm::Backoff;
 
-our $DATE = '2019-06-20'; # DATE
-our $VERSION = '0.009'; # VERSION
-
 use 5.010001;
 use strict 'subs', 'vars';
 use warnings;
 
 use Time::HiRes qw(time);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2024-02-24'; # DATE
+our $DIST = 'Algorithm-Backoff'; # DIST
+our $VERSION = '0.010'; # VERSION
 
 our %SPEC;
 
@@ -194,10 +196,9 @@ sub new {
 sub _consider_actual_delay {
     my ($self, $delay, $timestamp) = @_;
 
-    $self->{_last_delay} //= 0;
+    $self->{_prev_delay} //= 0;
     my $actual_delay = $timestamp - $self->{_last_timestamp};
-    my $new_delay = $delay + $self->{_last_delay} - $actual_delay;
-    $self->{_last_delay} = $new_delay;
+    my $new_delay = $delay + $self->{_prev_delay} - $actual_delay;
     $new_delay;
 }
 
@@ -279,7 +280,7 @@ Algorithm::Backoff - Various backoff strategies for retry
 
 =head1 VERSION
 
-This document describes version 0.009 of Algorithm::Backoff (from Perl distribution Algorithm-Backoff), released on 2019-06-20.
+This document describes version 0.010 of Algorithm::Backoff (from Perl distribution Algorithm-Backoff), released on 2024-02-24.
 
 =head1 SYNOPSIS
 
@@ -291,8 +292,10 @@ This document describes version 0.009 of Algorithm::Backoff (from Perl distribut
      #delay_on_success => 0, # optional, default 0
  );
 
- # 2. log success/failure and get a new number of seconds to delay, timestamp is
- # optional but must be monotonically increasing.
+ # 2. log success/failure and get a new number of seconds to delay. if you don't
+ # want to log for the current time, you can pass a timestamp (number of seconds
+ # passed since some reference value, like a Unix epoch) as the argument, which
+ # should be monotonically increasing.
 
  my $secs = $ab->failure(); # => 2
  my $secs = $ab->success(); # => 0
@@ -304,6 +307,12 @@ This distribution provides several classes that implement various backoff
 strategies for setting delay between retry attempts.
 
 This class (C<Algorithm::Backoff>) is a base class only.
+
+Algorithm::Backoff does not actually provide a function/method to retry a piece
+of code. It only contains the backoff strategies and splits the actual delaying
+to another module (e.g. L<Retry::Backoff>). This allows for things like
+printing/returning all the retries and their delay amounts without actually
+doing the delay (e.g. in L<show-backoff-delays> script).
 
 =head1 METHODS
 
@@ -341,6 +350,7 @@ Note that after a success, the number of attempts is reset (as expected). So if
 max_attempts is 3, and if you fail twice then succeed, then on the next failure
 the algorithm will retry again for a maximum of 3 times.
 
+
 =back
 
 Return value:  (obj)
@@ -353,8 +363,8 @@ Usage:
  my $secs = $obj->success([ $timestamp ]);
 
 Log a successful attempt. If not specified, C<$timestamp> defaults to current
-time. Will return the suggested number of seconds to wait before doing another
-attempt.
+Unix timestamp. Will return the suggested number of seconds to wait before doing
+another attempt.
 
 =head2 failure
 
@@ -362,9 +372,9 @@ Usage:
 
  my $secs = $obj->failure([ $timestamp ]);
 
-Log a failed attempt. If not specified, C<$timestamp> defaults to current time.
-Will return the suggested number of seconds to wait before doing another
-attempt, or -1 if it suggests that one gives up (e.g. if C<max_attempts>
+Log a failed attempt. If not specified, C<$timestamp> defaults to current Unix
+timestamp. Will return the suggested number of seconds to wait before doing
+another attempt, or -1 if it suggests that one gives up (e.g. if C<max_attempts>
 parameter has been exceeded).
 
 =head1 HOMEPAGE
@@ -375,14 +385,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Algorithm-
 
 Source repository is at L<https://github.com/perlancar/perl-Algorithm-Backoff>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Algorithm-Backoff>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Retry::Backoff> - an application of Algorithm::Backoff to retry a piece of
@@ -390,9 +392,9 @@ code using various backoff strategies.
 
 L<App::AlgorithmBackoffUtils> - various CLI's related to Algorithm::Backoff.
 
-L<Action::Retry> - Somehow I didn't find this module before writing
-Algorithm::Backoff. Otherwise I probably would not have created
-Algorithm::Backoff. But Algorithm::Backoff offers an alternative interface, some
+L<Action::Retry> - A prior art for Algorithm::Backoff. Somehow I didn't find
+this module before writing Algorithm::Backoff. But Algorithm::Backoff offers an
+alternative interface (a split of actual sleep/retry vs the algorithm), and some
 additional parameters (like delay on success and jitter factor), a lighter
 footprint (no Moo), and a couple more strategies.
 
@@ -400,11 +402,53 @@ footprint (no Moo), and a couple more strategies.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTORS
+
+=for stopwords Brendan Byrd SineSwiper
+
+=over 4
+
+=item *
+
+Brendan Byrd <brendan.byrd@grantstreet.com>
+
+=item *
+
+SineSwiper <GitHub@ResonatorSoft.org>
+
+=back
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2024, 2019 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Algorithm-Backoff>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

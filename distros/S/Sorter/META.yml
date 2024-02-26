@@ -19,12 +19,12 @@ name: Sorter
 provides:
   Sorter:
     file: lib/Sorter.pm
-    version: v0.1.1
+    version: v0.1.2
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sorter
   homepage: https://metacpan.org/release/Sorter
   repository: git://github.com/perlancar/perl-Sorter.git
-version: 0.1.1
+version: 0.1.2
 x_Dist_Zilla:
   perl:
     version: '5.038002'

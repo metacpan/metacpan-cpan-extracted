@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.014;
 
-our $VERSION = '1.94';
+our $VERSION = '1.96';
 
 use Carp qw(confess cluck);
 use DateTime;
@@ -471,7 +471,6 @@ sub get_station {
 
 	while ( @queue and $iter_depth < 12 ) {
 		my $station = shift(@queue);
-		push( @seen, $station );
 		$iter_depth++;
 
 		my ( $raw, $err )
@@ -555,7 +554,7 @@ sub get_station {
 			for my $ref (@refs) {
 				if ( none { $_ == $ref } @seen and none { $_ == $ref } @queue )
 				{
-					push( @queue, @refs );
+					push( @queue, $ref );
 				}
 			}
 			$opt{root} = 0;
@@ -989,7 +988,7 @@ Non-blocking variant (EXPERIMENTAL):
 
 =head1 VERSION
 
-version 1.94
+version 1.96
 
 =head1 DESCRIPTION
 

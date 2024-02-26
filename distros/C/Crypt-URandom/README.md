@@ -4,7 +4,7 @@ Crypt::URandom - Provide non blocking randomness
 
 # VERSION
 
-This document describes Crypt::URandom version 0.39
+This document describes Crypt::URandom version 0.40
 
 # SYNOPSIS
 
@@ -111,11 +111,7 @@ None reported.
 
 # BUGS AND LIMITATIONS
 
-No bugs have been reported.
-
-Please report any bugs or feature requests to
-`bug-crypt-urandom@rt.cpan.org`, or through the web interface at
-[http://rt.cpan.org](http://rt.cpan.org).
+To report a bug, or view the current list of bugs, please visit [https://github.com/david-dick/crypt-urandom/issues](https://github.com/david-dick/crypt-urandom/issues)
 
 # AUTHOR
 

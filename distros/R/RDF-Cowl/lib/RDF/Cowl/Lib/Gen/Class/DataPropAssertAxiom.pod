@@ -1,0 +1,216 @@
+# PODNAME: RDF::Cowl::Lib::Gen::Class::DataPropAssertAxiom
+# ABSTRACT: Generated docs for RDF::Cowl::DataPropAssertAxiom
+
+## DO NOT EDIT
+## Generated via maint/tt/Class.pod.tt
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+RDF::Cowl::Lib::Gen::Class::DataPropAssertAxiom - Generated docs for RDF::Cowl::DataPropAssertAxiom
+
+=head1 VERSION
+
+version 1.0.0
+
+=head1 MAIN MODULE
+
+L<RDF::Cowl::DataPropAssertAxiom>
+
+=head1 CONSTRUCTORS
+
+=head2 new
+
+B<Signature>:
+
+  RDF::Cowl::DataPropAssertAxiom->new(CowlAnyIndividual $subj, CowlLiteral $obj, Maybe[ CowlVector ] $annot)
+
+B<Params>:
+
+  CowlAnyDataPropExp $prop 
+  CowlAnyIndividual $subj 
+  CowlLiteral $obj 
+  Maybe[ CowlVector ] $annot I<[optional]>
+
+Documentation:
+
+  Returns a retained data property assertion axiom.
+  
+  @param prop The data property.
+  @param subj The assertion subject.
+  @param obj The assertion object.
+  @param annot [optional] The annotations.
+  @return Retained axiom. Throws exception on error.
+
+Throws exception on error.
+
+=over 2
+
+B<C function name>: C<< cowl_data_prop_assert_axiom >>
+
+=back
+
+=head2 cowl_neg_data_prop_assert_axiom
+
+B<Signature>:
+
+  RDF::Cowl::DataPropAssertAxiom->cowl_neg_data_prop_assert_axiom(CowlAnyIndividual $subj, CowlLiteral $obj, Maybe[ CowlVector ] $annot)
+
+B<Params>:
+
+  CowlAnyDataPropExp $prop 
+  CowlAnyIndividual $subj 
+  CowlLiteral $obj 
+  Maybe[ CowlVector ] $annot I<[optional]>
+
+Documentation:
+
+  Returns a retained negative data property assertion axiom.
+  
+  @param subj The assertion subject.
+  @param prop The data property.
+  @param obj The assertion object.
+  @param annot [optional] The annotations.
+  @return Retained axiom. Throws exception on error.
+
+Throws exception on error.
+
+=over 2
+
+B<C function name>: C<< cowl_neg_data_prop_assert_axiom >>
+
+=back
+
+=head1 METHODS
+
+=head2 is_negative
+
+B<Signature>:
+
+  $self->is_negative()
+
+B<Params>:
+
+  CowlDataPropAssertAxiom $axiom 
+
+Documentation:
+
+  Returns true if the specified data property assertion axiom is negative.
+  
+  @param axiom The axiom.
+  @return True if the assertion is negative, false otherwise.
+
+=over 2
+
+B<C function name>: C<< cowl_data_prop_assert_axiom_is_negative >>
+
+=back
+
+=head2 get_prop
+
+B<Signature>:
+
+  $self->get_prop()
+
+B<Params>:
+
+  CowlDataPropAssertAxiom $axiom 
+
+Documentation:
+
+  Gets the data property.
+  
+  @param axiom The axiom.
+  @return The data property.
+
+=over 2
+
+B<C function name>: C<< cowl_data_prop_assert_axiom_get_prop >>
+
+=back
+
+=head2 get_subject
+
+B<Signature>:
+
+  $self->get_subject()
+
+B<Params>:
+
+  CowlDataPropAssertAxiom $axiom 
+
+Documentation:
+
+  Gets the assertion subject.
+  
+  @param axiom The axiom.
+  @return The assertion subject.
+
+=over 2
+
+B<C function name>: C<< cowl_data_prop_assert_axiom_get_subject >>
+
+=back
+
+=head2 get_object
+
+B<Signature>:
+
+  $self->get_object()
+
+B<Params>:
+
+  CowlDataPropAssertAxiom $axiom 
+
+Documentation:
+
+  Gets the assertion object.
+  
+  @param axiom The axiom.
+  @return The assertion object.
+
+=over 2
+
+B<C function name>: C<< cowl_data_prop_assert_axiom_get_object >>
+
+=back
+
+=head2 get_annot
+
+B<Signature>:
+
+  $self->get_annot()
+
+B<Params>:
+
+  CowlDataPropAssertAxiom $axiom 
+
+Documentation:
+
+  Gets the annotations of the specified axiom.
+  
+  @param axiom The axiom.
+  @return The annotations.
+
+=over 2
+
+B<C function name>: C<< cowl_data_prop_assert_axiom_get_annot >>
+
+=back
+
+=head1 AUTHOR
+
+Zakariyya Mughal <zmughal@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 by Auto-Parallel Technologies, Inc..
+
+This is free software, licensed under Eclipse Public License - v 2.0.
+
+=cut

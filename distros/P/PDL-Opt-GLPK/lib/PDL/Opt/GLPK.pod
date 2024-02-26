@@ -1,0 +1,635 @@
+package PDL::Opt::GLPK;
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+PDL::Opt::GLPK - PDL interface to the GNU Linear Programming Kit
+
+=head1 SYNOPSIS
+
+ use PDL;
+ use PDL::Opt::GLPK;
+
+ glpk($c, $a, $b $lb, $ub, $ctype, $vtype, GLP_MAX,
+	$xopt = null, $fopt = null, $status = null,
+	$lambda = null, $redcosts = null, \%param);
+
+=head1 DESCRIPTION
+
+This module provides an interface to GLPK, the GNU Linear Programming
+Kit.
+The interface was ported from Octave and mimics its GLPK interface.
+
+=head1 FUNCTIONS
+
+=head2 glpk
+
+ Signature (c(m); a(m, n); b(n); lb(m); ub(m); ctype(n); vtype(m);
+	int sense; [o]xopt(m); [o]fopt(); [o]status(); [o]lambda(n);
+	[o]redcosts(n); SV *param)
+
+Solve a linear program using the GNU GLPK library.
+
+The LP can be of the form
+
+ [ min | max ] C'*x
+ subject to
+
+ A*x [ "=" | "<=" | ">=" ] b
+   x >= LB
+   x <= UB
+
+=head3 Arguments
+
+Input values:
+
+=over
+
+=item c
+
+A ndarray containing the objective function coefficients.
+
+=item a
+
+A ndarray containing the constraints coefficients.
+C<a> must be 2-d, though broadcasting over higher dimensions is possible
+for other arguments.
+
+The coefficients may be given as a L<PDL::CCS::Nd> sparse matrix as
+well.
+
+=item b
+
+A ndarray containing the right-hand side value for each constraint
+in the constraint matrix.
+
+=item lb
+
+A ndarray containing the lower bound on each of the variables.
+
+=item ub
+
+A ndarray containing the upper bound on each of the variables.
+
+=item ctype
+
+A ndarray containing the sense of each constraint in the
+constraint matrix.
+Each element of the array may be one of the following
+values
+
+=over
+
+=item 1 (GLP_FR)
+
+A free (unbounded) constraint (the constraint is ignored).
+
+=item 2 (GLP_LO)
+
+An inequality constraint with a lower bound.
+
+=item 3 (GLP_UP)
+
+An inequality constraint with an upper bound.
+
+=item 4 (GLP_DB)
+
+An inequality constraint with equal lower and upper bounds.
+
+=item 5 (GLP_FX)
+
+An equality constraint.
+
+=back
+
+=item vartype
+
+A ndarray containing the types of the variables.
+
+=over
+
+=item 1 (GLP_CV)
+
+A continuous variable.
+
+=item 2 (GLP_IV)
+
+An integer variable.
+
+=item 3 (GLP_BV)
+
+A binary variable.
+Lower and upper bound are ignored and set to zero resp. one.
+
+=back
+
+=item sense
+
+=over
+
+=item 1 (GLP_MIN)
+
+	Minimize the objective function.
+
+=item 2 (GLP_MAX)
+
+	Maximize the objective function.
+
+=back
+
+=item param (optional)
+
+A hash reference with any of following keys used to define the behavior
+of solver. Missing keys take on default values, so you
+only need to set the values that you wish to change from the default.
+
+Integer parameters:
+
+=over
+
+=item msglev (default: 1)
+
+Level of messages output by solver routines:
+
+=over
+
+=item 0 (GLP_MSG_OFF)
+
+No output.
+
+=item 1 (GLP_MSG_ERR)
+
+Error and warning messages only.
+
+=item 2 (GLP_MSG_ON)
+
+Normal output.
+
+=item 3 (GLP_MSG_ALL)
+
+Full output (includes informational messages).
+
+=item 4 (GLP_MSG_DBG)
+
+Debug output.
+
+=back
+
+=item scale (default: 16)
+
+Scaling option. The values can be combined with the bitwise
+OR operator and may be the following:
+
+=over
+
+=item 1 (GLP_SF_GM)
+
+Geometric mean scaling.
+
+=item 16 (GLP_SF_EQ)
+
+Equilibration scaling.
+
+=item 32 (GLP_SF_2N)
+
+Round scale factors to power of two.
+
+=item 64 (GLP_SF_SKIP)
+
+Skip if problem is well scaled.
+
+=back
+
+Alternatively, a value of 128 (GLP_SF_AUTO) may be also spec-
+ified, in which case the routine chooses the scaling options
+automatically.
+
+=item dual (default: 1)
+
+Simplex method option:
+
+=over
+
+=item 1 (GLP_PRIMAL)
+
+Use two-phase primal simplex.
+
+=item 2 (GLP_DUALP)
+
+Use two-phase dual simplex, and if it fails, switch
+to the primal simplex.
+
+=item 3 (GLP_DUAL)
+
+Use two-phase dual simplex.
+
+=back
+
+=item price (default: 0x22)
+
+Pricing option (for both primal and dual simplex):
+
+=over
+
+=item 0x11 (GLP_PT_STD)
+
+Textbook pricing.
+
+=item 0x22 (GLP_PT_PSE)
+
+Steepest edge pricing.
+
+=back
+
+=item itlim (default: intmax)
+
+Simplex iterations limit. It is decreased by one each time
+when one simplex iteration has been performed, and reaching
+zero value signals the solver to stop the search.
+
+=item outfrq (default: 200)
+
+Output frequency, in iterations. This parameter specifies how
+frequently the solver sends information about the solution to
+the standard output.
+
+=item branch (default: 4)
+
+Branching technique option (for MIP only):
+
+=over
+
+=item 1 (GLP_BR_FFV)
+
+First fractional variable.
+
+=item 2 (GLP_BR_LFV)
+
+Last fractional variable.
+
+=item 3 (GLP_BR_MFV)
+
+Most fractional variable.
+
+=item 4 (GLP_BR_DTH)
+
+Heuristic by Driebeck and Tomlin.
+
+=item 5 (GLP_BR_PCH)
+
+Hybrid pseudocost heuristic.
+
+=back
+
+=item btrack (default: 4)
+
+Backtracking technique option (for MIP only):
+
+=over
+
+=item 1 (GLP_BT_DFS)
+
+Depth first search.
+
+=item 2 (GLP_BT_BFS)
+
+Breadth first search.
+
+=item 3 (GLP_BT_BLB)
+
+Best local bound.
+
+=item 4 (GLP_BT_BPH)
+
+Best projection heuristic.
+
+=back
+
+=item presol (default: 1)
+
+If this flag is set, the simplex solver uses the built-in LP
+presolver. Otherwise the LP presolver is not used.
+
+=item lpsolver (default: 1)
+
+Select which solver to use. If the problem is a MIP problem
+this flag will be ignored.
+
+=over
+
+=item 1
+
+Revised simplex method.
+
+=item 2
+
+Interior point method.
+
+=back
+
+=item rtest (default: 0x22)
+
+Ratio test technique:
+
+=over
+
+=item 0x11 (GLP_RT_STD)
+
+Standard ("textbook").
+
+=item 0x22 (GLP_RT_HAR)
+
+Harris’ two-pass ratio test.
+
+=item 0x33 (GLP_RT_FLIP)
+
+long-step (flip-flop) ratio test
+
+=back
+
+=item tmlim (default: intmax)
+
+Searching time limit, in milliseconds.
+
+=item outdly (default: 0)
+
+Output delay, in seconds. This parameter specifies how long
+the solver should delay sending information about the solution
+to the standard output.
+
+=item save_pb (default: 0)
+
+If this parameter is nonzero, save a copy of the problem in
+CPLEX LP format to a file as specified by the parameter C<save_fn>.
+
+=item save_fn (default: C<"outpb.%d.lp">)
+
+This is a format for the file name(s) the problem will be written to if
+C<save_pb> is true.
+The pattern shall contain a placeholder like C<%d>
+that will be replaced with a sequence number.
+This is required for broadcasting to prevent the file being overwritten.
+
+=back
+
+Real parameters:
+
+=over
+
+=item tolbnd (default: 1e-7)
+
+Relative tolerance used to check if the current basic solution
+is primal feasible. It is not recommended that you change
+this parameter unless you have a detailed understanding of
+its purpose.
+
+=item toldj (default: 1e-7)
+
+Absolute tolerance used to check if the current basic solution
+is dual feasible. It is not recommended that you change this
+parameter unless you have a detailed understanding of its
+purpose.
+
+=item tolpiv (default: 1e-10)
+
+Relative tolerance used to choose eligible pivotal elements of
+the simplex table. It is not recommended that you change
+this parameter unless you have a detailed understanding of
+its purpose.
+
+=item objll (default: -INFINITY)
+
+Lower limit of the objective function. If the objective function
+reaches this limit and continues decreasing, the solver stops
+the search. This parameter is used in the dual simplex method
+only.
+
+=item objul (default: INFINITY)
+
+Upper limit of the objective function. If the objective function
+reaches this limit and continues increasing, the solver stops
+the search. This parameter is used in the dual simplex only.
+
+=item tolint (default: 1e-5)
+
+Relative tolerance used to check if the current basic solution
+is integer feasible. It is not recommended that you change
+this parameter unless you have a detailed understanding of
+its purpose.
+
+=item tolobj (default: 1e-7)
+
+Relative tolerance used to check if the value of the objective
+function is not better than in the best known integer feasi-
+ble solution. It is not recommended that you change this
+parameter unless you have a detailed understanding of its
+purpose.
+
+=back
+
+=back
+
+Output values:
+
+=over
+
+=item xopt
+
+The optimizer (the value of the decision variables at the optimum).
+
+=item fopt
+
+The optimum value of the objective function.
+
+=item lambda (optional)
+
+Dual variables.
+
+=item redcosts (optional)
+
+Reduced Costs.
+
+=item status Status of the optimization.
+
+=over
+
+=item 1 (GLP_UNDEF)
+
+Solution status is undefined.
+
+=item 2 (GLP_FEAS)
+
+Solution is feasible.
+
+=item 3 (GLP_INFEAS)
+
+Solution is infeasible.
+
+=item 4 (GLP_NOFEAS)
+
+Problem has no feasible solution.
+
+=item 5 (GLP_OPT)
+
+Solution is optimal.
+
+=item 6 (GLP_UNBND)
+
+Problem has no unbounded solution.
+
+=back
+
+=back
+
+=head1 EXAMPLES
+
+=head2 A standard case
+
+A modified example from the GLPK documentation, with an extra variable
+to avoid a square matrix:
+
+ Maximize
+  obj: + 10 x_1 + 6 x_2 + 4 x_3 - x_4
+
+ Subject To
+  r_1: + x_4 + x_3 + x_2 + x_1 <= 100
+  r_2: + x_4 + 5 x_3 + 4 x_2 + 10 x_1 <= 600
+  r_3: + x_4 + 6 x_3 + 2 x_2 + 2 x_1 <= 300
+
+The solution is straightforward:
+
+ use PDL;
+ use PDL::Opt::GLPK;
+
+ $a = pdl([[1, 1, 1, 1], [10, 4, 5, 1], [2, 2, 6, 1]]);
+ $b = pdl([100, 600, 300]);
+ $c = pdl([10, 6, 4, -1]);
+ $lb = zeroes(4);
+ $ub = inf(4);
+ $ctype = pdl([GLP_UP, GLP_UP, GLP_UP]);
+ $vtype = pdl([GLP_CV, GLP_CV, GLP_CV, GLP_CV]);
+
+ glpk($c, $a, $b $lb, $ub, $ctype, $vtype, GLPX_MAX,
+	$xopt = null, $fopt = null, $status = null);
+
+ # $xopt:
+ # [
+ #   [ 33.333333  66.666667          0          0]
+ # ]
+
+ # $fopt:
+ # [ 733.33333]
+
+=head2 Broadcasting
+
+Multiple problems on the same coefficients may be solved simultaneously.
+Some care must be taken when all combinations of multiple arguments are
+requested.
+
+The base problem:
+
+ Maximize
+  obj: + y_1 + y_2 + y_3 + y_4
+
+ Subject To
+  r_1: - y_2 + y_1 >= 1
+  r_2: - y_3 + y_2 >= 1
+  r_3: - y_4 + y_3 >= 1
+
+ Bounds
+  0 <= y_1 <= 4
+  0 <= y_2 <= 4
+  0 <= y_3 <= 4
+  0 <= y_4 <= 4
+
+ Generals
+  y_1
+  y_2
+  y_3
+  y_4
+
+Looking for the objective function's minimum I<and> maximum with both
+lower I<and> upper bound constraints:
+
+ use PDL;
+ use PDL::Opt::GLPK;
+
+ my $a = pdl(
+     [[1, -1, 0, 0],
+      [0, 1, -1, 0],
+      [0, 0, 1, -1]]);
+ my $b = pdl([1, 1, 1]);
+ my $c = pdl([1, 1, 1, 1]);
+ my $lb = pdl([0, 0, 0, 0]);
+ my $ub = pdl([4, 4, 4, 4]);
+
+ # dims: 3, 2 - loop over lower and upper bounds
+ my $ctype = pdl([[GLP_LO, GLP_LO, GLP_LO],[GLP_UP, GLP_UP, GLP_UP]]);
+
+ my $vtype = (GLP_IV * ones(4));
+
+ # dims: 1, 2 - extra loop over min and max
+ my $sense = pdl [[GLPX_MAX], [GLPX_MIN]];
+
+ my $xopt = null;
+ my $fopt = null;
+ my $status = null;
+
+ glpk($c, $a, $b, $lb, $ub, $ctype, $vtype, $sense, $xopt, $fopt, $status);
+
+ # $xopt:
+ # [
+ #  [
+ #   [4 3 2 1]
+ #   [4 4 4 4]
+ #  ]
+ #  [
+ #   [3 2 1 0]
+ #   [0 0 0 0]
+ #  ]
+ # ]
+ #
+ # $fopt:
+ # [
+ #  [10 16]
+ #  [ 6  0]
+ # ]
+
+=head2 Specifying parameters
+
+The C<params> hash ref is always the last argument. It is permitted to
+leave out the other optional output arguments, as in
+
+ glpk($c, $a, $b, $lb, $up, $ctpye, $vtype, $sense,
+     $xopt, $fopt, $status, {save_pb => 1});
+
+=head1 ERRORS
+
+In case the solver reports an error, it will raise an PDL error.
+
+=head1 AUTHOR
+
+Jörg Sommrey
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2024 Jörg Sommrey
+
+This library is free software; you may redistribute it and/or
+modify it under the terms of the GNU GENERAL PUBLIC LICENSE Version 3.
+See COPYING.
+
+=head1 SEE ALSO
+
+The Octave Manual:
+L<https://docs.octave.org/latest/Linear-Programming.html>
+
+The GNU Linear Programming Kit:
+L<https://www.gnu.org/software/glpk/>
+
+The GLPK reference manual is included in the GLPK distribution.
+
+=cut

@@ -1,3 +1,12 @@
+1.01
+     - Fix s2d() to handle Inf and NaN.
+     - Add new functions pn, pnv, sn, snv.
+     - Revise fmtpy() to be more efficient and, hopefully, more readable, too.
+     - Conditionaly add -std=c99 flag to compilation of libryu - aimed at
+       avoiding some "UNKNOWN" reports and allowing the module to build on those
+       affected platforms.
+     - Add benchmark script (benchmark.p) in "benchmark" folder.
+
 1.0
      - Significant changes between 1.0 and 0.7 include removal of some fairly
        useless functions (which can be reinstated, if requested), and support

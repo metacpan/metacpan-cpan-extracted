@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Test::BinaryData 0.015;
+package Test::BinaryData 0.016;
 # ABSTRACT: compare two things, give hex dumps if they differ
 
 use 5.006;
@@ -8,7 +8,7 @@ use 5.006;
 #pod =head1 SYNOPSIS
 #pod
 #pod   use Test::BinaryData;
-#pod   
+#pod
 #pod   my $computed_data = do_something_complicated;
 #pod   my $expected_data = read_file('correct.data');
 #pod
@@ -50,7 +50,7 @@ use 5.006;
 #pod When comparing very long strings, we can stop after we've seen a few
 #pod differences.  Here, we'll just look for two:
 #pod
-#pod   # have (hex)           have         want (hex)           want    
+#pod   # have (hex)           have         want (hex)           want
 #pod   # 416c6c20435220616e64 All CR and = 416c6c20435220616e64 All CR and
 #pod   # 206e6f204c46206d616b  no LF mak = 206e6f204c46206d616b  no LF mak
 #pod   # 6573204d616320612064 es Mac a d = 6573204d616320612064 es Mac a d
@@ -124,7 +124,7 @@ sub import {
 #pod               COLUMNS - is used; otherwise, the default is 79
 #pod
 #pod   max_diffs - if given, this is the maximum number of differing lines that will
-#pod               be compared; if output would have been given beyond this line, 
+#pod               be compared; if output would have been given beyond this line,
 #pod               it will be replaced with an elipsis ("...")
 #pod
 #pod =cut
@@ -165,14 +165,14 @@ sub is_binary {
     $want = join q{}, map { chr hex } map { unpack "(a2)*", $_ } @$want;
   }
 
-  my $have_is_wide = grep { ord > 255 } split //, $have;
-  my $want_is_wide = grep { ord > 255 } split //, $want;
+  my $have_is_wide = $have =~ /[^\x00-\xFF]/;
+  my $want_is_wide = $want =~ /[^\x00-\xFF]/;
 
   if ($have_is_wide or $want_is_wide) {
     $Test->ok(0, $comment);
 
-    $Test->diag("value for 'have' contains wide bytes") if $have_is_wide;
-    $Test->diag("value for 'want' contains wide bytes") if $want_is_wide;
+    $Test->diag("value for 'have' contains wide codepoints") if $have_is_wide;
+    $Test->diag("value for 'want' contains wide codepoints") if $want_is_wide;
 
     return;
   }
@@ -197,8 +197,8 @@ sub is_binary {
       last CHUNK;
     }
 
-    my $g_substr = substr($have, $pos, $aw);
-    my $e_substr = substr($want, $pos, $aw);
+    my $g_substr = length $have < $pos ? q{} : substr($have, $pos, $aw);
+    my $e_substr = length $want < $pos ? q{} : substr($want, $pos, $aw);
 
     my $eq = $g_substr eq $e_substr;
 
@@ -272,12 +272,12 @@ Test::BinaryData - compare two things, give hex dumps if they differ
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 
   use Test::BinaryData;
-  
+
   my $computed_data = do_something_complicated;
   my $expected_data = read_file('correct.data');
 
@@ -319,7 +319,7 @@ make up the line to see which differ.
 When comparing very long strings, we can stop after we've seen a few
 differences.  Here, we'll just look for two:
 
-  # have (hex)           have         want (hex)           want    
+  # have (hex)           have         want (hex)           want
   # 416c6c20435220616e64 All CR and = 416c6c20435220616e64 All CR and
   # 206e6f204c46206d616b  no LF mak = 206e6f204c46206d616b  no LF mak
   # 6573204d616320612064 es Mac a d = 6573204d616320612064 es Mac a d
@@ -337,13 +337,13 @@ differences.  Here, we'll just look for two:
 
 =head1 PERL VERSION
 
-This library should run on perls released even a long time ago.  It should work
-on any version of perl released in the last five years.
+This library should run on perls released even a long time ago.  It should
+work on any version of perl released in the last five years.
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
-for any reason, and there is no promise that patches will be accepted to lower
-the minimum required perl.
+for any reason, and there is no promise that patches will be accepted to
+lower the minimum required perl.
 
 =head1 FUNCTIONS
 
@@ -377,7 +377,7 @@ The C<$comment> and C<%arg> arguments are optional.  Valid arguments are:
               COLUMNS - is used; otherwise, the default is 79
 
   max_diffs - if given, this is the maximum number of differing lines that will
-              be compared; if output would have been given beyond this line, 
+              be compared; if output would have been given beyond this line,
               it will be replaced with an elipsis ("...")
 
 =head1 WARNING
@@ -418,21 +418,11 @@ for dealing with encoded strings.
 
 Ricardo Signes <cpan@semiotic.systems>
 
-=head1 CONTRIBUTORS
+=head1 CONTRIBUTOR
 
-=for stopwords Ricardo SIGNES Signes
-
-=over 4
-
-=item *
-
-Ricardo SIGNES <rjbs@codesimply.com>
-
-=item *
+=for stopwords Ricardo Signes
 
 Ricardo Signes <rjbs@semiotic.systems>
-
-=back
 
 =head1 COPYRIGHT AND LICENSE
 

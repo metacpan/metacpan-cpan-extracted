@@ -19,11 +19,11 @@ name: Pod-Weaver-Plugin-Sah-Schemas
 provides:
   Pod::Weaver::Plugin::Sah::Schemas:
     file: lib/Pod/Weaver/Plugin/Sah/Schemas.pm
-    version: '0.078'
+    version: '0.079'
 requires:
   Data::Clone: '0'
   Data::Dmp: '0.242'
-  Data::Dump: '0'
+  Data::Dump::SortKeys: '0'
   Data::Sah: '0.914'
   Data::Sah::Util::Type: '0.45'
   Markdown::To::POD: '0'
@@ -31,6 +31,8 @@ requires:
   Moose: '0'
   Pod::Weaver::Role::AddTextToSection: '0.06'
   Pod::Weaver::Role::Section: '0'
+  Sort::Sub: '0.120'
+  Sort::Sub::sah_schema_clause: '0'
   String::PodQuote: '0'
   perl: '5.010001'
   strict: '0'
@@ -38,7 +40,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Plugin-Sah-Schemas
   homepage: https://metacpan.org/release/Pod-Weaver-Plugin-Sah-Schemas
   repository: git://github.com/perlancar/perl-Pod-Weaver-Plugin-Sah-Schemas.git
-version: '0.078'
+version: '0.079'
 x_Dist_Zilla:
   perl:
     version: '5.038002'

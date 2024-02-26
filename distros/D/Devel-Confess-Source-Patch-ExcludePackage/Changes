@@ -1,0 +1,9 @@
+0.002   2024-02-06  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Downgrade prereq Win32::Console::ANSI to
+          RuntimeRecommends.
+
+
+0.001   2024-02-06  Released-By: PERLANCAR
+
+        - First release.

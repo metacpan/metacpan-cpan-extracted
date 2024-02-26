@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -43,14 +43,14 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/davorg/template-provider-pandoc/issues"
+         "web" : "https://github.com/davorg-cpan/template-provider-pandoc/issues"
       },
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/davorg/template-provider-pandoc.git",
-         "web" : "https://github.com/davorg/template-provider-pandoc"
+         "url" : "https://github.com/davorg-cpan/template-provider-pandoc.git",
+         "web" : "https://github.com/davorg-cpan/template-provider-pandoc"
       }
    },
-   "version" : "v0.0.4",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "v0.0.5",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

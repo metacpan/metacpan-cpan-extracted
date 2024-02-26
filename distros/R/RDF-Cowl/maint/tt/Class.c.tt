@@ -1,0 +1,17 @@
+#include "cowl.h"
+
+/*
+ * DO NOT EDIT
+ *
+ * Generated via maint/tt/Class.c.tt
+ */
+
+[% FOREACH binding = bindings -%]
+[% NEXT IF binding.incomplete -%]
+
+[% INCLUDE binding.inline.c.tt binding = binding -%]
+
+[% END -%]
+[%#-
+# vim: ft=tt2
+-%]

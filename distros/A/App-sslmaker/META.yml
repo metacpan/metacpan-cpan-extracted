@@ -34,6 +34,6 @@ resources:
   homepage: https://github.com/jhthorsen/app-sslmaker
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/jhthorsen/app-sslmaker.git
-version: '0.19'
+version: '0.20'
 x_contributors: []
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

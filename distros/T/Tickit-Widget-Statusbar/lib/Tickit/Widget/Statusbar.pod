@@ -1,7 +1,6 @@
 =encoding utf8
 
 =for comment POD_DERIVED_INDEX_GENERATED
-
 The following documentation is automatically generated.  Please do not edit
 this file, but rather the original, inline with Tickit::Widget::Statusbar
 at lib/Tickit/Widget/Statusbar.pm
@@ -55,7 +54,11 @@ L<child_opts|Tickit::ContainerWidget/child_opts>, L<child_resized|Tickit::Contai
 
 =item L<Tickit::Widget>
 
-L<get_style_pen|Tickit::Widget/get_style_pen>, L<get_style_text|Tickit::Widget/get_style_text>, L<get_style_values|Tickit::Widget/get_style_values>, L<key_focus_next_after|Tickit::Widget/key_focus_next_after>, L<key_focus_next_before|Tickit::Widget/key_focus_next_before>, L<parent|Tickit::Widget/parent>, L<pen|Tickit::Widget/pen>, L<redraw|Tickit::Widget/redraw>, L<requested_cols|Tickit::Widget/requested_cols>, L<requested_lines|Tickit::Widget/requested_lines>, L<requested_size|Tickit::Widget/requested_size>, L<resized|Tickit::Widget/resized>, L<set_parent|Tickit::Widget/set_parent>, L<set_requested_size|Tickit::Widget/set_requested_size>, L<set_style|Tickit::Widget/set_style>, L<set_style_tag|Tickit::Widget/set_style_tag>, L<set_window|Tickit::Widget/set_window>, L<style_classes|Tickit::Widget/style_classes>, L<take_focus|Tickit::Widget/take_focus>, L<window|Tickit::Widget/window>
+L<get_style_pen|Tickit::Widget/get_style_pen>, L<get_style_text|Tickit::Widget/get_style_text>, L<get_style_values|Tickit::Widget/get_style_values>, L<key_focus_next_after|Tickit::Widget/key_focus_next_after>, L<key_focus_next_before|Tickit::Widget/key_focus_next_before>, L<parent|Tickit::Widget/parent>, L<pen|Tickit::Widget/pen>, L<redraw|Tickit::Widget/redraw>, L<requested_cols|Tickit::Widget/requested_cols>, L<requested_lines|Tickit::Widget/requested_lines>, L<requested_size|Tickit::Widget/requested_size>, L<resized|Tickit::Widget/resized>, L<set_parent|Tickit::Widget/set_parent>, L<set_requested_size|Tickit::Widget/set_requested_size>, L<set_style|Tickit::Widget/set_style>, L<set_style_tag|Tickit::Widget/set_style_tag>, L<set_window|Tickit::Widget/set_window>, L<split_widget_opts|Tickit::Widget/split_widget_opts>, L<style_classes|Tickit::Widget/style_classes>, L<take_focus|Tickit::Widget/take_focus>, L<window|Tickit::Widget/window>
+
+=item L<Object::Pad::UNIVERSAL>
+
+L<BUILDARGS|Object::Pad::UNIVERSAL/BUILDARGS>
 
 =back
 

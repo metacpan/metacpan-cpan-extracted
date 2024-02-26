@@ -6,4 +6,4 @@ BEGIN {
 	use_ok( 'File::LoadLines' );
 }
 
-diag( "Testing File::LoadLines $File::LoadLines::VERSION, Perl $], $^X" );
+note( "Testing File::LoadLines $File::LoadLines::VERSION, Perl $], $^X" );

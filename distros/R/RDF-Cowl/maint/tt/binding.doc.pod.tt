@@ -1,0 +1,52 @@
+[% IF binding.is_constructor -%]
+=construct [% binding.perl_func_name %]
+[% ELSE %]
+=method [% binding.perl_func_name %]
+[% END %]
+
+B<Signature>:
+
+[% FILTER indent('2') -%]
+[% IF binding.is_constructor -%]
+[%- INCLUDE "class-name.tt" %]->[% binding.perl_func_name %]
+[%- ELSE %]
+$self->[% binding.perl_func_name %]
+[%- END -%]
+(
+[%- FOREACH arg = binding.args -%]
+[%- UNLESS loop.first -%]
+[% arg.type_tiny.type %] $[% arg.id %][%- UNLESS loop.last -%], [% END -%]
+[%- END -%]
+[%- END -%]
+)
+[% END -%]
+
+[% IF binding.args.size > 0 %]
+B<Params>:
+
+[% FOREACH arg = binding.args -%]
+  [% arg.type_tiny.type %] $[% arg.id %] [% IF arg.meta.optional %]I<[optional]>[% END %]
+[% END -%]
+[% END %]
+
+Documentation:
+
+
+[% FILTER indent('2') -%]
+[% binding.comment %]
+[% END -%]
+
+[% IF binding.return_type.meta.null_on_error %]
+Throws exception on error.
+[% END %]
+
+=over 2
+
+B<C function name>: C<< [% binding.c_func_name %] >>
+
+=back
+
+=cut
+[%#-
+# vim: ft=tt2
+-%]

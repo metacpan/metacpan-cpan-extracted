@@ -1,0 +1,60 @@
+# PODNAME: RDF::Cowl::Lib::Gen::Class::ClsExp
+# ABSTRACT: Generated docs for RDF::Cowl::ClsExp
+
+## DO NOT EDIT
+## Generated via maint/tt/Class.pod.tt
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+RDF::Cowl::Lib::Gen::Class::ClsExp - Generated docs for RDF::Cowl::ClsExp
+
+=head1 VERSION
+
+version 1.0.0
+
+=head1 MAIN MODULE
+
+L<RDF::Cowl::ClsExp>
+
+=head1 METHODS
+
+=head2 get_type
+
+B<Signature>:
+
+  $self->get_type()
+
+B<Params>:
+
+  CowlAnyClsExp $exp 
+
+Documentation:
+
+  Gets the type of the specified class expression.
+  
+  @param exp The class expression.
+  @return The type.
+
+=over 2
+
+B<C function name>: C<< cowl_cls_exp_get_type >>
+
+=back
+
+=head1 AUTHOR
+
+Zakariyya Mughal <zmughal@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 by Auto-Parallel Technologies, Inc..
+
+This is free software, licensed under Eclipse Public License - v 2.0.
+
+=cut

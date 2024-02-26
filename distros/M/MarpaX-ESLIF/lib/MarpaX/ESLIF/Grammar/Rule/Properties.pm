@@ -7,7 +7,7 @@ package MarpaX::ESLIF::Grammar::Rule::Properties;
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '6.0.29'; # VERSION
+our $VERSION = '6.0.33.3'; # VERSION
 
 
 #
@@ -191,6 +191,9 @@ sub getHideseparator {
     goto &isHideseparator
 }
 
+
+1;
+
 __END__
 
 =pod
@@ -203,7 +206,7 @@ MarpaX::ESLIF::Grammar::Rule::Properties - ESLIF Grammar Rule Properties
 
 =head1 VERSION
 
-version 6.0.29
+version 6.0.33.3
 
 =head1 SYNOPSIS
 
@@ -363,8 +366,6 @@ Calls to grammar's currentRuleProperties() or rulePropertiesByLevel() methods ou
 =head1 SEE ALSO
 
 L<MarpaX::ESLIF::Rule::PropertyBitSet>
-
-1;
 
 =head1 AUTHOR
 

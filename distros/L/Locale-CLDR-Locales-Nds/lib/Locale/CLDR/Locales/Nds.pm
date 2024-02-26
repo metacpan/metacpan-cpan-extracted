@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Nds - Package for language Low German
 
 package Locale::CLDR::Locales::Nds;
 # This file auto generated from Data\common\main\nds.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -24,22 +24,6 @@ use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
 extends('Locale::CLDR::Locales::Root');
-# Need to add code for Key type pattern
-sub display_name_pattern {
-	my ($self, $name, $region, $script, $variant) = @_;
-
-	my $display_pattern = '{0} ({1})';
-	$display_pattern =~s/\{0\}/$name/g;
-	my $subtags = join '{0}, {1}', grep {$_} (
-		$region,
-		$script,
-		$variant,
-	);
-
-	$display_pattern =~s/\{1\}/$subtags/g;
-	return $display_pattern;
-}
-
 has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
@@ -1065,11 +1049,10 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{[á à ă â ā æ ç é è ĕ ê ë ę ē í ì ĭ î ï ī ñ ó ò ŏ ô ø ō œ ú ù ŭ û ū ÿ]},
+			auxiliary => qr{[áàăâā æ ç éèĕêëęē íìĭîïī ñ óòŏôøō œ úùŭûū ÿ]},
 			index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'ẞ', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
-			main => qr{[a å ä b c d e f g h i j k l m n o ö p q r s t u ü v w x y z]},
-			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
-			punctuation => qr{[\- ‐ ‑ – — , ; \: ! ? . … ' ‘ ‚ " “ „ « » ( ) \[ \] \{ \} § @ * / \& #]},
+			main => qr{[aåä b c d e f g h i j k l m n oö p q r s t uü v w x y z]},
+			punctuation => qr{[\- ‐‑ – — , ; \: ! ? . … '‘‚ "“„ « » ( ) \[ \] \{ \} § @ * / \& #]},
 		};
 	},
 EOT
@@ -1114,7 +1097,6 @@ has 'duration_units' => (
 	default		=> sub { {
 				hm => 'h.mm',
 				hms => 'h.mm:ss',
-				ms => 'm:ss',
 			} }
 );
 
@@ -1245,16 +1227,6 @@ has 'units' => (
 						'other' => q({0} Millimeter),
 					},
 					# Long Unit Identifier
-					'mass-gram' => {
-						'name' => q(Gramm),
-						'other' => q({0} Gramm),
-					},
-					# Core Unit Identifier
-					'gram' => {
-						'name' => q(Gramm),
-						'other' => q({0} Gramm),
-					},
-					# Long Unit Identifier
 					'mass-kilogram' => {
 						'name' => q(Kilogramm),
 						'other' => q({0} Kilogramm),
@@ -1318,12 +1290,10 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'duration-millisecond' => {
-						'name' => q(ms),
 						'other' => q({0}ms),
 					},
 					# Core Unit Identifier
 					'millisecond' => {
-						'name' => q(ms),
 						'other' => q({0}ms),
 					},
 					# Long Unit Identifier
@@ -1377,46 +1347,6 @@ has 'units' => (
 						'other' => q({0}a),
 					},
 					# Long Unit Identifier
-					'length-centimeter' => {
-						'name' => q(cm),
-						'other' => q({0} cm),
-					},
-					# Core Unit Identifier
-					'centimeter' => {
-						'name' => q(cm),
-						'other' => q({0} cm),
-					},
-					# Long Unit Identifier
-					'length-kilometer' => {
-						'name' => q(km),
-						'other' => q({0} km),
-					},
-					# Core Unit Identifier
-					'kilometer' => {
-						'name' => q(km),
-						'other' => q({0} km),
-					},
-					# Long Unit Identifier
-					'length-meter' => {
-						'name' => q(m),
-						'other' => q({0} m),
-					},
-					# Core Unit Identifier
-					'meter' => {
-						'name' => q(m),
-						'other' => q({0} m),
-					},
-					# Long Unit Identifier
-					'length-millimeter' => {
-						'name' => q(mm),
-						'other' => q({0} mm),
-					},
-					# Core Unit Identifier
-					'millimeter' => {
-						'name' => q(mm),
-						'other' => q({0} mm),
-					},
-					# Long Unit Identifier
 					'mass-gram' => {
 						'name' => q(g),
 						'other' => q({0} g),
@@ -1425,26 +1355,6 @@ has 'units' => (
 					'gram' => {
 						'name' => q(g),
 						'other' => q({0} g),
-					},
-					# Long Unit Identifier
-					'mass-kilogram' => {
-						'name' => q(kg),
-						'other' => q({0} kg),
-					},
-					# Core Unit Identifier
-					'kilogram' => {
-						'name' => q(kg),
-						'other' => q({0} kg),
-					},
-					# Long Unit Identifier
-					'speed-kilometer-per-hour' => {
-						'name' => q(km/h),
-						'other' => q({0} km/h),
-					},
-					# Core Unit Identifier
-					'kilometer-per-hour' => {
-						'name' => q(km/h),
-						'other' => q({0} km/h),
 					},
 					# Long Unit Identifier
 					'temperature-celsius' => {
@@ -1489,16 +1399,6 @@ has 'units' => (
 						'other' => q({0} Stn.),
 					},
 					# Long Unit Identifier
-					'duration-millisecond' => {
-						'name' => q(ms),
-						'other' => q({0} ms),
-					},
-					# Core Unit Identifier
-					'millisecond' => {
-						'name' => q(ms),
-						'other' => q({0} ms),
-					},
-					# Long Unit Identifier
 					'duration-minute' => {
 						'name' => q(Min.),
 						'other' => q({0} Min.),
@@ -1549,44 +1449,12 @@ has 'units' => (
 						'other' => q({0} J.),
 					},
 					# Long Unit Identifier
-					'length-centimeter' => {
-						'name' => q(cm),
-						'other' => q({0} cm),
-					},
-					# Core Unit Identifier
-					'centimeter' => {
-						'name' => q(cm),
-						'other' => q({0} cm),
-					},
-					# Long Unit Identifier
-					'length-kilometer' => {
-						'name' => q(km),
-						'other' => q({0} km),
-					},
-					# Core Unit Identifier
-					'kilometer' => {
-						'name' => q(km),
-						'other' => q({0} km),
-					},
-					# Long Unit Identifier
 					'length-meter' => {
 						'name' => q(m),
-						'other' => q({0} m),
 					},
 					# Core Unit Identifier
 					'meter' => {
 						'name' => q(m),
-						'other' => q({0} m),
-					},
-					# Long Unit Identifier
-					'length-millimeter' => {
-						'name' => q(mm),
-						'other' => q({0} mm),
-					},
-					# Core Unit Identifier
-					'millimeter' => {
-						'name' => q(mm),
-						'other' => q({0} mm),
 					},
 					# Long Unit Identifier
 					'mass-gram' => {
@@ -1597,26 +1465,6 @@ has 'units' => (
 					'gram' => {
 						'name' => q(Gramm),
 						'other' => q({0} Gramm),
-					},
-					# Long Unit Identifier
-					'mass-kilogram' => {
-						'name' => q(kg),
-						'other' => q({0} kg),
-					},
-					# Core Unit Identifier
-					'kilogram' => {
-						'name' => q(kg),
-						'other' => q({0} kg),
-					},
-					# Long Unit Identifier
-					'speed-kilometer-per-hour' => {
-						'name' => q(km/h),
-						'other' => q({0} km/h),
-					},
-					# Core Unit Identifier
-					'kilometer-per-hour' => {
-						'name' => q(km/h),
-						'other' => q({0} km/h),
 					},
 					# Long Unit Identifier
 					'temperature-celsius' => {
@@ -1661,25 +1509,9 @@ has 'listPatterns' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-				start => q({0}, {1}),
-				middle => q({0}, {1}),
 				end => q({0} un {1}),
 				2 => q({0} un {1}),
 		} }
-);
-
-has 'default_numbering_system' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> 'latn',
-);
-
-has native_numbering_system => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> 'latn',
 );
 
 has 'number_symbols' => (
@@ -1689,15 +1521,7 @@ has 'number_symbols' => (
 	default		=> sub { {
 		'latn' => {
 			'decimal' => q(,),
-			'exponential' => q(E),
 			'group' => q(.),
-			'infinity' => q(∞),
-			'list' => q(;),
-			'minusSign' => q(-),
-			'nan' => q(NaN),
-			'perMille' => q(‰),
-			'percentSign' => q(%),
-			'plusSign' => q(+),
 		},
 	} }
 );
@@ -1707,24 +1531,10 @@ has 'number_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		decimalFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0.###',
-				},
-			},
-		},
 		percentFormat => {
 			'default' => {
 				'standard' => {
 					'default' => '#,##0 %',
-				},
-			},
-		},
-		scientificFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#E0',
 				},
 			},
 		},
@@ -1757,130 +1567,102 @@ has 'currencies' => (
 			symbol => 'AU$',
 			display_name => {
 				'currency' => q(Austraalsch Dollar),
-				'other' => q(Austraalsch Dollar),
 			},
 		},
 		'BRL' => {
-			symbol => 'R$',
 			display_name => {
 				'currency' => q(Brasiliaansch Real),
-				'other' => q(Brasiliaansch Real),
 			},
 		},
 		'CAD' => {
-			symbol => 'CA$',
 			display_name => {
 				'currency' => q(Kanaadsch Dollar),
 				'other' => q(Kanada-Dollar),
 			},
 		},
 		'CHF' => {
-			symbol => 'CHF',
 			display_name => {
 				'currency' => q(Swiezer Franken),
-				'other' => q(Swiezer Franken),
 			},
 		},
 		'CNY' => {
-			symbol => 'CN¥',
 			display_name => {
 				'currency' => q(Chineesch Yuan),
 				'other' => q(Renminbi),
 			},
 		},
 		'DKK' => {
-			symbol => 'DKK',
 			display_name => {
 				'currency' => q(Däänsch Kroon),
 				'other' => q(Däänsch Kronen),
 			},
 		},
 		'EUR' => {
-			symbol => '€',
 			display_name => {
 				'currency' => q(Euro),
-				'other' => q(Euro),
 			},
 		},
 		'GBP' => {
-			symbol => '£',
 			display_name => {
 				'currency' => q(Britsch Pund Sterling),
 				'other' => q(Engelsch Pund),
 			},
 		},
 		'HKD' => {
-			symbol => 'HK$',
 			display_name => {
 				'currency' => q(Hongkong-Dollar),
-				'other' => q(Hongkong-Dollar),
 			},
 		},
 		'IDR' => {
-			symbol => 'IDR',
 			display_name => {
 				'currency' => q(Indoneesch Rupje),
-				'other' => q(Indoneesch Rupje),
 			},
 		},
 		'INR' => {
-			symbol => '₹',
 			display_name => {
 				'currency' => q(Indsch Rupje),
-				'other' => q(Indsch Rupje),
 			},
 		},
 		'JPY' => {
-			symbol => 'JP¥',
 			display_name => {
 				'currency' => q(Japaansch Yen),
-				'other' => q(Japaansch Yen),
 			},
 		},
 		'KRW' => {
-			symbol => '₩',
 			display_name => {
 				'currency' => q(Söödkoreansch Won),
 				'other' => q(Koreaansch Won),
 			},
 		},
 		'MXN' => {
-			symbol => 'MX$',
 			display_name => {
 				'currency' => q(Mexikaansch Peso),
 				'other' => q(Mexiko-Peso),
 			},
 		},
 		'NOK' => {
-			symbol => 'NOK',
 			display_name => {
 				'currency' => q(Norweegsch Kroon),
 				'other' => q(Norweegsch Kronen),
 			},
 		},
 		'PLN' => {
-			symbol => 'PLN',
 			display_name => {
 				'currency' => q(Poolsch Zloty),
-				'other' => q(Poolsch Zloty),
 			},
 		},
 		'RUB' => {
-			symbol => 'RUB',
 			display_name => {
 				'currency' => q(Russ’sch Ruvel),
-				'other' => q(Russ’sch Ruvel),
 			},
 		},
 		'SAR' => {
-			symbol => 'SAR',
 			display_name => {
 				'currency' => q(Saudsch Rial),
 				'other' => q(Saudiaraabsch Rial),
 			},
 		},
 		'SEK' => {
-			symbol => 'SEK',
 			display_name => {
 				'currency' => q(Sweedsch Kroon),
 				'other' => q(Sweedsch Kronen),
@@ -1894,10 +1676,8 @@ has 'currencies' => (
 			},
 		},
 		'TRY' => {
-			symbol => 'TRY',
 			display_name => {
 				'currency' => q(Törksch Lira),
-				'other' => q(Törksch Lira),
 			},
 		},
 		'TWD' => {
@@ -1921,10 +1701,8 @@ has 'currencies' => (
 			},
 		},
 		'ZAR' => {
-			symbol => 'ZAR',
 			display_name => {
 				'currency' => q(Söödafrikaansch Rand),
-				'other' => q(Söödafrikaansch Rand),
 			},
 		},
 	} },
@@ -1957,25 +1735,6 @@ has 'calendar_months' => (
 							
 						],
 					},
-					narrow => {
-						nonleap => [
-							'J',
-							'F',
-							'M',
-							'A',
-							'M',
-							'J',
-							'J',
-							'A',
-							'S',
-							'O',
-							'N',
-							'D'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'Januaar',
@@ -1997,25 +1756,6 @@ has 'calendar_months' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'Jan.',
-							'Feb.',
-							'März',
-							'Apr.',
-							'Mai',
-							'Juni',
-							'Juli',
-							'Aug.',
-							'Sep.',
-							'Okt.',
-							'Nov.',
-							'Dez.'
-						],
-						leap => [
-							
-						],
-					},
 					narrow => {
 						nonleap => [
 							'J',
@@ -2030,25 +1770,6 @@ has 'calendar_months' => (
 							'O',
 							'N',
 							'D'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'Januaar',
-							'Februaar',
-							'März',
-							'April',
-							'Mai',
-							'Juni',
-							'Juli',
-							'August',
-							'September',
-							'Oktover',
-							'November',
-							'Dezember'
 						],
 						leap => [
 							
@@ -2075,15 +1796,6 @@ has 'calendar_days' => (
 						sat => 'Sa.',
 						sun => 'Sü.'
 					},
-					narrow => {
-						mon => 'M',
-						tue => 'D',
-						wed => 'M',
-						thu => 'D',
-						fri => 'F',
-						sat => 'S',
-						sun => 'S'
-					},
 					wide => {
 						mon => 'Maandag',
 						tue => 'Dingsdag',
@@ -2095,15 +1807,6 @@ has 'calendar_days' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						mon => 'Ma.',
-						tue => 'Di.',
-						wed => 'Mi.',
-						thu => 'Du.',
-						fri => 'Fr.',
-						sat => 'Sa.',
-						sun => 'Sü.'
-					},
 					narrow => {
 						mon => 'M',
 						tue => 'D',
@@ -2112,15 +1815,6 @@ has 'calendar_days' => (
 						fri => 'F',
 						sat => 'S',
 						sun => 'S'
-					},
-					wide => {
-						mon => 'Maandag',
-						tue => 'Dingsdag',
-						wed => 'Middeweken',
-						thu => 'Dunnersdag',
-						fri => 'Freedag',
-						sat => 'Sünnavend',
-						sun => 'Sünndag'
 					},
 				},
 			},
@@ -2139,11 +1833,6 @@ has 'calendar_quarters' => (
 						2 => 'Q.3',
 						3 => 'Q.4'
 					},
-					narrow => {0 => 'Q1',
-						1 => 'Q2',
-						2 => 'Q3',
-						3 => 'Q4'
-					},
 					wide => {0 => '1. Quartaal',
 						1 => '2. Quartaal',
 						2 => '3. Quartaal',
@@ -2161,11 +1850,6 @@ has 'calendar_quarters' => (
 						2 => 'Q3',
 						3 => 'Q4'
 					},
-					wide => {0 => '1. Quartaal',
-						1 => '2. Quartaal',
-						2 => '3. Quartaal',
-						3 => '4. Quartaal'
-					},
 				},
 			},
 	} },
@@ -2179,10 +1863,6 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'am' => q{vm},
-					'pm' => q{nm},
-				},
-				'wide' => {
 					'am' => q{vm},
 					'pm' => q{nm},
 				},
@@ -2282,9 +1962,7 @@ has 'datetime_formats_available_formats' => (
 			GyMMM => q{MMM y G},
 			GyMMMEd => q{E, d. MMM y G},
 			GyMMMd => q{d. MMM y G},
-			M => q{L},
 			MEd => q{E, d. M.},
-			MMM => q{LLL},
 			MMMEd => q{E, d. MMM},
 			MMMd => q{d. MMM},
 			Md => q{d. M.},
@@ -2301,12 +1979,11 @@ has 'datetime_formats_available_formats' => (
 			yyyyQQQQ => q{QQQQ y G},
 		},
 		'gregorian' => {
-			E => q{ccc},
 			EHm => q{E, 'Kl'. HH.mm},
 			EHms => q{E, 'Kl'. HH.mm:ss},
 			Ed => q{E d.},
-			Ehm => q{E, 'Kl'. h.mm a},
-			Ehms => q{E, 'Kl'. h.mm:ss a},
+			Ehm => q{E, 'Kl'. h.mm a},
+			Ehms => q{E, 'Kl'. h.mm:ss a},
 			Gy => q{y G},
 			GyMMM => q{MMM y G},
 			GyMMMEd => q{E, d. MMM y G},
@@ -2314,18 +1991,17 @@ has 'datetime_formats_available_formats' => (
 			H => q{'Klock' H},
 			Hm => q{'Kl'. H.mm},
 			Hms => q{'Klock' H.mm:ss},
-			M => q{L},
+			Hmsv => q{'Klock' H.mm:ss v},
 			MEd => q{E, d. M.},
-			MMM => q{LLL},
 			MMMEd => q{E, d. MMM},
 			MMMd => q{d. MMM},
 			Md => q{d. M.},
 			d => q{d.},
-			h => q{'Klock' h a},
-			hm => q{'Kl'. h.mm a},
-			hms => q{'Klock' h.mm:ss a},
+			h => q{'Klock' h a},
+			hm => q{'Kl'. h.mm a},
+			hms => q{'Klock' h.mm:ss a},
+			hmsv => q{'Klock' h.mm:ss a v},
 			ms => q{m:ss},
-			y => q{y},
 			yM => q{MM/y},
 			yMEd => q{E, d.M.y},
 			yMMM => q{MMM y},
@@ -2355,22 +2031,19 @@ has 'datetime_formats_interval' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-			M => {
-				M => q{MM–MM},
-			},
 			MEd => {
-				M => q{E, d.M. – E, d.M.},
-				d => q{E, d.M. – E, d.M.},
+				M => q{E, d.M. – E, d.M.},
+				d => q{E, d.M. – E, d.M.},
 			},
 			MMM => {
-				M => q{MMM – MMM},
+				M => q{MMM – MMM},
 			},
 			MMMEd => {
-				M => q{E, d. MMM – E, d. MMM},
-				d => q{E, d. – E, d. MMM},
+				M => q{E, d. MMM – E, d. MMM},
+				d => q{E, d. – E, d. MMM},
 			},
 			MMMd => {
-				M => q{d. MMM – d. MMM},
+				M => q{d. MMM – d. MMM},
 				d => q{d.–d. MMM},
 			},
 			Md => {
@@ -2380,74 +2053,70 @@ has 'datetime_formats_interval' => (
 			d => {
 				d => q{d.–d.},
 			},
-			fallback => '{0} – {1}',
 			y => {
 				y => q{y–y G},
 			},
 			yM => {
 				M => q{MM–MM/y GGGGG},
-				y => q{MM/y – MM/y GGGGG},
+				y => q{MM/y – MM/y GGGGG},
 			},
 			yMEd => {
-				M => q{E, d.M. – E, d.M.y GGGGG},
-				d => q{E, d. – E, d.M.y GGGGG},
-				y => q{E, d.M.y – E, d.M.y GGGGG},
+				M => q{E, d.M. – E, d.M.y GGGGG},
+				d => q{E, d. – E, d.M.y GGGGG},
+				y => q{E, d.M.y – E, d.M.y GGGGG},
 			},
 			yMMM => {
-				M => q{MMM – MMM y G},
-				y => q{MMM y – MMM y G},
+				M => q{MMM – MMM y G},
+				y => q{MMM y – MMM y G},
 			},
 			yMMMEd => {
-				M => q{E, d. MMM – E, d. MMM y G},
-				d => q{E, d. – E, d. MMM y G},
-				y => q{E, d. MMM y – E, d. MMM y G},
+				M => q{E, d. MMM – E, d. MMM y G},
+				d => q{E, d. – E, d. MMM y G},
+				y => q{E, d. MMM y – E, d. MMM y G},
 			},
 			yMMMM => {
-				M => q{MMMM – MMMM y G},
-				y => q{MMMM y – MMMM y G},
+				M => q{MMMM – MMMM y G},
+				y => q{MMMM y – MMMM y G},
 			},
 			yMMMd => {
-				M => q{d. MMM – d. MMM y G},
+				M => q{d. MMM – d. MMM y G},
 				d => q{d.–d. MMM y G},
-				y => q{d. MMM y – d. MMM y G},
+				y => q{d. MMM y – d. MMM y G},
 			},
 			yMd => {
 				M => q{d.M.–d.M.y GGGGG},
 				d => q{d.–d.M.y GGGGG},
-				y => q{d.M.y – d.M.y GGGGG},
+				y => q{d.M.y – d.M.y GGGGG},
 			},
 		},
 		'gregorian' => {
 			H => {
-				H => q{'Kl'. H – H},
+				H => q{'Kl'. H – H},
 			},
 			Hm => {
-				H => q{'Kl'. H.mm – H.mm},
-				m => q{'Kl'. H.mm – H.mm},
+				H => q{'Kl'. H.mm – H.mm},
+				m => q{'Kl'. H.mm – H.mm},
 			},
 			Hmv => {
-				H => q{'Kl'. H.mm – H.mm (v)},
-				m => q{'Kl'. H.mm – H.mm (v)},
+				H => q{'Kl'. H.mm – H.mm (v)},
+				m => q{'Kl'. H.mm – H.mm (v)},
 			},
 			Hv => {
-				H => q{'Kl'. H – H (v)},
-			},
-			M => {
-				M => q{MM–MM},
+				H => q{'Kl'. H – H (v)},
 			},
 			MEd => {
-				M => q{E, d.M. – E, d.M.},
-				d => q{E, d. – E, d.M.},
+				M => q{E, d.M. – E, d.M.},
+				d => q{E, d. – E, d.M.},
 			},
 			MMM => {
-				M => q{LLL – LLL},
+				M => q{LLL – LLL},
 			},
 			MMMEd => {
-				M => q{E, d. MMM – E, d. MMM},
-				d => q{E, d. – E, d. MMM},
+				M => q{E, d. MMM – E, d. MMM},
+				d => q{E, d. – E, d. MMM},
 			},
 			MMMd => {
-				M => q{d. MMM – d. MMM},
+				M => q{d. MMM – d. MMM},
 				d => q{d.–d. MMM},
 			},
 			Md => {
@@ -2457,59 +2126,55 @@ has 'datetime_formats_interval' => (
 			d => {
 				d => q{d.–d.},
 			},
-			fallback => '{0} – {1}',
 			h => {
-				a => q{'Kl'. h a – h a},
-				h => q{'Kl'. h – h a},
+				a => q{'Kl'. h a – h a},
+				h => q{'Kl'. h – h a},
 			},
 			hm => {
-				a => q{'Kl'. h.mm a – 'Kl'. h.mm a},
-				h => q{'Kl'. h.mm – h.mm a},
-				m => q{'Kl'. h.mm – h.mm a},
+				a => q{'Kl'. h.mm a – 'Kl'. h.mm a},
+				h => q{'Kl'. h.mm – h.mm a},
+				m => q{'Kl'. h.mm – h.mm a},
 			},
 			hmv => {
-				a => q{'Kl'. h.mm – h.mm a (v)},
-				h => q{'Kl'. h.mm – h.mm a (v)},
-				m => q{'Kl'. h.mm – h.mm a (v)},
+				a => q{'Kl'. h.mm – h.mm a (v)},
+				h => q{'Kl'. h.mm – h.mm a (v)},
+				m => q{'Kl'. h.mm – h.mm a (v)},
 			},
 			hv => {
-				a => q{'Kl'. h a – h a (v)},
-				h => q{'Kl'. h – h a (v)},
-			},
-			y => {
-				y => q{y–y},
+				a => q{'Kl'. h a – h a (v)},
+				h => q{'Kl'. h – h a (v)},
 			},
 			yM => {
 				M => q{MM–MM/y},
-				y => q{MM/y – MM/y},
+				y => q{MM/y – MM/y},
 			},
 			yMEd => {
-				M => q{E, d.M. – E, d.M.y},
-				d => q{E, d. – E, d.M.y},
-				y => q{E, d.M.y – E, d.M.y},
+				M => q{E, d.M. – E, d.M.y},
+				d => q{E, d. – E, d.M.y},
+				y => q{E, d.M.y – E, d.M.y},
 			},
 			yMMM => {
-				M => q{MMM – MMM y},
-				y => q{MMM y – MMM y},
+				M => q{MMM – MMM y},
+				y => q{MMM y – MMM y},
 			},
 			yMMMEd => {
-				M => q{E, d. MMM – E, d. MMM y},
-				d => q{E, d. – E, d. MMM y},
-				y => q{E, d. MMM y – E, d. MMM y},
+				M => q{E, d. MMM – E, d. MMM y},
+				d => q{E, d. – E, d. MMM y},
+				y => q{E, d. MMM y – E, d. MMM y},
 			},
 			yMMMM => {
-				M => q{MMMM – MMMM y},
-				y => q{MMMM y – MMMM y},
+				M => q{MMMM – MMMM y},
+				y => q{MMMM y – MMMM y},
 			},
 			yMMMd => {
-				M => q{d. MMM – d. MMM y},
+				M => q{d. MMM – d. MMM y},
 				d => q{d.–d. MMM y},
-				y => q{d. MMM y – d. MMM y},
+				y => q{d. MMM y – d. MMM y},
 			},
 			yMd => {
 				M => q{d.M.–d.M.y},
 				d => q{d.–d.M.y},
-				y => q{d.M.y – d.M.y},
+				y => q{d.M.y – d.M.y},
 			},
 		},
 	} },
@@ -2526,7 +2191,6 @@ has 'time_zone_names' => (
 		regionFormat => q({0}-Tiet),
 		regionFormat => q({0}-Summertiet),
 		regionFormat => q({0}-Standardtiet),
-		fallbackFormat => q({1} ({0})),
 		'Africa_Central' => {
 			long => {
 				'standard' => q#Zentraalafrikaansch Tiet#,
@@ -2585,9 +2249,6 @@ has 'time_zone_names' => (
 				'generic' => q#Noordamerikaansch Pazifiktiet#,
 				'standard' => q#Noordamerikaansch Pazifik-Standardtiet#,
 			},
-		},
-		'Antarctica/DumontDUrville' => {
-			exemplarCity => q#Dumont d’Urville#,
 		},
 		'Antarctica/Vostok' => {
 			exemplarCity => q#Wostok#,

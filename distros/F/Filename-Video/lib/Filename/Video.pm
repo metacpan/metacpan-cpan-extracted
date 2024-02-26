@@ -9,7 +9,7 @@ use Exporter qw(import);
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2024-01-12'; # DATE
 our $DIST = 'Filename-Video'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 our @EXPORT_OK = qw(check_video_filename);
 
@@ -54,18 +54,18 @@ _
         },
         {
             args => {filename => 'foo.webm'},
-            naked_result => {filename_without_suffix=>"foo", suffix=>"webm"},
+            naked_result => {filename=>'foo.webm', filename_without_suffix=>"foo", suffix=>"webm"},
         },
         {
             args => {filename => 'foo.MP4'},
-            naked_result => {filename_without_suffix=>"foo", suffix=>"MP4"},
+            naked_result => {filename=>'foo.MP4', filename_without_suffix=>"foo", suffix=>"MP4"},
         },
     ],
 };
 sub check_video_filename {
     my %args = @_;
 
-    $args{filename} =~ $RE ? {filename_without_suffix=>$1, suffix=>$2} : 0;
+    $args{filename} =~ $RE ? {filename=>"$1.$2", filename_without_suffix=>$1, suffix=>$2} : 0;
 }
 
 1;
@@ -83,7 +83,7 @@ Filename::Video - Check whether filename indicates being a video file
 
 =head1 VERSION
 
-This document describes version 0.005 of Filename::Video (from Perl distribution Filename-Video), released on 2024-01-12.
+This document describes version 0.006 of Filename::Video (from Perl distribution Filename-Video), released on 2024-01-12.
 
 =head1 SYNOPSIS
 
@@ -122,11 +122,27 @@ Examples:
 
 =item * Example #3:
 
- check_video_filename(filename => "foo.webm"); # -> { filename_without_suffix => "foo", suffix => "webm" }
+ check_video_filename(filename => "foo.webm");
+
+Result:
+
+ {
+   filename => "foo.webm",
+   filename_without_suffix => "foo",
+   suffix => "webm",
+ }
 
 =item * Example #4:
 
- check_video_filename(filename => "foo.MP4"); # -> { filename_without_suffix => "foo", suffix => "MP4" }
+ check_video_filename(filename => "foo.MP4");
+
+Result:
+
+ {
+   filename => "foo.MP4",
+   filename_without_suffix => "foo",
+   suffix => "MP4",
+ }
 
 =back
 

@@ -1,3 +1,13 @@
+0.010   2024-01-23  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Add some examples.
+
+        - Switch from inline pericmd script to a regular one, for nicer
+          POD.
+
+        - Tweak completion.
+
+
 0.009   2020-05-22  Released-By: PERLANCAR; Urgency: medium
 
         - Bump prereq App::genpw version.

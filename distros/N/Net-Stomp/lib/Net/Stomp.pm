@@ -6,7 +6,7 @@ use Net::Stomp::Frame;
 use Carp qw(longmess);
 use base 'Class::Accessor::Fast';
 use Log::Any;
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 
 __PACKAGE__->mk_accessors( qw(
     current_host failover hostname hosts port select serial session_id socket ssl
@@ -57,11 +57,14 @@ sub new {
         $self->_logconfess("Unable to parse failover uri: " . $self->failover)
             unless $uris;
 
+        my %host_options;
+        $host_options{'ssl'} = $self->ssl if $self->ssl;
+        $host_options{'ssl_options'} = $self->ssl_options if $self->ssl_options;
         foreach my $host (split(/,/,$uris)) {
             $host =~ m{^\w+://([a-zA-Z0-9\-./]+):([0-9]+)$} || $self->_logconfess("Unable to parse failover component: '$host'");
             my ($hostname, $port) = ($1, $2);
 
-            push(@hosts, {hostname => $hostname, port => $port});
+            push(@hosts, {%host_options, hostname => $hostname, port => $port});
         }
     } elsif ($self->hosts) {
         ## @hosts is used inside the while loop later to decide whether we have
@@ -163,7 +166,7 @@ sub _get_socket {
         $socket = $socket_class->new(%sockopts);
         binmode($socket) if $socket;
     }
-    if ($keep_alive) {
+    if ($socket && $keep_alive) {
         require Socket;
         if (Socket->can('SO_KEEPALIVE')) {
             $socket->setsockopt(Socket::SOL_SOCKET(),Socket::SO_KEEPALIVE(),1);
@@ -673,7 +676,8 @@ There is some failover support in C<Net::Stomp>. You can specify
 L<< /C<failover> >> in a similar manner to ActiveMQ
 (L<http://activemq.apache.org/failover-transport-reference.html>) for
 similarity with Java configs or using a more natural method to Perl of
-passing in an array-of-hashrefs in the C<hosts> parameter.
+passing in an array-of-hashrefs in the C<hosts> parameter. The C<ssl>
+and C<ssl_options> parameters are inherited by all hosts.
 
 When C<Net::Stomp> connects the first time, upon construction, it will
 simply try each host in the list, stopping at the first one that
@@ -754,6 +758,9 @@ This is equivalent to setting L<< /C<hosts> >> to:
 
   [ { hostname => $hostname1, port => $port1 },
     { hostname => $hostname2, port => $port2 } ]
+
+If the C<ssl> and C<ssl_options> constructor parameters are used with
+C<failover> the SSL settings are applied for all hosts.
 
 =head2 C<hosts>
 

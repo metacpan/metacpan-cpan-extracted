@@ -1,5 +1,11 @@
 Revision history for Neo4j::Driver
 
+0.45  2024-02-16
+
+ - The boolean values used in HTTP query results are no longer chosen
+   by the JSON coder. Perl core booleans are used on v5.36 and newer;
+   on older Perl versions, JSON::PP booleans are used. (GH #16)
+
 0.44  2024-02-06
 
  - Result->peek() is no longer experimental.

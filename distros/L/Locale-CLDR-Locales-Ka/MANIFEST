@@ -1,7 +1,7 @@
 Build.PL
 lib/Locale/CLDR/Locales/Ka.pm
-lib/Locale/CLDR/Locales/Ka/Any.pm
-lib/Locale/CLDR/Locales/Ka/Any/Ge.pm
+lib/Locale/CLDR/Locales/Ka/Geor.pm
+lib/Locale/CLDR/Locales/Ka/Geor/Ge.pm
 MANIFEST			This list of files
 README
 t/00-load.t

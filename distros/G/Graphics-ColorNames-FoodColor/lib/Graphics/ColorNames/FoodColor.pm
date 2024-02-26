@@ -4,105 +4,105 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-12-04'; # DATE
+our $DATE = '2023-12-05'; # DATE
 our $DIST = 'Graphics-ColorNames-FoodColor'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 sub NamesRgbTable() {
     use integer;
     return {
-        allura_red => "ff0000",
-        ci_16035 => "ff0000",
-        fdc_red_40 => "ff0000",
-        ci_food_red_17 => "ff0000",
-        e129 => "ff0000",
+        allura_red => 0xff0000,
+        ci_16035 => 0xff0000,
+        fdc_red_40 => 0xff0000,
+        ci_food_red_17 => 0xff0000,
+        e129 => 0xff0000,
 
-        amaranth => "993366",
-        ci_16185 => "993366",
-        fdc_red_2 => "993366",
-        ci_food_red_9 => "993366",
-        e123 => "993366",
+        amaranth => 0x993366,
+        ci_16185 => 0x993366,
+        fdc_red_2 => 0x993366,
+        ci_food_red_9 => 0x993366,
+        e123 => 0x993366,
 
-        black_pn => "660033",
-        ci_food_black_1 => "660033",
-        ci_28440 => "660033",
-        e151 => "660033",
+        black_pn => 0x660033,
+        ci_food_black_1 => 0x660033,
+        ci_28440 => 0x660033,
+        e151 => 0x660033,
 
-        brilliant_blue_fcf => "0000ff",
-        ci_42090 => "0000ff",
-        fdc_blue_1 => "0000ff",
-        ci_food_blue_2 => "0000ff",
-        e133 => "0000ff",
+        brilliant_blue_fcf => 0x0000ff,
+        ci_42090 => 0x0000ff,
+        fdc_blue_1 => 0x0000ff,
+        ci_food_blue_2 => 0x0000ff,
+        e133 => 0x0000ff,
 
-        carmoisine => "cc3300",
-        ci_14720 => "cc3300",
-        ci_food_red_3 => "cc3300",
-        azorubine => "cc3300",
-        e122 => "cc3300",
+        carmoisine => 0xcc3300,
+        ci_14720 => 0xcc3300,
+        ci_food_red_3 => 0xcc3300,
+        azorubine => 0xcc3300,
+        e122 => 0xcc3300,
 
-        chocolate_brown_ht => "996600",
-        ci_20285 => "996600",
-        ci_food_brown_3 => "996600",
-        e155 => "996600",
+        chocolate_brown_ht => 0x996600,
+        ci_20285 => 0x996600,
+        ci_food_brown_3 => 0x996600,
+        e155 => 0x996600,
 
-        erythrosine => "ff0080",
-        ci_45430 => "ff0080",
-        fdc_red_3 => "ff0080",
-        ci_food_red_14 => "ff0080",
-        e127 => "ff0080",
+        erythrosine => 0xff0080,
+        ci_45430 => 0xff0080,
+        fdc_red_3 => 0xff0080,
+        ci_food_red_14 => 0xff0080,
+        e127 => 0xff0080,
 
-        fast_green_fcf => "99ff33",
-        ci_42053 => "99ff33",
-        fdc_green_3 => "99ff33",
-        ci_food_green_3 => "99ff33",
+        fast_green_fcf => 0x99ff33,
+        ci_42053 => 0x99ff33,
+        fdc_green_3 => 0x99ff33,
+        ci_food_green_3 => 0x99ff33,
 
-        fast_red_e => "cc3300",
-        ci_16045 => "cc3300",
-        ci_food_red_4 => "cc3300",
+        fast_red_e => 0xcc3300,
+        ci_16045 => 0xcc3300,
+        ci_food_red_4 => 0xcc3300,
 
-        green_s => "008000",
-        ci_44090 => "008000",
-        ci_food_green_4 => "008000",
-        e142 => "008000",
+        green_s => 0x008000,
+        ci_44090 => 0x008000,
+        ci_food_green_4 => 0x008000,
+        e142 => 0x008000,
 
-        indigo_carmine => "666699",
-        ci_73015 => "666699",
-        fdc_blue_2 => "666699",
-        ci_food_blue_1 => "666699",
-        e132 => "666699",
+        indigo_carmine => 0x666699,
+        ci_73015 => 0x666699,
+        fdc_blue_2 => 0x666699,
+        ci_food_blue_1 => 0x666699,
+        e132 => 0x666699,
 
-        patent_blue_v => "9999ff",
-        ci_42051 => "9999ff",
-        ci_food_blue_5 => "9999ff",
-        e131 => "9999ff",
+        patent_blue_v => 0x9999ff,
+        ci_42051 => 0x9999ff,
+        ci_food_blue_5 => 0x9999ff,
+        e131 => 0x9999ff,
 
-        ponceau_4r => "ff0000",
-        ci_16255 => "ff0000",
-        ci_food_red_7 => "ff0000",
-        e124 => "ff0000",
+        ponceau_4r => 0xff0000,
+        ci_16255 => 0xff0000,
+        ci_food_red_7 => 0xff0000,
+        e124 => 0xff0000,
 
-        quinoline_yellow => "ffff00",
-        ci_47005 => "ffff00",
-        dc_yellow_10 => "ffff00",
-        ci_food_yellow_13 => "ffff00",
-        e104 => "ffff00",
+        quinoline_yellow => 0xffff00,
+        ci_47005 => 0xffff00,
+        dc_yellow_10 => 0xffff00,
+        ci_food_yellow_13 => 0xffff00,
+        e104 => 0xffff00,
 
-        red_2g => "ff3300",
-        ci_18050 => "ff3300",
-        ci_food_red_10 => "ff3300",
-        e128 => "ff3300",
+        red_2g => 0xff3300,
+        ci_18050 => 0xff3300,
+        ci_food_red_10 => 0xff3300,
+        e128 => 0xff3300,
 
-        sunset_yellow_fcf => "f7fe6d",
-        ci_15985 => "f7fe6d",
-        fdc_yellow_6 => "f7fe6d",
-        ci_food_yellow_3 => "f7fe6d",
-        e110 => "f7fe6d",
+        sunset_yellow_fcf => 0xf7fe6d,
+        ci_15985 => 0xf7fe6d,
+        fdc_yellow_6 => 0xf7fe6d,
+        ci_food_yellow_3 => 0xf7fe6d,
+        e110 => 0xf7fe6d,
 
-        tartrazine => "ffcc66",
-        ci_19140 => "ffcc66",
-        fdc_yellow_5 => "ffcc66",
-        ci_food_yellow_4 => "ffcc66",
-        e102 => "ffcc66",
+        tartrazine => 0xffcc66,
+        ci_19140 => 0xffcc66,
+        fdc_yellow_5 => 0xffcc66,
+        ci_food_yellow_4 => 0xffcc66,
+        e102 => 0xffcc66,
     };
 }
 
@@ -121,7 +121,7 @@ Graphics::ColorNames::FoodColor - Food colors
 
 =head1 VERSION
 
-This document describes version 0.001 of Graphics::ColorNames::FoodColor (from Perl distribution Graphics-ColorNames-FoodColor), released on 2023-12-04.
+This document describes version 0.002 of Graphics::ColorNames::FoodColor (from Perl distribution Graphics-ColorNames-FoodColor), released on 2023-12-05.
 
 =head1 SYNOPSIS
 

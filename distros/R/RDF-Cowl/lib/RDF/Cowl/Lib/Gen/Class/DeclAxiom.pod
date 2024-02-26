@@ -1,0 +1,110 @@
+# PODNAME: RDF::Cowl::Lib::Gen::Class::DeclAxiom
+# ABSTRACT: Generated docs for RDF::Cowl::DeclAxiom
+
+## DO NOT EDIT
+## Generated via maint/tt/Class.pod.tt
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+RDF::Cowl::Lib::Gen::Class::DeclAxiom - Generated docs for RDF::Cowl::DeclAxiom
+
+=head1 VERSION
+
+version 1.0.0
+
+=head1 MAIN MODULE
+
+L<RDF::Cowl::DeclAxiom>
+
+=head1 CONSTRUCTORS
+
+=head2 new
+
+B<Signature>:
+
+  RDF::Cowl::DeclAxiom->new(Maybe[ CowlVector ] $annot)
+
+B<Params>:
+
+  CowlAnyEntity $entity 
+  Maybe[ CowlVector ] $annot I<[optional]>
+
+Documentation:
+
+  Returns a retained declaration axiom.
+  
+  @param entity The declared entity.
+  @param annot [optional] The annotations.
+  @return Retained declaration.
+
+=over 2
+
+B<C function name>: C<< cowl_decl_axiom >>
+
+=back
+
+=head1 METHODS
+
+=head2 get_entity
+
+B<Signature>:
+
+  $self->get_entity()
+
+B<Params>:
+
+  CowlDeclAxiom $axiom 
+
+Documentation:
+
+  Gets the declared entity.
+  
+  @param axiom The axiom.
+  @return The entity.
+
+=over 2
+
+B<C function name>: C<< cowl_decl_axiom_get_entity >>
+
+=back
+
+=head2 get_annot
+
+B<Signature>:
+
+  $self->get_annot()
+
+B<Params>:
+
+  CowlDeclAxiom $axiom 
+
+Documentation:
+
+  Gets the annotations of the specified axiom.
+  
+  @param axiom The axiom.
+  @return The annotations.
+
+=over 2
+
+B<C function name>: C<< cowl_decl_axiom_get_annot >>
+
+=back
+
+=head1 AUTHOR
+
+Zakariyya Mughal <zmughal@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 by Auto-Parallel Technologies, Inc..
+
+This is free software, licensed under Eclipse Public License - v 2.0.
+
+=cut

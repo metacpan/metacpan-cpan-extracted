@@ -1,36 +1,44 @@
 Revision history for perl distribution Config::Structured
 
-2.004
-- Switched to Perl6::Junction to avoid smartmatch warnings from Syntax::Keyword::Junction
+2.006      2024-02-23T09:52:29-04:00
+  - restore package version declaration
 
-2.003
-- Added __get_child_node_names method to introspect valid keys from current node
+2.005      2024-02-21T16:42:30-04:00
+  - Improved documentation
+  - Split out autodeserialization into its own independent module
+  - Add TOML config file support
 
-2.002
-- Fixed typecheck tests
-- Added support for hooks
+2.004      2023-09-14T12:40:00-05:00
+  - Switched to Perl6::Junction to avoid smartmatch warnings from Syntax::Keyword::Junction
 
-2.001
-- Minor improvements
+2.003      2023-01-09T14:36:00-04:00
+  - Added __get_child_node_names method to introspect valid keys from current node
 
-2.000
-- Added typechecking
-- Added tests
-- Simplified prereqs
+2.002      2020-08-28T15:24:00-05:00
+  - Fixed typecheck tests
+  - Added support for hooks
 
-1.004
-- Allow undef config values
-- Simplified syntax for sourcing config values from files
-- Removed existing unuseable tests
+2.001      2020-03-25T14:15:00-05:00
+  - Minor improvements
 
-1.003
-- Added POD documentation
+2.000      2020-13-06T10:57:00-04:00
+  - Added typechecking
+  - Added tests
+  - Simplified prereqs
 
-1.002
-- Improved handling of file-sourced values with linebreaks
+1.004      2019-11-18T11:04:00-04:00
+  - Allow undef config values
+  - Simplified syntax for sourcing config values from files
+  - Removed existing unuseable tests
 
-1.001
-- Added file value option
+1.003      2019-11-11T14:27:00-04:00
+  - Added POD documentation
 
-1.000
-- First public release
+1.002      2019-11-08T16:37:00-04:00
+  - Improved handling of file-sourced values with linebreaks
+
+1.001      2019-10-16T10:29:00-05:00
+  - Added file value option
+
+1.000      2019-10-11T09:52:00-05:00
+  - First public release

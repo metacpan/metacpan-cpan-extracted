@@ -207,5 +207,6 @@ t/010-gpio.t
 t/020-rfspi.t
 t/030-i2c.t
 t/040-sysfs.t
+t/050-1wire.t
 typemap
 Utils.xs

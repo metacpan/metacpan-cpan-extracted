@@ -7,9 +7,9 @@ use warnings;
 use Capture::Tiny 'capture_stderr';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-05'; # DATE
+our $DATE = '2023-12-12'; # DATE
 our $DIST = 'App-FoodAdditivesUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 our %SPEC;
 
@@ -100,7 +100,7 @@ App::FoodAdditivesUtils - Utilities related to food additives
 
 =head1 VERSION
 
-This document describes version 0.005 of App::FoodAdditivesUtils (from Perl distribution App-FoodAdditivesUtils), released on 2023-02-05.
+This document describes version 0.006 of App::FoodAdditivesUtils (from Perl distribution App-FoodAdditivesUtils), released on 2023-12-12.
 
 =head1 DESCRIPTION
 
@@ -198,6 +198,8 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-FoodAd
 Source repository is at L<https://github.com/perlancar/perl-App-FoodAdditivesUtils>.
 
 =head1 SEE ALSO
+
+L<App::FoodColorUtils>
 
 =head1 AUTHOR
 

@@ -8,6 +8,24 @@ use AsposeCellsCloud::Object::XpsSaveOptions;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
+**DefaultFont** | **string** |  |
+**CheckWorkbookDefaultFont** | **boolean** |  |
+**CheckFontCompatibility** | **boolean** |  |
+**IsFontSubstitutionCharGranularity** | **boolean** |  |
+**OnePagePerSheet** | **boolean** |  |
+**AllColumnsInOnePagePerSheet** | **boolean** |  |
+**IgnoreError** | **boolean** |  |
+**OutputBlankPageWhenNothingToPrint** | **boolean** |  |
+**PageIndex** | **int** |  |
+**PageCount** | **int** |  |
+**PrintingPageType** | **string** |  |
+**GridlineType** | **string** |  |
+**TextCrossType** | **string** |  |
+**DefaultEditLanguage** | **string** |  |
+**EmfRenderSetting** | **string** |  |
+**MergeAreas** | **boolean** |  |
+**SortExternalNames** | **boolean** |  |
+**UpdateSmartArt** | **boolean** |  |
 **SaveFormat** | **string** |  |
 **CachedFileFolder** | **string** |  |
 **ClearData** | **boolean** |  |

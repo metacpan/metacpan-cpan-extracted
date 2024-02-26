@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ig - Package for language Igbo
 
 package Locale::CLDR::Locales::Ig;
 # This file auto generated from Data\common\main\ig.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -31,47 +31,102 @@ has 'display_name_language' => (
 	default		=> sub {
 		 sub {
 			 my %languages = (
-				'af' => 'Afrikaans',
+				'ab' => 'Abkaziani',
+ 				'ace' => 'Achinisi',
+ 				'ada' => 'Adangme',
+ 				'ady' => 'Adigi',
+ 				'af' => 'Afrikaans',
  				'agq' => 'Aghem',
+ 				'ain' => 'Ainu',
  				'ak' => 'Akan',
+ 				'ale' => 'Alụt',
+ 				'alt' => 'Sọutarn Altai',
  				'am' => 'Amariikị',
+ 				'an' => 'Aragonisị',
+ 				'ann' => 'Obolọ',
+ 				'anp' => 'Angika',
  				'ar' => 'Arabiikị',
  				'ar_001' => 'Ụdị Arabiikị nke oge a',
+ 				'arn' => 'Mapuche',
+ 				'arp' => 'Arapaho',
+ 				'ars' => 'Najdi Arabikị',
+ 				'as' => 'Asamisị',
  				'asa' => 'Asụ',
+ 				'ast' => 'Asturianị',
+ 				'atj' => 'Atikamekwe',
+ 				'av' => 'Avarịk',
+ 				'awa' => 'Awadị',
+ 				'ay' => 'Ayịmarà',
  				'az' => 'Azerbajanị',
  				'az@alt=short' => 'Azeri',
+ 				'ba' => 'Bashki',
+ 				'ban' => 'Balinisị',
+ 				'bas' => 'Basaà',
  				'be' => 'Belarusianụ',
+ 				'bem' => 'Bembà',
  				'bez' => 'Bena',
  				'bg' => 'Bọlụgarịa',
+ 				'bgc' => 'Haryanvi',
+ 				'bho' => 'Bojpuri',
+ 				'bi' => 'Bislama',
+ 				'bin' => 'Bini',
+ 				'bla' => 'Siksikà',
  				'bm' => 'Bambara',
  				'bn' => 'Bengali',
  				'bo' => 'Tibetan',
  				'br' => 'Breton',
  				'brx' => 'Bọdọ',
  				'bs' => 'Bosnia',
+ 				'bug' => 'Buginisị',
+ 				'byn' => 'Blin',
  				'ca' => 'Catalan',
+ 				'cay' => 'Cayuga',
  				'ccp' => 'Chakma',
  				'ce' => 'Chechen',
  				'ceb' => 'Cebụanọ',
+ 				'cgg' => 'Chiga',
+ 				'ch' => 'Chamoro',
+ 				'chk' => 'Chukisị',
+ 				'chm' => 'Mari',
+ 				'cho' => 'Choctawu',
+ 				'chp' => 'Chipewan',
  				'chr' => 'Cheroke',
- 				'ckb@alt=menu' => 'Kurdish ọsote',
+ 				'chy' => 'Cheyene',
+ 				'ckb' => 'Kurdish ọsote',
  				'ckb@alt=variant' => 'Kurdish ọzọ',
+ 				'clc' => 'Chilcotinị',
  				'co' => 'Kọsịan',
+ 				'crg' => 'Mịchif',
+ 				'crj' => 'Sọutarn East kree',
+ 				'crk' => 'Plains kree',
+ 				'crl' => 'Nọrtan Eastị Kree',
+ 				'crm' => 'Moọse kree',
+ 				'crr' => 'Carolina Algonịkwan',
  				'cs' => 'Cheekị',
+ 				'csw' => 'Swampi kree',
  				'cu' => 'Church slavic',
+ 				'cv' => 'Chuvash',
  				'cy' => 'Wesh',
  				'da' => 'Danịsh',
+ 				'dak' => 'Dakota',
+ 				'dar' => 'Dagwa',
  				'dav' => 'Taịta',
  				'de' => 'Jamanị',
  				'de_AT' => 'Jaman ndị Austria',
  				'de_CH' => 'Jaman Izugbe ndị Switzerland',
+ 				'dgr' => 'Dogribụ',
  				'dje' => 'Zarma',
+ 				'doi' => 'Dogri',
  				'dsb' => 'Lowa Sorbịan',
  				'dua' => 'Dụala',
+ 				'dv' => 'Divehi',
  				'dyo' => 'Jọla-Fọnyị',
  				'dz' => 'Dọzngọka',
+ 				'dzg' => 'Dazaga',
  				'ebu' => 'Ebụm',
  				'ee' => 'Ewe',
+ 				'efi' => 'Efik',
+ 				'eka' => 'Ekajukụ',
  				'el' => 'Giriikị',
  				'en' => 'Bekee',
  				'en_AU' => 'Bekee ndị Australia',
@@ -92,176 +147,322 @@ has 'display_name_language' => (
  				'ff' => 'Fula',
  				'fi' => 'Fịnịsh',
  				'fil' => 'Fịlịpịnọ',
+ 				'fj' => 'Fijanị',
  				'fo' => 'Farọse',
+ 				'fon' => 'Fon',
  				'fr' => 'Fụrenchị',
  				'fr_CA' => 'Fụrench ndị Canada',
  				'fr_CH' => 'Fụrench ndị Switzerland',
+ 				'frc' => 'Kajun Furenchị',
+ 				'frr' => 'Nọrtan Frisian',
  				'fur' => 'Frụlịan',
  				'fy' => 'Westan Frịsịan',
  				'ga' => 'Ịrịsh',
+ 				'gaa' => 'Ga',
  				'gd' => 'Sụkọtịs Gelị',
+ 				'gez' => 'Gịzị',
+ 				'gil' => 'Gilbertisị',
  				'gl' => 'Galịcịan',
+ 				'gn' => 'Gwarani',
+ 				'gor' => 'Gorontalo',
  				'gsw' => 'German Swiss',
  				'gu' => 'Gụaratị',
  				'guz' => 'Gụshị',
  				'gv' => 'Mansị',
+ 				'gwi' => 'Gwichin',
  				'ha' => 'Hausa',
+ 				'hai' => 'Haida',
  				'haw' => 'Hawaịlịan',
+ 				'hax' => 'Sọutarn Haida',
  				'he' => 'Hebrew',
  				'hi' => 'Hindị',
+ 				'hil' => 'Hiligayanon',
  				'hmn' => 'Hmong',
  				'hr' => 'Kọrọtịan',
  				'hsb' => 'Ụpa Sọrbịa',
  				'ht' => 'Haịtịan ndị Cerọle',
  				'hu' => 'Hụngarian',
+ 				'hup' => 'Hupa',
+ 				'hur' => 'Halkomelem',
+ 				'hy' => 'Armenianị',
+ 				'hz' => 'Herero',
  				'ia' => 'Intalịgụa',
+ 				'iba' => 'Ibanị',
+ 				'ibb' => 'Ibibio',
  				'id' => 'Indonisia',
  				'ig' => 'Igbo',
  				'ii' => 'Sịchụayị',
+ 				'ikt' => 'Westarn Canadian Inuktitut',
+ 				'ilo' => 'Iloko',
+ 				'inh' => 'Ingush',
+ 				'io' => 'Ido',
  				'is' => 'Icịlandịk',
  				'it' => 'Italịanu',
+ 				'iu' => 'Inuktitutị',
  				'ja' => 'Japaniisi',
+ 				'jbo' => 'Lojban',
  				'jgo' => 'Ngọmba',
  				'jmc' => 'Machame',
  				'jv' => 'Java',
  				'ka' => 'Geọjịan',
  				'kab' => 'Kabyle',
+ 				'kac' => 'Kachin',
+ 				'kaj' => 'Ju',
  				'kam' => 'Kamba',
+ 				'kbd' => 'Kabadian',
+ 				'kcg' => 'Tịyap',
  				'kde' => 'Makọnde',
  				'kea' => 'Kabụverdịanụ',
+ 				'kfo' => 'Koro',
+ 				'kgp' => 'Kainganga',
+ 				'kha' => 'Khasi',
  				'khq' => 'Kọyra Chịnị',
  				'ki' => 'Kịkụyụ',
+ 				'kj' => 'Kwanyama',
  				'kk' => 'Kazak',
  				'kkj' => 'Kakọ',
  				'kl' => 'Kalaalịsụt',
  				'kln' => 'Kalenjịn',
  				'km' => 'Keme',
+ 				'kmb' => 'Kimbundụ',
  				'kn' => 'Kanhada',
  				'ko' => 'Korịa',
  				'kok' => 'Kọnkanị',
+ 				'kpe' => 'Kpele',
+ 				'kr' => 'Kanuri',
+ 				'krc' => 'Karaché-Balka',
+ 				'krl' => 'Karelian',
+ 				'kru' => 'Kuruk',
  				'ks' => 'Kashmịrị',
  				'ksb' => 'Shabala',
  				'ksf' => 'Bafịa',
  				'ksh' => 'Colognịan',
  				'ku' => 'Ndị Kụrdịsh',
+ 				'kum' => 'Kumik',
+ 				'kv' => 'Komi',
  				'kw' => 'Kọnịsh',
+ 				'kwk' => 'Kwakwala',
  				'ky' => 'Kyrayz',
  				'la' => 'Latịn',
+ 				'lad' => 'Ladino',
  				'lag' => 'Langị',
  				'lb' => 'Lụxenbọụgịsh',
+ 				'lez' => 'Lezgian',
  				'lg' => 'Ganda',
+ 				'li' => 'Limburgish',
+ 				'lil' => 'Liloetị',
+ 				'lkt' => 'Lakota',
  				'ln' => 'Lịngala',
  				'lo' => 'Laọ',
+ 				'lou' => 'Louisiana Kreole',
+ 				'loz' => 'Lozi',
  				'lrc' => 'Nọrtụ Lụrị',
+ 				'lsm' => 'Samia',
  				'lt' => 'Lituanian',
  				'lu' => 'Lịba-Katanga',
+ 				'lua' => 'Luba-Lulua',
+ 				'lun' => 'Lunda',
+ 				'lus' => 'Mizo',
  				'luy' => 'Lụyịa',
  				'lv' => 'Latviani',
+ 				'mad' => 'Madurese',
+ 				'mag' => 'Magahi',
  				'mai' => 'Maịtịlị',
+ 				'mak' => 'Makasa',
  				'mas' => 'Masaị',
+ 				'mdf' => 'Moksha',
+ 				'men' => 'Mende',
  				'mer' => 'Merụ',
  				'mfe' => 'Mọrịsye',
  				'mg' => 'Malagasị',
  				'mgh' => 'Makụwa Metọ',
  				'mgo' => 'Meta',
+ 				'mh' => 'Marshalese',
  				'mi' => 'Maọrị',
+ 				'mic' => 'Mịkmak',
+ 				'min' => 'Mịnangkabau',
  				'mk' => 'Masedọnịa',
  				'ml' => 'Malayalam',
  				'mn' => 'Mọngolịan',
  				'mni' => 'Manịpụrị',
+ 				'moe' => 'Inu-imun',
+ 				'moh' => 'Mohọk',
+ 				'mos' => 'Mossi',
  				'mr' => 'Maratị',
  				'ms' => 'Maleyi',
  				'mt' => 'Matịse',
  				'mua' => 'Mụdang',
  				'mul' => 'Ọtụtụ asụsụ',
+ 				'mus' => 'Muscogee',
+ 				'mwl' => 'Mịrandisị',
  				'my' => 'Bụrmese',
+ 				'myv' => 'Erzaya',
  				'mzn' => 'Mazandaranị',
+ 				'na' => 'Nauru',
+ 				'nap' => 'Nịapolitan',
  				'naq' => 'Nama',
  				'nb' => 'Nọrweyịan Bọkmal',
  				'nd' => 'Nọrtụ Ndabede',
  				'nds' => 'Lowa German',
  				'ne' => 'Nepali',
+ 				'new' => 'Nịwari',
+ 				'ng' => 'Ndonga',
+ 				'nia' => 'Nias',
+ 				'niu' => 'Niwan',
  				'nl' => 'Dọchị',
  				'nmg' => 'Kwasịọ',
  				'nn' => 'Nọrweyịan Nynersk',
  				'nnh' => 'Nglembọn',
+ 				'no' => 'Nọrweyịan',
+ 				'nog' => 'Nogai',
+ 				'nqo' => 'Nkọ',
+ 				'nr' => 'Sọut Ndebele',
+ 				'nso' => 'Nọrtan Sotọ',
  				'nus' => 'Nụer',
+ 				'nv' => 'Navajo',
  				'ny' => 'Nyanja',
  				'nyn' => 'Nyakọle',
+ 				'oc' => 'Osịtan',
+ 				'ojb' => 'Nọrtwestan Ojibwa',
+ 				'ojc' => 'Ojibwa ọsote',
+ 				'ojs' => 'Oji-kree',
+ 				'ojw' => 'Westarn Ojibwa',
+ 				'oka' => 'Okanagan',
  				'om' => 'Ọromo',
  				'or' => 'Ọdịa',
  				'os' => 'Osetik',
  				'pa' => 'Punjabi',
+ 				'pag' => 'Pangasinan',
+ 				'pam' => 'Pampanga',
+ 				'pap' => 'Papịamento',
+ 				'pau' => 'Palawan',
  				'pcm' => 'Pidgịn',
+ 				'pis' => 'Pijịn',
  				'pl' => 'Poliishi',
+ 				'pqm' => 'Maliset-Pasamakwodị',
  				'prg' => 'Prụssịan',
  				'ps' => 'Pashọ',
  				'pt' => 'Pọrtụgụese',
  				'pt_BR' => 'Pọrtụgụese ndị Brazil',
  				'pt_PT' => 'Asụsụ Portuguese ndị Europe',
  				'qu' => 'Qụechụa',
+ 				'raj' => 'Rajastani',
+ 				'rap' => 'Rapunwị',
+ 				'rar' => 'Rarotonganị',
+ 				'rhg' => 'Rohinga',
  				'rm' => 'Rọmansị',
  				'rn' => 'Rụndị',
  				'ro' => 'Romania',
  				'rof' => 'Rọmbọ',
  				'ru' => 'Rọshian',
+ 				'rup' => 'Aromanian',
  				'rw' => 'Kinyarwanda',
  				'rwk' => 'Rwa',
  				'sa' => 'Sansịkịt',
+ 				'sad' => 'Sandawe',
  				'sah' => 'Saka',
  				'saq' => 'Sambụrụ',
  				'sat' => 'Santalị',
+ 				'sba' => 'Nkambé',
  				'sbp' => 'Sangụ',
+ 				'sc' => 'Sardinian',
+ 				'scn' => 'Sisịlian',
+ 				'sco' => 'Scots',
  				'sd' => 'Sịndh',
  				'se' => 'Nọrtan Samị',
  				'seh' => 'Sena',
  				'ses' => 'Kọyraboro Senị',
  				'sg' => 'Sangọ',
  				'shi' => 'Tachịkịt',
+ 				'shn' => 'Shan',
  				'si' => 'Sinhala',
  				'sk' => 'Slova',
  				'sl' => 'Slovịan',
+ 				'slh' => 'Sọutarn Lushoọtseed',
  				'sm' => 'Samọa',
  				'smn' => 'Inarị Samị',
+ 				'sms' => 'Skolt sami',
  				'sn' => 'Shọna',
+ 				'snk' => 'Soninké',
  				'so' => 'Somali',
+ 				'sq' => 'Albanianị',
  				'sr' => 'Sebịan',
+ 				'srn' => 'Sranan Tongo',
+ 				'ss' => 'Swati',
  				'st' => 'Sọụth Soto',
+ 				'str' => 'Straits Salish',
+ 				'su' => 'Sudanese',
+ 				'suk' => 'Sukuma',
  				'sv' => 'Sụwidiishi',
+ 				'sw' => 'Swahili',
+ 				'swb' => 'Komorịan',
+ 				'syr' => 'Sirịak',
  				'ta' => 'Tamil',
+ 				'tce' => 'Sọutarn Tuchone',
  				'te' => 'Telụgụ',
+ 				'tem' => 'Timne',
  				'teo' => 'Tesọ',
+ 				'tet' => 'Tetum',
  				'tg' => 'Tajịk',
+ 				'tgx' => 'Tagish',
  				'th' => 'Taị',
+ 				'tht' => 'Tahitan',
  				'ti' => 'Tịgrịnya',
+ 				'tig' => 'Tịgre',
  				'tk' => 'Turkịs',
+ 				'tlh' => 'Klingon',
+ 				'tli' => 'Tlịngịt',
+ 				'tn' => 'Swana',
  				'to' => 'Tọngan',
+ 				'tok' => 'Tokị pọna',
+ 				'tpi' => 'Tok pisin',
  				'tr' => 'Tọkiishi',
+ 				'trv' => 'Tarokọ',
+ 				'ts' => 'Songa',
  				'tt' => 'Tata',
+ 				'ttm' => 'Nọrtan Tuchone',
+ 				'tum' => 'Tumbuka',
+ 				'tvl' => 'Tuvalu',
  				'twq' => 'Tasawa',
+ 				'ty' => 'Tahitian',
+ 				'tyv' => 'Tuvinian',
+ 				'tzm' => 'Central Atlas',
+ 				'udm' => 'Udumụrt',
  				'ug' => 'Ụyghụr',
  				'uk' => 'Ukureenị',
+ 				'umb' => 'Umbụndụ',
  				'und' => 'Asụsụ amaghị',
  				'ur' => 'Urdụ',
  				'uz' => 'Ụzbek',
  				'vai' => 'Val',
+ 				've' => 'Venda',
  				'vi' => 'Vietnamisi',
  				'vo' => 'Volapụ',
  				'vun' => 'Vụnjọ',
+ 				'wa' => 'Waloọn',
  				'wae' => 'Wasa',
+ 				'wal' => 'Woleịta',
+ 				'war' => 'Waraị',
  				'wo' => 'Wolọf',
+ 				'wuu' => 'Wụ Chainisị',
+ 				'xal' => 'Kalmik',
  				'xh' => 'Xhọsa',
  				'xog' => 'Sọga',
  				'yav' => 'Yangben',
+ 				'ybb' => 'Yemba',
  				'yi' => 'Yịdịsh',
  				'yo' => 'Yoruba',
+ 				'yrl' => 'Nheengatụ',
  				'yue' => 'Katọnịse',
  				'yue@alt=menu' => 'Chinese,Cantonese',
+ 				'zgh' => 'Standard Moroccan Tamazait',
  				'zh' => 'Chainisi',
  				'zh_Hans' => 'Asụsụ Chinese dị mfe',
  				'zh_Hant' => 'Asụsụ Chinese Izugbe',
  				'zu' => 'Zulu',
+ 				'zun' => 'Zuni',
  				'zxx' => 'Ndị ọzọ abụghị asụsụ',
+ 				'zza' => 'Zaza',
 
 			);
 			if (@_) {
@@ -279,11 +480,16 @@ has 'display_name_script' => (
 	default		=> sub {
 		sub {
 			my %scripts = (
-			'Arab' => 'Mkpụrụ Okwu Arabic',
+			'Adlm' => 'Adlam',
+ 			'Arab' => 'Mkpụrụ Okwu Arabic',
+ 			'Aran' => 'Nastalik',
  			'Armn' => 'Mkpụrụ ọkwụ Armenịan',
  			'Beng' => 'Mkpụrụ ọkwụ Bangla',
  			'Bopo' => 'Mkpụrụ ọkwụ Bopomofo',
  			'Brai' => 'Braịlle',
+ 			'Cakm' => 'Chakma',
+ 			'Cans' => 'Unified Canadian Aboriginal Syllabics',
+ 			'Cher' => 'Cherọkee',
  			'Cyrl' => 'Mkpụrụ Okwu Cyrillic',
  			'Deva' => 'Mkpụrụ ọkwụ Devangarị',
  			'Ethi' => 'Mkpụrụ ọkwụ Etọpịa',
@@ -311,13 +517,22 @@ has 'display_name_script' => (
  			'Latn' => 'Latin',
  			'Mlym' => 'Malayala',
  			'Mong' => 'Mọngọlịan',
+ 			'Mtei' => 'Meitei Mayek',
  			'Mymr' => 'Myanmar',
+ 			'Nkoo' => 'Nkoọ',
+ 			'Olck' => 'Ochiki',
  			'Orya' => 'Ọdịa',
+ 			'Rohg' => 'Hanifi',
  			'Sinh' => 'Sinhala',
+ 			'Sund' => 'Sundanisị',
+ 			'Syrc' => 'Syriak',
  			'Taml' => 'Tamịl',
  			'Telu' => 'Telụgụ',
+ 			'Tfng' => 'Tifinag',
  			'Thaa' => 'Taa',
  			'Tibt' => 'Tịbeta',
+ 			'Vaii' => 'Vai',
+ 			'Yiii' => 'Yị',
  			'Zmth' => 'Mkpụrụ ọkwụ Mgbakọ',
  			'Zsye' => 'Emojị',
  			'Zsym' => 'Akara',
@@ -489,6 +704,7 @@ has 'display_name_region' => (
  			'IM' => 'Isle of Man',
  			'IN' => 'India',
  			'IO' => 'British Indian Ocean Territory',
+ 			'IO@alt=chagos' => 'Chagos Archipelago',
  			'IQ' => 'Iraq',
  			'IR' => 'Iran',
  			'IS' => 'Iceland',
@@ -675,11 +891,15 @@ has 'display_name_type' => (
 			'calendar' => {
  				'buddhist' => q{Kalịnda Bụddịst},
  				'chinese' => q{Kalịnda Chinese},
+ 				'coptic' => q{Kalenda Koptic},
  				'dangi' => q{Kalịnda Dang},
  				'ethiopic' => q{Kalịnda Etopịa},
+ 				'ethiopic-amete-alem' => q{Etiopic Amete Alem Kalenda},
  				'gregorian' => q{Kalenda Gregory},
  				'hebrew' => q{Kalịnda Hebrew},
- 				'islamic' => q{Kalịnda Islam},
+ 				'islamic' => q{Kalenda Hijri},
+ 				'islamic-civil' => q{Kalenda Hijri},
+ 				'islamic-umalqura' => q{Kalenda Hijri (Umm al-Qura)},
  				'iso8601' => q{Kalenda ISO-8601},
  				'japanese' => q{Kalịnda Japanese},
  				'persian' => q{Kalịnda Persian},
@@ -690,6 +910,7 @@ has 'display_name_type' => (
  				'standard' => q{Ụsọrọ egọ nzụgbe},
  			},
  			'collation' => {
+ 				'ducet' => q{Default Unicode ụsọrọ nhazị},
  				'search' => q{Ọchụchụ nịle},
  				'standard' => q{Usoro Nhazi},
  			},
@@ -715,6 +936,7 @@ has 'display_name_type' => (
  				'armn' => q{Ọnụ ọgụgụ Armenịan},
  				'armnlow' => q{ọbere ọnụ ọgụgụ Armenịan},
  				'beng' => q{Ọnụ ọgụgụ Bang},
+ 				'cakm' => q{Ọnụ ọgụgụ Chakma},
  				'deva' => q{Ọnụ ọgụgụ Devanagarị},
  				'ethi' => q{Ọnụ ọgụgụ Etọpịa},
  				'fullwide' => q{Ọnụ ọgụgụ ọbọsara},
@@ -729,6 +951,7 @@ has 'display_name_type' => (
  				'hant' => q{Ọnụ ọgụgụ ọdinala chinese},
  				'hantfin' => q{Ọnụ ọgụgụ akantụ ọdịnala Chinese},
  				'hebr' => q{Ọnụ ọgụgụ Hebrew},
+ 				'java' => q{Ọnụ ọgụgụ Javanịsị},
  				'jpan' => q{Ọnụ ọgụgụ Japanese},
  				'jpanfin' => q{Ọnụ ọgụgụ akantụ Japanese},
  				'khmr' => q{Ọnụ ọgụgụ Khmer},
@@ -736,7 +959,9 @@ has 'display_name_type' => (
  				'laoo' => q{Ọnụ ọgụgụ Laọ},
  				'latn' => q{Ọnụ Ọgụgụ Mpaghara Ọdịda Anyanwụ},
  				'mlym' => q{Ọnụ ọgụgụ Malayala},
+ 				'mtei' => q{Ọnụ ọgụgụ Meetei Mayek},
  				'mymr' => q{Ọnụ ọgụgụ Myamar},
+ 				'olck' => q{Ọnụ ọgụgụ Ochiki},
  				'orya' => q{Ọnụ ọgụgụ Ọdịa},
  				'roman' => q{Ọnụ ọgụgụ Roman},
  				'romanlow' => q{Ọbere Ọnụ ọgụgụ Roman},
@@ -745,6 +970,7 @@ has 'display_name_type' => (
  				'telu' => q{Ọnụ ọgụgụ Telụgụ},
  				'thai' => q{Ọnụ ọgụgụ Taị},
  				'tibt' => q{Ọnụ ọgụgụ Tịbeta},
+ 				'vaii' => q{Ọnụ ọgụgụ Vai},
  			},
 
 		}
@@ -786,10 +1012,10 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{[á à ā c é è ē í ì ī {ị́} {ị̀} ḿ {m̀} ń ǹ ó ò ō {ọ́} {ọ̀} q ú ù ū {ụ́} {ụ̀} x]},
+			auxiliary => qr{[áàā c éèē íìī {ị́}{ị̀} ḿ{m̀} ńǹ óòō {ọ́}{ọ̀} q úùū {ụ́}{ụ̀} x]},
 			index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
-			main => qr{[a b {ch} d e ẹ f g {gb} {gh} {gw} h i ị j k {kp} {kw} l m n ṅ {nw} {ny} o ọ p r s {sh} t u ụ v w y z]},
-			punctuation => qr{[\- ‑ , ; \: ! ? . ‘ ’ “ ” ( ) \[ \] \{ \}]},
+			main => qr{[a b {ch} d eẹ f g {gb} {gh} {gw} h i ị j k {kp} {kw} l m n ṅ {nw} {ny} o ọ p r s {sh} t u ụ v w y z]},
+			punctuation => qr{[\- ‑ , ; \: ! ? . ‘’ “” ( ) \[ \] \{ \}]},
 		};
 	},
 EOT
@@ -805,6 +1031,38 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					# Long Unit Identifier
+					'10p-27' => {
+						'1' => q(ronto{0}),
+					},
+					# Core Unit Identifier
+					'27' => {
+						'1' => q(ronto{0}),
+					},
+					# Long Unit Identifier
+					'10p-30' => {
+						'1' => q(kwekto{0}),
+					},
+					# Core Unit Identifier
+					'30' => {
+						'1' => q(kwekto{0}),
+					},
+					# Long Unit Identifier
+					'10p27' => {
+						'1' => q(ronna{0}),
+					},
+					# Core Unit Identifier
+					'10p27' => {
+						'1' => q(ronna{0}),
+					},
+					# Long Unit Identifier
+					'10p30' => {
+						'1' => q(kwetta{0}),
+					},
+					# Core Unit Identifier
+					'10p30' => {
+						'1' => q(kwetta{0}),
+					},
 					# Long Unit Identifier
 					'duration-century' => {
 						'name' => q(Ọtụtụ nari afọ),
@@ -838,6 +1096,16 @@ has 'units' => (
 						'name' => q(Ọtụtụ Ọnwa),
 					},
 					# Long Unit Identifier
+					'duration-quarter' => {
+						'name' => q(Nkeji Nkeano),
+						'other' => q({0}/q),
+					},
+					# Core Unit Identifier
+					'quarter' => {
+						'name' => q(Nkeji Nkeano),
+						'other' => q({0}/q),
+					},
+					# Long Unit Identifier
 					'duration-week' => {
 						'name' => q(Ọtụtụ Izu),
 					},
@@ -854,12 +1122,68 @@ has 'units' => (
 						'name' => q(Ọtụtụ Afọ),
 					},
 					# Long Unit Identifier
+					'energy-foodcalorie' => {
+						'name' => q(Kalori),
+						'other' => q({0} Kalori),
+					},
+					# Core Unit Identifier
+					'foodcalorie' => {
+						'name' => q(Kalori),
+						'other' => q({0} Kalori),
+					},
+					# Long Unit Identifier
+					'graphics-dot-per-centimeter' => {
+						'name' => q(ntụpọ kwa sentimita),
+						'other' => q({0} ntụpọ kwa sentimita),
+					},
+					# Core Unit Identifier
+					'dot-per-centimeter' => {
+						'name' => q(ntụpọ kwa sentimita),
+						'other' => q({0} ntụpọ kwa sentimita),
+					},
+					# Long Unit Identifier
+					'graphics-dot-per-inch' => {
+						'name' => q(ntụpọ kwa inch),
+						'other' => q({0} ntụpọ kwa inch),
+					},
+					# Core Unit Identifier
+					'dot-per-inch' => {
+						'name' => q(ntụpọ kwa inch),
+						'other' => q({0} ntụpọ kwa inch),
+					},
+					# Long Unit Identifier
 					'length-earth-radius' => {
 						'name' => q(radius uwa),
 					},
 					# Core Unit Identifier
 					'earth-radius' => {
 						'name' => q(radius uwa),
+					},
+					# Long Unit Identifier
+					'power2' => {
+						'other' => q({0} square),
+					},
+					# Core Unit Identifier
+					'power2' => {
+						'other' => q({0} square),
+					},
+					# Long Unit Identifier
+					'power3' => {
+						'other' => q({0} cubic),
+					},
+					# Core Unit Identifier
+					'power3' => {
+						'other' => q({0} cubic),
+					},
+					# Long Unit Identifier
+					'speed-beaufort' => {
+						'name' => q(Beaufort),
+						'other' => q(Beaufort {0}),
+					},
+					# Core Unit Identifier
+					'beaufort' => {
+						'name' => q(Beaufort),
+						'other' => q(Beaufort {0}),
 					},
 					# Long Unit Identifier
 					'volume-dessert-spoon' => {
@@ -878,7 +1202,219 @@ has 'units' => (
 						'name' => q(mmiri dram),
 					},
 				},
+				'narrow' => {
+					# Long Unit Identifier
+					'concentr-item' => {
+						'other' => q({0}ihe),
+					},
+					# Core Unit Identifier
+					'item' => {
+						'other' => q({0}ihe),
+					},
+					# Long Unit Identifier
+					'concentr-millimole-per-liter' => {
+						'other' => q({0}mmol/L),
+					},
+					# Core Unit Identifier
+					'millimole-per-liter' => {
+						'other' => q({0}mmol/L),
+					},
+					# Long Unit Identifier
+					'concentr-permillion' => {
+						'other' => q({0}ppm),
+					},
+					# Core Unit Identifier
+					'permillion' => {
+						'other' => q({0}ppm),
+					},
+					# Long Unit Identifier
+					'duration-microsecond' => {
+						'name' => q(μsec),
+						'other' => q({0}μs),
+					},
+					# Core Unit Identifier
+					'microsecond' => {
+						'name' => q(μsec),
+						'other' => q({0}μs),
+					},
+					# Long Unit Identifier
+					'duration-nanosecond' => {
+						'other' => q({0}ns),
+					},
+					# Core Unit Identifier
+					'nanosecond' => {
+						'other' => q({0}ns),
+					},
+					# Long Unit Identifier
+					'duration-quarter' => {
+						'other' => q({0}q),
+					},
+					# Core Unit Identifier
+					'quarter' => {
+						'other' => q({0}q),
+					},
+					# Long Unit Identifier
+					'energy-calorie' => {
+						'name' => q(kal),
+						'other' => q({0}kal),
+					},
+					# Core Unit Identifier
+					'calorie' => {
+						'name' => q(kal),
+						'other' => q({0}kal),
+					},
+					# Long Unit Identifier
+					'energy-foodcalorie' => {
+						'other' => q({0}Kal),
+					},
+					# Core Unit Identifier
+					'foodcalorie' => {
+						'other' => q({0}Kal),
+					},
+					# Long Unit Identifier
+					'force-newton' => {
+						'other' => q({0}N),
+					},
+					# Core Unit Identifier
+					'newton' => {
+						'other' => q({0}N),
+					},
+					# Long Unit Identifier
+					'graphics-dot' => {
+						'other' => q({0}ntụpọ),
+					},
+					# Core Unit Identifier
+					'dot' => {
+						'other' => q({0}ntụpọ),
+					},
+					# Long Unit Identifier
+					'graphics-dot-per-centimeter' => {
+						'other' => q({0}nksm),
+					},
+					# Core Unit Identifier
+					'dot-per-centimeter' => {
+						'other' => q({0}nksm),
+					},
+					# Long Unit Identifier
+					'graphics-dot-per-inch' => {
+						'other' => q({0}nki),
+					},
+					# Core Unit Identifier
+					'dot-per-inch' => {
+						'other' => q({0}nki),
+					},
+					# Long Unit Identifier
+					'graphics-em' => {
+						'other' => q({0}em),
+					},
+					# Core Unit Identifier
+					'em' => {
+						'other' => q({0}em),
+					},
+					# Long Unit Identifier
+					'graphics-megapixel' => {
+						'other' => q({0}MP),
+					},
+					# Core Unit Identifier
+					'megapixel' => {
+						'other' => q({0}MP),
+					},
+					# Long Unit Identifier
+					'graphics-pixel' => {
+						'other' => q({0}px),
+					},
+					# Core Unit Identifier
+					'pixel' => {
+						'other' => q({0}px),
+					},
+					# Long Unit Identifier
+					'graphics-pixel-per-centimeter' => {
+						'name' => q(pksm),
+						'other' => q({0}pksm),
+					},
+					# Core Unit Identifier
+					'pixel-per-centimeter' => {
+						'name' => q(pksm),
+						'other' => q({0}pksm),
+					},
+					# Long Unit Identifier
+					'graphics-pixel-per-inch' => {
+						'name' => q(pki),
+						'other' => q({0}pki),
+					},
+					# Core Unit Identifier
+					'pixel-per-inch' => {
+						'name' => q(pki),
+						'other' => q({0}pki),
+					},
+					# Long Unit Identifier
+					'speed-beaufort' => {
+						'other' => q(B{0}),
+					},
+					# Core Unit Identifier
+					'beaufort' => {
+						'other' => q(B{0}),
+					},
+				},
 				'short' => {
+					# Long Unit Identifier
+					'concentr-item' => {
+						'name' => q(ihe),
+						'other' => q({0} ihe),
+					},
+					# Core Unit Identifier
+					'item' => {
+						'name' => q(ihe),
+						'other' => q({0} ihe),
+					},
+					# Long Unit Identifier
+					'duration-quarter' => {
+						'other' => q({0} qtrs),
+					},
+					# Core Unit Identifier
+					'quarter' => {
+						'other' => q({0} qtrs),
+					},
+					# Long Unit Identifier
+					'energy-foodcalorie' => {
+						'name' => q(Kal),
+						'other' => q({0} Kal),
+					},
+					# Core Unit Identifier
+					'foodcalorie' => {
+						'name' => q(Kal),
+						'other' => q({0} Kal),
+					},
+					# Long Unit Identifier
+					'graphics-dot' => {
+						'name' => q(ntụpọ),
+						'other' => q({0} ntụpọ),
+					},
+					# Core Unit Identifier
+					'dot' => {
+						'name' => q(ntụpọ),
+						'other' => q({0} ntụpọ),
+					},
+					# Long Unit Identifier
+					'graphics-dot-per-centimeter' => {
+						'name' => q(nksm),
+						'other' => q({0} nksm),
+					},
+					# Core Unit Identifier
+					'dot-per-centimeter' => {
+						'name' => q(nksm),
+						'other' => q({0} nksm),
+					},
+					# Long Unit Identifier
+					'graphics-dot-per-inch' => {
+						'name' => q(nki),
+						'other' => q({0} nki),
+					},
+					# Core Unit Identifier
+					'dot-per-inch' => {
+						'name' => q(nki),
+						'other' => q({0} nki),
+					},
 					# Long Unit Identifier
 					'volume-drop' => {
 						'name' => q(dobé),
@@ -910,17 +1446,9 @@ has 'listPatterns' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-				middle => q({0}, {1}),
 				end => q({0}, na {1}),
-				2 => q({0}, {1}),
+				2 => q({0} na {1}),
 		} }
-);
-
-has 'minimum_grouping_digits' => (
-	is			=>'ro',
-	isa			=> Int,
-	init_arg	=> undef,
-	default		=> 1,
 );
 
 has 'number_symbols' => (
@@ -929,56 +1457,9 @@ has 'number_symbols' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'arab' => {
-			'decimal' => q(٫),
-			'group' => q(٬),
-			'infinity' => q(∞),
-			'list' => q(؛),
 			'minusSign' => q(‏-),
-			'nan' => q(NaN),
-			'perMille' => q(؉),
 			'percentSign' => q(٪‏),
 			'plusSign' => q(‏+),
-			'superscriptingExponent' => q(×),
-			'timeSeparator' => q(:),
-		},
-		'arabext' => {
-			'decimal' => q(٫),
-			'group' => q(٬),
-			'infinity' => q(∞),
-			'list' => q(؛),
-			'minusSign' => q(‎-‎),
-			'nan' => q(NaN),
-			'perMille' => q(؉),
-			'percentSign' => q(٪),
-			'plusSign' => q(‎+‎),
-			'superscriptingExponent' => q(×),
-			'timeSeparator' => q(٫),
-		},
-		'bali' => {
-			'timeSeparator' => q(:),
-		},
-		'beng' => {
-			'timeSeparator' => q(:),
-		},
-		'brah' => {
-			'timeSeparator' => q(:),
-		},
-		'cakm' => {
-			'timeSeparator' => q(:),
-		},
-		'latn' => {
-			'decimal' => q(.),
-			'exponential' => q(E),
-			'group' => q(,),
-			'infinity' => q(∞),
-			'list' => q(;),
-			'minusSign' => q(-),
-			'nan' => q(NaN),
-			'perMille' => q(‰),
-			'percentSign' => q(%),
-			'plusSign' => q(+),
-			'superscriptingExponent' => q(×),
-			'timeSeparator' => q(:),
 		},
 	} }
 );
@@ -1137,7 +1618,6 @@ has 'currencies' => (
 		'BRL' => {
 			display_name => {
 				'currency' => q(Real Brazil),
-				'other' => q(Real Brazil),
 			},
 		},
 		'BSD' => {
@@ -1197,7 +1677,6 @@ has 'currencies' => (
 		'CNY' => {
 			display_name => {
 				'currency' => q(Yuan China),
-				'other' => q(Yuan China),
 			},
 		},
 		'COP' => {
@@ -1290,7 +1769,6 @@ has 'currencies' => (
 		'GBP' => {
 			display_name => {
 				'currency' => q(Pound British),
-				'other' => q(Pound British),
 			},
 		},
 		'GEL' => {
@@ -1367,7 +1845,6 @@ has 'currencies' => (
 		'INR' => {
 			display_name => {
 				'currency' => q(Rupee India),
-				'other' => q(Rupee India),
 			},
 		},
 		'IQD' => {
@@ -1400,7 +1877,6 @@ has 'currencies' => (
 			symbol => '¥',
 			display_name => {
 				'currency' => q(Yen Japan),
-				'other' => q(Yen Japan),
 			},
 		},
 		'KES' => {
@@ -1472,8 +1948,7 @@ has 'currencies' => (
 		},
 		'LSL' => {
 			display_name => {
-				'currency' => q(This is not a translation),
-				'other' => q(This is not a translation),
+				'currency' => q(Ego loti obodo Lesotho),
 			},
 		},
 		'LYD' => {
@@ -1649,7 +2124,6 @@ has 'currencies' => (
 		'RUB' => {
 			display_name => {
 				'currency' => q(Ruble Russia),
-				'other' => q(Ruble Russia),
 			},
 		},
 		'RWF' => {
@@ -1694,9 +2168,14 @@ has 'currencies' => (
 				'currency' => q(Ego Pound obodo St Helena),
 			},
 		},
-		'SLL' => {
+		'SLE' => {
 			display_name => {
 				'currency' => q(Ego Leone obodo Sierra Leone),
+			},
+		},
+		'SLL' => {
+			display_name => {
+				'currency' => q(Ego Leone obodo Sierra Leone \(1964—2022\)),
 			},
 		},
 		'SOS' => {
@@ -1707,7 +2186,6 @@ has 'currencies' => (
 		'SRD' => {
 			display_name => {
 				'currency' => q(Dollar Surinamese),
-				'other' => q(Dollar Surinamese),
 			},
 		},
 		'SSP' => {
@@ -1905,25 +2383,6 @@ has 'calendar_months' => (
 							
 						],
 					},
-					narrow => {
-						nonleap => [
-							'J',
-							'F',
-							'M',
-							'E',
-							'M',
-							'J',
-							'J',
-							'Ọ',
-							'S',
-							'Ọ',
-							'N',
-							'D'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'Jenụwarị',
@@ -1945,25 +2404,6 @@ has 'calendar_months' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'Jen',
-							'Feb',
-							'Maa',
-							'Epr',
-							'Mee',
-							'Juu',
-							'Jul',
-							'Ọgọ',
-							'Sep',
-							'Ọkt',
-							'Nov',
-							'Dis'
-						],
-						leap => [
-							
-						],
-					},
 					narrow => {
 						nonleap => [
 							'J',
@@ -1978,25 +2418,6 @@ has 'calendar_months' => (
 							'Ọ',
 							'N',
 							'D'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'Jenụwarị',
-							'Febrụwarị',
-							'Maachị',
-							'Epreel',
-							'Mee',
-							'Juun',
-							'Julaị',
-							'Ọgọọst',
-							'Septemba',
-							'Ọktoba',
-							'Novemba',
-							'Disemba'
 						],
 						leap => [
 							
@@ -2015,44 +2436,6 @@ has 'calendar_days' => (
 			'gregorian' => {
 				'format' => {
 					abbreviated => {
-						mon => 'Mọn',
-						tue => 'Tiu',
-						wed => 'Wen',
-						thu => 'Tọọ',
-						fri => 'Fraị',
-						sat => 'Sat',
-						sun => 'Sọn'
-					},
-					short => {
-						mon => 'Mọn',
-						tue => 'Tiu',
-						wed => 'Wen',
-						thu => 'Tọọ',
-						fri => 'Fraị',
-						sat => 'Sat',
-						sun => 'Sọn'
-					},
-					wide => {
-						mon => 'Mọnde',
-						tue => 'Tiuzdee',
-						wed => 'Wenezdee',
-						thu => 'Tọọzdee',
-						fri => 'Fraịdee',
-						sat => 'Satọdee',
-						sun => 'Sọndee'
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						mon => 'Mọn',
-						tue => 'Tiu',
-						wed => 'Wen',
-						thu => 'Tọọ',
-						fri => 'Fraị',
-						sat => 'Sat',
-						sun => 'Sọn'
-					},
-					short => {
 						mon => 'Mọn',
 						tue => 'Tiu',
 						wed => 'Wen',
@@ -2087,28 +2470,6 @@ has 'calendar_quarters' => (
 						2 => 'Ọ3',
 						3 => 'Ọ4'
 					},
-					narrow => {0 => '1',
-						1 => '2',
-						2 => '3',
-						3 => '4'
-					},
-					wide => {0 => 'Ọkara 1',
-						1 => 'Ọkara 2',
-						2 => 'Ọkara 3',
-						3 => 'Ọkara 4'
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {0 => 'Ọ1',
-						1 => 'Ọ2',
-						2 => 'Ọ3',
-						3 => 'Ọ4'
-					},
-					narrow => {0 => '1',
-						1 => '2',
-						2 => '3',
-						3 => '4'
-					},
 					wide => {0 => 'Ọkara 1',
 						1 => 'Ọkara 2',
 						2 => 'Ọkara 3',
@@ -2130,27 +2491,9 @@ has 'day_periods' => (
 					'am' => q{A.M.},
 					'pm' => q{P.M.},
 				},
-				'narrow' => {
-					'am' => q{A.M.},
-					'pm' => q{P.M.},
-				},
 				'wide' => {
 					'am' => q{N’ụtụtụ},
 					'pm' => q{N’abali},
-				},
-			},
-			'stand-alone' => {
-				'abbreviated' => {
-					'am' => q{A.M.},
-					'pm' => q{P.M.},
-				},
-				'narrow' => {
-					'am' => q{A.M.},
-					'pm' => q{P.M.},
-				},
-				'wide' => {
-					'am' => q{A.M.},
-					'pm' => q{P.M.},
 				},
 			},
 		},
@@ -2166,10 +2509,6 @@ has 'eras' => (
 		},
 		'gregorian' => {
 			abbreviated => {
-				'0' => 'T.K.',
-				'1' => 'A.K.'
-			},
-			narrow => {
 				'0' => 'T.K.',
 				'1' => 'A.K.'
 			},
@@ -2223,14 +2562,14 @@ has 'datetime_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-			'full' => q{{1} 'na' {0}},
-			'long' => q{{1} 'na' {0}},
+			'full' => q{{1}, {0}},
+			'long' => q{{1}, {0}},
 			'medium' => q{{1}, {0}},
 			'short' => q{{1}, {0}},
 		},
 		'gregorian' => {
-			'full' => q{{1} 'na' {0}},
-			'long' => q{{1} 'na' {0}},
+			'full' => q{{1}, {0}},
+			'long' => q{{1}, {0}},
 			'medium' => q{{1}, {0}},
 			'short' => q{{1}, {0}},
 		},
@@ -2243,19 +2582,11 @@ has 'datetime_formats_available_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
 			MEd => q{E, M/d},
-			MMM => q{LLL},
 			MMMEd => q{E, MMM d},
 			MMMMEd => q{E, MMMM d},
-			MMMMd => q{MMMM d},
-			MMMd => q{MMM d},
 			Md => q{M/d},
-			d => q{d},
-			hm => q{h:mm a},
-			ms => q{mm:ss},
+			hm => q{h:mm a},
 			y => q{y},
 			yM => q{M/y},
 			yMEd => q{E, M/d/y},
@@ -2295,9 +2626,6 @@ has 'datetime_formats_append_item' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			'Timezone' => '{0} {1}',
-		},
 	} },
 );
 
@@ -2307,97 +2635,67 @@ has 'datetime_formats_interval' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'gregorian' => {
-			H => {
-				H => q{HH–HH},
-			},
-			Hm => {
-				H => q{HH:mm–HH:mm},
-				m => q{HH:mm–HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm–HH:mm v},
-				m => q{HH:mm–HH:mm v},
-			},
-			Hv => {
-				H => q{HH–HH v},
-			},
-			M => {
-				M => q{MM–MM},
-			},
 			MEd => {
-				M => q{MM-dd, E – MM-dd, E},
-				d => q{E, MM/dd – E, MM/dd},
-			},
-			MMM => {
-				M => q{LLL–LLL},
+				M => q{MM-dd, E – MM-dd, E},
+				d => q{E, MM/dd – E, MM/dd},
 			},
 			MMMEd => {
-				M => q{MMM d, E – MMM d, E},
-				d => q{MMM d, E – MMM d, E},
+				M => q{MMM d, E – MMM d, E},
+				d => q{MMM d, E – MMM d, E},
 			},
 			MMMd => {
-				M => q{MMM d – MMM d},
-				d => q{MMM d–d},
+				M => q{MMM d – MMM d},
 			},
 			Md => {
-				M => q{MM/dd – MM/dd},
-				d => q{MM/dd – MM/dd},
-			},
-			d => {
-				d => q{d–d},
+				M => q{MM/dd – MM/dd},
+				d => q{MM/dd – MM/dd},
 			},
 			h => {
-				a => q{h a – h a},
-				h => q{h–h a},
+				a => q{h a – h a},
+				h => q{h–h a},
 			},
 			hm => {
-				a => q{h:mm a – h:mm a},
-				h => q{h:mm–h:mm a},
-				m => q{h:mm–h:mm a},
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
 			},
 			hmv => {
-				a => q{h:mm a – h:mm a v},
-				h => q{h:mm–h:mm a v},
-				m => q{h:mm–h:mm a v},
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
 			},
 			hv => {
-				a => q{h a – h a v},
-				h => q{h–h a v},
-			},
-			y => {
-				y => q{y–y},
+				a => q{h a – h a v},
+				h => q{h–h a v},
 			},
 			yM => {
-				M => q{MM/y – MM/y},
-				y => q{y-MM – y-MM},
+				M => q{MM/y – MM/y},
+				y => q{y-MM – y-MM},
 			},
 			yMEd => {
-				M => q{y-MM-dd, E – y-MM-dd, E},
-				d => q{y-MM-dd, E – y-MM-dd, E},
-				y => q{y-MM-dd, E – y-MM-dd, E},
+				M => q{y-MM-dd, E – y-MM-dd, E},
+				d => q{y-MM-dd, E – y-MM-dd, E},
+				y => q{y-MM-dd, E – y-MM-dd, E},
 			},
 			yMMM => {
-				M => q{y MMM–MMM},
-				y => q{y MMM – y MMM},
+				y => q{y MMM – y MMM},
 			},
 			yMMMEd => {
-				M => q{y MMM d, E – MMM d, E},
-				d => q{y MMM d, E – MMM d, E},
-				y => q{y MMM d, E – y MMM d, E},
+				M => q{y MMM d, E – MMM d, E},
+				d => q{y MMM d, E – MMM d, E},
+				y => q{y MMM d, E – y MMM d, E},
 			},
 			yMMMM => {
-				M => q{y MMMM–MMMM},
-				y => q{y MMMM – y MMMM},
+				y => q{y MMMM – y MMMM},
 			},
 			yMMMd => {
-				M => q{y MMM d – MMM d},
-				d => q{y MMM d–d},
-				y => q{y MMM d – y MMM d},
+				M => q{y MMM d – MMM d},
+				y => q{y MMM d – y MMM d},
 			},
 			yMd => {
-				M => q{y-MM-dd – y-MM-dd},
-				d => q{y-MM-dd – y-MM-dd},
-				y => q{y-MM-dd – y-MM-dd},
+				M => q{y-MM-dd – y-MM-dd},
+				d => q{y-MM-dd – y-MM-dd},
+				y => q{y-MM-dd – y-MM-dd},
 			},
 		},
 	} },
@@ -2408,13 +2706,9 @@ has 'time_zone_names' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default	=> sub { {
-		hourFormat => q(+HH:mm;-HH:mm),
-		gmtFormat => q(GMT{0}),
-		gmtZeroFormat => q(GMT),
 		regionFormat => q(Oge {0}),
 		regionFormat => q(Oge Ihe {0}),
 		regionFormat => q(Oge Izugbe {0}),
-		fallbackFormat => q({1} ({0})),
 		'Afghanistan' => {
 			long => {
 				'standard' => q#Oge Afghanistan#,
@@ -2455,9 +2749,6 @@ has 'time_zone_names' => (
 				'generic' => q#Oge Amazon#,
 				'standard' => q#Oge Izugbe Amazon#,
 			},
-		},
-		'America/Araguaina' => {
-			exemplarCity => q#Araguaina#,
 		},
 		'America_Central' => {
 			long => {

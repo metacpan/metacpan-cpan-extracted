@@ -445,12 +445,12 @@ is($locale->unit(1, 'acceleration-meter-per-square-second', 'short'), '1 m/s²',
 is($locale->unit(2, 'acceleration-meter-per-square-second', 'short'), '2 m/s²', 'English short 2 meters per second squared');
 is($locale->unit(1, 'acceleration-meter-per-square-second'), '1 meter per second squared', 'English long 1 meter per second squared');
 is($locale->unit(2, 'acceleration-meter-per-square-second'), '2 meters per second squared', 'English long 2 meters per second squared');
-is($locale->unit(1, 'mass-metric-ton', 'narrow'), '1t', 'English narrow 1 metric ton');
-is($locale->unit(2, 'mass-metric-ton', 'narrow'), '2t', 'English narrow 2 metric tons');
-is($locale->unit(1, 'mass-metric-ton', 'short'), '1 t', 'English short 1 metric ton');
-is($locale->unit(2, 'mass-metric-ton', 'short'), '2 t', 'English short 2 metric tons');
-is($locale->unit(1, 'mass-metric-ton'), '1 metric ton', 'English long 1 metric ton');
-is($locale->unit(2, 'mass-metric-ton'), '2 metric tons', 'English long 2 metric tons');
+is($locale->unit(1, 'mass-tonne', 'narrow'), '1t', 'English narrow 1 metric ton');
+is($locale->unit(2, 'mass-tonne', 'narrow'), '2t', 'English narrow 2 metric tons');
+is($locale->unit(1, 'mass-tonne', 'short'), '1 t', 'English short 1 metric ton');
+is($locale->unit(2, 'mass-tonne', 'short'), '2 t', 'English short 2 metric tons');
+is($locale->unit(1, 'mass-tonne'), '1 metric ton', 'English long 1 metric ton');
+is($locale->unit(2, 'mass-tonne'), '2 metric tons', 'English long 2 metric tons');
 is($locale->unit(1, 'mass-microgram', 'narrow'), '1μg', 'English narrow 1 microgram');
 is($locale->unit(2, 'mass-microgram', 'narrow'), '2μg', 'English narrow 2 micrograms');
 is($locale->unit(1, 'mass-microgram', 'short'), '1 μg', 'English short 1 microgram');

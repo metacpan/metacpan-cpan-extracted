@@ -4749,6 +4749,40 @@ then :
 fi
 
 
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for fexecve" >&5
+printf %s "checking for fexecve... " >&6; }
+if test ${ac_cv_fexecve+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#include <fcntl.h>
+#include <unistd.h>
+int main (void)
+{
+   char *const argv[] = { "foo", "bar", 0 };
+   int res = fexecve (-1, argv, 0);
+   return 0;
+}
+
+_ACEOF
+if ac_fn_c_try_link "$LINENO"
+then :
+  ac_cv_fexecve=yes
+else $as_nop
+  ac_cv_fexecve=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_fexecve" >&5
+printf "%s\n" "$ac_cv_fexecve" >&6; }
+test $ac_cv_fexecve = yes &&
+printf "%s\n" "#define HAVE_FEXECVE 1" >>confdefs.h
+
+
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for siginfo_t" >&5
 printf %s "checking for siginfo_t... " >&6; }
 if test ${ac_cv_siginfo_t+y}
@@ -5254,8 +5288,7 @@ else $as_nop
 #include <sys/socket.h>
 int main (void)
 {
-   int res;
-   res = accept4 (1, (struct sockaddr *)0, (socklen_t)0, SOCK_NONBLOCK | SOCK_CLOEXEC);
+   int res = accept4 (1, (struct sockaddr *)0, (socklen_t)0, SOCK_NONBLOCK | SOCK_CLOEXEC);
    return 0;
 }
 
@@ -5282,8 +5315,8 @@ then :
 
 fi
 
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for mount/umount" >&5
-printf %s "checking for mount/umount... " >&6; }
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for mount" >&5
+printf %s "checking for mount... " >&6; }
 if test ${ac_cv_mount+y}
 then :
   printf %s "(cached) " >&6
@@ -5294,9 +5327,7 @@ else $as_nop
 #include <sys/mount.h>
 int main (void)
 {
-   int res;
-   res = mount ("path", "path", "fstype", MS_RDONLY, 0);
-   res = umount ("path");
+   int res = mount ("path", "path", "fstype", MS_RDONLY, 0);
    return 0;
 }
 
@@ -5315,6 +5346,37 @@ printf "%s\n" "$ac_cv_mount" >&6; }
 test $ac_cv_mount = yes &&
 printf "%s\n" "#define HAVE_MOUNT 1" >>confdefs.h
 
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for umount" >&5
+printf %s "checking for umount... " >&6; }
+if test ${ac_cv_umount+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#include <sys/mount.h>
+int main (void)
+{
+   int res = umount ("path");
+   return 0;
+}
+
+_ACEOF
+if ac_fn_c_try_link "$LINENO"
+then :
+  ac_cv_umount=yes
+else $as_nop
+  ac_cv_umount=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_umount" >&5
+printf "%s\n" "$ac_cv_umount" >&6; }
+test $ac_cv_umount = yes &&
+printf "%s\n" "#define HAVE_UMOUNT 1" >>confdefs.h
+
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for umount2" >&5
 printf %s "checking for umount2... " >&6; }
 if test ${ac_cv_umount2+y}
@@ -5327,8 +5389,7 @@ else $as_nop
 #include <sys/mount.h>
 int main (void)
 {
-   int res;
-   res = umount2 ("path", MNT_FORCE|MNT_DETACH);
+   int res = umount2 ("path", MNT_FORCE|MNT_DETACH);
    return 0;
 }
 

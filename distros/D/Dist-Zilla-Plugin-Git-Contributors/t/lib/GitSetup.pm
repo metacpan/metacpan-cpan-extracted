@@ -85,7 +85,8 @@ sub git_wrapper
 
     $My::Git::Wrapper::has_gpgsign = versioncmp($version, '2.0.0') >= 0;
 
-    $git->init;
+    $git->init({ '-c', 'init.defaultBranch=main' });
+
     $err = $git->ERR;
     diag explain @$err if @$err;
 

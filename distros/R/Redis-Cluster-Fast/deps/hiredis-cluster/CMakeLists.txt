@@ -28,7 +28,9 @@ project(hiredis-cluster
   VERSION "${VERSION}"
   LANGUAGES C)
 
+# Use plain C99 (-std=c99) without extensions like GNU C (-std=gnu99)
 set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_EXTENSIONS OFF)
 
 # Build using a sanitizer
 if(USE_SANITIZER)
@@ -79,12 +81,14 @@ if(DOWNLOAD_HIREDIS)
       "Downloading of the dependency 'hiredis' requires CMake >= v3.20.\n"
       "Upgrade CMake or manually install 'hiredis' and use -DDOWNLOAD_HIREDIS=OFF")
   endif()
-  message("Downloading dependency 'hiredis'..")
+
+  set(HIREDIS_VERSION "1.2.0")
+  message("Downloading dependency: hiredis v${HIREDIS_VERSION}")
 
   include(FetchContent)
   FetchContent_Declare(hiredis
     GIT_REPOSITORY https://github.com/redis/hiredis
-    GIT_TAG        v1.1.0
+    GIT_TAG        "v${HIREDIS_VERSION}"
     SOURCE_DIR     "${CMAKE_CURRENT_BINARY_DIR}/_deps/hiredis"
   )
 
@@ -103,6 +107,7 @@ if(DOWNLOAD_HIREDIS)
   set(stub_dir "${CMAKE_CURRENT_BINARY_DIR}/generated/pkg")
 
   file(WRITE "${stub_dir}/hiredis-config.cmake" "")
+  file(WRITE "${stub_dir}/hiredis-config-version.cmake" "set(PACKAGE_VERSION ${HIREDIS_VERSION})")
   set(hiredis_DIR ${stub_dir})
   # Set variables normally got from hiredis-config.cmake
   set(hiredis_LIBRARIES hiredis::hiredis)
@@ -221,6 +226,8 @@ include(CMakePackageConfigHelpers)
 configure_package_config_file(hiredis_cluster-config.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/hiredis_cluster-config.cmake
   INSTALL_DESTINATION ${CMAKE_CONF_INSTALL_DIR}
   PATH_VARS INCLUDE_INSTALL_DIR)
+write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/hiredis_cluster-config-version.cmake
+  COMPATIBILITY SameMinorVersion)
 
 install(EXPORT hiredis_cluster-targets
   FILE hiredis_cluster-targets.cmake
@@ -228,6 +235,7 @@ install(EXPORT hiredis_cluster-targets
   DESTINATION ${CMAKE_CONF_INSTALL_DIR})
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/hiredis_cluster-config.cmake
+              ${CMAKE_CURRENT_BINARY_DIR}/hiredis_cluster-config-version.cmake
   DESTINATION ${CMAKE_CONF_INSTALL_DIR})
 
 # Install target for hiredis_cluster_ssl

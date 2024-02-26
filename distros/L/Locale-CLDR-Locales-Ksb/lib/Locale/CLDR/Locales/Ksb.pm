@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ksb - Package for language Shambala
 
 package Locale::CLDR::Locales::Ksb;
 # This file auto generated from Data\common\main\ksb.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -340,34 +340,6 @@ EOT
 );
 
 
-has 'quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{“},
-);
-
-has 'quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{”},
-);
-
-has 'alternate_quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{‘},
-);
-
-has 'alternate_quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{’},
-);
-
 has 'yesstr' => (
 	is			=> 'ro',
 	isa			=> RegexpRef,
@@ -619,9 +591,14 @@ has 'currencies' => (
 				'currency' => q(pauni ya Santahelena),
 			},
 		},
-		'SLL' => {
+		'SLE' => {
 			display_name => {
 				'currency' => q(leoni),
+			},
+		},
+		'SLL' => {
+			display_name => {
+				'currency' => q(leoni \(1964—2022\)),
 			},
 		},
 		'SOS' => {
@@ -844,10 +821,6 @@ has 'day_periods' => (
 					'am' => q{makeo},
 					'pm' => q{nyiaghuo},
 				},
-				'wide' => {
-					'am' => q{makeo},
-					'pm' => q{nyiaghuo},
-				},
 			},
 		},
 	} },
@@ -927,19 +900,11 @@ has 'datetime_formats_available_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
 			MEd => q{E, M/d},
-			MMM => q{LLL},
 			MMMEd => q{E, MMM d},
 			MMMMEd => q{E, MMMM d},
-			MMMMd => q{MMMM d},
-			MMMd => q{MMM d},
 			Md => q{M/d},
-			d => q{d},
-			hm => q{h:mm a},
-			ms => q{mm:ss},
+			hm => q{h:mm a},
 			y => q{y},
 			yM => q{M/y},
 			yMEd => q{E, M/d/y},
@@ -950,20 +915,11 @@ has 'datetime_formats_available_formats' => (
 			yQQQQ => q{QQQQ y},
 		},
 		'gregorian' => {
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
 			MEd => q{E, M/d},
-			MMM => q{LLL},
 			MMMEd => q{E, MMM d},
 			MMMMEd => q{E, MMMM d},
-			MMMMd => q{MMMM d},
-			MMMd => q{MMM d},
 			Md => q{M/d},
-			d => q{d},
-			hm => q{h:mm a},
-			ms => q{mm:ss},
-			y => q{y},
+			hm => q{h:mm a},
 			yM => q{M/y},
 			yMEd => q{E, M/d/y},
 			yMMM => q{MMM y},

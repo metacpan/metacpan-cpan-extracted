@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Tt - Package for language Tatar
 
 package Locale::CLDR::Locales::Tt;
 # This file auto generated from Data\common\main\tt.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -24,22 +24,6 @@ use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
 extends('Locale::CLDR::Locales::Root');
-# Need to add code for Key type pattern
-sub display_name_pattern {
-	my ($self, $name, $region, $script, $variant) = @_;
-
-	my $display_pattern = '{0} ({1})';
-	$display_pattern =~s/\{0\}/$name/g;
-	my $subtags = join '{0}, {1}', grep {$_} (
-		$region,
-		$script,
-		$variant,
-	);
-
-	$display_pattern =~s/\{1\}/$subtags/g;
-	return $display_pattern;
-}
-
 has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
@@ -79,7 +63,9 @@ has 'display_name_language' => (
  				'el' => 'грек',
  				'en' => 'инглиз',
  				'en_GB' => 'Британия инглизчәсе',
+ 				'en_GB@alt=short' => 'инглиз (Берләшкән Корольлек)',
  				'en_US' => 'Америка инглизчәсе',
+ 				'en_US@alt=short' => 'инглиз (АКШ)',
  				'eo' => 'эсперанто',
  				'es' => 'испан',
  				'es_419' => 'испан (Латин Америкасы)',
@@ -285,7 +271,7 @@ has 'display_name_region' => (
  			'BZ' => 'Белиз',
  			'CA' => 'Канада',
  			'CC' => 'Кокос (Килинг) утраулары',
- 			'CD@alt=variant' => 'Конго (КДР)',
+ 			'CD' => 'Конго (КДР)',
  			'CF' => 'Үзәк Африка Республикасы',
  			'CH' => 'Швейцария',
  			'CI' => 'Кот-д’Ивуар',
@@ -555,64 +541,17 @@ has 'characters' => (
 		no warnings 'experimental::regex_sets';
 		return {
 			auxiliary => qr{[ғ қ]},
-			index => ['А', 'Ә', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'Җ', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н', 'Ң', 'О', 'Ө', 'П', 'Р', 'С', 'Т', 'У', 'Ү', 'Ф', 'Х', 'Һ', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я'],
-			main => qr{[а ә б в г д е ё ж җ з и й к л м н ң о ө п р с т у ү ф х һ ц ч ш щ ъ ы ь э ю я]},
-			punctuation => qr{[\- ‐ ‑ – — , ; \: ! ? . … ' ‘ ’ " “ ” ( ) \[ \] § @ * / \& # ′ ″]},
+			index => ['А', 'Ә', 'Б', 'В', 'Г', 'Д', 'ЕЁ', 'Ж', 'Җ', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н', 'Ң', 'О', 'Ө', 'П', 'Р', 'С', 'Т', 'У', 'Ү', 'Ф', 'Х', 'Һ', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я'],
+			main => qr{[а ә б в г д её ж җ з и й к л м н ң о ө п р с т у ү ф х һ ц ч ш щ ъ ы ь э ю я]},
+			punctuation => qr{[\- ‐‑ – — , ; \: ! ? . … '‘’ "“” ( ) \[ \] § @ * / \& # ′ ″]},
 		};
 	},
 EOT
 : sub {
-		return { index => ['А', 'Ә', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'Җ', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н', 'Ң', 'О', 'Ө', 'П', 'Р', 'С', 'Т', 'У', 'Ү', 'Ф', 'Х', 'Һ', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я'], };
+		return { index => ['А', 'Ә', 'Б', 'В', 'Г', 'Д', 'ЕЁ', 'Ж', 'Җ', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н', 'Ң', 'О', 'Ө', 'П', 'Р', 'С', 'Т', 'У', 'Ү', 'Ф', 'Х', 'Һ', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я'], };
 },
 );
 
-
-has 'quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{“},
-);
-
-has 'quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{”},
-);
-
-has 'alternate_quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{‘},
-);
-
-has 'alternate_quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{’},
-);
-
-has 'duration_units' => (
-	is			=> 'ro',
-	isa			=> HashRef[Str],
-	init_arg	=> undef,
-	default		=> sub { {
-				hm => 'h:mm',
-				hms => 'h:mm:ss',
-				ms => 'm:ss',
-			} }
-);
-
-has 'units' => (
-	is			=> 'ro',
-	isa			=> HashRef[HashRef[HashRef[Str]]],
-	init_arg	=> undef,
-	default		=> sub { {
-			} }
-);
 
 has 'yesstr' => (
 	is			=> 'ro',
@@ -633,32 +572,9 @@ has 'listPatterns' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-				start => q({0}, {1}),
-				middle => q({0}, {1}),
 				end => q({0} һәм {1}),
 				2 => q({0} һәм {1}),
 		} }
-);
-
-has 'default_numbering_system' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> 'latn',
-);
-
-has native_numbering_system => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> 'latn',
-);
-
-has 'minimum_grouping_digits' => (
-	is			=>'ro',
-	isa			=> Int,
-	init_arg	=> undef,
-	default		=> 1,
 );
 
 has 'number_symbols' => (
@@ -668,15 +584,7 @@ has 'number_symbols' => (
 	default		=> sub { {
 		'latn' => {
 			'decimal' => q(,),
-			'exponential' => q(E),
 			'group' => q( ),
-			'infinity' => q(∞),
-			'minusSign' => q(-),
-			'nan' => q(NaN),
-			'perMille' => q(‰),
-			'percentSign' => q(%),
-			'plusSign' => q(+),
-			'superscriptingExponent' => q(×),
 		},
 	} }
 );
@@ -686,24 +594,10 @@ has 'number_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		decimalFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0.###',
-				},
-			},
-		},
 		percentFormat => {
 			'default' => {
 				'standard' => {
 					'default' => '#,##0 %',
-				},
-			},
-		},
-		scientificFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#E0',
 				},
 			},
 		},
@@ -718,9 +612,6 @@ has 'number_currency_formats' => (
 		'latn' => {
 			'pattern' => {
 				'default' => {
-					'accounting' => {
-						'positive' => '#,##0.00 ¤',
-					},
 					'standard' => {
 						'positive' => '#,##0.00 ¤',
 					},
@@ -736,42 +627,32 @@ has 'currencies' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'BRL' => {
-			symbol => 'R$',
 			display_name => {
 				'currency' => q(Бразилия реалы),
-				'other' => q(Бразилия реалы),
 			},
 		},
 		'CNY' => {
-			symbol => 'CN¥',
 			display_name => {
 				'currency' => q(кытай юане),
 				'other' => q(юань),
 			},
 		},
 		'EUR' => {
-			symbol => '€',
 			display_name => {
 				'currency' => q(евро),
-				'other' => q(евро),
 			},
 		},
 		'GBP' => {
-			symbol => '£',
 			display_name => {
 				'currency' => q(фунт стерлинг),
-				'other' => q(фунт стерлинг),
 			},
 		},
 		'INR' => {
-			symbol => '₹',
 			display_name => {
 				'currency' => q(Индия рупиясе),
-				'other' => q(Индия рупиясе),
 			},
 		},
 		'JPY' => {
-			symbol => 'JP¥',
 			display_name => {
 				'currency' => q(япон иенасы),
 				'other' => q(иена),
@@ -791,7 +672,6 @@ has 'currencies' => (
 			symbol => '$',
 			display_name => {
 				'currency' => q(АКШ доллары),
-				'other' => q(АКШ доллары),
 			},
 		},
 		'XXX' => {
@@ -825,84 +705,6 @@ has 'calendar_months' => (
 							'окт.',
 							'нояб.',
 							'дек.'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'гыйнвар',
-							'февраль',
-							'март',
-							'апрель',
-							'май',
-							'июнь',
-							'июль',
-							'август',
-							'сентябрь',
-							'октябрь',
-							'ноябрь',
-							'декабрь'
-						],
-						leap => [
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'гыйн.',
-							'фев.',
-							'мар.',
-							'апр.',
-							'май',
-							'июнь',
-							'июль',
-							'авг.',
-							'сент.',
-							'окт.',
-							'нояб.',
-							'дек.'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
 						],
 						leap => [
 							
@@ -948,24 +750,6 @@ has 'calendar_days' => (
 						sat => 'шим.',
 						sun => 'якш.'
 					},
-					narrow => {
-						mon => 'Д',
-						tue => 'С',
-						wed => 'Ч',
-						thu => 'П',
-						fri => 'Җ',
-						sat => 'Ш',
-						sun => 'Я'
-					},
-					short => {
-						mon => 'дүш.',
-						tue => 'сиш.',
-						wed => 'чәр.',
-						thu => 'пәнҗ.',
-						fri => 'җом.',
-						sat => 'шим.',
-						sun => 'якш.'
-					},
 					wide => {
 						mon => 'дүшәмбе',
 						tue => 'сишәмбе',
@@ -977,15 +761,6 @@ has 'calendar_days' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						mon => 'дүш.',
-						tue => 'сиш.',
-						wed => 'чәр.',
-						thu => 'пәнҗ.',
-						fri => 'җом.',
-						sat => 'шим.',
-						sun => 'якш.'
-					},
 					narrow => {
 						mon => 'Д',
 						tue => 'С',
@@ -994,24 +769,6 @@ has 'calendar_days' => (
 						fri => 'Җ',
 						sat => 'Ш',
 						sun => 'Я'
-					},
-					short => {
-						mon => 'дүш.',
-						tue => 'сиш.',
-						wed => 'чәр.',
-						thu => 'пәнҗ.',
-						fri => 'җом.',
-						sat => 'шим.',
-						sun => 'якш.'
-					},
-					wide => {
-						mon => 'дүшәмбе',
-						tue => 'сишәмбе',
-						wed => 'чәршәмбе',
-						thu => 'пәнҗешәмбе',
-						fri => 'җомга',
-						sat => 'шимбә',
-						sun => 'якшәмбе'
 					},
 				},
 			},
@@ -1030,28 +787,6 @@ has 'calendar_quarters' => (
 						2 => '3 нче кв.',
 						3 => '4 нче кв.'
 					},
-					narrow => {0 => '1',
-						1 => '2',
-						2 => '3',
-						3 => '4'
-					},
-					wide => {0 => '1 нче квартал',
-						1 => '2 нче квартал',
-						2 => '3 нче квартал',
-						3 => '4 нче квартал'
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {0 => '1 нче кв.',
-						1 => '2 нче кв.',
-						2 => '3 нче кв.',
-						3 => '4 нче кв.'
-					},
-					narrow => {0 => '1',
-						1 => '2',
-						2 => '3',
-						3 => '4'
-					},
 					wide => {0 => '1 нче квартал',
 						1 => '2 нче квартал',
 						2 => '3 нче квартал',
@@ -1059,44 +794,6 @@ has 'calendar_quarters' => (
 					},
 				},
 			},
-	} },
-);
-
-has 'day_periods' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'gregorian' => {
-			'format' => {
-				'abbreviated' => {
-					'am' => q{AM},
-					'pm' => q{PM},
-				},
-				'narrow' => {
-					'am' => q{AM},
-					'pm' => q{PM},
-				},
-				'wide' => {
-					'am' => q{AM},
-					'pm' => q{PM},
-				},
-			},
-			'stand-alone' => {
-				'abbreviated' => {
-					'am' => q{AM},
-					'pm' => q{PM},
-				},
-				'narrow' => {
-					'am' => q{AM},
-					'pm' => q{PM},
-				},
-				'wide' => {
-					'am' => q{AM},
-					'pm' => q{PM},
-				},
-			},
-		},
 	} },
 );
 
@@ -1125,15 +822,15 @@ has 'date_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-			'full' => q{d MMMM, y 'ел' (G), EEEE},
-			'long' => q{d MMMM, y 'ел' (G)},
+			'full' => q{d MMMM, y 'ел' (G), EEEE},
+			'long' => q{d MMMM, y 'ел' (G)},
 			'medium' => q{dd.MM.y (G)},
 			'short' => q{dd.MM.y (GGGGG)},
 		},
 		'gregorian' => {
-			'full' => q{d MMMM, y 'ел', EEEE},
-			'long' => q{d MMMM, y 'ел'},
-			'medium' => q{d MMM, y 'ел'},
+			'full' => q{d MMMM, y 'ел', EEEE},
+			'long' => q{d MMMM, y 'ел'},
+			'medium' => q{d MMM, y 'ел'},
 			'short' => q{dd.MM.y},
 		},
 	} },
@@ -1181,65 +878,54 @@ has 'datetime_formats_available_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-			Gy => q{G y 'ел'},
-			GyMMM => q{G y 'ел', MMM},
-			GyMMMEd => q{G y 'ел', d MMM, E},
-			GyMMMd => q{G y 'ел', d MMM},
+			Gy => q{G y 'ел'},
+			GyMMM => q{G y 'ел', MMM},
+			GyMMMEd => q{G y 'ел', d MMM, E},
+			GyMMMd => q{G y 'ел', d MMM},
 			MEd => q{dd.MM, E},
 			MMMEd => q{d MMM, E},
 			MMMMd => q{d MMMM},
 			MMMd => q{d MMM},
 			Md => q{dd.MM},
-			y => q{G y 'ел'},
-			yyyy => q{G y 'ел'},
-			yyyyM => q{GGGGG y 'ел', MM},
+			y => q{G y 'ел'},
+			yyyy => q{G y 'ел'},
+			yyyyM => q{GGGGG y 'ел', MM},
 			yyyyMEd => q{GGGGG dd.MM.y, E},
-			yyyyMMM => q{G y 'ел', MMM},
-			yyyyMMMEd => q{G y 'ел', d MMM, E},
-			yyyyMMMM => q{G y 'ел', MMMM},
-			yyyyMMMd => q{G y 'ел', d MMM},
+			yyyyMMM => q{G y 'ел', MMM},
+			yyyyMMMEd => q{G y 'ел', d MMM, E},
+			yyyyMMMM => q{G y 'ел', MMMM},
+			yyyyMMMd => q{G y 'ел', d MMM},
 			yyyyMd => q{GGGGG dd.MM.y},
-			yyyyQQQ => q{G y 'ел', QQQ},
-			yyyyQQQQ => q{G y 'ел', QQQQ},
+			yyyyQQQ => q{G y 'ел', QQQ},
+			yyyyQQQQ => q{G y 'ел', QQQQ},
 		},
 		'gregorian' => {
-			E => q{ccc},
 			EHm => q{E, HH:mm},
 			EHms => q{E, HH:mm:ss},
-			Gy => q{G y 'ел'},
-			GyMMM => q{G y 'ел', MMM},
-			GyMMMEd => q{G y 'ел', d MMM, E},
-			GyMMMd => q{G y 'ел', d MMM},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			Hmsv => q{HH:mm:ss v},
-			Hmv => q{HH:mm v},
-			M => q{L},
+			Gy => q{G y 'ел'},
+			GyMMM => q{G y 'ел', MMM},
+			GyMMMEd => q{G y 'ел', d MMM, E},
+			GyMMMd => q{G y 'ел', d MMM},
 			MEd => q{dd.MM, E},
-			MMM => q{LLL},
 			MMMEd => q{d MMM, E},
 			MMMMW => q{MMMM 'аеның' W 'атнасы'},
 			MMMMd => q{d MMMM},
 			MMMd => q{d MMM},
 			Md => q{dd.MM},
-			d => q{d},
-			h => q{h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			hmsv => q{h:mm:ss a v},
-			hmv => q{h:mm a v},
-			ms => q{mm:ss},
-			y => q{y},
+			h => q{h a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
+			hmsv => q{h:mm:ss a v},
+			hmv => q{h:mm a v},
 			yM => q{MM.y},
 			yMEd => q{dd.MM.y, E},
-			yMMM => q{y 'ел', MMM},
-			yMMMEd => q{y 'ел', d MMM, E},
-			yMMMM => q{y 'ел', MMMM},
-			yMMMd => q{y 'ел', d MMM},
+			yMMM => q{y 'ел', MMM},
+			yMMMEd => q{y 'ел', d MMM, E},
+			yMMMM => q{y 'ел', MMMM},
+			yMMMd => q{y 'ел', d MMM},
 			yMd => q{dd.MM.y},
-			yQQQ => q{y 'ел', QQQ},
-			yQQQQ => q{y 'ел', QQQQ},
+			yQQQ => q{y 'ел', QQQ},
+			yQQQQ => q{y 'ел', QQQQ},
 			yw => q{Y 'елның' w 'атнасы'},
 		},
 	} },
@@ -1250,9 +936,6 @@ has 'datetime_formats_append_item' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			'Timezone' => '{0} {1}',
-		},
 	} },
 );
 
@@ -1263,13 +946,13 @@ has 'datetime_formats_interval' => (
 	default		=> sub { {
 		'generic' => {
 			Gy => {
-				G => q{G y 'ел' – G y 'ел'},
-				y => q{G y–y 'ел'},
+				G => q{G y 'ел' – G y 'ел'},
+				y => q{G y–y 'ел'},
 			},
 			GyM => {
-				G => q{GGGGG y 'ел', MM – GGGGG y 'ел', MM},
-				M => q{GGGGG y 'ел', MM – y 'ел', MM},
-				y => q{GGGGG y 'ел', MM – y 'ел', MM},
+				G => q{GGGGG y 'ел', MM – GGGGG y 'ел', MM},
+				M => q{GGGGG y 'ел', MM – y 'ел', MM},
+				y => q{GGGGG y 'ел', MM – y 'ел', MM},
 			},
 			GyMEd => {
 				G => q{GGGGG dd.MM.y, E – GGGGG dd.MM.y, E},
@@ -1278,21 +961,21 @@ has 'datetime_formats_interval' => (
 				y => q{GGGGG dd.MM.y, E – dd.MM.y, E},
 			},
 			GyMMM => {
-				G => q{G y 'ел', MMM – G y 'ел', MMM},
-				M => q{G y 'ел', MMM–MMM},
-				y => q{G y 'ел', MMM – y 'ел', MMM},
+				G => q{G y 'ел', MMM – G y 'ел', MMM},
+				M => q{G y 'ел', MMM–MMM},
+				y => q{G y 'ел', MMM – y 'ел', MMM},
 			},
 			GyMMMEd => {
-				G => q{G y 'ел', d MMM, E – G y 'ел', d MMM, E},
-				M => q{G y 'ел', d MMM, E – d MMM, E},
-				d => q{G y 'ел', d MMM, E – d MMM, E},
-				y => q{G y 'ел', d MMM, E – y 'ел', d MMM, E},
+				G => q{G y 'ел', d MMM, E – G y 'ел', d MMM, E},
+				M => q{G y 'ел', d MMM, E – d MMM, E},
+				d => q{G y 'ел', d MMM, E – d MMM, E},
+				y => q{G y 'ел', d MMM, E – y 'ел', d MMM, E},
 			},
 			GyMMMd => {
-				G => q{G y 'ел', d MMM – G y 'ел', d MMM},
-				M => q{G y 'ел', d MMM – d MMM},
-				d => q{G y 'ел', d–d MMM},
-				y => q{G y 'ел', d MMM – y 'ел' d MMM},
+				G => q{G y 'ел', d MMM – G y 'ел', d MMM},
+				M => q{G y 'ел', d MMM – d MMM},
+				d => q{G y 'ел', d–d MMM},
+				y => q{G y 'ел', d MMM – y 'ел' d MMM},
 			},
 			GyMd => {
 				G => q{GGGGG dd.MM.y – GGGGG dd.MM.y},
@@ -1321,11 +1004,11 @@ has 'datetime_formats_interval' => (
 			},
 			fallback => '{0} – {1}',
 			y => {
-				y => q{G y–y 'ел'},
+				y => q{G y–y 'ел'},
 			},
 			yM => {
-				M => q{GGGGG y 'ел', MM – y 'ел', MM},
-				y => q{GGGGG y 'ел', MM – y 'ел', MM},
+				M => q{GGGGG y 'ел', MM – y 'ел', MM},
+				y => q{GGGGG y 'ел', MM – y 'ел', MM},
 			},
 			yMEd => {
 				M => q{GGGGG dd.MM.y, E – dd.MM.y, E},
@@ -1333,22 +1016,22 @@ has 'datetime_formats_interval' => (
 				y => q{GGGGG dd.MM.y, E – dd.MM.y, E},
 			},
 			yMMM => {
-				M => q{G y 'ел', MMM–MMM},
-				y => q{G y 'ел', MMM – y 'ел', MMM},
+				M => q{G y 'ел', MMM–MMM},
+				y => q{G y 'ел', MMM – y 'ел', MMM},
 			},
 			yMMMEd => {
-				M => q{G y 'ел', d MMM, E – d MMM, E},
-				d => q{G y 'ел' d MMM, E – d MMM, E},
-				y => q{G y 'ел', d MMM, E – y 'ел', d MMM, E},
+				M => q{G y 'ел', d MMM, E – d MMM, E},
+				d => q{G y 'ел' d MMM, E – d MMM, E},
+				y => q{G y 'ел', d MMM, E – y 'ел', d MMM, E},
 			},
 			yMMMM => {
-				M => q{G y 'ел', MMMM–MMMM},
-				y => q{G y 'ел', MMMM – y 'ел', MMMM},
+				M => q{G y 'ел', MMMM–MMMM},
+				y => q{G y 'ел', MMMM – y 'ел', MMMM},
 			},
 			yMMMd => {
-				M => q{G y 'ел', d MMM – d MMM},
-				d => q{G y 'ел', d–d MMM},
-				y => q{G y 'ел', d MMM – y 'ел', d MMM},
+				M => q{G y 'ел', d MMM – d MMM},
+				d => q{G y 'ел', d–d MMM},
+				y => q{G y 'ел', d MMM – y 'ел', d MMM},
 			},
 			yMd => {
 				M => q{GGGGG dd.MM.y – dd.MM.y},
@@ -1358,8 +1041,8 @@ has 'datetime_formats_interval' => (
 		},
 		'gregorian' => {
 			Gy => {
-				G => q{G y 'ел' – G y 'ел'},
-				y => q{G y–y 'ел'},
+				G => q{G y 'ел' – G y 'ел'},
+				y => q{G y–y 'ел'},
 			},
 			GyM => {
 				G => q{GGGGG MM.y – GGGGG MM.y},
@@ -1373,21 +1056,21 @@ has 'datetime_formats_interval' => (
 				y => q{GGGGG dd.MM.y, E – dd.MM.y, E},
 			},
 			GyMMM => {
-				G => q{G y 'ел', MMM – G y 'ел', MMM},
-				M => q{G y 'ел', MMM–MMM},
-				y => q{G y 'ел', MMM – y 'ел', MMM},
+				G => q{G y 'ел', MMM – G y 'ел', MMM},
+				M => q{G y 'ел', MMM–MMM},
+				y => q{G y 'ел', MMM – y 'ел', MMM},
 			},
 			GyMMMEd => {
-				G => q{G y 'ел', d MMM, E – G y 'ел', d MMM, E},
-				M => q{G y 'ел', d MMM, E – d MMM, E},
-				d => q{G y 'ел', d MMM, E – d MMM, E},
-				y => q{G y 'ел', d MMM, E – y 'ел', d MMM, E},
+				G => q{G y 'ел', d MMM, E – G y 'ел', d MMM, E},
+				M => q{G y 'ел', d MMM, E – d MMM, E},
+				d => q{G y 'ел', d MMM, E – d MMM, E},
+				y => q{G y 'ел', d MMM, E – y 'ел', d MMM, E},
 			},
 			GyMMMd => {
-				G => q{G y 'ел', d MMM – G y 'ел', d MMM},
-				M => q{G y 'ел', d MMM – d MMM},
-				d => q{G y 'ел', d–d MMM},
-				y => q{G y 'ел', d MMM – y 'ел', d MMM},
+				G => q{G y 'ел', d MMM – G y 'ел', d MMM},
+				M => q{G y 'ел', d MMM – d MMM},
+				d => q{G y 'ел', d–d MMM},
+				y => q{G y 'ел', d MMM – y 'ел', d MMM},
 			},
 			GyMd => {
 				G => q{GGGGG dd.MM.y – GGGGG dd.MM.y},
@@ -1395,29 +1078,9 @@ has 'datetime_formats_interval' => (
 				d => q{GGGGG dd.MM.y – dd.MM.y},
 				y => q{GGGGG dd.MM.y – dd.MM.y},
 			},
-			H => {
-				H => q{HH–HH},
-			},
-			Hm => {
-				H => q{HH:mm–HH:mm},
-				m => q{HH:mm–HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm–HH:mm v},
-				m => q{HH:mm–HH:mm v},
-			},
-			Hv => {
-				H => q{HH–HH v},
-			},
-			M => {
-				M => q{MM–MM},
-			},
 			MEd => {
 				M => q{dd.MM, E – dd.MM, E},
 				d => q{dd.MM, E – dd.MM, E},
-			},
-			MMM => {
-				M => q{LLL–LLL},
 			},
 			MMMEd => {
 				M => q{d MMM, E – d MMM, E},
@@ -1431,30 +1094,24 @@ has 'datetime_formats_interval' => (
 				M => q{dd.MM – dd.MM},
 				d => q{dd.MM – dd.MM},
 			},
-			d => {
-				d => q{d–d},
-			},
 			fallback => '{0} – {1}',
 			h => {
-				a => q{h a – h a},
-				h => q{h–h a},
+				a => q{h a – h a},
+				h => q{h–h a},
 			},
 			hm => {
-				a => q{h:mm a – h:mm a},
-				h => q{h:mm–h:mm a},
-				m => q{h:mm–h:mm a},
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
 			},
 			hmv => {
-				a => q{h:mm a – h:mm a v},
-				h => q{h:mm–h:mm a v},
-				m => q{h:mm–h:mm a v},
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
 			},
 			hv => {
-				a => q{h a – h a v},
-				h => q{h–h a v},
-			},
-			y => {
-				y => q{y–y},
+				a => q{h a – h a v},
+				h => q{h–h a v},
 			},
 			yM => {
 				M => q{MM.y – MM.y},
@@ -1466,22 +1123,22 @@ has 'datetime_formats_interval' => (
 				y => q{dd.MM.y, E – dd.MM.y, E},
 			},
 			yMMM => {
-				M => q{y 'ел', MMM – MMM},
-				y => q{y 'ел', MMM – y 'ел', MMM},
+				M => q{y 'ел', MMM – MMM},
+				y => q{y 'ел', MMM – y 'ел', MMM},
 			},
 			yMMMEd => {
-				M => q{y 'ел', d MMM, E – d MMM, E},
-				d => q{y 'ел', d MMM, E – d MMM, E},
-				y => q{y 'ел', d MMM, E – y 'ел', d MMM, E},
+				M => q{y 'ел', d MMM, E – d MMM, E},
+				d => q{y 'ел', d MMM, E – d MMM, E},
+				y => q{y 'ел', d MMM, E – y 'ел', d MMM, E},
 			},
 			yMMMM => {
-				M => q{y 'ел', MMMM – MMMM},
-				y => q{y 'ел', MMMM – y 'ел', MMMM},
+				M => q{y 'ел', MMMM – MMMM},
+				y => q{y 'ел', MMMM – y 'ел', MMMM},
 			},
 			yMMMd => {
-				M => q{y 'ел', d MMM – d MMM},
-				d => q{y 'ел', d–d MMM},
-				y => q{y 'ел', d MMM – y 'ел', d MMM},
+				M => q{y 'ел', d MMM – d MMM},
+				d => q{y 'ел', d–d MMM},
+				y => q{y 'ел', d MMM – y 'ел', d MMM},
 			},
 			yMd => {
 				M => q{dd.MM.y – dd.MM.y},
@@ -1497,13 +1154,14 @@ has 'time_zone_names' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default	=> sub { {
-		hourFormat => q(+HH:mm;-HH:mm),
-		gmtFormat => q(GMT{0}),
-		gmtZeroFormat => q(GMT),
 		regionFormat => q({0} вакыты),
 		regionFormat => q({0} җәйге вакыты),
 		regionFormat => q({0} гадәти вакыты),
-		fallbackFormat => q({1} ({0})),
+		'Acre' => {
+			long => {
+				'generic' => q#Акр вакыты#,
+			},
+		},
 		'America_Central' => {
 			long => {
 				'daylight' => q#Төньяк Америка җәйге үзәк вакыты#,
@@ -1530,6 +1188,11 @@ has 'time_zone_names' => (
 				'daylight' => q#Төньяк Америка җәйге Тын океан вакыты#,
 				'generic' => q#Төньяк Америка Тын океан вакыты#,
 				'standard' => q#Төньяк Америка гадәти Тын океан вакыты#,
+			},
+		},
+		'Anadyr' => {
+			long => {
+				'generic' => q#Анадырь вакыты#,
 			},
 		},
 		'Atlantic' => {
@@ -1571,6 +1234,16 @@ has 'time_zone_names' => (
 		'GMT' => {
 			long => {
 				'standard' => q#Гринвич уртача вакыты#,
+			},
+		},
+		'Kamchatka' => {
+			long => {
+				'generic' => q#Петропавловск-Камчатский вакыты#,
+			},
+		},
+		'Samara' => {
+			long => {
+				'generic' => q#Самара вакыты#,
 			},
 		},
 	 } }

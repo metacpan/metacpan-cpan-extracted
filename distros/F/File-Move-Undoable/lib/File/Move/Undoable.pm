@@ -1,17 +1,19 @@
 package File::Move::Undoable;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.09'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
 
-use File::MoreUtil qw(file_exists l_abs_path);
 use File::Trash::Undoable;
+use File::Util::Test qw(file_exists l_abs_path);
 use IPC::System::Options 'system', -log=>1;
 use Proc::ChildError qw(explain_child_error);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-11-21'; # DATE
+our $DIST = 'File-Move-Undoable'; # DIST
+our $VERSION = '0.100'; # VERSION
 
 our %SPEC;
 
@@ -176,7 +178,7 @@ File::Move::Undoable - Move file/directory using rename/rsync, with undo support
 
 =head1 VERSION
 
-This document describes version 0.09 of File::Move::Undoable (from Perl distribution File-Move-Undoable), released on 2017-07-10.
+This document describes version 0.100 of File::Move::Undoable (from Perl distribution File-Move-Undoable), released on 2023-11-21.
 
 =head1 FUNCTIONS
 
@@ -185,9 +187,9 @@ This document describes version 0.09 of File::Move::Undoable (from Perl distribu
 
 Usage:
 
- mv(%args) -> [status, msg, result, meta]
+ mv(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-Move file/directory using rename/rsync, with undo support.
+Move fileE<sol>directory using renameE<sol>rsync, with undo support.
 
 If moving to the same filesystem, will move using C<rename()>. On undo will
 restore the old name.
@@ -224,6 +226,8 @@ interrupted move impossible.
 
 =item * B<source>* => I<str>
 
+(No description)
+
 =item * B<target>* => I<str>
 
 Target location.
@@ -231,6 +235,7 @@ Target location.
 Note that to avoid ambiguity, you must specify full location instead of just
 directory name. For example: mv(source=>'/dir', target=>'/a') will move /dir to
 /a and mv(source=>'/dir', target=>'/a/dir') will move /dir to /a/dir.
+
 
 =back
 
@@ -240,34 +245,34 @@ Special arguments:
 
 =item * B<-tx_action> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_action_id> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_recovery> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_rollback> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_v> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -288,14 +293,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/File-Move-
 
 Source repository is at L<https://github.com/perlancar/perl-File-Move-Undoable>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=File-Move-Undoable>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Setup>
@@ -306,11 +303,43 @@ L<Rinci::Transaction>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2017, 2016, 2015, 2014, 2012 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=File-Move-Undoable>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

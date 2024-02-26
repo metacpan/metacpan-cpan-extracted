@@ -1,6 +1,7 @@
 #!perl
 
 use strict;
+use warnings;
 use Test::More 0.90;
 
 use Variable::OnDestruct qw/on_destruct on_destruct_fifo/;

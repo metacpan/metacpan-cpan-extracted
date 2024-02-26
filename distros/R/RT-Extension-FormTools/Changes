@@ -1,5 +1,17 @@
 Revision history for RT-Extension-FormTools
 
+1.07 2024-02-22
+ - Document ticket variables available for HTML blocks
+ - Fix uninitialized warnings for modify page
+
+1.06 2024-02-22
+ - Added wide character support
+ - Remove duplicate values of hidden inputs to avoid possible double-encoding of content
+
+1.05 2024-02-21
+ - Don't show hidden fields on the ShowChoices summary
+ - Group fields on ShowChoices by page in the order they appear
+
 1.04 2024-02-12
  - Avoid long redirect URLs resulting from clicking the Back button
 

@@ -1,3 +1,8 @@
+0.042   2024-02-06  Released-By: PERLANCAR; Urgency: medium
+
+        - Implement chart types 'bar' & 'raw'.
+
+
 0.041   2021-04-10  Released-By: PERLANCAR; Urgency: medium
 
 	- Update dependency's new name {,Data::}TableData::Object.

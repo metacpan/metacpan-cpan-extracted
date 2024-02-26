@@ -1,62 +1,66 @@
 NAME
-
-    Mojolicious::Plugin::Config::Structured - Mojolicious Plugin for
-    Config::Structured: locates and reads config and definition files and
-    loads them into a Config::Structured instance, made available globally
-    as 'conf'
-
-VERSION
-
-    version 1.003
+    Mojolicious::Plugin::Config::Structured - provides Mojo app access to
+    structured configuration data
 
 SYNOPSIS
-
       # For a full Mojo app
       $self->plugin('Config::Structured' => {config_file => $filename});
-    
+
       ...
-    
+
       if ($c->conf->feature->enabled) {
         ...
       }
-    
+
       say $c->conf->email->recipient->{some_feature};
 
 DESCRIPTION
-
-    Initializes Config::Structured from two files:
-
-    definition
-
-      pulled from $app_home/$moniker.conf.def
-
-    config_values
-
-      pulled from the first existent, readable file from:
-
-        config_file parameter value
-      
-        $app_home/$moniker.$mode.conf
-      
-        $app_home/$moniker.conf
-
-      These files are expected to contain perl hashref structures
+    Mojolicious Plugin for Config::Structured: locates and reads config and
+    definition files and loads them into a Config::Structured instance, made
+    available globally via the "conf" method.
 
 METHODS
+    Mojolicious::Plugin::Config::Structured inherits all methods from
+    Mojolicious::Plugin and implements the following new ones
 
- conf()
+  register
+        $plugin->register(Mojolicious->new, [structure_file => $struct_fn,] [config_file => $config_file])
 
-    Returns an Config::Structured instance initialized to the root of the
-    configuration definition
+    Register plugin in Mojolicious application. "structure_file" is the
+    filesystem path of the file that defines the configuration definition.
+    If omitted, a sane default is used ("./{app}.conf.def") relative to the
+    mojo app home.
+
+    "config_file" is the filesystem path of the file that provides the
+    active configuration. If omitted, a sane default is used
+    ("./{app}.{mode}.conf" or "./{app}.conf")
+
+  conf
+    This method is used to access the loaded configuration from within the
+    Mojo application. Returns the root Config::Structured instance.
 
 AUTHOR
+    Mark Tyrrell "<mark@tyrrminal.dev>"
 
-    Mark Tyrrell <mtyrrell@concertpharma.com>
+LICENSE
+    Copyright (c) 2024 Mark Tyrrell
 
-COPYRIGHT AND LICENSE
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
 
-    This software is copyright (c) 2019 by Concert Pharmaceuticals, Inc.
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
 
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as the Perl 5 programming language system itself.
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 

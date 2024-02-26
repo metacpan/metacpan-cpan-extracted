@@ -2,19 +2,19 @@
 
 =head1 NAME
 
-Locale::CLDR::Locales::Ff - Package for language Fulah
+Locale::CLDR::Locales::Ff - Package for language Fula
 
 =cut
 
 package Locale::CLDR::Locales::Ff;
 # This file auto generated from Data\common\main\ff.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -750,14 +750,14 @@ has 'characters' => (
 		no warnings 'experimental::regex_sets';
 		return {
 			auxiliary => qr{[q v x z]},
-			index => ['A', 'B', 'Ɓ', 'C', 'D', 'Ɗ', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ñ', 'Ŋ', 'O', 'P', 'R', 'S', 'T', 'U', 'W', 'Y', 'Ƴ'],
-			main => qr{[a b ɓ c d ɗ e f g h i j k l m n ñ ŋ o p r s t u w y ƴ]},
+			index => ['A', 'B', 'Ɓ', 'C', 'D', 'Ɗ', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'NÑ', 'Ŋ', 'O', 'P', 'R', 'S', 'T', 'U', 'W', 'Y', 'Ƴ'],
+			main => qr{[a b ɓ c d ɗ e f g h i j k l m nñ ŋ o p r s t u w y ƴ]},
 			numbers => qr{[  \- ‑ , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
 : sub {
-		return { index => ['A', 'B', 'Ɓ', 'C', 'D', 'Ɗ', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ñ', 'Ŋ', 'O', 'P', 'R', 'S', 'T', 'U', 'W', 'Y', 'Ƴ'], };
+		return { index => ['A', 'B', 'Ɓ', 'C', 'D', 'Ɗ', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'NÑ', 'Ŋ', 'O', 'P', 'R', 'S', 'T', 'U', 'W', 'Y', 'Ƴ'], };
 },
 );
 
@@ -769,25 +769,11 @@ has 'quote_start' => (
 	default		=> qq{„},
 );
 
-has 'quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{”},
-);
-
 has 'alternate_quote_start' => (
 	is			=> 'ro',
 	isa			=> Str,
 	init_arg	=> undef,
 	default		=> qq{‚},
-);
-
-has 'alternate_quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{’},
 );
 
 has 'yesstr' => (
@@ -1048,9 +1034,14 @@ has 'currencies' => (
 				'currency' => q(Liibar Sent Helen),
 			},
 		},
-		'SLL' => {
+		'SLE' => {
 			display_name => {
 				'currency' => q(Lewoon Seraa Liyon),
+			},
+		},
+		'SLL' => {
+			display_name => {
+				'currency' => q(Lewoon Seraa Liyon \(1964—2022\)),
 			},
 		},
 		'SOS' => {
@@ -1272,10 +1263,6 @@ has 'day_periods' => (
 					'am' => q{subaka},
 					'pm' => q{kikiiɗe},
 				},
-				'wide' => {
-					'am' => q{subaka},
-					'pm' => q{kikiiɗe},
-				},
 			},
 		},
 	} },
@@ -1387,7 +1374,6 @@ has 'datetime_formats_available_formats' => (
 			MMdd => q{dd/MM},
 			Md => q{d/M},
 			ms => q{m:ss},
-			y => q{y},
 			yM => q{M/y},
 			yMEd => q{E d/M/y},
 			yMM => q{MM/y},
@@ -1406,19 +1392,6 @@ has 'datetime_formats_append_item' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			'Day' => '{0} ({2}: {1})',
-			'Day-Of-Week' => '{0} {1}',
-			'Era' => '{1} {0}',
-			'Hour' => '{0} ({2}: {1})',
-			'Minute' => '{0} ({2}: {1})',
-			'Month' => '{0} ({2}: {1})',
-			'Quarter' => '{0} ({2}: {1})',
-			'Second' => '{0} ({2}: {1})',
-			'Timezone' => '{0} {1}',
-			'Week' => '{0} ({2}: {1})',
-			'Year' => '{1} {0}',
-		},
 	} },
 );
 

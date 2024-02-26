@@ -1,10 +1,11 @@
 requires 'parent', 0;
 requires 'List::Util', '>= 1.29';
-requires 'Tickit', '>= 0.71';
-requires 'Tickit::Widget', '>= 0.54';
+requires 'List::UtilsBy';
+requires 'Tickit', '>= 0.74';
+requires 'Tickit::Widget', '>= 0.58';
 requires 'Tickit::Widget::Menu', 0;
 requires 'Variable::Disposition', 0;
-requires 'Tickit::WidgetRole::Movable', '>= 0.003';
+requires 'Tickit::WidgetRole::Movable', '>= 0.004';
 requires 'curry::weak', 0;
 
 on 'test' => sub {

@@ -1,6 +1,11 @@
 Revision history for Tickit-WidgetRole-Movable
 
-0.002     2017-06-25 02:41:06+08:00 Asia/Kuala_Lumpur
+0.004     2024-02-16 06:07:32+08:00 Asia/Singapore
+    [Bugs fixed]
+
+    - latest Tickit::Widget and Tickit::Style require Object::Pad-compatible classes
+
+0.003     2017-06-25 02:41:06+08:00 Asia/Kuala_Lumpur
     No new features
 
     Bugs fixed:

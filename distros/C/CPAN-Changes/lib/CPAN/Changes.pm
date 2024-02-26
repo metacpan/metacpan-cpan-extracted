@@ -2,7 +2,7 @@ package CPAN::Changes;
 use strict;
 use warnings;
 
-our $VERSION = '0.500002';
+our $VERSION = '0.500003';
 $VERSION =~ tr/_//d;
 
 use Sub::Quote qw(qsub);
@@ -103,14 +103,17 @@ sub serialize {
     my $styles = \@styles;
     my $indents = \@indents;
     if (
-      grep {
-        length($styles->[1]) > 1
-        && length($indents->[0] . $styles->[1] . $_->text) > $width
-      }
-        @{ $release->entries }
-      or
-      !grep { $_->has_entries }
-        @{ $release->entries }
+      !$opts{styles}
+      and (
+        grep {
+          length($styles->[1]) > 1
+          && length($indents->[0] . $styles->[1] . $_->text) > $width
+        }
+          @{ $release->entries }
+        or
+        !grep { $_->has_entries }
+          @{ $release->entries }
+      )
     ) {
       $styles = [ '', '-', '*' ];
     }
@@ -284,7 +287,8 @@ The width to wrap lines at.  By default, lines will be wrapped at 75 characters.
 
 =item styles
 
-An array reference of styles to use when outputting the entries.
+An array reference of styles to use when outputting the entries, one for each
+level of change. The first entry is used for the release entry itself.
 
 The styles can be either a single character to prefix change lines or two
 characters to use as a prefix and suffix.

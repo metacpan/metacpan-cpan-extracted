@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 266;
+use Test::More tests => 268;
 # use Test::More 'no_plan';
 use File::Copy::Recursive qw(dircopy fcopy);
 use File::Path qw(remove_tree);
@@ -64,6 +64,12 @@ can_ok $CLASS => qw(
     _readme
     _clean_html_body
 );
+
+# Make sure Text::Markup recognizes the "none" parser for text files.
+is +Text::Markup->guess_format("foo.text"), "none",
+    'Text::Markup should parse .text files with the "none" parser';
+is +Text::Markup->guess_format("foo.txt"), "none",
+    'Text::Markup should parse .txt files with the "none" parser';
 
 my $api = PGXN::API->instance;
 my $doc_root = catdir 't', 'test_indexer_root';
@@ -341,8 +347,12 @@ is_deeply $doc_data, $mir_data,
 fcopy catfile(qw(t data theory-updated.json)),
       catfile($api->mirror_root, qw(user theory.json));
 $params->{meta} = $meta_011;
-ok $indexer->update_user($params),
-    'Update the user metadata for pair 0.1.1';
+{
+    # Tell it not to index.
+    local $indexer->{_index_it} = 0;
+    ok $indexer->update_user($params),
+        'Update the user metadata for pair 0.1.1';
+}
 is_deeply $indexer->to_index->{users}, [],
     'Should have no index update for test dist';
 
@@ -604,15 +614,24 @@ is_deeply $doc_data, $exp,
 fcopy catfile(qw(t data pair-ext-updated.json)),
       catfile($api->mirror_root, qw(extension pair.json));
 $params->{meta} = $meta_011;
-do {
-    # Tell it not to index.
-    local $indexer->{_index_it} = 0;
     ok $indexer->update_extensions($params),
         'Update the extension metadata to 0.1.1';
-};
-is_deeply $indexer->to_index, {
-    map { $_ => [] } qw(docs dists extensions users tags)
-}, 'Should have no indexed extensions with _index_it false';
+
+# It should have indexed the testing release because there is no existin stable
+# release. Normally would not happen when there is an existing stable version
+# because merge_distmeta, called by add_distribution, would have set _index_it
+# to false. This test ensures that it indexes the highest status relaese.
+is_deeply shift @{ $indexer->to_index->{extensions} }, {
+    abstract  => 'A key/value pair data type',
+    date      => '2010-10-29T22:46:45Z',
+    dist      => 'pair',
+    docpath   => 'docs/howto',
+    extension => 'pair',
+    key       => 'pair',
+    user      => 'theory',
+    user_name => 'David E. Wheeler',
+    version   => '0.1.0',
+}, 'Should have stable extension index data';
 
 $exp->{latest} = 'testing';
 $exp->{testing} = {

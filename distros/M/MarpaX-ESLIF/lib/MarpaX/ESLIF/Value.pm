@@ -16,7 +16,7 @@ sub _EQ       { return }
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '6.0.29'; # VERSION
+our $VERSION = '6.0.33.3'; # VERSION
 
 
 sub CLONE_SKIP {
@@ -37,17 +37,19 @@ MarpaX::ESLIF::Value - MarpaX::ESLIF's value
 
 =head1 VERSION
 
-version 6.0.29
+version 6.0.33.3
 
 =head1 SYNOPSIS
-
-  my $eslifValue = MarpaX::ESLIF::Value->new($eslifRecognizer, $valueInterface);
-
-The value interface is used to get parse tree valuation.
 
 =head1 DESCRIPTION
 
 MarpaX::ESLIF::Value is a possible step after a MarpaX::ESLIF::Recognizer instance is created.
+
+=for test_synopsis no strict 'vars'
+
+  my $eslifValue = MarpaX::ESLIF::Value->new($eslifRecognizer, $valueInterface);
+
+The value interface is used to get parse tree valuation.
 
 =head1 METHODS
 

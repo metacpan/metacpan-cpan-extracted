@@ -1,6 +1,6 @@
 package Games::Sudoku::PatternSolver;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 require 5.10.0;
 
@@ -115,7 +115,21 @@ sub solve_puzzle {
   my $symbol_vectors = $puzzle->{symbolVectors};
   my $symbol_counts  = $puzzle->{symbolCounts};
 
+  #  so far, only symbols with at least 1 given appear here
   my @by_count = sort {(($symbol_counts->{$b} // 0) <=> ($symbol_counts->{$a} // 0)) || ($a cmp $b)} keys %$symbol_counts;
+
+  my $no_clue_patterns;
+  if ($USE_LOGIC) {
+    foreach my $symbol (1 .. 9) {
+      unless (exists $symbol_counts->{$symbol}) {
+        # all clueless symbols share the same candidate positions
+        my $no_clue_candidates = $puzzle->{candidateVectors}{$symbol};
+        $no_clue_patterns = [map {$_->subset($no_clue_candidates) ? $_ : ()} @$all_patterns];
+        last;
+      }
+    }
+  }
+  $no_clue_patterns ||= $all_patterns;
 
   if ($LOOSE_MODE && @by_count < 8) {
     # with less than 8 different givens, we have to stock up on distinguishing cell markers
@@ -142,14 +156,26 @@ sub solve_puzzle {
 
     my $pre_filtered;
 
-    if ($symbol_counts->{$symbol} > 0) {
+    if ($symbol_counts->{$symbol} == 9) {
+      $pre_filtered = [$symbol_vector];
+
+    } elsif ($symbol_counts->{$symbol} > 0) {
       # start with a reduced set of 5184 instead of 46656 possible distributions for this symbol
       my $any_given_field = $symbol_vector->Min();
-      $pre_filtered = $patterns_by_field->{$any_given_field};
+
+      if ($USE_LOGIC) {
+        # a chance to early prune patterns by subsetting them against their resp. candidate map
+        my $allowed_positions = Bit::Vector->new(81);
+        $allowed_positions->Or($symbol_vector, $puzzle->{candidateVectors}{$symbol});
+        $pre_filtered = [map {$_->subset($allowed_positions) ? $_ : ()} @{$patterns_by_field->{$any_given_field}}];
+
+      }	else {
+        $pre_filtered = $patterns_by_field->{$any_given_field};
+      }
 
     } else {
-      # no givens -> no pattern filtering is possible in the 1st step
-      $pre_filtered = $all_patterns;
+      # no givens -> a general prefilterung by shared candidates happened above
+      $pre_filtered = $no_clue_patterns;
     }
 
     my @solutions = ();
@@ -157,7 +183,7 @@ sub solve_puzzle {
     my $omitted = 0;
 
     foreach my $pattern_vector (@$pre_filtered) {
-      if (($symbol && $symbol_vector->subset($pattern_vector)) || $pattern_vector->subset($symbol_vector)) {
+      if ($symbol_vector->subset($pattern_vector)) {
         $found++;
 
         # early omittance of patterns wherever a non-conflicting pattern was not found for any of the former symbols

@@ -22,7 +22,7 @@ use DynaLoader;
 
 
 
-#line 78 "real.pd"
+#line 79 "real.pd"
 
 use strict;
 
@@ -68,11 +68,9 @@ PDL::LinearAlgebra::Real - PDL interface to the real lapack linear algebra progr
 
 This module provides an interface to parts of the real lapack library.
 These routines accept either float or double ndarrays.
-#line 72 "Real.pm"
 
-
-
-
+=cut
+#line 74 "Real.pm"
 
 
 =head1 FUNCTIONS
@@ -8028,7 +8026,22 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (A(m,n);int uplo();[o] C(m,n))
+  Signature: (A(m,n);[o] C(m,n); int uplo)
+
+=for usage
+
+tricpy(PDL(A), int(uplo), PDL(C))
+
+=for example
+
+	use PDL::LinearAlgebra;
+
+	$c = $a->tricpy($uplo);	# explicit uplo
+	$c = $a->tricpy;			# default upper
+or
+	use PDL::LinearAlgebra::Real;
+
+	tricpy($a, $uplo, $c);	# modify c
 
 =for ref
 
@@ -8178,7 +8191,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 10762 "real.pd"
+#line 10755 "real.pd"
 
 =head1 AUTHOR
 
@@ -8189,10 +8202,7 @@ it under the terms of the Perl Artistic License as in the file Artistic_2
 in this distribution.
 
 =cut
-#line 8193 "Real.pm"
-
-
-
+#line 8206 "Real.pm"
 
 # Exit with OK status
 

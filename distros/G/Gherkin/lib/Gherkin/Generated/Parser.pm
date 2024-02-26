@@ -1,5 +1,5 @@
 package Gherkin::Generated::Parser;
-$Gherkin::Generated::Parser::VERSION = '27.0.0';
+$Gherkin::Generated::Parser::VERSION = '28.0.0';
 # This file is generated. Do not edit! Edit gherkin-perl.razor instead.
 use strict;
 use warnings;

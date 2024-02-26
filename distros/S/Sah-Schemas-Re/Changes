@@ -1,3 +1,10 @@
+0.006   2023-12-20  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Explain the difference between re_from_str and str_or_re.
+
+
 0.005   2023-09-09  Released-By: PERLANCAR; Urgency: medium
 
         - Base re_or_code_from_str on obj::re instead of the 're' type, to

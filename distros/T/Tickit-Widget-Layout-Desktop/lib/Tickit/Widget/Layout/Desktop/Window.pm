@@ -2,10 +2,12 @@ package Tickit::Widget::Layout::Desktop::Window;
 
 use strict;
 use warnings;
+use Object::Pad;
+class Tickit::Widget::Layout::Desktop::Window :isa(Tickit::SingleChildWidget);
 
-use parent qw(Tickit::WidgetRole::Movable Tickit::SingleChildWidget);
+apply Tickit::WidgetRole::Movable;
 
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =head1 NAME
@@ -46,10 +48,7 @@ BEGIN {
 
 =cut
 
-sub new {
-    my $class = shift;
-    my %args = @_;
-    my $self = $class->SUPER::new;
+BUILD (%args) {
     Scalar::Util::weaken(
         $self->{container} = $args{container} or die "No container provided?"
     );
@@ -62,8 +61,7 @@ Returns true if this location is the maximise button.
 
 =cut
 
-sub position_is_maximise {
-    my ($self, $line, $col) = @_;
+method position_is_maximise ($line, $col) {
     my $win = $self->window or return;
     # what hardcoded madness is this
     return 1 if $line == 0 && $col == $win->cols - 4;
@@ -76,37 +74,32 @@ Returns true if this location is the close button.
 
 =cut
 
-sub position_is_close {
-    my ($self, $line, $col) = @_;
+method position_is_close ($line, $col) {
     my $win = $self->window or return;
     # again I say with the numbers
     return 1 if $line == 0 && $col == $win->cols - 2;
     return 0;
 }
 
-sub position_is_control {
-    my ($self, $line, $col) = @_;
+method position_is_control ($line, $col) {
     my $win = $self->window or return;
     # more numbers!
     return 1 if $line == 0 && $col >= 1 && $col <= 3;
     return 0;
 }
 
-sub action_close {
-    my ($self) = @_;
+method action_close {
     # Close button... probably need some way to indicate when
     # this happens, Tickit::Window doesn't appear to have set_on_closed ?
     $self->close;
 }
 
-sub close {
-    my ($self) = @_;
+method close {
     $self->{container}->close_panel($self);
     $self
 }
 
-sub action_restore {
-    my ($self) = @_;
+method action_restore {
     my $win = $self->window or return 1;
     return 1 unless $self->{maximised};
     $win->change_geometry(
@@ -118,10 +111,9 @@ sub action_restore {
     delete $self->{maximised};
 }
 
-sub parent { shift->{container} }
+method parent { $self->{container} }
 
-sub action_maximise {
-    my ($self) = @_;
+method action_maximise {
     my $win = $self->window or return 1;
     return 1 if $self->{maximised};
     $self->{maximised} = $win->rect;
@@ -133,8 +125,7 @@ sub action_maximise {
     );
 }
 
-sub action_control {
-    my ($self) = @_;
+method action_control {
     $self->{container}->show_control(
         $self,
         $self->{maximised}
@@ -148,10 +139,10 @@ sub action_control {
     );
 }
 
-sub action_weld { }
-sub action_unweld { }
+method action_weld { }
+method action_unweld { }
 
-=head2 mouse_press
+=head2 before_mouse_press
 
 Override mouse click events to mark this window as active
 before continuing with the usual move/resize detection logic.
@@ -160,9 +151,7 @@ Provides click-to-raise and click-to-focus behaviour.
 
 =cut
 
-sub mouse_press {
-    my $self = shift;
-    my ($line, $col) = @_;
+method before_mouse_press ($line, $col) {
     $self->{container}->make_active($self);
     if($self->position_is_close($line, $col)) {
         $self->action_close;
@@ -174,7 +163,7 @@ sub mouse_press {
         $self->action_control;
         return 1;
     } else {
-        $self->SUPER::mouse_press(@_)
+        return 0;
     }
 }
 
@@ -187,8 +176,7 @@ Returns $self.
 
 =cut
 
-sub with_rb {
-    my ($self, $rb, $code) = @_;
+method with_rb ($rb, $code) {
     $rb->save;
     $code->($rb);
     $rb->restore;
@@ -202,8 +190,7 @@ content without the frame.
 
 =cut
 
-sub content_rect {
-    my ($self) = @_;
+method content_rect {
     my $win = $self->window;
     $self->child->window->rect->translate(
         $win->top,
@@ -211,7 +198,7 @@ sub content_rect {
     )
 }
 
-sub container { shift->{container} }
+method container { $self->{container} }
 
 my %override = (
     southeast => 0x256D,
@@ -226,8 +213,7 @@ Returns $self.
 
 =cut
 
-sub render_to_rb {
-    my ($self, $rb, $rect) = @_;
+method render_to_rb ($rb, $rect) {
     my $win = $self->window or return;
     return unless $self->child->window;
 
@@ -322,13 +308,11 @@ sub render_to_rb {
     # $rb->text_at(0, $w - 5, "\N{U+238A}", Tickit::Pen->new(fg => 'hi-yellow'));
 }
 
-sub format_label {
-    my $self = shift;
+method format_label {
     ' ' . $self->label . ' ';
 }
 
-sub render_frame {
-    my ($self, $rb, $target) = @_;
+method render_frame ($rb, $target) {
     my $win = $self->window or return;
 
     my $line_type = LINE_SINGLE; #LINE_DOUBLE; #$self->is_active ? LINE_DOUBLE : LINE_SINGLE;
@@ -363,40 +347,34 @@ sub render_frame {
     });
 }
 
-sub is_active { shift->{active} ? 1 : 0 }
+method is_active { $self->{active} ? 1 : 0 }
 
-sub label {
-    my $self = shift;
-    return $self->{label} // '' unless @_;
-    $self->{label} = shift;
+method label ($v = undef) {
+    return $self->{label} // '' unless defined $v;
+    $self->{label} = $v;
     return $self;
 }
 
-sub lines {
-    my $self = shift;
+method lines {
     my $child = $self->child;
     return 2 + ($child ? $child->lines : 0);
 }
 
-sub cols {
-    my $self = shift;
+method cols {
     my $child = $self->child;
     return 2 + ($child ? $child->cols : 0);
 }
 
-sub children_changed { shift->set_child_window }
+method children_changed { $self->set_child_window }
 
-sub window_gained {
-    my $self = shift;
-    my ($win) = @_;
+method window_gained ($win) {
     delete $self->{frame_rects};
     $self->{window_lines} = $win->lines;
     $self->{window_cols} = $win->cols;
-    return $self->SUPER::window_gained(@_);
+    return $self->SUPER::window_gained($win);
 }
 
-sub reshape {
-    my $self = shift;
+method reshape {
     my $win = $self->window;
 
     # Keep our frame info if we're just moving the window around?
@@ -406,44 +384,36 @@ sub reshape {
     $self->set_child_window
 }
 
-sub set_child_window {
-    my $self = shift;
+method set_child_window {
 
-#   warn "set child window for $self\n";
     my $window = $self->window or return;
     my $child  = $self->child  or return;
 
     my $lines = $window->lines;
     my $cols  = $window->cols;
 
-#   warn "* $lines x $cols\n";
     if( $lines > 2 and $cols > 2 ) {
         if( my $childwin = $child->window ) {
-#   warn "* geom change\n";
             $childwin->change_geometry( 1, 1, $lines - 2, $cols - 2 );
         } else {
-#   warn "* new sub\n";
             my $childwin = $window->make_sub( 1, 1, $lines - 2, $cols - 2 );
             $child->set_window( $childwin );
         }
     } else {
-#       warn "* too small, clear\n";
         if( $child->window ) {
             $child->set_window( undef );
         }
     }
 }
 
-sub mark_active {
-    my $self = shift;
+method mark_active {
     $self->{active} = 1;
     $self->set_style_tag(active => 1);
     $self->expose_frame;
     $self
 }
 
-sub mark_inactive {
-    my $self = shift;
+method mark_inactive {
     $self->{active} = 0;
     $self->set_style_tag(active => 0);
     $self->expose_frame;
@@ -451,8 +421,7 @@ sub mark_inactive {
 }
 
 # 'hmmm.'
-sub expose_frame {
-    my $self = shift;
+method expose_frame {
     my $win = $self->window or return $self;
 
     my @rect = $self->frame_rects;
@@ -460,16 +429,14 @@ sub expose_frame {
     $self;
 }
 
-sub frame_rects {
-    my $self = shift;
+method frame_rects {
     @{ $self->{frame_rects} ||= [
         # Tickit::Rect really is quite neat
         $self->window->rect->subtract($self->content_rect)
     ] };
 }
 
-sub adjust_left {
-    my ($self, $delta) = @_;
+method adjust_left ($delta) {
     my $rect = $self->window->rect;
     my $cols = $rect->cols - $delta;
     return if $cols < $self->MIN_WIDTH;
@@ -480,8 +447,8 @@ sub adjust_left {
         $cols,
     )
 }
-sub adjust_right {
-    my ($self, $delta) = @_;
+
+method adjust_right ($delta) {
     my $rect = $self->window->rect;
     my $cols = $rect->cols + $delta;
     return if $cols < $self->MIN_WIDTH;
@@ -492,8 +459,8 @@ sub adjust_right {
         $cols,
     )
 }
-sub adjust_top {
-    my ($self, $delta) = @_;
+
+method adjust_top ($delta) {
     my $rect = $self->window->rect;
     my $lines = $rect->lines - $delta;
     return if $lines < $self->MIN_HEIGHT;
@@ -504,8 +471,8 @@ sub adjust_top {
         $rect->cols,
     )
 }
-sub adjust_bottom {
-    my ($self, $delta) = @_;
+
+method adjust_bottom ($delta) {
     my $rect = $self->window->rect;
     my $lines = $rect->lines + $delta;
     return if $lines < $self->MIN_HEIGHT;
@@ -517,8 +484,8 @@ sub adjust_bottom {
     )
 }
 
-sub linked_widgets {
-    shift->{linked_widgets} ||= {}
+method linked_widgets {
+    $self->{linked_widgets} ||= {}
 }
 
 =head2 change_geometry
@@ -545,9 +512,7 @@ That's about it. The idea is that edges can be "joined", meaning that resizing a
 
 =cut
 
-sub change_geometry {
-    my ($self, $top, $left, $lines, $cols) = @_;
-
+method before_change_geometry ($top, $left, $lines, $cols) {
     delete $self->{maximised};
 
     my $deskwin = $self->container->window;
@@ -580,9 +545,7 @@ sub change_geometry {
             );
         }
     }
-    $self->SUPER::change_geometry(
-        $top, $left, $lines, $cols
-    );
+    return 0;
 }
 
 1;
@@ -595,5 +558,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2012-2020. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2012-2015. Licensed under the same terms as Perl itself.
 

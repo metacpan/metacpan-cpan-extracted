@@ -1,0 +1,135 @@
+#!perl
+use strict;
+use warnings;
+
+use Games::Sudoku::Pdf;
+our $VERSION = $Games::Sudoku::Pdf::VERSION;
+
+BEGIN {
+  require Getopt::Std;
+  $| = 1;
+}
+
+my $script_name = $0;
+$script_name =~ s|^.+/||;
+my $opts = {};
+Getopt::Std::getopts('i:D:F:P:O:L:T:A:S:K:o:a:', $opts) or die usage();
+usage() if $opts->{h};
+
+if ($opts->{i}) {
+  push @ARGV, $opts->{i};
+}
+
+my $quiet = ($opts->{o} || $opts->{a}) ? 0 : 1;
+
+my $delim = $opts->{D} || ';';
+my $line_format = $opts->{F} || join $delim, 'C', 'D', 'X', 'J';
+
+my %positions = ();
+my $i = 0;
+my @line = split / *\Q$delim\E */, $line_format;
+foreach my $s (@line) {
+  if ($s =~ /C|D|X|J/) {
+    $positions{$s} = $i;
+  }
+  $i++;
+}
+$delim = "\t" if $delim eq 'T';
+
+my %params = ();
+$params{appendFile}      = $opts->{a} if $opts->{a};
+$params{pageFormat}      = $opts->{P} if $opts->{P};
+$params{pageOrientation} = $opts->{O} if $opts->{O};
+$params{puzzlesPerPage}  = $opts->{L} || '2x2';
+$params{title}    = $opts->{T} if $opts->{T};
+$params{author}   = $opts->{A} if $opts->{A};
+$params{subject}  = $opts->{S} if $opts->{S};
+$params{keywords} = $opts->{K} if $opts->{K};
+$params{quiet} = $quiet;
+
+my $writer = Games::Sudoku::Pdf->new( %params );
+my $del_line = ''; #"\r" . (' ' x 80) . "\r";
+
+my $count = 0;
+while (<>) {
+  chomp;
+  @line = split / *\Q$delim\E */o, $_;
+
+  my %puzzle = ( clues => $line[$positions{C}] );
+  if (exists($positions{D}) && $line[$positions{D}]) {
+     $puzzle{bottomLine} = $line[$positions{D}];
+  }
+  if (exists($positions{X}) && $line[$positions{X}]) {
+     $puzzle{extraRegion} = $line[$positions{X}];
+  }
+  if (exists($positions{J}) && $line[$positions{J}]) {
+     $puzzle{jigsaw} = $line[$positions{J}];
+  }
+
+  $writer->add_puzzle( %puzzle );
+  $count++;
+  print $del_line, sprintf "  %3d) %s\t%s\n", 
+    $count, $puzzle{clues}, $puzzle{bottomLine}
+    unless $quiet;
+}
+
+if ($opts->{o} || $opts->{a}) {
+  # print to file
+  $writer->{quiet} = 0;
+  $writer->close($opts->{o});
+
+} else {
+  #  print to stdout
+  binmode(STDOUT);
+  my $pdf = $writer->{pdf};
+  print $pdf->can('to_string') ? $pdf->to_string() : $pdf->stringify();
+}
+
+exit 0;
+
+sub usage {
+    print <<EOM;
+Usage:
+  $script_name [OPTIONS] my_sudokus.txt > my_sudokus.pdf
+  $script_name [OPTIONS] -i my_sudokus.txt -a my_sudokus.pdf
+  producer | $script_name [OPTIONS] > my_sudokus.pdf
+
+Read lines with sudoku puzzles from file(s) or pipe and turn them into a pdf file.
+The producer may be a generator like e.g. sudogen (see Games::Sudoku::PatternSolver) or a re-formatter.
+
+OPTIONS
+
+  -i  A text file with one sudoku puzzle per line to read from.
+      Reads from stdin if none was specified.
+
+  -D  The character used to separate the defining string of given clues from further parameters. Can be '|', ':', ';', ',' or 'T' (tab).
+      Default is the semikolon ';'.
+  -F  A string that specifies the order of parameters (line format), using the specified delimiter.
+      Default is 'C;D;X;J', where 
+          C is the 81 character string of clues (givens), empty cells denoted by '.', '0', ' '.
+          D is the descriptive text string to put in the bottom line under the puzzle.
+          X is an optional single, case-insensitive character of [x|h|p|c|d|a|g] that specifies the pattern of an extra region.
+          J is the optional 81 character string of dgits 1-9, denoting the sqiggly regions in a jigsaw sudoku.
+          See more on this in the documentation of Games::Sudoku::Pdf.
+
+  -o  A pdf file to write to.
+  -a  An existing pdf file to append to.
+
+  -P  Page format to use. Default is 'A4'.
+  -O  Page orientation, p(ortrait) or l(andscape). Default is the orientation associated with the format of -P.
+  -L  Puzzle layout per page. Default is '2x2'.
+  -T  Pdf info title.
+  -A  Pdf info author.
+  -S  Pdf info subject.
+  -K  Pdf info keywords.
+
+  -h  Display this help.
+
+Copyright (c) 2024 Steffen Heinrich. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+EOM
+    exit;
+}

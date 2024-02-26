@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::Git::Contributors; # git description: v0.035-12-gb31d49d
+package Dist::Zilla::Plugin::Git::Contributors; # git description: v0.036-4-gb6b1214
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Add contributor names from git to your distribution
 # KEYWORDS: plugin distribution metadata git contributors authors commits
 
-our $VERSION = '0.036';
+our $VERSION = '0.037';
 
 use Moose;
 with 'Dist::Zilla::Role::MetaProvider',
@@ -164,13 +164,24 @@ sub _build_contributors
             sub { lc $_[0] }    # not callable via \&CORE::lc
         };
 
-    # remove duplicates by email address, keeping the latest associated name
-    my $count = @counts_and_contributors;
-    @counts_and_contributors = uniq_by { $fc->(($_->[1] =~ /(<[^>]+>)/g)[-1]) } @counts_and_contributors;
+    my %seen_email;
+    ++$seen_email{$fc->(($_->[1] =~ /<([^>]+)>/g)[-1])} foreach @counts_and_contributors;
+    if (my @duplicate_emails = grep $seen_email{$_} > 1, keys %seen_email) {
+      $self->log('multiple names with the same email found: you may want to use a .mailmap file (https://www.kernel.org/pub/software/scm/git/docs/git-shortlog.html#_mapping_authors):',
+        join("\n", '', map '  '.$_, @duplicate_emails));
+    }
 
-    $self->log('multiple names with the same email found: you may want to use a .mailmap file (https://www.kernel.org/pub/software/scm/git/docs/git-shortlog.html#_mapping_authors)') if @counts_and_contributors != $count;
+    my %seen_name;
+    ++$seen_name{$fc->(($_->[1] =~ /^([^<]+) </g)[-1])} foreach @counts_and_contributors;
+    if (my @duplicate_names = grep $seen_name{$_} > 1, keys %seen_name) {
+      $self->log('multiple emails with the same name found: you may want to use a .mailmap file (https://www.kernel.org/pub/software/scm/git/docs/git-shortlog.html#_mapping_authors):',
+        join("\n", '', map '  '.$_, @duplicate_names));
+    }
 
-    # sort by name or count depending on choice (numeric descending, name ascending)
+    # remove duplicates by email address, keeping the first associated name
+    @counts_and_contributors = uniq_by { $fc->(($_->[1] =~ /<([^>]+)>/g)[-1]) } @counts_and_contributors;
+
+    # sort by name (ascending) or count (descending) depending on choice
     my $Collator = Unicode::Collate->new(level => 1);
 
     my $sort_sub =
@@ -285,7 +296,7 @@ Dist::Zilla::Plugin::Git::Contributors - Add contributor names from git to your 
 
 =head1 VERSION
 
-version 0.036
+version 0.037
 
 =head1 SYNOPSIS
 
@@ -428,7 +439,7 @@ L<http://dzil.org/#mailing-list>.
 There is also an irc channel available for users of this distribution, at
 L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
 
-I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.freenode.org>.
+I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
 
 =head1 AUTHOR
 

@@ -23,8 +23,9 @@ if(Math::Ryu::MAX_DEC_DIG == 17) {
   my $skip = 0;
   $skip =  1 if s2d(d2s($inf)) != $inf;
   if($skip) {
-  warn "\n   Be warned: s2d() does not handle inf or nan correctly !!\n",
-        "   DO NOT USE IT if non-finite values might be encountered\n";
+    # s2d() has now been amended and this warning should no longer appear
+    warn "\n   Be warned: s2d() does not handle inf or nan correctly !!\n",
+          "   DO NOT USE IT if non-finite values might be encountered\n";
   }
 
   for my $p (@range) {
@@ -43,6 +44,9 @@ if(Math::Ryu::MAX_DEC_DIG == 17) {
       cmp_ok(s2d(d2s($nv)), '==', $nv, sprintf("%.17g", $nv) . ": round trip succeeds");
     }
   }
+}
+else {
+  warn "\n   Skipping tests that were written exclusively for nvtype of 'double'\n";
 }
 
 ########################
@@ -69,6 +73,12 @@ if( $] >= 5.030 || $Config{nvtype} eq '__float128') {
       cmp_ok(nv2s($nv), '==', $nv, sprintf("%.17g", $nv) . ": round trip succeeds");
     }
   }
+}
+else {
+  warn "\n   Skipping tests that assume that perl assigns values correctly.\n",
+        "   This perl doesn't always do that\n";
+  # Run a least one test.
+  cmp_ok(1, '==', 1, "dummy test");
 }
 
 sub random_digits {

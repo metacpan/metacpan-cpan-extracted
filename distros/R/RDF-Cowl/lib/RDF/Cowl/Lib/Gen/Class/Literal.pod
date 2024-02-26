@@ -1,0 +1,166 @@
+# PODNAME: RDF::Cowl::Lib::Gen::Class::Literal
+# ABSTRACT: Generated docs for RDF::Cowl::Literal
+
+## DO NOT EDIT
+## Generated via maint/tt/Class.pod.tt
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+RDF::Cowl::Lib::Gen::Class::Literal - Generated docs for RDF::Cowl::Literal
+
+=head1 VERSION
+
+version 1.0.0
+
+=head1 MAIN MODULE
+
+L<RDF::Cowl::Literal>
+
+=head1 CONSTRUCTORS
+
+=head2 new
+
+B<Signature>:
+
+  RDF::Cowl::Literal->new(CowlString $value, Maybe[ CowlString ] $lang)
+
+B<Params>:
+
+  Maybe[ CowlDatatype ] $dt I<[optional]>
+  CowlString $value 
+  Maybe[ CowlString ] $lang I<[optional]>
+
+Documentation:
+
+  Returns a retained literal.
+  
+  @param dt [optional] The datatype.
+  @param value The value.
+  @param lang [optional] The language tag.
+  @return Retained literal. Throws exception on error.
+
+Throws exception on error.
+
+=over 2
+
+B<C function name>: C<< cowl_literal >>
+
+=back
+
+=head2 from_string
+
+B<Signature>:
+
+  RDF::Cowl::Literal->from_string(UString $value, Maybe[ UString ] $lang)
+
+B<Params>:
+
+  Maybe[ UString ] $dt I<[optional]>
+  UString $value 
+  Maybe[ UString ] $lang I<[optional]>
+
+Documentation:
+
+  Returns a retained literal given the string representations of its components.
+  
+  @param dt [optional] The datatype.
+  @param value The value.
+  @param lang [optional] The language tag.
+  @return Retained literal. Throws exception on error.
+
+Throws exception on error.
+
+=over 2
+
+B<C function name>: C<< cowl_literal_from_string >>
+
+=back
+
+=head1 METHODS
+
+=head2 get_datatype
+
+B<Signature>:
+
+  $self->get_datatype()
+
+B<Params>:
+
+  CowlLiteral $literal 
+
+Documentation:
+
+  Gets the datatype.
+  
+  @param literal The literal.
+  @return The datatype.
+
+=over 2
+
+B<C function name>: C<< cowl_literal_get_datatype >>
+
+=back
+
+=head2 get_value
+
+B<Signature>:
+
+  $self->get_value()
+
+B<Params>:
+
+  CowlLiteral $literal 
+
+Documentation:
+
+  Gets the value.
+  
+  @param literal The literal.
+  @return The value.
+
+=over 2
+
+B<C function name>: C<< cowl_literal_get_value >>
+
+=back
+
+=head2 get_lang
+
+B<Signature>:
+
+  $self->get_lang()
+
+B<Params>:
+
+  CowlLiteral $literal 
+
+Documentation:
+
+  Gets the language tag.
+  
+  @param literal The literal.
+  @return The language tag.
+
+=over 2
+
+B<C function name>: C<< cowl_literal_get_lang >>
+
+=back
+
+=head1 AUTHOR
+
+Zakariyya Mughal <zmughal@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 by Auto-Parallel Technologies, Inc..
+
+This is free software, licensed under Eclipse Public License - v 2.0.
+
+=cut

@@ -14,7 +14,7 @@ MarpaX::ESLIF::Value::Interface - MarpaX::ESLIF's value interface
 
 =head1 VERSION
 
-version 6.0.29
+version 6.0.33.3
 
 =head1 DESCRIPTION
 
@@ -119,6 +119,30 @@ Stores rule number. Always set in case of a rule callback, C<undef> otherwise.
 =item $valueInterface->setGrammar($grammar)
 
 Stores grammar instance.
+
+=back
+
+=head1 OPTIONAL METHODS SINCE VERSION 6.0.30
+
+=over
+
+=item $valueInterface->resolver($action)
+
+This method is I<not> required, and only necessary if you want to use callbacks without polluting a package stash.
+
+Value callbacks to perl are are resolved this way:
+
+=over
+
+=item
+
+If the resolved method exist, it is used to get the callback for a given action C<$action>.
+
+=item
+
+If the return value of the resolver is a code reference, it is used. Else it will be assumed that the callback is available in package's stash.
+
+=back
 
 =back
 

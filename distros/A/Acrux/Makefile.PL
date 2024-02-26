@@ -9,7 +9,8 @@ my $build_requires = {
 
 my $prereq_pm = {
         'Sys::Syslog'           => 0,
-        'Config::General'       => 2.00,    # Ubuntu = libconfig-general-perl       RGEL = perl-Config-General
+        'Config::General'       => 2.00,    # Ubuntu = libconfig-general-perl       RHEL = perl-Config-General
+        'Sub::Util'             => 1.41,
     };
 
 WriteMakefile(

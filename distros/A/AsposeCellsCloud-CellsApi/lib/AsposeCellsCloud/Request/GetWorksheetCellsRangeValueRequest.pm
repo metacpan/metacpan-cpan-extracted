@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,9 +59,9 @@ sub new {
 
 
 # Run Operation Request
-# GetWorksheetCellsRangeValueRequest.name : The workbook name.  ,
+# GetWorksheetCellsRangeValueRequest.name : The file name.  ,
 # GetWorksheetCellsRangeValueRequest.sheetName : The worksheet name.  ,
-# GetWorksheetCellsRangeValueRequest.namerange : range name.  ,
+# GetWorksheetCellsRangeValueRequest.namerange : The range name.  ,
 # GetWorksheetCellsRangeValueRequest.firstRow : Gets the index of the first row of the range.  ,
 # GetWorksheetCellsRangeValueRequest.firstColumn : Gets the index of the first columnn of the range.  ,
 # GetWorksheetCellsRangeValueRequest.rowCount : Gets the count of rows in the range.  ,
@@ -78,7 +78,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_cells_range_value' } = { 
-    	summary => 'Get the value of cells in range.',
+    	summary => 'Retrieve the values of cells within the specified range.',
         params => $params,
         returns => 'RangeValueResponse',
     };
@@ -155,7 +155,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -169,7 +169,7 @@ __PACKAGE__->method_documentation({
      'namerange' => {
      	datatype => 'string',
      	base_name => 'namerange',
-     	description => 'range name.',
+     	description => 'The range name.',
      	format => '',
      	read_only => '',
      		},

@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# PostWorkbookNameRequest.name : The workbook name.  ,
+# PostWorkbookNameRequest.name : The file name.  ,
 # PostWorkbookNameRequest.nameName : the Aspose.Cells.Name element name.  ,
-# PostWorkbookNameRequest.newName : new name.  ,
-# PostWorkbookNameRequest.folder : Original workbook folder.  ,
-# PostWorkbookNameRequest.storageName : Storage name.   
+# PostWorkbookNameRequest.newName : Namenew name.  ,
+# PostWorkbookNameRequest.folder : The folder where the file is situated.  ,
+# PostWorkbookNameRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_workbook_name' } = { 
-    	summary => 'Update workbook`s name.',
+    	summary => 'Update a named range in the workbook.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -137,7 +137,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -151,21 +151,21 @@ __PACKAGE__->method_documentation({
      'new_name' => {
      	datatype => 'Name',
      	base_name => 'newName',
-     	description => 'new name.',
+     	description => 'Namenew name.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

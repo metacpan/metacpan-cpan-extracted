@@ -1,5 +1,10 @@
 Revision history for SVGPDF
 
+0.086	2024-02-14
+
+	- Change font and text callback api to use hash parameter.
+	- Small doc/pod fixes.
+
 0.085	2024-01-29
 
 	- Fix some tests for longdouble perls.

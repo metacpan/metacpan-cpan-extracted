@@ -14,7 +14,7 @@ MarpaX::ESLIF::Introduction - MarpaX::ESLIF's Introduction
 
 =head1 VERSION
 
-version 6.0.29
+version 6.0.33.3
 
 =head1 DESCRIPTION
 
@@ -466,7 +466,7 @@ is setting an internal PCRE2 match limit to 15. The dump does not show that as a
 
 =back
 
-It is highly recommended to read the L<pcre2pattern|http://www.pcre.org/current/doc/html/pcre2pattern.html> documentation to know all the possible settings that can be I<embedded> into the regular expression. Explicit modifiers are insipired by the L<jpcre2|https://github.com/jpcre2/jpcre2> and L<Perl language|www.perl.org> (most of the descriptions below are copy/pasted from jpcre2). Please refer to L<MarpaX::ESLIF::BNF> for the exhaustive list of modifiers.
+It is highly recommended to read the L<pcre2pattern|http://www.pcre.org/current/doc/html/pcre2pattern.html> documentation to know all the possible settings that can be I<embedded> into the regular expression. Explicit modifiers are insipired by the L<jpcre2|https://github.com/jpcre2/jpcre2> and L<Perl language|http://www.perl.org> (most of the descriptions below are copy/pasted from jpcre2). Please refer to L<MarpaX::ESLIF::BNF> for the exhaustive list of modifiers.
 
 =back
 

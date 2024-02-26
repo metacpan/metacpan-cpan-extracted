@@ -1,0 +1,179 @@
+<h1 id="frequentlyaskedquestions">Frequently Asked Questions</h1>
+
+<h2 id="releasingonpgxn">Releasing on PGXN</h2>
+
+<dl>
+<dt><span id="extension"></span></dt>
+<dt>WTF is an “extension”?</dt>
+<dd>An extension is a piece of software that adds functionality to PostgreSQL
+itself. Examples are data types (<a href="https://www.postgresql.org/docs/current/citext.html">citext</a>, <a href="https://www.postgresql.org/docs/current/hstore.html">hstore</a>), utilities (<a href="https://www.postgresql.org/docs/current/dblink.html">dblink</a>,
+<a href="https://pgxn.org/extension/pgtap">pgTAP</a>), and procedural languages (<a href="https://www.postgresql.org/docs/current/plperl.html">PL/Perl</a>, <a href="https://github.com/postgres-plr/plr">PL/R</a>), among others. See
+<a href="https://www.postgresql.org/docs/current/extend.html">Extending SQL</a> for details.</dd>
+
+<dt><span id="allowed"></span></dt>
+<dt>What’s allowed to be released on PGXN?</dt>
+<dd>Open-source PostgreSQL extension release packages. The <a href="https://manager.pgxn.org/howto">How To</a> documents
+the contents of such packages. Following the <a href="https://www.cpan.org/misc/ZCAN.html">CPAN example</a>, “no commercial
+software of any kind, not even share/guilt/donateware, will be allowed…any
+other policy would be open to nitpicking, or maybe even legal challenges.”</dd>
+
+<dt><span id="notallowed"></span></dt>
+<dt>What’s not allowed to be released on PGXN?</dt>
+<dd>Non-package files (that is, files that are not tarballs, bzip-balls, or zip
+archives), closed-source distributions, and distributions with no license.</dd>
+
+<dt><span id="whocanrelease"></span></dt>
+<dt>Who can release on PGXN?</dt>
+<dd>Any registered user.</dd>
+
+<dt><span id="whocanregister"></span></dt>
+<dt>Who can register for PGXN?</dt>
+<dd>Anyone who applies. Such registrations will be approved by volunteers, but
+we’re usually pretty quick to respond to requests.</dd>
+
+<dt><span id="howtoapply"></span></dt>
+<dt>So how do I apply?</dt>
+<dd>Head on over to <a href="https://manager.pgxn.org/">PGXN Manager</a> and hit the “<a href="https://manager.pgxn.org/account/register">Request Account</a>” link. Once
+you’ve signed up, unless you’re obviously a <a href="https://en.wikipedia.org/wiki/Troll_(slang)">troll</a>, your account will be
+quickly approved.</dd>
+
+<dt><span id="releaseapproval"></span></dt>
+<dt>Okay, I have an account and want to release an extension. Is there a release</dt>
+<dt>approval process?</dt>
+<dd>Short answer: No, because PGXN needs to <a href="https://en.wikipedia.org/wiki/KISS_principle">KISS</a>. Longer answer: No. Again
+following the <a href="https://www.cpan.org/misc/ZCAN.html">CPAN example</a>, PGXN “is and will stay an open and free forum,
+where the authors decide what they upload. Any further selection belongs to
+different fora.” This is because “the first goal of PGXN is to make it easy
+to submit code and redistribute it. Ease of use and quality control are not
+the central problems ~[it~] tries to solve.” (Original quotation lost to
+time and internet entropy.) Frankly, moderation of releases is a significant
+reason that other communities have failed to duplicate the success of CPAN.</dd>
+
+<dt><span id="howto"></span></dt>
+<dt>Great, so how do I create an extension distribution and release it?</dt>
+<dd>Basically, you upload an archive file with a <a href="https://pgxn.org/spec/">META.json</a> file describing the
+distribution. Have a look at the <a href="https://manager.pgxn.org/howto">How To</a> for all the details.</dd>
+
+<dt><span id="github"></span></dt>
+<dt>I read that, but it seems like an awful lot of work for something that should be</dt>
+<dt>automated. Is there any way I can automatically have my extension appear on PGXN</dt>
+<dt>when I make a release on GitHub?</dt>
+<dd><p>Yes! You can use the <a href="https://github.com/pgxn/docker-pgxn-tools">pgxn-tools</a> Docker image as part of your release
+workflows. It supports both testing an extension with multiple versions of
+Postgres, as well as releasing extensions on GitHub and PGXN. For details,
+check out these blog posts:</p>
+
+<ul>
+<li><a href="https://justatheory.com/2020/06/test-extensions-with-github-actions/">Test Postgres Extensions With GitHub Actions</a></li>
+<li><a href="https://justatheory.com/2020/10/release-postgres-extensions-with-github-actions/">Automate Postgres Extension Releases on GitHub and PGXN</a></li>
+</ul></dd>
+
+<dt><span id="maillist"></dt>
+<dt>Is there some place I can go to ask questions and get help from like-minded PGXN</dt>
+<dt>contributors?</dt>
+<dd>Yes, there is a <a href="https://groups.google.com/group/pgxn-users">Google Group</a> for this very purpose. Join us!</dd>
+
+<dt><span id="goodbadugly"></span></dt>
+<dt>How does PGXN make it easy to distinguish the garbage from the viable</dt>
+<dt>extensions?</dt>
+<dd>The first step is the PGXN search engine, accessible via the <a href="https://pgxn.org/">home page</a>,
+which will allow you to find extensions relevant to you and to read their
+documentation. This will “often ~[be~] enough to distinguish the good stuff
+from the crap,” as <a href="https://www.postgresql.org/message-id/603c8f071001061718t40e42609y59a26165bb72ff01@mail.gmail.com">Robert Haas says</a>. As more extensions are released on
+PGXN with competing features and functionality, the addition of ratings
+features and dedicated testing will also make it easier to evaluate
+competing options.</dd>
+</dl>
+
+<h2 id="pgxnclient">PGXN Client</h2>
+
+<dl>
+<dt><span id="commandlineclient"></span></dt>
+<dt>Is there a command-line client for installing extensions from PGXN?</dt>
+<dd><p>There is! Install it with this command:</p>
+
+<pre><code class="sh">sudo easy_install pgxnclient
+</code></pre>
+
+<p>If you use <a href="https://brew.sh">Homebrew</a>:</p>
+
+<pre><code class="sh">brew install pgxnclient
+</code></pre>
+
+<p>Then you can install PGXN extensions with a simple command:</p>
+
+<pre><code class="sh">pgxn install pair
+</code></pre>
+
+<p>Run <code>pgxn help</code> to get a list of supported commands; or check out the
+introductory <a href="https://blog.pgxn.org/post/5026314153/writing-a-client-for-pgxn">blog</a> <a href="https://blog.pgxn.org/post/5118152273/new-release-for-the-pgxn-client">posts</a>, the <a href="https://pgxn.github.io/pgxnclient/">complete documentation</a> or the <a href="https://github.com/pgxn/pgxnclient">source
+code</a>.</p></dd>
+
+<dt><span id="howclientworks"></span></dt>
+<dt>How does the command-line client work?</dt>
+<dd>It uses JSON-based API available on every PGXN mirror to find, download,
+build, and install extensions. It relies on <a href="https://www.postgresql.org/docs/current/extend-pgxs.html">PGXS</a> to do the heavy lifting
+to build extensions.</dd>
+
+<dt><span id="clientwindows"></span></dt>
+<dt>What about Windows?</dt>
+<dd>The PGXN client follows the lead of the PostgreSQL core on installing
+extensions. If support for installing extensions on Windows improves such
+that a compiler is no longer required, the PGXN client will be modified as
+appropriate to take advantage of it. This applies not specifically to
+Windows, but to the ability of the core installer (or any future
+community-supported installer) to work on <em>any</em> platform.</dd>
+
+<dt><span id="clientsecurity"></span></dt>
+<dt>What kind of security does PGXN have?</dt>
+<dd>Each release package has an accompanying SHA1 hash that the PGXN client
+verifies before installing an extension.</dd>
+</dl>
+
+<h2 id="contributingtopgxn">Contributing to PGXN</h2>
+
+<dl>
+<dt><span id="license"></span></dt>
+<dt>Under what license is PGXN’s source code distributed?</dt>
+<dd><a href="https://www.postgresql.org/about/licence/">The PostgreSQL License</a>. Note that the actual extensions themselves may be
+under any open source license, determined by their authors.</dd>
+
+<dt><span id="contribute"></span></dt>
+<dt>Can other people contribute to PGXN?</dt>
+<dd>Definitely! Contributions and help with refining the specification are very
+welcome. Major code contributions may be funded out of the PGXN fund based
+on circumstances. Any contributions must be submitted under The PostgreSQL
+License.</dd>
+
+<dt><span id="mirroring"></span></dt>
+<dt>What about mirroring? Can I create a PGXN mirror?</dt>
+<dd>Absolutely! See <a href="https://pgxn.org/mirroring/">mirroring</a> for the details.</dd>
+
+<dt><span id="owners"></span></dt>
+<dt>Who owns and runs PGXN?</dt>
+<dd>Currently, PGXN is hosted on a box owned by <a href="https://www.depesz.com">depesz</a>. Eventually it may run
+on community servers, as the PostgreSQL.org Web Team determines. Or it may
+end up on one or more servers to be contributed to the <a href="https://www.postgresql.org/about/policies/funds-group/">PostgreSQL Funds
+Group</a>. In any case, the PGXN master index and server will always be
+contributed to the PostgreSQL community.</dd>
+
+<dt><span id="source"></span></dt>
+<dt>Where is the PGXN source code hosted?</dt>
+<dd><a href="https://github.com/pgxn/">On GitHub</a>. Please feel free to fork and send pull requests!</dd>
+
+<dt><span id="language"></span></dt>
+<dt>What language is PGXN written in?</dt>
+<dd>Mostly Perl. The database used by <a href="https://manager.pgxn.org/">PGXN Manager</a> is written in SQL,
+PL/pgSQL, and PL/Perl — and even uses <a href="https://pgxn.org/extension/semver">semver</a>, a <a href="https://semver.org/">semantic version</a> data
+type written in C and distributed right here on PGXN!</dd>
+
+<dt><span id="api"></span></dt>
+<dt>Is there an API?</dt>
+<dd>Yes! The <a href="https://github.com/pgxn/pgxn-api/wiki/">PGXN API</a> provides centralized index and API of distribution
+metadata, as well as the search APIs used here.</dd>
+
+<dt><span id="logos"></span></dt>
+<dt>Is the PGXN logo available for use?</dt>
+<dd>Yes, see <a href="https://pgxn.org/art/">identity</a> for the license details and downloadable artwork.</dd>
+</dl>
+

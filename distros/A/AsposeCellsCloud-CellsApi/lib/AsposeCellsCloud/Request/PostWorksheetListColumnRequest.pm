@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,13 +59,13 @@ sub new {
 
 
 # Run Operation Request
-# PostWorksheetListColumnRequest.name : The workbook name.  ,
+# PostWorksheetListColumnRequest.name : The file name.  ,
 # PostWorksheetListColumnRequest.sheetName : The worksheet name.  ,
-# PostWorksheetListColumnRequest.listObjectIndex : List object index.  ,
+# PostWorksheetListColumnRequest.listObjectIndex : The list object index.  ,
 # PostWorksheetListColumnRequest.columnIndex : Represents table column index.  ,
 # PostWorksheetListColumnRequest.listColumn : Represents table column description.  ,
-# PostWorksheetListColumnRequest.folder : Original workbook folder.  ,
-# PostWorksheetListColumnRequest.storageName : Storage name.   
+# PostWorksheetListColumnRequest.folder : The folder where the file is situated.  ,
+# PostWorksheetListColumnRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -76,7 +76,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_worksheet_list_column' } = { 
-    	summary => 'Update list column properties.',
+    	summary => 'Update list column in list object.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -151,7 +151,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -165,7 +165,7 @@ __PACKAGE__->method_documentation({
      'list_object_index' => {
      	datatype => 'int',
      	base_name => 'listObjectIndex',
-     	description => 'List object index.',
+     	description => 'The list object index.',
      	format => '',
      	read_only => '',
      		},
@@ -186,14 +186,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

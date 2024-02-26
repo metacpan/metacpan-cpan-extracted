@@ -3,7 +3,7 @@ abstract: 'Read/write blocked GZIP (BGZF) files'
 author:
   - 'Jeremy Volkening <volkening@cpan.org>'
 build_requires:
-  Test::Exception: '0'
+  Test::Fatal: '0'
   Test::More: '0'
 configure_requires:
   Config: '0'
@@ -18,7 +18,7 @@ name: Compress-BGZF
 provides:
   Compress::BGZF:
     file: lib/Compress/BGZF.pm
-    version: '0.007'
+    version: '0.007001'
   Compress::BGZF::Reader:
     file: lib/Compress/BGZF/Reader.pm
   Compress::BGZF::Writer:
@@ -31,5 +31,5 @@ requires:
 resources:
   license: http://www.gnu.org/licenses/gpl-3.0.txt
   repository: https://github.com/jvolkening/p5-Compress-BGZF
-version: '0.007'
+version: '0.007001'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

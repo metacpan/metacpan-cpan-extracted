@@ -16,7 +16,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::Exception" : "0",
+            "Test::Fatal" : "0",
             "Test::More" : "0"
          }
       },
@@ -38,7 +38,7 @@
    "provides" : {
       "Compress::BGZF" : {
          "file" : "lib/Compress/BGZF.pm",
-         "version" : "0.007"
+         "version" : "0.007001"
       },
       "Compress::BGZF::Reader" : {
          "file" : "lib/Compress/BGZF/Reader.pm"
@@ -56,6 +56,6 @@
          "url" : "https://github.com/jvolkening/p5-Compress-BGZF"
       }
    },
-   "version" : "0.007",
+   "version" : "0.007001",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

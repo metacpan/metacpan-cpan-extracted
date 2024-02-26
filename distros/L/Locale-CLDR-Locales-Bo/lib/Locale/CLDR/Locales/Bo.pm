@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Bo - Package for language Tibetan
 
 package Locale::CLDR::Locales::Bo;
 # This file auto generated from Data\common\main\bo.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -203,7 +203,7 @@ has 'display_name_region' => (
  			'GT' => 'གྷོ་ཊེ་མ་ལ།',
  			'GW' => 'གྷི་ནི་ཡ་བིས྄་སོ།',
  			'GY' => 'གྷུ་ཡཱ་ན།',
- 			'HK@alt=short' => 'ཧོང་ཀོང༌།',
+ 			'HK' => 'ཧོང་ཀོང༌།',
  			'HN' => 'ཧོན་དུ་རས྄།',
  			'HR' => 'ཀུརོ་ཤི་ཡ།',
  			'HT' => 'ཧེ་ཏི།',
@@ -246,7 +246,7 @@ has 'display_name_region' => (
  			'ML' => 'མ་ལི།',
  			'MM' => 'འབར་མ།',
  			'MN' => 'སོག་ཡུལ།',
- 			'MO@alt=short' => 'མེ་ཀའོ།',
+ 			'MO' => 'མེ་ཀའོ།',
  			'MR' => 'མཽ་རི་ཏ་ནི་ཡ།',
  			'MT' => 'མལ་ཊ།',
  			'MU' => 'མཽ་རིཤས྄།',
@@ -355,7 +355,7 @@ has 'characters' => (
 		return {
 			auxiliary => qr{[ༀ]},
 			index => ['ཀ', 'ཁ', 'ག', 'ང', 'ཅ', 'ཆ', 'ཇ', 'ཉ', 'ཏ', 'ཐ', 'ད', 'ན', 'པ', 'ཕ', 'བ', 'མ', 'ཙ', 'ཚ', 'ཛ', 'ཝ', 'ཞ', 'ཟ', 'འ', 'ཡ', 'ར', 'ལ', 'ཤ', 'ས', 'ཧ', 'ཨ'],
-			main => qr{[྄ ཿ ཀ {ཀྵ} ཁ ག {གྷ} ང ཅ ཆ ཇ ཉ ཏ ཊ ཐ ཋ ད {དྷ} ཌ {ཌྷ} ན ཎ པ ཕ བ {བྷ} མ ཾ ཙ ཚ ཛ {ཛྷ} ཝ ཞ ཟ འ ཡ ར ཪ ལ ཤ ཥ ས ཧ ཨ ི {ཱི} ྀ {ཱྀ} ུ {ཱུ} ེ ཻ ོ ཽ ྐ {ྐྵ} ྑ ྒ {ྒྷ} ྔ ྕ ྖ ྗ ྙ ྟ ྚ ྠ ྛ ྡ {ྡྷ} ྜ {ྜྷ} ྣ ྞ ྤ ྥ ྦ {ྦྷ} ྨ ྩ ྪ ྫ {ྫྷ} ྭ ྺ ྮ ྯ ྰ ྱ ྻ ྲ ྼ ླ ྴ ྵ ྶ ྷ ྸ {ྲྀ} ཷ {ླྀ} ཹ]},
+			main => qr{[྄ཿ ཀ {ཀྵ} ཁ ག {གྷ} ང ཅ ཆ ཇ ཉ ཏ ཊ ཐ ཋ ད {དྷ} ཌ {ཌྷ} ན ཎ པ ཕ བ {བྷ} མ ཾ ཙ ཚ ཛ {ཛྷ} ཝ ཞ ཟ འ ཡ རཪ ལ ཤ ཥ ས ཧ ཨ ི {ཱི} ྀ {ཱྀ} ུ {ཱུ} ེ ཻ ོ ཽ ྐ {ྐྵ} ྑ ྒ {ྒྷ} ྔ ྕ ྖ ྗ ྙ ྟ ྚ ྠ ྛ ྡ {ྡྷ} ྜ {ྜྷ} ྣ ྞ ྤ ྥ ྦ {ྦྷ} ྨ ྩ ྪ ྫ {ྫྷ} ྭ ྺ ྮ ྯ ྰ ྱ ྻ ྲ ྼ ླ ྴ ྵ ྶ ྷ ྸ {ྲྀ} ཷ {ླྀ} ཹ]},
 			numbers => qr{[\- ‑ , . % ‰ + 0༠ 1༡ 2༢ 3༣ 4༤ 5༥ 6༦ 7༧ 8༨ 9༩]},
 			punctuation => qr{[\: ། ་]},
 		};
@@ -381,13 +381,6 @@ has 'nostr' => (
 	default		=> sub { qr'^(?i:མིན།|N)$' }
 );
 
-has 'default_numbering_system' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> 'latn',
-);
-
 has native_numbering_system => (
 	is			=> 'ro',
 	isa			=> Str,
@@ -400,54 +393,10 @@ has 'number_symbols' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'latn' => {
-			'decimal' => q(.),
-			'group' => q(,),
-			'nan' => q(NaN),
-		},
 		'tibt' => {
 			'nan' => q(ཨང་མེན་),
 		},
 	} }
-);
-
-has 'number_formats' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		decimalFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0.###',
-				},
-			},
-		},
-		percentFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0%',
-				},
-			},
-		},
-} },
-);
-
-has 'number_currency_formats' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'latn' => {
-			'pattern' => {
-				'default' => {
-					'standard' => {
-						'positive' => '¤ #,##0.00',
-					},
-				},
-			},
-		},
-} },
 );
 
 has 'currencies' => (
@@ -567,15 +516,6 @@ has 'calendar_days' => (
 						sat => 'སྤེན་པ་',
 						sun => 'ཉི་མ་'
 					},
-					narrow => {
-						mon => 'ཟླ',
-						tue => 'མིག',
-						wed => 'ལྷག',
-						thu => 'ཕུར',
-						fri => 'སངས',
-						sat => 'སྤེན',
-						sun => 'ཉི'
-					},
 					wide => {
 						mon => 'གཟའ་ཟླ་བ་',
 						tue => 'གཟའ་མིག་དམར་',
@@ -587,15 +527,6 @@ has 'calendar_days' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						mon => 'ཟླ་བ་',
-						tue => 'མིག་དམར་',
-						wed => 'ལྷག་པ་',
-						thu => 'ཕུར་བུ་',
-						fri => 'པ་སངས་',
-						sat => 'སྤེན་པ་',
-						sun => 'ཉི་མ་'
-					},
 					narrow => {
 						mon => 'ཟླ',
 						tue => 'མིག',
@@ -604,15 +535,6 @@ has 'calendar_days' => (
 						fri => 'སངས',
 						sat => 'སྤེན',
 						sun => 'ཉི'
-					},
-					wide => {
-						mon => 'གཟའ་ཟླ་བ་',
-						tue => 'གཟའ་མིག་དམར་',
-						wed => 'གཟའ་ལྷག་པ་',
-						thu => 'གཟའ་ཕུར་བུ་',
-						fri => 'གཟའ་པ་སངས་',
-						sat => 'གཟའ་སྤེན་པ་',
-						sun => 'གཟའ་ཉི་མ་'
 					},
 				},
 			},
@@ -626,23 +548,6 @@ has 'calendar_quarters' => (
 	default		=> sub { {
 			'gregorian' => {
 				'format' => {
-					abbreviated => {0 => 'དུས་ཚིགས་དང་པོ།',
-						1 => 'དུས་ཚིགས་གཉིས་པ།',
-						2 => 'དུས་ཚིགས་གསུམ་པ།',
-						3 => 'དུས་ཚིགས་བཞི་པ།'
-					},
-					wide => {0 => 'དུས་ཚིགས་དང་པོ།',
-						1 => 'དུས་ཚིགས་གཉིས་པ།',
-						2 => 'དུས་ཚིགས་གསུམ་པ།',
-						3 => 'དུས་ཚིགས་བཞི་པ།'
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {0 => 'དུས་ཚིགས་དང་པོ།',
-						1 => 'དུས་ཚིགས་གཉིས་པ།',
-						2 => 'དུས་ཚིགས་གསུམ་པ།',
-						3 => 'དུས་ཚིགས་བཞི་པ།'
-					},
 					wide => {0 => 'དུས་ཚིགས་དང་པོ།',
 						1 => 'དུས་ཚིགས་གཉིས་པ།',
 						2 => 'དུས་ཚིགས་གསུམ་པ།',
@@ -661,10 +566,6 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'am' => q{སྔ་དྲོ་},
-					'pm' => q{ཕྱི་དྲོ་},
-				},
-				'wide' => {
 					'am' => q{སྔ་དྲོ་},
 					'pm' => q{ཕྱི་དྲོ་},
 				},

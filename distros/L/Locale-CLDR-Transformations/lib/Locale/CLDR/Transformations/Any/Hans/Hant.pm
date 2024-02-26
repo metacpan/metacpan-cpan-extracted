@@ -1,12 +1,12 @@
 package Locale::CLDR::Transformations::Any::Hans::Hant;
 # This file auto generated from Data\common\transforms\Simplified-Traditional.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -4630,8 +4630,134 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(五脏),
+					result  => q(五臟),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(六脏),
+					result  => q(六臟),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(内脏),
+					result  => q(內臟),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(心脏),
+					result  => q(心臟),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(牝脏),
+					result  => q(牝臟),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(肝脏),
+					result  => q(肝臟),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(肺脏),
+					result  => q(肺臟),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(肾脏),
+					result  => q(腎臟),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(胃脏),
+					result  => q(胃臟),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(胰脏),
+					result  => q(胰臟),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(脏器),
+					result  => q(臟器),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(脏毒),
+					result  => q(臟毒),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(脏气),
+					result  => q(臟氣),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(脏症),
+					result  => q(臟症),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(脏腑),
+					result  => q(臟腑),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(脏象),
+					result  => q(臟象),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(脏躁),
+					result  => q(臟躁),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(脾脏),
+					result  => q(脾臟),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(脏),
-					result  => q(臟),
+					result  => q(髒),
 					revisit => 0,
 				},
 				{
@@ -25240,20 +25366,6 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(龟),
 					result  => q(龜),
-					revisit => 0,
-				},
-				{
-					before  => q(),
-					after   => q(),
-					replace => q(“),
-					result  => q(「),
-					revisit => 0,
-				},
-				{
-					before  => q(),
-					after   => q(),
-					replace => q(”),
-					result  => q(」),
 					revisit => 0,
 				},
 			]

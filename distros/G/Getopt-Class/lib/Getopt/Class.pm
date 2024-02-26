@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Getopt::Long with Class - ~/lib/Getopt/Class.pm
-## Version v0.104.3
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v1.0.0
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/04/25
-## Modified 2024/02/06
+## Modified 2024/02/23
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -27,7 +27,7 @@ BEGIN
     use Module::Generic::Scalar;
     use Nice::Try;
     use Scalar::Util;
-    our $VERSION = 'v0.104.3';
+    our $VERSION = 'v1.0.0';
 };
 
 use strict;
@@ -228,7 +228,9 @@ sub init
         {
             $suff = '=s%';
         }
-        elsif( $def->{type} eq 'array' || $def->{type} eq 'file-array' )
+        elsif( $def->{type} eq 'array' || 
+            $def->{type} eq 'file-array' ||
+            $def->{type} eq 'uri-array' )
         {
             $suff = '=s@';
             $opts->{ $k2_under } = [] unless( length( $def->{default} ) );
@@ -258,7 +260,7 @@ sub init
         {
             $suff = '=i';
         }
-        elsif( $def->{type} eq 'decimal' )
+        elsif( $def->{type} eq 'decimal' || $def->{type} eq 'float' || $def->{type} eq 'number' )
         {
             $suff .= '=f';
         }
@@ -273,6 +275,10 @@ sub init
             $opts->{ $k2_under } = $def->{code};
         }
         elsif( $def->{type} eq 'file' )
+        {
+            $suff = '=s';
+        }
+        elsif( $def->{type} eq 'uri' )
         {
             $suff = '=s';
         }
@@ -624,6 +630,21 @@ sub postprocess
             }
             $opts->{ $k } = $arr;
         }
+        elsif( $def->{type} eq 'uri' )
+        {
+            my $uri_class = exists( $def->{package} ) ? $def->{package} : 'URI';
+            $opts->{ $k } = $uri_class->new( $opts->{ $k } );
+        }
+        elsif( $def->{type} eq 'uri-array' )
+        {
+            my $uri_class = exists( $def->{package} ) ? $def->{package} : 'URI';
+            my $arr = Module::Generic::Array->new;
+            foreach( @{$opts->{ $k }} )
+            {
+                push( @$arr, $uri_class->new( $_ ) );
+            }
+            $opts->{ $k } = $arr;
+        }
    }
    return( $self );
 }
@@ -693,6 +714,7 @@ sub init
 
 sub verbose { return( shift->_set_get_number( 'verbose', @_ ) ); }
 
+# NOTE: AUTOLOAD
 AUTOLOAD
 {
     my( $method ) = our $AUTOLOAD =~ /([^:]+)$/;
@@ -720,6 +742,7 @@ AUTOLOAD
         return( $self->_set_get_boolean( $f, @_ ) );
     }
     elsif( $def->{type} eq 'string' ||
+        $def->{type} eq 'scalar' ||
         Scalar::Util::reftype( $self->{ $f } ) eq 'SCALAR' )
     {
         return( $self->_set_get_scalar_as_object( $f, @_ ) );
@@ -746,6 +769,59 @@ AUTOLOAD
     elsif( $def->{type} eq 'code' )
     {
         return( $self->_set_get_code( $f, @_ ) );
+    }
+    elsif( $def->{type} eq 'file' )
+    {
+        return( $self->_set_get_file( $f, @_ ) );
+    }
+    elsif( $def->{type} eq 'file-array' )
+    {
+        if( @_ )
+        {
+            my $arr = Module::Generic::Array->new;
+            foreach( @_ )
+            {
+                push( @$arr, file( $_ ) );
+            }
+            $self->{ $f } = $arr;
+        }
+        return( $self->_set_get_array_as_object( $f ) );
+    }
+    elsif( $def->{type} eq 'uri' )
+    {
+        my $uri_class = exists( $def->{package} ) ? $def->{package} : 'URI';
+        return( $self->_set_get_uri( { field => $f, class => $uri_class }, @_ ) );
+    }
+    elsif( $def->{type} eq 'uri-array' )
+    {
+        my $uri_class = exists( $def->{package} ) ? $def->{package} : 'URI';
+        if( @_ )
+        {
+            my $arr = Module::Generic::Array->new;
+            foreach( @_ )
+            {
+                push( @$arr, $uri_class->new( $_ ) );
+            }
+            $self->{ $f } = $arr;
+        }
+        return( $self->_set_get_uri( { field => $f, class => $uri_class } ) );
+    }
+    elsif( $def->{type} eq 'uri' )
+    {
+        return( $self->_set_get_uri( $f, @_ ) );
+    }
+    elsif( $def->{type} eq 'uri-array' )
+    {
+        if( @_ )
+        {
+            my $arr = Module::Generic::Array->new;
+            foreach( @_ )
+            {
+                push( @$arr, file( $_ ) );
+            }
+            $self->{ $f } = $arr;
+        }
+        return( $self->_set_get_array_as_object( $f ) );
     }
     else
     {
@@ -1099,6 +1175,8 @@ Getopt::Class - Extended dictionary version of Getopt::Long
         age             => { type => 'integer', class => [qw(person)], name => 'age', },
         path            => { type => 'file' },
         skip            => { type => 'file-array' },
+        url             => { type => 'uri', package => 'URI' },
+        urls            => { type => 'uri-array', package => 'URI::Fast' },
     };
     
     # Assuming command line arguments like:
@@ -1137,7 +1215,7 @@ Getopt::Class - Extended dictionary version of Getopt::Long
 
 =head1 VERSION
 
-    v0.104.3
+    v1.0.0
 
 =head1 DESCRIPTION
 
@@ -1208,26 +1286,6 @@ A string to be used to set an error by L</"check_class_data">. Typically the str
     currency => { type => 'string', class => [qw(product)], name => 'currency', re => qr/^[a-z]{3}$/, error => "must be a three-letter iso 4217 value" },
     };
 
-=item * C<file>
-
-This type will mark the value as a directory or file path and will become a L<Module::Generic::File> object.
-
-This is particularly convenient when the user provided you with a relative path, such as:
-
-    ./my_prog.pl --debug 3 --path ./here/
-
-And if you are not very careful and inadvertently change directory like when using L<File::Find>, then this relative path could lead to some unpleasant surprise.
-
-Setting this argument type to C<file> ensure the resulting value is a L<Module::Generic::File>, whose underlying file or directory will be resolved to their absolute path.
-
-=item * C<file-array>
-
-Same as I<file> argument type, but allows multiple value saved as an array. For example:
-
-    ./my_prog.pl --skip ./not/here ./avoid/me/ ./skip/this/directory
-
-This would result in the option property I<skip> being an L<array object|Module::Generic::Array> containing 3 entries.
-
 =item * C<max>
 
 This is well explained in L<Getopt::Long/"Options with multiple values">
@@ -1262,17 +1320,15 @@ This is an alternative to the L</"required"> method which is used at an earlier 
 
 =item * C<type>
 
-Type can be C<array>, C<boolean>, C<code>, C<datetime>, C<decimal>, C<file>, C<hash>, C<integer>, C<string>, C<string-hash>
+Supported types are:
 
-Type C<hash> is convenient for free key-value pair such as:
+=over 12
 
-    --define customer_id=10 --define transaction_id 123
+=item * C<array>
 
-would result for C<define> with an anonymous hash as value containing C<customer_id> with value C<10> and C<transaction_id> with value C<123>
+This type will set the resulting value to be a L<Module::Generic::Array> object of values provided.
 
-Type code implies an anonymous sub routine and should be accompanied with the attribute I<code>, such as:
-
-    { type => 'code', code => sub{ pod2usage(1); exit( 0 ) }, alias => '?', action => 1 },
+=item * C<boolean>
 
 If type is C<boolean> and the key is either C<with>, C<without>, C<enable>, C<disable>, their counterpart will automatically be available as well, such as you can do, as show in the excerpt in the synopsis above:
 
@@ -1288,6 +1344,80 @@ Be careful though. If, in your dictionary, as shown in the synopsis, you defined
     {
         # Do something else
     }
+
+=item * C<code>
+
+Type code implies an anonymous sub routine and should be accompanied with the attribute I<code>, such as:
+
+    { type => 'code', code => sub{ pod2usage(1); exit( 0 ) }, alias => '?', action => 1 },
+
+=item * C<datetime>
+
+This type will set the resulting value to be a L<DateTime> object of the value provided.
+
+=item * C<decimal>
+
+This type will set the resulting value to be a L<Module::Generic::Number> object of the value provided.
+
+=item * C<file>
+
+This type will mark the value as a directory or file path and will become a L<Module::Generic::File> object.
+
+This is particularly convenient when the user provided you with a relative path, such as:
+
+    ./my_prog.pl --debug 3 --path ./here/
+
+And if you are not very careful and inadvertently change directory like when using L<File::Find>, then this relative path could lead to some unpleasant surprise.
+
+Setting this argument type to C<file> ensure the resulting value is a L<Module::Generic::File>, whose underlying file or directory will be resolved to their absolute path.
+
+=item * C<file-array>
+
+Same as C<file> argument type, but allows multiple value saved as an array. For example:
+
+    ./my_prog.pl --skip ./not/here ./avoid/me/ ./skip/this/directory
+
+This would result in the option property C<skip> being an L<array object|Module::Generic::Array> containing 3 entries.
+
+=item * C<hash>
+
+Type C<hash> is convenient for free key-value pair such as:
+
+    --define customer_id=10 --define transaction_id 123
+
+would result for C<define> with an anonymous hash as value containing C<customer_id> with value C<10> and C<transaction_id> with value C<123>
+
+=item * C<integer>
+
+This type will set the resulting value to be a L<Module::Generic::Number> object of the value provided.
+
+=item * C<scalar>
+
+This type will set the resulting value to be a L<Module::Generic::Scalar> object of the value provided.
+
+=item * C<string>
+
+Same as C<scalar>. This type will set the resulting value to be a L<Module::Generic::Scalar> object of the value provided.
+
+=item * C<string-hash>
+
+=item * C<uri>
+
+This type will mark the value as a directory or file path and will become a L<URI> object, by default.
+
+You can override this default pacage, by using C<package> property, such as:
+
+    url => { type => 'uri', package => 'URI' }
+
+=item * C<uri-array>
+
+Same as C<uri> argument type, but allows multiple value saved as an array. For example:
+
+    ./my_prog.pl --uris https://example.com/some/where https://example.com/some/where/else
+
+This would result in the option property C<uris> being an L<array object|Module::Generic::Array> containing 2 entries.
+
+=back
 
 Also as seen in the example above, you can add additional properties to be used in your program, here such as C<action> that could be used to identify all options that are used to trigger an action or a call to a sub routine.
 

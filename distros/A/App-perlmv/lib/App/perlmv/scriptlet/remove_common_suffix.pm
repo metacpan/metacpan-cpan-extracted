@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-15'; # DATE
+our $DATE = '2023-11-17'; # DATE
 our $DIST = 'App-perlmv'; # DIST
-our $VERSION = '0.608'; # VERSION
+our $VERSION = '0.609'; # VERSION
 
 our $SCRIPTLET = {
     summary => q[Remove suffix that are common to all args, while preserving extension, e.g. (1-radiolab.mp3, 2-radiolab.mp3) -> (1.mp3, 2.mp3)],
@@ -48,7 +48,7 @@ App::perlmv::scriptlet::remove_common_suffix - Remove suffix that are common to 
 
 =head1 VERSION
 
-This document describes version 0.608 of App::perlmv::scriptlet::remove_common_suffix (from Perl distribution App-perlmv), released on 2023-07-15.
+This document describes version 0.609 of App::perlmv::scriptlet::remove_common_suffix (from Perl distribution App-perlmv), released on 2023-11-17.
 
 =head1 HOMEPAGE
 

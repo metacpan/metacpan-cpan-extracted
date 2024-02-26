@@ -258,13 +258,34 @@ const char* const* SPVM_OP_C_ID_NAMES(void) {
 
 SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP* op_type, SPVM_OP* op_block, SPVM_OP* op_list_attributes, SPVM_OP* op_extends) {
   
-  const char* basic_type_name = op_type->uv.type->unresolved_basic_type_name;
+  const char* basic_type_name;
+  
+  // Anon class
+  if (strstr(compiler->current_outer_class_name, "eval::anon::")) {
+    if (op_type) {
+      SPVM_COMPILER_error(compiler, "An anon class cannot have its class name.\n  at %s line %d", op_class->file, op_class->line);
+      return op_class;
+    }
+    
+    basic_type_name = compiler->current_outer_class_name;
+    
+    SPVM_OP* op_name_basic_type = SPVM_OP_new_op_name(compiler, basic_type_name, op_class->file, op_class->line);
+    op_type = SPVM_OP_build_basic_type(compiler, op_name_basic_type);
+  }
+  // Class
+  else {
+    basic_type_name = op_type->uv.type->unresolved_basic_type_name;
+  }
   
   SPVM_TYPE* type = op_type->uv.type;
   
   SPVM_BASIC_TYPE* basic_type = SPVM_HASH_get(compiler->basic_type_symtable, basic_type_name, strlen(basic_type_name));
   if (!basic_type) {
     basic_type = SPVM_COMPILER_add_basic_type(compiler, basic_type_name);
+    
+    SPVM_BASIC_TYPE* outer_basic_type = SPVM_HASH_get(compiler->basic_type_symtable, basic_type_name, strlen(basic_type_name));
+    
+    assert(outer_basic_type);
   }
   
   type->basic_type = basic_type;
@@ -274,7 +295,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
   
   type->basic_type->class_dir = compiler->current_class_dir;
   type->basic_type->class_rel_file = compiler->current_class_rel_file;
-  type->basic_type->class_file = compiler->current_file;
+  type->basic_type->file = compiler->current_file;
   
   if (op_extends) {
     SPVM_OP* op_type_parent_basic_type = op_extends->first;
@@ -294,7 +315,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
     SPVM_STRING_new(compiler, type->basic_type->class_dir, strlen(type->basic_type->class_dir));
   }
   SPVM_STRING_new(compiler, type->basic_type->class_rel_file, strlen(type->basic_type->class_rel_file));
-  SPVM_STRING_new(compiler, type->basic_type->class_file, strlen(type->basic_type->class_file));
+  SPVM_STRING_new(compiler, type->basic_type->file, strlen(type->basic_type->file));
   
   // Assert
   SPVM_BASIC_TYPE* found_basic_type = SPVM_HASH_get(compiler->basic_type_symtable, basic_type_name, strlen(basic_type_name));

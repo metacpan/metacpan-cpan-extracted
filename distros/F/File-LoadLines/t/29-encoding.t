@@ -55,3 +55,5 @@ $options = {};
 @lines = loadlines( encode_utf8($lines[0]), $options );
 is( $options->{encoding}, "ASCII", "returned encoding 2" );
 is( $lines[0], $reftext, "correct data 2" );
+
+unlink(encode_utf8($filename));

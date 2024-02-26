@@ -1,18 +1,20 @@
 package Module::FeaturesUtil::Get;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-31'; # DATE
-our $DIST = 'Module-FeaturesUtil-Get'; # DIST
-our $VERSION = '0.005'; # VERSION
-
 use strict 'subs', 'vars';
 use warnings;
 
 use Exporter 'import';
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-11-11'; # DATE
+our $DIST = 'Module-FeaturesUtil-Get'; # DIST
+our $VERSION = '0.006'; # VERSION
+
 our @EXPORT_OK = qw(
                        get_feature_set_spec
                        get_features_decl
                        get_feature_val
+                       get_feature_defhash
                        module_declares_feature
                );
 
@@ -81,17 +83,27 @@ sub get_feature_val {
     my ($module_name, $feature_set_name, $feature_name) = @_;
 
     my $features_decl = get_features_decl($module_name);
-    return undef unless $features_decl->{features}{$feature_set_name};
+    return undef unless $features_decl->{features}{$feature_set_name}; ## no critic: Subroutines::ProhibitExplicitReturnUndef
 
     my $val0 = $features_decl->{features}{$feature_set_name}{$feature_name};
     return ref $val0 eq 'HASH' ? $val0->{value} : $val0;
+}
+
+sub get_feature_defhash {
+    my ($module_name, $feature_set_name, $feature_name) = @_;
+
+    my $features_decl = get_features_decl($module_name);
+    return undef unless $features_decl->{features}{$feature_set_name}; ## no critic: Subroutines::ProhibitExplicitReturnUndef
+
+    my $hash0 = $features_decl->{features}{$feature_set_name}{$feature_name};
+    return ref $hash0 eq 'HASH' ? $hash0 : {value=>$hash0};
 }
 
 sub module_declares_feature {
     my ($module_name, $feature_set_name, $feature_name) = @_;
 
     my $features_decl = get_features_decl($module_name);
-    return undef unless $features_decl->{features}{$feature_set_name};
+    return undef unless $features_decl->{features}{$feature_set_name}; ## no critic: Subroutines::ProhibitExplicitReturnUndef
 
     exists $features_decl->{features}{$feature_set_name}{$feature_name};
 }
@@ -111,13 +123,14 @@ Module::FeaturesUtil::Get - Get a feature from a module (following Module::Featu
 
 =head1 VERSION
 
-This document describes version 0.005 of Module::FeaturesUtil::Get (from Perl distribution Module-FeaturesUtil-Get), released on 2021-07-31.
+This document describes version 0.006 of Module::FeaturesUtil::Get (from Perl distribution Module-FeaturesUtil-Get), released on 2023-11-11.
 
 =head1 SYNOPSIS
 
  use Module::FeaturesUtil::Get qw(
      get_features_decl
      get_feature_val
+     get_feature_defhash
      module_declares_feature
  );
 
@@ -188,6 +201,20 @@ Features declaration is retrieved using L</get_features_decl>.
 This routine will also NOT check the validity of feature value against the
 specification's schema.
 
+=head2 get_feature_defhash
+
+Usage:
+
+ my $defhash = get_feature_defhash($module_name, $feature_set_name, $feature_name);
+
+Example:
+
+ $defhash = get_feature_defhash('Text::Table::Sprintf', 'TextTable', 'can_halign'; # => {value=>1, summary=>'Only support l (left) and r (right), not c (center)'}
+
+Get a single feature declaration defhash.
+
+Features declaration is retrieved using L</get_features_decl>.
+
 =head2 module_declares_feature
 
 Usage:
@@ -208,14 +235,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Module-Fea
 
 Source repository is at L<https://github.com/perlancar/perl-Module-FeaturesUtil-Get>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Module-FeaturesUtil-Get>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Module::Features>
@@ -229,11 +248,37 @@ C<check_feature_set_spec>.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Module-FeaturesUtil-Get>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

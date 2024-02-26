@@ -7,9 +7,9 @@ package Require::HookChain::log::stderr;
 # END IFUNBUILT
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-23'; # DATE
+our $DATE = '2023-12-05'; # DATE
 our $DIST = 'Require-HookChain'; # DIST
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 sub new {
     my ($class) = @_;
@@ -42,7 +42,7 @@ Require::HookChain::log::stderr - Log a message to STDERR
 
 =head1 VERSION
 
-This document describes version 0.015 of Require::HookChain::log::stderr (from Perl distribution Require-HookChain), released on 2023-07-23.
+This document describes version 0.016 of Require::HookChain::log::stderr (from Perl distribution Require-HookChain), released on 2023-12-05.
 
 =head1 SYNOPSIS
 

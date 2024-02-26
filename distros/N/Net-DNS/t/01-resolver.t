@@ -1,10 +1,10 @@
 #!/usr/bin/perl
-# $Id: 01-resolver.t 1959 2024-01-17 08:55:01Z willem $	-*-perl-*-
+# $Id: 01-resolver.t 1965 2024-02-14 09:19:32Z willem $	-*-perl-*-
 #
 
 use strict;
 use warnings;
-use Test::More tests => 36;
+use Test::More tests => 38;
 use TestToolkit;
 
 use Net::DNS::Resolver;
@@ -69,8 +69,10 @@ $resolver->nameservers();		## exercise UDP failure path
 ok( !$resolver->send('.'), 'no UDP nameservers' );
 
 $resolver->nameservers(@NOIP);
-ok( !$resolver->send('.'),   '$resolver->send	UDP socket error' );
+ok( !$resolver->send('.'),   '$resolver->send UDP socket error' );
 ok( !$resolver->bgsend('.'), '$resolver->bgsend UDP socket error' );
+ok( !$resolver->bgbusy(),    '$resolver->bgbusy undefined handle' );
+ok( !$resolver->_bgread(),   '$resolver->_bgread undefined handle' );
 
 
 $resolver->usevc(1);			## exercise TCP failure path

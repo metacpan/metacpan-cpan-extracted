@@ -3,9 +3,9 @@ package App::TextTableUtils;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-10'; # DATE
+our $DATE = '2023-12-03'; # DATE
 our $DIST = 'App-TextTableUtils'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 1;
 # ABSTRACT: CLI utilities related to text tables
@@ -22,7 +22,7 @@ App::TextTableUtils - CLI utilities related to text tables
 
 =head1 VERSION
 
-This document describes version 0.009 of App::TextTableUtils (from Perl distribution App-TextTableUtils), released on 2023-03-10.
+This document describes version 0.010 of App::TextTableUtils (from Perl distribution App-TextTableUtils), released on 2023-12-03.
 
 =head1 DESCRIPTION
 

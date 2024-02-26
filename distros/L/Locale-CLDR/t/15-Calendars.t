@@ -107,22 +107,22 @@ $date_format = $locale->date_format_short;
 is($date_format, 'M/d/yy', 'Date Format Short');
 
 my $time_format = $locale->time_format_full;
-is($time_format, 'h:mm:ss a zzzz', 'Time Format Full');
+is($time_format, 'h:mm:ss a zzzz', 'Time Format Full');
 $time_format = $locale->time_format_long;
-is($time_format, 'h:mm:ss a z', 'Time Format Long');
+is($time_format, 'h:mm:ss a z', 'Time Format Long');
 $time_format = $locale->time_format_medium;
-is($time_format, 'h:mm:ss a', 'Time Format Medium');
+is($time_format, 'h:mm:ss a', 'Time Format Medium');
 $time_format = $locale->time_format_short;
-is($time_format, 'h:mm a', 'Time Format Short');
+is($time_format, 'h:mm a', 'Time Format Short');
 
 my $date_time_format = $locale->datetime_format_full;
-is($date_time_format, "EEEE, MMMM d, y 'at' h:mm:ss a zzzz", 'Date Time Format Full');
+is($date_time_format, "EEEE, MMMM d, y, h:mm:ss a zzzz", 'Date Time Format Full');
 $date_time_format = $locale->datetime_format_long;
-is($date_time_format, "MMMM d, y 'at' h:mm:ss a z", 'Date Time Format Long');
+is($date_time_format, "MMMM d, y, h:mm:ss a z", 'Date Time Format Long');
 $date_time_format = $locale->datetime_format_medium;
-is($date_time_format, 'MMM d, y, h:mm:ss a', 'Date Time Format Medium');
+is($date_time_format, 'MMM d, y, h:mm:ss a', 'Date Time Format Medium');
 $date_time_format = $locale->datetime_format_short;
-is($date_time_format, 'M/d/yy, h:mm a', 'Date Time Format Short');
+is($date_time_format, 'M/d/yy, h:mm a', 'Date Time Format Short');
 
 is ($locale->prefers_24_hour_time(), 0, 'Prefers 24 hour time');
 is ($locale->first_day_of_week(), 7, 'First day of week recoded for DateTime');

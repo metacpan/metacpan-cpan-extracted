@@ -1,3 +1,18 @@
+0.008   2023-11-11  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild with newer Pod::Weaver::Plugin::Module::Features to
+          render can_halign feature's summary.
+
+
+0.007   2023-11-11  Released-By: PERLANCAR; Urgency: medium
+
+        - Support 'align' parameter (only left and right alignment).
+
+        - [doc] Fix typo in option name (separate_rows, not separate_row).
+
+
 0.006   2022-01-07  Released-By: PERLANCAR; Urgency: medium
 
 	- Support option: separate_rows.

@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Result::JSON;
 # ABSTRACT: JSON/REST result handler
-$Neo4j::Driver::Result::JSON::VERSION = '0.44';
+$Neo4j::Driver::Result::JSON::VERSION = '0.45';
 
 # This package is not part of the public Neo4j::Driver API.
 
@@ -14,6 +14,7 @@ use parent 'Neo4j::Driver::Result';
 
 use Carp qw(carp croak);
 our @CARP_NOT = qw(Neo4j::Driver::Net::HTTP);
+use JSON::MaybeXS 1.002004 ();
 use Try::Tiny;
 
 use URI 1.31;
@@ -21,7 +22,7 @@ use URI 1.31;
 use Neo4j::Error;
 
 
-my ($TRUE, $FALSE);
+my ($FALSE, $TRUE) = Neo4j::Driver::Result->_bool_values;
 
 my $MEDIA_TYPE = "application/json";
 my $ACCEPT_HEADER = "$MEDIA_TYPE";
@@ -31,8 +32,6 @@ my $ACCEPT_HEADER_POST = "$MEDIA_TYPE;q=0.5";
 sub new {
 	# uncoverable pod (private method)
 	my ($class, $params) = @_;
-	
-	($TRUE, $FALSE) = @{ $params->{http_agent}->json_coder->decode('[true,false]') } unless $TRUE;
 	
 	my $json = $class->_parse_json($params);
 	
@@ -238,10 +237,10 @@ sub _deep_bless {
 		return $data;
 	}
 	
-	if (ref $data eq '' && ref $rest eq '') {  # scalar
-		return $data;
+	if (JSON::MaybeXS::is_bool($data) && JSON::MaybeXS::is_bool($rest)) {  # boolean
+		return $data ? $TRUE : $FALSE;
 	}
-	if ( $data == $TRUE && $rest == $TRUE || $data == $FALSE && $rest == $FALSE ) {  # boolean
+	if (ref $data eq '' && ref $rest eq '') {  # scalar
 		return $data;
 	}
 	

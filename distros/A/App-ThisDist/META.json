@@ -58,11 +58,11 @@
    "provides" : {
       "App::ThisDist" : {
          "file" : "lib/App/ThisDist.pm",
-         "version" : "0.022"
+         "version" : "0.023"
       },
       "App::ThisMod" : {
          "file" : "lib/App/ThisMod.pm",
-         "version" : "0.022"
+         "version" : "0.023"
       }
    },
    "release_status" : "stable",
@@ -77,7 +77,7 @@
          "web" : "https://github.com/perlancar/perl-App-ThisDist"
       }
    },
-   "version" : "0.022",
+   "version" : "0.023",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038002"

@@ -1,67 +1,14 @@
-package Mojolicious::Plugin::Config::Structured;
-$Mojolicious::Plugin::Config::Structured::VERSION = '1.003';
-# ABSTRACT: Mojolicious Plugin for Config::Structured: locates and reads config and definition files and loads them into a Config::Structured instance, made available globally as 'conf'
+package Mojolicious::Plugin::Config::Structured 1.004;
+use v5.22;
+use warnings;
 
-use 5.022;
-
-use Mojo::Base 'Mojolicious::Plugin', -signatures;
-use Config::Structured;
-
-use Readonly;
-
-Readonly::Scalar our $PERIOD => q{.};
-
-Readonly::Scalar our $CONF_FILE_SUFFIX => q{conf};
-Readonly::Scalar our $DEF_FILE_SUFFIX  => q{def};
-
-sub register ($self, $app, $params) {
-  my @search = (
-    $params->{config_file},
-    $app->home->child(join($PERIOD, $app->moniker, $app->mode, $CONF_FILE_SUFFIX))->to_string,
-    $app->home->child(join($PERIOD, $app->moniker, $CONF_FILE_SUFFIX))->to_string
-  );
-  my ($conf_file) = grep {defined && -r -f} @search;    #get the first existent, readable file
-  unless (defined($conf_file)) {
-    $app->log->error('[Config::Structured] Initializing with empty configuration');
-  }
-
-  @search =
-    ($params->{structure_file}, $app->home->child(join($PERIOD, $app->moniker, $CONF_FILE_SUFFIX, $DEF_FILE_SUFFIX))->to_string);
-  my ($def_file) = grep {defined && -r -f} @search;
-  unless (defined($def_file) && -r -f $def_file) {
-    $app->log->error("[Config::Structured] No configuration definition found (tried to read from `$def_file`)");
-  }
-
-  my $conf = Config::Structured->new(
-    config    => $conf_file,
-    structure => $def_file,
-    hooks     => $params->{hooks},
-  )->__register_default;
-
-  $app->helper(
-    conf => sub {
-      return $conf;
-    }
-  );
-
-  return;
-}
-
-1;
-
-__END__
-
-=pod
+# ABSTRACT: Mojolicious Plugin for Config::Structured: provides Mojo app access to structured configuration data
 
 =encoding UTF-8
 
 =head1 NAME
 
-Mojolicious::Plugin::Config::Structured - Mojolicious Plugin for Config::Structured: locates and reads config and definition files and loads them into a Config::Structured instance, made available globally as 'conf'
-
-=head1 VERSION
-
-version 1.003
+Mojolicious::Plugin::Config::Structured - provides Mojo app access to structured configuration data
 
 =head1 SYNOPSIS
 
@@ -78,44 +25,113 @@ version 1.003
 
 =head1 DESCRIPTION
 
-Initializes L<Config::Structured> from two files:
+Mojolicious Plugin for L<Config::Structured>: locates and reads config and definition files and loads them into a 
+Config::Structured instance, made available globally via the C<conf> method.
 
-=over
+=cut
 
-=item C<definition> 
+use Mojo::Base 'Mojolicious::Plugin';
 
-pulled from $app_home/$moniker.conf.def
+use Config::Structured;
+use Readonly;
 
-=item C<config_values> 
+use experimental qw(signatures);
 
-pulled from the first existent, readable file from:
+Readonly::Scalar our $PERIOD           => q{.};
+Readonly::Scalar our $CONF_FILE_SUFFIX => q{conf};
+Readonly::Scalar our $DEF_FILE_SUFFIX  => q{def};
 
-  config_file parameter value
-
-  $app_home/$moniker.$mode.conf
-
-  $app_home/$moniker.conf
-
-These files are expected to contain perl hashref structures
-
-=back
+=pod
 
 =head1 METHODS
 
-=head2 conf()
+L<Mojolicious::Plugin::Config::Structured> inherits all methods from L<Mojolicious::Plugin> and implements the following
+new ones
 
-Returns an L<Config::Structured> instance initialized to the root of the 
-configuration definition
+=head2 register
+
+    $plugin->register(Mojolicious->new, [structure_file => $struct_fn,] [config_file => $config_file])
+
+Register plugin in L<Mojolicious> application. C<structure_file> is the filesystem path of the file that defines the 
+configuration definition. If omitted, a sane default is used (C<./{app}.conf.def>) relative to the mojo app home.
+
+C<config_file> is the filesystem path of the file that provides the active configuration. If omitted, a sane default is
+used (C<./{app}.{mode}.conf> or C<./{app}.conf>)
+
+=cut
+
+sub register ($self, $app, $params) {
+  my @search =
+    ($params->{structure_file}, $app->home->child(join($PERIOD, $app->moniker, $CONF_FILE_SUFFIX, $DEF_FILE_SUFFIX))->to_string);
+  my ($def_file) = grep {defined && -r -f} @search;    #get the first existing, readable file
+  unless (defined($def_file) && -r -f $def_file) {
+    $app->log->error(sprintf('[Config::Structured] No configuration structure found (tried to read from `%s`)', $def_file // ''));
+    die("[Config::Structured] Cannot continue without a valid conf structure");
+  }
+
+  @search = (
+    $params->{config_file},
+    $app->home->child(join($PERIOD, $app->moniker, $app->mode, $CONF_FILE_SUFFIX))->to_string,
+    $app->home->child(join($PERIOD, $app->moniker, $CONF_FILE_SUFFIX))->to_string
+  );
+  my ($conf_file) = grep {defined && -r -f} @search;    #get the first existing, readable file
+  unless (defined($conf_file)) {
+    $app->log->warn('[Config::Structured] Initializing with empty configuration');
+    $conf_file = {};
+  }
+
+  my $conf = Config::Structured->new(
+    config    => $conf_file,
+    structure => $def_file,
+    hooks     => $params->{hooks},
+  )->__register_default;
+
+=pod
+
+=head2 conf
+
+This method is used to access the loaded configuration from within the Mojo 
+application. Returns the root L<Config::Structured> instance.
+
+=cut
+
+  $app->helper(
+    conf => sub {
+      return $conf;
+    }
+  );
+
+  return;
+}
 
 =head1 AUTHOR
 
-Mark Tyrrell <mtyrrell@concertpharma.com>
+Mark Tyrrell C<< <mark@tyrrminal.dev> >>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE
 
-This software is copyright (c) 2019 by Concert Pharmaceuticals, Inc.
+Copyright (c) 2024 Mark Tyrrell
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
 =cut
+
+1;
+
+__END__

@@ -16,4 +16,4 @@ my $opt = { fail => "soft" };
 my @lines = loadlines( "a hopefully not existing file", $opt );
 is( scalar(@lines), 0, "no lines" );
 ok( $opt->{error}, "error ok" );
-diag("Error message: $opt->{error}");
+note("Error message: $opt->{error}");

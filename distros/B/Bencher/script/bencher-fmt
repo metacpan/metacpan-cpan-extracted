@@ -9,9 +9,9 @@ use Function::Fallback::CoreOrPP qw(clone);
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-30'; # DATE
+our $DATE = '2024-02-19'; # DATE
 our $DIST = 'Bencher'; # DIST
-our $VERSION = '1.062.2'; # VERSION
+our $VERSION = '1.062.4'; # VERSION
 
 our %SPEC;
 
@@ -19,7 +19,7 @@ $SPEC{format_result} = do {
     my $meta = clone($Bencher::Backend::SPEC{format_result});
 
     # currently we only use default formatters, but we will allow this
-    delete $meta->{args}{formatters};
+    #delete $meta->{args}{formatters};
 
     $meta->{args}{envres}{cmdline_src} = 'stdin_or_file';
 
@@ -56,7 +56,7 @@ bencher-fmt - Format bencher result
 
 =head1 VERSION
 
-This document describes version 1.062.2 of bencher-fmt (from Perl distribution Bencher), released on 2022-11-30.
+This document describes version 1.062.4 of bencher-fmt (from Perl distribution Bencher), released on 2024-02-19.
 
 =head1 SYNOPSIS
 
@@ -84,6 +84,8 @@ Can also be specified as the 1st command-line argument.
 
 Exclude Formatters specification.
 
+Can also be specified as the 4th command-line argument.
+
 Can be specified multiple times.
 
 =item B<--exclude-formatters-json>=I<s>
@@ -91,6 +93,22 @@ Can be specified multiple times.
 Exclude Formatters specification (JSON-encoded).
 
 See C<--exclude-formatter>.
+
+Can also be specified as the 4th command-line argument.
+
+=item B<--formatters-json>=I<s>
+
+Formatters specification (JSON-encoded).
+
+See C<--formatters>.
+
+Can also be specified as the 2nd command-line argument.
+
+=item B<--formatters>=I<s>*
+
+Formatters specification.
+
+Can also be specified as the 2nd command-line argument.
 
 =item B<--options-json>=I<s>
 
@@ -277,7 +295,7 @@ For fish and zsh, install L<shcompgen> as described above.
 
 This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
 
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/bencher-fmt.conf>, F</home/u1/bencher-fmt.conf>, or F</etc/bencher-fmt.conf>.
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/s1/.config/bencher-fmt.conf>, F</home/s1/bencher-fmt.conf>, or F</etc/bencher-fmt.conf>.
 
 All found files will be read and merged.
 
@@ -309,6 +327,7 @@ List of available configuration parameters:
  envres (see --envres)
  exclude_formatters (see --exclude-formatter)
  format (see --format)
+ formatters (see --formatters)
  naked_res (see --naked-res)
  options (see --options)
 
@@ -320,9 +339,9 @@ String. Specify additional command-line options.
 
 =head1 FILES
 
-=head2 /home/u1/.config/bencher-fmt.conf
+=head2 /home/s1/.config/bencher-fmt.conf
 
-=head2 /home/u1/bencher-fmt.conf
+=head2 /home/s1/bencher-fmt.conf
 
 =head2 /etc/bencher-fmt.conf
 
@@ -358,7 +377,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

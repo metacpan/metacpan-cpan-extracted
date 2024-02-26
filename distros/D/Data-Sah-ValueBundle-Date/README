@@ -3,9 +3,9 @@ NAME
     times)
 
 VERSION
-    This document describes version 0.002 of Data::Sah::ValueBundle::Date
+    This document describes version 0.003 of Data::Sah::ValueBundle::Date
     (from Perl distribution Data-Sah-ValueBundle-Date), released on
-    2023-03-30.
+    2023-12-09.
 
 HOMEPAGE
     Please visit the project's homepage at

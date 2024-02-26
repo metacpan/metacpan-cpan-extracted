@@ -24,6 +24,8 @@ WriteMakefile(
     'Text::CSV' => 0,
     'Excel::Writer::XLSX' => 0,
     'Test::Fatal' => 0,
+    'Pod::Simple::Text' => 0,
+    'Pod::Simple::HTML' => 0,
   },
   BUILD_REQUIRES => {
     'CPAN::Uploader' => 0

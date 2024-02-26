@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Gu - Package for language Gujarati
 
 package Locale::CLDR::Locales::Gu;
 # This file auto generated from Data\common\main\gu.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -24,22 +24,6 @@ use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
 extends('Locale::CLDR::Locales::Root');
-# Need to add code for Key type pattern
-sub display_name_pattern {
-	my ($self, $name, $region, $script, $variant) = @_;
-
-	my $display_pattern = '{0} ({1})';
-	$display_pattern =~s/\{0\}/$name/g;
-	my $subtags = join '{0}, {1}', grep {$_} (
-		$region,
-		$script,
-		$variant,
-	);
-
-	$display_pattern =~s/\{1\}/$subtags/g;
-	return $display_pattern;
-}
-
 has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
@@ -65,6 +49,7 @@ has 'display_name_language' => (
  				'am' => 'એમ્હારિક',
  				'an' => 'અર્ગોનીઝ',
  				'ang' => 'જુની અંગ્રેજી',
+ 				'ann' => 'ઓબોલો',
  				'anp' => 'અંગીકા',
  				'ar' => 'અરબી',
  				'ar_001' => 'મોડર્ન સ્ટાન્ડર્ડ અરબી',
@@ -72,12 +57,14 @@ has 'display_name_language' => (
  				'arn' => 'મેપુચે',
  				'arp' => 'અરાપાહો',
  				'arq' => 'આલ્જેરિયન અરબી',
+ 				'ars' => 'નજદી અરેબિક',
  				'arw' => 'અરાવક',
  				'ary' => 'મોરોક્કન અરબી',
  				'arz' => 'ઈજિપ્શિયન અરબી',
  				'as' => 'આસામી',
  				'asa' => 'અસુ',
  				'ast' => 'અસ્તુરિયન',
+ 				'atj' => 'એટીકામેકવ',
  				'av' => 'અવેરિક',
  				'awa' => 'અવધી',
  				'ay' => 'આયમારા',
@@ -93,6 +80,7 @@ has 'display_name_language' => (
  				'bem' => 'બેમ્બા',
  				'bez' => 'બેના',
  				'bg' => 'બલ્ગેરિયન',
+ 				'bgc' => 'હરયાણવી',
  				'bgn' => 'પશ્ચિમી બાલોચી',
  				'bho' => 'ભોજપુરી',
  				'bi' => 'બિસ્લામા',
@@ -114,6 +102,7 @@ has 'display_name_language' => (
  				'ca' => 'કતલાન',
  				'cad' => 'કડ્ડો',
  				'car' => 'કરિબ',
+ 				'cay' => 'કેયુગા',
  				'cch' => 'અત્સમ',
  				'ccp' => 'ચકમા',
  				'ce' => 'ચેચન',
@@ -130,13 +119,23 @@ has 'display_name_language' => (
  				'chr' => 'શેરોકી',
  				'chy' => 'શેયેન્ન',
  				'ckb' => 'સેન્ટ્રલ કુર્દિશ',
+ 				'ckb@alt=menu' => 'કુર્દિશ, સેન્ટ્રલ',
+ 				'ckb@alt=variant' => 'કુર્દિશ, સોરાની',
+ 				'clc' => 'ચિલકોટિન',
  				'co' => 'કોર્સિકન',
  				'cop' => 'કોપ્ટિક',
  				'cr' => 'ક્રી',
+ 				'crg' => 'મિચિફ',
  				'crh' => 'ક્રિમિયન તુર્કી',
+ 				'crj' => 'દક્ષિણ પૂર્વ ક્રી',
+ 				'crk' => 'પ્લેઇન્સ ક્રી',
+ 				'crl' => 'ઉત્તરી પૂર્વ ક્રી',
+ 				'crm' => 'મૂઝ ક્રી',
+ 				'crr' => 'કેરોલિના એલ્ગોનક્વિઅન',
  				'crs' => 'સેસેલ્વા ક્રેઓલે ફ્રેન્ચ',
  				'cs' => 'ચેક',
  				'csb' => 'કાશુબિયન',
+ 				'csw' => 'સ્વેમ્પી ક્રી',
  				'cu' => 'ચર્ચ સ્લાવિક',
  				'cv' => 'ચૂવાશ',
  				'cy' => 'વેલ્શ',
@@ -200,10 +199,10 @@ has 'display_name_language' => (
  				'frc' => 'કાજૂન ફ્રેન્ચ',
  				'frm' => 'મિડિલ ફ્રેંચ',
  				'fro' => 'જૂની ફ્રેંચ',
- 				'frr' => 'ઉત્તરીય ફ્રિશિયન',
+ 				'frr' => 'ઉત્તરી ફ્રિશિયન',
  				'frs' => 'પૂર્વ ફ્રિશિયન',
  				'fur' => 'ફ્રિયુલિયાન',
- 				'fy' => 'પશ્ચિમી ફ્રિસિયન',
+ 				'fy' => 'પશ્ચિમિ ફ્રિશિયન',
  				'ga' => 'આઇરિશ',
  				'gaa' => 'ગા',
  				'gag' => 'ગાગાઝ',
@@ -232,8 +231,10 @@ has 'display_name_language' => (
  				'ha' => 'હૌસા',
  				'hai' => 'હૈડા',
  				'haw' => 'હવાઇયન',
+ 				'hax' => 'દક્ષિણ હૈડા',
  				'he' => 'હીબ્રુ',
  				'hi' => 'હિન્દી',
+ 				'hi_Latn@alt=variant' => 'હિંગ્લિશ',
  				'hif' => 'ફીજી હિંદી',
  				'hil' => 'હિલિગેનોન',
  				'hit' => 'હિટ્ટિતે',
@@ -244,6 +245,7 @@ has 'display_name_language' => (
  				'ht' => 'હૈતિઅન ક્રેઓલે',
  				'hu' => 'હંગેરિયન',
  				'hup' => 'હૂપા',
+ 				'hur' => 'હેલ્કોમેલેમ',
  				'hy' => 'આર્મેનિયન',
  				'hz' => 'હેરેરો',
  				'ia' => 'ઇંટરલિંગુઆ',
@@ -254,6 +256,7 @@ has 'display_name_language' => (
  				'ig' => 'ઇગ્બો',
  				'ii' => 'સિચુઆન યી',
  				'ik' => 'ઇનુપિયાક',
+ 				'ikt' => 'પશ્ચિમ કેનેડિયન ઇનુકિટ્યુટ',
  				'ilo' => 'ઇલોકો',
  				'inh' => 'ઇંગુશ',
  				'io' => 'ઈડો',
@@ -280,6 +283,7 @@ has 'display_name_language' => (
  				'kea' => 'કાબુવર્ડિઆનુ',
  				'kfo' => 'કોરો',
  				'kg' => 'કોંગો',
+ 				'kgp' => 'કૈંગાંગ',
  				'kha' => 'ખાસી',
  				'kho' => 'ખોતાનીસ',
  				'khq' => 'કોયરા ચિનિ',
@@ -310,6 +314,7 @@ has 'display_name_language' => (
  				'kut' => 'કુતેનાઇ',
  				'kv' => 'કોમી',
  				'kw' => 'કોર્નિશ',
+ 				'kwk' => 'ક્વેકવાલા',
  				'ky' => 'કિર્ગીઝ',
  				'la' => 'લેટિન',
  				'lad' => 'લાદીનો',
@@ -321,6 +326,7 @@ has 'display_name_language' => (
  				'lfn' => 'લિંગ્વા ફેન્કા નોવા',
  				'lg' => 'ગાંડા',
  				'li' => 'લિંબૂર્ગિશ',
+ 				'lil' => 'લિલુએટ',
  				'lkt' => 'લાકોટા',
  				'ln' => 'લિંગાલા',
  				'lo' => 'લાઓ',
@@ -328,6 +334,7 @@ has 'display_name_language' => (
  				'lou' => 'લ્યુઇસિયાના ક્રેઓલ',
  				'loz' => 'લોઝી',
  				'lrc' => 'ઉત્તરી લુરી',
+ 				'lsm' => 'સામિયા',
  				'lt' => 'લિથુઆનિયન',
  				'lu' => 'લૂબા-કટાંગા',
  				'lua' => 'લૂબા-લુલુઆ',
@@ -361,6 +368,7 @@ has 'display_name_language' => (
  				'mn' => 'મોંગોલિયન',
  				'mnc' => 'માન્ચુ',
  				'mni' => 'મણિપુરી',
+ 				'moe' => 'ઇન્નુ-આયમુન',
  				'moh' => 'મોહૌક',
  				'mos' => 'મોસ્સી',
  				'mr' => 'મરાઠી',
@@ -408,6 +416,11 @@ has 'display_name_language' => (
  				'nzi' => 'ન્ઝિમા',
  				'oc' => 'ઓક્સિટન',
  				'oj' => 'ઓજિબ્વા',
+ 				'ojb' => 'ઉત્તરપશ્ચિમી ઓઝિબવે',
+ 				'ojc' => 'સેન્ટ્રલ ઓઝિબ્વા',
+ 				'ojs' => 'ઓજી-ક્રી',
+ 				'ojw' => 'પશ્ચિમી ઓઝિબ્વા',
+ 				'oka' => 'ઓકાનાગન',
  				'om' => 'ઓરોમો',
  				'or' => 'ઉડિયા',
  				'os' => 'ઓસ્સેટિક',
@@ -423,8 +436,10 @@ has 'display_name_language' => (
  				'peo' => 'જૂની ફારસી',
  				'phn' => 'ફોનિશિયન',
  				'pi' => 'પાલી',
+ 				'pis' => 'પિજિન',
  				'pl' => 'પોલીશ',
  				'pon' => 'પોહપિએન',
+ 				'pqm' => 'મલિસીટ-પાસમાક્વોડ્ડી',
  				'prg' => 'પ્રુસ્સીયન',
  				'pro' => 'જુની પ્રોવેન્સલ',
  				'ps' => 'પશ્તો',
@@ -475,6 +490,7 @@ has 'display_name_language' => (
  				'sid' => 'સિદામો',
  				'sk' => 'સ્લોવૅક',
  				'sl' => 'સ્લોવેનિયન',
+ 				'slh' => 'દક્ષિણ લુશુટસીડ',
  				'sm' => 'સામોન',
  				'sma' => 'દક્ષિણી સામી',
  				'smj' => 'લુલે સામી',
@@ -491,6 +507,7 @@ has 'display_name_language' => (
  				'ss' => 'સ્વાતી',
  				'ssy' => 'સાહો',
  				'st' => 'દક્ષિણ સોથો',
+ 				'str' => 'સ્ટ્રેટ્સ સેલિશ',
  				'su' => 'સંડેનીઝ',
  				'suk' => 'સુકુમા',
  				'sus' => 'સુસુ',
@@ -502,6 +519,7 @@ has 'display_name_language' => (
  				'syc' => 'પરંપરાગત સિરિએક',
  				'syr' => 'સિરિએક',
  				'ta' => 'તમિલ',
+ 				'tce' => 'દક્ષિણ ટુચૉન',
  				'tcy' => 'તુલુ',
  				'te' => 'તેલુગુ',
  				'tem' => 'ટિમ્ને',
@@ -509,7 +527,9 @@ has 'display_name_language' => (
  				'ter' => 'તેરેનો',
  				'tet' => 'તેતુમ',
  				'tg' => 'તાજીક',
+ 				'tgx' => 'ટાગિશ',
  				'th' => 'થાઈ',
+ 				'tht' => 'તહલતાન',
  				'ti' => 'ટાઇગ્રિનિયા',
  				'tig' => 'ટાઇગ્રે',
  				'tiv' => 'તિવ',
@@ -517,17 +537,19 @@ has 'display_name_language' => (
  				'tkl' => 'તોકેલાઉ',
  				'tl' => 'ટાગાલોગ',
  				'tlh' => 'ક્લિન્ગોન',
- 				'tli' => 'ક્લીન્ગકિટ',
+ 				'tli' => 'ટ્લિંગિટ',
  				'tmh' => 'તામાશેખ',
  				'tn' => 'ત્સ્વાના',
  				'to' => 'ટોંગાન',
  				'tog' => 'ન્યાસા ટોન્ગા',
+ 				'tok' => 'ટોકી પોના',
  				'tpi' => 'ટોક પિસિન',
  				'tr' => 'ટર્કિશ',
  				'trv' => 'ટારોકો',
  				'ts' => 'સોંગા',
  				'tsi' => 'સિમ્શિયન',
  				'tt' => 'તતાર',
+ 				'ttm' => 'ઉત્તરી ટુચૉન',
  				'ttt' => 'મુસ્લિમ તાટ',
  				'tum' => 'તુમ્બુકા',
  				'tvl' => 'તુવાલુ',
@@ -557,6 +579,7 @@ has 'display_name_language' => (
  				'was' => 'વાશો',
  				'wbp' => 'વાર્લ્પીરી',
  				'wo' => 'વોલોફ',
+ 				'wuu' => 'વુ ચાઈનીઝ',
  				'xal' => 'કાલ્મિક',
  				'xh' => 'ખોસા',
  				'xog' => 'સોગા',
@@ -566,6 +589,7 @@ has 'display_name_language' => (
  				'ybb' => 'યેમ્બા',
  				'yi' => 'યિદ્દિશ',
  				'yo' => 'યોરૂબા',
+ 				'yrl' => 'નહેનગાતુ',
  				'yue' => 'કેંટોનીઝ',
  				'yue@alt=menu' => 'ચાઇનીઝ, કેન્ટોનીઝ',
  				'za' => 'ઝુઆગ',
@@ -600,8 +624,10 @@ has 'display_name_script' => (
 	default		=> sub {
 		sub {
 			my %scripts = (
-			'Arab' => 'અરબી',
+			'Adlm' => 'એડલમ',
+ 			'Arab' => 'અરબી',
  			'Arab@alt=variant' => 'પર્સો-અરબી',
+ 			'Aran' => 'નસ્તાલીક',
  			'Armi' => 'ઇમ્પિરિયલ આર્મનિક',
  			'Armn' => 'અર્મેનિયન',
  			'Avst' => 'અવેસ્તન',
@@ -696,6 +722,7 @@ has 'display_name_script' => (
  			'Plrd' => 'પોલાર્ડ ફોનેટિક',
  			'Prti' => 'ઇન્સ્ક્રિપ્શનલ પાર્થિયન',
  			'Rjng' => 'રીજાંગ',
+ 			'Rohg' => 'હનીફી',
  			'Roro' => 'રોંગોરોંગો',
  			'Runr' => 'રૂનિક',
  			'Samr' => 'સમરિટાન',
@@ -902,6 +929,8 @@ has 'display_name_region' => (
  			'IM' => 'આઇલ ઑફ મેન',
  			'IN' => 'ભારત',
  			'IO' => 'બ્રિટિશ ઇન્ડિયન ઓશન ટેરિટરી',
+ 			'IO@alt=biot' => 'બ્રિટિશ હિંદ મહાસાગર ક્ષેત્ર',
+ 			'IO@alt=chagos' => 'ચાગસ દ્વિપસમૂહ',
  			'IQ' => 'ઇરાક',
  			'IR' => 'ઈરાન',
  			'IS' => 'આઇસલેન્ડ',
@@ -968,6 +997,7 @@ has 'display_name_region' => (
  			'NR' => 'નૌરુ',
  			'NU' => 'નીયુ',
  			'NZ' => 'ન્યુઝીલેન્ડ',
+ 			'NZ@alt=variant' => 'ઓટેરોઆ ન્યૂઝીલેન્ડ',
  			'OM' => 'ઓમાન',
  			'PA' => 'પનામા',
  			'PE' => 'પેરુ',
@@ -1026,7 +1056,7 @@ has 'display_name_region' => (
  			'TM' => 'તુર્કમેનિસ્તાન',
  			'TN' => 'ટ્યુનિશિયા',
  			'TO' => 'ટોંગા',
- 			'TR' => 'તુર્કી',
+ 			'TR' => 'તુર્કિયે',
  			'TT' => 'ટ્રિનીદાદ અને ટોબેગો',
  			'TV' => 'તુવાલુ',
  			'TW' => 'તાઇવાન',
@@ -1121,11 +1151,11 @@ has 'display_name_type' => (
  				'gregorian' => q{ગ્રેગોરિઅન કેલેન્ડર},
  				'hebrew' => q{હિબ્રુ કેલેન્ડર},
  				'indian' => q{ભારતીય રાષ્ટ્રીય કેલેન્ડર},
- 				'islamic' => q{ઇસ્લામિક કેલેન્ડર},
- 				'islamic-civil' => q{ઇસ્લામિક-નાગરિક કેલેન્ડર},
+ 				'islamic' => q{હિજરી કેલેન્ડર},
+ 				'islamic-civil' => q{હિજરી-નાગરિક કેલેન્ડર},
  				'islamic-rgsa' => q{ઇસ્લામિક કેલેન્ડર (સાઉદી અરેબિયા, નિરીક્ષણ)},
  				'islamic-tbla' => q{ઇસ્લામિક કેલેન્ડર (ટેબ્યુલર, ખગોળશાસ્ત્રીય યુગ)},
- 				'islamic-umalqura' => q{ઇસ્લામિક કેલેન્ડર (ઉમમ અલ-કુરા)},
+ 				'islamic-umalqura' => q{હિજરી કેલેન્ડર (ઉમ અલ-કુરા)},
  				'iso8601' => q{ISO-8601 કેલેન્ડર},
  				'japanese' => q{જાપાનીઝ કેલેન્ડર},
  				'persian' => q{પર્શિયન કેલેન્ડર},
@@ -1216,6 +1246,7 @@ has 'display_name_type' => (
  				'armn' => q{અર્મેનિયન સંખ્યાઓ},
  				'armnlow' => q{અર્મેનિયન નાના અક્ષરની સંખ્યાઓ},
  				'beng' => q{બંગાળી અંકો},
+ 				'cakm' => q{ચકમા અંકો},
  				'deva' => q{દેવનાગરી અંકો},
  				'ethi' => q{ઇથિયોપીક સંખ્યાઓ},
  				'finance' => q{નાણાકીય સંખ્યાઓ},
@@ -1231,6 +1262,7 @@ has 'display_name_type' => (
  				'hant' => q{પરંપરાગત ચાઇનીઝ સંખ્યાઓ},
  				'hantfin' => q{પરંપરાગત ચાઇનીઝ નાણાકીય સંખ્યાઓ},
  				'hebr' => q{હિબ્રુ સંખ્યાઓ},
+ 				'java' => q{જાવાનીઝ અંકો},
  				'jpan' => q{જાપાનીઝ સંખ્યાઓ},
  				'jpanfin' => q{જાપાનીઝ નાણાકીય સંખ્યાઓ},
  				'khmr' => q{ખ્મેર અંકો},
@@ -1239,8 +1271,10 @@ has 'display_name_type' => (
  				'latn' => q{પશ્ચિમી અંકો},
  				'mlym' => q{મલયાલમ અંકો},
  				'mong' => q{મોંગોલિયન અંકો},
+ 				'mtei' => q{મેઇતેઇ માયેક અંકો},
  				'mymr' => q{મ્યાન્માર અંકો},
  				'native' => q{મૂળ અંકો},
+ 				'olck' => q{ઓલ ચિકી અંકો},
  				'orya' => q{ઓરિયા અંકો},
  				'roman' => q{રોમન સંખ્યાઓ},
  				'romanlow' => q{રોમન નાના અક્ષરની સંખ્યા},
@@ -1295,80 +1329,18 @@ has 'characters' => (
 		no warnings 'experimental::regex_sets';
 		return {
 			auxiliary => qr{[‌‍ ૰]},
-			index => ['અ', '{અ\u0A82}', '{અઃ}', 'આ', 'ઇ', 'ઈ', 'ઉ', 'ઊ', 'ઋ', 'ઍ', 'એ', 'ઐ', 'ઑ', 'ઓ', 'ઔ', 'ક', '{ક\u0ACDષ}', 'ખ', 'ગ', 'ઘ', 'ઙ', 'ચ', 'છ', 'જ', '{જ\u0ACDઞ}', 'ઝ', 'ઞ', 'ટ', 'ઠ', 'ડ', 'ઢ', 'ણ', 'ત', '{ત\u0ACDર}', 'થ', 'દ', 'ધ', 'ન', 'પ', 'ફ', 'બ', 'ભ', 'મ', 'ય', 'ર', 'લ', 'વ', 'શ', 'ષ', 'સ', 'હ', 'ળ'],
+			index => ['અ', '{અં}', '{અઃ}', 'આ', 'ઇ', 'ઈ', 'ઉ', 'ઊ', 'ઋ', 'ઍ', 'એ', 'ઐ', 'ઑ', 'ઓ', 'ઔ', 'ક', '{ક્ષ}', 'ખ', 'ગ', 'ઘ', 'ઙ', 'ચ', 'છ', 'જ', '{જ્ઞ}', 'ઝ', 'ઞ', 'ટ', 'ઠ', 'ડ', 'ઢ', 'ણ', 'ત', '{ત્ર}', 'થ', 'દ', 'ધ', 'ન', 'પ', 'ફ', 'બ', 'ભ', 'મ', 'ય', 'ર', 'લ', 'વ', 'શ', 'ષ', 'સ', 'હ', 'ળ'],
 			main => qr{[઼ ૐ ં ઁ ઃ અ આ ઇ ઈ ઉ ઊ ઋ ૠ ઍ એ ઐ ઑ ઓ ઔ ક ખ ગ ઘ ઙ ચ છ જ ઝ ઞ ટ ઠ ડ ઢ ણ ત થ દ ધ ન પ ફ બ ભ મ ય ર લ વ શ ષ સ હ ળ ઽ ા િ ી ુ ૂ ૃ ૄ ૅ ે ૈ ૉ ો ૌ ્]},
 			numbers => qr{[\- ‑ , . % ‰ + 0૦ 1૧ 2૨ 3૩ 4૪ 5૫ 6૬ 7૭ 8૮ 9૯]},
-			punctuation => qr{[\- ‐ ‑ – — , ; \: ! ? . … ' ‘ ’ " “ ” ( ) \[ \] § @ * / \& # † ‡ ′ ″]},
+			punctuation => qr{[\- ‐‑ – — , ; \: ! ? . … '‘’ "“” ( ) \[ \] § @ * / \& # † ‡ ′ ″]},
 		};
 	},
 EOT
 : sub {
-		return { index => ['અ', '{અ\u0A82}', '{અઃ}', 'આ', 'ઇ', 'ઈ', 'ઉ', 'ઊ', 'ઋ', 'ઍ', 'એ', 'ઐ', 'ઑ', 'ઓ', 'ઔ', 'ક', '{ક\u0ACDષ}', 'ખ', 'ગ', 'ઘ', 'ઙ', 'ચ', 'છ', 'જ', '{જ\u0ACDઞ}', 'ઝ', 'ઞ', 'ટ', 'ઠ', 'ડ', 'ઢ', 'ણ', 'ત', '{ત\u0ACDર}', 'થ', 'દ', 'ધ', 'ન', 'પ', 'ફ', 'બ', 'ભ', 'મ', 'ય', 'ર', 'લ', 'વ', 'શ', 'ષ', 'સ', 'હ', 'ળ'], };
+		return { index => ['અ', '{અં}', '{અઃ}', 'આ', 'ઇ', 'ઈ', 'ઉ', 'ઊ', 'ઋ', 'ઍ', 'એ', 'ઐ', 'ઑ', 'ઓ', 'ઔ', 'ક', '{ક્ષ}', 'ખ', 'ગ', 'ઘ', 'ઙ', 'ચ', 'છ', 'જ', '{જ્ઞ}', 'ઝ', 'ઞ', 'ટ', 'ઠ', 'ડ', 'ઢ', 'ણ', 'ત', '{ત્ર}', 'થ', 'દ', 'ધ', 'ન', 'પ', 'ફ', 'બ', 'ભ', 'મ', 'ય', 'ર', 'લ', 'વ', 'શ', 'ષ', 'સ', 'હ', 'ળ'], };
 },
 );
 
-
-has 'ellipsis' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub {
-		return {
-			'final' => '{0}…',
-			'initial' => '…{0}',
-			'medial' => '{0}…{1}',
-			'word-final' => '{0} …',
-			'word-initial' => '… {0}',
-			'word-medial' => '{0} … {1}',
-		};
-	},
-);
-
-has 'more_information' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{?},
-);
-
-has 'quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{“},
-);
-
-has 'quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{”},
-);
-
-has 'alternate_quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{‘},
-);
-
-has 'alternate_quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{’},
-);
-
-has 'duration_units' => (
-	is			=> 'ro',
-	isa			=> HashRef[Str],
-	init_arg	=> undef,
-	default		=> sub { {
-				hm => 'h:mm',
-				hms => 'h:mm:ss',
-				ms => 'm:ss',
-			} }
-);
 
 has 'units' => (
 	is			=> 'ro',
@@ -1505,12 +1477,28 @@ has 'units' => (
 						'1' => q(યોક્ટો{0}),
 					},
 					# Long Unit Identifier
+					'10p-27' => {
+						'1' => q(રોન્ટો{0}),
+					},
+					# Core Unit Identifier
+					'27' => {
+						'1' => q(રોન્ટો{0}),
+					},
+					# Long Unit Identifier
 					'10p-3' => {
 						'1' => q(મિલી{0}),
 					},
 					# Core Unit Identifier
 					'3' => {
 						'1' => q(મિલી{0}),
+					},
+					# Long Unit Identifier
+					'10p-30' => {
+						'1' => q(ક્વેક્ટો{0}),
+					},
+					# Core Unit Identifier
+					'30' => {
+						'1' => q(ક્વેક્ટો{0}),
 					},
 					# Long Unit Identifier
 					'10p-6' => {
@@ -1585,12 +1573,28 @@ has 'units' => (
 						'1' => q(યોટા{0}),
 					},
 					# Long Unit Identifier
+					'10p27' => {
+						'1' => q(રોના{0}),
+					},
+					# Core Unit Identifier
+					'10p27' => {
+						'1' => q(રોના{0}),
+					},
+					# Long Unit Identifier
 					'10p3' => {
 						'1' => q(કિલો{0}),
 					},
 					# Core Unit Identifier
 					'10p3' => {
 						'1' => q(કિલો{0}),
+					},
+					# Long Unit Identifier
+					'10p30' => {
+						'1' => q(ક્વેટા{0}),
+					},
+					# Core Unit Identifier
+					'10p30' => {
+						'1' => q(ક્વેટા{0}),
 					},
 					# Long Unit Identifier
 					'10p6' => {
@@ -1611,14 +1615,12 @@ has 'units' => (
 					# Long Unit Identifier
 					'acceleration-g-force' => {
 						'1' => q(masculine),
-						'name' => q(ગુ-બળ),
 						'one' => q({0} ગુ-બળ),
 						'other' => q({0} ગુ-બળ),
 					},
 					# Core Unit Identifier
 					'g-force' => {
 						'1' => q(masculine),
-						'name' => q(ગુ-બળ),
 						'one' => q({0} ગુ-બળ),
 						'other' => q({0} ગુ-બળ),
 					},
@@ -1637,110 +1639,58 @@ has 'units' => (
 					# Long Unit Identifier
 					'angle-arc-minute' => {
 						'1' => q(feminine),
-						'name' => q(ચાપમિનિટ),
 						'one' => q({0} ચાપમિનિટ),
 						'other' => q({0} ચાપમિનિટ),
 					},
 					# Core Unit Identifier
 					'arc-minute' => {
 						'1' => q(feminine),
-						'name' => q(ચાપમિનિટ),
 						'one' => q({0} ચાપમિનિટ),
 						'other' => q({0} ચાપમિનિટ),
 					},
 					# Long Unit Identifier
 					'angle-arc-second' => {
 						'1' => q(feminine),
-						'name' => q(ચાપસેકન્ડ),
-						'one' => q({0} ચાપસેકન્ડ),
-						'other' => q({0} ચાપસેકન્ડ),
 					},
 					# Core Unit Identifier
 					'arc-second' => {
 						'1' => q(feminine),
-						'name' => q(ચાપસેકન્ડ),
-						'one' => q({0} ચાપસેકન્ડ),
-						'other' => q({0} ચાપસેકન્ડ),
 					},
 					# Long Unit Identifier
 					'angle-degree' => {
 						'1' => q(masculine),
-						'name' => q(અંશ),
-						'one' => q({0} અંશ),
-						'other' => q({0} અંશ),
 					},
 					# Core Unit Identifier
 					'degree' => {
 						'1' => q(masculine),
-						'name' => q(અંશ),
-						'one' => q({0} અંશ),
-						'other' => q({0} અંશ),
 					},
 					# Long Unit Identifier
 					'angle-radian' => {
 						'1' => q(masculine),
-						'name' => q(સમત્રિજ્યાકોણ),
 						'one' => q({0} સમત્રિજ્યાકોણ),
 						'other' => q({0} સમત્રિજ્યાકોણ),
 					},
 					# Core Unit Identifier
 					'radian' => {
 						'1' => q(masculine),
-						'name' => q(સમત્રિજ્યાકોણ),
 						'one' => q({0} સમત્રિજ્યાકોણ),
 						'other' => q({0} સમત્રિજ્યાકોણ),
 					},
 					# Long Unit Identifier
 					'angle-revolution' => {
 						'1' => q(masculine),
-						'name' => q(પરિભ્રમણ),
-						'one' => q({0} પરિભ્રમણ),
-						'other' => q({0} પરિભ્રમણ),
 					},
 					# Core Unit Identifier
 					'revolution' => {
 						'1' => q(masculine),
-						'name' => q(પરિભ્રમણ),
-						'one' => q({0} પરિભ્રમણ),
-						'other' => q({0} પરિભ્રમણ),
-					},
-					# Long Unit Identifier
-					'area-acre' => {
-						'name' => q(એકર),
-						'one' => q({0} એકર),
-						'other' => q({0} એકર),
-					},
-					# Core Unit Identifier
-					'acre' => {
-						'name' => q(એકર),
-						'one' => q({0} એકર),
-						'other' => q({0} એકર),
-					},
-					# Long Unit Identifier
-					'area-dunam' => {
-						'name' => q(ડનમ),
-						'one' => q({0} ડનમ),
-						'other' => q({0} ડનમ),
-					},
-					# Core Unit Identifier
-					'dunam' => {
-						'name' => q(ડનમ),
-						'one' => q({0} ડનમ),
-						'other' => q({0} ડનમ),
 					},
 					# Long Unit Identifier
 					'area-hectare' => {
 						'1' => q(masculine),
-						'name' => q(હેક્ટર),
-						'one' => q({0} હેક્ટર),
-						'other' => q({0} હેક્ટર),
 					},
 					# Core Unit Identifier
 					'hectare' => {
 						'1' => q(masculine),
-						'name' => q(હેક્ટર),
-						'one' => q({0} હેક્ટર),
-						'other' => q({0} હેક્ટર),
 					},
 					# Long Unit Identifier
 					'area-square-centimeter' => {
@@ -1757,29 +1707,11 @@ has 'units' => (
 						'per' => q({0} પ્રતિ ચોરસ સેન્ટિમીટર),
 					},
 					# Long Unit Identifier
-					'area-square-foot' => {
-						'name' => q(ચોરસ ફૂટ),
-						'one' => q({0} ચોરસ ફૂટ),
-						'other' => q({0} ચોરસ ફૂટ),
-					},
-					# Core Unit Identifier
-					'square-foot' => {
-						'name' => q(ચોરસ ફૂટ),
-						'one' => q({0} ચોરસ ફૂટ),
-						'other' => q({0} ચોરસ ફૂટ),
-					},
-					# Long Unit Identifier
 					'area-square-inch' => {
-						'name' => q(ચોરસ ઇંચ),
-						'one' => q({0} ચોરસ ઇંચ),
-						'other' => q({0} ચોરસ ઇંચ),
 						'per' => q({0} પ્રતિ ચોરસ ઈંચ),
 					},
 					# Core Unit Identifier
 					'square-inch' => {
-						'name' => q(ચોરસ ઇંચ),
-						'one' => q({0} ચોરસ ઇંચ),
-						'other' => q({0} ચોરસ ઇંચ),
 						'per' => q({0} પ્રતિ ચોરસ ઈંચ),
 					},
 					# Long Unit Identifier
@@ -1798,69 +1730,27 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'area-square-meter' => {
-						'name' => q(ચોરસ મીટર),
-						'one' => q({0} ચોરસ મીટર),
-						'other' => q({0} ચોરસ મીટર),
 						'per' => q({0} પ્રતિ ચોરસ મીટર),
 					},
 					# Core Unit Identifier
 					'square-meter' => {
-						'name' => q(ચોરસ મીટર),
-						'one' => q({0} ચોરસ મીટર),
-						'other' => q({0} ચોરસ મીટર),
 						'per' => q({0} પ્રતિ ચોરસ મીટર),
 					},
 					# Long Unit Identifier
 					'area-square-mile' => {
-						'name' => q(ચોરસ માઇલ),
-						'one' => q({0} ચોરસ માઇલ),
-						'other' => q({0} ચોરસ માઇલ),
 						'per' => q({0} પ્રતિ ચોરસ માઈલ),
 					},
 					# Core Unit Identifier
 					'square-mile' => {
-						'name' => q(ચોરસ માઇલ),
-						'one' => q({0} ચોરસ માઇલ),
-						'other' => q({0} ચોરસ માઇલ),
 						'per' => q({0} પ્રતિ ચોરસ માઈલ),
-					},
-					# Long Unit Identifier
-					'area-square-yard' => {
-						'name' => q(ચોરસ વાર),
-						'one' => q({0} ચોરસ વાર),
-						'other' => q({0} ચોરસ વાર),
-					},
-					# Core Unit Identifier
-					'square-yard' => {
-						'name' => q(ચોરસ વાર),
-						'one' => q({0} ચોરસ વાર),
-						'other' => q({0} ચોરસ વાર),
-					},
-					# Long Unit Identifier
-					'concentr-item' => {
-						'name' => q(વસ્તુ),
-						'one' => q({0} વસ્તુ),
-						'other' => q({0} વસ્તુ),
-					},
-					# Core Unit Identifier
-					'item' => {
-						'name' => q(વસ્તુ),
-						'one' => q({0} વસ્તુ),
-						'other' => q({0} વસ્તુ),
 					},
 					# Long Unit Identifier
 					'concentr-karat' => {
 						'1' => q(feminine),
-						'name' => q(કૅરેટ),
-						'one' => q({0} કૅરેટ),
-						'other' => q({0} કૅરેટ),
 					},
 					# Core Unit Identifier
 					'karat' => {
 						'1' => q(feminine),
-						'name' => q(કૅરેટ),
-						'one' => q({0} કૅરેટ),
-						'other' => q({0} કૅરેટ),
 					},
 					# Long Unit Identifier
 					'concentr-milligram-ofglucose-per-deciliter' => {
@@ -1889,42 +1779,32 @@ has 'units' => (
 					# Long Unit Identifier
 					'concentr-mole' => {
 						'1' => q(masculine),
-						'name' => q(મોલ),
-						'one' => q({0} મોલ),
-						'other' => q({0} મોલ),
 					},
 					# Core Unit Identifier
 					'mole' => {
 						'1' => q(masculine),
-						'name' => q(મોલ),
-						'one' => q({0} મોલ),
-						'other' => q({0} મોલ),
 					},
 					# Long Unit Identifier
 					'concentr-percent' => {
 						'1' => q(masculine),
-						'name' => q(ટકા),
 						'one' => q({0} ટકા),
 						'other' => q({0} ટકા),
 					},
 					# Core Unit Identifier
 					'percent' => {
 						'1' => q(masculine),
-						'name' => q(ટકા),
 						'one' => q({0} ટકા),
 						'other' => q({0} ટકા),
 					},
 					# Long Unit Identifier
 					'concentr-permille' => {
 						'1' => q(feminine),
-						'name' => q(પ્રતિમાઈલ),
 						'one' => q({0} પ્રતિમાઈલ),
 						'other' => q({0} પ્રતિમાઈલ),
 					},
 					# Core Unit Identifier
 					'permille' => {
 						'1' => q(feminine),
-						'name' => q(પ્રતિમાઈલ),
 						'one' => q({0} પ્રતિમાઈલ),
 						'other' => q({0} પ્રતિમાઈલ),
 					},
@@ -1945,14 +1825,12 @@ has 'units' => (
 					# Long Unit Identifier
 					'concentr-permyriad' => {
 						'1' => q(masculine),
-						'name' => q(પરમિરિયડ),
 						'one' => q({0} પરમિરિયડ),
 						'other' => q({0} પરમિરિયડ),
 					},
 					# Core Unit Identifier
 					'permyriad' => {
 						'1' => q(masculine),
-						'name' => q(પરમિરિયડ),
 						'one' => q({0} પરમિરિયડ),
 						'other' => q({0} પરમિરિયડ),
 					},
@@ -2021,40 +1899,26 @@ has 'units' => (
 					# Long Unit Identifier
 					'digital-bit' => {
 						'1' => q(feminine),
-						'name' => q(બિટ),
-						'one' => q({0} બિટ),
-						'other' => q({0} બિટ),
 					},
 					# Core Unit Identifier
 					'bit' => {
 						'1' => q(feminine),
-						'name' => q(બિટ),
-						'one' => q({0} બિટ),
-						'other' => q({0} બિટ),
 					},
 					# Long Unit Identifier
 					'digital-byte' => {
 						'1' => q(feminine),
-						'name' => q(બાઇટ),
-						'one' => q({0} બાઇટ),
-						'other' => q({0} બાઇટ),
 					},
 					# Core Unit Identifier
 					'byte' => {
 						'1' => q(feminine),
-						'name' => q(બાઇટ),
-						'one' => q({0} બાઇટ),
-						'other' => q({0} બાઇટ),
 					},
 					# Long Unit Identifier
 					'digital-gigabit' => {
-						'name' => q(ગીગાબિટ),
 						'one' => q({0} ગીગાબિટ),
 						'other' => q({0} ગીગાબિટ),
 					},
 					# Core Unit Identifier
 					'gigabit' => {
-						'name' => q(ગીગાબિટ),
 						'one' => q({0} ગીગાબિટ),
 						'other' => q({0} ગીગાબિટ),
 					},
@@ -2171,17 +2035,11 @@ has 'units' => (
 					# Long Unit Identifier
 					'duration-day' => {
 						'1' => q(masculine),
-						'name' => q(દિવસ),
-						'one' => q({0} દિવસ),
-						'other' => q({0} દિવસ),
 						'per' => q({0} પ્રતિ દિવસ),
 					},
 					# Core Unit Identifier
 					'day' => {
 						'1' => q(masculine),
-						'name' => q(દિવસ),
-						'one' => q({0} દિવસ),
-						'other' => q({0} દિવસ),
 						'per' => q({0} પ્રતિ દિવસ),
 					},
 					# Long Unit Identifier
@@ -2195,32 +2053,22 @@ has 'units' => (
 					# Long Unit Identifier
 					'duration-decade' => {
 						'1' => q(masculine),
-						'name' => q(દાયકા),
 						'one' => q({0} દાયકો),
 						'other' => q({0} દાયકા),
 					},
 					# Core Unit Identifier
 					'decade' => {
 						'1' => q(masculine),
-						'name' => q(દાયકા),
 						'one' => q({0} દાયકો),
 						'other' => q({0} દાયકા),
 					},
 					# Long Unit Identifier
 					'duration-hour' => {
 						'1' => q(masculine),
-						'name' => q(કલાક),
-						'one' => q({0} કલાક),
-						'other' => q({0} કલાક),
-						'per' => q({0} પ્રતિ કલાક),
 					},
 					# Core Unit Identifier
 					'hour' => {
 						'1' => q(masculine),
-						'name' => q(કલાક),
-						'one' => q({0} કલાક),
-						'other' => q({0} કલાક),
-						'per' => q({0} પ્રતિ કલાક),
 					},
 					# Long Unit Identifier
 					'duration-microsecond' => {
@@ -2236,80 +2084,67 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'duration-millisecond' => {
-						'name' => q(મિલિસેકન્ડ),
 						'one' => q({0} મિલિસેકન્ડ),
 						'other' => q({0} મિલિસેકન્ડ),
 					},
 					# Core Unit Identifier
 					'millisecond' => {
-						'name' => q(મિલિસેકન્ડ),
 						'one' => q({0} મિલિસેકન્ડ),
 						'other' => q({0} મિલિસેકન્ડ),
 					},
 					# Long Unit Identifier
 					'duration-minute' => {
 						'1' => q(masculine),
-						'name' => q(મિનિટ),
-						'one' => q({0} મિનિટ),
-						'other' => q({0} મિનિટ),
 						'per' => q({0} પ્રતિ મિનિટ),
 					},
 					# Core Unit Identifier
 					'minute' => {
 						'1' => q(masculine),
-						'name' => q(મિનિટ),
-						'one' => q({0} મિનિટ),
-						'other' => q({0} મિનિટ),
 						'per' => q({0} પ્રતિ મિનિટ),
 					},
 					# Long Unit Identifier
 					'duration-month' => {
 						'1' => q(masculine),
-						'name' => q(મહિના),
-						'one' => q({0} મહિનો),
-						'other' => q({0} મહિના),
 						'per' => q({0} પ્રતિ મહિનો),
 					},
 					# Core Unit Identifier
 					'month' => {
 						'1' => q(masculine),
-						'name' => q(મહિના),
-						'one' => q({0} મહિનો),
-						'other' => q({0} મહિના),
 						'per' => q({0} પ્રતિ મહિનો),
 					},
 					# Long Unit Identifier
 					'duration-nanosecond' => {
-						'name' => q(નેનોસેકંડ),
 						'one' => q({0} નેનોસેકંડ),
 						'other' => q({0} નેનોસેકંડ),
 					},
 					# Core Unit Identifier
 					'nanosecond' => {
-						'name' => q(નેનોસેકંડ),
 						'one' => q({0} નેનોસેકંડ),
 						'other' => q({0} નેનોસેકંડ),
 					},
 					# Long Unit Identifier
+					'duration-quarter' => {
+						'name' => q(ત્રિમાસિક),
+						'one' => q({0} ત્રિમાસિક),
+						'other' => q({0} ત્રિમાસિક),
+					},
+					# Core Unit Identifier
+					'quarter' => {
+						'name' => q(ત્રિમાસિક),
+						'one' => q({0} ત્રિમાસિક),
+						'other' => q({0} ત્રિમાસિક),
+					},
+					# Long Unit Identifier
 					'duration-second' => {
 						'1' => q(masculine),
-						'name' => q(સેકંડ),
-						'one' => q({0} સેકંડ),
-						'other' => q({0} સેકંડ),
-						'per' => q({0} પ્રતિ સેકંડ),
 					},
 					# Core Unit Identifier
 					'second' => {
 						'1' => q(masculine),
-						'name' => q(સેકંડ),
-						'one' => q({0} સેકંડ),
-						'other' => q({0} સેકંડ),
-						'per' => q({0} પ્રતિ સેકંડ),
 					},
 					# Long Unit Identifier
 					'duration-week' => {
 						'1' => q(masculine),
-						'name' => q(અઠવાડિયા),
 						'one' => q({0} અઠવાડિયું),
 						'other' => q({0} અઠવાડિયા),
 						'per' => q({0} પ્રતિ અઠવાડિયું),
@@ -2317,7 +2152,6 @@ has 'units' => (
 					# Core Unit Identifier
 					'week' => {
 						'1' => q(masculine),
-						'name' => q(અઠવાડિયા),
 						'one' => q({0} અઠવાડિયું),
 						'other' => q({0} અઠવાડિયા),
 						'per' => q({0} પ્રતિ અઠવાડિયું),
@@ -2325,17 +2159,11 @@ has 'units' => (
 					# Long Unit Identifier
 					'duration-year' => {
 						'1' => q(masculine),
-						'name' => q(વર્ષ),
-						'one' => q({0} વર્ષ),
-						'other' => q({0} વર્ષ),
 						'per' => q({0} પ્રતિ વર્ષ),
 					},
 					# Core Unit Identifier
 					'year' => {
 						'1' => q(masculine),
-						'name' => q(વર્ષ),
-						'one' => q({0} વર્ષ),
-						'other' => q({0} વર્ષ),
 						'per' => q({0} પ્રતિ વર્ષ),
 					},
 					# Long Unit Identifier
@@ -2367,28 +2195,24 @@ has 'units' => (
 					# Long Unit Identifier
 					'electric-ohm' => {
 						'1' => q(masculine),
-						'name' => q(ઓહ્મ),
 						'one' => q({0} ઓહ્મ),
 						'other' => q({0} ઓહ્મ),
 					},
 					# Core Unit Identifier
 					'ohm' => {
 						'1' => q(masculine),
-						'name' => q(ઓહ્મ),
 						'one' => q({0} ઓહ્મ),
 						'other' => q({0} ઓહ્મ),
 					},
 					# Long Unit Identifier
 					'electric-volt' => {
 						'1' => q(masculine),
-						'name' => q(વૉલ્ટ),
 						'one' => q({0} વૉલ્ટ),
 						'other' => q({0} વૉલ્ટ્),
 					},
 					# Core Unit Identifier
 					'volt' => {
 						'1' => q(masculine),
-						'name' => q(વૉલ્ટ),
 						'one' => q({0} વૉલ્ટ),
 						'other' => q({0} વૉલ્ટ્),
 					},
@@ -2420,39 +2244,23 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'energy-electronvolt' => {
-						'name' => q(ઇલેક્ટ્રોનવૉલ્ટ),
 						'one' => q({0} ઇલેક્ટ્રોનવૉલ્ટ),
 						'other' => q({0} ઇલેક્ટ્રોનવૉલ્ટ),
 					},
 					# Core Unit Identifier
 					'electronvolt' => {
-						'name' => q(ઇલેક્ટ્રોનવૉલ્ટ),
 						'one' => q({0} ઇલેક્ટ્રોનવૉલ્ટ),
 						'other' => q({0} ઇલેક્ટ્રોનવૉલ્ટ),
 					},
 					# Long Unit Identifier
-					'energy-foodcalorie' => {
-						'name' => q(કેલરી),
-						'one' => q({0} કેલરી),
-						'other' => q({0} કેલરી),
-					},
-					# Core Unit Identifier
-					'foodcalorie' => {
-						'name' => q(કેલરી),
-						'one' => q({0} કેલરી),
-						'other' => q({0} કેલરી),
-					},
-					# Long Unit Identifier
 					'energy-joule' => {
 						'1' => q(masculine),
-						'name' => q(જૂલ),
 						'one' => q({0} જૂલ),
 						'other' => q({0} જૂલ),
 					},
 					# Core Unit Identifier
 					'joule' => {
 						'1' => q(masculine),
-						'name' => q(જૂલ),
 						'one' => q({0} જૂલ),
 						'other' => q({0} જૂલ),
 					},
@@ -2493,18 +2301,6 @@ has 'units' => (
 						'other' => q({0} કિલોવૉટ-કલાક),
 					},
 					# Long Unit Identifier
-					'energy-therm-us' => {
-						'name' => q(યુએસ થર્મ),
-						'one' => q({0} યુએસ થર્મ),
-						'other' => q({0} યુએસ થર્મ),
-					},
-					# Core Unit Identifier
-					'therm-us' => {
-						'name' => q(યુએસ થર્મ),
-						'one' => q({0} યુએસ થર્મ),
-						'other' => q({0} યુએસ થર્મ),
-					},
-					# Long Unit Identifier
 					'force-kilowatt-hour-per-100-kilometer' => {
 						'name' => q(કિલોવૉટ કલાક પ્રતિ 100 કિલોમીટર),
 						'one' => q({0} કિલોવૉટ કલાક પ્રતિ 100 કિલોમીટર),
@@ -2519,26 +2315,22 @@ has 'units' => (
 					# Long Unit Identifier
 					'force-newton' => {
 						'1' => q(masculine),
-						'name' => q(ન્યૂટન),
 						'one' => q({0} ન્યૂટન),
 						'other' => q({0} ન્યૂટન),
 					},
 					# Core Unit Identifier
 					'newton' => {
 						'1' => q(masculine),
-						'name' => q(ન્યૂટન),
 						'one' => q({0} ન્યૂટન),
 						'other' => q({0} ન્યૂટન),
 					},
 					# Long Unit Identifier
 					'force-pound-force' => {
-						'name' => q(પાઉન્ડ બળ),
 						'one' => q({0} પાઉન્ડ બળ),
 						'other' => q({0} પાઉન્ડ બળ),
 					},
 					# Core Unit Identifier
 					'pound-force' => {
-						'name' => q(પાઉન્ડ બળ),
 						'one' => q({0} પાઉન્ડ બળ),
 						'other' => q({0} પાઉન્ડ બળ),
 					},
@@ -2557,14 +2349,12 @@ has 'units' => (
 					# Long Unit Identifier
 					'frequency-hertz' => {
 						'1' => q(feminine),
-						'name' => q(હર્ટ્ઝ),
 						'one' => q({0} હર્ટ્ઝ),
 						'other' => q({0} હર્ટ્ઝ),
 					},
 					# Core Unit Identifier
 					'hertz' => {
 						'1' => q(feminine),
-						'name' => q(હર્ટ્ઝ),
 						'one' => q({0} હર્ટ્ઝ),
 						'other' => q({0} હર્ટ્ઝ),
 					},
@@ -2593,62 +2383,62 @@ has 'units' => (
 						'other' => q({0} મેગાહર્ટ્ઝ),
 					},
 					# Long Unit Identifier
-					'graphics-dot' => {
-						'name' => q(ડૉટ),
-						'one' => q({0} px),
-						'other' => q({0} ડૉટ),
-					},
-					# Core Unit Identifier
-					'dot' => {
-						'name' => q(ડૉટ),
-						'one' => q({0} px),
-						'other' => q({0} ડૉટ),
-					},
-					# Long Unit Identifier
 					'graphics-dot-per-centimeter' => {
-						'name' => q(ડૉટ્સ પ્રતિ સેન્ટિમીટર),
+						'name' => q(ડૉટ પ્રતિ સેન્ટિમીટર),
 						'one' => q({0} ડૉટ પ્રતિ સેન્ટિમીટર),
-						'other' => q({0} ડૉટ્સ પ્રતિ સેન્ટિમીટર),
+						'other' => q({0} ડૉટ પ્રતિ સેન્ટિમીટર),
 					},
 					# Core Unit Identifier
 					'dot-per-centimeter' => {
-						'name' => q(ડૉટ્સ પ્રતિ સેન્ટિમીટર),
+						'name' => q(ડૉટ પ્રતિ સેન્ટિમીટર),
 						'one' => q({0} ડૉટ પ્રતિ સેન્ટિમીટર),
-						'other' => q({0} ડૉટ્સ પ્રતિ સેન્ટિમીટર),
+						'other' => q({0} ડૉટ પ્રતિ સેન્ટિમીટર),
 					},
 					# Long Unit Identifier
 					'graphics-dot-per-inch' => {
-						'name' => q(ડૉટ્સ પ્રતિ ઇંચ),
+						'name' => q(ડૉટ પ્રતિ ઇંચ),
 						'one' => q({0} ડૉટ પ્રતિ ઇંચ),
-						'other' => q({0} ડૉટ્સ પ્રતિ ઇંચ),
+						'other' => q({0} ડૉટ પ્રતિ ઇંચ),
 					},
 					# Core Unit Identifier
 					'dot-per-inch' => {
-						'name' => q(ડૉટ્સ પ્રતિ ઇંચ),
+						'name' => q(ડૉટ પ્રતિ ઇંચ),
 						'one' => q({0} ડૉટ પ્રતિ ઇંચ),
-						'other' => q({0} ડૉટ્સ પ્રતિ ઇંચ),
+						'other' => q({0} ડૉટ પ્રતિ ઇંચ),
 					},
 					# Long Unit Identifier
 					'graphics-em' => {
 						'1' => q(masculine),
 						'name' => q(ટાઇપોગ્રાફિક એમ),
+						'one' => q({0} em),
+						'other' => q({0} ems),
 					},
 					# Core Unit Identifier
 					'em' => {
 						'1' => q(masculine),
 						'name' => q(ટાઇપોગ્રાફિક એમ),
+						'one' => q({0} em),
+						'other' => q({0} ems),
+					},
+					# Long Unit Identifier
+					'graphics-megapixel' => {
+						'one' => q({0} મેગાપિક્સેલ),
+						'other' => q({0} મેગાપિક્સેલ),
+					},
+					# Core Unit Identifier
+					'megapixel' => {
+						'one' => q({0} મેગાપિક્સેલ),
+						'other' => q({0} મેગાપિક્સેલ),
 					},
 					# Long Unit Identifier
 					'graphics-pixel' => {
 						'1' => q(masculine),
-						'name' => q(પિક્સેલ),
 						'one' => q({0} પિક્સેલ),
 						'other' => q({0} પિક્સેલ),
 					},
 					# Core Unit Identifier
 					'pixel' => {
 						'1' => q(masculine),
-						'name' => q(પિક્સેલ),
 						'one' => q({0} પિક્સેલ),
 						'other' => q({0} પિક્સેલ),
 					},
@@ -2678,13 +2468,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-astronomical-unit' => {
-						'name' => q(ખગોળીય યુનિટ),
 						'one' => q({0} ખગોળીય યુનિટ),
 						'other' => q({0} ખગોળીય યુનિટ),
 					},
 					# Core Unit Identifier
 					'astronomical-unit' => {
-						'name' => q(ખગોળીય યુનિટ),
 						'one' => q({0} ખગોળીય યુનિટ),
 						'other' => q({0} ખગોળીય યુનિટ),
 					},
@@ -2716,54 +2504,38 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-fathom' => {
-						'name' => q(ફૅધમ),
 						'one' => q({0} ફૅધમ),
 						'other' => q({0} ફૅધમ),
 					},
 					# Core Unit Identifier
 					'fathom' => {
-						'name' => q(ફૅધમ),
 						'one' => q({0} ફૅધમ),
 						'other' => q({0} ફૅધમ),
 					},
 					# Long Unit Identifier
 					'length-foot' => {
-						'name' => q(ફૂટ),
-						'one' => q({0} ફૂટ),
-						'other' => q({0} ફૂટ),
 						'per' => q({0} પ્રતિ ફૂટ),
 					},
 					# Core Unit Identifier
 					'foot' => {
-						'name' => q(ફૂટ),
-						'one' => q({0} ફૂટ),
-						'other' => q({0} ફૂટ),
 						'per' => q({0} પ્રતિ ફૂટ),
 					},
 					# Long Unit Identifier
 					'length-furlong' => {
-						'name' => q(ફર્લાંગ),
 						'one' => q({0} ફર્લાંગ),
 						'other' => q({0} ફર્લાંગ),
 					},
 					# Core Unit Identifier
 					'furlong' => {
-						'name' => q(ફર્લાંગ),
 						'one' => q({0} ફર્લાંગ),
 						'other' => q({0} ફર્લાંગ),
 					},
 					# Long Unit Identifier
 					'length-inch' => {
-						'name' => q(ઇંચ),
-						'one' => q({0} ઇંચ),
-						'other' => q({0} ઇંચ),
 						'per' => q({0} પ્રતિ ઈંચ),
 					},
 					# Core Unit Identifier
 					'inch' => {
-						'name' => q(ઇંચ),
-						'one' => q({0} ઇંચ),
-						'other' => q({0} ઇંચ),
 						'per' => q({0} પ્રતિ ઈંચ),
 					},
 					# Long Unit Identifier
@@ -2781,21 +2553,8 @@ has 'units' => (
 						'per' => q({0} પ્રતિ કિલોમીટર),
 					},
 					# Long Unit Identifier
-					'length-light-year' => {
-						'name' => q(પ્રકાશ વર્ષ),
-						'one' => q({0} પ્રકાશ વર્ષ),
-						'other' => q({0} પ્રકાશ વર્ષ),
-					},
-					# Core Unit Identifier
-					'light-year' => {
-						'name' => q(પ્રકાશ વર્ષ),
-						'one' => q({0} પ્રકાશ વર્ષ),
-						'other' => q({0} પ્રકાશ વર્ષ),
-					},
-					# Long Unit Identifier
 					'length-meter' => {
 						'1' => q(masculine),
-						'name' => q(મીટર),
 						'one' => q({0} મીટર),
 						'other' => q({0} મીટર),
 						'per' => q({0} પ્રતિ મીટર),
@@ -2803,34 +2562,19 @@ has 'units' => (
 					# Core Unit Identifier
 					'meter' => {
 						'1' => q(masculine),
-						'name' => q(મીટર),
 						'one' => q({0} મીટર),
 						'other' => q({0} મીટર),
 						'per' => q({0} પ્રતિ મીટર),
 					},
 					# Long Unit Identifier
 					'length-micrometer' => {
-						'name' => q(માઇક્રોમીટર),
 						'one' => q({0} માઇક્રોમીટર),
 						'other' => q({0} માઇક્રોમીટર),
 					},
 					# Core Unit Identifier
 					'micrometer' => {
-						'name' => q(માઇક્રોમીટર),
 						'one' => q({0} માઇક્રોમીટર),
 						'other' => q({0} માઇક્રોમીટર),
-					},
-					# Long Unit Identifier
-					'length-mile' => {
-						'name' => q(માઇલ),
-						'one' => q({0} માઇલ),
-						'other' => q({0} માઇલ),
-					},
-					# Core Unit Identifier
-					'mile' => {
-						'name' => q(માઇલ),
-						'one' => q({0} માઇલ),
-						'other' => q({0} માઇલ),
 					},
 					# Long Unit Identifier
 					'length-mile-scandinavian' => {
@@ -2859,52 +2603,14 @@ has 'units' => (
 						'other' => q({0} મિલિમીટર),
 					},
 					# Long Unit Identifier
-					'length-nanometer' => {
-						'name' => q(નેનોમીટર),
-						'one' => q({0} નેનોમીટર),
-						'other' => q({0} નેનોમીટર),
-					},
-					# Core Unit Identifier
-					'nanometer' => {
-						'name' => q(નેનોમીટર),
-						'one' => q({0} નેનોમીટર),
-						'other' => q({0} નેનોમીટર),
-					},
-					# Long Unit Identifier
 					'length-nautical-mile' => {
-						'name' => q(નૉટિકલ માઇલ),
 						'one' => q({0} નૉટિકલ માઇલ),
 						'other' => q({0} નૉટિકલ માઇલ),
 					},
 					# Core Unit Identifier
 					'nautical-mile' => {
-						'name' => q(નૉટિકલ માઇલ),
 						'one' => q({0} નૉટિકલ માઇલ),
 						'other' => q({0} નૉટિકલ માઇલ),
-					},
-					# Long Unit Identifier
-					'length-parsec' => {
-						'name' => q(પરસેક),
-						'one' => q({0} પરસેક),
-						'other' => q({0} પરસેક),
-					},
-					# Core Unit Identifier
-					'parsec' => {
-						'name' => q(પરસેક),
-						'one' => q({0} પરસેક),
-						'other' => q({0} પરસેક),
-					},
-					# Long Unit Identifier
-					'length-picometer' => {
-						'name' => q(પિસૉમીટર),
-						'one' => q({0} પિસૉમીટર),
-						'other' => q({0} પિસૉમીટર),
-					},
-					# Core Unit Identifier
-					'picometer' => {
-						'name' => q(પિસૉમીટર),
-						'one' => q({0} પિસૉમીટર),
-						'other' => q({0} પિસૉમીટર),
 					},
 					# Long Unit Identifier
 					'length-point' => {
@@ -2920,27 +2626,13 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-solar-radius' => {
-						'name' => q(સૌર ત્રિજ્યા),
 						'one' => q({0} સૌર ત્રિજ્યા),
 						'other' => q({0} સૌર ત્રિજ્યા),
 					},
 					# Core Unit Identifier
 					'solar-radius' => {
-						'name' => q(સૌર ત્રિજ્યા),
 						'one' => q({0} સૌર ત્રિજ્યા),
 						'other' => q({0} સૌર ત્રિજ્યા),
-					},
-					# Long Unit Identifier
-					'length-yard' => {
-						'name' => q(વાર),
-						'one' => q({0} વાર),
-						'other' => q({0} વાર),
-					},
-					# Core Unit Identifier
-					'yard' => {
-						'name' => q(વાર),
-						'one' => q({0} વાર),
-						'other' => q({0} વાર),
 					},
 					# Long Unit Identifier
 					'light-candela' => {
@@ -2973,83 +2665,52 @@ has 'units' => (
 					# Long Unit Identifier
 					'light-lux' => {
 						'1' => q(masculine),
-						'name' => q(લક્સ),
-						'one' => q({0} લક્સ),
-						'other' => q({0} લક્સ),
 					},
 					# Core Unit Identifier
 					'lux' => {
 						'1' => q(masculine),
-						'name' => q(લક્સ),
-						'one' => q({0} લક્સ),
-						'other' => q({0} લક્સ),
 					},
 					# Long Unit Identifier
 					'light-solar-luminosity' => {
-						'name' => q(સૌર તેજસ્વિતા),
 						'one' => q({0} સૌર તેજસ્વિતા),
 						'other' => q({0} સૌર તેજસ્વિતા),
 					},
 					# Core Unit Identifier
 					'solar-luminosity' => {
-						'name' => q(સૌર તેજસ્વિતા),
 						'one' => q({0} સૌર તેજસ્વિતા),
 						'other' => q({0} સૌર તેજસ્વિતા),
 					},
 					# Long Unit Identifier
 					'mass-carat' => {
 						'1' => q(masculine),
-						'name' => q(કેરેટ),
-						'one' => q({0} કેરેટ),
-						'other' => q({0} કેરેટ),
 					},
 					# Core Unit Identifier
 					'carat' => {
 						'1' => q(masculine),
-						'name' => q(કેરેટ),
-						'one' => q({0} કેરેટ),
-						'other' => q({0} કેરેટ),
 					},
 					# Long Unit Identifier
 					'mass-dalton' => {
-						'name' => q(ડાલ્ટન),
 						'one' => q({0} ડાલ્ટન),
 						'other' => q({0} ડાલ્ટન),
 					},
 					# Core Unit Identifier
 					'dalton' => {
-						'name' => q(ડાલ્ટન),
 						'one' => q({0} ડાલ્ટન),
 						'other' => q({0} ડાલ્ટન),
 					},
 					# Long Unit Identifier
 					'mass-earth-mass' => {
-						'name' => q(પૃથ્વી ઘનતા),
 						'one' => q({0} પૃથ્વી ઘનતા),
 						'other' => q({0} પૃથ્વી ઘનતા),
 					},
 					# Core Unit Identifier
 					'earth-mass' => {
-						'name' => q(પૃથ્વી ઘનતા),
 						'one' => q({0} પૃથ્વી ઘનતા),
 						'other' => q({0} પૃથ્વી ઘનતા),
 					},
 					# Long Unit Identifier
-					'mass-grain' => {
-						'name' => q(ગ્રેન),
-						'one' => q({0} ગ્રેન),
-						'other' => q({0} ગ્રેન),
-					},
-					# Core Unit Identifier
-					'grain' => {
-						'name' => q(ગ્રેન),
-						'one' => q({0} ગ્રેન),
-						'other' => q({0} ગ્રેન),
-					},
-					# Long Unit Identifier
 					'mass-gram' => {
 						'1' => q(masculine),
-						'name' => q(ગ્રામ),
 						'one' => q({0} ગ્રામ),
 						'other' => q({0} ગ્રામ),
 						'per' => q({0} પ્રતિ ગ્રામ),
@@ -3057,7 +2718,6 @@ has 'units' => (
 					# Core Unit Identifier
 					'gram' => {
 						'1' => q(masculine),
-						'name' => q(ગ્રામ),
 						'one' => q({0} ગ્રામ),
 						'other' => q({0} ગ્રામ),
 						'per' => q({0} પ્રતિ ગ્રામ),
@@ -3077,20 +2737,6 @@ has 'units' => (
 						'one' => q({0} કિલોગ્રામ),
 						'other' => q({0} કિલોગ્રામ),
 						'per' => q({0} પ્રતિ કિલોગ્રામ),
-					},
-					# Long Unit Identifier
-					'mass-metric-ton' => {
-						'1' => q(masculine),
-						'name' => q(મેટ્રિક ટન),
-						'one' => q({0} મેટ્રિક ટન),
-						'other' => q({0} મેટ્રિક ટન),
-					},
-					# Core Unit Identifier
-					'metric-ton' => {
-						'1' => q(masculine),
-						'name' => q(મેટ્રિક ટન),
-						'one' => q({0} મેટ્રિક ટન),
-						'other' => q({0} મેટ્રિક ટન),
 					},
 					# Long Unit Identifier
 					'mass-microgram' => {
@@ -3118,77 +2764,43 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'mass-ounce' => {
-						'name' => q(ઔંસ),
-						'one' => q({0} ઔંસ),
-						'other' => q({0} ઔંસ),
 						'per' => q({0} પ્રતિ ઔંસ),
 					},
 					# Core Unit Identifier
 					'ounce' => {
-						'name' => q(ઔંસ),
-						'one' => q({0} ઔંસ),
-						'other' => q({0} ઔંસ),
 						'per' => q({0} પ્રતિ ઔંસ),
 					},
 					# Long Unit Identifier
-					'mass-ounce-troy' => {
-						'name' => q(ટ્રોય ઔંસ),
-						'one' => q({0} ટ્રોય ઔંસ),
-						'other' => q({0} ટ્રોય ઔંસ),
-					},
-					# Core Unit Identifier
-					'ounce-troy' => {
-						'name' => q(ટ્રોય ઔંસ),
-						'one' => q({0} ટ્રોય ઔંસ),
-						'other' => q({0} ટ્રોય ઔંસ),
-					},
-					# Long Unit Identifier
 					'mass-pound' => {
-						'name' => q(પાઉન્ડ),
-						'one' => q({0} પાઉન્ડ),
-						'other' => q({0} પાઉન્ડ),
 						'per' => q({0} પ્રતિ પાઉન્ડ),
 					},
 					# Core Unit Identifier
 					'pound' => {
-						'name' => q(પાઉન્ડ),
-						'one' => q({0} પાઉન્ડ),
-						'other' => q({0} પાઉન્ડ),
 						'per' => q({0} પ્રતિ પાઉન્ડ),
 					},
 					# Long Unit Identifier
 					'mass-solar-mass' => {
-						'name' => q(સૌર ઘનતા),
 						'one' => q({0} સૌર ઘનતા),
 						'other' => q({0} સૌર ઘનતા),
 					},
 					# Core Unit Identifier
 					'solar-mass' => {
-						'name' => q(સૌર ઘનતા),
 						'one' => q({0} સૌર ઘનતા),
 						'other' => q({0} સૌર ઘનતા),
 					},
 					# Long Unit Identifier
-					'mass-stone' => {
-						'one' => q({0} સ્ટોન),
-						'other' => q({0} સ્ટોન),
+					'mass-tonne' => {
+						'1' => q(masculine),
+						'name' => q(મેટ્રિક ટન),
+						'one' => q({0} મેટ્રિક ટન),
+						'other' => q({0} મેટ્રિક ટન),
 					},
 					# Core Unit Identifier
-					'stone' => {
-						'one' => q({0} સ્ટોન),
-						'other' => q({0} સ્ટોન),
-					},
-					# Long Unit Identifier
-					'mass-ton' => {
-						'name' => q(ટન),
-						'one' => q({0} ટન),
-						'other' => q({0} ટન),
-					},
-					# Core Unit Identifier
-					'ton' => {
-						'name' => q(ટન),
-						'one' => q({0} ટન),
-						'other' => q({0} ટન),
+					'tonne' => {
+						'1' => q(masculine),
+						'name' => q(મેટ્રિક ટન),
+						'one' => q({0} મેટ્રિક ટન),
+						'other' => q({0} મેટ્રિક ટન),
 					},
 					# Long Unit Identifier
 					'per' => {
@@ -3261,14 +2873,12 @@ has 'units' => (
 					# Long Unit Identifier
 					'power-watt' => {
 						'1' => q(masculine),
-						'name' => q(વૉટ),
 						'one' => q({0} વૉટ),
 						'other' => q({0} વૉટ),
 					},
 					# Core Unit Identifier
 					'watt' => {
 						'1' => q(masculine),
-						'name' => q(વૉટ),
 						'one' => q({0} વૉટ),
 						'other' => q({0} વૉટ),
 					},
@@ -3313,16 +2923,10 @@ has 'units' => (
 					# Long Unit Identifier
 					'pressure-bar' => {
 						'1' => q(masculine),
-						'name' => q(બાર),
-						'one' => q({0} બાર),
-						'other' => q({0} બાર),
 					},
 					# Core Unit Identifier
 					'bar' => {
 						'1' => q(masculine),
-						'name' => q(બાર),
-						'one' => q({0} બાર),
-						'other' => q({0} બાર),
 					},
 					# Long Unit Identifier
 					'pressure-hectopascal' => {
@@ -3423,6 +3027,18 @@ has 'units' => (
 						'other' => q({0} પાઉન્ડ પ્રતિ વર્ગ ઇંચ),
 					},
 					# Long Unit Identifier
+					'speed-beaufort' => {
+						'name' => q(બોફર્ટ),
+						'one' => q(બોફર્ટ {0}),
+						'other' => q(બોફર્ટ {0}),
+					},
+					# Core Unit Identifier
+					'beaufort' => {
+						'name' => q(બોફર્ટ),
+						'one' => q(બોફર્ટ {0}),
+						'other' => q(બોફર્ટ {0}),
+					},
+					# Long Unit Identifier
 					'speed-kilometer-per-hour' => {
 						'name' => q(કિલોમીટર પ્રતિ કલાક),
 						'one' => q({0} કિલોમીટર પ્રતિ કલાક),
@@ -3433,18 +3049,6 @@ has 'units' => (
 						'name' => q(કિલોમીટર પ્રતિ કલાક),
 						'one' => q({0} કિલોમીટર પ્રતિ કલાક),
 						'other' => q({0} કિલોમીટર પ્રતિ કલાક),
-					},
-					# Long Unit Identifier
-					'speed-knot' => {
-						'name' => q(નોટ),
-						'one' => q({0} નોટ),
-						'other' => q({0} નોટ),
-					},
-					# Core Unit Identifier
-					'knot' => {
-						'name' => q(નોટ),
-						'one' => q({0} નોટ),
-						'other' => q({0} નોટ),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
@@ -3473,54 +3077,42 @@ has 'units' => (
 					# Long Unit Identifier
 					'temperature-celsius' => {
 						'1' => q(feminine),
-						'name' => q(ડિગ્રી સેલ્સિયસ),
 						'one' => q({0} ડિગ્રી સેલ્સિયસ),
 						'other' => q({0} ડિગ્રી સેલ્સિયસ),
 					},
 					# Core Unit Identifier
 					'celsius' => {
 						'1' => q(feminine),
-						'name' => q(ડિગ્રી સેલ્સિયસ),
 						'one' => q({0} ડિગ્રી સેલ્સિયસ),
 						'other' => q({0} ડિગ્રી સેલ્સિયસ),
 					},
 					# Long Unit Identifier
 					'temperature-fahrenheit' => {
-						'name' => q(ડિગ્રી ફેરનહીટ),
 						'one' => q({0} ડિગ્રી ફેરનહીટ),
 						'other' => q({0} ડિગ્રી ફેરનહીટ),
 					},
 					# Core Unit Identifier
 					'fahrenheit' => {
-						'name' => q(ડિગ્રી ફેરનહીટ),
 						'one' => q({0} ડિગ્રી ફેરનહીટ),
 						'other' => q({0} ડિગ્રી ફેરનહીટ),
 					},
 					# Long Unit Identifier
 					'temperature-generic' => {
 						'1' => q(feminine),
-						'name' => q(°),
-						'one' => q({0}°),
-						'other' => q({0}°),
 					},
 					# Core Unit Identifier
 					'generic' => {
 						'1' => q(feminine),
-						'name' => q(°),
-						'one' => q({0}°),
-						'other' => q({0}°),
 					},
 					# Long Unit Identifier
 					'temperature-kelvin' => {
 						'1' => q(feminine),
-						'name' => q(કેલ્વિન),
 						'one' => q({0} કેલ્વિન),
 						'other' => q({0} કેલ્વિન),
 					},
 					# Core Unit Identifier
 					'kelvin' => {
 						'1' => q(feminine),
-						'name' => q(કેલ્વિન),
 						'one' => q({0} કેલ્વિન),
 						'other' => q({0} કેલ્વિન),
 					},
@@ -3557,52 +3149,24 @@ has 'units' => (
 						'other' => q({0} પાઉન્ડ ફૂટ),
 					},
 					# Long Unit Identifier
-					'volume-acre-foot' => {
-						'name' => q(એકર-ફૂટ),
-						'one' => q({0} એકર-ફૂટ),
-						'other' => q({0} એકર-ફૂટ),
-					},
-					# Core Unit Identifier
-					'acre-foot' => {
-						'name' => q(એકર-ફૂટ),
-						'one' => q({0} એકર-ફૂટ),
-						'other' => q({0} એકર-ફૂટ),
-					},
-					# Long Unit Identifier
 					'volume-barrel' => {
-						'name' => q(બેરલ),
 						'one' => q({0} બેરલ),
 						'other' => q({0} બેરલ),
 					},
 					# Core Unit Identifier
 					'barrel' => {
-						'name' => q(બેરલ),
 						'one' => q({0} બેરલ),
 						'other' => q({0} બેરલ),
 					},
 					# Long Unit Identifier
 					'volume-bushel' => {
-						'name' => q(બુશલ),
 						'one' => q({0} બુશલ),
 						'other' => q({0} બુશલ),
 					},
 					# Core Unit Identifier
 					'bushel' => {
-						'name' => q(બુશલ),
 						'one' => q({0} બુશલ),
 						'other' => q({0} બુશલ),
-					},
-					# Long Unit Identifier
-					'volume-centiliter' => {
-						'name' => q(સેન્ટિલીટર),
-						'one' => q({0} સેન્ટિલીટર),
-						'other' => q({0} સેન્ટિલીટર),
-					},
-					# Core Unit Identifier
-					'centiliter' => {
-						'name' => q(સેન્ટિલીટર),
-						'one' => q({0} સેન્ટિલીટર),
-						'other' => q({0} સેન્ટિલીટર),
 					},
 					# Long Unit Identifier
 					'volume-cubic-centimeter' => {
@@ -3619,30 +3183,6 @@ has 'units' => (
 						'per' => q({0} પ્રતિ ઘન સેન્ટિમીટર),
 					},
 					# Long Unit Identifier
-					'volume-cubic-foot' => {
-						'name' => q(ઘન ફૂટ),
-						'one' => q({0} ઘન ફૂટ),
-						'other' => q({0} ઘન ફૂટ),
-					},
-					# Core Unit Identifier
-					'cubic-foot' => {
-						'name' => q(ઘન ફૂટ),
-						'one' => q({0} ઘન ફૂટ),
-						'other' => q({0} ઘન ફૂટ),
-					},
-					# Long Unit Identifier
-					'volume-cubic-inch' => {
-						'name' => q(ઘન ઇંચ),
-						'one' => q({0} ઘન ઇંચ),
-						'other' => q({0} ઘન ઇંચ),
-					},
-					# Core Unit Identifier
-					'cubic-inch' => {
-						'name' => q(ઘન ઇંચ),
-						'one' => q({0} ઘન ઇંચ),
-						'other' => q({0} ઘન ઇંચ),
-					},
-					# Long Unit Identifier
 					'volume-cubic-kilometer' => {
 						'name' => q(ઘન કિલોમીટર),
 						'one' => q({0} ઘન કિલોમીટર),
@@ -3656,53 +3196,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'volume-cubic-meter' => {
-						'name' => q(ઘન મીટર),
-						'one' => q({0} ઘન મીટર),
-						'other' => q({0} ઘન મીટર),
 						'per' => q({0} પ્રતિ ઘન મીટર),
 					},
 					# Core Unit Identifier
 					'cubic-meter' => {
-						'name' => q(ઘન મીટર),
-						'one' => q({0} ઘન મીટર),
-						'other' => q({0} ઘન મીટર),
 						'per' => q({0} પ્રતિ ઘન મીટર),
-					},
-					# Long Unit Identifier
-					'volume-cubic-mile' => {
-						'name' => q(ઘન માઇલ),
-						'one' => q({0} ઘન માઇલ),
-						'other' => q({0} ઘન માઇલ),
-					},
-					# Core Unit Identifier
-					'cubic-mile' => {
-						'name' => q(ઘન માઇલ),
-						'one' => q({0} ઘન માઇલ),
-						'other' => q({0} ઘન માઇલ),
-					},
-					# Long Unit Identifier
-					'volume-cubic-yard' => {
-						'name' => q(ઘન વાર),
-						'one' => q({0} ઘન વાર),
-						'other' => q({0} ઘન વાર),
-					},
-					# Core Unit Identifier
-					'cubic-yard' => {
-						'name' => q(ઘન વાર),
-						'one' => q({0} ઘન વાર),
-						'other' => q({0} ઘન વાર),
-					},
-					# Long Unit Identifier
-					'volume-cup' => {
-						'name' => q(કપ),
-						'one' => q({0} કપ),
-						'other' => q({0} કપ),
-					},
-					# Core Unit Identifier
-					'cup' => {
-						'name' => q(કપ),
-						'one' => q({0} કપ),
-						'other' => q({0} કપ),
 					},
 					# Long Unit Identifier
 					'volume-cup-metric' => {
@@ -3717,18 +3215,6 @@ has 'units' => (
 						'name' => q(મેટ્રિક કપ),
 						'one' => q({0} મેટ્રિક કપ),
 						'other' => q({0} મેટ્રિક કપ),
-					},
-					# Long Unit Identifier
-					'volume-deciliter' => {
-						'name' => q(ડેસિલીટર),
-						'one' => q({0} ડેસિલીટર),
-						'other' => q({0} ડેસિલીટર),
-					},
-					# Core Unit Identifier
-					'deciliter' => {
-						'name' => q(ડેસિલીટર),
-						'one' => q({0} ડેસિલીટર),
-						'other' => q({0} ડેસિલીટર),
 					},
 					# Long Unit Identifier
 					'volume-dessert-spoon' => {
@@ -3767,97 +3253,38 @@ has 'units' => (
 						'other' => q({0} ડ્રામ),
 					},
 					# Long Unit Identifier
-					'volume-drop' => {
-						'name' => q(ડ્રોપ),
-						'one' => q({0} ડ્રોપ),
-						'other' => q({0} ડ્રોપ),
-					},
-					# Core Unit Identifier
-					'drop' => {
-						'name' => q(ડ્રોપ),
-						'one' => q({0} ડ્રોપ),
-						'other' => q({0} ડ્રોપ),
-					},
-					# Long Unit Identifier
-					'volume-fluid-ounce' => {
-						'name' => q(પ્રવાહી ઔંસ),
-						'one' => q({0} પ્રવાહી ઔંસ),
-						'other' => q({0} પ્રવાહી ઔંસ),
-					},
-					# Core Unit Identifier
-					'fluid-ounce' => {
-						'name' => q(પ્રવાહી ઔંસ),
-						'one' => q({0} પ્રવાહી ઔંસ),
-						'other' => q({0} પ્રવાહી ઔંસ),
-					},
-					# Long Unit Identifier
 					'volume-fluid-ounce-imperial' => {
-						'name' => q(ઇમ્પીરિયલ પ્રવાહી ઔંસ),
 						'one' => q({0} ઇમ્પીરિયલ પ્રવાહી ઔંસ),
 						'other' => q({0} ઇમ્પીરિયલ પ્રવાહી ઔંસ),
 					},
 					# Core Unit Identifier
 					'fluid-ounce-imperial' => {
-						'name' => q(ઇમ્પીરિયલ પ્રવાહી ઔંસ),
 						'one' => q({0} ઇમ્પીરિયલ પ્રવાહી ઔંસ),
 						'other' => q({0} ઇમ્પીરિયલ પ્રવાહી ઔંસ),
 					},
 					# Long Unit Identifier
 					'volume-gallon' => {
-						'name' => q(ગૅલન),
-						'one' => q({0} ગૅલન),
-						'other' => q({0} ગૅલન),
 						'per' => q({0} પ્રતિ ગૅલન),
 					},
 					# Core Unit Identifier
 					'gallon' => {
-						'name' => q(ગૅલન),
-						'one' => q({0} ગૅલન),
-						'other' => q({0} ગૅલન),
 						'per' => q({0} પ્રતિ ગૅલન),
 					},
 					# Long Unit Identifier
 					'volume-gallon-imperial' => {
-						'name' => q(ઈમ્પિ. ગૅલન),
 						'one' => q({0} ઈમ્પિ. ગૅલન),
 						'other' => q({0} ઈમ્પિ. ગૅલન),
 						'per' => q({0} પ્રતિ ઈમ્પિ. ગૅલન),
 					},
 					# Core Unit Identifier
 					'gallon-imperial' => {
-						'name' => q(ઈમ્પિ. ગૅલન),
 						'one' => q({0} ઈમ્પિ. ગૅલન),
 						'other' => q({0} ઈમ્પિ. ગૅલન),
 						'per' => q({0} પ્રતિ ઈમ્પિ. ગૅલન),
 					},
 					# Long Unit Identifier
-					'volume-hectoliter' => {
-						'name' => q(હેક્ટોલીટર),
-						'one' => q({0} હેક્ટોલીટર),
-						'other' => q({0} હેક્ટોલીટર),
-					},
-					# Core Unit Identifier
-					'hectoliter' => {
-						'name' => q(હેક્ટોલીટર),
-						'one' => q({0} હેક્ટોલીટર),
-						'other' => q({0} હેક્ટોલીટર),
-					},
-					# Long Unit Identifier
-					'volume-jigger' => {
-						'name' => q(જિગર),
-						'one' => q({0} જિગર),
-						'other' => q({0} જિગર),
-					},
-					# Core Unit Identifier
-					'jigger' => {
-						'name' => q(જિગર),
-						'one' => q({0} જિગર),
-						'other' => q({0} જિગર),
-					},
-					# Long Unit Identifier
 					'volume-liter' => {
 						'1' => q(masculine),
-						'name' => q(લિટર),
 						'one' => q({0} લિટર),
 						'other' => q({0} લિટર),
 						'per' => q({0} પ્રતિ લિટર),
@@ -3865,58 +3292,9 @@ has 'units' => (
 					# Core Unit Identifier
 					'liter' => {
 						'1' => q(masculine),
-						'name' => q(લિટર),
 						'one' => q({0} લિટર),
 						'other' => q({0} લિટર),
 						'per' => q({0} પ્રતિ લિટર),
-					},
-					# Long Unit Identifier
-					'volume-megaliter' => {
-						'name' => q(મેગાલીટર),
-						'one' => q({0} મેગાલીટર),
-						'other' => q({0} મેગાલીટર),
-					},
-					# Core Unit Identifier
-					'megaliter' => {
-						'name' => q(મેગાલીટર),
-						'one' => q({0} મેગાલીટર),
-						'other' => q({0} મેગાલીટર),
-					},
-					# Long Unit Identifier
-					'volume-milliliter' => {
-						'name' => q(મિલિલીટર),
-						'one' => q({0} મિલિલીટર),
-						'other' => q({0} મિલિલીટર),
-					},
-					# Core Unit Identifier
-					'milliliter' => {
-						'name' => q(મિલિલીટર),
-						'one' => q({0} મિલિલીટર),
-						'other' => q({0} મિલિલીટર),
-					},
-					# Long Unit Identifier
-					'volume-pinch' => {
-						'name' => q(ચપટી),
-						'one' => q({0} ચપટી),
-						'other' => q({0} ચપટી),
-					},
-					# Core Unit Identifier
-					'pinch' => {
-						'name' => q(ચપટી),
-						'one' => q({0} ચપટી),
-						'other' => q({0} ચપટી),
-					},
-					# Long Unit Identifier
-					'volume-pint' => {
-						'name' => q(પિન્ટ),
-						'one' => q({0} પિન્ટ),
-						'other' => q({0} પિન્ટ),
-					},
-					# Core Unit Identifier
-					'pint' => {
-						'name' => q(પિન્ટ),
-						'one' => q({0} પિન્ટ),
-						'other' => q({0} પિન્ટ),
 					},
 					# Long Unit Identifier
 					'volume-pint-metric' => {
@@ -3933,18 +3311,6 @@ has 'units' => (
 						'other' => q({0} મેટ્રિક પિન્ટ),
 					},
 					# Long Unit Identifier
-					'volume-quart' => {
-						'name' => q(ક્વાર્ટ),
-						'one' => q({0} ક્વાર્ટ),
-						'other' => q({0} ક્વાર્ટ),
-					},
-					# Core Unit Identifier
-					'quart' => {
-						'name' => q(ક્વાર્ટ),
-						'one' => q({0} ક્વાર્ટ),
-						'other' => q({0} ક્વાર્ટ),
-					},
-					# Long Unit Identifier
 					'volume-quart-imperial' => {
 						'name' => q(ઇમ્પીરિયલ ક્વૉર્ટ),
 						'one' => q({0} ઇમ્પીરિયલ ક્વૉર્ટ),
@@ -3956,104 +3322,8 @@ has 'units' => (
 						'one' => q({0} ઇમ્પીરિયલ ક્વૉર્ટ),
 						'other' => q({0} ઇમ્પીરિયલ ક્વૉર્ટ),
 					},
-					# Long Unit Identifier
-					'volume-tablespoon' => {
-						'name' => q(ટેબલસ્પૂન),
-						'one' => q({0} ટેબલસ્પૂન),
-						'other' => q({0} ટેબલસ્પૂન),
-					},
-					# Core Unit Identifier
-					'tablespoon' => {
-						'name' => q(ટેબલસ્પૂન),
-						'one' => q({0} ટેબલસ્પૂન),
-						'other' => q({0} ટેબલસ્પૂન),
-					},
-					# Long Unit Identifier
-					'volume-teaspoon' => {
-						'name' => q(ટીસ્પૂન),
-						'one' => q({0} ટીસ્પૂન),
-						'other' => q({0} ટીસ્પૂન),
-					},
-					# Core Unit Identifier
-					'teaspoon' => {
-						'name' => q(ટીસ્પૂન),
-						'one' => q({0} ટીસ્પૂન),
-						'other' => q({0} ટીસ્પૂન),
-					},
 				},
 				'narrow' => {
-					# Long Unit Identifier
-					'' => {
-						'name' => q(દિશા),
-					},
-					# Core Unit Identifier
-					'' => {
-						'name' => q(દિશા),
-					},
-					# Long Unit Identifier
-					'1024p1' => {
-						'1' => q(Ki{0}),
-					},
-					# Core Unit Identifier
-					'1024p1' => {
-						'1' => q(Ki{0}),
-					},
-					# Long Unit Identifier
-					'1024p2' => {
-						'1' => q(Mi{0}),
-					},
-					# Core Unit Identifier
-					'1024p2' => {
-						'1' => q(Mi{0}),
-					},
-					# Long Unit Identifier
-					'1024p3' => {
-						'1' => q(Gi{0}),
-					},
-					# Core Unit Identifier
-					'1024p3' => {
-						'1' => q(Gi{0}),
-					},
-					# Long Unit Identifier
-					'1024p4' => {
-						'1' => q(Ti{0}),
-					},
-					# Core Unit Identifier
-					'1024p4' => {
-						'1' => q(Ti{0}),
-					},
-					# Long Unit Identifier
-					'1024p5' => {
-						'1' => q(Pi{0}),
-					},
-					# Core Unit Identifier
-					'1024p5' => {
-						'1' => q(Pi{0}),
-					},
-					# Long Unit Identifier
-					'1024p6' => {
-						'1' => q(Ei{0}),
-					},
-					# Core Unit Identifier
-					'1024p6' => {
-						'1' => q(Ei{0}),
-					},
-					# Long Unit Identifier
-					'1024p7' => {
-						'1' => q(Zi{0}),
-					},
-					# Core Unit Identifier
-					'1024p7' => {
-						'1' => q(Zi{0}),
-					},
-					# Long Unit Identifier
-					'1024p8' => {
-						'1' => q(Yi{0}),
-					},
-					# Core Unit Identifier
-					'1024p8' => {
-						'1' => q(Yi{0}),
-					},
 					# Long Unit Identifier
 					'10p-1' => {
 						'1' => q(ડેસી{0}),
@@ -4117,6 +3387,14 @@ has 'units' => (
 					# Core Unit Identifier
 					'3' => {
 						'1' => q(મિલી{0}),
+					},
+					# Long Unit Identifier
+					'10p-30' => {
+						'1' => q(ક્વેક્ટો{0}),
+					},
+					# Core Unit Identifier
+					'30' => {
+						'1' => q(ક્વેક્ટો{0}),
 					},
 					# Long Unit Identifier
 					'10p-9' => {
@@ -4183,12 +3461,28 @@ has 'units' => (
 						'1' => q(યોટા{0}),
 					},
 					# Long Unit Identifier
+					'10p27' => {
+						'1' => q(રો.{0}),
+					},
+					# Core Unit Identifier
+					'10p27' => {
+						'1' => q(રો.{0}),
+					},
+					# Long Unit Identifier
 					'10p3' => {
 						'1' => q(કિલો{0}),
 					},
 					# Core Unit Identifier
 					'10p3' => {
 						'1' => q(કિલો{0}),
+					},
+					# Long Unit Identifier
+					'10p30' => {
+						'1' => q(ક્વે.{0}),
+					},
+					# Core Unit Identifier
+					'10p30' => {
+						'1' => q(ક્વે.{0}),
 					},
 					# Long Unit Identifier
 					'10p6' => {
@@ -4245,24 +3539,6 @@ has 'units' => (
 						'other' => q({0}″),
 					},
 					# Long Unit Identifier
-					'angle-degree' => {
-						'name' => q(અંશ),
-					},
-					# Core Unit Identifier
-					'degree' => {
-						'name' => q(અંશ),
-					},
-					# Long Unit Identifier
-					'angle-radian' => {
-						'one' => q({0} સમત્રિ.),
-						'other' => q({0} સમત્રિ.),
-					},
-					# Core Unit Identifier
-					'radian' => {
-						'one' => q({0} સમત્રિ.),
-						'other' => q({0} સમત્રિ.),
-					},
-					# Long Unit Identifier
 					'area-square-centimeter' => {
 						'one' => q({0}ચો.સેમી),
 						'other' => q({0}ચો.સેમી),
@@ -4293,18 +3569,6 @@ has 'units' => (
 						'other' => q({0}ચો.મીટર),
 					},
 					# Long Unit Identifier
-					'concentr-item' => {
-						'name' => q(વસ્તુ),
-						'one' => q({0} વસ્તુ),
-						'other' => q({0} વસ્તુ),
-					},
-					# Core Unit Identifier
-					'item' => {
-						'name' => q(વસ્તુ),
-						'one' => q({0} વસ્તુ),
-						'other' => q({0} વસ્તુ),
-					},
-					# Long Unit Identifier
 					'concentr-millimole-per-liter' => {
 						'name' => q(mmol/L),
 					},
@@ -4315,14 +3579,10 @@ has 'units' => (
 					# Long Unit Identifier
 					'concentr-percent' => {
 						'name' => q(%),
-						'one' => q({0}%),
-						'other' => q({0}%),
 					},
 					# Core Unit Identifier
 					'percent' => {
 						'name' => q(%),
-						'one' => q({0}%),
-						'other' => q({0}%),
 					},
 					# Long Unit Identifier
 					'concentr-permille' => {
@@ -4350,13 +3610,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
-						'name' => q(લિ/100 કિમી),
 						'one' => q({0}લિ/100કિમી),
 						'other' => q({0}લિ/100કિમી),
 					},
 					# Core Unit Identifier
 					'liter-per-100-kilometer' => {
-						'name' => q(લિ/100 કિમી),
 						'one' => q({0}લિ/100કિમી),
 						'other' => q({0}લિ/100કિમી),
 					},
@@ -4369,20 +3627,6 @@ has 'units' => (
 					'mile-per-gallon-imperial' => {
 						'one' => q({0} માઈલ/ઈમ્પે. ગેલન),
 						'other' => q({0} માઈલ/ઈમ્પે. ગેલન),
-					},
-					# Long Unit Identifier
-					'coordinate' => {
-						'east' => q({0}પૂ),
-						'north' => q({0}ઉ),
-						'south' => q({0}દ),
-						'west' => q({0}પ),
-					},
-					# Core Unit Identifier
-					'coordinate' => {
-						'east' => q({0}પૂ),
-						'north' => q({0}ઉ),
-						'south' => q({0}દ),
-						'west' => q({0}પ),
 					},
 					# Long Unit Identifier
 					'digital-gigabit' => {
@@ -4402,67 +3646,47 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'duration-day' => {
-						'name' => q(દિવસ),
 						'one' => q({0} દિ),
 						'other' => q({0} દિ),
 						'per' => q({0}/ દિ),
 					},
 					# Core Unit Identifier
 					'day' => {
-						'name' => q(દિવસ),
 						'one' => q({0} દિ),
 						'other' => q({0} દિ),
 						'per' => q({0}/ દિ),
 					},
 					# Long Unit Identifier
 					'duration-hour' => {
-						'name' => q(કલાક),
 						'one' => q({0} ક),
 						'other' => q({0} ક),
 						'per' => q({0}/ક),
 					},
 					# Core Unit Identifier
 					'hour' => {
-						'name' => q(કલાક),
 						'one' => q({0} ક),
 						'other' => q({0} ક),
 						'per' => q({0}/ક),
 					},
 					# Long Unit Identifier
-					'duration-millisecond' => {
-						'name' => q(મિલિસેકન્ડ),
-						'one' => q({0} મિસે),
-						'other' => q({0} મિસે),
-					},
-					# Core Unit Identifier
-					'millisecond' => {
-						'name' => q(મિલિસેકન્ડ),
-						'one' => q({0} મિસે),
-						'other' => q({0} મિસે),
-					},
-					# Long Unit Identifier
 					'duration-minute' => {
-						'name' => q(મિનિટ),
 						'one' => q({0} મિ),
 						'other' => q({0} મિ),
 						'per' => q({0}/મિ),
 					},
 					# Core Unit Identifier
 					'minute' => {
-						'name' => q(મિનિટ),
 						'one' => q({0} મિ),
 						'other' => q({0} મિ),
 						'per' => q({0}/મિ),
 					},
 					# Long Unit Identifier
 					'duration-month' => {
-						'name' => q(મહિના),
 						'one' => q({0} મ),
 						'other' => q({0} મ),
 					},
 					# Core Unit Identifier
 					'month' => {
-						'name' => q(મહિના),
 						'one' => q({0} મ),
 						'other' => q({0} મ),
 					},
@@ -4476,49 +3700,25 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'duration-second' => {
-						'name' => q(સેકંડ),
 						'one' => q({0} સે),
 						'other' => q({0} સે),
 						'per' => q({0}/સે),
 					},
 					# Core Unit Identifier
 					'second' => {
-						'name' => q(સેકંડ),
 						'one' => q({0} સે),
 						'other' => q({0} સે),
 						'per' => q({0}/સે),
 					},
 					# Long Unit Identifier
-					'duration-week' => {
-						'name' => q(અઠવાડિયા),
-						'one' => q({0} અઠ.),
-						'other' => q({0} અઠ.),
-					},
-					# Core Unit Identifier
-					'week' => {
-						'name' => q(અઠવાડિયા),
-						'one' => q({0} અઠ.),
-						'other' => q({0} અઠ.),
-					},
-					# Long Unit Identifier
 					'duration-year' => {
-						'name' => q(વર્ષ),
 						'one' => q({0} વ),
 						'other' => q({0} વ),
 					},
 					# Core Unit Identifier
 					'year' => {
-						'name' => q(વર્ષ),
 						'one' => q({0} વ),
 						'other' => q({0} વ),
-					},
-					# Long Unit Identifier
-					'electric-volt' => {
-						'name' => q(વૉલ્ટ),
-					},
-					# Core Unit Identifier
-					'volt' => {
-						'name' => q(વૉલ્ટ),
 					},
 					# Long Unit Identifier
 					'energy-electronvolt' => {
@@ -4555,30 +3755,20 @@ has 'units' => (
 						'name' => q(lbf),
 					},
 					# Long Unit Identifier
-					'length-centimeter' => {
-						'name' => q(સેમી),
-						'one' => q({0} સેમી),
-						'other' => q({0} સેમી),
-						'per' => q({0}/સેમી),
+					'graphics-megapixel' => {
+						'name' => q(MP),
 					},
 					# Core Unit Identifier
-					'centimeter' => {
-						'name' => q(સેમી),
-						'one' => q({0} સેમી),
-						'other' => q({0} સેમી),
-						'per' => q({0}/સેમી),
+					'megapixel' => {
+						'name' => q(MP),
 					},
 					# Long Unit Identifier
-					'length-decimeter' => {
-						'name' => q(ડેમી),
-						'one' => q({0} ડેમી),
-						'other' => q({0} ડેમી),
+					'graphics-pixel' => {
+						'name' => q(px),
 					},
 					# Core Unit Identifier
-					'decimeter' => {
-						'name' => q(ડેમી),
-						'one' => q({0} ડેમી),
-						'other' => q({0} ડેમી),
+					'pixel' => {
+						'name' => q(px),
 					},
 					# Long Unit Identifier
 					'length-foot' => {
@@ -4592,31 +3782,13 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-inch' => {
-						'name' => q(ઇંચ),
 						'one' => q({0} "),
 						'other' => q({0} "),
-						'per' => q({0}/ઈંચ),
 					},
 					# Core Unit Identifier
 					'inch' => {
-						'name' => q(ઇંચ),
 						'one' => q({0} "),
 						'other' => q({0} "),
-						'per' => q({0}/ઈંચ),
-					},
-					# Long Unit Identifier
-					'length-kilometer' => {
-						'name' => q(કિમી),
-						'one' => q({0} કિમી),
-						'other' => q({0} કિમી),
-						'per' => q({0}/કિમી),
-					},
-					# Core Unit Identifier
-					'kilometer' => {
-						'name' => q(કિમી),
-						'one' => q({0} કિમી),
-						'other' => q({0} કિમી),
-						'per' => q({0}/કિમી),
 					},
 					# Long Unit Identifier
 					'length-light-year' => {
@@ -4631,52 +3803,20 @@ has 'units' => (
 					# Long Unit Identifier
 					'length-meter' => {
 						'name' => q(મી),
-						'one' => q({0} મી),
-						'other' => q({0} મી),
-						'per' => q({0}/મી),
 					},
 					# Core Unit Identifier
 					'meter' => {
 						'name' => q(મી),
-						'one' => q({0} મી),
-						'other' => q({0} મી),
-						'per' => q({0}/મી),
-					},
-					# Long Unit Identifier
-					'length-mile' => {
-						'name' => q(માઇલ),
-						'one' => q({0} માઇલ),
-						'other' => q({0} માઇલ),
-					},
-					# Core Unit Identifier
-					'mile' => {
-						'name' => q(માઇલ),
-						'one' => q({0} માઇલ),
-						'other' => q({0} માઇલ),
 					},
 					# Long Unit Identifier
 					'length-mile-scandinavian' => {
-						'name' => q(smi),
 						'one' => q({0}smi),
 						'other' => q({0}smi),
 					},
 					# Core Unit Identifier
 					'mile-scandinavian' => {
-						'name' => q(smi),
 						'one' => q({0}smi),
 						'other' => q({0}smi),
-					},
-					# Long Unit Identifier
-					'length-millimeter' => {
-						'name' => q(મિમી),
-						'one' => q({0} મિમી),
-						'other' => q({0} મિમી),
-					},
-					# Core Unit Identifier
-					'millimeter' => {
-						'name' => q(મિમી),
-						'one' => q({0} મિમી),
-						'other' => q({0} મિમી),
 					},
 					# Long Unit Identifier
 					'length-picometer' => {
@@ -4689,32 +3829,12 @@ has 'units' => (
 						'other' => q({0}પિસૉ.મી),
 					},
 					# Long Unit Identifier
-					'length-point' => {
-						'name' => q(પોઈન્ટ),
-					},
-					# Core Unit Identifier
-					'point' => {
-						'name' => q(પોઈન્ટ),
-					},
-					# Long Unit Identifier
 					'length-solar-radius' => {
 						'name' => q(R☉),
 					},
 					# Core Unit Identifier
 					'solar-radius' => {
 						'name' => q(R☉),
-					},
-					# Long Unit Identifier
-					'length-yard' => {
-						'name' => q(વાર),
-						'one' => q({0} વાર),
-						'other' => q({0} વાર),
-					},
-					# Core Unit Identifier
-					'yard' => {
-						'name' => q(વાર),
-						'one' => q({0} વાર),
-						'other' => q({0} વાર),
 					},
 					# Long Unit Identifier
 					'light-solar-luminosity' => {
@@ -4741,62 +3861,6 @@ has 'units' => (
 						'name' => q(M⊕),
 					},
 					# Long Unit Identifier
-					'mass-gram' => {
-						'name' => q(ગ્રામ),
-						'one' => q({0} ગ્રા),
-						'other' => q({0} ગ્રા),
-						'per' => q({0}/ગ્રામ),
-					},
-					# Core Unit Identifier
-					'gram' => {
-						'name' => q(ગ્રામ),
-						'one' => q({0} ગ્રા),
-						'other' => q({0} ગ્રા),
-						'per' => q({0}/ગ્રામ),
-					},
-					# Long Unit Identifier
-					'mass-kilogram' => {
-						'name' => q(કિગ્રા),
-						'one' => q({0} કિગ્રા),
-						'other' => q({0} કિગ્રા),
-						'per' => q({0}/કિગ્રા),
-					},
-					# Core Unit Identifier
-					'kilogram' => {
-						'name' => q(કિગ્રા),
-						'one' => q({0} કિગ્રા),
-						'other' => q({0} કિગ્રા),
-						'per' => q({0}/કિગ્રા),
-					},
-					# Long Unit Identifier
-					'mass-ounce' => {
-						'name' => q(ઔંસ),
-						'one' => q({0} ઔંશ),
-						'other' => q({0} ઔંશ),
-						'per' => q({0}/ઔંસ),
-					},
-					# Core Unit Identifier
-					'ounce' => {
-						'name' => q(ઔંસ),
-						'one' => q({0} ઔંશ),
-						'other' => q({0} ઔંશ),
-						'per' => q({0}/ઔંસ),
-					},
-					# Long Unit Identifier
-					'mass-pound' => {
-						'name' => q(પાઉન્ડ),
-						'one' => q({0} પાઉન્ડ),
-						'other' => q({0} પાઉન્ડ),
-						'per' => q({0}/પાઉન્ડ),
-					},
-					# Core Unit Identifier
-					'pound' => {
-						'name' => q(પાઉન્ડ),
-						'one' => q({0} પાઉન્ડ),
-						'other' => q({0} પાઉન્ડ),
-						'per' => q({0}/પાઉન્ડ),
-					},
-					# Long Unit Identifier
 					'mass-solar-mass' => {
 						'name' => q(M☉),
 					},
@@ -4817,122 +3881,32 @@ has 'units' => (
 						'other' => q({0}સ્ટોન),
 					},
 					# Long Unit Identifier
-					'per' => {
-						'1' => q({0}/{1}),
-					},
-					# Core Unit Identifier
-					'per' => {
-						'1' => q({0}/{1}),
-					},
-					# Long Unit Identifier
-					'power-horsepower' => {
-						'one' => q({0} hp),
-						'other' => q({0} hp),
-					},
-					# Core Unit Identifier
-					'horsepower' => {
-						'one' => q({0} hp),
-						'other' => q({0} hp),
-					},
-					# Long Unit Identifier
-					'power-kilowatt' => {
-						'one' => q({0} kW),
-						'other' => q({0} kW),
-					},
-					# Core Unit Identifier
-					'kilowatt' => {
-						'one' => q({0} kW),
-						'other' => q({0} kW),
-					},
-					# Long Unit Identifier
-					'power-watt' => {
-						'one' => q({0} W),
-						'other' => q({0} W),
-					},
-					# Core Unit Identifier
-					'watt' => {
-						'one' => q({0} W),
-						'other' => q({0} W),
-					},
-					# Long Unit Identifier
-					'pressure-hectopascal' => {
-						'one' => q({0} hPa),
-						'other' => q({0} hPa),
-					},
-					# Core Unit Identifier
-					'hectopascal' => {
-						'one' => q({0} hPa),
-						'other' => q({0} hPa),
-					},
-					# Long Unit Identifier
-					'pressure-inch-ofhg' => {
-						'one' => q({0} inHg),
-						'other' => q({0} inHg),
-					},
-					# Core Unit Identifier
-					'inch-ofhg' => {
-						'one' => q({0} inHg),
-						'other' => q({0} inHg),
-					},
-					# Long Unit Identifier
 					'pressure-millibar' => {
-						'one' => q({0}મિલીબાર),
+						'one' => q({0} મિલિબાર),
 						'other' => q({0}મિલીબાર),
 					},
 					# Core Unit Identifier
 					'millibar' => {
-						'one' => q({0}મિલીબાર),
+						'one' => q({0} મિલિબાર),
 						'other' => q({0}મિલીબાર),
 					},
 					# Long Unit Identifier
 					'speed-kilometer-per-hour' => {
-						'name' => q(કિમી/કલાક),
 						'one' => q({0} કિપ્રક),
 						'other' => q({0} કિપ્રક),
 					},
 					# Core Unit Identifier
 					'kilometer-per-hour' => {
-						'name' => q(કિમી/કલાક),
 						'one' => q({0} કિપ્રક),
 						'other' => q({0} કિપ્રક),
 					},
 					# Long Unit Identifier
-					'speed-meter-per-second' => {
-						'name' => q(મીટર/સેકન્ડ),
-					},
-					# Core Unit Identifier
-					'meter-per-second' => {
-						'name' => q(મીટર/સેકન્ડ),
-					},
-					# Long Unit Identifier
-					'speed-mile-per-hour' => {
-						'name' => q(માઇલ/કલાક),
-					},
-					# Core Unit Identifier
-					'mile-per-hour' => {
-						'name' => q(માઇલ/કલાક),
-					},
-					# Long Unit Identifier
 					'temperature-celsius' => {
 						'name' => q(°C),
-						'one' => q({0}°C),
-						'other' => q({0}°C),
 					},
 					# Core Unit Identifier
 					'celsius' => {
 						'name' => q(°C),
-						'one' => q({0}°C),
-						'other' => q({0}°C),
-					},
-					# Long Unit Identifier
-					'temperature-fahrenheit' => {
-						'one' => q({0}°F),
-						'other' => q({0}°F),
-					},
-					# Core Unit Identifier
-					'fahrenheit' => {
-						'one' => q({0}°F),
-						'other' => q({0}°F),
 					},
 					# Long Unit Identifier
 					'volume-dessert-spoon-imperial' => {
@@ -4956,13 +3930,13 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'volume-fluid-ounce-imperial' => {
-						'one' => q({0} પ્રવાહી ઔંસ ઈમ્પિ.),
-						'other' => q({0} પ્રવાહી ઔંસ ઈમ્પિ.),
+						'one' => q({0} પ્રવાહી ઔંસ ઈમ્પી.),
+						'other' => q({0} પ્રવાહી ઔંસ ઈમ્પી.),
 					},
 					# Core Unit Identifier
 					'fluid-ounce-imperial' => {
-						'one' => q({0} પ્રવાહી ઔંસ ઈમ્પિ.),
-						'other' => q({0} પ્રવાહી ઔંસ ઈમ્પિ.),
+						'one' => q({0} પ્રવાહી ઔંસ ઈમ્પી.),
+						'other' => q({0} પ્રવાહી ઔંસ ઈમ્પી.),
 					},
 					# Long Unit Identifier
 					'volume-gallon-imperial' => {
@@ -4974,18 +3948,6 @@ has 'units' => (
 						'one' => q({0} ગૅ. ઈમ્પિ.),
 						'other' => q({0} ગૅ. ઈમ્પિ.),
 					},
-					# Long Unit Identifier
-					'volume-liter' => {
-						'name' => q(લિટર),
-						'one' => q({0} લિ),
-						'other' => q({0} લિ),
-					},
-					# Core Unit Identifier
-					'liter' => {
-						'name' => q(લિટર),
-						'one' => q({0} લિ),
-						'other' => q({0} લિ),
-					},
 				},
 				'short' => {
 					# Long Unit Identifier
@@ -4995,70 +3957,6 @@ has 'units' => (
 					# Core Unit Identifier
 					'' => {
 						'name' => q(દિશા),
-					},
-					# Long Unit Identifier
-					'1024p1' => {
-						'1' => q(Ki{0}),
-					},
-					# Core Unit Identifier
-					'1024p1' => {
-						'1' => q(Ki{0}),
-					},
-					# Long Unit Identifier
-					'1024p2' => {
-						'1' => q(Mi{0}),
-					},
-					# Core Unit Identifier
-					'1024p2' => {
-						'1' => q(Mi{0}),
-					},
-					# Long Unit Identifier
-					'1024p3' => {
-						'1' => q(Gi{0}),
-					},
-					# Core Unit Identifier
-					'1024p3' => {
-						'1' => q(Gi{0}),
-					},
-					# Long Unit Identifier
-					'1024p4' => {
-						'1' => q(Ti{0}),
-					},
-					# Core Unit Identifier
-					'1024p4' => {
-						'1' => q(Ti{0}),
-					},
-					# Long Unit Identifier
-					'1024p5' => {
-						'1' => q(Pi{0}),
-					},
-					# Core Unit Identifier
-					'1024p5' => {
-						'1' => q(Pi{0}),
-					},
-					# Long Unit Identifier
-					'1024p6' => {
-						'1' => q(Ei{0}),
-					},
-					# Core Unit Identifier
-					'1024p6' => {
-						'1' => q(Ei{0}),
-					},
-					# Long Unit Identifier
-					'1024p7' => {
-						'1' => q(Zi{0}),
-					},
-					# Core Unit Identifier
-					'1024p7' => {
-						'1' => q(Zi{0}),
-					},
-					# Long Unit Identifier
-					'1024p8' => {
-						'1' => q(Yi{0}),
-					},
-					# Core Unit Identifier
-					'1024p8' => {
-						'1' => q(Yi{0}),
 					},
 					# Long Unit Identifier
 					'10p-1' => {
@@ -5117,12 +4015,28 @@ has 'units' => (
 						'1' => q(યોક.{0}),
 					},
 					# Long Unit Identifier
+					'10p-27' => {
+						'1' => q(રો.{0}),
+					},
+					# Core Unit Identifier
+					'27' => {
+						'1' => q(રો.{0}),
+					},
+					# Long Unit Identifier
 					'10p-3' => {
 						'1' => q(મિ.{0}),
 					},
 					# Core Unit Identifier
 					'3' => {
 						'1' => q(મિ.{0}),
+					},
+					# Long Unit Identifier
+					'10p-30' => {
+						'1' => q(ક્વે.{0}),
+					},
+					# Core Unit Identifier
+					'30' => {
+						'1' => q(ક્વે.{0}),
 					},
 					# Long Unit Identifier
 					'10p-9' => {
@@ -5405,14 +4319,14 @@ has 'units' => (
 						'name' => q(ચોરસ માઇલ),
 						'one' => q({0} ચોરસ માઇલ),
 						'other' => q({0} ચોરસ માઇલ),
-						'per' => q({0} / ચોરસ માઈલ),
+						'per' => q({0} / ચોરસ માઇલ),
 					},
 					# Core Unit Identifier
 					'square-mile' => {
 						'name' => q(ચોરસ માઇલ),
 						'one' => q({0} ચોરસ માઇલ),
 						'other' => q({0} ચોરસ માઇલ),
-						'per' => q({0} / ચોરસ માઈલ),
+						'per' => q({0} / ચોરસ માઇલ),
 					},
 					# Long Unit Identifier
 					'area-square-yard' => {
@@ -5451,28 +4365,12 @@ has 'units' => (
 						'other' => q({0} કૅરેટ),
 					},
 					# Long Unit Identifier
-					'concentr-milligram-ofglucose-per-deciliter' => {
-						'name' => q(mg/dL),
-						'one' => q({0} mg/dL),
-						'other' => q({0} mg/dL),
-					},
-					# Core Unit Identifier
-					'milligram-ofglucose-per-deciliter' => {
-						'name' => q(mg/dL),
-						'one' => q({0} mg/dL),
-						'other' => q({0} mg/dL),
-					},
-					# Long Unit Identifier
 					'concentr-millimole-per-liter' => {
 						'name' => q(મિલિમોલ/લિટર),
-						'one' => q({0} mmol/L),
-						'other' => q({0} mmol/L),
 					},
 					# Core Unit Identifier
 					'millimole-per-liter' => {
 						'name' => q(મિલિમોલ/લિટર),
-						'one' => q({0} mmol/L),
-						'other' => q({0} mmol/L),
 					},
 					# Long Unit Identifier
 					'concentr-mole' => {
@@ -5489,50 +4387,34 @@ has 'units' => (
 					# Long Unit Identifier
 					'concentr-percent' => {
 						'name' => q(ટકા),
-						'one' => q({0}%),
-						'other' => q({0}%),
 					},
 					# Core Unit Identifier
 					'percent' => {
 						'name' => q(ટકા),
-						'one' => q({0}%),
-						'other' => q({0}%),
 					},
 					# Long Unit Identifier
 					'concentr-permille' => {
 						'name' => q(પ્રતિમાઈલ),
-						'one' => q({0}‰),
-						'other' => q({0}‰),
 					},
 					# Core Unit Identifier
 					'permille' => {
 						'name' => q(પ્રતિમાઈલ),
-						'one' => q({0}‰),
-						'other' => q({0}‰),
 					},
 					# Long Unit Identifier
 					'concentr-permillion' => {
 						'name' => q(કણ/મિલિયન),
-						'one' => q({0} ppm),
-						'other' => q({0} ppm),
 					},
 					# Core Unit Identifier
 					'permillion' => {
 						'name' => q(કણ/મિલિયન),
-						'one' => q({0} ppm),
-						'other' => q({0} ppm),
 					},
 					# Long Unit Identifier
 					'concentr-permyriad' => {
 						'name' => q(પરમિરિયડ),
-						'one' => q({0}‱),
-						'other' => q({0}‱),
 					},
 					# Core Unit Identifier
 					'permyriad' => {
 						'name' => q(પરમિરિયડ),
-						'one' => q({0}‱),
-						'other' => q({0}‱),
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
@@ -5573,14 +4455,10 @@ has 'units' => (
 					# Long Unit Identifier
 					'consumption-mile-per-gallon-imperial' => {
 						'name' => q(માઈલ/ઈમ્પે. ગેલન),
-						'one' => q({0} mpg Imp.),
-						'other' => q({0} mpg Imp.),
 					},
 					# Core Unit Identifier
 					'mile-per-gallon-imperial' => {
 						'name' => q(માઈલ/ઈમ્પે. ગેલન),
-						'one' => q({0} mpg Imp.),
-						'other' => q({0} mpg Imp.),
 					},
 					# Long Unit Identifier
 					'coordinate' => {
@@ -5623,110 +4501,18 @@ has 'units' => (
 					# Long Unit Identifier
 					'digital-gigabit' => {
 						'name' => q(ગીગાબિટ),
-						'one' => q({0} Gb),
-						'other' => q({0} Gb),
 					},
 					# Core Unit Identifier
 					'gigabit' => {
 						'name' => q(ગીગાબિટ),
-						'one' => q({0} Gb),
-						'other' => q({0} Gb),
-					},
-					# Long Unit Identifier
-					'digital-gigabyte' => {
-						'name' => q(GB),
-						'one' => q({0} GB),
-						'other' => q({0} GB),
-					},
-					# Core Unit Identifier
-					'gigabyte' => {
-						'name' => q(GB),
-						'one' => q({0} GB),
-						'other' => q({0} GB),
-					},
-					# Long Unit Identifier
-					'digital-kilobit' => {
-						'name' => q(kb),
-						'one' => q({0} kb),
-						'other' => q({0} kb),
-					},
-					# Core Unit Identifier
-					'kilobit' => {
-						'name' => q(kb),
-						'one' => q({0} kb),
-						'other' => q({0} kb),
-					},
-					# Long Unit Identifier
-					'digital-kilobyte' => {
-						'name' => q(kB),
-						'one' => q({0} kB),
-						'other' => q({0} kB),
-					},
-					# Core Unit Identifier
-					'kilobyte' => {
-						'name' => q(kB),
-						'one' => q({0} kB),
-						'other' => q({0} kB),
-					},
-					# Long Unit Identifier
-					'digital-megabit' => {
-						'name' => q(Mb),
-						'one' => q({0} Mb),
-						'other' => q({0} Mb),
-					},
-					# Core Unit Identifier
-					'megabit' => {
-						'name' => q(Mb),
-						'one' => q({0} Mb),
-						'other' => q({0} Mb),
-					},
-					# Long Unit Identifier
-					'digital-megabyte' => {
-						'name' => q(MB),
-						'one' => q({0} MB),
-						'other' => q({0} MB),
-					},
-					# Core Unit Identifier
-					'megabyte' => {
-						'name' => q(MB),
-						'one' => q({0} MB),
-						'other' => q({0} MB),
 					},
 					# Long Unit Identifier
 					'digital-petabyte' => {
 						'name' => q(PByte),
-						'one' => q({0} PB),
-						'other' => q({0} PB),
 					},
 					# Core Unit Identifier
 					'petabyte' => {
 						'name' => q(PByte),
-						'one' => q({0} PB),
-						'other' => q({0} PB),
-					},
-					# Long Unit Identifier
-					'digital-terabit' => {
-						'name' => q(Tb),
-						'one' => q({0} Tb),
-						'other' => q({0} Tb),
-					},
-					# Core Unit Identifier
-					'terabit' => {
-						'name' => q(Tb),
-						'one' => q({0} Tb),
-						'other' => q({0} Tb),
-					},
-					# Long Unit Identifier
-					'digital-terabyte' => {
-						'name' => q(TB),
-						'one' => q({0} TB),
-						'other' => q({0} TB),
-					},
-					# Core Unit Identifier
-					'terabyte' => {
-						'name' => q(TB),
-						'one' => q({0} TB),
-						'other' => q({0} TB),
 					},
 					# Long Unit Identifier
 					'duration-century' => {
@@ -5781,18 +4567,6 @@ has 'units' => (
 						'per' => q({0} પ્રતિ કલાક),
 					},
 					# Long Unit Identifier
-					'duration-microsecond' => {
-						'name' => q(μs),
-						'one' => q({0} μs),
-						'other' => q({0} μs),
-					},
-					# Core Unit Identifier
-					'microsecond' => {
-						'name' => q(μs),
-						'one' => q({0} μs),
-						'other' => q({0} μs),
-					},
-					# Long Unit Identifier
 					'duration-millisecond' => {
 						'name' => q(મિલિસેકન્ડ),
 						'one' => q({0} મિસે),
@@ -5835,14 +4609,24 @@ has 'units' => (
 					# Long Unit Identifier
 					'duration-nanosecond' => {
 						'name' => q(નેનોસેકંડ),
-						'one' => q({0} ns),
-						'other' => q({0} ns),
 					},
 					# Core Unit Identifier
 					'nanosecond' => {
 						'name' => q(નેનોસેકંડ),
-						'one' => q({0} ns),
-						'other' => q({0} ns),
+					},
+					# Long Unit Identifier
+					'duration-quarter' => {
+						'name' => q(ત્રિમાસ),
+						'one' => q({0}ત્રિ),
+						'other' => q({0}ત્રિ),
+						'per' => q({0}/ત્રિ),
+					},
+					# Core Unit Identifier
+					'quarter' => {
+						'name' => q(ત્રિમાસ),
+						'one' => q({0}ત્રિ),
+						'other' => q({0}ત્રિ),
+						'per' => q({0}/ત્રિ),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
@@ -5887,148 +4671,66 @@ has 'units' => (
 						'per' => q({0}/વર્ષ),
 					},
 					# Long Unit Identifier
-					'electric-ampere' => {
-						'name' => q(amp),
-						'one' => q({0} A),
-						'other' => q({0} A),
-					},
-					# Core Unit Identifier
-					'ampere' => {
-						'name' => q(amp),
-						'one' => q({0} A),
-						'other' => q({0} A),
-					},
-					# Long Unit Identifier
-					'electric-milliampere' => {
-						'name' => q(mA),
-						'one' => q({0} mA),
-						'other' => q({0} mA),
-					},
-					# Core Unit Identifier
-					'milliampere' => {
-						'name' => q(mA),
-						'one' => q({0} mA),
-						'other' => q({0} mA),
-					},
-					# Long Unit Identifier
 					'electric-ohm' => {
 						'name' => q(ઓહ્મ),
-						'one' => q({0} Ω),
-						'other' => q({0} Ω),
 					},
 					# Core Unit Identifier
 					'ohm' => {
 						'name' => q(ઓહ્મ),
-						'one' => q({0} Ω),
-						'other' => q({0} Ω),
 					},
 					# Long Unit Identifier
 					'electric-volt' => {
 						'name' => q(વૉલ્ટ),
-						'one' => q({0} V),
-						'other' => q({0} V),
 					},
 					# Core Unit Identifier
 					'volt' => {
 						'name' => q(વૉલ્ટ),
-						'one' => q({0} V),
-						'other' => q({0} V),
 					},
 					# Long Unit Identifier
 					'energy-british-thermal-unit' => {
 						'name' => q(BTU),
-						'one' => q({0} Btu),
-						'other' => q({0} Btu),
 					},
 					# Core Unit Identifier
 					'british-thermal-unit' => {
 						'name' => q(BTU),
-						'one' => q({0} Btu),
-						'other' => q({0} Btu),
 					},
 					# Long Unit Identifier
 					'energy-calorie' => {
-						'name' => q(cal),
 						'one' => q({0} Cal),
 						'other' => q({0} cal),
 					},
 					# Core Unit Identifier
 					'calorie' => {
-						'name' => q(cal),
 						'one' => q({0} Cal),
 						'other' => q({0} cal),
 					},
 					# Long Unit Identifier
 					'energy-electronvolt' => {
 						'name' => q(ઇલેક્ટ્રોનવૉલ્ટ),
-						'one' => q({0} eV),
-						'other' => q({0} eV),
 					},
 					# Core Unit Identifier
 					'electronvolt' => {
 						'name' => q(ઇલેક્ટ્રોનવૉલ્ટ),
-						'one' => q({0} eV),
-						'other' => q({0} eV),
 					},
 					# Long Unit Identifier
 					'energy-foodcalorie' => {
-						'name' => q(Cal),
-						'one' => q({0} Cal),
-						'other' => q({0} Cal),
+						'name' => q(કેલરી),
+						'one' => q({0} કેલરી),
+						'other' => q({0} કેલરી),
 					},
 					# Core Unit Identifier
 					'foodcalorie' => {
-						'name' => q(Cal),
-						'one' => q({0} Cal),
-						'other' => q({0} Cal),
+						'name' => q(કેલરી),
+						'one' => q({0} કેલરી),
+						'other' => q({0} કેલરી),
 					},
 					# Long Unit Identifier
 					'energy-joule' => {
 						'name' => q(જૂલ),
-						'one' => q({0} J),
-						'other' => q({0} J),
 					},
 					# Core Unit Identifier
 					'joule' => {
 						'name' => q(જૂલ),
-						'one' => q({0} J),
-						'other' => q({0} J),
-					},
-					# Long Unit Identifier
-					'energy-kilocalorie' => {
-						'name' => q(kcal),
-						'one' => q({0} kcal),
-						'other' => q({0} kcal),
-					},
-					# Core Unit Identifier
-					'kilocalorie' => {
-						'name' => q(kcal),
-						'one' => q({0} kcal),
-						'other' => q({0} kcal),
-					},
-					# Long Unit Identifier
-					'energy-kilojoule' => {
-						'name' => q(kJ),
-						'one' => q({0} kJ),
-						'other' => q({0} kJ),
-					},
-					# Core Unit Identifier
-					'kilojoule' => {
-						'name' => q(kJ),
-						'one' => q({0} kJ),
-						'other' => q({0} kJ),
-					},
-					# Long Unit Identifier
-					'energy-kilowatt-hour' => {
-						'name' => q(kWh),
-						'one' => q({0} kWh),
-						'other' => q({0} kWh),
-					},
-					# Core Unit Identifier
-					'kilowatt-hour' => {
-						'name' => q(kWh),
-						'one' => q({0} kWh),
-						'other' => q({0} kWh),
 					},
 					# Long Unit Identifier
 					'energy-therm-us' => {
@@ -6045,86 +4747,70 @@ has 'units' => (
 					# Long Unit Identifier
 					'force-newton' => {
 						'name' => q(ન્યૂટન),
-						'one' => q({0} N),
-						'other' => q({0} N),
 					},
 					# Core Unit Identifier
 					'newton' => {
 						'name' => q(ન્યૂટન),
-						'one' => q({0} N),
-						'other' => q({0} N),
 					},
 					# Long Unit Identifier
 					'force-pound-force' => {
 						'name' => q(પાઉન્ડ બળ),
-						'one' => q({0} lbf),
-						'other' => q({0} lbf),
 					},
 					# Core Unit Identifier
 					'pound-force' => {
 						'name' => q(પાઉન્ડ બળ),
-						'one' => q({0} lbf),
-						'other' => q({0} lbf),
-					},
-					# Long Unit Identifier
-					'frequency-gigahertz' => {
-						'name' => q(GHz),
-						'one' => q({0} GHz),
-						'other' => q({0} GHz),
-					},
-					# Core Unit Identifier
-					'gigahertz' => {
-						'name' => q(GHz),
-						'one' => q({0} GHz),
-						'other' => q({0} GHz),
 					},
 					# Long Unit Identifier
 					'frequency-hertz' => {
 						'name' => q(હર્ટ્ઝ),
-						'one' => q({0} Hz),
-						'other' => q({0} Hz),
 					},
 					# Core Unit Identifier
 					'hertz' => {
 						'name' => q(હર્ટ્ઝ),
-						'one' => q({0} Hz),
-						'other' => q({0} Hz),
-					},
-					# Long Unit Identifier
-					'frequency-kilohertz' => {
-						'name' => q(kHz),
-						'one' => q({0} kHz),
-						'other' => q({0} kHz),
-					},
-					# Core Unit Identifier
-					'kilohertz' => {
-						'name' => q(kHz),
-						'one' => q({0} kHz),
-						'other' => q({0} kHz),
-					},
-					# Long Unit Identifier
-					'frequency-megahertz' => {
-						'name' => q(MHz),
-						'one' => q({0} MHz),
-						'other' => q({0} MHz),
-					},
-					# Core Unit Identifier
-					'megahertz' => {
-						'name' => q(MHz),
-						'one' => q({0} MHz),
-						'other' => q({0} MHz),
 					},
 					# Long Unit Identifier
 					'graphics-dot' => {
 						'name' => q(ડૉટ),
-						'one' => q({0} px),
+						'one' => q({0} ડૉટ),
 						'other' => q({0} ડૉટ),
 					},
 					# Core Unit Identifier
 					'dot' => {
 						'name' => q(ડૉટ),
-						'one' => q({0} px),
+						'one' => q({0} ડૉટ),
 						'other' => q({0} ડૉટ),
+					},
+					# Long Unit Identifier
+					'graphics-dot-per-centimeter' => {
+						'name' => q(dpcm),
+						'one' => q({0} dpcm),
+						'other' => q({0} dpcm),
+					},
+					# Core Unit Identifier
+					'dot-per-centimeter' => {
+						'name' => q(dpcm),
+						'one' => q({0} dpcm),
+						'other' => q({0} dpcm),
+					},
+					# Long Unit Identifier
+					'graphics-dot-per-inch' => {
+						'name' => q(dpi),
+						'one' => q({0} dpi),
+						'other' => q({0} dpi),
+					},
+					# Core Unit Identifier
+					'dot-per-inch' => {
+						'name' => q(dpi),
+						'one' => q({0} dpi),
+						'other' => q({0} dpi),
+					},
+					# Long Unit Identifier
+					'graphics-megapixel' => {
+						'name' => q(મેગાપિક્સેલ),
+					},
+					# Core Unit Identifier
+					'megapixel' => {
+						'name' => q(મેગાપિક્સેલ),
 					},
 					# Long Unit Identifier
 					'graphics-pixel' => {
@@ -6137,14 +4823,10 @@ has 'units' => (
 					# Long Unit Identifier
 					'length-astronomical-unit' => {
 						'name' => q(ખગોળીય યુનિટ),
-						'one' => q({0} au),
-						'other' => q({0} au),
 					},
 					# Core Unit Identifier
 					'astronomical-unit' => {
 						'name' => q(ખગોળીય યુનિટ),
-						'one' => q({0} au),
-						'other' => q({0} au),
 					},
 					# Long Unit Identifier
 					'length-centimeter' => {
@@ -6281,18 +4963,6 @@ has 'units' => (
 						'other' => q({0} માઇલ),
 					},
 					# Long Unit Identifier
-					'length-mile-scandinavian' => {
-						'name' => q(smi),
-						'one' => q({0} smi),
-						'other' => q({0} smi),
-					},
-					# Core Unit Identifier
-					'mile-scandinavian' => {
-						'name' => q(smi),
-						'one' => q({0} smi),
-						'other' => q({0} smi),
-					},
-					# Long Unit Identifier
 					'length-millimeter' => {
 						'name' => q(મિમી),
 						'one' => q({0} મિમી),
@@ -6319,14 +4989,10 @@ has 'units' => (
 					# Long Unit Identifier
 					'length-nautical-mile' => {
 						'name' => q(નૉટિકલ માઇલ),
-						'one' => q({0} nmi),
-						'other' => q({0} nmi),
 					},
 					# Core Unit Identifier
 					'nautical-mile' => {
 						'name' => q(નૉટિકલ માઇલ),
-						'one' => q({0} nmi),
-						'other' => q({0} nmi),
 					},
 					# Long Unit Identifier
 					'length-parsec' => {
@@ -6367,14 +5033,10 @@ has 'units' => (
 					# Long Unit Identifier
 					'length-solar-radius' => {
 						'name' => q(સૌર ત્રિજ્યા),
-						'one' => q({0} R☉),
-						'other' => q({0} R☉),
 					},
 					# Core Unit Identifier
 					'solar-radius' => {
 						'name' => q(સૌર ત્રિજ્યા),
-						'one' => q({0} R☉),
-						'other' => q({0} R☉),
 					},
 					# Long Unit Identifier
 					'length-yard' => {
@@ -6403,14 +5065,10 @@ has 'units' => (
 					# Long Unit Identifier
 					'light-solar-luminosity' => {
 						'name' => q(સૌર તેજસ્વિતા),
-						'one' => q({0} L☉),
-						'other' => q({0} L☉),
 					},
 					# Core Unit Identifier
 					'solar-luminosity' => {
 						'name' => q(સૌર તેજસ્વિતા),
-						'one' => q({0} L☉),
-						'other' => q({0} L☉),
 					},
 					# Long Unit Identifier
 					'mass-carat' => {
@@ -6427,26 +5085,18 @@ has 'units' => (
 					# Long Unit Identifier
 					'mass-dalton' => {
 						'name' => q(ડાલ્ટન),
-						'one' => q({0} Da),
-						'other' => q({0} Da),
 					},
 					# Core Unit Identifier
 					'dalton' => {
 						'name' => q(ડાલ્ટન),
-						'one' => q({0} Da),
-						'other' => q({0} Da),
 					},
 					# Long Unit Identifier
 					'mass-earth-mass' => {
 						'name' => q(પૃથ્વી ઘનતા),
-						'one' => q({0} M⊕),
-						'other' => q({0} M⊕),
 					},
 					# Core Unit Identifier
 					'earth-mass' => {
 						'name' => q(પૃથ્વી ઘનતા),
-						'one' => q({0} M⊕),
-						'other' => q({0} M⊕),
 					},
 					# Long Unit Identifier
 					'mass-grain' => {
@@ -6487,18 +5137,6 @@ has 'units' => (
 						'one' => q({0} કિગ્રા),
 						'other' => q({0} કિગ્રા),
 						'per' => q({0}/કિગ્રા),
-					},
-					# Long Unit Identifier
-					'mass-metric-ton' => {
-						'name' => q(t),
-						'one' => q({0} t),
-						'other' => q({0} t),
-					},
-					# Core Unit Identifier
-					'metric-ton' => {
-						'name' => q(t),
-						'one' => q({0} t),
-						'other' => q({0} t),
 					},
 					# Long Unit Identifier
 					'mass-microgram' => {
@@ -6567,14 +5205,10 @@ has 'units' => (
 					# Long Unit Identifier
 					'mass-solar-mass' => {
 						'name' => q(સૌર ઘનતા),
-						'one' => q({0} M☉),
-						'other' => q({0} M☉),
 					},
 					# Core Unit Identifier
 					'solar-mass' => {
 						'name' => q(સૌર ઘનતા),
-						'one' => q({0} M☉),
-						'other' => q({0} M☉),
 					},
 					# Long Unit Identifier
 					'mass-stone' => {
@@ -6601,96 +5235,12 @@ has 'units' => (
 						'other' => q({0} ટન),
 					},
 					# Long Unit Identifier
-					'per' => {
-						'1' => q({0}/{1}),
-					},
-					# Core Unit Identifier
-					'per' => {
-						'1' => q({0}/{1}),
-					},
-					# Long Unit Identifier
-					'power-gigawatt' => {
-						'name' => q(GW),
-						'one' => q({0} GW),
-						'other' => q({0} GW),
-					},
-					# Core Unit Identifier
-					'gigawatt' => {
-						'name' => q(GW),
-						'one' => q({0} GW),
-						'other' => q({0} GW),
-					},
-					# Long Unit Identifier
-					'power-horsepower' => {
-						'name' => q(hp),
-						'one' => q({0} hp),
-						'other' => q({0} hp),
-					},
-					# Core Unit Identifier
-					'horsepower' => {
-						'name' => q(hp),
-						'one' => q({0} hp),
-						'other' => q({0} hp),
-					},
-					# Long Unit Identifier
-					'power-kilowatt' => {
-						'name' => q(kW),
-						'one' => q({0} kW),
-						'other' => q({0} kW),
-					},
-					# Core Unit Identifier
-					'kilowatt' => {
-						'name' => q(kW),
-						'one' => q({0} kW),
-						'other' => q({0} kW),
-					},
-					# Long Unit Identifier
-					'power-megawatt' => {
-						'name' => q(MW),
-						'one' => q({0} MW),
-						'other' => q({0} MW),
-					},
-					# Core Unit Identifier
-					'megawatt' => {
-						'name' => q(MW),
-						'one' => q({0} MW),
-						'other' => q({0} MW),
-					},
-					# Long Unit Identifier
-					'power-milliwatt' => {
-						'name' => q(mW),
-						'one' => q({0} mW),
-						'other' => q({0} mW),
-					},
-					# Core Unit Identifier
-					'milliwatt' => {
-						'name' => q(mW),
-						'one' => q({0} mW),
-						'other' => q({0} mW),
-					},
-					# Long Unit Identifier
 					'power-watt' => {
 						'name' => q(વૉટ),
-						'one' => q({0} W),
-						'other' => q({0} W),
 					},
 					# Core Unit Identifier
 					'watt' => {
 						'name' => q(વૉટ),
-						'one' => q({0} W),
-						'other' => q({0} W),
-					},
-					# Long Unit Identifier
-					'pressure-atmosphere' => {
-						'name' => q(atm),
-						'one' => q({0} atm),
-						'other' => q({0} atm),
-					},
-					# Core Unit Identifier
-					'atmosphere' => {
-						'name' => q(atm),
-						'one' => q({0} atm),
-						'other' => q({0} atm),
 					},
 					# Long Unit Identifier
 					'pressure-bar' => {
@@ -6705,66 +5255,6 @@ has 'units' => (
 						'other' => q({0} બાર),
 					},
 					# Long Unit Identifier
-					'pressure-hectopascal' => {
-						'name' => q(hPa),
-						'one' => q({0} hPa),
-						'other' => q({0} hPa),
-					},
-					# Core Unit Identifier
-					'hectopascal' => {
-						'name' => q(hPa),
-						'one' => q({0} hPa),
-						'other' => q({0} hPa),
-					},
-					# Long Unit Identifier
-					'pressure-inch-ofhg' => {
-						'name' => q(inHg),
-						'one' => q({0} inHg),
-						'other' => q({0} inHg),
-					},
-					# Core Unit Identifier
-					'inch-ofhg' => {
-						'name' => q(inHg),
-						'one' => q({0} inHg),
-						'other' => q({0} inHg),
-					},
-					# Long Unit Identifier
-					'pressure-kilopascal' => {
-						'name' => q(kPa),
-						'one' => q({0} kPa),
-						'other' => q({0} kPa),
-					},
-					# Core Unit Identifier
-					'kilopascal' => {
-						'name' => q(kPa),
-						'one' => q({0} kPa),
-						'other' => q({0} kPa),
-					},
-					# Long Unit Identifier
-					'pressure-megapascal' => {
-						'name' => q(MPa),
-						'one' => q({0} MPa),
-						'other' => q({0} MPa),
-					},
-					# Core Unit Identifier
-					'megapascal' => {
-						'name' => q(MPa),
-						'one' => q({0} MPa),
-						'other' => q({0} MPa),
-					},
-					# Long Unit Identifier
-					'pressure-millibar' => {
-						'name' => q(mbar),
-						'one' => q({0} mbar),
-						'other' => q({0} mbar),
-					},
-					# Core Unit Identifier
-					'millibar' => {
-						'name' => q(mbar),
-						'one' => q({0} mbar),
-						'other' => q({0} mbar),
-					},
-					# Long Unit Identifier
 					'pressure-millimeter-ofhg' => {
 						'name' => q(mmHg),
 						'one' => q({0} mmHg),
@@ -6775,30 +5265,6 @@ has 'units' => (
 						'name' => q(mmHg),
 						'one' => q({0} mmHg),
 						'other' => q({0} mmHg),
-					},
-					# Long Unit Identifier
-					'pressure-pascal' => {
-						'name' => q(Pa),
-						'one' => q({0} Pa),
-						'other' => q({0} Pa),
-					},
-					# Core Unit Identifier
-					'pascal' => {
-						'name' => q(Pa),
-						'one' => q({0} Pa),
-						'other' => q({0} Pa),
-					},
-					# Long Unit Identifier
-					'pressure-pound-force-per-square-inch' => {
-						'name' => q(psi),
-						'one' => q({0} psi),
-						'other' => q({0} psi),
-					},
-					# Core Unit Identifier
-					'pound-force-per-square-inch' => {
-						'name' => q(psi),
-						'one' => q({0} psi),
-						'other' => q({0} psi),
 					},
 					# Long Unit Identifier
 					'speed-kilometer-per-hour' => {
@@ -6851,74 +5317,26 @@ has 'units' => (
 					# Long Unit Identifier
 					'temperature-celsius' => {
 						'name' => q(ડિગ્રી સેલ્સિયસ),
-						'one' => q({0}°C),
-						'other' => q({0}°C),
 					},
 					# Core Unit Identifier
 					'celsius' => {
 						'name' => q(ડિગ્રી સેલ્સિયસ),
-						'one' => q({0}°C),
-						'other' => q({0}°C),
 					},
 					# Long Unit Identifier
 					'temperature-fahrenheit' => {
 						'name' => q(ડિગ્રી ફેરનહીટ),
-						'one' => q({0}°F),
-						'other' => q({0}°F),
 					},
 					# Core Unit Identifier
 					'fahrenheit' => {
 						'name' => q(ડિગ્રી ફેરનહીટ),
-						'one' => q({0}°F),
-						'other' => q({0}°F),
-					},
-					# Long Unit Identifier
-					'temperature-generic' => {
-						'name' => q(°),
-						'one' => q({0}°),
-						'other' => q({0}°),
-					},
-					# Core Unit Identifier
-					'generic' => {
-						'name' => q(°),
-						'one' => q({0}°),
-						'other' => q({0}°),
 					},
 					# Long Unit Identifier
 					'temperature-kelvin' => {
 						'name' => q(કેલ્વિન),
-						'one' => q({0} K),
-						'other' => q({0} K),
 					},
 					# Core Unit Identifier
 					'kelvin' => {
 						'name' => q(કેલ્વિન),
-						'one' => q({0} K),
-						'other' => q({0} K),
-					},
-					# Long Unit Identifier
-					'torque-newton-meter' => {
-						'name' => q(N⋅m),
-						'one' => q({0} N⋅m),
-						'other' => q({0} N⋅m),
-					},
-					# Core Unit Identifier
-					'newton-meter' => {
-						'name' => q(N⋅m),
-						'one' => q({0} N⋅m),
-						'other' => q({0} N⋅m),
-					},
-					# Long Unit Identifier
-					'torque-pound-force-foot' => {
-						'name' => q(lbf⋅ft),
-						'one' => q({0} lbf⋅ft),
-						'other' => q({0} lbf⋅ft),
-					},
-					# Core Unit Identifier
-					'pound-force-foot' => {
-						'name' => q(lbf⋅ft),
-						'one' => q({0} lbf⋅ft),
-						'other' => q({0} lbf⋅ft),
 					},
 					# Long Unit Identifier
 					'volume-acre-foot' => {
@@ -6935,14 +5353,10 @@ has 'units' => (
 					# Long Unit Identifier
 					'volume-barrel' => {
 						'name' => q(બેરલ),
-						'one' => q({0} bbl),
-						'other' => q({0} bbl),
 					},
 					# Core Unit Identifier
 					'barrel' => {
 						'name' => q(બેરલ),
-						'one' => q({0} bbl),
-						'other' => q({0} bbl),
 					},
 					# Long Unit Identifier
 					'volume-bushel' => {
@@ -7317,18 +5731,9 @@ has 'listPatterns' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-				start => q({0}, {1}),
-				middle => q({0}, {1}),
-				end => q({0}, {1}),
-				2 => q({0}, {1}),
+				end => q({0} અને {1}),
+				2 => q({0} અને {1}),
 		} }
-);
-
-has 'default_numbering_system' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> 'latn',
 );
 
 has native_numbering_system => (
@@ -7336,51 +5741,6 @@ has native_numbering_system => (
 	isa			=> Str,
 	init_arg	=> undef,
 	default		=> 'gujr',
-);
-
-has 'minimum_grouping_digits' => (
-	is			=>'ro',
-	isa			=> Int,
-	init_arg	=> undef,
-	default		=> 1,
-);
-
-has 'number_symbols' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'arab' => {
-			'decimal' => q(٫),
-		},
-		'gujr' => {
-			'decimal' => q(.),
-			'exponential' => q(E),
-			'group' => q(,),
-			'infinity' => q(∞),
-			'minusSign' => q(-),
-			'nan' => q(NaN),
-			'perMille' => q(‰),
-			'percentSign' => q(%),
-			'plusSign' => q(+),
-			'superscriptingExponent' => q(×),
-			'timeSeparator' => q(:),
-		},
-		'latn' => {
-			'decimal' => q(.),
-			'exponential' => q(E),
-			'group' => q(,),
-			'infinity' => q(∞),
-			'list' => q(;),
-			'minusSign' => q(-),
-			'nan' => q(NaN),
-			'perMille' => q(‰),
-			'percentSign' => q(%),
-			'plusSign' => q(+),
-			'superscriptingExponent' => q(×),
-			'timeSeparator' => q(:),
-		},
-	} }
 );
 
 has 'number_formats' => (
@@ -7596,7 +5956,6 @@ has 'currencies' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'AED' => {
-			symbol => 'AED',
 			display_name => {
 				'currency' => q(યુનાઈટેડ આરબ અમિરાત દિરહામ),
 				'one' => q([UAE] દિરહામ),
@@ -7604,95 +5963,61 @@ has 'currencies' => (
 			},
 		},
 		'AFN' => {
-			symbol => 'AFN',
 			display_name => {
 				'currency' => q(અફ્ગાન અફ્ગાની),
-				'one' => q(અફ્ગાન અફ્ગાની),
-				'other' => q(અફ્ગાન અફ્ગાની),
 			},
 		},
 		'ALL' => {
-			symbol => 'ALL',
 			display_name => {
 				'currency' => q(અલ્બેનિયન લેક),
-				'one' => q(અલ્બેનિયન લેક),
-				'other' => q(અલ્બેનિયન લેક),
 			},
 		},
 		'AMD' => {
-			symbol => 'AMD',
 			display_name => {
 				'currency' => q(અર્મેનિયન ડ્રેમ),
-				'one' => q(અર્મેનિયન ડ્રેમ),
-				'other' => q(અર્મેનિયન ડ્રેમ),
 			},
 		},
 		'ANG' => {
-			symbol => 'ANG',
 			display_name => {
 				'currency' => q(નેધરલેંડ એંટિલિન ગિલ્ડર),
-				'one' => q(નેધરલેંડ એંટિલિન ગિલ્ડર),
-				'other' => q(નેધરલેંડ એંટિલિન ગિલ્ડર),
 			},
 		},
 		'AOA' => {
-			symbol => 'AOA',
 			display_name => {
 				'currency' => q(અંગોલિયન ક્વાન્ઝા),
-				'one' => q(અંગોલિયન ક્વાન્ઝા),
-				'other' => q(અંગોલિયન ક્વાન્ઝા),
 			},
 		},
 		'ARS' => {
-			symbol => 'ARS',
 			display_name => {
 				'currency' => q(અર્જેન્ટીના પેસો),
-				'one' => q(અર્જેન્ટીના પેસો),
-				'other' => q(અર્જેન્ટીના પેસો),
 			},
 		},
 		'AUD' => {
-			symbol => 'A$',
 			display_name => {
 				'currency' => q(ઑસ્ટ્રેલિયન ડૉલર),
-				'one' => q(ઑસ્ટ્રેલિયન ડૉલર),
-				'other' => q(ઑસ્ટ્રેલિયન ડૉલર),
 			},
 		},
 		'AWG' => {
-			symbol => 'AWG',
 			display_name => {
 				'currency' => q(અરુબન ફ્લોરિન),
-				'one' => q(અરુબન ફ્લોરિન),
-				'other' => q(અરુબન ફ્લોરિન),
 			},
 		},
 		'AZN' => {
-			symbol => 'AZN',
 			display_name => {
 				'currency' => q(અઝરબૈજાની મનાત),
-				'one' => q(અઝરબૈજાની મનાત),
-				'other' => q(અઝરબૈજાની મનાત),
 			},
 		},
 		'BAM' => {
-			symbol => 'BAM',
 			display_name => {
 				'currency' => q(બોસ્નિયા અને હર્ઝેગોવિના રૂપાંતર યોગ્ય માર્ક),
-				'one' => q(બોસ્નિયા અને હર્ઝેગોવિના રૂપાંતર યોગ્ય માર્ક),
-				'other' => q(બોસ્નિયા અને હર્ઝેગોવિના રૂપાંતર યોગ્ય માર્ક),
 			},
 		},
 		'BBD' => {
-			symbol => 'BBD',
 			display_name => {
 				'currency' => q(બાર્બાડિયન ડોલર),
-				'one' => q(બાર્બાડિયન ડોલર),
-				'other' => q(બાર્બાડિયન ડોલર),
 			},
 		},
 		'BDT' => {
-			symbol => 'BDT',
 			display_name => {
 				'currency' => q(બાંગ્લાદેશી ટાકા),
 				'one' => q(બાંગ્લાદેશી ટાકા),
@@ -7700,287 +6025,182 @@ has 'currencies' => (
 			},
 		},
 		'BGN' => {
-			symbol => 'BGN',
 			display_name => {
 				'currency' => q(બલ્ગેરીયન લેવ),
-				'one' => q(બલ્ગેરીયન લેવ),
-				'other' => q(બલ્ગેરીયન લેવ),
 			},
 		},
 		'BHD' => {
-			symbol => 'BHD',
 			display_name => {
 				'currency' => q(બેહરિની દિનાર),
-				'one' => q(બેહરિની દિનાર),
-				'other' => q(બેહરિની દિનાર),
 			},
 		},
 		'BIF' => {
-			symbol => 'BIF',
 			display_name => {
 				'currency' => q(બુરુન્ડિયન ફ્રેંક),
-				'one' => q(બુરુન્ડિયન ફ્રેંક),
-				'other' => q(બુરુન્ડિયન ફ્રેંક),
 			},
 		},
 		'BMD' => {
-			symbol => 'BMD',
 			display_name => {
 				'currency' => q(બર્મુડન ડોલર),
-				'one' => q(બર્મુડન ડોલર),
-				'other' => q(બર્મુડન ડોલર),
 			},
 		},
 		'BND' => {
-			symbol => 'BND',
 			display_name => {
 				'currency' => q(બ્રુનેઇ ડોલર),
-				'one' => q(બ્રુનેઇ ડોલર),
-				'other' => q(બ્રુનેઇ ડોલર),
 			},
 		},
 		'BOB' => {
-			symbol => 'BOB',
 			display_name => {
 				'currency' => q(બોલિવિયન બોલિવિયાનો),
-				'one' => q(બોલિવિયન બોલિવિયાનો),
-				'other' => q(બોલિવિયન બોલિવિયાનો),
 			},
 		},
 		'BRL' => {
-			symbol => 'R$',
 			display_name => {
 				'currency' => q(બ્રાઝિલીયન રિઆલ),
-				'one' => q(બ્રાઝિલીયન રિઆલ),
-				'other' => q(બ્રાઝિલીયન રિઆલ),
 			},
 		},
 		'BSD' => {
-			symbol => 'BSD',
 			display_name => {
 				'currency' => q(બહામિયન ડોલર),
-				'one' => q(બહામિયન ડોલર),
-				'other' => q(બહામિયન ડોલર),
 			},
 		},
 		'BTN' => {
-			symbol => 'BTN',
 			display_name => {
 				'currency' => q(ભુતાનિઝ એંગુલ્ત્રમ),
-				'one' => q(ભુતાનિઝ એંગુલ્ત્રમ),
-				'other' => q(ભુતાનિઝ એંગુલ્ત્રમ),
 			},
 		},
 		'BWP' => {
-			symbol => 'BWP',
 			display_name => {
 				'currency' => q(બોત્સવાનન પુલા),
-				'one' => q(બોત્સવાનન પુલા),
-				'other' => q(બોત્સવાનન પુલા),
 			},
 		},
 		'BYN' => {
-			symbol => 'BYN',
+			symbol => 'р.',
 			display_name => {
 				'currency' => q(બેલારુશિયન રૂબલ),
-				'one' => q(બેલારુશિયન રૂબલ),
-				'other' => q(બેલારુશિયન રૂબલ),
 			},
 		},
 		'BYR' => {
-			symbol => 'BYR',
 			display_name => {
 				'currency' => q(બેલારુશિયન રૂબલ \(2000–2016\)),
-				'one' => q(બેલારુશિયન રૂબલ \(2000–2016\)),
-				'other' => q(બેલારુશિયન રૂબલ \(2000–2016\)),
 			},
 		},
 		'BZD' => {
-			symbol => 'BZD',
 			display_name => {
 				'currency' => q(બેલિઝ ડોલર),
-				'one' => q(બેલિઝ ડોલર),
-				'other' => q(બેલિઝ ડોલર),
 			},
 		},
 		'CAD' => {
-			symbol => 'CA$',
 			display_name => {
 				'currency' => q(કેનેડિયન ડૉલર),
-				'one' => q(કેનેડિયન ડૉલર),
-				'other' => q(કેનેડિયન ડૉલર),
 			},
 		},
 		'CDF' => {
-			symbol => 'CDF',
 			display_name => {
 				'currency' => q(કોંગોલિઝ ફ્રેંક),
-				'one' => q(કોંગોલિઝ ફ્રેંક),
-				'other' => q(કોંગોલિઝ ફ્રેંક),
 			},
 		},
 		'CHF' => {
-			symbol => 'CHF',
 			display_name => {
 				'currency' => q(સ્વિસ ફ્રેંક),
-				'one' => q(સ્વિસ ફ્રેંક),
-				'other' => q(સ્વિસ ફ્રેંક),
 			},
 		},
 		'CLP' => {
-			symbol => 'CLP',
 			display_name => {
 				'currency' => q(ચિલિઅન પેસો),
-				'one' => q(ચિલિઅન પેસો),
-				'other' => q(ચિલિઅન પેસો),
 			},
 		},
 		'CNH' => {
-			symbol => 'CNH',
 			display_name => {
 				'currency' => q(ચાઇનીઝ યુઆન \(ઑફશોર\)),
-				'one' => q(ચાઇનીઝ યુઆન \(ઑફશોર\)),
-				'other' => q(ચાઇનીઝ યુઆન \(ઑફશોર\)),
 			},
 		},
 		'CNY' => {
-			symbol => 'CN¥',
 			display_name => {
 				'currency' => q(ચાઇનિઝ યુઆન),
-				'one' => q(ચાઇનિઝ યુઆન),
-				'other' => q(ચાઇનિઝ યુઆન),
 			},
 		},
 		'COP' => {
-			symbol => 'COP',
 			display_name => {
 				'currency' => q(કોલમ્બિયન પેસો),
-				'one' => q(કોલમ્બિયન પેસો),
-				'other' => q(કોલમ્બિયન પેસો),
 			},
 		},
 		'CRC' => {
-			symbol => 'CRC',
 			display_name => {
 				'currency' => q(કોસ્ટા રિકન કોલોન),
-				'one' => q(કોસ્ટા રિકન કોલોન),
-				'other' => q(કોસ્ટા રિકન કોલોન),
 			},
 		},
 		'CUC' => {
-			symbol => 'CUC',
 			display_name => {
 				'currency' => q(ક્યુબન રૂપાંતર યોગ્ય પેસો),
-				'one' => q(ક્યુબન રૂપાંતર યોગ્ય પેસો),
-				'other' => q(ક્યુબન રૂપાંતર યોગ્ય પેસો),
 			},
 		},
 		'CUP' => {
-			symbol => 'CUP',
 			display_name => {
 				'currency' => q(ક્યુબન પેસો),
-				'one' => q(ક્યુબન પેસો),
-				'other' => q(ક્યુબન પેસો),
 			},
 		},
 		'CVE' => {
-			symbol => 'CVE',
 			display_name => {
 				'currency' => q(કેપ વર્દિયન એસ્કુડો),
-				'one' => q(કેપ વર્દિયન એસ્કુડો),
-				'other' => q(કેપ વર્દિયન એસ્કુડો),
 			},
 		},
 		'CZK' => {
-			symbol => 'CZK',
 			display_name => {
 				'currency' => q(ચેક રીપબ્લિક કોરુના),
-				'one' => q(ચેક રીપબ્લિક કોરુના),
-				'other' => q(ચેક રીપબ્લિક કોરુના),
 			},
 		},
 		'DJF' => {
-			symbol => 'DJF',
 			display_name => {
 				'currency' => q(જિબુટિયન ફ્રેંક),
-				'one' => q(જિબુટિયન ફ્રેંક),
-				'other' => q(જિબુટિયન ફ્રેંક),
 			},
 		},
 		'DKK' => {
-			symbol => 'DKK',
 			display_name => {
 				'currency' => q(ડેનિશ ક્રોન),
-				'one' => q(ડેનિશ ક્રોન),
-				'other' => q(ડેનિશ ક્રોન),
 			},
 		},
 		'DOP' => {
-			symbol => 'DOP',
 			display_name => {
 				'currency' => q(ડોમિનિકન પેસો),
-				'one' => q(ડોમિનિકન પેસો),
-				'other' => q(ડોમિનિકન પેસો),
 			},
 		},
 		'DZD' => {
-			symbol => 'DZD',
 			display_name => {
 				'currency' => q(અલ્જિરિયન દિનાર),
-				'one' => q(અલ્જિરિયન દિનાર),
-				'other' => q(અલ્જિરિયન દિનાર),
 			},
 		},
 		'EGP' => {
-			symbol => 'EGP',
 			display_name => {
 				'currency' => q(ઇજિપ્તિયન પાઉન્ડ),
-				'one' => q(ઇજિપ્તિયન પાઉન્ડ),
-				'other' => q(ઇજિપ્તિયન પાઉન્ડ),
 			},
 		},
 		'ERN' => {
-			symbol => 'ERN',
 			display_name => {
 				'currency' => q(એરિટ્રેયન નક્ફા),
-				'one' => q(એરિટ્રેયન નક્ફા),
-				'other' => q(એરિટ્રેયન નક્ફા),
 			},
 		},
 		'ETB' => {
-			symbol => 'ETB',
 			display_name => {
 				'currency' => q(ઇથિયોપીયન બિર),
-				'one' => q(ઇથિયોપીયન બિર),
-				'other' => q(ઇથિયોપીયન બિર),
 			},
 		},
 		'EUR' => {
-			symbol => '€',
 			display_name => {
 				'currency' => q(યુરો),
-				'one' => q(યુરો),
-				'other' => q(યુરો),
 			},
 		},
 		'FJD' => {
-			symbol => 'FJD',
 			display_name => {
 				'currency' => q(ફિજિઅન ડોલર),
-				'one' => q(ફિજિઅન ડોલર),
-				'other' => q(ફિજિઅન ડોલર),
 			},
 		},
 		'FKP' => {
-			symbol => 'FKP',
 			display_name => {
 				'currency' => q(ફૉકલેન્ડ આઇલેંડ્સ પાઉન્ડ),
-				'one' => q(ફૉકલેન્ડ આઇલેંડ્સ પાઉન્ડ),
-				'other' => q(ફૉકલેન્ડ આઇલેંડ્સ પાઉન્ડ),
 			},
 		},
 		'GBP' => {
-			symbol => '£',
 			display_name => {
 				'currency' => q(બ્રિટિશ પાઉન્ડ),
 				'one' => q(બ્રિટિશ પાઉન્ડ),
@@ -7988,275 +6208,173 @@ has 'currencies' => (
 			},
 		},
 		'GEL' => {
-			symbol => 'GEL',
 			display_name => {
 				'currency' => q(જ્યોર્જિઅન લારી),
-				'one' => q(જ્યોર્જિઅન લારી),
-				'other' => q(જ્યોર્જિઅન લારી),
 			},
 		},
 		'GHS' => {
-			symbol => 'GHS',
 			display_name => {
 				'currency' => q(ઘાનાઇયન સેડી),
-				'one' => q(ઘાનાઇયન સેડી),
-				'other' => q(ઘાનાઇયન સેડી),
 			},
 		},
 		'GIP' => {
-			symbol => 'GIP',
 			display_name => {
 				'currency' => q(જીબ્રાલ્ટર પાઉન્ડ),
-				'one' => q(જીબ્રાલ્ટર પાઉન્ડ),
-				'other' => q(જીબ્રાલ્ટર પાઉન્ડ),
 			},
 		},
 		'GMD' => {
-			symbol => 'GMD',
 			display_name => {
 				'currency' => q(ગેમ્બિયન દલાસી),
-				'one' => q(ગેમ્બિયન દલાસી),
-				'other' => q(ગેમ્બિયન દલાસી),
 			},
 		},
 		'GNF' => {
-			symbol => 'GNF',
 			display_name => {
 				'currency' => q(ગિનીયન ફ્રેંક),
-				'one' => q(ગિનીયન ફ્રેંક),
-				'other' => q(ગિનીયન ફ્રેંક),
 			},
 		},
 		'GTQ' => {
-			symbol => 'GTQ',
 			display_name => {
 				'currency' => q(ગ્વાટેમાલા કુઇટ્ઝલ),
-				'one' => q(ગ્વાટેમાલા કુઇટ્ઝલ),
-				'other' => q(ગ્વાટેમાલા કુઇટ્ઝલ),
 			},
 		},
 		'GYD' => {
-			symbol => 'GYD',
 			display_name => {
 				'currency' => q(ગયાનિઝ ડોલર),
-				'one' => q(ગયાનિઝ ડોલર),
-				'other' => q(ગયાનિઝ ડોલર),
 			},
 		},
 		'HKD' => {
-			symbol => 'HK$',
 			display_name => {
 				'currency' => q(હોંગ કોંગ ડૉલર),
-				'one' => q(હોંગ કોંગ ડૉલર),
-				'other' => q(હોંગ કોંગ ડૉલર),
 			},
 		},
 		'HNL' => {
-			symbol => 'HNL',
 			display_name => {
 				'currency' => q(હોન્ડ્યુરન લેમ્પિરા),
-				'one' => q(હોન્ડ્યુરન લેમ્પિરા),
-				'other' => q(હોન્ડ્યુરન લેમ્પિરા),
 			},
 		},
 		'HRK' => {
-			symbol => 'HRK',
 			display_name => {
 				'currency' => q(ક્રોએશિયન ક્યુના),
-				'one' => q(ક્રોએશિયન ક્યુના),
-				'other' => q(ક્રોએશિયન ક્યુના),
 			},
 		},
 		'HTG' => {
-			symbol => 'HTG',
 			display_name => {
 				'currency' => q(હાઇટિઇન ગોર્ડ),
-				'one' => q(હાઇટિઇન ગોર્ડ),
-				'other' => q(હાઇટિઇન ગોર્ડ),
 			},
 		},
 		'HUF' => {
-			symbol => 'HUF',
 			display_name => {
 				'currency' => q(હંગેરીયન ફોરિન્ત),
-				'one' => q(હંગેરીયન ફોરિન્ત),
-				'other' => q(હંગેરીયન ફોરિન્ત),
 			},
 		},
 		'IDR' => {
-			symbol => 'IDR',
 			display_name => {
 				'currency' => q(ઇન્ડોનેશિયન રૂપિયા),
-				'one' => q(ઇન્ડોનેશિયન રૂપિયા),
-				'other' => q(ઇન્ડોનેશિયન રૂપિયા),
 			},
 		},
 		'ILS' => {
-			symbol => '₪',
 			display_name => {
 				'currency' => q(ઇઝરાયેલી ન્યુ શેકલ),
-				'one' => q(ઇઝરાયેલી ન્યુ શેકલ),
-				'other' => q(ઇઝરાયેલી ન્યુ શેકલ),
 			},
 		},
 		'INR' => {
-			symbol => '₹',
 			display_name => {
 				'currency' => q(ભારતીય રૂપિયા),
-				'one' => q(ભારતીય રૂપિયા),
-				'other' => q(ભારતીય રૂપિયા),
 			},
 		},
 		'IQD' => {
-			symbol => 'IQD',
 			display_name => {
 				'currency' => q(ઇરાકી દિનાર),
-				'one' => q(ઇરાકી દિનાર),
-				'other' => q(ઇરાકી દિનાર),
 			},
 		},
 		'IRR' => {
-			symbol => 'IRR',
 			display_name => {
 				'currency' => q(ઇરાનિયન રિયાલ),
-				'one' => q(ઇરાનિયન રિયાલ),
-				'other' => q(ઇરાનિયન રિયાલ),
 			},
 		},
 		'ISK' => {
-			symbol => 'ISK',
 			display_name => {
 				'currency' => q(આઇસલેન્ડિક ક્રોના),
-				'one' => q(આઇસલેન્ડિક ક્રોના),
-				'other' => q(આઇસલેન્ડિક ક્રોના),
 			},
 		},
 		'JMD' => {
-			symbol => 'JMD',
 			display_name => {
 				'currency' => q(જમૈકિયન ડોલર),
-				'one' => q(જમૈકિયન ડોલર),
-				'other' => q(જમૈકિયન ડોલર),
 			},
 		},
 		'JOD' => {
-			symbol => 'JOD',
 			display_name => {
 				'currency' => q(જોર્ડનિયન દિનાર),
-				'one' => q(જોર્ડનિયન દિનાર),
-				'other' => q(જોર્ડનિયન દિનાર),
 			},
 		},
 		'JPY' => {
-			symbol => 'JP¥',
 			display_name => {
 				'currency' => q(જાપાનીઝ યેન),
-				'one' => q(જાપાનીઝ યેન),
-				'other' => q(જાપાનીઝ યેન),
 			},
 		},
 		'KES' => {
-			symbol => 'KES',
 			display_name => {
 				'currency' => q(કેન્યેન શિલિંગ),
-				'one' => q(કેન્યેન શિલિંગ),
-				'other' => q(કેન્યેન શિલિંગ),
 			},
 		},
 		'KGS' => {
-			symbol => 'KGS',
 			display_name => {
 				'currency' => q(કિર્ગિસ્તાની સોમ),
-				'one' => q(કિર્ગિસ્તાની સોમ),
-				'other' => q(કિર્ગિસ્તાની સોમ),
 			},
 		},
 		'KHR' => {
-			symbol => 'KHR',
 			display_name => {
 				'currency' => q(કેમ્બોડિયન રીઅલ),
-				'one' => q(કેમ્બોડિયન રીઅલ),
-				'other' => q(કેમ્બોડિયન રીઅલ),
 			},
 		},
 		'KMF' => {
-			symbol => 'KMF',
 			display_name => {
 				'currency' => q(કોમોરિઅન ફ્રેંક),
-				'one' => q(કોમોરિઅન ફ્રેંક),
-				'other' => q(કોમોરિઅન ફ્રેંક),
 			},
 		},
 		'KPW' => {
-			symbol => 'KPW',
 			display_name => {
 				'currency' => q(ઉત્તર કોરિયન વન),
-				'one' => q(ઉત્તર કોરિયન વન),
-				'other' => q(ઉત્તર કોરિયન વન),
 			},
 		},
 		'KRW' => {
-			symbol => '₩',
 			display_name => {
 				'currency' => q(દક્ષિણ કોરિયન વન),
-				'one' => q(દક્ષિણ કોરિયન વન),
-				'other' => q(દક્ષિણ કોરિયન વન),
 			},
 		},
 		'KWD' => {
-			symbol => 'KWD',
 			display_name => {
 				'currency' => q(કુવૈતી દિનાર),
-				'one' => q(કુવૈતી દિનાર),
-				'other' => q(કુવૈતી દિનાર),
 			},
 		},
 		'KYD' => {
-			symbol => 'KYD',
 			display_name => {
 				'currency' => q(કેયમેન આઇલેંડ્સ ડોલર),
-				'one' => q(કેયમેન આઇલેંડ્સ ડોલર),
-				'other' => q(કેયમેન આઇલેંડ્સ ડોલર),
 			},
 		},
 		'KZT' => {
-			symbol => 'KZT',
 			display_name => {
 				'currency' => q(કઝાકિસ્તાની ટેંગ),
-				'one' => q(કઝાકિસ્તાની ટેંગ),
-				'other' => q(કઝાકિસ્તાની ટેંગ),
 			},
 		},
 		'LAK' => {
-			symbol => 'LAK',
 			display_name => {
 				'currency' => q(લાઓશિયન કિપ),
-				'one' => q(લાઓશિયન કિપ),
-				'other' => q(લાઓશિયન કિપ),
 			},
 		},
 		'LBP' => {
-			symbol => 'LBP',
 			display_name => {
 				'currency' => q(લેબેનિઝ પાઉન્ડ),
-				'one' => q(લેબેનિઝ પાઉન્ડ),
-				'other' => q(લેબેનિઝ પાઉન્ડ),
 			},
 		},
 		'LKR' => {
-			symbol => 'LKR',
 			display_name => {
 				'currency' => q(શ્રી લંકન રૂપી),
-				'one' => q(શ્રી લંકન રૂપી),
-				'other' => q(શ્રી લંકન રૂપી),
 			},
 		},
 		'LRD' => {
-			symbol => 'LRD',
 			display_name => {
 				'currency' => q(લિબેરિયન ડોલર),
-				'one' => q(લિબેરિયન ડોલર),
-				'other' => q(લિબેરિયન ડોલર),
 			},
 		},
 		'LSL' => {
@@ -8265,287 +6383,183 @@ has 'currencies' => (
 			},
 		},
 		'LTL' => {
-			symbol => 'LTL',
 			display_name => {
 				'currency' => q(લિથુએનિયન લિતાસ),
-				'one' => q(લિથુએનિયન લિતાસ),
-				'other' => q(લિથુએનિયન લિતાસ),
 			},
 		},
 		'LVL' => {
-			symbol => 'LVL',
 			display_name => {
 				'currency' => q(લાતવિયન લેત્સ),
-				'one' => q(લાતવિયન લેત્સ),
-				'other' => q(લાતવિયન લેત્સ),
 			},
 		},
 		'LYD' => {
-			symbol => 'LYD',
 			display_name => {
 				'currency' => q(લિબ્યન દિનાર),
-				'one' => q(લિબ્યન દિનાર),
-				'other' => q(લિબ્યન દિનાર),
 			},
 		},
 		'MAD' => {
-			symbol => 'MAD',
 			display_name => {
 				'currency' => q(મોરોક્કન દિરહામ),
-				'one' => q(મોરોક્કન દિરહામ),
-				'other' => q(મોરોક્કન દિરહામ),
 			},
 		},
 		'MDL' => {
-			symbol => 'MDL',
 			display_name => {
 				'currency' => q(મોલડોવેન લિયુ),
-				'one' => q(મોલડોવેન લિયુ),
-				'other' => q(મોલડોવેન લિયુ),
 			},
 		},
 		'MGA' => {
-			symbol => 'MGA',
 			display_name => {
 				'currency' => q(માલાગેસી અરીઆરી),
-				'one' => q(માલાગેસી અરીઆરી),
-				'other' => q(માલાગેસી અરીઆરી),
 			},
 		},
 		'MKD' => {
-			symbol => 'MKD',
 			display_name => {
 				'currency' => q(મેસેડોનિયન દિનાર),
-				'one' => q(મેસેડોનિયન દિનાર),
-				'other' => q(મેસેડોનિયન દિનાર),
 			},
 		},
 		'MMK' => {
-			symbol => 'MMK',
 			display_name => {
 				'currency' => q(મ્યાંમાર ક્યાત),
-				'one' => q(મ્યાંમાર ક્યાત),
-				'other' => q(મ્યાંમાર ક્યાત),
 			},
 		},
 		'MNT' => {
-			symbol => 'MNT',
 			display_name => {
 				'currency' => q(મોંગોલિયન ટગરિક),
-				'one' => q(મોંગોલિયન ટગરિક),
-				'other' => q(મોંગોલિયન ટગરિક),
 			},
 		},
 		'MOP' => {
-			symbol => 'MOP',
 			display_name => {
 				'currency' => q(માકાનિઝ પતાકા),
-				'one' => q(માકાનિઝ પતાકા),
-				'other' => q(માકાનિઝ પતાકા),
 			},
 		},
 		'MRO' => {
-			symbol => 'MRO',
 			display_name => {
 				'currency' => q(મોરીશેનિયન ઓગુયા \(1973–2017\)),
-				'one' => q(મોરીશેનિયન ઓગુયા \(1973–2017\)),
-				'other' => q(મોરીશેનિયન ઓગુયા \(1973–2017\)),
 			},
 		},
 		'MRU' => {
-			symbol => 'MRU',
 			display_name => {
 				'currency' => q(મોરીશેનિયન ઓગુયા),
-				'one' => q(મોરીશેનિયન ઓગુયા),
-				'other' => q(મોરીશેનિયન ઓગુયા),
 			},
 		},
 		'MUR' => {
-			symbol => 'MUR',
+			symbol => 'રૂ.',
 			display_name => {
 				'currency' => q(મોરેશીઅન રૂપી),
-				'one' => q(મોરેશીઅન રૂપી),
-				'other' => q(મોરેશીઅન રૂપી),
 			},
 		},
 		'MVR' => {
-			symbol => 'MVR',
 			display_name => {
 				'currency' => q(માલ્દિવિયન રુફિયા),
-				'one' => q(માલ્દિવિયન રુફિયા),
-				'other' => q(માલ્દિવિયન રુફિયા),
 			},
 		},
 		'MWK' => {
-			symbol => 'MWK',
 			display_name => {
 				'currency' => q(માલાવિયન ક્વાચા),
-				'one' => q(માલાવિયન ક્વાચા),
-				'other' => q(માલાવિયન ક્વાચા),
 			},
 		},
 		'MXN' => {
-			symbol => 'MX$',
 			display_name => {
 				'currency' => q(મેક્સિકન પેસો),
-				'one' => q(મેક્સિકન પેસો),
-				'other' => q(મેક્સિકન પેસો),
 			},
 		},
 		'MYR' => {
-			symbol => 'MYR',
 			display_name => {
 				'currency' => q(મલેશિયન રિંગ્ગેટ),
-				'one' => q(મલેશિયન રિંગ્ગેટ),
-				'other' => q(મલેશિયન રિંગ્ગેટ),
 			},
 		},
 		'MZN' => {
-			symbol => 'MZN',
 			display_name => {
 				'currency' => q(મોઝામ્બિકન મેટિકલ),
-				'one' => q(મોઝામ્બિકન મેટિકલ),
-				'other' => q(મોઝામ્બિકન મેટિકલ),
 			},
 		},
 		'NAD' => {
-			symbol => 'NAD',
 			display_name => {
 				'currency' => q(નામિબિયન ડોલર),
-				'one' => q(નામિબિયન ડોલર),
-				'other' => q(નામિબિયન ડોલર),
 			},
 		},
 		'NGN' => {
-			symbol => 'NGN',
 			display_name => {
 				'currency' => q(નાઇજીરિયન નૈરા),
-				'one' => q(નાઇજીરિયન નૈરા),
-				'other' => q(નાઇજીરિયન નૈરા),
 			},
 		},
 		'NIO' => {
-			symbol => 'NIO',
 			display_name => {
 				'currency' => q(નિકારાગુઅન કોર્ડોબા),
-				'one' => q(નિકારાગુઅન કોર્ડોબા),
-				'other' => q(નિકારાગુઅન કોર્ડોબા),
 			},
 		},
 		'NOK' => {
-			symbol => 'NOK',
 			display_name => {
 				'currency' => q(નૉર્વેજિયન ક્રોન),
-				'one' => q(નૉર્વેજિયન ક્રોન),
-				'other' => q(નૉર્વેજિયન ક્રોન),
 			},
 		},
 		'NPR' => {
-			symbol => 'NPR',
 			display_name => {
 				'currency' => q(નેપાલિઝ રૂપી),
-				'one' => q(નેપાલિઝ રૂપી),
-				'other' => q(નેપાલિઝ રૂપી),
 			},
 		},
 		'NZD' => {
-			symbol => 'NZ$',
 			display_name => {
 				'currency' => q(ન્યૂઝિલેંડ ડૉલર),
-				'one' => q(ન્યૂઝિલેંડ ડૉલર),
-				'other' => q(ન્યૂઝિલેંડ ડૉલર),
 			},
 		},
 		'OMR' => {
-			symbol => 'OMR',
 			display_name => {
 				'currency' => q(ઓમાની રિયાલ),
-				'one' => q(ઓમાની રિયાલ),
-				'other' => q(ઓમાની રિયાલ),
 			},
 		},
 		'PAB' => {
-			symbol => 'PAB',
 			display_name => {
 				'currency' => q(પનામેનિયન બાલ્બોઆ),
-				'one' => q(પનામેનિયન બાલ્બોઆ),
-				'other' => q(પનામેનિયન બાલ્બોઆ),
 			},
 		},
 		'PEN' => {
-			symbol => 'PEN',
 			display_name => {
 				'currency' => q(પેરુવિયન સોલ),
-				'one' => q(પેરુવિયન સોલ),
-				'other' => q(પેરુવિયન સોલ),
 			},
 		},
 		'PGK' => {
-			symbol => 'PGK',
 			display_name => {
 				'currency' => q(પાપુઆ ન્યૂ ગિનીયન કિના),
-				'one' => q(પાપુઆ ન્યૂ ગિનીયન કિના),
-				'other' => q(પાપુઆ ન્યૂ ગિનીયન કિના),
 			},
 		},
 		'PHP' => {
 			symbol => 'PHP',
 			display_name => {
 				'currency' => q(ફિલીપાઇન પેસો),
-				'one' => q(ફિલીપાઇન પેસો),
-				'other' => q(ફિલીપાઇન પેસો),
 			},
 		},
 		'PKR' => {
-			symbol => 'PKR',
 			display_name => {
 				'currency' => q(પાકિસ્તાની રૂપી),
-				'one' => q(પાકિસ્તાની રૂપી),
-				'other' => q(પાકિસ્તાની રૂપી),
 			},
 		},
 		'PLN' => {
-			symbol => 'PLN',
 			display_name => {
 				'currency' => q(પોલિસ ઝ્લોટી),
-				'one' => q(પોલિસ ઝ્લોટી),
-				'other' => q(પોલિસ ઝ્લોટી),
 			},
 		},
 		'PYG' => {
-			symbol => 'PYG',
 			display_name => {
 				'currency' => q(પરાગ્વેયન ગુઆરાની),
-				'one' => q(પરાગ્વેયન ગુઆરાની),
-				'other' => q(પરાગ્વેયન ગુઆરાની),
 			},
 		},
 		'QAR' => {
-			symbol => 'QAR',
 			display_name => {
 				'currency' => q(કતારી રિયાલ),
-				'one' => q(કતારી રિયાલ),
-				'other' => q(કતારી રિયાલ),
 			},
 		},
 		'RON' => {
-			symbol => 'RON',
 			display_name => {
 				'currency' => q(રોમાનિયન લેઉ),
-				'one' => q(રોમાનિયન લેઉ),
-				'other' => q(રોમાનિયન લેઉ),
 			},
 		},
 		'RSD' => {
-			symbol => 'RSD',
 			display_name => {
 				'currency' => q(સર્બિયન દિનાર),
-				'one' => q(સર્બિયન દિનાર),
-				'other' => q(સર્બિયન દિનાર),
 			},
 		},
 		'RUB' => {
-			symbol => 'RUB',
 			display_name => {
 				'currency' => q(રશિયન રૂબલ),
 				'one' => q(રશિયન રૂબલ),
@@ -8553,287 +6567,188 @@ has 'currencies' => (
 			},
 		},
 		'RWF' => {
-			symbol => 'RWF',
 			display_name => {
 				'currency' => q(રવાંડન ફ્રેંક),
-				'one' => q(રવાંડન ફ્રેંક),
-				'other' => q(રવાંડન ફ્રેંક),
 			},
 		},
 		'SAR' => {
-			symbol => 'SAR',
 			display_name => {
 				'currency' => q(સાઉદી રિયાલ),
-				'one' => q(સાઉદી રિયાલ),
-				'other' => q(સાઉદી રિયાલ),
 			},
 		},
 		'SBD' => {
-			symbol => 'SBD',
 			display_name => {
 				'currency' => q(સોલોમન આઇલેંડ્સ ડોલર),
-				'one' => q(સોલોમન આઇલેંડ્સ ડોલર),
-				'other' => q(સોલોમન આઇલેંડ્સ ડોલર),
 			},
 		},
 		'SCR' => {
-			symbol => 'SCR',
 			display_name => {
 				'currency' => q(સેશેલોઈ રૂપી),
-				'one' => q(સેશેલોઈ રૂપી),
-				'other' => q(સેશેલોઈ રૂપી),
 			},
 		},
 		'SDG' => {
-			symbol => 'SDG',
 			display_name => {
 				'currency' => q(સુદાનિઝ પાઉન્ડ),
-				'one' => q(સુદાનિઝ પાઉન્ડ),
-				'other' => q(સુદાનિઝ પાઉન્ડ),
 			},
 		},
 		'SEK' => {
-			symbol => 'SEK',
 			display_name => {
 				'currency' => q(સ્વીડિશ ક્રોના),
-				'one' => q(સ્વીડિશ ક્રોના),
-				'other' => q(સ્વીડિશ ક્રોના),
 			},
 		},
 		'SGD' => {
-			symbol => 'SGD',
 			display_name => {
 				'currency' => q(સિંગાપુર ડૉલર),
-				'one' => q(સિંગાપુર ડૉલર),
-				'other' => q(સિંગાપુર ડૉલર),
 			},
 		},
 		'SHP' => {
-			symbol => 'SHP',
 			display_name => {
 				'currency' => q(સેંટ હેલેના પાઉન્ડ),
-				'one' => q(સેંટ હેલેના પાઉન્ડ),
-				'other' => q(સેંટ હેલેના પાઉન્ડ),
+			},
+		},
+		'SLE' => {
+			display_name => {
+				'currency' => q(સિએરા લિઓનિઅન લિઓન),
 			},
 		},
 		'SLL' => {
-			symbol => 'SLL',
 			display_name => {
-				'currency' => q(સિએરા લિઓનિઅન લિઓન),
-				'one' => q(સિએરા લિઓનિઅન લિઓન),
-				'other' => q(સિએરા લિઓનિઅન લિઓન),
+				'currency' => q(સિએરા લિઓનિઅન લિઓન \(1964—2022\)),
 			},
 		},
 		'SOS' => {
-			symbol => 'SOS',
 			display_name => {
 				'currency' => q(સોમાલી શિલિંગ),
-				'one' => q(સોમાલી શિલિંગ),
-				'other' => q(સોમાલી શિલિંગ),
 			},
 		},
 		'SRD' => {
-			symbol => 'SRD',
 			display_name => {
 				'currency' => q(સૂરીનામિઝ ડોલર),
-				'one' => q(સૂરીનામિઝ ડોલર),
-				'other' => q(સૂરીનામિઝ ડોલર),
 			},
 		},
 		'SSP' => {
-			symbol => 'SSP',
 			display_name => {
 				'currency' => q(દક્ષિણ સુદાનિઝ પાઉન્ડ),
-				'one' => q(દક્ષિણ સુદાનિઝ પાઉન્ડ),
-				'other' => q(દક્ષિણ સુદાનિઝ પાઉન્ડ),
 			},
 		},
 		'STD' => {
-			symbol => 'STD',
 			display_name => {
 				'currency' => q(સાઓ ટૉમ એન્ડ પ્રિંસાઇપ ડોબ્રા \(1977–2017\)),
-				'one' => q(સાઓ ટૉમ એન્ડ પ્રિંસાઇપ ડોબ્રા \(1977–2017\)),
-				'other' => q(સાઓ ટૉમ એન્ડ પ્રિંસાઇપ ડોબ્રા \(1977–2017\)),
 			},
 		},
 		'STN' => {
-			symbol => 'STN',
 			display_name => {
 				'currency' => q(સાઓ ટૉમ એન્ડ પ્રિંસાઇપ ડોબ્રા),
-				'one' => q(સાઓ ટૉમ એન્ડ પ્રિંસાઇપ ડોબ્રા),
-				'other' => q(સાઓ ટૉમ એન્ડ પ્રિંસાઇપ ડોબ્રા),
 			},
 		},
 		'SYP' => {
-			symbol => 'SYP',
 			display_name => {
 				'currency' => q(સાઇરિયન પાઉન્ડ),
-				'one' => q(સાઇરિયન પાઉન્ડ),
-				'other' => q(સાઇરિયન પાઉન્ડ),
 			},
 		},
 		'SZL' => {
-			symbol => 'SZL',
 			display_name => {
 				'currency' => q(સ્વાઝી લિલાન્ગેની),
-				'one' => q(સ્વાઝી લિલાન્ગેની),
-				'other' => q(સ્વાઝી લિલાન્ગેની),
 			},
 		},
 		'THB' => {
 			symbol => '฿',
 			display_name => {
 				'currency' => q(થાઇ બાહ્ત),
-				'one' => q(થાઇ બાહ્ત),
-				'other' => q(થાઇ બાહ્ત),
 			},
 		},
 		'TJS' => {
-			symbol => 'TJS',
 			display_name => {
 				'currency' => q(તાજિકિસ્તાની સોમોની),
-				'one' => q(તાજિકિસ્તાની સોમોની),
-				'other' => q(તાજિકિસ્તાની સોમોની),
 			},
 		},
 		'TMT' => {
-			symbol => 'TMT',
 			display_name => {
 				'currency' => q(તુર્કમેનિસ્તાની મનત),
-				'one' => q(તુર્કમેનિસ્તાની મનત),
-				'other' => q(તુર્કમેનિસ્તાની મનત),
 			},
 		},
 		'TND' => {
-			symbol => 'TND',
 			display_name => {
 				'currency' => q(ટ્યુનિશિયન દિનાર),
-				'one' => q(ટ્યુનિશિયન દિનાર),
-				'other' => q(ટ્યુનિશિયન દિનાર),
 			},
 		},
 		'TOP' => {
-			symbol => 'TOP',
 			display_name => {
 				'currency' => q(ટોંગન પ’અંગા),
-				'one' => q(ટોંગન પ’અંગા),
-				'other' => q(ટોંગન પ’અંગા),
 			},
 		},
 		'TRY' => {
-			symbol => 'TRY',
 			display_name => {
 				'currency' => q(તુર્કિશ લિરા),
-				'one' => q(તુર્કિશ લિરા),
-				'other' => q(તુર્કિશ લિરા),
 			},
 		},
 		'TTD' => {
-			symbol => 'TTD',
 			display_name => {
 				'currency' => q(ત્રિનિદાદ અને ટોબેગો ડોલર),
-				'one' => q(ત્રિનિદાદ અને ટોબેગો ડોલર),
-				'other' => q(ત્રિનિદાદ અને ટોબેગો ડોલર),
 			},
 		},
 		'TWD' => {
 			symbol => 'NT$',
 			display_name => {
 				'currency' => q(ન્યુ તાઇવાન ડૉલર),
-				'one' => q(ન્યુ તાઇવાન ડૉલર),
-				'other' => q(ન્યુ તાઇવાન ડૉલર),
 			},
 		},
 		'TZS' => {
-			symbol => 'TZS',
 			display_name => {
 				'currency' => q(તાન્ઝાનિયન શિલિંગ),
-				'one' => q(તાન્ઝાનિયન શિલિંગ),
-				'other' => q(તાન્ઝાનિયન શિલિંગ),
 			},
 		},
 		'UAH' => {
-			symbol => 'UAH',
 			display_name => {
 				'currency' => q(યુક્રેનિયન હ્રિવિનિયા),
-				'one' => q(યુક્રેનિયન હ્રિવિનિયા),
-				'other' => q(યુક્રેનિયન હ્રિવિનિયા),
 			},
 		},
 		'UGX' => {
-			symbol => 'UGX',
 			display_name => {
 				'currency' => q(યુગાંડન શિલિંગ),
-				'one' => q(યુગાંડન શિલિંગ),
-				'other' => q(યુગાંડન શિલિંગ),
 			},
 		},
 		'USD' => {
-			symbol => 'US$',
 			display_name => {
 				'currency' => q(યુઍસ ડોલર),
-				'one' => q(યુઍસ ડોલર),
-				'other' => q(યુઍસ ડોલર),
 			},
 		},
 		'UYU' => {
-			symbol => 'UYU',
 			display_name => {
 				'currency' => q(ઉરુગ્વેયન પેસો),
-				'one' => q(ઉરુગ્વેયન પેસો),
-				'other' => q(ઉરુગ્વેયન પેસો),
 			},
 		},
 		'UZS' => {
-			symbol => 'UZS',
 			display_name => {
 				'currency' => q(ઉઝ્બેકિસ્તાન સોમ),
-				'one' => q(ઉઝ્બેકિસ્તાન સોમ),
-				'other' => q(ઉઝ્બેકિસ્તાન સોમ),
 			},
 		},
 		'VEF' => {
-			symbol => 'VEF',
 			display_name => {
 				'currency' => q(વેનેઝુએલન બોલિવર \(2008–2018\)),
-				'one' => q(વેનેઝુએલન બોલિવર \(2008–2018\)),
-				'other' => q(વેનેઝુએલન બોલિવર \(2008–2018\)),
 			},
 		},
 		'VES' => {
-			symbol => 'VES',
 			display_name => {
 				'currency' => q(વેનેઝુએલન બોલિવર),
-				'one' => q(વેનેઝુએલન બોલિવર),
-				'other' => q(વેનેઝુએલન બોલિવર),
 			},
 		},
 		'VND' => {
-			symbol => '₫',
 			display_name => {
 				'currency' => q(વિયેતનામીસ ડોંગ),
-				'one' => q(વિયેતનામીસ ડોંગ),
-				'other' => q(વિયેતનામીસ ડોંગ),
 			},
 		},
 		'VUV' => {
-			symbol => 'VUV',
 			display_name => {
 				'currency' => q(વનૌતુ વાતુ),
-				'one' => q(વનૌતુ વાતુ),
-				'other' => q(વનૌતુ વાતુ),
 			},
 		},
 		'WST' => {
-			symbol => 'WST',
 			display_name => {
 				'currency' => q(સમોઅન તાલા),
-				'one' => q(સમોઅન તાલા),
-				'other' => q(સમોઅન તાલા),
 			},
 		},
 		'XAF' => {
-			symbol => 'FCFA',
 			display_name => {
 				'currency' => q(મધ્ય આફ્રિકન [CFA] ફ્રેંક),
 				'one' => q(મધ્ય આફ્રિકન [CFA] ફ્રેંક),
@@ -8841,15 +6756,11 @@ has 'currencies' => (
 			},
 		},
 		'XCD' => {
-			symbol => 'EC$',
 			display_name => {
 				'currency' => q(ઇસ્ટ કેરિબિયન ડોલર),
-				'one' => q(ઇસ્ટ કેરિબિયન ડોલર),
-				'other' => q(ઇસ્ટ કેરિબિયન ડોલર),
 			},
 		},
 		'XOF' => {
-			symbol => 'F CFA',
 			display_name => {
 				'currency' => q(પશ્ચિમી આફ્રિકન [CFA] ફ્રેંક),
 				'one' => q(પશ્ચિમી આફ્રિકન [CFA] ફ્રેંક),
@@ -8857,34 +6768,23 @@ has 'currencies' => (
 			},
 		},
 		'XPF' => {
-			symbol => 'CFPF',
 			display_name => {
 				'currency' => q([CFP] ફ્રેંક),
-				'one' => q([CFP] ફ્રેંક),
-				'other' => q([CFP] ફ્રેંક),
 			},
 		},
 		'XXX' => {
 			display_name => {
 				'currency' => q(અજ્ઞાત ચલણ),
-				'one' => q(અજ્ઞાત ચલણ),
-				'other' => q(અજ્ઞાત ચલણ),
 			},
 		},
 		'YER' => {
-			symbol => 'YER',
 			display_name => {
 				'currency' => q(યેમેની રિઆલ),
-				'one' => q(યેમેની રિઆલ),
-				'other' => q(યેમેની રિઆલ),
 			},
 		},
 		'ZAR' => {
-			symbol => 'ZAR',
 			display_name => {
 				'currency' => q(દક્ષિણ આફ્રિકી રેંડ),
-				'one' => q(દક્ષિણ આફ્રિકી રેંડ),
-				'other' => q(દક્ષિણ આફ્રિકી રેંડ),
 			},
 		},
 		'ZMK' => {
@@ -8893,11 +6793,8 @@ has 'currencies' => (
 			},
 		},
 		'ZMW' => {
-			symbol => 'ZMW',
 			display_name => {
 				'currency' => q(ઝામ્બિયન ક્વાચા),
-				'one' => q(ઝામ્બિયન ક્વાચા),
-				'other' => q(ઝામ્બિયન ક્વાચા),
 			},
 		},
 	} },
@@ -8911,108 +6808,6 @@ has 'calendar_months' => (
 	default		=> sub { {
 			'coptic' => {
 				'format' => {
-					abbreviated => {
-						nonleap => [
-							'ટૉટ',
-							'બાબા',
-							'હેટોર',
-							'કિયાક',
-							'ટોબા',
-							'અમશિર',
-							'બારમ્હાટ',
-							'બારમુઉડા',
-							'બાશાન્સ',
-							'પાઓના',
-							'ઈપેપ',
-							'મેસ્રા',
-							'નાસીઈ'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12',
-							'13'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'ટૉટ',
-							'બાબા',
-							'હેટોર',
-							'કિયાક',
-							'ટોબા',
-							'અમશિર',
-							'બારમ્હાટ',
-							'બારમુઉડા',
-							'બાશાન્સ',
-							'પાઓના',
-							'ઈપેપ',
-							'મેસ્રા',
-							'નાસીઈ'
-						],
-						leap => [
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'ટૉટ',
-							'બાબા',
-							'હેટોર',
-							'કિયાક',
-							'ટોબા',
-							'અમશિર',
-							'બારમ્હાટ',
-							'બારમુઉડા',
-							'બાશાન્સ',
-							'પાઓના',
-							'ઈપેપ',
-							'મેસ્રા',
-							'નાસીઈ'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12',
-							'13'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'ટૉટ',
@@ -9037,108 +6832,6 @@ has 'calendar_months' => (
 			},
 			'ethiopic' => {
 				'format' => {
-					abbreviated => {
-						nonleap => [
-							'મેસ્કેરેમ',
-							'ટેકેમ્ટ',
-							'હેડાર',
-							'તાહસાસ',
-							'તેર',
-							'યેકાતીત',
-							'મેગાબીટ',
-							'મિયાઝિયા',
-							'ગેનબોટ',
-							'સેને',
-							'હેમલે',
-							'નેહાસ્સે',
-							'પેગુમેન'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12',
-							'13'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'મેસ્કેરેમ',
-							'ટેકેમ્ટ',
-							'હેડાર',
-							'તાહસાસ',
-							'તેર',
-							'યેકાતીત',
-							'મેગાબીટ',
-							'મિયાઝિયા',
-							'ગેનબોટ',
-							'સેને',
-							'હેમલે',
-							'નેહાસ્સે',
-							'પેગુમેન'
-						],
-						leap => [
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'મેસ્કેરેમ',
-							'ટેકેમ્ટ',
-							'હેડાર',
-							'તાહસાસ',
-							'તેર',
-							'યેકાતીત',
-							'મેગાબીટ',
-							'મિયાઝિયા',
-							'ગેનબોટ',
-							'સેને',
-							'હેમલે',
-							'નેહાસ્સે',
-							'પેગુમેન'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12',
-							'13'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'મેસ્કેરેમ',
@@ -9182,25 +6875,6 @@ has 'calendar_months' => (
 							
 						],
 					},
-					narrow => {
-						nonleap => [
-							'જા',
-							'ફે',
-							'મા',
-							'એ',
-							'મે',
-							'જૂ',
-							'જુ',
-							'ઑ',
-							'સ',
-							'ઑ',
-							'ન',
-							'ડિ'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'જાન્યુઆરી',
@@ -9222,25 +6896,6 @@ has 'calendar_months' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'જાન્યુ',
-							'ફેબ્રુ',
-							'માર્ચ',
-							'એપ્રિલ',
-							'મે',
-							'જૂન',
-							'જુલાઈ',
-							'ઑગસ્ટ',
-							'સપ્ટે',
-							'ઑક્ટો',
-							'નવે',
-							'ડિસે'
-						],
-						leap => [
-							
-						],
-					},
 					narrow => {
 						nonleap => [
 							'જા',
@@ -9255,25 +6910,6 @@ has 'calendar_months' => (
 							'ઑ',
 							'ન',
 							'ડિ'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'જાન્યુઆરી',
-							'ફેબ્રુઆરી',
-							'માર્ચ',
-							'એપ્રિલ',
-							'મે',
-							'જૂન',
-							'જુલાઈ',
-							'ઑગસ્ટ',
-							'સપ્ટેમ્બર',
-							'ઑક્ટોબર',
-							'નવેમ્બર',
-							'ડિસેમ્બર'
 						],
 						leap => [
 							
@@ -9283,138 +6919,6 @@ has 'calendar_months' => (
 			},
 			'hebrew' => {
 				'format' => {
-					abbreviated => {
-						nonleap => [
-							'તીશ્રી',
-							'હેશવાન',
-							'કિસ્લેવ',
-							'તેવેટ',
-							'શેવાત',
-							'અદાર I',
-							'અદાર',
-							'નિસાન',
-							'ઈયાર',
-							'સિવાન',
-							'તામુઝ',
-							'આવ',
-							'ઈલુલ'
-						],
-						leap => [
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12',
-							'13'
-						],
-						leap => [
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'તીશ્રી',
-							'હેશવાન',
-							'કિસ્લેવ',
-							'તેવેટ',
-							'શેવાત',
-							'અદાર I',
-							'અદાર',
-							'નિસાન',
-							'ઈયાર',
-							'સિવાન',
-							'તામુઝ',
-							'આવ',
-							'ઈલુલ'
-						],
-						leap => [
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'તીશ્રી',
-							'હેશવાન',
-							'કિસ્લેવ',
-							'તેવેટ',
-							'શેવાત',
-							'અદાર I',
-							'અદાર',
-							'નિસાન',
-							'ઈયાર',
-							'સિવાન',
-							'તામુઝ',
-							'આવ',
-							'ઈલુલ'
-						],
-						leap => [
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12',
-							'13'
-						],
-						leap => [
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'તીશ્રી',
@@ -9445,44 +6949,6 @@ has 'calendar_months' => (
 			},
 			'indian' => {
 				'format' => {
-					abbreviated => {
-						nonleap => [
-							'ચૈત્ર',
-							'વૈશાખ',
-							'જ્યેષ્ઠ',
-							'અષાઢ',
-							'શ્રાવણ',
-							'ભાદો',
-							'અસ્વિના',
-							'કાર્તિક',
-							'અગ્રેહાના',
-							'પોષ',
-							'મહા',
-							'ફાલ્ગુન'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'ચૈત્ર',
@@ -9491,68 +6957,9 @@ has 'calendar_months' => (
 							'અષાઢ',
 							'શ્રાવણ',
 							'ભાદો',
-							'અસ્વિના',
+							'અશ્વિન',
 							'કાર્તિક',
-							'અગ્રેહાના',
-							'પોષ',
-							'મહા',
-							'ફાલ્ગુન'
-						],
-						leap => [
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'ચૈત્ર',
-							'વૈશાખ',
-							'જ્યેષ્ઠ',
-							'અષાઢ',
-							'શ્રાવણ',
-							'ભાદો',
-							'અસ્વિના',
-							'કાર્તિક',
-							'અગ્રેહાના',
-							'પોષ',
-							'મહા',
-							'ફાલ્ગુન'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'ચૈત્ર',
-							'વૈશાખ',
-							'જ્યેષ્ઠ',
-							'અષાઢ',
-							'શ્રાવણ',
-							'ભાદો',
-							'અસ્વિના',
-							'કાર્તિક',
-							'અગ્રેહાના',
+							'અગ્રહાયણ',
 							'પોષ',
 							'મહા',
 							'ફાલ્ગુન'
@@ -9584,84 +6991,6 @@ has 'calendar_months' => (
 							
 						],
 					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'મુહર્રમ',
-							'સફર',
-							'રાબીʻ I',
-							'રાબીʻ II',
-							'જુમાદા I',
-							'જુમાદા II',
-							'રજબ',
-							'શાʻબાન',
-							'રમદાન',
-							'શાવ્વલ',
-							'ધુʻલ-ક્વીʻડાહ',
-							'ધુʻલ-હિજ્જાહ'
-						],
-						leap => [
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'મુહ.',
-							'સફ.',
-							'રબ.I',
-							'રબ. II',
-							'જુમ. I',
-							'જુમ. II',
-							'રાજ.',
-							'શા.',
-							'રામ.',
-							'શાવ.',
-							'ધુʻલ-ક્યુ.',
-							'ધુʻલ-એચ.'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'મુહર્રમ',
@@ -9685,103 +7014,6 @@ has 'calendar_months' => (
 			},
 			'persian' => {
 				'format' => {
-					abbreviated => {
-						nonleap => [
-							'ફાર્વાર્દિન',
-							'ઓરડીબેહેશ્ટ',
-							'ખોરદાદ',
-							'તિર',
-							'મોર્દાદ',
-							'શાહરિવર',
-							'મેહર',
-							'અબાન',
-							'અઝાર',
-							'ડેય',
-							'બાહમેન',
-							'એસ્ફાન્ડ'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'ફાર્વાર્દિન',
-							'ઓરડીબેહેશ્ટ',
-							'ખોરદાદ',
-							'તિર',
-							'મોર્દાદ',
-							'શાહરિવર',
-							'મેહર',
-							'અબાન',
-							'અઝાર',
-							'ડેય',
-							'બાહમેન',
-							'એસ્ફાન્ડ'
-						],
-						leap => [
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'ફાર્વાર્દિન',
-							'ઓરડીબેહેશ્ટ',
-							'ખોરદાદ',
-							'તિર',
-							'મોર્દાદ',
-							'શાહરિવર',
-							'મેહર',
-							'અબાન',
-							'અઝાર',
-							'ડેય',
-							'બાહમેન',
-							'એસ્ફાન્ડ'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'ફાર્વાર્દિન',
@@ -9822,15 +7054,6 @@ has 'calendar_days' => (
 						sat => 'શનિ',
 						sun => 'રવિ'
 					},
-					narrow => {
-						mon => 'સો',
-						tue => 'મં',
-						wed => 'બુ',
-						thu => 'ગુ',
-						fri => 'શુ',
-						sat => 'શ',
-						sun => 'ર'
-					},
 					short => {
 						mon => 'સો',
 						tue => 'મં',
@@ -9851,15 +7074,6 @@ has 'calendar_days' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						mon => 'સોમ',
-						tue => 'મંગળ',
-						wed => 'બુધ',
-						thu => 'ગુરુ',
-						fri => 'શુક્ર',
-						sat => 'શનિ',
-						sun => 'રવિ'
-					},
 					narrow => {
 						mon => 'સો',
 						tue => 'મં',
@@ -9868,24 +7082,6 @@ has 'calendar_days' => (
 						fri => 'શુ',
 						sat => 'શ',
 						sun => 'ર'
-					},
-					short => {
-						mon => 'સો',
-						tue => 'મં',
-						wed => 'બુ',
-						thu => 'ગુ',
-						fri => 'શુ',
-						sat => 'શ',
-						sun => 'ર'
-					},
-					wide => {
-						mon => 'સોમવાર',
-						tue => 'મંગળવાર',
-						wed => 'બુધવાર',
-						thu => 'ગુરુવાર',
-						fri => 'શુક્રવાર',
-						sat => 'શનિવાર',
-						sun => 'રવિવાર'
 					},
 				},
 			},
@@ -9903,28 +7099,6 @@ has 'calendar_quarters' => (
 						1 => 'Q2',
 						2 => 'Q3',
 						3 => 'Q4'
-					},
-					narrow => {0 => '1',
-						1 => '2',
-						2 => '3',
-						3 => '4'
-					},
-					wide => {0 => '1લો ત્રિમાસ',
-						1 => '2જો ત્રિમાસ',
-						2 => '3જો ત્રિમાસ',
-						3 => '4થો ત્રિમાસ'
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {0 => 'Q1',
-						1 => 'Q2',
-						2 => 'Q3',
-						3 => 'Q4'
-					},
-					narrow => {0 => '1',
-						1 => '2',
-						2 => '3',
-						3 => '4'
 					},
 					wide => {0 => '1લો ત્રિમાસ',
 						1 => '2જો ત્રિમાસ',
@@ -9946,30 +7120,6 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'buddhist') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 400;
-				}
-				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 400;
-				}
-				last SWITCH;
-				}
 			if ($_ eq 'coptic') {
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
@@ -10204,59 +7354,25 @@ has 'day_periods' => (
 			'format' => {
 				'abbreviated' => {
 					'afternoon1' => q{બપોરે},
-					'am' => q{AM},
 					'evening1' => q{સાંજે},
 					'midnight' => q{મધ્યરાત્રિ},
 					'morning1' => q{સવારે},
 					'night1' => q{રાત્રે},
-					'pm' => q{PM},
 				},
 				'narrow' => {
 					'afternoon1' => q{બપોરે},
-					'am' => q{AM},
 					'evening1' => q{સાંજે},
 					'midnight' => q{મ.રાત્રિ},
 					'morning1' => q{સવારે},
 					'night1' => q{રાત્રે},
-					'pm' => q{PM},
-				},
-				'wide' => {
-					'afternoon1' => q{બપોરે},
-					'am' => q{AM},
-					'evening1' => q{સાંજે},
-					'midnight' => q{મધ્યરાત્રિ},
-					'morning1' => q{સવારે},
-					'night1' => q{રાત્રે},
-					'pm' => q{PM},
 				},
 			},
 			'stand-alone' => {
-				'abbreviated' => {
-					'afternoon1' => q{બપોરે},
-					'am' => q{AM},
-					'evening1' => q{સાંજે},
-					'midnight' => q{મધ્યરાત્રિ},
-					'morning1' => q{સવારે},
-					'night1' => q{રાત્રે},
-					'pm' => q{PM},
-				},
-				'narrow' => {
-					'afternoon1' => q{બપોરે},
-					'am' => q{AM},
-					'evening1' => q{સાંજે},
-					'midnight' => q{મધ્યરાત્રિ},
-					'morning1' => q{સવારે},
-					'night1' => q{રાત્રે},
-					'pm' => q{PM},
-				},
 				'wide' => {
 					'afternoon1' => q{બપોર},
-					'am' => q{AM},
 					'evening1' => q{સાંજ},
-					'midnight' => q{મધ્યરાત્રિ},
 					'morning1' => q{સવાર},
 					'night1' => q{રાત્રિ},
-					'pm' => q{PM},
 				},
 			},
 		},
@@ -10268,41 +7384,14 @@ has 'eras' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'buddhist' => {
-			abbreviated => {
-				'0' => 'BE'
-			},
-			narrow => {
-				'0' => 'BE'
-			},
-			wide => {
-				'0' => 'BE'
-			},
-		},
 		'coptic' => {
 			abbreviated => {
-				'0' => 'એરા0',
-				'1' => 'એરા1'
-			},
-			narrow => {
-				'0' => 'એરા0',
-				'1' => 'એરા1'
-			},
-			wide => {
 				'0' => 'એરા0',
 				'1' => 'એરા1'
 			},
 		},
 		'ethiopic' => {
 			abbreviated => {
-				'0' => 'એરા0',
-				'1' => 'એરા1'
-			},
-			narrow => {
-				'0' => 'એરા0',
-				'1' => 'એરા1'
-			},
-			wide => {
 				'0' => 'એરા0',
 				'1' => 'એરા1'
 			},
@@ -10324,59 +7413,21 @@ has 'eras' => (
 			},
 		},
 		'hebrew' => {
-			abbreviated => {
-				'0' => 'AM'
-			},
-			narrow => {
-				'0' => 'AM'
-			},
-			wide => {
-				'0' => 'AM'
-			},
 		},
 		'indian' => {
 			abbreviated => {
-				'0' => 'સાકા'
-			},
-			narrow => {
-				'0' => 'સાકા'
+				'0' => 'શક'
 			},
 			wide => {
 				'0' => 'સાકા'
 			},
 		},
 		'islamic' => {
-			abbreviated => {
-				'0' => 'AH'
-			},
-			narrow => {
-				'0' => 'AH'
-			},
-			wide => {
-				'0' => 'AH'
-			},
 		},
 		'persian' => {
-			abbreviated => {
-				'0' => 'AP'
-			},
-			narrow => {
-				'0' => 'AP'
-			},
-			wide => {
-				'0' => 'AP'
-			},
 		},
 		'roc' => {
 			abbreviated => {
-				'0' => 'આર.ઓ.સી. પહેલાં',
-				'1' => 'આર.ઓ.સી.'
-			},
-			narrow => {
-				'0' => 'આર.ઓ.સી. પહેલાં',
-				'1' => 'આર.ઓ.સી.'
-			},
-			wide => {
 				'0' => 'આર.ઓ.સી. પહેલાં',
 				'1' => 'આર.ઓ.સી.'
 			},
@@ -10389,8 +7440,6 @@ has 'date_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'buddhist' => {
-		},
 		'coptic' => {
 		},
 		'ethiopic' => {
@@ -10425,8 +7474,6 @@ has 'time_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'buddhist' => {
-		},
 		'coptic' => {
 		},
 		'ethiopic' => {
@@ -10457,8 +7504,6 @@ has 'datetime_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'buddhist' => {
-		},
 		'coptic' => {
 		},
 		'ethiopic' => {
@@ -10470,8 +7515,8 @@ has 'datetime_formats' => (
 			'short' => q{{1} {0}},
 		},
 		'gregorian' => {
-			'full' => q{{1} એ {0} વાગ્યે},
-			'long' => q{{1} એ {0} વાગ્યે},
+			'full' => q{{1} {0}},
+			'long' => q{{1} {0}},
 			'medium' => q{{1} {0}},
 			'short' => q{{1} {0}},
 		},
@@ -10494,39 +7539,18 @@ has 'datetime_formats_available_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-			Bh => q{h B},
-			Bhm => q{h:mm B},
-			Bhms => q{h:mm:ss B},
-			E => q{ccc},
-			EBhm => q{E h:mm B},
-			EBhms => q{E h:mm:ss B},
-			EHm => q{E HH:mm},
-			EHms => q{E HH:mm:ss},
 			Ed => q{E d},
-			Ehm => q{E h:mm a},
-			Ehms => q{E h:mm:ss a},
-			Gy => q{G y},
 			GyMMM => q{MMM G y},
 			GyMMMEd => q{E, d MMM, G y},
 			GyMMMd => q{d, MMM G y},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
 			MEd => q{E, d/M},
-			MMM => q{LLL},
 			MMMEd => q{E, d MMM},
 			MMMMd => q{d MMMM},
 			MMMd => q{d MMM},
 			MMdd => q{dd-MM},
 			Md => q{d/M},
-			d => q{d},
-			h => q{h a},
 			hm => q{hh:mm a},
 			hms => q{hh:mm:ss a},
-			ms => q{mm:ss},
-			y => q{G y},
-			yyyy => q{G y},
 			yyyyM => q{M/G y},
 			yyyyMEd => q{E, d/M/G y},
 			yyyyMM => q{MM-y G},
@@ -10539,43 +7563,17 @@ has 'datetime_formats_available_formats' => (
 			yyyyQQQQ => q{QQQQ G y},
 		},
 		'gregorian' => {
-			Bh => q{h B},
-			Bhm => q{h:mm B},
-			Bhms => q{h:mm:ss B},
-			E => q{ccc},
-			EBhm => q{E h:mm B},
-			EBhms => q{E h:mm:ss B},
-			EHm => q{E HH:mm},
-			EHms => q{E HH:mm:ss},
 			Ed => q{E d},
-			Ehm => q{E h:mm a},
-			Ehms => q{E h:mm:ss a},
-			Gy => q{G y},
 			GyMMM => q{MMM, G y},
 			GyMMMEd => q{E, d MMM, G y},
 			GyMMMd => q{d MMM, G y},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			Hmsv => q{HH:mm:ss v},
-			Hmv => q{HH:mm v},
-			M => q{L},
 			MEd => q{E, d/M},
-			MMM => q{LLL},
 			MMMEd => q{E, d MMM},
 			MMMMW => q{MMMMના W અઠવાડિયા},
 			MMMMd => q{d MMMM},
 			MMMd => q{d MMM},
 			MMdd => q{dd-MM},
 			Md => q{d/M},
-			d => q{d},
-			h => q{h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			hmsv => q{h:mm:ss a v},
-			hmv => q{h:mm a v},
-			ms => q{mm:ss},
-			y => q{y},
 			yM => q{M/y},
 			yMEd => q{E, d/M/y},
 			yMM => q{MM-y},
@@ -10584,17 +7582,7 @@ has 'datetime_formats_available_formats' => (
 			yMMMM => q{MMMM y},
 			yMMMd => q{d MMM, y},
 			yMd => q{d/M/y},
-			yQQQ => q{y QQQ},
-			yQQQQ => q{y QQQQ},
 			yw => q{Y ના w અઠવાડિયા},
-		},
-		'indian' => {
-			MEd => q{E, d/M},
-			MMMEd => q{E, d MMM},
-			MMMMd => q{d MMMM},
-			MMMd => q{d MMM},
-			MMdd => q{dd-MM},
-			Md => q{d/M},
 		},
 	} },
 );
@@ -10604,9 +7592,6 @@ has 'datetime_formats_append_item' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			'Timezone' => '{0} {1}',
-		},
 	} },
 );
 
@@ -10643,20 +7628,6 @@ has 'datetime_formats_interval' => (
 				d => q{GGGGG y-dd-MM – y-dd-MM},
 				y => q{GGGGG y-dd-MM – y-dd-MM},
 			},
-			H => {
-				H => q{HH–HH},
-			},
-			Hm => {
-				H => q{HH:mm–HH:mm},
-				m => q{HH:mm–HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm–HH:mm v},
-				m => q{HH:mm–HH:mm v},
-			},
-			Hv => {
-				H => q{HH–HH v},
-			},
 			M => {
 				M => q{M–M},
 			},
@@ -10679,31 +7650,7 @@ has 'datetime_formats_interval' => (
 				M => q{d/M – d/M},
 				d => q{d/M – d/M},
 			},
-			d => {
-				d => q{d–d},
-			},
 			fallback => '{0} – {1}',
-			h => {
-				a => q{h a – h a},
-				h => q{h–h a},
-			},
-			hm => {
-				a => q{h:mm a – h:mm a},
-				h => q{h:mm–h:mm a},
-				m => q{h:mm–h:mm a},
-			},
-			hmv => {
-				a => q{h:mm a – h:mm a v},
-				h => q{h:mm–h:mm a v},
-				m => q{h:mm–h:mm a v},
-			},
-			hv => {
-				a => q{h a – h a v},
-				h => q{h–h a v},
-			},
-			y => {
-				y => q{G y–y},
-			},
 			yM => {
 				M => q{GGGG M/y – M/y},
 				y => q{GGGG M/y – M/y},
@@ -10715,7 +7662,6 @@ has 'datetime_formats_interval' => (
 			},
 			yMMM => {
 				M => q{G MMM–MMM y},
-				y => q{G y MMM – y MMM},
 			},
 			yMMMEd => {
 				M => q{E,d MMM–E,d MMM G y},
@@ -10773,14 +7719,6 @@ has 'datetime_formats_interval' => (
 			},
 			Hm => {
 				H => q{HH:mm – HH:mm},
-				m => q{HH:mm–HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm–HH:mm v},
-				m => q{HH:mm–HH:mm v},
-			},
-			Hv => {
-				H => q{HH–HH v},
 			},
 			M => {
 				M => q{M – M},
@@ -10808,23 +7746,8 @@ has 'datetime_formats_interval' => (
 				d => q{d – d},
 			},
 			fallback => '{0} – {1}',
-			h => {
-				a => q{h a – h a},
-				h => q{h–h a},
-			},
 			hm => {
-				a => q{h:mm a – h:mm a},
 				h => q{h:mm – h:mm a},
-				m => q{h:mm–h:mm a},
-			},
-			hmv => {
-				a => q{h:mm a – h:mm a v},
-				h => q{h:mm–h:mm a v},
-				m => q{h:mm–h:mm a v},
-			},
-			hv => {
-				a => q{h a – h a v},
-				h => q{h–h a v},
 			},
 			y => {
 				y => q{y – y},
@@ -10870,13 +7793,9 @@ has 'time_zone_names' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default	=> sub { {
-		hourFormat => q(+HH:mm;-HH:mm),
-		gmtFormat => q(GMT{0}),
-		gmtZeroFormat => q(GMT),
 		regionFormat => q({0} સમય),
 		regionFormat => q({0} દિવસ સમય),
 		regionFormat => q({0} માનક સમય),
-		fallbackFormat => q({1} ({0})),
 		'Acre' => {
 			long => {
 				'daylight' => q#એકર ગ્રીષ્મ સમય#,
@@ -11186,6 +8105,9 @@ has 'time_zone_names' => (
 		},
 		'America/Chihuahua' => {
 			exemplarCity => q#ચિહુઆહુઆ#,
+		},
+		'America/Ciudad_Juarez' => {
+			exemplarCity => q#સિયુદાદ હુઆરેઝ#,
 		},
 		'America/Coral_Harbour' => {
 			exemplarCity => q#એટિકોકેન#,
@@ -12816,6 +9738,9 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Johnston' => {
 			exemplarCity => q#જોહ્નસ્ટોન#,
+		},
+		'Pacific/Kanton' => {
+			exemplarCity => q#કેન્ટન#,
 		},
 		'Pacific/Kiritimati' => {
 			exemplarCity => q#કિરિતિમાતી#,

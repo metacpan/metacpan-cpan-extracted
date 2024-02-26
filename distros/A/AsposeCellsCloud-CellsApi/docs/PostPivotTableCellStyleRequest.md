@@ -8,15 +8,15 @@ use AsposeCellsCloud::Request::PostPivotTableCellStyle;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**name** | **string** | The workbook name. |
+**name** | **string** | The file name. |
 **sheet_name** | **string** | The worksheet name. |
-**pivot_table_index** | **int** | Gets the PivotTable report by index. |
-**column** | **int** | Column index of the cell. |
-**row** | **int** | RowIndex of the cell. |
-**style** | **Style** | Style description in request body. |
-**need_re_calculate** | **boolean** | Whether the specific pivot table calculate(true/false). |
-**folder** | **string** | Original workbook folder. |
-**storage_name** | **string** | Storage name. |  
+**pivot_table_index** | **int** | The PivotTable index. |
+**column** | **int** | The column index of the cell. |
+**row** | **int** | The row index of the cell. |
+**style** | **Style** | Style Style description in request body. |
+**need_re_calculate** | **boolean** | Whether the specific PivotTable calculate(true/false). |
+**folder** | **string** | The folder where the file is situated. |
+**storage_name** | **string** | The storage name where the file is situated. |  
 
 [[Back to Model list]](../README.md#documentation-for-requests) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

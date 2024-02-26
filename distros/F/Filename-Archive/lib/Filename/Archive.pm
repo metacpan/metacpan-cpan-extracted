@@ -7,9 +7,9 @@ use warnings;
 use Exporter 'import';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-08-27'; # DATE
+our $DATE = '2023-12-15'; # DATE
 our $DIST = 'Filename-Archive'; # DIST
-our $VERSION = '0.032'; # VERSION
+our $VERSION = '0.033'; # VERSION
 
 our @EXPORT_OK = qw(check_archive_filename);
 #list_archive_suffixes
@@ -91,7 +91,7 @@ _
             pos => 0,
         },
         # XXX recurse?
-        ci => {
+        ignore_case => {
             summary => 'Whether to match case-insensitively',
             schema  => 'bool',
             default => 1,
@@ -108,6 +108,14 @@ information, which contains these keys: `archive_name`, `archive_suffix`,
 
 _
     },
+    examples => [
+        {
+            args => {filename=>'foo.tar.bz2'},
+        },
+        {
+            args => {filename=>'bar.Zip', ignore_case=>1},
+        },
+    ],
 };
 sub check_archive_filename {
     require Filename::Compressed;
@@ -115,7 +123,7 @@ sub check_archive_filename {
     my %args = @_;
 
     my $filename = $args{filename};
-    my $ci = $args{ci} // 1;
+    my $ci = $args{ignore_case} // 1;
 
     my @compressor_info;
     while (1) {
@@ -170,7 +178,7 @@ Filename::Archive - Check whether filename indicates being an archive file
 
 =head1 VERSION
 
-This document describes version 0.032 of Filename::Archive (from Perl distribution Filename-Archive), released on 2023-08-27.
+This document describes version 0.033 of Filename::Archive (from Perl distribution Filename-Archive), released on 2023-12-15.
 
 =head1 SYNOPSIS
 
@@ -197,19 +205,56 @@ Usage:
 
 Check whether filename indicates being an archive file.
 
+Examples:
+
+=over
+
+=item * Example #1:
+
+ check_archive_filename(filename => "foo.tar.bz2");
+
+Result:
+
+ {
+   archive_name            => "tar",
+   archive_suffix          => ".tar",
+   compressor_info         => [
+                                {
+                                  compressor_name       => "Bzip2",
+                                  compressor_suffix     => ".bz2",
+                                  uncompressed_filename => "foo.tar",
+                                },
+                              ],
+   filename_without_suffix => "foo",
+ }
+
+=item * Example #2:
+
+ check_archive_filename(filename => "bar.Zip", ignore_case => 1);
+
+Result:
+
+ {
+   archive_name => "Zip",
+   archive_suffix => ".Zip",
+   filename_without_suffix => "bar",
+ }
+
+=back
+
 This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<ci> => I<bool> (default: 1)
-
-Whether to match case-insensitively.
-
 =item * B<filename>* => I<str>
 
 (No description)
+
+=item * B<ignore_case> => I<bool> (default: 1)
+
+Whether to match case-insensitively.
 
 
 =back

@@ -45,7 +45,7 @@ if(!(-e 't/online.enabled')) {
 	);
 	ok(defined($l));
 	ok($l->isa('CGI::Lingua'));
-	is($l->time_zone(), 'America/New_York', 'America/New_York');
+	cmp_ok($l->time_zone(), 'eq', 'America/New_York', 'time_zone: America/New_York');
 } else {
 	plan(skip_all => 'You need either JSON::Parse and LWP::Simple::WithCache to test t/time_zone.t');
 }

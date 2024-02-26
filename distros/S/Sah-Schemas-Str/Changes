@@ -1,3 +1,17 @@
+0.018   2024-02-06  Released-By: PERLANCAR; Urgency: medium
+
+        - Add schemas: matcher::str, single_line_str, multi_line_str,
+          str_or_aos::arrayified, str_or_aos1::arrayified.
+
+
+0.017   2023-12-20  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Explain difference between re_from_str & str_or_re, and
+          code_from_str and str_or_code.
+
+
 0.016   2023-10-23  Released-By: PERLANCAR; Urgency: medium
 
         - Add minimum perl version v5.14 because of the generated (?^...)

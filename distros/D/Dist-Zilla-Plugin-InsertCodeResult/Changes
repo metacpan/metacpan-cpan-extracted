@@ -1,4 +1,9 @@
-0.055   2021-08-06  Released-By: PERLANCAR; Urgency: medium
+0.056   2023-12-11  Released-By: PERLANCAR; Urgency: medium
+
+        - Allow each line in multiline code to be prefixed by comment.
+
+
+0.055   2021-08-06  Released-By: PERLANCAR; Urgency: high
 
 	- [bugfix] Fix bug in regexp (wrong capture).
 

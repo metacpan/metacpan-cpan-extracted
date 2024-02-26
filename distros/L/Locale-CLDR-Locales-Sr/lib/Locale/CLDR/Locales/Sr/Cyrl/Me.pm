@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Sr::Cyrl::Me - Package for language Serbian
 
 package Locale::CLDR::Locales::Sr::Cyrl::Me;
 # This file auto generated from Data\common\main\sr_Cyrl_ME.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -41,7 +41,6 @@ has 'display_name_language' => (
  				'moh' => 'мохок',
  				'nqo' => 'н’ко',
  				'shi' => 'јужни шилха',
- 				'tzm' => 'централноатласки тамашек',
  				'xh' => 'исикоса',
  				'zgh' => 'стандардни марокански тамашек',
  				'zu' => 'исизулу',
@@ -104,27 +103,6 @@ has 'calendar_months' => (
 						],
 					},
 				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'јан',
-							'феб',
-							'март',
-							'апр',
-							'мај',
-							'јун',
-							'јул',
-							'авг',
-							'септ',
-							'окт',
-							'нов',
-							'дец'
-						],
-						leap => [
-							
-						],
-					},
-				},
 			},
 	} },
 );
@@ -136,17 +114,6 @@ has 'calendar_days' => (
 	default		=> sub { {
 			'gregorian' => {
 				'format' => {
-					wide => {
-						mon => 'понедељак',
-						tue => 'уторак',
-						wed => 'сриједа',
-						thu => 'четвртак',
-						fri => 'петак',
-						sat => 'субота',
-						sun => 'недјеља'
-					},
-				},
-				'stand-alone' => {
 					wide => {
 						mon => 'понедељак',
 						tue => 'уторак',
@@ -239,13 +206,13 @@ has 'day_periods' => (
 			'format' => {
 				'abbreviated' => {
 					'afternoon1' => q{по под.},
-					'am' => q{прије подне},
+					'am' => q{прије подне},
 					'evening1' => q{вече},
 					'midnight' => q{поноћ},
 					'morning1' => q{јутро},
 					'night1' => q{ноћу},
 					'noon' => q{подне},
-					'pm' => q{по подне},
+					'pm' => q{по подне},
 				},
 				'narrow' => {
 					'afternoon1' => q{по под.},
@@ -261,10 +228,6 @@ has 'day_periods' => (
 				},
 			},
 			'stand-alone' => {
-				'abbreviated' => {
-					'am' => q{прије подне},
-					'pm' => q{по подне},
-				},
 				'narrow' => {
 					'am' => q{a},
 					'pm' => q{p},

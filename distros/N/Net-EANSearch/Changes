@@ -1,5 +1,20 @@
 Revision history for Perl extension Net::EANSearch.
 
+1.06  Wed Feb 16 01:00:00 2024
+	- add missing test dependency
+
+1.05  Wed Feb 15 21:00:00 2024
+	- remove Perl version restrictions
+	- documentation fixes
+
+1.04  Wed Feb 15 15:00:00 2024
+	- fix module dependencies
+
+1.03  Wed Feb 14 18:00:00 2024
+	- longer network timeout
+	- documentation fixes
+	- more tests
+
 1.02  Wed Feb 14 14:06:00 2024
 	- switch internally to LWP for broader plattform support
 	- documentation fixes

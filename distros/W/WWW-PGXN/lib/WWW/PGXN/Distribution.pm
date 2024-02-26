@@ -4,7 +4,7 @@ use 5.8.1;
 use strict;
 use File::Spec;
 use Carp;
-our $VERSION = v0.12.4;
+our $VERSION = v0.13.0;
 
 BEGIN {
     # XXX Use DateTime for release date?
@@ -165,7 +165,7 @@ WWW::PGXN::Distribution - Distribution metadata fetched from PGXN
 
 =head1 Synopsis
 
-  my $pgxn = WWW::PGXN->new( url => 'http://api.pgxn.org/' );
+  my $pgxn = WWW::PGXN->new( url => 'https://api.pgxn.org/' );
   my $dist = $pgxn->get_distribution('pgTAP');
   $dist->download_to('.');
 
@@ -227,7 +227,7 @@ The abstract for the distribution, a very brief description.
   $distribution->license($license);
 
 The license for the distribution, usually a simple string such as "gpl_3" or
-"postgresql". See the L<PGXN Meta spec|http://pgxn.org/meta/spec.html#license>
+"postgresql". See the L<PGXN Meta spec|https://pgxn.org/meta/spec.html#license>
 for details.
 
 =head3 C<user>
@@ -262,7 +262,7 @@ this distribution object is created.
   $distribution->date($date);
 
 The date the distribution was released on PGXN. Represented as a string in
-strict L<ISO-8601|http://en.wikipedia.org/wiki/ISO_8601> format and in the UTC
+strict L<ISO-8601|https://en.wikipedia.org/wiki/ISO_8601> format and in the UTC
 time zone. It may be parsed into a L<DateTime> object like so:
 
   use DateTime::Format::Strptime;
@@ -316,7 +316,7 @@ like so:
   my @maintainers = $distribution->maintainers;
 
 Returns a list of the maintainers of the module. By the recommendation of the
-L<PGXN Meta spec|http://pgxn.org/meta/spec.html#maintainer>, each should be
+L<PGXN Meta spec|https://pgxn.org/meta/spec.html#maintainer>, each should be
 formatted with a name and email address suitable for on the recipient line of
 an email.
 
@@ -345,7 +345,7 @@ C<body_for_html_doc()>.
 
 Returns a hash reference describing files and directories that should not be
 indexed by search engines or the PGXN infrastructure. The L<PGXN Meta
-spec|http://pgxn.org/meta/spec.html#no_index> specifies that the structure of
+spec|https://pgxn.org/meta/spec.html#no_index> specifies that the structure of
 this hash contain only these keys:
 
 =over
@@ -367,7 +367,7 @@ The returned has will be empty if all files may be indexed.
   my $prereqs = $distribution->prereqs;
 
 Returns a hash reference describing the prerequisites of the extension. The
-L<PGXN Meta spec|http://pgxn.org/meta/spec.html#prereqs> dictates That the top
+L<PGXN Meta spec|https://pgxn.org/meta/spec.html#prereqs> dictates That the top
 level keys of this hash may be any of:
 
 =over
@@ -401,7 +401,7 @@ secondary hash may be any of:
 Each of these in turn points to another hash reference, the keys of which are
 the names of the prerequisite extensions and the values are their minimum
 required version numbers. See the
-L<Prereq Spec|http://pgxn.org/meta/spec.html#Prereq.Spec> for further
+L<Prereq Spec|https://pgxn.org/meta/spec.html#Prereq.Spec> for further
 explication of these phases and relationships. Here's an example of what a
 typical C<prereqs> hash might look like:
 
@@ -483,7 +483,7 @@ single extension:
      }
   }
 
-See the <spec|http://pgxn.org/meta/spec.html#provides> for more information.
+See the <spec|https://pgxn.org/meta/spec.html#provides> for more information.
 
 =head3 C<releases>
 
@@ -529,17 +529,17 @@ like. Example:
 
   {
      bugtracker => {
-        web => 'http://github.com/theory/kv-pair/issues/'
+        web => 'https://github.com/theory/kv-pair/issues/'
      },
      repository => {
         type => 'git',
         url  => 'git://github.com/theory/kv-pair.git',
-        web  => 'http://github.com/theory/kv-pair/'
+        web  => 'https://github.com/theory/kv-pair/'
      },
   }
 
 Read the
-L<Resources section of the meta spec|http://pgxn.org/meta/spec.html#resources>
+L<Resources section of the meta spec|https://pgxn.org/meta/spec.html#resources>
 for all the details.
 
 =head3 C<tags>
@@ -561,7 +561,7 @@ like so:
 The absolute URL for the distribution archive file on the mirror or API sever,
 such as
 
-  http://api.pgxn.org/dist/pair/pair-0.1.1.zip
+  https://api.pgxn.org/dist/pair/pair-0.1.1.zip
 
 Or, for a file system URL:
 
@@ -585,7 +585,7 @@ for example:
 The absolute URL to the unzipped source on the API server, suitable for
 browsing. For example:
 
-  http://api.pgxn.org/src/pair/pair-0.1.1/
+  https://api.pgxn.org/src/pair/pair-0.1.1/
 
 Or, for a file system URL:
 
@@ -666,7 +666,7 @@ are returned in order from most to least recent.
 
 =head3 C<url_for_html_doc>
 
-  # returns http://api.pgxn.org/dist/pair/pair-0.1.1/doc/pair.html
+  # returns https://api.pgxn.org/dist/pair/pair-0.1.1/doc/pair.html
   my $doc_url = $distribution->url_for_html_doc('doc/pair');
 
 The absolute URL to an HTML documentation file. Pass a document path to get
@@ -731,11 +731,11 @@ The main class to communicate with a PGXN mirror or API server.
 =head1 Support
 
 This module is stored in an open L<GitHub
-repository|http://github.com/theory/www-pgxn/>. Feel free to fork and
+repository|https://github.com/theory/www-pgxn/>. Feel free to fork and
 contribute!
 
 Please file bug reports via L<GitHub
-Issues|http://github.com/theory/www-pgxn/issues/> or by sending mail to
+Issues|https://github.com/theory/www-pgxn/issues/> or by sending mail to
 L<bug-WWW-PGXN@rt.cpan.org|mailto:bug-WWW-PGXN@rt.cpan.org>.
 
 =head1 Author
@@ -744,7 +744,7 @@ David E. Wheeler <david@justatheory.com>
 
 =head1 Copyright and License
 
-Copyright (c) 2011 David E. Wheeler. Some Rights Reserved.
+Copyright (c) 2011-2024 David E. Wheeler. Some Rights Reserved.
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

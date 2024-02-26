@@ -1,9 +1,9 @@
 This archive contains the distribution Dispatch-Fu,
-version 1.05:
+version 1.06:
 
   Converts any complicated conditional dispatch situation into familiar static hash-key based dispatch
 
-This software is copyright (c) 2023 by oodler577.
+This software is copyright (c) 2024 by oodler577.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,9 @@
+No Format Test File
+===================
+
+This file tests the the default parser used if Text::Markup can't figure out the
+type of parser to use. Powered by Text::Markup::None. Öy.
+
+    func main() {
+        fmt.Println("hello")
+    }

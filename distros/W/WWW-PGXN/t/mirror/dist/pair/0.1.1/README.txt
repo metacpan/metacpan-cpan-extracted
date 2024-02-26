@@ -7,7 +7,7 @@ key/value pairs. It's just a simple thing, really: a two-value composite type
 that can store any type of value in its slots, which are named "k" and "v".
 
 The `pair` data type was created as an inspiration, as documented in
-[this blog post](http://justatheory.com/computers/databases/postgresql/key-value-pairs.html).
+[this blog post](https://justatheory.com/computers/databases/postgresql/key-value-pairs.html).
 Give it a read if you're interested in the context of its creation.
 
 To build it, just do this:
@@ -64,7 +64,7 @@ Copyright and License
 Copyright (c) 2010 David E. Wheeler.
 
 This module is free software; you can redistribute it and/or modify it under
-the [PostgreSQL License](http://www.opensource.org/licenses/postgresql).
+the [PostgreSQL License](https://www.opensource.org/licenses/postgresql).
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose, without fee, and without a written agreement is

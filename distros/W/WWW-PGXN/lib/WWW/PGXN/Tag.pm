@@ -3,7 +3,7 @@ package WWW::PGXN::Tag;
 use 5.8.1;
 use strict;
 
-our $VERSION = v0.12.4;
+our $VERSION = v0.13.0;
 
 sub new {
     my ($class, $data) = @_;
@@ -24,7 +24,7 @@ WWW::PGXN::Tag - Tag metadata fetched from PGXN
 
 =head1 Synopsis
 
-  my $pgxn = WWW::PGXN->new( url => 'http://api.pgxn.org/' );
+  my $pgxn = WWW::PGXN->new( url => 'https://api.pgxn.org/' );
   my $tag  = $pgxn->get_tag('unit testing');
   say $tag->name;
 
@@ -118,11 +118,11 @@ The main class to communicate with a PGXN mirror or API server.
 =head1 Support
 
 This module is stored in an open L<GitHub
-repository|http://github.com/theory/www-pgxn/>. Feel free to fork and
+repository|https://github.com/theory/www-pgxn/>. Feel free to fork and
 contribute!
 
 Please file bug reports via L<GitHub
-Issues|http://github.com/theory/www-pgxn/issues/> or by sending mail to
+Issues|https://github.com/theory/www-pgxn/issues/> or by sending mail to
 L<bug-WWW-PGXN@rt.cpan.org|mailto:bug-WWW-PGXN@rt.cpan.org>.
 
 =head1 Author
@@ -131,7 +131,7 @@ David E. Wheeler <david@justatheory.com>
 
 =head1 Copyright and License
 
-Copyright (c) 2011 David E. Wheeler. Some Rights Reserved.
+Copyright (c) 2011-2024 David E. Wheeler. Some Rights Reserved.
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

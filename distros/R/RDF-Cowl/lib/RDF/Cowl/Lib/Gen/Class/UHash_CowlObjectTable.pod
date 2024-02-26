@@ -1,0 +1,376 @@
+# PODNAME: RDF::Cowl::Lib::Gen::Class::UHash_CowlObjectTable
+# ABSTRACT: Generated docs for RDF::Cowl::Ulib::UHash_CowlObjectTable
+
+## DO NOT EDIT
+## Generated via maint/tt/Class.pod.tt
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+RDF::Cowl::Lib::Gen::Class::UHash_CowlObjectTable - Generated docs for RDF::Cowl::Ulib::UHash_CowlObjectTable
+
+=head1 VERSION
+
+version 1.0.0
+
+=head1 MAIN MODULE
+
+L<RDF::Cowl::Ulib::UHash_CowlObjectTable>
+
+=head1 METHODS
+
+=head2 hash_deinit
+
+B<Signature>:
+
+  $self->hash_deinit()
+
+B<Params>:
+
+  UHash_CowlObjectTable $h 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uhash_deinit_CowlObjectTable >>
+
+=back
+
+=head2 hash_copy
+
+B<Signature>:
+
+  $self->hash_copy(UHash_CowlObjectTable $dest)
+
+B<Params>:
+
+  UHash_CowlObjectTable $src 
+  UHash_CowlObjectTable $dest 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uhash_copy_CowlObjectTable >>
+
+=back
+
+=head2 hash_copy_as_set
+
+B<Signature>:
+
+  $self->hash_copy_as_set(UHash_CowlObjectTable $dest)
+
+B<Params>:
+
+  UHash_CowlObjectTable $src 
+  UHash_CowlObjectTable $dest 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uhash_copy_as_set_CowlObjectTable >>
+
+=back
+
+=head2 hash_clear
+
+B<Signature>:
+
+  $self->hash_clear()
+
+B<Params>:
+
+  UHash_CowlObjectTable $h 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uhash_clear_CowlObjectTable >>
+
+=back
+
+=head2 hash_get
+
+B<Signature>:
+
+  $self->hash_get(CowlAny $key)
+
+B<Params>:
+
+  UHash_CowlObjectTable $h 
+  CowlAny $key 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uhash_get_CowlObjectTable >>
+
+=back
+
+=head2 hash_resize
+
+B<Signature>:
+
+  $self->hash_resize(Ulib_uint $new_size)
+
+B<Params>:
+
+  UHash_CowlObjectTable $h 
+  Ulib_uint $new_size 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uhash_resize_CowlObjectTable >>
+
+=back
+
+=head2 hash_put
+
+B<Signature>:
+
+  $self->hash_put(CowlAny $key, Ulib_uint * $idx)
+
+B<Params>:
+
+  UHash_CowlObjectTable $h 
+  CowlAny $key 
+  Ulib_uint * $idx 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uhash_put_CowlObjectTable >>
+
+=back
+
+=head2 hash_delete
+
+B<Signature>:
+
+  $self->hash_delete(Ulib_uint $x)
+
+B<Params>:
+
+  UHash_CowlObjectTable $h 
+  Ulib_uint $x 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uhash_delete_CowlObjectTable >>
+
+=back
+
+=head2 hmap_get
+
+B<Signature>:
+
+  $self->hmap_get(CowlAny $key, CowlAny $if_missing)
+
+B<Params>:
+
+  UHash_CowlObjectTable $h 
+  CowlAny $key 
+  CowlAny $if_missing 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uhmap_get_CowlObjectTable >>
+
+=back
+
+=head2 hset_is_superset
+
+B<Signature>:
+
+  $self->hset_is_superset(UHash_CowlObjectTable $h2)
+
+B<Params>:
+
+  UHash_CowlObjectTable $h1 
+  UHash_CowlObjectTable $h2 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uhset_is_superset_CowlObjectTable >>
+
+=back
+
+=head2 hset_union
+
+B<Signature>:
+
+  $self->hset_union(UHash_CowlObjectTable $h2)
+
+B<Params>:
+
+  UHash_CowlObjectTable $h1 
+  UHash_CowlObjectTable $h2 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uhset_union_CowlObjectTable >>
+
+=back
+
+=head2 hset_intersect
+
+B<Signature>:
+
+  $self->hset_intersect(UHash_CowlObjectTable $h2)
+
+B<Params>:
+
+  UHash_CowlObjectTable $h1 
+  UHash_CowlObjectTable $h2 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uhset_intersect_CowlObjectTable >>
+
+=back
+
+=head2 hset_hash
+
+B<Signature>:
+
+  $self->hset_hash()
+
+B<Params>:
+
+  UHash_CowlObjectTable $h 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uhset_hash_CowlObjectTable >>
+
+=back
+
+=head2 hset_get_any
+
+B<Signature>:
+
+  $self->hset_get_any(CowlAny $if_empty)
+
+B<Params>:
+
+  UHash_CowlObjectTable $h 
+  CowlAny $if_empty 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uhset_get_any_CowlObjectTable >>
+
+=back
+
+=head2 hash_is_map
+
+B<Signature>:
+
+  $self->hash_is_map()
+
+B<Params>:
+
+  UHash_CowlObjectTable $h 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uhash_is_map_CowlObjectTable >>
+
+=back
+
+=head2 hash_move
+
+B<Signature>:
+
+  $self->hash_move()
+
+B<Params>:
+
+  UHash_CowlObjectTable $h 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uhash_move_CowlObjectTable >>
+
+=back
+
+=head2 hash_next
+
+B<Signature>:
+
+  $self->hash_next(Ulib_uint $i)
+
+B<Params>:
+
+  UHash_CowlObjectTable $h 
+  Ulib_uint $i 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uhash_next_CowlObjectTable >>
+
+=back
+
+=head2 hset_equals
+
+B<Signature>:
+
+  $self->hset_equals(UHash_CowlObjectTable $h2)
+
+B<Params>:
+
+  UHash_CowlObjectTable $h1 
+  UHash_CowlObjectTable $h2 
+
+Documentation:
+
+=over 2
+
+B<C function name>: C<< uhset_equals_CowlObjectTable >>
+
+=back
+
+=head1 AUTHOR
+
+Zakariyya Mughal <zmughal@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 by Auto-Parallel Technologies, Inc..
+
+This is free software, licensed under Eclipse Public License - v 2.0.
+
+=cut

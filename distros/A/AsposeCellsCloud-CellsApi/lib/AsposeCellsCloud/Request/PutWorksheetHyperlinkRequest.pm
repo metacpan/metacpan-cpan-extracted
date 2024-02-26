@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,15 +59,15 @@ sub new {
 
 
 # Run Operation Request
-# PutWorksheetHyperlinkRequest.name : The workbook name.  ,
+# PutWorksheetHyperlinkRequest.name : The file name.  ,
 # PutWorksheetHyperlinkRequest.sheetName : The worksheet name.  ,
 # PutWorksheetHyperlinkRequest.firstRow : First row of the hyperlink range.  ,
 # PutWorksheetHyperlinkRequest.firstColumn : First column of the hyperlink range.  ,
 # PutWorksheetHyperlinkRequest.totalRows : Number of rows in this hyperlink range.  ,
 # PutWorksheetHyperlinkRequest.totalColumns : Number of columns of this hyperlink range.  ,
 # PutWorksheetHyperlinkRequest.address : Address of the hyperlink.  ,
-# PutWorksheetHyperlinkRequest.folder : Original workbook folder.  ,
-# PutWorksheetHyperlinkRequest.storageName : Storage name.   
+# PutWorksheetHyperlinkRequest.folder : The folder where the file is situated.  ,
+# PutWorksheetHyperlinkRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -78,7 +78,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_worksheet_hyperlink' } = { 
-    	summary => 'Adds hyperlink in worksheet.',
+    	summary => 'Add hyperlink in the worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -155,7 +155,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -204,14 +204,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

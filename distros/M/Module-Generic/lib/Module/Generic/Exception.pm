@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Exception.pm
-## Version v1.2.3
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v1.3.1
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2023/08/08
+## Modified 2024/02/24
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -29,7 +29,7 @@ BEGIN
     $CALLER_LEVEL = 0;
     $CALLER_INTERNAL->{'Module::Generic'}++;
     $CALLER_INTERNAL->{'Module::Generic::Exception'}++;
-    our $VERSION = 'v1.2.3';
+    our $VERSION = 'v1.3.1';
 };
 
 BEGIN
@@ -43,14 +43,16 @@ no warnings 'redefine';
 sub init
 {
     my $self = shift( @_ );
+    $self->{cause} = undef unless( length( $self->{cause} ) );
     $self->{code} = '' unless( length( $self->{code} ) );
-    $self->{type} = '' unless( length( $self->{type} ) );
     $self->{file} = '' unless( length( $self->{file} ) );
+    $self->{lang} = '' unless( length( $self->{lang} ) );
     $self->{line} = '' unless( length( $self->{line} ) );
     $self->{message} = '' unless( length( $self->{message} ) );
     $self->{package} = '' unless( length( $self->{package} ) );
     $self->{retry_after} = '' unless( length( $self->{retry_after} ) );
     $self->{subroutine} = '' unless( length( $self->{subroutine} ) );
+    $self->{type} = '' unless( length( $self->{type} ) );
     my $args = {};
     if( @_ )
     {
@@ -68,6 +70,7 @@ sub init
         }
     }
     # $self->SUPER::init( @_ );
+    $self->debug( $args->{debug} ) if( exists( $args->{debug} ) );
     
     unless( length( $args->{skip_frames} ) )
     {
@@ -126,18 +129,18 @@ sub init
     if( ref( $args->{object} ) && Scalar::Util::blessed( $args->{object} ) && $args->{object}->isa( 'Module::Generic::Exception' ) )
     {
         my $o = $args->{object};
-        $self->{message} = $o->message;
-        $self->{code} = $o->code;
-        $self->{type} = $o->type;
-        $self->{retry_after} = $o->retry_after;
+        $self->message( $o->message );
+        $self->code( $o->code );
+        $self->type( $o->type );
+        $self->retry_after( $o->retry_after );
     }
     else
     {
         # print( STDERR __PACKAGE__, "::init() Got here with args: ", Module::Generic->dump( $args ), "\n" );
-        $self->{message} = $args->{message} || '';
-        $self->{code} = $args->{code} if( exists( $args->{code} ) );
-        $self->{type} = $args->{type} if( exists( $args->{type} ) );
-        $self->{retry_after} = $args->{retry_after} if( exists( $args->{retry_after} ) );
+        $self->message( $args->{message} || '' );
+        $self->code( $args->{code} ) if( exists( $args->{code} ) );
+        $self->type( $args->{type} ) if( exists( $args->{type} ) );
+        $self->retry_after( $args->{retry_after} ) if( exists( $args->{retry_after} ) );
         # I do not want to alter the original hash reference, which may adversely affect the calling code if they depend on its content for further execution for example.
         my $copy = {};
         %$copy = %$args;
@@ -157,12 +160,12 @@ sub init
             }
         }
     }
-    $self->{file} = $frame->filename;
-    $self->{line} = $frame->line;
+    $self->file( $frame->filename );
+    $self->line( $frame->line );
     ## The caller sub routine ( caller( n ) )[3] returns the sub called by our caller instead of the sub that called our caller, so we go one frame back to get it
-    $self->{subroutine} = $frame2->subroutine if( $frame2 );
-    $self->{package} = $frame->package;
-    $self->{trace} = $trace;
+    $self->subroutine( $frame2->subroutine ) if( $frame2 );
+    $self->package( $frame->package );
+    $self->trace( $trace );
     return( $self );
 }
 
@@ -199,9 +202,34 @@ sub code { return( shift->_set_get_scalar( 'code', @_ ) ); }
 
 sub file { return( shift->_set_get_scalar( 'file', @_ ) ); }
 
+sub lang { return( shift->_set_get_scalar( 'lang', @_ ) ); }
+
 sub line { return( shift->_set_get_scalar( 'line', @_ ) ); }
 
-sub message { return( shift->_set_get_scalar( 'message', @_ ) ); }
+sub locale { return( shift->_set_get_scalar( 'lang', @_ ) ); }
+
+sub message { return( shift->_set_get_scalar( {
+    field => 'message',
+    callbacks => 
+    {
+        set => sub
+        {
+            my( $self, $val ) = @_;
+            if( defined( $val ) && !$self->lang )
+            {
+                if( $self->_can( $val => 'locale' ) )
+                {
+                    $self->lang( $val->locale );
+                }
+                elsif( $self->_can( $val => 'lang' ) )
+                {
+                    $self->lang( $val->lang );
+                }
+            }
+            return( $val );
+        },
+    },
+}, @_ ) ); }
 
 sub package { return( shift->_set_get_scalar( 'package', @_ ) ); }
 
@@ -368,6 +396,9 @@ Module::Generic::Exception - Generic Module Exception Class
         code => 404,
         type => $error_type,
         file => '/home/joe/some/lib/My/Module.pm',
+        lang => 'en_GB',
+        # or alternatively
+        # locale => 'en_GB',
         line => 120,
         message => 'Invalid property provided',
         package => 'My::Module',
@@ -380,6 +411,14 @@ Module::Generic::Exception - Generic Module Exception Class
             },
     });
 
+or, providing a list of string that will be concatenated:
+
+    my $ex = Module::Generic::Exception->new( "Some error", "has occurred:", $details );
+
+or, re-using an exception object:
+
+    my $ex = Module::Generic::Exception->new( $other_exception_object );
+
     print( "Error stack trace: ", $ex->stack_trace, "\n" );
     # or
     $object->customer_orders || die( "Error in file ", $object->error->file, " at line ", $object->error->line, "\n" );
@@ -389,7 +428,7 @@ Module::Generic::Exception - Generic Module Exception Class
 
 =head1 VERSION
 
-    v1.2.3
+    v1.3.1
 
 =head1 DESCRIPTION
 
@@ -434,11 +473,23 @@ An error code
 
 =item * C<file>
 
-The localtion where the error occurred. This is populated using the L<Devel::StackTrace/"filename">
+The location where the error occurred. This is populated using the L<Devel::StackTrace/"filename">
+
+=item * C<lang>
+
+An iso 639 language code that represents the language the error message is in.
+
+You can use C<locale> alternatively. See the L</lang> method below for more information.
 
 =item * C<line>
 
 The line number in the file where the error occurred.This is populated using the L<Devel::StackTrace/"line">
+
+=item * C<locale>
+
+An iso 639 language code that represents the language the error message is in.
+
+You can use C<lang> alternatively. See the L</lang> method below for more information.
 
 =item * C<message>
 
@@ -509,6 +560,15 @@ But L<Nice::Try> let's you do this:
 
 =head2 cause
 
+    my $ex = Module::Generic::Exception->new({
+        code => 401,
+        message => 'Not authorised',
+        cause => {
+            id => 1234,
+        },
+    });
+    say $ex->cause->id; # 1234
+
 Sets or gets an hash reference of metadata that serve to provide more context on the error.
 
 This returns an L<hash object|Module::Generic::Hash>.
@@ -521,9 +581,38 @@ Set or get the error code. It returns the current value.
 
 Set or get the file path where the error originated. It returns the current value.
 
+=head2 lang
+
+Set or get the language iso 639 code representing the language the error message is in.
+
+If the error message is a string object that has a C<locale> or C<lang> object, it will be used to set this C<lang> value.
+
+This is the case if you use the module L<Text::PO::Gettext> to implement GNU PO localisation framework. For example:
+
+    use Text::PO::Gettext;
+    my $po = Text::PO::Gettext->new || die( Text::PO::Gettext->error, "\n" );
+    my $po = Text::PO::Gettext->new({
+        category => 'LC_MESSAGES',
+        debug    => 3,
+        domain   => "com.example.api",
+        locale   => 'ja-JP',
+        path     => "/home/joe/locale",
+        use_json => 1,
+    }) || die( Text::PO::Gettext->error, "\n" );
+
+    my $message = $po->gettext( "Something wrong happened." );
+
+Then, C<$message> would be a C<Text::PO::String>
+
+See L<Text::PO::Gettext/gettext> for more information.
+
 =head2 line
 
 Set or get the line where the error originated. It returns the current value.
+
+=head2 locale
+
+This is an alias for L</lang>
 
 =head2 message
 

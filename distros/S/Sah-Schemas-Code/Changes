@@ -1,3 +1,10 @@
+0.003   2023-12-20  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Explain difference between code_from_str and str_or_code.
+
+
 0.002   2023-09-05  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

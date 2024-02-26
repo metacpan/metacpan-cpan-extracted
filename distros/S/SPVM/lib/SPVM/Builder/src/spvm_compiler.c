@@ -139,7 +139,15 @@ void SPVM_COMPILER_free(SPVM_COMPILER* compiler) {
   compiler->global_allocator = NULL;
 }
 
+int32_t SPVM_COMPILER_compile_anon_class(SPVM_COMPILER* compiler, const char* source, const char** anon_basic_type_name_ptr) {
+  return SPVM_COMPILER_compile_common(compiler, NULL, source, anon_basic_type_name_ptr);
+}
+
 int32_t SPVM_COMPILER_compile(SPVM_COMPILER* compiler, const char* basic_type_name) {
+  return SPVM_COMPILER_compile_common(compiler, basic_type_name, NULL, NULL);
+}
+
+int32_t SPVM_COMPILER_compile_common(SPVM_COMPILER* compiler, const char* basic_type_name, const char* source, const char** anon_basic_type_name_ptr) {
   
   SPVM_MUTEX* compiler_mutex_compile = compiler->mutex_compile;
   
@@ -169,10 +177,30 @@ int32_t SPVM_COMPILER_compile(SPVM_COMPILER* compiler, const char* basic_type_na
   
   SPVM_COMPILER_use_default_loaded_classes(compiler);
   
+  int32_t original_eval_anon_classes_length = compiler->eval_anon_classes_length;
+  
+  // Anon class
+  if (source) {
+    int32_t int32_max_length = 10;
+    int32_t anon_method_basic_type_name_length = 4 + 2 + 4 + 2 + int32_max_length;
+    
+    char* anon_basic_type_name = SPVM_ALLOCATOR_alloc_memory_block_permanent(compiler->current_each_compile_allocator, anon_method_basic_type_name_length + 1);
+    sprintf(anon_basic_type_name, "eval::anon::%d", compiler->eval_anon_classes_length);
+    compiler->eval_anon_classes_length++;
+    
+    char* rel_file = SPVM_ALLOCATOR_alloc_memory_block_permanent(compiler->current_each_compile_allocator, anon_method_basic_type_name_length + 1);
+    sprintf(rel_file, "eval/anon/%d.spvm", compiler->eval_anon_classes_length);
+    
+    SPVM_COMPILER_set_class_file_with_members(compiler, anon_basic_type_name, rel_file, source);
+    
+    basic_type_name = anon_basic_type_name;
+  }
+  
   if (basic_type_name) {
-    SPVM_STRING* basic_type_name_string = SPVM_STRING_new(compiler, basic_type_name, strlen(basic_type_name));
-    basic_type_name = basic_type_name_string->value;
+    SPVM_STRING_new(compiler, basic_type_name, strlen(basic_type_name));
+    
     const char* start_file = SPVM_COMPILER_get_start_file(compiler);
+    
     int32_t start_line = SPVM_COMPILER_get_start_line(compiler);
     
     SPVM_COMPILER_use(compiler, basic_type_name, start_file, start_line);
@@ -228,6 +256,9 @@ int32_t SPVM_COMPILER_compile(SPVM_COMPILER* compiler, const char* basic_type_na
       
       SPVM_HASH_set(compiler->basic_type_symtable, basic_type->name, strlen(basic_type->name), NULL);
     }
+    
+    compiler->eval_anon_classes_length = original_eval_anon_classes_length;
+    
     compiler->basic_types->length = compiler_basic_types_base_id;
      
     for (int32_t constant_string_id = compiler_constant_strings_base_id; constant_string_id < compiler->constant_strings->length; constant_string_id++) {
@@ -240,6 +271,11 @@ int32_t SPVM_COMPILER_compile(SPVM_COMPILER* compiler, const char* basic_type_na
     compiler->current_each_compile_allocator = NULL;
   }
   else {
+    // Anon class
+    if (source) {
+      *anon_basic_type_name_ptr = basic_type_name;
+    }
+    
     SPVM_LIST_push(compiler->each_compile_allocators, compiler->current_each_compile_allocator);
     compiler->current_each_compile_allocator = NULL;
     
@@ -464,7 +500,7 @@ void SPVM_COMPILER_set_default_loaded_class_files(SPVM_COMPILER* compiler) {
     const char* class_name = "Bool";
     const char* rel_file = "Bool.spvm";
     const char* content = "class Bool {\n  INIT {\n    $TRUE = new Bool;\n    $TRUE->{value} = 1;\n    $FALSE = new Bool;\n    $FALSE->{value} = 0;\n  }\n  \n  our $TRUE : ro Bool;\n  our $FALSE : ro Bool;\n  has value : ro int;\n}";
-    SPVM_COMPILER_set_default_loaded_class_file(compiler, class_name, rel_file, content);
+    SPVM_COMPILER_set_class_file_with_members(compiler, class_name, rel_file, content);
   }
   
   // Add Error class file
@@ -472,7 +508,7 @@ void SPVM_COMPILER_set_default_loaded_class_files(SPVM_COMPILER* compiler) {
     const char* class_name = "Error";
     const char* rel_file = "Error.spvm";
     const char* content = "class Error;";
-    SPVM_COMPILER_set_default_loaded_class_file(compiler, class_name, rel_file, content);
+    SPVM_COMPILER_set_class_file_with_members(compiler, class_name, rel_file, content);
   }
   
   // Add Error::System class file
@@ -480,7 +516,7 @@ void SPVM_COMPILER_set_default_loaded_class_files(SPVM_COMPILER* compiler) {
     const char* class_name = "Error::System";
     const char* rel_file = "Error/System.spvm";
     const char* content = "class Error::System extends Error;";
-    SPVM_COMPILER_set_default_loaded_class_file(compiler, class_name, rel_file, content);
+    SPVM_COMPILER_set_class_file_with_members(compiler, class_name, rel_file, content);
   }
   
   // Add Error::NotSupported class file
@@ -488,7 +524,7 @@ void SPVM_COMPILER_set_default_loaded_class_files(SPVM_COMPILER* compiler) {
     const char* class_name = "Error::NotSupported";
     const char* rel_file = "Error/NotSupported.spvm";
     const char* content = "class Error::NotSupported extends Error;";
-    SPVM_COMPILER_set_default_loaded_class_file(compiler, class_name, rel_file, content);
+    SPVM_COMPILER_set_class_file_with_members(compiler, class_name, rel_file, content);
   }
   
   // Add Byte class file
@@ -496,7 +532,7 @@ void SPVM_COMPILER_set_default_loaded_class_files(SPVM_COMPILER* compiler) {
     const char* class_name = "Byte";
     const char* rel_file = "Byte.spvm";
     const char* content = "class Byte {\n  has value : ro byte;\n  static method new : Byte ($value : int) {\n    my $self = new Byte;\n    $self->{value} = (byte)$value;\n    return $self;\n  }\n}";
-    SPVM_COMPILER_set_default_loaded_class_file(compiler, class_name, rel_file, content);
+    SPVM_COMPILER_set_class_file_with_members(compiler, class_name, rel_file, content);
   }
   
   // Add Short class file
@@ -504,7 +540,7 @@ void SPVM_COMPILER_set_default_loaded_class_files(SPVM_COMPILER* compiler) {
     const char* class_name = "Short";
     const char* rel_file = "Short.spvm";
     const char* content = "class Short {\n  has value : ro short;\n  static method new : Short ($value : int) {\n    my $self = new Short;\n    $self->{value} = (short)$value;\n    return $self;\n  }\n}";
-    SPVM_COMPILER_set_default_loaded_class_file(compiler, class_name, rel_file, content);
+    SPVM_COMPILER_set_class_file_with_members(compiler, class_name, rel_file, content);
   }
   
   // Add Int class file
@@ -512,7 +548,7 @@ void SPVM_COMPILER_set_default_loaded_class_files(SPVM_COMPILER* compiler) {
     const char* class_name = "Int";
     const char* rel_file = "Int.spvm";
     const char* content = "class Int {\n  has value : ro int;\n  static method new : Int ($value : int) {\n    my $self = new Int;\n    $self->{value} = $value;\n    return $self;\n  }\n}";
-    SPVM_COMPILER_set_default_loaded_class_file(compiler, class_name, rel_file, content);
+    SPVM_COMPILER_set_class_file_with_members(compiler, class_name, rel_file, content);
   }
   
   // Add Long class file
@@ -520,7 +556,7 @@ void SPVM_COMPILER_set_default_loaded_class_files(SPVM_COMPILER* compiler) {
     const char* class_name = "Long";
     const char* rel_file = "Long.spvm";
     const char* content = "class Long {\n  has value : ro long;\n  static method new : Long ($value : long) {\n    my $self = new Long;\n    $self->{value} = $value;\n    return $self;\n  }\n}";
-    SPVM_COMPILER_set_default_loaded_class_file(compiler, class_name, rel_file, content);
+    SPVM_COMPILER_set_class_file_with_members(compiler, class_name, rel_file, content);
   }
   
   // Add Float class file
@@ -528,7 +564,7 @@ void SPVM_COMPILER_set_default_loaded_class_files(SPVM_COMPILER* compiler) {
     const char* class_name = "Float";
     const char* rel_file = "Float.spvm";
     const char* content = "class Float {\n  has value : ro float;\n  static method new : Float ($value : float) {\n    my $self = new Float;\n    $self->{value} = $value;\n    return $self;\n  }\n}";
-    SPVM_COMPILER_set_default_loaded_class_file(compiler, class_name, rel_file, content);
+    SPVM_COMPILER_set_class_file_with_members(compiler, class_name, rel_file, content);
   }
   
   // Add Double class file
@@ -536,7 +572,7 @@ void SPVM_COMPILER_set_default_loaded_class_files(SPVM_COMPILER* compiler) {
     const char* class_name = "Double";
     const char* rel_file = "Double.spvm";
     const char* content = "class Double {\n  has value : ro double;\n  static method new : Double ($value : double) {\n    my $self = new Double;\n    $self->{value} = $value;\n    return $self;\n  }\n}";
-    SPVM_COMPILER_set_default_loaded_class_file(compiler, class_name, rel_file, content);
+    SPVM_COMPILER_set_class_file_with_members(compiler, class_name, rel_file, content);
   }
   
   // Add CommandInfo class file
@@ -544,7 +580,7 @@ void SPVM_COMPILER_set_default_loaded_class_files(SPVM_COMPILER* compiler) {
     const char* class_name = "CommandInfo";
     const char* rel_file = "CommandInfo.spvm";
     const char* content = "class CommandInfo {\n  our $PROGRAM_NAME : ro string;\n  our $ARGV : ro string[];\n  our $BASE_TIME : ro long;\n  }";
-    SPVM_COMPILER_set_default_loaded_class_file(compiler, class_name, rel_file, content);
+    SPVM_COMPILER_set_class_file_with_members(compiler, class_name, rel_file, content);
   }
   
   // Add Address class file
@@ -552,7 +588,7 @@ void SPVM_COMPILER_set_default_loaded_class_files(SPVM_COMPILER* compiler) {
     const char* class_name = "Address";
     const char* rel_file = "Address.spvm";
     const char* content = "class Address : pointer {\n  static method new : Address () {\n    my $self = new Address;\n    return $self;\n  }\n}";
-    SPVM_COMPILER_set_default_loaded_class_file(compiler, class_name, rel_file, content);
+    SPVM_COMPILER_set_class_file_with_members(compiler, class_name, rel_file, content);
   }
   
   // Add Error::Compile class file
@@ -560,11 +596,11 @@ void SPVM_COMPILER_set_default_loaded_class_files(SPVM_COMPILER* compiler) {
     const char* class_name = "Error::Compile";
     const char* rel_file = "Error/Compile.spvm";
     const char* content = "class Error::Compile extends Error;";
-    SPVM_COMPILER_set_default_loaded_class_file(compiler, class_name, rel_file, content);
+    SPVM_COMPILER_set_class_file_with_members(compiler, class_name, rel_file, content);
   }
 }
 
-void SPVM_COMPILER_set_default_loaded_class_file(SPVM_COMPILER* compiler, const char* class_name, const char* rel_file, const char* content) {
+void SPVM_COMPILER_set_class_file_with_members(SPVM_COMPILER* compiler, const char* class_name, const char* rel_file, const char* content) {
   SPVM_COMPILER_add_class_file(compiler, class_name);
   
   SPVM_CLASS_FILE* class_file = SPVM_COMPILER_get_class_file(compiler, class_name);
@@ -888,14 +924,19 @@ SPVM_RUNTIME* SPVM_COMPILER_build_runtime(SPVM_COMPILER* compiler) {
     assert(basic_type_string->index >= 0);
     runtime_basic_type->name = runtime_basic_type->constant_strings[basic_type_string->index].value;
     
-    if (basic_type->class_rel_file) {
-      SPVM_STRING* basic_type_rel_file_string = SPVM_HASH_get(basic_type->constant_string_symtable, basic_type->class_rel_file, strlen(basic_type->class_rel_file));
-      runtime_basic_type->class_rel_file = runtime_basic_type->constant_strings[basic_type_rel_file_string->index].value;
+    if (basic_type->file) {
+      SPVM_STRING* basic_type_file_string = SPVM_HASH_get(basic_type->constant_string_symtable, basic_type->file, strlen(basic_type->file));
+      runtime_basic_type->file = runtime_basic_type->constant_strings[basic_type_file_string->index].value;
     }
     
     if (basic_type->class_dir) {
       SPVM_STRING* basic_type_dir_string = SPVM_HASH_get(basic_type->constant_string_symtable, basic_type->class_dir, strlen(basic_type->class_dir));
       runtime_basic_type->class_dir = runtime_basic_type->constant_strings[basic_type_dir_string->index].value;
+    }
+    
+    if (basic_type->class_rel_file) {
+      SPVM_STRING* basic_type_rel_file_string = SPVM_HASH_get(basic_type->constant_string_symtable, basic_type->class_rel_file, strlen(basic_type->class_rel_file));
+      runtime_basic_type->class_rel_file = runtime_basic_type->constant_strings[basic_type_rel_file_string->index].value;
     }
     
     if (basic_type->version_string) {

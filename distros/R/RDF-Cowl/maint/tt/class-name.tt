@@ -1,0 +1,10 @@
+[% IF library == 'cowl' -%]
+RDF::Cowl::[% class_suffix -%]
+[% ELSIF library == 'ulib' -%]
+RDF::Cowl::Ulib::[% class_suffix -%]
+[% ELSE -%]
+[% THROW library "Unknown library name: $library" %]
+[% END -%]
+[%#-
+# vim: ft=tt2
+-%]

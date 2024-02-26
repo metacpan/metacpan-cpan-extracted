@@ -1,5 +1,9 @@
 Revision history for CGI-Lingua
 
+0.66	Wed Feb 14 10:06:25 EST 2024
+	time_zone(): Don't load Geo::IP for local connections
+	time_zone(): Don't fail on "Usage" message from Geo::IP
+
 0.65	Tue May 23 10:34:07 EDT 2023
 	Added bug notice for limitation imposed by I18N::Acceptlanguage
 	Smokers: don't test on-line stuff

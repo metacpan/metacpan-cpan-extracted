@@ -8,7 +8,7 @@ use AsposeCellsCloud::Request::PostWorksheetCellsRangeMoveTo;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**name** | **string** | The workbook name. |
+**name** | **string** | The file name. |
 **sheet_name** | **string** | The worksheet name. |
 **range** | **Range** | range in worksheet  |
 **dest_row** | **int** | The start row of the dest range. |

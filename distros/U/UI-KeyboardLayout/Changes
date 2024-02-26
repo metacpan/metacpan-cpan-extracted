@@ -14,7 +14,8 @@
 	 For example, to access our layout this way, one needs to know different "handfuls" of allocation rules
 	 for Ancient Greek than for Math Symbols.
 
-Currently achieved (ranges as of Unicode v6.2):
+=== Currently achieved (as of ∼2013; much better now)   (ranges as of Unicode v6.2):
+
 *) Two gotcha (with Shift-SPACE and ApplicationMenu keys) comparing to US and Russian Phonetic keyboards;
 *) Support of all keys (ISO/ABNT/JIS) on all contemporary hardware layouts;
 *) Full coverage of Latin-based scripts (according to Wikipedia), Latin-n repertoirs of ISO 8859,
@@ -1608,7 +1609,7 @@ got <0x30 00 0x65 00 0x31 00 0x32 00 0x33 00 0x34 0x20 0x20 0x20 0x20 0x20 0x20 
 	(Instead:) start implementing [FlatPrefixMap] (for layer 0 only???).
 		Should better be enabled only on top-level ByPairs (not those filtered through extra code)???
 		Currently only enabled if ByPairs is of Flat flavor.
-	Extra flavor Flat for ByPairs (Window only).
+	Extra flavor Flat for ByPairs (Windows only).
 		Currently, must be put directly into the prefix keymap…
 	For X11 build, encode extra-deadkeys and multi-char keys below the U1000000 region.
 	For X11 build, reset units.
@@ -1642,3 +1643,216 @@ got <0x30 00 0x65 00 0x31 00 0x32 00 0x33 00 0x34 0x20 0x20 0x20 0x20 0x20 0x20 
 	izKeys-front-base.html:	Minor tweaks.
 
 	build_here.cmd:	5 new #ERROR#⸣s handled (compatibly with 0.72).
+
+0.74:	Fix signature of print_composition*.
+	New method print_composition_ch_filter() allowing printing a few compositions only.
+	In the docs, instead of ReadConsoleInput(), we were mentioning ReadConsoleEvent(s)().
+	Pre-generate LinkFace by reordering (this SOMETIMES fixes coptic numbers ≥10)
+		(a few bindings are not generated: but this restores the older behaviour)
+	Add ˆ to turnaround.
+	Revive “Blue” substitution faces and layers.
+		(Breaks CopticDigits in tens again???  Apparently, this sub-face may be evaluated in context of non-Latin face,
+		 which is not yet filled via LinkFace; but why OTHER coptic stuff works???)
+	Sort faces before manipulating them.  (Breaks many bindings, removes Coptic tens???)
+	[Undone] Reverse this sort (restores coptic tens???).
+		Still, there are changes in two positions; see diff-ooo-us-reverse-undone
+	Restore subdivision of steps of massaging faces.  (Does not change a lot.)
+	Take into account LinkFace when processing substitution layers.  (Does not change a lot???)
+	Sort faces in create_DeadKey_Maps.  (VLine or somesuch was initialized with Hebrew the main font…)
+	Include ⪍⪎ in addtilde.
+	New transform hattify.
+	addline ⊊⫋⊋⫌ to ⊈⊉⫅⫆, tilde to ≴⋦≵⋧, sharpen to ⪱⪵⪲⪶, unsharpen to ⋤⋢⋥⋣, hattify to ⋨⪹⋩⪺
+	Change CPAN’s http: to https:.
+	Try keys2hex in linked_faces_2_hex_map()
+		UNTESTED
+	Allow (simplest) multi-char postfixes (provided there is no conflict in mapping-to-itself).
+		UNFINISHED	(Immediate deadkey loop on Windows [kill reporting], Is it needed on Apple?)
+	Support “Inv” flavor in Flat ByPairs[] (to add “a mapping” to the inverted map).
+	Better message for “immediate deadkey loop”.
+	Make ² and ²⁺ layers from non-rectangular descriptions too.
+		Currently cannot do ₂ and ₂₊: do not have info about sub-rows!!! ???
+	Enhance (un)sharpen, add(h)line|tilde, amplify to match new ⪇≦ ⪈≧ on Blue.
+	Report which flat ByPairs miss the accessible extra-keys.  (Note that we prohibit base-keys!)
+	Stabilize the order of these reports and of the keys of the initial configuration file (and a few other places giving
+		“usual” warnings).
+	Generator of compose-key mappings was early-filtering compositions without paying attention to the LinkedFace.
+	debug_noid was too non-specific.
+	More messages for debug_noid.
+	Layer name generation for NotSameKey was brain-damaged, and the layers were not recalculated for different bases.
+	Distinguish prefix keys when doing NoID and NotSameKey.
+		NO DIFFERENCE???
+	Greek was missing greek question mark.
+	Put glottal stop letters on /? of AltGr-↓.
+	Move creation of enhanced maps to the massage stage.
+	Take into account enhanced maps when reporting unreached bindings.
+	More predictable order of warnings.
+		(“adding Flip_AltGr =>” still misbehaves — from link_faces() ???)
+	New setting @Prefix_Force_Altern.
+	  Useful e.g. when Menu-Gray-⋆ repeats Shift-Gray-⋆ — which in presence of “Altern” source (for prefix keys; recessive
+	  w.r.t. the base face) being Menu-⋆⋆, leads to duplication of Menu-Gray-⋆ and Shift-Menu-Gray-⋆ bindings.
+	New debugging key warnReached for more stats of reached characters per a prefix-map.
+	Remove unmatched slots on the AltGr-inverted base face.  (This allows making “Unreached:” reports more readable.)
+	Include provenance stats for every character in the generated summary.
+	Check for Flat being used in satellite faces only.
+	Allow Inv flat maps not only for Prefix keys.
+	Make order_faces_4_massage() deterministic.
+	Order reports in warnings from make_translated_layers_noid().
+	Order calls to massage_VK(), export_layers(), ensure_DeadKey_Map_by_recipe(), patch_face() (to make debugging output with 0x2030 more deterministic).
+	Order calls to link_layers() (to make “adding Flip_AltGr” reports deterministic).
+	Mark chars accessible via flat maps with ⓕ.
+	Better explanations of accessibitity in summaries of emitted font files; distinguish “by-1-prefix” from “unknown”.
+		On “1” it is garbled; SPACE is counted as an AltGr-inverted control-char???  Some of accessors conradictory: Ⓔ?
+	Update docs: KANALOK …
+	Document the new workflow (with klc2c.pl).
+	Streamline docs of assignment of bitmaps to modifier keys.  Take into account 16-bit vs 8-bits for bitmaps.
+	New sections on “common confusion” about power of “legacy Windows keyboards”.
+	Clarify more sections in the docs.
+	Fix links to berkeley.
+	Update @double_scan_VK to the substitutions we were actually duing during patching.
+	Output "\0" on Ctrl-2.
+	Replace by $self->order_faces_4_massage the last remaining sort keys %{$self->{faces}} (no difference).
+	Rename BaseKeys() to Base_VK_names(), add micro-docs.
+	Emit control-[]\ on Cyrillic.  (Also does on OEM_102.)
+	Fix errors in POD.
+
+	izKeys.kbdd:	Change ÷ on AltGr-: to Compose (move → Green : → Green AltGr-:)
+				LONG DIVISION, RULE-DELAYED, CIRCLED DIVISION, ALEUT KA moved somewhere???
+			Fix this by AltGrCharSubstitutions, and edit of ByPair[]s.
+				(On PREFIX AltGr-: only ☐ ⧅ change now — due to the fact that ÷ was shared AltGr-: vs. Gray-/.)
+			Attempt to move LongStrings on “,” to -Junk
+				(even moving to Greek-AltGr removes it on Double-Struck from Cyr/Greek/Hebr).  ???
+			Move ₢ to AltGr-G (visually), move ৳ to AltGr-b, and insert BITCOIN on b (in Currency).
+			AltGr-↑ / should enter ˊ (currently on AltGr-' TAB), and AltGr-6 should enter ♭ (currently on @).  ♮ on & ???
+			Green/Ripe < and > are not used.  One may put ⟨⟩ ⟪⟫ there, which would free amplified-() for something better.
+				Green: ⟨⟩ ≪≫;  Blue: ⟪⟫ ⋘⋙;  Ripe ⪡⪢ ⫷⫸
+			AltGr-/ & should give ⫛, 7 should give ⧢.
+			UNDONE!!! Replace AltGr-3 by ≠ instead of · (the derivatives of · in this position are duplicated anyway).
+				  breaks no-down-shift rule??? problems with ⫥⩤; adds ⟞, but not paired with ⟝
+			Add (dis)enjoy emoticons named-layerlets.
+			Fix coptic tens by redirecting FlipShift to Latin ???
+			Remove useless -<any-amplify> in ring_dot; prohibit ∊∍⪍⪎ in macron.
+			<any-slanted> in macron.
+			⊊⫋⊋⫌ in Blue (on unshifted-<>).  
+			manual-round □ to ∷ too.  Block ∷⊡ in unsharpen.
+			Add hattify to hat, prohibit ⫶.
+			Translate ⊊⫋⊋⫌ to ⪯⪳⪰⪴ in ˵.  To ⫇⫈⫉⫊ in Currencies (so ⫰⫯ are only on AltGr-, (AltGr-)| now).
+			Migrate DOT operator ⋅ (and ⊙⊚) To Green: AltGr-. and (AltGr-), .
+			Put ≾≿⪷⪸ on AltGr-, (AltGr-)comma/dot.  Put ⪇⪈ on AltGr-_ AltGr-,.  and ≨≩ on AltGr-6 AltGr-,. .
+			In Latin-inside-Cyrillic, filter out ′″⋱≀⨊∓ from Green: they are hiding the sub-prefix keys.
+			Rearrange the order of the stack-of-recipes in Latin-in-Cyrillic.
+				[Latin Ꞵ disappeared from Greek (now recognized as paired with Latin variant ꞵ of β,
+							so is not “inserted alone” — when “the symbol” ϐ has preference)]
+				 In Latin-in-Hebrew ¬º·¢€√„“” ¡ª№ do not appear (This is due to duplication of emitted characters
+				 			in the base face)]
+			Produce smilies instead of dial-a-dash; dial-a-dash on Macron.
+						WHY ♫ ON AltGr-inverted dial-a-dash???
+			Remove any-subize2 from ᴀ↓.
+			Move Coptic Digits Hundreds to F-keys of Double-Struck.
+			Add objectified-etc smilies to F-keys of Script.
+			Remove duplication of extra keys in the Mnu-rCtrl (Hebrew) layer.
+			Put ⋮ on Mnu-, (to make this key available as a unique postfix).
+			Put ⪇≦ ⪈≧ on Blue . and ,.  Enhance Business(⊈⊀⋠⊉⊁⋡), DblGrave(⋐⟃⫇⫉⋑⟄⫈⫊), Cedilla(⊊⫅⊋⫆), Breve(⪹≾⋨⪷⪺≿⋩⪸)
+				Diaeresis(⪯⪵⪰⪶).  Now heuristics:
+			  Heuristics: ᴀ- on ᴀ‾ reflects Upside-Down; ᴀ$ negates-round/sharpen; ᴀ″ double/~-rounds; ᴀ˘ ~-sharpens,
+			  ᴀ, overflows from ᴀ..  ∸ now on ᴀ._.  See the table below (with ⇡/⇣ for (un)Shift-ed, AltGr on the right).
+
+			ₔ got garbled in the file (unused).
+			Flip (back) Shift- on Gray-+, replacing duplication of ﬩/﬩ by ﬩/∑.  (At least this matches better the other Gray-keys.)
+			Use @Prefix_Force_Altern to avoid duplication of bindings.
+			prefer_first for 06f0.  (Fixes a few of “Unreached”.)
+			Add ˱ ˲ ₽ to Menu- on < > !.
+			All ellipsis chars may now be inserted by turning/lifting … (on Mnu-.) by AltGr-→/↑/←/→.  Also ⋮ (on Mnu-,).
+			ᴀ←, and ᴀ→ support <> etc.  (leaking to Mnu-,. in some cases — as in the tables below).
+			Support Mnu-<> bindings.  (Leaking to Mnu-,. when needed; with as much duplication as convenient for guessing.)
+							The table of bindings (with ᴀ↓, ᴀ←, and ᴀ→ below; rows “<>” ".." & with Mnu-):
+
+ Heuristics                        OK      OK      OK      dup+Bl    /⊕.       ◌◌        OK    ovfl.    OK      dup-OK ´⊕~   =Blue
+   ⊕ means &     ≈¬◌               OK-Bl   OK-Bl?  OK-Bl   dup+Gr    /⊕´       ◌⊕~ Bl?    ↔    ovfl     OK ???  OKish  ´⊕~   ´⊕_ d+'
+⇡ Grn: ⟨ ≪  Bl: ⟪ ⋘  Ripe: ⪡ ⫷  ᴀ´ ≺ ≼  ᴀ` ⊏ ⊑  ᴀ/ ≮ ≰  ᴀ‾ ⪕ ⪛  Busns: ⊄ ⊈  ᴀ" ⋐ ⟃  ᴀ. ⊂ ⊆  ᴀ, ⋖ ⧀  ᴀ~ ≲ ⪍  ᴀ^ ≪ ⪡  ᴀ˘ ⪹ ≾  ᴀ; === 
+⇣  · ⋅ ⊙ ⊚      ⪇ ≦        ⋮…«»    ⪱ ⪳     ⋤ ⋢     ⪙ ≨     ⩽⩾⫹⫺        ⊀ ⋠     ⫇ ⫉    ————     ⊊ ⫅     ⋦ ≴     ⪉ ⪅     ⋨ ⪷     ⪯ ⪵
+⇡˱˲    ⩽⩾⫹⫺     ≶≷⋚⋛       ⪋⪌⪑⪒    ⪻⪼⋞⋟    ⥹⥻      ⪓⪔⫁⫂    ⪪⪫⪬⪭        ⪿⫀⫋⫌    ⪽⪾⫃⫄    ⋖⋗⩿⪀    ⩹⩺⪗⪘    ⪝⪞⪏⪐    ⪻⪼⫷⫸    ⪦⪧⪨⪩    ≶≷⋚⋛
+⇣⋮…    ⪕⪖⪛⪜     ⦿⨀         ◌◌⃣     ⪯⪰⪵⪶            ⫁⫂      ⪬⪭          ⫁⫂      ⫓⫔⫕⫖    ⪁⪂⪃⪄    ⩻⩼      ⪟⪠⪟⪠    ⫕⫖⪣⨠    ⪨⪩      ⪋⪌⪓⪔
+ ↑Mnu  dup-‾	dup+;	   OK?Bl  dup+^           OK??Bl   OK                                          OK      dup+´          dup+Bl
+       dup-‾                      =Dup-;       dup+; dup+£             dup+/     dup+^                 OK?     dup+"       dup+Rp¦-/
+
+ ᴀ← ⩻≶  ⪘  ᴀ→ ⸲⩼⋜⋝ ≷??  ᴀ↑ ᴀ↓ ˱˲ ⪿⫀	Non-dups on Mnu-,. :  ⫓⫔⫕⫖  ( ⫁⫂ is on Mnu-<>, but with not obvious AltGr-/)
+       ⪁⪄     ⹁ ⪃⪂ ⪗???       ¸˳ ⫁⫂		Was: ←: ♪♪♪♪ ♪♪♪♪  →: ⸲♪♪♪ ⹁♪⋜⋝  ↓: ¸˳˱˲ ♪♪˂˃
+              ≷ ⪗
+     ⋰        ⋰⋱                         NOTE: ⪣⨠ are unmatched on ᴀ^ Flip-ᴀ Mnu-,.  !!!
+
+			Move 𐆠 (tau-rho) from AltGr-Mnu-+ to AltGr-Mnu-- (temporarily?!).
+			Add ₌ ₊ to AltGr-Mnu-= and -+.
+			Try lowering the priority of tone marks in Cyrillic.  (Good results from removing ‑꜍꜓⁃ ⇝ ∤★⨊∓.)
+				UNDO and Replace by:
+			Filter out ‑꜍꜓⁃ from tone marks in Cyrillic; in Hebrew: ꜍˧꜏꜐꜑⁃.
+			(Temporarily?) put ≠ on Blue 9.  (Without optimizations of satellites.)
+			Remove SPACE from skip_extra_layers_WIN.
+			Fix assignments to SPACE with extra modifiers (needs FullFace(Latin)!!!).
+
+	examples/izKeys-front-base.html
+			Was not included in MANIFEST
+
+	examples/izKeys-front-base.html
+	examples/izKeys-visual-maps-base.html
+		Filter the old-style references to search.cpan which do not survive transition to MetaCPAN.
+			perl -wlpe "sub san($) {my $in=shift; $in =~ s(^([\x22\x27]?)http:)(${1}https:); $in=~ s/_/-/g; $in} s/(?<=\bhref=)(.*?)(?=>)/san $1/ge" ! > !-try
+			perl -wlpe 'sub san($) {my $in=shift; $in =~ s(^[\x22\x27]?http:)(https:); $in=~ s/_/-/g; $in} s/(?<=\bhref=)(.*?)(?=>)/san $1/ge' ! > !-try
+???		⎖ not present in MathBlue on RU
+		0297@ is generated on lC-lA-:, but is bound only on EN
+
+	examples/klc2c.pl
+		New file.  A few choices hardwired.  Functionality not full (see inside).
+		(Fixes errors in preceding builds of izKeys (during patching): ABNT_C1 was duplicated, ABNT_C2 OEM_8 were missing)
+
+	examples/msklc_altgr.c
+	examples/msklc_altgr_r2l.c
+	examples/msklc_lig4.h
+		Add not-yet-autogenerated files used for building the example layout (were in extra_c.zip).
+		Massage to naming conventions generated by klc2c.pl.
+
+	examples/extra_c.zip
+		Remove.
+
+	examples/h_files.patch
+		Patch for h-files: add VK-codes for a few more keys we use, and replace APP to AX and KANA to APP.
+
+	Scan all prefix keymaps for non-UCS-16 prefixes.  Make a meta-map of needed prefixes and addressed half-keys.  Need to avoid
+	loops when “redirecting” the leading half-keys to “random” previx maps.  (Due to the format of the tables, can emit them
+	later!)
+
+		disappear
+  20d5    < ⃕>     COMBINING CLOCKWISE ARROW ABOVE [Inherited; Combining Diacritical Marks for Symbols; 1.1]
+  20dc    < ⃜>     COMBINING FOUR DOTS ABOVE [Inherited; Combining Diacritical Marks for Symbols; 1.1]
+  20e9    < ⃩>     COMBINING WIDE BRIDGE ABOVE [Inherited; Combining Diacritical Marks for Symbols; 3.2]
+  2c69    <Ⱪ>     LATIN CAPITAL LETTER K WITH DESCENDER [Latin; Latin Extended-C; 5.0]
+  2c6a    <ⱪ>     LATIN SMALL LETTER K WITH DESCENDER [Latin; Latin Extended-C; 5.0]
+  a766    <Ꝧ>     LATIN CAPITAL LETTER THORN WITH STROKE THROUGH DESCENDER [Latin; Latin Extended-D; 5.1]
+  a767    <ꝧ>     LATIN SMALL LETTER THORN WITH STROKE THROUGH DESCENDER [Latin; Latin Extended-D; 5.1]
+
+
+0.75:
+	Document treatment of KBDKANA (and +KBDSHIFT) to handle lAlt-keys (due to “KBDALT stripping”).
+	Document the problem with OEM_8 on Firefox.
+	Update the docs on problems with Firefox to v.55 (sic!).
+
+	examples/build-here.cmd
+		Remove 2 more lines from LAYOUT section (kbdutool failing).
+
+	examples/klc2c.pl
+		Emit parts of layouts “of different lengths” as close to “the same order as specified” as possible.
+			(Except lengths 2 and 3 which were emitted by kbdutool first.)
+		Take into account “KBDALT stripping” when duplicating mappings bitmaps to translation columns.
+			(Now izkeys can be built, and perform with only a few bugs — for bleading edge features only.
+			 However, one may need to comment out the line with OEM_8 in the .C file — if Firefox locks when switching to
+			 this personality.)
+
+	examples/Keyboard_API.pm
+		try_checkConsole without parens was considered a method call.
+
+	examples/raw_keys_via_api.pl
+		Avoid the warnings.
+		Add option --help.
+
+	examples/msklc_altgr_r2l.c
+	examples/msklc_altgr.c
+		Change the maximal length of ligature to 3 (to match the LIGATURE3 type from msklc_lig4.h).

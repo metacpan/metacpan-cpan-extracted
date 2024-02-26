@@ -1,8 +1,9 @@
 Build.PL
 lib/Locale/CLDR/Locales/El.pm
-lib/Locale/CLDR/Locales/El/Any.pm
-lib/Locale/CLDR/Locales/El/Any/Cy.pm
-lib/Locale/CLDR/Locales/El/Any/Gr.pm
+lib/Locale/CLDR/Locales/El/Grek.pm
+lib/Locale/CLDR/Locales/El/Grek/Cy.pm
+lib/Locale/CLDR/Locales/El/Grek/Gr.pm
+lib/Locale/CLDR/Locales/El/Polyton.pm
 MANIFEST			This list of files
 README
 t/00-load.t

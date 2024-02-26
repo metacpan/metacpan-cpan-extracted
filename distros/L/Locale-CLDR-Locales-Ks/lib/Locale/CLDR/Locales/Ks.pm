@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ks - Package for language Kashmiri
 
 package Locale::CLDR::Locales::Ks;
 # This file auto generated from Data\common\main\ks.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -24,22 +24,6 @@ use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
 extends('Locale::CLDR::Locales::Root');
-# Need to add code for Key type pattern
-sub display_name_pattern {
-	my ($self, $name, $region, $script, $variant) = @_;
-
-	my $display_pattern = '{0} ({1})';
-	$display_pattern =~s/\{0\}/$name/g;
-	my $subtags = join '{0}, {1}', grep {$_} (
-		$region,
-		$script,
-		$variant,
-	);
-
-	$display_pattern =~s/\{1\}/$subtags/g;
-	return $display_pattern;
-}
-
 has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
@@ -56,6 +40,7 @@ has 'display_name_language' => (
  				'ae' => 'اَویستَن',
  				'af' => 'اَفریٖکانز',
  				'afh' => 'اَفرِہِلی',
+ 				'agq' => 'اگہم',
  				'ain' => 'اینوٗ',
  				'ak' => 'اَکان',
  				'akk' => 'اَکادِیَن',
@@ -66,6 +51,7 @@ has 'display_name_language' => (
  				'ang' => 'پرون اَنگریٖزی',
  				'anp' => 'اَنگِکا',
  				'ar' => 'عربی',
+ 				'ar_001' => 'ماڈرن معیٲری عربی',
  				'arc' => 'اَرَمیک',
  				'arn' => 'ایرو کونِیَن',
  				'arp' => 'اَراپاہو',
@@ -128,7 +114,7 @@ has 'display_name_language' => (
  				'dar' => 'دَرگوا',
  				'de' => 'جٔرمَن',
  				'de_AT' => 'آسٹرِیَن جٔرمَن',
- 				'de_CH' => 'سٕوِس ہاےجٔرمَن',
+ 				'de_CH' => 'سٕوِس ہائی جٔرمَن',
  				'del' => 'ڈیلوییَر',
  				'den' => 'سلیو',
  				'dgr' => 'ڈاگرِب',
@@ -150,12 +136,15 @@ has 'display_name_language' => (
  				'en_AU' => 'آسٹریلیَن اَنگریٖزۍ',
  				'en_CA' => 'کینَڈِیٲیی اَنگریٖزۍ',
  				'en_GB' => 'بَرطانوی اَنگریٖزۍ',
- 				'en_US' => 'یوٗ ایس اَنگریٖزۍ',
+ 				'en_GB@alt=short' => 'UK اَنٛگریٖزۍ',
+ 				'en_US' => 'امریٖکی اَنٛگریٖزۍ',
+ 				'en_US@alt=short' => 'US اَنٛگریٖزۍ',
  				'enm' => 'وَسطی اَنگریٖزۍ',
  				'eo' => 'ایسپَرینٹو',
- 				'es' => 'سپینِش',
- 				'es_419' => 'لیٹٕن امریٖکی سپینِش',
- 				'es_ES' => 'لِبیریَن سپینِش',
+ 				'es' => 'ہسپانوی',
+ 				'es_419' => 'لاطیٖنی امریٖکی ہسپانوی',
+ 				'es_ES' => 'یوٗرپی ہسپانوی',
+ 				'es_MX' => 'میکسیکن ہسپانوی',
  				'et' => 'ایسٹونیَن',
  				'eu' => 'باسک',
  				'ewo' => 'ایوونڈو',
@@ -168,9 +157,9 @@ has 'display_name_language' => (
  				'fj' => 'فِجیَن',
  				'fo' => 'فَروس',
  				'fon' => 'فون',
- 				'fr' => 'فرینچ',
- 				'fr_CA' => 'کَنیڈیَن فرینچ',
- 				'fr_CH' => 'سٕوٕس فرینچ',
+ 				'fr' => 'فرانسیسی',
+ 				'fr_CA' => 'کَنیڈیَن فرانسیسی',
+ 				'fr_CH' => 'سٕوٕس فرانسیسی',
  				'frm' => 'وسطی فرینچ',
  				'fro' => 'پرون فرینچ',
  				'frr' => 'شُمٲلی فرِشیَن',
@@ -224,7 +213,7 @@ has 'display_name_language' => (
  				'inh' => 'اِنگُش',
  				'io' => 'اِڈو',
  				'is' => 'آیِسلینڈِک',
- 				'it' => 'اِٹیلیَن',
+ 				'it' => 'اِطالوی',
  				'iu' => 'اِنُکتِتوٗ',
  				'ja' => 'جاپٲنۍ',
  				'jbo' => 'لوجبان',
@@ -364,8 +353,8 @@ has 'display_name_language' => (
  				'pro' => 'پرون پرووینچَل',
  				'ps' => 'پَشتوٗ',
  				'pt' => 'پُرتَگیٖز',
- 				'pt_BR' => 'برازیٖلی پُتَگیٖز',
- 				'pt_PT' => 'لِبیریَن پُرتَگیٖز',
+ 				'pt_BR' => 'برازیٖلی پُرتَگیٖز',
+ 				'pt_PT' => 'یوٗرپی پُرتَگیٖز',
  				'qu' => 'کُویشُوا',
  				'raj' => 'راجِستھٲنۍ',
  				'rap' => 'رَپانوی',
@@ -475,9 +464,12 @@ has 'display_name_language' => (
  				'za' => 'زُہانگ',
  				'zap' => 'زَپوتیک',
  				'zen' => 'زیناگا',
- 				'zh' => 'چیٖنی',
- 				'zh_Hans' => 'سیود چیٖنی',
+ 				'zh' => 'چیٖنی ﴿ترجمع اِشارٕ: خاص طور، مینڈارن چیٖنی۔﴾',
+ 				'zh@alt=menu' => 'چیٖنی، مینڈارن',
+ 				'zh_Hans' => 'سَہل چیٖنی',
+ 				'zh_Hans@alt=long' => 'سَہل مینڈارن چیٖنی',
  				'zh_Hant' => 'رِوٲجی چیٖنی',
+ 				'zh_Hant@alt=long' => 'رِوٲجی مینڈارن چیٖنی',
  				'zu' => 'زُلوٗ',
  				'zun' => 'زوٗنی',
  				'zxx' => 'کانہہ تہِ لِسانیاتی مواد نہٕ',
@@ -499,7 +491,7 @@ has 'display_name_script' => (
 	default		=> sub {
 		sub {
 			my %scripts = (
-			'Arab' => 'اَربی',
+			'Arab' => 'عربی',
  			'Aran' => 'نستعلیق',
  			'Armn' => 'اَرمانیَن',
  			'Avst' => 'اَویستَن',
@@ -537,8 +529,10 @@ has 'display_name_script' => (
  			'Hang' => 'ہانگُل',
  			'Hani' => 'ہان',
  			'Hano' => 'ہانُنوٗ',
- 			'Hans' => 'سِمپلِفایِڑ ہان',
- 			'Hant' => 'ٹریڑِشَنَل',
+ 			'Hans' => 'سَہل ﴿ترجمع اِشارٕ: یِم ورژن رَسم الخط ہُک ناؤ چھُ چیٖنی باپتھ زَبانٕ ناؤ کِس مجموعَس سٕتۍ اِستعمال یِوان کرنٕہ۔﴾',
+ 			'Hans@alt=stand-alone' => 'سَہل ہان ﴿ترجمع اِشارٕ: یِم ورژن رَسم الخط ہُک ناؤ چھُ چیٖنی باپتھ زَبانٕ ناؤ کِس مجموعَس بغٲرٕ الگ اِستعمال یِوان کرنٕہ۔﴾',
+ 			'Hant' => 'رِوٲجی ﴿ترجمع اِشارٕ: یِم ورژن رَسم الخط ہُک ناؤ چھُ چیٖنی باپتھ زَبانٕ ناؤ کِس مجموعَس سٕتۍ اِستعمال یِوان کرنٕہ۔﴾',
+ 			'Hant@alt=stand-alone' => 'رِوٲجی ہان ﴿ترجمع اِشارٕ: یِم ورژن رَسم الخط ہُک ناؤ چھُ چیٖنی باپتھ زَبانٕ ناؤ کِس مجموعَس بغٲرٕ الگ اِستعمال یِوان کرنٕہ۔﴾',
  			'Hebr' => 'ہِبرِو',
  			'Hira' => 'ہیٖراگانا',
  			'Hmng' => 'پَہاو مانگ',
@@ -547,7 +541,7 @@ has 'display_name_script' => (
  			'Inds' => 'اِنڈَس',
  			'Ital' => 'اولڈ اِٹیلِک',
  			'Java' => 'جاوَنیٖز',
- 			'Jpan' => 'جیپَنیٖز',
+ 			'Jpan' => 'جاپٲنی',
  			'Kali' => 'کایا لی',
  			'Kana' => 'کَتاکانا',
  			'Khar' => 'خَروشتھی',
@@ -558,7 +552,7 @@ has 'display_name_script' => (
  			'Laoo' => 'لاو',
  			'Latf' => 'فرکتُر لیٹِن',
  			'Latg' => 'گیلِک لیٹَن',
- 			'Latn' => 'لیٹِن',
+ 			'Latn' => 'لاطیٖنی',
  			'Lepc' => 'لیپکا',
  			'Limb' => 'لِمبوٗ',
  			'Lina' => 'لیٖنیَر اے',
@@ -619,7 +613,7 @@ has 'display_name_script' => (
  			'Yiii' => 'یٖی',
  			'Zxxx' => 'لیکھنَے',
  			'Zyyy' => 'عام',
- 			'Zzzz' => 'اَن زٲنۍ یا نا لَگہٕ ہار رَسمُل خظ',
+ 			'Zzzz' => 'نامولوٗم رَسم الخط',
 
 			);
 			if ( @_ ) {
@@ -654,7 +648,7 @@ has 'display_name_region' => (
  			'034' => 'جنوٗبی ایشیا',
  			'035' => 'جنوٗبہِ مَشرِقی ایشیا',
  			'039' => 'جنوٗبی یوٗرَپ',
- 			'053' => 'آسٹریلیا تہٕ نِوزِلینڑ',
+ 			'053' => 'آسٹریلیشیا',
  			'054' => 'مؠلَنیٖشِیا',
  			'057' => 'مَیکرونَیشِیَن خٕطہٕ',
  			'061' => 'پالنیشِیا',
@@ -665,25 +659,27 @@ has 'display_name_region' => (
  			'151' => 'مشرِقی یوٗرَپ',
  			'154' => 'شُمٲلی یوٗرَپ',
  			'155' => 'مغرِبی یوٗرَپ',
- 			'419' => 'لاطیٖنی اَمریٖکا تہٕ کیرَبیٖن',
- 			'AD' => 'اؠنڑورا',
+ 			'202' => 'ذیلی سہارن افریقہ',
+ 			'419' => 'لاطیٖنی اَمریٖکا',
+ 			'AC' => 'ایسنشن جزیرٕ',
+ 			'AD' => 'اینڈورا',
  			'AE' => 'مُتحدہ عرَب امارات',
  			'AF' => 'اَفغانَستان',
  			'AG' => 'اؠنٹِگُوا تہٕ باربوڑا',
  			'AI' => 'انگوئیلا',
- 			'AL' => 'اؠلبانِیا',
+ 			'AL' => 'البانیا',
  			'AM' => 'اَرمانِیا',
  			'AO' => 'انگولا',
  			'AQ' => 'اینٹارٹِکا',
  			'AR' => 'أرجَنٹینا',
  			'AS' => 'اَمریٖکَن سَموا',
- 			'AT' => 'آسٹِیا',
+ 			'AT' => 'آسٹریا',
  			'AU' => 'آسٹریلِیا',
  			'AW' => 'اَروٗبا',
  			'AX' => 'ایلینڑ جٔزیٖرٕ',
- 			'AZ' => 'آزَرباجان',
+ 			'AZ' => 'آذربائیجان',
  			'BA' => 'بوسنِیا تہٕ ہَرزِگووِنا',
- 			'BB' => 'باربیڈاس',
+ 			'BB' => 'باربیڈوس',
  			'BD' => 'بَنگلادیش',
  			'BE' => 'بیلجِیَم',
  			'BF' => 'بُرکِنا فیسو',
@@ -692,80 +688,92 @@ has 'display_name_region' => (
  			'BI' => 'بورَنڈِ',
  			'BJ' => 'بِنِن',
  			'BL' => 'سینٹ بارتَھیلمی',
- 			'BM' => 'بٔرمیوڈا',
- 			'BN' => 'بُرنٔے',
+ 			'BM' => 'برمودا',
+ 			'BN' => 'برونے',
  			'BO' => 'بولِوِیا',
- 			'BQ' => 'برطانوی قُطبہِ جَنوٗبی علاقہٕ',
+ 			'BQ' => 'کیریبین نیدرلینڈس',
  			'BR' => 'برازِل',
  			'BS' => 'بَہامَس',
  			'BT' => 'بوٗٹان',
  			'BV' => 'بووَٹ جٔزیٖرٕ',
  			'BW' => 'بوتَسوانا',
  			'BY' => 'بیلاروٗس',
- 			'BZ' => 'بیلِج',
- 			'CA' => 'کینَڑا',
- 			'CC' => 'کوکَس کیٖلِنگ جٔزیٖرٕ',
+ 			'BZ' => 'بیلز',
+ 			'CA' => 'کینیڈا',
+ 			'CC' => 'کوکَس (کیٖلِنگ) جٔزیٖرٕ',
  			'CD' => 'کونگو کِنشاسا',
+ 			'CD@alt=variant' => 'کونگو (ڈی آر سی)',
  			'CF' => 'مرکٔزی اَفریٖکی جموٗریَت',
  			'CG' => 'کونگو بٔرزاوِلی',
+ 			'CG@alt=variant' => 'کونگو (جمہوریہ)',
  			'CH' => 'سُوِزَرلینڑ',
- 			'CI' => 'اَیوٕری کوسٹ',
+ 			'CI' => 'کوٹ ڈلوائر',
  			'CK' => 'کُک جٔزیٖرٕ',
  			'CL' => 'چِلی',
  			'CM' => 'کیمِروٗن',
  			'CN' => 'چیٖن',
  			'CO' => 'کولَمبِیا',
- 			'CR' => 'کوسٹا رِکا',
+ 			'CP' => 'کلیپرٹن جزیرٕ',
+ 			'CR' => 'کوسٹا ریکا',
  			'CU' => 'کیوٗبا',
  			'CV' => 'کیپ ؤرڑی',
+ 			'CW' => 'کیوراکو',
  			'CX' => 'کرِسمَس جٔزیٖرٕ',
- 			'CY' => 'سایفرس',
- 			'CZ' => 'چیک جَموٗرِیَت',
+ 			'CY' => 'سائپرس',
+ 			'CZ' => 'چیکیا',
  			'DE' => 'جرمٔنی',
+ 			'DG' => 'ڈیگو گریشیا',
  			'DJ' => 'جِبوٗتی',
  			'DK' => 'ڈینمارٕک',
  			'DM' => 'ڈومِنِکا',
  			'DO' => 'ڈومِنِکَن جموٗرِیَت',
  			'DZ' => 'اؠلجیرِیا',
+ 			'EA' => 'سیوٹا تٕہ مٔلیلا',
  			'EC' => 'اِکواڑور',
  			'EE' => 'ایسٹونِیا',
- 			'EG' => 'مِسٔر',
+ 			'EG' => 'مصر',
  			'EH' => 'مشرِقی سَہارا',
  			'ER' => 'اِرٕٹِیا',
  			'ES' => 'سٕپین',
  			'ET' => 'اِتھوپِیا',
- 			'FI' => 'فِنلینڑ',
+ 			'EU' => 'یوٗرپی یونین',
+ 			'EZ' => 'یوٗرو زون',
+ 			'FI' => 'فِن لینڈ',
  			'FJ' => 'فِجی',
  			'FK' => 'فٕلاکلینڑ جٔزیٖرٕ',
+ 			'FM' => 'مائیکرونیشیا',
+ 			'FO' => 'فارو جزیرہ',
  			'FR' => 'فرانس',
  			'GA' => 'گیبان',
- 			'GB' => 'یُنایٹِڑ کِنگڈَم',
- 			'GD' => 'گرنیڑا',
+ 			'GB' => 'متحدہ مملِکت',
+ 			'GD' => 'گرینیڈا',
  			'GE' => 'جارجِیا',
  			'GF' => 'فرانسِسی گِانا',
- 			'GG' => 'گیوَنَرسے',
+ 			'GG' => 'گورنسے',
  			'GH' => 'گانا',
  			'GI' => 'جِبرالٹَر',
- 			'GL' => 'گریٖنلینڑ',
+ 			'GL' => 'گرین لینڈ',
  			'GM' => 'گَمبِیا',
  			'GN' => 'گِنی',
- 			'GP' => 'گَواڑیلوپ',
+ 			'GP' => 'گواڈلوپ',
  			'GQ' => 'اِکوِٹورِیَل گِنی',
  			'GR' => 'گریٖس',
  			'GS' => 'جنوٗبی جارجِیا تہٕ جنوٗبی سینڑوٕچ جٔزیٖرٕ',
- 			'GT' => 'گوتیدالا',
+ 			'GT' => 'گواٹمالا',
  			'GU' => 'گُوام',
  			'GW' => 'گیٖنی بِساو',
  			'GY' => 'گُیانا',
  			'HK' => 'ہانگ کانگ ایس اے آر چیٖن',
- 			'HM' => 'ہَرٕڑ جٔزیٖرٕ تہٕ مؠکڈونالڑٕ جٔزیٖرٕ',
- 			'HN' => 'ہانڈوٗرِس',
+ 			'HK@alt=short' => 'ہانگ کانگ',
+ 			'HM' => 'ہَرٕڑ تہٕ مؠکڈونالڑٕ جٔزیٖرٕ',
+ 			'HN' => 'ہونڈورس',
  			'HR' => 'کروشِیا',
- 			'HT' => 'ہایتی',
+ 			'HT' => 'ہیتی',
  			'HU' => 'ہَنگری',
- 			'ID' => 'اِنڑونیشِیا',
+ 			'IC' => 'کینری جزیرٕ',
+ 			'ID' => 'انڈونیشیا',
  			'IE' => 'اَیَرلینڑ',
- 			'IL' => 'اِسرایٖل',
+ 			'IL' => 'اسرا ییل',
  			'IM' => 'آیِل آف مین',
  			'IN' => 'ہِندوستان',
  			'IO' => 'برطانوی بحرِ ہِندۍ علاقہٕ',
@@ -775,9 +783,10 @@ has 'display_name_region' => (
  			'IT' => 'اِٹلی',
  			'JE' => 'جٔرسی',
  			'JM' => 'جَمایکا',
+ 			'JO' => 'جورڈن',
  			'JP' => 'جاپان',
  			'KE' => 'کِنیا',
- 			'KG' => 'کِرگِستان',
+ 			'KG' => 'کرغزستان',
  			'KH' => 'کَمبوڑِیا',
  			'KI' => 'کِرٕباتی',
  			'KM' => 'کَمورَس',
@@ -786,12 +795,12 @@ has 'display_name_region' => (
  			'KR' => 'جنوٗبی کورِیا',
  			'KW' => 'کُویت',
  			'KY' => 'کیمَن جٔزیٖرٕ',
- 			'KZ' => 'کَزاکِستان',
+ 			'KZ' => 'قازقستان',
  			'LA' => 'لاس',
  			'LB' => 'لؠبنان',
  			'LC' => 'سینٹ لوٗسِیا',
  			'LI' => 'لِکٹیسٹیٖن',
- 			'LK' => 'سِریٖلَنکا',
+ 			'LK' => 'سری لنکا',
  			'LR' => 'لایبیرِیا',
  			'LS' => 'لیسوتھو',
  			'LT' => 'لِتھُوانِیا',
@@ -800,15 +809,17 @@ has 'display_name_region' => (
  			'LY' => 'لِبیا',
  			'MA' => 'موروکو',
  			'MC' => 'مونیکو',
- 			'MD' => 'مولڑاوِیا',
+ 			'MD' => 'مولڈووا',
  			'ME' => 'موٹونیگِریو',
  			'MF' => 'سینٹ مارٹِن',
- 			'MG' => 'میڑاگاسکار',
+ 			'MG' => 'میڈاگاسکار',
  			'MH' => 'مارشَل جٔزیٖرٕ',
+ 			'MK' => 'شُمالی میسڈونیا',
  			'ML' => 'مالی',
- 			'MM' => 'مَیَنما بٔرما',
+ 			'MM' => 'میانمار (برما)',
  			'MN' => 'مَنگولِیا',
  			'MO' => 'مَکاوو ایس اے آر چیٖن',
+ 			'MO@alt=short' => 'ماکاوو',
  			'MP' => 'شُمٲلی مارِیانا جٔزیٖرٕ',
  			'MQ' => 'مارٹِنِک',
  			'MR' => 'مارٕٹانِیا',
@@ -831,19 +842,20 @@ has 'display_name_region' => (
  			'NP' => 'نیپال',
  			'NR' => 'نارووٗ',
  			'NU' => 'نیوٗ',
- 			'NZ' => 'نیوٗزِلینڑ',
+ 			'NZ' => 'نیوزی لینڈ',
  			'OM' => 'اومان',
  			'PA' => 'پَناما',
  			'PE' => 'پیٖروٗ',
  			'PF' => 'فرانسی پولِنیشِیا',
  			'PG' => 'پاپُوا نیوٗ گیٖنی',
- 			'PH' => 'فِلِپِینس',
+ 			'PH' => 'فلپائن',
  			'PK' => 'پاکِستان',
- 			'PL' => 'پولینڑ',
+ 			'PL' => 'پولینڈ',
  			'PM' => 'سینٹ پیٖری تہٕ موکیلِیَن',
  			'PN' => 'پِٹکیرٕنۍ جٔزیٖرٕ',
  			'PR' => 'پٔرٹو رِکو',
- 			'PS' => 'فَلَستیٖن',
+ 			'PS' => 'فلسطینی علاقٕہ',
+ 			'PS@alt=short' => 'فلسطین',
  			'PT' => 'پُرتِگال',
  			'PW' => 'پَلاو',
  			'PY' => 'پَراگُے',
@@ -854,34 +866,38 @@ has 'display_name_region' => (
  			'RS' => 'سَربِیا',
  			'RU' => 'روٗس',
  			'RW' => 'روٗوانڈا',
- 			'SA' => 'سوٗدی عربِیہ',
+ 			'SA' => 'سعودی عرب',
  			'SB' => 'سولامان جٔزیٖرٕ',
  			'SC' => 'سیشَلِس',
  			'SD' => 'سوٗڈان',
- 			'SE' => 'سُوِڈَن',
+ 			'SE' => 'سویڈن',
  			'SG' => 'سِنگاپوٗر',
  			'SH' => 'سینٹ ہؠلِنا',
  			'SI' => 'سَلووینِیا',
  			'SJ' => 'سَوالبریڑ تہٕ جان ماییڑ',
  			'SK' => 'سَلوواکِیا',
- 			'SL' => 'سیٖرالیوون',
+ 			'SL' => 'سیرا لیون',
  			'SM' => 'سین میرِنو',
  			'SN' => 'سینیگَل',
  			'SO' => 'سومالِیا',
  			'SR' => 'سُرِنام',
+ 			'SS' => 'جنوبی سوڈان',
  			'ST' => 'ساو توم تہٕ پرنسِپی',
- 			'SV' => 'اؠل سَلواڑور',
+ 			'SV' => 'ایل سلویڈر',
+ 			'SX' => 'سِنٹ مارٹِن',
  			'SY' => 'شام',
- 			'SZ' => 'سُوزِلینڑ',
- 			'TC' => 'تُرُک تہٕ کیکوس جٔزیٖرٕ',
+ 			'SZ' => 'ایسواتنی',
+ 			'SZ@alt=variant' => 'سویزیلینڈ',
+ 			'TA' => 'ٹریسٹن ڈا کنہا',
+ 			'TC' => 'تُرکس تٕہ کیکو جزیرٕ',
  			'TD' => 'چاڑ',
  			'TF' => 'فرانسِسی جَنوٗبی عَلاقہٕ',
  			'TG' => 'ٹوگو',
- 			'TH' => 'تھایلینڑ',
+ 			'TH' => 'تھائی لینڈ',
  			'TJ' => 'تاجکِستان',
- 			'TK' => 'توکیلاو',
- 			'TL' => 'مَشرِقی تایمور',
- 			'TM' => 'تُرمِنِستان',
+ 			'TK' => 'ٹوکلو',
+ 			'TL' => 'تیمور-لیسٹ',
+ 			'TM' => 'تُرکمنستان',
  			'TN' => 'ٹونیشِیا',
  			'TO' => 'ٹونگا',
  			'TR' => 'تُرکی',
@@ -892,6 +908,7 @@ has 'display_name_region' => (
  			'UA' => 'یوٗرِکین',
  			'UG' => 'یوٗگانڑا',
  			'UM' => 'یوٗنایٹِڑ سِٹیٹِس ماینَر آوُٹلییِنگ جٔزیٖرٕ',
+ 			'UN' => 'متحدہ مُمٲلک',
  			'US' => 'یوٗنایٹِڑ سِٹیٹِس',
  			'UY' => 'یوٗروگے',
  			'UZ' => 'اُزبِکِستان',
@@ -900,16 +917,19 @@ has 'display_name_region' => (
  			'VE' => 'وینازوٗلا',
  			'VG' => 'بَرطانوی ؤرجِن جٔزیٖرٕ',
  			'VI' => 'یوٗ ایس ؤرجِن جٔزیٖرٕ',
- 			'VN' => 'ویٹِنام',
+ 			'VN' => 'ویتنام',
  			'VU' => 'وانوٗتوٗ',
  			'WF' => 'والِس تہٕ فیوٗچوٗنا',
- 			'WS' => 'سیمووا',
+ 			'WS' => 'سامو',
+ 			'XA' => 'سوڈو-ایسنٹس',
+ 			'XB' => 'سوڈو-بیڈی',
+ 			'XK' => 'کوسوو',
  			'YE' => 'یَمَن',
  			'YT' => 'مَییٹ',
- 			'ZA' => 'جَنوٗبی اَفریٖکا',
- 			'ZM' => 'جامبِیا',
+ 			'ZA' => 'جنوبی افریقہ',
+ 			'ZM' => 'زیمبیا',
  			'ZW' => 'زِمبابے',
- 			'ZZ' => 'نامعلوٗم تہٕ نالَگہار عَلاقہٕ',
+ 			'ZZ' => 'نامولوٗم علاقٕہ',
 
 		}
 	},
@@ -973,8 +993,10 @@ has 'display_name_type' => (
  				'chinese' => q{چیٖنی کیلَنڑَر},
  				'gregorian' => q{گرگوریَن کیلنڑَر},
  				'hebrew' => q{ہِبرِو کیلنڑَر},
+ 				'indian' => q{انڈین نیشنل کیلنڈر},
  				'islamic' => q{اِسلٲمی کیلنڑَر},
  				'islamic-civil' => q{اِسلٲمی اِجتمٲیی کیلنڑَر},
+ 				'iso8601' => q{ISO-8601 کیلنڈر},
  				'japanese' => q{جاپٲنۍ کیلنڑَر},
  				'roc' => q{جموٗریٲتی چیٖنی کیلَنڑَر},
  			},
@@ -982,8 +1004,15 @@ has 'display_name_type' => (
  				'big5han' => q{رؠوٲتی چیٖنی تِرتیٖب},
  				'phonebook' => q{فون بُک تَرتیٖب},
  				'pinyin' => q{آسان بَناونہٕ آمُت چیٖنی پیٖنیَن تَرتیٖب},
+ 				'standard' => q{معیٲری ترتیٖب آڈر},
  				'stroke' => q{رؠوٲتی چیٖنی سٹروک تَرتیٖب},
  				'traditional' => q{رؠوٲتی تَرتیٖب},
+ 			},
+ 			'numbers' => {
+ 				'arab' => q{اَربی-اِنڈِک ہندسٕہ},
+ 				'arabext' => q{توسیٖع شُدہ اَربی-اِنڈِک ہندسٕہ},
+ 				'deva' => q{دیوناگری ہندسٕہ},
+ 				'latn' => q{مغربی ہندسٕہ},
  			},
 
 		}
@@ -997,7 +1026,8 @@ has 'display_name_measurement_system' => (
 	default		=> sub {
 		{
 			'metric' => q{میٖٹرِک},
- 			'US' => q{یوٗ ایس},
+ 			'UK' => q{یو کے},
+ 			'US' => q{یو ایس},
 
 		}
 	},
@@ -1036,9 +1066,10 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{[‎‏ َ ُ ِ ٔ ٕ ٟ ٖ ٗ]},
+			auxiliary => qr{[‎‏ َ ُ ِ ٔ ٕ ٟ ٖ ٗ ئ]},
 			main => qr{[ء آ أ ٲ ؤ ا ب پ ت ث ٹ ج چ ح خ د ذ ڈ ر ز ڑ ژ س ش ص ض ط ظ ع غ ف ق ک گ ل م ن ں ھ ہ و ۄ ۆ ی ۍ ؠ ے]},
-			numbers => qr{[‎ \- ‑ , . % ‰ + 0۰ 1۱ 2۲ 3۳ 4۴ 5۵ 6۶ 7۷ 8۸ 9۹]},
+			numbers => qr{[‎ \- ‑ , ٫ ٬ . % ‰ + 0۰ 1۱ 2۲ 3۳ 4۴ 5۵ 6۶ 7۷ 8۸ 9۹]},
+			punctuation => qr{[\- ‐‑ – — , ; \: ! ? . … '‘’ "“” ( ) \[ \] § @ * / \& # † ‡ ′ ″]},
 		};
 	},
 EOT
@@ -1048,6 +1079,13 @@ EOT
 );
 
 
+has 'more_information' => (
+	is			=> 'ro',
+	isa			=> Str,
+	init_arg	=> undef,
+	default		=> qq{؟},
+);
+
 has 'units' => (
 	is			=> 'ro',
 	isa			=> HashRef[HashRef[HashRef[Str]]],
@@ -1056,87 +1094,99 @@ has 'units' => (
 				'long' => {
 					# Long Unit Identifier
 					'duration-day' => {
-						'name' => q(دۄہ),
 						'one' => q({0} دۄہ),
 						'other' => q({0} دۄہ),
 					},
 					# Core Unit Identifier
 					'day' => {
-						'name' => q(دۄہ),
 						'one' => q({0} دۄہ),
 						'other' => q({0} دۄہ),
 					},
 					# Long Unit Identifier
 					'duration-hour' => {
-						'name' => q(گٲنٹہٕ),
 						'one' => q({0} گَنٹہٕ),
 						'other' => q({0} گٲنٹہٕ),
 					},
 					# Core Unit Identifier
 					'hour' => {
-						'name' => q(گٲنٹہٕ),
 						'one' => q({0} گَنٹہٕ),
 						'other' => q({0} گٲنٹہٕ),
 					},
 					# Long Unit Identifier
 					'duration-minute' => {
-						'name' => q(مِنَٹ),
 						'one' => q({0} مِنَٹ),
 						'other' => q({0} مِنَٹ),
 					},
 					# Core Unit Identifier
 					'minute' => {
-						'name' => q(مِنَٹ),
 						'one' => q({0} مِنَٹ),
 						'other' => q({0} مِنَٹ),
 					},
 					# Long Unit Identifier
 					'duration-month' => {
-						'name' => q(ریتھ),
 						'one' => q({0} ریتھ),
 						'other' => q({0} ریتھ),
 					},
 					# Core Unit Identifier
 					'month' => {
-						'name' => q(ریتھ),
 						'one' => q({0} ریتھ),
 						'other' => q({0} ریتھ),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
-						'name' => q(سیکَنڈ),
 						'one' => q({0} سیکَنڈ),
 						'other' => q({0} سیکَنڈ),
 					},
 					# Core Unit Identifier
 					'second' => {
-						'name' => q(سیکَنڈ),
 						'one' => q({0} سیکَنڈ),
 						'other' => q({0} سیکَنڈ),
 					},
 					# Long Unit Identifier
 					'duration-week' => {
-						'name' => q(ہَفتہٕ),
 						'one' => q({0} ہَفتہٕ),
 						'other' => q({0} ہَفتہٕ),
 					},
 					# Core Unit Identifier
 					'week' => {
-						'name' => q(ہَفتہٕ),
 						'one' => q({0} ہَفتہٕ),
 						'other' => q({0} ہَفتہٕ),
 					},
 					# Long Unit Identifier
 					'duration-year' => {
-						'name' => q(ؤری),
 						'one' => q({0} ؤری),
 						'other' => q({0} ؤری),
 					},
 					# Core Unit Identifier
 					'year' => {
-						'name' => q(ؤری),
 						'one' => q({0} ؤری),
 						'other' => q({0} ؤری),
+					},
+					# Long Unit Identifier
+					'length-centimeter' => {
+						'name' => q(سؠنٹی میٖٹَر),
+					},
+					# Core Unit Identifier
+					'centimeter' => {
+						'name' => q(سؠنٹی میٖٹَر),
+					},
+					# Long Unit Identifier
+					'length-kilometer' => {
+						'name' => q(کِلومیٖٹر),
+						'per' => q({0} فی کِلومیٖٹر),
+					},
+					# Core Unit Identifier
+					'kilometer' => {
+						'name' => q(کِلومیٖٹر),
+						'per' => q({0} فی کِلومیٖٹر),
+					},
+					# Long Unit Identifier
+					'length-meter' => {
+						'name' => q(میٖٹَر),
+					},
+					# Core Unit Identifier
+					'meter' => {
+						'name' => q(میٖٹَر),
 					},
 				},
 				'short' => {
@@ -1196,6 +1246,16 @@ has 'units' => (
 					'year' => {
 						'name' => q(ؤری),
 					},
+					# Long Unit Identifier
+					'length-kilometer' => {
+						'name' => q(کلومیٹر),
+						'per' => q({0}/کِلومیٖٹر),
+					},
+					# Core Unit Identifier
+					'kilometer' => {
+						'name' => q(کلومیٹر),
+						'per' => q({0}/کِلومیٖٹر),
+					},
 				},
 			} }
 );
@@ -1204,7 +1264,7 @@ has 'yesstr' => (
 	is			=> 'ro',
 	isa			=> RegexpRef,
 	init_arg	=> undef,
-	default		=> sub { qr'^(?i:اٟں|yes|y)$' }
+	default		=> sub { qr'^(?i:آ|yes|y)$' }
 );
 
 has 'nostr' => (
@@ -1212,6 +1272,18 @@ has 'nostr' => (
 	isa			=> RegexpRef,
 	init_arg	=> undef,
 	default		=> sub { qr'^(?i:نَہ|no|n)$' }
+);
+
+has 'listPatterns' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+				start => q({0}، {1}),
+				middle => q({0}، {1}),
+				end => q({0}، تٕہ {1}),
+				2 => q({0} تٕہ {1}),
+		} }
 );
 
 has 'default_numbering_system' => (
@@ -1237,47 +1309,9 @@ has 'number_symbols' => (
 			'timeSeparator' => q(:),
 		},
 		'latn' => {
-			'decimal' => q(.),
-			'exponential' => q(E),
-			'group' => q(,),
-			'infinity' => q(∞),
-			'list' => q(;),
-			'minusSign' => q(‎-),
-			'nan' => q(NaN),
-			'perMille' => q(‰),
-			'percentSign' => q(%),
-			'plusSign' => q(‎+),
+			'group' => q(،),
 		},
 	} }
-);
-
-has 'number_formats' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		decimalFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##,##0.###',
-				},
-			},
-		},
-		percentFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##,##0%',
-				},
-			},
-		},
-		scientificFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#E0',
-				},
-			},
-		},
-} },
 );
 
 has 'number_currency_formats' => (
@@ -1289,7 +1323,7 @@ has 'number_currency_formats' => (
 			'pattern' => {
 				'default' => {
 					'standard' => {
-						'positive' => '¤ #,##,##0.00',
+						'positive' => '¤#,##0.00',
 					},
 				},
 			},
@@ -1454,7 +1488,9 @@ has 'currencies' => (
 		},
 		'BRL' => {
 			display_name => {
-				'currency' => q(برازیٖلین رِیَل),
+				'currency' => q(برازیٖلی رِیَل),
+				'one' => q(برازیٖلی رِیَل),
+				'other' => q(برازیٖلی رِیَلز),
 			},
 		},
 		'BRN' => {
@@ -1544,7 +1580,7 @@ has 'currencies' => (
 		},
 		'CNY' => {
 			display_name => {
-				'currency' => q(چینیٖز یَن رِنمِنبی),
+				'currency' => q(چیٖنی یُوان),
 			},
 		},
 		'COP' => {
@@ -1664,7 +1700,7 @@ has 'currencies' => (
 		},
 		'GBP' => {
 			display_name => {
-				'currency' => q(برطٲنوی پاونڑ سٹٔرلِنگ),
+				'currency' => q(برطٲنوی پوٗنڈ),
 			},
 		},
 		'GEK' => {
@@ -1823,8 +1859,11 @@ has 'currencies' => (
 			},
 		},
 		'JPY' => {
+			symbol => '¥',
 			display_name => {
 				'currency' => q(جاپانُک یَن),
+				'one' => q(جاپٲن یَن),
+				'other' => q(جاپٲن یَن),
 			},
 		},
 		'KES' => {
@@ -2179,7 +2218,9 @@ has 'currencies' => (
 		},
 		'RUB' => {
 			display_name => {
-				'currency' => q(رٔشیَن رَبٕل),
+				'currency' => q(روٗسی رَبٕل),
+				'one' => q(روٗسی رَبٕل),
+				'other' => q(روٗسی رَبٕلز),
 			},
 		},
 		'RUR' => {
@@ -2358,8 +2399,11 @@ has 'currencies' => (
 			},
 		},
 		'USD' => {
+			symbol => '$',
 			display_name => {
-				'currency' => q(یوٗ ایس ڈالَر),
+				'currency' => q(US ڈالر),
+				'one' => q(US ڈالر),
+				'other' => q(US ڈالرس),
 			},
 		},
 		'USN' => {
@@ -2514,7 +2558,9 @@ has 'currencies' => (
 		},
 		'XXX' => {
 			display_name => {
-				'currency' => q(اَنزٲنۍ یا نالَگہٕ ہار سِکہٕ),
+				'currency' => q(نامولوٗم کرنسی),
+				'one' => q(﴿کرنسی ہُنٛد نامولوٗم سِکٕہ﴾),
+				'other' => q(﴿نانولوٗم کرنسی﴾),
 			},
 		},
 		'YDD' => {
@@ -2583,13 +2629,53 @@ has 'calendar_months' => (
 	default		=> sub { {
 			'gregorian' => {
 				'format' => {
+					abbreviated => {
+						nonleap => [
+							'جنؤری',
+							'فرؤری',
+							'مارٕچ',
+							'اپریل',
+							'مئی',
+							'جوٗن',
+							'جُلَے',
+							'اگست',
+							'ستمبر',
+							'اکتوٗبر',
+							'نومبر',
+							'دسمبر'
+						],
+						leap => [
+							
+						],
+					},
 					wide => {
 						nonleap => [
 							'جنؤری',
 							'فرؤری',
 							'مارٕچ',
 							'اپریل',
-							'میٔ',
+							'مئی',
+							'جوٗن',
+							'جُلَے',
+							'اگست',
+							'ستمبر',
+							'اکتوٗبر',
+							'نومبر',
+							'دَسَمبَر'
+						],
+						leap => [
+							
+						],
+					},
+				},
+				'stand-alone' => {
+					abbreviated => {
+						nonleap => [
+							'جنؤری',
+							'فرؤری',
+							'مارٕچ',
+							'اپریل',
+							'مئی',
 							'جوٗن',
 							'جوٗلایی',
 							'اگست',
@@ -2602,8 +2688,6 @@ has 'calendar_months' => (
 							
 						],
 					},
-				},
-				'stand-alone' => {
 					narrow => {
 						nonleap => [
 							'ج',
@@ -2618,6 +2702,25 @@ has 'calendar_months' => (
 							'س',
 							'ا',
 							'ن'
+						],
+						leap => [
+							
+						],
+					},
+					wide => {
+						nonleap => [
+							'جنؤری',
+							'فرؤری',
+							'مارٕچ',
+							'اپریل',
+							'مئی',
+							'جوٗن',
+							'جوٗلایی',
+							'اگست',
+							'ستمبر',
+							'اکتوٗبر',
+							'نومبر',
+							'دسمبر'
 						],
 						leap => [
 							
@@ -2639,7 +2742,7 @@ has 'calendar_months' => (
 							'شعبان',
 							'رمضان',
 							'شوال',
-							'ذِی القد',
+							'ذِی القعدہ',
 							'ذِی الحج'
 						],
 						leap => [
@@ -2699,10 +2802,10 @@ has 'calendar_quarters' => (
 	default		=> sub { {
 			'gregorian' => {
 				'format' => {
-					abbreviated => {0 => 'ژۄباگ',
-						1 => 'دۆیِم ژۄباگ',
-						2 => 'تریِم ژۄباگ',
-						3 => 'ژوٗرِم ژۄباگ'
+					abbreviated => {0 => 'کیو 1',
+						1 => 'کیو 2',
+						2 => 'کیو 3',
+						3 => 'کیو 4'
 					},
 					wide => {0 => 'گۄڑنیُک ژۄباگ',
 						1 => 'دۆیِم ژۄباگ',
@@ -2711,6 +2814,26 @@ has 'calendar_quarters' => (
 					},
 				},
 			},
+	} },
+);
+
+has 'day_periods' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+		'gregorian' => {
+			'format' => {
+				'narrow' => {
+					'am' => q{a},
+					'pm' => q{p},
+				},
+				'wide' => {
+					'am' => q{اے ایم},
+					'pm' => q{پی ایم},
+				},
+			},
+		},
 	} },
 );
 
@@ -2728,10 +2851,13 @@ has 'eras' => (
 			},
 			wide => {
 				'0' => 'قبٕل مسیٖح',
-				'1' => 'عیٖسوی سنہٕ'
+				'1' => 'اینو ڈومنی'
 			},
 		},
 		'indian' => {
+			abbreviated => {
+				'0' => 'ساکا'
+			},
 		},
 	} },
 );
@@ -2742,10 +2868,10 @@ has 'date_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-			'full' => q{EEEE, MMMM d, Gy},
-			'long' => q{MMMM d, Gy},
-			'medium' => q{MMM d, Gy},
-			'short' => q{M/d/Gy},
+			'full' => q{EEEE, MMMM d, y G},
+			'long' => q{MMMM d, y G},
+			'medium' => q{MMM d, y G},
+			'short' => q{M/d/y GGGGG},
 		},
 		'gregorian' => {
 			'full' => q{EEEE, MMMM d, y},
@@ -2782,16 +2908,16 @@ has 'datetime_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-			'full' => q{{1} {0}},
-			'long' => q{{1} {0}},
-			'medium' => q{{1} {0}},
-			'short' => q{{1} {0}},
+			'full' => q{{1}, {0}},
+			'long' => q{{1}, {0}},
+			'medium' => q{{1}, {0}},
+			'short' => q{{1}, {0}},
 		},
 		'gregorian' => {
-			'full' => q{{1} {0}},
-			'long' => q{{1} {0}},
-			'medium' => q{{1} {0}},
-			'short' => q{{1} {0}},
+			'full' => q{{1}, {0}},
+			'long' => q{{1}, {0}},
+			'medium' => q{{1}, {0}},
+			'short' => q{{1}, {0}},
 		},
 		'indian' => {
 		},
@@ -2806,58 +2932,46 @@ has 'datetime_formats_available_formats' => (
 		'generic' => {
 			Gy => q{Gy},
 			GyMMM => q{MMM Gy},
-			GyMMMEd => q{EEE, MMM d, Gy},
-			GyMMMd => q{MMM d, Gy},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
+			GyMMMEd => q{E, MMM d, y G},
+			GyMMMd => q{MMM d, y G},
+			GyMd => q{M/d/y GGGGG},
 			MEd => q{E, M/d},
-			MMM => q{LLL},
 			MMMEd => q{E, MMM d},
 			MMMMEd => q{E, MMMM d},
-			MMMMd => q{MMMM d},
-			MMMd => q{d-MMM},
 			Md => q{M/d},
-			d => q{d},
-			hm => q{h:mm a},
-			ms => q{mm:ss},
-			y => q{Gy},
-			yyyy => q{Gy},
-			yyyyM => q{M/Gy},
-			yyyyMEd => q{EEE, M/d/Gy},
-			yyyyMMM => q{MMM Gy},
-			yyyyMMMEd => q{EEE, MMM d, Gy},
-			yyyyMMMM => q{MMMM Gy},
-			yyyyMMMd => q{MMM d, Gy},
-			yyyyQQQ => q{QQQ Gy},
-			yyyyQQQQ => q{QQQQ Gy},
+			y => q{y G},
+			yyyy => q{y G},
+			yyyyM => q{M/y GGGGG},
+			yyyyMEd => q{E, M/d/y GGGGG},
+			yyyyMMM => q{MMM y G},
+			yyyyMMMEd => q{E, MMM d, y G},
+			yyyyMMMM => q{MMMM y G},
+			yyyyMMMd => q{MMM d, y G},
+			yyyyMd => q{M/d/y GGGGG},
+			yyyyQQQ => q{QQQ y G},
+			yyyyQQQQ => q{QQQQ y G},
 		},
 		'gregorian' => {
-			Gy => q{Gy},
-			GyMMM => q{MMM Gy},
-			GyMMMEd => q{EEE, MMM d, Gy},
-			GyMMMd => q{MMM d, Gy},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
+			Ed => q{d E},
+			Gy => q{y G},
+			GyMMM => q{MMM y G},
+			GyMMMEd => q{E, MMM d, y G},
+			GyMMMd => q{MMM d, y G},
+			GyMd => q{M/d/y GGGGG},
 			MEd => q{E, M/d},
-			MMM => q{LLL},
 			MMMEd => q{E, MMM d},
 			MMMMEd => q{E, MMMM d},
-			MMMMd => q{MMMM d},
-			MMMd => q{d-MMM},
+			MMMMW => q{ہفتہ W از MMMM},
 			Md => q{M/d},
-			d => q{d},
-			hm => q{h:mm a},
-			ms => q{mm:ss},
-			y => q{y},
 			yM => q{M/y},
-			yMEd => q{EEE, M/d/y},
+			yMEd => q{E, M/d/y},
 			yMMM => q{MMM y},
-			yMMMEd => q{EEE, MMM d, y},
+			yMMMEd => q{E, MMM d, y},
 			yMMMM => q{MMMM y},
+			yMd => q{M/d/y},
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
+			yw => q{ہفتہ w از Y},
 		},
 	} },
 );
@@ -2875,6 +2989,200 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'generic' => {
+			Gy => {
+				G => q{y G – y G},
+				y => q{y – y G},
+			},
+			GyM => {
+				G => q{M/y GGGGG – M/y GGGGG},
+				M => q{M/y – M/y GGGGG},
+				y => q{M/y – M/y GGGGG},
+			},
+			GyMEd => {
+				G => q{E, M/d/y GGGGG – E, M/d/y GGGGG},
+				M => q{E, M/d/y – E, M/d/y GGGGG},
+				d => q{E, M/d/y – E, M/d/y GGGGG},
+				y => q{E, M/d/y – E, M/d/y GGGGG},
+			},
+			GyMMM => {
+				G => q{MMM y G – MMM y G},
+				M => q{MMM – MMM y G},
+				y => q{MMM y – MMM y G},
+			},
+			GyMMMEd => {
+				G => q{E, MMM d, y G – E, MMM d, y G},
+				M => q{E, MMM d – E, MMM d, y G},
+				d => q{E, MMM d – E, MMM d, y G},
+				y => q{E, MMM d, y – E, MMM d, y G},
+			},
+			GyMMMd => {
+				G => q{MMM d, y G – MMM d, y G},
+				M => q{MMM d – MMM d, y G},
+				d => q{MMM d – d, y G},
+				y => q{MMM d, y – MMM d, y G},
+			},
+			GyMd => {
+				G => q{M/d/y GGGGG – M/d/y GGGGG},
+				M => q{M/d/y – M/d/y GGGGG},
+				d => q{M/d/y – M/d/y GGGGG},
+				y => q{M/d/y – M/d/y GGGGG},
+			},
+			M => {
+				M => q{M – M},
+			},
+			MEd => {
+				M => q{E, M/d – E, M/d},
+				d => q{E, M/d – E, M/d},
+			},
+			MMM => {
+				M => q{MMM – MMM},
+			},
+			MMMEd => {
+				M => q{E, MMM d – E, MMM d},
+				d => q{E, MMM d – E, MMM d},
+			},
+			MMMd => {
+				M => q{MMM d – MMM d},
+				d => q{MMM d – d},
+			},
+			Md => {
+				M => q{M/d – M/d},
+				d => q{M/d – M/d},
+			},
+			y => {
+				y => q{y – y G},
+			},
+			yM => {
+				M => q{M/y – M/y GGGGG},
+				y => q{M/y – M/y GGGGG},
+			},
+			yMEd => {
+				M => q{E, M/d/y – E, M/d/y GGGGG},
+				d => q{E, M/d/y – E, M/d/y GGGGG},
+				y => q{E, M/d/y – E, M/d/y GGGGG},
+			},
+			yMMM => {
+				M => q{MMM – MMM y G},
+				y => q{MMM y – MMM y G},
+			},
+			yMMMEd => {
+				M => q{E, MMM d – E, MMM d, y G},
+				d => q{E, MMM d – E, MMM d, y G},
+				y => q{E, MMM d, y – E, MMM d, y G},
+			},
+			yMMMM => {
+				M => q{MMMM – MMMM y G},
+				y => q{MMMM y – MMMM y G},
+			},
+			yMMMd => {
+				M => q{MMM d – MMM d, y G},
+				d => q{MMM d – d, y G},
+				y => q{MMM d, y – MMM d, y G},
+			},
+			yMd => {
+				M => q{M/d/y – M/d/y GGGGG},
+				d => q{M/d/y – M/d/y GGGGG},
+				y => q{M/d/y – M/d/y GGGGG},
+			},
+		},
+		'gregorian' => {
+			GyM => {
+				G => q{M/y G – M/y G},
+				M => q{M/y – M/y G},
+				y => q{M/y – M/y G},
+			},
+			GyMEd => {
+				G => q{E, M/d/y G – E, M/d/y G},
+				M => q{E, M/d/y – E, M/d/y G},
+				d => q{E, M/d/y – E, M/d/y G},
+				y => q{E, M/d/y – E, M/d/y G},
+			},
+			GyMMM => {
+				G => q{MMM y G – MMM y G},
+				M => q{MMM – MMM y G},
+				y => q{MMM y – MMM y G},
+			},
+			GyMMMEd => {
+				G => q{E, MMM d, y G – E, MMM d, y G},
+				M => q{E, MMM d – E, MMM d, y G},
+				d => q{E, MMM d – E, MMM d, y G},
+				y => q{E, MMM d, y – E, MMM d, y G},
+			},
+			GyMMMd => {
+				G => q{MMM d, y G – MMM d, y G},
+				M => q{MMM d – MMM d, y G},
+				d => q{MMM d – d, y G},
+				y => q{MMM d, y – MMM d, y G},
+			},
+			GyMd => {
+				G => q{M/d/y G – M/d/y G},
+				M => q{M/d/y – M/d/y G},
+				d => q{M/d/y – M/d/y G},
+				y => q{M/d/y – M/d/y G},
+			},
+			M => {
+				M => q{M – M},
+			},
+			MEd => {
+				M => q{E, M/d – E, M/d},
+				d => q{E, M/d – E, M/d},
+			},
+			MMM => {
+				M => q{MMM – MMM},
+			},
+			MMMEd => {
+				M => q{E, MMM d – E, MMM d},
+				d => q{E, MMM d – E, MMM d},
+			},
+			MMMd => {
+				M => q{MMM d – MMM d},
+				d => q{MMM d – d},
+			},
+			Md => {
+				M => q{M/d – M/d},
+				d => q{M/d – M/d},
+			},
+			h => {
+				a => q{h a – h a},
+				h => q{h – h a},
+			},
+			y => {
+				y => q{y – y},
+			},
+			yM => {
+				M => q{M/y – M/y},
+				y => q{M/y – M/y},
+			},
+			yMEd => {
+				M => q{E, M/d/y – E, M/d/y},
+				d => q{E, M/d/y – E, M/d/y},
+				y => q{E, M/d/y – E, M/d/y},
+			},
+			yMMM => {
+				M => q{MMM – MMM y},
+				y => q{MMM y – MMM y},
+			},
+			yMMMEd => {
+				M => q{E, MMM d – E, MMM d, y},
+				d => q{E, MMM d – E, MMM d, y},
+				y => q{E, MMM d, y – E, MMM d, y},
+			},
+			yMMMM => {
+				M => q{MMMM – MMMM y},
+				y => q{MMMM y – MMMM y},
+			},
+			yMMMd => {
+				M => q{MMM d – MMM d, y},
+				d => q{MMM d – d, y},
+				y => q{MMM d, y – MMM d, y},
+			},
+			yMd => {
+				M => q{M/d/y – M/d/y},
+				d => q{M/d/y – M/d/y},
+				y => q{M/d/y – M/d/y},
+			},
+		},
 	} },
 );
 
@@ -2883,8 +3191,10 @@ has 'time_zone_names' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default	=> sub { {
-		hourFormat => q(+HH:mm;-HH:mm),
-		gmtFormat => q(GMT{0}),
+		gmtZeroFormat => q(جی ایم ٹی),
+		regionFormat => q({0} وَکھ),
+		regionFormat => q({0} ڈے لائٹ وَکھ),
+		regionFormat => q({0} معیٲری وَکھ),
 		'Acre' => {
 			long => {
 				'daylight' => q#اؠکرے سَمَر ٹایِم#,
@@ -2902,6 +3212,9 @@ has 'time_zone_names' => (
 		},
 		'Africa/Accra' => {
 			exemplarCity => q#اؠکرا#,
+		},
+		'Africa/Addis_Ababa' => {
+			exemplarCity => q#عدیس ابابا#,
 		},
 		'Africa/Algiers' => {
 			exemplarCity => q#اَلجیٖرِیا#,
@@ -2946,13 +3259,16 @@ has 'time_zone_names' => (
 			exemplarCity => q#دَکار#,
 		},
 		'Africa/Dar_es_Salaam' => {
-			exemplarCity => q#دارُالسلام#,
+			exemplarCity => q#دارالسلام#,
 		},
 		'Africa/Djibouti' => {
-			exemplarCity => q#ڑِزِبوٹی#,
+			exemplarCity => q#ڈِجیبوٹی#,
 		},
 		'Africa/Douala' => {
-			exemplarCity => q#دوعالا#,
+			exemplarCity => q#ڈوولا#,
+		},
+		'Africa/El_Aaiun' => {
+			exemplarCity => q#ال عیون#,
 		},
 		'Africa/Freetown' => {
 			exemplarCity => q#فری ٹاوُن#,
@@ -2964,7 +3280,10 @@ has 'time_zone_names' => (
 			exemplarCity => q#ہَراریے#,
 		},
 		'Africa/Johannesburg' => {
-			exemplarCity => q#جانسبٔرگ#,
+			exemplarCity => q#جوہانسبرگ#,
+		},
+		'Africa/Juba' => {
+			exemplarCity => q#جوبا#,
 		},
 		'Africa/Kampala' => {
 			exemplarCity => q#کَمپالا#,
@@ -2988,13 +3307,13 @@ has 'time_zone_names' => (
 			exemplarCity => q#لوم#,
 		},
 		'Africa/Luanda' => {
-			exemplarCity => q#لُعؠنڑا#,
+			exemplarCity => q#لیوانڈا#,
 		},
 		'Africa/Lubumbashi' => {
-			exemplarCity => q#لُبُمباشی#,
+			exemplarCity => q#لوبم باشی#,
 		},
 		'Africa/Lusaka' => {
-			exemplarCity => q#لُساکا#,
+			exemplarCity => q#لوساکا#,
 		},
 		'Africa/Malabo' => {
 			exemplarCity => q#مالابو#,
@@ -3030,7 +3349,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#اوآگدوگو#,
 		},
 		'Africa/Porto-Novo' => {
-			exemplarCity => q#پوٹو نووو#,
+			exemplarCity => q#پورٹو نووو#,
 		},
 		'Africa/Sao_Tome' => {
 			exemplarCity => q#ساو ٹوم#,
@@ -3063,7 +3382,7 @@ has 'time_zone_names' => (
 			long => {
 				'daylight' => q#مغربی افریٖقا سَمَر ٹایِم#,
 				'generic' => q#مغربی افریٖقا ٹایِم#,
-				'standard' => q#مغربی افریٖقا سٹینڑاڑ ٹایِم#,
+				'standard' => q#مغربی افریٖقا سٹینڈرڈ ٹایِم#,
 			},
 		},
 		'Alaska' => {
@@ -3088,7 +3407,7 @@ has 'time_zone_names' => (
 			},
 		},
 		'America/Adak' => {
-			exemplarCity => q#اِدَک#,
+			exemplarCity => q#ادک#,
 		},
 		'America/Anchorage' => {
 			exemplarCity => q#اَنکوراج#,
@@ -3107,6 +3426,9 @@ has 'time_zone_names' => (
 		},
 		'America/Argentina/Rio_Gallegos' => {
 			exemplarCity => q#رِیو گالیگوس#,
+		},
+		'America/Argentina/Salta' => {
+			exemplarCity => q#سالٹا#,
 		},
 		'America/Argentina/San_Juan' => {
 			exemplarCity => q#سین جُواں#,
@@ -3129,8 +3451,11 @@ has 'time_zone_names' => (
 		'America/Bahia' => {
 			exemplarCity => q#بَہِیا#,
 		},
+		'America/Bahia_Banderas' => {
+			exemplarCity => q#باہیا بندارس#,
+		},
 		'America/Barbados' => {
-			exemplarCity => q#بَرباڑوس#,
+			exemplarCity => q#بارباڈوس#,
 		},
 		'America/Belem' => {
 			exemplarCity => q#بؠلؠم#,
@@ -3181,13 +3506,16 @@ has 'time_zone_names' => (
 			exemplarCity => q#چِہُوا ہُوا#,
 		},
 		'America/Coral_Harbour' => {
-			exemplarCity => q#کورَل بٔندٕرگاہ#,
+			exemplarCity => q#اٹی کوکنٍ#,
 		},
 		'America/Cordoba' => {
 			exemplarCity => q#کورڑوبا#,
 		},
 		'America/Costa_Rica' => {
 			exemplarCity => q#کوسٹا ریٖکا#,
+		},
+		'America/Creston' => {
+			exemplarCity => q#کریسٹن#,
 		},
 		'America/Cuiaba' => {
 			exemplarCity => q#کوٗیابا#,
@@ -3196,13 +3524,13 @@ has 'time_zone_names' => (
 			exemplarCity => q#کیوٗراکااو#,
 		},
 		'America/Danmarkshavn' => {
-			exemplarCity => q#ڑؠنمارکشَون#,
+			exemplarCity => q#ڈنمارک شاون#,
 		},
 		'America/Dawson' => {
-			exemplarCity => q#ڑاسَن#,
+			exemplarCity => q#ڈاوسن#,
 		},
 		'America/Dawson_Creek' => {
-			exemplarCity => q#ڑاسَن کریٖک#,
+			exemplarCity => q#ڈواسَن کریٖک#,
 		},
 		'America/Denver' => {
 			exemplarCity => q#ڈینوَر#,
@@ -3214,13 +3542,16 @@ has 'time_zone_names' => (
 			exemplarCity => q#ڈومِنِکا#,
 		},
 		'America/Edmonton' => {
-			exemplarCity => q#اؠڑمَنٹَن#,
+			exemplarCity => q#اؠڈمَنٹَن#,
 		},
 		'America/Eirunepe' => {
 			exemplarCity => q#ایٖروٗنیپ#,
 		},
 		'America/El_Salvador' => {
 			exemplarCity => q#ایل سَلویدَر#,
+		},
+		'America/Fort_Nelson' => {
+			exemplarCity => q#فورٹ نیلسن#,
 		},
 		'America/Fortaleza' => {
 			exemplarCity => q#فورٹیلیزا#,
@@ -3229,7 +3560,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#گلیس خلیٖج#,
 		},
 		'America/Godthab' => {
-			exemplarCity => q#گعاڑتھیب#,
+			exemplarCity => q#نوٗک#,
 		},
 		'America/Goose_Bay' => {
 			exemplarCity => q#گوٗس خلیٖج#,
@@ -3238,7 +3569,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#گرینڈ تٔرک#,
 		},
 		'America/Grenada' => {
-			exemplarCity => q#گریناڑا#,
+			exemplarCity => q#گریناڈا#,
 		},
 		'America/Guadeloupe' => {
 			exemplarCity => q#گوڑلوپ#,
@@ -3265,22 +3596,22 @@ has 'time_zone_names' => (
 			exemplarCity => q#نوکس#,
 		},
 		'America/Indiana/Marengo' => {
-			exemplarCity => q#میرینگو#,
+			exemplarCity => q#میرنگو، انڈیانا#,
 		},
 		'America/Indiana/Petersburg' => {
-			exemplarCity => q#پِٹس بٔرگ#,
+			exemplarCity => q#پِٹس بٔرگ، انڈیانا#,
 		},
 		'America/Indiana/Tell_City' => {
-			exemplarCity => q#ٹیل سِٹی#,
+			exemplarCity => q#ٹیل سِٹی، انڈیانا#,
 		},
 		'America/Indiana/Vevay' => {
-			exemplarCity => q#ویویے#,
+			exemplarCity => q#ویویے، انڈیانا#,
 		},
 		'America/Indiana/Vincennes' => {
-			exemplarCity => q#وِنسینیس#,
+			exemplarCity => q#وِنسینیس، انڈیانا#,
 		},
 		'America/Indiana/Winamac' => {
-			exemplarCity => q#وِنیمیک#,
+			exemplarCity => q#وِنیمیک، انڈیانا#,
 		},
 		'America/Indianapolis' => {
 			exemplarCity => q#اِنڈیَن پولِس#,
@@ -3301,7 +3632,10 @@ has 'time_zone_names' => (
 			exemplarCity => q#جوٗنی#,
 		},
 		'America/Kentucky/Monticello' => {
-			exemplarCity => q#مونٹِسیلو#,
+			exemplarCity => q#مونٹِسیلو، کینٹوکی#,
+		},
+		'America/Kralendijk' => {
+			exemplarCity => q#کرالینڈِک#,
 		},
 		'America/La_Paz' => {
 			exemplarCity => q#لا پاز#,
@@ -3315,6 +3649,9 @@ has 'time_zone_names' => (
 		'America/Louisville' => {
 			exemplarCity => q#لوٗیِس وِل#,
 		},
+		'America/Lower_Princes' => {
+			exemplarCity => q#لوور پرنس کوارٹر#,
+		},
 		'America/Maceio' => {
 			exemplarCity => q#میسِیوو#,
 		},
@@ -3324,8 +3661,14 @@ has 'time_zone_names' => (
 		'America/Manaus' => {
 			exemplarCity => q#مَنوس#,
 		},
+		'America/Marigot' => {
+			exemplarCity => q#میریگوٹ#,
+		},
 		'America/Martinique' => {
 			exemplarCity => q#مارٹِنِک#,
+		},
+		'America/Matamoros' => {
+			exemplarCity => q#میٹاموروس#,
 		},
 		'America/Mazatlan' => {
 			exemplarCity => q#مَزَٹلان#,
@@ -3338,6 +3681,9 @@ has 'time_zone_names' => (
 		},
 		'America/Merida' => {
 			exemplarCity => q#میرِڈا#,
+		},
+		'America/Metlakatla' => {
+			exemplarCity => q#میٹلا کاٹلا#,
 		},
 		'America/Mexico_City' => {
 			exemplarCity => q#میکسِکو سِٹی#,
@@ -3372,11 +3718,17 @@ has 'time_zone_names' => (
 		'America/Noronha' => {
 			exemplarCity => q#نورونہا#,
 		},
+		'America/North_Dakota/Beulah' => {
+			exemplarCity => q#بیولاہ، شُمالی ڈیکوٹا#,
+		},
 		'America/North_Dakota/Center' => {
 			exemplarCity => q#مَرکزی جنوٗبی ڈکوٹا#,
 		},
 		'America/North_Dakota/New_Salem' => {
-			exemplarCity => q#نوو سیلٕم#,
+			exemplarCity => q#نوو سیلٕم، شُمالی ڈیکوٹا#,
+		},
+		'America/Ojinaga' => {
+			exemplarCity => q#اوجی ناگا#,
 		},
 		'America/Panama' => {
 			exemplarCity => q#پَناما#,
@@ -3402,6 +3754,9 @@ has 'time_zone_names' => (
 		'America/Puerto_Rico' => {
 			exemplarCity => q#پیٖٹو رِکو#,
 		},
+		'America/Punta_Arenas' => {
+			exemplarCity => q#پونٹا اریناس#,
+		},
 		'America/Rainy_River' => {
 			exemplarCity => q#رینی رِوَر#,
 		},
@@ -3409,7 +3764,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#رینکِن اِنلؠٹ#,
 		},
 		'America/Recife' => {
-			exemplarCity => q#رؠچیٖف#,
+			exemplarCity => q#ریسیف#,
 		},
 		'America/Regina' => {
 			exemplarCity => q#رؠجیٖنا#,
@@ -3420,17 +3775,26 @@ has 'time_zone_names' => (
 		'America/Rio_Branco' => {
 			exemplarCity => q#رِیو برانکو#,
 		},
+		'America/Santarem' => {
+			exemplarCity => q#سانتاریم#,
+		},
 		'America/Santiago' => {
-			exemplarCity => q#سینٹِعؠگو#,
+			exemplarCity => q#سینٹیاگو#,
 		},
 		'America/Santo_Domingo' => {
 			exemplarCity => q#سؠنٹو ڑومِنگو#,
 		},
 		'America/Sao_Paulo' => {
-			exemplarCity => q#ساو پعالو#,
+			exemplarCity => q#ساؤ پالو#,
 		},
 		'America/Scoresbysund' => {
 			exemplarCity => q#سکورٕسباےسَنڑ#,
+		},
+		'America/Sitka' => {
+			exemplarCity => q#سِٹکا#,
+		},
+		'America/St_Barthelemy' => {
+			exemplarCity => q#سینٹ بارتھیلمی#,
 		},
 		'America/St_Johns' => {
 			exemplarCity => q#سؠنٹ جونس#,
@@ -3445,16 +3809,19 @@ has 'time_zone_names' => (
 			exemplarCity => q#سینٹ تھامَس#,
 		},
 		'America/St_Vincent' => {
-			exemplarCity => q#وِنسینٹ#,
+			exemplarCity => q#سینٹ وِنسینٹ#,
 		},
 		'America/Swift_Current' => {
 			exemplarCity => q#سٕوِفٹ کَرَنٹ#,
+		},
+		'America/Tegucigalpa' => {
+			exemplarCity => q#ٹیگوسی گالپا#,
 		},
 		'America/Thule' => {
 			exemplarCity => q#تھیوٗلے#,
 		},
 		'America/Thunder_Bay' => {
-			exemplarCity => q#تھَنڑَر خلیٖج#,
+			exemplarCity => q#تھَنڈر خلیٖج#,
 		},
 		'America/Tijuana' => {
 			exemplarCity => q#تِجُوانا#,
@@ -3560,8 +3927,11 @@ has 'time_zone_names' => (
 			long => {
 				'daylight' => q#ارؠبِیَن ڈےلایِٔٹ ٹایِم#,
 				'generic' => q#ارؠبِیَن ٹایِم#,
-				'standard' => q#ارؠبِیَن سٹینڑاڑ ٹایِم#,
+				'standard' => q#ارؠبِیَن سٹینڈرڈ ٹایِم#,
 			},
+		},
+		'Arctic/Longyearbyen' => {
+			exemplarCity => q#لونگ ییئر بئین#,
 		},
 		'Argentina' => {
 			long => {
@@ -3581,7 +3951,7 @@ has 'time_zone_names' => (
 			long => {
 				'daylight' => q#ارمیٖنِیا سَمَر ٹایِم#,
 				'generic' => q#ارمیٖنِیا ٹایِم#,
-				'standard' => q#ارمیٖنِیا سٹینڑاڑ ٹایِم#,
+				'standard' => q#ارمیٖنِیا سٹینڈرڈ ٹایِم#,
 			},
 		},
 		'Asia/Aden' => {
@@ -3597,13 +3967,16 @@ has 'time_zone_names' => (
 			exemplarCity => q#اَنَدیر#,
 		},
 		'Asia/Aqtau' => {
-			exemplarCity => q#اَکتاؤں#,
+			exemplarCity => q#اکٹو#,
 		},
 		'Asia/Aqtobe' => {
 			exemplarCity => q#اَقٹوب#,
 		},
 		'Asia/Ashgabat' => {
 			exemplarCity => q#اَشگَبَت#,
+		},
+		'Asia/Atyrau' => {
+			exemplarCity => q#اٹیرو#,
 		},
 		'Asia/Baghdad' => {
 			exemplarCity => q#بغداد#,
@@ -3617,14 +3990,23 @@ has 'time_zone_names' => (
 		'Asia/Bangkok' => {
 			exemplarCity => q#بینگ کاک#,
 		},
+		'Asia/Barnaul' => {
+			exemplarCity => q#برنول#,
+		},
 		'Asia/Beirut' => {
-			exemplarCity => q#بیرُت#,
+			exemplarCity => q#بیرٹ#,
 		},
 		'Asia/Bishkek' => {
 			exemplarCity => q#بِشکیک#,
 		},
 		'Asia/Brunei' => {
 			exemplarCity => q#بروٗنَے#,
+		},
+		'Asia/Calcutta' => {
+			exemplarCity => q#کَلٕکَتا#,
+		},
+		'Asia/Chita' => {
+			exemplarCity => q#چیٹا#,
 		},
 		'Asia/Choibalsan' => {
 			exemplarCity => q#چویبالسَن#,
@@ -3642,16 +4024,22 @@ has 'time_zone_names' => (
 			exemplarCity => q#دِلی#,
 		},
 		'Asia/Dubai' => {
-			exemplarCity => q#دُبَے#,
+			exemplarCity => q#دُبئی#,
 		},
 		'Asia/Dushanbe' => {
 			exemplarCity => q#دُشانبیے#,
 		},
+		'Asia/Famagusta' => {
+			exemplarCity => q#فاما گوسٹا#,
+		},
 		'Asia/Gaza' => {
-			exemplarCity => q#غازا#,
+			exemplarCity => q#غزہ#,
+		},
+		'Asia/Hebron' => {
+			exemplarCity => q#ہیبرون#,
 		},
 		'Asia/Hong_Kong' => {
-			exemplarCity => q#حانگ کانگ#,
+			exemplarCity => q#ہانگ کانگ#,
 		},
 		'Asia/Hovd' => {
 			exemplarCity => q#حووڑ#,
@@ -3666,7 +4054,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#جَیاپوٗرا#,
 		},
 		'Asia/Jerusalem' => {
-			exemplarCity => q#یؠروٗسَلَم#,
+			exemplarCity => q#یروشلم#,
 		},
 		'Asia/Kabul' => {
 			exemplarCity => q#قابُل#,
@@ -3679,6 +4067,9 @@ has 'time_zone_names' => (
 		},
 		'Asia/Katmandu' => {
 			exemplarCity => q#کاٹھمَنڈوٗ#,
+		},
+		'Asia/Khandyga' => {
+			exemplarCity => q#کھانڈیگا#,
 		},
 		'Asia/Krasnoyarsk' => {
 			exemplarCity => q#کرنسنویارسک#,
@@ -3693,7 +4084,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#کُویت#,
 		},
 		'Asia/Macau' => {
-			exemplarCity => q#مقاؤں#,
+			exemplarCity => q#مکو#,
 		},
 		'Asia/Magadan' => {
 			exemplarCity => q#مَگادَن#,
@@ -3705,10 +4096,13 @@ has 'time_zone_names' => (
 			exemplarCity => q#مَنیٖلا#,
 		},
 		'Asia/Muscat' => {
-			exemplarCity => q#مَسکَت#,
+			exemplarCity => q#مسقط#,
 		},
 		'Asia/Nicosia' => {
 			exemplarCity => q#نِکوسِیا#,
+		},
+		'Asia/Novokuznetsk' => {
+			exemplarCity => q#نوووکُزنیٹسک#,
 		},
 		'Asia/Novosibirsk' => {
 			exemplarCity => q#نوووسِبِرسک#,
@@ -3729,7 +4123,10 @@ has 'time_zone_names' => (
 			exemplarCity => q#پیونگیانگ#,
 		},
 		'Asia/Qatar' => {
-			exemplarCity => q#قَتَر#,
+			exemplarCity => q#قطر#,
+		},
+		'Asia/Qostanay' => {
+			exemplarCity => q#کوسٹانے#,
 		},
 		'Asia/Qyzylorda' => {
 			exemplarCity => q#قؠزؠلوڑا#,
@@ -3738,7 +4135,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#رنگوٗن#,
 		},
 		'Asia/Riyadh' => {
-			exemplarCity => q#رِیاد#,
+			exemplarCity => q#ریاض#,
 		},
 		'Asia/Saigon' => {
 			exemplarCity => q#سیگَن#,
@@ -3750,10 +4147,16 @@ has 'time_zone_names' => (
 			exemplarCity => q#سَمَرکَند#,
 		},
 		'Asia/Seoul' => {
-			exemplarCity => q#سول#,
+			exemplarCity => q#سیول#,
+		},
+		'Asia/Shanghai' => {
+			exemplarCity => q#شانگے#,
 		},
 		'Asia/Singapore' => {
 			exemplarCity => q#سِنگاپور#,
+		},
+		'Asia/Srednekolymsk' => {
+			exemplarCity => q#سریڈنیکولیمسک#,
 		},
 		'Asia/Taipei' => {
 			exemplarCity => q#تَیپیے#,
@@ -3773,11 +4176,17 @@ has 'time_zone_names' => (
 		'Asia/Tokyo' => {
 			exemplarCity => q#ٹوکیو#,
 		},
+		'Asia/Tomsk' => {
+			exemplarCity => q#ٹومسک#,
+		},
 		'Asia/Ulaanbaatar' => {
-			exemplarCity => q#اُلانباٹَر#,
+			exemplarCity => q#اولن باٹر#,
 		},
 		'Asia/Urumqi' => {
-			exemplarCity => q#اُرَمچی#,
+			exemplarCity => q#اُرومقی#,
+		},
+		'Asia/Ust-Nera' => {
+			exemplarCity => q#اوسٹ-نیرا#,
 		},
 		'Asia/Vientiane' => {
 			exemplarCity => q#وِیَنتِیین#,
@@ -3823,7 +4232,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#رؠکیاوِک#,
 		},
 		'Atlantic/South_Georgia' => {
-			exemplarCity => q#ساوتھ جورجِیا#,
+			exemplarCity => q#جنوبی جارجیا#,
 		},
 		'Atlantic/St_Helena' => {
 			exemplarCity => q#سینٹ ہیلِنا#,
@@ -3897,14 +4306,14 @@ has 'time_zone_names' => (
 		},
 		'Azerbaijan' => {
 			long => {
-				'daylight' => q#اَزَربیجان سَمَر ٹایِم#,
-				'generic' => q#اَزَربیجان ٹایِم#,
-				'standard' => q#اَزَربیجان سٹینڑاڑ ٹایِم#,
+				'daylight' => q#ازربائیجان سَمَر ٹائم#,
+				'generic' => q#ازربائیجان ٹائم#,
+				'standard' => q#ازربائیجان سٹینڈرڈ ٹائم#,
 			},
 		},
 		'Azores' => {
 			long => {
-				'daylight' => q#اؠزورٕس سَمَر ٹ#,
+				'daylight' => q#اؠزورٕس سَمَر ٹائم#,
 				'generic' => q#اؠزورٕس ٹایِم#,
 				'standard' => q#اؠزورٕس سٹینڑاڑ ٹایِم#,
 			},
@@ -3942,7 +4351,7 @@ has 'time_zone_names' => (
 			long => {
 				'daylight' => q#کیپ سَمَر ٹایِم#,
 				'generic' => q#کیپ ؤرڑو ٹایِم#,
-				'standard' => q#کیپ ؤرڑو سٹینڑاڑ ٹایِم#,
+				'standard' => q#کیپ ؤرڑو سٹینڈرڈ ٹایِم#,
 			},
 		},
 		'Chamorro' => {
@@ -3968,14 +4377,14 @@ has 'time_zone_names' => (
 			long => {
 				'daylight' => q#چَینا ڈےلایِٔٹ ٹایِم#,
 				'generic' => q#چَینا ٹایِم#,
-				'standard' => q#چَینا سٹینڑاڑ ٹایِم#,
+				'standard' => q#چَینا سٹینڈرڈ ٹایِم#,
 			},
 		},
 		'Choibalsan' => {
 			long => {
 				'daylight' => q#کوےبؠلسَن سَمَر ٹایِم#,
 				'generic' => q#کوےبؠلسَن ٹایِم#,
-				'standard' => q#کوےبؠلسَن سٹینڑاڑ ٹایِم#,
+				'standard' => q#کوےبؠلسَن سٹینڈرڈ ٹایِم#,
 			},
 		},
 		'Christmas' => {
@@ -4026,14 +4435,19 @@ has 'time_zone_names' => (
 		},
 		'Easter' => {
 			long => {
-				'daylight' => q#ایٖسٹَر سَمَر ٹایِم#,
-				'generic' => q#ایٖسٹَر ٹایِم#,
-				'standard' => q#ایٖسٹَر سٹینڑاڑ ٹایِم#,
+				'daylight' => q#ایٖسٹَر جزیرٕ سَمَر ٹایِم#,
+				'generic' => q#ایٖسٹَر جزیرٕ ٹایِم#,
+				'standard' => q#ایٖسٹَر جزیرٕ سٹینڈرڈ ٹایِم#,
 			},
 		},
 		'Ecuador' => {
 			long => {
 				'standard' => q#اِکویڑَر ٹایِم#,
+			},
+		},
+		'Etc/UTC' => {
+			long => {
+				'standard' => q#کوآرڈنیٹڈ یونیورسل وَکھ#,
 			},
 		},
 		'Etc/Unknown' => {
@@ -4043,13 +4457,22 @@ has 'time_zone_names' => (
 			exemplarCity => q#ایمسٹَرڈیم#,
 		},
 		'Europe/Andorra' => {
-			exemplarCity => q#اَنڑورا#,
+			exemplarCity => q#اَنڈورا#,
+		},
+		'Europe/Astrakhan' => {
+			exemplarCity => q#ایسٹرا کھان#,
 		},
 		'Europe/Athens' => {
 			exemplarCity => q#اؠتھٕنس#,
 		},
+		'Europe/Belgrade' => {
+			exemplarCity => q#بیلگریڈ#,
+		},
 		'Europe/Berlin' => {
 			exemplarCity => q#بٔرلِن#,
+		},
+		'Europe/Bratislava' => {
+			exemplarCity => q#بریٹیسلاوا#,
 		},
 		'Europe/Brussels' => {
 			exemplarCity => q#برسٕلس#,
@@ -4058,13 +4481,16 @@ has 'time_zone_names' => (
 			exemplarCity => q#بَچاریسٹ#,
 		},
 		'Europe/Budapest' => {
-			exemplarCity => q#بُڑاپیسٹ#,
+			exemplarCity => q#بُڈاپیسٹ#,
+		},
+		'Europe/Busingen' => {
+			exemplarCity => q#بوسِنگین#,
 		},
 		'Europe/Chisinau' => {
 			exemplarCity => q#چِسیٖنو#,
 		},
 		'Europe/Copenhagen' => {
-			exemplarCity => q#کوپَنہیگَن#,
+			exemplarCity => q#کوپن ہیگن#,
 		},
 		'Europe/Dublin' => {
 			exemplarCity => q#ڈَبلِن#,
@@ -4075,11 +4501,20 @@ has 'time_zone_names' => (
 		'Europe/Gibraltar' => {
 			exemplarCity => q#گِبرالٹَر#,
 		},
+		'Europe/Guernsey' => {
+			exemplarCity => q#گویرنسے#,
+		},
 		'Europe/Helsinki' => {
 			exemplarCity => q#حؠلسِنکی#,
 		},
+		'Europe/Isle_of_Man' => {
+			exemplarCity => q#آئل آف مین#,
+		},
 		'Europe/Istanbul' => {
 			exemplarCity => q#اِستانبُل#,
+		},
+		'Europe/Jersey' => {
+			exemplarCity => q#جرسی#,
 		},
 		'Europe/Kaliningrad' => {
 			exemplarCity => q#کَلِناِنگرَد#,
@@ -4087,8 +4522,14 @@ has 'time_zone_names' => (
 		'Europe/Kiev' => {
 			exemplarCity => q#کیٖو#,
 		},
+		'Europe/Kirov' => {
+			exemplarCity => q#کیرو#,
+		},
 		'Europe/Lisbon' => {
 			exemplarCity => q#لِسبَن#,
+		},
+		'Europe/Ljubljana' => {
+			exemplarCity => q#لِیوٗب لِیانا#,
 		},
 		'Europe/London' => {
 			exemplarCity => q#لَندَن#,
@@ -4100,10 +4541,13 @@ has 'time_zone_names' => (
 			exemplarCity => q#لَکزٕمبٔرگ#,
 		},
 		'Europe/Madrid' => {
-			exemplarCity => q#میڑرِڑ#,
+			exemplarCity => q#میڈریڈ#,
 		},
 		'Europe/Malta' => {
 			exemplarCity => q#مالٹا#,
+		},
+		'Europe/Mariehamn' => {
+			exemplarCity => q#میری ہیم#,
 		},
 		'Europe/Minsk' => {
 			exemplarCity => q#مِنسک#,
@@ -4120,6 +4564,12 @@ has 'time_zone_names' => (
 		'Europe/Paris' => {
 			exemplarCity => q#پیرِس#,
 		},
+		'Europe/Podgorica' => {
+			exemplarCity => q#پوڈگوریکا#,
+		},
+		'Europe/Prague' => {
+			exemplarCity => q#پراگ#,
+		},
 		'Europe/Riga' => {
 			exemplarCity => q#رِگا#,
 		},
@@ -4129,8 +4579,20 @@ has 'time_zone_names' => (
 		'Europe/Samara' => {
 			exemplarCity => q#سَمارا#,
 		},
+		'Europe/San_Marino' => {
+			exemplarCity => q#سین مرینو#,
+		},
+		'Europe/Sarajevo' => {
+			exemplarCity => q#سارا جیوو#,
+		},
+		'Europe/Saratov' => {
+			exemplarCity => q#ساراٹو#,
+		},
 		'Europe/Simferopol' => {
 			exemplarCity => q#سِمفیروپول#,
+		},
+		'Europe/Skopje' => {
+			exemplarCity => q#سِکوپیے#,
 		},
 		'Europe/Sofia' => {
 			exemplarCity => q#سوفِیا#,
@@ -4144,11 +4606,17 @@ has 'time_zone_names' => (
 		'Europe/Tirane' => {
 			exemplarCity => q#ٹِرین#,
 		},
+		'Europe/Ulyanovsk' => {
+			exemplarCity => q#اولیانووسک#,
+		},
 		'Europe/Uzhgorod' => {
 			exemplarCity => q#اُزگورود#,
 		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#وادُز#,
+		},
+		'Europe/Vatican' => {
+			exemplarCity => q#ویٹیکن#,
 		},
 		'Europe/Vienna' => {
 			exemplarCity => q#وِیَننا#,
@@ -4161,6 +4629,9 @@ has 'time_zone_names' => (
 		},
 		'Europe/Warsaw' => {
 			exemplarCity => q#وارسا#,
+		},
+		'Europe/Zagreb' => {
+			exemplarCity => q#زگریب#,
 		},
 		'Europe/Zaporozhye' => {
 			exemplarCity => q#زَپوروزَے#,
@@ -4182,18 +4653,23 @@ has 'time_zone_names' => (
 				'standard' => q#مشرقی یوٗرپی سٹینڑاڑ ٹایِم#,
 			},
 		},
+		'Europe_Further_Eastern' => {
+			long => {
+				'standard' => q#مزید مشرقی یورپی ٹائم#,
+			},
+		},
 		'Europe_Western' => {
 			long => {
 				'daylight' => q#مغرِبی یوٗرِپی سَمَر ٹایِم#,
 				'generic' => q#مغرِبی یوٗرپی ٹایِم#,
-				'standard' => q#مغرِبی یوٗرپی سٹینڑاڑ ٹایِم#,
+				'standard' => q#مغرِبی یوٗرپی سٹینڈرڈ ٹایِم#,
 			},
 		},
 		'Falkland' => {
 			long => {
-				'daylight' => q#فاکلینڑ سَمَر ٹایِم#,
-				'generic' => q#فاکلینڑ ٹایِم#,
-				'standard' => q#فاکلینڑ سٹینڑاڑ ٹایِم#,
+				'daylight' => q#فالک لینڈ جزیرٕ سَمَر ٹائم#,
+				'generic' => q#فالک لینڈ جزیرٕ ٹائم#,
+				'standard' => q#فالک لینڈ جزیرٕ سٹینڈرڈ ٹائم#,
 			},
 		},
 		'Fiji' => {
@@ -4210,7 +4686,7 @@ has 'time_zone_names' => (
 		},
 		'French_Southern' => {
 			long => {
-				'standard' => q#جنوٗبی فرؠنچ ٹایِم#,
+				'standard' => q#فرینچ جنوبی تٕہ انٹارکٹِک ٹائم#,
 			},
 		},
 		'GMT' => {
@@ -4232,7 +4708,7 @@ has 'time_zone_names' => (
 			long => {
 				'daylight' => q#جورجِیاہُک سَمَر ٹایِم#,
 				'generic' => q#جورجِیاہُک ٹایِم#,
-				'standard' => q#جورجِیاہُک سٹینڑاڑ ٹایِم#,
+				'standard' => q#جورجِیاہُک سٹینڈرڈ ٹایِم#,
 			},
 		},
 		'Gilbert_Islands' => {
@@ -4242,16 +4718,16 @@ has 'time_zone_names' => (
 		},
 		'Greenland_Eastern' => {
 			long => {
-				'daylight' => q#مشرِقی گریٖن لینڑُک سَمَر ٹایِم#,
-				'generic' => q#مشرِقی گریٖن لینڑُک ٹایِم#,
-				'standard' => q#مشرِقی گریٖن لینڑُک سٹینڑاڑ ٹایِم#,
+				'daylight' => q#مشرِقی گریٖن لینڈُک سَمَر ٹایِم#,
+				'generic' => q#مشرِقی گریٖن لینڈُک ٹایِم#,
+				'standard' => q#مشرِقی گریٖن لینڈُک سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Greenland_Western' => {
 			long => {
-				'daylight' => q#مغرِبی گریٖن لینڑُک سَمَر ٹایِم#,
-				'generic' => q#مغرِبی گریٖن لینڑُک ٹایِم#,
-				'standard' => q#مغرِبی گریٖن لینڑُک سٹینڑاڑ ٹایِم#,
+				'daylight' => q#مغرِبی گریٖن لینڈُک سَمَر ٹایِم#,
+				'generic' => q#مغرِبی گریٖن لینڈُک ٹایِم#,
+				'standard' => q#مغرِبی گریٖن لینڈُک سٹینڑاڑ ٹایِم#,
 			},
 		},
 		'Guam' => {
@@ -4261,7 +4737,7 @@ has 'time_zone_names' => (
 		},
 		'Gulf' => {
 			long => {
-				'standard' => q#گَلف سٹینڑاڑ ٹایِم#,
+				'standard' => q#گَلف سٹینڈرڈ ٹایِم#,
 			},
 		},
 		'Guyana' => {
@@ -4278,16 +4754,16 @@ has 'time_zone_names' => (
 		},
 		'Hong_Kong' => {
 			long => {
-				'daylight' => q#حانگ کانگ سَمَر ٹایِم#,
-				'generic' => q#حانگ کانگ ٹایِم#,
-				'standard' => q#حانگ کانگ سٹینڑاڑ ٹایِم#,
+				'daylight' => q#ہانگ کانگ سَمر ٹائم#,
+				'generic' => q#ہانگ کانگ ٹائم#,
+				'standard' => q#ہانگ کانگ سٹینڈرڈ ٹائم#,
 			},
 		},
 		'Hovd' => {
 			long => {
 				'daylight' => q#حووڑ سَمَر ٹایِم#,
 				'generic' => q#حووڑ ٹایِم#,
-				'standard' => q#حووڑ سٹینڑاڑ ٹایِم#,
+				'standard' => q#حووڑ سٹینڈرڈ ٹایِم#,
 			},
 		},
 		'India' => {
@@ -4330,7 +4806,7 @@ has 'time_zone_names' => (
 		},
 		'Indian_Ocean' => {
 			long => {
-				'standard' => q#ہِندوستٲنۍ اوشَن ٹایِن#,
+				'standard' => q#ہِندوستٲنۍ اوشَن ٹائم#,
 			},
 		},
 		'Indochina' => {
@@ -4364,21 +4840,21 @@ has 'time_zone_names' => (
 			long => {
 				'daylight' => q#اِرکُٹسک سَمَر ٹایِم#,
 				'generic' => q#اِرکُٹسک ٹایِم#,
-				'standard' => q#اِرکُٹسک سٹینڑاڑ ٹایِم#,
+				'standard' => q#اِرکُٹسک سٹینڈرڈ ٹایِم#,
 			},
 		},
 		'Israel' => {
 			long => {
 				'daylight' => q#اِسرٲیِلی ڑےلایِٔٹ ٹایِم#,
 				'generic' => q#اِسرٲیِلی ٹایِم#,
-				'standard' => q#اِسرٲیِلی سٹینڑاڑ ٹایِم#,
+				'standard' => q#اِسرٲیِلی سٹینڈرڈ ٹایِم#,
 			},
 		},
 		'Japan' => {
 			long => {
 				'daylight' => q#جاپٲنۍ ڑےلایِٔٹ ٹایِم#,
 				'generic' => q#جاپٲنۍ ٹایِم#,
-				'standard' => q#جاپٲنۍ سٹینڑاڑ ٹایِم#,
+				'standard' => q#جاپٲنۍ سٹینڈرڈ ٹایِم#,
 			},
 		},
 		'Kamchatka' => {
@@ -4390,19 +4866,19 @@ has 'time_zone_names' => (
 		},
 		'Kazakhstan_Eastern' => {
 			long => {
-				'standard' => q#مشرِقی کَزاکھِستان ٹایِم#,
+				'standard' => q#مشرقی قازقستان ٹائم#,
 			},
 		},
 		'Kazakhstan_Western' => {
 			long => {
-				'standard' => q#مغرِبی کَزاکھِستان ٹایِم#,
+				'standard' => q#مغربی قازقستان ٹائم#,
 			},
 		},
 		'Korea' => {
 			long => {
 				'daylight' => q#کورِیا ڑےلایِٔٹ ٹایِم#,
 				'generic' => q#کورِیا ٹایِم#,
-				'standard' => q#کورِیا سٹینڑاڑ ٹایِم#,
+				'standard' => q#کورِیا سٹینڈرڈ ٹایِم#,
 			},
 		},
 		'Kosrae' => {
@@ -4414,12 +4890,12 @@ has 'time_zone_names' => (
 			long => {
 				'daylight' => q#کرؠسنوےیارسک سَمَر ٹایِم#,
 				'generic' => q#کرؠسنوےیارسک ٹایِم#,
-				'standard' => q#کرؠسنوےیارسک سٹینڑاڑ ٹایِم#,
+				'standard' => q#کرؠسنوےیارسک سٹینڈرڈ ٹایِم#,
 			},
 		},
 		'Kyrgystan' => {
 			long => {
-				'standard' => q#کِرگِستان ٹایِم#,
+				'standard' => q#کرغزستان ٹائم#,
 			},
 		},
 		'Lanka' => {
@@ -4450,7 +4926,7 @@ has 'time_zone_names' => (
 			long => {
 				'daylight' => q#مَگَدَن سَمَر ٹایِم#,
 				'generic' => q#مَگَدَن ٹایِم#,
-				'standard' => q#مَگَدَن سٹینڑاڑ ٹایِم#,
+				'standard' => q#مَگَدَن سٹینڈرڈ ٹایِم#,
 			},
 		},
 		'Malaysia' => {
@@ -4477,7 +4953,7 @@ has 'time_zone_names' => (
 			long => {
 				'daylight' => q#مورِشَس سَمَر ٹایِم#,
 				'generic' => q#مورِشَس ٹایِم#,
-				'standard' => q#مورِشَس سٹینڑاڑ ٹایِم#,
+				'standard' => q#مورِشَس سٹینڈرڈ ٹایِم#,
 			},
 		},
 		'Mawson' => {
@@ -4485,18 +4961,32 @@ has 'time_zone_names' => (
 				'standard' => q#ماسَن ٹایِم#,
 			},
 		},
+		'Mexico_Northwest' => {
+			long => {
+				'daylight' => q#شُمال مغربی میکسیکو ڈے لائٹ ٹائم#,
+				'generic' => q#شُمال مغربی میکسیکو ٹائم#,
+				'standard' => q#شُمال مغربی میکسیکو سٹینڈرڈ ٹائم#,
+			},
+		},
+		'Mexico_Pacific' => {
+			long => {
+				'daylight' => q#میکسیکن پیسیفک ڈے لائٹ ٹائم#,
+				'generic' => q#میکسیکن پیسیفک ٹائم#,
+				'standard' => q#میکسیکن پیسیفک سٹینڈرڈ ٹائم#,
+			},
+		},
 		'Mongolia' => {
 			long => {
-				'daylight' => q#مونگولِیا سَمَر ٹایِم#,
-				'generic' => q#مونگولِیا ٹایِم#,
-				'standard' => q#مونگولِیا سٹینڑاڑ ٹایِم#,
+				'daylight' => q#اولن باٹر سَمَر ٹایِم#,
+				'generic' => q#اولن باٹر ٹائم#,
+				'standard' => q#اولن باٹر سٹینڈرڈ ٹائم#,
 			},
 		},
 		'Moscow' => {
 			long => {
 				'daylight' => q#ماسکو سَمَر ٹایِم#,
 				'generic' => q#ماسکَو ٹایِم#,
-				'standard' => q#ماسکو سٹینڑاڑ ٹایِم#,
+				'standard' => q#ماسکو سٹینڈرڈ ٹایِم#,
 			},
 		},
 		'Myanmar' => {
@@ -4530,9 +5020,9 @@ has 'time_zone_names' => (
 		},
 		'Newfoundland' => {
 			long => {
-				'daylight' => q#نیوٗ فاونڑ لینڑ ڑےلایِٔٹ ٹایِم#,
-				'generic' => q#نیوٗ فاونڑلینڑ ٹایِم#,
-				'standard' => q#نیوٗ فاونڑلینڑ سٹینڑاڑ ٹایِم#,
+				'daylight' => q#نیو فاؤنڈ لینڈ ڈے لائٹ ٹائم#,
+				'generic' => q#نیو فاؤنڈ لینڈ ٹائم#,
+				'standard' => q#نیو فاؤنڈ لینڈ سٹینڈرڈ ٹائم#,
 			},
 		},
 		'Niue' => {
@@ -4549,9 +5039,9 @@ has 'time_zone_names' => (
 		},
 		'Noronha' => {
 			long => {
-				'daylight' => q#نورونہا سَمَر ٹایِم#,
-				'generic' => q#نورونہا ٹایِم#,
-				'standard' => q#نورونہا سٹینڑاڑ ٹایِم#,
+				'daylight' => q#فرنینڈو ڈی نورونہا سَمَر ٹائم#,
+				'generic' => q#فرنینڈو ڈی نورونہا ٹائم#,
+				'standard' => q#فرنینڈو ڈی نورونہا سٹینڈرڈ ٹائم#,
 			},
 		},
 		'North_Mariana' => {
@@ -4563,14 +5053,14 @@ has 'time_zone_names' => (
 			long => {
 				'daylight' => q#نۄوۄسِبٔرسک سَمَر ٹایِم#,
 				'generic' => q#نۄوۄسِبٔرسک ٹایِم#,
-				'standard' => q#نۄوۄسِبٔرسک سٹینڑاڑ ٹایِم#,
+				'standard' => q#نۄوۄسِبٔرسک سٹینڈرڈ ٹایِم#,
 			},
 		},
 		'Omsk' => {
 			long => {
 				'daylight' => q#اۄمسک سَمَر ٹایِم#,
 				'generic' => q#اۄمسک ٹایِم#,
-				'standard' => q#اۄمسک سٹینڑاڑ ٹایِم#,
+				'standard' => q#اۄمسک سٹینڈرڈ ٹایِم#,
 			},
 		},
 		'Pacific/Apia' => {
@@ -4708,14 +5198,14 @@ has 'time_zone_names' => (
 			long => {
 				'daylight' => q#پیرؠگوے سَمَر ٹایِم#,
 				'generic' => q#پیرؠگوے ٹایِم#,
-				'standard' => q#پیرؠگوے سٹینڑاڑ ٹایِم#,
+				'standard' => q#پیرؠگوے سٹینڈرڈ ٹایِم#,
 			},
 		},
 		'Peru' => {
 			long => {
 				'daylight' => q#پٔروٗ سَمَر ٹایِم#,
 				'generic' => q#پٔروٗ ٹایِم#,
-				'standard' => q#پٔروٗ سٹینڑاڑ ٹایِم#,
+				'standard' => q#پٔروٗ سٹینڈرڈ ٹایِم#,
 			},
 		},
 		'Philippines' => {
@@ -4747,6 +5237,11 @@ has 'time_zone_names' => (
 				'standard' => q#پونیپ ٹایِم#,
 			},
 		},
+		'Pyongyang' => {
+			long => {
+				'standard' => q#یونگ یانگ ٹائم#,
+			},
+		},
 		'Qyzylorda' => {
 			long => {
 				'daylight' => q#قِزلوڑا سَمَر ٹایِم#,
@@ -4768,7 +5263,7 @@ has 'time_zone_names' => (
 			long => {
 				'daylight' => q#سَکھؠلِن سَمَر ٹایِم#,
 				'generic' => q#سَکھؠلِن ٹایِم#,
-				'standard' => q#سَکھؠلِن سٹینڑاڑ ٹایِم#,
+				'standard' => q#سَکھؠلِن سٹینڈرڈ ٹایِم#,
 			},
 		},
 		'Samara' => {
@@ -4820,9 +5315,16 @@ has 'time_zone_names' => (
 				'standard' => q#ٹاہِٹی ٹایِم#,
 			},
 		},
+		'Taipei' => {
+			long => {
+				'daylight' => q#ٹے پے ڈے لائٹ ٹائم#,
+				'generic' => q#ٹے پے ٹائم#,
+				'standard' => q#ٹے پے سٹینڈرڈ ٹائم#,
+			},
+		},
 		'Tajikistan' => {
 			long => {
-				'standard' => q#تازِکِستان ٹایِم#,
+				'standard' => q#تاجکستان ٹائم#,
 			},
 		},
 		'Tokelau' => {
@@ -4845,8 +5347,8 @@ has 'time_zone_names' => (
 		'Turkmenistan' => {
 			long => {
 				'daylight' => q#تُرکمؠنِستان سَمَر ٹایِم#,
-				'generic' => q#تُرکمؠنِستان ٹایِم#,
-				'standard' => q#تُرکمؠنِستان سٹینڑاڑ ٹایِم#,
+				'generic' => q#ترکمانستان ٹائم#,
+				'standard' => q#ترکمانستان سٹینڈرڈ ٹائم#,
 			},
 		},
 		'Tuvalu' => {
@@ -4858,14 +5360,14 @@ has 'time_zone_names' => (
 			long => {
 				'daylight' => q#یوٗرؠگوَے سَمَر ٹایِم#,
 				'generic' => q#یوٗرؠگوَے ٹایِم#,
-				'standard' => q#یوٗرؠگوَے سٹینڑاڑ ٹایِم#,
+				'standard' => q#یوٗرؠگوَے سٹینڈرڈ ٹایِم#,
 			},
 		},
 		'Uzbekistan' => {
 			long => {
 				'daylight' => q#اُزبیکِستانُک سَمَر ٹایِم#,
 				'generic' => q#اُزبیکِستان ٹایِم#,
-				'standard' => q#اُزبیکِستان سٹینڑاڑ ٹایِم#,
+				'standard' => q#اُزبیکِستان سٹینڈرڈ ٹایِم#,
 			},
 		},
 		'Vanuatu' => {
@@ -4884,14 +5386,14 @@ has 'time_zone_names' => (
 			long => {
 				'daylight' => q#ولاڑِووسٹوک سَمَر ٹایِم#,
 				'generic' => q#ولاڑِووسٹوک ٹایِم#,
-				'standard' => q#ولاڑِووسٹوک سٹینڑاڑ ٹایِم#,
+				'standard' => q#ولاڑِووسٹوک سٹینڈرڈ ٹایِم#,
 			},
 		},
 		'Volgograd' => {
 			long => {
 				'daylight' => q#وولگوگریڑ سَمَر ٹایِم#,
 				'generic' => q#وولگوگریڑ ٹایِم#,
-				'standard' => q#وولگوگریڑ سٹینڑاڑ ٹایِم#,
+				'standard' => q#وولگوگریڑ سٹینڈرڈ ٹایِم#,
 			},
 		},
 		'Vostok' => {
@@ -4913,14 +5415,19 @@ has 'time_zone_names' => (
 			long => {
 				'daylight' => q#یَکُٹُسک سَمَر ٹایِم#,
 				'generic' => q#یَکُٹسک ٹایِم#,
-				'standard' => q#یَکُٹسک سٹینڑاڑ ٹایِم#,
+				'standard' => q#یَکُٹسک سٹینڈرڈ ٹایِم#,
 			},
 		},
 		'Yekaterinburg' => {
 			long => {
 				'daylight' => q#یؠکَٹرِنبٔرگ سَمَر ٹایِم#,
 				'generic' => q#یؠکَٹٔرِنبٔرگ ٹایِم#,
-				'standard' => q#یؠکَٹٔرِنبٔرگ سٹینڑاڑ ٹایِم#,
+				'standard' => q#یؠکَٹٔرِنبٔرگ سٹینڈرڈ ٹایِم#,
+			},
+		},
+		'Yukon' => {
+			long => {
+				'standard' => q#یوکون ٹائم#,
 			},
 		},
 	 } }

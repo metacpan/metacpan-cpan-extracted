@@ -1,3 +1,16 @@
+0.003   2024-01-15  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Forgot to set ns_prefix option to
+          Module::Load::Util::instantiate_class_with_optional_args().
+
+
+0.002   2024-01-15  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc][bugfix] Fix example in Synopsis.
+
+
 0.001   2024-01-15  Released-By: PERLANCAR
 
         - First version.

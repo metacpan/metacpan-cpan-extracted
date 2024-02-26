@@ -1,6 +1,6 @@
 package Net::SAML2::Role::VerifyXML;
 use Moose::Role;
-our $VERSION = '0.77'; # VERSION
+our $VERSION = '0.78'; # VERSION
 
 use Net::SAML2::XML::Sig;
 use Crypt::OpenSSL::Verify;
@@ -81,7 +81,7 @@ Net::SAML2::Role::VerifyXML - A role to verify the SAML response XML
 
 =head1 VERSION
 
-version 0.77
+version 0.78
 
 =head1 SYNOPSIS
 

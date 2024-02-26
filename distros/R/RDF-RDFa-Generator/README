@@ -42,9 +42,9 @@ DESCRIPTION
   Public Methods
     `$gen->create_document($model, %opts)`
         Creates a new RDFa file containing triples. $model is an
-        RDF::Trine::Model object providing the triples. Returns an
-        XML::LibXML::Document object suitable for serializing using its
-        `toString` method.
+        Attean::QuadModel (where the graph name is not used) object providing
+        the triples. Returns an XML::LibXML::Document object suitable for
+        serializing using its `toString` method.
 
         If you're planning on serving the RDFa with the text/html media type,
         then it is recommended that you use HTML::HTML5::Writer to serialize
@@ -62,9 +62,9 @@ DESCRIPTION
     `$gen->inject_document($document, $model)`
         Injects an existing document with triples. $document is an
         XML::LibXML::Document to inject, or a well-formed XML string. $model
-        is an RDF::Trine::Model object providing the triples. Returns an
-        XML::LibXML::Document object suitable for serializing using its
-        `toString` method.
+        is an Attean::QuadModel (where the graph name is not used) object
+        providing the triples. Returns an XML::LibXML::Document object
+        suitable for serializing using its `toString` method.
 
         See `create_document` for information about serving the RDFa with the
         text/html media type.
@@ -74,10 +74,11 @@ DESCRIPTION
 
     `$gen->nodes($model)`
         Provides triple-laden XML::LibXML::Elements to be added to a document.
-        $model is an RDF::Trine::Model object providing the triples. If called
-        in list context, returns a list of XML::LibXML::Element objects which
-        can be added to a document; otherwise returns an XML::LibXML::NodeList
-        containing a list of such elements.
+        $model is an Attean::QuadModel (where the graph name is not used)
+        object providing the triples. If called in list context, returns a
+        list of XML::LibXML::Element objects which can be added to a document;
+        otherwise returns an XML::LibXML::NodeList containing a list of such
+        elements.
 
         Can also be called as a class method. See `create_document` for
         details.

@@ -3,9 +3,9 @@ package Sah::Schemas::Date;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-12'; # DATE
+our $DATE = '2023-12-09'; # DATE
 our $DIST = 'Sah-Schemas-Date'; # DIST
-our $VERSION = '0.018'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 1;
 # ABSTRACT: Sah schemas related to date
@@ -22,7 +22,7 @@ Sah::Schemas::Date - Sah schemas related to date
 
 =head1 VERSION
 
-This document describes version 0.018 of Sah::Schemas::Date (from Perl distribution Sah-Schemas-Date), released on 2022-10-12.
+This document describes version 0.019 of Sah::Schemas::Date (from Perl distribution Sah-Schemas-Date), released on 2023-12-09.
 
 =head1 SYNOPSIS
 
@@ -89,7 +89,7 @@ L<Sah::Schema::date::month::en_or_id> (English/Indonesian), etc.
 
 =item * L<date::month_name::en|Sah::Schema::date::month_name::en>
 
-Month name (abbreviated or full, in English), e.g. jan or "September".
+Month name (abbreviated or full, in English), e.g. "jan" or "September".
 
 See also: L<Sah::Schema::date::month_num>.
 
@@ -122,7 +122,7 @@ Second of minute (0-60), e.g. 39.
 
 =item * L<date::tz_name|Sah::Schema::date::tz_name>
 
-Timezone name (validity not checked), e.g. AsiaE<sol>Jakarta.
+Timezone name (validity not checked), e.g. "AsiaE<sol>Jakarta".
 
 Currently no validation for valid timezone names. But completion is provided.
 
@@ -147,7 +147,7 @@ A coercion from timezone name is also provided.
 
 =item * L<date::tz_offset_lax|Sah::Schema::date::tz_offset_lax>
 
-Timezone offset in seconds from UTC (any offset is allowed, coercible from string), e.g. 1 or 25200 e.g. UTC+7.
+Timezone offset in seconds from UTC (any offset is allowed, coercible from string), e.g. 1 or 25200 e.g. "UTC+7".
 
 This schema allows timezone offsets that are not known to exist, e.g. 1 second
 (+00:00:01). If you only want ot allow timezone offsets that are known to exist,
@@ -166,6 +166,38 @@ A coercion from timezone name is also provided.
 =item * L<date::year|Sah::Schema::date::year>
 
 Year number (AD, starting from 1), e.g. 2022.
+
+=item * L<datetime::default_end_of_last_month_local|Sah::Schema::datetime::default_end_of_last_month_local>
+
+Datetime with default of end of last month (23:59:59E<sol>60), local time.
+
+=item * L<datetime::default_end_of_last_month_utc|Sah::Schema::datetime::default_end_of_last_month_utc>
+
+Datetime with default of end of last month (23:59:59E<sol>60), UTC.
+
+=item * L<datetime::default_end_of_yesterday_local|Sah::Schema::datetime::default_end_of_yesterday_local>
+
+Datetime with default of end of yesterday (23:59:59E<sol>60), local time.
+
+=item * L<datetime::default_end_of_yesterday_utc|Sah::Schema::datetime::default_end_of_yesterday_utc>
+
+Datetime with default of end of yesterday (23:59:59E<sol>60), UTC.
+
+=item * L<datetime::default_start_of_this_month_local|Sah::Schema::datetime::default_start_of_this_month_local>
+
+Datetime with default of start of this month (00:00:00 day 1), local time.
+
+=item * L<datetime::default_start_of_this_month_utc|Sah::Schema::datetime::default_start_of_this_month_utc>
+
+Datetime with default of start of this month (00:00:00 day 1), UTC.
+
+=item * L<datetime::default_start_of_today_local|Sah::Schema::datetime::default_start_of_today_local>
+
+Datetime with default of start of today (00:00:00), local time.
+
+=item * L<datetime::default_start_of_today_utc|Sah::Schema::datetime::default_start_of_today_utc>
+
+Datetime with default of start of today (00:00:00), UTC.
 
 =back
 
@@ -209,7 +241,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2019 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020, 2019 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -26,7 +26,7 @@ use constant {
     I2C_RP1     => 3
 };
 
-our $VERSION ='0.90';
+our $VERSION ='0.91';
 
 __PACKAGE__->create_accessors( qw ( fh fno address busmode readmode ) );
 

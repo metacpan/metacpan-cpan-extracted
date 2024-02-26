@@ -1,6 +1,5 @@
 package Net::EANSearch;
 
-use 5.030000;
 use strict;
 use warnings;
 
@@ -30,7 +29,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '1.02';
+our $VERSION = '1.06';
 
 our $ALL_LANGUAGES = 99;
 our $ENGLISH = 1;
@@ -60,7 +59,7 @@ sub new {
 	my $token = shift;
 
 	my $ua = LWP::UserAgent->new();
-	$ua->timeout(10);
+	$ua->timeout(30);
 
 	my $self = bless { base_uri => $BASE_URI . $token, ua => $ua }, $class;
 
@@ -177,9 +176,11 @@ Net::EANSearch - Perl module for EAN and ISBN lookup and validation using the AP
 
   use Net::EANSearch;
 
-  my $eansearch = EANSearch->new($API_TOKEN);
+  my $eansearch = Net::EANSearch->new($API_TOKEN);
 
-  my $product = $eansearch->barcodeLookup(5099750442227);
+  my $product = $eansearch->barcodeLookup('5099750442227');
+
+  my $book = $eansearch->isbnLookup('1119578884');
 
 =head1 DESCRIPTION
 
@@ -202,7 +203,7 @@ Optionally, you can specify a preferred language for the result. See appendix B 
 
 =item isbnLookup($isbn)
 
-Search for an ISBN number (ISBN-10 or ISBN-13 format).
+Lookup book data for an ISBN number (ISBN-10 or ISBN-13 format).
 
 =item barcodePrefixSearch($prefix [, $language, $page])
 
@@ -214,7 +215,7 @@ If there are many results, you may need to page through the results to retrieve 
 
 =item productSearch($name [, $language, $page])
 
-Search a certain product category for a product name or keyword. See appendix C in the API manual for category numbers.
+Search the database by product name or keyword.
 
 Optionally, you can specify a preferred language for the results.
 
@@ -222,7 +223,7 @@ If there are many results, you may need to page through the results to retrieve 
 
 =item categorySearch($category, $name [, $language, $page])
 
-Search the database by product name or keyword.
+Search a certain product category for a product name or keyword. See appendix C in the API manual for category numbers.
 
 Optionally, you can specify a preferred language for the results.
 
@@ -238,7 +239,7 @@ Generate a PNG image with the barcode for the EAN number.
 
 =item verifyChecksum($ean)
 
-Verify if the checksum in the EAN numnber is valid.
+Verify if the checksum in the EAN number is valid.
 
 =back
 

@@ -515,8 +515,8 @@ sub main
 
         for my $host (split(',', $host_list))
         {
-            die "host does not exist\n" unless $sysync->is_valid_host($host);
-            die "host $host not mapped to addresses\n" unless $hosts->{hosts}{$host};
+            die "host: $host does not exist\n" unless $sysync->is_valid_host($host);
+            die "host: $host not mapped to addresses\n" unless $hosts->{hosts}{$host};
         }
 
         for my $host (split(',', $host_list))

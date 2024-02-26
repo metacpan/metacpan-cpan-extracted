@@ -37,7 +37,7 @@ struct floating_decimal_128 quad_to_fd128(NV d) {
 }
 #endif
 
-double M_RYU_s2d(char * buffer) {
+double _s2d(char * buffer) {
 #if NVSIZE == 8
   double nv;
   s2d(buffer, &nv);
@@ -139,7 +139,7 @@ MODULE = Math::Ryu  PACKAGE = Math::Ryu PREFIX = M_RYU_
 PROTOTYPES: DISABLE
 
 double
-M_RYU_s2d (buffer)
+_s2d (buffer)
 	char *	buffer
 
 SV *

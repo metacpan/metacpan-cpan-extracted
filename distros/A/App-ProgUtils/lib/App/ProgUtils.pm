@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-09'; # DATE
+our $DATE = '2023-12-03'; # DATE
 our $DIST = 'App-ProgUtils'; # DIST
-our $VERSION = '0.203'; # VERSION
+our $VERSION = '0.204'; # VERSION
 
 our %SPEC;
 
@@ -101,7 +101,7 @@ App::ProgUtils - Command line to manipulate programs in PATH
 
 =head1 VERSION
 
-This document describes version 0.203 of App::ProgUtils (from Perl distribution App-ProgUtils), released on 2022-08-09.
+This document describes version 0.204 of App::ProgUtils (from Perl distribution App-ProgUtils), released on 2023-12-03.
 
 =head1 SYNOPSIS
 
@@ -110,21 +110,23 @@ programs found in PATH:
 
 =over
 
-=item * L<allprogs>
+=item 1. L<allprogs>
 
-=item * L<list-all-programs-in-path>
+=item 2. L<list-all-programs-in-path>
 
-=item * L<progcat>
+=item 3. L<progcat>
 
-=item * L<progedit>
+=item 4. L<progedit>
 
-=item * L<progless>
+=item 5. L<progless>
 
-=item * L<proglist>
+=item 6. L<proglist>
 
-=item * L<progman>
+=item 7. L<progman>
 
-=item * L<progpath>
+=item 8. L<progpath>
+
+=item 9. L<scriptlist>
 
 =back
 
@@ -148,6 +150,8 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<with_path> => I<bool>
+
+(No description)
 
 
 =back
@@ -232,13 +236,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2019, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020, 2019, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,11 @@
+msgid "# NAME"
+msgstr "#NAME"
+
 msgid "Liveman::Project - создать новый Perl-репозиторий"
 msgstr "Liveman::Project - create a new Perl repository"
+
+msgid "# DESCRIPTION"
+msgstr "#DESCRIPTION"
 
 msgid "Создает новый Perl-репозиторий."
 msgstr "Creates a new Perl repository."

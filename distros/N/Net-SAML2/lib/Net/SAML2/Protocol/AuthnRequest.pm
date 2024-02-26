@@ -1,12 +1,13 @@
 package Net::SAML2::Protocol::AuthnRequest;
 use Moose;
 
-our $VERSION = '0.77'; # VERSION
+our $VERSION = '0.78'; # VERSION
 use MooseX::Types::URI            qw/ Uri /;
 use MooseX::Types::Common::String qw/ NonEmptySimpleStr /;
 use XML::Generator;
 use List::Util        qw(any);
 use URN::OASIS::SAML2 qw(:urn BINDING_HTTP_POST);
+use Net::SAML2::Util ();
 
 with 'Net::SAML2::Role::ProtocolMessage';
 
@@ -106,9 +107,10 @@ around BUILDARGS => sub {
 
     my %params = @_;
     if ($params{nameid_format} && !defined $params{nameidpolicy_format}) {
-        warn "You are using nameid_format, this field has changed to "
-          . "nameidpolicy_format. This field will be used for other purposes "
-          . "in an upcoming release. Please change your code ASAP.";
+        Net::SAML2::Util::deprecation_warning "You are using nameid_format, "
+          . "this field has changed to nameidpolicy_format. This field will "
+          . "be used for other purposes in an upcoming release. Please change "
+          . "your code ASAP.";
         $params{nameidpolicy_format} = $params{nameid_format};
     }
 
@@ -256,7 +258,7 @@ Net::SAML2::Protocol::AuthnRequest - SAML2 AuthnRequest object
 
 =head1 VERSION
 
-version 0.77
+version 0.78
 
 =head1 SYNOPSIS
 

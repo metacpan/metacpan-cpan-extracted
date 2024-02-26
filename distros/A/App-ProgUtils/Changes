@@ -1,3 +1,10 @@
+0.204   2023-12-03  Released-By: PERLANCAR; Urgency: medium
+
+        - Add utility: scriptlist.
+
+        - [cli proglist] Add option --type.
+
+
 0.203   2022-08-09  Released-By: PERLANCAR; Urgency: medium
 
         - [bugfix] Make sure we get completion answers in array (not hash)

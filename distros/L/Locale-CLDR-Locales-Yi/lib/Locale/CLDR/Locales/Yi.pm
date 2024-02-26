@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Yi - Package for language Yiddish
 
 package Locale::CLDR::Locales::Yi;
 # This file auto generated from Data\common\main\yi.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -24,22 +24,6 @@ use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
 extends('Locale::CLDR::Locales::Root');
-# Need to add code for Key type pattern
-sub display_name_pattern {
-	my ($self, $name, $region, $script, $variant) = @_;
-
-	my $display_pattern = '{0} ({1})';
-	$display_pattern =~s/\{0\}/$name/g;
-	my $subtags = join '{0}, {1}', grep {$_} (
-		$region,
-		$script,
-		$variant,
-	);
-
-	$display_pattern =~s/\{1\}/$subtags/g;
-	return $display_pattern;
-}
-
 has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
@@ -433,7 +417,7 @@ has 'display_name_region' => (
  			'TD' => 'טשאַד',
  			'TG' => 'טאגא',
  			'TH' => 'טיילאַנד',
- 			'TL@alt=variant' => 'מזרח טימאר',
+ 			'TL' => 'מזרח טימאר',
  			'TM' => 'טורקמעניסטאַן',
  			'TN' => 'טוניסיע',
  			'TO' => 'טאנגאַ',
@@ -535,27 +519,19 @@ has 'characters' => (
 		no warnings 'experimental::regex_sets';
 		return {
 			auxiliary => qr{[‎‏]},
-			index => ['\u05C2', '\u05BC', '\u05BF', 'א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח', 'ט', 'י', 'כ', 'ל', 'מ', 'נ', 'ס', 'ע', 'פ', 'צ', 'ק', 'ר', 'ש', 'ת'],
-			main => qr{[א {אַ} {אָ} ב {בֿ} ג ד {דזש} ה ו {וּ} {וו} {וי} ז {זש} ח ט {טש} י {יִ} {יי} {ײַ} {כּ} כ ך ל מ ם נ ן ס ע {פּ} {פֿ} ף צ ץ ק ר ש {שׂ} {תּ} ת]},
-			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
-			punctuation => qr{[\- ‐ ‑ – — , ; \: ! ? . ׳ ' " ( ) \[ \] / ״ ־]},
+			index => ['ׂ', 'ּ', 'ֿ', 'א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח', 'ט', 'י', 'כ', 'ל', 'מ', 'נ', 'ס', 'ע', 'פ', 'צ', 'ק', 'ר', 'ש', 'ת'],
+			main => qr{[א{אַ}{אָ} ב {בֿ} ג ד {דזש} ה ו{וּ}{וו}{וי} ז {זש} ח ט {טש} י{יִ}{יי}{ײַ} {כּ} כך ל מם נן ס ע {פּ} {פֿ}ף צץ ק ר ש {שׂ} {תּ} ת]},
+			punctuation => qr{[\- ‐‑ – — , ; \: ! ? . '׳ "״ ( ) \[ \] / ־]},
 		};
 	},
 EOT
 : sub {
-		return { index => ['\u05C2', '\u05BC', '\u05BF', 'א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח', 'ט', 'י', 'כ', 'ל', 'מ', 'נ', 'ס', 'ע', 'פ', 'צ', 'ק', 'ר', 'ש', 'ת'], };
+		return { index => ['ׂ', 'ּ', 'ֿ', 'א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח', 'ט', 'י', 'כ', 'ל', 'מ', 'נ', 'ס', 'ע', 'פ', 'צ', 'ק', 'ר', 'ש', 'ת'], };
 },
 );
 
 
 has 'quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{”},
-);
-
-has 'quote_end' => (
 	is			=> 'ro',
 	isa			=> Str,
 	init_arg	=> undef,
@@ -569,56 +545,14 @@ has 'alternate_quote_start' => (
 	default		=> qq{’},
 );
 
-has 'alternate_quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{’},
-);
-
-has 'duration_units' => (
-	is			=> 'ro',
-	isa			=> HashRef[Str],
-	init_arg	=> undef,
-	default		=> sub { {
-				hm => 'h:mm',
-				hms => 'h:mm:ss',
-				ms => 'm:ss',
-			} }
-);
-
-has 'units' => (
-	is			=> 'ro',
-	isa			=> HashRef[HashRef[HashRef[Str]]],
-	init_arg	=> undef,
-	default		=> sub { {
-			} }
-);
-
 has 'listPatterns' => (
 	is			=> 'ro',
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-				start => q({0}, {1}),
-				middle => q({0}, {1}),
 				end => q({0} און {1}),
 				2 => q({0} און {1}),
 		} }
-);
-
-has 'default_numbering_system' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> 'latn',
-);
-
-has native_numbering_system => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> 'latn',
 );
 
 has traditional_numbering_system => (
@@ -626,26 +560,6 @@ has traditional_numbering_system => (
 	isa			=> Str,
 	init_arg	=> undef,
 	default		=> 'hebr',
-);
-
-has 'number_symbols' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'latn' => {
-			'decimal' => q(.),
-			'exponential' => q(E),
-			'group' => q(,),
-			'infinity' => q(∞),
-			'list' => q(;),
-			'minusSign' => q(-),
-			'nan' => q(NaN),
-			'perMille' => q(‰),
-			'percentSign' => q(%),
-			'plusSign' => q(+),
-		},
-	} }
 );
 
 has 'currencies' => (
@@ -678,23 +592,16 @@ has 'currencies' => (
 			},
 		},
 		'EUR' => {
-			symbol => '€',
 			display_name => {
 				'currency' => q(איירא),
-				'one' => q(איירא),
-				'other' => q(איירא),
 			},
 		},
 		'GBP' => {
-			symbol => '£',
 			display_name => {
 				'currency' => q(פֿונט שטערלינג),
-				'one' => q(פֿונט שטערלינג),
-				'other' => q(פֿונט שטערלינג),
 			},
 		},
 		'INR' => {
-			symbol => '₹',
 			display_name => {
 				'currency' => q(אינדישער רופי),
 				'one' => q(אינדישער רופי),
@@ -702,7 +609,6 @@ has 'currencies' => (
 			},
 		},
 		'JPY' => {
-			symbol => 'JP¥',
 			display_name => {
 				'currency' => q(יאפאנעזישער יען),
 				'one' => q(יאפאנעזישער יען),
@@ -710,7 +616,6 @@ has 'currencies' => (
 			},
 		},
 		'RUB' => {
-			symbol => 'RUB',
 			display_name => {
 				'currency' => q(רוסישער רובל),
 				'one' => q(רוסישער רובל),
@@ -723,7 +628,6 @@ has 'currencies' => (
 			},
 		},
 		'USD' => {
-			symbol => '$',
 			display_name => {
 				'currency' => q(אמעריקאנער דאלאר),
 				'one' => q(אמעריקאנער דאלאר),
@@ -743,8 +647,6 @@ has 'currencies' => (
 		'XXX' => {
 			display_name => {
 				'currency' => q(אומבאַוואוסטע וואַלוטע),
-				'one' => q(אומבאַוואוסטע וואַלוטע),
-				'other' => q(אומבאַוואוסטע וואַלוטע),
 			},
 		},
 	} },
@@ -758,25 +660,6 @@ has 'calendar_months' => (
 	default		=> sub { {
 			'gregorian' => {
 				'format' => {
-					abbreviated => {
-						nonleap => [
-							'יאַנואַר',
-							'פֿעברואַר',
-							'מערץ',
-							'אַפּריל',
-							'מיי',
-							'יוני',
-							'יולי',
-							'אויגוסט',
-							'סעפּטעמבער',
-							'אקטאבער',
-							'נאוועמבער',
-							'דעצעמבער'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'יאַנואַר',
@@ -817,81 +700,10 @@ has 'calendar_months' => (
 							
 						],
 					},
-					wide => {
-						nonleap => [
-							'יאַנואַר',
-							'פֿעברואַר',
-							'מערץ',
-							'אַפּריל',
-							'מיי',
-							'יוני',
-							'יולי',
-							'אויגוסט',
-							'סעפּטעמבער',
-							'אקטאבער',
-							'נאוועמבער',
-							'דעצעמבער'
-						],
-						leap => [
-							
-						],
-					},
 				},
 			},
 			'hebrew' => {
 				'format' => {
-					abbreviated => {
-						nonleap => [
-							'תשרי',
-							'חשוון',
-							'כסלו',
-							'טבת',
-							'שבט',
-							'אדר א׳',
-							'אדר',
-							'ניסן',
-							'אייר',
-							'סיון',
-							'תמוז',
-							'אב',
-							'אלול'
-						],
-						leap => [
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'תש',
-							'חש',
-							'כס',
-							'טב',
-							'שב',
-							'אא',
-							'אד',
-							'ני',
-							'אי',
-							'סי',
-							'תמ',
-							'אב',
-							'אל'
-						],
-						leap => [
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'תשרי',
@@ -1010,53 +822,6 @@ has 'calendar_days' => (
 	default		=> sub { {
 			'gregorian' => {
 				'format' => {
-					abbreviated => {
-						mon => 'מאָנטיק',
-						tue => 'דינסטיק',
-						wed => 'מיטוואך',
-						thu => 'דאנערשטיק',
-						fri => 'פֿרײַטיק',
-						sat => 'שבת',
-						sun => 'זונטיק'
-					},
-					short => {
-						mon => 'מאָנטיק',
-						tue => 'דינסטיק',
-						wed => 'מיטוואך',
-						thu => 'דאנערשטיק',
-						fri => 'פֿרײַטיק',
-						sat => 'שבת',
-						sun => 'זונטיק'
-					},
-					wide => {
-						mon => 'מאָנטיק',
-						tue => 'דינסטיק',
-						wed => 'מיטוואך',
-						thu => 'דאנערשטיק',
-						fri => 'פֿרײַטיק',
-						sat => 'שבת',
-						sun => 'זונטיק'
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						mon => 'מאָנטיק',
-						tue => 'דינסטיק',
-						wed => 'מיטוואך',
-						thu => 'דאנערשטיק',
-						fri => 'פֿרײַטיק',
-						sat => 'שבת',
-						sun => 'זונטיק'
-					},
-					short => {
-						mon => 'מאָנטיק',
-						tue => 'דינסטיק',
-						wed => 'מיטוואך',
-						thu => 'דאנערשטיק',
-						fri => 'פֿרײַטיק',
-						sat => 'שבת',
-						sun => 'זונטיק'
-					},
 					wide => {
 						mon => 'מאָנטיק',
 						tue => 'דינסטיק',
@@ -1079,10 +844,6 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'am' => q{פֿאַרמיטאָג},
-					'pm' => q{נאָכמיטאָג},
-				},
-				'wide' => {
 					'am' => q{פֿאַרמיטאָג},
 					'pm' => q{נאָכמיטאָג},
 				},
@@ -1185,20 +946,11 @@ has 'datetime_formats_available_formats' => (
 			GyMMM => q{MMM y G},
 			GyMMMEd => q{E, d בMMM y G},
 			GyMMMd => q{d בMMM y G},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
 			MEd => q{E, d/M},
-			MMM => q{LLL},
 			MMMEd => q{E, d בMMM},
 			MMMd => q{d בMMM},
 			Md => q{d/M},
-			d => q{d},
 			h => q{‏h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			ms => q{mm:ss},
 			y => q{y G},
 			yyyy => q{y G},
 			yyyyM => q{M.y G},
@@ -1208,35 +960,16 @@ has 'datetime_formats_available_formats' => (
 			yyyyMMMEd => q{E, d בMMM y G},
 			yyyyMMMd => q{d בMMM y G},
 			yyyyMd => q{d.M.y G},
-			yyyyQQQ => q{G y QQQ},
-			yyyyQQQQ => q{G y QQQQ},
 		},
 		'gregorian' => {
-			E => q{ccc},
-			EHm => q{E HH:mm},
-			EHms => q{E HH:mm:ss},
 			Ed => q{E דעם dטן},
-			Ehm => q{E h:mm a},
-			Ehms => q{E h:mm:ss a},
 			Gy => q{y G},
 			GyMMM => q{MMM y G},
 			GyMMMEd => q{E דעם dטן MMM yG},
 			GyMMMd => q{dטן MMM y G},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
 			MEd => q{E, d/M},
-			MMM => q{LLL},
-			MMMEd => q{MMM d, E},
-			MMMd => q{MMM d},
 			Md => q{d/M},
-			d => q{d},
 			h => q{‏h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			ms => q{mm:ss},
-			y => q{y},
 			yM => q{M.y},
 			yMEd => q{E, d/M/y},
 			yMM => q{MM/y},
@@ -1245,12 +978,8 @@ has 'datetime_formats_available_formats' => (
 			yMMMM => q{MMMM y},
 			yMMMd => q{dטן MMM y},
 			yMd => q{d-M-y},
-			yQQQ => q{y QQQ},
-			yQQQQ => q{y QQQQ},
 		},
 		'hebrew' => {
-			Ed => q{E ה-d},
-			Gy => q{y G},
 			GyMMM => q{MMMM y G},
 			GyMMMEd => q{E, d MMMM y G},
 			GyMMMd => q{d MMMM y G},
@@ -1295,20 +1024,6 @@ has 'datetime_formats_interval' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-			H => {
-				H => q{HH–HH},
-			},
-			Hm => {
-				H => q{HH:mm–HH:mm},
-				m => q{HH:mm–HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm–HH:mm v},
-				m => q{HH:mm–HH:mm v},
-			},
-			Hv => {
-				H => q{HH–HH v},
-			},
 			M => {
 				M => q{M–M},
 			},
@@ -1334,28 +1049,7 @@ has 'datetime_formats_interval' => (
 				M => q{dd/MM – dd/MM},
 				d => q{dd/MM – dd/MM},
 			},
-			d => {
-				d => q{d–d},
-			},
 			fallback => '{0} – {1}',
-			h => {
-				a => q{h a – h a},
-				h => q{h–h a},
-			},
-			hm => {
-				a => q{h:mm a – h:mm a},
-				h => q{h:mm–h:mm a},
-				m => q{h:mm–h:mm a},
-			},
-			hmv => {
-				a => q{h:mm a – h:mm a v},
-				h => q{h:mm–h:mm a v},
-				m => q{h:mm–h:mm a v},
-			},
-			hv => {
-				a => q{h a – h a v},
-				h => q{h–h a v},
-			},
 			y => {
 				y => q{y–y},
 			},
@@ -1393,29 +1087,12 @@ has 'datetime_formats_interval' => (
 			},
 		},
 		'gregorian' => {
-			H => {
-				H => q{HH–HH},
-			},
-			Hm => {
-				H => q{HH:mm–HH:mm},
-				m => q{HH:mm–HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm–HH:mm v},
-				m => q{HH:mm–HH:mm v},
-			},
-			Hv => {
-				H => q{HH–HH v},
-			},
 			M => {
 				M => q{M–M},
 			},
 			MEd => {
 				M => q{EEEE dd/MM – EEEE dd/MM},
 				d => q{EEEE dd/MM – EEEE dd/MM},
-			},
-			MMM => {
-				M => q{LLL–LLL},
 			},
 			MMMEd => {
 				M => q{EEEE d MMM – EEEE d MMM},
@@ -1432,31 +1109,7 @@ has 'datetime_formats_interval' => (
 				M => q{dd/MM – dd/MM},
 				d => q{dd/MM – dd/MM},
 			},
-			d => {
-				d => q{d–d},
-			},
 			fallback => '{0} – {1}',
-			h => {
-				a => q{h a – h a},
-				h => q{h–h a},
-			},
-			hm => {
-				a => q{h:mm a – h:mm a},
-				h => q{h:mm–h:mm a},
-				m => q{h:mm–h:mm a},
-			},
-			hmv => {
-				a => q{h:mm a – h:mm a v},
-				h => q{h:mm–h:mm a v},
-				m => q{h:mm–h:mm a v},
-			},
-			hv => {
-				a => q{h a – h a v},
-				h => q{h–h a v},
-			},
-			y => {
-				y => q{y–y},
-			},
 			yM => {
 				M => q{MM/y – MM/y},
 				y => q{MM/y – MM/y},
@@ -1486,7 +1139,6 @@ has 'datetime_formats_interval' => (
 			},
 			yMd => {
 				M => q{dd/MM/y – dd/MM/y},
-				d => q{y-MM-dd – y-MM-dd},
 				y => q{dd/MM/y – dd/MM/y},
 			},
 		},
@@ -1510,25 +1162,6 @@ has 'datetime_formats_interval' => (
 				M => q{d בMMMM – d בMMMM},
 				d => q{d בMMMM – d בMMMM},
 			},
-			fallback => '{0} – {1}',
-			h => {
-				a => q{h a – h a},
-				h => q{h–h a},
-			},
-			hm => {
-				a => q{h:mm a – h:mm a},
-				h => q{h:mm–h:mm a},
-				m => q{h:mm–h:mm a},
-			},
-			hmv => {
-				a => q{h:mm a – h:mm a v},
-				h => q{h:mm–h:mm a v},
-				m => q{h:mm–h:mm a v},
-			},
-			hv => {
-				a => q{h a – h a v},
-				h => q{h–h a v},
-			},
 			yM => {
 				M => q{MMMM y – MMMM y},
 				y => q{MMMM y – MMMM y},
@@ -1548,7 +1181,6 @@ has 'datetime_formats_interval' => (
 				y => q{E d בMMMM y – E d בMMMM y},
 			},
 			yMMMM => {
-				M => q{MMMM–MMMM y},
 				y => q{MMMM y – MMMM y},
 			},
 			yMMMd => {

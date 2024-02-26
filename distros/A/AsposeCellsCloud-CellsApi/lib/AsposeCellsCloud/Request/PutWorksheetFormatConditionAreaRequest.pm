@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,12 +59,12 @@ sub new {
 
 
 # Run Operation Request
-# PutWorksheetFormatConditionAreaRequest.name : The workbook name.  ,
+# PutWorksheetFormatConditionAreaRequest.name : The file name.  ,
 # PutWorksheetFormatConditionAreaRequest.sheetName : The worksheet name.  ,
 # PutWorksheetFormatConditionAreaRequest.index : Gets the Conditional Formatting element at the specified index.  ,
 # PutWorksheetFormatConditionAreaRequest.cellArea : Adds a conditional formatted cell range.  ,
-# PutWorksheetFormatConditionAreaRequest.folder : Original workbook folder.  ,
-# PutWorksheetFormatConditionAreaRequest.storageName : Storage name.   
+# PutWorksheetFormatConditionAreaRequest.folder : The folder where the file is situated.  ,
+# PutWorksheetFormatConditionAreaRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_worksheet_format_condition_area' } = { 
-    	summary => 'Adds a cell area for format condition.',
+    	summary => 'Add a cell area for the format condition in the worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -142,7 +142,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -170,14 +170,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

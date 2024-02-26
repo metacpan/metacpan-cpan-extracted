@@ -12,7 +12,7 @@ use base 'Exporter';
 
 # WARNING: Use X.X.X format for $VERSION -> see: https://rt.cpan.org/Public/Bug/Display.html?id=119713
 # because 0.20.1 < 0.1 (0.1 is converted to real number)
-our $VERSION = '4.0.2';
+our $VERSION = '4.0.3';
 
 our @EXPORT_OK = qw(
     get_signature
@@ -28,6 +28,10 @@ my $STATUS_URL = 'https://secure.verotel.com/salestatus';
 my $FLEXPAY_URL = 'https://secure.verotel.com/startorder';
 my $CANCEL_URL = 'https://secure.verotel.com/cancel-subscription';
 my $PROTOCOL_VERSION = '3.5';
+
+=head1 UNSUPPORTED
+
+This library is no longer maintained. Please check other FlexPay libraries at https://github.com/verotel
 
 =head1 NAME
 

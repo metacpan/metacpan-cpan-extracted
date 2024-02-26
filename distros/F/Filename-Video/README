@@ -2,7 +2,7 @@ NAME
     Filename::Video - Check whether filename indicates being a video file
 
 VERSION
-    This document describes version 0.005 of Filename::Video (from Perl
+    This document describes version 0.006 of Filename::Video (from Perl
     distribution Filename-Video), released on 2024-01-12.
 
 SYNOPSIS
@@ -35,11 +35,27 @@ FUNCTIONS
 
     *   Example #3:
 
-         check_video_filename(filename => "foo.webm"); # -> { filename_without_suffix => "foo", suffix => "webm" }
+         check_video_filename(filename => "foo.webm");
+
+        Result:
+
+         {
+           filename => "foo.webm",
+           filename_without_suffix => "foo",
+           suffix => "webm",
+         }
 
     *   Example #4:
 
-         check_video_filename(filename => "foo.MP4"); # -> { filename_without_suffix => "foo", suffix => "MP4" }
+         check_video_filename(filename => "foo.MP4");
+
+        Result:
+
+         {
+           filename => "foo.MP4",
+           filename_without_suffix => "foo",
+           suffix => "MP4",
+         }
 
     This function is not exported by default, but exportable.
 

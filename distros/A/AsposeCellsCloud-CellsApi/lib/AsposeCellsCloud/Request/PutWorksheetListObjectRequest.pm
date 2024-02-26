@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,17 +59,17 @@ sub new {
 
 
 # Run Operation Request
-# PutWorksheetListObjectRequest.name : The workbook name.  ,
+# PutWorksheetListObjectRequest.name : The file name.  ,
 # PutWorksheetListObjectRequest.sheetName : The worksheet name.  ,
 # PutWorksheetListObjectRequest.startRow : The start row of the list range.  ,
-# PutWorksheetListObjectRequest.startColumn : The start row of the list range.  ,
+# PutWorksheetListObjectRequest.startColumn : The start column of the list range.  ,
 # PutWorksheetListObjectRequest.endRow : The start row of the list range.  ,
-# PutWorksheetListObjectRequest.endColumn : The start row of the list range.  ,
-# PutWorksheetListObjectRequest.folder : Original workbook folder.  ,
-# PutWorksheetListObjectRequest.hasHeaders : Whether the range has headers.  ,
-# PutWorksheetListObjectRequest.displayName :   ,
-# PutWorksheetListObjectRequest.showTotals :   ,
-# PutWorksheetListObjectRequest.storageName : Storage name.   
+# PutWorksheetListObjectRequest.endColumn : The start column of the list range.  ,
+# PutWorksheetListObjectRequest.folder : The folder where the file is situated.  ,
+# PutWorksheetListObjectRequest.hasHeaders : Indicate whether the range has headers.  ,
+# PutWorksheetListObjectRequest.displayName : Indicate whether display name.  ,
+# PutWorksheetListObjectRequest.showTotals : Indicate whether show totals.  ,
+# PutWorksheetListObjectRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -80,7 +80,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_worksheet_list_object' } = { 
-    	summary => 'Adds a list object in worksheet.',
+    	summary => 'Add a ListObject in the worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -165,7 +165,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -186,7 +186,7 @@ __PACKAGE__->method_documentation({
      'start_column' => {
      	datatype => 'int',
      	base_name => 'startColumn',
-     	description => 'The start row of the list range.',
+     	description => 'The start column of the list range.',
      	format => '',
      	read_only => '',
      		},
@@ -200,42 +200,42 @@ __PACKAGE__->method_documentation({
      'end_column' => {
      	datatype => 'int',
      	base_name => 'endColumn',
-     	description => 'The start row of the list range.',
+     	description => 'The start column of the list range.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'has_headers' => {
      	datatype => 'string',
      	base_name => 'hasHeaders',
-     	description => 'Whether the range has headers.',
+     	description => 'Indicate whether the range has headers.',
      	format => '',
      	read_only => '',
      		},
      'display_name' => {
      	datatype => 'string',
      	base_name => 'displayName',
-     	description => '',
+     	description => 'Indicate whether display name.',
      	format => '',
      	read_only => '',
      		},
      'show_totals' => {
      	datatype => 'string',
      	base_name => 'showTotals',
-     	description => '',
+     	description => 'Indicate whether show totals.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

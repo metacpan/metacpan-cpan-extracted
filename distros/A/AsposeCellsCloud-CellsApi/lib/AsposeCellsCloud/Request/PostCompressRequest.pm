@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,7 +59,7 @@ sub new {
 
 
 # Run Operation Request
-# PostCompressRequest.File : Compress level. The compression ratio 1-100.  ,
+# PostCompressRequest.File : File to upload  ,
 # PostCompressRequest.CompressLevel : Compress level. The compression ratio 1-100.  ,
 # PostCompressRequest.password : The password needed to open an Excel file.  ,
 # PostCompressRequest.checkExcelRestriction : Whether check restriction of excel file when user modify cells related objects.   
@@ -133,7 +133,7 @@ __PACKAGE__->method_documentation({
      'file' => {
      	datatype => 'string',
      	base_name => 'File',
-     	description => 'Compress level. The compression ratio 1-100.',
+     	description => 'File to upload',
      	format => '',
      	read_only => '',
      		},

@@ -23,19 +23,19 @@ name: App-perlmv
 provides:
   App::perlmv:
     file: lib/App/perlmv.pm
-    version: '0.608'
+    version: '0.609'
   App::perlmv::scriptlet::remove_common_prefix:
     file: lib/App/perlmv/scriptlet/remove_common_prefix.pm
-    version: '0.608'
+    version: '0.609'
   App::perlmv::scriptlet::remove_common_suffix:
     file: lib/App/perlmv/scriptlet/remove_common_suffix.pm
-    version: '0.608'
+    version: '0.609'
   App::perlmv::scriptlets::std:
     file: lib/App/perlmv/scriptlets/std.pm
-    version: '0.608'
+    version: '0.609'
   Complete::App::perlmv:
     file: lib/Complete/App/perlmv.pm
-    version: '0.608'
+    version: '0.609'
 recommends:
   File::HomeDir: '0'
   Lingua::Han::PinYin: '0'
@@ -47,10 +47,10 @@ requires:
   Exporter: '5.57'
   File::Copy: '0'
   File::Find: '0'
-  File::MoreUtil: '0.625'
   File::Path: '2.07'
   File::Slurper: '0'
   File::Spec: '0'
+  File::Util::Test: '0.628'
   Getopt::Long::Complete: '0'
   Module::List::Tiny: '0'
   perl: '5.010001'
@@ -61,7 +61,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-perlmv
   homepage: https://metacpan.org/release/App-perlmv
   repository: git://github.com/perlancar/perl-App-perlmv.git
-version: '0.608'
+version: '0.609'
 x_Dist_Zilla:
   perl:
     version: '5.038000'
@@ -145,7 +145,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.608'
+      version: '0.610'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'

@@ -1,5 +1,6 @@
 Changes to Spreadsheet::Edit, Spreadsheet::Edit::IO, and/or Spreadsheet::Edit::Log
 
+1000.014 : Revised algo used to search for an OO/LL installation
 1000.013 : Require Data::Dumper::Interp 7.003 (to fix API change issue)
 1000.012 : Put back first/last_data_rx (reverts removal in 1000.009).
            sort_rows() needs them to be useful in multi-section sheets.

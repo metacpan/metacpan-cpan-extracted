@@ -19,12 +19,12 @@ name: SortKey
 provides:
   SortKey:
     file: lib/SortKey.pm
-    version: v0.1.0
+    version: v0.1.1
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=SortKey
   homepage: https://metacpan.org/release/SortKey
   repository: git://github.com/perlancar/perl-SortKey.git
-version: 0.1.0
+version: 0.1.1
 x_Dist_Zilla:
   perl:
     version: '5.038002'
@@ -314,7 +314,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'
-              version: '0.01'
+              version: '0.021'
             -
               class: Pod::Weaver::Plugin::EnsureUniqueSections
               name: '@Author::PERLANCAR/EnsureUniqueSections'

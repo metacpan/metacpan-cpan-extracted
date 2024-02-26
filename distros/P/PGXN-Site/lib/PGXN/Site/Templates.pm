@@ -16,7 +16,7 @@ use File::Basename qw(basename);
 use SemVer;
 use Gravatar::URL;
 #use namespace::autoclean; # Do not use; breaks sort {}
-our $VERSION = v0.23.4;
+our $VERSION = v0.23.7;
 
 my $l = PGXN::Site::Locale->get_handle('en');
 sub T { $l->maketext(@_) }
@@ -560,7 +560,8 @@ template distribution => sub {
                         my $path = $info->{docpath};
                         dt {
                             if ($path) {
-                                delete $docs->{$path};
+                                # Exclude from doc list except for root readme.
+                                delete $docs->{$path} unless $path eq 'README';
                                 a {
                                     href is $req->uri->path . "$sep$path.html";
                                     span { class is 'fn';       $ext             };

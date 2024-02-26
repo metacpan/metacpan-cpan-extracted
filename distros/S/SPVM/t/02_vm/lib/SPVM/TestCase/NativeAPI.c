@@ -229,6 +229,7 @@ int32_t SPVM__TestCase__NativeAPI__check_native_api_ids(SPVM_ENV* env, SPVM_VALU
   if ((void*)&env->spvm_stdin != &env_array[209]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->spvm_stdout != &env_array[210]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->spvm_stderr != &env_array[211]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->check_bootstrap_method != &env_array[212]) { stack[0].ival = 0; return 0; }
   
   stack[0].ival = 1;
   
@@ -295,6 +296,7 @@ int32_t SPVM__TestCase__NativeAPI__check_native_api_basic_type_ids(SPVM_ENV* env
   if ((void*)&env->api->basic_type->get_anon_basic_types_length != &env_array[19]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->api->basic_type->has_interface != &env_array[20]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->api->basic_type->is_super_class != &env_array[21]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->basic_type->get_file != &env_array[22]) { stack[0].ival = 0; return 0; }
   
   stack[0].ival = 1;
   
@@ -687,6 +689,69 @@ int32_t SPVM__TestCase__NativeAPI__get_class_var_short_native(SPVM_ENV* env, SPV
   stack[0].ival = 1;
   return 0;
 }
+
+int32_t SPVM__TestCase__NativeAPI__get_class_var_long_native(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  void* class_var = env->get_class_var(env, stack, "TestCase::NativeAPI", "$LONG_VALUE");
+  
+  if (!class_var) {
+    stack[0].ival = 0;
+    return 0;
+  }
+  
+  long value = env->get_class_var_long(env, stack, class_var);
+  
+  if (!(value == 2147483647)) {
+    stack[0].ival = 0;
+    return 0;
+  }
+
+  stack[0].ival = 1;
+  return 0;
+}
+
+
+int32_t SPVM__TestCase__NativeAPI__get_class_var_float_native(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  void* class_var = env->get_class_var(env, stack, "TestCase::NativeAPI", "$FLOAT_VALUE");
+  
+  if (!class_var) {
+    stack[0].ival = 0;
+    return 0;
+  }
+  
+  float value = env->get_class_var_float(env, stack, class_var);
+  
+  if (!(value == 3.402823e+38f)) {
+    stack[0].ival = 0;
+    return 0;
+  }
+
+  stack[0].ival = 1;
+  return 0;
+}
+
+
+int32_t SPVM__TestCase__NativeAPI__get_class_var_double_native(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  void* class_var = env->get_class_var(env, stack, "TestCase::NativeAPI", "$DOUBLE_VALUE");
+  
+  if (!class_var) {
+    stack[0].ival = 0;
+    return 0;
+  }
+  
+  double value = env->get_class_var_double(env, stack, class_var);
+  
+  if (!(value == 1.79769e+308)) {
+    stack[0].ival = 0;
+    return 0;
+  }
+
+  stack[0].ival = 1;
+  return 0;
+}
+
 
 int32_t SPVM__TestCase__NativeAPI__get_class_var_byte_by_name_test(SPVM_ENV* env, SPVM_VALUE* stack) {
   

@@ -17,7 +17,7 @@ our @EXPORT = qw(
     pipe_to_fork pipe_from_fork
 );
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 
 # Code ganked from http://perldoc.perl.org/perlfork.html
@@ -56,11 +56,12 @@ sub pipe_from_fork ($) {
 
 1;
 __END__
-# Below is stub documentation for your module. You'd better edit it!
+
+=begin POD
 
 =head1 NAME
 
-IPC::ForkPipe - Perl extension for blah blah blah
+IPC::ForkPipe - Perl extension for safely forking with a pipe
 
 =head1 SYNOPSIS
 
@@ -68,7 +69,7 @@ IPC::ForkPipe - Perl extension for blah blah blah
     use Symbol;
     
     my $pipe = gensym;
-    my $pid = fork_from_pipe( $pipe );
+    my $pid = pipe_from_fork( $pipe );
     die "Unable to fork: $!" unless defined $pid;
     if( $pid ) {    # parent
         while( <$pipe> ) {
@@ -82,7 +83,7 @@ IPC::ForkPipe - Perl extension for blah blah blah
 
     # equiv to open("| some-prog" );
     my $pipe = gensym;
-    my $pid = fork_to_pipe( $pipe );
+    my $pid = pipe_to_fork( $pipe );
     die "Unable to fork: $!" unless defined $pid;
     unless( $pid ) {    # child
         exec "some-prog";
@@ -98,15 +99,15 @@ This module implements pure-perl functions to do the same thing.
 
 =head1 FUNCTIONS
 
-=head2 fork_from_pipe
+=head2 pipe_from_fork
 
-    my $pid = fork_from_pipe( $fh );
+    my $pid = pipe_from_fork( $fh );
 
 Equivalent to C<$pid = open $fh, "-|">.
 
-=head2 fork_to_pipe
+=head2 pipe_to_fork
 
-    my $pid = fork_to_pipe( $fh );
+    my $pid = pipe_to_fork( $fh );
 
 Equivalent to C<$pid = open $fh, "|-">.
 
@@ -114,7 +115,7 @@ Equivalent to C<$pid = open $fh, "|-">.
 
 =head1 EXPORT
 
-L</fork_to_pipe>, L</fork_from_pipe>.
+L</pipe_to_fork>, L</pipe_from_fork>.
 
 
 =head1 SEE ALSO

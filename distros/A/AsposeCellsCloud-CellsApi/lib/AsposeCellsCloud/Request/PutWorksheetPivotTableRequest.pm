@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,14 +59,14 @@ sub new {
 
 
 # Run Operation Request
-# PutWorksheetPivotTableRequest.name : The workbook name.  ,
+# PutWorksheetPivotTableRequest.name : The file name.  ,
 # PutWorksheetPivotTableRequest.sheetName : The worksheet name.  ,
-# PutWorksheetPivotTableRequest.folder : Original workbook folder.  ,
+# PutWorksheetPivotTableRequest.folder : The folder where the file is situated.  ,
 # PutWorksheetPivotTableRequest.sourceData : The data for the new PivotTable cache.  ,
-# PutWorksheetPivotTableRequest.destCellName : The cell in the upper-left corner of the PivotTable report`s destination range.  ,
-# PutWorksheetPivotTableRequest.tableName : The name of the new PivotTable report.  ,
-# PutWorksheetPivotTableRequest.useSameSource : Indicates whether using same data source when another existing pivot table has used this data source. If the property is true, it will save memory.  ,
-# PutWorksheetPivotTableRequest.storageName : Storage name.   
+# PutWorksheetPivotTableRequest.destCellName : The cell in the upper-left corner of the destination range for the PivotTable report.  ,
+# PutWorksheetPivotTableRequest.tableName : The name of the new PivotTable.  ,
+# PutWorksheetPivotTableRequest.useSameSource : Indicates whether using same data source when another existing PivotTable has used this data source. If the property is true, it will save memory.  ,
+# PutWorksheetPivotTableRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -77,7 +77,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_worksheet_pivot_table' } = { 
-    	summary => 'Adds a pivot table in worksheet.',
+    	summary => 'Add a PivotTable in the worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -150,7 +150,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -164,7 +164,7 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
@@ -178,28 +178,28 @@ __PACKAGE__->method_documentation({
      'dest_cell_name' => {
      	datatype => 'string',
      	base_name => 'destCellName',
-     	description => 'The cell in the upper-left corner of the PivotTable report`s destination range.',
+     	description => 'The cell in the upper-left corner of the destination range for the PivotTable report.',
      	format => '',
      	read_only => '',
      		},
      'table_name' => {
      	datatype => 'string',
      	base_name => 'tableName',
-     	description => 'The name of the new PivotTable report.',
+     	description => 'The name of the new PivotTable.',
      	format => '',
      	read_only => '',
      		},
      'use_same_source' => {
      	datatype => 'string',
      	base_name => 'useSameSource',
-     	description => 'Indicates whether using same data source when another existing pivot table has used this data source. If the property is true, it will save memory.',
+     	description => 'Indicates whether using same data source when another existing PivotTable has used this data source. If the property is true, it will save memory.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

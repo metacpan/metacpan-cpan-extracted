@@ -22,13 +22,14 @@ use Test::More;
 
 # test gender('male')
 {
+    my $cache  = {};
     my %params = (
         word_class   => 'Data::Gimei::Name',
         word_subtype => 'gender',
         gender       => 'male'
     );
     my $g      = App::Gimei::Generator->new(%params);
-    my $gender = $g->execute();
+    my $gender = $g->execute($cache);
 
     is $g->gender(), 'male';
     is $gender,      'male';

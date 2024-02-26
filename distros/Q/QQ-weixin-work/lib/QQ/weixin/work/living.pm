@@ -19,7 +19,7 @@ use LWP::UserAgent;
 use JSON;
 use utf8;
 
-our $VERSION = '0.06';
+our $VERSION = '0.10';
 our @EXPORT = qw/ create modify cancel delete_replay_data get_living_code
 				get_user_all_livingid get_living_info get_watch_stat get_living_share_info /;
 
@@ -28,6 +28,7 @@ our @EXPORT = qw/ create modify cancel delete_replay_data get_living_code
 =head2 create(access_token, hash);
 
 创建预约直播
+最后更新：2023/11/30
 
 =head2 SYNOPSIS
 
@@ -37,7 +38,7 @@ L<https://developer.work.weixin.qq.com/document/path/93637>
 
 =head4 请求包结构体为：
 
-    {
+	{
 	   "anchor_userid": "zhangsan",
 	   "theme": "theme",
 	   "living_start": 1600000000,
@@ -60,14 +61,14 @@ L<https://developer.work.weixin.qq.com/document/path/93637>
 
 =head4 参数说明：
 
-    参数	            必须	说明
+	参数	            必须	说明
     access_token	是	调用接口凭证。获取方法查看“获取access_token”
 	anchor_userid	是	直播发起者的userid
-	theme	是	直播的标题，最多支持60个字节
+	theme	是	直播的标题，最多支持20个utf8字符
 	living_start	是	直播开始时间的unix时间戳
 	living_duration	是	直播持续时长
 	type	否	直播的类型，0：通用直播，1：小班课，2：大班课，3：企业培训，4：活动直播，默认 0。其中大班课和小班课仅k12学校和IT行业类型能够发起
-	description	否	直播的简介，最多支持300个字节，仅对“通用直播”、“小班课”、“大班课”和“企业培训”生效，“活动直播”简介通过activity_detail.description控制
+	description	否	直播的简介，最多支持100个utf8字符，仅对“通用直播”、“小班课”、“大班课”和“企业培训”生效，“活动直播”简介通过activity_detail.description控制
 	agentid	否	授权方安装的应用agentid。仅旧的第三方多应用套件需要填此参数
 	remind_time	否	指定直播开始前多久提醒用户，相对于living_start前的秒数，默认为0
 	activity_cover_mediaid	否	活动直播特定参数，直播间封面图的mediaId
@@ -78,10 +79,10 @@ L<https://developer.work.weixin.qq.com/document/path/93637>
 
 =head4 权限说明：
 
-发起人必须在应用可见范围内，「上课直播/直播」应用默认全员可见
-系统应用「上课直播/直播」默认可使用直播接口
-自建应用需要配置在“可调用接口的应用”里
-第三方服务商创建应用的时候，需要开启“直播接口权限”
+	应用类型	权限要求
+	自建应用	配置到「上课直播/直播 - 可调用接口的应用」中
+	代开发应用	具有「直播」权限
+	第三方应用	具有「直播」权限
 
 =head3 RETURN 返回结果：
 
@@ -93,7 +94,7 @@ L<https://developer.work.weixin.qq.com/document/path/93637>
 
 =head4 RETURN 参数说明：
 
-    参数	        说明
+	参数	        说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	livingid	直播id，通过此id可调用“进入直播”接口(包括小程序接口和JS-SDK接口)，以实现主播到点后的开播操作，以及观众进入直播详情预约和观看直播
@@ -120,6 +121,7 @@ sub create {
 =head2 modify(access_token, hash);
 
 修改预约直播
+最后更新：2023/11/30
 
 =head2 SYNOPSIS
 
@@ -141,7 +143,7 @@ L<https://developer.work.weixin.qq.com/document/path/93640>
 
 =head4 参数说明：
 
-    参数	            必须	说明
+	参数	            必须	说明
     access_token	是	调用接口凭证。获取方法查看“获取access_token”
 	livingid	是	直播id，仅允许修改预约状态下的直播id
 	theme	否	直播的标题，最多支持60个字节
@@ -152,6 +154,11 @@ L<https://developer.work.weixin.qq.com/document/path/93640>
 	remind_time	否	指定直播开始前多久提醒用户，相对于living_start前的秒数，默认为0
 
 =head4 权限说明：
+
+	应用类型	权限要求
+	自建应用	配置到「上课直播/直播 - 可调用接口的应用」中
+	代开发应用	具有「直播」权限
+	第三方应用	具有「直播」权限
 
 仅允许修改当前应用创建的直播。
 
@@ -164,7 +171,7 @@ L<https://developer.work.weixin.qq.com/document/path/93640>
 
 =head4 RETURN 参数说明：
 
-    参数	        说明
+	参数	        说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 
@@ -190,6 +197,7 @@ sub modify {
 =head2 cancel(access_token, hash);
 
 取消预约直播
+最后更新：2023/11/30
 
 =head2 SYNOPSIS
 
@@ -205,11 +213,16 @@ L<https://developer.work.weixin.qq.com/document/path/93638>
 
 =head4 参数说明：
 
-    参数	            必须	说明
+	参数	            必须	说明
     access_token	是	调用接口凭证。获取方法查看“获取access_token”
 	livingid	是	直播id，仅允许取消预约状态下的直播id
 
 =head4 权限说明：
+
+	应用类型	权限要求
+	自建应用	配置到「上课直播/直播 - 可调用接口的应用」中
+	代开发应用	具有「直播」权限
+	第三方应用	具有「直播」权限
 
 仅允许取消当前应用创建的直播。
 
@@ -222,7 +235,7 @@ L<https://developer.work.weixin.qq.com/document/path/93638>
 
 =head4 RETURN 参数说明：
 
-    参数	        说明
+	参数	        说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 
@@ -248,6 +261,7 @@ sub cancel {
 =head2 delete_replay_data(access_token, hash);
 
 删除直播回放
+最后更新：2023/12/08
 
 =head2 SYNOPSIS
 
@@ -263,13 +277,19 @@ L<https://developer.work.weixin.qq.com/document/path/93874>
 
 =head4 参数说明：
 
-    参数	            必须	说明
+	参数	            必须	说明
     access_token	是	调用接口凭证。获取方法查看“获取access_token”
 	livingid	是	直播id
 
 =head4 权限说明：
 
+	应用类型	权限要求
+	自建应用	配置到「上课直播/直播 - 可调用接口的应用」中
+	代开发应用	具有「直播」权限
+	第三方应用	具有「直播」权限
+
 仅允许取消当前应用创建的直播。
+注： 从2023年12月1日0点起，不再支持通过系统应用secret调用接口，存量企业暂不受影响 查看详情
 
 =head3 RETURN 返回结果：
 
@@ -280,7 +300,7 @@ L<https://developer.work.weixin.qq.com/document/path/93874>
 
 =head4 RETURN 参数说明：
 
-    参数	        说明
+	参数	        说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 
@@ -303,6 +323,10 @@ sub delete_replay_data {
     return 0;
 }
 
+=head2 在微信中观看直播或直播回放
+
+最后更新：2023/12/01
+
 =head2 get_living_code(access_token, hash);
 
 获取微信观看直播凭证
@@ -324,15 +348,20 @@ L<https://developer.work.weixin.qq.com/document/path/93641#获取微信观看直
 
 =head4 参数说明：
 
-    参数	            必须	说明
+	参数	            必须	说明
     access_token	是	调用接口凭证。获取方法查看“获取access_token”
 	livingid	是	直播id
 	openid	是	微信用户的openid
 
 =head4 权限说明：
 
-非直播系统应用仅允许获取当前应用创建的微信观看直播凭证。
-直播系统应用可以调用该企业任意直播的微信观看直播凭证。
+	应用类型	权限要求
+	自建应用	配置到「上课直播/直播 - 可调用接口的应用」中
+	代开发应用	具有「直播」权限
+	第三方应用	具有「直播」权限
+
+仅允许获取当前应用创建的微信观看直播凭证。
+注： 从2023年12月1日0点起，不再支持通过系统应用secret调用接口，存量企业暂不受影响 查看详情
 
 =head3 RETURN 返回结果：
 
@@ -344,7 +373,7 @@ L<https://developer.work.weixin.qq.com/document/path/93641#获取微信观看直
 
 =head4 RETURN 参数说明：
 
-    参数	        说明
+	参数	        说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	living_code	微信观看直播凭证，5分钟内可以重复使用，且仅能在微信上使用。开发者获取到该凭证后可以在微信H5页面或小程序进入直播或直播回放页
@@ -371,6 +400,7 @@ sub get_living_code {
 =head2 get_user_all_livingid(access_token, hash);
 
 获取成员直播ID列表
+最后更新：2023/12/01
 
 =head2 SYNOPSIS
 
@@ -390,17 +420,21 @@ L<https://developer.work.weixin.qq.com/document/path/93634>
 
 =head4 参数说明：
 
-    参数	            必须	说明
+	参数	            必须	说明
     access_token	是	调用接口凭证
 	userid	是	企业成员的userid
 	cursor	否	上一次调用时返回的next_cursor，第一次拉取可以不填
-	limit	否	每次拉取的数据量，默认值和最大值都为100
+	limit	否	每次拉取的数据量，建议填20，默认值和最大值都为100
 
 =head4 权限说明：
 
-「上课直播/直播」应用有获取用户的所有直播
-自建应用和第三方应用只能获取本应用创建的直播
+	应用类型	权限要求
+	自建应用	配置到「上课直播/直播 - 可调用接口的应用」中
+	代开发应用	具有「直播」权限
+	第三方应用	具有「直播」权限
 
+只能获取本应用创建的直播
+注： 从2023年12月1日0点起，不再支持通过系统应用secret调用接口，存量企业暂不受影响 查看详情
 
 =head3 RETURN 返回结果：
 
@@ -416,7 +450,7 @@ L<https://developer.work.weixin.qq.com/document/path/93634>
 
 =head4 RETURN 参数说明：
 
-    参数	        说明
+	参数	        说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	next_cursor	当前数据最后一个key值，如果下次调用带上该值则从该key值往后拉，用于实现分页拉取，返回空字符串代表已经是最后一页
@@ -444,6 +478,7 @@ sub get_user_all_livingid {
 =head2 get_living_info(access_token,livingid);
 
 获取直播详情
+最后更新：2023/12/01
 
 =head2 SYNOPSIS
 
@@ -453,14 +488,19 @@ L<https://developer.work.weixin.qq.com/document/path/93635>
 
 =head4 参数说明：
 
-    参数	            必须	说明
+	参数	            必须	说明
     access_token	是	调用接口凭证
 	livingid	是	直播ID
 
 =head4 权限说明：
 
-「上课直播/直播」应用可获取用户的所有直播
-自建应用和第三方应用只能获取本应用创建的直播
+	应用类型	权限要求
+	自建应用	配置到「上课直播/直播 - 可调用接口的应用」中
+	代开发应用	具有「直播」权限
+	第三方应用	具有「直播」权限
+
+只能获取本应用创建的直播
+注： 从2023年12月1日0点起，不再支持通过系统应用secret调用接口，存量企业暂不受影响 查看详情
 
 =head3 RETURN 返回结果：
 
@@ -491,7 +531,7 @@ L<https://developer.work.weixin.qq.com/document/path/93635>
 
 =head4 RETURN 参数说明：
 
-    参数	        说明
+	参数	        说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	living_info	直播信息
@@ -536,10 +576,11 @@ sub get_living_info {
 =head2 get_watch_stat(access_token, hash);
 
 获取直播观看明细
+最后更新：2023/12/01
 
 =head2 SYNOPSIS
 
-L<https://developer.work.weixin.qq.com/document/path/93634>
+L<https://developer.work.weixin.qq.com/document/path/93636>
 
 =head3 请求说明：
 
@@ -554,20 +595,24 @@ L<https://developer.work.weixin.qq.com/document/path/93634>
 
 =head4 参数说明：
 
-    参数	            必须	说明
+	参数	            必须	说明
     access_token	是	调用接口凭证
 	livingid	是	直播的id
 	next_key	否	上一次调用时返回的next_key，初次调用可以填"0"
 
 =head4 权限说明：
 
-「上课直播/直播」应用有获取用户的所有直播
-自建应用和第三方应用只能获取本应用创建的直播
+	应用类型	权限要求
+	自建应用	配置到「上课直播/直播 - 可调用接口的应用」中
+	代开发应用	具有「直播」权限
+	第三方应用	具有「直播」权限
 
+能获取本应用创建的直播
+注： 从2023年12月1日0点起，不再支持通过系统应用secret调用接口，存量企业暂不受影响 查看详情
 
 =head3 RETURN 返回结果：
 
-    {
+	{
 	   "errcode": 0,
 	   "errmsg": "ok",
 	   "ending":1,
@@ -604,7 +649,7 @@ L<https://developer.work.weixin.qq.com/document/path/93634>
 
 =head4 RETURN 参数说明：
 
-    参数	        说明
+	参数	        说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	ending	是否结束。0：表示还有更多数据，需要继续拉取，1：表示已经拉取完所有数据。注意只能根据该字段判断是否已经拉完数据
@@ -649,6 +694,7 @@ sub get_watch_stat {
 =head2 get_living_share_info(access_token, hash);
 
 获取跳转小程序商城的直播观众信息
+最后更新：2023/12/01
 
 =head2 SYNOPSIS
 
@@ -666,17 +712,19 @@ L<https://developer.work.weixin.qq.com/document/path/94442>
 
 =head4 参数说明：
 
-    参数	            必须	说明
+	参数	            必须	说明
     access_token	是	调用接口凭证
-	ww_share_code	是	“推广产品”直播观众跳转小程序商城时会在小程序path中带上ww_share_code=xxxxx参数
+	ww_share_code	是	“推广产品”直播观众跳转小程序商城时会在小程序path中带上ww_share_code=xxxxx参数，ww_share_code五分钟内有效
 
 =head4 权限说明：
 
-系统应用「直播」默认可使用此接口
-自建应用需要配置在“可调用接口的应用”里
-第三方服务商创建应用的时候，需要开启“直播接口权限”
-跳转的小程序需要与企业有绑定关系
+	应用类型	权限要求
+	自建应用	配置到「上课直播/直播 - 可调用接口的应用」中
+	代开发应用	具有「直播」权限
+	第三方应用	具有「直播」权限
 
+跳转的小程序需要与企业有绑定关系
+注： 从2023年12月1日0点起，不再支持通过系统应用secret调用接口，存量企业暂不受影响 查看详情
 
 =head3 RETURN 返回结果：
 
@@ -692,7 +740,7 @@ L<https://developer.work.weixin.qq.com/document/path/94442>
 
 =head4 RETURN 参数说明：
 
-    参数	        说明
+	参数	        说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	livingid	直播id

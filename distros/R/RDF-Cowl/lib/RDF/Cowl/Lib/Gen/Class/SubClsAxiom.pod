@@ -1,0 +1,137 @@
+# PODNAME: RDF::Cowl::Lib::Gen::Class::SubClsAxiom
+# ABSTRACT: Generated docs for RDF::Cowl::SubClsAxiom
+
+## DO NOT EDIT
+## Generated via maint/tt/Class.pod.tt
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+RDF::Cowl::Lib::Gen::Class::SubClsAxiom - Generated docs for RDF::Cowl::SubClsAxiom
+
+=head1 VERSION
+
+version 1.0.0
+
+=head1 MAIN MODULE
+
+L<RDF::Cowl::SubClsAxiom>
+
+=head1 CONSTRUCTORS
+
+=head2 new
+
+B<Signature>:
+
+  RDF::Cowl::SubClsAxiom->new(CowlAnyClsExp $super, Maybe[ CowlVector ] $annot)
+
+B<Params>:
+
+  CowlAnyClsExp $sub 
+  CowlAnyClsExp $super 
+  Maybe[ CowlVector ] $annot I<[optional]>
+
+Documentation:
+
+  Returns a retained subclass axiom.
+  
+  @param sub The subclass.
+  @param super The superclass.
+  @param annot [optional] The annotations.
+  @return Retained axiom. Throws exception on error.
+
+Throws exception on error.
+
+=over 2
+
+B<C function name>: C<< cowl_sub_cls_axiom >>
+
+=back
+
+=head1 METHODS
+
+=head2 get_sub
+
+B<Signature>:
+
+  $self->get_sub()
+
+B<Params>:
+
+  CowlSubClsAxiom $axiom 
+
+Documentation:
+
+  Gets the subclass.
+  
+  @param axiom The axiom.
+  @return The subclass.
+
+=over 2
+
+B<C function name>: C<< cowl_sub_cls_axiom_get_sub >>
+
+=back
+
+=head2 get_super
+
+B<Signature>:
+
+  $self->get_super()
+
+B<Params>:
+
+  CowlSubClsAxiom $axiom 
+
+Documentation:
+
+  Gets the superclass.
+  
+  @param axiom The axiom.
+  @return The superclass.
+
+=over 2
+
+B<C function name>: C<< cowl_sub_cls_axiom_get_super >>
+
+=back
+
+=head2 get_annot
+
+B<Signature>:
+
+  $self->get_annot()
+
+B<Params>:
+
+  CowlSubClsAxiom $axiom 
+
+Documentation:
+
+  Gets the annotations of the specified axiom.
+  
+  @param axiom The axiom.
+  @return The annotations.
+
+=over 2
+
+B<C function name>: C<< cowl_sub_cls_axiom_get_annot >>
+
+=back
+
+=head1 AUTHOR
+
+Zakariyya Mughal <zmughal@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 by Auto-Parallel Technologies, Inc..
+
+This is free software, licensed under Eclipse Public License - v 2.0.
+
+=cut

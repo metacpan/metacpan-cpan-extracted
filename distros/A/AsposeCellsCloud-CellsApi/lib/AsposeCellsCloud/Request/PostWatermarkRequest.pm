@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,8 +59,8 @@ sub new {
 
 
 # Run Operation Request
-# PostWatermarkRequest.File : e.g. #1032ff  ,
-# PostWatermarkRequest.text :   ,
+# PostWatermarkRequest.File : File to upload  ,
+# PostWatermarkRequest.text : background text.  ,
 # PostWatermarkRequest.color : e.g. #1032ff  ,
 # PostWatermarkRequest.outFormat : The output data file format.(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers)  ,
 # PostWatermarkRequest.password : The password needed to open an Excel file.  ,
@@ -148,14 +148,14 @@ __PACKAGE__->method_documentation({
      'file' => {
      	datatype => 'string',
      	base_name => 'File',
-     	description => 'e.g. #1032ff',
+     	description => 'File to upload',
      	format => '',
      	read_only => '',
      		},
      'text' => {
      	datatype => 'string',
      	base_name => 'text',
-     	description => '',
+     	description => 'background text.',
      	format => '',
      	read_only => '',
      		},

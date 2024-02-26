@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,12 +59,12 @@ sub new {
 
 
 # Run Operation Request
-# PostWorksheetCellsRangeValueRequest.name : The workbook name.  ,
+# PostWorksheetCellsRangeValueRequest.name : The file name.  ,
 # PostWorksheetCellsRangeValueRequest.sheetName : The worksheet name.  ,
-# PostWorksheetCellsRangeValueRequest.range : range in worksheet   ,
-# PostWorksheetCellsRangeValueRequest.Value : Input value  ,
+# PostWorksheetCellsRangeValueRequest.range : The range in worksheet.   ,
+# PostWorksheetCellsRangeValueRequest.Value : Input value.  ,
 # PostWorksheetCellsRangeValueRequest.isConverted : True: converted to other data type if appropriate.  ,
-# PostWorksheetCellsRangeValueRequest.setStyle : True: set the number format to cell`s style when converting to other data type  ,
+# PostWorksheetCellsRangeValueRequest.setStyle : True: set the number format to cell`s style when converting to other data type.  ,
 # PostWorksheetCellsRangeValueRequest.folder : Original workbook folder.  ,
 # PostWorksheetCellsRangeValueRequest.storageName : Storage name.   
 
@@ -77,7 +77,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_worksheet_cells_range_value' } = { 
-    	summary => 'Puts a value into the range, if appropriate the value will be converted to other data type and cell`s number format will be reset.',
+    	summary => 'Assign a value to the range; if necessary, the value will be converted to another data type, and the cell`s number format will be reset.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -152,7 +152,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -166,14 +166,14 @@ __PACKAGE__->method_documentation({
      'range' => {
      	datatype => 'Range',
      	base_name => 'range',
-     	description => 'range in worksheet ',
+     	description => 'The range in worksheet. ',
      	format => '',
      	read_only => '',
      		},
      'value' => {
      	datatype => 'string',
      	base_name => 'Value',
-     	description => 'Input value',
+     	description => 'Input value.',
      	format => '',
      	read_only => '',
      		},
@@ -187,7 +187,7 @@ __PACKAGE__->method_documentation({
      'set_style' => {
      	datatype => 'string',
      	base_name => 'setStyle',
-     	description => 'True: set the number format to cell`s style when converting to other data type',
+     	description => 'True: set the number format to cell`s style when converting to other data type.',
      	format => '',
      	read_only => '',
      		},

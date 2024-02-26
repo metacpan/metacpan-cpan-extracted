@@ -2,11 +2,11 @@ NAME
     File::Util::Rename - Utilities related to renaming files
 
 VERSION
-    This document describes version 0.001 of File::Util::Rename (from Perl
-    distribution File-Util-Rename), released on 2024-01-22.
+    This document describes version 0.002 of File::Util::Rename (from Perl
+    distribution File-Util-Rename), released on 2024-02-12.
 
 SYNOPSIS
-     use File::Util::Symlink qw(
+     use File::Util::Rename qw(
          rename_noclobber
      );
 

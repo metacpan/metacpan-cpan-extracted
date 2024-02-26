@@ -1,11 +1,12 @@
 NAME
-    Acme::CPANModules::WorkingWithXLS - Working with Excel formats (XLS,
-    XLSX) or other spreadsheet formats like LibreOffice Calc (ODS)
+    Acme::CPANModules::WorkingWithXLS - List of modules to work with Excel
+    formats (XLS, XLSX) or other spreadsheet formats like LibreOffice Calc
+    (ODS)
 
 VERSION
-    This document describes version 0.002 of
+    This document describes version 0.005 of
     Acme::CPANModules::WorkingWithXLS (from Perl distribution
-    Acme-CPANModules-WorkingWithXLS), released on 2022-11-13.
+    Acme-CPANModules-WorkingWithXLS), released on 2023-12-04.
 
 DESCRIPTION
     The following are tools (programs, modules, scripts) to work with Excel
@@ -130,6 +131,8 @@ SOURCE
 SEE ALSO
     Acme::CPANModules::WorkingWithCSV
 
+    Acme::CPANModules::WorkingWithDOC
+
     Acme::CPANModules - about the Acme::CPANModules namespace
 
     cpanmodules - CLI tool to let you browse/view the lists
@@ -154,7 +157,8 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2023, 2022 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -3,9 +3,9 @@ NAME
     are ported (or inspired from) NPM libraries
 
 VERSION
-    This document describes version 0.005 of
+    This document describes version 0.007 of
     Acme::CPANModules::PortedFrom::NPM (from Perl distribution
-    Acme-CPANModules-PortedFrom-NPM), released on 2023-09-25.
+    Acme-CPANModules-PortedFrom-NPM), released on 2024-01-15.
 
 DESCRIPTION
     If you know of others, please drop me a message.
@@ -29,6 +29,11 @@ ACME::CPANMODULES ENTRIES
         Author: MIKIHOSHI <https://metacpan.org/author/MIKIHOSHI>
 
     Is::Bot
+    Sub::Fp
+        Author: ODDTUPLE <https://metacpan.org/author/ODDTUPLE>
+
+    Hash::Util::Pick
+        Author: PINE <https://metacpan.org/author/PINE>
 
 FAQ
   What is an Acme::CPANModules::* module?
@@ -103,7 +108,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023, 2021, 2018 by perlancar
+    This software is copyright (c) 2024, 2023, 2021, 2018 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

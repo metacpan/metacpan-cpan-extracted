@@ -1,15 +1,16 @@
 package Filename::Executable;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-10-02'; # DATE
-our $DIST = 'Filename-Executable'; # DIST
-our $VERSION = '0.001'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
 use Exporter qw(import);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-12-16'; # DATE
+our $DIST = 'Filename-Executable'; # DIST
+our $VERSION = '0.002'; # VERSION
+
 our @EXPORT_OK = qw(check_executable_filename);
 
 our %TYPES = (
@@ -43,10 +44,11 @@ _
             pos => 0,
         },
         # XXX recurse?
-        ci => {
+        ignore_case => {
             summary => 'Whether to match case-insensitively',
-            schema  => 'bool',
+            schema  => 'bool*',
             default => 1,
+            cmdline_aliases => {i=>{}},
         },
     },
     result_naked => 1,
@@ -76,7 +78,7 @@ _
         },
         {
             summary => 'Case-sensitive',
-            args => {filename => 'foo.Appimage', ci=>0},
+            args => {filename => 'foo.Appimage', ignore_case=>0},
             naked_result => 0,
         },
     ],
@@ -85,7 +87,7 @@ sub check_executable_filename {
     my %args = @_;
 
     my $filename = $args{filename};
-    my $ci = $args{ci} // 1;
+    my $ci = $args{ignore_case} // 1;
 
     #use DD; dd \%EXTS;
     my ($name, $ext) = $filename =~ ($ci ? $RE_CI : $RE_NOCI)
@@ -112,7 +114,7 @@ Filename::Executable - Check whether filename indicates being an executable prog
 
 =head1 VERSION
 
-This document describes version 0.001 of Filename::Executable (from Perl distribution Filename-Executable), released on 2020-10-02.
+This document describes version 0.002 of Filename::Executable (from Perl distribution Filename-Executable), released on 2023-12-16.
 
 =head1 SYNOPSIS
 
@@ -145,7 +147,7 @@ Examples:
 
 =item * Example #1:
 
- check_executable_filename(filename => "foo.pm"); # -> [200, "OK", 0, {}]
+ check_executable_filename(filename => "foo.pm"); # -> 0
 
 =item * Example #2:
 
@@ -153,12 +155,7 @@ Examples:
 
 Result:
 
- [
-   200,
-   "OK",
-   { exec_ext => ".appimage", exec_name => "foo", exec_type => "appimage" },
-   {},
- ]
+ { exec_ext => ".appimage", exec_name => "foo", exec_type => "appimage" }
 
 =item * Case-insensitive by default:
 
@@ -166,16 +163,11 @@ Result:
 
 Result:
 
- [
-   200,
-   "OK",
-   { exec_ext => ".Appimage", exec_name => "foo", exec_type => "appimage" },
-   {},
- ]
+ { exec_ext => ".Appimage", exec_name => "foo", exec_type => "appimage" }
 
 =item * Case-sensitive:
 
- check_executable_filename(filename => "foo.Appimage", ci => 0); # -> [200, "OK", 0, {}]
+ check_executable_filename(filename => "foo.Appimage", ignore_case => 0); # -> 0
 
 =back
 
@@ -185,11 +177,13 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<ci> => I<bool> (default: 1)
+=item * B<filename>* => I<str>
+
+(No description)
+
+=item * B<ignore_case> => I<bool> (default: 1)
 
 Whether to match case-insensitively.
-
-=item * B<filename>* => I<str>
 
 
 =back
@@ -209,6 +203,37 @@ Please visit the project's homepage at L<https://metacpan.org/release/Filename-E
 
 Source repository is at L<https://github.com/perlancar/perl-Filename-Executable>.
 
+=head1 SEE ALSO
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Filename-Executable>
@@ -216,18 +241,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 SEE ALSO
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2020 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

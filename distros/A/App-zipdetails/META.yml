@@ -2,21 +2,36 @@
 abstract: 'Display details about the internal structure of Zip files'
 author:
   - 'Paul Marquess <pmqs@cpan.org>'
-build_requires: {}
+build_requires:
+  Cwd: '0'
+  Data::Dumper: '0'
+  File::Basename: '0'
+  File::Temp: '0'
+  Pod::Markdown: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: App-zipdetails
 no_index:
   directory:
     - t
     - inc
     - t
+requires:
+  Encode: '0'
+  Fcntl: '0'
+  Getopt::Long: '0'
+  IO::File: '0'
+  Time::Local: '0'
 resources:
   bugtracker: https://github.com/pmqs/zipdetails/issues
   homepage: https://github.com/pmqs/zipdetails
   repository: git://github.com/pmqs/zipdetails.git
-version: 2.108
+version: '4.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

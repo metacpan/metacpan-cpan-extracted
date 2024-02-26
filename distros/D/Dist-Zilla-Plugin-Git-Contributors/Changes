@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-Plugin-Git-Contributors
 
+0.037     2024-02-18 23:50:16Z
+          - also check for duplicate names; print the duplicate emails or
+            names found
+
 0.036     2020-12-24 19:08:06Z
           - minor documentation and tooling updates
           - sort by name as well as commit count, for consistent results

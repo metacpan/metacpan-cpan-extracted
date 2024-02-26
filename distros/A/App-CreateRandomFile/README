@@ -1,4 +1,141 @@
-SYNOPSIS
+NAME
+    App::CreateRandomFile - Create file with random content
 
+VERSION
+    This document describes version 0.021 of App::CreateRandomFile (from
+    Perl distribution App-CreateRandomFile), released on 2023-11-20.
+
+SYNOPSIS
     See create-random-file.
+
+FUNCTIONS
+  create_random_file
+    Usage:
+
+     create_random_file(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Create file with random content.
+
+    Examples:
+
+    *   Create a file of size 1MB containing random bytes:
+
+         create_random_file(name => "file1", size => "1M");
+
+    *   Like the previous example (--random-bytes is optional):
+
+         create_random_file(name => "file2", size => "2M", random_bytes => 1);
+
+    *   Create a file of size 3.5KB containing repeated pattern:
+
+         create_random_file(name => "file3", size => "3.5K", patterns => ["AABBCC"]);
+
+    *   Create a file of size 4KB containing random sequences of A, B, C:
+
+         create_random_file(name => "file4", size => "4K", patterns => ["A", "B", "C"]);
+
+    Create "random" file with a specified size. There are several choices of
+    what random data to use:
+
+    *   random bytes, created using rand()
+
+    *   repeated pattern supplied from "--pattern" command-line option
+
+    TODO:
+
+    *   random bytes, source from /dev/urandom
+
+    *   random lines from a specified file
+
+    *   random byte sequences from a specified file
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   interactive => *bool* (default: 0)
+
+        Whether or not the program should be interactive.
+
+        If set to false then will not prompt interactively and usually will
+        proceed (unless for dangerous stuffs, in which case will bail
+        immediately.
+
+    *   name* => *str*
+
+        (No description)
+
+    *   overwrite => *bool* (default: 0)
+
+        Whether to overwrite existing file.
+
+        If se to true then will overwrite existing file without warning. The
+        default is to prompt, or bail (if not interactive).
+
+    *   patterns => *array[str]*
+
+        (No description)
+
+    *   random_bytes => *bool*
+
+        (No description)
+
+    *   size* => *str*
+
+        Size (e.g. 10K, 22.5M).
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-CreateRandomFile>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-CreateRandomFile>.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2023, 2017, 2015 by perlancar
+    <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-CreateRandomFile>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

@@ -1,8 +1,8 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::date::dow_name::en;
 
-our $DATE = '2022-10-12'; # DATE
-our $VERSION = '0.018'; # VERSION
+our $DATE = '2023-12-09'; # DATE
+our $VERSION = '0.019'; # VERSION
 
 our $rschema = do{my$var={base=>"cistr",clsets_after_base=>[{description=>"\nSee also: <pm:Sah::Schema::date::dow_num>.\n\nSee also related schemas for other locales, e.g.\n<pm:Sah::Schema::date::dow_name::id> (Indonesian),\n<pm:Sah::Schema::date::dow_name::en_or_id> (English/Indonesian), etc.\n\n",examples=>[{summary=>"Empty string",valid=>0,value=>""},{valid=>1,value=>"su"},{valid=>1,value=>"mOn"},{valid=>1,value=>"TUESDAY"},{summary=>"Not a day-of-week name",valid=>0,value=>"foo"}],in=>["su","mo","tu","we","th","fr","sa","sun","mon","tue","wed","thu","fri","sat","sunday","monday","tuesday","wednesday","thursday","friday","saturday"],summary=>"Day-of-week name (abbreviated or full, in English), e.g. \"su\" or \"Monday\""}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["cistr"],type=>"cistr",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
@@ -21,7 +21,7 @@ Sah::SchemaR::date::dow_name::en - Day-of-week name (abbreviated or full, in Eng
 
 =head1 VERSION
 
-This document describes version 0.018 of Sah::SchemaR::date::dow_name::en (from Perl distribution Sah-Schemas-Date), released on 2022-10-12.
+This document describes version 0.019 of Sah::SchemaR::date::dow_name::en (from Perl distribution Sah-Schemas-Date), released on 2023-12-09.
 
 =head1 DESCRIPTION
 
@@ -61,7 +61,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2019 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020, 2019 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

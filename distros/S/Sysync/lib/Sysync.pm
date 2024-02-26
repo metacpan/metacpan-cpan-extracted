@@ -4,7 +4,7 @@ use Digest::MD5 qw(md5_hex);
 use File::Find;
 use File::Path;
 
-our $VERSION = '0.35';
+our $VERSION = '0.38';
 
 =head1 NAME
 
@@ -37,6 +37,7 @@ sub new
         stagedir      => ($params->{stagedir}     || "$params->{sysdir}/stage"),
         stagefilesdir => ($params->{stagefiledir} || "$params->{sysdir}/stage-files"),
         salt_prefix   => (exists($params->{salt_prefix}) ? $params->{salt_prefix} : '$6$'),
+        extra_users   => $params->{extra_users},
         log           => $params->{log},
     };
 
@@ -327,7 +328,7 @@ sub get_host_ent
     my ($self, $host) = @_;
 
     return unless $self->is_valid_host($host);
-    
+
     my $data   = $self->get_host_users_groups($host);
     my @users  = @{$data->{users} || []};
     my @groups = @{$data->{groups} || []};
@@ -512,7 +513,7 @@ sub update_host_files
     # get list of staging directory contents
     my @staged_file_list;
     File::Find::find({
-        wanted   => sub { push @staged_file_list, $_ }, 
+        wanted   => sub { push @staged_file_list, $_ },
         no_chdir => 1,
     }, "$stagefilesdir/$host");
 
@@ -527,6 +528,7 @@ sub update_host_files
         next if $local_staged_file eq '/etc';
         next if $local_staged_file eq '/etc/ssh';
         next if $local_staged_file eq '/etc/ssh/authorized_keys';
+        next if $local_staged_file eq '/var/lib/extrausers';
 
         unless ($files->{$local_staged_file})
         {
@@ -566,6 +568,19 @@ sub update_all_hosts
     my $stagedir = $self->stagedir;
 
     my $r = 0;
+
+    if  ($hosts->{extra_users} || $self->{extra_users})
+    {
+        $hosts->{passwd_file} = '/var/lib/extrausers/passwd';
+        $hosts->{group_file} = '/var/lib/extrausers/group';
+        $hosts->{shadow_file} = '/var/lib/extrausers/shadow';
+        $hosts->{gshadow_file} = '/var/lib/extrausers/gshadow';
+    }
+
+    my $passwd_file = $hosts->{passwd_file} || '/etc/passwd';
+    my $group_file  = $hosts->{group_file}  || '/etc/group';
+    my $shadow_file = $hosts->{shadow_file} || '/etc/shadow';
+    my $gshadow_file = $hosts->{gshadow_file} || '/etc/gshadow';
 
     for my $host (@hosts)
     {
@@ -607,6 +622,36 @@ sub update_all_hosts
             $r++;
         }
 
+        unless (-d "$stagedir/$host/var")
+        {
+            mkdir "$stagedir/$host/var";
+            chmod 0755, "$stagedir/$host/var";
+            chown 0, 0, "$stagedir/$host/var";
+
+            $self->log("creating: $stagedir/$host/var");
+            $r++;
+        }
+
+        unless (-d "$stagedir/$host/var/lib")
+        {
+            mkdir "$stagedir/$host/var/lib";
+            chmod 0755, "$stagedir/$host/var/lib";
+            chown 0, 0, "$stagedir/$host/var/lib";
+
+            $self->log("creating: $stagedir/$host/var/lib");
+            $r++;
+        }
+
+        unless (-d "$stagedir/$host/var/lib/extrausers")
+        {
+            mkdir "$stagedir/$host/var/lib/extrausers";
+            chmod 0755, "$stagedir/$host/var/lib/extrausers";
+            chown 0, 0, "$stagedir/$host/var/lib/extrausers";
+
+            $self->log("creating: $stagedir/$host/var/lib/extrausers");
+            $r++;
+        }
+
         # write host files
         my $ent_data = $self->get_host_ent($host);
 
@@ -633,31 +678,31 @@ sub update_all_hosts
         $shadow_group = {} unless defined $shadow_group;
         $shadow_group = $shadow_group->{gid} || 0;
 
-        if ($self->write_file_contents("$stagedir/$host/etc/passwd", $ent_data->{passwd}))
+        if ($self->write_file_contents("$stagedir/$host/$passwd_file", $ent_data->{passwd}))
         {
-            chmod 0644, "$stagedir/$host/etc/passwd";
-            chown 0, 0, "$stagedir/$host/etc/passwd";
+            chmod 0644, "$stagedir/$host/$passwd_file";
+            chown 0, 0, "$stagedir/$host/$passwd_file";
             $r++;
         }
 
-        if ($self->write_file_contents("$stagedir/$host/etc/group", $ent_data->{group}))
+        if ($self->write_file_contents("$stagedir/$host/${group_file}", $ent_data->{group}))
         {
-            chmod 0644, "$stagedir/$host/etc/group";
-            chown 0, 0, "$stagedir/$host/etc/group";
+            chmod 0644, "$stagedir/$host/${group_file}";
+            chown 0, 0, "$stagedir/$host/${group_file}";
             $r++;
         }
 
-        if ($self->write_file_contents("$stagedir/$host/etc/shadow", $ent_data->{shadow}))
+        if ($self->write_file_contents("$stagedir/$host/${shadow_file}", $ent_data->{shadow}))
         {
-            chmod 0640, "$stagedir/$host/etc/shadow";
-            chown 0, $shadow_group, "$stagedir/$host/etc/shadow";
+            chmod 0640, "$stagedir/$host/${shadow_file}";
+            chown 0, $shadow_group, "$stagedir/$host/${shadow_file}";
             $r++;
         }
- 
-       if ($self->write_file_contents("$stagedir/$host/etc/gshadow", $ent_data->{gshadow}))
+
+       if ($self->write_file_contents("$stagedir/$host/${gshadow_file}", $ent_data->{gshadow}))
         {
-            chmod 0640, "$stagedir/$host/etc/gshadow";
-            chown 0, $shadow_group, "$stagedir/$host/etc/gshadow";
+            chmod 0640, "$stagedir/$host/${gshadow_file}";
+            chown 0, $shadow_group, "$stagedir/$host/${gshadow_file}";
             $r++;
         }
    }
@@ -729,17 +774,17 @@ L<Bizowie|http://bizowie.com/> L<cloud erp|http://bizowie.com/solutions/>
  Copyright (C) 2012, 2013 Bizowie
 
  This file is part of Sysync.
- 
+
  Sysync is free software: you can redistribute it and/or modify
  it under the terms of the GNU Affero General Public License as
  published by the Free Software Foundation, either version 3 of the
  License, or (at your option) any later version.
- 
+
  Sysync is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU Affero General Public License for more details.
- 
+
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -748,4 +793,3 @@ L<Bizowie|http://bizowie.com/> L<cloud erp|http://bizowie.com/solutions/>
 Michael J. Flickinger, C<< <mjflick@gnu.org> >>
 
 =cut
-

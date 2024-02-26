@@ -8,9 +8,9 @@ use AsposeCellsCloud::Request::PostWorksheetCellsRangesCopy;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**name** | **string** | The workbook name. |
+**name** | **string** | The file name. |
 **sheet_name** | **string** | The worksheet name. |
-**range_operate** | **RangeCopyRequest** | copydata,copystyle,copyto,copyvalue |
+**range_operate** | **RangeCopyRequest** | RangeCopyRequestcopydata,copystyle,copyto,copyvalue |
 **folder** | **string** | Original workbook folder. |
 **storage_name** | **string** | Storage name. |  
 

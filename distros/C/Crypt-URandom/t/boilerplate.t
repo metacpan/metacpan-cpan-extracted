@@ -35,12 +35,14 @@ sub module_boilerplate_ok {
         'the great new $MODULENAME'   => qr/ - The great new /,
         'boilerplate description'     => qr/Quick summary of what the module/,
         'stub function definition'    => qr/function[12]/,
+        'rt.cpan.org'                 => qr/rt.cpan.org/, # preferred bug tracker.
     );
 }
 
   not_in_file_ok(README =>
     "The README is used..."       => qr/The README is used/,
     "'version information here'"  => qr/to provide version information/,
+    'rt.cpan.org'                 => qr/rt.cpan.org/, # preferred bug tracker.
   );
 
   not_in_file_ok(Changes =>

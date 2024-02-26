@@ -1,10 +1,5 @@
 package Pod::Weaver::Plugin::Module::Features;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-06'; # DATE
-our $DIST = 'Pod-Weaver-Plugin-Module-Features'; # DIST
-our $VERSION = '0.002'; # VERSION
-
 use 5.010001;
 use Moose;
 with 'Pod::Weaver::Role::AddTextToSection';
@@ -14,6 +9,11 @@ with 'Pod::Weaver::Role::Section';
 #has exclude_module => (is=>'rw');
 
 use Data::Dmp;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-11-11'; # DATE
+our $DIST = 'Pod-Weaver-Plugin-Module-Features'; # DIST
+our $VERSION = '0.003'; # VERSION
 
 sub _md2pod {
     require Markdown::To::POD;
@@ -26,7 +26,7 @@ sub _md2pod {
 }
 
 sub _process_module {
-    no strict 'refs';
+    no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
 
     my ($self, $document, $input, $package) = @_;
 
@@ -142,15 +142,18 @@ sub _process_module {
                         push @pod, _md2pod($fspec->{description});
                     }
                     my $type = Data::Sah::Util::Type::get_type($fspec->{schema} // 'bool');
-                    my $fval = Module::FeaturesUtil::Get::get_feature_val($package, $fsetname, $fname);
-                    if (!defined($fval)) {
+                    my $fdefhash = Module::FeaturesUtil::Get::get_feature_defhash($package, $fsetname, $fname);
+                    my $fval;
+                    if (!defined($fdefhash->{value})) {
                         $fval = "N/A (not defined)";
                     } elsif ($type eq 'bool') {
-                        $fval = $fval ? "yes" : "no";
+                        $fval = $fdefhash->{value} ? "yes" : "no";
                     } else {
-                        $fval = Data::Dmp::dmp($fval);
+                        $fval = Data::Dmp::dmp($fdefhash->{value});
                     }
                     push @pod, "Value: ".String::PodQuote::pod_escape($fval).".\n\n";
+                    if ($fdefhash->{summary}) { push @pod, $self->_md2pod($fdefhash->{summary} . ".") }
+                    if ($fdefhash->{description}) { push @pod, $self->_md2pod($fdefhash->{description}) }
                 } # for fname
                 push @pod, "=back\n\n";
             } # for fsetname
@@ -203,7 +206,7 @@ Pod::Weaver::Plugin::Module::Features - Plugin to use when building distribution
 
 =head1 VERSION
 
-This document describes version 0.002 of Pod::Weaver::Plugin::Module::Features (from Perl distribution Pod-Weaver-Plugin-Module-Features), released on 2021-04-06.
+This document describes version 0.003 of Pod::Weaver::Plugin::Module::Features (from Perl distribution Pod-Weaver-Plugin-Module-Features), released on 2023-11-11.
 
 =head1 SYNOPSIS
 
@@ -247,14 +250,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Pod-Weaver
 
 Source repository is at L<https://github.com/perlancar/perl-Pod-Weaver-Plugin-Module-Features>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Pod-Weaver-Plugin-Module-Features/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Module::Features>
@@ -265,11 +260,37 @@ L<Dist::Zilla::Plugin::Module::Features>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Plugin-Module-Features>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

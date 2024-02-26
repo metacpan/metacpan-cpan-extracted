@@ -3,9 +3,9 @@ package Sah::Schema::obj::re;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-09-09'; # DATE
+our $DATE = '2023-12-20'; # DATE
 our $DIST = 'Sah-Schemas-Re'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 our $schema = [
     obj => {
@@ -42,7 +42,7 @@ Sah::Schema::obj::re - Regexp object
 
 =head1 VERSION
 
-This document describes version 0.005 of Sah::Schema::obj::re (from Perl distribution Sah-Schemas-Re), released on 2023-09-09.
+This document describes version 0.006 of Sah::Schema::obj::re (from Perl distribution Sah-Schemas-Re), released on 2023-12-20.
 
 =for Pod::Coverage ^(.+)$
 
@@ -72,7 +72,7 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data);
  
  # a sample valid data
- $data = qr();
+ $data = qr(^abc$)i;
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
@@ -87,8 +87,8 @@ validated value will be different from the original. To return the validated
  my $res = $validator->($data); # [$errmsg, $validated_val]
  
  # a sample valid data
- $data = qr();
- my $res = $validator->($data); # => ["",qr()]
+ $data = qr(^abc$)i;
+ my $res = $validator->($data); # => ["",qr(^abc$)i]
  
  # a sample invalid data
  $data = "^abc\$";

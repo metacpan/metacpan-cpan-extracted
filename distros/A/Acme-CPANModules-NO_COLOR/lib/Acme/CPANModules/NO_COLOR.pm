@@ -3,12 +3,12 @@ package Acme::CPANModules::NO_COLOR;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-12-03'; # DATE
+our $DATE = '2023-10-29'; # DATE
 our $DIST = 'Acme-CPANModules-NO_COLOR'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 our $LIST = {
-    summary => "Modules/scripts that follow the NO_COLOR convention",
+    summary => "List of modules/scripts that follow the NO_COLOR convention",
     description => <<'_',
 
 The NO_COLOR convention (see <https://no-color.org>) lets user disable color
@@ -59,7 +59,7 @@ _
 };
 
 1;
-# ABSTRACT: Modules/scripts that follow the NO_COLOR convention
+# ABSTRACT: List of modules/scripts that follow the NO_COLOR convention
 
 __END__
 
@@ -69,11 +69,11 @@ __END__
 
 =head1 NAME
 
-Acme::CPANModules::NO_COLOR - Modules/scripts that follow the NO_COLOR convention
+Acme::CPANModules::NO_COLOR - List of modules/scripts that follow the NO_COLOR convention
 
 =head1 VERSION
 
-This document describes version 0.009 of Acme::CPANModules::NO_COLOR (from Perl distribution Acme-CPANModules-NO_COLOR), released on 2021-12-03.
+This document describes version 0.010 of Acme::CPANModules::NO_COLOR (from Perl distribution Acme-CPANModules-NO_COLOR), released on 2023-10-29.
 
 =head1 DESCRIPTION
 
@@ -88,147 +88,147 @@ If you know of other modules that should be listed here, please contact me.
 
 =over
 
-=item * L<App::ccdiff> - Colored Character diff
+=item L<App::ccdiff>
 
 Author: L<HMBRAND|https://metacpan.org/author/HMBRAND>
 
 Script: L<ccdiff>
 
-=item * L<App::Codeowners> - A tool for managing CODEOWNERS files
+=item L<App::Codeowners>
 
 Author: L<CCM|https://metacpan.org/author/CCM>
 
 Script: L<git-codeowners>
 
-=item * L<App::DiffTarballs> - Diff contents of two tarballs
+=item L<App::DiffTarballs>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
 Script: L<diff-tarballs>
 
-=item * L<App::HL7::Dump> - Base class for hl7dump script.
+=item L<App::HL7::Dump>
 
 Author: L<SKIM|https://metacpan.org/author/SKIM>
 
 Script: L<hl7dump>
 
-=item * L<App::hr> - Print horizontal bar on the terminal
+=item L<App::hr>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
 Script: L<hr>
 
-=item * L<App::Licensecheck> - functions for a simple license checker for source files
+=item L<App::Licensecheck>
 
 Author: L<JONASS|https://metacpan.org/author/JONASS>
 
 Script: L<licensecheck>
 
-=item * L<App::riap> - Riap command-line client shell
+=item L<App::riap>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
 Script: L<riap>
 
-=item * L<App::rsynccolor> - Add some color to rsync output
+=item L<App::rsynccolor>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
 Script: L<rsynccolor>
 
-=item * L<Color::ANSI::Util> - Routines for dealing with ANSI colors
+=item L<Color::ANSI::Util>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<Data::Dump::Color> - Like Data::Dump, but with color
+=item L<Data::Dump::Color>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<Debug::Print> - Make debugging with print() more awesome
+=item L<Debug::Print>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<Git::Deploy>
+=item L<Git::Deploy>
 
 Author: L<AVAR|https://metacpan.org/author/AVAR>
 
 Script: L<git-deploy>
 
-=item * L<Indent::Form>
+=item L<Indent::Form>
 
 Author: L<SKIM|https://metacpan.org/author/SKIM>
 
-=item * L<JSON::Color> - Encode to colored JSON
+=item L<JSON::Color>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<Log::Any::Adapter::Screen> - Send logs to screen, with colors and some other features
+=item L<Log::Any::Adapter::Screen>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<Log::ger::Output::Screen> - Output log to screen
+=item L<Log::ger::Output::Screen>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<Parse::Netstat::Colorizer> - Searches and colorizes the output from Parse::Netstat
+=item L<Parse::Netstat::Colorizer>
 
 Author: L<VVELOX|https://metacpan.org/author/VVELOX>
 
 Script: L<cnetstat>
 
-=item * L<Proc::ProcessTable::ncps> - New Colorized(optional) PS, a enhanced version of PS with advanced searching capabilities
+=item L<Proc::ProcessTable::ncps>
 
 Author: L<VVELOX|https://metacpan.org/author/VVELOX>
 
 Script: L<ncps>
 
-=item * L<Progress::Any::Output::TermProgressBar>
+=item L<Progress::Any::Output::TermProgressBar>
 
-=item * L<Search::ESsearcher> - Provides a handy system for doing templated elasticsearch searches.
+=item L<Search::ESsearcher>
 
 Author: L<VVELOX|https://metacpan.org/author/VVELOX>
 
 Script: L<essearcher>
 
-=item * L<Spreadsheet::Read>
+=item L<Spreadsheet::Read>
 
 Author: L<HMBRAND|https://metacpan.org/author/HMBRAND>
 
 Script: L<xls2csv>
 
-=item * L<String::Tagged::Terminal> - format terminal output using C<String::Tagged>
+=item L<String::Tagged::Terminal>
 
 Author: L<PEVANS|https://metacpan.org/author/PEVANS>
 
-=item * L<Term::ANSIColor> - Color screen output using ANSI escape sequences
+=item L<Term::ANSIColor>
 
 Author: L<RRA|https://metacpan.org/author/RRA>
 
-=item * L<Term::ANSIColor::Conditional> - Colorize text only if color is enabled
+=item L<Term::ANSIColor::Conditional>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<Term::ANSIColor::Patch::Conditional> - Colorize text only if color is enabled
+=item L<Term::ANSIColor::Patch::Conditional>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<Term::App::Roles> - Collection of roles for terminal-based application
+=item L<Term::App::Roles>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<Term::App::Roles::Attrs>
+=item L<Term::App::Roles::Attrs>
 
-=item * L<Term::App::Util::Color> - Determine color depth and whether to use color or not
+=item L<Term::App::Util::Color>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<Text::CSV_XS> - comma-separated values manipulation routines
+=item L<Text::CSV_XS>
 
 Author: L<HMBRAND|https://metacpan.org/author/HMBRAND>
 
 Script: L<csvdiff>
 
-=item * L<Tree::Shell> - Navigate and manipulate in-memory tree objects using a CLI shell
+=item L<Tree::Shell>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
@@ -302,13 +302,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2018 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2021, 2020, 2018 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

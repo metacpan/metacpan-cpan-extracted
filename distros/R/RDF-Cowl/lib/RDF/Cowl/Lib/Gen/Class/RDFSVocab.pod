@@ -1,0 +1,55 @@
+# PODNAME: RDF::Cowl::Lib::Gen::Class::RDFSVocab
+# ABSTRACT: Generated docs for RDF::Cowl::RDFSVocab
+
+## DO NOT EDIT
+## Generated via maint/tt/Class.pod.tt
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+RDF::Cowl::Lib::Gen::Class::RDFSVocab - Generated docs for RDF::Cowl::RDFSVocab
+
+=head1 VERSION
+
+version 1.0.0
+
+=head1 MAIN MODULE
+
+L<RDF::Cowl::RDFSVocab>
+
+=head1 CONSTRUCTORS
+
+=head2 new
+
+B<Signature>:
+
+  RDF::Cowl::RDFSVocab->new()
+
+Documentation:
+
+  Returns the RDFS vocabulary.
+  
+  @return The RDFS vocabulary.
+
+=over 2
+
+B<C function name>: C<< cowl_rdfs_vocab >>
+
+=back
+
+=head1 AUTHOR
+
+Zakariyya Mughal <zmughal@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 by Auto-Parallel Technologies, Inc..
+
+This is free software, licensed under Eclipse Public License - v 2.0.
+
+=cut

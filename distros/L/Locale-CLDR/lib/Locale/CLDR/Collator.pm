@@ -1,7 +1,7 @@
 package Locale::CLDR::Collator;
 
 use version;
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';

@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Pa::Arab - Package for language Punjabi
 
 package Locale::CLDR::Locales::Pa::Arab;
 # This file auto generated from Data\common\main\pa_Arab.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -23,7 +23,7 @@ use if $^V ge v5.12.0, feature => 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
-extends('Locale::CLDR::Locales::Pa');
+extends('Locale::CLDR::Locales::Root');
 has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
@@ -322,10 +322,6 @@ has 'eras' => (
 				'0' => 'ايساپورو',
 				'1' => 'سں'
 			},
-			wide => {
-				'0' => 'ايساپورو',
-				'1' => 'سں'
-			},
 		},
 	} },
 );
@@ -386,7 +382,6 @@ has 'datetime_formats_available_formats' => (
 		'generic' => {
 			HHmmss => q{HH:mm:ss},
 			Md => q{d/M},
-			ms => q{mm:ss},
 			yMMM => q{MMM y},
 			yQQQ => q{QQQ y},
 		},

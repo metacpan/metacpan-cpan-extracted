@@ -5,9 +5,9 @@ use warnings;
 use Acme::CPANModulesUtil::Misc;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-03-18'; # DATE
+our $DATE = '2023-11-20'; # DATE
 our $DIST = 'Acme-CPANModules-Symlink'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our $description = <<'_';
 
@@ -31,7 +31,7 @@ handle is symbolic link.
 
 <pm:Test::Symlink>
 
-<pm:File::MoreUtil> provides some utilities that are symlink-aware, like
+<pm:File::Util::Test> provides some utilities that are symlink-aware, like
 `l_abs_path` and `file_exists`.
 
 
@@ -79,7 +79,7 @@ Acme::CPANModules::Symlink - List of modules that deal with symbolic links (syml
 
 =head1 VERSION
 
-This document describes version 0.001 of Acme::CPANModules::Symlink (from Perl distribution Acme-CPANModules-Symlink), released on 2022-03-18.
+This document describes version 0.002 of Acme::CPANModules::Symlink (from Perl distribution Acme-CPANModules-Symlink), released on 2023-11-20.
 
 =head1 DESCRIPTION
 
@@ -101,7 +101,7 @@ B<Testing>
 
 L<Test::Symlink>
 
-L<File::MoreUtil> provides some utilities that are symlink-aware, like
+L<File::Util::Test> provides some utilities that are symlink-aware, like
 C<l_abs_path> and C<file_exists>.
 
 B<Other utilities>
@@ -126,35 +126,35 @@ L<Win32::NTFS::Symlink>
 
 =over
 
-=item * L<Setup::File::Symlink> - Setup symlink (existence, target)
+=item L<Setup::File::Symlink>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<Test::Symlink> - Test::Builder based test for symlink correctness
+=item L<Test::Symlink>
 
 Author: L<NIKC|https://metacpan.org/author/NIKC>
 
-=item * L<File::MoreUtil> - File-related utilities
+=item L<File::Util::Test>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<File::Symlink::Relative> - Create relative symbolic links
+=item L<File::Symlink::Relative>
 
 Author: L<WYANT|https://metacpan.org/author/WYANT>
 
-=item * L<File::Symlink::Util> - Utilities related to symbolic links
+=item L<File::Symlink::Util>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<File::LinkTree::Builder> - builds a tree of symlinks based on file metadata
+=item L<File::LinkTree::Builder>
 
 Author: L<RJBS|https://metacpan.org/author/RJBS>
 
-=item * L<App::short> - Manage short directory symlinks
+=item L<App::short>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<Win32::NTFS::Symlink> - Support for NTFS symlinks and junctions on Microsoft
+=item L<Win32::NTFS::Symlink>
 
 Author: L<BAYMAX|https://metacpan.org/author/BAYMAX>
 
@@ -226,13 +226,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

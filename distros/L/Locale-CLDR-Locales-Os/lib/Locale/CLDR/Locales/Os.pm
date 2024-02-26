@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Os - Package for language Ossetic
 
 package Locale::CLDR::Locales::Os;
 # This file auto generated from Data\common\main\os.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -24,22 +24,6 @@ use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
 extends('Locale::CLDR::Locales::Root');
-# Need to add code for Key type pattern
-sub display_name_pattern {
-	my ($self, $name, $region, $script, $variant) = @_;
-
-	my $display_pattern = '{0} ({1})';
-	$display_pattern =~s/\{0\}/$name/g;
-	my $subtags = join '{0}, {1}', grep {$_} (
-		$region,
-		$script,
-		$variant,
-	);
-
-	$display_pattern =~s/\{1\}/$subtags/g;
-	return $display_pattern;
-}
-
 has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
@@ -250,38 +234,18 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			index => ['А', 'Ӕ', 'Б', 'В', 'Г', '{Гъ}', 'Д', '{Дж}', '{Дз}', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й', 'К', '{Къ}', 'Л', 'М', 'Н', 'О', 'П', '{Пъ}', 'Р', 'С', 'Т', '{Тъ}', 'У', 'Ф', 'Х', '{Хъ}', 'Ц', '{Цъ}', 'Ч', '{Чъ}', 'Ш', 'Щ', 'Ы', 'Э', 'Ю', 'Я'],
-			main => qr{[а ӕ б в г {гъ} д {дж} {дз} е ё ж з и й к {къ} л м н о п {пъ} р с т {тъ} у ф х {хъ} ц {цъ} ч {чъ} ш щ ъ ы ь э ю я]},
+			index => ['А', 'Ӕ', 'Б', 'В', 'Г', '{Гъ}', 'Д', '{Дж}', '{Дз}', 'ЕЁ', 'Ж', 'З', 'И', 'Й', 'К', '{Къ}', 'Л', 'М', 'Н', 'О', 'П', '{Пъ}', 'Р', 'С', 'Т', '{Тъ}', 'У', 'Ф', 'Х', '{Хъ}', 'Ц', '{Цъ}', 'Ч', '{Чъ}', 'Ш', 'Щ', 'Ы', 'Э', 'Ю', 'Я'],
+			main => qr{[а ӕ б в г {гъ} д {дж} {дз} её ж з и й к {къ} л м н о п {пъ} р с т {тъ} у ф х {хъ} ц {цъ} ч {чъ} ш щ ъ ы ь э ю я]},
 			numbers => qr{[  \- ‑ , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
-			punctuation => qr{[\- ‐ ‑ – — , ; \: ! ? . … ' ‘ ‚ " “ „ « » ( ) \[ \] \{ \} § @ * / \& #]},
+			punctuation => qr{[\- ‐‑ – — , ; \: ! ? . … '‘‚ "“„ « » ( ) \[ \] \{ \} § @ * / \& #]},
 		};
 	},
 EOT
 : sub {
-		return { index => ['А', 'Ӕ', 'Б', 'В', 'Г', '{Гъ}', 'Д', '{Дж}', '{Дз}', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й', 'К', '{Къ}', 'Л', 'М', 'Н', 'О', 'П', '{Пъ}', 'Р', 'С', 'Т', '{Тъ}', 'У', 'Ф', 'Х', '{Хъ}', 'Ц', '{Цъ}', 'Ч', '{Чъ}', 'Ш', 'Щ', 'Ы', 'Э', 'Ю', 'Я'], };
+		return { index => ['А', 'Ӕ', 'Б', 'В', 'Г', '{Гъ}', 'Д', '{Дж}', '{Дз}', 'ЕЁ', 'Ж', 'З', 'И', 'Й', 'К', '{Къ}', 'Л', 'М', 'Н', 'О', 'П', '{Пъ}', 'Р', 'С', 'Т', '{Тъ}', 'У', 'Ф', 'Х', '{Хъ}', 'Ц', '{Цъ}', 'Ч', '{Чъ}', 'Ш', 'Щ', 'Ы', 'Э', 'Ю', 'Я'], };
 },
 );
 
-
-has 'ellipsis' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub {
-		return {
-			'final' => '{0}…',
-			'initial' => '…{0}',
-			'medial' => '{0}…{1}',
-		};
-	},
-);
-
-has 'more_information' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{?},
-);
 
 has 'quote_start' => (
 	is			=> 'ro',
@@ -318,86 +282,62 @@ has 'units' => (
 	default		=> sub { {
 				'long' => {
 					# Long Unit Identifier
-					'duration-day' => {
-						'name' => q(боны),
-						'one' => q({0} бон),
-						'other' => q({0} боны),
-					},
-					# Core Unit Identifier
-					'day' => {
-						'name' => q(боны),
-						'one' => q({0} бон),
-						'other' => q({0} боны),
-					},
-					# Long Unit Identifier
 					'duration-hour' => {
-						'name' => q(сахаты),
 						'one' => q({0} сахат),
 						'other' => q({0} сахаты),
 					},
 					# Core Unit Identifier
 					'hour' => {
-						'name' => q(сахаты),
 						'one' => q({0} сахат),
 						'other' => q({0} сахаты),
 					},
 					# Long Unit Identifier
 					'duration-minute' => {
-						'name' => q(минуты),
 						'one' => q({0} минут),
 						'other' => q({0} минуты),
 					},
 					# Core Unit Identifier
 					'minute' => {
-						'name' => q(минуты),
 						'one' => q({0} минут),
 						'other' => q({0} минуты),
 					},
 					# Long Unit Identifier
 					'duration-month' => {
-						'name' => q(мӕйы),
 						'one' => q({0} мӕй),
 						'other' => q({0} мӕйы),
 					},
 					# Core Unit Identifier
 					'month' => {
-						'name' => q(мӕйы),
 						'one' => q({0} мӕй),
 						'other' => q({0} мӕйы),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
-						'name' => q(секунды),
 						'one' => q({0} секунд),
 						'other' => q({0} секунды),
 					},
 					# Core Unit Identifier
 					'second' => {
-						'name' => q(секунды),
 						'one' => q({0} секунд),
 						'other' => q({0} секунды),
 					},
 					# Long Unit Identifier
 					'duration-week' => {
-						'name' => q(къуырийы),
 						'one' => q({0} къуыри),
 						'other' => q({0} къуырийы),
 					},
 					# Core Unit Identifier
 					'week' => {
-						'name' => q(къуырийы),
 						'one' => q({0} къуыри),
 						'other' => q({0} къуырийы),
 					},
 					# Long Unit Identifier
 					'duration-year' => {
-						'name' => q(азы),
 						'one' => q({0} аз),
 						'other' => q({0} азы),
 					},
 					# Core Unit Identifier
 					'year' => {
-						'name' => q(азы),
 						'one' => q({0} аз),
 						'other' => q({0} азы),
 					},
@@ -494,18 +434,9 @@ has 'listPatterns' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-				start => q({0}, {1}),
-				middle => q({0}, {1}),
 				end => q({0} ӕмӕ {1}),
 				2 => q({0} ӕмӕ {1}),
 		} }
-);
-
-has 'default_numbering_system' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> 'latn',
 );
 
 has 'number_symbols' => (
@@ -515,63 +446,10 @@ has 'number_symbols' => (
 	default		=> sub { {
 		'latn' => {
 			'decimal' => q(,),
-			'exponential' => q(E),
 			'group' => q( ),
-			'infinity' => q(∞),
-			'list' => q(;),
-			'minusSign' => q(-),
 			'nan' => q(НН),
-			'perMille' => q(‰),
-			'percentSign' => q(%),
-			'plusSign' => q(+),
 		},
 	} }
-);
-
-has 'number_formats' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		decimalFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0.###',
-				},
-			},
-		},
-		percentFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0%',
-				},
-			},
-		},
-		scientificFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#E0',
-				},
-			},
-		},
-} },
-);
-
-has 'number_currency_formats' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'latn' => {
-			'pattern' => {
-				'default' => {
-					'standard' => {
-						'positive' => '¤ #,##0.00',
-					},
-				},
-			},
-		},
-} },
 );
 
 has 'currencies' => (
@@ -580,7 +458,6 @@ has 'currencies' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'BRL' => {
-			symbol => 'R$',
 			display_name => {
 				'currency' => q(Бразилиаг реал),
 				'one' => q(бразилиаг реал),
@@ -588,7 +465,6 @@ has 'currencies' => (
 			},
 		},
 		'EUR' => {
-			symbol => '€',
 			display_name => {
 				'currency' => q(Евро),
 				'one' => q(евро),
@@ -596,7 +472,6 @@ has 'currencies' => (
 			},
 		},
 		'GBP' => {
-			symbol => '£',
 			display_name => {
 				'currency' => q(Бритайнаг Фунт),
 				'one' => q(бритайнаг фунт),
@@ -658,25 +533,6 @@ has 'calendar_months' => (
 							'окт.',
 							'ноя.',
 							'дек.'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'Я',
-							'Ф',
-							'М',
-							'А',
-							'М',
-							'И',
-							'И',
-							'А',
-							'С',
-							'О',
-							'Н',
-							'Д'
 						],
 						leap => [
 							
@@ -781,15 +637,6 @@ has 'calendar_days' => (
 						sat => 'сбт',
 						sun => 'хцб'
 					},
-					narrow => {
-						mon => 'К',
-						tue => 'Д',
-						wed => 'Ӕ',
-						thu => 'Ц',
-						fri => 'М',
-						sat => 'С',
-						sun => 'Х'
-					},
 					wide => {
 						mon => 'къуырисӕр',
 						tue => 'дыццӕг',
@@ -845,28 +692,6 @@ has 'calendar_quarters' => (
 						2 => '3-аг кв.',
 						3 => '4-ӕм кв.'
 					},
-					narrow => {0 => '1',
-						1 => '2',
-						2 => '3',
-						3 => '4'
-					},
-					wide => {0 => '1-аг квартал',
-						1 => '2-аг квартал',
-						2 => '3-аг квартал',
-						3 => '4-ӕм квартал'
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {0 => '1-аг кв.',
-						1 => '2-аг кв.',
-						2 => '3-аг кв.',
-						3 => '4-ӕм кв.'
-					},
-					narrow => {0 => '1',
-						1 => '2',
-						2 => '3',
-						3 => '4'
-					},
 					wide => {0 => '1-аг квартал',
 						1 => '2-аг квартал',
 						2 => '3-аг квартал',
@@ -884,10 +709,6 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'am' => q{AM},
-					'pm' => q{PM},
-				},
 				'wide' => {
 					'am' => q{ӕмбисбоны размӕ},
 					'pm' => q{ӕмбисбоны фӕстӕ},
@@ -919,15 +740,15 @@ has 'date_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-			'full' => q{EEEE, d MMMM, y 'аз' G},
-			'long' => q{d MMMM, y 'аз' G},
-			'medium' => q{dd MMM y 'аз' G},
+			'full' => q{EEEE, d MMMM, y 'аз' G},
+			'long' => q{d MMMM, y 'аз' G},
+			'medium' => q{dd MMM y 'аз' G},
 			'short' => q{dd.MM.yy GGGGG},
 		},
 		'gregorian' => {
-			'full' => q{EEEE, d MMMM, y 'аз'},
-			'long' => q{d MMMM, y 'аз'},
-			'medium' => q{dd MMM y 'аз'},
+			'full' => q{EEEE, d MMMM, y 'аз'},
+			'long' => q{d MMMM, y 'аз'},
+			'medium' => q{dd MMM y 'аз'},
 			'short' => q{dd.MM.yy},
 		},
 	} },
@@ -975,20 +796,13 @@ has 'datetime_formats_available_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
 			MEd => q{E, dd.MM},
-			MMM => q{LLL},
 			MMMEd => q{ccc, d MMM},
 			MMMd => q{d MMM},
 			Md => q{dd.MM},
-			d => q{d},
-			h => q{h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			ms => q{mm:ss},
+			h => q{h a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
 			y => q{y},
 			yM => q{MM.y},
 			yMEd => q{E, dd.MM.y},
@@ -998,21 +812,13 @@ has 'datetime_formats_available_formats' => (
 			yQQQQ => q{y-'ӕм' 'азы' QQQQ},
 		},
 		'gregorian' => {
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
 			MEd => q{E, dd.MM},
-			MMM => q{LLL},
 			MMMEd => q{ccc, d MMM},
 			MMMd => q{d MMM},
 			Md => q{dd.MM},
-			d => q{d},
-			h => q{h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			ms => q{mm:ss},
-			y => q{y},
+			h => q{h a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
 			yM => q{MM.y},
 			yMEd => q{E, dd.MM.y},
 			yMMM => q{LLL y},
@@ -1037,20 +843,6 @@ has 'datetime_formats_interval' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-			H => {
-				H => q{HH–HH},
-			},
-			Hm => {
-				H => q{HH:mm–HH:mm},
-				m => q{HH:mm–HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm–HH:mm v},
-				m => q{HH:mm–HH:mm v},
-			},
-			Hv => {
-				H => q{HH–HH v},
-			},
 			M => {
 				M => q{M–M},
 			},
@@ -1058,44 +850,27 @@ has 'datetime_formats_interval' => (
 				M => q{dd.MM – dd.MM},
 				d => q{dd.MM – dd.MM},
 			},
-			d => {
-				d => q{d–d},
-			},
 			fallback => '{0} – {1}',
 			h => {
-				a => q{h a – h a},
-				h => q{h–h a},
+				a => q{h a – h a},
+				h => q{h–h a},
 			},
 			hm => {
-				a => q{h:mm a – h:mm a},
-				h => q{h:mm–h:mm a},
-				m => q{h:mm–h:mm a},
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
 			},
 			hmv => {
-				a => q{h:mm a – h:mm a v},
-				h => q{h:mm–h:mm a v},
-				m => q{h:mm–h:mm a v},
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
 			},
 			hv => {
-				a => q{h a – h a v},
-				h => q{h–h a v},
+				a => q{h a – h a v},
+				h => q{h–h a v},
 			},
 		},
 		'gregorian' => {
-			H => {
-				H => q{HH–HH},
-			},
-			Hm => {
-				H => q{HH:mm–HH:mm},
-				m => q{HH:mm–HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm–HH:mm v},
-				m => q{HH:mm–HH:mm v},
-			},
-			Hv => {
-				H => q{HH–HH v},
-			},
 			M => {
 				M => q{M–M},
 			},
@@ -1103,27 +878,24 @@ has 'datetime_formats_interval' => (
 				M => q{dd.MM – dd.MM},
 				d => q{dd.MM – dd.MM},
 			},
-			d => {
-				d => q{d–d},
-			},
 			fallback => '{0} – {1}',
 			h => {
-				a => q{h a – h a},
-				h => q{h–h a},
+				a => q{h a – h a},
+				h => q{h–h a},
 			},
 			hm => {
-				a => q{h:mm a – h:mm a},
-				h => q{h:mm–h:mm a},
-				m => q{h:mm–h:mm a},
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
 			},
 			hmv => {
-				a => q{h:mm a – h:mm a v},
-				h => q{h:mm–h:mm a v},
-				m => q{h:mm–h:mm a v},
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
 			},
 			hv => {
-				a => q{h a – h a v},
-				h => q{h–h a v},
+				a => q{h a – h a v},
+				h => q{h–h a v},
 			},
 		},
 	} },
@@ -1134,11 +906,7 @@ has 'time_zone_names' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default	=> sub { {
-		hourFormat => q(+HH:mm;-HH:mm),
-		gmtFormat => q(GMT{0}),
-		gmtZeroFormat => q(GMT),
 		regionFormat => q({0} рӕстӕг),
-		fallbackFormat => q({1} ({0})),
 		'Asia/Tbilisi' => {
 			exemplarCity => q#Тбилис#,
 		},

@@ -1,5 +1,5 @@
 {
-   "abstract" : "Locale::CLDR - Data Package ( Perl localization data for Sakha )",
+   "abstract" : "Locale::CLDR - Data Package ( Perl localization data for Yakut )",
    "author" : [
       "John Imrie <john.imrie1@gmail.com>"
    ],
@@ -34,7 +34,7 @@
       "runtime" : {
          "requires" : {
             "DateTime" : "0.72",
-            "Locale::CLDR" : "v0.40.1",
+            "Locale::CLDR" : "v0.44.0",
             "Moo" : "2",
             "MooX::ClassAttribute" : "0.011",
             "Type::Tiny" : "0",
@@ -46,15 +46,15 @@
    "provides" : {
       "Locale::CLDR::Locales::Sah" : {
          "file" : "lib/Locale/CLDR/Locales/Sah.pm",
-         "version" : "v0.40.1"
+         "version" : "v0.44.0"
       },
-      "Locale::CLDR::Locales::Sah::Any" : {
-         "file" : "lib/Locale/CLDR/Locales/Sah/Any.pm",
-         "version" : "v0.40.1"
+      "Locale::CLDR::Locales::Sah::Cyrl" : {
+         "file" : "lib/Locale/CLDR/Locales/Sah/Cyrl.pm",
+         "version" : "v0.44.0"
       },
-      "Locale::CLDR::Locales::Sah::Any::Ru" : {
-         "file" : "lib/Locale/CLDR/Locales/Sah/Any/Ru.pm",
-         "version" : "v0.40.1"
+      "Locale::CLDR::Locales::Sah::Cyrl::Ru" : {
+         "file" : "lib/Locale/CLDR/Locales/Sah/Cyrl/Ru.pm",
+         "version" : "v0.44.0"
       }
    },
    "release_status" : "stable",
@@ -67,6 +67,6 @@
          "url" : "https://github.com/ThePilgrim/perlcldr.git"
       }
    },
-   "version" : "v0.40.1",
+   "version" : "v0.44.0",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

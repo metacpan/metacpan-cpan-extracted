@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -62,8 +62,8 @@ sub new {
 # GetWorksheetValidationRequest.name : The workbook name.  ,
 # GetWorksheetValidationRequest.sheetName : The worksheet name.  ,
 # GetWorksheetValidationRequest.validationIndex : The validation index.  ,
-# GetWorksheetValidationRequest.folder : Original workbook folder.  ,
-# GetWorksheetValidationRequest.storageName : Storage name.   
+# GetWorksheetValidationRequest.folder : The folder where the file is situated.  ,
+# GetWorksheetValidationRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_validation' } = { 
-    	summary => 'Gets a validation by index in worksheet.',
+    	summary => 'Retrieve a validation by its index in the worksheet.',
         params => $params,
         returns => 'ValidationResponse',
     };
@@ -158,14 +158,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

@@ -44,6 +44,7 @@ lib/Net/DNS/RR/CDS.pm
 lib/Net/DNS/RR/CERT.pm
 lib/Net/DNS/RR/CNAME.pm
 lib/Net/DNS/RR/CSYNC.pm
+lib/Net/DNS/RR/DELEG.pm
 lib/Net/DNS/RR/DHCID.pm
 lib/Net/DNS/RR/DNAME.pm
 lib/Net/DNS/RR/DNSKEY.pm

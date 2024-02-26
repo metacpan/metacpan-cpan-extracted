@@ -2,7 +2,7 @@ package Bundle::Locale::CLDR::Micronesianregion;
 
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 =head1 NAME
 
@@ -10,23 +10,23 @@ Bundle::Locale::CLDR::Micronesianregion
 
 =head1 CONTENTS
 
-Locale::CLDR::Locales::En::Any::Fm 0.40.1
+Locale::CLDR::Locales::En::Latn::Fm 0.44.0
 
-Locale::CLDR::Locales::En::Any::Gu 0.40.1
+Locale::CLDR::Locales::En::Latn::Gu 0.44.0
 
-Locale::CLDR::Locales::En::Any::Ki 0.40.1
+Locale::CLDR::Locales::En::Latn::Ki 0.44.0
 
-Locale::CLDR::Locales::En::Any::Mh 0.40.1
+Locale::CLDR::Locales::En::Latn::Mh 0.44.0
 
-Locale::CLDR::Locales::En::Any::Mp 0.40.1
+Locale::CLDR::Locales::En::Latn::Mp 0.44.0
 
-Locale::CLDR::Locales::En::Any::Nr 0.40.1
+Locale::CLDR::Locales::En::Latn::Nr 0.44.0
 
-Locale::CLDR::Locales::En::Any::Pw 0.40.1
+Locale::CLDR::Locales::En::Latn::Pw 0.44.0
 
-Locale::CLDR::Locales::En::Any::Um 0.40.1
+Locale::CLDR::Locales::En::Latn::Um 0.44.0
 
-Locale::CLDR::Locales::En::Any::001 0.40.1
+Locale::CLDR::Locales::En::Latn::001 0.44.0
 
 
 =cut

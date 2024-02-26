@@ -1,0 +1,31 @@
+---
+abstract: 'The Suffit plugin for authentication and authorization by password file'
+author:
+  - 'Serz Minus (Sergey Lepenkov) <abalama@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '6.6'
+  Test::More: '0.94'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Suffit-Plugin-FileAuth
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Digest::SHA: '0'
+  Mojolicious: '7.94'
+  WWW::Suffit: '1.07'
+  perl: '5.020'
+resources:
+  homepage: https://sourceforge.net/projects/www-suffit-plugin-fileauth/
+  license: https://dev.perl.org/licenses
+  repository: https://abalama@git.code.sf.net/p/www-suffit-plugin-fileauth/code
+version: '1.00'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

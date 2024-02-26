@@ -79,7 +79,7 @@ has "audio_delay" => (
 
 sub run() {
 	my $self = shift;
-	my $tempdir = tempdir("avsXXXXXX", CLEANUP => 1);
+	my $tempdir = tempdir("avsXXXXXX", CLEANUP => 1, TMPDIR => 1);
 	if($self->audio_delay == 0) {
 		# Why are we here??
 		Media::Convert::Pipe->new(inputs => [$self->input], output => $self->output)->run();

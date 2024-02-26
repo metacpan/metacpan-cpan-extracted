@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-02-01'; # DATE
+our $DATE = '2024-02-21'; # DATE
 our $DIST = 'Acme-CPANAuthorsBundle-CPAN-Streaks'; # DIST
-our $VERSION = '20240201.0'; # VERSION
+our $VERSION = '20240221.0'; # VERSION
 
 use Acme::CPANAuthors::Register (
     'PERLANCAR' => '',
@@ -14,21 +14,21 @@ use Acme::CPANAuthors::Register (
     'GENE' => '',
     'VVELOX' => '',
     'ABALAMA' => '',
+    'DJERIUS' => '',
+    'JGNI' => '',
     'BPS' => '',
     'DERIV' => '',
-    'DJERIUS' => '',
     'ETHER' => '',
-    'JGNI' => '',
     'JMATES' => '',
     'PEVANS' => '',
     'VKON' => '',
+    'LEONT' => '',
     'ARISTOTLE' => '',
     'ATRODO' => '',
     'DRCLAW' => '',
     'GARU' => '',
     'GHE' => '',
     'JROBINSON' => '',
-    'LEONT' => '',
     'MMCCLENN' => '',
     'MSIMERSON' => '',
     'MSLM' => '',
@@ -41,6 +41,18 @@ use Acme::CPANAuthors::Register (
     'SISYPHUS' => '',
     'SREZIC' => '',
     'XMOLEX' => '',
+    'ASB' => '',
+    'BRIANDFOY' => '',
+    'CRLCU' => '',
+    'DAVECROSS' => '',
+    'JANW' => '',
+    'LITCHIE' => '',
+    'RAWLEYFOW' => '',
+    'RRWO' => '',
+    'SVW' => '',
+    'TYRRMINAL' => '',
+    'WATERKIP' => '',
+    'ZMUGHAL' => '',
 );
 
 
@@ -59,37 +71,37 @@ Acme::CPANAuthors::CPAN::Streaks::MonthlyNewDistributions::Current - Authors wit
 
 =head1 VERSION
 
-This document describes version 20240201.0 of Acme::CPANAuthors::CPAN::Streaks::MonthlyNewDistributions::Current (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-02-01.
+This document describes version 20240221.0 of Acme::CPANAuthors::CPAN::Streaks::MonthlyNewDistributions::Current (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-02-21.
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-Current standings (as of 2024-02-01, produced by L<cpan-streaks>):
+Current standings (as of 2024-02-21, produced by L<cpan-streaks>):
 
   +-----------+-----+------------+-------------+
   | author    | len | start_date | status      |
   +-----------+-----+------------+-------------+
   | PERLANCAR | 115 | 2014-08    | ongoing     |
-  | SKIM      |  11 | 2023-03    | might-break |
+  | SKIM      |  12 | 2023-03    | ongoing     |
   | GENE      |   3 | 2023-11    | might-break |
   | VVELOX    |   3 | 2023-11    | might-break |
-  | ABALAMA   |   2 | 2023-12    | might-break |
+  | ABALAMA   |   3 | 2023-12    | ongoing     |
+  | DJERIUS   |   3 | 2023-12    | ongoing     |
+  | JGNI      |   3 | 2023-12    | ongoing     |
   | BPS       |   2 | 2023-12    | might-break |
   | DERIV     |   2 | 2023-12    | might-break |
-  | DJERIUS   |   2 | 2023-12    | might-break |
   | ETHER     |   2 | 2023-12    | might-break |
-  | JGNI      |   2 | 2023-12    | might-break |
   | JMATES    |   2 | 2023-12    | might-break |
   | PEVANS    |   2 | 2023-12    | might-break |
   | VKON      |   2 | 2023-12    | might-break |
+  | LEONT     |   2 | 2024-01    | ongoing     |
   | ARISTOTLE |   1 | 2024-01    | might-break |
   | ATRODO    |   1 | 2024-01    | might-break |
   | DRCLAW    |   1 | 2024-01    | might-break |
   | GARU      |   1 | 2024-01    | might-break |
   | GHE       |   1 | 2024-01    | might-break |
   | JROBINSON |   1 | 2024-01    | might-break |
-  | LEONT     |   1 | 2024-01    | might-break |
   | MMCCLENN  |   1 | 2024-01    | might-break |
   | MSIMERSON |   1 | 2024-01    | might-break |
   | MSLM      |   1 | 2024-01    | might-break |
@@ -102,6 +114,18 @@ Current standings (as of 2024-02-01, produced by L<cpan-streaks>):
   | SISYPHUS  |   1 | 2024-01    | might-break |
   | SREZIC    |   1 | 2024-01    | might-break |
   | XMOLEX    |   1 | 2024-01    | might-break |
+  | ASB       |   1 | 2024-02    | ongoing     |
+  | BRIANDFOY |   1 | 2024-02    | ongoing     |
+  | CRLCU     |   1 | 2024-02    | ongoing     |
+  | DAVECROSS |   1 | 2024-02    | ongoing     |
+  | JANW      |   1 | 2024-02    | ongoing     |
+  | LITCHIE   |   1 | 2024-02    | ongoing     |
+  | RAWLEYFOW |   1 | 2024-02    | ongoing     |
+  | RRWO      |   1 | 2024-02    | ongoing     |
+  | SVW       |   1 | 2024-02    | ongoing     |
+  | TYRRMINAL |   1 | 2024-02    | ongoing     |
+  | WATERKIP  |   1 | 2024-02    | ongoing     |
+  | ZMUGHAL   |   1 | 2024-02    | ongoing     |
   +-----------+-----+------------+-------------+
 
 =head1 HOMEPAGE

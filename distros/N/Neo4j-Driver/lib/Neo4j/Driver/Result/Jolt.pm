@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Result::Jolt;
 # ABSTRACT: Jolt result handler
-$Neo4j::Driver::Result::Jolt::VERSION = '0.44';
+$Neo4j::Driver::Result::Jolt::VERSION = '0.45';
 
 # This package is not part of the public Neo4j::Driver API.
 
@@ -14,10 +14,11 @@ use parent 'Neo4j::Driver::Result';
 
 use Carp qw(carp croak);
 our @CARP_NOT = qw(Neo4j::Driver::Net::HTTP Neo4j::Driver::Result);
+use JSON::MaybeXS 1.002004 ();
 
 use Neo4j::Error;
 
-my ($TRUE, $FALSE);
+my ($FALSE, $TRUE) = Neo4j::Driver::Result->_bool_values;
 
 my $MEDIA_TYPE = "application/vnd.neo4j.jolt";
 my $ACCEPT_HEADER = "$MEDIA_TYPE-v2+json-seq";
@@ -46,8 +47,6 @@ sub new {
 		v2_id_prefix => $jolt_v2 ? 'element_' : '',
 	};
 	bless $self, $class;
-	
-	($TRUE, $FALSE) = @{ $self->{json_coder}->decode('[true,false]') } unless $TRUE;
 	
 	return $self->_gather_results($params) if $gather_results;
 	
@@ -208,14 +207,14 @@ sub _deep_bless {
 	my ($self, $data) = @_;
 	my $cypher_types = $self->{cypher_types};
 	
+	if (JSON::MaybeXS::is_bool $data) {  # Boolean (sparse)
+		return $data ? $TRUE : $FALSE;
+	}
 	if (ref $data eq 'ARRAY') {  # List (sparse)
 		$data->[$_] = $self->_deep_bless($data->[$_]) for 0 .. $#{$data};
 		return $data;
 	}
 	if (ref $data eq '') {  # Null or Integer (sparse) or String (sparse)
-		return $data;
-	}
-	if ($data == $TRUE || $data == $FALSE) {  # Boolean (sparse)
 		return $data;
 	}
 	

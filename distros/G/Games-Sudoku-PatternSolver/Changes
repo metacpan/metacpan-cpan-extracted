@@ -1,3 +1,13 @@
+
+Changes for Games::Sudoku::PatternSolver
+
+v0.06 
+
+	scripts/sudogen.pl added.
+	Move the PlayerIf into its own distribution Games::Sudoku::Html.
+	Use known candidate positions in the solver's pattern pruning. (Making Solver and generator a tad faster.)
+	New Test ensures that advanced logic is not commented out.  
+
 v0.05 2024.01.12
 
     Fixed a hard coded skip of advanced methods in CPLogic::apply_logic().

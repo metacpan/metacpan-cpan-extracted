@@ -8,7 +8,7 @@ QQ::weixin::work::oa::journal
 
 =head1 DESCRIPTION
 
-日历
+汇报
 
 =cut
 
@@ -19,14 +19,16 @@ use LWP::UserAgent;
 use JSON;
 use utf8;
 
-our $VERSION = '0.06';
-our @EXPORT = qw/ get_record_list get_record_detail get_stat_list /;
+our $VERSION = '0.10';
+our @EXPORT = qw/ get_record_list get_record_detail get_stat_list
+				download_wedrive_file /;
 
 =head1 FUNCTION
 
 =head2 get_record_list(access_token, hash);
 
 批量获取汇报记录单号
+最后更新：2023/11/30
 
 =head2 SYNOPSIS
 
@@ -34,7 +36,7 @@ L<https://developer.work.weixin.qq.com/document/path/93393>
 
 =head3 请求说明：
 
-企业可通过access_token调用本接口，以获取企业一段时间内企业微信“汇报应用”汇报记录编号，支持按汇报表单ID、申请人、部门等条件筛选。
+企业可通过本接口获取企业一段时间内企业微信“汇报应用”汇报记录编号，支持按汇报表单ID、申请人、部门等条件筛选。
 
 一次拉取调用最多拉取100个汇报记录，可以通过多次拉取的方式来满足需求，但调用频率不可超过600次/分。
 
@@ -66,17 +68,26 @@ L<https://developer.work.weixin.qq.com/document/path/93393>
 
 =head4 参数说明：
 
-    参数	必须	类型	说明
+	参数		必须		类型		说明
 	access_token	是	string	调用接口凭证
 	starttime	是	uint32	开始时间
 	endtime	是	uint32	结束时间,开始时间和结束时间间隔不能超过一个月
 	cursor	是	uint32	游标首次请求传0，非首次请求携带上一次请求返回的next_cursor
 	limit	是	uint32	拉取条数
 	filters	否	obj[]	过滤条件
-	filters.key	否	string	-不多于256字节，creator指定汇报记录提单人；department指定提单人所在部门；template_id指定模板
-	filters.value	否	string	-不多于256字节
+	filters.key	否	string	-
+							不多于256字节，creator指定汇报记录提单人；department指定提单人所在部门；template_id指定模板
+	filters.value	否	string	-
+								不多于256字节
 
 =head3 权限说明
+
+	应用类型	权限要求
+	自建应用	需要配置到「汇报 - 可调用接口的应用」中
+	代开发应用	暂不支持
+	第三方应用	暂不支持
+
+注： 从2023年12月1日0点起，不再支持通过系统应用secret调用接口，存量企业暂不受影响 查看详情
 
 =head3 RETURN 返回结果
 
@@ -101,7 +112,7 @@ L<https://developer.work.weixin.qq.com/document/path/93393>
 
 =head3 RETURN 参数说明
 
-    参数	类型	说明
+	参数		类型		说明
 	errcode	int32	返回码
 	errmsg	string	错误码描述
 	journaluuid_list	string[]	汇报记录id列表
@@ -137,6 +148,7 @@ sub get_record_list {
 =head2 get_record_detail(access_token, hash);
 
 获取汇报记录详情
+最后更新：2023/11/30
 
 =head2 SYNOPSIS
 
@@ -144,7 +156,7 @@ L<https://developer.work.weixin.qq.com/document/path/93394>
 
 =head3 请求说明：
 
-企业可通过access_token调用本接口，根据汇报记录单号查询企业微信“汇报应用”的汇报详情。
+根据汇报记录单号查询企业微信“汇报应用”的汇报详情。
 
 =head4 请求包结构体为：
 
@@ -154,15 +166,22 @@ L<https://developer.work.weixin.qq.com/document/path/93394>
 
 =head4 参数说明：
 
-    参数	必须	类型	说明
+	参数		必须		类型		说明
 	access_token	是	string	调用接口凭证
 	journaluuid	是	string	-不多于256字节
 
 =head3 权限说明
 
+	应用类型	权限要求
+	自建应用	需要配置到「汇报 - 可调用接口的应用」中
+	代开发应用	暂不支持
+	第三方应用	暂不支持
+
+注： 从2023年12月1日0点起，不再支持通过系统应用secret调用接口，存量企业暂不受影响 查看详情
+
 =head3 RETURN 返回结果
 
-    {
+	{
 		"errcode": 0,
 		"errmsg": "ok",
 		"info": {
@@ -189,8 +208,7 @@ L<https://developer.work.weixin.qq.com/document/path/93394>
 						"id": "Text-1606365477123",
 						"title": [
 							{
-								"text": "工作内容",
-								"lang": "zh_CN"
+								"text": "工作内容"
 							}
 						],
 						"value": {
@@ -225,7 +243,7 @@ L<https://developer.work.weixin.qq.com/document/path/93394>
 
 =head3 RETURN 参数说明
 
-    参数	类型	说明
+	参数		类型		说明
 	errcode	int32	返回码
 	errmsg	string	错误码描述
 	info	obj	汇报详情
@@ -241,7 +259,7 @@ L<https://developer.work.weixin.qq.com/document/path/93394>
 	info.readed_receivers.userid	string	已读用户id
 	info.apply_data	obj	表单数据
 	info.apply_data.contents	obj[]	表单字段列表
-	info.apply_data.contents.control	string	控件类型：Text-文本；Textarea-多行文本；Number-数字；Money-金额；Date-日期/日期+时间；Selector-单选/多选；；Contact-成员/部门；Tips-说明文字；File-附件；Table-明细；DateRange-时长
+	info.apply_data.contents.control	string	控件类型：Text-文本；Textarea-多行文本；Number-数字；Money-金额；Date-日期/日期+时间；Selector-单选/多选；；Contact-成员/部门；Tips-说明文字；File-附件；Table-明细；DateRange-时长；Doc-文档；WedriveFile-微盘附件
 	info.apply_data.contents.id	string	控件id
 	info.apply_data.contents.title	obj	控件名称 ，若配置了多语言则会包含中英文的控件名称
 	info.apply_data.contents.value	obj	控件值 ，包含了申请人在各种类型控件中输入的值，不同控件有不同的值，具体说明详见附录
@@ -253,6 +271,10 @@ L<https://developer.work.weixin.qq.com/document/path/93394>
 	info.comments.comment_userinfo.userid	string	评论用户id
 	info.comments.content	string	评论内容
 	info.comments.comment_time	uint32	评论时间
+
+=head3 附录：各控件apply_data/contents/value参数介绍
+
+L<https://developer.work.weixin.qq.com/document/path/93394#附录：各控件apply-datacontentsvalue参数介绍>
 
 =head3 错误说明：
 
@@ -283,6 +305,7 @@ sub get_record_detail {
 =head2 get_stat_list(access_token, hash);
 
 获取汇报统计数据
+最后更新：2023/11/30
 
 =head2 SYNOPSIS
 
@@ -290,7 +313,7 @@ L<https://developer.work.weixin.qq.com/document/path/93395>
 
 =head3 请求说明：
 
-企业可通过access_token调用本接口，根据汇报表单id查询企业微信“汇报应用”的汇报统计汇总信息。该接口只能拉取到已经汇总的统计数据，对于尚未完成汇总的周期不会返回。
+企业可通过调用本接口，根据汇报表单id查询企业微信“汇报应用”的汇报统计汇总信息。该接口只能拉取到已经汇总的统计数据，对于尚未完成汇总的周期不会返回。
 
 =head4 请求包结构体为：
 
@@ -302,7 +325,7 @@ L<https://developer.work.weixin.qq.com/document/path/93395>
 
 =head4 参数说明：
 
-    参数	必须	类型	说明
+	参数		必须		类型		说明
 	access_token	是	string	调用接口凭证
 	template_id	是	string	汇报表单id,不多于256字节
 	starttime	是	uint64	开始时间
@@ -310,9 +333,16 @@ L<https://developer.work.weixin.qq.com/document/path/93395>
 
 =head3 权限说明
 
+	应用类型	权限要求
+	自建应用	需要配置到「汇报 - 可调用接口的应用」中
+	代开发应用	暂不支持
+	第三方应用	暂不支持
+
+注： 从2023年12月1日0点起，不再支持通过系统应用secret调用接口，存量企业暂不受影响 查看详情
+
 =head3 RETURN 返回结果
 
-    {
+	{
 		"errcode": 0,
 		"errmsg": "ok",
 		"stat_list": [
@@ -397,7 +427,7 @@ L<https://developer.work.weixin.qq.com/document/path/93395>
 
 =head3 RETURN 参数说明
 
-    参数	类型	说明
+	参数		类型		说明
 	errcode	int32	返回码
 	errmsg	string	错误码描述
 	stat_list	obj[]	统计数据列表
@@ -466,6 +496,79 @@ sub get_stat_list {
     return 0;
 }
 
+=head2 download_wedrive_file(access_token, hash);
+
+下载微盘文件
+最后更新：2023/11/30
+
+=head2 SYNOPSIS
+
+L<https://developer.work.weixin.qq.com/document/path/98021>
+
+=head3 请求说明：
+
+该接口仅可用于下载汇报中关联的微盘文件。
+
+=head4 请求包结构体为：
+
+	{
+		"journaluuid": "JOURNAL_UUID",
+		"fileid": "FILEID"
+	}
+
+=head4 参数说明：
+
+	参数		必须		类型		说明
+	access_token	是	string	调用接口凭证
+	journaluuid	string	是	汇报记录id
+	fileid	string	是	微盘fileid。获取汇报记录详情返回的微盘附件fileid。必须是journaluuid对应的汇报关联的wedrive_files。
+
+=head3 权限说明
+
+	应用类型	权限要求
+	自建应用	需要配置到「汇报 - 可调用接口的应用」中
+	代开发应用	暂不支持
+	第三方应用	暂不支持
+
+注： 从2023年12月1日0点起，不再支持通过系统应用secret调用接口，存量企业暂不受影响 查看详情
+
+=head3 RETURN 返回结果
+
+	{
+		"errcode": 0,
+		"errmsg": "ok",
+		"download_url": "DOWNLOAD_URL",
+		"cookie_name": "COOKIE_NAME",
+		"cookie_value": "COOKIE_VALUE"
+	}
+
+=head3 RETURN 参数说明
+
+	参数		类型		说明
+	errcode	int32	返回码
+	errmsg	string	错误码描述
+	download_url	string	下载请求url (有效期2个小时)
+	cookie_name	string	下载请求带cookie的key
+	cookie_value	string	下载请求带cookie的value
+
+=cut
+
+sub download_wedrive_file {
+    if ( @_ && $_[0] && ref $_[1] eq 'HASH' ) {
+        my $access_token = $_[0];
+        my $json = $_[1];
+        my $ua = LWP::UserAgent->new;
+        $ua->timeout(30);
+        $ua->env_proxy;
+
+        my $response = $ua->post("https://qyapi.weixin.qq.com/cgi-bin/oa/journal/download_wedrive_file?access_token=$access_token",Content => to_json($json,{allow_nonref=>1}),Content_type =>'application/json');
+        if ($response->is_success) {
+            return from_json($response->decoded_content,{utf8 => 1, allow_nonref => 1});
+        }
+
+    }
+    return 0;
+}
 
 1;
 __END__

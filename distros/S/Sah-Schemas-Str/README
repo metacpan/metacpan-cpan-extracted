@@ -2,147 +2,8 @@ NAME
     Sah::Schemas::Str - Various string schemas
 
 VERSION
-    This document describes version 0.016 of Sah::Schemas::Str (from Perl
-    distribution Sah-Schemas-Str), released on 2023-10-23.
-
-SAH SCHEMAS
-    The following schemas are included in this distribution:
-
-    *   hexstr
-
-        String of bytes in hexadecimal notation, e.g. "ab99" or "CAFE".
-
-        Whitespace is allowed and will be removed.
-
-    *   latin_alpha
-
-        String containing only zero or more Latin letters, i.e. A-Z or a-z.
-
-    *   latin_alphanum
-
-        String containing only zero or more Latin letters/digits, i.e.
-        A-Za-z0-9.
-
-    *   latin_letter
-
-        A single latin letter, i.e. A-Z or a-z.
-
-    *   latin_lowercase_alpha
-
-        String containing only zero or more lowercases Latin letters, i.e.
-        a-z.
-
-        Uppercase letters will be coerced to lowercase.
-
-    *   latin_lowercase_letter
-
-        A single latin lowercase letter, i.e. a-z.
-
-    *   latin_uppercase_alpha
-
-        String containing only zero or more uppercase Latin letters, i.e.
-        A-Z.
-
-        Uppercase letters will be coerced to lowercase.
-
-    *   latin_uppercase_letter
-
-        A single latin uppercase letter, i.e. A-Z.
-
-    *   lowercase_str
-
-        String containing only zero or more lowercase letters.
-
-        Uppercase letters will be coerced to lowercase.
-
-    *   non_empty_str
-
-        A non-empty string (length >= 1) (alias for str1).
-
-    *   percent_str
-
-        A number in percent form, e.g. "10.5%".
-
-        This schema accepts floating number followed by percent sign. Unlike
-        the "percent" schema from Sah::Schemas::Float, The percent sign will
-        not be removed nor the number be converted to decimal (e.g. 50% to
-        0.5).
-
-    *   str1
-
-        A non-empty string (length >= 1).
-
-    *   str_or_aos
-
-        String or array (0+ length) of (defined) string.
-
-    *   str_or_aos1
-
-        String or array (1+ length) of (defined) string.
-
-    *   str_or_code
-
-        String or coderef (if string is of the form `sub {...}`).
-
-        Either string or coderef is accepted.
-
-        If string matches the regex "qr/\Asub\s*\{.*\}\z/s", then it will be
-        eval'ed into a coderef. If the code fails to compile, the value will
-        be rejected. Note that this means you accept arbitrary code from the
-        user to execute! Please make sure first and foremost that this is
-        acceptable in your case.
-
-        Currently string is eval'ed in the "main" package, without "use
-        strict" or "use warnings".
-
-        This schema is handy if you want to accept string or coderef from
-        the command-line.
-
-    *   str_or_re
-
-        String or regex (if string is of the form `/.../`).
-
-        Either string or Regexp object is accepted.
-
-        If string is of the form of "/.../" or qr(...), then it will be
-        compiled into a Regexp object. If the regex pattern inside "/.../"
-        or qr(...) is invalid, value will be rejected.
-
-        Currently, unlike in normal Perl, for the qr(...) form, only
-        parentheses "(" and ")" are allowed as the delimiter.
-
-        Currently modifiers "i", "m", and "s" after the second "/" are
-        allowed.
-
-    *   str_or_re_or_code
-
-        String, or regex (if string is of the form `/.../`), or coderef (if
-        string is in the form of `sub { ... }`).
-
-        Either string, Regexp object, or coderef is accepted.
-
-        If string is of the form of "/.../" or qr(...), then it will be
-        compiled into a Regexp object. If the regex pattern inside "/.../"
-        or qr(...) is invalid, value will be rejected. Currently, unlike in
-        normal Perl, for the qr(...) form, only parentheses "(" and ")" are
-        allowed as the delimiter. Currently modifiers "i", "m", and "s"
-        after the second "/" are allowed.
-
-        If string matches the regex "qr/\Asub\s*\{.*\}\z/s", then it will be
-        eval'ed into a coderef. If the code fails to compile, the value will
-        be rejected. Note that this means you accept arbitrary code from the
-        user to execute! Please make sure first and foremost that this is
-        acceptable in your case. Currently string is eval'ed in the "main"
-        package, without "use strict" or "use warnings".
-
-        This schema is handy if you want to accept string or regex or
-        coderef from the command-line.
-
-    *   uppercase_str
-
-        String containing only zero or more uppercase letters.
-
-        Uppercase letters will be coerced to lowercase.
+    This document describes version 0.018 of Sah::Schemas::Str (from Perl
+    distribution Sah-Schemas-Str), released on 2024-02-06.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -151,14 +12,6 @@ HOMEPAGE
 SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-Sah-Schemas-Str>.
-
-SEE ALSO
-    Sah - schema specification
-
-    Data::Sah - Perl implementation of Sah
-
-  Related schemas from Sah::Schemas::Re
-    Sah::Schema::re_from_str
 
 AUTHOR
     perlancar <perlancar@cpan.org>
@@ -180,7 +33,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023, 2022, 2020 by perlancar
+    This software is copyright (c) 2024, 2023, 2022, 2020 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

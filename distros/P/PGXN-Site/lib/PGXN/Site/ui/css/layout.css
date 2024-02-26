@@ -123,7 +123,7 @@ b {
 
 ol, ul {
   margin: 10px 0 0 0;
-  padding: 0 0 0 38px;
+  padding: 0 0 10px 38px;
 }
 
 ol span {
@@ -175,11 +175,11 @@ dt {
 
 dd {
   margin-left: 0;
-  padding-left: 15px;
+  padding: 10px 0 15px 15px;
 }
 
 .meta dd {
-  padding-left: 45px;
+  padding: 0 0 0 45px;
 }
 
 dd pre {
@@ -468,6 +468,7 @@ img.floatLeft {
 /* Override the margin from html.css. */
 #pgxntoc ul {
   margin: 0;
+  padding-left: 18px;
 }
 
 #pgxntoc h3 {

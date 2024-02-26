@@ -1,5 +1,8 @@
 Revision history for perl distribution App-sslmaker
 
+0.20 2024-02-16T15:20:40
+ - Add support for --help in all sub commands
+
 0.19 2023-10-05T15:21:23
  - Add support for --ext for ex "subjectAltName=DNS:example.com"
  - Add "subjectAltName=DNS:$domainname" as default for "generate" sub command

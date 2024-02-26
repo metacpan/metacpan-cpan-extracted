@@ -32,10 +32,9 @@ has 'lookup_order' => is => 'lazy', default => sub {
 sub _build_relative_dir {
   my ($self) = @_;
 
-  return $ENV{CONFIG_ROFL_RELATIVE_DIR} if $ENV{CONFIG_ROFL_RELATIVE_DIR};
-
   if (ref $self eq __PACKAGE__) {
-    my $root = $Bin =~ m{/(?:bin|script|lib|t)\z}gmx ? Path::Tiny->new($Bin)->parent: $Bin;
+    my $bin = $Bin;
+    my $root = ($bin =~ m{/(?:bin|script|share|lib|t)}gmx) ? path($bin)->parent : path($bin);
     return $root->child('share');
   } else {
     my $pm = _class_to_pm(ref $self);
@@ -62,14 +61,15 @@ sub _build_config {
 
   if ($config->found) {
     _post_process_config($config->load);
-    say {*STDERR} "Loaded configs: " . (
+    $self->_log("Loaded configs: " . (
         join ', ',
         map {
           my $realpath = path($_)->realpath;
           my $rel_path = cwd->relative($realpath);
           $rel_path =~ /^\.\./ ? $realpath : $rel_path
         } $config->found
-      ) if $ENV{CONFIG_ROFL_DEBUG};
+      )
+    );
   }
   else {
     Carp::croak 'Could not find config file: ' . $self->config_path . '/' . $self->name . '.(conf|yml|json)';
@@ -93,8 +93,10 @@ sub _build_config_path {
   for my $type (@{ $self->lookup_order }) {
     my $method = "_lookup_$type";
     if ($path = $self->$method) {
-      warn "Found config via '$method'";
+      $self->_log("Found config via '$method'");
       return $method eq '_lookup_global_path' ? path($path) : path($path)->child('/etc');
+    } else {
+      $self->_log("Looking up by '$method'");
     }
   }
 
@@ -138,7 +140,7 @@ sub _lookup_by_dist {
   my $path;
   return $path unless $self->dist;
 
-  eval { $path = File::Share::dist_dir($self->dist) } or warn $@;
+  eval { $path = File::Share::dist_dir($self->dist) } or $self->_log($@);
 
   return $path;
 }
@@ -147,7 +149,10 @@ sub _lookup_by_self {
   my ($self) = @_;
 
   my $path;
-  eval { $path = File::Share::dist_dir(ref $self) }  or warn $@;
+
+  if (ref $self ne __PACKAGE__) {
+    eval { $path = File::Share::dist_dir(ref $self) }  or $self->_log($@);
+  }
 
   return $path;
 }
@@ -160,6 +165,11 @@ sub _lookup_global_path {
   if (List::Util::first {-e} glob path($self->global_path, $self->name) . '.{conf,yml,yaml,json,ini}') {
     return $self->global_path;
   }
+}
+
+sub _log {
+  my $self = shift;
+  say {*STDERR} shift if $ENV{CONFIG_ROFL_DEBUG};
 }
 
 sub get {

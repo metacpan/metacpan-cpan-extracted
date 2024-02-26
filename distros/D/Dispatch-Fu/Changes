@@ -86,3 +86,11 @@ Revision history for Dispatch::Fu.
 1.05 Thu Dec 14 01:02:01 2023
      - no functional changes
      - POD updates only
+
+1.06 Sun Feb 18 12:02:33 2024
+     - added the "xshift_and_deref" utility method that is great for
+       eliminating boilerplate needed unpack references that are necessarily
+       passed into "dispatch" or one of the static key handlers as the
+       first element ("$_[0]") of "@_"
+     - updated POD, added a test for "xshift_and_deref"
+     - fixed tests failing for 5.8.9 (thanks @Bscan on Discord #perl!)

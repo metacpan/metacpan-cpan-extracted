@@ -1,0 +1,87 @@
+# PODNAME: RDF::Cowl::Lib::Gen::Class::InvObjProp
+# ABSTRACT: Generated docs for RDF::Cowl::InvObjProp
+
+## DO NOT EDIT
+## Generated via maint/tt/Class.pod.tt
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+RDF::Cowl::Lib::Gen::Class::InvObjProp - Generated docs for RDF::Cowl::InvObjProp
+
+=head1 VERSION
+
+version 1.0.0
+
+=head1 MAIN MODULE
+
+L<RDF::Cowl::InvObjProp>
+
+=head1 CONSTRUCTORS
+
+=head2 new
+
+B<Signature>:
+
+  RDF::Cowl::InvObjProp->new()
+
+B<Params>:
+
+  CowlObjProp $prop 
+
+Documentation:
+
+  Returns a retained inverse object property.
+  
+  @param prop The object property of which the expression is the inverse of.
+  @return Retained inverse object property. Throws exception on error.
+
+Throws exception on error.
+
+=over 2
+
+B<C function name>: C<< cowl_inv_obj_prop >>
+
+=back
+
+=head1 METHODS
+
+=head2 get_prop
+
+B<Signature>:
+
+  $self->get_prop()
+
+B<Params>:
+
+  CowlInvObjProp $inv 
+
+Documentation:
+
+  Gets the property of which the expression is the inverse of.
+  
+  @param inv The inverse object property.
+  @return The property.
+
+=over 2
+
+B<C function name>: C<< cowl_inv_obj_prop_get_prop >>
+
+=back
+
+=head1 AUTHOR
+
+Zakariyya Mughal <zmughal@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 by Auto-Parallel Technologies, Inc..
+
+This is free software, licensed under Eclipse Public License - v 2.0.
+
+=cut

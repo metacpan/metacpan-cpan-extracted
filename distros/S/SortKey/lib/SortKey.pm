@@ -2,9 +2,9 @@
 package SortKey;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-23'; # DATE
+our $DATE = '2024-02-14'; # DATE
 our $DIST = 'SortKey'; # DIST
-our $VERSION = '0.1.0'; # VERSION
+our $VERSION = '0.1.1'; # VERSION
 
 1;
 # ABSTRACT: Reusable sort key generators
@@ -25,7 +25,7 @@ SortKey - Reusable sort key generators
 
 =head1 VERSION
 
-This document describes version 0.1.0 of SortKey (from Perl distribution SortKey), released on 2024-01-23.
+This document describes version 0.1.1 of SortKey (from Perl distribution SortKey), released on 2024-02-14.
 
 =head1 SYNOPSIS
 
@@ -34,7 +34,7 @@ Basic use with C<sort()>:
  use SortKey::Num::length;
  my $by_length = SortKey::Num::length::gen_keygen;
 
- my @sorted = sort { $length->($a) <=> $length($b) } "food", "foo", "foolish";
+ my @sorted = sort { $by_length->($a) <=> $by_length->($b) } "food", "foo", "foolish";
  # => ('foo', 'food', 'foolish')
 
 Basic use with C<Sort::Key>:

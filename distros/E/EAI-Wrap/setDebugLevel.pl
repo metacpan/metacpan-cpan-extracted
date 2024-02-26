@@ -28,7 +28,7 @@ while (1) {
 		@datalines = split('\n',$data);
 		$i=1;
 		# print loggers with levels to screen, collecting them for later change
-		print "Use setDebugLevel to change the following entries from $logconfig (enter 0 to switch to common log.config and back):\n\n";
+		print "Use setDebugLevel to change the following entries from $logconfig (enter 0 to switch to prod/common log.config and back to test):\n\n";
 		do {
 			print "$i: $datalines[$i-1]\n";
 			($toChange{$i},$levelToChange{$i}) = ($datalines[$i-1] =~ /(.+?)= (.+?)$/) if $datalines[$i-1] =~ /(.+?)= (.+?)$/;
@@ -38,7 +38,7 @@ while (1) {
 		# ask user for choices of logger to change
 		print "\nenter first logger (1..".($i-1).") or (#) to invert comments globally,\nthen level to change to ((F)ATAL, (E)RROR, (I)NFO, (D)EBUG, (T)RACE) or (#) to comment the logger in/out,\nand finally optional appenders ((S)CREEN, (M)AIL, (F)ILE) not for rootLogger!), only possible with changing the level.\n(no entry ends the program):";
 	} else {
-		print "no log.config found in $logconfig (enter 0 to switch to common log.config and back):\n\n";
+		print "no log.config found in $logconfig (enter 0 to switch to prod/common log.config and back to test):\n\n";
 	}
 	my $choice= <STDIN>; chomp $choice;
 	last if $choice eq ""; # break out of loop
@@ -54,10 +54,10 @@ while (1) {
 	}
 	# switch to common log.config and back
 	if ($choice eq "0") {
-		if ($logconfig ne "$ENV{EAI_WRAP_CONFIG_PATH}/log.config") {
-			$logconfig = "$ENV{EAI_WRAP_CONFIG_PATH}/log.config";
+		if ($config{prodEnvironmentInSeparatePath}) {
+			$logconfig = $ENV{EAI_WRAP_CONFIG_PATH}."/".($logconfig eq $ENV{EAI_WRAP_CONFIG_PATH}."/".$config{folderEnvironmentMapping}{Prod}."/log.config" ? $config{folderEnvironmentMapping}{Test} : $config{folderEnvironmentMapping}{Prod})."/log.config";
 		} else {
-			$logconfig = "$ENV{EAI_WRAP_CONFIG_PATH}/$env/log.config";
+			$logconfig = $ENV{EAI_WRAP_CONFIG_PATH}."/".($logconfig eq $ENV{EAI_WRAP_CONFIG_PATH}."/log.config" ? $config{folderEnvironmentMapping}{Test}."/" : "")."log.config";
 		}
 		next;
 	}

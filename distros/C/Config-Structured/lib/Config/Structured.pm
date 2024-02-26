@@ -1,26 +1,168 @@
-package Config::Structured;
-$Config::Structured::VERSION = '2.004';
+package Config::Structured 2.006;
+use v5.22;
+use warnings;
+
 # ABSTRACT: Provides generalized and structured configuration value access
 
+=encoding UTF-8
 
-use 5.022;
+=head1 NAME
+
+Config::Structured - provides generalized and structured configuration value access
+
+=head1 SYNOPSIS
+
+Basic usage:
+
+  use Config::Structured;
+
+  my $conf = Config::Structured->new(
+    structure => { 
+      db => {
+        host     => {
+          isa         => 'Str',
+          default     => 'localhost',
+          description => 'the database server hostname',
+        },
+        username => {
+          isa         => 'Str',
+          default     => 'dbuser',
+          description => 'the database user's username',
+        },
+        password => {
+          isa         => 'Str',
+          description => 'the database user's password',
+        },
+      }
+    },
+    config => { 
+      db => {
+        username => 'appuser',
+        host     => {
+          source   => 'env',
+          ref      => 'DB_HOSTNAME',
+        },
+        password => {
+          source => 'file',
+          ref    => '/run/secrets/db_password',
+        },
+      }
+    }
+  );
+
+  say $conf->db->username(); # appuser
+  # assuming that the hostname value has been set in the DB_HOSTNAME env var
+  say $conf->db->host; # prod_db_1.mydomain.com
+  # assuming that the password value has been stored in /run/secrets/db_password
+  say $conf->db->password(); # *mD9ua&ZSVzEeWkm93bmQzG
+
+Hooks example showing how to ensure config directories exist prior to first 
+use:
+
+  my $conf = Config::Structured->new(
+    ...
+    hooks => {
+      '/paths/*' => {
+        on_load => sub($node,$value) {
+          Mojo::File->new($value)->make_path
+        }
+      }
+    }
+  )
+
+=head1 DESCRIPTION
+
+L<Config::Structured> provides a structured method of accessing configuration values
+
+This is predicated on the use of a configuration C<structure> (required), This structure
+provides a hierarchical structure of configuration branches and leaves. Each branch becomes
+a L<Config::Structured> method which returns a new L<Config::Structured> instance rooted at
+that node, while each leaf becomes a method which returns the configuration value.
+
+The configuration value is normally provided in the C<config> hash. However, a C<config> node
+for a non-Hash value can be a hash containing the "source" and "ref" keys. This permits sourcing
+the config value from a file (when source="file") whose filesystem location is given in the "ref"
+value, or an environment variable (when source="env") whose name is given in the "ref" value.
+
+I<Structure Leaf Nodes> are required to include an "isa" key, whose value is a type 
+(see L<Moose::Util::TypeConstraints>). If typechecking is not required, use isa => 'Any'.
+There are a few other keys that L<Config::Structured> respects in a leaf node:
+
+=over
+
+=item C<default>
+
+This key's value is the default configuration value if a data source or value is not provided by
+the configuation.
+
+=item C<description>
+
+=item C<notes>
+
+A human-readable description and implementation notes, respectively, of the configuration node. 
+L<Config::Structured> does not do anything with these values at present, but they provides inline 
+documentation of configuration directivess within the structure (particularly useful in the common 
+case where the structure is read from a file)
+
+=back
+
+Besides C<structure> and C<config>, L<Config::Structured> also accepts a C<hooks> argument at 
+initialization time. This argument must be a HashRef whose keys are patterns matching config
+node paths, and whose values are HashRefs containing C<on_load> and/or C<on_access> keys. These
+in turn point to CodeRefs which are run when the config value is initially loaded, or every time
+it is accessed, respectively.
+
+=cut
+
+=pod
+
+=head1 CONSTRUCTORS
+
+=head2 Config::Structured->new( config => {...}, structure => {...} )
+
+Returns a new C<Config::Structured> instance. C<config> and C<structure> are
+required parameters and must either be HashRefs or strings containing a data
+structure in C<JSON>, C<YAML>, or C<perl> (i.e., L<Data::Dumper>) formats. The
+format of the structure will be autodetected. The content of these data 
+structures is detailed above in the C<DESCRIPTION> section.
+
+=head1 METHODS
+
+=head2 get( [$name] )
+
+Class method.
+
+Returns a registered L<Config::Structured> instance.  If C<$name> is not provided, returns the default instance.
+Instances can be registered with C<__register_default> or C<__register_as>. This mechanism is used to provide
+global access to a configuration, even from code contexts that otherwise cannot share data.
+
+=head2 __register_default()
+
+Call on a L<Config::Structured> instance to set the instance as the default.
+
+=head2 __register_as( $name )
+
+Call on a L<Config::Structured> instance to register the instance as the provided name.
+
+=head2 __get_child_node_names()
+
+Returns a list of names (strings) of all immediate child nodes of the current config node
+
+=cut
 
 use Moose;
-use Moose::Util::TypeConstraints;
-use Mojo::DynamicMethods -dispatch;
 
-use Perl6::Junction qw(any);
 use Carp;
-use IO::All;
-use List::Util  qw(reduce);
 use Data::DPath qw(dpath);
-use Text::Glob  qw(match_glob);
-
+use Data::Printer;    # not debug, used for Carp message in $make_leaf_generator
+use Data::Structure::Deserialize::Auto;
+use IO::All;
+use List::Util qw(reduce);
+use Mojo::DynamicMethods -dispatch;
+use Moose::Util::TypeConstraints;
+use Perl6::Junction qw(any);
 use Readonly;
-
-use Config::Structured::Deserializer;
-
-use Data::Printer;
+use Text::Glob qw(match_glob);
 
 use experimental qw(signatures lexical_subs);
 
@@ -57,7 +199,7 @@ has '_structure' => (
   isa      => 'HashRef',
   init_arg => undef,
   lazy     => 1,
-  default  => sub {Config::Structured::Deserializer->decode(shift->_structure_v)}
+  default  => sub($self) {Data::Structure::Deserialize::Auto::deserialize($self->_structure_v)}
 );
 
 has '_hooks' => (
@@ -83,7 +225,7 @@ has '_config' => (
   isa      => 'HashRef',
   init_arg => undef,
   lazy     => 1,
-  default  => sub {Config::Structured::Deserializer->decode(shift->_config_v)}
+  default  => sub($self) {Data::Structure::Deserialize::Auto::deserialize($self->_config_v)}
 );
 
 #
@@ -99,8 +241,8 @@ has '_base' => (
 #
 # Convenience method for adding dynamic methods to an object
 #
-sub _add_helper {
-  Mojo::DynamicMethods::register __PACKAGE__, @_;
+sub _add_helper (@args) {
+  Mojo::DynamicMethods::register __PACKAGE__, @args;
 }
 
 around BUILDARGS => sub ($orig, $class, @args) {
@@ -156,8 +298,8 @@ sub BUILD ($self, $args) {
     return $el->{$DEF_DEFAULT};
   }
 
-  state sub concat_path {
-    reduce {local $/ = $SLASH; chomp($a); join(($b =~ m|^$SLASH|) ? $EMPTY : $SLASH, $a, $b)} @_;
+  state sub concat_path($base, $p) {
+    reduce {local $/ = $SLASH; chomp($a); join(($b =~ m|^$SLASH|) ? $EMPTY : $SLASH, $a, $b)} ($base, $p);
   }
 
   state sub typecheck ($isa, $value) {
@@ -251,10 +393,8 @@ sub BUILD ($self, $args) {
 #
 # Handle dynamic method dispatch
 #
-sub BUILD_DYNAMIC {
-  my ($class, $method, $dyn_methods) = @_;
-  return sub {
-    my ($self, @args) = @_;
+sub BUILD_DYNAMIC($class, $method, $dyn_methods) {
+  return sub($self, @args) {
     my $dynamic = $dyn_methods->{$self}{$method};
     return $self->$dynamic(@args) if ($dynamic);
     my $package = ref $self;
@@ -316,123 +456,36 @@ sub __get_child_node_names ($self) {
   return (keys($node->%*));
 }
 
-1;
-
-__END__
-
 =pod
-
-=encoding UTF-8
-
-=head1 NAME
-
-Config::Structured - Provides generalized and structured configuration value access
-
-=head1 VERSION
-
-version 2.004
-
-=head1 SYNOPSIS
-
-Basic usage:
-
-  use Config::Structured;
-
-  my $conf = Config::Structured->new(
-    structure    => { ... },
-    config       => { ... }
-  );
-
-  say $conf->some->nested->value();
-
-Hooks exammple showing how to ensure config directories exist prior to first 
-use:
-
-  my $conf = Config::Structured->new(
-    ...
-    hooks => {
-      '/paths/*' => {
-        on_load => sub($node,$value) {
-          Mojo::File->new($value)->make_path
-        }
-      }
-    }
-  )
-
-=head1 DESCRIPTION
-
-L<Config::Structured> provides a structured method of accessing configuration values
-
-This is predicated on the use of a configuration C<structure> (required), This structure
-provides a hierarchical structure of configuration branches and leaves. Each branch becomes
-a L<Config::Structured> method which returns a new L<Config::Structured> instance rooted at
-that node, while each leaf becomes a method which returns the configuration value.
-
-The configuration value is normally provided in the C<config> hash. However, a C<config> node
-for a non-Hash value can be a hash containing the "source" and "ref" keys. This permits sourcing
-the config value from a file (when source="file") whose filesystem location is given in the "ref"
-value, or an environment variable (when source="env") whose name is given in the "ref" value.
-
-I<Structure Leaf Nodes> are required to include an "isa" key, whose value is a type 
-(see L<Moose::Util::TypeConstraints>). If typechecking is not required, use isa => 'Any'.
-There are a few other keys that L<Config::Structured> respects in a leaf node:
-
-=over 5
-
-=item C<default>
-
-This key's value is the default configuration value if a data source or value is not provided by
-the configuation.
-
-=item C<description>
-
-=item C<notes>
-
-A human-readable description and implementation notes, respectively, of the configuration node. 
-L<Config::Structured> does not do anything with these values at present, but they provides inline 
-documentation of configuration directivess within the structure (particularly useful in the common 
-case where the structure is read from a file)
-
-=back
-
-Besides C<structure> and C<config>, L<Config::Structured> also accepts a C<hooks> argument at 
-initialization time. This argument must be a HashRef whose keys are patterns matching config
-node paths, and whose values are HashRefs containing C<on_load> and/or C<on_access> keys. These
-in turn point to CodeRefs which are run when the config value is initially loaded, or every time
-it is accessed, respectively.
-
-=head1 METHODS
-
-=head2 get($name?)
-
-Class method.
-
-Returns a registered L<Config::Structured> instance.  If C<$name> is not provided, returns the default instance.
-Instances can be registered with C<__register_default> or C<__register_as>. This mechanism is used to provide
-global access to a configuration, even from code contexts that otherwise cannot share data.
-
-=head2 __register_default()
-
-Call on a L<Config::Structured> instance to set the instance as the default.
-
-=head2 __register_as($name)
-
-Call on a L<Config::Structured> instance to register the instance as the provided name.
-
-=head2 __get_child_node_names()
-
-Returns a list of names (strings) of all immediate child nodes of the current config node
 
 =head1 AUTHOR
 
-Mark Tyrrell <mtyrrell@concertpharma.com>
+Mark Tyrrell C<< <mark@tyrrminal.dev> >>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE
 
-This software is Copyright (c) 2023 by Concert Pharmaceuticals, Inc.
+Copyright (c) 2024 Mark Tyrrell
 
-This is free software, licensed under:
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-  The MIT (X11) License
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
 =cut
+
+1;
+
+__END__

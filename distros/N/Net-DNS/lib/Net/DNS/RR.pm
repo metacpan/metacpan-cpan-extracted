@@ -3,7 +3,7 @@ package Net::DNS::RR;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: RR.pm 1910 2023-03-30 19:16:30Z willem $)[2];
+our $VERSION = (qw$Id: RR.pm 1965 2024-02-14 09:19:32Z willem $)[2];
 
 
 =head1 NAME
@@ -89,11 +89,11 @@ my $PARSE_REGEX = q/("[^"]*")|;[^\n]*|[ \t\n\r\f()]+/;		# NB: *not* \s (matches 
 
 sub _new_string {
 	my ( $base, $string ) = @_;
-	local $_ = $string;
-	die 'argument absent or undefined' unless defined $_;
-	die 'non-scalar argument' if ref $_;
+	die 'argument absent or undefined' unless defined $string;
+	die 'non-scalar argument' if ref $string;
 
 	# parse into quoted strings, contiguous non-whitespace and (discarded) comments
+	local $_ = $string;
 	s/\\\\/\\092/g;						# disguise escaped escape
 	s/\\"/\\034/g;						# disguise escaped quote
 	s/\\\(/\\040/g;						# disguise escaped bracket
@@ -234,8 +234,11 @@ sub decode {
 	my $next = $index + $self->{rdlength};
 	die 'corrupt wire-format data' if length $$data < $next;
 
-	local $self->{offset} = $offset;
-	$self->_decode_rdata( $data, $index, @opaque ) if $next > $index or $self->type eq 'OPT';
+	if ( $next > $index or $self->type eq 'OPT' ) {
+		local $self->{offset} = $offset;
+		eval { $self->_decode_rdata( $data, $index, @opaque ) };
+		warn $@ if $@;
+	}
 
 	return wantarray ? ( $self, $next ) : $self;
 }
@@ -328,7 +331,7 @@ sub string {
 	my @rdata = $empty ? () : eval { $self->_format_rdata };
 	carp $@ if $@;
 
-	my $tab = length($name) < 72 ? "\t" : ' ';
+	my $tab	 = length($name) < 72 ? "\t" : ' ';
 	my @line = _wrap( join( $tab, @core, '(' ), @rdata, ')' );
 
 	my $last = pop(@line);					# last or only line
@@ -775,7 +778,7 @@ sub AUTOLOAD {				## Default method
 	}
 
 	my $oref = ref($self);
-	*{$AUTOLOAD} = sub {};		## suppress deep recursion
+	*{$AUTOLOAD} = sub { };		## suppress deep recursion
 	croak qq[$self has no class method "$method"] unless $oref;
 
 	my $string = $self->string;

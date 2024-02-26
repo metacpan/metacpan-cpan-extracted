@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.72';
+our $VERSION = '0.73';
 
 # shortcuts
 #  os and distros
@@ -19,6 +19,9 @@ use constant before_debian_stretch => (linuxdistrocodename => [qw(squeeze precis
 use constant before_ubuntu_bionic  => (linuxdistrocodename => [qw(squeeze precise wheezy trusty jessie xenial stretch)]);
 use constant before_debian_buster  => (linuxdistrocodename => [qw(squeeze precise wheezy trusty jessie xenial stretch bionic)]);
 use constant before_ubuntu_focal   => (linuxdistrocodename => [qw(squeeze precise wheezy trusty jessie xenial stretch bionic buster)]);
+use constant before_ubuntu_bullseye=> (linuxdistrocodename => [qw(squeeze precise wheezy trusty jessie xenial stretch bionic buster focal)]);
+use constant before_ubuntu_jammy   => (linuxdistrocodename => [qw(squeeze precise wheezy trusty jessie xenial stretch bionic buster focal bullseye)]);
+use constant before_ubuntu_bookworm=> (linuxdistrocodename => [qw(squeeze precise wheezy trusty jessie xenial stretch bionic buster focal bullseye jammy)]);
 use constant like_fedora => (linuxdistro => '~fedora');
 #  package shortcuts
 use constant freebsd_jpeg => 'jpeg | jpeg-turbo';
@@ -973,7 +976,10 @@ sub mapping {
       [like_debian,
        [package => 'libusb-dev']],
       [like_fedora,
-       [package => 'libusb-devel']], # but testsuite segfaults
+	[linuxdistro => 'fedora',
+	 linuxdistroversion => {'>=', 39}, # what about older versions?
+	 package => 'libusb1-devel'],
+       [package => 'libusb-devel']],
      ],
 
      [cpanmod => 'Device::Velleman::K8055::libk8055',
@@ -1126,11 +1132,14 @@ sub mapping {
      ],
 
      [cpanmod => 'Filesys::SmbClient',
-      ## XXX unclear which package is the correct one
+      ## XXX does not work out-of-the box, maybe needs some -I and -L settings
       #[os_freebsd,
-      # [package => 'samba-libsmbclient | samba41 | samba4']],
+      # [package => 'samba416 | samba413 | samba41 | samba4 | samba-libsmbclient']],
       [like_debian,
        [package => 'libsmbclient-dev']],
+      ## XXX does not seem to build, neither with centos7 nor with fedora39
+      #[like_fedora,
+      # [package => 'libsmbclient-devel']],
      ],
 
      [cpanmod => 'Finance::MICR::GOCR::Check',
@@ -1802,8 +1811,9 @@ sub mapping {
      ],
 
      [cpanmod => 'Image::Magick',  # typically needs manual work
-      [os_freebsd,
-       [package => 'ImageMagick']],
+      ## XXX needs to be either ImageMagick6 or ImageMagick7 nowadays, but does not install without manual work anyway
+      #[os_freebsd,
+      # [package => 'ImageMagick']],
       [like_debian,
        [package => 'libmagickcore-dev']]],
 
@@ -1892,6 +1902,12 @@ sub mapping {
        [before_ubuntu_bionic,
 	[package => []]],
        [package => 'libheif-dev']],
+      [like_fedora,
+       [linuxdistro => 'centos', # not available for 7
+	package => []],
+       [linuxdistro => 'fedora', linuxdistroversion => {'>=', 37}, # however, configure fails: "doesn't have a HEVC encoder"
+	[package => 'libheif-devel']],
+      ],
      ],
 
      [cpanmod => 'Imager::File::JPEG',
@@ -3168,7 +3184,7 @@ sub mapping {
 
      [cpanmod => 'Tcl',
       [os_freebsd,
-       [package => 'tcl86 | tcl85 | tcl84']],
+       [package => 'tcl87 | tcl86 | tcl85 | tcl84']],
       [like_debian,
        [package => 'tcl8.6-dev | tcl8.5-dev']],
       [like_fedora,
@@ -3335,6 +3351,21 @@ sub mapping {
        [package => 'libqrencode-dev']],
       [like_fedora,
        [package => 'qrencode-devel']],
+     ],
+
+     [cpanmod => 'Text::Treesitter',
+      [os_freebsd,
+       [osvers => {'<', 13},
+	[package => []]],
+       [package => 'tree-sitter']],
+      [like_debian,
+       [before_ubuntu_jammy,
+	[package => []]],
+       [package => 'libtree-sitter-dev']],
+      [like_fedora,
+       [linuxdistro => 'centos',
+	[package => []]],
+       [package => 'libtree-sitter-devel']],
      ],
 
      [cpanmod => 'Text::VimColor',
@@ -3575,7 +3606,7 @@ sub mapping {
 
      [cpanmod => 'XML::LibXSLT',
       [os_freebsd,
-       [package => 'libxslt']],
+       [package => 'libxslt', 'pkgconf']], # pkg-config is required to find location of libxml2 header files
       [os_dragonfly,
        [package => 'libxslt']],
       [os_openbsd,

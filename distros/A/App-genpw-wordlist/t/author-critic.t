@@ -11,11 +11,11 @@ BEGIN {
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.005
+# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.006
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/genpw/wordlist.pm','script/_genpw-wordlist','script/genpw-wordlist'];
+my $filenames = ['lib/App/genpw/wordlist.pm','script/genpw-wordlist'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

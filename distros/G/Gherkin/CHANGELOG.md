@@ -8,6 +8,18 @@ This document is formatted according to the principles of [Keep A CHANGELOG](htt
 
 ## [Unreleased]
 
+## [28.0.0] - 2024-02-15
+### Added
+- [Python] Added release workflow for releasing to Pypi ([#213](https://github.com/cucumber/gherkin/pull/213))
+- (i18n) Added Vietnamese translation of "Rule" ([#204](https://github.com/cucumber/gherkin/pull/204))
+- (i18n) Added Irish translation of "Rule" ([#216](https://github.com/cucumber/gherkin/pull/216))
+
+### Changed
+- [Python] Reuse the action cucumber/action-publish-pypi in release ([#220](https://github.com/cucumber/gherkin/pull/220))
+- [Python] Removed duplicate code in markdown token matcher ([#205](https://github.com/cucumber/gherkin/pull/205))
+- [Java, JavaScript, PHP, Go, Ruby] Upgraded messages to v24
+- Upgraded messages to v22
+
 ## [27.0.0] - 2023-09-15
 ### Added
 - (i18n) Added Malayalam localization
@@ -637,17 +649,18 @@ This document is formatted according to the principles of [Keep A CHANGELOG](htt
 ### Changed
 - First release
 
-[Unreleased]: https://github.com/cucumber/gherkin/compare/v27.0.0...main
-[27.0.0]: https://github.com/cucumber/gherkin/compare/v26.2.0...main
-[26.2.0]: https://github.com/cucumber/gherkin/compare/v26.1.0...main
-[26.1.0]: https://github.com/cucumber/gherkin/compare/v26.0.3...main
-[26.0.3]: https://github.com/cucumber/gherkin/compare/v26.0.2...main
-[26.0.2]: https://github.com/cucumber/gherkin/compare/v26.0.1...main
-[26.0.1]: https://github.com/cucumber/gherkin/compare/v26.0.0...main
-[26.0.0]: https://github.com/cucumber/gherkin/compare/v25.0.2...main
-[25.0.2]: https://github.com/cucumber/gherkin/compare/v25.0.1...main
-[25.0.1]: https://github.com/cucumber/gherkin/compare/v25.0.0...main
-[25.0.0]: https://github.com/cucumber/gherkin/compare/v24.1.0...main
+[Unreleased]: https://github.com/cucumber/gherkin/compare/v28.0.0...HEAD
+[28.0.0]: https://github.com/cucumber/gherkin/compare/v27.0.0...v28.0.0
+[27.0.0]: https://github.com/cucumber/gherkin/compare/v26.2.0...v27.0.0
+[26.2.0]: https://github.com/cucumber/gherkin/compare/v26.1.0...v26.2.0
+[26.1.0]: https://github.com/cucumber/gherkin/compare/v26.0.3...v26.1.0
+[26.0.3]: https://github.com/cucumber/gherkin/compare/v26.0.2...v26.0.3
+[26.0.2]: https://github.com/cucumber/gherkin/compare/v26.0.1...v26.0.2
+[26.0.1]: https://github.com/cucumber/gherkin/compare/v26.0.0...v26.0.1
+[26.0.0]: https://github.com/cucumber/gherkin/compare/v25.0.2...v26.0.0
+[25.0.2]: https://github.com/cucumber/gherkin/compare/v25.0.1...v25.0.2
+[25.0.1]: https://github.com/cucumber/gherkin/compare/v25.0.0...v25.0.1
+[25.0.0]: https://github.com/cucumber/gherkin/compare/v24.1.0...v25.0.0
 [24.1.0]: https://github.com/cucumber/gherkin/compare/v24.0.0...v24.1.0
 [24.0.0]: https://github.com/cucumber/gherkin/compare/v23.0.1...v24.0.0
 [23.0.1]: https://github.com/cucumber/gherkin/compare/v23.0.0...v23.0.1

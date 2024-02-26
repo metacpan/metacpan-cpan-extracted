@@ -1,10 +1,10 @@
 NAME
-    Acme::CPANModules::OneLetter - One-letter CPAN modules
+    Acme::CPANModules::OneLetter - List of one-letter CPAN modules
 
 VERSION
-    This document describes version 0.003 of Acme::CPANModules::OneLetter
+    This document describes version 0.004 of Acme::CPANModules::OneLetter
     (from Perl distribution Acme-CPANModules-OneLetter), released on
-    2020-09-21.
+    2023-10-29.
 
 DESCRIPTION
     Just a list of one-letter modules on CPAN.
@@ -18,37 +18,49 @@ DESCRIPTION
 
      % setop --diff <(perl -E'say for "A".."Z","a".."z","_"') <(cpanmodules ls-entries OneLetter)
 
-INCLUDED MODULES
-    *   B
+ACME::CPANMODULES ENTRIES
+    B   Author: RJBS <https://metacpan.org/author/RJBS>
 
-    *   D
+    D   Author: YOITO <https://metacpan.org/author/YOITO>
 
-    *   H
+    H   Author: EXODIST <https://metacpan.org/author/EXODIST>
 
-    *   K
+    K   Author: WHITNEY <https://metacpan.org/author/WHITNEY>
 
-    *   L
+    L   Author: SONGMU <https://metacpan.org/author/SONGMU>
 
-    *   M
+    M   Author: MSTROUT <https://metacpan.org/author/MSTROUT>
 
-    *   O
+    O   Author: RJBS <https://metacpan.org/author/RJBS>
 
-    *   P
+    P   Author: LAWALSH <https://metacpan.org/author/LAWALSH>
 
-    *   T
+    T   Author: EXODIST <https://metacpan.org/author/EXODIST>
 
-    *   U
+    U   Author: DAGOLDEN <https://metacpan.org/author/DAGOLDEN>
 
-    *   V
+    V   Author: ABELTJE <https://metacpan.org/author/ABELTJE>
 
-    *   Z
+    Z   Author: TOBYINK <https://metacpan.org/author/TOBYINK>
 
-    *   c
+    c   Author: JROCKWAY <https://metacpan.org/author/JROCKWAY>
 
 FAQ
-  What are ways to use this module?
-    Aside from reading it, you can install all the listed modules using
-    cpanmodules:
+  What is an Acme::CPANModules::* module?
+    An Acme::CPANModules::* module, like this module, contains just a list
+    of module names that share a common characteristics. It is a way to
+    categorize modules and document CPAN. See Acme::CPANModules for more
+    details.
+
+  What are ways to use this Acme::CPANModules module?
+    Aside from reading this Acme::CPANModules module's POD documentation,
+    you can install all the listed modules (entries) using cpanm-cpanmodules
+    script (from App::cpanm::cpanmodules distribution):
+
+     % cpanm-cpanmodules -n OneLetter
+
+    Alternatively you can use the cpanmodules CLI (from App::cpanmodules
+    distribution):
 
         % cpanmodules ls-entries OneLetter | cpanm -n
 
@@ -56,9 +68,15 @@ FAQ
 
         % perl -MAcme::CM::Get=OneLetter -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
 
-    This module also helps lcpan produce a more meaningful result for "lcpan
-    related-mods" when it comes to finding related modules for the modules
-    listed in this Acme::CPANModules module.
+    or directly:
+
+        % perl -MAcme::CPANModules::OneLetter -E'say $_->{module} for @{ $Acme::CPANModules::OneLetter::LIST->{entries} }' | cpanm -n
+
+    This Acme::CPANModules module also helps lcpan produce a more meaningful
+    result for "lcpan related-mods" command when it comes to finding related
+    modules for the modules listed in this Acme::CPANModules module. See
+    App::lcpan::Cmd::related_mods for more details on how "related modules"
+    are found.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -68,14 +86,6 @@ SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-Acme-CPANModules-OneLetter>.
 
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-OneL
-    etter>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
 SEE ALSO
     Acme::CPANModules - about the Acme::CPANModules namespace
 
@@ -84,9 +94,34 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2023, 2020, 2019 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-OneL
+    etter>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

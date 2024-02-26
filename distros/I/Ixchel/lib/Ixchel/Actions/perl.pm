@@ -13,11 +13,11 @@ Ixchel::Actions::perl - Handles making sure desired Perl modules are installed a
 
 =head1 VERSION
 
-Version 0.3.0
+Version 0.4.0
 
 =cut
 
-our $VERSION = '0.3.0';
+our $VERSION = '0.4.0';
 
 =head1 CLI SYNOPSIS
 
@@ -207,6 +207,8 @@ sub action_extra {
 			push( @cpanm_args, $module );
 			$self->status_add( status => 'running... ' . join( ' ', @cpanm_args ), );
 			system(@cpanm_args);
+			# set this here just in case it is defined multiple times we can skip it if it fails once
+			$installed{$module} = 1;
 			if ( $? != 0 ) {
 				$self->status_add(
 					status => 'cpanm failed: ' . join( ' ', @cpanm_args ),
@@ -214,7 +216,6 @@ sub action_extra {
 				);
 				push( @cpanm_failed, $module );
 			} else {
-				$installed{$module} = 1;
 				push( @installed_via_cpanm, $module );
 			}
 

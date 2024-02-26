@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Vai::Latn - Package for language Vai
 
 package Locale::CLDR::Locales::Vai::Latn;
 # This file auto generated from Data\common\main\vai_Latn.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -23,7 +23,7 @@ use if $^V ge v5.12.0, feature => 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
-extends('Locale::CLDR::Locales::Vai');
+extends('Locale::CLDR::Locales::Root');
 has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
@@ -329,8 +329,7 @@ has 'characters' => (
 		no warnings 'experimental::regex_sets';
 		return {
 			index => ['A', 'B', 'Ɓ', 'C', 'D', 'Ɗ', 'E', 'Ɛ', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ŋ', 'O', 'Ɔ', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
-			main => qr{[a á ã b ɓ c d ɗ e é ẽ ɛ {ɛ́} {ɛ̃} f g h i í ĩ j k l m n ŋ o ó õ ɔ {ɔ́} {ɔ̃} p q r s t u ú ũ v w x y z]},
-			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			main => qr{[aáã b ɓ c d ɗ eéẽ ɛ{ɛ́}{ɛ̃} f g h iíĩ j k l m n ŋ oóõ ɔ{ɔ́}{ɔ̃} p q r s t uúũ v w x y z]},
 		};
 	},
 EOT
@@ -340,39 +339,11 @@ EOT
 );
 
 
-has 'quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{“},
-);
-
-has 'quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{”},
-);
-
-has 'alternate_quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{‘},
-);
-
-has 'alternate_quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{’},
-);
-
 has 'yesstr' => (
 	is			=> 'ro',
 	isa			=> RegexpRef,
 	init_arg	=> undef,
-	default		=> sub { qr'^(?i:yes|y)$' }
+	default		=> sub { qr'^(?i:|yes|y)$' }
 );
 
 has 'nostr' => (
@@ -382,45 +353,11 @@ has 'nostr' => (
 	default		=> sub { qr'^(?i:kpele|k|no|n)$' }
 );
 
-has 'default_numbering_system' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> 'latn',
-);
-
 has native_numbering_system => (
 	is			=> 'ro',
 	isa			=> Str,
 	init_arg	=> undef,
 	default		=> 'vaii',
-);
-
-has 'number_symbols' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'latn' => {
-			'decimal' => q(.),
-			'group' => q(,),
-		},
-	} }
-);
-
-has 'number_formats' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		decimalFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0.###',
-				},
-			},
-		},
-} },
 );
 
 has 'number_currency_formats' => (
@@ -655,9 +592,14 @@ has 'currencies' => (
 				'currency' => q(Siŋ Hɛlina Pɔɔ̃),
 			},
 		},
-		'SLL' => {
+		'SLE' => {
 			display_name => {
 				'currency' => q(Liyɔɔ̀),
+			},
+		},
+		'SLL' => {
+			display_name => {
+				'currency' => q(Liyɔɔ̀ \(1964—2022\)),
 			},
 		},
 		'SOS' => {
@@ -795,10 +737,10 @@ has 'time_formats' => (
 		'generic' => {
 		},
 		'gregorian' => {
-			'full' => q{h:mm:ss a zzzz},
-			'long' => q{h:mm:ss a z},
-			'medium' => q{h:mm:ss a},
-			'short' => q{h:mm a},
+			'full' => q{h:mm:ss a zzzz},
+			'long' => q{h:mm:ss a z},
+			'medium' => q{h:mm:ss a},
+			'short' => q{h:mm a},
 		},
 	} },
 );
@@ -822,17 +764,11 @@ has 'datetime_formats_available_formats' => (
 	default		=> sub { {
 		'generic' => {
 			Ed => q{E d},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
 			MEd => q{E, M/d},
-			MMM => q{LLL},
 			MMMEd => q{E, MMM d},
-			MMMd => q{MMM d},
 			Md => q{M/d},
-			d => q{d},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
 			ms => q{m:ss},
 			y => q{y},
 			yM => q{M/y},
@@ -846,19 +782,12 @@ has 'datetime_formats_available_formats' => (
 		},
 		'gregorian' => {
 			Ed => q{E d},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
 			MEd => q{E, M/d},
-			MMM => q{LLL},
 			MMMEd => q{E, MMM d},
-			MMMd => q{MMM d},
 			Md => q{M/d},
-			d => q{d},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
 			ms => q{m:ss},
-			y => q{y},
 			yM => q{M/y},
 			yMEd => q{E, M/d/y},
 			yMMM => q{MMM y},

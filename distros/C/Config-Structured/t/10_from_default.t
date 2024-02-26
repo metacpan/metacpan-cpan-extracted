@@ -2,7 +2,7 @@ use strict;
 use warnings qw(all);
 use 5.022;
 
-use Test::More tests => 1;
+use Test2::V0;
 
 use Config::Structured;
 
@@ -20,3 +20,5 @@ END
 );
 
 is($conf->paths->tmp, '/tmp', 'Conf value from default');
+
+done_testing;

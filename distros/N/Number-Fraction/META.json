@@ -4,7 +4,7 @@
       "Dave Cross, E<lt>dave@mag-sol.comE<gt>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4232",
    "license" : [
       "perl_5"
    ],
@@ -29,7 +29,7 @@
          "requires" : {
             "Carp" : "0",
             "Moo" : "0",
-            "MooX::Types::MooseLike::Base" : "0",
+            "Types::Standard" : "0",
             "overload" : "0",
             "perl" : "v5.10.0"
          }
@@ -38,7 +38,7 @@
    "provides" : {
       "Number::Fraction" : {
          "file" : "lib/Number/Fraction.pm",
-         "version" : "v3.0.4"
+         "version" : "v3.1.0"
       }
    },
    "release_status" : "stable",
@@ -55,6 +55,6 @@
          "web" : "https://github.com/p5-number-fraction/number-fraction"
       }
    },
-   "version" : "v3.0.4",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "v3.1.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

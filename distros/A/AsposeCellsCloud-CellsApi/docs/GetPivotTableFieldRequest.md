@@ -8,13 +8,13 @@ use AsposeCellsCloud::Request::GetPivotTableField;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**name** | **string** | The workbook name. |
+**name** | **string** | The file name. |
 **sheet_name** | **string** | The worksheet name. |
-**pivot_table_index** | **int** | Gets the PivotTable report by index. |
-**pivot_field_index** | **int** | The field index in the base fields. |
-**pivot_field_type** | **string** | The fields area type(column/row). |
-**folder** | **string** | Original workbook folder. |
-**storage_name** | **string** | Storage name. |  
+**pivot_table_index** | **int** | The PivotTable index. |
+**pivot_field_index** | **int** | The pivot field index of PivotTable. |
+**pivot_field_type** | **string** | The field area type(column/row). |
+**folder** | **string** | The folder where the file is situated. |
+**storage_name** | **string** | The storage name where the file is situated. |  
 
 [[Back to Model list]](../README.md#documentation-for-requests) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

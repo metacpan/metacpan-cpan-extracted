@@ -347,11 +347,11 @@ sub _get_covered_cells_vector {
 __END__
 
 =head1 NAME
- 
+
 Games::Sudoku::PatternSolver::Patterns - for internal use in L<Games::Sudoku::PatternSolver> only
- 
+
 =head1 DESCRIPTION
- 
+
 This sub module encompasses procedures that require a certain knowledge of the specific grid size and layout (currently only the standard 9x9).
 
 The solve method does not know of the grid. For its backtracking algorithm it doesn't apply constraint rules to any individual field, 
@@ -367,18 +367,18 @@ As an array, as well as a hash which holds them ordered in sets by a common fiel
 
 * provides the field indices in sets of groups (rows, columns and boxes). 
 These are needed by the cheat mode, essentially in methods hidden_singles() and naked_singles(), which have to know which fields they must apply the rules to.
- 
+
 =head1 SEE ALSO
- 
+
 L<https://www.sudokuwiki.org/Pattern_Overlay>, L<https://sites.math.washington.edu/~morrow/mcm/team2280.pdf>
- 
+
 =head1 AUTHOR
- 
+
 Steffen Heinrich
- 
+
 =head1 LICENSE
- 
+
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
- 
+
 =cut

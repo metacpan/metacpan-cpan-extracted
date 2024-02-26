@@ -2,10 +2,13 @@ NAME
     Require::HookChain - Chainable require hooks
 
 VERSION
-    This document describes version 0.015 of Require::HookChain (from Perl
-    distribution Require-HookChain), released on 2023-07-23.
+    This document describes version 0.016 of Require::HookChain (from Perl
+    distribution Require-HookChain), released on 2023-12-05.
 
 SYNOPSIS
+    NOTE: Please see Require::HookPlugin instead which will supersede this
+    project.
+
     Say you want to create a require hook to prepend some code to the module
     source code that is loaded. In your hook source, in
     Require/HookChain/munge/prepend.pm:
@@ -207,6 +210,34 @@ FAQ
     You control the ordering by putting the hooks in @INC in your preferred
     order. See "Hook ordering" for more details.
 
+  What are the differences between Require::HookChain and Require::HookPlugin?
+    Require::HookChain (RHC) and Require::HookPlugin (RHP) are both
+    frameworks to add custom behavior to the module loading process. The
+    following are the comparison between the two:
+
+    RHC and RHP both work by installing its own handler (a coderef) at the
+    beginning of @INC. They then evaluate the rest of @INC like Perl does,
+    with some differences.
+
+    Perl stops at the first @INC element where it finds the source code,
+    while RHC's handler evaluates all the entries of @INC looking for hooks
+    in the form of objects of the class under the "Require::HookChain::"
+    namespace.
+
+    RHP's plugins, on the other hand, are not installed directly in @INC but
+    at another array (@Require::HookPlugin::Plugin_Instances), so the only
+    entry installed in @INC is RHP's own handler.
+
+    RHC evaluates hooks in @INC in order, so you have to install the hooks
+    in the right order to get the correct behavior. On the other hand, RHP
+    evaluates plugins based on events, plugins' priority, and activation
+    order. Plugins have a default priority value (though you can override
+    it). In general you can activate plugins in whatever order and generally
+    they will do the right thing. RHP is more flexible and powerful than
+    RHC, but is slightly more complex.
+
+    Writing hooks for RHC (or plugins for RHP) are roughly equally easy.
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/Require-HookChain>.
@@ -218,8 +249,13 @@ SOURCE
 SEE ALSO
     RHC for convenience of using on the command-line or one-liners.
 
-    Require::Hook is an older framework and is superseded by
-    Require::HookChain.q
+    Require::Hook (RH) is an older framework and is superseded by
+    Require::HookChain (RHC).
+
+    Require::HookPlugin (RHP) is a newer framework that aims to be more
+    flexible and comes with sensible default of ordering, to avoid the trap
+    of installing hooks at the wrong order. RHP might supersede RHC in the
+    future.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

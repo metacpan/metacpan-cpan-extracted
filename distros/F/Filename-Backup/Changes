@@ -1,11 +1,17 @@
-Revision history for Filename-Backup
+0.040   2023-12-15  Released-By: PERLANCAR; Urgency: medium
 
-0.03    2016-10-18 (PERLANCAR)
+        - [incompatible change] Rename 'ci' arg to 'ignore_case' to be
+          consistent with others.
+
+        - [ux][doc] Add examples.
+
+
+0.03    2016-10-18  Released-By: PERLANCAR
 
         - Recognize #...#, .swp, .orig, .rej.
 
 
-0.02    2015-09-03 (PERLANCAR)
+0.02    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -14,6 +20,6 @@ Revision history for Filename-Backup
 	  requirement.
 
 
-0.01    2015-01-04 (PERLANCAR)
+0.01    2015-01-04  Released-By: PERLANCAR
 
         - First release.

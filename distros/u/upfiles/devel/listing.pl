@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2016, 2017, 2019 Kevin Ryde
+# Copyright 2016, 2017, 2019, 2020, 2021 Kevin Ryde
 
 # This file is part of Upfiles.
 #
@@ -78,8 +78,9 @@ sub number_commas {
 {
   # Mangle so sort() will have "." before "-" before "_".
   # "." is tr'ed to whichever of the three sorts first, etc.
-  my $tr = Regexp::Tr->new('.-_',
-                           join('', sort {$a cmp $b} split //, '.-_'));
+  my $chars = '.-_';
+  my $tr = Regexp::Tr->new($chars,
+                           join('', sort {$a cmp $b} split //, $chars));
 
   sub filename_sort_key {
     my ($str) = @_;
@@ -93,7 +94,7 @@ foreach my $dir (@dirs) {
 
   my @filenames;
   if ($dir eq '.') {
-    @filenames = grep {!-d} File::Slurp::read_dir('.');
+    @filenames = File::Slurp::read_dir('.');
   } else {
     File::Find::find({ no_chdir => 1,
                        wanted => sub {

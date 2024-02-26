@@ -13,11 +13,11 @@ Shell::Var::Reader::CMDB - Helper for updating shell_var_reader based CMDBs.
 
 =head1 VERSION
 
-Version 0.3.0
+Version 0.4.0
 
 =cut
 
-our $VERSION = '0.3.0';
+our $VERSION = '0.4.0';
 
 =head1 SUBROUTINES
 
@@ -38,6 +38,10 @@ The following options are available.
     - verbose :: If it should be verbose or not.
         - Default :: 1
 
+    - to_process :: An optional array of groups or systems
+            to process by path.
+        - Default :: undef
+
 If dir undef, it will check the following
 directories for the file '.shell_var_reader'.
 
@@ -46,6 +50,32 @@ directories for the file '.shell_var_reader'.
   ../../
   ../../../
   ../../../../
+
+When using to_process, group and systems should not be mixed
+as it will result in groups being ignored as systems is more
+restrictive.
+
+Lets assume we have the following...
+
+    ./group_a/foo.sh
+    ./group_a/bar.sh
+    ./group_b/nas.sh
+
+So if we have to_process set to ['group_a'] the following
+would be processed...
+
+    ./group_a/foo.sh
+    ./group_a/bar.sh
+
+So if we have to_process set to ['group_a/bar.sh'] the following
+would be processed...
+
+    ./group_a/bar.sh
+
+So if we have to_process set to ['group_a/bar.sh', 'group_b'] the following
+would be processed...
+
+    ./group_a/bar.sh
 
 =cut
 
@@ -83,6 +113,40 @@ sub update {
 		}
 	}
 
+	chdir( $opts{dir} );
+	$opts{dir} = './';
+
+	my $has_specified_groups  = 0;
+	my $has_specified_systems = 0;
+	my %specified_groups;
+	my %specified_systems;
+	if (   defined( $opts{to_process} )
+		&& ref( $opts{to_process} ) eq 'ARRAY'
+		&& defined( $opts{to_process}[0] )
+		&& ( ref( $opts{to_process}[0] ) eq '' || ref( $opts{to_process}[0] ) eq 'SCALAR' ) )
+	{
+		foreach my $item ( @{ $opts{to_process} } ) {
+			$item =~ s/^\.\/+//;
+			$item =~ s/\/+$//;
+			if ( -d $item ) {
+				$specified_groups{$item} = 1;
+				$has_specified_groups = 1;
+			} elsif ( $item =~ /^[a-zA-Z0-9\.\_\-]+\/+[a-zA-Z0-9\.\_\-]+\.sh$/ ) {
+				my $group = $item;
+				$group =~ s/\/+.*$//;
+				$specified_groups{$group} = 1;
+
+				my $system = $item;
+				$system =~ s/^.*\/+//;
+				$system =~ s/\.sh$//;
+				$specified_systems{$system} = 1;
+
+				$has_specified_groups  = 1;
+				$has_specified_systems = 1;
+			} ## end elsif ( $item =~ /^[a-zA-Z0-9\.\_\-]+\/+[a-zA-Z0-9\.\_\-]+\.sh$/)
+		} ## end foreach my $item ( @{ $opts{to_process} } )
+	} ## end if ( defined( $opts{to_process} ) && ref( ...))
+
 	# make sure this file exists, ortherwise likely not a directory this should be operating on
 	if ( !-f $opts{dir} . '/.shell_var_reader' ) {
 		die(      'Does not appear to be a directory for cmdb_shell_var_reader ... "'
@@ -109,33 +173,56 @@ sub update {
 			&& $_ ne 'cmdb'
 	} read_dir( $opts{dir} );
 	foreach my $sys_group ( sort(@system_groups) ) {
-		if ( $opts{verbose} ) {
-			print "Processing group $sys_group ... \n";
+		my $process_group = 1;
+		if ( $has_specified_groups && !$specified_groups{$sys_group} ) {
+			$process_group = 0;
 		}
 
-		my @systems_in_group = grep { -f $sys_group . '/' . $_ && $_ =~ /\.sh$/ && $_ !~ /^\_/ } read_dir($sys_group);
-		chdir($sys_group);
-		foreach my $system ( sort(@systems_in_group) ) {
-			my $cmdb_host = $system;
-			$cmdb_host =~ s/\.sh$//;
-
+		if ($process_group) {
 			if ( $opts{verbose} ) {
-				print $cmdb_host. "\n";
+				print "Processing group $sys_group ... \n";
 			}
-			my $command
-				= 'shell_var_reader -r '
-				. shell_quote($system)
-				. ' --tcmdb ../cmdb/ -s -p --cmdb_host '
-				. shell_quote($cmdb_host) . ' '
-				. $munger_option
-				. ' -o multi -d ../';
-			print `$command`;
 
-		} ## end foreach my $system ( sort(@systems_in_group) )
-		if ( $opts{verbose} ) {
-			print "\n\n";
+			my @systems_in_group
+				= grep { -f $sys_group . '/' . $_ && $_ =~ /\.sh$/ && $_ !~ /^\_/ } read_dir($sys_group);
+			chdir($sys_group);
+			foreach my $system ( sort(@systems_in_group) ) {
+				my $cmdb_host = $system;
+				$cmdb_host =~ s/\.sh$//;
+
+				my $process_system = 1;
+				if ( $has_specified_systems && !$specified_systems{$cmdb_host} ) {
+					$process_system = 0;
+				}
+
+				if ($process_system) {
+					if ( $opts{verbose} ) {
+						print $cmdb_host. "\n";
+					}
+					my $command
+						= 'shell_var_reader -r '
+						. shell_quote($system)
+						. ' --tcmdb ../cmdb/ -s -p --cmdb_host '
+						. shell_quote($cmdb_host) . ' '
+						. $munger_option
+						. ' -o multi -d ../';
+					print `$command`;
+
+				} else {
+					if ( $opts{verbose} ) {
+						print 'skipping ' . $cmdb_host . "\n";
+					}
+				}
+			} ## end foreach my $system ( sort(@systems_in_group) )
+			if ( $opts{verbose} ) {
+				print "\n\n";
+			}
+			chdir('..');
+		} else {
+			if ( $opts{verbose} ) {
+				print "Skipping group $sys_group ... \n\n\n";
+			}
 		}
-		chdir('..');
 	} ## end foreach my $sys_group ( sort(@system_groups) )
 } ## end sub update
 

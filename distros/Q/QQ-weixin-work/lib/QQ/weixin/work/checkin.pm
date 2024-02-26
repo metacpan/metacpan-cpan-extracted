@@ -8,7 +8,7 @@ QQ::weixin::work::checkin
 
 =head1 DESCRIPTION
 
-应用管理
+打卡
 
 =cut
 
@@ -19,16 +19,20 @@ use LWP::UserAgent;
 use JSON;
 use utf8;
 
-our $VERSION = '0.06';
+our $VERSION = '0.10';
 our @EXPORT = qw/ getcorpcheckinoption getcheckinoption getcheckindata
-				getcheckin_daydata getcheckin_monthdata getcheckinschedulist
-				setcheckinschedulist addcheckinuserface /;
+				getcheckin_daydata getcheckin_monthdata
+				getcheckinschedulist setcheckinschedulist
+				punch_correction addcheckinuserface
+				add_checkin_option update_checkin_option clear_checkin_option_array_field
+				del_checkin_option /;
 
 =head1 FUNCTION
 
 =head2 getcorpcheckinoption(access_token, hash);
 
 获取企业所有打卡规则
+最后更新：2023/11/30
 
 =head2 SYNOPSIS
 
@@ -36,7 +40,7 @@ L<https://developer.work.weixin.qq.com/document/path/93384>
 
 =head3 请求说明：
 
-企业可通过打卡应用Secret调用本接口，获取企业内所有打卡规则数据。
+自建应用、代开发应用可用此接口，获取企业内所有打卡规则。
 
 =head4 请求包结构体为：
 
@@ -44,16 +48,25 @@ L<https://developer.work.weixin.qq.com/document/path/93384>
 
 =head4 参数说明：
 
-    参数	            必须	说明
+	参数	            必须	说明
     access_token	是	调用接口凭证。必须使用打卡应用的Secret获取access_token，获取方式参考：文档-获取access_token
 
-=head3 权限说明
+=head4 调用频率:
 
 接口调用频率限制为60次/分钟。
 
+=head3 权限说明
+
+	应用类型	权限要求
+	自建应用	配置到「打卡 - 可调用接口的应用」中
+	代开发应用	具有「打卡」权限
+	第三方应用	暂不支持
+
+注： 从2023年12月1日0点起，不再支持通过系统应用secret调用接口，存量企业暂不受影响 查看详情
+
 =head3 RETURN 返回结果
 
-    {
+	{
 		"errcode": 0,
 		"errmsg": "ok",
 		"group": [{
@@ -131,7 +144,7 @@ L<https://developer.work.weixin.qq.com/document/path/93384>
 				}
 			],
 			"range": {
-				"partyid": []
+				"party_id": []
 				"userid": ["icef", "LiJingZhong"]
 				"tagid": [2]
 			},
@@ -255,8 +268,8 @@ L<https://developer.work.weixin.qq.com/document/path/93384>
 
 =head4 RETURN 参数说明
 
-    参数	    说明
-    errcode	int32	错误码，详情见错误码说明
+	参数		类型		说明
+	errcode	int32	错误码，详情见错误码说明
 	errmsg	string	错误码对应的错误信息提示
 	group	obj[]	企业规则信息列表
 	group.grouptype	uint32	打卡规则类型，1：固定时间上下班；2：按班次上下班；3：自由上下班
@@ -271,8 +284,8 @@ L<https://developer.work.weixin.qq.com/document/path/93384>
 	group.checkindate.checkintime.remind_off_work_sec	uint32	下班提醒时间，表示为距离当天0点的秒数。
 	group.checkindate.noneed_offwork	bool	下班不需要打卡，true为下班不需要打卡，false为下班需要打卡
 	group.checkindate.limit_aheadtime	uint32	打卡时间限制（毫秒）
-	group.checkindate.flex_on_duty_time	int32	允许迟到时间，单位ms
-	group.checkindate.flex_off_duty_time	int32	允许早退时间，单位ms
+	group.checkindate.flex_on_duty_time	int32	允许迟到时间（秒）
+	group.checkindate.flex_off_duty_time	int32	允许早退时间（秒）
 	group.spe_workdays	obj[]	特殊日期-必须打卡日期信息，timestamp表示具体时间
 	group.spe_workdays.timestamp	uint32	特殊日期-必须打卡日期时间戳
 	group.spe_workdays.notes	string	特殊日期备注
@@ -296,7 +309,7 @@ L<https://developer.work.weixin.qq.com/document/path/93384>
 	group.loc_infos.distance	uint32	允许打卡范围（米）
 	group.range	obj	打卡人员信息
 	group.range.userid	string	打卡人员中，单个打卡人员节点的userid
-	group.range.partyid	string[]	打卡人员中，部门节点的id
+	group.range.party_id	string[]	打卡人员中，部门节点的id
 	group.range.tagid	uint32[]	打卡人员中，标签节点的标签id
 	group.create_time	uint32	创建打卡规则时间，为unix时间戳
 	group.white_users	string[]	打卡人员白名单，即不需要打卡人员，需要有设置白名单才能查看
@@ -349,8 +362,8 @@ L<https://developer.work.weixin.qq.com/document/path/93384>
 	group.schedulelist.limit_offtime	uint32	下班xx秒后不允许打下班卡
 	group.schedulelist.noneed_offwork	bool	下班不需要打卡
 	group.schedulelist.allow_flex	bool	是否允许弹性时间
-	group.schedulelist.flex_on_duty_time	uint32	允许迟到时间
-	group.schedulelist.flex_off_duty_time	uint32	允许早退时间
+	group.schedulelist.flex_on_duty_time	uint32	允许迟到时间（秒）
+	group.schedulelist.flex_off_duty_time	uint32	允许早退时间（秒）
 	group.schedulelist.late_rule	obj	晚走晚到时间规则信息
 	group.schedulelist.late_rule.allow_offwork_after_time	bool	是否允许超时下班（下班晚走次日晚到）允许时onwork_flex_time，offwork_after_time才有意义
 	group.schedulelist.late_rule.timerules	obj[]	迟到规则时间
@@ -359,6 +372,7 @@ L<https://developer.work.weixin.qq.com/document/path/93384>
 	group.schedulelist.max_allow_arrive_early	uint32	最早可打卡时间限制
 	group.schedulelist.max_allow_arrive_late	uint32	最晚可打卡时间限制，max_allow_arrive_early、max_allow_arrive_early与flex_on_duty_time、flex_off_duty_time互斥，当设置其中一组时，另一组数值置0
 	group.offwork_interval_time	uint32	自由签到，上班打卡后xx秒可打下班卡
+	group.buka_restriction	uint64	补卡指定异常类型，按比特位设置，大端模式，某位bit置位为1表示关闭某类型。从低到高四个比特位分别表示缺卡类型、迟到类型、早退类型、其他异常类型。为默认值0表示所有异常类型均允许补卡。
 
 =cut
 
@@ -382,6 +396,7 @@ sub getcorpcheckinoption {
 =head2 getcheckinoption(access_token, hash);
 
 获取员工打卡规则
+最后更新：2023/11/30
 
 =head2 SYNOPSIS
 
@@ -389,8 +404,7 @@ L<https://developer.work.weixin.qq.com/document/path/90263>
 
 =head3 请求说明：
 
-企业可通过打卡应用Secret获取的token，获取指定员工指定日期的打卡规则。
-第三方应用可获取应用可见范围内指定员工指定日期的打卡规则。
+自建应用、第三方应用和代开发应用可使用此接口，获取可见范围内指定员工指定日期的打卡规则。
 
 =head4 请求包结构体为：
 
@@ -401,19 +415,26 @@ L<https://developer.work.weixin.qq.com/document/path/90263>
 
 =head4 参数说明：
 
-    参数	            必须	说明
+	参数	            必须	说明
     access_token	是	调用接口凭证。必须使用打卡应用的Secret获取access_token，获取方式参考：文档-获取access_token
 	datetime	是	需要获取规则的日期当天0点的Unix时间戳
 	useridlist	是	需要获取打卡规则的用户列表
 
+1. 用户列表不超过100个，若用户超过100个，请分批获取。
+2. 用户在不同日期的规则不一定相同，请按天获取。
+
 =head3 权限说明
 
-用户列表不超过100个，若用户超过100个，请分批获取。
-用户在不同日期的规则不一定相同，请按天获取。
+	应用类型	权限要求
+	自建应用	配置到「打卡 - 可调用接口的应用」中
+	代开发应用	具有「打卡」权限
+	第三方应用	具有「打卡」权限
+
+注： 从2023年12月1日0点起，不再支持通过系统应用secret调用接口，存量企业暂不受影响 查看详情
 
 =head3 RETURN 返回结果
 
-    {
+	{
 		"errcode": 0,
 		"errmsg": "ok",
 		"info": [
@@ -548,8 +569,8 @@ L<https://developer.work.weixin.qq.com/document/path/90263>
 
 =head4 RETURN 参数说明
 
-    参数	    说明
-    errcode	int32	错误码，详情见错误码说明
+	参数		类型		说明
+	errcode	int32	错误码，详情见错误码说明
 	errmsg	string	错误码对应的错误信息提示
 	info	obj[]	返回的打卡规则列表
 	userid	string	打卡人员userid
@@ -567,8 +588,8 @@ L<https://developer.work.weixin.qq.com/document/path/90263>
 	group.checkindate.noneed_offwork	bool	下班不需要打卡，true为下班不需要打卡，false为下班需要打卡
 	group.checkindate.limit_aheadtime	uint32	打卡时间限制（毫秒）
 	group.checkindate.flex_time	uint32	弹性时间（毫秒）只有flex_on_duty_time，flex_off_duty_time不生效时（值为-1）才有意义
-	group.checkindate.flex_on_duty_time	int32	允许迟到时间，单位ms，值为-1使用flex_time
-	group.checkindate.flex_off_duty_time	int32	允许早退时间，单位ms，值为-1使用flex_time
+	group.checkindate.flex_on_duty_time	int32	允许迟到时间（秒），值为-1使用flex_time
+	group.checkindate.flex_off_duty_time	int32	允许早退时间（秒），值为-1使用flex_time
 	group.spe_workdays	obj[]	特殊日期-必须打卡日期，timestamp表示具体时间
 	group.spe_workdays.timestamp	uint32	特殊日期-必须打卡日期时间戳
 	group.spe_workdays.notes	string	特殊日期备注
@@ -606,8 +627,8 @@ L<https://developer.work.weixin.qq.com/document/path/90263>
 	group.schedulelist.limit_offtime	uint32	下班xx秒后不允许打下班卡
 	group.schedulelist.noneed_offwork	bool	下班不需要打卡
 	group.schedulelist.allow_flex	uint32	是否允许弹性时间
-	group.schedulelist.flex_on_duty_time	uint32	允许迟到时间，单位ms，值为-1使用flex_time
-	group.schedulelist.flex_off_duty_time	uint32	允许早退时间，单位ms，值为-1使用flex_time
+	group.schedulelist.flex_on_duty_time	uint32	允许迟到时间（秒），值为-1使用flex_time
+	group.schedulelist.flex_off_duty_time	uint32	允许早退时间（秒），值为-1使用flex_time
 	group.schedulelist.late_rule	obj	晚走晚到时间规则信息
 	group.schedulelist.late_rule.allow_offwork_after_time	bool	是否允许超时下班（下班晚走次日晚到）允许时onwork_flex_time，offwork_after_time才有意义
 	group.schedulelist.late_rule.timerules	obj[]	迟到规则时间
@@ -615,6 +636,7 @@ L<https://developer.work.weixin.qq.com/document/path/90263>
 	group.schedulelist.late_rule.timerules.onwork_flex_time	uint32	第二天第一个班次允许迟到的弹性时间单位：秒
 	group.schedulelist.max_allow_arrive_early	uint32	最早可打卡时间限制
 	group.schedulelist.max_allow_arrive_late	uint32	最晚可打卡时间限制，max_allow_arrive_early、max_allow_arrive_early与flex_on_duty_time、flex_off_duty_time互斥，当设置其中一组时，另一组数值置0
+	group.buka_restriction	uint64	补卡指定异常类型，按比特位设置，大端模式，某位bit置位为1表示关闭某类型。从低到高四个比特位分别表示缺卡类型、迟到类型、早退类型、其他异常类型。为默认值0表示所有异常类型均允许补卡。
 
 =cut
 
@@ -638,6 +660,7 @@ sub getcheckinoption {
 =head2 getcheckindata(access_token, hash);
 
 获取打卡记录数据
+最后更新：2023/12/18
 
 =head2 SYNOPSIS
 
@@ -645,8 +668,7 @@ L<https://developer.work.weixin.qq.com/document/path/90262>
 
 =head3 请求说明：
 
-企业可通过打卡应用Secret调用本接口，获取指定员工指定时间段内的打卡记录数据。
-第三方应用可获取应用可见范围内指定员工指定日期的打卡记录数据。
+应用可通过本接口，获取可见范围内员工指定时间段内的打卡记录数据。
 
 =head4 请求包结构体为：
 
@@ -659,14 +681,12 @@ L<https://developer.work.weixin.qq.com/document/path/90262>
 
 =head4 参数说明：
 
-    参数	            必须	说明
-    access_token	是	调用接口凭证。必须使用打卡应用的Secret获取access_token，获取方式参考：文档-获取access_token
+	参数	            必须	说明
+    access_token	是	调用接口凭证，获取方式参考：文档-获取access_token
 	opencheckindatatype	是	打卡类型。1：上下班打卡；2：外出打卡；3：全部打卡
 	starttime	是	获取打卡记录的开始时间。Unix时间戳
 	endtime	是	获取打卡记录的结束时间。Unix时间戳
 	useridlist	是	需要获取打卡记录的用户列表
-
-=head3 权限说明
 
 1. 获取记录时间跨度不超过30天
 2. 用户列表不超过100个。若用户超过100个，请分批获取
@@ -674,9 +694,18 @@ L<https://developer.work.weixin.qq.com/document/path/90262>
 4. 标准打卡时间只对于固定排班和自定义排班两种类型有效
 5. 接口调用频率限制为600次/分钟
 
+=head3 权限说明
+
+	应用类型	权限要求
+	自建应用	配置到「打卡 - 可调用接口的应用」中
+	代开发应用	具有「打卡」权限
+	第三方应用	具有「打卡」权限
+
+注： 从2023年12月1日0点起，不再支持通过系统应用secret调用接口，存量企业暂不受影响 查看详情
+
 =head3 RETURN 返回结果
 
-    {
+	{
 	   "errcode":0,
 	   "errmsg":"ok",
 	   "checkindata": [{
@@ -719,7 +748,7 @@ L<https://developer.work.weixin.qq.com/document/path/90262>
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     userid	用户id
 	groupname	打卡规则名称
 	checkin_type	打卡类型。字符串，目前有：上班打卡，下班打卡，外出打卡
@@ -761,6 +790,7 @@ sub getcheckindata {
 =head2 getcheckin_daydata(access_token, hash);
 
 获取打卡日报数据
+最后更新：2023/12/18
 
 =head2 SYNOPSIS
 
@@ -768,8 +798,7 @@ L<https://developer.work.weixin.qq.com/document/path/93374>
 
 =head3 请求说明：
 
-企业可通过打卡应用Secret调用本接口，获取指定员工指定时间段内的打卡日报统计数据。
-第三方应用可获取应用可见范围内指定员工指定日期内的打卡日报统计数据。
+企业可通过具有调用权限的应用，获取应用可见范围内指定员工指定日期内的打卡日报统计数据。
 
 =head4 请求包结构体为：
 
@@ -783,20 +812,30 @@ L<https://developer.work.weixin.qq.com/document/path/93374>
 
 =head4 参数说明：
 
-    参数	必须	类型	说明
-    access_token	是	string	调用接口凭证，必须使用打卡应用的Secret获取access_token，获取方式参考：文档-获取access_token。
+	参数		必须		类型		说明
+	access_token	是	string	调用接口凭证，获取方式参考：文档-获取access_token。
 	starttime	是	uint32	获取日报的开始时间。0点Unix时间戳
 	endtime	是	uint32	获取日报的结束时间。0点Unix时间戳
-	useridlist	是	string[]	获取日报的userid列表。单个userid不少于1字节，不多于64字节,可填充个数：1 ~ 100
+	useridlist	是	string[]	获取日报的userid列表。
+								单个userid不少于1字节，不多于64字节
+								可填充个数：1 ~ 100
+
+=head4 调用频率:
+
+接口调用频率限制为100次/分钟。
 
 =head3 权限说明
 
-接口调用频率限制为100次/分钟。
-仅允许通过打卡应用的secret获取到的access_token调用。
+	应用类型	权限要求
+	自建应用	配置到「打卡 - 可调用接口的应用」中
+	代开发应用	具有「打卡」权限
+	第三方应用	具有「打卡」权限
+
+注： 从2023年12月1日0点起，不再支持通过系统应用secret调用接口，存量企业暂不受影响 查看详情
 
 =head3 RETURN 返回结果
 
-    {
+	{
 		"errcode":0,
 		"errmsg":"ok",
 		"datas":[
@@ -884,9 +923,8 @@ L<https://developer.work.weixin.qq.com/document/path/93374>
 				"ot_info":{
 					"ot_status":1,
 					"ot_duration":3600,
-					"exception_duration":[
-						
-					]
+					"exception_duration":[],
+					"workday_over_as_money": 54000
 				},
 				"sp_items":[
 					{
@@ -912,7 +950,7 @@ L<https://developer.work.weixin.qq.com/document/path/93374>
 
 =head4 RETURN 参数说明
 
-    参数	类型	说明
+	参数		类型		说明
 	errcode	int32	返回码
 	errmsg	string	错误码描述
 	datas	obj[]	日报数据列表
@@ -922,7 +960,7 @@ L<https://developer.work.weixin.qq.com/document/path/93374>
 	datas.base_info.name	string	打卡人员姓名
 	datas.base_info.name_ex	string	打卡人员别名
 	datas.base_info.departs_name	string	打卡人员所在部门，会显示所有所在部门
-	datas.base_info.acctid	string	打卡人员帐号，即userid
+	datas.base_info.acctid	string	打卡人员账号，即userid
 	datas.base_info.rule_info	obj	打卡人员所属规则信息
 	datas.base_info.rule_info.groupid	int32	所属规则的id
 	datas.base_info.rule_info.groupname	string	打卡规则名
@@ -956,6 +994,12 @@ L<https://developer.work.weixin.qq.com/document/path/93374>
 	datas.ot_info.ot_status	uint32	状态：0-无加班；1-正常；2-缺时长
 	datas.ot_info.ot_duration	uint32	加班时长
 	datas.ot_info.exception_duration	uint32[]	ot_status为2下，加班不足的时长
+	datas.ot_info.workday_over_as_vacation	int32	工作日加班记为调休，单位秒
+	datas.ot_info.workday_over_as_money	int32	工作日加班记为加班费，单位秒
+	datas.ot_info.restday_over_as_vacation	int32	休息日加班记为调休，单位秒
+	datas.ot_info.restday_over_as_money	int32	休息日加班记为加班费，单位秒
+	datas.ot_info.holiday_over_as_vacation	int32	节假日加班记为调休，单位秒
+	datas.ot_info.holiday_over_as_money	int32	节假日加班记为加班费，单位秒
 	datas.sp_items	obj[]	假勤统计信息
 	datas.sp_items.type	uint32	类型：1-请假；2-补卡；3-出差；4-外出；100-外勤
 	datas.sp_items.vacation_id	uint32	具体请假类型，当type为1请假时，具体的请假类型id，可通过审批相关接口获取假期详情
@@ -986,6 +1030,7 @@ sub getcheckin_daydata {
 =head2 getcheckin_monthdata(access_token, hash);
 
 获取打卡月报数据
+最后更新：2023/12/18
 
 =head2 SYNOPSIS
 
@@ -993,8 +1038,7 @@ L<https://developer.work.weixin.qq.com/document/path/93387>
 
 =head3 请求说明：
 
-企业可通过打卡应用Secret调用本接口，获取指定员工指定时间段内的打卡月报统计数据。
-第三方应用可获取应用可见范围内指定员工指定日期内的打卡月报统计数据。
+企业可通过具有调用权限的应用，获取应用可见范围内指定员工指定日期内的打卡月报统计数据。
 
 =head4 请求包结构体为：
 
@@ -1008,20 +1052,31 @@ L<https://developer.work.weixin.qq.com/document/path/93387>
 
 =head4 参数说明：
 
-    参数	必须	类型	说明
-    access_token	是	string	调用接口凭证，必须使用打卡应用的Secret获取access_token，获取方式参考：文档-获取access_token
-	starttime	否	uint32	获取月报的开始时间。0点Unix时间戳
-	endtime	否	uint32	获取月报的结束时间。0点Unix时间戳
-	useridlist	否	string[]	-不少于1字节,不多于64字节,可填充个数：1 ~ 100
+	参数		必须		类型		说明
+	access_token	是	string	调用接口凭证，使用自建应用的Secret获取access_token，获取方式参考：文档-获取access_token
+	starttime	是	uint32	获取月报的开始时间。0点Unix时间戳
+	endtime	是	uint32	获取月报的结束时间。0点Unix时间戳
+	useridlist	是	string[]	-
+								不少于1字节
+								不多于64字节
+								可填充个数：1 ~ 100
 
 =head3 权限说明
 
-仅允许通过打卡应用的secret获取到的access_token调用。
+	应用类型	权限要求
+	自建应用	配置到「打卡 - 可调用接口的应用」中
+	代开发应用	具有「打卡」权限
+	第三方应用	具有「打卡」权限
+
+注： 从2023年12月1日0点起，不再支持通过系统应用secret调用接口，存量企业暂不受影响 查看详情
+
+=head4 调用频率:
+
 接口调用频率限制为60次/分钟。
 
 =head3 RETURN 返回结果
 
-    {
+	{
 		"errcode": 0,
 		"errmsg": "ok",
 		"datas": [
@@ -1078,8 +1133,15 @@ L<https://developer.work.weixin.qq.com/document/path/93387>
 						"name": "年假"
 					}
 				],
-				"overwork_info":{
-					"workday_over_sec":10800
+				"overwork_info": {
+					"workday_over_sec": 54000,
+					"restdays_over_sec": 205560,
+					"workdays_over_as_vacation": 0,
+					"workdays_over_as_money": 54000,
+					"restdays_over_as_vacation": 0,
+					"restdays_over_as_money": 172800,
+					"holidays_over_as_vacation": 0,
+					"holidays_over_as_money": 0
 				}
 			}
 		]
@@ -1087,7 +1149,7 @@ L<https://developer.work.weixin.qq.com/document/path/93387>
 
 =head4 RETURN 参数说明
 
-    参数	类型	说明
+	参数		类型		说明
 	errcode	int32	返回码
 	errmsg	string	错误码描述
 	datas	obj[]	月报数据列表
@@ -1096,7 +1158,7 @@ L<https://developer.work.weixin.qq.com/document/path/93387>
 	datas.base_info.name	string	打卡人员姓名
 	datas.base_info.name_ex	string	打卡人员别名
 	datas.base_info.departs_name	string	打卡人员所在部门，会显示所有所在部门
-	datas.base_info.acctid	string	打卡人员帐号，即userid
+	datas.base_info.acctid	string	打卡人员账号，即userid
 	datas.base_info.rule_info	obj	打卡人员所属规则信息
 	datas.base_info.rule_info.groupid	int32	所属规则的id
 	datas.base_info.rule_info.groupname	string	打卡规则名
@@ -1104,8 +1166,8 @@ L<https://developer.work.weixin.qq.com/document/path/93387>
 	datas.summary_info.work_days	int32	应打卡天数
 	datas.summary_info.regular_days	int32	正常天数
 	datas.summary_info.except_days	int32	异常天数
-	datas.summary_info.regular_work_sec	int32	实际工作时长，为统计周期每日实际工作时长之和
-	datas.summary_info.standard_work_sec	int32	标准工作时长，为统计周期每日标准工作时长之和
+	datas.summary_info.regular_work_sec	int32	实际工作时长，为统计周期每日实际工作时长之和, 单位: 秒
+	datas.summary_info.standard_work_sec	int32	标准工作时长，为统计周期每日标准工作时长之和, 单位: 秒
 	datas.exception_infos	obj[]	异常状态统计信息
 	datas.exception_infos.exception	uint32	异常类型：1-迟到；2-早退；3-缺卡；4-旷工；5-地点异常；6-设备异常
 	datas.exception_infos.count	int32	异常次数，为统计周期内每日此异常次数之和
@@ -1121,6 +1183,12 @@ L<https://developer.work.weixin.qq.com/document/path/93387>
 	datas.overwork_info.workday_over_sec	int32	工作日加班时长
 	datas.overwork_info.holidays_over_sec	int32	节假日加班时长
 	datas.overwork_info.restdays_over_sec	int32	休息日加班时长
+	datas.overwork_info.workdays_over_as_vacation	int32	工作日加班记为调休，单位秒
+	datas.overwork_info.workdays_over_as_money	int32	工作日加班记为加班费，单位秒
+	datas.overwork_info.restdays_over_as_vacation	int32	休息日加班记为调休，单位秒
+	datas.overwork_info.restdays_over_as_money	int32	休息日加班记为加班费，单位秒
+	datas.overwork_info.holidays_over_as_vacation	int32	节假日加班记为调休，单位秒
+	datas.overwork_info.holidays_over_as_money	int32	节假日加班记为加班费，单位秒
 
 =cut
 
@@ -1144,6 +1212,7 @@ sub getcheckin_monthdata {
 =head2 getcheckinschedulist(access_token, hash);
 
 获取打卡人员排班信息
+最后更新：2023/12/18
 
 =head2 SYNOPSIS
 
@@ -1151,8 +1220,7 @@ L<https://developer.work.weixin.qq.com/document/path/93380>
 
 =head3 请求说明：
 
-企业可通过打卡应用Secret调用本接口，获取打卡规则为“按班次上下班”规则的指定员工指定时间段内的排班信息。
-第三方应用获取应用可见范围内、打卡规则为“按班次上下班”规则的指定员工指定时间段内的排班信息。
+应用可通过此接口，获取应用可见范围内、打卡规则为“按班次上下班”规则的指定员工指定时间段内的排班信息。
 
 =head4 请求包结构体为：
 
@@ -1167,19 +1235,28 @@ L<https://developer.work.weixin.qq.com/document/path/93380>
 
 =head4 参数说明：
 
-    参数	必须	类型	说明
-    access_token	是	string	调用接口凭证，必须使用打卡应用的Secret获取access_token，获取方式参考：文档-获取access_token
-	useridlist	否	string[]	需要获取排班信息的用户列表（不超过100个）
-	starttime	否	uint32	获取排班信息的开始时间。Unix时间戳
-	endtime	否	uint32	获取排班信息的结束时间。Unix时间戳（与starttime跨度不超过一个月）
+	参数		必须		类型		说明
+	access_token	是	string	调用接口凭证，获取方式参考：文档-获取access_token
+	useridlist	是	string[]	需要获取排班信息的用户列表（不超过100个）
+	starttime	是	uint32	获取排班信息的开始时间。Unix时间戳
+	endtime	是	uint32	获取排班信息的结束时间。Unix时间戳（与starttime跨度不超过一个月）
 
 =head3 权限说明
+
+	应用类型	权限要求
+	自建应用	配置到「打卡 - 可调用接口的应用」中
+	代开发应用	具有「打卡」权限
+	第三方应用	具有「打卡」权限
+
+注： 从2023年12月1日0点起，不再支持通过系统应用secret调用接口，存量企业暂不受影响 查看详情
+
+=head4 调用频率:
 
 接口调用频率限制为60次/分钟。
 
 =head3 RETURN 返回结果
 
-    {
+	{
 		"schedule_list":[
 			{
 				"userid":"james",
@@ -1198,8 +1275,7 @@ L<https://developer.work.weixin.qq.com/document/path/93380>
 										"id":1,
 										"work_sec":32400,
 										"off_work_sec":43200,
-										"remind_work_sec":32400,
-										 "remind_off_work_sec":43200
+										"remind_work_sec":32400,                                         "remind_off_work_sec":43200
 									}
 								]
 							}
@@ -1240,7 +1316,7 @@ L<https://developer.work.weixin.qq.com/document/path/93380>
 
 =head4 RETURN 参数说明
 
-    参数	类型	说明
+	参数		类型		说明
 	errcode	int32	返回码
 	errmsg	string	错误码描述
 	schedule_list	obj[]	排班表信息
@@ -1290,6 +1366,7 @@ sub getcheckinschedulist {
 =head2 setcheckinschedulist(access_token, hash);
 
 为打卡人员排班
+最后更新：2023/12/18
 
 =head2 SYNOPSIS
 
@@ -1297,8 +1374,7 @@ L<https://developer.work.weixin.qq.com/document/path/93385>
 
 =head3 请求说明：
 
-企业可通过打卡应用Secret调用本接口，为打卡规则为“按班次上下班”规则的指定员工排班。
-第三方应用可通过本接口为应用可见范围内、打卡规则为“按班次上下班”规则的指定员工排班。
+企业可通过具有调用权限的应用，为打卡规则为“按班次上下班”规则的指定员工排班。
 
 =head4 请求包结构体为：
 
@@ -1316,8 +1392,8 @@ L<https://developer.work.weixin.qq.com/document/path/93385>
 
 =head4 参数说明：
 
-    参数	必须	类型	说明
-    access_token	是	调用接口凭证。必须使用打卡应用的Secret获取access_token，获取方式参考：文档-获取access_token
+	参数		必须		说明
+	access_token	是	调用接口凭证。获取方式参考：文档-获取access_token
 	items	是	排班表信息
 	groupid	是	打卡规则的规则id，可通过“获取打卡规则”、“获取打卡数据”、“获取打卡人员排班信息”等相关接口获取
 	userid	是	打卡人员userid
@@ -1328,6 +1404,16 @@ L<https://developer.work.weixin.qq.com/document/path/93385>
 =head3 权限说明
 
 仅支持为打卡规则为“按班次上下班”
+
+	应用类型	权限要求
+	自建应用	配置到「打卡 - 可调用接口的应用」中
+	代开发应用	具有「打卡」权限
+	第三方应用	具有「打卡」权限
+
+注： 从2023年12月1日0点起，不再支持通过系统应用secret调用接口，存量企业暂不受影响 查看详情
+
+=head4 调用频率:
+
 接口调用频率限制为60次/分钟。
 
 =head3 RETURN 返回结果
@@ -1339,7 +1425,7 @@ L<https://developer.work.weixin.qq.com/document/path/93385>
 
 =head4 RETURN 参数说明
 
-    参数	类型	说明
+	参数	类型	说明
 	errcode	int32	返回码
 	errmsg	string	错误码描述
 
@@ -1362,9 +1448,88 @@ sub setcheckinschedulist {
     return 0;
 }
 
+=head2 punch_correction(access_token, hash);
+
+为打卡人员补卡
+最后更新：2023/11/30
+
+=head2 SYNOPSIS
+
+L<https://developer.work.weixin.qq.com/document/path/95803>
+
+=head3 请求说明：
+
+=head4 请求包结构体为：
+
+	{
+	   "userid": "zhangsan",
+	   "schedule_date_time": 1654444800,
+	   "schedule_checkin_time": 32400,
+	   "checkin_time": 1654486827,
+	   "remark": "备注信息"
+	}
+
+=head4 参数说明：
+
+	参数		类型		是否必须		说明
+	access_token	string	是	调用接口凭证
+	userid	string	是	需要补卡的成员userid
+	schedule_date_time	uint32	是	应打卡日期，为当天0点的Unix时间戳。
+	schedule_checkin_time	uint32	否	应打卡时间点，相对应打卡日期0点的偏移秒数，如9点整则为32400。可通过获取员工打卡规则获取对应的规则打卡时间点，如work_sec/off_work_sec。
+										对于没有规则对应的打卡时间点，如休息日打卡、无规则打卡、自由上下班，该参数不用填。
+	checkin_time	uint32	是	实际打卡时间，Unix时间戳。相对于schedule_checkin_time的实际打卡时间，具体可以表现为正常/迟到/早退
+	remark	string	否	备注信息
+						不超过512字节
+
+=head3 权限说明
+
+	应用类型	权限要求
+	自建应用	配置到「打卡 - 可调用接口的应用」中
+	代开发应用	暂不支持
+	第三方应用	暂不支持
+
+注： 从2023年12月1日0点起，不再支持通过系统应用secret调用接口，存量企业暂不受影响 查看详情 
+
+=head4 调用频率:
+
+接口调用频率限制为600次/分钟
+
+=head3 RETURN 返回结果
+
+    {
+		"errcode": 0,
+		"errmsg": "ok"
+	}
+
+=head4 RETURN 参数说明
+
+	参数	类型	说明
+	errcode	int32	返回码
+	errmsg	string	错误码描述
+
+=cut
+
+sub punch_correction {
+    if ( @_ && $_[0] && ref $_[1] eq 'HASH' ) {
+        my $access_token = $_[0];
+        my $json = $_[1];
+        my $ua = LWP::UserAgent->new;
+        $ua->timeout(30);
+        $ua->env_proxy;
+
+        my $response = $ua->post("https://qyapi.weixin.qq.com/cgi-bin/checkin/punch_correction?access_token=$access_token",Content => to_json($json,{allow_nonref=>1}),Content_type =>'application/json');
+        if ($response->is_success) {
+            return from_json($response->decoded_content,{utf8 => 1, allow_nonref => 1});
+        }
+
+    }
+    return 0;
+}
+
 =head2 addcheckinuserface(access_token, hash);
 
 录入打卡人员人脸信息
+最后更新：2023/11/30
 
 =head2 SYNOPSIS
 
@@ -1372,7 +1537,7 @@ L<https://developer.work.weixin.qq.com/document/path/93378>
 
 =head3 请求说明：
 
-企业可通过打卡应用Secret调用本接口，为企业打卡人员录入人脸信息，人脸信息仅用于人脸打卡。
+企业可通过自建应用，为企业打卡人员录入人脸信息，人脸信息仅用于人脸打卡。
 
 =head4 请求包结构体为：
 
@@ -1383,14 +1548,23 @@ L<https://developer.work.weixin.qq.com/document/path/93378>
 
 =head4 参数说明：
 
-    参数	必须	类型	说明
-    access_token	是	string	调用接口凭证，必须使用打卡应用的Secret获取access_token，获取方式参考：文档-获取access_token
+	参数		必须		类型		说明
+	access_token	是	string	调用接口凭证，获取方式参考：文档-获取access_token
 	userid	否	string	需要录入的用户id
 	userface	否	string	需要录入的人脸图片数据，需要将图片数据base64处理后填入，对已录入的人脸会进行更新处理
-	
+
 注意：对于已有人脸的用户，使用此接口将使用传入的人脸覆盖原有人脸，请谨慎操作。
 
 =head3 权限说明
+
+	应用类型	权限要求
+	自建应用	配置到「打卡 - 可调用接口的应用」中
+	代开发应用	暂不支持
+	第三方应用	暂不支持
+
+注： 从2023年12月1日0点起，不再支持通过系统应用secret调用接口，存量企业暂不受影响 查看详情
+
+=head4 调用频率:
 
 接口调用频率限制为10次/分钟。
 
@@ -1403,7 +1577,7 @@ L<https://developer.work.weixin.qq.com/document/path/93378>
 
 =head4 RETURN 参数说明
 
-    参数	类型	说明
+	参数		类型		说明
 	errcode	int32	返回码
 	errmsg	string	错误码描述
 
@@ -1435,7 +1609,494 @@ sub addcheckinuserface {
     return 0;
 }
 
+=head2 Name
 
+管理打卡规则
+最后更新：2023/11/30
+
+=head2 SYNOPSIS
+
+L<https://developer.work.weixin.qq.com/document/path/98041>
+
+=head2 add_checkin_option(access_token, hash);
+
+创建打卡规则
+
+=head2 SYNOPSIS
+
+L<https://developer.work.weixin.qq.com/document/path/98041#创建打卡规则>
+
+=head3 请求说明：
+
+企业可通过自建应用或授权的代开发应用，为企业添加打卡规则。
+
+=head4 请求包结构体为：
+
+	{
+		"effective_now": true,
+		"group": {
+			"grouptype": 1,
+			"groupname": "打卡规则1",
+			"checkindate": [
+				{
+					"workdays": [
+						1,
+						2,
+						3,
+						4,
+						5
+					],
+					"checkintime": [
+						{
+							"time_id": 1,
+							"work_sec": 36000,
+							"off_work_sec": 43200,
+							"remind_work_sec": 35400,
+							"remind_off_work_sec": 43200,
+							"earliest_work_sec": 35040,
+							"latest_work_sec": 37020,
+							"earliest_off_work_sec": 43140,
+							"latest_off_work_sec": 43800
+						}
+					],
+					"flex_on_duty_time": 0,
+					"flex_off_duty_time": 0
+				}
+			],
+			"sync_holidays": true,
+			"need_photo": true,
+			"note_can_use_local_pic": false,
+			"wifimac_infos": [
+				{
+					"wifiname": "Tencent-WiFi-1",
+					"wifimac": "c0:7b:bc:37:f8:d3"
+				}
+			],
+			"allow_checkin_offworkday": true,
+			"allow_apply_offworkday": true,
+			"loc_infos": [
+				{
+					"lat": 30547030,
+					"lng": 104062890,
+					"loc_title": "腾讯成都大厦",
+					"loc_detail": "四川省成都市武侯区高新南区天府三街",
+					"distance": 300
+				}
+			],
+			"range": {
+				"party_id": [],
+				"userid": [
+					"xiaoxioa"
+				],
+				"tagid": []
+			},
+			"white_users": [
+				"xiaoxioa"
+			],
+			"type": 0,
+			"reporterinfo": {
+				"reporters": [
+					{
+						"userid": "xiaoxioa"
+					}
+				]
+			},
+			"ot_info_v2": {
+				"workdayconf": {
+					"allow_ot": true,
+					"type": 0
+				}
+			},
+			"allow_apply_bk_cnt": -1,
+			"option_out_range": 0,
+			"use_face_detect": true,
+			"allow_apply_bk_day_limit": -1,
+			"open_face_live_detect": true,
+			"buka_limit_next_month": -1,
+			"sync_out_checkin": true,
+			"buka_remind": {
+				"open_remind": true,
+				"buka_remind_day": 28,
+				"buka_remind_month": 0
+			},
+			"buka_restriction":0
+		}
+	}
+
+=head4 参数说明：
+
+	参数		是否必填		说明
+	access_token	是	调用接口凭证。自建应用或代开发应用的access_token
+	group	视情况而定	打卡规则详细定义，具体见打卡规则字段说明
+	effective_now	否	是否立即生效, 默认为false
+
+注意：
+1.创建打卡规则时，groupid无需传入，该字段会被忽略。
+2.附常见错误信息列表
+
+=head3 权限说明
+
+	应用类型	权限要求
+	自建应用	配置到「打卡 - 可调用接口的应用」中
+	代开发应用	具有「打卡」权限
+	第三方应用	暂不支持
+
+注： 从2023年12月1日0点起，不再支持通过系统应用secret调用接口，存量企业暂不受影响 查看详情
+
+=head3 RETURN 返回结果
+
+    {
+		"errcode": 0,
+		"errmsg": "ok"
+	}
+
+=head4 RETURN 参数说明
+
+	参数		类型		说明
+	errcode	int32	返回码
+	errmsg	string	错误码描述
+
+=cut
+
+sub add_checkin_option {
+    if ( @_ && $_[0] && ref $_[1] eq 'HASH' ) {
+        my $access_token = $_[0];
+        my $json = $_[1];
+        my $ua = LWP::UserAgent->new;
+        $ua->timeout(30);
+        $ua->env_proxy;
+
+        my $response = $ua->post("https://qyapi.weixin.qq.com/cgi-bin/checkin/add_checkin_option?access_token=$access_token",Content => to_json($json,{allow_nonref=>1}),Content_type =>'application/json');
+        if ($response->is_success) {
+            return from_json($response->decoded_content,{utf8 => 1, allow_nonref => 1});
+        }
+
+    }
+    return 0;
+}
+
+=head2 获取打卡规则
+
+同获取企业所有打卡规则
+
+=head2 SYNOPSIS
+
+L<https://developer.work.weixin.qq.com/document/path/93384>
+
+=head2 update_checkin_option(access_token, hash);
+
+修改打卡规则
+
+=head2 SYNOPSIS
+
+L<https://developer.work.weixin.qq.com/document/path/98041#修改打卡规则>
+
+=head3 请求说明：
+
+企业可通过自建应用或授权的代开发应用，修改该应用为企业创建的打卡规则。
+
+=head4 请求包结构体为：
+
+	{
+		"effective_now": true,
+		"group": {
+			"groupid": 1,
+			"grouptype": 1,
+			"groupname": "打卡规则1",
+			"checkindate": [
+				{
+					"workdays": [
+						1,
+						2,
+						3,
+						4,
+						5
+					],
+					"checkintime": [
+						{
+							"time_id": 1,
+							"work_sec": 36000,
+							"off_work_sec": 43200,
+							"remind_work_sec": 35400,
+							"remind_off_work_sec": 43200,
+							"earliest_work_sec": 35040,
+							"latest_work_sec": 37020,
+							"earliest_off_work_sec": 43140,
+							"latest_off_work_sec": 43800
+						}
+					],
+					"flex_on_duty_time": 0,
+					"flex_off_duty_time": 0
+				}
+			],
+			"sync_holidays": true,
+			"need_photo": true,
+			"note_can_use_local_pic": false,
+			"wifimac_infos": [
+				{
+					"wifiname": "Tencent-WiFi-1",
+					"wifimac": "c0:7b:bc:37:f8:d3"
+				}
+			],
+			"allow_checkin_offworkday": true,
+			"allow_apply_offworkday": true,
+			"loc_infos": [
+				{
+					"lat": 30547030,
+					"lng": 104062890,
+					"loc_title": "腾讯成都大厦",
+					"loc_detail": "四川省成都市武侯区高新南区天府三街",
+					"distance": 300
+				}
+			],
+			"range": {
+				"party_id": [],
+				"userid": [
+					"xiaoxioa"
+				],
+				"tagid": []
+			},
+			"white_users": [
+				"xiaoxioa"
+			],
+			"type": 0,
+			"reporterinfo": {
+				"reporters": [
+					{
+						"userid": "xiaoxioa"
+					}
+				]
+			},
+			"ot_info_v2": {
+				"workdayconf": {
+					"allow_ot": true,
+					"type": 0
+				}
+			},
+			"allow_apply_bk_cnt": -1,
+			"option_out_range": 0,
+			"use_face_detect": true,
+			"allow_apply_bk_day_limit": -1,
+			"open_face_live_detect": true,
+			"buka_limit_next_month": -1,
+			"sync_out_checkin": true,
+			"buka_remind": {
+				"open_remind": true,
+				"buka_remind_day": 28,
+				"buka_remind_month": 0
+			}
+		}
+	}
+
+=head4 参数说明：
+
+	参数		是否必填		说明
+	access_token	是	调用接口凭证。自建应用或代开发应用的access_token
+	group	视情况而定	打卡规则详细定义，具体见打卡规则字段说明
+	effective_now	否	是否立即生效, 默认false
+
+注意：
+1.修改打卡规则时，groupid须传入，否则会报错。
+2.打卡规则仅可由该规则的创建应用修改。
+3.group定义存在多层结构体嵌套，对于group.*一级的字段：
+ a.若该字段为数组且调用端无传入或传入空元素数组，则理解为不更新该数组字段；
+ b.若该字段为数组且调用端有传入，理解为覆盖该数组字段( 即清空原有数组，保留传入的数组 )；
+ c.若该字段非数组且调用端有传入，理解为覆盖该字段，及递归的所有字段；
+ d.若该字段非数组且调用端无传入，理解为不更新该字段。
+4.若想清空group.*一级的字段:
+ a.若该字段为数组，可以使用清空规则数组元素接口；
+ b.若该字段非数组，则直接传入空元素即可；
+5.附常见错误信息列表。
+
+=head3 权限说明
+
+	应用类型	权限要求
+	自建应用	配置到「打卡 - 可调用接口的应用」中
+	代开发应用	具有「打卡」权限
+	第三方应用	暂不支持
+
+注： 从2023年12月1日0点起，不再支持通过系统应用secret调用接口，存量企业暂不受影响 查看详情
+
+=head3 RETURN 返回结果
+
+    {
+		"errcode": 0,
+		"errmsg": "ok"
+	}
+
+=head4 RETURN 参数说明
+
+	参数		类型		说明
+	errcode	int32	返回码
+	errmsg	string	错误码描述
+
+=cut
+
+sub update_checkin_option {
+    if ( @_ && $_[0] && ref $_[1] eq 'HASH' ) {
+        my $access_token = $_[0];
+        my $json = $_[1];
+        my $ua = LWP::UserAgent->new;
+        $ua->timeout(30);
+        $ua->env_proxy;
+
+        my $response = $ua->post("https://qyapi.weixin.qq.com/cgi-bin/checkin/update_checkin_option?access_token=$access_token",Content => to_json($json,{allow_nonref=>1}),Content_type =>'application/json');
+        if ($response->is_success) {
+            return from_json($response->decoded_content,{utf8 => 1, allow_nonref => 1});
+        }
+
+    }
+    return 0;
+}
+
+=head2 clear_checkin_option_array_field(access_token, hash);
+
+清空打卡规则数组元素
+
+=head2 SYNOPSIS
+
+L<https://developer.work.weixin.qq.com/document/path/98041#清空打卡规则数组元素>
+
+=head3 请求说明：
+
+企业可通过自建应用或授权的代开发应用，修改该应用为企业创建的打卡规则。
+
+=head4 请求包结构体为：
+
+	{
+	  "groupid":1,
+	  "clear_field":[1,2,3],
+	  "effective_now":true
+	}
+
+=head4 参数说明：
+
+	参数		是否必填		说明
+	access_token	是	调用接口凭证。自建应用或代开发应用的access_token
+	groupid	是	打卡规则id
+	clear_field	是	清空的字段标识：
+					1-清空spe_workdays字段; 2-清空spe_offdays字段; 3-清空wifimac_infos字段; 4-清空loc_infos字段( wifimac_infos和loc_infos不可同时为空 )
+	effective_now	否	是否立即生效，默认false
+
+1.打卡规则仅可由该规则的创建应用修改。
+
+=head3 权限说明
+
+	应用类型	权限要求
+	自建应用	配置到「打卡 - 可调用接口的应用」中
+	代开发应用	具有「打卡」权限
+	第三方应用	暂不支持
+
+注： 从2023年12月1日0点起，不再支持通过系统应用secret调用接口，存量企业暂不受影响 查看详情
+
+=head3 RETURN 返回结果
+
+    {
+		"errcode": 0,
+		"errmsg": "ok"
+	}
+
+=head4 RETURN 参数说明
+
+	参数		类型		说明
+	errcode	int32	返回码
+	errmsg	string	错误码描述
+
+=cut
+
+sub clear_checkin_option_array_field {
+    if ( @_ && $_[0] && ref $_[1] eq 'HASH' ) {
+        my $access_token = $_[0];
+        my $json = $_[1];
+        my $ua = LWP::UserAgent->new;
+        $ua->timeout(30);
+        $ua->env_proxy;
+
+        my $response = $ua->post("https://qyapi.weixin.qq.com/cgi-bin/checkin/clear_checkin_option_array_field?access_token=$access_token",Content => to_json($json,{allow_nonref=>1}),Content_type =>'application/json');
+        if ($response->is_success) {
+            return from_json($response->decoded_content,{utf8 => 1, allow_nonref => 1});
+        }
+
+    }
+    return 0;
+}
+
+=head2 del_checkin_option(access_token, hash);
+
+删除打卡规则
+
+=head2 SYNOPSIS
+
+L<https://developer.work.weixin.qq.com/document/path/98041#删除打卡规则>
+
+=head3 请求说明：
+
+企业可通过自建应用或授权的代开发应用，删除该应用为企业创建的打卡规则。
+
+=head4 请求包结构体为：
+
+	{
+		"groupid":1,
+		"effective_now":true
+	}
+
+=head4 参数说明：
+
+	参数		是否必填		说明
+	access_token	是	调用接口凭证。自建应用或代开发应用的access_token
+	groupid	是	删除的打卡规则id
+	effective_now	否	是否立即生效，默认false
+
+1.打卡规则仅可由该规则的创建应用删除。
+
+=head3 权限说明
+
+	应用类型	权限要求
+	自建应用	配置到「打卡 - 可调用接口的应用」中
+	代开发应用	具有「打卡」权限
+	第三方应用	暂不支持
+
+注： 从2023年12月1日0点起，不再支持通过系统应用secret调用接口，存量企业暂不受影响 查看详情
+
+=head3 RETURN 返回结果
+
+    {
+		"errcode": 0,
+		"errmsg": "ok"
+	}
+
+=head4 RETURN 参数说明
+
+	参数		类型		说明
+	errcode	int32	返回码
+	errmsg	string	错误码描述
+
+=head3 打卡规则字段说明
+
+L<https://developer.work.weixin.qq.com/document/path/98041#打卡规则字段说明>
+
+=head3 错误信息列表
+
+L<https://developer.work.weixin.qq.com/document/path/98041#错误信息列表>
+
+=cut
+
+sub del_checkin_option {
+    if ( @_ && $_[0] && ref $_[1] eq 'HASH' ) {
+        my $access_token = $_[0];
+        my $json = $_[1];
+        my $ua = LWP::UserAgent->new;
+        $ua->timeout(30);
+        $ua->env_proxy;
+
+        my $response = $ua->post("https://qyapi.weixin.qq.com/cgi-bin/checkin/del_checkin_option?access_token=$access_token",Content => to_json($json,{allow_nonref=>1}),Content_type =>'application/json');
+        if ($response->is_success) {
+            return from_json($response->decoded_content,{utf8 => 1, allow_nonref => 1});
+        }
+
+    }
+    return 0;
+}
 
 1;
 __END__

@@ -22,7 +22,11 @@
          "Google::Ads::GoogleAds::V15::Enums",
          "Google::Ads::GoogleAds::V15::Common",
          "Google::Ads::GoogleAds::V15::Resources",
-         "Google::Ads::GoogleAds::V15::Services"
+         "Google::Ads::GoogleAds::V15::Services",
+         "Google::Ads::GoogleAds::V16::Enums",
+         "Google::Ads::GoogleAds::V16::Common",
+         "Google::Ads::GoogleAds::V16::Resources",
+         "Google::Ads::GoogleAds::V16::Services"
       ]
    },
    "prereqs" : {
@@ -97,6 +101,6 @@
          "url" : "https://github.com/googleads/google-ads-perl"
       }
    },
-   "version" : "v20.0.0",
+   "version" : "v21.0.0",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

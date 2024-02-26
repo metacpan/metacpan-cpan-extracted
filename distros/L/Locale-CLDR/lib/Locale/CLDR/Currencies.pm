@@ -1,12 +1,12 @@
 package Locale::CLDR::Currencies;
 # This file auto generated from Data.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -321,6 +321,12 @@ has '_currency_fractions' => (
 			'cashdigits' => '2',
 			'cashrounding' => '0',
 		},
+		SLE => {
+			'digits' => '2',
+			'rounding' => '0',
+			'cashdigits' => '2',
+			'cashrounding' => '0',
+		},
 		SLL => {
 			'digits' => '0',
 			'rounding' => '0',
@@ -579,7 +585,7 @@ has '_default_currency' => (
 				'HK' => 'HKD',
 				'HM' => 'AUD',
 				'HN' => 'HNL',
-				'HR' => 'HRK',
+				'HR' => 'EUR',
 				'HT' => 'HTG',
 				'HU' => 'HUF',
 				'IC' => 'EUR',
@@ -685,7 +691,7 @@ has '_default_currency' => (
 				'SI' => 'EUR',
 				'SJ' => 'NOK',
 				'SK' => 'EUR',
-				'SL' => 'SLL',
+				'SL' => 'SLE',
 				'SM' => 'EUR',
 				'SN' => 'XOF',
 				'SO' => 'SOS',

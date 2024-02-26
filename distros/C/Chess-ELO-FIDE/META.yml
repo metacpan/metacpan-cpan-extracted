@@ -1,0 +1,50 @@
+---
+abstract: 'Download and store FIDE ratings'
+author:
+  - 'NICEPERL L<https://metacpan.org/author/NICEPERL>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Chess-ELO-FIDE
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Chess::ELO::FIDE:
+    file: lib/Chess/ELO/FIDE.pm
+    version: '0.01'
+requires:
+  DBD::SQLite: '0'
+  DBI: '0'
+  DateTime: '0'
+  DateTime::Format::Mail: '0'
+  DateTime::Format::Strptime: '0'
+  HTTP::Tiny: '0'
+  IO::Uncompress::Unzip: '0'
+  Log::Handler: '0'
+  Moo: '0'
+  Net::SSLeay: '0'
+  Type::Tiny: '0'
+resources:
+  bugtracker: https://github.com/niceperl/chess-elo-fide/issues
+  homepage: https://github.com/niceperl/chess-elo-fide
+  repository: https://github.com/niceperl/chess-elo-fide.git
+version: '0.01'
+x_contributors:
+  - 'JMiguel PRZ <niceperl@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

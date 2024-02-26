@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-02-01'; # DATE
+our $DATE = '2024-02-21'; # DATE
 our $DIST = 'Acme-CPANAuthorsBundle-CPAN-Streaks'; # DIST
-our $VERSION = '20240201.0'; # VERSION
+our $VERSION = '20240221.0'; # VERSION
 
 use Acme::CPANAuthors::Register (
     'PERLANCAR' => '',
@@ -45,47 +45,47 @@ Acme::CPANAuthors::CPAN::Streaks::DailyReleases::AllTime - Authors with all-time
 
 =head1 VERSION
 
-This document describes version 20240201.0 of Acme::CPANAuthors::CPAN::Streaks::DailyReleases::AllTime (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-02-01.
+This document describes version 20240221.0 of Acme::CPANAuthors::CPAN::Streaks::DailyReleases::AllTime (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-02-21.
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-Current standings (as of 2024-02-01, produced by L<cpan-streaks>, only streaks with length of at least 20 are included):
+Current standings (as of 2024-02-21, produced by L<cpan-streaks>, only streaks with length of at least 20 are included):
 
-  +-----------+------+------------+------------+---------+
-  | author    |  len | start_date | end_date   | status  |
-  +-----------+------+------------+------------+---------+
-  | PERLANCAR | 1722 | 2019-05-17 |            | ongoing |
-  | MANWAR    | 1027 | 2014-10-28 | 2017-08-19 | broken  |
-  | MANWAR    |  621 | 2017-08-21 | 2019-05-03 | broken  |
-  | BARBIE    |  370 | 2014-03-19 | 2015-03-23 | broken  |
-  | MANWAR    |  182 | 2019-05-05 | 2019-11-02 | broken  |
-  | SKIM      |  145 | 2014-10-31 | 2015-03-24 | broken  |
-  | NEILB     |  111 | 2014-03-20 | 2014-07-08 | broken  |
-  | IVANWILLS |  102 | 2015-05-17 | 2015-08-26 | broken  |
-  | KENTNL    |  101 | 2014-07-12 | 2014-10-20 | broken  |
-  | PERLANCAR |   81 | 2016-12-20 | 2017-03-10 | broken  |
-  | ETHER     |   77 | 2014-06-01 | 2014-08-16 | broken  |
-  | RENEEB    |   76 | 2018-12-31 | 2019-03-16 | broken  |
-  | CSSON     |   55 | 2014-12-30 | 2015-02-22 | broken  |
-  | INGY      |   47 | 2014-07-21 | 2014-09-05 | broken  |
-  | RENEEB    |   44 | 2014-11-27 | 2015-01-09 | broken  |
-  | SKIM      |   35 | 2014-08-04 | 2014-09-07 | broken  |
-  | PLICEASE  |   32 | 2017-07-05 | 2017-08-05 | broken  |
-  | CSSON     |   28 | 2014-08-30 | 2014-09-26 | broken  |
-  | NEILB     |   28 | 2015-10-19 | 2015-11-15 | broken  |
-  | ZOFFIX    |   27 | 2008-03-01 | 2008-03-27 | broken  |
-  | SCHUBIGER |   26 | 2004-01-11 | 2004-02-05 | broken  |
-  | TOBYINK   |   26 | 2022-06-19 | 2022-07-14 | broken  |
-  | ETHER     |   25 | 2014-05-06 | 2014-05-30 | broken  |
-  | PERLANCAR |   25 | 2014-12-24 | 2015-01-17 | broken  |
-  | PERLANCAR |   23 | 2016-01-02 | 2016-01-24 | broken  |
-  | WOLLMERS  |   22 | 2014-07-26 | 2014-08-16 | broken  |
-  | LNATION   |   21 | 2017-03-04 | 2017-03-24 | broken  |
-  | BKB       |   21 | 2020-12-07 | 2020-12-27 | broken  |
-  | PERLANCAR |   20 | 2016-02-02 | 2016-02-21 | broken  |
-  +-----------+------+------------+------------+---------+
+  +-----------+------+------------+------------+--------+
+  | author    |  len | start_date | end_date   | status |
+  +-----------+------+------------+------------+--------+
+  | PERLANCAR | 1737 | 2019-05-17 | 2024-02-16 | broken |
+  | MANWAR    | 1027 | 2014-10-28 | 2017-08-19 | broken |
+  | MANWAR    |  621 | 2017-08-21 | 2019-05-03 | broken |
+  | BARBIE    |  370 | 2014-03-19 | 2015-03-23 | broken |
+  | MANWAR    |  182 | 2019-05-05 | 2019-11-02 | broken |
+  | SKIM      |  145 | 2014-10-31 | 2015-03-24 | broken |
+  | NEILB     |  111 | 2014-03-20 | 2014-07-08 | broken |
+  | IVANWILLS |  102 | 2015-05-17 | 2015-08-26 | broken |
+  | KENTNL    |  101 | 2014-07-12 | 2014-10-20 | broken |
+  | PERLANCAR |   81 | 2016-12-20 | 2017-03-10 | broken |
+  | ETHER     |   77 | 2014-06-01 | 2014-08-16 | broken |
+  | RENEEB    |   76 | 2018-12-31 | 2019-03-16 | broken |
+  | CSSON     |   55 | 2014-12-30 | 2015-02-22 | broken |
+  | INGY      |   47 | 2014-07-21 | 2014-09-05 | broken |
+  | RENEEB    |   44 | 2014-11-27 | 2015-01-09 | broken |
+  | SKIM      |   35 | 2014-08-04 | 2014-09-07 | broken |
+  | PLICEASE  |   32 | 2017-07-05 | 2017-08-05 | broken |
+  | CSSON     |   28 | 2014-08-30 | 2014-09-26 | broken |
+  | NEILB     |   28 | 2015-10-19 | 2015-11-15 | broken |
+  | ZOFFIX    |   27 | 2008-03-01 | 2008-03-27 | broken |
+  | SCHUBIGER |   26 | 2004-01-11 | 2004-02-05 | broken |
+  | TOBYINK   |   26 | 2022-06-19 | 2022-07-14 | broken |
+  | ETHER     |   25 | 2014-05-06 | 2014-05-30 | broken |
+  | PERLANCAR |   25 | 2014-12-24 | 2015-01-17 | broken |
+  | PERLANCAR |   23 | 2016-01-02 | 2016-01-24 | broken |
+  | WOLLMERS  |   22 | 2014-07-26 | 2014-08-16 | broken |
+  | LNATION   |   21 | 2017-03-04 | 2017-03-24 | broken |
+  | BKB       |   21 | 2020-12-07 | 2020-12-27 | broken |
+  | PERLANCAR |   20 | 2016-02-02 | 2016-02-21 | broken |
+  +-----------+------+------------+------------+--------+
 
 =head1 HOMEPAGE
 

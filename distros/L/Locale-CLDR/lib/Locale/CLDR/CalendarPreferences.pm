@@ -1,12 +1,12 @@
 package Locale::CLDR::CalendarPreferences;
 # This file auto generated from Data.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -21,10 +21,12 @@ has 'calendar_preferences' => (
 	init_arg	=> undef,
 	default	=> sub { {
 		'001' => ['gregorian'],
+		'BD' => ['gregorian','islamic','islamic-civil','islamic-tbla'],
 		'DJ' => ['gregorian','islamic','islamic-civil','islamic-tbla'],
 		'DZ' => ['gregorian','islamic','islamic-civil','islamic-tbla'],
 		'EH' => ['gregorian','islamic','islamic-civil','islamic-tbla'],
 		'ER' => ['gregorian','islamic','islamic-civil','islamic-tbla'],
+		'ID' => ['gregorian','islamic','islamic-civil','islamic-tbla'],
 		'IQ' => ['gregorian','islamic','islamic-civil','islamic-tbla'],
 		'JO' => ['gregorian','islamic','islamic-civil','islamic-tbla'],
 		'KM' => ['gregorian','islamic','islamic-civil','islamic-tbla'],
@@ -32,13 +34,24 @@ has 'calendar_preferences' => (
 		'LY' => ['gregorian','islamic','islamic-civil','islamic-tbla'],
 		'MA' => ['gregorian','islamic','islamic-civil','islamic-tbla'],
 		'MR' => ['gregorian','islamic','islamic-civil','islamic-tbla'],
+		'MY' => ['gregorian','islamic','islamic-civil','islamic-tbla'],
+		'NE' => ['gregorian','islamic','islamic-civil','islamic-tbla'],
 		'OM' => ['gregorian','islamic','islamic-civil','islamic-tbla'],
+		'PK' => ['gregorian','islamic','islamic-civil','islamic-tbla'],
 		'PS' => ['gregorian','islamic','islamic-civil','islamic-tbla'],
 		'SD' => ['gregorian','islamic','islamic-civil','islamic-tbla'],
 		'SY' => ['gregorian','islamic','islamic-civil','islamic-tbla'],
 		'TD' => ['gregorian','islamic','islamic-civil','islamic-tbla'],
 		'TN' => ['gregorian','islamic','islamic-civil','islamic-tbla'],
 		'YE' => ['gregorian','islamic','islamic-civil','islamic-tbla'],
+		'AL' => ['gregorian','islamic-civil','islamic-tbla'],
+		'AZ' => ['gregorian','islamic-civil','islamic-tbla'],
+		'MV' => ['gregorian','islamic-civil','islamic-tbla'],
+		'TJ' => ['gregorian','islamic-civil','islamic-tbla'],
+		'TM' => ['gregorian','islamic-civil','islamic-tbla'],
+		'TR' => ['gregorian','islamic-civil','islamic-tbla'],
+		'UZ' => ['gregorian','islamic-civil','islamic-tbla'],
+		'XK' => ['gregorian','islamic-civil','islamic-tbla'],
 		'AE' => ['gregorian','islamic-umalqura','islamic','islamic-civil','islamic-tbla'],
 		'BH' => ['gregorian','islamic-umalqura','islamic','islamic-civil','islamic-tbla'],
 		'KW' => ['gregorian','islamic-umalqura','islamic','islamic-civil','islamic-tbla'],

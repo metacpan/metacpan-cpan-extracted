@@ -69,7 +69,9 @@ METHODS
         characters.
 
     styles
-        An array reference of styles to use when outputting the entries.
+        An array reference of styles to use when outputting the entries, one
+        for each level of change. The first entry is used for the release
+        entry itself.
 
         The styles can be either a single character to prefix change lines
         or two characters to use as a prefix and suffix.

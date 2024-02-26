@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Lo - Package for language Lao
 
 package Locale::CLDR::Locales::Lo;
 # This file auto generated from Data\common\main\lo.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -238,22 +238,6 @@ has 'algorithmic_number_format_data' => (
     } },
 );
 
-# Need to add code for Key type pattern
-sub display_name_pattern {
-	my ($self, $name, $region, $script, $variant) = @_;
-
-	my $display_pattern = '{0} ({1})';
-	$display_pattern =~s/\{0\}/$name/g;
-	my $subtags = join '{0}, {1}', grep {$_} (
-		$region,
-		$script,
-		$variant,
-	);
-
-	$display_pattern =~s/\{1\}/$subtags/g;
-	return $display_pattern;
-}
-
 has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
@@ -279,16 +263,19 @@ has 'display_name_language' => (
  				'am' => 'ອຳຮາຣິກ',
  				'an' => 'ອາຣາໂກເນັດ',
  				'ang' => 'ອັງກິດໂບຮານ',
+ 				'ann' => 'ໂອໂບໂລ',
  				'anp' => 'ແອນຈີກາ',
  				'ar' => 'ອາຣັບ',
  				'ar_001' => 'ອາຣາບິກມາດຕະຖານສະໄໝໃໝ່',
  				'arc' => 'ອາລາມິກ',
  				'arn' => 'ມາພຸດຊີ',
  				'arp' => 'ອາຣາປາໂຮ',
+ 				'ars' => 'ນາຈດີ ອາຣາບິກ',
  				'arw' => 'ອາຣາແວກ',
  				'as' => 'ອັສຊາມີສ',
  				'asa' => 'ອາຊູ',
  				'ast' => 'ອັສຕູຮຽນ',
+ 				'atj' => 'ອາຕິກາແມກ',
  				'av' => 'ອາວາຣິກ',
  				'awa' => 'ອາວາຮິ',
  				'ay' => 'ອາຍມາລາ',
@@ -306,6 +293,7 @@ has 'display_name_language' => (
  				'bez' => 'ບີນາ',
  				'bfd' => 'ບາຟັດ',
  				'bg' => 'ບັງກາຣຽນ',
+ 				'bgc' => 'ຮາຢານວີ',
  				'bgn' => 'ບາໂລຈີ ພາກຕາເວັນຕົກ',
  				'bho' => 'ໂບພູຣິ',
  				'bi' => 'ບິສລະມາ',
@@ -331,7 +319,7 @@ has 'display_name_language' => (
  				'car' => 'ຄາຣິບ',
  				'cay' => 'ຄາຢູກາ',
  				'cch' => 'ອາດແຊມ',
- 				'ccp' => 'Chakma',
+ 				'ccp' => 'ຊາກມາ',
  				'ce' => 'ຊີເຄນ',
  				'ceb' => 'ຊີບູໂນ',
  				'cgg' => 'ຊີກາ',
@@ -346,13 +334,21 @@ has 'display_name_language' => (
  				'chr' => 'ຊີໂຣກີ',
  				'chy' => 'ຊີເຢນນີ',
  				'ckb' => 'ໂຊຣານິ ເຄີດິຊ',
+ 				'clc' => 'ຊິວໂຄຕິນ',
  				'co' => 'ຄໍຊິກາ',
  				'cop' => 'ຄອບຕິກ',
  				'cr' => 'ຄີ',
+ 				'crg' => 'ມິຊິຟ',
  				'crh' => 'ຄຣີເມນເຕີຄິຊ',
+ 				'crj' => 'ຄຣີຕາເວັນອອກສ່ຽງໃຕ້',
+ 				'crk' => 'ເພລນຄຣີ',
+ 				'crl' => 'ຄຣີຕາເວັນອອກສ່ຽງເໜືອ',
+ 				'crm' => 'ມູສຄຣີ',
+ 				'crr' => 'ຄາໂຣລິນາ ອາກອນຄວຽນ',
  				'crs' => 'ເຊເຊວາ ໂຄຣດ ຝຣັ່ງ',
  				'cs' => 'ເຊກ',
  				'csb' => 'ກາຊູບຽນ',
+ 				'csw' => 'ຊວາມປີຄຣີ',
  				'cu' => 'ໂບດສລາວິກ',
  				'cv' => 'ຊູວາຊ',
  				'cy' => 'ເວວ',
@@ -385,8 +381,6 @@ has 'display_name_language' => (
  				'el' => 'ກຣີກ',
  				'elx' => 'ອີລາໄມ',
  				'en' => 'ອັງກິດ',
- 				'en_AU' => 'ອັງກິດ (ໂອດສະຕາລີ)',
- 				'en_CA' => 'ອັງກິດແຄນາດາ',
  				'en_GB' => 'ອັງກິດ (ບຣິດທິຊ)',
  				'en_GB@alt=short' => 'ອັງກິດ (ສະຫະລາດຊະອານາຈັກ)',
  				'en_US' => 'ອັງກິດ (ອາເມລິກັນ)',
@@ -411,8 +405,8 @@ has 'display_name_language' => (
  				'fo' => 'ຟາໂຣສ',
  				'fon' => 'ຟອນ',
  				'fr' => 'ຝຣັ່ງ',
- 				'fr_CA' => 'ຟລັງ(ການາດາ)',
  				'fr_CH' => 'ຝຣັ່ງ (ສວິສ)',
+ 				'frc' => 'ຝຣັ່ງເຄຈຸນ',
  				'frm' => 'ຟຮັ່ງເສດກາງ',
  				'fro' => 'ຟຮັ່ງເສດໂບຮານ',
  				'frr' => 'ຟຣີຊຽນເໜືອ',
@@ -444,8 +438,10 @@ has 'display_name_language' => (
  				'ha' => 'ເຮົາຊາ',
  				'hai' => 'ໄຮດາ',
  				'haw' => 'ຮາໄວອຽນ',
+ 				'hax' => 'ໄຮດາໃຕ້',
  				'he' => 'ຮີບຣິວ',
  				'hi' => 'ຮິນດິ',
+ 				'hi_Latn@alt=variant' => 'ຮິນກລີຊ',
  				'hil' => 'ຮິຣິໄກນອນ',
  				'hit' => 'ຮິດໄຕ',
  				'hmn' => 'ມອງ',
@@ -455,6 +451,7 @@ has 'display_name_language' => (
  				'ht' => 'ໄຮຕຽນ',
  				'hu' => 'ຮັງກາຣຽນ',
  				'hup' => 'ຮູປາ',
+ 				'hur' => 'ຮາລໂກເມລຽມ',
  				'hy' => 'ອາເມນຽນ',
  				'hz' => 'ເຮິຮິໂຣ',
  				'ia' => 'ອິນເຕີລິງລົວ',
@@ -465,6 +462,7 @@ has 'display_name_language' => (
  				'ig' => 'ອິກໂບ',
  				'ii' => 'ເສສວນ ອີ',
  				'ik' => 'ອິນນູປຽກ',
+ 				'ikt' => 'ອິນັກທິທັດຄານາດາຕາເວັນຕົກ',
  				'ilo' => 'ໄອໂລໂກ',
  				'inh' => 'ອິນກັຊ',
  				'io' => 'ອີໂດ',
@@ -492,6 +490,7 @@ has 'display_name_language' => (
  				'kea' => 'ຄາເວີເດຍນູ',
  				'kfo' => 'ໂຄໂລ',
  				'kg' => 'ຄອງໂກ',
+ 				'kgp' => 'ເຄນກັງ',
  				'kha' => 'ຄາສິ',
  				'kho' => 'ໂຄຕັນ',
  				'khq' => 'ຄອຍຣາ ຊິນີ',
@@ -522,6 +521,7 @@ has 'display_name_language' => (
  				'kut' => 'ຄູເທໄນ',
  				'kv' => 'ໂຄມິ',
  				'kw' => 'ຄໍນິຊ',
+ 				'kwk' => 'ຄວາກຄວາກລາ',
  				'ky' => 'ເກຍກີສ',
  				'la' => 'ລາຕິນ',
  				'lad' => 'ລາດີໂນ',
@@ -532,19 +532,22 @@ has 'display_name_language' => (
  				'lez' => 'ລີຊຽນ',
  				'lg' => 'ແກນດາ',
  				'li' => 'ລິມເບີກີຊ',
+ 				'lil' => 'ລິນລູເອັດ',
  				'lkt' => 'ລາໂກຕາ',
  				'ln' => 'ລິງກາລາ',
  				'lo' => 'ລາວ',
  				'lol' => 'ແມັງໂກ້',
+ 				'lou' => 'ລຸຍຊີອານນາ ຄຣີໂອນ',
  				'loz' => 'ໂລຊິ',
  				'lrc' => 'ລູຣິ ທາງຕອນເໜືອ',
+ 				'lsm' => 'ຊາອາເມຍ',
  				'lt' => 'ລິທົວນຽນ',
  				'lu' => 'ລູບາ-ຄາຕັງກາ',
  				'lua' => 'ລູບາ-ລູລົວ',
  				'lui' => 'ລູເຊໂນ',
  				'lun' => 'ລຸນດາ',
  				'luo' => 'ລົວ',
- 				'lus' => 'ລູໄຊ',
+ 				'lus' => 'ມີໂຊ',
  				'luy' => 'ລູໄຍ',
  				'lv' => 'ລັດວຽນ',
  				'mad' => 'ມາດູລາ',
@@ -567,12 +570,13 @@ has 'display_name_language' => (
  				'mh' => 'ມາຊານເລັດ',
  				'mi' => 'ມາວຣິ',
  				'mic' => 'ມິກແມກ',
- 				'min' => 'ທີແນງກາບູ',
+ 				'min' => 'ມີແນງກາບູ',
  				'mk' => 'ແມຊິໂດນຽນ',
  				'ml' => 'ມາເລອາລຳ',
  				'mn' => 'ມອງໂກເລຍ',
  				'mnc' => 'ແມນຈູ',
  				'mni' => 'ມານີພູຣິ',
+ 				'moe' => 'ອິນນຸໄອມັນ',
  				'moh' => 'ໂມຫາ',
  				'mos' => 'ມອສຊີ',
  				'mr' => 'ມາຣາທີ',
@@ -580,7 +584,7 @@ has 'display_name_language' => (
  				'mt' => 'ມອລທີສ',
  				'mua' => 'ມັນດັງ',
  				'mul' => 'ຫລາຍພາສາ',
- 				'mus' => 'ຄຣິກ',
+ 				'mus' => 'ມັສໂກກີ',
  				'mwl' => 'ມີລັນດາ',
  				'mwr' => 'ມາວາຣິ',
  				'my' => 'ມຽນມາ',
@@ -592,7 +596,7 @@ has 'display_name_language' => (
  				'naq' => 'ນາມາ',
  				'nb' => 'ນໍເວຈຽນ ບັອກມອລ',
  				'nd' => 'ເອັນເດເບເລເໜືອ',
- 				'nds' => 'ເຢຍລະມັນ ຕອນໄຕ້',
+ 				'nds' => 'ເຢຍລະມັນ ຕອນໃຕ້',
  				'nds_NL' => 'ຊາຊອນ ຕອນໄຕ',
  				'ne' => 'ເນປາລີ',
  				'new' => 'ນີວາຣິ',
@@ -604,7 +608,7 @@ has 'display_name_language' => (
  				'nmg' => 'ກວາຊີໂອ',
  				'nn' => 'ນໍເວຈຽນ ນີນອກ',
  				'nnh' => 'ຈີ່ມບູນ',
- 				'no' => 'ນໍເວຍ',
+ 				'no' => 'ນໍເວຈຽນ',
  				'nog' => 'ນໍໄກ',
  				'non' => 'ນໍໂບຮານ',
  				'nqo' => 'ເອັນໂກ',
@@ -620,13 +624,18 @@ has 'display_name_language' => (
  				'nzi' => 'ນິມາ',
  				'oc' => 'ອັອກຊີຕານ',
  				'oj' => 'ໂອຈິບວາ',
+ 				'ojb' => 'ໂອຈິບວາຕາເວັນຕົກສ່ຽງເໜືອ',
+ 				'ojc' => 'ໂອຈິບວາກາງ',
+ 				'ojs' => 'ໂອຈິຄຣີ',
+ 				'ojw' => 'ໂອຈິບວາຕາເວັນຕົກ',
+ 				'oka' => 'ໂອກະນາກັນ',
  				'om' => 'ໂອໂຣໂມ',
- 				'or' => 'ໂອຣິຢາ',
+ 				'or' => 'ໂອເດຍ',
  				'os' => 'ອອດເຊຕິກ',
  				'osa' => 'ໂອແຊກ',
  				'ota' => 'ຕູກີອອດໂຕມັນ',
  				'pa' => 'ປັນຈາບີ',
- 				'pag' => 'ປານກາຊີມານ',
+ 				'pag' => 'ປານກາຊີນານ',
  				'pal' => 'ພາລາວີ',
  				'pam' => 'ປາມປານກາ',
  				'pap' => 'ປາມເປຍເມັນໂທ',
@@ -635,13 +644,14 @@ has 'display_name_language' => (
  				'peo' => 'ເປີເຊຍໂບຮານ',
  				'phn' => 'ຟີນີເຊຍ',
  				'pi' => 'ປາລີ',
+ 				'pis' => 'ປິຈິນ',
  				'pl' => 'ໂປລິຊ',
  				'pon' => 'ພອນເພ',
+ 				'pqm' => 'ມາລິຊີດ ພາສຊາມາໂຄດດີ',
  				'prg' => 'ປຣັສຊຽນ',
  				'pro' => 'ໂປວອງຊານໂບຮານ',
  				'ps' => 'ປາສໂຕ',
  				'pt' => 'ປອກຕຸຍກິສ',
- 				'pt_BR' => 'ປອກຕຸຍກິສ ບະເລຊີ່ນ',
  				'pt_PT' => 'ປອກຕຸຍກິສ ຢຸໂຣບ',
  				'qu' => 'ຄີຊົວ',
  				'quc' => 'Kʼicheʼ',
@@ -688,6 +698,7 @@ has 'display_name_language' => (
  				'sid' => 'ຊິດາໂມ',
  				'sk' => 'ສະໂລແວັກ',
  				'sl' => 'ສະໂລເວນຽນ',
+ 				'slh' => 'ລູຊຸດຊີດໃຕ້',
  				'sm' => 'ຊາມົວ',
  				'sma' => 'ຊາມິໃຕ້',
  				'smj' => 'ລຸນຊາມິ',
@@ -701,9 +712,10 @@ has 'display_name_language' => (
  				'sr' => 'ເຊີບຽນ',
  				'srn' => 'ສຣານນານຕອນໂກ',
  				'srr' => 'ເຊເລີ',
- 				'ss' => 'ຊຣາຕິ',
+ 				'ss' => 'ສະວາຕິ',
  				'ssy' => 'ຊາໂຮ',
  				'st' => 'ໂຊໂທໃຕ້',
+ 				'str' => 'ຊ່ອງແຄບເຊລີຊ',
  				'su' => 'ຊຸນແດນນີສ',
  				'suk' => 'ຊູຄູມ້າ',
  				'sus' => 'ຊູຊູ',
@@ -715,13 +727,16 @@ has 'display_name_language' => (
  				'syc' => 'ຊີເລຍແບບດັ້ງເດີມ',
  				'syr' => 'ຊີເລຍ',
  				'ta' => 'ທາມິລ',
+ 				'tce' => 'ທຸດຊອນໃຕ້',
  				'te' => 'ເຕລູກູ',
  				'tem' => 'ທີມເນ',
  				'teo' => 'ເຕໂຊ',
  				'ter' => 'ເຕເລໂນ',
  				'tet' => 'ເຕຕູມ',
  				'tg' => 'ທາຈິກ',
+ 				'tgx' => 'ທາກີຊ',
  				'th' => 'ໄທ',
+ 				'tht' => 'ທາວທັນ',
  				'ti' => 'ຕິກຣິນຢາ',
  				'tig' => 'ໄທກຣີ',
  				'tiv' => 'ຕີວ',
@@ -734,12 +749,14 @@ has 'display_name_language' => (
  				'tn' => 'ເຕສະວານາ',
  				'to' => 'ທອງການ',
  				'tog' => 'ນາຍອາຊາຕອງກາ',
+ 				'tok' => 'ໂທກີໂພນາ',
  				'tpi' => 'ທອກພີຊິນ',
  				'tr' => 'ເທີຄິຊ',
  				'trv' => 'ຕາໂລໂກ',
  				'ts' => 'ເຕຊອງກາ',
  				'tsi' => 'ຊີມຊີແອນ',
  				'tt' => 'ທາທາ',
+ 				'ttm' => 'ທັດໂຈນເເໜືອ',
  				'tum' => 'ຕຳບູກາ',
  				'tvl' => 'ຕູວາລູ',
  				'tw' => 'ທວີ',
@@ -763,11 +780,12 @@ has 'display_name_language' => (
  				'vun' => 'ວັນໂຈ',
  				'wa' => 'ວໍລູມ',
  				'wae' => 'ວາເຊີ',
- 				'wal' => 'ວາລາໂມ',
+ 				'wal' => 'ໂວເລຕາ',
  				'war' => 'ວາເລ',
  				'was' => 'ວາໂຊ',
  				'wbp' => 'ວາຣພິຣິ',
  				'wo' => 'ວໍລອບ',
+ 				'wuu' => 'ຈີນອູ',
  				'xal' => 'ການມິກ',
  				'xh' => 'ໂຮຊາ',
  				'xog' => 'ໂຊກາ',
@@ -777,8 +795,9 @@ has 'display_name_language' => (
  				'ybb' => 'ແຢມບາ',
  				'yi' => 'ຢິວ',
  				'yo' => 'ໂຢຣູບາ',
+ 				'yrl' => 'ນີນກາຕູ',
  				'yue' => 'ກວາງຕຸ້ງ',
- 				'yue@alt=menu' => 'ພາສາຈີນ, ຈີກວາງຕຸ້ງ',
+ 				'yue@alt=menu' => 'ພາສາຈີນ, ຈີນກວາງຕຸ້ງ',
  				'za' => 'ຊວາງ',
  				'zap' => 'ຊາໂປແຕບ',
  				'zbl' => 'ສັນຍາລັກບລີຊິມ',
@@ -811,8 +830,10 @@ has 'display_name_script' => (
 	default		=> sub {
 		sub {
 			my %scripts = (
-			'Afak' => 'ອັບຟາກາ',
+			'Adlm' => 'ແອດລາມ',
+ 			'Afak' => 'ອັບຟາກາ',
  			'Arab' => 'ອາຣາບິກ',
+ 			'Aran' => 'ນາສຕໍລິກ (ຄຳໃບ້ການແປ: ລະຫັດພິເສດກຳນົດຮູບແບບຕົວໜັງສືອາຣັບ.)',
  			'Armi' => 'ອິມພີຮຽນ ອາເມອິກ',
  			'Armn' => 'ອາເມນຽນ',
  			'Avst' => 'ອະເວສຕະ',
@@ -831,7 +852,7 @@ has 'display_name_script' => (
  			'Cans' => 'ສັນຍາລັກຊົນເຜົ່າພື້ນເມືອງແຄນນາດາ',
  			'Cari' => 'ຄາເຮຍ',
  			'Cham' => 'ຈາມ',
- 			'Cher' => 'ເຊໂຮກີ',
+ 			'Cher' => 'ເຊໂຣກີ',
  			'Cirt' => 'ເຊີຮ',
  			'Copt' => 'ຄອບຕິກ',
  			'Cprt' => 'ໄຊເປຍ',
@@ -925,6 +946,7 @@ has 'display_name_script' => (
  			'Plrd' => 'ສັດຕະສາດພໍຮລາ',
  			'Prti' => 'ພາຮ໌ເທຍອິນສຄຮິປຊັນແນລ',
  			'Rjng' => 'ເຮຈັງ',
+ 			'Rohg' => 'ຮານິຟີ',
  			'Roro' => 'ຮອງໂກຮອງໂກ',
  			'Runr' => 'ຮູນິກ',
  			'Samr' => 'ຊາມາເລຍ',
@@ -939,7 +961,7 @@ has 'display_name_script' => (
  			'Sora' => 'ໂສຮາສົມເປັງ',
  			'Sund' => 'ຊຸນດາ',
  			'Sylo' => 'ຊີໂລຕິນາກຣີ',
- 			'Syrc' => 'ຊີເຮຍ',
+ 			'Syrc' => 'ຊີເຣຍ',
  			'Syre' => 'ຊີເຮຍເອສທຮານຈີໂລ',
  			'Syrj' => 'ຊີເຮຍຕາເວັນຕົກ',
  			'Syrn' => 'ຊີເຮຍຕາເວັນອອກ',
@@ -1004,8 +1026,8 @@ has 'display_name_region' => (
  			'021' => 'ພາກເໜືອອາເມລີກາ',
  			'029' => 'ຄາຣິບບຽນ',
  			'030' => 'ອາຊີຕາເວັນອອກ',
- 			'034' => 'ອາຊີໄຕ້',
- 			'035' => 'ອາຊີຕາເວັນອອກສ່ຽງໄຕ້',
+ 			'034' => 'ອາຊີໃຕ້',
+ 			'035' => 'ອາຊີຕາເວັນອອກສຽງໃຕ້',
  			'039' => 'ຢູໂຣບໃຕ້',
  			'053' => 'ໂອດສະຕາລີ',
  			'054' => 'ເມລານີເຊຍ',
@@ -1108,7 +1130,7 @@ has 'display_name_region' => (
  			'FR' => 'ຝຣັ່ງ',
  			'GA' => 'ກາບອນ',
  			'GB' => 'ສະຫະລາດຊະອະນາຈັກ',
- 			'GB@alt=short' => 'ສະຫະລາດຊະອະນາຈັກຯ',
+ 			'GB@alt=short' => 'ສະຫະລາຊະອານາຈັກ',
  			'GD' => 'ເກຣເນດາ',
  			'GE' => 'ຈໍເຈຍ',
  			'GF' => 'ເຟຣນຊ໌ ກຸຍອານາ',
@@ -1139,7 +1161,8 @@ has 'display_name_region' => (
  			'IL' => 'ອິສຣາເອວ',
  			'IM' => 'ເອວ ອອບ ແມນ',
  			'IN' => 'ອິນເດຍ',
- 			'IO' => 'ເຂດແດນອັງກິດໃນມະຫາສະມຸດອິນເດຍ',
+ 			'IO' => 'ເຂດແດນອັງກິດໃນມະຫາສະໝຸດອິນເດຍ',
+ 			'IO@alt=chagos' => 'ໝູ່ເກາະຊາໂກສ',
  			'IQ' => 'ອີຣັກ',
  			'IR' => 'ອີຣານ',
  			'IS' => 'ໄອສແລນ',
@@ -1254,7 +1277,7 @@ has 'display_name_region' => (
  			'TA' => 'ທຣິສຕັນ ດາ ກັນຮາ',
  			'TC' => 'ໝູ່ເກາະ ເທີກ ແລະ ໄຄໂຄສ',
  			'TD' => 'ຊາດ',
- 			'TF' => 'ເຂດແດນທາງໃຕ້ຂອຝຮັ່ງ',
+ 			'TF' => 'ເຂດແດນທາງໃຕ້ຂອງຝຮັ່ງ',
  			'TG' => 'ໂຕໂກ',
  			'TH' => 'ໄທ',
  			'TJ' => 'ທາຈິກິດສະຖານ',
@@ -1275,7 +1298,6 @@ has 'display_name_region' => (
  			'UN' => 'ສະຫະປະຊາຊາດ',
  			'UN@alt=short' => 'ຢູເອັນ',
  			'US' => 'ສະຫະລັດ',
- 			'US@alt=short' => 'ສະຫະລັດຯ',
  			'UY' => 'ອູຣຸກວຍ',
  			'UZ' => 'ອຸສເບກິສະຖານ',
  			'VA' => 'ນະຄອນ ວາຕິກັນ',
@@ -1405,6 +1427,7 @@ has 'display_name_type' => (
  				'indian' => q{ປະຕິທິນແຫ່ງຊາດອິນເດຍ},
  				'islamic' => q{ປະຕິທິນອິສະລາມ},
  				'islamic-civil' => q{ປະຕິທິນອິດສະລາມ},
+ 				'islamic-umalqura' => q{ປະຕິທິນອິດສະລາມ (ອຳອາວຄິວຣາ)},
  				'iso8601' => q{ປະ​ຕິ​ທິນ ISO-8601},
  				'japanese' => q{ປະຕິທິນຍີ່ປຸ່ນ},
  				'persian' => q{ປະຕິທິນເປີຊຽນ},
@@ -1452,6 +1475,7 @@ has 'display_name_type' => (
  				'armnlow' => q{ຕົວເລກອາເມນຽນຕົວພິມນ້ອຍ},
  				'bali' => q{ຕົວເລກບາລີ},
  				'beng' => q{ຕົວເລກບັງກລາ},
+ 				'cakm' => q{ຕົວເລກຈັກກະມາ},
  				'cham' => q{ຕົວເລກຊຣາມ},
  				'deva' => q{ຕົວເລກເດວານາກາຣີ},
  				'ethi' => q{ຕົວເລກເອທິໂອປິກ},
@@ -1518,20 +1542,6 @@ has 'display_name_measurement_system' => (
 	},
 );
 
-has 'display_name_code_patterns' => (
-	is			=> 'ro',
-	isa			=> HashRef[Str],
-	init_arg	=> undef,
-	default		=> sub {
-		{
-			'language' => '{0}',
- 			'script' => '{0}',
- 			'region' => '{0}',
-
-		}
-	},
-);
-
 has 'characters' => (
 	is			=> 'ro',
 	isa			=> HashRef,
@@ -1544,8 +1554,7 @@ has 'characters' => (
 			auxiliary => qr{[​ ໐ ໑ ໒ ໓ ໔ ໕ ໖ ໗ ໘ ໙]},
 			index => ['ກ', 'ຂ', 'ຄ', 'ງ', 'ຈ', 'ສ', 'ຊ', 'ຍ', 'ດ', 'ຕ', 'ຖ', 'ທ', 'ນ', 'ບ', 'ປ', 'ຜ', 'ຝ', 'ພ', 'ຟ', 'ມ', 'ຢ', 'ຣ', 'ລ', 'ວ', 'ຫ', '{ຫງ}', '{ຫຍ}', '{ຫນ}', '{ຫມ}', '{ຫລ}', '{ຫວ}', 'ອ', 'ຮ'],
 			main => qr{[່ ້ ໊ ໋ ໌ ໍ ໆ ກ ຂ ຄ ງ ຈ ສ ຊ ຍ ດ ຕ ຖ ທ ນ ບ ປ ຜ ຝ ພ ຟ ມ ຢ ຣ ລ ວ ຫ ໜ ໝ ອ ຮ ຯ ະ ັ າ ຳ ິ ີ ຶ ື ຸ ູ ົ ຼ ຽ ເ ແ ໂ ໃ ໄ]},
-			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
-			punctuation => qr{[\- ‐ ‑ – — , ; \: ! ? . … ' ‘ ’ " “ ” ( ) \[ \] § @ * / \& # † ‡ ′ ″]},
+			punctuation => qr{[\- ‐‑ – — , ; \: ! ? . … '‘’ "“” ( ) \[ \] § @ * / \& # † ‡ ′ ″]},
 		};
 	},
 EOT
@@ -1554,68 +1563,6 @@ EOT
 },
 );
 
-
-has 'ellipsis' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub {
-		return {
-			'final' => '{0}…',
-			'initial' => '…{0}',
-			'medial' => '{0}…{1}',
-			'word-final' => '{0} …',
-			'word-initial' => '… {0}',
-			'word-medial' => '{0} … {1}',
-		};
-	},
-);
-
-has 'more_information' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{?},
-);
-
-has 'quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{“},
-);
-
-has 'quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{”},
-);
-
-has 'alternate_quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{‘},
-);
-
-has 'alternate_quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{’},
-);
-
-has 'duration_units' => (
-	is			=> 'ro',
-	isa			=> HashRef[Str],
-	init_arg	=> undef,
-	default		=> sub { {
-				hm => 'h:mm',
-				hms => 'h:mm:ss',
-				ms => 'm:ss',
-			} }
-);
 
 has 'units' => (
 	is			=> 'ro',
@@ -1689,11 +1636,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'1024p8' => {
-						'1' => q(yobe{0}),
+						'1' => q(ໂຢບີ{0}),
 					},
 					# Core Unit Identifier
 					'1024p8' => {
-						'1' => q(yobe{0}),
+						'1' => q(ໂຢບີ{0}),
 					},
 					# Long Unit Identifier
 					'10p-1' => {
@@ -1752,12 +1699,28 @@ has 'units' => (
 						'1' => q(ຢັອກໂຕ{0}),
 					},
 					# Long Unit Identifier
+					'10p-27' => {
+						'1' => q(ຣອນໂຕ{0}),
+					},
+					# Core Unit Identifier
+					'27' => {
+						'1' => q(ຣອນໂຕ{0}),
+					},
+					# Long Unit Identifier
 					'10p-3' => {
 						'1' => q(ມິນລິ{0}),
 					},
 					# Core Unit Identifier
 					'3' => {
 						'1' => q(ມິນລິ{0}),
+					},
+					# Long Unit Identifier
+					'10p-30' => {
+						'1' => q(ເກັກໂທ{0}),
+					},
+					# Core Unit Identifier
+					'30' => {
+						'1' => q(ເກັກໂທ{0}),
 					},
 					# Long Unit Identifier
 					'10p-6' => {
@@ -1792,14 +1755,6 @@ has 'units' => (
 						'1' => q(ເທຣາ{0}),
 					},
 					# Long Unit Identifier
-					'10p15' => {
-						'1' => q(ເພຕາ{0}),
-					},
-					# Core Unit Identifier
-					'10p15' => {
-						'1' => q(ເພຕາ{0}),
-					},
-					# Long Unit Identifier
 					'10p18' => {
 						'1' => q(ເອັກຊາ{0}),
 					},
@@ -1832,12 +1787,28 @@ has 'units' => (
 						'1' => q(ຢັອດຕາ{0}),
 					},
 					# Long Unit Identifier
+					'10p27' => {
+						'1' => q(ຣອນນາ{0}),
+					},
+					# Core Unit Identifier
+					'10p27' => {
+						'1' => q(ຣອນນາ{0}),
+					},
+					# Long Unit Identifier
 					'10p3' => {
 						'1' => q(ກິໂລ{0}),
 					},
 					# Core Unit Identifier
 					'10p3' => {
 						'1' => q(ກິໂລ{0}),
+					},
+					# Long Unit Identifier
+					'10p30' => {
+						'1' => q(ເກັດຕາ{0}),
+					},
+					# Core Unit Identifier
+					'10p30' => {
+						'1' => q(ເກັດຕາ{0}),
 					},
 					# Long Unit Identifier
 					'10p6' => {
@@ -1857,12 +1828,10 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'acceleration-g-force' => {
-						'name' => q(ແຮງຕົກຕາມລຳພັງ),
 						'other' => q({0} ແຮງຕົກຕາມລຳພັງ),
 					},
 					# Core Unit Identifier
 					'g-force' => {
-						'name' => q(ແຮງຕົກຕາມລຳພັງ),
 						'other' => q({0} ແຮງຕົກຕາມລຳພັງ),
 					},
 					# Long Unit Identifier
@@ -1896,63 +1865,19 @@ has 'units' => (
 						'other' => q({0} ວິນາທີ),
 					},
 					# Long Unit Identifier
-					'angle-degree' => {
-						'name' => q(ອົງສາ),
-						'other' => q({0} ອົງສາ),
-					},
-					# Core Unit Identifier
-					'degree' => {
-						'name' => q(ອົງສາ),
-						'other' => q({0} ອົງສາ),
-					},
-					# Long Unit Identifier
 					'angle-radian' => {
-						'name' => q(radians),
 						'other' => q({0} radians),
 					},
 					# Core Unit Identifier
 					'radian' => {
-						'name' => q(radians),
 						'other' => q({0} radians),
 					},
 					# Long Unit Identifier
-					'angle-revolution' => {
-						'name' => q(rev),
-						'other' => q({0} rev),
-					},
-					# Core Unit Identifier
-					'revolution' => {
-						'name' => q(rev),
-						'other' => q({0} rev),
-					},
-					# Long Unit Identifier
-					'area-acre' => {
-						'name' => q(ເອເຄີ),
-						'other' => q({0} ເອເຄີ),
-					},
-					# Core Unit Identifier
-					'acre' => {
-						'name' => q(ເອເຄີ),
-						'other' => q({0} ເອເຄີ),
-					},
-					# Long Unit Identifier
-					'area-dunam' => {
-						'name' => q(ດູ​ນຳ),
-						'other' => q({0} ດູ​ນຳ),
-					},
-					# Core Unit Identifier
-					'dunam' => {
-						'name' => q(ດູ​ນຳ),
-						'other' => q({0} ດູ​ນຳ),
-					},
-					# Long Unit Identifier
 					'area-hectare' => {
-						'name' => q(ເຮັກຕາ),
 						'other' => q({0} ເຮັກຕາ),
 					},
 					# Core Unit Identifier
 					'hectare' => {
-						'name' => q(ເຮັກຕາ),
 						'other' => q({0} ເຮັກຕາ),
 					},
 					# Long Unit Identifier
@@ -2017,13 +1942,11 @@ has 'units' => (
 					'area-square-mile' => {
 						'name' => q(ຕາ​ລາງໄມລ໌),
 						'other' => q({0} ຕາ​ລາງໄມລ໌),
-						'per' => q({0}/mi²),
 					},
 					# Core Unit Identifier
 					'square-mile' => {
 						'name' => q(ຕາ​ລາງໄມລ໌),
 						'other' => q({0} ຕາ​ລາງໄມລ໌),
-						'per' => q({0}/mi²),
 					},
 					# Long Unit Identifier
 					'area-square-yard' => {
@@ -2036,34 +1959,20 @@ has 'units' => (
 						'other' => q({0} ຕາລາງຢາດ),
 					},
 					# Long Unit Identifier
-					'concentr-item' => {
-						'name' => q(ອັນ),
-						'other' => q({0} ອັນ),
-					},
-					# Core Unit Identifier
-					'item' => {
-						'name' => q(ອັນ),
-						'other' => q({0} ອັນ),
-					},
-					# Long Unit Identifier
 					'concentr-karat' => {
-						'name' => q(ກະຣັດ),
 						'other' => q({0} ກະຣັດ),
 					},
 					# Core Unit Identifier
 					'karat' => {
-						'name' => q(ກະຣັດ),
 						'other' => q({0} ກະຣັດ),
 					},
 					# Long Unit Identifier
 					'concentr-milligram-ofglucose-per-deciliter' => {
 						'name' => q(ມິລິກຣັມຕໍ່ເດຊິລິດ),
-						'other' => q({0} mg/dL),
 					},
 					# Core Unit Identifier
 					'milligram-ofglucose-per-deciliter' => {
 						'name' => q(ມິລິກຣັມຕໍ່ເດຊິລິດ),
-						'other' => q({0} mg/dL),
 					},
 					# Long Unit Identifier
 					'concentr-millimole-per-liter' => {
@@ -2087,22 +1996,18 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'concentr-percent' => {
-						'name' => q(ເປີເຊັນ),
 						'other' => q({0} ເປີເຊັນ),
 					},
 					# Core Unit Identifier
 					'percent' => {
-						'name' => q(ເປີເຊັນ),
 						'other' => q({0} ເປີເຊັນ),
 					},
 					# Long Unit Identifier
 					'concentr-permille' => {
-						'name' => q(ຕໍ່ພັນ),
 						'other' => q({0} ຕໍ່ພັນ),
 					},
 					# Core Unit Identifier
 					'permille' => {
-						'name' => q(ຕໍ່ພັນ),
 						'other' => q({0} ຕໍ່ພັນ),
 					},
 					# Long Unit Identifier
@@ -2137,12 +2042,10 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-kilometer' => {
-						'name' => q(ລ/ກມ),
 						'other' => q({0} ລິດຕໍ່ກິໂລແມັດ),
 					},
 					# Core Unit Identifier
 					'liter-per-kilometer' => {
-						'name' => q(ລ/ກມ),
 						'other' => q({0} ລິດຕໍ່ກິໂລແມັດ),
 					},
 					# Long Unit Identifier
@@ -2166,100 +2069,6 @@ has 'units' => (
 						'other' => q({0} ໄມລ໌ຕໍ່ແກລລອນອັງກິດ),
 					},
 					# Long Unit Identifier
-					'coordinate' => {
-						'east' => q({0}E),
-						'north' => q({0}N),
-						'south' => q({0}S),
-						'west' => q({0}W),
-					},
-					# Core Unit Identifier
-					'coordinate' => {
-						'east' => q({0}E),
-						'north' => q({0}N),
-						'south' => q({0}S),
-						'west' => q({0}W),
-					},
-					# Long Unit Identifier
-					'digital-bit' => {
-						'name' => q(bit),
-						'other' => q({0} bit),
-					},
-					# Core Unit Identifier
-					'bit' => {
-						'name' => q(bit),
-						'other' => q({0} bit),
-					},
-					# Long Unit Identifier
-					'digital-byte' => {
-						'name' => q(byte),
-						'other' => q({0} byte),
-					},
-					# Core Unit Identifier
-					'byte' => {
-						'name' => q(byte),
-						'other' => q({0} byte),
-					},
-					# Long Unit Identifier
-					'digital-gigabit' => {
-						'name' => q(Gb),
-						'other' => q({0} Gb),
-					},
-					# Core Unit Identifier
-					'gigabit' => {
-						'name' => q(Gb),
-						'other' => q({0} Gb),
-					},
-					# Long Unit Identifier
-					'digital-gigabyte' => {
-						'name' => q(GB),
-						'other' => q({0} GB),
-					},
-					# Core Unit Identifier
-					'gigabyte' => {
-						'name' => q(GB),
-						'other' => q({0} GB),
-					},
-					# Long Unit Identifier
-					'digital-kilobit' => {
-						'name' => q(kb),
-						'other' => q({0} kb),
-					},
-					# Core Unit Identifier
-					'kilobit' => {
-						'name' => q(kb),
-						'other' => q({0} kb),
-					},
-					# Long Unit Identifier
-					'digital-kilobyte' => {
-						'name' => q(kB),
-						'other' => q({0} kB),
-					},
-					# Core Unit Identifier
-					'kilobyte' => {
-						'name' => q(kB),
-						'other' => q({0} kB),
-					},
-					# Long Unit Identifier
-					'digital-megabit' => {
-						'name' => q(Mb),
-						'other' => q({0} Mb),
-					},
-					# Core Unit Identifier
-					'megabit' => {
-						'name' => q(Mb),
-						'other' => q({0} Mb),
-					},
-					# Long Unit Identifier
-					'digital-megabyte' => {
-						'name' => q(MB),
-						'other' => q({0} MB),
-					},
-					# Core Unit Identifier
-					'megabyte' => {
-						'name' => q(MB),
-						'other' => q({0} MB),
-					},
-					# Long Unit Identifier
 					'digital-petabyte' => {
 						'name' => q(ເພຕາໄບຕ໌),
 						'other' => q({0} ເພຕາໄບຕ໌),
@@ -2268,26 +2077,6 @@ has 'units' => (
 					'petabyte' => {
 						'name' => q(ເພຕາໄບຕ໌),
 						'other' => q({0} ເພຕາໄບຕ໌),
-					},
-					# Long Unit Identifier
-					'digital-terabit' => {
-						'name' => q(Tb),
-						'other' => q({0} Tb),
-					},
-					# Core Unit Identifier
-					'terabit' => {
-						'name' => q(Tb),
-						'other' => q({0} Tb),
-					},
-					# Long Unit Identifier
-					'digital-terabyte' => {
-						'name' => q(TB),
-						'other' => q({0} TB),
-					},
-					# Core Unit Identifier
-					'terabyte' => {
-						'name' => q(TB),
-						'other' => q({0} TB),
 					},
 					# Long Unit Identifier
 					'duration-century' => {
@@ -2301,35 +2090,19 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'duration-day' => {
-						'name' => q(ມື້),
-						'other' => q({0} ມື້),
 						'per' => q({0} ຕໍ່ມື້),
 					},
 					# Core Unit Identifier
 					'day' => {
-						'name' => q(ມື້),
-						'other' => q({0} ມື້),
 						'per' => q({0} ຕໍ່ມື້),
 					},
 					# Long Unit Identifier
-					'duration-decade' => {
-						'name' => q(ທົດສະວັດ),
-						'other' => q({0} ທົດສະວັດ),
-					},
-					# Core Unit Identifier
-					'decade' => {
-						'name' => q(ທົດສະວັດ),
-						'other' => q({0} ທົດສະວັດ),
-					},
-					# Long Unit Identifier
 					'duration-hour' => {
-						'name' => q(ຊົ່ວໂມງ),
 						'other' => q({0} ຊົ່ວໂມງ),
 						'per' => q({0} ຕໍ່ຊົ່ວໂມງ),
 					},
 					# Core Unit Identifier
 					'hour' => {
-						'name' => q(ຊົ່ວໂມງ),
 						'other' => q({0} ຊົ່ວໂມງ),
 						'per' => q({0} ຕໍ່ຊົ່ວໂມງ),
 					},
@@ -2367,15 +2140,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'duration-month' => {
-						'name' => q(ເດືອນ),
 						'other' => q({0} ເດືອນ),
-						'per' => q({0}/ເດືອນ),
 					},
 					# Core Unit Identifier
 					'month' => {
-						'name' => q(ເດືອນ),
 						'other' => q({0} ເດືອນ),
-						'per' => q({0}/ເດືອນ),
 					},
 					# Long Unit Identifier
 					'duration-nanosecond' => {
@@ -2401,67 +2170,21 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'duration-week' => {
-						'name' => q(ອາທິດ),
 						'other' => q({0} ອາທິດ),
 						'per' => q({0} ຕໍ່ອາທິດ),
 					},
 					# Core Unit Identifier
 					'week' => {
-						'name' => q(ອາທິດ),
 						'other' => q({0} ອາທິດ),
 						'per' => q({0} ຕໍ່ອາທິດ),
 					},
 					# Long Unit Identifier
 					'duration-year' => {
-						'name' => q(ປີ),
-						'other' => q({0} ປີ),
 						'per' => q({0} /ປີ),
 					},
 					# Core Unit Identifier
 					'year' => {
-						'name' => q(ປີ),
-						'other' => q({0} ປີ),
 						'per' => q({0} /ປີ),
-					},
-					# Long Unit Identifier
-					'electric-ampere' => {
-						'name' => q(amp),
-						'other' => q({0} A),
-					},
-					# Core Unit Identifier
-					'ampere' => {
-						'name' => q(amp),
-						'other' => q({0} A),
-					},
-					# Long Unit Identifier
-					'electric-milliampere' => {
-						'name' => q(mA),
-						'other' => q({0} mA),
-					},
-					# Core Unit Identifier
-					'milliampere' => {
-						'name' => q(mA),
-						'other' => q({0} mA),
-					},
-					# Long Unit Identifier
-					'electric-ohm' => {
-						'name' => q(ohm),
-						'other' => q({0} Ω),
-					},
-					# Core Unit Identifier
-					'ohm' => {
-						'name' => q(ohm),
-						'other' => q({0} Ω),
-					},
-					# Long Unit Identifier
-					'electric-volt' => {
-						'name' => q(ໂວລ),
-						'other' => q({0} ໂວລ),
-					},
-					# Core Unit Identifier
-					'volt' => {
-						'name' => q(ໂວລ),
-						'other' => q({0} ໂວລ),
 					},
 					# Long Unit Identifier
 					'energy-british-thermal-unit' => {
@@ -2504,46 +2227,6 @@ has 'units' => (
 						'other' => q({0} ແຄລໍລີ່),
 					},
 					# Long Unit Identifier
-					'energy-joule' => {
-						'name' => q(joule),
-						'other' => q({0} J),
-					},
-					# Core Unit Identifier
-					'joule' => {
-						'name' => q(joule),
-						'other' => q({0} J),
-					},
-					# Long Unit Identifier
-					'energy-kilocalorie' => {
-						'name' => q(ກິໂລແຄລໍລີ່),
-						'other' => q({0} ກິໂລແຄລໍລີ່),
-					},
-					# Core Unit Identifier
-					'kilocalorie' => {
-						'name' => q(ກິໂລແຄລໍລີ່),
-						'other' => q({0} ກິໂລແຄລໍລີ່),
-					},
-					# Long Unit Identifier
-					'energy-kilojoule' => {
-						'name' => q(kJ),
-						'other' => q({0} kJ),
-					},
-					# Core Unit Identifier
-					'kilojoule' => {
-						'name' => q(kJ),
-						'other' => q({0} kJ),
-					},
-					# Long Unit Identifier
-					'energy-kilowatt-hour' => {
-						'name' => q(kWh),
-						'other' => q({0} kWh),
-					},
-					# Core Unit Identifier
-					'kilowatt-hour' => {
-						'name' => q(kWh),
-						'other' => q({0} kWh),
-					},
-					# Long Unit Identifier
 					'force-kilowatt-hour-per-100-kilometer' => {
 						'name' => q(ກິໂລວັດໂມງຕໍ່ 100 ກິໂລແມັດ),
 						'other' => q({0} ກິໂລວັດໂມງຕໍ່ 100 ກິໂລແມັດ),
@@ -2572,56 +2255,6 @@ has 'units' => (
 					'pound-force' => {
 						'name' => q(ແຮງປ​ອນ),
 						'other' => q({0} ແຮງປ​ອນ),
-					},
-					# Long Unit Identifier
-					'frequency-gigahertz' => {
-						'name' => q(GHz),
-						'other' => q({0} GHz),
-					},
-					# Core Unit Identifier
-					'gigahertz' => {
-						'name' => q(GHz),
-						'other' => q({0} GHz),
-					},
-					# Long Unit Identifier
-					'frequency-hertz' => {
-						'name' => q(Hz),
-						'other' => q({0} Hz),
-					},
-					# Core Unit Identifier
-					'hertz' => {
-						'name' => q(Hz),
-						'other' => q({0} Hz),
-					},
-					# Long Unit Identifier
-					'frequency-kilohertz' => {
-						'name' => q(kHz),
-						'other' => q({0} kHz),
-					},
-					# Core Unit Identifier
-					'kilohertz' => {
-						'name' => q(kHz),
-						'other' => q({0} kHz),
-					},
-					# Long Unit Identifier
-					'frequency-megahertz' => {
-						'name' => q(MHz),
-						'other' => q({0} MHz),
-					},
-					# Core Unit Identifier
-					'megahertz' => {
-						'name' => q(MHz),
-						'other' => q({0} MHz),
-					},
-					# Long Unit Identifier
-					'graphics-dot' => {
-						'name' => q(ດັອດ),
-						'other' => q({0} ດັອດ),
-					},
-					# Core Unit Identifier
-					'dot' => {
-						'name' => q(ດັອດ),
-						'other' => q({0} ດັອດ),
 					},
 					# Long Unit Identifier
 					'length-astronomical-unit' => {
@@ -2656,36 +2289,22 @@ has 'units' => (
 						'other' => q({0} ເດຊີແມັດ),
 					},
 					# Long Unit Identifier
-					'length-fathom' => {
-						'name' => q(ftm),
-						'other' => q({0} ftm),
-					},
-					# Core Unit Identifier
-					'fathom' => {
-						'name' => q(ftm),
-						'other' => q({0} ftm),
-					},
-					# Long Unit Identifier
 					'length-foot' => {
-						'name' => q(ຟຸດ),
 						'other' => q({0} ຟຸດ),
 						'per' => q({0} ຕໍ່ຟຸດ),
 					},
 					# Core Unit Identifier
 					'foot' => {
-						'name' => q(ຟຸດ),
 						'other' => q({0} ຟຸດ),
 						'per' => q({0} ຕໍ່ຟຸດ),
 					},
 					# Long Unit Identifier
 					'length-inch' => {
-						'name' => q(ນິ້ວ),
 						'other' => q({0} ນິ້ວ),
 						'per' => q({0} ຕໍ່ນິ້ວ),
 					},
 					# Core Unit Identifier
 					'inch' => {
-						'name' => q(ນິ້ວ),
 						'other' => q({0} ນິ້ວ),
 						'per' => q({0} ຕໍ່ນິ້ວ),
 					},
@@ -2703,23 +2322,19 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-light-year' => {
-						'name' => q(ປີແສງ),
 						'other' => q({0} ປີແສງ),
 					},
 					# Core Unit Identifier
 					'light-year' => {
-						'name' => q(ປີແສງ),
 						'other' => q({0} ປີແສງ),
 					},
 					# Long Unit Identifier
 					'length-meter' => {
-						'name' => q(ແມັດ),
 						'other' => q({0} ແມັດ),
 						'per' => q({0} ຕໍ່ແມັດ),
 					},
 					# Core Unit Identifier
 					'meter' => {
-						'name' => q(ແມັດ),
 						'other' => q({0} ແມັດ),
 						'per' => q({0} ຕໍ່ແມັດ),
 					},
@@ -2735,12 +2350,10 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-mile' => {
-						'name' => q(ໄມລ໌),
 						'other' => q({0} ໄມລ໌),
 					},
 					# Core Unit Identifier
 					'mile' => {
-						'name' => q(ໄມລ໌),
 						'other' => q({0} ໄມລ໌),
 					},
 					# Long Unit Identifier
@@ -2785,12 +2398,10 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-parsec' => {
-						'name' => q(parsecs),
 						'other' => q({0} parsecs),
 					},
 					# Core Unit Identifier
 					'parsec' => {
-						'name' => q(parsecs),
 						'other' => q({0} parsecs),
 					},
 					# Long Unit Identifier
@@ -2805,12 +2416,10 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-point' => {
-						'name' => q(ຈຸດ),
 						'other' => q({0} ຈຸດ),
 					},
 					# Core Unit Identifier
 					'point' => {
-						'name' => q(ຈຸດ),
 						'other' => q({0} ຈຸດ),
 					},
 					# Long Unit Identifier
@@ -2822,16 +2431,6 @@ has 'units' => (
 					'solar-radius' => {
 						'name' => q(ລັດ​ສະ​ໝີ​ດວງ​ຕາ​ເວັນ),
 						'other' => q({0} ລັດ​ສະ​ໝີ​ດວງ​ຕາ​ເວັນ),
-					},
-					# Long Unit Identifier
-					'length-yard' => {
-						'name' => q(ຫລາ),
-						'other' => q({0} ຫລາ),
-					},
-					# Core Unit Identifier
-					'yard' => {
-						'name' => q(ຫລາ),
-						'other' => q({0} ຫລາ),
 					},
 					# Long Unit Identifier
 					'light-candela' => {
@@ -2855,12 +2454,10 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'light-lux' => {
-						'name' => q(lux),
 						'other' => q({0} lux),
 					},
 					# Core Unit Identifier
 					'lux' => {
-						'name' => q(lux),
 						'other' => q({0} lux),
 					},
 					# Long Unit Identifier
@@ -2872,16 +2469,6 @@ has 'units' => (
 					'solar-luminosity' => {
 						'name' => q(ຄວາມ​ແຈ້ງດວງ​ຕາ​ເວັນ),
 						'other' => q({0} ຄວາມ​ແຈ້ງດວງ​ຕາ​ເວັນ),
-					},
-					# Long Unit Identifier
-					'mass-carat' => {
-						'name' => q(CD),
-						'other' => q({0} CD),
-					},
-					# Core Unit Identifier
-					'carat' => {
-						'name' => q(CD),
-						'other' => q({0} CD),
 					},
 					# Long Unit Identifier
 					'mass-dalton' => {
@@ -2915,47 +2502,19 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'mass-gram' => {
-						'name' => q(ກຣາມ),
 						'other' => q({0} ກຣາມ),
-						'per' => q({0}/g),
 					},
 					# Core Unit Identifier
 					'gram' => {
-						'name' => q(ກຣາມ),
 						'other' => q({0} ກຣາມ),
-						'per' => q({0}/g),
 					},
 					# Long Unit Identifier
 					'mass-kilogram' => {
-						'name' => q(ກິໂລກຣາມ),
 						'other' => q({0} ກິໂລກຣາມ),
-						'per' => q({0}/kg),
 					},
 					# Core Unit Identifier
 					'kilogram' => {
-						'name' => q(ກິໂລກຣາມ),
 						'other' => q({0} ກິໂລກຣາມ),
-						'per' => q({0}/kg),
-					},
-					# Long Unit Identifier
-					'mass-metric-ton' => {
-						'name' => q(t),
-						'other' => q({0} t),
-					},
-					# Core Unit Identifier
-					'metric-ton' => {
-						'name' => q(t),
-						'other' => q({0} t),
-					},
-					# Long Unit Identifier
-					'mass-microgram' => {
-						'name' => q(μg),
-						'other' => q({0} μg),
-					},
-					# Core Unit Identifier
-					'microgram' => {
-						'name' => q(μg),
-						'other' => q({0} μg),
 					},
 					# Long Unit Identifier
 					'mass-milligram' => {
@@ -2969,35 +2528,21 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'mass-ounce' => {
-						'name' => q(ອອນສ),
 						'other' => q({0} ອອນສ),
 						'per' => q({0} ຕໍ່ ອອນສ),
 					},
 					# Core Unit Identifier
 					'ounce' => {
-						'name' => q(ອອນສ),
 						'other' => q({0} ອອນສ),
 						'per' => q({0} ຕໍ່ ອອນສ),
 					},
 					# Long Unit Identifier
-					'mass-ounce-troy' => {
-						'name' => q(oz t),
-						'other' => q({0} oz t),
-					},
-					# Core Unit Identifier
-					'ounce-troy' => {
-						'name' => q(oz t),
-						'other' => q({0} oz t),
-					},
-					# Long Unit Identifier
 					'mass-pound' => {
-						'name' => q(ປອນ),
 						'other' => q({0} ປອນ),
 						'per' => q({0}/ປອນ),
 					},
 					# Core Unit Identifier
 					'pound' => {
-						'name' => q(ປອນ),
 						'other' => q({0} ປອນ),
 						'per' => q({0}/ປອນ),
 					},
@@ -3040,64 +2585,20 @@ has 'units' => (
 						'1' => q({0} ຕໍ່ {1}),
 					},
 					# Long Unit Identifier
-					'power-gigawatt' => {
-						'name' => q(GW),
-						'other' => q({0} GW),
-					},
-					# Core Unit Identifier
-					'gigawatt' => {
-						'name' => q(GW),
-						'other' => q({0} GW),
-					},
-					# Long Unit Identifier
 					'power-horsepower' => {
-						'name' => q(ແຮງມ້າ),
 						'other' => q({0} ແຮງມ້າ),
 					},
 					# Core Unit Identifier
 					'horsepower' => {
-						'name' => q(ແຮງມ້າ),
 						'other' => q({0} ແຮງມ້າ),
 					},
 					# Long Unit Identifier
 					'power-kilowatt' => {
-						'name' => q(ກິໂລວັດ),
 						'other' => q({0} ກິໂລວັດ),
 					},
 					# Core Unit Identifier
 					'kilowatt' => {
-						'name' => q(ກິໂລວັດ),
 						'other' => q({0} ກິໂລວັດ),
-					},
-					# Long Unit Identifier
-					'power-megawatt' => {
-						'name' => q(MW),
-						'other' => q({0} MW),
-					},
-					# Core Unit Identifier
-					'megawatt' => {
-						'name' => q(MW),
-						'other' => q({0} MW),
-					},
-					# Long Unit Identifier
-					'power-milliwatt' => {
-						'name' => q(mW),
-						'other' => q({0} mW),
-					},
-					# Core Unit Identifier
-					'milliwatt' => {
-						'name' => q(mW),
-						'other' => q({0} mW),
-					},
-					# Long Unit Identifier
-					'power-watt' => {
-						'name' => q(ວັດ),
-						'other' => q({0} ວັດ),
-					},
-					# Core Unit Identifier
-					'watt' => {
-						'name' => q(ວັດ),
-						'other' => q({0} ວັດ),
 					},
 					# Long Unit Identifier
 					'power2' => {
@@ -3200,6 +2701,16 @@ has 'units' => (
 						'other' => q({0} ປອນຕໍ່ຕະລາງນິ້້ວ),
 					},
 					# Long Unit Identifier
+					'speed-beaufort' => {
+						'name' => q(ໂບຝອດ),
+						'other' => q({0} ໂບຝອດ),
+					},
+					# Core Unit Identifier
+					'beaufort' => {
+						'name' => q(ໂບຝອດ),
+						'other' => q({0} ໂບຝອດ),
+					},
+					# Long Unit Identifier
 					'speed-kilometer-per-hour' => {
 						'name' => q(ກິໂລແມັດຕໍ່ຊົ່ວໂມງ),
 						'other' => q({0} ກິໂລແມັດຕໍ່ຊົ່ວໂມງ),
@@ -3221,13 +2732,13 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
-						'name' => q(ແມັດຕໍ່ນາທີ),
-						'other' => q({0} ແມັດຕໍ່ນາທີ),
+						'name' => q(ແມັດຕໍ່ວິນາທີ),
+						'other' => q({0} ແມັດຕໍ່ວິນາທີ),
 					},
 					# Core Unit Identifier
 					'meter-per-second' => {
-						'name' => q(ແມັດຕໍ່ນາທີ),
-						'other' => q({0} ແມັດຕໍ່ນາທີ),
+						'name' => q(ແມັດຕໍ່ວິນາທີ),
+						'other' => q({0} ແມັດຕໍ່ວິນາທີ),
 					},
 					# Long Unit Identifier
 					'speed-mile-per-hour' => {
@@ -3242,12 +2753,10 @@ has 'units' => (
 					# Long Unit Identifier
 					'temperature-celsius' => {
 						'name' => q(ອົງສາເຊວຊຽສ),
-						'other' => q({0} ອົງສາ ຊີ.),
 					},
 					# Core Unit Identifier
 					'celsius' => {
 						'name' => q(ອົງສາເຊວຊຽສ),
-						'other' => q({0} ອົງສາ ຊີ.),
 					},
 					# Long Unit Identifier
 					'temperature-fahrenheit' => {
@@ -3258,16 +2767,6 @@ has 'units' => (
 					'fahrenheit' => {
 						'name' => q(ອົງສາຟາເຣນຮາຍ),
 						'other' => q({0} ອົງສາຟາເຣນຮາຍ),
-					},
-					# Long Unit Identifier
-					'temperature-generic' => {
-						'name' => q(°),
-						'other' => q({0}°),
-					},
-					# Core Unit Identifier
-					'generic' => {
-						'name' => q(°),
-						'other' => q({0}°),
 					},
 					# Long Unit Identifier
 					'temperature-kelvin' => {
@@ -3300,16 +2799,6 @@ has 'units' => (
 						'other' => q({0} ປອນ​-ຟຸດ),
 					},
 					# Long Unit Identifier
-					'volume-acre-foot' => {
-						'name' => q(ac ft),
-						'other' => q({0} ac ft),
-					},
-					# Core Unit Identifier
-					'acre-foot' => {
-						'name' => q(ac ft),
-						'other' => q({0} ac ft),
-					},
-					# Long Unit Identifier
 					'volume-barrel' => {
 						'name' => q(ບາ​ເຣວ),
 						'other' => q({0} ບາ​ເຣວ),
@@ -3318,48 +2807,6 @@ has 'units' => (
 					'barrel' => {
 						'name' => q(ບາ​ເຣວ),
 						'other' => q({0} ບາ​ເຣວ),
-					},
-					# Long Unit Identifier
-					'volume-centiliter' => {
-						'name' => q(cL),
-						'other' => q({0} cL),
-					},
-					# Core Unit Identifier
-					'centiliter' => {
-						'name' => q(cL),
-						'other' => q({0} cL),
-					},
-					# Long Unit Identifier
-					'volume-cubic-centimeter' => {
-						'name' => q(cm³),
-						'other' => q({0} cm³),
-						'per' => q({0}/cm³),
-					},
-					# Core Unit Identifier
-					'cubic-centimeter' => {
-						'name' => q(cm³),
-						'other' => q({0} cm³),
-						'per' => q({0}/cm³),
-					},
-					# Long Unit Identifier
-					'volume-cubic-foot' => {
-						'name' => q(ft³),
-						'other' => q({0} ft³),
-					},
-					# Core Unit Identifier
-					'cubic-foot' => {
-						'name' => q(ft³),
-						'other' => q({0} ft³),
-					},
-					# Long Unit Identifier
-					'volume-cubic-inch' => {
-						'name' => q(in³),
-						'other' => q({0} in³),
-					},
-					# Core Unit Identifier
-					'cubic-inch' => {
-						'name' => q(in³),
-						'other' => q({0} in³),
 					},
 					# Long Unit Identifier
 					'volume-cubic-kilometer' => {
@@ -3394,44 +2841,12 @@ has 'units' => (
 						'other' => q({0} ໄມລ໌ກ້ອນ),
 					},
 					# Long Unit Identifier
-					'volume-cubic-yard' => {
-						'name' => q(yd³),
-						'other' => q({0} yd³),
-					},
-					# Core Unit Identifier
-					'cubic-yard' => {
-						'name' => q(yd³),
-						'other' => q({0} yd³),
-					},
-					# Long Unit Identifier
-					'volume-cup' => {
-						'name' => q(cup),
-						'other' => q({0} c),
-					},
-					# Core Unit Identifier
-					'cup' => {
-						'name' => q(cup),
-						'other' => q({0} c),
-					},
-					# Long Unit Identifier
 					'volume-cup-metric' => {
-						'name' => q(mcup),
 						'other' => q({0} metric cups),
 					},
 					# Core Unit Identifier
 					'cup-metric' => {
-						'name' => q(mcup),
 						'other' => q({0} metric cups),
-					},
-					# Long Unit Identifier
-					'volume-deciliter' => {
-						'name' => q(dL),
-						'other' => q({0} dL),
-					},
-					# Core Unit Identifier
-					'deciliter' => {
-						'name' => q(dL),
-						'other' => q({0} dL),
 					},
 					# Long Unit Identifier
 					'volume-dram' => {
@@ -3444,110 +2859,32 @@ has 'units' => (
 						'other' => q({0} ແດຣມ),
 					},
 					# Long Unit Identifier
-					'volume-drop' => {
-						'name' => q(ຢອດ),
-						'other' => q({0} ຢອດ),
-					},
-					# Core Unit Identifier
-					'drop' => {
-						'name' => q(ຢອດ),
-						'other' => q({0} ຢອດ),
-					},
-					# Long Unit Identifier
-					'volume-fluid-ounce' => {
-						'name' => q(fl oz),
-						'other' => q({0} fl oz),
-					},
-					# Core Unit Identifier
-					'fluid-ounce' => {
-						'name' => q(fl oz),
-						'other' => q({0} fl oz),
-					},
-					# Long Unit Identifier
 					'volume-gallon' => {
-						'name' => q(ແກລລອນ),
-						'other' => q({0} ແກລລອນ),
 						'per' => q({0} ຕໍ່ແກລລອນ),
 					},
 					# Core Unit Identifier
 					'gallon' => {
-						'name' => q(ແກລລອນ),
-						'other' => q({0} ແກລລອນ),
 						'per' => q({0} ຕໍ່ແກລລອນ),
 					},
 					# Long Unit Identifier
 					'volume-gallon-imperial' => {
 						'name' => q(ແກລລອນອັງກິດ),
 						'other' => q({0} ແກລລອນອັງກິດ),
-						'per' => q({0}/gal Imp.),
 					},
 					# Core Unit Identifier
 					'gallon-imperial' => {
 						'name' => q(ແກລລອນອັງກິດ),
 						'other' => q({0} ແກລລອນອັງກິດ),
-						'per' => q({0}/gal Imp.),
-					},
-					# Long Unit Identifier
-					'volume-hectoliter' => {
-						'name' => q(hL),
-						'other' => q({0} hL),
-					},
-					# Core Unit Identifier
-					'hectoliter' => {
-						'name' => q(hL),
-						'other' => q({0} hL),
 					},
 					# Long Unit Identifier
 					'volume-liter' => {
-						'name' => q(ລິດ),
 						'other' => q({0} ລິດ),
 						'per' => q({0} ຕໍ່ລິດ),
 					},
 					# Core Unit Identifier
 					'liter' => {
-						'name' => q(ລິດ),
 						'other' => q({0} ລິດ),
 						'per' => q({0} ຕໍ່ລິດ),
-					},
-					# Long Unit Identifier
-					'volume-megaliter' => {
-						'name' => q(ML),
-						'other' => q({0} ML),
-					},
-					# Core Unit Identifier
-					'megaliter' => {
-						'name' => q(ML),
-						'other' => q({0} ML),
-					},
-					# Long Unit Identifier
-					'volume-milliliter' => {
-						'name' => q(mL),
-						'other' => q({0} mL),
-					},
-					# Core Unit Identifier
-					'milliliter' => {
-						'name' => q(mL),
-						'other' => q({0} mL),
-					},
-					# Long Unit Identifier
-					'volume-pinch' => {
-						'name' => q(ຢິບ),
-						'other' => q({0} ຢິບ),
-					},
-					# Core Unit Identifier
-					'pinch' => {
-						'name' => q(ຢິບ),
-						'other' => q({0} ຢິບ),
-					},
-					# Long Unit Identifier
-					'volume-pint' => {
-						'name' => q(pt),
-						'other' => q({0} pt),
-					},
-					# Core Unit Identifier
-					'pint' => {
-						'name' => q(pt),
-						'other' => q({0} pt),
 					},
 					# Long Unit Identifier
 					'volume-pint-metric' => {
@@ -3559,206 +2896,8 @@ has 'units' => (
 						'name' => q(metric pints),
 						'other' => q({0} metric pints),
 					},
-					# Long Unit Identifier
-					'volume-quart' => {
-						'name' => q(qt),
-						'other' => q({0} qt),
-					},
-					# Core Unit Identifier
-					'quart' => {
-						'name' => q(qt),
-						'other' => q({0} qt),
-					},
-					# Long Unit Identifier
-					'volume-tablespoon' => {
-						'name' => q(tbsp),
-						'other' => q({0} tbsp),
-					},
-					# Core Unit Identifier
-					'tablespoon' => {
-						'name' => q(tbsp),
-						'other' => q({0} tbsp),
-					},
-					# Long Unit Identifier
-					'volume-teaspoon' => {
-						'name' => q(tsp),
-						'other' => q({0} tsp),
-					},
-					# Core Unit Identifier
-					'teaspoon' => {
-						'name' => q(tsp),
-						'other' => q({0} tsp),
-					},
 				},
 				'narrow' => {
-					# Long Unit Identifier
-					'' => {
-						'name' => q(ທິດທາງ),
-					},
-					# Core Unit Identifier
-					'' => {
-						'name' => q(ທິດທາງ),
-					},
-					# Long Unit Identifier
-					'10p-1' => {
-						'1' => q(ດຊ{0}),
-					},
-					# Core Unit Identifier
-					'1' => {
-						'1' => q(ດຊ{0}),
-					},
-					# Long Unit Identifier
-					'10p-12' => {
-						'1' => q(ປກ{0}),
-					},
-					# Core Unit Identifier
-					'12' => {
-						'1' => q(ປກ{0}),
-					},
-					# Long Unit Identifier
-					'10p-15' => {
-						'1' => q(ຟຕ{0}),
-					},
-					# Core Unit Identifier
-					'15' => {
-						'1' => q(ຟຕ{0}),
-					},
-					# Long Unit Identifier
-					'10p-18' => {
-						'1' => q(ອຕ{0}),
-					},
-					# Core Unit Identifier
-					'18' => {
-						'1' => q(ອຕ{0}),
-					},
-					# Long Unit Identifier
-					'10p-2' => {
-						'1' => q(ຊມ{0}),
-					},
-					# Core Unit Identifier
-					'2' => {
-						'1' => q(ຊມ{0}),
-					},
-					# Long Unit Identifier
-					'10p-21' => {
-						'1' => q(ຊຕ{0}),
-					},
-					# Core Unit Identifier
-					'21' => {
-						'1' => q(ຊຕ{0}),
-					},
-					# Long Unit Identifier
-					'10p-24' => {
-						'1' => q(ຢຕ{0}),
-					},
-					# Core Unit Identifier
-					'24' => {
-						'1' => q(ຢຕ{0}),
-					},
-					# Long Unit Identifier
-					'10p-3' => {
-						'1' => q(ມມ{0}),
-					},
-					# Core Unit Identifier
-					'3' => {
-						'1' => q(ມມ{0}),
-					},
-					# Long Unit Identifier
-					'10p-6' => {
-						'1' => q(ມຄ{0}),
-					},
-					# Core Unit Identifier
-					'6' => {
-						'1' => q(ມຄ{0}),
-					},
-					# Long Unit Identifier
-					'10p-9' => {
-						'1' => q(ນນ{0}),
-					},
-					# Core Unit Identifier
-					'9' => {
-						'1' => q(ນນ{0}),
-					},
-					# Long Unit Identifier
-					'10p1' => {
-						'1' => q(ດກ{0}),
-					},
-					# Core Unit Identifier
-					'10p1' => {
-						'1' => q(ດກ{0}),
-					},
-					# Long Unit Identifier
-					'10p12' => {
-						'1' => q(ທຣ{0}),
-					},
-					# Core Unit Identifier
-					'10p12' => {
-						'1' => q(ທຣ{0}),
-					},
-					# Long Unit Identifier
-					'10p15' => {
-						'1' => q(ເພຕາ{0}),
-					},
-					# Core Unit Identifier
-					'10p15' => {
-						'1' => q(ເພຕາ{0}),
-					},
-					# Long Unit Identifier
-					'10p18' => {
-						'1' => q(ອຊ{0}),
-					},
-					# Core Unit Identifier
-					'10p18' => {
-						'1' => q(ອຊ{0}),
-					},
-					# Long Unit Identifier
-					'10p2' => {
-						'1' => q(ຮຕ{0}),
-					},
-					# Core Unit Identifier
-					'10p2' => {
-						'1' => q(ຮຕ{0}),
-					},
-					# Long Unit Identifier
-					'10p21' => {
-						'1' => q(ຊ{0}),
-					},
-					# Core Unit Identifier
-					'10p21' => {
-						'1' => q(ຊ{0}),
-					},
-					# Long Unit Identifier
-					'10p24' => {
-						'1' => q(ຢ{0}),
-					},
-					# Core Unit Identifier
-					'10p24' => {
-						'1' => q(ຢ{0}),
-					},
-					# Long Unit Identifier
-					'10p3' => {
-						'1' => q(ກມ{0}),
-					},
-					# Core Unit Identifier
-					'10p3' => {
-						'1' => q(ກມ{0}),
-					},
-					# Long Unit Identifier
-					'10p6' => {
-						'1' => q(ມກ{0}),
-					},
-					# Core Unit Identifier
-					'10p6' => {
-						'1' => q(ມກ{0}),
-					},
-					# Long Unit Identifier
-					'10p9' => {
-						'1' => q(ກກ{0}),
-					},
-					# Core Unit Identifier
-					'10p9' => {
-						'1' => q(ກກ{0}),
-					},
 					# Long Unit Identifier
 					'angle-arc-minute' => {
 						'other' => q({0}′),
@@ -3808,59 +2947,35 @@ has 'units' => (
 						'other' => q({0} ft²),
 					},
 					# Long Unit Identifier
-					'area-square-kilometer' => {
-						'name' => q(ກມ²),
-						'other' => q({0} ກມ²),
-					},
-					# Core Unit Identifier
-					'square-kilometer' => {
-						'name' => q(ກມ²),
-						'other' => q({0} ກມ²),
-					},
-					# Long Unit Identifier
-					'area-square-meter' => {
-						'name' => q(ແມັດ²),
-					},
-					# Core Unit Identifier
-					'square-meter' => {
-						'name' => q(ແມັດ²),
-					},
-					# Long Unit Identifier
 					'area-square-mile' => {
-						'other' => q({0} mi²),
+						'name' => q(mi²),
 					},
 					# Core Unit Identifier
 					'square-mile' => {
-						'other' => q({0} mi²),
+						'name' => q(mi²),
 					},
 					# Long Unit Identifier
-					'concentr-item' => {
-						'name' => q(ອັນ),
-						'other' => q({0} ອັນ),
+					'area-square-yard' => {
+						'name' => q(yd²),
 					},
 					# Core Unit Identifier
-					'item' => {
-						'name' => q(ອັນ),
-						'other' => q({0} ອັນ),
+					'square-yard' => {
+						'name' => q(yd²),
 					},
 					# Long Unit Identifier
 					'concentr-percent' => {
 						'name' => q(%),
-						'other' => q({0}%),
 					},
 					# Core Unit Identifier
 					'percent' => {
 						'name' => q(%),
-						'other' => q({0}%),
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
-						'name' => q(ລ/ 100 ກມ),
 						'other' => q({0} ລ / 100 ກມ),
 					},
 					# Core Unit Identifier
 					'liter-per-100-kilometer' => {
-						'name' => q(ລ/ 100 ກມ),
 						'other' => q({0} ລ / 100 ກມ),
 					},
 					# Long Unit Identifier
@@ -3874,38 +2989,12 @@ has 'units' => (
 						'other' => q({0} m/gUK),
 					},
 					# Long Unit Identifier
-					'coordinate' => {
-						'east' => q({0}E),
-						'north' => q({0}N),
-						'south' => q({0}S),
-						'west' => q({0}W),
-					},
-					# Core Unit Identifier
-					'coordinate' => {
-						'east' => q({0}E),
-						'north' => q({0}N),
-						'south' => q({0}S),
-						'west' => q({0}W),
-					},
-					# Long Unit Identifier
 					'duration-day' => {
-						'name' => q(ມື້),
 						'other' => q({0} ມ.),
 					},
 					# Core Unit Identifier
 					'day' => {
-						'name' => q(ມື້),
 						'other' => q({0} ມ.),
-					},
-					# Long Unit Identifier
-					'duration-hour' => {
-						'name' => q(ຊົ່ວໂມງ),
-						'other' => q({0} ຊມ),
-					},
-					# Core Unit Identifier
-					'hour' => {
-						'name' => q(ຊົ່ວໂມງ),
-						'other' => q({0} ຊມ),
 					},
 					# Long Unit Identifier
 					'duration-millisecond' => {
@@ -3918,54 +3007,36 @@ has 'units' => (
 						'other' => q({0} ມລ. ວິ.),
 					},
 					# Long Unit Identifier
-					'duration-minute' => {
-						'name' => q(ນທ.),
-						'other' => q({0} ນທ),
-					},
-					# Core Unit Identifier
-					'minute' => {
-						'name' => q(ນທ.),
-						'other' => q({0} ນທ),
-					},
-					# Long Unit Identifier
-					'duration-month' => {
-						'name' => q(ເດືອນ),
-						'other' => q({0} ດ.),
-					},
-					# Core Unit Identifier
-					'month' => {
-						'name' => q(ເດືອນ),
-						'other' => q({0} ດ.),
-					},
-					# Long Unit Identifier
-					'duration-second' => {
-						'name' => q(ວິ.),
-						'other' => q({0} ວິ),
-					},
-					# Core Unit Identifier
-					'second' => {
-						'name' => q(ວິ.),
-						'other' => q({0} ວິ),
-					},
-					# Long Unit Identifier
 					'duration-week' => {
 						'name' => q(ອທ.),
-						'other' => q({0} ອທ.),
 					},
 					# Core Unit Identifier
 					'week' => {
 						'name' => q(ອທ.),
-						'other' => q({0} ອທ.),
 					},
 					# Long Unit Identifier
 					'duration-year' => {
-						'name' => q(ປີ),
 						'other' => q({0} ປ),
 					},
 					# Core Unit Identifier
 					'year' => {
-						'name' => q(ປີ),
 						'other' => q({0} ປ),
+					},
+					# Long Unit Identifier
+					'energy-foodcalorie' => {
+						'other' => q({0}ຄລ),
+					},
+					# Core Unit Identifier
+					'foodcalorie' => {
+						'other' => q({0}ຄລ),
+					},
+					# Long Unit Identifier
+					'energy-joule' => {
+						'name' => q(ຈູນ),
+					},
+					# Core Unit Identifier
+					'joule' => {
+						'name' => q(ຈູນ),
 					},
 					# Long Unit Identifier
 					'force-kilowatt-hour-per-100-kilometer' => {
@@ -3976,142 +3047,44 @@ has 'units' => (
 						'other' => q({0}kWh/100km),
 					},
 					# Long Unit Identifier
-					'length-centimeter' => {
-						'name' => q(ຊມ),
-						'other' => q({0} ຊມ),
+					'graphics-dot-per-centimeter' => {
+						'other' => q({0}dpcm),
 					},
 					# Core Unit Identifier
-					'centimeter' => {
-						'name' => q(ຊມ),
-						'other' => q({0} ຊມ),
+					'dot-per-centimeter' => {
+						'other' => q({0}dpcm),
 					},
 					# Long Unit Identifier
-					'length-foot' => {
-						'name' => q(ຟຸດ),
-						'other' => q({0} ຟ),
+					'graphics-dot-per-inch' => {
+						'other' => q({0}dpi),
 					},
 					# Core Unit Identifier
-					'foot' => {
-						'name' => q(ຟຸດ),
-						'other' => q({0} ຟ),
+					'dot-per-inch' => {
+						'other' => q({0}dpi),
 					},
 					# Long Unit Identifier
-					'length-inch' => {
-						'name' => q(ນິ້ວ),
+					'mass-carat' => {
+						'name' => q(ກະຣັດ),
 					},
 					# Core Unit Identifier
-					'inch' => {
-						'name' => q(ນິ້ວ),
-					},
-					# Long Unit Identifier
-					'length-kilometer' => {
-						'name' => q(ກມ),
-						'other' => q({0} ກມ),
-					},
-					# Core Unit Identifier
-					'kilometer' => {
-						'name' => q(ກມ),
-						'other' => q({0} ກມ),
-					},
-					# Long Unit Identifier
-					'length-light-year' => {
-						'name' => q(ປີແສງ),
-						'other' => q({0} ປສ),
-					},
-					# Core Unit Identifier
-					'light-year' => {
-						'name' => q(ປີແສງ),
-						'other' => q({0} ປສ),
-					},
-					# Long Unit Identifier
-					'length-meter' => {
-						'name' => q(ແມັດ),
-						'other' => q({0} ມ),
-					},
-					# Core Unit Identifier
-					'meter' => {
-						'name' => q(ແມັດ),
-						'other' => q({0} ມ),
-					},
-					# Long Unit Identifier
-					'length-mile' => {
-						'other' => q({0} ໄມ),
-					},
-					# Core Unit Identifier
-					'mile' => {
-						'other' => q({0} ໄມ),
-					},
-					# Long Unit Identifier
-					'length-millimeter' => {
-						'name' => q(ມມ),
-						'other' => q({0} ມມ),
-					},
-					# Core Unit Identifier
-					'millimeter' => {
-						'name' => q(ມມ),
-						'other' => q({0} ມມ),
-					},
-					# Long Unit Identifier
-					'length-yard' => {
-						'name' => q(ຫລາ),
-						'other' => q({0} ຫລາ),
-					},
-					# Core Unit Identifier
-					'yard' => {
-						'name' => q(ຫລາ),
-						'other' => q({0} ຫລາ),
-					},
-					# Long Unit Identifier
-					'mass-gram' => {
-						'name' => q(ກຣາມ),
-						'other' => q({0} ກຼ),
-					},
-					# Core Unit Identifier
-					'gram' => {
-						'name' => q(ກຣາມ),
-						'other' => q({0} ກຼ),
+					'carat' => {
+						'name' => q(ກະຣັດ),
 					},
 					# Long Unit Identifier
 					'mass-kilogram' => {
-						'name' => q(ກິໂລກຣາມ),
 						'other' => q({0} ກລ),
 					},
 					# Core Unit Identifier
 					'kilogram' => {
-						'name' => q(ກິໂລກຣາມ),
 						'other' => q({0} ກລ),
 					},
 					# Long Unit Identifier
-					'mass-ounce' => {
-						'other' => q({0} ອ),
+					'mass-stone' => {
+						'name' => q(ສະໂຕນ),
 					},
 					# Core Unit Identifier
-					'ounce' => {
-						'other' => q({0} ອ),
-					},
-					# Long Unit Identifier
-					'mass-pound' => {
-						'other' => q({0} ປ),
-					},
-					# Core Unit Identifier
-					'pound' => {
-						'other' => q({0} ປ),
-					},
-					# Long Unit Identifier
-					'per' => {
-						'1' => q({0}/{1}),
-					},
-					# Core Unit Identifier
-					'per' => {
-						'1' => q({0}/{1}),
-					},
-					# Long Unit Identifier
-					'power-horsepower' => {
-						'other' => q({0} hp),
-					},
-					# Core Unit Identifier
-					'horsepower' => {
-						'other' => q({0} hp),
+					'stone' => {
+						'name' => q(ສະໂຕນ),
 					},
 					# Long Unit Identifier
 					'power-kilowatt' => {
@@ -4122,58 +3095,12 @@ has 'units' => (
 						'other' => q({0} kW),
 					},
 					# Long Unit Identifier
-					'power2' => {
-						'other' => q({0}²),
-					},
-					# Core Unit Identifier
-					'power2' => {
-						'other' => q({0}²),
-					},
-					# Long Unit Identifier
-					'pressure-hectopascal' => {
-						'name' => q(hPA),
-						'other' => q({0} hPA),
-					},
-					# Core Unit Identifier
-					'hectopascal' => {
-						'name' => q(hPA),
-						'other' => q({0} hPA),
-					},
-					# Long Unit Identifier
-					'pressure-inch-ofhg' => {
-						'name' => q(in Hg),
-						'other' => q({0} in Hg),
-					},
-					# Core Unit Identifier
-					'inch-ofhg' => {
-						'name' => q(in Hg),
-						'other' => q({0} in Hg),
-					},
-					# Long Unit Identifier
-					'pressure-millibar' => {
-						'name' => q(mbar),
-						'other' => q({0} mbar),
-					},
-					# Core Unit Identifier
-					'millibar' => {
-						'name' => q(mbar),
-						'other' => q({0} mbar),
-					},
-					# Long Unit Identifier
-					'speed-kilometer-per-hour' => {
-						'name' => q(ກມ/ຊມ),
-					},
-					# Core Unit Identifier
-					'kilometer-per-hour' => {
-						'name' => q(ກມ/ຊມ),
-					},
-					# Long Unit Identifier
 					'speed-meter-per-second' => {
-						'other' => q({0} m/s),
+						'name' => q(ມ/ວ),
 					},
 					# Core Unit Identifier
 					'meter-per-second' => {
-						'other' => q({0} m/s),
+						'name' => q(ມ/ວ),
 					},
 					# Long Unit Identifier
 					'temperature-celsius' => {
@@ -4196,20 +3123,22 @@ has 'units' => (
 						'other' => q({0}°F),
 					},
 					# Long Unit Identifier
-					'volume-cubic-mile' => {
-						'other' => q({0} mi³),
-					},
-					# Core Unit Identifier
-					'cubic-mile' => {
-						'other' => q({0} mi³),
-					},
-					# Long Unit Identifier
 					'volume-dessert-spoon-imperial' => {
+						'name' => q(dsp Imp),
 						'other' => q({0}dsp-Imp),
 					},
 					# Core Unit Identifier
 					'dessert-spoon-imperial' => {
+						'name' => q(dsp Imp),
 						'other' => q({0}dsp-Imp),
+					},
+					# Long Unit Identifier
+					'volume-dram' => {
+						'name' => q(fl.dr.),
+					},
+					# Core Unit Identifier
+					'dram' => {
+						'name' => q(fl.dr.),
 					},
 					# Long Unit Identifier
 					'volume-fluid-ounce-imperial' => {
@@ -4229,12 +3158,10 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'volume-liter' => {
-						'name' => q(ລິດ),
 						'other' => q({0}L),
 					},
 					# Core Unit Identifier
 					'liter' => {
-						'name' => q(ລິດ),
 						'other' => q({0}L),
 					},
 				},
@@ -4304,12 +3231,28 @@ has 'units' => (
 						'1' => q(ຢຕ{0}),
 					},
 					# Long Unit Identifier
+					'10p-27' => {
+						'1' => q(ຣຕ{0}),
+					},
+					# Core Unit Identifier
+					'27' => {
+						'1' => q(ຣຕ{0}),
+					},
+					# Long Unit Identifier
 					'10p-3' => {
 						'1' => q(ມມ{0}),
 					},
 					# Core Unit Identifier
 					'3' => {
 						'1' => q(ມມ{0}),
+					},
+					# Long Unit Identifier
+					'10p-30' => {
+						'1' => q(ກທ{0}),
+					},
+					# Core Unit Identifier
+					'30' => {
+						'1' => q(ກທ{0}),
 					},
 					# Long Unit Identifier
 					'10p-6' => {
@@ -4384,12 +3327,28 @@ has 'units' => (
 						'1' => q(ຢ{0}),
 					},
 					# Long Unit Identifier
+					'10p27' => {
+						'1' => q(ຣນ{0}),
+					},
+					# Core Unit Identifier
+					'10p27' => {
+						'1' => q(ຣນ{0}),
+					},
+					# Long Unit Identifier
 					'10p3' => {
 						'1' => q(ກມ{0}),
 					},
 					# Core Unit Identifier
 					'10p3' => {
 						'1' => q(ກມ{0}),
+					},
+					# Long Unit Identifier
+					'10p30' => {
+						'1' => q(ກຕ{0}),
+					},
+					# Core Unit Identifier
+					'10p30' => {
+						'1' => q(ກຕ{0}),
 					},
 					# Long Unit Identifier
 					'10p6' => {
@@ -4410,12 +3369,10 @@ has 'units' => (
 					# Long Unit Identifier
 					'acceleration-g-force' => {
 						'name' => q(ແຮງຕົກຕາມລຳພັງ),
-						'other' => q({0} G),
 					},
 					# Core Unit Identifier
 					'g-force' => {
 						'name' => q(ແຮງຕົກຕາມລຳພັງ),
-						'other' => q({0} G),
 					},
 					# Long Unit Identifier
 					'acceleration-meter-per-square-second' => {
@@ -4460,22 +3417,10 @@ has 'units' => (
 					# Long Unit Identifier
 					'angle-radian' => {
 						'name' => q(radians),
-						'other' => q({0} rad),
 					},
 					# Core Unit Identifier
 					'radian' => {
 						'name' => q(radians),
-						'other' => q({0} rad),
-					},
-					# Long Unit Identifier
-					'angle-revolution' => {
-						'name' => q(rev),
-						'other' => q({0} rev),
-					},
-					# Core Unit Identifier
-					'revolution' => {
-						'name' => q(rev),
-						'other' => q({0} rev),
 					},
 					# Long Unit Identifier
 					'area-acre' => {
@@ -4532,26 +3477,20 @@ has 'units' => (
 					# Long Unit Identifier
 					'area-square-inch' => {
 						'name' => q(ນິ້ວ²),
-						'other' => q({0} in²),
-						'per' => q({0}/in²),
 					},
 					# Core Unit Identifier
 					'square-inch' => {
 						'name' => q(ນິ້ວ²),
-						'other' => q({0} in²),
-						'per' => q({0}/in²),
 					},
 					# Long Unit Identifier
 					'area-square-kilometer' => {
 						'name' => q(ກມ²),
 						'other' => q({0} ກມ²),
-						'per' => q({0}/km²),
 					},
 					# Core Unit Identifier
 					'square-kilometer' => {
 						'name' => q(ກມ²),
 						'other' => q({0} ກມ²),
-						'per' => q({0}/km²),
 					},
 					# Long Unit Identifier
 					'area-square-meter' => {
@@ -4568,24 +3507,18 @@ has 'units' => (
 					# Long Unit Identifier
 					'area-square-mile' => {
 						'name' => q(sq miles),
-						'other' => q({0} mi²),
-						'per' => q({0}/mi²),
 					},
 					# Core Unit Identifier
 					'square-mile' => {
 						'name' => q(sq miles),
-						'other' => q({0} mi²),
-						'per' => q({0}/mi²),
 					},
 					# Long Unit Identifier
 					'area-square-yard' => {
 						'name' => q(yards²),
-						'other' => q({0} yd²),
 					},
 					# Core Unit Identifier
 					'square-yard' => {
 						'name' => q(yards²),
-						'other' => q({0} yd²),
 					},
 					# Long Unit Identifier
 					'concentr-item' => {
@@ -4600,72 +3533,50 @@ has 'units' => (
 					# Long Unit Identifier
 					'concentr-karat' => {
 						'name' => q(ກະຣັດ),
-						'other' => q({0} kt),
 					},
 					# Core Unit Identifier
 					'karat' => {
 						'name' => q(ກະຣັດ),
-						'other' => q({0} kt),
-					},
-					# Long Unit Identifier
-					'concentr-milligram-ofglucose-per-deciliter' => {
-						'name' => q(mg/dL),
-						'other' => q({0} mg/dL),
-					},
-					# Core Unit Identifier
-					'milligram-ofglucose-per-deciliter' => {
-						'name' => q(mg/dL),
-						'other' => q({0} mg/dL),
 					},
 					# Long Unit Identifier
 					'concentr-millimole-per-liter' => {
 						'name' => q(ມິລິໂມນ/ລິດ),
-						'other' => q({0} mmol/L),
 					},
 					# Core Unit Identifier
 					'millimole-per-liter' => {
 						'name' => q(ມິລິໂມນ/ລິດ),
-						'other' => q({0} mmol/L),
 					},
 					# Long Unit Identifier
 					'concentr-percent' => {
 						'name' => q(ເປີເຊັນ),
-						'other' => q({0}%),
 					},
 					# Core Unit Identifier
 					'percent' => {
 						'name' => q(ເປີເຊັນ),
-						'other' => q({0}%),
 					},
 					# Long Unit Identifier
 					'concentr-permille' => {
 						'name' => q(ຕໍ່ພັນ),
-						'other' => q({0}‰),
 					},
 					# Core Unit Identifier
 					'permille' => {
 						'name' => q(ຕໍ່ພັນ),
-						'other' => q({0}‰),
 					},
 					# Long Unit Identifier
 					'concentr-permillion' => {
 						'name' => q(ພາດ/ລ້ານ),
-						'other' => q({0} ppm),
 					},
 					# Core Unit Identifier
 					'permillion' => {
 						'name' => q(ພາດ/ລ້ານ),
-						'other' => q({0} ppm),
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
 						'name' => q(ລ/ 100 ກມ),
-						'other' => q({0} L/100km),
 					},
 					# Core Unit Identifier
 					'liter-per-100-kilometer' => {
 						'name' => q(ລ/ 100 ກມ),
-						'other' => q({0} L/100km),
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-kilometer' => {
@@ -4690,146 +3601,18 @@ has 'units' => (
 					# Long Unit Identifier
 					'consumption-mile-per-gallon-imperial' => {
 						'name' => q(ໄມລ໌/ແກລລອນອັງກິດ),
-						'other' => q({0} mpg Imp.),
 					},
 					# Core Unit Identifier
 					'mile-per-gallon-imperial' => {
 						'name' => q(ໄມລ໌/ແກລລອນອັງກິດ),
-						'other' => q({0} mpg Imp.),
-					},
-					# Long Unit Identifier
-					'coordinate' => {
-						'east' => q({0}E),
-						'north' => q({0}N),
-						'south' => q({0}S),
-						'west' => q({0}W),
-					},
-					# Core Unit Identifier
-					'coordinate' => {
-						'east' => q({0}E),
-						'north' => q({0}N),
-						'south' => q({0}S),
-						'west' => q({0}W),
-					},
-					# Long Unit Identifier
-					'digital-bit' => {
-						'name' => q(bit),
-						'other' => q({0} bit),
-					},
-					# Core Unit Identifier
-					'bit' => {
-						'name' => q(bit),
-						'other' => q({0} bit),
-					},
-					# Long Unit Identifier
-					'digital-byte' => {
-						'name' => q(byte),
-						'other' => q({0} byte),
-					},
-					# Core Unit Identifier
-					'byte' => {
-						'name' => q(byte),
-						'other' => q({0} byte),
-					},
-					# Long Unit Identifier
-					'digital-gigabit' => {
-						'name' => q(Gb),
-						'other' => q({0} Gb),
-					},
-					# Core Unit Identifier
-					'gigabit' => {
-						'name' => q(Gb),
-						'other' => q({0} Gb),
-					},
-					# Long Unit Identifier
-					'digital-gigabyte' => {
-						'name' => q(GB),
-						'other' => q({0} GB),
-					},
-					# Core Unit Identifier
-					'gigabyte' => {
-						'name' => q(GB),
-						'other' => q({0} GB),
-					},
-					# Long Unit Identifier
-					'digital-kilobit' => {
-						'name' => q(kb),
-						'other' => q({0} kb),
-					},
-					# Core Unit Identifier
-					'kilobit' => {
-						'name' => q(kb),
-						'other' => q({0} kb),
-					},
-					# Long Unit Identifier
-					'digital-kilobyte' => {
-						'name' => q(kB),
-						'other' => q({0} kB),
-					},
-					# Core Unit Identifier
-					'kilobyte' => {
-						'name' => q(kB),
-						'other' => q({0} kB),
-					},
-					# Long Unit Identifier
-					'digital-megabit' => {
-						'name' => q(Mb),
-						'other' => q({0} Mb),
-					},
-					# Core Unit Identifier
-					'megabit' => {
-						'name' => q(Mb),
-						'other' => q({0} Mb),
-					},
-					# Long Unit Identifier
-					'digital-megabyte' => {
-						'name' => q(MB),
-						'other' => q({0} MB),
-					},
-					# Core Unit Identifier
-					'megabyte' => {
-						'name' => q(MB),
-						'other' => q({0} MB),
 					},
 					# Long Unit Identifier
 					'digital-petabyte' => {
 						'name' => q(PByte),
-						'other' => q({0} PB),
 					},
 					# Core Unit Identifier
 					'petabyte' => {
 						'name' => q(PByte),
-						'other' => q({0} PB),
-					},
-					# Long Unit Identifier
-					'digital-terabit' => {
-						'name' => q(Tb),
-						'other' => q({0} Tb),
-					},
-					# Core Unit Identifier
-					'terabit' => {
-						'name' => q(Tb),
-						'other' => q({0} Tb),
-					},
-					# Long Unit Identifier
-					'digital-terabyte' => {
-						'name' => q(TB),
-						'other' => q({0} TB),
-					},
-					# Core Unit Identifier
-					'terabyte' => {
-						'name' => q(TB),
-						'other' => q({0} TB),
-					},
-					# Long Unit Identifier
-					'duration-century' => {
-						'name' => q(c),
-						'other' => q({0} c),
-					},
-					# Core Unit Identifier
-					'century' => {
-						'name' => q(c),
-						'other' => q({0} c),
 					},
 					# Long Unit Identifier
 					'duration-day' => {
@@ -4920,6 +3703,18 @@ has 'units' => (
 						'other' => q({0} ນນ​ວິ),
 					},
 					# Long Unit Identifier
+					'duration-quarter' => {
+						'name' => q(ໄຕມາດ),
+						'other' => q({0} ໄຕມາດ),
+						'per' => q({0}/ໄຕມາດ),
+					},
+					# Core Unit Identifier
+					'quarter' => {
+						'name' => q(ໄຕມາດ),
+						'other' => q({0} ໄຕມາດ),
+						'per' => q({0}/ໄຕມາດ),
+					},
+					# Long Unit Identifier
 					'duration-second' => {
 						'name' => q(ວິ.),
 						'other' => q({0} ວິ),
@@ -4956,36 +3751,6 @@ has 'units' => (
 						'per' => q({0}/ປີ),
 					},
 					# Long Unit Identifier
-					'electric-ampere' => {
-						'name' => q(amp),
-						'other' => q({0} A),
-					},
-					# Core Unit Identifier
-					'ampere' => {
-						'name' => q(amp),
-						'other' => q({0} A),
-					},
-					# Long Unit Identifier
-					'electric-milliampere' => {
-						'name' => q(mA),
-						'other' => q({0} mA),
-					},
-					# Core Unit Identifier
-					'milliampere' => {
-						'name' => q(mA),
-						'other' => q({0} mA),
-					},
-					# Long Unit Identifier
-					'electric-ohm' => {
-						'name' => q(ohm),
-						'other' => q({0} Ω),
-					},
-					# Core Unit Identifier
-					'ohm' => {
-						'name' => q(ohm),
-						'other' => q({0} Ω),
-					},
-					# Long Unit Identifier
 					'electric-volt' => {
 						'name' => q(ໂວລ),
 						'other' => q({0} ໂວລ),
@@ -5016,16 +3781,6 @@ has 'units' => (
 						'other' => q({0} ຄລ),
 					},
 					# Long Unit Identifier
-					'energy-joule' => {
-						'name' => q(joule),
-						'other' => q({0} J),
-					},
-					# Core Unit Identifier
-					'joule' => {
-						'name' => q(joule),
-						'other' => q({0} J),
-					},
-					# Long Unit Identifier
 					'energy-kilocalorie' => {
 						'name' => q(ກິໂລແຄລໍລີ່),
 						'other' => q({0} ກິໂລແຄລໍລີ່),
@@ -5034,66 +3789,6 @@ has 'units' => (
 					'kilocalorie' => {
 						'name' => q(ກິໂລແຄລໍລີ່),
 						'other' => q({0} ກິໂລແຄລໍລີ່),
-					},
-					# Long Unit Identifier
-					'energy-kilojoule' => {
-						'name' => q(kJ),
-						'other' => q({0} kJ),
-					},
-					# Core Unit Identifier
-					'kilojoule' => {
-						'name' => q(kJ),
-						'other' => q({0} kJ),
-					},
-					# Long Unit Identifier
-					'energy-kilowatt-hour' => {
-						'name' => q(kWh),
-						'other' => q({0} kWh),
-					},
-					# Core Unit Identifier
-					'kilowatt-hour' => {
-						'name' => q(kWh),
-						'other' => q({0} kWh),
-					},
-					# Long Unit Identifier
-					'frequency-gigahertz' => {
-						'name' => q(GHz),
-						'other' => q({0} GHz),
-					},
-					# Core Unit Identifier
-					'gigahertz' => {
-						'name' => q(GHz),
-						'other' => q({0} GHz),
-					},
-					# Long Unit Identifier
-					'frequency-hertz' => {
-						'name' => q(Hz),
-						'other' => q({0} Hz),
-					},
-					# Core Unit Identifier
-					'hertz' => {
-						'name' => q(Hz),
-						'other' => q({0} Hz),
-					},
-					# Long Unit Identifier
-					'frequency-kilohertz' => {
-						'name' => q(kHz),
-						'other' => q({0} kHz),
-					},
-					# Core Unit Identifier
-					'kilohertz' => {
-						'name' => q(kHz),
-						'other' => q({0} kHz),
-					},
-					# Long Unit Identifier
-					'frequency-megahertz' => {
-						'name' => q(MHz),
-						'other' => q({0} MHz),
-					},
-					# Core Unit Identifier
-					'megahertz' => {
-						'name' => q(MHz),
-						'other' => q({0} MHz),
 					},
 					# Long Unit Identifier
 					'graphics-dot' => {
@@ -5106,14 +3801,24 @@ has 'units' => (
 						'other' => q({0} ດັອດ),
 					},
 					# Long Unit Identifier
-					'length-astronomical-unit' => {
-						'name' => q(au),
-						'other' => q({0} au),
+					'graphics-dot-per-centimeter' => {
+						'name' => q(dpcm),
+						'other' => q({0} dpcm),
 					},
 					# Core Unit Identifier
-					'astronomical-unit' => {
-						'name' => q(au),
-						'other' => q({0} au),
+					'dot-per-centimeter' => {
+						'name' => q(dpcm),
+						'other' => q({0} dpcm),
+					},
+					# Long Unit Identifier
+					'graphics-dot-per-inch' => {
+						'name' => q(dpi),
+						'other' => q({0} dpi),
+					},
+					# Core Unit Identifier
+					'dot-per-inch' => {
+						'name' => q(dpi),
+						'other' => q({0} dpi),
 					},
 					# Long Unit Identifier
 					'length-centimeter' => {
@@ -5206,16 +3911,6 @@ has 'units' => (
 						'per' => q({0}/ມ),
 					},
 					# Long Unit Identifier
-					'length-micrometer' => {
-						'name' => q(μm),
-						'other' => q({0} μm),
-					},
-					# Core Unit Identifier
-					'micrometer' => {
-						'name' => q(μm),
-						'other' => q({0} μm),
-					},
-					# Long Unit Identifier
 					'length-mile' => {
 						'name' => q(ໄມລ໌),
 						'other' => q({0} ໄມ),
@@ -5224,16 +3919,6 @@ has 'units' => (
 					'mile' => {
 						'name' => q(ໄມລ໌),
 						'other' => q({0} ໄມ),
-					},
-					# Long Unit Identifier
-					'length-mile-scandinavian' => {
-						'name' => q(smi),
-						'other' => q({0} smi),
-					},
-					# Core Unit Identifier
-					'mile-scandinavian' => {
-						'name' => q(smi),
-						'other' => q({0} smi),
 					},
 					# Long Unit Identifier
 					'length-millimeter' => {
@@ -5256,24 +3941,12 @@ has 'units' => (
 						'other' => q({0} ນມ),
 					},
 					# Long Unit Identifier
-					'length-nautical-mile' => {
-						'name' => q(nmi),
-						'other' => q({0} nmi),
-					},
-					# Core Unit Identifier
-					'nautical-mile' => {
-						'name' => q(nmi),
-						'other' => q({0} nmi),
-					},
-					# Long Unit Identifier
 					'length-parsec' => {
 						'name' => q(parsecs),
-						'other' => q({0} pc),
 					},
 					# Core Unit Identifier
 					'parsec' => {
 						'name' => q(parsecs),
-						'other' => q({0} pc),
 					},
 					# Long Unit Identifier
 					'length-picometer' => {
@@ -5288,12 +3961,10 @@ has 'units' => (
 					# Long Unit Identifier
 					'length-point' => {
 						'name' => q(ຈຸດ),
-						'other' => q({0} pt),
 					},
 					# Core Unit Identifier
 					'point' => {
 						'name' => q(ຈຸດ),
-						'other' => q({0} pt),
 					},
 					# Long Unit Identifier
 					'length-yard' => {
@@ -5308,22 +3979,10 @@ has 'units' => (
 					# Long Unit Identifier
 					'light-lux' => {
 						'name' => q(lux),
-						'other' => q({0} lx),
 					},
 					# Core Unit Identifier
 					'lux' => {
 						'name' => q(lux),
-						'other' => q({0} lx),
-					},
-					# Long Unit Identifier
-					'mass-carat' => {
-						'name' => q(CD),
-						'other' => q({0} CD),
-					},
-					# Core Unit Identifier
-					'carat' => {
-						'name' => q(CD),
-						'other' => q({0} CD),
 					},
 					# Long Unit Identifier
 					'mass-grain' => {
@@ -5339,45 +3998,21 @@ has 'units' => (
 					'mass-gram' => {
 						'name' => q(ກຣາມ),
 						'other' => q({0} ກຼ),
-						'per' => q({0}/g),
 					},
 					# Core Unit Identifier
 					'gram' => {
 						'name' => q(ກຣາມ),
 						'other' => q({0} ກຼ),
-						'per' => q({0}/g),
 					},
 					# Long Unit Identifier
 					'mass-kilogram' => {
 						'name' => q(ກິໂລກຣາມ),
 						'other' => q({0} ກິໂລ),
-						'per' => q({0}/kg),
 					},
 					# Core Unit Identifier
 					'kilogram' => {
 						'name' => q(ກິໂລກຣາມ),
 						'other' => q({0} ກິໂລ),
-						'per' => q({0}/kg),
-					},
-					# Long Unit Identifier
-					'mass-metric-ton' => {
-						'name' => q(t),
-						'other' => q({0} t),
-					},
-					# Core Unit Identifier
-					'metric-ton' => {
-						'name' => q(t),
-						'other' => q({0} t),
-					},
-					# Long Unit Identifier
-					'mass-microgram' => {
-						'name' => q(μg),
-						'other' => q({0} μg),
-					},
-					# Core Unit Identifier
-					'microgram' => {
-						'name' => q(μg),
-						'other' => q({0} μg),
 					},
 					# Long Unit Identifier
 					'mass-milligram' => {
@@ -5402,16 +4037,6 @@ has 'units' => (
 						'per' => q({0}/ອ),
 					},
 					# Long Unit Identifier
-					'mass-ounce-troy' => {
-						'name' => q(oz t),
-						'other' => q({0} oz t),
-					},
-					# Core Unit Identifier
-					'ounce-troy' => {
-						'name' => q(oz t),
-						'other' => q({0} oz t),
-					},
-					# Long Unit Identifier
 					'mass-pound' => {
 						'name' => q(ປອນ),
 						'other' => q({0} ປ),
@@ -5434,32 +4059,12 @@ has 'units' => (
 						'other' => q({0} ຕ),
 					},
 					# Long Unit Identifier
-					'per' => {
-						'1' => q({0}/{1}),
-					},
-					# Core Unit Identifier
-					'per' => {
-						'1' => q({0}/{1}),
-					},
-					# Long Unit Identifier
-					'power-gigawatt' => {
-						'name' => q(GW),
-						'other' => q({0} GW),
-					},
-					# Core Unit Identifier
-					'gigawatt' => {
-						'name' => q(GW),
-						'other' => q({0} GW),
-					},
-					# Long Unit Identifier
 					'power-horsepower' => {
 						'name' => q(ແຮງມ້າ),
-						'other' => q({0} hp),
 					},
 					# Core Unit Identifier
 					'horsepower' => {
 						'name' => q(ແຮງມ້າ),
-						'other' => q({0} hp),
 					},
 					# Long Unit Identifier
 					'power-kilowatt' => {
@@ -5472,26 +4077,6 @@ has 'units' => (
 						'other' => q({0} ກລ. ວັດ),
 					},
 					# Long Unit Identifier
-					'power-megawatt' => {
-						'name' => q(MW),
-						'other' => q({0} MW),
-					},
-					# Core Unit Identifier
-					'megawatt' => {
-						'name' => q(MW),
-						'other' => q({0} MW),
-					},
-					# Long Unit Identifier
-					'power-milliwatt' => {
-						'name' => q(mW),
-						'other' => q({0} mW),
-					},
-					# Core Unit Identifier
-					'milliwatt' => {
-						'name' => q(mW),
-						'other' => q({0} mW),
-					},
-					# Long Unit Identifier
 					'power-watt' => {
 						'name' => q(ວັດ),
 						'other' => q({0} ວັດ),
@@ -5500,16 +4085,6 @@ has 'units' => (
 					'watt' => {
 						'name' => q(ວັດ),
 						'other' => q({0} ວັດ),
-					},
-					# Long Unit Identifier
-					'pressure-atmosphere' => {
-						'name' => q(atm),
-						'other' => q({0} atm),
-					},
-					# Core Unit Identifier
-					'atmosphere' => {
-						'name' => q(atm),
-						'other' => q({0} atm),
 					},
 					# Long Unit Identifier
 					'pressure-hectopascal' => {
@@ -5532,34 +4107,12 @@ has 'units' => (
 						'other' => q({0} in Hg),
 					},
 					# Long Unit Identifier
-					'pressure-millibar' => {
-						'name' => q(mbar),
-						'other' => q({0} mbar),
+					'speed-beaufort' => {
+						'other' => q({0} B),
 					},
 					# Core Unit Identifier
-					'millibar' => {
-						'name' => q(mbar),
-						'other' => q({0} mbar),
-					},
-					# Long Unit Identifier
-					'pressure-millimeter-ofhg' => {
-						'name' => q(mm Hg),
-						'other' => q({0} mm Hg),
-					},
-					# Core Unit Identifier
-					'millimeter-ofhg' => {
-						'name' => q(mm Hg),
-						'other' => q({0} mm Hg),
-					},
-					# Long Unit Identifier
-					'pressure-pound-force-per-square-inch' => {
-						'name' => q(psi),
-						'other' => q({0} psi),
-					},
-					# Core Unit Identifier
-					'pound-force-per-square-inch' => {
-						'name' => q(psi),
-						'other' => q({0} psi),
+					'beaufort' => {
+						'other' => q({0} B),
 					},
 					# Long Unit Identifier
 					'speed-kilometer-per-hour' => {
@@ -5572,24 +4125,14 @@ has 'units' => (
 						'other' => q({0} ກມ/ຊມ),
 					},
 					# Long Unit Identifier
-					'speed-knot' => {
-						'name' => q(kn),
-						'other' => q({0} kn),
-					},
-					# Core Unit Identifier
-					'knot' => {
-						'name' => q(kn),
-						'other' => q({0} kn),
-					},
-					# Long Unit Identifier
 					'speed-meter-per-second' => {
-						'name' => q(ແມັດ/ນທ.),
-						'other' => q({0} ມ/ນທ.),
+						'name' => q(ແມັດ/ວິ),
+						'other' => q({0} ມ/ວ),
 					},
 					# Core Unit Identifier
 					'meter-per-second' => {
-						'name' => q(ແມັດ/ນທ.),
-						'other' => q({0} ມ/ນທ.),
+						'name' => q(ແມັດ/ວິ),
+						'other' => q({0} ມ/ວ),
 					},
 					# Long Unit Identifier
 					'speed-mile-per-hour' => {
@@ -5622,16 +4165,6 @@ has 'units' => (
 						'other' => q({0} ອົງສາ ຟ.),
 					},
 					# Long Unit Identifier
-					'temperature-generic' => {
-						'name' => q(°),
-						'other' => q({0}°),
-					},
-					# Core Unit Identifier
-					'generic' => {
-						'name' => q(°),
-						'other' => q({0}°),
-					},
-					# Long Unit Identifier
 					'temperature-kelvin' => {
 						'name' => q(ອົງສາ ເຄ.),
 						'other' => q({0}°K),
@@ -5640,58 +4173,6 @@ has 'units' => (
 					'kelvin' => {
 						'name' => q(ອົງສາ ເຄ.),
 						'other' => q({0}°K),
-					},
-					# Long Unit Identifier
-					'volume-acre-foot' => {
-						'name' => q(ac ft),
-						'other' => q({0} ac ft),
-					},
-					# Core Unit Identifier
-					'acre-foot' => {
-						'name' => q(ac ft),
-						'other' => q({0} ac ft),
-					},
-					# Long Unit Identifier
-					'volume-centiliter' => {
-						'name' => q(cL),
-						'other' => q({0} cL),
-					},
-					# Core Unit Identifier
-					'centiliter' => {
-						'name' => q(cL),
-						'other' => q({0} cL),
-					},
-					# Long Unit Identifier
-					'volume-cubic-centimeter' => {
-						'name' => q(cm³),
-						'other' => q({0} cm³),
-						'per' => q({0}/cm³),
-					},
-					# Core Unit Identifier
-					'cubic-centimeter' => {
-						'name' => q(cm³),
-						'other' => q({0} cm³),
-						'per' => q({0}/cm³),
-					},
-					# Long Unit Identifier
-					'volume-cubic-foot' => {
-						'name' => q(ft³),
-						'other' => q({0} ft³),
-					},
-					# Core Unit Identifier
-					'cubic-foot' => {
-						'name' => q(ft³),
-						'other' => q({0} ft³),
-					},
-					# Long Unit Identifier
-					'volume-cubic-inch' => {
-						'name' => q(in³),
-						'other' => q({0} in³),
-					},
-					# Core Unit Identifier
-					'cubic-inch' => {
-						'name' => q(in³),
-						'other' => q({0} in³),
 					},
 					# Long Unit Identifier
 					'volume-cubic-kilometer' => {
@@ -5714,56 +4195,6 @@ has 'units' => (
 						'name' => q(ມ³),
 						'other' => q({0} ມ³),
 						'per' => q({0}/ມ³),
-					},
-					# Long Unit Identifier
-					'volume-cubic-mile' => {
-						'name' => q(mi³),
-						'other' => q({0} mi³),
-					},
-					# Core Unit Identifier
-					'cubic-mile' => {
-						'name' => q(mi³),
-						'other' => q({0} mi³),
-					},
-					# Long Unit Identifier
-					'volume-cubic-yard' => {
-						'name' => q(yd³),
-						'other' => q({0} yd³),
-					},
-					# Core Unit Identifier
-					'cubic-yard' => {
-						'name' => q(yd³),
-						'other' => q({0} yd³),
-					},
-					# Long Unit Identifier
-					'volume-cup' => {
-						'name' => q(cup),
-						'other' => q({0} c),
-					},
-					# Core Unit Identifier
-					'cup' => {
-						'name' => q(cup),
-						'other' => q({0} c),
-					},
-					# Long Unit Identifier
-					'volume-cup-metric' => {
-						'name' => q(mcup),
-						'other' => q({0} mc),
-					},
-					# Core Unit Identifier
-					'cup-metric' => {
-						'name' => q(mcup),
-						'other' => q({0} mc),
-					},
-					# Long Unit Identifier
-					'volume-deciliter' => {
-						'name' => q(dL),
-						'other' => q({0} dL),
-					},
-					# Core Unit Identifier
-					'deciliter' => {
-						'name' => q(dL),
-						'other' => q({0} dL),
 					},
 					# Long Unit Identifier
 					'volume-dram' => {
@@ -5808,58 +4239,14 @@ has 'units' => (
 						'per' => q({0}/ແກລລອນ),
 					},
 					# Long Unit Identifier
-					'volume-gallon-imperial' => {
-						'name' => q(Imp. gal),
-						'other' => q({0} gal Imp.),
-						'per' => q({0}/gal Imp.),
-					},
-					# Core Unit Identifier
-					'gallon-imperial' => {
-						'name' => q(Imp. gal),
-						'other' => q({0} gal Imp.),
-						'per' => q({0}/gal Imp.),
-					},
-					# Long Unit Identifier
-					'volume-hectoliter' => {
-						'name' => q(hL),
-						'other' => q({0} hL),
-					},
-					# Core Unit Identifier
-					'hectoliter' => {
-						'name' => q(hL),
-						'other' => q({0} hL),
-					},
-					# Long Unit Identifier
 					'volume-liter' => {
 						'name' => q(ລິດ),
 						'other' => q({0} L),
-						'per' => q({0}/l),
 					},
 					# Core Unit Identifier
 					'liter' => {
 						'name' => q(ລິດ),
 						'other' => q({0} L),
-						'per' => q({0}/l),
-					},
-					# Long Unit Identifier
-					'volume-megaliter' => {
-						'name' => q(ML),
-						'other' => q({0} ML),
-					},
-					# Core Unit Identifier
-					'megaliter' => {
-						'name' => q(ML),
-						'other' => q({0} ML),
-					},
-					# Long Unit Identifier
-					'volume-milliliter' => {
-						'name' => q(mL),
-						'other' => q({0} mL),
-					},
-					# Core Unit Identifier
-					'milliliter' => {
-						'name' => q(mL),
-						'other' => q({0} mL),
 					},
 					# Long Unit Identifier
 					'volume-pinch' => {
@@ -5871,72 +4258,8 @@ has 'units' => (
 						'name' => q(ຢິບ),
 						'other' => q({0} ຢິບ),
 					},
-					# Long Unit Identifier
-					'volume-pint' => {
-						'name' => q(pt),
-						'other' => q({0} pt),
-					},
-					# Core Unit Identifier
-					'pint' => {
-						'name' => q(pt),
-						'other' => q({0} pt),
-					},
-					# Long Unit Identifier
-					'volume-pint-metric' => {
-						'name' => q(mpt),
-						'other' => q({0} mpt),
-					},
-					# Core Unit Identifier
-					'pint-metric' => {
-						'name' => q(mpt),
-						'other' => q({0} mpt),
-					},
-					# Long Unit Identifier
-					'volume-quart' => {
-						'name' => q(qt),
-						'other' => q({0} qt),
-					},
-					# Core Unit Identifier
-					'quart' => {
-						'name' => q(qt),
-						'other' => q({0} qt),
-					},
-					# Long Unit Identifier
-					'volume-tablespoon' => {
-						'name' => q(tbsp),
-						'other' => q({0} tbsp),
-					},
-					# Core Unit Identifier
-					'tablespoon' => {
-						'name' => q(tbsp),
-						'other' => q({0} tbsp),
-					},
-					# Long Unit Identifier
-					'volume-teaspoon' => {
-						'name' => q(tsp),
-						'other' => q({0} tsp),
-					},
-					# Core Unit Identifier
-					'teaspoon' => {
-						'name' => q(tsp),
-						'other' => q({0} tsp),
-					},
 				},
 			} }
-);
-
-has 'yesstr' => (
-	is			=> 'ro',
-	isa			=> RegexpRef,
-	init_arg	=> undef,
-	default		=> sub { qr'^(?i:yes|y)$' }
-);
-
-has 'nostr' => (
-	is			=> 'ro',
-	isa			=> RegexpRef,
-	init_arg	=> undef,
-	default		=> sub { qr'^(?i:no|n)$' }
 );
 
 has 'listPatterns' => (
@@ -5944,18 +4267,8 @@ has 'listPatterns' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-				start => q({0}, {1}),
-				middle => q({0}, {1}),
-				end => q({0}, {1}),
-				2 => q({0}, {1}),
+				2 => q({0} ແລະ {1}),
 		} }
-);
-
-has 'default_numbering_system' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> 'latn',
 );
 
 has native_numbering_system => (
@@ -5972,13 +4285,8 @@ has 'number_symbols' => (
 	default		=> sub { {
 		'latn' => {
 			'decimal' => q(,),
-			'exponential' => q(E),
 			'group' => q(.),
-			'infinity' => q(∞),
-			'list' => q(;),
 			'nan' => q(ບໍ່​ແມ່ນ​ໂຕ​ເລກ),
-			'perMille' => q(‰),
-			'percentSign' => q(%),
 		},
 	} }
 );
@@ -6066,13 +4374,6 @@ has 'number_formats' => (
 				},
 			},
 		},
-		percentFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0%',
-				},
-			},
-		},
 		scientificFormat => {
 			'default' => {
 				'standard' => {
@@ -6091,10 +4392,6 @@ has 'number_currency_formats' => (
 		'latn' => {
 			'pattern' => {
 				'default' => {
-					'accounting' => {
-						'negative' => '¤-#,##0.00',
-						'positive' => '¤#,##0.00',
-					},
 					'standard' => {
 						'negative' => '¤-#,##0.00',
 						'positive' => '¤#,##0.00',
@@ -6116,10 +4413,8 @@ has 'currencies' => (
 			},
 		},
 		'AED' => {
-			symbol => 'AED',
 			display_name => {
 				'currency' => q(ສະ​ຫະ​ລັດ​ອາ​ຣັບ​ອາ​ມິ​ເຣດ ເດີ​ແຮມ),
-				'other' => q(ສະ​ຫະ​ລັດ​ອາ​ຣັບ​ອາ​ມິ​ເຣດ ເດີ​ແຮມ),
 			},
 		},
 		'AFA' => {
@@ -6128,38 +4423,28 @@ has 'currencies' => (
 			},
 		},
 		'AFN' => {
-			symbol => 'AFN',
 			display_name => {
 				'currency' => q(ອັຟ​ກັນ ອັຟ​ກາ​ນິ),
-				'other' => q(ອັຟ​ກັນ ອັຟ​ກາ​ນິ),
 			},
 		},
 		'ALL' => {
-			symbol => 'ALL',
 			display_name => {
 				'currency' => q(ອັລ​ບາ​ນຽນ ເລກ),
-				'other' => q(ອັລ​ບາ​ນຽນ ເລກ),
 			},
 		},
 		'AMD' => {
-			symbol => 'AMD',
 			display_name => {
 				'currency' => q(ອາ​ເມ​ນຽນ ແດຣມ),
-				'other' => q(ອາ​ເມ​ນຽນ ແດຣມ),
 			},
 		},
 		'ANG' => {
-			symbol => 'ANG',
 			display_name => {
 				'currency' => q(ເນ​ເທີ​ແລນ ແອນ​ຕິ​ລຽນ ກິວ​ເດີ),
-				'other' => q(ເນ​ເທີ​ແລນ ແອນ​ຕິ​ລຽນ ກິວ​ເດີ),
 			},
 		},
 		'AOA' => {
-			symbol => 'AOA',
 			display_name => {
 				'currency' => q(ແອງ​ໂກ​ລັນ ຄວນ​ຊາ),
-				'other' => q(ແອງ​ໂກ​ລັນ ຄວນ​ຊາ),
 			},
 		},
 		'AOK' => {
@@ -6198,10 +4483,8 @@ has 'currencies' => (
 			},
 		},
 		'ARS' => {
-			symbol => 'ARS',
 			display_name => {
 				'currency' => q(ອາ​ເຈນ​ທິ​ນາ ເປ​ໂຊ),
-				'other' => q(ອາ​ເຈນ​ທິ​ນາ ເປ​ໂຊ),
 			},
 		},
 		'ATS' => {
@@ -6210,17 +4493,13 @@ has 'currencies' => (
 			},
 		},
 		'AUD' => {
-			symbol => 'A$',
 			display_name => {
 				'currency' => q(ອອສ​ເຕຣ​ລຽນ ໂດ​ລ່າ),
-				'other' => q(ອອສ​ເຕຣ​ລຽນ ໂດ​ລ່າ),
 			},
 		},
 		'AWG' => {
-			symbol => 'AWG',
 			display_name => {
 				'currency' => q(ອະຣູແບນ ຟລໍຣິນ),
-				'other' => q(ອະຣູແບນ ຟລໍຣິນ),
 			},
 		},
 		'AZM' => {
@@ -6229,10 +4508,8 @@ has 'currencies' => (
 			},
 		},
 		'AZN' => {
-			symbol => 'AZN',
 			display_name => {
 				'currency' => q(ອາ​ເຊີ​ໄບ​ຈາ​ນິ ມາ​ນັດ),
-				'other' => q(ອາ​ເຊີ​ໄບ​ຈາ​ນິ ມາ​ນັດ),
 			},
 		},
 		'BAD' => {
@@ -6241,10 +4518,8 @@ has 'currencies' => (
 			},
 		},
 		'BAM' => {
-			symbol => 'BAM',
 			display_name => {
 				'currency' => q(ບອ​ສ​ເນຍ-ເຮີ​ເຊ​ໂກວິ​ນາ ຄອນ​ເວີດ​ຕິ​ໂບ ມາກ),
-				'other' => q(ບອ​ສ​ເນຍ-ເຮີ​ເຊ​ໂກວິ​ນາ ຄອນ​ເວີດ​ຕິ​ໂບ ມາກ),
 			},
 		},
 		'BAN' => {
@@ -6253,17 +4528,13 @@ has 'currencies' => (
 			},
 		},
 		'BBD' => {
-			symbol => 'BBD',
 			display_name => {
 				'currency' => q(ໂດລ່າ ບາບາດຽນ),
-				'other' => q(ໂດລ່າ ບາບາດຽນ),
 			},
 		},
 		'BDT' => {
-			symbol => 'BDT',
 			display_name => {
 				'currency' => q(ບັງ​ຄລາ​ເທດ ຕາ​ກາ),
-				'other' => q(ບັງ​ຄລາ​ເທດ ຕາ​ກາ),
 			},
 		},
 		'BEC' => {
@@ -6292,7 +4563,6 @@ has 'currencies' => (
 			},
 		},
 		'BGN' => {
-			symbol => 'BGN',
 			display_name => {
 				'currency' => q(ບັງ​ກາ​ຣຽນ ເລບ),
 				'other' => q(ເລບ ບູນກາຣີ),
@@ -6304,38 +4574,28 @@ has 'currencies' => (
 			},
 		},
 		'BHD' => {
-			symbol => 'BHD',
 			display_name => {
 				'currency' => q(ບາ​ໄຣ​ນິ ດິ​ນາ),
-				'other' => q(ບາ​ໄຣ​ນິ ດິ​ນາ),
 			},
 		},
 		'BIF' => {
-			symbol => 'BIF',
 			display_name => {
 				'currency' => q(ບຸ​ຣັນ​ດຽນ ຟຣັງ),
-				'other' => q(ບຸ​ຣັນ​ດຽນ ຟຣັງ),
 			},
 		},
 		'BMD' => {
-			symbol => 'BMD',
 			display_name => {
 				'currency' => q(ໂດ​ລ່າ​ເບີ​ມິວ​ດາ),
-				'other' => q(ໂດ​ລ່າ​ເບີ​ມິວ​ດາ),
 			},
 		},
 		'BND' => {
-			symbol => 'BND',
 			display_name => {
 				'currency' => q(ບຣູ​ໄນ ໂດ​ລ່າ),
-				'other' => q(ບຣູ​ໄນ ໂດ​ລ່າ),
 			},
 		},
 		'BOB' => {
-			symbol => 'BOB',
 			display_name => {
 				'currency' => q(ໂບ​ລິ​ວຽນ ໂບ​ລິ​ເວຍ​ໂນ),
-				'other' => q(ໂບ​ລິ​ວຽນ ໂບ​ລິ​ເວຍ​ໂນ),
 			},
 		},
 		'BOL' => {
@@ -6369,10 +4629,8 @@ has 'currencies' => (
 			},
 		},
 		'BRL' => {
-			symbol => 'R$',
 			display_name => {
 				'currency' => q(ບຣາ​ຊິ​ລຽນ ຣຽວ),
-				'other' => q(ບຣາ​ຊິ​ລຽນ ຣຽວ),
 			},
 		},
 		'BRN' => {
@@ -6391,17 +4649,13 @@ has 'currencies' => (
 			},
 		},
 		'BSD' => {
-			symbol => 'BSD',
 			display_name => {
 				'currency' => q(ໂດລ່າ ບາຮາມຽນ),
-				'other' => q(ໂດລ່າ ບາຮາມຽນ),
 			},
 		},
 		'BTN' => {
-			symbol => 'BTN',
 			display_name => {
 				'currency' => q(ພູ​ຖານ ງຸນດຣັມ),
-				'other' => q(ພູ​ຖານ ງຸນດຣັມ),
 			},
 		},
 		'BUK' => {
@@ -6410,10 +4664,8 @@ has 'currencies' => (
 			},
 		},
 		'BWP' => {
-			symbol => 'BWP',
 			display_name => {
 				'currency' => q(ບອດ​ສະ​ວາ​ນານ ພູ​ລາ),
-				'other' => q(ບອດ​ສະ​ວາ​ນານ ພູ​ລາ),
 			},
 		},
 		'BYB' => {
@@ -6422,38 +4674,29 @@ has 'currencies' => (
 			},
 		},
 		'BYN' => {
-			symbol => 'BYN',
+			symbol => 'р.',
 			display_name => {
 				'currency' => q(ເບ​ລາ​ຣຸ​ສ​ຊຽນ ຣູ​ເບິນ),
-				'other' => q(ເບ​ລາ​ຣຸ​ສ​ຊຽນ ຣູ​ເບິນ),
 			},
 		},
 		'BYR' => {
-			symbol => 'BYR',
 			display_name => {
 				'currency' => q(ເບ​ລາ​ຣຸ​ສ​ຊຽນ ຣູ​ເບິນ \(2000–2016\)),
-				'other' => q(ເບ​ລາ​ຣຸ​ສ​ຊຽນ ຣູ​ເບິນ \(2000–2016\)),
 			},
 		},
 		'BZD' => {
-			symbol => 'BZD',
 			display_name => {
 				'currency' => q(ໂດ​ລ່າ​ເບ​ລີຊ),
-				'other' => q(ໂດ​ລ່າ​ເບ​ລີຊ),
 			},
 		},
 		'CAD' => {
-			symbol => 'CA$',
 			display_name => {
 				'currency' => q(ໂດລ່າແຄນາດາ),
-				'other' => q(ໂດລ່າແຄນາດາ),
 			},
 		},
 		'CDF' => {
-			symbol => 'CDF',
 			display_name => {
 				'currency' => q(ຄອງ​ໂກ​ລີສ ຟຣັງ),
-				'other' => q(ຄອງ​ໂກ​ລີສ ຟຣັງ),
 			},
 		},
 		'CHE' => {
@@ -6462,10 +4705,8 @@ has 'currencies' => (
 			},
 		},
 		'CHF' => {
-			symbol => 'CHF',
 			display_name => {
 				'currency' => q(ສະ​ວິ​ສ ຟ​ຣັງ),
-				'other' => q(ສະ​ວິ​ສ ຟ​ຣັງ),
 			},
 		},
 		'CHW' => {
@@ -6484,31 +4725,23 @@ has 'currencies' => (
 			},
 		},
 		'CLP' => {
-			symbol => 'CLP',
 			display_name => {
 				'currency' => q(ຊິ​ລຽນ ເປ​ໂຊ),
-				'other' => q(ຊິ​ລຽນ ເປ​ໂຊ),
 			},
 		},
 		'CNH' => {
-			symbol => 'CNH',
 			display_name => {
 				'currency' => q(ຢວນຈີນ \(ນອກປະເທດ\)),
-				'other' => q(ຢວນຈີນ \(ນອກປະເທດ\)),
 			},
 		},
 		'CNY' => {
-			symbol => 'CN¥',
 			display_name => {
 				'currency' => q(ຈີນ ຢວນ),
-				'other' => q(ຈີນ ຢວນ),
 			},
 		},
 		'COP' => {
-			symbol => 'COP',
 			display_name => {
 				'currency' => q(ໂຄ​ລົມ​ບຽນ ເປ​ໂຊ),
-				'other' => q(ໂຄ​ລົມ​ບຽນ ເປ​ໂຊ),
 			},
 		},
 		'COU' => {
@@ -6517,10 +4750,8 @@ has 'currencies' => (
 			},
 		},
 		'CRC' => {
-			symbol => 'CRC',
 			display_name => {
 				'currency' => q(ໂຄສຕາ ຣິກັນ ໂຄລອນ),
-				'other' => q(ໂຄສຕາ ຣິກັນ ໂຄລອນ),
 			},
 		},
 		'CSD' => {
@@ -6534,24 +4765,18 @@ has 'currencies' => (
 			},
 		},
 		'CUC' => {
-			symbol => 'CUC',
 			display_name => {
 				'currency' => q(ຄິວແບນ ຄອນເວີດຕິໂບ ເປໂຊ),
-				'other' => q(ຄິວແບນ ຄອນເວີດຕິໂບ ເປໂຊ),
 			},
 		},
 		'CUP' => {
-			symbol => 'CUP',
 			display_name => {
 				'currency' => q(ຄິວແບນ ເປໂຊ),
-				'other' => q(ຄິວແບນ ເປໂຊ),
 			},
 		},
 		'CVE' => {
-			symbol => 'CVE',
 			display_name => {
 				'currency' => q(ເຄບ ເວີດ​ດີນ ເອ​ສ​ຄູ​ໂດ),
-				'other' => q(ເຄບ ເວີດ​ດີນ ເອ​ສ​ຄູ​ໂດ),
 			},
 		},
 		'CYP' => {
@@ -6560,10 +4785,8 @@ has 'currencies' => (
 			},
 		},
 		'CZK' => {
-			symbol => 'CZK',
 			display_name => {
 				'currency' => q(ເຊກ ໂຄ​ຣູ​ນາ),
-				'other' => q(ເຊກ ໂຄ​ຣູ​ນາ),
 			},
 		},
 		'DDM' => {
@@ -6577,31 +4800,24 @@ has 'currencies' => (
 			},
 		},
 		'DJF' => {
-			symbol => 'DJF',
 			display_name => {
 				'currency' => q(​ດິ​ບູ​ຈຽນ ຟຣັງ),
-				'other' => q(​ດິ​ບູ​ຈຽນ ຟຣັງ),
 			},
 		},
 		'DKK' => {
-			symbol => 'DKK',
 			display_name => {
 				'currency' => q(ແດນ​ນິ​ຊ ໂຄຣນ),
 				'other' => q(ແດນ​ນິ​ຊ ໂຄຣນເນີ),
 			},
 		},
 		'DOP' => {
-			symbol => 'DOP',
 			display_name => {
 				'currency' => q(ໂດ​ມິ​ນິ​ກັນ ເປ​ໂຊ),
-				'other' => q(ໂດ​ມິ​ນິ​ກັນ ເປ​ໂຊ),
 			},
 		},
 		'DZD' => {
-			symbol => 'DZD',
 			display_name => {
 				'currency' => q(ອັລ​ເຈີ​ຣຽນ ດິ​ນາ),
-				'other' => q(ອັລ​ເຈີ​ຣຽນ ດິ​ນາ),
 			},
 		},
 		'ECS' => {
@@ -6620,17 +4836,13 @@ has 'currencies' => (
 			},
 		},
 		'EGP' => {
-			symbol => 'EGP',
 			display_name => {
 				'currency' => q(ອີ​ຢິບ​ທຽນ ພາວດ໌),
-				'other' => q(ອີ​ຢິບ​ທຽນ ພາວດ໌),
 			},
 		},
 		'ERN' => {
-			symbol => 'ERN',
 			display_name => {
 				'currency' => q(ອິ​ຣິ​ທຣຽນ ແນກ​ຟ​າ),
-				'other' => q(ອິ​ຣິ​ທຣຽນ ແນກ​ຟ​າ),
 			},
 		},
 		'ESA' => {
@@ -6649,17 +4861,13 @@ has 'currencies' => (
 			},
 		},
 		'ETB' => {
-			symbol => 'ETB',
 			display_name => {
 				'currency' => q(ເອ​ທິ​ໂອ​ປຽນ ເບີ​ຣ໌),
-				'other' => q(ເອ​ທິ​ໂອ​ປຽນ ເບີ​ຣ໌),
 			},
 		},
 		'EUR' => {
-			symbol => '€',
 			display_name => {
 				'currency' => q(ຢູ​ໂຣ),
-				'other' => q(ຢູ​ໂຣ),
 			},
 		},
 		'FIM' => {
@@ -6668,17 +4876,13 @@ has 'currencies' => (
 			},
 		},
 		'FJD' => {
-			symbol => 'FJD',
 			display_name => {
 				'currency' => q(ຟິ​ຈຽນ ໂດ​ລ່າ),
-				'other' => q(ຟິ​ຈຽນ ໂດ​ລ່າ),
 			},
 		},
 		'FKP' => {
-			symbol => 'FKP',
 			display_name => {
 				'currency' => q(ຟອ​ລ໌ກ​ແລນ ໄອ​ແລນ​ສ໌ ພາວ​ດ໌),
-				'other' => q(ຟອ​ລ໌ກ​ແລນ ໄອ​ແລນ​ສ໌ ພາວ​ດ໌),
 			},
 		},
 		'FRF' => {
@@ -6687,10 +4891,8 @@ has 'currencies' => (
 			},
 		},
 		'GBP' => {
-			symbol => '£',
 			display_name => {
 				'currency' => q(ອັງກິດ ປອນ),
-				'other' => q(ອັງກິດ ປອນ),
 			},
 		},
 		'GEK' => {
@@ -6699,10 +4901,9 @@ has 'currencies' => (
 			},
 		},
 		'GEL' => {
-			symbol => 'GEL',
+			symbol => 'ລາຣີ',
 			display_name => {
 				'currency' => q(ຈໍ​ຈຽນ ລາ​ຣິ),
-				'other' => q(ຈໍ​ຈຽນ ລາ​ຣິ),
 			},
 		},
 		'GHC' => {
@@ -6711,31 +4912,23 @@ has 'currencies' => (
 			},
 		},
 		'GHS' => {
-			symbol => 'GHS',
 			display_name => {
 				'currency' => q(ກາ​ນາ​ອຽນ ເຊ​ດິ),
-				'other' => q(ກາ​ນາ​ອຽນ ເຊ​ດິ),
 			},
 		},
 		'GIP' => {
-			symbol => 'GIP',
 			display_name => {
 				'currency' => q(ກິບ​ຣາ​ທາ ພາ​ວດ໌),
-				'other' => q(ກິບ​ຣາ​ທາ ພາ​ວດ໌),
 			},
 		},
 		'GMD' => {
-			symbol => 'GMD',
 			display_name => {
 				'currency' => q(​ແກມ​ບຽນ ດາ​ລາ​ຊິ),
-				'other' => q(​ແກມ​ບຽນ ດາ​ລາ​ຊິ),
 			},
 		},
 		'GNF' => {
-			symbol => 'GNF',
 			display_name => {
 				'currency' => q(ກິ​ນຽນ ຟຣັງ),
-				'other' => q(ກິ​ນຽນ ຟຣັງ),
 			},
 		},
 		'GNS' => {
@@ -6754,7 +4947,6 @@ has 'currencies' => (
 			},
 		},
 		'GTQ' => {
-			symbol => 'GTQ',
 			display_name => {
 				'currency' => q(ກົວເຕມາລານ ເຄັດຊອນ),
 				'other' => q(ເຄັດຊອນ),
@@ -6771,24 +4963,18 @@ has 'currencies' => (
 			},
 		},
 		'GYD' => {
-			symbol => 'GYD',
 			display_name => {
 				'currency' => q(ກາຍ​ຢາ​ນີ​ສ ໂດ​ລ່າ),
-				'other' => q(ກາຍ​ຢາ​ນີ​ສ ໂດ​ລ່າ),
 			},
 		},
 		'HKD' => {
-			symbol => 'HK$',
 			display_name => {
 				'currency' => q(ຮອງ​ກົງ ໂດ​ລ່າ),
-				'other' => q(ຮອງ​ກົງ ໂດ​ລ່າ),
 			},
 		},
 		'HNL' => {
-			symbol => 'HNL',
 			display_name => {
 				'currency' => q(ຮອນດູແຣນ ເລມພິຣາ),
-				'other' => q(ຮອນດູແຣນ ເລມພິຣາ),
 			},
 		},
 		'HRD' => {
@@ -6797,31 +4983,23 @@ has 'currencies' => (
 			},
 		},
 		'HRK' => {
-			symbol => 'HRK',
 			display_name => {
 				'currency' => q(ໂຄຣ​ເອ​ທຽນ ຄູ​ນາ),
-				'other' => q(ໂຄຣ​ເອ​ທຽນ ຄູ​ນາ),
 			},
 		},
 		'HTG' => {
-			symbol => 'HTG',
 			display_name => {
 				'currency' => q(ໄຮ​ຕຽນ ກົວ​ເດ),
-				'other' => q(ໄຮ​ຕຽນ ກົວ​ເດ),
 			},
 		},
 		'HUF' => {
-			symbol => 'HUF',
 			display_name => {
 				'currency' => q(ຮັງ​ກາ​ຣຽນ ຟໍ​ຣິນ),
-				'other' => q(ຮັງ​ກາ​ຣຽນ ຟໍ​ຣິນ),
 			},
 		},
 		'IDR' => {
-			symbol => 'IDR',
 			display_name => {
 				'currency' => q(ອິນ​ໂດ​ເນ​ຊຽນ ໂດ​ລ່າ),
-				'other' => q(ອິນ​ໂດ​ເນ​ຊຽນ ໂດ​ລ່າ),
 			},
 		},
 		'IEP' => {
@@ -6835,38 +5013,28 @@ has 'currencies' => (
 			},
 		},
 		'ILS' => {
-			symbol => '₪',
 			display_name => {
 				'currency' => q(ອິສ​ຣາ​ເອວ​ລິ ນິວ ເຊ​ເກວ),
-				'other' => q(ອິສ​ຣາ​ເອວ​ລິ ນິວ ເຊ​ເກວ),
 			},
 		},
 		'INR' => {
-			symbol => '₹',
 			display_name => {
 				'currency' => q(ອິນ​ເດຍ ຣູ​ປີ),
-				'other' => q(ອິນ​ເດຍ ຣູ​ປີ),
 			},
 		},
 		'IQD' => {
-			symbol => 'IQD',
 			display_name => {
 				'currency' => q(ອິ​ຣັກ​ກິ ດິ​ນາ),
-				'other' => q(ອິ​ຣັກ​ກິ ດິ​ນາ),
 			},
 		},
 		'IRR' => {
-			symbol => 'IRR',
 			display_name => {
 				'currency' => q(ອິ​ຣາ​ນິ ຣຽວ),
-				'other' => q(ອິ​ຣາ​ນິ ຣຽວ),
 			},
 		},
 		'ISK' => {
-			symbol => 'ISK',
 			display_name => {
 				'currency' => q(ໄອ​ສ໌​ແລນ​ດິກ ໂຄຣ​ນາ),
-				'other' => q(ໄອ​ສ໌​ແລນ​ດິກ ໂຄຣ​ນາ),
 			},
 		},
 		'ITL' => {
@@ -6875,59 +5043,43 @@ has 'currencies' => (
 			},
 		},
 		'JMD' => {
-			symbol => 'JMD',
 			display_name => {
 				'currency' => q(​ຈາ​ໄມ​ກັນ ໂດ​ລ່າ),
-				'other' => q(​ຈາ​ໄມ​ກັນ ໂດ​ລ່າ),
 			},
 		},
 		'JOD' => {
-			symbol => 'JOD',
 			display_name => {
 				'currency' => q(ຈໍ​ແດ​ນຽນ ດິ​ນາ),
-				'other' => q(ຈໍ​ແດ​ນຽນ ດິ​ນາ),
 			},
 		},
 		'JPY' => {
-			symbol => 'JP¥',
 			display_name => {
 				'currency' => q(ຍີ່​ປຸ່ນ ເຢນ),
-				'other' => q(ຍີ່​ປຸ່ນ ເຢນ),
 			},
 		},
 		'KES' => {
-			symbol => 'KES',
 			display_name => {
 				'currency' => q(ເຄນ​ຢັນ ຊິວ​ລິງ),
-				'other' => q(ເຄນ​ຢັນ ຊິວ​ລິງ),
 			},
 		},
 		'KGS' => {
-			symbol => 'KGS',
 			display_name => {
 				'currency' => q(ຄ​ຣີ​ກິສ​​ຖາ​ນິ ໂຊມ),
-				'other' => q(ຄ​ຣີ​ກິສ​​ຖາ​ນິ ໂຊມ),
 			},
 		},
 		'KHR' => {
-			symbol => 'KHR',
 			display_name => {
 				'currency' => q(ກຳ​ປູ​ເຈຍ ຣຽວ),
-				'other' => q(ກຳ​ປູ​ເຈຍ ຣຽວ),
 			},
 		},
 		'KMF' => {
-			symbol => 'KMF',
 			display_name => {
 				'currency' => q(ໂຄ​ໂມ​ຣຽນ ຟຣັງ),
-				'other' => q(ໂຄ​ໂມ​ຣຽນ ຟຣັງ),
 			},
 		},
 		'KPW' => {
-			symbol => 'KPW',
 			display_name => {
 				'currency' => q(ເກົາ​ຫລີ​ເໜືອ ວອນ),
-				'other' => q(ເກົາ​ຫລີ​ເໜືອ ວອນ),
 			},
 		},
 		'KRH' => {
@@ -6941,59 +5093,44 @@ has 'currencies' => (
 			},
 		},
 		'KRW' => {
-			symbol => '₩',
 			display_name => {
 				'currency' => q(ເກົາ​ຫລີໃຕ້ ວອນ),
-				'other' => q(ເກົາ​ຫລີໃຕ້ ວອນ),
 			},
 		},
 		'KWD' => {
-			symbol => 'KWD',
 			display_name => {
 				'currency' => q(ຄູ​ເວ​ຕິ ດິ​ນາ),
-				'other' => q(ຄູ​ເວ​ຕິ ດິ​ນາ),
 			},
 		},
 		'KYD' => {
-			symbol => 'KYD',
 			display_name => {
 				'currency' => q(ເຄ​ແມນ ໄອ​ແລນ ໂດ​ລ່າ),
-				'other' => q(ເຄ​ແມນ ໄອ​ແລນ ໂດ​ລ່າ),
 			},
 		},
 		'KZT' => {
-			symbol => 'KZT',
 			display_name => {
 				'currency' => q(ຄາ​ຊັກ​ສະ​ຖາ​ນິ ເຕັງ​ເຈ),
-				'other' => q(ຄາ​ຊັກ​ສະ​ຖາ​ນິ ເຕັງ​ເຈ),
 			},
 		},
 		'LAK' => {
 			symbol => '₭',
 			display_name => {
 				'currency' => q(ລາວ ກີບ),
-				'other' => q(ລາວ ກີບ),
 			},
 		},
 		'LBP' => {
-			symbol => 'LBP',
 			display_name => {
 				'currency' => q(ເລ​ບາ​ນີ​ສ ພາວດ໌),
-				'other' => q(ເລ​ບາ​ນີ​ສ ພາວດ໌),
 			},
 		},
 		'LKR' => {
-			symbol => 'LKR',
 			display_name => {
 				'currency' => q(ສີ​ລັງ​ກາ ຣູ​ປີ),
-				'other' => q(ສີ​ລັງ​ກາ ຣູ​ປີ),
 			},
 		},
 		'LRD' => {
-			symbol => 'LRD',
 			display_name => {
 				'currency' => q(ລິ​ເບີ​ຣຽນ ໂດ​ລ່າ),
-				'other' => q(ລິ​ເບີ​ຣຽນ ໂດ​ລ່າ),
 			},
 		},
 		'LSL' => {
@@ -7002,10 +5139,8 @@ has 'currencies' => (
 			},
 		},
 		'LTL' => {
-			symbol => 'LTL',
 			display_name => {
 				'currency' => q(ລິ​ທົວ​ນຽນ ລິ​ທັ​ສ),
-				'other' => q(ລິ​ທົວ​ນຽນ ລິ​ທັ​ສ),
 			},
 		},
 		'LTT' => {
@@ -7029,7 +5164,6 @@ has 'currencies' => (
 			},
 		},
 		'LVL' => {
-			symbol => 'LVL',
 			display_name => {
 				'currency' => q(ລັດ​ວຽນ ລັດ​ສ໌),
 				'other' => q(ລັດ​ວຽນ ລັດ​ຕິ),
@@ -7041,17 +5175,13 @@ has 'currencies' => (
 			},
 		},
 		'LYD' => {
-			symbol => 'LYD',
 			display_name => {
 				'currency' => q(ລິບ​ບຽນ ດິ​ນາ),
-				'other' => q(ລິບ​ບຽນ ດິ​ນາ),
 			},
 		},
 		'MAD' => {
-			symbol => 'MAD',
 			display_name => {
 				'currency' => q(ມໍ​ຣັອກ​ແຄນ​ ເດີ​ແຮມ),
-				'other' => q(ມໍ​ຣັອກ​ແຄນ​ ເດີ​ແຮມ),
 			},
 		},
 		'MAF' => {
@@ -7070,17 +5200,13 @@ has 'currencies' => (
 			},
 		},
 		'MDL' => {
-			symbol => 'MDL',
 			display_name => {
 				'currency' => q(ມອນ​ໂດ​ແວນ ເລ​ອູ),
-				'other' => q(ມອນ​ໂດ​ແວນ ເລ​ອູ),
 			},
 		},
 		'MGA' => {
-			symbol => 'MGA',
 			display_name => {
 				'currency' => q(ມາ​ລາ​ກາ​ຊີ ອາ​ເຣຍ​ຣີ),
-				'other' => q(ມາ​ລາ​ກາ​ຊີ ອາ​ເຣຍ​ຣີ),
 			},
 		},
 		'MGF' => {
@@ -7089,10 +5215,8 @@ has 'currencies' => (
 			},
 		},
 		'MKD' => {
-			symbol => 'MKD',
 			display_name => {
 				'currency' => q(ແມັກ​ເຊ​ໂດ​ນຽນ ເດ​ນາ),
-				'other' => q(ແມັກ​ເຊ​ໂດ​ນຽນ ເດ​ນາ),
 			},
 		},
 		'MKN' => {
@@ -7106,37 +5230,28 @@ has 'currencies' => (
 			},
 		},
 		'MMK' => {
-			symbol => 'MMK',
 			display_name => {
 				'currency' => q(ມຽນ​ມາ ຈ໊າດ),
-				'other' => q(ມຽນ​ມາ ຈ໊າດ),
 			},
 		},
 		'MNT' => {
-			symbol => 'MNT',
 			display_name => {
 				'currency' => q(ມອງ​ໂກ​ລຽນ ຕູກຣິກ),
-				'other' => q(ມອງ​ໂກ​ລຽນ ຕູກຣິກ),
 			},
 		},
 		'MOP' => {
-			symbol => 'MOP',
 			display_name => {
 				'currency' => q(ມາ​ເກົ້າ ປາ​​ຕາ​ກາ),
-				'other' => q(ມາ​ເກົ້າ ປາ​​ຕາ​ກາ),
 			},
 		},
 		'MRO' => {
-			symbol => 'MRO',
 			display_name => {
 				'currency' => q(ມົວ​ຣິ​ທາ​ນຽນ ອູ​ກິວ​ຢາ \(1973–2017\)),
-				'other' => q(ມົວ​ຣິ​ທາ​ນຽນ ອູ​ກິວ​ຢາ \(1973–2017\)),
 			},
 		},
 		'MRU' => {
 			display_name => {
 				'currency' => q(ມົວ​ຣິ​ທາ​ນຽນ ອູ​ກິວ​ຢາ),
-				'other' => q(ມົວ​ຣິ​ທາ​ນຽນ ອູ​ກິວ​ຢາ),
 			},
 		},
 		'MTL' => {
@@ -7150,31 +5265,23 @@ has 'currencies' => (
 			},
 		},
 		'MUR' => {
-			symbol => 'MUR',
 			display_name => {
 				'currency' => q(ເມົາ​ຣິ​ທຽນ ຣູ​ປີ),
-				'other' => q(ເມົາ​ຣິ​ທຽນ ຣູ​ປີ),
 			},
 		},
 		'MVR' => {
-			symbol => 'MVR',
 			display_name => {
 				'currency' => q(ມັ​ລ​ດິ​ວຽນ ຣູ​ຟິ​ຢາ),
-				'other' => q(ມັ​ລ​ດິ​ວຽນ ຣູ​ຟິ​ຢາ),
 			},
 		},
 		'MWK' => {
-			symbol => 'MWK',
 			display_name => {
 				'currency' => q(ມາ​ລາ​ວຽນ ຄວາ​ຊາ),
-				'other' => q(ມາ​ລາ​ວຽນ ຄວາ​ຊາ),
 			},
 		},
 		'MXN' => {
-			symbol => 'MX$',
 			display_name => {
 				'currency' => q(ເມັກຊິກັນ ເປໂຊ),
-				'other' => q(ເມັກຊິກັນ ເປໂຊ),
 			},
 		},
 		'MXP' => {
@@ -7188,10 +5295,8 @@ has 'currencies' => (
 			},
 		},
 		'MYR' => {
-			symbol => 'MYR',
 			display_name => {
 				'currency' => q(ມາ​ເລ​ເຊຍ ຣິງ​ກິດ),
-				'other' => q(ມາ​ເລ​ເຊຍ ຣິງ​ກິດ),
 			},
 		},
 		'MZE' => {
@@ -7205,24 +5310,18 @@ has 'currencies' => (
 			},
 		},
 		'MZN' => {
-			symbol => 'MZN',
 			display_name => {
 				'currency' => q(ໂມ​ແຊມ​ບິ​ກັນ ເມ​ທິ​ຄອນ),
-				'other' => q(ໂມ​ແຊມ​ບິ​ກັນ ເມ​ທິ​ຄອນ),
 			},
 		},
 		'NAD' => {
-			symbol => 'NAD',
 			display_name => {
 				'currency' => q(ນາ​ມິ​ບຽນ ໂດ​ລ່າ),
-				'other' => q(ນາ​ມິ​ບຽນ ໂດ​ລ່າ),
 			},
 		},
 		'NGN' => {
-			symbol => 'NGN',
 			display_name => {
 				'currency' => q(ໄນ​ຣາ ​ໄນເຈີ​ຣຽນ),
-				'other' => q(ໄນ​ຣາ ​ໄນເຈີ​ຣຽນ),
 			},
 		},
 		'NIC' => {
@@ -7231,10 +5330,8 @@ has 'currencies' => (
 			},
 		},
 		'NIO' => {
-			symbol => 'NIO',
 			display_name => {
 				'currency' => q(ນິກາຣາກວນ ໂຄໂດບາ),
-				'other' => q(ນິກາຣາກວນ ໂຄໂດບາ),
 			},
 		},
 		'NLG' => {
@@ -7243,38 +5340,28 @@ has 'currencies' => (
 			},
 		},
 		'NOK' => {
-			symbol => 'NOK',
 			display_name => {
 				'currency' => q(ນໍ​ເວ​ຈຽນ ​ໂຄຣນ),
-				'other' => q(ນໍ​ເວ​ຈຽນ ​ໂຄຣນ),
 			},
 		},
 		'NPR' => {
-			symbol => 'NPR',
 			display_name => {
 				'currency' => q(ເນ​ປານ ຣູ​ປີ),
-				'other' => q(ເນ​ປານ ຣູ​ປີ),
 			},
 		},
 		'NZD' => {
-			symbol => 'NZ$',
 			display_name => {
 				'currency' => q(ນິວ​ຊີ​ແລນ ໂດ​ລ່າ),
-				'other' => q(ນິວ​ຊີ​ແລນ ໂດ​ລ່າ),
 			},
 		},
 		'OMR' => {
-			symbol => 'OMR',
 			display_name => {
 				'currency' => q(ໂອ​ມາ​ນິ ຣຽວ),
-				'other' => q(ໂອ​ມາ​ນິ ຣຽວ),
 			},
 		},
 		'PAB' => {
-			symbol => 'PAB',
 			display_name => {
 				'currency' => q(ພານາມານຽນ ບອນບົວ),
-				'other' => q(ພານາມານຽນ ບອນບົວ),
 			},
 		},
 		'PEI' => {
@@ -7283,10 +5370,8 @@ has 'currencies' => (
 			},
 		},
 		'PEN' => {
-			symbol => 'PEN',
 			display_name => {
 				'currency' => q(ເປ​ຣູ​ວຽນ ໂຊ​ລ໌),
-				'other' => q(ເປ​ຣູ​ວຽນ ໂຊ​ລ໌),
 			},
 		},
 		'PES' => {
@@ -7295,31 +5380,24 @@ has 'currencies' => (
 			},
 		},
 		'PGK' => {
-			symbol => 'PGK',
 			display_name => {
 				'currency' => q(ປາ​ປົວ ນິວ ກິ​ນຽນ ກິ​ນາ),
-				'other' => q(ປາ​ປົວ ນິວ ກິ​ນຽນ ກິ​ນາ),
 			},
 		},
 		'PHP' => {
 			symbol => 'PHP',
 			display_name => {
 				'currency' => q(ຟິ​ລິບ​ປິນ ເປ​ໂຊ),
-				'other' => q(ຟິ​ລິບ​ປິນ ເປ​ໂຊ),
 			},
 		},
 		'PKR' => {
-			symbol => 'PKR',
 			display_name => {
 				'currency' => q(ປາ​ກິ​ສຖານ ຣູ​ປີ),
-				'other' => q(ປາ​ກິ​ສຖານ ຣູ​ປີ),
 			},
 		},
 		'PLN' => {
-			symbol => 'PLN',
 			display_name => {
 				'currency' => q(ໂປ​ລິ​ຊ ຊະ​ລໍ​ຕີ),
-				'other' => q(ໂປ​ລິ​ຊ ຊະ​ລໍ​ຕີ),
 			},
 		},
 		'PLZ' => {
@@ -7333,17 +5411,13 @@ has 'currencies' => (
 			},
 		},
 		'PYG' => {
-			symbol => 'PYG',
 			display_name => {
 				'currency' => q(ກວາຣານີ ປາຣາກວາຍ),
-				'other' => q(ກວາຣານີ ປາຣາກວາຍ),
 			},
 		},
 		'QAR' => {
-			symbol => 'QAR',
 			display_name => {
 				'currency' => q(ຄາ​ຕາ​ຣິ ຣຽວ),
-				'other' => q(ຄາ​ຕາ​ຣິ ຣຽວ),
 			},
 		},
 		'RHD' => {
@@ -7357,24 +5431,18 @@ has 'currencies' => (
 			},
 		},
 		'RON' => {
-			symbol => 'RON',
 			display_name => {
 				'currency' => q(ໂຣ​ມາ​ນຽນ ເລ​ອູ),
-				'other' => q(ໂຣ​ມາ​ນຽນ ເລ​ອູ),
 			},
 		},
 		'RSD' => {
-			symbol => 'RSD',
 			display_name => {
 				'currency' => q(ເຊີ​ບຽນ ດິ​ນາ),
-				'other' => q(ເຊີ​ບຽນ ດິ​ນາ),
 			},
 		},
 		'RUB' => {
-			symbol => 'RUB',
 			display_name => {
 				'currency' => q(ຣັສ​ຊຽນ ຣູ​ເບິນ),
-				'other' => q(ຣັສ​ຊຽນ ຣູ​ເບິນ),
 			},
 		},
 		'RUR' => {
@@ -7383,31 +5451,23 @@ has 'currencies' => (
 			},
 		},
 		'RWF' => {
-			symbol => 'RWF',
 			display_name => {
 				'currency' => q(ຣະ​ວັນ​ດັນ ຟຣັງ),
-				'other' => q(ຣະ​ວັນ​ດັນ ຟຣັງ),
 			},
 		},
 		'SAR' => {
-			symbol => 'SAR',
 			display_name => {
 				'currency' => q(ຊາ​ອູ​ດິ ຣິ​ຢອນ),
-				'other' => q(ຊາ​ອູ​ດິ ຣິ​ຢອນ),
 			},
 		},
 		'SBD' => {
-			symbol => 'SBD',
 			display_name => {
 				'currency' => q(ໂຊ​ໂລມອນ ໄອ​ແລນ ໂດ​ລ່າ),
-				'other' => q(ໂຊ​ໂລມອນ ໄອ​ແລນ ໂດ​ລ່າ),
 			},
 		},
 		'SCR' => {
-			symbol => 'SCR',
 			display_name => {
 				'currency' => q(ເຊ​ເຊວ​ລອຍ​ສ໌ ຣູ​ປີ),
-				'other' => q(ເຊ​ເຊວ​ລອຍ​ສ໌ ຣູ​ປີ),
 			},
 		},
 		'SDD' => {
@@ -7416,10 +5476,8 @@ has 'currencies' => (
 			},
 		},
 		'SDG' => {
-			symbol => 'SDG',
 			display_name => {
 				'currency' => q(ຊູ​ດານ​ນີ​ສ ພາວດ໌),
-				'other' => q(ຊູ​ດານ​ນີ​ສ ພາວດ໌),
 			},
 		},
 		'SDP' => {
@@ -7428,24 +5486,18 @@ has 'currencies' => (
 			},
 		},
 		'SEK' => {
-			symbol => 'SEK',
 			display_name => {
 				'currency' => q(ສະ​ວີ​ດິ​ຊ ໂຄຣ​ນາ),
-				'other' => q(ສະ​ວີ​ດິ​ຊ ໂຄຣ​ນາ),
 			},
 		},
 		'SGD' => {
-			symbol => 'SGD',
 			display_name => {
 				'currency' => q(ສິງ​ກະ​ໂປ ໂດ​ລ່າ),
-				'other' => q(ສິງ​ກະ​ໂປ ໂດ​ລ່າ),
 			},
 		},
 		'SHP' => {
-			symbol => 'SHP',
 			display_name => {
 				'currency' => q(ເຊນ ເຮ​ເລ​ນາ ພາວດ໌),
-				'other' => q(ເຊນ ເຮ​ເລ​ນາ ພາວດ໌),
 			},
 		},
 		'SIT' => {
@@ -7458,25 +5510,24 @@ has 'currencies' => (
 				'currency' => q(ຄູໂຣນາ ສະໂລວັກ),
 			},
 		},
-		'SLL' => {
-			symbol => 'SLL',
+		'SLE' => {
 			display_name => {
 				'currency' => q(ເຊຍ​ນາ ​ເລໂອ​ນຽນ ເລ​ໂອນ),
-				'other' => q(ເຊຍ​ນາ ​ເລໂອ​ນຽນ ເລ​ໂອນ),
+			},
+		},
+		'SLL' => {
+			display_name => {
+				'currency' => q(ເຊຍ​ນາ ​ເລໂອ​ນຽນ ເລ​ໂອນ \(1964—2022\)),
 			},
 		},
 		'SOS' => {
-			symbol => 'SOS',
 			display_name => {
 				'currency' => q(ໂຊ​ມາ​ລິ ຊິວ​ລິງ),
-				'other' => q(ໂຊ​ມາ​ລິ ຊິວ​ລິງ),
 			},
 		},
 		'SRD' => {
-			symbol => 'SRD',
 			display_name => {
 				'currency' => q(ຊູ​ຣິ​ນາ​ມີ​ສ ໂດ​ລ່າ),
-				'other' => q(ຊູ​ຣິ​ນາ​ມີ​ສ ໂດ​ລ່າ),
 			},
 		},
 		'SRG' => {
@@ -7485,24 +5536,18 @@ has 'currencies' => (
 			},
 		},
 		'SSP' => {
-			symbol => 'SSP',
 			display_name => {
 				'currency' => q(ເຊົາ​ທ໌ ຊູ​ດານ​ນີ​ສ ພາວດ໌),
-				'other' => q(ເຊົາ​ທ໌ ຊູ​ດານ​ນີ​ສ ພາວດ໌),
 			},
 		},
 		'STD' => {
-			symbol => 'STD',
 			display_name => {
 				'currency' => q(ເຊົາ ໂທ​ເມ ແອນ ພ​ຣິນ​ຊິ​ປີ ໂດບຣາ \(1977–2017\)),
-				'other' => q(ເຊົາ ໂທ​ເມ ແອນ ພ​ຣິນ​ຊິ​ປີ ໂດບຣາ \(1977–2017\)),
 			},
 		},
 		'STN' => {
-			symbol => 'STN',
 			display_name => {
 				'currency' => q(ເຊົາ ໂທ​ເມ ແອນ ພ​ຣິນ​ຊິ​ປີ ໂດບຣາ),
-				'other' => q(ເຊົາ ໂທ​ເມ ແອນ ພ​ຣິນ​ຊິ​ປີ ໂດບຣາ),
 			},
 		},
 		'SUR' => {
@@ -7516,24 +5561,19 @@ has 'currencies' => (
 			},
 		},
 		'SYP' => {
-			symbol => 'SYP',
 			display_name => {
 				'currency' => q(ຊີ​ຣຽນ ພາວດ໌),
-				'other' => q(ຊີ​ຣຽນ ພາວດ໌),
 			},
 		},
 		'SZL' => {
-			symbol => 'SZL',
 			display_name => {
 				'currency' => q(ສະ​ວາ​ຊິ ລິ​ລັນ​ກິ​ນີ),
-				'other' => q(ສະ​ວາ​ຊິ ລິ​ລັນ​ກິ​ນີ),
 			},
 		},
 		'THB' => {
 			symbol => '฿',
 			display_name => {
 				'currency' => q(ໄທ ບາດ),
-				'other' => q(ໄທ ບາດ),
 			},
 		},
 		'TJR' => {
@@ -7542,10 +5582,8 @@ has 'currencies' => (
 			},
 		},
 		'TJS' => {
-			symbol => 'TJS',
 			display_name => {
 				'currency' => q(ທາ​ຈິ​ກິ​​ຖາ​ນິ ໂຊ​ໂມ​ນິ),
-				'other' => q(ທາ​ຈິ​ກິ​​ຖາ​ນິ ໂຊ​ໂມ​ນິ),
 			},
 		},
 		'TMM' => {
@@ -7554,24 +5592,18 @@ has 'currencies' => (
 			},
 		},
 		'TMT' => {
-			symbol => 'TMT',
 			display_name => {
 				'currency' => q(ເຕີກ​ເມ​ນິ​ສ​ຖາ​ນິ ມາ​ນັດ),
-				'other' => q(ເຕີກ​ເມ​ນິ​ສ​ຖາ​ນິ ມາ​ນັດ),
 			},
 		},
 		'TND' => {
-			symbol => 'TND',
 			display_name => {
 				'currency' => q(ຕູ​ນິ​ຊຽນ ດິ​ນາ),
-				'other' => q(ຕູ​ນິ​ຊຽນ ດິ​ນາ),
 			},
 		},
 		'TOP' => {
-			symbol => 'TOP',
 			display_name => {
 				'currency' => q(ຕອງ​ກັນ ປາ​ອັງ​ກາ),
-				'other' => q(ຕອງ​ກັນ ປາ​ອັງ​ກາ),
 			},
 		},
 		'TPE' => {
@@ -7585,38 +5617,29 @@ has 'currencies' => (
 			},
 		},
 		'TRY' => {
-			symbol => 'TRY',
 			display_name => {
 				'currency' => q(ເຕີ​ກິ​ຊ ລິ​ຣາ),
-				'other' => q(ເຕີ​ກິ​ຊ ລິ​ຣາ),
 			},
 		},
 		'TTD' => {
-			symbol => 'TTD',
 			display_name => {
 				'currency' => q(ທ​ຣິ​ນິ​ແດດ & ໂທ​ບາ​ໂກ ໂດ​ລ່າ),
-				'other' => q(ທ​ຣິ​ນິ​ແດດ & ໂທ​ບາ​ໂກ ໂດ​ລ່າ),
 			},
 		},
 		'TWD' => {
 			symbol => 'NT$',
 			display_name => {
 				'currency' => q(ນິວ ໄຕ້​ຫວັນ ໂດ​ລ່າ),
-				'other' => q(ນິວ ໄຕ້​ຫວັນ ໂດ​ລ່າ),
 			},
 		},
 		'TZS' => {
-			symbol => 'TZS',
 			display_name => {
 				'currency' => q(ທານ​ຊາ​ນຽນ ຊິວ​ລິງ),
-				'other' => q(ທານ​ຊາ​ນຽນ ຊິວ​ລິງ),
 			},
 		},
 		'UAH' => {
-			symbol => 'UAH',
 			display_name => {
 				'currency' => q(ຢູ​ເຄຣ​ນຽນ ຮະ​ຣີບ​ເນຍ),
-				'other' => q(ຢູ​ເຄຣ​ນຽນ ຮະ​ຣີບ​ເນຍ),
 			},
 		},
 		'UAK' => {
@@ -7630,17 +5653,13 @@ has 'currencies' => (
 			},
 		},
 		'UGX' => {
-			symbol => 'UGX',
 			display_name => {
 				'currency' => q(ອູ​ກັນ​ດັນ ຊິວ​ລິງ),
-				'other' => q(ອູ​ກັນ​ດັນ ຊິວ​ລິງ),
 			},
 		},
 		'USD' => {
-			symbol => 'US$',
 			display_name => {
 				'currency' => q(​ໂດ​ລ່າ​ສະ​ຫະ​ລັດຯ),
-				'other' => q(​ໂດ​ລ່າ​ສະ​ຫະ​ລັດຯ),
 			},
 		},
 		'USN' => {
@@ -7664,17 +5683,13 @@ has 'currencies' => (
 			},
 		},
 		'UYU' => {
-			symbol => 'UYU',
 			display_name => {
 				'currency' => q(ອູ​ຣຸ​ກົວ​ຢານ ເປ​ໂຊ),
-				'other' => q(ອູ​ຣຸ​ກົວ​ຢານ ເປ​ໂຊ),
 			},
 		},
 		'UZS' => {
-			symbol => 'UZS',
 			display_name => {
 				'currency' => q(ອຸສເບກິສຖານິ ໂຊມ),
-				'other' => q(ອຸສເບກິສຖານິ ໂຊມ),
 			},
 		},
 		'VEB' => {
@@ -7683,24 +5698,19 @@ has 'currencies' => (
 			},
 		},
 		'VEF' => {
-			symbol => 'VEF',
 			display_name => {
 				'currency' => q(ເວ​ເນ​ຊູ​ເອ​ລັນ ໂບ​ລິ​ວາ \(2008–2018\)),
 				'other' => q(ເວເນຊູເອລັນ ໂບລິວາສ໌),
 			},
 		},
 		'VES' => {
-			symbol => 'VES',
 			display_name => {
 				'currency' => q(ເວ​ເນ​ຊູ​ເອ​ລັນ ໂບ​ລິ​ວາ),
-				'other' => q(ເວ​ເນ​ຊູ​ເອ​ລັນ ໂບ​ລິ​ວາ),
 			},
 		},
 		'VND' => {
-			symbol => '₫',
 			display_name => {
 				'currency' => q(ຫວຽດ​ນາມ ດົງ),
-				'other' => q(ຫວຽດ​ນາມ ດົງ),
 			},
 		},
 		'VNN' => {
@@ -7709,21 +5719,16 @@ has 'currencies' => (
 			},
 		},
 		'VUV' => {
-			symbol => 'VUV',
 			display_name => {
 				'currency' => q(​ວາ​ນົວ​ຕູ ວາ​ຕູ),
-				'other' => q(​ວາ​ນົວ​ຕູ ວາ​ຕູ),
 			},
 		},
 		'WST' => {
-			symbol => 'WST',
 			display_name => {
 				'currency' => q(ຊາ​ໂມນ ທາ​ລາ),
-				'other' => q(ຊາ​ໂມນ ທາ​ລາ),
 			},
 		},
 		'XAF' => {
-			symbol => 'FCFA',
 			display_name => {
 				'currency' => q(ສາທາລະນະລັດອາຟຣິກາກາງ),
 				'other' => q(ຟຣັງ ເຊຟານ ທະນາຄານລັດອາຟຣິກາກາງ),
@@ -7760,10 +5765,8 @@ has 'currencies' => (
 			},
 		},
 		'XCD' => {
-			symbol => 'EC$',
 			display_name => {
 				'currency' => q(ອີ​ສ ຄາ​ຣິ​ບຽນ ໂດ​ລ່າ),
-				'other' => q(ອີ​ສ ຄາ​ຣິ​ບຽນ ໂດ​ລ່າ),
 			},
 		},
 		'XDR' => {
@@ -7787,10 +5790,8 @@ has 'currencies' => (
 			},
 		},
 		'XOF' => {
-			symbol => 'F CFA',
 			display_name => {
 				'currency' => q(ຟັງເຊຟານ ອາຟຣິກາຕາເວັນຕົກ),
-				'other' => q(ຟັງເຊຟານ ອາຟຣິກາຕາເວັນຕົກ),
 			},
 		},
 		'XPD' => {
@@ -7799,10 +5800,8 @@ has 'currencies' => (
 			},
 		},
 		'XPF' => {
-			symbol => 'CFPF',
 			display_name => {
 				'currency' => q(ຊີ​ເອັບ​ພີ ຟຣັງ),
-				'other' => q(ຊີ​ເອັບ​ພີ ຟຣັງ),
 			},
 		},
 		'XPT' => {
@@ -7832,10 +5831,8 @@ has 'currencies' => (
 			},
 		},
 		'YER' => {
-			symbol => 'YER',
 			display_name => {
 				'currency' => q(ເຢ​ເມ​ນິ ຣຽວ),
-				'other' => q(ເຢ​ເມ​ນິ ຣຽວ),
 			},
 		},
 		'YUD' => {
@@ -7864,10 +5861,8 @@ has 'currencies' => (
 			},
 		},
 		'ZAR' => {
-			symbol => 'ZAR',
 			display_name => {
 				'currency' => q(ເຊົາທ໌ ອາ​ຟຣິ​ກັນ ແຣນດ໌),
-				'other' => q(ເຊົາທ໌ ອາ​ຟຣິ​ກັນ ແຣນດ໌),
 			},
 		},
 		'ZMK' => {
@@ -7876,10 +5871,8 @@ has 'currencies' => (
 			},
 		},
 		'ZMW' => {
-			symbol => 'ZMW',
 			display_name => {
 				'currency' => q(ແຊມ​ບຽນ ຄວາ​ຊາ),
-				'other' => q(ແຊມ​ບຽນ ຄວາ​ຊາ),
 			},
 		},
 		'ZRN' => {
@@ -7918,103 +5911,6 @@ has 'calendar_months' => (
 	default		=> sub { {
 			'chinese' => {
 				'format' => {
-					abbreviated => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'1',
@@ -8053,26 +5949,6 @@ has 'calendar_months' => (
 							'ອີແປບ',
 							'ມາສລາ',
 							'ນາຊິວ'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12',
-							'13'
 						],
 						leap => [
 							
@@ -8120,26 +5996,6 @@ has 'calendar_months' => (
 							
 						],
 					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12',
-							'13'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'ເທົາ',
@@ -8164,108 +6020,6 @@ has 'calendar_months' => (
 			},
 			'ethiopic' => {
 				'format' => {
-					abbreviated => {
-						nonleap => [
-							'ແມສເຄີແຣມ',
-							'ເຕເກມ',
-							'ເຮດາ',
-							'ທາຊັສ',
-							'ເທີ',
-							'ເຍຄາທິດ',
-							'ເມກາບິດ',
-							'ເມຍເຊຍ',
-							'ເຈນບອດ',
-							'ເຊເນ',
-							'ຮຳເລ',
-							'ເນແຮສ໌',
-							'ພາກູເມນ'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12',
-							'13'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'ແມສເຄີແຣມ',
-							'ເຕເກມ',
-							'ເຮດາ',
-							'ທາຊັສ',
-							'ເທີ',
-							'ເຍຄາທິດ',
-							'ເມກາບິດ',
-							'ເມຍເຊຍ',
-							'ເຈນບອດ',
-							'ເຊເນ',
-							'ຮຳເລ',
-							'ເນແຮສ໌',
-							'ພາກູເມນ'
-						],
-						leap => [
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'ແມສເຄີແຣມ',
-							'ເຕເກມ',
-							'ເຮດາ',
-							'ທາຊັສ',
-							'ເທີ',
-							'ເຍຄາທິດ',
-							'ເມກາບິດ',
-							'ເມຍເຊຍ',
-							'ເຈນບອດ',
-							'ເຊເນ',
-							'ຮຳເລ',
-							'ເນແຮສ໌',
-							'ພາກູເມນ'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12',
-							'13'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'ແມສເຄີແຣມ',
@@ -8309,84 +6063,6 @@ has 'calendar_months' => (
 							
 						],
 					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'ມັງກອນ',
-							'ກຸມພາ',
-							'ມີນາ',
-							'ເມສາ',
-							'ພຶດສະພາ',
-							'ມິຖຸນາ',
-							'ກໍລະກົດ',
-							'ສິງຫາ',
-							'ກັນຍາ',
-							'ຕຸລາ',
-							'ພະຈິກ',
-							'ທັນວາ'
-						],
-						leap => [
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'ມ.ກ.',
-							'ກ.ພ.',
-							'ມ.ນ.',
-							'ມ.ສ.',
-							'ພ.ພ.',
-							'ມິ.ຖ.',
-							'ກ.ລ.',
-							'ສ.ຫ.',
-							'ກ.ຍ.',
-							'ຕ.ລ.',
-							'ພ.ຈ.',
-							'ທ.ວ.'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'ມັງກອນ',
@@ -8410,86 +6086,6 @@ has 'calendar_months' => (
 			},
 			'hebrew' => {
 				'format' => {
-					abbreviated => {
-						nonleap => [
-							'ທຣິດຣີ',
-							'ເຮວານ',
-							'ກິດເລບ',
-							'ເຕເວດ',
-							'ຊີວັດ',
-							'ອາດາ I',
-							'ອາດາ',
-							'ນິດຊານ',
-							'ອີຍາຣ',
-							'ສີວານ',
-							'ຕາມູ',
-							'ເອບ',
-							'ອີລູ'
-						],
-						leap => [
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'ທຣິດຣີ',
-							'ເຮວານ',
-							'ກິດເລບ',
-							'ເຕເວດ',
-							'ຊີວັດ',
-							'ອາດາ I',
-							'ອາດາ',
-							'ນິດຊານ',
-							'ອີຍາຣ',
-							'ສີວານ',
-							'ຕາມູ',
-							'ເອບ',
-							'ອີລູ'
-						],
-						leap => [
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'ທຣິດຣີ',
-							'ເຮວານ',
-							'ກິດເລບ',
-							'ເຕເວດ',
-							'ຊີວັດ',
-							'ອາດາ I',
-							'ອາດາ',
-							'ນິດຊານ',
-							'ອີຍາຣ',
-							'ສີວານ',
-							'ຕາມູ',
-							'ເອບ',
-							'ອີລູ'
-						],
-						leap => [
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'ທຣິດຣີ',
@@ -8539,25 +6135,6 @@ has 'calendar_months' => (
 							
 						],
 					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'ຈິຕຣາ',
@@ -8598,44 +6175,6 @@ has 'calendar_months' => (
 							
 						],
 					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'ຈິຕຣາ',
-							'ວິສາຂະ',
-							'ເຊດຖາ',
-							'ອັດສາ',
-							'ສາຣາວານາ',
-							'ພະຕຣາ',
-							'ອັສວິຊາ',
-							'ການຕິກາ',
-							'ອັກຣາຮາຢານາ',
-							'ປຸສະຍາ',
-							'ມາຄະ',
-							'ຜາລກຸນີ'
-						],
-						leap => [
-							
-						],
-					},
 				},
 			},
 			'islamic' => {
@@ -8654,25 +6193,6 @@ has 'calendar_months' => (
 							'ເຊົາ',
 							'ຊຸລກິອຸ',
 							'ຊຸລຫິຈ'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
 						],
 						leap => [
 							
@@ -8718,44 +6238,6 @@ has 'calendar_months' => (
 							
 						],
 					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'ມຸຣະຮອມ',
-							'ຊາຟາຣ',
-							'ຮອດບີ 1',
-							'ຮອດບີ 2',
-							'ຈຸມາດາ 1',
-							'ຈຸມາດາ 2',
-							'ຮາຈັບ',
-							'ຊະບານ',
-							'ຮາມາດອນ',
-							'ເຊົາວັດ',
-							'ດຸອັດກິດະ',
-							'ດຸອັດກິຈະ'
-						],
-						leap => [
-							
-						],
-					},
 				},
 			},
 			'persian' => {
@@ -8774,25 +6256,6 @@ has 'calendar_months' => (
 							'ດີຣ',
 							'ບຣາມານ',
 							'ເອສຟານ'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
 						],
 						leap => [
 							
@@ -8838,44 +6301,6 @@ has 'calendar_months' => (
 							
 						],
 					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'ຟຣາວາດິນ',
-							'ອໍຣດີບີເຫຣດ',
-							'ຄໍຣເດດ',
-							'ແຕຣ',
-							'ມໍຣເດດ',
-							'ຊາຣຫິວາ',
-							'ເມີ',
-							'ອາບານ',
-							'ອາຊາຣ',
-							'ດີຣ',
-							'ບຣາແມນ',
-							'ເອສຟານ'
-						],
-						leap => [
-							
-						],
-					},
 				},
 			},
 	} },
@@ -8897,15 +6322,6 @@ has 'calendar_days' => (
 						sat => 'ເສົາ',
 						sun => 'ອາທິດ'
 					},
-					narrow => {
-						mon => 'ຈ',
-						tue => 'ອ',
-						wed => 'ພ',
-						thu => 'ພຫ',
-						fri => 'ສຸ',
-						sat => 'ສ',
-						sun => 'ອາ'
-					},
 					short => {
 						mon => 'ຈ.',
 						tue => 'ອ.',
@@ -8926,15 +6342,6 @@ has 'calendar_days' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						mon => 'ຈັນ',
-						tue => 'ອັງຄານ',
-						wed => 'ພຸດ',
-						thu => 'ພະຫັດ',
-						fri => 'ສຸກ',
-						sat => 'ເສົາ',
-						sun => 'ອາທິດ'
-					},
 					narrow => {
 						mon => 'ຈ',
 						tue => 'ອ',
@@ -8943,24 +6350,6 @@ has 'calendar_days' => (
 						fri => 'ສຸ',
 						sat => 'ສ',
 						sun => 'ອາ'
-					},
-					short => {
-						mon => 'ຈ.',
-						tue => 'ອ.',
-						wed => 'ພ.',
-						thu => 'ພຫ.',
-						fri => 'ສຸ.',
-						sat => 'ສ.',
-						sun => 'ອາ.'
-					},
-					wide => {
-						mon => 'ວັນຈັນ',
-						tue => 'ວັນອັງຄານ',
-						wed => 'ວັນພຸດ',
-						thu => 'ວັນພະຫັດ',
-						fri => 'ວັນສຸກ',
-						sat => 'ວັນເສົາ',
-						sun => 'ວັນອາທິດ'
 					},
 				},
 			},
@@ -8979,11 +6368,6 @@ has 'calendar_quarters' => (
 						2 => 'ຕມ3',
 						3 => 'ຕມ4'
 					},
-					narrow => {0 => '1',
-						1 => '2',
-						2 => '3',
-						3 => '4'
-					},
 					wide => {0 => 'ໄຕຣມາດ 1',
 						1 => 'ໄຕຣມາດ 2',
 						2 => 'ໄຕຣມາດ 3',
@@ -8995,16 +6379,6 @@ has 'calendar_quarters' => (
 						1 => 'ຕ2',
 						2 => 'ຕ3',
 						3 => 'ຕ4'
-					},
-					narrow => {0 => '1',
-						1 => '2',
-						2 => '3',
-						3 => '4'
-					},
-					wide => {0 => 'ໄຕຣມາດ 1',
-						1 => 'ໄຕຣມາດ 2',
-						2 => 'ໄຕຣມາດ 3',
-						3 => 'ໄຕຣມາດ 4'
 					},
 				},
 			},
@@ -9357,25 +6731,21 @@ has 'day_periods' => (
 				},
 				'wide' => {
 					'afternoon1' => q{ຕອນບ່າຍ},
-					'am' => q{ກ່ອນທ່ຽງ},
 					'evening1' => q{ຕອນແລງ},
 					'midnight' => q{ທ່ຽງຄືນ},
 					'morning1' => q{ຕອນເຊົ້າ},
 					'night1' => q{ຕອນກາງຄືນ},
 					'noon' => q{ຕອນທ່ຽງ},
-					'pm' => q{ຫຼັງທ່ຽງ},
 				},
 			},
 			'stand-alone' => {
 				'abbreviated' => {
 					'afternoon1' => q{ສວຍ},
-					'am' => q{ກ່ອນທ່ຽງ},
 					'evening1' => q{ແລງ},
 					'midnight' => q{ທ່ຽງ​ຄືນ},
 					'morning1' => q{​ເຊົ້າ},
 					'night1' => q{​ກາງ​ຄືນ},
 					'noon' => q{ທ່ຽງ},
-					'pm' => q{ຫຼັງທ່ຽງ},
 				},
 				'narrow' => {
 					'afternoon1' => q{ສ},
@@ -9385,14 +6755,8 @@ has 'day_periods' => (
 					'noon' => q{ຕອນທ່ຽງ},
 				},
 				'wide' => {
-					'afternoon1' => q{ສວຍ},
-					'am' => q{ກ່ອນທ່ຽງ},
-					'evening1' => q{ແລງ},
 					'midnight' => q{ທ່ຽງຄືນ},
-					'morning1' => q{​ເຊົ້າ},
-					'night1' => q{​ກາງ​ຄືນ},
 					'noon' => q{ຕອນທ່ຽງ},
-					'pm' => q{ຫຼັງທ່ຽງ},
 				},
 			},
 		},
@@ -9428,9 +6792,6 @@ has 'eras' => (
 			},
 		},
 		'hebrew' => {
-			abbreviated => {
-				'0' => 'AM'
-			},
 		},
 		'indian' => {
 			abbreviated => {
@@ -9438,9 +6799,6 @@ has 'eras' => (
 			},
 		},
 		'islamic' => {
-			abbreviated => {
-				'0' => 'AH'
-			},
 		},
 		'japanese' => {
 			abbreviated => {
@@ -9825,39 +7183,16 @@ has 'datetime_formats_available_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-			Bh => q{h B},
-			Bhm => q{h:mm B},
-			Bhms => q{h:mm:ss B},
-			E => q{ccc},
-			EBhm => q{E h:mm B},
-			EBhms => q{E h:mm:ss B},
-			EHm => q{E HH:mm},
-			EHms => q{E HH:mm:ss},
 			Ed => q{E d},
-			Ehm => q{E h:mm a},
-			Ehms => q{E h:mm:ss a},
-			Gy => q{G y},
 			GyMMM => q{MMM y G},
 			GyMMMEd => q{E, MMM d, y G},
 			GyMMMd => q{G d MMM y},
 			GyMd => q{d/M/GGGGG y},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
 			MEd => q{E, d/M},
-			MMM => q{LLL},
 			MMMEd => q{E d MMM},
-			MMMMd => q{MMMM d},
 			MMMd => q{d MMM},
 			Md => q{d/M},
-			d => q{d},
 			h => q{h ໂມງa},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			ms => q{mm:ss},
-			y => q{G y},
-			yyyy => q{G y},
 			yyyyM => q{G M/y},
 			yyyyMEd => q{E, G d/M/y},
 			yyyyMMM => q{G MMM y},
@@ -9866,46 +7201,20 @@ has 'datetime_formats_available_formats' => (
 			yyyyMMMd => q{G d MMM y},
 			yyyyMd => q{G d/M/y},
 			yyyyQQQ => q{G QQQ y},
-			yyyyQQQQ => q{G y QQQQ},
 		},
 		'gregorian' => {
-			Bh => q{h B},
-			Bhm => q{h:mm B},
-			Bhms => q{h:mm:ss B},
-			E => q{ccc},
-			EBhm => q{E h:mm B},
-			EBhms => q{E h:mm:ss B},
-			EHm => q{E HH:mm},
-			EHms => q{E HH:mm:ss},
 			Ed => q{E, d},
-			Ehm => q{E h:mm a},
-			Ehms => q{E h:mm:ss a},
-			Gy => q{G y},
 			GyMMM => q{MMM, G y},
 			GyMMMEd => q{E d MMMM, G y},
 			GyMMMd => q{d MMMM, G y},
 			GyMd => q{d/M/GGGGG y},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			Hmsv => q{HH:mm:ss v},
-			Hmv => q{HH:mm v},
-			M => q{L},
 			MEd => q{E, d/M},
-			MMM => q{LLL},
 			MMMEd => q{E d MMM},
 			MMMMW => q{ອາທິດທີ່ W ຂອງເດືອນ M},
-			MMMMd => q{MMMM d},
+			MMMMd => q{d MMMM},
 			MMMd => q{d MMM},
 			Md => q{d/M},
-			d => q{d},
 			h => q{h ໂມງa},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			hmsv => q{h:mm:ss a v},
-			hmv => q{h:mm a v},
-			ms => q{mm:ss},
-			y => q{y},
 			yM => q{M/y},
 			yMEd => q{E, d/M/y},
 			yMMM => q{MMM y},
@@ -9920,18 +7229,9 @@ has 'datetime_formats_available_formats' => (
 		'islamic' => {
 			H => q{H},
 			Hm => q{H:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
-			MEd => q{E, d/M},
-			MMM => q{LLL},
 			MMMEd => q{E MMM d},
-			MMMd => q{d MMM},
-			Md => q{d/M},
-			d => q{d},
 			h => q{ha},
 			hm => q{h mm a},
-			hms => q{h:mm:ss a},
-			ms => q{mm:ss},
 			y => q{y},
 			yM => q{M/y},
 			yMEd => q{E M/d/y},
@@ -9948,9 +7248,6 @@ has 'datetime_formats_append_item' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			'Timezone' => '{0} {1}',
-		},
 	} },
 );
 
@@ -9987,20 +7284,6 @@ has 'datetime_formats_interval' => (
 				d => q{GGGGG d/M/y – d/M/y},
 				y => q{GGGGG d/M/y – d/M/y},
 			},
-			H => {
-				H => q{HH–HH},
-			},
-			Hm => {
-				H => q{HH:mm–HH:mm},
-				m => q{HH:mm–HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm–HH:mm v},
-				m => q{HH:mm–HH:mm v},
-			},
-			Hv => {
-				H => q{HH–HH v},
-			},
 			M => {
 				M => q{M–M},
 			},
@@ -10023,31 +7306,7 @@ has 'datetime_formats_interval' => (
 				M => q{d/M – d/M},
 				d => q{d/M – d/M},
 			},
-			d => {
-				d => q{d–d},
-			},
 			fallback => '{0} – {1}',
-			h => {
-				a => q{h a – h a},
-				h => q{h–h a},
-			},
-			hm => {
-				a => q{h:mm a – h:mm a},
-				h => q{h:mm–h:mm a},
-				m => q{h:mm–h:mm a},
-			},
-			hmv => {
-				a => q{h:mm a – h:mm a v},
-				h => q{h:mm–h:mm a v},
-				m => q{h:mm–h:mm a v},
-			},
-			hv => {
-				a => q{h a – h a v},
-				h => q{h–h a v},
-			},
-			y => {
-				y => q{G y–y},
-			},
 			yM => {
 				M => q{M/y – M/y GGGGG},
 				y => q{M/y – M/y GGGGG},
@@ -10082,10 +7341,6 @@ has 'datetime_formats_interval' => (
 			},
 		},
 		'gregorian' => {
-			Gy => {
-				G => q{G y – G y},
-				y => q{G y–y},
-			},
 			GyM => {
 				G => q{GGGGG MM/y – GGGGG MM/y},
 				M => q{GGGGG MM/y – MM/y},
@@ -10099,7 +7354,7 @@ has 'datetime_formats_interval' => (
 			},
 			GyMMM => {
 				G => q{G MM/y – G MM/y},
-				M => q{G MM/y – MM},
+				M => q{G MM – MM/y},
 				y => q{G MM/y – MM/y},
 			},
 			GyMMMEd => {
@@ -10120,29 +7375,12 @@ has 'datetime_formats_interval' => (
 				d => q{GGGGG dd/MM/y – dd/MM/y},
 				y => q{GGGGG dd/MM/y – dd/MM/y},
 			},
-			H => {
-				H => q{HH–HH},
-			},
-			Hm => {
-				H => q{HH:mm–HH:mm},
-				m => q{HH:mm–HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm–HH:mm v},
-				m => q{HH:mm–HH:mm v},
-			},
-			Hv => {
-				H => q{HH–HH v},
-			},
 			M => {
 				M => q{M–M},
 			},
 			MEd => {
 				M => q{E, dd/MM – E, dd/MM},
 				d => q{E, dd/MM – E, dd/MM},
-			},
-			MMM => {
-				M => q{LLL–LLL},
 			},
 			MMMEd => {
 				M => q{E, d/MM – E, d/MM},
@@ -10156,34 +7394,10 @@ has 'datetime_formats_interval' => (
 				M => q{dd/MM – dd/MM},
 				d => q{dd/MM – dd/MM},
 			},
-			d => {
-				d => q{d–d},
-			},
 			fallback => '{0} – {1}',
-			h => {
-				a => q{h a – h a},
-				h => q{h–h a},
-			},
-			hm => {
-				a => q{h:mm a – h:mm a},
-				h => q{h:mm–h:mm a},
-				m => q{h:mm–h:mm a},
-			},
-			hmv => {
-				a => q{h:mm a – h:mm a v},
-				h => q{h:mm–h:mm a v},
-				m => q{h:mm–h:mm a v},
-			},
-			hv => {
-				a => q{h a – h a v},
-				h => q{h–h a v},
-			},
-			y => {
-				y => q{y–y},
-			},
 			yM => {
 				M => q{MM/y – MM/y},
-				y => q{y/MM – y/MM},
+				y => q{MM/y – MM/y},
 			},
 			yMEd => {
 				M => q{E, dd/MM/y – E, dd/MM/y},
@@ -10204,7 +7418,7 @@ has 'datetime_formats_interval' => (
 				y => q{MM/y – MM/y},
 			},
 			yMMMd => {
-				M => q{d/MM/y – d/MM},
+				M => q{d/MM – d/MM/y},
 				d => q{d/MM/y – d/MM/y},
 				y => q{dd/MM/y – dd/MM/y},
 			},
@@ -10334,13 +7548,9 @@ has 'time_zone_names' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default	=> sub { {
-		hourFormat => q(+HH:mm;-HH:mm),
-		gmtFormat => q(GMT{0}),
-		gmtZeroFormat => q(GMT),
 		regionFormat => q(ເວລາ {0}),
 		regionFormat => q(ເວລາກາງເວັນ {0}),
 		regionFormat => q(ເວລາມາດຕະຖານ {0}),
-		fallbackFormat => q({1} ({0})),
 		'Acre' => {
 			long => {
 				'daylight' => q#ເວລາລະດູຮ້ອນຂອງອາເກຣ#,
@@ -10650,6 +7860,9 @@ has 'time_zone_names' => (
 		},
 		'America/Chihuahua' => {
 			exemplarCity => q#ຊິວາວາ#,
+		},
+		'America/Ciudad_Juarez' => {
+			exemplarCity => q#ຊີອູດັດ ຄົວເຣຊ#,
 		},
 		'America/Coral_Harbour' => {
 			exemplarCity => q#ອາທິໂຄຄານ#,
@@ -12268,6 +9481,9 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Johnston' => {
 			exemplarCity => q#ຈອນສະໂຕນ#,
+		},
+		'Pacific/Kanton' => {
+			exemplarCity => q#ແຄນຕອນ#,
 		},
 		'Pacific/Kiritimati' => {
 			exemplarCity => q#ຄີຣິທີມາຕີ#,

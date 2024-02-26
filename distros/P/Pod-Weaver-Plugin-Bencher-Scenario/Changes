@@ -1,3 +1,9 @@
+0.253   2024-02-13  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+        - Process Bencher/ScenarioBundle/*.pm instead of
+          Bencher/Scenarios/*.pm.
+
+
 0.252   2021-07-31  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Tzm - Package for language Central Atlas Tamazight
 
 package Locale::CLDR::Locales::Tzm;
 # This file auto generated from Data\common\main\tzm.xml
-#	on Tue  5 Dec  1:36:26 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'ak' => 'Takanit',
@@ -90,7 +90,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'AD' => 'Anḍurra',
  			'AE' => 'Imarat Tiεrabin Tidduklin',
@@ -217,7 +217,6 @@ has 'display_name_region' => (
  			'MD' => 'Mulḍavya',
  			'MG' => 'Madaɣacqar',
  			'MH' => 'Tigzirin n Marcal',
- 			'MK' => 'Maqdunya',
  			'ML' => 'Mali',
  			'MM' => 'Myanmar',
  			'MN' => 'Manɣulya',
@@ -331,45 +330,17 @@ has 'characters' => (
 		no warnings 'experimental::regex_sets';
 		return {
 			auxiliary => qr{[o p v]},
-			index => ['A', 'B', 'C', 'D', 'Ḍ', 'E', 'Ɛ', 'F', 'G', 'Ɣ', 'H', 'Ḥ', 'I', 'J', 'K', 'L', 'M', 'N', 'Q', 'R', 'Ṛ', 'S', 'Ṣ', 'T', 'Ṭ', 'U', 'W', 'X', 'Y', 'Z'],
-			main => qr{[a b c d ḍ e ɛ f g {gʷ} ɣ h ḥ i j k {kʷ} l m n q r ṛ s ṣ t ṭ u w x y z]},
-			numbers => qr{[  \- , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			index => ['A', 'B', 'C', 'DḌ', 'E', 'Ɛ', 'F', 'G', 'Ɣ', 'HḤ', 'I', 'J', 'K', 'L', 'M', 'N', 'Q', 'RṚ', 'SṢ', 'TṬ', 'U', 'W', 'X', 'Y', 'Z'],
+			main => qr{[a b c dḍ e ɛ f g {gʷ} ɣ hḥ i j k {kʷ} l m n q rṛ sṣ tṭ u w x y z]},
+			numbers => qr{[  \- ‑ , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
 : sub {
-		return { index => ['A', 'B', 'C', 'D', 'Ḍ', 'E', 'Ɛ', 'F', 'G', 'Ɣ', 'H', 'Ḥ', 'I', 'J', 'K', 'L', 'M', 'N', 'Q', 'R', 'Ṛ', 'S', 'Ṣ', 'T', 'Ṭ', 'U', 'W', 'X', 'Y', 'Z'], };
+		return { index => ['A', 'B', 'C', 'DḌ', 'E', 'Ɛ', 'F', 'G', 'Ɣ', 'HḤ', 'I', 'J', 'K', 'L', 'M', 'N', 'Q', 'RṚ', 'SṢ', 'TṬ', 'U', 'W', 'X', 'Y', 'Z'], };
 },
 );
 
-
-has 'quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{“},
-);
-
-has 'quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{”},
-);
-
-has 'alternate_quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{‘},
-);
-
-has 'alternate_quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{’},
-);
 
 has 'yesstr' => (
 	is			=> 'ro',
@@ -634,9 +605,14 @@ has 'currencies' => (
 				'currency' => q(Junih Usantehilini),
 			},
 		},
-		'SLL' => {
+		'SLE' => {
 			display_name => {
 				'currency' => q(Lyun Usirralyuni),
+			},
+		},
+		'SLL' => {
+			display_name => {
+				'currency' => q(Lyun Usirralyuni \(1964—2022\)),
 			},
 		},
 		'SOS' => {
@@ -855,8 +831,8 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'am' => q{Zdat azal},
-					'pm' => q{Ḍeffir aza},
+					'am' => q{Zdat azal},
+					'pm' => q{Ḍeffir aza},
 				},
 				'wide' => {
 					'am' => q{Zdat azal},
@@ -937,19 +913,11 @@ has 'datetime_formats_available_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
 			MEd => q{E, M/d},
-			MMM => q{LLL},
 			MMMEd => q{E, MMM d},
 			MMMMEd => q{E, MMMM d},
-			MMMMd => q{MMMM d},
-			MMMd => q{MMM d},
 			Md => q{M/d},
-			d => q{d},
-			hm => q{h:mm a},
-			ms => q{mm:ss},
+			hm => q{h:mm a},
 			y => q{y},
 			yM => q{M/y},
 			yMEd => q{E, M/d/y},
@@ -960,20 +928,11 @@ has 'datetime_formats_available_formats' => (
 			yQQQQ => q{QQQQ y},
 		},
 		'gregorian' => {
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
 			MEd => q{E, M/d},
-			MMM => q{LLL},
 			MMMEd => q{E, MMM d},
 			MMMMEd => q{E, MMMM d},
-			MMMMd => q{MMMM d},
-			MMMd => q{MMM d},
 			Md => q{M/d},
-			d => q{d},
-			hm => q{h:mm a},
-			ms => q{mm:ss},
-			y => q{y},
+			hm => q{h:mm a},
 			yM => q{M/y},
 			yMEd => q{E, M/d/y},
 			yMMM => q{MMM y},

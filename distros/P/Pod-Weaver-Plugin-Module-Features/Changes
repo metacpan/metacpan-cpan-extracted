@@ -1,3 +1,8 @@
+0.003   2023-11-11  Released-By: PERLANCAR; Urgency: medium
+
+        - Render feature declaration's summary and description.
+
+
 0.002   2021-04-06  Released-By: PERLANCAR; Urgency: medium
 
         - [bugfix] Boolean feature value was always rendered as yes.

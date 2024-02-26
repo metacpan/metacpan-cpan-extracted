@@ -1,3 +1,9 @@
-0.001    2018-06-03 (PERLANCAR)
+0.002   2024-02-01  Released-By: PERLANCAR; Urgency: medium
+
+        - Add options: --ordered (-o), --unordered-dash (-d),
+          --unordered-asterisk (-a).
+
+
+0.001    2018-06-03  Released-By: PERLANCAR
 
         - First release.

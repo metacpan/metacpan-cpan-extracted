@@ -1,0 +1,258 @@
+# PODNAME: RDF::Cowl::Lib::Gen::Class::String
+# ABSTRACT: Generated docs for RDF::Cowl::String
+
+## DO NOT EDIT
+## Generated via maint/tt/Class.pod.tt
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+RDF::Cowl::Lib::Gen::Class::String - Generated docs for RDF::Cowl::String
+
+=head1 VERSION
+
+version 1.0.0
+
+=head1 MAIN MODULE
+
+L<RDF::Cowl::String>
+
+=head1 CONSTRUCTORS
+
+=head2 new
+
+B<Signature>:
+
+  RDF::Cowl::String->new()
+
+B<Params>:
+
+  UString $string 
+
+Documentation:
+
+  Returns a retained string.
+  
+  @param string The underlying string object.
+  @return Retained string. Throws exception on error.
+  
+  @note The buffer of the raw string must have been dynamically allocated.
+  @note Ownership of the raw string is transferred to the newly created CowlString,
+        meaning you must not deinitialize it.
+  @note Equivalent to `cowl_string_opt(string, COWL_SO_NONE)`.
+
+Throws exception on error.
+
+=over 2
+
+B<C function name>: C<< cowl_string >>
+
+=back
+
+=head2 opt
+
+B<Signature>:
+
+  RDF::Cowl::String->opt(CowlStringOpts $opts)
+
+B<Params>:
+
+  UString $string 
+  CowlStringOpts $opts 
+
+Documentation:
+
+  Returns a retained string.
+  
+  String creation is governed by the following options:
+  
+  - COWL_SO_COPY: if set, the raw string is copied internally, otherwise it is directly assigned.
+                  Note that in the latter case the raw string must have been dynamically allocated,
+                  and you must not deinitialize it after passing it to this method.
+  - COWL_SO_INTERN: if set, the CowlString is either created and added to an internal
+                    instance pool, or if an instance with the same raw string already exists
+                    in the pool, that instance is retained and returned. This entails that
+                    all instances created with this flag are guaranteed to be unique in memory.
+  
+  @param string The underlying string object.
+  @param opts String creation options.
+  @return Retained string. Throws exception on error.
+
+Throws exception on error.
+
+=over 2
+
+B<C function name>: C<< cowl_string_opt >>
+
+=back
+
+=head2 empty
+
+B<Signature>:
+
+  RDF::Cowl::String->empty()
+
+Documentation:
+
+  Returns a retained empty string.
+  
+  @return Retained string. Throws exception on error.
+
+Throws exception on error.
+
+=over 2
+
+B<C function name>: C<< cowl_string_empty >>
+
+=back
+
+=head1 METHODS
+
+=head2 intern
+
+B<Signature>:
+
+  $self->intern()
+
+B<Params>:
+
+  CowlString $string 
+
+Documentation:
+
+  Interns the specified string.
+  
+  The string is either added to an internal instance pool, or if an instance with the same
+  raw string already exists in the pool, that instance is returned.
+  
+  @param string The string.
+  @return Interned string.
+  
+  @note The reference counts of the original string and that of the returned instance are not
+        changed. This means you are still responsible for releasing the original string if
+        you created it, and you should retain the returned string if you need to keep it alive.
+
+=over 2
+
+B<C function name>: C<< cowl_string_intern >>
+
+=back
+
+=head2 release_copying_cstring
+
+B<Signature>:
+
+  $self->release_copying_cstring()
+
+B<Params>:
+
+  CowlString $string 
+
+Documentation:
+
+  Releases the specified string, returning its buffer as a copy.
+  
+  @param string The string.
+  @return The copied buffer.
+  
+  @note As an optimization, if the string is deallocated due to the release call,
+        then the original buffer is returned.
+
+=over 2
+
+B<C function name>: C<< cowl_string_release_copying_cstring >>
+
+=back
+
+=head2 get_length
+
+B<Signature>:
+
+  $self->get_length()
+
+B<Params>:
+
+  CowlString $string 
+
+Documentation:
+
+  Gets the length of the string, excluding the NULL terminator.
+  
+  @param string The string.
+  @return The length.
+
+=over 2
+
+B<C function name>: C<< cowl_string_get_length >>
+
+=back
+
+=head2 get_raw
+
+B<Signature>:
+
+  $self->get_raw()
+
+B<Params>:
+
+  CowlString $string 
+
+Documentation:
+
+  Gets the underlying string object.
+  
+  @param string The string.
+  @return Underlying string object.
+
+=over 2
+
+B<C function name>: C<< cowl_string_get_raw >>
+
+=back
+
+=head2 concat
+
+B<Signature>:
+
+  $self->concat(CowlString $rhs)
+
+B<Params>:
+
+  CowlString $lhs 
+  CowlString $rhs 
+
+Documentation:
+
+  Returns a retained string obtained by concatenating two strings.
+  
+  @param lhs LHS of the concatenation.
+  @param rhs RHS of the concatenation.
+  @return Retained string. Throws exception on error.
+
+Throws exception on error.
+
+=over 2
+
+B<C function name>: C<< cowl_string_concat >>
+
+=back
+
+=for comment # cowl_string_get_cstring
+# See manual binding definition.
+
+=head1 AUTHOR
+
+Zakariyya Mughal <zmughal@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 by Auto-Parallel Technologies, Inc..
+
+This is free software, licensed under Eclipse Public License - v 2.0.
+
+=cut

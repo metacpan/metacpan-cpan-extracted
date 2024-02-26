@@ -29,7 +29,83 @@ int32_t SPVM__Native__MethodCall__new_class_method(SPVM_ENV* env, SPVM_VALUE* st
   
   void* method = env->get_class_method(env, stack, basic_type_name, method_name);
   if (!method) {
-    return env->die(env, stack, "The \"%s\" method in the \"%s\" class cannot be found.", method_name, basic_type_name, __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The \"%s\" class method in the \"%s\" class cannot be found.", method_name, basic_type_name, __func__, FILE_NAME, __LINE__);
+  }
+  
+  void* obj_method = env->new_pointer_object_by_name(env, stack, "Native::Method", method, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
+  void* obj_self = env->new_pointer_object_by_name(env, stack, "Native::MethodCall", method, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
+  env->set_field_object_by_name(env, stack, obj_self, "method", obj_method, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
+  stack[0].oval = obj_self;
+  
+  return 0;
+}
+
+int32_t SPVM__Native__MethodCall__new_instance_method_static(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  void* obj_basic_type_name = stack[0].oval;
+  
+  if (!obj_basic_type_name) {
+    return env->die(env, stack, "$basic_type_name must be defined.", __func__, FILE_NAME, __LINE__);
+  }
+  
+  const char* basic_type_name = env->get_chars(env, stack, obj_basic_type_name);
+  
+  void* obj_method_name = stack[1].oval;
+  
+  if (!obj_method_name) {
+    return env->die(env, stack, "$method_name must be defined.", __func__, FILE_NAME, __LINE__);
+  }
+  
+  const char* method_name = env->get_chars(env, stack, obj_method_name);
+  
+  void* method = env->get_instance_method_static(env, stack, basic_type_name, method_name);
+  if (!method) {
+    return env->die(env, stack, "The \"%s\" instance method in the \"%s\" class cannot be found.", method_name, basic_type_name, __func__, FILE_NAME, __LINE__);
+  }
+  
+  void* obj_method = env->new_pointer_object_by_name(env, stack, "Native::Method", method, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
+  void* obj_self = env->new_pointer_object_by_name(env, stack, "Native::MethodCall", method, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
+  env->set_field_object_by_name(env, stack, obj_self, "method", obj_method, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
+  stack[0].oval = obj_self;
+  
+  return 0;
+}
+
+int32_t SPVM__Native__MethodCall__new_instance_method(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  void* obj_instance = stack[0].oval;
+  
+  if (!obj_instance) {
+    return env->die(env, stack, "$instance must be defined.", __func__, FILE_NAME, __LINE__);
+  }
+  
+  void* obj_method_name = stack[1].oval;
+  
+  if (!obj_method_name) {
+    return env->die(env, stack, "$method_name must be defined.", __func__, FILE_NAME, __LINE__);
+  }
+  
+  const char* method_name = env->get_chars(env, stack, obj_method_name);
+  
+  void* method = env->get_instance_method(env, stack, obj_instance, method_name);
+  if (!method) {
+    return env->die(env, stack, "The \"%s\" instance method cannot be found.", method_name, __func__, FILE_NAME, __LINE__);
   }
   
   void* obj_method = env->new_pointer_object_by_name(env, stack, "Native::Method", method, &error_id, __func__, FILE_NAME, __LINE__);
@@ -55,7 +131,8 @@ int32_t SPVM__Native__MethodCall__call(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* obj_args = stack[1].oval;
   
   if (!obj_args) {
-    return env->die(env, stack, "$args must be defined.", __func__, FILE_NAME, __LINE__);
+    obj_args = env->new_object_array_by_name(env, stack, "object", 0, &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
   }
   
   int32_t args_length = env->length(env, stack, obj_args);
@@ -693,7 +770,7 @@ int32_t SPVM__Native__MethodCall__call_callback(SPVM_ENV* current_env, SPVM_VALU
   return 0;
 }
 
-int32_t SPVM__Native__MethodCall__call_class_method(SPVM_ENV* current_env, SPVM_VALUE* current_stack) {
+int32_t SPVM__Native__MethodCall__call_class_method_for_env(SPVM_ENV* current_env, SPVM_VALUE* current_stack) {
   
   int32_t current_error_id = 0;
   

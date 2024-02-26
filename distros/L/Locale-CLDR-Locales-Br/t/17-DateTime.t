@@ -26,4 +26,4 @@ my $dt_br_fr = DateTime->new(
 	time_zone  => 'Europe/London',
 );
 
-is ($dt_br_fr->format_cldr($locale->datetime_format_full), 'Meurzh 25 Here 1966 da 07:15:47 Europe/London', 'Date Time Format Full Breton');
+is ($dt_br_fr->format_cldr($locale->datetime_format_full), 'Meurzh 25 Here 1966, 07:15:47 Europe/London', 'Date Time Format Full Breton');

@@ -5,6 +5,7 @@ SYNOPSIS
      use Tags::HTML::ChangePassword;
 
      my $obj = Tags::HTML::ChangePassword->new(%params);
+     $obj->cleanup;
      $obj->prepare($message_types_hr);
      $obj->init($messages_ar);
      $obj->process;
@@ -70,6 +71,13 @@ METHODS
 
     Returns instance of object.
 
+  "cleanup"
+     $obj->cleanup;
+
+    Process cleanup after page run.
+
+    Returns undef.
+
   "init"
      $obj->init($messages_ar);
 
@@ -108,6 +116,12 @@ ERRORS
              From Tags::HTML::new():
                      Parameter 'css' must be a 'CSS::Struct::Output::*' class.
                      Parameter 'tags' must be a 'Tags::Output::*' class.
+
+     init():
+             No messages to init.
+
+     prepare():
+             No message types to init.
 
      process():
              From Tags::HTML::process():
@@ -294,5 +308,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.02
+    0.03
 

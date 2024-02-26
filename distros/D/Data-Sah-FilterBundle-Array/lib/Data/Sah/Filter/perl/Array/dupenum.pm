@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-17'; # DATE
+our $DATE = '2024-02-06'; # DATE
 our $DIST = 'Data-Sah-FilterBundle-Array'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 sub meta {
     +{
@@ -60,7 +60,7 @@ Data::Sah::Filter::perl::Array::dupenum - Return the elements of array that appe
 
 =head1 VERSION
 
-This document describes version 0.001 of Data::Sah::Filter::perl::Array::dupenum (from Perl distribution Data-Sah-FilterBundle-Array), released on 2024-01-17.
+This document describes version 0.002 of Data::Sah::Filter::perl::Array::dupenum (from Perl distribution Data-Sah-FilterBundle-Array), released on 2024-02-06.
 
 =head1 SYNOPSIS
 

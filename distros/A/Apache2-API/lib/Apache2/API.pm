@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Apache2 API Framework - ~/lib/Apache2/API.pm
-## Version v0.1.4
+## Version v0.2.0
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/05/30
-## Modified 2023/10/21
+## Modified 2024/02/16
 ## All rights reserved
 ## 
 ## 
@@ -39,7 +39,7 @@ BEGIN
     use JSON ();
     use Scalar::Util ();
     $DEBUG   = 0;
-    $VERSION = 'v0.1.4';
+    $VERSION = 'v0.2.0';
 };
 
 use strict;
@@ -490,6 +490,19 @@ sub reply
     {
         ( $code, $ref ) = @_;
     }
+    elsif( scalar( @_ ) == 1 &&
+        $self->_can( $_[0] => 'code' ) && 
+        $self->_can( $_[0] => 'message' ) )
+    {
+        my $ex = shift( @_ );
+        $code = $ex->code;
+        $ref = 
+        {
+            message => $ex->message,
+            ( $ex->can( 'public_message' ) ? ( public_message => $ex->public_message ) : () ),
+            ( $ex->can( 'locale' ) ? ( locale => $ex->locale ) : () ),
+        };
+    }
     # $self->reply({ code => Apache2::Const::HTTP_OK, message => "All is well" } );
     elsif( ref( $_[0] ) eq 'HASH' )
     {
@@ -551,6 +564,7 @@ sub reply
         }
         else
         {
+            # All is good already
         }
     }
     elsif( $self->response->is_error( $code ) )
@@ -846,7 +860,7 @@ Apache2::API - Apache2 API Framework
 
 =head1 VERSION
 
-    v0.1.4
+    v0.2.0
 
 =head1 DESCRIPTION
 
@@ -1034,7 +1048,7 @@ Returns the values from L<Apache2::Server/push_handlers> by passing it whatever 
 
 =head2 reply
 
-This takes an HTTP code and a message, or just a hash reference, B<reply> will find out if the code provided is an error and format the replied json appropriately like:
+This takes an HTTP code and a message, or an exception object such as L<Module::Generic::Exception> or any other object that supports the C<code> and C<message> method, or just a hash reference, B<reply> will find out if the code provided is an error and format the replied json appropriately like:
 
     { "error": { "code": 400, "message": "Some error" } }
 

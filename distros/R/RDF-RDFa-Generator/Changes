@@ -7,6 +7,13 @@ Bug tracker:  <https://github.com/kjetilk/p5-rdf-rdfa-generator/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Maintainer:   Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>
 
+0.204	2024-02-22	Minor updates and transition to Github Actions for CI.
+
+ - Added: Use Github actions for CI.
+ - Improve documentation.
+ - Removed: Remove Travis for CI.
+ - Some minor changes.
+
 0.200	2018-02-11	Extensive changes to support both Attean and Trine. Backwards incompatible changes.
 
  - Added: Many more tests.

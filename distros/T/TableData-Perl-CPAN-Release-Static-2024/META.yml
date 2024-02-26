@@ -20,7 +20,7 @@ name: TableData-Perl-CPAN-Release-Static-2024
 provides:
   TableData::Perl::CPAN::Release::Static::2024:
     file: lib/TableData/Perl/CPAN/Release/Static/2024.pm
-    version: '20240201.0'
+    version: '20240221.0'
 requires:
   File::Basename: '0'
   File::ShareDir: '0'
@@ -34,7 +34,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=TableData-Perl-CPAN-Release-Static-2024
   homepage: https://metacpan.org/release/TableData-Perl-CPAN-Release-Static-2024
   repository: git://github.com/perlancar/perl-TableData-Perl-CPAN-Release-Static-2024.git
-version: '20240201.0'
+version: '20240221.0'
 x_Dist_Zilla:
   perl:
     version: '5.038002'
@@ -332,7 +332,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'
-              version: '0.01'
+              version: '0.021'
             -
               class: Pod::Weaver::Plugin::EnsureUniqueSections
               name: '@Author::PERLANCAR/EnsureUniqueSections'

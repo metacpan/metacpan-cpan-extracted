@@ -7,7 +7,7 @@ use warnings;
 
 =head1 NAME
 
-JavaScript::QuickJS::Date
+JavaScript::QuickJS::Date - JavaScript `Date` in Perl
 
 =head1 SYNOPSIS
 

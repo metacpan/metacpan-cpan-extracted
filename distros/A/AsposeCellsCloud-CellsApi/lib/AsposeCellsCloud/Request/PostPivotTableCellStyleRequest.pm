@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,15 +59,15 @@ sub new {
 
 
 # Run Operation Request
-# PostPivotTableCellStyleRequest.name : The workbook name.  ,
+# PostPivotTableCellStyleRequest.name : The file name.  ,
 # PostPivotTableCellStyleRequest.sheetName : The worksheet name.  ,
-# PostPivotTableCellStyleRequest.pivotTableIndex : Gets the PivotTable report by index.  ,
-# PostPivotTableCellStyleRequest.column : Column index of the cell.  ,
-# PostPivotTableCellStyleRequest.row : RowIndex of the cell.  ,
-# PostPivotTableCellStyleRequest.style : Style description in request body.  ,
-# PostPivotTableCellStyleRequest.needReCalculate : Whether the specific pivot table calculate(true/false).  ,
-# PostPivotTableCellStyleRequest.folder : Original workbook folder.  ,
-# PostPivotTableCellStyleRequest.storageName : Storage name.   
+# PostPivotTableCellStyleRequest.pivotTableIndex : The PivotTable index.  ,
+# PostPivotTableCellStyleRequest.column : The column index of the cell.  ,
+# PostPivotTableCellStyleRequest.row : The row index of the cell.  ,
+# PostPivotTableCellStyleRequest.style : Style Style description in request body.  ,
+# PostPivotTableCellStyleRequest.needReCalculate : Whether the specific PivotTable calculate(true/false).  ,
+# PostPivotTableCellStyleRequest.folder : The folder where the file is situated.  ,
+# PostPivotTableCellStyleRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -78,7 +78,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_pivot_table_cell_style' } = { 
-    	summary => 'Updates cell style in pivot table.',
+    	summary => 'Update cell style in the PivotTable.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -159,7 +159,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -173,49 +173,49 @@ __PACKAGE__->method_documentation({
      'pivot_table_index' => {
      	datatype => 'int',
      	base_name => 'pivotTableIndex',
-     	description => 'Gets the PivotTable report by index.',
+     	description => 'The PivotTable index.',
      	format => '',
      	read_only => '',
      		},
      'column' => {
      	datatype => 'int',
      	base_name => 'column',
-     	description => 'Column index of the cell.',
+     	description => 'The column index of the cell.',
      	format => '',
      	read_only => '',
      		},
      'row' => {
      	datatype => 'int',
      	base_name => 'row',
-     	description => 'RowIndex of the cell.',
+     	description => 'The row index of the cell.',
      	format => '',
      	read_only => '',
      		},
      'style' => {
      	datatype => 'Style',
      	base_name => 'style',
-     	description => 'Style description in request body.',
+     	description => 'Style Style description in request body.',
      	format => '',
      	read_only => '',
      		},
      'need_re_calculate' => {
      	datatype => 'string',
      	base_name => 'needReCalculate',
-     	description => 'Whether the specific pivot table calculate(true/false).',
+     	description => 'Whether the specific PivotTable calculate(true/false).',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

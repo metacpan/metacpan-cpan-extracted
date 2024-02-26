@@ -6,7 +6,6 @@ use base 'Module::Build::XSUtil';
 use Config;
 use File::Spec;
 use File::Which qw(which);
-use File::chdir;
 
 sub is_debug {
     -d '.git';

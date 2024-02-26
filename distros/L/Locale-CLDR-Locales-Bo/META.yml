@@ -22,19 +22,19 @@ name: Locale-CLDR-Locales-Bo
 provides:
   Locale::CLDR::Locales::Bo:
     file: lib/Locale/CLDR/Locales/Bo.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Bo::Any:
-    file: lib/Locale/CLDR/Locales/Bo/Any.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Bo::Any::Cn:
-    file: lib/Locale/CLDR/Locales/Bo/Any/Cn.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Bo::Any::In:
-    file: lib/Locale/CLDR/Locales/Bo/Any/In.pm
-    version: v0.40.1
+    version: v0.44.0
+  Locale::CLDR::Locales::Bo::Tibt:
+    file: lib/Locale/CLDR/Locales/Bo/Tibt.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Bo::Tibt::Cn:
+    file: lib/Locale/CLDR/Locales/Bo/Tibt/Cn.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Bo::Tibt::In:
+    file: lib/Locale/CLDR/Locales/Bo/Tibt/In.pm
+    version: v0.44.0
 requires:
   DateTime: '0.72'
-  Locale::CLDR: v0.40.1
+  Locale::CLDR: v0.44.0
   Moo: '2'
   MooX::ClassAttribute: '0.011'
   Type::Tiny: '0'
@@ -44,5 +44,5 @@ resources:
   bugtracker: https://github.com/ThePilgrim/perlcldr/issues
   homepage: https://github.com/ThePilgrim/perlcldr
   repository: https://github.com/ThePilgrim/perlcldr.git
-version: v0.40.1
+version: v0.44.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

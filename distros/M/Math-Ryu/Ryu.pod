@@ -92,6 +92,15 @@ Math::Ryu - perl interface to Ryu (NV-to-string conversion).
     die with an explanatory message. Other arguments that are not an NV
     will be coerced to NV, following the usual rules that perl employs.
 
+    Note: nv2s() spends some time reformatting the string that the ryu
+          library returned. If you are happy enough with that original
+          string, then save some time by avoiding the reformating and
+          just run d2s() or ld2s() or q2s() - whichever is appropriate
+          for your nvtype. (Or employ your own reformatting sub.)
+          Run the script in the "benchmark" folder of Math-Ryu source
+          distro (perl benchmark.p), for comparative timings of "with"
+          and "without" reformatting.
+
    $str = n2s($sv);
     Handles "integer", "floating point" and "string" values. If the
     argument is a floating point numeric value, then this function returns
@@ -101,6 +110,18 @@ Math::Ryu - perl interface to Ryu (NV-to-string conversion).
     If the argument ($sv) is itself a string, then $str will reflect the
     value of $sv considered in numeric context. For example
     n2s('hello world') would return '0.0', not 'hello world'.
+
+  pnv($nv); # mnemonic: "print nv2s($nv)"
+   prints nv2s($nv) to STDOUT.
+
+  snv($nv); # mnemonic: "say nv2s($nv)"
+   prints nv2s($nv)."\n" to STDOUT.
+
+  pn($arg); # mnemonic: "print n2s($arg)"
+   prints n2s($arg) to STDOUT.
+
+  sn($arg); # mnemonic: "say n2s($arg)"
+   prints n2s($arg)."\n" to STDOUT.
 
   $str = d2s($nv);  # Use only when $Config{nvtype} is 'double'.
     Returns a decimal string representation of the value of $nv in the
@@ -127,41 +148,36 @@ Math::Ryu - perl interface to Ryu (NV-to-string conversion).
           'fmtpy(q2s($nv))' is equivalent to doing 'nv2s($nv))'.
 
    $bool = ryu_lln($sv);
-    This is an interface to the API function 'looks_like_number'.
-    Returns 1 if $sv looks like a number, else returns 0.
-    There's not really any reason to include this subroutine, but
-    it's there to use if it's ever helpful.
+   This is an interface to the API function 'looks_like_number'.
+   Returns 1 if $sv looks like a number, else returns 0.
+   There's not really any reason to include this subroutine, but
+   it's there to use if it's ever helpful.
 
-   $nv = s2d($str); # string to double
-    BE WARNED: This function generally mishandles inf and nan !!
-    AVOID USING IT if non-finite values might be encountered !!!
-    On perl-5.30.0 and later, perl will perform the task reliably,
-    so just use perl.
-    Available only to perls whose $Config{nvsize} is 8. Converts the
-    string ($str) to a double precision floating point value ($nv)
-    and returns it.
+  $nv = s2d($str); # string to double
+   Available only to perls whose $Config{nvsize} is 8. Converts the
+   string ($str) to a double precision floating point value ($nv)
+   and returns it.
 
 =head1 LICENSE
 
-    This perl module is free software; you may redistribute it
-    and/or modify it under the same terms as Perl itself.
-    However, the ".c" and ".h" files that ship with this distro
-    are Copyright 2018 Ulf Adams, and can only be used under the
-    the terms of version 2.0 the Apache License, or of version 1.0
-    of the Boost Software License.
-    A copy of the Apache License (Apache_License.txt) is included
-    with this distro.
+   This perl module is free software; you may redistribute it
+   and/or modify it under the same terms as Perl itself.
+   However, the ".c" and ".h" files that ship with this distro
+   are Copyright 2018 Ulf Adams, and can only be used under the
+   the terms of version 2.0 the Apache License, or of version 1.0
+   of the Boost Software License.
+   A copy of the Apache License (Apache_License.txt) is included
+   with this distro.
 
-    The Apache License can also be found at:
-    http://www.apache.org/licenses/LICENSE-2.0
+   The Apache License can also be found at:
+   http://www.apache.org/licenses/LICENSE-2.0
 
-    The Boost Software License can be found at:
-    https://www.boost.org/LICENSE_1_0.txt
+   The Boost Software License can be found at:
+   https://www.boost.org/LICENSE_1_0.txt
 
-    This perl module is Copyright 2024 Sisyphus
-
+   This perl module is Copyright 2024 Sisyphus
 =head1 AUTHOR
 
-    Sisyphus <sisyphus at(@) cpan dot (.) org>
+   Sisyphus <sisyphus at(@) cpan dot (.) org>
 
 =cut

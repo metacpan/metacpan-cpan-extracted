@@ -1,14 +1,16 @@
 package IO::Prompt::I18N;
 
-our $DATE = '2015-01-03'; # DATE
-our $VERSION = '0.80'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
-require Exporter;
-our @ISA = qw(Exporter);
+use Exporter qw(import);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-11-20'; # DATE
+our $DIST = 'IO-Prompt-I18N'; # DIST
+our $VERSION = '0.81'; # VERSION
+
 our @EXPORT_OK = qw(prompt confirm);
 
 sub prompt {
@@ -121,8 +123,7 @@ sub confirm {
         show_default => $show_default,
         default      => $default,
     });
-    use experimental 'smartmatch';
-    $answer ~~ @{$opts->{yes_words}} ? 1:0;
+    (grep {$_ eq $answer} @{$opts->{yes_words}}) ? 1:0;
 }
 
 1;
@@ -140,7 +141,7 @@ IO::Prompt::I18N - Prompt user question, with some options (including I18N)
 
 =head1 VERSION
 
-This document describes version 0.80 of IO::Prompt::I18N (from Perl distribution IO-Prompt-I18N), released on 2015-01-03.
+This document describes version 0.81 of IO::Prompt::I18N (from Perl distribution IO-Prompt-I18N), released on 2023-11-20.
 
 =head1 SYNOPSIS
 
@@ -227,10 +228,6 @@ Set default value.
 
 =back
 
-=head1 SEE ALSO
-
-L<IO::Prompt>, L<IO::Prompt::Tiny>, L<Term::Prompt>, L<Prompt::Timeout>
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/IO-Prompt-I18N>.
@@ -239,6 +236,39 @@ Please visit the project's homepage at L<https://metacpan.org/release/IO-Prompt-
 
 Source repository is at L<https://github.com/perlancar/perl-IO-Prompt-I18N>.
 
+=head1 SEE ALSO
+
+L<IO::Prompt>, L<IO::Prompt::Tiny>, L<Term::Prompt>, L<Prompt::Timeout>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023, 2015, 2014 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=IO-Prompt-I18N>
@@ -246,16 +276,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2015 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

@@ -13,7 +13,7 @@ Neo4j::Driver::Types - Type mapping from Neo4j to Perl and vice versa
 
 =head1 VERSION
 
-version 0.44
+version 0.45
 
 =head1 MAPPING
 
@@ -165,7 +165,7 @@ you might consider caching the hash ref locally.
 For connecting to a Neo4j server using the Bolt protocol, this
 driver will by default use L<Neo4j::Bolt>. The following bugs
 and limitations related to types are known for the latest
-released version of L<Neo4j::Bolt> at time of this writing:
+released version of L<Neo4j::Bolt> (0.4203 at time of this writing):
 
 =over
 
@@ -180,13 +180,6 @@ relationship properties named C<_end>, C<_node>, C<_labels>,
 C<_relationship>, C<_start>, or C<_type> may not be returned
 correctly. Note that support for all L<Neo4j::Bolt> versions
 earlier than 0.4201 will be phased out entirely soon.
-
-=back
-
-The following additional issues currently exist with Bolt, but
-L<Neo4j::Bolt> S<version 0.5000> is expected to resolve them:
-
-=over
 
 =item *
 L<builtin::true|builtin/"true"> and
@@ -214,17 +207,17 @@ version of L<Neo4j::Driver>:
 =over
 
 =item *
-L<builtin::true|builtin/"true"> and
-L<builtin::false|builtin/"false"> are not yet
-supported in query parameters. Use C<\1> and C<\0>
-or L<JSON::PP::Boolean> instead.
-
-=item *
 Byte arrays are not supported as query parameters.
 Byte arrays are coded as unblessed strings in Jolt results.
 
 =item *
 Temporal and spatial values are not supported as query parameters.
+
+=item *
+The use of L<builtin::true|builtin/"true"> and
+L<builtin::false|builtin/"false"> in query parameters
+requires recent enough JSON module versions
+(S<L<Cpanel::JSON::XS> 4.38> / S<L<JSON::PP> 4.11>).
 
 =back
 
@@ -238,17 +231,17 @@ and limitations related to types are known for JSON:
 =over
 
 =item *
-L<builtin::true|builtin/"true"> and
-L<builtin::false|builtin/"false"> are not yet
-supported in query parameters. Use C<\1> and C<\0>
-or L<JSON::PP::Boolean> instead.
-
-=item *
 Byte arrays are not supported as query parameters.
 Byte arrays are coded as lists of integers in JSON results.
 
 =item *
 Temporal and spatial values are not supported as query parameters.
+
+=item *
+The use of L<builtin::true|builtin/"true"> and
+L<builtin::false|builtin/"false"> in query parameters
+requires recent enough JSON module versions
+(S<L<Cpanel::JSON::XS> 4.38> / S<L<JSON::PP> 4.11>).
 
 =item *
 The value of node or relationship properties named C<_meta>

@@ -36,6 +36,8 @@ find(
         open my $fh, '<', $file
           or die "Can't open $file: $!";
         
+        binmode $fh;
+        
         my $content = do { local $/; <$fh> };
         
         $content =~ s/class +([\w:]+) *\{/class $1 : precompile {/g;
@@ -44,6 +46,8 @@ find(
         
         open my $to_fh, '>', $to_file
           or die "Can't open $to_file: $!";
+        
+        binmode $to_fh;
         
         print $to_fh $content;
         

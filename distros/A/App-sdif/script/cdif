@@ -179,19 +179,21 @@ my %colormap = do {
     my $col = $app->{256} ? 0 : 1;
     pairmap { $a => (ref $b eq 'ARRAY') ? $b->[$col] : $b } (
 	UNKNOWN =>   ""   ,
+	UMARK   => [ "/444" , "/w" ] ,
 	CMARK   =>   "GS" ,
 	OMARK   =>   "CS" ,
 	NMARK   =>   "MS" ,
 	MMARK   =>   "YS" ,
+	UTEXT   =>   ""  ,
 	CTEXT   =>   "G"  ,
 	OTEXT   =>   "C"  ,
 	NTEXT   =>   "M"  ,
 	MTEXT   =>   "Y"  ,
-	COMMAND => [ "555/222E" , "W/KE" ] ,
-	OCHANGE => [ "K/445"    , "BD/W" ] ,
-	NCHANGE => [ "K/445"    , "BD/W" ] ,
-	DELETE  => [ "K/544"    , "RD/W" ] ,
-	APPEND  => [ "K/544"    , "RD/W" ] ,
+	COMMAND => [ "555/222E" , "w/kE" ] ,
+	OCHANGE => [ "K/445"    , "B/w" ] ,
+	NCHANGE => [ "K/445"    , "B/w" ] ,
+	DELETE  => [ "K/544"    , "R/w" ] ,
+	APPEND  => [ "K/544"    , "R/w" ] ,
 	VISIBLE => "",
     );
 };
@@ -337,7 +339,7 @@ my $stdout = App::sdif::Divert->new;
 while (<DIFF>) {
     my($left, $cmd, $right);
     #
-    # normal diff
+    # --linebyline, --lxl option
     #
     if ($app->linebyline) {
 	my $old = $_;
@@ -349,6 +351,9 @@ while (<DIFF>) {
 	print color("OTEXT", $old);
 	print color("NTEXT", $new);
     }
+    #
+    # normal diff
+    #
     elsif (($left, $cmd, $right) = /^([\d,]+)([adc])([\d,]+)\r?$/) {
 	my $command_line = $_;
 	my($old, $del, $new);
@@ -592,13 +597,13 @@ sub compare_unified_generic {
     my $n = $buf->collect(qr/[+]/);
     compare(\$o, \$n, $mark_re) if $app->unit;
     if ($app->color) {
-	$c =~ s/^$mark_re//mg if not $app->mark;
 	map {
 	    my($buf, $m, $t) = @$_;
 	    $$buf =~ s{^($mark_re)(.*)}{
 	    ($app->mark ? color($m, $1) : '') . color($t, $2)
 	    }mge;
-	} ( [ \$o, 'OMARK', 'OTEXT' ],
+	} ( [ \$c, 'UMARK', 'UTEXT' ],
+	    [ \$o, 'OMARK', 'OTEXT' ],
 	    [ \$n, 'NMARK', 'NTEXT' ] );
     } else {
 	map { s/^$mark_re//mg } $c, $o, $n if not $app->mark;
@@ -907,7 +912,7 @@ cdif - word context diff
 
 =head1 VERSION
 
-Version 4.31
+Version 4.32
 
 =head1 SYNOPSIS
 
@@ -1084,6 +1089,7 @@ where the FIELD is one from these :
     COMMAND  Command line
     OMARK    Old mark
     NMARK    New mark
+    UTEXT    Same text
     OTEXT    Old text
     NTEXT    New text
     OCHANGE  Old change part
@@ -1164,6 +1170,7 @@ Defaults are :
     COMMAND => "555/222E"
     OMARK   => "CS"
     NMARK   => "MS"
+    UTEXT   => ""
     OTEXT   => "C"
     NTEXT   => "M"
     OCHANGE => "K/445"
@@ -1179,7 +1186,7 @@ Defaults are :
 This is equivalent to :
 
     cdif --cm 'COMMAND=555/222E,OMARK=CS,NMARK=MS' \
-         --cm 'OTEXT=C,NTEXT=M,*CHANGE=BD/445,DELETE=APPEND=RD/544' \
+         --cm 'UTEXT=,OTEXT=C,NTEXT=M,*CHANGE=BD/445,DELETE=APPEND=RD/544' \
          --cm 'CMARK=GS,MMARK=YS,CTEXT=G,MTEXT=Y'
 
 =item B<--colormap>=C<&func>
@@ -1336,7 +1343,7 @@ them by its result.  Consult L<App::Greple::tee> for detail.
 
 You can use L<teip(1)> command as well.
 
-    teip -g '^(OLD|NEW): -- cdif --lxl
+    teip -g '^(OLD|NEW):' -- cdif --lxl
 
 =back
 

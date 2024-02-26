@@ -5,10 +5,15 @@ lib/PGXN/Site.pm
 lib/PGXN/Site/Controller.pm
 lib/PGXN/Site/Locale.pm
 lib/PGXN/Site/Locale/en.pm
+lib/PGXN/Site/Locale/en/about.html
 lib/PGXN/Site/Locale/en/about.mmd
+lib/PGXN/Site/Locale/en/art.html
 lib/PGXN/Site/Locale/en/art.mmd
+lib/PGXN/Site/Locale/en/faq.html
 lib/PGXN/Site/Locale/en/faq.mmd
+lib/PGXN/Site/Locale/en/feedback.html
 lib/PGXN/Site/Locale/en/feedback.mmd
+lib/PGXN/Site/Locale/en/mirroring.html
 lib/PGXN/Site/Locale/en/mirroring.mmd
 lib/PGXN/Site/Locale/fr.pm
 lib/PGXN/Site/Router.pm

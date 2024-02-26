@@ -3,9 +3,9 @@ package Bencher;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-30'; # DATE
+our $DATE = '2024-02-19'; # DATE
 our $DIST = 'Bencher'; # DIST
-our $VERSION = '1.062.2'; # VERSION
+our $VERSION = '1.062.4'; # VERSION
 
 1;
 # ABSTRACT: A benchmark framework
@@ -22,7 +22,7 @@ Bencher - A benchmark framework
 
 =head1 VERSION
 
-This document describes version 1.062.2 of Bencher (from Perl distribution Bencher), released on 2022-11-30.
+This document describes version 1.062.4 of Bencher (from Perl distribution Bencher), released on 2024-02-19.
 
 =head1 SYNOPSIS
 
@@ -706,7 +706,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

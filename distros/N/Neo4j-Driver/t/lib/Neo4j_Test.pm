@@ -99,6 +99,20 @@ sub transaction_unconnected {
 }
 
 
+# helper for Neo4j::Types v2 bools
+sub bool_ok {
+	my $value = shift;
+	my $name = shift // 'bool_ok';
+	require Scalar::Util;
+	no if defined &builtin::is_bool, 'warnings', 'experimental::builtin';
+	if (defined &builtin::is_bool && builtin::is_bool $value) {
+		Test::More::pass $name;
+		return;
+	}
+	Test::More::ok( Scalar::Util::blessed $value && $value->isa('JSON::PP::Boolean'), $name );
+}
+
+
 1;
 
 __END__

@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -63,8 +63,8 @@ sub new {
 # PutWorkbookCreateRequest.templateFile : The template file, if the data not provided default workbook is created.  ,
 # PutWorkbookCreateRequest.dataFile : Smart marker data file, if the data not provided the request content is checked for the data.  ,
 # PutWorkbookCreateRequest.isWriteOver : Specifies whether to write over targer file.  ,
-# PutWorkbookCreateRequest.folder : Original workbook folder.  ,
-# PutWorkbookCreateRequest.storageName : Storage name.  ,
+# PutWorkbookCreateRequest.folder : The folder where the file is situated.  ,
+# PutWorkbookCreateRequest.storageName : The storage name where the file is situated.  ,
 # PutWorkbookCreateRequest.checkExcelRestriction :    
 
 {
@@ -76,7 +76,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_workbook_create' } = { 
-    	summary => 'Creates new workbook using deferent methods.',
+    	summary => 'Create a new workbook using different methods.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -171,14 +171,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},

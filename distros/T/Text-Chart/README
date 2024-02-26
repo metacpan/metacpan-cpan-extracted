@@ -2,8 +2,8 @@ NAME
     Text::Chart - Generate text-based chart
 
 VERSION
-    This document describes version 0.041 of Text::Chart (from Perl
-    distribution Text-Chart), released on 2021-04-10.
+    This document describes version 0.042 of Text::Chart (from Perl
+    distribution Text-Chart), released on 2024-02-06.
 
 SYNOPSIS
      use Text::Chart qw(gen_text_chart);
@@ -61,20 +61,14 @@ SYNOPSIS
       *     *      *     *     *
      Andi  Budi  Cinta  Dewi  Edi
 
-    "Sparkline chart:"
+    Sparkline chart:
 
-     my $res = gen_text_chart(
-         data => [["Andi",1], ["Budi",5], ["Cinta",3], ["Dewi",9], ["Edi",2]],
-         type => 'column',
-         show_data_label => 1,
-     );
+    Via tchart (from App::tchart) CLI:
 
-     my $res = gen_text_chart(
-         data => [1.5, 0.5, 3.5, 2.5, 5.5, 4.5, 7.5, 6.5],
-         type => 'sparkline',
-     );
+     % tchart -d sales -t sparkline < celine-dion-album-sales.json
+     âââââââââââ
 
-    Result:
+    Horizontal sparkline chart:
 
      XXX
 
@@ -84,8 +78,6 @@ SYNOPSIS
 
 DESCRIPTION
     THIS IS AN EARLY RELEASE, MANY FEATURES ARE NOT YET IMPLEMENTED.
-    Currently only sparkline chart is implemented. Showing data labels and
-    data values are not yet implemented.
 
     This module lets you generate text-based charts.
 
@@ -103,7 +95,11 @@ FUNCTIONS
 
     *   chart_height => *float*
 
+        (No description)
+
     *   chart_width => *float*
+
+        (No description)
 
     *   data* => *array[num]|array[array]|array[hash]*
 
@@ -132,17 +128,27 @@ FUNCTIONS
         columns named "column0", "column1" and so on. Array of hashes will
         have columns named according to the hash keys.
 
-    *   data_column => *str|array[str]*
+    *   data_column => *str_or_aos1::arrayified*
 
         Which column(s) contain data to plot.
 
         Multiple data columns are supported.
 
-    *   label_column => *str*
+    *   label_column => *str_or_aos1::arrayified*
 
-        Which column contains data labels.
+        Which column(s) contain data labels.
 
         If not specified, the first non-numeric column will be selected.
+
+        The number of label columns must match that of data columns.
+
+    *   show_data_label => *bool*
+
+        (No description)
+
+    *   show_data_value => *bool*
+
+        (No description)
 
     *   spec => *hash*
 
@@ -168,13 +174,6 @@ HOMEPAGE
 SOURCE
     Source repository is at <https://github.com/perlancar/perl-Text-Chart>.
 
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Chart>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
 SEE ALSO
     Text::Graph, a mature CPAN module for doing text-based graphs. Before
     writing Text::Chart I used this module for a while, but ran into the
@@ -191,10 +190,36 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2017, 2015, 2014 by
-    perlancar@cpan.org.
+    This software is copyright (c) 2024, 2017, 2015, 2014 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Chart>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

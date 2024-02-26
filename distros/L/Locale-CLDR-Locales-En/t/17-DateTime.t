@@ -26,4 +26,4 @@ my $dt_en_gb = DateTime->new(
 	time_zone  => 'Europe/London',
 );
 
-is ($dt_en_gb->format_cldr($locale->datetime_format_full), 'Tuesday, 25 October 1966 at 07:15:47 Europe/London', 'Date Time Format Full British English ');
+is ($dt_en_gb->format_cldr($locale->datetime_format_full), 'Tuesday 25 October 1966, 07:15:47 Europe/London', 'Date Time Format Full British English ');

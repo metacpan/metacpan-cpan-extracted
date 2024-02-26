@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ewo - Package for language Ewondo
 
 package Locale::CLDR::Locales::Ewo;
 # This file auto generated from Data\common\main\ewo.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -331,7 +331,7 @@ has 'characters' => (
 		return {
 			auxiliary => qr{[c j q x]},
 			index => ['A', 'B', 'D', 'E', 'Ə', 'Ɛ', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'Ŋ', 'O', 'Ɔ', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'Y', 'Z'],
-			main => qr{[a á à â ǎ b d {dz} e é è ê ě ə {ə́} {ə̀} {ə̂} {ə̌} ɛ {ɛ́} {ɛ̀} {ɛ̂} {ɛ̌} f g h i í ì î ǐ k {kp} l m n ń ǹ {ng} {nk} ŋ o ó ò ô ǒ ɔ {ɔ́} {ɔ̀} {ɔ̂} {ɔ̌} p r s t {ts} u ú ù û ǔ v w y z]},
+			main => qr{[aáàâǎ b d {dz} eéèêě ə{ə́}{ə̀}{ə̂}{ə̌} ɛ{ɛ́}{ɛ̀}{ɛ̂}{ɛ̌} f g h iíìîǐ k {kp} l m nńǹ {ng} {nk} ŋ oóòôǒ ɔ{ɔ́}{ɔ̀}{ɔ̂}{ɔ̌} p r s t {ts} uúùûǔ v w y z]},
 			numbers => qr{[  \- ‑ , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
@@ -394,28 +394,6 @@ has 'number_symbols' => (
 			'group' => q( ),
 		},
 	} }
-);
-
-has 'number_formats' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		decimalFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0.###',
-				},
-			},
-		},
-		percentFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0%',
-				},
-			},
-		},
-} },
 );
 
 has 'number_currency_formats' => (
@@ -655,9 +633,14 @@ has 'currencies' => (
 				'currency' => q(Lívələ yá Ǹfúfúb Elɛ́n),
 			},
 		},
-		'SLL' => {
+		'SLE' => {
 			display_name => {
 				'currency' => q(Leóne yá Sierá-leónə),
+			},
+		},
+		'SLL' => {
+			display_name => {
+				'currency' => q(Leóne yá Sierá-leónə \(1964—2022\)),
 			},
 		},
 		'SOS' => {
@@ -879,10 +862,6 @@ has 'day_periods' => (
 					'am' => q{kíkíríg},
 					'pm' => q{ngəgógəle},
 				},
-				'wide' => {
-					'am' => q{kíkíríg},
-					'pm' => q{ngəgógəle},
-				},
 			},
 		},
 	} },
@@ -963,17 +942,12 @@ has 'datetime_formats_available_formats' => (
 	default		=> sub { {
 		'generic' => {
 			Ed => q{d E},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
 			MEd => q{E d/M},
-			MMM => q{LLL},
 			MMMEd => q{E d MMM},
 			MMMd => q{d MMM},
 			Md => q{d/M},
-			d => q{d},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
 			ms => q{m:ss},
 			y => q{y},
 			yM => q{M/y},
@@ -987,19 +961,13 @@ has 'datetime_formats_available_formats' => (
 		},
 		'gregorian' => {
 			Ed => q{d E},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
 			MEd => q{E d/M},
-			MMM => q{LLL},
 			MMMEd => q{E d MMM},
 			MMMd => q{d MMM},
 			Md => q{d/M},
-			d => q{d},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
 			ms => q{m:ss},
-			y => q{y},
 			yM => q{M/y},
 			yMEd => q{E d/M/y},
 			yMMM => q{MMM y},

@@ -1,5 +1,5 @@
 package Catalyst::Controller::DBIC::API::Validator::Visitor;
-$Catalyst::Controller::DBIC::API::Validator::Visitor::VERSION = '2.008001';
+$Catalyst::Controller::DBIC::API::Validator::Visitor::VERSION = '2.009000';
 #ABSTRACT: Provides validation services for inbound requests against whitelisted parameters
 use Moose;
 use namespace::autoclean;
@@ -95,7 +95,7 @@ Catalyst::Controller::DBIC::API::Validator::Visitor - Provides validation servic
 
 =head1 VERSION
 
-version 2.008001
+version 2.009000
 
 =head1 PRIVATE_ATTRIBUTES
 
@@ -136,7 +136,7 @@ Samuel Kaufman <sam@socialflow.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Luke Saunders, Nicholas Perez, Alexander Hartmaier, et al.
+This software is copyright (c) 2024 by Luke Saunders, Nicholas Perez, Alexander Hartmaier, et al.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

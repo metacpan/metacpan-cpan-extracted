@@ -1,7 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/ProgUtils/list_all_programs_in_path
-# and generated automatically using Perinci::CmdLine::Gen version 0.501
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-09'; # DATE
+our $DATE = '2023-12-03'; # DATE
 our $DIST = 'App-ProgUtils'; # DIST
-our $VERSION = '0.203'; # VERSION
+our $VERSION = '0.204'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/ProgUtils/list_all_programs_in_path",
@@ -38,11 +38,15 @@ list-all-programs-in-path - List all programs in PATH
 
 =head1 VERSION
 
-This document describes version 0.203 of list-all-programs-in-path (from Perl distribution App-ProgUtils), released on 2022-08-09.
+This document describes version 0.204 of list-all-programs-in-path (from Perl distribution App-ProgUtils), released on 2023-12-03.
 
 =head1 SYNOPSIS
 
-% B<list-all-programs-in-path> [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--with-path>|B<-x>|B<--without-path>]
+B<list-all-programs-in-path> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<list-all-programs-in-path> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<list-all-programs-in-path> [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--with-path|/"-x">>|B<L<-x|/"-x">>|B<L<--without-path|/"-x">>]
 
 =head1 OPTIONS
 
@@ -53,6 +57,9 @@ C<*> marks required options.
 =over
 
 =item B<--with-path>
+
+(No description)
+
 
 =item B<-x>
 
@@ -201,13 +208,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2019, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020, 2019, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,43 +1,59 @@
 NAME
-    Acme::CPANModules::Org - Modules related to Org format
+    Acme::CPANModules::Org - List of modules related to Org format
 
 VERSION
-    This document describes version 0.004 of Acme::CPANModules::Org (from
-    Perl distribution Acme-CPANModules-Org), released on 2021-05-17.
+    This document describes version 0.005 of Acme::CPANModules::Org (from
+    Perl distribution Acme-CPANModules-Org), released on 2023-10-29.
 
 DESCRIPTION
 ACME::CPANMODULES ENTRIES
-    *   App::org2wp
+    App::org2wp
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   App::orgdaemon
+    App::orgdaemon
+        Author: SREZIC <https://metacpan.org/author/SREZIC>
 
-    *   App::orgsel
+    App::orgsel
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   App::OrgUtils
+    App::OrgUtils
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Data::CSel
+    Data::CSel
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Data::Dmp::Org
+    Data::Dmp::Org
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Org::Dump
+    Org::Dump
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Org::Examples
+    Org::Examples
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Org::Parser
+    Org::Parser
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Org::Parser::Tiny
+    Org::Parser::Tiny
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Org::To::HTML
+    Org::To::HTML
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Org::To::HTML::WordPress
+    Org::To::HTML::WordPress
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Org::To::Pod
+    Org::To::Pod
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Org::To::Text
+    Org::To::Text
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Org::To::VCF
+    Org::To::VCF
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Text::Table::Org
+    Text::Table::Org
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
 FAQ
   What is an Acme::CPANModules::* module?
@@ -48,8 +64,13 @@ FAQ
 
   What are ways to use this Acme::CPANModules module?
     Aside from reading this Acme::CPANModules module's POD documentation,
-    you can install all the listed modules (entries) using cpanmodules CLI
-    (from App::cpanmodules distribution):
+    you can install all the listed modules (entries) using cpanm-cpanmodules
+    script (from App::cpanm::cpanmodules distribution):
+
+     % cpanm-cpanmodules -n Org
+
+    Alternatively you can use the cpanmodules CLI (from App::cpanmodules
+    distribution):
 
         % cpanmodules ls-entries Org | cpanm -n
 
@@ -63,7 +84,9 @@ FAQ
 
     This Acme::CPANModules module also helps lcpan produce a more meaningful
     result for "lcpan related-mods" command when it comes to finding related
-    modules for the modules listed in this Acme::CPANModules module.
+    modules for the modules listed in this Acme::CPANModules module. See
+    App::lcpan::Cmd::related_mods for more details on how "related modules"
+    are found.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -72,13 +95,6 @@ HOMEPAGE
 SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-Acme-CPANModules-Org>.
-
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://github.com/perlancar/perl-Acme-CPANModules-Org/issues>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
     <https://orgmode.org>
@@ -90,9 +106,33 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2023, 2021, 2020, 2019 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Org>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

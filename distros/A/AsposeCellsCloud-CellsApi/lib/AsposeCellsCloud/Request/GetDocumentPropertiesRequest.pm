@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -60,9 +60,9 @@ sub new {
 
 # Run Operation Request
 # GetDocumentPropertiesRequest.name : The workbook name.  ,
-# GetDocumentPropertiesRequest.type :   ,
-# GetDocumentPropertiesRequest.folder : Original workbook folder.  ,
-# GetDocumentPropertiesRequest.storageName : Storage name.   
+# GetDocumentPropertiesRequest.type : Excel property type.  ,
+# GetDocumentPropertiesRequest.folder : The folder where the file is situated.  ,
+# GetDocumentPropertiesRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -73,7 +73,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_document_properties' } = { 
-    	summary => 'Get document properties description.',
+    	summary => 'Retrieve descriptions of Excel file properties.',
         params => $params,
         returns => 'CellsDocumentPropertiesResponse',
     };
@@ -135,21 +135,21 @@ __PACKAGE__->method_documentation({
      'type' => {
      	datatype => 'string',
      	base_name => 'type',
-     	description => '',
+     	description => 'Excel property type.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

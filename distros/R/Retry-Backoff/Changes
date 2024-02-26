@@ -1,3 +1,10 @@
+0.006   2024-02-24  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Use sleep() from Time::HiRes to support
+          subsecond/fractional second, since we already use Time::HiRes for
+          time() anyway (GH#3).
+
+
 0.005   2023-01-08  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

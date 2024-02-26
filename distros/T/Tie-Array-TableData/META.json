@@ -48,7 +48,7 @@
    "provides" : {
       "Tie::Array::TableData" : {
          "file" : "lib/Tie/Array/TableData.pm",
-         "version" : "0.001"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -63,7 +63,7 @@
          "web" : "https://github.com/perlancar/perl-Tie-Array-TableData"
       }
    },
-   "version" : "0.001",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038002"

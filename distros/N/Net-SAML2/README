@@ -2,7 +2,7 @@ NAME
     Net::SAML2 - SAML2 bindings and protocol implementation
 
 VERSION
-    version 0.77
+    version 0.78
 
 SYNOPSIS
       See TUTORIAL.md for implementation documentation and
@@ -83,6 +83,7 @@ DESCRIPTION
     GSuite (Google)
     Jump
     Keycloak
+    MockSAML (https://mocksaml.com/)
     Mircosoft ADFS
     Okta
     OneLogin

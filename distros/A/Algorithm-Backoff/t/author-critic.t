@@ -11,5 +11,13 @@ BEGIN {
 use strict;
 use warnings;
 
-use Test::Perl::Critic (-profile => "perlcritic.rc") x!! -e "perlcritic.rc";
-all_critic_ok();
+# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.006
+
+use Test::Perl::Critic (-profile => "") x!! -e "";
+
+my $filenames = ['lib/Algorithm/Backoff.pm','lib/Algorithm/Backoff/Constant.pm','lib/Algorithm/Backoff/Exponential.pm','lib/Algorithm/Backoff/Fibonacci.pm','lib/Algorithm/Backoff/LILD.pm','lib/Algorithm/Backoff/LIMD.pm','lib/Algorithm/Backoff/MILD.pm','lib/Algorithm/Backoff/MIMD.pm'];
+unless ($filenames && @$filenames) {
+    $filenames = -d "blib" ? ["blib"] : ["lib"];
+}
+
+all_critic_ok(@$filenames);

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 5;
+use Test::More tests => 7;
 
 use Games::Sudoku::PatternSolver qw( solve $VERBOSE $MAX_SOLUTIONS $LOOSE_MODE $USE_LOGIC );
 
@@ -22,6 +22,12 @@ my $result = solve($seven_givens);
 is($result, 0, "warns underdetermined");
 
 $LOOSE_MODE = 1;
+$result = solve($seven_givens);
+
+is($result->{solutionCount}, 1, "accepted with loose mode");
+
+is($result->{candidatesDropped}, 21, "candidates were dropped");
+
 $result = solve($six_givens);
 is($result->{solutionCount}, 2, "solves 6 givens");
 

@@ -38,5 +38,5 @@ my $dt_fr_be = DateTime->new(
 	time_zone  => 'Europe/London',
 );
 
-is ($dt_fr_fr->format_cldr($locale->datetime_format_full), 'mardi 25 octobre 1966 à 07:15:47 Europe/London', 'Date Time Format Full French');
-is ($dt_fr_be->format_cldr($other_locale->datetime_format_full), 'mardi 25 octobre 1966 à 7 h 15 min 47 s Europe/London', 'Date Time Format Full Belgium French');
+is ($dt_fr_fr->format_cldr($locale->datetime_format_full), 'mardi 25 octobre 1966, 07:15:47 Europe/London', 'Date Time Format Full French');
+is ($dt_fr_be->format_cldr($other_locale->datetime_format_full), 'mardi 25 octobre 1966, 7 h 15 min 47 s Europe/London', 'Date Time Format Full Belgium French');

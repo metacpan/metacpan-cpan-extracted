@@ -2,37 +2,26 @@ NAME
     App::SubtitleUtils - Utilities related to video subtitles
 
 VERSION
-    This document describes version 0.012 of App::SubtitleUtils (from Perl
-    distribution App-SubtitleUtils), released on 2022-11-23.
+    This document describes version 0.013 of App::SubtitleUtils (from Perl
+    distribution App-SubtitleUtils), released on 2024-01-13.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
 
-    *   srtadjust
-
-    *   srtcalc
-
-    *   srtcheck
-
-    *   srtcombine2text
-
-    *   srtcombinetext
-
-    *   srtparse
-
-    *   srtrenumber
-
-    *   srtscale
-
-    *   srtshift
-
-    *   srtsplit
-
-    *   subscale
-
-    *   subshift
-
-    *   vtt2srt
+    1. rename-subtitle-files-like-their-movie-files
+    2. srtadjust
+    3. srtcalc
+    4. srtcheck
+    5. srtcombine2text
+    6. srtcombinetext
+    7. srtparse
+    8. srtrenumber
+    9. srtscale
+    10. srtshift
+    11. srtsplit
+    12. subscale
+    13. subshift
+    14. vtt2srt
 
 FUNCTIONS
   srtcheck
@@ -248,7 +237,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022, 2021, 2020 by perlancar
+    This software is copyright (c) 2024, 2022, 2021, 2020 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

@@ -1,13 +1,13 @@
 Build.PL
 lib/Locale/CLDR/Locales/De.pm
-lib/Locale/CLDR/Locales/De/Any.pm
-lib/Locale/CLDR/Locales/De/Any/At.pm
-lib/Locale/CLDR/Locales/De/Any/Be.pm
-lib/Locale/CLDR/Locales/De/Any/Ch.pm
-lib/Locale/CLDR/Locales/De/Any/De.pm
-lib/Locale/CLDR/Locales/De/Any/It.pm
-lib/Locale/CLDR/Locales/De/Any/Li.pm
-lib/Locale/CLDR/Locales/De/Any/Lu.pm
+lib/Locale/CLDR/Locales/De/Latn.pm
+lib/Locale/CLDR/Locales/De/Latn/At.pm
+lib/Locale/CLDR/Locales/De/Latn/Be.pm
+lib/Locale/CLDR/Locales/De/Latn/Ch.pm
+lib/Locale/CLDR/Locales/De/Latn/De.pm
+lib/Locale/CLDR/Locales/De/Latn/It.pm
+lib/Locale/CLDR/Locales/De/Latn/Li.pm
+lib/Locale/CLDR/Locales/De/Latn/Lu.pm
 MANIFEST			This list of files
 README
 t/00-load.t

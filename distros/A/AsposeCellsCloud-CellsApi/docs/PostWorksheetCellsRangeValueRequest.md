@@ -8,12 +8,12 @@ use AsposeCellsCloud::Request::PostWorksheetCellsRangeValue;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**name** | **string** | The workbook name. |
+**name** | **string** | The file name. |
 **sheet_name** | **string** | The worksheet name. |
-**range** | **Range** | range in worksheet  |
-**value** | **string** | Input value |
+**range** | **Range** | The range in worksheet.  |
+**value** | **string** | Input value. |
 **is_converted** | **boolean** | True: converted to other data type if appropriate. |
-**set_style** | **boolean** | True: set the number format to cell's style when converting to other data type |
+**set_style** | **boolean** | True: set the number format to cell's style when converting to other data type. |
 **folder** | **string** | Original workbook folder. |
 **storage_name** | **string** | Storage name. |  
 

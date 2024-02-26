@@ -1,12 +1,12 @@
 {
-   "abstract" : "A Test::Builder based module to ease testing with files and dirs",
+   "abstract" : "A Test::Builder based Perl module to ease testing with files and dirs.",
    "author" : [
-      "Phil Crow <phil@localdomain>"
+      "Jurij Fajnberg <fajnbergj@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -32,15 +32,38 @@
       },
       "runtime" : {
          "requires" : {
-            "Algorithm::Diff" : "0",
+            "Const::Fast" : "0",
+            "Cwd" : "0",
+            "Data::Compare" : "0",
+            "Exporter" : "0",
+            "Fcntl" : "0",
+            "PadWalker" : "0",
+            "Path::Tiny" : "0.144",
             "Test::Builder" : "0",
-            "Test::Builder::Tester" : "0",
-            "Test::More" : "0",
-            "Text::Diff" : "0"
+            "Text::Diff" : "0",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Copy::Recursive" : "0",
+            "FindBin" : "0",
+            "Test::Expander" : "0",
+            "Test::Simple" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.15",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jsf116/Test-Files/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/jsf116/Test-Files.git",
+         "web" : "https://github.com/jsf116/Test-Files"
+      }
+   },
+   "version" : "0.23",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

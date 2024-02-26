@@ -1,7 +1,7 @@
 Build.PL
 lib/Locale/CLDR/Locales/Xog.pm
-lib/Locale/CLDR/Locales/Xog/Any.pm
-lib/Locale/CLDR/Locales/Xog/Any/Ug.pm
+lib/Locale/CLDR/Locales/Xog/Latn.pm
+lib/Locale/CLDR/Locales/Xog/Latn/Ug.pm
 MANIFEST			This list of files
 README
 t/00-load.t

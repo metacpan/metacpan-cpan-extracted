@@ -1,3 +1,8 @@
+0.457   2024-02-18  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Forgot to give up when max retries have been reached.
+
+
 0.456   2023-07-12  Released-By: PERLANCAR; Urgency: medium
 
         - No functional changes.

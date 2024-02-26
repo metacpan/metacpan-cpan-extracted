@@ -2,19 +2,19 @@
 
 =head1 NAME
 
-Locale::CLDR::Locales::Ff::Adlm::Gm - Package for language Fulah
+Locale::CLDR::Locales::Ff::Adlm::Gm - Package for language Fula
 
 =cut
 
 package Locale::CLDR::Locales::Ff::Adlm::Gm;
 # This file auto generated from Data\common\main\ff_Adlm_GM.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';

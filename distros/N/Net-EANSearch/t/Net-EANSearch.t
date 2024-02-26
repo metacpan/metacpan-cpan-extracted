@@ -8,11 +8,12 @@
 use strict;
 use warnings;
 
-use Test::More tests => 1;
+use Test::More tests => 3;
+use Test::NoWarnings;
 BEGIN { use_ok('Net::EANSearch') };
 
 #########################
 
-# Insert your test code below, the Test::More module is use()ed here so read
-# its man page ( perldoc Test::More ) for help writing this test script.
+my $eansearch = Net::EANSearch->new('invalid-token');
+ok(defined($eansearch));
 

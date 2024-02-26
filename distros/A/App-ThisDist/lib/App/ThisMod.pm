@@ -3,9 +3,9 @@ package App::ThisMod;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-05'; # DATE
+our $DATE = '2024-01-06'; # DATE
 our $DIST = 'App-ThisDist'; # DIST
-our $VERSION = '0.022'; # VERSION
+our $VERSION = '0.023'; # VERSION
 
 1;
 # ABSTRACT: Synonym for App::ThisDist
@@ -22,7 +22,7 @@ App::ThisMod - Synonym for App::ThisDist
 
 =head1 VERSION
 
-This document describes version 0.022 of App::ThisMod (from Perl distribution App-ThisDist), released on 2024-01-05.
+This document describes version 0.023 of App::ThisMod (from Perl distribution App-ThisDist), released on 2024-01-06.
 
 =head1 DESCRIPTION
 

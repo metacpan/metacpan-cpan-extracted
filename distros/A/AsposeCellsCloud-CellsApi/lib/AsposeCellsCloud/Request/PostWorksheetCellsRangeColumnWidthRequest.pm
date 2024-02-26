@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,9 +59,9 @@ sub new {
 
 
 # Run Operation Request
-# PostWorksheetCellsRangeColumnWidthRequest.name : The workbook name.  ,
+# PostWorksheetCellsRangeColumnWidthRequest.name : The file name.  ,
 # PostWorksheetCellsRangeColumnWidthRequest.sheetName : The worksheet name.  ,
-# PostWorksheetCellsRangeColumnWidthRequest.range : The range object.  ,
+# PostWorksheetCellsRangeColumnWidthRequest.range : Range The range object.  ,
 # PostWorksheetCellsRangeColumnWidthRequest.value : Sets the column width of this range.  ,
 # PostWorksheetCellsRangeColumnWidthRequest.folder : Original workbook folder.  ,
 # PostWorksheetCellsRangeColumnWidthRequest.storageName : Storage name.   
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_worksheet_cells_range_column_width' } = { 
-    	summary => 'Sets column width of range.',
+    	summary => 'Set the column width of the specified range.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -142,7 +142,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -156,7 +156,7 @@ __PACKAGE__->method_documentation({
      'range' => {
      	datatype => 'Range',
      	base_name => 'range',
-     	description => 'The range object.',
+     	description => 'Range The range object.',
      	format => '',
      	read_only => '',
      		},

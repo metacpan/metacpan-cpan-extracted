@@ -174,7 +174,7 @@ $override->override('Net::SAML2::Protocol::AuthnRequest::_build_id' =>
         is_passive  => 0,
     );
 
-    my $req = $sp->authn_request($sp->id, '', %params,);
+    my $req = $sp->authn_request($sp->issuer, '', %params,);
 
     my $xp = get_xpath(
         $req->as_xml,

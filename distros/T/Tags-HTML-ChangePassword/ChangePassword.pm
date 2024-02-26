@@ -12,7 +12,7 @@ use Tags::HTML::Messages;
 
 Readonly::Array our @FORM_METHODS => qw(post get);
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Constructor.
 sub new {
@@ -89,6 +89,10 @@ sub _cleanup {
 sub _prepare {
 	my ($self, $message_types_hr) = @_;
 
+	if (! defined $message_types_hr) {
+		err 'No message types to init.';
+	}
+
 	$self->{'_message_types'} = $message_types_hr;
 
 	return;
@@ -96,6 +100,10 @@ sub _prepare {
 
 sub _init {
 	my ($self, $messages_ar) = @_;
+
+	if (! defined $messages_ar) {
+		err 'No messages to init.';
+	}
 
 	$self->{'_messages'} = $messages_ar;
 
@@ -274,6 +282,7 @@ Tags::HTML::ChangePassword - Tags helper for change password.
  use Tags::HTML::ChangePassword;
 
  my $obj = Tags::HTML::ChangePassword->new(%params);
+ $obj->cleanup;
  $obj->prepare($message_types_hr);
  $obj->init($messages_ar);
  $obj->process;
@@ -344,6 +353,14 @@ Default value is:
 
 Returns instance of object.
 
+=head2 C<cleanup>
+
+ $obj->cleanup;
+
+Process cleanup after page run.
+
+Returns undef.
+
 =head2 C<init>
 
  $obj->init($messages_ar);
@@ -388,6 +405,12 @@ Returns undef.
          From Tags::HTML::new():
                  Parameter 'css' must be a 'CSS::Struct::Output::*' class.
                  Parameter 'tags' must be a 'Tags::Output::*' class.
+
+ init():
+         No messages to init.
+
+ prepare():
+         No message types to init.
 
  process():
          From Tags::HTML::process():
@@ -555,7 +578,7 @@ Returns undef.
 =begin html
 
 <a href="https://raw.githubusercontent.com/michal-josef-spacek/Tags-HTML-ChangePassword/master/images/plack_app_change_password.png">
-  <img src="https://raw.githubusercontent.com/michal-josef-spacek/Tags-HTML-Login-ChangePassword/master/images/plack_app_change_password.png" alt="Web app example" width="300px" height="300px" />
+  <img src="https://raw.githubusercontent.com/michal-josef-spacek/Tags-HTML-ChangePassword/master/images/plack_app_change_password.png" alt="Web app example" width="300px" height="300px" />
 </a>
 
 =end html
@@ -605,6 +628,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

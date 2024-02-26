@@ -170,7 +170,5 @@ p5-Template-Toolkit p5-YAML-LibYAML p5-App-cpanminus`
 	- install client
 	- db server setup
   - CAPEv2
-  - snmp setup
 - better documentation for Suricata outputs
-- use File::Spec->canonpath every where relevant
 - lots more documentation

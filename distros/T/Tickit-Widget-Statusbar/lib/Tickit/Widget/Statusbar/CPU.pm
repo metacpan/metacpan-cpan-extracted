@@ -3,7 +3,7 @@ package Tickit::Widget::Statusbar::CPU;
 use strict;
 use warnings;
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 use parent qw(Tickit::Widget);

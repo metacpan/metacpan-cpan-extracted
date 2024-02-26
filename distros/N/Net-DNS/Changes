@@ -1,4 +1,10 @@
-$Id: Changes 1964 2024-01-26 14:49:12Z willem $                       -*-text-*-
+$Id: Changes 1968 2024-02-15 11:42:31Z willem $                       -*-text-*-
+
+
+**** 1.44 Feb 15, 2024
+
+	Simplify testing of resolver error paths.
+	Prevent read beyond end of RDATA in corrupt SVCB RR.
 
 
 **** 1.43 Jan 26, 2024

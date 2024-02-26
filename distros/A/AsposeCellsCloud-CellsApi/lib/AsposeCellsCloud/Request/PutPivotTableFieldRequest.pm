@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,14 +59,14 @@ sub new {
 
 
 # Run Operation Request
-# PutPivotTableFieldRequest.name : The workbook name.  ,
+# PutPivotTableFieldRequest.name : The file name.  ,
 # PutPivotTableFieldRequest.sheetName : The worksheet name.  ,
-# PutPivotTableFieldRequest.pivotTableIndex : Gets the PivotTable report by index.  ,
+# PutPivotTableFieldRequest.pivotTableIndex : The PivotTable index.  ,
 # PutPivotTableFieldRequest.pivotFieldType : The fields area type.  ,
-# PutPivotTableFieldRequest.pivotTableFieldRequest : Dto that conrains field indexes  ,
-# PutPivotTableFieldRequest.needReCalculate : Whether the specific pivot table calculate(true/false).  ,
-# PutPivotTableFieldRequest.folder : Original workbook folder.  ,
-# PutPivotTableFieldRequest.storageName : Storage name.   
+# PutPivotTableFieldRequest.pivotTableFieldRequest : PivotTableFieldRequest The PivotTable field request.  ,
+# PutPivotTableFieldRequest.needReCalculate : Whether the specific PivotTable calculate(true/false).  ,
+# PutPivotTableFieldRequest.folder : The folder where the file is situated.  ,
+# PutPivotTableFieldRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -77,7 +77,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_pivot_table_field' } = { 
-    	summary => 'Adds a pivot field in pivot table',
+    	summary => 'Add a pivot field in the PivotTable.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -154,7 +154,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -168,7 +168,7 @@ __PACKAGE__->method_documentation({
      'pivot_table_index' => {
      	datatype => 'int',
      	base_name => 'pivotTableIndex',
-     	description => 'Gets the PivotTable report by index.',
+     	description => 'The PivotTable index.',
      	format => '',
      	read_only => '',
      		},
@@ -182,28 +182,28 @@ __PACKAGE__->method_documentation({
      'pivot_table_field_request' => {
      	datatype => 'PivotTableFieldRequest',
      	base_name => 'pivotTableFieldRequest',
-     	description => 'Dto that conrains field indexes',
+     	description => 'PivotTableFieldRequest The PivotTable field request.',
      	format => '',
      	read_only => '',
      		},
      'need_re_calculate' => {
      	datatype => 'string',
      	base_name => 'needReCalculate',
-     	description => 'Whether the specific pivot table calculate(true/false).',
+     	description => 'Whether the specific PivotTable calculate(true/false).',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

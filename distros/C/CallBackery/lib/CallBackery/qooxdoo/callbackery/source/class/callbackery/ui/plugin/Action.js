@@ -25,6 +25,7 @@ qx.Class.define("callbackery.ui.plugin.Action", {
         this._urlActions = [];
         this._buttonMap = {};
         this._buttonSetMap = {};
+        this._menuButtonSetMap = {};
         this._cfg = cfg;
         this._populate(cfg, buttonClass, getFormData);
         plugin.addOwnedQxObject(this, 'Action');
@@ -124,6 +125,8 @@ qx.Class.define("callbackery.ui.plugin.Action", {
         _tableMenu: null,
         _defaultAction: null,
         _buttonMap: null,
+        _buttonSetMap: null,
+        _menuButtonSetMap: null,
         _urlActions: null,
         _mobileMenu: null,
         _print(content, left, top) {
@@ -138,35 +141,55 @@ qx.Class.define("callbackery.ui.plugin.Action", {
             win.print();
         },
         _populate(cfg, buttonClass, getFormData) {
-            var tm = this._tableMenu = new qx.ui.menu.Menu;
+            let tm = this._tableMenu = new qx.ui.menu.Menu;
             let mm = this._mobileMenu = new qx.ui.menu.Menu;
-            var menues = {};
-            var mmMenues = {};
+            let menues = {};
+            let mmMenues = {};
             cfg.action.forEach(function (btCfg) {
-                var button, menuButton, mmButton;
-                var label = btCfg.label ? this.xtr(btCfg.label) : null;
+                let button, menuButton, mmButton;
+                // label for form and context menu buttons
+                let label = btCfg.label ? this.xtr(btCfg.label) : null;
+                // label for mobile menu buttons
+                let menuLabel = btCfg.menuLabel ? this.xtr(btCfg.menuLabel) : null;
+                let bs  = btCfg.buttonSet,
+                    mbs = btCfg.menuButtonSet;
+                if (bs) {
+                    if (bs.label) {
+                        bs.label = this.xtr(bs.label);
+                    }
+                }
+                if (mbs) {
+                    if (mbs.label) {
+                        mbs.label = this.xtr(mbs.label);
+                    }
+                }
+                else if (bs) { // use buttonSet as menuButtonSet if no menuButtonSet is given
+                    mbs = bs;
+                }
+
                 switch (btCfg.action) {
                     case 'menu':
-                        var menu = menues[btCfg.key] = new qx.ui.menu.Menu;
-                        var mmMenu = mmMenues[btCfg.key] = new qx.ui.menu.Menu;
+                        let menu = menues[btCfg.key] = new qx.ui.menu.Menu;
+                        let mmMenu = mmMenues[btCfg.key] = new qx.ui.menu.Menu;
                         if (btCfg.addToMenu != null) { // add submenu to menu
                             button = new qx.ui.menu.Button(label, null, null, menu)
-                            mmButton = new qx.ui.menu.Button(label, null, null, mmMenu)
+                            mmButton = new qx.ui.menu.Button(menuLabel || label, null, null, mmMenu)
                             menues[btCfg.addToMenu].add(button);
                             mmMenues[btCfg.addToMenu].add(mmButton);
                         }
                         else { // add menu to form
                             button = new qx.ui.form.MenuButton(label, null, menu);
-                            mmButton = new qx.ui.menu.Button(label, null, null, mmMenu);
-                            if (btCfg.buttonSet) {
-                                var bs = btCfg.buttonSet;
-                                if (bs.label) {
-                                    bs.label = this.xtr(bs.label);
-                                }
+                            mmButton = new qx.ui.menu.Button(menuLabel || label, null, null, mmMenu);
+                            if (bs) {
                                 button.set(bs);
-                                mmButton.set(bs);
                                 if (btCfg.key) {
                                     this._buttonSetMap[btCfg.key] = bs;
+                                }
+                            }
+                            if (mbs) {
+                                mmButton.set(mbs);
+                                if (btCfg.key) {
+                                    this._menuButtonSetMap[btCfg.key] = mbs;
                                 }
                             }
                             this.add(button);
@@ -182,7 +205,7 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                                 + 'mmButton';
                             this.addOwnedQxObject(mmButton, mmBtnId);
                         }
-                        this._bindButtonPropperties(button, mmButton);
+                        this._bindButtonProperties(button, mmButton);
                         return;
                     case 'save':
                     case 'submitVerify':
@@ -193,7 +216,7 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                     case 'cancel':
                     case 'download':
                     case 'display':
-                        mmButton = new qx.ui.menu.Button(label);
+                        mmButton = new qx.ui.menu.Button(menuLabel || label);
                         if (btCfg.addToMenu != null) {
                             button = new qx.ui.menu.Button(label);
                         }
@@ -211,15 +234,17 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                                 });
                             }
                         }
-                        if (btCfg.buttonSet) {
-                            var bs = btCfg.buttonSet;
-                            if (bs.label) {
-                                bs.label = this.xtr(bs.label);
-                            }
+
+                        if (bs) {
                             button.set(bs);
-                            mmButton.set(bs);
                             if (btCfg.key) {
                                 this._buttonSetMap[btCfg.key] = bs;
+                            }
+                        }
+                        if (mbs) {
+                            mmButton.set(mbs);
+                            if (btCfg.key) {
+                                this._menuButtonSetMap[btCfg.key] = mbs;
                             }
                         }
 
@@ -515,6 +540,7 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                 }
             }, this);
         },
+
         _makeUploadButton(cfg, btCfg, getFormData, buttonClass) {
             var button;
             var label = btCfg.label ? this.xtr(btCfg.label) : null;
@@ -558,7 +584,6 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                     );
                 }
             }, this);
-
 
             return button;
         },
@@ -618,6 +643,9 @@ qx.Class.define("callbackery.ui.plugin.Action", {
         getButtonSetMap() {
             return this._buttonSetMap;
         },
+        getMenuButtonSetMap() {
+            return this._menuButtonSetMap;
+        },
         _bindButtonProperties(button, mmButton) {
             ['visibility', 'enabled', 'label', 'icon'].forEach((prop) => {
                 button.bind(prop, mmButton, prop);
@@ -633,5 +661,5 @@ qx.Class.define("callbackery.ui.plugin.Action", {
             btn.destroy();
         }
     },
-    
+
 });

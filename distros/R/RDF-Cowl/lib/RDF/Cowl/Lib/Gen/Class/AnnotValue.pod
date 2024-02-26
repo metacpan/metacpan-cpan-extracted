@@ -1,0 +1,60 @@
+# PODNAME: RDF::Cowl::Lib::Gen::Class::AnnotValue
+# ABSTRACT: Generated docs for RDF::Cowl::AnnotValue
+
+## DO NOT EDIT
+## Generated via maint/tt/Class.pod.tt
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+RDF::Cowl::Lib::Gen::Class::AnnotValue - Generated docs for RDF::Cowl::AnnotValue
+
+=head1 VERSION
+
+version 1.0.0
+
+=head1 MAIN MODULE
+
+L<RDF::Cowl::AnnotValue>
+
+=head1 METHODS
+
+=head2 get_type
+
+B<Signature>:
+
+  $self->get_type()
+
+B<Params>:
+
+  CowlAnyAnnotValue $value 
+
+Documentation:
+
+  Gets the type of the specified annotation value.
+  
+  @param value The annotation value.
+  @return The type.
+
+=over 2
+
+B<C function name>: C<< cowl_annot_value_get_type >>
+
+=back
+
+=head1 AUTHOR
+
+Zakariyya Mughal <zmughal@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 by Auto-Parallel Technologies, Inc..
+
+This is free software, licensed under Eclipse Public License - v 2.0.
+
+=cut

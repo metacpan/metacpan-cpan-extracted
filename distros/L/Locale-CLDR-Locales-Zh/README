@@ -21,8 +21,3 @@ To install this module, run the following commands:
 Locale Data
 This is a locale data package, you will need the Locale::CLDR package to get it to work, which if you are using the
 CPAN client should have been installed for you.
-WARNING
-This package has insufficient tests. If you feel like helping get hold of the Locale::CLDR::Locales::En package from CPAN
-or use the git repository at https://github.com/ThePilgrim/perlcldr and use the tests from that to create a propper test
-suite for this language pack. Please send me a copy of the tests, either by a git pull request, which will get your name into
-the git history or by emailing me using my email address on CPAN.

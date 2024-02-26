@@ -1,6 +1,12 @@
 use strict;
 use warnings FATAL => 'all';
 
+#
+# Note that we do not use diag() within thread because it seems to me
+# that is reordering the output, hiding the fact that threads run in
+# parallel, in contrary to $log->trace().
+#
+
 BEGIN {
     use Config;
     if (! $Config{usethreads}) {
@@ -11,9 +17,8 @@ BEGIN {
 
 use threads;
 use threads::shared;
-use Log::Log4perl qw/:easy/;
-use Log::Any::Adapter;
 use Log::Any qw/$log/;
+use Log::Any::Adapter 'Stdout';
 use constant { NTHREAD => 3 };
 use Test::More;
 
@@ -30,20 +35,6 @@ BEGIN {
     require_ok('MarpaX::ESLIF');
 }
 
-#
-# Init log
-#
-our $defaultLog4perlConf = '
-log4perl.rootLogger              = INFO, Screen
-log4perl.appender.Screen         = Log::Log4perl::Appender::Screen
-log4perl.appender.Screen.stderr  = 0
-log4perl.appender.Screen.layout  = PatternLayout
-log4perl.appender.Screen.layout.ConversionPattern = %d [Thread %X{tid}] %-5p %6P %m{chomp}%n
-';
-Log::Log4perl::init(\$defaultLog4perlConf);
-Log::Any::Adapter->set('Log4perl');
-Log::Log4perl::MDC->put("tid", threads->tid());
-
 my $grammar = q{
 Expression ::=
     /[\d]+/
@@ -58,15 +49,24 @@ Expression ::=
 my $input = '(1+2)*3';
 my $expected = '(1+2)*3';
 
+sub trace_and_ok {
+    my ($condition, $trace) = @_;
+    #
+    # This method ensures that there is a trace (used to see that threads are truely running in parallel)
+    # and to call ok() (output of the later is digested by Test package before being printed out, so we
+    # cannot use ok() to "see" that threads are running... in parallel)
+    #
+    $log->trace($trace);
+    ok($condition, $trace);
+}
+
 my ($eslif_with_logger, $eslif2_with_logger, $eslif_without_logger, $eslif2_without_logger, $eslifGrammar, $eslifGrammar2) = unit_test();
 
 sub thr_sub {
   my $tid = threads->tid();
-  Log::Log4perl::MDC->put("tid", $tid);
-
   {
       lock($go);
-      $log->trace("Waiting for go signal");
+      $log->trace("[Thread $tid] Waiting for go signal");
       {
           lock($nwaitingGoSignal);
           $nwaitingGoSignal++;
@@ -76,15 +76,16 @@ sub thr_sub {
 
   unit_test();
 
-  $log->trace('Ending');
+  $log->trace("[Thread $tid] Ending");
 }
 
+my $tid = threads->tid(); # This is main thread in fact
 my @t = grep { defined } map {
     my $thr = threads->create(\&thr_sub, $input, $expected);
-    $log->warn("threads->create failure, $!") if ! defined($thr);
+    $log->warn("[Thread $tid] threads->create failure, $!") if ! defined($thr);
     $thr;
 } (1..NTHREAD);
-$log->trace('Number of threads created: ' . scalar(@t));
+$log->trace("[Thread $tid] Number of threads created: " . scalar(@t));
 
 #
 # Wait for all threads to signal they are ready
@@ -107,7 +108,7 @@ while (1) {
 {
     lock($go);
     $go = 1;
-    $log->trace('Broadcasting go signal');
+    $log->trace("[Thread $tid] Broadcasting go signal");
     cond_broadcast($go);
 }
 
@@ -126,21 +127,21 @@ sub test_eslif_multiton {
     #
     # 6 tests
     #
-    $log->tracef("Thread $tid - Testing ESLIF multiton creation with logger=%s", "$log");
+    $log->trace("[Thread $tid] Testing ESLIF multiton creation with logger=$log");
     my $eslif_with_logger = MarpaX::ESLIF->new($log);
-    ok(defined($eslif_with_logger), "Thread $tid - \$eslif_with_logger is defined");
+    trace_and_ok(defined($eslif_with_logger), "[Thread $tid] \$eslif_with_logger is defined");
     my $eslif2_with_logger = MarpaX::ESLIF->new($log);
-    ok(defined($eslif2_with_logger), "Thread $tid - \$eslif2_with_logger is defined");
+    trace_and_ok(defined($eslif2_with_logger), "[Thread $tid] \$eslif2_with_logger is defined");
 
-    ok($eslif_with_logger == $eslif2_with_logger, "Thread $tid - ESLIF multiton with logger $eslif_with_logger == $eslif2_with_logger");
+    trace_and_ok($eslif_with_logger == $eslif2_with_logger, "[Thread $tid] ESLIF multiton with logger $eslif_with_logger == $eslif2_with_logger");
 
-    $log->trace("Thread $tid - Testing ESLIF multiton creation without logger");
+    $log->trace("[Thread $tid] Testing ESLIF multiton creation without logger");
     my $eslif_without_logger = MarpaX::ESLIF->new();
-    ok(defined($eslif_without_logger), "Thread $tid - \$eslif_without_logger is defined");
+    trace_and_ok(defined($eslif_without_logger), "[Thread $tid] \$eslif_without_logger is defined");
     my $eslif2_without_logger = MarpaX::ESLIF->new();
-    ok(defined($eslif2_without_logger), "Thread $tid - \$eslif2_without_logger is defined");
+    trace_and_ok(defined($eslif2_without_logger), "[Thread $tid] \$eslif2_without_logger is defined");
 
-    ok($eslif_without_logger == $eslif2_without_logger, "Thread $tid - ESLIF multiton without logger $eslif_without_logger == $eslif2_without_logger");
+    trace_and_ok($eslif_without_logger == $eslif2_without_logger, "[Thread $tid] ESLIF multiton without logger $eslif_without_logger == $eslif2_without_logger");
 
     return ($eslif_with_logger, $eslif2_with_logger, $eslif_without_logger, $eslif2_without_logger);
 }
@@ -153,13 +154,13 @@ sub test_eslifGrammar_multiton {
     #
     my $tid = threads->tid();
 
-    $log->trace("Thread $tid - Testing ESLIFGrammar multiton using $eslif");
+    $log->trace("[Thread $tid] Testing ESLIFGrammar multiton using $eslif");
     my $eslifGrammar = MarpaX::ESLIF::Grammar->new($eslif, $grammar);
-    ok(defined($eslifGrammar), "Thread $tid - \$eslifGrammar is defined");
+    trace_and_ok(defined($eslifGrammar), "[Thread $tid] \$eslifGrammar is defined");
     my $eslifGrammar2 = MarpaX::ESLIF::Grammar->new($eslif, $grammar);
-    ok(defined($eslifGrammar2), "Thread $tid - \$eslifGrammar2 is defined");
+    trace_and_ok(defined($eslifGrammar2), "[Thread $tid] \$eslifGrammar2 is defined");
 
-    ok($eslifGrammar == $eslifGrammar2, "Thread $tid - ESLIFGrammar multiton $eslifGrammar == $eslifGrammar2");
+    trace_and_ok($eslifGrammar == $eslifGrammar2, "[Thread $tid] ESLIFGrammar multiton $eslifGrammar == $eslifGrammar2");
 
     return ($eslifGrammar, $eslifGrammar2);
 }
@@ -175,10 +176,10 @@ sub valuation_test {
     my $eslifRecognizerInterface = MyRecognizerInterface->new($input);
     my $eslifValueInterface = MyValueInterface->new();
 
-    $log->tracef("Thread $tid - Testing parse()");
+    $log->trace("[Thread $tid] Testing parse()");
     $eslifGrammar->parse($eslifRecognizerInterface, $eslifValueInterface);
     my $value = $eslifValueInterface->getResult;
-    is($value, $expected, "Thread $tid - value $value == expected $expected");
+    is($value, $expected, "[Thread $tid] value $value == expected $expected");
 }
 
 sub unit_test {

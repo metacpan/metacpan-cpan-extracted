@@ -19,7 +19,7 @@ use LWP::UserAgent;
 use JSON;
 use utf8;
 
-our $VERSION = '0.06';
+our $VERSION = '0.10';
 our @EXPORT = qw/ get_by_user /;
 
 =head1 FUNCTION
@@ -27,6 +27,7 @@ our @EXPORT = qw/ get_by_user /;
 =head2 get_by_user(access_token, hash);
 
 批量获取客户详情
+最后更新：2023/12/01
 
 =head2 SYNOPSIS
 
@@ -50,7 +51,7 @@ L<https://developer.work.weixin.qq.com/document/path/92994>
 
 =head4 参数说明：
 
-    参数	            必须	说明
+	参数	            必须	说明
     access_token	是	调用接口凭证
 	userid_list	是	企业成员的userid列表，字符串类型，最多支持100个
 	cursor	否	用于分页查询的游标，字符串类型，由上一次调用返回，首次调用可不填
@@ -58,14 +59,20 @@ L<https://developer.work.weixin.qq.com/document/path/92994>
 
 =head4 权限说明：
 
-企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）；
-第三方应用需具有“企业客户权限->客户基础信息”权限
-第三方/自建应用调用此接口时，userid需要在相关应用的可见范围内。
-规则组标签仅可通过“客户联系”获取。
+调用接口的应用需要满足如下的权限：
+
+	应用类型	权限要求
+	自建应用	配置到「客户联系 可调用接口的应用」中
+	代开发应用	具有「客户基础信息」权限
+	第三方应用	具有「客户基础信息」权限
+
+应用只能获取到可见范围内的成员。
+
+注： 从2023年12月1日0点起，不再支持通过系统应用secret调用接口，存量企业暂不受影响 查看详情
 
 =head3 RETURN 返回结果：
 
-    {
+	{
 	   "errcode": 0,
 	   "errmsg": "ok",
 	   "external_contact_list":
@@ -130,7 +137,11 @@ L<https://developer.work.weixin.qq.com/document/path/92994>
 						"13000000002"
 					],
 					"oper_userid":"rocky",
-					"add_way":1
+					"add_way":10,
+					"wechat_channels": {
+						"nickname": "视频号名称",
+						"source": 1
+					}
 				}
 			},
 			{
@@ -159,17 +170,21 @@ L<https://developer.work.weixin.qq.com/document/path/92994>
 				}
 			}
 		],
-		"next_cursor":"r9FqSqsI8fgNbHLHE5QoCP50UIg2cFQbfma3l2QsmwI"
+		"next_cursor":"r9FqSqsI8fgNbHLHE5QoCP50UIg2cFQbfma3l2QsmwI",
+		"fail_info":{
+			 "unlicensed_userid_list" : ["lisi"]
+		 }
 	}
 
 =head4 RETURN 参数说明：
 
-    参数	        说明
+	参数	        说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	external_contact_list.external_contact	客户的基本信息，可以参考获取客户详情
 	external_contact_list.follow_info	企业成员客户跟进信息，可以参考获取客户详情，但标签信息只会返回企业标签和规则组标签的tag_id，个人标签将不再返回
 	next_cursor	分页游标，再下次请求时填写以获取之后分页的记录，如果已经没有更多的数据则返回空
+	fail_info.unlicensed_userid_list	注：若请求中所有userid都无有效互通许可，接口直接报错701008。如果部分userid无有效互通许可，接口返回成功，该字段为无许可的userid列表
 
 =cut
 

@@ -29,6 +29,7 @@ use Carp qw(cluck croak carp confess);
 use IO::Handle ();
 use Exporter   qw(import);
 use Errno;
+use Scalar::Util qw/ looks_like_number /;
 
 # This is necessary to make routines within Expect work.
 
@@ -36,7 +37,7 @@ use Errno;
 @Expect::EXPORT = qw(expect exp_continue exp_continue_timeout);
 
 BEGIN {
-	$Expect::VERSION = '1.35';
+	$Expect::VERSION = '1.36';
 
 	# These are defaults which may be changed per object, or set as
 	# the user wishes.
@@ -89,6 +90,12 @@ sub new {
 		return $self->spawn(@args);
 	}
 	return $self;
+}
+
+sub timeout {
+    my $self = shift;
+    ${*$self}{expect_timeout} = shift if @_;
+    return ${*$self}{expect_timeout};
 }
 
 sub spawn {
@@ -471,7 +478,7 @@ sub expect {
 	}
 	croak "expect(): not enough arguments, should be expect(timeout, [patterns...])"
 		if @_ < 1;
-	my $timeout      = shift;
+    my $timeout = looks_like_number($_[0]) ? shift : $self->timeout;
 	my $timeout_hook = undef;
 
 	my @object_list;
@@ -500,7 +507,10 @@ sub expect {
 		print STDERR ("expect(): handling param '$parm'...\n")
 			if $Expect::Debug;
 		if ( ref($parm) ) {
-			if ( ref($parm) eq 'ARRAY' ) {
+			if ( ref($parm) eq 'Regexp' ) {
+                push @pattern_list, [ $parm_nr, '-re', $parm, undef ];
+            }
+			elsif ( ref($parm) eq 'ARRAY' ) {
 				my $err = _add_patterns_to_list(
 					\@pattern_list, \@timeout_list,
 					$parm_nr,       $parm
@@ -2098,14 +2108,22 @@ makes the pty transparently act like a bidirectional pipe.
 
 Given $timeout in seconds Expect will wait for $object's handle to produce
 one of the match_patterns, which are matched exactly by default. If you
-want a regexp match, prefix the pattern with '-re'.
+want a regexp match, use a regexp object (C<qr//>) or prefix the pattern with '-re'.
 
+  $object->expect(15, 'match me exactly', qr/match\s+me\s+exactly/);
   $object->expect(15, 'match me exactly','-re','match\s+me\s+exactly');
 
 Due to o/s limitations $timeout should be a round number. If $timeout
 is 0 Expect will check one time to see if $object's handle contains
 any of the match_patterns. If $timeout is undef Expect
-will wait forever for a pattern to match.
+will wait forever for a pattern to match. If you don't want to 
+explicitly put the timeout on all calls to C<expect>, you can set 
+it via the C<timeout> method . If the first argument of C<expect> 
+doesn't look like a number, that value will be used.
+
+  $object->timeout(15);
+  $object->expect('match me exactly','-re','match\s+me\s+exactly');
+
 
 If called in a scalar context, expect() will return the position of
 the matched pattern within @matched_patterns, or undef if no pattern was

@@ -7,7 +7,7 @@ use Text::Markup;
 use File::BOM qw(open_bom);
 use Parse::BBCode;
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 sub import {
     # Replace the regex if passed one.

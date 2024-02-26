@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-19'; # DATE
+our $DATE = '2023-12-01'; # DATE
 our $DIST = 'App-CompleteCLIs'; # DIST
-our $VERSION = '0.152'; # VERSION
+our $VERSION = '0.153'; # VERSION
 
 1;
 # ABSTRACT: CLI front-end for the complete_*() functions from Complete::* modules
@@ -24,7 +24,7 @@ App::CompleteCLIs - CLI front-end for the complete_*() functions from Complete::
 
 =head1 VERSION
 
-This document describes version 0.152 of App::CompleteCLIs (from Perl distribution App-CompleteCLIs), released on 2023-01-19.
+This document describes version 0.153 of App::CompleteCLIs (from Perl distribution App-CompleteCLIs), released on 2023-12-01.
 
 =head1 SYNOPSIS
 
@@ -36,121 +36,125 @@ functions on the command-line.
 
 =over
 
-=item * L<complete-acme-metasyntactic-meta-category>
+=item 1. L<complete-acme-metasyntactic-meta-category>
 
-=item * L<complete-acme-metasyntactic-meta-theme>
+=item 2. L<complete-acme-metasyntactic-meta-theme>
 
-=item * L<complete-acme-metasyntactic-meta-theme-and-category>
+=item 3. L<complete-acme-metasyntactic-meta-theme-and-category>
 
-=item * L<complete-array-elem>
+=item 4. L<complete-array-elem>
 
-=item * L<complete-chrome-profile-name>
+=item 5. L<complete-chrome-profile-name>
 
-=item * L<complete-country-code>
+=item 6. L<complete-color-name>
 
-=item * L<complete-currency-code>
+=item 7. L<complete-color-rgb24-hexcode>
 
-=item * L<complete-cwalitee-indicator>
+=item 8. L<complete-country-code>
 
-=item * L<complete-dist>
+=item 9. L<complete-currency-code>
 
-=item * L<complete-dzil-bundle>
+=item 10. L<complete-cwalitee-indicator>
 
-=item * L<complete-dzil-plugin>
+=item 11. L<complete-dist>
 
-=item * L<complete-dzil-role>
+=item 12. L<complete-dzil-bundle>
 
-=item * L<complete-env>
+=item 13. L<complete-dzil-plugin>
 
-=item * L<complete-env-elem>
+=item 14. L<complete-dzil-role>
 
-=item * L<complete-file>
+=item 15. L<complete-env>
 
-=item * L<complete-firefox-profile-name>
+=item 16. L<complete-env-elem>
 
-=item * L<complete-float>
+=item 17. L<complete-file>
 
-=item * L<complete-from-schema>
+=item 18. L<complete-firefox-profile-name>
 
-=item * L<complete-gid>
+=item 19. L<complete-float>
 
-=item * L<complete-group>
+=item 20. L<complete-from-schema>
 
-=item * L<complete-hash-key>
+=item 21. L<complete-gid>
 
-=item * L<complete-idx-listed-stock-code>
+=item 22. L<complete-group>
 
-=item * L<complete-int>
+=item 23. L<complete-hash-key>
 
-=item * L<complete-kernel>
+=item 24. L<complete-idx-listed-stock-code>
 
-=item * L<complete-known-host>
+=item 25. L<complete-int>
 
-=item * L<complete-known-mac>
+=item 26. L<complete-kernel>
 
-=item * L<complete-language-code>
+=item 27. L<complete-known-host>
 
-=item * L<complete-locale>
+=item 28. L<complete-known-mac>
 
-=item * L<complete-manpage>
+=item 29. L<complete-language-code>
 
-=item * L<complete-manpage-section>
+=item 30. L<complete-locale>
 
-=item * L<complete-module>
+=item 31. L<complete-manpage>
 
-=item * L<complete-path-env-elem>
+=item 32. L<complete-manpage-section>
 
-=item * L<complete-perl-builtin-function>
+=item 33. L<complete-module>
 
-=item * L<complete-perl-builtin-symbol>
+=item 34. L<complete-path-env-elem>
 
-=item * L<complete-perl-version>
+=item 35. L<complete-perl-builtin-function>
 
-=item * L<complete-perlmv-scriptlet>
+=item 36. L<complete-perl-builtin-symbol>
 
-=item * L<complete-pid>
+=item 37. L<complete-perl-version>
 
-=item * L<complete-pod>
+=item 38. L<complete-perlmv-scriptlet>
 
-=item * L<complete-ppr-subpattern>
+=item 39. L<complete-pid>
 
-=item * L<complete-proc-name>
+=item 40. L<complete-pod>
 
-=item * L<complete-program>
+=item 41. L<complete-ppr-subpattern>
 
-=item * L<complete-random-string>
+=item 42. L<complete-proc-name>
 
-=item * L<complete-rclone-remote>
+=item 43. L<complete-program>
 
-=item * L<complete-regexp-pattern-module>
+=item 44. L<complete-random-string>
 
-=item * L<complete-regexp-pattern-pattern>
+=item 45. L<complete-rclone-remote>
 
-=item * L<complete-riap-url>
+=item 46. L<complete-regexp-pattern-module>
 
-=item * L<complete-riap-url-clientless>
+=item 47. L<complete-regexp-pattern-pattern>
 
-=item * L<complete-service-name>
+=item 48. L<complete-riap-url>
 
-=item * L<complete-service-port>
+=item 49. L<complete-riap-url-clientless>
 
-=item * L<complete-tz-name>
+=item 50. L<complete-service-name>
 
-=item * L<complete-tz-offset>
+=item 51. L<complete-service-port>
 
-=item * L<complete-uid>
+=item 52. L<complete-tz-name>
 
-=item * L<complete-user>
+=item 53. L<complete-tz-offset>
 
-=item * L<complete-vivaldi-profile-name>
+=item 54. L<complete-uid>
 
-=item * L<complete-weaver-bundle>
+=item 55. L<complete-user>
 
-=item * L<complete-weaver-plugin>
+=item 56. L<complete-vivaldi-profile-name>
 
-=item * L<complete-weaver-role>
+=item 57. L<complete-weaver-bundle>
 
-=item * L<complete-weaver-section>
+=item 58. L<complete-weaver-plugin>
+
+=item 59. L<complete-weaver-role>
+
+=item 60. L<complete-weaver-section>
 
 =back
 

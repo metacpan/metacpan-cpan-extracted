@@ -1,0 +1,114 @@
+# PODNAME: RDF::Cowl::Lib::Gen::Class::AnonInd
+# ABSTRACT: Generated docs for RDF::Cowl::AnonInd
+
+## DO NOT EDIT
+## Generated via maint/tt/Class.pod.tt
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+RDF::Cowl::Lib::Gen::Class::AnonInd - Generated docs for RDF::Cowl::AnonInd
+
+=head1 VERSION
+
+version 1.0.0
+
+=head1 MAIN MODULE
+
+L<RDF::Cowl::AnonInd>
+
+=head1 CONSTRUCTORS
+
+=head2 new
+
+B<Signature>:
+
+  RDF::Cowl::AnonInd->new()
+
+B<Params>:
+
+  CowlString $id 
+
+Documentation:
+
+  Returns a retained anonymous individual.
+  
+  @param id Anonymous individual identifier.
+  @return Retained anonymous individual. Throws exception on error.
+  
+  @note By passing NULL as the identifier, a new identifier is randomly generated.
+
+Throws exception on error.
+
+=over 2
+
+B<C function name>: C<< cowl_anon_ind >>
+
+=back
+
+=head2 from_string
+
+B<Signature>:
+
+  RDF::Cowl::AnonInd->from_string()
+
+B<Params>:
+
+  UString $string 
+
+Documentation:
+
+  Returns a retained anonymous individual.
+  
+  @param string Anonymous individual identifier.
+  @return Retained anonymous individual. Throws exception on error.
+
+Throws exception on error.
+
+=over 2
+
+B<C function name>: C<< cowl_anon_ind_from_string >>
+
+=back
+
+=head1 METHODS
+
+=head2 get_id
+
+B<Signature>:
+
+  $self->get_id()
+
+B<Params>:
+
+  CowlAnonInd $ind 
+
+Documentation:
+
+  Gets the node ID of the specified anonymous individual.
+  
+  @param ind The anonymous individual.
+  @return Node ID.
+
+=over 2
+
+B<C function name>: C<< cowl_anon_ind_get_id >>
+
+=back
+
+=head1 AUTHOR
+
+Zakariyya Mughal <zmughal@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 by Auto-Parallel Technologies, Inc..
+
+This is free software, licensed under Eclipse Public License - v 2.0.
+
+=cut

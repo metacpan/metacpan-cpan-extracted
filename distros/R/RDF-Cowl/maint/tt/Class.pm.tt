@@ -1,0 +1,44 @@
+package RDF::Cowl::Lib::Gen::Class::[% class_suffix %];
+# ABSTRACT: Private class for [%- INCLUDE "class-name.tt" %]
+
+## DO NOT EDIT
+## Generated via maint/tt/Class.pm.tt
+
+package # hide from PAUSE
+  [% INCLUDE "class-name.tt" -%];
+
+use strict;
+use warnings;
+use feature qw(state);
+use Devel::StrictMode qw( STRICT );
+use RDF::Cowl::Lib qw(arg);
+use RDF::Cowl::Lib::Types qw(:all);
+[%# See `$ffi_type_to_type_tiny_static` in maint/process-api.pl -%]
+use Types::Common qw(Maybe BoolLike PositiveOrZeroInt Str StrMatch InstanceOf);
+use Type::Params -sigs;
+
+my $ffi = RDF::Cowl::Lib->ffi;
+
+[% FOREACH binding = bindings -%]
+[% IF binding.manual -%]
+
+# [% binding.c_func_name %]
+# See manual binding definition.
+
+[% ELSIF binding.incomplete -%]
+
+[% FILTER format('## %s') -%]
+[% INCLUDE binding.ffi.pl.tt binding = binding -%]
+[% END -%]
+
+[% ELSE -%]
+
+[% INCLUDE binding.ffi.pl.tt binding = binding -%]
+
+[% END -%]
+[% END -%]
+
+1;
+[%#-
+# vim: ft=tt2
+-%]

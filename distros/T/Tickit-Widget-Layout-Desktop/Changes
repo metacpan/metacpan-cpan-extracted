@@ -1,5 +1,11 @@
 Revision history for Tickit-Widget-Layout-Desktop
 
+0.013     2024-02-16 06:15:59+08:00 Asia/Singapore
+    [Bugs fixed]
+
+    - latest Tickit::Widget and Tickit::Style require Object::Pad-compatible classes
+    - avoid segfault when closing a window
+
 0.012     2020-09-20 12:52:50+08:00 Asia/Kuala_Lumpur
     No new features.
 

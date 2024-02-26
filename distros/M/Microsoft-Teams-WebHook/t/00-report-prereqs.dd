@@ -1,0 +1,43 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Test::More' => '0',
+                                      'Test::Perl::Critic' => '0',
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'DateTime' => '1.65',
+                                      'DateTime::Format::Human::Duration' => '0.64',
+                                      'Encode' => '3.20',
+                                      'JSON::XS' => '4.03',
+                                      'Object::Pad' => '0.806',
+                                      'perl' => '5.026000'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Test2::Plugin::NoWarnings' => '0',
+                                   'Test2::Suite' => '0.000155',
+                                   'Test2::Tools::Explain' => '0',
+                                   'Test::MockModule' => '0',
+                                   'Test::More' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

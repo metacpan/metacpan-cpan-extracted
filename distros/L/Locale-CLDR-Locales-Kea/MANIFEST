@@ -1,7 +1,7 @@
 Build.PL
 lib/Locale/CLDR/Locales/Kea.pm
-lib/Locale/CLDR/Locales/Kea/Any.pm
-lib/Locale/CLDR/Locales/Kea/Any/Cv.pm
+lib/Locale/CLDR/Locales/Kea/Latn.pm
+lib/Locale/CLDR/Locales/Kea/Latn/Cv.pm
 MANIFEST			This list of files
 README
 t/00-load.t

@@ -63,9 +63,10 @@ while (my $data = <DATA>) {
         plan tests => @exts + 7;
         use_ok $module or next;
 
-        push @loaded => $format unless grep { $_ eq $format } @loaded;
-        is_deeply [Text::Markup->formats], \@loaded,
-            "$format should be loaded";
+        if ($format ne 'none') { # Not loaded yet; tested below.
+            is_deeply [Text::Markup->formats], \@loaded,
+                "$format should be loaded";
+        }
 
         my $parser = new_ok 'Text::Markup';
         for my $ext (@exts) {
@@ -103,6 +104,12 @@ while (my $data = <DATA>) {
         is $parser->guess_format('hello.txt'), $format,
             'Now guess_format should match .txt';
         $module->import($regex_for{$format});
+
+        if ($format eq 'none') {
+            @loaded = sort (@loaded, 'none');
+            is_deeply [Text::Markup->formats], \@loaded,
+                "$format should be loaded";
+        }
     }
 }
 
@@ -123,3 +130,4 @@ asciidoc,asciidoc,Text::Markup::Asciidoc,Text::Markup::Asciidoc,asciidoc,asc,ado
 asciidoctor,asciidoc,Text::Markup::Asciidoctor,Text::Markup::Asciidoctor,asciidoc,asc,adoc
 bbcode,bbcode,Text::Markup::Bbcode,Parse::BBCode,bbcode,bb
 creole,creole,Text::Markup::Creole,Text::WikiCreole,creole
+none,none,Text::Markup::None,,

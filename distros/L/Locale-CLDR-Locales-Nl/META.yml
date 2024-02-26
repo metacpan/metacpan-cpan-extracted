@@ -22,34 +22,34 @@ name: Locale-CLDR-Locales-Nl
 provides:
   Locale::CLDR::Locales::Nl:
     file: lib/Locale/CLDR/Locales/Nl.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Nl::Any:
-    file: lib/Locale/CLDR/Locales/Nl/Any.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Nl::Any::Aw:
-    file: lib/Locale/CLDR/Locales/Nl/Any/Aw.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Nl::Any::Be:
-    file: lib/Locale/CLDR/Locales/Nl/Any/Be.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Nl::Any::Bq:
-    file: lib/Locale/CLDR/Locales/Nl/Any/Bq.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Nl::Any::Cw:
-    file: lib/Locale/CLDR/Locales/Nl/Any/Cw.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Nl::Any::Nl:
-    file: lib/Locale/CLDR/Locales/Nl/Any/Nl.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Nl::Any::Sr:
-    file: lib/Locale/CLDR/Locales/Nl/Any/Sr.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Nl::Any::Sx:
-    file: lib/Locale/CLDR/Locales/Nl/Any/Sx.pm
-    version: v0.40.1
+    version: v0.44.0
+  Locale::CLDR::Locales::Nl::Latn:
+    file: lib/Locale/CLDR/Locales/Nl/Latn.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Nl::Latn::Aw:
+    file: lib/Locale/CLDR/Locales/Nl/Latn/Aw.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Nl::Latn::Be:
+    file: lib/Locale/CLDR/Locales/Nl/Latn/Be.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Nl::Latn::Bq:
+    file: lib/Locale/CLDR/Locales/Nl/Latn/Bq.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Nl::Latn::Cw:
+    file: lib/Locale/CLDR/Locales/Nl/Latn/Cw.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Nl::Latn::Nl:
+    file: lib/Locale/CLDR/Locales/Nl/Latn/Nl.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Nl::Latn::Sr:
+    file: lib/Locale/CLDR/Locales/Nl/Latn/Sr.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Nl::Latn::Sx:
+    file: lib/Locale/CLDR/Locales/Nl/Latn/Sx.pm
+    version: v0.44.0
 requires:
   DateTime: '0.72'
-  Locale::CLDR: v0.40.1
+  Locale::CLDR: v0.44.0
   Moo: '2'
   MooX::ClassAttribute: '0.011'
   Type::Tiny: '0'
@@ -59,5 +59,5 @@ resources:
   bugtracker: https://github.com/ThePilgrim/perlcldr/issues
   homepage: https://github.com/ThePilgrim/perlcldr
   repository: https://github.com/ThePilgrim/perlcldr.git
-version: v0.40.1
+version: v0.44.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,14 +1,14 @@
-# no code
-## no critic: TestingAndDebugging::RequireUseStrict
 package Acme::CPANModules::Parse::HumanDate;
 
+use strict;
+
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-09-11'; # DATE
+our $DATE = '2023-10-31'; # DATE
 our $DIST = 'Acme-CPANModules-Parse-HumanDate'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our $LIST = {
-    summary => "Modules that parse human date/time expression",
+    summary => "List of modules that parse human date/time expression",
     entries => [
         {
             module=>'DateTime::Format::Natural',
@@ -65,7 +65,7 @@ _
 };
 
 1;
-# ABSTRACT: Modules that parse human date/time expression
+# ABSTRACT: List of modules that parse human date/time expression
 
 __END__
 
@@ -75,19 +75,21 @@ __END__
 
 =head1 NAME
 
-Acme::CPANModules::Parse::HumanDate - Modules that parse human date/time expression
+Acme::CPANModules::Parse::HumanDate - List of modules that parse human date/time expression
 
 =head1 VERSION
 
-This document describes version 0.001 of Acme::CPANModules::Parse::HumanDate (from Perl distribution Acme-CPANModules-Parse-HumanDate), released on 2021-09-11.
+This document describes version 0.002 of Acme::CPANModules::Parse::HumanDate (from Perl distribution Acme-CPANModules-Parse-HumanDate), released on 2023-10-31.
 
 =head1 DESCRIPTION
 
-=head1 ACME::MODULES ENTRIES
+=head1 ACME::CPANMODULES ENTRIES
 
 =over
 
-=item * L<DateTime::Format::Natural>
+=item L<DateTime::Format::Natural>
+
+Author: L<SCHUBIGER|https://metacpan.org/author/SCHUBIGER>
 
 Compared to L<DateTime::Format::Flexible>, this module can also parse
 duration in addition to date/time, e.g.:
@@ -100,7 +102,9 @@ Speed-wise, I'd say the two modules are roughly comparable. For some patterns
 one might be faster than the other.
 
 
-=item * L<DateTime::Format::Flexible>
+=item L<DateTime::Format::Flexible>
+
+Author: L<THINC|https://metacpan.org/author/THINC>
 
 One advantage of this over L<DateTime::Format::Natural> is its time zone
 support, e.g.:
@@ -113,7 +117,9 @@ Speed-wise, I'd say the two modules are roughly comparable. For some patterns
 one might be faster than the other.
 
 
-=item * L<Date::Parse>
+=item L<Date::Parse>
+
+Author: L<ATOOMIC|https://metacpan.org/author/ATOOMIC>
 
 This module can parse several formats, but does not really fall into "human
 date/time parser" as it lacks support for casual expression like "yesterday" or
@@ -194,13 +200,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

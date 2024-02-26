@@ -7,9 +7,9 @@ use warnings;
 use parent 'TableData::Munge::Concat';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-11-26'; # DATE
+our $DATE = '2023-12-28'; # DATE
 our $DIST = 'TableDataBundle-Perl-CPAN-Release'; # DIST
-our $VERSION = '20231126.0'; # VERSION
+our $VERSION = '20231228.0'; # VERSION
 
 sub new {
     my $self = shift;
@@ -20,7 +20,7 @@ sub new {
     $self->SUPER::new(tabledatalist => \@tabledatalist);
 }
 
-our %STATS = ("num_columns",9,"num_rows",362347); # STATS
+# STATS
 
 1;
 # ABSTRACT: CPAN releases (from newest to oldest)
@@ -37,7 +37,7 @@ TableData::Perl::CPAN::Release::Static::FromNewest - CPAN releases (from newest 
 
 =head1 VERSION
 
-This document describes version 20231126.0 of TableData::Perl::CPAN::Release::Static::FromNewest (from Perl distribution TableDataBundle-Perl-CPAN-Release), released on 2023-11-26.
+This document describes version 20231228.0 of TableData::Perl::CPAN::Release::Static::FromNewest (from Perl distribution TableDataBundle-Perl-CPAN-Release), released on 2023-12-28.
 
 =head1 SYNOPSIS
 

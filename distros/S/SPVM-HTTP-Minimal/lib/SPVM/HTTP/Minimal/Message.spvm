@@ -4,5 +4,5 @@
 class HTTP::Minimal::Message {
   use HTTP::Minimal::Headers;
   
-  has headers : ro HTTP::Minimal::Headers;
+  has headers : ro protected HTTP::Minimal::Headers;
 }

@@ -8,6 +8,7 @@ use Test::More 0.98;
 use Filename::Archive qw(check_archive_filename);
 
 is_deeply(check_archive_filename(filename=>"foo.txt"), 0);
+is_deeply(check_archive_filename(filename=>"foo.Rar", ignore_case=>0), 0);
 is_deeply(check_archive_filename(filename=>"foo.rar"),
           {
               archive_name=>'RAR',
@@ -27,7 +28,7 @@ is_deeply(check_archive_filename(filename=>"foo.tar.gz"),
                   },
               ],
           });
-# double-compressed, ci=1
+# double-compressed, ignore_case=1
 is_deeply(check_archive_filename(filename=>"foo.ZIP.gz.XZ"),
           {
               archive_name=>'Zip',

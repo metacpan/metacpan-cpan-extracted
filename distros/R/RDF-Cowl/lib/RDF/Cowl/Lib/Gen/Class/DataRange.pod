@@ -1,0 +1,60 @@
+# PODNAME: RDF::Cowl::Lib::Gen::Class::DataRange
+# ABSTRACT: Generated docs for RDF::Cowl::DataRange
+
+## DO NOT EDIT
+## Generated via maint/tt/Class.pod.tt
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+RDF::Cowl::Lib::Gen::Class::DataRange - Generated docs for RDF::Cowl::DataRange
+
+=head1 VERSION
+
+version 1.0.0
+
+=head1 MAIN MODULE
+
+L<RDF::Cowl::DataRange>
+
+=head1 METHODS
+
+=head2 get_type
+
+B<Signature>:
+
+  $self->get_type()
+
+B<Params>:
+
+  CowlAnyDataRange $range 
+
+Documentation:
+
+  Gets the type of the specified data range.
+  
+  @param range The data range.
+  @return The type.
+
+=over 2
+
+B<C function name>: C<< cowl_data_range_get_type >>
+
+=back
+
+=head1 AUTHOR
+
+Zakariyya Mughal <zmughal@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 by Auto-Parallel Technologies, Inc..
+
+This is free software, licensed under Eclipse Public License - v 2.0.
+
+=cut

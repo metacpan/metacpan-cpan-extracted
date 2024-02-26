@@ -1,4 +1,4 @@
-package At::Lexicon::com::atproto::repo 0.17 {
+package At::Lexicon::com::atproto::repo 0.18 {
     use v5.38;
     no warnings 'experimental::class', 'experimental::builtin';    # Be quiet.
     use feature 'class';

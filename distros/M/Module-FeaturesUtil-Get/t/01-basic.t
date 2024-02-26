@@ -13,6 +13,7 @@ use Module::FeaturesUtil::Get qw(
                                     get_feature_set_spec
                                     get_features_decl
                                     get_feature_val
+                                    get_feature_defhash
                                     module_declares_feature
                             );
 
@@ -36,6 +37,10 @@ subtest get_feature_val => sub {
     is_deeply(get_feature_val('Local::Declarer1', 'Foo', 'feature1'), undef);
 
     is_deeply(get_feature_val('Local::Declarer2', 'Dummy', 'feature1'), undef);
+};
+
+subtest get_feature_defhash => sub {
+    is_deeply(get_feature_defhash('Local::Declarer1', 'Dummy', 'feature3'), {value=>'a'});
 };
 
 subtest module_declares_feature => sub {

@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Kkj - Package for language Kako
 
 package Locale::CLDR::Locales::Kkj;
 # This file auto generated from Data\common\main\kkj.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -66,15 +66,14 @@ has 'characters' => (
 		no warnings 'experimental::regex_sets';
 		return {
 			auxiliary => qr{[q x z]},
-			index => ['A', 'B', 'Ɓ', 'C', 'D', 'Ɗ', '{Ɗy}', 'E', 'Ɛ', 'F', 'G', '{Gb}', '{Gw}', 'H', 'I', '{I\u0327}', 'J', 'K', '{Kp}', '{Kw}', 'L', 'M', '{Mb}', 'N', '{Nd}', 'ǋ', '{Ny}', 'Ŋ', '{Ŋg}', '{Ŋgb}', '{Ŋgw}', 'O', 'Ɔ', '{Ɔ\u0327}', 'P', 'R', 'S', 'T', 'U', '{U\u0327}', 'V', 'W', 'Y'],
-			main => qr{[a á à â {a̧} b ɓ c d ɗ {ɗy} e é è ê ɛ {ɛ́} {ɛ̀} {ɛ̂} {ɛ̧} f g {gb} {gw} h i í ì î {i̧} j k {kp} {kw} l m {mb} n {nd} ǌ {ny} ŋ {ŋg} {ŋgb} {ŋgw} o ó ò ô ɔ {ɔ́} {ɔ̀} {ɔ̂} {ɔ̧} p r s t u ú ù û {u̧} v w y]},
-			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
-			punctuation => qr{[, \: ! ? . … ‘ ‹ › “ ” « » ( ) *]},
+			index => ['A', 'B', 'Ɓ', 'C', 'D', 'Ɗ', '{Ɗy}', 'E', 'Ɛ', 'F', 'G', '{Gb}', '{Gw}', 'H', 'I{I̧}', 'J', 'K', '{Kp}', '{Kw}', 'L', 'M', '{Mb}', 'N', '{Nd}', '{Nj}', '{Ny}', 'Ŋ', '{Ŋg}', '{Ŋgb}', '{Ŋgw}', 'O', 'Ɔ{Ɔ̧}', 'P', 'R', 'S', 'T', 'U{U̧}', 'V', 'W', 'Y'],
+			main => qr{[aáàâ{a̧} b ɓ c d ɗ {ɗy} eéèê ɛ{ɛ́}{ɛ̀}{ɛ̂}{ɛ̧} f g {gb} {gw} h iíìî{i̧} j k {kp} {kw} l m {mb} n {nd} {nj} {ny} ŋ {ŋg} {ŋgb} {ŋgw} oóòô ɔ{ɔ́}{ɔ̀}{ɔ̂}{ɔ̧} p r s t uúùû{u̧} v w y]},
+			punctuation => qr{[, \: ! ? . … ‘ ‹ › “” « » ( ) *]},
 		};
 	},
 EOT
 : sub {
-		return { index => ['A', 'B', 'Ɓ', 'C', 'D', 'Ɗ', '{Ɗy}', 'E', 'Ɛ', 'F', 'G', '{Gb}', '{Gw}', 'H', 'I', '{I\u0327}', 'J', 'K', '{Kp}', '{Kw}', 'L', 'M', '{Mb}', 'N', '{Nd}', 'ǋ', '{Ny}', 'Ŋ', '{Ŋg}', '{Ŋgb}', '{Ŋgw}', 'O', 'Ɔ', '{Ɔ\u0327}', 'P', 'R', 'S', 'T', 'U', '{U\u0327}', 'V', 'W', 'Y'], };
+		return { index => ['A', 'B', 'Ɓ', 'C', 'D', 'Ɗ', '{Ɗy}', 'E', 'Ɛ', 'F', 'G', '{Gb}', '{Gw}', 'H', 'I{I̧}', 'J', 'K', '{Kp}', '{Kw}', 'L', 'M', '{Mb}', 'N', '{Nd}', '{Nj}', '{Ny}', 'Ŋ', '{Ŋg}', '{Ŋgb}', '{Ŋgw}', 'O', 'Ɔ{Ɔ̧}', 'P', 'R', 'S', 'T', 'U{U̧}', 'V', 'W', 'Y'], };
 },
 );
 
@@ -107,31 +106,6 @@ has 'alternate_quote_end' => (
 	default		=> qq{›},
 );
 
-has 'listPatterns' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-				start => q({0}, {1}),
-				middle => q({0}, {1}),
-				end => q({0}, {1}),
-		} }
-);
-
-has 'default_numbering_system' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> 'latn',
-);
-
-has native_numbering_system => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> 'latn',
-);
-
 has 'number_symbols' => (
 	is			=> 'ro',
 	isa			=> HashRef,
@@ -150,7 +124,6 @@ has 'currencies' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'XAF' => {
-			symbol => 'FCFA',
 			display_name => {
 				'currency' => q(Franc CFA),
 			},
@@ -186,27 +159,6 @@ has 'calendar_months' => (
 						],
 					},
 				},
-				'stand-alone' => {
-					wide => {
-						nonleap => [
-							'pamba',
-							'wanja',
-							'mbiyɔ mɛndoŋgɔ',
-							'Nyɔlɔmbɔŋgɔ',
-							'Mɔnɔ ŋgbanja',
-							'Nyaŋgwɛ ŋgbanja',
-							'kuŋgwɛ',
-							'fɛ',
-							'njapi',
-							'nyukul',
-							'M11',
-							'ɓulɓusɛ'
-						],
-						leap => [
-							
-						],
-					},
-				},
 			},
 	} },
 );
@@ -218,33 +170,6 @@ has 'calendar_days' => (
 	default		=> sub { {
 			'gregorian' => {
 				'format' => {
-					abbreviated => {
-						mon => 'lundi',
-						tue => 'mardi',
-						wed => 'mɛrkɛrɛdi',
-						thu => 'yedi',
-						fri => 'vaŋdɛrɛdi',
-						sat => 'mɔnɔ sɔndi',
-						sun => 'sɔndi'
-					},
-					narrow => {
-						mon => 'lu',
-						tue => 'ma',
-						wed => 'mɛ',
-						thu => 'ye',
-						fri => 'va',
-						sat => 'ms',
-						sun => 'so'
-					},
-					short => {
-						mon => 'lundi',
-						tue => 'mardi',
-						wed => 'mɛrkɛrɛdi',
-						thu => 'yedi',
-						fri => 'vaŋdɛrɛdi',
-						sat => 'mɔnɔ sɔndi',
-						sun => 'sɔndi'
-					},
 					wide => {
 						mon => 'lundi',
 						tue => 'mardi',
@@ -256,15 +181,6 @@ has 'calendar_days' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						mon => 'lundi',
-						tue => 'mardi',
-						wed => 'mɛrkɛrɛdi',
-						thu => 'yedi',
-						fri => 'vaŋdɛrɛdi',
-						sat => 'mɔnɔ sɔndi',
-						sun => 'sɔndi'
-					},
 					narrow => {
 						mon => 'lu',
 						tue => 'ma',
@@ -282,15 +198,6 @@ has 'calendar_days' => (
 						fri => 'va',
 						sat => 'ms',
 						sun => 'so'
-					},
-					wide => {
-						mon => 'lundi',
-						tue => 'mardi',
-						wed => 'mɛrkɛrɛdi',
-						thu => 'yedi',
-						fri => 'vaŋdɛrɛdi',
-						sat => 'mɔnɔ sɔndi',
-						sun => 'sɔndi'
 					},
 				},
 			},

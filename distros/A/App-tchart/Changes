@@ -1,3 +1,13 @@
+0.062   2024-02-06  Released-By: PERLANCAR; Urgency: medium
+
+        - Allow multiple -d & -l.
+
+
+0.061   2024-02-06  Released-By: PERLANCAR; Urgency: medium
+
+        - Tweak Text::Chart arguments.
+
+
 0.060   2021-04-10  Released-By: PERLANCAR; Urgency: medium
 
 	- Update dependency's new name {,Data::}TableData::Object.

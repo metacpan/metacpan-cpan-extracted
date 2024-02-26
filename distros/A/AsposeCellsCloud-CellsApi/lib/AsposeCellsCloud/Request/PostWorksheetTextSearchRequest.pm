@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,7 +59,7 @@ sub new {
 
 
 # Run Operation Request
-# PostWorksheetTextSearchRequest.name : The workbook name.  ,
+# PostWorksheetTextSearchRequest.name : The file name.  ,
 # PostWorksheetTextSearchRequest.sheetName : The worksheet name.  ,
 # PostWorksheetTextSearchRequest.text : Text to search.  ,
 # PostWorksheetTextSearchRequest.folder : Original workbook folder.  ,
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_worksheet_text_search' } = { 
-    	summary => 'Searchs text in worksheet.',
+    	summary => 'Search for text in the worksheet.',
         params => $params,
         returns => 'TextItemsResponse',
     };
@@ -135,7 +135,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},

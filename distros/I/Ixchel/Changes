@@ -1,5 +1,29 @@
 Revision history for Ixchel
 
+0.9.3  2024-02-22/11:30
+		 - remove a uneeded . for pcap logging in the suricata outputs template
+		 - fix template for suricata pcap logging
+
+0.9.2  2024-02-20/13:00
+		 - Do not use --logical with lstopo as some versions this skips showing what the actual core ID is
+		 - Show all sections for --help.
+
+0.9.1  2024-02-20/09:45
+		 - default exclude for suricata is now based of > 16
+		 - fix exclude handling when when .suricata.auto_threading.exclude is undef.
+
+0.9.0  2024-02-20/07:30
+		 - add in automatic threading and sensor-name capabilities for Suricata
+		 - add in autoconfig for Lilith
+
+0.8.1  2024-02-14/16:00
+		 - don't enable anomaly syslog logging for suricata as it can't use both syslog and the flows file
+
+0.8.0  2024-02-14/12:00
+		 - remove .pfring from suricata base
+		 - fix typo in suricata_outputs template preenting syslog outputs from working
+		 - don't try to install perl modules from cpanm more than once
+
 0.7.0  2024-01-26/15:15
 		 - action suricata_base, .netmap and .nflog added to items to remove by default
 		 - action lilith_config, add new action for configuring lilith

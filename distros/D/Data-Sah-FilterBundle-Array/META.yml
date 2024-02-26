@@ -17,15 +17,18 @@ meta-spec:
   version: '1.4'
 name: Data-Sah-FilterBundle-Array
 provides:
+  Data::Sah::Filter::perl::Array::arrayify:
+    file: lib/Data/Sah/Filter/perl/Array/arrayify.pm
+    version: '0.002'
   Data::Sah::Filter::perl::Array::dupenum:
     file: lib/Data/Sah/Filter/perl/Array/dupenum.pm
-    version: '0.001'
+    version: '0.002'
   Data::Sah::Filter::perl::Array::dupestr:
     file: lib/Data/Sah/Filter/perl/Array/dupestr.pm
-    version: '0.001'
+    version: '0.002'
   Data::Sah::FilterBundle::Array:
     file: lib/Data/Sah/FilterBundle/Array.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   perl: '5.010001'
   strict: '0'
@@ -34,7 +37,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah-FilterBundle-Array
   homepage: https://metacpan.org/release/Data-Sah-FilterBundle-Array
   repository: git://github.com/perlancar/perl-Data-Sah-FilterBundle-Array.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.038002'
@@ -348,7 +351,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Data::Sah::Filter
               name: -Data::Sah::Filter
-              version: '0.008'
+              version: '0.009'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.010'
     -

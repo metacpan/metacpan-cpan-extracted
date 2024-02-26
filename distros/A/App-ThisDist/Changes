@@ -1,3 +1,9 @@
+0.023   2024-01-06  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Return undef when dist is not found and extract version
+          is requested.
+
+
 0.022   2024-01-05  Released-By: PERLANCAR; Urgency: medium
 
         - Add third argument $detail? to instruct to return a hash or more

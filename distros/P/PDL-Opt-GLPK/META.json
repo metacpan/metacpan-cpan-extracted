@@ -1,0 +1,61 @@
+{
+   "abstract" : "PDL interface to the GNU Linear Programming Kit",
+   "author" : [
+      "JÃ¶rg Sommrey <git@sommrey.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "PDL-Opt-GLPK",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Devel::CheckLib" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "PDL::Core::Dev" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "PDL" : "2.085",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jo-37/pdl-opt-glpk/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/jo-37/pdl-opt-glpk.git",
+         "web" : "https://github.com/jo-37/pdl-opt-glpk.git"
+      }
+   },
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

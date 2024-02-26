@@ -1,4 +1,4 @@
-package At 0.17 {
+package At 0.18 {
     use v5.38;
     no warnings 'experimental::class', 'experimental::builtin', 'experimental::for_list';    # Be quiet.
     use feature 'class';
@@ -276,6 +276,8 @@ package At 0.17 {
                             defined $args{addedLabels}           ? ( addedLabels           => $args{addedLabels} )              : (),
                             defined $args{removedLabels}         ? ( removedLabels         => $args{removedLabels} )            : (),
                             defined $args{reportTypes}           ? ( reportTypes           => $args{reportTypes} )              : (),
+                            defined $args{addedTags}             ? ( addedTags             => $args{addedTags} )                : (),
+                            defined $args{removedTags}           ? ( removedTags           => $args{removedTags} )              : (),
                             defined $args{cursor}                ? ( cursor                => $args{cursor} )                   : ()
                         }
                     }
@@ -315,7 +317,9 @@ package At 0.17 {
                             defined $args{sortDirection}  ? ( sortDirection  => $args{sortDirection} )                                 : (),
                             defined $args{takendown}      ? ( takendown      => \!!$args{takendown} )                                  : (),
                             defined $args{limit}          ? ( limit          => $args{limit} )                                         : (),
-                            defined $args{cursor}         ? ( cursor         => $args{cursor} )                                        : ()
+                            defined $args{cursor}         ? ( cursor         => $args{cursor} )                                        : (),
+                            defined $args{tags}           ? ( tags           => $args{tags} )                                          : (),
+                            defined $args{excludeTags}    ? ( excludeTags    => $args{excludeTags} )                                   : ()
                         }
                     }
                 );
@@ -1703,6 +1707,14 @@ If specified, only events where all of these labels were added are returned.
 
 If specified, only events where all of these labels were removed are returned.
 
+=item C<addedTags>
+
+If specified, only events where all of these tags were added are returned.
+
+=item C<removedTags>
+
+If specified, only events where all of these tags were removed are returned.
+
 =item C<reportTypes>
 
 =item C<cursor>
@@ -1772,6 +1784,14 @@ Get subjects that were taken down.
 =item C<limit>
 
 Minimum of 1, maximum is 100, the default is 50.
+
+=item C<tags>
+
+List of tags.
+
+=item C<excludeTags>
+
+List of tags to exclude.
 
 =item C<cursor>
 

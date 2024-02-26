@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/Acme/CPANModules/WorkingWithXLS.pm'];
+my $filenames = ['lib/Acme/CPANModules/Spreadsheet.pm','lib/Acme/CPANModules/WorkingWithODS.pm','lib/Acme/CPANModules/WorkingWithXLS.pm','lib/Acme/CPANModules/WorkingWithXLSX.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

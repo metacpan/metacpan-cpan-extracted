@@ -27,6 +27,7 @@ WriteMakefile(
 		'autodie' => 0,
 		'strict' => 0,
 		'warnings' => 0,
+		'Data::Dumper' => 0,
 		'DBD::SQLite::Constants' => 0,
 		'File::Basename' => 0,
 		'File::Spec' => 0,

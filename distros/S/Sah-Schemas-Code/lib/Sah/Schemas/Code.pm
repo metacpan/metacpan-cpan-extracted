@@ -3,9 +3,9 @@ package Sah::Schemas::Code;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-09-05'; # DATE
+our $DATE = '2023-12-20'; # DATE
 our $DIST = 'Sah-Schemas-Code'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: Various schemas related to 'code' type and coderefs
@@ -22,7 +22,7 @@ Sah::Schemas::Code - Various schemas related to 'code' type and coderefs
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::Schemas::Code (from Perl distribution Sah-Schemas-Code), released on 2023-09-05.
+This document describes version 0.003 of Sah::Schemas::Code (from Perl distribution Sah-Schemas-Code), released on 2023-12-20.
 
 =head1 SAH SCHEMAS
 
@@ -42,6 +42,13 @@ your case.
 By default C<eval()> is performed in the C<main> namespace and without stricture
 or warnings. See the parameterized version L<Sah::PSchema::code_from_str> if
 you want to customize the C<eval()>.
+
+What's the difference between this schema and C<str_or_code> (from
+L<Sah::Schemas::Str>)? Both this schema and C<str_or_code> accept string, but
+this schema will directly compile any input string while C<str_or_code> will only
+convert string to code if it is in the form of C<sub { ... }>. In other words,
+this schema will always produce coderef, while C<str_or_code> can produce strings
+also.
 
 
 =back

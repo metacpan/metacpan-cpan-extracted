@@ -90,7 +90,19 @@ foreach my $job (keys %{$config{checkLookup}}) {
 	}
 	my $infos = " is missing for job $job:\n";
 	my $lastLogFile = $logFileToCheck;
-	$lastLogFile =~ s/^(.+?[\\\/])([^\\\/]+?)$/$1$curDate\.$2/;
+	my $logAppender = Log::Log4perl->appenders()->{"FILE"}->{"appender"} if Log::Log4perl->appenders() and Log::Log4perl->appenders()->{"FILE"};
+	if ($logAppender) {
+		my $logprefix = get_curdate();
+		unless ($logAppender->isa("Log::Dispatch::FileRotate")) {
+			$@ = ""; # reset bogus error messages from Log::Log4perl::init
+			eval {$logprefix = $config{logprefixForLastLogfile}->()} if $config{logprefixForLastLogfile};
+			$logger->warn("error getting logprefix from \$config{logprefixForLastLogfile}: $@") if $@;
+			# if mail is watched next day, the rolled file is in $LogFPathDayBefore. Depending on appender, either append ".1" to filename or prepend $logprefix to it (default assume a date rotator, with current date in format yyyymmdd)
+			$lastLogFile =~ s/^(.+?[\\\/])([^\\\/]+?)$/$1$curDate\.$2/;
+		} else {
+			$lastLogFile .= ".1";
+		}
+	}
 	if (open (LOGFILE, "<$logFileToCheck")) {
 		# check log file for log check pattern, assumption tab separated!
 		while (<LOGFILE>){
@@ -119,7 +131,7 @@ foreach my $job (keys %{$config{checkLookup}}) {
 	# insert $curDate before file name with a dot
 	unless ($doneError{$job}) {
 		$infos = $infos."\njob: <$job>, frequency: ".$freqToCheck.", time to check: ".$timeToCheck.", log in file file:///".$logFileToCheck." resp. file:///".$lastLogFile;
-		$logger->info("failed logcheck for '".$job."', sending mail to: '".$mailsendTo);
+		$logger->warn("failed logcheck for '".$job."', sending mail to: '".$mailsendTo);
 		#            sendGeneralMail($From, $To, $Cc, $Bcc, $Subject, $Data, $Type, $Encoding, $AttachType, $AttachFile)
 		EAI::Common::sendGeneralMail("", $mailsendTo,"","","Starting problem detected for $job",$infos,'text/plain');
 		$doneError{$job} = 1;

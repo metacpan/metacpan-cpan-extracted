@@ -4,9 +4,9 @@ use strict;
 use Acme::CPANModulesUtil::Misc;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-11-26'; # DATE
+our $DATE = '2024-01-18'; # DATE
 our $DIST = 'Acme-CPANModules-GrepVariants'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 my $description = <<'_';
 This list catalogs various grep-like tools.
@@ -84,10 +84,18 @@ multiple terms into a chain of look-ahead patterns like described above. This
 allows you to use the standard grep.
 
 
-**3. Variants: alternate ways of specifying regex**
+**3. Variants: alternate ways of specifying things to search for**
 
-Instead of specifying a pattern, with <prog:rpgrep> (from <pm:App::rpgrep>) you
-can specify a pattern name in a <pm:Regexp::Pattern>::* module instead.
+Instead of specifying a regexp pattern directly, with <prog:rpgrep> (from
+<pm:App::rpgrep>) you can specify a pattern name in a <pm:Regexp::Pattern>::*
+module instead.
+
+With <prog:wcgrep> (from <pm:App::wcgrep>) you can search using wildcard pattern
+instead of regex, which is admittedly more limited than regex.
+
+<prog:grep-similar-text> (from <pm:App::grep::similar::text> lets you specify a
+text and it will only show lines from input that are similar to the provided
+text.
 
 
 **4a. Variants: alternate source: repository (version control system) content and history**
@@ -96,6 +104,7 @@ For git, the abovementioned `git-grep` can search for files in the work tree as
 well as commit content. For Mercurial, `hg grep` accomplishes the same.
 Alternatively you can dump the history then use the standard `grep` to go
 through it.
+
 
 **4b. Variants: alternate source: Perl source code**
 
@@ -116,7 +125,7 @@ or inside string literals.
 <prog:podgrep> (from <pm:pmtools>) greps from POD sections of Perl source.
 
 
-**4b. Variants: alternate source: CSV**
+**4c. Variants: alternate source: CSV**
 
 <prog:csvgrep> (from <pm:csvgrep>)
 
@@ -124,13 +133,13 @@ or inside string literals.
 rows of CSV.
 
 
-**4c. Variants: alternate source: word lists**
+**4d. Variants: alternate source: word lists**
 
 <prog:wordlist> (from <pm:App::wordlist>) greps words from wordlist modules
 (modules that contains word lists, see WordList).
 
 
-**4d. Variants: other alternate sources**
+**4e. Variants: other alternate sources**
 
 <prog:grep-from-bash-history> (from <pm:App::BashHistoryUtils>).
 
@@ -168,7 +177,7 @@ some text, or whether a certain query parameter must match some pattern.
 _
 
 our $LIST = {
-    summary => 'Grep-like CLI utilities available on CPAN',
+    summary => 'List of grep-like CLI utilities available on CPAN',
     description => $description,
     entries => [
     ],
@@ -177,7 +186,7 @@ our $LIST = {
 Acme::CPANModulesUtil::Misc::populate_entries_from_module_links_in_description;
 
 1;
-# ABSTRACT: Grep-like CLI utilities available on CPAN
+# ABSTRACT: List of grep-like CLI utilities available on CPAN
 
 __END__
 
@@ -187,11 +196,11 @@ __END__
 
 =head1 NAME
 
-Acme::CPANModules::GrepVariants - Grep-like CLI utilities available on CPAN
+Acme::CPANModules::GrepVariants - List of grep-like CLI utilities available on CPAN
 
 =head1 VERSION
 
-This document describes version 0.009 of Acme::CPANModules::GrepVariants (from Perl distribution Acme-CPANModules-GrepVariants), released on 2021-11-26.
+This document describes version 0.012 of Acme::CPANModules::GrepVariants (from Perl distribution Acme-CPANModules-GrepVariants), released on 2024-01-18.
 
 =head1 DESCRIPTION
 
@@ -267,10 +276,18 @@ L<grep-terms> (from L<App::GrepUtils>) is a grep wrapper to convert
 multiple terms into a chain of look-ahead patterns like described above. This
 allows you to use the standard grep.
 
-B<3. Variants: alternate ways of specifying regex>
+B<3. Variants: alternate ways of specifying things to search for>
 
-Instead of specifying a pattern, with L<rpgrep> (from L<App::rpgrep>) you
-can specify a pattern name in a L<Regexp::Pattern>::* module instead.
+Instead of specifying a regexp pattern directly, with L<rpgrep> (from
+L<App::rpgrep>) you can specify a pattern name in a L<Regexp::Pattern>::*
+module instead.
+
+With L<wcgrep> (from L<App::wcgrep>) you can search using wildcard pattern
+instead of regex, which is admittedly more limited than regex.
+
+L<grep-similar-text> (from L<App::grep::similar::text> lets you specify a
+text and it will only show lines from input that are similar to the provided
+text.
 
 B<4a. Variants: alternate source: repository (version control system) content and history>
 
@@ -297,19 +314,19 @@ or inside string literals.
 
 L<podgrep> (from L<pmtools>) greps from POD sections of Perl source.
 
-B<4b. Variants: alternate source: CSV>
+B<4c. Variants: alternate source: CSV>
 
 L<csvgrep> (from L<csvgrep>)
 
 L<csv-grep> (from L<App::CSVUtils>) allows you to apply Perl code against
 rows of CSV.
 
-B<4c. Variants: alternate source: word lists>
+B<4d. Variants: alternate source: word lists>
 
 L<wordlist> (from L<App::wordlist>) greps words from wordlist modules
 (modules that contains word lists, see WordList).
 
-B<4d. Variants: other alternate sources>
+B<4e. Variants: other alternate sources>
 
 L<grep-from-bash-history> (from L<App::BashHistoryUtils>).
 
@@ -346,97 +363,103 @@ L<dategrep> (from L<App::dategrep>) prints lines matching a date range.
 
 =over
 
-=item * L<PerlPowerTools> - BSD utilities written in pure Perl
+=item L<PerlPowerTools>
 
 Author: L<BDFOY|https://metacpan.org/author/BDFOY>
 
-=item * L<ack>
+=item L<ack>
 
-=item * L<App::Gre> - A grep clone using Perl regexp's with better file filtering, defaults, speed, and presentation
+=item L<App::Gre>
 
 Author: L<JACOBG|https://metacpan.org/author/JACOBG>
 
-=item * L<App::abgrep> - Print lines matching a pattern
+=item L<App::abgrep>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<App::Greple> - extensible grep with lexical expression and region handling
+=item L<App::Greple>
 
 Author: L<UTASHIRO|https://metacpan.org/author/UTASHIRO>
 
-=item * L<App::GrepUtils> - CLI utilities related to the Unix command 'grep'
+=item L<App::GrepUtils>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<App::rpgrep> - Print lines matching a Regexp::Pattern pattern
+=item L<App::rpgrep>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<Regexp::Pattern> - Convention/framework for modules that contain collection of regexes
+=item L<Regexp::Pattern>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<App::pmgrep> - Print lines from installed Perl module sources matching a pattern
+=item L<App::wcgrep>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<App::cpangrep> - Grep CPAN from the command-line using grep.cpan.me
+=item L<App::grep::similar::text>
+
+=item L<App::pmgrep>
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item L<App::cpangrep>
 
 Author: L<TSIBLEY|https://metacpan.org/author/TSIBLEY>
 
-=item * L<App::Grepl> - PPI-powered grep
+=item L<App::Grepl>
 
 Author: L<OVID|https://metacpan.org/author/OVID>
 
-=item * L<PPI> - Parse, Analyze and Manipulate Perl (without perl)
+=item L<PPI>
 
 Author: L<MITHALDU|https://metacpan.org/author/MITHALDU>
 
-=item * L<pmtools> - Perl Module Tools
+=item L<pmtools>
 
 Author: L<MLFISHER|https://metacpan.org/author/MLFISHER>
 
-=item * L<csvgrep>
+=item L<csvgrep>
 
 Author: L<NEILB|https://metacpan.org/author/NEILB>
 
-=item * L<App::CSVUtils> - CLI utilities related to CSV
+=item L<App::CSVUtils>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<App::wordlist> - Grep words from WordList::*
+=item L<App::wordlist>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<App::BashHistoryUtils> - CLI utilities related to bash history file
+=item L<App::BashHistoryUtils>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<App::IODUtils> - IOD utilities
+=item L<App::IODUtils>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<App::INIUtils> - INI utilities
+=item L<App::INIUtils>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<App::CryptoCurrencyUtils> - CLI utilities related to cryptocurrencies
+=item L<App::CryptoCurrencyUtils>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<App::JsonLogUtils> - Command line utilities for dealing with JSON-formatted log files
+=item L<App::JsonLogUtils>
 
 Author: L<JEFFOBER|https://metacpan.org/author/JEFFOBER>
 
-=item * L<App::PDFUtils> - Command-line utilities related to PDF files
+=item L<App::PDFUtils>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<Archive::Tar> - module for manipulations of tar archives
+=item L<Archive::Tar>
 
 Author: L<BINGOS|https://metacpan.org/author/BINGOS>
 
-=item * L<App::grep::url> - Print lines having URL(s) (optionally of certain criteria) in them
+=item L<App::grep::url>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
@@ -510,13 +533,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2021, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

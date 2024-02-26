@@ -1,10 +1,5 @@
 package App::instopt;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-25'; # DATE
-our $DIST = 'App-instopt'; # DIST
-our $VERSION = '0.020'; # VERSION
-
 use 5.010001;
 use strict 'subs', 'vars';
 use warnings;
@@ -12,10 +7,15 @@ use Log::ger;
 
 use App::swcat ();
 use File::chdir;
-use File::MoreUtil qw(dir_has_non_dot_files);
+use File::Util::Test qw(dir_has_non_dot_files);
 use Perinci::Object;
 use PerlX::Maybe;
 use Sah::Schema::software::arch;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-11-20'; # DATE
+our $DIST = 'App-instopt'; # DIST
+our $VERSION = '0.021'; # VERSION
 
 our %Config;
 our %SPEC;
@@ -122,7 +122,7 @@ sub _real_url {
         } elsif ($res->code !~ /^2/) {
             warn "Can't HEAD URL '$url': ".$res->code." - ".$res->message;
             # give up
-            return undef;
+            return undef;## no critic: Subroutines::ProhibitExplicitReturnUndef
         } else {
             return $url;
         }
@@ -292,7 +292,7 @@ sub list {
         for my $e (glob "*") {
             if (-l $e) {
                 unless (grep { $e eq $_ } @$swlist) {
-                    log_trace "Skipping symlink $e: name not in software list";
+                    log_trace "Skipping symlink $e: name '$e' not in software list";
                     next;
                 }
                 my $v = readlink($e);
@@ -303,14 +303,14 @@ sub list {
                 $installed_active_versions{$e} = $v;
             } elsif ((-d $e) && (-f "$e/instopt.version")) {
                 unless (grep { $e eq $_ } @$swlist) {
-                    log_trace "Skipping directory $e: name not in software list even though it has instopt.version file";
+                    log_trace "Skipping directory $e: name '$e' not in software list even though it has instopt.version file";
                     next;
                 }
                 chomp($installed_active_versions{$e} =
                           File::Slurper::read_text("$e/instopt.version"));
             } elsif (-d $e) {
                 my ($n, $v) = $e =~ /(.+)-(.+)/ or do {
-                    log_trace "Skipping directory $e: name does not contain dash (for NAME-VERSION)";
+                    log_trace "Skipping directory $e: name '$e' does not contain dash (for NAME-VERSION)";
                     next;
                 };
                 unless (grep { $n eq $_ } @$swlist) {
@@ -845,7 +845,7 @@ $SPEC{update} = {
 };
 sub update {
     require Archive::Any;
-    require File::MoreUtil;
+    require File::Util::Test;
     require File::Path;
     require Filename::Archive;
     require Filename::Executable;
@@ -1021,7 +1021,7 @@ sub update {
       SYMLINK_OR_HARDLINK_DIR: {
             log_trace "Creating/updating directory symlink/hardlink to latest version ...";
             local $CWD = $args{install_dir};
-            if (File::MoreUtil::file_exists($sw)) {
+            if (File::Util::Test::file_exists($sw)) {
                 File::Path::remove_tree($sw);
             }
             my $use_symlink = !$mod->is_dedicated_profile;
@@ -1045,7 +1045,7 @@ sub update {
             log_trace "Creating/updating program symlinks ...";
             my $programs = $aires->[2]{programs} // [];
             for my $e (@$programs) {
-                if ((-l $e->{name}) || !File::MoreUtil::file_exists($e->{name})) {
+                if ((-l $e->{name}) || !File::Util::Test::file_exists($e->{name})) {
                     unlink $e->{name};
                     my $target = "$args{install_dir}/$sw$e->{path}/$e->{name}";
                     $target =~ s!//!/!g;
@@ -1065,7 +1065,7 @@ sub update {
             last unless $fileformat eq 'executable';
             local $CWD = $args{program_dir};
             log_trace "Creating/updating program symlink ...";
-            if ((-l $sw) || !File::MoreUtil::file_exists($sw)) {
+            if ((-l $sw) || !File::Util::Test::file_exists($sw)) {
                 unlink $sw;
                 my $target = "$args{install_dir}/$sw/$filename";
                 $target =~ s!//!/!g;
@@ -1116,7 +1116,7 @@ App::instopt - Download and install software
 
 =head1 VERSION
 
-This document describes version 0.020 of App::instopt (from Perl distribution App-instopt), released on 2021-07-25.
+This document describes version 0.021 of App::instopt (from Perl distribution App-instopt), released on 2023-11-20.
 
 =head1 SYNOPSIS
 
@@ -1144,9 +1144,15 @@ Arguments ('*' denotes required arguments):
 
 =item * B<download_dir> => I<dirname>
 
+(No description)
+
 =item * B<install_dir> => I<dirname>
 
+(No description)
+
 =item * B<program_dir> => I<dirname>
+
+(No description)
 
 
 =back
@@ -1193,9 +1199,15 @@ Arguments ('*' denotes required arguments):
 
 =item * B<download_dir> => I<dirname>
 
+(No description)
+
 =item * B<install_dir> => I<dirname>
 
+(No description)
+
 =item * B<program_dir> => I<dirname>
+
+(No description)
 
 
 =back
@@ -1239,9 +1251,15 @@ Arguments ('*' denotes required arguments):
 
 =item * B<download_dir> => I<dirname>
 
+(No description)
+
 =item * B<install_dir> => I<dirname>
 
+(No description)
+
 =item * B<program_dir> => I<dirname>
+
+(No description)
 
 
 =back
@@ -1275,13 +1293,23 @@ Arguments ('*' denotes required arguments):
 
 =item * B<arch> => I<software::arch>
 
+(No description)
+
 =item * B<download_dir> => I<dirname>
+
+(No description)
 
 =item * B<install_dir> => I<dirname>
 
+(No description)
+
 =item * B<program_dir> => I<dirname>
 
+(No description)
+
 =item * B<softwares_or_patterns>* => I<array[str]>
+
+(No description)
 
 
 =back
@@ -1315,11 +1343,19 @@ Arguments ('*' denotes required arguments):
 
 =item * B<arch> => I<software::arch>
 
+(No description)
+
 =item * B<download_dir> => I<dirname>
+
+(No description)
 
 =item * B<install_dir> => I<dirname>
 
+(No description)
+
 =item * B<program_dir> => I<dirname>
+
+(No description)
 
 
 =back
@@ -1356,13 +1392,23 @@ Arguments ('*' denotes required arguments):
 
 =item * B<download_dir> => I<dirname>
 
+(No description)
+
 =item * B<install_dir> => I<dirname>
+
+(No description)
 
 =item * B<program_dir> => I<dirname>
 
+(No description)
+
 =item * B<quiet> => I<bool>
 
+(No description)
+
 =item * B<software>* => I<str>
+
+(No description)
 
 
 =back
@@ -1399,13 +1445,23 @@ Arguments ('*' denotes required arguments):
 
 =item * B<download_dir> => I<dirname>
 
+(No description)
+
 =item * B<install_dir> => I<dirname>
+
+(No description)
 
 =item * B<program_dir> => I<dirname>
 
+(No description)
+
 =item * B<quiet> => I<bool>
 
+(No description)
+
 =item * B<software>* => I<str>
+
+(No description)
 
 
 =back
@@ -1442,13 +1498,23 @@ Arguments ('*' denotes required arguments):
 
 =item * B<download_dir> => I<dirname>
 
+(No description)
+
 =item * B<install_dir> => I<dirname>
+
+(No description)
 
 =item * B<program_dir> => I<dirname>
 
+(No description)
+
 =item * B<quiet> => I<bool>
 
+(No description)
+
 =item * B<software>* => I<str>
+
+(No description)
 
 
 =back
@@ -1485,13 +1551,23 @@ Arguments ('*' denotes required arguments):
 
 =item * B<download_dir> => I<dirname>
 
+(No description)
+
 =item * B<install_dir> => I<dirname>
+
+(No description)
 
 =item * B<program_dir> => I<dirname>
 
+(No description)
+
 =item * B<quiet> => I<bool>
 
+(No description)
+
 =item * B<software>* => I<str>
+
+(No description)
 
 
 =back
@@ -1529,16 +1605,16 @@ Result:
 
  [
    500,
-   "Function died: Failed to change directory to '/home/s1/software': No such file or directory at lib/App/instopt.pm line 331.\n",
+   "Function died: Failed to change directory to '/home/u1/software': No such file or directory at (eval 2188) line 331.\n",
    undef,
    {
      logs => [
        {
-         file    => "/home/s1/perl5/perlbrew/perls/perl-5.30.2/lib/site_perl/5.30.2/Perinci/Access/Schemeless.pm",
+         file    => "/home/u1/perl5/perlbrew/perls/perl-5.38.0/lib/site_perl/5.38.0/Perinci/Access/Schemeless.pm",
          func    => "Perinci::Access::Schemeless::action_call",
-         line    => 501,
+         line    => 499,
          package => "Perinci::Access::Schemeless",
-         time    => 1627177634,
+         time    => 1700470253,
          type    => "create",
        },
      ],
@@ -1563,13 +1639,19 @@ Arguments ('*' denotes required arguments):
 
 =item * B<detail> => I<true>
 
+(No description)
+
 =item * B<download_dir> => I<dirname>
+
+(No description)
 
 =item * B<downloaded> => I<bool>
 
 If true, will only list downloaded software.
 
 =item * B<install_dir> => I<dirname>
+
+(No description)
 
 =item * B<installed> => I<bool>
 
@@ -1596,6 +1678,8 @@ If set to false, a software which is not installed, or does not have the latest
 version installed, will be included.
 
 =item * B<program_dir> => I<dirname>
+
+(No description)
 
 
 =back
@@ -1629,13 +1713,23 @@ Arguments ('*' denotes required arguments):
 
 =item * B<arch> => I<software::arch>
 
+(No description)
+
 =item * B<detail> => I<true>
+
+(No description)
 
 =item * B<download_dir> => I<dirname>
 
+(No description)
+
 =item * B<install_dir> => I<dirname>
 
+(No description)
+
 =item * B<program_dir> => I<dirname>
+
+(No description)
 
 
 =back
@@ -1669,13 +1763,23 @@ Arguments ('*' denotes required arguments):
 
 =item * B<arch> => I<software::arch>
 
+(No description)
+
 =item * B<download_dir> => I<dirname>
+
+(No description)
 
 =item * B<install_dir> => I<dirname>
 
+(No description)
+
 =item * B<program_dir> => I<dirname>
 
+(No description)
+
 =item * B<software>* => I<str>
+
+(No description)
 
 
 =back
@@ -1709,11 +1813,19 @@ Arguments ('*' denotes required arguments):
 
 =item * B<detail> => I<true>
 
+(No description)
+
 =item * B<download_dir> => I<dirname>
+
+(No description)
 
 =item * B<install_dir> => I<dirname>
 
+(No description)
+
 =item * B<program_dir> => I<dirname>
+
+(No description)
 
 
 =back
@@ -1747,11 +1859,19 @@ Arguments ('*' denotes required arguments):
 
 =item * B<download_dir> => I<dirname>
 
+(No description)
+
 =item * B<install_dir> => I<dirname>
+
+(No description)
 
 =item * B<program_dir> => I<dirname>
 
+(No description)
+
 =item * B<software>* => I<str>
+
+(No description)
 
 
 =back
@@ -1789,11 +1909,19 @@ Whether to download latest version from URLor just find from download dir.
 
 =item * B<download_dir> => I<dirname>
 
+(No description)
+
 =item * B<install_dir> => I<dirname>
+
+(No description)
 
 =item * B<program_dir> => I<dirname>
 
+(No description)
+
 =item * B<softwares_or_patterns>* => I<array[str]>
+
+(No description)
 
 
 =back
@@ -1831,9 +1959,15 @@ Whether to download latest version from URLor just find from download dir.
 
 =item * B<download_dir> => I<dirname>
 
+(No description)
+
 =item * B<install_dir> => I<dirname>
 
+(No description)
+
 =item * B<program_dir> => I<dirname>
+
+(No description)
 
 
 =back
@@ -1857,6 +1991,41 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-instop
 
 Source repository is at L<https://github.com/perlancar/perl-App-instopt>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords James Raspass
+
+James Raspass <jraspass@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023, 2021, 2020, 2019, 2018 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-instopt>
@@ -1864,36 +2033,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 CONTRIBUTORS
-
-=for stopwords James Raspass liana (on netbook-dell-xps13) perlancar pc-office)
-
-=over 4
-
-=item *
-
-James Raspass <jraspass@gmail.com>
-
-=item *
-
-liana (on netbook-dell-xps13) <lianamelati88@gmail.com>
-
-=item *
-
-perlancar (on pc-office) <perlancar@gmail.com>
-
-=back
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2020, 2019, 2018 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

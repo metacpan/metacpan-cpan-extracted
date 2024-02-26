@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,13 +59,13 @@ sub new {
 
 
 # Run Operation Request
-# PostHeaderRequest.name : The workbook name.  ,
+# PostHeaderRequest.name : The file name.  ,
 # PostHeaderRequest.sheetName : The worksheet name.  ,
 # PostHeaderRequest.section : 0:Left Section. 1:Center Section 2:Right Section  ,
 # PostHeaderRequest.script : Header format script.  ,
 # PostHeaderRequest.isFirstPage : Is first page(true/false).  ,
-# PostHeaderRequest.folder : Original workbook folder.  ,
-# PostHeaderRequest.storageName : Storage name.   
+# PostHeaderRequest.folder : The folder where the file is situated.  ,
+# PostHeaderRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -76,7 +76,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_header' } = { 
-    	summary => 'Updates page header in worksheet.',
+    	summary => 'Update page header in the worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -145,7 +145,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -180,14 +180,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

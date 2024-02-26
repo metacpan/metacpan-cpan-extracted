@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -175,6 +175,20 @@ __PACKAGE__->method_documentation({
      	format => '',
      	read_only => '',
      		},
+     'page_wide_fit_on_per_sheet' => {
+     	datatype => 'boolean',
+     	base_name => 'PageWideFitOnPerSheet',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
+     'page_tall_fit_on_per_sheet' => {
+     	datatype => 'boolean',
+     	base_name => 'PageTallFitOnPerSheet',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
      'save_options' => {
      	datatype => 'SaveOptions',
      	base_name => 'SaveOptions',
@@ -192,6 +206,8 @@ __PACKAGE__->swagger_types( {
     'out_folder' => 'string',
     'out_storage' => 'string',
     'region' => 'string',
+    'page_wide_fit_on_per_sheet' => 'boolean',
+    'page_tall_fit_on_per_sheet' => 'boolean',
     'save_options' => 'SaveOptions' 
 } );
 
@@ -203,6 +219,8 @@ __PACKAGE__->attribute_map( {
     'out_folder' => 'OutFolder',
     'out_storage' => 'OutStorage',
     'region' => 'Region',
+    'page_wide_fit_on_per_sheet' => 'PageWideFitOnPerSheet',
+    'page_tall_fit_on_per_sheet' => 'PageTallFitOnPerSheet',
     'save_options' => 'SaveOptions' 
 } );
 

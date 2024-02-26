@@ -19,7 +19,7 @@ name: Acme-CPANModules-TableData
 provides:
   Acme::CPANModules::TableData:
     file: lib/Acme/CPANModules/TableData.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Acme::CPANModulesUtil::Misc: '0'
   strict: '0'
@@ -28,7 +28,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-TableData
   homepage: https://metacpan.org/release/Acme-CPANModules-TableData
   repository: git://github.com/perlancar/perl-Acme-CPANModules-TableData.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.038002'

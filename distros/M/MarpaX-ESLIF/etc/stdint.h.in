@@ -1,0 +1,315 @@
+#ifndef CMAKE_HELPERS_STDINT_H
+#  define CMAKE_HELPERS_STDINT_H
+
+#cmakedefine HAVE_SYS_STDINT_H @HAVE_SYS_STDINT_H@
+#  ifdef HAVE_SYS_STDINT_H
+#    include <sys/stdint.h>
+#  else /* HAVE_SYS_STDINT_H */
+#cmakedefine HAVE_STDLIB_H @HAVE_STDLIB_H@
+#    ifdef HAVE_STDLIB_H
+#      include <stdlib.h>
+#    endif
+#cmakedefine HAVE_LIMITS_H @HAVE_LIMITS_H@
+#    ifdef HAVE_LIMITS_H
+#      include <limits.h>
+#    endif
+#cmakedefine HAVE_SYS_TYPES_H @HAVE_SYS_TYPES_H@
+#    ifdef HAVE_SYS_TYPES_H
+#      include <sys/types.h>
+#    endif
+#  
+/* ----------- */
+/* int8 family */
+/* ----------- */
+#cmakedefine HAVE_INT8_T @HAVE_INT8_T@
+#    ifndef HAVE_INT8_T
+#cmakedefine HAVE_CMAKE_HELPERS_INT8 @HAVE_CMAKE_HELPERS_INT8@
+#      ifdef HAVE_CMAKE_HELPERS_INT8
+typedef @CMAKE_HELPERS_INT8_TYPEDEF@ int8_t;
+#      endif
+#    endif
+#cmakedefine HAVE_INT_LEAST8_T @HAVE_INT_LEAST8_T@
+#    ifndef HAVE_INT_LEAST8_T
+#cmakedefine HAVE_CMAKE_HELPERS_INT_LEAST8 @HAVE_CMAKE_HELPERS_INT_LEAST8@
+#      ifdef HAVE_CMAKE_HELPERS_INT_LEAST8
+typedef @CMAKE_HELPERS_INT_LEAST8_TYPEDEF@ int_least8_t;
+#      endif
+#    endif
+#cmakedefine HAVE_INT_FAST8_T @HAVE_INT_FAST8_T@
+#    ifndef HAVE_INT_FAST8_T
+#cmakedefine HAVE_CMAKE_HELPERS_INT_FAST8 @HAVE_CMAKE_HELPERS_INT_FAST8@
+#      ifdef HAVE_CMAKE_HELPERS_INT_FAST8
+typedef @CMAKE_HELPERS_INT_FAST8_TYPEDEF@ int_fast8_t;
+#      endif
+#    endif
+
+/* ------------ */
+/* uint8 family */
+/* ------------ */
+#cmakedefine HAVE_UINT8_T @HAVE_UINT8_T@
+#    ifndef HAVE_UINT8_T
+#cmakedefine HAVE_CMAKE_HELPERS_UINT8 @HAVE_CMAKE_HELPERS_UINT8@
+#      ifdef HAVE_CMAKE_HELPERS_UINT8
+typedef @CMAKE_HELPERS_UINT8_TYPEDEF@ uint8_t;
+#      endif
+#    endif
+#cmakedefine HAVE_UINT_LEAST8_T @HAVE_UINT_LEAST8_T@
+#    ifndef HAVE_UINT_LEAST8_T
+#cmakedefine HAVE_CMAKE_HELPERS_UINT_LEAST8 @HAVE_CMAKE_HELPERS_UINT_LEAST8@
+#      ifdef HAVE_CMAKE_HELPERS_UINT_LEAST8
+typedef @CMAKE_HELPERS_UINT_LEAST8_TYPEDEF@ uint_least8_t;
+#      endif
+#    endif
+#cmakedefine HAVE_UINT_FAST8_T @HAVE_UINT_FAST8_T@
+#    ifndef HAVE_UINT_FAST8_T
+#cmakedefine HAVE_CMAKE_HELPERS_UINT_FAST8 @HAVE_CMAKE_HELPERS_UINT_FAST8@
+#      ifdef HAVE_CMAKE_HELPERS_UINT_FAST8
+typedef @CMAKE_HELPERS_UINT_FAST8_TYPEDEF@ uint_fast8_t;
+#      endif
+#    endif
+
+/* ------------ */
+/* int16 family */
+/* ------------ */
+#cmakedefine HAVE_INT16_T @HAVE_INT16_T@
+#    ifndef HAVE_INT16_T
+#cmakedefine HAVE_CMAKE_HELPERS_INT16 @HAVE_CMAKE_HELPERS_INT16@
+#      ifdef HAVE_CMAKE_HELPERS_INT16
+typedef @CMAKE_HELPERS_INT16_TYPEDEF@ int16_t;
+#      endif
+#    endif
+#cmakedefine HAVE_INT_LEAST16_T @HAVE_INT_LEAST16_T@
+#    ifndef HAVE_INT_LEAST16_T
+#cmakedefine HAVE_CMAKE_HELPERS_INT_LEAST16 @HAVE_CMAKE_HELPERS_INT_LEAST16@
+#      ifdef HAVE_CMAKE_HELPERS_INT_LEAST16
+typedef @CMAKE_HELPERS_INT_LEAST16_TYPEDEF@ int_least16_t;
+#      endif
+#    endif
+#cmakedefine HAVE_INT_FAST16_T @HAVE_INT_FAST16_T@
+#    ifndef HAVE_INT_FAST16_T
+#cmakedefine HAVE_CMAKE_HELPERS_INT_FAST16 @HAVE_CMAKE_HELPERS_INT_FAST16@
+#      ifdef HAVE_CMAKE_HELPERS_INT_FAST16
+typedef @CMAKE_HELPERS_INT_FAST16_TYPEDEF@ int_fast16_t;
+#      endif
+#    endif
+
+/* ------------- */
+/* uint16 family */
+/* ------------- */
+#cmakedefine HAVE_UINT16_T @HAVE_UINT16_T@
+#    ifndef HAVE_UINT16_T
+#cmakedefine HAVE_CMAKE_HELPERS_UINT16 @HAVE_CMAKE_HELPERS_UINT16@
+#      ifdef HAVE_CMAKE_HELPERS_UINT16
+typedef @CMAKE_HELPERS_UINT16_TYPEDEF@ uint16_t;
+#      endif
+#    endif
+#cmakedefine HAVE_UINT_LEAST16_T @HAVE_UINT_LEAST16_T@
+#    ifndef HAVE_UINT_LEAST16_T
+#cmakedefine HAVE_CMAKE_HELPERS_UINT_LEAST16 @HAVE_CMAKE_HELPERS_UINT_LEAST16@
+#      ifdef HAVE_CMAKE_HELPERS_UINT_LEAST16
+typedef @CMAKE_HELPERS_UINT_LEAST16_TYPEDEF@ uint_least16_t;
+#      endif
+#    endif
+#cmakedefine HAVE_UINT_FAST16_T @HAVE_UINT_FAST16_T@
+#    ifndef HAVE_UINT_FAST16_T
+#cmakedefine HAVE_CMAKE_HELPERS_UINT_FAST16 @HAVE_CMAKE_HELPERS_UINT_FAST16@
+#      ifdef HAVE_CMAKE_HELPERS_UINT_FAST16
+typedef @CMAKE_HELPERS_UINT_FAST16_TYPEDEF@ uint_fast16_t;
+#      endif
+#    endif
+
+/* ------------ */
+/* int32 family */
+/* ------------ */
+#cmakedefine HAVE_INT32_T @HAVE_INT32_T@
+#    ifndef HAVE_INT32_T
+#cmakedefine HAVE_CMAKE_HELPERS_INT32 @HAVE_CMAKE_HELPERS_INT32@
+#      ifdef HAVE_CMAKE_HELPERS_INT32
+typedef @CMAKE_HELPERS_INT32_TYPEDEF@ int32_t;
+#      endif
+#    endif
+#cmakedefine HAVE_INT_LEAST32_T @HAVE_INT_LEAST32_T@
+#    ifndef HAVE_INT_LEAST32_T
+#cmakedefine HAVE_CMAKE_HELPERS_INT_LEAST32 @HAVE_CMAKE_HELPERS_INT_LEAST32@
+#      ifdef HAVE_CMAKE_HELPERS_INT_LEAST32
+typedef @CMAKE_HELPERS_INT_LEAST32_TYPEDEF@ int_least32_t;
+#      endif
+#    endif
+#cmakedefine HAVE_INT_FAST32_T @HAVE_INT_FAST32_T@
+#    ifndef HAVE_INT_FAST32_T
+#cmakedefine HAVE_CMAKE_HELPERS_INT_FAST32 @HAVE_CMAKE_HELPERS_INT_FAST32@
+#      ifdef HAVE_CMAKE_HELPERS_INT_FAST32
+typedef @CMAKE_HELPERS_INT_FAST32_TYPEDEF@ int_fast32_t;
+#      endif
+#    endif
+
+/* ------------- */
+/* uint32 family */
+/* ------------- */
+#cmakedefine HAVE_UINT32_T @HAVE_UINT32_T@
+#    ifndef HAVE_UINT32_T
+#cmakedefine HAVE_CMAKE_HELPERS_UINT32 @HAVE_CMAKE_HELPERS_UINT32@
+#      ifdef HAVE_CMAKE_HELPERS_UINT32
+typedef @CMAKE_HELPERS_UINT32_TYPEDEF@ uint32_t;
+#      endif
+#    endif
+#cmakedefine HAVE_UINT_LEAST32_T @HAVE_UINT_LEAST32_T@
+#    ifndef HAVE_UINT_LEAST32_T
+#cmakedefine HAVE_CMAKE_HELPERS_UINT_LEAST32 @HAVE_CMAKE_HELPERS_UINT_LEAST32@
+#      ifdef HAVE_CMAKE_HELPERS_UINT_LEAST32
+typedef @CMAKE_HELPERS_UINT_LEAST32_TYPEDEF@ uint_least32_t;
+#      endif
+#    endif
+#cmakedefine HAVE_UINT_FAST32_T @HAVE_UINT_FAST32_T@
+#    ifndef HAVE_UINT_FAST32_T
+#cmakedefine HAVE_CMAKE_HELPERS_UINT_FAST32 @HAVE_CMAKE_HELPERS_UINT_FAST32@
+#      ifdef HAVE_CMAKE_HELPERS_UINT_FAST32
+typedef @CMAKE_HELPERS_UINT_FAST32_TYPEDEF@ uint_fast32_t;
+#      endif
+#    endif
+
+/* ------------ */
+/* int64 family */
+/* ------------ */
+#cmakedefine HAVE_INT64_T @HAVE_INT64_T@
+#    ifndef HAVE_INT64_T
+#cmakedefine HAVE_CMAKE_HELPERS_INT64 @HAVE_CMAKE_HELPERS_INT64@
+#      ifdef HAVE_CMAKE_HELPERS_INT64
+typedef @CMAKE_HELPERS_INT64_TYPEDEF@ int64_t;
+#      endif
+#    endif
+#cmakedefine HAVE_INT_LEAST64_T @HAVE_INT_LEAST64_T@
+#    ifndef HAVE_INT_LEAST64_T
+#cmakedefine HAVE_CMAKE_HELPERS_INT_LEAST64 @HAVE_CMAKE_HELPERS_INT_LEAST64@
+#      ifdef HAVE_CMAKE_HELPERS_INT_LEAST64
+typedef @CMAKE_HELPERS_INT_LEAST64_TYPEDEF@ int_least64_t;
+#      endif
+#    endif
+#cmakedefine HAVE_INT_FAST64_T @HAVE_INT_FAST64_T@
+#    ifndef HAVE_INT_FAST64_T
+#cmakedefine HAVE_CMAKE_HELPERS_INT_FAST64 @HAVE_CMAKE_HELPERS_INT_FAST64@
+#      ifdef HAVE_CMAKE_HELPERS_INT_FAST64
+typedef @CMAKE_HELPERS_INT_FAST64_TYPEDEF@ int_fast64_t;
+#      endif
+#    endif
+
+/* ------------- */
+/* uint64 family */
+/* ------------- */
+#cmakedefine HAVE_UINT64_T @HAVE_UINT64_T@
+#    ifndef HAVE_UINT64_T
+#cmakedefine HAVE_CMAKE_HELPERS_UINT64 @HAVE_CMAKE_HELPERS_UINT64@
+#      ifdef HAVE_CMAKE_HELPERS_UINT64
+typedef @CMAKE_HELPERS_UINT64_TYPEDEF@ uint64_t;
+#      endif
+#    endif
+#cmakedefine HAVE_UINT_LEAST64_T @HAVE_UINT_LEAST64_T@
+#    ifndef HAVE_UINT_LEAST64_T
+#cmakedefine HAVE_CMAKE_HELPERS_UINT_LEAST64 @HAVE_CMAKE_HELPERS_UINT_LEAST64@
+#      ifdef HAVE_CMAKE_HELPERS_UINT_LEAST64
+typedef @CMAKE_HELPERS_UINT_LEAST64_TYPEDEF@ uint_least64_t;
+#      endif
+#    endif
+#cmakedefine HAVE_UINT_FAST64_T @HAVE_UINT_FAST64_T@
+#    ifndef HAVE_UINT_FAST64_T
+#cmakedefine HAVE_CMAKE_HELPERS_UINT_FAST64 @HAVE_CMAKE_HELPERS_UINT_FAST64@
+#      ifdef HAVE_CMAKE_HELPERS_UINT_FAST64
+typedef @CMAKE_HELPERS_UINT_FAST64_TYPEDEF@ uint_fast64_t;
+#      endif
+#    endif
+
+/* ----------------------------------------------- */
+/* Integer type capable of holding object pointers */
+/* ----------------------------------------------- */
+#cmakedefine HAVE_INTPTR_T @HAVE_INTPTR_T@
+#    ifndef HAVE_INTPTR_T
+#cmakedefine HAVE_CMAKE_HELPERS_INTPTR @HAVE_CMAKE_HELPERS_INTPTR@
+#      ifdef HAVE_CMAKE_HELPERS_INTPTR
+typedef @CMAKE_HELPERS_INTPTR_TYPEDEF@ intptr_t;
+#      endif
+#    endif
+#cmakedefine HAVE_UINTPTR_T @HAVE_UINTPTR_T@
+#    ifndef HAVE_UINTPTR_T
+#cmakedefine HAVE_CMAKE_HELPERS_UINTPTR @HAVE_CMAKE_HELPERS_UINTPTR@
+#      ifdef HAVE_CMAKE_HELPERS_UINTPTR
+typedef @CMAKE_HELPERS_UINTPTR_TYPEDEF@ uintptr_t;
+#      endif
+#    endif
+
+/* ----------------------------------------------- */
+/* Limits of Specified-Width Integer Types         */
+/* ----------------------------------------------- */
+#    ifndef INT8_MIN
+#cmakedefine CMAKE_HELPERS_INT8_MIN @CMAKE_HELPERS_INT8_MIN@
+#      ifdef CMAKE_HELPERS_INT8_MIN
+#        define INT8_MIN CMAKE_HELPERS_INT8_MIN
+#      endif
+#    endif
+#    ifndef INT8_MAX
+#cmakedefine CMAKE_HELPERS_INT8_MAX @CMAKE_HELPERS_INT8_MAX@
+#      ifdef CMAKE_HELPERS_INT8_MAX
+#        define INT8_MAX CMAKE_HELPERS_INT8_MAX
+#      endif
+#    endif
+#    ifndef UINT8_MAX
+#cmakedefine CMAKE_HELPERS_UINT8_MAX @CMAKE_HELPERS_UINT8_MAX@
+#      ifdef CMAKE_HELPERS_UINT8_MAX
+#        define UINT8_MAX CMAKE_HELPERS_UINT8_MAX
+#      endif
+#    endif
+#    ifndef INT16_MIN
+#cmakedefine CMAKE_HELPERS_INT16_MIN @CMAKE_HELPERS_INT16_MIN@
+#      ifdef CMAKE_HELPERS_INT16_MIN
+#        define INT16_MIN CMAKE_HELPERS_INT16_MIN
+#      endif
+#    endif
+#    ifndef INT16_MAX
+#cmakedefine CMAKE_HELPERS_INT16_MAX @CMAKE_HELPERS_INT16_MAX@
+#      ifdef CMAKE_HELPERS_INT16_MAX
+#        define INT16_MAX CMAKE_HELPERS_INT16_MAX
+#      endif
+#    endif
+#    ifndef UINT16_MAX
+#cmakedefine CMAKE_HELPERS_UINT16_MAX @CMAKE_HELPERS_UINT16_MAX@
+#      ifdef CMAKE_HELPERS_UINT16_MAX
+#        define UINT16_MAX CMAKE_HELPERS_UINT16_MAX
+#      endif
+#    endif
+#    ifndef INT32_MIN
+#cmakedefine CMAKE_HELPERS_INT32_MIN @CMAKE_HELPERS_INT32_MIN@
+#      ifdef CMAKE_HELPERS_INT32_MIN
+#        define INT32_MIN CMAKE_HELPERS_INT32_MIN
+#      endif
+#    endif
+#    ifndef INT32_MAX
+#cmakedefine CMAKE_HELPERS_INT32_MAX @CMAKE_HELPERS_INT32_MAX@
+#      ifdef CMAKE_HELPERS_INT32_MAX
+#        define INT32_MAX CMAKE_HELPERS_INT32_MAX
+#      endif
+#    endif
+#    ifndef UINT32_MAX
+#cmakedefine CMAKE_HELPERS_UINT32_MAX @CMAKE_HELPERS_UINT32_MAX@
+#      ifdef CMAKE_HELPERS_UINT32_MAX
+#        define UINT32_MAX CMAKE_HELPERS_UINT32_MAX
+#      endif
+#    endif
+#    ifndef INT64_MIN
+#cmakedefine CMAKE_HELPERS_INT64_MIN @CMAKE_HELPERS_INT64_MIN@
+#      ifdef CMAKE_HELPERS_INT64_MIN
+#        define INT64_MIN CMAKE_HELPERS_INT64_MIN
+#      endif
+#    endif
+#    ifndef INT64_MAX
+#cmakedefine CMAKE_HELPERS_INT64_MAX @CMAKE_HELPERS_INT64_MAX@
+#      ifdef CMAKE_HELPERS_INT64_MAX
+#        define INT64_MAX CMAKE_HELPERS_INT64_MAX
+#      endif
+#    endif
+#    ifndef UINT64_MAX
+#cmakedefine CMAKE_HELPERS_UINT64_MAX @CMAKE_HELPERS_UINT64_MAX@
+#      ifdef CMAKE_HELPERS_UINT64_MAX
+#        define UINT64_MAX CMAKE_HELPERS_UINT64_MAX
+#      endif
+#    endif
+#  endif HAVE_SYS_STDINT_H
+#endif /* CMAKE_HELPERS_STDINT_H */

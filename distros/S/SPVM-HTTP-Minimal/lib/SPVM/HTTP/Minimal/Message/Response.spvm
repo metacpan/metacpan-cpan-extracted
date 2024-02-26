@@ -3,13 +3,16 @@
 
 class HTTP::Minimal::Message::Response extends HTTP::Minimal::Message {
   allow HTTP::Minimal::Socket;
+  allow HTTP::Minimal;
   
   use HTTP::Minimal::Headers;
   
   # Fields
   has protocol : ro string;
   
-  has status : ro string;
+  has status : ro int;
+  
+  has success : ro byte;
   
   has reason : ro string;
   
@@ -28,17 +31,6 @@ class HTTP::Minimal::Message::Response extends HTTP::Minimal::Message {
   }
   
   # Instance Methods
-  method is_success : int () {
-    my $status = $self->{status};
-    
-    my $success = 0;
-    if ($status && $status->[0] == '2') {
-      $success = 1;
-    }
-    
-    return $success;
-  }
-  
   method content : string () {
     return $self->{content_buffer}->to_string;
   }

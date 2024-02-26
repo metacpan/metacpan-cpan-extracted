@@ -70,27 +70,27 @@
    "provides" : {
       "EAI::Common" : {
          "file" : "lib/EAI/Common.pm",
-         "version" : "1.908"
+         "version" : "1.911"
       },
       "EAI::DB" : {
          "file" : "lib/EAI/DB.pm",
-         "version" : "1.908"
+         "version" : "1.911"
       },
       "EAI::DateUtil" : {
          "file" : "lib/EAI/DateUtil.pm",
-         "version" : "1.908"
+         "version" : "1.911"
       },
       "EAI::FTP" : {
          "file" : "lib/EAI/FTP.pm",
-         "version" : "1.908"
+         "version" : "1.911"
       },
       "EAI::File" : {
          "file" : "lib/EAI/File.pm",
-         "version" : "1.908"
+         "version" : "1.911"
       },
       "EAI::Wrap" : {
          "file" : "lib/EAI/Wrap.pm",
-         "version" : "1.908"
+         "version" : "1.911"
       }
    },
    "release_status" : "stable",
@@ -104,6 +104,6 @@
          "web" : "https://github.com/rkapl123/EAI-Wrap"
       }
    },
-   "version" : "1.908",
+   "version" : "1.911",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

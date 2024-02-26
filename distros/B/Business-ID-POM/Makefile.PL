@@ -23,13 +23,12 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Business::ID::NPWP" => 0,
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Test::More" => "0.98"
+    "Test::More" => 0
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,13 +36,12 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Business::ID::NPWP" => 0,
   "Exporter" => "5.57",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Log::ger" => "0.038",
-  "Test::More" => "0.98",
+  "Test::More" => 0,
   "strict" => 0,
   "warnings" => 0
 );

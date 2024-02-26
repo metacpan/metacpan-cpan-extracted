@@ -26,4 +26,4 @@ my $dt_ca_fr = DateTime->new(
 	time_zone  => 'Europe/London',
 );
 
-is ($dt_ca_fr->format_cldr($locale->datetime_format_full), 'úterý 25. října 1966 7:15:47 Europe/London', 'Date Time Format Full Czech');
+is ($dt_ca_fr->format_cldr($locale->datetime_format_full), 'úterý 25. října 1966 7:15:47, Europe/London', 'Date Time Format Full Czech');

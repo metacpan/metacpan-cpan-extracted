@@ -9,7 +9,7 @@ use Role::Tiny;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2024-01-15'; # DATE
 our $DIST = 'TableDataRoles-Standard'; # DIST
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.023'; # VERSION
 
 with 'TableDataRole::Spec::Basic';
 
@@ -112,7 +112,7 @@ TableDataRole::Source::AOH - Get table data from an array of hashes
 
 =head1 VERSION
 
-This document describes version 0.021 of TableDataRole::Source::AOH (from Perl distribution TableDataRoles-Standard), released on 2024-01-15.
+This document describes version 0.023 of TableDataRole::Source::AOH (from Perl distribution TableDataRoles-Standard), released on 2024-01-15.
 
 =head1 SYNOPSIS
 

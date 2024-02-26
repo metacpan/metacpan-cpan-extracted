@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Bm - Package for language Bambara
 
 package Locale::CLDR::Locales::Bm;
 # This file auto generated from Data\common\main\bm.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -624,9 +624,14 @@ has 'currencies' => (
 				'currency' => q(Ɛlɛni-Senu Livri),
 			},
 		},
-		'SLL' => {
+		'SLE' => {
 			display_name => {
 				'currency' => q(siyeralewɔni Lewɔni),
+			},
+		},
+		'SLL' => {
+			display_name => {
+				'currency' => q(siyeralewɔni Lewɔni \(1964—2022\)),
 			},
 		},
 		'SOS' => {
@@ -944,7 +949,6 @@ has 'datetime_formats_available_formats' => (
 			MMdd => q{dd/MM},
 			Md => q{d/M},
 			ms => q{m:ss},
-			y => q{y},
 			yM => q{M/y},
 			yMEd => q{E d/M/y},
 			yMM => q{MM/y},
@@ -964,19 +968,6 @@ has 'datetime_formats_append_item' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			'Day' => '{0} ({2}: {1})',
-			'Day-Of-Week' => '{0} {1}',
-			'Era' => '{1} {0}',
-			'Hour' => '{0} ({2}: {1})',
-			'Minute' => '{0} ({2}: {1})',
-			'Month' => '{0} ({2}: {1})',
-			'Quarter' => '{0} ({2}: {1})',
-			'Second' => '{0} ({2}: {1})',
-			'Timezone' => '{0} {1}',
-			'Week' => '{0} ({2}: {1})',
-			'Year' => '{1} {0}',
-		},
 	} },
 );
 

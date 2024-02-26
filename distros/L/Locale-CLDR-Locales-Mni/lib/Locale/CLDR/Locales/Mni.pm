@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Mni - Package for language Manipuri
 
 package Locale::CLDR::Locales::Mni;
 # This file auto generated from Data\common\main\mni.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -24,22 +24,6 @@ use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
 extends('Locale::CLDR::Locales::Root');
-# Need to add code for Key type pattern
-sub display_name_pattern {
-	my ($self, $name, $region, $script, $variant) = @_;
-
-	my $display_pattern = '{0} ({1})';
-	$display_pattern =~s/\{0\}/$name/g;
-	my $subtags = join '{0}, {1}', grep {$_} (
-		$region,
-		$script,
-		$variant,
-	);
-
-	$display_pattern =~s/\{1\}/$subtags/g;
-	return $display_pattern;
-}
-
 has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
@@ -47,7 +31,10 @@ has 'display_name_language' => (
 	default		=> sub {
 		 sub {
 			 my %languages = (
-				'de' => 'জর্মন',
+				'ar' => 'আরাবিক',
+ 				'ar_001' => 'মোর্দর্ন স্তেন্দর্দ আরাবিক',
+ 				'bn' => 'বাংলা',
+ 				'de' => 'জর্মন',
  				'de_AT' => 'ওষ্ট্রিয়ান জর্মন',
  				'de_CH' => 'স্বিজ হায় জর্মন',
  				'en' => 'ইংলিস',
@@ -64,13 +51,21 @@ has 'display_name_language' => (
  				'fr' => 'ফ্রেঞ্চ',
  				'fr_CA' => 'কানাদিয়ান ফ্রেঞ্চ',
  				'fr_CH' => 'স্বিজ ফ্রেঞ্চ',
+ 				'hi' => 'হিন্দী',
+ 				'id' => 'ইন্দোনেসিয়া',
  				'it' => 'ইটালিয়ন',
  				'ja' => 'জাপানিজ',
+ 				'ko' => 'কোরিয়ন',
  				'mni' => 'মৈতৈলোন্',
+ 				'nl' => 'দচ',
+ 				'nl_BE' => 'ফ্লেমিশ',
+ 				'pl' => 'পোলিশ',
  				'pt' => 'পোর্টুগিজ',
  				'pt_BR' => 'ব্রাজিলিয়ান পোর্টুগিজ',
  				'pt_PT' => 'য়ুরোপিয়ান পোর্টুগিজ',
  				'ru' => 'রুসিয়ান',
+ 				'th' => 'থাই',
+ 				'tr' => 'টর্কিশ',
  				'und' => 'মশকখংদবা লোল',
  				'zh' => 'চাইনিজ',
  				'zh@alt=menu' => 'চাইনিজ মন্দারিন',
@@ -102,8 +97,10 @@ has 'display_name_script' => (
  			'Hans@alt=stand-alone' => 'লাইথোকহল্লবা চাইনিজ',
  			'Hant' => 'ত্রেদিস্নেল',
  			'Hant@alt=stand-alone' => 'ত্রেদিস্নেল চাইনিজ',
+ 			'Jpan' => 'জপানিজ',
+ 			'Kore' => 'কোরিয়ন',
  			'Latn' => 'লেটিন',
- 			'Mtei' => 'মেইটেই মায়েক',
+ 			'Mtei' => 'মীতৈ ময়েক',
  			'Zxxx' => 'ইদবা',
  			'Zzzz' => 'মশকখংদবা স্ক্রিপ্ট',
 
@@ -122,7 +119,11 @@ has 'display_name_region' => (
 	init_arg	=> undef,
 	default		=> sub {
 		{
-			'BR' => 'ব্রাজিল',
+			'001' => 'মালেম',
+ 			'002' => 'অফ্রিকা',
+ 			'019' => 'অমেরিকাশিং',
+ 			'150' => 'য়ুরোপ',
+ 			'BR' => 'ব্রাজিল',
  			'CN' => 'চিনা',
  			'DE' => 'জর্মনি',
  			'FR' => 'ফ্রান্স',
@@ -197,9 +198,9 @@ has 'characters' => (
 		no warnings 'experimental::regex_sets';
 		return {
 			auxiliary => qr{[‌‍]},
-			main => qr{[় ঁ ং ঃ অ আ ই ঈ উ ঊ ঋ এ ঐ ও ঔ ক খ গ ঘ ঙ চ ছ জ ঝ ঞ ট ঠ ড {ড়} ঢ {ঢ়} ণ ত থ দ ধ ন প ফ ব ভ ম য {য়} র ল ৱ শ ষ স হ া ি ী ু ূ ৃ ে ৈ ো ৌ ্]},
+			main => qr{[় ঁংঃ অ আ ই ঈ উ ঊ ঋ এ ঐ ও ঔ ক খ গ ঘ ঙ চ ছ জ ঝ ঞ ট ঠ ড{ড়} ঢ{ঢ়} ণ ত থ দ ধ ন প ফ ব ভ ম য{য়} র ল ৱ শ ষ স হ া ি ী ু ূ ৃ ে ৈ ো ৌ ্]},
 			numbers => qr{[\- ‑ , . % ‰ + 0০ 1১ 2২ 3৩ 4৪ 5৫ 6৬ 7৭ 8৮ 9৯]},
-			punctuation => qr{[\- ‐ ‑ – — , ; \: ! ? . … ' ‘ ’ " “ ” ( ) \[ \] § @ * / \& # † ‡ ′ ″]},
+			punctuation => qr{[\- ‐‑ – — , ; \: ! ? . … '‘’ "“” ( ) \[ \] § @ * / \& # † ‡ ′ ″]},
 		};
 	},
 EOT
@@ -228,8 +229,6 @@ has 'listPatterns' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-				start => q({0}, {1}),
-				middle => q({0}, {1}),
 				end => q({0} অমসুং {1}),
 				2 => q({0} অমসুং {1}),
 		} }
@@ -242,21 +241,6 @@ has 'default_numbering_system' => (
 	default		=> 'beng',
 );
 
-has 'number_symbols' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'latn' => {
-			'decimal' => q(.),
-			'group' => q(,),
-			'minusSign' => q(-),
-			'percentSign' => q(%),
-			'plusSign' => q(+),
-		},
-	} }
-);
-
 has 'currencies' => (
 	is			=> 'ro',
 	isa			=> HashRef,
@@ -265,56 +249,47 @@ has 'currencies' => (
 		'BRL' => {
 			display_name => {
 				'currency' => q(ব্রাজিলিয়ান রেয়াল),
-				'other' => q(ব্রাজিলিয়ান রেয়াল),
 			},
 		},
 		'CNY' => {
 			display_name => {
 				'currency' => q(চাইনিজ য়ুআন),
-				'other' => q(চাইনিজ য়ুআন),
 			},
 		},
 		'EUR' => {
 			display_name => {
 				'currency' => q(য়ুরো),
-				'other' => q(য়ুরো),
 			},
 		},
 		'GBP' => {
 			display_name => {
 				'currency' => q(ব্রিটিশ পাউন্দ),
-				'other' => q(ব্রিটিশ পাউন্দ),
 			},
 		},
 		'INR' => {
 			display_name => {
 				'currency' => q(ইন্দিয়ান রুপী),
-				'other' => q(ইন্দিয়ান রুপী),
 			},
 		},
 		'JPY' => {
 			display_name => {
 				'currency' => q(জাপানিজ য়েন),
-				'other' => q(জাপানিজ য়েন),
 			},
 		},
 		'RUB' => {
 			display_name => {
 				'currency' => q(রুসিয়ান রুবল),
-				'other' => q(রুসিয়ান রুবল),
 			},
 		},
 		'USD' => {
 			symbol => '$',
 			display_name => {
 				'currency' => q(য়ু এস দি),
-				'other' => q(য়ু এস দি),
 			},
 		},
 		'XXX' => {
 			display_name => {
 				'currency' => q(মশকখংদবা করেন্সি),
-				'other' => q(মশকখংদবা করেন্সি),
 			},
 		},
 	} },
@@ -330,14 +305,14 @@ has 'calendar_months' => (
 				'format' => {
 					abbreviated => {
 						nonleap => [
-							'জানুৱারি',
+							'জন',
 							'ফেব্রুৱারি',
 							'মার্চ',
 							'এপ্রিল',
 							'মে',
 							'জুন',
 							'জুলাই',
-							'আগস্ট',
+							'ওগ',
 							'সেপ্টেম্বর',
 							'ওক্টোবর',
 							'নভেম্বর',
@@ -368,14 +343,14 @@ has 'calendar_months' => (
 					},
 					wide => {
 						nonleap => [
-							'জানুৱারি',
+							'জনুৱারী',
 							'ফেব্রুৱারি',
 							'মার্চ',
 							'এপ্রিল',
 							'মে',
 							'জুন',
 							'জুলাই',
-							'আগস্ট',
+							'‌ওগষ্ট',
 							'সেপ্টেম্বর',
 							'ওক্টোবর',
 							'নভেম্বর',
@@ -456,15 +431,6 @@ has 'calendar_days' => (
 	default		=> sub { {
 			'gregorian' => {
 				'format' => {
-					abbreviated => {
-						mon => 'নিংথৌকাবা',
-						tue => 'লৈবাকপোকপা',
-						wed => 'য়ুমশকৈশা',
-						thu => 'শগোলশেন',
-						fri => 'ইরাই',
-						sat => 'থাংজ',
-						sun => 'নোংমাইজিং'
-					},
 					narrow => {
 						mon => 'নিং',
 						tue => 'লৈবা',
@@ -485,15 +451,6 @@ has 'calendar_days' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						mon => 'নিংথৌকাবা',
-						tue => 'লৈবাকপোকপা',
-						wed => 'য়ুমশকৈশা',
-						thu => 'শগোলশেন',
-						fri => 'ইরাই',
-						sat => 'থাংজ',
-						sun => 'নোংমাইজিং'
-					},
 					narrow => {
 						mon => 'নিং',
 						tue => 'লৈ',
@@ -502,15 +459,6 @@ has 'calendar_days' => (
 						fri => 'ইরা',
 						sat => 'থাং',
 						sun => 'নো'
-					},
-					wide => {
-						mon => 'নিংথৌকাবা',
-						tue => 'লৈবাকপোকপা',
-						wed => 'য়ুমশকৈশা',
-						thu => 'শগোলশেন',
-						fri => 'ইরাই',
-						sat => 'থাংজ',
-						sun => 'নোংমাইজিং'
 					},
 				},
 			},
@@ -524,11 +472,6 @@ has 'calendar_quarters' => (
 	default		=> sub { {
 			'gregorian' => {
 				'format' => {
-					abbreviated => {0 => 'অহানবা মসুং',
-						1 => 'অনীশুবা মসুং',
-						2 => 'অহুমশুবা মসুং',
-						3 => 'মরীশুবা মসুং'
-					},
 					wide => {0 => 'অহানবা মসুং',
 						1 => 'অনীশুবা মসুং',
 						2 => 'অহুমশুবা মসুং',
@@ -617,14 +560,14 @@ has 'datetime_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-			'full' => q{{1} গী {0} দা},
-			'long' => q{{1} গী {0} দা},
+			'full' => q{{1} {0}},
+			'long' => q{{1} {0}},
 			'medium' => q{{1} {0}},
 			'short' => q{{1}, {0}},
 		},
 		'gregorian' => {
-			'full' => q{{1} গী {0} দা},
-			'long' => q{{1} গী {0} দা},
+			'full' => q{{1}, {0}},
+			'long' => q{{1}, {0}},
 			'medium' => q{{1}, {0}},
 			'short' => q{{1}, {0}},
 		},
@@ -637,14 +580,8 @@ has 'datetime_formats_available_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'gregorian' => {
-			GyMMM => q{G y MMM},
-			GyMMMEd => q{G y MMM d, E},
-			GyMMMd => q{G y MMM d},
 			GyMd => q{GGGGG dd-MM-y},
 			MEd => q{d/M, E},
-			MMMEd => q{MMM d, E},
-			MMMMd => q{MMMM d},
-			MMMd => q{MMM d},
 			Md => q{d/M},
 			yM => q{M/y},
 			yMEd => q{d/M/y, E},
@@ -653,7 +590,6 @@ has 'datetime_formats_available_formats' => (
 			yMMMM => q{MMMM y},
 			yMMMd => q{MMM d, y},
 			yMd => q{d/M/y},
-			yQQQ => q{y QQQ},
 		},
 	} },
 );
@@ -682,13 +618,11 @@ has 'time_zone_names' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default	=> sub { {
-		hourFormat => q(+HH:mm;-HH:mm),
 		gmtFormat => q(জি এম টি {0}),
 		gmtZeroFormat => q(জি এম টি),
 		regionFormat => q({0} টাইম),
 		regionFormat => q({0} (+1) দেলাইট টাইম),
 		regionFormat => q({0} (+0) ষ্টেন্দর্দ টাইম),
-		fallbackFormat => q({1} ({0})),
 		'America_Central' => {
 			long => {
 				'daylight' => q#নোর্থ অমেরিকান সেন্ত্রেল দেলাইট টাইম#,

@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver;
 # ABSTRACT: Neo4j community graph database driver for Bolt and HTTP
-$Neo4j::Driver::VERSION = '0.44';
+$Neo4j::Driver::VERSION = '0.45';
 
 use Carp qw(croak);
 
@@ -247,7 +247,7 @@ Neo4j::Driver - Neo4j community graph database driver for Bolt and HTTP
 
 =head1 VERSION
 
-version 0.44
+version 0.45
 
 =head1 SYNOPSIS
 

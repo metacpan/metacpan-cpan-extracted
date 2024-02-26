@@ -1,10 +1,10 @@
 NAME
-    Acme::CPANModules::HTMLTable - Modules that generate HTML tables
+    Acme::CPANModules::HTMLTable - List of modules that generate HTML tables
 
 VERSION
-    This document describes version 0.001 of Acme::CPANModules::HTMLTable
+    This document describes version 0.002 of Acme::CPANModules::HTMLTable
     (from Perl distribution Acme-CPANModules-HTMLTable), released on
-    2021-02-16.
+    2023-10-29.
 
 SYNOPSIS
     To run benchmark with default option:
@@ -19,15 +19,31 @@ SYNOPSIS
     list/include/exclude/add datasets, etc), see bencher or run "bencher
     --help".
 
+ACME::CPANMODULES ENTRIES
+    Text::Table::Any
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+        This is a common frontend for many text table modules as backends,
+        Text::Table::HTML being one.
+
+    Text::Table::HTML
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    Text::Table::HTML::DataTables
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    Text::Table::Manifold
+        Author: RSAVAGE <https://metacpan.org/author/RSAVAGE>
+
 BENCHMARKED MODULES
     Version numbers shown below are the versions used when running the
     sample benchmark.
 
-    Text::Table::Any 0.100
+    Text::Table::Any 0.115
 
-    Text::Table::HTML 0.003
+    Text::Table::HTML 0.010
 
-    Text::Table::HTML::DataTables 0.007
+    Text::Table::HTML::DataTables 0.012
 
     Text::Table::Manifold 1.03
 
@@ -59,97 +75,187 @@ BENCHMARK DATASETS
 
     *   large (30x300)
 
-SAMPLE BENCHMARK RESULTS
-    Run on: perl: *v5.30.0*, CPU: *Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz
-    (2 cores)*, OS: *GNU/Linux Ubuntu version 19.10*, OS kernel: *Linux
-    version 5.3.0-64-generic*.
+BENCHMARK SAMPLE RESULTS
+  Sample benchmark #1
+    Run on: perl: *v5.38.0*, CPU: *Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz
+    (2 cores)*, OS: *GNU/Linux Ubuntu version 20.04*, OS kernel: *Linux
+    version 5.4.0-164-generic*.
 
-    Benchmark with default options ("bencher --cpanmodules-module
-    HTMLTable"):
+    Benchmark command (default options):
+
+     % bencher --cpanmodules-module HTMLTable
+
+    Result formatted as table (split, part 1 of 5):
 
      #table1#
      {dataset=>"large (30x300)"}
-     +-------------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
-     | participant                   | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors   | samples |
-     +-------------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
-     | Text::Table::Manifold         |        15 |      65   |                 0.00% |               738.63% |   0.00015 |      20 |
-     | Text::Table::HTML::DataTables |       120 |       8.1 |               694.41% |                 5.57% | 6.2e-05   |      20 |
-     | Text::Table::HTML             |       130 |       7.7 |               736.70% |                 0.23% | 1.8e-05   |      20 |
-     | Text::Table::Any              |       130 |       7.7 |               738.63% |                 0.00% | 1.1e-05   |      20 |
-     +-------------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
+     +-------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+     | participant                   | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+     +-------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+     | Text::Table::Manifold         |      15.8 |     63.3  |                 0.00% |               636.27% | 4.9e-05 |      21 |
+     | Text::Table::HTML             |      68   |     15    |               328.81% |                71.70% | 1.9e-05 |      21 |
+     | Text::Table::Any              |      68.3 |     14.7  |               331.76% |                70.53% | 1.2e-05 |      20 |
+     | Text::Table::HTML::DataTables |     116   |      8.59 |               636.27% |                 0.00% | 4.6e-06 |      20 |
+     +-------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+
+    The above result formatted in Benchmark.pm style:
+
+               Rate  TT:M  TT:H  TT:A  TTH:D 
+      TT:M   15.8/s    --  -76%  -76%   -86% 
+      TT:H     68/s  322%    --   -2%   -42% 
+      TT:A   68.3/s  330%    2%    --   -41% 
+      TTH:D   116/s  636%   74%   71%     -- 
+ 
+     Legends:
+       TT:A: participant=Text::Table::Any
+       TT:H: participant=Text::Table::HTML
+       TT:M: participant=Text::Table::Manifold
+       TTH:D: participant=Text::Table::HTML::DataTables
+
+    Result formatted as table (split, part 2 of 5):
 
      #table2#
      {dataset=>"long (3x300)"}
-     +-------------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
-     | participant                   | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors   | samples |
-     +-------------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
-     | Text::Table::Manifold         |       100 |      9    |                 0.00% |               857.44% |   0.00012 |      20 |
-     | Text::Table::HTML::DataTables |       960 |      1    |               737.72% |                14.29% | 6.1e-06   |      20 |
-     | Text::Table::Any              |      1100 |      0.92 |               845.63% |                 1.25% | 4.5e-06   |      20 |
-     | Text::Table::HTML             |      1100 |      0.91 |               857.44% |                 0.00% | 1.8e-06   |      20 |
-     +-------------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
+     +-------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+     | participant                   | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+     +-------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+     | Text::Table::Manifold         |       129 |      7.73 |                 0.00% |               598.03% | 6.3e-06 |      21 |
+     | Text::Table::HTML             |       620 |      1.6  |               378.42% |                45.90% | 1.8e-06 |      20 |
+     | Text::Table::Any              |       625 |      1.6  |               383.35% |                44.41% | 5.8e-07 |      20 |
+     | Text::Table::HTML::DataTables |       903 |      1.11 |               598.03% |                 0.00% | 2.7e-07 |      23 |
+     +-------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+
+    The above result formatted in Benchmark.pm style:
+
+              Rate  TT:M  TT:H  TT:A  TTH:D 
+      TT:M   129/s    --  -79%  -79%   -85% 
+      TT:H   620/s  383%    --    0%   -30% 
+      TT:A   625/s  383%    0%    --   -30% 
+      TTH:D  903/s  596%   44%   44%     -- 
+ 
+     Legends:
+       TT:A: participant=Text::Table::Any
+       TT:H: participant=Text::Table::HTML
+       TT:M: participant=Text::Table::Manifold
+       TTH:D: participant=Text::Table::HTML::DataTables
+
+    Result formatted as table (split, part 3 of 5):
 
      #table3#
      {dataset=>"small (3x5)"}
      +-------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
-     | participant                   | rate (/s) | time (μs) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+     | participant                   | rate (/s) | time (Î¼s) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
      +-------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
-     | Text::Table::Manifold         |      4400 |       230 |                 0.00% |               963.57% | 2.7e-07 |      20 |
-     | Text::Table::HTML::DataTables |     15000 |        68 |               234.83% |               217.64% | 9.2e-08 |      27 |
-     | Text::Table::Any              |     37000 |        27 |               741.94% |                26.32% |   2e-07 |      20 |
-     | Text::Table::HTML             |     47000 |        21 |               963.57% |                 0.00% |   8e-08 |      20 |
+     | Text::Table::Manifold         |      4400 |     230   |                 0.00% |               559.84% | 3.2e-07 |      23 |
+     | Text::Table::HTML::DataTables |     13000 |      74   |               205.38% |               116.07% | 1.3e-07 |      30 |
+     | Text::Table::Any              |     27200 |      36.8 |               516.53% |                 7.03% | 3.3e-08 |      31 |
+     | Text::Table::HTML             |     29100 |      34.3 |               559.84% |                 0.00% | 6.5e-09 |      20 |
      +-------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+
+    The above result formatted in Benchmark.pm style:
+
+                Rate  TT:M  TTH:D  TT:A  TT:H 
+      TT:M    4400/s    --   -67%  -84%  -85% 
+      TTH:D  13000/s  210%     --  -50%  -53% 
+      TT:A   27200/s  525%   101%    --   -6% 
+      TT:H   29100/s  570%   115%    7%    -- 
+ 
+     Legends:
+       TT:A: participant=Text::Table::Any
+       TT:H: participant=Text::Table::HTML
+       TT:M: participant=Text::Table::Manifold
+       TTH:D: participant=Text::Table::HTML::DataTables
+
+    Result formatted as table (split, part 4 of 5):
 
      #table4#
      {dataset=>"tiny (1x1)"}
      +-------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
-     | participant                   | rate (/s) | time (μs) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+     | participant                   | rate (/s) | time (Î¼s) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
      +-------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
-     | Text::Table::Manifold         |      9200 |   110     |                 0.00% |              1940.27% | 4.7e-07 |      21 |
-     | Text::Table::HTML::DataTables |     20000 |    49     |               120.82% |               823.96% | 5.3e-08 |      20 |
-     | Text::Table::Any              |    135600 |     7.377 |              1372.90% |                38.52% | 2.3e-10 |      21 |
-     | Text::Table::HTML             |    190000 |     5.3   |              1940.27% |                 0.00% | 6.7e-09 |      20 |
+     | Text::Table::Manifold         |      9700 |    100    |                 0.00% |              1436.99% | 1.3e-07 |      20 |
+     | Text::Table::HTML::DataTables |     18000 |     55    |                87.14% |               721.28% | 7.8e-08 |      22 |
+     | Text::Table::Any              |    114000 |      8.81 |              1072.17% |                31.12% | 5.6e-09 |      22 |
+     | Text::Table::HTML             |    149000 |      6.72 |              1436.99% |                 0.00% | 2.9e-09 |      20 |
      +-------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+
+    The above result formatted in Benchmark.pm style:
+
+                 Rate   TT:M  TTH:D  TT:A  TT:H 
+      TT:M     9700/s     --   -44%  -91%  -93% 
+      TTH:D   18000/s    81%     --  -83%  -87% 
+      TT:A   114000/s  1035%   524%    --  -23% 
+      TT:H   149000/s  1388%   718%   31%    -- 
+ 
+     Legends:
+       TT:A: participant=Text::Table::Any
+       TT:H: participant=Text::Table::HTML
+       TT:M: participant=Text::Table::Manifold
+       TTH:D: participant=Text::Table::HTML::DataTables
+
+    Result formatted as table (split, part 5 of 5):
 
      #table5#
      {dataset=>"wide (30x5)"}
      +-------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
-     | participant                   | rate (/s) | time (μs) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+     | participant                   | rate (/s) | time (Î¼s) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
      +-------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
-     | Text::Table::Manifold         |       820 |      1200 |                 0.00% |               720.08% | 9.4e-06 |      20 |
-     | Text::Table::HTML::DataTables |      4770 |       210 |               484.83% |                40.23% | 1.6e-07 |      20 |
-     | Text::Table::Any              |      6620 |       151 |               711.10% |                 1.11% | 5.2e-08 |      21 |
-     | Text::Table::HTML             |      6690 |       149 |               720.08% |                 0.00% | 4.6e-08 |      27 |
+     | Text::Table::Manifold         |       830 |      1200 |                 0.00% |               434.10% | 1.7e-06 |      20 |
+     | Text::Table::Any              |      3390 |       295 |               307.45% |                31.08% | 1.4e-07 |      20 |
+     | Text::Table::HTML             |      3430 |       291 |               313.00% |                29.32% | 1.3e-07 |      26 |
+     | Text::Table::HTML::DataTables |      4400 |       230 |               434.10% |                 0.00% | 2.3e-07 |      21 |
      +-------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
 
-    Benchmark module startup overhead ("bencher --cpanmodules-module
-    HTMLTable --module-startup"):
+    The above result formatted in Benchmark.pm style:
+
+               Rate  TT:M  TT:A  TT:H  TTH:D 
+      TT:M    830/s    --  -75%  -75%   -80% 
+      TT:A   3390/s  306%    --   -1%   -22% 
+      TT:H   3430/s  312%    1%    --   -20% 
+      TTH:D  4400/s  421%   28%   26%     -- 
+ 
+     Legends:
+       TT:A: participant=Text::Table::Any
+       TT:H: participant=Text::Table::HTML
+       TT:M: participant=Text::Table::Manifold
+       TTH:D: participant=Text::Table::HTML::DataTables
+
+  Sample benchmark #2
+    Benchmark command (benchmarking module startup overhead):
+
+     % bencher --cpanmodules-module HTMLTable --module-startup
+
+    Result formatted as table:
 
      #table6#
-     +-------------------------------+-----------+-------------------+-----------------------+-----------------------+----------+---------+
-     | participant                   | time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors  | samples |
-     +-------------------------------+-----------+-------------------+-----------------------+-----------------------+----------+---------+
-     | Text::Table::Manifold         |      85   |              77.5 |                 0.00% |              1039.21% |   0.0002 |      20 |
-     | Text::Table::HTML             |       9.1 |               1.6 |               830.21% |                22.47% | 2.7e-05  |      20 |
-     | Text::Table::HTML::DataTables |       9.1 |               1.6 |               831.24% |                22.33% | 1.5e-05  |      20 |
-     | Text::Table::Any              |       8.1 |               0.6 |               945.19% |                 9.00% | 4.8e-05  |      20 |
-     | perl -e1 (baseline)           |       7.5 |               0   |              1039.21% |                 0.00% | 3.5e-05  |      21 |
-     +-------------------------------+-----------+-------------------+-----------------------+-----------------------+----------+---------+
+     +-------------------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
+     | participant                   | time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+     +-------------------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
+     | Text::Table::Manifold         |     91    |             84.55 |                 0.00% |              1310.03% | 4.8e-05 |      20 |
+     | Text::Table::Any              |     11    |              4.55 |               727.82% |                70.33% | 5.1e-06 |      22 |
+     | Text::Table::HTML::DataTables |      9.37 |              2.92 |               870.91% |                45.23% | 6.8e-06 |      20 |
+     | Text::Table::HTML             |      9.13 |              2.68 |               897.27% |                41.39% | 4.9e-06 |      20 |
+     | perl -e1 (baseline)           |      6.45 |              0    |              1310.03% |                 0.00% | 3.2e-06 |      20 |
+     +-------------------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
+
+    The above result formatted in Benchmark.pm style:
+
+                              Rate   TT:M  TT:A  TTH:D  TT:H  perl -e1 (baseline) 
+      TT:M                  11.0/s     --  -87%   -89%  -89%                 -92% 
+      TT:A                  90.9/s   727%    --   -14%  -16%                 -41% 
+      TTH:D                106.7/s   871%   17%     --   -2%                 -31% 
+      TT:H                 109.5/s   896%   20%     2%    --                 -29% 
+      perl -e1 (baseline)  155.0/s  1310%   70%    45%   41%                   -- 
+ 
+     Legends:
+       TT:A: mod_overhead_time=4.55 participant=Text::Table::Any
+       TT:H: mod_overhead_time=2.68 participant=Text::Table::HTML
+       TT:M: mod_overhead_time=84.55 participant=Text::Table::Manifold
+       TTH:D: mod_overhead_time=2.92 participant=Text::Table::HTML::DataTables
+       perl -e1 (baseline): mod_overhead_time=0 participant=perl -e1 (baseline)
 
     To display as an interactive HTML table on a browser, you can add option
     "--format html+datatables".
-
-ACME::MODULES ENTRIES
-    *   Text::Table::Any
-
-        This is a common frontend for many text table modules as backends,
-        Text::Table::HTML being one.
-
-    *   Text::Table::HTML
-
-    *   Text::Table::HTML::DataTables
-
-    *   Text::Table::Manifold
 
 FAQ
   What is an Acme::CPANModules::* module?
@@ -160,8 +266,13 @@ FAQ
 
   What are ways to use this Acme::CPANModules module?
     Aside from reading this Acme::CPANModules module's POD documentation,
-    you can install all the listed modules (entries) using cpanmodules CLI
-    (from App::cpanmodules distribution):
+    you can install all the listed modules (entries) using cpanm-cpanmodules
+    script (from App::cpanm::cpanmodules distribution):
+
+     % cpanm-cpanmodules -n HTMLTable
+
+    Alternatively you can use the cpanmodules CLI (from App::cpanmodules
+    distribution):
 
         % cpanmodules ls-entries HTMLTable | cpanm -n
 
@@ -182,7 +293,9 @@ FAQ
 
     This Acme::CPANModules module also helps lcpan produce a more meaningful
     result for "lcpan related-mods" command when it comes to finding related
-    modules for the modules listed in this Acme::CPANModules module.
+    modules for the modules listed in this Acme::CPANModules module. See
+    App::lcpan::Cmd::related_mods for more details on how "related modules"
+    are found.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -191,13 +304,6 @@ HOMEPAGE
 SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-Acme-CPANModules-HTMLTable>.
-
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://github.com/perlancar/perl-Acme-CPANModules-HTMLTable/issues>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
     Acme::CPANModules::TextTable
@@ -209,9 +315,34 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021 by perlancar@cpan.org.
+    This software is copyright (c) 2023, 2021 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-HTML
+    Table>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

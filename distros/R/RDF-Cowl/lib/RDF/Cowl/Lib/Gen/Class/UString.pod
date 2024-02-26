@@ -1,0 +1,816 @@
+# PODNAME: RDF::Cowl::Lib::Gen::Class::UString
+# ABSTRACT: Generated docs for RDF::Cowl::Ulib::UString
+
+## DO NOT EDIT
+## Generated via maint/tt/Class.pod.tt
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+RDF::Cowl::Lib::Gen::Class::UString - Generated docs for RDF::Cowl::Ulib::UString
+
+=head1 VERSION
+
+version 1.0.0
+
+=head1 MAIN MODULE
+
+L<RDF::Cowl::Ulib::UString>
+
+=head1 METHODS
+
+=head2 size
+
+B<Signature>:
+
+  $self->size()
+
+B<Params>:
+
+  UString $string 
+
+Documentation:
+
+  Returns the size of the string.
+  
+  @param string String.
+  @return String size.
+
+=over 2
+
+B<C function name>: C<< ustring_size >>
+
+=back
+
+=head2 length
+
+B<Signature>:
+
+  $self->length()
+
+B<Params>:
+
+  UString $string 
+
+Documentation:
+
+  Returns the length of the string, excluding the null terminator.
+  
+  @param string String.
+  @return String length.
+
+=over 2
+
+B<C function name>: C<< ustring_length >>
+
+=back
+
+=head2 assign
+
+B<Signature>:
+
+  $self->assign(PositiveOrZeroInt $length)
+
+B<Params>:
+
+  Str $buf 
+  PositiveOrZeroInt $length 
+
+Documentation:
+
+  Initializes a new string by taking ownership of the specified buffer,
+  which must have been dynamically allocated.
+  
+  @param buf String buffer.
+  @param length Length of the string (excluding the null terminator).
+  @return New string.
+  
+  @note The buffer must be null-terminated.
+  @note Due to the internals of UString, you must not attempt to access the buffer
+        after calling this function as it may have been deallocated.
+
+=over 2
+
+B<C function name>: C<< ustring_assign >>
+
+=back
+
+=head2 copy
+
+B<Signature>:
+
+  $self->copy(PositiveOrZeroInt $length)
+
+B<Params>:
+
+  Str $buf 
+  PositiveOrZeroInt $length 
+
+Documentation:
+
+  Initializes a new string by copying the specified buffer.
+  
+  @param buf String buffer.
+  @param length Length of the string (excluding the null terminator).
+  @return New string.
+  
+  @note The buffer must be null-terminated.
+
+=over 2
+
+B<C function name>: C<< ustring_copy >>
+
+=back
+
+=head2 wrap
+
+B<Signature>:
+
+  $self->wrap(PositiveOrZeroInt $length)
+
+B<Params>:
+
+  Str $buf 
+  PositiveOrZeroInt $length 
+
+Documentation:
+
+  Initializes a new string by wrapping the specified buffer.
+  
+  @param buf String buffer.
+  @param length Length of the string (excluding the null terminator).
+  @return New string.
+  
+  @note The buffer must be null-terminated.
+  @note If the buffer has been dynamically allocated, you are responsible for its deallocation.
+  @note You must not call `ustring_deinit` on a string initialized with this function.
+
+=over 2
+
+B<C function name>: C<< ustring_wrap >>
+
+=back
+
+=head2 _new
+
+B<Signature>:
+
+  $self->_new(PositiveOrZeroInt $length)
+
+B<Params>:
+
+  UString $string 
+  PositiveOrZeroInt $length 
+
+Documentation:
+
+  Initializes a new string of the specified length and returns its underlying buffer.
+  This allows direct initialization of the buffer, avoiding unnecessary allocations or copies.
+  
+  @param string String to initialize.
+  @param length Length of the string (excluding the null terminator).
+  @return Underlying buffer.
+  
+  @note The returned buffer is null-terminated but otherwise uninitialized.
+
+=over 2
+
+B<C function name>: C<< ustring >>
+
+=back
+
+=head2 assign_buf
+
+B<Signature>:
+
+  $self->assign_buf()
+
+B<Params>:
+
+  Str $buf 
+
+Documentation:
+
+  Initializes a new string by taking ownership of the specified buffer,
+  which must have been dynamically allocated.
+  
+  @param buf String buffer.
+  @return New string.
+  
+  @note The buffer must be null-terminated.
+  @note Due to the internals of UString, you must not attempt to access the buffer
+        after calling this function as it may have been deallocated.
+
+=over 2
+
+B<C function name>: C<< ustring_assign_buf >>
+
+=back
+
+=head2 copy_buf
+
+B<Signature>:
+
+  $self->copy_buf()
+
+B<Params>:
+
+  Str $buf 
+
+Documentation:
+
+  Initializes a new string by copying the specified buffer.
+  
+  @param buf String buffer.
+  @return New string.
+  
+  @note The buffer must be null-terminated.
+
+=over 2
+
+B<C function name>: C<< ustring_copy_buf >>
+
+=back
+
+=head2 wrap_buf
+
+B<Signature>:
+
+  $self->wrap_buf()
+
+B<Params>:
+
+  Str $buf 
+
+Documentation:
+
+  Initializes a new string by wrapping the specified buffer.
+  
+  @param buf String buffer.
+  @return New string.
+  
+  @note The buffer must be null-terminated.
+  @note If the buffer has been dynamically allocated, you are responsible for its deallocation.
+  @note You must not call `ustring_deinit` on a string initialized with this function.
+
+=over 2
+
+B<C function name>: C<< ustring_wrap_buf >>
+
+=back
+
+=head2 dup
+
+B<Signature>:
+
+  $self->dup()
+
+B<Params>:
+
+  UString $string 
+
+Documentation:
+
+  Duplicates the specified string.
+  
+  @param string String to duplicate.
+  @return Duplicated string.
+
+=over 2
+
+B<C function name>: C<< ustring_dup >>
+
+=back
+
+=head2 concat
+
+B<Signature>:
+
+  $self->concat(Ulib_uint $count)
+
+B<Params>:
+
+  UString $strings 
+  Ulib_uint $count 
+
+Documentation:
+
+  Concatenates the specified strings.
+  
+  @param strings Strings to concatenate.
+  @param count Number of strings.
+  @return Concatenation of the specified strings.
+
+=over 2
+
+B<C function name>: C<< ustring_concat >>
+
+=back
+
+=head2 join
+
+B<Signature>:
+
+  $self->join(Ulib_uint $count, UString $sep)
+
+B<Params>:
+
+  UString $strings 
+  Ulib_uint $count 
+  UString $sep 
+
+Documentation:
+
+  Joins the specified strings with a separator.
+  
+  @param strings Strings to join.
+  @param count Number of strings.
+  @param sep Separator.
+  @return Strings joined with the specified separator.
+
+=over 2
+
+B<C function name>: C<< ustring_join >>
+
+=back
+
+=head2 repeating
+
+B<Signature>:
+
+  $self->repeating(Ulib_uint $times)
+
+B<Params>:
+
+  UString $string 
+  Ulib_uint $times 
+
+Documentation:
+
+  Returns a new string obtained by repeating the specified string.
+  
+  @param string String to repeat.
+  @param times Number of repetitions.
+  @return New string.
+
+=over 2
+
+B<C function name>: C<< ustring_repeating >>
+
+=back
+
+=head2 is_upper
+
+B<Signature>:
+
+  $self->is_upper()
+
+B<Params>:
+
+  UString $string 
+
+Documentation:
+
+  Checks if the string does not contain lowercase characters.
+  
+  @param string String.
+  @return True if the string does not contain lowercase characters, false otherwise.
+
+=over 2
+
+B<C function name>: C<< ustring_is_upper >>
+
+=back
+
+=head2 is_lower
+
+B<Signature>:
+
+  $self->is_lower()
+
+B<Params>:
+
+  UString $string 
+
+Documentation:
+
+  Checks if the string does not contain uppercase characters.
+  
+  @param string String.
+  @return True if the string does not contain uppercase characters, false otherwise.
+
+=over 2
+
+B<C function name>: C<< ustring_is_lower >>
+
+=back
+
+=head2 to_upper
+
+B<Signature>:
+
+  $self->to_upper()
+
+B<Params>:
+
+  UString $string 
+
+Documentation:
+
+  Converts the given string to uppercase.
+  
+  @param string String to convert.
+  @return Uppercase string.
+
+=over 2
+
+B<C function name>: C<< ustring_to_upper >>
+
+=back
+
+=head2 to_lower
+
+B<Signature>:
+
+  $self->to_lower()
+
+B<Params>:
+
+  UString $string 
+
+Documentation:
+
+  Converts the given string to lowercase.
+  
+  @param string String to convert.
+  @return Lowercase string.
+
+=over 2
+
+B<C function name>: C<< ustring_to_lower >>
+
+=back
+
+=head2 index_of
+
+B<Signature>:
+
+  $self->index_of(StrMatch[qr{\A.\z}] $needle)
+
+B<Params>:
+
+  UString $string 
+  StrMatch[qr{\A.\z}] $needle 
+
+Documentation:
+
+  Returns the index of the first occurrence of the specified character.
+  
+  @param string String to search into.
+  @param needle Character to find.
+  @return Index of the first occurrence of the specified character.
+          If it cannot be found, returns an index greater than or equal to the string's length.
+
+=over 2
+
+B<C function name>: C<< ustring_index_of >>
+
+=back
+
+=head2 index_of_last
+
+B<Signature>:
+
+  $self->index_of_last(StrMatch[qr{\A.\z}] $needle)
+
+B<Params>:
+
+  UString $string 
+  StrMatch[qr{\A.\z}] $needle 
+
+Documentation:
+
+  Returns the index of the last occurrence of the specified character.
+  
+  @param string String to search into.
+  @param needle Character to find.
+  @return Index of the last occurrence of the specified character.
+          If it cannot be found, returns an index greater than or equal to the string's length.
+
+=over 2
+
+B<C function name>: C<< ustring_index_of_last >>
+
+=back
+
+=head2 find
+
+B<Signature>:
+
+  $self->find(UString $needle)
+
+B<Params>:
+
+  UString $string 
+  UString $needle 
+
+Documentation:
+
+  Returns the index of the first occurrence of the specified string.
+  
+  @param string String to search into.
+  @param needle String to find.
+  @return Index of the first occurrence of the specified string.
+          If it cannot be found, returns an index greater than or equal to the string's length.
+
+=over 2
+
+B<C function name>: C<< ustring_find >>
+
+=back
+
+=head2 find_last
+
+B<Signature>:
+
+  $self->find_last(UString $needle)
+
+B<Params>:
+
+  UString $string 
+  UString $needle 
+
+Documentation:
+
+  Returns the index of the last occurrence of the specified string.
+  
+  @param string String to search into.
+  @param needle String to find.
+  @return Index of the last occurrence of the specified string.
+          If it cannot be found, returns an index greater than or equal to the string's length.
+
+=over 2
+
+B<C function name>: C<< ustring_find_last >>
+
+=back
+
+=head2 starts_with
+
+B<Signature>:
+
+  $self->starts_with(UString $prefix)
+
+B<Params>:
+
+  UString $string 
+  UString $prefix 
+
+Documentation:
+
+  Checks whether the string starts with the specified prefix.
+  
+  @param string String.
+  @param prefix Prefix.
+  @return True if the string starts with the specified prefix, false otherwise.
+
+=over 2
+
+B<C function name>: C<< ustring_starts_with >>
+
+=back
+
+=head2 ends_with
+
+B<Signature>:
+
+  $self->ends_with(UString $suffix)
+
+B<Params>:
+
+  UString $string 
+  UString $suffix 
+
+Documentation:
+
+  Checks whether the string ends with the specified suffix.
+  
+  @param string String.
+  @param suffix Suffix.
+  @return True if the string ends with the specified suffix, false otherwise.
+
+=over 2
+
+B<C function name>: C<< ustring_ends_with >>
+
+=back
+
+=head2 equals
+
+B<Signature>:
+
+  $self->equals(UString $rhs)
+
+B<Params>:
+
+  UString $lhs 
+  UString $rhs 
+
+Documentation:
+
+  Checks whether two strings are equal.
+  
+  @param lhs First string.
+  @param rhs Second string.
+  @return True if the two strings are equal, false otherwise.
+
+=over 2
+
+B<C function name>: C<< ustring_equals >>
+
+=back
+
+=head2 precedes
+
+B<Signature>:
+
+  $self->precedes(UString $rhs)
+
+B<Params>:
+
+  UString $lhs 
+  UString $rhs 
+
+Documentation:
+
+  Checks whether lhs precedes rhs in lexicographic order.
+  
+  @param lhs First string.
+  @param rhs Second string.
+  @return True if lhs precedes rhs, False otherwise.
+
+=over 2
+
+B<C function name>: C<< ustring_precedes >>
+
+=back
+
+=head2 compare
+
+B<Signature>:
+
+  $self->compare(UString $rhs)
+
+B<Params>:
+
+  UString $lhs 
+  UString $rhs 
+
+Documentation:
+
+  Compares lhs and rhs in lexicographic order.
+  
+  @param lhs First string.
+  @param rhs Second string.
+  @return -1 if lhs comes before rhs, 0 if they are equal, 1 if lhs comes after rhs.
+
+=over 2
+
+B<C function name>: C<< ustring_compare >>
+
+=back
+
+=head2 hash
+
+B<Signature>:
+
+  $self->hash()
+
+B<Params>:
+
+  UString $string 
+
+Documentation:
+
+  Returns the hash of the specified string.
+  
+  @param string String.
+  @return Hash.
+
+=over 2
+
+B<C function name>: C<< ustring_hash >>
+
+=back
+
+=head2 deinit
+
+B<Signature>:
+
+  $self->deinit()
+
+B<Params>:
+
+  UString $string 
+
+Documentation:
+
+  Deinitializes the specified string.
+  
+  @param string String to deinitialize.
+
+=over 2
+
+B<C function name>: C<< ustring_deinit >>
+
+=back
+
+=head2 deinit_return_data
+
+B<Signature>:
+
+  $self->deinit_return_data()
+
+B<Params>:
+
+  UString $string 
+
+Documentation:
+
+  Deinitializes the specified string, returning its underlying buffer.
+  
+  @param string String to deinitialize.
+  @return Buffer.
+  
+  @note You are responsible for deallocating the returned buffer.
+
+=over 2
+
+B<C function name>: C<< ustring_deinit_return_data >>
+
+=back
+
+=head2 is_null
+
+B<Signature>:
+
+  $self->is_null()
+
+B<Params>:
+
+  UString $string 
+
+Documentation:
+
+  Checks whether the string has a NULL buffer.
+  
+  @param string String instance.
+  @return True if the string has a NULL buffer, false otherwise.
+
+=over 2
+
+B<C function name>: C<< ustring_is_null >>
+
+=back
+
+=head2 is_empty
+
+B<Signature>:
+
+  $self->is_empty()
+
+B<Params>:
+
+  UString $string 
+
+Documentation:
+
+  Checks whether the string is empty.
+  
+  @param string String instance.
+  @return True if the string is empty, false otherwise.
+  
+  @note The null string is considered empty.
+
+=over 2
+
+B<C function name>: C<< ustring_is_empty >>
+
+=back
+
+=head1 AUTHOR
+
+Zakariyya Mughal <zmughal@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 by Auto-Parallel Technologies, Inc..
+
+This is free software, licensed under Eclipse Public License - v 2.0.
+
+=cut

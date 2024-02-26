@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Vo - Package for language Volapük
 
 package Locale::CLDR::Locales::Vo;
 # This file auto generated from Data\common\main\vo.xml
-#	on Tue  5 Dec  1:37:59 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'de' => 'Deutänapük',
@@ -56,7 +56,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'BR' => 'Brasilän',
  			'CN' => 'Tsyinän',
@@ -84,7 +84,7 @@ has 'display_name_code_patterns' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'language' => 'Pük: {0}',
  			'region' => 'Topäd: {0}',
@@ -105,7 +105,7 @@ has 'characters' => (
 			auxiliary => qr{[q w]},
 			index => ['A', 'Ä', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'Ö', 'P', 'R', 'S', 'T', 'U', 'Ü', 'V', 'X', 'Y', 'Z'],
 			main => qr{[a ä b c d e f g h i j k l m n o ö p r s t u ü v x y z]},
-			punctuation => qr{[\- ‐ – — , ; \: ! ? . … ' ‘ ’ " “ ” « » ( ) \[ \] \{ \} § @ * / \& #]},
+			punctuation => qr{[\- ‐‑ – — , ; \: ! ? . … '‘’ "“” « » ( ) \[ \] \{ \} § @ * / \& #]},
 		};
 	},
 EOT
@@ -121,39 +121,10 @@ has 'ellipsis' => (
 	init_arg	=> undef,
 	default		=> sub {
 		return {
-			'final' => '{0}…',
 			'initial' => '… {0}',
 			'medial' => '{0} … {1}',
 		};
 	},
-);
-
-has 'quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{“},
-);
-
-has 'quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{”},
-);
-
-has 'alternate_quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{‘},
-);
-
-has 'alternate_quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{’},
 );
 
 has 'units' => (
@@ -162,17 +133,41 @@ has 'units' => (
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
+					# Long Unit Identifier
+					'duration-day' => {
+						'name' => q(dels),
+					},
+					# Core Unit Identifier
 					'day' => {
 						'name' => q(dels),
 					},
+					# Long Unit Identifier
+					'duration-month' => {
+						'name' => q(muls),
+						'one' => q(mul {0}),
+						'other' => q(muls {0}),
+					},
+					# Core Unit Identifier
 					'month' => {
 						'name' => q(muls),
 						'one' => q(mul {0}),
 						'other' => q(muls {0}),
 					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'name' => q(vigs),
+					},
+					# Core Unit Identifier
 					'week' => {
 						'name' => q(vigs),
 					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'name' => q(yels),
+						'one' => q(yel {0}),
+						'other' => q(yels {0}),
+					},
+					# Core Unit Identifier
 					'year' => {
 						'name' => q(yels),
 						'one' => q(yel {0}),
@@ -193,7 +188,7 @@ has 'nostr' => (
 	is			=> 'ro',
 	isa			=> RegexpRef,
 	init_arg	=> undef,
-	default		=> sub { qr'^(?i:no|n)$' }
+	default		=> sub { qr'^(?i:|no|n)$' }
 );
 
 has 'calendar_months' => (
@@ -217,25 +212,6 @@ has 'calendar_months' => (
 							'ton',
 							'nov',
 							'dek'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'Y',
-							'F',
-							'M',
-							'P',
-							'M',
-							'Y',
-							'Y',
-							'G',
-							'S',
-							'T',
-							'N',
-							'D'
 						],
 						leap => [
 							
@@ -300,25 +276,6 @@ has 'calendar_months' => (
 							
 						],
 					},
-					wide => {
-						nonleap => [
-							'yanul',
-							'febul',
-							'mäzul',
-							'prilul',
-							'mayul',
-							'yunul',
-							'yulul',
-							'gustul',
-							'setul',
-							'tobul',
-							'novul',
-							'dekul'
-						],
-						leap => [
-							
-						],
-					},
 				},
 			},
 	} },
@@ -369,15 +326,6 @@ has 'calendar_days' => (
 						sat => 'Z',
 						sun => 'S'
 					},
-					wide => {
-						mon => 'mudel',
-						tue => 'tudel',
-						wed => 'vedel',
-						thu => 'dödel',
-						fri => 'fridel',
-						sat => 'zädel',
-						sun => 'sudel'
-					},
 				},
 			},
 	} },
@@ -394,11 +342,6 @@ has 'calendar_quarters' => (
 						1 => 'Yf2',
 						2 => 'Yf3',
 						3 => 'Yf4'
-					},
-					narrow => {0 => '1',
-						1 => '2',
-						2 => '3',
-						3 => '4'
 					},
 					wide => {0 => '1id yelafoldil',
 						1 => '2id yelafoldil',
@@ -419,10 +362,6 @@ has 'eras' => (
 		},
 		'gregorian' => {
 			abbreviated => {
-				'0' => 'b. t. kr.',
-				'1' => 'p. t. kr.'
-			},
-			wide => {
 				'0' => 'b. t. kr.',
 				'1' => 'p. t. kr.'
 			},

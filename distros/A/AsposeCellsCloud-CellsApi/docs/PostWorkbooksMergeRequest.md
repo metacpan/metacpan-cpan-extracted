@@ -8,10 +8,10 @@ use AsposeCellsCloud::Request::PostWorkbooksMerge;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**name** | **string** | Workbook name. |
+**name** | **string** | The file name. |
 **merge_with** | **string** | The workbook to merge with. |
-**folder** | **string** | Original workbook folder. |
-**storage_name** | **string** | Storage name. |
+**folder** | **string** | The folder where the file is situated. |
+**storage_name** | **string** | The storage name where the file is situated. |
 **merged_storage_name** | **string** | Storage name. |  
 
 [[Back to Model list]](../README.md#documentation-for-requests) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

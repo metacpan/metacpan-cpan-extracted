@@ -3,6 +3,10 @@
 # This is a simple example of a font handler callback that uses the
 # fontconfig system to find a font given its style properties.
 # NOTE: This probably works on Linux only.
+#
+# Usage:
+#
+#    $svg = SVGPDF->new( pdf => $pdf, fc => \&fc_callback );
 
 # Remember the fc-match program, if found.
 my $fallback;
@@ -12,7 +16,9 @@ my $fontcache;
 
 sub fc_fallback {
 
-    my ( $self, $pdf, $xo, $style ) = @_;
+    my ( $self, %args ) = @_;
+    my $pdf   = $args{pdf};
+    my $style = $args{style};
 
     my $ffamily = $style->{'font-family'};
     my $fstyle  = $style->{'font-style'}  // "";
@@ -24,9 +30,8 @@ sub fc_fallback {
 
     # Resolve from cache.
     if ( $fontcache->{$pdf}->{$key} ) {
-	# Found it, set and return success.
-	$xo->font( $fontcache->{$pdf}->{$key}, $fsize );
-	return 1;
+	# Found. Return it.
+	return $pdf->font( $fontcache->{$pdf}->{$key}, $fsize );
     }
 
     # First, find the fc-match program.
@@ -67,10 +72,7 @@ sub fc_fallback {
     # Cache it.
     $fontcache->{$pdf}->{$key} = $font;
 
-    # Set it.
-    $xo->font( $font, $fsize );
-
     # Return success.
-    return 1;
+    return $font;
 }
 

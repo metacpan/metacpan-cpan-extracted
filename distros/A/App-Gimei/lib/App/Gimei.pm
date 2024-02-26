@@ -2,11 +2,7 @@ use v5.36;
 
 package App::Gimei;
 
-use version; our $VERSION = version->declare("v0.2.4");
-
-use App::Gimei::Runner;
-use App::Gimei::Parser;
-use App::Gimei::Generator;
+use version; our $VERSION = version->declare("v0.2.5");
 
 1;
 __END__

@@ -14,7 +14,7 @@ my $builder = Module::Build->new(
         'MooX::ClassAttribute'      => '0.011',
         'Type::Tiny'                => 0,
         'perl'                      => '5.10.1',
-        'Locale::CLDR'              => '0.40.1',
+        'Locale::CLDR'              => '0.44.0',
     },
     dist_author         => q{John Imrie <john.imrie1@gmail.com>},
     dist_version_from   => 'lib/Locale/CLDR/Locales/Dua.pm',
@@ -26,7 +26,7 @@ my $builder = Module::Build->new(
     add_to_cleanup      => [ 'Locale-CLDR-Locales-Dua-*' ],
     configure_requires => { 'Module::Build' => '0.40' },
     release_status => 'stable',
-    dist_abstract => 'Locale::CLDR - Data Package ( Perl localization data for Duala )',
+    dist_abstract => q<Locale::CLDR - Data Package ( Perl localization data for Duala )>,
     meta_add => {
         keywords => [ qw( locale CLDR locale-data-pack ) ],
         resources => {

@@ -7,9 +7,9 @@ use warnings;
 use Exporter 'import';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-08-27'; # DATE
+our $DATE = '2023-12-16'; # DATE
 our $DIST = 'Filename-Perl-Release'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our @EXPORT_OK = qw(check_perl_release_filename);
 
@@ -40,6 +40,14 @@ return a hash of information, which contains these keys: `distribution`,
 
 MARKDOWN
     },
+    examples => [
+        {
+            args => {filename=>'foo.bar'},
+        },
+        {
+            args => {filename=>'qux-quux-0.123.tar.gz'},
+        },
+    ],
 };
 sub check_perl_release_filename {
     require Filename::Archive;
@@ -77,7 +85,7 @@ Filename::Perl::Release - Check whether filename looks like a perl module releas
 
 =head1 VERSION
 
-This document describes version 0.001 of Filename::Perl::Release (from Perl distribution Filename-Perl-Release), released on 2023-08-27.
+This document describes version 0.002 of Filename::Perl::Release (from Perl distribution Filename-Perl-Release), released on 2023-12-16.
 
 =head1 SYNOPSIS
 
@@ -103,6 +111,29 @@ Usage:
  check_perl_release_filename(%args) -> bool|hash
 
 Check whether filename looks like a perl module release archive, e.g. a CPAN release tarball.
+
+Examples:
+
+=over
+
+=item * Example #1:
+
+ check_perl_release_filename(filename => "foo.bar"); # -> 0
+
+=item * Example #2:
+
+ check_perl_release_filename(filename => "qux-quux-0.123.tar.gz");
+
+Result:
+
+ {
+   archive_suffix => ".tar",
+   distribution => "qux-quux",
+   module => "qux::quux",
+   version => 0.123,
+ }
+
+=back
 
 This function is not exported by default, but exportable.
 

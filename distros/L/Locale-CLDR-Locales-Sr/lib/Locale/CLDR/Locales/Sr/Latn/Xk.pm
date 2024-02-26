@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Sr::Latn::Xk - Package for language Serbian
 
 package Locale::CLDR::Locales::Sr::Latn::Xk;
 # This file auto generated from Data\common\main\sr_Latn_XK.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -41,7 +41,6 @@ has 'display_name_language' => (
  				'nqo' => 'n’ko',
  				'shi' => 'južni šilha',
  				'si' => 'sinhalski',
- 				'tzm' => 'centralnoatlaski tamašek',
  				'xh' => 'isikosa',
  				'zgh' => 'standardni marokanski tamašek',
  				'zu' => 'isizulu',
@@ -85,33 +84,18 @@ has 'calendar_months' => (
 				'format' => {
 					abbreviated => {
 						nonleap => [
-							undef(),
-							undef(),
+							'jan',
+							'feb',
 							'mart',
-							undef(),
+							'apr',
 							'maj',
 							'jun',
 							'jul',
-							undef(),
-							'sept'
-						],
-						leap => [
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							undef(),
-							undef(),
-							'mart',
-							undef(),
-							'maj',
-							'jun',
-							'jul',
-							undef(),
-							'sept'
+							'avg',
+							'sept',
+							'okt',
+							'nov',
+							'dec'
 						],
 						leap => [
 							
@@ -296,8 +280,8 @@ has 'datetime_formats_interval' => (
 	default		=> sub { {
 		'generic' => {
 			MMMEd => {
-				M => q{E, d. MMM – E, d. MMM},
-				d => q{E, d – E, d. MMM},
+				M => q{E, d. MMM – E, d. MMM},
+				d => q{E, d – E, d. MMM},
 			},
 		},
 	} },

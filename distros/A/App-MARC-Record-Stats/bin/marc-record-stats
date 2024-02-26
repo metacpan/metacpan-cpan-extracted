@@ -1,0 +1,87 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use App::MARC::Record::Stats;
+
+our $VERSION = 0.01;
+
+# Run.
+exit App::MARC::Record::Stats->new->run;
+
+# Print version.
+sub VERSION_MESSAGE {
+	print $VERSION."\n";
+	exit 0;
+}
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+marc-record-stats - Tool to work with MARC::Record::Stats on MARC dataset.
+
+=head1 SYNOPSIS
+
+ marc-record-stats [-h] [-i format] [--version] marc_file
+
+=head1 DESCRIPTION
+
+It supports MARC XML files now.
+
+=head1 ARGUMENTS
+
+=over 8
+
+=item * C<-h>
+
+Print help.
+
+=item * C<-i format>
+
+Input MARC format.
+
+Possible formats are:
+
+=over
+
+=item * xml
+
+=back
+
+=item * C<--version>
+
+Print version of script.
+
+=item * C<marc_file>
+
+MARC file name for statistics.
+
+=back
+
+=head1 REPOSITORY
+
+L<https://github.com/michal-josef-spacek/App-MARC-Record-Stats>
+
+=head1 AUTHOR
+
+Michal Josef Špaček L<mailto:skim@cpan.org>
+
+L<http://skim.cz>
+
+=head1 LICENSE AND COPYRIGHT
+
+© 2024 Michal Josef Špaček
+
+BSD 2-Clause License
+
+=head1 VERSION
+
+0.01
+
+=cut

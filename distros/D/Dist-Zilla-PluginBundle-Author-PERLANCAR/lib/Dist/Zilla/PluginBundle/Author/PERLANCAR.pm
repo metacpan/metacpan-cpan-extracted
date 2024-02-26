@@ -1,14 +1,17 @@
 package Dist::Zilla::PluginBundle::Author::PERLANCAR;
 
 use Moose;
-with 'Dist::Zilla::Role::PluginBundle::Easy';
+with (
+    'Dist::Zilla::Role::PluginBundle::Easy',
+    'Dist::Zilla::Role::PluginBundle::Config::Slicer',
+);
 
 use Dist::Zilla::PluginBundle::Filter;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-11-01'; # DATE
+our $DATE = '2023-11-16'; # DATE
 our $DIST = 'Dist-Zilla-PluginBundle-Author-PERLANCAR'; # DIST
-our $VERSION = '0.609'; # VERSION
+our $VERSION = '0.610'; # VERSION
 
 sub configure {
     my $self = shift;
@@ -81,7 +84,7 @@ Dist::Zilla::PluginBundle::Author::PERLANCAR - Dist::Zilla like PERLANCAR when y
 
 =head1 VERSION
 
-This document describes version 0.609 of Dist::Zilla::PluginBundle::Author::PERLANCAR (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2023-11-01.
+This document describes version 0.610 of Dist::Zilla::PluginBundle::Author::PERLANCAR (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2023-11-16.
 
 =head1 SYNOPSIS
 

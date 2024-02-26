@@ -40,4 +40,4 @@ requires:
   namespace::clean: 0
 resources:
   license: http://dev.perl.org/licenses/
-version: '1.07'
+version: '1.08'

@@ -26,6 +26,104 @@ use Test::More;
 
 # Compilation Errors in spvm_toke.c 
 
+# Line Directive
+{
+  {
+    my $source = "class MyClass { static method main : void () {\n#line 1\n} }";
+    compile_ok($source);
+  }
+  
+  {
+    my $source = "class MyClass { static method main : void () {\n#line 1 \n} }";
+    compile_ok($source);
+  }
+  
+  {
+    my $source = "class MyClass { static method main : void () {\n#line  1\n} }";
+    compile_ok($source);
+  }
+  
+  {
+    my $source = "class MyClass { static method main : void () {\n#line 2147483647\n} }";
+    compile_ok($source);
+  }
+  
+  {
+    my $source = "class MyClass { static method main : void () {\n#line 0\n} }";
+    compile_not_ok($source, q|The line number given to a line directive must be a positive 32bit integer.|);
+  }
+  
+  {
+    my $source = "class MyClass { static method main : void () {\n#line 2147483648\n} }";
+    compile_not_ok($source, q|The line number given to a line directive must be a positive 32bit integer.|);
+  }
+  
+  {
+    my $source = "#line 1\nclass MyClass { static method main : void () {} }";
+    compile_ok($source);
+  }
+  
+  {
+    my $source = " #line 1\nclass MyClass { static method main : void () {} }";
+    compile_not_ok($source, q|A line directive must begin from the beggining of the line.|);
+  }
+  
+  {
+    my $source = "class MyClass { static method main : void () {\n #line 1\n} }";
+    compile_not_ok($source, q|A line directive must begin from the beggining of the line.|);
+  }
+  
+  {
+    my $source = "class MyClass { static method main : void () {\n#line a\n} }";
+    compile_not_ok($source, q|A line directive must end with "\n".|);
+  }
+  
+  {
+    my $source = "class MyClass { static method main : void () {\n#line 12a\n} }";
+    compile_not_ok($source, q|A line directive must end with "\n".|);
+  }
+  
+  {
+    my $source = "class MyClass { static method main : void () {\n#line \n} }";
+    compile_not_ok($source, q|A line directive must have a line number.|);
+  }
+  
+}
+
+# File Directive
+{
+  {
+    my $source = qq|#file "/foo/bar.txt"\nclass MyClass { static method main : void () {} }|;
+    compile_ok($source);
+  }
+  
+  {
+    my $source = qq|#file "/foo/bar.txt" \nclass MyClass { static method main : void () {} }|;
+    compile_ok($source);
+  }
+  
+  {
+    my $source = qq|#file "/foo/bar.txt\nclass MyClass { static method main : void () {} }|;
+    compile_not_ok($source, q|A file in a line directive must end with ".|);
+  }
+  
+  {
+    my $source = qq| #file "/foo/bar.txt"\nclass MyClass { static method main : void () {} }|;
+    compile_not_ok($source, q|A file directive must begin from the beggining of the source code.|);
+  }
+  
+  {
+    my $source = qq|#file \nclass MyClass { static method main : void () {} }|;
+    compile_not_ok($source, q|A file directive must have a file path.|);
+  }
+  
+  {
+    my $source = qq|#file "/foo/bar.txt"a\nclass MyClass { static method main : void () {} }|;
+    compile_not_ok($source, q|A file directive must end with "\n".|);
+  }
+  
+}
+
 # Line number
 {
   compile_not_ok_file('CompileError::Syntax::LineNumber', qr/our.*\b8:3\b/is);
@@ -36,6 +134,40 @@ use Test::More;
   {
     my $source = 'class myclass;';
     compile_not_ok($source, qr|\.\n  at .+ line |s);
+  }
+}
+
+# End of Source Code
+{
+  {
+    my $source = "class MyClass { }\x00aiueokakikukeko";
+    compile_ok($source);
+  }
+}
+
+# Character Encoding of Source Code
+{
+  {
+    my $source = "class MyClass { \xFF }";
+    compile_not_ok($source, q|The charactor encoding of SPVM source codes must be UTF-8.|);
+  }
+}
+
+# Line Terminator
+{
+  {
+    my $source = "class MyClass { static method main : void () { \x0A } }";
+    compile_ok($source);
+  }
+  
+  {
+    my $source = "class MyClass { static method main : void () { \x0D\x0A } }";
+    compile_not_ok($source, q|The new line of SPVM source codes must be LF. The source code cannot contains CR and CRLF.|);
+  }
+  
+  {
+    my $source = "class MyClass { static method main : void () { \x0D } }";
+    compile_not_ok($source, q|The new line of SPVM source codes must be LF. The source code cannot contains CR and CRLF.|);
   }
 }
 
@@ -510,8 +642,8 @@ use Test::More;
 # Unexpected Charater
 {
   {
-    my $source = "class MyClass { \xFE }";
-    compile_not_ok($source, q|Use of the character code "FE" is not allowed in source code.|);
+    my $source = "class MyClass { \x01 }";
+    compile_not_ok($source, q|If a character in a SPVM source code is ASCII, it must be ASCII printable or space.|);
   }
 }
 

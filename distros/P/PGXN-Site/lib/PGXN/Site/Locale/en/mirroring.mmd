@@ -13,11 +13,15 @@ The `rsync` address for the PGXN root mirror is `rsync://master.pgxn.org/pgxn`.
 Once you have the `rsync` client installed on your system and the disk space
 mapped out, add an entry to your crontab like so:
 
-    0 20 * * * /usr/bin/rsync -az --delete rsync://master.pgxn.org/pgxn /usr/local/pgxn
+``` cron
+0 20 * * * /usr/bin/rsync -az --delete rsync://master.pgxn.org/pgxn /usr/local/pgxn
+```
 
 On Windows, use AT like so:
 
-    AT 20:00 /every:M,T,W,Th,F,S,Su "C:\Program Files\Rsync\rsync -az --delete rsync://master.pgxn.org/pgxn C:\Projects\PGXN"
+```
+AT 20:00 /every:M,T,W,Th,F,S,Su "C:\Program Files\Rsync\rsync -az --delete rsync://master.pgxn.org/pgxn C:\Projects\PGXN"
+```
 
 Please do not sync more than once every hour. And realistically you only need to
 sync once or twice a day. Next, set up a web server to serve the mirror. If your
@@ -25,33 +29,39 @@ rsync is already in the subdirectory of a web server root, you should be golden.
 Otherwise you need a static file web server; perhaps the simplest is this [Python
 one-liner] serving on port 8080:
 
-    python -m http.server 8080
+``` sh
+python -m http.server 8080
+```
 
 If you’re using [Apache], you can set up a virtual host like so (assuming that
 you’re `rsync`ing to `/usr/local/pgxn`):
 
-    <VirtualHost *:80>
-      DocumentRoot /usr/local/pgxn
-      ServerName pgxn.example.org
-      CustomLog /var/log/httpd/access_log combined
-      <Directory /usr/local/pgxn>
-        AllowOverride All
-        Allow from all
-        Options +Indexes
-      </Directory>
-    </VirtualHost>
+``` apache
+<VirtualHost *:80>
+  DocumentRoot /usr/local/pgxn
+  ServerName pgxn.example.org
+  CustomLog /var/log/httpd/access_log combined
+  <Directory /usr/local/pgxn>
+    AllowOverride All
+    Allow from all
+    Options +Indexes
+  </Directory>
+</VirtualHost>
+```
 
 For [Nginx], you set set up a virtual host like this:
 
-    server {
-        listen       80;
-        server_name  pgxn.example.org;
-        charset      utf-8;
-        location / {
-            root   /var/local/pgxn;
-            index  index.html;
-        }
+``` nginx
+server {
+    listen       80;
+    server_name  pgxn.example.org;
+    charset      utf-8;
+    location / {
+        root   /var/local/pgxn;
+        index  index.html;
     }
+}
+```
 
 If you’d like to register your mirror, [send us email] with all the details and
 we’ll get you registered.

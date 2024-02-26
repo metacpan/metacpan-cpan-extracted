@@ -5,12 +5,10 @@ author:
 build_requires:
   HTTP::Message::PSGI: '0'
   HTTP::Request::Common: '5.824'
-  Module::Build: '0.4209'
   Plack::Test: '0'
   Test::File::Contents: '0.20'
   Test::MockModule: '0.05'
   Test::More: '0.70'
-  Text::MultiMarkdown: '0'
 configure_requires:
   Module::Build: '0.4209'
 dynamic_config: 1
@@ -23,25 +21,25 @@ name: PGXN-Site
 provides:
   PGXN::Site:
     file: lib/PGXN/Site.pm
-    version: v0.23.4
+    version: v0.23.7
   PGXN::Site::Controller:
     file: lib/PGXN/Site/Controller.pm
-    version: v0.23.4
+    version: v0.23.7
   PGXN::Site::Locale:
     file: lib/PGXN/Site/Locale.pm
-    version: v0.23.4
+    version: v0.23.7
   PGXN::Site::Locale::en:
     file: lib/PGXN/Site/Locale/en.pm
-    version: v0.23.4
+    version: v0.23.7
   PGXN::Site::Locale::fr:
     file: lib/PGXN/Site/Locale/fr.pm
-    version: v0.23.4
+    version: v0.23.7
   PGXN::Site::Router:
     file: lib/PGXN/Site/Router.pm
-    version: v0.23.4
+    version: v0.23.7
   PGXN::Site::Templates:
     file: lib/PGXN/Site/Templates.pm
-    version: v0.23.4
+    version: v0.23.7
 requires:
   Carp: '0'
   Data::Dump: '1.17'
@@ -71,5 +69,5 @@ requires:
   perl: v5.14.0
 resources:
   homepage: https://www.pgxn.org/
-version: v0.23.4
+version: v0.23.7
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

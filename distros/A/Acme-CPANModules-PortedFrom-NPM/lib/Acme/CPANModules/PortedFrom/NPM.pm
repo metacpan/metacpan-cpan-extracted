@@ -3,9 +3,9 @@ package Acme::CPANModules::PortedFrom::NPM;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-09-25'; # DATE
+our $DATE = '2024-01-15'; # DATE
 our $DIST = 'Acme-CPANModules-PortedFrom-NPM'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 our $LIST = {
     summary => "List of modules/applications that are ported (or inspired from) NPM libraries",
@@ -47,6 +47,16 @@ _
             npm_module => 'isbot',
             tags => ['http', 'browser', 'webbot'],
         },
+        {
+            module => 'Sub::Fp',
+            npm_module => 'lodash',
+            tags => [],
+        },
+        {
+            module => 'Hash::Util::Pick',
+            npm_module => 'lodash',
+            tags => [],
+        },
     ],
 };
 
@@ -65,7 +75,7 @@ Acme::CPANModules::PortedFrom::NPM - List of modules/applications that are porte
 
 =head1 VERSION
 
-This document describes version 0.005 of Acme::CPANModules::PortedFrom::NPM (from Perl distribution Acme-CPANModules-PortedFrom-NPM), released on 2023-09-25.
+This document describes version 0.007 of Acme::CPANModules::PortedFrom::NPM (from Perl distribution Acme-CPANModules-PortedFrom-NPM), released on 2024-01-15.
 
 =head1 DESCRIPTION
 
@@ -98,6 +108,14 @@ Author: L<MFONTANI|https://metacpan.org/author/MFONTANI>
 Author: L<MIKIHOSHI|https://metacpan.org/author/MIKIHOSHI>
 
 =item L<Is::Bot>
+
+=item L<Sub::Fp>
+
+Author: L<ODDTUPLE|https://metacpan.org/author/ODDTUPLE>
+
+=item L<Hash::Util::Pick>
+
+Author: L<PINE|https://metacpan.org/author/PINE>
 
 =back
 
@@ -182,7 +200,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2021, 2018 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2021, 2018 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

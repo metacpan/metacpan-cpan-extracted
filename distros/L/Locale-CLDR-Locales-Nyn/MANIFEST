@@ -1,7 +1,7 @@
 Build.PL
 lib/Locale/CLDR/Locales/Nyn.pm
-lib/Locale/CLDR/Locales/Nyn/Any.pm
-lib/Locale/CLDR/Locales/Nyn/Any/Ug.pm
+lib/Locale/CLDR/Locales/Nyn/Latn.pm
+lib/Locale/CLDR/Locales/Nyn/Latn/Ug.pm
 MANIFEST			This list of files
 README
 t/00-load.t

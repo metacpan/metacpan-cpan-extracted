@@ -41,7 +41,7 @@ our %EXPORT_TAGS = (
 
 sub net_saml2_sp {
     return Net::SAML2::SP->new(
-        id     => 'Some entity ID',
+        issuer => 'Some entity ID',
         cert   => 't/sign-nopw-cert.pem',
         key    => 't/sign-nopw-cert.pem',
         cacert => 't/cacert.pem',

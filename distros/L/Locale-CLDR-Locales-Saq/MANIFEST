@@ -1,7 +1,7 @@
 Build.PL
 lib/Locale/CLDR/Locales/Saq.pm
-lib/Locale/CLDR/Locales/Saq/Any.pm
-lib/Locale/CLDR/Locales/Saq/Any/Ke.pm
+lib/Locale/CLDR/Locales/Saq/Latn.pm
+lib/Locale/CLDR/Locales/Saq/Latn/Ke.pm
 MANIFEST			This list of files
 README
 t/00-load.t

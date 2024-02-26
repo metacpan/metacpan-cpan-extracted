@@ -9,6 +9,7 @@ QQ::weixin::work::externalcontact::group_welcome_template
 =head1 DESCRIPTION
 
 入群欢迎语素材管理
+最后更新：2023/12/01
 
 =cut
 
@@ -19,7 +20,7 @@ use LWP::UserAgent;
 use JSON;
 use utf8;
 
-our $VERSION = '0.06';
+our $VERSION = '0.10';
 our @EXPORT = qw/ add edit get del /;
 
 =head1 FUNCTION
@@ -70,7 +71,7 @@ L<https://developer.work.weixin.qq.com/document/path/92366#添加入群欢迎语
 
 =head4 参数说明：
 
-    参数	            必须	说明
+	参数	            必须	说明
     access_token	是	调用接口凭证
 	text.content	否	消息文本内容,最长为3000字节
 	image.media_id	否	图片的media_id，可以通过素材管理接口获得
@@ -96,7 +97,7 @@ text以外的消息类型，只能有一个，如果三者同时填，则按imag
 
 =head4 权限说明：
 
-企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
+企业需要使用配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
 第三方应用需具有“企业客户权限->客户联系->配置入群欢迎语素材”权限
 
 =head3 RETURN 返回结果：
@@ -109,7 +110,7 @@ text以外的消息类型，只能有一个，如果三者同时填，则按imag
 
 =head4 RETURN 参数说明：
 
-    参数	        说明
+	参数	        说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	template_id	欢迎语素材id
@@ -179,7 +180,7 @@ L<https://developer.work.weixin.qq.com/document/path/92366#编辑入群欢迎语
 
 =head4 参数说明：
 
-    参数	            必须	说明
+	参数	            必须	说明
     access_token	是	调用接口凭证
 	template_id	是	欢迎语素材id
 	text.content	否	消息文本内容,最长为4000字节
@@ -199,7 +200,7 @@ L<https://developer.work.weixin.qq.com/document/path/92366#编辑入群欢迎语
 
 =head4 权限说明：
 
-企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
+企业需要使用配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
 第三方应用需具有“企业客户权限->客户联系->配置入群欢迎语素材”权限
 仅可编辑本应用创建的入群欢迎语素材
 
@@ -212,7 +213,7 @@ L<https://developer.work.weixin.qq.com/document/path/92366#编辑入群欢迎语
 
 =head4 RETURN 参数说明：
 
-    参数	        说明
+	参数	        说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 
@@ -255,13 +256,13 @@ L<https://developer.work.weixin.qq.com/document/path/92366#获取入群欢迎语
 
 =head4 参数说明：
 
-    参数	            必须	说明
+	参数	            必须	说明
     access_token	是	调用接口凭证
 	template_id	是	群欢迎语的素材id
 
 =head4 权限说明：
 
-企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
+企业需要使用配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
 第三方应用需具有“企业客户权限->客户联系->配置入群欢迎语素材”权限
 
 =head3 RETURN 返回结果：
@@ -297,7 +298,7 @@ L<https://developer.work.weixin.qq.com/document/path/92366#获取入群欢迎语
 
 =head4 RETURN 参数说明：
 
-    参数	        说明
+	参数	        说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	text.content	消息文本内容
@@ -353,14 +354,14 @@ L<https://developer.work.weixin.qq.com/document/path/92366#删除入群欢迎语
 
 =head4 参数说明：
 
-    参数	            必须	说明
+	参数	            必须	说明
     access_token	是	调用接口凭证
 	template_id	是	群欢迎语的素材id
 	agentid	否	授权方安装的应用agentid。仅旧的第三方多应用套件需要填此参数
 
 =head4 权限说明：
 
-企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
+企业需要使用配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
 第三方应用需具有“企业客户权限->客户联系->配置入群欢迎语素材”权限
 仅可删除本应用创建的入群欢迎语素材
 
@@ -373,7 +374,7 @@ L<https://developer.work.weixin.qq.com/document/path/92366#删除入群欢迎语
 
 =head4 RETURN 参数说明：
 
-    参数	        说明
+	参数	        说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 

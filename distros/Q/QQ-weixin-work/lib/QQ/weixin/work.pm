@@ -38,7 +38,7 @@ use LWP::UserAgent;
 use JSON;
 use utf8;
 
-our $VERSION = '0.06';
+our $VERSION = '0.10';
 our @EXPORT = qw/ gettoken getcallbackip get_api_domain_ip /;
 
 =head1 FUNCTION
@@ -108,34 +108,35 @@ sub gettoken {
 =head2 getcallbackip(access_token);
 
 获取企业微信服务器的ip段
+最后更新：2023/11/29
 
 =head3 SYNOPSIS
 
-L<https://developer.work.weixin.qq.com/document/path/90930#33-获取企业微信服务器的ip段>
+L<https://developer.work.weixin.qq.com/document/path/90238#获取企业微信服务器的ip段>
+
+=head3 请求说明：
+
 企业微信在回调企业指定的URL时，是通过特定的IP发送出去的。如果企业需要做防火墙配置，那么可以通过这个接口获取到所有相关的IP段。IP段有变更可能，当IP段变更时，新旧IP段会同时保留一段时间。建议企业每天定时拉取IP段，更新防火墙设置，避免因IP段变更导致网络不通。
 
 =head3 参数说明
 
-    参数          必须  说明
+	参数          必须  说明
     access_token	是	调用接口凭证
 
 =head3 RETURN 返回结果
 
-  {
-    "ip_list":[
-      "182.254.11.176",
-      "182.254.78.66"
-      ],
-      "errcode":0,
-      "errmsg":"ok"
-  }
+	{
+		"errcode": 0,
+		"errmsg": "ok",
+		"ip_list": ["101.226.103.*", "101.226.62.*"]
+	}
 
 =head4 RETURN 参数说明
 
-    参数       类型       说明
-    ip_list	StringArray	企业微信回调的IP段
+	参数       类型       说明
     errcode	int	错误码，0表示成功，非0表示调用失败
     errmsg	string	错误信息，调用失败会有相关的错误信息返回
+    ip_list	StringArray	企业微信回调的IP段
 
 =head3 注意事项
 

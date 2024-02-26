@@ -11,7 +11,7 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '0.18';
+   our $VERSION = '0.19';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::FFTW3 $VERSION;
@@ -19,6 +19,10 @@ use DynaLoader;
 
 
 
+
+
+
+#line 25 "FFTW3.pd"
 
 #line 0 "README.pod"
 
@@ -77,8 +81,6 @@ PDL::FFTW3 - PDL interface to the Fastest Fourier Transform in the West v3
        +   *     *   +             +            + *  *        +             +
      0 ****-------*********************************--************************
        0             10            20           30            40            50
-
-
 
  # Correlation of two real signals
 
@@ -222,7 +224,6 @@ This is different from the behavior of the underlying FFTW3 library itself,
 but more consistent with other FFT packages for popular analysis languages
 including PDL.
 
-
 =head1 FUNCTIONS
 
 =head2 fftX (fft1, fft2, fft3, ..., fftn)
@@ -248,7 +249,6 @@ The following are equivalent:
  $X = fftn( $x, 1 );
  $X = fft1( $x );
  fft1( $x, my $X = $x->zeros );
-
 
 =head2 ifftX (ifft1, ifft2, ifft3, ..., ifftn)
 
@@ -308,317 +308,10 @@ under the terms of the GNU General Public License.
 use strict;
 use warnings;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#line 53 "FFTW3.pd"
 #line 0 "FFTW3_header_include.pm"
 
 # This file is included by FFTW3.pd
-
 
 use PDL::Types;
 use List::Util 'reduce';
@@ -1014,10 +707,6 @@ sub getPlan
   return $existingPlans{$planID};
 }
 
-
-;
-
-
 #line 61 "FFTW3.pd"
 sub fft1 { __fft_internal( "fft1",@_ ); }
 *PDL::fft1 = \&fft1;
@@ -1037,10 +726,8 @@ sub rNfft1 { __fft_internal( "rNfft1", @_ ); }
 
 sub irfft1 { my $a = __fft_internal( "irfft1", @_ ); $a /= $a->shape->slice('0:0')->prodover; $a; }
 *PDL::irfft1 = \&irfft1;
-
-
-
 #line 61 "FFTW3.pd"
+
 sub fft2 { __fft_internal( "fft2",@_ ); }
 *PDL::fft2 = \&fft2;
 
@@ -1059,10 +746,8 @@ sub rNfft2 { __fft_internal( "rNfft2", @_ ); }
 
 sub irfft2 { my $a = __fft_internal( "irfft2", @_ ); $a /= $a->shape->slice('0:1')->prodover; $a; }
 *PDL::irfft2 = \&irfft2;
-
-
-
 #line 61 "FFTW3.pd"
+
 sub fft3 { __fft_internal( "fft3",@_ ); }
 *PDL::fft3 = \&fft3;
 
@@ -1081,10 +766,8 @@ sub rNfft3 { __fft_internal( "rNfft3", @_ ); }
 
 sub irfft3 { my $a = __fft_internal( "irfft3", @_ ); $a /= $a->shape->slice('0:2')->prodover; $a; }
 *PDL::irfft3 = \&irfft3;
-
-
-
 #line 61 "FFTW3.pd"
+
 sub fft4 { __fft_internal( "fft4",@_ ); }
 *PDL::fft4 = \&fft4;
 
@@ -1103,10 +786,8 @@ sub rNfft4 { __fft_internal( "rNfft4", @_ ); }
 
 sub irfft4 { my $a = __fft_internal( "irfft4", @_ ); $a /= $a->shape->slice('0:3')->prodover; $a; }
 *PDL::irfft4 = \&irfft4;
-
-
-
 #line 61 "FFTW3.pd"
+
 sub fft5 { __fft_internal( "fft5",@_ ); }
 *PDL::fft5 = \&fft5;
 
@@ -1125,10 +806,8 @@ sub rNfft5 { __fft_internal( "rNfft5", @_ ); }
 
 sub irfft5 { my $a = __fft_internal( "irfft5", @_ ); $a /= $a->shape->slice('0:4')->prodover; $a; }
 *PDL::irfft5 = \&irfft5;
-
-
-
 #line 61 "FFTW3.pd"
+
 sub fft6 { __fft_internal( "fft6",@_ ); }
 *PDL::fft6 = \&fft6;
 
@@ -1147,10 +826,8 @@ sub rNfft6 { __fft_internal( "rNfft6", @_ ); }
 
 sub irfft6 { my $a = __fft_internal( "irfft6", @_ ); $a /= $a->shape->slice('0:5')->prodover; $a; }
 *PDL::irfft6 = \&irfft6;
-
-
-
 #line 61 "FFTW3.pd"
+
 sub fft7 { __fft_internal( "fft7",@_ ); }
 *PDL::fft7 = \&fft7;
 
@@ -1169,10 +846,8 @@ sub rNfft7 { __fft_internal( "rNfft7", @_ ); }
 
 sub irfft7 { my $a = __fft_internal( "irfft7", @_ ); $a /= $a->shape->slice('0:6')->prodover; $a; }
 *PDL::irfft7 = \&irfft7;
-
-
-
 #line 61 "FFTW3.pd"
+
 sub fft8 { __fft_internal( "fft8",@_ ); }
 *PDL::fft8 = \&fft8;
 
@@ -1191,10 +866,8 @@ sub rNfft8 { __fft_internal( "rNfft8", @_ ); }
 
 sub irfft8 { my $a = __fft_internal( "irfft8", @_ ); $a /= $a->shape->slice('0:7')->prodover; $a; }
 *PDL::irfft8 = \&irfft8;
-
-
-
 #line 61 "FFTW3.pd"
+
 sub fft9 { __fft_internal( "fft9",@_ ); }
 *PDL::fft9 = \&fft9;
 
@@ -1213,10 +886,8 @@ sub rNfft9 { __fft_internal( "rNfft9", @_ ); }
 
 sub irfft9 { my $a = __fft_internal( "irfft9", @_ ); $a /= $a->shape->slice('0:8')->prodover; $a; }
 *PDL::irfft9 = \&irfft9;
-
-
-
 #line 61 "FFTW3.pd"
+
 sub fft10 { __fft_internal( "fft10",@_ ); }
 *PDL::fft10 = \&fft10;
 
@@ -1235,10 +906,8 @@ sub rNfft10 { __fft_internal( "rNfft10", @_ ); }
 
 sub irfft10 { my $a = __fft_internal( "irfft10", @_ ); $a /= $a->shape->slice('0:9')->prodover; $a; }
 *PDL::irfft10 = \&irfft10;
-
-
-
 #line 89 "FFTW3.pd"
+
 sub _rank_springboard {
   my ($name, $source, $rank, @rest) = @_;
   my $inverse = ($name =~ m/^i/);
@@ -1276,9 +945,7 @@ sub irfftn  { _rank_springboard( "irfft", @_ ) }
 *PDL::ifftn  = \&ifftn;
 *PDL::rfftn  = \&rfftn;
 *PDL::irfftn = \&irfftn;
-
-
-
+#line 949 "FFTW3.pm"
 
 # Exit with OK status
 

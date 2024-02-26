@@ -22,16 +22,23 @@ name: Locale-CLDR-Locales-Sat
 provides:
   Locale::CLDR::Locales::Sat:
     file: lib/Locale/CLDR/Locales/Sat.pm
-    version: v0.40.1
+    version: v0.44.0
+  Locale::CLDR::Locales::Sat::Deva:
+    file: lib/Locale/CLDR/Locales/Sat/Deva.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Sat::Deva::In:
+    file: lib/Locale/CLDR/Locales/Sat/Deva/In.pm
+    version: v0.44.0
   Locale::CLDR::Locales::Sat::Olck:
     file: lib/Locale/CLDR/Locales/Sat/Olck.pm
-    version: v0.40.1
+    version: v0.44.0
   Locale::CLDR::Locales::Sat::Olck::In:
     file: lib/Locale/CLDR/Locales/Sat/Olck/In.pm
-    version: v0.40.1
+    version: v0.44.0
 requires:
   DateTime: '0.72'
-  Locale::CLDR: v0.40.1
+  Locale::CLDR: v0.44.0
+  Locale::CLDR::Locales::Root: v0.44.0
   Moo: '2'
   MooX::ClassAttribute: '0.011'
   Type::Tiny: '0'
@@ -41,5 +48,5 @@ resources:
   bugtracker: https://github.com/ThePilgrim/perlcldr/issues
   homepage: https://github.com/ThePilgrim/perlcldr
   repository: https://github.com/ThePilgrim/perlcldr.git
-version: v0.40.1
+version: v0.44.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

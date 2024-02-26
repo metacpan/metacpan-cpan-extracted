@@ -1,0 +1,299 @@
+  Using with Data::Sah
+    To check data against this schema (requires Data::Sah):
+
+     use Data::Sah qw(gen_validator);
+     my \$validator = gen_validator("$sch_name*");
+     say \$validator->(\$data) ? "valid" : "INVALID!";
+
+    The above validator returns a boolean result (true if data is valid,
+    false if otherwise). To return an error message string instead (empty
+    string if data is valid, a non-empty error message otherwise):
+
+     my \$validator = gen_validator("$sch_name", {return_type=>'str_errmsg'});
+     my \$errmsg = \$validator->(\$data);
+    _
+
+                        my $v = Data::Sah::gen_validator($sch, {return_type=>"str_errmsg"});
+                        if ($random_valid_eg) {
+                            push @pod, " \n";
+                            push @pod, " # a sample valid data\n";
+                            push @pod, " \$data = ".Data::Dmp::dmp($random_valid_eg->{value}).";\n";
+                            push @pod, " my \$errmsg = \$validator->(\$data); # => ".Data::Dmp::dmp($v->($random_valid_eg->{value}))."\n";
+                        }
+                        if ($random_invalid_eg) {
+                            push @pod, " \n";
+                            push @pod, " # a sample invalid data\n";
+                            push @pod, " \$data = ".Data::Dmp::dmp($random_invalid_eg->{value}).";\n";
+                            push @pod, " my \$errmsg = \$validator->(\$data); # => ".Data::Dmp::dmp($v->($random_invalid_eg->{value}))."\n";
+                        }
+
+                        push @pod, <<"_";
+
+    Often a schema has coercion rule or default value rules, so after
+    validation the validated value will be different from the original. To
+    return the validated (set-as-default, coerced, prefiltered) value:
+
+     my \$validator = gen_validator("$sch_name", {return_type=>'str_errmsg+val'});
+     my \$res = \$validator->(\$data); # [\$errmsg, \$validated_val]
+    _
+
+                        $v = Data::Sah::gen_validator($sch, {return_type=>"str_errmsg+val"});
+                        if ($random_valid_eg) {
+                            push @pod, " \n";
+                            push @pod, " # a sample valid data\n";
+                            push @pod, " \$data = ".Data::Dmp::dmp($random_valid_eg->{value}).";\n";
+                            push @pod, " my \$res = \$validator->(\$data); # => ".Data::Dmp::dmp($v->($random_valid_eg->{value}))."\n";
+                        }
+                        if ($random_invalid_eg) {
+                            push @pod, " \n";
+                            push @pod, " # a sample invalid data\n";
+                            push @pod, " \$data = ".Data::Dmp::dmp($random_invalid_eg->{value}).";\n";
+                            push @pod, " my \$res = \$validator->(\$data); # => ".Data::Dmp::dmp($v->($random_invalid_eg->{value}))."\n";
+                        }
+
+                        push @pod, <<"_";
+
+    Data::Sah can also create validator that returns a hash of detailed
+    error message. Data::Sah can even create validator that targets other
+    language, like JavaScript, from the same schema. Other things Data::Sah
+    can do: show source code for validator, generate a validator code with
+    debug comments and/or log statements, generate human text from schema.
+    See its documentation for more details.
+
+  Using with Params::Sah
+    To validate function parameters against this schema (requires
+    Params::Sah):
+
+     use Params::Sah qw(gen_validator);
+
+     sub myfunc {
+         my \@args = \@_;
+         state \$validator = gen_validator("$sch_name*");
+         \$validator->(\\\@args);
+         ...
+     }
+
+  Using with Perinci::CmdLine::Lite
+    To specify schema in Rinci function metadata and use the metadata with
+    Perinci::CmdLine (Perinci::CmdLine::Lite) to create a CLI:
+
+     # in lib/MyApp.pm
+     package
+       MyApp;
+     our \%SPEC;
+     \$SPEC{myfunc} = {
+         v => 1.1,
+         summary => 'Routine to do blah ...',
+         args => {
+             arg1 => {
+                 summary => 'The blah blah argument',
+                 schema => ['$sch_name*'],
+             },
+             ...
+         },
+     };
+     sub myfunc {
+         my \%args = \@_;
+         ...
+     }
+     1;
+
+     # in myapp.pl
+     package
+       main;
+     use Perinci::CmdLine::Any;
+     Perinci::CmdLine::Any->new(url=>'/MyApp/myfunc')->run;
+
+     # in command-line
+     % ./myapp.pl --help
+     myapp - Routine to do blah ...
+     ...
+
+     % ./myapp.pl --version
+
+     % ./myapp.pl --arg1 ...
+
+  Using on the CLI with validate-with-sah
+    To validate some data on the CLI, you can use validate-with-sah utility.
+    Specify the schema as the first argument (encoded in Perl syntax) and
+    the data to validate as the second argument (encoded in Perl syntax):
+
+     % validate-with-sah '"$sch_name*"' '"data..."'
+
+    "validate-with-sah" has several options for, e.g. validating multiple
+    data, showing the generated validator code (Perl/JavaScript/etc), or
+    loading schema/data from file. See its manpage for more details.
+
+    _ (my $type_name = $sch_name) =~ s/(\A\w)|(::|_)(\w)/defined($3) ?
+    uc($3) : uc($1)/eg;
+
+                        push @pod, <<"_";
+
+  Using with Type::Tiny
+    To create a type constraint and type library from a schema (requires
+    Type::Tiny as well as Type::FromSah):
+
+     package My::Types {
+         use Type::Library -base;
+         use Type::FromSah qw( sah2type );
+
+         __PACKAGE__->add_type(
+             sah2type('$sch_name*', name=>'$type_name')
+         );
+     }
+
+     use My::Types qw($type_name);
+     $type_name->assert_valid(\$data);
+
+    _ }
+
+                    $self->add_text_to_section(
+                        $document, join("", @pod), 'SYNOPSIS',
+                        {ignore => 1},
+                    );
+                }
+
+                # add POD section: DESCRIPTION
+                {
+                    last unless $sch->[1]{description};
+                    require Markdown::To::POD;
+                    my @pod;
+                    push @pod, Markdown::To::POD::markdown_to_pod(
+                        $sch->[1]{description}), "\n\n";
+                    $self->add_text_to_section(
+                        $document, join("", @pod), 'DESCRIPTION',
+                        {ignore => 1},
+                    );
+                }
+
+                $self->log(["Generated POD for '%s'", $filename]);
+
+                # add POD section: SEE ALSO
+                {
+                    my $links = $sch->[1]{links};
+                    next unless $links && @$links;
+
+                    my @pod;
+
+                    require String::PodQuote;
+                    for my $link (@$links) {
+                        my $url = $link->{url}; $url =~ s/^(prog|pm)://;
+                        push @pod, "L<$url>", ($link->{summary} ? " - ".String::PodQuote::pod_quote($link->{summary}) : ""), "\n\n";
+                    }
+                    $self->add_text_to_section(
+                        $document, join('', @pod), 'SEE ALSO',
+                        {after_section => ['DESCRIPTION']},
+                    );
+                }
+
+            } # Sah::Schema::*
+        }
+    }
+
+    1; # ABSTRACT: Plugin to use when building Sah::SchemaBundle::*
+    distribution
+
+    __END__
+
+NAME
+    Pod::Weaver::Plugin::Sah::SchemaBundle - Plugin to use when building
+    Sah::SchemaBundle::* distribution
+
+VERSION
+    This document describes version 0.082 of
+    Pod::Weaver::Plugin::Sah::SchemaBundle (from Perl distribution
+    Pod-Weaver-Plugin-Sah-SchemaBundle), released on 2024-02-23.
+
+SYNOPSIS
+    In your weaver.ini:
+
+     [-Sah::SchemaBundle]
+
+DESCRIPTION
+    This plugin is used when building a Sah::SchemaBundle::* distribution.
+    It currently does the following to lib/Sah/SchemaBundle/* .pm files:
+
+    *   Create "SAH SCHEMAS" POD section from list of Sah::Schema::* modules
+        in the distribution
+
+    *   Mention some modules in See Also section
+
+        e.g. Sah and Data::Sah.
+
+    It does the following to "Sah/Schema/*" in lib .pm files:
+
+    *   Add "DESCRIPTION" POD section schema's description
+
+CONFIGURATION
+  show_source
+    Bool. Default true. If set to true, will add a "SAH SCHEMA DEFINITION"
+    section containing the source (dump) of the schema. Examples will be
+    stripped.
+
+  include_schema_module
+    Filter only certain scenario modules that get processed. Can be
+    specified multiple times. The "Sah::Schema::" prefix can be omitted.
+
+  exclude_schema_module
+    Exclude certain scenario modules from being processed. Can be specified
+    multiple times. The "Sah::Schems::" prefix can be omitted.
+
+  include_schemabundle_module
+    Filter only certain scenario modules that get processed. Can be
+    specified multiple times. The "Sah::SchemaBundle::" prefix can be
+    omitted.
+
+  exclude_schemabundle_module
+    Exclude certain scenario modules from being processed. Can be specified
+    multiple times. The "Sah::SchemaBundle::" prefix can be omitted.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Pod-Weaver-Plugin-Sah-SchemaBundle>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Pod-Weaver-Plugin-Sah-SchemaBundle>.
+
+SEE ALSO
+    Sah and Data::Sah
+
+    Dist::Zilla::Plugin::Sah::SchemaBundle
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2024, 2023, 2022, 2020, 2019, 2016 by
+    perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Plugin-Sah
+    -SchemaBundle>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

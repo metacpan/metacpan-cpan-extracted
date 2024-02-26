@@ -6,7 +6,7 @@ WriteMakefile(
   VERSION_FROM     => 'FlexPay.pm',
   AUTHOR           => 'Verotel dev team',
   MIN_PERL_VERSION => 5.20.3,
-  ABSTRACT => 'This library allows merchants to use Verotel payment gateway and get paid by their users via Credit Card and other payment methods.',
+  ABSTRACT => 'Unsupported! / This library allows merchants to use Verotel payment gateway and get paid by their users via Credit Card and other payment methods.',
   PREREQ_PM        => {
     'strict'   => 0,
     'warnings' => 0,

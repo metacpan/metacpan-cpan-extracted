@@ -47,7 +47,14 @@
       }
    },
    "release_status" : "stable",
-   "resources" : {},
-   "version" : "1.045",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sciurius/perl-File-LoadLines/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/sciurius/perl-File-LoadLines"
+      }
+   },
+   "version" : "1.046",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -6,6 +6,7 @@ use warnings;
 use File::Slurp;
 use TOML::Tiny qw(to_toml);
 use base 'Ixchel::Actions::base';
+use Sys::Hostname;
 
 =head1 NAME
 
@@ -13,11 +14,11 @@ Ixchel::Actions::lilith_config - Generates the config for Lilith.
 
 =head1 VERSION
 
-Version 0.0.1
+Version 0.1.0
 
 =cut
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.1.0';
 
 =head1 CLI SYNOPSIS
 
@@ -51,6 +52,36 @@ Default :: /usr/local/etc/lilith.toml
 
 .lilith.config is used for generating the config.
 
+=head2 AUTO CONFIG
+
+If .lilith.auto_config.enabled=1 is set, then it it will automatically fill out the
+monitored instances.
+
+For single instances setups it is done as below.
+
+    Suricata -> $hostname-pie      -> /var/log/suricata/alert.json
+    Sagan    -> $hostname-lae      -> /var/log/sagan/alert.json
+    CAPEv2   -> $hostname-malware  -> /opt/CAPEv2/log/eve.json
+
+For multi-instance it is done as below.
+
+    Suricata -> $hostname-$instance -> /var/log/suricata/alert-$instance.json
+    Sagan    -> $hostname-$instance -> /var/log/sagan/alert-$instance.json
+    CAPEv2   -> $hostname-malware   -> /opt/CAPEv2/log/eve.json (or wherever .cape.eve set to)
+
+For hostname .lilith.auto_config.full=1 is set, then the full hostname is used.
+Otherwise it will use the shorthostname via removing everything after the first /\./
+via s/\.+$//.
+
+The variables used for checking which should be enabled are the usual enable ones as below.
+
+    .suricata.enable
+    .sagan.enable
+    .cape.enable
+
+This expects that the instane naming scheme does not overlap and will error if any of them
+do overlap, including if they are already defined in .lilith.config .
+
 =head1 RESULT HASH REF
 
     .errors :: A array of errors encountered.
@@ -71,16 +102,126 @@ sub new_extra {
 sub action_extra {
 	my $self = $_[0];
 
-	my $toml;
-	eval { $toml = to_toml( $self->{config}{lilith}{config} ); };
+	my $config = $self->{config}{lilith}{config};
 	if ($@) {
 		$self->status_add( error => 1, status => 'Errored generating TOML for config ... ' . $@ );
 		return undef;
 	}
 
-	if ( !$self->{opts}{np} ) {
-		print $toml;
+	##
+	##
+	## auto config stuff
+	##
+	##
+	$self->status_add( status => '.lilith.auto_config.enable=1 .lilith.auto_config.full='
+			. $self->{config}{lilith}{auto_config}{full}, );
+	if ( $self->{config}{lilith}{auto_config}{enabled} ) {
+		my $hostname = hostname;
+		if ( !$self->{config}{lilith}{auto_config}{full} ) {
+			$hostname =~ s/\..*$//;
+		}
+		$self->status_add( status => 'using hostname "' . $hostname . '"', );
+		##
+		## cape auto config
+		##
+		if ( $self->{config}{cape}{enable} ) {
+			my $instance_name = $hostname . '-malware';
+			if ( defined( $config->{$instance_name} ) ) {
+				$self->status_add(
+					error  => 1,
+					status => $instance_name . ' already exists',
+				);
+			}
+			$config->{ $hostname . '-malware' } = {
+				instance => $hostname . '-malware',
+				type     => 'cape',
+				eve      => $self->{caoe}{eve},
+			};
+			$self->status_add( status => $instance_name . ': type=cape, eve="' . $self->{vape}{eve} . '"', );
+		} ## end if ( $self->{config}{cape}{enable} )
+		##
+		## suricata auto config
+		##
+		if ( $self->{config}{suricata}{enable} && !$self->{config}{suricata}{multi_instance} ) {
+			my $instance_name = $hostname . '-pie';
+			if ( defined( $config->{$instance_name} ) ) {
+				$self->status_add(
+					error  => 1,
+					status => $instance_name . ' already exists',
+				);
+			}
+			$config->{$instance_name} = {
+				instance => $hostname . '-pie',
+				type     => 'suricata',
+				eve      => '/var/log/suricata/alert.json',
+			};
+			$self->status_add( status => $instance_name . ': type=suricata, eve="/var/log/suricata/alert.json"', );
+		} elsif ( $self->{config}{suricata}{enable} && $self->{config}{suricata}{multi_instance} ) {
+			my @instances = keys( %{ $self->{config}{suricata}{instances} } );
+			foreach my $item (@instances) {
+				my $instance_name = $hostname . '-' . $item;
+				if ( defined( $config->{$instance_name} ) ) {
+					$self->status_add(
+						error  => 1,
+						status => $instance_name . ' already exists',
+					);
+				}
+				$config->{$instance_name} = {
+					instance => $instance_name,
+					type     => 'suricata',
+					eve      => '/var/log/suricata/alert-' . $item . '.json',
+				};
+				$self->status_add(
+					status => $instance_name . ': type=suricata, eve="/var/log/suricata/alert-' . $item . '.json"',
+				);
+			} ## end foreach my $item (@instances)
+		} ## end elsif ( $self->{config}{suricata}{enable} && ...)
+		##
+		## sagan auto config
+		##
+		if ( $self->{config}{sagan}{enable} && !$self->{config}{sagan}{multi_instance} ) {
+			my $instance_name = $hostname . '-lae';
+			if ( defined( $config->{$instance_name} ) ) {
+				$self->status_add(
+					error  => 1,
+					status => $instance_name . ' already exists',
+				);
+			}
+			$config->{ $hostname . '-lae' } = {
+				instance => $hostname . '-lae',
+				type     => 'sagan',
+				eve      => '/var/log/sagan/alert.json',
+			};
+			$self->status_add( status => $instance_name . ': type=sagan, eve="/var/log/sagan/alert.json"', );
+		} elsif ( $self->{config}{sagan}{enable} && $self->{config}{suricatsgan}{multi_instance} ) {
+			my @instances = keys( %{ $self->{config}{sagan}{instances} } );
+			foreach my $item (@instances) {
+				my $instance_name = $hostname . '-' . $item;
+				if ( defined( $config->{$instance_name} ) ) {
+					$self->status_add(
+						error  => 1,
+						status => $instance_name . ' already exists',
+					);
+				}
+				$config->{$instance_name} = {
+					instance => $instance_name,
+					type     => 'suricata',
+					eve      => '/var/log/suricata/alert-' . $item . '.json',
+				};
+				$self->status_add(
+					status => $instance_name . ': type=sagan, eve="/var/log/sagan/alert-' . $item . '.json"', );
+			} ## end foreach my $item (@instances)
+		} ## end elsif ( $self->{config}{sagan}{enable} && $self...)
+	} ## end if ( $self->{config}{lilith}{auto_config}{...})
+
+	my $toml = to_toml($config);
+	eval { };
+	if ($@) {
+		$self->status_add( error => 1, status => 'Errored generating TOML for config ... ' . $@ );
+		return undef;
 	}
+
+	$self->status_add( status => "Lilith Config ...\n" . $toml );
 
 	if ( $self->{opts}{w} ) {
 		eval { write_file( $self->{opts}{o}, $toml ) };

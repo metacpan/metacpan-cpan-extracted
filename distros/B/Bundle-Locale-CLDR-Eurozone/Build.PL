@@ -17,7 +17,7 @@ my $builder = Module::Build->new(
         ,
     },
     dist_author         => q{John Imrie <john.imrie1@gmail.com>},
-    dist_version        => '0.40.1',
+    dist_version        => '0.44.0',
     build_requires => {
         'ok'                => 0,
         'Test::Exception'   => 0,
@@ -26,7 +26,7 @@ my $builder = Module::Build->new(
     add_to_cleanup      => [ 'Bundle-Locale-CLDR-Eurozone-*' ],
     configure_requires => { 'Module::Build' => '0.40' },
     release_status => 'stable',
-    dist_abstract => 'Locale::CLDR - Data Package (  )',
+    dist_abstract => q<Locale::CLDR - Data Package (  )>,
     meta_add => {
         keywords => [ qw( locale CLDR locale-data-pack ) ],
         resources => {

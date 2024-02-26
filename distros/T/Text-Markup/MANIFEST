@@ -31,6 +31,7 @@ t/html/html.html
 t/html/markdown.html
 t/html/mediawiki.html
 t/html/multimarkdown.html
+t/html/none.html
 t/html/pod.html
 t/html/rest.html
 t/html/textile.html
@@ -44,6 +45,7 @@ t/markups/html.txt
 t/markups/markdown.txt
 t/markups/mediawiki.txt
 t/markups/multimarkdown.txt
+t/markups/none.txt
 t/markups/pod.txt
 t/markups/rest.txt
 t/markups/textile.txt

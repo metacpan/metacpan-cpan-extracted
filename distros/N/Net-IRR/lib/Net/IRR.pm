@@ -8,7 +8,7 @@ use IO::Socket::INET;
 
 use vars qw/ @ISA %EXPORT_TAGS @EXPORT_OK $VERSION /;
 
-$VERSION = '0.09';
+$VERSION = '0.10';
 
 #  used for route searches
 use constant EXACT_MATCH   => 'o';
@@ -30,6 +30,7 @@ sub connect {
     my $self = bless {}, ref($class) || $class;
     $self->{host} = $args{host} || '127.0.0.1';
     $self->{port} = $args{port} || 43;
+    $self->{timeout} = $args{timeout} || 5;
     $self->{tcp} = IO::Socket::INET->new(
                        PeerAddr => $self->{host},
                        PeerPort => $self->{port},
@@ -186,10 +187,14 @@ sub _response {
         return ();
     }
     return () if ($header =~ /^[CDEF].*$/);
+    my $timeout = time() + $self->{timeout};
     my($data_length) = $header =~ /^A(.*)$/;
     my $data = '';
-    while($data_length != length($data)) {
-        $data .= $t->getline();
+    while($data_length != length($data) && time() <= $timeout) {
+        my $line = $t->getline();
+        if( defined($line) ) {
+            $data .= $line;
+        }
     }
     carp sprintf("%s: only received %d out of %d bytes from %s:%d\n", $error_prefix, length($data), $data_length, $self->{host}, $self->{port})
         if $data_length != length($data);

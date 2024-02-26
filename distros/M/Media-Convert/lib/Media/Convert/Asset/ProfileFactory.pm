@@ -353,10 +353,7 @@ sub create {
 	} else {
 		my $parent = $profiles->{$profile}{parent};
 		require_module("Media::Convert::Asset::Profile::$parent");
-		my $rv = "Media::Convert::Asset::Profile::$parent"->new(url => '', reference => $ref);
-		foreach my $param(keys %{$profiles->{$profile}{settings}}) {
-			$rv->meta->find_attribute_by_name($param)->set_value($rv, $profiles->{$profile}{settings}{$param});
-		}
+		my $rv = "Media::Convert::Asset::Profile::$parent"->new(url => '', reference => $ref, %{$profiles->{$profile}{settings}});
 		return $rv;
 	}
 	die "Unknown profile $profile requested!";

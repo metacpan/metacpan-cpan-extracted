@@ -40,6 +40,8 @@
             "Locale::PO" : "0.27",
             "Mojolicious" : "9.33",
             "Mojolicious::Plugin::Qooxdoo" : "v1.0.14",
+            "Pod::Simple::HTML" : "0",
+            "Pod::Simple::Text" : "0",
             "Syntax::Keyword::Try" : "0.29",
             "Test::Fatal" : "0",
             "Text::CSV" : "0",
@@ -61,6 +63,6 @@
          "url" : "https://github.com/oetiker/callbackery"
       }
    },
-   "version" : "v0.49.0",
+   "version" : "v0.49.2",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

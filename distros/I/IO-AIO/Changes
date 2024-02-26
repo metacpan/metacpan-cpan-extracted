@@ -45,6 +45,22 @@ TODO: io_uring, but it's so broken  :/
 TODO: allow import of fds as aio_wd
 TODO: close_range
 TODO: move_mount, open_tree, fsmount, fspick, fsconfig, fsopen https://lwn.net/Articles/759499/
+TODO: aio_mmap
+
+4.81 Tue 20 Feb 2024 07:38:35 CET
+	- work around a bug in musl w.r.t to O_SEARCH and use EIO_O_PATH instead,
+          vertifying the semantics against the subset of O_PATH and O_SEARCH
+          (based on a report by Steve Dondley).
+	- aio_copy now tries to preallocate the destination file.
+        - fexecve configure test used the wrong püointer type (patch by Paul Howarth).
+
+4.80 Sat 01 Apr 2023 04:13:37 CEST
+	- remove long obsolete "paths must be absolute" text in aio_open/stat
+          descriptions.
+	- another workaround for the low-quality musl libc.
+	- test for umount seperately, as it is more portable.
+        - some low-quality posix attempts (openbsd, osx) declare the availability
+          of fexecve but then don't even bother to implemnent a stub.
 
 4.79 Sun 25 Sep 2022 18:25:53 CEST
 	- the autoconf result of the mount check was not used, so it failed to

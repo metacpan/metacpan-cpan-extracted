@@ -1,11 +1,13 @@
 package Pod::Weaver::Plugin::AppendPrepend;
 
-our $DATE = '2015-04-04'; # DATE
-our $VERSION = '0.01'; # VERSION
-
 use 5.010001;
 use Moose;
 with 'Pod::Weaver::Role::Finalizer';
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2024-02-06'; # DATE
+our $DIST = 'Pod-Weaver-Plugin-AppendPrepend'; # DIST
+our $VERSION = '0.021'; # VERSION
 
 # regex
 has exclude_modules => (
@@ -15,6 +17,11 @@ has exclude_modules => (
 has exclude_files => (
     is => 'rw',
     isa => 'Str',
+);
+has ignore => (
+    is => 'rw',
+    #isa => 'Bool',
+    default => sub { 1 },
 );
 
 sub finalize_document {
@@ -66,7 +73,12 @@ sub finalize_document {
         next unless $target;
         $self->log_debug(["%s to section %s", $which, $target]);
         unless (defined $headlines_pos{$target}) {
-            $self->log_fatal(["Can't $which $target: no such section", $target]);
+            if ($self->ignore) {
+                $self->log(["Skipping $which $target: no such section"]);
+                next;
+            } else {
+                $self->log_fatal(["Can't $which $target: no such section"]);
+            }
         }
         my $section_elem = $document->children->[$headlines_pos{$target}];
         my $appprep_elem = $document->children->[$headlines_pos{$h}];
@@ -101,11 +113,11 @@ Pod::Weaver::Plugin::AppendPrepend - Merge append:FOO and prepend:FOO sections i
 
 =head1 VERSION
 
-This document describes version 0.01 of Pod::Weaver::Plugin::AppendPrepend (from Perl distribution Pod-Weaver-Plugin-AppendPrepend), released on 2015-04-04.
+This document describes version 0.021 of Pod::Weaver::Plugin::AppendPrepend (from Perl distribution Pod-Weaver-Plugin-AppendPrepend), released on 2024-02-06.
 
 =head1 SYNOPSIS
 
-In your C<weaver.ini>:
+In your F<weaver.ini>:
 
  [-AppendPrepend]
  ;exclude_modules = REGEX
@@ -137,6 +149,17 @@ to add some text to it.
 
 =for Pod::Coverage finalize_document
 
+=head1 CONFIGURATION
+
+=head2 exclude_modules
+
+=head2 exclude_files
+
+=head2 ignore
+
+Bool. Default to true. If set to true (the default), then when target headline
+does not exist, instead of dying, ignore append/prepend the headline.
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Pod-Weaver-Plugin-AppendPrepend>.
@@ -145,6 +168,35 @@ Please visit the project's homepage at L<https://metacpan.org/release/Pod-Weaver
 
 Source repository is at L<https://github.com/perlancar/perl-Pod-Weaver-Plugin-AppendPrepend>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2024, 2015 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Plugin-AppendPrepend>
@@ -152,16 +204,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2015 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

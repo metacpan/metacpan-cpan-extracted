@@ -1,0 +1,60 @@
+# PODNAME: RDF::Cowl::Lib::Gen::Class::DataPropExp
+# ABSTRACT: Generated docs for RDF::Cowl::DataPropExp
+
+## DO NOT EDIT
+## Generated via maint/tt/Class.pod.tt
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+RDF::Cowl::Lib::Gen::Class::DataPropExp - Generated docs for RDF::Cowl::DataPropExp
+
+=head1 VERSION
+
+version 1.0.0
+
+=head1 MAIN MODULE
+
+L<RDF::Cowl::DataPropExp>
+
+=head1 METHODS
+
+=head2 get_prop
+
+B<Signature>:
+
+  $self->get_prop()
+
+B<Params>:
+
+  CowlAnyDataPropExp $exp 
+
+Documentation:
+
+  Gets the underlying data property.
+  
+  @param exp The data property expression.
+  @return The data property.
+
+=over 2
+
+B<C function name>: C<< cowl_data_prop_exp_get_prop >>
+
+=back
+
+=head1 AUTHOR
+
+Zakariyya Mughal <zmughal@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 by Auto-Parallel Technologies, Inc..
+
+This is free software, licensed under Eclipse Public License - v 2.0.
+
+=cut

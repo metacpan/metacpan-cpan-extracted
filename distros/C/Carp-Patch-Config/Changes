@@ -1,3 +1,11 @@
+0.008   2024-02-16  Released-By: PERLANCAR; Urgency: high
+
+        - [bugfix] We didn't set the right Carp variables, so versions before
+          this didn't actually work.
+
+        - Add option to dump using Data::Dump::IfSmall (set -Dump config to 4).
+
+
 0.007   2022-02-06  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

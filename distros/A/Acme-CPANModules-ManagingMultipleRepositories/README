@@ -1,11 +1,11 @@
 NAME
-    Acme::CPANModules::ManagingMultipleRepositories - Managing multiple
-    repositories
+    Acme::CPANModules::ManagingMultipleRepositories - List of tools to
+    manage multiple repositories
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     Acme::CPANModules::ManagingMultipleRepositories (from Perl distribution
-    Acme-CPANModules-ManagingMultipleRepositories), released on 2021-02-02.
+    Acme-CPANModules-ManagingMultipleRepositories), released on 2023-10-29.
 
 DESCRIPTION
     This Acme::CPANModules list catalogs tools to manage multiple
@@ -37,12 +37,15 @@ DESCRIPTION
 
     mr, <http://joeyh.name/code/mr>
 
-ACME::MODULES ENTRIES
-    *   Git::Bunch
+ACME::CPANMODULES ENTRIES
+    Git::Bunch
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   App::GitGot
+    App::GitGot
+        Author: GENEHACK <https://metacpan.org/author/GENEHACK>
 
-    *   Group::Git
+    Group::Git
+        Author: IVANWILLS <https://metacpan.org/author/IVANWILLS>
 
 FAQ
   What is an Acme::CPANModules::* module?
@@ -53,8 +56,13 @@ FAQ
 
   What are ways to use this Acme::CPANModules module?
     Aside from reading this Acme::CPANModules module's POD documentation,
-    you can install all the listed modules (entries) using cpanmodules CLI
-    (from App::cpanmodules distribution):
+    you can install all the listed modules (entries) using cpanm-cpanmodules
+    script (from App::cpanm::cpanmodules distribution):
+
+     % cpanm-cpanmodules -n ManagingMultipleRepositories
+
+    Alternatively you can use the cpanmodules CLI (from App::cpanmodules
+    distribution):
 
         % cpanmodules ls-entries ManagingMultipleRepositories | cpanm -n
 
@@ -68,7 +76,9 @@ FAQ
 
     This Acme::CPANModules module also helps lcpan produce a more meaningful
     result for "lcpan related-mods" command when it comes to finding related
-    modules for the modules listed in this Acme::CPANModules module.
+    modules for the modules listed in this Acme::CPANModules module. See
+    App::lcpan::Cmd::related_mods for more details on how "related modules"
+    are found.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -80,14 +90,6 @@ SOURCE
     <https://github.com/perlancar/perl-Acme-CPANModules-ManagingMultipleRepo
     sitories>.
 
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://github.com/perlancar/perl-Acme-CPANModules-ManagingMultipleRepo
-    sitories/issues>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
 SEE ALSO
     Acme::CPANModules - about the Acme::CPANModules namespace
 
@@ -96,9 +98,34 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021 by perlancar@cpan.org.
+    This software is copyright (c) 2023, 2021 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Mana
+    gingMultipleRepositories>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

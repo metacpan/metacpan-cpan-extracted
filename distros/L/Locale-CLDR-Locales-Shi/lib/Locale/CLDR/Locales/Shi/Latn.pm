@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Shi::Latn - Package for language Tachelhit
 
 package Locale::CLDR::Locales::Shi::Latn;
 # This file auto generated from Data\common\main\shi_Latn.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -23,7 +23,7 @@ use if $^V ge v5.12.0, feature => 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
-extends('Locale::CLDR::Locales::Shi');
+extends('Locale::CLDR::Locales::Root');
 has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
@@ -330,14 +330,14 @@ has 'characters' => (
 		no warnings 'experimental::regex_sets';
 		return {
 			auxiliary => qr{[o p v]},
-			index => ['A', 'B', 'C', 'D', 'Ḍ', 'E', 'Ɛ', 'F', 'G', '{Gʷ}', 'Ɣ', 'H', 'Ḥ', 'I', 'J', 'K', '{Kʷ}', 'L', 'M', 'N', 'Q', 'R', 'Ṛ', 'S', 'Ṣ', 'T', 'Ṭ', 'U', 'W', 'X', 'Y', 'Z'],
-			main => qr{[a b c d ḍ e ɛ f g {gʷ} ɣ h ḥ i j k {kʷ} l m n q r ṛ s ṣ t ṭ u w x y z]},
+			index => ['A', 'B', 'C', 'DḌ', 'E', 'Ɛ', 'F', 'G', '{Gʷ}', 'Ɣ', 'HḤ', 'I', 'J', 'K', '{Kʷ}', 'L', 'M', 'N', 'Q', 'RṚ', 'SṢ', 'TṬ', 'U', 'W', 'X', 'Y', 'Z'],
+			main => qr{[a b c dḍ e ɛ f g {gʷ} ɣ hḥ i j k {kʷ} l m n q rṛ sṣ tṭ u w x y z]},
 			numbers => qr{[  \- ‑ , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
 : sub {
-		return { index => ['A', 'B', 'C', 'D', 'Ḍ', 'E', 'Ɛ', 'F', 'G', '{Gʷ}', 'Ɣ', 'H', 'Ḥ', 'I', 'J', 'K', '{Kʷ}', 'L', 'M', 'N', 'Q', 'R', 'Ṛ', 'S', 'Ṣ', 'T', 'Ṭ', 'U', 'W', 'X', 'Y', 'Z'], };
+		return { index => ['A', 'B', 'C', 'DḌ', 'E', 'Ɛ', 'F', 'G', '{Gʷ}', 'Ɣ', 'HḤ', 'I', 'J', 'K', '{Kʷ}', 'L', 'M', 'N', 'Q', 'RṚ', 'SṢ', 'TṬ', 'U', 'W', 'X', 'Y', 'Z'], };
 },
 );
 
@@ -633,9 +633,14 @@ has 'currencies' => (
 				'currency' => q(ajnih n santilin),
 			},
 		},
-		'SLL' => {
+		'SLE' => {
 			display_name => {
 				'currency' => q(liyun),
+			},
+		},
+		'SLL' => {
+			display_name => {
+				'currency' => q(liyun \(1964—2022\)),
 			},
 		},
 		'SOS' => {
@@ -846,10 +851,6 @@ has 'day_periods' => (
 					'am' => q{tifawt},
 					'pm' => q{tadggʷat},
 				},
-				'wide' => {
-					'am' => q{tifawt},
-					'pm' => q{tadggʷat},
-				},
 			},
 		},
 	} },
@@ -955,7 +956,6 @@ has 'datetime_formats_available_formats' => (
 			MMdd => q{dd/MM},
 			Md => q{d/M},
 			ms => q{m:ss},
-			y => q{y},
 			yM => q{M/y},
 			yMEd => q{E d/M/y},
 			yMMM => q{MMM y},
@@ -972,19 +972,6 @@ has 'datetime_formats_append_item' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			'Day' => '{0} ({2}: {1})',
-			'Day-Of-Week' => '{0} {1}',
-			'Era' => '{1} {0}',
-			'Hour' => '{0} ({2}: {1})',
-			'Minute' => '{0} ({2}: {1})',
-			'Month' => '{0} ({2}: {1})',
-			'Quarter' => '{0} ({2}: {1})',
-			'Second' => '{0} ({2}: {1})',
-			'Timezone' => '{0} {1}',
-			'Week' => '{0} ({2}: {1})',
-			'Year' => '{1} {0}',
-		},
 	} },
 );
 

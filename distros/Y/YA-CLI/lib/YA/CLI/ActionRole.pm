@@ -1,5 +1,5 @@
 package YA::CLI::ActionRole;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 use Moo::Role;
 use namespace::autoclean;
 
@@ -71,17 +71,19 @@ sub has_action {
 }
 
 sub as_help {
-    my ($self, $rc, $message) = @_;
+    my $self = shift;
+    my $rc = shift;
+    my $message = shift;
 
     return YA::CLI::Usage->new(
-        rc => ($rc // 0),
-        $message ? (message  => $message) : (),
-        $self->_get_podfile_for_usage,
+      rc => ($rc // 0),
+      $message ? (message => $message) : (),
+      $self->_get_podfile_for_usage,
     );
 }
 
 sub as_manpage {
-    my ($self) = @_;
+    my $self = shift;
 
     return YA::CLI::Usage->new(
         rc      => 0,
@@ -93,11 +95,12 @@ sub as_manpage {
 
 sub _get_podfile_for_usage {
     my $self = shift;
+
     my $podfile;
-    if (my $pod = $self->usage_pod) {
-        $podfile = $pod == 1? $self : $pod;
-    }
-    return $podfile ? ( pod_file => $podfile ) : ();
+    my $pod = $self->usage_pod;
+    return unless $pod;
+    return (pod_file => $pod) unless $pod == 1;
+    return (pod_file => ref $self || $self);
 }
 
 1;
@@ -114,7 +117,7 @@ YA::CLI::ActionRole - Action handler role
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

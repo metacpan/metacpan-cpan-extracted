@@ -1,17 +1,17 @@
 
                             Compress-Raw-Zlib
 
-                              Version 2.206
+                              Version 2.209
 
-                               25 July 2023
+                             26 February 2024
 
-        Copyright (c) 2005-2023 Paul Marquess. All rights reserved.
+        Copyright (c) 2005-2024 Paul Marquess. All rights reserved.
           This program is free software; you can redistribute it
            and/or modify it under the same terms as Perl itself.
 
               The directory zlib-src contains a subset of the
-             source files copied directly from zlib version 1.2.13.
-                  These files are Copyright(C) 1995-2022
+             source files copied directly from zlib version 1.3.1.
+                  These files are Copyright(C) 1995-2024
                      Jean-loup Gailly and Mark Adler.
              Full source for the zlib library is available at
                             http://www.zlib.org
@@ -19,7 +19,7 @@
 DESCRIPTION
 -----------
 
-This module provides a Perl interface to the zlib compression library.
+This module provides a Perl interface to the zlib and zlib-ng compression libraries.
 
 PREREQUISITES
 -------------
@@ -33,8 +33,8 @@ installed on your system:
 
 By default, Compress-Raw-Zlib will build its own private copy of the
 zlib library. If you want to use a different version of
-zlib, follow the instructions in the section called
-"Controlling the version of zlib used by Compress-Raw-Zlib"
+zlib or use the zlib-ng library, follow the instructions in the section called
+"Controlling the version of zlib/zlib-ng used by Compress-Raw-Zlib"
 later in this document.
 
 BUILDING THE MODULE
@@ -54,91 +54,123 @@ To install Compress-Raw-Zlib, run the command below:
 
     make install
 
-Controlling the version of zlib used by Compress-Raw-Zlib
-----------------------------------------------------------
+Controlling the version of zlib/zlib-ng used by Compress-Raw-Zlib
+--------------------------------------------------------------------
 
-Compress-Raw-Zlib interfaces to the zlib compression library. There
-are three options available to control which version/instance of the
-zlib library is used:
+Compress-Raw-Zlib interfaces to the zlib or zlib-ng compression libraries.
+There are a number of options available to control which version/instance of
+the zlib/zlib-ng library is used:
 
     1. Build a private copy of the zlib library using the
        zlib library source that is included with this module.
-       This is the default and recommended option.
+       This is the default option.
 
     2. Build a private copy of the zlib library using a standard
        zlib source distribution.
+       This option is not supported with zlib-ng.
 
-    3. Use a pre-built zlib library.
+    3. Use a pre-built zlib or zlib-ng library.
 
-Note that if you intend to use either Option 2 or 3, you need to have
-zlib version 1.2.0 or better.
+If you intend to use the zlib library with either Option 2 or 3,
+you need to have zlib version 1.2.0 or better.
+Any version of zlib-ng is acceptable.
 
-The contents of the file config.in are used to control which of the
-three options is actually used. This file is read during the
+The configuration for this module is controlled by a series of variable/value pairs.
+These can either be set as environment variables or stored in the file config.in.
+The environment variables will silently take presedence if both are present.
+
+Make sure you have set the environment variables or updated config.in
+before running
 
     perl Makefile.PL
-
-step of the build, so remember to make any required changes to config.in
-before building this module.
 
   Option 1
   --------
 
-  For option 1, edit the file config.in and set the variables in it
-  as follows:
+  For option 1, set the configuration variable/value pairs as follows:
 
-      BUILD_ZLIB   = True
-      INCLUDE      = ./zlib-src
-      LIB          = ./zlib-src
-      OLD_ZLIB     = False
-      GZIP_OS_CODE = AUTO_DETECT
+      BUILD_ZLIB=True
+      ZLIB_INCLUDE=./zlib-src
+      ZLIB_LIB=./zlib-src
+      OLD_ZLIB=False
+      GZIP_OS_CODE=AUTO_DETECT
+      USE_ZLIB_NG=False
 
   Option 2
   --------
 
   For option 2, fetch a copy of the zlib source distribution from
   http://www.zlib.org and unpack it into the Compress-Raw-Zlib source
-  directory. Assuming you have fetched zlib 1.2.13,
-  it will create a directory called zlib-1.2.13.
+  directory. Assuming you have fetched zlib 1.3.1,
+  it will create a directory called zlib-1.3.1.
 
-  Now set the variables in the file config.in as follows (if the version
-  you have fetched isn't 1.2.13, change the INCLUDE and LIB
+  Now set the configuration variables as follows (if the version you have
+  fetched isn't 1.3.1, change the ZLIB_INCLUDE and ZLIB_LIB
   variables appropriately):
 
-      BUILD_ZLIB   = True
-      INCLUDE      = ./zlib-1.2.13
-      LIB          = ./zlib-1.2.13
-      OLD_ZLIB     = False
-      GZIP_OS_CODE = AUTO_DETECT
+      BUILD_ZLIB=True
+      ZLIB_INCLUDE=./zlib-1.3.1
+      ZLIB_LIB=./zlib-1.3.1
+      OLD_ZLIB=False
+      GZIP_OS_CODE=AUTO_DETECT
+      USE_ZLIB_NG=False
 
-  Option 3
-  --------
+  Option 3a - Using zlib
+  ----------------------
 
-  For option 3, you need to find out where zlib is stored on your
-  system.  There are two parts to this.
+  For this option you need to find out where the zlib files are stored
+  on your system.  There are two parts to this.
 
-  First, find the directory where the zlib library is stored (some
-  common names for the library are libz.a and libz.so). Set the LIB variable
-  in the config.in file to that directory.
+  First, find the directory where the zlib library is stored (a
+  common name for the the zlib library is libz.so on Unix/Linux derived systems).
+  Set the ZLIB_LIB configuration variable to that directory.
 
   Secondly, find the directory where the file zlib.h is stored. Now set
-  the INCLUDE variable in the config.in file to that directory.
+  the ZLIB_INCLUDE configuration variable to that directory.
 
-  Next set BUILD_ZLIB to False.
+  Next set both the BUILD_ZLIB and USE_ZLIB_NG variables to False.
 
   Finally, if you are running zlib 1.0.5 or older, set the OLD_ZLIB
   variable to True. Otherwise set it to False.
 
   As an example, if the zlib library on your system is in
   /usr/local/lib, zlib.h is in /usr/local/include and zlib is more
-  recent than version 1.0.5, the variables in config.in should be set as
+  recent than version 1.0.5, the configuration variables should be set as
   follows:
 
-      BUILD_ZLIB   = False
-      INCLUDE      = /usr/local/include
-      LIB          = /usr/local/lib
-      OLD_ZLIB     = False
-      GZIP_OS_CODE = AUTO_DETECT
+      BUILD_ZLIB=False
+      ZLIB_INCLUDE=/usr/local/include
+      ZLIB_LIB=/usr/local/lib
+      OLD_ZLIB=False
+      GZIP_OS_CODE=AUTO_DETECT
+      USE_ZLIB_NG=False
+
+  Option 3b - Using zlib-ng
+  -------------------------
+
+  For this option you need to find out where the zlib-ng files are stored
+  on your system.  There are two parts to this.
+
+  First, find the directory where the zlib-ng library is stored (some
+  common names for the the zlib-ng library are  libz-ng.so on Unix/Linux derived systems).
+  Set the ZLIB_LIB configuration variable that directory.
+
+  Secondly, find the directory where the file zlib-ng.h is stored. Now set
+  the ZLIB_INCLUDE configuration variable that directory.
+
+  Next set both BUILD_ZLIB and OLD_ZLIB variables to False.
+  Set USE_ZLIB_NG to True.
+
+  As an example, if the zlib-ng library on your system is in
+  /usr/local/lib and zlib-ng.h is in /usr/local/include, the configuration
+  variables should be set as follows:
+
+      BUILD_ZLIB=False
+      ZLIB_INCLUDE=/usr/local/include
+      ZLIB_LIB=/usr/local/lib
+      OLD_ZLIB=False
+      GZIP_OS_CODE=AUTO_DETECT
+      USE_ZLIB_NG=True
 
 Setting the Gzip OS Code
 ------------------------
@@ -148,16 +180,16 @@ System that was used to create the gzip stream. When you build Compress-Raw-Zlib
 your Operating System. This will then be used by IO::Compress::Gzip as the
 default value for the OS byte in all gzip headers it creates.
 
-The variable GZIP_OS_CODE in the config.in file controls the setting of
+The configuration variable GZIP_OS_CODE controls the setting of
 this value when building Compress-Raw-Zlib. If GZIP_OS_CODE is set to
 AUTO_DETECT, Compress-Raw-Zlib will attempt to determine the correct value for
 your Operating System.
 
 Alternatively, you can override auto-detection of the default OS code and
-explicitly set it yourself. Set the GZIP_OS_CODE variable in the config.in
-file to be a number between 0 and 255. For example
+explicitly set it yourself. Set the GZIP_OS_CODE configuration variable to
+a number between 0 and 255. For example
 
-    GZIP_OS_CODE = 3
+    GZIP_OS_CODE=3
 
 See RFC 1952 for valid OS codes that can be used.
 
@@ -189,7 +221,7 @@ There are two ways to fix this problem:
 
     1. Upgrade to the latest version of zlib.
 
-    2. Edit config.in and set the OLD_ZLIB variable to True.
+    2. Set the configuration variable OLD_ZLIB to True and rebuild.
 
 Test Harness 01version fails
 ----------------------------
@@ -358,7 +390,7 @@ To help me help you, I need all of the following information:
         If you haven't installed Compress-Raw-Zlib then search Compress::Raw::Zlib.pm
         for a line like this:
 
-          $VERSION = "2.206" ;
+          $VERSION = "2.209" ;
 
      c. The version of zlib you have used.
         If you have successfully installed Compress-Raw-Zlib, this one-liner
@@ -370,9 +402,10 @@ To help me help you, I need all of the following information:
 
  2. If you are having problems building Compress-Raw-Zlib, send me a
     complete log of what happened. Start by unpacking the Compress-Raw-Zlib
-    module into a fresh directory and keep a log of all the steps
+    module into a fresh directory and keep a log of all the steps, including
+    the setting of configuration environment variables (if applicable).
 
-        [edit config.in, if necessary]
+        [edit config.in or set environment varialbes, if necessary]
         perl Makefile.PL
         make
         make test TEST_VERBOSE=1

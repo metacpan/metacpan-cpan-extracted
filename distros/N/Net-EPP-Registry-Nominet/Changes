@@ -1,3 +1,13 @@
+0.09 2024-02-15
+
+    - No changes from 0.08_01
+
+0.08_01 2024-02-09
+
+    - Work around Net::EPP::Simple issue
+      https://github.com/gbxyz/perl-net-epp/issues/2
+    - Test suite: update local certificate chain and expiry
+
 0.08 2023-07-06
 
     - No changes from 0.07_03

@@ -11,7 +11,7 @@ use Carp ;
 use bytes ;
 our ($VERSION, $XS_VERSION, @ISA, @EXPORT, $AUTOLOAD);
 
-$VERSION = '2.206';
+$VERSION = '2.209';
 $XS_VERSION = $VERSION;
 $VERSION = eval $VERSION;
 
@@ -981,7 +981,7 @@ __END__
 
 =head1 NAME
 
-Compress::Raw::Lzma - Low-Level Interface to lzma compression library
+Compress::Raw::Lzma - Low-Level Perl Interface to lzma compression library
 
 =head1 SYNOPSIS
 
@@ -1005,16 +1005,16 @@ Compress::Raw::Lzma - Low-Level Interface to lzma compression library
 
     # Decoders
     my ($lz, $status) = new Compress::Raw::Lzma::AloneDecoder [OPTS]
-        or die "Cannot create bunzip2 object: $status\n";
+        or die "Cannot create lzma object: $status\n";
 
     my ($lz, $status) = new Compress::Raw::Lzma::AutoDecoder [OPTS]
-        or die "Cannot create bunzip2 object: $status\n";
+        or die "Cannot create lzma object: $status\n";
 
     my ($lz, $status) = new Compress::Raw::Lzma::StreamDecoder [OPTS]
-        or die "Cannot create bunzip2 object: $status\n";
+        or die "Cannot create lzma object: $status\n";
 
     my ($lz, $status) = new Compress::Raw::Lzma::RawDecoder [OPTS]
-        or die "Cannot create bunzip2 object: $status\n";
+        or die "Cannot create lzma object: $status\n";
 
     $status = $lz->code($input, $output);
 
@@ -1045,8 +1045,11 @@ There are four compression interfaces available in this module.
 =over 5
 
 =item Compress::Raw::Lzma::EasyEncoder
+
 =item Compress::Raw::Lzma::AloneEncoder
+
 =item Compress::Raw::Lzma::StreamEncoder
+
 =item Compress::Raw::Lzma::RawEncoder
 
 =back
@@ -1173,6 +1176,7 @@ Below is a list of the valid options:
 =over 5
 
 =item B<< Filter => $filter >>
+
 =item B<< Filter => [$filter1, $filter2,...] >>
 
 This option is used to change the bahaviour of the StreamEncoder by
@@ -1230,6 +1234,7 @@ Below is a list of the valid options:
 =over 5
 
 =item B<< Filter => $filter >>
+
 =item B<< Filter => [$filter1, $filter2,...] >>
 
 This option is used to change the bahaviour of the RawEncoder by
@@ -1270,7 +1275,7 @@ Defaults to 0.
 
 =back
 
-=head2 $status = $lz->code($input, $output);
+=head2 $status = $lz->code($input, $output)
 
 Reads the contents of C<$input>, compresses it and writes the compressed
 data to C<$output>.
@@ -1299,8 +1304,11 @@ There are four uncompression interfaces available in this module.
 =over 5
 
 =item Compress::Raw::Lzma::AutoDecoder
+
 =item Compress::Raw::Lzma::AloneDecoder
+
 =item Compress::Raw::Lzma::StreamDecoder
+
 =item Compress::Raw::Lzma::RawDecoder
 
 =back
@@ -1714,7 +1722,7 @@ See the Changes file.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2005-2023 Paul Marquess. All rights reserved.
+Copyright (c) 2005-2024 Paul Marquess. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

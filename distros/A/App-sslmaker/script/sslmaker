@@ -69,6 +69,7 @@ sub root {
 
 sub subcommand_revoke {
   my ($self, $cert) = @_;
+  return print extract_usage if $self->{h};
   die "Usage: sslmaker revoke /path/to/file.cert\n" unless $cert;
 
   my $sslmaker   = App::sslmaker->new;
@@ -88,6 +89,7 @@ sub subcommand_revoke {
 
 sub subcommand_root {
   my ($self) = @_;
+  return print extract_usage if $self->{h};
   die "--subject is required\n" unless $self->{subject};
 
   my $args = {
@@ -110,13 +112,15 @@ sub subcommand_root {
 
 sub subcommand_dhparam {
   my ($self, $path, $bits) = @_;
+  return print extract_usage if $self->{h};
   $path ||= $self->home->child('dhparam.pem');
   $self->run_maybe($path, sub { App::sslmaker::openssl(qw(dhparam -out) => $path, $bits || 2048) });
 }
 
 sub subcommand_generate {
   my ($self, $cn) = @_;
-  die "Usage: sslmaker generate <CN>\n" unless $cn;
+  return print extract_usage if $self->{h};
+  die "Usage: sslmaker generate <name>\n" unless $cn;
 
   my $args = {
     bits    => $self->{bits},
@@ -138,6 +142,7 @@ sub subcommand_generate {
 
 sub subcommand_intermediate {
   my ($self) = @_;
+  return print extract_usage if $self->{h};
   $self->{bits} ||= 8192;
 
   my $home = $self->home;
@@ -184,6 +189,7 @@ sub subcommand_intermediate {
 
 sub subcommand_nginx {
   my ($self, $domain) = @_;
+  return print extract_usage if $self->{h};
   die "Usage: sslmaker nginx <domain>\n" unless $domain;
 
   print +App::sslmaker->_render_template(
@@ -202,6 +208,7 @@ sub subcommand_nginx {
 sub subcommand_sign {
   my ($self, $csr, $cert) = @_;
   my $home = $self->home;
+  return print extract_usage if $self->{h};
   die "Usage: sslmaker sign <csr> [cert]\n" unless $csr;
 
   $cert ||= do { local $_ = $csr; s!(\.csr)?\.pem$!\.cert.pem!; $_ };
@@ -240,8 +247,8 @@ sub _root_file {
 run(
   @options,
   sub {
-    my ($self, $action, @args) = @_;
+    my ($self) = @_;
     return print extract_usage if $self->{h};
-    return print extract_usage unless $action;
+    return print extract_usage;
   },
 );

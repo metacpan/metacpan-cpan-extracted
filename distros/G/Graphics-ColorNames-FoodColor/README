@@ -2,9 +2,9 @@ NAME
     Graphics::ColorNames::FoodColor - Food colors
 
 VERSION
-    This document describes version 0.001 of Graphics::ColorNames::FoodColor
+    This document describes version 0.002 of Graphics::ColorNames::FoodColor
     (from Perl distribution Graphics-ColorNames-FoodColor), released on
-    2023-12-04.
+    2023-12-05.
 
 SYNOPSIS
       require Graphics::ColorNames::FoodColor;

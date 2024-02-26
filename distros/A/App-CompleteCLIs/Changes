@@ -1,3 +1,8 @@
+0.153   2023-12-01  Released-By: PERLANCAR; Urgency: medium
+
+        - Add CLIs: complete-color-name, complete-color-rgb24-hexcode.
+
+
 0.152   2023-01-19  Released-By: PERLANCAR; Urgency: medium
 
         - Add CLI: complete-from-schema.

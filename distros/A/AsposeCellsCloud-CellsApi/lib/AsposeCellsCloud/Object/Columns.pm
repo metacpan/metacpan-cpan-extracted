@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -129,21 +129,21 @@ __PACKAGE__->method_documentation({
      'max_column' => {
      	datatype => 'int',
      	base_name => 'MaxColumn',
-     	description => '',
+     	description => 'The max column index.',
      	format => '',
      	read_only => '',
      		},
      'columns_count' => {
      	datatype => 'int',
      	base_name => 'ColumnsCount',
-     	description => '',
+     	description => 'Column count.',
      	format => '',
      	read_only => '',
      		},
      'columns_list' => {
      	datatype => 'ARRAY[LinkElement]',
      	base_name => 'ColumnsList',
-     	description => '',
+     	description => 'Columns list.',
      	format => '',
      	read_only => '',
      		},

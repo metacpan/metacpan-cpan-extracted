@@ -4,15 +4,15 @@ use Test::Exception;
 use ok( 'Locale::CLDR' );
 my $locale;
 
-diag( "Testing Locale::CLDR v0.40.1, Perl $], $^X" );
+diag( "Testing Locale::CLDR v0.44.0, Perl $], $^X" );
 use ok 'Locale::CLDR::Locales::De';
-use ok 'Locale::CLDR::Locales::De::Any::At';
-use ok 'Locale::CLDR::Locales::De::Any::Be';
-use ok 'Locale::CLDR::Locales::De::Any::Ch';
-use ok 'Locale::CLDR::Locales::De::Any::De';
-use ok 'Locale::CLDR::Locales::De::Any::It';
-use ok 'Locale::CLDR::Locales::De::Any::Li';
-use ok 'Locale::CLDR::Locales::De::Any::Lu';
-use ok 'Locale::CLDR::Locales::De::Any';
+use ok 'Locale::CLDR::Locales::De::Latn::At';
+use ok 'Locale::CLDR::Locales::De::Latn::Be';
+use ok 'Locale::CLDR::Locales::De::Latn::Ch';
+use ok 'Locale::CLDR::Locales::De::Latn::De';
+use ok 'Locale::CLDR::Locales::De::Latn::It';
+use ok 'Locale::CLDR::Locales::De::Latn::Li';
+use ok 'Locale::CLDR::Locales::De::Latn::Lu';
+use ok 'Locale::CLDR::Locales::De::Latn';
 
 done_testing();

@@ -37,7 +37,7 @@ use CallBackery::Plugin::Doc;
 use CallBackery::Database;
 use CallBackery::User;
 
-our $VERSION = '0.49.0';
+our $VERSION = '0.49.2';
 
 =head2 config
 
@@ -142,6 +142,9 @@ sub startup {
            $app->log->debug("Opening $gcfg->{log_file}: $!");
         }
     }
+
+    ## commands
+    unshift @{$app->commands->namespaces},  __PACKAGE__.'::Command';
 
     unshift @{$app->static->paths}, 
         $app->home->rel_file('frontend').'/compiled/source/'

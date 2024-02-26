@@ -1,0 +1,60 @@
+# PODNAME: RDF::Cowl::Lib::Gen::Class::Individual
+# ABSTRACT: Generated docs for RDF::Cowl::Individual
+
+## DO NOT EDIT
+## Generated via maint/tt/Class.pod.tt
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+RDF::Cowl::Lib::Gen::Class::Individual - Generated docs for RDF::Cowl::Individual
+
+=head1 VERSION
+
+version 1.0.0
+
+=head1 MAIN MODULE
+
+L<RDF::Cowl::Individual>
+
+=head1 METHODS
+
+=head2 is_named
+
+B<Signature>:
+
+  $self->is_named()
+
+B<Params>:
+
+  CowlAnyIndividual $ind 
+
+Documentation:
+
+  Returns true if the underlying individual is named.
+  
+  @param ind The individual.
+  @return True if the underlying individual is named, false otherwise.
+
+=over 2
+
+B<C function name>: C<< cowl_individual_is_named >>
+
+=back
+
+=head1 AUTHOR
+
+Zakariyya Mughal <zmughal@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 by Auto-Parallel Technologies, Inc..
+
+This is free software, licensed under Eclipse Public License - v 2.0.
+
+=cut

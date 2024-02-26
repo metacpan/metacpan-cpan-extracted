@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-12-26'; # DATE
+our $DATE = '2023-12-27'; # DATE
 our $DIST = 'Bencher-Scenarios-Tie'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our $scenario = {
     summary => 'Benchmark the overhead of tied scalar',
@@ -36,7 +36,7 @@ Bencher::Scenario::Tie::Scalar - Benchmark the overhead of tied scalar
 
 =head1 VERSION
 
-This document describes version 0.001 of Bencher::Scenario::Tie::Scalar (from Perl distribution Bencher-Scenarios-Tie), released on 2023-12-26.
+This document describes version 0.002 of Bencher::Scenario::Tie::Scalar (from Perl distribution Bencher-Scenarios-Tie), released on 2023-12-27.
 
 =head1 SYNOPSIS
 
@@ -107,23 +107,23 @@ Benchmark command (default options):
 Result formatted as table:
 
  #table1#
- +------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
- | participant      | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
- +------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
- | read-tied-100k   |        47 |      21   |                 0.00% |               633.60% | 6.8e-05 |      20 |
- | write-tied-100k  |        47 |      21   |                 1.54% |               622.47% | 7.5e-05 |      20 |
- | read-notie-100k  |       320 |       3.1 |               594.48% |                 5.63% | 1.3e-05 |      20 |
- | write-notie-100k |       340 |       2.9 |               633.60% |                 0.00% | 1.1e-05 |      20 |
- +------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ +------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
+ | participant      | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors   | samples |
+ +------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
+ | read-tied-100k   |        40 |        30 |                 0.00% |               787.74% |   0.00035 |      20 |
+ | write-tied-100k  |        45 |        22 |                21.47% |               630.86% |   0.00015 |      20 |
+ | read-notie-100k  |       300 |         3 |               730.21% |                 6.93% | 6.6e-05   |      20 |
+ | write-notie-100k |       330 |         3 |               787.74% |                 0.00% | 2.8e-05   |      20 |
+ +------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
 
 
 The above result formatted in L<Benchmark.pm|Benchmark> style:
 
                      Rate  read-tied-100k  write-tied-100k  read-notie-100k  write-notie-100k 
-  read-tied-100k     47/s              --               0%             -85%              -86% 
-  write-tied-100k    47/s              0%               --             -85%              -86% 
-  read-notie-100k   320/s            577%             577%               --               -6% 
-  write-notie-100k  340/s            624%             624%               6%                -- 
+  read-tied-100k     40/s              --             -26%             -90%              -90% 
+  write-tied-100k    45/s             36%               --             -86%              -86% 
+  read-notie-100k   300/s            900%             633%               --                0% 
+  write-notie-100k  330/s            900%             633%               0%                -- 
  
  Legends:
    read-notie-100k: participant=read-notie-100k

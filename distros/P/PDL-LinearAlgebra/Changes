@@ -1,3 +1,7 @@
+0.38 2024-02-24
+- tricpy now supports native-complex types
+- tricpy now defaults to upper - thanks @jo-37
+
 0.37 2023-04-01
 - install pdldoc using PDL::Doc
 

@@ -1,3 +1,8 @@
+0.003   2023-11-20  Released-By: PERLANCAR; Urgency: medium
+
+        - Update module name: File::MoreUtil -> File::Util::Test.
+
+
 0.002   2020-04-13  Released-By: PERLANCAR; Urgency: medium
 
 	- Read pool.*, pool1.*, and pool2.* too; make them configurable via

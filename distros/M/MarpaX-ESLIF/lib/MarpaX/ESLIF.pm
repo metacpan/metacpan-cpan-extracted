@@ -5,12 +5,12 @@ package MarpaX::ESLIF;
 use parent qw/MarpaX::ESLIF::Base/;
 use MarpaX::ESLIF::String;       # Make sure it is loaded, the XS is using it
 use MarpaX::ESLIF::RegexCallout; # Make sure it is loaded, the XS is using it
+use XSLoader ();
 
 # ABSTRACT: ESLIF is Extended ScanLess InterFace
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-use vars qw/$VERSION/;
 use Config;
 
 #
@@ -62,14 +62,25 @@ BEGIN {
 # Bootstrap
 #
 BEGIN {
-    our $VERSION = '6.0.29'; # VERSION
-
-    require XSLoader;
-    # Modules that we depent on bootstrap
+    #
+    our $VERSION = '6.0.33.3'; # VERSION
+    #
+    # Note that $VERSION is always defined when you use a distributed CPAN package.
+    # With old versions of perl, only the XSLoader::load(__PACKAGE__, $version) works.
+    # E.g. with perl-5.10, doing directly:
+    # make test
+    # within the repository may yell like this:
+    # Error:  XSLoader::load('Your::Module', $Your::Module::VERSION)
+    # In this case, you can put the module version in the MARPAX_ESLIF_VERSION
+    # environment variable, e.g.:
+    # MARPAX_ESLIF_VERSION=999.999.999 make test
+    #
+    # Modules that we depend on bootstrap
     use Math::BigFloat qw//;
     use Math::BigInt qw//;
     use Encode qw//;
-    XSLoader::load(__PACKAGE__, $VERSION);
+    my $version = eval q{$VERSION} // $ENV{MARPAX_ESLIF_VERSION}; ## no critic
+    defined($version) ? XSLoader::load(__PACKAGE__, $version) : XSLoader::load();
 }
 
 # Load our explicit sub-modules
@@ -112,7 +123,7 @@ MarpaX::ESLIF - ESLIF is Extended ScanLess InterFace
 
 =head1 VERSION
 
-version 6.0.29
+version 6.0.33.3
 
 =head1 SYNOPSIS
 
@@ -132,6 +143,148 @@ With a logger, using Log::Any::Adapter::Stderr as an example:
 
 This class and its derivatives are thread-safe. Although there can be many ESLIF instances, in practice a single instance is enough, unless you want different logging interfaces. This is why the C<new> method is implemented as a I<multiton>. Once a MarpaX::ESLIF instance is created, the user should create a L<MarpaX::ESLIF::Grammar> instance to have a working grammar.
 
+A full example of a calculator with a I<self-contained grammar>, actions being writen in B<Lua>:
+
+  package MyRecognizer;
+  sub new {
+      my ($pkg, $string) = @_;
+      open my $fh, "<", \$string;
+      bless { data => undef, fh => $fh }, $pkg
+  }
+  sub read                   { my ($self) = @_; defined($self->{data} = readline($self->{fh})) } # Reader
+  sub isEof                  {  eof shift->{fh} } # End of data ?
+  sub isCharacterStream      {                1 } # Character stream ?
+  sub encoding               {                  } # Encoding ?
+  sub data                   {    shift->{data} } # data
+  sub isWithDisableThreshold {                0 } # Disable threshold warning ?
+  sub isWithExhaustion       {                0 } # Exhaustion event ?
+  sub isWithNewline          {                1 } # Newline count ?
+  sub isWithTrack            {                0 } # Absolute position tracking ?
+  1;
+  
+  package MyValue;
+  sub new                { bless { result => undef}, shift }
+  sub isWithHighRankOnly { 1 }  # When there is the rank adverb: highest ranks only ?
+  sub isWithOrderByRank  { 1 }  # When there is the rank adverb: order by rank ?
+  sub isWithAmbiguous    { 0 }  # Allow ambiguous parse ?
+  sub isWithNull         { 0 }  # Allow null parse ?
+  sub maxParses          { 0 }  # Maximum number of parse tree values
+  sub getResult          { my ($self) = @_; $self->{result} }
+  sub setResult          { my ($self, $result) = @_; $self->{result} = $result }
+  1;
+  
+  package main;
+  use Log::Any qw/$log/, default_adapter => qw/Stdout/;
+  use MarpaX::ESLIF;
+  use Test::More;
+  
+  my %tests = (
+      1 => [ '1',               1            ],
+      2 => [ '1/2',             0.5          ],
+      3 => [ 'x',               undef        ],
+      4 => [ '(1*(2+3)/4**5)',  0.0048828125 ]
+      );
+  
+  my $eslif = MarpaX::ESLIF->new($log);
+  my $g = MarpaX::ESLIF::Grammar->new($eslif, do { local $/; <DATA> });
+  foreach (sort { $a <=> $b} keys %tests) {
+      my ($input, $value) = @{$tests{$_}};
+      my $r = MyRecognizer->new($input);
+      my $v = MyValue->new();
+      if (defined($value)) {
+          ok($g->parse($r, $v), "'$input' parse is ok");
+          ok($v->getResult == $value, "'$input' value is $value");
+      } else {
+          ok(!$g->parse($r, $v), "'$input' parse is ko");
+      }
+  }
+  
+  done_testing();
+
+  __DATA__
+  :discard ::= /[\s]+/
+  :default ::= event-action => ::luac->function()
+                                         print('In event-action')
+                                         return true
+                                       end
+  event ^exp = predicted exp
+  exp ::=
+      /[\d]+/                             action => ::luac->function(input) return tonumber(input) end
+      |    "("  exp ")"    assoc => group action => ::luac->function(l,e,r) return e               end
+     || exp (- '**' -) exp assoc => right action => ::luac->function(x,y)   return x^y             end
+     || exp (-  '*' -) exp                action => ::luac->function(x,y)   return x*y             end
+      | exp (-  '/' -) exp                action => ::luac->function(x,y)   return x/y             end
+     || exp (-  '+' -) exp                action => ::luac->function(x,y)   return x+y             end
+      | exp (-  '-' -) exp                action => ::luac->function(x,y)   return x-y             end
+
+The same but with actions writen in B<Perl>:
+
+  package MyRecognizer;
+  sub new {
+      my ($pkg, $string) = @_;
+      open my $fh, "<", \$string;
+      bless { data => undef, fh => $fh }, $pkg
+  }
+  sub read                   { my ($self) = @_; defined($self->{data} = readline($self->{fh})) } # Reader
+  sub isEof                  {  eof shift->{fh} } # End of data ?
+  sub isCharacterStream      {                1 } # Character stream ?
+  sub encoding               {                  } # Encoding ?
+  sub data                   {    shift->{data} } # data
+  sub isWithDisableThreshold {                0 } # Disable threshold warning ?
+  sub isWithExhaustion       {                0 } # Exhaustion event ?
+  sub isWithNewline          {                1 } # Newline count ?
+  sub isWithTrack            {                0 } # Absolute position tracking ?
+  1;
+  
+  package MyValue;
+  sub new                { bless { result => undef}, shift }
+  sub isWithHighRankOnly { 1 }  # When there is the rank adverb: highest ranks only ?
+  sub isWithOrderByRank  { 1 }  # When there is the rank adverb: order by rank ?
+  sub isWithAmbiguous    { 0 }  # Allow ambiguous parse ?
+  sub isWithNull         { 0 }  # Allow null parse ?
+  sub maxParses          { 0 }  # Maximum number of parse tree values
+  sub getResult          { my ($self) = @_; $self->{result} }
+  sub setResult          { my ($self, $result) = @_; $self->{result} = $result }
+  #
+  # Here the actions are writen in Perl, they all belong to the valuator namespace 'MyValue'
+  #
+  sub tonumber           { shift; $_[0] }
+  sub e                  { shift; $_[1] }
+  sub power              { shift; $_[0] ** $_[1] }
+  sub mul                { shift; $_[0]  * $_[1] }
+  sub div                { shift; $_[0]  / $_[1] }
+  sub plus               { shift; $_[0]  + $_[1] }
+  sub minus              { shift; $_[0]  - $_[1] }
+  1;
+  
+  package main;
+  use Log::Any qw/$log/, default_adapter => qw/Stdout/;
+  use MarpaX::ESLIF;
+  use Test::More;
+  
+  my %tests = (
+      1 => [ '1',               1            ],
+      2 => [ '1/2',             0.5          ],
+      3 => [ 'x',               undef        ],
+      4 => [ '(1*(2+3)/4**5)',  0.0048828125 ]
+      );
+  
+  my $eslif = MarpaX::ESLIF->new($log);
+  my $g = MarpaX::ESLIF::Grammar->new($eslif, do { local $/; <DATA> });
+  foreach (sort { $a <=> $b} keys %tests) {
+      my ($input, $value) = @{$tests{$_}};
+      my $r = MyRecognizer->new($input);
+      my $v = MyValue->new();
+      if (defined($value)) {
+          ok($g->parse($r, $v), "'$input' parse is ok");
+          ok($v->getResult == $value, "'$input' value is $value");
+      } else {
+          ok(!$g->parse($r, $v), "'$input' parse is ko");
+      }
+  }
+  
+  done_testing();
+
 =head1 DESCRIPTION
 
 ESLIF is derived from perl's L<Marpa::R2>, and has its own BNF, documented in L<MarpaX::ESLIF::BNF>.
@@ -140,21 +293,87 @@ The main features of this BNF are:
 
 =over
 
-=item Sub-grammars
+=item Embedded Lua language
 
-The number of sub grammars is unlimited.
+Actions can be writen directly in the grammar.
 
 =item Regular expressions
 
-Native support of regular expression using the L<PCRE2|http://www.pcre.org/> library (i.e. this is <not> exactly perl regexps, although very closed).
+Matching supports natively regular expression using the L<PCRE2|http://www.pcre.org/> library.
 
 =item Streaming
 
 Native support of streaming input.
 
+=item Sub-grammars
+
+The number of sub grammars is unlimited.
+
 =back
 
 Beginners might want to look at L<MarpaX::ESLIF::Introduction>.
+
+=for test_synopsis BEGIN { die "SKIP: skip this pod, this is output from previous code\n"; }
+
+In both cases, the output will be:
+
+  ok 1 - '1' parse is ok
+  ok 2 - '1' value is 1
+  ok 3 - '1/2' parse is ok
+  ok 4 - '1/2' value is 0.5
+  --------------------------------------------
+  Recognizer progress (grammar level 0 (Grammar level 0)):
+  [P1@0..0] exp ::= . exp[0]
+  [P2@0..0] exp[0] ::= . exp[1]
+  [P3@0..0] exp[1] ::= . exp[2]
+  [P4@0..0] exp[2] ::= . exp[3]
+  [P10@0..0] exp[3] ::= . /[\d]+/
+  [P11@0..0] exp[3] ::= . "("
+  [P11@0..0]            exp[0]
+  [P11@0..0]            ")"
+  [P13@0..0] exp[2] ::= . exp[3]
+  [P13@0..0]            Internal[5]
+  [P13@0..0]            exp[2]
+  [P15@0..0] exp[1] ::= . exp[1]
+  [P15@0..0]            Internal[6]
+  [P15@0..0]            exp[2]
+  [P17@0..0] exp[1] ::= . exp[1]
+  [P17@0..0]            Internal[7]
+  [P17@0..0]            exp[2]
+  [P19@0..0] exp[0] ::= . exp[0]
+  [P19@0..0]            Internal[8]
+  [P19@0..0]            exp[1]
+  [P21@0..0] exp[0] ::= . exp[0]
+  [P21@0..0]            Internal[9]
+  [P21@0..0]            exp[1]
+  Expected symbol: /[\d]+/ (symbol No 7)
+  Expected symbol: "(" (symbol No 8)
+  <<<<<< FAILURE AT LINE No 1 COLUMN No 1, HERE: >>>>>>
+  UTF-8 converted data after the failure (1 bytes) at 1:1:
+  0x000000: 78                                              x
+  --------------------------------------------
+  ok 5 - 'x' parse is ko
+  ok 6 - '(1*(2+3)/4**5)' parse is ok
+  ok 7 - '(1*(2+3)/4**5)' value is 0.0048828125
+  1..7
+
+MarpaX::ESLIF also provide native JSON encoder/decoder:
+
+  use Log::Any qw/$log/, default_adapter => qw/Stdout/;
+  use MarpaX::ESLIF;
+  
+  my $eslif = MarpaX::ESLIF->new($log);
+  my $json = MarpaX::ESLIF::JSON->new($eslif);
+  
+  my $perl_hash = $json->encode({data => { 1 => [ 2, "3" ] } });
+  $log->infof('JSON Encoder: %s', $perl_hash);
+  
+  my $json_string = $json->decode($perl_hash);
+  $log->infof('JSON decoder: %s', $json_string);
+
+  # Output: 
+  # JSON Encoder: {"data":{"1":[2,"3"]}}
+  # JSON decoder: {data => {1 => [2,3]}}
 
 =head1 METHODS
 
@@ -226,26 +445,6 @@ L<MarpaX::ESLIF::Introduction>, L<PCRE2|http://www.pcre.org/>, L<MarpaX::ESLIF::
 =head1 AUTHOR
 
 Jean-Damien Durand <jeandamiendurand@free.fr>
-
-=head1 CONTRIBUTORS
-
-=for stopwords Jean-Damien Durand Jeffrey Kegler
-
-=over 4
-
-=item *
-
-Jean-Damien Durand <Jean-Damien.Durand@newaccess.ch>
-
-=item *
-
-Jeffrey Kegler <jeffreykegler@jeffreykegler.com>
-
-=item *
-
-Jeffrey Kegler <jeffreykegler@protonmail.com>
-
-=back
 
 =head1 COPYRIGHT AND LICENSE
 

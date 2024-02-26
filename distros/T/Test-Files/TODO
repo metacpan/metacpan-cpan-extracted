@@ -7,6 +7,7 @@ A user pointed out an error (in his opinion):
 
 The same user said that once compare_dirs_ok is fixed, there should
 be an option like --exclude in the standard diff.
+(implemented in 0.16)
 
 #-----------------------------------------------------
 
@@ -28,6 +29,7 @@ dir_ok( "some/dir", {
 
 find_ok( "some/dir", sub { which will be run against all files in some/dir
                            and returns true if they pass } );
+(implemented in 0.16)
 
 #-----------------------------------------------------
 
@@ -65,3 +67,4 @@ compare_dirs_filter but one file at a time
 
 The version 0.15 causes a lot of warning being processed by Perl::Critic
 so that some style changes may improve further maintainability.
+(implemented in 0.16)

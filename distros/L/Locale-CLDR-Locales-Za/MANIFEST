@@ -1,0 +1,9 @@
+Build.PL
+lib/Locale/CLDR/Locales/Za.pm
+lib/Locale/CLDR/Locales/Za/Latn.pm
+lib/Locale/CLDR/Locales/Za/Latn/Cn.pm
+MANIFEST			This list of files
+README
+t/00-load.t
+META.yml
+META.json

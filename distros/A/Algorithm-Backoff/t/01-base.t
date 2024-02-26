@@ -4,10 +4,11 @@ use strict;
 use warnings;
 use Test::Exception;
 use Test::More 0.98;
+#use Test::RandomResults;
 
 use Algorithm::Backoff::Constant;
 
-# XXX test max_attempts for each strategy
+# XXX also test max_attempts for each strategy
 subtest "attr: max_attempts" => sub {
     my $ar;
 
@@ -36,7 +37,7 @@ subtest "attr: max_attempts" => sub {
     is  ($ar->failure(1), -1);
 };
 
-# XXX test max_actual_duration for each strategy
+# XXX also test max_actual_duration for each strategy
 subtest "attr: max_actual_duration" => sub {
     my $ar;
 
@@ -51,7 +52,7 @@ subtest "attr: max_actual_duration" => sub {
     is  ($ar->failure(4), -1);
 };
 
-# XXX test consider_actual_delay for each strategy
+# XXX also test consider_actual_delay for each strategy
 subtest "attr: consider_actual_delay" => sub {
     my $ar;
 
@@ -76,7 +77,35 @@ subtest "attr: consider_actual_delay" => sub {
     is($ar->failure(11), 0);
 };
 
-# XXX test jitter_factor for each strategy
+# This tests that consider_actual_delay uses the post-processed _prev_delay
+# value correctly.
+subtest "attr: consider_actual_delay + post-processing" => sub {
+    my $ar;
+
+    $ar = Algorithm::Backoff::Constant->new(
+        consider_actual_delay => 1,
+        delay     => 3,  # "pre-processor" delay
+        max_delay => 2,  # real delay
+        max_attempts => 0,
+    );
+
+    # first failure after 1 second
+    is($ar->failure(1), 2);
+
+    # 2s delay + instant failure, so the delay is now 3 -> max 2
+    is($ar->failure(1+2+0), 2);
+
+    # 2s delay + 2s failure, so the delay is now 3-2 = 1
+    is($ar->failure(3+2+2), 1);
+
+    # 1s delay + 5s failure, so delay is now 3-5 = -2 -> min 0
+    is($ar->failure(7+1+5), 0);
+
+    # 0s delay + instant failure, so delay is now 3 -> max 2
+    is($ar->failure(13+0+0), 2);
+};
+
+# XXX also test jitter_factor for each strategy
 subtest "attr: jitter_factor" => sub {
     my $ar = Algorithm::Backoff::Constant->new(
         delay => 2,

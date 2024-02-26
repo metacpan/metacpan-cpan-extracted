@@ -1,4 +1,4 @@
-# Copyright 2017, 2020 Kevin Ryde
+# Copyright 2017, 2020, 2024 Kevin Ryde
 
 # This file is part of Upfiles.
 #
@@ -23,6 +23,6 @@ use warnings;
 use URI::ftp;
 use base 'URI::ftp';
 
-our $VERSION = 15;
+our $VERSION = 16;
 sub default_port { 990 }
 1;

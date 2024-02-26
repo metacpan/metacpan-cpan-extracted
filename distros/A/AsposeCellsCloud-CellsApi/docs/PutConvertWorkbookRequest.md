@@ -15,7 +15,9 @@ Name | Type | Description | Notes
 **storage_name** | **string** | The storage name where the file is situated. |
 **check_excel_restriction** | **boolean** | Whether check restriction of excel file when user modify cells related objects. |
 **stream_format** | **string** | The format of the input file stream.  |
-**region** | **string** | The regional settings for workbook. |  
+**region** | **string** | The regional settings for workbook. |
+**page_wide_fit_on_per_sheet** | **boolean** | The page wide fit on worksheet. |
+**page_tall_fit_on_per_sheet** | **boolean** | The page tall fit on worksheet. |  
 
 [[Back to Model list]](../README.md#documentation-for-requests) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

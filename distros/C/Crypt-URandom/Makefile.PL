@@ -39,6 +39,7 @@ WriteMakefile(
     PREREQ_PM => {
 	'Exporter'   => 0,
 	'Carp'       => 0,
+	'constant'   => 0,
 	'English'    => 0,
 	($^O eq 'MSWin32') ? ( 'Win32::API' => 0 ) : ( 'FileHandle' => 0 ),
     },

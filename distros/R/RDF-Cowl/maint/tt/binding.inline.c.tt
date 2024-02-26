@@ -1,0 +1,17 @@
+[% binding.return_type.c_type %] COWL_WRAP_[% binding.c_func_name %] (
+[% FOREACH arg = binding.args -%]
+	[% arg.c_type %] [% arg.id %][% UNLESS loop.last %],[% END %]
+[% END -%]
+) {
+	[% IF binding.return_type.c_type != 'void' %]return [% END -%]
+	[%- binding.c_func_name %](
+[% FOREACH arg = binding.args -%]
+		[% arg.id
+			.replace('\[\]$', '') # remove postfix []
+		%][% UNLESS loop.last %],[% END %]
+[% END -%]
+	);
+}
+[%#-
+# vim: ft=tt2
+-%]

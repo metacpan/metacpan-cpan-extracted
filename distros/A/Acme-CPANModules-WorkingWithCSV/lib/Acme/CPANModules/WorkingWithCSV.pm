@@ -1,12 +1,13 @@
 package Acme::CPANModules::WorkingWithCSV;
 
 use strict;
+
 use Acme::CPANModulesUtil::Misc;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-12-02'; # DATE
+our $DATE = '2023-10-31'; # DATE
 our $DIST = 'Acme-CPANModules-WorkingWithCSV'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 my $text = <<'_';
 The following are tools (modules and scripts) to work with the CSV format:
@@ -128,10 +129,15 @@ Aside from the obvious <pm:Text::CSV>, you can also use <prog:csv-each-row>,
 
 <prog:csv-setop> from <pm:App::CSVUtils>
 
+
+** Other modules/unorganized
+
+<pm:Data::CTable>
+
 _
 
 our $LIST = {
-    summary => 'Working with CSV (comma-separated value) data in Perl',
+    summary => 'List of modules/applications to work with CSV (comma-separated value) data in Perl',
     description => $text,
     tags => ['task'],
 };
@@ -139,7 +145,7 @@ our $LIST = {
 Acme::CPANModulesUtil::Misc::populate_entries_from_module_links_in_description;
 
 1;
-# ABSTRACT: Working with CSV (comma-separated value) data in Perl
+# ABSTRACT: List of modules/applications to work with CSV (comma-separated value) data in Perl
 
 __END__
 
@@ -149,11 +155,11 @@ __END__
 
 =head1 NAME
 
-Acme::CPANModules::WorkingWithCSV - Working with CSV (comma-separated value) data in Perl
+Acme::CPANModules::WorkingWithCSV - List of modules/applications to work with CSV (comma-separated value) data in Perl
 
 =head1 VERSION
 
-This document describes version 0.002 of Acme::CPANModules::WorkingWithCSV (from Perl distribution Acme-CPANModules-WorkingWithCSV), released on 2022-12-02.
+This document describes version 0.003 of Acme::CPANModules::WorkingWithCSV (from Perl distribution Acme-CPANModules-WorkingWithCSV), released on 2023-10-31.
 
 =head1 DESCRIPTION
 
@@ -258,6 +264,10 @@ B<Performing set operations (intersection, union, difference) on CSV>
 
 L<csv-setop> from L<App::CSVUtils>
 
+** Other modules/unorganized
+
+L<Data::CTable>
+
 =head1 ACME::CPANMODULES ENTRIES
 
 =over
@@ -297,6 +307,10 @@ Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 =item L<csvgrep>
 
 Author: L<NEILB|https://metacpan.org/author/NEILB>
+
+=item L<Data::CTable>
+
+Author: L<CHTHORMAN|https://metacpan.org/author/CHTHORMAN>
 
 =back
 
@@ -379,7 +393,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

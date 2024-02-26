@@ -1,10 +1,11 @@
 NAME
-    Acme::CPANModules::HashUtilities - Modules that manipulate hashes
+    Acme::CPANModules::HashUtilities - List of modules that manipulate
+    hashes
 
 VERSION
-    This document describes version 0.003 of
+    This document describes version 0.004 of
     Acme::CPANModules::HashUtilities (from Perl distribution
-    Acme-CPANModules-HashUtilities), released on 2023-10-06.
+    Acme-CPANModules-HashUtilities), released on 2023-10-29.
 
 DESCRIPTION
     Most of the time, you don't need modules to manipulate hashes; Perl's

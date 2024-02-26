@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Doi - Package for language Dogri
 
 package Locale::CLDR::Locales::Doi;
 # This file auto generated from Data\common\main\doi.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -24,22 +24,6 @@ use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
 extends('Locale::CLDR::Locales::Root');
-# Need to add code for Key type pattern
-sub display_name_pattern {
-	my ($self, $name, $region, $script, $variant) = @_;
-
-	my $display_pattern = '{0} ({1})';
-	$display_pattern =~s/\{0\}/$name/g;
-	my $subtags = join '{0}, {1}', grep {$_} (
-		$region,
-		$script,
-		$variant,
-	);
-
-	$display_pattern =~s/\{1\}/$subtags/g;
-	return $display_pattern;
-}
-
 has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
@@ -197,9 +181,8 @@ has 'characters' => (
 		return {
 			auxiliary => qr{[‌‍ ऍ ऑ ॅ]},
 			index => ['अ', 'आ', 'इ', 'ई', 'उ', 'ऊ', 'ऋ', 'ॠ', 'ऌ', 'ॡ', 'ए', 'ऐ', 'ओ', 'औ', 'क', 'ख', 'ग', 'घ', 'ङ', 'च', 'छ', 'ज', 'झ', 'ञ', 'ट', 'ठ', 'ड', 'ढ', 'ण', 'त', 'थ', 'द', 'ध', 'न', 'प', 'फ', 'ब', 'भ', 'म', 'य', 'र', 'ल', 'ळ', 'व', 'श', 'ष', 'स', 'ह'],
-			main => qr{[॒॑ ़ ँ ं ः ॐ अ आ इ ई उ ऊ ऋ ॠ ऌ ॡ ए ऐ ओ औ क {क्ष} ख ग घ ङ च छ ज झ ञ ट ठ ड {ड़} ढ {ढ़} ण त थ द ध न प फ ब भ म य र ल ळ व श ष स ह ऽ ा ि ी ु ू ृ ॄ ॢ ॣ े ै ो ौ ्]},
-			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
-			punctuation => qr{[_ – — , ; \: ! ? . … ' ‘ ’ " “ ” ( ) § @ * / \& # † ‡ ′ ″]},
+			main => qr{[॑ ॒ ़ ँ ंः ॐ अ आ इ ई उ ऊ ऋ ॠ ऌ ॡ ए ऐ ओ औ क {क्ष} ख ग घ ङ च छ ज झ ञ ट ठ ड{ड़} ढ{ढ़} ण त थ द ध न प फ ब भ म य र ल ळ व श ष स ह ऽ ा ि ी ु ू ृ ॄ ॢ ॣ े ै ो ौ ्]},
+			punctuation => qr{[_ – — , ; \: ! ? . … '‘’ "“” ( ) § @ * / \& # † ‡ ′ ″]},
 		};
 	},
 EOT
@@ -209,50 +192,29 @@ EOT
 );
 
 
-has 'quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{“},
-);
-
-has 'quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{”},
-);
-
-has 'alternate_quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{‘},
-);
-
-has 'alternate_quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{’},
-);
-
-has 'duration_units' => (
-	is			=> 'ro',
-	isa			=> HashRef[Str],
-	init_arg	=> undef,
-	default		=> sub { {
-				hm => 'h:mm',
-				hms => 'h:mm:ss',
-				ms => 'm:ss',
-			} }
-);
-
 has 'units' => (
 	is			=> 'ro',
 	isa			=> HashRef[HashRef[HashRef[Str]]],
 	init_arg	=> undef,
 	default		=> sub { {
+				'long' => {
+					# Long Unit Identifier
+					'mass-gram' => {
+						'name' => q(ग्राम),
+					},
+					# Core Unit Identifier
+					'gram' => {
+						'name' => q(ग्राम),
+					},
+					# Long Unit Identifier
+					'mass-kilogram' => {
+						'name' => q(किल्लो),
+					},
+					# Core Unit Identifier
+					'kilogram' => {
+						'name' => q(किल्लो),
+					},
+				},
 				'narrow' => {
 					# Long Unit Identifier
 					'consumption-mile-per-gallon-imperial' => {
@@ -327,18 +289,9 @@ has 'listPatterns' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-				start => q({0}, {1}),
-				middle => q({0}, {1}),
 				end => q({0}, ते {1}),
 				2 => q({0} ते {1}),
 		} }
-);
-
-has 'default_numbering_system' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> 'latn',
 );
 
 has native_numbering_system => (
@@ -346,50 +299,6 @@ has native_numbering_system => (
 	isa			=> Str,
 	init_arg	=> undef,
 	default		=> 'deva',
-);
-
-has 'number_symbols' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'latn' => {
-			'decimal' => q(.),
-			'group' => q(,),
-			'minusSign' => q(-),
-			'percentSign' => q(%),
-			'plusSign' => q(+),
-		},
-	} }
-);
-
-has 'number_formats' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		decimalFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0.###',
-				},
-			},
-		},
-		percentFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0%',
-				},
-			},
-		},
-		scientificFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#E0',
-				},
-			},
-		},
-} },
 );
 
 has 'number_currency_formats' => (
@@ -415,67 +324,45 @@ has 'currencies' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'BRL' => {
-			symbol => 'R$',
 			display_name => {
 				'currency' => q(ब्राजीली रियाल),
-				'one' => q(ब्राजीली रियाल),
-				'other' => q(ब्राजीली रियाल),
 			},
 		},
 		'CNY' => {
-			symbol => 'CN¥',
 			display_name => {
 				'currency' => q(चीनी युआन),
-				'one' => q(चीनी युआन),
-				'other' => q(चीनी युआन),
 			},
 		},
 		'EUR' => {
-			symbol => '€',
 			display_name => {
 				'currency' => q(यूरो),
-				'one' => q(यूरो),
-				'other' => q(यूरो),
 			},
 		},
 		'GBP' => {
-			symbol => '£',
 			display_name => {
 				'currency' => q(ब्रिटिश पाउंड),
-				'one' => q(ब्रिटिश पाउंड),
-				'other' => q(ब्रिटिश पाउंड),
 			},
 		},
 		'INR' => {
-			symbol => '₹',
 			display_name => {
 				'currency' => q(भारती रपेऽ),
-				'one' => q(भारती रपेऽ),
-				'other' => q(भारती रपेऽ),
 			},
 		},
 		'JPY' => {
 			symbol => '¥',
 			display_name => {
 				'currency' => q(जापानी येन),
-				'one' => q(जापानी येन),
-				'other' => q(जापानी येन),
 			},
 		},
 		'RUB' => {
-			symbol => 'RUB',
 			display_name => {
 				'currency' => q(रूसी रूबल),
-				'one' => q(रूसी रूबल),
-				'other' => q(रूसी रूबल),
 			},
 		},
 		'USD' => {
 			symbol => '$',
 			display_name => {
 				'currency' => q(यूएस डालर),
-				'one' => q(यूएस डालर),
-				'other' => q(यूएस डालर),
 			},
 		},
 		'XXX' => {
@@ -515,84 +402,6 @@ has 'calendar_months' => (
 							
 						],
 					},
-					narrow => {
-						nonleap => [
-							'ज',
-							'फ',
-							'मा',
-							'अ',
-							'मे',
-							'जू',
-							'जु',
-							'अ',
-							'सि',
-							'अ',
-							'न',
-							'दि'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'जनवरी',
-							'फरवरी',
-							'मार्च',
-							'अप्रैल',
-							'मेई',
-							'जून',
-							'जुलाई',
-							'अगस्त',
-							'सितंबर',
-							'अत्तूबर',
-							'नवंबर',
-							'दिसंबर'
-						],
-						leap => [
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'जन.',
-							'फर.',
-							'मार्च',
-							'अप्रैल',
-							'मेई',
-							'जून',
-							'जुलाई',
-							'अग.',
-							'सित.',
-							'अक्तू.',
-							'नव.',
-							'दिस.'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'ज',
-							'फ',
-							'मा',
-							'अ',
-							'मे',
-							'जू',
-							'जु',
-							'अ',
-							'सि',
-							'अ',
-							'न',
-							'दि'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'जनवरी',
@@ -607,6 +416,27 @@ has 'calendar_months' => (
 							'अक्तूबर',
 							'नवंबर',
 							'दिसंबर'
+						],
+						leap => [
+							
+						],
+					},
+				},
+				'stand-alone' => {
+					narrow => {
+						nonleap => [
+							'ज',
+							'फ',
+							'मा',
+							'अ',
+							'मे',
+							'जू',
+							'जु',
+							'अ',
+							'सि',
+							'अ',
+							'न',
+							'दि'
 						],
 						leap => [
 							
@@ -642,53 +472,6 @@ has 'calendar_days' => (
 						sat => 'श.',
 						sun => 'ऐ.'
 					},
-					short => {
-						mon => 'सोम',
-						tue => 'मंगल',
-						wed => 'बुध',
-						thu => 'बीर',
-						fri => 'शुक्र',
-						sat => 'शनि',
-						sun => 'ऐत'
-					},
-					wide => {
-						mon => 'सोमबार',
-						tue => 'मंगलबार',
-						wed => 'बुधबार',
-						thu => 'बीरबार',
-						fri => 'शुक्रबार',
-						sat => 'शनीबार',
-						sun => 'ऐतबार'
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						mon => 'सोम',
-						tue => 'मंगल',
-						wed => 'बुध',
-						thu => 'बीर',
-						fri => 'शुक्र',
-						sat => 'शनि',
-						sun => 'ऐत'
-					},
-					narrow => {
-						mon => 'सो',
-						tue => 'म.',
-						wed => 'बु.',
-						thu => 'बी.',
-						fri => 'शु.',
-						sat => 'श.',
-						sun => 'ऐ'
-					},
-					short => {
-						mon => 'सोम',
-						tue => 'मंगल',
-						wed => 'बुध',
-						thu => 'बीर',
-						fri => 'शुक्र',
-						sat => 'शनि',
-						sun => 'ऐत'
-					},
 					wide => {
 						mon => 'सोमबार',
 						tue => 'मंगलबार',
@@ -697,6 +480,17 @@ has 'calendar_days' => (
 						fri => 'शुक्रबार',
 						sat => 'शनिबार',
 						sun => 'ऐतबार'
+					},
+				},
+				'stand-alone' => {
+					narrow => {
+						mon => 'सो',
+						tue => 'म.',
+						wed => 'बु.',
+						thu => 'बी.',
+						fri => 'शु.',
+						sat => 'श.',
+						sun => 'ऐ'
 					},
 				},
 			},
@@ -714,28 +508,6 @@ has 'calendar_quarters' => (
 						1 => 'त्र.2',
 						2 => 'त्र.3',
 						3 => 'त्र.4'
-					},
-					narrow => {0 => '1',
-						1 => '2',
-						2 => '3',
-						3 => '4'
-					},
-					wide => {0 => 'पैहली त्रमाही',
-						1 => 'दूई त्रमाही',
-						2 => 'त्री त्रमाही',
-						3 => 'चौथी त्रमाही'
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {0 => 'त्र.1',
-						1 => 'त्र.2',
-						2 => 'त्र.3',
-						3 => 'त्र.4'
-					},
-					narrow => {0 => '1',
-						1 => '2',
-						2 => '3',
-						3 => '4'
 					},
 					wide => {0 => 'पैहली त्रमाही',
 						1 => 'दूई त्रमाही',
@@ -758,27 +530,9 @@ has 'day_periods' => (
 					'am' => q{सवेर},
 					'pm' => q{स’ञ},
 				},
-				'narrow' => {
-					'am' => q{सवेर},
-					'pm' => q{स’ञ},
-				},
 				'wide' => {
 					'am' => q{सवेर},
-					'pm' => q{बाद दपैहर},
-				},
-			},
-			'stand-alone' => {
-				'abbreviated' => {
-					'am' => q{सवेर},
-					'pm' => q{स’ञ},
-				},
-				'narrow' => {
-					'am' => q{सवेर},
-					'pm' => q{स’ञ},
-				},
-				'wide' => {
-					'am' => q{सवेर},
-					'pm' => q{स’ञ},
+					'pm' => q{दपैहर बाद},
 				},
 			},
 		},
@@ -846,14 +600,14 @@ has 'datetime_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-			'full' => q{{1} गी {0}},
-			'long' => q{{1} गी {0}},
+			'full' => q{{1}, {0}},
+			'long' => q{{1}, {0}},
 			'medium' => q{{1}, {0}},
 			'short' => q{{1}, {0}},
 		},
 		'gregorian' => {
-			'full' => q{{1} गी {0}},
-			'long' => q{{1} गी {0}},
+			'full' => q{{1}, {0}},
+			'long' => q{{1}, {0}},
 			'medium' => q{{1}, {0}},
 			'short' => q{{1}, {0}},
 		},
@@ -866,42 +620,15 @@ has 'datetime_formats_available_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'gregorian' => {
-			Bh => q{h B},
-			Bhm => q{h:mm B},
-			Bhms => q{h:mm:ss B},
-			E => q{ccc},
-			EBhm => q{E h:mm B},
-			EBhms => q{E h:mm:ss B},
-			EHm => q{E HH:mm},
-			EHms => q{E HH:mm:ss},
 			Ed => q{E d},
-			Ehm => q{E h:mm a},
-			Ehms => q{E h:mm:ss a},
-			Gy => q{G y},
-			GyMMM => q{G y MMM},
 			GyMMMEd => q{E, d, MMM G y},
 			GyMMMd => q{d, MMM G y},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			Hmsv => q{HH:mm:ss v},
-			Hmv => q{HH:mm v},
-			M => q{L},
 			MEd => q{E, d/M},
-			MMM => q{LLL},
 			MMMEd => q{E, d MMM},
 			MMMMW => q{MMMM दा हफ्ता W},
 			MMMMd => q{d MMMM},
 			MMMd => q{d MMM},
 			Md => q{d/M},
-			d => q{d},
-			h => q{h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			hmsv => q{h:mm:ss a v},
-			hmv => q{h:mm a v},
-			ms => q{mm:ss},
-			y => q{y},
 			yM => q{M/y},
 			yMEd => q{E, d/M/y},
 			yMMM => q{MMM y},
@@ -921,9 +648,6 @@ has 'datetime_formats_append_item' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			'Timezone' => '{0} {1}',
-		},
 	} },
 );
 
@@ -937,11 +661,9 @@ has 'datetime_formats_interval' => (
 		},
 		'gregorian' => {
 			Bh => {
-				B => q{h B – h B},
 				h => q{h – h B},
 			},
 			Bhm => {
-				B => q{h:mm B – h:mm B},
 				h => q{h:mm – h:mm B},
 				m => q{h:mm – h:mm B},
 			},
@@ -1012,7 +734,6 @@ has 'datetime_formats_interval' => (
 				d => q{E, MMM d – E, MMM d},
 			},
 			MMMd => {
-				M => q{MMM d – MMM d},
 				d => q{MMM d – d},
 			},
 			Md => {
@@ -1024,21 +745,17 @@ has 'datetime_formats_interval' => (
 			},
 			fallback => '{0} – {1}',
 			h => {
-				a => q{h a – h a},
 				h => q{h – h a},
 			},
 			hm => {
-				a => q{h:mm a – h:mm a},
 				h => q{h:mm – h:mm a},
 				m => q{h:mm – h:mm a},
 			},
 			hmv => {
-				a => q{h:mm a – h:mm a v},
 				h => q{h:mm – h:mm a v},
 				m => q{h:mm – h:mm a v},
 			},
 			hv => {
-				a => q{h a – h a v},
 				h => q{h – h a v},
 			},
 			y => {
@@ -1085,13 +802,9 @@ has 'time_zone_names' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default	=> sub { {
-		hourFormat => q(+HH:mm;-HH:mm),
-		gmtFormat => q(GMT{0}),
-		gmtZeroFormat => q(GMT),
 		regionFormat => q({0} समां),
 		regionFormat => q({0} डेलाइट समां),
 		regionFormat => q({0} मानक समां),
-		fallbackFormat => q({1} ({0})),
 		'America_Central' => {
 			long => {
 				'daylight' => q#उत्तरी अमरीकी डेलाइट केंदरी समां#,

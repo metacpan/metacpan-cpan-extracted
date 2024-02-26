@@ -8,7 +8,7 @@ use AsposeCellsCloud::Request::PostWorksheetCellsRangeRowHeight;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**name** | **string** | The workbook name. |
+**name** | **string** | The file name. |
 **sheet_name** | **string** | The worksheet name. |
 **range** | **Range** | The range object. |
 **value** | **double** | Sets the column height of this range. |

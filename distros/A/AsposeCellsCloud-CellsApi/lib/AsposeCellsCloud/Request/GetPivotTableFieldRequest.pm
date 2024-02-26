@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,13 +59,13 @@ sub new {
 
 
 # Run Operation Request
-# GetPivotTableFieldRequest.name : The workbook name.  ,
+# GetPivotTableFieldRequest.name : The file name.  ,
 # GetPivotTableFieldRequest.sheetName : The worksheet name.  ,
-# GetPivotTableFieldRequest.pivotTableIndex : Gets the PivotTable report by index.  ,
-# GetPivotTableFieldRequest.pivotFieldIndex : The field index in the base fields.  ,
-# GetPivotTableFieldRequest.pivotFieldType : The fields area type(column/row).  ,
-# GetPivotTableFieldRequest.folder : Original workbook folder.  ,
-# GetPivotTableFieldRequest.storageName : Storage name.   
+# GetPivotTableFieldRequest.pivotTableIndex : The PivotTable index.  ,
+# GetPivotTableFieldRequest.pivotFieldIndex : The pivot field index of PivotTable.  ,
+# GetPivotTableFieldRequest.pivotFieldType : The field area type(column/row).  ,
+# GetPivotTableFieldRequest.folder : The folder where the file is situated.  ,
+# GetPivotTableFieldRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -76,7 +76,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_pivot_table_field' } = { 
-    	summary => 'Gets pivot field description in pivot table.',
+    	summary => 'Retrieve descriptions of pivot fields in the PivotTable.',
         params => $params,
         returns => 'PivotFieldResponse',
     };
@@ -147,7 +147,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -161,35 +161,35 @@ __PACKAGE__->method_documentation({
      'pivot_table_index' => {
      	datatype => 'int',
      	base_name => 'pivotTableIndex',
-     	description => 'Gets the PivotTable report by index.',
+     	description => 'The PivotTable index.',
      	format => '',
      	read_only => '',
      		},
      'pivot_field_index' => {
      	datatype => 'int',
      	base_name => 'pivotFieldIndex',
-     	description => 'The field index in the base fields.',
+     	description => 'The pivot field index of PivotTable.',
      	format => '',
      	read_only => '',
      		},
      'pivot_field_type' => {
      	datatype => 'string',
      	base_name => 'pivotFieldType',
-     	description => 'The fields area type(column/row).',
+     	description => 'The field area type(column/row).',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

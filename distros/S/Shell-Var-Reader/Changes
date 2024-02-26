@@ -1,5 +1,8 @@
 Revision history for Shell-Var-Reader
 
+0.9.0   2024-02-21/14:30
+		 - cmdb_shell_var_reader can now take specified groups or systems to regen
+
 0.8.2   2024-01-26/09:30
 		 - \- in the found keys are replaced with \_\_
 

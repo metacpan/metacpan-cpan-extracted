@@ -2,7 +2,7 @@ package Net::DNS::RR::SVCB;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: SVCB.pm 1945 2023-11-22 08:02:31Z willem $)[2];
+our $VERSION = (qw$Id: SVCB.pm 1967 2024-02-15 09:02:37Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -35,19 +35,25 @@ my %keybyname = (
 
 
 sub _decode_rdata {			## decode rdata from wire-format octet string
-	my ( $self, $data, $offset, @opaque ) = @_;
+	my ( $self, $data, $offset ) = @_;
 
-	my $limit = $offset + $self->{rdlength};
-	$self->{SvcPriority} = unpack( "\@$offset n", $$data );
-	( $self->{TargetName}, $offset ) = Net::DNS::DomainName->decode( $data, $offset + 2, @opaque );
+	my $limit = $self->{rdlength};
+	my $rdata = substr $$data, $offset, $limit;
+	$self->{SvcPriority} = unpack 'n', $rdata;
+	( $self->{TargetName}, $offset ) = Net::DNS::DomainName->decode( \$rdata, 2 );
 
 	my $params = $self->{SvcParams} = [];
-	while ( $offset < $limit ) {
-		my ( $key, $size ) = unpack( "\@$offset n2", $$data );
-		push @$params, ( $key, substr $$data, $offset + 4, $size );
-		$offset += ( $size + 4 );
+	while ( ( my $start = $offset + 4 ) <= $limit ) {
+		my ( $key, $size ) = unpack( "\@$offset n2", $rdata );
+		my $next = $start + $size;
+		last if $next > $limit;
+		push @$params, ( $key, substr $rdata, $start, $size );
+		$offset = $next;
 	}
-	die $self->type . ': corrupt RDATA' unless $offset == $limit;
+	unless ( $offset == $limit ) {
+		$self->{corrupt} = substr $rdata, $offset;
+		die $self->type . ': corrupt RDATA';
+	}
 	return;
 }
 
@@ -63,7 +69,7 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 		my $val = shift @params;
 		push @packed, pack( 'n2a*', $key, length($val), $val );
 	}
-	return join '', @packed;
+	return join '', @packed, grep {defined} $self->{corrupt};
 }
 
 
@@ -73,15 +79,15 @@ sub _format_rdata {			## format rdata portion of RR string.
 	my $priority = $self->{SvcPriority};
 	my $target   = $self->{TargetName}->string;
 	my $params   = $self->{SvcParams} || [];
-	return ( $priority, $target ) unless scalar @$params;
+	return ( $priority, $target ) unless $priority;
 
 	my $encode = $self->{TargetName}->encode();
 	my $length = 2 + length $encode;
 	my @target = grep {length} split /(\S{32})/, unpack 'H*', $encode;
 	my @rdata  = unpack 'H4', pack 'n', $priority;
-	push @rdata, "\t; priority: $priority\n";
+	push @rdata, "\t; $priority\n";
 	push @rdata, shift @target;
-	push @rdata, join '', "\t; target: ", substr( $target, 0, 50 ), "\n";
+	push @rdata, join '', "\t; ", substr( $target, 0, 40 ), "\n";
 	push @rdata, @target;
 
 	my @params = @$params;
@@ -89,10 +95,15 @@ sub _format_rdata {			## format rdata portion of RR string.
 		my $key = shift @params;
 		my $val = shift @params;
 		push @rdata, "\n";
-		push @rdata, "; key$key=...\n" if $key > 15;
+		push @rdata, "; key$key=...\n" if $key > 25;
 		push @rdata, unpack 'H4H4',    pack( 'n2', $key, length $val );
 		push @rdata, split /(\S{32})/, unpack 'H*', $val;
 		$length += 4 + length $val;
+	}
+	if ( $self->{corrupt} ) {
+		my @hex = split /(\S{32})/, unpack 'H*', $self->{corrupt};
+		push @rdata, "\n", shift(@hex), "\t; corrupt RDATA\n", @hex;
+		$length += length $self->{corrupt};
 	}
 	return ( "\\# $length", @rdata );
 }

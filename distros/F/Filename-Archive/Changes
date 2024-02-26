@@ -1,3 +1,11 @@
+0.033   2023-12-15  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+        - [incompatible change] Rename 'ci' arg to 'ignore_case' to be
+          consistent with others.
+
+        - [ux][doc] Add examples.
+
+
 0.032   2023-08-27  Released-By: PERLANCAR; Urgency: medium
 
         - Return 'filename_without_suffix' key in result.

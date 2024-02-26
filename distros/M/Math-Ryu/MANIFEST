@@ -16,6 +16,8 @@ t/mpfr_cross_checks.t
 t/round_trip.t
 have_uint128_t.in
 
+benchmark/benchmark.p
+
 ryu_headers/common.h
 ryu_headers/d2fixed_full_table.h
 ryu_headers/d2s_full_table.h

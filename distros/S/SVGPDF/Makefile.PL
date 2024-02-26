@@ -53,8 +53,8 @@ WriteMakefile(
 
     META_MERGE => {
       resources    => {
-        repository => 'https://github.com/sciurius/perl-DVG-PDF',
-        bugtracker => "https://github.com/sciurius/perl-DVG-PDF/issues",
+        repository => 'https://github.com/sciurius/perl-SVGPDF',
+        bugtracker => "https://github.com/sciurius/perl-SVGPDF/issues",
         license    => "https://dev.perl.org/licenses/",
       },
       provides => {
@@ -66,10 +66,6 @@ WriteMakefile(
          directory => [
 	    "lib/SVGPDF",
 	 ],
-      },
-      'meta-spec' => {
-        version => '2',
-        url     => 'https://metacpan.org/pod/CPAN::Meta::Spec',
       },
     },
 );

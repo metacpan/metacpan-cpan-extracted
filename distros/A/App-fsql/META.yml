@@ -24,7 +24,7 @@ name: App-fsql
 provides:
   App::fsql:
     file: lib/App/fsql.pm
-    version: '0.232'
+    version: '0.233'
 requires:
   DBD::CSV: '0'
   DBI: '0'
@@ -51,7 +51,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-fsql
   homepage: https://metacpan.org/release/App-fsql
   repository: git://github.com/perlancar/perl-App-fsql.git
-version: '0.232'
+version: '0.233'
 x_Dist_Zilla:
   perl:
     version: '5.038002'

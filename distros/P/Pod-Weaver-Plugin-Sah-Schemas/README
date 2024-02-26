@@ -199,9 +199,9 @@ NAME
     Sah::Schemas::* distribution
 
 VERSION
-    This document describes version 0.078 of
+    This document describes version 0.079 of
     Pod::Weaver::Plugin::Sah::Schemas (from Perl distribution
-    Pod-Weaver-Plugin-Sah-Schemas), released on 2024-01-08.
+    Pod-Weaver-Plugin-Sah-Schemas), released on 2024-01-12.
 
 SYNOPSIS
     In your weaver.ini:

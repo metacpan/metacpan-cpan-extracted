@@ -1,57 +1,57 @@
 package YA::CLI::Usage;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 use Moo;
 use namespace::autoclean;
 
 # ABSTRACT: Class that handles usage and man page generation for action handlers
 
-use Carp qw(croak);
+use Carp       qw(croak);
 use List::Util qw(first);
-use Pod::Find qw(pod_where);
+use Pod::Find  qw(pod_where);
 use Pod::Usage qw(pod2usage);
 
 has verbose => (
-    is      => 'ro',
-    default => 1,
+  is      => 'ro',
+  default => 1,
 );
 
 has rc => (
-    is      => 'ro',
-    default => 0,
+  is      => 'ro',
+  default => 0,
 );
 
 has message => (
-    is        => 'ro',
-    predicate => 'has_message',
+  is        => 'ro',
+  predicate => 'has_message',
 );
 
 has pod_file => (
-    is        => 'ro',
-    predicate => 'has_pod_file'
+  is        => 'ro',
+  predicate => 'has_pod_file'
 );
 
 sub run {
-    my $self = shift;
+  my $self = shift;
 
-    my $pod_where = $self->_pod_where;
+  my $pod_where = $self->_pod_where;
 
-    $self->_pod2usage(
-        $self->has_message ? (-message => $self->message) : (),
-        -verbose => $self->verbose,
-        -exitval => $self->rc,
-        $pod_where ? ('-input' => $pod_where) : (),
-    );
+  $self->_pod2usage(
+    $self->has_message ? (-message => $self->message) : (),
+    -verbose => $self->verbose,
+    -exitval => $self->rc,
+    $pod_where ? ('-input' => $pod_where) : (),
+  );
 }
 
 sub _pod_where {
   my $self = shift;
   return unless $self->has_pod_file;
-  return pod_where({ -inc => 1 }, $self->pod_file);
+  return pod_where({ -inc => 1, -verbose => $ENV{YA_CLI_USAGE_LIB} // 0 }, $self->pod_file);
 }
 
 sub _pod2usage {
-    my $self = shift;
-    pod2usage(@_);
+  my $self = shift;
+  pod2usage(@_);
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -68,7 +68,7 @@ YA::CLI::Usage - Class that handles usage and man page generation for action han
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

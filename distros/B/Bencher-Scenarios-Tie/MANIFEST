@@ -7,7 +7,11 @@ META.yml
 Makefile.PL
 README
 dist.ini
+lib/Bencher/Scenario/Tie/Array.pm
+lib/Bencher/Scenario/Tie/Hash.pm
 lib/Bencher/Scenario/Tie/Scalar.pm
+lib/Bencher/ScenarioR/Tie/Array.pm
+lib/Bencher/ScenarioR/Tie/Hash.pm
 lib/Bencher/ScenarioR/Tie/Scalar.pm
 lib/Bencher/Scenarios/Tie.pm
 t/00-compile.t

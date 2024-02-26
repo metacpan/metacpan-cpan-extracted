@@ -6,22 +6,22 @@ WriteMakefile
   'PREREQ_PM' => {
                    'Text::Markdown' => '1.000004',
                    'Text::Textile' => '2.10',
-                   'HTML::Tagset' => 0,
-                   'File::BOM' => '0.14',
-                   'Text::WikiCreole' => '0.07',
                    'Text::MediawikiFormat' => '1.0',
+                   'Text::WikiCreole' => '0.07',
                    'Pod::Simple::XHTML' => '3.15',
-                   'Text::MultiMarkdown' => '1.000028',
-                   'Symbol' => 0,
-                   'Text::Trac' => '0.10',
                    'Parse::BBCode' => '0.15',
+                   'Symbol' => 0,
+                   'HTML::Tagset' => 0,
                    'IPC::Open3' => 0,
-                   'HTML::Entities' => 0
+                   'Text::Trac' => '0.10',
+                   'HTML::Entities' => 0,
+                   'Text::MultiMarkdown' => '1.000028',
+                   'File::BOM' => '0.14'
                  },
-  'PL_FILES' => {},
   'VERSION_FROM' => 'lib/Text/Markup.pm',
-  'INSTALLDIRS' => 'site',
+  'NAME' => 'Text::Markup',
   'EXE_FILES' => [],
-  'NAME' => 'Text::Markup'
+  'PL_FILES' => {},
+  'INSTALLDIRS' => 'site'
 )
 ;

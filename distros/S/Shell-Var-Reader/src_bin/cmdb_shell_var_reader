@@ -34,23 +34,10 @@ if ($help) {
 	pod2usage( -exitval => 255, -verbose => 2, -output => \*STDOUT );
 }
 
-if ( !defined($dir) ) {
-	if ( -f './.shell_var_reader' ) {
-		$dir = './';
-	} elsif ( -f '../.shell_var_reader' ) {
-		$dir = '../';
-	} elsif ( -f '../../.shell_var_reader' ) {
-		$dir = '../../';
-	} elsif ( -f '../../../.shell_var_reader' ) {
-		$dir = '../../../';
-	} elsif ( -f '../../../../.shell_var_reader' ) {
-		$dir = '../../../../';
-	}
-} ## end if ( !defined($dir) )
-
 Shell::Var::Reader::CMDB->update(
-	dir     => $dir,
-	verbose => $verbose,
+	dir        => $dir,
+	verbose    => $verbose,
+	to_process => \@ARGV,
 );
 exit 0;
 
@@ -59,6 +46,16 @@ exit 0;
 cmdb_shell_var_reader - Bulk run shell_var_reader for CMDB build purposes.
 
 =head1 SYNOPSIS
+
+cmdb_shell_var_reader [B<--verbose> <0/1>] [BB<-d> <dir>]
+
+cmdb_shell_var_reader [B<--verbose> <0/1>] [BB<-d> <dir>] $group0 [$group1] ...
+
+cmdb_shell_var_reader [B<--verbose> <0/1>] [BB<-d> <dir>] $group/$system0.sh [$group/$system1.sh] ...
+
+=head1 DESCRIPTION
+
+@ARGV cam be be specified to list specific groups or systems to regenerate the config files for.
 
 =head1 FLAGS
 

@@ -4,10 +4,44 @@ use strict;
 use Win32API::File 'GetOsFHandle';
 use utf8;
 
+sub printConsole ($;$);
+
+if ("@ARGV" eq '--help') {
+   my $txt = <<EOH . <<'EOP';
+    $0  --help | cooked | U [COUNT] | Unn [COUNT]
+EOH
+
+Recognized arguments:
+
+  cooked
+	Tries to read 5 keys from console in cooked mode (except C-Enter, C-c).  Should be the only argument.
+
+  U ...
+  U11 ...
+	Without digits, does not set keyboard.
+	With digits, chooses entry 11 (via ActivateKeyboardLayout(ID)) from the list it outputs.
+
+  COUNT
+  inf
+	(Default: 20) exit after COUNT events processed.  (Otherwise: use C-c.)
+
+Setting the keyboard may be needed for a correct operation if:
+    • The keyboard is set to be “per application”, and not “the same for all applications”.
+    • The current keyboard of “this console” is different from the keyboard of (?) the desktop.
+(The problem is that the “console application servers” is run at high priority, and its keyboard setting cannot be queried.)
+EOP
+  if (!-p STDOUT) {
+    printConsole($txt);
+  } else {
+    print $txt;
+  }
+  exit;
+}
+
 my $flag_use_for_keyup = 0x0100;		# The documented value is 0x8000; but it does not produce what CONSOLE sees
    $flag_use_for_keyup = 0x8000;		# 0x100 works to sync us with TTY, but it duplicates prefix keys
 
-$Win32::API::DEBUG = 1;				# XXXX Too early now, when we load-when-needed
+$Win32::API::DEBUG = $Win32::API::DEBUG = 1;	# XXXX Too early now, when we load-when-needed.  (Avoid the warning used-only-once)
 my %pointer_ints = qw(4 int 8 __int64);
 my $HANDLE_t = $pointer_ints{length pack 'p', ''} or die "Cannot deduce pointer size";
 

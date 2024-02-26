@@ -2,12 +2,12 @@ package Tickit::Widget::Layout::Desktop;
 # ABSTRACT: desktop-like float management implementation for Tickit
 use strict;
 use warnings;
+use Object::Pad;
+class Tickit::Widget::Layout::Desktop :isa(Tickit::ContainerWidget);
 
 use utf8;
 
-use parent qw(Tickit::ContainerWidget);
-
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =head1 NAME
@@ -74,6 +74,7 @@ window lists and launchers
 =cut
 
 use curry::weak;
+use List::UtilsBy;
 use Scalar::Util qw(refaddr);
 use List::Util qw(max pairmap);
 use Tickit::Utils qw(textwidth distribute);
@@ -86,14 +87,13 @@ use Variable::Disposition;
 
 use constant CAN_FOCUS => 1;
 use constant WIDGET_PEN_FROM_STYLE => 1;
-#use Tickit::ContainerWidget
 
 =head1 METHODS
 
 =cut
 
-sub lines { 1 }
-sub cols { 1 }
+method lines { 1 }
+method cols { 1 }
 
 =head2 render_to_rb
 
@@ -102,12 +102,11 @@ floating windows on top of this widget.
 
 =cut
 
-sub render_to_rb {
-    my ($self, $rb, $rect) = @_;
+method render_to_rb ($rb, $rect) {
     $rb->eraserect($rect);
 }
 
-sub children { @{shift->{widgets}} }
+method children { @{$self->{widgets}} }
 
 =head2 overlay
 
@@ -126,8 +125,7 @@ to check for intersections so we don't waste time drawing unrelated areas
 
 =cut
 
-sub overlay {
-    my ($self, $rb, $rect, $exclude) = @_;
+method overlay ($rb, $rect, $exclude) {
     my $target = $exclude->window->rect;
 
     # TODO change this when proper accessors are available
@@ -161,13 +159,11 @@ Records our initial window geometry when the L<Tickit::Window> is first attached
 
 =cut
 
-sub window_gained {
-    my $self = shift;
-    my ($win) = @_;
+method window_gained ($win) {
     $self->{geometry} = {
         map { $_ => $win->$_ } qw(top left lines cols)
     };
-    $self->SUPER::window_gained(@_);
+    $self->SUPER::window_gained($win);
 
 }
 
@@ -193,9 +189,7 @@ Takes the following named parameters:
 
 =cut
 
-sub create_panel {
-    my $self = shift;
-    my %args = @_;
+method create_panel (%args) {
     my $win = $self->window or return;
 
     # Normalise percentages
@@ -207,14 +201,14 @@ sub create_panel {
 
     if(defined(my $bottom = delete $args{bottom})) {
         # Extrapolate coördinates to ensure we have top+lines
-        $args{top}   //= $bottom - $args{lines} if exists $args{lines};
-        $args{lines} //= $bottom - $args{top} if exists $args{top};
+        $args{top}   //= delete($args{bottom}) - $args{lines} if exists $args{lines};
+        $args{lines} //= delete($args{bottom}) - $args{top} if exists $args{top};
     }
 
     if(defined(my $right = delete $args{right})) {
         # Extrapolate coördinates to ensure we have left+cols
-        $args{left}  //= $right - $args{cols} if exists $args{cols};
-        $args{cols}  //= $right - $args{left} if exists $args{left};
+        $args{left}  //= delete($args{right}) - $args{cols} if exists $args{cols};
+        $args{cols}  //= delete($args{right}) - $args{left} if exists $args{left};
     }
 
     $args{top} //= 2;
@@ -243,20 +237,17 @@ sub create_panel {
     $w
 }
 
-sub horizontal {
-    my ($self, $win, $v) = @_;
+method horizontal ($win, $v) {
     $v = $1 * $win->cols if $v =~ /(-?\d+(?:\.\d*)?)%/;
     $v
 }
 
-sub vertical {
-    my ($self, $win, $v) = @_;
+method vertical ($win, $v) {
     $v = $1 * $win->lines if $v =~ /(-?\d+(?:\.\d*)?)%/;
     $v
 }
 
-sub show_control {
-    my ($self, $panel, @items) = @_;
+method show_control ($panel, @items) {
     my $win = $self->window or return;
     my $panel_win = $panel->window;
 
@@ -287,9 +278,7 @@ sub show_control {
     );
 }
 
-sub float_geom_changed {
-    my $self = shift;
-    my $w = shift;
+method float_geom_changed ($w, @) {
     my $win = $self->window or return;
     my $float = $w->window or return;
 
@@ -327,7 +316,7 @@ sub float_geom_changed {
     $self->{extents}{refaddr $float} = $w->window->rect->translate(0,0);
 
     # Also pass on the event, so the child widget knows what's going on
-    $w->reshape(@_);
+    $w->reshape($w);
 }
 
 =head1 API METHODS
@@ -344,9 +333,7 @@ Returns $self.
 
 =cut
 
-sub make_active {
-    my $self = shift;
-    my $child = shift;
+method make_active ($child) {
     $_->mark_inactive for grep $_->is_active, @{$self->{widgets}};
     $child->window->raise_to_front;
     $child->mark_active;
@@ -389,8 +376,7 @@ Returns C< $self > for chaining.
 
 =cut
 
-sub weld {
-    my ($self, $src_edge, $src_widget, $dst_edge, $dst_widget) = @_;
+method weld ($src_edge, $src_widget, $dst_edge, $dst_widget) {
     my ($src) = grep { refaddr($src_widget) == refaddr($_->child) } @{$self->{widgets}}
         or die "src not found";
     my ($dst) = grep { refaddr($dst_widget) == refaddr($_->child) } @{$self->{widgets}}
@@ -412,8 +398,7 @@ Returns $self.
 
 =cut
 
-sub reshape {
-    my $self = shift;
+method reshape {
     my $win = $self->window or return;
 
     my @directions = qw(top left lines cols);
@@ -463,8 +448,7 @@ Arrange all the windows in a cascade (first at 1,1, second at 2,2, etc.).
 
 =cut
 
-sub cascade {
-    my $self = shift;
+method cascade {
     my @windows = reverse $self->window->subwindows;
     my $x = 0;
     my $y = 0;
@@ -487,9 +471,7 @@ Returns $self.
 
 =cut
 
-sub tile {
-    my $self = shift;
-    my %args = @_;
+method tile (%args) {
     my $win = $self->window or return;
     my @windows = reverse @{$win->{child_windows}};
 
@@ -535,26 +517,25 @@ Close all the windows.
 
 =cut
 
-sub close_all {
-    my $self = shift;
+method close_all {
     $_->close for reverse $self->window->subwindows;
 }
 
-sub close_panel {
-    my ($self, $panel) = @_;
+method close_panel ($panel) {
     my $rect = $panel->window->rect;
     my $addr = refaddr($panel);
-    List::UtilsBy::extract_by { refaddr($_) == $addr }@{ $self->{widgets} };
-    $panel->window->close;
+    List::UtilsBy::extract_by {
+        refaddr($_) == $addr
+    } $self->{widgets}->@*;
     my $win = $self->window;
     $win->tickit->later(sub {
+        $panel->window->close;
         $win->expose($rect);
-    })
+    });
 }
 
 # Tickit::Widget
-sub focus_next {
-    my ($self) = shift;
+method focus_next {
     $self->SUPER::focus_next(@_)
 }
 
@@ -576,5 +557,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2020. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2017. Licensed under the same terms as Perl itself.
 

@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,13 +59,13 @@ sub new {
 
 
 # Run Operation Request
-# PostAutofitWorksheetRowsRequest.name : The workbook name.  ,
+# PostAutofitWorksheetRowsRequest.name : The file name.  ,
 # PostAutofitWorksheetRowsRequest.sheetName : The worksheet name.  ,
-# PostAutofitWorksheetRowsRequest.startRow : Start row index.  ,
-# PostAutofitWorksheetRowsRequest.endRow : End row index.  ,
+# PostAutofitWorksheetRowsRequest.startRow : The start row index.  ,
+# PostAutofitWorksheetRowsRequest.endRow : The end row index.  ,
 # PostAutofitWorksheetRowsRequest.onlyAuto : Autofits all rows in this worksheet.  ,
-# PostAutofitWorksheetRowsRequest.folder : Original workbook folder.  ,
-# PostAutofitWorksheetRowsRequest.storageName : Storage name.   
+# PostAutofitWorksheetRowsRequest.folder : The folder where the file is situated.  ,
+# PostAutofitWorksheetRowsRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -76,7 +76,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_autofit_worksheet_rows' } = { 
-    	summary => 'Autofit rows in worksheet.',
+    	summary => 'Autofit rows in the worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -145,7 +145,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -159,14 +159,14 @@ __PACKAGE__->method_documentation({
      'start_row' => {
      	datatype => 'int',
      	base_name => 'startRow',
-     	description => 'Start row index.',
+     	description => 'The start row index.',
      	format => '',
      	read_only => '',
      		},
      'end_row' => {
      	datatype => 'int',
      	base_name => 'endRow',
-     	description => 'End row index.',
+     	description => 'The end row index.',
      	format => '',
      	read_only => '',
      		},
@@ -180,14 +180,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

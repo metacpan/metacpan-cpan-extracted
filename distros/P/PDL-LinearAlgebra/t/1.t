@@ -81,4 +81,15 @@ $B = identity(2);
 ok fapprox($got = $A x $B, $A), 'complex first' or diag "got: $got";
 ok fapprox($got = $B x $A, $A), 'complex second' or diag "got: $got";
 
+$A = pdl '[[1 2 3] [4 5 6] [7 8 9]]';
+my $up = pdl '[[1 2 3] [0 5 6] [0 0 9]]';
+my $lo = pdl '[[1 0 0] [4 5 0] [7 8 9]]';
+ok fapprox($got = $A->tricpy(0), $up), 'upper triangle #1' or diag "got: $got";
+tricpy($A, 0, $got = null);
+ok fapprox($got, $up), 'upper triangle #2' or diag "got: $got";
+ok fapprox($got = $A->tricpy, $up), 'upper triangle #3' or diag "got: $got";
+ok fapprox($got = $A->tricpy(1), $lo), 'lower triangle #1' or diag "got: $got";
+tricpy($A, 1, $got = null);
+ok fapprox($got, $lo), 'lower triangle #2' or diag "got: $got";
+
 done_testing;

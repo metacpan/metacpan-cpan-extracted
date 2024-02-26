@@ -1,0 +1,60 @@
+# PODNAME: RDF::Cowl::Lib::Gen::Class::UVersion
+# ABSTRACT: Generated docs for RDF::Cowl::Ulib::UVersion
+
+## DO NOT EDIT
+## Generated via maint/tt/Class.pod.tt
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+RDF::Cowl::Lib::Gen::Class::UVersion - Generated docs for RDF::Cowl::Ulib::UVersion
+
+=head1 VERSION
+
+version 1.0.0
+
+=head1 MAIN MODULE
+
+L<RDF::Cowl::Ulib::UVersion>
+
+=head1 METHODS
+
+=head2 to_string
+
+B<Signature>:
+
+  $self->to_string()
+
+B<Params>:
+
+  UVersion $version 
+
+Documentation:
+
+  Converts the version into a string.
+  
+  @param version Version.
+  @return String.
+
+=over 2
+
+B<C function name>: C<< uversion_to_string >>
+
+=back
+
+=head1 AUTHOR
+
+Zakariyya Mughal <zmughal@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 by Auto-Parallel Technologies, Inc..
+
+This is free software, licensed under Eclipse Public License - v 2.0.
+
+=cut

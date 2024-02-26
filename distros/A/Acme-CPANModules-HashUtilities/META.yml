@@ -1,5 +1,5 @@
 ---
-abstract: 'Modules that manipulate hashes'
+abstract: 'List of modules that manipulate hashes'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
@@ -19,7 +19,7 @@ name: Acme-CPANModules-HashUtilities
 provides:
   Acme::CPANModules::HashUtilities:
     file: lib/Acme/CPANModules/HashUtilities.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   Acme::CPANModulesUtil::Misc: '0'
   strict: '0'
@@ -27,7 +27,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-HashUtilities
   homepage: https://metacpan.org/release/Acme-CPANModules-HashUtilities
   repository: git://github.com/perlancar/perl-Acme-CPANModules-HashUtilities.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.038000'

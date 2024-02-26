@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,13 +59,13 @@ sub new {
 
 
 # Run Operation Request
-# DeleteWorksheetPivotTableFilterRequest.name : The workbook name.  ,
+# DeleteWorksheetPivotTableFilterRequest.name : The file name.  ,
 # DeleteWorksheetPivotTableFilterRequest.sheetName : The worksheet name.  ,
 # DeleteWorksheetPivotTableFilterRequest.pivotTableIndex : Gets the PivotTable report by index.  ,
 # DeleteWorksheetPivotTableFilterRequest.fieldIndex : Gets the PivotField Object at the specific index.  ,
-# DeleteWorksheetPivotTableFilterRequest.needReCalculate : Whether the specific pivot table calculate(true/false).  ,
-# DeleteWorksheetPivotTableFilterRequest.folder : Original workbook folder.  ,
-# DeleteWorksheetPivotTableFilterRequest.storageName : Storage name.   
+# DeleteWorksheetPivotTableFilterRequest.needReCalculate : Whether the specific PivotTable calculate(true/false).  ,
+# DeleteWorksheetPivotTableFilterRequest.folder : The folder where the file is situated.  ,
+# DeleteWorksheetPivotTableFilterRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -76,7 +76,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'delete_worksheet_pivot_table_filter' } = { 
-    	summary => 'Deletes a pivot filter in piovt table.',
+    	summary => 'Delete a pivot filter in the PivotTable.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -149,7 +149,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -177,21 +177,21 @@ __PACKAGE__->method_documentation({
      'need_re_calculate' => {
      	datatype => 'string',
      	base_name => 'needReCalculate',
-     	description => 'Whether the specific pivot table calculate(true/false).',
+     	description => 'Whether the specific PivotTable calculate(true/false).',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

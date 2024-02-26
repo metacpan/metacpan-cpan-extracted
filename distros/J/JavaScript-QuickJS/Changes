@@ -1,12 +1,16 @@
 Revision history for Perl extension JavaScript::QuickJS:
 
+0.21 Sec 14 Feb 2024
+- Documentation updates. (No functional changes.)
+
 0.20 Tue 13 Feb 2024
+- BREAKING CHANGE: eval_module() now returns a Promise (as QuickJS itself
+  now does) instead of the JavaScript::QuickJS instance.
 - Fix integer-overflow bug in setTime() (et al.) when Perl stores the number
   as NV rather than IV/UV.
 - Properly free QuickJS resources upon failure to convert Perl parameters
   to JavaScript.
 - Add Promise support.
-- Make eval_module() return a promise (since QuickJS itself now does).
 
 0.19 Fri 1 Dec 2023
 - BREAKING CHANGE: Enabling std() or os() now creates globals by those names.

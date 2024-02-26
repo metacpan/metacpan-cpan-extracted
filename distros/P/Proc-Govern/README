@@ -2,8 +2,8 @@ NAME
     Proc::Govern - Run child process and govern its various aspects
 
 VERSION
-    This document describes version 0.212 of Proc::Govern (from Perl
-    distribution Proc-Govern), released on 2021-08-06.
+    This document describes version 0.213 of Proc::Govern (from Perl
+    distribution Proc-Govern), released on 2023-11-16.
 
 SYNOPSIS
     To use as Perl module:
@@ -176,7 +176,7 @@ FUNCTIONS
 
         Command to run.
 
-        Passed to IPC::Run's "start()".
+        Passed to IPC::Run's start().
 
     *   egid => *str*
 
@@ -344,7 +344,7 @@ FUNCTIONS
         first sent the TERM signal. If after 30 seconds pass some processes
         still survive, they are sent the KILL signal.
 
-        The killing is implemented using IPC::Run's "kill_kill()".
+        The killing is implemented using IPC::Run's kill_kill().
 
         Upon timeout, exit code is set to 124.
 
@@ -376,16 +376,6 @@ HOMEPAGE
 SOURCE
     Source repository is at <https://github.com/perlancar/perl-Proc-Govern>.
 
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Proc-Govern>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
-CAVEATS
-    Not yet tested on Win32.
-
 SEE ALSO
     Forks::Super (since 2009) extends the fork(), wait(), and waitpid()
     functions with some process/job management features, e.g. set timeout,
@@ -401,9 +391,9 @@ SEE ALSO
 
     IPC::Cmd is a core module, but can also use IPC::Run (as well as
     IPC::Open3 on systems that do not have IPC::Run installed or on some
-    archaic systems that do not support IPC::Run). Its "run_forked()"
-    routine has some of Proc::Govern's functionalities like capturing stdout
-    and stderr, timeout, hiding (discarding) output. If you only need those
+    archaic systems that do not support IPC::Run). Its run_forked() routine
+    has some of Proc::Govern's functionalities like capturing stdout and
+    stderr, timeout, hiding (discarding) output. If you only need those
     functionalities, you can use IPC::Cmd as it is a core module.
 
     Proc::Govern attempts (or will attempt, some day) to provide the
@@ -415,6 +405,10 @@ SEE ALSO
         djb's supervise, http://cr.yp.to/daemontools/supervise.html
 
     *   Pausing under high system load
+
+        run-stop-run from App::RunStopRun employs the same technique of
+        stopping/resuming processes periodically but does not seem to
+        monitor system load or CPU usage.
 
         loadwatch. This program also has the ability to run N copies of
         program and interactively control stopping/resuming via Unix socket.
@@ -448,12 +442,38 @@ AUTHOR
 CONTRIBUTORS
     *   perlancar <perlancar@cpan.org>
 
-    *   Steven Haryanto <sharyanto@cpan.org>
+    *   Steven Haryanto <stevenharyanto@gmail.com>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015,
+    This software is copyright (c) 2023, 2020, 2019, 2018, 2017, 2016, 2015,
     2014, 2013, 2012 by perlancar.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Proc-Govern>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+CAVEATS
+    Not yet tested on Win32.
 

@@ -8,6 +8,8 @@ QQ::weixin::work::kf::account
 
 =head1 DESCRIPTION
 
+客服账号管理
+
 =cut
 
 use strict;
@@ -17,7 +19,7 @@ use LWP::UserAgent;
 use JSON;
 use utf8;
 
-our $VERSION = '0.06';
+our $VERSION = '0.10';
 our @EXPORT = qw/ add del update list /;
 
 =head1 FUNCTION
@@ -25,6 +27,7 @@ our @EXPORT = qw/ add del update list /;
 =head2 add(access_token, hash);
 
 添加客服帐号
+最后更新：2023/12/05
 
 =head2 SYNOPSIS
 
@@ -32,7 +35,7 @@ L<https://developer.work.weixin.qq.com/document/path/94662>
 
 =head3 请求说明：
 
-添加客服帐号，并可设置客服名称和头像。目前一家企业最多可添加10个客服帐号。
+添加客服账号，并可设置客服名称和头像。目前一家企业最多可添加5000个客服账号。
 
 =head4 请求包结构体为：
 
@@ -43,7 +46,7 @@ L<https://developer.work.weixin.qq.com/document/path/94662>
 
 =head4 参数说明：
 
-    参数	必须	类型	说明
+	参数	必须	类型	说明
 	access_token	是	string	调用接口凭证
 	name	是	string	客服名称
 						不多于16个字符
@@ -52,8 +55,16 @@ L<https://developer.work.weixin.qq.com/document/path/94662>
 
 =head3 权限说明
 
-企业需要使用“微信客服”secret所获取的accesstoken来调用（accesstoken如何获取？）；
-第三方应用需具有“微信客服->管理帐号、分配会话和收发消息”权限
+调用的应用需要满足如下的权限
+
+	应用类型	权限要求
+	自建应用	配置到「 微信客服- 可调用接口的应用」中，且在管理后台「通过API管理会话消息」-「企业内部开发」对应的自建应用的「可管理的客服账号」处，配置至少一个客服账号
+	第三方应用	具有“微信客服->管理账号、分配会话和收发消息”权限
+	代开发自建应用	具有“微信客服->管理账号、分配会话和收发消息”权限
+
+注： 从2023年12月1日0点起，不再支持通过系统应用secret调用接口，存量企业暂不受影响 查看详情
+
+通过接口创建的客服账号，将自动拥有该客服账号的管理权限。企业可在管理后台“微信客服-通过API管理微信客服账号”处设置对应的客服账号通过API来管理。
 
 =head3 RETURN 返回结果
 
@@ -65,7 +76,7 @@ L<https://developer.work.weixin.qq.com/document/path/94662>
 
 =head4 RETURN 参数说明
 
-    参数	类型	说明
+	参数	类型	说明
 	errcode	int32	返回码
 	errmsg	string	错误码描述
 	open_kfid	string	新创建的客服帐号ID
@@ -91,7 +102,8 @@ sub add {
 
 =head2 del(access_token, hash);
 
-添加客服帐号
+删除客服账号
+最后更新：2023/11/30
 
 =head2 SYNOPSIS
 
@@ -109,15 +121,24 @@ L<https://developer.work.weixin.qq.com/document/path/94663>
 
 =head4 参数说明：
 
-    参数	必须	类型	说明
+	参数	必须	类型	说明
 	access_token	是	string	调用接口凭证
 	open_kfid	是	string	客服帐号ID。
 							不多于64字节
 
 =head3 权限说明
 
-企业需要使用“微信客服”secret所获取的accesstoken来调用（accesstoken如何获取？）
-第三方应用需具有“微信客服->管理帐号、分配会话和收发消息”权限
+调用的应用需要满足如下的权限
+
+	应用类型	权限要求
+	自建应用	配置到「 微信客服- 可调用接口的应用」中
+	第三方应用	具有“微信客服->管理账号、分配会话和收发消息”权限
+	代开发自建应用	具有“微信客服->管理账号、分配会话和收发消息”权限
+
+注： 从2023年12月1日0点起，不再支持通过系统应用secret调用接口，存量企业暂不受影响 查看详情
+
+只能通过API管理企业指定的客服账号。企业可在管理后台“微信客服-通过API管理微信客服账号”处设置对应的客服账号通过API来管理。
+操作的客服账号对应的接待人员应在应用的可见范围内
 
 =head3 RETURN 返回结果
 
@@ -128,7 +149,7 @@ L<https://developer.work.weixin.qq.com/document/path/94663>
 
 =head4 RETURN 参数说明
 
-    参数	类型	说明
+	参数	类型	说明
 	errcode	int32	返回码
 	errmsg	string	错误码描述
 
@@ -154,6 +175,7 @@ sub del {
 =head2 update(access_token, hash);
 
 修改客服帐号
+最后更新：2023/11/30
 
 =head2 SYNOPSIS
 
@@ -173,7 +195,7 @@ L<https://developer.work.weixin.qq.com/document/path/94664>
 
 =head4 参数说明：
 
-    参数	必须	类型	说明
+	参数	必须	类型	说明
 	access_token	是	string	调用接口凭证
 	open_kfid	是	string	要修改的客服帐号ID。
 							不多于64字节
@@ -184,8 +206,16 @@ L<https://developer.work.weixin.qq.com/document/path/94664>
 
 =head3 权限说明
 
-企业需要使用“微信客服”secret所获取的accesstoken来调用（accesstoken如何获取？）
-第三方应用需具有“微信客服->管理帐号、分配会话和收发消息”权限
+调用的应用需要满足如下的权限
+
+	应用类型	权限要求
+	自建应用	配置到「 微信客服- 可调用接口的应用」中
+	第三方应用	具有“微信客服->管理账号、分配会话和收发消息”权限
+	代开发自建应用	具有“微信客服->管理账号、分配会话和收发消息”权限
+
+只能通过API管理企业指定的客服账号。企业可在管理后台“微信客服-通过API管理微信客服账号”处设置对应的客服账号通过API来管理。
+操作的客服账号对应的接待人员应在应用的可见范围内
+注： 从2023年12月1日0点起，不再支持通过系统应用secret调用接口，存量企业暂不受影响 查看详情
 
 =head3 RETURN 返回结果
 
@@ -196,7 +226,7 @@ L<https://developer.work.weixin.qq.com/document/path/94664>
 
 =head4 RETURN 参数说明
 
-    参数	类型	说明
+	参数	类型	说明
 	errcode	int32	返回码
 	errmsg	string	错误码描述
 
@@ -222,6 +252,7 @@ sub update {
 =head2 list(access_token);
 
 获取客服帐号列表
+最后更新：2023/11/30
 
 =head2 SYNOPSIS
 
@@ -231,39 +262,57 @@ L<https://developer.work.weixin.qq.com/document/path/94661>
 
 获取客服帐号列表，包括所有的客服帐号的客服ID、名称和头像。
 
+=head4 请求包结构体为：
+
+	{
+		"offset": 0,
+		"limit": 100
+	}
+
 =head4 参数说明：
 
-    参数	必须	类型	说明
+	参数	必须	类型	说明
 	access_token	是	string	调用接口凭证
+	offset	否	uint32	分页，偏移量, 默认为0
+	limit	否	uint32	分页，预期请求的数据量，默认为100，取值范围 1 ~ 100
 
 =head3 权限说明
 
-企业需要使用“微信客服”secret所获取的accesstoken来调用（accesstoken如何获取？）
-第三方应用需具有“微信客服->获取基础信息”权限
+调用的应用需要满足如下的权限
+
+	应用类型	权限要求
+	自建应用	配置到「 微信客服- 可调用接口的应用」中
+	第三方应用	具有“微信客服->获取基础信息”权限
+	代开发自建应用	具有“微信客服->获取基础信息”权限
+	微信客服组件应用	具有“管理接入的微信客服->获取企业授权接入的客服账号->客服账号信息与链接”权限，仅可获取企业已授权的客服账号
+
+注： 从2023年12月1日0点起，不再支持通过系统应用secret调用接口，存量企业暂不受影响 查看详情
 
 =head3 RETURN 返回结果
 
-    {
+	{
 		"errcode": 0,
 		"errmsg": "ok",
 		"account_list": [
 			{
 				"open_kfid": "wkAJ2GCAAASSm4_FhToWMFea0xAFfd3Q",
 				"name": "咨询客服",
-				"avatar": "https://wework.qpic.cn/wwhead/duc2TvpEgSSjibPZlNR6chpx9W3dtd9Ogp8XEmSNKGa6uufMWn2239HUPuwIFoYYZ7Ph580FPvo8/0"
+				"avatar": "https://wework.qpic.cn/wwhead/duc2TvpEgSSjibPZlNR6chpx9W3dtd9Ogp8XEmSNKGa6uufMWn2239HUPuwIFoYYZ7Ph580FPvo8/0",
+				"manage_privilege": false
 			}
 		]
 	}
 
 =head4 RETURN 参数说明
 
-    参数	类型	说明
+	参数	类型	说明
 	errcode	int32	返回码
 	errmsg	string	错误码描述
-	account_list	obj[]	帐号信息列表
-	account_list.open_kfid	string	客服帐号ID
+	account_list	obj[]	账号信息列表
+	account_list.open_kfid	string	客服账号ID
 	account_list.name	string	客服名称
 	account_list.avatar	string	客服头像URL
+	account_list.manage_privilege	bool	当前调用接口的应用身份，是否有该客服账号的管理权限（编辑客服账号信息、分配会话和收发消息）。组件应用不返回此字段
 
 =cut
 

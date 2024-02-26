@@ -22,97 +22,97 @@ name: Locale-CLDR-Locales-Ar
 provides:
   Locale::CLDR::Locales::Ar:
     file: lib/Locale/CLDR/Locales/Ar.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Ar::Any:
-    file: lib/Locale/CLDR/Locales/Ar/Any.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Ar::Any::001:
-    file: lib/Locale/CLDR/Locales/Ar/Any/001.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Ar::Any::Ae:
-    file: lib/Locale/CLDR/Locales/Ar/Any/Ae.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Ar::Any::Bh:
-    file: lib/Locale/CLDR/Locales/Ar/Any/Bh.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Ar::Any::Dj:
-    file: lib/Locale/CLDR/Locales/Ar/Any/Dj.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Ar::Any::Dz:
-    file: lib/Locale/CLDR/Locales/Ar/Any/Dz.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Ar::Any::Eg:
-    file: lib/Locale/CLDR/Locales/Ar/Any/Eg.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Ar::Any::Eh:
-    file: lib/Locale/CLDR/Locales/Ar/Any/Eh.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Ar::Any::Er:
-    file: lib/Locale/CLDR/Locales/Ar/Any/Er.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Ar::Any::Il:
-    file: lib/Locale/CLDR/Locales/Ar/Any/Il.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Ar::Any::Iq:
-    file: lib/Locale/CLDR/Locales/Ar/Any/Iq.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Ar::Any::Jo:
-    file: lib/Locale/CLDR/Locales/Ar/Any/Jo.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Ar::Any::Km:
-    file: lib/Locale/CLDR/Locales/Ar/Any/Km.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Ar::Any::Kw:
-    file: lib/Locale/CLDR/Locales/Ar/Any/Kw.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Ar::Any::Lb:
-    file: lib/Locale/CLDR/Locales/Ar/Any/Lb.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Ar::Any::Ly:
-    file: lib/Locale/CLDR/Locales/Ar/Any/Ly.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Ar::Any::Ma:
-    file: lib/Locale/CLDR/Locales/Ar/Any/Ma.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Ar::Any::Mr:
-    file: lib/Locale/CLDR/Locales/Ar/Any/Mr.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Ar::Any::Om:
-    file: lib/Locale/CLDR/Locales/Ar/Any/Om.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Ar::Any::Ps:
-    file: lib/Locale/CLDR/Locales/Ar/Any/Ps.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Ar::Any::Qa:
-    file: lib/Locale/CLDR/Locales/Ar/Any/Qa.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Ar::Any::Sa:
-    file: lib/Locale/CLDR/Locales/Ar/Any/Sa.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Ar::Any::Sd:
-    file: lib/Locale/CLDR/Locales/Ar/Any/Sd.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Ar::Any::So:
-    file: lib/Locale/CLDR/Locales/Ar/Any/So.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Ar::Any::Ss:
-    file: lib/Locale/CLDR/Locales/Ar/Any/Ss.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Ar::Any::Sy:
-    file: lib/Locale/CLDR/Locales/Ar/Any/Sy.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Ar::Any::Td:
-    file: lib/Locale/CLDR/Locales/Ar/Any/Td.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Ar::Any::Tn:
-    file: lib/Locale/CLDR/Locales/Ar/Any/Tn.pm
-    version: v0.40.1
-  Locale::CLDR::Locales::Ar::Any::Ye:
-    file: lib/Locale/CLDR/Locales/Ar/Any/Ye.pm
-    version: v0.40.1
+    version: v0.44.0
+  Locale::CLDR::Locales::Ar::Arab:
+    file: lib/Locale/CLDR/Locales/Ar/Arab.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Ar::Arab::001:
+    file: lib/Locale/CLDR/Locales/Ar/Arab/001.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Ar::Arab::Ae:
+    file: lib/Locale/CLDR/Locales/Ar/Arab/Ae.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Ar::Arab::Bh:
+    file: lib/Locale/CLDR/Locales/Ar/Arab/Bh.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Ar::Arab::Dj:
+    file: lib/Locale/CLDR/Locales/Ar/Arab/Dj.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Ar::Arab::Dz:
+    file: lib/Locale/CLDR/Locales/Ar/Arab/Dz.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Ar::Arab::Eg:
+    file: lib/Locale/CLDR/Locales/Ar/Arab/Eg.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Ar::Arab::Eh:
+    file: lib/Locale/CLDR/Locales/Ar/Arab/Eh.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Ar::Arab::Er:
+    file: lib/Locale/CLDR/Locales/Ar/Arab/Er.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Ar::Arab::Il:
+    file: lib/Locale/CLDR/Locales/Ar/Arab/Il.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Ar::Arab::Iq:
+    file: lib/Locale/CLDR/Locales/Ar/Arab/Iq.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Ar::Arab::Jo:
+    file: lib/Locale/CLDR/Locales/Ar/Arab/Jo.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Ar::Arab::Km:
+    file: lib/Locale/CLDR/Locales/Ar/Arab/Km.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Ar::Arab::Kw:
+    file: lib/Locale/CLDR/Locales/Ar/Arab/Kw.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Ar::Arab::Lb:
+    file: lib/Locale/CLDR/Locales/Ar/Arab/Lb.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Ar::Arab::Ly:
+    file: lib/Locale/CLDR/Locales/Ar/Arab/Ly.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Ar::Arab::Ma:
+    file: lib/Locale/CLDR/Locales/Ar/Arab/Ma.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Ar::Arab::Mr:
+    file: lib/Locale/CLDR/Locales/Ar/Arab/Mr.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Ar::Arab::Om:
+    file: lib/Locale/CLDR/Locales/Ar/Arab/Om.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Ar::Arab::Ps:
+    file: lib/Locale/CLDR/Locales/Ar/Arab/Ps.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Ar::Arab::Qa:
+    file: lib/Locale/CLDR/Locales/Ar/Arab/Qa.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Ar::Arab::Sa:
+    file: lib/Locale/CLDR/Locales/Ar/Arab/Sa.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Ar::Arab::Sd:
+    file: lib/Locale/CLDR/Locales/Ar/Arab/Sd.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Ar::Arab::So:
+    file: lib/Locale/CLDR/Locales/Ar/Arab/So.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Ar::Arab::Ss:
+    file: lib/Locale/CLDR/Locales/Ar/Arab/Ss.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Ar::Arab::Sy:
+    file: lib/Locale/CLDR/Locales/Ar/Arab/Sy.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Ar::Arab::Td:
+    file: lib/Locale/CLDR/Locales/Ar/Arab/Td.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Ar::Arab::Tn:
+    file: lib/Locale/CLDR/Locales/Ar/Arab/Tn.pm
+    version: v0.44.0
+  Locale::CLDR::Locales::Ar::Arab::Ye:
+    file: lib/Locale/CLDR/Locales/Ar/Arab/Ye.pm
+    version: v0.44.0
 requires:
   DateTime: '0.72'
-  Locale::CLDR: v0.40.1
+  Locale::CLDR: v0.44.0
   Moo: '2'
   MooX::ClassAttribute: '0.011'
   Type::Tiny: '0'
@@ -122,5 +122,5 @@ resources:
   bugtracker: https://github.com/ThePilgrim/perlcldr/issues
   homepage: https://github.com/ThePilgrim/perlcldr
   repository: https://github.com/ThePilgrim/perlcldr.git
-version: v0.40.1
+version: v0.44.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

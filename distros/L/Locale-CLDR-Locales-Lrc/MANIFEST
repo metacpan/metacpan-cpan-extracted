@@ -1,8 +1,8 @@
 Build.PL
 lib/Locale/CLDR/Locales/Lrc.pm
-lib/Locale/CLDR/Locales/Lrc/Any.pm
-lib/Locale/CLDR/Locales/Lrc/Any/Iq.pm
-lib/Locale/CLDR/Locales/Lrc/Any/Ir.pm
+lib/Locale/CLDR/Locales/Lrc/Arab.pm
+lib/Locale/CLDR/Locales/Lrc/Arab/Iq.pm
+lib/Locale/CLDR/Locales/Lrc/Arab/Ir.pm
 MANIFEST			This list of files
 README
 t/00-load.t

@@ -12,6 +12,9 @@
 /* fdatasync(2) is available */
 #undef HAVE_FDATASYNC
 
+/* fexecve(2) is available */
+#undef HAVE_FEXECVE
+
 /* futimes(2) is available */
 #undef HAVE_FUTIMES
 
@@ -36,7 +39,7 @@
 /* Define to 1 if you have the <minix/config.h> header file. */
 #undef HAVE_MINIX_CONFIG_H
 
-/* mount/umount are available */
+/* mount is available */
 #undef HAVE_MOUNT
 
 /* pipe2(2) is available */
@@ -137,6 +140,9 @@
 
 /* timerfd_*(2) are available */
 #undef HAVE_TIMERFD
+
+/* umount is available */
+#undef HAVE_UMOUNT
 
 /* umount2 is available */
 #undef HAVE_UMOUNT2

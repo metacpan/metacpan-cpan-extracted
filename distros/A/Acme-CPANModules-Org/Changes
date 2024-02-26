@@ -1,3 +1,10 @@
+0.005   2023-10-29  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Tweak Abstract (add 'List of ...') to follow convention.
+
+
 0.004   2021-05-17  Released-By: PERLANCAR; Urgency: medium
 
 	- Add entry: App::orgdaemon.

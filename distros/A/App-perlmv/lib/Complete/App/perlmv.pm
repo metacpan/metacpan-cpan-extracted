@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-15'; # DATE
+our $DATE = '2023-11-17'; # DATE
 our $DIST = 'App-perlmv'; # DIST
-our $VERSION = '0.608'; # VERSION
+our $VERSION = '0.609'; # VERSION
 
 use Exporter 'import';
 our @EXPORT_OK = qw(
@@ -62,7 +62,7 @@ Complete::App::perlmv - Completion routines related to App::perlmv
 
 =head1 VERSION
 
-This document describes version 0.608 of Complete::App::perlmv (from Perl distribution App-perlmv), released on 2023-07-15.
+This document describes version 0.609 of Complete::App::perlmv (from Perl distribution App-perlmv), released on 2023-11-17.
 
 =head1 FUNCTIONS
 

@@ -1,9 +1,11 @@
 package Acme::CPANModules::OrganizingCPAN;
 
+use strict;
+
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-06-03'; # DATE
+our $DATE = '2023-10-29'; # DATE
 our $DIST = 'Acme-CPANModules-OrganizingCPAN'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use strict;
 use Acme::CPANModulesUtil::Misc;
@@ -47,19 +49,19 @@ author post about a module she plans to release, or perhaps just an idea of a
 module, to get input on name, interface, or what have you. Alternatively, the
 usual places where Perl communities hang out can be used for this use-case,
 including the Perl subreddit (<https://reddit.com/r/perl>), IRC channels (see
-<https://irc.perl.org>), or PerlMonks (https://www.perlmonks.org>).
+<https://irc.perl.org>), or PerlMonks (<https://www.perlmonks.org>).
 
 _
 
 our $LIST = {
-    summary => "Efforts to organize CPAN",
+    summary => "List of efforts to organize CPAN",
     description => $text,
 };
 
 Acme::CPANModulesUtil::Misc::populate_entries_from_module_links_in_description;
 
 1;
-# ABSTRACT: Efforts to organize CPAN
+# ABSTRACT: List of efforts to organize CPAN
 
 __END__
 
@@ -69,11 +71,11 @@ __END__
 
 =head1 NAME
 
-Acme::CPANModules::OrganizingCPAN - Efforts to organize CPAN
+Acme::CPANModules::OrganizingCPAN - List of efforts to organize CPAN
 
 =head1 VERSION
 
-This document describes version 0.001 of Acme::CPANModules::OrganizingCPAN (from Perl distribution Acme-CPANModules-OrganizingCPAN), released on 2021-06-03.
+This document describes version 0.002 of Acme::CPANModules::OrganizingCPAN (from Perl distribution Acme-CPANModules-OrganizingCPAN), released on 2023-10-29.
 
 =head1 DESCRIPTION
 
@@ -115,17 +117,23 @@ author post about a module she plans to release, or perhaps just an idea of a
 module, to get input on name, interface, or what have you. Alternatively, the
 usual places where Perl communities hang out can be used for this use-case,
 including the Perl subreddit (L<https://reddit.com/r/perl>), IRC channels (see
-L<https://irc.perl.org>), or PerlMonks (https://www.perlmonks.org>).
+L<https://irc.perl.org>), or PerlMonks (L<https://www.perlmonks.org>).
 
-=head1 ACME::MODULES ENTRIES
+=head1 ACME::CPANMODULES ENTRIES
 
 =over
 
-=item * L<Task>
+=item L<Task>
 
-=item * L<Acme::CPANAuthors>
+Author: L<ADAMK|https://metacpan.org/author/ADAMK>
 
-=item * L<Acme::CPANModules>
+=item L<Acme::CPANAuthors>
+
+Author: L<ISHIGAKI|https://metacpan.org/author/ISHIGAKI>
+
+=item L<Acme::CPANModules>
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
 =back
 
@@ -161,6 +169,8 @@ or directly:
 This Acme::CPANModules module also helps L<lcpan> produce a more meaningful
 result for C<lcpan related-mods> command when it comes to finding related
 modules for the modules listed in this Acme::CPANModules module.
+See L<App::lcpan::Cmd::related_mods> for more details on how "related modules"
+are found.
 
 =head1 HOMEPAGE
 
@@ -169,14 +179,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Acme-CPANM
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Acme-CPANModules-OrganizingCPAN>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-OrganizingCPAN>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -188,11 +190,37 @@ L<cpanmodules> - CLI tool to let you browse/view the lists
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-OrganizingCPAN>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

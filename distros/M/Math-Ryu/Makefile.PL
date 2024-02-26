@@ -56,7 +56,7 @@ if($defines =~ /\-DCOMPILER/ && !$avoid_generic_128) {
     my $make = $Config::Config{make};
     my $cc = $Config::Config{cc};
     my @flags = ("CC=$cc");
-    push(@flags, "CFLAGS=-fPIC") if $Config::Config{cccdlflags} =~ /\-fPIC/;
+    push(@flags, "CFLAGS=-fPIC -std=c99") if $Config::Config{cccdlflags} =~ /\-fPIC/;
     system($make, @flags);
   }
 

@@ -8,7 +8,7 @@ QQ::weixin::work::dial
 
 =head1 DESCRIPTION
 
-企业微信公费电话
+公费电话
 
 =cut
 
@@ -19,7 +19,7 @@ use LWP::UserAgent;
 use JSON;
 use utf8;
 
-our $VERSION = '0.06';
+our $VERSION = '0.10';
 our @EXPORT = qw/ get_dial_record /;
 
 =head1 FUNCTION
@@ -27,6 +27,7 @@ our @EXPORT = qw/ get_dial_record /;
 =head2 get_dial_record(access_token, hash);
 
 获取公费电话拨打记录
+最后更新：2023/11/30
 
 =head2 SYNOPSIS
 
@@ -47,7 +48,7 @@ L<https://developer.work.weixin.qq.com/document/path/93662>
 
 =head4 参数说明：
 
-    参数	            必须	说明
+	参数	            必须	说明
     access_token	是	调用接口凭证
     start_time	否	查询的起始时间戳
     end_time	否	查询的结束时间戳
@@ -60,8 +61,12 @@ L<https://developer.work.weixin.qq.com/document/path/93662>
 
 =head4 权限说明：
 
-企业需要使用公费电话secret所获取的accesstoken来调用（accesstoken如何获取？）；
-暂不支持第三方调用
+	应用类型	权限要求
+	自建应用	配置到「公费电话 - 可调用接口的应用」中
+	代开发应用	暂不支持
+	第三方应用	暂不支持
+
+注： 从2023年12月1日0点起，不再支持通过系统应用secret调用接口，存量企业暂不受影响 查看详情
 
 =head3 RETURN 返回结果：
 
@@ -110,7 +115,7 @@ L<https://developer.work.weixin.qq.com/document/path/93662>
 
 =head4 RETURN 参数说明：
 
-    参数	        说明
+	参数	        说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	record.call_time	拨出时间
@@ -122,6 +127,7 @@ L<https://developer.work.weixin.qq.com/document/path/93662>
 	record.callee.phone	被叫用户的号码，当被叫用户为外部用户时返回
 	record.callee.duration	被叫用户的通话时长
 
+应用可见范围外用户相关的record会被过滤掉，不会返回
 通话类型为单人通话时，总通话时长等于单人通话时长，通话类型为多人通话时，总通话时长等于包括主叫用户在内的每个接入用户的通话时长之和。
 
 =cut

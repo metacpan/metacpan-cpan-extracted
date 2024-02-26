@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Sa - Package for language Sanskrit
 
 package Locale::CLDR::Locales::Sa;
 # This file auto generated from Data\common\main\sa.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -217,9 +217,9 @@ has 'characters' => (
 		return {
 			auxiliary => qr{[‌‍ ऍ ऑ ॅ ॉ]},
 			index => ['अ', 'आ', 'इ', 'ई', 'उ', 'ऊ', 'ऋ', 'ॠ', 'ऌ', 'ॡ', 'ए', 'ऐ', 'ओ', 'औ', 'क', 'ख', 'ग', 'घ', 'ङ', 'च', 'छ', 'ज', 'झ', 'ञ', 'ट', 'ठ', 'ड', 'ढ', 'ण', 'त', 'थ', 'द', 'ध', 'न', 'प', 'फ', 'ब', 'भ', 'म', 'य', 'र', 'ल', 'ळ', 'व', 'श', 'ष', 'स', 'ह'],
-			main => qr{[॒॑ ़ ँ ं ः ॐ अ आ इ ई उ ऊ ऋ ॠ ऌ ॡ ए ऐ ओ औ क ख ग घ ङ च छ ज झ ञ ट ठ ड ढ ण त थ द ध न प फ ब भ म य र ल ळ व श ष स ह ऽ ा ि ी ु ू ृ ॄ ॢ ॣ े ै ो ौ ्]},
+			main => qr{[॑ ॒ ़ ँ ंः ॐ अ आ इ ई उ ऊ ऋ ॠ ऌ ॡ ए ऐ ओ औ क ख ग घ ङ च छ ज झ ञ ट ठ ड ढ ण त थ द ध न प फ ब भ म य र ल ळ व श ष स ह ऽ ा ि ी ु ू ृ ॄ ॢ ॣ े ै ो ौ ्]},
 			numbers => qr{[\- ‑ , . % ‰ + 0० 1१ 2२ 3३ 4४ 5५ 6६ 7७ 8८ 9९]},
-			punctuation => qr{[_ \- ‑ – — , ; \: ! ? . … ' ‘ ’ " “ ” ( ) \[ \] \{ \} § @ * / \\ \& # ′ ″ ` + | ~]},
+			punctuation => qr{[_ \- ‑ – — , ; \: ! ? . … '‘’ "“” ( ) \[ \] \{ \} § @ * / \\ \& # ′ ″ ` + | ~]},
 		};
 	},
 EOT
@@ -265,33 +265,6 @@ has native_numbering_system => (
 	isa			=> Str,
 	init_arg	=> undef,
 	default		=> 'deva',
-);
-
-has 'minimum_grouping_digits' => (
-	is			=>'ro',
-	isa			=> Int,
-	init_arg	=> undef,
-	default		=> 1,
-);
-
-has 'number_symbols' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'latn' => {
-			'decimal' => q(.),
-			'exponential' => q(E),
-			'group' => q(,),
-			'infinity' => q(∞),
-			'minusSign' => q(-),
-			'nan' => q(NaN),
-			'perMille' => q(‰),
-			'percentSign' => q(%),
-			'plusSign' => q(+),
-			'superscriptingExponent' => q(×),
-		},
-	} }
 );
 
 has 'number_formats' => (
@@ -349,54 +322,41 @@ has 'currencies' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'BRL' => {
-			symbol => 'R$',
 			display_name => {
 				'currency' => q(ब्राजीली रियाल),
-				'other' => q(ब्राजीली रियाल),
 			},
 		},
 		'CNY' => {
-			symbol => '¥',
 			display_name => {
 				'currency' => q(चीनी युआन),
-				'other' => q(चीनी युआन),
 			},
 		},
 		'EUR' => {
 			display_name => {
 				'currency' => q(फिरङ्गिन् मुद्रा),
-				'other' => q(फिरङ्गिन् मुद्रा),
 			},
 		},
 		'GBP' => {
-			symbol => '£',
 			display_name => {
 				'currency' => q(आङ्ग्लदेशीयः पाउंड),
-				'other' => q(आङ्ग्लदेशीयः पाउंड),
 			},
 		},
 		'INR' => {
-			symbol => '₹',
 			display_name => {
 				'currency' => q(भारतीय रूप्यकम्),
-				'other' => q(भारतीय रूप्यकम्),
 			},
 		},
 		'JPY' => {
-			symbol => '¥',
 			display_name => {
 				'currency' => q(जापानी येन),
-				'other' => q(जापानी येन),
 			},
 		},
 		'RUB' => {
 			display_name => {
 				'currency' => q(रष्यदेशीय रूबल),
-				'other' => q(रष्यदेशीय रूबल),
 			},
 		},
 		'USD' => {
-			symbol => 'US$',
 			display_name => {
 				'currency' => q(यूएस डॉलर),
 				'other' => q(अमेरिकादेशः डॉलर),
@@ -477,65 +437,6 @@ has 'calendar_months' => (
 						],
 					},
 				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'जनवरी:',
-							'फरवरी:',
-							'मार्च:',
-							'अप्रैल:',
-							'मई',
-							'जून:',
-							'जुलाई:',
-							'अगस्त:',
-							'सितंबर:',
-							'अक्तूबर:',
-							'नवंबर:',
-							'दिसंबर:'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'जनवरीमासः',
-							'फरवरीमासः',
-							'मार्चमासः',
-							'अप्रैलमासः',
-							'मईमासः',
-							'जूनमासः',
-							'जुलाईमासः',
-							'अगस्तमासः',
-							'सितंबरमासः',
-							'अक्तूबरमासः',
-							'नवंबरमासः',
-							'दिसंबरमासः'
-						],
-						leap => [
-							
-						],
-					},
-				},
 			},
 	} },
 );
@@ -556,15 +457,6 @@ has 'calendar_days' => (
 						sat => 'शनि',
 						sun => 'रवि'
 					},
-					narrow => {
-						mon => 'सो',
-						tue => 'मं',
-						wed => 'बु',
-						thu => 'गु',
-						fri => 'शु',
-						sat => 'श',
-						sun => 'र'
-					},
 					short => {
 						mon => 'Mon',
 						tue => 'Tue',
@@ -585,15 +477,6 @@ has 'calendar_days' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						mon => 'सोम',
-						tue => 'मंगल',
-						wed => 'बुध',
-						thu => 'गुरु',
-						fri => 'शुक्र',
-						sat => 'शनि',
-						sun => 'रवि'
-					},
 					narrow => {
 						mon => 'सो',
 						tue => 'मं',
@@ -602,24 +485,6 @@ has 'calendar_days' => (
 						fri => 'शु',
 						sat => 'श',
 						sun => 'र'
-					},
-					short => {
-						mon => 'Mon',
-						tue => 'Tue',
-						wed => 'Wed',
-						thu => 'Thu',
-						fri => 'Fri',
-						sat => 'Sat',
-						sun => 'Sun'
-					},
-					wide => {
-						mon => 'सोमवासरः',
-						tue => 'मंगलवासरः',
-						wed => 'बुधवासरः',
-						thu => 'गुरुवासर:',
-						fri => 'शुक्रवासरः',
-						sat => 'शनिवासरः',
-						sun => 'रविवासरः'
 					},
 				},
 			},
@@ -638,28 +503,6 @@ has 'calendar_quarters' => (
 						2 => 'त्रैमासिक3',
 						3 => 'त्रैमासिक4'
 					},
-					narrow => {0 => '1',
-						1 => '2',
-						2 => '3',
-						3 => '4'
-					},
-					wide => {0 => 'प्रथम त्रैमासिक',
-						1 => 'द्वितीय त्रैमासिक',
-						2 => 'तृतीय त्रैमासिक',
-						3 => 'चतुर्थ त्रैमासिक'
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {0 => 'त्रैमासिक1',
-						1 => 'त्रैमासिक2',
-						2 => 'त्रैमासिक3',
-						3 => 'त्रैमासिक4'
-					},
-					narrow => {0 => '1',
-						1 => '2',
-						2 => '3',
-						3 => '4'
-					},
 					wide => {0 => 'प्रथम त्रैमासिक',
 						1 => 'द्वितीय त्रैमासिक',
 						2 => 'तृतीय त्रैमासिक',
@@ -677,31 +520,9 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'am' => q{AM},
-					'pm' => q{PM},
-				},
-				'narrow' => {
-					'am' => q{AM},
-					'pm' => q{PM},
-				},
 				'wide' => {
 					'am' => q{पूर्वाह्न},
 					'pm' => q{अपराह्न},
-				},
-			},
-			'stand-alone' => {
-				'abbreviated' => {
-					'am' => q{AM},
-					'pm' => q{PM},
-				},
-				'narrow' => {
-					'am' => q{AM},
-					'pm' => q{PM},
-				},
-				'wide' => {
-					'am' => q{AM},
-					'pm' => q{PM},
 				},
 			},
 		},
@@ -716,13 +537,6 @@ has 'eras' => (
 		'generic' => {
 		},
 		'gregorian' => {
-			abbreviated => {
-				'0' => 'BCE'
-			},
-			wide => {
-				'0' => 'BCE',
-				'1' => 'CE'
-			},
 		},
 	} },
 );
@@ -773,14 +587,14 @@ has 'datetime_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-			'full' => q{{1} तेन {0}},
-			'long' => q{{1} तेन {0}},
+			'full' => q{{1}, {0}},
+			'long' => q{{1}, {0}},
 			'medium' => q{{1}, {0}},
 			'short' => q{{1}, {0}},
 		},
 		'gregorian' => {
-			'full' => q{{1} तदा {0}},
-			'long' => q{{1} तदा {0}},
+			'full' => q{{1}, {0}},
+			'long' => q{{1}, {0}},
 			'medium' => q{{1}, {0}},
 			'short' => q{{1}, {0}},
 		},
@@ -796,39 +610,19 @@ has 'datetime_formats_available_formats' => (
 			Bh => q{B h},
 			Bhm => q{B h:mm},
 			Bhms => q{B h:mm:ss},
-			E => q{ccc},
 			EBhm => q{E B h:mm},
 			EBhms => q{E B h:mm:ss},
-			EHm => q{E HH:mm},
-			EHms => q{E HH:mm:ss},
 			Ed => q{E d},
-			Ehm => q{E h:mm a},
-			Ehms => q{E h:mm:ss a},
 			Gy => q{y G},
 			GyMMM => q{MMM G y},
 			GyMMMEd => q{E, d MMM y G},
 			GyMMMd => q{d MMM y G},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			Hmsv => q{HH:mm:ss v},
-			Hmv => q{HH:mm v},
-			M => q{L},
 			MEd => q{E, d/M},
-			MMM => q{LLL},
 			MMMEd => q{E, d MMM},
 			MMMMW => q{'week' W 'of' MMM},
 			MMMMd => q{d MMMM},
 			MMMd => q{d MMM},
 			Md => q{d/M},
-			d => q{d},
-			h => q{h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			hmsv => q{h:mm:ss a v},
-			hmv => q{h:mm a v},
-			ms => q{mm:ss},
-			y => q{y},
 			yM => q{M/y},
 			yMEd => q{E, d/M/y},
 			yMMM => q{MMM y},
@@ -838,7 +632,6 @@ has 'datetime_formats_available_formats' => (
 			yMd => q{d/M/y},
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
-			yw => q{'week' w 'of' Y},
 		},
 	} },
 );
@@ -848,9 +641,6 @@ has 'datetime_formats_append_item' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			'Timezone' => '{0} {1}',
-		},
 	} },
 );
 
@@ -863,99 +653,7 @@ has 'datetime_formats_interval' => (
 			fallback => '{0}-{1}',
 		},
 		'gregorian' => {
-			H => {
-				H => q{HH–HH},
-			},
-			Hm => {
-				H => q{HH:mm–HH:mm},
-				m => q{HH:mm–HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm–HH:mm v},
-				m => q{HH:mm–HH:mm v},
-			},
-			Hv => {
-				H => q{HH–HH v},
-			},
-			M => {
-				M => q{MM–MM},
-			},
-			MEd => {
-				M => q{MM-dd, E – MM-dd, E},
-				d => q{MM-dd, E – MM-dd, E},
-			},
-			MMM => {
-				M => q{LLL–LLL},
-			},
-			MMMEd => {
-				M => q{MMM d, E – MMM d, E},
-				d => q{MMM d, E – MMM d, E},
-			},
-			MMMd => {
-				M => q{MMM d – MMM d},
-				d => q{MMM d–d},
-			},
-			Md => {
-				M => q{MM-dd – MM-dd},
-				d => q{MM-dd – MM-dd},
-			},
-			d => {
-				d => q{d–d},
-			},
 			fallback => '{0} – {1}',
-			h => {
-				a => q{h a – h a},
-				h => q{h–h a},
-			},
-			hm => {
-				a => q{h:mm a – h:mm a},
-				h => q{h:mm–h:mm a},
-				m => q{h:mm–h:mm a},
-			},
-			hmv => {
-				a => q{h:mm a – h:mm a v},
-				h => q{h:mm–h:mm a v},
-				m => q{h:mm–h:mm a v},
-			},
-			hv => {
-				a => q{h a – h a v},
-				h => q{h–h a v},
-			},
-			y => {
-				y => q{y–y},
-			},
-			yM => {
-				M => q{y-MM – y-MM},
-				y => q{y-MM – y-MM},
-			},
-			yMEd => {
-				M => q{y-MM-dd, E – y-MM-dd, E},
-				d => q{y-MM-dd, E – y-MM-dd, E},
-				y => q{y-MM-dd, E – y-MM-dd, E},
-			},
-			yMMM => {
-				M => q{y MMM–MMM},
-				y => q{y MMM – y MMM},
-			},
-			yMMMEd => {
-				M => q{y MMM d, E – MMM d, E},
-				d => q{y MMM d, E – MMM d, E},
-				y => q{y MMM d, E – y MMM d, E},
-			},
-			yMMMM => {
-				M => q{y MMMM–MMMM},
-				y => q{y MMMM – y MMMM},
-			},
-			yMMMd => {
-				M => q{y MMM d – MMM d},
-				d => q{y MMM d–d},
-				y => q{y MMM d – y MMM d},
-			},
-			yMd => {
-				M => q{y-MM-dd – y-MM-dd},
-				d => q{y-MM-dd – y-MM-dd},
-				y => q{y-MM-dd – y-MM-dd},
-			},
 		},
 	} },
 );
@@ -965,9 +663,11 @@ has 'time_zone_names' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default	=> sub { {
+		gmtFormat => q(जी.एम.टी. {0}),
+		gmtZeroFormat => q(जी.एम.टी.),
 		regionFormat => q({0} समय:),
-		regionFormat => q({0} डेलाइट समय:),
-		regionFormat => q({0} मानक समय:),
+		regionFormat => q({0} अयामसमयः),
+		regionFormat => q({0} प्रमाणसमयः),
 		'America_Central' => {
 			long => {
 				'daylight' => q#उत्तर अमेरिका: मध्य अयाम समयः#,

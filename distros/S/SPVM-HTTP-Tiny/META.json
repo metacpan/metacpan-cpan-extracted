@@ -1,0 +1,54 @@
+{
+   "abstract" : "HTTP Client",
+   "author" : [
+      "Yuki Kimoto<kimoto.yuki@gmail.com"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "SPVM-HTTP-Tiny",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "SPVM" : "0.9706"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "SPVM" : "0.9706",
+            "SPVM::File::Temp" : "0.021",
+            "SPVM::IO" : "0.211",
+            "SPVM::Mozilla::CA" : "0.001",
+            "SPVM::Regex" : "0.243"
+         }
+      },
+      "test" : {
+         "requires" : {}
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git"
+      }
+   },
+   "version" : "0.001",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

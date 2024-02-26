@@ -1,0 +1,99 @@
+use alienfile;
+use File::Spec;
+use File::chdir;
+use Path::Tiny;
+use Config;
+
+# replace this with your own system probe.
+# See Alien::Build::Plugin::Probe and
+# Alien::Build::Plugin::PkgConfig for common
+# probe plugins.
+probe sub { 'share' };
+
+share {
+  requires 'Alien::bison';
+  requires 'Alien::flex';
+  requires 'Alien::git';
+  requires 'Alien::Build::CommandSequence';
+
+  # `Download::GitHub` does not work at this time because the GitHub tarballs do
+  # not contain submodules. See <https://github.com/dear-github/dear-github/issues/214>.
+  start_url 'https://github.com/sisinflab-swot/cowl.git';
+  plugin 'Download::Git' => (
+    version => qr/\Av(\Q0.7.0\E)\z/,
+  );
+
+  # Need to fetch the submodules too.
+  meta->around_hook( fetch => sub {
+    my $orig  = shift;
+    my $build = shift;
+    my $data  = $orig->($build, @_);
+
+    if( $data->{type} eq 'file' ) {
+      local $CWD = $data->{path};
+      $build->log("In $CWD");
+      $build->system(
+        '%{git}',
+        qw(submodule update),
+        qw(--init --recursive),
+      );
+    }
+
+    return $data;
+  });
+
+  patch sub {
+    # See <https://github.com/sisinflab-swot/cowl/pull/9>.
+    my $needle = q|add_subdirectory("${COWL_DOCS_DIR}")|;
+    my $install_targets = q|install(TARGETS cowl ulib)|;
+    Path::Tiny->new('CMakeLists.txt')->edit_utf8(sub {
+      s/\Q$needle\E/$install_targets\n\n$&/s;
+    });
+  };
+
+  plugin 'Build::CMake';
+  my $build_dir = '_build';
+  build [
+    # Static build
+    [
+      '%{cmake}', @{ meta->prop->{plugin_build_cmake}->{args} },
+        qw(-S), '%{.install.extract}',
+        qw(-B), "${build_dir}_static",
+        '-DCOWL_LIBRARY_TYPE=STATIC',
+    ],
+    [ '%{make}', qw( -C ), "${build_dir}_static" ],
+    [ '%{make}', qw( -C ), "${build_dir}_static", 'install' ],
+
+    # Dynamic build
+    [
+      '%{cmake}', @{ meta->prop->{plugin_build_cmake}->{args} },
+        qw(-S), '%{.install.extract}',
+        qw(-B), "${build_dir}_shared",
+        '-DCOWL_LIBRARY_TYPE=SHARED',
+    ],
+    [ '%{make}', qw( -C ), "${build_dir}_shared" ],
+    [ '%{make}', qw( -C ), "${build_dir}_shared", 'install' ],
+  ];
+
+  plugin 'Gather::IsolateDynamic';
+
+  # There is no pkg-config .pc file in the original upstream version.
+  after 'gather' => sub {
+    my($build) = @_;
+
+    my $prefix = $build->runtime_prop->{prefix};
+
+    my $ulib_a = path('lib', 'ulib' . $Config::Config{_a});
+    if( -f $ulib_a ) {
+      my $libulib_a = $ulib_a->sibling('libulib' . $Config::Config{_a} );
+      $build->log( "Renaming $ulib_a to $libulib_a" );
+      $ulib_a->move( $libulib_a );
+    }
+
+    my $cflags_path = path($prefix, qw(include));
+    my $libs_path   = path($prefix, qw(lib));
+
+    $build->runtime_prop->{cflags}        = join " ", "-I$cflags_path";
+    $build->runtime_prop->{libs}          = join " ", "-L$libs_path", qw(-lcowl -lulib);
+  };
+}

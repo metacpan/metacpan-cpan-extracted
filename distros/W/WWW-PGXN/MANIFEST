@@ -6,10 +6,7 @@ lib/WWW/PGXN/Extension.pm
 lib/WWW/PGXN/Mirror.pm
 lib/WWW/PGXN/Tag.pm
 lib/WWW/PGXN/User.pm
-Makefile.PL
 MANIFEST			This list of files
-META.json
-META.yml
 README.md
 t/base.t
 t/dist.t
@@ -38,3 +35,6 @@ t/stats.t
 t/tag.t
 t/user.t
 t/userlist.t
+Makefile.PL
+META.yml
+META.json

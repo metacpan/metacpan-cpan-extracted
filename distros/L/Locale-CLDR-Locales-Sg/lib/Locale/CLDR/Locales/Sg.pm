@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Sg - Package for language Sango
 
 package Locale::CLDR::Locales::Sg;
 # This file auto generated from Data\common\main\sg.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -332,8 +332,7 @@ has 'characters' => (
 		return {
 			auxiliary => qr{[c q x]},
 			index => ['A', 'B', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'Y', 'Z'],
-			main => qr{[a â ä b d e ê ë f g h i î ï j k l m n o ô ö p r s t u ù û ü v w y z]},
-			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			main => qr{[aâä b d eêë f g h iîï j k l m n oôö p r s t uùûü v w y z]},
 		};
 	},
 EOT
@@ -630,9 +629,14 @@ has 'currencies' => (
 				'currency' => q(pôndo tî Zûâ Sênt-Helêna),
 			},
 		},
-		'SLL' => {
+		'SLE' => {
 			display_name => {
 				'currency' => q(leône tî Sierâ-Leône),
+			},
+		},
+		'SLL' => {
+			display_name => {
+				'currency' => q(leône tî Sierâ-Leône \(1964—2022\)),
 			},
 		},
 		'SOS' => {
@@ -854,10 +858,6 @@ has 'day_periods' => (
 					'am' => q{ND},
 					'pm' => q{LK},
 				},
-				'wide' => {
-					'am' => q{ND},
-					'pm' => q{LK},
-				},
 			},
 		},
 	} },
@@ -967,7 +967,6 @@ has 'datetime_formats_available_formats' => (
 			MMdd => q{dd/MM},
 			Md => q{d/M},
 			ms => q{m:ss},
-			y => q{y},
 			yM => q{M/y},
 			yMEd => q{E d/M/y},
 			yMMM => q{MMM y},
@@ -984,19 +983,6 @@ has 'datetime_formats_append_item' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			'Day' => '{0} ({2}: {1})',
-			'Day-Of-Week' => '{0} {1}',
-			'Era' => '{1} {0}',
-			'Hour' => '{0} ({2}: {1})',
-			'Minute' => '{0} ({2}: {1})',
-			'Month' => '{0} ({2}: {1})',
-			'Quarter' => '{0} ({2}: {1})',
-			'Second' => '{0} ({2}: {1})',
-			'Timezone' => '{0} {1}',
-			'Week' => '{0} ({2}: {1})',
-			'Year' => '{1} {0}',
-		},
 	} },
 );
 

@@ -1,12 +1,12 @@
 package Locale::CLDR::RegionContainment;
 # This file auto generated from Data.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -48,7 +48,7 @@ has 'region_contains' => (
 		'145' => [ qw( AE AM AZ BH CY GE IL IQ JO KW LB OM PS QA SA SY TR YE ) ], 
 		'150' => [ qw( 154 155 151 039 ) ], 
 		'151' => [ qw( BG BY CZ HU MD PL RO RU SK UA ) ], 
-		'154' => [ qw( GG IM JE AX DK EE FI FO GB IE IS LT LV NO SE SJ ) ], 
+		'154' => [ qw( GG IM JE AX DK EE FI FO GB IE IS LT LV NO SE SJ CQ ) ], 
 		'155' => [ qw( AT BE CH DE FR LI LU MC NL ) ], 
 		'202' => [ qw( 011 017 014 018 ) ], 
 		'419' => [ qw( 013 029 005 ) ], 
@@ -146,6 +146,7 @@ has 'region_contained_by' => (
 		'CN' => '030', 
 		'CO' => '005', 
 		'CP' => 'QO', 
+		'CQ' => '154', 
 		'CR' => '013', 
 		'CU' => '029', 
 		'CV' => '011', 

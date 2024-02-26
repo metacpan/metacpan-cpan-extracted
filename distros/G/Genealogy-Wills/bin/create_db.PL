@@ -37,18 +37,18 @@ BEGIN {
 }
 
 my $force_flag;
+my $dir = 'lib/Genealogy/Wills/data';
+
 if(defined($ARGV[0]) && ($ARGV[0] eq '-f')) {
 	$force_flag++;
 } elsif($ENV{'AUTOMATED_TESTING'}) {
 	exit;
 }
 
-my $dir = 'lib/Genealogy/Wills';
 if(!-d $dir) {
 	mkdir $dir, 0755;
 }
 
-$dir = "$dir/database";
 my $filename = File::Spec->catdir($dir, 'wills.sql');
 my %normalised;
 
@@ -108,6 +108,7 @@ flush($dbh);
 
 $dbh->commit();
 $dbh->prepare('CREATE INDEX name_index ON wills(first, last)')->execute();
+$dbh->prepare('CREATE INDEX name_index_year ON wills(first, last, year)')->execute();
 $dbh->do('pragma optimize');
 $dbh->disconnect();
 

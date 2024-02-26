@@ -17,6 +17,7 @@ extern "C" {
 } /* extern "C" */
 #endif
 
+#define NEED_newRV_noinc
 #define NEED_my_strlcpy
 #include "ppport.h"
 
@@ -214,13 +215,10 @@ cluster_node *get_node_by_random(pTHX_ Redis__Cluster__Fast self) {
 
 void Redis__Cluster__Fast_run_cmd(pTHX_ Redis__Cluster__Fast self, int argc, const char **argv, size_t *argvlen,
                                   cmd_reply_context_t *reply_t) {
-    char *cmd;
-    int len, status, event_loop_error;
+    int status, event_loop_error;
     pid_t current_pid;
 
     DEBUG_MSG("start: %s", *argv);
-
-    cmd = NULL;
 
     reply_t->done = 0;
     reply_t->self = (void *) self;
@@ -232,20 +230,13 @@ void Redis__Cluster__Fast_run_cmd(pTHX_ Redis__Cluster__Fast self, int argc, con
         DEBUG_MSG("%s", "pid changed");
         if (event_reinit(self->cluster_event_base) != 0) {
             reply_t->error = newSVpvf("%s", "event reinit failed");
-            goto end;
+            return;
         }
         redisClusterAsyncDisconnect(self->acc);
         self->pid = current_pid;
     }
 
-    len = (int) redisFormatCommandArgv(&cmd, argc, argv, argvlen);
-    if (len == -1) {
-        DEBUG_MSG("error: err=%s", "memory error");
-        reply_t->error = newSVpvf("%s", "memory allocation error");
-        goto end;
-    }
-
-    status = redisClusterAsyncFormattedCommand(self->acc, replyCallback, reply_t, cmd, len);
+    status = redisClusterAsyncCommandArgv(self->acc, replyCallback, reply_t, argc, argv, argvlen);
     if (status != REDIS_OK) {
         if (self->acc->err == REDIS_ERR_OTHER &&
             strcmp(self->acc->errstr, "No keys in command(must have keys for redis cluster mode)") == 0) {
@@ -258,19 +249,19 @@ void Redis__Cluster__Fast_run_cmd(pTHX_ Redis__Cluster__Fast self, int argc, con
             node = get_node_by_random(aTHX_ self);
             if (node == NULL) {
                 reply_t->error = newSVpvf("%s", "No node found");
-                goto end;
+                return;
             }
 
-            status = redisClusterAsyncFormattedCommandToNode(self->acc, node, replyCallback, reply_t, cmd, len);
+            status = redisClusterAsyncCommandArgvToNode(self->acc, node, replyCallback, reply_t, argc, argv, argvlen);
             if (status != REDIS_OK) {
                 DEBUG_MSG("error: err=%d errstr=%s", self->acc->err, self->acc->errstr);
                 reply_t->error = newSVpvf("%s", self->acc->errstr);
-                goto end;
+                return;
             }
         } else {
             DEBUG_MSG("error: err=%d errstr=%s", self->acc->err, self->acc->errstr);
             reply_t->error = newSVpvf("%s", self->acc->errstr);
-            goto end;
+            return;
         }
     }
 
@@ -282,10 +273,6 @@ void Redis__Cluster__Fast_run_cmd(pTHX_ Redis__Cluster__Fast self, int argc, con
             break;
         }
     }
-
-end:
-    if (cmd != NULL)
-        hi_free(cmd);
 }
 
 MODULE = Redis::Cluster::Fast    PACKAGE = Redis::Cluster::Fast

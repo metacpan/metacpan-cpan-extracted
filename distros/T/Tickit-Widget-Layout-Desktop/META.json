@@ -4,7 +4,7 @@
       "Tom Molesworth <TEAM@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -38,7 +38,7 @@
             "Test::EOL" : "0",
             "Test::MinimumVersion" : "0",
             "Test::Mojibake" : "0",
-            "Test::More" : "0.96",
+            "Test::More" : "0.88",
             "Test::NoTabs" : "0",
             "Test::Pod" : "1.41",
             "Test::Portability::Files" : "0",
@@ -48,24 +48,14 @@
       "runtime" : {
          "requires" : {
             "List::Util" : "1.29",
-            "Scalar::Util" : "0",
-            "Tickit" : "0.71",
-            "Tickit::ContainerWidget" : "0",
-            "Tickit::RenderBuffer" : "0",
-            "Tickit::SingleChildWidget" : "0",
-            "Tickit::Style" : "0",
-            "Tickit::Utils" : "0",
-            "Tickit::Widget" : "0.54",
+            "List::UtilsBy" : "0",
+            "Tickit" : "0.74",
+            "Tickit::Widget" : "0.58",
             "Tickit::Widget::Menu" : "0",
-            "Tickit::Widget::Menu::Item" : "0",
-            "Tickit::WidgetRole::Movable" : "0.003",
+            "Tickit::WidgetRole::Movable" : "0.004",
             "Variable::Disposition" : "0",
-            "constant" : "0",
             "curry::weak" : "0",
-            "parent" : "0",
-            "strict" : "0",
-            "utf8" : "0",
-            "warnings" : "0"
+            "parent" : "0"
          }
       },
       "test" : {
@@ -78,19 +68,18 @@
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test::CheckDeps" : "0.010",
-            "Test::More" : "0.98",
-            "perl" : "5.006"
+            "Test::More" : "0.98"
          }
       }
    },
    "provides" : {
       "Tickit::Widget::Layout::Desktop" : {
          "file" : "lib/Tickit/Widget/Layout/Desktop.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       },
       "Tickit::Widget::Layout::Desktop::Window" : {
          "file" : "lib/Tickit/Widget/Layout/Desktop/Window.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       }
    },
    "release_status" : "stable",
@@ -105,13 +94,13 @@
          "web" : "https://github.com/team-at-cpan/Tickit-Widget-Layout-Desktop"
       }
    },
-   "version" : "0.012",
+   "version" : "0.013",
    "x_authority" : "cpan:TEAM",
    "x_contributors" : [
       "Tom Molesworth <tom@perlsite.co.uk>"
    ],
-   "x_generated_by_perl" : "v5.32.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.23",
+   "x_generated_by_perl" : "v5.38.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

@@ -19,11 +19,11 @@ WriteMakefile(
     resources => {
       repository => {
         type => 'git',
-        url  => 'https://github.com/davorg/template-provider-pandoc.git',
-        web  => 'https://github.com/davorg/template-provider-pandoc',
+        url  => 'https://github.com/davorg-cpan/template-provider-pandoc.git',
+        web  => 'https://github.com/davorg-cpan/template-provider-pandoc',
       },
       bugtracker => {
-        web  => 'https://github.com/davorg/template-provider-pandoc/issues',
+        web  => 'https://github.com/davorg-cpan/template-provider-pandoc/issues',
       },
     },
   }

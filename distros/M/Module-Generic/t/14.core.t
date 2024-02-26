@@ -34,14 +34,16 @@ my $o = MyObject->new(
 isa_ok( $o, 'MyObject', 'new' );
 my $hash = $o->as_hash;
 diag( "as_hash results in: ", $o->dump( $hash ) ) if( $DEBUG );
-is_deeply( $hash, {
+my $expect_hash = {
     name => 'id',
     total => 12,
     type => 'attribute',
     user_id => '63d36776-c34e-49ad-8d51-02c8abbee3b2',
     value => 'hello',
     version => 'v1.2.3',
-});
+};
+$expect_hash->{debug_level} = 1 if( $DEBUG );
+is_deeply( $hash, $expect_hash);
 if( $DEBUG )
 {
     foreach my $e ( sort( keys( %MyObject:: ) ) )
@@ -659,14 +661,16 @@ subtest "symbols" => sub
     my @all = sort( grep( !/^message$/, grep( /^[a-z]/, $obj->_list_symbols ) ) );
 #     require Data::Pretty;
 #     diag( Data::Pretty::dump( [sort( @all )] ) );
-    is_deeply( \@all => [qw(
+    my $expect = [qw(
         array array_object as_hash callback can clone created
         datetime debug deserialise error error_handler fatal
         file hash id init io ip isa metadata name new
         new_array new_file new_hash new_number new_scalar
         new_tempfile pass_error serialise setget setget_assign
         total trigger_error type uri user_id value version
-    )], '_list_symbols' );
+    )];
+    splice( @$expect, 10, 0, 'dump' ) if( $DEBUG );
+    is_deeply( \@all => $expect, '_list_symbols' );
 };
 
 done_testing();

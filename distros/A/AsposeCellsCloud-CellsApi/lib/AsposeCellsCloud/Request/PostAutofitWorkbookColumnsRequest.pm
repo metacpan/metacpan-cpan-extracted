@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -60,10 +60,10 @@ sub new {
 
 # Run Operation Request
 # PostAutofitWorkbookColumnsRequest.name :   ,
-# PostAutofitWorkbookColumnsRequest.startColumn :   ,
-# PostAutofitWorkbookColumnsRequest.endColumn :   ,
-# PostAutofitWorkbookColumnsRequest.folder :   ,
-# PostAutofitWorkbookColumnsRequest.storageName :    
+# PostAutofitWorkbookColumnsRequest.startColumn : The start column index.  ,
+# PostAutofitWorkbookColumnsRequest.endColumn : The end column index.  ,
+# PostAutofitWorkbookColumnsRequest.folder : The folder where the file is situated.  ,
+# PostAutofitWorkbookColumnsRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_autofit_workbook_columns' } = { 
-    	summary => '',
+    	summary => 'Autofit columns in the workbook.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -140,28 +140,28 @@ __PACKAGE__->method_documentation({
      'start_column' => {
      	datatype => 'int',
      	base_name => 'startColumn',
-     	description => '',
+     	description => 'The start column index.',
      	format => '',
      	read_only => '',
      		},
      'end_column' => {
      	datatype => 'int',
      	base_name => 'endColumn',
-     	description => '',
+     	description => 'The end column index.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

@@ -8,9 +8,9 @@ use AsposeCellsCloud::Request::PostWorksheetCellsRangeUnMerge;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**name** | **string** | The workbook name. |
+**name** | **string** | The file name. |
 **sheet_name** | **string** | The worksheet name. |
-**range** | **Range** | range description. |
+**range** | **Range** | Range range description. |
 **folder** | **string** | Original workbook folder. |
 **storage_name** | **string** | Storage name. |  
 

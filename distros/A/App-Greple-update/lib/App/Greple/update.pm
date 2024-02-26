@@ -20,7 +20,7 @@ Options:
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
 =head1 DESCRIPTION
 
@@ -59,6 +59,11 @@ B<greple> behaves as normal operation, that means only matched lines
 are printed.
 
 File is not touched as far as its content does not change.
+
+The file is also not updated if the output is empty.  This is to
+prevent the contents of the file from being erased if none of the
+match strings are included.  If you want to intentionally empty a
+file, you need to think of another way.
 
 =item B<--with-backup>[=I<suffix>]
 
@@ -138,7 +143,7 @@ package App::Greple::update;
 use v5.14;
 use warnings;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 use utf8;
 use open IO => ':utf8';
@@ -259,7 +264,7 @@ sub update_file {
     return if $arg{discard};
     $divert_buffer = decode 'utf8', $divert_buffer;
 
-    if ($_ eq $divert_buffer) {
+    if ($_ eq $divert_buffer or $divert_buffer eq '') {
 	return;
     }
 
@@ -305,7 +310,7 @@ option default \
 	--prologue update_initialize \
 	--begin    update_begin
 
-expand ++dump --all --need 0 -h --color=never --no-newline --no-line-number
+expand ++dump --all -h --color=never --no-newline --no-line-number
 option --update::diff    ++dump --of &update_diff
 option --update::create  ++dump --begin update_divert --end update_file() --update-suffix=.new
 option --update::update  ++dump --begin update_divert --end update_file(replace)

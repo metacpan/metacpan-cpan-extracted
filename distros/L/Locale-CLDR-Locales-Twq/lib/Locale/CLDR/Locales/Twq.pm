@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Twq - Package for language Tasawaq
 
 package Locale::CLDR::Locales::Twq;
 # This file auto generated from Data\common\main\twq.xml
-#	on Tue  5 Dec  1:36:25 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'ak' => 'Akan senni',
@@ -90,7 +90,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'AD' => 'Andoora',
  			'AE' => 'Laaraw Imaarawey Margantey',
@@ -217,7 +217,6 @@ has 'display_name_region' => (
  			'MD' => 'Moldovi',
  			'MG' => 'Madagascar',
  			'MH' => 'Maršal gungey',
- 			'MK' => 'Maacedooni',
  			'ML' => 'Maali',
  			'MM' => 'Maynamar',
  			'MN' => 'Mongooli',
@@ -332,8 +331,8 @@ has 'characters' => (
 		return {
 			auxiliary => qr{[v]},
 			index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'W', 'X', 'Y', 'Z'],
-			main => qr{[a ã b c d e ẽ f g h i j k l m n ɲ ŋ o õ p q r s š t u w x y z ž]},
-			numbers => qr{[  \- . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			main => qr{[aã b c d eẽ f g h i j k l m n ɲ ŋ oõ p q r sš t u w x y zž]},
+			numbers => qr{[  \- ‑ . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -342,34 +341,6 @@ EOT
 },
 );
 
-
-has 'quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{“},
-);
-
-has 'quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{”},
-);
-
-has 'alternate_quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{‘},
-);
-
-has 'alternate_quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{’},
-);
 
 has 'yesstr' => (
 	is			=> 'ro',
@@ -391,32 +362,9 @@ has 'number_symbols' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'latn' => {
-			'decimal' => q(.),
 			'group' => q( ),
 		},
 	} }
-);
-
-has 'number_formats' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		decimalFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0.###',
-				},
-			},
-		},
-		percentFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0%',
-				},
-			},
-		},
-} },
 );
 
 has 'number_currency_formats' => (
@@ -656,9 +604,14 @@ has 'currencies' => (
 				'currency' => q(Seŋ Helena Fraŋ),
 			},
 		},
-		'SLL' => {
+		'SLE' => {
 			display_name => {
 				'currency' => q(Leeon),
+			},
+		},
+		'SLL' => {
+			display_name => {
+				'currency' => q(Leeon \(1964—2022\)),
 			},
 		},
 		'SOS' => {
@@ -878,7 +831,7 @@ has 'day_periods' => (
 			'format' => {
 				'abbreviated' => {
 					'am' => q{Subbaahi},
-					'pm' => q{Zaarikay b},
+					'pm' => q{Zaarikay b},
 				},
 				'wide' => {
 					'am' => q{Subbaahi},
@@ -964,17 +917,12 @@ has 'datetime_formats_available_formats' => (
 	default		=> sub { {
 		'generic' => {
 			Ed => q{E d},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
 			MEd => q{E d/M},
-			MMM => q{LLL},
 			MMMEd => q{E d MMM},
 			MMMd => q{d MMM},
 			Md => q{d/M},
-			d => q{d},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
 			ms => q{m:ss},
 			y => q{y},
 			yM => q{M/y},
@@ -988,19 +936,13 @@ has 'datetime_formats_available_formats' => (
 		},
 		'gregorian' => {
 			Ed => q{E d},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
 			MEd => q{E d/M},
-			MMM => q{LLL},
 			MMMEd => q{E d MMM},
 			MMMd => q{d MMM},
 			Md => q{d/M},
-			d => q{d},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
 			ms => q{m:ss},
-			y => q{y},
 			yM => q{M/y},
 			yMEd => q{E d/M/y},
 			yMMM => q{MMM y},

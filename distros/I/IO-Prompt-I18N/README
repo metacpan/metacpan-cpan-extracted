@@ -1,82 +1,125 @@
-SYNOPSIS
+NAME
+    IO::Prompt::I18N - Prompt user question, with some options (including
+    I18N)
 
+VERSION
+    This document describes version 0.81 of IO::Prompt::I18N (from Perl
+    distribution IO-Prompt-I18N), released on 2023-11-20.
+
+SYNOPSIS
      use IO::Prompt::I18N qw(prompt confirm);
      use Text::LocaleDomain 'My-App';
-    
+
      my $file = prompt(__"Enter filename");
-    
+
      if (confirm(__"Really delete filename", {lang=>"id", default=>0})) {
          unlink $file;
      }
 
 DESCRIPTION
-
-    This module provides the prompt function to ask for a value from STDIN.
-    It features prompt text, default value, validation (using regex),
-    optional/required. It also provides confirm wrapper to ask yes/no, with
-    localizable text.
+    This module provides the "prompt" function to ask for a value from
+    STDIN. It features prompt text, default value, validation (using regex),
+    optional/required. It also provides "confirm" wrapper to ask yes/no,
+    with localizable text.
 
 FUNCTIONS
-
- prompt([ $text[, \%opts] ]) => val
-
+  prompt([ $text[, \%opts] ]) => val
     Display $text and ask value from STDIN. Will re-ask if value is not
     valid. Return the chomp-ed value.
 
     Options:
 
-      * var => \$var
+    *   var => \$var
 
-      * required => bool
+    *   required => bool
 
-      If set to true then will require that value is not empty
-      (zero-length).
+        If set to true then will require that value is not empty
+        (zero-length).
 
-      * default => VALUE
+    *   default => VALUE
 
-      Set default value.
+        Set default value.
 
-      * show_default => bool (default: 1)
+    *   show_default => bool (default: 1)
 
-      Whether to show default value if defined.
+        Whether to show default value if defined.
 
-      * regex => REGEX
+    *   regex => REGEX
 
-      Validate using regex.
+        Validate using regex.
 
- confirm([ $text, [\%opts] ]) => bool
-
-    Display $text (defaults to Confirm in English) and ask for yes or no.
-    Will return bool. Basically a convenient wrapper around prompt.
+  confirm([ $text, [\%opts] ]) => bool
+    Display $text (defaults to "Confirm" in English) and ask for yes or no.
+    Will return bool. Basically a convenient wrapper around "prompt".
 
     Options:
 
-      * lang => str
+    *   lang => str
 
-      Support several languages (id, en, fr). Default to using
-      LANG/LANGUAGE or English. Will preset yes_words and no_words and adds
-      the choice of words to $text. Will die if language is not supported.
-      Here are the supported languages:
+        Support several languages ("id", "en", "fr"). Default to using
+        LANG/LANGUAGE or English. Will preset "yes_words" and "no_words" and
+        adds the choice of words to $text. Will die if language is not
+        supported. Here are the supported languages:
 
-        lang  yes_words     no_regex   default text
-        ----  ---------     --------   ------------
-        en    y, yes        n, no      Confirm
-        fr    o, oui        n, non     Confirmer
-        id    y, ya         t, tidak   Konfirmasi
+          lang  yes_words     no_regex   default text
+          ----  ---------     --------   ------------
+          en    y, yes        n, no      Confirm
+          fr    o, oui        n, non     Confirmer
+          id    y, ya         t, tidak   Konfirmasi
 
-      * yes_words => array
+    *   yes_words => array
 
-      Overrides preset from lang.
+        Overrides preset from "lang".
 
-      * no_words => array
+    *   no_words => array
 
-      Overrides preset from lang.
+        Overrides preset from "lang".
 
-      * default => bool
+    *   default => bool
 
-      Set default value.
+        Set default value.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/IO-Prompt-I18N>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-IO-Prompt-I18N>.
 
 SEE ALSO
-
     IO::Prompt, IO::Prompt::Tiny, Term::Prompt, Prompt::Timeout
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2023, 2015, 2014 by perlancar
+    <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=IO-Prompt-I18N>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

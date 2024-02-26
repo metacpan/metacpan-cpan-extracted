@@ -1,3 +1,6 @@
+Version 0.91  - 25 February 2024
+                Updated for latest Raspberry Pi OS
+
 Version 0.90  - 10 November 2023
                 HiPi::Device::GPIO ( sysfs gpio interface )
                 enabled for Raspberry Pi 5

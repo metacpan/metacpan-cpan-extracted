@@ -1,6 +1,7 @@
 package SPVM::HTTP::Minimal;
 
-our $VERSION = "0.002";
+our $VERSION = "0.003";
+
 1;
 
 =head1 Name
@@ -82,6 +83,26 @@ Headers for an HTTP request.
 Timeout seconds.
 
 =back
+
+=head2 head
+
+  method head : HTTP::Minimal::Message::Response ($url : string, $options : object[] = undef);
+
+=head2 put
+
+  method put : HTTP::Minimal::Message::Response ($url : string, $options : object[] = undef);
+
+=head2 post
+
+  method post : HTTP::Minimal::Message::Response ($url : string, $options : object[] = undef);
+
+=head2 patch
+
+  method patch : HTTP::Minimal::Message::Response ($url : string, $options : object[] = undef);
+
+=head2 delete
+
+  method delete : HTTP::Minimal::Message::Response ($url : string, $options : object[] = undef);
 
 =head1 Repository
 

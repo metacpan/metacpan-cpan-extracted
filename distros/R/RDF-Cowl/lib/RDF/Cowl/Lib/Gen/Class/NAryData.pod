@@ -1,0 +1,111 @@
+# PODNAME: RDF::Cowl::Lib::Gen::Class::NAryData
+# ABSTRACT: Generated docs for RDF::Cowl::NAryData
+
+## DO NOT EDIT
+## Generated via maint/tt/Class.pod.tt
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+RDF::Cowl::Lib::Gen::Class::NAryData - Generated docs for RDF::Cowl::NAryData
+
+=head1 VERSION
+
+version 1.0.0
+
+=head1 MAIN MODULE
+
+L<RDF::Cowl::NAryData>
+
+=head1 CONSTRUCTORS
+
+=head2 new
+
+B<Signature>:
+
+  RDF::Cowl::NAryData->new(CowlVector $operands)
+
+B<Params>:
+
+  CowlNAryType $type 
+  CowlVector $operands 
+
+Documentation:
+
+  Returns a retained N-ary data range.
+  
+  @param type N-ary data range type.
+  @param operands The operands.
+  @return Retained N-ary data range. Throws exception on error.
+
+Throws exception on error.
+
+=over 2
+
+B<C function name>: C<< cowl_nary_data >>
+
+=back
+
+=head1 METHODS
+
+=head2 get_type
+
+B<Signature>:
+
+  $self->get_type()
+
+B<Params>:
+
+  CowlNAryData $range 
+
+Documentation:
+
+  Gets the type of the specified N-ary data range.
+  @param range The data range.
+  @return The type.
+
+=over 2
+
+B<C function name>: C<< cowl_nary_data_get_type >>
+
+=back
+
+=head2 get_operands
+
+B<Signature>:
+
+  $self->get_operands()
+
+B<Params>:
+
+  CowlNAryData $range 
+
+Documentation:
+
+  Gets the operands of the specified N-ary data range.
+  
+  @param range The data range.
+  @return The operands.
+
+=over 2
+
+B<C function name>: C<< cowl_nary_data_get_operands >>
+
+=back
+
+=head1 AUTHOR
+
+Zakariyya Mughal <zmughal@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 by Auto-Parallel Technologies, Inc..
+
+This is free software, licensed under Eclipse Public License - v 2.0.
+
+=cut

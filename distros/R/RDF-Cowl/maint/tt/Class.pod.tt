@@ -1,0 +1,30 @@
+# PODNAME: RDF::Cowl::Lib::Gen::Class::[% class_suffix %]
+# ABSTRACT: Generated docs for [%- INCLUDE "class-name.tt" %]
+
+## DO NOT EDIT
+## Generated via maint/tt/Class.pod.tt
+
+=pod
+
+=head1 MAIN MODULE
+
+L<[% INCLUDE "class-name.tt" %]>
+
+=cut
+
+[% FOREACH binding = bindings -%]
+[% IF binding.manual -%]
+
+=begin comment
+
+# [% binding.c_func_name %]
+# See manual binding definition.
+
+=end comment
+
+[% ELSIF ! binding.incomplete -%]
+
+[% INCLUDE binding.doc.pod.tt binding = binding -%]
+
+[% END -%]
+[% END -%]

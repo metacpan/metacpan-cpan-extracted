@@ -1,0 +1,10 @@
+Build.PL
+lib/Locale/CLDR/Locales/Gez.pm
+lib/Locale/CLDR/Locales/Gez/Ethi.pm
+lib/Locale/CLDR/Locales/Gez/Ethi/Er.pm
+lib/Locale/CLDR/Locales/Gez/Ethi/Et.pm
+MANIFEST			This list of files
+README
+t/00-load.t
+META.yml
+META.json

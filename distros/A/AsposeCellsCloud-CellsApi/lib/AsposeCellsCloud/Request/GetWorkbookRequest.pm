@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -69,7 +69,9 @@ sub new {
 # GetWorkbookRequest.storageName : The storage name where the file is situated.  ,
 # GetWorkbookRequest.outStorageName : The storage name where the output file is situated.  ,
 # GetWorkbookRequest.checkExcelRestriction : Whether check restriction of excel file when user modify cells related objects.  ,
-# GetWorkbookRequest.region : The regional settings for workbook.   
+# GetWorkbookRequest.region : The regional settings for workbook.  ,
+# GetWorkbookRequest.pageWideFitOnPerSheet : The page wide fit on worksheet.  ,
+# GetWorkbookRequest.pageTallFitOnPerSheet : The page tall fit on worksheet.   
 
 {
     my $params = {
@@ -148,6 +150,14 @@ sub run_http_request {
 
     if(defined $self->region){
         $query_params->{'region'} = $client->to_query_value($self->region);      
+    }
+
+    if(defined $self->page_wide_fit_on_per_sheet){
+        $query_params->{'pageWideFitOnPerSheet'} = $client->to_query_value($self->page_wide_fit_on_per_sheet);      
+    }
+
+    if(defined $self->page_tall_fit_on_per_sheet){
+        $query_params->{'pageTallFitOnPerSheet'} = $client->to_query_value($self->page_tall_fit_on_per_sheet);      
     } 
     my $_body_data;
     # authentication setting, if any
@@ -236,6 +246,20 @@ __PACKAGE__->method_documentation({
      	description => 'The regional settings for workbook.',
      	format => '',
      	read_only => '',
+     		},
+     'page_wide_fit_on_per_sheet' => {
+     	datatype => 'string',
+     	base_name => 'pageWideFitOnPerSheet',
+     	description => 'The page wide fit on worksheet.',
+     	format => '',
+     	read_only => '',
+     		},
+     'page_tall_fit_on_per_sheet' => {
+     	datatype => 'string',
+     	base_name => 'pageTallFitOnPerSheet',
+     	description => 'The page tall fit on worksheet.',
+     	format => '',
+     	read_only => '',
      		},    
 });
 
@@ -251,7 +275,9 @@ __PACKAGE__->attribute_map( {
     'storage_name' => 'storageName',
     'out_storage_name' => 'outStorageName',
     'check_excel_restriction' => 'checkExcelRestriction',
-    'region' => 'region' 
+    'region' => 'region',
+    'page_wide_fit_on_per_sheet' => 'pageWideFitOnPerSheet',
+    'page_tall_fit_on_per_sheet' => 'pageTallFitOnPerSheet' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

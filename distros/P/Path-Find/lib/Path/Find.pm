@@ -1,11 +1,13 @@
 package Path::Find;
 
+# $Id: Find.pm 2590 2024-02-23 17:36:47Z fil $
+
 use 5.00405;
 use strict;
 use vars qw($VERSION @ISA);
 @ISA = qw();
 
-$VERSION = '0.02';
+$VERSION = '0.04';
 
 use Carp;
 use File::Spec;

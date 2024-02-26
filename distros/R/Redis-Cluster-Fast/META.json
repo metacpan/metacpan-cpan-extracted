@@ -30,7 +30,6 @@
       "configure" : {
          "requires" : {
             "File::Which" : "0",
-            "File::chdir" : "0",
             "Module::Build" : "0.4005",
             "Module::Build::XSUtil" : "0.02"
          }
@@ -64,7 +63,7 @@
    "provides" : {
       "Redis::Cluster::Fast" : {
          "file" : "lib/Redis/Cluster/Fast.pm",
-         "version" : "0.090"
+         "version" : "0.091"
       }
    },
    "release_status" : "stable",
@@ -79,7 +78,7 @@
          "web" : "https://github.com/plainbanana/Redis-Cluster-Fast"
       }
    },
-   "version" : "0.090",
+   "version" : "0.091",
    "x_contributors" : [
       "Masahiro Honma <hiratara@cpan.org>"
    ],

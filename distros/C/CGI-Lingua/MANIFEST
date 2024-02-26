@@ -58,6 +58,7 @@ t/unused.t
 t/used.t
 t/usgb.t
 t/vars.t
+t/version.t
 t/zz.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

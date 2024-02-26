@@ -4,7 +4,7 @@ use warnings;
 
 package Neo4j::Driver::Plugin;
 # ABSTRACT: Plug-in interface for Neo4j::Driver
-$Neo4j::Driver::Plugin::VERSION = '0.44';
+$Neo4j::Driver::Plugin::VERSION = '0.45';
 
 1;
 
@@ -20,7 +20,7 @@ Neo4j::Driver::Plugin - Plug-in interface for Neo4j::Driver
 
 =head1 VERSION
 
-version 0.44
+version 0.45
 
 =head1 DESCRIPTION
 

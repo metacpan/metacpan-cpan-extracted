@@ -1,0 +1,226 @@
+# PODNAME: RDF::Cowl::Lib::Gen::Class::UIStream
+# ABSTRACT: Generated docs for RDF::Cowl::Ulib::UIStream
+
+## DO NOT EDIT
+## Generated via maint/tt/Class.pod.tt
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+RDF::Cowl::Lib::Gen::Class::UIStream - Generated docs for RDF::Cowl::Ulib::UIStream
+
+=head1 VERSION
+
+version 1.0.0
+
+=head1 MAIN MODULE
+
+L<RDF::Cowl::Ulib::UIStream>
+
+=head1 METHODS
+
+=head2 deinit
+
+B<Signature>:
+
+  $self->deinit()
+
+B<Params>:
+
+  UIStream $stream 
+
+Documentation:
+
+  Deinitializes the stream, releasing any reserved resource.
+  
+  @param stream Input stream.
+  @return Return code.
+
+=over 2
+
+B<C function name>: C<< uistream_deinit >>
+
+=back
+
+=head2 reset
+
+B<Signature>:
+
+  $self->reset()
+
+B<Params>:
+
+  UIStream $stream 
+
+Documentation:
+
+  Resets the stream.
+  
+  @param stream Input stream.
+  @return Return code.
+
+=over 2
+
+B<C function name>: C<< uistream_reset >>
+
+=back
+
+=head2 std
+
+B<Signature>:
+
+  $self->std()
+
+Documentation:
+
+  Returns a stream that reads from the standard input.
+  
+  @return Standard input stream.
+
+=over 2
+
+B<C function name>: C<< uistream_std >>
+
+=back
+
+=head2 from_path
+
+B<Signature>:
+
+  $self->from_path(Str $path)
+
+B<Params>:
+
+  UIStream $stream 
+  Str $path 
+
+Documentation:
+
+  Initializes a stream that reads from the file at the specified path.
+  
+  @param stream Input stream.
+  @param path Path to the file to read from.
+  @return Return code.
+
+=over 2
+
+B<C function name>: C<< uistream_from_path >>
+
+=back
+
+=head2 from_file
+
+B<Signature>:
+
+  $self->from_file(InstanceOf["FFI::C::File"] $file)
+
+B<Params>:
+
+  UIStream $stream 
+  InstanceOf["FFI::C::File"] $file 
+
+Documentation:
+
+  Initializes a stream that reads from the specified file.
+  
+  @param stream Input stream.
+  @param file The input file.
+  @return Return code.
+
+=over 2
+
+B<C function name>: C<< uistream_from_file >>
+
+=back
+
+=head2 from_strbuf
+
+B<Signature>:
+
+  $self->from_strbuf(UStrBuf $buf)
+
+B<Params>:
+
+  UIStream $stream 
+  UStrBuf $buf 
+
+Documentation:
+
+  Initializes a stream that reads from the specified string buffer.
+  
+  @param stream Input stream.
+  @param buf String buffer.
+  @return Return code.
+
+=over 2
+
+B<C function name>: C<< uistream_from_strbuf >>
+
+=back
+
+=head2 from_string
+
+B<Signature>:
+
+  $self->from_string(Str $string)
+
+B<Params>:
+
+  UIStream $stream 
+  Str $string 
+
+Documentation:
+
+  Initializes a stream that reads from the specified null-terminated string.
+  
+  @param stream Input stream.
+  @param string String.
+  @return Return code.
+
+=over 2
+
+B<C function name>: C<< uistream_from_string >>
+
+=back
+
+=head2 from_ustring
+
+B<Signature>:
+
+  $self->from_ustring(UString $string)
+
+B<Params>:
+
+  UIStream $stream 
+  UString $string 
+
+Documentation:
+
+  Initializes a stream that reads from the specified string.
+  
+  @param stream Input stream.
+  @param string String.
+  @return Return code.
+
+=over 2
+
+B<C function name>: C<< uistream_from_ustring >>
+
+=back
+
+=head1 AUTHOR
+
+Zakariyya Mughal <zmughal@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 by Auto-Parallel Technologies, Inc..
+
+This is free software, licensed under Eclipse Public License - v 2.0.
+
+=cut

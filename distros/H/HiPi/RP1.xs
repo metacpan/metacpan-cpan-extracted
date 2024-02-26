@@ -38,9 +38,9 @@
 #define PI_LOW   0
 #define PI_HIGH  1
 
-/* mode: 0-9 */
+/* mode: 0-11 */
 
-#define PI_MAX_MODE 9
+#define PI_MAX_MODE 11
 
 /* pud: 0-2 */
 

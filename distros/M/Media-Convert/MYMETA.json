@@ -4,7 +4,7 @@
       "Wouter Verhelst <w@uter.be>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -53,6 +53,6 @@
          "web" : "https://salsa.debian.org/wouter/media-convert"
       }
    },
-   "version" : "v1.1.0",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "v1.1.1",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

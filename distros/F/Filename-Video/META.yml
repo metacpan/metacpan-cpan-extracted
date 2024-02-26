@@ -19,7 +19,7 @@ name: Filename-Video
 provides:
   Filename::Video:
     file: lib/Filename/Video.pm
-    version: '0.005'
+    version: '0.006'
 requires:
   Exporter: '5.57'
   perl: '5.010001'
@@ -29,7 +29,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Filename-Video
   homepage: https://metacpan.org/release/Filename-Video
   repository: git://github.com/perlancar/perl-Filename-Video.git
-version: '0.005'
+version: '0.006'
 x_Dist_Zilla:
   perl:
     version: '5.038002'

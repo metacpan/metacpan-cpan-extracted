@@ -32,4 +32,4 @@ for my $k (@kxlt1) {
     say "q[", backslash($_), "]";
 }
 
-exit $found ? 1:0;
+exit($found ? 1 : 0);

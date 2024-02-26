@@ -1,3 +1,178 @@
+0.989080 2023-02-23
+  [Document Fix]
+    * Fix language specification document pathes.
+    
+0.989079 2023-02-22
+  [Document Improvement]
+    * Separate SPVM::Document::Language to the following documents.
+    
+      =item * L<Lexical Tokenization|SPVM::Document::Language::Tokenization>
+
+      =item * L<Syntax Parsing|SPVM::Document::Language::SyntaxParsing>
+
+      =item * L<Class Definition|SPVM::Document::Language::Class>
+
+      =item * L<Types|SPVM::Document::Language::Types>
+
+      =item * L<Statements|SPVM::Document::Language::Statements>
+
+      =item * L<Operators|SPVM::Document::Language::Operators>
+
+      =item * L<Exception Handling|SPVM::Document::Language::ExceptionHandling>
+
+      =item * L<Garbage Collection|SPVM::Document::Language::GarbageCollection>
+
+      =item * L<System Setting|SPVM::Document::Language::System>
+    * Improve many docs.
+  [Test Improvement]
+    * Add tests for native APIs.
+0.989078 2023-02-21
+  [Document Improvement]
+    * Improve "Usage" of SPVM program.
+    * Add SPVM::Document::EnvironmentVariables.
+    * Improve the doc of basic type Native APIs.
+    * Improve the doc of class variable Native APIs.
+  [New Features]
+    * Add the get_file basic type native API.
+    * Add the new_instance_method_static to the Native::MethodCall class.
+    * Add the call_instance_method_static to the Native::MethodCall class.
+    * Add the new_instance_method to the Native::MethodCall class.
+    * Add the call_instance_method to the Native::MethodCall class.
+  [Bug Fix]
+    * Fix argument types and return types in argument native APIs.
+    
+      -  const void* (*get_name)(void* runtime, void* arg);
+      +  const char* (*get_name)(void* runtime, void* arg);
+
+    * Fix argument types and return types in basic type native APIs.
+      
+      -  const void* (*get_name)(void* runtime, void* basic_type);
+      +  const char* (*get_name)(void* runtime, void* basic_type);
+
+      -  const void* (*get_version_string)(void* runtime, void* basic_type);
+      +  const char* (*get_version_string)(void* runtime, void* basic_type);
+
+      -  const void* (*get_class_dir)(void* runtime, void* basic_type);
+      +  const char* (*get_class_dir)(void* runtime, void* basic_type);
+
+      -  const void* (*get_class_rel_file)(void* runtime, void* basic_type);
+      +  const char* (*get_class_rel_file)(void* runtime, void* basic_type);
+
+      -  void* (*get_class_var_by_name)(void* runtime, void* basic_type, const void* class_var_name);
+      +  void* (*get_class_var_by_name)(void* runtime, void* basic_type, const char* class_var_name);
+
+      -  void* (*get_field_by_name)(void* runtime, void* basic_type, const void* field_name);
+      +  void* (*get_field_by_name)(void* runtime, void* basic_type, const char* field_name);
+
+      -  void* (*get_method_by_name)(void* runtime, void* basic_type, const void* method_name);
+      +  void* (*get_method_by_name)(void* runtime, void* basic_type, const char* method_name);
+
+    * Fix argument types and return types in method native APIs.
+
+      -  const void* (*get_name)(void* runtime, void* method);
+      +  const char* (*get_name)(void* runtime, void* method);
+      
+0.989077 2023-02-20
+  [New Features]
+    * Add file directive syntax.
+    
+      #file "/Foo/Bar.spvm"
+    * Add the check_bootstrap_method native API.
+    * Add the check_bootstrap_method method to the Native class.
+    
+  [Incompatible Changes and breaking binary compatibility]
+    * The warn native API is changed. This change causes breaking binary compatibility in the warn operator.
+      [Before]
+      void (*warn)(SPVM_ENV* env, SPVM_VALUE* stack, void* string, const char* class_dir, const char* class_rel_file, int32_t line);
+      
+      [After]
+      void (*warn)(SPVM_ENV* env, SPVM_VALUE* stack, void* string, const char* file, int32_t line);
+      
+  [Incompatible Changes]
+    * The __FILE__ operator returns current file path, instead of the relative file name of the class.
+    * The main method return type of a given class to the spvmcc command becomes void .
+    * The main method return type of a given class to the spvm command becomes void.
+  [Document Changes]
+  
+    * Remove the specification of "End of Source Code"
+
+    * Improve the specification of "Character Encoding of Source Code"
+
+      The character encoding of SPVM source codes is UTF-8.
+
+      If a character is ASCII, it must be ASCII printable characters or ASCII space characters except for ASCII C<CR>.
+
+      Compilation Errors:
+
+      The charactor encoding of SPVM source codes must be UTF-8. Otherwise a compilation error occurs.
+
+      If a character in a SPVM source code is ASCII, it must be ASCII printable or space.
+
+      The new line of SPVM source codes must be LF. The source code cannot contains CR and CRLF.
+
+0.989076 2023-02-19
+  [Changes]
+    * Improve the compilation error message in the compile and compile_anon_class in the Native::Compiler class.
+  [New Features]
+    * Add line directive syntax.
+    
+      #line 35
+      
+0.989075 2023-02-19
+  [Changes]
+    * The $args argument in the call_class_method method in the Native::MethodCall class becomes optional.
+    * The $args argument in the call method in the Native::MethodCall class becomes optional.
+  [New Features]
+    * Add the eval_string method in the Native::Compiler class.
+    * Add the spvm command
+0.989074 2023-02-14
+  [New Features]
+    * Add anon class syntax. Anon class cause compilation error, but this will be used for the compile_anon_class method.
+      class {
+        
+      }
+    * Add the compile_anon_class native compiler API.
+    * Add the compile_anon_class method to the Native::Compiler class.
+      
+0.989073 2023-02-14
+  [Changes]
+    * The spvmdist command outputs .gitattributes file that contains "*.spvm text eol=lf".
+    * Add the spvm_utf8.c and spvm_utf8.h files.
+  [Incompatible Changes and New Features]
+    * Rename the call_class_method in the Native::MethodCall class to call_class_method_for_env.
+    * Add the new call_class_method to the Native::MethodCall class.
+      
+      static method call_class_method : void ($basic_type_name : string, $method_name : string, $args : object[]);
+    
+    
+  [Incompatible Changes]
+    * The new line of SPVM source codes must be LF. Otherwise compilation error occurs.
+    * Change the specification of "Line Terminators"
+
+      The line terminators are C<LF> of ASCII.
+
+      When a line terminator appears, the current line number is incremented by 1.
+
+      Compilation Errors:
+
+      The new line of SPVM source codes must be LF. The source code cannot contains CR and CRLF.
+    * The charactor encoding of SPVM source codes must be UTF-8. Otherwise a compilation error occurs.
+    
+  [Document Improvement]
+  
+    * Add the specification of "End of Source Code"
+
+      A SPVM source code ends with C<\0> in ASCII. If a source code is loaded by a file, C<\0> is added to the end of the source code.
+
+    * Add the specification of "Character Encoding of Source Code"
+
+      The character encoding of SPVM source codes is UTF-8.
+
+      Compilation Errors:
+
+      The charactor encoding of SPVM source codes must be UTF-8. Otherwise a compilation error occurs.
+
+
 0.989072 2023-02-14
   [New Features]
     * Add single quote string literal syntax.

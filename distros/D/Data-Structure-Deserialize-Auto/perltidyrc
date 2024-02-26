@@ -1,0 +1,14 @@
+--block-brace-tightness=2
+--brace-tightness=2
+--break-before-all-operators
+--closing-token-indentation=1
+--cuddled-else
+--indent-columns=2
+--keep-old-blank-lines=2
+--maximum-consecutive-blank-lines=0
+--maximum-line-length=132
+--opening-token-right
+--paren-tightness=2
+--space-signature-paren=0
+--square-bracket-tightness=2
+--want-break-after='='

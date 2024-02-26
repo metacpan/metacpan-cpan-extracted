@@ -4,12 +4,12 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-10-01'; # DATE
+our $DATE = '2023-10-31'; # DATE
 our $DIST = 'Acme-CPANModules-Parse-UnixShellCommandLine'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our $LIST = {
-    summary => "Modules that parse command-line like Unix shells",
+    summary => "List of modules that parse command-line like Unix shells",
     description => <<'_',
 
 Sometimes you need to parse a Unix shell command-line string, e.g. when you want
@@ -61,7 +61,7 @@ _
 };
 
 1;
-# ABSTRACT: Modules that parse command-line like Unix shells
+# ABSTRACT: List of modules that parse command-line like Unix shells
 
 __END__
 
@@ -71,11 +71,11 @@ __END__
 
 =head1 NAME
 
-Acme::CPANModules::Parse::UnixShellCommandLine - Modules that parse command-line like Unix shells
+Acme::CPANModules::Parse::UnixShellCommandLine - List of modules that parse command-line like Unix shells
 
 =head1 VERSION
 
-This document describes version 0.002 of Acme::CPANModules::Parse::UnixShellCommandLine (from Perl distribution Acme-CPANModules-Parse-UnixShellCommandLine), released on 2021-10-01.
+This document describes version 0.003 of Acme::CPANModules::Parse::UnixShellCommandLine (from Perl distribution Acme-CPANModules-Parse-UnixShellCommandLine), released on 2023-10-31.
 
 =head1 DESCRIPTION
 
@@ -86,11 +86,13 @@ In general I recommend L<Text::ParseWords> as it is a core module. If you want
 a little more speed, try L<Parse::CommandLine::Regexp> (see reference to
 benchmark in See Also).
 
-=head1 ACME::MODULES ENTRIES
+=head1 ACME::CPANMODULES ENTRIES
 
 =over
 
-=item * L<Complete::Bash>
+=item L<Complete::Bash>
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
 Its C<parse_cmdline()> function can break a command-line string into words. This
 function is geared for tab completion, so by default it also breaks on some
@@ -98,22 +100,34 @@ other word-breaking characters like "=", "@", and so on. Probably not what you
 want generally, unless you are working with tab completion.
 
 
-=item * L<Complete::Zsh>
+=item L<Complete::Zsh>
 
-=item * L<Complete::Fish>
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<Complete::Tcsh>
+=item L<Complete::Fish>
 
-=item * L<Text::ParseWords>
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item L<Complete::Tcsh>
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item L<Text::ParseWords>
+
+Author: L<NEILB|https://metacpan.org/author/NEILB>
 
 This core module can split string into words with customizable quoting character
 and support for escaping using backslash. Its C<shellwords()> function is
 suitable for breaking command-line string into words.
 
 
-=item * L<Parse::CommandLine>
+=item L<Parse::CommandLine>
 
-=item * L<Parse::CommandLine::Regexp>
+Author: L<SONGMU|https://metacpan.org/author/SONGMU>
+
+=item L<Parse::CommandLine::Regexp>
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
 =back
 
@@ -185,13 +199,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

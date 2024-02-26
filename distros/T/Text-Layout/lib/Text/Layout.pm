@@ -8,9 +8,7 @@ package Text::Layout;
 
 use Carp;
 
-
-
-our $VERSION = "0.032";
+ our $VERSION = "0.035";
 
 =head1 NAME
 
@@ -144,8 +142,8 @@ Same as font_face="I<FAM>".
 =item size=I<FNUM>   size=I<FNUM>pt   size=I<FNUM>%
 
 Font size in 1024ths of a point (conformance mode), or in points (e.g.
-‘12.5pt’), or a percentage (e.g. ‘200%’), or one of the relative sizes
-‘smaller’ or ‘larger’.
+'12.5pt'), or a percentage (e.g. '200%'), or one of the relative sizes
+'smaller' or 'larger'.
 
 Note that in Pango conformance mode, the actual font size is 96/72
 larger. So C<"45pt"> gives a 60pt font.
@@ -186,7 +184,7 @@ The colour to be used for ovderlining, if enabled.
 
 =item strikethrough="I<ARG>"
 
-Enables or diables overlining. I<ARG> must be C<true> or C<1> to
+Enables or disables overlining. I<ARG> must be C<true> or C<1> to
 enable, and C<false> or C<0> to disable.
 
 =item strikethrough_color="I<COLOR>"
@@ -324,7 +322,7 @@ sub new {
     if ( $pkg eq __PACKAGE__ ) {
 	# For convenience (and backward compatibility)...
 	unless ( @data >= 1 && ref($data[0]) =~ /^PDF::(API2|Builder)\b/ ) {
-	    croak("Please instanciate a backend, e.g. ".__PACKAGE__."::PDFAPI2");
+	    croak("Please instantiate a backend, e.g. ".__PACKAGE__."::PDFAPI2");
 	}
 	require Text::Layout::PDFAPI2;
 	return Text::Layout::PDFAPI2->new(@data); # CUL8R

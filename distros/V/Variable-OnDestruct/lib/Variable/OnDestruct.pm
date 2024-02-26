@@ -1,7 +1,7 @@
 package Variable::OnDestruct;
-$Variable::OnDestruct::VERSION = '0.06';
+$Variable::OnDestruct::VERSION = '0.07';
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 use Exporter 5.57 'import';
 use XSLoader;
 
@@ -27,7 +27,7 @@ Variable::OnDestruct - Call a subroutine on destruction of a variable.
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 

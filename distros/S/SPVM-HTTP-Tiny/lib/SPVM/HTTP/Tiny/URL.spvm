@@ -1,0 +1,176 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class HTTP::Tiny::URL {
+  allow HTTP::Tiny;
+  allow HTTP::Tiny::Handle;
+  
+  use StringBuffer;
+  
+  # Fields
+  has scheme : string;
+  
+  has host : string;
+  
+  has port : int;
+  
+  has path : string;
+  
+  has auth : string;
+  
+  private static method new : HTTP::Tiny::URL ($options : object[]) {
+    
+    my $options_h = Hash->new($options);
+    
+    my $self = new HTTP::Tiny::URL;
+    
+    $self->{scheme} = $options_h->delete_or_default_string("scheme", undef);
+    
+    $self->{host} = $options_h->delete_or_default_string("host", undef);
+    
+    $self->{port} = $options_h->delete_or_default_int("port", -1);
+    
+    $self->{path} = $options_h->delete_or_default_string("path", undef);
+    
+    $self->{auth} = $options_h->delete_or_default_string("auth", undef);
+    
+    return $self;
+  }
+  
+  private static method parse : HTTP::Tiny::URL ($url_string : string) {
+    
+    # URI regex adapted from the URI module
+    my $scheme = (string)undef;
+    my $host = (string)undef;
+    my $path_query = (string)undef;
+    
+    if (my $match = Regex->new("\A([^:/?#]+)://([^/?#]*)([^#]*)")->match($url_string)) {
+      $scheme = $match->cap1;
+      $host = $match->cap2;
+      $path_query = $match->cap3;
+    }
+    else {
+      die "Cannot parse URL: \"$url_string\"";
+    }
+    
+    $scheme = Fn->lc($scheme);
+    
+    unless (Regex->new("\A/")->match($path_query)) {
+      $path_query = "/$path_query";
+    }
+    
+    my $auth = "";
+    if ((my $i = Fn->index($host, '@')) != -1 ) {
+      # user:pass@host
+      $auth = &substr_replacement($host, 0, $i, ""); # take up to the @ for auth
+      &substr_replacement($host, 0, 1, "");          # knock the @ off the host
+      
+      # userinfo might be percent escaped, so recover real auth info
+      Regex->new("%([0-9A-Fa-f]{2})")->replace_g($auth, method : string ($re : Regex, $match : Regex::Match) {
+        return Fn->chr(Fn->hex($match->cap1));
+      });
+    }
+    
+    my $port_string = (string)undef;
+    
+    my $replace_info_ref = [(Regex::ReplaceInfo)undef];
+    
+    Regex->new(":(\d*)\z")->replace($host, "", 0, -1, {info => $replace_info_ref});
+    my $match = $replace_info_ref->[0]->match;
+    if ($match) {
+      $port_string = $match->cap1;
+    }
+    
+    my $port = -1;
+    if($port_string) {
+      $port = Fn->to_int($port_string);
+    }
+    else {
+      if ($scheme eq "http") {
+        $port = 80;
+      }
+      elsif ($scheme eq "https") {
+        $port = 443;
+      }
+    }
+    
+    if ($host) {
+      $host = Fn->lc($host);
+    }
+    else {
+      $host = "localhost";
+    }
+    
+    my $url = HTTP::Tiny::URL->new({
+      scheme => $scheme,
+      host => $host,
+      port => $port,
+      path => $path_query,
+      auth => $auth,
+    });
+    
+    return $url;
+  }
+  
+  private static method substr_replacement : string ($string : string, $offset : int, $length : int = -1, $replacement : string = undef) {
+    
+    unless ($string) {
+      die "The \$string must be defined.";
+    }
+    
+    unless ($offset >= 0) {
+      die "The \$offset must be greater than or equal to 0.";
+    }
+    
+    my $string_length = length $string;
+    if ($length < 0) {
+      $length = $string_length - $offset;
+    }
+    
+    unless ($offset + $length <= $string_length) {
+      die "The \$offset + the \$length must be less than or equal to the length of the \$string.";
+    }
+    
+    my $substring = (string)undef;
+    if ($replacement) {
+      
+      $substring = Fn->substr($string, 0, $offset) . $replacement . Fn->substr($string, $length - $offset);
+    }
+    else {
+      $substring = (mutable string)new_string_len($length);
+      Fn->memcpy($substring, 0, $string, $offset, $length);
+    }
+    
+    return $substring;
+  }
+  
+  private method to_string : string () {
+    
+    my $scheme = $self->{scheme};
+    my $auth = $self->{auth};
+    my $host = $self->{host};
+    my $port = $self->{port};
+    my $path = $self->{path};
+    
+    my $buffer = StringBuffer->new;
+    
+    $buffer->push("$scheme://");
+    
+    if ($auth && length $auth) {
+      $buffer->push("$auth@");
+    }
+    
+    $buffer->push("$host");
+    
+    if ($port >= 0) {
+      $buffer->push(":$port");
+    }
+    
+    $buffer->push("$path");
+    
+    my $string = $buffer->to_string;
+    
+    return $string;
+  }
+  
+}

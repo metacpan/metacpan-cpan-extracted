@@ -1,11 +1,11 @@
 NAME
-    Acme::CPANModules::NO_COLOR - Modules/scripts that follow the NO_COLOR
-    convention
+    Acme::CPANModules::NO_COLOR - List of modules/scripts that follow the
+    NO_COLOR convention
 
 VERSION
-    This document describes version 0.009 of Acme::CPANModules::NO_COLOR
+    This document describes version 0.010 of Acme::CPANModules::NO_COLOR
     (from Perl distribution Acme-CPANModules-NO_COLOR), released on
-    2021-12-03.
+    2023-10-29.
 
 DESCRIPTION
     The NO_COLOR convention (see <https://no-color.org>) lets user disable
@@ -17,159 +17,118 @@ DESCRIPTION
     me.
 
 ACME::CPANMODULES ENTRIES
-    *   App::ccdiff - Colored Character diff
-
+    App::ccdiff
         Author: HMBRAND <https://metacpan.org/author/HMBRAND>
 
         Script: ccdiff
 
-    *   App::Codeowners - A tool for managing CODEOWNERS files
-
+    App::Codeowners
         Author: CCM <https://metacpan.org/author/CCM>
 
         Script: git-codeowners
 
-    *   App::DiffTarballs - Diff contents of two tarballs
-
+    App::DiffTarballs
         Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
         Script: diff-tarballs
 
-    *   App::HL7::Dump - Base class for hl7dump script.
-
+    App::HL7::Dump
         Author: SKIM <https://metacpan.org/author/SKIM>
 
         Script: hl7dump
 
-    *   App::hr - Print horizontal bar on the terminal
-
+    App::hr
         Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
         Script: hr
 
-    *   App::Licensecheck - functions for a simple license checker for
-        source files
-
+    App::Licensecheck
         Author: JONASS <https://metacpan.org/author/JONASS>
 
         Script: licensecheck
 
-    *   App::riap - Riap command-line client shell
-
+    App::riap
         Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
         Script: riap
 
-    *   App::rsynccolor - Add some color to rsync output
-
+    App::rsynccolor
         Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
         Script: rsynccolor
 
-    *   Color::ANSI::Util - Routines for dealing with ANSI colors
-
+    Color::ANSI::Util
         Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Data::Dump::Color - Like Data::Dump, but with color
-
+    Data::Dump::Color
         Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Debug::Print - Make debugging with print() more awesome
-
+    Debug::Print
         Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Git::Deploy
-
+    Git::Deploy
         Author: AVAR <https://metacpan.org/author/AVAR>
 
         Script: git-deploy
 
-    *   Indent::Form
-
+    Indent::Form
         Author: SKIM <https://metacpan.org/author/SKIM>
 
-    *   JSON::Color - Encode to colored JSON
-
+    JSON::Color
         Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Log::Any::Adapter::Screen - Send logs to screen, with colors and
-        some other features
-
+    Log::Any::Adapter::Screen
         Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Log::ger::Output::Screen - Output log to screen
-
+    Log::ger::Output::Screen
         Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Parse::Netstat::Colorizer - Searches and colorizes the output from
-        Parse::Netstat
-
+    Parse::Netstat::Colorizer
         Author: VVELOX <https://metacpan.org/author/VVELOX>
 
         Script: cnetstat
 
-    *   Proc::ProcessTable::ncps - New Colorized(optional) PS, a enhanced
-        version of PS with advanced searching capabilities
-
+    Proc::ProcessTable::ncps
         Author: VVELOX <https://metacpan.org/author/VVELOX>
 
         Script: ncps
 
-    *   Progress::Any::Output::TermProgressBar
-
-    *   Search::ESsearcher - Provides a handy system for doing templated
-        elasticsearch searches.
-
+    Progress::Any::Output::TermProgressBar
+    Search::ESsearcher
         Author: VVELOX <https://metacpan.org/author/VVELOX>
 
         Script: essearcher
 
-    *   Spreadsheet::Read
-
+    Spreadsheet::Read
         Author: HMBRAND <https://metacpan.org/author/HMBRAND>
 
         Script: xls2csv
 
-    *   String::Tagged::Terminal - format terminal output using
-        "String::Tagged"
-
+    String::Tagged::Terminal
         Author: PEVANS <https://metacpan.org/author/PEVANS>
 
-    *   Term::ANSIColor - Color screen output using ANSI escape sequences
-
+    Term::ANSIColor
         Author: RRA <https://metacpan.org/author/RRA>
 
-    *   Term::ANSIColor::Conditional - Colorize text only if color is
-        enabled
-
+    Term::ANSIColor::Conditional
         Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Term::ANSIColor::Patch::Conditional - Colorize text only if color is
-        enabled
-
+    Term::ANSIColor::Patch::Conditional
         Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Term::App::Roles - Collection of roles for terminal-based
-        application
-
+    Term::App::Roles
         Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Term::App::Roles::Attrs
-
-    *   Term::App::Util::Color - Determine color depth and whether to use
-        color or not
-
+    Term::App::Roles::Attrs
+    Term::App::Util::Color
         Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Text::CSV_XS - comma-separated values manipulation routines
-
+    Text::CSV_XS
         Author: HMBRAND <https://metacpan.org/author/HMBRAND>
 
         Script: csvdiff
 
-    *   Tree::Shell - Navigate and manipulate in-memory tree objects using a
-        CLI shell
-
+    Tree::Shell
         Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
         Script: treesh
@@ -234,13 +193,13 @@ CONTRIBUTING
 
     If you want to build the distribution (e.g. to try to install it locally
     on your system), you can install Dist::Zilla,
-    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
-    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
-    steps required beyond that are considered a bug and can be reported to
-    me.
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2020, 2018 by perlancar
+    This software is copyright (c) 2023, 2021, 2020, 2018 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

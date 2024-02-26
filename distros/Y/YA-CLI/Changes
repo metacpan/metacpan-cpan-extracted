@@ -2,6 +2,10 @@ Revision history for YA-CLI
 
 TODO: Port to Object::Pad / Corrina
 
+0.005     2024-02-23 18:58:45Z
+
+    * Fix usage() bug where incorrect POD is shown
+
 0.004     2023-09-07 14:17:03Z
 
     * Add sub commands so you could implement logic as this:

@@ -1,0 +1,14 @@
+Dancer2-Controllers-1.0.tar.gz
+example/example.pl
+lib/Dancer2/Controllers.pm
+lib/Dancer2/Controllers/Controller.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/01-basic.t
+t/02-sad.t
+t/03-extra-sad.t
+t/04-dancer.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

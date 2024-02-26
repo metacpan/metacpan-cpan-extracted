@@ -1,5 +1,11 @@
+msgid "# NAME"
+msgstr "#NAME"
+
 msgid "Liveman::MinillaPod2Markdown – заглушка для Minilla, которая перебрасывает lib/MainModule.md в README.md"
 msgstr "Liveman::MinillaPod2Markdown – a stub for Minilla that redirects lib/MainModule.md to README.md"
+
+msgid "# DESCRIPION"
+msgstr "#DESCRIPTION"
 
 msgid "Добавьте строку `markdown_maker = \"Liveman::MinillaPod2Markdown\"` в `minil.toml`, и Minilla не будет создавать `README.md` из pod-документации главного модуля, а возьмёт из одноимённого файла рядом с расширением `*.md`."
 msgstr "Add the line `markdown_maker = \"Liveman::MinillaPod2Markdown\"` to `minil.toml`, and Minilla will not create `README.md` from the pod documentation of the main module, but will take it from the file of the same name next to the `*.md` extension."
@@ -12,6 +18,9 @@ msgstr "Stub."
 
 msgid "Чтобы установить этот модуль в вашу систему, выполните следующие действия [командой](https://metacpan.org/pod/App::cpm):"
 msgstr "To install this module on your system, follow these steps [command](https://metacpan.org/pod/App::cpm):"
+
+msgid "# AUTHOR"
+msgstr "#AUTHOR"
 
 msgid "Yaroslav O. Kosmina <dart@cpan.org>"
 msgstr "Yaroslav O. Kosmina <dart@cpan.org>"

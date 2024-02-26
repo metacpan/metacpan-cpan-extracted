@@ -1,0 +1,26 @@
+package RDF::Cowl::Lib::Gen::Enum::ObjectType;
+# ABSTRACT: Private class for RDF::Cowl::ObjectType
+
+## DO NOT EDIT
+## Generated via maint/tt/Enum_OT.pm.tt
+
+package # hide from PAUSE
+  RDF::Cowl::ObjectType;
+
+use strict;
+use warnings;
+
+our $_ENUM_CODES = [%
+USE Dumper(Terse=1);
+Dumper.dump(names);
+-%];
+
+our $_ENUM_TYPES = [%
+USE Dumper(Terse=1);
+Dumper.dump(types);
+-%];
+
+1;
+[%#-
+# vim: ft=tt2
+-%]

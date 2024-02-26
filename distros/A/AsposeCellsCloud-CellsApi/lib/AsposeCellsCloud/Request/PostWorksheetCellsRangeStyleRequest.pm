@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,9 +59,9 @@ sub new {
 
 
 # Run Operation Request
-# PostWorksheetCellsRangeStyleRequest.name : The workbook name.  ,
+# PostWorksheetCellsRangeStyleRequest.name : The file name.  ,
 # PostWorksheetCellsRangeStyleRequest.sheetName : The worksheet name.  ,
-# PostWorksheetCellsRangeStyleRequest.rangeOperate : Range Set Style Request   ,
+# PostWorksheetCellsRangeStyleRequest.rangeOperate : RangeSetStyleRequest Range Set Style Request   ,
 # PostWorksheetCellsRangeStyleRequest.folder : Original workbook folder.  ,
 # PostWorksheetCellsRangeStyleRequest.storageName : Storage name.   
 
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_worksheet_cells_range_style' } = { 
-    	summary => 'Sets the style of the range.',
+    	summary => 'Set the style for the specified range.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -137,7 +137,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -151,7 +151,7 @@ __PACKAGE__->method_documentation({
      'range_operate' => {
      	datatype => 'RangeSetStyleRequest',
      	base_name => 'rangeOperate',
-     	description => 'Range Set Style Request ',
+     	description => 'RangeSetStyleRequest Range Set Style Request ',
      	format => '',
      	read_only => '',
      		},

@@ -9,6 +9,7 @@ use Pod::Usage;
 use Pod::Find qw( pod_where );
 
 use App::Gimei;
+use App::Gimei::Parser;
 
 use Class::Tiny;
 
@@ -22,9 +23,7 @@ my %conf = ( POD_FILE => pod_where( { -inc => 1 }, 'App::Gimei' ) );
 # methods
 #
 
-sub parse_option {
-    my ( $self, $args_ref, $opts_ref ) = @_;
-
+sub parse_option ( $self, $args_ref, $opts_ref ) {
     $opts_ref->{n}   = 1;
     $opts_ref->{sep} = ', ';
 
@@ -40,9 +39,7 @@ sub parse_option {
     }
 }
 
-sub execute {
-    my ( $self, @args ) = @_;
-
+sub execute ( $self, @args ) {
     my %opts;
     $self->parse_option( \@args, \%opts );
 
@@ -60,26 +57,21 @@ sub execute {
         push @args, 'name:kanji';
     }
 
-    my @generators = App::Gimei::Parser::parse_args(@args);
+    my $parser     = App::Gimei::Parser->new( args => \@args );
+    my $generators = $parser->parse();
 
-    semantic_analysis(@generators);
+    semantic_analysis($generators);
 
     foreach ( 1 .. $opts{n} ) {
-        my ( @words, %cache );
-        foreach my $g (@generators) {
-            push @words, $g->execute( \%cache );
-        }
-        say join $opts{sep}, @words;
+        say join $opts{sep}, $generators->execute();
     }
 
     return 0;
 }
 
-sub semantic_analysis {
-    my (@generators) = @_;
-
-    foreach my $gen (@generators) {
-        if ( $gen->word_class eq 'Data::Gimei::Address' && $gen->render eq 'romaji' ) {
+sub semantic_analysis ($generators) {
+    foreach my $gen ( $generators->to_list() ) {
+        if ( $gen->word_class eq 'Data::Gimei::Address' && $gen->rendering eq 'romaji' ) {
             die "Error: rendering romaji is not supported for address\n";
         }
     }

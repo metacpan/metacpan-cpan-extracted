@@ -15,8 +15,8 @@ package Spreadsheet::Edit;
 # Allow "use <thismodule> <someversion>;" in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
 
-our $VERSION = '1000.013'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-01-23'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1000.014'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2024-02-18'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # FIXME: cmd_nesting does nothing except prefix >s to log messages.
 #        Shouldn't it skip that many "public" call frames???

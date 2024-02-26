@@ -27,8 +27,11 @@ WriteMakefile(
 
     DEFINE       => "$WALL " ,
     XS           => { 'Lzma.xs' => 'Lzma.c'},
-    'depend'     => { 'Makefile'   => 'config.in' },
-    'dist'       => { COMPRESS     => 'gzip',
+    depend       => { Makefile   => 'config.in',
+                      manifypods => 'READMEmd'
+                    },
+    postamble    => { name => 'Lzma' },
+    dist         => { COMPRESS     => 'gzip',
                       TARFLAGS     => '-chvf',
                       SUFFIX       => 'gz',
                       DIST_DEFAULT => 'MyTrebleCheck tardist',
@@ -74,6 +77,14 @@ WriteMakefile(
             )
         : ()
     ),
+
+    ((ExtUtils::MakeMaker->VERSION() gt '6.55_03')
+        ? ('BUILD_REQUIRES'  => {
+                    "ExtUtils::MakeMaker" => 0,
+                    'Pod::Markdown'       => 0,
+                }
+          )
+        : ()),
 
     ((ExtUtils::MakeMaker->VERSION() gt '6.30') ?
         ('LICENSE'  => 'perl')         : ()),

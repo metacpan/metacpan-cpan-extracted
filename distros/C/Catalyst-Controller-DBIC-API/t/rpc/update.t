@@ -89,7 +89,7 @@ my $tracks_update_url = "$base/api/rpc/track/update";
 }
 
 {
-    my $req = POST( $track_update_url, { title => undef } );
+    my $req = POST( $track_update_url, { title => '' } );
     $mech->request( $req, $content_type );
     cmp_ok( $mech->status, '==', 200, 'Update with key with no value okay' );
 

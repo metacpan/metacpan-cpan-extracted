@@ -2,7 +2,7 @@ package Liveman;
 use 5.22.0;
 use common::sense;
 
-our $VERSION = "3.0";
+our $VERSION = "3.1";
 
 use Cwd::utf8 qw/getcwd/;
 use File::Basename qw/dirname/;
@@ -199,6 +199,7 @@ sub trans {
     $po->{__used} = 1, $po->loaded_line_number($lineno), return _from_str($po->msgstr) if defined $po;
 
     my $dir = File::Spec->catfile(File::Spec->tmpdir, ".liveman");
+    mkpath($dir);
     my $trans_from = File::Spec->catfile($dir, $self->{from});
     my $trans_to = File::Spec->catfile($dir, $self->{to});
     write_text($trans_from, $text);
@@ -226,12 +227,13 @@ sub trans {
 }
 
 # Заголовки не переводим
+# Так же разбиваем по параграфам
 sub trans_paragraph {
 	my ($self, $paragraph, $lineno) = @_;
 
     join "", map {
-        /^#/ ? $_: join "", "\n", $self->trans(_first_line_trim($_), $lineno += 0.001), "\n\n"
-    } split m/^(#.*)/m, $paragraph
+        /^(#|\s*$)/n ? $_: join "", "\n", $self->trans(_first_line_trim($_), $lineno += 0.001), "\n\n"
+    } split /((?:[\t\ ]*\n){2,})/, $paragraph
 }
 
 # Трансформирует md-файл в тест и документацию
@@ -435,7 +437,7 @@ Liveman - compiler from markdown to tests and documentation
 
 =head1 VERSION
 
-3.0
+3.1
 
 =head1 SYNOPSIS
 
@@ -476,7 +478,7 @@ Test:
 	# Ограничить liveman этими файлами для операций, преобразований и тестов (без покрытия):
 	my $liveman2 = Liveman->new(files => [], force_compile => 1);
 
-=head1 DESCRIPION
+=head1 DESCRIPTION
 
 The problem with modern projects is that documentation is divorced from testing.
 This means that the examples in the documentation may not work, and the documentation itself may lag behind the code.
@@ -498,7 +500,12 @@ If the B<minil.toml> file exists, then Liveman will read C<name> from it and cop
 
 If you need the documentation in C<.md> to be written in one language, and C<pod> in another, then at the beginning of C<.md> you need to indicate C<!from:to> (from which language to translate, for example, for this file: C<!ru:en>).
 
+Headings (lines starting with #) are not translated. Also, do not translate blocks of code.
+And the translation itself is carried out paragraph by paragraph.
+
 Files with translations are stored in the C<i18n> directory, for example, C<lib/My/Module.md> -> C<i18n/My/Module.ru-en.po>. Translation is carried out using the C<trans> utility (it must be installed on the system). Translation files can be corrected, because if the translation is already in the file, then it is taken.
+
+B<Warning!> Be careful and review C<git diff> after editing C<.md> so as not to lose the corrected translations in C<.po>.
 
 =head2 TYPES OF TESTS
 

@@ -8,12 +8,12 @@ use AsposeCellsCloud::Request::PostWorkbookGetSmartMarkerResult;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**name** | **string** | The workbook name. |
+**name** | **string** | The file name. |
 **xml_file** | **string** | The xml file full path, if empty the data is read from request body. |
-**folder** | **string** | Original workbook folder. |
-**out_path** | **string** | Path to save result |
-**storage_name** | **string** | Storage name. |
-**out_storage_name** | **string** | Storage name. |  
+**folder** | **string** | The folder where the file is situated. |
+**out_path** | **string** | The path to save result |
+**storage_name** | **string** | The storage name where the file is situated. |
+**out_storage_name** | **string** | The storage name where the result file is situated. |  
 
 [[Back to Model list]](../README.md#documentation-for-requests) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

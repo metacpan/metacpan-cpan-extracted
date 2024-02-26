@@ -1,8 +1,7 @@
 bin/create_db.PL
 Changes
 lib/Genealogy/Wills.pm
-lib/Genealogy/Wills/DB.pm
-lib/Genealogy/Wills/DB/wills.pm
+lib/Genealogy/Wills/wills.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
@@ -29,6 +28,7 @@ t/pod.t
 t/snippets.t
 t/strict.t
 t/unused.t
+t/version.t
 t/wills.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

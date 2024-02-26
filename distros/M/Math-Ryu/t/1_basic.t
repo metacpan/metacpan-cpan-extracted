@@ -10,7 +10,7 @@ else { warn "\nCompiler HAS_UINT128: 0\n" }
 
 warn "MAX_DEC_DIG: ", Math::Ryu::MAX_DEC_DIG, "\n";
 
-cmp_ok($Math::Ryu::VERSION, 'eq', '1.0', "\$Math::Ryu::VERSION is as expected");
+cmp_ok($Math::Ryu::VERSION, 'eq', '1.01', "\$Math::Ryu::VERSION is as expected");
 
 cmp_ok(Math::Ryu::MAX_DEC_DIG, '!=', 0, "MAX_DEC_DIG is non-zero");
 
@@ -29,5 +29,7 @@ else {
   my $s = fmtpy(q2s(1.4 / 10));
   cmp_ok($s, 'eq', '0.13999999999999999999999999999999999', "fmtpy(q2s(1.4 / 10)) is as expected");
 }
+
+cmp_ok(nv2s(6.0), 'eq', '6.0', "6.0 appears in expected format");
 
 done_testing();

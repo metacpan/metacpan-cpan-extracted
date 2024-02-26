@@ -9,7 +9,7 @@ use Role::Tiny::With;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2024-01-15'; # DATE
 our $DIST = 'TableDataRoles-Standard'; # DIST
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.023'; # VERSION
 
 with 'TableDataRole::Source::CSVInDATA';
 
@@ -26,7 +26,37 @@ TableData::Sample::DeNiro - Rotten Tomato ratings of movies with Robert De Niro
 
 =head1 VERSION
 
-This document describes version 0.021 of TableData::Sample::DeNiro (from Perl distribution TableDataRoles-Standard), released on 2024-01-15.
+This document describes version 0.023 of TableData::Sample::DeNiro (from Perl distribution TableDataRoles-Standard), released on 2024-01-15.
+
+=head1 SYNOPSIS
+
+To use from Perl code:
+
+ use TableData::Sample::DeNiro;
+
+ my $td = TableData::Sample::DeNiro->new;
+
+ # Iterate rows of the table
+ $td->each_row_arrayref(sub { my $row = shift; ... });
+ $td->each_row_hashref (sub { my $row = shift; ... });
+
+ # Get the list of column names
+ my @columns = $td->get_column_names;
+
+ # Get the number of rows
+ my $row_count = $td->get_row_count;
+
+See also L<TableDataRole::Spec::Basic> for other methods.
+
+To use from command-line (using L<tabledata> CLI):
+
+ # Display as ASCII table and view with pager
+ % tabledata Sample::DeNiro --page
+
+ # Get number of rows
+ % tabledata --action count_rows Sample::DeNiro
+
+See the L<tabledata> CLI's documentation for other available actions and options.
 
 =head1 HOMEPAGE
 
@@ -35,6 +65,12 @@ Please visit the project's homepage at L<https://metacpan.org/release/TableDataR
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-TableDataRoles-Standard>.
+
+=head1 SEE ALSO
+
+L<ArrayData::Sample::DeNiro>
+
+L<HashData::Sample::DeNiro>
 
 =head1 AUTHOR
 
@@ -145,22 +181,34 @@ __DATA__
 2007,76,"Captain Shakespeare"
 2008,19,"Righteous Kill"
 2008,51,"What Just Happened?"
-2009,46,"Everybody's Fine"
-2010,72,"Machete"
-2010,10,"Little Fockers"
+2009,47,"Everybody's Fine"
+2010,70,"Machete"
+2010,9,"Little Fockers"
 2010,50,"Stone"
-2011,25,"Killer Elite"
+2011,28,"Killer Elite"
 2011,7,"New Year's Eve"
-2011,70,"Limitless"
+2011,68,"Limitless"
 2012,92,"Silver Linings Playbook"
 2012,51,"Being Flynn"
-2012,29,"Red Lights"
+2012,31,"Red Lights"
 2013,46,"Last Vegas"
 2013,7,"The Big Wedding"
-2013,29,"Grudge Match"
-2013,11,"Killing Season"
-2014,9,"The Bag Man"
+2013,31,"Grudge Match"
+2013,10,"Killing Season"
+2014,11,"The Bag Man"
 2015,60,"Joy"
-2015,26,"Heist"
-2015,61,"The Intern"
-2016,11,"Dirty Grandpa"
+2015,30,"Heist"
+2015,59,"The Intern"
+2016,10,"Dirty Grandpa"
+2016,44,"Hands of Stone"
+2016,24,"The Comedian"
+2017,73,"The Wizard of Lies"
+2019,69,"Joker"
+2019,95,"The Irishman"
+2020,28,"The War with Grandpa"
+2020,30,"The Comeback Trail"
+2022,32,"Amsterdam"
+2022,-,"Savage Salvation"
+2023,93,"Killers of the Flower Moon"
+2023,37,"About My Father"
+2023,73,"Ezra"

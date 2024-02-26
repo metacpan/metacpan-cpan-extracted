@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,9 +59,9 @@ sub new {
 
 
 # Run Operation Request
-# PostAssembleRequest.File : The format to convert(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers)  ,
+# PostAssembleRequest.File : File to upload  ,
 # PostAssembleRequest.datasource :   ,
-# PostAssembleRequest.format : The format to convert(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers)  ,
+# PostAssembleRequest.outFormat : The format to convert(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers)  ,
 # PostAssembleRequest.password : The password needed to open an Excel file.  ,
 # PostAssembleRequest.checkExcelRestriction : Whether check restriction of excel file when user modify cells related objects.  ,
 # PostAssembleRequest.region : The regional settings for workbook.   
@@ -105,8 +105,8 @@ sub run_http_request {
         $query_params->{'datasource'} = $client->to_query_value($self->datasource);      
     }
 
-    if(defined $self->format){
-        $query_params->{'format'} = $client->to_query_value($self->format);      
+    if(defined $self->out_format){
+        $query_params->{'outFormat'} = $client->to_query_value($self->out_format);      
     }
 
     if(defined $self->password){
@@ -143,7 +143,7 @@ __PACKAGE__->method_documentation({
      'file' => {
      	datatype => 'string',
      	base_name => 'File',
-     	description => 'The format to convert(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers)',
+     	description => 'File to upload',
      	format => '',
      	read_only => '',
      		},
@@ -154,9 +154,9 @@ __PACKAGE__->method_documentation({
      	format => '',
      	read_only => '',
      		},
-     'format' => {
+     'out_format' => {
      	datatype => 'string',
-     	base_name => 'format',
+     	base_name => 'outFormat',
      	description => 'The format to convert(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers)',
      	format => '',
      	read_only => '',
@@ -188,7 +188,7 @@ __PACKAGE__->method_documentation({
 __PACKAGE__->attribute_map( {
     'file' => 'File',
     'datasource' => 'datasource',
-    'format' => 'format',
+    'out_format' => 'outFormat',
     'password' => 'password',
     'check_excel_restriction' => 'checkExcelRestriction',
     'region' => 'region' 

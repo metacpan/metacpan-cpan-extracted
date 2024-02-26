@@ -1,3 +1,15 @@
+0.1.2   2024-01-23  Released-By: PERLANCAR; Urgency: low
+
+        - No spec changes.
+
+        - Reorganize See Also section, mention SortKey specification
+          to replace Data::Sah::Filter::perl.
+
+        - Fix examples.
+
+        - Add note about reverse and is_ci being made a regular argument.
+
+
 0.1.1   2024-01-22  Released-By: PERLANCAR; Urgency: low
 
         - No spec changes.

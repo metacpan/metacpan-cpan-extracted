@@ -2,7 +2,7 @@ package Net::SAML2::AttributeConsumingService;
 use Moose;
 use XML::Generator;
 use URN::OASIS::SAML2 qw(URN_METADATA NS_METADATA);
-our $VERSION = '0.77'; # VERSION
+our $VERSION = '0.78'; # VERSION
 
 # ABSTRACT: An attribute consuming service object
 
@@ -86,7 +86,7 @@ Net::SAML2::AttributeConsumingService - An attribute consuming service object
 
 =head1 VERSION
 
-version 0.77
+version 0.78
 
 =head1 SYNOPSIS
 

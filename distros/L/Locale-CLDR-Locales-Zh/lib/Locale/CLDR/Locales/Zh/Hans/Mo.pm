@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Zh::Hans::Mo - Package for language Chinese
 
 package Locale::CLDR::Locales::Zh::Hans::Mo;
 # This file auto generated from Data\common\main\zh_Hans_MO.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -68,6 +68,14 @@ has 'units' => (
 					},
 				},
 				'narrow' => {
+					# Long Unit Identifier
+					'concentr-karat' => {
+						'other' => q({0}开),
+					},
+					# Core Unit Identifier
+					'karat' => {
+						'other' => q({0}开),
+					},
 					# Long Unit Identifier
 					'length-foot' => {
 						'other' => q({0}英尺),
@@ -174,6 +182,7 @@ has 'currencies' => (
 		'XAG' => {
 			display_name => {
 				'currency' => q(白银),
+				'other' => q(白银),
 			},
 		},
 	} },
@@ -190,6 +199,38 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
+			if ($_ eq 'buddhist') {
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1900;
+					return 'evening1' if $time >= 1900
+						&& $time < 2400;
+					return 'morning1' if $time >= 500
+						&& $time < 800;
+					return 'morning2' if $time >= 800
+						&& $time < 1200;
+					return 'night1' if $time >= 0
+						&& $time < 500;
+				}
+				if($day_period_type eq 'selection') {
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1900;
+					return 'evening1' if $time >= 1900
+						&& $time < 2400;
+					return 'morning1' if $time >= 500
+						&& $time < 800;
+					return 'morning2' if $time >= 800
+						&& $time < 1200;
+					return 'night1' if $time >= 0
+						&& $time < 500;
+				}
+				last SWITCH;
+				}
 			if ($_ eq 'chinese') {
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
@@ -364,6 +405,8 @@ has 'eras' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'buddhist' => {
+		},
 		'chinese' => {
 		},
 		'generic' => {
@@ -382,6 +425,8 @@ has 'date_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'buddhist' => {
+		},
 		'chinese' => {
 			'full' => q{U年MMMd日EEEE},
 			'long' => q{U年MMMd日},
@@ -407,6 +452,8 @@ has 'time_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'buddhist' => {
+		},
 		'chinese' => {
 		},
 		'generic' => {
@@ -429,6 +476,8 @@ has 'datetime_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'buddhist' => {
+		},
 		'chinese' => {
 		},
 		'generic' => {
@@ -464,9 +513,7 @@ has 'datetime_formats_available_formats' => (
 			yMd => q{y年M月d日},
 		},
 		'roc' => {
-			MEd => q{M-dE},
 			MMM => q{M月},
-			Md => q{M-d},
 		},
 	} },
 );
@@ -484,6 +531,12 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'buddhist' => {
+			Hv => {
+				H => q{vHH–HH},
+			},
+			fallback => '{0}–{1}',
+		},
 		'generic' => {
 			Hmv => {
 				H => q{vHH:mm–HH:mm},

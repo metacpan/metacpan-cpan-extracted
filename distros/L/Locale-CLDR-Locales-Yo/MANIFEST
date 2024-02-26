@@ -1,8 +1,8 @@
 Build.PL
 lib/Locale/CLDR/Locales/Yo.pm
-lib/Locale/CLDR/Locales/Yo/Any.pm
-lib/Locale/CLDR/Locales/Yo/Any/Bj.pm
-lib/Locale/CLDR/Locales/Yo/Any/Ng.pm
+lib/Locale/CLDR/Locales/Yo/Latn.pm
+lib/Locale/CLDR/Locales/Yo/Latn/Bj.pm
+lib/Locale/CLDR/Locales/Yo/Latn/Ng.pm
 MANIFEST			This list of files
 README
 t/00-load.t

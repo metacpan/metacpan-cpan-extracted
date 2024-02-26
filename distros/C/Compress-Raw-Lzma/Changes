@@ -1,7 +1,27 @@
 CHANGES
 -------
 
-  2.206 25July 2023
+  2.209 19 February 2024
+
+    * Merge pull request #11 from pkg-perl-tools/pkg-perl-1708373862
+      Mon Feb 19 22:42:43 2024 +0000
+      b05c0160b9572684998708f7ce21fc5a59e1a850
+
+    * raise skip count in t/001version.t
+      Mon Feb 19 21:17:55 2024 +0100
+      5912a2cf7f426c5efec08cb6e1e4d93625fb2c61
+
+  2.208 19 February 2024
+
+    * fix for READMEmd target
+      Mon Feb 19 09:11:39 2024 +0000
+      c8e794edf48382738aeed4e2f43a938c68a80c76
+
+  2.207 18 February 2024
+
+    * No changes
+
+  2.206 25 July 2023
 
     * 2.206
       Tue, 25 Jul 2023 16:24:23 +0100

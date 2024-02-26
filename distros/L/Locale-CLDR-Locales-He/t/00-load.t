@@ -4,9 +4,9 @@ use Test::Exception;
 use ok( 'Locale::CLDR' );
 my $locale;
 
-diag( "Testing Locale::CLDR v0.40.1, Perl $], $^X" );
+diag( "Testing Locale::CLDR v0.44.0, Perl $], $^X" );
 use ok 'Locale::CLDR::Locales::He';
-use ok 'Locale::CLDR::Locales::He::Any::Il';
-use ok 'Locale::CLDR::Locales::He::Any';
+use ok 'Locale::CLDR::Locales::He::Hebr::Il';
+use ok 'Locale::CLDR::Locales::He::Hebr';
 
 done_testing();

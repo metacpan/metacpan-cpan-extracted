@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Uz::Arab - Package for language Uzbek
 
 package Locale::CLDR::Locales::Uz::Arab;
 # This file auto generated from Data\common\main\uz_Arab.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -23,7 +23,7 @@ use if $^V ge v5.12.0, feature => 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
-extends('Locale::CLDR::Locales::Uz');
+extends('Locale::CLDR::Locales::Root');
 has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
@@ -126,10 +126,6 @@ has 'number_symbols' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'arabext' => {
-			'decimal' => q(٫),
-			'exponential' => q(×۱۰^),
-			'group' => q(٬),
-			'percentSign' => q(٪),
 			'timeSeparator' => q(:),
 		},
 		'latn' => {

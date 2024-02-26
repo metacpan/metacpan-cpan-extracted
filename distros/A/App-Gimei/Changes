@@ -1,5 +1,14 @@
 Revision history for Perl extension App-Gimei
 
+v0.2.5 2024-02-22T19:26:26Z
+    - introduce Generators
+    - Parser was defined as a class
+    - organize packages
+    - rewrite with subroutine signature
+    - perltidy
+    - change field name rendering
+    - move error handling of unprocessed tokens from render() to parse_arg()
+
 v0.2.4 2023-12-23T12:27:01Z
     - [dev]add modules
     - specify version <5.00 on 'Pod::Text'

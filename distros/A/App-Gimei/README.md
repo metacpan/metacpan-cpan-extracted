@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/youpong/App-Gimei/workflows/test/badge.svg)](https://github.com/youpong/App-Gimei/actions)
+[![Actions Status](https://github.com/youpong/App-Gimei/workflows/test/badge.svg)](https://github.com/youpong/App-Gimei/actions) [![MetaCPAN Release](https://badge.fury.io/pl/App-Gimei.svg)](https://metacpan.org/release/App-Gimei)
 # NAME
 
 App::Gimei - a CLI for Data::Gimei

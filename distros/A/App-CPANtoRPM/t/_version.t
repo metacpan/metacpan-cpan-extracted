@@ -15,8 +15,8 @@ my $ti;
 
 BEGIN {
    $ti      = new Test::Inter $0;
-   unless ($ENV{RELEASE_TESTING}) {
-      $ti->skip_all('Author tests not required for installation (set RELEASE_TESTING to test)');
+   unless ($ENV{App_CPANtoRPM_RELEASE_TESTING}) {
+      $ti->skip_all('Author tests not required for installation (set App_CPANtoRPM_RELEASE_TESTING to test)');
    }
 }
 

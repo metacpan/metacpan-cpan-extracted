@@ -48,7 +48,7 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Net-EPP-Registry-Nominet"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Net-EPP-Registry-Nominet"
       },
       "repository" : {
          "type" : "git",
@@ -56,6 +56,6 @@
          "web" : "https://gitlab.com/openstrike/nominet-epp"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

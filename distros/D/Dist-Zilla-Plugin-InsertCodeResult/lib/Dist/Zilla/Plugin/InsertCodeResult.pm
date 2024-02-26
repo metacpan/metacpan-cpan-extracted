@@ -1,15 +1,11 @@
 package Dist::Zilla::Plugin::InsertCodeResult;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-06'; # DATE
-our $DIST = 'Dist-Zilla-Plugin-InsertCodeResult'; # DIST
-our $VERSION = '0.055'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
 use Data::Dump qw(dump);
+use String::CommonPrefix qw(common_prefix);
 
 use Moose;
 with (
@@ -22,6 +18,11 @@ with (
 has make_verbatim => (is => 'rw', default => sub{1});
 
 use namespace::autoclean;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-12-11'; # DATE
+our $DIST = 'Dist-Zilla-Plugin-InsertCodeResult'; # DIST
+our $VERSION = '0.056'; # VERSION
 
 sub munge_files {
     my $self = shift;
@@ -52,7 +53,15 @@ sub _code_result {
     local @INC = @INC;
     unshift @INC, "lib";
 
-    my $res = eval $code;
+  REMOVE_COMMENT: {
+        my @lines = split /^/m, $code;
+        my $common_prefix = common_prefix(@lines);
+        if ($common_prefix =~ /\A\#+\s*\z/) {
+            $code =~ s/^\Q$common_prefix\E//gm;
+        }
+    }
+
+    my $res = eval $code;## no critic: BuiltinFunctions::ProhibitStringyEval
 
     if ($@) {
         die "eval '$code' failed: $@";
@@ -82,7 +91,7 @@ Dist::Zilla::Plugin::InsertCodeResult - Insert the result of Perl code into your
 
 =head1 VERSION
 
-This document describes version 0.055 of Dist::Zilla::Plugin::InsertCodeResult (from Perl distribution Dist-Zilla-Plugin-InsertCodeResult), released on 2021-08-06.
+This document describes version 0.056 of Dist::Zilla::Plugin::InsertCodeResult (from Perl distribution Dist-Zilla-Plugin-InsertCodeResult), released on 2023-12-11.
 
 =head1 SYNOPSIS
 
@@ -101,6 +110,15 @@ or for multiline code:
  require MyLib;
  MyLib::gen_stuff("some", "param");
  ...
+ # END_CODE
+
+(you can prefix each line in multiline code with comment, to prevent this code
+from being analyzed by other analyzers e.g. L<scan_prereqs>):
+
+ # BEGIN_CODE
+ #require MyLib;
+ #MyLib::gen_stuff("some", "param");
+ #...
  # END_CODE
 
 =head1 DESCRIPTION
@@ -124,14 +142,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Dist-Zilla
 
 Source repository is at L<https://github.com/perlancar/perl-Dist-Zilla-Plugin-InsertCodeResult>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-InsertCodeResult>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Dist::Zilla::Plugin::InsertCodeOutput>
@@ -142,11 +152,37 @@ L<Dist::Zilla::Plugin::InsertExample>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2021, 2020, 2019, 2018, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-InsertCodeResult>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

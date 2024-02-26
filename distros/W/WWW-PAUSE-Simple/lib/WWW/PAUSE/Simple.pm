@@ -21,9 +21,9 @@ our @EXPORT_OK = qw(
                );
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-12'; # DATE
+our $DATE = '2024-02-18'; # DATE
 our $DIST = 'WWW-PAUSE-Simple'; # DIST
-our $VERSION = '0.456'; # VERSION
+our $VERSION = '0.457'; # VERSION
 
 our %SPEC;
 my $access_log = Log::ger->get_logger(category => "_access");
@@ -245,12 +245,17 @@ sub _request {
         if ($resp->code =~ /^[5]/) {
             $tries++;
             my $delay = $strategy->failure;
-            log_warn("Got error %s (%s) from server when POST-ing to %s%s, retrying (%d/%d) in %d second(s) ...",
-                     $resp->code, $resp->message,
-                     $url,
-                     $args{note} ? " ($args{note})" : "",
-                     $tries, $args{retries}, $delay);
-            sleep $delay;
+            if ($delay < 0) {
+                log_warn("Got error %s (%s) from server when POST-ing to %s%s, giving up");
+                last;
+            } else {
+                log_warn("Got error %s (%s) from server when POST-ing to %s%s, retrying (%d/%d) in %d second(s) ...",
+                         $resp->code, $resp->message,
+                         $url,
+                         $args{note} ? " ($args{note})" : "",
+                         $tries, $args{retries}, $delay);
+                sleep $delay;
+            }
             next;
         }
         last;
@@ -1007,7 +1012,7 @@ WWW::PAUSE::Simple - An API for PAUSE
 
 =head1 VERSION
 
-This document describes version 0.456 of WWW::PAUSE::Simple (from Perl distribution WWW-PAUSE-Simple), released on 2023-07-12.
+This document describes version 0.457 of WWW::PAUSE::Simple (from Perl distribution WWW-PAUSE-Simple), released on 2024-02-18.
 
 =head1 SYNOPSIS
 
@@ -1692,7 +1697,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

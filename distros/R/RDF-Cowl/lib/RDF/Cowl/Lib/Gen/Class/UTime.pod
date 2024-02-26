@@ -1,0 +1,120 @@
+# PODNAME: RDF::Cowl::Lib::Gen::Class::UTime
+# ABSTRACT: Generated docs for RDF::Cowl::Ulib::UTime
+
+## DO NOT EDIT
+## Generated via maint/tt/Class.pod.tt
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+RDF::Cowl::Lib::Gen::Class::UTime - Generated docs for RDF::Cowl::Ulib::UTime
+
+=head1 VERSION
+
+version 1.0.0
+
+=head1 MAIN MODULE
+
+L<RDF::Cowl::Ulib::UTime>
+
+=head1 METHODS
+
+=head2 equals
+
+B<Signature>:
+
+  $self->equals(UTime $b)
+
+B<Params>:
+
+  UTime $a 
+  UTime $b 
+
+Documentation:
+
+  Checks whether the specified dates are equal.
+  
+  @param a First date.
+  @param b Second date.
+  @return True if the two dates are equal, false otherwise.
+
+=over 2
+
+B<C function name>: C<< utime_equals >>
+
+=back
+
+=head2 to_string
+
+B<Signature>:
+
+  $self->to_string()
+
+B<Params>:
+
+  UTime $time 
+
+Documentation:
+
+  Converts the specified date into a human readable string.
+  
+  @param time Date.
+  @return Human readable date string.
+  
+  
+  @note You are responsible for deinitializing the returned string.
+
+=over 2
+
+B<C function name>: C<< utime_to_string >>
+
+=back
+
+=head2 from_string
+
+B<Signature>:
+
+  $self->from_string(UString $string)
+
+B<Params>:
+
+  UTime $time 
+  UString $string 
+
+Documentation:
+
+  Parses a date from the specified string.
+  
+  @param[out] time Date.
+  @param string Date string.
+  @return True if the string was parsed without errors, false otherwise.
+  
+  @note The string must be in Y_M_D_H_M_S format, where each component is separated by any
+        non-digit character. An optional timezone specifier can also be specified, in which case
+        the date is automatically normalized to UTC. Examples of equivalent dates:
+        - 1990/02/14 13:30:00
+        - 1990-02-14T13:30:00Z
+        - 1990 02 14 14.30.00+1:00
+
+=over 2
+
+B<C function name>: C<< utime_from_string >>
+
+=back
+
+=head1 AUTHOR
+
+Zakariyya Mughal <zmughal@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 by Auto-Parallel Technologies, Inc..
+
+This is free software, licensed under Eclipse Public License - v 2.0.
+
+=cut

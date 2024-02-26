@@ -89,7 +89,7 @@ Untrapped exceptions in JavaScript will be rethrown as Perl exceptions.
 
 $JS\_CODE is a _character_ string.
 
-## $obj = $PROMISE = _OBJ_->eval\_module( $JS\_CODE )
+## $promise = _OBJ_->eval\_module( $JS\_CODE )
 
 Runs $JS\_CODE as a module, which enables ES6 module syntax.
 Note that no values can be returned directly in this mode of execution.
@@ -274,12 +274,6 @@ V8 versions.
 - [JE](https://metacpan.org/pod/JE) is a pure-Perl (!) JavaScript engine.
 - [JavaScript](https://metacpan.org/pod/JavaScript) and [JavaScript::Lite](https://metacpan.org/pod/JavaScript%3A%3ALite) expose Mozilla’s
 [SpiderMonkey](https://spidermonkey.dev/) engine to Perl.
-
-# TODO
-
-Upstream QuickJS seems to lack active maintenance. It may be advantageous
-to switch to one of its forks (like
-[quickjs-ng](https://github.com/quickjs-ng/quickjs)).
 
 # LICENSE & COPYRIGHT
 

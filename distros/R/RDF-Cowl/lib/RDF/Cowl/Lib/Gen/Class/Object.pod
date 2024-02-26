@@ -1,0 +1,422 @@
+# PODNAME: RDF::Cowl::Lib::Gen::Class::Object
+# ABSTRACT: Generated docs for RDF::Cowl::Object
+
+## DO NOT EDIT
+## Generated via maint/tt/Class.pod.tt
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+RDF::Cowl::Lib::Gen::Class::Object - Generated docs for RDF::Cowl::Object
+
+=head1 VERSION
+
+version 1.0.0
+
+=head1 MAIN MODULE
+
+L<RDF::Cowl::Object>
+
+=head1 METHODS
+
+=head2 release
+
+B<Signature>:
+
+  $self->release()
+
+B<Params>:
+
+  CowlAny $object 
+
+Documentation:
+
+  Releases the specified object.
+  
+  @param object The object.
+
+=over 2
+
+B<C function name>: C<< cowl_release >>
+
+=back
+
+=head2 get_type
+
+B<Signature>:
+
+  $self->get_type()
+
+B<Params>:
+
+  CowlAny $object 
+
+Documentation:
+
+  Gets the type of the specified object.
+  
+  @param object The object.
+  @return The type.
+
+=over 2
+
+B<C function name>: C<< cowl_get_type >>
+
+=back
+
+=head2 is_entity
+
+B<Signature>:
+
+  $self->is_entity()
+
+B<Params>:
+
+  CowlAny $object 
+
+Documentation:
+
+  Checks whether the specified object is an entity.
+  
+  @param object The object
+  @return True if the object is an entity, false otherwise.
+
+=over 2
+
+B<C function name>: C<< cowl_is_entity >>
+
+=back
+
+=head2 is_axiom
+
+B<Signature>:
+
+  $self->is_axiom()
+
+B<Params>:
+
+  CowlAny $object 
+
+Documentation:
+
+  Checks whether the specified object is an axiom.
+  
+  @param object The object
+  @return True if the object is an axiom, false otherwise.
+
+=over 2
+
+B<C function name>: C<< cowl_is_axiom >>
+
+=back
+
+=head2 is_cls_exp
+
+B<Signature>:
+
+  $self->is_cls_exp()
+
+B<Params>:
+
+  CowlAny $object 
+
+Documentation:
+
+  Checks whether the specified object is a class expression.
+  
+  @param object The object
+  @return True if the object is a class expression, false otherwise.
+
+=over 2
+
+B<C function name>: C<< cowl_is_cls_exp >>
+
+=back
+
+=head2 is_obj_prop_exp
+
+B<Signature>:
+
+  $self->is_obj_prop_exp()
+
+B<Params>:
+
+  CowlAny $object 
+
+Documentation:
+
+  Checks whether the specified object is an object property expression.
+  
+  @param object The object
+  @return True if the object is an object property expression, false otherwise.
+
+=over 2
+
+B<C function name>: C<< cowl_is_obj_prop_exp >>
+
+=back
+
+=head2 is_data_prop_exp
+
+B<Signature>:
+
+  $self->is_data_prop_exp()
+
+B<Params>:
+
+  CowlAny $object 
+
+Documentation:
+
+  Checks whether the specified object is a data property expression.
+  
+  @param object The object
+  @return True if the object is a data property expression, false otherwise.
+
+=over 2
+
+B<C function name>: C<< cowl_is_data_prop_exp >>
+
+=back
+
+=head2 is_individual
+
+B<Signature>:
+
+  $self->is_individual()
+
+B<Params>:
+
+  CowlAny $object 
+
+Documentation:
+
+  Checks whether the specified object is an individual.
+  
+  @param object The object
+  @return True if the object is an individual, false otherwise.
+
+=over 2
+
+B<C function name>: C<< cowl_is_individual >>
+
+=back
+
+=head2 is_data_range
+
+B<Signature>:
+
+  $self->is_data_range()
+
+B<Params>:
+
+  CowlAny $object 
+
+Documentation:
+
+  Checks whether the specified object is a data range.
+  
+  @param object The object
+  @return True if the object is a data range, false otherwise.
+
+=over 2
+
+B<C function name>: C<< cowl_is_data_range >>
+
+=back
+
+=head2 get_iri
+
+B<Signature>:
+
+  $self->get_iri()
+
+B<Params>:
+
+  CowlAny $object 
+
+Documentation:
+
+  If the object is an entity, returns its IRI, otherwise returns NULL.
+  
+  @param object The object.
+  @return IRI or NULL.
+
+=over 2
+
+B<C function name>: C<< cowl_get_iri >>
+
+=back
+
+=head2 to_string
+
+B<Signature>:
+
+  $self->to_string()
+
+B<Params>:
+
+  CowlAny $object 
+
+Documentation:
+
+  Returns the string representation of the specified object.
+  
+  @param object The object.
+  @return String representation. Throws exception on error.
+
+Throws exception on error.
+
+=over 2
+
+B<C function name>: C<< cowl_to_string >>
+
+=back
+
+=head2 to_debug_string
+
+B<Signature>:
+
+  $self->to_debug_string()
+
+B<Params>:
+
+  CowlAny $object 
+
+Documentation:
+
+  Returns a debug string representation of the specified object.
+  
+  The debug string includes internal details such as the object's address,
+  type and reference count.
+  
+  @param object The object.
+  @return String representation. Throws exception on error.
+
+Throws exception on error.
+
+=over 2
+
+B<C function name>: C<< cowl_to_debug_string >>
+
+=back
+
+=head2 equals
+
+B<Signature>:
+
+  $self->equals(CowlAny $rhs)
+
+B<Params>:
+
+  CowlAny $lhs 
+  CowlAny $rhs 
+
+Documentation:
+
+  Equality function.
+  
+  @param lhs LHS of the equality relation.
+  @param rhs RHS of the equality relation.
+  @return True if the equality relation holds, false otherwise.
+
+=over 2
+
+B<C function name>: C<< cowl_equals >>
+
+=back
+
+=head2 equals_iri_string
+
+B<Signature>:
+
+  $self->equals_iri_string(UString $iri_str)
+
+B<Params>:
+
+  CowlAny $object 
+  UString $iri_str 
+
+Documentation:
+
+  Checks if the object is an entity and its IRI matches the specified string.
+  
+  @param object The object.
+  @param iri_str IRI string.
+  @return True if the object is an entity and its IRI matches the string, false otherwise.
+
+=over 2
+
+B<C function name>: C<< cowl_equals_iri_string >>
+
+=back
+
+=head2 hash
+
+B<Signature>:
+
+  $self->hash()
+
+B<Params>:
+
+  CowlAny $object 
+
+Documentation:
+
+  Hash function.
+  
+  @param object The object.
+  @return The hash value.
+
+=over 2
+
+B<C function name>: C<< cowl_hash >>
+
+=back
+
+=head2 iterate_primitives
+
+B<Signature>:
+
+  $self->iterate_primitives(CowlPrimitiveFlags $flags, CowlIterator $iter)
+
+B<Params>:
+
+  CowlAny $object 
+  CowlPrimitiveFlags $flags 
+  CowlIterator $iter 
+
+Documentation:
+
+  Iterates over the primitives referenced by the specified object.
+  
+  @param object The object.
+  @param flags Iteration flags.
+  @param iter The iterator.
+  @return True if the iteration was completed, false if it was stopped.
+
+=over 2
+
+B<C function name>: C<< cowl_iterate_primitives >>
+
+=back
+
+=for comment # cowl_retain
+# See manual binding definition.
+
+=head1 AUTHOR
+
+Zakariyya Mughal <zmughal@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 by Auto-Parallel Technologies, Inc..
+
+This is free software, licensed under Eclipse Public License - v 2.0.
+
+=cut

@@ -61,11 +61,9 @@ This module provides some transcendental functions for matrices.
 Moreover it provides sec, asec, sech, asech, cot, acot, acoth, coth, csc,
 acsc, csch, acsch. Beware, importing this module will overwrite the hidden
 PDL routine sec. If you need to call it specify its origin module : PDL::Basic::sec(args)
-#line 65 "Trans.pm"
 
-
-
-
+=cut
+#line 67 "Trans.pm"
 
 
 =head1 FUNCTIONS
@@ -168,9 +166,7 @@ sub PDL::cgeexp {
   goto &PDL::__Ncgeexp;
 }
 *cgeexp = \&PDL::cgeexp;
-#line 172 "Trans.pm"
-
-
+#line 170 "Trans.pm"
 
 *__Cctrsqrt = \&PDL::__Cctrsqrt;
 
@@ -209,9 +205,7 @@ sub PDL::ctrsqrt {
   goto &PDL::__Nctrsqrt;
 }
 *ctrsqrt = \&PDL::ctrsqrt;
-#line 213 "Trans.pm"
-
-
+#line 209 "Trans.pm"
 
 *__Cctrfun = \&PDL::__Cctrfun;
 
@@ -247,13 +241,8 @@ sub PDL::ctrfun {
   goto &PDL::__Nctrfun;
 }
 *ctrfun = \&PDL::ctrfun;
-#line 251 "Trans.pm"
 
-
-
-
-#line 817 "trans.pd"
-
+#line 807 "trans.pd"
 my $pi;
 BEGIN { $pi = pdl(3.1415926535897932384626433832795029) }
 sub pi () { $pi->copy };
@@ -1240,12 +1229,7 @@ it under the terms of the Perl Artistic License as in the file Artistic_2
 in this distribution.
 
 =cut
-#line 1244 "Trans.pm"
-
-
-
-
-
+#line 1233 "Trans.pm"
 
 # Exit with OK status
 

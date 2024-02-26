@@ -91,7 +91,7 @@ SKIP: {
 
 	# rt-147136 login as new user.
 	is $epp->{authenticated}, 0, 'Unauthenticated';
-	is $epp->{connected}, 0, 'Unconnected';
+	is $epp->{connected}, undef, 'Unconnected';
 	isnt ($epp->login ("$ENV{NOMTAG}_", $ENV{NOMPASS}), undef, 'Login as secondary user with good credentials');
 	is ($Net::EPP::Registry::Nominet::Code, 1000, 'Logged in') or diag
 	$epp->get_message;
@@ -113,7 +113,7 @@ SKIP: {
 		'Expected warnings are thrown';
 	ok ((not defined $epp), 'Reconnect with duff SSL cert verification');
 	SKIP: {
-		skip "Server cert may not be valid now", 1 if time > 1707436800;
+		skip "Server cert may not be valid now", 1 if time > 1930130556;
 		$newargs{ca_file}  = 't/ca.crt';
 		$epp = Net::EPP::Registry::Nominet->new (%newargs);
 		ok (defined $epp, 'Reconnect with good SSL cert verification');

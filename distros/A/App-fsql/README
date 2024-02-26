@@ -3,7 +3,7 @@ NAME
     files,TableData modules}
 
 VERSION
-    This document describes version 0.232 of App::fsql (from Perl
+    This document describes version 0.233 of App::fsql (from Perl
     distribution App-fsql), released on 2023-12-29.
 
 SYNOPSIS

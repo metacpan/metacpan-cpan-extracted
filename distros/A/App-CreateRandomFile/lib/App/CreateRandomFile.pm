@@ -1,14 +1,16 @@
 package App::CreateRandomFile;
 
-our $DATE = '2017-03-21'; # DATE
-our $VERSION = '0.02'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
-use File::MoreUtil qw(file_exists);
+use File::Util::Test qw(file_exists);
 use IO::Prompt::I18N qw(confirm);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-11-20'; # DATE
+our $DIST = 'App-CreateRandomFile'; # DIST
+our $VERSION = '0.021'; # VERSION
 
 our %SPEC;
 
@@ -26,7 +28,7 @@ sub _write_block {
 
 $SPEC{create_random_file} = {
     v => 1.1,
-    summary => 'Create random file',
+    summary => 'Create file with random content',
     description => <<'_',
 
 Create "random" file with a specified size. There are several choices of what
@@ -191,7 +193,7 @@ sub create_random_file {
 }
 
 1;
-# ABSTRACT: Create random file
+# ABSTRACT: Create file with random content
 
 __END__
 
@@ -201,11 +203,11 @@ __END__
 
 =head1 NAME
 
-App::CreateRandomFile - Create random file
+App::CreateRandomFile - Create file with random content
 
 =head1 VERSION
 
-This document describes version 0.02 of App::CreateRandomFile (from Perl distribution App-CreateRandomFile), released on 2017-03-21.
+This document describes version 0.021 of App::CreateRandomFile (from Perl distribution App-CreateRandomFile), released on 2023-11-20.
 
 =head1 SYNOPSIS
 
@@ -218,9 +220,9 @@ See L<create-random-file>.
 
 Usage:
 
- create_random_file(%args) -> [status, msg, result, meta]
+ create_random_file(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-Create random file.
+Create file with random content.
 
 Examples:
 
@@ -228,19 +230,19 @@ Examples:
 
 =item * Create a file of size 1MB containing random bytes:
 
- create_random_file( name => "file1", size => "1M");
+ create_random_file(name => "file1", size => "1M");
 
 =item * Like the previous example (--random-bytes is optional):
 
- create_random_file( name => "file2", size => "2M", random_bytes => 1);
+ create_random_file(name => "file2", size => "2M", random_bytes => 1);
 
 =item * Create a file of size 3.5KB containing repeated pattern:
 
- create_random_file( name => "file3", size => "3.5K", patterns => ["AABBCC"]);
+ create_random_file(name => "file3", size => "3.5K", patterns => ["AABBCC"]);
 
 =item * Create a file of size 4KB containing random sequences of A, B, C:
 
- create_random_file( name => "file4", size => "4K", patterns => ["A", "B", "C"]);
+ create_random_file(name => "file4", size => "4K", patterns => ["A", "B", "C"]);
 
 =back
 
@@ -282,6 +284,8 @@ If set to false then will not prompt interactively and usually will proceed
 
 =item * B<name>* => I<str>
 
+(No description)
+
 =item * B<overwrite> => I<bool> (default: 0)
 
 Whether to overwrite existing file.
@@ -291,22 +295,27 @@ to prompt, or bail (if not interactive).
 
 =item * B<patterns> => I<array[str]>
 
+(No description)
+
 =item * B<random_bytes> => I<bool>
+
+(No description)
 
 =item * B<size>* => I<str>
 
 Size (e.g. 10K, 22.5M).
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -318,6 +327,35 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-Create
 
 Source repository is at L<https://github.com/perlancar/perl-App-CreateRandomFile>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023, 2017, 2015 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-CreateRandomFile>
@@ -325,16 +363,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2017, 2015 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

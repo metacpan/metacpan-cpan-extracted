@@ -8,9 +8,9 @@ use AsposeCellsCloud::Request::PostWorksheetCellsRangeStyle;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**name** | **string** | The workbook name. |
+**name** | **string** | The file name. |
 **sheet_name** | **string** | The worksheet name. |
-**range_operate** | **RangeSetStyleRequest** | Range Set Style Request  |
+**range_operate** | **RangeSetStyleRequest** | RangeSetStyleRequest Range Set Style Request  |
 **folder** | **string** | Original workbook folder. |
 **storage_name** | **string** | Storage name. |  
 

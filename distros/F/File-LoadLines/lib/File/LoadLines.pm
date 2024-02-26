@@ -17,7 +17,7 @@ File::LoadLines - Load lines from files and network
 
 =cut
 
-our $VERSION = '1.045';
+our $VERSION = '1.046';
 
 =head1 SYNOPSIS
 
@@ -33,7 +33,7 @@ File::LoadLines provides an easy way to load the contents of a text
 file into an array of lines. It is intended for small to moderate size files
 like config files that are often produced by weird tools (and users).
 
-It will transparantly fetch data from the network if the provided file
+It will transparently fetch data from the network if the provided file
 name is a URL.
 
 File::LoadLines automatically handles ASCII, Latin-1 and UTF-8 text.

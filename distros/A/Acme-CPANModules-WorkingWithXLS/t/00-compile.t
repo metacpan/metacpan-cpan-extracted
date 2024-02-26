@@ -6,10 +6,13 @@ use warnings;
 
 use Test::More;
 
-plan tests => 1 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'Acme/CPANModules/WorkingWithXLS.pm'
+    'Acme/CPANModules/Spreadsheet.pm',
+    'Acme/CPANModules/WorkingWithODS.pm',
+    'Acme/CPANModules/WorkingWithXLS.pm',
+    'Acme/CPANModules/WorkingWithXLSX.pm'
 );
 
 

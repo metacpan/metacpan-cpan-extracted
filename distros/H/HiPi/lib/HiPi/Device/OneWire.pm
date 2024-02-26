@@ -1,7 +1,7 @@
 #########################################################################################
 # Package        HiPi::Device::OneWire
 # Description  : 1-Wire Device
-# Copyright    : Copyright (c) 2013-2017 Mark Dootson
+# Copyright    : Copyright (c) 2013-2023 Mark Dootson
 # License      : This is free software; you can redistribute it and/or modify it under
 #                the same terms as the Perl 5 programming language system itself.
 #########################################################################################
@@ -16,7 +16,7 @@ use Carp;
 use HiPi;
 use parent qw( HiPi::Device );
 
-our $VERSION ='0.81';
+our $VERSION ='0.91';
 
 our %idmap = (
     '01' => [ '2401/11', 'silicon serial number'], 
@@ -73,15 +73,15 @@ sub get_required_module_options {
     return $moduleoptions;
 }
 
-sub list_slaves {
+sub list_devices {
     my( $class ) = @_;
     my @rlist = ();
     my $slist = qx(/bin/cat /sys/bus/w1/devices/w1_bus_master1/w1_master_slaves);
     if( $? ) {
         return @rlist;
     }
-    my @slaves = split(/\n/, $slist);
-    for my $id ( @slaves ) {
+    my @devices = split(/\n/, $slist);
+    for my $id ( @devices ) {
         my ( $family, $discard ) = split(/-/, $id);
         $family = '0' . $family if length($family) == 1;
         my ($name, $desc) = ('','');
@@ -107,5 +107,9 @@ sub id_exists {
     my $slist = qx(/bin/cat /sys/bus/w1/devices/w1_bus_master1/w1_master_slaves);
     return ( $slist =~ /\Q$id\E/ && -e qq(/sys/bus/w1/devices/$id/w1_slave) ) ? 1 : 0;
 }
+
+## legacy calls
+
+*HiPi::Device::OneWire::list_slaves = \&list_devices;
 
 1;

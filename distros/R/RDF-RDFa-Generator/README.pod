@@ -12,7 +12,7 @@ use strict;
 use warnings;
 
 
-our $VERSION = '0.200';
+our $VERSION = '0.204';
 
 use RDF::RDFa::Generator::HTML::Head;
 use RDF::RDFa::Generator::HTML::Hidden;
@@ -75,8 +75,8 @@ sub new
 
 =item C<< $gen->create_document($model, %opts) >>
 
-Creates a new RDFa file containing triples. $model is an RDF::Trine::Model object
-providing the triples. Returns an XML::LibXML::Document object suitable
+Creates a new RDFa file containing triples. $model is an L<Attean::QuadModel> (where the graph name is not used) object
+providing the triples. Returns an L<XML::LibXML::Document> object suitable
 for serializing using its C<toString> method.
 
 If you're planning on serving the RDFa with the text/html media type, then
@@ -102,9 +102,9 @@ sub create_document
 
 =item C<< $gen->inject_document($document, $model) >>
 
-Injects an existing document with triples. $document is an XML::LibXML::Document
-to inject, or a well-formed XML string. $model is an RDF::Trine::Model object providing
-the triples. Returns an XML::LibXML::Document object suitable
+Injects an existing document with triples. $document is an L<XML::LibXML::Document>
+to inject, or a well-formed XML string. $model is an L<Attean::QuadModel> (where the graph name is not used) object providing
+the triples. Returns an L<XML::LibXML::Document> object suitable
 for serializing using its C<toString> method.
 
 See C<create_document> for information about serving the RDFa with the
@@ -123,10 +123,10 @@ sub inject_document
 
 =item C<< $gen->nodes($model) >>
 
-Provides triple-laden XML::LibXML::Elements to be added to a document.
-$model is an RDF::Trine::Model object providing the triples. If called in
-list context, returns a list of XML::LibXML::Element objects which can be
-added to a document; otherwise returns an XML::LibXML::NodeList containing
+Provides triple-laden L<XML::LibXML::Elements> to be added to a document.
+$model is an L<Attean::QuadModel> (where the graph name is not used) object providing the triples. If called in
+list context, returns a list of L<XML::LibXML::Element> objects which can be
+added to a document; otherwise returns an L<XML::LibXML::NodeList> containing
 a list of such elements.
 
 Can also be called as a class method. See C<create_document> for details.
@@ -135,7 +135,7 @@ The HTML::Pretty generator can be passed a couple of additional options:
 
   $gen->nodes($model, notes_heading=>'Additional Info', notes=>\@notes);
 
-The notes are a list of RDF::RDFa::Generator::HTML::Pretty::Note objects
+The notes are a list of L<RDF::RDFa::Generator::HTML::Pretty::Note> objects
 which are added as notes to the end of each subject's data.
 
 =cut

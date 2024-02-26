@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,14 +59,16 @@ sub new {
 
 
 # Run Operation Request
-# PutConvertWorkbookRequest.File : The format to convert(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers).  ,
+# PutConvertWorkbookRequest.File : File to upload  ,
 # PutConvertWorkbookRequest.format : The format to convert(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers).  ,
 # PutConvertWorkbookRequest.password : The password needed to open an Excel file.  ,
 # PutConvertWorkbookRequest.outPath : Path to save the result. If it`s a single file, the `outPath` should encompass both the filename and extension. In the case of multiple files, the `outPath` should only include the folder.  ,
 # PutConvertWorkbookRequest.storageName : The storage name where the file is situated.  ,
 # PutConvertWorkbookRequest.checkExcelRestriction : Whether check restriction of excel file when user modify cells related objects.  ,
 # PutConvertWorkbookRequest.streamFormat : The format of the input file stream.   ,
-# PutConvertWorkbookRequest.region : The regional settings for workbook.   
+# PutConvertWorkbookRequest.region : The regional settings for workbook.  ,
+# PutConvertWorkbookRequest.pageWideFitOnPerSheet : The page wide fit on worksheet.  ,
+# PutConvertWorkbookRequest.pageTallFitOnPerSheet : The page tall fit on worksheet.   
 
 {
     my $params = {
@@ -129,6 +131,14 @@ sub run_http_request {
 
     if(defined $self->region){
         $query_params->{'region'} = $client->to_query_value($self->region);      
+    }
+
+    if(defined $self->page_wide_fit_on_per_sheet){
+        $query_params->{'pageWideFitOnPerSheet'} = $client->to_query_value($self->page_wide_fit_on_per_sheet);      
+    }
+
+    if(defined $self->page_tall_fit_on_per_sheet){
+        $query_params->{'pageTallFitOnPerSheet'} = $client->to_query_value($self->page_tall_fit_on_per_sheet);      
     } 
     my $_body_data;
  
@@ -153,7 +163,7 @@ __PACKAGE__->method_documentation({
      'file' => {
      	datatype => 'string',
      	base_name => 'File',
-     	description => 'The format to convert(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers).',
+     	description => 'File to upload',
      	format => '',
      	read_only => '',
      		},
@@ -205,6 +215,20 @@ __PACKAGE__->method_documentation({
      	description => 'The regional settings for workbook.',
      	format => '',
      	read_only => '',
+     		},
+     'page_wide_fit_on_per_sheet' => {
+     	datatype => 'string',
+     	base_name => 'pageWideFitOnPerSheet',
+     	description => 'The page wide fit on worksheet.',
+     	format => '',
+     	read_only => '',
+     		},
+     'page_tall_fit_on_per_sheet' => {
+     	datatype => 'string',
+     	base_name => 'pageTallFitOnPerSheet',
+     	description => 'The page tall fit on worksheet.',
+     	format => '',
+     	read_only => '',
      		},    
 });
 
@@ -217,7 +241,9 @@ __PACKAGE__->attribute_map( {
     'storage_name' => 'storageName',
     'check_excel_restriction' => 'checkExcelRestriction',
     'stream_format' => 'streamFormat',
-    'region' => 'region' 
+    'region' => 'region',
+    'page_wide_fit_on_per_sheet' => 'pageWideFitOnPerSheet',
+    'page_tall_fit_on_per_sheet' => 'pageTallFitOnPerSheet' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

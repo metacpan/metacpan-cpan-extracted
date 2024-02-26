@@ -8,9 +8,9 @@ use AsposeCellsCloud::Request::PostWorksheetCellsRangeSort;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**name** | **string** | The workbook name. |
+**name** | **string** | The file name. |
 **sheet_name** | **string** | The worksheet name. |
-**range_sort_request** | **RangeSortRequest** | Range Sort Request  |
+**range_sort_request** | **RangeSortRequest** | RangeSortRequest Range Sort Request  |
 **folder** | **string** | Original workbook folder. |
 **storage_name** | **string** | Storage name. |  
 

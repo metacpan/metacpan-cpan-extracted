@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 38 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 54 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Data/Sah/Coerce/perl/To_int/From_str/convert_en_dow_name_to_num.pm',
@@ -31,6 +31,14 @@ my @module_files = (
     'Sah/Schema/date/tz_offset.pm',
     'Sah/Schema/date/tz_offset_lax.pm',
     'Sah/Schema/date/year.pm',
+    'Sah/Schema/datetime/default_end_of_last_month_local.pm',
+    'Sah/Schema/datetime/default_end_of_last_month_utc.pm',
+    'Sah/Schema/datetime/default_end_of_yesterday_local.pm',
+    'Sah/Schema/datetime/default_end_of_yesterday_utc.pm',
+    'Sah/Schema/datetime/default_start_of_this_month_local.pm',
+    'Sah/Schema/datetime/default_start_of_this_month_utc.pm',
+    'Sah/Schema/datetime/default_start_of_today_local.pm',
+    'Sah/Schema/datetime/default_start_of_today_utc.pm',
     'Sah/SchemaR/date/day.pm',
     'Sah/SchemaR/date/dow_name/en.pm',
     'Sah/SchemaR/date/dow_num.pm',
@@ -46,6 +54,14 @@ my @module_files = (
     'Sah/SchemaR/date/tz_offset.pm',
     'Sah/SchemaR/date/tz_offset_lax.pm',
     'Sah/SchemaR/date/year.pm',
+    'Sah/SchemaR/datetime/default_end_of_last_month_local.pm',
+    'Sah/SchemaR/datetime/default_end_of_last_month_utc.pm',
+    'Sah/SchemaR/datetime/default_end_of_yesterday_local.pm',
+    'Sah/SchemaR/datetime/default_end_of_yesterday_utc.pm',
+    'Sah/SchemaR/datetime/default_start_of_this_month_local.pm',
+    'Sah/SchemaR/datetime/default_start_of_this_month_utc.pm',
+    'Sah/SchemaR/datetime/default_start_of_today_local.pm',
+    'Sah/SchemaR/datetime/default_start_of_today_utc.pm',
     'Sah/Schemas/Date.pm'
 );
 

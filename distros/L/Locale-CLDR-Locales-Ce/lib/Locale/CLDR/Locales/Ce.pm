@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ce - Package for language Chechen
 
 package Locale::CLDR::Locales::Ce;
 # This file auto generated from Data\common\main\ce.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -24,22 +24,6 @@ use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
 extends('Locale::CLDR::Locales::Root');
-# Need to add code for Key type pattern
-sub display_name_pattern {
-	my ($self, $name, $region, $script, $variant) = @_;
-
-	my $display_pattern = '{0} ({1})';
-	$display_pattern =~s/\{0\}/$name/g;
-	my $subtags = join '{0}, {1}', grep {$_} (
-		$region,
-		$script,
-		$variant,
-	);
-
-	$display_pattern =~s/\{1\}/$subtags/g;
-	return $display_pattern;
-}
-
 has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
@@ -135,6 +119,7 @@ has 'display_name_language' => (
  				'en_GB' => 'британин ингалсан',
  				'en_GB@alt=short' => 'ингалсан (Британи)',
  				'en_US' => 'американ ингалсан',
+ 				'en_US@alt=short' => 'ингалсан (АЦШ)',
  				'eo' => 'эсперанто',
  				'es' => 'испанхойн',
  				'es_419' => 'латинан американ испанхойн',
@@ -881,16 +866,6 @@ has 'display_name_code_patterns' => (
 	},
 );
 
-has 'text_orientation' => (
-	is			=> 'ro',
-	isa			=> HashRef[Str],
-	init_arg	=> undef,
-	default		=> sub { return {
-			lines => 'top-to-bottom',
-			characters => 'left-to-right',
-		}}
-);
-
 has 'characters' => (
 	is			=> 'ro',
 	isa			=> HashRef,
@@ -900,29 +875,17 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			index => ['А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я'],
-			main => qr{[а {аь} б в г {гӏ} д е ё ж з и {ий} й к {кк} {ккх} {кх} {кь} {кӏ} л м н о {ов} {оь} п {пп} {пӏ} р {рхӏ} с {сс} т {тт} {тӏ} у {ув} {уь} {уьй} ф х {хь} {хӏ} ц {цӏ} ч {чӏ} ш щ ъ ы ь э ю {юь} я {яь}]},
-			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
-			punctuation => qr{[\- ‐ ‑ – — , ; \: ! ? . … ' ‘ ‚ " “ „ « » ( ) \[ \] \{ \} § @ * / \& #]},
+			index => ['А', 'Б', 'В', 'Г', 'Д', 'ЕЁ', 'Ж', 'З', 'И', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я'],
+			main => qr{[а {аь} б в г {гӏ} д её ж з и {ий} й к {кк} {ккх} {кх} {кь} {кӏ} л м н о {ов} {оь} п {пп} {пӏ} р {рхӏ} с {сс} т {тт} {тӏ} у {ув} {уь} {уьй} ф х {хь} {хӏ} ц {цӏ} ч {чӏ} ш щ ъ ы ь э ю {юь} я {яь}]},
+			punctuation => qr{[\- ‐‑ – — , ; \: ! ? . … '‘‚ "“„ « » ( ) \[ \] \{ \} § @ * / \& #]},
 		};
 	},
 EOT
 : sub {
-		return { index => ['А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я'], };
+		return { index => ['А', 'Б', 'В', 'Г', 'Д', 'ЕЁ', 'Ж', 'З', 'И', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я'], };
 },
 );
 
-
-has 'duration_units' => (
-	is			=> 'ro',
-	isa			=> HashRef[Str],
-	init_arg	=> undef,
-	default		=> sub { {
-				hm => 'h:mm',
-				hms => 'h:mm:ss',
-				ms => 'm:ss',
-			} }
-);
 
 has 'units' => (
 	is			=> 'ro',
@@ -931,27 +894,13 @@ has 'units' => (
 	default		=> sub { {
 				'long' => {
 					# Long Unit Identifier
-					'duration-century' => {
-						'name' => q(c),
-						'one' => q({0} c),
-						'other' => q({0} c),
-					},
-					# Core Unit Identifier
-					'century' => {
-						'name' => q(c),
-						'one' => q({0} c),
-						'other' => q({0} c),
-					},
-					# Long Unit Identifier
 					'duration-day' => {
-						'name' => q(денош),
 						'one' => q({0} де),
 						'other' => q({0} де),
 						'per' => q({0} дийнахь),
 					},
 					# Core Unit Identifier
 					'day' => {
-						'name' => q(денош),
 						'one' => q({0} де),
 						'other' => q({0} де),
 						'per' => q({0} дийнахь),
@@ -1113,18 +1062,6 @@ has 'units' => (
 						'name' => q(дециметраш),
 						'one' => q({0} дециметр),
 						'other' => q({0} дециметр),
-					},
-					# Long Unit Identifier
-					'length-foot' => {
-						'name' => q(футаш),
-						'one' => q({0} фут),
-						'other' => q({0} фут),
-					},
-					# Core Unit Identifier
-					'foot' => {
-						'name' => q(футаш),
-						'one' => q({0} фут),
-						'other' => q({0} фут),
 					},
 					# Long Unit Identifier
 					'length-inch' => {
@@ -1165,50 +1102,12 @@ has 'units' => (
 						'other' => q({0} д.),
 					},
 					# Long Unit Identifier
-					'duration-hour' => {
-						'name' => q(сахь),
-						'one' => q({0} сахь.),
-						'other' => q({0} сахь.),
-					},
-					# Core Unit Identifier
-					'hour' => {
-						'name' => q(сахь),
-						'one' => q({0} сахь.),
-						'other' => q({0} сахь.),
-					},
-					# Long Unit Identifier
-					'duration-millisecond' => {
-						'name' => q(мс),
-						'one' => q({0} мс),
-						'other' => q({0} мс),
-					},
-					# Core Unit Identifier
-					'millisecond' => {
-						'name' => q(мс),
-						'one' => q({0} мс),
-						'other' => q({0} мс),
-					},
-					# Long Unit Identifier
-					'duration-minute' => {
-						'name' => q(мин),
-						'one' => q({0} мин),
-						'other' => q({0} мин),
-					},
-					# Core Unit Identifier
-					'minute' => {
-						'name' => q(мин),
-						'one' => q({0} мин),
-						'other' => q({0} мин),
-					},
-					# Long Unit Identifier
 					'duration-month' => {
-						'name' => q(бут),
 						'one' => q({0} б.),
 						'other' => q({0} б.),
 					},
 					# Core Unit Identifier
 					'month' => {
-						'name' => q(бут),
 						'one' => q({0} б.),
 						'other' => q({0} б.),
 					},
@@ -1226,66 +1125,26 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'duration-week' => {
-						'name' => q(кӀир),
 						'one' => q({0} кӀ.),
 						'other' => q({0} кӀ.),
 					},
 					# Core Unit Identifier
 					'week' => {
-						'name' => q(кӀир),
 						'one' => q({0} кӀ.),
 						'other' => q({0} кӀ.),
 					},
 					# Long Unit Identifier
-					'duration-year' => {
-						'name' => q(ш.),
-						'one' => q({0} ш.),
-						'other' => q({0} ш.),
-					},
-					# Core Unit Identifier
-					'year' => {
-						'name' => q(ш.),
-						'one' => q({0} ш.),
-						'other' => q({0} ш.),
-					},
-					# Long Unit Identifier
 					'length-centimeter' => {
-						'name' => q(см),
 						'one' => q({0} см),
 						'other' => q({0} cm),
 					},
 					# Core Unit Identifier
 					'centimeter' => {
-						'name' => q(см),
 						'one' => q({0} см),
 						'other' => q({0} cm),
 					},
-					# Long Unit Identifier
-					'length-kilometer' => {
-						'name' => q(км),
-						'one' => q({0} км),
-						'other' => q({0} км),
-					},
-					# Core Unit Identifier
-					'kilometer' => {
-						'name' => q(км),
-						'one' => q({0} км),
-						'other' => q({0} км),
-					},
 				},
 				'short' => {
-					# Long Unit Identifier
-					'duration-century' => {
-						'name' => q(c),
-						'one' => q({0} c),
-						'other' => q({0} c),
-					},
-					# Core Unit Identifier
-					'century' => {
-						'name' => q(c),
-						'one' => q({0} c),
-						'other' => q({0} c),
-					},
 					# Long Unit Identifier
 					'duration-day' => {
 						'name' => q(денош),
@@ -1486,29 +1345,13 @@ has 'units' => (
 			} }
 );
 
-has 'minimum_grouping_digits' => (
-	is			=>'ro',
-	isa			=> Int,
-	init_arg	=> undef,
-	default		=> 1,
-);
-
 has 'number_symbols' => (
 	is			=> 'ro',
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
 		'latn' => {
-			'decimal' => q(.),
-			'exponential' => q(E),
-			'group' => q(,),
-			'minusSign' => q(-),
 			'nan' => q(Терхьаш дац),
-			'perMille' => q(‰),
-			'percentSign' => q(%),
-			'plusSign' => q(+),
-			'superscriptingExponent' => q(×),
-			'timeSeparator' => q(:),
 		},
 	} }
 );
@@ -1519,59 +1362,6 @@ has 'number_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		decimalFormat => {
-			'default' => {
-				'1000' => {
-					'one' => '0 эзар',
-					'other' => '0 эзар',
-				},
-				'10000' => {
-					'one' => '00 эзар',
-					'other' => '00 эзар',
-				},
-				'100000' => {
-					'one' => '000 эзар',
-					'other' => '000 эзар',
-				},
-				'1000000' => {
-					'one' => '0 млн',
-					'other' => '0 млн',
-				},
-				'10000000' => {
-					'one' => '00 млн',
-					'other' => '00 млн',
-				},
-				'100000000' => {
-					'one' => '000 млн',
-					'other' => '000 млн',
-				},
-				'1000000000' => {
-					'one' => '0 млрд',
-					'other' => '0 млрд',
-				},
-				'10000000000' => {
-					'one' => '00 млрд',
-					'other' => '00 млрд',
-				},
-				'100000000000' => {
-					'one' => '000 млрд',
-					'other' => '000 млрд',
-				},
-				'1000000000000' => {
-					'one' => '0 трлн',
-					'other' => '0 трлн',
-				},
-				'10000000000000' => {
-					'one' => '00 трлн',
-					'other' => '00 трлн',
-				},
-				'100000000000000' => {
-					'one' => '000 трлн',
-					'other' => '000 трлн',
-				},
-				'standard' => {
-					'default' => '#,##0.###',
-				},
-			},
 			'long' => {
 				'1000' => {
 					'one' => '0 эзар',
@@ -1680,13 +1470,6 @@ has 'number_formats' => (
 				},
 			},
 		},
-		scientificFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#E0',
-				},
-			},
-		},
 } },
 );
 
@@ -1698,9 +1481,6 @@ has 'number_currency_formats' => (
 		'latn' => {
 			'pattern' => {
 				'default' => {
-					'accounting' => {
-						'positive' => '#,##0.00 ¤',
-					},
 					'standard' => {
 						'positive' => '#,##0.00 ¤',
 					},
@@ -1716,7 +1496,6 @@ has 'currencies' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'AED' => {
-			symbol => 'AED',
 			display_name => {
 				'currency' => q(Дирхам ӀЦЭ),
 				'one' => q(Дирхам ӀЦЭ),
@@ -1724,7 +1503,6 @@ has 'currencies' => (
 			},
 		},
 		'AFN' => {
-			symbol => 'AFN',
 			display_name => {
 				'currency' => q(ОвхӀан-пачхьалкхан афгани),
 				'one' => q(ОвхӀан-пачхьалкхан афгани),
@@ -1732,7 +1510,6 @@ has 'currencies' => (
 			},
 		},
 		'ALL' => {
-			symbol => 'ALL',
 			display_name => {
 				'currency' => q(Албанин лек),
 				'one' => q(Албанин лек),
@@ -1740,7 +1517,6 @@ has 'currencies' => (
 			},
 		},
 		'AMD' => {
-			symbol => 'AMD',
 			display_name => {
 				'currency' => q(Эрмалойчоьнан драм),
 				'one' => q(Эрмалойчоьнан драм),
@@ -1748,7 +1524,6 @@ has 'currencies' => (
 			},
 		},
 		'ANG' => {
-			symbol => 'ANG',
 			display_name => {
 				'currency' => q(Нидерландин Антилин гульден),
 				'one' => q(Нидерландин Антилин гульден),
@@ -1756,7 +1531,6 @@ has 'currencies' => (
 			},
 		},
 		'AOA' => {
-			symbol => 'AOA',
 			display_name => {
 				'currency' => q(Анголан кванза),
 				'one' => q(Анголан кванза),
@@ -1764,7 +1538,6 @@ has 'currencies' => (
 			},
 		},
 		'ARS' => {
-			symbol => 'ARS',
 			display_name => {
 				'currency' => q(Аргентинан песо),
 				'one' => q(Аргентинан песо),
@@ -1772,7 +1545,6 @@ has 'currencies' => (
 			},
 		},
 		'AUD' => {
-			symbol => 'A$',
 			display_name => {
 				'currency' => q(Австралин доллар),
 				'one' => q(Австралин доллар),
@@ -1780,7 +1552,6 @@ has 'currencies' => (
 			},
 		},
 		'AWG' => {
-			symbol => 'AWG',
 			display_name => {
 				'currency' => q(Арубан флорин),
 				'one' => q(Арубан флорин),
@@ -1788,7 +1559,6 @@ has 'currencies' => (
 			},
 		},
 		'AZN' => {
-			symbol => 'AZN',
 			display_name => {
 				'currency' => q(Азербайджанан манат),
 				'one' => q(Азербайджанан манат),
@@ -1796,7 +1566,6 @@ has 'currencies' => (
 			},
 		},
 		'BAM' => {
-			symbol => 'BAM',
 			display_name => {
 				'currency' => q(Боснин а, Герцеговинан а хийцалун марка),
 				'one' => q(Боснин а, Герцеговинан а хийцалун марка),
@@ -1804,7 +1573,6 @@ has 'currencies' => (
 			},
 		},
 		'BBD' => {
-			symbol => 'BBD',
 			display_name => {
 				'currency' => q(Барбадосан доллар),
 				'one' => q(Барбадосан доллар),
@@ -1812,7 +1580,6 @@ has 'currencies' => (
 			},
 		},
 		'BDT' => {
-			symbol => 'BDT',
 			display_name => {
 				'currency' => q(Бангладешан така),
 				'one' => q(Бангладешан така),
@@ -1820,7 +1587,6 @@ has 'currencies' => (
 			},
 		},
 		'BGN' => {
-			symbol => 'BGN',
 			display_name => {
 				'currency' => q(Болгарин лев),
 				'one' => q(Болгарин лев),
@@ -1828,7 +1594,6 @@ has 'currencies' => (
 			},
 		},
 		'BHD' => {
-			symbol => 'BHD',
 			display_name => {
 				'currency' => q(Бахрейнан динар),
 				'one' => q(Бахрейнан динар),
@@ -1836,7 +1601,6 @@ has 'currencies' => (
 			},
 		},
 		'BIF' => {
-			symbol => 'BIF',
 			display_name => {
 				'currency' => q(Бурундин франк),
 				'one' => q(Бурундин франк),
@@ -1844,7 +1608,6 @@ has 'currencies' => (
 			},
 		},
 		'BMD' => {
-			symbol => 'BMD',
 			display_name => {
 				'currency' => q(Бермудан доллар),
 				'one' => q(Бермудан доллар),
@@ -1852,7 +1615,6 @@ has 'currencies' => (
 			},
 		},
 		'BND' => {
-			symbol => 'BND',
 			display_name => {
 				'currency' => q(Брунейн доллар),
 				'one' => q(Брунейн доллар),
@@ -1860,7 +1622,6 @@ has 'currencies' => (
 			},
 		},
 		'BOB' => {
-			symbol => 'BOB',
 			display_name => {
 				'currency' => q(Боливин боливиано),
 				'one' => q(Боливин боливиано),
@@ -1868,7 +1629,6 @@ has 'currencies' => (
 			},
 		},
 		'BRL' => {
-			symbol => 'R$',
 			display_name => {
 				'currency' => q(Бразилин реал),
 				'one' => q(Бразилин реал),
@@ -1876,7 +1636,6 @@ has 'currencies' => (
 			},
 		},
 		'BSD' => {
-			symbol => 'BSD',
 			display_name => {
 				'currency' => q(Багаман доллар),
 				'one' => q(Багаман доллар),
@@ -1884,7 +1643,6 @@ has 'currencies' => (
 			},
 		},
 		'BTN' => {
-			symbol => 'BTN',
 			display_name => {
 				'currency' => q(Бутанан нгултрум),
 				'one' => q(Бутанан нгултрум),
@@ -1892,7 +1650,6 @@ has 'currencies' => (
 			},
 		},
 		'BWP' => {
-			symbol => 'BWP',
 			display_name => {
 				'currency' => q(Ботсванан пула),
 				'one' => q(Ботсванан пула),
@@ -1900,7 +1657,7 @@ has 'currencies' => (
 			},
 		},
 		'BYN' => {
-			symbol => 'BYN',
+			symbol => 'р.',
 			display_name => {
 				'currency' => q(Белоруссин сом),
 				'one' => q(Белоруссин сом),
@@ -1908,7 +1665,6 @@ has 'currencies' => (
 			},
 		},
 		'BYR' => {
-			symbol => 'BYR',
 			display_name => {
 				'currency' => q(Белоруссин сом \(2000–2016\)),
 				'one' => q(Белоруссин сом \(2000–2016\)),
@@ -1916,7 +1672,6 @@ has 'currencies' => (
 			},
 		},
 		'BZD' => {
-			symbol => 'BZD',
 			display_name => {
 				'currency' => q(Белизин доллар),
 				'one' => q(Белизин доллар),
@@ -1924,7 +1679,6 @@ has 'currencies' => (
 			},
 		},
 		'CAD' => {
-			symbol => 'CA$',
 			display_name => {
 				'currency' => q(Канадан доллар),
 				'one' => q(Канадан доллар),
@@ -1932,7 +1686,6 @@ has 'currencies' => (
 			},
 		},
 		'CDF' => {
-			symbol => 'CDF',
 			display_name => {
 				'currency' => q(Конголезин франк),
 				'one' => q(Конголезин франк),
@@ -1940,7 +1693,6 @@ has 'currencies' => (
 			},
 		},
 		'CHF' => {
-			symbol => 'CHF',
 			display_name => {
 				'currency' => q(Швейцарин франк),
 				'one' => q(Швейцарин франк),
@@ -1948,7 +1700,6 @@ has 'currencies' => (
 			},
 		},
 		'CLP' => {
-			symbol => 'CLP',
 			display_name => {
 				'currency' => q(Чилин песо),
 				'one' => q(Чилин песо),
@@ -1956,7 +1707,6 @@ has 'currencies' => (
 			},
 		},
 		'CNY' => {
-			symbol => 'CN¥',
 			display_name => {
 				'currency' => q(Китайн юань),
 				'one' => q(Китайн юань),
@@ -1964,15 +1714,11 @@ has 'currencies' => (
 			},
 		},
 		'COP' => {
-			symbol => 'COP',
 			display_name => {
 				'currency' => q(Колумбин песо),
-				'one' => q(Колумбин песо),
-				'other' => q(Колумбин песо),
 			},
 		},
 		'CRC' => {
-			symbol => 'CRC',
 			display_name => {
 				'currency' => q(Костарикан колон),
 				'one' => q(Костарикан колон),
@@ -1980,7 +1726,6 @@ has 'currencies' => (
 			},
 		},
 		'CUC' => {
-			symbol => 'CUC',
 			display_name => {
 				'currency' => q(Кубан хийцалун песо),
 				'one' => q(Кубан хийцалун песо),
@@ -1988,7 +1733,6 @@ has 'currencies' => (
 			},
 		},
 		'CUP' => {
-			symbol => 'CUP',
 			display_name => {
 				'currency' => q(Кубан песо),
 				'one' => q(Кубан песо),
@@ -1996,7 +1740,6 @@ has 'currencies' => (
 			},
 		},
 		'CVE' => {
-			symbol => 'CVE',
 			display_name => {
 				'currency' => q(Кабо-Верден эскудо),
 				'one' => q(Кабо-Верден эскудо),
@@ -2004,7 +1747,6 @@ has 'currencies' => (
 			},
 		},
 		'CZK' => {
-			symbol => 'CZK',
 			display_name => {
 				'currency' => q(Чехин крона),
 				'one' => q(Чехин крона),
@@ -2012,7 +1754,6 @@ has 'currencies' => (
 			},
 		},
 		'DJF' => {
-			symbol => 'DJF',
 			display_name => {
 				'currency' => q(Джибутин франк),
 				'one' => q(Джибутин франк),
@@ -2020,7 +1761,6 @@ has 'currencies' => (
 			},
 		},
 		'DKK' => {
-			symbol => 'DKK',
 			display_name => {
 				'currency' => q(Данин крона),
 				'one' => q(Данин крона),
@@ -2028,7 +1768,6 @@ has 'currencies' => (
 			},
 		},
 		'DOP' => {
-			symbol => 'DOP',
 			display_name => {
 				'currency' => q(Доминикан песо),
 				'one' => q(Доминикан песо),
@@ -2036,7 +1775,6 @@ has 'currencies' => (
 			},
 		},
 		'DZD' => {
-			symbol => 'DZD',
 			display_name => {
 				'currency' => q(Алжиран динар),
 				'one' => q(Алжиран динар),
@@ -2044,7 +1782,6 @@ has 'currencies' => (
 			},
 		},
 		'EGP' => {
-			symbol => 'EGP',
 			display_name => {
 				'currency' => q(Мисаран фунт),
 				'one' => q(Мисаран фунт),
@@ -2052,7 +1789,6 @@ has 'currencies' => (
 			},
 		},
 		'ERN' => {
-			symbol => 'ERN',
 			display_name => {
 				'currency' => q(Эритрейн накфа),
 				'one' => q(Эритрейн накфа),
@@ -2060,7 +1796,6 @@ has 'currencies' => (
 			},
 		},
 		'ETB' => {
-			symbol => 'ETB',
 			display_name => {
 				'currency' => q(Эфиопин быр),
 				'one' => q(Эфиопин быр),
@@ -2068,7 +1803,6 @@ has 'currencies' => (
 			},
 		},
 		'EUR' => {
-			symbol => '€',
 			display_name => {
 				'currency' => q(Евро),
 				'one' => q(евро),
@@ -2076,7 +1810,6 @@ has 'currencies' => (
 			},
 		},
 		'FJD' => {
-			symbol => 'FJD',
 			display_name => {
 				'currency' => q(Фиджин доллар),
 				'one' => q(Фиджин доллар),
@@ -2084,7 +1817,6 @@ has 'currencies' => (
 			},
 		},
 		'FKP' => {
-			symbol => 'FKP',
 			display_name => {
 				'currency' => q(Фолклендан гӀайренийн фунт),
 				'one' => q(Фолклендан гӀайренийн фунт),
@@ -2092,7 +1824,6 @@ has 'currencies' => (
 			},
 		},
 		'GBP' => {
-			symbol => '£',
 			display_name => {
 				'currency' => q(Англин фунт),
 				'one' => q(Англин фунт),
@@ -2100,7 +1831,6 @@ has 'currencies' => (
 			},
 		},
 		'GEL' => {
-			symbol => 'GEL',
 			display_name => {
 				'currency' => q(Гуьржийчоьнан лари),
 				'one' => q(Гуьржийчоьнан лари),
@@ -2108,7 +1838,6 @@ has 'currencies' => (
 			},
 		},
 		'GHS' => {
-			symbol => 'GHS',
 			display_name => {
 				'currency' => q(Ганан седи),
 				'one' => q(Ганан седи),
@@ -2116,7 +1845,6 @@ has 'currencies' => (
 			},
 		},
 		'GIP' => {
-			symbol => 'GIP',
 			display_name => {
 				'currency' => q(Гибралтаран фунт),
 				'one' => q(Гибралтаран фунт),
@@ -2124,7 +1852,6 @@ has 'currencies' => (
 			},
 		},
 		'GMD' => {
-			symbol => 'GMD',
 			display_name => {
 				'currency' => q(Гамбин даласи),
 				'one' => q(Гамбин даласи),
@@ -2132,7 +1859,6 @@ has 'currencies' => (
 			},
 		},
 		'GNF' => {
-			symbol => 'GNF',
 			display_name => {
 				'currency' => q(Гвинейн франк),
 				'one' => q(Гвинейн франк),
@@ -2140,7 +1866,6 @@ has 'currencies' => (
 			},
 		},
 		'GTQ' => {
-			symbol => 'GTQ',
 			display_name => {
 				'currency' => q(Гватемалан кетсаль),
 				'one' => q(Гватемалан кетсаль),
@@ -2148,7 +1873,6 @@ has 'currencies' => (
 			},
 		},
 		'GYD' => {
-			symbol => 'GYD',
 			display_name => {
 				'currency' => q(Гайанан доллар),
 				'one' => q(Гайанан доллар),
@@ -2156,7 +1880,6 @@ has 'currencies' => (
 			},
 		},
 		'HKD' => {
-			symbol => 'HK$',
 			display_name => {
 				'currency' => q(Гонконган доллар),
 				'one' => q(Гонконган доллар),
@@ -2164,7 +1887,6 @@ has 'currencies' => (
 			},
 		},
 		'HNL' => {
-			symbol => 'HNL',
 			display_name => {
 				'currency' => q(Гондурасан лемпира),
 				'one' => q(Гондурасан лемпира),
@@ -2172,7 +1894,6 @@ has 'currencies' => (
 			},
 		},
 		'HRK' => {
-			symbol => 'HRK',
 			display_name => {
 				'currency' => q(Хорватин куна),
 				'one' => q(Хорватин куна),
@@ -2180,7 +1901,6 @@ has 'currencies' => (
 			},
 		},
 		'HTG' => {
-			symbol => 'HTG',
 			display_name => {
 				'currency' => q(Гаитин гурд),
 				'one' => q(Гаитин гурд),
@@ -2188,7 +1908,6 @@ has 'currencies' => (
 			},
 		},
 		'HUF' => {
-			symbol => 'HUF',
 			display_name => {
 				'currency' => q(Венгрин форинт),
 				'one' => q(Венгрин форинт),
@@ -2196,7 +1915,6 @@ has 'currencies' => (
 			},
 		},
 		'IDR' => {
-			symbol => 'IDR',
 			display_name => {
 				'currency' => q(Индонезин рупи),
 				'one' => q(Индонезин рупи),
@@ -2204,7 +1922,6 @@ has 'currencies' => (
 			},
 		},
 		'ILS' => {
-			symbol => '₪',
 			display_name => {
 				'currency' => q(Израилан керла шекель),
 				'one' => q(Израилан керла шекель),
@@ -2212,7 +1929,6 @@ has 'currencies' => (
 			},
 		},
 		'INR' => {
-			symbol => '₹',
 			display_name => {
 				'currency' => q(Индин рупи),
 				'one' => q(Индин рупи),
@@ -2220,7 +1936,6 @@ has 'currencies' => (
 			},
 		},
 		'IQD' => {
-			symbol => 'IQD',
 			display_name => {
 				'currency' => q(Ӏиракъан динар),
 				'one' => q(Ӏиракъан динар),
@@ -2228,7 +1943,6 @@ has 'currencies' => (
 			},
 		},
 		'IRR' => {
-			symbol => 'IRR',
 			display_name => {
 				'currency' => q(ГӀажарийчоьнан риал),
 				'one' => q(ГӀажарийчоьнан риал),
@@ -2236,7 +1950,6 @@ has 'currencies' => (
 			},
 		},
 		'ISK' => {
-			symbol => 'ISK',
 			display_name => {
 				'currency' => q(Исландин крона),
 				'one' => q(Исландин крона),
@@ -2244,7 +1957,6 @@ has 'currencies' => (
 			},
 		},
 		'JMD' => {
-			symbol => 'JMD',
 			display_name => {
 				'currency' => q(Ямайн доллар),
 				'one' => q(Ямайн доллар),
@@ -2252,7 +1964,6 @@ has 'currencies' => (
 			},
 		},
 		'JOD' => {
-			symbol => 'JOD',
 			display_name => {
 				'currency' => q(Урданан динар),
 				'one' => q(Урданан динар),
@@ -2260,7 +1971,6 @@ has 'currencies' => (
 			},
 		},
 		'JPY' => {
-			symbol => 'JP¥',
 			display_name => {
 				'currency' => q(Японин иена),
 				'one' => q(Японин иена),
@@ -2268,7 +1978,6 @@ has 'currencies' => (
 			},
 		},
 		'KES' => {
-			symbol => 'KES',
 			display_name => {
 				'currency' => q(Кенин шиллинг),
 				'one' => q(Кенин шиллинг),
@@ -2276,7 +1985,6 @@ has 'currencies' => (
 			},
 		},
 		'KGS' => {
-			symbol => 'KGS',
 			display_name => {
 				'currency' => q(Киргизин сом),
 				'one' => q(Киргизин сом),
@@ -2284,7 +1992,6 @@ has 'currencies' => (
 			},
 		},
 		'KHR' => {
-			symbol => 'KHR',
 			display_name => {
 				'currency' => q(Камбоджан риель),
 				'one' => q(Камбоджан риель),
@@ -2292,7 +1999,6 @@ has 'currencies' => (
 			},
 		},
 		'KMF' => {
-			symbol => 'KMF',
 			display_name => {
 				'currency' => q(Коморийн гӀайренийн франк),
 				'one' => q(Коморийн гӀайренийн франк),
@@ -2300,7 +2006,6 @@ has 'currencies' => (
 			},
 		},
 		'KPW' => {
-			symbol => 'KPW',
 			display_name => {
 				'currency' => q(Къилбаседа Корейн вона),
 				'one' => q(Къилбаседа Корейн вона),
@@ -2308,7 +2013,6 @@ has 'currencies' => (
 			},
 		},
 		'KRW' => {
-			symbol => '₩',
 			display_name => {
 				'currency' => q(Къилба Корейн вона),
 				'one' => q(Къилба Корейн вона),
@@ -2316,7 +2020,6 @@ has 'currencies' => (
 			},
 		},
 		'KWD' => {
-			symbol => 'KWD',
 			display_name => {
 				'currency' => q(Кувейтан динар),
 				'one' => q(Кувейтан динар),
@@ -2324,7 +2027,6 @@ has 'currencies' => (
 			},
 		},
 		'KYD' => {
-			symbol => 'KYD',
 			display_name => {
 				'currency' => q(Кайманийн гӀайренийн доллар),
 				'one' => q(Кайманийн гӀайренийн доллар),
@@ -2332,7 +2034,6 @@ has 'currencies' => (
 			},
 		},
 		'KZT' => {
-			symbol => 'KZT',
 			display_name => {
 				'currency' => q(Кхазакхстанан тенге),
 				'one' => q(Кхазакхстанан тенге),
@@ -2340,7 +2041,6 @@ has 'currencies' => (
 			},
 		},
 		'LAK' => {
-			symbol => 'LAK',
 			display_name => {
 				'currency' => q(Лаосан кип),
 				'one' => q(Лаосан кип),
@@ -2348,7 +2048,6 @@ has 'currencies' => (
 			},
 		},
 		'LBP' => {
-			symbol => 'LBP',
 			display_name => {
 				'currency' => q(Ливанан фунт),
 				'one' => q(Ливанан фунт),
@@ -2356,7 +2055,6 @@ has 'currencies' => (
 			},
 		},
 		'LKR' => {
-			symbol => 'LKR',
 			display_name => {
 				'currency' => q(Шри-Ланкан рупи),
 				'one' => q(Шри-Ланкан рупи),
@@ -2364,7 +2062,6 @@ has 'currencies' => (
 			},
 		},
 		'LRD' => {
-			symbol => 'LRD',
 			display_name => {
 				'currency' => q(Либерин доллар),
 				'one' => q(Либерин доллар),
@@ -2372,7 +2069,6 @@ has 'currencies' => (
 			},
 		},
 		'LYD' => {
-			symbol => 'LYD',
 			display_name => {
 				'currency' => q(Ливин динар),
 				'one' => q(Ливийский динар),
@@ -2380,7 +2076,6 @@ has 'currencies' => (
 			},
 		},
 		'MAD' => {
-			symbol => 'MAD',
 			display_name => {
 				'currency' => q(Мароккон дирхам),
 				'one' => q(Мароккон дирхам),
@@ -2388,7 +2083,6 @@ has 'currencies' => (
 			},
 		},
 		'MDL' => {
-			symbol => 'MDL',
 			display_name => {
 				'currency' => q(Молдавин лей),
 				'one' => q(Молдавин лей),
@@ -2396,7 +2090,6 @@ has 'currencies' => (
 			},
 		},
 		'MGA' => {
-			symbol => 'MGA',
 			display_name => {
 				'currency' => q(Малагасийн ариари),
 				'one' => q(Малагасийн ариари),
@@ -2404,7 +2097,6 @@ has 'currencies' => (
 			},
 		},
 		'MKD' => {
-			symbol => 'MKD',
 			display_name => {
 				'currency' => q(Македонин динар),
 				'one' => q(Македонин динар),
@@ -2412,7 +2104,6 @@ has 'currencies' => (
 			},
 		},
 		'MMK' => {
-			symbol => 'MMK',
 			display_name => {
 				'currency' => q(Мьянман кьят),
 				'one' => q(Мьянман кьят),
@@ -2420,7 +2111,6 @@ has 'currencies' => (
 			},
 		},
 		'MNT' => {
-			symbol => 'MNT',
 			display_name => {
 				'currency' => q(Монголин тугрик),
 				'one' => q(Монголин тугрик),
@@ -2428,7 +2118,6 @@ has 'currencies' => (
 			},
 		},
 		'MOP' => {
-			symbol => 'MOP',
 			display_name => {
 				'currency' => q(Макаон патака),
 				'one' => q(Макаон патака),
@@ -2436,7 +2125,6 @@ has 'currencies' => (
 			},
 		},
 		'MRO' => {
-			symbol => 'MRO',
 			display_name => {
 				'currency' => q(Мавританин уги \(1973–2017\)),
 				'one' => q(Мавританин уги \(1973–2017\)),
@@ -2451,7 +2139,6 @@ has 'currencies' => (
 			},
 		},
 		'MUR' => {
-			symbol => 'MUR',
 			display_name => {
 				'currency' => q(Маврикин рупи),
 				'one' => q(Маврикин рупи),
@@ -2459,7 +2146,6 @@ has 'currencies' => (
 			},
 		},
 		'MVR' => {
-			symbol => 'MVR',
 			display_name => {
 				'currency' => q(Мальдивийн руфи),
 				'one' => q(Мальдивийн руфи),
@@ -2467,7 +2153,6 @@ has 'currencies' => (
 			},
 		},
 		'MWK' => {
-			symbol => 'MWK',
 			display_name => {
 				'currency' => q(Малавин квача),
 				'one' => q(Малавин квача),
@@ -2475,7 +2160,6 @@ has 'currencies' => (
 			},
 		},
 		'MXN' => {
-			symbol => 'MX$',
 			display_name => {
 				'currency' => q(Мексикан песо),
 				'one' => q(Мексикан песо),
@@ -2483,7 +2167,6 @@ has 'currencies' => (
 			},
 		},
 		'MYR' => {
-			symbol => 'MYR',
 			display_name => {
 				'currency' => q(Малайзин ринггит),
 				'one' => q(Малайзин ринггит),
@@ -2491,7 +2174,6 @@ has 'currencies' => (
 			},
 		},
 		'MZN' => {
-			symbol => 'MZN',
 			display_name => {
 				'currency' => q(Мозамбикан метикал),
 				'one' => q(Мозамбикан метикал),
@@ -2499,7 +2181,6 @@ has 'currencies' => (
 			},
 		},
 		'NAD' => {
-			symbol => 'NAD',
 			display_name => {
 				'currency' => q(Намибин доллар),
 				'one' => q(Намибин доллар),
@@ -2507,7 +2188,6 @@ has 'currencies' => (
 			},
 		},
 		'NGN' => {
-			symbol => 'NGN',
 			display_name => {
 				'currency' => q(Нигерин найра),
 				'one' => q(Нигерин найра),
@@ -2515,7 +2195,6 @@ has 'currencies' => (
 			},
 		},
 		'NIO' => {
-			symbol => 'NIO',
 			display_name => {
 				'currency' => q(Никарагуан кордоба),
 				'one' => q(Никарагуан кордоба),
@@ -2523,7 +2202,6 @@ has 'currencies' => (
 			},
 		},
 		'NOK' => {
-			symbol => 'NOK',
 			display_name => {
 				'currency' => q(Норвегин крона),
 				'one' => q(Норвегин крона),
@@ -2531,7 +2209,6 @@ has 'currencies' => (
 			},
 		},
 		'NPR' => {
-			symbol => 'NPR',
 			display_name => {
 				'currency' => q(Непалан рупи),
 				'one' => q(Непалан рупи),
@@ -2539,7 +2216,6 @@ has 'currencies' => (
 			},
 		},
 		'NZD' => {
-			symbol => 'NZ$',
 			display_name => {
 				'currency' => q(Керла Зеландин доллар),
 				'one' => q(Керла Зеландин доллар),
@@ -2547,7 +2223,6 @@ has 'currencies' => (
 			},
 		},
 		'OMR' => {
-			symbol => 'OMR',
 			display_name => {
 				'currency' => q(Оманан риал),
 				'one' => q(Оманан риал),
@@ -2555,7 +2230,6 @@ has 'currencies' => (
 			},
 		},
 		'PAB' => {
-			symbol => 'PAB',
 			display_name => {
 				'currency' => q(Панаман бальбоа),
 				'one' => q(Панаман бальбоа),
@@ -2563,7 +2237,6 @@ has 'currencies' => (
 			},
 		},
 		'PEN' => {
-			symbol => 'PEN',
 			display_name => {
 				'currency' => q(Перун соль),
 				'one' => q(Перун соль),
@@ -2571,7 +2244,6 @@ has 'currencies' => (
 			},
 		},
 		'PGK' => {
-			symbol => 'PGK',
 			display_name => {
 				'currency' => q(Папуа — Керла Гвинейн кина),
 				'one' => q(Папуа — Керла Гвинейн кина),
@@ -2587,7 +2259,6 @@ has 'currencies' => (
 			},
 		},
 		'PKR' => {
-			symbol => 'PKR',
 			display_name => {
 				'currency' => q(Пакистанан рупи),
 				'one' => q(Пакистанан рупи),
@@ -2595,7 +2266,6 @@ has 'currencies' => (
 			},
 		},
 		'PLN' => {
-			symbol => 'PLN',
 			display_name => {
 				'currency' => q(Польшан злотый),
 				'one' => q(Польшан злотый),
@@ -2603,7 +2273,6 @@ has 'currencies' => (
 			},
 		},
 		'PYG' => {
-			symbol => 'PYG',
 			display_name => {
 				'currency' => q(Парагвайн гуарани),
 				'one' => q(Парагвайн гуарани),
@@ -2611,7 +2280,6 @@ has 'currencies' => (
 			},
 		},
 		'QAR' => {
-			symbol => 'QAR',
 			display_name => {
 				'currency' => q(Катаран риал),
 				'one' => q(Катаран риал),
@@ -2619,7 +2287,7 @@ has 'currencies' => (
 			},
 		},
 		'RON' => {
-			symbol => 'RON',
+			symbol => 'лей',
 			display_name => {
 				'currency' => q(Румынин лей),
 				'one' => q(Румынин лей),
@@ -2627,7 +2295,6 @@ has 'currencies' => (
 			},
 		},
 		'RSD' => {
-			symbol => 'RSD',
 			display_name => {
 				'currency' => q(Сербин динар),
 				'one' => q(Сербин динар),
@@ -2643,7 +2310,6 @@ has 'currencies' => (
 			},
 		},
 		'RWF' => {
-			symbol => 'RWF',
 			display_name => {
 				'currency' => q(Руандан франк),
 				'one' => q(Руандан франк),
@@ -2651,7 +2317,6 @@ has 'currencies' => (
 			},
 		},
 		'SAR' => {
-			symbol => 'SAR',
 			display_name => {
 				'currency' => q(СаӀудийн Ӏаьрбийчоьнан риал),
 				'one' => q(СаӀудийн Ӏаьрбийчоьнан риал),
@@ -2659,7 +2324,6 @@ has 'currencies' => (
 			},
 		},
 		'SBD' => {
-			symbol => 'SBD',
 			display_name => {
 				'currency' => q(Соломонан гӀайренийн доллар),
 				'one' => q(Соломонан гӀайренийн доллар),
@@ -2667,7 +2331,6 @@ has 'currencies' => (
 			},
 		},
 		'SCR' => {
-			symbol => 'SCR',
 			display_name => {
 				'currency' => q(Сейшелан рупи),
 				'one' => q(Сейшелан рупи),
@@ -2675,7 +2338,6 @@ has 'currencies' => (
 			},
 		},
 		'SDG' => {
-			symbol => 'SDG',
 			display_name => {
 				'currency' => q(Суданан фунт),
 				'one' => q(Суданан фунт),
@@ -2683,7 +2345,6 @@ has 'currencies' => (
 			},
 		},
 		'SEK' => {
-			symbol => 'SEK',
 			display_name => {
 				'currency' => q(Швецин крона),
 				'one' => q(Швецин крона),
@@ -2691,7 +2352,6 @@ has 'currencies' => (
 			},
 		},
 		'SGD' => {
-			symbol => 'SGD',
 			display_name => {
 				'currency' => q(Сингапуран доллар),
 				'one' => q(Сингапуран доллар),
@@ -2699,23 +2359,27 @@ has 'currencies' => (
 			},
 		},
 		'SHP' => {
-			symbol => 'SHP',
 			display_name => {
 				'currency' => q(Сийлахьчу Еленин гӀайрен фунт),
 				'one' => q(Сийлахьчу Еленин гӀайрен фунт),
 				'other' => q(Сийлахьчу Еленин гӀайрен фунташ),
 			},
 		},
-		'SLL' => {
-			symbol => 'SLL',
+		'SLE' => {
 			display_name => {
 				'currency' => q(Леоне),
 				'one' => q(леоне),
 				'other' => q(леонеш),
 			},
 		},
+		'SLL' => {
+			display_name => {
+				'currency' => q(Леоне \(1964—2022\)),
+				'one' => q(леоне \(1964—2022\)),
+				'other' => q(леонеш \(1964—2022\)),
+			},
+		},
 		'SOS' => {
-			symbol => 'SOS',
 			display_name => {
 				'currency' => q(Сомалин шиллинг),
 				'one' => q(Сомалин шиллинг),
@@ -2723,7 +2387,6 @@ has 'currencies' => (
 			},
 		},
 		'SRD' => {
-			symbol => 'SRD',
 			display_name => {
 				'currency' => q(Суринаман доллар),
 				'one' => q(Суринаман доллар),
@@ -2731,7 +2394,6 @@ has 'currencies' => (
 			},
 		},
 		'SSP' => {
-			symbol => 'SSP',
 			display_name => {
 				'currency' => q(Къилба Суданан фунт),
 				'one' => q(Къилба Суданан фунт),
@@ -2739,7 +2401,6 @@ has 'currencies' => (
 			},
 		},
 		'STD' => {
-			symbol => 'STD',
 			display_name => {
 				'currency' => q(Сан-Томен а, Принсипин а добра \(1977–2017\)),
 				'one' => q(Сан-Томен а, Принсипин а добра \(1977–2017\)),
@@ -2747,7 +2408,6 @@ has 'currencies' => (
 			},
 		},
 		'STN' => {
-			symbol => 'Db',
 			display_name => {
 				'currency' => q(Сан-Томен а, Принсипин а добра),
 				'one' => q(Сан-Томен а, Принсипин а добра),
@@ -2755,7 +2415,6 @@ has 'currencies' => (
 			},
 		},
 		'SYP' => {
-			symbol => 'SYP',
 			display_name => {
 				'currency' => q(Шеман фунт),
 				'one' => q(Шеман фунт),
@@ -2763,7 +2422,6 @@ has 'currencies' => (
 			},
 		},
 		'SZL' => {
-			symbol => 'SZL',
 			display_name => {
 				'currency' => q(Свазилендан лилангени),
 				'one' => q(Свазилендан лилангени),
@@ -2771,7 +2429,6 @@ has 'currencies' => (
 			},
 		},
 		'THB' => {
-			symbol => 'THB',
 			display_name => {
 				'currency' => q(Таиландан бат),
 				'one' => q(Таиландан бат),
@@ -2779,7 +2436,6 @@ has 'currencies' => (
 			},
 		},
 		'TJS' => {
-			symbol => 'TJS',
 			display_name => {
 				'currency' => q(Таджикистанан сомони),
 				'one' => q(Таджикистанан сомони),
@@ -2787,7 +2443,6 @@ has 'currencies' => (
 			},
 		},
 		'TMT' => {
-			symbol => 'TMT',
 			display_name => {
 				'currency' => q(Туркменин керла манат),
 				'one' => q(Туркменин керла манат),
@@ -2795,7 +2450,6 @@ has 'currencies' => (
 			},
 		},
 		'TND' => {
-			symbol => 'TND',
 			display_name => {
 				'currency' => q(Тунисан динар),
 				'one' => q(Тунисан динар),
@@ -2803,7 +2457,6 @@ has 'currencies' => (
 			},
 		},
 		'TOP' => {
-			symbol => 'TOP',
 			display_name => {
 				'currency' => q(Тонганан паанга),
 				'one' => q(Тонганан паанга),
@@ -2811,7 +2464,6 @@ has 'currencies' => (
 			},
 		},
 		'TRY' => {
-			symbol => 'TRY',
 			display_name => {
 				'currency' => q(Туркойчоьнан лира),
 				'one' => q(Туркойчоьнан керла лира),
@@ -2819,7 +2471,6 @@ has 'currencies' => (
 			},
 		},
 		'TTD' => {
-			symbol => 'TTD',
 			display_name => {
 				'currency' => q(Тринидадан а, Тобагон а доллар),
 				'one' => q(Тринидадан а, Тобагон а доллар),
@@ -2827,7 +2478,6 @@ has 'currencies' => (
 			},
 		},
 		'TWD' => {
-			symbol => 'NT$',
 			display_name => {
 				'currency' => q(Тайванан керла доллар),
 				'one' => q(Тайванан керла доллар),
@@ -2835,7 +2485,6 @@ has 'currencies' => (
 			},
 		},
 		'TZS' => {
-			symbol => 'TZS',
 			display_name => {
 				'currency' => q(Танзанин шиллинг),
 				'one' => q(Танзанин шиллинг),
@@ -2843,7 +2492,6 @@ has 'currencies' => (
 			},
 		},
 		'UAH' => {
-			symbol => 'UAH',
 			display_name => {
 				'currency' => q(Украинан гривна),
 				'one' => q(Украинан гривна),
@@ -2851,7 +2499,6 @@ has 'currencies' => (
 			},
 		},
 		'UGX' => {
-			symbol => 'UGX',
 			display_name => {
 				'currency' => q(Угандан шиллинг),
 				'one' => q(Угандан шиллинг),
@@ -2859,7 +2506,6 @@ has 'currencies' => (
 			},
 		},
 		'USD' => {
-			symbol => 'US$',
 			display_name => {
 				'currency' => q(АЦШн доллар),
 				'one' => q(АЦШн доллар),
@@ -2867,7 +2513,6 @@ has 'currencies' => (
 			},
 		},
 		'UYU' => {
-			symbol => 'UYU',
 			display_name => {
 				'currency' => q(Уругвайн песо),
 				'one' => q(Уругвайн песо),
@@ -2875,7 +2520,6 @@ has 'currencies' => (
 			},
 		},
 		'UZS' => {
-			symbol => 'UZS',
 			display_name => {
 				'currency' => q(Узбекистанан сом),
 				'one' => q(Узбекистанан сом),
@@ -2883,7 +2527,6 @@ has 'currencies' => (
 			},
 		},
 		'VEF' => {
-			symbol => 'VEF',
 			display_name => {
 				'currency' => q(Венесуэлан боливар \(2008–2018\)),
 				'one' => q(Венесуэлан боливар \(2008–2018\)),
@@ -2898,7 +2541,6 @@ has 'currencies' => (
 			},
 		},
 		'VND' => {
-			symbol => '₫',
 			display_name => {
 				'currency' => q(Вьетнаман донг),
 				'one' => q(Вьетнаман донг),
@@ -2906,7 +2548,6 @@ has 'currencies' => (
 			},
 		},
 		'VUV' => {
-			symbol => 'VUV',
 			display_name => {
 				'currency' => q(Вануатун вату),
 				'one' => q(Вануатун вату),
@@ -2914,7 +2555,6 @@ has 'currencies' => (
 			},
 		},
 		'WST' => {
-			symbol => 'WST',
 			display_name => {
 				'currency' => q(Самоанан тала),
 				'one' => q(Самоанан тала),
@@ -2922,7 +2562,6 @@ has 'currencies' => (
 			},
 		},
 		'XAF' => {
-			symbol => 'FCFA',
 			display_name => {
 				'currency' => q(Юккъерчу Африкан КФА франк),
 				'one' => q(Юккъерчу Африкан КФА франк),
@@ -2930,7 +2569,6 @@ has 'currencies' => (
 			},
 		},
 		'XCD' => {
-			symbol => 'EC$',
 			display_name => {
 				'currency' => q(Малхбален Карибийн доллар),
 				'one' => q(Малхбален Карибийн доллар),
@@ -2938,30 +2576,21 @@ has 'currencies' => (
 			},
 		},
 		'XOF' => {
-			symbol => 'F CFA',
 			display_name => {
 				'currency' => q(Малхбузен Африкан КФА франк),
-				'one' => q(Малхбузен Африкан КФА франк),
-				'other' => q(Малхбузен Африкан КФА франк),
 			},
 		},
 		'XPF' => {
-			symbol => 'CFPF',
 			display_name => {
 				'currency' => q(Французийн Тийна океанан франк),
-				'one' => q(Французийн Тийна океанан франк),
-				'other' => q(Французийн Тийна океанан франк),
 			},
 		},
 		'XXX' => {
 			display_name => {
 				'currency' => q(девзаш доцу я лелаш доцу ахча),
-				'one' => q(девзаш доцу я лелаш доцу ахча),
-				'other' => q(девзаш доцу я лелаш доцу ахча),
 			},
 		},
 		'YER' => {
-			symbol => 'YER',
 			display_name => {
 				'currency' => q(Йеменан риал),
 				'one' => q(Йеменан риал),
@@ -2969,7 +2598,6 @@ has 'currencies' => (
 			},
 		},
 		'ZAR' => {
-			symbol => 'ZAR',
 			display_name => {
 				'currency' => q(Къилба-Африкин рэнд),
 				'one' => q(Къилба-Африкин рэнд),
@@ -2977,7 +2605,6 @@ has 'currencies' => (
 			},
 		},
 		'ZMW' => {
-			symbol => 'ZMW',
 			display_name => {
 				'currency' => q(Замбин квача),
 				'one' => q(Замбин квача),
@@ -3014,25 +2641,6 @@ has 'calendar_months' => (
 							
 						],
 					},
-					narrow => {
-						nonleap => [
-							'Я',
-							'Ф',
-							'М',
-							'А',
-							'М',
-							'И',
-							'И',
-							'А',
-							'С',
-							'О',
-							'Н',
-							'Д'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'январь',
@@ -3068,25 +2676,6 @@ has 'calendar_months' => (
 							'О',
 							'Н',
 							'Д'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'январь',
-							'февраль',
-							'март',
-							'апрель',
-							'май',
-							'июнь',
-							'июль',
-							'август',
-							'сентябрь',
-							'октябрь',
-							'ноябрь',
-							'декабрь'
 						],
 						leap => [
 							
@@ -3122,15 +2711,6 @@ has 'calendar_days' => (
 						sat => 'шуо',
 						sun => 'кӀи'
 					},
-					short => {
-						mon => 'ор',
-						tue => 'ши',
-						wed => 'кха',
-						thu => 'еа',
-						fri => 'пӀе',
-						sat => 'шуо',
-						sun => 'кӀи'
-					},
 					wide => {
 						mon => 'оршот',
 						tue => 'шинара',
@@ -3142,15 +2722,6 @@ has 'calendar_days' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						mon => 'ор',
-						tue => 'ши',
-						wed => 'кха',
-						thu => 'еа',
-						fri => 'пӀе',
-						sat => 'шуо',
-						sun => 'кӀи'
-					},
 					narrow => {
 						mon => 'о',
 						tue => 'ш',
@@ -3159,24 +2730,6 @@ has 'calendar_days' => (
 						fri => 'пӀ',
 						sat => 'ш',
 						sun => 'кӀ'
-					},
-					short => {
-						mon => 'ор',
-						tue => 'ши',
-						wed => 'кха',
-						thu => 'еа',
-						fri => 'пӀе',
-						sat => 'шуо',
-						sun => 'кӀи'
-					},
-					wide => {
-						mon => 'оршот',
-						tue => 'шинара',
-						wed => 'кхаара',
-						thu => 'еара',
-						fri => 'пӀераска',
-						sat => 'шуот',
-						sun => 'кӀира'
 					},
 				},
 			},
@@ -3195,28 +2748,6 @@ has 'calendar_quarters' => (
 						2 => '3-гӀа кв.',
 						3 => '4-гӀа кв.'
 					},
-					narrow => {0 => '1',
-						1 => '2',
-						2 => '3',
-						3 => '4'
-					},
-					wide => {0 => '1-гӀа квартал',
-						1 => '2-гӀа квартал',
-						2 => '3-гӀа квартал',
-						3 => '4-гӀа квартал'
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {0 => '1-гӀа кв.',
-						1 => '2-гӀа кв.',
-						2 => '3-гӀа кв.',
-						3 => '4-гӀа кв.'
-					},
-					narrow => {0 => '1',
-						1 => '2',
-						2 => '3',
-						3 => '4'
-					},
 					wide => {0 => '1-гӀа квартал',
 						1 => '2-гӀа квартал',
 						2 => '3-гӀа квартал',
@@ -3232,8 +2763,6 @@ has 'eras' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-		},
 		'gregorian' => {
 			abbreviated => {
 				'0' => 'в. э. тӀ. я',
@@ -3252,8 +2781,6 @@ has 'date_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-		},
 		'gregorian' => {
 		},
 	} },
@@ -3264,8 +2791,6 @@ has 'time_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-		},
 		'gregorian' => {
 		},
 	} },
@@ -3276,12 +2801,6 @@ has 'datetime_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			'full' => q{{1} {0}},
-			'long' => q{{1} {0}},
-			'medium' => q{{1} {0}},
-			'short' => q{{1} {0}},
-		},
 		'gregorian' => {
 		},
 	} },
@@ -3292,9 +2811,6 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			d => q{d},
-		},
 	} },
 );
 
@@ -3319,13 +2835,6 @@ has 'time_zone_names' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default	=> sub { {
-		hourFormat => q(+HH:mm;-HH:mm),
-		gmtFormat => q(GMT{0}),
-		gmtZeroFormat => q(GMT),
-		regionFormat => q({0}),
-		regionFormat => q({0} (+1)),
-		regionFormat => q({0} (+0)),
-		fallbackFormat => q({1} ({0})),
 		'Afghanistan' => {
 			long => {
 				'standard' => q#ОвхӀан#,

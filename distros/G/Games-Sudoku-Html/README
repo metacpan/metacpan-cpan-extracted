@@ -1,0 +1,10 @@
+
+ Games::Sudoku::Html - Visualize and play collections of 9x9 standard Sudoku in your browser.
+
+ A very simple Module which converts an array with sudoku puzzles into a javascript-driven html page.
+ Lists with sudoku puzzles from text files or generators can be loaded and played in the browser.
+
+ A script 'sudoku2html' gets installed together with Games::Sudoku::Html.
+ Invoke C<E<gt>sudoku2html -h> for option details.
+
+ Steffen Heinrich, Jan. 2024

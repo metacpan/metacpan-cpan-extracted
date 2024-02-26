@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Mas - Package for language Masai
 
 package Locale::CLDR::Locales::Mas;
 # This file auto generated from Data\common\main\mas.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -320,18 +320,6 @@ has 'display_name_region' => (
 	},
 );
 
-has 'display_name_measurement_system' => (
-	is			=> 'ro',
-	isa			=> HashRef[Str],
-	init_arg	=> undef,
-	default		=> sub {
-		{
-			'metric' => q{Metric},
-
-		}
-	},
-);
-
 has 'characters' => (
 	is			=> 'ro',
 	isa			=> HashRef,
@@ -343,7 +331,7 @@ has 'characters' => (
 		return {
 			auxiliary => qr{[f q v x z]},
 			index => ['A', 'B', 'C', 'D', 'E', 'Ɛ', 'G', 'H', 'I', 'Ɨ', 'J', 'K', 'L', 'M', 'N', 'Ŋ', 'O', 'Ɔ', 'P', 'R', 'S', 'T', 'U', 'Ʉ', 'W', 'Y'],
-			main => qr{[a á à â ā b c d e é è ê ē ɛ g h i í ì î ī ɨ j k l m n {ny} ŋ o ó ò ô ō ɔ p r {rr} s {sh} t u ú ù û ū ʉ {ʉ́} w {wu} y {yi}]},
+			main => qr{[aáàâā b c d eéèêē ɛ g h iíìîī ɨ j k l m n {ny} ŋ oóòôō ɔ p r {rr} s {sh} t uúùûū ʉ{ʉ́} w {wu} y {yi}]},
 		};
 	},
 EOT
@@ -352,34 +340,6 @@ EOT
 },
 );
 
-
-has 'quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{“},
-);
-
-has 'quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{”},
-);
-
-has 'alternate_quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{‘},
-);
-
-has 'alternate_quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{’},
-);
 
 has 'yesstr' => (
 	is			=> 'ro',
@@ -632,9 +592,14 @@ has 'currencies' => (
 				'currency' => q(Iropiyianí e Santahelena),
 			},
 		},
-		'SLL' => {
+		'SLE' => {
 			display_name => {
 				'currency' => q(Iropiyianí e leoni),
+			},
+		},
+		'SLL' => {
+			display_name => {
+				'currency' => q(Iropiyianí e leoni \(1964—2022\)),
 			},
 		},
 		'SOS' => {
@@ -835,10 +800,6 @@ has 'day_periods' => (
 					'am' => q{Ɛnkakɛnyá},
 					'pm' => q{Ɛndámâ},
 				},
-				'wide' => {
-					'am' => q{Ɛnkakɛnyá},
-					'pm' => q{Ɛndámâ},
-				},
 			},
 		},
 	} },
@@ -918,19 +879,11 @@ has 'datetime_formats_available_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
 			MEd => q{E, M/d},
-			MMM => q{LLL},
 			MMMEd => q{E, MMM d},
 			MMMMEd => q{E, MMMM d},
-			MMMMd => q{MMMM d},
-			MMMd => q{MMM d},
 			Md => q{M/d},
-			d => q{d},
-			hm => q{h:mm a},
-			ms => q{mm:ss},
+			hm => q{h:mm a},
 			y => q{y},
 			yM => q{M/y},
 			yMEd => q{E, M/d/y},
@@ -941,20 +894,11 @@ has 'datetime_formats_available_formats' => (
 			yQQQQ => q{QQQQ y},
 		},
 		'gregorian' => {
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
 			MEd => q{E, M/d},
-			MMM => q{LLL},
 			MMMEd => q{E, MMM d},
 			MMMMEd => q{E, MMMM d},
-			MMMMd => q{MMMM d},
-			MMMd => q{MMM d},
 			Md => q{M/d},
-			d => q{d},
-			hm => q{h:mm a},
-			ms => q{mm:ss},
-			y => q{y},
+			hm => q{h:mm a},
 			yM => q{M/y},
 			yMEd => q{E, M/d/y},
 			yMMM => q{MMM y},

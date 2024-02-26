@@ -59,7 +59,7 @@ sub _enctest {
 
     my $opts = { fail => "soft" };
     my @d = loadlines( $fn, $opts );
-    diag("$fn: " . $opts->{error} ) unless @d;
+    note("$fn: " . $opts->{error} ) unless @d;
     ok( scalar( @d ) == 2, "$enc: Two lines" );
     is( $d[0], $data[0], "$enc: Line 1" );
     is( $d[1], $data[1], "$enc: Line 2" );

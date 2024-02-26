@@ -1,0 +1,31 @@
+---
+abstract: 'PDL interface to the GNU Linear Programming Kit'
+author:
+  - 'JÃ¶rg Sommrey <git@sommrey.de>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test2::V0: '0'
+  Test::More: '0'
+configure_requires:
+  Devel::CheckLib: '0'
+  ExtUtils::MakeMaker: '0'
+  PDL::Core::Dev: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PDL-Opt-GLPK
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  PDL: '2.085'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/jo-37/pdl-opt-glpk/issues
+  repository: git://github.com/jo-37/pdl-opt-glpk.git
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

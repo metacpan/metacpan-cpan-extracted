@@ -3,12 +3,12 @@ package Acme::CPANModules::WordListBundle::Proverbs;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-22'; # DATE
+our $DATE = '2023-10-31'; # DATE
 our $DIST = 'Acme-CPANModules-WordListBundle-Proverbs'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our $LIST = {
-    summary => 'All proverbs WordList modules (in all languages)',
+    summary => 'List of all proverbs WordList modules (in all languages)',
     entries => [
 {module=>'WordList::Phrase::EN::Proverb::TWW'},
 {module=>'WordList::Phrase::EN::Proverb::Wiktionary'},
@@ -23,7 +23,7 @@ our $LIST = {
 };
 
 1;
-# ABSTRACT: All proverbs WordList modules (in all languages)
+# ABSTRACT: List of all proverbs WordList modules (in all languages)
 
 __END__
 
@@ -33,51 +33,15 @@ __END__
 
 =head1 NAME
 
-Acme::CPANModules::WordListBundle::Proverbs - All proverbs WordList modules (in all languages)
+Acme::CPANModules::WordListBundle::Proverbs - List of all proverbs WordList modules (in all languages)
 
 =head1 VERSION
 
-This document describes version 0.001 of Acme::CPANModules::WordListBundle::Proverbs (from Perl distribution Acme-CPANModules-WordListBundle-Proverbs), released on 2022-07-22.
+This document describes version 0.002 of Acme::CPANModules::WordListBundle::Proverbs (from Perl distribution Acme-CPANModules-WordListBundle-Proverbs), released on 2023-10-31.
 
 =head1 ACME::CPANMODULES ENTRIES
 
 =over
-
-=item * L<WordList::Phrase::EN::Proverb::TWW> - Proverb phrases from Tom Wills
-
-Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
-
-=item * L<WordList::Phrase::EN::Proverb::Wiktionary> - English proverbs from wiktionary.org
-
-Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
-
-=item * L<WordList::Phrase::FR::Proverb::ProverbesFrancais> - French proverbs from proverbesfrancais.com
-
-Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
-
-=item * L<WordList::Phrase::FR::Proverb::Wikiquote> - French proverbs from en.wikiquote.org
-
-Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
-
-=item * L<WordList::Phrase::FR::Proverb::Wiktionary> - French proverbs from wiktionary.org
-
-Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
-
-=item * L<WordList::Phrase::ID::Proverb::KBBI> - Proverb phrases from Kamus Besar Bahasa Indonesia
-
-Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
-
-=item * L<WordList::Phrase::JV::Proverb::PeribahasaNet> - Javanese proverbs from peribahasa.net
-
-Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
-
-=item * L<WordList::Phrase::SU::Proverb::PeribahasaNet> - Sundanese proverbs from peribahasa.net
-
-Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
-
-=item * L<WordList::Phrase::ZH::Proverb::Wiktionary> - Chinese proverbs from wiktionary.org
-
-Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
 =back
 
@@ -147,13 +111,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

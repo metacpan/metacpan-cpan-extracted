@@ -26,4 +26,4 @@ my $dt_cy_gb = DateTime->new(
 	time_zone  => 'Europe/London',
 );
 
-is ($dt_cy_gb->format_cldr($locale->datetime_format_full), 'Dydd Mawrth, 25 Hydref 1966 am 07:15:47 Europe/London', 'Date Time Format Full Welsh');
+is ($dt_cy_gb->format_cldr($locale->datetime_format_full), 'Dydd Mawrth, 25 Hydref 1966, 07:15:47 Europe/London', 'Date Time Format Full Welsh');

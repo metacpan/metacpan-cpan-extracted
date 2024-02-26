@@ -5,8 +5,7 @@ use strict;
 use Carp;
 use File::Spec;
 use Module::Info;
-use Genealogy::Wills::DB;
-use Genealogy::Wills::DB::wills;
+use Genealogy::Wills::wills;
 
 =head1 NAME
 
@@ -14,11 +13,11 @@ Genealogy::Wills - Lookup in a database of wills
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -33,15 +32,14 @@ our $VERSION = '0.03';
 
 Creates a Genealogy::Wills object.
 
-Takes two optionals arguments:
+Takes two optional arguments:
 	directory: that is the directory containing obituaries.sql
 	logger: an object to send log messages to
 
 =cut
 
 sub new {
-	my $class = $_[0];
-	shift;
+	my $class = shift;
 	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
 	if(!defined($class)) {
@@ -56,14 +54,22 @@ sub new {
 		return bless { %{$class}, %args }, ref($class);
 	}
 
-	my $directory = $args{'directory'} || Module::Info->new_from_loaded(__PACKAGE__)->file();
-	$directory =~ s/\.pm$//;
+	if(!defined((my $directory = ($args{'directory'} || $Database::Abstraction::init->{'directory'})))) {
+		# If the directory argument isn't given, see if we can find the data
+		$directory ||= Module::Info->new_from_loaded(__PACKAGE__)->file();
+		$directory =~ s/\.pm$//;
+		$args{'directory'} = File::Spec->catfile($directory, 'data');
+	}
+	if(!-d $args{'directory'}) {
+		Carp::carp(__PACKAGE__, ': ', $args{'directory'}, ' is not a directory');
+		return;
+	}
 
-	# The database is updated daily
-	$args{'cache_duration'} ||= '1 day';
-
-	Genealogy::Wills::DB::init(directory => File::Spec->catfile($directory, 'database'), %args);
-	return bless { }, $class;
+	# cache_duration can be overriden by the args
+	return bless {
+		cache_duration => '1 day',	# The database is updated daily
+		%args,
+	}, $class;
 }
 
 =head2 search
@@ -87,7 +93,7 @@ sub search {
 		return;
 	}
 
-	$self->{'wills'} ||= Genealogy::Wills::DB::wills->new(no_entry => 1);
+	$self->{'wills'} ||= Genealogy::Wills::wills->new(no_entry => 1, %{$self});
 
 	if(!defined($self->{'wills'})) {
 		Carp::croak("Can't open the wills database");
@@ -137,10 +143,6 @@ L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Genealogy-Wills>
 
 L<http://matrix.cpantesters.org/?dist=Genealogy-Wills>
 
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Genealogy-Wills>
-
 =item * CPAN Testers Dependencies
 
 L<http://deps.cpantesters.org/?module=Genealogy::Wills>
@@ -149,7 +151,7 @@ L<http://deps.cpantesters.org/?module=Genealogy::Wills>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2023 Nigel Horne.
+Copyright 2023-2024 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

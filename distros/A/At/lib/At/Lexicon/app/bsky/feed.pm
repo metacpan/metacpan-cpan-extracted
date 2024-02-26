@@ -1,4 +1,4 @@
-package At::Lexicon::app::bsky::feed 0.17 {
+package At::Lexicon::app::bsky::feed 0.18 {
     use v5.38;
     no warnings 'experimental::class', 'experimental::builtin';    # Be quiet.
     use feature 'class';
@@ -531,9 +531,10 @@ package At::Lexicon::app::bsky::feed 0.17 {
     }
 
     class At::Lexicon::app::bsky::feed::threadgate {
-        field $post : param;         # At-URI, required
-        field $allow : param;        # array, union, max 5
-        field $createdAt : param;    # datetime, required
+        field $type : param($type) //= ();    # record field
+        field $post : param;                  # At-URI, required
+        field $allow : param;                 # array, union, max 5
+        field $createdAt : param;             # datetime, required
         ADJUST {
             $post = URI->new($post) unless builtin::blessed $post;
             Carp::confess 'too many elements in allow' if defined $allow && scalar @$allow > 5;
@@ -548,7 +549,10 @@ package At::Lexicon::app::bsky::feed 0.17 {
         method createdAt {$createdAt}
 
         method _raw() {
-            +{ post => $post->as_string, defined $allow ? ( allow => [ map { $_->_raw } @$allow ] ) : (), createdAt => $createdAt->_raw };
+            +{  defined $type ? ( '$type' => $type ) : (),
+                post => $post->as_string,
+                defined $allow ? ( allow => [ map { $_->_raw } @$allow ] ) : (), createdAt => $createdAt->_raw
+            };
         }
     }
 

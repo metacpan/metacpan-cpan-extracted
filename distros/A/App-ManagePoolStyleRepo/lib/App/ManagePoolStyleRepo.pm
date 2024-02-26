@@ -1,10 +1,5 @@
 package App::ManagePoolStyleRepo;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-13'; # DATE
-our $DIST = 'App-ManagePoolStyleRepo'; # DIST
-our $VERSION = '0.002'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
@@ -16,6 +11,11 @@ use File::chdir;
 use File::Slurper qw(read_text);
 use Hash::Subset qw(hash_subset);
 use Regexp::Pattern::Path;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-11-20'; # DATE
+our $DIST = 'App-ManagePoolStyleRepo'; # DIST
+our $VERSION = '0.003'; # VERSION
 
 my $re_filename_unix = $Regexp::Pattern::Path::RE{filename_unix}{pat};
 
@@ -146,7 +146,7 @@ $SPEC{list_items} = {
     },
 };
 sub list_items {
-    require File::MoreUtil;
+    require File::Util::Test;
 
     my %args = @_;
     my $pool_pattern  = $args{pool_pattern}  // qr/\Apool(?:\..+)?\z/;
@@ -160,7 +160,7 @@ sub list_items {
 
     my @rows;
 
-    my @dir_entries = File::MoreUtil::get_dir_entries();
+    my @dir_entries = File::Util::Test::get_dir_entries();
 
   POOL2:
     {
@@ -330,7 +330,7 @@ App::ManagePoolStyleRepo - Manage pool-style repo directory
 
 =head1 VERSION
 
-This document describes version 0.002 of App::ManagePoolStyleRepo (from Perl distribution App-ManagePoolStyleRepo), released on 2020-04-13.
+This document describes version 0.003 of App::ManagePoolStyleRepo (from Perl distribution App-ManagePoolStyleRepo), released on 2023-11-20.
 
 =head1 FUNCTIONS
 
@@ -349,6 +349,8 @@ Arguments ('*' denotes required arguments):
 
 =item * B<item_path>* => I<filename>
 
+(No description)
+
 
 =back
 
@@ -360,7 +362,7 @@ Return value:  (any)
 
 Usage:
 
- list_items(%args) -> [status, msg, payload, meta]
+ list_items(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 This function is not exported.
 
@@ -370,9 +372,15 @@ Arguments ('*' denotes required arguments):
 
 =item * B<detail> => I<bool>
 
+(No description)
+
 =item * B<has_tags> => I<array[str]>
 
+(No description)
+
 =item * B<lacks_tags> => I<array[str]>
+
+(No description)
 
 =item * B<pool1_pattern> => I<re> (default: qr(\Apool1(?:\..+)?\z))
 
@@ -404,12 +412,12 @@ Repo directory.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -419,7 +427,7 @@ Return value:  (any)
 
 Usage:
 
- update_index(%args) -> [status, msg, payload, meta]
+ update_index(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 This function is not exported.
 
@@ -453,28 +461,46 @@ Repo directory.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
-
-=head1 BUGS
-
-Please report all bug reports or feature requests to L<mailto:stevenharyanto@gmail.com>.
 
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report all bug reports or feature requests to L<mailto:stevenharyanto@gmail.com>.
 
 =cut

@@ -28,6 +28,7 @@
 #include "spvm_method.h"
 #include "spvm_string.h"
 #include "spvm_class_file.h"
+#include "spvm_utf8.h"
 
 // Get token
 int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
@@ -151,7 +152,6 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
         continue;
         break;
       }
-      case '\r':
       case '\n':
       {
         assert(SPVM_TOKE_is_line_terminator(compiler, compiler->ch_ptr));
@@ -388,22 +388,135 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
         }
         break;
       }
-      // Comment
       case '#': {
+        
+        int32_t is_content_begin = (compiler->ch_ptr == compiler->current_class_content);
+        
+        int32_t is_line_begin = (compiler->ch_ptr == compiler->line_begin_ch_ptr);
+        
         compiler->ch_ptr++;
-        while(1) {
-          int32_t is_line_terminator = SPVM_TOKE_is_line_terminator(compiler, compiler->ch_ptr);
+        
+        // Line directive
+        if (strncmp(compiler->ch_ptr, "line ", 5) == 0) {
           
-          if (is_line_terminator) {
-            SPVM_TOKE_parse_line_terminator(compiler, &compiler->ch_ptr);
-            SPVM_TOKE_increment_current_line(compiler);
+          if (!is_line_begin) {
+            SPVM_COMPILER_error(compiler, "A line directive must begin from the beggining of the line.\n  at %s line %d", compiler->current_file, compiler->current_line);
+            return 0;
           }
           
-          if (is_line_terminator || *compiler->ch_ptr == '\0') {
-            break;
-          }
-          else {
+          compiler->ch_ptr += 4;
+          
+          while (*compiler->ch_ptr == ' ') {
             compiler->ch_ptr++;
+          }
+          
+          const char* line_number_begin_ptr = compiler->ch_ptr;
+          while (isdigit(*compiler->ch_ptr) || *compiler->ch_ptr == '-') {
+            compiler->ch_ptr++;
+          }
+          
+          while (*compiler->ch_ptr == ' ') {
+            compiler->ch_ptr++;
+          }
+          
+          if (!(*compiler->ch_ptr == '\n')) {
+            SPVM_COMPILER_error(compiler, "A line directive must end with \"\\n\".\n  at %s line %d", compiler->current_file, compiler->current_line);
+            return 0;
+          }
+          
+          if (line_number_begin_ptr == compiler->ch_ptr) {
+            SPVM_COMPILER_error(compiler, "A line directive must have a line number.\n  at %s line %d", compiler->current_file, compiler->current_line);
+            return 0;
+          }
+          
+          errno = 0;
+          char *end;
+          int64_t line_number = (int64_t)strtoll(line_number_begin_ptr, &end, 10);
+          
+          if (!(line_number >= 1 && line_number <= INT32_MAX && errno == 0)) {
+            SPVM_COMPILER_error(compiler, "The line number given to a line directive must be a positive 32bit integer.\n  at %s line %d", compiler->current_file, compiler->current_line);
+            return 0;
+          }
+          
+          compiler->current_line = (int32_t)line_number;
+          
+          compiler->ch_ptr++;
+          compiler->line_begin_ch_ptr = compiler->ch_ptr;
+        }
+        // File directive
+        else if (strncmp(compiler->ch_ptr, "file ", 5) == 0) {
+          
+          if (!is_content_begin) {
+            SPVM_COMPILER_error(compiler, "A file directive must begin from the beggining of the source code.\n  at %s line %d", compiler->current_file, compiler->current_line);
+            return 0;
+          }
+          
+          compiler->ch_ptr += 4;
+          
+          while (*compiler->ch_ptr == ' ') {
+            compiler->ch_ptr++;
+          }
+          
+          char* file = NULL;
+          if (*compiler->ch_ptr == '"') {
+            
+            compiler->ch_ptr++;
+            
+            const char* file_begin_ptr = compiler->ch_ptr;
+            int32_t file_length = 0;
+            while (*compiler->ch_ptr != '"') {
+              if (*compiler->ch_ptr == '\n') {
+                SPVM_COMPILER_error(compiler, "A file in a line directive must end with \".\n  at %s line %d", compiler->current_file, compiler->current_line);
+                return 0;
+              }
+              
+              compiler->ch_ptr++;
+              file_length++;
+            }
+            
+            compiler->ch_ptr++;
+            
+            file = SPVM_ALLOCATOR_alloc_memory_block_permanent(compiler->current_each_compile_allocator, file_length + 1);
+            memcpy(file, file_begin_ptr, file_length);
+            
+            SPVM_STRING_new(compiler, file, file_length);
+          }
+          
+          while (*compiler->ch_ptr == ' ') {
+            compiler->ch_ptr++;
+          }
+          
+          if (!(*compiler->ch_ptr == '\n')) {
+            SPVM_COMPILER_error(compiler, "A file directive must end with \"\\n\".\n  at %s line %d", compiler->current_file, compiler->current_line);
+            return 0;
+          }
+          
+          if (!file) {
+            SPVM_COMPILER_error(compiler, "A file directive must have a file path.\n  at %s line %d", compiler->current_file, compiler->current_line);
+            return 0;
+          }
+          
+          compiler->current_file = file;
+          
+          compiler->ch_ptr++;
+          compiler->line_begin_ch_ptr = compiler->ch_ptr;
+        }
+        // Comment
+        else {
+          while(1) {
+            int32_t is_line_terminator = SPVM_TOKE_is_line_terminator(compiler, compiler->ch_ptr);
+            
+            if (is_line_terminator) {
+              SPVM_TOKE_parse_line_terminator(compiler, &compiler->ch_ptr);
+              SPVM_TOKE_increment_current_line(compiler);
+            }
+            
+            if (is_line_terminator || *compiler->ch_ptr == '\0') {
+              break;
+            }
+            else {
+              compiler->ch_ptr++;
+            }
           }
         }
         
@@ -565,16 +678,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 
                 int32_t heredoc_index = 0;
                 while (heredoc_index < heredoc_length) {
-                  int32_t is_line_terminator = SPVM_TOKE_is_line_terminator(compiler, heredoc_ptr);
-                  
-                  if (is_line_terminator) {
-                    heredoc[heredoc_index] = '\n';
-                    
-                    SPVM_TOKE_parse_line_terminator(compiler, &heredoc_ptr);
-                    
-                    heredoc_index++;
-                  }
-                  else if (*heredoc_ptr == '\0') {
+                  if (*heredoc_ptr == '\0') {
                     assert(0);
                   }
                   else {
@@ -1081,10 +1185,10 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                         char *end;
                         int64_t unicode = (int64_t)strtoll(unicode_chars, &end, 16);
                         
-                        int32_t is_valid_utf8_code_point = SPVM_TOKE_is_valid_utf8_code_point(unicode);
+                        int32_t is_valid_utf8_code_point = SPVM_UTF8_is_valid_utf8_code_point(unicode);
                         if (is_valid_utf8_code_point) {
                           char utf8_chars[4];
-                          int32_t byte_length = SPVM_TOKE_convert_unicode_codepoint_to_utf8_character(unicode, (uint8_t*)utf8_chars);
+                          int32_t byte_length = SPVM_UTF8_convert_unicode_codepoint_to_utf8_character(unicode, (uint8_t*)utf8_chars);
                           for (int32_t byte_index = 0; byte_index < byte_length; byte_index++) {
                             string_literal_tmp[string_literal_length] = utf8_chars[byte_index];
                             string_literal_length++;
@@ -2354,7 +2458,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   keyword_token = CURRENT_CLASS_NAME;
                 }
                 else if (strcmp(symbol_name, "__FILE__") == 0) {
-                  SPVM_OP* op_constant = SPVM_OP_new_op_constant_string(compiler, compiler->current_class_rel_file, strlen(compiler->current_class_rel_file), compiler->current_file, compiler->current_line);
+                  SPVM_OP* op_constant = SPVM_OP_new_op_constant_string(compiler, compiler->current_file, strlen(compiler->current_file), compiler->current_file, compiler->current_line);
                   yylvalp->opval = op_constant;
                   keyword_token = CONSTANT;
                 }
@@ -2456,8 +2560,10 @@ int32_t SPVM_TOKE_load_class_file(SPVM_COMPILER* compiler) {
       const char* basic_type_name = op_use->uv.use->op_type->uv.type->unresolved_basic_type_name;
       int32_t basic_type_name_length = strlen(basic_type_name);
       
+      int32_t is_anon_class = !!strstr(basic_type_name, "::anon::");
+      
       // Check the class name
-      {
+      if (!is_anon_class) {
         // A class name must begin with an upper case character
         if (SPVM_TOKE_islower_ascii(compiler, basic_type_name[0])) {
           SPVM_COMPILER_error(compiler, "The class name \"%s\" must begin with an upper case character.\n  at %s line %d", basic_type_name, op_use->file, op_use->line);
@@ -2617,6 +2723,8 @@ int32_t SPVM_TOKE_load_class_file(SPVM_COMPILER* compiler) {
               fclose(fh);
               source[source_length] = '\0';
               
+              int32_t content_length = strlen(source);
+              
               SPVM_CLASS_FILE* found_class_file = SPVM_COMPILER_get_class_file(compiler, basic_type_name);
               
               if (!found_class_file) {
@@ -2626,7 +2734,7 @@ int32_t SPVM_TOKE_load_class_file(SPVM_COMPILER* compiler) {
                 SPVM_CLASS_FILE_set_rel_file(compiler, class_file, current_class_rel_file);
                 SPVM_CLASS_FILE_set_dir(compiler, class_file, include_dir);
                 SPVM_CLASS_FILE_set_content(compiler, class_file, source);
-                SPVM_CLASS_FILE_set_content_length(compiler, class_file, source_length);
+                SPVM_CLASS_FILE_set_content_length(compiler, class_file, content_length);
               }
             }
           }
@@ -2666,6 +2774,43 @@ int32_t SPVM_TOKE_load_class_file(SPVM_COMPILER* compiler) {
           }
           else {
             compiler->current_file = class_file->rel_file;
+          }
+          
+          int32_t content_length = class_file->content_length;
+          
+          for (int32_t i = 0; i < content_length; i++) {
+            char ch = compiler->current_class_content[i];
+          }
+          
+          // Check characters in source code.
+          int32_t content_offset = 0;
+          while (content_offset < class_file->content_length) {
+            int32_t dst;
+            
+            // UTF-8
+            const char* current_ch = compiler->current_class_content + content_offset;
+            int32_t utf8_char_len = (int32_t)SPVM_UTF8_iterate((const uint8_t*)(compiler->current_class_content + content_offset), class_file->content_length, &dst);
+            
+            if (!(utf8_char_len > 0)) {
+              SPVM_COMPILER_error(compiler, "The charactor encoding of SPVM source codes must be UTF-8. The source code of the \"%s\" class in the \"%s\" file contains non-UTF8 characters.\n  at %s line %d", basic_type_name, compiler->current_file, op_use->file, op_use->line);
+              return 0;
+            }
+            
+            // ASCII
+            if (utf8_char_len == 1) {
+              if (!(SPVM_TOKE_isprint_ascii(compiler, *current_ch) || SPVM_TOKE_isspace_ascii(compiler, *current_ch))) {
+                SPVM_COMPILER_error(compiler, "If a character in a SPVM source code is ASCII, it must be ASCII printable or space. The source code of the \"%s\" class in the \"%s\" file contains it.\n  at %s line %d", basic_type_name, compiler->current_file, op_use->file, op_use->line);
+                return 0;
+              }
+              
+              // Check new lines
+              if (*current_ch == '\r') {
+                SPVM_COMPILER_error(compiler, "The new line of SPVM source codes must be LF. The source code cannot contains CR and CRLF. The source code of the \"%s\" class in the \"%s\" file contains it.\n  at %s line %d", basic_type_name, compiler->current_file, op_use->file, op_use->line);
+                return 0;
+              }
+            }
+            
+            content_offset += utf8_char_len;
           }
           
           // Set initial information for tokenization
@@ -2847,55 +2992,11 @@ char SPVM_TOKE_parse_hex_escape(SPVM_COMPILER* compiler, char** ch_ptr_ptr) {
   return ch;
 }
 
-int32_t SPVM_TOKE_is_valid_utf8_code_point(int32_t code_point) {
-  return SPVM_TOKE_is_unicode_scalar_value(code_point);
-}
-
-int32_t SPVM_TOKE_is_unicode_scalar_value(int32_t code_point) {
-  int32_t is_unicode_scalar_value = 0;
-  if (code_point >= 0 && code_point <= 0x10FFFF) {
-    if (!(code_point >= 0xD800 && code_point <= 0xDFFF)) {
-      is_unicode_scalar_value = 1;
-    }
-  }
-  
-  return is_unicode_scalar_value;
-}
-
-int32_t SPVM_TOKE_convert_unicode_codepoint_to_utf8_character(int32_t uc, uint8_t* dst) {
-  if (uc < 0x00) {
-    return 0;
-  } else if (uc < 0x80) {
-    dst[0] = (uint8_t)uc;
-    return 1;
-  } else if (uc < 0x800) {
-    dst[0] = (uint8_t)(0xC0 + (uc >> 6));
-    dst[1] = (uint8_t)(0x80 + (uc & 0x3F));
-    return 2;
-  // Note: we allow encoding 0xd800-0xdfff here, so as not to change
-  // the API, however, these are actually invalid in UTF-8
-  } else if (uc < 0x10000) {
-    dst[0] = (uint8_t)(0xE0 + (uc >> 12));
-    dst[1] = (uint8_t)(0x80 + ((uc >> 6) & 0x3F));
-    dst[2] = (uint8_t)(0x80 + (uc & 0x3F));
-    return 3;
-  } else if (uc < 0x110000) {
-    dst[0] = (uint8_t)(0xF0 + (uc >> 18));
-    dst[1] = (uint8_t)(0x80 + ((uc >> 12) & 0x3F));
-    dst[2] = (uint8_t)(0x80 + ((uc >> 6) & 0x3F));
-    dst[3] = (uint8_t)(0x80 + (uc & 0x3F));
-    return 4;
-  }
-  else {
-    return 0;
-  }
-}
-
 int32_t SPVM_TOKE_is_line_terminator(SPVM_COMPILER* compiler, char* ch) {
   
   int32_t is_line_terminator = 0;
   
-  if (*ch == '\n' || *ch == '\r') {
+  if (*ch == '\n') {
     is_line_terminator = 1;
   }
   
@@ -2924,6 +3025,17 @@ int32_t SPVM_TOKE_isalnum_ascii(SPVM_COMPILER* compiler, int32_t ch) {
   return isalnum_ascii;
 }
 
+int32_t SPVM_TOKE_isspace_ascii(SPVM_COMPILER* compiler, int32_t ch) {
+  
+  int32_t isalpha_ascii = 0;
+  
+  if (isascii(ch) && isspace(ch)) {
+    isalpha_ascii = 1;
+  }
+  
+  return isalpha_ascii;
+}
+
 int32_t SPVM_TOKE_isdigit_ascii(SPVM_COMPILER* compiler, int32_t ch) {
   
   int32_t isdigit_ascii = 0;
@@ -2946,15 +3058,22 @@ int32_t SPVM_TOKE_islower_ascii(SPVM_COMPILER* compiler, int32_t ch) {
   return islower_ascii;
 }
 
+int32_t SPVM_TOKE_isprint_ascii(SPVM_COMPILER* compiler, int32_t ch) {
+  
+  int32_t islower_ascii = 0;
+  
+  if (isascii(ch) && isprint(ch)) {
+    islower_ascii = 1;
+  }
+  
+  return islower_ascii;
+}
+
 int32_t SPVM_TOKE_parse_line_terminator(SPVM_COMPILER* compiler, char** ch_ptr_ptr) {
   
   int32_t is_line_terminator = 0;
   
-  if (**ch_ptr_ptr == '\r' && *(*ch_ptr_ptr + 1) == '\n') {
-    is_line_terminator = 1;
-    *ch_ptr_ptr += 2;
-  }
-  else if (**ch_ptr_ptr == '\n' || **ch_ptr_ptr == '\r') {
+  if (**ch_ptr_ptr == '\n') {
     is_line_terminator = 1;
     (*ch_ptr_ptr)++;
   }

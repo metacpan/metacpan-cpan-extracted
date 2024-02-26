@@ -31,8 +31,8 @@ use PDL::LinearAlgebra::Real;
   package # hide from CPAN
     PDL::Complex;
 	my $warningFlag;
-  	BEGIN{
-  		$warningFlag = $^W;
+	BEGIN{
+		$warningFlag = $^W;
 		$^W = 0;
 	}
 	use overload (
@@ -65,11 +65,9 @@ PDL::LinearAlgebra::Complex - PDL interface to the lapack linear algebra program
 
 This module provides an interface to parts of the lapack library (complex numbers).
 These routines accept either float or double ndarrays.
-#line 69 "Complex.pm"
 
-
-
-
+=cut
+#line 71 "Complex.pm"
 
 
 =head1 FUNCTIONS
@@ -160,9 +158,7 @@ sub PDL::cgtsv {
   goto &PDL::__Ncgtsv;
 }
 *cgtsv = \&PDL::cgtsv;
-#line 164 "Complex.pm"
-
-
+#line 162 "Complex.pm"
 
 *__Ccgesvd = \&PDL::__Ccgesvd;
 
@@ -201,9 +197,7 @@ sub PDL::cgesvd {
   goto &PDL::__Ncgesvd;
 }
 *cgesvd = \&PDL::cgesvd;
-#line 205 "Complex.pm"
-
-
+#line 201 "Complex.pm"
 
 *__Ccgesdd = \&PDL::__Ccgesdd;
 
@@ -242,9 +236,7 @@ sub PDL::cgesdd {
   goto &PDL::__Ncgesdd;
 }
 *cgesdd = \&PDL::cgesdd;
-#line 246 "Complex.pm"
-
-
+#line 240 "Complex.pm"
 
 *__Ccggsvd = \&PDL::__Ccggsvd;
 
@@ -279,9 +271,7 @@ sub PDL::cggsvd {
   goto &PDL::__Ncggsvd;
 }
 *cggsvd = \&PDL::cggsvd;
-#line 283 "Complex.pm"
-
-
+#line 275 "Complex.pm"
 
 *__Ccgeev = \&PDL::__Ccgeev;
 
@@ -316,9 +306,7 @@ sub PDL::cgeev {
   goto &PDL::__Ncgeev;
 }
 *cgeev = \&PDL::cgeev;
-#line 320 "Complex.pm"
-
-
+#line 310 "Complex.pm"
 
 *__Ccgeevx = \&PDL::__Ccgeevx;
 
@@ -353,9 +341,7 @@ sub PDL::cgeevx {
   goto &PDL::__Ncgeevx;
 }
 *cgeevx = \&PDL::cgeevx;
-#line 357 "Complex.pm"
-
-
+#line 345 "Complex.pm"
 
 *__Ccggev = \&PDL::__Ccggev;
 
@@ -390,9 +376,7 @@ sub PDL::cggev {
   goto &PDL::__Ncggev;
 }
 *cggev = \&PDL::cggev;
-#line 394 "Complex.pm"
-
-
+#line 380 "Complex.pm"
 
 *__Ccggevx = \&PDL::__Ccggevx;
 
@@ -427,9 +411,7 @@ sub PDL::cggevx {
   goto &PDL::__Ncggevx;
 }
 *cggevx = \&PDL::cggevx;
-#line 431 "Complex.pm"
-
-
+#line 415 "Complex.pm"
 
 *__Ccgees = \&PDL::__Ccgees;
 
@@ -477,9 +459,7 @@ sub PDL::cgees {
   goto &PDL::__Ncgees;
 }
 *cgees = \&PDL::cgees;
-#line 481 "Complex.pm"
-
-
+#line 463 "Complex.pm"
 
 *__Ccgeesx = \&PDL::__Ccgeesx;
 
@@ -526,9 +506,7 @@ sub PDL::cgeesx {
   goto &PDL::__Ncgeesx;
 }
 *cgeesx = \&PDL::cgeesx;
-#line 530 "Complex.pm"
-
-
+#line 510 "Complex.pm"
 
 *__Ccgges = \&PDL::__Ccgges;
 
@@ -575,9 +553,7 @@ sub PDL::cgges {
   goto &PDL::__Ncgges;
 }
 *cgges = \&PDL::cgges;
-#line 579 "Complex.pm"
-
-
+#line 557 "Complex.pm"
 
 *__Ccggesx = \&PDL::__Ccggesx;
 
@@ -624,9 +600,7 @@ sub PDL::cggesx {
   goto &PDL::__Ncggesx;
 }
 *cggesx = \&PDL::cggesx;
-#line 628 "Complex.pm"
-
-
+#line 604 "Complex.pm"
 
 *__Ccheev = \&PDL::__Ccheev;
 
@@ -661,9 +635,7 @@ sub PDL::cheev {
   goto &PDL::__Ncheev;
 }
 *cheev = \&PDL::cheev;
-#line 665 "Complex.pm"
-
-
+#line 639 "Complex.pm"
 
 *__Ccheevd = \&PDL::__Ccheevd;
 
@@ -698,9 +670,7 @@ sub PDL::cheevd {
   goto &PDL::__Ncheevd;
 }
 *cheevd = \&PDL::cheevd;
-#line 702 "Complex.pm"
-
-
+#line 674 "Complex.pm"
 
 *__Ccheevx = \&PDL::__Ccheevx;
 
@@ -735,9 +705,7 @@ sub PDL::cheevx {
   goto &PDL::__Ncheevx;
 }
 *cheevx = \&PDL::cheevx;
-#line 739 "Complex.pm"
-
-
+#line 709 "Complex.pm"
 
 *__Ccheevr = \&PDL::__Ccheevr;
 
@@ -772,9 +740,7 @@ sub PDL::cheevr {
   goto &PDL::__Ncheevr;
 }
 *cheevr = \&PDL::cheevr;
-#line 776 "Complex.pm"
-
-
+#line 744 "Complex.pm"
 
 *__Cchegv = \&PDL::__Cchegv;
 
@@ -809,9 +775,7 @@ sub PDL::chegv {
   goto &PDL::__Nchegv;
 }
 *chegv = \&PDL::chegv;
-#line 813 "Complex.pm"
-
-
+#line 779 "Complex.pm"
 
 *__Cchegvd = \&PDL::__Cchegvd;
 
@@ -846,9 +810,7 @@ sub PDL::chegvd {
   goto &PDL::__Nchegvd;
 }
 *chegvd = \&PDL::chegvd;
-#line 850 "Complex.pm"
-
-
+#line 814 "Complex.pm"
 
 *__Cchegvx = \&PDL::__Cchegvx;
 
@@ -887,9 +849,7 @@ sub PDL::chegvx {
   goto &PDL::__Nchegvx;
 }
 *chegvx = \&PDL::chegvx;
-#line 891 "Complex.pm"
-
-
+#line 853 "Complex.pm"
 
 *__Ccgesv = \&PDL::__Ccgesv;
 
@@ -924,9 +884,7 @@ sub PDL::cgesv {
   goto &PDL::__Ncgesv;
 }
 *cgesv = \&PDL::cgesv;
-#line 928 "Complex.pm"
-
-
+#line 888 "Complex.pm"
 
 *__Ccgesvx = \&PDL::__Ccgesvx;
 
@@ -953,7 +911,7 @@ Complex version of L<PDL::LinearAlgebra::Real/gesvx>.
 
     trans:  Specifies the form of the system of equations:
             = 0:  A * X = B     (No transpose)   
-            = 1:  A' * X = B  (Transpose)   
+            = 1:  A' * X = B  (Transpose)
             = 2:  A**H * X = B  (Conjugate transpose)  
 
 =cut
@@ -966,9 +924,7 @@ sub PDL::cgesvx {
   goto &PDL::__Ncgesvx;
 }
 *cgesvx = \&PDL::cgesvx;
-#line 970 "Complex.pm"
-
-
+#line 928 "Complex.pm"
 
 *__Ccsysv = \&PDL::__Ccsysv;
 
@@ -1003,9 +959,7 @@ sub PDL::csysv {
   goto &PDL::__Ncsysv;
 }
 *csysv = \&PDL::csysv;
-#line 1007 "Complex.pm"
-
-
+#line 963 "Complex.pm"
 
 *__Ccsysvx = \&PDL::__Ccsysvx;
 
@@ -1040,9 +994,7 @@ sub PDL::csysvx {
   goto &PDL::__Ncsysvx;
 }
 *csysvx = \&PDL::csysvx;
-#line 1044 "Complex.pm"
-
-
+#line 998 "Complex.pm"
 
 *__Cchesv = \&PDL::__Cchesv;
 
@@ -1077,9 +1029,7 @@ sub PDL::chesv {
   goto &PDL::__Nchesv;
 }
 *chesv = \&PDL::chesv;
-#line 1081 "Complex.pm"
-
-
+#line 1033 "Complex.pm"
 
 *__Cchesvx = \&PDL::__Cchesvx;
 
@@ -1114,9 +1064,7 @@ sub PDL::chesvx {
   goto &PDL::__Nchesvx;
 }
 *chesvx = \&PDL::chesvx;
-#line 1118 "Complex.pm"
-
-
+#line 1068 "Complex.pm"
 
 *__Ccposv = \&PDL::__Ccposv;
 
@@ -1151,9 +1099,7 @@ sub PDL::cposv {
   goto &PDL::__Ncposv;
 }
 *cposv = \&PDL::cposv;
-#line 1155 "Complex.pm"
-
-
+#line 1103 "Complex.pm"
 
 *__Ccposvx = \&PDL::__Ccposvx;
 
@@ -1188,9 +1134,7 @@ sub PDL::cposvx {
   goto &PDL::__Ncposvx;
 }
 *cposvx = \&PDL::cposvx;
-#line 1192 "Complex.pm"
-
-
+#line 1138 "Complex.pm"
 
 *__Ccgels = \&PDL::__Ccgels;
 
@@ -1230,9 +1174,7 @@ sub PDL::cgels {
   goto &PDL::__Ncgels;
 }
 *cgels = \&PDL::cgels;
-#line 1234 "Complex.pm"
-
-
+#line 1178 "Complex.pm"
 
 *__Ccgelsy = \&PDL::__Ccgelsy;
 
@@ -1267,9 +1209,7 @@ sub PDL::cgelsy {
   goto &PDL::__Ncgelsy;
 }
 *cgelsy = \&PDL::cgelsy;
-#line 1271 "Complex.pm"
-
-
+#line 1213 "Complex.pm"
 
 *__Ccgelss = \&PDL::__Ccgelss;
 
@@ -1304,9 +1244,7 @@ sub PDL::cgelss {
   goto &PDL::__Ncgelss;
 }
 *cgelss = \&PDL::cgelss;
-#line 1308 "Complex.pm"
-
-
+#line 1248 "Complex.pm"
 
 *__Ccgelsd = \&PDL::__Ccgelsd;
 
@@ -1341,9 +1279,7 @@ sub PDL::cgelsd {
   goto &PDL::__Ncgelsd;
 }
 *cgelsd = \&PDL::cgelsd;
-#line 1345 "Complex.pm"
-
-
+#line 1283 "Complex.pm"
 
 *__Ccgglse = \&PDL::__Ccgglse;
 
@@ -1378,9 +1314,7 @@ sub PDL::cgglse {
   goto &PDL::__Ncgglse;
 }
 *cgglse = \&PDL::cgglse;
-#line 1382 "Complex.pm"
-
-
+#line 1318 "Complex.pm"
 
 *__Ccggglm = \&PDL::__Ccggglm;
 
@@ -1415,9 +1349,7 @@ sub PDL::cggglm {
   goto &PDL::__Ncggglm;
 }
 *cggglm = \&PDL::cggglm;
-#line 1419 "Complex.pm"
-
-
+#line 1353 "Complex.pm"
 
 *__Ccgetrf = \&PDL::__Ccgetrf;
 
@@ -1452,9 +1384,7 @@ sub PDL::cgetrf {
   goto &PDL::__Ncgetrf;
 }
 *cgetrf = \&PDL::cgetrf;
-#line 1456 "Complex.pm"
-
-
+#line 1388 "Complex.pm"
 
 *__Ccgetf2 = \&PDL::__Ccgetf2;
 
@@ -1489,9 +1419,7 @@ sub PDL::cgetf2 {
   goto &PDL::__Ncgetf2;
 }
 *cgetf2 = \&PDL::cgetf2;
-#line 1493 "Complex.pm"
-
-
+#line 1423 "Complex.pm"
 
 *__Ccsytrf = \&PDL::__Ccsytrf;
 
@@ -1526,9 +1454,7 @@ sub PDL::csytrf {
   goto &PDL::__Ncsytrf;
 }
 *csytrf = \&PDL::csytrf;
-#line 1530 "Complex.pm"
-
-
+#line 1458 "Complex.pm"
 
 *__Ccsytf2 = \&PDL::__Ccsytf2;
 
@@ -1563,9 +1489,7 @@ sub PDL::csytf2 {
   goto &PDL::__Ncsytf2;
 }
 *csytf2 = \&PDL::csytf2;
-#line 1567 "Complex.pm"
-
-
+#line 1493 "Complex.pm"
 
 *__Ccchetrf = \&PDL::__Ccchetrf;
 
@@ -1600,9 +1524,7 @@ sub PDL::cchetrf {
   goto &PDL::__Ncchetrf;
 }
 *cchetrf = \&PDL::cchetrf;
-#line 1604 "Complex.pm"
-
-
+#line 1528 "Complex.pm"
 
 *__Cchetf2 = \&PDL::__Cchetf2;
 
@@ -1637,9 +1559,7 @@ sub PDL::chetf2 {
   goto &PDL::__Nchetf2;
 }
 *chetf2 = \&PDL::chetf2;
-#line 1641 "Complex.pm"
-
-
+#line 1563 "Complex.pm"
 
 *__Ccpotrf = \&PDL::__Ccpotrf;
 
@@ -1674,9 +1594,7 @@ sub PDL::cpotrf {
   goto &PDL::__Ncpotrf;
 }
 *cpotrf = \&PDL::cpotrf;
-#line 1678 "Complex.pm"
-
-
+#line 1598 "Complex.pm"
 
 *__Ccpotf2 = \&PDL::__Ccpotf2;
 
@@ -1711,9 +1629,7 @@ sub PDL::cpotf2 {
   goto &PDL::__Ncpotf2;
 }
 *cpotf2 = \&PDL::cpotf2;
-#line 1715 "Complex.pm"
-
-
+#line 1633 "Complex.pm"
 
 *__Ccgetri = \&PDL::__Ccgetri;
 
@@ -1748,9 +1664,7 @@ sub PDL::cgetri {
   goto &PDL::__Ncgetri;
 }
 *cgetri = \&PDL::cgetri;
-#line 1752 "Complex.pm"
-
-
+#line 1668 "Complex.pm"
 
 *__Ccsytri = \&PDL::__Ccsytri;
 
@@ -1785,9 +1699,7 @@ sub PDL::csytri {
   goto &PDL::__Ncsytri;
 }
 *csytri = \&PDL::csytri;
-#line 1789 "Complex.pm"
-
-
+#line 1703 "Complex.pm"
 
 *__Cchetri = \&PDL::__Cchetri;
 
@@ -1822,9 +1734,7 @@ sub PDL::chetri {
   goto &PDL::__Nchetri;
 }
 *chetri = \&PDL::chetri;
-#line 1826 "Complex.pm"
-
-
+#line 1738 "Complex.pm"
 
 *__Ccpotri = \&PDL::__Ccpotri;
 
@@ -1859,9 +1769,7 @@ sub PDL::cpotri {
   goto &PDL::__Ncpotri;
 }
 *cpotri = \&PDL::cpotri;
-#line 1863 "Complex.pm"
-
-
+#line 1773 "Complex.pm"
 
 *__Cctrtri = \&PDL::__Cctrtri;
 
@@ -1896,9 +1804,7 @@ sub PDL::ctrtri {
   goto &PDL::__Nctrtri;
 }
 *ctrtri = \&PDL::ctrtri;
-#line 1900 "Complex.pm"
-
-
+#line 1808 "Complex.pm"
 
 *__Cctrti2 = \&PDL::__Cctrti2;
 
@@ -1933,9 +1839,7 @@ sub PDL::ctrti2 {
   goto &PDL::__Nctrti2;
 }
 *ctrti2 = \&PDL::ctrti2;
-#line 1937 "Complex.pm"
-
-
+#line 1843 "Complex.pm"
 
 *__Ccgetrs = \&PDL::__Ccgetrs;
 
@@ -1963,8 +1867,8 @@ Complex version of L<PDL::LinearAlgebra::Real/getrs>
     Arguments   
     =========   
 	trans:   = 0:  No transpose;
-            	 = 1:  Transpose; 
-            	 = 2:  Conjugate transpose;
+		 = 1:  Transpose;
+		 = 2:  Conjugate transpose;
 
 =cut
 
@@ -1976,9 +1880,7 @@ sub PDL::cgetrs {
   goto &PDL::__Ncgetrs;
 }
 *cgetrs = \&PDL::cgetrs;
-#line 1980 "Complex.pm"
-
-
+#line 1884 "Complex.pm"
 
 *__Ccsytrs = \&PDL::__Ccsytrs;
 
@@ -2013,9 +1915,7 @@ sub PDL::csytrs {
   goto &PDL::__Ncsytrs;
 }
 *csytrs = \&PDL::csytrs;
-#line 2017 "Complex.pm"
-
-
+#line 1919 "Complex.pm"
 
 *__Cchetrs = \&PDL::__Cchetrs;
 
@@ -2050,9 +1950,7 @@ sub PDL::chetrs {
   goto &PDL::__Nchetrs;
 }
 *chetrs = \&PDL::chetrs;
-#line 2054 "Complex.pm"
-
-
+#line 1954 "Complex.pm"
 
 *__Ccpotrs = \&PDL::__Ccpotrs;
 
@@ -2087,9 +1985,7 @@ sub PDL::cpotrs {
   goto &PDL::__Ncpotrs;
 }
 *cpotrs = \&PDL::cpotrs;
-#line 2091 "Complex.pm"
-
-
+#line 1989 "Complex.pm"
 
 *__Cctrtrs = \&PDL::__Cctrtrs;
 
@@ -2117,8 +2013,8 @@ Complex version of L<PDL::LinearAlgebra::Real/trtrs>
     Arguments   
     =========   
 	trans:   = 0:  No transpose;
-            	 = 1:  Transpose; 
-            	 = 2:  Conjugate transpose;
+		 = 1:  Transpose;
+		 = 2:  Conjugate transpose;
 
 =cut
 
@@ -2130,9 +2026,7 @@ sub PDL::ctrtrs {
   goto &PDL::__Nctrtrs;
 }
 *ctrtrs = \&PDL::ctrtrs;
-#line 2134 "Complex.pm"
-
-
+#line 2030 "Complex.pm"
 
 *__Cclatrs = \&PDL::__Cclatrs;
 
@@ -2160,8 +2054,8 @@ Complex version of L<PDL::LinearAlgebra::Real/latrs>
     Arguments   
     =========   
 	trans:   = 0:  No transpose;
-            	 = 1:  Transpose; 
-            	 = 2:  Conjugate transpose;
+		 = 1:  Transpose;
+		 = 2:  Conjugate transpose;
 
 =cut
 
@@ -2173,9 +2067,7 @@ sub PDL::clatrs {
   goto &PDL::__Nclatrs;
 }
 *clatrs = \&PDL::clatrs;
-#line 2177 "Complex.pm"
-
-
+#line 2071 "Complex.pm"
 
 *__Ccgecon = \&PDL::__Ccgecon;
 
@@ -2210,9 +2102,7 @@ sub PDL::cgecon {
   goto &PDL::__Ncgecon;
 }
 *cgecon = \&PDL::cgecon;
-#line 2214 "Complex.pm"
-
-
+#line 2106 "Complex.pm"
 
 *__Ccsycon = \&PDL::__Ccsycon;
 
@@ -2247,9 +2137,7 @@ sub PDL::csycon {
   goto &PDL::__Ncsycon;
 }
 *csycon = \&PDL::csycon;
-#line 2251 "Complex.pm"
-
-
+#line 2141 "Complex.pm"
 
 *__Cchecon = \&PDL::__Cchecon;
 
@@ -2284,9 +2172,7 @@ sub PDL::checon {
   goto &PDL::__Nchecon;
 }
 *checon = \&PDL::checon;
-#line 2288 "Complex.pm"
-
-
+#line 2176 "Complex.pm"
 
 *__Ccpocon = \&PDL::__Ccpocon;
 
@@ -2321,9 +2207,7 @@ sub PDL::cpocon {
   goto &PDL::__Ncpocon;
 }
 *cpocon = \&PDL::cpocon;
-#line 2325 "Complex.pm"
-
-
+#line 2211 "Complex.pm"
 
 *__Cctrcon = \&PDL::__Cctrcon;
 
@@ -2358,9 +2242,7 @@ sub PDL::ctrcon {
   goto &PDL::__Nctrcon;
 }
 *ctrcon = \&PDL::ctrcon;
-#line 2362 "Complex.pm"
-
-
+#line 2246 "Complex.pm"
 
 *__Ccgeqp3 = \&PDL::__Ccgeqp3;
 
@@ -2395,9 +2277,7 @@ sub PDL::cgeqp3 {
   goto &PDL::__Ncgeqp3;
 }
 *cgeqp3 = \&PDL::cgeqp3;
-#line 2399 "Complex.pm"
-
-
+#line 2281 "Complex.pm"
 
 *__Ccgeqrf = \&PDL::__Ccgeqrf;
 
@@ -2432,9 +2312,7 @@ sub PDL::cgeqrf {
   goto &PDL::__Ncgeqrf;
 }
 *cgeqrf = \&PDL::cgeqrf;
-#line 2436 "Complex.pm"
-
-
+#line 2316 "Complex.pm"
 
 *__Ccungqr = \&PDL::__Ccungqr;
 
@@ -2469,9 +2347,7 @@ sub PDL::cungqr {
   goto &PDL::__Ncungqr;
 }
 *cungqr = \&PDL::cungqr;
-#line 2473 "Complex.pm"
-
-
+#line 2351 "Complex.pm"
 
 *__Ccunmqr = \&PDL::__Ccunmqr;
 
@@ -2506,9 +2382,7 @@ sub PDL::cunmqr {
   goto &PDL::__Ncunmqr;
 }
 *cunmqr = \&PDL::cunmqr;
-#line 2510 "Complex.pm"
-
-
+#line 2386 "Complex.pm"
 
 *__Ccgelqf = \&PDL::__Ccgelqf;
 
@@ -2543,9 +2417,7 @@ sub PDL::cgelqf {
   goto &PDL::__Ncgelqf;
 }
 *cgelqf = \&PDL::cgelqf;
-#line 2547 "Complex.pm"
-
-
+#line 2421 "Complex.pm"
 
 *__Ccunglq = \&PDL::__Ccunglq;
 
@@ -2580,9 +2452,7 @@ sub PDL::cunglq {
   goto &PDL::__Ncunglq;
 }
 *cunglq = \&PDL::cunglq;
-#line 2584 "Complex.pm"
-
-
+#line 2456 "Complex.pm"
 
 *__Ccunmlq = \&PDL::__Ccunmlq;
 
@@ -2617,9 +2487,7 @@ sub PDL::cunmlq {
   goto &PDL::__Ncunmlq;
 }
 *cunmlq = \&PDL::cunmlq;
-#line 2621 "Complex.pm"
-
-
+#line 2491 "Complex.pm"
 
 *__Ccgeqlf = \&PDL::__Ccgeqlf;
 
@@ -2654,9 +2522,7 @@ sub PDL::cgeqlf {
   goto &PDL::__Ncgeqlf;
 }
 *cgeqlf = \&PDL::cgeqlf;
-#line 2658 "Complex.pm"
-
-
+#line 2526 "Complex.pm"
 
 *__Ccungql = \&PDL::__Ccungql;
 
@@ -2690,9 +2556,7 @@ sub PDL::cungql {
   goto &PDL::__Ncungql;
 }
 *cungql = \&PDL::cungql;
-#line 2694 "Complex.pm"
-
-
+#line 2560 "Complex.pm"
 
 *__Ccunmql = \&PDL::__Ccunmql;
 
@@ -2727,9 +2591,7 @@ sub PDL::cunmql {
   goto &PDL::__Ncunmql;
 }
 *cunmql = \&PDL::cunmql;
-#line 2731 "Complex.pm"
-
-
+#line 2595 "Complex.pm"
 
 *__Ccgerqf = \&PDL::__Ccgerqf;
 
@@ -2764,9 +2626,7 @@ sub PDL::cgerqf {
   goto &PDL::__Ncgerqf;
 }
 *cgerqf = \&PDL::cgerqf;
-#line 2768 "Complex.pm"
-
-
+#line 2630 "Complex.pm"
 
 *__Ccungrq = \&PDL::__Ccungrq;
 
@@ -2801,9 +2661,7 @@ sub PDL::cungrq {
   goto &PDL::__Ncungrq;
 }
 *cungrq = \&PDL::cungrq;
-#line 2805 "Complex.pm"
-
-
+#line 2665 "Complex.pm"
 
 *__Ccunmrq = \&PDL::__Ccunmrq;
 
@@ -2838,9 +2696,7 @@ sub PDL::cunmrq {
   goto &PDL::__Ncunmrq;
 }
 *cunmrq = \&PDL::cunmrq;
-#line 2842 "Complex.pm"
-
-
+#line 2700 "Complex.pm"
 
 *__Cctzrzf = \&PDL::__Cctzrzf;
 
@@ -2875,9 +2731,7 @@ sub PDL::ctzrzf {
   goto &PDL::__Nctzrzf;
 }
 *ctzrzf = \&PDL::ctzrzf;
-#line 2879 "Complex.pm"
-
-
+#line 2735 "Complex.pm"
 
 *__Ccunmrz = \&PDL::__Ccunmrz;
 
@@ -2912,9 +2766,7 @@ sub PDL::cunmrz {
   goto &PDL::__Ncunmrz;
 }
 *cunmrz = \&PDL::cunmrz;
-#line 2916 "Complex.pm"
-
-
+#line 2770 "Complex.pm"
 
 *__Ccgehrd = \&PDL::__Ccgehrd;
 
@@ -2949,9 +2801,7 @@ sub PDL::cgehrd {
   goto &PDL::__Ncgehrd;
 }
 *cgehrd = \&PDL::cgehrd;
-#line 2953 "Complex.pm"
-
-
+#line 2805 "Complex.pm"
 
 *__Ccunghr = \&PDL::__Ccunghr;
 
@@ -2986,9 +2836,7 @@ sub PDL::cunghr {
   goto &PDL::__Ncunghr;
 }
 *cunghr = \&PDL::cunghr;
-#line 2990 "Complex.pm"
-
-
+#line 2840 "Complex.pm"
 
 *__Cchseqr = \&PDL::__Cchseqr;
 
@@ -3023,9 +2871,7 @@ sub PDL::chseqr {
   goto &PDL::__Nchseqr;
 }
 *chseqr = \&PDL::chseqr;
-#line 3027 "Complex.pm"
-
-
+#line 2875 "Complex.pm"
 
 *__Cctrevc = \&PDL::__Cctrevc;
 
@@ -3060,9 +2906,7 @@ sub PDL::ctrevc {
   goto &PDL::__Nctrevc;
 }
 *ctrevc = \&PDL::ctrevc;
-#line 3064 "Complex.pm"
-
-
+#line 2910 "Complex.pm"
 
 *__Cctgevc = \&PDL::__Cctgevc;
 
@@ -3097,9 +2941,7 @@ sub PDL::ctgevc {
   goto &PDL::__Nctgevc;
 }
 *ctgevc = \&PDL::ctgevc;
-#line 3101 "Complex.pm"
-
-
+#line 2945 "Complex.pm"
 
 *__Ccgebal = \&PDL::__Ccgebal;
 
@@ -3134,9 +2976,7 @@ sub PDL::cgebal {
   goto &PDL::__Ncgebal;
 }
 *cgebal = \&PDL::cgebal;
-#line 3138 "Complex.pm"
-
-
+#line 2980 "Complex.pm"
 
 *__Cclange = \&PDL::__Cclange;
 
@@ -3171,9 +3011,7 @@ sub PDL::clange {
   goto &PDL::__Nclange;
 }
 *clange = \&PDL::clange;
-#line 3175 "Complex.pm"
-
-
+#line 3015 "Complex.pm"
 
 *__Cclansy = \&PDL::__Cclansy;
 
@@ -3208,9 +3046,7 @@ sub PDL::clansy {
   goto &PDL::__Nclansy;
 }
 *clansy = \&PDL::clansy;
-#line 3212 "Complex.pm"
-
-
+#line 3050 "Complex.pm"
 
 *__Cclantr = \&PDL::__Cclantr;
 
@@ -3245,9 +3081,7 @@ sub PDL::clantr {
   goto &PDL::__Nclantr;
 }
 *clantr = \&PDL::clantr;
-#line 3249 "Complex.pm"
-
-
+#line 3085 "Complex.pm"
 
 *__Ccgemm = \&PDL::__Ccgemm;
 
@@ -3275,12 +3109,12 @@ Complex version of L<PDL::LinearAlgebra::Real/gemm>.
     Arguments   
     =========   
 	transa:  = 0:  No transpose;
-            	 = 1:  Transpose; 
-            	 = 2:  Conjugate transpose;
+		 = 1:  Transpose;
+		 = 2:  Conjugate transpose;
 
 	transb:  = 0:  No transpose;
-            	 = 1:  Transpose; 
-            	 = 2:  Conjugate transpose;
+		 = 1:  Transpose;
+		 = 2:  Conjugate transpose;
 
 =cut
 
@@ -3292,9 +3126,7 @@ sub PDL::cgemm {
   goto &PDL::__Ncgemm;
 }
 *cgemm = \&PDL::cgemm;
-#line 3296 "Complex.pm"
-
-
+#line 3130 "Complex.pm"
 
 *__Ccmmult = \&PDL::__Ccmmult;
 
@@ -3329,9 +3161,7 @@ sub PDL::cmmult {
   goto &PDL::__Ncmmult;
 }
 *cmmult = \&PDL::cmmult;
-#line 3333 "Complex.pm"
-
-
+#line 3165 "Complex.pm"
 
 *__Cccrossprod = \&PDL::__Cccrossprod;
 
@@ -3366,9 +3196,7 @@ sub PDL::ccrossprod {
   goto &PDL::__Nccrossprod;
 }
 *ccrossprod = \&PDL::ccrossprod;
-#line 3370 "Complex.pm"
-
-
+#line 3200 "Complex.pm"
 
 *__Ccsyrk = \&PDL::__Ccsyrk;
 
@@ -3403,9 +3231,7 @@ sub PDL::csyrk {
   goto &PDL::__Ncsyrk;
 }
 *csyrk = \&PDL::csyrk;
-#line 3407 "Complex.pm"
-
-
+#line 3235 "Complex.pm"
 
 *__Ccdot = \&PDL::__Ccdot;
 
@@ -3440,9 +3266,7 @@ sub PDL::cdot {
   goto &PDL::__Ncdot;
 }
 *cdot = \&PDL::cdot;
-#line 3444 "Complex.pm"
-
-
+#line 3270 "Complex.pm"
 
 *__Ccdotc = \&PDL::__Ccdotc;
 
@@ -3478,9 +3302,7 @@ sub PDL::cdotc {
   goto &PDL::__Ncdotc;
 }
 *cdotc = \&PDL::cdotc;
-#line 3482 "Complex.pm"
-
-
+#line 3306 "Complex.pm"
 
 *__Ccaxpy = \&PDL::__Ccaxpy;
 
@@ -3515,9 +3337,7 @@ sub PDL::caxpy {
   goto &PDL::__Ncaxpy;
 }
 *caxpy = \&PDL::caxpy;
-#line 3519 "Complex.pm"
-
-
+#line 3341 "Complex.pm"
 
 *__Ccnrm2 = \&PDL::__Ccnrm2;
 
@@ -3552,9 +3372,7 @@ sub PDL::cnrm2 {
   goto &PDL::__Ncnrm2;
 }
 *cnrm2 = \&PDL::cnrm2;
-#line 3556 "Complex.pm"
-
-
+#line 3376 "Complex.pm"
 
 *__Ccasum = \&PDL::__Ccasum;
 
@@ -3589,9 +3407,7 @@ sub PDL::casum {
   goto &PDL::__Ncasum;
 }
 *casum = \&PDL::casum;
-#line 3593 "Complex.pm"
-
-
+#line 3411 "Complex.pm"
 
 *__Ccscal = \&PDL::__Ccscal;
 
@@ -3626,9 +3442,7 @@ sub PDL::cscal {
   goto &PDL::__Ncscal;
 }
 *cscal = \&PDL::cscal;
-#line 3630 "Complex.pm"
-
-
+#line 3446 "Complex.pm"
 
 *__Ccsscal = \&PDL::__Ccsscal;
 
@@ -3663,9 +3477,7 @@ sub PDL::csscal {
   goto &PDL::__Ncsscal;
 }
 *csscal = \&PDL::csscal;
-#line 3667 "Complex.pm"
-
-
+#line 3481 "Complex.pm"
 
 *__Ccrotg = \&PDL::__Ccrotg;
 
@@ -3700,9 +3512,7 @@ sub PDL::crotg {
   goto &PDL::__Ncrotg;
 }
 *crotg = \&PDL::crotg;
-#line 3704 "Complex.pm"
-
-
+#line 3516 "Complex.pm"
 
 *__Cclacpy = \&PDL::__Cclacpy;
 
@@ -3737,9 +3547,7 @@ sub PDL::clacpy {
   goto &PDL::__Nclacpy;
 }
 *clacpy = \&PDL::clacpy;
-#line 3741 "Complex.pm"
-
-
+#line 3551 "Complex.pm"
 
 *__Cclaswp = \&PDL::__Cclaswp;
 
@@ -3774,31 +3582,7 @@ sub PDL::claswp {
   goto &PDL::__Nclaswp;
 }
 *claswp = \&PDL::claswp;
-#line 3778 "Complex.pm"
-
-
-
-
-
-=head2 ctricpy
-
-=for sig
-
-  Signature: (A(c=2,m,n);int uplo();[o] C(c=2,m,n))
-
-=for ref
-
-Copy triangular part to another matrix. If uplo == 0 copy upper triangular part.
-
-=for bad
-
-ctricpy does not process bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-=cut
-
-
-
+#line 3586 "Complex.pm"
 
 *ctricpy = \&PDL::ctricpy;
 
@@ -3866,14 +3650,8 @@ sub PDL::ccharpol {
   goto &PDL::__Nccharpol;
 }
 *ccharpol = \&PDL::ccharpol;
-#line 3870 "Complex.pm"
 
-
-
-
-
-
-#line 5140 "complex.pd"
+#line 5093 "complex.pd"
 
 =head1 AUTHOR
 
@@ -3884,10 +3662,7 @@ it under the terms of the Perl Artistic License as in the file Artistic_2
 in this distribution.
 
 =cut
-#line 3888 "Complex.pm"
-
-
-
+#line 3666 "Complex.pm"
 
 # Exit with OK status
 

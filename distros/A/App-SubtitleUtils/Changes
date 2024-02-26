@@ -1,3 +1,10 @@
+0.013   2024-01-13  Released-By: PERLANCAR; Urgency: medium
+
+        - Add script: rename-subtitle-files-like-their-movie-files.
+
+        - [bugfix] Fix Rinci metadata.
+
+
 0.012   2022-11-23  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

@@ -2,19 +2,19 @@
 
 =head1 NAME
 
-Locale::CLDR::Locales::Ff::Latn::Gm - Package for language Fulah
+Locale::CLDR::Locales::Ff::Latn::Gm - Package for language Fula
 
 =cut
 
 package Locale::CLDR::Locales::Ff::Latn::Gm;
 # This file auto generated from Data\common\main\ff_Latn_GM.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -62,10 +62,10 @@ has 'time_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'gregorian' => {
-			'full' => q{h:mm:ss a zzzz},
-			'long' => q{h:mm:ss a z},
-			'medium' => q{h:mm:ss a},
-			'short' => q{h:mm a},
+			'full' => q{h:mm:ss a zzzz},
+			'long' => q{h:mm:ss a z},
+			'medium' => q{h:mm:ss a},
+			'short' => q{h:mm a},
 		},
 	} },
 );

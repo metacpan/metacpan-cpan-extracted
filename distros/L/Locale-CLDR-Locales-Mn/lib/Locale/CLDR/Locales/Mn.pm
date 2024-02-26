@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Mn - Package for language Mongolian
 
 package Locale::CLDR::Locales::Mn;
 # This file auto generated from Data\common\main\mn.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -24,22 +24,6 @@ use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
 extends('Locale::CLDR::Locales::Root');
-# Need to add code for Key type pattern
-sub display_name_pattern {
-	my ($self, $name, $region, $script, $variant) = @_;
-
-	my $display_pattern = '{0} ({1})';
-	$display_pattern =~s/\{0\}/$name/g;
-	my $subtags = join '{0}, {1}', grep {$_} (
-		$region,
-		$script,
-		$variant,
-	);
-
-	$display_pattern =~s/\{1\}/$subtags/g;
-	return $display_pattern;
-}
-
 has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
@@ -60,14 +44,17 @@ has 'display_name_language' => (
  				'alt' => 'өмнөд алтай',
  				'am' => 'амхар',
  				'an' => 'арагон',
+ 				'ann' => 'оболо',
  				'anp' => 'ангик',
  				'ar' => 'араб',
  				'ar_001' => 'стандарт араб',
  				'arn' => 'мапүчи',
  				'arp' => 'арапаго',
+ 				'ars' => 'наджи араб',
  				'as' => 'ассам',
  				'asa' => 'асу',
  				'ast' => 'астури',
+ 				'atj' => 'атикамек',
  				'av' => 'авар',
  				'awa' => 'авадхи',
  				'ay' => 'аймара',
@@ -80,6 +67,7 @@ has 'display_name_language' => (
  				'bem' => 'бемба',
  				'bez' => 'бена',
  				'bg' => 'болгар',
+ 				'bgc' => 'Харьянви',
  				'bho' => 'божпури',
  				'bi' => 'бислам',
  				'bin' => 'бини',
@@ -93,6 +81,7 @@ has 'display_name_language' => (
  				'bug' => 'буги',
  				'byn' => 'блин',
  				'ca' => 'каталан',
+ 				'cay' => 'кайюга хэл',
  				'ccp' => 'чакма',
  				'ce' => 'чечень',
  				'ceb' => 'себуано',
@@ -101,14 +90,23 @@ has 'display_name_language' => (
  				'chk' => 'чуук',
  				'chm' => 'мари хэл',
  				'cho' => 'чоктау',
+ 				'chp' => 'чипевайан',
  				'chr' => 'чероки',
  				'chy' => 'чэенн',
  				'ckb' => 'төв курд',
  				'ckb@alt=menu' => 'Курд, Төв',
  				'ckb@alt=variant' => 'Курд, Сорани',
+ 				'clc' => 'чилкотин',
  				'co' => 'корсик',
+ 				'crg' => 'мичиф',
+ 				'crj' => 'зүүн өмнөд кри',
+ 				'crk' => 'плэйн кри',
+ 				'crl' => 'зүүн хойд кри',
+ 				'crm' => 'мүүс кри',
+ 				'crr' => 'каролина алгонкинск хэл',
  				'crs' => 'сеселва креол франц',
  				'cs' => 'чех',
+ 				'csw' => 'свампи кри',
  				'cu' => 'сүмийн славян',
  				'cv' => 'чуваш',
  				'cy' => 'уэльс',
@@ -137,9 +135,7 @@ has 'display_name_language' => (
  				'en_AU' => 'австрали-англи',
  				'en_CA' => 'канад-англи',
  				'en_GB' => 'британи-англи',
- 				'en_GB@alt=short' => 'британи-англи',
  				'en_US' => 'америк-англи',
- 				'en_US@alt=short' => 'америк-англи',
  				'eo' => 'эсперанто',
  				'es' => 'испани',
  				'es_419' => 'испани хэл (Латин Америк)',
@@ -158,6 +154,8 @@ has 'display_name_language' => (
  				'fr' => 'франц',
  				'fr_CA' => 'канад-франц',
  				'fr_CH' => 'швейцари-франц',
+ 				'frc' => 'франц, кажун',
+ 				'frr' => 'хойд фриз',
  				'fur' => 'фриулан',
  				'fy' => 'баруун фриз',
  				'ga' => 'ирланд',
@@ -175,9 +173,12 @@ has 'display_name_language' => (
  				'gv' => 'манкс',
  				'gwi' => 'гвичин',
  				'ha' => 'хауса',
+ 				'hai' => 'хайда',
  				'haw' => 'хавай',
+ 				'hax' => 'өмнөд хайда',
  				'he' => 'еврей',
  				'hi' => 'хинди',
+ 				'hi_Latn@alt=variant' => 'хинглиш',
  				'hil' => 'хилигайнон',
  				'hmn' => 'хмонг',
  				'hr' => 'хорват',
@@ -185,6 +186,7 @@ has 'display_name_language' => (
  				'ht' => 'Гаитийн креол',
  				'hu' => 'мажар',
  				'hup' => 'хупа',
+ 				'hur' => 'халкомелем',
  				'hy' => 'армен',
  				'hz' => 'хереро',
  				'ia' => 'интерлингво',
@@ -194,6 +196,7 @@ has 'display_name_language' => (
  				'ie' => 'нэгдмэл хэл',
  				'ig' => 'игбо',
  				'ii' => 'сычуань и',
+ 				'ikt' => 'баруун канадын инуктитут',
  				'ilo' => 'илоко',
  				'inh' => 'ингуш',
  				'io' => 'идо',
@@ -215,6 +218,7 @@ has 'display_name_language' => (
  				'kde' => 'маконде',
  				'kea' => 'кабүвердиану',
  				'kfo' => 'коро',
+ 				'kgp' => 'кайнганг',
  				'kha' => 'каси',
  				'khq' => 'койра чини',
  				'ki' => 'кикуюү',
@@ -242,6 +246,7 @@ has 'display_name_language' => (
  				'kum' => 'кумук',
  				'kv' => 'коми',
  				'kw' => 'корн',
+ 				'kwk' => 'квак вала',
  				'ky' => 'киргиз',
  				'la' => 'латин',
  				'lad' => 'ладин',
@@ -250,11 +255,15 @@ has 'display_name_language' => (
  				'lez' => 'лезги',
  				'lg' => 'ганда',
  				'li' => 'лимбург',
+ 				'lij' => 'Лигури',
+ 				'lil' => 'лиллуэт',
  				'lkt' => 'лакота',
  				'ln' => 'лингала',
  				'lo' => 'лаос',
+ 				'lou' => 'луизиана креоле',
  				'loz' => 'лози',
  				'lrc' => 'хойд лури',
+ 				'lsm' => 'самиа',
  				'lt' => 'литва',
  				'lu' => 'луба-катанга',
  				'lua' => 'луба-лулуа',
@@ -283,6 +292,7 @@ has 'display_name_language' => (
  				'ml' => 'малаялам',
  				'mn' => 'монгол',
  				'mni' => 'манипури',
+ 				'moe' => 'инну-аймун',
  				'moh' => 'мохаук',
  				'mos' => 'мосси',
  				'mr' => 'марати',
@@ -301,7 +311,6 @@ has 'display_name_language' => (
  				'nb' => 'норвегийн букмол',
  				'nd' => 'хойд ндебеле',
  				'nds' => 'доод герман',
- 				'nds_NL' => 'бага саксон',
  				'ne' => 'балба',
  				'new' => 'невари',
  				'ng' => 'ндонга',
@@ -322,6 +331,11 @@ has 'display_name_language' => (
  				'ny' => 'нянжа',
  				'nyn' => 'нянколе',
  				'oc' => 'окситан',
+ 				'ojb' => 'баруун хойд ожибва',
+ 				'ojc' => 'төв ожибва',
+ 				'ojs' => 'ожи кри',
+ 				'ojw' => 'баруун ожибва',
+ 				'oka' => 'оканаган',
  				'om' => 'оромо',
  				'or' => 'ория',
  				'os' => 'оссетин',
@@ -331,7 +345,9 @@ has 'display_name_language' => (
  				'pap' => 'папьяменто',
  				'pau' => 'палау',
  				'pcm' => 'нигерийн пиджин',
+ 				'pis' => 'пижин',
  				'pl' => 'польш',
+ 				'pqm' => 'малесит-пассамакводди',
  				'prg' => 'прусс',
  				'ps' => 'пушту',
  				'pt' => 'португал',
@@ -339,6 +355,7 @@ has 'display_name_language' => (
  				'pt_PT' => 'португал хэл (Европ)',
  				'qu' => 'кечуа',
  				'quc' => 'киче',
+ 				'raj' => 'ражастани',
  				'rap' => 'рапануи',
  				'rar' => 'раротонг',
  				'rhg' => 'рохинжа',
@@ -372,6 +389,7 @@ has 'display_name_language' => (
  				'si' => 'синхала',
  				'sk' => 'словак',
  				'sl' => 'словени',
+ 				'slh' => 'өмнөд лушуцид',
  				'sm' => 'самоа',
  				'sma' => 'өмнөд сами',
  				'smj' => 'люле сами',
@@ -386,6 +404,7 @@ has 'display_name_language' => (
  				'ss' => 'свати',
  				'ssy' => 'сахо',
  				'st' => 'сесото',
+ 				'str' => 'стрейтс салиш',
  				'su' => 'сундан',
  				'suk' => 'сукума',
  				'sv' => 'швед',
@@ -394,23 +413,29 @@ has 'display_name_language' => (
  				'swb' => 'комори',
  				'syr' => 'сири',
  				'ta' => 'тамил',
+ 				'tce' => 'өмнөд тутчоне',
  				'te' => 'тэлүгү',
  				'tem' => 'тимн',
  				'teo' => 'тэсо',
  				'tet' => 'тетум',
  				'tg' => 'тажик',
+ 				'tgx' => 'тагиш',
  				'th' => 'тай',
+ 				'tht' => 'талтан',
  				'ti' => 'тигринья',
  				'tig' => 'тигр',
  				'tk' => 'туркмен',
  				'tlh' => 'клингон',
+ 				'tli' => 'тлингит',
  				'tn' => 'цвана',
  				'to' => 'тонга',
+ 				'tok' => 'токипона',
  				'tpi' => 'ток писин',
  				'tr' => 'турк',
  				'trv' => 'тароко',
  				'ts' => 'цонга',
  				'tt' => 'татар',
+ 				'ttm' => 'хойд тутчоне',
  				'tum' => 'тумбула',
  				'tvl' => 'тувалу',
  				'tw' => 'тви',
@@ -427,6 +452,7 @@ has 'display_name_language' => (
  				'uz' => 'узбек',
  				'vai' => 'вай',
  				've' => 'венда',
+ 				'vec' => 'венец',
  				'vi' => 'вьетнам',
  				'vo' => 'волапюк',
  				'vun' => 'вунжо',
@@ -435,6 +461,7 @@ has 'display_name_language' => (
  				'wal' => 'уоллайтта',
  				'war' => 'варай',
  				'wo' => 'волоф',
+ 				'wuu' => 'хятад, ву хэл',
  				'xal' => 'халимаг',
  				'xh' => 'хоса',
  				'xog' => 'сога',
@@ -442,6 +469,7 @@ has 'display_name_language' => (
  				'ybb' => 'емба',
  				'yi' => 'иддиш',
  				'yo' => 'ёруба',
+ 				'yrl' => 'ньенгату',
  				'yue' => 'кантон',
  				'yue@alt=menu' => 'хятад, кантон',
  				'zgh' => 'стандарт тамазайт (Морокко)',
@@ -472,46 +500,179 @@ has 'display_name_script' => (
 	default		=> sub {
 		sub {
 			my %scripts = (
-			'Arab' => 'араб',
+			'Adlm' => 'Адлам бичиг',
+ 			'Aghb' => 'Кавказийн албани',
+ 			'Ahom' => 'Ахом',
+ 			'Arab' => 'араб',
+ 			'Aran' => 'Насталик бичиг',
+ 			'Armi' => 'Арамайк',
  			'Armn' => 'армени',
+ 			'Avst' => 'Авестан',
+ 			'Bali' => 'Бали',
+ 			'Bamu' => 'Баму',
+ 			'Bass' => 'Басс',
+ 			'Batk' => 'Батк',
  			'Beng' => 'бенгал',
+ 			'Bhks' => 'Байксуки',
  			'Bopo' => 'вопомофо',
+ 			'Brah' => 'Брахми',
  			'Brai' => 'брайл',
+ 			'Bugi' => 'Бугинез',
+ 			'Buhd' => 'Бухид',
+ 			'Cakm' => 'Чакма бичиг',
+ 			'Cans' => 'Канадын уугуул иргэдийн тэмдэгт бичиг',
+ 			'Cari' => 'Кари',
+ 			'Cham' => 'Чам',
+ 			'Cher' => 'Чероки бичиг',
+ 			'Chrs' => 'Корасми',
+ 			'Copt' => 'Коптик',
+ 			'Cpmn' => 'Кипр-Миноан',
+ 			'Cprt' => 'Киприот',
  			'Cyrl' => 'кирилл',
  			'Deva' => 'деванагари',
+ 			'Diak' => 'Диак',
+ 			'Dogr' => 'Догра',
+ 			'Dsrt' => 'Дезерет',
+ 			'Dupl' => 'Дуплоян',
+ 			'Egyp' => 'Египетийн дүрс бичиг',
+ 			'Elba' => 'Элбасан',
+ 			'Elym' => 'Элимайк',
  			'Ethi' => 'этиоп',
  			'Geor' => 'гүрж',
+ 			'Glag' => 'Глаголитик',
+ 			'Gong' => 'Гонг',
+ 			'Gonm' => 'Масарам Гонди',
+ 			'Goth' => 'Готик',
+ 			'Gran' => 'Гранта',
  			'Grek' => 'грек',
  			'Gujr' => 'гужарати',
  			'Guru' => 'гүрмүх',
  			'Hanb' => 'Бопомофотой ханз',
  			'Hang' => 'хангыль',
  			'Hani' => 'ханз',
+ 			'Hano' => 'Хануноо',
  			'Hans' => 'хялбаршуулсан',
  			'Hans@alt=stand-alone' => 'хялбаршуулсан ханз',
  			'Hant' => 'уламжлалт',
  			'Hant@alt=stand-alone' => 'уламжлалт ханз',
+ 			'Hatr' => 'Хатран',
  			'Hebr' => 'еврей',
  			'Hira' => 'хирагана',
+ 			'Hluw' => 'Анатолийн дүрс бичиг',
+ 			'Hmng' => 'Пахав Хмонг',
+ 			'Hmnp' => 'Хмнп',
  			'Hrkt' => 'япон хэлний үеийн цагаан толгой',
+ 			'Hung' => 'Хуучин Унгар',
+ 			'Ital' => 'Хуучин итали',
  			'Jamo' => 'жамо',
+ 			'Java' => 'Жава',
  			'Jpan' => 'япон',
+ 			'Kali' => 'Кали',
  			'Kana' => 'катакана',
+ 			'Kawi' => 'Кави',
+ 			'Khar' => 'Карошти',
  			'Khmr' => 'кхмер',
+ 			'Khoj' => 'Кожки',
+ 			'Kits' => 'Китан бага бичвэр',
  			'Knda' => 'каннада',
  			'Kore' => 'солонгос',
+ 			'Kthi' => 'Кайти',
+ 			'Lana' => 'Лана',
  			'Laoo' => 'лаос',
  			'Latn' => 'латин',
+ 			'Lepc' => 'Лепк',
+ 			'Limb' => 'Лимб',
+ 			'Lina' => 'Зураасан A',
+ 			'Linb' => 'Зураасан B',
+ 			'Lisu' => 'Лису',
+ 			'Lyci' => 'Лиси',
+ 			'Lydi' => 'Лиди',
+ 			'Mahj' => 'Махажани',
+ 			'Maka' => 'Макасар',
+ 			'Mand' => 'Манд',
+ 			'Mani' => 'Манич',
+ 			'Marc' => 'Марк',
+ 			'Medf' => 'Медефайдрин',
+ 			'Mend' => 'Менди',
+ 			'Merc' => 'Меройтик Курсив',
+ 			'Mero' => 'Меройтик',
  			'Mlym' => 'малаялам',
+ 			'Modi' => 'Моди',
  			'Mong' => 'монгол бичиг',
+ 			'Mroo' => 'Мру',
+ 			'Mtei' => 'Мейтей маек бичиг',
+ 			'Mult' => 'Мултани',
  			'Mymr' => 'мьянмар',
+ 			'Nagm' => 'Наг Мундари',
+ 			'Nand' => 'Нандинагари',
+ 			'Narb' => 'Хуучин Хойд Араб бичиг',
+ 			'Nbat' => 'Набата',
+ 			'Newa' => 'Нева',
+ 			'Nkoo' => 'Нко бичиг',
+ 			'Nshu' => 'Нүшү',
+ 			'Ogam' => 'Огам',
+ 			'Olck' => 'Ол чики бичиг',
+ 			'Orkh' => 'Орхон',
  			'Orya' => 'ория',
+ 			'Osge' => 'Осге',
+ 			'Osma' => 'Османи',
+ 			'Ougr' => 'Хуучин уйгар',
+ 			'Palm' => 'Палмирен',
+ 			'Pauc' => 'Пай Чин Хау',
+ 			'Perm' => 'Хуучин Пермик',
+ 			'Phag' => 'Фагс-па',
+ 			'Phli' => 'Пахлави',
+ 			'Phlp' => 'Псалтер Пахлави',
+ 			'Phnx' => 'Финик',
+ 			'Plrd' => 'Пирд',
+ 			'Prti' => 'Партиан',
+ 			'Qaag' => 'Каак',
+ 			'Rjng' => 'Режанг',
+ 			'Rohg' => 'Ханафи бичиг',
+ 			'Runr' => 'Руни',
+ 			'Samr' => 'Самаритан',
+ 			'Sarb' => 'Хуучин Өмнөд Араб',
+ 			'Saur' => 'Саураштра',
+ 			'Sgnw' => 'Тэмдэгт бичиг',
+ 			'Shaw' => 'Шави',
+ 			'Shrd' => 'Шарада',
+ 			'Sidd' => 'Сиддхам',
+ 			'Sind' => 'Кудавади',
  			'Sinh' => 'синхала',
+ 			'Sogd' => 'Согди',
+ 			'Sogo' => 'Хуучин согди',
+ 			'Sora' => 'Сора сомпенг',
+ 			'Soyo' => 'Соёмбо',
+ 			'Sund' => 'Сундан бичиг',
+ 			'Sylo' => 'Сило',
+ 			'Syrc' => 'Сирийк бичиг',
+ 			'Tagb' => 'Тагбанва',
+ 			'Takr' => 'Такри',
+ 			'Tale' => 'Тале',
+ 			'Talu' => 'Талу',
  			'Taml' => 'тамил',
+ 			'Tang' => 'Тангут',
+ 			'Tavt' => 'Тай Вьетнам',
  			'Telu' => 'тэлүгү',
+ 			'Tfng' => 'Тифинаг бичиг',
+ 			'Tglg' => 'Тагалог',
  			'Thaa' => 'тана',
  			'Thai' => 'тай',
  			'Tibt' => 'төвд',
+ 			'Tirh' => 'Тирхута',
+ 			'Tnsa' => 'Тангса',
+ 			'Toto' => 'Тото',
+ 			'Ugar' => 'Угаритик',
+ 			'Vaii' => 'Ваи бичиг',
+ 			'Vith' => 'Виткуки',
+ 			'Wara' => 'Варанг Кшити',
+ 			'Wcho' => 'Ванчу',
+ 			'Xpeo' => 'Хуучин перс',
+ 			'Xsux' => 'Сумеро-Аккадиан шаантаг бичиг',
+ 			'Yezi' => 'Езиди',
+ 			'Yiii' => 'И бичиг',
+ 			'Zanb' => 'Занабазарын дөрвөлжин бичиг',
+ 			'Zinh' => 'Зинх',
  			'Zmth' => 'математик тооллын систем',
  			'Zsye' => 'эможи',
  			'Zsym' => 'тэмдэг',
@@ -685,6 +846,7 @@ has 'display_name_region' => (
  			'IM' => 'Мэн Арал',
  			'IN' => 'Энэтхэг',
  			'IO' => 'Британийн харьяа Энэтхэгийн далай дахь нутаг дэвсгэр',
+ 			'IO@alt=chagos' => 'Чагос олтриг',
  			'IQ' => 'Ирак',
  			'IR' => 'Иран',
  			'IS' => 'Исланд',
@@ -751,6 +913,7 @@ has 'display_name_region' => (
  			'NR' => 'Науру',
  			'NU' => 'Ниуэ',
  			'NZ' => 'Шинэ Зеланд',
+ 			'NZ@alt=variant' => 'Аотеароагийн Шинэ Зеланд',
  			'OM' => 'Оман',
  			'PA' => 'Панам',
  			'PE' => 'Перу',
@@ -874,11 +1037,18 @@ has 'display_name_type' => (
 			'calendar' => {
  				'buddhist' => q{буддын цаглавар},
  				'chinese' => q{хятад цаглавар},
+ 				'coptic' => q{коптик цаглавар},
  				'dangi' => q{данги цаглавар},
  				'ethiopic' => q{этиоп цаглавар},
+ 				'ethiopic-amete-alem' => q{этиоп цаглавар},
  				'gregorian' => q{грегорийн цаглавар},
  				'hebrew' => q{еврей цаглавар},
+ 				'indian' => q{энэтхэгийн үндэсний цаглавар},
  				'islamic' => q{исламын цаглавар},
+ 				'islamic-civil' => q{исламын цаглавар (хүснэгт, иргэний эрин үе)},
+ 				'islamic-rgsa' => q{исламийн цаглавар (саудын араб, газарзүйн)},
+ 				'islamic-tbla' => q{исламийн цаглавар (хүснэгтэн, одон орны эрин)},
+ 				'islamic-umalqura' => q{исламын цаглавар (Umm al-Qura)},
  				'iso8601' => q{ISO-8601 цаглавар},
  				'japanese' => q{япон цаглавар},
  				'persian' => q{перс цаглавар},
@@ -889,9 +1059,22 @@ has 'display_name_type' => (
  				'standard' => q{мөнгөн тэмдэгтийн стандарт хэлбэр},
  			},
  			'collation' => {
+ 				'big5han' => q{Хуучин хятад Эрэмбэлэх дараалал - Том5},
+ 				'compat' => q{Нийцлийн үүднээс өмнөх эрэмбэлэх дараалал},
+ 				'dictionary' => q{Тольны эрэмбэлэх дараалал},
  				'ducet' => q{юникодын үндсэн эрэмбэлэх дараалал},
+ 				'emoji' => q{Эможи эрэмбэлэх дараалал},
+ 				'eor' => q{Европийн эрэмбэлэх дүрэм},
+ 				'gb2312han' => q{Хялбаршуулсан хятад Эрэмбэлэх дараалал - GB2312},
+ 				'phonebook' => q{Утасны дэвтрийн эрэмбэлэх дараалал},
+ 				'pinyin' => q{Пиньян эрэмбэлэх дараалал},
+ 				'reformed' => q{Шинэчилсэн эрэмбэлэх дараалал},
  				'search' => q{ерөнхий хайлт},
+ 				'searchjl' => q{Хангүлээр эхний гийгүүлэгчээр хайх},
  				'standard' => q{стандарт эрэмбэлэх дараалал},
+ 				'traditional' => q{Хуучин эрэмбэлэх дараалал},
+ 				'unihan' => q{Язгуурын зураасны эрэмбэлэх дараалал},
+ 				'zhuyin' => q{Жүяин эрэмбэлэх дараалал},
  			},
  			'hc' => {
  				'h11' => q{12 цагийн систем (0–11)},
@@ -910,15 +1093,24 @@ has 'display_name_type' => (
  				'ussystem' => q{Америк нэгжийн систем},
  			},
  			'numbers' => {
+ 				'ahom' => q{Ахом тоо},
  				'arab' => q{араб-энэтхэг тоо},
  				'arabext' => q{өргөтгөсөн араб-энэтхэг тоо},
  				'armn' => q{армен тоо},
  				'armnlow' => q{жижиг армен тоо},
+ 				'bali' => q{Бали тоо},
  				'beng' => q{бенгал тоо},
+ 				'brah' => q{Брахми тоо},
+ 				'cakm' => q{чакма тоо},
+ 				'cham' => q{Чам тоо},
+ 				'cyrl' => q{Кирилл тоо},
  				'deva' => q{деванагари тоо},
+ 				'diak' => q{Дивэс Акүрү Тоо},
  				'ethi' => q{этиоп тоо},
  				'fullwide' => q{бүтэн-өргөнтэй тоо},
  				'geor' => q{гүрж тоо},
+ 				'gong' => q{Гунжала Гонди тоо},
+ 				'gonm' => q{Масарам Гонди тоо},
  				'grek' => q{грек тоо},
  				'greklow' => q{жижиг грек тоо},
  				'gujr' => q{гүжарати тоо},
@@ -929,23 +1121,60 @@ has 'display_name_type' => (
  				'hant' => q{уламжлалт хятад тоо},
  				'hantfin' => q{уламжлалт хятад санхүүгийн тоо},
  				'hebr' => q{еврей тоо},
+ 				'hmng' => q{Пахав Хмонг тоо},
+ 				'hmnp' => q{Няакенг Пуачэ Хмонг тоо},
+ 				'java' => q{жава тоо},
  				'jpan' => q{япон тоо},
  				'jpanfin' => q{япон санхүүгийн тоо},
+ 				'kali' => q{Каяа Ли тоо},
+ 				'kawi' => q{Кави тоо},
  				'khmr' => q{кхмер тоо},
  				'knda' => q{каннада тоо},
+ 				'lana' => q{Тай Там Хора тоо},
+ 				'lanatham' => q{Тай Там Там тоо},
  				'laoo' => q{лаос тоо},
  				'latn' => q{араб тоо},
+ 				'lepc' => q{Лепча тоо},
+ 				'limb' => q{Лимбу тоо},
+ 				'mathbold' => q{Математикийн бүдүүн тоо},
+ 				'mathdbl' => q{Математикийн хос зурлагат тоо},
+ 				'mathmono' => q{Математикийн Monospace тоо},
+ 				'mathsanb' => q{Математикийн Sans-Serif Бүдүүн тоо},
+ 				'mathsans' => q{Математикийн Sans-Serif тоо},
  				'mlym' => q{малаялам тоо},
+ 				'modi' => q{Моди тоо},
  				'mong' => q{монгол тоо},
+ 				'mroo' => q{Мро тоо},
+ 				'mtei' => q{мейтей маек тоо},
  				'mymr' => q{мьянмар тоо},
+ 				'mymrshan' => q{Мьянмар Шан тоо},
+ 				'mymrtlng' => q{Мьянмар Тай Лайнг тоо},
+ 				'nagm' => q{Наг Мундари тоо},
+ 				'nkoo' => q{N’Ko тоо},
+ 				'olck' => q{ол чики тоо},
  				'orya' => q{ория тоо},
+ 				'osma' => q{Османи тоо},
+ 				'rohg' => q{Ханифи Рохинж тоо},
  				'roman' => q{ром тоо},
  				'romanlow' => q{жижиг ром тоо},
+ 				'saur' => q{Саураштра тоо},
+ 				'shrd' => q{Шарада тоо},
+ 				'sind' => q{Күдавади тоо},
+ 				'sinh' => q{Синхала Лит тоо},
+ 				'sora' => q{Сора Сомпенг тоо},
+ 				'sund' => q{Сундан тоо},
+ 				'takr' => q{Такри тоо},
+ 				'talu' => q{Шинэ тай луэ тоо},
  				'taml' => q{уламжлалт тамил тоо},
  				'tamldec' => q{тамил тоо},
  				'telu' => q{тэлүгү тоо},
  				'thai' => q{тай тоо},
  				'tibt' => q{төвд тоо},
+ 				'tirh' => q{Тирхута тоо},
+ 				'tnsa' => q{Тангса тоо},
+ 				'vaii' => q{вай тоо},
+ 				'wara' => q{Варанг сити тоо},
+ 				'wcho' => q{Ванчо тоо},
  			},
 
 		}
@@ -972,9 +1201,9 @@ has 'display_name_code_patterns' => (
 	init_arg	=> undef,
 	default		=> sub {
 		{
-			'language' => '{0}',
- 			'script' => '{0}',
- 			'region' => '{0}',
+			'language' => 'Хэл: {0}',
+ 			'script' => 'Бичиг: {0}',
+ 			'region' => 'Бүс: {0}',
 
 		}
 	},
@@ -991,9 +1220,8 @@ has 'characters' => (
 		return {
 			auxiliary => qr{[ә җ ӊ һ]},
 			index => ['А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ж', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н', 'О', 'Ө', 'П', 'Р', 'С', 'Т', 'У', 'Ү', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я'],
-			main => qr{[а б в г д е ё ж з и й к л м н о ө п р с т у ү ф х ц ч ш щ ъ ы ь э ю я]},
-			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
-			punctuation => qr{[\- ‐ ‑ – — , ; \: ! ? . … ' ‘ ’ " “ ” ( ) \[ \] § @ * / \& # † ‡ ′ ″]},
+			main => qr{[а б в г д её ж з и й к л м н о ө п р с т у ү ф х ц ч ш щ ъ ы ь э ю я]},
+			punctuation => qr{[\- ‐‑ – — , ; \: ! ? . … '‘’ "“” ( ) \[ \] § @ * / \& # † ‡ ′ ″]},
 		};
 	},
 EOT
@@ -1003,57 +1231,6 @@ EOT
 );
 
 
-has 'ellipsis' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub {
-		return {
-			'final' => '{0}…',
-			'initial' => '…{0}',
-			'medial' => '{0}…{1}',
-			'word-final' => '{0} …',
-			'word-initial' => '… {0}',
-			'word-medial' => '{0} … {1}',
-		};
-	},
-);
-
-has 'more_information' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{?},
-);
-
-has 'quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{“},
-);
-
-has 'quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{”},
-);
-
-has 'alternate_quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{‘},
-);
-
-has 'alternate_quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{’},
-);
-
 has 'duration_units' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
@@ -1061,7 +1238,6 @@ has 'duration_units' => (
 	default		=> sub { {
 				hm => 'hh:mm',
 				hms => 'hh:mm:ss',
-				ms => 'm:ss',
 			} }
 );
 
@@ -1352,74 +1528,22 @@ has 'units' => (
 						'other' => q({0} арксекунд),
 					},
 					# Long Unit Identifier
-					'angle-degree' => {
-						'name' => q(хэм),
-						'one' => q({0} хэм),
-						'other' => q({0} хэм),
-					},
-					# Core Unit Identifier
-					'degree' => {
-						'name' => q(хэм),
-						'one' => q({0} хэм),
-						'other' => q({0} хэм),
-					},
-					# Long Unit Identifier
 					'angle-radian' => {
-						'name' => q(радиан),
 						'one' => q({0} радиан),
 						'other' => q({0} радиан),
 					},
 					# Core Unit Identifier
 					'radian' => {
-						'name' => q(радиан),
 						'one' => q({0} радиан),
 						'other' => q({0} радиан),
 					},
 					# Long Unit Identifier
-					'angle-revolution' => {
-						'name' => q(эргэлт),
-						'one' => q({0} эргэлт),
-						'other' => q({0} эргэлт),
-					},
-					# Core Unit Identifier
-					'revolution' => {
-						'name' => q(эргэлт),
-						'one' => q({0} эргэлт),
-						'other' => q({0} эргэлт),
-					},
-					# Long Unit Identifier
-					'area-acre' => {
-						'name' => q(акр),
-						'one' => q({0} акр),
-						'other' => q({0} акр),
-					},
-					# Core Unit Identifier
-					'acre' => {
-						'name' => q(акр),
-						'one' => q({0} акр),
-						'other' => q({0} акр),
-					},
-					# Long Unit Identifier
-					'area-dunam' => {
-						'name' => q(дунам),
-						'one' => q({0} дунам),
-						'other' => q({0} дунам),
-					},
-					# Core Unit Identifier
-					'dunam' => {
-						'name' => q(дунам),
-						'one' => q({0} дунам),
-						'other' => q({0} дунам),
-					},
-					# Long Unit Identifier
 					'area-hectare' => {
-						'name' => q(гектар),
 						'one' => q({0} гектар),
 						'other' => q({0} гектар),
 					},
 					# Core Unit Identifier
 					'hectare' => {
-						'name' => q(гектар),
 						'one' => q({0} гектар),
 						'other' => q({0} гектар),
 					},
@@ -1518,40 +1642,14 @@ has 'units' => (
 						'other' => q({0} квадрат ярд),
 					},
 					# Long Unit Identifier
-					'concentr-item' => {
-						'name' => q(зүйл),
-						'one' => q({0} зүйл),
-						'other' => q({0} зүйл),
-					},
-					# Core Unit Identifier
-					'item' => {
-						'name' => q(зүйл),
-						'one' => q({0} зүйл),
-						'other' => q({0} зүйл),
-					},
-					# Long Unit Identifier
 					'concentr-karat' => {
-						'name' => q(карат),
 						'one' => q({0} карат),
 						'other' => q({0} карат),
 					},
 					# Core Unit Identifier
 					'karat' => {
-						'name' => q(карат),
 						'one' => q({0} карат),
 						'other' => q({0} карат),
-					},
-					# Long Unit Identifier
-					'concentr-milligram-ofglucose-per-deciliter' => {
-						'name' => q(мг/дл),
-						'one' => q({0} мг/дл),
-						'other' => q({0} мг/дл),
-					},
-					# Core Unit Identifier
-					'milligram-ofglucose-per-deciliter' => {
-						'name' => q(мг/дл),
-						'one' => q({0} мг/дл),
-						'other' => q({0} мг/дл),
 					},
 					# Long Unit Identifier
 					'concentr-millimole-per-liter' => {
@@ -1566,38 +1664,22 @@ has 'units' => (
 						'other' => q(литр тутамд {0} миллимоль),
 					},
 					# Long Unit Identifier
-					'concentr-mole' => {
-						'name' => q(моль),
-						'one' => q({0} моль),
-						'other' => q({0} моль),
-					},
-					# Core Unit Identifier
-					'mole' => {
-						'name' => q(моль),
-						'one' => q({0} моль),
-						'other' => q({0} моль),
-					},
-					# Long Unit Identifier
 					'concentr-percent' => {
-						'name' => q(хувь),
 						'one' => q({0} хувь),
 						'other' => q({0} хувь),
 					},
 					# Core Unit Identifier
 					'percent' => {
-						'name' => q(хувь),
 						'one' => q({0} хувь),
 						'other' => q({0} хувь),
 					},
 					# Long Unit Identifier
 					'concentr-permille' => {
-						'name' => q(мянганы хувь),
 						'one' => q(мянганы {0} хувь),
 						'other' => q(мянганы {0} хувь),
 					},
 					# Core Unit Identifier
 					'permille' => {
-						'name' => q(мянганы хувь),
 						'one' => q(мянганы {0} хувь),
 						'other' => q(мянганы {0} хувь),
 					},
@@ -1615,13 +1697,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'concentr-permyriad' => {
-						'name' => q(арван мянганы хувь),
 						'one' => q(арван мянганы {0} хувь),
 						'other' => q(арван мянганы {0} хувь),
 					},
 					# Core Unit Identifier
 					'permyriad' => {
-						'name' => q(арван мянганы хувь),
 						'one' => q(арван мянганы {0} хувь),
 						'other' => q(арван мянганы {0} хувь),
 					},
@@ -1686,30 +1766,6 @@ has 'units' => (
 						'north' => q(хойд өргөргийн {0}),
 						'south' => q(өмнөд өргөргийн {0}),
 						'west' => q(баруун уртрагийн {0}),
-					},
-					# Long Unit Identifier
-					'digital-bit' => {
-						'name' => q(бит),
-						'one' => q({0} бит),
-						'other' => q({0} бит),
-					},
-					# Core Unit Identifier
-					'bit' => {
-						'name' => q(бит),
-						'one' => q({0} бит),
-						'other' => q({0} бит),
-					},
-					# Long Unit Identifier
-					'digital-byte' => {
-						'name' => q(байт),
-						'one' => q({0} байт),
-						'other' => q({0} байт),
-					},
-					# Core Unit Identifier
-					'byte' => {
-						'name' => q(байт),
-						'one' => q({0} байт),
-						'other' => q({0} байт),
 					},
 					# Long Unit Identifier
 					'digital-gigabit' => {
@@ -1820,58 +1876,6 @@ has 'units' => (
 						'other' => q({0} терабайт),
 					},
 					# Long Unit Identifier
-					'duration-century' => {
-						'name' => q(зуун),
-						'one' => q({0} зуун),
-						'other' => q({0} зуун),
-					},
-					# Core Unit Identifier
-					'century' => {
-						'name' => q(зуун),
-						'one' => q({0} зуун),
-						'other' => q({0} зуун),
-					},
-					# Long Unit Identifier
-					'duration-day' => {
-						'name' => q(хоног),
-						'one' => q({0} хоног),
-						'other' => q({0} хоног),
-						'per' => q({0}/хоног),
-					},
-					# Core Unit Identifier
-					'day' => {
-						'name' => q(хоног),
-						'one' => q({0} хоног),
-						'other' => q({0} хоног),
-						'per' => q({0}/хоног),
-					},
-					# Long Unit Identifier
-					'duration-decade' => {
-						'name' => q(декад),
-						'one' => q({0} декад),
-						'other' => q({0} декад),
-					},
-					# Core Unit Identifier
-					'decade' => {
-						'name' => q(декад),
-						'one' => q({0} декад),
-						'other' => q({0} декад),
-					},
-					# Long Unit Identifier
-					'duration-hour' => {
-						'name' => q(цаг),
-						'one' => q({0} цаг),
-						'other' => q({0} цаг),
-						'per' => q({0}/ц),
-					},
-					# Core Unit Identifier
-					'hour' => {
-						'name' => q(цаг),
-						'one' => q({0} цаг),
-						'other' => q({0} цаг),
-						'per' => q({0}/ц),
-					},
-					# Long Unit Identifier
 					'duration-microsecond' => {
 						'name' => q(микросекунд),
 						'one' => q({0} микросекунд),
@@ -1885,13 +1889,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'duration-millisecond' => {
-						'name' => q(миллисекунд),
 						'one' => q({0} миллисекунд),
 						'other' => q({0} миллисекунд),
 					},
 					# Core Unit Identifier
 					'millisecond' => {
-						'name' => q(миллисекунд),
 						'one' => q({0} миллисекунд),
 						'other' => q({0} миллисекунд),
 					},
@@ -1900,28 +1902,12 @@ has 'units' => (
 						'name' => q(минут),
 						'one' => q({0} минут),
 						'other' => q({0} минут),
-						'per' => q({0}/мин),
 					},
 					# Core Unit Identifier
 					'minute' => {
 						'name' => q(минут),
 						'one' => q({0} минут),
 						'other' => q({0} минут),
-						'per' => q({0}/мин),
-					},
-					# Long Unit Identifier
-					'duration-month' => {
-						'name' => q(сар),
-						'one' => q({0} сар),
-						'other' => q({0} сар),
-						'per' => q({0}/сар),
-					},
-					# Core Unit Identifier
-					'month' => {
-						'name' => q(сар),
-						'one' => q({0} сар),
-						'other' => q({0} сар),
-						'per' => q({0}/сар),
 					},
 					# Long Unit Identifier
 					'duration-nanosecond' => {
@@ -1940,41 +1926,31 @@ has 'units' => (
 						'name' => q(секунд),
 						'one' => q({0} секунд),
 						'other' => q({0} секунд),
-						'per' => q({0}/сек),
 					},
 					# Core Unit Identifier
 					'second' => {
 						'name' => q(секунд),
 						'one' => q({0} секунд),
 						'other' => q({0} секунд),
-						'per' => q({0}/сек),
 					},
 					# Long Unit Identifier
 					'duration-week' => {
-						'name' => q(долоо хоног),
 						'one' => q({0} долоо хоног),
 						'other' => q({0} долоо хоног),
 						'per' => q({0}/долоо хоног),
 					},
 					# Core Unit Identifier
 					'week' => {
-						'name' => q(долоо хоног),
 						'one' => q({0} долоо хоног),
 						'other' => q({0} долоо хоног),
 						'per' => q({0}/долоо хоног),
 					},
 					# Long Unit Identifier
 					'duration-year' => {
-						'name' => q(жил),
-						'one' => q({0} жил),
-						'other' => q({0} жил),
 						'per' => q({0}/жил),
 					},
 					# Core Unit Identifier
 					'year' => {
-						'name' => q(жил),
-						'one' => q({0} жил),
-						'other' => q({0} жил),
 						'per' => q({0}/жил),
 					},
 					# Long Unit Identifier
@@ -2051,13 +2027,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'energy-electronvolt' => {
-						'name' => q(электрон-Вольт),
 						'one' => q({0} электрон-Вольт),
 						'other' => q({0} электрон-Вольт),
 					},
 					# Core Unit Identifier
 					'electronvolt' => {
-						'name' => q(электрон-Вольт),
 						'one' => q({0} электрон-Вольт),
 						'other' => q({0} электрон-Вольт),
 					},
@@ -2075,13 +2049,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'energy-joule' => {
-						'name' => q(Жоуль),
 						'one' => q({0} Жоуль),
 						'other' => q({0} Жоуль),
 					},
 					# Core Unit Identifier
 					'joule' => {
-						'name' => q(Жоуль),
 						'one' => q({0} Жоуль),
 						'other' => q({0} Жоуль),
 					},
@@ -2099,13 +2071,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'energy-kilojoule' => {
-						'name' => q(килоЖоуль),
 						'one' => q({0} килоЖоуль),
 						'other' => q({0} килоЖоуль),
 					},
 					# Core Unit Identifier
 					'kilojoule' => {
-						'name' => q(килоЖоуль),
 						'one' => q({0} килоЖоуль),
 						'other' => q({0} килоЖоуль),
 					},
@@ -2147,25 +2117,21 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'force-newton' => {
-						'name' => q(ньютон),
 						'one' => q({0} ньютон),
 						'other' => q({0} ньютон),
 					},
 					# Core Unit Identifier
 					'newton' => {
-						'name' => q(ньютон),
 						'one' => q({0} ньютон),
 						'other' => q({0} ньютон),
 					},
 					# Long Unit Identifier
 					'force-pound-force' => {
-						'name' => q(фунт хүч),
 						'one' => q({0} фунт хүч),
 						'other' => q({0} фунт хүч),
 					},
 					# Core Unit Identifier
 					'pound-force' => {
-						'name' => q(фунт хүч),
 						'one' => q({0} фунт хүч),
 						'other' => q({0} фунт хүч),
 					},
@@ -2216,30 +2182,6 @@ has 'units' => (
 						'name' => q(мегаГерц),
 						'one' => q({0} мегаГерц),
 						'other' => q({0} мегаГерц),
-					},
-					# Long Unit Identifier
-					'graphics-dot' => {
-						'name' => q(цэг),
-						'one' => q({0} цэг),
-						'other' => q({0} цэг),
-					},
-					# Core Unit Identifier
-					'dot' => {
-						'name' => q(цэг),
-						'one' => q({0} цэг),
-						'other' => q({0} цэг),
-					},
-					# Long Unit Identifier
-					'graphics-dot-per-centimeter' => {
-						'name' => q(цэг/см),
-						'one' => q({0} цэг/см),
-						'other' => q({0} цэг/см),
-					},
-					# Core Unit Identifier
-					'dot-per-centimeter' => {
-						'name' => q(цэг/см),
-						'one' => q({0} цэг/см),
-						'other' => q({0} цэг/см),
 					},
 					# Long Unit Identifier
 					'graphics-pixel-per-centimeter' => {
@@ -2317,55 +2259,23 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-fathom' => {
-						'name' => q(фатом),
 						'one' => q({0} фатом),
 						'other' => q({0} фатом),
 					},
 					# Core Unit Identifier
 					'fathom' => {
-						'name' => q(фатом),
 						'one' => q({0} фатом),
 						'other' => q({0} фатом),
 					},
 					# Long Unit Identifier
-					'length-foot' => {
-						'name' => q(фут),
-						'one' => q({0} фут),
-						'other' => q({0} фут),
-						'per' => q({0}/фут),
-					},
-					# Core Unit Identifier
-					'foot' => {
-						'name' => q(фут),
-						'one' => q({0} фут),
-						'other' => q({0} фут),
-						'per' => q({0}/фут),
-					},
-					# Long Unit Identifier
 					'length-furlong' => {
-						'name' => q(фурлонг),
 						'one' => q({0} фурлонг),
 						'other' => q({0} фурлонг),
 					},
 					# Core Unit Identifier
 					'furlong' => {
-						'name' => q(фурлонг),
 						'one' => q({0} фурлонг),
 						'other' => q({0} фурлонг),
-					},
-					# Long Unit Identifier
-					'length-inch' => {
-						'name' => q(инч),
-						'one' => q({0} инч),
-						'other' => q({0} инч),
-						'per' => q({0}/инч),
-					},
-					# Core Unit Identifier
-					'inch' => {
-						'name' => q(инч),
-						'one' => q({0} инч),
-						'other' => q({0} инч),
-						'per' => q({0}/инч),
 					},
 					# Long Unit Identifier
 					'length-kilometer' => {
@@ -2421,25 +2331,21 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-mile' => {
-						'name' => q(миль),
 						'one' => q({0} миль),
 						'other' => q({0} миль),
 					},
 					# Core Unit Identifier
 					'mile' => {
-						'name' => q(миль),
 						'one' => q({0} миль),
 						'other' => q({0} миль),
 					},
 					# Long Unit Identifier
 					'length-mile-scandinavian' => {
-						'name' => q(скандинавын миль),
 						'one' => q({0} скандинавын миль),
 						'other' => q({0} скандинавын миль),
 					},
 					# Core Unit Identifier
 					'mile-scandinavian' => {
-						'name' => q(скандинавын миль),
 						'one' => q({0} скандинавын миль),
 						'other' => q({0} скандинавын миль),
 					},
@@ -2481,13 +2387,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-parsec' => {
-						'name' => q(парсек),
 						'one' => q({0} парсек),
 						'other' => q({0} парсек),
 					},
 					# Core Unit Identifier
 					'parsec' => {
-						'name' => q(парсек),
 						'one' => q({0} парсек),
 						'other' => q({0} парсек),
 					},
@@ -2504,40 +2408,14 @@ has 'units' => (
 						'other' => q({0} пикометр),
 					},
 					# Long Unit Identifier
-					'length-point' => {
-						'name' => q(оноо),
-						'one' => q({0} оноо),
-						'other' => q({0} оноо),
-					},
-					# Core Unit Identifier
-					'point' => {
-						'name' => q(оноо),
-						'one' => q({0} оноо),
-						'other' => q({0} оноо),
-					},
-					# Long Unit Identifier
 					'length-solar-radius' => {
-						'name' => q(нарны радиус),
 						'one' => q({0} нарны радиус),
 						'other' => q({0} нарны радиус),
 					},
 					# Core Unit Identifier
 					'solar-radius' => {
-						'name' => q(нарны радиус),
 						'one' => q({0} нарны радиус),
 						'other' => q({0} нарны радиус),
-					},
-					# Long Unit Identifier
-					'length-yard' => {
-						'name' => q(ярд),
-						'one' => q({0} ярд),
-						'other' => q({0} ярд),
-					},
-					# Core Unit Identifier
-					'yard' => {
-						'name' => q(ярд),
-						'one' => q({0} ярд),
-						'other' => q({0} ярд),
 					},
 					# Long Unit Identifier
 					'light-candela' => {
@@ -2564,87 +2442,53 @@ has 'units' => (
 						'other' => q({0} люмен),
 					},
 					# Long Unit Identifier
-					'light-lux' => {
-						'name' => q(люкс),
-						'one' => q({0} люкс),
-						'other' => q({0} люкс),
-					},
-					# Core Unit Identifier
-					'lux' => {
-						'name' => q(люкс),
-						'one' => q({0} люкс),
-						'other' => q({0} люкс),
-					},
-					# Long Unit Identifier
 					'light-solar-luminosity' => {
-						'name' => q(нарны гэрлийн урсгал),
 						'one' => q({0} нарны гэрлийн урсгал),
 						'other' => q({0} нарны гэрлийн урсгал),
 					},
 					# Core Unit Identifier
 					'solar-luminosity' => {
-						'name' => q(нарны гэрлийн урсгал),
 						'one' => q({0} нарны гэрлийн урсгал),
 						'other' => q({0} нарны гэрлийн урсгал),
 					},
 					# Long Unit Identifier
 					'mass-carat' => {
-						'name' => q(карат),
 						'one' => q({0} карат),
 						'other' => q({0} карат),
 					},
 					# Core Unit Identifier
 					'carat' => {
-						'name' => q(карат),
 						'one' => q({0} карат),
 						'other' => q({0} карат),
 					},
 					# Long Unit Identifier
 					'mass-dalton' => {
-						'name' => q(дальтон),
 						'one' => q({0} дальтон),
 						'other' => q({0} дальтон),
 					},
 					# Core Unit Identifier
 					'dalton' => {
-						'name' => q(дальтон),
 						'one' => q({0} дальтон),
 						'other' => q({0} дальтон),
 					},
 					# Long Unit Identifier
 					'mass-earth-mass' => {
-						'name' => q(Дэлхийн масс),
 						'one' => q({0} Дэлхийн масс),
 						'other' => q({0} Дэлхийн масс),
 					},
 					# Core Unit Identifier
 					'earth-mass' => {
-						'name' => q(Дэлхийн масс),
 						'one' => q({0} Дэлхийн масс),
 						'other' => q({0} Дэлхийн масс),
 					},
 					# Long Unit Identifier
-					'mass-grain' => {
-						'name' => q(үр),
-						'one' => q({0} үр),
-						'other' => q({0} үр),
-					},
-					# Core Unit Identifier
-					'grain' => {
-						'name' => q(үр),
-						'one' => q({0} үр),
-						'other' => q({0} үр),
-					},
-					# Long Unit Identifier
 					'mass-gram' => {
-						'name' => q(грамм),
 						'one' => q({0} грамм),
 						'other' => q({0} грамм),
 						'per' => q(грамм тутамд {0}),
 					},
 					# Core Unit Identifier
 					'gram' => {
-						'name' => q(грамм),
 						'one' => q({0} грамм),
 						'other' => q({0} грамм),
 						'per' => q(грамм тутамд {0}),
@@ -2662,18 +2506,6 @@ has 'units' => (
 						'one' => q({0} килограмм),
 						'other' => q({0} килограмм),
 						'per' => q(килограмм тутамд {0}),
-					},
-					# Long Unit Identifier
-					'mass-metric-ton' => {
-						'name' => q(тонн),
-						'one' => q({0} тонн),
-						'other' => q({0} тонн),
-					},
-					# Core Unit Identifier
-					'metric-ton' => {
-						'name' => q(тонн),
-						'one' => q({0} тонн),
-						'other' => q({0} тонн),
 					},
 					# Long Unit Identifier
 					'mass-microgram' => {
@@ -2701,79 +2533,71 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'mass-ounce' => {
-						'name' => q(унц),
-						'one' => q({0} унц),
-						'other' => q({0} унц),
 						'per' => q(унц тутамд {0}),
 					},
 					# Core Unit Identifier
 					'ounce' => {
-						'name' => q(унц),
-						'one' => q({0} унц),
-						'other' => q({0} унц),
 						'per' => q(унц тутамд {0}),
 					},
 					# Long Unit Identifier
 					'mass-ounce-troy' => {
-						'name' => q(трой унц),
 						'one' => q({0} трой унц),
 						'other' => q({0} трой унц),
 					},
 					# Core Unit Identifier
 					'ounce-troy' => {
-						'name' => q(трой унц),
 						'one' => q({0} трой унц),
 						'other' => q({0} трой унц),
 					},
 					# Long Unit Identifier
 					'mass-pound' => {
-						'name' => q(фунт),
-						'one' => q({0} фунт),
-						'other' => q({0} фунт),
 						'per' => q(фунт тутамд {0}),
 					},
 					# Core Unit Identifier
 					'pound' => {
-						'name' => q(фунт),
-						'one' => q({0} фунт),
-						'other' => q({0} фунт),
 						'per' => q(фунт тутамд {0}),
 					},
 					# Long Unit Identifier
 					'mass-solar-mass' => {
-						'name' => q(нарны масс),
 						'one' => q({0} нарны масс),
 						'other' => q({0} нарны масс),
 					},
 					# Core Unit Identifier
 					'solar-mass' => {
-						'name' => q(нарны масс),
 						'one' => q({0} нарны масс),
 						'other' => q({0} нарны масс),
 					},
 					# Long Unit Identifier
 					'mass-stone' => {
-						'name' => q(чулуу),
 						'one' => q({0} чулуу),
 						'other' => q({0} чулуу),
 					},
 					# Core Unit Identifier
 					'stone' => {
-						'name' => q(чулуу),
 						'one' => q({0} чулуу),
 						'other' => q({0} чулуу),
 					},
 					# Long Unit Identifier
 					'mass-ton' => {
-						'name' => q(америк тонн),
 						'one' => q({0} америк тонн),
 						'other' => q({0} америк тонн),
 					},
 					# Core Unit Identifier
 					'ton' => {
-						'name' => q(америк тонн),
 						'one' => q({0} америк тонн),
 						'other' => q({0} америк тонн),
+					},
+					# Long Unit Identifier
+					'mass-tonne' => {
+						'name' => q(тонн),
+						'one' => q({0} тонн),
+						'other' => q({0} тонн),
+					},
+					# Core Unit Identifier
+					'tonne' => {
+						'name' => q(тонн),
+						'one' => q({0} тонн),
+						'other' => q({0} тонн),
 					},
 					# Long Unit Identifier
 					'per' => {
@@ -2845,13 +2669,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'power-watt' => {
-						'name' => q(Ватт),
 						'one' => q({0} Ватт),
 						'other' => q({0} Ватт),
 					},
 					# Core Unit Identifier
 					'watt' => {
-						'name' => q(Ватт),
 						'one' => q({0} Ватт),
 						'other' => q({0} Ватт),
 					},
@@ -2890,18 +2712,6 @@ has 'units' => (
 						'name' => q(уур амьсгал),
 						'one' => q({0} уур амьсгал),
 						'other' => q({0} уур амьсгал),
-					},
-					# Long Unit Identifier
-					'pressure-bar' => {
-						'name' => q(бар),
-						'one' => q({0} бар),
-						'other' => q({0} бар),
-					},
-					# Core Unit Identifier
-					'bar' => {
-						'name' => q(бар),
-						'one' => q({0} бар),
-						'other' => q({0} бар),
 					},
 					# Long Unit Identifier
 					'pressure-hectopascal' => {
@@ -3068,18 +2878,6 @@ has 'units' => (
 						'other' => q({0} Фаренгейтын хэм),
 					},
 					# Long Unit Identifier
-					'temperature-generic' => {
-						'name' => q(°),
-						'one' => q({0}°),
-						'other' => q({0}°),
-					},
-					# Core Unit Identifier
-					'generic' => {
-						'name' => q(°),
-						'one' => q({0}°),
-						'other' => q({0}°),
-					},
-					# Long Unit Identifier
 					'temperature-kelvin' => {
 						'name' => q(Кельвиний хэм),
 						'one' => q({0} Кельвиний хэм),
@@ -3126,18 +2924,6 @@ has 'units' => (
 						'name' => q(акр-фут),
 						'one' => q({0} акр-фут),
 						'other' => q({0} акр-фут),
-					},
-					# Long Unit Identifier
-					'volume-barrel' => {
-						'name' => q(баррель),
-						'one' => q({0} баррель),
-						'other' => q({0} баррель),
-					},
-					# Core Unit Identifier
-					'barrel' => {
-						'name' => q(баррель),
-						'one' => q({0} баррель),
-						'other' => q({0} баррель),
 					},
 					# Long Unit Identifier
 					'volume-centiliter' => {
@@ -3241,13 +3027,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'volume-cup' => {
-						'name' => q(аяга),
 						'one' => q({0} аяга),
 						'other' => q({0} аяга),
 					},
 					# Core Unit Identifier
 					'cup' => {
-						'name' => q(аяга),
 						'one' => q({0} аяга),
 						'other' => q({0} аяга),
 					},
@@ -3310,18 +3094,6 @@ has 'units' => (
 						'name' => q(драм),
 						'one' => q({0} драм),
 						'other' => q({0} драм),
-					},
-					# Long Unit Identifier
-					'volume-drop' => {
-						'name' => q(дусал),
-						'one' => q({0} дусал),
-						'other' => q({0} дусал),
-					},
-					# Core Unit Identifier
-					'drop' => {
-						'name' => q(дусал),
-						'one' => q({0} дусал),
-						'other' => q({0} дусал),
 					},
 					# Long Unit Identifier
 					'volume-fluid-ounce' => {
@@ -3388,27 +3160,13 @@ has 'units' => (
 						'other' => q({0} хектолитр),
 					},
 					# Long Unit Identifier
-					'volume-jigger' => {
-						'name' => q(джиггер),
-						'one' => q({0} джиггер),
-						'other' => q({0} джиггер),
-					},
-					# Core Unit Identifier
-					'jigger' => {
-						'name' => q(джиггер),
-						'one' => q({0} джиггер),
-						'other' => q({0} джиггер),
-					},
-					# Long Unit Identifier
 					'volume-liter' => {
-						'name' => q(литр),
 						'one' => q({0} литр),
 						'other' => q({0} литр),
 						'per' => q(литр тутамд {0}),
 					},
 					# Core Unit Identifier
 					'liter' => {
-						'name' => q(литр),
 						'one' => q({0} литр),
 						'other' => q({0} литр),
 						'per' => q(литр тутамд {0}),
@@ -3438,26 +3196,12 @@ has 'units' => (
 						'other' => q({0} миллилитр),
 					},
 					# Long Unit Identifier
-					'volume-pinch' => {
-						'name' => q(чимх),
-						'one' => q({0} чимх),
-						'other' => q({0} чимх),
-					},
-					# Core Unit Identifier
-					'pinch' => {
-						'name' => q(чимх),
-						'one' => q({0} чимх),
-						'other' => q({0} чимх),
-					},
-					# Long Unit Identifier
 					'volume-pint' => {
-						'name' => q(пинт),
 						'one' => q({0} пинт),
 						'other' => q({0} пинт),
 					},
 					# Core Unit Identifier
 					'pint' => {
-						'name' => q(пинт),
 						'one' => q({0} пинт),
 						'other' => q({0} пинт),
 					},
@@ -3488,14 +3232,10 @@ has 'units' => (
 					# Long Unit Identifier
 					'volume-quart-imperial' => {
 						'name' => q(Том куарт),
-						'one' => q({0} том куарт),
-						'other' => q({0} том куарт),
 					},
 					# Core Unit Identifier
 					'quart-imperial' => {
 						'name' => q(Том куарт),
-						'one' => q({0} том куарт),
-						'other' => q({0} том куарт),
 					},
 					# Long Unit Identifier
 					'volume-tablespoon' => {
@@ -3523,238 +3263,6 @@ has 'units' => (
 					},
 				},
 				'narrow' => {
-					# Long Unit Identifier
-					'' => {
-						'name' => q(зүг),
-					},
-					# Core Unit Identifier
-					'' => {
-						'name' => q(зүг),
-					},
-					# Long Unit Identifier
-					'1024p1' => {
-						'1' => q(Ки{0}),
-					},
-					# Core Unit Identifier
-					'1024p1' => {
-						'1' => q(Ки{0}),
-					},
-					# Long Unit Identifier
-					'1024p2' => {
-						'1' => q(Ми{0}),
-					},
-					# Core Unit Identifier
-					'1024p2' => {
-						'1' => q(Ми{0}),
-					},
-					# Long Unit Identifier
-					'1024p3' => {
-						'1' => q(Ги{0}),
-					},
-					# Core Unit Identifier
-					'1024p3' => {
-						'1' => q(Ги{0}),
-					},
-					# Long Unit Identifier
-					'1024p4' => {
-						'1' => q(Ти{0}),
-					},
-					# Core Unit Identifier
-					'1024p4' => {
-						'1' => q(Ти{0}),
-					},
-					# Long Unit Identifier
-					'1024p5' => {
-						'1' => q(Пи{0}),
-					},
-					# Core Unit Identifier
-					'1024p5' => {
-						'1' => q(Пи{0}),
-					},
-					# Long Unit Identifier
-					'1024p6' => {
-						'1' => q(Эи{0}),
-					},
-					# Core Unit Identifier
-					'1024p6' => {
-						'1' => q(Эи{0}),
-					},
-					# Long Unit Identifier
-					'1024p7' => {
-						'1' => q(Зи{0}),
-					},
-					# Core Unit Identifier
-					'1024p7' => {
-						'1' => q(Зи{0}),
-					},
-					# Long Unit Identifier
-					'1024p8' => {
-						'1' => q(Яи{0}),
-					},
-					# Core Unit Identifier
-					'1024p8' => {
-						'1' => q(Яи{0}),
-					},
-					# Long Unit Identifier
-					'10p-1' => {
-						'1' => q(д{0}),
-					},
-					# Core Unit Identifier
-					'1' => {
-						'1' => q(д{0}),
-					},
-					# Long Unit Identifier
-					'10p-12' => {
-						'1' => q(п{0}),
-					},
-					# Core Unit Identifier
-					'12' => {
-						'1' => q(п{0}),
-					},
-					# Long Unit Identifier
-					'10p-15' => {
-						'1' => q(ф{0}),
-					},
-					# Core Unit Identifier
-					'15' => {
-						'1' => q(ф{0}),
-					},
-					# Long Unit Identifier
-					'10p-18' => {
-						'1' => q(а{0}),
-					},
-					# Core Unit Identifier
-					'18' => {
-						'1' => q(а{0}),
-					},
-					# Long Unit Identifier
-					'10p-2' => {
-						'1' => q(с{0}),
-					},
-					# Core Unit Identifier
-					'2' => {
-						'1' => q(с{0}),
-					},
-					# Long Unit Identifier
-					'10p-21' => {
-						'1' => q(з{0}),
-					},
-					# Core Unit Identifier
-					'21' => {
-						'1' => q(з{0}),
-					},
-					# Long Unit Identifier
-					'10p-24' => {
-						'1' => q(ё{0}),
-					},
-					# Core Unit Identifier
-					'24' => {
-						'1' => q(ё{0}),
-					},
-					# Long Unit Identifier
-					'10p-3' => {
-						'1' => q(м{0}),
-					},
-					# Core Unit Identifier
-					'3' => {
-						'1' => q(м{0}),
-					},
-					# Long Unit Identifier
-					'10p-6' => {
-						'1' => q(μ{0}),
-					},
-					# Core Unit Identifier
-					'6' => {
-						'1' => q(μ{0}),
-					},
-					# Long Unit Identifier
-					'10p-9' => {
-						'1' => q(н{0}),
-					},
-					# Core Unit Identifier
-					'9' => {
-						'1' => q(н{0}),
-					},
-					# Long Unit Identifier
-					'10p1' => {
-						'1' => q(да{0}),
-					},
-					# Core Unit Identifier
-					'10p1' => {
-						'1' => q(да{0}),
-					},
-					# Long Unit Identifier
-					'10p12' => {
-						'1' => q(Т{0}),
-					},
-					# Core Unit Identifier
-					'10p12' => {
-						'1' => q(Т{0}),
-					},
-					# Long Unit Identifier
-					'10p15' => {
-						'1' => q(П{0}),
-					},
-					# Core Unit Identifier
-					'10p15' => {
-						'1' => q(П{0}),
-					},
-					# Long Unit Identifier
-					'10p18' => {
-						'1' => q(Э{0}),
-					},
-					# Core Unit Identifier
-					'10p18' => {
-						'1' => q(Э{0}),
-					},
-					# Long Unit Identifier
-					'10p2' => {
-						'1' => q(х{0}),
-					},
-					# Core Unit Identifier
-					'10p2' => {
-						'1' => q(х{0}),
-					},
-					# Long Unit Identifier
-					'10p21' => {
-						'1' => q(З{0}),
-					},
-					# Core Unit Identifier
-					'10p21' => {
-						'1' => q(З{0}),
-					},
-					# Long Unit Identifier
-					'10p24' => {
-						'1' => q(Ё{0}),
-					},
-					# Core Unit Identifier
-					'10p24' => {
-						'1' => q(Ё{0}),
-					},
-					# Long Unit Identifier
-					'10p3' => {
-						'1' => q(к{0}),
-					},
-					# Core Unit Identifier
-					'10p3' => {
-						'1' => q(к{0}),
-					},
-					# Long Unit Identifier
-					'10p6' => {
-						'1' => q(М{0}),
-					},
-					# Core Unit Identifier
-					'10p6' => {
-						'1' => q(М{0}),
-					},
-					# Long Unit Identifier
-					'10p9' => {
-						'1' => q(Г{0}),
-					},
-					# Core Unit Identifier
-					'10p9' => {
-						'1' => q(Г{0}),
-					},
 					# Long Unit Identifier
 					'acceleration-g-force' => {
 						'name' => q(гравитацын тогтмол хүч),
@@ -3806,26 +3314,6 @@ has 'units' => (
 						'other' => q({0}°),
 					},
 					# Long Unit Identifier
-					'area-acre' => {
-						'one' => q({0} акр),
-						'other' => q({0} акр),
-					},
-					# Core Unit Identifier
-					'acre' => {
-						'one' => q({0} акр),
-						'other' => q({0} акр),
-					},
-					# Long Unit Identifier
-					'area-hectare' => {
-						'one' => q({0} га),
-						'other' => q({0} га),
-					},
-					# Core Unit Identifier
-					'hectare' => {
-						'one' => q({0} га),
-						'other' => q({0} га),
-					},
-					# Long Unit Identifier
 					'area-square-foot' => {
 						'one' => q({0} фт²),
 						'other' => q({0} фт²),
@@ -3836,58 +3324,12 @@ has 'units' => (
 						'other' => q({0} фт²),
 					},
 					# Long Unit Identifier
-					'area-square-kilometer' => {
-						'one' => q({0} км²),
-						'other' => q({0} км²),
-					},
-					# Core Unit Identifier
-					'square-kilometer' => {
-						'one' => q({0} км²),
-						'other' => q({0} км²),
-					},
-					# Long Unit Identifier
-					'area-square-meter' => {
-						'one' => q({0} м²),
-						'other' => q({0} м²),
-					},
-					# Core Unit Identifier
-					'square-meter' => {
-						'one' => q({0} м²),
-						'other' => q({0} м²),
-					},
-					# Long Unit Identifier
-					'area-square-mile' => {
-						'one' => q({0} миль²),
-						'other' => q({0} миль²),
-					},
-					# Core Unit Identifier
-					'square-mile' => {
-						'one' => q({0} миль²),
-						'other' => q({0} миль²),
-					},
-					# Long Unit Identifier
-					'concentr-item' => {
-						'name' => q(зүйл),
-						'one' => q({0} зүйл),
-						'other' => q({0} зүйл),
-					},
-					# Core Unit Identifier
-					'item' => {
-						'name' => q(зүйл),
-						'one' => q({0} зүйл),
-						'other' => q({0} зүйл),
-					},
-					# Long Unit Identifier
 					'concentr-percent' => {
 						'name' => q(%),
-						'one' => q({0}%),
-						'other' => q({0}%),
 					},
 					# Core Unit Identifier
 					'percent' => {
 						'name' => q(%),
-						'one' => q({0}%),
-						'other' => q({0}%),
 					},
 					# Long Unit Identifier
 					'concentr-permille' => {
@@ -3919,13 +3361,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
-						'name' => q(л/100км),
 						'one' => q({0} л/100км),
 						'other' => q({0}л/100км),
 					},
 					# Core Unit Identifier
 					'liter-per-100-kilometer' => {
-						'name' => q(л/100км),
 						'one' => q({0} л/100км),
 						'other' => q({0}л/100км),
 					},
@@ -3950,124 +3390,58 @@ has 'units' => (
 						'other' => q({0} ми/анг.гал),
 					},
 					# Long Unit Identifier
-					'coordinate' => {
-						'east' => q({0} з.у),
-						'north' => q({0} х.ө),
-						'south' => q({0} ө.ө),
-						'west' => q({0} б.у),
-					},
-					# Core Unit Identifier
-					'coordinate' => {
-						'east' => q({0} з.у),
-						'north' => q({0} х.ө),
-						'south' => q({0} ө.ө),
-						'west' => q({0} б.у),
-					},
-					# Long Unit Identifier
-					'duration-day' => {
-						'name' => q(хоног),
-						'one' => q({0} хоног),
-						'other' => q({0} хоног),
-					},
-					# Core Unit Identifier
-					'day' => {
-						'name' => q(хоног),
-						'one' => q({0} хоног),
-						'other' => q({0} хоног),
-					},
-					# Long Unit Identifier
 					'duration-hour' => {
-						'name' => q(цаг),
 						'one' => q({0} ц),
 						'other' => q({0} ц),
 					},
 					# Core Unit Identifier
 					'hour' => {
-						'name' => q(цаг),
 						'one' => q({0} ц),
 						'other' => q({0} ц),
 					},
 					# Long Unit Identifier
 					'duration-millisecond' => {
 						'name' => q(мсек),
-						'one' => q({0} мс),
-						'other' => q({0} мс),
 					},
 					# Core Unit Identifier
 					'millisecond' => {
 						'name' => q(мсек),
-						'one' => q({0} мс),
-						'other' => q({0} мс),
-					},
-					# Long Unit Identifier
-					'duration-minute' => {
-						'name' => q(мин),
-						'one' => q({0} мин),
-						'other' => q({0} мин),
-					},
-					# Core Unit Identifier
-					'minute' => {
-						'name' => q(мин),
-						'one' => q({0} мин),
-						'other' => q({0} мин),
 					},
 					# Long Unit Identifier
 					'duration-month' => {
-						'name' => q(сар),
 						'one' => q({0}с),
 						'other' => q({0}с),
 					},
 					# Core Unit Identifier
 					'month' => {
-						'name' => q(сар),
 						'one' => q({0}с),
 						'other' => q({0}с),
 					},
 					# Long Unit Identifier
-					'duration-second' => {
-						'name' => q(сек),
-						'one' => q({0} сек),
-						'other' => q({0} сек),
-					},
-					# Core Unit Identifier
-					'second' => {
-						'name' => q(сек),
-						'one' => q({0} сек),
-						'other' => q({0} сек),
-					},
-					# Long Unit Identifier
 					'duration-week' => {
 						'name' => q(д.х),
-						'one' => q({0} д.х),
-						'other' => q({0} д.х),
 					},
 					# Core Unit Identifier
 					'week' => {
 						'name' => q(д.х),
-						'one' => q({0} д.х),
-						'other' => q({0} д.х),
 					},
 					# Long Unit Identifier
 					'duration-year' => {
-						'name' => q(жил),
 						'one' => q({0}ж),
 						'other' => q({0}ж),
 					},
 					# Core Unit Identifier
 					'year' => {
-						'name' => q(жил),
 						'one' => q({0}ж),
 						'other' => q({0}ж),
 					},
 					# Long Unit Identifier
 					'force-kilowatt-hour-per-100-kilometer' => {
-						'name' => q(кВт.ц/100 км),
 						'one' => q({0}кВт.ц/100км),
 						'other' => q({0}кВт.ц/100км),
 					},
 					# Core Unit Identifier
 					'kilowatt-hour-per-100-kilometer' => {
-						'name' => q(кВт.ц/100 км),
 						'one' => q({0}кВт.ц/100км),
 						'other' => q({0}кВт.ц/100км),
 					},
@@ -4114,18 +3488,6 @@ has 'units' => (
 						'other' => q({0}au),
 					},
 					# Long Unit Identifier
-					'length-centimeter' => {
-						'name' => q(см),
-						'one' => q({0} см),
-						'other' => q({0} см),
-					},
-					# Core Unit Identifier
-					'centimeter' => {
-						'name' => q(см),
-						'one' => q({0} см),
-						'other' => q({0} см),
-					},
-					# Long Unit Identifier
 					'length-foot' => {
 						'one' => q({0}′),
 						'other' => q({0}′),
@@ -4156,38 +3518,12 @@ has 'units' => (
 						'other' => q({0}″),
 					},
 					# Long Unit Identifier
-					'length-kilometer' => {
-						'name' => q(км),
-						'one' => q({0} км),
-						'other' => q({0} км),
-					},
-					# Core Unit Identifier
-					'kilometer' => {
-						'name' => q(км),
-						'one' => q({0} км),
-						'other' => q({0} км),
-					},
-					# Long Unit Identifier
-					'length-light-year' => {
-						'one' => q({0} гэрл.жил),
-						'other' => q({0} гэрл.жил),
-					},
-					# Core Unit Identifier
-					'light-year' => {
-						'one' => q({0} гэрл.жил),
-						'other' => q({0} гэрл.жил),
-					},
-					# Long Unit Identifier
 					'length-meter' => {
 						'name' => q(метр),
-						'one' => q({0} м),
-						'other' => q({0} м),
 					},
 					# Core Unit Identifier
 					'meter' => {
 						'name' => q(метр),
-						'one' => q({0} м),
-						'other' => q({0} м),
 					},
 					# Long Unit Identifier
 					'length-mile' => {
@@ -4210,44 +3546,12 @@ has 'units' => (
 						'other' => q({0} ск.миль),
 					},
 					# Long Unit Identifier
-					'length-millimeter' => {
-						'name' => q(мм),
-						'one' => q({0} мм),
-						'other' => q({0} мм),
-					},
-					# Core Unit Identifier
-					'millimeter' => {
-						'name' => q(мм),
-						'one' => q({0} мм),
-						'other' => q({0} мм),
-					},
-					# Long Unit Identifier
-					'length-picometer' => {
-						'one' => q({0} пм),
-						'other' => q({0} пм),
-					},
-					# Core Unit Identifier
-					'picometer' => {
-						'one' => q({0} пм),
-						'other' => q({0} пм),
-					},
-					# Long Unit Identifier
 					'length-solar-radius' => {
 						'name' => q(R☉),
 					},
 					# Core Unit Identifier
 					'solar-radius' => {
 						'name' => q(R☉),
-					},
-					# Long Unit Identifier
-					'length-yard' => {
-						'one' => q({0} ярд),
-						'other' => q({0} ярд),
-					},
-					# Core Unit Identifier
-					'yard' => {
-						'one' => q({0} ярд),
-						'other' => q({0} ярд),
 					},
 					# Long Unit Identifier
 					'light-candela' => {
@@ -4282,40 +3586,6 @@ has 'units' => (
 						'name' => q(L☉),
 					},
 					# Long Unit Identifier
-					'mass-gram' => {
-						'name' => q(грамм),
-						'one' => q({0} гр),
-						'other' => q({0} гр),
-					},
-					# Core Unit Identifier
-					'gram' => {
-						'name' => q(грамм),
-						'one' => q({0} гр),
-						'other' => q({0} гр),
-					},
-					# Long Unit Identifier
-					'mass-kilogram' => {
-						'name' => q(кг),
-						'one' => q({0} кг),
-						'other' => q({0} кг),
-					},
-					# Core Unit Identifier
-					'kilogram' => {
-						'name' => q(кг),
-						'one' => q({0} кг),
-						'other' => q({0} кг),
-					},
-					# Long Unit Identifier
-					'mass-ounce' => {
-						'one' => q({0} унц),
-						'other' => q({0} унц),
-					},
-					# Core Unit Identifier
-					'ounce' => {
-						'one' => q({0} унц),
-						'other' => q({0} унц),
-					},
-					# Long Unit Identifier
 					'mass-pound' => {
 						'one' => q({0}#),
 						'other' => q({0}#),
@@ -4324,14 +3594,6 @@ has 'units' => (
 					'pound' => {
 						'one' => q({0}#),
 						'other' => q({0}#),
-					},
-					# Long Unit Identifier
-					'per' => {
-						'1' => q({0}/{1}),
-					},
-					# Core Unit Identifier
-					'per' => {
-						'1' => q({0}/{1}),
 					},
 					# Long Unit Identifier
 					'power-horsepower' => {
@@ -4364,30 +3626,6 @@ has 'units' => (
 						'other' => q({0} ватт),
 					},
 					# Long Unit Identifier
-					'power2' => {
-						'1' => q({0}²),
-						'one' => q({0}²),
-						'other' => q({0}²),
-					},
-					# Core Unit Identifier
-					'power2' => {
-						'1' => q({0}²),
-						'one' => q({0}²),
-						'other' => q({0}²),
-					},
-					# Long Unit Identifier
-					'power3' => {
-						'1' => q({0}³),
-						'one' => q({0}³),
-						'other' => q({0}³),
-					},
-					# Core Unit Identifier
-					'power3' => {
-						'1' => q({0}³),
-						'one' => q({0}³),
-						'other' => q({0}³),
-					},
-					# Long Unit Identifier
 					'pressure-atmosphere' => {
 						'name' => q(уур амьсгал),
 						'one' => q({0} уур амьсгал),
@@ -4398,16 +3636,6 @@ has 'units' => (
 						'name' => q(уур амьсгал),
 						'one' => q({0} уур амьсгал),
 						'other' => q({0} уур амьсгал),
-					},
-					# Long Unit Identifier
-					'pressure-hectopascal' => {
-						'one' => q({0} гПа),
-						'other' => q({0} гПа),
-					},
-					# Core Unit Identifier
-					'hectopascal' => {
-						'one' => q({0} гПа),
-						'other' => q({0} гПа),
 					},
 					# Long Unit Identifier
 					'pressure-inch-ofhg' => {
@@ -4432,50 +3660,34 @@ has 'units' => (
 					# Long Unit Identifier
 					'speed-kilometer-per-hour' => {
 						'name' => q(км/ц),
-						'one' => q({0} км/ц),
-						'other' => q({0} км/ц),
 					},
 					# Core Unit Identifier
 					'kilometer-per-hour' => {
 						'name' => q(км/ц),
-						'one' => q({0} км/ц),
-						'other' => q({0} км/ц),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
 						'name' => q(м/с),
-						'one' => q({0} м/с),
-						'other' => q({0} м/с),
 					},
 					# Core Unit Identifier
 					'meter-per-second' => {
 						'name' => q(м/с),
-						'one' => q({0} м/с),
-						'other' => q({0} м/с),
 					},
 					# Long Unit Identifier
 					'speed-mile-per-hour' => {
 						'name' => q(ми/ц),
-						'one' => q({0} ми/ц),
-						'other' => q({0} ми/ц),
 					},
 					# Core Unit Identifier
 					'mile-per-hour' => {
 						'name' => q(ми/ц),
-						'one' => q({0} ми/ц),
-						'other' => q({0} ми/ц),
 					},
 					# Long Unit Identifier
 					'temperature-celsius' => {
 						'name' => q(°C),
-						'one' => q({0}°C),
-						'other' => q({0}°C),
 					},
 					# Core Unit Identifier
 					'celsius' => {
 						'name' => q(°C),
-						'one' => q({0}°C),
-						'other' => q({0}°C),
 					},
 					# Long Unit Identifier
 					'temperature-fahrenheit' => {
@@ -4498,26 +3710,6 @@ has 'units' => (
 					'kelvin' => {
 						'one' => q({0}K),
 						'other' => q({0}K),
-					},
-					# Long Unit Identifier
-					'volume-cubic-kilometer' => {
-						'one' => q({0} км³),
-						'other' => q({0} км³),
-					},
-					# Core Unit Identifier
-					'cubic-kilometer' => {
-						'one' => q({0} км³),
-						'other' => q({0} км³),
-					},
-					# Long Unit Identifier
-					'volume-cubic-mile' => {
-						'one' => q({0} ми³),
-						'other' => q({0} ми³),
-					},
-					# Core Unit Identifier
-					'cubic-mile' => {
-						'one' => q({0} ми³),
-						'other' => q({0} ми³),
 					},
 					# Long Unit Identifier
 					'volume-cup' => {
@@ -4550,18 +3742,6 @@ has 'units' => (
 						'one' => q({0} анг.гал),
 						'other' => q({0} анг.гал),
 						'per' => q({0} анг.гал),
-					},
-					# Long Unit Identifier
-					'volume-liter' => {
-						'name' => q(литр),
-						'one' => q({0} л),
-						'other' => q({0} л),
-					},
-					# Core Unit Identifier
-					'liter' => {
-						'name' => q(литр),
-						'one' => q({0} л),
-						'other' => q({0} л),
 					},
 				},
 				'short' => {
@@ -4702,14 +3882,6 @@ has 'units' => (
 						'1' => q(м{0}),
 					},
 					# Long Unit Identifier
-					'10p-6' => {
-						'1' => q(μ{0}),
-					},
-					# Core Unit Identifier
-					'6' => {
-						'1' => q(μ{0}),
-					},
-					# Long Unit Identifier
 					'10p-9' => {
 						'1' => q(н{0}),
 					},
@@ -5074,26 +4246,18 @@ has 'units' => (
 					# Long Unit Identifier
 					'concentr-percent' => {
 						'name' => q(хувь),
-						'one' => q({0}%),
-						'other' => q({0}%),
 					},
 					# Core Unit Identifier
 					'percent' => {
 						'name' => q(хувь),
-						'one' => q({0}%),
-						'other' => q({0}%),
 					},
 					# Long Unit Identifier
 					'concentr-permille' => {
 						'name' => q(мянганы хувь),
-						'one' => q({0}‰),
-						'other' => q({0}‰),
 					},
 					# Core Unit Identifier
 					'permille' => {
 						'name' => q(мянганы хувь),
-						'one' => q({0}‰),
-						'other' => q({0}‰),
 					},
 					# Long Unit Identifier
 					'concentr-permillion' => {
@@ -5426,6 +4590,20 @@ has 'units' => (
 						'other' => q({0} нс),
 					},
 					# Long Unit Identifier
+					'duration-quarter' => {
+						'name' => q(улирал),
+						'one' => q({0} улирал),
+						'other' => q({0} улирал),
+						'per' => q({0}/улирал),
+					},
+					# Core Unit Identifier
+					'quarter' => {
+						'name' => q(улирал),
+						'one' => q({0} улирал),
+						'other' => q({0} улирал),
+						'per' => q({0}/улирал),
+					},
+					# Long Unit Identifier
 					'duration-second' => {
 						'name' => q(сек),
 						'one' => q({0} сек),
@@ -5494,14 +4672,10 @@ has 'units' => (
 					# Long Unit Identifier
 					'electric-ohm' => {
 						'name' => q(Ω),
-						'one' => q({0} Ω),
-						'other' => q({0} Ω),
 					},
 					# Core Unit Identifier
 					'ohm' => {
 						'name' => q(Ω),
-						'one' => q({0} Ω),
-						'other' => q({0} Ω),
 					},
 					# Long Unit Identifier
 					'electric-volt' => {
@@ -6066,18 +5240,6 @@ has 'units' => (
 						'per' => q({0}/кг),
 					},
 					# Long Unit Identifier
-					'mass-metric-ton' => {
-						'name' => q(т),
-						'one' => q({0} т),
-						'other' => q({0} т),
-					},
-					# Core Unit Identifier
-					'metric-ton' => {
-						'name' => q(т),
-						'one' => q({0} т),
-						'other' => q({0} т),
-					},
-					# Long Unit Identifier
 					'mass-microgram' => {
 						'name' => q(μг),
 						'one' => q({0} μг),
@@ -6174,12 +5336,16 @@ has 'units' => (
 						'other' => q({0} ам. тн),
 					},
 					# Long Unit Identifier
-					'per' => {
-						'1' => q({0}/{1}),
+					'mass-tonne' => {
+						'name' => q(т),
+						'one' => q({0} т),
+						'other' => q({0} т),
 					},
 					# Core Unit Identifier
-					'per' => {
-						'1' => q({0}/{1}),
+					'tonne' => {
+						'name' => q(т),
+						'one' => q({0} т),
+						'other' => q({0} т),
 					},
 					# Long Unit Identifier
 					'power-gigawatt' => {
@@ -6252,30 +5418,6 @@ has 'units' => (
 						'name' => q(Ватт),
 						'one' => q({0} Вт),
 						'other' => q({0} Вт),
-					},
-					# Long Unit Identifier
-					'power2' => {
-						'1' => q({0}²),
-						'one' => q({0}²),
-						'other' => q({0}²),
-					},
-					# Core Unit Identifier
-					'power2' => {
-						'1' => q({0}²),
-						'one' => q({0}²),
-						'other' => q({0}²),
-					},
-					# Long Unit Identifier
-					'power3' => {
-						'1' => q({0}³),
-						'one' => q({0}³),
-						'other' => q({0}³),
-					},
-					# Core Unit Identifier
-					'power3' => {
-						'1' => q({0}³),
-						'one' => q({0}³),
-						'other' => q({0}³),
 					},
 					# Long Unit Identifier
 					'pressure-atmosphere' => {
@@ -6448,48 +5590,26 @@ has 'units' => (
 					# Long Unit Identifier
 					'temperature-celsius' => {
 						'name' => q(C хэм),
-						'one' => q({0}°C),
-						'other' => q({0}°C),
 					},
 					# Core Unit Identifier
 					'celsius' => {
 						'name' => q(C хэм),
-						'one' => q({0}°C),
-						'other' => q({0}°C),
 					},
 					# Long Unit Identifier
 					'temperature-fahrenheit' => {
 						'name' => q(F хэм),
-						'one' => q({0}°F),
-						'other' => q({0}°F),
 					},
 					# Core Unit Identifier
 					'fahrenheit' => {
 						'name' => q(F хэм),
-						'one' => q({0}°F),
-						'other' => q({0}°F),
-					},
-					# Long Unit Identifier
-					'temperature-generic' => {
-						'name' => q(°),
-						'one' => q({0}°),
-						'other' => q({0}°),
-					},
-					# Core Unit Identifier
-					'generic' => {
-						'name' => q(°),
-						'one' => q({0}°),
-						'other' => q({0}°),
 					},
 					# Long Unit Identifier
 					'temperature-kelvin' => {
-						'name' => q(K),
 						'one' => q({0}°К),
 						'other' => q({0}°К),
 					},
 					# Core Unit Identifier
 					'kelvin' => {
-						'name' => q(K),
 						'one' => q({0}°К),
 						'other' => q({0}°К),
 					},
@@ -6929,120 +6049,12 @@ has 'nostr' => (
 	default		=> sub { qr'^(?i:үгүй|ү|no|n)$' }
 );
 
-has 'listPatterns' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-				start => q({0} {1}),
-				middle => q({0} {1}),
-				end => q({0} {1}),
-				2 => q({0} {1}),
-		} }
-);
-
-has 'default_numbering_system' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> 'latn',
-);
-
-has native_numbering_system => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> 'latn',
-);
-
-has 'minimum_grouping_digits' => (
-	is			=>'ro',
-	isa			=> Int,
-	init_arg	=> undef,
-	default		=> 1,
-);
-
-has 'number_symbols' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'latn' => {
-			'decimal' => q(.),
-			'exponential' => q(E),
-			'group' => q(,),
-			'infinity' => q(∞),
-			'list' => q(;),
-			'minusSign' => q(-),
-			'nan' => q(NaN),
-			'perMille' => q(‰),
-			'percentSign' => q(%),
-			'plusSign' => q(+),
-			'superscriptingExponent' => q(×),
-			'timeSeparator' => q(:),
-		},
-	} }
-);
-
 has 'number_formats' => (
 	is			=> 'ro',
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
 		decimalFormat => {
-			'default' => {
-				'1000' => {
-					'one' => '0 мянга',
-					'other' => '0 мянга',
-				},
-				'10000' => {
-					'one' => '00 мянга',
-					'other' => '00 мянга',
-				},
-				'100000' => {
-					'one' => '000 мянга',
-					'other' => '000 мянга',
-				},
-				'1000000' => {
-					'one' => '0 сая',
-					'other' => '0 сая',
-				},
-				'10000000' => {
-					'one' => '00 сая',
-					'other' => '00 сая',
-				},
-				'100000000' => {
-					'one' => '000 сая',
-					'other' => '000 сая',
-				},
-				'1000000000' => {
-					'one' => '0 тэрбум',
-					'other' => '0 тэрбум',
-				},
-				'10000000000' => {
-					'one' => '00 тэрбум',
-					'other' => '00 тэрбум',
-				},
-				'100000000000' => {
-					'one' => '000Т',
-					'other' => '000Т',
-				},
-				'1000000000000' => {
-					'one' => '0ИН',
-					'other' => '0ИН',
-				},
-				'10000000000000' => {
-					'one' => '00ИН',
-					'other' => '00ИН',
-				},
-				'100000000000000' => {
-					'one' => '000ИН',
-					'other' => '000ИН',
-				},
-				'standard' => {
-					'default' => '#,##0.###',
-				},
-			},
 			'long' => {
 				'1000' => {
 					'one' => '0 мянга',
@@ -7144,20 +6156,6 @@ has 'number_formats' => (
 				},
 			},
 		},
-		percentFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0%',
-				},
-			},
-		},
-		scientificFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#E0',
-				},
-			},
-		},
 } },
 );
 
@@ -7170,10 +6168,11 @@ has 'number_currency_formats' => (
 			'pattern' => {
 				'default' => {
 					'accounting' => {
-						'positive' => '¤ #,##0.00',
+						'negative' => '(#,##0.00)',
+						'positive' => '#,##0.00',
 					},
 					'standard' => {
-						'positive' => '¤ #,##0.00',
+						'positive' => '¤ 0 мянга',
 					},
 				},
 			},
@@ -7187,1062 +6186,676 @@ has 'currencies' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'AED' => {
-			symbol => 'AED',
 			display_name => {
 				'currency' => q(арабын нэгдсэн эмиратын дирхам),
-				'one' => q(арабын нэгдсэн эмиратын дирхам),
-				'other' => q(арабын нэгдсэн эмиратын дирхам),
 			},
 		},
 		'AFN' => {
-			symbol => 'AFN',
 			display_name => {
 				'currency' => q(Афганистаны афгани),
-				'one' => q(Афганистаны афгани),
-				'other' => q(Афганистаны афгани),
 			},
 		},
 		'ALL' => {
-			symbol => 'ALL',
 			display_name => {
 				'currency' => q(Албанийн лек),
-				'one' => q(Албанийн лек),
-				'other' => q(Албанийн лек),
 			},
 		},
 		'AMD' => {
-			symbol => 'AMD',
 			display_name => {
 				'currency' => q(Арменийн драм),
-				'one' => q(Арменийн драм),
-				'other' => q(Арменийн драм),
 			},
 		},
 		'ANG' => {
-			symbol => 'ANG',
 			display_name => {
 				'currency' => q(Нидерландын Антиллийн гулдер),
-				'one' => q(Нидерландын Антиллийн гулдер),
-				'other' => q(Нидерландын Антиллийн гулдер),
 			},
 		},
 		'AOA' => {
-			symbol => 'AOA',
 			display_name => {
 				'currency' => q(Анголын кванза),
-				'one' => q(Анголын кванза),
-				'other' => q(Анголын кванза),
 			},
 		},
 		'ARS' => {
-			symbol => 'ARS',
 			display_name => {
 				'currency' => q(Аргентины песо),
-				'one' => q(Аргентины песо),
-				'other' => q(Аргентины песо),
 			},
 		},
 		'AUD' => {
-			symbol => 'A$',
 			display_name => {
 				'currency' => q(Австралийн доллар),
-				'one' => q(Австралийн доллар),
-				'other' => q(Австралийн доллар),
 			},
 		},
 		'AWG' => {
-			symbol => 'AWG',
 			display_name => {
 				'currency' => q(Арубын флорин),
-				'one' => q(Арубын флорин),
-				'other' => q(Арубын флорин),
 			},
 		},
 		'AZN' => {
-			symbol => 'AZN',
 			display_name => {
 				'currency' => q(Азербайжаны манат),
-				'one' => q(Азербайжаны манат),
-				'other' => q(Азербайжаны манат),
 			},
 		},
 		'BAM' => {
-			symbol => 'BAM',
 			display_name => {
 				'currency' => q(Босни-Герцеговины хөрвөгч марк),
-				'one' => q(Босни-Герцеговины хөрвөгч марк),
-				'other' => q(Босни-Герцеговины хөрвөгч марк),
 			},
 		},
 		'BBD' => {
-			symbol => 'BBD',
 			display_name => {
 				'currency' => q(барбадос доллар),
-				'one' => q(барбадос доллар),
-				'other' => q(барбадос доллар),
 			},
 		},
 		'BDT' => {
-			symbol => 'BDT',
 			display_name => {
 				'currency' => q(Бангладешийн така),
-				'one' => q(Бангладешийн така),
-				'other' => q(Бангладешийн така),
 			},
 		},
 		'BGN' => {
-			symbol => 'BGN',
 			display_name => {
 				'currency' => q(Болгарын лев),
-				'one' => q(Болгарын лев),
-				'other' => q(Болгарын лев),
 			},
 		},
 		'BHD' => {
-			symbol => 'BHD',
 			display_name => {
 				'currency' => q(Бахрейн динар),
-				'one' => q(Бахрейн динар),
-				'other' => q(Бахрейн динар),
 			},
 		},
 		'BIF' => {
-			symbol => 'BIF',
 			display_name => {
 				'currency' => q(Бурундийн франк),
-				'one' => q(Бурундийн франк),
-				'other' => q(Бурундийн франк),
 			},
 		},
 		'BMD' => {
-			symbol => 'BMD',
 			display_name => {
 				'currency' => q(Бермудын доллар),
-				'one' => q(Бермудын доллар),
-				'other' => q(Бермудын доллар),
 			},
 		},
 		'BND' => {
-			symbol => 'BND',
 			display_name => {
 				'currency' => q(Брунейн доллар),
-				'one' => q(Брунейн доллар),
-				'other' => q(Брунейн доллар),
 			},
 		},
 		'BOB' => {
-			symbol => 'BOB',
 			display_name => {
 				'currency' => q(Боливийн боливиано),
-				'one' => q(Боливийн боливиано),
-				'other' => q(Боливийн боливиано),
 			},
 		},
 		'BRL' => {
-			symbol => 'R$',
 			display_name => {
 				'currency' => q(Бразилийн реал),
-				'one' => q(Бразилийн реал),
-				'other' => q(Бразилийн реал),
 			},
 		},
 		'BSD' => {
-			symbol => 'BSD',
 			display_name => {
 				'currency' => q(Багамын доллар),
-				'one' => q(Багамын доллар),
-				'other' => q(Багамын доллар),
 			},
 		},
 		'BTN' => {
-			symbol => 'BTN',
 			display_name => {
 				'currency' => q(Бутаны нгултрум),
-				'one' => q(Бутаны нгултрум),
-				'other' => q(Бутаны нгултрум),
 			},
 		},
 		'BWP' => {
-			symbol => 'BWP',
 			display_name => {
 				'currency' => q(Ботсванийн пула),
-				'one' => q(Ботсванийн пула),
-				'other' => q(Ботсванийн пула),
 			},
 		},
 		'BYN' => {
-			symbol => 'BYN',
+			symbol => 'р.',
 			display_name => {
 				'currency' => q(Беларусийн рубль),
-				'one' => q(Беларусийн рубль),
-				'other' => q(Беларусийн рубль),
 			},
 		},
 		'BYR' => {
-			symbol => 'BYR',
 			display_name => {
 				'currency' => q(беларусь рубль \(2000–2016\)),
-				'one' => q(беларусь рубль \(2000–2016\)),
-				'other' => q(беларусь рубль \(2000–2016\)),
 			},
 		},
 		'BZD' => {
-			symbol => 'BZD',
 			display_name => {
 				'currency' => q(Белизийн доллар),
-				'one' => q(Белизийн доллар),
-				'other' => q(Белизийн доллар),
 			},
 		},
 		'CAD' => {
-			symbol => 'CA$',
 			display_name => {
 				'currency' => q(канад доллар),
-				'one' => q(канад доллар),
-				'other' => q(канад доллар),
 			},
 		},
 		'CDF' => {
-			symbol => 'CDF',
 			display_name => {
 				'currency' => q(Конгогийн франк),
-				'one' => q(Конгогийн франк),
-				'other' => q(Конгогийн франк),
 			},
 		},
 		'CHF' => {
-			symbol => 'CHF',
 			display_name => {
 				'currency' => q(Швейцарийн франк),
-				'one' => q(Швейцарийн франк),
-				'other' => q(Швейцарийн франк),
 			},
 		},
 		'CLP' => {
-			symbol => 'CLP',
 			display_name => {
 				'currency' => q(Чилийн песо),
-				'one' => q(Чилийн песо),
-				'other' => q(Чилийн песо),
 			},
 		},
 		'CNH' => {
-			symbol => 'CNH',
 			display_name => {
 				'currency' => q(Хятадын юань \(офшор\)),
-				'one' => q(Хятадын юань \(офшор\)),
-				'other' => q(Хятадын юань \(офшор\)),
 			},
 		},
 		'CNY' => {
-			symbol => 'CN¥',
 			display_name => {
 				'currency' => q(Хятадын юань),
-				'one' => q(Хятадын юань),
-				'other' => q(Хятадын юань),
 			},
 		},
 		'COP' => {
-			symbol => 'COP',
 			display_name => {
 				'currency' => q(Колумбын песо),
-				'one' => q(Колумбын песо),
-				'other' => q(Колумбын песо),
 			},
 		},
 		'CRC' => {
-			symbol => 'CRC',
 			display_name => {
 				'currency' => q(Коста-Рикагийн колон),
-				'one' => q(Коста-Рикагийн колон),
-				'other' => q(Коста-Рикагийн колон),
 			},
 		},
 		'CUC' => {
-			symbol => 'CUC',
 			display_name => {
 				'currency' => q(Кубын хөрвөгч песо),
-				'one' => q(Кубын хөрвөгч песо),
-				'other' => q(Кубын хөрвөгч песо),
 			},
 		},
 		'CUP' => {
-			symbol => 'CUP',
 			display_name => {
 				'currency' => q(Кубын песо),
-				'one' => q(Кубын песо),
-				'other' => q(Кубын песо),
 			},
 		},
 		'CVE' => {
-			symbol => 'CVE',
 			display_name => {
 				'currency' => q(Кабо-Вердийн эскудо),
-				'one' => q(Кабо-Вердийн эскудо),
-				'other' => q(Кабо-Вердийн эскудо),
 			},
 		},
 		'CZK' => {
-			symbol => 'CZK',
 			display_name => {
 				'currency' => q(Чехийн крон),
-				'one' => q(Чехийн крон),
-				'other' => q(Чехийн крон),
 			},
 		},
 		'DJF' => {
-			symbol => 'DJF',
 			display_name => {
 				'currency' => q(Жибутийн франк),
-				'one' => q(Жибутийн франк),
-				'other' => q(Жибутийн франк),
 			},
 		},
 		'DKK' => {
-			symbol => 'DKK',
 			display_name => {
 				'currency' => q(Данийн крон),
-				'one' => q(Данийн крон),
-				'other' => q(Данийн крон),
 			},
 		},
 		'DOP' => {
-			symbol => 'DOP',
 			display_name => {
 				'currency' => q(Доминиканы песо),
-				'one' => q(Доминиканы песо),
-				'other' => q(Доминиканы песо),
 			},
 		},
 		'DZD' => {
-			symbol => 'DZD',
 			display_name => {
 				'currency' => q(Алжирийн доллар),
-				'one' => q(Алжирийн доллар),
-				'other' => q(Алжирийн доллар),
 			},
 		},
 		'EGP' => {
-			symbol => 'EGP',
 			display_name => {
 				'currency' => q(Египетийн фунт),
-				'one' => q(Египетийн фунт),
-				'other' => q(Египетийн фунт),
 			},
 		},
 		'ERN' => {
-			symbol => 'ERN',
 			display_name => {
 				'currency' => q(Эритрейн накфа),
-				'one' => q(Эритрейн накфа),
-				'other' => q(Эритрейн накфа),
 			},
 		},
 		'ETB' => {
-			symbol => 'ETB',
 			display_name => {
 				'currency' => q(Этиопын бирр),
-				'one' => q(Этиопын бирр),
-				'other' => q(Этиопын бирр),
 			},
 		},
 		'EUR' => {
-			symbol => '€',
 			display_name => {
 				'currency' => q(евро),
-				'one' => q(евро),
-				'other' => q(евро),
 			},
 		},
 		'FJD' => {
-			symbol => 'FJD',
 			display_name => {
 				'currency' => q(Фижигийн доллар),
-				'one' => q(Фижигийн доллар),
-				'other' => q(Фижигийн доллар),
 			},
 		},
 		'FKP' => {
-			symbol => 'FKP',
 			display_name => {
 				'currency' => q(Фолклендийн арлуудын паунд),
-				'one' => q(Фолклендийн арлуудын паунд),
-				'other' => q(Фолклендийн арлуудын паунд),
 			},
 		},
 		'GBP' => {
-			symbol => '£',
 			display_name => {
 				'currency' => q(Британийн фунт),
-				'one' => q(Британийн фунт),
-				'other' => q(Британийн фунт),
 			},
 		},
 		'GEL' => {
-			symbol => 'GEL',
 			display_name => {
 				'currency' => q(Гүржийн лари),
-				'one' => q(Гүржийн лари),
-				'other' => q(Гүржийн лари),
 			},
 		},
 		'GHS' => {
-			symbol => 'GHS',
 			display_name => {
 				'currency' => q(Ганагийн седи),
-				'one' => q(Ганагийн седи),
-				'other' => q(Ганагийн седи),
 			},
 		},
 		'GIP' => {
-			symbol => 'GIP',
 			display_name => {
 				'currency' => q(Гибралтарын фунт),
-				'one' => q(Гибралтарын фунт),
-				'other' => q(Гибралтарын фунт),
 			},
 		},
 		'GMD' => {
-			symbol => 'GMD',
 			display_name => {
 				'currency' => q(Гамбийн даласи),
-				'one' => q(Гамбийн даласи),
-				'other' => q(Гамбийн даласи),
 			},
 		},
 		'GNF' => {
-			symbol => 'GNF',
 			display_name => {
 				'currency' => q(Гвинейн франк),
-				'one' => q(Гвинейн франк),
-				'other' => q(Гвинейн франк),
 			},
 		},
 		'GTQ' => {
-			symbol => 'GTQ',
 			display_name => {
 				'currency' => q(Гватемалын кецал),
-				'one' => q(Гватемалын кецал),
-				'other' => q(Гватемалын кецал),
 			},
 		},
 		'GYD' => {
-			symbol => 'GYD',
 			display_name => {
 				'currency' => q(Гайанын доллар),
-				'one' => q(Гайанын доллар),
-				'other' => q(Гайанын доллар),
 			},
 		},
 		'HKD' => {
-			symbol => 'HK$',
 			display_name => {
 				'currency' => q(Хонг Конгийн доллар),
-				'one' => q(Хонг Конгийн доллар),
-				'other' => q(Хонг Конгийн доллар),
 			},
 		},
 		'HNL' => {
-			symbol => 'HNL',
 			display_name => {
 				'currency' => q(Гондурасын лемпира),
-				'one' => q(Гондурасын лемпира),
-				'other' => q(Гондурасын лемпира),
 			},
 		},
 		'HRK' => {
-			symbol => 'HRK',
 			display_name => {
 				'currency' => q(Хорватын куна),
-				'one' => q(Хорватын куна),
-				'other' => q(Хорватын куна),
 			},
 		},
 		'HTG' => {
-			symbol => 'HTG',
 			display_name => {
 				'currency' => q(Гаитийн гурд),
-				'one' => q(Гаитийн гурд),
-				'other' => q(Гаитийн гурд),
 			},
 		},
 		'HUF' => {
-			symbol => 'HUF',
 			display_name => {
 				'currency' => q(Унгарын форинт),
-				'one' => q(Унгарын форинт),
-				'other' => q(Унгарын форинт),
 			},
 		},
 		'IDR' => {
-			symbol => 'IDR',
 			display_name => {
 				'currency' => q(Индонезийн рупи),
-				'one' => q(Индонезийн рупи),
-				'other' => q(Индонезийн рупи),
 			},
 		},
 		'ILS' => {
-			symbol => '₪',
 			display_name => {
 				'currency' => q(Израилийн шинэ шекел),
-				'one' => q(Израилийн шинэ шекел),
-				'other' => q(Израилийн шинэ шекел),
 			},
 		},
 		'INR' => {
-			symbol => '₹',
 			display_name => {
 				'currency' => q(Энэтхэгийн рупи),
-				'one' => q(Энэтхэгийн рупи),
-				'other' => q(Энэтхэгийн рупи),
 			},
 		},
 		'IQD' => {
-			symbol => 'IQD',
 			display_name => {
 				'currency' => q(Иракийн динар),
-				'one' => q(Иракийн динар),
-				'other' => q(Иракийн динар),
 			},
 		},
 		'IRR' => {
-			symbol => 'IRR',
 			display_name => {
 				'currency' => q(Ираны риял),
-				'one' => q(Ираны риял),
-				'other' => q(Ираны риял),
 			},
 		},
 		'ISK' => {
-			symbol => 'ISK',
 			display_name => {
 				'currency' => q(Исландын крон),
-				'one' => q(Исландын крон),
-				'other' => q(Исландын крон),
 			},
 		},
 		'JMD' => {
-			symbol => 'JMD',
 			display_name => {
 				'currency' => q(Ямайкийн доллар),
-				'one' => q(Ямайкийн доллар),
-				'other' => q(Ямайкийн доллар),
 			},
 		},
 		'JOD' => {
-			symbol => 'JOD',
 			display_name => {
 				'currency' => q(Йорданы динар),
-				'one' => q(Йорданы динар),
-				'other' => q(Йорданы динар),
 			},
 		},
 		'JPY' => {
-			symbol => 'JP¥',
 			display_name => {
 				'currency' => q(Японы иен),
-				'one' => q(Японы иен),
-				'other' => q(Японы иен),
 			},
 		},
 		'KES' => {
-			symbol => 'KES',
 			display_name => {
 				'currency' => q(Кенийн шиллинг),
-				'one' => q(Кенийн шиллинг),
-				'other' => q(Кенийн шиллинг),
 			},
 		},
 		'KGS' => {
-			symbol => 'KGS',
 			display_name => {
 				'currency' => q(Кыргызын сом),
-				'one' => q(Кыргызын сом),
-				'other' => q(Кыргызын сом),
 			},
 		},
 		'KHR' => {
-			symbol => 'KHR',
 			display_name => {
 				'currency' => q(Камбожийн риел),
-				'one' => q(Камбожийн риел),
-				'other' => q(Камбожийн риел),
 			},
 		},
 		'KMF' => {
-			symbol => 'KMF',
 			display_name => {
 				'currency' => q(Коморын франк),
-				'one' => q(Коморын франк),
-				'other' => q(Коморын франк),
 			},
 		},
 		'KPW' => {
-			symbol => 'KPW',
 			display_name => {
 				'currency' => q(Хойд Солонгосын вон),
-				'one' => q(Хойд Солонгосын вон),
-				'other' => q(Хойд Солонгосын вон),
 			},
 		},
 		'KRW' => {
-			symbol => '₩',
 			display_name => {
 				'currency' => q(Өмнөд Солонгосын вон),
-				'one' => q(Өмнөд Солонгосын вон),
-				'other' => q(Өмнөд Солонгосын вон),
 			},
 		},
 		'KWD' => {
-			symbol => 'KWD',
 			display_name => {
 				'currency' => q(Кувейтийн динар),
-				'one' => q(Кувейтийн динар),
-				'other' => q(Кувейтийн динар),
 			},
 		},
 		'KYD' => {
-			symbol => 'KYD',
 			display_name => {
 				'currency' => q(Кайманы арлуудын доллар),
-				'one' => q(Кайманы арлуудын доллар),
-				'other' => q(Кайманы арлуудын доллар),
 			},
 		},
 		'KZT' => {
-			symbol => 'KZT',
 			display_name => {
 				'currency' => q(Казахстаны тэнгэ),
-				'one' => q(Казахстаны тэнгэ),
-				'other' => q(Казахстаны тэнгэ),
 			},
 		},
 		'LAK' => {
-			symbol => 'LAK',
 			display_name => {
 				'currency' => q(Лаосын кип),
-				'one' => q(Лаосын кип),
-				'other' => q(Лаосын кип),
 			},
 		},
 		'LBP' => {
-			symbol => 'LBP',
 			display_name => {
 				'currency' => q(Ливаны фунт),
-				'one' => q(Ливаны фунт),
-				'other' => q(Ливаны фунт),
 			},
 		},
 		'LKR' => {
-			symbol => 'LKR',
 			display_name => {
 				'currency' => q(Шри-Ланкийн рупи),
-				'one' => q(Шри-Ланкийн рупи),
-				'other' => q(Шри-Ланкийн рупи),
 			},
 		},
 		'LRD' => {
-			symbol => 'LRD',
 			display_name => {
 				'currency' => q(Либерийн доллар),
-				'one' => q(Либерийн доллар),
-				'other' => q(Либерийн доллар),
 			},
 		},
 		'LSL' => {
 			display_name => {
 				'currency' => q(Лесото лоти),
-				'one' => q(Лесото лоти),
-				'other' => q(Лесото лоти),
 			},
 		},
 		'LTL' => {
-			symbol => 'LTL',
 			display_name => {
 				'currency' => q(литвийн литас),
-				'one' => q(литвийн литас),
-				'other' => q(литвийн литас),
 			},
 		},
 		'LVL' => {
-			symbol => 'LVL',
 			display_name => {
 				'currency' => q(латвийн лац),
-				'one' => q(латвийн лац),
-				'other' => q(латвийн лац),
 			},
 		},
 		'LYD' => {
-			symbol => 'LYD',
 			display_name => {
 				'currency' => q(Ливийн доллар),
-				'one' => q(Ливийн доллар),
-				'other' => q(Ливийн доллар),
 			},
 		},
 		'MAD' => {
-			symbol => 'MAD',
 			display_name => {
 				'currency' => q(Мороккогийн дирхэм),
-				'one' => q(Мороккогийн дирхэм),
-				'other' => q(Мороккогийн дирхэм),
 			},
 		},
 		'MDL' => {
-			symbol => 'MDL',
 			display_name => {
 				'currency' => q(Молдовын лей),
-				'one' => q(Молдовын лей),
-				'other' => q(Молдовын лей),
 			},
 		},
 		'MGA' => {
-			symbol => 'MGA',
 			display_name => {
 				'currency' => q(Малагасийн ариари),
-				'one' => q(Малагасийн ариари),
-				'other' => q(Малагасийн ариари),
 			},
 		},
 		'MKD' => {
-			symbol => 'MKD',
 			display_name => {
 				'currency' => q(Македонийн динар),
-				'one' => q(Македонийн динар),
-				'other' => q(Македонийн динар),
 			},
 		},
 		'MMK' => {
-			symbol => 'MMK',
 			display_name => {
 				'currency' => q(Мьянмарын киат),
-				'one' => q(Мьянмарын киат),
-				'other' => q(Мьянмарын киат),
 			},
 		},
 		'MNT' => {
 			symbol => '₮',
 			display_name => {
 				'currency' => q(Монгол төгрөг),
-				'one' => q(Монгол төгрөг),
-				'other' => q(Монгол төгрөг),
 			},
 		},
 		'MOP' => {
-			symbol => 'MOP',
 			display_name => {
 				'currency' => q(Макаогийн патака),
-				'one' => q(Макаогийн патака),
-				'other' => q(Макаогийн патака),
 			},
 		},
 		'MRO' => {
-			symbol => 'MRO',
 			display_name => {
 				'currency' => q(мавритан угия \(1973–2017\)),
-				'one' => q(мавритан угия \(1973–2017\)),
-				'other' => q(мавритан угия \(1973–2017\)),
 			},
 		},
 		'MRU' => {
-			symbol => 'MRU',
 			display_name => {
 				'currency' => q(Мавританийн угия),
-				'one' => q(Мавританийн угия),
-				'other' => q(Мавританийн угия),
 			},
 		},
 		'MUR' => {
-			symbol => 'MUR',
 			display_name => {
 				'currency' => q(Маврикийн рупи),
-				'one' => q(Маврикийн рупи),
-				'other' => q(Маврикийн рупи),
 			},
 		},
 		'MVR' => {
-			symbol => 'MVR',
 			display_name => {
 				'currency' => q(Мальдивийн руфия),
-				'one' => q(Мальдивийн руфия),
-				'other' => q(Мальдивийн руфия),
 			},
 		},
 		'MWK' => {
-			symbol => 'MWK',
 			display_name => {
 				'currency' => q(Малавийн квача),
-				'one' => q(Малавийн квача),
-				'other' => q(Малавийн квача),
 			},
 		},
 		'MXN' => {
-			symbol => 'MX$',
 			display_name => {
 				'currency' => q(Мексикийн песо),
-				'one' => q(Мексикийн песо),
-				'other' => q(Мексикийн песо),
 			},
 		},
 		'MYR' => {
-			symbol => 'MYR',
 			display_name => {
 				'currency' => q(Малайзын рингит),
-				'one' => q(Малайзын рингит),
-				'other' => q(Малайзын рингит),
 			},
 		},
 		'MZN' => {
-			symbol => 'MZN',
 			display_name => {
 				'currency' => q(Мозамбикийн метикал),
-				'one' => q(Мозамбикийн метикал),
-				'other' => q(Мозамбикийн метикал),
 			},
 		},
 		'NAD' => {
-			symbol => 'NAD',
 			display_name => {
 				'currency' => q(Намибийн доллар),
-				'one' => q(Намибийн доллар),
-				'other' => q(Намибийн доллар),
 			},
 		},
 		'NGN' => {
-			symbol => 'NGN',
 			display_name => {
 				'currency' => q(Нигерийн найра),
-				'one' => q(Нигерийн найра),
-				'other' => q(Нигерийн найра),
 			},
 		},
 		'NIO' => {
-			symbol => 'NIO',
 			display_name => {
 				'currency' => q(Никарагуагийн кордоба),
-				'one' => q(Никарагуагийн кордоба),
-				'other' => q(Никарагуагийн кордоба),
 			},
 		},
 		'NOK' => {
-			symbol => 'NOK',
 			display_name => {
 				'currency' => q(Норвегийн крон),
-				'one' => q(Норвегийн крон),
-				'other' => q(Норвегийн крон),
 			},
 		},
 		'NPR' => {
-			symbol => 'NPR',
 			display_name => {
 				'currency' => q(Балбын рупи),
-				'one' => q(Балбын рупи),
-				'other' => q(Балбын рупи),
 			},
 		},
 		'NZD' => {
-			symbol => 'NZ$',
 			display_name => {
 				'currency' => q(Шинэ Зеландын доллар),
-				'one' => q(Шинэ Зеландын доллар),
-				'other' => q(Шинэ Зеландын доллар),
 			},
 		},
 		'OMR' => {
-			symbol => 'OMR',
 			display_name => {
 				'currency' => q(Оманийн риал),
-				'one' => q(Оманийн риал),
-				'other' => q(Оманийн риал),
 			},
 		},
 		'PAB' => {
-			symbol => 'PAB',
 			display_name => {
 				'currency' => q(Панамын бальбоа),
-				'one' => q(Панамын бальбоа),
-				'other' => q(Панамын бальбоа),
 			},
 		},
 		'PEN' => {
-			symbol => 'PEN',
 			display_name => {
 				'currency' => q(Перугийн соль),
-				'one' => q(Перугийн соль),
-				'other' => q(Перугийн соль),
 			},
 		},
 		'PGK' => {
-			symbol => 'PGK',
 			display_name => {
 				'currency' => q(Папуа-Шинэ Гвинейн кина),
-				'one' => q(Папуа-Шинэ Гвинейн кина),
-				'other' => q(Папуа-Шинэ Гвинейн кина),
 			},
 		},
 		'PHP' => {
 			symbol => 'PHP',
 			display_name => {
 				'currency' => q(Филиппиний песо),
-				'one' => q(Филиппиний песо),
-				'other' => q(Филиппиний песо),
 			},
 		},
 		'PKR' => {
-			symbol => 'PKR',
 			display_name => {
 				'currency' => q(Пакистаны рупи),
-				'one' => q(Пакистаны рупи),
-				'other' => q(Пакистаны рупи),
 			},
 		},
 		'PLN' => {
-			symbol => 'PLN',
 			display_name => {
 				'currency' => q(Польшийн злот),
-				'one' => q(Польшийн злот),
-				'other' => q(Польшийн злот),
 			},
 		},
 		'PYG' => {
-			symbol => 'PYG',
 			display_name => {
 				'currency' => q(Парагвайн гуарани),
-				'one' => q(Парагвайн гуарани),
-				'other' => q(Парагвайн гуарани),
 			},
 		},
 		'QAR' => {
-			symbol => 'QAR',
 			display_name => {
 				'currency' => q(Катарын риал),
-				'one' => q(Катарын риал),
-				'other' => q(Катарын риал),
 			},
 		},
 		'RON' => {
-			symbol => 'RON',
 			display_name => {
 				'currency' => q(Румыны лей),
-				'one' => q(Румыны лей),
-				'other' => q(Румыны лей),
 			},
 		},
 		'RSD' => {
-			symbol => 'RSD',
 			display_name => {
 				'currency' => q(Сербийн динар),
-				'one' => q(Сербийн динар),
-				'other' => q(Сербийн динар),
 			},
 		},
 		'RUB' => {
-			symbol => 'RUB',
+			symbol => '₽',
 			display_name => {
 				'currency' => q(Оросын рубль),
-				'one' => q(Оросын рубль),
-				'other' => q(Оросын рубль),
 			},
 		},
 		'RWF' => {
-			symbol => 'RWF',
 			display_name => {
 				'currency' => q(Руандагийн франк),
-				'one' => q(Руандагийн франк),
-				'other' => q(Руандагийн франк),
 			},
 		},
 		'SAR' => {
-			symbol => 'SAR',
 			display_name => {
 				'currency' => q(Саудын риял),
-				'one' => q(Саудын риял),
-				'other' => q(Саудын риял),
 			},
 		},
 		'SBD' => {
-			symbol => 'SBD',
 			display_name => {
 				'currency' => q(Соломоны арлуудын доллар),
-				'one' => q(Соломоны арлуудын доллар),
-				'other' => q(Соломоны арлуудын доллар),
 			},
 		},
 		'SCR' => {
-			symbol => 'SCR',
 			display_name => {
 				'currency' => q(Сейшелийн рупи),
-				'one' => q(Сейшелийн рупи),
-				'other' => q(Сейшелийн рупи),
 			},
 		},
 		'SDG' => {
-			symbol => 'SDG',
 			display_name => {
 				'currency' => q(Суданы фунт),
-				'one' => q(Суданы фунт),
-				'other' => q(Суданы фунт),
 			},
 		},
 		'SEK' => {
-			symbol => 'SEK',
+			symbol => 'кр',
 			display_name => {
 				'currency' => q(Шведийн крон),
-				'one' => q(Шведийн крон),
-				'other' => q(Шведийн крон),
 			},
 		},
 		'SGD' => {
-			symbol => 'SGD',
 			display_name => {
 				'currency' => q(Сингапурын доллар),
-				'one' => q(Сингапурын доллар),
-				'other' => q(Сингапурын доллар),
 			},
 		},
 		'SHP' => {
-			symbol => 'SHP',
 			display_name => {
 				'currency' => q(Сент Хеленагийн фунт),
-				'one' => q(Сент Хеленагийн фунт),
-				'other' => q(Сент Хеленагийн фунт),
+			},
+		},
+		'SLE' => {
+			display_name => {
+				'currency' => q(Сьерра-Леоны леон),
 			},
 		},
 		'SLL' => {
-			symbol => 'SLL',
 			display_name => {
-				'currency' => q(Сьерра-Леоны леон),
-				'one' => q(Сьерра-Леоны леон),
-				'other' => q(Сьерра-Леоны леон),
+				'currency' => q(Сьерра-Леоны леон \(1964—2022\)),
 			},
 		},
 		'SOS' => {
-			symbol => 'SOS',
 			display_name => {
 				'currency' => q(Сомалийн шиллинг),
-				'one' => q(Сомалийн шиллинг),
-				'other' => q(Сомалийн шиллинг),
 			},
 		},
 		'SRD' => {
-			symbol => 'SRD',
 			display_name => {
 				'currency' => q(Суринамын доллар),
-				'one' => q(Суринамын доллар),
-				'other' => q(Суринамын доллар),
 			},
 		},
 		'SSP' => {
-			symbol => 'SSP',
 			display_name => {
 				'currency' => q(Өмнөд Суданы фунт),
-				'one' => q(Өмнөд Суданы фунт),
-				'other' => q(Өмнөд Суданы фунт),
 			},
 		},
 		'STD' => {
-			symbol => 'STD',
 			display_name => {
 				'currency' => q(сан-томе ба принсипи добра \(1977–2017\)),
 				'one' => q(Сан-Томе Принсипигийн мөнгөн тэмдэгт добра \(1977–2017\)),
@@ -8250,211 +6863,136 @@ has 'currencies' => (
 			},
 		},
 		'STN' => {
-			symbol => 'STN',
 			display_name => {
 				'currency' => q(Сан-Томе ба Принсипигийн добра),
-				'one' => q(Сан-Томе ба Принсипигийн добра),
-				'other' => q(Сан-Томе ба Принсипигийн добра),
 			},
 		},
 		'SYP' => {
-			symbol => 'SYP',
 			display_name => {
 				'currency' => q(Сирийн фунт),
-				'one' => q(Сирийн фунт),
-				'other' => q(Сирийн фунт),
 			},
 		},
 		'SZL' => {
-			symbol => 'SZL',
 			display_name => {
 				'currency' => q(Свазиландын лилангени),
-				'one' => q(Свазиландын лилангени),
-				'other' => q(Свазиландын лилангени),
 			},
 		},
 		'THB' => {
 			symbol => '฿',
 			display_name => {
 				'currency' => q(Тайландын бат),
-				'one' => q(Тайландын бат),
-				'other' => q(Тайландын бат),
 			},
 		},
 		'TJS' => {
-			symbol => 'TJS',
 			display_name => {
 				'currency' => q(Тажикийн сомон),
-				'one' => q(Тажикийн сомон),
-				'other' => q(Тажикийн сомон),
 			},
 		},
 		'TMT' => {
-			symbol => 'TMT',
 			display_name => {
 				'currency' => q(Туркмены манат),
-				'one' => q(Туркмены манат),
-				'other' => q(Туркмены манат),
 			},
 		},
 		'TND' => {
-			symbol => 'TND',
 			display_name => {
 				'currency' => q(Тунисын доллар),
-				'one' => q(Тунисын доллар),
-				'other' => q(Тунисын доллар),
 			},
 		},
 		'TOP' => {
-			symbol => 'TOP',
 			display_name => {
 				'currency' => q(Тонгагийн панга),
-				'one' => q(Тонгагийн панга),
-				'other' => q(Тонгагийн панга),
 			},
 		},
 		'TRY' => {
-			symbol => 'TRY',
 			display_name => {
 				'currency' => q(Туркийн лира),
-				'one' => q(Туркийн лира),
-				'other' => q(Туркийн лира),
 			},
 		},
 		'TTD' => {
-			symbol => 'TTD',
 			display_name => {
 				'currency' => q(Тринидад ба Тобагогийн доллар),
-				'one' => q(Тринидад ба Тобагогийн доллар),
-				'other' => q(Тринидад ба Тобагогийн доллар),
 			},
 		},
 		'TWD' => {
 			symbol => 'NT$',
 			display_name => {
 				'currency' => q(Шинэ Тайванийн доллар),
-				'one' => q(Шинэ Тайванийн доллар),
-				'other' => q(Шинэ Тайванийн доллар),
 			},
 		},
 		'TZS' => {
-			symbol => 'TZS',
 			display_name => {
 				'currency' => q(Танзанийн шиллинг),
-				'one' => q(Танзанийн шиллинг),
-				'other' => q(Танзанийн шиллинг),
 			},
 		},
 		'UAH' => {
-			symbol => 'UAH',
 			display_name => {
 				'currency' => q(Украины гривна),
-				'one' => q(Украины гривна),
-				'other' => q(Украины гривна),
 			},
 		},
 		'UGX' => {
-			symbol => 'UGX',
 			display_name => {
 				'currency' => q(Угандагийн шиллинг),
-				'one' => q(Угандагийн шиллинг),
-				'other' => q(Угандагийн шиллинг),
 			},
 		},
 		'USD' => {
 			symbol => '$',
 			display_name => {
 				'currency' => q(америк доллар),
-				'one' => q(америк доллар),
-				'other' => q(америк доллар),
 			},
 		},
 		'UYU' => {
-			symbol => 'UYU',
 			display_name => {
 				'currency' => q(Уругвайн песо),
-				'one' => q(Уругвайн песо),
-				'other' => q(Уругвайн песо),
 			},
 		},
 		'UZS' => {
-			symbol => 'UZS',
 			display_name => {
 				'currency' => q(Узбекийн сом),
-				'one' => q(Узбекийн сом),
-				'other' => q(Узбекийн сом),
 			},
 		},
 		'VEF' => {
-			symbol => 'VEF',
 			display_name => {
 				'currency' => q(венесуэлийн боливар \(2008–2018\)),
-				'one' => q(венесуэлийн боливар \(2008–2018\)),
-				'other' => q(венесуэлийн боливар \(2008–2018\)),
 			},
 		},
 		'VES' => {
-			symbol => 'VES',
 			display_name => {
 				'currency' => q(Венесуэлийн боливар),
-				'one' => q(Венесуэлийн боливар),
-				'other' => q(Венесуэлийн боливар),
 			},
 		},
 		'VND' => {
-			symbol => '₫',
 			display_name => {
 				'currency' => q(Вьетнамын донг),
-				'one' => q(Вьетнамын донг),
-				'other' => q(Вьетнамын донг),
 			},
 		},
 		'VUV' => {
-			symbol => 'VUV',
 			display_name => {
 				'currency' => q(Вануатугийн вату),
-				'one' => q(Вануатугийн вату),
-				'other' => q(Вануатугийн вату),
 			},
 		},
 		'WST' => {
-			symbol => 'WST',
 			display_name => {
 				'currency' => q(Самоагийн тала),
-				'one' => q(Самоагийн тала),
-				'other' => q(Самоагийн тала),
 			},
 		},
 		'XAF' => {
-			symbol => 'FCFA',
 			display_name => {
 				'currency' => q(Төв Африкийн франк),
-				'one' => q(Төв Африкийн франк),
-				'other' => q(Төв Африкийн франк),
 			},
 		},
 		'XCD' => {
-			symbol => 'EC$',
 			display_name => {
 				'currency' => q(Зүүн Карибийн доллар),
-				'one' => q(Зүүн Карибийн доллар),
-				'other' => q(Зүүн Карибийн доллар),
 			},
 		},
 		'XOF' => {
-			symbol => 'F CFA',
 			display_name => {
 				'currency' => q(Баруун Африкийн франк),
-				'one' => q(Баруун Африкийн франк),
-				'other' => q(Баруун Африкийн франк),
 			},
 		},
 		'XPF' => {
-			symbol => 'CFPF',
 			display_name => {
 				'currency' => q(Францын колонийн франк),
-				'one' => q(Францын колонийн франк),
-				'other' => q(Францын колонийн франк),
 			},
 		},
 		'XXX' => {
@@ -8465,34 +7003,23 @@ has 'currencies' => (
 			},
 		},
 		'YER' => {
-			symbol => 'YER',
 			display_name => {
 				'currency' => q(Йемений риял),
-				'one' => q(Йемений риял),
-				'other' => q(Йемений риял),
 			},
 		},
 		'ZAR' => {
-			symbol => 'ZAR',
 			display_name => {
 				'currency' => q(Өмнөд Африкийн ранд),
-				'one' => q(Өмнөд Африкийн ранд),
-				'other' => q(Өмнөд Африкийн ранд),
 			},
 		},
 		'ZMK' => {
 			display_name => {
 				'currency' => q(Замби квача \(1968–2012\)),
-				'one' => q(Замби квача \(1968–2012\)),
-				'other' => q(Замби квача \(1968–2012\)),
 			},
 		},
 		'ZMW' => {
-			symbol => 'ZMW',
 			display_name => {
 				'currency' => q(Замбийн квача),
-				'one' => q(Замбийн квача),
-				'other' => q(Замбийн квача),
 			},
 		},
 	} },
@@ -8504,9 +7031,9 @@ has 'calendar_months' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-			'gregorian' => {
+			'chinese' => {
 				'format' => {
-					abbreviated => {
+					wide => {
 						nonleap => [
 							'1-р сар',
 							'2-р сар',
@@ -8525,20 +7052,24 @@ has 'calendar_months' => (
 							
 						],
 					},
-					narrow => {
+				},
+			},
+			'gregorian' => {
+				'format' => {
+					abbreviated => {
 						nonleap => [
-							'I',
-							'II',
-							'III',
-							'IV',
-							'V',
-							'VI',
-							'VII',
-							'VIII',
-							'IX',
-							'X',
-							'XI',
-							'XII'
+							'1-р сар',
+							'2-р сар',
+							'3-р сар',
+							'4-р сар',
+							'5-р сар',
+							'6-р сар',
+							'7-р сар',
+							'8-р сар',
+							'9-р сар',
+							'10-р сар',
+							'11-р сар',
+							'12-р сар'
 						],
 						leap => [
 							
@@ -8565,25 +7096,6 @@ has 'calendar_months' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'1-р сар',
-							'2-р сар',
-							'3-р сар',
-							'4-р сар',
-							'5-р сар',
-							'6-р сар',
-							'7-р сар',
-							'8-р сар',
-							'9-р сар',
-							'10-р сар',
-							'11-р сар',
-							'12-р сар'
-						],
-						leap => [
-							
-						],
-					},
 					narrow => {
 						nonleap => [
 							'I',
@@ -8643,24 +7155,6 @@ has 'calendar_days' => (
 						sat => 'Бя',
 						sun => 'Ня'
 					},
-					narrow => {
-						mon => 'Да',
-						tue => 'Мя',
-						wed => 'Лх',
-						thu => 'Пү',
-						fri => 'Ба',
-						sat => 'Бя',
-						sun => 'Ня'
-					},
-					short => {
-						mon => 'Да',
-						tue => 'Мя',
-						wed => 'Лх',
-						thu => 'Пү',
-						fri => 'Ба',
-						sat => 'Бя',
-						sun => 'Ня'
-					},
 					wide => {
 						mon => 'даваа',
 						tue => 'мягмар',
@@ -8672,25 +7166,7 @@ has 'calendar_days' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						mon => 'Да',
-						tue => 'Мя',
-						wed => 'Лх',
-						thu => 'Пү',
-						fri => 'Ба',
-						sat => 'Бя',
-						sun => 'Ня'
-					},
 					narrow => {
-						mon => 'Да',
-						tue => 'Мя',
-						wed => 'Лх',
-						thu => 'Пү',
-						fri => 'Ба',
-						sat => 'Бя',
-						sun => 'Ня'
-					},
-					short => {
 						mon => 'Да',
 						tue => 'Мя',
 						wed => 'Лх',
@@ -8725,11 +7201,6 @@ has 'calendar_quarters' => (
 						2 => 'III улирал',
 						3 => 'IV улирал'
 					},
-					narrow => {0 => 'I',
-						1 => 'II',
-						2 => 'III',
-						3 => 'IV'
-					},
 					wide => {0 => '1-р улирал',
 						1 => '2-р улирал',
 						2 => '3-р улирал',
@@ -8737,20 +7208,10 @@ has 'calendar_quarters' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {0 => 'I улирал',
-						1 => 'II улирал',
-						2 => 'III улирал',
-						3 => 'IV улирал'
-					},
 					narrow => {0 => 'I',
 						1 => 'II',
 						2 => 'III',
 						3 => 'IV'
-					},
-					wide => {0 => '1-р улирал',
-						1 => '2-р улирал',
-						2 => '3-р улирал',
-						3 => '4-р улирал'
 					},
 				},
 			},
@@ -8767,6 +7228,31 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
+			if ($_ eq 'chinese') {
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+				}
+				if($day_period_type eq 'selection') {
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
+				}
+				last SWITCH;
+				}
 			if ($_ eq 'generic') {
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
@@ -8843,58 +7329,6 @@ has 'day_periods' => (
 					'noon' => q{үд дунд},
 					'pm' => q{ү.х.},
 				},
-				'narrow' => {
-					'afternoon1' => q{өдөр},
-					'am' => q{ү.ө.},
-					'evening1' => q{орой},
-					'midnight' => q{шөнө дунд},
-					'morning1' => q{өглөө},
-					'night1' => q{шөнө},
-					'noon' => q{үд дунд},
-					'pm' => q{ү.х.},
-				},
-				'wide' => {
-					'afternoon1' => q{өдөр},
-					'am' => q{ү.ө.},
-					'evening1' => q{орой},
-					'midnight' => q{шөнө дунд},
-					'morning1' => q{өглөө},
-					'night1' => q{шөнө},
-					'noon' => q{үд дунд},
-					'pm' => q{ү.х.},
-				},
-			},
-			'stand-alone' => {
-				'abbreviated' => {
-					'afternoon1' => q{өдөр},
-					'am' => q{ү.ө.},
-					'evening1' => q{орой},
-					'midnight' => q{шөнө дунд},
-					'morning1' => q{өглөө},
-					'night1' => q{шөнө},
-					'noon' => q{үд дунд},
-					'pm' => q{ү.х.},
-				},
-				'narrow' => {
-					'afternoon1' => q{өдөр},
-					'am' => q{ү.ө.},
-					'evening1' => q{орой},
-					'midnight' => q{шөнө дунд},
-					'morning1' => q{өглөө},
-					'night1' => q{шөнө},
-					'noon' => q{үд дунд},
-					'pm' => q{ү.х.},
-				},
-				'wide' => {
-					'afternoon1' => q{өдөр},
-					'am' => q{ү.ө.},
-					'evening1' => q{орой},
-					'midnight' => q{шөнө дунд},
-					'morning1' => q{өглөө},
-					'night1' => q{шөнө},
-					'noon' => q{үд дунд},
-					'pm' => q{ү.х.},
-				},
 			},
 		},
 	} },
@@ -8905,14 +7339,12 @@ has 'eras' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'chinese' => {
+		},
 		'generic' => {
 		},
 		'gregorian' => {
 			abbreviated => {
-				'0' => 'МЭӨ',
-				'1' => 'МЭ'
-			},
-			narrow => {
 				'0' => 'МЭӨ',
 				'1' => 'МЭ'
 			},
@@ -8929,16 +7361,22 @@ has 'date_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'chinese' => {
+			'full' => q{r(U) 'оны' MM 'сарын' d, EEEE},
+			'long' => q{r(U) 'оны' MM-'р' 'сарын' d},
+			'medium' => q{r.MM.d},
+			'short' => q{r-MM-dd},
+		},
 		'generic' => {
-			'full' => q{G y 'оны' MMMM'ын' d. cccc 'гараг'},
-			'long' => q{G y 'оны' MM 'сарын' dd},
-			'medium' => q{G y 'оны' MMM'ын' d},
+			'full' => q{G y 'оны' MMMM'ын' d. cccc 'гараг'},
+			'long' => q{G y 'оны' MM 'сарын' dd},
+			'medium' => q{G y 'оны' MMM'ын' d},
 			'short' => q{GGGGG y.MM.dd},
 		},
 		'gregorian' => {
-			'full' => q{y 'оны' MMMM'ын' d, EEEE 'гараг'},
-			'long' => q{y 'оны' MMMM'ын' d},
-			'medium' => q{y 'оны' MMM'ын' d},
+			'full' => q{y 'оны' MMMM'ын' d, EEEE 'гараг'},
+			'long' => q{y 'оны' MMMM'ын' d},
+			'medium' => q{y 'оны' MMM'ын' d},
 			'short' => q{y.MM.dd},
 		},
 	} },
@@ -8949,6 +7387,8 @@ has 'time_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'chinese' => {
+		},
 		'generic' => {
 		},
 		'gregorian' => {
@@ -8965,6 +7405,8 @@ has 'datetime_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'chinese' => {
+		},
 		'generic' => {
 			'full' => q{{1} {0}},
 			'long' => q{{1} {0}},
@@ -8989,92 +7431,75 @@ has 'datetime_formats_available_formats' => (
 			Bh => q{B h 'ц'},
 			Bhm => q{B h:mm},
 			Bhms => q{B h:mm:ss},
-			E => q{ccc},
 			EBhm => q{E. B h:mm},
 			EBhms => q{E. B h:mm:ss},
 			EHm => q{E. HH:mm},
 			EHms => q{E. HH:mm:ss},
 			Ed => q{dd. E},
-			Ehm => q{E. h:mm a},
-			Ehms => q{E. h:mm:ss a},
-			Gy => q{G y},
-			GyMMM => q{G y 'оны' MMM},
-			GyMMMEd => q{G y 'оны' MMM'ын' d. E},
-			GyMMMd => q{G y 'оны' MMM'ын' d},
+			Ehm => q{E. h:mm a},
+			Ehms => q{E. h:mm:ss a},
+			GyMMM => q{G y 'оны' MMM},
+			GyMMMEd => q{G y 'оны' MMM'ын' d. E},
+			GyMMMd => q{G y 'оны' MMM'ын' d},
 			GyMd => q{GGGGG y.MM.dd},
 			H => q{HH 'ц'},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
 			M => q{LLLLL},
 			MEd => q{MMMMM/dd. E},
-			MMM => q{LLL},
 			MMMEd => q{MMM'ын' d. E},
 			MMMMd => q{MMMM'ын' d},
 			MMMd => q{MMM'ын' d},
 			Md => q{MMMMM/dd},
-			d => q{d},
 			h => q{h 'ц' a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			ms => q{mm:ss},
-			y => q{G y},
-			yyyy => q{G y},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
 			yyyyM => q{GGGGG y MMMMM},
 			yyyyMEd => q{GGGGG y.MM.dd. E},
-			yyyyMMM => q{G y 'оны' MMM},
-			yyyyMMMEd => q{G y 'оны' MMM'ын' d. E},
-			yyyyMMMM => q{G y 'оны' MMMM},
-			yyyyMMMd => q{G y 'оны' MMM'ын' d},
+			yyyyMMM => q{G y 'оны' MMM},
+			yyyyMMMEd => q{G y 'оны' MMM'ын' d. E},
+			yyyyMMMM => q{G y 'оны' MMMM},
+			yyyyMMMd => q{G y 'оны' MMM'ын' d},
 			yyyyMd => q{GGGGG y.MM.dd},
-			yyyyQQQ => q{G y 'оны' QQQ},
-			yyyyQQQQ => q{G y 'оны' QQQQ},
+			yyyyQQQ => q{G y 'оны' QQQ},
+			yyyyQQQQ => q{G y 'оны' QQQQ},
 		},
 		'gregorian' => {
 			Bh => q{B h 'ц'},
 			Bhm => q{B h:mm},
 			Bhms => q{B h:mm:ss},
-			E => q{ccc},
 			EBhm => q{E. B h:mm},
 			EBhms => q{E. B h:mm:ss},
 			EHm => q{E. HH:mm},
 			EHms => q{E. HH:mm:ss},
 			Ed => q{dd. E},
-			Ehm => q{E. h:mm a},
-			Ehms => q{E. h:mm:ss a},
-			Gy => q{G y},
-			GyMMM => q{G y 'оны' MMM},
-			GyMMMEd => q{G y 'оны' MMM'ын' d. E},
-			GyMMMd => q{G y 'оны' MMM'ын' d},
+			Ehm => q{E. h:mm a},
+			Ehms => q{E. h:mm:ss a},
+			GyMMM => q{G y 'оны' MMM},
+			GyMMMEd => q{G y 'оны' MMM'ын' d. E},
+			GyMMMd => q{G y 'оны' MMM'ын' d},
 			H => q{HH 'ц'},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
 			Hmsv => q{HH:mm:ss (v)},
 			Hmv => q{HH:mm (v)},
 			M => q{LLLLL},
 			MEd => q{MMMMM/dd. E},
-			MMM => q{LLL},
 			MMMEd => q{MMM'ын' d. E},
 			MMMMW => q{MMMM'ын' W-'р' 'долоо' 'хоног'},
 			MMMMd => q{MMMM'ын' d},
 			MMMd => q{MMM'ын' d},
 			Md => q{MMMMM/dd},
-			d => q{d},
 			h => q{h 'ц' a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			hmsv => q{h:mm:ss a (v)},
-			hmv => q{h:mm a (v)},
-			ms => q{mm:ss},
-			y => q{y},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
+			hmsv => q{h:mm:ss a (v)},
+			hmv => q{h:mm a (v)},
 			yM => q{y MMMMM},
 			yMEd => q{y.MM.dd. E},
-			yMMM => q{y 'оны' MMM},
-			yMMMEd => q{y 'оны' MMM'ын' d. E},
-			yMMMM => q{y 'оны' MMMM},
-			yMMMd => q{y 'оны' MMM'ын' d},
+			yMMM => q{y 'оны' MMM},
+			yMMMEd => q{y 'оны' MMM'ын' d. E},
+			yMMMM => q{y 'оны' MMMM},
+			yMMMd => q{y 'оны' MMM'ын' d},
 			yMd => q{y.MM.dd},
-			yQQQ => q{y 'оны' QQQ},
-			yQQQQ => q{y 'оны' QQQQ},
+			yQQQ => q{y 'оны' QQQ},
+			yQQQQ => q{y 'оны' QQQQ},
 			yw => q{Y 'оны' w-'р' 'долоо' 'хоног'},
 		},
 	} },
@@ -9097,20 +7522,6 @@ has 'datetime_formats_interval' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-			H => {
-				H => q{HH–HH},
-			},
-			Hm => {
-				H => q{HH:mm–HH:mm},
-				m => q{HH:mm–HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm–HH:mm v},
-				m => q{HH:mm–HH:mm v},
-			},
-			Hv => {
-				H => q{HH–HH v},
-			},
 			M => {
 				M => q{MMMMM – MMMMM 'сар'},
 			},
@@ -9138,57 +7549,54 @@ has 'datetime_formats_interval' => (
 			},
 			fallback => '{0} – {1}',
 			h => {
-				a => q{h a – h a},
-				h => q{h–h a},
+				a => q{h a – h a},
+				h => q{h–h a},
 			},
 			hm => {
-				a => q{h:mm a – h:mm a},
-				h => q{h:mm–h:mm a},
-				m => q{h:mm–h:mm a},
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
 			},
 			hmv => {
-				a => q{h:mm a – h:mm a v},
-				h => q{h:mm–h:mm a v},
-				m => q{h:mm–h:mm a v},
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
 			},
 			hv => {
-				a => q{h a – h a v},
-				h => q{h–h a v},
-			},
-			y => {
-				y => q{G y–y},
+				a => q{h a – h a v},
+				h => q{h–h a v},
 			},
 			yM => {
-				M => q{GGGGG y 'оны' MMMMM–MMMMM 'сар'},
-				y => q{GGGGG y 'оны' MMMMM 'сар' – y 'оны' MMMMM 'сар'},
+				M => q{GGGGG y 'оны' MMMMM–MMMMM 'сар'},
+				y => q{GGGGG y 'оны' MMMMM 'сар' – y 'оны' MMMMM 'сар'},
 			},
 			yMEd => {
-				M => q{GGGGG y 'оны' MMMMM/dd E – MMMMM/dd E},
-				d => q{GGGGG y 'оны' MMMMM/dd E – MMMMM/dd E},
-				y => q{GGGGG y 'оны' MMMMM/dd E – y 'оны' MMMMM/dd E},
+				M => q{GGGGG y 'оны' MMMMM/dd E – MMMMM/dd E},
+				d => q{GGGGG y 'оны' MMMMM/dd E – MMMMM/dd E},
+				y => q{GGGGG y 'оны' MMMMM/dd E – y 'оны' MMMMM/dd E},
 			},
 			yMMM => {
-				M => q{G y 'оны' MMMMM – MMMMM 'сар'},
-				y => q{G y 'оны' MMMMM 'сар' – y 'оны' MMMMM 'сар'},
+				M => q{G y 'оны' MMMMM – MMMMM 'сар'},
+				y => q{G y 'оны' MMMMM 'сар' – y 'оны' MMMMM 'сар'},
 			},
 			yMMMEd => {
-				M => q{G y 'оны' MMMMM/dd E – MMMMM/dd E},
-				d => q{G y 'оны' MMMMM/dd E – MMMMM/dd E},
-				y => q{G y 'оны' MMMMM/dd E – y 'оны' MMMMM/dd E},
+				M => q{G y 'оны' MMMMM/dd E – MMMMM/dd E},
+				d => q{G y 'оны' MMMMM/dd E – MMMMM/dd E},
+				y => q{G y 'оны' MMMMM/dd E – y 'оны' MMMMM/dd E},
 			},
 			yMMMM => {
-				M => q{G y 'оны' MMMMM – MMMMM 'сар'},
-				y => q{G y 'оны' MMMMM 'сар' – y 'оны' MMMMM 'сар'},
+				M => q{G y 'оны' MMMMM – MMMMM 'сар'},
+				y => q{G y 'оны' MMMMM 'сар' – y 'оны' MMMMM 'сар'},
 			},
 			yMMMd => {
-				M => q{G y 'оны' MMMMM/dd – MMMMM/dd},
-				d => q{G y 'оны' MMMMM/dd – dd},
-				y => q{G y 'оны' MMMMM/dd – y 'оны' MMMMM/dd},
+				M => q{G y 'оны' MMMMM/dd – MMMMM/dd},
+				d => q{G y 'оны' MMMMM/dd – dd},
+				y => q{G y 'оны' MMMMM/dd – y 'оны' MMMMM/dd},
 			},
 			yMd => {
-				M => q{GGGGG y 'оны' MMMMM/dd – MMMMM/dd},
-				d => q{GGGGG y 'оны' MMMMM/dd – MMMMM/dd},
-				y => q{GGGGG y 'оны' MMMMM/dd – y 'оны' MMMMM/dd},
+				M => q{GGGGG y 'оны' MMMMM/dd – MMMMM/dd},
+				d => q{GGGGG y 'оны' MMMMM/dd – MMMMM/dd},
+				y => q{GGGGG y 'оны' MMMMM/dd – y 'оны' MMMMM/dd},
 			},
 		},
 		'gregorian' => {
@@ -9236,57 +7644,57 @@ has 'datetime_formats_interval' => (
 			},
 			fallback => '{0} – {1}',
 			h => {
-				a => q{h a – h a},
-				h => q{h – h a},
+				a => q{h a – h a},
+				h => q{h – h a},
 			},
 			hm => {
-				a => q{h:mm a – h:mm a},
-				h => q{h:mm – h:mm a},
-				m => q{h:mm – h:mm a},
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm – h:mm a},
+				m => q{h:mm – h:mm a},
 			},
 			hmv => {
-				a => q{h:mm a – h:mm a (v)},
-				h => q{h:mm – h:mm a (v)},
-				m => q{h:mm – h:mm a (v)},
+				a => q{h:mm a – h:mm a (v)},
+				h => q{h:mm – h:mm a (v)},
+				m => q{h:mm – h:mm a (v)},
 			},
 			hv => {
-				a => q{h a – h a (v)},
-				h => q{h – h a (v)},
+				a => q{h a – h a (v)},
+				h => q{h – h a (v)},
 			},
 			y => {
 				y => q{y – y},
 			},
 			yM => {
-				M => q{y 'оны' MMMMM–MMMMM 'сар'},
-				y => q{y 'оны' MMMMM 'сар' – y 'оны' MMMMM 'сар'},
+				M => q{y 'оны' MMMMM–MMMMM 'сар'},
+				y => q{y 'оны' MMMMM 'сар' – y 'оны' MMMMM 'сар'},
 			},
 			yMEd => {
-				M => q{y 'оны' MMMMM/dd E – MMMMM/dd E},
-				d => q{y 'оны' MMMMM/dd E – MMMMM/dd E},
-				y => q{y 'оны' MMMMM/dd E – y 'оны' MMMMM/dd E},
+				M => q{y 'оны' MMMMM/dd E – MMMMM/dd E},
+				d => q{y 'оны' MMMMM/dd E – MMMMM/dd E},
+				y => q{y 'оны' MMMMM/dd E – y 'оны' MMMMM/dd E},
 			},
 			yMMM => {
-				M => q{y 'оны' MMMMM – MMMMM 'сар'},
-				y => q{y 'оны' MMMMM 'сар' – y 'оны' MMMMM 'сар'},
+				M => q{y 'оны' MMMMM – MMMMM 'сар'},
+				y => q{y 'оны' MMMMM 'сар' – y 'оны' MMMMM 'сар'},
 			},
 			yMMMEd => {
-				M => q{y 'оны' MMMMM/dd E – MMMMM/dd E},
-				d => q{y 'оны' MMMMM/dd E – MMMMM/dd E},
-				y => q{y 'оны' MMMMM/dd E – y 'оны' MMMMM/dd E},
+				M => q{y 'оны' MMMMM/dd E – MMMMM/dd E},
+				d => q{y 'оны' MMMMM/dd E – MMMMM/dd E},
+				y => q{y 'оны' MMMMM/dd E – y 'оны' MMMMM/dd E},
 			},
 			yMMMM => {
-				M => q{y 'оны' MMMMM – MMMMM 'сар'},
-				y => q{y 'оны' MMMMM 'сар' – y 'оны' MMMMM 'сар'},
+				M => q{y 'оны' MMMMM – MMMMM 'сар'},
+				y => q{y 'оны' MMMMM 'сар' – y 'оны' MMMMM 'сар'},
 			},
 			yMMMd => {
-				M => q{y 'оны' MMMMM/dd – MMMMM/dd},
-				d => q{y 'оны' MMMMM/dd – dd},
-				y => q{y 'оны' MMMMM/dd – y 'оны' MMMMM/dd},
+				M => q{y 'оны' MMMMM/dd – MMMMM/dd},
+				d => q{y 'оны' MMMMM/dd – dd},
+				y => q{y 'оны' MMMMM/dd – y 'оны' MMMMM/dd},
 			},
 			yMd => {
-				M => q{y 'оны' MMMMM/dd – MMMMM/dd},
-				d => q{y 'оны' MMMMM/dd – MMMMM/dd},
-				y => q{y 'оны' MMMMM/dd – y 'оны' MMMMM/dd},
+				M => q{y 'оны' MMMMM/dd – MMMMM/dd},
+				d => q{y 'оны' MMMMM/dd – MMMMM/dd},
+				y => q{y 'оны' MMMMM/dd – y 'оны' MMMMM/dd},
 			},
 		},
 	} },
@@ -9297,13 +7705,9 @@ has 'time_zone_names' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default	=> sub { {
-		hourFormat => q(+HH:mm;-HH:mm),
-		gmtFormat => q(GMT{0}),
-		gmtZeroFormat => q(GMT),
 		regionFormat => q({0}-н цаг),
 		regionFormat => q({0}-н зуны цаг),
 		regionFormat => q({0}-н стандарт цаг),
-		fallbackFormat => q({1} ({0})),
 		'Afghanistan' => {
 			long => {
 				'standard' => q#Афганистаны цаг#,
@@ -9599,6 +8003,9 @@ has 'time_zone_names' => (
 		},
 		'America/Chihuahua' => {
 			exemplarCity => q#Чихуахуа#,
+		},
+		'America/Ciudad_Juarez' => {
+			exemplarCity => q#Сьюдад Хуарес#,
 		},
 		'America/Coral_Harbour' => {
 			exemplarCity => q#Атикокан#,
@@ -11176,6 +9583,9 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Johnston' => {
 			exemplarCity => q#Жонстон#,
+		},
+		'Pacific/Kanton' => {
+			exemplarCity => q#Кантон#,
 		},
 		'Pacific/Kiritimati' => {
 			exemplarCity => q#Киритимати#,

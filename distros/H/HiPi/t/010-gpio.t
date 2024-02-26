@@ -1,6 +1,6 @@
 #!perl
 
-use Test::More tests => 47;
+use Test::More tests => 49;
 use HiPi qw( :rpi );
 use HiPi::RaspberryPi;
 use Time::HiRes;
@@ -8,7 +8,7 @@ use Time::HiRes;
 my $sleepwait = 1000;
 
 SKIP: {
-      skip 'not in dist testing', 47 unless $ENV{HIPI_MODULES_DIST_TEST_GPIO};
+      skip 'not in dist testing', 49 unless $ENV{HIPI_MODULES_DIST_TEST_GPIO};
 
 diag('GPIO (/dev/gpiomem) tests are running');
 
@@ -17,6 +17,9 @@ use_ok( 'HiPi::GPIO' );
 my $gpio = HiPi::GPIO->new;
 
 ## MODE
+
+my $pin_36_startmode = $gpio->get_pin_mode( RPI_PIN_36 );
+
 $gpio->set_pin_mode( RPI_PIN_36, RPI_MODE_INPUT );
 Time::HiRes::usleep($sleepwait);
 is ( $gpio->get_pin_mode( RPI_PIN_36 ), RPI_MODE_INPUT, 'pin mode input');
@@ -102,10 +105,16 @@ $pin->active_low( 0 );
 Time::HiRes::usleep($sleepwait);
 is( $pin->active_low(), undef, 'PIN active low is reset');
 
+## return to startmode
+$pin->mode($pin_36_startmode);
+Time::HiRes::usleep($sleepwait);
+is ( $gpio->get_pin_mode( RPI_PIN_36 ), $pin_36_startmode, 'starting pin mode input restored');
 
 # OUTPUT
 
-is ( $gpio->get_pin_mode( RPI_PIN_37 ), RPI_MODE_INPUT, 'output pin mode input');
+my $pin_37_startmode = $gpio->get_pin_mode( RPI_PIN_37 );
+
+is ( $gpio->get_pin_mode( RPI_PIN_37 ), $pin_37_startmode, 'output pin mode at start');
 $gpio->set_pin_mode( RPI_PIN_37, RPI_MODE_OUTPUT );
 Time::HiRes::usleep($sleepwait);
 is ( $gpio->get_pin_mode( RPI_PIN_37 ), RPI_MODE_OUTPUT, 'output pin mode output');
@@ -143,6 +152,10 @@ sleep(4); # see the LED
 $pinout->mode( RPI_MODE_INPUT );
 is ( $pinout->get_function(), 'INPUT', 'pin function name' );
 
+$gpio->set_pin_mode( RPI_PIN_37, $pin_37_startmode );
+Time::HiRes::usleep($sleepwait);
+is ( $gpio->get_pin_mode( RPI_PIN_37 ), $pin_37_startmode, 'output pin mode start restored');
+
 SKIP: {
         skip 'does not have RP1', 13 unless HiPi::RaspberryPi::has_rp1();
         $gpio->set_pin_mode( RPI_PIN_36, RPI_MODE_INPUT );
@@ -155,11 +168,11 @@ SKIP: {
         $gpio->set_pin_slew( RPI_PIN_36, RPI_SLEW_SLOW);
         is( $gpio->get_pin_slew( RPI_PIN_36 ), RPI_SLEW_SLOW, 'gpio slew reset slow');
         
-        is( $gpio->get_pin_schmitt( RPI_PIN_36 ), RPI_SCHMITT_OFF, 'gpio schmitt starts off');
-        $gpio->set_pin_schmitt( RPI_PIN_36, RPI_SCHMITT_ON );
-        is( $gpio->get_pin_schmitt( RPI_PIN_36 ), RPI_SCHMITT_ON, 'gpio schmitt set on');
+        is( $gpio->get_pin_schmitt( RPI_PIN_36 ), RPI_SCHMITT_ON, 'gpio schmitt starts on');
         $gpio->set_pin_schmitt( RPI_PIN_36, RPI_SCHMITT_OFF );
-        is( $gpio->get_pin_schmitt( RPI_PIN_36 ), RPI_SCHMITT_OFF, 'gpio schmitt reset off');
+        is( $gpio->get_pin_schmitt( RPI_PIN_36 ), RPI_SCHMITT_OFF, 'gpio schmitt set off');
+        $gpio->set_pin_schmitt( RPI_PIN_36, RPI_SCHMITT_ON );
+        is( $gpio->get_pin_schmitt( RPI_PIN_36 ), RPI_SCHMITT_ON, 'gpio schmitt reset on');
         
         is( $pin->slew(), RPI_SLEW_SLOW, 'pin slew starts low');
         $pin->slew( RPI_SLEW_FAST );
@@ -167,11 +180,11 @@ SKIP: {
         $pin->slew( RPI_SLEW_SLOW );
         is( $pin->slew(), RPI_SLEW_SLOW, 'pin slew reset low');
         
-        is( $pin->schmitt(), RPI_SCHMITT_OFF, 'pin schmitt starts off');
-        $pin->schmitt( RPI_SCHMITT_ON );
-        is( $pin->schmitt(), RPI_SCHMITT_ON, 'pin schmitt set on');
+        is( $pin->schmitt(), RPI_SCHMITT_ON, 'pin schmitt starts on');
         $pin->schmitt( RPI_SCHMITT_OFF );
-        is( $pin->schmitt(), RPI_SCHMITT_OFF, 'pin schmitt reset off');
+        is( $pin->schmitt(), RPI_SCHMITT_OFF, 'pin schmitt set off');
+        $pin->schmitt( RPI_SCHMITT_ON );
+        is( $pin->schmitt(), RPI_SCHMITT_ON, 'pin schmitt reset on');
         
       
 } # END SKIP NOT RP1

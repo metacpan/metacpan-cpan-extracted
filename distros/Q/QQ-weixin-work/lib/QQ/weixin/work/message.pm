@@ -19,7 +19,7 @@ use LWP::UserAgent;
 use JSON;
 use utf8;
 
-our $VERSION = '0.06';
+our $VERSION = '0.10';
 our @EXPORT = qw/ send update_template_card recall update_taskcard get_statistics revoke /;
 
 =head1 FUNCTION
@@ -27,12 +27,14 @@ our @EXPORT = qw/ send update_template_card recall update_taskcard get_statistic
 =head2 send(access_token, hash);
 
 发送应用消息
+最后更新：2024/01/10
 
 =head2 SYNOPSIS
 
 L<https://developer.work.weixin.qq.com/document/path/90236>
 
 =head3 请求说明：
+应用支持推送文本、图片、视频、文件、图文等类型。
 
 =head4 请求包结构体为：
 
@@ -51,26 +53,28 @@ L<https://developer.work.weixin.qq.com/document/path/90236>
 
 =head3 RETURN 返回结果
 
-    {
+	{
 	  "errcode" : 0,
 	  "errmsg" : "ok",
 	  "invaliduser" : "userid1|userid2",
 	  "invalidparty" : "partyid1|partyid2",
 	  "invalidtag": "tagid1|tagid2",
+	  "unlicenseduser" : "userid3|userid4",
 	  "msgid": "xxxx",
 	  "response_code": "xyzxyz"
 	}
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	invaliduser	不合法的userid，不区分大小写，统一转为小写
 	invalidparty	不合法的partyid
 	invalidtag	不合法的标签id
+	unlicenseduser	没有基础接口许可(包含已过期)的userid
 	msgid	消息id，用于撤回应用消息
-	response_code	仅消息类型为“按钮交互型”，“投票选择型”和“多项选择型”的模板卡片消息返回，应用可使用response_code调用更新模版卡片消息接口，24小时内有效，且只能使用一次
+	response_code	仅消息类型为“按钮交互型”，“投票选择型”和“多项选择型”的模板卡片消息返回，应用可使用response_code调用更新模版卡片消息接口，72小时内有效，且只能使用一次
 
 =cut
 
@@ -93,7 +97,8 @@ sub send {
 
 =head2 update_template_card(access_token, hash);
 
-更新任务卡片消息状态
+更新模版卡片消息
+最后更新：2023/09/21
 
 =head2 SYNOPSIS
 
@@ -121,7 +126,7 @@ L<https://developer.work.weixin.qq.com/document/path/94888>
 
 =head4 参数说明：
 
-    参数	            必须	说明
+	参数	            必须	说明
     access_token	是	调用接口凭证
     userids	否	企业的成员ID列表（最多支持1000个）
 	partyids	否	企业的部门ID列表（最多支持100个）
@@ -151,11 +156,11 @@ L<https://developer.work.weixin.qq.com/document/path/94888>
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
     errmsg	对返回码的文本描述内容
 
-    如果部分指定的用户无权限或不存在，更新仍然执行，但会返回无效的部分（即invaliduser），常见的原因是用户不在应用的可见范围内或者不在消息的接收范围内。
+如果部分指定的用户无权限或不存在，更新仍然执行，但会返回无效的部分（即invaliduser），常见的原因是用户不在应用的可见范围内或者不在消息的接收范围内。
 
 =cut
 
@@ -179,6 +184,7 @@ sub update_template_card {
 =head2 recall(access_token, hash);
 
 撤回应用消息
+最后更新：2021/08/11
 
 =head2 SYNOPSIS
 
@@ -196,7 +202,7 @@ L<https://developer.work.weixin.qq.com/document/path/94867>
 
 =head4 参数说明：
 
-    参数	            必须	说明
+	参数	            必须	说明
     access_token	是	调用接口凭证。获取方法查看“获取access_token”
 	msgid	是	消息ID。从应用发送消息接口处获得。
 
@@ -212,7 +218,7 @@ L<https://developer.work.weixin.qq.com/document/path/94867>
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
     errmsg	对返回码的文本描述内容
 

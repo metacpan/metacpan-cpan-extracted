@@ -14,7 +14,7 @@ do { my $x = {
                                       'Test::EOL' => '0',
                                       'Test::MinimumVersion' => '0',
                                       'Test::Mojibake' => '0',
-                                      'Test::More' => '0.96',
+                                      'Test::More' => '0.88',
                                       'Test::NoTabs' => '0',
                                       'Test::Pod' => '1.41',
                                       'Test::Portability::Files' => '0',
@@ -24,24 +24,14 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'List::Util' => '1.29',
-                                      'Scalar::Util' => '0',
-                                      'Tickit' => '0.71',
-                                      'Tickit::ContainerWidget' => '0',
-                                      'Tickit::RenderBuffer' => '0',
-                                      'Tickit::SingleChildWidget' => '0',
-                                      'Tickit::Style' => '0',
-                                      'Tickit::Utils' => '0',
-                                      'Tickit::Widget' => '0.54',
+                                      'List::UtilsBy' => '0',
+                                      'Tickit' => '0.74',
+                                      'Tickit::Widget' => '0.58',
                                       'Tickit::Widget::Menu' => '0',
-                                      'Tickit::Widget::Menu::Item' => '0',
-                                      'Tickit::WidgetRole::Movable' => '0.003',
+                                      'Tickit::WidgetRole::Movable' => '0.004',
                                       'Variable::Disposition' => '0',
-                                      'constant' => '0',
                                       'curry::weak' => '0',
-                                      'parent' => '0',
-                                      'strict' => '0',
-                                      'utf8' => '0',
-                                      'warnings' => '0'
+                                      'parent' => '0'
                                     }
                     },
        'test' => {
@@ -54,8 +44,7 @@ do { my $x = {
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
                                    'Test::CheckDeps' => '0.010',
-                                   'Test::More' => '0.98',
-                                   'perl' => '5.006'
+                                   'Test::More' => '0.98'
                                  }
                  }
      };

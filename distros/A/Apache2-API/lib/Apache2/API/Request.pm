@@ -2373,7 +2373,7 @@ Gets or sets the HTTP request headers using L<APR::Table> by calling L</Apache2:
 
 This takes zero, one or sets or C<< key => value >> pairs.
 
-When no argument is provided, this returns the L<APR::Object>.
+When no argument is provided, this returns the L<APR::Table> object.
 
 When one argument is provided, it returns the corresponding HTTP header value, if any.
 

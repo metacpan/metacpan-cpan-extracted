@@ -1,12 +1,12 @@
 package Locale::CLDR::Transformations::Any::Latn::Cyrl;
 # This file auto generated from Data\common\transforms\Cyrillic-Latin.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -196,6 +196,34 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(Ü),
+					result  => q(Ү),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(ü),
+					result  => q(ү),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(Ū),
+					result  => q(Ұ),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(ū),
+					result  => q(ұ),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(T),
 					result  => q(Т),
 					revisit => 0,
@@ -266,6 +294,20 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(Ö),
+					result  => q(Ө),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(ö),
+					result  => q(ө),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(N),
 					result  => q(Н),
 					revisit => 0,
@@ -275,6 +317,20 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(n),
 					result  => q(н),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(Ň),
+					result  => q(Ң),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(ň),
+					result  => q(ң),
 					revisit => 0,
 				},
 				{
@@ -569,6 +625,20 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(a),
 					result  => q(а),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(Ḫ),
+					result  => q(Һ),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(ḫ),
+					result  => q(һ),
 					revisit => 0,
 				},
 				{

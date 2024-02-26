@@ -1,0 +1,276 @@
+# PODNAME: RDF::Cowl::Lib::Gen::Class::UOStream
+# ABSTRACT: Generated docs for RDF::Cowl::Ulib::UOStream
+
+## DO NOT EDIT
+## Generated via maint/tt/Class.pod.tt
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+RDF::Cowl::Lib::Gen::Class::UOStream - Generated docs for RDF::Cowl::Ulib::UOStream
+
+=head1 VERSION
+
+version 1.0.0
+
+=head1 MAIN MODULE
+
+L<RDF::Cowl::Ulib::UOStream>
+
+=head1 METHODS
+
+=head2 deinit
+
+B<Signature>:
+
+  $self->deinit()
+
+B<Params>:
+
+  UOStream $stream 
+
+Documentation:
+
+  Deinitializes the stream, releasing any reserved resource.
+  
+  @param stream Output stream.
+  @return Return code.
+
+=over 2
+
+B<C function name>: C<< uostream_deinit >>
+
+=back
+
+=head2 flush
+
+B<Signature>:
+
+  $self->flush()
+
+B<Params>:
+
+  UOStream $stream 
+
+Documentation:
+
+  Flushes the stream, writing any buffered data.
+  
+  @param stream Output stream.
+  @return Return code.
+
+=over 2
+
+B<C function name>: C<< uostream_flush >>
+
+=back
+
+=head2 std
+
+B<Signature>:
+
+  $self->std()
+
+Documentation:
+
+  Returns a stream that writes to the standard output.
+  
+  @return Standard output stream.
+
+=over 2
+
+B<C function name>: C<< uostream_std >>
+
+=back
+
+=head2 stderr
+
+B<Signature>:
+
+  $self->stderr()
+
+Documentation:
+
+  Returns a stream that writes to the standard error.
+  
+  @return Standard error stream.
+
+=over 2
+
+B<C function name>: C<< uostream_stderr >>
+
+=back
+
+=head2 null
+
+B<Signature>:
+
+  $self->null()
+
+Documentation:
+
+  Returns a stream that discards its output.
+  
+  @return Null output stream.
+
+=over 2
+
+B<C function name>: C<< uostream_null >>
+
+=back
+
+=head2 to_path
+
+B<Signature>:
+
+  $self->to_path(Str $path)
+
+B<Params>:
+
+  UOStream $stream 
+  Str $path 
+
+Documentation:
+
+  Initializes a stream that writes to the file at the specified path.
+  
+  @param stream Output stream.
+  @param path Path to the file to write to.
+  @return Return code.
+
+=over 2
+
+B<C function name>: C<< uostream_to_path >>
+
+=back
+
+=head2 to_file
+
+B<Signature>:
+
+  $self->to_file(InstanceOf["FFI::C::File"] $file)
+
+B<Params>:
+
+  UOStream $stream 
+  InstanceOf["FFI::C::File"] $file 
+
+Documentation:
+
+  Initializes a stream that writes to the specified file.
+  
+  @param stream Output stream.
+  @param file The output file.
+  @return Return code.
+  
+  @note You are responsible for closing the file.
+
+=over 2
+
+B<C function name>: C<< uostream_to_file >>
+
+=back
+
+=head2 to_strbuf
+
+B<Signature>:
+
+  $self->to_strbuf(UStrBuf $buf)
+
+B<Params>:
+
+  UOStream $stream 
+  UStrBuf $buf 
+
+Documentation:
+
+  Initializes a stream that writes to the specified string buffer.
+  
+  @param stream Output stream.
+  @param buf The output buffer.
+  @return Return code.
+  
+  @note If `buf` is NULL, the stream will allocate a new string buffer and set it as its context.
+        In this case, the string buffer will be deinitialized when calling `uostream_deinit`.
+
+=over 2
+
+B<C function name>: C<< uostream_to_strbuf >>
+
+=back
+
+=head2 to_multi
+
+B<Signature>:
+
+  $self->to_multi()
+
+B<Params>:
+
+  UOStream $stream 
+
+Documentation:
+
+  Initializes a stream that writes to multiple substreams.
+  
+  @param stream Output stream.
+  @return Return code.
+  
+  @note Multi-streams behave as follows:
+        - In case of error of any of the substreams, only the first detected error code
+          is returned. It is your responsibility to check the state of each individual
+          substream if that is important for your use case.
+        - The reported written bytes are the maximum bytes written by any of the underlying
+          substreams.
+        - Calling `uostream_deinit` deinitializes all substreams.
+
+=over 2
+
+B<C function name>: C<< uostream_to_multi >>
+
+=back
+
+=head2 add_substream
+
+B<Signature>:
+
+  $self->add_substream(UOStream $other)
+
+B<Params>:
+
+  UOStream $stream 
+  UOStream $other 
+
+Documentation:
+
+  Adds a new output stream to the specified multi-stream.
+  
+  @param stream Output stream.
+  @param other Stream to add.
+  @return Return code.
+  
+  @note Both streams must have been initialized beforehand, and `stream`
+        must have been initialized via `uostream_to_multi`.
+
+=over 2
+
+B<C function name>: C<< uostream_add_substream >>
+
+=back
+
+=head1 AUTHOR
+
+Zakariyya Mughal <zmughal@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 by Auto-Parallel Technologies, Inc..
+
+This is free software, licensed under Eclipse Public License - v 2.0.
+
+=cut

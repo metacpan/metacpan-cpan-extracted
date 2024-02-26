@@ -1,5 +1,26 @@
 Revision history for Perl extension PGXN::Site
 
+0.23.7  2024-02-22T20:50:06Z
+      - Removed duplicate CC license image and link on the /art page.
+      - Moved the generation of HTML from Multimarkdown files from build
+        time to release time, and switched from Text::Multimarkdown to
+        the `multimarkdown` CLI.
+      - Tweaked the CSS for definition lists to open up space a bit more
+        between terms and definitions.
+
+0.23.6 2024-02-20T20:56:52Z
+      - Tweaked the indentation of list items in the documentation "Contents"
+        nav box to align with the text above.
+      - Fixed broken SVG images. Turns out browsers don't know that
+        `https://www.w3.org/2000/svg` is valid. Reverting them to
+        `http://www.w3.org/2000/svg` fixes the issue.
+      - Regenerated all the logo images. Most are a bit smaller now, and
+        some superfluous data was removed from a few others.
+
+0.23.5  2024-02-15T19:56:46Z
+      - Restored the README to releases where the README is also listed as
+        extension documentation (#17).
+
 0.23.4  2024-02-06T23:47:18Z
       - Fixed the dependency configuration in `Build.PL` so it actually knows
         to install modules required for testing. Thanks to Slaven Rezic for the

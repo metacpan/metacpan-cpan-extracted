@@ -13,9 +13,9 @@ use File::Slurper qw(write_binary read_binary);
 use version;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-11'; # DATE
+our $DATE = '2023-11-20'; # DATE
 our $DIST = 'App-depak'; # DIST
-our $VERSION = '0.586'; # VERSION
+our $VERSION = '0.587'; # VERSION
 
 my @ALLOW_XS = qw(List::MoreUtils version::vxs);
 
@@ -780,7 +780,7 @@ _
 };
 sub depak {
     require Cwd;
-    require File::MoreUtil;
+    require File::Util::Test;
     require File::Spec;
     require File::Temp;
 
@@ -832,7 +832,7 @@ sub depak {
         $self->{output_file} = $self->{abs_output_file} = (File::Temp::tempfile())[1];
     } else {
         return [412, "Output file '$self->{output_file}' exists, won't overwrite (see --overwrite)"]
-            if File::MoreUtil::file_exists($self->{output_file}) && !$self->{overwrite};
+            if File::Util::Test::file_exists($self->{output_file}) && !$self->{overwrite};
         return [500, "Can't write to output file '$self->{output_file}': $!"]
             unless open my($fh), ">", $self->{output_file};
     }
@@ -901,7 +901,7 @@ App::depak - Pack dependencies onto your script file
 
 =head1 VERSION
 
-This document describes version 0.586 of App::depak (from Perl distribution App-depak), released on 2023-07-11.
+This document describes version 0.587 of App::depak (from Perl distribution App-depak), released on 2023-11-20.
 
 =head1 SYNOPSIS
 

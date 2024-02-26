@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-10-29'; # DATE
+our $DATE = '2023-12-29'; # DATE
 our $DIST = 'Log-ger'; # DIST
-our $VERSION = '0.041'; # VERSION
+our $VERSION = '0.042'; # VERSION
 
 require Log::ger;
 require Log::ger::Heavy;
@@ -306,13 +306,74 @@ Log::ger::Util - Utility routines for Log::ger
 
 =head1 VERSION
 
-version 0.041
+version 0.042
 
 =head1 DESCRIPTION
 
 This package is created to keep Log::ger as minimalist as possible.
 
-=for Pod::Coverage ^(.+)$
+=head1 FUNCTIONS
+
+None of these functions are exported.
+
+=head2 numeric_level
+
+Usage:
+
+ my $num = Log::ger::Util::numeric_level($level);
+
+If given a non-negative integer, will return the number as-is. Otherwise will
+convert the argument, assumed to be a string level, to the associated numeric
+level. Will die on failure.
+
+=head2 string_level
+
+Usage:
+
+ my $str_level = Log::ger::Util::string_level($level);
+
+If given a known string level, will return the string as-is. Otherwise will
+convert the argument, assumed to be a number, to the associated string level.
+Will die on failure.
+
+=head2 set_level
+
+Usage:
+
+ Log::ger::Util::set_level($level);
+
+Set log level to C<$level>, which can be a string or numeric level. Will die on
+failure.
+
+=head2 add_hook
+
+=head2 add_per_target_hook
+
+=head2 remove_hook
+
+=head2 remove_per_target_hook
+
+=head2 reset_hooks
+
+=head2 reset_per_target_hooks
+
+=head2 empty_hooks
+
+=head2 empty_per_target_hooks
+
+=head2 save_hooks
+
+=head2 save_per_target_hooks
+
+=head2 restore_hooks
+
+=head2 restore_per_target_hooks
+
+=head2 reinit_target
+
+=head2 reinit_all_targets
+
+=head2 set_plugin
 
 =head1 AUTHOR
 

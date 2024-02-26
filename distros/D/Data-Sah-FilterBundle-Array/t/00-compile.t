@@ -6,9 +6,10 @@ use warnings;
 
 use Test::More;
 
-plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
+    'Data/Sah/Filter/perl/Array/arrayify.pm',
     'Data/Sah/Filter/perl/Array/dupenum.pm',
     'Data/Sah/Filter/perl/Array/dupestr.pm',
     'Data/Sah/FilterBundle/Array.pm'

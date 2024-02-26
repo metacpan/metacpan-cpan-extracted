@@ -40,6 +40,7 @@
 #include "spvm_api_internal.h"
 #include "spvm_api_mutex.h"
 #include "spvm_mutex.h"
+#include "spvm_utf8.h"
 
 static const char* FILE_NAME = "spvm_api.c";
 
@@ -310,6 +311,7 @@ SPVM_ENV* SPVM_API_new_env(void) {
     SPVM_API_spvm_stdin,
     SPVM_API_spvm_stdout,
     SPVM_API_spvm_stderr,
+    SPVM_API_check_bootstrap_method,
   };
   SPVM_ENV* env = calloc(1, sizeof(env_init));
   if (env == NULL) {
@@ -2089,34 +2091,24 @@ SPVM_OBJECT* SPVM_API_get_compile_type_name(SPVM_ENV* env, SPVM_VALUE* stack, co
 }
 
 SPVM_OBJECT* SPVM_API_new_stack_trace_no_mortal(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* exception, SPVM_RUNTIME_METHOD* method, int32_t line) {
-
+  
   if (stack[SPVM_API_C_STACK_INDEX_CALL_DEPTH].ival > 100) {
     return exception;
   }
-
+  
   SPVM_RUNTIME* runtime = env->runtime;
-
+  
   SPVM_RUNTIME_BASIC_TYPE* basic_type = method->current_basic_type;
   const char* basic_type_name = basic_type->name;
   const char* method_name = method->name;
-
-  const char* class_dir = basic_type->class_dir;
-  const char* class_dir_sep;
-  if (class_dir) {
-    class_dir_sep = "/";
-  }
-  else {
-    class_dir = "";
-    class_dir_sep = "";
-  }
   
-  const char* class_rel_file = basic_type->class_rel_file;
+  const char* class_file = basic_type->file;
   
   // Basic type name and method name
   const char* new_line_part = "\n  ";
   const char* arrow_part = "->";
   const char* at_part = " at ";
-
+  
   // Exception
   const char* exception_bytes = SPVM_API_get_chars(env, stack, exception);
   int32_t exception_length = SPVM_API_length(env, stack, exception);
@@ -2129,10 +2121,8 @@ SPVM_OBJECT* SPVM_API_new_stack_trace_no_mortal(SPVM_ENV* env, SPVM_VALUE* stack
   total_length += strlen(arrow_part);
   total_length += strlen(method_name);
   total_length += strlen(at_part);
-  total_length += strlen(class_dir);
-  total_length += strlen(class_dir_sep);
-  total_length += strlen(class_rel_file);
-
+  total_length += strlen(class_file);
+  
   const char* line_part = " line ";
   char line_str[20];
   
@@ -2149,18 +2139,16 @@ SPVM_OBJECT* SPVM_API_new_stack_trace_no_mortal(SPVM_ENV* env, SPVM_VALUE* stack
     (void*)(exception_bytes),
     exception_length
   );
-
+  
   sprintf(
     (char*)new_exception_bytes + exception_length,
-    "%s%s%s%s%s%s%s%s%s%" PRId32,
+    "%s%s%s%s%s%s%s%" PRId32,
     new_line_part,
     basic_type_name,
     arrow_part,
     method_name,
     at_part,
-    class_dir,
-    class_dir_sep,
-    class_rel_file,
+    class_file,
     line_part,
     line
   );
@@ -2206,15 +2194,7 @@ void SPVM_API_say(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* string) {
   fputc('\n', runtime->spvm_stdout);
 }
 
-void SPVM_API_warn(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* string, const char* class_dir, const char* class_rel_file, int32_t line) {
-  const char* class_dir_sep;
-  if (class_dir) {
-    class_dir_sep = "/";
-  }
-  else {
-    class_dir_sep = "";
-    class_dir = "";
-  }
+void SPVM_API_warn(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* string, const char* file, int32_t line) {
   
   FILE* spvm_stderr = SPVM_API_RUNTIME_get_spvm_stderr(env->runtime);
   
@@ -2229,7 +2209,7 @@ void SPVM_API_warn(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* string, const 
       // Add line and file information if last character is not '\n'
       int32_t add_line_file;
       if (bytes[string_length - 1] != '\n') {
-        fprintf(spvm_stderr, "\n  at %s%s%s line %d\n", class_dir, class_dir_sep, class_rel_file, line);
+        fprintf(spvm_stderr, "\n  at %s line %d\n", file, line);
       }
     }
     else {
@@ -2241,7 +2221,7 @@ void SPVM_API_warn(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* string, const 
   }
   
   if (empty_or_undef) {
-    fprintf(spvm_stderr, "Warning\n  at %s%s%s line %d\n", class_dir, class_dir_sep, class_rel_file, line);
+    fprintf(spvm_stderr, "Warning\n  at %s line %d\n", file, line);
   }
 }
 
@@ -2327,54 +2307,6 @@ const char* SPVM_API_dumpc(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object
   return dump_chars;
 }
 
-#define utf_cont(ch)  (((ch) & 0xc0) == 0x80)
-#define SPVM_UTF8PROC_ERROR_INVALIDUTF8 -3
-static ptrdiff_t spvm_utf8proc_iterate(const uint8_t *str, ptrdiff_t strlen, int32_t *dst) {
-  uint32_t uc;
-  const uint8_t *end;
-  
-  *dst = -1;
-  if (!strlen) return 0;
-  end = str + ((strlen < 0) ? 4 : strlen);
-  uc = *str++;
-  if (uc < 0x80) {
-    *dst = uc;
-    return 1;
-  }
-  // Must be between 0xc2 and 0xf4 inclusive to be valid
-  if ((uc - 0xc2) > (0xf4-0xc2)) return SPVM_UTF8PROC_ERROR_INVALIDUTF8;
-  if (uc < 0xe0) {         // 2-byte sequence
-     // Must have valid continuation character
-     if (str >= end || !utf_cont(*str)) return SPVM_UTF8PROC_ERROR_INVALIDUTF8;
-     *dst = ((uc & 0x1f)<<6) | (*str & 0x3f);
-     return 2;
-  }
-  if (uc < 0xf0) {        // 3-byte sequence
-     if ((str + 1 >= end) || !utf_cont(*str) || !utf_cont(str[1]))
-        return SPVM_UTF8PROC_ERROR_INVALIDUTF8;
-     // Check for surrogate chars
-     if (uc == 0xed && *str > 0x9f)
-         return SPVM_UTF8PROC_ERROR_INVALIDUTF8;
-     uc = ((uc & 0xf)<<12) | ((*str & 0x3f)<<6) | (str[1] & 0x3f);
-     if (uc < 0x800)
-         return SPVM_UTF8PROC_ERROR_INVALIDUTF8;
-     *dst = uc;
-     return 3;
-  }
-  // 4-byte sequence
-  // Must have 3 valid continuation characters
-  if ((str + 2 >= end) || !utf_cont(*str) || !utf_cont(str[1]) || !utf_cont(str[2]))
-     return SPVM_UTF8PROC_ERROR_INVALIDUTF8;
-  // Make sure in correct range (0x10000 - 0x10ffff)
-  if (uc == 0xf0) {
-    if (*str < 0x90) return SPVM_UTF8PROC_ERROR_INVALIDUTF8;
-  } else if (uc == 0xf4) {
-    if (*str > 0x8f) return SPVM_UTF8PROC_ERROR_INVALIDUTF8;
-  }
-  *dst = ((uc & 7)<<18) | ((*str & 0x3f)<<12) | ((str[1] & 0x3f)<<6) | (str[2] & 0x3f);
-  return 4;
-}
-
 void SPVM_API_dump_recursive(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, int32_t* depth, SPVM_STRING_BUFFER* string_buffer, SPVM_HASH* address_symtable) {
   
   SPVM_RUNTIME* runtime = env->runtime;
@@ -2402,7 +2334,7 @@ void SPVM_API_dump_recursive(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* obje
         }
         
         int32_t dst;
-        int32_t utf8_char_len = (int32_t)spvm_utf8proc_iterate((const uint8_t*)(chars + offset), chars_length, &dst);
+        int32_t utf8_char_len = (int32_t)SPVM_UTF8_iterate((const uint8_t*)(chars + offset), chars_length, &dst);
         
         int32_t uchar;
         if (utf8_char_len > 0) {
@@ -4355,4 +4287,40 @@ FILE* SPVM_API_spvm_stderr(SPVM_ENV* env, SPVM_VALUE* stack) {
   FILE* spvm_stderr = env->api->runtime->get_spvm_stderr(env->runtime);
   
   return spvm_stderr;
+}
+
+int32_t SPVM_API_check_bootstrap_method(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name) {
+  
+  int32_t error_id = 0;
+  
+  void* class_basic_type = env->api->runtime->get_basic_type_by_name(env->runtime, basic_type_name);
+  void* method = env->api->basic_type->get_method_by_name(env->runtime, class_basic_type, "main");
+  
+  if (method) {
+    int32_t is_class_method = env->api->method->is_class_method(env->runtime, method);
+    
+    if (is_class_method) {
+      int32_t args_length = env->api->method->get_args_length(env->runtime, method);
+      
+      if (!(args_length == 0)) {
+        error_id = env->die(env, stack, "The length of the arguments of the \"main\" method in the \"%s\" class must be 0.", basic_type_name, __func__, FILE_NAME, __LINE__);
+      }
+      else {
+        void* return_basic_type = env->api->method->get_return_basic_type(env->runtime, method);
+        const char* return_basic_type_name = env->api->basic_type->get_name(env->runtime, return_basic_type);
+        
+        if (!(strcmp(return_basic_type_name, "void") == 0)) {
+          error_id = env->die(env, stack, "The return type of the \"main\" method in the \"%s\" class must be the void type.", basic_type_name, __func__, FILE_NAME, __LINE__);
+        }
+      }
+    }
+    else {
+      error_id = env->die(env, stack, "The \"main\" method in the \"%s\" class must be a class method.", basic_type_name, __func__, FILE_NAME, __LINE__);
+    }
+  }
+  else {
+    error_id = env->die(env, stack, "The \"main\" method in the \"%s\" class must be defined.", basic_type_name, __func__, FILE_NAME, __LINE__);
+  }
+  
+  return error_id;
 }

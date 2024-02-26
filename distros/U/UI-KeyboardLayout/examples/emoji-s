@@ -1,0 +1,415 @@
+﻿	❤️  heart + VS16
+		Enjoy (12)
+    🙂 Slightly Smiling Face
+    😌 Relieved Face
+    ☺ Smiling Face
+    😊 Smiling Face With Smiling Eyes
+    😃 Smiling Face With Open Mouth
+    😄 Smiling Face With Open Mouth & Smiling Eyes
+    😆 Smiling Face With Open Mouth & Closed Eyes
+    😅 Smiling Face With Open Mouth & Cold Sweat
+    😀 Grinning Face
+    😁 Grinning Face With Smiling Eyes
+    😂 Face With Tears of Joy
+    🤣 Rolling on the Floor Laughing
+
+		Enjoy+objectified/love (12)
+    👌 OK Hand
+    👍 Thumbs Up
+    😎 Smiling Face With Sunglasses
+    😍 Smiling Face With Heart-Eyes
+    😘 Face Blowing a Kiss
+    🤗 Hugging Face
+    😗 Kissing Face
+    😙 Kissing Face With Smiling Eyes
+    😚 Kissing Face With Closed Eyes
+    💏 Kiss
+    💑 Couple With Heart
+    💋 Kiss Mark
+
+		disenjoy (Ia, 12)
+    😑 Expressionless Face
+    😐 Neutral Face
+    😒 Unamused Face
+    🙁 Slightly Frowning Face
+    ☹ Frowning Face
+    😦 Frowning Face With Open Mouth
+    😟 Worried Face
+    😞 Disappointed Face
+    😬 Grimacing Face
+    😠 Angry Face
+    😧 Anguished Face
+    😢 Crying Face
+
+		disenjoy + strange (IIa, 12)
+    🤨 Face With Raised Eyebrow    
+    😏 Smirking Face
+    🙄 Face With Rolling Eyes
+    😕 Confused Face
+    😖 Confounded Face
+    😥 Disappointed but Relieved Face
+    😡 Pouting Face
+    👿 Angry Face With Horns
+    🤦 Person Facepalming
+    😭 Loudly Crying Face
+    🤢 Nauseated Face
+    🤮 Face Vomiting
+
+       Objectified (hate?!)
+    👎 Thumbs Down
+    🖕 Middle Finger
+    😵 Dizzy Face
+    💩 Pile of Poo
+    👊 Oncoming Fist
+    ❤ Heart
+
+		Feelings
+    😇 Smiling Face With Halo
+    😈 Smiling Face With Horns
+    🤔 Thinking Face
+    😉 Winking Face
+    🤩 Star-Struck
+    😔 Pensive Face
+    😲 Astonished Face
+    😩 Weary Face
+    😨 Fearful Face
+    😱 Face Screaming in Fear
+    🤯 Exploding Head
+    😰 Face With Open Mouth & Cold Sweat
+    😳 Flushed Face
+    🤪 Crazy Face
+    😛 Face With Stuck-Out Tongue
+    😜 Face With Stuck-Out Tongue & Winking Eye
+    😝 Face With Stuck-Out Tongue & Closed Eyes
+    🤭 Face With Hand Over Mouth
+    🫢 Face with Open Eyes and Hand Over Mouth [v14]
+    🤦‍♂️ Man Facepalming
+    🤦‍♀️ Woman Facepalming
+
+		Pre v14, ambiguous; in v14, new one added  https://www.unicode.org/L2/L2019/19304-face-hands-over-mouth.pdf
+			‘polite snickering’ as in “tee hee” and (2) ‘astonishment’ as in “they said WHAT?!”
+    🤭 Face With Hand Over Mouth
+    🫢 Face with Open Eyes and Hand Over Mouth
+
+		We miss from newer Unicode ([dis]enjoy)
+    🥰 Smiling Face with Hearts
+    🥲 Smiling Face with Tear
+    🥹 Face Holding Back Tears
+
+		We miss from newer Unicode (others)
+    🥵 Hot Face
+    🥶 Cold Face
+    🥴 Woozy Face
+    🥳 Partying Face
+    🥺 Pleading Face
+    🥱 Yawning Face
+    🥸 Disguised Face
+    🫣 Face with Peeking Eye
+    🫡 Saluting Face
+    🫥 Dotted Line Face
+    🫤 Face with Diagonal Mouth
+    
+    😋 Face Savouring Delicious Food
+    😶 Face Without Mouth
+    😣 Persevering Face
+    😮 Face With Open Mouth
+    🤐 Zipper-Mouth Face
+    😯 Hushed Face
+    😪 Sleepy Face
+    😫 Tired Face
+    😴 Sleeping Face
+    🤤 Drooling Face
+    😓 Face With Cold Sweat
+    🙃 Upside-Down Face
+    🤑 Money-Mouth Face
+    😤 Face With Steam From Nose
+    🤬 Face With Symbols Over Mouth
+    😷 Face With Medical Mask
+    🤒 Face With Thermometer
+    🤕 Face With Head-Bandage
+    🤧 Sneezing Face
+    🤠 Cowboy Hat Face
+    🤡 Clown Face
+    🤥 Lying Face
+    🤫 Shushing Face
+    🧐 Face With Monocle
+    🤓 Nerd Face
+    👹 Ogre
+    👺 Goblin
+    💀 Skull
+    👻 Ghost
+    👽 Alien
+    🤖 Robot Face
+    😺 Smiling Cat Face With Open Mouth
+    😸 Grinning Cat Face With Smiling Eyes
+    😹 Cat Face With Tears of Joy
+    😻 Smiling Cat Face With Heart-Eyes
+    😼 Cat Face With Wry Smile
+    😽 Kissing Cat Face With Closed Eyes
+    🙀 Weary Cat Face
+    😿 Crying Cat Face
+    😾 Pouting Cat Face
+    👶 Baby
+    👦 Boy
+    👧 Girl
+    👨 Man
+    👩 Woman
+    👴 Old Man
+    👵 Old Woman
+    👨‍⚕️ Man Health Worker
+    👩‍⚕️ Woman Health Worker
+    👨‍🎓 Man Student
+    👩‍🎓 Woman Student
+    👨‍⚖️ Man Judge
+    👩‍⚖️ Woman Judge
+    👨‍🌾 Man Farmer
+    👩‍🌾 Woman Farmer
+    👨‍🍳 Man Cook
+    👩‍🍳 Woman Cook
+    👨‍🔧 Man Mechanic
+    👩‍🔧 Woman Mechanic
+    👨‍🏭 Man Factory Worker
+    👩‍🏭 Woman Factory Worker
+    👨‍💼 Man Office Worker
+    👩‍💼 Woman Office Worker
+    👨‍🔬 Man Scientist
+    👩‍🔬 Woman Scientist
+    👨‍💻 Man Technologist
+    👩‍💻 Woman Technologist
+    👨‍🎤 Man Singer
+    👩‍🎤 Woman Singer
+    👨‍🎨 Man Artist
+    👩‍🎨 Woman Artist
+    👨‍✈️ Man Pilot
+    👩‍✈️ Woman Pilot
+    👨‍🚀 Man Astronaut
+    👩‍🚀 Woman Astronaut
+    👨‍🚒 Man Firefighter
+    👩‍🚒 Woman Firefighter
+    👮 Police Officer
+    👮‍♂️ Man Police Officer
+    👮‍♀️ Woman Police Officer
+    🕵 Detective
+    🕵️‍♂️ Man Detective
+    🕵️‍♀️ Woman Detective
+    💂 Guard
+    💂‍♂️ Man Guard
+    💂‍♀️ Woman Guard
+    👷 Construction Worker
+    👷‍♂️ Man Construction Worker
+    👷‍♀️ Woman Construction Worker
+    🤴 Prince
+    👸 Princess
+    👳 Person Wearing Turban
+    👳‍♂️ Man Wearing Turban
+    👳‍♀️ Woman Wearing Turban
+    👲 Man With Chinese Cap
+    🧕 Woman With Headscarf
+    🧔 Bearded Person
+    👱 Blond-Haired Person
+    👱‍♂️ Blond-Haired Man
+    👱‍♀️ Blond-Haired Woman
+    🤵 Man in Tuxedo
+    👰 Bride With Veil
+    🤰 Pregnant Woman
+    🤱 Breast-Feeding
+    👼 Baby Angel
+    🎅 Santa Claus
+    🤶 Mrs. Claus
+    🧙‍♀️ Woman Mage
+    🧙‍♂️ Man Mage
+    🧚‍♀️ Woman Fairy
+    🧚‍♂️ Man Fairy
+    🧛‍♀️ Woman Vampire
+    🧛‍♂️ Man Vampire
+    🧜‍♀️ Mermaid
+    🧜‍♂️ Merman
+    🧝‍♀️ Woman Elf
+    🧝‍♂️ Man Elf
+    🧞‍♀️ Woman Genie
+    🧞‍♂️ Man Genie
+    🧟‍♀️ Woman Zombie
+    🧟‍♂️ Man Zombie
+    🙍 Person Frowning
+    🙍‍♂️ Man Frowning
+    🙍‍♀️ Woman Frowning
+    🙎 Person Pouting
+    🙎‍♂️ Man Pouting
+    🙎‍♀️ Woman Pouting
+    🙅 Person Gesturing No
+    🙅‍♂️ Man Gesturing No
+    🙅‍♀️ Woman Gesturing No
+    🙆 Person Gesturing OK
+    🙆‍♂️ Man Gesturing OK
+    🙆‍♀️ Woman Gesturing OK
+    💁 Person Tipping Hand
+    💁‍♂️ Man Tipping Hand
+    💁‍♀️ Woman Tipping Hand
+    🙋 Person Raising Hand
+    🙋‍♂️ Man Raising Hand
+    🙋‍♀️ Woman Raising Hand
+    🙇 Person Bowing
+    🙇‍♂️ Man Bowing
+    🙇‍♀️ Woman Bowing
+    🤷 Person Shrugging
+    🤷‍♂️ Man Shrugging
+    🤷‍♀️ Woman Shrugging
+    💆 Person Getting Massage
+    💆‍♂️ Man Getting Massage
+    💆‍♀️ Woman Getting Massage
+    💇 Person Getting Haircut
+    💇‍♂️ Man Getting Haircut
+    💇‍♀️ Woman Getting Haircut
+    🚶 Person Walking
+    🚶‍♂️ Man Walking
+    🚶‍♀️ Woman Walking
+    🏃 Person Running
+    🏃‍♂️ Man Running
+    🏃‍♀️ Woman Running
+    💃 Woman Dancing
+    🕺 Man Dancing
+    👯 People With Bunny Ears Partying
+    👯‍♂️ Men With Bunny Ears Partying
+    👯‍♀️ Women With Bunny Ears Partying
+    🧖‍♀️ Woman in Steamy Room
+    🧖‍♂️ Man in Steamy Room
+    🕴 Man in Business Suit Levitating
+    🗣 Speaking Head
+    👤 Bust in Silhouette
+    👥 Busts in Silhouette
+    👫 Man and Woman Holding Hands
+    👬 Two Men Holding Hands
+    👭 Two Women Holding Hands
+    👨‍❤️‍💋‍👨 Kiss: Man, Man
+    👩‍❤️‍💋‍👩 Kiss: Woman, Woman
+    👨‍❤️‍👨 Couple With Heart: Man, Man
+    👩‍❤️‍👩 Couple With Heart: Woman, Woman
+    👪 Family
+    👨‍👩‍👦 Family: Man, Woman, Boy
+    👨‍👩‍👧 Family: Man, Woman, Girl
+    👨‍👩‍👧‍👦 Family: Man, Woman, Girl, Boy
+    👨‍👩‍👦‍👦 Family: Man, Woman, Boy, Boy
+    👨‍👩‍👧‍👧 Family: Man, Woman, Girl, Girl
+    👨‍👨‍👦 Family: Man, Man, Boy
+    👨‍👨‍👧 Family: Man, Man, Girl
+    👨‍👨‍👧‍👦 Family: Man, Man, Girl, Boy
+    👨‍👨‍👦‍👦 Family: Man, Man, Boy, Boy
+    👨‍👨‍👧‍👧 Family: Man, Man, Girl, Girl
+    👩‍👩‍👦 Family: Woman, Woman, Boy
+    👩‍👩‍👧 Family: Woman, Woman, Girl
+    👩‍👩‍👧‍👦 Family: Woman, Woman, Girl, Boy
+    👩‍👩‍👦‍👦 Family: Woman, Woman, Boy, Boy
+    👩‍👩‍👧‍👧 Family: Woman, Woman, Girl, Girl
+    👨‍👦 Family: Man, Boy
+    👨‍👦‍👦 Family: Man, Boy, Boy
+    👨‍👧 Family: Man, Girl
+    👨‍👧‍👦 Family: Man, Girl, Boy
+    👨‍👧‍👧 Family: Man, Girl, Girl
+    👩‍👦 Family: Woman, Boy
+    👩‍👦‍👦 Family: Woman, Boy, Boy
+    👩‍👧 Family: Woman, Girl
+    👩‍👧‍👦 Family: Woman, Girl, Boy
+    👩‍👧‍👧 Family: Woman, Girl, Girl
+    🤳 Selfie
+    💪 Flexed Biceps
+    👈 Backhand Index Pointing Left
+    👉 Backhand Index Pointing Right
+    ☝ Index Pointing Up
+    👆 Backhand Index Pointing Up
+    👇 Backhand Index Pointing Down
+    ✌ Victory Hand
+    🤞 Crossed Fingers
+    🖖 Vulcan Salute
+    🤘 Sign of the Horns
+    🖐 Raised Hand With Fingers Splayed
+    ✋ Raised Hand
+    ✊ Raised Fist
+    🤛 Left-Facing Fist
+    🤜 Right-Facing Fist
+    🤚 Raised Back of Hand
+    👋 Waving Hand
+    🤟 Love-You Gesture
+    ✍ Writing Hand
+    👏 Clapping Hands
+    👐 Open Hands
+    🙌 Raising Hands
+    🤲 Palms Up Together
+    🙏 Folded Hands
+    🤝 Handshake
+    💅 Nail Polish
+    👂 Ear
+    👃 Nose
+    👣 Footprints
+    👀 Eyes
+    👁 Eye
+    🧠 Brain
+    👅 Tongue
+    👄 Mouth
+    👓 Glasses
+    🕶 Sunglasses
+    👔 Necktie
+    👕 T-Shirt
+    👖 Jeans
+    🧣 Scarf
+    🧤 Gloves
+    🧥 Coat
+    🧦 Socks
+    👗 Dress
+    👘 Kimono
+    👙 Bikini
+    👚 Woman’s Clothes
+    👛 Purse
+    👜 Handbag
+    👝 Clutch Bag
+    🎒 School Backpack
+    👞 Man’s Shoe
+    👟 Running Shoe
+    👠 High-Heeled Shoe
+    👡 Woman’s Sandal
+    👢 Woman’s Boot
+    👑 Crown
+    👒 Woman’s Hat
+    🎩 Top Hat
+    🎓 Graduation Cap
+    🧢 Billed Cap
+    ⛑ Rescue Worker’s Helmet
+    💄 Lipstick
+    💍 Ring
+    🌂 Closed Umbrella
+    ☂ Umbrella
+    💼 Briefcase
+
+https://emojipedia.org/emoji-11.0/
+    🥰 Smiling Face with Hearts
+    🥵 Hot Face
+    🥶 Cold Face
+    🥴 Woozy Face
+    🥳 Partying Face
+    🥺 Pleading Face
+
+New Emojis in Version 12.0
+
+    🥱 Yawning Face
+
+New Emojis in Version 13.0
+
+    🥲 Smiling Face with Tear
+    🥸 Disguised Face
+
+New Emojis in Version 14.0
+
+    🫠 Melting Face
+    🫢 Face with Open Eyes and Hand Over Mouth [+++]
+    🫣 Face with Peeking Eye
+    🫡 Saluting Face
+    🫥 Dotted Line Face
+    🫤 Face with Diagonal Mouth
+    🥹 Face Holding Back Tears
+
+    🫵 Index Pointing at the Viewer
+    🫶 Heart Hands
+    🫦 Biting Lip
+
+New Emojis in Version 15.0
+
+    🫨 Shaking Face

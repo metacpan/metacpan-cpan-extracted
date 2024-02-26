@@ -31,8 +31,8 @@ else {
 	
 	my @words = $locale->split_words($text);
 	is_deeply(\@words, [
-		'adf543', '.', ', ', 'Tiếng ', 'Viết', "\n", "\r", '45dfr.', 'A ', 'new ',
-		'sentence'
+		'adf543', '.', ',', ' ', 'Tiếng', ' ', 'Viết', "\n", "\r", '45dfr.', 'A', ' ', 'new', ' ',
+		'sentence' 
 	], 'Split words');
 
 	my @sentences = $locale->split_sentences($text);

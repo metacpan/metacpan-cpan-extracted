@@ -7,7 +7,7 @@ use warnings;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2024-01-15'; # DATE
 our $DIST = 'Tie-Array-TableData'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 sub TIEARRAY {
     require Module::Load::Util;
@@ -16,7 +16,7 @@ sub TIEARRAY {
     my ($tabledata, $row_as_hashref) = @_;
 
     die "Please specify a TableData module to instantiate (string or 2-element array)" unless $tabledata;
-    my $tdobj = Module::Load::Util::instantiate_class_with_optional_args($tabledata);
+    my $tdobj = Module::Load::Util::instantiate_class_with_optional_args({ns_prefix=>"TableData"}, $tabledata);
 
     unless ($tdobj->can("get_item_at_pos")) {
         warn "TableData does not support get_item_at_pos(), applying the inefficient implementation";
@@ -96,14 +96,14 @@ Tie::Array::TableData - Access TableData object as a tied array
 
 =head1 VERSION
 
-This document describes version 0.001 of Tie::Array::TableData (from Perl distribution Tie-Array-TableData), released on 2024-01-15.
+This document describes version 0.003 of Tie::Array::TableData (from Perl distribution Tie-Array-TableData), released on 2024-01-15.
 
 =head1 SYNOPSIS
 
  use Tie::Array::TableData;
 
-  tie my @ary, 'Tie::Array::TableData', 'Example::DeNiro'   ; # access rows as arrayref
- #tie my @ary, 'Tie::Array::TableData', 'Example::DeNiro', 1; # access rows as hashref
+  tie my @ary, 'Tie::Array::TableData', 'Sample::DeNiro'   ; # access rows as arrayref
+ #tie my @ary, 'Tie::Array::TableData', 'Sample::DeNiro', 1; # access rows as hashref
 
  # get the second row
  my $row = $ary[1];

@@ -1,0 +1,62 @@
+# PODNAME: RDF::Cowl::Lib::Gen::Class::UStrBuf
+# ABSTRACT: Generated docs for RDF::Cowl::Ulib::UStrBuf
+
+## DO NOT EDIT
+## Generated via maint/tt/Class.pod.tt
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+RDF::Cowl::Lib::Gen::Class::UStrBuf - Generated docs for RDF::Cowl::Ulib::UStrBuf
+
+=head1 VERSION
+
+version 1.0.0
+
+=head1 MAIN MODULE
+
+L<RDF::Cowl::Ulib::UStrBuf>
+
+=head1 METHODS
+
+=head2 ustrbuf_to_ustring
+
+B<Signature>:
+
+  $self->ustrbuf_to_ustring()
+
+B<Params>:
+
+  UStrBuf $buf 
+
+Documentation:
+
+  Converts the string buffer into a UString and deinitializes the buffer.
+  
+  @param buf String buffer.
+  @return String.
+  
+  @note After calling this function, the string buffer must not be used anymore.
+
+=over 2
+
+B<C function name>: C<< ustrbuf_to_ustring >>
+
+=back
+
+=head1 AUTHOR
+
+Zakariyya Mughal <zmughal@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 by Auto-Parallel Technologies, Inc..
+
+This is free software, licensed under Eclipse Public License - v 2.0.
+
+=cut

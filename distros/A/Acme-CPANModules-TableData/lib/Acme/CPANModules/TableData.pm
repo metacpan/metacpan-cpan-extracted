@@ -6,9 +6,9 @@ use warnings;
 use Acme::CPANModulesUtil::Misc;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-12-29'; # DATE
+our $DATE = '2024-01-22'; # DATE
 our $DIST = 'Acme-CPANModules-TableData'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 my $text = <<'MARKDOWN';
 
@@ -40,6 +40,16 @@ modules in local installation or CPAN.
 well as CSV/TSV/JSON/YAML files) using SQL.
 
 
+**Sah schemas**
+
+<pm:Sah::Schemas::TableData>
+
+
+**Tie**
+
+<pm:Tie::Array::TableData>
+
+
 **Miscelaneous**
 
 <pm:Perinci::Sub::Gen::AccessTable> accepts TableData module.
@@ -69,7 +79,7 @@ Acme::CPANModules::TableData - List of modules related to TableData
 
 =head1 VERSION
 
-This document describes version 0.001 of Acme::CPANModules::TableData (from Perl distribution Acme-CPANModules-TableData), released on 2023-12-29.
+This document describes version 0.002 of Acme::CPANModules::TableData (from Perl distribution Acme-CPANModules-TableData), released on 2024-01-22.
 
 =head1 DESCRIPTION
 
@@ -98,6 +108,14 @@ modules in local installation or CPAN.
 L<fsql> (from L<App::fsql>) allows you to query C<TableData::*> modules (as
 well as CSV/TSV/JSON/YAML files) using SQL.
 
+B<Sah schemas>
+
+L<Sah::Schemas::TableData>
+
+B<Tie>
+
+L<Tie::Array::TableData>
+
 B<Miscelaneous>
 
 L<Perinci::Sub::Gen::AccessTable> accepts TableData module.
@@ -121,6 +139,12 @@ Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 =item L<App::fsql>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item L<Sah::Schemas::TableData>
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item L<Tie::Array::TableData>
 
 =item L<Perinci::Sub::Gen::AccessTable>
 
@@ -203,7 +227,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

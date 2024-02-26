@@ -68,6 +68,6 @@ is($locale->format_number(-12345678, '#,####,00%'), '-1234 5678 00%', 'Format 
 
 # RBNF
 is($locale->format_number(0, 'spellout-numbering-year'), 'нула', 'RBNF: Spell out year 0');
-is($locale->format_number('-0.0', 'spellout-numbering'), 'минус нула кома нула', 'RBNF: Spell out -0.0');
+is($locale->format_number('-0.0', 'spellout-numbering'), 'минус нула цяло и нула', 'RBNF: Spell out -0.0');
 is($locale->format_number(123456, 'roman-lower'), '123 456', 'Number grater than max value');
 is($locale->format_number(1234, 'roman-lower'), 'mccxxxiv', 'Roman Number');

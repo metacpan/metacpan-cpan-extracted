@@ -1,0 +1,817 @@
+FF locks in Latin?!  Even with v73 compiled with klc2c — fixed by omitting OEM_8.
+
+In Chrome (with AltGr; Menu-F2 works, but the rest of F1–F4 gives too many “actions”):
+  🙂😌☺😊😃😄😆?😀😁😂🤣  😑😐😒🙁☹😦😟😞😬?😧😢 👌👍😎😍😘🤗😗?😚💏💑💋 🤨😏🙄😕😖😥😡👿🤦?🤢🤮
+  🙂😌☺😊😃😄😆?😀?😂🤣  😑😐😒🙁☹😦😟😞😬?😧😢 👌👍😎😍😘🤗😗?😚?💑💋 🤨😏🙄😕😖😥😡👿🤦?🤢🤮  FF in RU
+
+Latin has -> ♫ on multicomp in Hebrew and Cyrillic prefixes???!!!  (Should be triggered only on AltGr-Invertor???)
+
+Latin duplications (meaningful) bindings on AltGr-inverted prefix key.
+
+(Shift)-Menu-F12 is Compose (³).
+
+In RU, Dial-a-dash is on AltGr-inverted Green!  Without inversion, ♫ is inserted (vs. ♪ on other prefix keys).
+
+Maybe it is better to map synthetic Ctrl-Alt- bindings to AltGr- (as opposed to “Greek” lAlt-lCtrl-)???
+
+klc2c emits junk (instead of “empty”) if sections were missing.
+
+lAlt-Space in console not working anymore. lAlt-Char search not working in FCW; likewise for input in CMD.  But lAlt-\ works in FCW,
+and not in CMD.  keycodes.exe shows the same “translation” as English(US), but empty “Key”.  raw_… cannot see char on lAlt-a; neither
+by default, nor with “cooked” argument.
+						DONE and DOCUMENTED
+
+lCtrl-Menu-, produces “ — ¼”.  (Header file contains the type LIGATURE3, but the length in msklc_altgr(_r2l).c was 4.)
+						DONE
+
+Control-@ does not produce "\000". (But Control-2 does.)
+			But how a console application can see that it got 0 without using back-scan (sp?)???
+
+On RU AltGr-- д emits ¯д.  AltGr-- AltGr-F1 emits ¯🙂 = ¯🙂.	(Actually, AltGr- is not a dead key???)
+
+Duplication of VK_-codes does not duplicate LIGATURES.
+
+Binding like ByPairsPrefix[0020.06f0](Face(Latin)) works only with (FullFace(Latin)).  (VK keys not in Face(Latin).)
+How to preserve determinism — but make this less error-prone?
+    ByPairsPrefix cannot bind SPACE on extra-modifiers maps (even without SPACE in @skip_extra_layers_WIN).  (Needs FullFace()!)
+						DOCUMENTED; a workaround put into the kbdd.
+
+
+Document that if different keys have identical chars, to make an assignment to prefix key maps one may need to define a special
+layer with different values at these positions.
+
+Put ⋮ ⋯ ⋰ ⋱ to be more accessible???  Duplicate RET - / \ ; maybe would not be critical???  ⪇≦ ⪈≧
+
+		Was with v0.73; seems very wrong duplication — and SPACE is too short:
+
+33	OEM_COMMA	0	002c	003c	-1	-1	00b8@	2264	%%	%%	00ab	-1	0591	05a4	-1	-1	-1	-1	-1	%%	%%	%%	2aa1	-1	-1	%%	%%	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	// ,, <,  ,  , ¸, ≤,  — ,  — , «,  , ֑, ֤,  ,  ,  ,  ,  ,  — ,  
+34	OEM_PERIOD	0	002e	003e	-1	-1	00b0@	2265	00b7	%%	2026	-1	05c3	059a	-1	-1	-1	-1	-1	-1	%%	-1	2aa2	-1	-1	-1	%%	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	// ., >,  ,  , °, ≥, ·, 𝄡𝄡, …,  , ׃, ֚,  ,  ,  ,  ,  ,  , 𝄡𝄡,  , ⪢
+7E	ABNT_C2		0	002e	003e	-1	-1	00b0@	2265	00b7	%%	2026	-1	05c3	059a	-1	-1	-1	-1	-1	-1	%%	-1	2aa2	-1	-1	-1	%%	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	// ., >,  ,  , °, ≥, ·, 𝄡𝄡, …,  , ׃, ֚,  ,  ,  ,  ,  ,  , 𝄡𝄡,  , ⪢,
+53	DECIMAL		0	002e	-1	-1	-1	2502	-1	-1	-1	2503	-1	2578	-1	2574	-1	2579	-1	-1	2551	-1	2575	-1	257f	-1	%%	-1	257e	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	%%	-1	%%	-1	-1	-1	// .,  ,  ,  , │,  ,  ,  , ┃,  , ╸,  , ╴,  , ╹,  ,  , ║,  , ╵,  , ╿,  ,
+
+56	OEM_102		0	06f0@	00a0@	-1	-1	00b6	2767	-1	-1	044a	042a	05bf	05c7	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	// ۰,  ,  ,  , ¶, ❧,  ,  , ъ, Ъ, ֿ, ׇ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,
+7D	OEM_8		0	06f0@	00a0@	-1	-1	00b6	2767	-1	-1	044a	042a	05bf	05c7	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	// ۰,  ,  ,  , ¶, ❧,  ,  , ъ, Ъ, ֿ, ׇ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  
+73	ABNT_C1		0	06f0@	00a0@	-1	-1	00a3@	0301	// ۰,  ,  ,  , £, ́	// EXTENDED ARABIC-INDIC DIGIT ZERO, NO-BREAK SPACE,  ,  , POUND SIGN, COMBINING ACUTE ACCENT
+
+39	SPACE		0	0020	0138@	0020	-1	0192@	00a0@	//  , ĸ,  ,  , ƒ,  	// SPACE, LATIN SMALL LETTER KRA, SPACE,  , LATIN SMALL LETTER F WITH HOOK, NO-BREAK SPACE
+		From .C file (with lCtrl-lAlt- and Menu- bindings added — possibly with SHIFT: Compose and Compose³):
+  {VK_SPACE     ,0      ,' '      ,0x0138@ ,' '      ,WCH_NONE ,0x0192@   ,0x00a0@   ,0x06f0@   ,0x06e8@   ,0x06f0@   ,0x06e8@   },
+
+ABNT2 Brazil keyboard has OEM_102 (scancode 56) on the left (in PT with “\|”), and ABNT_C1 (scancode 73) on the right
+(in PT with “/?”).  (ABNT_C2 should have the “opposite separator” to PERIOD.)
+
+         https://www.win.tue.nl/~aeb/linux/kbd/scancodes-8.html
+ JIS keyboard has OEM_8 (scancode 7D) to the left of BACKSPACE (unmarked, or with “¥|” — with “¥” often substituted by “\” in
+ DOS???).  To the right of “/?” there is a key with “\_” OEM_102 (but with scancode 73, of ABNT_C1).
+
+  So to combine the ”full functionality” of both (with scancodes 56+73 and with scancodes 73+7D), one needs to duplicate 56 to 7D.
+
+    DOCUMENT THIS!
+    					DONE
+
+One should duplicate “the opposite of DECIMAL” to ABNT_C2.
+					DONE
+
+Mark=comment as “mirrored” extra entries in SHIFTSTATE.
+
+Mark the minimal representation of “modification bitmap” in SHIFTSTATE and in the header of layout columns.
+
+Need to duplicate VK_OEM_AX to another “redefinable” scancode or VK_CODE???
+
+Document restrictions of SGCAPS and dead keys (can one circumvent some of them by combining with CAPLOK???).
+					DONE
+
+Inline links to L<"More (random) rambling on assignment of key combinations">
+					DONE??
+
+Make %double_scan_VK the default of a customizable mapping.
+
+========================
+
+The current code producing SGCAPS lines cannot work with CAPLOKALTGR.
+					DONE
+
+Since CAPLOKALTGR affects not only the AltGr-keys, one should allow a way to force a particular value.  Likewise for CAPLOK.
+
+Make Compose⁴ show ⎄,    AltGr_Invert⁶ show ⤨ instead of “ ” 2008 (as we show on Apple bindings)
+
+Document choice of modifier flags:
+	No autogeneration of Ctrl-letters if l/rCTRL has more bits set than expected.
+					DOCUMENTED
+
+  only ø and SHIFT are affected by CAPSLOK and SGCAPS logic (so it is disabled by KANALOK — see below);
+  only those with ALT and CTRL are affected by CAPSLOKALTGR logic
+  all are affected by KANALOK logic (which turns up KANA flag — but it is “documented” otherwise?!)
+					DOCUMENTED
+
+How to implement (=merge internal nodes)interaction of prefix keys and keys producing multi-codepoint strings:
+
+  On the prefix tree of “multi-chars” some inner vertices may be multi-chars.  If it is defined, then we cannot define any vertex
+  after this vertex (but this is not confusing to the user).  If it is not defined, we need to define it to ♪ to avoid user’s
+  confustion.  CONCLUSION: defined sequences which have a defined prefix should be ignored.
+
+    This is as with the compose map???
+
+  Two vertices are compatible if the colors (codepoints) of outgoing edges do not intersect.  Out of immediate childs compatible
+  with the vertex choose one with smallest valence (to try to minimize conflicts); out of those compatible with it too choose
+  likewise etc.
+
+KANALOK seems to be used only when VK_KANA is down (locked by a physical keyboard); so, essentially, this allows VK_KANA to
+have effect on some keys (those with KANALOK), and no effect on tother keys (those without).  (Of course, this effect could be
+achieved also by duplicating entries in the columns with KBDKANA?!)
+			DOCUMENTED
+
+With our layout of modifiers bits, it seems that rCTRL (standalone) is affected by CAPSLOCK state.  How to check this?  This does
+not show in CMD or copy con nul???
+
+Ctrl-_ should produce 0x1f.  In fact, Ctrl-- produces 0x1f, and Ctrl-Shft-- produces 0x2001f in FCW (which usually cannot read
+above 0xFFFF from keyboard!).  (One can also get top-flags 4,6,8 instead of 2 with e.g. Ctrl-Q Ctrl-Alt-1, with the bottom
+being the bound key!)  But they perform as expected in CMD and "copy con nul"?!
+
+   Another mystery(?): in CMD, both Ctrl-2 and Ctrl-@ produce a control character shown as ^@.
+
+     It seems that our produced binding for Ctrl and Ctrl-Shift do not take into account Loya and Roya bits!!!  ???
+     Is it because of this that Ctrl-[]\ do not work in Cyrillic (where the base chars are not as expected)???
+
+All other combinations of modifier-keys are affected by CAPSLOCK.
+
+However, the implementation has WORD wModBits; so the bitmap on a character may go up to 16 bits!!!
+	https://dispoclavier.com/src/kbfrintu/kbfrintu.c
+  Uses flag 0x80 KBDGRPSELTAP as a modifier bit on a modifier key!!!
+	See the last message on:
+https://answers.microsoft.com/en-us/insider/forum/all/how-to-implement-multiple-deadkey-strokes/4ff38c09-b58c-490a-963e-3cc745dfb396
+
+  In Bépo wiki: B00 is the key to the left of Z (=B01; B=the second row from the bottom)
+
+
+============================== If one can make Win “mean ±Bold” (e.g., with KBD-flag 0x100)
+
+	!!!!!  Unfortunately, Win-accelerators act on VK_codes, so this would not work???   !!!!!!!
+		But this works with AltGr!
+
+============================== Orthogonality with Win allowed
+
+  (Assuming that Win is used only “with AltGr” or “with lCtrl-lAlt”, so does not conflict with system’s accelerators.)
+
+If A and B are two modifier keys, then “A⊕B 3-hook” consists of their combinations where at least one is down.  Likewise for
+A⊕B-squares, A⊕B⊕C-cubes.  Given a set S of certain combinations of modifiers in a set σ, likewise for sets T and τ, denote by S×T
+their combinations — provided σ ∩ τ = ∅.
+
+First, introduce a shortcut: note that if AltGr is down, one can use Win, and when AltGr is not down, one can use lCtrl.  So call
+leftKey “a suitable key out of lCtrl and Win, depending on the state of AltGr”.  Likewise, let leftKey² be the combination of them
+both.
+
+=========================== A working variant using Win (with 26 output 34 used)
+
+Summary (with FancyMath=rCtrl, Bold=lAlt, Italic=Win, mathGreek=OtherScript), earlier rule wins over the latter one:
+  • All text variants are orthogonal and “without FancyMath”.  4 personalities are controlled by OtherScript/FancyScript. And AltGr.
+  • With FancyMath (and can add Bold): the 3-hook AltGr ⊕ Menu means Bbb,Script,Frakture (with Bold: Mono,Bold-Script,Bold-Fracture)
+  • One can combine Latin and OtherScript, with “Font Math” (as AltGr) — but only with ONE of “math-Bold/Italic” by Win or lAlt
+    (with OtherScript meaning “Greek” in math).  (Bold-Italic is obsured by the first rule.)
+  • One can combine the preceding rule orthgonally with FancyMath to add SansSerif — however, the second rule obsures the non-Italic
+    variants.
+
+(This leaves Bold Italic math, SansSerif math, and SansSerif Bold math not yet supported.)
+
+  • SansSerif math is entered as lCtrl-rCtrl.  Combining this with Win for Italic and lAlt for Bold, Menu for Greek (as above) is
+    supported — but for Bold Italic one omits Sans Serif.  (Lᴵˢˢ is omitted — see below — since it is on Win-Ctrl-Ctrl which may
+    trigger system accelerators.)  This allows access to all the Unicode Math letters.
+
+This follows from what is described above:
+
+  • Math “TensorLike”: FancyScript + FancyMath (modifiable by OtherScript and by AltGr).  With AltGr: it is “Tensor” (SansSerif Bold
+    Italic), removing AltGr removes SansSerif.
+  • There is a pair of unused positions differing by Menu-, based on Win-lAlt-rCtrl.
+  • There is a 3-hook lCtrl-lAlt of unused positions based on Menu.  This based position may be also modified by rCtrl.
+
+Visualization:
+
+      |	  ∅   M    C    MC     A   AM   AC    AMC
+———————————————————————————————————————————————————
+  ∅   |	  L   Gr   —    Scr    Lᴬ  Grᴬ  BbB   Frk
+  C   |	  —       Lˢˢ          〃    〃    〃     〃
+   A  |	  —             Scrᴮ   Lᴮ  Grᴮ  Mono  Frkᴮ
+  CA  |	  —       Lᴮˢˢ  Grᴮˢˢ  〃    〃    〃     〃
+   W  |	  —   ¿?   —    ¿?     Lᴵ  Grᴵ  Lᴵˢˢ
+  CW  |	  —   ¿?   —    ¿?     〃    〃    〃     〃
+   WA |	  —   ¿?              Cyrᴬ Hbrᴬ Lᵗᵉⁿ  Grᵗᵉⁿ
+  CWA |	 Cyr Hbr  Lᴮⁱ   Grᴮᴵ   〃    〃    〃     〃
+
+ • Columns are combinations of “keys on the right of Spacebar: AltGr, Menu, rCtrl”,
+ • Rows are cominations of keys “on the left of Spacebar: lCtrl Win lAlt”;
+ • dashes “—” mean “this position should not bound to free it to application accelerators”;
+ • ditto marks “〃” mean “same as above it” — the limitation due to KLLF_ALTGR.
+ • L/Gr/Cyr/Hbr mean 4 personalities, the superscripts mean: ᴬ: AltGr-flavor, ᴮ: Bold, ᴵ: Italic, ˢˢ: SansSerif, ᵗᵉⁿ: “Tensor” = ᴮᴵˢˢ.
+ • Bbb/Mono/Scr/Frk mean flavors of “fancy” math charactre: Blackboard-Bold, Monospaced, Script, Frakture (the last two may be bold).
+ • “¿?” marks “questionable positions”, where the system-accelerator-based-on-VK_-code can trigger???
+
+==============================
+
+LINK : fatal error LNK1104: cannot open file 'OLDNAMES.lib'
+  This was present several times from 2012.  Then — apparently — goes away?!  Reboot???
+	ANSWER: a missing symbol forces a lookup in a (faulty) supplied library.  (Or conflict between an extern declaration and
+		a static definition.)
+
+Document dial-a-smiley and new positions for dial-a-space and dial-a-dash.
+
+Put new dial-a-something on Mnu-digits.  (Circled digits???)  Would conflict with ≠ variants on Blue 9.
+
+Implement FromToFlat(Inv)?
+
+2a7b (etc.) are considered not simple in the “Compose” summary.  (Although it is CORRECTLY marked as ⓕ11.)
+
+06f0 on Greek is considered accessible.  Likewise for AltGr-inverted prefix keys (due to UTF-16 codepoints “staged” in two steps?).
+
+In Hebrew and Greek there are many chars (correctly) detected as difficult to reach.
+
+AltGr-inverted “flat” not in “access types” with assigned letters.
+
+Ctrl-keys should be considered as difficult too!  (What about AltGr???)
+
+Difficulty of flat is less than of many others, but they would win in assignment.
+
+Flat mapping is not reflected in “covered Math+Latin-D” report (at end).
+
+Accessibility report on SPACE: is counted as an AltGr-inverted control-char.  Some of accessors conradictory: Ⓔ?
+				PROBABLY FIXED???
+
+Check report on Ⓐ.  Mnu-: ^Shift-A (=Ripe⁴); AltGr-, ^Shift-A.  The former is reported as ②: so an extra “prefix” is counted.  This
+affects the calcuation of “difficulty” — should be compensated!
+
+Inspect accessibility reports in 1-prefix and 2-prefices sections.
+
+One of the turned commas obscured by by ⓐ→ binding on AltGr-inverted . (but not on AltGr-.???)
+
+In non-Latin personalities it is not clear which of Green/Ripe symbols are on Green or Ripe (in the numeric row).
+
+On the coverage, introduce a category “from a flat map”.
+
+When importing a satellite face from a companion, how to grab a flat map???
+
+AltGr-inverted Ctrl-⋆ on AltGr-. should insert Ⓐ etc.  (What about AltGr-, where Ⓐ/etc currently are???)
+
+Currently Circled uppercase are on ⓐ, prefix and 0483=Ripe⁴=Menu-:.
+
+Need to insert AltGr-inverted Ctrl-⋆ into visual layout tables.  As extra two columns on ⓒ-z etc?
+
+Seems that the reports of “Unreached:” positions are legitimate bugs!  (Or unhandled AltGr-inverted Ctrl-⋆, or prefer-first of 06f0???)
+
+  Getting and reporting of how-reachable info on keys.  Getting ignores flat maps.
+  		PARTIALLY IMPLEMENTED: enhanced maps, unmatched slots on AltGr-inverted-base
+
+  (Need to move all these from output-for-Win to massage stage. ???)
+  		PARTIALLY IMPLEMENTED: enhanced maps
+
+  Shift-Gray-* and Menu-Gray-* produce the same ÷; since Menu⸣less version takes preference, ÷ is associated to both
+  Gray-* and Shift-Gray-* when action of prefix keys is calculated.  (ᴬ$ maps Shift-Gray-/ to ☐ — hence Menu-/ to ☐ — as producing
+  the same base key; and since shifted, Shift-Menu-/ is also mapped to ☐.)
+  						DONE (via @Prefix_Force_Altern)
+
+  Extracting coverage0 from AltGr-inverted base face should be special-cased when AltGr-inversion is not bijective!
+  (No: this should be handled when the inverted map is created…)
+  						DONE
+
+  Reporting "Unreached:" should show which row/column of the keyboard this comes from (or what is on the base face).
+
+     Enhanced/Flat maps are used on Windows only — so how to test coverage “in general”?
+
+$self->keys2hex(to_UTF16LE_units(chr hex $hex)) - need to do for all components of the binding.
+
+As an optimization, have a special prefix key for 32-bit (or multichar) not-bound keys
+
+Alt-→ arrows should give double tips.  Alt-↑ should give double arrows; Alt-↓ double-opposite arrows???
+
+AltGr-" or AltGr-; should produce double arrows on arrows.
+
+Check Menu-; in Cyrillic: “hanging” ʗ.
+
+Length in IPA “ː Modifier Letter Triangular Colon” should be accessible via “ⓐ↑ :”. ???  (Currently ˸/꞉; use ⓐ; Ⓒm)
+Maybe move “modifier letter colon ‘꞉’” to “ⓐ↓ :”.
+	U+02d1 ˑ half triangular colon???  (On ⓐ↑ ^)
+
+0297@ imports Cyr-Bizzare (?) into Latin — but it also leaks to Cyrillic — where it is useless.
+
+On non-Latin Green, ,. are obscured by Latin’s ¸°.  So one needs alternative access to ⊚ and operator-⋅.
+
+  When we order faces to process, one needs to take into account faces mentioned as sections in the .kbdd file.
+
+On F12 columns 8,9 are not faces, but Compose.  Needed???
+
+On Cyrillic and Hebrew, columns 8,9 do not contain smilies???
+
+ByPairsFlat of satellites should be able to depend on the base face.
+
+Use of coverage0oneUTF16 is obsolete now; use of $cov1 for extra-faces makes no sense.
+
+Why adding .⪈ to FlipLayer adds it to comma-on-non-flipped layer too?
+
+Apparently, deliver-Script prefix-face may be evaluated in context of non-Latin face, which is not yet filled via LinkFace; but why
+OTHER coptic digits work???  Seems that FlipShift is not good without an explicit argument face
+
+PETSCII unshifted (wiki) ↗-order of horizontal lines: 0xA4  0x66  0x63  0x65 0x65  0xA3    https://unicode.org/charts/PDF/U1FB00.pdf
+  ???	https://groups.google.com/g/comp.sys.apple2/c/8VTjK-kMZXo/m/CSia974tCQAJ?pli=1
+	https://macgui.com/usenet/?group=1&id=289276
+
+Enabling ≠ as AltGr-3 leads to a lot of duplication with AltGr-1.
+	Maybe modify ¬: ∦ on A$ (or A" ???); ≄ on A~; 
+
+Duplication of ′″ on Green-AltGr- and on Ripe- '".
+
+⎖ Blue Alt-" missing on Cyrillic.
+
+AltGr-^ Gray-* not entering ✖ (as expected, since Gray-* is the same as ×???).  What to do — Menu-Gray-*???
+
+⥲ missing (maybe more with similar names?!  It is on Alt-' ~.)
+
+Rotating AltGr-^ should give ˯.
+						TRYING NOW
+
+AltGr-/ & should give ⫛.
+						TRYING NOW
+
+CSS: Font family names containing whitespace should be quoted.  (Actually, only punctuation/numbers at start are important???)
+	https://developer.mozilla.org/en-US/docs/Web/CSS/font-family
+
+TableSummaryAddHTML: generates <p>.  Need to remove this.
+
+In prefix mappings, need to move assignments to keypad earlier (e.g., × may be Mutate⸣d instead of being picked up from there).
+
+Put ʈ on Ctrl-↑ AltGr.  Put upper-lower greek (etc?) to Ctrl-letter AltGr-↕ prefixes.
+Should be automated: a mutator should be marked as “Wide”, and ExtraFacesWide should be covered by this mutator too ⇝ Flat map.
+
+Put ₢ on AltGr-G (visually), move ৳ to AltGr-b, and insert BITCOIN.
+						TRYING NOW
+
+Operator-\ is both on Business and on Blue.  (One of them not highlighted blue???  Likewise for asterisk operator on Business…)
+
+Replace AltGr-3 by ≠ instead of · (the derivatives of · in this position are duplicated anyway).
+						TRYING NOW (breaks no-down-shift rule??? problems with ⫥⩤; adds ⟞, but not paired with ⟝)
+						BACKED UP.  Retry later with attention to what is on prefixed ¬ — and maybe 9,0???
+
+Do with ⊣⊢ what we did with <>.  (Many different forms, intelligently, leaking to Mnu- if needed.)
+
+Optimize assignments on the (new) ≠.   ≇ ≭ on Business-8 (via ≐) ≢⧻⧧⧺ on Business-=+  ⫮ on Business-\ (why not on AltGr-/???).
+≭ on Business-? too.  ⊀⊄⊁⊅ on Business-<>.  ≸∌ on Business-1; ≉ on Business-AltGr-~.
+
+Green/Ripe < and > are not used.  One may put ⟨⟩ ⟪⟫ there, which would free amplified-() for something better.
+	Green: ⟨⟩ ≪≫;  Blue: ⟪⟫ ⋘⋙;  Ripe ⪡⪢ ⫷⫸;  Amplify-()   ⟬⟭???  (Currently on AltGr-. []).
+						TRYING NOW	⟬⟭???
+
+Amplify-<>  now may be not ≪≫   ???
+
+On X11, RTRN (sp?) produces U000d.  Space produces a lot of undeadified deadkeys (related to fake dead-0x06f2 SPACE).
+	First ½: DONE
+
+On RU, Compose is not gluing Latin/Cyrillic E/Е (due to us overwriting %$hexH ??? — NO, $delay has nothing to do with this…).
+
+A recipe should create both an array assignment, AND a hash describing possible mutation.
+	What if a mutation is anchored on a face?  Mutate[any-tilde](Face(Latin))???
+		Maybe add new pseudorecipe Hash to add to Face(Latin)???
+
+On ligatures, document chars outside BMP.
+
+On X11, use also `usl´ versions of dead_acute etc.  (see file `xkeysymdb´.)  [Unix System Laboratories???]
+
+Mnu-;² should access Mnu-: and  ҃.
+			CODED, does not work (ChainPrefix does not work, since Mnu-; is not on the main 2 layers of base kbd).
+			First ½ done.
+
+Prefix keys not in the base layout cannot be used in chains (due to layout being array-based, and not hash-based).
+If put into ExtraChars: need to fix coverage to avoid counting them (to detect errors better).
+			PARTIAL FIX via Flat
+
+Need to allow FlipAltGr in Compose maps too???
+
+Need to: Gray-+-*/Enter to work well with prefixes.
+
+In RU, - produces -_¯—⁻–₋― (base, AltGr, lClA, Mnu), but no prefix.  And 6 makes 6Ъ^ⷶ⁶£₆˦; ' makes '"ꙗ´∂∇′″;
+while ; makes ;:¨÷äΦаΦаⷶ (so lClA-; works) and , makes ,<«≤ — ą —  —  (so one needs lClA-Shift-, instead of lClA-,);
+while . makes .>»≥·å…𝄡𝄡 (again, extra Shift with lClA), and / makes /?јЈ⁄¿÷;.  On the other hand, ` and 4 work as expected.
+
+In LA, - produces -_ā—⁻–₋―; why ¯ is not exported???
+
+In the hashes of prefix maps, need to take into account characters produced with CapsLock.
+	Also: need to be able to map chars produced with non-AltGr modifiers.
+The order ꞵꞴḅḄ on AltGr-, b is not optimal.  (How to change???)
+
+On ABNT_C1, a lot of bindings are to non-assigned deadkeys.
+
+[AltGr-][Mnu-]KpEnter produces “!” in Character Map???   (With `US´ as well...)
+
+There is no special binding for KpEnter???
+
+On Cyrillic: CA-, CA-. require extra shift; CA-/ CA-- CA-; are wrong; CA-: accesses a ghost prefix Φ (no binding on Cyrillic/Latin);
+	     on CA-' CA-" CA-6 CA-^ ∂∇⁶£ obscure “the prefix meaning”.
+
+On B/I-Math: digits reproduce Bold math (there are no B+I-digits!)
+
+In RU, Ripe⁴ Ctrl-char does not produce Ⓕ etc.
+
+In Compose, may need to put flags into submaps (like 0000 is OK).
+
+https://en.wikipedia.org/wiki/Romanization_of_Armenian#Transliteration_table	(see at end; “versatile”???)
+https://en.wikipedia.org/wiki/Romanization_of_Georgian#Transliteration_table
+		Armenian:
+		 versatile: cčć in 3 variants (ć may be considered as “special” x; dz/ch/ew may be considered as “special” d/h/w)
+		 ISO: č̣çc’č in 4 variants, oòow in 3, eēëew in 4.
+		 H-M: eēëev in 4; cc'čč' in 4
+		 BGN: tt'tsts' in 4, chch' in 2 (!)
+		 KNAB: eèew in 3, ddzdž in 3.  (with z also appearing as “special”, but w not)
+		Basically: needs 2 postfixes (` and ~ ???).
+
+	RFC does not use “start with _”, and of “start with //” only // //>, or “start with gg”
+	Does not use \[]{}|`~@#$^
+	Trailing 5,6 on letters: only n5, N6 and uc/lc aeiou (on punctuation: 5 on "*+ and 6 on '".-+*).
+	Trailing 7,8 on letters: only a7 A7 M8  (and not on punctuation, except <7 >7 (7) (8)).
+	Trailing 9 on letters: only o O u U	(also: '.": while need at least .,-'?!)
+
+perl -wlne "next unless /^\w/; my @f = split /\s*\^^\s*/; next unless length $f[2]; print for split $f[6]" unimathsymbols.txt | sort -u >unimathsymbols.pkg
+perl -wlne "next unless /^\w/; my @f = split /\s*\^\s*/; next unless length $f[2]; print for split /\s+/, $f[6]" unimathsymbols.txt | sort -u >unimathsymbols.pkg
+
+MATHEMATICAL … DOTLESS i/j
+	add to fancy greek???
+
+The AltGr-inverted of imported keys (on RU) have bizarre names in KEYNAME_DEAD section of .klc file
+
+#macro re-defined: <#define XK_Ooblique                      0x00d8  /* U+00D8 LATIN CAPITAL LETTER O WITH STROKE */>
+#macro re-defined: <#define XK_ooblique                      0x00f8  /* U+00F8 LATIN SMALL LETTER O WITH STROKE */>
+#macro re-defined: <#define XK_Arabic_farsi_yeh           0x10006cc  /* U+06CC ARABIC LETTER FARSI YEH */>
+#macro re-defined: <#define XK_Greek_LAMBDA                  0x07cb  /* U+039B GREEK CAPITAL LETTER LAMDA */>
+#macro re-defined: <#define XK_Greek_lambda                  0x07eb  /* U+03BB GREEK SMALL LETTER LAMDA */>
+#macro re-defined: <#define XK_Armenian_verjaket          0x1000589  /* U+0589 ARMENIAN FULL STOP */>
+#macro re-defined: <#define XK_Armenian_but               0x100055d  /* U+055D ARMENIAN COMMA */>
+#macro re-defined: <#define XK_Armenian_yentamna          0x100058a  /* U+058A ARMENIAN HYPHEN */>
+#macro re-defined: <#define XK_Armenian_amanak            0x100055c  /* U+055C ARMENIAN EXCLAMATION MARK */>
+#macro re-defined: <#define XK_Armenian_shesht            0x100055b  /* U+055B ARMENIAN EMPHASIS MARK */>
+#macro re-defined: <#define XK_Armenian_paruyk            0x100055e  /* U+055E ARMENIAN QUESTION MARK */>
+
+!!!	https://source.android.com/devices/input/key-character-map-files.html
+		bepo also uses "map key" directive
+	http://stackoverflow.com/questions/3480715/how-to-develop-a-soft-keyboard-for-android?rq=1
+	https://play.google.com/store/apps/details?id=org.pocketworkstation.pckeyboard
+	https://code.google.com/p/hackerskeyboard/source/browse/java/src/org/pocketworkstation/pckeyboard/ComposeSequence.java
+		Does not allow custom layouts (and AltGr!)
+	https://github.com/AnySoftKeyboard/AnySoftKeyboard/wiki/Installing-AnySoftKeyboard-on-System-Partition
+	https://github.com/AnySoftKeyboard/AnySoftKeyboard/wiki/How-to-Build-AnySoftKeyboard
+
+		APK: http://zewaren.net/site/?q=taxonomy/term/6/all
+
+Problem with ъ vs Inv-AltGr on ISO key:
+	in Latin, AltGr-Space Inv-AltGr is Ъ.
+		In fcw — the actual behaviour is different: empty output!!! ???
+		Ъ .
+
+		Example (but not as above???)
+			AltGr-SPACE² TAB is ↹;
+				one can replace with Inv-AltGr³ SPACE TAB
+					[here Inv-AltGr³ is Inv-AltGr of AltGr-SPACE; so SPACE ⎯→ AltGr-SPACE²]
+				but one cannot make it with Inv-AltGr SPACE???
+
+  Switching ABNT_C1 and SPACE does not help.
+    !!! No wonder: they are both in VK hash, so the order does not matter!  Sorted alphabetically!
+	Comparing Lat ⎯→ Cyr has Shift-ISO (00a0) ↦ Ъ, AltGr-Shift-Space (00a0) ↦ prefix for Cyr-inverted
+	We have prefer-last on 00a0     (In addition to ISO, 00a0 is also on ABNT_C1.)
+
+We use output_deadkeys() on Apple too, but it only supports up to 0xFFFF.  Likewise for treatment of Compose???
+
+  In Compose, create small-integer deadkeys only for stuff needed on Windows; create something else for Apple/X11???
+    But what if WIN key is also down???
+
+In Cyrillic, Mnu-F4 etc do not work.
+		In Cyr, working are on AltGr, lCtrl-lAlt, Mnu-rCtrl (AltGr, Latin, Hebrew)
+		In Lat, working are on AltGr, Mnu, Mnu-rCtrl (AltGr, Cyr, Hebrew)		???
+
+In mini-en output, deadkeys should be named based on the row they trigger.
+
+In mini-en output, flipAltGr_key is flipping only the base. (Processing bound on a presence of chains!)
+
+In mini-en output: Compose with unreachable characters is emitted!
+
+Add warning to multi-char key2hex(), rework into keys2hex() if needed.
+
+Repeating Flip-AltGr should end in output of ⤨ (as in Apple terminators! — is it configurable?).
+
+ATTRIBUTES
+LRM_RLM
+ALTGR
+??? SHIFTLOCK
+
+Satellite vs Companion.  Personalities.
+
+	Before posting (sys)keyup/keydown, async key state is updated.
+	Keystate is allowed up to vk=255.
+	xxxSkipSysMsg(): when a message is moved from system queue to the thread's one, sets key state.
+	For VK_APPCOMMAND_FIRST ... VK_APPCOMMAND_LAST, a message QEVENT_APPCOMMAND is posted before the usual processing;
+		This causes the corresponding APPCOMMAND_FIRST + ... is sent (in low), with GetMouseKeyFlags() in top.
+			GetMouseKeyFlags(): shift/control + 5 mouse buttons.
+		+ Extra code to allow the target window to go to foreground if it wishes.
+	TranslateAccelerator():
+		Disabled in HEX input mode
+		Acts on (SYS)KEYDOWN and (SYS)CHAR keys
+		For KLLF_ALTGR layouts with AltGr down, acts only on RCONTROL and LMENU
+		Uses GetKeyState to check for C/A/Shift down
+		Shift/Control are checked only on (SYS)KEYDOWN events
+		For every found, find the first for which it may send a message:
+			Tries to find menu (for non-child), or else sysmenu, or sys-desktop menu
+				If: !item_disables AND (sysmenu OR !minimized) AND (not_in_menu AND !(captured OR win_disabled)):
+					send:	(sys)command (sys = in sys menu) with low(w)=cmd,
+						top(w) = 1 for non-sys
+						top(l)=1 for sys
+					When checking menus, WM_INITMENU is send, and for submenus
+						WM_INITMENUPOPUP, WM_UNINITMENUPOPUP (the latter after the main send, if any).
+
+Apple "terminators" for surrogates:
+  low:  Now U-DC .. U-DF, or U-DC0 .. U-DFF		[U-DC]=U+_[048C], [U-DC0]=U+_[048C]0
+  high: Now U-D8 .. U-DB, or U-D80 .. U-DBF		[U-D8]=U+0[1-4], [U-DB]=U+[0D-10],	[U-D80]=U+01[0-3]
+  	U+_⁽⁰⁴⁸ᶜ⁾	U+0⁽¹⁻⁴⁾	U+⁽⁰ᵈ⁻¹⁰⁾
+  		After a high surrogate, drop the user into a state for entering 3 low digits?
+
+Flip-AltGr Ctrl-char	should be also engaged
+Flip-AltGr AltGr-char	should duplicate Ctrl-char.  (With Shift-AltGr-char, should do Flip-AltGr Ctrl-char.)
+
+SPACE not switching to SCROLL in GIMP.  (US, Russian, US Intl and Canadian multilingual are OK!)
+
+Move circled to (Repeated) AltGr-Prefix Ctrl-CHAR.
+
+Math faces: rCtrl, lCtrl, and lAlt+rAlt are liabilities.  Move the most important
+actions (Bold; ???) to Mnu, and lAlt instead?
+
+New map consolidators (instead of default, empty one; should be surrounded by spaces):
+  +	Same as “|” in mutators
+  ++	Same, and allow removing AltGr if an AltGr-less slot is empty
+    or maybe
+  +[-A]	instead of ++,
+    allow [-S] for removal of Shift, --S for removal of Shift AND of Shift-ed binding
+      and maybe [+A] for explicitly allowing adding AltGr if AltGr-less position is taken, etc. 
+
+Or maybe:
+  +	Equivalent to +[+A]
+  +[]	Same without allowing adding AltGr if AltGr-less position is already taken (synonym of joining by whitespace???).
+
+In newer, disappeared: AltGr-~ AltGr-~ now makes ⍭.  
+	Changed in 0.65 —→ 0.66 (due to APL???)
+
+	perl -C31 -wlpe "s/^(([0-9a-f]+)(\.\.([0-9a-f]+))?)/qq($1\t).(!!$3&&qq(\t)).join q( ), map chr, hex($2)..($3 ? hex($4) : hex($2))/ie" l-x >l-x-o
+		“+” means already included
+	ϳ Ϳ     ꭥ	𐆋𐆌 𐆠
++037F             GREEK CAPITAL LETTER YOT
+AB30		ꬰ	LATIN SMALL LETTER BARRED ALPHA
+AB53		ꭓ	LATIN SMALL LETTER CHI
+AB54		ꭔ	LATIN SMALL LETTER CHI WITH LOW RIGHT RING
+AB55		ꭕ	LATIN SMALL LETTER CHI WITH LOW LEFT SERIF
+AB64		ꭤ	LATIN SMALL LETTER INVERTED ALPHA
+	x (latin small letter turned alpha - 0252)
++AB65		ꭥ	GREEK LETTER SMALL CAPITAL OMEGA
+	* obsolete for mid back rounded vowel
+	x (latin small letter closed omega - 0277)
+	x (greek small letter omega - 03C9)
++1018B..1018C	𐆋 𐆌  ; 7.0 #   [2] GREEK ONE QUARTER SIGN..GREEK SINUSOID SIGN
++101A0		𐆠            GREEK SYMBOL TAU RHO
++102E0..102FB	𐋠 𐋡 𐋢 𐋣 𐋤 𐋥 𐋦 𐋧 𐋨 𐋩 𐋪 𐋫 𐋬 𐋭 𐋮 𐋯 𐋰 𐋱 𐋲 𐋳 𐋴 𐋵 𐋶 𐋷 𐋸 𐋹 𐋺 𐋻  ; 7.0 #  [28] COPTIC EPACT THOUSANDS MARK..COPTIC EPACT NUMBER NINE HUNDRED
+
+0528..052F	Ԩ ԩ Ԫ ԫ Ԭ ԭ Ԯ ԯ   [8] CYRILLIC CAPITAL LETTER EN WITH LEFT HOOK..CYRILLIC SMALL LETTER EL WITH DESCENDER
+1AB0..1ABE	᪰ ᪱ ᪲ ᪳ ᪴ ᪵ ᪶ ᪷ ᪸ ᪹ ᪺ ᪻ ᪼ ᪽ ᪾  [15] COMBINING DOUBLED CIRCUMFLEX ACCENT..COMBINING PARENTHESES OVERLAY
+1DE7..1DF5	ᷧ ᷨ ᷩ ᷪ ᷫ ᷬ ᷭ ᷮ ᷯ ᷰ ᷱ ᷲ ᷳ ᷴ ᷵  [15] COMBINING LATIN SMALL LETTER ALPHA..COMBINING UP TACK ABOVE
+			except: 20bb is missing
++20BB..20BD	₻ ₼ ₽   [3] NORDIC MARK SIGN..RUBLE SIGN
+23F4..23FA	⏴ ⏵ ⏶ ⏷ ⏸ ⏹ ⏺   [7] BLACK MEDIUM LEFT-POINTING TRIANGLE..BLACK CIRCLE FOR RECORD
+2700		✀             BLACK SAFETY SCISSORS
+2B4D..2B4F	⭍ ⭎ ⭏   [3] DOWNWARDS TRIANGLE-HEADED ZIGZAG ARROW..SHORT BACKSLANTED SOUTH ARROW
+2B5A..2B73	⭚ ⭛ ⭜ ⭝ ⭞ ⭟ ⭠ ⭡ ⭢ ⭣ ⭤ ⭥ ⭦ ⭧ ⭨ ⭩ ⭪ ⭫ ⭬ ⭭ ⭮ ⭯ ⭰ ⭱ ⭲ ⭳  [26] SLANTED NORTH ARROW WITH HOOKED HEAD..DOWNWARDS TRIANGLE-HEADED ARROW TO BAR
+2B76..2B95	⭶ ⭷ ⭸ ⭹ ⭺ ⭻ ⭼ ⭽ ⭾ ⭿ ⮀ ⮁ ⮂ ⮃ ⮄ ⮅ ⮆ ⮇ ⮈ ⮉ ⮊ ⮋ ⮌ ⮍ ⮎ ⮏ ⮐ ⮑ ⮒ ⮓ ⮔ ⮕  [32] NORTH WEST TRIANGLE-HEADED ARROW TO BAR..RIGHTWARDS BLACK ARROW
+2B98..2BB9	⮘ ⮙ ⮚ ⮛ ⮜ ⮝ ⮞ ⮟ ⮠ ⮡ ⮢ ⮣ ⮤ ⮥ ⮦ ⮧ ⮨ ⮩ ⮪ ⮫ ⮬ ⮭ ⮮ ⮯ ⮰ ⮱ ⮲ ⮳ ⮴ ⮵ ⮶ ⮷ ⮸ ⮹  [34] THREE-D TOP-LIGHTED LEFTWARDS EQUILATERAL ARROWHEAD..UP ARROWHEAD IN A RECTANGLE BOX
+2BBD..2BC8	⮽ ⮾ ⮿ ⯀ ⯁ ⯂ ⯃ ⯄ ⯅ ⯆ ⯇ ⯈  [12] BALLOT BOX WITH LIGHT X..BLACK MEDIUM RIGHT-POINTING TRIANGLE CENTRED
+2BCA..2BD1	⯊ ⯋ ⯌ ⯍ ⯎ ⯏ ⯐ ⯑   [8] TOP HALF BLACK CIRCLE..UNCERTAINTY SIGN
+2E3C..2E42	⸼ ⸽ ⸾ ⸿ ⹀ ⹁ ⹂   [7] STENOGRAPHIC FULL STOP..DOUBLE LOW-REVERSED-9 QUOTATION MARK
+A698..A69D	Ꚙ ꚙ Ꚛ ꚛ ꚜ ꚝ   [6] CYRILLIC CAPITAL LETTER DOUBLE O..MODIFIER LETTER CYRILLIC SOFT SIGN
+A794..A79F	ꞔ ꞕ Ꞗ ꞗ Ꞙ ꞙ Ꞛ ꞛ Ꞝ ꞝ Ꞟ ꞟ  [12] LATIN SMALL LETTER C WITH PALATAL HOOK..LATIN SMALL LETTER VOLAPUK UE
+A7AB..A7AD	Ɜ Ɡ Ɬ   [3] LATIN CAPITAL LETTER REVERSED OPEN E..LATIN CAPITAL LETTER L WITH BELT
++A7B0..A7B1	Ʞ Ʇ   [2] LATIN CAPITAL LETTER TURNED K..LATIN CAPITAL LETTER TURNED T
+A7F7		ꟷ             LATIN EPIGRAPHIC LETTER SIDEWAYS I
+AB30..AB5F	ꬰ ꬱ ꬲ ꬳ ꬴ ꬵ ꬶ ꬷ ꬸ ꬹ ꬺ ꬻ ꬼ ꬽ ꬾ ꬿ ꭀ ꭁ ꭂ ꭃ ꭄ ꭅ ꭆ ꭇ ꭈ ꭉ ꭊ ꭋ ꭌ ꭍ ꭎ ꭏ ꭐ ꭑ ꭒ ꭓ ꭔ ꭕ ꭖ ꭗ ꭘ ꭙ ꭚ ꭛ ꭜ ꭝ ꭞ ꭟ  [48] LATIN SMALL LETTER BARRED ALPHA..MODIFIER LETTER SMALL U WITH LEFT HOOK
+AB64..AB65	ꭤ ꭥ   [2] LATIN SMALL LETTER INVERTED ALPHA..GREEK LETTER SMALL CAPITAL OMEGA
+FE27..FE2D	︧ ︨ ︩ ︪ ︫ ︬ ︭   [7] COMBINING LIGATURE LEFT HALF BELOW..COMBINING CONJOINING MACRON BELOW
+1018B..1018C	𐆋 𐆌  ; 7.0 #   [2] GREEK ONE QUARTER SIGN..GREEK SINUSOID SIGN
+101A0		𐆠            GREEK SYMBOL TAU RHO
+102E0..102FB	𐋠 𐋡 𐋢 𐋣 𐋤 𐋥 𐋦 𐋧 𐋨 𐋩 𐋪 𐋫 𐋬 𐋭 𐋮 𐋯 𐋰 𐋱 𐋲 𐋳 𐋴 𐋵 𐋶 𐋷 𐋸 𐋹 𐋺 𐋻  ; 7.0 #  [28] COPTIC EPACT THOUSANDS MARK..COPTIC EPACT NUMBER NINE HUNDRED
+1031F		𐌟            OLD ITALIC LETTER ESS
+1BCA0..1BCA3	𛲠 𛲡 𛲢 𛲣  ; 7.0 #   [4] SHORTHAND FORMAT LETTER OVERLAP..SHORTHAND FORMAT UP STEP
+1F0BF		🂿            PLAYING CARD RED JOKER
+1F0E0..1F0F5	🃠 🃡 🃢 🃣 🃤 🃥 🃦 🃧 🃨 🃩 🃪 🃫 🃬 🃭 🃮 🃯 🃰 🃱 🃲 🃳 🃴 🃵  ; 7.0 #  [22] PLAYING CARD FOOL..PLAYING CARD TRUMP-21
+1F10B..1F10C	🄋 🄌  ; 7.0 #   [2] DINGBAT CIRCLED SANS-SERIF DIGIT ZERO..DINGBAT NEGATIVE CIRCLED SANS-SERIF DIGIT ZERO
+1F441		👁            EYE
+1F780..1F7D4	🞀 🞁 🞂 🞃 🞄 🞅 🞆 🞇 🞈 🞉 🞊 🞋 🞌 🞍 🞎 🞏 🞐 🞑 🞒 🞓 🞔 🞕 🞖 🞗 🞘 🞙 🞚 🞛 🞜 🞝 🞞 🞟 🞠 🞡 🞢 🞣 🞤 🞥 🞦 🞧 🞨 🞩 🞪 🞫 🞬 🞭 🞮 🞯 🞰 🞱 🞲 🞳 🞴 🞵 🞶 🞷 🞸 🞹 🞺 🞻 🞼 🞽 🞾 🞿 🟀 🟁 🟂 🟃 🟄 🟅 🟆 🟇 🟈 🟉 🟊 🟋 🟌 🟍 🟎 🟏 🟐 🟑 🟒 🟓 🟔  ; 7.0 #  [85] BLACK LEFT-POINTING ISOSCELES RIGHT TRIANGLE..HEAVY TWELVE POINTED PINWHEEL STAR
+1F800..1F80B	🠀 🠁 🠂 🠃 🠄 🠅 🠆 🠇 🠈 🠉 🠊 🠋  ; 7.0 #  [12] LEFTWARDS ARROW WITH SMALL TRIANGLE ARROWHEAD..DOWNWARDS ARROW WITH LARGE TRIANGLE ARROWHEAD
+1F810..1F847	🠐 🠑 🠒 🠓 🠔 🠕 🠖 🠗 🠘 🠙 🠚 🠛 🠜 🠝 🠞 🠟 🠠 🠡 🠢 🠣 🠤 🠥 🠦 🠧 🠨 🠩 🠪 🠫 🠬 🠭 🠮 🠯 🠰 🠱 🠲 🠳 🠴 🠵 🠶 🠷 🠸 🠹 🠺 🠻 🠼 🠽 🠾 🠿 🡀 🡁 🡂 🡃 🡄 🡅 🡆 🡇  ; 7.0 #  [56] LEFTWARDS ARROW WITH SMALL EQUILATERAL ARROWHEAD..DOWNWARDS HEAVY ARROW
+1F850..1F859	🡐 🡑 🡒 🡓 🡔 🡕 🡖 🡗 🡘 🡙  ; 7.0 #  [10] LEFTWARDS SANS-SERIF ARROW..UP DOWN SANS-SERIF ARROW
+1F860..1F887	🡠 🡡 🡢 🡣 🡤 🡥 🡦 🡧 🡨 🡩 🡪 🡫 🡬 🡭 🡮 🡯 🡰 🡱 🡲 🡳 🡴 🡵 🡶 🡷 🡸 🡹 🡺 🡻 🡼 🡽 🡾 🡿 🢀 🢁 🢂 🢃 🢄 🢅 🢆 🢇  ; 7.0 #  [40] WIDE-HEADED LEFTWARDS LIGHT BARB ARROW..WIDE-HEADED SOUTH WEST VERY HEAVY BARB ARROW
+1F890..1F8AD	🢐 🢑 🢒 🢓 🢔 🢕 🢖 🢗 🢘 🢙 🢚 🢛 🢜 🢝 🢞 🢟 🢠 🢡 🢢 🢣 🢤 🢥 🢦 🢧 🢨 🢩 🢪 🢫 🢬 🢭  ; 7.0 #  [30] LEFTWARDS TRIANGLE ARROWHEAD..WHITE ARROW SHAFT WIDTH TWO THIRDS
+
+	v8.0
+20BE		₾       LARI SIGN
++218A..218B	↊ ↋   [2] TURNED DIGIT TWO..TURNED DIGIT THREE
+2BEC..2BEF	⯬ ⯭ ⯮ ⯯   [4] LEFTWARDS TWO-HEADED ARROW WITH TRIANGLE ARROWHEADS..DOWNWARDS TWO-HEADED ARROW WITH TRIANGLE ARROWHEADS
++A69E		ꚞ       COMBINING CYRILLIC LETTER EF
+A78F		ꞏ       LATIN LETTER SINOLOGICAL DOT
+A7B2..A7B7	Ʝ Ꭓ Ꞵ ꞵ Ꞷ ꞷ   [6] LATIN CAPITAL LETTER J WITH CROSSED-TAIL..LATIN SMALL LETTER OMEGA
+AB60..AB63	ꭠ ꭡ ꭢ ꭣ   [4] LATIN SMALL LETTER SAKHA YAT..LATIN SMALL LETTER UO
+FE2E..FE2F	︮ ︯   [2] COMBINING CYRILLIC TITLO LEFT HALF..COMBINING CYRILLIC TITLO RIGHT HALF
+
+	v9.0
+1C80..1C88	ᲀ ᲁ ᲂ ᲃ ᲄ ᲅ ᲆ ᲇ ᲈ   [9] CYRILLIC SMALL LETTER ROUNDED VE..CYRILLIC SMALL LETTER UNBLENDED UK
+1DFB		᷻       COMBINING DELETION MARK
+23FB..23FE	⏻ ⏼ ⏽ ⏾   [4] POWER SYMBOL..POWER SLEEP SYMBOL
+				⹄ is paleo-greek
+2E43..2E44	⹃ ⹄   [2] DASH WITH LEFT UPTURN..DOUBLE SUSPENSION MARK
+A7AE		Ɪ       LATIN CAPITAL LETTER SMALL CAPITAL I
+1018D..1018E	𐆍 𐆎   [2] GREEK INDICTION SIGN..NOMISMA SIGN
+1E000..1E006	𞀀 𞀁 𞀂 𞀃 𞀄 𞀅 𞀆   [7] COMBINING GLAGOLITIC LETTER AZU..COMBINING GLAGOLITIC LETTER ZHIVETE
+1E008..1E018	𞀈 𞀉 𞀊 𞀋 𞀌 𞀍 𞀎 𞀏 𞀐 𞀑 𞀒 𞀓 𞀔 𞀕 𞀖 𞀗 𞀘  [17] COMBINING GLAGOLITIC LETTER ZEMLJA..COMBINING GLAGOLITIC LETTER HERU
+1E01B..1E021	𞀛 𞀜 𞀝 𞀞 𞀟 𞀠 𞀡   [7] COMBINING GLAGOLITIC LETTER SHTA..COMBINING GLAGOLITIC LETTER YATI
+1E023..1E024	𞀣 𞀤   [2] COMBINING GLAGOLITIC LETTER YU..COMBINING GLAGOLITIC LETTER SMALL YUS
+1E026..1E02A	𞀦 𞀧 𞀨 𞀩 𞀪   [5] COMBINING GLAGOLITIC LETTER YO..COMBINING GLAGOLITIC LETTER FITA
+1F19B..1F1AC	🆛 🆜 🆝 🆞 🆟 🆠 🆡 🆢 🆣 🆤 🆥 🆦 🆧 🆨 🆩 🆪 🆫 🆬  [18] SQUARED THREE D..SQUARED VOD
+1F6D1..1F6D2	🛑 🛒   [2] OCTAGONAL SIGN..SHOPPING TROLLEY
+
+	v10:
+1df6..1df9	᷶ ᷷ ᷸ ᷹	combining
+20BF	₿	BITCOIN SIGN
+23FF	⏿	OBSERVER EYE SYMBOL
+			paleo-computer (BCDIC):
+2BD2	⯒	GROUP MARK
+
+	v11
+05EF	ׯ	HEBREW YOD TRIANGLE
+A7AF	ꞯ	LATIN LETTER SMALL CAPITAL Q
+A7B8	Ꞹ	LATIN CAPITAL LETTER U WITH STROKE
+A7B9	ꞹ	LATIN SMALL LETTER U WITH STROKE
+2E4A
+⹊
+DOTTED SOLIDUS
+= virgula suspensiva
+•
+ indicates a medial disjunction more than
+solidus but less than punctus elevatus
+2E4B
+⹋
+TRIPLE DAGGER
+→
+
+†
+  dagger
+→
+
+‡
+  double dagger
+2E4C
+⹌
+MEDIEVAL COMMA
+•
+ indicates a minor medial pause or disjunction
+of sense
+2E4D
+⹍
+PARAGRAPHUS MARK
+•
+ indicates the beginning of a paragraph, section,
+stanza, or proposition
+→
+
+¶
+  pilcrow sign
+→
+
+⁋
+  reversed pilcrow sign
+→
+
+⸏
+  paragraphos
+→
+
+⸿
+  capitulum
+2E4E
+⹎
+PUNCTUS ELEVATUS MARK
+•
+ indicates a major medial pause where the
+sense is complete but the meaning is not
+
+2BFE	⯾	REVERSED RIGHT ANGLE
+			= without
+			→	221F	∟  right angle
+
+======================== DONE AFTER THiS POINT
+
+Accessibility report on “1” is garbled.
+						DONE
+
+On Cyrillic ∤ is obscured by a dash (on Green AltGr-1) — and a lot of others on Green are too.  Likewise on Hebrew.
+						DONE
+
+AltGr-: hides Greek question mark in Greek.  (But /? are AltGr-mapped to ɂɁ ???)
+Greek question mark is available in Latin on Green AltGr-?, but not on Greek?!
+						DONE (on AltGr-?)
+
+Put ⋮ (v-ellipsis, not 3ple-dot colon) to Menu-, (like … on Menu-.).
+						DONE
+
+Adding AltGr-: as prefix modified many bindings on prefixed AltGr-: (but AltGrCharSubstitutions shouild have
+taken care of this?  See AltGrCharSubstitutionsLayers???)
+						DONE
+
+#extra-fonts in the docs should direct to a correct HTML file.  Also: The link should be to /software/fonts, and not /fonts.
+DejaVu link needs to be updated.
+						DONE (mostly)
+
+Above: resolve "-" vs "_" in anchor names to search.cpan.
+						DONE
+perl -i~cpan -wlpe "sub ss($){(my$in=shift)=~s/-/_/g;$in} s((?<=href=https://)search\.cpan\.org/(?:.*?)/(.*?)(?=/)(.*?)(?=>))(qq(metacpan.org/dist/$1/view).ss $2)ge" izKeys-visual-maps-base.html
+							WAS DONE EARLIER
+
+
+AltGr-↑ / should enter ˊ (currently on AltGr-' TAB), and AltGr-6 should enter ♭ (currently on @).  ♮ on & ???
+						DONE
+
+AltGr-→ … (or ⫶) should produce diag-ellipsis, AltGr-↑ … should produce ⋯
+					DONE	(NEED TO KNOW that … is accessible ???  But if not, this is reported now!)
+
+Put smilies on Fn keys, and the current meaning to the Green prefix.
+						DONE
+
+Menu-Gray-+ produces ﬩ both shifted and unshifted (the latter should produce ∑).  (Since it is noID and the base Shift-Gray-+ gives
+∑ instead of the inspected copy of ﬩ on Menu-+???)
+						DONE (revert switching of ﬩/∑ on Menu- which led to duplication)
+
+On Cyr-satellite make Cyr-AltGr-1 (which is ₽) into a Shift-Menu-1.
+						DONE
+
+Coptic digit “zeroty” is output as 9.  (analogue of 80 with 0 instead of 8)
+						DONE
+
+Mnu->, Mnu-< should give ˱, ˲.
+						DONE
+
+	diff-izKeys.kbdd-nn-fx-bad
+makes non-Latin faces much smaller.  Modifies DeadKey_Map06f3.
+Temporarily modify .kbdd to restore the old value
+	Was: were not inspecting LinkFace when doing early filtering of ComposeKey.
+						DONE
+
+In Greek, there were no bindings for ∁∃ (they are hidden by Latin AltGr).  NotSameKey(FullFace(...) ...) not working???
+But non-AltGr digit-row of Hebrew is not used, and the hook-right part...???
+Without SelectRX, a lot of Latin prefix keys unaccessible???
+		Layer exists ???!!!
+						DONE
+
+	New:	Problems: Φ is now directly accessible, and on Greek very easily!  Need to move it to something more exotic… ʗ=0297!
+         ... <Latin>: ҃(ʗ,ƒ)|ĸ(ĸ)|ʗ(ʗ,ƒ)|Ɯ(ĸ)|Į(ƒ)|Ϣ(ĸ)|£(ĸ)|ƒ(ƒ) at UI-Keyboard
+         ... <Hebrew>: ¨(ƒ)|̸(ƒ)|҃(ʗ)|ĸ(ĸ)|Ɯ(ĸ)|ʗ(ʗ,ƒ)|Ϣ(ĸ)|Į(ƒ)|£(ĸ)|ƒ(ƒ) at UI
+         ... <GreekPoly>: ¨(ƒ)|̸(ƒ)|ĸ(ĸ)|Ɯ(ĸ)|ʗ(ƒ)|Ϣ(ĸ)|Į(ƒ)|£(ĸ)|ƒ(ƒ) at UI-Key
+         ... <CyrillicPhonetic>: ¨(ƒ)|̸(ƒ)|ĸ(ĸ)|Ɯ(ĸ)|́(ƒ)|Ϣ(ĸ)|Į(ƒ)|£(ĸ)|ƒ(ƒ) at
+			DONE
+
+Greek Sinosoid sign (on Script ~) obscures Greek-~ prefix.
+			DONE
+
+keysymdef.h
+dotCompose uses builtin ad hoc translation rules to Unicode.
+Shift-␣² f should produce ƒ.
+							DONE
+
+In RU, AltGr-inversion does not work on (imported?) 02c6 02c7 02cb 02dc 02f5	(inv=070b etc)
+		But works on (imported?) 00a8 (in the first group; inv=0702) or 0338 (the last group)
+			Did not work before too: on 00af 00b4!!!
+	$HH may contain *Chain* (then works OK), or #@#@#@ (then does not)???
+								massage_imported(); calls link_layers();
+		DONE
+
+adding AltGr-inv for CyrillicPhonetic, accessor=0702 at UI-KeyboardLayout/lib/UI/KeyboardLayout.pm line 6117.
+Added to CyrillicPhonetic*==>*Chain*00a8 at UI-KeyboardLayout/lib/UI/KeyboardLayout.pm line 6131.
+adding AltGr-inv for CyrillicPhonetic, accessor=070b at UI-KeyboardLayout/lib/UI/KeyboardLayout.pm line 6117.
+Added to CyrillicPhonetic#@#@#@ˆ:Latin at UI-KeyboardLayout/lib/UI/KeyboardLayout.pm line 6131.
+adding AltGr-inv for CyrillicPhonetic, accessor=071b at UI-KeyboardLayout/lib/UI/KeyboardLayout.pm line 6117.
+Added to CyrillicPhonetic###06ed at UI-KeyboardLayout/lib/UI/KeyboardLayout.pm line 6131.
+			DONE
+
+Document that one may use TranslateAccelerator() (HOW???) to peek at KLLF_ALTGR flag.
+		Since the translation is syncroneous (sent, not posted) one may need to
+		set a flag marking a fake message.
+			DONE
+
+MS’s “Ligatures” slots have length at most 125; but a ligature — with some creative placement — can
+take more than one slot (fine for 1 long ligature; may be prohibited by [highly unprobable] coincidences for more than 1).
+Then the limit is 255 UTF-16 codepoints.  (For proper C files, may need to change the first field to unsigned short,
+or fill by a union.
+				DONE
+
+Insertion of diacritics via *2Self depends on space being in a defined-via-VK SPACE key.
+
+AltGr-Invert of Shift-Space is AltGr-Invert.  This leads to an infinite chain.
+				DONE
+
+Put ⨟-style ":" and pilcrow/hedera sign on : and & in Green/Ripe keys.  (Or exchange with "∶".)
+On Blue, put double-struck π and Π (instead of ℎ) ℼℿℽ.
+			DONE
+

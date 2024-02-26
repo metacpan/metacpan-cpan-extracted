@@ -49,14 +49,16 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "X_type" : "git",
-      "X_url" : "git://github.com/PDLPorters/pdl-fftw3.git",
-      "X_web" : "http://github.com/PDLPorters/pdl-fftw3",
       "bugtracker" : {
-         "web" : "http://github.com/PDLPorters/pdl-fftw3/issues"
+         "web" : "https://github.com/PDLPorters/pdl-fftw3/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/PDLPorters/pdl-fftw3.git",
+         "web" : "https://github.com/PDLPorters/pdl-fftw3"
       },
       "x_IRC" : "irc://irc.perl.org/#pdl"
    },
-   "version" : "0.18",
+   "version" : "0.19",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

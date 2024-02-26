@@ -70,7 +70,10 @@ use URN::OASIS::SAML2 qw(:bindings :urn);
     }
 
 
-    get_single_node_ok($xpath, '//ds:Signature');
+    my $root_node = get_single_node_ok($xpath, '/md:EntityDescriptor');
+    my $signature_node = $root_node->firstChild;
+    is($signature_node->nodeName(),
+        'dsig:Signature', "First node is the signature");
 
     is(
         'e73560b0e23602121aedc55bcb1ca637',
@@ -485,6 +488,20 @@ use URN::OASIS::SAML2 qw(:bindings :urn);
         'foo', ".. with the correct friendly name");
     is($child[1]->getAttribute('Name'),       'urn:foo:bar', ".. and name");
     is($child[1]->getAttribute('isRequired'), '1', ".. and requiredness");
+}
+
+{
+    my $sp = net_saml2_sp();
+
+    my @warns;
+    local $SIG{__WARN__} = sub { push(@warns, shift); };
+    my $id = $sp->id;
+    is($id, $sp->issuer, "id is still the issuer");
+    cmp_deeply(
+        \@warns,
+        ["Net::SAML2 deprecation warning: id() has been renamed to issuer()\n"],
+        "We have our deprecation warning"
+    );
 }
 
 done_testing;

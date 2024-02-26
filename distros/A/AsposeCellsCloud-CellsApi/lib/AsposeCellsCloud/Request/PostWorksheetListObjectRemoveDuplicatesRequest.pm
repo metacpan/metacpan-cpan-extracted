@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# PostWorksheetListObjectRemoveDuplicatesRequest.name : The workbook name.  ,
+# PostWorksheetListObjectRemoveDuplicatesRequest.name : The file name.  ,
 # PostWorksheetListObjectRemoveDuplicatesRequest.sheetName : The worksheet name.  ,
-# PostWorksheetListObjectRemoveDuplicatesRequest.listObjectIndex : List object index.  ,
-# PostWorksheetListObjectRemoveDuplicatesRequest.folder : Original workbook folder.  ,
-# PostWorksheetListObjectRemoveDuplicatesRequest.storageName : Storage name.   
+# PostWorksheetListObjectRemoveDuplicatesRequest.listObjectIndex : The list object index.  ,
+# PostWorksheetListObjectRemoveDuplicatesRequest.folder : The folder where the file is situated.  ,
+# PostWorksheetListObjectRemoveDuplicatesRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_worksheet_list_object_remove_duplicates' } = { 
-    	summary => 'Remove duplicates on list object.',
+    	summary => 'Remove duplicates in list object.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -137,7 +137,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -151,21 +151,21 @@ __PACKAGE__->method_documentation({
      'list_object_index' => {
      	datatype => 'int',
      	base_name => 'listObjectIndex',
-     	description => 'List object index.',
+     	description => 'The list object index.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

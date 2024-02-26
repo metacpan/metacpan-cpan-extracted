@@ -1,5 +1,5 @@
 package YA::CLI::ErrorHandler;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 use Moo;
 use namespace::autoclean;
 
@@ -29,7 +29,7 @@ YA::CLI::ErrorHandler - The default action handler
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 DESCRIPTION
 

@@ -8,7 +8,7 @@ Template::Provider::Pandoc - pre-process templates with Pandoc
     use Template::Provider::Pandoc;
 
     my $tt = Template->new(
-      LOAD_TEMPLATES = [ Template::Provider::Pandoc->new ],
+      LOAD_TEMPLATES => [ Template::Provider::Pandoc->new ],
     );
 
     $tt->process('template.md', \%vars)
@@ -81,7 +81,7 @@ extends 'Template::Provider';
 
 use Pandoc ();
 
-our $VERSION = '0.0.4';
+our $VERSION = '0.0.5';
 
 has pandoc => (
   isa => 'Pandoc',

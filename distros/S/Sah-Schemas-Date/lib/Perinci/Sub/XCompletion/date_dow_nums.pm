@@ -7,9 +7,9 @@ use warnings;
 use Complete::Util qw(complete_comma_sep);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-12'; # DATE
+our $DATE = '2023-12-09'; # DATE
 our $DIST = 'Sah-Schemas-Date'; # DIST
-our $VERSION = '0.018'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 our %SPEC;
 
@@ -47,7 +47,7 @@ Perinci::Sub::XCompletion::date_dow_nums - Generate completion for date::dow_num
 
 =head1 VERSION
 
-This document describes version 0.018 of Perinci::Sub::XCompletion::date_dow_nums (from Perl distribution Sah-Schemas-Date), released on 2022-10-12.
+This document describes version 0.019 of Perinci::Sub::XCompletion::date_dow_nums (from Perl distribution Sah-Schemas-Date), released on 2023-12-09.
 
 =head1 CONFIGURATION
 
@@ -111,7 +111,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2019 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020, 2019 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

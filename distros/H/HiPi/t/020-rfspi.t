@@ -20,18 +20,27 @@ my $monitor_1 = '0004-0001-000A54';
 my $adapter_1 = '0004-0002-000E08';
 my $adapter_2 = '0004-0002-002BA0';
 
-#my $reset_pin = RPI_PIN_22;
-#
-#my $gpio = HiPi::GPIO->new;
-#$gpio->set_pin_mode( $reset_pin, RPI_MODE_OUTPUT ) if( $gpio->get_pin_mode($reset_pin) != RPI_MODE_OUTPUT );
-#$gpio->pin_write($reset_pin, RPI_LOW);
+my $reset_gpio;
 
-my $mcp = HiPi::Interface::MCP23017->new(
-    devicename => '/dev/i2c-1',
-    address    => 0x20,
-);
+if ( $ENV{HIPI_MODULES_DIST_TEST_RFSPI_DEV_1} ) {
+    $reset_gpio = RPI_PIN_22;
+    
+    #$gpio = HiPi::GPIO->new;
+    #$gpio->set_pin_mode( $reset_pin, RPI_MODE_OUTPUT ) if( $gpio->get_pin_mode($reset_pin) != RPI_MODE_OUTPUT );
+    #$gpio->pin_write($reset_pin, RPI_LOW);
+} else {
+    my $mcp = HiPi::Interface::MCP23017->new(
+        devicename => '/dev/i2c-1',
+        address    => 0x20,
+    );
+    $mcp->pin_mode( MCP_PIN_A1, MCP23017_OUTPUT );
+    $reset_gpio = sub {
+        my $value = shift;
+        $mcp->pin_value( MCP_PIN_A1, $value );
+    };
+}
 
-$mcp->pin_mode( MCP_PIN_A1, MCP23017_OUTPUT );
+
 
 my $device_name = $ENV{HIPI_MODULES_DIST_TEST_RFSPI_DEV_0} ? '/dev/spidev0.0' : '/dev/spidev0.1';
 
@@ -41,10 +50,7 @@ my %handler_params = ( $ENV{HIPI_MODULES_DIST_TEST_RFSPI_HIGH_POWER} )
 
 my $handler = HiPi::Energenie->new(
     %handler_params,
-    reset_gpio => sub {
-        my $value = shift;
-        $mcp->pin_value( MCP_PIN_A1, $value );
-    }
+    reset_gpio => $reset_gpio,
 );
 
 if ($handler_params{backend} eq 'RF69HW' ) {

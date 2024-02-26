@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Sr::Cyrl::Ba - Package for language Serbian
 
 package Locale::CLDR::Locales::Sr::Cyrl::Ba;
 # This file auto generated from Data\common\main\sr_Cyrl_BA.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -31,35 +31,22 @@ has 'display_name_language' => (
 	default		=> sub {
 		 sub {
 			 my %languages = (
-				'ar_001' => 'савремени стандардни арапски',
- 				'arn' => 'мапудунгун',
- 				'be' => 'бјелоруски',
+				'be' => 'бјелоруски',
  				'bm' => 'бамананкан',
  				'bn' => 'бангла',
+ 				'crl' => 'сјевероисточни кри',
  				'de' => 'њемачки',
  				'de_CH' => 'швајцарски високи њемачки',
- 				'en_GB' => 'енглески (Велика Британија)',
- 				'es_ES' => 'шпански (Европа)',
- 				'fa_AF' => 'дари',
+ 				'frr' => 'сјевернофризијски',
  				'gsw' => 'њемачки (Швајцарска)',
  				'ht' => 'хаићански креолски',
- 				'lo' => 'лаошки',
  				'lrc' => 'сјеверни лури',
- 				'moh' => 'мохок',
  				'nd' => 'сјеверни ндебеле',
  				'nds' => 'нискоњемачки',
- 				'nqo' => 'н’ко',
- 				'pt_PT' => 'португалски (Португал)',
+ 				'nso' => 'сјеверни сото',
+ 				'ojb' => 'сјеверозападни оџибва',
  				'se' => 'сјеверни сами',
- 				'shi' => 'јужни шилха',
- 				'si' => 'синхалски',
- 				'sw_CD' => 'кисвахили',
- 				'tzm' => 'централноатласки тамашек',
- 				'xh' => 'исикоса',
- 				'zgh' => 'стандардни марокански тамашек',
- 				'zh_Hans' => 'поједностављени кинески',
- 				'zh_Hant' => 'традиционални кинески',
- 				'zu' => 'исизулу',
+ 				'ttm' => 'сјеверни тучон',
 
 			);
 			if (@_) {
@@ -83,32 +70,37 @@ has 'display_name_region' => (
  			'021' => 'Сјеверна Америка',
  			'154' => 'Сјеверна Европа',
  			'AC' => 'острво Асенсион',
+ 			'AX' => 'Оландска острва',
+ 			'BL' => 'Сен Бартелеми',
+ 			'BN' => 'Брунеји',
+ 			'BV' => 'острво Буве',
  			'BY' => 'Бјелорусија',
  			'CC' => 'Кокосова (Килинг) острва',
- 			'CG' => 'Конго',
  			'CP' => 'острво Клипертон',
- 			'CV' => 'Кабо Верде',
  			'CZ' => 'Чешка Република',
  			'DE' => 'Њемачка',
+ 			'FK' => 'Фокландска острва',
  			'FK@alt=variant' => 'Фолкландска (Малвинска) острва',
+ 			'FO' => 'Фарска острва',
  			'GS' => 'Јужна Џорџија и Јужна Сендвичка острва',
  			'GU' => 'Гвам',
+ 			'GW' => 'Гвинеја Бисао',
  			'HK' => 'Хонгконг (САО Кине)',
  			'HM' => 'острво Херд и острва Макдоналд',
- 			'KN' => 'Свети Китс и Невис',
+ 			'KM' => 'Комори',
  			'KP' => 'Сјеверна Кореја',
  			'MK' => 'Сјеверна Македонија',
- 			'MO' => 'САР Макао',
+ 			'MM' => 'Мјанмар (Бурма)',
  			'MP' => 'Сјеверна Маријанска острва',
  			'NF' => 'острво Норфок',
  			'NU' => 'Нијуе',
- 			'PM' => 'Свети Пјер и Микелон',
  			'PS' => 'палестинске територије',
  			'RE' => 'Реунион',
+ 			'TF' => 'Француске јужне територије',
  			'UM' => 'Спољна острва САД',
  			'VC' => 'Свети Винсент и Гренадини',
- 			'VG' => 'Британска Дјевичанска Острва',
- 			'VI' => 'Америчка Дјевичанска Острва',
+ 			'VG' => 'Британска Дјевичанска острва',
+ 			'VI' => 'Америчка Дјевичанска острва',
 
 		}
 	},
@@ -134,9 +126,14 @@ has 'display_name_type' => (
 	default		=> sub {
 		{
 			'collation' => {
+ 				'compat' => q{претходни редослијед сортирања, због компатибилности},
+ 				'dictionary' => q{редослијед сортирања у рјечнику},
  				'ducet' => q{подразумијевани Unicode редослијед сортирања},
+ 				'phonetic' => q{фонетски редослијед сортирања},
+ 				'reformed' => q{реформисани редослијед сортирања},
  				'search' => q{претрага опште намјене},
  				'standard' => q{стандардни редослијед сортирања},
+ 				'unihan' => q{редослијед сортирања радикалних потеза},
  			},
  			'numbers' => {
  				'mymr' => q{мјанмарске цифре},
@@ -161,6 +158,42 @@ has 'units' => (
 						'1' => q(јоби{0}),
 					},
 					# Long Unit Identifier
+					'10p-30' => {
+						'1' => q(q{0}),
+					},
+					# Core Unit Identifier
+					'30' => {
+						'1' => q(q{0}),
+					},
+					# Long Unit Identifier
+					'10p27' => {
+						'1' => q(R{0}),
+					},
+					# Core Unit Identifier
+					'10p27' => {
+						'1' => q(R{0}),
+					},
+					# Long Unit Identifier
+					'10p30' => {
+						'1' => q(Q{0}),
+					},
+					# Core Unit Identifier
+					'10p30' => {
+						'1' => q(Q{0}),
+					},
+					# Long Unit Identifier
+					'acceleration-g-force' => {
+						'few' => q({0} G),
+						'one' => q({0} ге сила),
+						'other' => q({0} ге сила),
+					},
+					# Core Unit Identifier
+					'g-force' => {
+						'few' => q({0} G),
+						'one' => q({0} ге сила),
+						'other' => q({0} ге сила),
+					},
+					# Long Unit Identifier
 					'duration-century' => {
 						'few' => q({0} вијека),
 						'name' => q(вијекови),
@@ -177,7 +210,6 @@ has 'units' => (
 					# Long Unit Identifier
 					'duration-month' => {
 						'few' => q({0} мјесеца),
-						'name' => q(мјесеци),
 						'one' => q({0} мјесец),
 						'other' => q({0} мјесеци),
 						'per' => q({0} мјесечно),
@@ -185,7 +217,6 @@ has 'units' => (
 					# Core Unit Identifier
 					'month' => {
 						'few' => q({0} мјесеца),
-						'name' => q(мјесеци),
 						'one' => q({0} мјесец),
 						'other' => q({0} мјесеци),
 						'per' => q({0} мјесечно),
@@ -207,6 +238,42 @@ has 'units' => (
 						'per' => q({0} недјељно),
 					},
 					# Long Unit Identifier
+					'electric-milliampere' => {
+						'few' => q({0} mA),
+						'one' => q({0} милиампер),
+						'other' => q({0} милиампера),
+					},
+					# Core Unit Identifier
+					'milliampere' => {
+						'few' => q({0} mA),
+						'one' => q({0} милиампер),
+						'other' => q({0} милиампера),
+					},
+					# Long Unit Identifier
+					'energy-kilojoule' => {
+						'few' => q({0} kJ),
+						'one' => q({0} килоџул),
+						'other' => q({0} килоџула),
+					},
+					# Core Unit Identifier
+					'kilojoule' => {
+						'few' => q({0} kJ),
+						'one' => q({0} килоџул),
+						'other' => q({0} килоџула),
+					},
+					# Long Unit Identifier
+					'frequency-hertz' => {
+						'few' => q({0} Hz),
+						'one' => q({0} херц),
+						'other' => q({0} херца),
+					},
+					# Core Unit Identifier
+					'hertz' => {
+						'few' => q({0} Hz),
+						'one' => q({0} херц),
+						'other' => q({0} херца),
+					},
+					# Long Unit Identifier
 					'length-light-year' => {
 						'few' => q({0} свјетлосне године),
 						'name' => q(свјетлосне године),
@@ -223,30 +290,162 @@ has 'units' => (
 					# Long Unit Identifier
 					'mass-grain' => {
 						'few' => q({0} грана),
-						'name' => q(гран),
 						'one' => q({0} гран),
 						'other' => q({0} гранова),
 					},
 					# Core Unit Identifier
 					'grain' => {
 						'few' => q({0} грана),
-						'name' => q(гран),
 						'one' => q({0} гран),
 						'other' => q({0} гранова),
+					},
+					# Long Unit Identifier
+					'pressure-inch-ofhg' => {
+						'few' => q({0} inHg),
+						'one' => q({0} инч живиног стуба),
+						'other' => q({0} инча живиног стуба),
+					},
+					# Core Unit Identifier
+					'inch-ofhg' => {
+						'few' => q({0} inHg),
+						'one' => q({0} инч живиног стуба),
+						'other' => q({0} инча живиног стуба),
+					},
+					# Long Unit Identifier
+					'pressure-millibar' => {
+						'few' => q({0} mbar),
+						'one' => q({0} милибар),
+						'other' => q({0} милибара),
+					},
+					# Core Unit Identifier
+					'millibar' => {
+						'few' => q({0} mbar),
+						'one' => q({0} милибар),
+						'other' => q({0} милибара),
+					},
+					# Long Unit Identifier
+					'speed-beaufort' => {
+						'few' => q(B {0}),
+						'name' => q(Bft),
+						'one' => q(B {0}),
+						'other' => q(B {0}),
+					},
+					# Core Unit Identifier
+					'beaufort' => {
+						'few' => q(B {0}),
+						'name' => q(Bft),
+						'one' => q(B {0}),
+						'other' => q(B {0}),
+					},
+					# Long Unit Identifier
+					'volume-acre-foot' => {
+						'few' => q({0} акер стопе),
+						'one' => q({0} ac ft),
+						'other' => q({0} акер стопа),
+					},
+					# Core Unit Identifier
+					'acre-foot' => {
+						'few' => q({0} акер стопе),
+						'one' => q({0} ac ft),
+						'other' => q({0} акер стопа),
+					},
+					# Long Unit Identifier
+					'volume-gallon-imperial' => {
+						'few' => q({0} gal Imp.),
+						'one' => q({0} имп. галон),
+						'other' => q({0} имп. галона),
+					},
+					# Core Unit Identifier
+					'gallon-imperial' => {
+						'few' => q({0} gal Imp.),
+						'one' => q({0} имп. галон),
+						'other' => q({0} имп. галона),
 					},
 				},
 				'narrow' => {
 					# Long Unit Identifier
+					'duration-month' => {
+						'few' => q({0} мјес.),
+						'one' => q({0} м),
+						'other' => q({0} м),
+					},
+					# Core Unit Identifier
+					'month' => {
+						'few' => q({0} мјес.),
+						'one' => q({0} м),
+						'other' => q({0} м),
+					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'few' => q({0} с),
+						'one' => q({0} сек),
+						'other' => q({0} с),
+					},
+					# Core Unit Identifier
+					'second' => {
+						'few' => q({0} с),
+						'one' => q({0} сек),
+						'other' => q({0} с),
+					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'few' => q({0} н),
+						'one' => q({0} нед.),
+						'other' => q({0} н),
+					},
+					# Core Unit Identifier
+					'week' => {
+						'few' => q({0} н),
+						'one' => q({0} нед.),
+						'other' => q({0} н),
+					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'few' => q({0} год.),
+						'one' => q({0} г),
+						'other' => q({0} г),
+					},
+					# Core Unit Identifier
+					'year' => {
+						'few' => q({0} год.),
+						'one' => q({0} г),
+						'other' => q({0} г),
+					},
+					# Long Unit Identifier
+					'power-horsepower' => {
+						'few' => q({0} hp),
+						'one' => q({0} кс),
+						'other' => q({0} кс),
+					},
+					# Core Unit Identifier
+					'horsepower' => {
+						'few' => q({0} hp),
+						'one' => q({0} кс),
+						'other' => q({0} кс),
+					},
+					# Long Unit Identifier
+					'speed-beaufort' => {
+						'few' => q(B {0}),
+						'name' => q(Bft),
+						'one' => q(B {0}),
+						'other' => q(B {0}),
+					},
+					# Core Unit Identifier
+					'beaufort' => {
+						'few' => q(B {0}),
+						'name' => q(Bft),
+						'one' => q(B {0}),
+						'other' => q(B {0}),
+					},
+					# Long Unit Identifier
 					'volume-barrel' => {
 						'few' => q({0} bbl),
-						'name' => q(bbl),
 						'one' => q({0}bbl),
 						'other' => q({0}bbl),
 					},
 					# Core Unit Identifier
 					'barrel' => {
 						'few' => q({0} bbl),
-						'name' => q(bbl),
 						'one' => q({0}bbl),
 						'other' => q({0}bbl),
 					},
@@ -277,6 +476,18 @@ has 'units' => (
 						'name' => q(и. д. к.),
 						'one' => q({0} и. д. к.),
 						'other' => q({0} и. д. к.),
+					},
+					# Long Unit Identifier
+					'volume-gallon-imperial' => {
+						'few' => q({0} gal Imp.),
+						'one' => q({0}/gal Imp),
+						'other' => q({0}/gal Imp),
+					},
+					# Core Unit Identifier
+					'gallon-imperial' => {
+						'few' => q({0} gal Imp.),
+						'one' => q({0}/gal Imp),
+						'other' => q({0}/gal Imp),
 					},
 				},
 				'short' => {
@@ -317,18 +528,16 @@ has 'units' => (
 						'other' => q({0} гранова),
 					},
 					# Long Unit Identifier
-					'volume-dessert-spoon' => {
-						'few' => q({0} dstspn),
-						'name' => q(dstspn),
-						'one' => q({0} dstspn),
-						'other' => q({0} dstspn),
+					'speed-beaufort' => {
+						'few' => q(B {0}),
+						'one' => q(B {0}),
+						'other' => q(Б {0}),
 					},
 					# Core Unit Identifier
-					'dessert-spoon' => {
-						'few' => q({0} dstspn),
-						'name' => q(dstspn),
-						'one' => q({0} dstspn),
-						'other' => q({0} dstspn),
+					'beaufort' => {
+						'few' => q(B {0}),
+						'one' => q(B {0}),
+						'other' => q(Б {0}),
 					},
 				},
 			} }
@@ -382,17 +591,6 @@ has 'calendar_days' => (
 	default		=> sub { {
 			'gregorian' => {
 				'format' => {
-					wide => {
-						mon => 'понедјељак',
-						tue => 'уторак',
-						wed => 'сриједа',
-						thu => 'четвртак',
-						fri => 'петак',
-						sat => 'субота',
-						sun => 'недјеља'
-					},
-				},
-				'stand-alone' => {
 					abbreviated => {
 						mon => 'пон',
 						tue => 'уто',
@@ -426,31 +624,6 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'generic') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
-				}
-				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
-				}
-				last SWITCH;
-				}
 			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
@@ -493,21 +666,15 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'afternoon1' => q{по под.},
-					'am' => q{прије подне},
-					'evening1' => q{вече},
-					'midnight' => q{поноћ},
-					'morning1' => q{јутро},
-					'night1' => q{ноћу},
-					'noon' => q{подне},
-					'pm' => q{по подне},
+					'am' => q{прије подне},
+					'pm' => q{по подне},
 				},
 				'narrow' => {
-					'afternoon1' => q{по под.},
-					'evening1' => q{вече},
+					'afternoon1' => q{по подне},
+					'evening1' => q{увече},
 					'midnight' => q{поноћ},
-					'morning1' => q{јутро},
-					'night1' => q{ноћ},
+					'morning1' => q{ујутро},
+					'night1' => q{ноћу},
 					'noon' => q{подне},
 				},
 				'wide' => {
@@ -516,10 +683,6 @@ has 'day_periods' => (
 				},
 			},
 			'stand-alone' => {
-				'abbreviated' => {
-					'am' => q{прије подне},
-					'pm' => q{по подне},
-				},
 				'narrow' => {
 					'am' => q{а},
 					'pm' => q{p},
@@ -538,8 +701,6 @@ has 'eras' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-		},
 		'gregorian' => {
 			wide => {
 				'0' => 'прије нове ере'
@@ -553,8 +714,6 @@ has 'date_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-		},
 		'gregorian' => {
 		},
 	} },
@@ -565,8 +724,6 @@ has 'time_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-		},
 		'gregorian' => {
 		},
 	} },
@@ -577,8 +734,6 @@ has 'datetime_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-		},
 		'gregorian' => {
 		},
 	} },
@@ -605,39 +760,6 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			MMMEd => {
-				M => q{E, d. MMM – E, d. MMM},
-				d => q{E, d. MMM – E, d. MMM},
-			},
-			yMd => {
-				M => q{d.M.y. – d.M.y. GGGGG},
-			},
-		},
-		'gregorian' => {
-			MEd => {
-				M => q{E, MM-dd – E, MM-dd},
-				d => q{E, MM-dd – E, MM-dd},
-			},
-			Md => {
-				M => q{MM-dd – MM-dd},
-				d => q{MM-dd – MM-dd},
-			},
-			yM => {
-				M => q{y-MM – y-MM},
-				y => q{y-MM – y-MM},
-			},
-			yMEd => {
-				M => q{E, y-MM-dd – E, y-MM-dd},
-				d => q{E, y-MM-dd – E, y-MM-dd},
-				y => q{E, y-MM-dd – E, y-MM-dd},
-			},
-			yMd => {
-				M => q{y-MM-dd – y-MM-dd},
-				d => q{y-MM-dd – y-MM-dd},
-				y => q{y-MM-dd – y-MM-dd},
-			},
-		},
 	} },
 );
 

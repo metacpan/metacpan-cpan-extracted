@@ -1,5 +1,11 @@
 Revision history for Perl extension Redis-Cluster-Fast
 
+0.091 2024-02-15T16:31:44Z
+
+    - Bump hiredis-cluster to 0.11.0
+    - Bump hiredis to 1.2.0
+    - Refactorings
+
 0.090 2023-11-05T16:51:58Z
 
     - Use a DEBUG_REDIS_CLUSTER_FAST environment variable instead of a debug argument.

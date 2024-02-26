@@ -2,9 +2,9 @@
 package Require::Hook;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-04-22'; # DATE
+our $DATE = '2023-12-05'; # DATE
 our $DIST = 'Require-Hook'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 1;
 # ABSTRACT: Namespace for require() hooks
@@ -21,11 +21,12 @@ Require::Hook - Namespace for require() hooks
 
 =head1 VERSION
 
-This document describes version 0.003 of Require::Hook (from Perl distribution Require-Hook), released on 2023-04-22.
+This document describes version 0.004 of Require::Hook (from Perl distribution Require-Hook), released on 2023-12-05.
 
 =head1 DESCRIPTION
 
-B<NOTE:> Please see L<Require::HookChain> instead which largely supersedes this.
+B<NOTE:> Please see L<Require::HookPlugin> instead which largely supersedes
+this.
 
 As one already understands, Perl lets you put coderefs or objects in C<@INC> as
 "hooks". This lets you do all sorts of things when it comes to loading modules,

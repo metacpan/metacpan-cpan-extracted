@@ -10,17 +10,15 @@ do { my $x = {
                                       'IO::Handle' => '0',
                                       'IPC::Open3' => '0',
                                       'Test::More' => '0',
-                                      'Test::Pod' => '1.41',
-                                      'strict' => '0',
-                                      'warnings' => '0'
+                                      'Test::Perl::Critic' => '0',
+                                      'Test::Pod' => '1.41'
                                     }
                     },
        'runtime' => {
                       'requires' => {
-                                      'Config::Structured' => '0',
-                                      'Mojo::Base' => '0',
-                                      'Readonly' => '0',
-                                      'perl' => '5.022'
+                                      'Config::Structured' => '2.006',
+                                      'Mojolicious' => '0',
+                                      'perl' => '5.022000'
                                     }
                     },
        'test' => {
@@ -30,9 +28,8 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
-                                   'Test::More' => '0',
-                                   'strict' => '0',
-                                   'warnings' => '0'
+                                   'Test2::Suite' => '0.000155',
+                                   'Test::More' => '0'
                                  }
                  }
      };

@@ -2,8 +2,8 @@ NAME
     Sah::Schemas::Re - Various regular-expression schemas
 
 VERSION
-    This document describes version 0.005 of Sah::Schemas::Re (from Perl
-    distribution Sah-Schemas-Re), released on 2023-09-09.
+    This document describes version 0.006 of Sah::Schemas::Re (from Perl
+    distribution Sah-Schemas-Re), released on 2023-12-20.
 
 SAH SCHEMAS
     The following schemas are included in this distribution:
@@ -28,6 +28,13 @@ SAH SCHEMAS
         pattern in Perl. Otherwise, your string will be quotemeta()-ed first
         then compiled to Regexp object. This means in the second case you
         cannot specify metacharacters.
+
+        What's the difference between this schema and "str_or_re" (from
+        Sah::Schemas::Str)? Both this schema and "str_or_re" accept string,
+        but this schema will still coerce strings not in the form of "/.../"
+        or qr(...) to regexp object, while "str_or_re" will leave the string
+        as-is. In other words, this schema always converts input to Regexp
+        object while "str_or_re" does not.
 
     *   re_or_code_from_str
 

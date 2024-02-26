@@ -1,12 +1,13 @@
 package Acme::CPANModules::WorkingWithXLS;
 
 use strict;
+
 use Acme::CPANModulesUtil::Misc;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-13'; # DATE
+our $DATE = '2023-12-04'; # DATE
 our $DIST = 'Acme-CPANModules-WorkingWithXLS'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 my $text = <<'_';
 
@@ -77,7 +78,7 @@ TBD
 _
 
 our $LIST = {
-    summary => 'Working with Excel formats (XLS, XLSX) or other spreadsheet formats like LibreOffice Calc (ODS)',
+    summary => 'List of modules to work with Excel formats (XLS, XLSX) or other spreadsheet formats like LibreOffice Calc (ODS)',
     description => $text,
     tags => ['task'],
 };
@@ -85,7 +86,7 @@ our $LIST = {
 Acme::CPANModulesUtil::Misc::populate_entries_from_module_links_in_description;
 
 1;
-# ABSTRACT: Working with Excel formats (XLS, XLSX) or other spreadsheet formats like LibreOffice Calc (ODS)
+# ABSTRACT: List of modules to work with Excel formats (XLS, XLSX) or other spreadsheet formats like LibreOffice Calc (ODS)
 
 __END__
 
@@ -95,11 +96,11 @@ __END__
 
 =head1 NAME
 
-Acme::CPANModules::WorkingWithXLS - Working with Excel formats (XLS, XLSX) or other spreadsheet formats like LibreOffice Calc (ODS)
+Acme::CPANModules::WorkingWithXLS - List of modules to work with Excel formats (XLS, XLSX) or other spreadsheet formats like LibreOffice Calc (ODS)
 
 =head1 VERSION
 
-This document describes version 0.002 of Acme::CPANModules::WorkingWithXLS (from Perl distribution Acme-CPANModules-WorkingWithXLS), released on 2022-11-13.
+This document describes version 0.005 of Acme::CPANModules::WorkingWithXLS (from Perl distribution Acme-CPANModules-WorkingWithXLS), released on 2023-12-04.
 
 =head1 DESCRIPTION
 
@@ -238,6 +239,8 @@ Source repository is at L<https://github.com/perlancar/perl-Acme-CPANModules-Wor
 
 L<Acme::CPANModules::WorkingWithCSV>
 
+L<Acme::CPANModules::WorkingWithDOC>
+
 L<Acme::CPANModules> - about the Acme::CPANModules namespace
 
 L<cpanmodules> - CLI tool to let you browse/view the lists
@@ -266,7 +269,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

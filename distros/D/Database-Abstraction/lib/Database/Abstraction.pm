@@ -24,10 +24,12 @@ Database::Abstraction - database abstraction layer
 #	use select() to select a database - use the table arg
 #	new(database => 'redis://servername');
 # TODO:	Add a "key" property, defaulting to "entry", which would be the name of the key
+# TODO:	The maximum number to return should be tuneable (as a LIMIT)
 
 use warnings;
 use strict;
 
+use Data::Dumper;
 use DBD::SQLite::Constants qw/:file_open/;	# For SQLITE_OPEN_READONLY
 use File::Basename;
 use File::Spec;
@@ -41,11 +43,11 @@ use constant	MAX_SLURP_SIZE => 16 * 1024;	# CSV files <= than this size are read
 
 =head1 VERSION
 
-Version 0.05
+Version 0.07
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 
 =head1 SYNOPSIS
 
@@ -71,13 +73,13 @@ You can then access the data using:
     my $row = $foo->fetchrow_hashref(customer_id => 'xyzzy');
     print Data::Dumper->new([$row])->Dump();
 
-CSV files can have empty lines or comment lines starting with '#',
-to make them more readable.
-
 If the table has a column called "entry",
 entries are keyed on that and sorts are based on it.
 To turn that off, pass 'no_entry' to the constructor, for legacy
 reasons it's enabled by default.
+
+CSV files that are not no_entry can have empty lines or comment lines starting with '#',
+to make them more readable.
 
 =head1 SUBROUTINES/METHODS
 
@@ -85,7 +87,7 @@ reasons it's enabled by default.
 
 Set some class level defaults.
 
-    MyPackageName::Database::init(directory => '../databases');
+    MyPackageName::Database::init(directory => '../data');
 
 See the documentation for new to see what variables can be set.
 
@@ -164,7 +166,7 @@ sub new {
 		# table => $args{'table'},	# The name of the file containing the table, defaults to the class name
 		# no_entry => $args{'no_entry'} || 0,
 	# }, $class;
-	# Reseen keys take precendence, so defaults come first
+	# Reseen keys take precedence, so defaults come first
 	return bless { no_entry => 0, cache_duration => '1 hour', %defaults, %args }, $class;
 }
 
@@ -334,6 +336,9 @@ sub _open {
 				require Text::xSV::Slurp;
 				Text::xSV::Slurp->import();
 
+				if($self->{'logger'}) {
+					$self->{'logger'}->trace('slurp in');
+				}
 				my @data = @{xsv_slurp(
 					shape => 'aoh',
 					text_csv => {
@@ -348,15 +353,21 @@ sub _open {
 					file => $slurp_file
 				)};
 
-				# Ignore blank lines or lines starting with # in the CSV file
-				unless($self->{no_entry}) {
-					@data = grep { $_->{'entry'} !~ /^\s*#/ } grep { defined($_->{'entry'}) } @data;
-				}
 				# $self->{'data'} = @data;
-				my $i = 0;
-				$self->{'data'} = ();
-				foreach my $d(@data) {
-					$self->{'data'}[$i++] = $d;
+				if($self->{'no_entry'}) {
+					# Not keyed, will need to scan each entry
+					my $i = 0;
+					$self->{'data'} = ();
+					foreach my $d(@data) {
+						$self->{'data'}[$i++] = $d;
+					}
+				} else {
+					# keyed on the "entry" column
+					# Ignore blank lines or lines starting with # in the CSV file
+					@data = grep { $_->{'entry'} !~ /^\s*#/ } grep { defined($_->{'entry'}) } @data;
+					foreach my $d(@data) {
+						$self->{'data'}->{$d->{'entry'}} = $d;
+					}
 				}
 			}
 			$self->{'type'} = 'CSV';
@@ -410,20 +421,18 @@ sub selectall_hash {
 	my $table = $self->{table} || ref($self);
 	$table =~ s/.*:://;
 
+	$self->_open() if(!$self->{$table});
+
 	if((scalar(keys %params) == 0) && $self->{'data'}) {
 		if($self->{'logger'}) {
 			$self->{'logger'}->trace("$table: selectall_hash fast track return");
 		}
-		# This use of a temporary variable is to avoid
-		#	"Implicit scalar context for array in return"
-		# return @{$self->{'data'}};
-		my @rc = @{$self->{'data'}};
-		return @rc;
+		return values %{$self->{'data'}};
+		# my @rc = values %{$self->{'data'}};
+		# return @rc;
 	}
 	# if((scalar(keys %params) == 1) && $self->{'data'} && defined($params{'entry'})) {
 	# }
-
-	$self->_open() if(!$self->{$table});
 
 	my $query;
 	my $done_where = 0;
@@ -545,6 +554,13 @@ sub fetchrow_hashref {
 
 	$self->_open() if(!$self->{$table});
 
+	if($self->{'data'} && (!$self->{'no_entry'}) && (scalar keys(%params) == 1) && defined($params{'entry'})) {
+		if(my $logger = $self->{'logger'}) {
+			$logger->debug('Fast return from slurped data');
+		}
+		return $self->{'data'}->{$params{'entry'}};
+	}
+
 	my $query = 'SELECT * FROM ';
 	if(my $t = delete $params{'table'}) {
 		$query .= $t;
@@ -602,15 +618,19 @@ sub fetchrow_hashref {
 	my $sth = $self->{$table}->prepare($query) or die $self->{$table}->errstr();
 	# $sth->execute(@query_args) || throw Error::Simple("$query: @query_args");
 	$sth->execute(@query_args) || croak("$query: @query_args");
+	my $rc = $sth->fetchrow_hashref();
 	if($c) {
-		my $rc = $sth->fetchrow_hashref();
 		if(my $logger = $self->{'logger'}) {
-			$logger->debug("Stash $key=>$rc in the cache for ", $self->{'cache_duration'});
+			if($rc) {
+				$logger->debug("stash $key=>$rc in the cache for ", $self->{'cache_duration'});
+				$logger->debug("returns ", Data::Dumper->new([$rc])->Dump());
+			} else {
+				$logger->debug("Stash $key=>undef in the cache for ", $self->{'cache_duration'});
+			}
 		}
 		$c->set($key, $rc, $self->{'cache_duration'});
-		return $rc;
 	}
-	return $sth->fetchrow_hashref();
+	return $rc;
 }
 
 =head2	execute
@@ -633,7 +653,7 @@ sub execute {
 		$args{'query'} = shift;
 	}
 
-	Carp::croak('Usage: execute(query => $query)') unless(defined($args{'query'}));
+	Carp::croak(__PACKAGE__, ': Usage: execute(query => $query)') unless(defined($args{'query'}));
 
 	my $table = $self->{table} || ref($self);
 	$table =~ s/.*:://;
@@ -704,12 +724,21 @@ sub AUTOLOAD {
 	} elsif((scalar(@_) % 2) == 0) {
 		%params = @_;
 	} elsif(scalar(@_) == 1) {
+		if($self->{'no_entry'}) {
+			Carp::croak(ref($self), "::($_[0]): entry is not a column");
+		}
 		$params{'entry'} = shift;
 	}
 
 	my $query;
 	my $done_where = 0;
-	if(wantarray && !delete($params{'distinct'})) {
+	my $distinct = delete($params{'distinct'});
+
+	if(wantarray && !$distinct) {
+		if(((scalar keys %params) == 0) && (my $data = $self->{'data'})) {
+			# Return all the entries in the column
+			return map { $_->{$column} } values %{$data};
+		}
 		if(($self->{'type'} eq 'CSV') && !$self->{no_entry}) {
 			$query = "SELECT $column FROM $table WHERE entry IS NOT NULL AND entry NOT LIKE '#%'";
 			$done_where = 1;
@@ -717,20 +746,71 @@ sub AUTOLOAD {
 			$query = "SELECT $column FROM $table";
 		}
 	} else {
-		if($self->{'data'} && ((scalar keys %params) == 1)) {
+		if(my $data = $self->{'data'}) {
 			# The data has been read in using Text::xSV::Slurp, and it's a simple query
 			#	so no need to do any SQL
-			my ($key, $value) = %params;
-			if(my $data = $self->{'data'}) {
+			if($self->{'no_entry'}) {
+				my ($key, $value) = %params;
 				foreach my $row(@{$data}) {
 					if(($row->{$key} eq $value) && (my $rc = $row->{$column})) {
 						if($self->{'logger'}) {
-							$self->{'logger'}->trace("AUTOLOAD return '$rc' from slurped data");
+							if(defined($rc)) {
+								$self->{'logger'}->trace(__LINE__, ": AUTOLOAD $key: return '$rc' from slurped data");
+							} else {
+								$self->{'logger'}->trace(__LINE__, ": AUTOLOAD $key: return undef from slurped data");
+							}
 						}
-						return $rc;
+						return $rc
+					}
+				}
+			} elsif(((scalar keys %params) == 1) && defined(my $key = $params{'entry'})) {
+				# Look up the key
+
+				# This weird code is to stop the data hash becoming polluted with empty
+				#	values as we look things up
+				# my $rc = $data->{$key}->{$column};
+				my $rc;
+				if(defined(my $hash = $data->{$key})) {
+					$rc = $hash->{$column};
+				}
+				if($self->{'logger'}) {
+					if(defined($rc)) {
+						$self->{'logger'}->trace(__LINE__, ": AUTOLOAD $key: return '$rc' from slurped data");
+					} else {
+						$self->{'logger'}->trace(__LINE__, ": AUTOLOAD $key: return undef from slurped data");
+					}
+				}
+				return $rc
+			} elsif((scalar keys %params) == 0) {
+				if(wantarray) {
+					if($distinct) {
+						# https://stackoverflow.com/questions/7651/how-do-i-remove-duplicate-items-from-an-array-in-perl
+						my %h = map { $_, 1 } map { $_->{$column} } values %{$data};
+						return keys %h;
+					}
+					return map { $_->{$column} } values %{$data}
+				}
+				foreach my $v (values %{$data}) {
+					return $v->{$column}
+				}
+			} else {
+				# It's keyed, but we're not querying off it
+				die scalar keys %params;	# I don't think this code can be reached - let's verify that
+				my ($key, $value) = %params;
+				while(my $row = (values %{$data})) {
+					if(($row->{$key} eq $value) && (my $rc = $row->{$column})) {
+						if($self->{'logger'}) {
+							if(defined($rc)) {
+								$self->{'logger'}->trace(__LINE__, ": AUTOLOAD $key: return '$rc' from slurped data");
+							} else {
+								$self->{'logger'}->trace(__LINE__, ": AUTOLOAD $key: return undef from slurped data");
+							}
+						}
+						return $rc
 					}
 				}
 			}
+			return
 		}
 		if(($self->{'type'} eq 'CSV') && !$self->{no_entry}) {
 			$query = "SELECT DISTINCT $column FROM $table WHERE entry IS NOT NULL AND entry NOT LIKE '#%'";
@@ -742,7 +822,7 @@ sub AUTOLOAD {
 	my @args;
 	while(my ($key, $value) = each %params) {
 		if($self->{'logger'}) {
-			$self->{'logger'}->debug(__PACKAGE__, ": AUTOLOAD adding $key=>$value");
+			$self->{'logger'}->debug(__PACKAGE__, ": AUTOLOAD adding key/value pair $key=>$value");
 		}
 		if(defined($value)) {
 			if($done_where) {

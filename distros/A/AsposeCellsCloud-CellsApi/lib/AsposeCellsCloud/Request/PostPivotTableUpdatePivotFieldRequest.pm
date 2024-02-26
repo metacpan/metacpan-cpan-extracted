@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,15 +59,15 @@ sub new {
 
 
 # Run Operation Request
-# PostPivotTableUpdatePivotFieldRequest.name : The workbook name.  ,
+# PostPivotTableUpdatePivotFieldRequest.name : The file name.  ,
 # PostPivotTableUpdatePivotFieldRequest.sheetName : The worksheet name.  ,
-# PostPivotTableUpdatePivotFieldRequest.pivotTableIndex : Gets the PivotTable report by index.  ,
-# PostPivotTableUpdatePivotFieldRequest.pivotFieldIndex : Gets the PivotField Object at the specific index.  ,
+# PostPivotTableUpdatePivotFieldRequest.pivotTableIndex : The PivotTable index.  ,
+# PostPivotTableUpdatePivotFieldRequest.pivotFieldIndex : The pivot field index.  ,
 # PostPivotTableUpdatePivotFieldRequest.pivotFieldType : Represents PivotTable field type(Undefined/Row/Column/Page/Data).  ,
 # PostPivotTableUpdatePivotFieldRequest.pivotField : Represents pivot field.  ,
-# PostPivotTableUpdatePivotFieldRequest.needReCalculate : Whether the specific pivot table calculate(true/false).  ,
-# PostPivotTableUpdatePivotFieldRequest.folder : Original workbook folder.  ,
-# PostPivotTableUpdatePivotFieldRequest.storageName : Storage name.   
+# PostPivotTableUpdatePivotFieldRequest.needReCalculate : Whether the specific PivotTable calculate(true/false).  ,
+# PostPivotTableUpdatePivotFieldRequest.folder : The folder where the file is situated.  ,
+# PostPivotTableUpdatePivotFieldRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -78,7 +78,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_pivot_table_update_pivot_field' } = { 
-    	summary => '',
+    	summary => 'Update pivot field in the PivotTable.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -161,7 +161,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -175,14 +175,14 @@ __PACKAGE__->method_documentation({
      'pivot_table_index' => {
      	datatype => 'int',
      	base_name => 'pivotTableIndex',
-     	description => 'Gets the PivotTable report by index.',
+     	description => 'The PivotTable index.',
      	format => '',
      	read_only => '',
      		},
      'pivot_field_index' => {
      	datatype => 'int',
      	base_name => 'pivotFieldIndex',
-     	description => 'Gets the PivotField Object at the specific index.',
+     	description => 'The pivot field index.',
      	format => '',
      	read_only => '',
      		},
@@ -203,21 +203,21 @@ __PACKAGE__->method_documentation({
      'need_re_calculate' => {
      	datatype => 'string',
      	base_name => 'needReCalculate',
-     	description => 'Whether the specific pivot table calculate(true/false).',
+     	description => 'Whether the specific PivotTable calculate(true/false).',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

@@ -11,47 +11,55 @@ class HTTP::Minimal::Headers {
   use StringBuffer;
   
   # Fields
-  has data : Hash;
+  has headers_h : Hash;
   
   # Class Methods
   static method new : HTTP::Minimal::Headers () {
     my $self = new HTTP::Minimal::Headers;
     
-    $self->{data} = Hash->new;
+    $self->{headers_h} = Hash->new;
     
     return $self;
   }
   
   # Instance Methods
   method add : void ($name : string, $value : string) {
+    $self->add_array($name, [$value]);
+  }
+  
+  method add_array : void ($name : string, $values : string[]) {
     
     unless ($name) {
       die "The \$name must be defined";
     }
     
-    unless ($value) {
-      die "The \$value must be defined";
+    unless ($values) {
+      die "The \$values must be defined";
     }
     
     if (Regex->new("[\x0d\x0a]")->match($name)) {
       die "Invalid characters in the $name header";
     }
     
-    if (Regex->new("[\x0d\x0a]")->match($value)) {
-      die "Invalid characters in the value of the $name header";
+    for my $value (@$values) {
+      if (Regex->new("[\x0d\x0a]")->match($value)) {
+        die "Invalid characters in the value of the $name header";
+      }
     }
     
     my $name_lc = Fn->lc($name);
     
-    my $values_list = (StringList)$self->{data}->get($name_lc);
+    my $values_list = (StringList)$self->{headers_h}->get($name_lc);
     
     unless ($values_list) {
       $values_list = StringList->new;
     }
     
-    $values_list->push($value);
+    for my $value (@$values) {
+      $values_list->push($value);
+    }
     
-    $self->{data}->set($name_lc, $values_list);
+    $self->{headers_h}->set($name_lc, $values_list);
   }
   
   method remove : void ($name : string) {
@@ -62,10 +70,10 @@ class HTTP::Minimal::Headers {
     
     my $name_lc = Fn->lc($name);
     
-    my $values_list = (StringList)$self->{data}->get($name_lc);
+    my $values_list = (StringList)$self->{headers_h}->get($name_lc);
     
     if ($values_list) {
-      $self->{data}->set($name_lc, undef);
+      $self->{headers_h}->set($name_lc, undef);
     }
   }
   
@@ -75,11 +83,11 @@ class HTTP::Minimal::Headers {
       die "The \$name must be defined";
     }
     
-    my $headers = $self->{data};
+    my $headers = $self->{headers_h};
     
     my $name_lc = Fn->lc($name);
     
-    my $values_list = (StringList)$self->{data}->get($name_lc);
+    my $values_list = (StringList)$self->{headers_h}->get($name_lc);
     
     my $values = (string[])undef;
     if ($values_list) {
@@ -102,7 +110,7 @@ class HTTP::Minimal::Headers {
   }
   
   method names : string[] () {
-    my $names = $self->{data}->keys;
+    my $names = $self->{headers_h}->keys;
     
     Sort->sort_string_asc($names);
     
@@ -124,5 +132,62 @@ class HTTP::Minimal::Headers {
     my $string = $buffer->to_string;
     
     return $string;
+  }
+  
+  method clone : HTTP::Minimal::Headers () {
+    
+    my $clone = HTTP::Minimal::Headers->new;
+    
+    my $headers_h = $self->{headers_h};
+    
+    my $names = $headers_h->keys;
+    
+    for my $name (@$names) {
+      my $value = $headers_h->get_string($name);
+      $clone->add($name, $value);
+    }
+    
+    return $clone;
+  }
+  
+  static method from_array : HTTP::Minimal::Headers ($name_value_pairs : object[]) {
+    
+    my $self = HTTP::Minimal::Headers->new;
+    
+    unless ($name_value_pairs) {
+      die "The \$name_value_pairs must be defined.";
+    }
+    
+    my $name_value_pairs_length = @$name_value_pairs;
+    
+    unless ($name_value_pairs_length % 2 == 0) {
+      die "The length of \$name_value_pairs_length must be an even number.";
+    }
+    
+    for (my $i = 0; $i < $name_value_pairs_length; $i+= 2) {
+      my $key = (string)$name_value_pairs->[$i];
+      
+      unless ($key) {
+        die "The key must be defined.";
+      }
+      
+      my $value = $name_value_pairs->[$i + 1];
+      
+      unless ($value) {
+        die "The value must be defined.";
+      }
+      
+      if ($value is_type string[]) {
+        $self->add_array($key, (string[])$value);
+      }
+      elsif ($value is_type string) {
+        $self->add($key, (string)$value);
+      }
+      else {
+        die "The type of value must be the string[] type or the string type.";
+      }
+    }
+    
+    return $self;
   }
 }

@@ -36,7 +36,7 @@ can_ok $user, qw(
 is $user->nickname, 'theory', 'Should have nickname';
 is $user->name, 'David E. Wheeler', 'Should have name';
 is $user->email, 'david@justatheory.com', 'Should have email';
-is $user->uri, 'http://justatheory.com/', 'Should have URI';
+is $user->uri, 'https://justatheory.com/', 'Should have URI';
 is $user->twitter, 'theory', 'Should have twitter nick';
 is_deeply $user->releases, {
     explanation => { stable => [

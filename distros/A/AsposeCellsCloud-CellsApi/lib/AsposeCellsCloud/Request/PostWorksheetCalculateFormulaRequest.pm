@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# PostWorksheetCalculateFormulaRequest.name : The workbook name.  ,
+# PostWorksheetCalculateFormulaRequest.name : The file name.  ,
 # PostWorksheetCalculateFormulaRequest.sheetName : Worksheet name.  ,
 # PostWorksheetCalculateFormulaRequest.formula : The formula.  ,
-# PostWorksheetCalculateFormulaRequest.folder : Original workbook folder.  ,
-# PostWorksheetCalculateFormulaRequest.storageName : Storage name.   
+# PostWorksheetCalculateFormulaRequest.folder : The folder where the file is situated.  ,
+# PostWorksheetCalculateFormulaRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_worksheet_calculate_formula' } = { 
-    	summary => 'Calculates formula value in worksheet.',
+    	summary => 'Calculate formula in the worksheet.',
         params => $params,
         returns => 'SingleValueResponse',
     };
@@ -135,7 +135,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -156,14 +156,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

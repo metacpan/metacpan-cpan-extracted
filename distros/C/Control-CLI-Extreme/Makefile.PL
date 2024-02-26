@@ -27,8 +27,16 @@ WriteMakefile(
 	MIN_PERL_VERSION => '5.6.0',
 	META_MERGE => {
 		'meta-spec' => { version => 2 },
-		bugtracker => {
-			web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Control-CLI-Extreme'
+		resources => {
+			repository => {
+				type => 'git',
+				url  => 'https://github.com/lgastevens/Control-CLI-Extreme.git',
+				web  => 'https://github.com/lgastevens/Control-CLI-Extreme',
+			},
+			bugtracker => {
+				web => 'https://github.com/lgastevens/Control-CLI-Extreme/issues',
+#				web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Control-CLI-Extreme',
+			},
 		},
 	},
 );

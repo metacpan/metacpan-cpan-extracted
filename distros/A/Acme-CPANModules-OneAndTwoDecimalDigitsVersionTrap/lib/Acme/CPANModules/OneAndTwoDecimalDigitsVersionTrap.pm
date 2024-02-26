@@ -1,12 +1,14 @@
 package Acme::CPANModules::OneAndTwoDecimalDigitsVersionTrap;
 
+use strict;
+
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-01-03'; # DATE
+our $DATE = '2023-10-29'; # DATE
 our $DIST = 'Acme-CPANModules-OneAndTwoDecimalDigitsVersionTrap'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our $LIST = {
-    summary => 'Chronicle CPAN distributions which have been trapped by the one- and two decimal digits versioning scheme',
+    summary => 'List of CPAN distributions which have been trapped by the one- and two decimal digits versioning scheme',
     description => <<'_',
 
 The x.y and x.yy versioning scheme used in Perl distribution has a trap: when
@@ -98,7 +100,7 @@ _
 };
 
 1;
-# ABSTRACT: Chronicle CPAN distributions which have been trapped by the one- and two decimal digits versioning scheme
+# ABSTRACT: List of CPAN distributions which have been trapped by the one- and two decimal digits versioning scheme
 
 __END__
 
@@ -108,15 +110,13 @@ __END__
 
 =head1 NAME
 
-Acme::CPANModules::OneAndTwoDecimalDigitsVersionTrap - Chronicle CPAN distributions which have been trapped by the one- and two decimal digits versioning scheme
+Acme::CPANModules::OneAndTwoDecimalDigitsVersionTrap - List of CPAN distributions which have been trapped by the one- and two decimal digits versioning scheme
 
 =head1 VERSION
 
-This document describes version 0.002 of Acme::CPANModules::OneAndTwoDecimalDigitsVersionTrap (from Perl distribution Acme-CPANModules-OneAndTwoDecimalDigitsVersionTrap), released on 2020-01-03.
+This document describes version 0.003 of Acme::CPANModules::OneAndTwoDecimalDigitsVersionTrap (from Perl distribution Acme-CPANModules-OneAndTwoDecimalDigitsVersionTrap), released on 2023-10-29.
 
 =head1 DESCRIPTION
-
-Chronicle CPAN distributions which have been trapped by the one- and two decimal digits versioning scheme.
 
 The x.y and x.yy versioning scheme used in Perl distribution has a trap: when
 you release a new version by incrementing the patchlevel part into x.y.z and
@@ -141,16 +141,22 @@ For a bit more details, see
 L<https://perlancar.wordpress.com/2018/09/10/should-i-choose-x-yy-or-x-yyy-versioning-scheme-for-my-perl-module/>
 and also L<version>.
 
-=head1 INCLUDED MODULES
+=head1 ACME::CPANMODULES ENTRIES
 
 =over
 
-=item * L<Validate::Simple> - From 0.01 to 0.01.1
+=item L<Validate::Simple>
+
+From 0.01 to 0.01.1.
+
+Author: L<ANDREIP|https://metacpan.org/author/ANDREIP>
 
 Author's comment in ChangeLog: "Change version properly."
 
 
-=item * L<Bencher> - From 0.46 to 0.46.1
+=item L<Bencher>
+
+From 0.46 to 0.46.1.
 
 Author's comment in ChangeLog: "This version number is broken because 0.46 >
 0.46.1 because 0.46 normalizes to 0.460.000 while 0.46.1 is 0.046.100. This has
@@ -162,7 +168,11 @@ L<https://perlancar.wordpress.com/2018/09/10/should-i-choose-x-yy-or-x-yyy-versi
 (2016-09-10).
 
 
-=item * L<Array::Compare> - From 2.12 to 2.12.1
+=item L<Array::Compare>
+
+From 2.12 to 2.12.1.
+
+Author: L<DAVECROSS|https://metacpan.org/author/DAVECROSS>
 
 Author's comment in ChangeLog: "Fixing the idiocy in the previous version."
 
@@ -170,7 +180,9 @@ Author's blog post: L<https://perlhacks.com/2016/12/version-numbers/>
 (2016-12-13).
 
 
-=item * L<Acme::CPANLists> - From 0.02 to 0.9.0
+=item L<Acme::CPANLists>
+
+From 0.02 to 0.9.0.
 
 Author's comment in ChangeLog: "Update version number so it's higher than 0.02
 (d'oh)."
@@ -180,10 +192,22 @@ Author's comment in ChangeLog: "Update version number so it's higher than 0.02
 
 =head1 FAQ
 
-=head2 What are ways to use this module?
+=head2 What is an Acme::CPANModules::* module?
 
-Aside from reading it, you can install all the listed modules using
-L<cpanmodules>:
+An Acme::CPANModules::* module, like this module, contains just a list of module
+names that share a common characteristics. It is a way to categorize modules and
+document CPAN. See L<Acme::CPANModules> for more details.
+
+=head2 What are ways to use this Acme::CPANModules module?
+
+Aside from reading this Acme::CPANModules module's POD documentation, you can
+install all the listed modules (entries) using L<cpanm-cpanmodules> script (from
+L<App::cpanm::cpanmodules> distribution):
+
+ % cpanm-cpanmodules -n OneAndTwoDecimalDigitsVersionTrap
+
+Alternatively you can use the L<cpanmodules> CLI (from L<App::cpanmodules>
+distribution):
 
     % cpanmodules ls-entries OneAndTwoDecimalDigitsVersionTrap | cpanm -n
 
@@ -191,9 +215,15 @@ or L<Acme::CM::Get>:
 
     % perl -MAcme::CM::Get=OneAndTwoDecimalDigitsVersionTrap -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
 
-This module also helps L<lcpan> produce a more meaningful result for C<lcpan
-related-mods> when it comes to finding related modules for the modules listed
-in this Acme::CPANModules module.
+or directly:
+
+    % perl -MAcme::CPANModules::OneAndTwoDecimalDigitsVersionTrap -E'say $_->{module} for @{ $Acme::CPANModules::OneAndTwoDecimalDigitsVersionTrap::LIST->{entries} }' | cpanm -n
+
+This Acme::CPANModules module also helps L<lcpan> produce a more meaningful
+result for C<lcpan related-mods> command when it comes to finding related
+modules for the modules listed in this Acme::CPANModules module.
+See L<App::lcpan::Cmd::related_mods> for more details on how "related modules"
+are found.
 
 =head1 HOMEPAGE
 
@@ -202,14 +232,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Acme-CPANM
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Acme-CPANModules-OneAndTwoDecimalDigitsVersionTrap>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-OneAndTwoDecimalDigitsVersionTrap>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -221,11 +243,37 @@ L<cpanmodules> - CLI tool to let you browse/view the lists
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-OneAndTwoDecimalDigitsVersionTrap>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

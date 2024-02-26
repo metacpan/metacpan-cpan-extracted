@@ -8,7 +8,7 @@ use Exporter qw(import);
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2024-01-10'; # DATE
 our $DIST = 'String-Util-Match'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 our @EXPORT_OK = qw(
                        match_string
@@ -205,11 +205,21 @@ String::Util::Match - String utilities related to matching
 
 =head1 VERSION
 
-This document describes version 0.004 of String::Util::Match (from Perl distribution String-Util-Match), released on 2024-01-10.
+This document describes version 0.005 of String::Util::Match (from Perl distribution String-Util-Match), released on 2024-01-10.
 
 =head1 SYNOPSIS
 
- use String::Util::Match qw(match_array_or_regex num_occurs);
+ use String::Util::Match qw(match_string match_array_or_regex num_occurs);
+
+ match_string(str => 'foo', matcher => 'foo'); # => 1
+ match_string(str => 'foo', matcher => 'FOO'); # => 0
+ match_string(str => 'foo', matcher => 'FOO', ignore_case=>1); # => 1
+ match_string(str => 'foo', matcher => qr/f.+/); # => 1
+ match_string(str => 'foo', matcher => qr/bar/); # => 0
+ match_string(str => 'foo', matcher => [qw/foo bar baz/]); # => 1
+ match_string(str => 'foo', matcher => [qw/bar baz/]); # => 0
+ match_string(str => 'foo', matcher => sub { $_[0] eq 'foo' }); # => 1
+ match_string(str => 'foo', matcher => sub { $_[0] eq 'bar' }); # => 0
 
  match_array_or_regex('bar',  ['foo', 'bar', qr/[xyz]/]); # true, matches string
  match_array_or_regex('baz',  ['foo', 'bar', qr/[xyz]/]); # true, matches regex

@@ -55,11 +55,11 @@
    "provides" : {
       "App::sortsub" : {
          "file" : "lib/App/sortsub.pm",
-         "version" : "0.048"
+         "version" : "0.049"
       },
       "App::subsort" : {
          "file" : "lib/App/subsort.pm",
-         "version" : "0.048"
+         "version" : "0.049"
       }
    },
    "release_status" : "stable",
@@ -74,7 +74,7 @@
          "web" : "https://github.com/perlancar/perl-App-subsort"
       }
    },
-   "version" : "0.048",
+   "version" : "0.049",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038000"
@@ -174,7 +174,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.608"
+            "version" : "0.610"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",

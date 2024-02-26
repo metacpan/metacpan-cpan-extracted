@@ -3,13 +3,16 @@
 outputs:
 [% IF vars.enable_fastlog %]
   - fast:
-      enabled: 'yes'
+      enabled: yes
       filename: "fast[% vars.instance_part %].log"
-      append: 'yes'
+      append: yes
 [% END %]
-[% IF vars.enable_syslog %]      
+[% IF vars.enable_syslog %]
+#
+# syslog
+#
   - eve-log:
-      enabled: 'no'
+      enabled: no
       filetype: syslog
       pcap-file: false
       community-id: false
@@ -23,7 +26,7 @@ outputs:
         - alert:
             payload: yes
             payload-buffer-size: 64kb
-            packet: 'yes'
+            packet: yes
             http-body: yes
             http-body-printable: no
             tagged-packets: yes
@@ -35,8 +38,9 @@ outputs:
                 raw: true
         - stats:
             totals: yes
+# flows
   - eve-log:
-      enabled: yes
+      enabled: no
       filetype: syslog
       pcap-file: false
       community-id: false
@@ -52,18 +56,18 @@ outputs:
   - eve-log:
       enabled: yes
       filetype: syslog
-      identity: "suricata-dns"
+      identity: suricata-dns
       facility: local5
       level: Info
       pcap-file: false
       community-id: false
       community-id-seed: 0
       types:
-        - dns:
+        - dns
   - eve-log:
       enabled: yes
       filetype: syslog
-      identity: "suricata-tls"
+      identity: suricata-tls
       facility: local5
       level: Info
       pcap-file: false
@@ -76,7 +80,7 @@ outputs:
   - eve-log:
       enabled: yes
       filetype: syslog
-      identity: "suricata-files"
+      identity: suricata-files
       facility: local5
       level: Info
       pcap-file: false
@@ -89,7 +93,7 @@ outputs:
   - eve-log:
       enabled: yes
       filetype: syslog
-      identity: "suricata-http"
+      identity: suricata-http
       facility: local5
       level: Info
       xff:
@@ -107,7 +111,7 @@ outputs:
   - eve-log:
       enabled: yes
       filetype: syslog
-      identity: "suricata-ssh"
+      identity: suricata-ssh
       facility: local5
       level: Info
       pcap-file: false
@@ -118,7 +122,7 @@ outputs:
   - eve-log:
       enabled: yes
       filetype: syslog
-      identity: "suricata-smtp"
+      identity: suricata-smtp
       facility: local5
       level: Info
       pcap-file: false
@@ -131,7 +135,7 @@ outputs:
   - eve-log:
       enabled: yes
       filetype: syslog
-      identity: "suricata-flow"
+      identity: suricata-flow
       facility: local5
       level: Info
       pcap-file: false
@@ -142,7 +146,7 @@ outputs:
   - eve-log:
       enabled: yes
       filetype: syslog
-      identity: "suricata-nfs"
+      identity: suricata-nfs
       facility: local5
       level: Info
       pcap-file: false
@@ -153,7 +157,7 @@ outputs:
   - eve-log:
       enabled: yes
       filetype: syslog
-      identity: "suricata-smb"
+      identity: suricata-smb
       facility: local5
       level: Info
       pcap-file: false
@@ -164,7 +168,7 @@ outputs:
   - eve-log:
       enabled: yes
       filetype: syslog
-      identity: "suricata-tftp"
+      identity: suricata-tftp
       facility: local5
       level: Info
       pcap-file: false
@@ -175,7 +179,7 @@ outputs:
   - eve-log:
       enabled: yes
       filetype: syslog
-      identity: "suricata-ikev2"
+      identity: suricata-ikev2
       facility: local5
       level: Info
       pcap-file: false
@@ -186,7 +190,7 @@ outputs:
   - eve-log:
       enabled: yes
       filetype: syslog
-      identity: "suricata-dhcp"
+      identity: suricata-dhcp
       facility: local5
       level: Info
       pcap-file: false
@@ -197,7 +201,7 @@ outputs:
   - eve-log:
       enabled: yes
       filetype: syslog
-      identity: "suricata-rdp"
+      identity: suricata-rdp
       facility: local5
       level: Info
       pcap-file: false
@@ -208,7 +212,7 @@ outputs:
   - eve-log:
       enabled: yes
       filetype: syslog
-      identity: "suricata-ftp"
+      identity: suricata-ftp
       facility: local5
       level: Info
       pcap-file: false
@@ -219,7 +223,7 @@ outputs:
   - eve-log:
       enabled: yes
       filetype: syslog
-      identity: "suricata-sip"
+      identity: suricata-sip
       facility: local5
       level: Info
       pcap-file: false
@@ -227,6 +231,50 @@ outputs:
       community-id-seed: 0
       types:
         - sip
+  - eve-log:
+      enabled: yes
+      filetype: syslog
+      identity: suricata-bittorrent-dht
+      facility: local5
+      level: Info
+      pcap-file: false
+      community-id: false
+      community-id-seed: 0
+      types:
+        - bittorrent-dht
+  - eve-log:
+      enabled: yes
+      filetype: syslog
+      identity: suricata-mqtt
+      facility: local5
+      level: Info
+      pcap-file: false
+      community-id: false
+      community-id-seed: 0
+      types:
+        - mqtt
+  - eve-log:
+      enabled: yes
+      filetype: syslog
+      identity: suricata-pgsql
+      facility: local5
+      level: Info
+      pcap-file: false
+      community-id: false
+      community-id-seed: 0
+      types:
+        - pgsql
+  - eve-log:
+      enabled: yes
+      filetype: syslog
+      identity: suricata-http2
+      facility: local5
+      level: Info
+      pcap-file: false
+      community-id: false
+      community-id-seed: 0
+      types:
+        - http2
 [% END %]
 [% IF vars.filestore_enable %]
   - file-store:
@@ -242,6 +290,10 @@ outputs:
         deployment: reverse
         header: X-Forwarded-For
 [% END %]
+
+##
+## regular files
+##
   - eve-log:
       enabled: 'yes'
       filetype: regular
@@ -270,6 +322,7 @@ outputs:
                 raw: true
         - stats:
             totals: yes
+# flows
   - eve-log:
       enabled: yes
       filetype: regular
@@ -293,7 +346,7 @@ outputs:
       community-id: false
       community-id-seed: 0
       types:
-        - dns:
+        - dns
   - eve-log:
       enabled: yes
       filetype: regular
@@ -399,7 +452,7 @@ outputs:
   - eve-log:
       enabled: yes
       filetype: regular
-      filename: /var/log/suricata/alert[ %vars.instance_part %].json
+      filename: /var/log/suricata/alert[% vars.instance_part %].json
       pcap-file: false
       community-id: false
       community-id-seed: 0
@@ -489,11 +542,11 @@ outputs:
       types:
         - bittorrent-dht
 [% IF vars.enable_pcap_log %]
-    - pcap-log:
-      enabled: yes
-      filename: pcap/[% vars.instance_part2 %].pcap
-      limit: 32
-      conditional: alerts
+  - pcap-log:
+    enabled: yes
+    filename: pcap/[% vars.instance_part2 %]pcap
+    limit: 32
+    conditional: alerts
 [% END %]
 
 [% IF vars.logging.in_outputs %]

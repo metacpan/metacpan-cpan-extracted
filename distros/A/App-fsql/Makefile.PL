@@ -52,7 +52,7 @@ my %WriteMakefileArgs = (
     "String::ShellQuote" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.232",
+  "VERSION" => "0.233",
   "test" => {
     "TESTS" => "t/*.t"
   }

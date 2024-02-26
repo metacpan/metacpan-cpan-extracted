@@ -7,7 +7,7 @@
       "Ash Berlin <ash_github@firemirror.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -47,7 +47,7 @@
    "provides" : {
       "Net::Stomp" : {
          "file" : "lib/Net/Stomp.pm",
-         "version" : "0.61"
+         "version" : "0.62"
       },
       "Net::Stomp::Frame" : {
          "file" : "lib/Net/Stomp/Frame.pm",
@@ -64,6 +64,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.61",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "0.62",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

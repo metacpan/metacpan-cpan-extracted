@@ -1,0 +1,17 @@
+Changes
+glpk.pd
+glpk_aio.c
+glpk_aio.h
+lib/PDL/Opt/GLPK.pod
+Makefile.PL
+MANIFEST			This list of files
+README
+COPYING
+t/00-load.t
+t/pod.t
+t/1.t
+t/2.t
+t/ccs.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+GENERATED/PDL/Opt/GLPK.pm                mod=PDL::Opt::GLPK pd=glpk.pd (added by pdlpp_mkgen)

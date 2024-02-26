@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -62,7 +62,7 @@ sub new {
 # PostWorksheetChartTitleRequest.name : The file name.  ,
 # PostWorksheetChartTitleRequest.sheetName : The worksheet name.  ,
 # PostWorksheetChartTitleRequest.chartIndex : The chart index.  ,
-# PostWorksheetChartTitleRequest.title : Chart title  ,
+# PostWorksheetChartTitleRequest.title : TitleChart title  ,
 # PostWorksheetChartTitleRequest.folder : The folder where the file is situated.  ,
 # PostWorksheetChartTitleRequest.storageName : The storage name where the file is situated.   
 
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_worksheet_chart_title' } = { 
-    	summary => 'Update chart title in worksheet.',
+    	summary => 'Update chart title in the worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -165,7 +165,7 @@ __PACKAGE__->method_documentation({
      'title' => {
      	datatype => 'Title',
      	base_name => 'title',
-     	description => 'Chart title',
+     	description => 'TitleChart title',
      	format => '',
      	read_only => '',
      		},

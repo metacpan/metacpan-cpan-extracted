@@ -4,11 +4,17 @@ use Getopt::Long;
 use File::Basename qw( fileparse );
 use File::Path qw( make_path );
 use Digest::SHA qw(sha256_hex);
-
+use Fcntl qw(:flock);
+use POSIX qw( strftime );
+use File::stat;
+use JSON;
+use strict;
 use open ":std", ":encoding(UTF-8)";
 
-
 my $output;
+my $output_source_map;
+my $zenfile;
+
 my $opt_target = 'main';
 my $opt_lang;
 my $opt_debug;
@@ -23,7 +29,9 @@ my $opt_live; # true -- live rendering in server mode
 my $opt_toc;
 my $opt_port = 8080;
 my $opt_source_map;
-my $opt_json_dump; 
+my $opt_json_dump;
+my $opt_help;
+my $opt_exec;
 my @section_levels = ('part', 'chapter', 'section', 'subsection', 'subsubsection', 'paragraph', 'subparagraph');
 my $opt_document_class = 'book';
 my $opt_top_heading;
@@ -34,6 +42,7 @@ my $global_vars = {};
 my @env_chain = ();
 my $re_defvar = qr/^[@-]\s*\{([A-Za-z0-9_ -]+)}=\s+`(.*?)`/;
 my $re_command = qr/@(mark|table|c|\+)\s*\b(.*)/;
+my @sections = ();
 my $re_inline_var = qr/`?\{([#=][A-Za-z].*?)}/;
 my %re_relaxed_inline_var = (
   #c => qr/`?\{([#=]?[A-Za-z].*?)}/
@@ -46,8 +55,6 @@ my %loc_formats = (
  nasm => sub { my ($file,$ln) = @_; return "%line $ln \"$file\"\n"; },
 );
 my %latex_listing_supported_languages = (c=>1,perl=>1,cpp=>1,html=>1,java=>1);
-
-
 sub sections_to_json {
   my $sections = shift;
 
@@ -62,7 +69,7 @@ sub sections_to_json {
     my $numLines = scalar @{$section->{lines}};
     my $ln = $numLines > 0 ? $section->{lines}[0]->{ln} : 0;
     my @lines = (map { $_->{text} } @{$section->{lines}});
-    my @blocks = (map { 
+    my @blocks = (map {
       my $blk = $_;
       my $numLines = 2 + (scalar @{$blk->{lines}});
       {
@@ -73,7 +80,7 @@ sub sections_to_json {
       };
     } @{$section->{blocks}});
 
-    push @a, { 
+    push @a, {
       id      => $section->{id},
       type    => $section->{type},
       heading => $section->{heading},
@@ -100,7 +107,7 @@ sub sortable_b64_encode_int {
   my $integ = int(shift);
   my $l = shift;
   my $alphabet = $sortable_b64_alphabet;
-  
+
   my $encoded = '';
   my $base = length($alphabet);
   my @digits = ();
@@ -130,32 +137,50 @@ sub gen_uuid {
 }
 
 
+my %options = (
+  "--loc"               => [\$opt_loc, 'Generate code location in the output'],
+  "--debug"             => [\$opt_debug, 'Enable debug'],
+  "--live"              => [\$opt_live, 'Render for httpd server'],
+  "--draft"             => [\$opt_draft, 'Generate draft for latex'],
+  "--lang LANG"            => [\$opt_lang, 'Program language for output source '],
+  "--target SECTION"          => [\$opt_target, 'starting section'],
+  "--section SECTION"         => [\$opt_target, 'starting section'],
+  "--exec SECTION"            => [\$opt_exec, 'execute section'],
+  "--toc"               => [\$opt_toc, 'generate toc'],
+  "--html"              => [\$opt_html, 'Set output format for documentation'],
+  "--latex"             => [\$opt_latex, 'Set output format for documentation'],
+  "--source-map FILENAME"      => [\$opt_source_map, 'Generate source map'],
+  "--top-heading LEVEL"     => [\$opt_top_heading, 'Set top level section type: <part|chapter|section>'],
+  "--document-class CLASS"  => [\$opt_document_class, 'Set latex document class'],
+  "--verbose"           => [\$opt_verbose, 'More logging'],
+  "--output FILENAME"          => [\$opt_output_file, 'Set output file'],
+  "--port PORT:i"            => [\$opt_port, 'Live HTTP Server port'],
+  "--daemon MODE:i"          => [\$opt_daemon, "Run server in: \n1 => foreground, 2 => background"],
+  "--json-dump"         => [\$opt_json_dump, 'Dump the document'],
+  "-x SECTION"               => [\$opt_exec, 'short for --exec'],
+  "-o OUTPUTFILE"               => [\$opt_output_file, 'short for --output'],
+  "-t SECTION"               => [\$opt_target, 'short for --target'],
+  "-h"                 => [\$opt_help, 'Shows help information'],
+);
 
+my %optionsSpec = map {
+    my $k = $_;
+    my $ref = $options{$_}[0];
 
-GetOptions("loc"      => \$opt_loc,
-  "debug"             => \$opt_debug,
-  "live"              => \$opt_live,
-  "draft"             => \$opt_draft,
-  "lang=s"            => \$opt_lang,
-  "target=s"          => \$opt_target,
-  "section=s"         => \$opt_target,
-  "exec=s"            => \$opt_exec,
-  "toc"               => \$opt_toc,
-  "html"              => \$opt_html,
-  "latex"             => \$opt_latex,
-  "source-map=s"      => \$opt_source_map,
-  "top-heading=s"     => \$opt_top_heading,
-  "document-class=s"  => \$opt_document_class,
-  "verbose"           => \$opt_verbose,
-  "output=s"          => \$opt_output_file,
-  "port=i"            => \$opt_port,
-  "daemon=i"          => \$opt_daemon,
-  "json-dump"         => \$opt_json_dump,
-  "x=s"               => \$opt_exec,
-  "o=s"               => \$opt_output_file,
-  "t=s"               => \$opt_target,
-  )
-  or usage();
+    my @x = split /\s+/, $k;
+    my $name = $x[0];
+    $name =~ s/^-+//;
+    my $suffix;
+    if ($x[1]) {
+      my @a = split /:/, $x[1];
+      $suffix = "=".($a[1]||'s');
+    }
+    $name.$suffix => $ref
+} keys %options;
+
+GetOptions(%optionsSpec) or usage("Invalid options");
+
+usage() if $opt_help || (scalar @ARGV == 0 && !$opt_daemon);
 
 if ($opt_top_heading) {
  while ($section_levels[0] ne $opt_top_heading) {
@@ -166,20 +191,13 @@ if ($opt_top_heading) {
 sub usage {
   my $msg = shift;
   print STDERR $msg,"\n" if $msg;
-  print STDERR <<EOF;
-zen command [options] <files>
-  command could be codegen, docgen, latexgen.
-  --target=<the-pattern>  Must in generating code. 
-  --output=<filename>     The output file of code/doc
-  --verbose
-  --lang                  Specify the programming language we are
-                          generating.
-  --loc                   Generating code location info in the output
-  --top-heading <part|chapter|section>
-  
-  --port=<http port>      The port for httpd server
-  --daemon=<1|2>          1: foreground, 2: background  
-EOF
+  print STDERR "zen [options] <file.zen>\n";
+  foreach (sort keys %options) {
+    my @desc = split(/\n/, $options{$_}[1]);
+    s/:.*//;
+    print STDERR sprintf("  %-24s %s\n", $_, shift @desc);
+    print STDERR sprintf("  %-24s $_\n", '') foreach (@desc);
+  }
   exit(1);
 };
 sub add_label
@@ -207,7 +225,7 @@ sub add_global_label
   my $x = {
     id => 'L-' . ($global_label_id++),
     section => $sec,
-    file => $sec->{file}, 
+    file => $sec->{file},
     ln => $ln
   };
   $global_labels{$name} = $x;
@@ -222,6 +240,8 @@ sub find_label
   }
   if (exists $global_labels{$name}) {
     return $global_labels{$name};
+  } else {
+    return {};
   }
 }
 
@@ -233,10 +253,14 @@ sub lookup {
     }
   }
   return $global_vars->{$name} if exists $global_vars->{$name};
+
+  if (exists $sections[0]->{fields}->{$name}) {
+    return $sections[0]->{fields}->{$name}->{value};
+  }
+
   return $ENV{$name} if exists $ENV{$name};
   err("lookup not found: '$name'");
 }
-  
 #print lookup("HOME", [ "b",{ x1 => 1 },"a"]),"\n";
 
 sub enter {
@@ -250,8 +274,6 @@ sub leave {
   die "Env chain empty" if scalar(@env_chain)==0;
   shift @env_chain;
 }
-
-my @sections = ();
 
 sub find_section
 {
@@ -283,8 +305,15 @@ sub find_section
 sub load_zen_file
 {
   my $filename = shift;
+  my $st = stat($filename);
+  my $mtime = $st->mtime;
+  my $filesize = $st->size;
+
   open(my $fh, '<:encoding(UTF-8)', $filename)
     or die "Could not open file '$filename' $!";
+
+  flock($fh, LOCK_EX) or die "Could not lock file '$filename' $!";
+
   my $ln = 0;
   my @lines = ();
   my $curr_section;
@@ -308,7 +337,7 @@ sub load_zen_file
     }
     
     $curr_section = {
-      id => gen_uuid(),
+      id => 'S-'.$ln,
       type    => 'default',
       level   => $level,
       heading => $heading,
@@ -335,14 +364,14 @@ sub load_zen_file
   while (my $s = <$fh>) {
     chomp $s;
     $ln++;
-  
+
     my $l = {
        section => $curr_section,
        ln   => $ln,
        file => $filename,
        text => $s
     };
-  
+
     if ($curr_block) {
       push @{$curr_section->{lines}}, $l if $curr_section;
       if ($curr_block->{type} eq 'table') {
@@ -373,7 +402,7 @@ sub load_zen_file
         xtrim(@{$curr_block->{lines}});
         
         $backticks = undef;
-        $curr_block = undef; 
+        $curr_block = undef;
         $l->{end_block} = 1;
       } elsif ($backticks && $s =~ m/^$backticks[^`]/) { # For detecting run away code sections (mystic errors, demystify it. for user's sake to recover from errors. Looks like unnecessary, but crucial.
         die "$filename:$ln: this is not a clean ending for code block at line $curr_block->{ln}. "
@@ -411,7 +440,7 @@ sub load_zen_file
       }
       
       $curr_section = {
-        id => gen_uuid(),
+        id => 'S-'.$ln,
         type    => 'default',
         level   => $level,
         heading => $heading,
@@ -436,17 +465,17 @@ sub load_zen_file
       push @{$curr_section->{lines}}, $l;
       next;
     }
-        
+
     push @{$curr_section->{lines}}, $l if $curr_section;
 
-    
+
     if ($s =~ m/^(```+)(\w+)?\s+@(\[.+?]|\{.+?}|\<.+?>)?(\+=|;\+=|=)?\s*$/) {
       $backticks = $1;
       my $lang = $2;
       my $name = $3;
       my $op = $4;
       if (has_prefix($name, '[')) {
-        die "$file:$ln: unexpected op" if $op ne '+=';
+        die "$filename:$ln: unexpected op" if $op ne '+=';
         $name = '+' . trim1($name);
       } elsif (has_prefix($name, '<')) {
         $name = '>' . trim1($name);
@@ -562,9 +591,16 @@ sub load_zen_file
       };
     }
   }
-  die "Error: $curr_block->{file}:$curr_block->{ln}: block not closed\n" 
+  die "Error: $curr_block->{file}:$curr_block->{ln}: block not closed\n"
      if $curr_block;
+
+  flock($fh, LOCK_UN) or die "Could not unlock file '$filename' $!";
   close($fh);
+  return {
+    last_modified => $mtime,
+    size => $filesize,
+    sections => \@sections
+  }
 }
 sub build_refs {
   for (@sections) {
@@ -586,12 +622,12 @@ sub build_refs {
           my $included = $2;
       
           # .i could be after .when or .for
-          next if !($prefix =~ m/^\s*$/) 
+          next if !($prefix =~ m/^\s*$/)
                && !($prefix =~ m/^\s*[\.@](when|if|for)/);
       
           foreach (extract_included($included)) {
             my @a = split /:/,$_;
-            my $sec = find_section($a[0], true);
+            my $sec = find_section($a[0], 1);
             add_ref($sec, $section, 'included') if $sec;
           }
         } elsif ($s=~m/^(.*?)\[\[(.*)]]\s*$/) {
@@ -599,12 +635,12 @@ sub build_refs {
           my $included = $2;
       
           # .i could be after .when or .for
-          next if !($prefix =~ m/^\s*$/) 
+          next if !($prefix =~ m/^\s*$/)
                && !($prefix =~ m/^\s*[\.@](when|if|for)/);
       
           foreach (split /;/,$included) {
             my @a = split /:/,trim($_);
-            my $sec = find_section($a[0], true);
+            my $sec = find_section($a[0], 1);
             add_ref($sec, $section, 'included') if $sec;
           }
         }
@@ -630,7 +666,7 @@ sub expand {
   my $section = find_section($name);
   my $env = enter($section->{file} . ":" . $section->{ln});
   my @ret = ();
-  
+
   my @params = @{$section->{params}};
   if (scalar(@params) > 0) {
    my $pat = $section->{pattern};
@@ -640,8 +676,8 @@ sub expand {
    if (scalar(@params) != scalar(@vals)) {
      print STDERR "Unmatched parameters:\n",
        "  params: ", join(',',@params), "\n",
-       "  values: ", join(',',@vals), "\n"; 
-     
+       "  values: ", join(',',@vals), "\n";
+  
      err("unbound parameters") if scalar(@params) > scalar(@vals);
      err("unbound values") if scalar(@params) < scalar(@vals);
    }
@@ -674,7 +710,7 @@ sub expand {
       if (!-d $dir) {
           make_path $dir or die "Failed to create path: $dir";
       }
-      open $fh, ">$x" or die "Can not write to `$x'";
+      open my $fh, ">$x" or die "Can not write to `$x'";
       emit($fh, $x, @lines);
       close $fh;
     } else {
@@ -730,11 +766,11 @@ my %operators = (
  'ne'    => sub { my ($x,$y) = @_; return $x ne $y; },
  'not'   => sub { my ($x,$y) = @_; return $x ne $y; },
  'in'    => sub {
-   my ($x,$y) = @_; 
+   my ($x,$y) = @_;
    return grep(/^$x$/, (split /,/,$y)) ? 1 : 0;
  },
- 'notin' => sub { 
-   my ($x,$y) = @_; 
+ 'notin' => sub {
+   my ($x,$y) = @_;
    return grep(/^$x$/, (split /,/,$y)) ? 0 : 1;
  },
  'add'   => sub { my ($x,$y) = @_; return $x + $y; },
@@ -776,7 +812,7 @@ sub eval_expr
 
 sub dupln {
   my ($l,$new_text) = @_;
-  return {ln => $l->{ln}, file => $l->{file}, 
+  return {ln => $l->{ln}, file => $l->{file},
     section => $l->{section},
     text => $new_text || $l->{text}};
 }
@@ -806,7 +842,7 @@ sub expand1 {
         my $z = pop @a;
         push @a, split /,/,$z;
       }
-      push @ret, indent($prefix,expand(@a)) 
+      push @ret, indent($prefix,expand(@a))
     }
   } elsif ($s =~ m/^(\s*)\[\[(.*)]]/) { # allow a trailing label
     my $prefix = $1;
@@ -818,7 +854,7 @@ sub expand1 {
         my $z = pop @a;
         push @a, split /,/,$z;
       }
-      push @ret, indent($prefix,expand(@a)) 
+      push @ret, indent($prefix,expand(@a))
     }
   } elsif ($s=~m/^(\s*)[\.@](when|if)\s*\{(.*?)}/) {
     my $prefix = $1;
@@ -929,10 +965,11 @@ sub emit {
   my $loc_format;
   my $lang = ($opt_lang || $g_curr_lang);
   $loc_format = $loc_formats{$lang} if ($lang && $opt_loc);
-  my $last_file,$last_ln;
-  
+  my $last_file;
+  my $last_ln;
+
   dbg("emit: ", scalar(@lines), " lines");
-  
+
   my $ln = 1;
   foreach (@lines) {
     if ($loc_format) {
@@ -943,7 +980,7 @@ sub emit {
       $last_file = $_->{file};
       $last_ln = $_->{ln};
     } elsif ($output_source_map) {
-      print $output_source_map "$output_filename:$ln:$_->{file}:$_->{ln}\n";    
+      print $output_source_map "$output_filename:$ln:$_->{file}:$_->{ln}\n";
       $ln++;
     }
     print $output $_->{text},"\n";
@@ -952,33 +989,159 @@ sub emit {
 use Data::Dumper;
 
 sub docgen_html {
- my $output = shift;
- print $output "<!DOCTYPE HTML>\n\n<html>\n<head>\n <meta charset=\"UTF-8\">\n <link rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/katex\@0.15.1/dist/katex.min.css\"  crossorigin=\"anonymous\">\n <script defer src=\"https://cdn.jsdelivr.net/npm/katex\@0.15.1/dist/katex.min.js\" crossorigin=\"anonymous\"></script>\n <script defer src=\"https://cdn.jsdelivr.net/npm/katex\@0.15.1/dist/contrib/auto-render.min.js\" crossorigin=\"anonymous\"\n        onload=\"renderMathInElement(document.body);\"></script>\n\n<script src=\"https://cdn.jsdelivr.net/gh/google/code-prettify\@master/loader/run_prettify.js\"></script>\n        \n <style>\n \n html,body {\n   margin: 0;\n   padding: 0;\n }\n \n html {\n   font-size: 14pt;\n }\n \n code {\n   background: #eee;\n }\n \n table {\n   border-collapse: collapse;\n }\n \n table, th, td {\n   border: 1px solid;\n } \n \n main {\n   overflow: scroll;\n   flex: 2;\n   padding: 2rem 4px 0 4px;\n }\n \n article {\n   max-width: 960px;\n   min-width: 320px;\n   margin: auto;\n   word-break: break-word;\n }\n \n aside {\n   overflow: scroll;\n   font-size: 0.8rem;\n   flex: 1;\n   background: #eee;\n }\n \n aside.multi-column {\n   column-width: 200px;\n   column-fill: auto;\n   font-size: 0.7rem;\n   flex: 3;\n }\n \n .collapse {\n   display: none;\n }\n \n .text-small {\n   font-size: 0.8rem;\n }\n \n \n \@media screen and (min-width: 960px) {\n   body {\n     display: flex;\n     flex-direction: row;\n     position: absolute;\n     width: 100%;\n     height: 100%;\n     overflow: hidden;\n   }\n   aside > section {\n     display: block !important;\n   }\n   #toggle-index { \n     display: none;\n   }\n }\n \n pre, pre.prettyprint {\n   padding: 0.5rem;\n   font-size: 0.9rem;\n   white-space: pre-wrap;\n }\n pre.listing {\n   padding-left: 3rem;\n   border: 2px solid black;\n }\n \n .line-number {\n   font-size: 0.7rem;\n   margin-left: -3rem;\n   margin-right: 1rem;\n   user-select: none; /*  */\n }\n \n \n .L-1 {\n  margin-left: 16px;\n }\n .L-2 {\n  margin-left: 28px;\n }\n .L-3,.L-4,.L-5,.L-6,.L-7,.L-8 {\n  margin-left: 36px;\n }\n \n \n img {\n   width: 100%;\n }\n \@media screen and (min-width: 480px) {\n    img.tiny { width: 50%; }\n }\n \n \@media screen and (min-width: 720px) {\n    img.tiny { width: 33%; }\n    img.small { width: 66%; }\n }\n \n \@media screen and (min-width: 960px) {\n   img.tiny { width: 25%; }\n   img.small { width: 50%; }\n   img.medium { width: 75%; }\n }\n \@media print {\n   img.tiny { width: 2.5in; }\n   img.small { width: 5in; }\n }\n \n \n figure { text-align: center}\n \n \@media print {\n   * {\n     /* Don't waste color ink */\n     color: black !important;\n   }\n   \@page { \n     size: auto; /* Magic: disable browser generated footer and header */\n     margin: 1em;\n     table { \n       page-break-inside: avoid;\n       page-break-after: avoid;\n     }\n   }\n   aside { display: none; }\n }\n \n </style>\n <script>\n   window.onload = function() {\n    document.getElementById('toggle-index').onclick = function(e) {\n      var el = document.querySelector('aside section');\n      el.classList.toggle('collapse');\n    };\n    document.getElementById('multi-column-mode').onclick = function(e) {\n      var el = document.querySelector('aside');\n      el.classList.toggle('multi-column');\n    };\n   }\n </script>\n</head>\n<body>";
+ my $zf = shift;
+ my $old = select(shift);
+ print "<!DOCTYPE HTML>\n\n<html>\n<head>\n <meta charset=\"UTF-8\">\n <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n <link rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/katex\@0.15.1/dist/katex.min.css\"\n   crossorigin=\"anonymous\">\n <style>\n :root {\n   --navbar-height: 1.6rem;\n }\n \n html,body {\n   margin: 0;\n   padding: 0;\n }\n \n html {\n   font-size: 12pt;\n }\n \n h1 { font-size: 1.5rem; }\n h2 { font-size: 1.3rem; }\n h3 { font-size: 1.1rem; }\n h4,h5 { font-size: 1rem; }\n \n .navbar {\n   background: #ccc;\n   padding: 4px 8px;\n   display: flex;\n   align-items: center;\n   height: var(--navbar-height);\n }\n .flex {\n   display: flex;\n }\n section.folded > .content {\n   display: none;\n }\n section.folded > .heading::before {\n   content: \"+\"\n }\n \n .align-right {\n   text-align: right;\n }\n \n .sticky-top {\n     position: sticky;\n     top: 0;\n }\n \n .container {\n   background: gray;\n }\n \n .xpad {\n   padding: 0 4px;\n }\n .xxpad {\n   padding: 0 8px;\n }\n \n .col-header {\n  display: flex;\n  background: #ccc;\n  height: var(--navbar-height);\n  align-items: center;\n }\n .fill-parent {\n   flex: 1;\n }\n \n p code {\n   background: #eee;\n }\n \n table {\n   border-collapse: collapse;\n   margin: 1em 0;\n }\n \n table, th, td {\n   border: 1px solid black;\n }\n \n th {\n   border-bottom: 4px solid black;\n }\n \n td {\n   padding: 0 4px;\n }\n \n thead > tr {\n   background: #ccc;\n }\n \n .container\n \n .col {\n  background: #eee;\n  overflow: scroll;\n  flex: 2;\n }\n \n \n .col.wide {\n   flex: 4;\n }\n .col.narrow {\n   flex: 1;\n }\n \n article {\n   max-width: 960px;\n   min-width: 320px;\n   margin: auto;\n   word-break: break-word;\n   padding: 1rem 8px;\n }\n \n aside {\n   background: #eee;\n   font-size: 0.8rem;\n   flex: 1;\n   max-height: 100vh;\n   overflow: auto;\n   position: sticky;\n   top: 0;\n }\n \n aside:not(.is-narrow) section {\n   column-width: 240px;\n   font-size: 0.8rem;\n   column-count: 2;\n }\n \n aside.is-wide section {\n   column-width: 240px;\n   font-size: 0.9rem;\n   column-count: 3;\n }\n \n .fullwidth {\n    width: 100%;\n }\n \n .collapse {\n   display: none;\n }\n \n .text-small {\n   font-size: 0.8rem;\n }\n \n section {\n \tscroll-margin-top: var(--navbar-height);\n }\n \n section.sidebar  {\n   position: fixed;\n   bottom: 0px;\n   background: #ccc;\n   overflow: auto;\n   top: var(--navbar-height);\n   z-index: 1000;\n   width: 320px;\n   right: 0;\n }\n \n .col.folded > article {\n   display: none;\n }\n \n \@media screen and (min-width: 960px) {\n   .container {\n     display: flex;\n     flex-direction: row;\n     position: absolute;\n     width: 100%;\n     height: 100%;\n     overflow: hidden;\n   }\n   .container > :not(:first-child) {\n     margin-left: 4px;\n   }\n \n   .col > .col-header {\n       position: sticky;\n       top: 0;\n   }\n \n   .col.folded > article {\n     visibility: hidden; /* can not use display none, because layout will be lost, scroll position lost */\n     display: block;\n   }\n \n   .col.folded > .col-header  {\n     writing-mode: vertical-rl; /* Vertical writing mode, content flows from top to bottom */\n     transform: rotate(180deg); /* Rotate the text 180 degrees */\n     width: 100%; /* Very important to fill the entire col */\n     height: 100%;\n   }\n \n   .col.folded {\n     overflow: hidden;\n     flex: 0;\n     min-width: 30px;\n  }\n \n   aside > section {\n     display: block !important;\n   }\n   #toggle-index {\n     display: none;\n   }\n }\n \n pre, pre.prettyprint {\n   padding: 0.5rem !important;\n   font-size: 0.9rem;\n   white-space: pre-wrap;\n }\n pre.listing {\n   padding-left: 3rem !important;\n   border: 2px solid black;\n }\n \n .line-number {\n   font-size: 0.7rem;\n   margin-left: -3rem !important;\n   margin-right: 1rem;\n   user-select: none; /*  */\n }\n \n \n .L-1 {\n  margin-left: 16px;\n }\n .L-2 {\n  margin-left: 28px;\n }\n .L-3,.L-4,.L-5,.L-6,.L-7,.L-8 {\n  margin-left: 36px;\n }\n \n \n img {\n   width: 100%;\n }\n \@media screen and (min-width: 480px) {\n    img.tiny { width: 50%; }\n }\n \n \@media screen and (min-width: 720px) {\n    img.tiny { width: 33%; }\n    img.small { width: 66%; }\n }\n \n \@media screen and (min-width: 960px) {\n   img.tiny { width: 25%; }\n   img.small { width: 50%; }\n   img.medium { width: 75%; }\n }\n \@media print {\n   img.tiny { width: 2.5in; }\n   img.small { width: 5in; }\n }\n \n \n figure { text-align: center}\n \n \@media print {\n   * {\n     /* Don't waste color ink */\n     color: black !important;\n   }\n   \@page {\n     size: auto; /* Magic: disable browser generated footer and header */\n     margin: 1em;\n     table {\n       page-break-inside: avoid;\n       page-break-after: avoid;\n     }\n   }\n   aside { display: none; }\n }\n \n </style>\n <script>\n   window.onload = function() {\n    function autoResizeTextArea(textarea) {\n      textarea.style.height = 'auto';\n      textarea.style.height = (textarea.scrollHeight + 2) + 'px';\n    }\n    \n    function applySearchFilter(searchTerms) {\n      document.querySelectorAll(\"div.col\").forEach(col => {\n        let n = 0;\n        col.querySelectorAll(\"section\").forEach(section => {\n          if (searchTerms.filter(t => section.innerText.toLowerCase().includes(t)).length == searchTerms.length) {\n            section.classList.remove('folded');\n            section.classList.remove('collapse');\n            n++;\n    \n          } else {\n            section.classList.add('collapse');\n          }\n        });\n    \n        if (n > 0) {\n          col.classList.remove('folded');\n        } else {\n          col.classList.add('folded');\n        }\n      });\n    }\n    \n    function clearSearchInput(el) {\n      el.value = '';\n      document.querySelectorAll(\"div.col\").forEach(col => {\n        col.querySelectorAll(\"section\").forEach(section => {\n          section.classList.remove('collapse');\n        })\n        col.classList.remove('folded');\n      });\n    }\n    \n    function onSearchInput(e) {\n      const el = e.target;\n      applySearchFilter(el.value.split(/\\s+/).map(x => x.toLowerCase()));\n    }\n    \n    document.addEventListener('click', async function(event) {\n      let el = event.target;\n      let handler = el.getAttribute('click');\n      if (handler == 'edit') {\n    \n        let editor = document.querySelector(\".editor\");\n        if (editor) {\n          let section = editor.closest('section');\n          section.scrollIntoView({ behavior: 'smooth', block: 'start' });\n          return;\n        }\n        let section = el.closest('section');\n        editor = document.createElement(\"div\");\n        editor.classList.add('editor');\n        section.appendChild(editor);\n    \n        let textarea = document.createElement('textarea');\n        textarea.classList.add('fullwidth');\n        textarea.addEventListener('input', function() {\n           this.style.resize = 'none';\n           autoResizeTextArea(this);\n        });\n        editor.appendChild(textarea);\n        el.classList.add('collapse');\n        let saveButton = document.createElement('button');\n        let cancelButton = document.createElement('button');\n        saveButton.innerText = 'Save';\n        editor.appendChild(saveButton);\n        cancelButton.innerText = 'Cancel';\n        editor.appendChild(cancelButton);\n    \n        let l = section.getAttribute('l');\n        let n = section.getAttribute('n');\n        let response = await fetch(`?raw=1&l=\${l}&n=\${n}`);\n        if (!response.ok) {\n          throw new Error(\"Bad\");\n        }\n        textarea.value = await response.text();\n        autoResizeTextArea(textarea);\n        saveButton.onclick = async function() {\n           let res = await fetch(`?l=\${l}&n=\${n}&last_modified=\${window.zen.last_modified}`, {\n             method: 'PUT',\n             headers: {\n               'Content-type': 'text/plain; charset=utf-8',\n             },\n             body: textarea.value\n           });\n           if (!res.ok) {\n             alert(res.status);\n             throw new Error(\"can not save\");\n           }\n           window.location.hash = section.getAttribute('id');\n           window.location.reload();\n        };\n        cancelButton.onclick = function() {\n           el.classList.remove('collapse');\n           section.removeChild(editor);\n        };\n    \n      } else if (handler == 'fold') {\n        let section = el.closest('.foldable');\n        section.classList.toggle('folded');\n      } else if (handler == 'expand') {\n        const col = el.closest('.col');\n        if (col.classList.contains('narrow')) {\n          col.classList.remove('narrow');\n          el.innerText = '+';\n        } else if (col.classList.contains('wide')) {\n          col.classList.remove('wide');\n          el.innerText = '-';\n        } else if (el.innerText == '-') {\n          col.classList.add('narrow');\n          el.innerText = '++';\n        } else if (el.innerText == '+') {\n          col.classList.add('wide');\n          el.innerText = '--';\n        }\n      } else if (handler == 'show-outline') {\n        let col = el.closest('.col');\n        if (col.querySelectorAll('section:not(.folded)').length == 0) {\n          col.querySelectorAll('section').forEach(section => {\n            section.classList.toggle('folded');\n          });\n        } else {\n          col.querySelectorAll('section').forEach(section => {\n            section.classList.add('folded');\n          });\n        }\n      } else if (handler == 'search') {\n        let header = el.closest('.col-header');\n        Array.from(header.children).forEach(x => x.classList.add('collapse'));\n        header.querySelector('#search').classList.remove('collapse');\n        header.querySelector('#search-text').addEventListener('input', onSearchInput);\n      } else if (handler == 'cancel-search') {\n        let header = el.closest('.col-header');\n        Array.from(header.children).forEach(x => x.classList.remove('collapse'));\n        header.querySelector('#search').classList.add('collapse');\n        header.querySelector('#search-text').removeEventListener('input',onSearchInput);\n        clearSearchInput(header.querySelector('#search-text'));\n      } else {\n        let col = el.closest('.col');\n        if (col.tagName == 'ASIDE' && el.tagName == 'A') {\n          if (!col.closest('.container').classList.contains('is-wide')) {\n            col.classList.toggle('folded');\n          }\n          // Unfold the target\n          let t = document.querySelector(el.getAttribute('href'));\n          if (t) {\n            let tcol = t.closest('.col');\n            if (tcol) tcol.classList.remove('folded');\n          }\n        }\n      }\n    });\n    \n    const observer = new ResizeObserver(entries => {\n      for (let entry of entries) {\n        const target = entry.target;\n    \n        if (target.classList.contains('folded'))\n          return;\n    \n        const width = target.getBoundingClientRect().width;\n        if (width < 640) {\n          target.classList.add('is-narrow');\n        } else {\n          target.classList.remove('is-narrow');\n        }\n        if (width > 960) {\n          target.classList.add('is-wide');\n        } else {\n          target.classList.remove('is-wide');\n        }\n      }\n    });\n    \n    document.querySelectorAll('.col,.container').forEach(col => {\n      observer.observe(col);\n    });\n   }\n </script>\n</head>\n<body>";
+ print "<script>";
+ print "window.zen = ";
+ print JSON::encode_json({
+   last_modified => $zf->{last_modified},
+   size => $zf->{size},
+ });
+ print "</script>";
+ print '<div class="container">';
 
- print $output '<aside>';
- print $output '<a href="/">home</a>' if $opt_live;
- print $output '<button id="toggle-index">Index</button> <button id="multi-column-mode">MultiCol</button><section class="collapse">';
- 
+ print '<aside class="col foldable narrow">';
+ print '<div class="col-header sticky-top">';
+ print '<span class="fill-parent">';
+ if ($opt_live) {
+   print '<a href="/">home</a>';
+   print '<a href="..">up</a>';
+ }
+ print '</span>';
+ print '<span class="flex fill-parent collapse" id="search">';
+ print '<button click="cancel-search">cancel</button>';
+ print '<input type="text" id="search-text"></input>';
+ print '</span>';
+
+ print "<button click=\"search\">search</button>";
+ print "<button click=\"expand\">++</button>";
+ print "<button click=\"fold\">fold</button>";
+
+ print '</div>';
+ print '<article><section>';
  foreach (@sections) {
      my $section = $_;
      next if $section->{hidden};
      my $level = $section->{level};
      my $id = $section->{id};
-     print $output "<a class=\"L-$level\" href=\"#$id\">$section->{heading}</a><br>\n";
- 
+     print "<a class=\"L-$level\" href=\"#$id\">$section->{heading}</a><br>\n";
  }
- print $output "</section></aside>\n";
+ print '</section></article>';
+ print '</aside>';
 
- print $output "<main><article>\n";
- foreach (@sections) {
-  my $section = $_;
-  
+ my @cols = ([]);
+ foreach my $section (@sections) {
+   next if $section->{hidden};
+   if (exists $section->{fields}->{break}) {
+     push @cols, [];
+   }
+   push @{$cols[-1]}, $section;
+ }
+
+ foreach my $col (@cols) {
+   next if scalar @{$col} == 0;
+   print "<div class=\"col foldable\">";
+   print "<div class=\"col-header\">";
+   print '<span class="fill-parent">', scalar @{$col}, ' sections</span>';
+   print "<button click=\"show-outline\">outline</button>";
+   print "<button click=\"expand\">+</button>";
+   print "<button click=\"fold\">fold</button>";
+
+   print "</div>";
+   print "<article>";
+   foreach my $section (@{$col}) {
+     gen_html_section($section);
+   }
+   print "</article></div>\n";
+ }
+
+ print '</div>';
+ print " <script defer src=\"https://cdn.jsdelivr.net/npm/katex\@0.15.1/dist/katex.min.js\" crossorigin=\"anonymous\"></script>\n <script defer src=\"https://cdn.jsdelivr.net/npm/katex\@0.15.1/dist/contrib/auto-render.min.js\"\n   crossorigin=\"anonymous\"\n   onload=\"renderMathInElement(document.body);\"></script>\n <script src=\"https://cdn.jsdelivr.net/gh/google/code-prettify\@master/loader/run_prettify.js\"></script>\n </body>\n</html>";
+ select($old);
+}
+
+sub docgen_line
+{
+ my $l = shift;
+ my @a = parse_doc_line($l);
+ foreach (@a) {
+  my $tok = $_;
+  if ($tok->{type} eq 'plain') {
+    print html_escape($tok->{text});
+  } elsif ($tok->{type} eq 'emph') {
+    print "<em>",html_escape($tok->{text}),"</em>";
+  } elsif ($tok->{type} eq 'code') {
+    print "<code>",html_escape_code($tok->{text}),"</code>";
+  } elsif ($tok->{type} eq 'math') {
+    print "\\(",html_escape_code($tok->{text}),"\\)";
+  } elsif ($tok->{type} eq 'image') {
+    print "<figure>",
+      '<img class="', $tok->{size},'" src="',$tok->{url},'">',
+      "<figcaption><b>Fig.$tok->{label}</b> ",
+        html_escape($tok->{caption}),
+      "</figcaption>",
+      "<a name=\"Fig-$tok->{label}\"></a>",
+      "</figure>\n";
+  } elsif ($tok->{type} eq 'ref') {
+    if ($tok->{url}) {
+      print "<a href=\"$tok->{url}\">",
+        html_escape($tok->{text}), "</a>";
+    } else {
+      if ($tok->{subtype} eq 'sec' || $tok->{subtype} eq 'section') {
+        my $sec = find_section($tok->{text});
+        print "<a href=\"\#$sec->{id}\">",html_escape($sec->{heading}),"</a>";
+      } elsif ($tok->{subtype} eq 'fig') {
+        print "<a href=\"\#Fig-$tok->{text}\">$tok->{text}</a>";
+      } elsif ($tok->{subtype} eq 'ln') {
+        my ($label,$t) = split /:/,$tok->{text};
+        my $sec = $l->{section};
+        $sec = find_section($t) if $t;
+        my $lab = find_label($label, $sec);
+        print "<a href=\"\#$lab->{id}\">$lab->{line}</a>";
+      } else {
+        my ($label,$t) = split /:/,$tok->{text};
+        my $lab = find_label($label);
+        print "<a href=\"\#$lab->{id}\">$t</a>";
+      }
+    }
+  } elsif ($tok->{type} eq 'link') {
+    print "<a href=\"",$tok->{url},"\">", $tok->{url}, "</a>";
+  } else {
+    die "HTML line: unsupported type: $tok->{type}";
+  }
+ }
+ print "\n";
+}
+sub html_escape
+{
+  my ($s) = @_;
+  $s =~ s/\&/\&amp;/g;
+  $s =~ s/\</&lt;/g;
+  $s =~ s/\>/&gt;/g;
+  $s =~ s/``/&ldquo;/g;
+  $s =~ s/\"/&rdquo;/g;
+  return $s;
+}
+sub html_escape_code
+{
+  my ($s) = @_;
+  $s =~ s/\&/\&amp;/g;
+  $s =~ s/\</&lt;/g;
+  $s =~ s/\>/&gt;/g;
+  return $s;
+}
+sub gen_html_section {
+  my $section = shift;
   next if $section->{hidden};
- 
+  my $numLines = scalar @{$section->{lines}};
+  my $ln = $numLines > 0 ? $section->{lines}[0]->{ln} : 0;
+
+  print '<section class="foldable" l="', $ln, '" n="', $numLines, '" id="', $section->{id}, '">';
   {
     my $level = $section->{level};
     my $id = $section->{id};
-    print $output "<h$level><a name=\"$id\"></a>",
+    print "<h$level class=\"heading\" click=\"fold\">",
       $section->{heading},
       ($section->{pattern} ?
        ' <span class="text-small"><code>['
@@ -989,37 +1152,38 @@ sub docgen_html {
        : ''),
       "</h$level>\n";
   }
-  
+
+  print '<div class="content">';
   my @lines = @{$section->{lines}};
   shift @lines;
   while (@lines > 0) {
     my $l = shift @lines;
     my $t = $l->{text};
- 
+
     if (exists $l->{begin_block}) {
       if ($l->{begin_block}->{type} eq 'table') {
         my $blk = $l->{begin_block};
-        print $output "<table>\n";
+        print "<table>\n";
         my @rows = @{$blk->{rows}};
         if ($blk->{has_headers}) {
           my $headers = shift @rows;
-          print $output "<tr>";
+          print "<tr>";
           for (@{$headers}) {
-            print $output "<th>$_</th>";
+            print "<th>$_</th>";
           }
-          print $output "</tr>";
+          print "</tr>";
         }
         
         for (@rows) {
           my $a = shift @rows;
-          print $output "<tr>";
+          print "<tr>";
           for (@{$a}) {
-            print $output "<td>$_</td>";
+            print "<td>$_</td>";
           }
-          print $output "</tr>\n";
+          print "</tr>\n";
         }
         
-        print $output "</table>\n";
+        print "</table>\n";
         while (@lines > 0) {
           $l = shift @lines;
           last if $l->{end_block};
@@ -1034,11 +1198,11 @@ sub docgen_html {
           if ($name =~ m/^\+\[?([^]]*)/) {
             my $sec = find_section($1);
             my $caption = $sec->{heading};
-            print $output "[<b>",html_escape($caption),"</b>]+&equiv;";
+            print "[<b>",html_escape($caption),"</b>]+&equiv;";
           } elsif ($name =~ m/^>(.*)/) {
-            print $output "&lang;<b>",html_escape($1),"</b>&rang;&equiv;";
+            print "&lang;<b>",html_escape($1),"</b>&rang;&equiv;";
           } else {
-            print $output "{<b>",html_escape($name),"</b>}&equiv;";
+            print "{<b>",html_escape($name),"</b>}&equiv;";
           }
         }
         
@@ -1049,7 +1213,7 @@ sub docgen_html {
         if ($l->{begin_block}->{first_number} == 1) {
           $linenums = 'first';
         }
-        print $output "<pre class=\"listing $pp\"><code class=\"$lang\">";
+        print "<pre class=\"listing $pp\"><code class=\"$lang\">";
         while (@lines > 0) {
           $l = shift @lines;
           last if $l->{end_block};
@@ -1059,15 +1223,15 @@ sub docgen_html {
             $label = $1;
             $t = $`;
           }
-          
+        
           if ($l->{id}) { # numbered line
-           print $output sprintf('<span class="nocode line-number">%3d</span>', $l->{id});
+           print sprintf('<span class="nocode line-number">%3d</span>', $l->{id});
           }
         
           if ($t =~ m/^(\s*)\[\[(.*)]]\s*$/) {
              my $spaces = $1;
              my @names = split /;/,$2;
-             print $output $spaces,"<span class=\"nocode\">&#x27e6;</span>";
+             print $spaces,"<span class=\"nocode\">&#x27e6;</span>";
              my $n = 0;
              foreach (@names) {
                $n++;
@@ -1077,39 +1241,39 @@ sub docgen_html {
                if ($params) {
                  $params = "<small>(" . html_escape($params) . ")</small>";
                }
-               print $output "; " if $n > 1;
+               print "; " if $n > 1;
                $name = $section->{heading} if index($name, '...') != -1;
-               print $output "<span class=\"nocode\"><a href=\"#$id\" title=\"$section->{heading}\"><b>$name</b></a>$params</span>";
+               print "<span class=\"nocode\"><a href=\"#$id\" title=\"$section->{heading}\"><b>$name</b></a>$params</span>";
              }
-             print $output "<span class=\"nocode\">&#x27e7;</span>";
+             print "<span class=\"nocode\">&#x27e7;</span>";
           } elsif ($t =~ m/^(\s*)\{\{(.*)}}\s*$/) {
              my $spaces = $1;
              my $names = $2;
         
-             print $output $spaces,"<span class=\"nocode\">&#x2983;<b>",
+             print $spaces,"<span class=\"nocode\">&#x2983;<b>",
                html_escape($names),  "</b>&#x2984;</span>";
-             
+        
           } elsif($t =~ m/^(\s*)\.label\s+(.*)/) {
             my $name = $2;
             my $lab = find_label($name, $section);
-            print $output "<a name=\"$lab->{id}\"></a>";
+            print "<a name=\"$lab->{id}\"></a>";
           } elsif($t =~ m/^(\s*)`([`.[].*)/) {
             my $s = html_escape_code($1 . $2);
             $s = ' ' unless $s; # Force to show a line in pretty
-            print $output "$s";
+            print "$s";
           } else {
             my $s = html_escape_code($t);
             $s = ' ' unless $s; # Force to show a line in pretty
-            print $output "$s";
+            print "$s";
           }
         
           if ($label) {
             my $lab = find_label($label, $section);
-            print $output "<a name=\"$lab->{id}\"></a>";
+            print "<a name=\"$lab->{id}\"></a>";
           }
-          print $output "\n";  
+          print "\n";
         }
-        print $output "</code></pre>\n";
+        print "</code></pre>\n";
       }
     } elsif ($t =~ m/^(```+)(\w+)?\s+%(.*)/) {
       
@@ -1123,7 +1287,8 @@ sub docgen_html {
         push @a, expand1($l);
       }
       my $src = join("\n", map {$_->{text}} xtrim(@a));
-      my $input_file, $output_file;
+      my $input_file;
+      my $output_file;
       my $dir = 'tmp';
       if ( !-d  $dir) {
           make_path $dir or die "Failed to create path: $dir";
@@ -1152,9 +1317,9 @@ sub docgen_html {
       }
       
       if ($output_file =~ m/\.(svg|png)$/) {
-        print $output "<img src=\"$output_file\">";
+        print "<img src=\"$output_file\">";
       } else {
-        print $output "<xmp>$src</xmp>";
+        print "<xmp>$src</xmp>";
       }
       
     } elsif ($t =~ m/^(```+)(\w+)?/) {
@@ -1162,7 +1327,7 @@ sub docgen_html {
       my $lang = $2;
       my $prettyprint = "prettyprint" if $lang;
       $lang = "language-$lang" if $lang;
-      print $output "<pre class=\"$prettyprint\"><code class=\"$lang\">";
+      print "<pre class=\"$prettyprint\"><code class=\"$lang\">";
       my @a = ();
       while (@lines > 0) {
         my $l = shift @lines;
@@ -1170,36 +1335,36 @@ sub docgen_html {
         push @a, $l;
       }
       foreach (xtrim(@a)) {
-        print $output html_escape_code($_->{text}), "\n";
+        print html_escape_code($_->{text}), "\n";
       }
-      print $output "</code></pre>\n";
+      print "</code></pre>\n";
     } elsif ($t =~ m/^\s*\.label\s+(\w+)/) {
       my $lab = find_label($1, $section);
-      print $output "<a name=\"$lab->{id}\"></a>";
+      print "<a name=\"$lab->{id}\"></a>";
     } elsif ($t =~ m/^\.def\s+(\w+)\s+(.*)/) {
-      print $output "{<b>$1</b>} &equiv; <code>",html_escape_code($2),"</code><br>\n";
+      print "{<b>$1</b>} &equiv; <code>",html_escape_code($2),"</code><br>\n";
     } elsif ($t =~ m/$re_defvar/) {
-      print $output "<div>{<b>$1</b>} &equiv; <code>",html_escape_code($2),"</code></div>\n";
+      print "<div>{<b>$1</b>} &equiv; <code>",html_escape_code($2),"</code></div>\n";
     } elsif ($t =~ m/^\.(\w+)\s+(.*)/) {
-      print $output "<code><b>.$1</b></code> <code>",html_escape_code($2),"</code>\n";
+      print "<code><b>.$1</b></code> <code>",html_escape_code($2),"</code>\n";
     } elsif ($t =~ m/^\$\$/) {
-      print $output "\\[\n";
+      print "\\[\n";
       while (@lines > 0) {
         my $l = shift @lines;
         last if $l->{text} =~ m/^\$\$/;
-        print $output html_escape_code($l->{text}), "\n";
+        print html_escape_code($l->{text}), "\n";
       }
-      print $output "\\]\n";
+      print "\\]\n";
     } elsif ($t =~ m/^(\s*)-\s+(.*)/) {
       my $indent = length($1);
-      print $output "<ul>\n";
-      print $output "<li> ";
+      print "<ul>\n";
+      print "<li> ";
       docgen_line({file=>$l->{file}, ln=>$l->{ln}, text=>$2});
       
       while (@lines > 0) {
         my $l = shift @lines;
         if ($l->{text} =~ m/^\s{$indent}-\s+(.*)/) {
-          print $output "<li> ";
+          print "<li> ";
           docgen_line({file=>$l->{file}, ln=>$l->{ln}, text=>$1});
         } elsif ($l->{text} =~ m/^\s{$indent}\s+(.*)/) {
           docgen_line({file=>$l->{file}, ln=>$l->{ln}, text=>$1});
@@ -1208,17 +1373,17 @@ sub docgen_html {
           last;
         }
       }
-      print $output "</ul>\n";
+      print "</ul>\n";
     } elsif ($t =~ m/^(\s*)\d+\.\s+(.*)/) {
       my $indent = length($1);
-      print $output "<ol>";
-      print $output "<li> ";
+      print "<ol>";
+      print "<li> ";
       docgen_line({file=>$l->{file}, ln=>$l->{ln}, text=>$2});
       
       while (@lines > 0) {
         my $l = shift @lines;
         if ($l->{text} =~ m/^\s{$indent}\d+\.\s+(.*)/) {
-          print $output "<li> ";
+          print "<li> ";
           docgen_line({file=>$l->{file}, ln=>$l->{ln}, text=>$1});
         } elsif ($l->{text} =~ m/^\s{$indent}\s+(.*)/) {
           docgen_line({file=>$l->{file}, ln=>$l->{ln}, text=>$1});
@@ -1227,7 +1392,7 @@ sub docgen_html {
           last;
         }
       }
-      print $output "</ol>\n";
+      print "</ol>\n";
     } elsif ($t =~ m/^\s*$/) {
       while (@lines > 0) {
         $l = shift @lines;
@@ -1238,21 +1403,21 @@ sub docgen_html {
           last;
         }
       }
-      print $output "<p>";
+      print "<p>";
     } elsif ($t =~ m/^>/) {
-      print $output "<blockquote>";
-      print $output html_escape(substr($t,1)), "\n";
+      print "<blockquote>";
+      print html_escape(substr($t,1)), "\n";
       while (@lines > 0) {
         $l = shift @lines;
         $t = $l->{text};
         if ($t =~ m/^>/) {
-          print $output html_escape(substr($t,1)), "\n";
+          print html_escape(substr($t,1)), "\n";
         } else {
           unshift @lines, $l;
           last;
         }
       }
-      print $output "</blockquote>";
+      print "</blockquote>";
     } else {
       docgen_line($l);
     }
@@ -1269,126 +1434,54 @@ sub docgen_html {
     my $ninc = scalar(@inc);
     my $next = scalar(@ext);
     if ($next > 0) {
-      print $output "<p class=\"text-small\">This section is extended by ";
+      print "<p class=\"text-small\">This section is extended by ";
       for (my $i = 0; $i < $next; $i++) {
         my $sec = $ext[$i];
-        print $output "<a href=\"\#$sec->{id}\">",html_escape($sec->{heading}),"</a>";
-        print $output $i == $ninc - 1 ? '. ' : '; ';
+        print "<a href=\"\#$sec->{id}\">",html_escape($sec->{heading}),"</a>";
+        print $i == $ninc - 1 ? '. ' : '; ';
       }
-      print $output "</p>\n";
+      print "</p>\n";
     }
   
     if ($ninc > 0) {
-      print $output "<p class=\"text-small\">This section is used in ";
+      print "<p class=\"text-small\">This section is used in ";
       for (my $i = 0; $i < $ninc; $i++) {
         my $sec = $inc[$i];
-        print $output "<a href=\"\#$sec->{id}\">",html_escape($sec->{heading}),"</a>";
-        print $output $i == $ninc - 1 ? '. ' : '; ';
+        print "<a href=\"\#$sec->{id}\">",html_escape($sec->{heading}),"</a>";
+        print $i == $ninc - 1 ? '. ' : '; ';
       }
-      print $output "</p>\n";
+      print "</p>\n";
     }
-    
+  
   }
   if ($opt_live) {
-  # TODO should only have one copy
-  my $lang;
-  foreach (@{$section->{blocks}}) {
-    $lang = $_->{lang};
-    last if $lang;
-  }
-  
-  if ($lang) {
-    print $output "<p class=\"text-small\">";
-    print $output "<a href=\"?section=$section->{heading}\">Show output</a> ";
-    if ($lang eq 'bash' || $lang eq 'sh' || $lang eq 'pl' || $lang eq 'perl' 
-     || $lang eq 'ruby') 
-    {
-      print $output "<a href=\"?action=exec&section=$section->{heading}\">Execute</a>";
+    my $lang;
+    foreach (@{$section->{blocks}}) {
+      $lang = $_->{lang};
+      last if $lang;
     }
-    print $output "</p>\n";
-  }
-  }
- }
- print $output "</article></main>\n";
- 
- print $output "</body></html>\n";
-}
-
-sub docgen_line
-{
- my $l = shift;
- my @a = parse_doc_line($l);
- foreach (@a) {
-  my $tok = $_;
-  if ($tok->{type} eq 'plain') {
-    print $output html_escape($tok->{text});
-  } elsif ($tok->{type} eq 'emph') {
-    print $output "<em>",html_escape($tok->{text}),"</em>";
-  } elsif ($tok->{type} eq 'code') {
-    print $output "<code>",html_escape_code($tok->{text}),"</code>";
-  } elsif ($tok->{type} eq 'math') {
-    print $output "\\(",html_escape_code($tok->{text}),"\\)";
-  } elsif ($tok->{type} eq 'image') {
-    print $output "<figure>",
-      '<img class="', $tok->{size},'" src="',$tok->{url},'">',
-      "<figcaption><b>Fig.$tok->{label}</b> ",
-        html_escape($tok->{caption}),
-      "</figcaption>",
-      "<a name=\"Fig-$tok->{label}\"></a>",
-      "</figure>\n";
-  } elsif ($tok->{type} eq 'ref') {
-    if ($tok->{url}) {
-      print $output "<a href=\"$tok->{url}\">",
-        html_escape($tok->{text}), "</a>";
-    } else {
-      if ($tok->{subtype} eq 'sec' || $tok->{subtype} eq 'section') {
-        my $sec = find_section($tok->{text});
-        print $output "<a href=\"\#$sec->{id}\">",html_escape($sec->{heading}),"</a>";
-      } elsif ($tok->{subtype} eq 'fig') {
-        print $output "<a href=\"\#Fig-$tok->{text}\">$tok->{text}</a>";
-      } elsif ($tok->{subtype} eq 'ln') {
-        my ($label,$t) = split /:/,$tok->{text};
-        my $sec = $l->{section};
-        $sec = find_section($t) if $t;
-        my $lab = find_label($label, $sec);
-        print $output "<a href=\"\#$lab->{id}\">$lab->{line}</a>";
-      } else {
-        my ($label,$t) = split /:/,$tok->{text};
-        my $lab = find_label($label);
-        print $output "<a href=\"\#$lab->{id}\">$t</a>";
+    print "<div class=\"text-small\">";
+    if ($lang) {
+      print "<a href=\"?section=$section->{heading}\">Show output</a> ";
+  
+      if ($lang eq 'bash' || $lang eq 'sh' || $lang eq 'pl' || $lang eq 'perl'
+       || $lang eq 'ruby')
+      {
+        print "<a href=\"?action=exec&section=$section->{heading}\">Execute</a>";
       }
     }
-  } elsif ($tok->{type} eq 'link') {
-    print $output "<a href=\"",$tok->{url},"\">", $tok->{url}, "</a>";
-  } else {
-    die "HTML line: unsupported type: $tok->{type}";
+    print '<button click="edit">Edit</button> ';
+    print "</div>\n";
   }
- }
- print $output "\n";
+  print "</div>";
+  print "</section>\n";
 }
-sub html_escape
-{
-  my ($s) = @_;
-  $s =~ s/\&/\&amp;/g;
-  $s =~ s/\</&lt;/g;
-  $s =~ s/\>/&gt;/g;
-  $s =~ s/``/&ldquo;/g;
-  $s =~ s/\"/&rdquo;/g;
-  return $s;
-}
-sub html_escape_code
-{
-  my ($s) = @_;
-  $s =~ s/\&/\&amp;/g;
-  $s =~ s/\</&lt;/g;
-  $s =~ s/\>/&gt;/g;
-  return $s;
-}
+
 sub docgen_latex {
- my $output = shift;
+ my $old = select(shift);
  my $opts;
  $opts = 'draft' if $opt_draft;
- print $output "\\documentclass[$opts]{$opt_document_class}\n",
+ print "\\documentclass[$opts]{$opt_document_class}\n",
  "\\usepackage[paperwidth=6in,paperheight=9in,margin={.5in,.5in}]{geometry}",
  "\\usepackage{hyperref}\n",
  "\\usepackage{listings}\n",
@@ -1398,7 +1491,7 @@ sub docgen_latex {
  "\\begin{document}\n",
  $opt_toc ? "\\tableofcontents\n" : '',
  "\\lstset{\n",
- "numbers=left, numberstyle=\\tiny, stepnumber=1, \nnumbersep=8pt, firstnumber=1,upquote=true,\nframe=single, breaklines=true,\npostbreak=\\mbox{\\small{\$\\hookrightarrow\$}\\space},\nbasicstyle=\\ttfamily\\small,\n",
+ "numbers=left, numberstyle=\\tiny, stepnumber=1,\nnumbersep=8pt, firstnumber=1,upquote=true,\nframe=single, breaklines=true,\npostbreak=\\mbox{\\small{\$\\hookrightarrow\$}\\space},\nbasicstyle=\\ttfamily\\small,\n",
  "  escapeinside={/*","!}{!*/}",
  "}\n";
  foreach (@sections) {
@@ -1410,20 +1503,20 @@ sub docgen_latex {
      my @params = @{$section->{params}};
      my $level_name = $section_levels[$level-1];
      my $id = $section->{id};
-     
-     my $short_title = latex_escape($section->{heading}) 
-       . ($section->{max_line_id} > 1 ? 
-           "{\\tiny \[".($section->{max_line_id} - 1)."]}" 
+   
+     my $short_title = latex_escape($section->{heading})
+       . ($section->{max_line_id} > 1 ?
+           "{\\tiny \[".($section->{max_line_id} - 1)."]}"
          : '');
    
-     print $output "\\$level_name", "[$short_title]{",
-        latex_escape($section->{heading}), 
-        ($section->{pattern} ? 
+     print "\\$level_name", "[$short_title]{",
+        latex_escape($section->{heading}),
+        ($section->{pattern} ?
           ' \\hfill{\\footnotesize \\texttt{['
-          .   latex_escape($section->{pattern}) 
-          . ']}~\\emph{' 
-          .   join(',', @params) 
-          . '}}' 
+          .   latex_escape($section->{pattern})
+          . ']}~\\emph{'
+          .   join(',', @params)
+          . '}}'
           : ''),
         "} \\label{$id}\n";
    }
@@ -1438,21 +1531,21 @@ sub docgen_latex {
        if ($l->{begin_block}->{type} eq 'table') {
          my $blk = $l->{begin_block};
          my @rows = @{$blk->{rows}};
-         print $output "\\begin{tabular}";
-         print $output "{|", join("|", ('c') x scalar(@{$rows[0]})), "|}\n\\hline\n";
+         print "\\begin{tabular}";
+         print "{|", join("|", ('c') x scalar(@{$rows[0]})), "|}\n\\hline\n";
          if ($blk->{has_headers}) {
            my $headers = shift @rows;
-           print $output join("&",@{$headers});
-           print $output " \\\\\n\\hline\n\\hline\n";
+           print join("&",@{$headers});
+           print " \\\\\n\\hline\n\\hline\n";
          }
          
          for (@rows) {
            my $a = shift @rows;
-           print $output join("&",@{$a});
-           print $output " \\\\\n\\hline\n";
+           print join("&",@{$a});
+           print " \\\\\n\\hline\n";
          }
          
-         print $output "\\end{tabular}\n";
+         print "\\end{tabular}\n";
          while (@lines > 0) {
            $l = shift @lines;
            last if $l->{end_block};
@@ -1466,21 +1559,21 @@ sub docgen_latex {
          
          if ($l->{begin_block}->{name}) {
            my $name = $l->{begin_block}->{name};
-           print $output "\\vskip 0.5em \\noindent ";
+           print "\\vskip 0.5em \\noindent ";
            if ($name =~ m/^\+\[?([^]]*)/) {
              my $sec = find_section($1);
              my $caption = $sec->{heading};
-             print $output '$[\\![$\\textbf{', latex_escape($caption), '}$]\\!] +\\!\\!\\equiv$';
+             print '$[\\![$\\textbf{', latex_escape($caption), '}$]\\!] +\\!\\!\\equiv$';
            } elsif ($name =~ m/^>(.*)/) {
-             print $output '$\\langle$\\textbf{',latex_escape($1), '}$\\rangle\\equiv$';
+             print '$\\langle$\\textbf{',latex_escape($1), '}$\\rangle\\equiv$';
            } else {
-             print $output "\\{\\textbf{",latex_escape($name),'}\\}$\\equiv$';
+             print "\\{\\textbf{",latex_escape($name),'}\\}$\\equiv$';
            }
          }
          
          my $options = "firstnumber=$firstnum";
          $options .= ",language=$lang" if $lang;
-         print $output "\\begin{lstlisting}[$options]\n";
+         print "\\begin{lstlisting}[$options]\n";
          
          $num_listings++;
          
@@ -1499,7 +1592,7 @@ sub docgen_latex {
            if ($t =~ m/^(\s*)\[\[(.*)]]\s*$/) {
              my $spaces = $1;
              my @names = split /;/, $2;
-             print $output $spaces, "/*", '!$[\\![$';
+             print $spaces, "/*", '!$[\\![$';
              my $n = 0;
              foreach (@names) {
                $n++;
@@ -1514,33 +1607,33 @@ sub docgen_latex {
                if ($params) {
                  $params = "{(" . latex_escape($params) . ")}";
                }
-               print $output "; " if $n > 1;
+               print "; " if $n > 1;
                if (scalar(@names)==1) {
-                 print $output "\\textrm{{",latex_escape($section->{heading}),"}}$params",
+                 print "\\textrm{{",latex_escape($section->{heading}),"}}$params",
                    " {\\scriptsize \\pageref{$id}}";
                } else {
                  $name = latex_escape($name);
-                 print $output "\\textrm{{$name}}$params {\\scriptsize \\pageref{$id}}";
+                 print "\\textrm{{$name}}$params {\\scriptsize \\pageref{$id}}";
                }
              }
-             print $output '$]\\!]$', "!*/";
+             print '$]\\!]$', "!*/";
            } elsif($t =~ m/^(\s*)\.label\s+(.*)/) {
              my $name = $2;
              my $lab = find_label($name, $section);
-             print $output '/*',"!\\label{$lab->{id}}!*/";
+             print '/*',"!\\label{$lab->{id}}!*/";
            } elsif($t =~ m/^(\s*)`([`.[].*)/) {
-             print $output $1,$2;
+             print $1,$2;
            } else {
-             print $output $t;
+             print $t;
            }
-           
+         
            if ($label) {
              my $lab = find_label($label, $section);
-             print $output '/*',"!\\label{$lab->{id}}!*/";
+             print '/*',"!\\label{$lab->{id}}!*/";
            }
-           print $output "\n";  
+           print "\n";
          }
-         print $output "\\end","{lstlisting}\n";
+         print "\\end","{lstlisting}\n";
        }
      } elsif ($t =~ m/^(```+)(\w+)?\s+%(.*)/) {
        my $backticks = $1;
@@ -1553,7 +1646,8 @@ sub docgen_latex {
          push @a, expand1($l);
        }
        my $src = join("\n", map {$_->{text}} xtrim(@a));
-       my $input_file, $output_file;
+       my $input_file;
+       my $output_file;
        my $dir = 'tmp';
        if ( !-d  $dir) {
            make_path $dir or die "Failed to create path: $dir";
@@ -1582,9 +1676,9 @@ sub docgen_latex {
        }
        
        if ($output_file =~ m/\.(pdf)$/) {
-         print $output "\\includegraphics[width=\\textwidth]{$output_file}";
+         print "\\includegraphics[width=\\textwidth]{$output_file}";
        } else {
-         print $output "$src";
+         print "$src";
        }
        
      } elsif ($t =~ m/^(```+)(\w+)?/) {
@@ -1594,7 +1688,7 @@ sub docgen_latex {
        
        $options .= ",language=$lang" if $lang && exists $latex_listing_supported_languages{$lang};
        
-       print $output "\\begin{lstlisting}[$options]\n";
+       print "\\begin{lstlisting}[$options]\n";
        my @a = ();
        while (@lines > 0) {
          my $l = shift @lines;
@@ -1602,41 +1696,41 @@ sub docgen_latex {
          push @a, $l;
        }
        foreach (xtrim(@a)) {
-         print $output $_->{text}, "\n";
+         print $_->{text}, "\n";
        }
-       print $output "\\end","{lstlisting}\n";
+       print "\\end","{lstlisting}\n";
      } elsif ($t =~ m/^\s*\.label\s+(.*)/) {
        my $lab = find_label($1);
-       print $output "\\label{$lab->{id}}\n";
+       print "\\label{$lab->{id}}\n";
      } elsif ($t =~ m/^\s*\{#(\w+)}/) {
        my $lab = find_label($1);
-       print $output "\\label{$lab->{id}}\n";
+       print "\\label{$lab->{id}}\n";
      } elsif ($t =~ m/^\.def\s+(\w+)\s+(.*)/) {
-       print $output "\\noindent", '$\\langle$', "\\verb|$1|", '$\\rangle$', 
+       print "\\noindent", '$\\langle$', "\\verb|$1|", '$\\rangle$',
          "\$\\equiv\$ \\verb|$2|\\newline\n";
      } elsif ($t =~ m/$re_defvar/) {
-       print $output "\\noindent", '$\\{$', "\\verb|$1|", '$\\}$', 
+       print "\\noindent", '$\\{$', "\\verb|$1|", '$\\}$',
          "\$\\equiv\$ \\verb|$2|\\newline\n";
      } elsif ($t =~ m/^\.(\w+)\s+(.*)/) {
-       print $output "\\textbf{.$1} \\verb|$2|\n";
+       print "\\textbf{.$1} \\verb|$2|\n";
      } elsif ($t =~ m/^\$\$/) {
-       print $output "\\[\n";
+       print "\\[\n";
        while (@lines > 0) {
          my $l = shift @lines;
          last if $l->{text} =~ m/^\$\$/;
-         print $output $l->{text}, "\n";
+         print $l->{text}, "\n";
        }
-       print $output "\\]\n";
+       print "\\]\n";
      } elsif ($t =~ m/^(\s*)-\s+(.*)/) {
        my $indent = length($1);
-       print $output "\\begin{itemize}\n";
-       print $output "\\item ";
+       print "\\begin{itemize}\n";
+       print "\\item ";
        latexgen_line({file=>$l->{file}, ln=>$l->{ln}, text=>$2});
        
        while (@lines > 0) {
          my $l = shift @lines;
          if ($l->{text} =~ m/^\s{$indent}-\s+(.*)/) {
-           print $output "\\item ";
+           print "\\item ";
            latexgen_line({file=>$l->{file}, ln=>$l->{ln}, text=>$1});
          } elsif ($l->{text} =~ m/^\s{$indent}\s+(.*)/) {
            latexgen_line({file=>$l->{file}, ln=>$l->{ln}, text=>$1});
@@ -1645,17 +1739,17 @@ sub docgen_latex {
            last;
          }
        }
-       print $output "\\end{itemize}\n";
+       print "\\end{itemize}\n";
      } elsif ($t =~ m/^(\s*)\d+\.\s+(.*)/) {
        my $indent = length($1);
-       print $output "\\begin{enumerate}\n";
-       print $output "\\item ";
+       print "\\begin{enumerate}\n";
+       print "\\item ";
        latexgen_line({file=>$l->{file}, ln=>$l->{ln}, text=>$2});
        
        while (@lines > 0) {
          my $l = shift @lines;
          if ($l->{text} =~ m/^\s{$indent}\d+\.\s+(.*)/) {
-           print $output "\\item ";
+           print "\\item ";
            latexgen_line({file=>$l->{file}, ln=>$l->{ln}, text=>$1});
          } elsif ($l->{text} =~ m/^\s{$indent}\s+(.*)/) {
            latexgen_line({file=>$l->{file}, ln=>$l->{ln}, text=>$1});
@@ -1664,9 +1758,9 @@ sub docgen_latex {
            last;
          }
        }
-       print $output "\\end{enumerate}\n";
+       print "\\end{enumerate}\n";
      } elsif ($t =~ m/^>/) {
-       print $output "\\begin{quote}";
+       print "\\begin{quote}";
        latexgen_line(dupln($l, substr($t,1)));
        while (@lines > 0) {
          $l = shift @lines;
@@ -1678,12 +1772,12 @@ sub docgen_latex {
            last;
          }
        }
-       print $output "\\end{quote}";
+       print "\\end{quote}";
      } else {
        latexgen_line($l);
      }
    }
-   
+ 
    {
      my @inc = ();
      my @ext = ();
@@ -1694,34 +1788,35 @@ sub docgen_latex {
      }
      my $ninc = scalar(@inc);
      my $next = scalar(@ext);
-     
+   
      if ($next > 0) {
-       print $output "\n\n{\\footnotesize This section is extended by \n";
+       print "\n\n{\\footnotesize This section is extended by \n";
        for (my $i = 0; $i < $next; $i++) {
          my $sec = $ext[$i];
-         print $output "\\textit{$sec->{heading}}",
+         print "\\textit{$sec->{heading}}",
           "{  \\tiny p.~\\pageref{$sec->{id}}}",
           $i == $next - 1 ? '. ' : '; ';
        }
-       print $output "}\n";
+       print "}\n";
      }
    
      if ($ninc > 0) {
-       print $output "\n\n{\\footnotesize This section is used in \n";
+       print "\n\n{\\footnotesize This section is used in \n";
        for (my $i = 0; $i < $ninc; $i++) {
          my $sec = $inc[$i];
-         print $output "\\textit{$sec->{heading}}",
+         print "\\textit{$sec->{heading}}",
           "{  \\tiny \\pageref{$sec->{id}}}",
           $i == $ninc - 1 ? '. ' : '; ';
        }
-       print $output "}\n";
+       print "}\n";
      }
    }
  
  }
  
- 
- print $output '\end{document}';
+
+ print '\end{document}';
+ select($old);
 }
 
 
@@ -1732,26 +1827,26 @@ sub latexgen_line
  foreach (@a) {
   my $tok = $_;
   if ($tok->{type} eq 'plain') {
-    print $output latex_escape($tok->{text});
+    print latex_escape($tok->{text});
   } elsif ($tok->{type} eq 'emph') {
-    print $output "\\emph{",latex_escape($tok->{text}),"}";
+    print "\\emph{",latex_escape($tok->{text}),"}";
   } elsif ($tok->{type} eq 'code') {
     if (index($tok->{text}, '|') == -1) {
-      print $output "\\verb|",$tok->{text},"|";
+      print "\\verb|",$tok->{text},"|";
     } elsif (index($tok->{text}, '$') == -1) {
-      print $output "\\verb\$",$tok->{text},"\$";
+      print "\\verb\$",$tok->{text},"\$";
     } else {
-      print $output "\\verb!",$tok->{text},"!";
+      print "\\verb!",$tok->{text},"!";
     }
   } elsif ($tok->{type} eq 'math') {
-    print $output "\\(",$tok->{text},"\\)";
+    print "\\(",$tok->{text},"\\)";
   } elsif ($tok->{type} eq 'image') {
     my $width = "\\linewidth";
     $width = "0.3" . $width if $tok->{size} eq 'tiny';
     $width = "0.5" . $width if $tok->{size} eq 'small';
     $width = "0.7" . $width if $tok->{size} eq 'medium';
-    
-    print $output "\\begin{figure}\n",
+
+    print "\\begin{figure}\n",
       "\\centering\n",
       "\\includegraphics[width=$width]{$tok->{url}}\n",
       "\\caption{$tok->{caption}}\n",
@@ -1759,36 +1854,36 @@ sub latexgen_line
       "\\end{figure}\n";
   } elsif ($tok->{type} eq 'ref') {
     if ($tok->{url}) {
-      print $output "\\href{$tok->{url}}{$tok->{text}}";
+      print "\\href{$tok->{url}}{$tok->{text}}";
     } else {
       if ($tok->{subtype} eq 'sec') {
         my $sec = find_section($tok->{text});
-        print $output "\\ref{$sec->{id}}";
+        print "\\ref{$sec->{id}}";
       } elsif ($tok->{subtype} eq 'section') {
         my $sec = find_section($tok->{text});
-        print $output "\\emph{$sec->{heading}}",
+        print "\\emph{$sec->{heading}}",
           "{  \\tiny p.~\\pageref{$sec->{id}}}";
       } elsif ($tok->{subtype} eq 'fig') {
-        print $output "\\ref{Fig-$tok->{text}}";
+        print "\\ref{Fig-$tok->{text}}";
       } elsif ($tok->{subtype} eq 'ln') {
         my ($label,$t) = split /:/,$tok->{text};
         my $sec = $l->{section};
         $sec = find_section($t) if $t;
         my $lab = find_label($label, $sec);
-        print $output "\\ref{$lab->{id}}";
+        print "\\ref{$lab->{id}}";
       } else {
         my ($label,$t) = split /:/,$tok->{text};
         my $lab = find_label($label);
-        print $output "\\emph{$t}", "{ \\tiny p.~\\pageref{$lab->{id}}}";
+        print "\\emph{$t}", "{ \\tiny p.~\\pageref{$lab->{id}}}";
       }
     }
   } elsif ($tok->{type} eq 'link') {
-    print $output "\\url{",$tok->{url},"}";
+    print "\\url{",$tok->{url},"}";
   } else {
     die "LaTeX line: unsupported type: $tok->{type}";
   }
  }
- print $output "\n";
+ print "\n";
 }
 
 sub latex_escape
@@ -1820,7 +1915,7 @@ sub parse_doc_line
       if ($url =~ m/-(small|tiny|medium|large)\./) {
         $size = $1;
       }
-      push @ret, { type=>'image', caption=>$caption, label=>$label, 
+      push @ret, { type=>'image', caption=>$caption, label=>$label,
         url=>$url, size=>$size };
     } elsif ($prefix eq '<') {
       push @ret, { type=>'link', url=>trim1($t) };
@@ -1860,28 +1955,28 @@ sub trim1 {
   return substr($s, 1, length($s)-2);
 }
 
-sub ltrim { 
-  my $s = shift; 
+sub ltrim {
+  my $s = shift;
   $s =~ s/^\s+//;
   return $s;
 };
 
-sub rtrim { 
-  my $s = shift; 
+sub rtrim {
+  my $s = shift;
   $s =~ s/\s+$//;
   return $s;
 };
 
-sub trim { 
-  my $s = shift; 
+sub trim {
+  my $s = shift;
   $s =~ s/^\s+|\s+$//g;
-  return $s 
+  return $s
 };
 
 
-sub has_prefix { 
+sub has_prefix {
   my ($s,$t)=@_;
-  return index($s,$t) == 0; 
+  return index($s,$t) == 0;
 }
 
 sub indent {
@@ -1905,7 +2000,7 @@ sub mpart {
   # Test if $s starts with $first.
   my $first = shift(@a);
   return if rindex($s, $first, 0) != 0;
-  
+
   # Test if $s ends with $last.
   my $last = pop(@a);
   my $l = length($s) - length($last);
@@ -1926,9 +2021,8 @@ sub mpart {
 
 sub generate_matcher {
   my $pattern = shift;
-  
+
   my $re = qr/(\.\.\.|\{.*?})/;
-  my $s = $heading;
   my @parts = split(/$re/, $pattern);
   if (scalar(@parts) == 1) {
     return sub {
@@ -1966,15 +2060,20 @@ sub generate_matcher {
   }
 }
 
+
+use Carp qw<longmess>;
+
 sub err
 {
   my $msg = shift;
   my $i = 0;
   print STDERR "! Error: $msg\n";
-  foreach (@{$env_chain}) {
+  foreach (@env_chain) {
     print STDERR "  $i: ",$_->{__loc},"\n";
     $i++;
   }
+  my $mess = longmess();
+  print Dumper( $mess );
   exit(1);
 }
 
@@ -1982,41 +2081,28 @@ sub err
 if ($opt_daemon) {
 use warnings;
 use strict;
-use File::Slurp;
-
-
-
-if (system("perl -MHTTP::Server::Simple -e 1") != 0) {
-  print STDERR <<END;
-No HTTP Server Simple found
-sudo perl -MCPAN -e 'install HTTP::Server::Simple'
-END
-}
 
 {
-package MyWebServer;
- 
- 
+package App::zen::WebServer;
+
 use HTTP::Server::Simple::CGI;
 use base qw(HTTP::Server::Simple::CGI);
 use File::Slurp;
 use File::Type;
 use File::stat;
 use JSON;
+use Fcntl qw(:flock);
+use POSIX qw( strftime );
+use Data::Dumper;
 
 my $ft = File::Type->new();
 
-eval("require JSON") or do {
-  print STDERR "sudo cpan JSON\n";
-  die "Can not load JSON.pm";
-};
- 
 sub handle_request {
     my ($self, $cgi) = @_;
-   
+
     my $path = $cgi->path_info();
     my $method = $cgi->request_method();
-    
+
     if ($method eq 'GET' && $path =~ m/\/$/) {
       on_list_dir($cgi, ".$path");
     } elsif ($method eq 'GET' && $path eq '/hello') {
@@ -2057,18 +2143,51 @@ sub write_error {
 
 sub on_put_file {
   my ($cgi, $path) = @_;
+
+  my $l = $cgi->url_param('l') || 0;
+  my $n = $cgi->url_param('n') || 0;
+  my $last_mtime = $cgi->url_param('last_modified');
+
   if (-f $path) {
     # override require last_mtime
     my $stat = stat($path);
     my $mtime = $stat->mtime;
-    my $last_mtime = $cgi->param('last_modified');
-    if (!$last_mtime || $last_mtime != $mtime) {
-      write_error(409, "Conflict", "Missing query parameter 'last_mtime'");
+    if (!$last_mtime) {
+      write_error(409, "Conflict", "Missing query parameter 'last_modified' l=$l");
+      print Dumper $cgi;
+      return;
+    }
+    if ($last_mtime != $mtime) {
+      write_error(409, "Conflict", "last modified doesn't match: $mtime");
       return;
     }
   }
-  my $data = $cgi->param('POSTDATA');
-  write_file($path, $data);
+  my $data = $cgi->param('PUTDATA');
+  if ($l == 0) {
+    write_file($path, $data);
+  } elsif ($l > 0) {
+    $data .= "\n" unless !$data || substr($data, -1) eq "\n";
+    open my $fh, '<', $path or die "Can not open file: $!";
+    my $x = '';
+    my $y = '';
+    while (<$fh>) {
+      if ($l > 1) {
+        $x .= $_;
+        $l--;
+      } elsif ($l == 1) {
+        if ($n <= 0) {
+          $y .= $_;
+        } else {
+          $n--;
+        }
+      }
+    }
+    close $fh;
+    write_file($path, $x.$data.$y);
+  } else {
+    print "HTTP/1.0 400 Bad request\r\n";
+    return;
+  }
   my $mtime = stat($path)->mtime;
   if ($mtime) {
     print "HTTP/1.0 200 OK\r\n";
@@ -2099,28 +2218,48 @@ sub on_get_file {
     return;
   }
 
-  my $raw = $cgi->param('raw');
-  if ($path =~ m/\.(md|zen)$/ && $raw ne '1') {
+  my $raw = $cgi->param('raw') || 0;
+  my $l = $cgi->param('l') || 0;
+  my $n = $cgi->param('n') || 0;
+  if ($path =~ m/\.(md|zen)$/ && ($raw ne '1')) {
     print "HTTP/1.0 200 OK\r\n";
     my $action = $cgi->param('action');
     my $section = $cgi->param('section');
     $action = 'view' unless $action;
+    my $zenCommand = 'zen';
+    $zenCommand = 'perl ./zen2.pl' if -f './zen2.pl';
     if ($action eq 'exec') {
        print "Content-Type: text/plain\r\n\r\n";
-       open FH, "perl ./zen2.pl --exec \"$section\" $path|";
+       open FH, "$zenCommand --exec \"$section\" $path|";
     } else {
       if (!$section) {
          print "Content-Type: text/html\r\n\r\n";
-         open FH, "perl ./zen2.pl --live --html $path|";
+         open FH, "$zenCommand --live --html $path|";
       } else {
          print "Content-Type: text/plain\r\n\r\n";
-         open FH, "perl ./zen2.pl --section \"$section\" $path|";
+         open FH, "$zenCommand --section \"$section\" $path|";
       }
     }
     while (<FH>) {
        print $_;
     }
     close FH;
+  } elsif ($raw eq '1' && $l > 0) {
+    my $mtime = stat($path)->mtime;
+    print "HTTP/1.0 200 OK\r\n";
+    print "Last-Modified: $mtime\r\n";
+    print "Content-Type: text/plain\r\n\r\n";
+    open my $fh, '<', $path or die "Can not open file: $!";
+    while (<$fh>) {
+      if ($l == 1) {
+        last if $n == 0;
+        print $_;
+        $n--;
+      } else {
+        $l--;
+      }
+    }
+    close $fh;
   } else {
     my $mime_type = $ft->mime_type($path);
     open my $fh, '<:raw', $path or die "Cannot open file: $!";
@@ -2163,35 +2302,42 @@ sub on_list_dir {
     };
   }
   @contents = sort { $a->{name} cmp $b->{name} } @contents;
-  
+
   my $fmt = $cgi->param('fmt');
-  if ($fmt eq "csv") {
-    print "HTTP/1.1 200 OK\r\n";
-    print "\r\n";
-    for (@contents) {
-      print "$_->{name},$_->{size},$_->{mtime}\n";
+  if ($fmt) {
+    if ($fmt eq "csv") {
+      print "HTTP/1.1 200 OK\r\n";
+      print "\r\n";
+      for (@contents) {
+        print "$_->{name},$_->{size},$_->{mtime}\n";
+      }
+      return;
+    } elsif ($fmt eq 'json') {
+      print "HTTP/1.1 200 OK\r\n";
+      print "\r\n";
+      print JSON::encode_json(\@contents);
+      return;
+    } else {
+      write_error(400, "Bad parameter: unsupported fmt");
+      return;
     }
-    return;
-  } elsif ($fmt eq 'json') {
-    print "HTTP/1.1 200 OK\r\n";
-    print "\r\n";
-    print JSON::encode_json(\@contents);
-    return;
   }
 
-  print "HTTP/1.0 200 OK\r\n";
-  print $cgi->header, $cgi->start_html('Index');
+  print "HTTP/1.0 200 OK\r\n\r\n";
+  print "<!doctype html>\n<html>\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>Index</title>\n    <style>\n      :root {\n        --navbar-height: 1.6rem;\n      }\n      \n      html,body {\n        margin: 0;\n        padding: 0;\n      }\n      \n      html {\n        font-size: 12pt;\n      }\n      \n      h1 { font-size: 1.5rem; }\n      h2 { font-size: 1.3rem; }\n      h3 { font-size: 1.1rem; }\n      h4,h5 { font-size: 1rem; }\n      \n      .navbar {\n        background: #ccc;\n        padding: 4px 8px;\n        display: flex;\n        align-items: center;\n        height: var(--navbar-height);\n      }\n      .flex {\n        display: flex;\n      }\n      section.folded > .content {\n        display: none;\n      }\n      section.folded > .heading::before {\n        content: \"+\"\n      }\n      \n      .align-right {\n        text-align: right;\n      }\n      \n      .sticky-top {\n          position: sticky;\n          top: 0;\n      }\n      \n      .container {\n        background: gray;\n      }\n      \n      .xpad {\n        padding: 0 4px;\n      }\n      .xxpad {\n        padding: 0 8px;\n      }\n      \n      .col-header {\n       display: flex;\n       background: #ccc;\n       height: var(--navbar-height);\n       align-items: center;\n      }\n      .fill-parent {\n        flex: 1;\n      }\n      \n      p code {\n        background: #eee;\n      }\n      \n      table {\n        border-collapse: collapse;\n        margin: 1em 0;\n      }\n      \n      table, th, td {\n        border: 1px solid black;\n      }\n      \n      th {\n        border-bottom: 4px solid black;\n      }\n      \n      td {\n        padding: 0 4px;\n      }\n      \n      thead > tr {\n        background: #ccc;\n      }\n      \n      .container\n      \n      .col {\n       background: #eee;\n       overflow: scroll;\n       flex: 2;\n      }\n      \n      \n      .col.wide {\n        flex: 4;\n      }\n      .col.narrow {\n        flex: 1;\n      }\n      \n      article {\n        max-width: 960px;\n        min-width: 320px;\n        margin: auto;\n        word-break: break-word;\n        padding: 1rem 8px;\n      }\n      \n      aside {\n        background: #eee;\n        font-size: 0.8rem;\n        flex: 1;\n        max-height: 100vh;\n        overflow: auto;\n        position: sticky;\n        top: 0;\n      }\n      \n      aside:not(.is-narrow) section {\n        column-width: 240px;\n        font-size: 0.8rem;\n        column-count: 2;\n      }\n      \n      aside.is-wide section {\n        column-width: 240px;\n        font-size: 0.9rem;\n        column-count: 3;\n      }\n      \n      .fullwidth {\n         width: 100%;\n      }\n      \n      .collapse {\n        display: none;\n      }\n      \n      .text-small {\n        font-size: 0.8rem;\n      }\n      \n      section {\n      \tscroll-margin-top: var(--navbar-height);\n      }\n      \n      section.sidebar  {\n        position: fixed;\n        bottom: 0px;\n        background: #ccc;\n        overflow: auto;\n        top: var(--navbar-height);\n        z-index: 1000;\n        width: 320px;\n        right: 0;\n      }\n      \n      .col.folded > article {\n        display: none;\n      }\n      \n      \@media screen and (min-width: 960px) {\n        .container {\n          display: flex;\n          flex-direction: row;\n          position: absolute;\n          width: 100%;\n          height: 100%;\n          overflow: hidden;\n        }\n        .container > :not(:first-child) {\n          margin-left: 4px;\n        }\n      \n        .col > .col-header {\n            position: sticky;\n            top: 0;\n        }\n      \n        .col.folded > article {\n          visibility: hidden; /* can not use display none, because layout will be lost, scroll position lost */\n          display: block;\n        }\n      \n        .col.folded > .col-header  {\n          writing-mode: vertical-rl; /* Vertical writing mode, content flows from top to bottom */\n          transform: rotate(180deg); /* Rotate the text 180 degrees */\n          width: 100%; /* Very important to fill the entire col */\n          height: 100%;\n        }\n      \n        .col.folded {\n          overflow: hidden;\n          flex: 0;\n          min-width: 30px;\n       }\n      \n        aside > section {\n          display: block !important;\n        }\n        #toggle-index {\n          display: none;\n        }\n      }\n      \n      pre, pre.prettyprint {\n        padding: 0.5rem !important;\n        font-size: 0.9rem;\n        white-space: pre-wrap;\n      }\n      pre.listing {\n        padding-left: 3rem !important;\n        border: 2px solid black;\n      }\n      \n      .line-number {\n        font-size: 0.7rem;\n        margin-left: -3rem !important;\n        margin-right: 1rem;\n        user-select: none; /*  */\n      }\n      \n      \n      .L-1 {\n       margin-left: 16px;\n      }\n      .L-2 {\n       margin-left: 28px;\n      }\n      .L-3,.L-4,.L-5,.L-6,.L-7,.L-8 {\n       margin-left: 36px;\n      }\n      \n      \n      img {\n        width: 100%;\n      }\n      \@media screen and (min-width: 480px) {\n         img.tiny { width: 50%; }\n      }\n      \n      \@media screen and (min-width: 720px) {\n         img.tiny { width: 33%; }\n         img.small { width: 66%; }\n      }\n      \n      \@media screen and (min-width: 960px) {\n        img.tiny { width: 25%; }\n        img.small { width: 50%; }\n        img.medium { width: 75%; }\n      }\n      \@media print {\n        img.tiny { width: 2.5in; }\n        img.small { width: 5in; }\n      }\n      \n      \n      figure { text-align: center}\n      \n      \@media print {\n        * {\n          /* Don't waste color ink */\n          color: black !important;\n        }\n        \@page {\n          size: auto; /* Magic: disable browser generated footer and header */\n          margin: 1em;\n          table {\n            page-break-inside: avoid;\n            page-break-after: avoid;\n          }\n        }\n        aside { display: none; }\n      }\n      \n    </style>\n  </head>\n  <body>";
+  print "<div class=\"xxpad\"><h1>Index</h1>\n";
   print "<table>\n";
-  print "<tr><th>Name</th><th>Size</th><th>Last Modified</th></tr>\n";
+  print "<thead><tr class=\"sticky-top\"><th>Name</th><th>Size</th><th>Last Modified</th></tr></thead>\n";
   for (@contents) {
+     my $timestr = strftime('%FT%TZ%z', localtime($_->{mtime}));
      print "<tr>";
      print "<td><a href=\"$_->{name}\">$_->{name}</a></td>";
-     print "<td>$_->{size}</td>";
-     print "<td>$_->{mtime}</td>";
+     print "<td class=\"align-right\">$_->{size}</td>";
+     print "<td>$timestr</td>";
      print "</tr>\n";
   }
-  print "</table>";
-  print  $cgi->end_html;
+  print "</table></div>";
+  print "  </body>\n</html>";
 }
 
 sub on_hello {
@@ -2207,7 +2353,7 @@ sub on_hello {
 }
 }
 
-my $server = MyWebServer->new($opt_port);
+my $server = App::zen::WebServer->new($opt_port);
 if ($opt_daemon == 2) {
   $server->background();
 } else {
@@ -2216,10 +2362,11 @@ if ($opt_daemon == 2) {
 exit;
 }
 
-
-foreach (@ARGV) {
-  load_zen_file($_);
+if (scalar @ARGV != 1) {
+  usage();
 }
+
+$zenfile = load_zen_file(shift @ARGV);
 
 if ($opt_debug) {
   foreach (@sections) {
@@ -2230,11 +2377,11 @@ if ($opt_debug) {
 if ($opt_output_file) {
    open $output,">$opt_output_file" or die "Can not write to `$opt_output_file'";
 } else {
-   $output = *STDOUT; 
+   $output = *STDOUT;
 }
 
 if ($opt_json_dump) {
-  print $output sections_to_json(\@sections);
+  print $output sections_to_json($zenfile->{sections});
   close $output;
   exit;
 }
@@ -2257,14 +2404,15 @@ if ($opt_exec) {
   emit($output, $opt_output_file, expand($opt_exec));
 } elsif (!$opt_html && !$opt_latex) {
   if ($opt_source_map) {
-    open $output_source_map, ">$opt_source_map" or die "Can not write to source map";
+    open $output_source_map, ">$opt_source_map"
+      or die "Can not write to source map";
   }
   emit($output, $opt_output_file, expand($opt_target));
   close $output_source_map if $output_source_map;
 } else {
   build_refs();
   if ($opt_html) {
-    docgen_html($output);
+    docgen_html($zenfile, $output);
   }
   if ($opt_latex) {
     docgen_latex($output);

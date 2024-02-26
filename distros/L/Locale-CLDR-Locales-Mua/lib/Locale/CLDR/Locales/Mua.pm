@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Mua - Package for language Mundang
 
 package Locale::CLDR::Locales::Mua;
 # This file auto generated from Data\common\main\mua.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -330,8 +330,7 @@ has 'characters' => (
 		return {
 			auxiliary => qr{[q x]},
 			index => ['A', 'B', 'Ɓ', 'C', 'D', 'Ɗ', 'E', 'Ǝ', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ŋ', 'O', 'P', 'R', 'S', 'T', 'U', 'V', 'W', 'Y', 'Z'],
-			main => qr{[a ã b ɓ c d ɗ e ë ǝ f g h i ĩ j k l m n ŋ o õ p r s t u v ṽ w y z]},
-			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			main => qr{[aã b ɓ c d ɗ eë ǝ f g h iĩ j k l m n ŋ oõ p r s t u vṽ w y z]},
 		};
 	},
 EOT
@@ -393,28 +392,6 @@ has 'number_symbols' => (
 			'group' => q(.),
 		},
 	} }
-);
-
-has 'number_formats' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		decimalFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0.###',
-				},
-			},
-		},
-		percentFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0%',
-				},
-			},
-		},
-} },
 );
 
 has 'number_currency_formats' => (
@@ -658,9 +635,14 @@ has 'currencies' => (
 				'currency' => q(Solai Helena),
 			},
 		},
-		'SLL' => {
+		'SLE' => {
 			display_name => {
 				'currency' => q(solai Sierra leonǝ),
+			},
+		},
+		'SLL' => {
+			display_name => {
+				'currency' => q(solai Sierra leonǝ \(1964—2022\)),
 			},
 		},
 		'SOS' => {
@@ -882,10 +864,6 @@ has 'day_periods' => (
 					'am' => q{comme},
 					'pm' => q{lilli},
 				},
-				'wide' => {
-					'am' => q{comme},
-					'pm' => q{lilli},
-				},
 			},
 		},
 	} },
@@ -966,17 +944,12 @@ has 'datetime_formats_available_formats' => (
 	default		=> sub { {
 		'generic' => {
 			Ed => q{E d},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
 			MEd => q{E d/M},
-			MMM => q{LLL},
 			MMMEd => q{E d MMM},
 			MMMd => q{d MMM},
 			Md => q{d/M},
-			d => q{d},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
 			ms => q{m:ss},
 			y => q{y},
 			yM => q{M/y},
@@ -990,19 +963,13 @@ has 'datetime_formats_available_formats' => (
 		},
 		'gregorian' => {
 			Ed => q{E d},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
 			MEd => q{E d/M},
-			MMM => q{LLL},
 			MMMEd => q{E d MMM},
 			MMMd => q{d MMM},
 			Md => q{d/M},
-			d => q{d},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
 			ms => q{m:ss},
-			y => q{y},
 			yM => q{M/y},
 			yMEd => q{E d/M/y},
 			yMMM => q{MMM y},

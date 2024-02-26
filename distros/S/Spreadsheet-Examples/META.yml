@@ -20,12 +20,12 @@ name: Spreadsheet-Examples
 provides:
   Spreadsheet::Examples:
     file: lib/Spreadsheet/Examples.pm
-    version: '0.003'
+    version: '0.004'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Spreadsheet-Examples
   homepage: https://metacpan.org/release/Spreadsheet-Examples
   repository: git://github.com/perlancar/perl-Spreadsheet-Examples.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.038000'
@@ -105,7 +105,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.609'
+      version: '0.610'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'

@@ -16,7 +16,7 @@ sub _EQ       { return }
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '6.0.29'; # VERSION
+our $VERSION = '6.0.33.3'; # VERSION
 
 
 sub _allocate_newFrom {
@@ -77,17 +77,19 @@ MarpaX::ESLIF::Recognizer - MarpaX::ESLIF's recognizer
 
 =head1 VERSION
 
-version 6.0.29
+version 6.0.33.3
 
 =head1 SYNOPSIS
-
-  my $eslifRecognizer = MarpaX::ESLIF::Recognizer->new($eslifGrammar, $recognizerInterface);
-
-The recognizer interface is used to read chunks of data, that the internal recognizer will keep in its internal buffers, until it is consumed. The recognizer internal buffer may not be an exact duplicate of the external data that was read: in case of a character stream, the external data is systematically converted to UTF-8 sequence of bytes. If the user is pushing alternatives, he will have to know how many bytes this represent: native number of bytes
 
 =head1 DESCRIPTION
 
 MarpaX::ESLIF::Recognizer is a possible step after a MarpaX::ESLIF::Grammar instance is created.
+
+=for test_synopsis no strict 'vars'
+
+  my $eslifRecognizer = MarpaX::ESLIF::Recognizer->new($eslifGrammar, $recognizerInterface);
+
+The recognizer interface is used to read chunks of data, that the internal recognizer will keep in its internal buffers, until it is consumed. The recognizer internal buffer may not be an exact duplicate of the external data that was read: in case of a character stream, the external data is systematically converted to UTF-8 sequence of bytes. If the user is pushing alternatives, he will have to know how many bytes this represent: native number of bytes
 
 =head1 METHODS
 

@@ -1,0 +1,52 @@
+NAME
+    isbn-check - Tool for ISBN checking.
+
+SYNOPSIS
+     isbn-check [-h] [--version] file_with_isbns
+
+DESCRIPTION
+    The tool checks the ISBN written in the file.
+
+ARGUMENTS
+    *       "-h"
+
+            Print help.
+
+    *       "--version"
+
+            Print version of script.
+
+    *       "file_with_isbns"
+
+            File with ISBN strings, one per line.
+
+EXAMPLE
+     cat /tmp/foo
+     978-80-253-4336-4
+     9788025343363
+     9788025343364
+     978802534336
+
+     isbn-chec /tmp/foo
+
+     # Output:
+     # 9788025343363: Different after format (978-80-253-4336-4).
+     # 9788025343364: Different after format (978-80-253-4336-4).
+     # 978802534336: Cannot parse.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/App-ISBN-Check>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2024 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

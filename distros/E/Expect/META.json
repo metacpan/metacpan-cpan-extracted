@@ -6,13 +6,13 @@
       "Dave Jacoby <jacoby@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Expect",
    "no_index" : {
@@ -58,6 +58,6 @@
          "web" : "http://github.com/jacoby/expect.pm"
       }
    },
-   "version" : "1.35",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "1.36",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

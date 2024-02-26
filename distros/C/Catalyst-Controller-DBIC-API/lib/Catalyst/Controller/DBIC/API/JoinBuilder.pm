@@ -1,5 +1,5 @@
 package Catalyst::Controller::DBIC::API::JoinBuilder;
-$Catalyst::Controller::DBIC::API::JoinBuilder::VERSION = '2.008001';
+$Catalyst::Controller::DBIC::API::JoinBuilder::VERSION = '2.009000';
 #ABSTRACT: Provides a helper class to automatically keep track of joins in complex searches
 use Moose;
 use MooseX::Types::Moose(':all');
@@ -79,7 +79,7 @@ Catalyst::Controller::DBIC::API::JoinBuilder - Provides a helper class to automa
 
 =head1 VERSION
 
-version 2.008001
+version 2.009000
 
 =head1 DESCRIPTION
 
@@ -151,7 +151,7 @@ Samuel Kaufman <sam@socialflow.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Luke Saunders, Nicholas Perez, Alexander Hartmaier, et al.
+This software is copyright (c) 2024 by Luke Saunders, Nicholas Perez, Alexander Hartmaier, et al.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -43,9 +43,5 @@ WriteMakefile
       repository => 'https://github.com/sciurius/perl-File-LoadLines',
       bugtracker => "https://github.com/sciurius/perl-File-LoadLines/issues",
     },
-    'meta-spec' => {
-      version => '2',
-	url     => 'https://metacpan.org/pod/CPAN::Meta::Spec',
-    },
   }
 );

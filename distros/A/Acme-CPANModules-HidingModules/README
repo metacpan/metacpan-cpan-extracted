@@ -1,10 +1,10 @@
 NAME
-    Acme::CPANModules::HidingModules - Hiding modules
+    Acme::CPANModules::HidingModules - List of modules to hide other modules
 
 VERSION
-    This document describes version 0.004 of
+    This document describes version 0.005 of
     Acme::CPANModules::HidingModules (from Perl distribution
-    Acme-CPANModules-HidingModules), released on 2020-04-30.
+    Acme-CPANModules-HidingModules), released on 2023-10-29.
 
 DESCRIPTION
     So you want to convince some Perl code that some modules that are
@@ -67,33 +67,56 @@ DESCRIPTION
     (temporarily) rename the module files. App::pmhiderename and
     <lib::hiderename> does this.
 
-INCLUDED MODULES
-    *   lib::filter
+ACME::CPANMODULES ENTRIES
+    lib::filter
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   lib::disallow
+    lib::disallow
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Devel::Hide
+    Devel::Hide
+        Author: DCANTRELL <https://metacpan.org/author/DCANTRELL>
 
-    *   Test::Without::Module
+    Test::Without::Module
+        Author: CORION <https://metacpan.org/author/CORION>
 
-    *   Module::Path::Patch::Hide
+    Module::Path::Patch::Hide
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Module::Path::More::Patch::Hide
+    Module::Path::More::Patch::Hide
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Module::List::Patch::Hide
+    Module::List::Patch::Hide
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   PERLANCAR::Module::List::Patch::Hide
+    PERLANCAR::Module::List::Patch::Hide
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Module::List::Tiny::Patch::Hide
+    Module::List::Tiny::Patch::Hide
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   Module::List::Wildcard::Patch::Hide
+    Module::List::Wildcard::Patch::Hide
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
-    *   App::pmhiderename
+    App::pmhiderename
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
 FAQ
-  What are ways to use this module?
-    Aside from reading it, you can install all the listed modules using
-    cpanmodules:
+  What is an Acme::CPANModules::* module?
+    An Acme::CPANModules::* module, like this module, contains just a list
+    of module names that share a common characteristics. It is a way to
+    categorize modules and document CPAN. See Acme::CPANModules for more
+    details.
+
+  What are ways to use this Acme::CPANModules module?
+    Aside from reading this Acme::CPANModules module's POD documentation,
+    you can install all the listed modules (entries) using cpanm-cpanmodules
+    script (from App::cpanm::cpanmodules distribution):
+
+     % cpanm-cpanmodules -n HidingModules
+
+    Alternatively you can use the cpanmodules CLI (from App::cpanmodules
+    distribution):
 
         % cpanmodules ls-entries HidingModules | cpanm -n
 
@@ -101,9 +124,15 @@ FAQ
 
         % perl -MAcme::CM::Get=HidingModules -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
 
-    This module also helps lcpan produce a more meaningful result for "lcpan
-    related-mods" when it comes to finding related modules for the modules
-    listed in this Acme::CPANModules module.
+    or directly:
+
+        % perl -MAcme::CPANModules::HidingModules -E'say $_->{module} for @{ $Acme::CPANModules::HidingModules::LIST->{entries} }' | cpanm -n
+
+    This Acme::CPANModules module also helps lcpan produce a more meaningful
+    result for "lcpan related-mods" command when it comes to finding related
+    modules for the modules listed in this Acme::CPANModules module. See
+    App::lcpan::Cmd::related_mods for more details on how "related modules"
+    are found.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -113,14 +142,6 @@ SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-Acme-CPANModules-HidingModules>.
 
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Hidi
-    ngModules>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
 SEE ALSO
     Acme::CPANModules - about the Acme::CPANModules namespace
 
@@ -129,9 +150,34 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2023, 2020, 2019 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Hidi
+    ngModules>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

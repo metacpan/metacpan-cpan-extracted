@@ -1,255 +1,356 @@
-_:rb5e50ce13c3f54d1d9b55ad093b8431cdr0 <http://usefulinc.com/ns/doap#browse> <https://github.com/kjetilk/p5-rdf-rdfa-generator> ;
-	a <http://usefulinc.com/ns/doap#GitRepository> ;
-	<http://www.w3.org/ns/prov#has_provenance> <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-rdf-rdfa-generator&serialization=PROV-O#> .
-_:rb7cc96b7c68f6472b991665d91d3edc57r0 <http://ontologi.es/doap-deps#on> "Test::More 0.96"^^<http://ontologi.es/doap-deps#CpanId> .
-_:rb7cc96b7c68f6472b991665d91d3edc57r1 <http://ontologi.es/doap-deps#on> "Test::Output"^^<http://ontologi.es/doap-deps#CpanId> .
-_:rb7cc96b7c68f6472b991665d91d3edc57r10 <http://ontologi.es/doap-deps#on> "RDF::NS::Curated 0.100"^^<http://ontologi.es/doap-deps#CpanId> .
-_:rb7cc96b7c68f6472b991665d91d3edc57r11 <http://ontologi.es/doap-deps#on> "perl 5.008"^^<http://ontologi.es/doap-deps#CpanId> .
-_:rb7cc96b7c68f6472b991665d91d3edc57r12 <http://ontologi.es/doap-deps#on> "Data::Dumper"^^<http://ontologi.es/doap-deps#CpanId> .
-_:rb7cc96b7c68f6472b991665d91d3edc57r13 <http://ontologi.es/doap-deps#on> "Icon::FamFamFam::Silk"^^<http://ontologi.es/doap-deps#CpanId> .
-_:rb7cc96b7c68f6472b991665d91d3edc57r14 <http://ontologi.es/doap-deps#on> "XML::LibXML 1.60"^^<http://ontologi.es/doap-deps#CpanId> .
-_:rb7cc96b7c68f6472b991665d91d3edc57r15 <http://ontologi.es/doap-deps#on> "Dist::Inkt 0.001"^^<http://ontologi.es/doap-deps#CpanId> .
-_:rb7cc96b7c68f6472b991665d91d3edc57r2 <http://ontologi.es/doap-deps#on> "Test::Modern"^^<http://ontologi.es/doap-deps#CpanId> .
-_:rb7cc96b7c68f6472b991665d91d3edc57r3 <http://ontologi.es/doap-deps#on> "Attean 0.019"^^<http://ontologi.es/doap-deps#CpanId> .
-_:rb7cc96b7c68f6472b991665d91d3edc57r4 <http://ontologi.es/doap-deps#on> "RDF::Prefixes"^^<http://ontologi.es/doap-deps#CpanId> .
-_:rb7cc96b7c68f6472b991665d91d3edc57r5 <http://ontologi.es/doap-deps#on> "RDF::Prefixes"^^<http://ontologi.es/doap-deps#CpanId> .
-_:rb7cc96b7c68f6472b991665d91d3edc57r6 <http://ontologi.es/doap-deps#on> "RDF::NS"^^<http://ontologi.es/doap-deps#CpanId> .
-_:rb7cc96b7c68f6472b991665d91d3edc57r7 <http://ontologi.es/doap-deps#on> "Attean 0.019"^^<http://ontologi.es/doap-deps#CpanId> .
-_:rb7cc96b7c68f6472b991665d91d3edc57r8 <http://ontologi.es/doap-deps#on> "RDF::Trine 0.112"^^<http://ontologi.es/doap-deps#CpanId> .
-_:rb7cc96b7c68f6472b991665d91d3edc57r9 <http://ontologi.es/doap-deps#on> "URI::NamespaceMap 1.06"^^<http://ontologi.es/doap-deps#CpanId> .
-_:rbbf6a73f600e44e4ca3ce5c2ce61f91d0r0 <http://ontologi.es/doap-changeset#item> [
-		<http://www.w3.org/2000/01/rdf-schema#label> "Using FamFamFam Silk icons."@en
-	], [
-		a <http://ontologi.es/doap-changeset#Addition> ;
-		<http://www.w3.org/2000/01/rdf-schema#label> "HTML::Pretty can now include additional textual notes in the output. This functionality added for RDF::RDFa::Linter."@en
-	] .
-_:rbbf6a73f600e44e4ca3ce5c2ce61f91d0r10 a <http://ontologi.es/doap-changeset#Bugfix> ;
-	<http://www.w3.org/2000/01/rdf-schema#label> "UTF-8 fixes."@en .
-_:rbbf6a73f600e44e4ca3ce5c2ce61f91d0r11 <http://ontologi.es/doap-changeset#item> [
-		a <http://ontologi.es/doap-changeset#Addition> ;
-		<http://www.w3.org/2000/01/rdf-schema#label> "HTML::Pretty now includes cross-links to other resources."@en
-	] .
-_:rbbf6a73f600e44e4ca3ce5c2ce61f91d0r13 <http://ontologi.es/doap-changeset#item> [
-		a <http://ontologi.es/doap-changeset#Addition> ;
-		<http://www.w3.org/2000/01/rdf-schema#label> "use RDF::Prefixes."@en
-	], [
-		a <http://ontologi.es/doap-changeset#Addition> ;
-		<http://www.w3.org/2000/01/rdf-schema#label> "Support 'namespaces' option for the constructor, for compatibility with other Trine serialisers."@en
-	], [
-		a <http://ontologi.es/doap-changeset#Addition> ;
-		<http://www.w3.org/2000/01/rdf-schema#label> "Icons for a few extra classes."@en
-	] .
-_:rbbf6a73f600e44e4ca3ce5c2ce61f91d0r17 <http://ontologi.es/doap-changeset#item> [
-		<http://ontologi.es/doap-changeset#fixes> [
-			<http://ontologi.es/doap-bugs#reporter> <http://purl.org/NET/cpan-uri/person/kjetilk>
-		] ;
-		a <http://ontologi.es/doap-changeset#Bugfix> ;
-		<http://www.w3.org/2000/01/rdf-schema#label> "<meta> element should name @name, not @nane."@en
-	], [
-		<http://ontologi.es/doap-changeset#fixes> [
-			<http://ontologi.es/doap-bugs#reporter> <http://purl.org/NET/cpan-uri/person/kjetilk>
-		] ;
-		a <http://ontologi.es/doap-changeset#Bugfix> ;
-		<http://www.w3.org/2000/01/rdf-schema#label> "Namespaces in HTML::Head and HTML::Hidden."@en
-	] .
-_:rbbf6a73f600e44e4ca3ce5c2ce61f91d0r22 <http://ontologi.es/doap-changeset#item> [
-		a <http://ontologi.es/doap-changeset#Packaging> ;
-		<http://www.w3.org/2000/01/rdf-schema#label> "Upgrade distribution build system."@en
-	], [
-		a <http://ontologi.es/doap-changeset#Bugfix> ;
-		<http://www.w3.org/2000/01/rdf-schema#label> "Fix strange buglet that affected RDF::RDFa::Linter."@en
-	], [
-		<http://www.w3.org/2000/01/rdf-schema#label> "Drop common::sense and parent.pm deps."@en
-	] .
-_:rbbf6a73f600e44e4ca3ce5c2ce61f91d0r26 <http://ontologi.es/doap-changeset#item> [
-		a <http://ontologi.es/doap-changeset#Packaging> ;
-		<http://www.w3.org/2000/01/rdf-schema#label> "Upgrade distribution build system to Dist::Inkt."@en
-	], [
-		<http://ontologi.es/doap-changeset#blame> <http://purl.org/NET/cpan-uri/person/zoran> ;
-		a <http://ontologi.es/doap-changeset#Bugfix> ;
-		<http://www.w3.org/2000/01/rdf-schema#label> "Prevent XML::LibXML::Element::setAttribute complaining about uninitialized value."@en
-	], [
-		a <http://ontologi.es/doap-changeset#Packaging> ;
-		<http://www.w3.org/2000/01/rdf-schema#label> "Many minor improvements in packaging."@en
-	] .
-_:rbbf6a73f600e44e4ca3ce5c2ce61f91d0r3 <http://ontologi.es/doap-changeset#item> [
-		a <http://ontologi.es/doap-changeset#Bugfix> ;
-		<http://www.w3.org/2000/01/rdf-schema#label> "HTML::Pretty Fallback to sorting by object now works."@en
-	], [
-		a <http://ontologi.es/doap-changeset#Addition> ;
-		<http://www.w3.org/2000/01/rdf-schema#label> "HTML::Pretty can now force safe HTML (prevents injection attacks)."@en
-	] .
-_:rbbf6a73f600e44e4ca3ce5c2ce61f91d0r30 <http://ontologi.es/doap-changeset#item> [
-		a <http://ontologi.es/doap-changeset#Addition> ;
-		<http://www.w3.org/2000/01/rdf-schema#label> "Support Attean."@en
-	], [
-		a <http://ontologi.es/doap-changeset#Addition> ;
-		<http://www.w3.org/2000/01/rdf-schema#label> "More tests."@en
-	], [
-		a <http://ontologi.es/doap-changeset#Change> ;
-		<http://www.w3.org/2000/01/rdf-schema#label> "Many minor improvements."@en
-	] .
-_:rbbf6a73f600e44e4ca3ce5c2ce61f91d0r34 <http://ontologi.es/doap-changeset#item> [
-		a <http://ontologi.es/doap-changeset#Removal> ;
-		<http://www.w3.org/2000/01/rdf-schema#label> "Stop using the Trine API."@en
-	], [
-		a <http://ontologi.es/doap-changeset#Addition> ;
-		<http://www.w3.org/2000/01/rdf-schema#label> "Use the Attean API."@en
-	], [
-		a <http://ontologi.es/doap-changeset#Removal> ;
-		<http://www.w3.org/2000/01/rdf-schema#label> "Trine serialization methods are deprecated and will croak."@en
-	], [
-		a <http://ontologi.es/doap-changeset#Change> ;
-		<http://www.w3.org/2000/01/rdf-schema#label> "data_context takes an object as input."@en
-	], [
-		a <http://ontologi.es/doap-changeset#Change> ;
-		<http://www.w3.org/2000/01/rdf-schema#label> "Use URI::NamespaceMap for managing prefixes, RDF::Prefixes can be used through it."@en
-	], [
-		a <http://ontologi.es/doap-changeset#Removal> ;
-		<http://www.w3.org/2000/01/rdf-schema#label> "Remove serialization of plain literals as they don't exist in RDF 1.1."@en
-	], [
-		a <http://ontologi.es/doap-changeset#Change> ;
-		<http://www.w3.org/2000/01/rdf-schema#label> "Improve CURIE generation."@en
-	], [
-		a <http://ontologi.es/doap-changeset#Addition> ;
-		<http://www.w3.org/2000/01/rdf-schema#label> "Use RDF::NS::Curated for the canonical list of namespaces."@en
-	], [
-		a <http://ontologi.es/doap-changeset#Change> ;
-		<http://www.w3.org/2000/01/rdf-schema#label> "Improve the HTML of Pretty a bit."@en
-	], [
-		a <http://ontologi.es/doap-changeset#Addition> ;
-		<http://www.w3.org/2000/01/rdf-schema#label> "Many more tests."@en
-	], [
-		a <http://ontologi.es/doap-changeset#Change> ;
-		<http://www.w3.org/2000/01/rdf-schema#label> "Many minor improvements."@en
-	] .
-_:rbbf6a73f600e44e4ca3ce5c2ce61f91d0r6 <http://ontologi.es/doap-changeset#item> [
-		<http://www.w3.org/2000/01/rdf-schema#label> "HTML::Hidden and HTML::Pretty now use @about instead of @src to set the subject URI."@en
-	], [
-		<http://www.w3.org/2000/01/rdf-schema#label> "HTML::Pretty no longer makes 'javascript:' URLs into links."@en
-	] .
-_:rbbf6a73f600e44e4ca3ce5c2ce61f91d0r9 <http://ontologi.es/doap-changeset#item> _:rbbf6a73f600e44e4ca3ce5c2ce61f91d0r10 .
-<http://dev.perl.org/licenses/> <http://purl.org/dc/terms/title> "the same terms as the perl 5 programming language system itself" .
-<http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/project> <http://ontologi.es/doap-deps#develop-recommendation> _:rb7cc96b7c68f6472b991665d91d3edc57r15 ;
-	<http://ontologi.es/doap-deps#runtime-recommendation> _:rb7cc96b7c68f6472b991665d91d3edc57r5, _:rb7cc96b7c68f6472b991665d91d3edc57r6, _:rb7cc96b7c68f6472b991665d91d3edc57r7 ;
-	<http://ontologi.es/doap-deps#runtime-requirement> _:rb7cc96b7c68f6472b991665d91d3edc57r10, _:rb7cc96b7c68f6472b991665d91d3edc57r11, _:rb7cc96b7c68f6472b991665d91d3edc57r12, _:rb7cc96b7c68f6472b991665d91d3edc57r13, _:rb7cc96b7c68f6472b991665d91d3edc57r14, _:rb7cc96b7c68f6472b991665d91d3edc57r9 ;
-	<http://ontologi.es/doap-deps#runtime-suggestion> _:rb7cc96b7c68f6472b991665d91d3edc57r8 ;
-	<http://ontologi.es/doap-deps#test-requirement> _:rb7cc96b7c68f6472b991665d91d3edc57r0, _:rb7cc96b7c68f6472b991665d91d3edc57r1, _:rb7cc96b7c68f6472b991665d91d3edc57r2, _:rb7cc96b7c68f6472b991665d91d3edc57r3, _:rb7cc96b7c68f6472b991665d91d3edc57r4 ;
-	<http://purl.org/dc/terms/contributor> <http://purl.org/NET/cpan-uri/person/kjetilk>, <http://purl.org/NET/cpan-uri/person/tobyink> ;
-	<http://usefulinc.com/ns/doap#bug-database> <https://github.com/kjetilk/p5-rdf-rdfa-generator/issues> ;
-	<http://usefulinc.com/ns/doap#category> <http://dbpedia.org/resource/Category:Semantic_Web> ;
-	<http://usefulinc.com/ns/doap#created> "2010-05-05"^^<http://www.w3.org/2001/XMLSchema#date> ;
-	<http://usefulinc.com/ns/doap#developer> <http://purl.org/NET/cpan-uri/person/kjetilk>, <http://purl.org/NET/cpan-uri/person/tobyink> ;
-	<http://usefulinc.com/ns/doap#documenter> <http://purl.org/NET/cpan-uri/person/tobyink> ;
-	<http://usefulinc.com/ns/doap#download-page> <https://metacpan.org/release/RDF-RDFa-Generator> ;
-	<http://usefulinc.com/ns/doap#homepage> <https://metacpan.org/release/RDF-RDFa-Generator> ;
-	<http://usefulinc.com/ns/doap#license> <http://dev.perl.org/licenses/> ;
-	<http://usefulinc.com/ns/doap#maintainer> <http://purl.org/NET/cpan-uri/person/kjetilk>, <http://purl.org/NET/cpan-uri/person/tobyink> ;
-	<http://usefulinc.com/ns/doap#name> "RDF-RDFa-Generator" ;
-	<http://usefulinc.com/ns/doap#programming-language> "Perl" ;
-	<http://usefulinc.com/ns/doap#release> <http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-01>, <http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-02>, <http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-03>, <http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-04>, <http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-05>, <http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-100>, <http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-101>, <http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-102>, <http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-103>, <http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-106>, <http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-192>, <http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-200> ;
-	<http://usefulinc.com/ns/doap#repository> _:rb5e50ce13c3f54d1d9b55ad093b8431cdr0 ;
-	<http://usefulinc.com/ns/doap#shortdesc> "Generate data for RDFa serialization"@en ;
-	<http://usefulinc.com/ns/doap#support-forum> <irc://irc.perl.org/#perlrdf> ;
-	<http://usefulinc.com/ns/doap#tester> <http://purl.org/NET/cpan-uri/person/tobyink> ;
-	a <http://usefulinc.com/ns/doap#Project> .
-<http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-01> <http://ontologi.es/doap-changeset#released-by> <http://purl.org/NET/cpan-uri/person/tobyink> ;
-	<http://purl.org/dc/terms/identifier> "RDF-RDFa-Generator-0.01"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	<http://purl.org/dc/terms/issued> "2010-05-09"^^<http://www.w3.org/2001/XMLSchema#date> ;
-	<http://usefulinc.com/ns/doap#file-release> <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Generator-0.01.tar.gz> ;
-	<http://usefulinc.com/ns/doap#revision> "0.01"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	a <http://usefulinc.com/ns/doap#Version> ;
-	<http://www.w3.org/2000/01/rdf-schema#label> "Original version"@en .
-<http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-02> <http://ontologi.es/doap-changeset#changeset> _:rbbf6a73f600e44e4ca3ce5c2ce61f91d0r0 ;
-	<http://ontologi.es/doap-changeset#released-by> <http://purl.org/NET/cpan-uri/person/tobyink> ;
-	<http://purl.org/dc/terms/identifier> "RDF-RDFa-Generator-0.02"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	<http://purl.org/dc/terms/issued> "2010-05-18"^^<http://www.w3.org/2001/XMLSchema#date> ;
-	<http://usefulinc.com/ns/doap#file-release> <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Generator-0.02.tar.gz> ;
-	<http://usefulinc.com/ns/doap#revision> "0.02"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	a <http://usefulinc.com/ns/doap#Version> .
-<http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-03> <http://ontologi.es/doap-changeset#changeset> _:rbbf6a73f600e44e4ca3ce5c2ce61f91d0r3 ;
-	<http://ontologi.es/doap-changeset#released-by> <http://purl.org/NET/cpan-uri/person/tobyink> ;
-	<http://purl.org/dc/terms/identifier> "RDF-RDFa-Generator-0.03"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	<http://purl.org/dc/terms/issued> "2010-05-19"^^<http://www.w3.org/2001/XMLSchema#date> ;
-	<http://usefulinc.com/ns/doap#file-release> <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Generator-0.03.tar.gz> ;
-	<http://usefulinc.com/ns/doap#revision> "0.03"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	a <http://usefulinc.com/ns/doap#Version> .
-<http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-04> <http://ontologi.es/doap-changeset#changeset> _:rbbf6a73f600e44e4ca3ce5c2ce61f91d0r6 ;
-	<http://ontologi.es/doap-changeset#released-by> <http://purl.org/NET/cpan-uri/person/tobyink> ;
-	<http://purl.org/dc/terms/identifier> "RDF-RDFa-Generator-0.04"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	<http://purl.org/dc/terms/issued> "2010-05-21"^^<http://www.w3.org/2001/XMLSchema#date> ;
-	<http://usefulinc.com/ns/doap#file-release> <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Generator-0.04.tar.gz> ;
-	<http://usefulinc.com/ns/doap#revision> "0.04"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	a <http://usefulinc.com/ns/doap#Version> .
-<http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-05> <http://ontologi.es/doap-changeset#changeset> _:rbbf6a73f600e44e4ca3ce5c2ce61f91d0r9 ;
-	<http://ontologi.es/doap-changeset#released-by> <http://purl.org/NET/cpan-uri/person/tobyink> ;
-	<http://purl.org/dc/terms/identifier> "RDF-RDFa-Generator-0.05"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	<http://purl.org/dc/terms/issued> "2010-05-27"^^<http://www.w3.org/2001/XMLSchema#date> ;
-	<http://usefulinc.com/ns/doap#file-release> <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Generator-0.05.tar.gz> ;
-	<http://usefulinc.com/ns/doap#revision> "0.05"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	a <http://usefulinc.com/ns/doap#Version> .
-<http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-100> <http://ontologi.es/doap-changeset#changeset> _:rbbf6a73f600e44e4ca3ce5c2ce61f91d0r11 ;
-	<http://ontologi.es/doap-changeset#released-by> <http://purl.org/NET/cpan-uri/person/tobyink> ;
-	<http://purl.org/dc/terms/identifier> "RDF-RDFa-Generator-0.100"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	<http://purl.org/dc/terms/issued> "2010-07-25"^^<http://www.w3.org/2001/XMLSchema#date> ;
-	<http://usefulinc.com/ns/doap#file-release> <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Generator-0.100.tar.gz> ;
-	<http://usefulinc.com/ns/doap#revision> "0.100"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	a <http://usefulinc.com/ns/doap#Version> .
-<http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-101> <http://ontologi.es/doap-changeset#changeset> _:rbbf6a73f600e44e4ca3ce5c2ce61f91d0r13 ;
-	<http://ontologi.es/doap-changeset#released-by> <http://purl.org/NET/cpan-uri/person/tobyink> ;
-	<http://purl.org/dc/terms/identifier> "RDF-RDFa-Generator-0.101"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	<http://purl.org/dc/terms/issued> "2010-09-06"^^<http://www.w3.org/2001/XMLSchema#date> ;
-	<http://usefulinc.com/ns/doap#file-release> <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Generator-0.101.tar.gz> ;
-	<http://usefulinc.com/ns/doap#revision> "0.101"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	a <http://usefulinc.com/ns/doap#Version> .
-<http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-102> <http://ontologi.es/doap-changeset#changeset> _:rbbf6a73f600e44e4ca3ce5c2ce61f91d0r17 ;
-	<http://ontologi.es/doap-changeset#released-by> <http://purl.org/NET/cpan-uri/person/tobyink> ;
-	<http://purl.org/dc/terms/identifier> "RDF-RDFa-Generator-0.102"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	<http://purl.org/dc/terms/issued> "2011-07-06"^^<http://www.w3.org/2001/XMLSchema#date> ;
-	<http://usefulinc.com/ns/doap#file-release> <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Generator-0.102.tar.gz> ;
-	<http://usefulinc.com/ns/doap#revision> "0.102"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	a <http://usefulinc.com/ns/doap#Version> .
-<http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-103> <http://ontologi.es/doap-changeset#changeset> _:rbbf6a73f600e44e4ca3ce5c2ce61f91d0r22 ;
-	<http://ontologi.es/doap-changeset#released-by> <http://purl.org/NET/cpan-uri/person/tobyink> ;
-	<http://purl.org/dc/terms/identifier> "RDF-RDFa-Generator-0.103"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	<http://purl.org/dc/terms/issued> "2012-12-12"^^<http://www.w3.org/2001/XMLSchema#date> ;
-	<http://usefulinc.com/ns/doap#file-release> <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Generator-0.103.tar.gz> ;
-	<http://usefulinc.com/ns/doap#revision> "0.103"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	a <http://usefulinc.com/ns/doap#Version> .
-<http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-106> <http://ontologi.es/doap-changeset#changeset> _:rbbf6a73f600e44e4ca3ce5c2ce61f91d0r26 ;
-	<http://ontologi.es/doap-changeset#released-by> <http://purl.org/NET/cpan-uri/person/kjetilk> ;
-	<http://purl.org/dc/terms/identifier> "RDF-RDFa-Generator-0.106"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	<http://purl.org/dc/terms/issued> "2017-12-22"^^<http://www.w3.org/2001/XMLSchema#date> ;
-	<http://usefulinc.com/ns/doap#file-release> <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/RDF-RDFa-Generator-0.106.tar.gz> ;
-	<http://usefulinc.com/ns/doap#revision> "0.106"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	a <http://usefulinc.com/ns/doap#Version> .
-<http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-192> <http://ontologi.es/doap-changeset#changeset> _:rbbf6a73f600e44e4ca3ce5c2ce61f91d0r30 ;
-	<http://ontologi.es/doap-changeset#released-by> <http://purl.org/NET/cpan-uri/person/kjetilk> ;
-	<http://purl.org/dc/terms/identifier> "RDF-RDFa-Generator-0.192"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	<http://purl.org/dc/terms/issued> "2017-12-22"^^<http://www.w3.org/2001/XMLSchema#date> ;
-	<http://usefulinc.com/ns/doap#file-release> <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/RDF-RDFa-Generator-0.192.tar.gz> ;
-	<http://usefulinc.com/ns/doap#revision> "0.192"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	a <http://usefulinc.com/ns/doap#Version> .
-<http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-200> <http://ontologi.es/doap-changeset#changeset> _:rbbf6a73f600e44e4ca3ce5c2ce61f91d0r34 ;
-	<http://ontologi.es/doap-changeset#released-by> <http://purl.org/NET/cpan-uri/person/kjetilk> ;
-	<http://purl.org/dc/terms/identifier> "RDF-RDFa-Generator-0.200"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	<http://purl.org/dc/terms/issued> "2018-02-11"^^<http://www.w3.org/2001/XMLSchema#date> ;
-	<http://usefulinc.com/ns/doap#file-release> <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/RDF-RDFa-Generator-0.200.tar.gz> ;
-	<http://usefulinc.com/ns/doap#revision> "0.200"^^<http://www.w3.org/2001/XMLSchema#string> ;
-	a <http://usefulinc.com/ns/doap#Version> ;
-	<http://www.w3.org/2000/01/rdf-schema#label> "Extensive changes to support both Attean and Trine. Backwards incompatible changes."@en .
-<http://purl.org/NET/cpan-uri/person/kjetilk> a <http://xmlns.com/foaf/0.1/Person> ;
-	<http://www.w3.org/2002/07/owl#sameAs> <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-rdf-rdfa-generator&serialization=PROV-O#user-Kjetil-Kjernsmo>, <http://www.kjetil.kjernsmo.net/foaf#me> ;
-	<http://xmlns.com/foaf/0.1/mbox> <mailto:kjetilk@cpan.org> ;
-	<http://xmlns.com/foaf/0.1/name> "Kjetil Kjernsmo" ;
-	<http://xmlns.com/foaf/0.1/nick> "KJETILK", "kjetilk" ;
-	<http://xmlns.com/foaf/0.1/page> <https://metacpan.org/author/KJETILK> .
-<http://purl.org/NET/cpan-uri/person/tobyink> a <http://xmlns.com/foaf/0.1/Person> ;
-	<http://www.w3.org/2002/07/owl#sameAs> <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-rdf-rdfa-generator&serialization=PROV-O#user-Toby-Inkster> ;
-	<http://xmlns.com/foaf/0.1/mbox> <mailto:tobyink@cpan.org> ;
-	<http://xmlns.com/foaf/0.1/name> "Toby Inkster" ;
-	<http://xmlns.com/foaf/0.1/nick> "TOBYINK" ;
-	<http://xmlns.com/foaf/0.1/page> <https://metacpan.org/author/TOBYINK> .
-<http://purl.org/NET/cpan-uri/person/zoran> a <http://xmlns.com/foaf/0.1/Person> ;
-	<http://xmlns.com/foaf/0.1/nick> "ZORAN" ;
-	<http://xmlns.com/foaf/0.1/page> <https://metacpan.org/author/ZORAN> .
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-bugs: <http://ontologi.es/doap-bugs#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix types: <http://rdfs.org/sioc/types#> .
+@prefix wot:   <http://xmlns.com/wot/0.1/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dbpedia.org/resource/Category:Semantic_Web>
+	rdfs:label           "Semantic Web"@en;
+	dc:description       "The Semantic Web is an extension of the current World Wide Web to enable wide data access and integration."@en.
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself";
+	rdfs:comment         "the same terms as the Perl 5 programming language system itself"@en.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/kjetilk>, <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
+	doap-deps:runtime-recommendation [ doap-deps:on "RDF::Prefixes"^^doap-deps:CpanId ], [ doap-deps:on "RDF::NS"^^doap-deps:CpanId ], [ doap-deps:on "Attean 0.019"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [
+		doap-deps:on "RDF::NS::Curated 0.100"^^doap-deps:CpanId;
+	], [ doap-deps:on "perl 5.008"^^doap-deps:CpanId ], [ doap-deps:on "Data::Dumper"^^doap-deps:CpanId ], [
+		doap-deps:on "Icon::FamFamFam::Silk"^^doap-deps:CpanId;
+	], [ doap-deps:on "XML::LibXML 1.60"^^doap-deps:CpanId ], [
+		doap-deps:on "URI::NamespaceMap 1.06"^^doap-deps:CpanId;
+	];
+	doap-deps:runtime-suggestion [ doap-deps:on "RDF::Trine 0.112"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [ doap-deps:on "Test::Output"^^doap-deps:CpanId ], [ doap-deps:on "Test::Modern"^^doap-deps:CpanId ], [ doap-deps:on "Attean 0.019"^^doap-deps:CpanId ], [ doap-deps:on "RDF::Prefixes"^^doap-deps:CpanId ];
+	doap:bug-database    <https://github.com/kjetilk/p5-rdf-rdfa-generator/issues>;
+	doap:category        <http://dbpedia.org/resource/Category:Semantic_Web>;
+	doap:created         "2010-05-05"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/kjetilk>, <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:documenter      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/RDF-RDFa-Generator>;
+	doap:homepage        <https://metacpan.org/release/RDF-RDFa-Generator>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/kjetilk>, <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "RDF-RDFa-Generator";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-01>, <http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-02>, <http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-03>, <http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-04>, <http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-05>, <http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-100>, <http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-101>, <http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-102>, <http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-103>, <http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-106>, <http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-192>, <http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-200>, <http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-204>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/kjetilk/p5-rdf-rdfa-generator>;
+		prov:has_provenance <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-rdf-rdfa-generator&serialization=PROV-O#>;
+	];
+	doap:security-contact <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:shortdesc       "Generate data for RDFa serialization"@en;
+	doap:support-forum   <irc://irc.perl.org/#perlrdf>;
+	doap:tester          <http://purl.org/NET/cpan-uri/person/tobyink>.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-01>
+	a                    doap:Version;
+	rdfs:label           "Original version"@en;
+	dc:identifier        "RDF-RDFa-Generator-0.01"^^xsd:string;
+	dc:issued            "2010-05-09"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Generator-0.01.tar.gz>;
+	doap:revision        "0.01"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-02>
+	a                    doap:Version;
+	dc:identifier        "RDF-RDFa-Generator-0.02"^^xsd:string;
+	dc:issued            "2010-05-18"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [ rdfs:label "Using FamFamFam Silk icons."@en ], [
+			a doap-changeset:Addition;
+			rdfs:label "HTML::Pretty can now include additional textual notes in the output. This functionality added for RDF::RDFa::Linter."@en;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Generator-0.02.tar.gz>;
+	doap:revision        "0.02"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-03>
+	a                    doap:Version;
+	dc:identifier        "RDF-RDFa-Generator-0.03"^^xsd:string;
+	dc:issued            "2010-05-19"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "HTML::Pretty Fallback to sorting by object now works."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "HTML::Pretty can now force safe HTML (prevents injection attacks)."@en;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Generator-0.03.tar.gz>;
+	doap:revision        "0.03"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-04>
+	a                    doap:Version;
+	dc:identifier        "RDF-RDFa-Generator-0.04"^^xsd:string;
+	dc:issued            "2010-05-21"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			rdfs:label "HTML::Hidden and HTML::Pretty now use @about instead of @src to set the subject URI."@en;
+		], [
+			rdfs:label "HTML::Pretty no longer makes 'javascript:' URLs into links."@en;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Generator-0.04.tar.gz>;
+	doap:revision        "0.04"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-05>
+	a                    doap:Version;
+	dc:identifier        "RDF-RDFa-Generator-0.05"^^xsd:string;
+	dc:issued            "2010-05-27"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "UTF-8 fixes."@en;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Generator-0.05.tar.gz>;
+	doap:revision        "0.05"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-100>
+	a                    doap:Version;
+	dc:identifier        "RDF-RDFa-Generator-0.100"^^xsd:string;
+	dc:issued            "2010-07-25"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "HTML::Pretty now includes cross-links to other resources."@en;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Generator-0.100.tar.gz>;
+	doap:revision        "0.100"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-101>
+	a                    doap:Version;
+	dc:identifier        "RDF-RDFa-Generator-0.101"^^xsd:string;
+	dc:issued            "2010-09-06"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "use RDF::Prefixes."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Support 'namespaces' option for the constructor, for compatibility with other Trine serialisers."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Icons for a few extra classes."@en;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Generator-0.101.tar.gz>;
+	doap:revision        "0.101"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-102>
+	a                    doap:Version;
+	dc:identifier        "RDF-RDFa-Generator-0.102"^^xsd:string;
+	dc:issued            "2011-07-06"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "<meta> element should name @name, not @nane."@en;
+			doap-changeset:fixes [
+				doap-bugs:reporter <http://purl.org/NET/cpan-uri/person/kjetilk>;
+			];
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Namespaces in HTML::Head and HTML::Hidden."@en;
+			doap-changeset:fixes [
+				doap-bugs:reporter <http://purl.org/NET/cpan-uri/person/kjetilk>;
+			];
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Generator-0.102.tar.gz>;
+	doap:revision        "0.102"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-103>
+	a                    doap:Version;
+	dc:identifier        "RDF-RDFa-Generator-0.103"^^xsd:string;
+	dc:issued            "2012-12-12"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Upgrade distribution build system."@en;
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix strange buglet that affected RDF::RDFa::Linter."@en;
+		], [
+			rdfs:label "Drop common::sense and parent.pm deps."@en;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/RDF-RDFa-Generator-0.103.tar.gz>;
+	doap:revision        "0.103"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-106>
+	a                    doap:Version;
+	dc:identifier        "RDF-RDFa-Generator-0.106"^^xsd:string;
+	dc:issued            "2017-12-22"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Upgrade distribution build system to Dist::Inkt."@en;
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Prevent XML::LibXML::Element::setAttribute complaining about uninitialized value."@en;
+			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/zoran>;
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Many minor improvements in packaging."@en;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/RDF-RDFa-Generator-0.106.tar.gz>;
+	doap:revision        "0.106"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-192>
+	a                    doap:Version;
+	dc:identifier        "RDF-RDFa-Generator-0.192"^^xsd:string;
+	dc:issued            "2017-12-22"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Support Attean."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "More tests."@en;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Many minor improvements."@en;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/RDF-RDFa-Generator-0.192.tar.gz>;
+	doap:revision        "0.192"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-200>
+	a                    doap:Version;
+	rdfs:label           "Extensive changes to support both Attean and Trine. Backwards incompatible changes."@en;
+	dc:identifier        "RDF-RDFa-Generator-0.200"^^xsd:string;
+	dc:issued            "2018-02-11"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Removal;
+			rdfs:label "Stop using the Trine API."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Use the Attean API."@en;
+		], [
+			a doap-changeset:Removal;
+			rdfs:label "Trine serialization methods are deprecated and will croak."@en;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "data_context takes an object as input."@en;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Use URI::NamespaceMap for managing prefixes, RDF::Prefixes can be used through it."@en;
+		], [
+			a doap-changeset:Removal;
+			rdfs:label "Remove serialization of plain literals as they don't exist in RDF 1.1."@en;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Improve CURIE generation."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Use RDF::NS::Curated for the canonical list of namespaces."@en;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Improve the HTML of Pretty a bit."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Many more tests."@en;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Many minor improvements."@en;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/RDF-RDFa-Generator-0.200.tar.gz>;
+	doap:revision        "0.200"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/v_0-204>
+	a                    doap:Version;
+	rdfs:label           "Minor updates and transition to Github Actions for CI."@en;
+	dc:identifier        "RDF-RDFa-Generator-0.204"^^xsd:string;
+	dc:issued            "2024-02-22"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Use Github actions for CI."@en;
+		], [
+			a doap-changeset:Removal;
+			rdfs:label "Remove Travis for CI."@en;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Improve documentation."@en;
+		], [
+			a doap-changeset:Changes;
+			rdfs:label "Some minor changes."@en;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/RDF-RDFa-Generator-0.204.tar.gz>;
+	doap:revision        "0.204"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/kjetilk>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:kjetilk@cpan.org>;
+	foaf:name            "Kjetil Kjernsmo";
+	foaf:nick            "KJETILK", "KjetilK", "kjetilk";
+	foaf:page            <https://metacpan.org/author/KJETILK>;
+	owl:sameAs           <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-rdf-rdfa-generator&serialization=PROV-O#user-Kjetil-Kjernsmo>, <http://www.kjetil.kjernsmo.net/foaf#me>, <https://solid.kjernsmo.net/profile/card#me>;
+	rdfs:seeAlso         <http://www.kjetil.kjernsmo.net/foaf>;
+	wot:hasKey           _:B1.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	doap:mbox            <mailto:tobyink@cpan.org>;
+	doap:name            "Toby Inkster";
+	doap:page            <https://metacpan.org/author/TOBYINK>;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>;
+	owl:sameAs           <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-rdf-rdfa-generator&serialization=PROV-O#user-Toby-Inkster>.
+
+<http://purl.org/NET/cpan-uri/person/zoran>
+	a                    foaf:Person;
+	foaf:nick            "ZORAN";
+	foaf:page            <https://metacpan.org/author/ZORAN>.
+
+<http://www.kjetil.kjernsmo.net/foaf#me>
+	a                    foaf:Person;
+	foaf:homepage        <http://kjetil.kjernsmo.net/>;
+	foaf:mbox            <mailto:kjetilk@cpan.org>;
+	foaf:name            "Kjetil Kjernsmo";
+	foaf:nick            "KjetilK";
+	owl:sameAs           <http://purl.org/NET/cpan-uri/person/kjetilk>, <https://solid.kjernsmo.net/profile/card#me>;
+	rdfs:seeAlso         <http://www.kjetil.kjernsmo.net/foaf>, <https://solid.kjernsmo.net/profile/card>;
+	wot:hasKey           _:B1.
+
+<irc://irc.perl.org/#perlrdf>
+	a                    types:ChatChannel;
+	dc:title             "The Perl and RDF IRC channel"@en.
+
+_:B1
+	a                    wot:PubKey;
+	wot:fingerprint      "0ECC8BC6D0A2E9B93BA417267FBEE8DF3A9E4AA5".
+

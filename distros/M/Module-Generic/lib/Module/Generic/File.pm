@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File.pm
-## Version v0.8.0
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v0.8.1
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2024/01/29
+## Modified 2024/02/21
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -127,7 +127,7 @@ BEGIN
     # Catching non-ascii characters: [^\x00-\x7F]
     # Credits to: File::Util
     $ILLEGAL_CHARACTERS = qr/[\x5C\/\|\015\012\t\013\*\"\?\<\:\>]/;
-    our $VERSION = 'v0.8.0';
+    our $VERSION = 'v0.8.1';
 };
 
 use strict;
@@ -883,10 +883,10 @@ sub content
         else
         {
             # $io = $self->open( $opts ) || return( $self->pass_error );
-            $io = $self->open( $opts ) || do
+            if( !( $io = $self->open( $opts ) ) )
             {
                 return( $self->pass_error );
-            };
+            }
         }
         my $vol = $self->volume;
         $a = $self->new_array( [ map( $self->_spec_catpath( $vol, $file, $_ ), grep{ !/^\.{1,2}$/ } $io->read ) ] );
@@ -1307,7 +1307,7 @@ sub filename
         {
             $self->code(200);
         }
-        ## Force to create new Apache2::SSI::URI object
+        # Force to create new Apache2::SSI::URI object
     }
     return( $self->{filename} );
 }
@@ -1623,10 +1623,10 @@ sub is_empty
         }
         else
         {
-            $io = $self->open || do
+            if( !( $io = $self->open ) )
             {
                 return( $self->pass_error );
-            };
+            }
         }
         
         while( defined( $elem = $io->read ) )
@@ -2192,10 +2192,10 @@ sub mkpath
             my $current_path = $self->_spec_catpath( $vol, $self->_spec_catdir( [ @$curr, $dir ] ) );
             if( !-e( "$current_path" ) )
             {
-                CORE::mkdir( "$current_path" ) || do
+                if( !CORE::mkdir( "$current_path" ) )
                 {
                     return( $self->error( "Unable to create directory \"$current_path\" ", ( CORE::length( "$parent_path" ) ? "under $parent_path" : "at filesystem root" ), ": $!" ) ) unless( $! =~ /\bFile exists\b/i );
-                };
+                }
                 local $_ = $current_path;
                 my $rv;
                 # try-catch
@@ -4319,17 +4319,18 @@ sub TO_JSON { return( shift->filepath ); }
             warn( "I was expecting an hash reference of options, but got instead '$opts'\n" );
             return;
         }
-        
-        my $io = $opts->{fh} || do
+
+        my( $io, $file );
+        if( !( $io = $opts->{fh} ) )
         {
             warn( "No file handle provided\n" );
             return;
-        };
-        my $file = $opts->{file} || do
+        }
+        if( !( $file = $opts->{file} ) )
         {
             warn( "No file path was provided.\n" );
             return;
-        };
+        }
         no strict 'refs';
         my $ref = \$file;
         ${$$ref} = $opts;
@@ -4340,11 +4341,12 @@ sub TO_JSON { return( shift->filepath ); }
     {
         my $self = shift( @_ );
         no strict 'refs';
-        my $fh = ${$$self}->{fh} || do
+        my $fh;
+        if( !( $fh = ${$$self}->{fh} ) )
         {
             warn( "Filehandle is gone!\n" );
             return;
-        };
+        }
         my $parent  = ${$$self}->{me};
         my $data    = $parent->load;
         # Initial variable length, if any, because initially the file may be padded with nulls
@@ -4363,11 +4365,12 @@ sub TO_JSON { return( shift->filepath ); }
     {
         my $self = shift( @_ );
         no strict 'refs';
-        my $fh = ${$$self}->{fh} || do
+        my $fh;
+        if( !( $fh = ${$$self}->{fh} ) )
         {
             warn( "Filehandle is gone!\n" );
             return;
-        };
+        }
         my $size   = ${$$self}->{size};
         my $parent = ${$$self}->{me};
         unless( $fh->opened )
@@ -4381,11 +4384,11 @@ sub TO_JSON { return( shift->filepath ); }
             # return;
         };
         # This needs to be print and not syswrite, because we cannot mix syswrite and read/print
-        $fh->print( $_[0] ) || do
+        if( !$fh->print( $_[0] ) )
         {
             warn( "Unable to write ", CORE::length( $_[0] // '' ), " byte(s) to file \"", $parent->filename, "\": $!\n" );
             return;
-        };
+        }
         $parent->unlock;
         $fh->sync;
         $fh->flush;
@@ -4532,7 +4535,7 @@ Module::Generic::File - File Object Abstraction Class
 
 =head1 VERSION
 
-    v0.8.0
+    v0.8.1
 
 =head1 DESCRIPTION
 
@@ -6164,7 +6167,7 @@ Provided some perl data and an optional hash or hash reference of options and th
 
 If the L<JSON> module is not installed or an error occurs during JSON encoding, this sets an L<error|Module::Generic/error> and returns undef.
 
-The L<JSON> object provided by L<Module::Generic/new_json> already has the following options enabled: C<allow_nonref>, C<allow_blessed>, C<convert_blessed> and C<relaxed>
+The L<JSON> object provided by L<Module::Generic/new_json> already has the following options enabled: C<allow_nonref>, C<allow_blessed>, C<convert_blessed>, C<allow_tags> and C<relaxed>
 
 Supported options are as follows, including any of the L<JSON> supported options:
 

@@ -90,7 +90,7 @@ sub arguments { \%WriteMakefile }
 
 do_it() unless caller;
 sub do_it {
-	unless( $^O =~ m/darwin/ ) {
+	unless( $^O =~ m/darwin/ and ! $ENV{RELEASE_ACTION} ) {
 		die "OS unsupported. This module only works on Mac OS X.\n";
 		}
 

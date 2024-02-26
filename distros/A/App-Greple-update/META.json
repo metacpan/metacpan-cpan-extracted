@@ -57,7 +57,7 @@
    "provides" : {
       "App::Greple::update" : {
          "file" : "lib/App/Greple/update.pm",
-         "version" : "1.02"
+         "version" : "1.03"
       }
    },
    "release_status" : "stable",
@@ -72,7 +72,7 @@
          "web" : "https://github.com/kaz-utashiro/greple-update"
       }
    },
-   "version" : "1.02",
+   "version" : "1.03",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

@@ -12,10 +12,10 @@ my $t = TableData::Munge::Reverse->new(tabledata => "Sample::DeNiro");
 is($t->get_column_count, 3);
 is_deeply([$t->get_column_names], [qw/Year Score Title/]);
 $t->reset_iterator;
-is_deeply($t->get_next_item, [2016,11,"Dirty Grandpa"]);
-is_deeply($t->get_next_row_hashref , {Year=>2015,Score=>61,Title=>"The Intern"});
+is_deeply($t->get_next_item, [2023,73,"Ezra"]);
+is_deeply($t->get_next_row_hashref , {Year=>2023,Score=>37,Title=>"About My Father"});
 $t->reset_iterator;
-is_deeply($t->get_next_row_hashref , {Year=>2016,Score=>11,Title=>"Dirty Grandpa"});
-is($t->get_row_count, 87);
+is_deeply($t->get_next_row_hashref , {Year=>2023,Score=>73,Title=>"Ezra"});
+is($t->get_row_count, 99);
 
 done_testing;

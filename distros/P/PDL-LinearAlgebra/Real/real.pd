@@ -5,6 +5,7 @@ pp_setversion($VERSION);
 $VERSION = eval $VERSION;
 
 use PDL::Exporter;
+use PDL::Types qw(ppdefs_all);
 
 sub generate_code($){
 	if ($config{WITHOUT_THREAD}){
@@ -122,6 +123,7 @@ PDL::LinearAlgebra::Real - PDL interface to the real lapack linear algebra progr
 This module provides an interface to parts of the real lapack library.
 These routines accept either float or double ndarrays.
 
+=cut
 EOD
 
 pp_def("gtsv",
@@ -10471,34 +10473,49 @@ the exponent range, as is found on a Cray.
 #		OTHER AUXILIARY ROUTINES
 #
 ################################################################################
-
 pp_def(
 	'tricpy',
-	Pars => 'A(m,n);int uplo();[o] C(m,n)',
+	Pars => 'A(m,n);[o] C(m,n)',
+	OtherPars => 'int uplo',
+	OtherParsDefaults => {uplo => 0},
+	ArgOrder => [qw(A uplo C)],
+	GenericTypes => [ppdefs_all()],
 	Code => '
-		PDL_Indx i, j, k;
-
-		if ($uplo())
+		if ($COMP(uplo))
 		{
-			for (i = 0; i < $SIZE(n);i++)
-			{
-				k = min(i,($SIZE(m)-1));
-				for (j = 0; j <= k; j++)
-					$C(m=>j,n=>i) = $A(m=>j,n=>i);
-			}
+			broadcastloop %{
+				loop(n,m) %{
+					$C() = $A();
+					if (m >= n) break;
+				%}
+			%}
 		}
 		else
 		{
-			for (i = 0; i < $SIZE(n);i++)
-			{
-				for (j = i; j < $SIZE(m); j++)
-					$C(m=>j,n=>i) = $A(m=>j,n=>i);
-				if (i >= $SIZE(m))
-					break;
-			}
+			broadcastloop %{
+				loop(m,n) %{
+					$C() = $A();
+					if (n >= m) break;
+				%}
+			%}
 		}
 	',
-	Doc => <<EOT
+	Doc => <<'EOT'
+=for usage
+
+tricpy(PDL(A), int(uplo), PDL(C))
+
+=for example
+
+	use PDL::LinearAlgebra;
+
+	$c = $a->tricpy($uplo);	# explicit uplo
+	$c = $a->tricpy;			# default upper
+or
+	use PDL::LinearAlgebra::Real;
+
+	tricpy($a, $uplo, $c);	# modify c
+
 =for ref
 
 Copy triangular part to another matrix. If uplo == 0 copy upper triangular part.
@@ -10509,12 +10526,11 @@ EOT
 
 );
 
-
 pp_def(
 	'cplx_eigen',
 	Pars => 'eigreval(n);eigimval(n); eigvec(n,p);int fortran();[o]cplx_val(c=2,n);[o]cplx_vec(c=2,n,p)',
 	Code => '
-	  register PDL_Indx i,j;
+	  register PDL_Indx i;
 	  if ($fortran() && $SIZE(n) != $SIZE(p))
 		  $CROAK("Fortran storage type needs square eigvec, but n=%"IND_FLAG", p=%"IND_FLAG, $SIZE(n), $SIZE(p));
 	  if ($fortran()) {
@@ -10522,19 +10538,19 @@ pp_def(
 			 $cplx_val(c=>0,n=>i) = $eigreval(n=>i);
 			 $cplx_val(c=>1,n=>i) = $eigimval(n=>i);
 			 if ($eigimval(n=>i) == 0) {
-				 for (j = 0; j < $SIZE(p); j++) {
-					$cplx_vec(c=>0,n=>j,p=>i) = $eigvec(n=>j,p=>i);
-					$cplx_vec(c=>1,n=>j,p=>i) = 0;
-				 }
+				 loop(p) %{
+					$cplx_vec(c=>0,n=>p,p=>i) = $eigvec(n=>p,p=>i);
+					$cplx_vec(c=>1,n=>p,p=>i) = 0;
+				 %}
 			 } else {
 				 PDL_Indx index = i+1;
 				 $cplx_val(c=>0,n=>index) = $eigreval(n=>index);
 				 $cplx_val(c=>1,n=>index) = $eigimval(n=>index);
-				 for (j = 0; j < $SIZE(p); j++) {
-					$cplx_vec(c=>0,n=>j,p=>i) = $cplx_vec(c=>0,n=>j,p=>index) = $eigvec(n=>j,p=>i);
-					$cplx_vec(c=>1,n=>j,p=>i) = $eigvec(n=>j,p=>index);
-					$cplx_vec(c=>1,n=>j,p=>index) = - $eigvec(n=>j,p=>index);
-				 }
+				 loop(p) %{
+					$cplx_vec(c=>0,n=>p,p=>i) = $cplx_vec(c=>0,n=>p,p=>index) = $eigvec(n=>p,p=>i);
+					$cplx_vec(c=>1,n=>p,p=>i) = $eigvec(n=>p,p=>index);
+					$cplx_vec(c=>1,n=>p,p=>index) = - $eigvec(n=>p,p=>index);
+				 %}
 				 i = index;
 			 }
 		  }
@@ -10543,19 +10559,19 @@ pp_def(
 			 $cplx_val(c=>0,n=>i) = $eigreval(n=>i);
 			 $cplx_val(c=>1,n=>i) = $eigimval(n=>i);
 			 if ($eigimval(n=>i) == 0) {
-				 for (j = 0; j < $SIZE(p); j++) {
-					$cplx_vec(c=>0,n=>i,p=>j) = $eigvec(n=>i,p=>j);
-					$cplx_vec(c=>1,n=>i,p=>j) = 0;
-				 }
+				 loop(p) %{
+					$cplx_vec(c=>0,n=>i) = $eigvec(n=>i);
+					$cplx_vec(c=>1,n=>i) = 0;
+				 %}
 			 } else {
 				 PDL_Indx index = i+1;
 				 $cplx_val(c=>0,n=>index) = $eigreval(n=>index);
 				 $cplx_val(c=>1,n=>index) = $eigimval(n=>index);
-				 for (j = 0; j < $SIZE(p); j++) {
-					$cplx_vec(c=>0,n=>i,p=>j) = $cplx_vec(c=>0,n=>index,p=>j) = $eigvec(n=>i,p=>j);
-					$cplx_vec(c=>1,n=>i,p=>j) = $eigvec(n=>index,p=>j);
-					$cplx_vec(c=>1,n=>index,p=>j) = - $eigvec(n=>index,p=>j);
-				 }
+				 loop(p) %{
+					$cplx_vec(c=>0,n=>i) = $cplx_vec(c=>0,n=>index) = $eigvec(n=>i);
+					$cplx_vec(c=>1,n=>i) = $eigvec(n=>index);
+					$cplx_vec(c=>1,n=>index) = - $eigvec(n=>index);
+				 %}
 				 i = index;
 			 }
 		  }
@@ -10591,28 +10607,20 @@ pp_def(
 	Pars => 'x(n); y(p);[o]out(q)',
 	RedoDimsCode => '$SIZE(q) = $SIZE(n) + $SIZE(p);',
 	Code => '
-	  register PDL_Indx i,j;
-
-	  for (i=0; i < $SIZE(n); i++){
-		$out(q=>i) = $x(n=>i);
-	  }
-	  j = 0;
-	  for (i=$SIZE(n); i < $SIZE(q); i++){
+	  loop(n) %{
+		$out(q=>n) = $x();
+	  %}
+	  register PDL_Indx i,j = 0;
+	  for (i=$SIZE(n); i < $SIZE(q); i++,j++)
 		$out(q=>i) = $y(p=>j);
-		j++;
-	  }
 	',
        BackCode => '
-	  register PDL_Indx i,j;
-
-	  for (i=0; i < $SIZE(n); i++){
-		$x(n=>i) = $out(q=>i);
-	  }
-	  j = 0;
-	  for (i=$SIZE(n); i < $SIZE(q); i++){
+	  loop(n) %{
+		$x() = $out(q=>n);
+	  %}
+	  register PDL_Indx i,j = 0;
+	  for (i=$SIZE(n); i < $SIZE(q); i++,j++)
 		$y(p=>j) = $out(q=>i);
-		j++;
-	  }
        ',
 	Doc => <<EOT
 =for ref
@@ -10634,32 +10642,28 @@ pp_def(
 	RedoDimsCode => '$SIZE(q) = $SIZE(m) + $SIZE(p);',
 	Code => '
 	  register PDL_Indx i,j;
-	  loop(m)%{
-		  loop(n)%{
-			$out(n=>n,q=>m) = $x();
-		  %}
+	  loop(m,n) %{
+		$out(q=>m) = $x();
 	  %}
 	  j=0;
 	  for (i = $SIZE(m); i < $SIZE(q) ;i++,j++)
 	  {
 		  loop(n)%{
-			$out(n=>n,q=>i) = $y(n=>n,p=>j);
+			$out(q=>i) = $y(p=>j);
 		  %}
 	  }
 	',
 
        BackCode => '
 	  register PDL_Indx i,j;
-	  loop(m)%{
-		  loop(n)%{
-			$x() = $out(n=>n,q=>m);
-		  %}
+	  loop(m,n) %{
+		$x() = $out(q=>m);
 	  %}
 	  j=0;
 	  for (i = $SIZE(m); i < $SIZE(q) ;i++,j++)
 	  {
 		  loop(n)%{
-			$y(n=>n,p=>j) = $out(n=>n,q=>i);
+			$y(p=>j) = $out(q=>i);
 		  %}
 	  }
        ',
@@ -10686,7 +10690,7 @@ pp_def(
 	Pars => 'A(n,n);[o]Y(n,n);[o]out(p);',
 	GenericTypes => [F,D],
 	Code => '
-	int i,j,k;
+	int i,k;
 	$GENERIC() *p, b;
 	//$GENERIC() *tmp;
 	char ptrans = \'N\';
@@ -10698,10 +10702,8 @@ pp_def(
 			$GENERIC() beta = 0;
 
 	p = ($GENERIC() * ) malloc ( $SIZE(n) * $SIZE(n) * sizeof($GENERIC()));
-	loop(n0)%{
-		loop(n1)%{
-			$Y(n0=>n0,n1=>n1) = (n0 == n1) ?  ($GENERIC()) 1.0 : ($GENERIC()) 0.0;
-		%}
+	loop(n0,n1) %{
+		$Y() = (n0 == n1) ?  ($GENERIC()) 1.0 : ($GENERIC()) 0.0;
 	%}
 	$out(p=>0) = 1;
 
@@ -10719,17 +10721,12 @@ pp_def(
 		//$P(Y) = p;
 		//p = tmp;
 		memmove($P(Y), p, $SIZE(n) * $SIZE(n) * sizeof($GENERIC()));
-//		loop(n1)
-//		%{
-//			loop(n0)
-//			%{
-//				$Y(n0=>n0,n1=>n1) = p[(n1*$SIZE(n))+n0];
-//			%}
+//		loop(n1,n0) %{
+//			$Y() = p[(n1*$SIZE(n))+n0];
 //		%}
 
 		b = $out(p=>i) = - $TFD(ftrace,dtrace)($SIZE(n), $P(Y)) / i;
-		for (j = 0; j < $SIZE(n); j++)
-			$Y(n0=>j,n1=>j) +=  b;
+		loop(n0) %{ $Y(n1=>n0) += b; %}
 
 	}
 
@@ -10737,12 +10734,8 @@ pp_def(
 	$out(p=>k) = - $TFD(ftrace,dtrace)(k, p) / k;
 	if ((k+1) & 1)
 	{
-		loop(n0)
-		%{
-			loop(n1)
-			%{
-				$Y(n0=>n0,n1=>n1) = -$Y(n0=>n0,n1=>n1);
-			%}
+		loop(n0,n1) %{
+			$Y() = -$Y();
 		%}
 	}
 	free(p);

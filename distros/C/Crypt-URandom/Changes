@@ -1,5 +1,9 @@
 Revision history for Crypt-URandom
 
+0.40 - Sat Feb 17 06:34:33 2024
+       Moving $OSNAME checks to compile time with GH#4.  Thanks to Aristotle.
+       Test and documentation fixes in GH#1, GH#2, GH#3.  Thanks to guest20.
+
 0.39 - Sun May 21 18:58:33 2023
        Adding support for test suite in non english locales
        Test and documentation fixes

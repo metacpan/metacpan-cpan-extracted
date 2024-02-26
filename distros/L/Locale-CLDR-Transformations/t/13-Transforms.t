@@ -14,8 +14,8 @@ use ok 'Locale::CLDR';
 my $locale = Locale::CLDR->new('en_GB');
 
 if ($^V ge v5.18.0) {
-	is($locale->transform(text => 'Let\'s try this one', from => 'latn', to => 'hebr'), 'לֶט\'ס טרי טהִס ֳןֶ', 'Transliteration from Latin to Hebrew');
-	is($locale->transform(text => 'Let\'s try this one', to => 'hebr'), 'לֶט\'ס טרי טהִס ֳןֶ', 'Transliteration from Latin to Hebrew with locale with no script');
+	is($locale->transform(text => 'Let\'s try this one', from => 'latn', to => 'hebr'), 'לֶט־ס טרי טהִס ֳןֶ', 'Transliteration from Latin to Hebrew');
+	is($locale->transform(text => 'Let\'s try this one', to => 'hebr'), 'לֶט־ס טרי טהִס ֳןֶ', 'Transliteration from Latin to Hebrew with locale with no script');
 	is($locale->transform(from => 'hang', to => 'latn', text => 'ᆾᆼ' ), 'chng', 'Translitteration from hang to Latin'); 
 }
 else {

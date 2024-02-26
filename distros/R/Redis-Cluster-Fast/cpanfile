@@ -6,7 +6,6 @@ on 'test' => sub {
 
 on 'configure' => sub {
     requires 'File::Which';
-    requires 'File::chdir';
     requires 'Module::Build::XSUtil', '>=0.02';
 };
 

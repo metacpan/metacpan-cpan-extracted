@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Sc - Package for language Sardinian
 
 package Locale::CLDR::Locales::Sc;
 # This file auto generated from Data\common\main\sc.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -24,22 +24,6 @@ use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
 extends('Locale::CLDR::Locales::Root');
-# Need to add code for Key type pattern
-sub display_name_pattern {
-	my ($self, $name, $region, $script, $variant) = @_;
-
-	my $display_pattern = '{0} ({1})';
-	$display_pattern =~s/\{0\}/$name/g;
-	my $subtags = join '{0}, {1}', grep {$_} (
-		$region,
-		$script,
-		$variant,
-	);
-
-	$display_pattern =~s/\{1\}/$subtags/g;
-	return $display_pattern;
-}
-
 has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
@@ -47,59 +31,110 @@ has 'display_name_language' => (
 	default		=> sub {
 		 sub {
 			 my %languages = (
-				'af' => 'afrikaans',
+				'ab' => 'abcasu',
+ 				'ace' => 'acehnesu',
+ 				'ada' => 'adangme',
+ 				'ady' => 'adighè',
+ 				'af' => 'afrikaans',
  				'agq' => 'aghem',
+ 				'ain' => 'àinu',
  				'ak' => 'akan',
+ 				'ale' => 'aleutinu',
+ 				'alt' => 'altai meridionale',
  				'am' => 'amàricu',
+ 				'an' => 'aragonesu',
+ 				'ann' => 'obolo',
+ 				'anp' => 'angika',
+ 				'apc' => 'àrabu levantinu',
  				'ar' => 'àrabu',
  				'ar_001' => 'àrabu modernu istandard',
+ 				'arn' => 'mapudungun',
+ 				'arp' => 'arapaho',
+ 				'ars' => 'àrabu najdi',
  				'as' => 'assamesu',
  				'asa' => 'asu',
  				'ast' => 'asturianu',
+ 				'atj' => 'atikamekw',
+ 				'av' => 'avaru',
+ 				'awa' => 'awadhi',
+ 				'ay' => 'aimara',
  				'az' => 'azerbaigianu',
  				'az@alt=short' => 'azeru',
+ 				'ba' => 'baschiru',
+ 				'ban' => 'balinesu',
  				'bas' => 'basaa',
  				'be' => 'bielorussu',
  				'bem' => 'bemba',
  				'bez' => 'bena',
  				'bg' => 'bùlgaru',
+ 				'bgc' => 'haryanvi',
+ 				'bho' => 'bhojpuri',
+ 				'bi' => 'bislama',
+ 				'bin' => 'bini',
+ 				'bla' => 'pees nieddos',
  				'bm' => 'bambara',
  				'bn' => 'bengalesu',
  				'bo' => 'tibetanu',
- 				'br' => 'brètonu',
+ 				'br' => 'brètone',
  				'brx' => 'bodo',
  				'bs' => 'bosnìacu',
+ 				'bug' => 'buginesu',
+ 				'byn' => 'blin',
  				'ca' => 'catalanu',
+ 				'cay' => 'cayuga',
  				'ccp' => 'chakma',
  				'ce' => 'cecenu',
  				'ceb' => 'cebuanu',
  				'cgg' => 'chiga',
+ 				'ch' => 'chamorru',
+ 				'chk' => 'chuukesu',
+ 				'chm' => 'mari',
+ 				'cho' => 'choctaw',
+ 				'chp' => 'chipewyan',
  				'chr' => 'cherokee',
+ 				'chy' => 'cheyenne',
  				'ckb' => 'curdu tzentrale',
  				'ckb@alt=menu' => 'curdu, tzentrale',
  				'ckb@alt=variant' => 'curdu, sorani',
+ 				'clc' => 'chilcotin',
  				'co' => 'corsicanu',
+ 				'crg' => 'michif',
+ 				'crj' => 'cree sud-orientale',
+ 				'crk' => 'cree de sas campuras',
+ 				'crl' => 'cree nord-orientale',
+ 				'crm' => 'cree moose',
+ 				'crr' => 'algonchinu de sa Carolina',
  				'cs' => 'tzecu',
+ 				'csw' => 'cree de sas paludes',
  				'cu' => 'islavu eclesiàsticu',
+ 				'cv' => 'ciuvàsciu',
  				'cy' => 'gallesu',
  				'da' => 'danesu',
+ 				'dak' => 'dakota',
+ 				'dar' => 'dargua',
  				'dav' => 'taita',
  				'de' => 'tedescu',
  				'de_AT' => 'tedescu austrìacu',
  				'de_CH' => 'tedescu artu isvìtzeru',
+ 				'dgr' => 'dogrib',
  				'dje' => 'zarma',
  				'doi' => 'dogri',
  				'dsb' => 'sòrabu bassu',
  				'dua' => 'duala',
+ 				'dv' => 'malvidianu',
  				'dyo' => 'jola-fonyi',
  				'dz' => 'dzongkha',
+ 				'dzg' => 'dazaga',
  				'ebu' => 'embu',
  				'ee' => 'ewe',
+ 				'efi' => 'efik',
+ 				'eka' => 'ekajuk',
  				'el' => 'grecu',
  				'en' => 'inglesu',
  				'en_AU' => 'inglesu australianu',
  				'en_CA' => 'inglesu canadesu',
  				'en_GB' => 'inglesu britànnicu',
+ 				'en_GB@alt=short' => 'inglesu (RU)',
  				'en_US' => 'inglesu americanu',
  				'en_US@alt=short' => 'inglesu (USA)',
  				'eo' => 'esperanto',
@@ -115,188 +150,323 @@ has 'display_name_language' => (
  				'ff' => 'fulah',
  				'fi' => 'finlandesu',
  				'fil' => 'filipinu',
+ 				'fj' => 'fijianu',
  				'fo' => 'faroesu',
+ 				'fon' => 'fon',
  				'fr' => 'frantzesu',
  				'fr_CA' => 'frantzesu canadesu',
  				'fr_CH' => 'frantzesu isvìtzeru',
  				'frc' => 'frantzesu cajun',
+ 				'frr' => 'frisone setentrionale',
  				'fur' => 'friulanu',
- 				'fy' => 'frìsonu otzidentale',
+ 				'fy' => 'frisone otzidentale',
  				'ga' => 'irlandesu',
+ 				'gaa' => 'ga',
  				'gd' => 'gaèlicu iscotzesu',
+ 				'gez' => 'ge’ez',
+ 				'gil' => 'gilbertesu',
  				'gl' => 'galitzianu',
+ 				'gn' => 'guaranì',
+ 				'gor' => 'gorontalo',
  				'gsw' => 'tedescu isvìtzeru',
  				'gu' => 'gujarati',
  				'guz' => 'gusii',
  				'gv' => 'mannesu',
+ 				'gwi' => 'gwichʼin',
  				'ha' => 'hausa',
+ 				'hai' => 'haida',
  				'haw' => 'hawaianu',
+ 				'hax' => 'haida meridionale',
  				'he' => 'ebreu',
  				'hi' => 'hindi',
+ 				'hi_Latn' => 'hindi (caràteres latinos)',
+ 				'hi_Latn@alt=variant' => 'hinglish',
+ 				'hil' => 'ilongu',
  				'hmn' => 'hmong',
  				'hr' => 'croatu',
  				'hsb' => 'sòrabu artu',
  				'ht' => 'crèolu haitianu',
  				'hu' => 'ungheresu',
+ 				'hup' => 'hupa',
+ 				'hur' => 'halkomelem',
  				'hy' => 'armenu',
+ 				'hz' => 'herero',
  				'ia' => 'interlìngua',
+ 				'iba' => 'iban',
+ 				'ibb' => 'ibibio',
  				'id' => 'indonesianu',
  				'ig' => 'igbo',
  				'ii' => 'sichuan yi',
+ 				'ikt' => 'inuktitut canadesu otzidentale',
+ 				'ilo' => 'ilocanu',
+ 				'inh' => 'ingùsciu',
+ 				'io' => 'ido',
  				'is' => 'islandesu',
  				'it' => 'italianu',
+ 				'iu' => 'inuktitut',
  				'ja' => 'giaponesu',
+ 				'jbo' => 'lojban',
  				'jgo' => 'ngomba',
  				'jmc' => 'machame',
  				'jv' => 'giavanesu',
  				'ka' => 'georgianu',
  				'kab' => 'cabilu',
+ 				'kac' => 'kachin',
+ 				'kaj' => 'jju',
  				'kam' => 'kamba',
+ 				'kbd' => 'cabardianu',
+ 				'kcg' => 'tyap',
  				'kde' => 'makonde',
  				'kea' => 'cabubirdianu',
+ 				'kfo' => 'koro',
  				'kgp' => 'kaingang',
+ 				'kha' => 'khasi',
  				'khq' => 'koyra chiini',
  				'ki' => 'kikuyu',
- 				'kk' => 'kazaku',
+ 				'kj' => 'kuanyama',
+ 				'kk' => 'kazacu',
  				'kkj' => 'kako',
  				'kl' => 'groenlandesu',
  				'kln' => 'kalenjin',
  				'km' => 'khmer',
+ 				'kmb' => 'kimbundu',
  				'kn' => 'kannada',
  				'ko' => 'coreanu',
  				'kok' => 'konkani',
+ 				'kpe' => 'kpelle',
+ 				'kr' => 'kanuri',
+ 				'krc' => 'caraciai-balcaru',
+ 				'krl' => 'carelianu',
+ 				'kru' => 'kurukh',
  				'ks' => 'kashmiri',
  				'ksb' => 'shambala',
  				'ksf' => 'bafia',
  				'ksh' => 'coloniesu',
  				'ku' => 'curdu',
+ 				'kum' => 'cumucu',
+ 				'kv' => 'komi',
  				'kw' => 'còrnicu',
- 				'ky' => 'kirghisu',
+ 				'kwk' => 'kwakʼwala',
+ 				'ky' => 'chirghisu',
  				'la' => 'latinu',
+ 				'lad' => 'giudeu-ispagnolu',
  				'lag' => 'langi',
  				'lb' => 'lussemburghesu',
+ 				'lez' => 'lezghianu',
  				'lg' => 'ganda',
+ 				'li' => 'limburghesu',
  				'lij' => 'lìgure',
+ 				'lil' => 'lillooet',
  				'lkt' => 'lakota',
+ 				'lmo' => 'lombardu',
  				'ln' => 'lingala',
  				'lo' => 'laotianu',
  				'lou' => 'crèolu de sa Louisiana',
- 				'lrc' => 'frìsonu setentrionale',
+ 				'loz' => 'lozi',
+ 				'lrc' => 'luri setentrionale',
+ 				'lsm' => 'sàmia',
  				'lt' => 'lituanu',
  				'lu' => 'luba-katanga',
+ 				'lua' => 'tshiluba',
+ 				'lun' => 'lunda',
  				'luo' => 'luo',
+ 				'lus' => 'mizo',
  				'luy' => 'luyia',
  				'lv' => 'lètone',
+ 				'mad' => 'maduresu',
+ 				'mag' => 'magahi',
  				'mai' => 'maithili',
+ 				'mak' => 'makassaresu',
  				'mas' => 'masai',
+ 				'mdf' => 'moksha',
+ 				'men' => 'mende',
  				'mer' => 'meru',
  				'mfe' => 'crèolu mauritzianu',
  				'mg' => 'malgàsciu',
  				'mgh' => 'makhuwa-meetto',
  				'mgo' => 'meta’',
+ 				'mh' => 'marshallesu',
  				'mi' => 'maori',
+ 				'mic' => 'micmac',
+ 				'min' => 'minangkabau',
  				'mk' => 'matzèdone',
  				'ml' => 'malayalam',
  				'mn' => 'mòngolu',
  				'mni' => 'manipuri',
+ 				'moe' => 'innu-aimun',
+ 				'moh' => 'mohawk',
+ 				'mos' => 'moore',
  				'mr' => 'marathi',
  				'ms' => 'malesu',
  				'mt' => 'maltesu',
  				'mua' => 'mundang',
  				'mul' => 'limbas mùltiplas',
+ 				'mus' => 'muscogee',
+ 				'mwl' => 'mirandesu',
  				'my' => 'burmesu',
+ 				'myv' => 'erzya',
  				'mzn' => 'mazandarani',
+ 				'na' => 'nauru',
+ 				'nap' => 'napoletanu',
  				'naq' => 'nama',
  				'nb' => 'norvegesu bokmål',
  				'nd' => 'ndebele de su nord',
- 				'nds' => 'bassu-tedescu',
- 				'nds_NL' => 'bassu-sàssone',
+ 				'nds' => 'tedescu bassu',
+ 				'nds_NL' => 'sàssone bassu',
  				'ne' => 'nepalesu',
+ 				'new' => 'nepal bhasa',
+ 				'ng' => 'ndonga',
+ 				'nia' => 'nias',
+ 				'niu' => 'niueanu',
  				'nl' => 'olandesu',
  				'nl_BE' => 'fiammingu',
  				'nmg' => 'kwasio',
  				'nn' => 'norvegesu nynorsk',
  				'nnh' => 'ngiemboon',
  				'no' => 'norvegesu',
+ 				'nog' => 'nogai',
+ 				'nqo' => 'n’ko',
+ 				'nr' => 'ndebele de su sud',
+ 				'nso' => 'sotho setentrionale',
  				'nus' => 'nuer',
  				'nv' => 'navajo',
  				'ny' => 'nyanja',
  				'nyn' => 'nyankole',
+ 				'oc' => 'otzitanu',
+ 				'ojb' => 'ojibwa nord-otzidentale',
+ 				'ojc' => 'ojibwa tzentrale',
+ 				'ojs' => 'oji-Cree',
+ 				'ojw' => 'ojibwa otzidentale',
+ 				'oka' => 'okanagan',
  				'om' => 'oromo',
  				'or' => 'odia',
  				'os' => 'ossèticu',
  				'pa' => 'punjabi',
+ 				'pag' => 'pangasinan',
+ 				'pam' => 'pampanga',
+ 				'pap' => 'papiamentu',
+ 				'pau' => 'palauanu',
  				'pcm' => 'pidgin nigerianu',
+ 				'pis' => 'pijin',
  				'pl' => 'polacu',
+ 				'pqm' => 'malecite-passamaquoddy',
  				'prg' => 'prussianu',
  				'ps' => 'pashto',
  				'pt' => 'portoghesu',
  				'pt_BR' => 'portoghesu brasilianu',
  				'pt_PT' => 'portoghesu europeu',
  				'qu' => 'quechua',
+ 				'raj' => 'rajasthani',
+ 				'rap' => 'rapanui',
+ 				'rar' => 'rarotonganu',
  				'rhg' => 'rohingya',
+ 				'rif' => 'rifenu',
  				'rm' => 'romànciu',
  				'rn' => 'rundi',
  				'ro' => 'rumenu',
  				'ro_MD' => 'moldavu',
  				'rof' => 'rombo',
  				'ru' => 'russu',
+ 				'rup' => 'arumenu',
  				'rw' => 'kinyarwanda',
  				'rwk' => 'rwa',
  				'sa' => 'sànscritu',
+ 				'sad' => 'sandawe',
  				'sah' => 'yakut',
  				'saq' => 'samburu',
  				'sat' => 'santali',
+ 				'sba' => 'ngambay',
  				'sbp' => 'sangu',
  				'sc' => 'sardu',
+ 				'scn' => 'sitzilianu',
+ 				'sco' => 'scots',
  				'sd' => 'sindhi',
  				'se' => 'sami setentrionale',
  				'seh' => 'sena',
  				'ses' => 'koyraboro senni',
  				'sg' => 'sango',
  				'shi' => 'tashelhit',
+ 				'shn' => 'shan',
  				'si' => 'singalesu',
  				'sk' => 'islovacu',
  				'sl' => 'islovenu',
+ 				'slh' => 'lushootseed meridionale',
  				'sm' => 'samoanu',
  				'smn' => 'sami de sos inari',
+ 				'sms' => 'sami skolt',
  				'sn' => 'shona',
+ 				'snk' => 'soninke',
  				'so' => 'sòmalu',
  				'sq' => 'albanesu',
  				'sr' => 'serbu',
+ 				'srn' => 'sranan tongo',
+ 				'ss' => 'swati',
  				'st' => 'sotho meridionale',
+ 				'str' => 'salish de sas astrinturas',
  				'su' => 'sundanesu',
+ 				'suk' => 'sukuma',
  				'sv' => 'isvedesu',
  				'sw' => 'swahili',
  				'sw_CD' => 'swahili de su Congo',
+ 				'swb' => 'comorianu',
+ 				'syr' => 'sirìacu',
  				'ta' => 'tamil',
+ 				'tce' => 'tutchone meridionale',
  				'te' => 'telugu',
+ 				'tem' => 'temne',
  				'teo' => 'teso',
+ 				'tet' => 'tetum',
  				'tg' => 'tagicu',
+ 				'tgx' => 'tagish',
  				'th' => 'tailandesu',
+ 				'tht' => 'tahltan',
  				'ti' => 'tigrignu',
+ 				'tig' => 'tigrè',
  				'tk' => 'turcmenu',
+ 				'tlh' => 'klingon',
+ 				'tli' => 'tlingit',
+ 				'tn' => 'tswana',
  				'to' => 'tonganu',
+ 				'tok' => 'toki pona',
+ 				'tpi' => 'tok pisin',
  				'tr' => 'turcu',
+ 				'trv' => 'taroko',
+ 				'ts' => 'tsonga',
  				'tt' => 'tàtaru',
+ 				'ttm' => 'tutchone setentrionale',
+ 				'tum' => 'tumbuka',
+ 				'tvl' => 'tuvalu',
  				'twq' => 'tasawaq',
+ 				'ty' => 'taitianu',
+ 				'tyv' => 'tuvanu',
  				'tzm' => 'tamazight de s’Atlànte tzentrale',
+ 				'udm' => 'udmurtu',
  				'ug' => 'uiguru',
  				'uk' => 'ucrainu',
+ 				'umb' => 'umbundu',
  				'und' => 'limba disconnota',
  				'ur' => 'urdu',
  				'uz' => 'uzbecu',
  				'vai' => 'vai',
+ 				've' => 'venda',
+ 				'vec' => 'vènetu',
  				'vi' => 'vietnamita',
  				'vo' => 'volapük',
  				'vun' => 'vunjo',
+ 				'wa' => 'vallonu',
  				'wae' => 'walser',
+ 				'wal' => 'wolaita',
+ 				'war' => 'waray',
  				'wo' => 'wolof',
+ 				'wuu' => 'wu',
+ 				'xal' => 'calmucu',
  				'xh' => 'xhosa',
  				'xog' => 'soga',
  				'yav' => 'yangben',
+ 				'ybb' => 'yemba',
  				'yi' => 'yiddish',
  				'yo' => 'yoruba',
+ 				'yrl' => 'nheengatu',
  				'yue' => 'cantonesu',
  				'yue@alt=menu' => 'tzinesu, cantonesu',
  				'zgh' => 'tamazight istandard marochinu',
@@ -307,7 +477,9 @@ has 'display_name_language' => (
  				'zh_Hant' => 'tzinesu traditzionale',
  				'zh_Hant@alt=long' => 'tzinesu mandarinu traditzionale',
  				'zu' => 'zulu',
+ 				'zun' => 'zuni',
  				'zxx' => 'perunu cuntenutu linguìsticu',
+ 				'zza' => 'zazaki',
 
 			);
 			if (@_) {
@@ -394,6 +566,7 @@ has 'display_name_script' => (
  			'Jpan' => 'giaponesu',
  			'Kali' => 'kayah li',
  			'Kana' => 'katakana',
+ 			'Kawi' => 'kawi',
  			'Khar' => 'kharoshthi',
  			'Khmr' => 'khmer',
  			'Khoj' => 'khojki',
@@ -427,6 +600,7 @@ has 'display_name_script' => (
  			'Mtei' => 'meitei mayek',
  			'Mult' => 'multani',
  			'Mymr' => 'birmanu',
+ 			'Nagm' => 'nag mundari',
  			'Nand' => 'nandinagari',
  			'Narb' => 'àrabu setentrionale antigu',
  			'Nbat' => 'nabateu',
@@ -603,6 +777,7 @@ has 'display_name_region' => (
  			'CN' => 'Tzina',
  			'CO' => 'Colòmbia',
  			'CP' => 'Ìsula de Clipperton',
+ 			'CQ' => 'Sark',
  			'CR' => 'Costa Rica',
  			'CU' => 'Cuba',
  			'CV' => 'Cabu birde',
@@ -669,6 +844,7 @@ has 'display_name_region' => (
  			'IM' => 'Ìsula de Man',
  			'IN' => 'Ìndia',
  			'IO' => 'Territòriu Britànnicu de s’Otzèanu Indianu',
+ 			'IO@alt=chagos' => 'Artzipèlagu Chagos',
  			'IQ' => 'Iraq',
  			'IR' => 'Iràn',
  			'IS' => 'Islanda',
@@ -735,6 +911,7 @@ has 'display_name_region' => (
  			'NR' => 'Nauru',
  			'NU' => 'Niue',
  			'NZ' => 'Zelanda Noa',
+ 			'NZ@alt=variant' => 'Aotearoa Zelanda Noa',
  			'OM' => 'Omàn',
  			'PA' => 'Pànama',
  			'PE' => 'Perù',
@@ -847,6 +1024,7 @@ has 'display_name_variant' => (
  			'ALUKU' => 'dialetu aluku',
  			'AO1990' => 'acordu ortogràficu de sa limba portoghesa de su 1990',
  			'ARANES' => 'aranesu',
+ 			'ARKAIKA' => 'esperanto arcàicu',
  			'ASANTE' => 'asante',
  			'AUVERN' => 'auvernesu',
  			'BAKU1926' => 'alfabetu latinu turcu unificadu',
@@ -871,6 +1049,7 @@ has 'display_name_variant' => (
  			'FONNAPA' => 'alfabetu fonèticu de s’Amèrica setentrionale',
  			'FONUPA' => 'alfabetu fonèticu uràlicu UPA',
  			'FONXSAMP' => 'alfabetu fonèticu X-SAMPA',
+ 			'GALLO' => 'gallu',
  			'GASCON' => 'gasconu',
  			'GRCLASS' => 'ortografia otzitana clàssica',
  			'GRITAL' => 'ortografia otzitana italianizada',
@@ -890,6 +1069,8 @@ has 'display_name_variant' => (
  			'LEMOSIN' => 'limosinu',
  			'LENGADOC' => 'languedocianu',
  			'LIPAW' => 'su dialetu lipovaz de su resianu',
+ 			'LTG1929' => 'ortografia de sa limba latgaliana de su 1929',
+ 			'LTG2007' => 'ortografia de sa limba latgaliana de su 2007',
  			'LUNA1918' => 'ortografia russa riformada de su 1918',
  			'METELKO' => 'alfabetu Metelko',
  			'MONOTON' => 'monotònicu',
@@ -905,6 +1086,7 @@ has 'display_name_variant' => (
  			'PAHAWH3' => 'ortografia reduida pahawh hmong fase 3',
  			'PAHAWH4' => 'ortografia reduida pahawh hmong fase 4',
  			'PAMAKA' => 'dialetu pamaka',
+ 			'PEANO' => 'interlingua de peano',
  			'PETR1708' => 'ortografia de Perdu I de su 1708',
  			'PINYIN' => 'romanizatzione pinyin',
  			'POLYTON' => 'politònicu',
@@ -925,7 +1107,10 @@ has 'display_name_variant' => (
  			'SURMIRAN' => 'surmiranu',
  			'SURSILV' => 'sursilvanu',
  			'SUTSILV' => 'sutsilvanu',
+ 			'SYNNEJYL' => 'jutlandesu meridionale',
  			'TARASK' => 'ortografia taraškievica',
+ 			'TONGYONG' => 'romanizatzione pinyin tongyong',
+ 			'TUNUMIIT' => 'groenlandesu orientale',
  			'UCCOR' => 'ortografia unificada',
  			'UCRCOR' => 'ortografia revisionada unificada',
  			'ULSTER' => 'ortografia de s’Ulster',
@@ -933,6 +1118,7 @@ has 'display_name_variant' => (
  			'VAIDIKA' => 'variante vèdica',
  			'VALENCIA' => 'valentzianu',
  			'VALLADER' => 'vallader',
+ 			'VECDRUKA' => 'ortografia lètone vecā druka',
  			'VIVARAUP' => 'vivaro-alpinu',
  			'WADEGILE' => 'romanizatzione Wale-Giles',
  			'XSISTEMO' => 'sistema ortogràficu X de s’esperanto',
@@ -976,11 +1162,11 @@ has 'display_name_type' => (
  				'gregorian' => q{calendàriu gregorianu},
  				'hebrew' => q{calendàriu ebràicu},
  				'indian' => q{calendàriu natzionale indianu},
- 				'islamic' => q{calendàriu islàmicu},
- 				'islamic-civil' => q{calendàriu islàmicu (tabulare, època tzivile)},
+ 				'islamic' => q{calendàriu egirianu},
+ 				'islamic-civil' => q{calendàriu egirianu (tabulare, època tzivile)},
  				'islamic-rgsa' => q{calendàriu islàmicu (Aràbia Saudita, osservatzione)},
  				'islamic-tbla' => q{calendàriu islàmicu (tabulare, època astronòmica)},
- 				'islamic-umalqura' => q{calendàriu islàmicu (Umm al-Qura)},
+ 				'islamic-umalqura' => q{calendàriu egirianu (Umm al-Qura)},
  				'iso8601' => q{calendàriu ISO-8601},
  				'japanese' => q{calendàriu giaponesu},
  				'persian' => q{calendàriu persianu},
@@ -1060,6 +1246,7 @@ has 'display_name_type' => (
  				'jpan' => q{nùmeros giaponesos},
  				'jpanfin' => q{nùmeros finantziàrios giaponesos},
  				'kali' => q{tzifras kayah li},
+ 				'kawi' => q{tzifras kawi},
  				'khmr' => q{tzifras khmer},
  				'knda' => q{tzifras kannada},
  				'lana' => q{tzifras tai tham hora},
@@ -1081,6 +1268,7 @@ has 'display_name_type' => (
  				'mymr' => q{tzifras birmanas},
  				'mymrshan' => q{tzifras shan birmanas},
  				'mymrtlng' => q{tzifras tai lang birmanas},
+ 				'nagm' => q{tzifras nag mundari},
  				'nkoo' => q{tzifras n’ko},
  				'olck' => q{tzifras ol chiki},
  				'orya' => q{tzifras odia},
@@ -1102,6 +1290,7 @@ has 'display_name_type' => (
  				'thai' => q{tzifras tailandesas},
  				'tibt' => q{tzifras tibetanas},
  				'tirh' => q{tzifras tirhuta},
+ 				'tnsa' => q{tzifras tangsa},
  				'vaii' => q{tzifras vai},
  				'wara' => q{tzifras warang citi},
  				'wcho' => q{tzifras wancho},
@@ -1148,11 +1337,10 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{[ª á â å ä ã æ ç é ê ë í î ï k ñ º ó ô ö õ ø œ q ß ú û ü w x y ÿ]},
+			auxiliary => qr{[ªáâåäã æ ç éêë íîï k ñ ºóôöõø œ q ß úûü w x yÿ]},
 			index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', '{TZ}', 'U', 'V', 'W', 'X', 'Y', 'Z'],
-			main => qr{[a à b c d e è f g h i ì j l m n o ò p r s t u ù v z]},
-			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
-			punctuation => qr{[‐ – — , ; \: ! ? . … · ' ‘ ’ " “ ” « » ( ) \[ \] @ * / \& # ′ ″]},
+			main => qr{[aà b c d eè f g h iì j l m n oò p r s t uù v z]},
+			punctuation => qr{[‐ – — , ; \: ! ? . … · '‘’ "“” « » ( ) \[ \] @ * / \& # ′ ″]},
 		};
 	},
 EOT
@@ -1325,12 +1513,28 @@ has 'units' => (
 						'1' => q(yoctò{0}),
 					},
 					# Long Unit Identifier
+					'10p-27' => {
+						'1' => q(rontò{0}),
+					},
+					# Core Unit Identifier
+					'27' => {
+						'1' => q(rontò{0}),
+					},
+					# Long Unit Identifier
 					'10p-3' => {
 						'1' => q(millì{0}),
 					},
 					# Core Unit Identifier
 					'3' => {
 						'1' => q(millì{0}),
+					},
+					# Long Unit Identifier
+					'10p-30' => {
+						'1' => q(quectò{0}),
+					},
+					# Core Unit Identifier
+					'30' => {
+						'1' => q(quectò{0}),
 					},
 					# Long Unit Identifier
 					'10p-6' => {
@@ -1405,12 +1609,28 @@ has 'units' => (
 						'1' => q(yotà{0}),
 					},
 					# Long Unit Identifier
+					'10p27' => {
+						'1' => q(ronnà{0}),
+					},
+					# Core Unit Identifier
+					'10p27' => {
+						'1' => q(ronnà{0}),
+					},
+					# Long Unit Identifier
 					'10p3' => {
 						'1' => q(chilò{0}),
 					},
 					# Core Unit Identifier
 					'10p3' => {
 						'1' => q(chilò{0}),
+					},
+					# Long Unit Identifier
+					'10p30' => {
+						'1' => q(quettà{0}),
+					},
+					# Core Unit Identifier
+					'10p30' => {
+						'1' => q(quettà{0}),
 					},
 					# Long Unit Identifier
 					'10p6' => {
@@ -1430,13 +1650,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'acceleration-g-force' => {
-						'name' => q(fortza g),
 						'one' => q({0} fortza g),
 						'other' => q({0} fortza g),
 					},
 					# Core Unit Identifier
 					'g-force' => {
-						'name' => q(fortza g),
 						'one' => q({0} fortza g),
 						'other' => q({0} fortza g),
 					},
@@ -1514,37 +1732,31 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'area-acre' => {
-						'name' => q(acros),
 						'one' => q({0} acru),
 						'other' => q({0} acros),
 					},
 					# Core Unit Identifier
 					'acre' => {
-						'name' => q(acros),
 						'one' => q({0} acru),
 						'other' => q({0} acros),
 					},
 					# Long Unit Identifier
 					'area-dunam' => {
-						'name' => q(dunams),
 						'one' => q({0} dunam),
 						'other' => q({0} dunams),
 					},
 					# Core Unit Identifier
 					'dunam' => {
-						'name' => q(dunams),
 						'one' => q({0} dunam),
 						'other' => q({0} dunams),
 					},
 					# Long Unit Identifier
 					'area-hectare' => {
-						'name' => q(ètaros),
 						'one' => q({0} ètaru),
 						'other' => q({0} ètaros),
 					},
 					# Core Unit Identifier
 					'hectare' => {
-						'name' => q(ètaros),
 						'one' => q({0} ètaru),
 						'other' => q({0} ètaros),
 					},
@@ -1958,16 +2170,10 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'duration-day' => {
-						'name' => q(dies),
-						'one' => q({0} die),
-						'other' => q({0} dies),
 						'per' => q({0} a sa die),
 					},
 					# Core Unit Identifier
 					'day' => {
-						'name' => q(dies),
-						'one' => q({0} die),
-						'other' => q({0} dies),
 						'per' => q({0} a sa die),
 					},
 					# Long Unit Identifier
@@ -1984,16 +2190,10 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'duration-hour' => {
-						'name' => q(oras),
-						'one' => q({0} ora),
-						'other' => q({0} oras),
 						'per' => q({0} a s’ora),
 					},
 					# Core Unit Identifier
 					'hour' => {
-						'name' => q(oras),
-						'one' => q({0} ora),
-						'other' => q({0} oras),
 						'per' => q({0} a s’ora),
 					},
 					# Long Unit Identifier
@@ -2036,16 +2236,10 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'duration-month' => {
-						'name' => q(meses),
-						'one' => q({0} mese),
-						'other' => q({0} meses),
 						'per' => q({0} a su mese),
 					},
 					# Core Unit Identifier
 					'month' => {
-						'name' => q(meses),
-						'one' => q({0} mese),
-						'other' => q({0} meses),
 						'per' => q({0} a su mese),
 					},
 					# Long Unit Identifier
@@ -2059,6 +2253,16 @@ has 'units' => (
 						'name' => q(nanosegundos),
 						'one' => q({0} nanosegundu),
 						'other' => q({0} nanosegundos),
+					},
+					# Long Unit Identifier
+					'duration-quarter' => {
+						'one' => q({0} cuartu),
+						'other' => q({0} cuartos),
+					},
+					# Core Unit Identifier
+					'quarter' => {
+						'one' => q({0} cuartu),
+						'other' => q({0} cuartos),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
@@ -2076,30 +2280,22 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'duration-week' => {
-						'name' => q(chidas),
 						'one' => q({0} chida),
 						'other' => q({0} chidas),
 						'per' => q({0} a sa chida),
 					},
 					# Core Unit Identifier
 					'week' => {
-						'name' => q(chidas),
 						'one' => q({0} chida),
 						'other' => q({0} chidas),
 						'per' => q({0} a sa chida),
 					},
 					# Long Unit Identifier
 					'duration-year' => {
-						'name' => q(annos),
-						'one' => q({0} annu),
-						'other' => q({0} annos),
 						'per' => q({0} a s’annu),
 					},
 					# Core Unit Identifier
 					'year' => {
-						'name' => q(annos),
-						'one' => q({0} annu),
-						'other' => q({0} annos),
 						'per' => q({0} a s’annu),
 					},
 					# Long Unit Identifier
@@ -2344,13 +2540,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'graphics-dot' => {
-						'name' => q(puntu gràficu),
 						'one' => q({0} puntu gràficu),
 						'other' => q({0} puntos gràficos),
 					},
 					# Core Unit Identifier
 					'dot' => {
-						'name' => q(puntu gràficu),
 						'one' => q({0} puntu gràficu),
 						'other' => q({0} puntos gràficos),
 					},
@@ -2594,13 +2788,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-mile' => {
-						'name' => q(mìllias),
 						'one' => q({0} mìlliu),
 						'other' => q({0} mìllias),
 					},
 					# Core Unit Identifier
 					'mile' => {
-						'name' => q(mìllias),
 						'one' => q({0} mìlliu),
 						'other' => q({0} mìllias),
 					},
@@ -2702,13 +2894,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-yard' => {
-						'name' => q(iardas),
 						'one' => q({0} iarda),
 						'other' => q({0} iardas),
 					},
 					# Core Unit Identifier
 					'yard' => {
-						'name' => q(iardas),
 						'one' => q({0} iarda),
 						'other' => q({0} iardas),
 					},
@@ -2797,18 +2987,6 @@ has 'units' => (
 						'other' => q({0} massas terrestres),
 					},
 					# Long Unit Identifier
-					'mass-grain' => {
-						'name' => q(granu),
-						'one' => q({0} granu),
-						'other' => q({0} granos),
-					},
-					# Core Unit Identifier
-					'grain' => {
-						'name' => q(granu),
-						'one' => q({0} granu),
-						'other' => q({0} granos),
-					},
-					# Long Unit Identifier
 					'mass-gram' => {
 						'name' => q(grammos),
 						'one' => q({0} grammu),
@@ -2835,18 +3013,6 @@ has 'units' => (
 						'one' => q({0} chilogrammu),
 						'other' => q({0} chilogrammos),
 						'per' => q({0} pro chilogrammu),
-					},
-					# Long Unit Identifier
-					'mass-metric-ton' => {
-						'name' => q(tonnelladas mètricas),
-						'one' => q({0} tonnellada mètrica),
-						'other' => q({0} tonnelladas mètricas),
-					},
-					# Core Unit Identifier
-					'metric-ton' => {
-						'name' => q(tonnelladas mètricas),
-						'one' => q({0} tonnellada mètrica),
-						'other' => q({0} tonnelladas mètricas),
 					},
 					# Long Unit Identifier
 					'mass-microgram' => {
@@ -2947,6 +3113,18 @@ has 'units' => (
 						'name' => q(tonnelladas),
 						'one' => q({0} tonnellada),
 						'other' => q({0} tonnelladas),
+					},
+					# Long Unit Identifier
+					'mass-tonne' => {
+						'name' => q(tonnelladas mètricas),
+						'one' => q({0} tonnellada mètrica),
+						'other' => q({0} tonnelladas mètricas),
+					},
+					# Core Unit Identifier
+					'tonne' => {
+						'name' => q(tonnelladas mètricas),
+						'one' => q({0} tonnellada mètrica),
+						'other' => q({0} tonnelladas mètricas),
 					},
 					# Long Unit Identifier
 					'per' => {
@@ -3167,6 +3345,18 @@ has 'units' => (
 						'name' => q(libbras pro pòddighe cuadradu),
 						'one' => q({0} libbra pro pòddighe cuadradu),
 						'other' => q({0} libbras pro pòddighe cuadradu),
+					},
+					# Long Unit Identifier
+					'speed-beaufort' => {
+						'name' => q(Beaufort),
+						'one' => q(Beaufort {0}),
+						'other' => q(Beaufort {0}),
+					},
+					# Core Unit Identifier
+					'beaufort' => {
+						'name' => q(Beaufort),
+						'one' => q(Beaufort {0}),
+						'other' => q(Beaufort {0}),
 					},
 					# Long Unit Identifier
 					'speed-kilometer-per-hour' => {
@@ -3302,13 +3492,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'volume-bushel' => {
-						'name' => q(carras),
 						'one' => q({0} carra),
 						'other' => q({0} carras),
 					},
 					# Core Unit Identifier
 					'bushel' => {
-						'name' => q(carras),
 						'one' => q({0} carra),
 						'other' => q({0} carras),
 					},
@@ -3474,27 +3662,13 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'volume-dram' => {
-						'name' => q(dràcma flùida),
 						'one' => q({0} dràcma flùida),
 						'other' => q({0} dràcmas flùidas),
 					},
 					# Core Unit Identifier
 					'dram' => {
-						'name' => q(dràcma flùida),
 						'one' => q({0} dràcma flùida),
 						'other' => q({0} dràcmas flùidas),
-					},
-					# Long Unit Identifier
-					'volume-drop' => {
-						'name' => q(gùtiu),
-						'one' => q({0} gùtiu),
-						'other' => q({0} gùtios),
-					},
-					# Core Unit Identifier
-					'drop' => {
-						'name' => q(gùtiu),
-						'one' => q({0} gùtiu),
-						'other' => q({0} gùtios),
 					},
 					# Long Unit Identifier
 					'volume-fluid-ounce' => {
@@ -3561,18 +3735,6 @@ has 'units' => (
 						'other' => q({0} etòlitros),
 					},
 					# Long Unit Identifier
-					'volume-jigger' => {
-						'name' => q(tzichete),
-						'one' => q({0} tzichete),
-						'other' => q({0} tzichetes),
-					},
-					# Core Unit Identifier
-					'jigger' => {
-						'name' => q(tzichete),
-						'one' => q({0} tzichete),
-						'other' => q({0} tzichetes),
-					},
-					# Long Unit Identifier
 					'volume-liter' => {
 						'name' => q(litros),
 						'one' => q({0} litru),
@@ -3612,13 +3774,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'volume-pinch' => {
-						'name' => q(ispitzuleddu),
 						'one' => q({0} ispitzuleddu),
 						'other' => q({0} ispitzuleddos),
 					},
 					# Core Unit Identifier
 					'pinch' => {
-						'name' => q(ispitzuleddu),
 						'one' => q({0} ispitzuleddu),
 						'other' => q({0} ispitzuleddos),
 					},
@@ -3697,14 +3857,6 @@ has 'units' => (
 				},
 				'narrow' => {
 					# Long Unit Identifier
-					'' => {
-						'name' => q(puntu),
-					},
-					# Core Unit Identifier
-					'' => {
-						'name' => q(puntu),
-					},
-					# Long Unit Identifier
 					'acceleration-g-force' => {
 						'name' => q(G),
 						'one' => q({0}G),
@@ -3727,30 +3879,6 @@ has 'units' => (
 						'other' => q({0}m/s²),
 					},
 					# Long Unit Identifier
-					'angle-arc-minute' => {
-						'name' => q(′),
-					},
-					# Core Unit Identifier
-					'arc-minute' => {
-						'name' => q(′),
-					},
-					# Long Unit Identifier
-					'angle-arc-second' => {
-						'name' => q(″),
-					},
-					# Core Unit Identifier
-					'arc-second' => {
-						'name' => q(″),
-					},
-					# Long Unit Identifier
-					'angle-degree' => {
-						'name' => q(°),
-					},
-					# Core Unit Identifier
-					'degree' => {
-						'name' => q(°),
-					},
-					# Long Unit Identifier
 					'angle-radian' => {
 						'one' => q({0}rad),
 						'other' => q({0}rad),
@@ -3762,13 +3890,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'angle-revolution' => {
-						'name' => q(riv),
 						'one' => q({0}riv),
 						'other' => q({0}riv),
 					},
 					# Core Unit Identifier
 					'revolution' => {
-						'name' => q(riv),
 						'one' => q({0}riv),
 						'other' => q({0}riv),
 					},
@@ -3880,49 +4006,41 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'concentr-item' => {
-						'name' => q(elem.),
 						'one' => q({0}elem.),
 						'other' => q({0}elem.),
 					},
 					# Core Unit Identifier
 					'item' => {
-						'name' => q(elem.),
 						'one' => q({0}elem.),
 						'other' => q({0}elem.),
 					},
 					# Long Unit Identifier
 					'concentr-karat' => {
-						'name' => q(ct),
 						'one' => q({0}ct),
 						'other' => q({0}ct),
 					},
 					# Core Unit Identifier
 					'karat' => {
-						'name' => q(ct),
 						'one' => q({0}ct),
 						'other' => q({0}ct),
 					},
 					# Long Unit Identifier
 					'concentr-milligram-ofglucose-per-deciliter' => {
-						'name' => q(mg/dl),
 						'one' => q({0}mg/dl),
 						'other' => q({0}mg/dl),
 					},
 					# Core Unit Identifier
 					'milligram-ofglucose-per-deciliter' => {
-						'name' => q(mg/dl),
 						'one' => q({0}mg/dl),
 						'other' => q({0}mg/dl),
 					},
 					# Long Unit Identifier
 					'concentr-millimole-per-liter' => {
-						'name' => q(mmol/l),
 						'one' => q({0}mmol/l),
 						'other' => q({0}mmol/l),
 					},
 					# Core Unit Identifier
 					'millimole-per-liter' => {
-						'name' => q(mmol/l),
 						'one' => q({0}mmol/l),
 						'other' => q({0}mmol/l),
 					},
@@ -3948,49 +4066,41 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
-						'name' => q(l/100km),
 						'one' => q({0}l/100km),
 						'other' => q({0}l/100km),
 					},
 					# Core Unit Identifier
 					'liter-per-100-kilometer' => {
-						'name' => q(l/100km),
 						'one' => q({0}l/100km),
 						'other' => q({0}l/100km),
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-kilometer' => {
-						'name' => q(l/km),
 						'one' => q({0}l/km),
 						'other' => q({0}l/km),
 					},
 					# Core Unit Identifier
 					'liter-per-kilometer' => {
-						'name' => q(l/km),
 						'one' => q({0}l/km),
 						'other' => q({0}l/km),
 					},
 					# Long Unit Identifier
 					'consumption-mile-per-gallon' => {
-						'name' => q(mi/gal),
 						'one' => q({0}mi/gal),
 						'other' => q({0}mi/gal),
 					},
 					# Core Unit Identifier
 					'mile-per-gallon' => {
-						'name' => q(mi/gal),
 						'one' => q({0}mi/gal),
 						'other' => q({0}mi/gal),
 					},
 					# Long Unit Identifier
 					'consumption-mile-per-gallon-imperial' => {
-						'name' => q(mi/gal imp.),
 						'one' => q({0}mi/gUK),
 						'other' => q({0}mi/gUK),
 					},
 					# Core Unit Identifier
 					'mile-per-gallon-imperial' => {
-						'name' => q(mi/gal imp.),
 						'one' => q({0}mi/gUK),
 						'other' => q({0}mi/gUK),
 					},
@@ -4014,13 +4124,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'digital-byte' => {
-						'name' => q(B),
 						'one' => q({0}B),
 						'other' => q({0}B),
 					},
 					# Core Unit Identifier
 					'byte' => {
-						'name' => q(B),
 						'one' => q({0}B),
 						'other' => q({0}B),
 					},
@@ -4116,13 +4224,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'duration-century' => {
-						'name' => q(sèc.),
 						'one' => q({0}sèc.),
 						'other' => q({0}sèc.),
 					},
 					# Core Unit Identifier
 					'century' => {
-						'name' => q(sèc.),
 						'one' => q({0}sèc.),
 						'other' => q({0}sèc.),
 					},
@@ -4163,16 +4269,6 @@ has 'units' => (
 						'per' => q({0}/o),
 					},
 					# Long Unit Identifier
-					'duration-microsecond' => {
-						'one' => q({0}μs),
-						'other' => q({0}μs),
-					},
-					# Core Unit Identifier
-					'microsecond' => {
-						'one' => q({0}μs),
-						'other' => q({0}μs),
-					},
-					# Long Unit Identifier
 					'duration-millisecond' => {
 						'one' => q({0}ms),
 						'other' => q({0}ms),
@@ -4184,14 +4280,12 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'duration-minute' => {
-						'name' => q(min),
 						'one' => q({0}m),
 						'other' => q({0}m),
 						'per' => q({0}/m),
 					},
 					# Core Unit Identifier
 					'minute' => {
-						'name' => q(min),
 						'one' => q({0}m),
 						'other' => q({0}m),
 						'per' => q({0}/m),
@@ -4211,24 +4305,24 @@ has 'units' => (
 						'per' => q({0}/me.),
 					},
 					# Long Unit Identifier
-					'duration-nanosecond' => {
-						'one' => q({0}ns),
-						'other' => q({0}ns),
+					'duration-quarter' => {
+						'name' => q(crt),
+						'one' => q({0}crt),
+						'other' => q({0}crt),
 					},
 					# Core Unit Identifier
-					'nanosecond' => {
-						'one' => q({0}ns),
-						'other' => q({0}ns),
+					'quarter' => {
+						'name' => q(crt),
+						'one' => q({0}crt),
+						'other' => q({0}crt),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
-						'name' => q(seg),
 						'one' => q({0}s),
 						'other' => q({0}s),
 					},
 					# Core Unit Identifier
 					'second' => {
-						'name' => q(seg),
 						'one' => q({0}s),
 						'other' => q({0}s),
 					},
@@ -4262,13 +4356,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'electric-ampere' => {
-						'name' => q(A),
 						'one' => q({0}A),
 						'other' => q({0}A),
 					},
 					# Core Unit Identifier
 					'ampere' => {
-						'name' => q(A),
 						'one' => q({0}A),
 						'other' => q({0}A),
 					},
@@ -4284,25 +4376,21 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'electric-ohm' => {
-						'name' => q(Ω),
 						'one' => q({0}Ω),
 						'other' => q({0}Ω),
 					},
 					# Core Unit Identifier
 					'ohm' => {
-						'name' => q(Ω),
 						'one' => q({0}Ω),
 						'other' => q({0}Ω),
 					},
 					# Long Unit Identifier
 					'electric-volt' => {
-						'name' => q(V),
 						'one' => q({0}V),
 						'other' => q({0}V),
 					},
 					# Core Unit Identifier
 					'volt' => {
-						'name' => q(V),
 						'one' => q({0}V),
 						'other' => q({0}V),
 					},
@@ -4348,13 +4436,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'energy-joule' => {
-						'name' => q(J),
 						'one' => q({0}J),
 						'other' => q({0}J),
 					},
 					# Core Unit Identifier
 					'joule' => {
-						'name' => q(J),
 						'one' => q({0}J),
 						'other' => q({0}J),
 					},
@@ -4390,13 +4476,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'energy-therm-us' => {
-						'name' => q(thm US),
 						'one' => q({0}thm US),
 						'other' => q({0}thm US),
 					},
 					# Core Unit Identifier
 					'therm-us' => {
-						'name' => q(thm US),
 						'one' => q({0}thm US),
 						'other' => q({0}thm US),
 					},
@@ -4472,37 +4556,33 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'graphics-dot' => {
-						'name' => q(pg),
+						'name' => q(puntu gràficu),
 						'one' => q({0}pg),
 						'other' => q({0}pg),
 					},
 					# Core Unit Identifier
 					'dot' => {
-						'name' => q(pg),
+						'name' => q(puntu gràficu),
 						'one' => q({0}pg),
 						'other' => q({0}pg),
 					},
 					# Long Unit Identifier
 					'graphics-dot-per-centimeter' => {
-						'name' => q(pupcm),
 						'one' => q({0}pupcm),
 						'other' => q({0}pupcm),
 					},
 					# Core Unit Identifier
 					'dot-per-centimeter' => {
-						'name' => q(pupcm),
 						'one' => q({0}pupcm),
 						'other' => q({0}pupcm),
 					},
 					# Long Unit Identifier
 					'graphics-dot-per-inch' => {
-						'name' => q(ppp),
 						'one' => q({0}ppp),
 						'other' => q({0}ppp),
 					},
 					# Core Unit Identifier
 					'dot-per-inch' => {
-						'name' => q(ppp),
 						'one' => q({0}ppp),
 						'other' => q({0}ppp),
 					},
@@ -4558,13 +4638,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-astronomical-unit' => {
-						'name' => q(ua),
 						'one' => q({0}ua),
 						'other' => q({0}ua),
 					},
 					# Core Unit Identifier
 					'astronomical-unit' => {
-						'name' => q(ua),
 						'one' => q({0}ua),
 						'other' => q({0}ua),
 					},
@@ -4650,25 +4728,21 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-light-year' => {
-						'name' => q(al),
 						'one' => q({0}al),
 						'other' => q({0}al),
 					},
 					# Core Unit Identifier
 					'light-year' => {
-						'name' => q(al),
 						'one' => q({0}al),
 						'other' => q({0}al),
 					},
 					# Long Unit Identifier
 					'length-meter' => {
-						'name' => q(m),
 						'one' => q({0}m),
 						'other' => q({0}m),
 					},
 					# Core Unit Identifier
 					'meter' => {
-						'name' => q(m),
 						'one' => q({0}m),
 						'other' => q({0}m),
 					},
@@ -4824,13 +4898,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'mass-carat' => {
-						'name' => q(ct),
 						'one' => q({0}ct),
 						'other' => q({0}ct),
 					},
 					# Core Unit Identifier
 					'carat' => {
-						'name' => q(ct),
 						'one' => q({0}ct),
 						'other' => q({0}ct),
 					},
@@ -4868,13 +4940,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'mass-gram' => {
-						'name' => q(g),
 						'one' => q({0}g),
 						'other' => q({0}g),
 					},
 					# Core Unit Identifier
 					'gram' => {
-						'name' => q(g),
 						'one' => q({0}g),
 						'other' => q({0}g),
 					},
@@ -4887,16 +4957,6 @@ has 'units' => (
 					'kilogram' => {
 						'one' => q({0}kg),
 						'other' => q({0}kg),
-					},
-					# Long Unit Identifier
-					'mass-metric-ton' => {
-						'one' => q({0}t),
-						'other' => q({0}t),
-					},
-					# Core Unit Identifier
-					'metric-ton' => {
-						'one' => q({0}t),
-						'other' => q({0}t),
 					},
 					# Long Unit Identifier
 					'mass-microgram' => {
@@ -4979,6 +5039,16 @@ has 'units' => (
 						'other' => q({0}tn),
 					},
 					# Long Unit Identifier
+					'mass-tonne' => {
+						'one' => q({0}t),
+						'other' => q({0}t),
+					},
+					# Core Unit Identifier
+					'tonne' => {
+						'one' => q({0}t),
+						'other' => q({0}t),
+					},
+					# Long Unit Identifier
 					'power-gigawatt' => {
 						'one' => q({0}GW),
 						'other' => q({0}GW),
@@ -4990,13 +5060,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'power-horsepower' => {
-						'name' => q(cp),
 						'one' => q({0}cp),
 						'other' => q({0}cp),
 					},
 					# Core Unit Identifier
 					'horsepower' => {
-						'name' => q(cp),
 						'one' => q({0}cp),
 						'other' => q({0}cp),
 					},
@@ -5032,13 +5100,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'power-watt' => {
-						'name' => q(W),
 						'one' => q({0}W),
 						'other' => q({0}W),
 					},
 					# Core Unit Identifier
 					'watt' => {
-						'name' => q(W),
 						'one' => q({0}W),
 						'other' => q({0}W),
 					},
@@ -5114,13 +5180,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'pressure-millimeter-ofhg' => {
-						'name' => q(mmHg),
 						'one' => q({0}mmHg),
 						'other' => q({0}mmHg),
 					},
 					# Core Unit Identifier
 					'millimeter-ofhg' => {
-						'name' => q(mmHg),
 						'one' => q({0}mmHg),
 						'other' => q({0}mmHg),
 					},
@@ -5268,13 +5332,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'volume-cubic-foot' => {
-						'name' => q(ft³),
 						'one' => q({0}ft³),
 						'other' => q({0}ft³),
 					},
 					# Core Unit Identifier
 					'cubic-foot' => {
-						'name' => q(ft³),
 						'one' => q({0}ft³),
 						'other' => q({0}ft³),
 					},
@@ -5330,25 +5392,21 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'volume-cup' => {
-						'name' => q(tz),
 						'one' => q({0}tz),
 						'other' => q({0}tz),
 					},
 					# Core Unit Identifier
 					'cup' => {
-						'name' => q(tz),
 						'one' => q({0}tz),
 						'other' => q({0}tz),
 					},
 					# Long Unit Identifier
 					'volume-cup-metric' => {
-						'name' => q(tzm),
 						'one' => q({0}tzm),
 						'other' => q({0}tzm),
 					},
 					# Core Unit Identifier
 					'cup-metric' => {
-						'name' => q(tzm),
 						'one' => q({0}tzm),
 						'other' => q({0}tzm),
 					},
@@ -5412,25 +5470,21 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'volume-fluid-ounce' => {
-						'name' => q(fl oz),
 						'one' => q({0}fl oz),
 						'other' => q({0}fl oz),
 					},
 					# Core Unit Identifier
 					'fluid-ounce' => {
-						'name' => q(fl oz),
 						'one' => q({0}fl oz),
 						'other' => q({0}fl oz),
 					},
 					# Long Unit Identifier
 					'volume-fluid-ounce-imperial' => {
-						'name' => q(fl oz imp.),
 						'one' => q({0}flozI),
 						'other' => q({0}flozI),
 					},
 					# Core Unit Identifier
 					'fluid-ounce-imperial' => {
-						'name' => q(fl oz imp.),
 						'one' => q({0}flozI),
 						'other' => q({0}flozI),
 					},
@@ -5448,13 +5502,11 @@ has 'units' => (
 					'volume-gallon-imperial' => {
 						'one' => q({0}gal imp.),
 						'other' => q({0}gal imp.),
-						'per' => q({0}/gal imp.),
 					},
 					# Core Unit Identifier
 					'gallon-imperial' => {
 						'one' => q({0}gal imp.),
 						'other' => q({0}gal imp.),
-						'per' => q({0}/gal imp.),
 					},
 					# Long Unit Identifier
 					'volume-hectoliter' => {
@@ -5468,25 +5520,21 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'volume-jigger' => {
-						'name' => q(tzichete),
 						'one' => q({0}tzichete),
 						'other' => q({0}tzichetes),
 					},
 					# Core Unit Identifier
 					'jigger' => {
-						'name' => q(tzichete),
 						'one' => q({0}tzichete),
 						'other' => q({0}tzichetes),
 					},
 					# Long Unit Identifier
 					'volume-liter' => {
-						'name' => q(l),
 						'one' => q({0}l),
 						'other' => q({0}l),
 					},
 					# Core Unit Identifier
 					'liter' => {
-						'name' => q(l),
 						'one' => q({0}l),
 						'other' => q({0}l),
 					},
@@ -5554,37 +5602,31 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'volume-quart-imperial' => {
-						'name' => q(qt imp.),
 						'one' => q({0}qtI),
 						'other' => q({0}qtI),
 					},
 					# Core Unit Identifier
 					'quart-imperial' => {
-						'name' => q(qt imp.),
 						'one' => q({0}qtI),
 						'other' => q({0}qtI),
 					},
 					# Long Unit Identifier
 					'volume-tablespoon' => {
-						'name' => q(cull),
 						'one' => q({0}cull),
 						'other' => q({0}cull),
 					},
 					# Core Unit Identifier
 					'tablespoon' => {
-						'name' => q(cull),
 						'one' => q({0}cull),
 						'other' => q({0}cull),
 					},
 					# Long Unit Identifier
 					'volume-teaspoon' => {
-						'name' => q(culld),
 						'one' => q({0}culld),
 						'other' => q({0}culld),
 					},
 					# Core Unit Identifier
 					'teaspoon' => {
-						'name' => q(culld),
 						'one' => q({0}culld),
 						'other' => q({0}culld),
 					},
@@ -5871,18 +5913,30 @@ has 'units' => (
 						'other' => q({0}ns),
 					},
 					# Long Unit Identifier
+					'duration-quarter' => {
+						'name' => q(cuartos),
+						'one' => q({0} crt),
+						'other' => q({0} crt),
+						'per' => q({0}/crt),
+					},
+					# Core Unit Identifier
+					'quarter' => {
+						'name' => q(cuartos),
+						'one' => q({0} crt),
+						'other' => q({0} crt),
+						'per' => q({0}/crt),
+					},
+					# Long Unit Identifier
 					'duration-second' => {
 						'name' => q(seg),
 						'one' => q({0} seg),
 						'other' => q({0} seg),
-						'per' => q({0}/s),
 					},
 					# Core Unit Identifier
 					'second' => {
 						'name' => q(seg),
 						'one' => q({0} seg),
 						'other' => q({0} seg),
-						'per' => q({0}/s),
 					},
 					# Long Unit Identifier
 					'duration-week' => {
@@ -5937,6 +5991,18 @@ has 'units' => (
 						'name' => q(V),
 					},
 					# Long Unit Identifier
+					'energy-foodcalorie' => {
+						'name' => q(Cal),
+						'one' => q({0} Cal),
+						'other' => q({0} Cal),
+					},
+					# Core Unit Identifier
+					'foodcalorie' => {
+						'name' => q(Cal),
+						'one' => q({0} Cal),
+						'other' => q({0} Cal),
+					},
+					# Long Unit Identifier
 					'energy-joule' => {
 						'name' => q(J),
 					},
@@ -5958,13 +6024,13 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'graphics-dot' => {
-						'name' => q(pg),
+						'name' => q(puntos gràficos),
 						'one' => q({0} pg),
 						'other' => q({0} pg),
 					},
 					# Core Unit Identifier
 					'dot' => {
-						'name' => q(pg),
+						'name' => q(puntos gràficos),
 						'one' => q({0} pg),
 						'other' => q({0} pg),
 					},
@@ -6399,8 +6465,6 @@ has 'listPatterns' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-				start => q({0} {1}),
-				middle => q({0} {1}),
 				end => q({0} e {1}),
 				2 => q({0} e {1}),
 		} }
@@ -6536,9 +6600,6 @@ has 'number_currency_formats' => (
 		'latn' => {
 			'pattern' => {
 				'default' => {
-					'accounting' => {
-						'positive' => '#,##0.00 ¤',
-					},
 					'standard' => {
 						'positive' => '#,##0.00 ¤',
 					},
@@ -8121,6 +8182,13 @@ has 'currencies' => (
 				'other' => q(coronas islovacas),
 			},
 		},
+		'SLE' => {
+			display_name => {
+				'currency' => q(leone nou de sa Sierra Leone),
+				'one' => q(leone nou de sa Sierra Leone),
+				'other' => q(leones noos de sa Sierra Leone),
+			},
+		},
 		'SLL' => {
 			display_name => {
 				'currency' => q(leone de sa Sierra Leone),
@@ -8378,6 +8446,13 @@ has 'currencies' => (
 				'currency' => q(bolivar venezuelanu \(1871–2008\)),
 				'one' => q(bolivar venezuelanu \(1871–2008\)),
 				'other' => q(bolivares venezuelanos \(1871–2008\)),
+			},
+		},
+		'VED' => {
+			display_name => {
+				'currency' => q(bolivar soberanu),
+				'one' => q(bolivar soberanu),
+				'other' => q(bolivares soberanos),
 			},
 		},
 		'VEF' => {
@@ -8725,27 +8800,6 @@ has 'calendar_months' => (
 						],
 					},
 				},
-				'stand-alone' => {
-					wide => {
-						nonleap => [
-							'su de unu mese',
-							'su de duos meses',
-							'su de tres meses',
-							'su de bator meses',
-							'su de chimbe meses',
-							'su de ses meses',
-							'su de sete meses',
-							'su de oto meses',
-							'su de nove meses',
-							'su de deghe meses',
-							'su de ùndighi meses',
-							'su de dòighi meses'
-						],
-						leap => [
-							
-						],
-					},
-				},
 			},
 			'coptic' => {
 				'format' => {
@@ -8764,50 +8818,6 @@ has 'calendar_months' => (
 							'epep',
 							'mesra',
 							'nasie'
-						],
-						leap => [
-							
-						],
-					},
-				},
-			},
-			'dangi' => {
-				'format' => {
-					wide => {
-						nonleap => [
-							'su de unu mese',
-							'su de duos meses',
-							'su de tres meses',
-							'su de bator meses',
-							'su de chimbe meses',
-							'su de ses meses',
-							'su de sete meses',
-							'su de oto meses',
-							'su de nove meses',
-							'su de deghe meses',
-							'su de ùndighi meses',
-							'su de dòighi meses'
-						],
-						leap => [
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					wide => {
-						nonleap => [
-							'su de unu mese',
-							'su de duos meses',
-							'su de tres meses',
-							'su de bator meses',
-							'su de chimbe meses',
-							'su de ses meses',
-							'su de sete meses',
-							'su de oto meses',
-							'su de nove meses',
-							'su de deghe meses',
-							'su de ùndighi meses',
-							'su de dòighi meses'
 						],
 						leap => [
 							
@@ -8880,25 +8890,6 @@ has 'calendar_months' => (
 							
 						],
 					},
-					narrow => {
-						nonleap => [
-							'G',
-							'F',
-							'M',
-							'A',
-							'M',
-							'L',
-							'T',
-							'A',
-							'C',
-							'S',
-							'S',
-							'N'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'ghennàrgiu',
@@ -8920,25 +8911,6 @@ has 'calendar_months' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'ghe',
-							'fre',
-							'mar',
-							'abr',
-							'maj',
-							'làm',
-							'trì',
-							'aus',
-							'cab',
-							'stG',
-							'stA',
-							'nad'
-						],
-						leap => [
-							
-						],
-					},
 					narrow => {
 						nonleap => [
 							'G',
@@ -8953,25 +8925,6 @@ has 'calendar_months' => (
 							'S',
 							'S',
 							'N'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'ghennàrgiu',
-							'freàrgiu',
-							'martzu',
-							'abrile',
-							'maju',
-							'làmpadas',
-							'trìulas',
-							'austu',
-							'cabudanni',
-							'santugaine',
-							'santandria',
-							'nadale'
 						],
 						leap => [
 							
@@ -9180,24 +9133,6 @@ has 'calendar_days' => (
 						sat => 'sàb',
 						sun => 'dom'
 					},
-					narrow => {
-						mon => 'L',
-						tue => 'M',
-						wed => 'M',
-						thu => 'G',
-						fri => 'C',
-						sat => 'S',
-						sun => 'D'
-					},
-					short => {
-						mon => 'lun',
-						tue => 'mar',
-						wed => 'mèr',
-						thu => 'giò',
-						fri => 'che',
-						sat => 'sàb',
-						sun => 'dom'
-					},
 					wide => {
 						mon => 'lunis',
 						tue => 'martis',
@@ -9209,15 +9144,6 @@ has 'calendar_days' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						mon => 'lun',
-						tue => 'mar',
-						wed => 'mèr',
-						thu => 'giò',
-						fri => 'che',
-						sat => 'sàb',
-						sun => 'dom'
-					},
 					narrow => {
 						mon => 'L',
 						tue => 'M',
@@ -9226,24 +9152,6 @@ has 'calendar_days' => (
 						fri => 'C',
 						sat => 'S',
 						sun => 'D'
-					},
-					short => {
-						mon => 'lun',
-						tue => 'mar',
-						wed => 'mèr',
-						thu => 'giò',
-						fri => 'che',
-						sat => 'sàb',
-						sun => 'dom'
-					},
-					wide => {
-						mon => 'lunis',
-						tue => 'martis',
-						wed => 'mèrcuris',
-						thu => 'giòbia',
-						fri => 'chenàbura',
-						sat => 'sàbadu',
-						sun => 'domìniga'
 					},
 				},
 			},
@@ -9262,28 +9170,6 @@ has 'calendar_quarters' => (
 						2 => 'T3',
 						3 => 'T4'
 					},
-					narrow => {0 => '1',
-						1 => '2',
-						2 => '3',
-						3 => '4'
-					},
-					wide => {0 => '1u trimestre',
-						1 => '2u trimestre',
-						2 => '3u trimestre',
-						3 => '4u trimestre'
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {0 => 'T1',
-						1 => 'T2',
-						2 => 'T3',
-						3 => 'T4'
-					},
-					narrow => {0 => '1',
-						1 => '2',
-						2 => '3',
-						3 => '4'
-					},
 					wide => {0 => '1u trimestre',
 						1 => '2u trimestre',
 						2 => '3u trimestre',
@@ -9301,31 +9187,9 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'am' => q{AM},
-					'pm' => q{PM},
-				},
 				'narrow' => {
 					'am' => q{m.},
 					'pm' => q{b.},
-				},
-				'wide' => {
-					'am' => q{AM},
-					'pm' => q{PM},
-				},
-			},
-			'stand-alone' => {
-				'abbreviated' => {
-					'am' => q{AM},
-					'pm' => q{PM},
-				},
-				'narrow' => {
-					'am' => q{AM},
-					'pm' => q{PM},
-				},
-				'wide' => {
-					'am' => q{AM},
-					'pm' => q{PM},
 				},
 			},
 		},
@@ -9367,10 +9231,6 @@ has 'eras' => (
 				'0' => 'a.Inc.',
 				'1' => 'p.Inc.'
 			},
-			narrow => {
-				'0' => 'a.Inc.',
-				'1' => 'p.Inc.'
-			},
 			wide => {
 				'0' => 'in antis de s’Incarnatzione',
 				'1' => 'a pustis de s’Incarnatzione'
@@ -9400,9 +9260,6 @@ has 'eras' => (
 			abbreviated => {
 				'0' => 'a.m.'
 			},
-			narrow => {
-				'0' => 'a.m.'
-			},
 			wide => {
 				'0' => 'annu de su mundu'
 			},
@@ -9423,11 +9280,10 @@ has 'eras' => (
 				'0' => 'era de s’Egira'
 			},
 		},
+		'japanese' => {
+		},
 		'persian' => {
 			abbreviated => {
-				'0' => 'a.p.'
-			},
-			narrow => {
 				'0' => 'a.p.'
 			},
 			wide => {
@@ -9475,7 +9331,7 @@ has 'date_formats' => (
 			'short' => q{dd/MM/y GGGGG},
 		},
 		'gregorian' => {
-			'full' => q{d 'de' MMMM 'de' 'su' y, 'de' EEEE},
+			'full' => q{EEEE d 'de' MMMM 'de' 'su' y},
 			'long' => q{d 'de' MMMM 'de' 'su' y},
 			'medium' => q{d 'de' MMM y},
 			'short' => q{dd/MM/y},
@@ -9485,6 +9341,8 @@ has 'date_formats' => (
 		'indian' => {
 		},
 		'islamic' => {
+		},
+		'japanese' => {
 		},
 		'persian' => {
 		},
@@ -9524,6 +9382,8 @@ has 'time_formats' => (
 		},
 		'islamic' => {
 		},
+		'japanese' => {
+		},
 		'persian' => {
 		},
 		'roc' => {
@@ -9539,8 +9399,8 @@ has 'datetime_formats' => (
 		'buddhist' => {
 		},
 		'chinese' => {
-			'full' => q{{1} 'a' 'sas' {0}},
-			'long' => q{{1} 'a' 'sas' {0}},
+			'full' => q{{1}, {0}},
+			'long' => q{{1}, {0}},
 			'medium' => q{{1}, {0}},
 			'short' => q{{1}, {0}},
 		},
@@ -9553,14 +9413,14 @@ has 'datetime_formats' => (
 		'ethiopic-amete-alem' => {
 		},
 		'generic' => {
-			'full' => q{{1} 'a' 'sas' {0}},
-			'long' => q{{1} 'a' 'sas' {0}},
+			'full' => q{{1}, {0}},
+			'long' => q{{1}, {0}},
 			'medium' => q{{1}, {0}},
 			'short' => q{{1}, {0}},
 		},
 		'gregorian' => {
-			'full' => q{{1} 'a' 'sas' {0}},
-			'long' => q{{1} 'a' 'sas' {0}},
+			'full' => q{{1}, {0}},
+			'long' => q{{1}, {0}},
 			'medium' => q{{1}, {0}},
 			'short' => q{{1}, {0}},
 		},
@@ -9569,6 +9429,8 @@ has 'datetime_formats' => (
 		'indian' => {
 		},
 		'islamic' => {
+		},
+		'japanese' => {
 		},
 		'persian' => {
 		},
@@ -9627,9 +9489,9 @@ has 'datetime_formats_available_formats' => (
 			MMMMd => q{d MMMM},
 			MMMd => q{d MMM},
 			Md => q{d/M},
-			h => q{hh a},
-			hm => q{hh:mm a},
-			hms => q{hh:mm:ss a},
+			h => q{hh a},
+			hm => q{hh:mm a},
+			hms => q{hh:mm:ss a},
 			y => q{y G},
 			yyyy => q{y G},
 			yyyyM => q{M/y GGGGG},
@@ -9649,19 +9511,19 @@ has 'datetime_formats_available_formats' => (
 			GyMMMEd => q{E d 'de' MMM 'de' 'su' y G},
 			GyMMMd => q{d 'de' MMM 'de' 'su' y G},
 			GyMd => q{dd/MM/y GGGGG},
-			MEd => q{E d/M},
+			MEd => q{E dd/MM},
 			MMMEd => q{E d 'de' MMM},
 			MMMMW => q{'chida' W 'de' MMMM},
 			MMMMd => q{d 'de' MMMM},
 			MMMd => q{d 'de' MMM},
-			Md => q{d/M},
-			yM => q{M/y},
-			yMEd => q{E d/M/y},
+			Md => q{dd/MM},
+			yM => q{MM/Y},
+			yMEd => q{E dd/MM/y},
 			yMMM => q{MMM y},
 			yMMMEd => q{E d 'de' MMM y},
 			yMMMM => q{MMMM 'de' 'su' y},
 			yMMMd => q{d 'de' MMM y},
-			yMd => q{d/M/y},
+			yMd => q{dd/MM/y},
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ 'de' 'su' y},
 			yw => q{'chida' w 'de' 'su' Y},
@@ -9683,248 +9545,530 @@ has 'datetime_formats_interval' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'buddhist' => {
-			GyMMMd => {
-				d => q{d–d MMM y G},
+			Bh => {
+				B => q{h B – h B},
+			},
+			Bhm => {
+				B => q{h:mm B – h:mm B},
+			},
+			Gy => {
+				G => q{G y – G y},
+			},
+			h => {
+				a => q{h a – h a},
+				h => q{h–h a},
+			},
+			hm => {
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
+			},
+			hmv => {
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
+			},
+			hv => {
+				a => q{h a – h a v},
+				h => q{h–h a v},
 			},
 		},
 		'chinese' => {
 			MEd => {
-				M => q{E dd/MM – E dd/MM},
-				d => q{E dd/MM – E dd/MM},
+				M => q{E dd/MM – E dd/MM},
+				d => q{E dd/MM – E dd/MM},
 			},
 			MMM => {
-				M => q{MMM – MMM},
+				M => q{MMM – MMM},
 			},
 			MMMEd => {
-				M => q{E dd MMM – E dd MMM},
-				d => q{E dd – E dd MMM},
+				M => q{E dd MMM – E dd MMM},
+				d => q{E dd – E dd MMM},
 			},
 			MMMd => {
-				M => q{dd MMM – dd MMM},
+				M => q{dd MMM – dd MMM},
 				d => q{dd–dd MMM},
 			},
 			Md => {
-				M => q{dd/MM – dd/MM},
-				d => q{dd/MM – dd/MM},
+				M => q{dd/MM – dd/MM},
+				d => q{dd/MM – dd/MM},
 			},
 			yM => {
-				M => q{MM/y – MM/y},
-				y => q{MM/y – MM/y},
+				M => q{MM/y – MM/y},
+				y => q{MM/y – MM/y},
 			},
 			yMEd => {
-				M => q{E dd/MM/y – E dd/MM/y},
-				d => q{E dd/MM/y – E dd/MM/y},
-				y => q{E dd/MM/y – E dd/MM/y},
+				M => q{E dd/MM/y – E dd/MM/y},
+				d => q{E dd/MM/y – E dd/MM/y},
+				y => q{E dd/MM/y – E dd/MM/y},
 			},
 			yMMM => {
 				M => q{MMM–MMM U},
-				y => q{MMM U – MMM U},
+				y => q{MMM U – MMM U},
 			},
 			yMMMEd => {
-				M => q{E d MMM – E d MMM U},
-				d => q{E d MMM – E d MMM U},
-				y => q{E d MMM U – E d MMM U},
+				M => q{E d MMM – E d MMM U},
+				d => q{E d MMM – E d MMM U},
+				y => q{E d MMM U – E d MMM U},
 			},
 			yMMMM => {
 				M => q{MMMM–MMMM 'de' 'su' U},
-				y => q{MMMM 'de' 'su' U – MMMM 'de' 'su' U},
+				y => q{MMMM 'de' 'su' U – MMMM 'de' 'su' U},
 			},
 			yMMMd => {
-				M => q{dd MMM – dd MMM U},
+				M => q{dd MMM – dd MMM U},
 				d => q{dd–dd MMM U},
-				y => q{dd MMM U – dd MMM U},
+				y => q{dd MMM U – dd MMM U},
 			},
 			yMd => {
-				M => q{dd/MM/y – dd/MM/y},
-				d => q{dd/MM/y – dd/MM/y},
-				y => q{dd/MM/y – dd/MM/y},
+				M => q{dd/MM/y – dd/MM/y},
+				d => q{dd/MM/y – dd/MM/y},
+				y => q{dd/MM/y – dd/MM/y},
+			},
+		},
+		'coptic' => {
+			Bh => {
+				B => q{h B – h B},
+			},
+			Bhm => {
+				B => q{h:mm B – h:mm B},
+			},
+			Gy => {
+				G => q{G y – G y},
+			},
+			h => {
+				a => q{h a – h a},
+				h => q{h–h a},
+			},
+			hm => {
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
+			},
+			hmv => {
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
+			},
+			hv => {
+				a => q{h a – h a v},
+				h => q{h–h a v},
+			},
+		},
+		'dangi' => {
+			Bh => {
+				B => q{h B – h B},
+			},
+			Bhm => {
+				B => q{h:mm B – h:mm B},
+			},
+			h => {
+				a => q{h a – h a},
+				h => q{h–h a},
+			},
+			hm => {
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
+			},
+			hmv => {
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
+			},
+			hv => {
+				a => q{h a – h a v},
+				h => q{h–h a v},
+			},
+		},
+		'ethiopic' => {
+			Bh => {
+				B => q{h B – h B},
+			},
+			Bhm => {
+				B => q{h:mm B – h:mm B},
+			},
+			Gy => {
+				G => q{G y – G y},
+			},
+			h => {
+				a => q{h a – h a},
+				h => q{h–h a},
+			},
+			hm => {
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
+			},
+			hmv => {
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
+			},
+			hv => {
+				a => q{h a – h a v},
+				h => q{h–h a v},
 			},
 		},
 		'generic' => {
 			GyM => {
-				G => q{M/y GGGGG – M/y GGGGG},
-				M => q{M/y – M/y GGGGG},
-				y => q{M/y – M/y GGGGG},
+				G => q{M/y GGGGG – M/y GGGGG},
+				M => q{M/y – M/y GGGGG},
+				y => q{M/y – M/y GGGGG},
 			},
 			GyMEd => {
-				G => q{E d/M/y GGGGG – E d/M/y GGGGG},
-				M => q{E d/M/y – E d/M/y GGGGG},
-				d => q{E d/M/y – E d/M/y GGGGG},
-				y => q{E d/M/y – E d/M/y GGGGG},
+				G => q{E d/M/y GGGGG – E d/M/y GGGGG},
+				M => q{E d/M/y – E d/M/y GGGGG},
+				d => q{E d/M/y – E d/M/y GGGGG},
+				y => q{E d/M/y – E d/M/y GGGGG},
 			},
 			GyMMM => {
-				G => q{MMM y G – MMM y G},
-				M => q{MMM – MMM y G},
-				y => q{MMM y – MMM y G},
+				G => q{MMM y G – MMM y G},
+				M => q{MMM – MMM y G},
+				y => q{MMM y – MMM y G},
 			},
 			GyMMMEd => {
-				G => q{E d MMM y G – E d MMM y G},
-				M => q{E d MMM – E d MMM y G},
-				d => q{E d MMM – E d MMM y G},
-				y => q{E d MMM y – E d MMM y G},
+				G => q{E d MMM y G – E d MMM y G},
+				M => q{E d MMM – E d MMM y G},
+				d => q{E d MMM – E d MMM y G},
+				y => q{E d MMM y – E d MMM y G},
 			},
 			GyMMMd => {
-				G => q{d MMM y G – d MMM y G},
-				M => q{d MMM – d MMM y G},
+				G => q{d MMM y G – d MMM y G},
+				M => q{d MMM – d MMM y G},
 				d => q{d–d MMM y G},
-				y => q{d MMM y – d MMM y G},
+				y => q{d MMM y – d MMM y G},
 			},
 			GyMd => {
-				G => q{d/M/y GGGGG – d/M/y GGGGG},
-				M => q{d/M/y – d/M/y GGGGG},
-				d => q{d/M/y – d/M/y GGGGG},
-				y => q{d/M/y – d/M/y GGGGG},
+				G => q{d/M/y GGGGG – d/M/y GGGGG},
+				M => q{d/M/y – d/M/y GGGGG},
+				d => q{d/M/y – d/M/y GGGGG},
+				y => q{d/M/y – d/M/y GGGGG},
 			},
 			M => {
 				M => q{M–M},
 			},
 			MEd => {
-				M => q{E dd/MM – E dd/MM},
-				d => q{E dd/MM – E dd/MM},
+				M => q{E dd/MM – E dd/MM},
+				d => q{E dd/MM – E dd/MM},
 			},
 			MMM => {
 				M => q{MMM–MMM},
 			},
 			MMMEd => {
-				M => q{E dd MMM – E dd MMM},
-				d => q{E dd – E dd MMM},
+				M => q{E dd MMM – E dd MMM},
+				d => q{E dd – E dd MMM},
 			},
 			MMMd => {
-				M => q{dd MMM – dd MMM},
+				M => q{dd MMM – dd MMM},
 				d => q{dd–dd MMM},
 			},
 			Md => {
-				M => q{dd/MM – dd/MM},
-				d => q{dd/MM – dd/MM},
+				M => q{dd/MM – dd/MM},
+				d => q{dd/MM – dd/MM},
 			},
 			y => {
 				y => q{y–y G},
 			},
 			yM => {
-				M => q{MM/y – MM/y GGGGG},
-				y => q{MM/y – MM/y GGGGG},
+				M => q{MM/y – MM/y GGGGG},
+				y => q{MM/y – MM/y GGGGG},
 			},
 			yMEd => {
-				M => q{E dd/MM/y – E dd/MM/y GGGGG},
-				d => q{E dd/MM/y – E dd/MM/y GGGGG},
-				y => q{E dd/MM/y – E dd/MM/y GGGGG},
+				M => q{E dd/MM/y – E dd/MM/y GGGGG},
+				d => q{E dd/MM/y – E dd/MM/y GGGGG},
+				y => q{E dd/MM/y – E dd/MM/y GGGGG},
 			},
 			yMMM => {
 				M => q{MMM–MMM y G},
-				y => q{MMM y – MMM y G},
+				y => q{MMM y – MMM y G},
 			},
 			yMMMEd => {
-				M => q{E d MMM – E d MMM y G},
-				d => q{E d – E d MMM y G},
-				y => q{E d MMM y – E d MMM y G},
+				M => q{E d MMM – E d MMM y G},
+				d => q{E d – E d MMM y G},
+				y => q{E d MMM y – E d MMM y G},
 			},
 			yMMMM => {
 				M => q{MMMM–MMMM y G},
-				y => q{MMMM y – MMMM y G},
+				y => q{MMMM y – MMMM y G},
 			},
 			yMMMd => {
-				M => q{dd MMM – dd MMM y G},
+				M => q{dd MMM – dd MMM y G},
 				d => q{dd–dd MMM y G},
-				y => q{dd MMM y – dd MMM y G},
+				y => q{dd MMM y – dd MMM y G},
 			},
 			yMd => {
-				M => q{dd/MM/y – dd/MM/y GGGGG},
-				d => q{dd/MM/y – dd/MM/y GGGGG},
-				y => q{dd/MM/y – dd/MM/y GGGGG},
+				M => q{dd/MM/y – dd/MM/y GGGGG},
+				d => q{dd/MM/y – dd/MM/y GGGGG},
+				y => q{dd/MM/y – dd/MM/y GGGGG},
 			},
 		},
 		'gregorian' => {
 			Gy => {
-				G => q{y G – y G},
-				y => q{y – y G},
+				G => q{y G – y G},
+				y => q{y – y G},
 			},
 			GyM => {
-				G => q{M/y GGGGG – M/y GGGGG},
-				M => q{M/y – M/y GGGGG},
-				y => q{M/y – M/y GGGGG},
+				G => q{MM/y GGGGG – MM/y GGGGG},
+				M => q{MM/y – MM/y GGGGG},
+				y => q{MM/y – MM/y GGGGG},
 			},
 			GyMEd => {
-				G => q{E d/M/y GGGGG – E d/M/y GGGGG},
-				M => q{E d/M/y – E d/M/y GGGGG},
-				d => q{E d/M/y – E d/M/y GGGGG},
-				y => q{E d/M/y – E d/M/y GGGGG},
+				G => q{E dd/MM/y GGGGG – E dd/MM/y GGGGG},
+				M => q{E dd/MM/y – E dd/MM/y GGGGG},
+				d => q{E dd/MM/y – E dd/MM/y GGGGG},
+				y => q{E dd/MM/y – E dd/MM/y GGGGG},
 			},
 			GyMMM => {
-				G => q{MMM y G – MMM y G},
-				M => q{MMM – MMM y G},
-				y => q{MMM y – MMM y G},
+				G => q{MMM y G – MMM y G},
+				M => q{MMM – MMM y G},
+				y => q{MMM y – MMM y G},
 			},
 			GyMMMEd => {
-				G => q{E d MMM y G – E d MMM y G},
-				M => q{E d MMM – E d MMM y G},
-				d => q{E d MMM – E d MMM y G},
-				y => q{E d MMM y – E d MMM y G},
+				G => q{E d MMM y G – E d MMM y G},
+				M => q{E d MMM – E d MMM y G},
+				d => q{E d MMM – E d MMM y G},
+				y => q{E d MMM y – E d MMM y G},
 			},
 			GyMMMd => {
-				G => q{d MMM y G – d MMM y G},
-				M => q{d MMM – d MMM y G},
-				d => q{d – d MMM y G},
-				y => q{d MMM y – d MMM y G},
+				G => q{d MMM y G – d MMM y G},
+				M => q{d MMM – d MMM y G},
+				d => q{d – d MMM y G},
+				y => q{d MMM y – d MMM y G},
 			},
 			GyMd => {
-				G => q{d/M/y GGGGG – d/M/y GGGGG},
-				M => q{d/M/y – d/M/y GGGGG},
-				d => q{d/M/y – d/M/y GGGGG},
-				y => q{d/M/y – d/M/y GGGGG},
+				G => q{dd/MM/y GGGGG – dd/MM/y GGGGG},
+				M => q{dd/MM/y – dd/MM/y GGGGG},
+				d => q{dd/MM/y – dd/MM/y GGGGG},
+				y => q{dd/MM/y – dd/MM/y GGGGG},
 			},
 			M => {
 				M => q{M–M},
 			},
 			MEd => {
-				M => q{E dd/MM – E dd/MM},
-				d => q{E dd/MM – E dd/MM},
+				M => q{E dd/MM – E dd/MM},
+				d => q{E dd/MM – E dd/MM},
 			},
 			MMM => {
 				M => q{MMM–MMM},
 			},
 			MMMEd => {
-				M => q{E dd MMM – E dd MMM},
-				d => q{E dd – E dd MMM},
+				M => q{E dd MMM – E dd MMM},
+				d => q{E dd – E dd MMM},
 			},
 			MMMd => {
-				M => q{dd MMM – dd MMM},
+				M => q{dd MMM – dd MMM},
 				d => q{dd–dd MMM},
 			},
 			Md => {
-				M => q{dd/MM – dd/MM},
-				d => q{dd/MM – dd/MM},
+				M => q{dd/MM – dd/MM},
+				d => q{dd/MM – dd/MM},
 			},
 			yM => {
-				M => q{MM/y – MM/y},
-				y => q{MM/y – MM/y},
+				M => q{MM/y – MM/y},
+				y => q{MM/y – MM/y},
 			},
 			yMEd => {
-				M => q{E dd/MM/y – E dd/MM/y},
-				d => q{E dd/MM/y – E dd/MM/y},
-				y => q{E dd/MM/y – E dd/MM/y},
+				M => q{E dd/MM/y – E dd/MM/y},
+				d => q{E dd/MM/y – E dd/MM/y},
+				y => q{E dd/MM/y – E dd/MM/y},
 			},
 			yMMM => {
 				M => q{MMM–MMM y},
-				y => q{MMM y – MMM y},
+				y => q{MMM y – MMM y},
 			},
 			yMMMEd => {
-				M => q{E d MMM – E d MMM y},
-				d => q{E d MMM – E d MMM y},
-				y => q{E d MMM y – E d MMM y},
+				M => q{E d MMM – E d MMM y},
+				d => q{E d MMM – E d MMM y},
+				y => q{E d MMM y – E d MMM y},
 			},
 			yMMMM => {
 				M => q{MMMM–MMMM 'de' 'su' y},
-				y => q{MMMM 'de' 'su' y – MMMM 'de' 'su' y},
+				y => q{MMMM 'de' 'su' y – MMMM 'de' 'su' y},
 			},
 			yMMMd => {
-				M => q{dd MMM – dd MMM y},
+				M => q{dd MMM – dd MMM y},
 				d => q{dd–dd MMM y},
-				y => q{dd MMM y – dd MMM y},
+				y => q{dd MMM y – dd MMM y},
 			},
 			yMd => {
-				M => q{dd/MM/y – dd/MM/y},
-				d => q{dd/MM/y – dd/MM/y},
-				y => q{dd/MM/y – dd/MM/y},
+				M => q{dd/MM/y – dd/MM/y},
+				d => q{dd/MM/y – dd/MM/y},
+				y => q{dd/MM/y – dd/MM/y},
+			},
+		},
+		'hebrew' => {
+			Bh => {
+				B => q{h B – h B},
+			},
+			Bhm => {
+				B => q{h:mm B – h:mm B},
+			},
+			Gy => {
+				G => q{G y – G y},
+			},
+			h => {
+				a => q{h a – h a},
+				h => q{h–h a},
+			},
+			hm => {
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
+			},
+			hmv => {
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
+			},
+			hv => {
+				a => q{h a – h a v},
+				h => q{h–h a v},
+			},
+		},
+		'indian' => {
+			Bh => {
+				B => q{h B – h B},
+			},
+			Bhm => {
+				B => q{h:mm B – h:mm B},
+			},
+			Gy => {
+				G => q{G y – G y},
+			},
+			h => {
+				a => q{h a – h a},
+				h => q{h–h a},
+			},
+			hm => {
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
+			},
+			hmv => {
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
+			},
+			hv => {
+				a => q{h a – h a v},
+				h => q{h–h a v},
+			},
+		},
+		'islamic' => {
+			Bh => {
+				B => q{h B – h B},
+			},
+			Bhm => {
+				B => q{h:mm B – h:mm B},
+			},
+			Gy => {
+				G => q{G y – G y},
+			},
+			h => {
+				a => q{h a – h a},
+				h => q{h–h a},
+			},
+			hm => {
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
+			},
+			hmv => {
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
+			},
+			hv => {
+				a => q{h a – h a v},
+				h => q{h–h a v},
+			},
+		},
+		'japanese' => {
+			Bh => {
+				B => q{h B – h B},
+			},
+			Bhm => {
+				B => q{h:mm B – h:mm B},
+			},
+			Gy => {
+				G => q{G y – G y},
+			},
+			h => {
+				a => q{h a – h a},
+				h => q{h–h a},
+			},
+			hm => {
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
+			},
+			hmv => {
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
+			},
+			hv => {
+				a => q{h a – h a v},
+				h => q{h–h a v},
+			},
+		},
+		'persian' => {
+			Bh => {
+				B => q{h B – h B},
+			},
+			Bhm => {
+				B => q{h:mm B – h:mm B},
+			},
+			Gy => {
+				G => q{G y – G y},
+			},
+			h => {
+				a => q{h a – h a},
+				h => q{h–h a},
+			},
+			hm => {
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
+			},
+			hmv => {
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
+			},
+			hv => {
+				a => q{h a – h a v},
+				h => q{h–h a v},
+			},
+		},
+		'roc' => {
+			Bh => {
+				B => q{h B – h B},
+			},
+			Bhm => {
+				B => q{h:mm B – h:mm B},
+			},
+			Gy => {
+				G => q{G y – G y},
+			},
+			h => {
+				a => q{h a – h a},
+				h => q{h–h a},
+			},
+			hm => {
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
+			},
+			hmv => {
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
+			},
+			hv => {
+				a => q{h a – h a v},
+				h => q{h–h a v},
 			},
 		},
 	} },
@@ -9937,23 +10081,6 @@ has 'month_patterns' => (
 	default		=> sub { {
 		'chinese' => {
 			'format' => {
-				'wide' => {
-					'leap' => q{{0} bis},
-				},
-			},
-			'stand-alone' => {
-				'wide' => {
-					'leap' => q{{0} bis},
-				},
-			},
-		},
-		'dangi' => {
-			'format' => {
-				'wide' => {
-					'leap' => q{{0} bis},
-				},
-			},
-			'stand-alone' => {
 				'wide' => {
 					'leap' => q{{0} bis},
 				},
@@ -9996,221 +10123,11 @@ has 'cyclic_name_sets' => (
 						22 => q(fritu minore),
 						23 => q(fritu mannu),
 					},
-					'narrow' => {
-						0 => q(incumintzu de su beranu),
-						1 => q(abba dae chelu),
-						2 => q(ischidada de sos boborrotos),
-						3 => q(ecuinòtziu de beranu),
-						4 => q(luminosu e craru),
-						5 => q(abba pro trigu),
-						6 => q(incumintzu de s’istiu),
-						7 => q(maturatzione minore),
-						8 => q(trigu in ispigas),
-						9 => q(solstìtziu de istiu),
-						10 => q(afogu minore),
-						11 => q(afogu mannu),
-						12 => q(incumintzu de s’atòngiu),
-						13 => q(acabu de s’afogu),
-						14 => q(lentore biancu),
-						15 => q(ecuinòtziu de atòngiu),
-						16 => q(lentore fritu),
-						17 => q(achirrada de su ghiliore),
-						18 => q(incumintzu de s’ierru),
-						19 => q(nie minore),
-						20 => q(nie mannu),
-						21 => q(solstìtziu de ierru),
-						22 => q(fritu minore),
-						23 => q(fritu mannu),
-					},
-					'wide' => {
-						0 => q(incumintzu de su beranu),
-						1 => q(abba dae chelu),
-						2 => q(ischidada de sos boborrotos),
-						3 => q(ecuinòtziu de beranu),
-						4 => q(luminosu e craru),
-						5 => q(abba pro trigu),
-						6 => q(incumintzu de s’istiu),
-						7 => q(maturatzione minore),
-						8 => q(trigu in ispigas),
-						9 => q(solstìtziu de istiu),
-						10 => q(afogu minore),
-						11 => q(afogu mannu),
-						12 => q(incumintzu de s’atòngiu),
-						13 => q(acabu de s’afogu),
-						14 => q(lentore biancu),
-						15 => q(ecuinòtziu de atòngiu),
-						16 => q(lentore fritu),
-						17 => q(achirrada de su ghiliore),
-						18 => q(incumintzu de s’ierru),
-						19 => q(nie minore),
-						20 => q(nie mannu),
-						21 => q(solstìtziu de ierru),
-						22 => q(fritu minore),
-						23 => q(fritu mannu),
-					},
 				},
 			},
 			'zodiacs' => {
 				'format' => {
 					'abbreviated' => {
-						0 => q(sòrighe),
-						1 => q(boe),
-						2 => q(tigre),
-						3 => q(cunillu),
-						4 => q(dragu),
-						5 => q(serpente),
-						6 => q(caddu),
-						7 => q(craba),
-						8 => q(martinica),
-						9 => q(puddu),
-						10 => q(cane),
-						11 => q(porcu),
-					},
-					'narrow' => {
-						0 => q(sòrighe),
-						1 => q(boe),
-						2 => q(tigre),
-						3 => q(cunillu),
-						4 => q(dragu),
-						5 => q(serpente),
-						6 => q(caddu),
-						7 => q(craba),
-						8 => q(martinica),
-						9 => q(puddu),
-						10 => q(cane),
-						11 => q(porcu),
-					},
-					'wide' => {
-						0 => q(sòrighe),
-						1 => q(boe),
-						2 => q(tigre),
-						3 => q(cunillu),
-						4 => q(dragu),
-						5 => q(serpente),
-						6 => q(caddu),
-						7 => q(craba),
-						8 => q(martinica),
-						9 => q(puddu),
-						10 => q(cane),
-						11 => q(porcu),
-					},
-				},
-			},
-		},
-		'dangi' => {
-			'solarTerms' => {
-				'format' => {
-					'abbreviated' => {
-						0 => q(incumintzu de su beranu),
-						1 => q(abba dae chelu),
-						2 => q(ischidada de sos boborrotos),
-						3 => q(ecuinòtziu de beranu),
-						4 => q(luminosu e craru),
-						5 => q(abba pro trigu),
-						6 => q(incumintzu de s’istiu),
-						7 => q(maturatzione minore),
-						8 => q(trigu in ispigas),
-						9 => q(solstìtziu de istiu),
-						10 => q(afogu minore),
-						11 => q(afogu mannu),
-						12 => q(incumintzu de s’atòngiu),
-						13 => q(acabu de s’afogu),
-						14 => q(lentore biancu),
-						15 => q(ecuinòtziu de atòngiu),
-						16 => q(lentore fritu),
-						17 => q(achirrada de su ghiliore),
-						18 => q(incumintzu de s’ierru),
-						19 => q(nie minore),
-						20 => q(nie mannu),
-						21 => q(solstìtziu de ierru),
-						22 => q(fritu minore),
-						23 => q(fritu mannu),
-					},
-					'narrow' => {
-						0 => q(incumintzu de su beranu),
-						1 => q(abba dae chelu),
-						2 => q(ischidada de sos boborrotos),
-						3 => q(ecuinòtziu de beranu),
-						4 => q(luminosu e craru),
-						5 => q(abba pro trigu),
-						6 => q(incumintzu de s’istiu),
-						7 => q(maturatzione minore),
-						8 => q(trigu in ispigas),
-						9 => q(solstìtziu de istiu),
-						10 => q(afogu minore),
-						11 => q(afogu mannu),
-						12 => q(incumintzu de s’atòngiu),
-						13 => q(acabu de s’afogu),
-						14 => q(lentore biancu),
-						15 => q(ecuinòtziu de atòngiu),
-						16 => q(lentore fritu),
-						17 => q(achirrada de su ghiliore),
-						18 => q(incumintzu de s’ierru),
-						19 => q(nie minore),
-						20 => q(nie mannu),
-						21 => q(solstìtziu de ierru),
-						22 => q(fritu minore),
-						23 => q(fritu mannu),
-					},
-					'wide' => {
-						0 => q(incumintzu de su beranu),
-						1 => q(abba dae chelu),
-						2 => q(ischidada de sos boborrotos),
-						3 => q(ecuinòtziu de beranu),
-						4 => q(luminosu e craru),
-						5 => q(abba pro trigu),
-						6 => q(incumintzu de s’istiu),
-						7 => q(maturatzione minore),
-						8 => q(trigu in ispigas),
-						9 => q(solstìtziu de istiu),
-						10 => q(afogu minore),
-						11 => q(afogu mannu),
-						12 => q(incumintzu de s’atòngiu),
-						13 => q(acabu de s’afogu),
-						14 => q(lentore biancu),
-						15 => q(ecuinòtziu de atòngiu),
-						16 => q(lentore fritu),
-						17 => q(achirrada de su ghiliore),
-						18 => q(incumintzu de s’ierru),
-						19 => q(nie minore),
-						20 => q(nie mannu),
-						21 => q(solstìtziu de ierru),
-						22 => q(fritu minore),
-						23 => q(fritu mannu),
-					},
-				},
-			},
-			'zodiacs' => {
-				'format' => {
-					'abbreviated' => {
-						0 => q(sòrighe),
-						1 => q(boe),
-						2 => q(tigre),
-						3 => q(cunillu),
-						4 => q(dragu),
-						5 => q(serpente),
-						6 => q(caddu),
-						7 => q(craba),
-						8 => q(martinica),
-						9 => q(puddu),
-						10 => q(cane),
-						11 => q(porcu),
-					},
-					'narrow' => {
-						0 => q(sòrighe),
-						1 => q(boe),
-						2 => q(tigre),
-						3 => q(cunillu),
-						4 => q(dragu),
-						5 => q(serpente),
-						6 => q(caddu),
-						7 => q(craba),
-						8 => q(martinica),
-						9 => q(puddu),
-						10 => q(cane),
-						11 => q(porcu),
-					},
-					'wide' => {
 						0 => q(sòrighe),
 						1 => q(boe),
 						2 => q(tigre),
@@ -10250,143 +10167,20 @@ has 'time_zone_names' => (
 				'standard' => q#Ora de s’Afghànistan#,
 			},
 		},
-		'Africa/Abidjan' => {
-			exemplarCity => q#Abidjan#,
-		},
-		'Africa/Accra' => {
-			exemplarCity => q#Accra#,
-		},
 		'Africa/Addis_Ababa' => {
 			exemplarCity => q#Addis Abeba#,
 		},
 		'Africa/Algiers' => {
 			exemplarCity => q#Algeri#,
 		},
-		'Africa/Asmera' => {
-			exemplarCity => q#Asmara#,
-		},
-		'Africa/Bamako' => {
-			exemplarCity => q#Bamako#,
-		},
-		'Africa/Bangui' => {
-			exemplarCity => q#Bangui#,
-		},
-		'Africa/Banjul' => {
-			exemplarCity => q#Banjul#,
-		},
-		'Africa/Bissau' => {
-			exemplarCity => q#Bissau#,
-		},
-		'Africa/Blantyre' => {
-			exemplarCity => q#Blantyre#,
-		},
-		'Africa/Brazzaville' => {
-			exemplarCity => q#Brazzaville#,
-		},
-		'Africa/Bujumbura' => {
-			exemplarCity => q#Bujumbura#,
-		},
 		'Africa/Cairo' => {
 			exemplarCity => q#Su Càiru#,
-		},
-		'Africa/Casablanca' => {
-			exemplarCity => q#Casablanca#,
-		},
-		'Africa/Conakry' => {
-			exemplarCity => q#Conakry#,
-		},
-		'Africa/Dakar' => {
-			exemplarCity => q#Dakar#,
-		},
-		'Africa/Dar_es_Salaam' => {
-			exemplarCity => q#Dar es Salaam#,
-		},
-		'Africa/Djibouti' => {
-			exemplarCity => q#Djibouti#,
-		},
-		'Africa/Douala' => {
-			exemplarCity => q#Douala#,
-		},
-		'Africa/El_Aaiun' => {
-			exemplarCity => q#El Aaiun#,
-		},
-		'Africa/Freetown' => {
-			exemplarCity => q#Freetown#,
-		},
-		'Africa/Gaborone' => {
-			exemplarCity => q#Gaborone#,
-		},
-		'Africa/Harare' => {
-			exemplarCity => q#Harare#,
-		},
-		'Africa/Johannesburg' => {
-			exemplarCity => q#Johannesburg#,
-		},
-		'Africa/Juba' => {
-			exemplarCity => q#Juba#,
-		},
-		'Africa/Kampala' => {
-			exemplarCity => q#Kampala#,
-		},
-		'Africa/Khartoum' => {
-			exemplarCity => q#Khartoum#,
-		},
-		'Africa/Kigali' => {
-			exemplarCity => q#Kigali#,
-		},
-		'Africa/Kinshasa' => {
-			exemplarCity => q#Kinshasa#,
-		},
-		'Africa/Lagos' => {
-			exemplarCity => q#Lagos#,
-		},
-		'Africa/Libreville' => {
-			exemplarCity => q#Libreville#,
-		},
-		'Africa/Lome' => {
-			exemplarCity => q#Lome#,
-		},
-		'Africa/Luanda' => {
-			exemplarCity => q#Luanda#,
-		},
-		'Africa/Lubumbashi' => {
-			exemplarCity => q#Lubumbashi#,
-		},
-		'Africa/Lusaka' => {
-			exemplarCity => q#Lusaka#,
-		},
-		'Africa/Malabo' => {
-			exemplarCity => q#Malabo#,
-		},
-		'Africa/Maputo' => {
-			exemplarCity => q#Maputo#,
-		},
-		'Africa/Maseru' => {
-			exemplarCity => q#Maseru#,
-		},
-		'Africa/Mbabane' => {
-			exemplarCity => q#Mbabane#,
 		},
 		'Africa/Mogadishu' => {
 			exemplarCity => q#Mogadìsciu#,
 		},
 		'Africa/Monrovia' => {
 			exemplarCity => q#Monròvia#,
-		},
-		'Africa/Nairobi' => {
-			exemplarCity => q#Nairobi#,
-		},
-		'Africa/Ndjamena' => {
-			exemplarCity => q#Ndjamena#,
-		},
-		'Africa/Niamey' => {
-			exemplarCity => q#Niamey#,
-		},
-		'Africa/Nouakchott' => {
-			exemplarCity => q#Nouakchott#,
-		},
-		'Africa/Ouagadougou' => {
-			exemplarCity => q#Ouagadougou#,
 		},
 		'Africa/Porto-Novo' => {
 			exemplarCity => q#Portu-Nou#,
@@ -10399,9 +10193,6 @@ has 'time_zone_names' => (
 		},
 		'Africa/Tunis' => {
 			exemplarCity => q#Tùnisi#,
-		},
-		'Africa/Windhoek' => {
-			exemplarCity => q#Windhoek#,
 		},
 		'Africa_Central' => {
 			long => {
@@ -10453,9 +10244,6 @@ has 'time_zone_names' => (
 		},
 		'America/Argentina/Tucuman' => {
 			exemplarCity => q#Tucumán#,
-		},
-		'America/Cancun' => {
-			exemplarCity => q#Cancún#,
 		},
 		'America/Curacao' => {
 			exemplarCity => q#Curaçao#,
@@ -10663,9 +10451,6 @@ has 'time_zone_names' => (
 		'Asia/Tehran' => {
 			exemplarCity => q#Teheràn#,
 		},
-		'Asia/Tokyo' => {
-			exemplarCity => q#Tòkyo#,
-		},
 		'Asia/Ulaanbaatar' => {
 			exemplarCity => q#Ulàn Bator#,
 		},
@@ -10698,6 +10483,9 @@ has 'time_zone_names' => (
 		},
 		'Atlantic/St_Helena' => {
 			exemplarCity => q#Sant’Elene#,
+		},
+		'Australia/Currie' => {
+			exemplarCity => q#Currie#,
 		},
 		'Australia_Central' => {
 			long => {
@@ -11103,23 +10891,8 @@ has 'time_zone_names' => (
 				'standard' => q#Ora istandard de s’Ìndia#,
 			},
 		},
-		'Indian/Antananarivo' => {
-			exemplarCity => q#Antananarivo#,
-		},
-		'Indian/Chagos' => {
-			exemplarCity => q#Chagos#,
-		},
 		'Indian/Christmas' => {
 			exemplarCity => q#Natividade#,
-		},
-		'Indian/Comoro' => {
-			exemplarCity => q#Comoro#,
-		},
-		'Indian/Kerguelen' => {
-			exemplarCity => q#Kerguelen#,
-		},
-		'Indian/Mahe' => {
-			exemplarCity => q#Mahe#,
 		},
 		'Indian/Maldives' => {
 			exemplarCity => q#Maldivas#,
@@ -11397,6 +11170,9 @@ has 'time_zone_names' => (
 				'standard' => q#Ora istandard de Omsk#,
 			},
 		},
+		'Pacific/Enderbury' => {
+			exemplarCity => q#Enderbury#,
+		},
 		'Pacific/Guam' => {
 			exemplarCity => q#Guàm#,
 		},
@@ -11406,6 +11182,9 @@ has 'time_zone_names' => (
 				'generic' => q#OIH#,
 				'standard' => q#OIH#,
 			},
+		},
+		'Pacific/Kanton' => {
+			exemplarCity => q#Canton#,
 		},
 		'Pacific/Marquesas' => {
 			exemplarCity => q#Marchesas#,

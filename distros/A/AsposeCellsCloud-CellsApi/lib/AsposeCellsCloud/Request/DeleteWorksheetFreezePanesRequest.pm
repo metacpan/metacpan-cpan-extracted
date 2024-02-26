@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,14 +59,14 @@ sub new {
 
 
 # Run Operation Request
-# DeleteWorksheetFreezePanesRequest.name : The workbook name.  ,
+# DeleteWorksheetFreezePanesRequest.name : The file name.  ,
 # DeleteWorksheetFreezePanesRequest.sheetName : The worksheet name.  ,
 # DeleteWorksheetFreezePanesRequest.row : Row index.  ,
 # DeleteWorksheetFreezePanesRequest.column : Column index.  ,
 # DeleteWorksheetFreezePanesRequest.freezedRows : Number of visible rows in top pane, no more than row index.  ,
 # DeleteWorksheetFreezePanesRequest.freezedColumns : Number of visible columns in left pane, no more than column index.  ,
-# DeleteWorksheetFreezePanesRequest.folder : Original workbook folder.  ,
-# DeleteWorksheetFreezePanesRequest.storageName : Storage name.   
+# DeleteWorksheetFreezePanesRequest.folder : The folder where the file is situated.  ,
+# DeleteWorksheetFreezePanesRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -77,7 +77,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'delete_worksheet_freeze_panes' } = { 
-    	summary => 'Unfreezes panes in worksheet.',
+    	summary => 'Unfreeze panes in worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -150,7 +150,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -192,14 +192,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

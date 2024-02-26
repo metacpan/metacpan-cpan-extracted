@@ -1,3 +1,9 @@
-0.001    2019-09-26 (PERLANCAR)
+0.002   2023-12-01  Released-By: PERLANCAR; Urgency: medium
+
+        - Use Complete::Color's complete_color_name() to complete
+          colorname.
+
+
+0.001    2019-09-26  Released-By: PERLANCAR
 
          - First release.

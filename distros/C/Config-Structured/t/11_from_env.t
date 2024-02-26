@@ -2,7 +2,7 @@ use strict;
 use warnings qw(all);
 use 5.022;
 
-use Test::More tests => 1;
+use Test2::V0;
 
 use Config::Structured;
 
@@ -24,3 +24,5 @@ END
 );
 
 is($conf->file_value, 'secure_password123', 'Conf value from referenced file');
+
+done_testing;

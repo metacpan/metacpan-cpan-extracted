@@ -1,4 +1,4 @@
-package EAI::DB 1.908;
+package EAI::DB 1.911;
 
 use strict; use feature 'unicode_strings'; use warnings;
 use Exporter qw(import); use DBI qw(:sql_types); use DBD::ODBC (); use Data::Dumper qw(Dumper); use Log::Log4perl qw(get_logger);
@@ -172,8 +172,8 @@ sub doInDB ($;$) {
 }
 
 # store row-based data into database, using insert or "upsert" technique
-sub storeInDB ($$) {
-	my ($DB, $data) = @_;
+sub storeInDB ($$;$) {
+	my ($DB, $data, $countPercent) = @_;
 	my $logger = get_logger();
 	my $tableName = $DB->{tablename};
 	my $addID = $DB->{addID};
@@ -184,6 +184,7 @@ sub storeInDB ($$) {
 	my $incrementalStore = $DB->{incrementalStore};
 	my $doUpdateBeforeInsert = $DB->{doUpdateBeforeInsert};
 	my $debugKeyIndicator = $DB->{debugKeyIndicator};
+	my $dontKeepContent= $DB->{dontKeepContent};
 
 	eval {
 		no warnings 'uninitialized';
@@ -193,7 +194,7 @@ sub storeInDB ($$) {
 		die "no valid dbh connection available" if !defined($dbh);
 		die "no tablename given" if !$tableName;
 		die "no primkey given for upsert" if (!$primkey and $upsert);
-		die "neither primkey nor deleteBeforeInsertSelector given" if (!$primkey and !$deleteBeforeInsertSelector);
+		die "neither primkey nor deleteBeforeInsertSelector given" if (!$primkey and !$deleteBeforeInsertSelector and !$dontKeepContent);
 		my $schemaName = $DB->{schemaName};
 		if ($tableName =~ /\./) {
 			$logger->debug("getting schema from $tableName (contains dot)");
@@ -225,12 +226,13 @@ sub storeInDB ($$) {
 			$logger->warn("field '".$dataheader."' not contained in table $schemaName.$tableName") if !$coldefs->{$dataheader} && !$DB->{dontWarnOnNotExistingFields};
 		}
 		$dbh->{PrintError} = 0; $dbh->{RaiseError} = 0;
-		if (scalar(@{$data}) > 0) {
+		my $lines = scalar(@{$data});
+		if ($lines > 0) {
 			$logger->trace("passed data:\n".Dumper($data)) if $logger->is_trace;
 			my %beforeInsert; # hash flag for update before insert (first row where data appears)
 			my $keyValueForDeleteBeforeInsert;
 			# row-wise processing data ($i)
-			for (my $i=0; $i<scalar(@{$data}); $i++) {
+			for (my $i=0; $i<$lines; $i++) {
 				my @dataArray; # row data that is prepared for insert/update, formatted by the type as defined in DB
 				my $inscols; my $inscolVals; my $updcols; my $updselector = $primkey; # for building insert and update statements
 				my $tgtCol=0; # separate target column iterator for dataArray to allow for skipping columns with $incrementalStore !
@@ -409,6 +411,7 @@ sub storeInDB ($$) {
 						}
 					};
 				}
+				print "EAI::DB::storeInDB stored ".($i+1)." of $lines\r" if $countPercent and (($i+1) % (int($lines * ($countPercent / 100)) == 0 ? 1 : int($lines * ($countPercent / 100))) == 0);
 			}
 		} else {
 			die "no data to store";
@@ -564,7 +567,7 @@ EAI::DB - Database wrapper functions (for DBI / DBD::ODBC)
  readFromDB ($DB, $data)
  readFromDBHash ($DB, $data)
  doInDB ($DB, $data)
- storeInDB ($DB, $data)
+ storeInDB ($DB, $data, $countPercent)
  deleteFromDB ($DB, $data)
  updateInDB ($DB, $data)
  setConn ($handle, $DSN)
@@ -639,7 +642,7 @@ do general statement $DB->{doString} in database using optional parameters passe
 
 returns 0 on error, 1 if OK
 
-=item storeInDB ($$)
+=item storeInDB ($$;$)
 
 store row-based data into database, using insert or an "upsert" technique
 
@@ -666,6 +669,7 @@ store row-based data into database, using insert or an "upsert" technique
              ...
            },
          ];
+  $countPercent .. (optional) percentage of progress where indicator should be output (e.g. 10 for all 10% of progress). set to 0 to disable progress indicator
 
 returns 0 on error, 1 if OK
 

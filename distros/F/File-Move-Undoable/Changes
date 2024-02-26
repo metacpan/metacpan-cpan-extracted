@@ -1,18 +1,23 @@
-0.09    2017-07-10 (PERLANCAR)
+0.100   2023-11-21  Released-By: PERLANCAR; Urgency: medium
+
+        - Update module name: File::MoreUtil -> File::Util::Test.
+
+
+0.09    2017-07-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace Log::Any with Log::ger.
 
 
-0.08    2016-06-10 (PERLANCAR)
+0.08    2016-06-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [dist] Bump prereq version Test::Perinci::Tx::Manager -> 0.56.
 
 
-0.07    2016-06-09 (PERLANCAR)
+0.07    2016-06-09  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -21,7 +26,7 @@
 	- [test] Replace File::Slurp::Tiny with File::Slurper.
 
 
-0.06    2015-09-03 (PERLANCAR)
+0.06    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -30,14 +35,14 @@
 	  requirement.
 
 
-0.05    2015-08-17 (PERLANCAR)
+0.05    2015-08-17  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Switch from Log::Any to Log::Any::IfLOG.
 
 
-0.04    2014-12-05 (PERLANCAR)
+0.04    2014-12-05  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -45,18 +50,18 @@
 	  File::MoreUtil.
 
 
-0.03    2014-05-17 (SHARYANTO)
+0.03    2014-05-17  Released-By: SHARYANTO
 
         - No functional changes.
 
         - Replace File::Slurp with File::Slurp::Tiny.
 
 
-0.02    2012-09-05 (SHARYANTO)
+0.02    2012-09-05  Released-By: SHARYANTO
 
         - No functional changes. Skip test if rsync is not available.
 
 
-0.01    2012-09-05 (SHARYANTO)
+0.01    2012-09-05  Released-By: SHARYANTO
 
         - First release.

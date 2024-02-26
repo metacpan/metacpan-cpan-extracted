@@ -1,0 +1,13 @@
+--maximum-line-length=132
+--cuddled-else
+--indent-columns=2
+--paren-tightness=2
+--closing-token-indentation=1
+--brace-tightness=2
+--square-bracket-tightness=2
+--block-brace-tightness=2
+--opening-token-right
+--break-before-all-operators
+--want-break-after='='
+--keep-old-blank-lines=2
+--maximum-consecutive-blank-lines=0

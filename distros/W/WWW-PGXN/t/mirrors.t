@@ -44,5 +44,5 @@ is $mirror->organization, 'depesz Software',         'Should have organization';
 is $mirror->rsync,        '',                        'Should have no rsync';
 is $mirror->src,          'rsync://my.pgxn.org/',    'Should have src';
 is $mirror->timezone,     'CEST',                    'Should have timezone';
-is $mirror->uri,          'http://pgxn.depesz.com/', 'Should have uri';
+is $mirror->uri,          'https://pgxn.depesz.com/', 'Should have uri';
 

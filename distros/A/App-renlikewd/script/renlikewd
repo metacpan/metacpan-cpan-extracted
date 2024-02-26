@@ -2,13 +2,14 @@
 
 use strict;
 use warnings;
+use Log::ger;
 
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-11-16'; # DATE
+our $DATE = '2023-11-23'; # DATE
 our $DIST = 'App-renlikewd'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 our %SPEC;
 
@@ -19,7 +20,7 @@ $SPEC{app} = {
 
     % pwd
     /home/u1/Some Project/Some Rather Long Title
-    % renlikewd foo.jpg; # foo.jpg now becomes "Some Rather Long Title.jpg"
+    % renlikewd --no-dry-run foo.jpg; # foo.jpg now becomes "Some Rather Long Title.jpg"
 
 Here's what I now often have to do: put some file under a subdirectory with the
 same name as the file (sans the extension), with the name being quite long. I
@@ -31,12 +32,23 @@ Alt-Enter because one of the pane is already inside the directory.
 
 This utility helps.
 
+Note that this utility can default to the only file in the current directory (if
+there are only a single file and zero or more directories and nothing else), so
+to minimize surprise, the default mode is dry-run. Supply `--no-dry-run` to turn
+off dry-run mode.
+
 _
     args => {
         file => {
-            schema => 'filename*',
-            req => 1,
+            schema => 'filename::default_only_file_not_dir_in_curdir*',
             pos => 0,
+        },
+        parents => {
+            schema => 'posint*',
+            summary => 'Instead of working directory, use its parent directory (if parents=1) or grandparent directory (if parents=2) and so on',
+            cmdline_aliases => {
+                p => {is_flag=>1, code=>sub { $_[0]{parents} = 1 }, summary => 'Shortcut for --parents=1'},
+            },
         },
         #extension => {
         #    summary => 'Add extension to the new name',
@@ -48,35 +60,53 @@ _
             cmdline_aliases => {O=>{}},
         },
     },
+    features => {
+        dry_run => {default=>1},
+    },
 };
 sub app {
     require Cwd;
-    require File::MoreUtil;
+    require File::Util::Test;
 
     my %args = @_;
     my $file = $args{file} or return [400, "Please specify file to rename"];
+    my $parents = $args{parents} // 0;
+
     return [404, "File '$file' does not exist"]
-        unless File::MoreUtil::file_exists($file);
+        unless File::Util::Test::file_exists($file);
     my $ext = $file =~ /.(\.\w+)$/ ? $1 : "";
 
     my $cwd = Cwd::getcwd();
     return [412, "Please don't run me in root directory as it's meaningless"]
         if $cwd eq '/';
 
-    my ($curname) = $cwd =~ m!/([^/]*)$!;
-
+    my $p = 0;
+    my $curname;
+    while (1) {
+        $cwd =~ s!/([^/]+)$!! or return [400, "Can't use working/parent directory because we already reach root"];
+        $curname = $1;
+        last if $p++ >= $parents;
+    }
     my $newfile = "$curname$ext";
     return [412, "New name '$newfile' already exists, use --overwrite (-O) to overwrite existing file"]
-        if File::MoreUtil::file_exists($newfile) && !$args{overwrite};
+        if File::Util::Test::file_exists($newfile) && !$args{overwrite};
 
-    rename $file, $newfile
-        or return [500, "Can't rename $file -> $newfile: $!"];
+    if ($args{-dry_run}) {
+        log_info "DRY-RUN: Renaming %s to %s ...", $file, $newfile;
+        return [200, "OK (dry-run)"];
+    } else {
+        log_info "Renaming %s to %s ...", $file, $newfile;
+        rename $file, $newfile
+            or return [500, "Can't rename $file -> $newfile: $!"];
+        return [200, "OK"];
+    }
 
-    [200];
 }
 
 Perinci::CmdLine::Any->new(
     url => "/main/app",
+    log => 1,
+    log_level => 'info',
 )->run;
 
 1;
@@ -95,7 +125,7 @@ renlikewd - REName a file so it becomes LIKE the current (Working) Directory's n
 
 =head1 VERSION
 
-This document describes version 0.002 of renlikewd (from Perl distribution App-renlikewd), released on 2021-11-16.
+This document describes version 0.005 of renlikewd (from Perl distribution App-renlikewd), released on 2023-11-23.
 
 =head1 SYNOPSIS
 
@@ -107,7 +137,7 @@ This document describes version 0.002 of renlikewd (from Perl distribution App-r
 
     % pwd
     /home/u1/Some Project/Some Rather Long Title
-    % renlikewd foo.jpg; # foo.jpg now becomes "Some Rather Long Title.jpg"
+    % renlikewd --no-dry-run foo.jpg; # foo.jpg now becomes "Some Rather Long Title.jpg"
 
 Here's what I now often have to do: put some file under a subdirectory with the
 same name as the file (sans the extension), with the name being quite long. I
@@ -119,6 +149,11 @@ Alt-Enter because one of the pane is already inside the directory.
 
 This utility helps.
 
+Note that this utility can default to the only file in the current directory (if
+there are only a single file and zero or more directories and nothing else), so
+to minimize surprise, the default mode is dry-run. Supply C<--no-dry-run> to turn
+off dry-run mode.
+
 =head1 OPTIONS
 
 C<*> marks required options.
@@ -127,11 +162,27 @@ C<*> marks required options.
 
 =over
 
-=item B<--file>=I<s>*
+=item B<--file>=I<s>
+
+(No description)
+
 
 Can also be specified as the 1st command-line argument.
 
 =item B<--overwrite>, B<-O>
+
+(No description)
+
+
+=item B<--parents>=I<s>
+
+Instead of working directory, use its parent directory (if parents=1) or grandparent directory (if parents=2) and so on.
+
+=item B<-p>
+
+Shortcut for --parents=1.
+
+See C<--parents>.
 
 =back
 
@@ -143,13 +194,37 @@ Can also be specified as the 1st command-line argument.
 
 Set path to configuration file.
 
+Can actually be specified multiple times to instruct application to read from
+multiple configuration files (and merge them).
+
+
 =item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
 
+A single configuration file can contain profiles, i.e. alternative sets of
+values that can be selected. For example:
+
+ [profile=dev]
+ username=foo
+ pass=beaver
+ 
+ [profile=production]
+ username=bar
+ pass=honey
+
+When you specify C<--config-profile=dev>, C<username> will be set to C<foo> and
+C<password> to C<beaver>. When you specify C<--config-profile=production>,
+C<username> will be set to C<bar> and C<password> to C<honey>.
+
+
 =item B<--no-config>, B<-C>
 
 Do not use any configuration file.
+
+If you specify C<--no-config>, the application will not read any configuration
+file.
+
 
 =back
 
@@ -160,6 +235,47 @@ Do not use any configuration file.
 =item B<--no-env>
 
 Do not read environment for default options.
+
+If you specify C<--no-env>, the application wil not read any environment
+variable.
+
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+By default, these log levels are available (in order of increasing level of
+importance, from least important to most): C<trace>, C<debug>, C<info>,
+C<warn>/C<warning>, C<error>, C<fatal>. By default, the level is usually set to
+C<warn>, which means that log statements with level C<info> and less important
+levels will not be shown. To increase verbosity, choose C<info>, C<debug>, or
+C<trace>.
+
+For more details on log level and logging, as well as how new logging levels can
+be defined or existing ones modified, see L<Log::ger>.
+
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
 
 =back
 
@@ -175,6 +291,12 @@ Default value:
 
  undef
 
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
 =item B<--json>
 
 Set output format to json.
@@ -189,24 +311,33 @@ Default value:
 
 By default, when outputing as JSON, the full enveloped result is returned, e.g.:
 
-    [200,"OK",[1,2,3],{"func.extra"=>4}]
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
 
 The reason is so you can get the status (1st element), status message (2nd
 element) as well as result metadata/extra result (4th element) instead of just
 the result (3rd element). However, sometimes you want just the result, e.g. when
 you want to pipe the result for more post-processing. In this case you can use
-`--naked-res` so you just get:
+C<--naked-res> so you just get:
 
-    [1,2,3]
+ [1,2,3]
 
 
 =item B<--page-result>
 
 Filter output through a pager.
 
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
 =item B<--view-result>
 
 View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
 
 =back
 
@@ -217,6 +348,10 @@ View output using a viewer.
 =item B<--help>, B<-h>, B<-?>
 
 Display help message and exit.
+
+=item B<--no-dry-run>, B<-N>
+
+Disable simulation mode (also via DRY_RUN=0).
 
 =item B<--version>, B<-v>
 
@@ -262,7 +397,7 @@ For fish and zsh, install L<shcompgen> as described above.
 
 This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
 
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/renlikewd.conf>, F<~/renlikewd.conf>, or F</etc/renlikewd.conf>.
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/renlikewd.conf>, F</home/u1/renlikewd.conf>, or F</etc/renlikewd.conf>.
 
 All found files will be read and merged.
 
@@ -293,22 +428,24 @@ List of available configuration parameters:
 
  file (see --file)
  format (see --format)
+ log_level (see --log-level)
  naked_res (see --naked-res)
  overwrite (see --overwrite)
+ parents (see --parents)
 
 =head1 ENVIRONMENT
 
-=head2 RENLIKEWD_OPT => str
+=head2 RENLIKEWD_OPT
 
-Specify additional command-line options.
+String. Specify additional command-line options.
 
 =head1 FILES
 
-F<~/.config/renlikewd.conf>
+=head2 /home/u1/.config/renlikewd.conf
 
-F<~/renlikewd.conf>
+=head2 /home/u1/renlikewd.conf
 
-F</etc/renlikewd.conf>
+=head2 /etc/renlikewd.conf
 
 =head1 HOMEPAGE
 
@@ -339,13 +476,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

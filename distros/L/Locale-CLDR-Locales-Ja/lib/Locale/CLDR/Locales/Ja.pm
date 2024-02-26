@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ja - Package for language Japanese
 
 package Locale::CLDR::Locales::Ja;
 # This file auto generated from Data\common\main\ja.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -449,22 +449,6 @@ has 'algorithmic_number_format_data' => (
     } },
 );
 
-# Need to add code for Key type pattern
-sub display_name_pattern {
-	my ($self, $name, $region, $script, $variant) = @_;
-
-	my $display_pattern = '{0} ({1})';
-	$display_pattern =~s/\{0\}/$name/g;
-	my $subtags = join '{0}、{1}', grep {$_} (
-		$region,
-		$script,
-		$variant,
-	);
-
-	$display_pattern =~s/\{1\}/$subtags/g;
-	return $display_pattern;
-}
-
 has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
@@ -493,6 +477,7 @@ has 'display_name_language' => (
  				'am' => 'アムハラ語',
  				'an' => 'アラゴン語',
  				'ang' => '古英語',
+ 				'ann' => 'オボロ語',
  				'anp' => 'アンギカ語',
  				'ar' => 'アラビア語',
  				'ar_001' => '現代標準アラビア語',
@@ -510,6 +495,7 @@ has 'display_name_language' => (
  				'asa' => 'アス語',
  				'ase' => 'アメリカ手話',
  				'ast' => 'アストゥリアス語',
+ 				'atj' => 'アティカメク語',
  				'av' => 'アヴァル語',
  				'avk' => 'コタヴァ',
  				'awa' => 'アワディー語',
@@ -532,6 +518,7 @@ has 'display_name_language' => (
  				'bfd' => 'バフット語',
  				'bfq' => 'バダガ語',
  				'bg' => 'ブルガリア語',
+ 				'bgc' => 'ハリヤーンウィー語',
  				'bgn' => '西バローチー語',
  				'bho' => 'ボージュプリー語',
  				'bi' => 'ビスラマ語',
@@ -578,14 +565,22 @@ has 'display_name_language' => (
  				'ckb' => '中央クルド語',
  				'ckb@alt=menu' => 'クルド語（中央）',
  				'ckb@alt=variant' => 'クルド語（ソラニー）',
+ 				'clc' => 'チルコーティン語',
  				'co' => 'コルシカ語',
  				'cop' => 'コプト語',
  				'cps' => 'カピス語',
  				'cr' => 'クリー語',
+ 				'crg' => 'ミチフ語',
  				'crh' => 'クリミア・タタール語',
+ 				'crj' => '東部クリー語(南部)',
+ 				'crk' => '平原クリー語',
+ 				'crl' => '東部クリー語(北部)',
+ 				'crm' => 'ムースクリー語',
+ 				'crr' => 'カロライナ・アルゴンキン語',
  				'crs' => 'セーシェル・クレオール語',
  				'cs' => 'チェコ語',
  				'csb' => 'カシューブ語',
+ 				'csw' => '湿原クリー語',
  				'cu' => '教会スラブ語',
  				'cv' => 'チュヴァシ語',
  				'cy' => 'ウェールズ語',
@@ -686,8 +681,10 @@ has 'display_name_language' => (
  				'hai' => 'ハイダ語',
  				'hak' => '客家語',
  				'haw' => 'ハワイ語',
+ 				'hax' => '南部ハイダ語',
  				'he' => 'ヘブライ語',
  				'hi' => 'ヒンディー語',
+ 				'hi_Latn@alt=variant' => 'インド英語 (ヒングリッシュ)',
  				'hif' => 'フィジー・ヒンディー語',
  				'hil' => 'ヒリガイノン語',
  				'hit' => 'ヒッタイト語',
@@ -699,6 +696,7 @@ has 'display_name_language' => (
  				'ht' => 'ハイチ・クレオール語',
  				'hu' => 'ハンガリー語',
  				'hup' => 'フパ語',
+ 				'hur' => 'ハルコメレム語',
  				'hy' => 'アルメニア語',
  				'hz' => 'ヘレロ語',
  				'ia' => 'インターリングア',
@@ -709,6 +707,7 @@ has 'display_name_language' => (
  				'ig' => 'イボ語',
  				'ii' => '四川イ語',
  				'ik' => 'イヌピアック語',
+ 				'ikt' => 'イヌイナクトゥン語',
  				'ilo' => 'イロカノ語',
  				'inh' => 'イングーシ語',
  				'io' => 'イド語',
@@ -775,6 +774,7 @@ has 'display_name_language' => (
  				'kut' => 'クテナイ語',
  				'kv' => 'コミ語',
  				'kw' => 'コーンウォール語',
+ 				'kwk' => 'クヮキゥワラ語',
  				'ky' => 'キルギス語',
  				'la' => 'ラテン語',
  				'lad' => 'ラディノ語',
@@ -787,6 +787,7 @@ has 'display_name_language' => (
  				'lg' => 'ガンダ語',
  				'li' => 'リンブルフ語',
  				'lij' => 'リグリア語',
+ 				'lil' => 'リルエット語',
  				'liv' => 'リヴォニア語',
  				'lkt' => 'ラコタ語',
  				'lmo' => 'ロンバルド語',
@@ -796,6 +797,7 @@ has 'display_name_language' => (
  				'lou' => 'ルイジアナ・クレオール語',
  				'loz' => 'ロジ語',
  				'lrc' => '北ロル語',
+ 				'lsm' => 'サーミア語',
  				'lt' => 'リトアニア語',
  				'ltg' => 'ラトガリア語',
  				'lu' => 'ルバ・カタンガ語',
@@ -834,6 +836,7 @@ has 'display_name_language' => (
  				'mn' => 'モンゴル語',
  				'mnc' => '満州語',
  				'mni' => 'マニプリ語',
+ 				'moe' => 'イヌー＝アイムン語',
  				'moh' => 'モーホーク語',
  				'mos' => 'モシ語',
  				'mr' => 'マラーティー語',
@@ -885,6 +888,11 @@ has 'display_name_language' => (
  				'nzi' => 'ンゼマ語',
  				'oc' => 'オック語',
  				'oj' => 'オジブウェー語',
+ 				'ojb' => '北西部オジブワ語',
+ 				'ojc' => '中部オジブワ語',
+ 				'ojs' => 'セヴァーン・オジブワ語',
+ 				'ojw' => '西部オジブワ語',
+ 				'oka' => 'オカナガン語',
  				'om' => 'オロモ語',
  				'or' => 'オディア語',
  				'os' => 'オセット語',
@@ -904,10 +912,12 @@ has 'display_name_language' => (
  				'pfl' => 'プファルツ語',
  				'phn' => 'フェニキア語',
  				'pi' => 'パーリ語',
+ 				'pis' => 'ピジン語',
  				'pl' => 'ポーランド語',
  				'pms' => 'ピエモンテ語',
  				'pnt' => 'ポントス・ギリシャ語',
  				'pon' => 'ポンペイ語',
+ 				'pqm' => 'マリシート＝パサマコディ語',
  				'prg' => 'プロシア語',
  				'pro' => '古期プロバンス語',
  				'ps' => 'パシュトゥー語',
@@ -969,6 +979,7 @@ has 'display_name_language' => (
  				'sid' => 'シダモ語',
  				'sk' => 'スロバキア語',
  				'sl' => 'スロベニア語',
+ 				'slh' => '南部ルシュツィード語',
  				'sli' => '低シレジア語',
  				'sly' => 'スラヤール語',
  				'sm' => 'サモア語',
@@ -988,6 +999,7 @@ has 'display_name_language' => (
  				'ssy' => 'サホ語',
  				'st' => '南部ソト語',
  				'stq' => 'ザーターフリジア語',
+ 				'str' => 'ストレイツセイリッシュ語',
  				'su' => 'スンダ語',
  				'suk' => 'スクマ語',
  				'sus' => 'スス語',
@@ -1000,6 +1012,7 @@ has 'display_name_language' => (
  				'syr' => 'シリア語',
  				'szl' => 'シレジア語',
  				'ta' => 'タミル語',
+ 				'tce' => '南部トゥショーニ語',
  				'tcy' => 'トゥル語',
  				'te' => 'テルグ語',
  				'tem' => 'テムネ語',
@@ -1007,7 +1020,9 @@ has 'display_name_language' => (
  				'ter' => 'テレーノ語',
  				'tet' => 'テトゥン語',
  				'tg' => 'タジク語',
+ 				'tgx' => 'タギシュ語',
  				'th' => 'タイ語',
+ 				'tht' => 'タールタン語',
  				'ti' => 'ティグリニア語',
  				'tig' => 'ティグレ語',
  				'tiv' => 'ティブ語',
@@ -1022,6 +1037,7 @@ has 'display_name_language' => (
  				'tn' => 'ツワナ語',
  				'to' => 'トンガ語',
  				'tog' => 'トンガ語(ニアサ)',
+ 				'tok' => 'トキポナ語',
  				'tpi' => 'トク・ピシン語',
  				'tr' => 'トルコ語',
  				'tru' => 'トゥロヨ語',
@@ -1030,6 +1046,7 @@ has 'display_name_language' => (
  				'tsd' => 'ツァコン語',
  				'tsi' => 'チムシュ語',
  				'tt' => 'タタール語',
+ 				'ttm' => '北部トゥショーニ語',
  				'ttt' => 'ムスリム・タタール語',
  				'tum' => 'トゥンブカ語',
  				'tvl' => 'ツバル語',
@@ -1112,7 +1129,8 @@ has 'display_name_script' => (
 	default		=> sub {
 		sub {
 			my %scripts = (
-			'Afak' => 'アファカ文字',
+			'Adlm' => 'アドラム文字',
+ 			'Afak' => 'アファカ文字',
  			'Aghb' => 'カフカス・アルバニア文字',
  			'Arab' => 'アラビア文字',
  			'Arab@alt=variant' => 'ペルソ・アラビア文字',
@@ -1234,6 +1252,7 @@ has 'display_name_script' => (
  			'Plrd' => 'ポラード音声記号',
  			'Prti' => '碑文パルティア文字',
  			'Rjng' => 'ルジャン文字',
+ 			'Rohg' => 'ロヒンギャ文字',
  			'Roro' => 'ロンゴロンゴ文字',
  			'Runr' => 'ルーン文字',
  			'Samr' => 'サマリア文字',
@@ -1450,6 +1469,7 @@ has 'display_name_region' => (
  			'IM' => 'マン島',
  			'IN' => 'インド',
  			'IO' => '英領インド洋地域',
+ 			'IO@alt=chagos' => 'チャゴス諸島',
  			'IQ' => 'イラク',
  			'IR' => 'イラン',
  			'IS' => 'アイスランド',
@@ -1516,6 +1536,7 @@ has 'display_name_region' => (
  			'NR' => 'ナウル',
  			'NU' => 'ニウエ',
  			'NZ' => 'ニュージーランド',
+ 			'NZ@alt=variant' => 'アオテアロア・ニュージーランド',
  			'OM' => 'オマーン',
  			'PA' => 'パナマ',
  			'PE' => 'ペルー',
@@ -1575,6 +1596,7 @@ has 'display_name_region' => (
  			'TN' => 'チュニジア',
  			'TO' => 'トンガ',
  			'TR' => 'トルコ',
+ 			'TR@alt=variant' => 'テュルキエ',
  			'TT' => 'トリニダード・トバゴ',
  			'TV' => 'ツバル',
  			'TW' => '台湾',
@@ -1728,7 +1750,7 @@ has 'display_name_type' => (
  				'hebrew' => q{ユダヤ暦},
  				'indian' => q{インド国定暦},
  				'islamic' => q{イスラム暦},
- 				'islamic-civil' => q{イスラム歴(定周期、公民紀元)},
+ 				'islamic-civil' => q{イスラム暦(定周期、公民紀元)},
  				'islamic-rgsa' => q{イスラム暦(サウジアラビア、月観測)},
  				'islamic-tbla' => q{イスラム歴(定周期、天文紀元)},
  				'islamic-umalqura' => q{イスラム暦(ウンム・アルクラー)},
@@ -1924,9 +1946,8 @@ has 'characters' => (
 		return {
 			auxiliary => qr{[丑 亥 亨 兌 兎 凧 剃 卯 嘉 嘔 嘘 壬 壺 嬉 寅 巳 庚 庵 弘 彗 悶 愕 戊 戌 拼 揃 斧 昌 杖 桶 梵 楔 湘 焚 燭 爬 牌 牝 牡 狐 狗 狼 猪 獅 癸 瞑 碇 祚 禄 禎 秤 竿 絆 繍 罫 膏 芒 蟄 蟹 蠍 蠣 贛 蹄 辰 酉 鋲 錄 錨 閏 閩 雀 雉 鳳 鼠 龍]},
 			index => ['あ', 'か', 'さ', 'た', 'な', 'は', 'ま', 'や', 'ら', 'わ'],
-			main => qr{[々 ゝヽ ゞヾ ー ぁァ あア ぃィ いイ ぅゥ うウ ヴ ぇェ えエ ぉォ おオ ヵ かカ がガ きキ ぎギ くク ぐグ ヶ けケ げゲ こコ ごゴ さサ ざザ しシ じジ すス ずズ せセ ぜゼ そソ ぞゾ たタ だダ ちチ ぢヂ っッ つツ づヅ てテ でデ とト どド なナ にニ ぬヌ ねネ のノ はハ ばバ ぱパ ひヒ びビ ぴピ ふフ ぶブ ぷプ へヘ べベ ぺペ ほホ ぼボ ぽポ まマ みミ むム めメ もモ ゃャ やヤ ゅュ ゆユ ょョ よヨ らラ りリ るル れレ ろロ ゎヮ わワ ゐヰ ゑヱ をヲ んン 一 丁 七 万-下 不 与 且 世 丘 丙 両 並 中 串 丸 丹 主 丼 久 乏 乗 乙 九 乞 乱 乳 乾 亀 了 予 争 事 二 互 五 井 亜 亡 交 享-亭 人 仁 今 介 仏 仕 他 付 仙 代-以 仮 仰 仲 件 任 企 伎-休 会 伝 伯 伴 伸 伺 似 但 位-佐 体 何 余 作 佳 併 使 例 侍 供 依 価 侮 侯 侵 侶 便 係 促 俊 俗 保 信 修 俳 俵 俸 俺 倉 個 倍 倒 候 借 倣 値 倫 倹 偉 偏 停 健 側-偶 偽 傍 傑 傘 備 催 傲 債 傷 傾 僅 働 像 僕 僚 僧 儀 億 儒 償 優 元-兆 先 光 克 免 児 党 入 全 八-六 共 兵 具 典 兼 内 円 冊 再 冒 冗 写 冠 冥 冬 冶 冷 凄 准 凍 凝 凡 処 凶 凸-出 刀 刃 分-刈 刊 刑 列 初 判 別 利 到 制-刻 則 削 前 剖 剛 剣-剥 副 剰 割 創 劇 力 功 加 劣 助 努 励 労 効 劾 勃 勅 勇 勉 動 勘 務 勝 募 勢 勤 勧 勲 勾 匂 包 化 北 匠 匹-医 匿 十 千 升 午 半 卑-協 南 単 博 占 印 危 即-卵 卸 厄 厘 厚 原 厳 去 参 又 及-収 叔 取 受 叙 口-句 叫 召 可-右 号 司 各 合 吉 同-向 君 吟 否 含 吸 吹 呂 呈-告 周 呪 味 呼 命 和 咲 咽 哀 品 員 哲 哺 唄 唆 唇 唐 唯 唱 唾 商 問 啓 善 喉 喚 喜 喝 喩-喫 営 嗅 嗣 嘆 嘱 嘲 器 噴 嚇 囚 四 回 因 団 困 囲 図 固 国 圏 園 土 圧 在 地 坂 均 坊 坑 坪 垂 型 垣 埋 城 域 執 培 基 埼 堀 堂 堅 堆 堕 堤 堪 報 場 塀 塁 塊 塑 塔 塗 塚 塞 塩 填 塾 境 墓 増 墜 墨 墳 墾 壁 壇 壊 壌 士 壮 声-売 変 夏 夕 外 多 夜 夢 大 天-夫 央 失 奇-奉 奏 契 奔 奥 奨 奪 奮 女 奴 好 如-妄 妊 妖 妙 妥 妨 妬 妹 妻 姉 始 姓 委 姫 姻 姿 威 娘 娠 娯 婆 婚 婦 婿 媒 媛 嫁 嫉 嫌 嫡 嬢 子 孔 字 存 孝 季 孤 学 孫 宅 宇-安 完 宗-宝 実 客-室 宮 宰 害-家 容 宿 寂 寄 密 富 寒 寛 寝 察 寡 寧 審 寮 寸 寺 対 寿 封 専 射 将 尉-尋 導 小 少 尚 就 尺-局 居 屈 届 屋 展 属 層 履 屯 山 岐 岡 岩 岬 岳 岸 峠 峡 峰 島 崇 崎 崖 崩 嵐 川 州 巡 巣 工-巨 差 己 巻 巾 市 布 帆 希 帝 帥 師 席 帯 帰 帳 常 帽 幅 幕 幣 干-年 幸 幹 幻-幾 庁 広 床 序 底 店 府 度 座 庫 庭 庶-庸 廃 廉 廊 延 廷 建 弁 弄 弊 式 弐 弓-引 弟 弥-弧 弱 張 強 弾 当 彙 形 彩 彫 彰 影 役 彼 往 征 径 待 律 後 徐 徒 従 得 御 復 循 微 徳 徴 徹 心 必 忌 忍 志-忙 応 忠 快 念 怒 怖 思 怠 急 性 怨 怪 恋 恐 恒 恣 恥 恨 恩 恭 息 恵 悔 悟 悠 患 悦 悩 悪 悲 悼 情 惑 惜 惧 惨 惰 想 愁 愉 意 愚 愛 感 慄 慈 態 慌 慎 慕 慢 慣 慨 慮 慰 慶 憂 憎 憤 憧 憩 憬 憲 憶 憾 懇 懐 懲 懸 成-戒 戚 戦 戯 戴 戸 戻 房 所 扇 扉 手 才 打 払 扱 扶 批 承 技 抄 把 抑 投 抗 折 抜 択 披 抱 抵 抹 押 抽 担 拉 拍 拐 拒 拓 拘 拙 招 拝 拠 拡 括 拭 拳 拶 拷 拾 持 指 挑 挙 挟 挨 挫 振 挿 捉 捕 捗 捜 捨 据 捻 掃 授 掌 排 掘 掛 採 探 接 控 推 措 掲 描 提 揚 換 握 揮 援 揺 損 搬 搭 携 搾 摂 摘 摩 摯 撃 撤 撮 撲 擁 操 擦 擬 支 改 攻 放 政 故 敏 救 敗 教 敢 散 敬 数 整 敵 敷 文 斉 斎 斑 斗 料 斜 斤 斥 斬 断 新 方 施 旅 旋 族 旗 既 日-早 旬 旺 昆 昇 明 易 昔 星 映 春 昧 昨 昭 是 昼 時 晩 普 景 晴 晶 暁 暇 暑 暖 暗 暦 暫 暮 暴 曇 曖 曜 曲 更 書 曹 曽 替 最 月 有 服 朕 朗 望 朝 期 木 未-札 朱 朴 机 朽 杉 材 村 束 条 来 杯 東 松 板 析 枕 林 枚 果 枝 枠 枢 枯 架 柄 某 染 柔 柱 柳 柵 査 柿 栃 栄 栓 校 株 核 根 格 栽 桁 桃 案 桑 桜 桟 梅 梗 梨 械 棄 棋 棒 棚 棟 森 棺 椅 植 椎 検 業 極 楷 楼 楽 概 構 様 槽 標 模 権 横 樹 橋 機 欄 欠 次 欧 欲 欺 款 歌 歓 止 正 武 歩 歯 歳 歴 死 殉-残 殖 殴 段 殺 殻 殿 毀 母 毎 毒 比 毛 氏 民 気 水 氷 永 氾 汁 求 汎 汗 汚 江 池 汰 決 汽 沃 沈 沖 沙 没 沢 河 沸 油 治 沼 沿 況 泉 泊 泌 法 泡-泣 泥 注 泰 泳 洋 洗 洞 津 洪 活 派 流 浄 浅 浜 浦 浪 浮 浴 海 浸 消 涙 涯 液 涼 淑 淡 淫 深 混 添 清 渇-渉 渋 渓 減 渡 渦 温 測 港 湖 湧 湯 湾-満 源 準 溝 溶 溺 滅 滋 滑 滝 滞 滴 漁 漂 漆 漏 演 漠 漢 漫 漬 漸 潔 潜 潟 潤 潮 潰 澄 激 濁 濃 濫 濯 瀬 火 灯 灰 災 炉 炊 炎 炭 点 為 烈 無 焦 然 焼 煎 煙 照 煩 煮 熊 熟 熱 燃 燥 爆 爪 爵 父 爽 片 版 牙 牛 牧 物 牲 特 犠 犬 犯 状 狂 狙 狩 独 狭 猛 猟 猫 献 猶 猿 獄 獣 獲 玄 率 玉 王 玩 珍 珠 班 現 球 理 琴 瑠 璃 璧 環 璽 瓦 瓶 甘 甚 生 産 用 田-申 男 町 画 界 畏 畑 畔 留 畜 畝 略 番 異 畳 畿 疎 疑 疫 疲 疾 病 症 痕 痘 痛 痢 痩 痴 瘍 療 癒 癖 発 登 白 百 的 皆 皇 皮 皿 盆 益 盗 盛 盟 監 盤 目 盲 直 相 盾 省 眉 看 県 真 眠 眺 眼 着 睡 督 睦 瞬 瞭 瞳 矛 矢 知 短 矯 石 砂 研 砕 砲 破 硝 硫 硬 碁 碑 確 磁 磨 礁 礎 示 礼 社 祈 祉 祖 祝 神 祥 票 祭 禁 禅 禍 福 秀 私 秋 科 秒 秘 租 秩 称 移 程 税 稚 種 稲 稼 稽 稿 穀 穂 積 穏 穫 穴 究 空 突 窃 窒 窓 窟 窮 窯 立 竜 章 童 端 競 竹 笑 笛 符 第 筆 等 筋 筒 答 策 箇 箋 算 管 箱 箸 節 範 築 篤 簡 簿 籍 籠 米 粉 粋 粒 粗 粘 粛 粧 精 糖 糧 糸 系 糾 紀 約 紅 紋 納 純 紙-紛 素-索 紫 累 細 紳 紹 紺 終 組 経 結 絞 絡 給 統 絵 絶 絹 継 続 維 綱 網 綻 綿 緊 総 緑 緒 線 締 編 緩 緯 練 緻 縁 縄 縛 縦 縫 縮 績 繁 繊 織 繕 繭 繰 缶 罪 置 罰 署 罵 罷 羅 羊 美 羞 群 羨 義 羽 翁 翌 習 翻 翼 老 考 者 耐 耕 耗 耳 聖 聞 聴 職 肉 肌 肖 肘 肝 股 肢 肥 肩 肪 肯 育 肺 胃 胆 背 胎 胞 胴 胸 能 脂 脅 脇 脈 脊 脚 脱 脳 腎 腐 腕 腫 腰 腸-腺 膚 膜 膝 膨 膳 臆 臓 臣 臨 自 臭 至 致 臼 興 舌 舎 舗 舞 舟 航 般 舶 舷 船 艇 艦 良 色 艶 芋 芝 芯 花 芳 芸 芽 苗 苛 若 苦 英 茂 茎 茨 茶 草 荒 荘 荷 菊 菌 菓 菜 華 萎 落 葉 著 葛 葬 蒸 蓄 蓋 蔑 蔵 蔽 薄 薦 薪-薬 藍 藤 藩 藻 虎 虐 虚 虜 虞 虫 虹 蚊 蚕 蛇 蛍 蛮 蜂 蜜 融 血 衆 行 術 街 衛 衝 衡 衣 表 衰 衷 袋 袖 被 裁 裂 装 裏 裕 補 裸 製 裾 複 褐 褒 襟 襲 西 要 覆 覇 見 規 視 覚 覧 親 観 角 解 触 言 訂 訃 計 討 訓 託 記 訟 訪 設 許 訳 訴 診 証 詐 詔 評 詞 詠 詣 試 詩 詮 詰-詳 誇 誉 誌 認 誓 誕 誘 語 誠 誤 説 読 誰 課 調 談 請 論 諦 諧 諭 諮 諸 諾 謀 謁 謄 謎 謙 講 謝 謡 謹 識 譜 警 議 譲 護 谷 豆 豊 豚 象 豪 貌 貝 貞 負-貢 貧-責 貯 貴 買 貸 費 貼 貿 賀 賂-賄 資 賊 賓 賛 賜 賞 賠 賢 賦 質 賭 購 贈 赤 赦 走 赴 起 超 越 趣 足 距 跡 路 跳 践 踊 踏 踪 蹴 躍 身 車 軌 軍 軒 軟 転 軸 軽 較 載 輝 輩 輪 輸 轄 辛 辞 辣 辱 農 辺 込 迅 迎 近 返 迫 迭 述 迷 追 退 送 逃 逆 透 逐 逓 途 通 逝 速 造 連 逮 週 進 逸 遂 遅 遇 遊 運 遍 過 道-違 遜 遠 遡 遣 適 遭 遮 遵 遷 選 遺 避 還 那 邦 邪 邸 郊 郎 郡 部 郭 郵 郷 都 酌-酎 酒 酔 酢 酪 酬 酵 酷 酸 醒 醜 醸 采 釈 里-量 金 釜 針 釣 鈍 鈴 鉄 鉛 鉢 鉱 銀 銃 銅 銘 銭 鋭 鋳 鋼 錠 錦 錬 錮 錯 録 鍋 鍛 鍵 鎌 鎖 鎮 鏡 鐘 鑑 長 門 閉 開 閑 間 関 閣 閥 閲 闇 闘 阜 阪 防 阻 附 降 限 陛 院-陥 陪 陰 陳 陵 陶 陸 険 陽 隅 隆 隊 階 随 隔 隙 際 障 隠 隣 隷 隻 雄-雇 雌 雑 離 難 雨 雪 雰 雲 零 雷 電 需 震 霊 霜 霧 露 青 静 非 面 革 靴 韓 音 韻 響 頂 頃 項 順 須 預-頓 領 頬 頭 頻 頼 題-顎 顔 顕 願 類 顧 風 飛 食 飢 飯 飲 飼-飾 餅 養 餌 餓 館 首 香 馬 駄-駆 駐 駒 騎 騒 験 騰 驚 骨 骸 髄 高 髪 鬱 鬼 魂 魅 魔 魚 鮮 鯨 鳥 鳴 鶏 鶴 鹿 麓 麗 麦 麺 麻 黄 黒 黙 鼓 鼻 齢]},
-			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
-			punctuation => qr{[‾ _＿ \-－ ‐ ‑ — ― 〜 ・ ･ ,， 、､ ;； \:： !！ ?？ .． ‥ … 。｡ ＇ ‘ ’ "＂ “ ” (（ )） \[［ \]］ \N{U+FF5B}｝ 〈 〉 《 》 「｢ 」｣ 『 』 【 】 〔 〕 ‖ § ¶ @＠ *＊ /／ \\＼ \&＆ #＃ %％ ‰ † ‡ ′ ″ 〃 ※]},
+			main => qr{[々 ゝヽゞヾ ー ぁァあア ぃィいイ ぅゥうウヴ ぇェえエ ぉォおオ ヵかカがガ きキぎギ くクぐグ ヶけケげゲ こコごゴ さサざザ しシじジ すスずズ せセぜゼ そソぞゾ たタだダ ちチぢヂ っッつツづヅ てテでデ とトどド なナ にニ ぬヌ ねネ のノ はハばバぱパ ひヒびビぴピ ふフぶブぷプ へヘべベぺペ ほホぼボぽポ まマ みミ むム めメ もモ ゃャやヤ ゅュゆユ ょョよヨ らラ りリ るル れレ ろロ ゎヮわワ ゐヰ ゑヱ をヲ んン 一 丁 七 万 丈 三 上 下 不 与 且 世 丘 丙 両 並 中 串 丸 丹 主 丼 久 乏 乗 乙 九 乞 乱 乳 乾 亀 了 予 争 事 二 互 五 井 亜 亡 交 享 京 亭 人 仁 今 介 仏 仕 他 付 仙 代 令 以 仮 仰 仲 件 任 企 伎 伏 伐 休 会 伝 伯 伴 伸 伺 似 但 位 低 住 佐 体 何 余 作 佳 併 使 例 侍 供 依 価 侮 侯 侵 侶 便 係 促 俊 俗 保 信 修 俳 俵 俸 俺 倉 個 倍 倒 候 借 倣 値 倫 倹 偉 偏 停 健 側 偵 偶 偽 傍 傑 傘 備 催 傲 債 傷 傾 僅 働 像 僕 僚 僧 儀 億 儒 償 優 元 兄 充 兆 先 光 克 免 児 党 入 全 八 公 六 共 兵 具 典 兼 内 円 冊 再 冒 冗 写 冠 冥 冬 冶 冷 凄 准 凍 凝 凡 処 凶 凸 凹 出 刀 刃 分 切 刈 刊 刑 列 初 判 別 利 到 制 刷 券 刹 刺 刻 則 削 前 剖 剛 剣 剤 剥 副 剰 割 創 劇 力 功 加 劣 助 努 励 労 効 劾 勃 勅 勇 勉 動 勘 務 勝 募 勢 勤 勧 勲 勾 匂 包 化 北 匠 匹 区 医 匿 十 千 升 午 半 卑 卒 卓 協 南 単 博 占 印 危 即 却 卵 卸 厄 厘 厚 原 厳 去 参 又 及 友 双 反 収 叔 取 受 叙 口 古 句 叫 召 可 台 叱 史 右 号 司 各 合 吉 同 名 后 吏 吐 向 君 吟 否 含 吸 吹 呂 呈 呉 告 周 呪 味 呼 命 和 咲 咽 哀 品 員 哲 哺 唄 唆 唇 唐 唯 唱 唾 商 問 啓 善 喉 喚 喜 喝 喩 喪 喫 営 嗅 嗣 嘆 嘱 嘲 器 噴 嚇 囚 四 回 因 団 困 囲 図 固 国 圏 園 土 圧 在 地 坂 均 坊 坑 坪 垂 型 垣 埋 城 域 執 培 基 埼 堀 堂 堅 堆 堕 堤 堪 報 場 塀 塁 塊 塑 塔 塗 塚 塞 塩 填 塾 境 墓 増 墜 墨 墳 墾 壁 壇 壊 壌 士 壮 声 壱 売 変 夏 夕 外 多 夜 夢 大 天 太 夫 央 失 奇 奈 奉 奏 契 奔 奥 奨 奪 奮 女 奴 好 如 妃 妄 妊 妖 妙 妥 妨 妬 妹 妻 姉 始 姓 委 姫 姻 姿 威 娘 娠 娯 婆 婚 婦 婿 媒 媛 嫁 嫉 嫌 嫡 嬢 子 孔 字 存 孝 季 孤 学 孫 宅 宇 守 安 完 宗 官 宙 定 宛 宜 宝 実 客 宣 室 宮 宰 害 宴 宵 家 容 宿 寂 寄 密 富 寒 寛 寝 察 寡 寧 審 寮 寸 寺 対 寿 封 専 射 将 尉 尊 尋 導 小 少 尚 就 尺 尻 尼 尽 尾 尿 局 居 屈 届 屋 展 属 層 履 屯 山 岐 岡 岩 岬 岳 岸 峠 峡 峰 島 崇 崎 崖 崩 嵐 川 州 巡 巣 工 左 巧 巨 差 己 巻 巾 市 布 帆 希 帝 帥 師 席 帯 帰 帳 常 帽 幅 幕 幣 干 平 年 幸 幹 幻 幼 幽 幾 庁 広 床 序 底 店 府 度 座 庫 庭 庶 康 庸 廃 廉 廊 延 廷 建 弁 弄 弊 式 弐 弓 弔 引 弟 弥 弦 弧 弱 張 強 弾 当 彙 形 彩 彫 彰 影 役 彼 往 征 径 待 律 後 徐 徒 従 得 御 復 循 微 徳 徴 徹 心 必 忌 忍 志 忘 忙 応 忠 快 念 怒 怖 思 怠 急 性 怨 怪 恋 恐 恒 恣 恥 恨 恩 恭 息 恵 悔 悟 悠 患 悦 悩 悪 悲 悼 情 惑 惜 惧 惨 惰 想 愁 愉 意 愚 愛 感 慄 慈 態 慌 慎 慕 慢 慣 慨 慮 慰 慶 憂 憎 憤 憧 憩 憬 憲 憶 憾 懇 懐 懲 懸 成 我 戒 戚 戦 戯 戴 戸 戻 房 所 扇 扉 手 才 打 払 扱 扶 批 承 技 抄 把 抑 投 抗 折 抜 択 披 抱 抵 抹 押 抽 担 拉 拍 拐 拒 拓 拘 拙 招 拝 拠 拡 括 拭 拳 拶 拷 拾 持 指 挑 挙 挟 挨 挫 振 挿 捉 捕 捗 捜 捨 据 捻 掃 授 掌 排 掘 掛 採 探 接 控 推 措 掲 描 提 揚 換 握 揮 援 揺 損 搬 搭 携 搾 摂 摘 摩 摯 撃 撤 撮 撲 擁 操 擦 擬 支 改 攻 放 政 故 敏 救 敗 教 敢 散 敬 数 整 敵 敷 文 斉 斎 斑 斗 料 斜 斤 斥 斬 断 新 方 施 旅 旋 族 旗 既 日 旦 旧 旨 早 旬 旺 昆 昇 明 易 昔 星 映 春 昧 昨 昭 是 昼 時 晩 普 景 晴 晶 暁 暇 暑 暖 暗 暦 暫 暮 暴 曇 曖 曜 曲 更 書 曹 曽 替 最 月 有 服 朕 朗 望 朝 期 木 未 末 本 札 朱 朴 机 朽 杉 材 村 束 条 来 杯 東 松 板 析 枕 林 枚 果 枝 枠 枢 枯 架 柄 某 染 柔 柱 柳 柵 査 柿 栃 栄 栓 校 株 核 根 格 栽 桁 桃 案 桑 桜 桟 梅 梗 梨 械 棄 棋 棒 棚 棟 森 棺 椅 植 椎 検 業 極 楷 楼 楽 概 構 様 槽 標 模 権 横 樹 橋 機 欄 欠 次 欧 欲 欺 款 歌 歓 止 正 武 歩 歯 歳 歴 死 殉 殊 残 殖 殴 段 殺 殻 殿 毀 母 毎 毒 比 毛 氏 民 気 水 氷 永 氾 汁 求 汎 汗 汚 江 池 汰 決 汽 沃 沈 沖 沙 没 沢 河 沸 油 治 沼 沿 況 泉 泊 泌 法 泡 波 泣 泥 注 泰 泳 洋 洗 洞 津 洪 活 派 流 浄 浅 浜 浦 浪 浮 浴 海 浸 消 涙 涯 液 涼 淑 淡 淫 深 混 添 清 渇 済 渉 渋 渓 減 渡 渦 温 測 港 湖 湧 湯 湾 湿 満 源 準 溝 溶 溺 滅 滋 滑 滝 滞 滴 漁 漂 漆 漏 演 漠 漢 漫 漬 漸 潔 潜 潟 潤 潮 潰 澄 激 濁 濃 濫 濯 瀬 火 灯 灰 災 炉 炊 炎 炭 点 為 烈 無 焦 然 焼 煎 煙 照 煩 煮 熊 熟 熱 燃 燥 爆 爪 爵 父 爽 片 版 牙 牛 牧 物 牲 特 犠 犬 犯 状 狂 狙 狩 独 狭 猛 猟 猫 献 猶 猿 獄 獣 獲 玄 率 玉 王 玩 珍 珠 班 現 球 理 琴 瑠 璃 璧 環 璽 瓦 瓶 甘 甚 生 産 用 田 由 甲 申 男 町 画 界 畏 畑 畔 留 畜 畝 略 番 異 畳 畿 疎 疑 疫 疲 疾 病 症 痕 痘 痛 痢 痩 痴 瘍 療 癒 癖 発 登 白 百 的 皆 皇 皮 皿 盆 益 盗 盛 盟 監 盤 目 盲 直 相 盾 省 眉 看 県 真 眠 眺 眼 着 睡 督 睦 瞬 瞭 瞳 矛 矢 知 短 矯 石 砂 研 砕 砲 破 硝 硫 硬 碁 碑 確 磁 磨 礁 礎 示 礼 社 祈 祉 祖 祝 神 祥 票 祭 禁 禅 禍 福 秀 私 秋 科 秒 秘 租 秩 称 移 程 税 稚 種 稲 稼 稽 稿 穀 穂 積 穏 穫 穴 究 空 突 窃 窒 窓 窟 窮 窯 立 竜 章 童 端 競 竹 笑 笛 符 第 筆 等 筋 筒 答 策 箇 箋 算 管 箱 箸 節 範 築 篤 簡 簿 籍 籠 米 粉 粋 粒 粗 粘 粛 粧 精 糖 糧 糸 系 糾 紀 約 紅 紋 納 純 紙 級 紛 素 紡 索 紫 累 細 紳 紹 紺 終 組 経 結 絞 絡 給 統 絵 絶 絹 継 続 維 綱 網 綻 綿 緊 総 緑 緒 線 締 編 緩 緯 練 緻 縁 縄 縛 縦 縫 縮 績 繁 繊 織 繕 繭 繰 缶 罪 置 罰 署 罵 罷 羅 羊 美 羞 群 羨 義 羽 翁 翌 習 翻 翼 老 考 者 耐 耕 耗 耳 聖 聞 聴 職 肉 肌 肖 肘 肝 股 肢 肥 肩 肪 肯 育 肺 胃 胆 背 胎 胞 胴 胸 能 脂 脅 脇 脈 脊 脚 脱 脳 腎 腐 腕 腫 腰 腸 腹 腺 膚 膜 膝 膨 膳 臆 臓 臣 臨 自 臭 至 致 臼 興 舌 舎 舗 舞 舟 航 般 舶 舷 船 艇 艦 良 色 艶 芋 芝 芯 花 芳 芸 芽 苗 苛 若 苦 英 茂 茎 茨 茶 草 荒 荘 荷 菊 菌 菓 菜 華 萎 落 葉 著 葛 葬 蒸 蓄 蓋 蔑 蔵 蔽 薄 薦 薪 薫 薬 藍 藤 藩 藻 虎 虐 虚 虜 虞 虫 虹 蚊 蚕 蛇 蛍 蛮 蜂 蜜 融 血 衆 行 術 街 衛 衝 衡 衣 表 衰 衷 袋 袖 被 裁 裂 装 裏 裕 補 裸 製 裾 複 褐 褒 襟 襲 西 要 覆 覇 見 規 視 覚 覧 親 観 角 解 触 言 訂 訃 計 討 訓 託 記 訟 訪 設 許 訳 訴 診 証 詐 詔 評 詞 詠 詣 試 詩 詮 詰 話 該 詳 誇 誉 誌 認 誓 誕 誘 語 誠 誤 説 読 誰 課 調 談 請 論 諦 諧 諭 諮 諸 諾 謀 謁 謄 謎 謙 講 謝 謡 謹 識 譜 警 議 譲 護 谷 豆 豊 豚 象 豪 貌 貝 貞 負 財 貢 貧 貨 販 貪 貫 責 貯 貴 買 貸 費 貼 貿 賀 賂 賃 賄 資 賊 賓 賛 賜 賞 賠 賢 賦 質 賭 購 贈 赤 赦 走 赴 起 超 越 趣 足 距 跡 路 跳 践 踊 踏 踪 蹴 躍 身 車 軌 軍 軒 軟 転 軸 軽 較 載 輝 輩 輪 輸 轄 辛 辞 辣 辱 農 辺 込 迅 迎 近 返 迫 迭 述 迷 追 退 送 逃 逆 透 逐 逓 途 通 逝 速 造 連 逮 週 進 逸 遂 遅 遇 遊 運 遍 過 道 達 違 遜 遠 遡 遣 適 遭 遮 遵 遷 選 遺 避 還 那 邦 邪 邸 郊 郎 郡 部 郭 郵 郷 都 酌 配 酎 酒 酔 酢 酪 酬 酵 酷 酸 醒 醜 醸 采 釈 里 重 野 量 金 釜 針 釣 鈍 鈴 鉄 鉛 鉢 鉱 銀 銃 銅 銘 銭 鋭 鋳 鋼 錠 錦 錬 錮 錯 録 鍋 鍛 鍵 鎌 鎖 鎮 鏡 鐘 鑑 長 門 閉 開 閑 間 関 閣 閥 閲 闇 闘 阜 阪 防 阻 附 降 限 陛 院 陣 除 陥 陪 陰 陳 陵 陶 陸 険 陽 隅 隆 隊 階 随 隔 隙 際 障 隠 隣 隷 隻 雄 雅 集 雇 雌 雑 離 難 雨 雪 雰 雲 零 雷 電 需 震 霊 霜 霧 露 青 静 非 面 革 靴 韓 音 韻 響 頂 頃 項 順 須 預 頑 頒 頓 領 頬 頭 頻 頼 題 額 顎 顔 顕 願 類 顧 風 飛 食 飢 飯 飲 飼 飽 飾 餅 養 餌 餓 館 首 香 馬 駄 駅 駆 駐 駒 騎 騒 験 騰 驚 骨 骸 髄 高 髪 鬱 鬼 魂 魅 魔 魚 鮮 鯨 鳥 鳴 鶏 鶴 鹿 麓 麗 麦 麺 麻 黄 黒 黙 鼓 鼻 齢]},
+			punctuation => qr{[‾ _＿ \-－ ‐‑ — ― 〜 ・･ ,， 、､ ;； \:： !！ ?？ .． ‥ … 。｡ ＇‘’ "＂“” (（ )） \[［ \]］ \N{U+FF5B}｝ 〈 〉 《 》 「｢ 」｣ 『 』 【 】 〔 〕 ‖ § ¶ @＠ *＊ /／ \\＼ \&＆ #＃ %％ ‰ † ‡ ′ ″ 〃 ※]},
 		};
 	},
 EOT
@@ -1935,29 +1956,6 @@ EOT
 },
 );
 
-
-has 'ellipsis' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub {
-		return {
-			'final' => '{0}…',
-			'initial' => '…{0}',
-			'medial' => '{0}…{1}',
-			'word-final' => '{0} …',
-			'word-initial' => '… {0}',
-			'word-medial' => '{0} … {1}',
-		};
-	},
-);
-
-has 'more_information' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{?},
-);
 
 has 'quote_start' => (
 	is			=> 'ro',
@@ -1987,31 +1985,12 @@ has 'alternate_quote_end' => (
 	default		=> qq{』},
 );
 
-has 'duration_units' => (
-	is			=> 'ro',
-	isa			=> HashRef[Str],
-	init_arg	=> undef,
-	default		=> sub { {
-				hm => 'h:mm',
-				hms => 'h:mm:ss',
-				ms => 'm:ss',
-			} }
-);
-
 has 'units' => (
 	is			=> 'ro',
 	isa			=> HashRef[HashRef[HashRef[Str]]],
 	init_arg	=> undef,
 	default		=> sub { {
 				'long' => {
-					# Long Unit Identifier
-					'' => {
-						'name' => q(方位),
-					},
-					# Core Unit Identifier
-					'' => {
-						'name' => q(方位),
-					},
 					# Long Unit Identifier
 					'1024p1' => {
 						'1' => q(キビ{0}),
@@ -2133,12 +2112,28 @@ has 'units' => (
 						'1' => q(ヨクト{0}),
 					},
 					# Long Unit Identifier
+					'10p-27' => {
+						'1' => q(ロント{0}),
+					},
+					# Core Unit Identifier
+					'27' => {
+						'1' => q(ロント{0}),
+					},
+					# Long Unit Identifier
 					'10p-3' => {
 						'1' => q(ミリ{0}),
 					},
 					# Core Unit Identifier
 					'3' => {
 						'1' => q(ミリ{0}),
+					},
+					# Long Unit Identifier
+					'10p-30' => {
+						'1' => q(クエクト{0}),
+					},
+					# Core Unit Identifier
+					'30' => {
+						'1' => q(クエクト{0}),
 					},
 					# Long Unit Identifier
 					'10p-6' => {
@@ -2213,12 +2208,28 @@ has 'units' => (
 						'1' => q(ヨタ{0}),
 					},
 					# Long Unit Identifier
+					'10p27' => {
+						'1' => q(ロナ{0}),
+					},
+					# Core Unit Identifier
+					'10p27' => {
+						'1' => q(ロナ{0}),
+					},
+					# Long Unit Identifier
 					'10p3' => {
 						'1' => q(キロ{0}),
 					},
 					# Core Unit Identifier
 					'10p3' => {
 						'1' => q(キロ{0}),
+					},
+					# Long Unit Identifier
+					'10p30' => {
+						'1' => q(クエタ{0}),
+					},
+					# Core Unit Identifier
+					'10p30' => {
+						'1' => q(クエタ{0}),
 					},
 					# Long Unit Identifier
 					'10p6' => {
@@ -2235,16 +2246,6 @@ has 'units' => (
 					# Core Unit Identifier
 					'10p9' => {
 						'1' => q(ギガ{0}),
-					},
-					# Long Unit Identifier
-					'acceleration-g-force' => {
-						'name' => q(重力加速度),
-						'other' => q({0} G),
-					},
-					# Core Unit Identifier
-					'g-force' => {
-						'name' => q(重力加速度),
-						'other' => q({0} G),
 					},
 					# Long Unit Identifier
 					'acceleration-meter-per-square-second' => {
@@ -2257,83 +2258,43 @@ has 'units' => (
 						'other' => q({0} メートル毎秒毎秒),
 					},
 					# Long Unit Identifier
-					'angle-arc-minute' => {
-						'name' => q(分),
-						'other' => q({0} 分),
-					},
-					# Core Unit Identifier
-					'arc-minute' => {
-						'name' => q(分),
-						'other' => q({0} 分),
-					},
-					# Long Unit Identifier
-					'angle-arc-second' => {
-						'name' => q(秒),
-						'other' => q({0} 秒),
-					},
-					# Core Unit Identifier
-					'arc-second' => {
-						'name' => q(秒),
-						'other' => q({0} 秒),
-					},
-					# Long Unit Identifier
-					'angle-degree' => {
-						'name' => q(度),
-						'other' => q({0} 度),
-					},
-					# Core Unit Identifier
-					'degree' => {
-						'name' => q(度),
-						'other' => q({0} 度),
-					},
-					# Long Unit Identifier
 					'angle-radian' => {
-						'name' => q(ラジアン),
 						'other' => q({0} ラジアン),
 					},
 					# Core Unit Identifier
 					'radian' => {
-						'name' => q(ラジアン),
 						'other' => q({0} ラジアン),
 					},
 					# Long Unit Identifier
 					'angle-revolution' => {
-						'name' => q(回転),
 						'other' => q({0} 回転),
 					},
 					# Core Unit Identifier
 					'revolution' => {
-						'name' => q(回転),
 						'other' => q({0} 回転),
 					},
 					# Long Unit Identifier
 					'area-acre' => {
-						'name' => q(エーカー),
 						'other' => q({0} エーカー),
 					},
 					# Core Unit Identifier
 					'acre' => {
-						'name' => q(エーカー),
 						'other' => q({0} エーカー),
 					},
 					# Long Unit Identifier
 					'area-dunam' => {
-						'name' => q(ドゥナム),
 						'other' => q({0} ドゥナム),
 					},
 					# Core Unit Identifier
 					'dunam' => {
-						'name' => q(ドゥナム),
 						'other' => q({0} ドゥナム),
 					},
 					# Long Unit Identifier
 					'area-hectare' => {
-						'name' => q(ヘクタール),
 						'other' => q({0} ヘクタール),
 					},
 					# Core Unit Identifier
 					'hectare' => {
-						'name' => q(ヘクタール),
 						'other' => q({0} ヘクタール),
 					},
 					# Long Unit Identifier
@@ -2350,23 +2311,19 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'area-square-foot' => {
-						'name' => q(平方フィート),
 						'other' => q({0} 平方フィート),
 					},
 					# Core Unit Identifier
 					'square-foot' => {
-						'name' => q(平方フィート),
 						'other' => q({0} 平方フィート),
 					},
 					# Long Unit Identifier
 					'area-square-inch' => {
-						'name' => q(平方インチ),
 						'other' => q({0} 平方インチ),
 						'per' => q({0}/平方インチ),
 					},
 					# Core Unit Identifier
 					'square-inch' => {
-						'name' => q(平方インチ),
 						'other' => q({0} 平方インチ),
 						'per' => q({0}/平方インチ),
 					},
@@ -2396,114 +2353,68 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'area-square-mile' => {
-						'name' => q(平方マイル),
 						'other' => q({0} 平方マイル),
 						'per' => q({0}/平方マイル),
 					},
 					# Core Unit Identifier
 					'square-mile' => {
-						'name' => q(平方マイル),
 						'other' => q({0} 平方マイル),
 						'per' => q({0}/平方マイル),
 					},
 					# Long Unit Identifier
 					'area-square-yard' => {
-						'name' => q(平方ヤード),
 						'other' => q({0} 平方ヤード),
 					},
 					# Core Unit Identifier
 					'square-yard' => {
-						'name' => q(平方ヤード),
 						'other' => q({0} 平方ヤード),
 					},
 					# Long Unit Identifier
-					'concentr-item' => {
-						'name' => q(項目),
-						'other' => q({0} 項目),
-					},
-					# Core Unit Identifier
-					'item' => {
-						'name' => q(項目),
-						'other' => q({0} 項目),
-					},
-					# Long Unit Identifier
-					'concentr-karat' => {
-						'name' => q(金),
-						'other' => q({0} 金),
-					},
-					# Core Unit Identifier
-					'karat' => {
-						'name' => q(金),
-						'other' => q({0} 金),
-					},
-					# Long Unit Identifier
 					'concentr-milligram-ofglucose-per-deciliter' => {
-						'name' => q(ミリグラム毎デシリットル),
 						'other' => q({0} ミリグラム毎デシリットル),
 					},
 					# Core Unit Identifier
 					'milligram-ofglucose-per-deciliter' => {
-						'name' => q(ミリグラム毎デシリットル),
 						'other' => q({0} ミリグラム毎デシリットル),
 					},
 					# Long Unit Identifier
 					'concentr-millimole-per-liter' => {
-						'name' => q(ミリモル毎リットル),
 						'other' => q({0} ミリモル毎リットル),
 					},
 					# Core Unit Identifier
 					'millimole-per-liter' => {
-						'name' => q(ミリモル毎リットル),
 						'other' => q({0} ミリモル毎リットル),
 					},
 					# Long Unit Identifier
 					'concentr-mole' => {
-						'name' => q(モル),
 						'other' => q({0} モル),
 					},
 					# Core Unit Identifier
 					'mole' => {
-						'name' => q(モル),
 						'other' => q({0} モル),
 					},
 					# Long Unit Identifier
 					'concentr-percent' => {
-						'name' => q(パーセント),
 						'other' => q({0} パーセント),
 					},
 					# Core Unit Identifier
 					'percent' => {
-						'name' => q(パーセント),
 						'other' => q({0} パーセント),
 					},
 					# Long Unit Identifier
 					'concentr-permille' => {
-						'name' => q(パーミル),
 						'other' => q({0} パーミル),
 					},
 					# Core Unit Identifier
 					'permille' => {
-						'name' => q(パーミル),
 						'other' => q({0} パーミル),
 					},
 					# Long Unit Identifier
-					'concentr-permillion' => {
-						'name' => q(ppm),
-						'other' => q({0} ppm),
-					},
-					# Core Unit Identifier
-					'permillion' => {
-						'name' => q(ppm),
-						'other' => q({0} ppm),
-					},
-					# Long Unit Identifier
 					'concentr-permyriad' => {
-						'name' => q(パーミリアド),
 						'other' => q({0} パーミリアド),
 					},
 					# Core Unit Identifier
 					'permyriad' => {
-						'name' => q(パーミリアド),
 						'other' => q({0} パーミリアド),
 					},
 					# Long Unit Identifier
@@ -2538,56 +2449,34 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'consumption-mile-per-gallon-imperial' => {
-						'name' => q(マイル毎英ガロン),
 						'other' => q({0} マイル毎英ガロン),
 					},
 					# Core Unit Identifier
 					'mile-per-gallon-imperial' => {
-						'name' => q(マイル毎英ガロン),
 						'other' => q({0} マイル毎英ガロン),
 					},
 					# Long Unit Identifier
-					'coordinate' => {
-						'east' => q(東経{0}),
-						'north' => q(北緯{0}),
-						'south' => q(南緯{0}),
-						'west' => q(西経{0}),
-					},
-					# Core Unit Identifier
-					'coordinate' => {
-						'east' => q(東経{0}),
-						'north' => q(北緯{0}),
-						'south' => q(南緯{0}),
-						'west' => q(西経{0}),
-					},
-					# Long Unit Identifier
 					'digital-bit' => {
-						'name' => q(ビット),
 						'other' => q({0} ビット),
 					},
 					# Core Unit Identifier
 					'bit' => {
-						'name' => q(ビット),
 						'other' => q({0} ビット),
 					},
 					# Long Unit Identifier
 					'digital-byte' => {
-						'name' => q(バイト),
 						'other' => q({0} バイト),
 					},
 					# Core Unit Identifier
 					'byte' => {
-						'name' => q(バイト),
 						'other' => q({0} バイト),
 					},
 					# Long Unit Identifier
 					'digital-gigabit' => {
-						'name' => q(ギガビット),
 						'other' => q({0} ギガビット),
 					},
 					# Core Unit Identifier
 					'gigabit' => {
-						'name' => q(ギガビット),
 						'other' => q({0} ギガビット),
 					},
 					# Long Unit Identifier
@@ -2602,12 +2491,10 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'digital-kilobit' => {
-						'name' => q(キロビット),
 						'other' => q({0} キロビット),
 					},
 					# Core Unit Identifier
 					'kilobit' => {
-						'name' => q(キロビット),
 						'other' => q({0} キロビット),
 					},
 					# Long Unit Identifier
@@ -2622,12 +2509,10 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'digital-megabit' => {
-						'name' => q(メガビット),
 						'other' => q({0} メガビット),
 					},
 					# Core Unit Identifier
 					'megabit' => {
-						'name' => q(メガビット),
 						'other' => q({0} メガビット),
 					},
 					# Long Unit Identifier
@@ -2642,216 +2527,98 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'digital-petabyte' => {
-						'name' => q(ペタバイト),
 						'other' => q({0} ペタバイト),
 					},
 					# Core Unit Identifier
 					'petabyte' => {
-						'name' => q(ペタバイト),
 						'other' => q({0} ペタバイト),
 					},
 					# Long Unit Identifier
 					'digital-terabit' => {
-						'name' => q(テラビット),
 						'other' => q({0} テラビット),
 					},
 					# Core Unit Identifier
 					'terabit' => {
-						'name' => q(テラビット),
 						'other' => q({0} テラビット),
 					},
 					# Long Unit Identifier
 					'digital-terabyte' => {
-						'name' => q(テラバイト),
 						'other' => q({0} テラバイト),
 					},
 					# Core Unit Identifier
 					'terabyte' => {
-						'name' => q(テラバイト),
 						'other' => q({0} テラバイト),
 					},
 					# Long Unit Identifier
-					'duration-century' => {
-						'name' => q(世紀),
-						'other' => q({0} 世紀),
-					},
-					# Core Unit Identifier
-					'century' => {
-						'name' => q(世紀),
-						'other' => q({0} 世紀),
-					},
-					# Long Unit Identifier
-					'duration-day' => {
-						'name' => q(日),
-						'other' => q({0} 日),
-						'per' => q({0}/日),
-					},
-					# Core Unit Identifier
-					'day' => {
-						'name' => q(日),
-						'other' => q({0} 日),
-						'per' => q({0}/日),
-					},
-					# Long Unit Identifier
-					'duration-decade' => {
-						'name' => q(十年),
-						'other' => q({0} 十年),
-					},
-					# Core Unit Identifier
-					'decade' => {
-						'name' => q(十年),
-						'other' => q({0} 十年),
-					},
-					# Long Unit Identifier
-					'duration-hour' => {
-						'name' => q(時間),
-						'other' => q({0} 時間),
-						'per' => q({0}/時間),
-					},
-					# Core Unit Identifier
-					'hour' => {
-						'name' => q(時間),
-						'other' => q({0} 時間),
-						'per' => q({0}/時間),
-					},
-					# Long Unit Identifier
 					'duration-microsecond' => {
-						'name' => q(マイクロ秒),
 						'other' => q({0} マイクロ秒),
 					},
 					# Core Unit Identifier
 					'microsecond' => {
-						'name' => q(マイクロ秒),
 						'other' => q({0} マイクロ秒),
 					},
 					# Long Unit Identifier
 					'duration-millisecond' => {
-						'name' => q(ミリ秒),
 						'other' => q({0} ミリ秒),
 					},
 					# Core Unit Identifier
 					'millisecond' => {
-						'name' => q(ミリ秒),
 						'other' => q({0} ミリ秒),
 					},
 					# Long Unit Identifier
-					'duration-minute' => {
-						'name' => q(分),
-						'other' => q({0} 分),
-						'per' => q({0}/分),
-					},
-					# Core Unit Identifier
-					'minute' => {
-						'name' => q(分),
-						'other' => q({0} 分),
-						'per' => q({0}/分),
-					},
-					# Long Unit Identifier
-					'duration-month' => {
-						'name' => q(か月),
-						'other' => q({0} か月),
-						'per' => q({0}/月),
-					},
-					# Core Unit Identifier
-					'month' => {
-						'name' => q(か月),
-						'other' => q({0} か月),
-						'per' => q({0}/月),
-					},
-					# Long Unit Identifier
 					'duration-nanosecond' => {
-						'name' => q(ナノ秒),
 						'other' => q({0} ナノ秒),
 					},
 					# Core Unit Identifier
 					'nanosecond' => {
-						'name' => q(ナノ秒),
 						'other' => q({0} ナノ秒),
 					},
 					# Long Unit Identifier
-					'duration-second' => {
-						'name' => q(秒),
-						'other' => q({0} 秒),
-						'per' => q({0}/秒),
+					'duration-quarter' => {
+						'other' => q({0} 四半期),
 					},
 					# Core Unit Identifier
-					'second' => {
-						'name' => q(秒),
-						'other' => q({0} 秒),
-						'per' => q({0}/秒),
-					},
-					# Long Unit Identifier
-					'duration-week' => {
-						'name' => q(週間),
-						'other' => q({0} 週間),
-						'per' => q({0}/週),
-					},
-					# Core Unit Identifier
-					'week' => {
-						'name' => q(週間),
-						'other' => q({0} 週間),
-						'per' => q({0}/週),
-					},
-					# Long Unit Identifier
-					'duration-year' => {
-						'name' => q(年),
-						'other' => q({0} 年),
-						'per' => q({0}/年),
-					},
-					# Core Unit Identifier
-					'year' => {
-						'name' => q(年),
-						'other' => q({0} 年),
-						'per' => q({0}/年),
+					'quarter' => {
+						'other' => q({0} 四半期),
 					},
 					# Long Unit Identifier
 					'electric-ampere' => {
-						'name' => q(アンペア),
 						'other' => q({0} アンペア),
 					},
 					# Core Unit Identifier
 					'ampere' => {
-						'name' => q(アンペア),
 						'other' => q({0} アンペア),
 					},
 					# Long Unit Identifier
 					'electric-milliampere' => {
-						'name' => q(ミリアンペア),
 						'other' => q({0} ミリアンペア),
 					},
 					# Core Unit Identifier
 					'milliampere' => {
-						'name' => q(ミリアンペア),
 						'other' => q({0} ミリアンペア),
 					},
 					# Long Unit Identifier
 					'electric-ohm' => {
-						'name' => q(オーム),
 						'other' => q({0} オーム),
 					},
 					# Core Unit Identifier
 					'ohm' => {
-						'name' => q(オーム),
 						'other' => q({0} オーム),
 					},
 					# Long Unit Identifier
 					'electric-volt' => {
-						'name' => q(ボルト),
 						'other' => q({0} ボルト),
 					},
 					# Core Unit Identifier
 					'volt' => {
-						'name' => q(ボルト),
 						'other' => q({0} ボルト),
 					},
 					# Long Unit Identifier
 					'energy-british-thermal-unit' => {
-						'name' => q(英熱量),
 						'other' => q({0} 英熱量),
 					},
 					# Core Unit Identifier
 					'british-thermal-unit' => {
-						'name' => q(英熱量),
 						'other' => q({0} 英熱量),
 					},
 					# Long Unit Identifier
@@ -2866,12 +2633,10 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'energy-electronvolt' => {
-						'name' => q(電子ボルト),
 						'other' => q({0} 電子ボルト),
 					},
 					# Core Unit Identifier
 					'electronvolt' => {
-						'name' => q(電子ボルト),
 						'other' => q({0} 電子ボルト),
 					},
 					# Long Unit Identifier
@@ -2886,12 +2651,10 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'energy-joule' => {
-						'name' => q(ジュール),
 						'other' => q({0} ジュール),
 					},
 					# Core Unit Identifier
 					'joule' => {
-						'name' => q(ジュール),
 						'other' => q({0} ジュール),
 					},
 					# Long Unit Identifier
@@ -2906,33 +2669,19 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'energy-kilojoule' => {
-						'name' => q(キロジュール),
 						'other' => q({0} キロジュール),
 					},
 					# Core Unit Identifier
 					'kilojoule' => {
-						'name' => q(キロジュール),
 						'other' => q({0} キロジュール),
 					},
 					# Long Unit Identifier
 					'energy-kilowatt-hour' => {
-						'name' => q(キロワット時),
 						'other' => q({0} キロワット時),
 					},
 					# Core Unit Identifier
 					'kilowatt-hour' => {
-						'name' => q(キロワット時),
 						'other' => q({0} キロワット時),
-					},
-					# Long Unit Identifier
-					'energy-therm-us' => {
-						'name' => q(米サーム),
-						'other' => q({0} 米サーム),
-					},
-					# Core Unit Identifier
-					'therm-us' => {
-						'name' => q(米サーム),
-						'other' => q({0} 米サーム),
 					},
 					# Long Unit Identifier
 					'force-kilowatt-hour-per-100-kilometer' => {
@@ -2946,22 +2695,18 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'force-newton' => {
-						'name' => q(ニュートン),
 						'other' => q({0} ニュートン),
 					},
 					# Core Unit Identifier
 					'newton' => {
-						'name' => q(ニュートン),
 						'other' => q({0} ニュートン),
 					},
 					# Long Unit Identifier
 					'force-pound-force' => {
-						'name' => q(重量ポンド),
 						'other' => q({0} 重量ポンド),
 					},
 					# Core Unit Identifier
 					'pound-force' => {
-						'name' => q(重量ポンド),
 						'other' => q({0} 重量ポンド),
 					},
 					# Long Unit Identifier
@@ -3005,14 +2750,6 @@ has 'units' => (
 						'other' => q({0} メガヘルツ),
 					},
 					# Long Unit Identifier
-					'graphics-dot' => {
-						'name' => q(ドット),
-					},
-					# Core Unit Identifier
-					'dot' => {
-						'name' => q(ドット),
-					},
-					# Long Unit Identifier
 					'graphics-dot-per-centimeter' => {
 						'name' => q(ドット/cm),
 						'other' => q({0} ドット/cm),
@@ -3042,22 +2779,18 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'graphics-megapixel' => {
-						'name' => q(メガピクセル),
 						'other' => q({0} メガピクセル),
 					},
 					# Core Unit Identifier
 					'megapixel' => {
-						'name' => q(メガピクセル),
 						'other' => q({0} メガピクセル),
 					},
 					# Long Unit Identifier
 					'graphics-pixel' => {
-						'name' => q(ピクセル),
 						'other' => q({0} ピクセル),
 					},
 					# Core Unit Identifier
 					'pixel' => {
-						'name' => q(ピクセル),
 						'other' => q({0} ピクセル),
 					},
 					# Long Unit Identifier
@@ -3082,12 +2815,10 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-astronomical-unit' => {
-						'name' => q(天文単位),
 						'other' => q({0} 天文単位),
 					},
 					# Core Unit Identifier
 					'astronomical-unit' => {
-						'name' => q(天文単位),
 						'other' => q({0} 天文単位),
 					},
 					# Long Unit Identifier
@@ -3104,12 +2835,10 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-decimeter' => {
-						'name' => q(デシメートル),
 						'other' => q({0} デシメートル),
 					},
 					# Core Unit Identifier
 					'decimeter' => {
-						'name' => q(デシメートル),
 						'other' => q({0} デシメートル),
 					},
 					# Long Unit Identifier
@@ -3124,45 +2853,37 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-fathom' => {
-						'name' => q(ファゾム),
 						'other' => q({0} ファゾム),
 					},
 					# Core Unit Identifier
 					'fathom' => {
-						'name' => q(ファゾム),
 						'other' => q({0} ファゾム),
 					},
 					# Long Unit Identifier
 					'length-foot' => {
-						'name' => q(フィート),
 						'other' => q({0} フィート),
 						'per' => q({0}/フィート),
 					},
 					# Core Unit Identifier
 					'foot' => {
-						'name' => q(フィート),
 						'other' => q({0} フィート),
 						'per' => q({0}/フィート),
 					},
 					# Long Unit Identifier
 					'length-furlong' => {
-						'name' => q(ハロン),
 						'other' => q({0} ハロン),
 					},
 					# Core Unit Identifier
 					'furlong' => {
-						'name' => q(ハロン),
 						'other' => q({0} ハロン),
 					},
 					# Long Unit Identifier
 					'length-inch' => {
-						'name' => q(インチ),
 						'other' => q({0} インチ),
 						'per' => q({0}/インチ),
 					},
 					# Core Unit Identifier
 					'inch' => {
-						'name' => q(インチ),
 						'other' => q({0} インチ),
 						'per' => q({0}/インチ),
 					},
@@ -3179,16 +2900,6 @@ has 'units' => (
 						'per' => q({0}/キロメートル),
 					},
 					# Long Unit Identifier
-					'length-light-year' => {
-						'name' => q(光年),
-						'other' => q({0} 光年),
-					},
-					# Core Unit Identifier
-					'light-year' => {
-						'name' => q(光年),
-						'other' => q({0} 光年),
-					},
-					# Long Unit Identifier
 					'length-meter' => {
 						'name' => q(メートル),
 						'other' => q({0} メートル),
@@ -3202,32 +2913,26 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-micrometer' => {
-						'name' => q(マイクロメートル),
 						'other' => q({0} マイクロメートル),
 					},
 					# Core Unit Identifier
 					'micrometer' => {
-						'name' => q(マイクロメートル),
 						'other' => q({0} マイクロメートル),
 					},
 					# Long Unit Identifier
 					'length-mile' => {
-						'name' => q(マイル),
 						'other' => q({0} マイル),
 					},
 					# Core Unit Identifier
 					'mile' => {
-						'name' => q(マイル),
 						'other' => q({0} マイル),
 					},
 					# Long Unit Identifier
 					'length-mile-scandinavian' => {
-						'name' => q(スカンジナビアマイル),
 						'other' => q({0} スカンジナビアマイル),
 					},
 					# Core Unit Identifier
 					'mile-scandinavian' => {
-						'name' => q(スカンジナビアマイル),
 						'other' => q({0} スカンジナビアマイル),
 					},
 					# Long Unit Identifier
@@ -3242,72 +2947,50 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-nanometer' => {
-						'name' => q(ナノメートル),
 						'other' => q({0} ナノメートル),
 					},
 					# Core Unit Identifier
 					'nanometer' => {
-						'name' => q(ナノメートル),
 						'other' => q({0} ナノメートル),
 					},
 					# Long Unit Identifier
-					'length-nautical-mile' => {
-						'name' => q(海里),
-						'other' => q({0} 海里),
-					},
-					# Core Unit Identifier
-					'nautical-mile' => {
-						'name' => q(海里),
-						'other' => q({0} 海里),
-					},
-					# Long Unit Identifier
 					'length-parsec' => {
-						'name' => q(パーセク),
 						'other' => q({0} パーセク),
 					},
 					# Core Unit Identifier
 					'parsec' => {
-						'name' => q(パーセク),
 						'other' => q({0} パーセク),
 					},
 					# Long Unit Identifier
 					'length-picometer' => {
-						'name' => q(ピコメートル),
 						'other' => q({0} ピコメートル),
 					},
 					# Core Unit Identifier
 					'picometer' => {
-						'name' => q(ピコメートル),
 						'other' => q({0} ピコメートル),
 					},
 					# Long Unit Identifier
 					'length-point' => {
-						'name' => q(ポイント),
 						'other' => q({0} ポイント),
 					},
 					# Core Unit Identifier
 					'point' => {
-						'name' => q(ポイント),
 						'other' => q({0} ポイント),
 					},
 					# Long Unit Identifier
 					'length-solar-radius' => {
-						'name' => q(太陽半径),
 						'other' => q({0} 太陽半径),
 					},
 					# Core Unit Identifier
 					'solar-radius' => {
-						'name' => q(太陽半径),
 						'other' => q({0} 太陽半径),
 					},
 					# Long Unit Identifier
 					'length-yard' => {
-						'name' => q(ヤード),
 						'other' => q({0} ヤード),
 					},
 					# Core Unit Identifier
 					'yard' => {
-						'name' => q(ヤード),
 						'other' => q({0} ヤード),
 					},
 					# Long Unit Identifier
@@ -3332,73 +3015,51 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'light-lux' => {
-						'name' => q(ルクス),
 						'other' => q({0} ルクス),
 					},
 					# Core Unit Identifier
 					'lux' => {
-						'name' => q(ルクス),
 						'other' => q({0} ルクス),
 					},
 					# Long Unit Identifier
 					'light-solar-luminosity' => {
-						'name' => q(太陽光度),
 						'other' => q({0} 太陽光度),
 					},
 					# Core Unit Identifier
 					'solar-luminosity' => {
-						'name' => q(太陽光度),
 						'other' => q({0} 太陽光度),
 					},
 					# Long Unit Identifier
 					'mass-carat' => {
-						'name' => q(カラット),
 						'other' => q({0} カラット),
 					},
 					# Core Unit Identifier
 					'carat' => {
-						'name' => q(カラット),
 						'other' => q({0} カラット),
 					},
 					# Long Unit Identifier
 					'mass-dalton' => {
-						'name' => q(ダルトン),
 						'other' => q({0} ダルトン),
 					},
 					# Core Unit Identifier
 					'dalton' => {
-						'name' => q(ダルトン),
 						'other' => q({0} ダルトン),
 					},
 					# Long Unit Identifier
 					'mass-earth-mass' => {
-						'name' => q(地球質量),
 						'other' => q({0} 地球質量),
 					},
 					# Core Unit Identifier
 					'earth-mass' => {
-						'name' => q(地球質量),
 						'other' => q({0} 地球質量),
 					},
 					# Long Unit Identifier
-					'mass-grain' => {
-						'name' => q(グレーン),
-						'other' => q({0} グレーン),
-					},
-					# Core Unit Identifier
-					'grain' => {
-						'name' => q(グレーン),
-						'other' => q({0} グレーン),
-					},
-					# Long Unit Identifier
 					'mass-gram' => {
-						'name' => q(グラム),
 						'other' => q({0} グラム),
 						'per' => q({0}/グラム),
 					},
 					# Core Unit Identifier
 					'gram' => {
-						'name' => q(グラム),
 						'other' => q({0} グラム),
 						'per' => q({0}/グラム),
 					},
@@ -3415,23 +3076,11 @@ has 'units' => (
 						'per' => q({0}/キログラム),
 					},
 					# Long Unit Identifier
-					'mass-metric-ton' => {
-						'name' => q(トン),
-						'other' => q({0} トン),
-					},
-					# Core Unit Identifier
-					'metric-ton' => {
-						'name' => q(トン),
-						'other' => q({0} トン),
-					},
-					# Long Unit Identifier
 					'mass-microgram' => {
-						'name' => q(マイクログラム),
 						'other' => q({0} マイクログラム),
 					},
 					# Core Unit Identifier
 					'microgram' => {
-						'name' => q(マイクログラム),
 						'other' => q({0} マイクログラム),
 					},
 					# Long Unit Identifier
@@ -3446,67 +3095,65 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'mass-ounce' => {
-						'name' => q(オンス),
 						'other' => q({0} オンス),
 						'per' => q({0}/オンス),
 					},
 					# Core Unit Identifier
 					'ounce' => {
-						'name' => q(オンス),
 						'other' => q({0} オンス),
 						'per' => q({0}/オンス),
 					},
 					# Long Unit Identifier
 					'mass-ounce-troy' => {
-						'name' => q(トロイオンス),
 						'other' => q({0} トロイオンス),
 					},
 					# Core Unit Identifier
 					'ounce-troy' => {
-						'name' => q(トロイオンス),
 						'other' => q({0} トロイオンス),
 					},
 					# Long Unit Identifier
 					'mass-pound' => {
-						'name' => q(ポンド),
 						'other' => q({0} ポンド),
 						'per' => q({0}/ポンド),
 					},
 					# Core Unit Identifier
 					'pound' => {
-						'name' => q(ポンド),
 						'other' => q({0} ポンド),
 						'per' => q({0}/ポンド),
 					},
 					# Long Unit Identifier
 					'mass-solar-mass' => {
-						'name' => q(太陽質量),
 						'other' => q({0} 太陽質量),
 					},
 					# Core Unit Identifier
 					'solar-mass' => {
-						'name' => q(太陽質量),
 						'other' => q({0} 太陽質量),
 					},
 					# Long Unit Identifier
 					'mass-stone' => {
-						'name' => q(ストーン),
 						'other' => q({0} ストーン),
 					},
 					# Core Unit Identifier
 					'stone' => {
-						'name' => q(ストーン),
 						'other' => q({0} ストーン),
 					},
 					# Long Unit Identifier
 					'mass-ton' => {
-						'name' => q(米トン),
 						'other' => q({0} 米トン),
 					},
 					# Core Unit Identifier
 					'ton' => {
-						'name' => q(米トン),
 						'other' => q({0} 米トン),
+					},
+					# Long Unit Identifier
+					'mass-tonne' => {
+						'name' => q(トン),
+						'other' => q({0} トン),
+					},
+					# Core Unit Identifier
+					'tonne' => {
+						'name' => q(トン),
+						'other' => q({0} トン),
 					},
 					# Long Unit Identifier
 					'per' => {
@@ -3518,62 +3165,42 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'power-gigawatt' => {
-						'name' => q(ギガワット),
 						'other' => q({0} ギガワット),
 					},
 					# Core Unit Identifier
 					'gigawatt' => {
-						'name' => q(ギガワット),
 						'other' => q({0} ギガワット),
 					},
 					# Long Unit Identifier
-					'power-horsepower' => {
-						'name' => q(馬力),
-						'other' => q({0} 馬力),
-					},
-					# Core Unit Identifier
-					'horsepower' => {
-						'name' => q(馬力),
-						'other' => q({0} 馬力),
-					},
-					# Long Unit Identifier
 					'power-kilowatt' => {
-						'name' => q(キロワット),
 						'other' => q({0} キロワット),
 					},
 					# Core Unit Identifier
 					'kilowatt' => {
-						'name' => q(キロワット),
 						'other' => q({0} キロワット),
 					},
 					# Long Unit Identifier
 					'power-megawatt' => {
-						'name' => q(メガワット),
 						'other' => q({0} メガワット),
 					},
 					# Core Unit Identifier
 					'megawatt' => {
-						'name' => q(メガワット),
 						'other' => q({0} メガワット),
 					},
 					# Long Unit Identifier
 					'power-milliwatt' => {
-						'name' => q(ミリワット),
 						'other' => q({0} ミリワット),
 					},
 					# Core Unit Identifier
 					'milliwatt' => {
-						'name' => q(ミリワット),
 						'other' => q({0} ミリワット),
 					},
 					# Long Unit Identifier
 					'power-watt' => {
-						'name' => q(ワット),
 						'other' => q({0} ワット),
 					},
 					# Core Unit Identifier
 					'watt' => {
-						'name' => q(ワット),
 						'other' => q({0} ワット),
 					},
 					# Long Unit Identifier
@@ -3598,22 +3225,18 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'pressure-atmosphere' => {
-						'name' => q(気圧),
 						'other' => q({0} 気圧),
 					},
 					# Core Unit Identifier
 					'atmosphere' => {
-						'name' => q(気圧),
 						'other' => q({0} 気圧),
 					},
 					# Long Unit Identifier
 					'pressure-bar' => {
-						'name' => q(バール),
 						'other' => q({0} バール),
 					},
 					# Core Unit Identifier
 					'bar' => {
-						'name' => q(バール),
 						'other' => q({0} バール),
 					},
 					# Long Unit Identifier
@@ -3628,12 +3251,10 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'pressure-inch-ofhg' => {
-						'name' => q(水銀柱インチ),
 						'other' => q({0} 水銀柱インチ),
 					},
 					# Core Unit Identifier
 					'inch-ofhg' => {
-						'name' => q(水銀柱インチ),
 						'other' => q({0} 水銀柱インチ),
 					},
 					# Long Unit Identifier
@@ -3658,43 +3279,45 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'pressure-millibar' => {
-						'name' => q(ミリバール),
 						'other' => q({0} ミリバール),
 					},
 					# Core Unit Identifier
 					'millibar' => {
-						'name' => q(ミリバール),
 						'other' => q({0} ミリバール),
 					},
 					# Long Unit Identifier
 					'pressure-millimeter-ofhg' => {
-						'name' => q(水銀柱ミリメートル),
 						'other' => q({0} 水銀柱ミリメートル),
 					},
 					# Core Unit Identifier
 					'millimeter-ofhg' => {
-						'name' => q(水銀柱ミリメートル),
 						'other' => q({0} 水銀柱ミリメートル),
 					},
 					# Long Unit Identifier
 					'pressure-pascal' => {
-						'name' => q(パスカル),
 						'other' => q({0} パスカル),
 					},
 					# Core Unit Identifier
 					'pascal' => {
-						'name' => q(パスカル),
 						'other' => q({0} パスカル),
 					},
 					# Long Unit Identifier
 					'pressure-pound-force-per-square-inch' => {
-						'name' => q(重量ポンド毎平方インチ),
 						'other' => q({0} 重量ポンド毎平方インチ),
 					},
 					# Core Unit Identifier
 					'pound-force-per-square-inch' => {
-						'name' => q(重量ポンド毎平方インチ),
 						'other' => q({0} 重量ポンド毎平方インチ),
+					},
+					# Long Unit Identifier
+					'speed-beaufort' => {
+						'name' => q(ビューフォート風力階級),
+						'other' => q(ビューフォート風力階級 {0}),
+					},
+					# Core Unit Identifier
+					'beaufort' => {
+						'name' => q(ビューフォート風力階級),
+						'other' => q(ビューフォート風力階級 {0}),
 					},
 					# Long Unit Identifier
 					'speed-kilometer-per-hour' => {
@@ -3708,12 +3331,10 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'speed-knot' => {
-						'name' => q(ノット),
 						'other' => q({0} ノット),
 					},
 					# Core Unit Identifier
 					'knot' => {
-						'name' => q(ノット),
 						'other' => q({0} ノット),
 					},
 					# Long Unit Identifier
@@ -3728,12 +3349,10 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'speed-mile-per-hour' => {
-						'name' => q(マイル毎時),
 						'other' => q(時速 {0} マイル),
 					},
 					# Core Unit Identifier
 					'mile-per-hour' => {
-						'name' => q(マイル毎時),
 						'other' => q(時速 {0} マイル),
 					},
 					# Long Unit Identifier
@@ -3777,71 +3396,51 @@ has 'units' => (
 						'other' => q({0} ケルビン),
 					},
 					# Long Unit Identifier
-					'times' => {
-						'1' => q({0}⋅{1}),
-					},
-					# Core Unit Identifier
-					'times' => {
-						'1' => q({0}⋅{1}),
-					},
-					# Long Unit Identifier
 					'torque-newton-meter' => {
-						'name' => q(ニュートンメートル),
 						'other' => q({0} ニュートンメートル),
 					},
 					# Core Unit Identifier
 					'newton-meter' => {
-						'name' => q(ニュートンメートル),
 						'other' => q({0} ニュートンメートル),
 					},
 					# Long Unit Identifier
 					'torque-pound-force-foot' => {
-						'name' => q(ポンドフィート),
 						'other' => q({0} ポンドフィート),
 					},
 					# Core Unit Identifier
 					'pound-force-foot' => {
-						'name' => q(ポンドフィート),
 						'other' => q({0} ポンドフィート),
 					},
 					# Long Unit Identifier
 					'volume-acre-foot' => {
-						'name' => q(エーカーフィート),
 						'other' => q({0} エーカーフィート),
 					},
 					# Core Unit Identifier
 					'acre-foot' => {
-						'name' => q(エーカーフィート),
 						'other' => q({0} エーカーフィート),
 					},
 					# Long Unit Identifier
 					'volume-barrel' => {
-						'name' => q(バレル),
 						'other' => q({0} バレル),
 					},
 					# Core Unit Identifier
 					'barrel' => {
-						'name' => q(バレル),
 						'other' => q({0} バレル),
 					},
 					# Long Unit Identifier
 					'volume-bushel' => {
-						'name' => q(ブッシェル),
 						'other' => q({0} ブッシェル),
 					},
 					# Core Unit Identifier
 					'bushel' => {
-						'name' => q(ブッシェル),
 						'other' => q({0} ブッシェル),
 					},
 					# Long Unit Identifier
 					'volume-centiliter' => {
-						'name' => q(センチリットル),
 						'other' => q({0} センチリットル),
 					},
 					# Core Unit Identifier
 					'centiliter' => {
-						'name' => q(センチリットル),
 						'other' => q({0} センチリットル),
 					},
 					# Long Unit Identifier
@@ -3858,22 +3457,18 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'volume-cubic-foot' => {
-						'name' => q(立方フィート),
 						'other' => q({0} 立方フィート),
 					},
 					# Core Unit Identifier
 					'cubic-foot' => {
-						'name' => q(立方フィート),
 						'other' => q({0} 立方フィート),
 					},
 					# Long Unit Identifier
 					'volume-cubic-inch' => {
-						'name' => q(立方インチ),
 						'other' => q({0} 立方インチ),
 					},
 					# Core Unit Identifier
 					'cubic-inch' => {
-						'name' => q(立方インチ),
 						'other' => q({0} 立方インチ),
 					},
 					# Long Unit Identifier
@@ -3900,73 +3495,35 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'volume-cubic-mile' => {
-						'name' => q(立方マイル),
 						'other' => q({0} 立方マイル),
 					},
 					# Core Unit Identifier
 					'cubic-mile' => {
-						'name' => q(立方マイル),
 						'other' => q({0} 立方マイル),
 					},
 					# Long Unit Identifier
 					'volume-cubic-yard' => {
-						'name' => q(立方ヤード),
 						'other' => q({0} 立方ヤード),
 					},
 					# Core Unit Identifier
 					'cubic-yard' => {
-						'name' => q(立方ヤード),
 						'other' => q({0} 立方ヤード),
 					},
 					# Long Unit Identifier
-					'volume-cup' => {
-						'name' => q(カップ),
-						'other' => q({0} カップ),
-					},
-					# Core Unit Identifier
-					'cup' => {
-						'name' => q(カップ),
-						'other' => q({0} カップ),
-					},
-					# Long Unit Identifier
 					'volume-cup-metric' => {
-						'name' => q(メトリックカップ),
 						'other' => q({0} メトリックカップ),
 					},
 					# Core Unit Identifier
 					'cup-metric' => {
-						'name' => q(メトリックカップ),
 						'other' => q({0} メトリックカップ),
 					},
 					# Long Unit Identifier
 					'volume-deciliter' => {
-						'name' => q(デシリットル),
 						'other' => q({0} デシリットル),
 					},
 					# Core Unit Identifier
 					'deciliter' => {
-						'name' => q(デシリットル),
 						'other' => q({0} デシリットル),
-					},
-					# Long Unit Identifier
-					'volume-dessert-spoon' => {
-						'name' => q(中さじ),
-						'other' => q(中さじ {0}),
-					},
-					# Core Unit Identifier
-					'dessert-spoon' => {
-						'name' => q(中さじ),
-						'other' => q(中さじ {0}),
-					},
-					# Long Unit Identifier
-					'volume-dessert-spoon-imperial' => {
-						'name' => q(英デザートスプーン),
-						'other' => q({0} 英デザートスプーン),
-					},
-					# Core Unit Identifier
-					'dessert-spoon-imperial' => {
-						'name' => q(英デザートスプーン),
-						'other' => q({0} 英デザートスプーン),
 					},
 					# Long Unit Identifier
 					'volume-dram' => {
@@ -3979,273 +3536,139 @@ has 'units' => (
 						'other' => q({0} ドラム),
 					},
 					# Long Unit Identifier
-					'volume-drop' => {
-						'name' => q(滴),
-						'other' => q({0} 滴),
-					},
-					# Core Unit Identifier
-					'drop' => {
-						'name' => q(滴),
-						'other' => q({0} 滴),
-					},
-					# Long Unit Identifier
 					'volume-fluid-ounce' => {
-						'name' => q(液量オンス),
 						'other' => q({0} 液量オンス),
 					},
 					# Core Unit Identifier
 					'fluid-ounce' => {
-						'name' => q(液量オンス),
 						'other' => q({0} 液量オンス),
 					},
 					# Long Unit Identifier
 					'volume-fluid-ounce-imperial' => {
-						'name' => q(英液量オンス),
 						'other' => q({0} 英液量オンス),
 					},
 					# Core Unit Identifier
 					'fluid-ounce-imperial' => {
-						'name' => q(英液量オンス),
 						'other' => q({0} 英液量オンス),
 					},
 					# Long Unit Identifier
 					'volume-gallon' => {
-						'name' => q(ガロン),
 						'other' => q({0} ガロン),
 						'per' => q({0}/ガロン),
 					},
 					# Core Unit Identifier
 					'gallon' => {
-						'name' => q(ガロン),
 						'other' => q({0} ガロン),
 						'per' => q({0}/ガロン),
 					},
 					# Long Unit Identifier
 					'volume-gallon-imperial' => {
-						'name' => q(英ガロン),
 						'other' => q({0} 英ガロン),
 						'per' => q({0}/英ガロン),
 					},
 					# Core Unit Identifier
 					'gallon-imperial' => {
-						'name' => q(英ガロン),
 						'other' => q({0} 英ガロン),
 						'per' => q({0}/英ガロン),
 					},
 					# Long Unit Identifier
 					'volume-hectoliter' => {
-						'name' => q(ヘクトリットル),
 						'other' => q({0} ヘクトリットル),
 					},
 					# Core Unit Identifier
 					'hectoliter' => {
-						'name' => q(ヘクトリットル),
 						'other' => q({0} ヘクトリットル),
 					},
 					# Long Unit Identifier
-					'volume-jigger' => {
-						'name' => q(ジガー),
-						'other' => q({0} ジガー),
-					},
-					# Core Unit Identifier
-					'jigger' => {
-						'name' => q(ジガー),
-						'other' => q({0} ジガー),
-					},
-					# Long Unit Identifier
 					'volume-liter' => {
-						'name' => q(リットル),
 						'other' => q({0} リットル),
 						'per' => q({0}/リットル),
 					},
 					# Core Unit Identifier
 					'liter' => {
-						'name' => q(リットル),
 						'other' => q({0} リットル),
 						'per' => q({0}/リットル),
 					},
 					# Long Unit Identifier
 					'volume-megaliter' => {
-						'name' => q(メガリットル),
 						'other' => q({0} メガリットル),
 					},
 					# Core Unit Identifier
 					'megaliter' => {
-						'name' => q(メガリットル),
 						'other' => q({0} メガリットル),
 					},
 					# Long Unit Identifier
 					'volume-milliliter' => {
-						'name' => q(ミリリットル),
 						'other' => q({0} ミリリットル),
 					},
 					# Core Unit Identifier
 					'milliliter' => {
-						'name' => q(ミリリットル),
 						'other' => q({0} ミリリットル),
 					},
 					# Long Unit Identifier
-					'volume-pinch' => {
-						'name' => q(つまみ),
-						'other' => q({0} つまみ),
-					},
-					# Core Unit Identifier
-					'pinch' => {
-						'name' => q(つまみ),
-						'other' => q({0} つまみ),
-					},
-					# Long Unit Identifier
 					'volume-pint' => {
-						'name' => q(パイント),
 						'other' => q({0} パイント),
 					},
 					# Core Unit Identifier
 					'pint' => {
-						'name' => q(パイント),
 						'other' => q({0} パイント),
 					},
 					# Long Unit Identifier
 					'volume-pint-metric' => {
-						'name' => q(メトリックパイント),
 						'other' => q({0} メトリックパイント),
 					},
 					# Core Unit Identifier
 					'pint-metric' => {
-						'name' => q(メトリックパイント),
 						'other' => q({0} メトリックパイント),
 					},
 					# Long Unit Identifier
 					'volume-quart' => {
-						'name' => q(クォート),
 						'other' => q({0} クォート),
 					},
 					# Core Unit Identifier
 					'quart' => {
-						'name' => q(クォート),
 						'other' => q({0} クォート),
 					},
 					# Long Unit Identifier
 					'volume-quart-imperial' => {
-						'name' => q(英クォート),
 						'other' => q({0} 英クォート),
 					},
 					# Core Unit Identifier
 					'quart-imperial' => {
-						'name' => q(英クォート),
 						'other' => q({0} 英クォート),
 					},
 					# Long Unit Identifier
 					'volume-tablespoon' => {
-						'name' => q(大さじ),
-						'other' => q(大さじ {0}),
+						'other' => q({0} テーブルスプーン),
 					},
 					# Core Unit Identifier
 					'tablespoon' => {
-						'name' => q(大さじ),
-						'other' => q(大さじ {0}),
+						'other' => q({0} テーブルスプーン),
 					},
 					# Long Unit Identifier
 					'volume-teaspoon' => {
-						'name' => q(小さじ),
-						'other' => q(小さじ {0}),
+						'other' => q({0} ティースプーン),
 					},
 					# Core Unit Identifier
 					'teaspoon' => {
-						'name' => q(小さじ),
-						'other' => q(小さじ {0}),
+						'other' => q({0} ティースプーン),
 					},
 				},
 				'narrow' => {
 					# Long Unit Identifier
-					'' => {
-						'name' => q(方位),
-					},
-					# Core Unit Identifier
-					'' => {
-						'name' => q(方位),
-					},
-					# Long Unit Identifier
-					'1024p1' => {
-						'1' => q(Ki{0}),
-					},
-					# Core Unit Identifier
-					'1024p1' => {
-						'1' => q(Ki{0}),
-					},
-					# Long Unit Identifier
-					'1024p2' => {
-						'1' => q(Mi{0}),
-					},
-					# Core Unit Identifier
-					'1024p2' => {
-						'1' => q(Mi{0}),
-					},
-					# Long Unit Identifier
-					'1024p3' => {
-						'1' => q(Gi{0}),
-					},
-					# Core Unit Identifier
-					'1024p3' => {
-						'1' => q(Gi{0}),
-					},
-					# Long Unit Identifier
-					'1024p4' => {
-						'1' => q(Ti{0}),
-					},
-					# Core Unit Identifier
-					'1024p4' => {
-						'1' => q(Ti{0}),
-					},
-					# Long Unit Identifier
-					'1024p5' => {
-						'1' => q(Pi{0}),
-					},
-					# Core Unit Identifier
-					'1024p5' => {
-						'1' => q(Pi{0}),
-					},
-					# Long Unit Identifier
-					'1024p6' => {
-						'1' => q(Ei{0}),
-					},
-					# Core Unit Identifier
-					'1024p6' => {
-						'1' => q(Ei{0}),
-					},
-					# Long Unit Identifier
-					'1024p7' => {
-						'1' => q(Zi{0}),
-					},
-					# Core Unit Identifier
-					'1024p7' => {
-						'1' => q(Zi{0}),
-					},
-					# Long Unit Identifier
-					'1024p8' => {
-						'1' => q(Yi{0}),
-					},
-					# Core Unit Identifier
-					'1024p8' => {
-						'1' => q(Yi{0}),
-					},
-					# Long Unit Identifier
 					'acceleration-g-force' => {
-						'name' => q(重力加速度),
 						'other' => q({0}G),
 					},
 					# Core Unit Identifier
 					'g-force' => {
-						'name' => q(重力加速度),
 						'other' => q({0}G),
 					},
 					# Long Unit Identifier
 					'acceleration-meter-per-square-second' => {
-						'name' => q(m/s²),
 						'other' => q({0}m/s²),
 					},
 					# Core Unit Identifier
 					'meter-per-square-second' => {
-						'name' => q(m/s²),
 						'other' => q({0}m/s²),
 					},
 					# Long Unit Identifier
@@ -4301,12 +3724,36 @@ has 'units' => (
 						'other' => q({0}ac),
 					},
 					# Long Unit Identifier
+					'area-bu-jp' => {
+						'other' => q({0}歩),
+					},
+					# Core Unit Identifier
+					'bu-jp' => {
+						'other' => q({0}歩),
+					},
+					# Long Unit Identifier
+					'area-cho' => {
+						'other' => q({0}町),
+					},
+					# Core Unit Identifier
+					'cho' => {
+						'other' => q({0}町),
+					},
+					# Long Unit Identifier
 					'area-hectare' => {
 						'other' => q({0}ha),
 					},
 					# Core Unit Identifier
 					'hectare' => {
 						'other' => q({0}ha),
+					},
+					# Long Unit Identifier
+					'area-se-jp' => {
+						'other' => q({0}畝),
+					},
+					# Core Unit Identifier
+					'se-jp' => {
+						'other' => q({0}畝),
 					},
 					# Long Unit Identifier
 					'area-square-centimeter' => {
@@ -4421,12 +3868,10 @@ has 'units' => (
 					# Long Unit Identifier
 					'concentr-percent' => {
 						'name' => q(%),
-						'other' => q({0}%),
 					},
 					# Core Unit Identifier
 					'percent' => {
 						'name' => q(%),
-						'other' => q({0}%),
 					},
 					# Long Unit Identifier
 					'concentr-permille' => {
@@ -4454,12 +3899,10 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'consumption-liter-per-100-kilometer' => {
-						'name' => q(L/100km),
 						'other' => q({0}L/100km),
 					},
 					# Core Unit Identifier
 					'liter-per-100-kilometer' => {
-						'name' => q(L/100km),
 						'other' => q({0}L/100km),
 					},
 					# Long Unit Identifier
@@ -4608,25 +4051,19 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'duration-century' => {
-						'name' => q(世紀),
 						'other' => q({0}世紀),
 					},
 					# Core Unit Identifier
 					'century' => {
-						'name' => q(世紀),
 						'other' => q({0}世紀),
 					},
 					# Long Unit Identifier
 					'duration-day' => {
-						'name' => q(日),
 						'other' => q({0}d),
-						'per' => q({0}/日),
 					},
 					# Core Unit Identifier
 					'day' => {
-						'name' => q(日),
 						'other' => q({0}d),
-						'per' => q({0}/日),
 					},
 					# Long Unit Identifier
 					'duration-decade' => {
@@ -4638,15 +4075,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'duration-hour' => {
-						'name' => q(時間),
 						'other' => q({0}h),
-						'per' => q({0}/時間),
 					},
 					# Core Unit Identifier
 					'hour' => {
-						'name' => q(時間),
 						'other' => q({0}h),
-						'per' => q({0}/時間),
 					},
 					# Long Unit Identifier
 					'duration-microsecond' => {
@@ -4670,27 +4103,19 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'duration-minute' => {
-						'name' => q(分),
 						'other' => q({0}m),
-						'per' => q({0}/分),
 					},
 					# Core Unit Identifier
 					'minute' => {
-						'name' => q(分),
 						'other' => q({0}m),
-						'per' => q({0}/分),
 					},
 					# Long Unit Identifier
 					'duration-month' => {
-						'name' => q(か月),
 						'other' => q({0}m),
-						'per' => q({0}/月),
 					},
 					# Core Unit Identifier
 					'month' => {
-						'name' => q(か月),
 						'other' => q({0}m),
-						'per' => q({0}/月),
 					},
 					# Long Unit Identifier
 					'duration-nanosecond' => {
@@ -4703,40 +4128,38 @@ has 'units' => (
 						'other' => q({0}ns),
 					},
 					# Long Unit Identifier
+					'duration-quarter' => {
+						'other' => q({0}Q),
+						'per' => q({0}/Q),
+					},
+					# Core Unit Identifier
+					'quarter' => {
+						'other' => q({0}Q),
+						'per' => q({0}/Q),
+					},
+					# Long Unit Identifier
 					'duration-second' => {
-						'name' => q(秒),
 						'other' => q({0}s),
-						'per' => q({0}/秒),
 					},
 					# Core Unit Identifier
 					'second' => {
-						'name' => q(秒),
 						'other' => q({0}s),
-						'per' => q({0}/秒),
 					},
 					# Long Unit Identifier
 					'duration-week' => {
-						'name' => q(週間),
 						'other' => q({0}w),
-						'per' => q({0}/週),
 					},
 					# Core Unit Identifier
 					'week' => {
-						'name' => q(週間),
 						'other' => q({0}w),
-						'per' => q({0}/週),
 					},
 					# Long Unit Identifier
 					'duration-year' => {
-						'name' => q(年),
 						'other' => q({0}y),
-						'per' => q({0}/年),
 					},
 					# Core Unit Identifier
 					'year' => {
-						'name' => q(年),
 						'other' => q({0}y),
-						'per' => q({0}/年),
 					},
 					# Long Unit Identifier
 					'electric-ampere' => {
@@ -4846,12 +4269,10 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'force-kilowatt-hour-per-100-kilometer' => {
-						'name' => q(kWh/100km),
 						'other' => q({0}kWh/100km),
 					},
 					# Core Unit Identifier
 					'kilowatt-hour-per-100-kilometer' => {
-						'name' => q(kWh/100km),
 						'other' => q({0}kWh/100km),
 					},
 					# Long Unit Identifier
@@ -4976,34 +4397,26 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-astronomical-unit' => {
-						'name' => q(天文単位),
 						'other' => q({0}au),
 					},
 					# Core Unit Identifier
 					'astronomical-unit' => {
-						'name' => q(天文単位),
 						'other' => q({0}au),
 					},
 					# Long Unit Identifier
 					'length-centimeter' => {
-						'name' => q(cm),
 						'other' => q({0}cm),
-						'per' => q({0}/cm),
 					},
 					# Core Unit Identifier
 					'centimeter' => {
-						'name' => q(cm),
 						'other' => q({0}cm),
-						'per' => q({0}/cm),
 					},
 					# Long Unit Identifier
 					'length-decimeter' => {
-						'name' => q(デシメートル),
 						'other' => q({0}dm),
 					},
 					# Core Unit Identifier
 					'decimeter' => {
-						'name' => q(デシメートル),
 						'other' => q({0}dm),
 					},
 					# Long Unit Identifier
@@ -5024,15 +4437,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-foot' => {
-						'name' => q(フィート),
 						'other' => q({0}′),
-						'per' => q({0}/ft),
 					},
 					# Core Unit Identifier
 					'foot' => {
-						'name' => q(フィート),
 						'other' => q({0}′),
-						'per' => q({0}/ft),
 					},
 					# Long Unit Identifier
 					'length-furlong' => {
@@ -5044,128 +4453,114 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-inch' => {
-						'name' => q(インチ),
 						'other' => q({0}″),
-						'per' => q({0}/in),
 					},
 					# Core Unit Identifier
 					'inch' => {
-						'name' => q(インチ),
 						'other' => q({0}″),
-						'per' => q({0}/in),
+					},
+					# Long Unit Identifier
+					'length-jo-jp' => {
+						'other' => q({0}丈),
+					},
+					# Core Unit Identifier
+					'jo-jp' => {
+						'other' => q({0}丈),
+					},
+					# Long Unit Identifier
+					'length-ken' => {
+						'other' => q({0}間),
+					},
+					# Core Unit Identifier
+					'ken' => {
+						'other' => q({0}間),
 					},
 					# Long Unit Identifier
 					'length-kilometer' => {
-						'name' => q(km),
 						'other' => q({0}km),
-						'per' => q({0}/km),
 					},
 					# Core Unit Identifier
 					'kilometer' => {
-						'name' => q(km),
 						'other' => q({0}km),
-						'per' => q({0}/km),
 					},
 					# Long Unit Identifier
 					'length-light-year' => {
-						'name' => q(光年),
 						'other' => q({0}光年),
 					},
 					# Core Unit Identifier
 					'light-year' => {
-						'name' => q(光年),
 						'other' => q({0}光年),
 					},
 					# Long Unit Identifier
 					'length-meter' => {
-						'name' => q(m),
 						'other' => q({0}m),
-						'per' => q({0}/m),
 					},
 					# Core Unit Identifier
 					'meter' => {
-						'name' => q(m),
 						'other' => q({0}m),
-						'per' => q({0}/m),
 					},
 					# Long Unit Identifier
 					'length-micrometer' => {
-						'name' => q(マイクロメートル),
 						'other' => q({0}μm),
 					},
 					# Core Unit Identifier
 					'micrometer' => {
-						'name' => q(マイクロメートル),
 						'other' => q({0}μm),
 					},
 					# Long Unit Identifier
 					'length-mile' => {
-						'name' => q(マイル),
-						'other' => q({0}マイル),
+						'other' => q({0}mi),
 					},
 					# Core Unit Identifier
 					'mile' => {
-						'name' => q(マイル),
-						'other' => q({0}マイル),
+						'other' => q({0}mi),
 					},
 					# Long Unit Identifier
 					'length-mile-scandinavian' => {
-						'name' => q(スカンジナビアマイル),
 						'other' => q({0}smi),
 					},
 					# Core Unit Identifier
 					'mile-scandinavian' => {
-						'name' => q(スカンジナビアマイル),
 						'other' => q({0}smi),
 					},
 					# Long Unit Identifier
 					'length-millimeter' => {
-						'name' => q(mm),
 						'other' => q({0}mm),
 					},
 					# Core Unit Identifier
 					'millimeter' => {
-						'name' => q(mm),
 						'other' => q({0}mm),
 					},
 					# Long Unit Identifier
 					'length-nanometer' => {
-						'name' => q(ナノメートル),
 						'other' => q({0}nm),
 					},
 					# Core Unit Identifier
 					'nanometer' => {
-						'name' => q(ナノメートル),
 						'other' => q({0}nm),
 					},
 					# Long Unit Identifier
 					'length-nautical-mile' => {
-						'name' => q(海里),
 						'other' => q({0}海里),
 					},
 					# Core Unit Identifier
 					'nautical-mile' => {
-						'name' => q(海里),
 						'other' => q({0}海里),
 					},
 					# Long Unit Identifier
 					'length-parsec' => {
-						'name' => q(パーセク),
 						'other' => q({0}pc),
 					},
 					# Core Unit Identifier
 					'parsec' => {
-						'name' => q(パーセク),
 						'other' => q({0}pc),
 					},
 					# Long Unit Identifier
 					'length-picometer' => {
-						'name' => q(ピコメートル),
 						'other' => q({0}pm),
 					},
 					# Core Unit Identifier
 					'picometer' => {
-						'name' => q(ピコメートル),
 						'other' => q({0}pm),
 					},
 					# Long Unit Identifier
@@ -5179,6 +4574,38 @@ has 'units' => (
 						'other' => q({0}pt),
 					},
 					# Long Unit Identifier
+					'length-ri-jp' => {
+						'other' => q({0}里),
+					},
+					# Core Unit Identifier
+					'ri-jp' => {
+						'other' => q({0}里),
+					},
+					# Long Unit Identifier
+					'length-rin' => {
+						'other' => q({0}厘),
+					},
+					# Core Unit Identifier
+					'rin' => {
+						'other' => q({0}厘),
+					},
+					# Long Unit Identifier
+					'length-shaku-cloth' => {
+						'other' => q({0}鯨尺),
+					},
+					# Core Unit Identifier
+					'shaku-cloth' => {
+						'other' => q({0}鯨尺),
+					},
+					# Long Unit Identifier
+					'length-shaku-length' => {
+						'other' => q({0}尺),
+					},
+					# Core Unit Identifier
+					'shaku-length' => {
+						'other' => q({0}尺),
+					},
+					# Long Unit Identifier
 					'length-solar-radius' => {
 						'name' => q(R☉),
 						'other' => q({0}R☉),
@@ -5189,43 +4616,43 @@ has 'units' => (
 						'other' => q({0}R☉),
 					},
 					# Long Unit Identifier
+					'length-sun' => {
+						'other' => q({0}寸),
+					},
+					# Core Unit Identifier
+					'sun' => {
+						'other' => q({0}寸),
+					},
+					# Long Unit Identifier
 					'length-yard' => {
-						'name' => q(ヤード),
-						'other' => q({0}ヤード),
+						'other' => q({0}yd),
 					},
 					# Core Unit Identifier
 					'yard' => {
-						'name' => q(ヤード),
-						'other' => q({0}ヤード),
+						'other' => q({0}yd),
 					},
 					# Long Unit Identifier
 					'light-candela' => {
-						'name' => q(cd),
 						'other' => q({0}cd),
 					},
 					# Core Unit Identifier
 					'candela' => {
-						'name' => q(cd),
 						'other' => q({0}cd),
 					},
 					# Long Unit Identifier
 					'light-lumen' => {
-						'name' => q(lm),
 						'other' => q({0}lm),
 					},
 					# Core Unit Identifier
 					'lumen' => {
-						'name' => q(lm),
 						'other' => q({0}lm),
 					},
 					# Long Unit Identifier
 					'light-lux' => {
-						'name' => q(ルクス),
 						'other' => q({0}lx),
 					},
 					# Core Unit Identifier
 					'lux' => {
-						'name' => q(ルクス),
 						'other' => q({0}lx),
 					},
 					# Long Unit Identifier
@@ -5267,6 +4694,16 @@ has 'units' => (
 						'other' => q({0}M⊕),
 					},
 					# Long Unit Identifier
+					'mass-fun' => {
+						'name' => q(分),
+						'other' => q({0}分),
+					},
+					# Core Unit Identifier
+					'fun' => {
+						'name' => q(分),
+						'other' => q({0}分),
+					},
+					# Long Unit Identifier
 					'mass-grain' => {
 						'other' => q({0}グレーン),
 					},
@@ -5278,35 +4715,19 @@ has 'units' => (
 					'mass-gram' => {
 						'name' => q(g),
 						'other' => q({0}g),
-						'per' => q({0}/g),
 					},
 					# Core Unit Identifier
 					'gram' => {
 						'name' => q(g),
 						'other' => q({0}g),
-						'per' => q({0}/g),
 					},
 					# Long Unit Identifier
 					'mass-kilogram' => {
-						'name' => q(kg),
 						'other' => q({0}kg),
-						'per' => q({0}/kg),
 					},
 					# Core Unit Identifier
 					'kilogram' => {
-						'name' => q(kg),
 						'other' => q({0}kg),
-						'per' => q({0}/kg),
-					},
-					# Long Unit Identifier
-					'mass-metric-ton' => {
-						'name' => q(t),
-						'other' => q({0}t),
-					},
-					# Core Unit Identifier
-					'metric-ton' => {
-						'name' => q(t),
-						'other' => q({0}t),
 					},
 					# Long Unit Identifier
 					'mass-microgram' => {
@@ -5328,15 +4749,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'mass-ounce' => {
-						'name' => q(オンス),
 						'other' => q({0}oz),
-						'per' => q({0}/oz),
 					},
 					# Core Unit Identifier
 					'ounce' => {
-						'name' => q(オンス),
 						'other' => q({0}oz),
-						'per' => q({0}/oz),
 					},
 					# Long Unit Identifier
 					'mass-ounce-troy' => {
@@ -5350,15 +4767,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'mass-pound' => {
-						'name' => q(ポンド),
 						'other' => q({0}lb),
-						'per' => q({0}/lb),
 					},
 					# Core Unit Identifier
 					'pound' => {
-						'name' => q(ポンド),
 						'other' => q({0}lb),
-						'per' => q({0}/lb),
 					},
 					# Long Unit Identifier
 					'mass-solar-mass' => {
@@ -5387,12 +4800,12 @@ has 'units' => (
 						'other' => q({0}s/t),
 					},
 					# Long Unit Identifier
-					'per' => {
-						'1' => q({0}/{1}),
+					'mass-tonne' => {
+						'other' => q({0}t),
 					},
 					# Core Unit Identifier
-					'per' => {
-						'1' => q({0}/{1}),
+					'tonne' => {
+						'other' => q({0}t),
 					},
 					# Long Unit Identifier
 					'power-gigawatt' => {
@@ -5447,6 +4860,14 @@ has 'units' => (
 						'other' => q({0}W),
 					},
 					# Long Unit Identifier
+					'pressure-atmosphere' => {
+						'other' => q({0}atm),
+					},
+					# Core Unit Identifier
+					'atmosphere' => {
+						'other' => q({0}atm),
+					},
+					# Long Unit Identifier
 					'pressure-bar' => {
 						'other' => q({0}bar),
 					},
@@ -5456,22 +4877,18 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'pressure-hectopascal' => {
-						'name' => q(hPa),
 						'other' => q({0}hPa),
 					},
 					# Core Unit Identifier
 					'hectopascal' => {
-						'name' => q(hPa),
 						'other' => q({0}hPa),
 					},
 					# Long Unit Identifier
 					'pressure-inch-ofhg' => {
-						'name' => q(水銀柱インチ),
 						'other' => q({0}" Hg),
 					},
 					# Core Unit Identifier
 					'inch-ofhg' => {
-						'name' => q(水銀柱インチ),
 						'other' => q({0}" Hg),
 					},
 					# Long Unit Identifier
@@ -5492,22 +4909,18 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'pressure-millibar' => {
-						'name' => q(ミリバール),
 						'other' => q({0}mb),
 					},
 					# Core Unit Identifier
 					'millibar' => {
-						'name' => q(ミリバール),
 						'other' => q({0}mb),
 					},
 					# Long Unit Identifier
 					'pressure-millimeter-ofhg' => {
-						'name' => q(水銀柱ミリメートル),
 						'other' => q({0}mmHg),
 					},
 					# Core Unit Identifier
 					'millimeter-ofhg' => {
-						'name' => q(水銀柱ミリメートル),
 						'other' => q({0}mmHg),
 					},
 					# Long Unit Identifier
@@ -5522,101 +4935,59 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'pressure-pound-force-per-square-inch' => {
-						'name' => q(重量ポンド毎平方インチ),
 						'other' => q({0}psi),
 					},
 					# Core Unit Identifier
 					'pound-force-per-square-inch' => {
-						'name' => q(重量ポンド毎平方インチ),
 						'other' => q({0}psi),
 					},
 					# Long Unit Identifier
+					'speed-beaufort' => {
+						'other' => q(B{0}),
+					},
+					# Core Unit Identifier
+					'beaufort' => {
+						'other' => q(B{0}),
+					},
+					# Long Unit Identifier
 					'speed-kilometer-per-hour' => {
-						'name' => q(km/h),
 						'other' => q({0}km/h),
 					},
 					# Core Unit Identifier
 					'kilometer-per-hour' => {
-						'name' => q(km/h),
 						'other' => q({0}km/h),
 					},
 					# Long Unit Identifier
 					'speed-knot' => {
-						'name' => q(ノット),
 						'other' => q({0}kn),
 					},
 					# Core Unit Identifier
 					'knot' => {
-						'name' => q(ノット),
 						'other' => q({0}kn),
 					},
 					# Long Unit Identifier
 					'speed-meter-per-second' => {
-						'name' => q(m/s),
 						'other' => q({0}m/s),
 					},
 					# Core Unit Identifier
 					'meter-per-second' => {
-						'name' => q(m/s),
 						'other' => q({0}m/s),
 					},
 					# Long Unit Identifier
 					'speed-mile-per-hour' => {
-						'name' => q(マイル毎時),
 						'other' => q({0}mi/h),
 					},
 					# Core Unit Identifier
 					'mile-per-hour' => {
-						'name' => q(マイル毎時),
 						'other' => q({0}mi/h),
 					},
 					# Long Unit Identifier
-					'temperature-celsius' => {
-						'name' => q(°C),
-						'other' => q({0}°C),
-					},
-					# Core Unit Identifier
-					'celsius' => {
-						'name' => q(°C),
-						'other' => q({0}°C),
-					},
-					# Long Unit Identifier
-					'temperature-fahrenheit' => {
-						'name' => q(°F),
-						'other' => q({0}°F),
-					},
-					# Core Unit Identifier
-					'fahrenheit' => {
-						'name' => q(°F),
-						'other' => q({0}°F),
-					},
-					# Long Unit Identifier
-					'temperature-generic' => {
-						'name' => q(°),
-						'other' => q({0}°),
-					},
-					# Core Unit Identifier
-					'generic' => {
-						'name' => q(°),
-						'other' => q({0}°),
-					},
-					# Long Unit Identifier
 					'temperature-kelvin' => {
-						'name' => q(K),
 						'other' => q({0}K),
 					},
 					# Core Unit Identifier
 					'kelvin' => {
-						'name' => q(K),
 						'other' => q({0}K),
-					},
-					# Long Unit Identifier
-					'times' => {
-						'1' => q({0}⋅{1}),
-					},
-					# Core Unit Identifier
-					'times' => {
-						'1' => q({0}⋅{1}),
 					},
 					# Long Unit Identifier
 					'torque-newton-meter' => {
@@ -5742,10 +5113,20 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'volume-cup' => {
+						'name' => q(カップ),
 						'other' => q({0}カップ),
 					},
 					# Core Unit Identifier
 					'cup' => {
+						'name' => q(カップ),
+						'other' => q({0}カップ),
+					},
+					# Long Unit Identifier
+					'volume-cup-jp' => {
+						'other' => q({0}カップ),
+					},
+					# Core Unit Identifier
+					'cup-jp' => {
 						'other' => q({0}カップ),
 					},
 					# Long Unit Identifier
@@ -5857,6 +5238,22 @@ has 'units' => (
 						'other' => q({0}ジガー),
 					},
 					# Long Unit Identifier
+					'volume-koku' => {
+						'other' => q({0}石),
+					},
+					# Core Unit Identifier
+					'koku' => {
+						'other' => q({0}石),
+					},
+					# Long Unit Identifier
+					'volume-kosaji' => {
+						'other' => q(小さじ{0}),
+					},
+					# Core Unit Identifier
+					'kosaji' => {
+						'other' => q(小さじ{0}),
+					},
+					# Long Unit Identifier
 					'volume-liter' => {
 						'name' => q(L),
 						'other' => q({0}L),
@@ -5885,6 +5282,14 @@ has 'units' => (
 					'milliliter' => {
 						'name' => q(mL),
 						'other' => q({0}ml),
+					},
+					# Long Unit Identifier
+					'volume-osaji' => {
+						'other' => q(大さじ{0}),
+					},
+					# Core Unit Identifier
+					'osaji' => {
+						'other' => q(大さじ{0}),
 					},
 					# Long Unit Identifier
 					'volume-pinch' => {
@@ -5933,20 +5338,48 @@ has 'units' => (
 						'other' => q({0}qt-Imp.),
 					},
 					# Long Unit Identifier
+					'volume-sai' => {
+						'other' => q({0}才),
+					},
+					# Core Unit Identifier
+					'sai' => {
+						'other' => q({0}才),
+					},
+					# Long Unit Identifier
+					'volume-shaku' => {
+						'other' => q({0}勺),
+					},
+					# Core Unit Identifier
+					'shaku' => {
+						'other' => q({0}勺),
+					},
+					# Long Unit Identifier
 					'volume-tablespoon' => {
-						'other' => q(大さじ{0}),
+						'name' => q(tbsp),
+						'other' => q({0}tbsp),
 					},
 					# Core Unit Identifier
 					'tablespoon' => {
-						'other' => q(大さじ{0}),
+						'name' => q(tbsp),
+						'other' => q({0}tbsp),
 					},
 					# Long Unit Identifier
 					'volume-teaspoon' => {
-						'other' => q(小さじ{0}),
+						'name' => q(tsp),
+						'other' => q({0}tsp),
 					},
 					# Core Unit Identifier
 					'teaspoon' => {
-						'other' => q(小さじ{0}),
+						'name' => q(tsp),
+						'other' => q({0}tsp),
+					},
+					# Long Unit Identifier
+					'volume-to-jp' => {
+						'other' => q({0}斗),
+					},
+					# Core Unit Identifier
+					'to-jp' => {
+						'other' => q({0}斗),
 					},
 				},
 				'short' => {
@@ -5959,88 +5392,12 @@ has 'units' => (
 						'name' => q(方位),
 					},
 					# Long Unit Identifier
-					'1024p1' => {
-						'1' => q(Ki{0}),
-					},
-					# Core Unit Identifier
-					'1024p1' => {
-						'1' => q(Ki{0}),
-					},
-					# Long Unit Identifier
-					'1024p2' => {
-						'1' => q(Mi{0}),
-					},
-					# Core Unit Identifier
-					'1024p2' => {
-						'1' => q(Mi{0}),
-					},
-					# Long Unit Identifier
-					'1024p3' => {
-						'1' => q(Gi{0}),
-					},
-					# Core Unit Identifier
-					'1024p3' => {
-						'1' => q(Gi{0}),
-					},
-					# Long Unit Identifier
-					'1024p4' => {
-						'1' => q(Ti{0}),
-					},
-					# Core Unit Identifier
-					'1024p4' => {
-						'1' => q(Ti{0}),
-					},
-					# Long Unit Identifier
-					'1024p5' => {
-						'1' => q(Pi{0}),
-					},
-					# Core Unit Identifier
-					'1024p5' => {
-						'1' => q(Pi{0}),
-					},
-					# Long Unit Identifier
-					'1024p6' => {
-						'1' => q(Ei{0}),
-					},
-					# Core Unit Identifier
-					'1024p6' => {
-						'1' => q(Ei{0}),
-					},
-					# Long Unit Identifier
-					'1024p7' => {
-						'1' => q(Zi{0}),
-					},
-					# Core Unit Identifier
-					'1024p7' => {
-						'1' => q(Zi{0}),
-					},
-					# Long Unit Identifier
-					'1024p8' => {
-						'1' => q(Yi{0}),
-					},
-					# Core Unit Identifier
-					'1024p8' => {
-						'1' => q(Yi{0}),
-					},
-					# Long Unit Identifier
 					'acceleration-g-force' => {
 						'name' => q(重力加速度),
-						'other' => q({0} G),
 					},
 					# Core Unit Identifier
 					'g-force' => {
 						'name' => q(重力加速度),
-						'other' => q({0} G),
-					},
-					# Long Unit Identifier
-					'acceleration-meter-per-square-second' => {
-						'name' => q(m/s²),
-						'other' => q({0} m/s²),
-					},
-					# Core Unit Identifier
-					'meter-per-square-second' => {
-						'name' => q(m/s²),
-						'other' => q({0} m/s²),
 					},
 					# Long Unit Identifier
 					'angle-arc-minute' => {
@@ -6075,32 +5432,46 @@ has 'units' => (
 					# Long Unit Identifier
 					'angle-radian' => {
 						'name' => q(ラジアン),
-						'other' => q({0} rad),
 					},
 					# Core Unit Identifier
 					'radian' => {
 						'name' => q(ラジアン),
-						'other' => q({0} rad),
 					},
 					# Long Unit Identifier
 					'angle-revolution' => {
 						'name' => q(回転),
-						'other' => q({0} rev),
 					},
 					# Core Unit Identifier
 					'revolution' => {
 						'name' => q(回転),
-						'other' => q({0} rev),
 					},
 					# Long Unit Identifier
 					'area-acre' => {
 						'name' => q(エーカー),
-						'other' => q({0} ac),
 					},
 					# Core Unit Identifier
 					'acre' => {
 						'name' => q(エーカー),
-						'other' => q({0} ac),
+					},
+					# Long Unit Identifier
+					'area-bu-jp' => {
+						'name' => q(歩),
+						'other' => q({0} 歩),
+					},
+					# Core Unit Identifier
+					'bu-jp' => {
+						'name' => q(歩),
+						'other' => q({0} 歩),
+					},
+					# Long Unit Identifier
+					'area-cho' => {
+						'name' => q(町),
+						'other' => q({0} 町),
+					},
+					# Core Unit Identifier
+					'cho' => {
+						'name' => q(町),
+						'other' => q({0} 町),
 					},
 					# Long Unit Identifier
 					'area-dunam' => {
@@ -6115,92 +5486,52 @@ has 'units' => (
 					# Long Unit Identifier
 					'area-hectare' => {
 						'name' => q(ヘクタール),
-						'other' => q({0} ha),
 					},
 					# Core Unit Identifier
 					'hectare' => {
 						'name' => q(ヘクタール),
-						'other' => q({0} ha),
 					},
 					# Long Unit Identifier
-					'area-square-centimeter' => {
-						'name' => q(cm²),
-						'other' => q({0} cm²),
-						'per' => q({0}/cm²),
+					'area-se-jp' => {
+						'name' => q(畝),
+						'other' => q({0} 畝),
 					},
 					# Core Unit Identifier
-					'square-centimeter' => {
-						'name' => q(cm²),
-						'other' => q({0} cm²),
-						'per' => q({0}/cm²),
+					'se-jp' => {
+						'name' => q(畝),
+						'other' => q({0} 畝),
 					},
 					# Long Unit Identifier
 					'area-square-foot' => {
 						'name' => q(平方フィート),
-						'other' => q({0} ft²),
 					},
 					# Core Unit Identifier
 					'square-foot' => {
 						'name' => q(平方フィート),
-						'other' => q({0} ft²),
 					},
 					# Long Unit Identifier
 					'area-square-inch' => {
 						'name' => q(平方インチ),
-						'other' => q({0} in²),
-						'per' => q({0}/in²),
 					},
 					# Core Unit Identifier
 					'square-inch' => {
 						'name' => q(平方インチ),
-						'other' => q({0} in²),
-						'per' => q({0}/in²),
-					},
-					# Long Unit Identifier
-					'area-square-kilometer' => {
-						'name' => q(km²),
-						'other' => q({0} km²),
-						'per' => q({0}/km²),
-					},
-					# Core Unit Identifier
-					'square-kilometer' => {
-						'name' => q(km²),
-						'other' => q({0} km²),
-						'per' => q({0}/km²),
-					},
-					# Long Unit Identifier
-					'area-square-meter' => {
-						'name' => q(m²),
-						'other' => q({0} m²),
-						'per' => q({0}/m²),
-					},
-					# Core Unit Identifier
-					'square-meter' => {
-						'name' => q(m²),
-						'other' => q({0} m²),
-						'per' => q({0}/m²),
 					},
 					# Long Unit Identifier
 					'area-square-mile' => {
 						'name' => q(平方マイル),
-						'other' => q({0} mi²),
-						'per' => q({0}/mi²),
 					},
 					# Core Unit Identifier
 					'square-mile' => {
 						'name' => q(平方マイル),
-						'other' => q({0} mi²),
-						'per' => q({0}/mi²),
 					},
 					# Long Unit Identifier
 					'area-square-yard' => {
 						'name' => q(平方ヤード),
-						'other' => q({0} yd²),
 					},
 					# Core Unit Identifier
 					'square-yard' => {
 						'name' => q(平方ヤード),
-						'other' => q({0} yd²),
 					},
 					# Long Unit Identifier
 					'concentr-item' => {
@@ -6225,92 +5556,50 @@ has 'units' => (
 					# Long Unit Identifier
 					'concentr-milligram-ofglucose-per-deciliter' => {
 						'name' => q(ミリグラム毎デシリットル),
-						'other' => q({0} mg/dL),
 					},
 					# Core Unit Identifier
 					'milligram-ofglucose-per-deciliter' => {
 						'name' => q(ミリグラム毎デシリットル),
-						'other' => q({0} mg/dL),
 					},
 					# Long Unit Identifier
 					'concentr-millimole-per-liter' => {
 						'name' => q(ミリモル毎リットル),
-						'other' => q({0} mmol/L),
 					},
 					# Core Unit Identifier
 					'millimole-per-liter' => {
 						'name' => q(ミリモル毎リットル),
-						'other' => q({0} mmol/L),
 					},
 					# Long Unit Identifier
 					'concentr-mole' => {
 						'name' => q(モル),
-						'other' => q({0} mol),
 					},
 					# Core Unit Identifier
 					'mole' => {
 						'name' => q(モル),
-						'other' => q({0} mol),
 					},
 					# Long Unit Identifier
 					'concentr-percent' => {
 						'name' => q(パーセント),
-						'other' => q({0}%),
 					},
 					# Core Unit Identifier
 					'percent' => {
 						'name' => q(パーセント),
-						'other' => q({0}%),
 					},
 					# Long Unit Identifier
 					'concentr-permille' => {
 						'name' => q(パーミル),
-						'other' => q({0}‰),
 					},
 					# Core Unit Identifier
 					'permille' => {
 						'name' => q(パーミル),
-						'other' => q({0}‰),
-					},
-					# Long Unit Identifier
-					'concentr-permillion' => {
-						'name' => q(ppm),
-						'other' => q({0} ppm),
-					},
-					# Core Unit Identifier
-					'permillion' => {
-						'name' => q(ppm),
-						'other' => q({0} ppm),
 					},
 					# Long Unit Identifier
 					'concentr-permyriad' => {
 						'name' => q(パーミリアド),
-						'other' => q({0}‱),
 					},
 					# Core Unit Identifier
 					'permyriad' => {
 						'name' => q(パーミリアド),
-						'other' => q({0}‱),
-					},
-					# Long Unit Identifier
-					'consumption-liter-per-100-kilometer' => {
-						'name' => q(L/100km),
-						'other' => q({0} L/100km),
-					},
-					# Core Unit Identifier
-					'liter-per-100-kilometer' => {
-						'name' => q(L/100km),
-						'other' => q({0} L/100km),
-					},
-					# Long Unit Identifier
-					'consumption-liter-per-kilometer' => {
-						'name' => q(L/km),
-						'other' => q({0} L/km),
-					},
-					# Core Unit Identifier
-					'liter-per-kilometer' => {
-						'name' => q(L/km),
-						'other' => q({0} L/km),
 					},
 					# Long Unit Identifier
 					'consumption-mile-per-gallon' => {
@@ -6325,12 +5614,10 @@ has 'units' => (
 					# Long Unit Identifier
 					'consumption-mile-per-gallon-imperial' => {
 						'name' => q(マイル毎英ガロン),
-						'other' => q({0} mpg Imp.),
 					},
 					# Core Unit Identifier
 					'mile-per-gallon-imperial' => {
 						'name' => q(マイル毎英ガロン),
-						'other' => q({0} mpg Imp.),
 					},
 					# Long Unit Identifier
 					'coordinate' => {
@@ -6349,52 +5636,34 @@ has 'units' => (
 					# Long Unit Identifier
 					'digital-bit' => {
 						'name' => q(ビット),
-						'other' => q({0} bit),
 					},
 					# Core Unit Identifier
 					'bit' => {
 						'name' => q(ビット),
-						'other' => q({0} bit),
 					},
 					# Long Unit Identifier
 					'digital-byte' => {
 						'name' => q(バイト),
-						'other' => q({0} byte),
 					},
 					# Core Unit Identifier
 					'byte' => {
 						'name' => q(バイト),
-						'other' => q({0} byte),
 					},
 					# Long Unit Identifier
 					'digital-gigabit' => {
 						'name' => q(ギガビット),
-						'other' => q({0} Gb),
 					},
 					# Core Unit Identifier
 					'gigabit' => {
 						'name' => q(ギガビット),
-						'other' => q({0} Gb),
-					},
-					# Long Unit Identifier
-					'digital-gigabyte' => {
-						'name' => q(GB),
-						'other' => q({0} GB),
-					},
-					# Core Unit Identifier
-					'gigabyte' => {
-						'name' => q(GB),
-						'other' => q({0} GB),
 					},
 					# Long Unit Identifier
 					'digital-kilobit' => {
 						'name' => q(キロビット),
-						'other' => q({0} kb),
 					},
 					# Core Unit Identifier
 					'kilobit' => {
 						'name' => q(キロビット),
-						'other' => q({0} kb),
 					},
 					# Long Unit Identifier
 					'digital-kilobyte' => {
@@ -6409,52 +5678,34 @@ has 'units' => (
 					# Long Unit Identifier
 					'digital-megabit' => {
 						'name' => q(メガビット),
-						'other' => q({0} Mb),
 					},
 					# Core Unit Identifier
 					'megabit' => {
 						'name' => q(メガビット),
-						'other' => q({0} Mb),
-					},
-					# Long Unit Identifier
-					'digital-megabyte' => {
-						'name' => q(MB),
-						'other' => q({0} MB),
-					},
-					# Core Unit Identifier
-					'megabyte' => {
-						'name' => q(MB),
-						'other' => q({0} MB),
 					},
 					# Long Unit Identifier
 					'digital-petabyte' => {
 						'name' => q(ペタバイト),
-						'other' => q({0} PB),
 					},
 					# Core Unit Identifier
 					'petabyte' => {
 						'name' => q(ペタバイト),
-						'other' => q({0} PB),
 					},
 					# Long Unit Identifier
 					'digital-terabit' => {
 						'name' => q(テラビット),
-						'other' => q({0} Tb),
 					},
 					# Core Unit Identifier
 					'terabit' => {
 						'name' => q(テラビット),
-						'other' => q({0} Tb),
 					},
 					# Long Unit Identifier
 					'digital-terabyte' => {
 						'name' => q(テラバイト),
-						'other' => q({0} TB),
 					},
 					# Core Unit Identifier
 					'terabyte' => {
 						'name' => q(テラバイト),
-						'other' => q({0} TB),
 					},
 					# Long Unit Identifier
 					'duration-century' => {
@@ -6503,22 +5754,18 @@ has 'units' => (
 					# Long Unit Identifier
 					'duration-microsecond' => {
 						'name' => q(マイクロ秒),
-						'other' => q({0} μs),
 					},
 					# Core Unit Identifier
 					'microsecond' => {
 						'name' => q(マイクロ秒),
-						'other' => q({0} μs),
 					},
 					# Long Unit Identifier
 					'duration-millisecond' => {
 						'name' => q(ミリ秒),
-						'other' => q({0} ms),
 					},
 					# Core Unit Identifier
 					'millisecond' => {
 						'name' => q(ミリ秒),
-						'other' => q({0} ms),
 					},
 					# Long Unit Identifier
 					'duration-minute' => {
@@ -6547,12 +5794,22 @@ has 'units' => (
 					# Long Unit Identifier
 					'duration-nanosecond' => {
 						'name' => q(ナノ秒),
-						'other' => q({0} ns),
 					},
 					# Core Unit Identifier
 					'nanosecond' => {
 						'name' => q(ナノ秒),
-						'other' => q({0} ns),
+					},
+					# Long Unit Identifier
+					'duration-quarter' => {
+						'name' => q(四半期),
+						'other' => q({0}四半期),
+						'per' => q({0}/四半期),
+					},
+					# Core Unit Identifier
+					'quarter' => {
+						'name' => q(四半期),
+						'other' => q({0}四半期),
+						'per' => q({0}/四半期),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
@@ -6593,42 +5850,34 @@ has 'units' => (
 					# Long Unit Identifier
 					'electric-ampere' => {
 						'name' => q(アンペア),
-						'other' => q({0} A),
 					},
 					# Core Unit Identifier
 					'ampere' => {
 						'name' => q(アンペア),
-						'other' => q({0} A),
 					},
 					# Long Unit Identifier
 					'electric-milliampere' => {
 						'name' => q(ミリアンペア),
-						'other' => q({0} mA),
 					},
 					# Core Unit Identifier
 					'milliampere' => {
 						'name' => q(ミリアンペア),
-						'other' => q({0} mA),
 					},
 					# Long Unit Identifier
 					'electric-ohm' => {
 						'name' => q(オーム),
-						'other' => q({0} Ω),
 					},
 					# Core Unit Identifier
 					'ohm' => {
 						'name' => q(オーム),
-						'other' => q({0} Ω),
 					},
 					# Long Unit Identifier
 					'electric-volt' => {
 						'name' => q(ボルト),
-						'other' => q({0} V),
 					},
 					# Core Unit Identifier
 					'volt' => {
 						'name' => q(ボルト),
-						'other' => q({0} V),
 					},
 					# Long Unit Identifier
 					'energy-british-thermal-unit' => {
@@ -6641,24 +5890,12 @@ has 'units' => (
 						'other' => q({0} BTU),
 					},
 					# Long Unit Identifier
-					'energy-calorie' => {
-						'name' => q(cal),
-						'other' => q({0} cal),
-					},
-					# Core Unit Identifier
-					'calorie' => {
-						'name' => q(cal),
-						'other' => q({0} cal),
-					},
-					# Long Unit Identifier
 					'energy-electronvolt' => {
 						'name' => q(電子ボルト),
-						'other' => q({0} eV),
 					},
 					# Core Unit Identifier
 					'electronvolt' => {
 						'name' => q(電子ボルト),
-						'other' => q({0} eV),
 					},
 					# Long Unit Identifier
 					'energy-foodcalorie' => {
@@ -6673,42 +5910,26 @@ has 'units' => (
 					# Long Unit Identifier
 					'energy-joule' => {
 						'name' => q(ジュール),
-						'other' => q({0} J),
 					},
 					# Core Unit Identifier
 					'joule' => {
 						'name' => q(ジュール),
-						'other' => q({0} J),
-					},
-					# Long Unit Identifier
-					'energy-kilocalorie' => {
-						'name' => q(kcal),
-						'other' => q({0} kcal),
-					},
-					# Core Unit Identifier
-					'kilocalorie' => {
-						'name' => q(kcal),
-						'other' => q({0} kcal),
 					},
 					# Long Unit Identifier
 					'energy-kilojoule' => {
 						'name' => q(キロジュール),
-						'other' => q({0} kJ),
 					},
 					# Core Unit Identifier
 					'kilojoule' => {
 						'name' => q(キロジュール),
-						'other' => q({0} kJ),
 					},
 					# Long Unit Identifier
 					'energy-kilowatt-hour' => {
 						'name' => q(キロワット時),
-						'other' => q({0} kWh),
 					},
 					# Core Unit Identifier
 					'kilowatt-hour' => {
 						'name' => q(キロワット時),
-						'other' => q({0} kWh),
 					},
 					# Long Unit Identifier
 					'energy-therm-us' => {
@@ -6721,74 +5942,20 @@ has 'units' => (
 						'other' => q({0} 米サーム),
 					},
 					# Long Unit Identifier
-					'force-kilowatt-hour-per-100-kilometer' => {
-						'name' => q(kWh/100km),
-						'other' => q({0} kWh/100km),
-					},
-					# Core Unit Identifier
-					'kilowatt-hour-per-100-kilometer' => {
-						'name' => q(kWh/100km),
-						'other' => q({0} kWh/100km),
-					},
-					# Long Unit Identifier
 					'force-newton' => {
 						'name' => q(ニュートン),
-						'other' => q({0} N),
 					},
 					# Core Unit Identifier
 					'newton' => {
 						'name' => q(ニュートン),
-						'other' => q({0} N),
 					},
 					# Long Unit Identifier
 					'force-pound-force' => {
 						'name' => q(重量ポンド),
-						'other' => q({0} lbf),
 					},
 					# Core Unit Identifier
 					'pound-force' => {
 						'name' => q(重量ポンド),
-						'other' => q({0} lbf),
-					},
-					# Long Unit Identifier
-					'frequency-gigahertz' => {
-						'name' => q(GHz),
-						'other' => q({0} GHz),
-					},
-					# Core Unit Identifier
-					'gigahertz' => {
-						'name' => q(GHz),
-						'other' => q({0} GHz),
-					},
-					# Long Unit Identifier
-					'frequency-hertz' => {
-						'name' => q(Hz),
-						'other' => q({0} Hz),
-					},
-					# Core Unit Identifier
-					'hertz' => {
-						'name' => q(Hz),
-						'other' => q({0} Hz),
-					},
-					# Long Unit Identifier
-					'frequency-kilohertz' => {
-						'name' => q(kHz),
-						'other' => q({0} kHz),
-					},
-					# Core Unit Identifier
-					'kilohertz' => {
-						'name' => q(kHz),
-						'other' => q({0} kHz),
-					},
-					# Long Unit Identifier
-					'frequency-megahertz' => {
-						'name' => q(MHz),
-						'other' => q({0} MHz),
-					},
-					# Core Unit Identifier
-					'megahertz' => {
-						'name' => q(MHz),
-						'other' => q({0} MHz),
 					},
 					# Long Unit Identifier
 					'graphics-dot' => {
@@ -6821,152 +5988,88 @@ has 'units' => (
 						'other' => q({0} dpi),
 					},
 					# Long Unit Identifier
-					'graphics-em' => {
-						'name' => q(em),
-						'other' => q({0} em),
-					},
-					# Core Unit Identifier
-					'em' => {
-						'name' => q(em),
-						'other' => q({0} em),
-					},
-					# Long Unit Identifier
 					'graphics-megapixel' => {
 						'name' => q(メガピクセル),
-						'other' => q({0} MP),
 					},
 					# Core Unit Identifier
 					'megapixel' => {
 						'name' => q(メガピクセル),
-						'other' => q({0} MP),
 					},
 					# Long Unit Identifier
 					'graphics-pixel' => {
 						'name' => q(ピクセル),
-						'other' => q({0} px),
 					},
 					# Core Unit Identifier
 					'pixel' => {
 						'name' => q(ピクセル),
-						'other' => q({0} px),
-					},
-					# Long Unit Identifier
-					'graphics-pixel-per-centimeter' => {
-						'name' => q(ppcm),
-						'other' => q({0} ppcm),
-					},
-					# Core Unit Identifier
-					'pixel-per-centimeter' => {
-						'name' => q(ppcm),
-						'other' => q({0} ppcm),
-					},
-					# Long Unit Identifier
-					'graphics-pixel-per-inch' => {
-						'name' => q(ppi),
-						'other' => q({0} ppi),
-					},
-					# Core Unit Identifier
-					'pixel-per-inch' => {
-						'name' => q(ppi),
-						'other' => q({0} ppi),
 					},
 					# Long Unit Identifier
 					'length-astronomical-unit' => {
 						'name' => q(天文単位),
-						'other' => q({0} au),
 					},
 					# Core Unit Identifier
 					'astronomical-unit' => {
 						'name' => q(天文単位),
-						'other' => q({0} au),
-					},
-					# Long Unit Identifier
-					'length-centimeter' => {
-						'name' => q(cm),
-						'other' => q({0} cm),
-						'per' => q({0}/cm),
-					},
-					# Core Unit Identifier
-					'centimeter' => {
-						'name' => q(cm),
-						'other' => q({0} cm),
-						'per' => q({0}/cm),
 					},
 					# Long Unit Identifier
 					'length-decimeter' => {
 						'name' => q(デシメートル),
-						'other' => q({0} dm),
 					},
 					# Core Unit Identifier
 					'decimeter' => {
 						'name' => q(デシメートル),
-						'other' => q({0} dm),
-					},
-					# Long Unit Identifier
-					'length-earth-radius' => {
-						'name' => q(R⊕),
-						'other' => q({0} R⊕),
-					},
-					# Core Unit Identifier
-					'earth-radius' => {
-						'name' => q(R⊕),
-						'other' => q({0} R⊕),
 					},
 					# Long Unit Identifier
 					'length-fathom' => {
 						'name' => q(ファゾム),
-						'other' => q({0} fth),
 					},
 					# Core Unit Identifier
 					'fathom' => {
 						'name' => q(ファゾム),
-						'other' => q({0} fth),
 					},
 					# Long Unit Identifier
 					'length-foot' => {
 						'name' => q(フィート),
-						'other' => q({0} ft),
-						'per' => q({0}/ft),
 					},
 					# Core Unit Identifier
 					'foot' => {
 						'name' => q(フィート),
-						'other' => q({0} ft),
-						'per' => q({0}/ft),
 					},
 					# Long Unit Identifier
 					'length-furlong' => {
 						'name' => q(ハロン),
-						'other' => q({0} fur),
 					},
 					# Core Unit Identifier
 					'furlong' => {
 						'name' => q(ハロン),
-						'other' => q({0} fur),
 					},
 					# Long Unit Identifier
 					'length-inch' => {
 						'name' => q(インチ),
-						'other' => q({0} in),
-						'per' => q({0}/in),
 					},
 					# Core Unit Identifier
 					'inch' => {
 						'name' => q(インチ),
-						'other' => q({0} in),
-						'per' => q({0}/in),
 					},
 					# Long Unit Identifier
-					'length-kilometer' => {
-						'name' => q(km),
-						'other' => q({0} km),
-						'per' => q({0}/km),
+					'length-jo-jp' => {
+						'name' => q(丈),
+						'other' => q({0} 丈),
 					},
 					# Core Unit Identifier
-					'kilometer' => {
-						'name' => q(km),
-						'other' => q({0} km),
-						'per' => q({0}/km),
+					'jo-jp' => {
+						'name' => q(丈),
+						'other' => q({0} 丈),
+					},
+					# Long Unit Identifier
+					'length-ken' => {
+						'name' => q(間),
+						'other' => q({0} 間),
+					},
+					# Core Unit Identifier
+					'ken' => {
+						'name' => q(間),
+						'other' => q({0} 間),
 					},
 					# Long Unit Identifier
 					'length-light-year' => {
@@ -6981,64 +6084,42 @@ has 'units' => (
 					# Long Unit Identifier
 					'length-meter' => {
 						'name' => q(m),
-						'other' => q({0} m),
-						'per' => q({0}/m),
 					},
 					# Core Unit Identifier
 					'meter' => {
 						'name' => q(m),
-						'other' => q({0} m),
-						'per' => q({0}/m),
 					},
 					# Long Unit Identifier
 					'length-micrometer' => {
 						'name' => q(マイクロメートル),
-						'other' => q({0} μm),
 					},
 					# Core Unit Identifier
 					'micrometer' => {
 						'name' => q(マイクロメートル),
-						'other' => q({0} μm),
 					},
 					# Long Unit Identifier
 					'length-mile' => {
 						'name' => q(マイル),
-						'other' => q({0} mi),
 					},
 					# Core Unit Identifier
 					'mile' => {
 						'name' => q(マイル),
-						'other' => q({0} mi),
 					},
 					# Long Unit Identifier
 					'length-mile-scandinavian' => {
 						'name' => q(スカンジナビアマイル),
-						'other' => q({0} smi),
 					},
 					# Core Unit Identifier
 					'mile-scandinavian' => {
 						'name' => q(スカンジナビアマイル),
-						'other' => q({0} smi),
-					},
-					# Long Unit Identifier
-					'length-millimeter' => {
-						'name' => q(mm),
-						'other' => q({0} mm),
-					},
-					# Core Unit Identifier
-					'millimeter' => {
-						'name' => q(mm),
-						'other' => q({0} mm),
 					},
 					# Long Unit Identifier
 					'length-nanometer' => {
 						'name' => q(ナノメートル),
-						'other' => q({0} nm),
 					},
 					# Core Unit Identifier
 					'nanometer' => {
 						'name' => q(ナノメートル),
-						'other' => q({0} nm),
 					},
 					# Long Unit Identifier
 					'length-nautical-mile' => {
@@ -7053,92 +6134,108 @@ has 'units' => (
 					# Long Unit Identifier
 					'length-parsec' => {
 						'name' => q(パーセク),
-						'other' => q({0} pc),
 					},
 					# Core Unit Identifier
 					'parsec' => {
 						'name' => q(パーセク),
-						'other' => q({0} pc),
 					},
 					# Long Unit Identifier
 					'length-picometer' => {
 						'name' => q(ピコメートル),
-						'other' => q({0} pm),
 					},
 					# Core Unit Identifier
 					'picometer' => {
 						'name' => q(ピコメートル),
-						'other' => q({0} pm),
 					},
 					# Long Unit Identifier
 					'length-point' => {
 						'name' => q(ポイント),
-						'other' => q({0} pt),
 					},
 					# Core Unit Identifier
 					'point' => {
 						'name' => q(ポイント),
-						'other' => q({0} pt),
+					},
+					# Long Unit Identifier
+					'length-ri-jp' => {
+						'name' => q(里),
+						'other' => q({0} 里),
+					},
+					# Core Unit Identifier
+					'ri-jp' => {
+						'name' => q(里),
+						'other' => q({0} 里),
+					},
+					# Long Unit Identifier
+					'length-rin' => {
+						'name' => q(厘),
+						'other' => q({0} 厘),
+					},
+					# Core Unit Identifier
+					'rin' => {
+						'name' => q(厘),
+						'other' => q({0} 厘),
+					},
+					# Long Unit Identifier
+					'length-shaku-cloth' => {
+						'name' => q(鯨尺),
+						'other' => q({0} 鯨尺),
+					},
+					# Core Unit Identifier
+					'shaku-cloth' => {
+						'name' => q(鯨尺),
+						'other' => q({0} 鯨尺),
+					},
+					# Long Unit Identifier
+					'length-shaku-length' => {
+						'name' => q(尺),
+						'other' => q({0} 尺),
+					},
+					# Core Unit Identifier
+					'shaku-length' => {
+						'name' => q(尺),
+						'other' => q({0} 尺),
 					},
 					# Long Unit Identifier
 					'length-solar-radius' => {
 						'name' => q(太陽半径),
-						'other' => q({0} R☉),
 					},
 					# Core Unit Identifier
 					'solar-radius' => {
 						'name' => q(太陽半径),
-						'other' => q({0} R☉),
+					},
+					# Long Unit Identifier
+					'length-sun' => {
+						'name' => q(寸),
+						'other' => q({0} 寸),
+					},
+					# Core Unit Identifier
+					'sun' => {
+						'name' => q(寸),
+						'other' => q({0} 寸),
 					},
 					# Long Unit Identifier
 					'length-yard' => {
 						'name' => q(ヤード),
-						'other' => q({0} yd),
 					},
 					# Core Unit Identifier
 					'yard' => {
 						'name' => q(ヤード),
-						'other' => q({0} yd),
-					},
-					# Long Unit Identifier
-					'light-candela' => {
-						'name' => q(cd),
-						'other' => q({0} cd),
-					},
-					# Core Unit Identifier
-					'candela' => {
-						'name' => q(cd),
-						'other' => q({0} cd),
-					},
-					# Long Unit Identifier
-					'light-lumen' => {
-						'name' => q(lm),
-						'other' => q({0} lm),
-					},
-					# Core Unit Identifier
-					'lumen' => {
-						'name' => q(lm),
-						'other' => q({0} lm),
 					},
 					# Long Unit Identifier
 					'light-lux' => {
 						'name' => q(ルクス),
-						'other' => q({0} lx),
 					},
 					# Core Unit Identifier
 					'lux' => {
 						'name' => q(ルクス),
-						'other' => q({0} lx),
 					},
 					# Long Unit Identifier
 					'light-solar-luminosity' => {
 						'name' => q(太陽光度),
-						'other' => q({0} L☉),
 					},
 					# Core Unit Identifier
 					'solar-luminosity' => {
 						'name' => q(太陽光度),
-						'other' => q({0} L☉),
 					},
 					# Long Unit Identifier
 					'mass-carat' => {
@@ -7153,22 +6250,28 @@ has 'units' => (
 					# Long Unit Identifier
 					'mass-dalton' => {
 						'name' => q(ダルトン),
-						'other' => q({0} Da),
 					},
 					# Core Unit Identifier
 					'dalton' => {
 						'name' => q(ダルトン),
-						'other' => q({0} Da),
 					},
 					# Long Unit Identifier
 					'mass-earth-mass' => {
 						'name' => q(地球質量),
-						'other' => q({0} M⊕),
 					},
 					# Core Unit Identifier
 					'earth-mass' => {
 						'name' => q(地球質量),
-						'other' => q({0} M⊕),
+					},
+					# Long Unit Identifier
+					'mass-fun' => {
+						'name' => q(分 - 質量),
+						'other' => q({0} 分 - 質量),
+					},
+					# Core Unit Identifier
+					'fun' => {
+						'name' => q(分 - 質量),
+						'other' => q({0} 分 - 質量),
 					},
 					# Long Unit Identifier
 					'mass-grain' => {
@@ -7183,110 +6286,58 @@ has 'units' => (
 					# Long Unit Identifier
 					'mass-gram' => {
 						'name' => q(グラム),
-						'other' => q({0} g),
-						'per' => q({0}/g),
 					},
 					# Core Unit Identifier
 					'gram' => {
 						'name' => q(グラム),
-						'other' => q({0} g),
-						'per' => q({0}/g),
-					},
-					# Long Unit Identifier
-					'mass-kilogram' => {
-						'name' => q(kg),
-						'other' => q({0} kg),
-						'per' => q({0}/kg),
-					},
-					# Core Unit Identifier
-					'kilogram' => {
-						'name' => q(kg),
-						'other' => q({0} kg),
-						'per' => q({0}/kg),
-					},
-					# Long Unit Identifier
-					'mass-metric-ton' => {
-						'name' => q(トン),
-						'other' => q({0} t),
-					},
-					# Core Unit Identifier
-					'metric-ton' => {
-						'name' => q(トン),
-						'other' => q({0} t),
 					},
 					# Long Unit Identifier
 					'mass-microgram' => {
 						'name' => q(マイクログラム),
-						'other' => q({0} μg),
 					},
 					# Core Unit Identifier
 					'microgram' => {
 						'name' => q(マイクログラム),
-						'other' => q({0} μg),
-					},
-					# Long Unit Identifier
-					'mass-milligram' => {
-						'name' => q(mg),
-						'other' => q({0} mg),
-					},
-					# Core Unit Identifier
-					'milligram' => {
-						'name' => q(mg),
-						'other' => q({0} mg),
 					},
 					# Long Unit Identifier
 					'mass-ounce' => {
 						'name' => q(オンス),
-						'other' => q({0} oz),
-						'per' => q({0}/oz),
 					},
 					# Core Unit Identifier
 					'ounce' => {
 						'name' => q(オンス),
-						'other' => q({0} oz),
-						'per' => q({0}/oz),
 					},
 					# Long Unit Identifier
 					'mass-ounce-troy' => {
 						'name' => q(トロイオンス),
-						'other' => q({0} oz t),
 					},
 					# Core Unit Identifier
 					'ounce-troy' => {
 						'name' => q(トロイオンス),
-						'other' => q({0} oz t),
 					},
 					# Long Unit Identifier
 					'mass-pound' => {
 						'name' => q(ポンド),
-						'other' => q({0} lb),
-						'per' => q({0}/lb),
 					},
 					# Core Unit Identifier
 					'pound' => {
 						'name' => q(ポンド),
-						'other' => q({0} lb),
-						'per' => q({0}/lb),
 					},
 					# Long Unit Identifier
 					'mass-solar-mass' => {
 						'name' => q(太陽質量),
-						'other' => q({0} M☉),
 					},
 					# Core Unit Identifier
 					'solar-mass' => {
 						'name' => q(太陽質量),
-						'other' => q({0} M☉),
 					},
 					# Long Unit Identifier
 					'mass-stone' => {
 						'name' => q(ストーン),
-						'other' => q({0} st),
 					},
 					# Core Unit Identifier
 					'stone' => {
 						'name' => q(ストーン),
-						'other' => q({0} st),
 					},
 					# Long Unit Identifier
 					'mass-ton' => {
@@ -7299,22 +6350,12 @@ has 'units' => (
 						'other' => q({0} s/t),
 					},
 					# Long Unit Identifier
-					'per' => {
-						'1' => q({0}/{1}),
-					},
-					# Core Unit Identifier
-					'per' => {
-						'1' => q({0}/{1}),
-					},
-					# Long Unit Identifier
 					'power-gigawatt' => {
 						'name' => q(ギガワット),
-						'other' => q({0} GW),
 					},
 					# Core Unit Identifier
 					'gigawatt' => {
 						'name' => q(ギガワット),
-						'other' => q({0} GW),
 					},
 					# Long Unit Identifier
 					'power-horsepower' => {
@@ -7329,102 +6370,58 @@ has 'units' => (
 					# Long Unit Identifier
 					'power-kilowatt' => {
 						'name' => q(キロワット),
-						'other' => q({0} kW),
 					},
 					# Core Unit Identifier
 					'kilowatt' => {
 						'name' => q(キロワット),
-						'other' => q({0} kW),
 					},
 					# Long Unit Identifier
 					'power-megawatt' => {
 						'name' => q(メガワット),
-						'other' => q({0} MW),
 					},
 					# Core Unit Identifier
 					'megawatt' => {
 						'name' => q(メガワット),
-						'other' => q({0} MW),
 					},
 					# Long Unit Identifier
 					'power-milliwatt' => {
 						'name' => q(ミリワット),
-						'other' => q({0} mW),
 					},
 					# Core Unit Identifier
 					'milliwatt' => {
 						'name' => q(ミリワット),
-						'other' => q({0} mW),
 					},
 					# Long Unit Identifier
 					'power-watt' => {
 						'name' => q(ワット),
-						'other' => q({0} W),
 					},
 					# Core Unit Identifier
 					'watt' => {
 						'name' => q(ワット),
-						'other' => q({0} W),
 					},
 					# Long Unit Identifier
 					'pressure-atmosphere' => {
 						'name' => q(気圧),
-						'other' => q({0} atm),
 					},
 					# Core Unit Identifier
 					'atmosphere' => {
 						'name' => q(気圧),
-						'other' => q({0} atm),
 					},
 					# Long Unit Identifier
 					'pressure-bar' => {
 						'name' => q(バール),
-						'other' => q({0} bar),
 					},
 					# Core Unit Identifier
 					'bar' => {
 						'name' => q(バール),
-						'other' => q({0} bar),
-					},
-					# Long Unit Identifier
-					'pressure-hectopascal' => {
-						'name' => q(hPa),
-						'other' => q({0} hPa),
-					},
-					# Core Unit Identifier
-					'hectopascal' => {
-						'name' => q(hPa),
-						'other' => q({0} hPa),
 					},
 					# Long Unit Identifier
 					'pressure-inch-ofhg' => {
 						'name' => q(水銀柱インチ),
-						'other' => q({0} inHg),
 					},
 					# Core Unit Identifier
 					'inch-ofhg' => {
 						'name' => q(水銀柱インチ),
-						'other' => q({0} inHg),
-					},
-					# Long Unit Identifier
-					'pressure-kilopascal' => {
-						'name' => q(kPa),
-						'other' => q({0} kPa),
-					},
-					# Core Unit Identifier
-					'kilopascal' => {
-						'name' => q(kPa),
-						'other' => q({0} kPa),
-					},
-					# Long Unit Identifier
-					'pressure-megapascal' => {
-						'name' => q(MPa),
-						'other' => q({0} MPa),
-					},
-					# Core Unit Identifier
-					'megapascal' => {
-						'name' => q(MPa),
-						'other' => q({0} MPa),
 					},
 					# Long Unit Identifier
 					'pressure-millibar' => {
@@ -7439,62 +6436,42 @@ has 'units' => (
 					# Long Unit Identifier
 					'pressure-millimeter-ofhg' => {
 						'name' => q(水銀柱ミリメートル),
-						'other' => q({0} mm Hg),
 					},
 					# Core Unit Identifier
 					'millimeter-ofhg' => {
 						'name' => q(水銀柱ミリメートル),
-						'other' => q({0} mm Hg),
 					},
 					# Long Unit Identifier
 					'pressure-pascal' => {
 						'name' => q(パスカル),
-						'other' => q({0} Pa),
 					},
 					# Core Unit Identifier
 					'pascal' => {
 						'name' => q(パスカル),
-						'other' => q({0} Pa),
 					},
 					# Long Unit Identifier
 					'pressure-pound-force-per-square-inch' => {
 						'name' => q(重量ポンド毎平方インチ),
-						'other' => q({0} psi),
 					},
 					# Core Unit Identifier
 					'pound-force-per-square-inch' => {
 						'name' => q(重量ポンド毎平方インチ),
-						'other' => q({0} psi),
 					},
 					# Long Unit Identifier
-					'speed-kilometer-per-hour' => {
-						'name' => q(km/h),
-						'other' => q({0} km/h),
+					'speed-beaufort' => {
+						'name' => q(風力階級),
 					},
 					# Core Unit Identifier
-					'kilometer-per-hour' => {
-						'name' => q(km/h),
-						'other' => q({0} km/h),
+					'beaufort' => {
+						'name' => q(風力階級),
 					},
 					# Long Unit Identifier
 					'speed-knot' => {
 						'name' => q(ノット),
-						'other' => q({0} kn),
 					},
 					# Core Unit Identifier
 					'knot' => {
 						'name' => q(ノット),
-						'other' => q({0} kn),
-					},
-					# Long Unit Identifier
-					'speed-meter-per-second' => {
-						'name' => q(m/s),
-						'other' => q({0} m/s),
-					},
-					# Core Unit Identifier
-					'meter-per-second' => {
-						'name' => q(m/s),
-						'other' => q({0} m/s),
 					},
 					# Long Unit Identifier
 					'speed-mile-per-hour' => {
@@ -7507,216 +6484,120 @@ has 'units' => (
 						'other' => q({0} mph),
 					},
 					# Long Unit Identifier
-					'temperature-celsius' => {
-						'name' => q(°C),
-						'other' => q({0}°C),
-					},
-					# Core Unit Identifier
-					'celsius' => {
-						'name' => q(°C),
-						'other' => q({0}°C),
-					},
-					# Long Unit Identifier
-					'temperature-fahrenheit' => {
-						'name' => q(°F),
-						'other' => q({0}°F),
-					},
-					# Core Unit Identifier
-					'fahrenheit' => {
-						'name' => q(°F),
-						'other' => q({0}°F),
-					},
-					# Long Unit Identifier
-					'temperature-generic' => {
-						'name' => q(°),
-						'other' => q({0}°),
-					},
-					# Core Unit Identifier
-					'generic' => {
-						'name' => q(°),
-						'other' => q({0}°),
-					},
-					# Long Unit Identifier
-					'temperature-kelvin' => {
-						'name' => q(K),
-						'other' => q({0} K),
-					},
-					# Core Unit Identifier
-					'kelvin' => {
-						'name' => q(K),
-						'other' => q({0} K),
-					},
-					# Long Unit Identifier
-					'times' => {
-						'1' => q({0}⋅{1}),
-					},
-					# Core Unit Identifier
-					'times' => {
-						'1' => q({0}⋅{1}),
-					},
-					# Long Unit Identifier
 					'torque-newton-meter' => {
 						'name' => q(ニュートンメートル),
-						'other' => q({0} N⋅m),
 					},
 					# Core Unit Identifier
 					'newton-meter' => {
 						'name' => q(ニュートンメートル),
-						'other' => q({0} N⋅m),
 					},
 					# Long Unit Identifier
 					'torque-pound-force-foot' => {
 						'name' => q(ポンドフィート),
-						'other' => q({0} lbf⋅ft),
 					},
 					# Core Unit Identifier
 					'pound-force-foot' => {
 						'name' => q(ポンドフィート),
-						'other' => q({0} lbf⋅ft),
 					},
 					# Long Unit Identifier
 					'volume-acre-foot' => {
 						'name' => q(エーカーフィート),
-						'other' => q({0} ac ft),
 					},
 					# Core Unit Identifier
 					'acre-foot' => {
 						'name' => q(エーカーフィート),
-						'other' => q({0} ac ft),
 					},
 					# Long Unit Identifier
 					'volume-barrel' => {
 						'name' => q(バレル),
-						'other' => q({0} bbl),
 					},
 					# Core Unit Identifier
 					'barrel' => {
 						'name' => q(バレル),
-						'other' => q({0} bbl),
 					},
 					# Long Unit Identifier
 					'volume-bushel' => {
 						'name' => q(ブッシェル),
-						'other' => q({0} bu),
 					},
 					# Core Unit Identifier
 					'bushel' => {
 						'name' => q(ブッシェル),
-						'other' => q({0} bu),
 					},
 					# Long Unit Identifier
 					'volume-centiliter' => {
 						'name' => q(センチリットル),
-						'other' => q({0} cL),
 					},
 					# Core Unit Identifier
 					'centiliter' => {
 						'name' => q(センチリットル),
-						'other' => q({0} cL),
-					},
-					# Long Unit Identifier
-					'volume-cubic-centimeter' => {
-						'name' => q(cm³),
-						'other' => q({0} cm³),
-						'per' => q({0}/cm³),
-					},
-					# Core Unit Identifier
-					'cubic-centimeter' => {
-						'name' => q(cm³),
-						'other' => q({0} cm³),
-						'per' => q({0}/cm³),
 					},
 					# Long Unit Identifier
 					'volume-cubic-foot' => {
 						'name' => q(立方フィート),
-						'other' => q({0} ft³),
 					},
 					# Core Unit Identifier
 					'cubic-foot' => {
 						'name' => q(立方フィート),
-						'other' => q({0} ft³),
 					},
 					# Long Unit Identifier
 					'volume-cubic-inch' => {
 						'name' => q(立方インチ),
-						'other' => q({0} in³),
 					},
 					# Core Unit Identifier
 					'cubic-inch' => {
 						'name' => q(立方インチ),
-						'other' => q({0} in³),
-					},
-					# Long Unit Identifier
-					'volume-cubic-kilometer' => {
-						'name' => q(km³),
-						'other' => q({0} km³),
-					},
-					# Core Unit Identifier
-					'cubic-kilometer' => {
-						'name' => q(km³),
-						'other' => q({0} km³),
-					},
-					# Long Unit Identifier
-					'volume-cubic-meter' => {
-						'name' => q(m³),
-						'other' => q({0} m³),
-						'per' => q({0}/m³),
-					},
-					# Core Unit Identifier
-					'cubic-meter' => {
-						'name' => q(m³),
-						'other' => q({0} m³),
-						'per' => q({0}/m³),
 					},
 					# Long Unit Identifier
 					'volume-cubic-mile' => {
 						'name' => q(立方マイル),
-						'other' => q({0} mi³),
 					},
 					# Core Unit Identifier
 					'cubic-mile' => {
 						'name' => q(立方マイル),
-						'other' => q({0} mi³),
 					},
 					# Long Unit Identifier
 					'volume-cubic-yard' => {
 						'name' => q(立方ヤード),
-						'other' => q({0} yd³),
 					},
 					# Core Unit Identifier
 					'cubic-yard' => {
 						'name' => q(立方ヤード),
-						'other' => q({0} yd³),
 					},
 					# Long Unit Identifier
 					'volume-cup' => {
+						'name' => q(カップ - 米国),
+						'other' => q({0} カップ - 米国),
+					},
+					# Core Unit Identifier
+					'cup' => {
+						'name' => q(カップ - 米国),
+						'other' => q({0} カップ - 米国),
+					},
+					# Long Unit Identifier
+					'volume-cup-jp' => {
 						'name' => q(カップ),
 						'other' => q({0} カップ),
 					},
 					# Core Unit Identifier
-					'cup' => {
+					'cup-jp' => {
 						'name' => q(カップ),
 						'other' => q({0} カップ),
 					},
 					# Long Unit Identifier
 					'volume-cup-metric' => {
 						'name' => q(メトリックカップ),
-						'other' => q({0} mc),
 					},
 					# Core Unit Identifier
 					'cup-metric' => {
 						'name' => q(メトリックカップ),
-						'other' => q({0} mc),
 					},
 					# Long Unit Identifier
 					'volume-deciliter' => {
 						'name' => q(デシリットル),
-						'other' => q({0} dL),
 					},
 					# Core Unit Identifier
 					'deciliter' => {
 						'name' => q(デシリットル),
-						'other' => q({0} dL),
 					},
 					# Long Unit Identifier
 					'volume-dessert-spoon' => {
@@ -7793,24 +6674,18 @@ has 'units' => (
 					# Long Unit Identifier
 					'volume-gallon-imperial' => {
 						'name' => q(英ガロン),
-						'other' => q({0} gal Imp.),
-						'per' => q({0}/gal Imp.),
 					},
 					# Core Unit Identifier
 					'gallon-imperial' => {
 						'name' => q(英ガロン),
-						'other' => q({0} gal Imp.),
-						'per' => q({0}/gal Imp.),
 					},
 					# Long Unit Identifier
 					'volume-hectoliter' => {
 						'name' => q(ヘクトリットル),
-						'other' => q({0} hL),
 					},
 					# Core Unit Identifier
 					'hectoliter' => {
 						'name' => q(ヘクトリットル),
-						'other' => q({0} hL),
 					},
 					# Long Unit Identifier
 					'volume-jigger' => {
@@ -7821,6 +6696,26 @@ has 'units' => (
 					'jigger' => {
 						'name' => q(ジガー),
 						'other' => q({0} ジガー),
+					},
+					# Long Unit Identifier
+					'volume-koku' => {
+						'name' => q(石),
+						'other' => q({0} 石),
+					},
+					# Core Unit Identifier
+					'koku' => {
+						'name' => q(石),
+						'other' => q({0} 石),
+					},
+					# Long Unit Identifier
+					'volume-kosaji' => {
+						'name' => q(小さじ),
+						'other' => q(小さじ {0}),
+					},
+					# Core Unit Identifier
+					'kosaji' => {
+						'name' => q(小さじ),
+						'other' => q(小さじ {0}),
 					},
 					# Long Unit Identifier
 					'volume-liter' => {
@@ -7837,12 +6732,10 @@ has 'units' => (
 					# Long Unit Identifier
 					'volume-megaliter' => {
 						'name' => q(メガリットル),
-						'other' => q({0} ML),
 					},
 					# Core Unit Identifier
 					'megaliter' => {
 						'name' => q(メガリットル),
-						'other' => q({0} ML),
 					},
 					# Long Unit Identifier
 					'volume-milliliter' => {
@@ -7853,6 +6746,16 @@ has 'units' => (
 					'milliliter' => {
 						'name' => q(ミリリットル),
 						'other' => q({0} ml),
+					},
+					# Long Unit Identifier
+					'volume-osaji' => {
+						'name' => q(大さじ),
+						'other' => q(大さじ {0}),
+					},
+					# Core Unit Identifier
+					'osaji' => {
+						'name' => q(大さじ),
+						'other' => q(大さじ {0}),
 					},
 					# Long Unit Identifier
 					'volume-pinch' => {
@@ -7867,62 +6770,80 @@ has 'units' => (
 					# Long Unit Identifier
 					'volume-pint' => {
 						'name' => q(パイント),
-						'other' => q({0} pt),
 					},
 					# Core Unit Identifier
 					'pint' => {
 						'name' => q(パイント),
-						'other' => q({0} pt),
 					},
 					# Long Unit Identifier
 					'volume-pint-metric' => {
 						'name' => q(メトリックパイント),
-						'other' => q({0} mpt),
 					},
 					# Core Unit Identifier
 					'pint-metric' => {
 						'name' => q(メトリックパイント),
-						'other' => q({0} mpt),
 					},
 					# Long Unit Identifier
 					'volume-quart' => {
 						'name' => q(クォート),
-						'other' => q({0} qt),
 					},
 					# Core Unit Identifier
 					'quart' => {
 						'name' => q(クォート),
-						'other' => q({0} qt),
 					},
 					# Long Unit Identifier
 					'volume-quart-imperial' => {
 						'name' => q(英クォート),
-						'other' => q({0} qt Imp.),
 					},
 					# Core Unit Identifier
 					'quart-imperial' => {
 						'name' => q(英クォート),
-						'other' => q({0} qt Imp.),
+					},
+					# Long Unit Identifier
+					'volume-sai' => {
+						'name' => q(才),
+						'other' => q({0} 才),
+					},
+					# Core Unit Identifier
+					'sai' => {
+						'name' => q(才),
+						'other' => q({0} 才),
+					},
+					# Long Unit Identifier
+					'volume-shaku' => {
+						'name' => q(勺),
+						'other' => q({0} 勺),
+					},
+					# Core Unit Identifier
+					'shaku' => {
+						'name' => q(勺),
+						'other' => q({0} 勺),
 					},
 					# Long Unit Identifier
 					'volume-tablespoon' => {
-						'name' => q(大さじ),
-						'other' => q(大さじ {0}),
+						'name' => q(テーブルスプーン),
 					},
 					# Core Unit Identifier
 					'tablespoon' => {
-						'name' => q(大さじ),
-						'other' => q(大さじ {0}),
+						'name' => q(テーブルスプーン),
 					},
 					# Long Unit Identifier
 					'volume-teaspoon' => {
-						'name' => q(小さじ),
-						'other' => q(小さじ {0}),
+						'name' => q(ティースプーン),
 					},
 					# Core Unit Identifier
 					'teaspoon' => {
-						'name' => q(小さじ),
-						'other' => q(小さじ {0}),
+						'name' => q(ティースプーン),
+					},
+					# Long Unit Identifier
+					'volume-to-jp' => {
+						'name' => q(斗),
+						'other' => q({0} 斗),
+					},
+					# Core Unit Identifier
+					'to-jp' => {
+						'name' => q(斗),
+						'other' => q({0} 斗),
 					},
 				},
 			} }
@@ -7947,25 +6868,11 @@ has 'listPatterns' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-				start => q({0} {1}),
-				middle => q({0} {1}),
-				end => q({0} {1}),
-				2 => q({0} {1}),
+				start => q({0}、{1}),
+				middle => q({0}、{1}),
+				end => q({0}、{1}),
+				2 => q({0}、{1}),
 		} }
-);
-
-has 'default_numbering_system' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> 'latn',
-);
-
-has native_numbering_system => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> 'latn',
 );
 
 has traditional_numbering_system => (
@@ -7982,120 +6889,12 @@ has finance_numbering_system => (
 	default		=> 'jpanfin',
 );
 
-has 'minimum_grouping_digits' => (
-	is			=>'ro',
-	isa			=> Int,
-	init_arg	=> undef,
-	default		=> 1,
-);
-
-has 'number_symbols' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'latn' => {
-			'decimal' => q(.),
-			'exponential' => q(E),
-			'group' => q(,),
-			'infinity' => q(∞),
-			'list' => q(;),
-			'minusSign' => q(-),
-			'nan' => q(NaN),
-			'perMille' => q(‰),
-			'percentSign' => q(%),
-			'plusSign' => q(+),
-			'superscriptingExponent' => q(×),
-			'timeSeparator' => q(:),
-		},
-	} }
-);
-
 has 'number_formats' => (
 	is			=> 'ro',
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
 		decimalFormat => {
-			'default' => {
-				'1000' => {
-					'other' => '0',
-				},
-				'10000' => {
-					'other' => '0万',
-				},
-				'100000' => {
-					'other' => '00万',
-				},
-				'1000000' => {
-					'other' => '000万',
-				},
-				'10000000' => {
-					'other' => '0000万',
-				},
-				'100000000' => {
-					'other' => '0億',
-				},
-				'1000000000' => {
-					'other' => '00億',
-				},
-				'10000000000' => {
-					'other' => '000億',
-				},
-				'100000000000' => {
-					'other' => '0000億',
-				},
-				'1000000000000' => {
-					'other' => '0兆',
-				},
-				'10000000000000' => {
-					'other' => '00兆',
-				},
-				'100000000000000' => {
-					'other' => '000兆',
-				},
-				'standard' => {
-					'default' => '#,##0.###',
-				},
-			},
-			'long' => {
-				'1000' => {
-					'other' => '0',
-				},
-				'10000' => {
-					'other' => '0万',
-				},
-				'100000' => {
-					'other' => '00万',
-				},
-				'1000000' => {
-					'other' => '000万',
-				},
-				'10000000' => {
-					'other' => '0000万',
-				},
-				'100000000' => {
-					'other' => '0億',
-				},
-				'1000000000' => {
-					'other' => '00億',
-				},
-				'10000000000' => {
-					'other' => '000億',
-				},
-				'100000000000' => {
-					'other' => '0000億',
-				},
-				'1000000000000' => {
-					'other' => '0兆',
-				},
-				'10000000000000' => {
-					'other' => '00兆',
-				},
-				'100000000000000' => {
-					'other' => '000兆',
-				},
-			},
 			'short' => {
 				'1000' => {
 					'other' => '0',
@@ -8133,19 +6932,20 @@ has 'number_formats' => (
 				'100000000000000' => {
 					'other' => '000兆',
 				},
-			},
-		},
-		percentFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0%',
+				'1000000000000000' => {
+					'other' => '0000兆',
 				},
-			},
-		},
-		scientificFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#E0',
+				'10000000000000000' => {
+					'other' => '0京',
+				},
+				'100000000000000000' => {
+					'other' => '00京',
+				},
+				'1000000000000000000' => {
+					'other' => '000京',
+				},
+				'10000000000000000000' => {
+					'other' => '0000京',
 				},
 			},
 		},
@@ -8179,927 +6979,666 @@ has 'currencies' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'ADP' => {
-			symbol => 'ADP',
 			display_name => {
 				'currency' => q(アンドラ ペセタ),
-				'other' => q(アンドラ ペセタ),
 			},
 		},
 		'AED' => {
-			symbol => 'AED',
 			display_name => {
 				'currency' => q(アラブ首長国連邦ディルハム),
 				'other' => q(UAE ディルハム),
 			},
 		},
 		'AFA' => {
-			symbol => 'AFA',
 			display_name => {
 				'currency' => q(アフガニスタン アフガニー \(1927–2002\)),
-				'other' => q(アフガニスタン アフガニー \(1927–2002\)),
 			},
 		},
 		'AFN' => {
-			symbol => 'AFN',
 			display_name => {
 				'currency' => q(アフガニスタン アフガニー),
-				'other' => q(アフガニスタン アフガニー),
 			},
 		},
 		'ALK' => {
-			symbol => 'ALK',
 			display_name => {
 				'currency' => q(アルバニア レク \(1946–1965\)),
-				'other' => q(アルバニア レク \(1946–1965\)),
 			},
 		},
 		'ALL' => {
-			symbol => 'ALL',
 			display_name => {
 				'currency' => q(アルバニア レク),
-				'other' => q(アルバニア レク),
 			},
 		},
 		'AMD' => {
-			symbol => 'AMD',
 			display_name => {
 				'currency' => q(アルメニア ドラム),
-				'other' => q(アルメニア ドラム),
 			},
 		},
 		'ANG' => {
-			symbol => 'ANG',
 			display_name => {
 				'currency' => q(オランダ領アンティル ギルダー),
-				'other' => q(オランダ領アンティル ギルダー),
 			},
 		},
 		'AOA' => {
-			symbol => 'AOA',
 			display_name => {
 				'currency' => q(アンゴラ クワンザ),
-				'other' => q(アンゴラ クワンザ),
 			},
 		},
 		'AOK' => {
-			symbol => 'AOK',
 			display_name => {
 				'currency' => q(アンゴラ クワンザ \(1977–1991\)),
-				'other' => q(アンゴラ クワンザ \(1977–1991\)),
 			},
 		},
 		'AON' => {
-			symbol => 'AON',
 			display_name => {
 				'currency' => q(アンゴラ 新クワンザ \(1990–2000\)),
-				'other' => q(アンゴラ 新クワンザ \(1990–2000\)),
 			},
 		},
 		'AOR' => {
-			symbol => 'AOR',
 			display_name => {
 				'currency' => q(アンゴラ 旧クワンザ \(1995–1999\)),
-				'other' => q(アンゴラ 旧クワンザ \(1995–1999\)),
 			},
 		},
 		'ARA' => {
-			symbol => 'ARA',
 			display_name => {
 				'currency' => q(アルゼンチン アゥストラール),
-				'other' => q(アルゼンチン アゥストラール),
 			},
 		},
 		'ARL' => {
-			symbol => 'ARL',
 			display_name => {
 				'currency' => q(アルゼンチン・ペソ・レイ（1970–1983）),
-				'other' => q(アルゼンチン・ペソ・レイ（1970–1983）),
 			},
 		},
 		'ARM' => {
-			symbol => 'ARM',
 			display_name => {
 				'currency' => q(アルゼンチン・ペソ（1881–1970）),
-				'other' => q(アルゼンチン・ペソ（1881–1970）),
 			},
 		},
 		'ARP' => {
-			symbol => 'ARP',
 			display_name => {
 				'currency' => q(アルゼンチン ペソ \(1983–1985\)),
-				'other' => q(アルゼンチン ペソ \(1983–1985\)),
 			},
 		},
 		'ARS' => {
-			symbol => 'ARS',
 			display_name => {
 				'currency' => q(アルゼンチン ペソ),
-				'other' => q(アルゼンチン ペソ),
 			},
 		},
 		'ATS' => {
-			symbol => 'ATS',
 			display_name => {
 				'currency' => q(オーストリア シリング),
-				'other' => q(オーストリア シリング),
 			},
 		},
 		'AUD' => {
-			symbol => 'A$',
 			display_name => {
 				'currency' => q(オーストラリア ドル),
-				'other' => q(オーストラリア ドル),
 			},
 		},
 		'AWG' => {
-			symbol => 'AWG',
 			display_name => {
 				'currency' => q(アルバ フロリン),
-				'other' => q(アルバ フロリン),
 			},
 		},
 		'AZM' => {
-			symbol => 'AZM',
 			display_name => {
 				'currency' => q(アゼルバイジャン マナト \(1993–2006\)),
-				'other' => q(アゼルバイジャン マナト \(1993–2006\)),
 			},
 		},
 		'AZN' => {
-			symbol => 'AZN',
 			display_name => {
 				'currency' => q(アゼルバイジャン マナト),
-				'other' => q(アゼルバイジャン マナト),
 			},
 		},
 		'BAD' => {
-			symbol => 'BAD',
 			display_name => {
 				'currency' => q(ボスニア・ヘルツェゴビナ ディナール \(1992–1994\)),
-				'other' => q(ボスニア・ヘルツェゴビナ ディナール \(1992–1994\)),
 			},
 		},
 		'BAM' => {
-			symbol => 'BAM',
 			display_name => {
 				'currency' => q(ボスニア・ヘルツェゴビナ 兌換マルク \(BAM\)),
-				'other' => q(ボスニア・ヘルツェゴビナ 兌換マルク \(BAM\)),
 			},
 		},
 		'BAN' => {
-			symbol => 'BAN',
 			display_name => {
 				'currency' => q(ボスニア・ヘルツェゴビナ 新ディナール（1994–1997）),
-				'other' => q(ボスニア・ヘルツェゴビナ 新ディナール（1994–1997）),
 			},
 		},
 		'BBD' => {
-			symbol => 'BBD',
 			display_name => {
 				'currency' => q(バルバドス ドル),
-				'other' => q(バルバドス ドル),
 			},
 		},
 		'BDT' => {
-			symbol => 'BDT',
 			display_name => {
 				'currency' => q(バングラデシュ タカ),
-				'other' => q(バングラデシュ タカ),
 			},
 		},
 		'BEC' => {
-			symbol => 'BEC',
 			display_name => {
 				'currency' => q(ベルギー フラン \(BEC\)),
-				'other' => q(ベルギー フラン \(BEC\)),
 			},
 		},
 		'BEF' => {
-			symbol => 'BEF',
 			display_name => {
 				'currency' => q(ベルギー フラン),
-				'other' => q(ベルギー フラン),
 			},
 		},
 		'BEL' => {
-			symbol => 'BEL',
 			display_name => {
 				'currency' => q(ベルギー フラン \(BEL\)),
-				'other' => q(ベルギー フラン \(BEL\)),
 			},
 		},
 		'BGL' => {
-			symbol => 'BGL',
 			display_name => {
 				'currency' => q(ブルガリア レフ),
-				'other' => q(ブルガリア レフ),
 			},
 		},
 		'BGM' => {
-			symbol => 'BGM',
 			display_name => {
 				'currency' => q(ブルガリア社会主義 レフ),
-				'other' => q(ブルガリア社会主義 レフ),
 			},
 		},
 		'BGN' => {
-			symbol => 'BGN',
 			display_name => {
 				'currency' => q(ブルガリア 新レフ),
-				'other' => q(ブルガリア 新レフ),
 			},
 		},
 		'BGO' => {
-			symbol => 'BGO',
 			display_name => {
 				'currency' => q(ブルガリア レフ（1879–1952）),
-				'other' => q(ブルガリア レフ（1879–1952）),
 			},
 		},
 		'BHD' => {
-			symbol => 'BHD',
 			display_name => {
 				'currency' => q(バーレーン ディナール),
-				'other' => q(バーレーン ディナール),
 			},
 		},
 		'BIF' => {
-			symbol => 'BIF',
 			display_name => {
 				'currency' => q(ブルンジ フラン),
-				'other' => q(ブルンジ フラン),
 			},
 		},
 		'BMD' => {
-			symbol => 'BMD',
 			display_name => {
 				'currency' => q(バミューダ ドル),
-				'other' => q(バミューダ ドル),
 			},
 		},
 		'BND' => {
-			symbol => 'BND',
 			display_name => {
 				'currency' => q(ブルネイ ドル),
-				'other' => q(ブルネイ ドル),
 			},
 		},
 		'BOB' => {
-			symbol => 'BOB',
 			display_name => {
 				'currency' => q(ボリビア ボリビアーノ),
-				'other' => q(ボリビア ボリビアーノ),
 			},
 		},
 		'BOL' => {
-			symbol => 'BOL',
 			display_name => {
 				'currency' => q(ボリビア ボリビアーノ \(1863–1963\)),
-				'other' => q(ボリビア ボリビアーノ \(1863–1963\)),
 			},
 		},
 		'BOP' => {
-			symbol => 'BOP',
 			display_name => {
 				'currency' => q(ボリビア ペソ),
-				'other' => q(ボリビア ペソ),
 			},
 		},
 		'BOV' => {
-			symbol => 'BOV',
 			display_name => {
 				'currency' => q(ボリビア \(Mvdol\)),
-				'other' => q(ボリビア \(Mvdol\)),
 			},
 		},
 		'BRB' => {
-			symbol => 'BRB',
 			display_name => {
 				'currency' => q(ブラジル 新クルゼイロ \(1967–1986\)),
-				'other' => q(ブラジル 新クルゼイロ \(1967–1986\)),
 			},
 		},
 		'BRC' => {
-			symbol => 'BRC',
 			display_name => {
 				'currency' => q(ブラジル クルザード \(1986–1989\)),
-				'other' => q(ブラジル クルザード \(1986–1989\)),
 			},
 		},
 		'BRE' => {
-			symbol => 'BRE',
 			display_name => {
 				'currency' => q(ブラジル クルゼイロ \(1990–1993\)),
-				'other' => q(ブラジル クルゼイロ \(1990–1993\)),
 			},
 		},
 		'BRL' => {
-			symbol => 'R$',
 			display_name => {
 				'currency' => q(ブラジル レアル),
-				'other' => q(ブラジル レアル),
 			},
 		},
 		'BRN' => {
-			symbol => 'BRN',
 			display_name => {
 				'currency' => q(ブラジル 新クルザード \(1989–1990\)),
-				'other' => q(ブラジル 新クルザード \(1989–1990\)),
 			},
 		},
 		'BRR' => {
-			symbol => 'BRR',
 			display_name => {
 				'currency' => q(ブラジル クルゼイロ \(1993–1994\)),
-				'other' => q(ブラジル クルゼイロ \(1993–1994\)),
 			},
 		},
 		'BRZ' => {
-			symbol => 'BRZ',
 			display_name => {
 				'currency' => q(ブラジル クルゼイロ（1942–1967）),
-				'other' => q(ブラジル クルゼイロ（1942–1967）),
 			},
 		},
 		'BSD' => {
-			symbol => 'BSD',
 			display_name => {
 				'currency' => q(バハマ ドル),
-				'other' => q(バハマ ドル),
 			},
 		},
 		'BTN' => {
-			symbol => 'BTN',
 			display_name => {
 				'currency' => q(ブータン ニュルタム),
-				'other' => q(ブータン ニュルタム),
 			},
 		},
 		'BUK' => {
-			symbol => 'BUK',
 			display_name => {
 				'currency' => q(ビルマ チャット),
-				'other' => q(ビルマ チャット),
 			},
 		},
 		'BWP' => {
-			symbol => 'BWP',
 			display_name => {
 				'currency' => q(ボツワナ プラ),
-				'other' => q(ボツワナ プラ),
 			},
 		},
 		'BYB' => {
-			symbol => 'BYB',
 			display_name => {
 				'currency' => q(ベラルーシ 新ルーブル \(1994–1999\)),
-				'other' => q(ベラルーシ 新ルーブル \(1994–1999\)),
 			},
 		},
 		'BYN' => {
-			symbol => 'BYN',
+			symbol => 'р.',
 			display_name => {
 				'currency' => q(ベラルーシ ルーブル),
-				'other' => q(ベラルーシ ルーブル),
 			},
 		},
 		'BYR' => {
-			symbol => 'BYR',
 			display_name => {
 				'currency' => q(ベラルーシ ルーブル \(2000–2016\)),
-				'other' => q(ベラルーシ ルーブル \(2000–2016\)),
 			},
 		},
 		'BZD' => {
-			symbol => 'BZD',
 			display_name => {
 				'currency' => q(ベリーズ ドル),
-				'other' => q(ベリーズ ドル),
 			},
 		},
 		'CAD' => {
-			symbol => 'CA$',
 			display_name => {
 				'currency' => q(カナダ ドル),
-				'other' => q(カナダ ドル),
 			},
 		},
 		'CDF' => {
-			symbol => 'CDF',
 			display_name => {
 				'currency' => q(コンゴ フラン),
-				'other' => q(コンゴ フラン),
 			},
 		},
 		'CHE' => {
-			symbol => 'CHE',
 			display_name => {
 				'currency' => q(ユーロ \(WIR\)),
-				'other' => q(ユーロ \(WIR\)),
 			},
 		},
 		'CHF' => {
-			symbol => 'CHF',
 			display_name => {
 				'currency' => q(スイス フラン),
-				'other' => q(スイス フラン),
 			},
 		},
 		'CHW' => {
-			symbol => 'CHW',
 			display_name => {
 				'currency' => q(フラン \(WIR\)),
-				'other' => q(フラン \(WIR\)),
 			},
 		},
 		'CLE' => {
-			symbol => 'CLE',
 			display_name => {
 				'currency' => q(チリ エスクード),
-				'other' => q(チリ エスクード),
 			},
 		},
 		'CLF' => {
-			symbol => 'CLF',
 			display_name => {
 				'currency' => q(チリ ウニダ・デ・フォメント \(UF\)),
-				'other' => q(チリ ウニダ・デ・フォメント \(UF\)),
 			},
 		},
 		'CLP' => {
-			symbol => 'CLP',
 			display_name => {
 				'currency' => q(チリ ペソ),
-				'other' => q(チリ ペソ),
 			},
 		},
 		'CNH' => {
-			symbol => 'CNH',
 			display_name => {
 				'currency' => q(中国人民元\(オフショア\)),
-				'other' => q(中国人民元\(オフショア\)),
 			},
 		},
 		'CNX' => {
-			symbol => 'CNX',
 			display_name => {
 				'currency' => q(中国人民銀行ドル),
-				'other' => q(中国人民銀行ドル),
 			},
 		},
 		'CNY' => {
 			symbol => '元',
 			display_name => {
 				'currency' => q(中国人民元),
-				'other' => q(中国人民元),
 			},
 		},
 		'COP' => {
-			symbol => 'COP',
 			display_name => {
 				'currency' => q(コロンビア ペソ),
-				'other' => q(コロンビア ペソ),
 			},
 		},
 		'COU' => {
-			symbol => 'COU',
 			display_name => {
 				'currency' => q(コロンビア レアル （UVR\)),
-				'other' => q(コロンビア レアル （UVR\)),
 			},
 		},
 		'CRC' => {
-			symbol => 'CRC',
 			display_name => {
 				'currency' => q(コスタリカ コロン),
-				'other' => q(コスタリカ コロン),
 			},
 		},
 		'CSD' => {
-			symbol => 'CSD',
 			display_name => {
 				'currency' => q(セルビア ディナール \(2002–2006\)),
-				'other' => q(セルビア ディナール \(2002–2006\)),
 			},
 		},
 		'CSK' => {
-			symbol => 'CSK',
 			display_name => {
 				'currency' => q(チェコスロバキア コルナ),
-				'other' => q(チェコスロバキア コルナ),
 			},
 		},
 		'CUC' => {
-			symbol => 'CUC',
 			display_name => {
 				'currency' => q(キューバ 兌換ペソ),
-				'other' => q(キューバ 兌換ペソ),
 			},
 		},
 		'CUP' => {
-			symbol => 'CUP',
 			display_name => {
 				'currency' => q(キューバ ペソ),
-				'other' => q(キューバ ペソ),
 			},
 		},
 		'CVE' => {
-			symbol => 'CVE',
 			display_name => {
 				'currency' => q(カーボベルデ エスクード),
-				'other' => q(カーボベルデ エスクード),
 			},
 		},
 		'CYP' => {
-			symbol => 'CYP',
 			display_name => {
 				'currency' => q(キプロス ポンド),
-				'other' => q(キプロス ポンド),
 			},
 		},
 		'CZK' => {
-			symbol => 'CZK',
 			display_name => {
 				'currency' => q(チェコ コルナ),
-				'other' => q(チェコ コルナ),
 			},
 		},
 		'DDM' => {
-			symbol => 'DDM',
 			display_name => {
 				'currency' => q(東ドイツ マルク),
-				'other' => q(東ドイツ マルク),
 			},
 		},
 		'DEM' => {
-			symbol => 'DEM',
 			display_name => {
 				'currency' => q(ドイツ マルク),
-				'other' => q(ドイツ マルク),
 			},
 		},
 		'DJF' => {
-			symbol => 'DJF',
 			display_name => {
 				'currency' => q(ジブチ フラン),
-				'other' => q(ジブチ フラン),
 			},
 		},
 		'DKK' => {
-			symbol => 'DKK',
 			display_name => {
 				'currency' => q(デンマーク クローネ),
-				'other' => q(デンマーク クローネ),
 			},
 		},
 		'DOP' => {
-			symbol => 'DOP',
 			display_name => {
 				'currency' => q(ドミニカ ペソ),
-				'other' => q(ドミニカ ペソ),
 			},
 		},
 		'DZD' => {
-			symbol => 'DZD',
 			display_name => {
 				'currency' => q(アルジェリア ディナール),
-				'other' => q(アルジェリア ディナール),
 			},
 		},
 		'ECS' => {
-			symbol => 'ECS',
 			display_name => {
 				'currency' => q(エクアドル スクレ),
-				'other' => q(エクアドル スクレ),
 			},
 		},
 		'ECV' => {
-			symbol => 'ECV',
 			display_name => {
 				'currency' => q(エクアドル \(UVC\)),
-				'other' => q(エクアドル \(UVC\)),
 			},
 		},
 		'EEK' => {
-			symbol => 'EEK',
 			display_name => {
 				'currency' => q(エストニア クルーン),
-				'other' => q(エストニア クルーン),
 			},
 		},
 		'EGP' => {
-			symbol => 'EGP',
 			display_name => {
 				'currency' => q(エジプト ポンド),
-				'other' => q(エジプト ポンド),
 			},
 		},
 		'ERN' => {
-			symbol => 'ERN',
 			display_name => {
 				'currency' => q(エリトリア ナクファ),
-				'other' => q(エリトリア ナクファ),
 			},
 		},
 		'ESA' => {
-			symbol => 'ESA',
 			display_name => {
 				'currency' => q(スペインペセタ（勘定A）),
-				'other' => q(スペインペセタ（勘定A）),
 			},
 		},
 		'ESB' => {
-			symbol => 'ESB',
 			display_name => {
 				'currency' => q(スペイン 兌換ペセタ),
-				'other' => q(スペイン 兌換ペセタ),
 			},
 		},
 		'ESP' => {
-			symbol => 'ESP',
 			display_name => {
 				'currency' => q(スペイン ペセタ),
-				'other' => q(スペイン ペセタ),
 			},
 		},
 		'ETB' => {
-			symbol => 'ETB',
 			display_name => {
 				'currency' => q(エチオピア ブル),
-				'other' => q(エチオピア ブル),
 			},
 		},
 		'EUR' => {
-			symbol => '€',
 			display_name => {
 				'currency' => q(ユーロ),
-				'other' => q(ユーロ),
 			},
 		},
 		'FIM' => {
-			symbol => 'FIM',
 			display_name => {
 				'currency' => q(フィンランド マルカ),
-				'other' => q(フィンランド マルカ),
 			},
 		},
 		'FJD' => {
-			symbol => 'FJD',
 			display_name => {
 				'currency' => q(フィジー ドル),
-				'other' => q(フィジー ドル),
 			},
 		},
 		'FKP' => {
-			symbol => 'FKP',
 			display_name => {
 				'currency' => q(フォークランド（マルビナス）諸島 ポンド),
-				'other' => q(フォークランド（マルビナス）諸島 ポンド),
 			},
 		},
 		'FRF' => {
-			symbol => 'FRF',
 			display_name => {
 				'currency' => q(フランス フラン),
-				'other' => q(フランス フラン),
 			},
 		},
 		'GBP' => {
-			symbol => '£',
 			display_name => {
 				'currency' => q(英国ポンド),
-				'other' => q(英国ポンド),
 			},
 		},
 		'GEK' => {
-			symbol => 'GEK',
 			display_name => {
 				'currency' => q(ジョージア クーポン ラリ),
-				'other' => q(ジョージア クーポン ラリ),
 			},
 		},
 		'GEL' => {
-			symbol => 'GEL',
 			display_name => {
 				'currency' => q(ジョージア ラリ),
-				'other' => q(ジョージア ラリ),
 			},
 		},
 		'GHC' => {
-			symbol => 'GHC',
 			display_name => {
 				'currency' => q(ガーナ セディ \(1979–2007\)),
-				'other' => q(ガーナ セディ \(1979–2007\)),
 			},
 		},
 		'GHS' => {
-			symbol => 'GHS',
 			display_name => {
 				'currency' => q(ガーナ セディ),
-				'other' => q(ガーナ セディ),
 			},
 		},
 		'GIP' => {
-			symbol => 'GIP',
 			display_name => {
 				'currency' => q(ジブラルタル ポンド),
-				'other' => q(ジブラルタル ポンド),
 			},
 		},
 		'GMD' => {
-			symbol => 'GMD',
 			display_name => {
 				'currency' => q(ガンビア ダラシ),
-				'other' => q(ガンビア ダラシ),
 			},
 		},
 		'GNF' => {
-			symbol => 'GNF',
 			display_name => {
 				'currency' => q(ギニア フラン),
-				'other' => q(ギニア フラン),
 			},
 		},
 		'GNS' => {
-			symbol => 'GNS',
 			display_name => {
 				'currency' => q(ギニア シリー),
-				'other' => q(ギニア シリー),
 			},
 		},
 		'GQE' => {
-			symbol => 'GQE',
 			display_name => {
 				'currency' => q(赤道ギニア エクウェレ),
-				'other' => q(赤道ギニア エクウェレ),
 			},
 		},
 		'GRD' => {
-			symbol => 'GRD',
 			display_name => {
 				'currency' => q(ギリシャ ドラクマ),
-				'other' => q(ギリシャ ドラクマ),
 			},
 		},
 		'GTQ' => {
-			symbol => 'GTQ',
 			display_name => {
 				'currency' => q(グアテマラ ケツァル),
-				'other' => q(グアテマラ ケツァル),
 			},
 		},
 		'GWE' => {
-			symbol => 'GWE',
 			display_name => {
 				'currency' => q(ポルトガル領ギニア エスクード),
-				'other' => q(ポルトガル領ギニア エスクード),
 			},
 		},
 		'GWP' => {
-			symbol => 'GWP',
 			display_name => {
 				'currency' => q(ギニアビサウ ペソ),
-				'other' => q(ギニアビサウ ペソ),
 			},
 		},
 		'GYD' => {
-			symbol => 'GYD',
 			display_name => {
 				'currency' => q(ガイアナ ドル),
-				'other' => q(ガイアナ ドル),
 			},
 		},
 		'HKD' => {
-			symbol => 'HK$',
 			display_name => {
 				'currency' => q(香港ドル),
-				'other' => q(香港ドル),
 			},
 		},
 		'HNL' => {
-			symbol => 'HNL',
 			display_name => {
 				'currency' => q(ホンジュラス レンピラ),
-				'other' => q(ホンジュラス レンピラ),
 			},
 		},
 		'HRD' => {
-			symbol => 'HRD',
 			display_name => {
 				'currency' => q(クロアチア ディナール),
-				'other' => q(クロアチア ディナール),
 			},
 		},
 		'HRK' => {
-			symbol => 'HRK',
 			display_name => {
 				'currency' => q(クロアチア クーナ),
-				'other' => q(クロアチア クーナ),
 			},
 		},
 		'HTG' => {
-			symbol => 'HTG',
 			display_name => {
 				'currency' => q(ハイチ グールド),
-				'other' => q(ハイチ グールド),
 			},
 		},
 		'HUF' => {
-			symbol => 'HUF',
 			display_name => {
 				'currency' => q(ハンガリー フォリント),
-				'other' => q(ハンガリー フォリント),
 			},
 		},
 		'IDR' => {
-			symbol => 'IDR',
 			display_name => {
 				'currency' => q(インドネシア ルピア),
-				'other' => q(インドネシア ルピア),
 			},
 		},
 		'IEP' => {
-			symbol => 'IEP',
 			display_name => {
 				'currency' => q(アイリッシュ ポンド),
-				'other' => q(アイリッシュ ポンド),
 			},
 		},
 		'ILP' => {
-			symbol => 'ILP',
 			display_name => {
 				'currency' => q(イスラエル ポンド),
-				'other' => q(イスラエル ポンド),
 			},
 		},
 		'ILR' => {
-			symbol => 'ILR',
 			display_name => {
 				'currency' => q(イスラエル シェケル \(1980–1985\)),
-				'other' => q(イスラエル シェケル \(1980–1985\)),
 			},
 		},
 		'ILS' => {
-			symbol => '₪',
 			display_name => {
 				'currency' => q(イスラエル新シェケル),
-				'other' => q(イスラエル新シェケル),
 			},
 		},
 		'INR' => {
-			symbol => '₹',
 			display_name => {
 				'currency' => q(インド ルピー),
-				'other' => q(インド ルピー),
 			},
 		},
 		'IQD' => {
-			symbol => 'IQD',
 			display_name => {
 				'currency' => q(イラク ディナール),
-				'other' => q(イラク ディナール),
 			},
 		},
 		'IRR' => {
-			symbol => 'IRR',
 			display_name => {
 				'currency' => q(イラン リアル),
-				'other' => q(イラン リアル),
 			},
 		},
 		'ISJ' => {
-			symbol => 'ISJ',
 			display_name => {
 				'currency' => q(アイスランド クローナ \(1918–1981\)),
-				'other' => q(アイスランド クローナ \(1918–1981\)),
 			},
 		},
 		'ISK' => {
-			symbol => 'ISK',
 			display_name => {
 				'currency' => q(アイスランド クローナ),
-				'other' => q(アイスランド クローナ),
 			},
 		},
 		'ITL' => {
-			symbol => 'ITL',
 			display_name => {
 				'currency' => q(イタリア リラ),
-				'other' => q(イタリア リラ),
 			},
 		},
 		'JMD' => {
-			symbol => 'JMD',
 			display_name => {
 				'currency' => q(ジャマイカ ドル),
-				'other' => q(ジャマイカ ドル),
 			},
 		},
 		'JOD' => {
-			symbol => 'JOD',
 			display_name => {
 				'currency' => q(ヨルダン ディナール),
-				'other' => q(ヨルダン ディナール),
 			},
 		},
 		'JPY' => {
@@ -9110,1186 +7649,857 @@ has 'currencies' => (
 			},
 		},
 		'KES' => {
-			symbol => 'KES',
 			display_name => {
 				'currency' => q(ケニア シリング),
-				'other' => q(ケニア シリング),
 			},
 		},
 		'KGS' => {
-			symbol => 'KGS',
 			display_name => {
 				'currency' => q(キルギス ソム),
-				'other' => q(キルギス ソム),
 			},
 		},
 		'KHR' => {
-			symbol => 'KHR',
 			display_name => {
 				'currency' => q(カンボジア リエル),
-				'other' => q(カンボジア リエル),
 			},
 		},
 		'KMF' => {
-			symbol => 'KMF',
 			display_name => {
 				'currency' => q(コモロ フラン),
-				'other' => q(コモロ フラン),
 			},
 		},
 		'KPW' => {
-			symbol => 'KPW',
 			display_name => {
 				'currency' => q(北朝鮮ウォン),
-				'other' => q(北朝鮮ウォン),
 			},
 		},
 		'KRH' => {
-			symbol => 'KRH',
 			display_name => {
 				'currency' => q(韓国 ファン（1953–1962）),
-				'other' => q(韓国 ファン（1953–1962）),
 			},
 		},
 		'KRO' => {
-			symbol => 'KRO',
 			display_name => {
 				'currency' => q(韓国 ウォン（1945–1953）),
-				'other' => q(韓国 ウォン（1945–1953）),
 			},
 		},
 		'KRW' => {
-			symbol => '₩',
 			display_name => {
 				'currency' => q(韓国ウォン),
-				'other' => q(韓国ウォン),
 			},
 		},
 		'KWD' => {
-			symbol => 'KWD',
 			display_name => {
 				'currency' => q(クウェート ディナール),
-				'other' => q(クウェート ディナール),
 			},
 		},
 		'KYD' => {
-			symbol => 'KYD',
 			display_name => {
 				'currency' => q(ケイマン諸島 ドル),
-				'other' => q(ケイマン諸島 ドル),
 			},
 		},
 		'KZT' => {
-			symbol => 'KZT',
 			display_name => {
 				'currency' => q(カザフスタン テンゲ),
-				'other' => q(カザフスタン テンゲ),
 			},
 		},
 		'LAK' => {
-			symbol => 'LAK',
 			display_name => {
 				'currency' => q(ラオス キープ),
-				'other' => q(ラオス キープ),
 			},
 		},
 		'LBP' => {
-			symbol => 'LBP',
 			display_name => {
 				'currency' => q(レバノン ポンド),
-				'other' => q(レバノン ポンド),
 			},
 		},
 		'LKR' => {
-			symbol => 'LKR',
 			display_name => {
 				'currency' => q(スリランカ ルピー),
-				'other' => q(スリランカ ルピー),
 			},
 		},
 		'LRD' => {
-			symbol => 'LRD',
 			display_name => {
 				'currency' => q(リベリア ドル),
-				'other' => q(リベリア ドル),
 			},
 		},
 		'LSL' => {
-			symbol => 'LSL',
 			display_name => {
 				'currency' => q(レソト ロティ),
-				'other' => q(レソト ロティ),
 			},
 		},
 		'LTL' => {
-			symbol => 'LTL',
 			display_name => {
 				'currency' => q(リトアニア リタス),
-				'other' => q(リトアニア リタス),
 			},
 		},
 		'LTT' => {
-			symbol => 'LTT',
 			display_name => {
 				'currency' => q(リトアニア タロナ),
-				'other' => q(リトアニア タロナ),
 			},
 		},
 		'LUC' => {
-			symbol => 'LUC',
 			display_name => {
 				'currency' => q(ルクセンブルク 兌換フラン),
-				'other' => q(ルクセンブルク 兌換フラン),
 			},
 		},
 		'LUF' => {
-			symbol => 'LUF',
 			display_name => {
 				'currency' => q(ルクセンブルグ フラン),
-				'other' => q(ルクセンブルグ フラン),
 			},
 		},
 		'LUL' => {
-			symbol => 'LUL',
 			display_name => {
 				'currency' => q(ルクセンブルク 金融フラン),
-				'other' => q(ルクセンブルク 金融フラン),
 			},
 		},
 		'LVL' => {
-			symbol => 'LVL',
 			display_name => {
 				'currency' => q(ラトビア ラッツ),
-				'other' => q(ラトビア ラッツ),
 			},
 		},
 		'LVR' => {
-			symbol => 'LVR',
 			display_name => {
 				'currency' => q(ラトビア ルーブル),
-				'other' => q(ラトビア ルーブル),
 			},
 		},
 		'LYD' => {
-			symbol => 'LYD',
 			display_name => {
 				'currency' => q(リビア ディナール),
-				'other' => q(リビア ディナール),
 			},
 		},
 		'MAD' => {
-			symbol => 'MAD',
 			display_name => {
 				'currency' => q(モロッコ ディルハム),
-				'other' => q(モロッコ ディルハム),
 			},
 		},
 		'MAF' => {
-			symbol => 'MAF',
 			display_name => {
 				'currency' => q(モロッコ フラン),
-				'other' => q(モロッコ フラン),
 			},
 		},
 		'MCF' => {
-			symbol => 'MCF',
 			display_name => {
 				'currency' => q(モネガスク フラン),
-				'other' => q(モネガスク フラン),
 			},
 		},
 		'MDC' => {
-			symbol => 'MDC',
 			display_name => {
 				'currency' => q(モルドバ クーポン),
-				'other' => q(モルドバ クーポン),
 			},
 		},
 		'MDL' => {
-			symbol => 'MDL',
 			display_name => {
 				'currency' => q(モルドバ レイ),
-				'other' => q(モルドバ レイ),
 			},
 		},
 		'MGA' => {
-			symbol => 'MGA',
 			display_name => {
 				'currency' => q(マダガスカル アリアリ),
-				'other' => q(マダガスカル アリアリ),
 			},
 		},
 		'MGF' => {
-			symbol => 'MGF',
 			display_name => {
 				'currency' => q(マラガシ フラン),
-				'other' => q(マラガシ フラン),
 			},
 		},
 		'MKD' => {
-			symbol => 'MKD',
 			display_name => {
 				'currency' => q(マケドニア デナル),
-				'other' => q(マケドニア デナル),
 			},
 		},
 		'MKN' => {
-			symbol => 'MKN',
 			display_name => {
 				'currency' => q(マケドニア ディナール（1992–1993）),
-				'other' => q(マケドニア ディナール（1992–1993）),
 			},
 		},
 		'MLF' => {
-			symbol => 'MLF',
 			display_name => {
 				'currency' => q(マリ フラン),
-				'other' => q(マリ フラン),
 			},
 		},
 		'MMK' => {
-			symbol => 'MMK',
 			display_name => {
 				'currency' => q(ミャンマー チャット),
-				'other' => q(ミャンマー チャット),
 			},
 		},
 		'MNT' => {
-			symbol => 'MNT',
 			display_name => {
 				'currency' => q(モンゴル トグログ),
-				'other' => q(モンゴル トグログ),
 			},
 		},
 		'MOP' => {
-			symbol => 'MOP',
 			display_name => {
 				'currency' => q(マカオ パタカ),
-				'other' => q(マカオ パタカ),
 			},
 		},
 		'MRO' => {
-			symbol => 'MRO',
 			display_name => {
 				'currency' => q(モーリタニア ウギア \(1973–2017\)),
-				'other' => q(モーリタニア ウギア \(1973–2017\)),
 			},
 		},
 		'MRU' => {
-			symbol => 'MRU',
 			display_name => {
 				'currency' => q(モーリタニア ウギア),
-				'other' => q(モーリタニア ウギア),
 			},
 		},
 		'MTL' => {
-			symbol => 'MTL',
 			display_name => {
 				'currency' => q(マルタ リラ),
-				'other' => q(マルタ リラ),
 			},
 		},
 		'MTP' => {
-			symbol => 'MTP',
 			display_name => {
 				'currency' => q(マルタ ポンド),
-				'other' => q(マルタ ポンド),
 			},
 		},
 		'MUR' => {
-			symbol => 'MUR',
 			display_name => {
 				'currency' => q(モーリシャス ルピー),
-				'other' => q(モーリシャス ルピー),
 			},
 		},
 		'MVP' => {
-			symbol => 'MVP',
 			display_name => {
 				'currency' => q(モルディブ諸島 ルピー),
-				'other' => q(モルディブ諸島 ルピー),
 			},
 		},
 		'MVR' => {
-			symbol => 'MVR',
 			display_name => {
 				'currency' => q(モルディブ ルフィア),
-				'other' => q(モルディブ ルフィア),
 			},
 		},
 		'MWK' => {
-			symbol => 'MWK',
 			display_name => {
 				'currency' => q(マラウィ クワチャ),
-				'other' => q(マラウィ クワチャ),
 			},
 		},
 		'MXN' => {
-			symbol => 'MX$',
 			display_name => {
 				'currency' => q(メキシコ ペソ),
-				'other' => q(メキシコ ペソ),
 			},
 		},
 		'MXP' => {
-			symbol => 'MXP',
 			display_name => {
 				'currency' => q(メキシコ ペソ \(1861–1992\)),
-				'other' => q(メキシコ ペソ \(1861–1992\)),
 			},
 		},
 		'MXV' => {
-			symbol => 'MXV',
 			display_name => {
 				'currency' => q(メキシコ \(UDI\)),
-				'other' => q(メキシコ \(UDI\)),
 			},
 		},
 		'MYR' => {
-			symbol => 'MYR',
 			display_name => {
 				'currency' => q(マレーシア リンギット),
-				'other' => q(マレーシア リンギット),
 			},
 		},
 		'MZE' => {
-			symbol => 'MZE',
 			display_name => {
 				'currency' => q(モザンピーク エスクード),
-				'other' => q(モザンピーク エスクード),
 			},
 		},
 		'MZM' => {
-			symbol => 'MZM',
 			display_name => {
 				'currency' => q(モザンビーク メティカル \(1980–2006\)),
-				'other' => q(モザンビーク メティカル \(1980–2006\)),
 			},
 		},
 		'MZN' => {
-			symbol => 'MZN',
 			display_name => {
 				'currency' => q(モザンビーク メティカル),
-				'other' => q(モザンビーク メティカル),
 			},
 		},
 		'NAD' => {
-			symbol => 'NAD',
 			display_name => {
 				'currency' => q(ナミビア ドル),
-				'other' => q(ナミビア ドル),
 			},
 		},
 		'NGN' => {
-			symbol => 'NGN',
 			display_name => {
 				'currency' => q(ナイジェリア ナイラ),
-				'other' => q(ナイジェリア ナイラ),
 			},
 		},
 		'NIC' => {
-			symbol => 'NIC',
 			display_name => {
 				'currency' => q(ニカラグア コルドバ \(1988–1991\)),
-				'other' => q(ニカラグア コルドバ \(1988–1991\)),
 			},
 		},
 		'NIO' => {
-			symbol => 'NIO',
 			display_name => {
 				'currency' => q(ニカラグア コルドバ オロ),
-				'other' => q(ニカラグア コルドバ オロ),
 			},
 		},
 		'NLG' => {
-			symbol => 'NLG',
 			display_name => {
 				'currency' => q(オランダ ギルダー),
-				'other' => q(オランダ ギルダー),
 			},
 		},
 		'NOK' => {
-			symbol => 'NOK',
 			display_name => {
 				'currency' => q(ノルウェー クローネ),
-				'other' => q(ノルウェー クローネ),
 			},
 		},
 		'NPR' => {
-			symbol => 'NPR',
 			display_name => {
 				'currency' => q(ネパール ルピー),
-				'other' => q(ネパール ルピー),
 			},
 		},
 		'NZD' => {
-			symbol => 'NZ$',
 			display_name => {
 				'currency' => q(ニュージーランド ドル),
-				'other' => q(ニュージーランド ドル),
 			},
 		},
 		'OMR' => {
-			symbol => 'OMR',
 			display_name => {
 				'currency' => q(オマーン リアル),
-				'other' => q(オマーン リアル),
 			},
 		},
 		'PAB' => {
-			symbol => 'PAB',
 			display_name => {
 				'currency' => q(パナマ バルボア),
-				'other' => q(パナマ バルボア),
 			},
 		},
 		'PEI' => {
-			symbol => 'PEI',
 			display_name => {
 				'currency' => q(ペルー インティ),
-				'other' => q(ペルー インティ),
 			},
 		},
 		'PEN' => {
-			symbol => 'PEN',
 			display_name => {
 				'currency' => q(ペルー ソル),
-				'other' => q(ペルー ソル),
 			},
 		},
 		'PES' => {
-			symbol => 'PES',
 			display_name => {
 				'currency' => q(ペルー ソル \(1863–1965\)),
-				'other' => q(ペルー ソル \(1863–1965\)),
 			},
 		},
 		'PGK' => {
-			symbol => 'PGK',
 			display_name => {
 				'currency' => q(パプアニューギニア キナ),
-				'other' => q(パプアニューギニア キナ),
 			},
 		},
 		'PHP' => {
 			symbol => 'PHP',
 			display_name => {
 				'currency' => q(フィリピン ペソ),
-				'other' => q(フィリピン ペソ),
 			},
 		},
 		'PKR' => {
-			symbol => 'PKR',
 			display_name => {
 				'currency' => q(パキスタン ルピー),
-				'other' => q(パキスタン ルピー),
 			},
 		},
 		'PLN' => {
-			symbol => 'PLN',
 			display_name => {
 				'currency' => q(ポーランド ズウォティ),
-				'other' => q(ポーランド ズウォティ),
 			},
 		},
 		'PLZ' => {
-			symbol => 'PLZ',
 			display_name => {
 				'currency' => q(ポーランド ズウォティ \(1950–1995\)),
-				'other' => q(ポーランド ズウォティ \(1950–1995\)),
 			},
 		},
 		'PTE' => {
-			symbol => 'PTE',
 			display_name => {
 				'currency' => q(ポルトガル エスクード),
-				'other' => q(ポルトガル エスクード),
 			},
 		},
 		'PYG' => {
-			symbol => 'PYG',
 			display_name => {
 				'currency' => q(パラグアイ グアラニ),
-				'other' => q(パラグアイ グアラニ),
 			},
 		},
 		'QAR' => {
-			symbol => 'QAR',
 			display_name => {
 				'currency' => q(カタール リアル),
-				'other' => q(カタール リアル),
 			},
 		},
 		'RHD' => {
-			symbol => 'RHD',
 			display_name => {
 				'currency' => q(ローデシア ドル),
-				'other' => q(ローデシア ドル),
 			},
 		},
 		'ROL' => {
-			symbol => 'ROL',
 			display_name => {
 				'currency' => q(ルーマニア レイ \(1952–2006\)),
-				'other' => q(ルーマニア レイ \(1952–2006\)),
 			},
 		},
 		'RON' => {
-			symbol => 'RON',
+			symbol => 'レイ',
 			display_name => {
 				'currency' => q(ルーマニア レイ),
-				'other' => q(ルーマニア レイ),
 			},
 		},
 		'RSD' => {
-			symbol => 'RSD',
 			display_name => {
 				'currency' => q(ディナール \(セルビア\)),
-				'other' => q(ディナール \(セルビア\)),
 			},
 		},
 		'RUB' => {
-			symbol => 'RUB',
 			display_name => {
 				'currency' => q(ロシア ルーブル),
-				'other' => q(ロシア ルーブル),
 			},
 		},
 		'RUR' => {
-			symbol => 'RUR',
 			display_name => {
 				'currency' => q(ロシア ルーブル \(1991–1998\)),
-				'other' => q(ロシア ルーブル \(1991–1998\)),
 			},
 		},
 		'RWF' => {
-			symbol => 'RWF',
 			display_name => {
 				'currency' => q(ルワンダ フラン),
-				'other' => q(ルワンダ フラン),
 			},
 		},
 		'SAR' => {
-			symbol => 'SAR',
 			display_name => {
 				'currency' => q(サウジ リヤル),
-				'other' => q(サウジ リヤル),
 			},
 		},
 		'SBD' => {
-			symbol => 'SBD',
 			display_name => {
 				'currency' => q(ソロモン諸島 ドル),
-				'other' => q(ソロモン諸島 ドル),
 			},
 		},
 		'SCR' => {
-			symbol => 'SCR',
 			display_name => {
 				'currency' => q(セーシェル ルピー),
-				'other' => q(セーシェル ルピー),
 			},
 		},
 		'SDD' => {
-			symbol => 'SDD',
 			display_name => {
 				'currency' => q(スーダン ディナール \(1992–2007\)),
-				'other' => q(スーダン ディナール \(1992–2007\)),
 			},
 		},
 		'SDG' => {
-			symbol => 'SDG',
 			display_name => {
 				'currency' => q(スーダン ポンド),
-				'other' => q(スーダン ポンド),
 			},
 		},
 		'SDP' => {
-			symbol => 'SDP',
 			display_name => {
 				'currency' => q(スーダン ポンド \(1957–1998\)),
-				'other' => q(スーダン ポンド \(1957–1998\)),
 			},
 		},
 		'SEK' => {
-			symbol => 'SEK',
 			display_name => {
 				'currency' => q(スウェーデン クローナ),
-				'other' => q(スウェーデン クローナ),
 			},
 		},
 		'SGD' => {
-			symbol => 'SGD',
 			display_name => {
 				'currency' => q(シンガポール ドル),
-				'other' => q(シンガポール ドル),
 			},
 		},
 		'SHP' => {
-			symbol => 'SHP',
 			display_name => {
 				'currency' => q(セントヘレナ ポンド),
-				'other' => q(セントヘレナ ポンド),
 			},
 		},
 		'SIT' => {
-			symbol => 'SIT',
 			display_name => {
 				'currency' => q(スロベニア トラール),
-				'other' => q(スロベニア トラール),
 			},
 		},
 		'SKK' => {
-			symbol => 'SKK',
 			display_name => {
 				'currency' => q(スロバキア コルナ),
-				'other' => q(スロバキア コルナ),
+			},
+		},
+		'SLE' => {
+			display_name => {
+				'currency' => q(シエラレオネ レオン),
 			},
 		},
 		'SLL' => {
-			symbol => 'SLL',
 			display_name => {
-				'currency' => q(シエラレオネ レオン),
-				'other' => q(シエラレオネ レオン),
+				'currency' => q(シエラレオネ レオン \(1964—2022\)),
 			},
 		},
 		'SOS' => {
-			symbol => 'SOS',
 			display_name => {
 				'currency' => q(ソマリア シリング),
-				'other' => q(ソマリア シリング),
 			},
 		},
 		'SRD' => {
-			symbol => 'SRD',
 			display_name => {
 				'currency' => q(スリナム ドル),
-				'other' => q(スリナム ドル),
 			},
 		},
 		'SRG' => {
-			symbol => 'SRG',
 			display_name => {
 				'currency' => q(スリナム ギルダー),
-				'other' => q(スリナム ギルダー),
 			},
 		},
 		'SSP' => {
-			symbol => 'SSP',
 			display_name => {
 				'currency' => q(南スーダン ポンド),
-				'other' => q(南スーダン ポンド),
 			},
 		},
 		'STD' => {
-			symbol => 'STD',
 			display_name => {
 				'currency' => q(サントメ・プリンシペ ドブラ \(1977–2017\)),
-				'other' => q(サントメ・プリンシペ ドブラ \(1977–2017\)),
 			},
 		},
 		'STN' => {
-			symbol => 'STN',
 			display_name => {
 				'currency' => q(サントメ・プリンシペ ドブラ),
-				'other' => q(サントメ・プリンシペ ドブラ),
 			},
 		},
 		'SUR' => {
-			symbol => 'SUR',
 			display_name => {
 				'currency' => q(ソ連 ルーブル),
-				'other' => q(ソ連 ルーブル),
 			},
 		},
 		'SVC' => {
-			symbol => 'SVC',
 			display_name => {
 				'currency' => q(エルサルバドル コロン),
-				'other' => q(エルサルバドル コロン),
 			},
 		},
 		'SYP' => {
-			symbol => 'SYP',
 			display_name => {
 				'currency' => q(シリア ポンド),
-				'other' => q(シリア ポンド),
 			},
 		},
 		'SZL' => {
-			symbol => 'SZL',
 			display_name => {
 				'currency' => q(スワジランド リランゲニ),
-				'other' => q(スワジランド リランゲニ),
 			},
 		},
 		'THB' => {
-			symbol => 'THB',
 			display_name => {
 				'currency' => q(タイ バーツ),
-				'other' => q(タイ バーツ),
 			},
 		},
 		'TJR' => {
-			symbol => 'TJR',
 			display_name => {
 				'currency' => q(タジキスタン ルーブル),
-				'other' => q(タジキスタン ルーブル),
 			},
 		},
 		'TJS' => {
-			symbol => 'TJS',
 			display_name => {
 				'currency' => q(タジキスタン ソモニ),
-				'other' => q(タジキスタン ソモニ),
 			},
 		},
 		'TMM' => {
-			symbol => 'TMM',
 			display_name => {
 				'currency' => q(トルクメニスタン マナト \(1993–2009\)),
-				'other' => q(トルクメニスタン マナト \(1993–2009\)),
 			},
 		},
 		'TMT' => {
-			symbol => 'TMT',
 			display_name => {
 				'currency' => q(トルクメニスタン マナト),
-				'other' => q(トルクメニスタン マナト),
 			},
 		},
 		'TND' => {
-			symbol => 'TND',
 			display_name => {
 				'currency' => q(チュニジア ディナール),
-				'other' => q(チュニジア ディナール),
 			},
 		},
 		'TOP' => {
-			symbol => 'TOP',
 			display_name => {
 				'currency' => q(トンガ パ・アンガ),
-				'other' => q(トンガ パ・アンガ),
 			},
 		},
 		'TPE' => {
-			symbol => 'TPE',
 			display_name => {
 				'currency' => q(ティモール エスクード),
-				'other' => q(ティモール エスクード),
 			},
 		},
 		'TRL' => {
-			symbol => 'TRL',
 			display_name => {
 				'currency' => q(トルコ リラ \(1922–2005\)),
-				'other' => q(トルコ リラ \(1922–2005\)),
 			},
 		},
 		'TRY' => {
-			symbol => 'TRY',
 			display_name => {
-				'currency' => q(新トルコリラ),
-				'other' => q(新トルコリラ),
+				'currency' => q(トルコ リラ),
 			},
 		},
 		'TTD' => {
-			symbol => 'TTD',
 			display_name => {
 				'currency' => q(トリニダード・トバゴ ドル),
-				'other' => q(トリニダード・トバゴ ドル),
 			},
 		},
 		'TWD' => {
-			symbol => 'NT$',
 			display_name => {
 				'currency' => q(新台湾ドル),
-				'other' => q(新台湾ドル),
 			},
 		},
 		'TZS' => {
-			symbol => 'TZS',
 			display_name => {
 				'currency' => q(タンザニア シリング),
-				'other' => q(タンザニア シリング),
 			},
 		},
 		'UAH' => {
-			symbol => 'UAH',
 			display_name => {
 				'currency' => q(ウクライナ グリブナ),
-				'other' => q(ウクライナ グリブナ),
 			},
 		},
 		'UAK' => {
-			symbol => 'UAK',
 			display_name => {
 				'currency' => q(ウクライナ カルボバネツ),
-				'other' => q(ウクライナ カルボバネツ),
 			},
 		},
 		'UGS' => {
-			symbol => 'UGS',
 			display_name => {
 				'currency' => q(ウガンダ シリング \(1966–1987\)),
-				'other' => q(ウガンダ シリング \(1966–1987\)),
 			},
 		},
 		'UGX' => {
-			symbol => 'UGX',
 			display_name => {
 				'currency' => q(ウガンダ シリング),
-				'other' => q(ウガンダ シリング),
 			},
 		},
 		'USD' => {
 			symbol => '$',
 			display_name => {
 				'currency' => q(米ドル),
-				'other' => q(米ドル),
 			},
 		},
 		'USN' => {
-			symbol => 'USN',
 			display_name => {
 				'currency' => q(米ドル \(翌日\)),
-				'other' => q(米ドル \(翌日\)),
 			},
 		},
 		'USS' => {
-			symbol => 'USS',
 			display_name => {
 				'currency' => q(米ドル \(当日\)),
-				'other' => q(米ドル \(当日\)),
 			},
 		},
 		'UYI' => {
-			symbol => 'UYI',
 			display_name => {
 				'currency' => q(ウルグアイ ペソエン),
-				'other' => q(ウルグアイ ペソエン),
 			},
 		},
 		'UYP' => {
-			symbol => 'UYP',
 			display_name => {
 				'currency' => q(ウルグアイ ペソ \(1975–1993\)),
-				'other' => q(ウルグアイ ペソ \(1975–1993\)),
 			},
 		},
 		'UYU' => {
-			symbol => 'UYU',
 			display_name => {
 				'currency' => q(ウルグアイ ペソ),
-				'other' => q(ウルグアイ ペソ),
 			},
 		},
 		'UZS' => {
-			symbol => 'UZS',
 			display_name => {
 				'currency' => q(ウズベキスタン スム),
-				'other' => q(ウズベキスタン スム),
 			},
 		},
 		'VEB' => {
-			symbol => 'VEB',
 			display_name => {
 				'currency' => q(ベネズエラ ボリバル \(1871–2008\)),
-				'other' => q(ベネズエラ ボリバル \(1871–2008\)),
 			},
 		},
 		'VEF' => {
-			symbol => 'VEF',
 			display_name => {
 				'currency' => q(ベネズエラ ボリバル \(2008–2018\)),
-				'other' => q(ベネズエラ ボリバル \(2008–2018\)),
 			},
 		},
 		'VES' => {
-			symbol => 'VES',
 			display_name => {
 				'currency' => q(ベネズエラ ボリバル),
-				'other' => q(ベネズエラ ボリバル),
 			},
 		},
 		'VND' => {
-			symbol => '₫',
 			display_name => {
 				'currency' => q(ベトナム ドン),
-				'other' => q(ベトナム ドン),
 			},
 		},
 		'VNN' => {
-			symbol => 'VNN',
 			display_name => {
 				'currency' => q(ベトナム ドン（1978–1985）),
-				'other' => q(ベトナム ドン（1978–1985）),
 			},
 		},
 		'VUV' => {
-			symbol => 'VUV',
 			display_name => {
 				'currency' => q(バヌアツ バツ),
-				'other' => q(バヌアツ バツ),
 			},
 		},
 		'WST' => {
-			symbol => 'WST',
 			display_name => {
 				'currency' => q(サモア タラ),
-				'other' => q(サモア タラ),
 			},
 		},
 		'XAF' => {
-			symbol => 'FCFA',
 			display_name => {
 				'currency' => q(中央アフリカ CFA フラン),
-				'other' => q(中央アフリカ CFA フラン),
 			},
 		},
 		'XAG' => {
-			symbol => 'XAG',
 			display_name => {
 				'currency' => q(銀),
-				'other' => q(銀),
 			},
 		},
 		'XAU' => {
-			symbol => 'XAU',
 			display_name => {
 				'currency' => q(金),
-				'other' => q(金),
 			},
 		},
 		'XBA' => {
-			symbol => 'XBA',
 			display_name => {
 				'currency' => q(ヨーロッパ混合単位 \(EURCO\)),
-				'other' => q(ヨーロッパ混合単位 \(EURCO\)),
 			},
 		},
 		'XBB' => {
-			symbol => 'XBB',
 			display_name => {
 				'currency' => q(ヨーロッパ通貨単位 \(EMU–6\)),
-				'other' => q(ヨーロッパ通貨単位 \(EMU–6\)),
 			},
 		},
 		'XBC' => {
-			symbol => 'XBC',
 			display_name => {
 				'currency' => q(ヨーロッパ勘定単位 \(EUA–9\)),
-				'other' => q(ヨーロッパ勘定単位 \(EUA–9\)),
 			},
 		},
 		'XBD' => {
-			symbol => 'XBD',
 			display_name => {
 				'currency' => q(ヨーロッパ勘定単位 \(EUA–17\)),
-				'other' => q(ヨーロッパ勘定単位 \(EUA–17\)),
 			},
 		},
 		'XCD' => {
-			symbol => 'EC$',
 			display_name => {
 				'currency' => q(東カリブ ドル),
-				'other' => q(東カリブ ドル),
 			},
 		},
 		'XDR' => {
-			symbol => 'XDR',
 			display_name => {
 				'currency' => q(特別引き出し権),
-				'other' => q(特別引き出し権),
 			},
 		},
 		'XEU' => {
-			symbol => 'XEU',
 			display_name => {
 				'currency' => q(ヨーロッパ通貨単位),
-				'other' => q(ヨーロッパ通貨単位),
 			},
 		},
 		'XFO' => {
-			symbol => 'XFO',
 			display_name => {
 				'currency' => q(フランス金フラン),
-				'other' => q(フランス金フラン),
 			},
 		},
 		'XFU' => {
-			symbol => 'XFU',
 			display_name => {
 				'currency' => q(フランス フラン \(UIC\)),
-				'other' => q(フランス フラン \(UIC\)),
 			},
 		},
 		'XOF' => {
-			symbol => 'F CFA',
 			display_name => {
 				'currency' => q(西アフリカ CFA フラン),
-				'other' => q(西アフリカ CFA フラン),
 			},
 		},
 		'XPD' => {
-			symbol => 'XPD',
 			display_name => {
 				'currency' => q(パラジウム),
-				'other' => q(パラジウム),
 			},
 		},
 		'XPF' => {
-			symbol => 'CFPF',
 			display_name => {
 				'currency' => q(CFP フラン),
-				'other' => q(CFP フラン),
 			},
 		},
 		'XPT' => {
-			symbol => 'XPT',
 			display_name => {
 				'currency' => q(プラチナ),
-				'other' => q(プラチナ),
 			},
 		},
 		'XRE' => {
-			symbol => 'XRE',
 			display_name => {
 				'currency' => q(RINET基金),
-				'other' => q(RINET基金),
 			},
 		},
 		'XSU' => {
-			symbol => 'XSU',
 			display_name => {
 				'currency' => q(スクレ),
-				'other' => q(スクレ),
 			},
 		},
 		'XTS' => {
-			symbol => 'XTS',
 			display_name => {
 				'currency' => q(テスト用通貨コード),
-				'other' => q(テスト用通貨コード),
 			},
 		},
 		'XUA' => {
-			symbol => 'XUA',
 			display_name => {
 				'currency' => q(UA \(アフリカ開発銀行\)),
-				'other' => q(UA \(アフリカ開発銀行\)),
 			},
 		},
 		'XXX' => {
 			symbol => 'XXX',
 			display_name => {
 				'currency' => q(不明または無効な通貨),
-				'other' => q(不明または無効な通貨),
 			},
 		},
 		'YDD' => {
-			symbol => 'YDD',
 			display_name => {
 				'currency' => q(イエメン ディナール),
-				'other' => q(イエメン ディナール),
 			},
 		},
 		'YER' => {
-			symbol => 'YER',
 			display_name => {
 				'currency' => q(イエメン リアル),
-				'other' => q(イエメン リアル),
 			},
 		},
 		'YUD' => {
-			symbol => 'YUD',
 			display_name => {
 				'currency' => q(ユーゴスラビア ハード・ディナール \(1966–1990\)),
-				'other' => q(ユーゴスラビア ハード・ディナール \(1966–1990\)),
 			},
 		},
 		'YUM' => {
-			symbol => 'YUM',
 			display_name => {
 				'currency' => q(ユーゴスラビア ノビ・ディナール \(1994–2002\)),
-				'other' => q(ユーゴスラビア ノビ・ディナール \(1994–2002\)),
 			},
 		},
 		'YUN' => {
-			symbol => 'YUN',
 			display_name => {
 				'currency' => q(ユーゴスラビア 兌換ディナール \(1990–1992\)),
-				'other' => q(ユーゴスラビア 兌換ディナール \(1990–1992\)),
 			},
 		},
 		'YUR' => {
-			symbol => 'YUR',
 			display_name => {
 				'currency' => q(ユーゴスラビア 改革ディナール（1992–1993）),
-				'other' => q(ユーゴスラビア 改革ディナール（1992–1993）),
 			},
 		},
 		'ZAL' => {
-			symbol => 'ZAL',
 			display_name => {
 				'currency' => q(南アフリカ ランド \(ZAL\)),
-				'other' => q(南アフリカ ランド \(ZAL\)),
 			},
 		},
 		'ZAR' => {
-			symbol => 'ZAR',
 			display_name => {
 				'currency' => q(南アフリカ ランド),
-				'other' => q(南アフリカ ランド),
 			},
 		},
 		'ZMK' => {
-			symbol => 'ZMK',
 			display_name => {
 				'currency' => q(ザンビア クワチャ \(1968–2012\)),
-				'other' => q(ザンビア クワチャ \(1968–2012\)),
 			},
 		},
 		'ZMW' => {
-			symbol => 'ZMW',
 			display_name => {
 				'currency' => q(ザンビア クワチャ),
-				'other' => q(ザンビア クワチャ),
 			},
 		},
 		'ZRN' => {
-			symbol => 'ZRN',
 			display_name => {
 				'currency' => q(ザイール 新ザイール \(1993–1998\)),
-				'other' => q(ザイール 新ザイール \(1993–1998\)),
 			},
 		},
 		'ZRZ' => {
-			symbol => 'ZRZ',
 			display_name => {
 				'currency' => q(ザイール ザイール \(1971–1993\)),
-				'other' => q(ザイール ザイール \(1971–1993\)),
 			},
 		},
 		'ZWD' => {
-			symbol => 'ZWD',
 			display_name => {
 				'currency' => q(ジンバブエ ドル \(1980–2008\)),
-				'other' => q(ジンバブエ ドル \(1980–2008\)),
 			},
 		},
 		'ZWL' => {
-			symbol => 'ZWL',
 			display_name => {
 				'currency' => q(ジンバブエ ドル \(2009\)),
-				'other' => q(ジンバブエ ドル \(2009\)),
 			},
 		},
 		'ZWR' => {
-			symbol => 'ZWR',
 			display_name => {
 				'currency' => q(シンバブエ ドル（2008）),
-				'other' => q(シンバブエ ドル（2008）),
 			},
 		},
 	} },
@@ -10303,44 +8513,6 @@ has 'calendar_months' => (
 	default		=> sub { {
 			'chinese' => {
 				'format' => {
-					abbreviated => {
-						nonleap => [
-							'正月',
-							'二月',
-							'三月',
-							'四月',
-							'五月',
-							'六月',
-							'七月',
-							'八月',
-							'九月',
-							'十月',
-							'十一月',
-							'十二月'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'正',
-							'二',
-							'三',
-							'四',
-							'五',
-							'六',
-							'七',
-							'八',
-							'九',
-							'十',
-							'十一',
-							'十二'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'正月',
@@ -10362,25 +8534,6 @@ has 'calendar_months' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'正月',
-							'二月',
-							'三月',
-							'四月',
-							'五月',
-							'六月',
-							'七月',
-							'八月',
-							'九月',
-							'十月',
-							'十一月',
-							'十二月'
-						],
-						leap => [
-							
-						],
-					},
 					narrow => {
 						nonleap => [
 							'正',
@@ -10395,25 +8548,6 @@ has 'calendar_months' => (
 							'十',
 							'十一',
 							'十二'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'正月',
-							'二月',
-							'三月',
-							'四月',
-							'五月',
-							'六月',
-							'七月',
-							'八月',
-							'九月',
-							'十月',
-							'十一月',
-							'十二月'
 						],
 						leap => [
 							
@@ -10423,46 +8557,6 @@ has 'calendar_months' => (
 			},
 			'coptic' => {
 				'format' => {
-					abbreviated => {
-						nonleap => [
-							'トウト',
-							'ババ',
-							'ハトール',
-							'キアック',
-							'トーバ',
-							'アムシール',
-							'バラムハート',
-							'バラモウダ',
-							'バシャンス',
-							'パオーナ',
-							'エペープ',
-							'メスラ',
-							'ナシエ'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12',
-							'13'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'トウト',
@@ -10478,188 +8572,6 @@ has 'calendar_months' => (
 							'エペープ',
 							'メスラ',
 							'ナシエ'
-						],
-						leap => [
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'トウト',
-							'ババ',
-							'ハトール',
-							'キアック',
-							'トーバ',
-							'アムシール',
-							'バラムハート',
-							'バラモウダ',
-							'バシャンス',
-							'パオーナ',
-							'エペープ',
-							'メスラ',
-							'ナシエ'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12',
-							'13'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'トウト',
-							'ババ',
-							'ハトール',
-							'キアック',
-							'トーバ',
-							'アムシール',
-							'バラムハート',
-							'バラモウダ',
-							'バシャンス',
-							'パオーナ',
-							'エペープ',
-							'メスラ',
-							'ナシエ'
-						],
-						leap => [
-							
-						],
-					},
-				},
-			},
-			'dangi' => {
-				'format' => {
-					abbreviated => {
-						nonleap => [
-							'正月',
-							'二月',
-							'三月',
-							'四月',
-							'五月',
-							'六月',
-							'七月',
-							'八月',
-							'九月',
-							'十月',
-							'十一月',
-							'十二月'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'正',
-							'二',
-							'三',
-							'四',
-							'五',
-							'六',
-							'七',
-							'八',
-							'九',
-							'十',
-							'十一',
-							'十二'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'正月',
-							'二月',
-							'三月',
-							'四月',
-							'五月',
-							'六月',
-							'七月',
-							'八月',
-							'九月',
-							'十月',
-							'十一月',
-							'十二月'
-						],
-						leap => [
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'正月',
-							'二月',
-							'三月',
-							'四月',
-							'五月',
-							'六月',
-							'七月',
-							'八月',
-							'九月',
-							'十月',
-							'十一月',
-							'十二月'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'正',
-							'二',
-							'三',
-							'四',
-							'五',
-							'六',
-							'七',
-							'八',
-							'九',
-							'十',
-							'十一',
-							'十二'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'正月',
-							'二月',
-							'三月',
-							'四月',
-							'五月',
-							'六月',
-							'七月',
-							'八月',
-							'九月',
-							'十月',
-							'十一月',
-							'十二月'
 						],
 						leap => [
 							
@@ -10669,108 +8581,6 @@ has 'calendar_months' => (
 			},
 			'ethiopic' => {
 				'format' => {
-					abbreviated => {
-						nonleap => [
-							'メスケレム',
-							'テケムト',
-							'ヘダル',
-							'ターサス',
-							'テル',
-							'イェカティト',
-							'メガビト',
-							'ミアジア',
-							'ゲンボト',
-							'セネ',
-							'ハムレ',
-							'ネハッセ',
-							'パグメン'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12',
-							'13'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'メスケレム',
-							'テケムト',
-							'ヘダル',
-							'ターサス',
-							'テル',
-							'イェカティト',
-							'メガビト',
-							'ミアジア',
-							'ゲンボト',
-							'セネ',
-							'ハムレ',
-							'ネハッセ',
-							'パグメン'
-						],
-						leap => [
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'メスケレム',
-							'テケムト',
-							'ヘダル',
-							'ターサス',
-							'テル',
-							'イェカティト',
-							'メガビト',
-							'ミアジア',
-							'ゲンボト',
-							'セネ',
-							'ハムレ',
-							'ネハッセ',
-							'パグメン'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12',
-							'13'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'メスケレム',
@@ -10795,103 +8605,6 @@ has 'calendar_months' => (
 			},
 			'gregorian' => {
 				'format' => {
-					abbreviated => {
-						nonleap => [
-							'1月',
-							'2月',
-							'3月',
-							'4月',
-							'5月',
-							'6月',
-							'7月',
-							'8月',
-							'9月',
-							'10月',
-							'11月',
-							'12月'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'1月',
-							'2月',
-							'3月',
-							'4月',
-							'5月',
-							'6月',
-							'7月',
-							'8月',
-							'9月',
-							'10月',
-							'11月',
-							'12月'
-						],
-						leap => [
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'1月',
-							'2月',
-							'3月',
-							'4月',
-							'5月',
-							'6月',
-							'7月',
-							'8月',
-							'9月',
-							'10月',
-							'11月',
-							'12月'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'1月',
@@ -10915,138 +8628,6 @@ has 'calendar_months' => (
 			},
 			'hebrew' => {
 				'format' => {
-					abbreviated => {
-						nonleap => [
-							'ティスレ',
-							'へシボン',
-							'キスレブ',
-							'テベット',
-							'シバット',
-							'アダル I',
-							'アダル',
-							'ニサン',
-							'イヤル',
-							'シバン',
-							'タムズ',
-							'アヴ',
-							'エルル'
-						],
-						leap => [
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12',
-							'13'
-						],
-						leap => [
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'ティスレ',
-							'へシボン',
-							'キスレブ',
-							'テベット',
-							'シバット',
-							'アダル I',
-							'アダル',
-							'ニサン',
-							'イヤル',
-							'シバン',
-							'タムズ',
-							'アヴ',
-							'エルル'
-						],
-						leap => [
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'ティスレ',
-							'へシボン',
-							'キスレブ',
-							'テベット',
-							'シバット',
-							'アダル I',
-							'アダル',
-							'ニサン',
-							'イヤル',
-							'シバン',
-							'タムズ',
-							'アヴ',
-							'エルル'
-						],
-						leap => [
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12',
-							'13'
-						],
-						leap => [
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'ティスレ',
@@ -11077,103 +8658,6 @@ has 'calendar_months' => (
 			},
 			'indian' => {
 				'format' => {
-					abbreviated => {
-						nonleap => [
-							'カイトラ',
-							'ヴァイサカ',
-							'ジャイスタ',
-							'アーサダ',
-							'スラバナ',
-							'バードラ',
-							'アスビナ',
-							'カルディカ',
-							'アヴラハヤナ',
-							'パウサ',
-							'マーガ',
-							'パルグナ'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'カイトラ',
-							'ヴァイサカ',
-							'ジャイスタ',
-							'アーサダ',
-							'スラバナ',
-							'バードラ',
-							'アスビナ',
-							'カルディカ',
-							'アヴラハヤナ',
-							'パウサ',
-							'マーガ',
-							'パルグナ'
-						],
-						leap => [
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'カイトラ',
-							'ヴァイサカ',
-							'ジャイスタ',
-							'アーサダ',
-							'スラバナ',
-							'バードラ',
-							'アスビナ',
-							'カルディカ',
-							'アヴラハヤナ',
-							'パウサ',
-							'マーガ',
-							'パルグナ'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'カイトラ',
@@ -11216,84 +8700,6 @@ has 'calendar_months' => (
 							
 						],
 					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'ムハッラム',
-							'サフアル',
-							'ラビー・ウル・アウワル',
-							'ラビー・ウッ・サーニー',
-							'ジュマーダル・アウワル',
-							'ジュマーダッサーニー',
-							'ラジャブ',
-							'シャアバーン',
-							'ラマダーン',
-							'シャウワール',
-							'ズル・カイダ',
-							'ズル・ヒッジャ'
-						],
-						leap => [
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'ムハッラム',
-							'サフアル',
-							'ラビー・ウル・アウワル',
-							'ラビー・ウッ・サーニー',
-							'ジュマーダル・アウワル',
-							'ジュマーダッサーニー',
-							'ラジャブ',
-							'シャアバーン',
-							'ラマダーン',
-							'シャウワール',
-							'ズル・カイダ',
-							'ズル・ヒッジャ'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'ムハッラム',
@@ -11317,103 +8723,6 @@ has 'calendar_months' => (
 			},
 			'persian' => {
 				'format' => {
-					abbreviated => {
-						nonleap => [
-							'ファルヴァルディーン',
-							'オルディーベヘシュト',
-							'ホルダード',
-							'ティール',
-							'モルダード',
-							'シャハリーヴァル',
-							'メフル',
-							'アーバーン',
-							'アーザル',
-							'デイ',
-							'バフマン',
-							'エスファンド'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'ファルヴァルディーン',
-							'オルディーベヘシュト',
-							'ホルダード',
-							'ティール',
-							'モルダード',
-							'シャハリーヴァル',
-							'メフル',
-							'アーバーン',
-							'アーザル',
-							'デイ',
-							'バフマン',
-							'エスファンド'
-						],
-						leap => [
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'ファルヴァルディーン',
-							'オルディーベヘシュト',
-							'ホルダード',
-							'ティール',
-							'モルダード',
-							'シャハリーヴァル',
-							'メフル',
-							'アーバーン',
-							'アーザル',
-							'デイ',
-							'バフマン',
-							'エスファンド'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'ファルヴァルディーン',
@@ -11454,24 +8763,6 @@ has 'calendar_days' => (
 						sat => '土',
 						sun => '日'
 					},
-					narrow => {
-						mon => '月',
-						tue => '火',
-						wed => '水',
-						thu => '木',
-						fri => '金',
-						sat => '土',
-						sun => '日'
-					},
-					short => {
-						mon => '月',
-						tue => '火',
-						wed => '水',
-						thu => '木',
-						fri => '金',
-						sat => '土',
-						sun => '日'
-					},
 					wide => {
 						mon => '月曜日',
 						tue => '火曜日',
@@ -11483,15 +8774,6 @@ has 'calendar_days' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						mon => '月',
-						tue => '火',
-						wed => '水',
-						thu => '木',
-						fri => '金',
-						sat => '土',
-						sun => '日'
-					},
 					narrow => {
 						mon => '月',
 						tue => '火',
@@ -11500,24 +8782,6 @@ has 'calendar_days' => (
 						fri => '金',
 						sat => '土',
 						sun => '日'
-					},
-					short => {
-						mon => '月',
-						tue => '火',
-						wed => '水',
-						thu => '木',
-						fri => '金',
-						sat => '土',
-						sun => '日'
-					},
-					wide => {
-						mon => '月曜日',
-						tue => '火曜日',
-						wed => '水曜日',
-						thu => '木曜日',
-						fri => '金曜日',
-						sat => '土曜日',
-						sun => '日曜日'
 					},
 				},
 			},
@@ -11535,28 +8799,6 @@ has 'calendar_quarters' => (
 						1 => 'Q2',
 						2 => 'Q3',
 						3 => 'Q4'
-					},
-					narrow => {0 => '1',
-						1 => '2',
-						2 => '3',
-						3 => '4'
-					},
-					wide => {0 => '第1四半期',
-						1 => '第2四半期',
-						2 => '第3四半期',
-						3 => '第4四半期'
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {0 => 'Q1',
-						1 => 'Q2',
-						2 => 'Q3',
-						3 => 'Q4'
-					},
-					narrow => {0 => '1',
-						1 => '2',
-						2 => '3',
-						3 => '4'
 					},
 					wide => {0 => '第1四半期',
 						1 => '第2四半期',
@@ -11637,35 +8879,6 @@ has 'day_period_data' => (
 				last SWITCH;
 				}
 			if ($_ eq 'coptic') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'evening1' if $time >= 1600
-						&& $time < 1900;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'night1' if $time >= 1900
-						&& $time < 2300;
-					return 'night2' if $time >= 2300;
-					return 'night2' if $time < 400;
-				}
-				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'evening1' if $time >= 1600
-						&& $time < 1900;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'night1' if $time >= 1900
-						&& $time < 2300;
-					return 'night2' if $time >= 2300;
-					return 'night2' if $time < 400;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'dangi') {
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
@@ -11982,63 +9195,6 @@ has 'day_periods' => (
 					'noon' => q{正午},
 					'pm' => q{午後},
 				},
-				'narrow' => {
-					'afternoon1' => q{昼},
-					'am' => q{午前},
-					'evening1' => q{夕方},
-					'midnight' => q{真夜中},
-					'morning1' => q{朝},
-					'night1' => q{夜},
-					'night2' => q{夜中},
-					'noon' => q{正午},
-					'pm' => q{午後},
-				},
-				'wide' => {
-					'afternoon1' => q{昼},
-					'am' => q{午前},
-					'evening1' => q{夕方},
-					'midnight' => q{真夜中},
-					'morning1' => q{朝},
-					'night1' => q{夜},
-					'night2' => q{夜中},
-					'noon' => q{正午},
-					'pm' => q{午後},
-				},
-			},
-			'stand-alone' => {
-				'abbreviated' => {
-					'afternoon1' => q{昼},
-					'am' => q{午前},
-					'evening1' => q{夕方},
-					'midnight' => q{真夜中},
-					'morning1' => q{朝},
-					'night1' => q{夜},
-					'night2' => q{夜中},
-					'noon' => q{正午},
-					'pm' => q{午後},
-				},
-				'narrow' => {
-					'afternoon1' => q{昼},
-					'am' => q{午前},
-					'evening1' => q{夕方},
-					'midnight' => q{真夜中},
-					'morning1' => q{朝},
-					'night1' => q{夜},
-					'night2' => q{夜中},
-					'noon' => q{正午},
-					'pm' => q{午後},
-				},
-				'wide' => {
-					'afternoon1' => q{昼},
-					'am' => q{午前},
-					'evening1' => q{夕方},
-					'midnight' => q{真夜中},
-					'morning1' => q{朝},
-					'night1' => q{夜},
-					'night2' => q{夜中},
-					'noon' => q{正午},
-					'pm' => q{午後},
-				},
 			},
 		},
 	} },
@@ -12050,12 +9206,6 @@ has 'eras' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'buddhist' => {
-			abbreviated => {
-				'0' => 'BE'
-			},
-			narrow => {
-				'0' => 'BE'
-			},
 			wide => {
 				'0' => '仏暦'
 			},
@@ -12063,34 +9213,8 @@ has 'eras' => (
 		'chinese' => {
 		},
 		'coptic' => {
-			abbreviated => {
-				'0' => 'ERA0',
-				'1' => 'ERA1'
-			},
-			narrow => {
-				'0' => 'ERA0',
-				'1' => 'ERA1'
-			},
-			wide => {
-				'0' => 'ERA0',
-				'1' => 'ERA1'
-			},
-		},
-		'dangi' => {
 		},
 		'ethiopic' => {
-			abbreviated => {
-				'0' => 'ERA0',
-				'1' => 'ERA1'
-			},
-			narrow => {
-				'0' => 'ERA0',
-				'1' => 'ERA1'
-			},
-			wide => {
-				'0' => 'ERA0',
-				'1' => 'ERA1'
-			},
 		},
 		'generic' => {
 		},
@@ -12103,43 +9227,15 @@ has 'eras' => (
 				'0' => 'BC',
 				'1' => 'AD'
 			},
-			wide => {
-				'0' => '紀元前',
-				'1' => '西暦'
-			},
 		},
 		'hebrew' => {
-			abbreviated => {
-				'0' => 'AM'
-			},
-			narrow => {
-				'0' => 'AM'
-			},
-			wide => {
-				'0' => 'AM'
-			},
 		},
 		'indian' => {
 			abbreviated => {
 				'0' => 'サカ'
 			},
-			narrow => {
-				'0' => 'サカ'
-			},
-			wide => {
-				'0' => 'サカ'
-			},
 		},
 		'islamic' => {
-			abbreviated => {
-				'0' => 'AH'
-			},
-			narrow => {
-				'0' => 'AH'
-			},
-			wide => {
-				'0' => 'AH'
-			},
 		},
 		'japanese' => {
 			abbreviated => {
@@ -12613,36 +9709,15 @@ has 'eras' => (
 				'228' => '万延',
 				'229' => '文久',
 				'230' => '元治',
-				'231' => '慶応',
-				'232' => 'M',
-				'233' => 'T',
-				'234' => 'S',
-				'235' => 'H',
-				'236' => 'R'
+				'231' => '慶応'
 			},
 		},
 		'persian' => {
-			abbreviated => {
-				'0' => 'AP'
-			},
-			narrow => {
-				'0' => 'AP'
-			},
-			wide => {
-				'0' => 'AP'
-			},
 		},
 		'roc' => {
 			abbreviated => {
 				'0' => '民国前',
 				'1' => '民国'
-			},
-			narrow => {
-				'0' => '民国前',
-				'1' => '民国'
-			},
-			wide => {
-				'0' => '民国前'
 			},
 		},
 	} },
@@ -12666,12 +9741,6 @@ has 'date_formats' => (
 			'short' => q{U-M-d},
 		},
 		'coptic' => {
-		},
-		'dangi' => {
-			'full' => q{U年MMMd日EEEE},
-			'long' => q{U年MMMd日},
-			'medium' => q{U年MMMd日},
-			'short' => q{U-M-d},
 		},
 		'ethiopic' => {
 		},
@@ -12729,8 +9798,6 @@ has 'time_formats' => (
 		},
 		'coptic' => {
 		},
-		'dangi' => {
-		},
 		'ethiopic' => {
 		},
 		'generic' => {
@@ -12766,8 +9833,6 @@ has 'datetime_formats' => (
 		'chinese' => {
 		},
 		'coptic' => {
-		},
-		'dangi' => {
 		},
 		'ethiopic' => {
 		},
@@ -12809,30 +9874,14 @@ has 'datetime_formats_available_formats' => (
 	default		=> sub { {
 		'buddhist' => {
 			EEEEd => q{d日EEEE},
-			Ed => q{d日(E)},
 			Gy => q{GGGGy年},
 			GyMMM => q{GGGGy年M月},
 			GyMMMEEEEd => q{GGGGy年M月d日EEEE},
 			GyMMMEd => q{GGGGy年M月d日(E)},
 			GyMMMd => q{GGGGy年M月d日},
 			GyMd => q{GGGGy年M月d日},
-			H => q{H時},
-			Hm => q{H:mm},
-			Hms => q{H:mm:ss},
-			M => q{M月},
 			MEEEEd => q{M/dEEEE},
-			MEd => q{M/d(E)},
-			MMM => q{M月},
 			MMMEEEEd => q{M月d日EEEE},
-			MMMEd => q{M月d日(E)},
-			MMMMd => q{M月d日},
-			MMMd => q{M月d日},
-			Md => q{M/d},
-			d => q{d日},
-			h => q{aK時},
-			hm => q{aK:mm},
-			hms => q{aK:mm:ss},
-			ms => q{mm:ss},
 			y => q{GGGGy年},
 			yyyy => q{GGGGy年},
 			yyyyM => q{GGGGy年M月},
@@ -12850,7 +9899,6 @@ has 'datetime_formats_available_formats' => (
 			Bh => q{BK時},
 			Bhm => q{BK:mm},
 			Bhms => q{BK:mm:ss},
-			E => q{ccc},
 			EBhm => q{BK:mm (E)},
 			EBhms => q{BK:mm:ss (E)},
 			EEEEd => q{d日EEEE},
@@ -12870,7 +9918,6 @@ has 'datetime_formats_available_formats' => (
 			M => q{MMM},
 			MEEEEd => q{M/dEEEE},
 			MEd => q{M/d(E)},
-			MMM => q{LLL},
 			MMMEEEEd => q{MMMd日EEEE},
 			MMMEd => q{MMMd日(E)},
 			MMMMd => q{MMMMd日},
@@ -12884,7 +9931,6 @@ has 'datetime_formats_available_formats' => (
 			h => q{aK時},
 			hm => q{aK:mm},
 			hms => q{aK:mm:ss},
-			ms => q{mm:ss},
 			y => q{U年},
 			yMd => q{U-M-d},
 			yyyy => q{U年},
@@ -12906,7 +9952,6 @@ has 'datetime_formats_available_formats' => (
 			Bh => q{BK時},
 			Bhm => q{BK:mm},
 			Bhms => q{BK:mm:ss},
-			E => q{ccc},
 			EBhm => q{BK:mm (E)},
 			EBhms => q{BK:mm:ss (E)},
 			EEEEd => q{d日(EEEE)},
@@ -12937,7 +9982,6 @@ has 'datetime_formats_available_formats' => (
 			h => q{aK時},
 			hm => q{aK:mm},
 			hms => q{aK:mm:ss},
-			ms => q{mm:ss},
 			y => q{Gy年},
 			yyyy => q{Gy年},
 			yyyyM => q{GGGGGy/M},
@@ -12956,7 +10000,6 @@ has 'datetime_formats_available_formats' => (
 			Bh => q{BK時},
 			Bhm => q{BK:mm},
 			Bhms => q{BK:mm:ss},
-			E => q{ccc},
 			EBhm => q{BK:mm (E)},
 			EBhms => q{BK:mm:ss (E)},
 			EEEEd => q{d日EEEE},
@@ -12992,7 +10035,6 @@ has 'datetime_formats_available_formats' => (
 			hms => q{aK:mm:ss},
 			hmsv => q{aK:mm:ss v},
 			hmv => q{aK:mm v},
-			ms => q{mm:ss},
 			y => q{y年},
 			yM => q{y/M},
 			yMEEEEd => q{y/M/dEEEE},
@@ -13008,69 +10050,14 @@ has 'datetime_formats_available_formats' => (
 			yQQQQ => q{y年QQQQ},
 			yw => q{Y年第w週},
 		},
-		'islamic' => {
-			M => q{M月},
-			MEd => q{M/d(E)},
-			MMM => q{M月},
-			MMMEd => q{M月d日(E)},
-			MMMMd => q{M月d日},
-			MMMd => q{M月d日},
-			Md => q{M/d},
-			d => q{d日},
-			y => q{Gy年},
-		},
 		'japanese' => {
-			E => q{ccc},
 			EEEEd => q{d日EEEE},
-			Ed => q{d日(E)},
-			Gy => q{Gy年},
-			GyMMM => q{Gy年M月},
 			GyMMMEEEEd => q{Gy年M月d日EEEE},
-			GyMMMEd => q{Gy年M月d日(E)},
-			GyMMMd => q{Gy年M月d日},
-			GyMd => q{GGGGGy/M/d},
-			H => q{H時},
-			Hm => q{H:mm},
-			Hms => q{H:mm:ss},
-			M => q{M月},
 			MEEEEd => q{M/dEEEE},
-			MEd => q{M/d(E)},
-			MMM => q{M月},
 			MMMEEEEd => q{M月d日EEEE},
-			MMMEd => q{M月d日(E)},
-			MMMMd => q{M月d日},
-			MMMd => q{M月d日},
-			Md => q{M/d},
-			d => q{d日},
-			h => q{aK時},
-			hm => q{aK:mm},
-			hms => q{aK:mm:ss},
-			ms => q{mm:ss},
-			y => q{Gy年},
-			yyyy => q{Gy年},
-			yyyyM => q{GGGGGy/M},
 			yyyyMEEEEd => q{GGGGGy/M/dEEEE},
-			yyyyMEd => q{GGGGGy/M/d(E)},
 			yyyyMM => q{GGGGGy/MM},
-			yyyyMMM => q{Gy年M月},
 			yyyyMMMEEEEd => q{Gy年M月d日EEEE},
-			yyyyMMMEd => q{Gy年M月d日(E)},
-			yyyyMMMM => q{Gy年M月},
-			yyyyMMMd => q{Gy年M月d日},
-			yyyyMd => q{GGGGGy/M/d},
-			yyyyQQQ => q{Gy/QQQ},
-			yyyyQQQQ => q{Gy年QQQQ},
-		},
-		'roc' => {
-			M => q{M月},
-			MEd => q{M/d(E)},
-			MMM => q{M月},
-			MMMEd => q{M月d日(E)},
-			MMMMd => q{M月d日},
-			MMMd => q{M月d日},
-			Md => q{M/d},
-			d => q{d日},
-			y => q{Gy年},
 		},
 	} },
 );
@@ -13080,9 +10067,6 @@ has 'datetime_formats_append_item' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			'Timezone' => '{0} {1}',
-		},
 	} },
 );
 
@@ -13663,110 +10647,6 @@ has 'cyclic_name_sets' => (
 				},
 			},
 		},
-		'dangi' => {
-			'dayParts' => {
-				'format' => {
-					'abbreviated' => {
-						0 => q(子),
-						1 => q(丑),
-						2 => q(寅),
-						3 => q(卯),
-						4 => q(辰),
-						5 => q(巳),
-						6 => q(午),
-						7 => q(未),
-						8 => q(申),
-						9 => q(酉),
-						10 => q(戌),
-						11 => q(亥),
-					},
-				},
-			},
-			'years' => {
-				'format' => {
-					'abbreviated' => {
-						0 => q(甲子),
-						1 => q(乙丑),
-						2 => q(丙寅),
-						3 => q(丁卯),
-						4 => q(戊辰),
-						5 => q(己巳),
-						6 => q(庚午),
-						7 => q(辛未),
-						8 => q(壬申),
-						9 => q(癸酉),
-						10 => q(甲戌),
-						11 => q(乙亥),
-						12 => q(丙子),
-						13 => q(丁丑),
-						14 => q(戊寅),
-						15 => q(己卯),
-						16 => q(庚辰),
-						17 => q(辛巳),
-						18 => q(壬午),
-						19 => q(癸未),
-						20 => q(甲申),
-						21 => q(乙酉),
-						22 => q(丙戌),
-						23 => q(丁亥),
-						24 => q(戊子),
-						25 => q(己丑),
-						26 => q(庚寅),
-						27 => q(辛卯),
-						28 => q(壬辰),
-						29 => q(癸巳),
-						30 => q(甲午),
-						31 => q(乙未),
-						32 => q(丙申),
-						33 => q(丁酉),
-						34 => q(戊戌),
-						35 => q(己亥),
-						36 => q(庚子),
-						37 => q(辛丑),
-						38 => q(壬寅),
-						39 => q(癸卯),
-						40 => q(甲辰),
-						41 => q(乙巳),
-						42 => q(丙午),
-						43 => q(丁未),
-						44 => q(戊申),
-						45 => q(己酉),
-						46 => q(庚戌),
-						47 => q(辛亥),
-						48 => q(壬子),
-						49 => q(癸丑),
-						50 => q(甲寅),
-						51 => q(乙卯),
-						52 => q(丙辰),
-						53 => q(丁巳),
-						54 => q(戊午),
-						55 => q(己未),
-						56 => q(庚申),
-						57 => q(辛酉),
-						58 => q(壬戌),
-						59 => q(癸亥),
-					},
-				},
-			},
-			'zodiacs' => {
-				'format' => {
-					'abbreviated' => {
-						0 => q(鼠),
-						1 => q(牛),
-						2 => q(虎),
-						3 => q(兎),
-						4 => q(竜),
-						5 => q(蛇),
-						6 => q(馬),
-						7 => q(羊),
-						8 => q(猿),
-						9 => q(鶏),
-						10 => q(犬),
-						11 => q(猪),
-					},
-				},
-			},
-		},
 	} },
 );
 
@@ -13775,9 +10655,6 @@ has 'time_zone_names' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default	=> sub { {
-		hourFormat => q(+HH:mm;-HH:mm),
-		gmtFormat => q(GMT{0}),
-		gmtZeroFormat => q(GMT),
 		regionFormat => q({0}時間),
 		regionFormat => q({0}夏時間),
 		regionFormat => q({0}標準時),
@@ -14091,6 +10968,9 @@ has 'time_zone_names' => (
 		},
 		'America/Chihuahua' => {
 			exemplarCity => q#チワワ#,
+		},
+		'America/Ciudad_Juarez' => {
+			exemplarCity => q#シウダー・フアレス#,
 		},
 		'America/Coral_Harbour' => {
 			exemplarCity => q#アティコカン#,
@@ -15128,7 +12008,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#カリーニングラード#,
 		},
 		'Europe/Kiev' => {
-			exemplarCity => q#キエフ#,
+			exemplarCity => q#キーウ#,
 		},
 		'Europe/Kirov' => {
 			exemplarCity => q#キーロフ#,
@@ -15728,6 +12608,9 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Johnston' => {
 			exemplarCity => q#ジョンストン島#,
+		},
+		'Pacific/Kanton' => {
+			exemplarCity => q#カントン島#,
 		},
 		'Pacific/Kiritimati' => {
 			exemplarCity => q#キリスィマスィ島#,

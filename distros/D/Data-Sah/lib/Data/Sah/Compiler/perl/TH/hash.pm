@@ -14,9 +14,9 @@ extends 'Data::Sah::Compiler::perl::TH';
 with 'Data::Sah::Type::hash';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-19'; # DATE
+our $DATE = '2024-02-16'; # DATE
 our $DIST = 'Data-Sah'; # DIST
-our $VERSION = '0.914'; # VERSION
+our $VERSION = '0.917'; # VERSION
 
 sub handle_type {
     my ($self, $cd) = @_;
@@ -92,6 +92,8 @@ sub superclause_has_elems {
 }
 
 sub _clause_keys_or_re_keys {
+    require Data::Sah::Normalize;
+
     my ($self_th, $which, $cd) = @_;
     my $c  = $self_th->compiler;
     my $cv = $cd->{cl_value};
@@ -156,7 +158,7 @@ sub _clause_keys_or_re_keys {
             my $kre = $c->_str2reliteral($cd, $k);
             local $cd->{spath} = [@{ $cd->{spath} }, $k];
             ++$i;
-            my $nsch = $c->main->normalize_schema($cv->{$k});
+            my $nsch = Data::Sah::Normalize::normalize_schema($cv->{$k});
             my $kdn = $k; $kdn =~ s/\W+/_/g;
             my $klit = $which eq 're_keys' ? '$_' : $c->literal($k);
             my $kdt = "$dt\->{$klit}";
@@ -307,7 +309,6 @@ sub clause_forbidden_keys {
     #$c->add_runtime_module($cd, "List::Util");
     $c->add_ccl(
       $cd,
-      #"!defined(List::Util::first(sub {\$_ ~~ $ct}, keys \%{ $dt }))",
       "!(grep { my \$_sahv_dt_item=\$_; !!(grep { \$_sahv_dt_item eq \$_ } \@{ $ct }) } keys \%{ $dt })",
       {
         err_msg => 'TMP',
@@ -502,7 +503,7 @@ Data::Sah::Compiler::perl::TH::hash - perl's type handler for type "hash"
 
 =head1 VERSION
 
-This document describes version 0.914 of Data::Sah::Compiler::perl::TH::hash (from Perl distribution Data-Sah), released on 2022-10-19.
+This document describes version 0.917 of Data::Sah::Compiler::perl::TH::hash (from Perl distribution Data-Sah), released on 2024-02-16.
 
 =for Pod::Coverage ^(clause_.+|superclause_.+)$
 
@@ -538,7 +539,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

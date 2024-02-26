@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,13 +59,13 @@ sub new {
 
 
 # Run Operation Request
-# DeleteWorksheetRowsRequest.name : The workbook name.  ,
+# DeleteWorksheetRowsRequest.name : The file name.  ,
 # DeleteWorksheetRowsRequest.sheetName : The worksheet name.  ,
 # DeleteWorksheetRowsRequest.startrow : The begin row index to be operated.  ,
 # DeleteWorksheetRowsRequest.totalRows : Number of rows to be operated.  ,
 # DeleteWorksheetRowsRequest.updateReference : Indicates if update references in other worksheets.  ,
-# DeleteWorksheetRowsRequest.folder : Original workbook folder.  ,
-# DeleteWorksheetRowsRequest.storageName : Storage name.   
+# DeleteWorksheetRowsRequest.folder : The folder where the file is situated.  ,
+# DeleteWorksheetRowsRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -76,7 +76,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'delete_worksheet_rows' } = { 
-    	summary => 'Delete several rows in worksheet.',
+    	summary => 'Delete several rows in the worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -145,7 +145,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -180,14 +180,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

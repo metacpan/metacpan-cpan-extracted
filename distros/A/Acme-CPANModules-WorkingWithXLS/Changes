@@ -1,3 +1,22 @@
+0.005   2023-12-04  Released-By: PERLANCAR; Urgency: medium
+
+        - Add aliases: WorkingWith{ODS,XLSX}.
+
+        - [doc] Mention related list: WorkingWithDOC.
+
+
+0.004   2023-11-20  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Add alias: Spreadsheet.
+
+
+0.003   2023-10-31  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Tweak Abstract (add 'List of ...' prefix) to follow convention.
+
+
 0.002   2022-11-13  Released-By: PERLANCAR; Urgency: medium
 
         - Add Data::XLSX::Parser.

@@ -1,4 +1,4 @@
-# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2017, 2020 Kevin Ryde
+# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2017, 2020, 2023, 2024 Kevin Ryde
 
 # This file is part of Upfiles.
 #
@@ -25,7 +25,7 @@ use Locale::TextDomain ('App-Upfiles');
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
-our $VERSION = 15;
+our $VERSION = 16;
 
 # Have croaks from Net::FTP reported against the caller (App::Upfiles)
 # rather than here.
@@ -33,6 +33,7 @@ our @CARP_NOT = ('Net::FTP');
 
 sub new {
   my $class = shift;
+  ### FTPlazy: @_
   return bless { verbose => 0,
                  want_dir => '/',
                  have_site_utime => 'unknown',
@@ -94,8 +95,9 @@ sub ensure_host {
   ### open Net FTP ...
   require Net::FTP;
   my $ftp = Net::FTP->new ($self->{'want_host'},
-                           Debug => ($self->{'verbose'} >= 2),
-                           SSL   => $self->{'use_SSL'},
+                           Debug   => ($self->{'verbose'} >= 2),
+                           SSL     => $self->{'use_SSL'},
+                           Passive => $self->{'Passive'},
                           );
   if (! $ftp) {
     $self->{'message'} = $@;

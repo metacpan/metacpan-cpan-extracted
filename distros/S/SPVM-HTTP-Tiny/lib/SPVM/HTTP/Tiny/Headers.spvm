@@ -1,0 +1,146 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class HTTP::Tiny::Headers {
+  allow HTTP::Tiny::Handle;
+  
+  use StringList;
+  use Hash;
+  use Sort;
+  use Regex;
+  use StringBuffer;
+  
+  # Fields
+  has headers_h : Hash;
+  
+  # Class Methods
+  static method new : HTTP::Tiny::Headers () {
+    my $self = new HTTP::Tiny::Headers;
+    
+    $self->{headers_h} = Hash->new;
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  method add : void ($name : string, $value : string) {
+    
+    unless ($name) {
+      die "\$name must be defined.";
+    }
+    
+    unless ($value) {
+      die "\$value must be defined.";
+    }
+    
+    if (Regex->new("[\x0d\x0a]")->match($name)) {
+      die "Invalid characters in the $name header.";
+    }
+    
+    if (Regex->new("[\x0d\x0a]")->match($value)) {
+      die "Invalid characters in the value of the $name header.";
+    }
+    
+    my $name_lc = Fn->lc($name);
+    
+    my $values_list = (StringList)$self->{headers_h}->get($name_lc);
+    
+    unless ($values_list) {
+      $values_list = StringList->new;
+    }
+    
+    $values_list->push($value);
+    
+    $self->{headers_h}->set($name_lc, $values_list);
+  }
+  
+  method remove : void ($name : string) {
+    
+    unless ($name) {
+      die "The \$name must be defined";
+    }
+    
+    my $name_lc = Fn->lc($name);
+    
+    my $values_list = (StringList)$self->{headers_h}->get($name_lc);
+    
+    if ($values_list) {
+      $self->{headers_h}->set($name_lc, undef);
+    }
+  }
+  
+  method header : string ($name : string) {
+    
+    unless ($name) {
+      die "\$name must be defined.";
+    }
+    
+    my $headers_h = $self->{headers_h};
+    
+    my $name_lc = Fn->lc($name);
+    
+    my $values_list = (StringList)$self->{headers_h}->get($name_lc);
+    
+    my $values = (string[])undef;
+    if ($values_list) {
+      $values = $values_list->to_array;
+    }
+    
+    my $value_string = (string)undef;
+    
+    if ($values) {
+      $value_string = Fn->join(",", $values);
+    }
+    
+    return $value_string;
+  }
+  
+  method set_header : void ($name : string, $value : string) {
+    
+    $self->remove($name);
+    
+    $self->add($name, $value);
+  }
+  
+  method names : string[] () {
+    my $names = $self->{headers_h}->keys;
+    
+    Sort->sort_string_asc($names);
+    
+    return $names;
+  }
+  
+  method to_string : string () {
+    
+    my $names = $self->names;
+    
+    my $buffer = StringBuffer->new;
+    for my $name (@$names) {
+      my $header_string = $self->header($name);
+      $buffer->push("$name:");
+      $buffer->push($header_string);
+      $buffer->push("\r\n");
+    }
+    
+    my $string = $buffer->to_string;
+    
+    return $string;
+  }
+  
+  method clone : HTTP::Tiny::Headers () {
+    
+    my $clone = HTTP::Tiny::Headers->new;
+    
+    my $headers_h = $self->{headers_h};
+    
+    my $names = $headers_h->keys;
+    
+    for my $name (@$names) {
+      my $value = $headers_h->get_string($name);
+      $clone->add($name, $value);
+    }
+    
+    return $clone;
+  }
+  
+}

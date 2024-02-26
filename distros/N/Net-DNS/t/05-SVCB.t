@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 05-SVCB.t 1930 2023-08-21 14:10:10Z willem $	-*-perl-*-
+# $Id: 05-SVCB.t 1965 2024-02-14 09:19:32Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -14,7 +14,7 @@ exit( plan skip_all => 'unresolved AUTOLOAD regression	[perl #120694]' )
 		unless ( $] > 5.018001 )
 		or ( $] < 5.018 );
 
-plan tests => 46;
+plan tests => 47;
 
 
 my $name = 'SVCB.example';
@@ -65,6 +65,13 @@ for my $rr ( Net::DNS::RR->new(". $type") ) {
 	$rr->key3(1234);
 	$rr->key3(undef);
 	is( length( $rr->encode ), $l0, 'delete SvcParams key' );
+}
+
+
+for my $corruption ( pack 'H*', '00004000010000000000070001000bad0001' ) {
+	$SIG{__WARN__} = sub { };
+	my $rr = Net::DNS::RR->decode( \$corruption );
+	like( $rr->string, '/RDATA/', 'string() includes corrupt RDATA' );
 }
 
 

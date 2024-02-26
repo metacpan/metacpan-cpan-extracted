@@ -6,7 +6,7 @@ use warnings;
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
 
-use Test::More tests => 26;
+use Test::More tests => 27;
 use Test::Exception;
 
 use ok 'Locale::CLDR';
@@ -47,3 +47,6 @@ is($locale->format_currency(123456.78), '123 456,78 £', 'Format currency wit
 is($locale->format_currency(123456.78, 'cash'), '123 456,78 £', 'Format currency with accountancy format, positive number and cash rounding and pound currency');
 is($locale->format_currency(-123456.78), '(123 456,78 £)', 'Format currency with accountancy format, negitive number and financial rounding and pound currency');
 is($locale->format_currency(-123456.78, 'cash'), '(123 456,78 £)', 'Format currency with accountancy format, negitive number and cash rounding and pound currency');
+
+$locale=Locale::CLDR->new('fr_US');
+is($locale->format_number(12345678, '¤###,###'), 'US$12 345 678,00', 'Format currency with default currency when using the US region');

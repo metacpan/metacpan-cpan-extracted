@@ -4,7 +4,7 @@ CPAN::Changes::Spec - Specification for CPAN Changes files
 
 =head1 VERSION
 
-version 0.500002
+version 0.500003
 
 =head1 SYNOPSIS
 

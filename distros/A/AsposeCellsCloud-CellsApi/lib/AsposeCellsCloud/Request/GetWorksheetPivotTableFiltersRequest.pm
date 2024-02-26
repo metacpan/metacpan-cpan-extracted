@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,11 +59,11 @@ sub new {
 
 
 # Run Operation Request
-# GetWorksheetPivotTableFiltersRequest.name : The workbook name.  ,
+# GetWorksheetPivotTableFiltersRequest.name : The file name.  ,
 # GetWorksheetPivotTableFiltersRequest.sheetName : The worksheet name.  ,
-# GetWorksheetPivotTableFiltersRequest.pivotTableIndex : Gets the PivotTable report by index.  ,
-# GetWorksheetPivotTableFiltersRequest.folder : Original workbook folder.  ,
-# GetWorksheetPivotTableFiltersRequest.storageName : Storage name.   
+# GetWorksheetPivotTableFiltersRequest.pivotTableIndex : The PivotTable index.  ,
+# GetWorksheetPivotTableFiltersRequest.folder : The folder where the file is situated.  ,
+# GetWorksheetPivotTableFiltersRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_pivot_table_filters' } = { 
-    	summary => 'Gets pivot table filters in worksheet.',
+    	summary => 'Gets PivotTable filters in worksheet.',
         params => $params,
         returns => 'PivotFiltersResponse',
     };
@@ -137,7 +137,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -151,21 +151,21 @@ __PACKAGE__->method_documentation({
      'pivot_table_index' => {
      	datatype => 'int',
      	base_name => 'pivotTableIndex',
-     	description => 'Gets the PivotTable report by index.',
+     	description => 'The PivotTable index.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

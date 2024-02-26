@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Usage: $0 /path/to/clusterclient-binary
 
@@ -20,10 +20,8 @@ EXPECT CLOSE
 EXPECT CONNECT
 EXPECT ["GET", "foo"]
 SEND -MOVED 12182 127.0.0.1:7404
-EXPECT CONNECT
 EXPECT ["CLUSTER", "SLOTS"]
 SEND [[0, 16383, ["127.0.0.1", 7404, "nodeid7404"]]]
-EXPECT CLOSE
 EXPECT CLOSE
 EOF
 server1=$!
@@ -41,7 +39,7 @@ server2=$!
 wait $syncpid1 $syncpid2;
 
 # Run client
-echo 'GET foo' | timeout 3s "$clientprog" 127.0.0.1:7403 > "$testname.out"
+echo 'GET foo' | timeout 3s "$clientprog" --events 127.0.0.1:7403 > "$testname.out"
 clientexit=$?
 
 # Wait for servers to exit
@@ -63,7 +61,13 @@ if [ $clientexit -ne 0 ]; then
 fi
 
 # Check the output from clusterclient
-echo 'bar' | cmp "$testname.out" - || exit 99
+expected="Event: slotmap-updated
+Event: ready
+Event: slotmap-updated
+bar
+Event: free-context"
+
+echo "$expected" | diff -u - "$testname.out" || exit 99
 
 # Clean up
 rm "$testname.out"

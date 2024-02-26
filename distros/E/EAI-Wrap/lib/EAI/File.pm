@@ -1,4 +1,4 @@
-package EAI::File 1.908;
+package EAI::File 1.911;
 
 use strict; use feature 'unicode_strings'; use warnings; no warnings 'uninitialized';
 use Exporter qw(import);use Text::CSV();use Data::XLSX::Parser();use Spreadsheet::ParseExcel();use Spreadsheet::WriteExcel();use Excel::Writer::XLSX();use Data::Dumper qw(Dumper);use XML::LibXML();use XML::LibXML::Debugging();
@@ -17,10 +17,9 @@ sub getcommon ($) {
 	my $skip = $File->{format_skip} if $File->{format_skip};
 	my $sep = $File->{format_sep} if $File->{format_sep};
 	$sep = $File->{format_defaultsep} if !$sep; # use default if not given
-	$sep = "\t" if !$sep; # use tab if also no default was given
-	# for fixed format, headers are parsed using tab
-	my @header = split(($sep =~ /^fix/ ? "\t" : $sep), $File->{format_header}) if $File->{format_header};
-	my @targetheader = split(($sep =~ /^fix/ ? "\t" : $sep), $File->{format_targetheader}) if $File->{format_targetheader};
+	# for fixed format and non existing separator, header and targetheader strings are parsed/split using tab as separator
+	my @header = split(($sep =~ /^fix/ or !$sep ? "\t" : $sep), $File->{format_header}) if $File->{format_header};
+	my @targetheader = split(($sep =~ /^fix/ or !$sep ? "\t" : $sep), $File->{format_targetheader}) if $File->{format_targetheader};
 	$Data::Dumper::Terse = 1;
 	get_logger()->debug("\$skip:$skip\n\$sep:".Data::Dumper::qquote($sep)."\n\@header:@header\n\@targetheader:@targetheader\n\$lineProcessing:$lineProcessing\n\$fieldProcessing:$fieldProcessing\n\$firstLineProc:$firstLineProc\n\$thousandsep:$thousandsep\n\$decimalsep:$decimalsep");
 	$Data::Dumper::Terse = 0;
@@ -28,8 +27,8 @@ sub getcommon ($) {
 }
 
 # read text files
-sub readText ($$$;$) {
-	my ($File,$data,$filenames,$redoSubDir) = @_;
+sub readText ($$$;$$) {
+	my ($File,$data,$filenames,$redoSubDir,$countPercent) = @_;
 	my $logger = get_logger();
 	my @filenames = @{$filenames} if $filenames;
 	if (!@filenames) {
@@ -63,6 +62,12 @@ sub readText ($$$;$) {
 	@targetheader = @header if !@targetheader; # if no specific targetheader defined use header instead
 	# read all files with same format
 	for my $filename (@filenames) {
+		my $lines = 0; my $buffer;
+		open my($fh), '<:raw', $redoSubDir.$filename;
+		while( sysread $fh, $buffer, 4096 ) {
+			$lines += ($buffer =~ s!$/!!g);
+		}
+		close $fh;
 		$logger->debug("reading $redoSubDir$filename");
 		open (FILE, "<".$File->{format_encoding}, $redoSubDir.$filename) or do { #
 			if (! -e $redoSubDir.$filename) {
@@ -79,7 +84,6 @@ sub readText ($$$;$) {
 			sep_char  => $sep,
 			eol => ($File->{format_eol} ? $File->{format_eol} : $/),
 		});
-
 		# local context for special line record separator
 		{
 			my $newRecSep;
@@ -98,6 +102,7 @@ sub readText ($$$;$) {
 				eval $firstLineProc;
 				$logger->error("eval firstLineProc: ".$firstLineProc.$@) if ($@);
 				$logger->debug("evaled: ".$firstLineProc);
+				$lines--;
 			}
 			if ($skip) {
 				$skip-- if $firstLineProc; # if consumed already by firstLineProc skip one row less
@@ -105,8 +110,10 @@ sub readText ($$$;$) {
 				# skip first $skip rows in file (e.g. report header) if $skip is an integer, if $skip is non-integer, skip until the text $skip appears (inclusive)
 				if ($skip =~ /^\d+$/) {
 					for (1 .. $skip) {$_ = <FILE>};
+					$lines-=$skip;
 				} else {
 					while (<FILE>) {
+						$lines--;
 						last if /$skip/;
 					}
 				}
@@ -147,6 +154,7 @@ LINE:
 					}
 				}
 				$lineno++;
+				print "EAI::File::readText read $lineno of $lines\r" if $countPercent and ($lineno % (int($lines * ($countPercent / 100)) == 0 ? 1 : int($lines * ($countPercent / 100))) == 0);
 				next LINE if $line[0] eq "" and !$lineProcessing;
 				readRow($data,\@line,\@header,\@targetheader,$rawline,$lineProcessing,$fieldProcessing,$thousandsep,$decimalsep,$lineno);
 			}
@@ -296,15 +304,15 @@ sub readExcel ($$$;$) {
 	for my $filename (@filenames) {
 		my $startRow = 1; # starting data row
 		$startRowHeader = 1; # starting header row for check (if format_header is defined)
-		if ($File->{format_skip}) {
-			$logger->debug("skipping ".$File->{format_skip}." rows for data begin"); 
-			$startRow += $File->{format_skip}; # skip additional rows for data begin, row semantics is 1 based
+		if ($skip =~ /^\d+$/) {
+			$logger->debug("skipping ".$skip." rows for data begin"); 
+			$startRow += $skip; # skip additional rows for data begin, row semantics is 1 based
 		}
 		if ($File->{format_headerskip}) {
 			$logger->debug("skipping ".$File->{format_headerskip}." rows for header row (1)"); 
 			$startRowHeader += $File->{format_headerskip}; # skip additional rows for header row, row semantics is 1 based
 		}
-		if (!$File->{format_skip} and $File->{format_header}) {
+		if (!$skip and $File->{format_header}) {
 			$logger->debug("setting data begin to \$startRowHeader ($startRowHeader) + 1 as format_header given and no format_skip found"); 
 			$startRow = $startRowHeader + 1; # set to header following row if format_skip not defined and format_header given
 		}
@@ -760,9 +768,9 @@ EAI::File - read/parse Files from the filesystem or write to the filesystem
 
 =head1 SYNOPSIS
 
- readText ($File, $data, $filenames)
- readExcel ($File, $data, $filenames)
- readXML ($File, $data, $filenames)
+ readText ($File, $data, $filenames, $redoSubDir, $countPercent)
+ readExcel ($File, $data, $filenames, $redoSubDir)
+ readXML ($File, $data, $filenames, $redoSubDir)
  writeText ($File, $data)
  writeExcel ($File, $data)
 
@@ -774,33 +782,37 @@ EAI::File contains all file parsing API-calls. This is for reading plain text da
 
 =over
 
-=item readText ($$$)
+=item readText ($$$;$$)
 
 reads the defined text file with specified parameters into array of hashes (DB ready structure)
 
  $File      .. hash ref for File specific configuration
  $data      .. hash ref for returned data (hashkey "data" -> above mentioned array of hashes)
  $filenames .. array of file names, if explicit (given in case of mget and unpacked zip archives).
+ $redoSubDir .. (optional) redo subdirectory, where file can be taken alternatively to homedir.
+ $countPercent .. (optional) percentage of progress where indicator should be output (e.g. 10 for all 10% of progress). set to 0 to disable progress indicator
 
 returns 0 on error, 1 if OK
 
-=item readExcel ($$$)
+=item readExcel ($$$;$)
 
 reads the defined excel file with specified parameters into array of hashes (DB ready structure)
 
  $File      .. hash ref for File specific configuration
  $data      .. hash ref for returned data (hashkey "data" -> above mentioned array of hashes)
  $filenames .. array of file names, if explicit (given in case of mget and unpacked zip archives).
+ $redoSubDir .. (optional) redo subdirectory, where file can be taken alternatively to homedir.
 
 returns 0 on error, 1 if OK
 
-=item readXML ($$$)
+=item readXML ($$$;$)
 
 reads the defined XML file with specified parameters into array of hashes (DB ready structure)
 
  $File      .. hash ref for File specific configuration
  $data      .. hash ref for returned data (hashkey "data" -> above mentioned array of hashes)
  $filenames .. array of filenamea, if explicit (given in case of mget and unpacked zip archives).
+ $redoSubDir .. (optional) redo subdirectory, where file can be taken alternatively to homedir.
 
 returns 0 on error, 1 if OK
 

@@ -1,0 +1,161 @@
+# PODNAME: RDF::Cowl::Lib::Gen::Class::IRI
+# ABSTRACT: Generated docs for RDF::Cowl::IRI
+
+## DO NOT EDIT
+## Generated via maint/tt/Class.pod.tt
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+RDF::Cowl::Lib::Gen::Class::IRI - Generated docs for RDF::Cowl::IRI
+
+=head1 VERSION
+
+version 1.0.0
+
+=head1 MAIN MODULE
+
+L<RDF::Cowl::IRI>
+
+=head1 CONSTRUCTORS
+
+=head2 new
+
+B<Signature>:
+
+  RDF::Cowl::IRI->new(CowlString $suffix)
+
+B<Params>:
+
+  CowlString $prefix 
+  CowlString $suffix 
+
+Documentation:
+
+  Returns a retained IRI whose string representation is the concatenation of
+  the specified strings.
+  
+  @param prefix The prefix.
+  @param suffix The suffix.
+  @return Retained IRI, or NULL on error
+
+Throws exception on error.
+
+=over 2
+
+B<C function name>: C<< cowl_iri >>
+
+=back
+
+=head2 from_string
+
+B<Signature>:
+
+  RDF::Cowl::IRI->from_string()
+
+B<Params>:
+
+  UString $string 
+
+Documentation:
+
+  Returns a retained IRI given its string representation.
+  
+  @param string String representation of the IRI.
+  @return Retained IRI, or NULL on error
+
+Throws exception on error.
+
+=over 2
+
+B<C function name>: C<< cowl_iri_from_string >>
+
+=back
+
+=head1 METHODS
+
+=head2 get_ns
+
+B<Signature>:
+
+  $self->get_ns()
+
+B<Params>:
+
+  CowlIRI $iri 
+
+Documentation:
+
+  Gets the namespace of the specified IRI.
+  
+  @param iri The IRI.
+  @return The namespace.
+
+=over 2
+
+B<C function name>: C<< cowl_iri_get_ns >>
+
+=back
+
+=head2 get_rem
+
+B<Signature>:
+
+  $self->get_rem()
+
+B<Params>:
+
+  CowlIRI $iri 
+
+Documentation:
+
+  Gets the remainder of the specified IRI.
+  
+  @param iri The IRI.
+  @return The remainder.
+
+=over 2
+
+B<C function name>: C<< cowl_iri_get_rem >>
+
+=back
+
+=head2 has_rem
+
+B<Signature>:
+
+  $self->has_rem()
+
+B<Params>:
+
+  CowlIRI $iri 
+
+Documentation:
+
+  Checks whether the IRI has a remainder.
+  
+  @param iri The IRI.
+  @return True if the IRI has a remainder, false otherwise.
+
+=over 2
+
+B<C function name>: C<< cowl_iri_has_rem >>
+
+=back
+
+=head1 AUTHOR
+
+Zakariyya Mughal <zmughal@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 by Auto-Parallel Technologies, Inc..
+
+This is free software, licensed under Eclipse Public License - v 2.0.
+
+=cut

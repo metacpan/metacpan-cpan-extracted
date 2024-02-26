@@ -1,15 +1,28 @@
-# This file documents the revision history for Perl extension Catalyst::ActionRole::Methods.
+Release history for Catalyst-ActionRole-Methods
+
+0.103 - 2024-02-25
+  - Correct content type for the default 405 response
+  - Minor code cleanups and speedups
+  - Improved documentation
+  - Updated packaging
+
+0.102 - 2024-02-25
+[ Retracted: Identical to 0.103 except for some bad POD formatting ]
+
+0.101 - 2024-02-21
+  - 204 status for default OPTIONS response rather than 200 status with 0-length text/plain body
+  - Faster and much cleaner code
 
 0.004 - 2024-01-07
-  - Fixed POD error
+  - No functional changes
+  - POD error fix
 
 0.003 - 2022-09-05
-  - Fixed bug where empty allows would return a useless
-    error (https://github.com/jjn1056/Catalyst-ActionRole-Methods/pull/1)
-    ap++ for the patch, sorry it took 5 years for me to see it.
+  - Correct handling of actions which do not implement any HTTP methods.
+    https://github.com/jjn1056/Catalyst-ActionRole-Methods/pull/1
 
 0.002 - 2015-11-11
-  - Fixed mission version information
+  - Version information
 
 0.001 - 2015-08-19
   - First Release 

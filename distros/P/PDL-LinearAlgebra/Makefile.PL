@@ -46,7 +46,7 @@ EOF
 WriteMakefile(
   NAME => 'PDL::LinearAlgebra',
   ABSTRACT => 'PDL bindings to some BLAS and LAPACK library routines',
-  AUTHOR => [ 'Chris Marshall <chm@cpan.org>' ],
+  AUTHOR => [ 'Grégory Vanuxem <ellipse@cpan.org>' ],
   VERSION_FROM => 'lib/PDL/LinearAlgebra.pm',
   LICENSE => 'artistic_2',
   META_MERGE => {

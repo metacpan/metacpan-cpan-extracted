@@ -25,7 +25,7 @@ is ($locale->region_name('wibble'), 'regió desconeguda', 'Invalid Region name')
 is ($locale->variant_name('PINYIN'), 'romanització Pinyin', 'Variant name');
 throws_ok { $locale->variant_name('WIBBLE') } qr{ \A Invalid \s variant }xms, 'Invalid Variant name';
 is ($locale->language_name('i_klingon'), 'klingonià', 'Language alias');
-is ($locale->region_name('BQ'), 'Antilles Neerlandeses', 'Region alias');
+is ($locale->region_name('BQ'), 'Carib Neerlandès', 'Region alias');
 is ($locale->region_name('830'), 'regió desconeguda', 'Region alias');
 is ($locale->variant_name('BOKMAL'), '', 'Variant alias');
 is ($locale->key_name('ca'), 'calendari', 'Key name');

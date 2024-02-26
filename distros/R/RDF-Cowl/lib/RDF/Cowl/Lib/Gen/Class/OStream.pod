@@ -1,0 +1,181 @@
+# PODNAME: RDF::Cowl::Lib::Gen::Class::OStream
+# ABSTRACT: Generated docs for RDF::Cowl::OStream
+
+## DO NOT EDIT
+## Generated via maint/tt/Class.pod.tt
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+RDF::Cowl::Lib::Gen::Class::OStream - Generated docs for RDF::Cowl::OStream
+
+=head1 VERSION
+
+version 1.0.0
+
+=head1 MAIN MODULE
+
+L<RDF::Cowl::OStream>
+
+=head1 METHODS
+
+=head2 get_manager
+
+B<Signature>:
+
+  $self->get_manager()
+
+B<Params>:
+
+  CowlOStream $stream 
+
+Documentation:
+
+  Gets the manager of this ontology output stream.
+  
+  @param stream The ontology output stream.
+  @return The manager.
+
+=over 2
+
+B<C function name>: C<< cowl_ostream_get_manager >>
+
+=back
+
+=head2 get_sym_table
+
+B<Signature>:
+
+  $self->get_sym_table()
+
+B<Params>:
+
+  CowlOStream $stream 
+
+Documentation:
+
+  Gets the symbol table of this ontology output stream.
+  
+  @param stream The ontology output stream.
+  @return The symbol table.
+
+=over 2
+
+B<C function name>: C<< cowl_ostream_get_sym_table >>
+
+=back
+
+=head2 write_header
+
+B<Signature>:
+
+  $self->write_header(CowlOntologyHeader $header)
+
+B<Params>:
+
+  CowlOStream $stream 
+  CowlOntologyHeader $header 
+
+Documentation:
+
+  Writes the ontology header.
+  
+  @param stream The ontology output stream.
+  @param header The ontology header.
+  @return Return code.
+
+=over 2
+
+B<C function name>: C<< cowl_ostream_write_header >>
+
+=back
+
+=head2 write_axiom
+
+B<Signature>:
+
+  $self->write_axiom(CowlAnyAxiom $axiom)
+
+B<Params>:
+
+  CowlOStream $stream 
+  CowlAnyAxiom $axiom 
+
+Documentation:
+
+  Writes an axiom.
+  
+  @param stream The ontology output stream.
+  @param axiom The axiom.
+  @return Return code.
+
+=over 2
+
+B<C function name>: C<< cowl_ostream_write_axiom >>
+
+=back
+
+=head2 write_footer
+
+B<Signature>:
+
+  $self->write_footer()
+
+B<Params>:
+
+  CowlOStream $stream 
+
+Documentation:
+
+  Writes the ontology footer.
+  
+  @param stream The ontology output stream.
+  @return Return code.
+
+=over 2
+
+B<C function name>: C<< cowl_ostream_write_footer >>
+
+=back
+
+=head2 write_ontology
+
+B<Signature>:
+
+  $self->write_ontology(CowlOntology $ontology)
+
+B<Params>:
+
+  CowlOStream $stream 
+  CowlOntology $ontology 
+
+Documentation:
+
+  Writes the specified ontology to the stream.
+  
+  @param stream The ontology output stream.
+  @param ontology The ontology.
+  @return Return code.
+
+=over 2
+
+B<C function name>: C<< cowl_ostream_write_ontology >>
+
+=back
+
+=head1 AUTHOR
+
+Zakariyya Mughal <zmughal@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 by Auto-Parallel Technologies, Inc..
+
+This is free software, licensed under Eclipse Public License - v 2.0.
+
+=cut

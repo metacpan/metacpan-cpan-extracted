@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,12 +59,12 @@ sub new {
 
 
 # Run Operation Request
-# PostMergeRequest.File : The output data file format.(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers)  ,
-# PostMergeRequest.outFormat : The password needed to open an Excel file.  ,
-# PostMergeRequest.mergeToOneSheet : Whether check restriction of excel file when user modify cells related objects.  ,
-# PostMergeRequest.password : The regional settings for workbook.  ,
-# PostMergeRequest.checkExcelRestriction : Upload files.  ,
-# PostMergeRequest.region :    
+# PostMergeRequest.File : File to upload  ,
+# PostMergeRequest.outFormat : The output data file format.(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers)  ,
+# PostMergeRequest.mergeToOneSheet : Merge all workbooks into a sheet.  ,
+# PostMergeRequest.password : The password needed to open an Excel file.  ,
+# PostMergeRequest.checkExcelRestriction : Whether check restriction of excel file when user modify cells related objects.  ,
+# PostMergeRequest.region : The regional settings for workbook.   
 
 {
     my $params = {
@@ -143,42 +143,42 @@ __PACKAGE__->method_documentation({
      'file' => {
      	datatype => 'string',
      	base_name => 'File',
-     	description => 'The output data file format.(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers)',
+     	description => 'File to upload',
      	format => '',
      	read_only => '',
      		},
      'out_format' => {
      	datatype => 'string',
      	base_name => 'outFormat',
-     	description => 'The password needed to open an Excel file.',
+     	description => 'The output data file format.(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers)',
      	format => '',
      	read_only => '',
      		},
      'merge_to_one_sheet' => {
      	datatype => 'string',
      	base_name => 'mergeToOneSheet',
-     	description => 'Whether check restriction of excel file when user modify cells related objects.',
+     	description => 'Merge all workbooks into a sheet.',
      	format => '',
      	read_only => '',
      		},
      'password' => {
      	datatype => 'string',
      	base_name => 'password',
-     	description => 'The regional settings for workbook.',
+     	description => 'The password needed to open an Excel file.',
      	format => '',
      	read_only => '',
      		},
      'check_excel_restriction' => {
      	datatype => 'string',
      	base_name => 'checkExcelRestriction',
-     	description => 'Upload files.',
+     	description => 'Whether check restriction of excel file when user modify cells related objects.',
      	format => '',
      	read_only => '',
      		},
      'region' => {
      	datatype => 'string',
      	base_name => 'region',
-     	description => '',
+     	description => 'The regional settings for workbook.',
      	format => '',
      	read_only => '',
      		},    

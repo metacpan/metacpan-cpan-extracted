@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
     "DateTime::Format::ISO8601" => 0,
     "Role::Tiny" => 0,
     "Role::Tiny::With" => 0,
-    "TableDataRole::Source::AOH" => 0,
+    "TableDataRole::Source::AOH" => "0.020",
     "TableDataRole::Util::CSV" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -39,7 +39,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,7 +54,7 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "Role::Tiny" => 0,
   "Role::Tiny::With" => 0,
-  "TableDataRole::Source::AOH" => 0,
+  "TableDataRole::Source::AOH" => "0.020",
   "TableDataRole::Util::CSV" => 0,
   "Test::More" => 0,
   "strict" => 0,

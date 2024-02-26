@@ -1,18 +1,17 @@
 package Color::ANSI::Util;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-09'; # DATE
-our $DIST = 'Color-ANSI-Util'; # DIST
-our $VERSION = '0.164'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
 use Color::RGB::Util qw(rgb_diff);
+use Exporter qw(import);
 
-require Exporter;
-our @ISA       = qw(Exporter);
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2024-02-23'; # DATE
+our $DIST = 'Color-ANSI-Util'; # DIST
+our $VERSION = '0.165'; # VERSION
+
 our @EXPORT_OK = qw(
                        ansi16_to_rgb
                        rgb_to_ansi16
@@ -427,11 +426,14 @@ sub _color_depth {
                 last;
             }
             if ($_use_termdetsw) {
-                eval { require Term::Detect::Software };
-                if (!$@) {
-                    $_color_depth = Term::Detect::Software::detect_terminal_cached()->{color_depth};
-                    last;
-                }
+                {
+                    local $@; local $SIG{__DIE__};
+                    eval { require Term::Detect::Software };
+                    unless ($@) {
+                        $_color_depth = Term::Detect::Software::detect_terminal_cached()->{color_depth};
+                        last;
+                    }
+                };
             }
             # simple heuristic
             if ($ENV{KONSOLE_DBUS_SERVICE}) {
@@ -551,7 +553,7 @@ Color::ANSI::Util - Routines for dealing with ANSI colors
 
 =head1 VERSION
 
-This document describes version 0.164 of Color::ANSI::Util (from Perl distribution Color-ANSI-Util), released on 2020-06-09.
+This document describes version 0.165 of Color::ANSI::Util (from Perl distribution Color-ANSI-Util), released on 2024-02-23.
 
 =head1 SYNOPSIS
 
@@ -609,6 +611,8 @@ Arguments ('*' denotes required arguments):
 
 =item * B<$color>* => I<color::ansi16>
 
+(No description)
+
 
 =back
 
@@ -631,6 +635,8 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<$color>* => I<color::ansi256>
+
+(No description)
 
 
 =back
@@ -655,6 +661,8 @@ Arguments ('*' denotes required arguments):
 
 =item * B<$color>* => I<color::rgb24>
 
+(No description)
+
 
 =back
 
@@ -677,6 +685,8 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<$color>* => I<color::rgb24>
+
+(No description)
 
 
 =back
@@ -701,6 +711,8 @@ Arguments ('*' denotes required arguments):
 
 =item * B<$color>* => I<color::rgb24>
 
+(No description)
+
 
 =back
 
@@ -723,6 +735,8 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<$color>* => I<color::rgb24>
+
+(No description)
 
 
 =back
@@ -747,6 +761,8 @@ Arguments ('*' denotes required arguments):
 
 =item * B<$color>* => I<color::rgb24>
 
+(No description)
+
 
 =back
 
@@ -769,6 +785,8 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<$color>* => I<color::rgb24>
+
+(No description)
 
 
 =back
@@ -793,6 +811,8 @@ Arguments ('*' denotes required arguments):
 
 =item * B<$color>* => I<color::rgb24>
 
+(No description)
+
 
 =back
 
@@ -815,6 +835,8 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<$color>* => I<color::rgb24>
+
+(No description)
 
 
 =back
@@ -846,6 +868,8 @@ Arguments ('*' denotes required arguments):
 
 =item * B<$color>* => I<color::rgb24>
 
+(No description)
+
 
 =back
 
@@ -875,6 +899,8 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<$color>* => I<color::rgb24>
+
+(No description)
 
 
 =back
@@ -954,14 +980,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Color-ANSI
 
 Source repository is at L<https://github.com/perlancar/perl-Color-ANSI-Util>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Color-ANSI-Util>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Term::ANSIColor>
@@ -972,11 +990,43 @@ L<http://en.wikipedia.org/wiki/ANSI_escape_code>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2024, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Color-ANSI-Util>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

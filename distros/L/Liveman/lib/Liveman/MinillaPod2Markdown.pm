@@ -35,6 +35,8 @@ sub as_markdown {
         write_text $self->{pm_path}, $pm;
     }
 
+    $md =~ s/^!\w+:\w+\s+//;
+
     $md
 }
 
@@ -65,7 +67,7 @@ Liveman::MinillaPod2Markdown – a stub for Minilla that redirects lib/MainModul
 	
 	$mark->as_markdown  # => hi!
 
-=head1 DESCRIPION
+=head1 DESCRIPTION
 
 Add the line C<markdown_maker = "Liveman::MinillaPod2Markdown"> to C<minil.toml>, and Minilla will not create C<README.md> from the pod documentation of the main module, but will take it from the file of the same name next to the C<*.md> extension.
 

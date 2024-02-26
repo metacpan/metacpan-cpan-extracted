@@ -10,7 +10,7 @@ YAMLScript - Program in YAML
 
     #!/usr/bin/env ys-0
 
-    defn main(name):
+    defn main(name='world'):
       say: "Hello, $name!"
 
 =head2 DESCRIPTION
@@ -106,13 +106,11 @@ You can install this module like any other Perl module:
 
 but you will need to have a system install of C<libyamlscript.so>.
 
-Note: YAMLScript.pm has Alien support built in, so you don't really need to install C<libyamlscript.so> yourself for Perl.
-
 One simple way to do that is with:
 
-    $ curl https://yamlscript.org/install | sudo PREFIX=/usr/local bash
+    $ curl -sSL yamlscript.org/install | bash
 
-Note: The above command will install the latest version of the YAMLScript command line utility, C<ys>, and the shared library, C<libyamlscript.so>, into C</usr/local/bin> and C</usr/local/lib> respectively.
+Note: The above command will install the latest version of the YAMLScript command line utility, C<ys>, and the shared library, C<libyamlscript.so>, into C<~/local/bin> and C<~/.local/lib> respectively.
 
 See L<https://github.com/yaml/yamlscript?#installing-yamlscript|https://github.com/yaml/yamlscript?#installing-yamlscript> for more info.
 

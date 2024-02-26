@@ -190,7 +190,7 @@ warn "overrun <", (join ' ', map sprintf("%#02x", ord), split //, $overrun), ">\
 sub readConsole ($;$) {
   my($l, $fh, $s) = (shift, shift);
   $fh = \*STDIN unless defined $fh;
-  (read $fh, $s, $l), return $s unless -t $fh and try_checkConsole $fh;	# -t is very successful, but just in case...
+  (read $fh, $s, $l), return $s unless -t $fh and try_checkConsole($fh);	# -t is very successful, but just in case...
   require Encode;
   my $prev = '';
   ($s = __ReadConsole($l, $fh)) =~ /.[\xd8-\xdb]\z/s and $s .= __ReadConsole(1, $fh);	# LittleEndian Surrogates

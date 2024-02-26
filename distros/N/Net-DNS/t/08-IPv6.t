@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 08-IPv6.t 1945 2023-11-22 08:02:31Z willem $ -*-perl-*-
+# $Id: 08-IPv6.t 1965 2024-02-14 09:19:32Z willem $ -*-perl-*-
 #
 
 use strict;
@@ -72,7 +72,7 @@ diag join( "\n\t", 'will use nameservers', @$IP ) if $debug;
 Net::DNS::Resolver->debug($debug);
 
 
-plan tests => 63;
+plan tests => 62;
 
 NonFatalBegin();
 
@@ -148,8 +148,10 @@ NonFatalBegin();
 
 	my $handle = $resolver->bgsend(qw(net-dns.org DNSKEY IN));
 	ok( $handle, '$resolver->bgsend(...)	truncated UDP' );
+	my $udp	   = $handle;
 	my $packet = $resolver->bgread($handle);
-	ok( $packet && !$packet->header->tc, '$resolver->bgread($tcp)	background TCP retry' );
+	isnt( $handle, $udp, '$resolver->bgbusy($udp)	handle changed to TCP' );
+	ok( $packet && !$packet->header->tc, '$resolver->bgread($udp)	background TCP retry' );
 }
 
 
@@ -403,34 +405,16 @@ SKIP: {
 }
 
 
-{					## exercise error paths in _send_???()
+{					## exercise error paths in _send_udp et al
 	my $resolver = Net::DNS::Resolver->new( nameservers => $IP, retry => 1 );
 	my $original = Net::DNS::Packet->new(qw(net-dns.org SOA));
 	my $mismatch = Net::DNS::Packet->new(qw(net-dns.org SOA));
 	ok( !$resolver->_send_tcp( $original, $mismatch->data ), '_send_tcp()	id mismatch' );
 	ok( !$resolver->_send_udp( $original, $mismatch->data ), '_send_udp()	id mismatch' );
-}
-
-
-{					## exercise error path in bgbusy() and bgread()
-	my $resolver = Net::DNS::Resolver->new( nameservers => $IP, udp_timeout => 5 );
-	my $original = $resolver->_make_query_packet(qw(net-dns.org SOA));
-	my $mismatch = $resolver->_make_query_packet(qw(net-dns.org SOA));
-	my $handle   = $resolver->_bgsend_udp( $original, $mismatch->data );
-	ok( !$resolver->bgread($handle), 'bgread()	id mismatch' );
-
-	ok( !$resolver->bgread(undef), 'bgread()	undefined handle' );
-
+	my $handle = $resolver->_bgsend_udp( $original, $mismatch->data );
+	$resolver->udp_timeout(1);
+	ok( !$resolver->bgread($handle),	     'bgread()	id mismatch' );
 	ok( !$resolver->bgread( ref($handle)->new ), 'bgread()	timeout' );
-
-	$resolver->tcp_timeout(10);
-	my $packet = $resolver->_make_query_packet(qw(net-dns.org SOA));
-	my $socket = $resolver->_bgsend_tcp( $packet, $packet->data );
-	while ( $resolver->bgbusy($socket) ) { sleep 1 }
-	my $discard;
-	$socket->recv( $discard, 10 );
-	my $buffer = Net::DNS::Resolver::Base::_read_tcp($socket);
-	is( length($buffer), 0, '_read_tcp()	incomplete data' );
 }
 
 

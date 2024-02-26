@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Fur - Package for language Friulian
 
 package Locale::CLDR::Locales::Fur;
 # This file auto generated from Data\common\main\fur.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -24,22 +24,6 @@ use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
 extends('Locale::CLDR::Locales::Root');
-# Need to add code for Key type pattern
-sub display_name_pattern {
-	my ($self, $name, $region, $script, $variant) = @_;
-
-	my $display_pattern = '{0} ({1})';
-	$display_pattern =~s/\{0\}/$name/g;
-	my $subtags = join '{0}, {1}', grep {$_} (
-		$region,
-		$script,
-		$variant,
-	);
-
-	$display_pattern =~s/\{1\}/$subtags/g;
-	return $display_pattern;
-}
-
 has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
@@ -730,15 +714,14 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{[å č é ë ğ ï ñ ó š ü]},
-			index => ['A', 'B', 'C', 'Ç', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
-			main => qr{[a à â b c ç d e è ê f g h i ì î j k l m n o ò ô p q r s t u ù û v w x y z]},
-			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			auxiliary => qr{[å č éë ğ ï ñ ó š ü]},
+			index => ['A', 'B', 'CÇ', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
+			main => qr{[aàâ b cç d eèê f g h iìî j k l m n oòô p q r s t uùû v w x y z]},
 		};
 	},
 EOT
 : sub {
-		return { index => ['A', 'B', 'C', 'Ç', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'], };
+		return { index => ['A', 'B', 'CÇ', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'], };
 },
 );
 
@@ -779,85 +762,71 @@ has 'units' => (
 				'long' => {
 					# Long Unit Identifier
 					'duration-day' => {
-						'name' => q(zornadis),
 						'one' => q({0} zornade),
 						'other' => q({0} zornadis),
 					},
 					# Core Unit Identifier
 					'day' => {
-						'name' => q(zornadis),
 						'one' => q({0} zornade),
 						'other' => q({0} zornadis),
 					},
 					# Long Unit Identifier
 					'duration-hour' => {
-						'name' => q(oris),
 						'one' => q({0} ore),
 						'other' => q({0} oris),
 					},
 					# Core Unit Identifier
 					'hour' => {
-						'name' => q(oris),
 						'one' => q({0} ore),
 						'other' => q({0} oris),
 					},
 					# Long Unit Identifier
 					'duration-minute' => {
-						'name' => q(minûts),
 						'one' => q({0} minût),
 						'other' => q({0} minûts),
 					},
 					# Core Unit Identifier
 					'minute' => {
-						'name' => q(minûts),
 						'one' => q({0} minût),
 						'other' => q({0} minûts),
 					},
 					# Long Unit Identifier
 					'duration-month' => {
-						'name' => q(mês),
 						'one' => q({0} mês),
 						'other' => q({0} mês),
 					},
 					# Core Unit Identifier
 					'month' => {
-						'name' => q(mês),
 						'one' => q({0} mês),
 						'other' => q({0} mês),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
-						'name' => q(seconts),
 						'one' => q({0} secont),
 						'other' => q({0} seconts),
 					},
 					# Core Unit Identifier
 					'second' => {
-						'name' => q(seconts),
 						'one' => q({0} secont),
 						'other' => q({0} seconts),
 					},
 					# Long Unit Identifier
 					'duration-week' => {
-						'name' => q(setemanis),
 						'one' => q({0} setemane),
 						'other' => q({0} setemanis),
 					},
 					# Core Unit Identifier
 					'week' => {
-						'name' => q(setemanis),
 						'one' => q({0} setemane),
 						'other' => q({0} setemanis),
 					},
 					# Long Unit Identifier
 					'duration-year' => {
-						'name' => q(agns),
 						'one' => q({0} an),
 						'other' => q({0} agns),
 					},
 					# Core Unit Identifier
 					'year' => {
-						'name' => q(agns),
 						'one' => q({0} an),
 						'other' => q({0} agns),
 					},
@@ -934,7 +903,7 @@ has 'nostr' => (
 	is			=> 'ro',
 	isa			=> RegexpRef,
 	init_arg	=> undef,
-	default		=> sub { qr'^(?i:no|n)$' }
+	default		=> sub { qr'^(?i:|no|n)$' }
 );
 
 has 'listPatterns' => (
@@ -954,63 +923,9 @@ has 'number_symbols' => (
 	default		=> sub { {
 		'latn' => {
 			'decimal' => q(,),
-			'exponential' => q(E),
 			'group' => q(.),
-			'infinity' => q(∞),
-			'list' => q(;),
-			'minusSign' => q(-),
-			'nan' => q(NaN),
-			'perMille' => q(‰),
-			'percentSign' => q(%),
-			'plusSign' => q(+),
 		},
 	} }
-);
-
-has 'number_formats' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		decimalFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0.###',
-				},
-			},
-		},
-		percentFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0%',
-				},
-			},
-		},
-		scientificFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#E0',
-				},
-			},
-		},
-} },
-);
-
-has 'number_currency_formats' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'latn' => {
-			'pattern' => {
-				'default' => {
-					'standard' => {
-						'positive' => '¤ #,##0.00',
-					},
-				},
-			},
-		},
-} },
 );
 
 has 'currencies' => (
@@ -1089,8 +1004,6 @@ has 'currencies' => (
 		'CNY' => {
 			display_name => {
 				'currency' => q(yuan cinês),
-				'one' => q(yuan cinês),
-				'other' => q(yuan cinês),
 			},
 		},
 		'CSD' => {
@@ -1188,15 +1101,11 @@ has 'currencies' => (
 		'JPY' => {
 			display_name => {
 				'currency' => q(yen gjaponês),
-				'one' => q(yen gjaponês),
-				'other' => q(yen gjaponês),
 			},
 		},
 		'KRW' => {
 			display_name => {
 				'currency' => q(won de Coree dal Sud),
-				'one' => q(won de Coree dal Sud),
-				'other' => q(won de Coree dal Sud),
 			},
 		},
 		'LVL' => {
@@ -1284,8 +1193,6 @@ has 'currencies' => (
 		'THB' => {
 			display_name => {
 				'currency' => q(baht tailandês),
-				'one' => q(baht tailandês),
-				'other' => q(baht tailandês),
 			},
 		},
 		'TRL' => {
@@ -1433,25 +1340,6 @@ has 'calendar_months' => (
 							
 						],
 					},
-					narrow => {
-						nonleap => [
-							'Z',
-							'F',
-							'M',
-							'A',
-							'M',
-							'J',
-							'L',
-							'A',
-							'S',
-							'O',
-							'N',
-							'D'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'Zenâr',
@@ -1473,25 +1361,6 @@ has 'calendar_months' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'Zen',
-							'Fev',
-							'Mar',
-							'Avr',
-							'Mai',
-							'Jug',
-							'Lui',
-							'Avo',
-							'Set',
-							'Otu',
-							'Nov',
-							'Dic'
-						],
-						leap => [
-							
-						],
-					},
 					narrow => {
 						nonleap => [
 							'Z',
@@ -1506,25 +1375,6 @@ has 'calendar_months' => (
 							'O',
 							'N',
 							'D'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'Zenâr',
-							'Fevrâr',
-							'Març',
-							'Avrîl',
-							'Mai',
-							'Jugn',
-							'Lui',
-							'Avost',
-							'Setembar',
-							'Otubar',
-							'Novembar',
-							'Dicembar'
 						],
 						leap => [
 							
@@ -1551,15 +1401,6 @@ has 'calendar_days' => (
 						sat => 'sab',
 						sun => 'dom'
 					},
-					narrow => {
-						mon => 'L',
-						tue => 'M',
-						wed => 'M',
-						thu => 'J',
-						fri => 'V',
-						sat => 'S',
-						sun => 'D'
-					},
 					wide => {
 						mon => 'lunis',
 						tue => 'martars',
@@ -1571,15 +1412,6 @@ has 'calendar_days' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						mon => 'lun',
-						tue => 'mar',
-						wed => 'mie',
-						thu => 'joi',
-						fri => 'vin',
-						sat => 'sab',
-						sun => 'dom'
-					},
 					narrow => {
 						mon => 'L',
 						tue => 'M',
@@ -1588,15 +1420,6 @@ has 'calendar_days' => (
 						fri => 'V',
 						sat => 'S',
 						sun => 'D'
-					},
-					wide => {
-						mon => 'lunis',
-						tue => 'martars',
-						wed => 'miercus',
-						thu => 'joibe',
-						fri => 'vinars',
-						sat => 'sabide',
-						sun => 'domenie'
 					},
 				},
 			},
@@ -1610,23 +1433,6 @@ has 'calendar_quarters' => (
 	default		=> sub { {
 			'gregorian' => {
 				'format' => {
-					abbreviated => {0 => 'T1',
-						1 => 'T2',
-						2 => 'T3',
-						3 => 'T4'
-					},
-					narrow => {0 => '1',
-						1 => '2',
-						2 => '3',
-						3 => '4'
-					},
-					wide => {0 => 'Prin trimestri',
-						1 => 'Secont trimestri',
-						2 => 'Tierç trimestri',
-						3 => 'Cuart trimestri'
-					},
-				},
-				'stand-alone' => {
 					abbreviated => {0 => 'T1',
 						1 => 'T2',
 						2 => 'T3',
@@ -1650,10 +1456,6 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'am' => q{a.},
-					'pm' => q{p.},
-				},
-				'wide' => {
 					'am' => q{a.},
 					'pm' => q{p.},
 				},
@@ -1734,17 +1536,13 @@ has 'datetime_formats_available_formats' => (
 		'generic' => {
 			Ed => q{d E},
 			Hm => q{H:mm},
-			M => q{L},
 			MEd => q{E d/M},
-			MMM => q{LLL},
 			MMMEd => q{E d MMM},
 			MMMMEd => q{E d MMMM},
 			MMMMd => q{d 'di' MMMM},
 			MMMd => q{d MMM},
 			MMd => q{d/MM},
 			Md => q{d/M},
-			d => q{d},
-			ms => q{mm:ss},
 			y => q{y},
 			yM => q{M/y},
 			yMEd => q{E, d/M/y},
@@ -1757,18 +1555,13 @@ has 'datetime_formats_available_formats' => (
 		'gregorian' => {
 			Ed => q{d E},
 			Hm => q{H:mm},
-			M => q{L},
 			MEd => q{E d/M},
-			MMM => q{LLL},
 			MMMEd => q{E d MMM},
 			MMMMEd => q{E d MMMM},
 			MMMMd => q{d 'di' MMMM},
 			MMMd => q{d MMM},
 			MMd => q{d/MM},
 			Md => q{d/M},
-			d => q{d},
-			ms => q{mm:ss},
-			y => q{y},
 			yM => q{M/y},
 			yMEd => q{E, d/M/y},
 			yMMM => q{MMM y},
@@ -1794,193 +1587,148 @@ has 'datetime_formats_interval' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-			H => {
-				H => q{HH–HH},
-			},
-			Hm => {
-				H => q{HH:mm–HH:mm},
-				m => q{HH:mm–HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm–HH:mm v},
-				m => q{HH:mm–HH:mm v},
-			},
-			Hv => {
-				H => q{HH–HH v},
-			},
 			M => {
 				M => q{M–M},
 			},
 			MEd => {
-				M => q{E dd/MM – E dd/MM},
-				d => q{E dd/MM – E dd/MM},
-			},
-			MMM => {
-				M => q{LLL–LLL},
+				M => q{E dd/MM – E dd/MM},
+				d => q{E dd/MM – E dd/MM},
 			},
 			MMMEd => {
-				M => q{E d 'di' MMM – E d 'di' MMM},
-				d => q{E d – E d 'di' MMM},
+				M => q{E d 'di' MMM – E d 'di' MMM},
+				d => q{E d – E d 'di' MMM},
 			},
 			MMMd => {
-				M => q{d 'di' MMM – d 'di' MMM},
+				M => q{d 'di' MMM – d 'di' MMM},
 				d => q{d–d 'di' MMM},
 			},
 			Md => {
-				M => q{dd/MM – dd/MM},
-				d => q{dd/MM – dd/MM},
+				M => q{dd/MM – dd/MM},
+				d => q{dd/MM – dd/MM},
 			},
-			d => {
-				d => q{d–d},
-			},
-			fallback => '{0} – {1}',
 			h => {
-				a => q{h a – h a},
-				h => q{h–h a},
+				a => q{h a – h a},
+				h => q{h–h a},
 			},
 			hm => {
-				a => q{h:mm a – h:mm a},
-				h => q{h:mm–h:mm a},
-				m => q{h:mm–h:mm a},
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
 			},
 			hmv => {
-				a => q{h:mm a – h:mm a v},
-				h => q{h:mm–h:mm a v},
-				m => q{h:mm–h:mm a v},
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
 			},
 			hv => {
-				a => q{h a – h a v},
-				h => q{h–h a v},
+				a => q{h a – h a v},
+				h => q{h–h a v},
 			},
 			y => {
 				y => q{y–y},
 			},
 			yM => {
-				M => q{MM/y – MM/y},
-				y => q{MM/y – MM/y},
+				M => q{MM/y – MM/y},
+				y => q{MM/y – MM/y},
 			},
 			yMEd => {
-				M => q{E dd/MM/y – E dd/MM/y},
-				d => q{E dd/MM/y – E dd/MM/y},
-				y => q{E dd/MM/y – E dd/MM/y},
+				M => q{E dd/MM/y – E dd/MM/y},
+				d => q{E dd/MM/y – E dd/MM/y},
+				y => q{E dd/MM/y – E dd/MM/y},
 			},
 			yMMM => {
-				M => q{MM – MM/y},
-				y => q{MM/y – MM/y},
+				M => q{MM – MM/y},
+				y => q{MM/y – MM/y},
 			},
 			yMMMEd => {
-				M => q{E dd/MM/y – E dd/MM/y},
-				d => q{E dd/MM/y – E dd/MM/y},
-				y => q{E dd/MM/y – E dd/MM/y},
+				M => q{E dd/MM/y – E dd/MM/y},
+				d => q{E dd/MM/y – E dd/MM/y},
+				y => q{E dd/MM/y – E dd/MM/y},
 			},
 			yMMMM => {
-				M => q{MM – MM/y},
-				y => q{MM/y – MM/y},
+				M => q{MM – MM/y},
+				y => q{MM/y – MM/y},
 			},
 			yMMMd => {
-				M => q{dd/MM/y – d/MM},
-				d => q{d – d/MM/y},
-				y => q{dd/MM/y – dd/MM/y},
+				M => q{dd/MM/y – d/MM},
+				d => q{d – d/MM/y},
+				y => q{dd/MM/y – dd/MM/y},
 			},
 			yMd => {
-				M => q{dd/MM/y – dd/MM/y},
-				d => q{dd/MM/y – dd/MM/y},
-				y => q{dd/MM/y – dd/MM/y},
+				M => q{dd/MM/y – dd/MM/y},
+				d => q{dd/MM/y – dd/MM/y},
+				y => q{dd/MM/y – dd/MM/y},
 			},
 		},
 		'gregorian' => {
-			H => {
-				H => q{HH–HH},
-			},
-			Hm => {
-				H => q{HH:mm–HH:mm},
-				m => q{HH:mm–HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm–HH:mm v},
-				m => q{HH:mm–HH:mm v},
-			},
-			Hv => {
-				H => q{HH–HH v},
-			},
 			M => {
 				M => q{M–M},
 			},
 			MEd => {
-				M => q{E dd/MM – E dd/MM},
-				d => q{E dd/MM – E dd/MM},
-			},
-			MMM => {
-				M => q{LLL–LLL},
+				M => q{E dd/MM – E dd/MM},
+				d => q{E dd/MM – E dd/MM},
 			},
 			MMMEd => {
-				M => q{E d 'di' MMM – E d 'di' MMM},
-				d => q{E d – E d 'di' MMM},
+				M => q{E d 'di' MMM – E d 'di' MMM},
+				d => q{E d – E d 'di' MMM},
 			},
 			MMMd => {
-				M => q{d 'di' MMM – d 'di' MMM},
+				M => q{d 'di' MMM – d 'di' MMM},
 				d => q{d–d 'di' MMM},
 			},
 			Md => {
-				M => q{dd/MM – dd/MM},
-				d => q{dd/MM – dd/MM},
+				M => q{dd/MM – dd/MM},
+				d => q{dd/MM – dd/MM},
 			},
-			d => {
-				d => q{d–d},
-			},
-			fallback => '{0} – {1}',
 			h => {
-				a => q{h a – h a},
-				h => q{h–h a},
+				a => q{h a – h a},
+				h => q{h–h a},
 			},
 			hm => {
-				a => q{h:mm a – h:mm a},
-				h => q{h:mm–h:mm a},
-				m => q{h:mm–h:mm a},
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
 			},
 			hmv => {
-				a => q{h:mm a – h:mm a v},
-				h => q{h:mm–h:mm a v},
-				m => q{h:mm–h:mm a v},
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
 			},
 			hv => {
-				a => q{h a – h a v},
-				h => q{h–h a v},
-			},
-			y => {
-				y => q{y–y},
+				a => q{h a – h a v},
+				h => q{h–h a v},
 			},
 			yM => {
-				M => q{MM/y – MM/y},
-				y => q{MM/y – MM/y},
+				M => q{MM/y – MM/y},
+				y => q{MM/y – MM/y},
 			},
 			yMEd => {
-				M => q{E dd/MM/y – E dd/MM/y},
-				d => q{E dd/MM/y – E dd/MM/y},
-				y => q{E dd/MM/y – E dd/MM/y},
+				M => q{E dd/MM/y – E dd/MM/y},
+				d => q{E dd/MM/y – E dd/MM/y},
+				y => q{E dd/MM/y – E dd/MM/y},
 			},
 			yMMM => {
-				M => q{MM – MM/y},
-				y => q{MM/y – MM/y},
+				M => q{MM – MM/y},
+				y => q{MM/y – MM/y},
 			},
 			yMMMEd => {
-				M => q{E dd/MM/y – E dd/MM/y},
-				d => q{E dd/MM/y – E dd/MM/y},
-				y => q{E dd/MM/y – E dd/MM/y},
+				M => q{E dd/MM/y – E dd/MM/y},
+				d => q{E dd/MM/y – E dd/MM/y},
+				y => q{E dd/MM/y – E dd/MM/y},
 			},
 			yMMMM => {
-				M => q{MM – MM/y},
-				y => q{MM/y – MM/y},
+				M => q{MM – MM/y},
+				y => q{MM/y – MM/y},
 			},
 			yMMMd => {
-				M => q{dd/MM/y – d/MM},
-				d => q{d – d/MM/y},
-				y => q{dd/MM/y – dd/MM/y},
+				M => q{dd/MM/y – d/MM},
+				d => q{d – d/MM/y},
+				y => q{dd/MM/y – dd/MM/y},
 			},
 			yMd => {
-				M => q{dd/MM/y – dd/MM/y},
-				d => q{dd/MM/y – dd/MM/y},
-				y => q{dd/MM/y – dd/MM/y},
+				M => q{dd/MM/y – dd/MM/y},
+				d => q{dd/MM/y – dd/MM/y},
+				y => q{dd/MM/y – dd/MM/y},
 			},
 		},
 	} },
@@ -1991,9 +1739,6 @@ has 'time_zone_names' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default	=> sub { {
-		hourFormat => q(+HH:mm;-HH:mm),
-		gmtFormat => q(GMT{0}),
-		fallbackFormat => q({1} ({0})),
 		'America/New_York' => {
 			exemplarCity => q#Gnove York#,
 		},

@@ -36,6 +36,7 @@
             "DBD::SQLite" : "0",
             "DBD::SQLite::Constants" : "0",
             "DBI" : "0",
+            "Database::Abstraction" : "0.04",
             "Error::Simple" : "0",
             "File::Basename" : "0",
             "File::HomeDir" : "0",
@@ -60,6 +61,7 @@
             "IPC::System::Simple" : "0",
             "Test::Carp" : "0",
             "Test::Most" : "0",
+            "Test::Needs" : "0",
             "Test::NoWarnings" : "0"
          }
       }
@@ -78,6 +80,6 @@
          "x_repository" : "https://github.com/nigelhorne/Genealogy-Wills"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

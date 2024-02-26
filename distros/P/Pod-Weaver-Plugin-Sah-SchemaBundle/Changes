@@ -1,0 +1,157 @@
+0.082   2024-02-23  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] In generated SAH SCHEMA DEFINITION section, also remove the
+          'summary' clause.
+
+
+0.081   2024-02-19  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Didn't handle non-array form of x.completions.
+
+
+0.080   2024-02-13  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename module/dist Pod-Weaver-Plugin-Sah-Schema{s,Bundle}.
+
+
+0.079   2024-01-12  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] In generated SAH SCHEMA DEFINITION section, sort schema clauses
+          using Sort::Sub::sah_schema_clause.
+
+
+0.078   2024-01-08  Released-By: PERLANCAR; Backward-Incompatible: yes; Urgency: medium
+
+        - [incompatible change] Default show_source configuration to true.
+
+
+0.077   2024-01-08  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Fix generated completion module name.
+
+
+0.076   2024-01-08  Released-By: PERLANCAR; Urgency: medium
+
+        - In generated definition, link to type or base schema module.
+
+
+0.075   2024-01-08  Released-By: PERLANCAR; Urgency: medium
+
+        - Add configuration: {include,exclude}_{schema,schemas}_module,
+          show_source.
+
+
+0.074   2023-07-15  Released-By: PERLANCAR; Urgency: medium
+
+        - Tweak generated POD: fix wording, link to Type::FromSah.
+
+
+0.073   2023-02-16  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Fix generated example on using with Type::Tiny
+          (interpolation bug).
+
+
+0.072   2022-10-19  Released-By: PERLANCAR; Urgency: medium
+
+        - Render Sah schema's links clause.
+
+
+0.071   2022-09-29  Released-By: PERLANCAR; Urgency: medium
+
+        - In generated Synopsis, show example on using with Type::Tiny
+          using Type::FromSah.
+
+
+0.070   2022-06-08  Released-By: PERLANCAR; Urgency: medium
+
+        - Also show example's summary for valid examples.
+
+
+0.069   2021-08-04  Released-By: PERLANCAR; Urgency: medium
+
+	- In generated Synopsis, show more code on using with Data::Sah.
+
+
+0.068   2021-08-04  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Tweak generated Synopsis: use subheadings, move sample data
+	  section to the beginning, change title to Sample Data &
+	  Validation results.
+
+
+0.067   2021-07-22  Released-By: PERLANCAR; Urgency: medium
+
+	- Fix typo in generated example.
+
+	- Tweak wording in generated mention.
+
+
+0.066   2021-07-20  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Non-defhash example was not handled correctly (results
+	  in 'undef' in POD).
+
+	- Add preamble in generated SAH SCHEMAS POD section.
+
+
+0.065   2021-07-19  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [dist] Workaround to avoid triggering PAUSE's simplistic package
+	  detection (package MyApp in example POD was detected as a package
+	  declaration).
+
+
+0.064   2021-07-19  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Didn't search for Sah::Schema::* modules recursively.
+
+
+0.063   2020-05-08  Released-By: PERLANCAR; Urgency: medium
+
+	- In generated Synopsis, show how to use with Params::Sah and show
+	  how to create CLI with Perinci::CmdLine in more detail.
+
+
+0.062   2020-05-08  Released-By: PERLANCAR; Urgency: medium
+
+	- Update property names for value & validated value.
+
+
+0.061   2020-03-03  Released-By: PERLANCAR; Urgency: medium
+
+	- Render example on how to use the Sah::Schema module with
+	  Data::Sah and in Rinci metadata.
+
+
+0.060   2020-03-02  Released-By: PERLANCAR; Urgency: medium
+
+	- Render schema examples in Synopsis.
+
+
+0.05    2019-12-17  Released-By: PERLANCAR; Urgency: medium
+
+	- Use String::PodQuote to quote summary when added into POD.
+
+
+0.04    2016-05-08  Released-By: PERLANCAR
+
+        - [Incompatible change] Rename dist from
+          Pod-Weaver-Plugin-Sah-Schema{,s}.
+
+
+0.03    2016-03-08  Released-By: PERLANCAR
+
+	- Fix perl syntax mistake, derp.
+
+
+0.02    2016-03-08  Released-By: PERLANCAR
+
+	- Add some skips.
+
+
+0.01    2016-03-08  Released-By: PERLANCAR
+
+        - First release.

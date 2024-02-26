@@ -28,7 +28,7 @@ use Getopt::EX::Hashed 'has'; {
     has help     => ' h      ' ;
     has version  => ' v      ' ;
     has debug    => ' d      ' ;
-    has unit     => '    =s  ' , default => '' ;
+    has unit     => ' by =s  ' , default => '' ;
     has diff     => '    =s  ' ;
     has exec     => ' e  =s@ ' , default => [] ;
     has refresh  => ' r  :1  ' , default => 1 ;
@@ -200,7 +200,7 @@ watchdiff - repeat command and watch differences
 
 =head1 VERSION
 
-Version 4.31
+Version 4.32
 
 =head1 DESCRIPTION
 

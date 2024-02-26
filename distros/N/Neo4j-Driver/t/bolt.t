@@ -90,6 +90,7 @@ package main;
 # (very "quick and dirty" -- started out as just net_module testing)
 
 use Neo4j::Driver;
+use Neo4j_Test;
 
 sub new_session {
 	my $d = Neo4j::Driver->new('bolt:');
@@ -142,7 +143,7 @@ subtest 'deep_bless' => sub {
 	is scalar(@{$v->get(5)}), 0, 'list empty';
 	is ref($v->get(6)), 'HASH', 'map';
 	is scalar(keys %{$v->get(6)}), 1, 'map entry';
-	ok ref($v->get(6)->{no}), 'bool blessed';
+	Neo4j_Test::bool_ok $v->get(6)->{no}, 'bool ok';
 	ok ! $v->get(6)->{no}, 'bool false';
 	is $v->get(7), 42, 'scalar';
 };

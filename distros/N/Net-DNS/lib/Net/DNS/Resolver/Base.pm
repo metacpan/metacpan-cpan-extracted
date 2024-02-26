@@ -2,7 +2,7 @@ package Net::DNS::Resolver::Base;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: Base.pm 1957 2024-01-10 14:54:10Z willem $)[2];
+our $VERSION = (qw$Id: Base.pm 1965 2024-02-14 09:19:32Z willem $)[2];
 
 
 #
@@ -621,7 +621,7 @@ sub bgbusy {				## no critic		# overwrites user UDP handle
 	my ( $expire, $query, $read ) = @$appendix;
 	return if ref($read);
 
-	return time() < $expire unless IO::Select->new($handle)->can_read(0);
+	return time() < $expire unless IO::Select->new($handle)->can_read(0.02);    # limit CPU burn
 
 	return unless $query;					# SpamAssassin 3.4.1 workaround
 	return unless $handle->socktype() == SOCK_DGRAM;
@@ -646,10 +646,7 @@ sub bgisready {				## historical
 
 
 sub bgread {
-	my ( $self, $handle ) = @_;
-	while (&bgbusy) {					# side effect: TCP retry
-		IO::Select->new($handle)->can_read(0.02);	# reduce my CPU usage by 3 orders of magnitude
-	}
+	1 while &bgbusy;		## side effect: TCP retry if TC flag set
 	return &_bgread;
 }
 
@@ -662,7 +659,7 @@ sub _bgread {
 	my ( $expire, $query, $read ) = @$appendix;
 	return shift(@$read) if ref($read);
 
-	return unless IO::Select->new($handle)->can_read(0);
+	return unless IO::Select->new($handle)->can_read(0.2);
 
 	my $dgram  = $handle->socktype() == SOCK_DGRAM;
 	my $buffer = $dgram ? _read_udp($handle) : _read_tcp($handle);
@@ -817,19 +814,23 @@ sub _axfr_next {
 #
 # Usage:  $data = _read_tcp($socket);
 #
+sub _read_socket {
+	my ( $socket, $size ) = @_;
+	my $buffer = '';
+	$socket->recv( $buffer, $size ) if $size;
+	return $buffer;
+}
+
 sub _read_tcp {
 	my $socket = shift;
 
-	my ( $s1, $s2 );
-	$socket->recv( $s1, 1 );				# two octet length
-	$socket->recv( $s2, 2 - length $s1 );			# possibly fragmented
-	my $size = unpack 'n', pack( 'a*a*@2', $s1, $s2 );
+	my $header = _read_socket( $socket, 2 );
+	$header .= _read_socket( $socket, 2 - length $header );
+	my $size = unpack 'n', $header;
 
 	my $buffer = '';
-	for ( ; ; ) {
-		my $fragment;
-		$socket->recv( $fragment, $size - length($buffer) );
-		last unless length( $buffer .= $fragment || last ) < $size;
+	while ( my $fragment = _read_socket( $socket, $size - length $buffer ) ) {
+		$buffer .= $fragment;
 	}
 	return $buffer;
 }
@@ -839,10 +840,7 @@ sub _read_tcp {
 # Usage:  $data = _read_udp($socket);
 #
 sub _read_udp {
-	my $socket = shift;
-	my $buffer = '';
-	$socket->recv( $buffer, 9000 );	## payload limit for Ethernet "Jumbo" packet
-	return $buffer;
+	return _read_socket( shift(), 9000 );	## payload limit for Ethernet "Jumbo" packet
 }
 
 

@@ -1,12 +1,12 @@
 package Locale::CLDR::Transformations::Any::Latn::Hebr;
 # This file auto generated from Data\common\transforms\Hebrew-Latin.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -377,6 +377,27 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(ẖ),
 					result  => q(ח),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(\'),
+					result  => q(־),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(\'),
+					result  => q(״),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(\'),
+					result  => q(׳),
 					revisit => 0,
 				},
 			],

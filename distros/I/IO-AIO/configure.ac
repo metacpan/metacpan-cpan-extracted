@@ -70,6 +70,23 @@ AC_CHECK_HEADERS([sys/mkdev.h])
 dnl readv / preadv, vmsplice
 AC_CHECK_HEADERS([sys/uio.h])
 
+dnl fexecve has always been in the single unix specification
+dnl but some atrocities (like opsnbsd and osx) claim implementing it
+dnl but then not definining it. ugh. garbage. and fexecve would be
+dnl useful for security, but, no, not on openbsd. we'd rather lie
+dnl about it.
+AC_CACHE_CHECK(for fexecve, ac_cv_fexecve, [AC_LINK_IFELSE([AC_LANG_SOURCE([[
+#include <fcntl.h>
+#include <unistd.h>
+int main (void)
+{
+   char *const argv[] = { "foo", "bar", 0 };
+   int res = fexecve (-1, argv, 0);
+   return 0;
+}
+]])],ac_cv_fexecve=yes,ac_cv_fexecve=no)])
+test $ac_cv_fexecve = yes && AC_DEFINE(HAVE_FEXECVE, 1, fexecve(2) is available)
+
 AC_CACHE_CHECK([for siginfo_t], ac_cv_siginfo_t, [AC_LINK_IFELSE([AC_LANG_SOURCE([
 #include <signal.h>
 int main (void)
@@ -264,31 +281,36 @@ AC_CACHE_CHECK(for accept4, ac_cv_accept4, [AC_LINK_IFELSE([AC_LANG_SOURCE([[
 #include <sys/socket.h>
 int main (void)
 {
-   int res;
-   res = accept4 (1, (struct sockaddr *)0, (socklen_t)0, SOCK_NONBLOCK | SOCK_CLOEXEC);
+   int res = accept4 (1, (struct sockaddr *)0, (socklen_t)0, SOCK_NONBLOCK | SOCK_CLOEXEC);
    return 0;
 }
 ]])],ac_cv_accept4=yes,ac_cv_accept4=no)])
 test $ac_cv_accept4 = yes && AC_DEFINE(HAVE_ACCEPT4, 1, accept4(2) is available)
 
 AC_CHECK_HEADERS([sys/mount.h])
-AC_CACHE_CHECK(for mount/umount, ac_cv_mount, [AC_LINK_IFELSE([AC_LANG_SOURCE([[
+AC_CACHE_CHECK(for mount, ac_cv_mount, [AC_LINK_IFELSE([AC_LANG_SOURCE([[
 #include <sys/mount.h>
 int main (void)
 {
-   int res;
-   res = mount ("path", "path", "fstype", MS_RDONLY, 0);
-   res = umount ("path");
+   int res = mount ("path", "path", "fstype", MS_RDONLY, 0);
    return 0;
 }
 ]])],ac_cv_mount=yes,ac_cv_mount=no)])
-test $ac_cv_mount = yes && AC_DEFINE(HAVE_MOUNT, 1, mount/umount are available)
+test $ac_cv_mount = yes && AC_DEFINE(HAVE_MOUNT, 1, mount is available)
+AC_CACHE_CHECK(for umount, ac_cv_umount, [AC_LINK_IFELSE([AC_LANG_SOURCE([[
+#include <sys/mount.h>
+int main (void)
+{
+   int res = umount ("path");
+   return 0;
+}
+]])],ac_cv_umount=yes,ac_cv_umount=no)])
+test $ac_cv_umount = yes && AC_DEFINE(HAVE_UMOUNT, 1, umount is available)
 AC_CACHE_CHECK(for umount2, ac_cv_umount2, [AC_LINK_IFELSE([AC_LANG_SOURCE([[
 #include <sys/mount.h>
 int main (void)
 {
-   int res;
-   res = umount2 ("path", MNT_FORCE|MNT_DETACH);
+   int res = umount2 ("path", MNT_FORCE|MNT_DETACH);
    return 0;
 }
 ]])],ac_cv_umount2=yes,ac_cv_umount2=no)])

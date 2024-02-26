@@ -26,4 +26,4 @@ my $dt_bg = DateTime->new(
 	time_zone  => 'Europe/London',
 );
 
-is ($dt_bg->format_cldr($locale->datetime_format_full), 'вторник, 25 октомври 1966 г., 7:15:47 ч. Europe/London', 'Date Time Format Full British Bg ');
+is ($dt_bg->format_cldr($locale->datetime_format_full), 'вторник, 25 октомври 1966 г., 7:15:47 ч. Europe/London', 'Date Time Format Full British Bg ');

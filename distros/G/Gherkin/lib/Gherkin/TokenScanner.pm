@@ -1,5 +1,5 @@
 package Gherkin::TokenScanner;
-$Gherkin::TokenScanner::VERSION = '27.0.0';
+$Gherkin::TokenScanner::VERSION = '28.0.0';
 use strict;
 use warnings;
 

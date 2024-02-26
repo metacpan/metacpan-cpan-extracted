@@ -1,3 +1,9 @@
+0.03 2024-02-26T11:03:48+01:00
+ - Add error to init() and prepare() without data.
+ - Add missing cleanup() method to doc.
+ - Add tests for cleanup() and init().
+ - Fix link to image in doc.
+
 0.02 2024-02-08T22:35:31+01:00
  - Fix label.
  - Regen example.

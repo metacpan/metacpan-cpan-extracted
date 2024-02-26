@@ -9,6 +9,7 @@ use Test::Warnings 0.010 qw(:no_end_test);
 my $no_warnings;
 use if $no_warnings = $ENV{AUTHOR_TESTING} ? 1 : 0, 'Test::Warnings';
 
+use Neo4j_Test;
 use Neo4j_Test::MockHTTP;
 
 my $mock_plugin = Neo4j_Test::MockHTTP->new;
@@ -143,10 +144,10 @@ subtest 'property types' => sub {
 	lives_and { is $r->fetch->get(), undef } 'null';
 	lives_ok { $v = undef; $v = $r->fetch->get() } 'Boolean true';
 	ok !! $v, 'Boolean truthy';
-	isnt ref($v), '', 'ref true';
+	Neo4j_Test::bool_ok $v, 'true is bool';
 	lives_ok { $v = undef; $v = $r->fetch->get() } 'Boolean false';
 	ok ! $v, 'Boolean falsy';
-	isnt ref($v), '', 'ref false';
+	Neo4j_Test::bool_ok $v, 'false is bool';
 	lives_and { is $r->fetch->get(), 13 } 'Integer';
 	lives_and { is $r->fetch->get(), 0.5 } 'Float';
 	lives_and { is $r->fetch->get(), 'hello' } 'String';
@@ -160,10 +161,10 @@ subtest 'property types sparse' => sub {
 	lives_and { ok $r = $s->run('property sparse') } 'run';
 	lives_ok { $v = undef; $v = $r->fetch->get() } 'Boolean true';
 	ok !! $v, 'Boolean truthy';
-	isnt ref($v), '', 'ref true';
+	Neo4j_Test::bool_ok $v, 'true is bool';
 	lives_ok { $v = undef; $v = $r->fetch->get() } 'Boolean false';
 	ok ! $v, 'Boolean falsy';
-	isnt ref($v), '', 'ref false';
+	Neo4j_Test::bool_ok $v, 'false is bool';
 	lives_and { is $r->fetch->get(), 17 } 'Integer';
 	lives_and { is $r->fetch->get(), 'world' } 'String';
 	lives_and { ok ! $r->has_next } 'no has_next';

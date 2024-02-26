@@ -4,12 +4,12 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-01-16'; # DATE
+our $DATE = '2023-10-29'; # DATE
 our $DIST = 'Acme-CPANModules-HaveWebsite'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 our $LIST = {
-    summary => 'Modules that have their own website',
+    summary => 'List of modules that have their own website',
     description => <<'_',
 
 This list was first constructed based on Gabor Szabo's post:
@@ -42,7 +42,7 @@ _
 };
 
 1;
-# ABSTRACT: Modules that have their own website
+# ABSTRACT: List of modules that have their own website
 
 __END__
 
@@ -52,11 +52,11 @@ __END__
 
 =head1 NAME
 
-Acme::CPANModules::HaveWebsite - Modules that have their own website
+Acme::CPANModules::HaveWebsite - List of modules that have their own website
 
 =head1 VERSION
 
-This document describes version 0.004 of Acme::CPANModules::HaveWebsite (from Perl distribution Acme-CPANModules-HaveWebsite), released on 2022-01-16.
+This document describes version 0.005 of Acme::CPANModules::HaveWebsite (from Perl distribution Acme-CPANModules-HaveWebsite), released on 2023-10-29.
 
 =head1 DESCRIPTION
 
@@ -94,13 +94,13 @@ Website URL: L<http://timetracker.plix.at/>
 
 =item L<Catalyst>
 
-Author: L<HAARG|https://metacpan.org/author/HAARG>
+Author: L<JJNAPIORK|https://metacpan.org/author/JJNAPIORK>
 
 Website URL: L<http://www.catalystframework.org/>
 
 =item L<Dancer>
 
-Author: L<BIGPRESH|https://metacpan.org/author/BIGPRESH>
+Author: L<YANICK|https://metacpan.org/author/YANICK>
 
 Website URL: L<https://perldancer.org/>
 
@@ -127,7 +127,7 @@ Website URL: L<https://davorg.dev/moox-role-json_ld/>
 
 =item L<Padre>
 
-Author: L<PLAVEN|https://metacpan.org/author/PLAVEN>
+Author: L<SZABGAB|https://metacpan.org/author/SZABGAB>
 
 Website URL: L<http://padre.perlide.org/>
 
@@ -166,7 +166,7 @@ Website URL: L<https://yuki-kimoto.github.io/spvmdoc-public/>
 
 =item L<Template>
 
-Author: L<ATOOMIC|https://metacpan.org/author/ATOOMIC>
+Author: L<ABW|https://metacpan.org/author/ABW>
 
 Website URL: L<http://www.template-toolkit.org/>
 
@@ -262,13 +262,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

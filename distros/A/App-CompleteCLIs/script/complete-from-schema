@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-19'; # DATE
+our $DATE = '2023-12-01'; # DATE
 our $DIST = 'App-CompleteCLIs'; # DIST
-our $VERSION = '0.152'; # VERSION
+our $VERSION = '0.153'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Complete/Sah/complete_from_schema",
@@ -40,7 +40,7 @@ complete-from-schema - Complete a value from schema
 
 =head1 VERSION
 
-This document describes version 0.152 of complete-from-schema (from Perl distribution App-CompleteCLIs), released on 2023-01-19.
+This document describes version 0.153 of complete-from-schema (from Perl distribution App-CompleteCLIs), released on 2023-12-01.
 
 =head1 SYNOPSIS
 
@@ -56,6 +56,15 @@ Employ some heuristics to complete a value from Sah schema. For example, if
 schema is C<< [str =E<gt> in =E<gt> [qw/new open resolved rejected/]] >>, then we can
 complete from the C<in> clause. Or for something like C<< [int =E<gt> between =E<gt> [1,
 20]] >> we can complete using values from 1 to 20.
+
+Tip: If you want to give summary for each entry in C<in> clause, you can use the
+C<x.in.summaries> attribute, example:
+
+ # schema
+ ['str', {
+     in => ['b', 'g'],
+     'x.in.summaries' => ['Male/boy', 'Female/girl'],
+ }]
 
 =head1 OPTIONS
 

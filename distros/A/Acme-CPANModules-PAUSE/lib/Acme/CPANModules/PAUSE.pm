@@ -1,14 +1,14 @@
-# no code
-## no critic: TestinAndDebugging::RequireUseStrict
 package Acme::CPANModules::PAUSE;
 
+use strict;
+
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-09-12'; # DATE
+our $DATE = '2023-10-29'; # DATE
 our $DIST = 'Acme-CPANModules-PAUSE'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our $LIST = {
-    summary => "Modules that interact with PAUSE, the Perl Authors Upload Server",
+    summary => "List of modules that interact with PAUSE, the Perl Authors Upload Server",
     entries => [
         {
             module => 'WWW::PAUSE::Simple',
@@ -42,7 +42,7 @@ our $LIST = {
 };
 
 1;
-# ABSTRACT: Modules that interact with PAUSE, the Perl Authors Upload Server
+# ABSTRACT: List of modules that interact with PAUSE, the Perl Authors Upload Server
 
 __END__
 
@@ -52,31 +52,45 @@ __END__
 
 =head1 NAME
 
-Acme::CPANModules::PAUSE - Modules that interact with PAUSE, the Perl Authors Upload Server
+Acme::CPANModules::PAUSE - List of modules that interact with PAUSE, the Perl Authors Upload Server
 
 =head1 VERSION
 
-This document describes version 0.002 of Acme::CPANModules::PAUSE (from Perl distribution Acme-CPANModules-PAUSE), released on 2021-09-12.
+This document describes version 0.003 of Acme::CPANModules::PAUSE (from Perl distribution Acme-CPANModules-PAUSE), released on 2023-10-29.
 
 =head1 DESCRIPTION
 
-=head1 ACME::MODULES ENTRIES
+=head1 ACME::CPANMODULES ENTRIES
 
 =over
 
-=item * L<WWW::PAUSE::Simple>
+=item L<WWW::PAUSE::Simple>
 
-=item * L<App::pause>
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<App::PAUSE::cleanup>
+=item L<App::pause>
 
-=item * L<CPAN::Uploader>
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<Dist::Zilla::Plugin::UploadToCPAN>
+=item L<App::PAUSE::cleanup>
 
-=item * L<Dist::Zilla::Plugin::UploadToCPAN::WWWPAUSESimple>
+Author: L<YANICK|https://metacpan.org/author/YANICK>
 
-=item * L<WWW::PAUSE::CleanUpHomeDir>
+=item L<CPAN::Uploader>
+
+Author: L<RJBS|https://metacpan.org/author/RJBS>
+
+=item L<Dist::Zilla::Plugin::UploadToCPAN>
+
+Author: L<RJBS|https://metacpan.org/author/RJBS>
+
+=item L<Dist::Zilla::Plugin::UploadToCPAN::WWWPAUSESimple>
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item L<WWW::PAUSE::CleanUpHomeDir>
+
+Author: L<ZOFFIX|https://metacpan.org/author/ZOFFIX>
 
 =back
 
@@ -146,13 +160,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

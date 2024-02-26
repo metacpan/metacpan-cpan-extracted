@@ -2,23 +2,20 @@ package Tickit::Widget::Progressbar;
 # ABSTRACT: horizontal/vertical progress bars for Tickit
 use strict;
 use warnings;
-use parent qw(Tickit::Widget);
+use Object::Pad;
+class Tickit::Widget::Progressbar :isa(Tickit::Widget);
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
 =head1 NAME
 
 Tickit::Widget::Progressbar - simple progressbar implementation for Tickit
 
-=head1 VERSION
-
-Version 0.101
-
 =head1 SYNOPSIS
 
  use Tickit::Widget::Progressbar::Horizontal;
  my $bar = Tickit::Widget::Progressbar::Horizontal->new(
- 	completion	=> 0.00,
+    completion  => 0.00,
  );
  $bar->completion($_ / 100.0) for 0..100;
 
@@ -37,19 +34,19 @@ use constant WIDGET_PEN_FROM_STYLE => 0;
 use constant CAN_FOCUS => 0;
 
 BEGIN {
-	style_definition base =>
-		fg => 255,
-		bg => 'black',
-		gradient => 0,
-		start_fg => 232;
+    style_definition base =>
+        fg => 255,
+        bg => 'black',
+        gradient => 0,
+        start_fg => 232;
 }
 
 =head1 METHODS
 
 =cut
 
-sub lines { 1 }
-sub cols { 1 }
+method lines { 1 }
+method cols { 1 }
 
 =head2 new
 
@@ -72,22 +69,19 @@ widget.
 
 =cut
 
-sub new {
-	my $class = shift;
-	my %args = @_;
-	my $completion = delete $args{completion};
-	my $orientation = delete $args{orientation};
-	my $direction = delete $args{direction};
-	my $self = $class->SUPER::new(%args);
-	$self->{completion} = $completion || 0.0;
-	$self->{orientation} = $orientation || 'horizontal';
-	$self->{direction} = $direction || 0;
-	return $self;
+BUILD (%args) {
+    my $completion = delete $args{completion};
+    my $orientation = delete $args{orientation};
+    my $direction = delete $args{direction};
+    $self->{completion} = $completion || 0.0;
+    $self->{orientation} = $orientation || 'horizontal';
+    $self->{direction} = $direction || 0;
+    return $self;
 }
 
-sub orientation { 'horizontal' }
-sub style { 'boxchar' }
-sub direction { shift->{direction} }
+method orientation { 'horizontal' }
+method style { 'boxchar' }
+method direction { $self->{direction} }
 
 =head2 completion
 
@@ -96,40 +90,37 @@ to set completion and re-render.
 
 =cut
 
-sub completion {
-	my $self = shift;
-	if(@_) {
-		my $previous = $self->{completion};
-		$self->{completion} = shift;
-		if(defined $previous) {
-			# Not entirely sure this part is working reliably enough yet
-#			$self->expose_between_values($previous, $self->{completion});
-			$self->redraw;
-		} else {
-			$self->redraw;
-		}
-		return $self;
-	}
-	return $self->{completion};
+method completion {
+    if(@_) {
+        my $previous = $self->{completion};
+        $self->{completion} = shift;
+        if(defined $previous) {
+            # Not entirely sure this part is working reliably enough yet
+#           $self->expose_between_values($previous, $self->{completion});
+            $self->redraw;
+        } else {
+            $self->redraw;
+        }
+        return $self;
+    }
+    return $self->{completion};
 }
 
-sub pen_for_position {
-	my $self = shift;
-	my %args = @_;
-	$self->{gradient_pen} ||= {};
-	$self->{gradient_pen}{join ',', map { $_ => $args{$_} } sort keys %args} ||= do {
-		my @start = Tickit::Colour->colour_to_rgb($args{start}->getattr($args{from}));
-		my @end = Tickit::Colour->colour_to_rgb($args{end}->getattr($args{from}));
-		my $col = Tickit::Colour->rgb_to_colour(map {
-				($start[$_] * $args{pos} + $end[$_] * ($args{total} - $args{pos})) / $args{total}
-			} 0..2);
-		my %extra = map {; /^extra_(.*)$/ ? ($1 => $args{$_}) : () } keys %args;
+method pen_for_position (%args) {
+    $self->{gradient_pen} ||= {};
+    $self->{gradient_pen}{join ',', map { $_ => $args{$_} } sort keys %args} ||= do {
+        my @start = Tickit::Colour->colour_to_rgb($args{start}->getattr($args{from}));
+        my @end = Tickit::Colour->colour_to_rgb($args{end}->getattr($args{from}));
+        my $col = Tickit::Colour->rgb_to_colour(map {
+                ($start[$_] * $args{pos} + $end[$_] * ($args{total} - $args{pos})) / $args{total}
+            } 0..2);
+        my %extra = map {; /^extra_(.*)$/ ? ($1 => $args{$_}) : () } keys %args;
 
-		Tickit::Pen::Immutable->new(
-			($args{to} || $args{from}) => $col,
-			%extra,
-		);
-	};
+        Tickit::Pen::Immutable->new(
+            ($args{to} || $args{from}) => $col,
+            %extra,
+        );
+    };
 }
 
 1;
@@ -147,3 +138,4 @@ Tom Molesworth <cpan@entitymodel.com>
 =head1 LICENSE
 
 Copyright Tom Molesworth 2011-2013. Licensed under the same terms as Perl itself.
+

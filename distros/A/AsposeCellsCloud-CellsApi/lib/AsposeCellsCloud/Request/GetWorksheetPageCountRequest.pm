@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,10 +59,10 @@ sub new {
 
 
 # Run Operation Request
-# GetWorksheetPageCountRequest.name :   ,
-# GetWorksheetPageCountRequest.sheetName :   ,
-# GetWorksheetPageCountRequest.folder :   ,
-# GetWorksheetPageCountRequest.storageName :    
+# GetWorksheetPageCountRequest.name : The file name.  ,
+# GetWorksheetPageCountRequest.sheetName : The worksheet name.  ,
+# GetWorksheetPageCountRequest.folder : The folder where the file is situated.  ,
+# GetWorksheetPageCountRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -73,7 +73,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_page_count' } = { 
-    	summary => '',
+    	summary => 'Get page count in the worksheet.',
         params => $params,
         returns => 'int',
     };
@@ -130,28 +130,28 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => '',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
      'sheet_name' => {
      	datatype => 'string',
      	base_name => 'sheetName',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => '',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => '',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

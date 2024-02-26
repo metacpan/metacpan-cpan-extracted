@@ -43,6 +43,7 @@ my %Cmd = (		# CLI commands to test with (output should be long enough to be mor
 			WLAN9100		=> 'show running-config',
 			ExtremeXOS		=> 'show system | exclude UpTime', # Suppress uptime line as seconds count risks modifying the output length between compares
 			ISW			=> 'show version',
+			ISWmarvell		=> 'show version',
 			Series200		=> 'show interfaces switchport general',
 			Wing			=> 'show wireless radio detail',
 #			SLX			=> 'show system',
@@ -415,7 +416,7 @@ do {{ # Test loop, we keep testing until user satisfied
 	# Test enabling more paging on device (except where not supported: Ipanema & PassportERS Standby CPUs)
 	# - More paging is usually already enabled on device
 	# - This test is to check that device_more_paging() behaves correctly before attribute 'model' is set 
-	unless ($familyType eq 'Ipanema' || $familyType eq 'PassportERS' && !$cli->attribute('is_master_cpu')) {
+	unless ($familyType eq 'Ipanema' || $familyType eq 'ISWmarvell' || $familyType eq 'PassportERS' && !$cli->attribute('is_master_cpu')) {
 		$ok = $cli->device_more_paging(1);
 		if (defined $ok && $ok == 0) { # Non-blocking mode not ready
 			ok( !$blocking, "Checking 0 return value only in non-blocking mode" );
@@ -492,6 +493,9 @@ do {{ # Test loop, we keep testing until user satisfied
 		attribute($cli, 'stp_mode');
 		attribute($cli, 'oob_ip',1); # might be undefined
 		attribute($cli, 'is_oob_connected');
+	}
+	elsif ($familyType eq 'ISW' || $familyType eq 'ISWmarvell') {
+		attribute($cli, 'is_isw_marvell');
 	}
 	elsif ($familyType eq 'Series200') {
 		if ('Stack' eq attribute($cli, 'switch_mode')) {
@@ -575,6 +579,12 @@ do {{ # Test loop, we keep testing until user satisfied
 					Return_result		=>	1,
 				);
 		}
+		elsif ($familyType eq 'ISWmarvell') {
+			($ok, $result) = $cli->cmd(
+					Command			=>	'configure',
+					Return_result		=>	1,
+				);
+		}
 		else {
 			ok( 0, "Unexpected family type for testing config mode" );
 			$cli->disconnect;
@@ -610,6 +620,12 @@ do {{ # Test loop, we keep testing until user satisfied
 			if    ( ($familyType eq 'PassportERS' && !$acli) || $familyType eq 'Accelar') {
 				($ok, $result) = $cli->cmd(
 						Command			=>	'box',
+						Return_result		=>	1,
+					);
+			}
+			elsif ( $familyType eq 'ISWmarvell') {
+				($ok, $result) = $cli->cmd(
+						Command			=>	'exit',
 						Return_result		=>	1,
 					);
 			}
@@ -668,6 +684,9 @@ do {{ # Test loop, we keep testing until user satisfied
 	else { ok( $ok, "Testing cmd() and cmd_poll() methods with more paging enabled") }
 	diag "Obtained output of command '$cmd':\n$output" if length $output;
 	diag $cli->errmsg unless $ok;
+	open(OUTPUT1, '>', 'output1.txt') and print OUTPUT1 $output;
+	close OUTPUT1;
+	diag "Output saved as 'output1.txt'";
 
 	# Test disabling more paging on device (except on PassportERS Standby CPUs)
 	$morePagingDisable = 0;
@@ -723,11 +742,9 @@ do {{ # Test loop, we keep testing until user satisfied
 		if (length $output2 && length $output) { # Compare both outputs if we have them
 			ok( length($output) == length($output2), "Testing that 1st & 2nd output of same command is of same length");
 			unless ( length $output == length $output2 ) {
-				open(OUTPUT1, '>', 'output1.txt') and print OUTPUT1 $output;
 				open(OUTPUT2, '>', 'output2.txt') and print OUTPUT2 $output2;
-				close OUTPUT1;
 				close OUTPUT2;
-				diag "Outputs saved as 'output1.txt' & 'output2.txt'";
+				diag "Output saved as 'output2.txt'";
 			}
 		}
 	}

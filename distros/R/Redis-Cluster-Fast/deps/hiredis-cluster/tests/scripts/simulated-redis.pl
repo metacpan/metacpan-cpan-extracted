@@ -12,10 +12,12 @@
 use strict;
 use warnings;
 use Socket;
+use JSON;
 
 my $port = 7000;
 my $debug = 0;
 my ($sig, $sig_pid);
+my $use_ipv6 = 0;
 
 # Parse command line args
 while ($_ = shift) {
@@ -26,6 +28,8 @@ while ($_ = shift) {
         $sig = uc $1;
         $sig_pid = shift;
         die "Pid expected after $_\n" unless $sig_pid;
+    } elsif (/^--ipv6$/) {
+        $use_ipv6 = 1;
     } elsif (/^(?:-d|--debug)$/) {
         $debug = 1;
     } elsif (/^(?:-h|--help)$/) {
@@ -40,10 +44,11 @@ while ($_ = shift) {
             "Options:",
             "",
             "  -p PORT, --port PORT   TCP port to use.",
+            "           --ipv6        Use IPv6, bind to address '::'.",
             "           --sigSIG PID  Send SIG to PID when ready to accept a",
             "                         client connection.",
-            "  -d,       --debug      Enable debug printouts.",
-            "  -h,       --help       Help.",
+            "  -d,      --debug       Enable debug printouts.",
+            "  -h,      --help        Help.",
             "",
             "Expected traffic is to be provided on stdin, one event per line,",
             "where the following events are accepted:",
@@ -74,17 +79,28 @@ while ($_ = shift) {
     }
 }
 
+# Use IPv4 default
+my $af = AF_INET;
+my $sockaddr = \&sockaddr_in;
+my $server_addr = INADDR_ANY;
+
+if ($use_ipv6) {
+    $af = AF_INET6;
+    $sockaddr = \&sockaddr_in6;
+    $server_addr = Socket::IN6ADDR_ANY;
+}
+
 # Listener socket. Close it on SIGTERM, etc. and at normal exit.
 my $listener;
 END {
     close $listener if $listener;
 }
 
-socket($listener, PF_INET, SOCK_STREAM, getprotobyname("tcp"))
+socket($listener, $af, SOCK_STREAM, getprotobyname("tcp"))
     or die "socket: $!\n";
 setsockopt($listener, SOL_SOCKET, SO_REUSEADDR, pack("l", 1))
     or die "setsockopt: $!\n";
-bind($listener, sockaddr_in($port, INADDR_ANY))
+bind($listener, &$sockaddr($port, $server_addr))
     or die "bind: $!\n";
 listen($listener, 5)
     or die "listen: $!\n";
@@ -111,7 +127,7 @@ while (<>) {
             $data .= "\r\n" unless $data =~ /\r\n$/;
         } else {
             # e.g. '["foo", "bar", 42]'
-            $data = redis_encode(eval $1);
+            $data = redis_encode(JSON->new->allow_nonref->decode($1));
         }
         print $connection $data;
         flush $connection;
@@ -132,9 +148,9 @@ while (<>) {
         undef $connection;
         my $peer_addr = accept($connection, $listener);
         push @connections, $connection;
-        my($client_port, $client_addr) = sockaddr_in($peer_addr);
-        my $name = gethostbyaddr($client_addr, AF_INET);
-        print "(port $port) Connection from $name [", inet_ntoa($client_addr),
+        my($client_port, $client_addr) = &$sockaddr($peer_addr);
+        my $name = gethostbyaddr($client_addr, $af);
+        print "(port $port) Connection from $name [", Socket::inet_ntop($af, $client_addr),
             "] on client port $client_port.\n" if $debug;
     } elsif (/^EXPECT ([\[\"].*)/) {
         my $expected = eval $1;
@@ -142,17 +158,23 @@ while (<>) {
         my $expected_str = pretty_format_command($expected);
         my $received_str = pretty_format_command($received);
         if ($expected_str ne $received_str) {
-            die "(port $port) Unexpected $received_str received.\n" .
-                "Expected $expected_str.\n";
+            unexpected($port, "$received_str received.\nExpected $expected_str");
         }
     } elsif (/^SLEEP (\d+)$/) {
         sleep $1;
     } else {
-        die "(port $port) Unexpected event: $_\n";
+        unexpected($port, "event: $_");
     }
 }
+close $listener;
 print "(port $port) Done.\n" if $debug;
 exit;
+
+sub unexpected {
+    my ($port, $unexpected) = @_;
+    print "(port $port) Unexpected $unexpected\n";
+    die "Unexpected communication\n";
+}
 
 sub redis_encode {
     my $x = shift;
@@ -160,6 +182,7 @@ sub redis_encode {
         if ref $x eq "ARRAY";
     return ":$x\r\n"
         unless ($x ^ $x) ne "0"; # hack to check if int or string
+    utf8::encode $x;
     return "\$" . length($x) . "\r\n$x\r\n";
 }
 
@@ -187,13 +210,13 @@ sub recv_command {
         my $buffer;
         do {
             my $read = read $connection, $buffer, $remaining;
-            die "(port $port) Unexpected EOF while receiving command\n"
+            unexpected($port, "EOF while receiving command")
                 unless $read;
             $result .= $buffer;
             $remaining -= $read;
         } while ($remaining > 0);
         $_ = <$connection>;
-        die "(port $port) Expected \\r\\n after string\n" unless /^\r\n$/
+        unexpected($port, "Expected \\r\\n after string") unless /^\r\n$/
     } else {
         die "Unexpected command: $_\n";
     }

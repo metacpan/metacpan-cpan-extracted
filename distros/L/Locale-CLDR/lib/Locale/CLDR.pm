@@ -8,7 +8,7 @@ Locale::CLDR - A Module to create locale objects with localisation data from the
 
 =head1 VERSION
 
-Version 0.40.1
+Version 0.44.0
 
 =head1 SYNOPSIS
 
@@ -39,7 +39,7 @@ or
 
 use v5.10.1;
 use version;
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use open ':encoding(utf8)';
 use utf8;
@@ -278,7 +278,7 @@ see L<Unicode Collation Identifier|https://www.unicode.org/reports/tr35/tr35-66/
 
 =item currency
 
-This extention overrides the default currency symbol for the locale.
+This extension overrides the default currency symbol for the locale.
 It's value is any valid currency identifyer.
 
 =item dx
@@ -307,7 +307,7 @@ Use the default presentation for emoji characters as specified in UTR #51 Sectio
 
 =item fw
 
-This extention overrides the first day of the week. It can be set to 
+This extension overrides the first day of the week. It can be set to 
 one of
 
 =over 12
@@ -750,7 +750,7 @@ sub installed_locales {
                 ( 
                     $self->language_id, 
                     $self->region_id 
-                        ? $self->script_id || 'Any'
+                        ? $self->script_id
                         : $self->script_id || (),
                     $self->region_id || ()
                 )
@@ -783,7 +783,7 @@ sub _get_installed_locals {
     # Windows does some wierd stuff with the recycle bin
     # make sure we don't enter that directory.
     my @path = File::Spec->splitdir($path);
-    return $locales if join ('/', @path) !~ m#/lib/Locale/CLDR/Locales#;
+    return $locales if join ('/', @path) !~ m#/lib/.*Locale/CLDR/Locales#;
 
     opendir(my $dir, $path);
 	foreach my $file (readdir $dir) {
@@ -1397,11 +1397,40 @@ has 'likely_subtag' => (
 	predicate => '_has_likely_subtag',
 );
 
+has 'old_isa' => (
+    is => 'rw',
+    isa => ArrayRef,
+    init_arg => undef,
+    default => sub {[]},
+);
+
+sub _fixup_segmentation_parent {
+    my $self = shift;
+    my $module_ref = ref $self->module;
+    no strict 'refs';
+
+    $self->old_isa([@{"${module_ref}::ISA"}]) unless @{$self->old_isa};
+
+    my $parent = $self->module->segmentation_parent;
+    no strict 'refs';
+    @{ ref ($self->module) . '::ISA'} = ($parent);
+}
+
+sub _return_parent {
+    my $self = shift;
+    my @parents = @{ $self->old_isa };
+    $self->old_isa([]);
+    no strict 'refs';
+    @{ ref ($self->module) . '::ISA'} = @parents;
+}
+
 sub _build_break {
 	my ($self, $what) = @_;
-
+    # We might need to change the class hierarchy here
+    $self->_fixup_segmentation_parent;
 	my $vars = $self->_build_break_vars($what);
 	my $rules = $self->_build_break_rules($vars, $what);
+    $self->_return_parent;
 	return $rules;
 }
 
@@ -1435,85 +1464,53 @@ sub IsCLDREmpty {
 }
 
 # Test for missing Unicode properties
-my $has_emoji = eval '1 !~ /\p{emoji}/';
-my $has_Grapheme_Cluster_Break_ZWJ = eval '1 !~ /\p{Grapheme_Cluster_Break=ZWJ}/';
-my $has_Grapheme_Cluster_Break_E_Base = eval '1 !~ /\p{Grapheme_Cluster_Break=E_Base}/';
-my $has_Grapheme_Cluster_Break_E_Base_GAZ = eval '1 !~ /\p{Grapheme_Cluster_Break=E_Base_GAZ}/';
-my $has_Grapheme_Cluster_Break_E_Modifier = eval '1 !~ /\p{Grapheme_Cluster_Break=E_Modifier}/';
-my $has_Word_Break_ZWJ = eval '1 !~ /\p{Word_Break=ZWJ}/';
-my $has_Word_Break_E_Base = eval '1 !~ /\p{Word_Break=E_Base}/';
-my $has_Word_Break_E_Base_GAZ = eval '1 !~ /\p{Word_Break=E_Base_GAZ}/';
-my $has_Word_Break_E_Modifier = eval '1 !~ /\p{Word_Break=E_Modifier}/';
-my $has_Word_Break_Hebrew_Letter = eval '1 !~ \p{Word_Break=Hebrew_Letter}/';
-my $has_Word_Break_Single_Quote = eval '1 !~ \p{Word_Break=Single_Quote}/';
-my $has_Line_Break_ZWJ = eval '1 !~ /\p{Line_Break=ZWJ}/';
-my $has_Line_Break_E_Base = eval '1 !~ /\p{Line_Break=E_Base}/';
-my $has_Line_Break_E_Base_GAZ = eval '1 !~ /\p{Line_Break=E_Base_GAZ}/';
-my $has_Line_Break_E_Modifier = eval '1 !~ /\p{Line_Break=E_Modifier}/';
-my $has_Extended_Pictographic = eval '1 !~ /\p{Extended_Pictographic}/';
-my $has_Word_Break_WSegSpace = eval '1 !~ /\p{Word_Break=WSegSpace}/';
-my $has_Indic_Syllabic_Category_Consonant = eval '1 !~ /\p{Indic_Syllabic_Category=Consonant}/';
+my @properties = (qw(
+    emoji
+    Extended_Pictographic
+    Grapheme_Cluster_Break=E_Base
+    Grapheme_Cluster_Break=E_Base_GAZ
+    Grapheme_Cluster_Break=E_Modifier
+    Grapheme_Cluster_Break=ZWJ
+    Indic_Conjunct_Break=Consonant
+    Indic_Conjunct_Break=Extend
+    Indic_Conjunct_Break=Linker
+    Indic_Syllabic_Category=Consonant
+    Line_Break=Aksara
+    Line_Break=Aksara_Prebase
+    Line_Break=Aksara_Start
+    Line_Break=E_Base
+    Line_Break=E_Base_GAZ
+    Line_Break=E_Modifier
+    Line_Break=Virama
+    Line_Break=Virama_Final
+    Line_Break=ZWJ
+    Word_Break=E_Base
+    Word_Break=E_Base_GAZ
+    Word_Break=E_Modifier
+    Word_Break=Hebrew_Letter
+    Word_Break=Single_Quote
+    Word_Break=WSegSpace
+    Word_Break=ZWJ
+));
+
+my %missing_unicode_properties = ();
+
+foreach my $missing (@properties) {
+    $missing_unicode_properties{$missing} = 1
+        unless eval "1 !~ /\\p{$missing}/";
+}
 
 sub _fix_missing_unicode_properties {
 	my $regex = shift;
 	
 	return '' unless defined $regex;
 	
-	$regex =~ s/\\(p)\{emoji\}/\\${1}{IsCLDREmpty}/ig
-		unless $has_emoji;
-		
-	$regex =~ s/\\(p)\{Grapheme_Cluster_Break=ZWJ\}/\\${1}{IsCLDREmpty}/ig
-		unless $has_Grapheme_Cluster_Break_ZWJ;
-		
-	$regex =~ s/\\(p)\{Grapheme_Cluster_Break=E_Base\}/\\${1}{IsCLDREmpty}/ig
-		unless $has_Grapheme_Cluster_Break_E_Base;
-	
-	$regex =~ s/\\(p)\{Grapheme_Cluster_Break=E_Base_GAZ\}/\\${1}{IsCLDREmpty}/ig
-		unless $has_Grapheme_Cluster_Break_E_Base_GAZ;
-
-	$regex =~ s/\\(p)\{Grapheme_Cluster_Break=E_Modifier\}/\\${1}{IsCLDREmpty}/ig
-		unless $has_Grapheme_Cluster_Break_E_Modifier;
-		
-	$regex =~ s/\\(p)\{Word_Break=ZWJ\}/\\${1}{IsCLDREmpty}/ig
-		unless $has_Word_Break_ZWJ;
-
-	$regex =~ s/\\(p)\{Word_Break=E_Base\}/\\${1}{IsCLDREmpty}/ig
-		unless $has_Word_Break_E_Base;
-
-	$regex =~ s/\\(p)\{Word_Break=E_Base_GAZ\}/\\${1}{IsCLDREmpty}/ig
-		unless $has_Word_Break_E_Base_GAZ;
-
-	$regex =~ s/\\(p)\{Word_Break=E_Modifier\}/\\${1}{IsCLDREmpty}/ig
-		unless $has_Word_Break_E_Modifier;
-
-	$regex =~ s/\\(p)\{Word_Break=Hebrew_Letter\}/\\${1}{IsCLDREmpty}/ig
-		unless $has_Word_Break_Hebrew_Letter;
-
-	$regex =~ s/\\(p)\{Word_Break=Single_Quote\}/\\${1}{IsCLDREmpty}/ig
-		unless $has_Word_Break_Single_Quote;
-		
-	$regex =~ s/\\(p)\{Line_Break=ZWJ\}/\\${1}{IsCLDREmpty}/ig
-		unless $has_Line_Break_ZWJ;
-
-	$regex =~ s/\\(p)\{Line_Break=E_Base\}/\\${1}{IsCLDREmpty}/ig
-		unless $has_Line_Break_E_Base;
-
-	$regex =~ s/\\(p)\{Line_Break=E_Base_GAZ\}/\\${1}{IsCLDREmpty}/ig
-		unless $has_Line_Break_E_Base_GAZ;
-
-	$regex =~ s/\\(p)\{Line_Break=E_Modifier\}/\\${1}{IsCLDREmpty}/ig
-		unless $has_Line_Break_E_Modifier;
-
-	$regex =~ s/\\(p)\{Extended_Pictographic\}/\\${1}{IsCLDREmpty}/ig
-		unless $has_Extended_Pictographic;
-	
-	$regex =~ s/\\(p)\{Word_Break=WSegSpace\}/\\${1}{IsCLDREmpty}/ig
-		unless $has_Word_Break_WSegSpace;
-
-    $regex =~ s/\\(p)\{Indic_Syllabic_Category=Consonant\}/\\${1}{IsCLDREmpty}/ig
-		unless $has_Indic_Syllabic_Category_Consonant;
-	
-	return $regex;
+    foreach my $missing (keys %missing_unicode_properties) {
+        $regex =~ s/\\(p)\{$missing\}/\\${1}{IsCLDREmpty}/ig
+            if $missing_unicode_properties{$missing};
+    }
+    
+    return $regex;
 }
 
 sub _build_break_rules {
@@ -1553,6 +1550,47 @@ sub _build_break_rules {
 	return \@rules;
 }
 
+sub _parse_string_extensions {
+    my ($self, $extensions) = @_;
+    return '' unless length $extensions;
+    my @extensions = split /[-_]/, $extensions;
+    my $vo = ref $self ? $self : $self->new();
+    my %keys = ($vo->valid_keys , $vo->key_names );
+    my @extension_keys = keys %keys;
+    my %extensions;
+    my @values = ();
+    
+    my $key = '';
+    foreach my $extension (@extensions) {
+        if (! $key ) { # This should be a new key
+            $key = $extension;
+            @values = ();
+            die "Invalid extension key $key\n" unless grep { $_ eq $key } @extension_keys;
+        }
+        else {
+            my $value = $extension;
+            my $next_key = '';
+            if (!@values && grep { $_ eq $value } @extension_keys) { # We have a new key where we where expecting a value
+                                                                    # Assume the real value is true as per CLDR rules on extensions
+                $next_key = $value;
+                push @values,'true';
+            }
+            elsif(! grep { $_ eq $value } @extension_keys) { # have a value to add to the key
+                push @values, $value;
+            }
+            else { # we have a new key and values so assign the values and reset the key
+                $extensions{$key} = [@values];
+                $key = $next_key || $value;
+                @values = ();
+            }
+        }
+    }
+    # Add the last key value pair
+    push @values,'true' unless @values;
+    $extensions{$key} = \@values;
+    return \%extensions;
+}
+
 sub BUILDARGS {
 	my $self = shift;
 	my %args;
@@ -1564,22 +1602,24 @@ sub BUILDARGS {
 	}
 
 	if (1 == @_ && ! ref $_[0]) {
-		my ($language, $script, $region, $variant, $extensions)
+		my ($language, $script, $region, $variant, @extensions)
 		 	= $_[0]=~/^
 				([a-zA-Z]+)
 				(?:[-_]([a-zA-Z]{4}))?
 				(?:[-_]([a-zA-Z]{2,3}))?
 				(?:[-_]([a-zA-Z0-9]+))?
-				(?:[-_][uU][_-](.+))?
+				(?:[-_]([uUtT](?:[_-][a-zA-Z0-9]{2,})+)){0,2}
 			$/x;
-
+            
+        my ($extensions, $transforms) = sort { $a =~ /^u/i ? -1 : 1 } @extensions;
+        
 		if (! defined $script && length $language == 4 && lc $language ne 'root') { # root is a special case and is the only 4 letter language ID
 			$script = $language;
 			$language = undef;
 		}
 		
-		foreach ($language, $script, $region, $variant) {
-			$_ = '' unless defined $_;
+		foreach ($language, $script, $region, $variant, $extensions, $transforms) {
+			$_ //= '';
 		}
 
 		%args = (
@@ -1587,7 +1627,8 @@ sub BUILDARGS {
 			script_id	=> $script,
 			region_id	=> $region,
 			variant_id	=> $variant,
-			extensions	=> $extensions,
+			extensions	=> $extensions =~ s/^[uU][-_]//r,
+            transforms  => $transforms =~ s/^[tT][-_]//r,
 		);
 	}
 
@@ -1597,13 +1638,10 @@ sub BUILDARGS {
 			: @_
 	}
 
-	# Split up the extensions
-	if ( defined $args{extensions} && ! ref $args{extensions} ) {
-		$args{extensions} = {
-			map {lc}
-			split /[_-]/, $args{extensions}
-		};
-	}
+    # Split up the extensions
+	if ( ! ref $args{extensions} ) {
+		$args{extensions} = $self->_parse_string_extensions($args{extensions});
+    }
 
 	# Fix casing of args
 	$args{language_id}	= lc $args{language_id}			if defined $args{language_id};
@@ -1613,6 +1651,11 @@ sub BUILDARGS {
 	
 	# Set up undefined language
 	$args{language_id} ||= 'und';
+    
+    # Convert empty extensions and transforms back to undef
+    foreach (@args{qw(extensions transforms)}) {
+        $_ = undef if defined && $_ eq '';
+    }
 
 	$self->SUPER::BUILDARGS(%args, %internal_args);
 }
@@ -1647,16 +1690,17 @@ sub BUILD {
 		my @keys = keys %{$args->{extensions}};
 
 		foreach my $key ( @keys ) {
-			my $canonical_key = exists $key_aliases{$key} ? $key_aliases{$key} : undef;
-			$canonical_key //= $key;
+			my $canonical_key = exists $key_aliases{$key} ? $key_aliases{$key} : $key;
 			if ($canonical_key ne $key) {
 				$args->{extensions}{$canonical_key} = delete $args->{extensions}{$key};
 			}
 
 			$key = $canonical_key;
 			die "Invalid extension name" unless exists $valid_keys{$key};
-			die "Invalid extension value" unless 
-				first { $_ eq $args->{extensions}{$key} } @{$valid_keys{$key}};
+            foreach my $value (@{$args->{extensions}{$key}}) {
+                die "Invalid extension value $value\n" unless 
+                    first { $_ eq $value } @{$valid_keys{$key}};
+            }
 		}
 
 		$self->_set_extensions($args->{extensions});
@@ -1715,10 +1759,10 @@ after 'BUILD' => sub {
 	# Fix up extension overrides
 	my $extensions = $self->extensions;
 	
-	foreach my $extention ( qw( ca cf co cu dx em fw hc lb lw ms nu rg sd ss tz va ) ) {
-		if (exists $extensions->{$extention}) {
-			my $default = "_set_default_$extention";
-			$self->$default($extensions->{$extention});
+	foreach my $extension ( qw( ca cf co cu dx em fw hc lb lw ms mu nu rg sd ss tz va ) ) {
+		if (exists $extensions->{$extension}) {
+			my $default = "_set_default_$extension";
+			$self->$default($extensions->{$extension});
 		}
 	}
 };
@@ -1726,15 +1770,32 @@ after 'BUILD' => sub {
 # Defaults get set by the -u- extension
 # Calendar, currency format, collation order, etc.
 # but not nu as that is done in the Numbering systems role
-foreach my $default (qw( ca cf co cu dx em fw hc lb lw ms rg sd ss tz va)) {
+foreach my $default (qw( ca cf co cu dx em fw hc lb lw ms mu rg sd ss tz va)) {
 	has "_default_$default" => (
 		is			=> 'ro',
-		isa			=> Str,
+		isa			=> ArrayRef,
 		init_arg	=> undef,
-		default		=> '',
+		default		=> sub {[]},
 		writer		=> "_set_default_$default",
 	);
 	
+    around "_default_$default" => sub {
+        my ($orij, $self) = @_;
+        
+        if (wantarray) {
+            return @{$self->$orij};
+        }
+        else {
+            return $self->$orij->[0];
+        }
+    };
+    
+    around "_set_default_$default" => sub {
+        my ($orij, $self, $value) = @_;
+        $value = [ $value ] unless ref $value;
+        return $self->$orij($value);
+    };
+    
 	no strict 'refs';
 	*{"_test_default_$default"} = sub {
 		my $self = shift;
@@ -1806,7 +1867,7 @@ sub _build_id {
 	if (defined $self->extensions) {
 		$string.= '_u';
 		foreach my $key (sort keys %{$self->extensions}) {
-			my $value = $self->extensions->{$key};
+			my $value = join '_', sort @{$self->extensions->{$key}};
 			$string .= "_${key}_$value";
 		}
 		$string =~ s/_u$//;
@@ -4323,7 +4384,7 @@ sub week_data_first_day {
 	my ($self, $region_id) = @_;
 	
 	if ($self->_test_default_fw) {
-		return $self->_default_fw;
+		return scalar $self->_default_fw;
 	}
 	
 	my $week_data_hash = $self->_week_data_first_day();
@@ -4634,7 +4695,9 @@ sub currency_format {
 	}
 	
 	$default_currency_format = 'accounting' if $default_currency_format eq 'account';
-	
+	if ($default_currency_format eq 'accounting' && ! $format->{$default_numbering_system}{pattern}{default}{accounting}{positive}) {
+        return $self->currency_format('standard');
+    }
 	return join ';',
 		$format->{$default_numbering_system}{pattern}{default}{$default_currency_format}{positive},
 		defined $format->{$default_numbering_system}{pattern}{default}{$default_currency_format}{negative}
@@ -4724,7 +4787,7 @@ If no region id is given then the current locale's is used
 sub default_currency {
 	my ($self, $region_id) = @_;
 	
-	return $self->_default_cu if $self->_test_default_cu();
+	return scalar $self->_default_cu if $self->_test_default_cu();
 	
 	$region_id //= $self->region_id;
 	
@@ -5267,13 +5330,8 @@ sub _collation_max_variable {
 =head1 Locales
 
 Other locales can be found on CPAN. You can install Language packs from the 
-Locale::CLDR::Locales::* packages. You will in future be able to install language
-packs for a given region by looking for a Bundle::Locale::CLDR::* package.
-
-If you are looking for a language pack that is not yet published then get hold of
-the version 0.25.4 from http://search.cpan.org/CPAN/authors/id/J/JG/JGNI/Locale-CLDR-v0.25.4.tar.gz
-which has data for all locals alternatively you can get hold of the latest version of the
-code from git hub at https://github.com/ThePilgrim/perlcldr
+Locale::CLDR::Locales::* packages. You can install language packs for a given 
+region by looking for a Bundle::Locale::CLDR::* package.
 
 =head1 AUTHOR
 
@@ -5323,7 +5381,7 @@ regex engine.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2009-2015 John Imrie.
+Copyright 2009-2024 John Imrie and others.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

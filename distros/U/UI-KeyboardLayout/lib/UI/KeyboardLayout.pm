@@ -1,6 +1,6 @@
 package UI::KeyboardLayout;
 
-$VERSION = $VERSION = "0.73";
+$VERSION = $VERSION = "0.75";
 
 binmode $DB::OUT, ':utf8' if $DB::OUT;		# (older) Perls had "Wide char in Print" in debugger otherwise
 binmode $DB::LINEINFO, ':utf8' if $DB::LINEINFO;		# (older) Perls had "Wide char in Print" in debugger otherwise
@@ -18,8 +18,8 @@ BEGIN { my $n = ($ENV{UI_KEYBOARDLAYOUT_DEBUG} || 0);
 	my @dbg = (qw( debug_face_layout_recipes debug_GUESS_MASSAGE debug_OPERATOR debug_import debug_stacking debug_noid ),
 	#		0x40			0x80		0x100	0x200		0x400		0x800		0x1000
 		   qw(warnSORTEDLISTS printSORTEDLISTS warnSORTCOMPOSE warnDO_COMPOSE warnCACHECOMP dontCOMPOSE_CACHE warnUNRES),
-	#		0x2000			0x4000
-		   qw(debug_STACKING	printSkippedComposeKey),
+	#		0x2000			0x4000		 0x8000		0x10000
+		   qw(debug_STACKING	printSkippedComposeKey	warnReached  debug_stacking_ord),
 		   '_debug_PERL_dollar1_scoping');
 	my $c = 0;		# printSORTEDLISTS: Dumpvalue to STDOUT (implementation detail!)
 	my @dbg_b = map $n & (1<<$_), 0..31;
@@ -108,6 +108,8 @@ UI::KeyboardLayout - Module for designing keyboard layouts
   close $f or die;
   $k->print_decompositions($d);
   $k->print_compositions  ($c);
+  # selected print
+  $l->print_compositions_ch_filter( [qw(<super> <pseudo-fake-super> <pseudo-manual-superize>)] ); 
   
   UI::KeyboardLayout::->set_NamesList("$ENV{HOME}/Downloads/NamesList.txt", 
   				      "$ENV{HOME}/Downloads/DerivedAge.txt"); 
@@ -342,6 +344,32 @@ version; hardwired now as C<1.0>) and keys C<LRM_RLM ALTGR SHIFTLOCK> defining
 what goes into the C<ATTRIBUTES> section of F<.klc> file (the latter may also
 be specified in a face's section, or its parents).
 
+=head2 Layers and Faces
+
+An "abstract" I<layer> is, essentially, just two arrays of “generated characters”: one
+for the un-C<Shift>ed state, and one for C<Shift>ed state.  A “generated characters”
+may be also a prefix keypress ("redirecting" to a different face); it may also have
+an attached metadata (for example, by which rules this character was generated, and
+which "ornaments" to use when one "visualizes" this keybinding.
+
+Most layers are just intermediate "building blocks" for constructing other layers.
+However, many layers are going to be output to the final description of the keyboard.
+For the latter layers, the position in the array should be thought of as associated
+(by the tables outside of the context of the layer) with particular physical key
+of the keyboard.  These positions are split into several intervals corresponding to
+different "isles" of the keyboard: the main isle, numeric isle, movement/insert/del
+keys, and function keys.
+
+The layers are defined by the visual sections of the keyboard definition, and by
+I<layer recipes> (well, one can also define layers by embedding/importing tables
+in MSKLC’s format).  The format of the visual sections is designed to define things
+"organized in row".  Every "generalized character" in a layer either comes from a
+visual section, or is produced by a "recipe rule" from (another) character from
+(another) layer.  (So they carry "a chain of provenance".)
+
+A I<face> consists of several layers (typically two: one for C<AltGr> not pressed,
+and one for C<AltGr> pressed) and a lot of associated metadata,
+
 =head2 Layer/Face/Prefix-key Recipes
 
 The sections C<layer_recipes> and C<face_recipes> contain instructions how
@@ -369,7 +397,7 @@ of the resulting layers, or in different layouts.
 A recipe may be of three kinds: it is either a "first comer wins" which is a space-separated collection of
 simpler recipes, or C<SELECTOR(COMPONENTS)>, or a "mutator": C<MUTATOR(BASE)> or just C<MUTATOR>.
 All recipes must be C<()>-balanced
-and C<[]>-balanced; so must be the C<MUTATOR>; in turn, the C<BASE> is either a 
+and C<[]>-balanced; so must be the C<MUTATOR>s; in turn, the C<BASE> is either a 
 layer name, or another recipe.  A layer name must be defined either in a visual C<KBD> section,
 or be a key in the C<layer_recipes> section (so it should not have C<+()[]> characters),
 or be the literal C<Empty>.
@@ -384,7 +412,10 @@ of the recipe.  The C<FlipLayers> builder is similar to C<Face>, but chooses the
 layer ("cyclically the next" layer if more than 2 are present).
 
 The other selectors are C<Self>, C<LinkFace> and C<FlipLayersLinkFace>; they
-operate on the base face or face associated to the base face.
+operate on the base face or face associated to the base face.  B<NOTE:> when C<NAME> is a name of a “personality” face (which
+is construted in steps for its C<Layers> declaration, C<LinkFace> and specific C<VK>-keys), C<Face(NAME)> is based only on this
+C<Layers> declaration.  Use C<FullFace(NAME)> to address the “synthesized” state of the face (the result depends on which moment
+this state is accessed!).  (Likewise for C<FullFlipLayers>.)  See also L<"Implementation details: C<FullFace(FNAME)>">.
 
 The simplest forms of C<MUTATORS> are C<Id, lc, uc, ucfirst, Empty> (note that
 C<uc>/C<lc>/C<ucfirst> return C<undefined> when case-conversion results in no
@@ -1106,7 +1137,7 @@ If/when one forgets the keying of the shortcut, but remembers such a rule,
 a short experiment with these positions allows one to reconstruct the lost
 memory.
 
-=item
+=item 2
 
 The "base keyboards" (those used for continuous typing in a certain language
 or script) should be identical to some "standard" widely used keyboards.
@@ -1117,14 +1148,14 @@ script B has more letters than a script A, then a lot of
 This missing punctuation should be made available by pressing a modifier
 (C<AltGr>? compare with L<MicroSoft's Vietnamese keyboard|http://www.microsoft.com/resources/msdn/goglobal/keyboards/kbdvntc.html>'s top row).
 
-=item
+=item 3
 
 If more than one base keyboard is used, there must be a quick access:
 if one needs to enter one letter from layout B when the active layout is A, one
 should not be forced to switch to B, type the letter, then switch back
 to A.  It should better be available I<also> on a prefixed combination "C<Quick_Access_Key letter>".
 
-=item
+=item 4
 
 One should consider what the C<Quick_Access_Key> does when the layouts A
 and B are identical on a particular key (e.g., punctuation).  One can go with the "Occam's
@@ -1141,7 +1172,7 @@ remember that OS (or misbehaving applications) may make some keypresses
 "unavailable".  I feel that in these situations, “having duplication” is
 a significant advantage over “having some extra symbols available”.
 
-=item
+=item 5
 
 The considerations in two preceding parts are applicable also in the
 case when there are more “allied” layouts than A and B.  Ways to make it possible
@@ -1156,7 +1187,7 @@ here we have two quick access prefix keys, the left one C<L_Quick>, and the righ
 C<R_Quick>.  Superscripts C<² ³ …> mean “pressing the prefix key several times”;
 the prefix keys move one left/right along the chain of layouts.
 
-=item
+=item 6
 
 The three preceding parts were concerned with entering one character from
 an “allied” layout.  To address another frequent need, entering one word
@@ -1169,18 +1200,18 @@ This should not stop one from implementing this feature: sometimes one has a cho
 from several applications performing the same task.  Moreover, since this feature
 is a “frill”, there is no pressing need to have it I<always> available.)
 
-=item
+=item 7
 
 Paired symbols (such as such as ≤≥, «», ‹›, “”, ‘’ should be put on paired 
 keyboard's keys: <> or [] or ().
 
-=item
+=item 8
 
 "Directional symbols" (such as arrows) should be put either on numeric keypad
 or on a 3×3 subgrid on the letter-part of the keyboard (such as QWE/ASD/ZXC).
 (Compare with [broken?] implementation in L<Neo2|http://www.mzuther.de/en/contents/osd-neo2>.)
 
-=item
+=item 9
 
 for symbols that are naturally thought of as sitting in a table, one can 
 create intuitive mapping of quite large tables to the keyboard.  Split each
@@ -1192,7 +1223,7 @@ one can map up to 8×10×2 (or 8×20) table to a keyboard.
 
 B<Example:> Think of L<IPA consonants|http://en.wikipedia.org/wiki/International_Phonetic_Alphabet#Consonants>.
 
-=item
+=item 10
 
 Cheatsheets are useful.  And there are people who are ready to dedicate a
 piece of their memory to where on a layout is a particularly useful to them
@@ -1210,7 +1241,7 @@ and one with all the bells and whistles.
 information indicated by classes in markup.  The details may be treated
 by the CSS rules.)
 
-=item
+=item 11
 
 "There is more than one way to do it" is not a defect, it is an asset.
 If it is a reasonable expectation to find a symbol X on keypress K', and
@@ -1222,7 +1253,7 @@ B<Example:> The standard Russian phonetic layout has Ё on the C<^>-key; on the
 other hand, Ё is a variant of Е; so it makes sense to have Ё available on
 C<AltGr-Е> as well.  Same for Ъ and Ь.
 
-=item
+=item 12
 
 Dead keys which are "abstract" (as opposed to being related to letters
 engraved on physical keyboard) should better be put on modified state
@@ -1458,7 +1489,7 @@ if none with the needed glyph, suitable non-Latin-1 "spacing modifier letters" o
 If followed by “special keys”, one should be able to access other related 
 modifier letters and combining characters (see L<"Classification of diacritics">
 and the section C<Diacritics> in L<the example
-layout|http://search.cpan.org/~ilyaz/UI-KeyboardLayout/examples/izKeys.kbdd>);
+layout|https://search.cpan.org/~ilyaz/UI-KeyboardLayout/examples/izKeys.kbdd>);
 one possible convenient choice is:
 
 =over 4
@@ -1523,7 +1554,7 @@ and prefix keys, so it is not clear which keypresses produce combining character
 =head2 What follows is partially deprecated
 
 Parts of following subsections is better explained in
-L<visual description of the izKeys layout|http://math.berkeley.edu/~ilya/keyboard/iz/windows/izKeys-visual-maps.html>;
+L<visual description of the izKeys layout|http://k.ilyaz.org/iz/windows/izKeys-visual-maps.html>;
 some other parts duplicate 
 
 =head2 On principles of intuitive design of Latin keyboard
@@ -1720,7 +1751,7 @@ the explanation of the rule 2.
 With many diacritics, and the limited mnemonically-viable positions on
 the keyboard, it makes sense to merge several diacritics on the same prefix key.
 Possible candidates are cedilla/ogonek/comma-below (on C<AltGr-,>),
-dot-above/ring-above/dot-below (on C<AltGr-.>), caron/breve, circumflex/inverted-breve (on C<AltGr-^).
+dot-above/ring-above/dot-below (on C<AltGr-.>), caron/breve, circumflex/inverted-breve (on C<AltGr-^>).
 In some cases, only one of the diacretics would be applicable to a particular character.
 Otherwise, one must decide which of several choices to prefer.  The notes below may be
 useful when designing such preferences.  (This module can take most of such choices
@@ -2488,7 +2519,8 @@ The keys which are currently down are mapped to the ORed bitmap (see above).
 
 If the key event does not contribute to input-by-number via numeric keypad,
 and C<KBDALT> is set, and no other bits except C<KBDSHIFT>, C<KBDKANA> are set:
-then the bit C<KBDALT> is removed from the ORed mask.
+then the bit C<KBDALT> is removed from the ORed mask.  (We call this “C<KBDALT>
+stripping” below.)
 
 =item 5
 
@@ -2787,7 +2819,8 @@ nowadays keyboard accelerators are rarely the I<only> way to access features of 
 and among hundreds of keyboard layout I saw, all but 2 or 3 would not “steal” I<anything> from applications.
 (Or maybe the developers just have no clue that the correct solution is so simple?)
 
-B<NOTE:> Among the applications I checked, the worst offender is Firefox.  It follows L<a particularly
+B<NOTE:> Among the applications I checked, the worst offender was Firefox (it improved a lot after I reported
+its problems; see below).  It follows L<a particularly
 unfortunate advice by Mike Kaplan|http://blogs.msdn.com/b/michkap/archive/2005/01/19/355870.aspx>
 and tries to reconstruct the mentioned above row/columns table of the keyboard layout, then
 uses this (heuristically reconstructed) table as a substitute for the real thing.  And
@@ -2797,7 +2830,12 @@ behaviour of the keyboard (the behaviour observed in less baroque applications).
 keyboards uses different modification columns for C<lCtrl-lAlt> and C<AltGr>=C<rAlt>
 modifiers, pressing C<AltGr-key> inputs wrong characters in Firefox.
 
-B<NOTE:> Among notable applications which fail spectacularly is Emacs.  The developers
+(After I reported Firefox bugs, the handling much improved.  In v.55 I can observe one major problem — but
+on grandious scale: in some layouts defining C<OEM_8> JIS left-of-backspace
+“replacement-for-ISO-key”, Firefox locks completely when one switches to these keyboards.)
+
+B<NOTE:> Among notable applications which fail spectacularly was Emacs (this changed
+dramatically when my patches were accepted).  The developers
 forget that for a generation, it is already XXI century; so they L<use ToAscii() instead of
 ToUnicode()|http://fossies.org/linux/misc/emacs-24.3.tar.gz:a/emacs-24.3/src/w32fns.c>!
 (Even if ToUnicode() is available, its result is converted to the result of the
@@ -2997,7 +3035,7 @@ In short, these layouts have an extra table which may define the following enhan
 
   One 3-state (or 2-state) radio-button:
       on keys with VK codes DBE_ALPHANUMERIC/DBE_HIRAGANA/DBE_KATAKANA
-         (the third state can be also toggled independently of the others).
+         (the third state can be also toggled (?!) independently of the others).
   Three Toggling (like CAPSLOCK) button (pairs): 
       toggling radio-button-like VK codes DBE_SBCSCHAR/DBE_DBCSCHAR, DBE_ROMAN/DBE_NOROMAN, DBE_CODEINPUT/DBE_NOCODEINPUT
   Make key produce different VK codes with different modifiers.
@@ -3008,7 +3046,8 @@ In short, these layouts have an extra table which may define the following enhan
 (Via assigning ORed masks to radio-buttons, the radio-buttons and toggle-buttons above may affect the layout.
 Using this, it is easy to convert each toggling buttons to 2-state radiobuttons.
 The limitation is that the number of modification columns compatible with the
-extra table is at most 8 — counting one for C<Ctrl>.)
+extra table is at most 8 (B<but no>, it is 16 — see
+L<"Workarounds for WINDOWS GOTCHAS for application developers (problems in kernel)">!) — counting one for C<Ctrl>.)
 
 Every C<VK> may be associated to two tables of functions, the “normal” one, and the “alternative” one.  For
 every modification column, each table
@@ -3134,43 +3173,88 @@ In this section, we omit discussion of C<Shift> modifier; so every
 bitmap may be further combined with C<KBDSHIFT> to produce two different bindings.
 Assign ORed masks to the modifier keys as follows:X<AssignMasksSmart>
 
-  lCtrl		Win	 lAlt		rAlt			Menu		rCtrl
-  CTRL|LOYA	CTRL|X1	 ALT|KANA	CTRL|ALT|LOYA|X1	CTRL|ALT|X2	CTRL|ALT|ROYA
+  lCtrl		lAlt		rAlt			Menu		rCtrl
+  CTRL|LOYA	ALT|KANA	CTRL|ALT|LOYA|X1	CTRL|ALT|X2	CTRL|ALT|ROYA
 
 with suitable backward-compatible mapping of ORed masks to modification columns.
 This assignment allows using C<KLLF_ALTGR> flag (faking presses of C<lCtrl> when
 C<rAlt> is pressed — this greatly increases compatibility of C<rAlt> with brain-damaged
-applications), all the combinations involving at most one of C<lCtrl>, C<Win> or 
-C<rAlt> give distinct ORed masks, it
-avoids stripping of C<KBDALT> on C<lAlt> combined with other modifiers,
-makes C<CapsLock> work with all relevant combinations, while completely preserving all
-application-visible properties of keyboard events [except those with C<lCtrl-Win-lAlt->
-modifiers; this combination is equivalent to C<lAlt-rAlt->].
+applications), it
+avoids L<stripping of C<KBDALT>|"Keyboard input on Windows, Part II: The semantic of ToUnicode()">
+on C<lAlt> combined with other modifiers,
+makes C<CapsLock> L<work with all relevant combinations|"Workarounds for WINDOWS GOTCHAS for application developers (problems in kernel)">,
+while completely preserving all application-visible properties of keyboard events.
 
 Note that ignoring the C<CTRL> and C<ALT> bits, all combinations of 
 C<LOYA,KANA,X1,X2,ROYA> are possible, which gives at least 32 C<Shift>-pairs.
-In fact, the only combination of C<LOYA,KANA,X1,X2,ROYA> which may appear with
-different C<CTRL,ALT> bits is C<LOYA|X1>; hence there are 33 possible combinations
-of C<CTRL,ALT,LOYA,KANA,X1,X2,ROYA>.  Indeed, C<CTRL> is determined by C<LOYA|X1|X2|ROYA>. 
-If one of C<KANA,X2,ROYA> is present, then C<ALT> is set; so assume C<KANA,X2,ROYA> are not present. 
-But then, if C<ALT> B<may be> set, then both C<LOYA|X1> B<must> be present; which gives the
-only duplication.
 
-Leaving out 5 combinations of C<lCtrl>, C<Win>, C<lAlt> [8, minus the empty one, and 
-C<lCtrl+lAlt>, which is avoided by most application due to its similarity to C<AltGr=rAlt>,
-and C<lCtrl+Win+lAlt> which is undistinguishable by the mask from C<lAlt+rAlt>]
-to have bindable keypresses in applications, and having C<rCtrl> as equivalent to
-C<lCtrl>, this gives 27 C<Shift>-pairs which may produce characters.
+With C<KLLF_ALTGR> flag, C<rAlt> is “forced” into
+C<lCtrl+rAlt> (so these combinations are not distinguishable and produce the same
+bitmaps. — I<This is why> above we assigned C<CTRL|ALT|LOYA|X1> to C<right-Alt>).
+Then there are 24 possible bitmaps (without using
+C<Shift>) — and 3 of them are taken by C<lCtrl> C<rCtrl> and C<lAlt> — which should
+better not be used for character input.  This leaves 21 possible C<Shift>-pairs.
 
-B<NOTE:> C<lCtrl+Win+lAlt> being undistinguishable by the mask from C<lAlt+rAlt>
-is not a big deal, since there is no standard keyboard shortcuts involving C<Ctrl+Win+Alt>.
+(The L<B<izKeys> keyboard layouts|http://k.ilyaz.org> use them for the Base personality
+and its C<AltGr> variant, plus 3 companion personalities (=alphabets), plus 16 for
+L<different flavors|https://en.wikipedia.org/wiki/Mathematical_Alphanumeric_Symbols>
+of Latin and Greek Unicode math symbols. — This misses 2 flavors of Sans-Serif+Bold Greek.
+See more details in L<"Notes on the finer details of assigning modifier-bitmap bits">.)
 
-B<NOTE:> Combinations of C<lCtrl> with C<rCtrl> L<cause several problems|"C<lCtrl-rCtrl> combination: multiple problems">;
-likewise for L<combinations of C<lAlt> with C<rAlt> |"C<lAlt-rAlt> combination: many keys are not delivered to applications">.
+B<WARNING:> the OS attempts to autogenerate bindings (such as C<"\004"> for C<Control-D>)
+for C<Control>-alphabetical keys (based on their C<VK_>codes).  However, this is done
+only if the current modifier bitmap is made of C<SHIFT> C<CTRL> and C<KANA> bits.  So with
+assignments above, it is important to have dedicated columns in the C<LAYOUT> section
+for C<Control->keys.  (But this is done anyway for keyboards generated with C<MSKLC>.)
 
-B<NOTE:> Removing the binding for C<Win> key, only 21 useful C<Shift>-pairs remain.
-(This is what C<version 0.63> of L<izKeys keyboard layout|http://k.ilyaz.org/iz> is
-using; out of 24 distinct combinations, C<lAlt>, C<lCtrl> and C<rCtrl> should be
+B<WARNING:> without any other modifier (except C<Shift>)
+L<the stripping of C<KBDALT>|"Keyboard input on Windows, Part II: The semantic of ToUnicode()">
+still happens with the assignment above.  It results in the bitmap C<KBDKANA> (possibly combined
+ with C<KBDSHIFT>).  For normal functionality of the C<left_Alt>-keys, one should redirect
+these bitmaps to modification columns by I<stripping C<KBDKANA>> from these two bitmaps.
+
+C<NOTE:> since C<KBDALT> stripping leaves a non-base bitmap, one can map to a column I<specific
+to C<Alt>-bindings>.  In particular, even if a keyboard is non-Latin, one can still make C<Alt->keys
+activate English-language menu entries, or trigger Latin-bases accelerator in an application.
+
+This is continued in L<More (random) rambling on assignment of key combinations>.
+
+=head2 Using C<Win>-key
+
+The preceding section was written when I thought that the bitmap is limited
+to 8 bits.  In fact, the bitmap turns out to be 16-bit, so one can enhance the
+discussion above assigning C<X3> bit to C<Win> key, making all the combinations
+with C<Win> fully distinct by their bitmap.
+(See L<"Workarounds for WINDOWS GOTCHAS for application developers (problems in kernel)">.)
+
+B<NOTE:> since the OS uses the bitmap as an index in the array C<MODIFIERS.ModNumber>, the
+size of this array does not affect the speed of lookup.  The only effect of using
+wider bitmaps is the size of the keyboard DLL: using 10 bits instead of 5 would
+only increase the size by 1K.
+
+Since it seems that L<the OS does not eat combinations of C<Win> and C<AltGr>|https://support.microsoft.com/en-us/windows/keyboard-shortcuts-in-windows-dcc61a57-8ff0-cffe-9796-cb9706c75eec>,
+one may actually use these combintations to produce character input.  (Although
+without thorough experiments it is not clear whether this is advisable…  Better
+avoid C<Win> if feasible!)
+
+If one assignes character input to combinations including C<Win+rAlt>, this
+adds 8 more C<Shift>-pairs to 21 discussed above.  For example, one could add
+2 missing math flavors of Greek, add 3 more for C<AltGr>-variants of companion
+personalities, B<as well as free> the C<lCtrl-lAlt> from character
+bindings — freeing it for application accelerators.
+
+(However, it is not clear whether these bindings can be made “orthogonal enough”
+to redeem the trouble!  For example, it is desired for C<AltGr> to “behave the
+same” on the base personality and on its 3 companions, as well as generate
+SanSerif/Bold/Italic variants of Latin/Greek by adding 3 modifiers.  Is it even
+possible?!)
+
+=head2 Notes on the finer details of assigning modifier-bitmap bits
+
+B<NOTE:> Without using the C<Win> key, only 21 useful C<Shift>-pairs remain (with the
+assignment above and using C<KLLF_ALTGR> flag).
+(This is what C<versions ≥0.63> of L<B<izKeys> keyboard layout|http://k.ilyaz.org/iz> is
+using; out of 24 combinations with distinct bitmaps, C<lAlt>, C<lCtrl> and C<rCtrl> should be
 excluded.)  B<Trivia:> While this may look as a complete overkill, recall that characters
 outside BMP can be inserted on Windows I<only> via one keypress, possibly with many
 modifiers. (This restriction relates only to the “classical” flavor of Windows keyboard layouts).
@@ -3179,7 +3263,17 @@ discourse|http://en.wikipedia.org/wiki/Mathematical_Alphanumeric_Symbols>.  If a
 layout would want to support these letters, this would quickly exhaust the possible combinations
 of modifiers.  (For 2-script layout, one could live with Latin/AltGr-Latin/Greek + 18 mathematical
 alphabets.  But for layouts supporting more scripts, it lookes like using C<Win> key is not
-avoidable.)
+avoidable.)  B<WARNING:> the price for using 21 C<Shift>-pairs (as opposed to ≤20) is that the
+modifiers C<lCtrl-lAlt> are forced to be used for character input.  This is in no way the best
+practice, since many applications using keyboard-accelerators get confusing results in such a
+situation.
+
+(B<HOWTO:> In principle, such applications could inspect the timing data on keypresses to 
+distinguish C<KLLF_ALTGR>-auto-generated C<lCtrl> presses — when C<rAlt> is pressed the timecodes 
+on C<lCtrl> and C<rAlt> are guarantied to be the same — from I<actual> keypresses of
+C<lCtrl> and C<rAlt> made by user — and interpret these as accelerators.  With such inspection,
+one could use C<lCtrl-lAlt> and C<rAlt> for character input, and use C<lCtrl-rAlt->presses
+to control the application.)
 
 B<NOTE:> Applications may call ToUnicode() with I<impossible combinations> of modifiers:
 for example, they may "put" C<Ctrl> down, but do not specify whether it is C<rCtrl> or
@@ -3197,7 +3291,7 @@ yet defined.  In the latter case, one may actually decide I<how> to resolve this
 map this combination of modifiers to an arbitatrary modification column!
 
 In particular, one can map such combination of modifiers to a certain choice of handedness
-of C<Ctrl> and C<Alt>.  (An example of such a problematic application is L<Firefox|"Firefox misinterprets keypresses">;
+of C<Ctrl> and C<Alt>.  (An example of such a problematic application was L<Firefox|"Firefox misinterprets keypresses">;
 look for “I<impossible modifier>”.)
 
 B<NOTE:> Some applications may do a "reverse lookup" using 
@@ -3215,12 +3309,88 @@ the mask which is I<usually> produced by pressing C<rAlt>, the application
 would think (correctly! — but only thanks to this fake entry) that this character 
 may be produced with C<rAlt> modifier.
 
-B<NOTE:> The maximal number of “modification columns” supported by Windows is 126.  A
-larger number would make the size of C<VK_TO_WCHARS...> to overflow the maximal number
-storable in the field C<VK_TO_WCHAR_TABLE.cbSize> of type C<BYTE> = C<unsigned char>.
+B<NOTE:> A keypress may be combined with “modifier keys” (like C<Shift>, C<right-Control> etc.) in up
+to 125 ways.  B<REMARK:> Why not a power of 2?  The maximal number of “modification columns” supported by Windows is 126: a
+larger number would make the size of C<VK_TO_WCHARS...> (which includes 2 extra bytes)
+to overflow the maximal number
+255 storable in the field C<VK_TO_WCHAR_TABLE.cbSize> of type C<BYTE> = C<unsigned char>.
 
 Given that the column 15 is ignored, this reduces the number of strings associated to
 a keypress (with different “modifiers”) to 125.
+
+=head2 Issues with support of European(ISO)/Brazilian(ABNT2)/Japanese(JIS) physical keyboards
+
+How can one keyboard layout (done in software!) retain functionality when used with different physical keyboards?
+
+Three keyboards above have L<extra keys|https://www.win.tue.nl/~aeb/linux/kbd/scancodes-8.html>,
+with their positions on the “main island” of the keyboard and scancodes
+(as well as intended translations to C<VK_>codes) as in:
+
+                          Left           Right       Top-Right
+  ————————————————————————————————————————————————————————————————
+  European(ISO)         56→OEM_102      ---             ---
+  Brazilian(ABNT2)      56→OEM_102     73→ABNT_C1       ---
+  Japanese(JIS)            ---         73→OEM_102    7D→OEM_8
+
+(These keys are positioned right-of-C<left_Shift>, left-of-C<right_Shift>,  left-of-C<Backspace>.)
+
+Recall that a scancode is a signal from hardware (+drivers), while the C<VK_>code is calculated based on the scancode.
+B<CONCLUSION:> these assignments are incompatible in one keyboard layout (due to conflicts of ABNT2/JIS with the translation of the
+scancode 0x73).
+
+On the other hand, European and Brazilian physical keyboards are compatible.  If one keeps these assignments C<56→OEM_102>,
+C<73→ABNT_C1>, then the right extra-key on JIS (marked as C<\> C<_>, between C</?> and right C<Shift>) behaves as the right extra
+key on the Brazilian keyboard.  (This is already good!)
+
+However, “doing only this” makes the functionality assigned to C<OEM_102> unavailable on the Japanese physical keyboard.  However,
+it has one more extra key (to the left of L<Backspace>). — So if one uses its intended translation to C<VK_OEM_8>, but B<duplicates>
+the functionality of C<VK_OEM_102> to C<VK_OEM_8>, then this key I<replaces> “the ISO key”!  (Nowadays they are even marked the
+same: C<\> C<|> — but historically it was C<¥> C<¦> on JIS.)
+
+This boils down to:
+
+=over 4
+
+=item
+
+Assign C<56→OEM_102>, C<73→ABNT_C1>, C<7D→OEM_8> and
+
+=item
+
+duplicate “the layout of” C<OEM_102> to C<OEM_8>.
+
+=item
+
+This results in the “extra right key” on ABNT2 and JIS keyboards behaving the same (C<ABNT_C1>), and
+
+=item
+
+the “extra left key” on ISO/ABNT2 keyboards behaving the same as “extra top-right key” on JIS keyboards.  (While this is
+inconvenient, the position of C<OEM_102> varies anyway on many physical keyboards!)
+
+=back
+
+(The only other shortcoming of this scheme is that applications special-casing the C<VK_>code C<OEM_102> — are there such?! — would
+not act on “the top-right extra-key” as intended. — But anyway, this happens even without using the scheme above!  C<TODO:> Can one
+work around by making an assignment C<e056→OEM_102> and remapping scancode C<56> to C<e056> as in "Low level scancode mapping"
+below?)
+
+B<MORE ISSUES:> On ABNT2 physical keyboard there is one more extra key C<7E→ABNT_C2> (between C<Gray-+> and C<Gray-Enter> on the
+“numeric island”).  In the Brazilean layout it generates “the opposite” of the C<DECIMAL> numeric-island key (C<.> vs. C<,>).  So
+if C<DECIMAL> generates C<.>, it makes sense to duplicate the bindings of the key C<COMMA> to the key C<ABNT_C2>.
+
+Likewise, on JIS physical keyboard the C<Space> key is very narrow — since its space is taken by C<CONVERT> and C<NOCONVERT> keys.
+When one runs non-Japanese keyboard layouts on such a keyboard, “one can restore the justice” and duplicate the bindings of the
+C<SPACE> key to the C<CONVERT> and C<NONCONVERT> keys.
+
+B<NOTE:> it is a judgement call how to implement the mirroring done above.  One could also, for example, map the scan codes
+0x79 and 0x7B (usually translated to C<CONVERT> and C<NONCONVERT> keys) to C<VK_SPACE>.  (However, this may make rebinding of
+these keys in customizable applications harder.)
+
+B<WARNING:> some versions of Firefox may lock when switching to certain keyboards (see
+L<"Can an application on Windows accept keyboard events?  Part II: special key events">).
+With v.55 such a lock would not occur when one
+removes the binding for C<OEM_8> from this keyboard.  Caveat emptor!
 
 =head1 WINDOWS GOTCHAS
 
@@ -3508,7 +3678,14 @@ due to C<gfx.font_rendering.fallback.always_use_cmaps> is irrelevant.
 
 =head2 Firefox misinterprets keypresses
 
+Most of these are fixed (at least as of v.55) except ones marked with [B<*>] below:
+
 =over 4
+
+=item *
+
+[B<*>] Firefox locks completely when one tries to switch to certain keyboards.  See
+details near the end of L<"Can an application on Windows accept keyboard events?  Part II: special key events">.
 
 =item *
 
@@ -3528,13 +3705,13 @@ character-generating key.
 
 =item *
 
-C<Kana-Enter> is not recognized as a character-generating key.
+[B<*>] C<Kana-Enter> is not recognized as a character-generating key.
 
 =item *
 
-C<Alt-+-HEXDIGITS> is not recognized as a character-generating key sequence (recall
+[B<*>] C<Alt-+-HEXDIGITS> is not recognized as a character-generating key sequence (recall
 that C<Alt> should be pressed all the time, and other keys C<+ HEXDIGITS> should be
-pressed+released sequentially).
+pressed+released sequentially).  (Nowadays digits work, but hex letter do not.)
 
 =item *
 
@@ -3554,12 +3731,12 @@ keypad, it is still buggy if C<NumLock> is on, or if the key is C<Numpad-Enter>.
 
 =item *
 
-The keyboard may have C<rCtrl> which produces the same characters as C<lCtrl>, but
+[B<*>] The keyboard may have C<rCtrl> which produces the same characters as C<lCtrl>, but
 which behaves differently when combined with other keys.  FireFox ignores these
 differences.
 
-This is combinable with other remarks above: e.g., C<rCtrl-Kana> is interpreted
-by FireFox as C<lCtrl>.
+This is combinable with other remarks above: e.g., C<lCtrl-Kana> is interpreted
+by FireFox as C<lCtrl>; same with C<lAlt>.
 
 =item *
 
@@ -3578,7 +3755,7 @@ are ignored on character-producing keys.
 
 =item *
 
-If C<lCtrl-lAlt-comma> produces C< — > (this is C<U+200A U+2014 U+200A>), and
+[B<*>] If C<lCtrl-lAlt-comma> produces C< — > (this is C<U+200A U+2014 U+200A>), and
 C<AltGr-comma> produces the “cedilla deadkey”, then pressing C<AltGr-comma c>
 acts as both: first C<U+200A U+2014 U+200A> are inserted, then C<ç>. 
 
@@ -3602,7 +3779,7 @@ expected Y!).
 
 =item 2
 
-in the second case it produces only the character C<ф> generated by C<Kana-f>.  Here
+[B<*>] in the second case it produces only the character C<ф> generated by C<Kana-f>.  Here
 the behaviour is neither as outside Firefox (where it would produce C<Yф>) nor as
 usual in Firefox (where it would eat the undefined sequence).
 
@@ -3730,9 +3907,14 @@ animation when special laptop keys are pressed; if you do not need them, it is s
 to kill).  It was stealing C<Control-Alt-s>.  (But to find I<this> one, I needed to
 kill all suspicious apps one by one…)
 
-=back
-
 =head1 WINDOWS GOTCHAS for keyboard developers using MSKLC
+
+F<MSKLC> has a convenient interactive tool F<MSKLC.exe> and a command-line
+program F<kbdutool.exe>.  However, the latter program has many shortcomings;
+they are listed in the sections below.
+
+The way to fix this is described in
+L<"WORKAROUND: a summary of the productive “alternative” workflow with F<.klc>">.
 
 =head2 Several similar F<MSKLC> created keyboards may confuse the system
 
@@ -3753,21 +3935,21 @@ on the toolbar; positioned to the right of the language code EN/RU
 etc (keyboard icon is not shown if only one keyboard is associated
 to the current language).
 
-=item
+=item 2
 
 Go to the C<Input Language> settings (e.g., right-click on the 
 Language bar, Settings, General.
 
-=item
+=item 3
 
 on this C<General> page, press C<Add> button, go to the language
 in question.
 
-=item
+=item 4
 
 Check the F<.klc> files for recently installed Input Languages.
 
-=item
+=item 5
 
 In MS Keyboard Layout Creator, go to C<File/Load Existing Keyboard>
 list.
@@ -3910,23 +4092,28 @@ inline comments.  If helps, change he workflow to cut off long lines (250 bytes 
 from F<MSKLC>.  This means that the internal table of virtual keys
 mapped to non-C<e0> (sic!) scancodes is overloaded.
 
-Time to switch to direct generation of F<.c> file?  Or you need to
+Time to switch to direct generation of F<.c> file? (See
+L<"WORKAROUND: a summary of the productive “alternative” workflow with F<.klc>">.)
+Or you need to
 triage the “added” virtual keys, and decide which are less important
 so you can delete them from the F<.klc> file.
 
 =head2 Only the first 8 with-modifiers columns are processed by F<kbdutool>
 
-Time to switch to direct generation of F<.c> file?
+Time to switch to direct generation of F<.c> file?  (See
+L<"WORKAROUND: a summary of the productive “alternative” workflow with F<.klc>">.)
 
 =head2 Only the first digit of the which-modifier-column is output by F<kbdutool> in C<LIGATURES>
 
-Time to switch to direct generation of F<.c> file?
+Time to switch to direct generation of F<.c> file?  (See
+L<"WORKAROUND: a summary of the productive “alternative” workflow with F<.klc>">.)
 
 =head2 F<kbdutool> produces C<KEYNAME_DEAD> section with meaningless entries for prefix keys C<0x08>, C<0x0A>, C<0x0D>
 
 These entries do not stop keyboard from working.  They look like C<L"'\b'"	L"Name is here…">...
 
-Time to switch to direct generation of F<.c> file?
+Time to switch to direct generation of F<.c> file?  (See
+L<"WORKAROUND: a summary of the productive “alternative” workflow with F<.klc>">.)
 
 =head2 It is not clear how to compile F<.C> files emitted by F<kbdutool.exe>
 
@@ -3980,11 +4167,13 @@ of C<SHFT_INVALID> for the bitmap 4, but C<SHFT_INVALID> is defined to be 15 any
 
 =head2 F<kbdutool> ignores bits above 0x20 in the modification columns descriptor
 
-Time to switch to direct generation of F<.C> files?
+Time to switch to direct generation of F<.C> files?  (See
+L<"WORKAROUND: a summary of the productive “alternative” workflow with F<.klc>">.)
 
 =head2 F<kbdutool> cannot assign more than one bitmask to a modification column
 
-Time to switch to direct generation of F<.C> files?
+Time to switch to direct generation of F<.C> files?  (See
+L<"WORKAROUND: a summary of the productive “alternative” workflow with F<.klc>">.)
 
 (Quite often, one combination of modifiers should produce the same characters as
 another one.  The format of keyboard layout tables allows them to share a
@@ -3999,7 +4188,8 @@ contains only C<aVkToWch1>/2.
 
 For example, C<VK_SUBTRACT> may be replaced by C<VK_F2> in the LIGATURES table.
 
-Time to switch to direct generation of F<.C> files?
+Time to switch to direct generation of F<.C> files?  (See
+L<"WORKAROUND: a summary of the productive “alternative” workflow with F<.klc>">.)
 
 =head2 F<kbdutool> places C<KbdTables> at end of the generated F<.c> file
 
@@ -4007,7 +4197,8 @@ The offset of this structure should be no more than 0x10000.  Thus keyboards
 with large tables of prefixed keys may fail to load.  This may be related to
 the bug L<"If data in C<KEYNAME_DEAD> takes too much space, keyboard is mis-installed, and “Language Bar” goes crazy">.
 
-Time to switch to direct generation of F<.C> files?
+Time to switch to direct generation of F<.C> files?  (See
+L<"WORKAROUND: a summary of the productive “alternative” workflow with F<.klc>">.)
 
 =head2 Error "the required resource DATABASE is missing" from F<setup.exe>
 
@@ -4042,10 +4233,34 @@ The alternative is to get rid of F<setup.exe> completely, and ask users
 to run the appropriate F<.msi> file from the install package by hand
 (choosing basing on 32-bit vs 64-bit architecture).
 
+=head2 Error when linking: a missing F<oldnames.lib>
+
+It seems that the supplied F<.lib> files of MSKLC are defective.  However, this is
+OK as far as the linked F<.obj> files are self-sufficient (as they should be).
+
+On the other hand, if there is a missing symbol, then the F<.lib> files are attempted
+to be read — and the resulting errors are “emitted first”; this “hides” the error about
+a missing symbol:
+
+   \Microsoft-Keyboard_Layout_Creator\lib\amd64\MSVCRT.lib : warning LNK4003: invalid library format; library ignored
+   LINK : fatal error LNK1104: cannot open file 'OLDNAMES.lib'
+
+To get the name of the missing symbols, one should either substitute these
+libraries by legal (but possibly empty) ones, (as via
+
+  https://gist.github.com/mmozeiko/7f3162ec2988e81e56d5c4e22cde9977
+
+or use the C</verbose> option on the linker to get more detailed output:
+
+ https://stackoverflow.com/questions/5249431/linker-trouble-how-to-determine-where-a-defaultlib-is-coming-from/31146961#31146961
+
+(Another conjectural reason: a conflict between an extern declaration and a static definition of a symbol.)
+
+=head1 WORKAROUND summary of the productive “alternative” workflow with F<.klc>
+
 =head2 Summary of the productive workflow with F<.klc>:
 
-If direct generation of F<.C> files is out of question, the following workflow
-may be used (some of these steps may be omitted depending on how complicated
+(Some of the steps below may be omitted depending on how complicated
 your F<.klc> layout is; for practical implementation, see
 L<the example of F<.klc> creation|http://cpansearch.perl.org/src/ILYAZ/UI-KeyboardLayout/examples/build-iz.pl>
 and L<the example of F<.klc> to F<.dll> 
@@ -4062,22 +4277,191 @@ Store the generated F<setup.exe>, rename the directory.
 
 =item
 
-Make a “less dummied” F<.klc> file (as above, but with the correct description).
-Do as above, and mix in the F<setup.exe> from the previous step.
+Make a “less dummied” F<.klc> file (as above, but with the correct “description” on
+the C<KBD> line).  Do as above, and mix in the F<setup.exe> from the previous step.
+
+This makes a correct “installation framework”. — But it has I<very wrong> F<.dll>
+files!
+
+There is no need to repeat these steps with newer versions of F<.klc> files — unless
+the C<KBD> line changes.
 
 =item
 
-Run the “real” F<.klc> file through the F<kbdutool> CLI.  Fix errors in the
-generated F<.C> and F<.H> files (using scripts and patches if needed).
+Run the “real” F<.klc> file through the F<kbdutool> CLI:
 
-(One may need to remove a few lines in the C<LAYOUT> section to avoid buffer overflows too.)
+  kbdutool.exe -v -w -s -u FILENAME.klc
+
+Fix errors (if any!) in the generated F<.H> files (using scripts and patches if needed).
+(In my experience, even if F<kbdutool.exe> fails, it still creates useful F<.rc> and
+F<.def> files, and a file F<.h> which is either correct, or easy-to-fix: look for
+C<#ERROR#> strings).
 
 =item
 
-Compile the fixed F<.C> files.  (One may need to split them in two to
-decrease the offset of the static table in the DLL to the level
-Windows can handle: less than 64K.)  Mix the generated F<.dll> files
+Create the correct F<.c> file with
+
+  perl ../examples/klc2c.pl FILENAME.klc >C_NAME.c
+
+Here C<C_NAME> is the name from C<KBD> line of F<.klc> file.  (This would
+overwrite the F<.c> file created on preceding step.)
+
+(This assumes that we are in a subdirectory created in the distribution
+directory of <UI::KeyboardLayout>).
+
+=item
+
+Copy the files F<msklc_altgr.c>, F<msklc_altgr_r2l.c>, F<msklc_lig4.h>
+from the
+L<directory F<examples> of the distribution of this Perl module|https://search.cpan.org/~ilyaz/UI-KeyboardLayout/examples/>.
+
+=item
+
+Compile the resulting B<C> files.   For example, one can use
+
+  %ex%\compile_link_kbd.cmd --with-extra-c msklc_altgr iz-la-4s
+
+=item
+
+Mix the generated F<.dll> files
 with the install package made above.
+
+=back
+
+However, one should remember that:
+
+=over 4
+
+=item
+
+The format of F<.klc> files understood by F<MSKLC> is C<UTF-16LE> with C<BOM>.
+Convert, for example, as in
+
+  ( perl -we "print qq(\xff\xfe)" && iconv -f UTF-8 -t UTF-16LE %%f ) > %%f-16
+
+=item
+
+Run
+
+  kbdutool.exe -v -w -s -u FILENAME.klc
+
+with the “honest” F<.klc> file.  In my experience, even if F<kbdutool.exe> fails,
+it still creates useful F<.rc> and F<.def> files, and a file F<.h> which is
+either correct, or easy-to-fix (look for C<#ERROR#> strings).
+
+=item
+
+Unfortunately, F<kbdutool.exe> has problems with long input lines.  So when
+running it as above, one may 
+need to remove a few lines in the C<LAYOUT> section to avoid buffer overflows.
+One may also need to shorten the lines by stripping away the comments (as in
+
+  perl -wlpe "s/^(.{250}[\x80-\xBF]*).*/$1/s" %src%/ooo-us >ooo-us-shorten
+
+ — but this should be done before conversion to C<UTF-16LE-BOM>).
+
+(If one does not remove lines with “unusual” C<VK_>-codes and scancodes,) this
+would not affect the generated files — except F<.c> file which we are
+going to overwrite anyway.
+ 
+=item
+
+The script F<klc2c.pl> has certain limitations (listed at the start of the file).
+However, I expect it to handle everything-non-tricky (except the C<ATTRIBUTES>
+section — for which one may need to substitute F<msklc_altgr> by
+F<msklc_altgr_r2l> (after C<--with-extra-c> above) if C<RTL_LTR> flag is there).
+
+(These attributes affect only one line in these files — proceed likewise with 
+other C<ATTRIBUTE>s.)
+
+=back
+
+This workflow (except the second part) is used by the example script
+L<F<examples/build_here.cmd>|https://search.cpan.org/~ilyaz/UI-KeyboardLayout/examples/build_here.cmd>
+used for generation of L<I<izKeys> layouts|http://k.ilyaz.org>.  This script
+assumes that the “fake” distributions (or the distributions of older versions)
+are in subdirectories F<iz-la-4s> etc. of the current directory, and that the
+F<.klc> files are in the parent directory (C<%src> above); moreover, it assumes
+that C<%Keyboard_Layout_Creator%> is set so that
+
+  %Keyboard_Layout_Creator%\bin\i386\kbdutool.exe
+
+exists).
+
+=back
+
+=head1 Workarounds for WINDOWS GOTCHAS for application developers (problems in kernel)
+
+The “old-style” keyboard layouts in Windows are just tables loaded into memory.  The
+kernel consults these tables when processing keypresses.  One cannot create a
+functionality except those hard-coded into the logic of processing these tables.
+
+However, there is much more flexibility in these tables than what is “typically believed”.
+In particular:
+
+=over 4
+
+=item
+
+The interaction of modifier keys and C<CapsLock> is less restrictive than one may think!  Recall that the modifier keys
+“act” via the associated bitmap, and that C<CAPSLOK-> and C<SGCAPS-> switches trigger only if this bitmap is 0 or C<SHIFT>.
+Likewise, C<CAPSLOKALTGR>-switch trigger only if this bitmap has both C<ALT> and C<CTRL> bits are set.  This may seem to be a strong
+restriction: what to do if only one of C<ALT> and C<CTRL> bits is set?!
+
+However, the latter situation I<may be completely avoided>): see L<"A convenient assignment of C<KBD*> bitmaps to modifier keys">.
+
+B<NOTE:> all keys are affected by C<KANALOK> logic (which mocks turning up C<KANA> bit if C<VK_KANA> key is “logically down” — it
+may be processed as “radiobutton” if it has C<KBDKANA> bit assigned).  This allows Ц<VK_KANA> to
+have effect on some keys (those with KANALOK), and no effect on tother keys (those without).  (Of course, this effect could be
+achieved also by duplicating entries in the columns with C<KBDKANA>!)
+
+=item
+
+The prefix keys (“deadkeys”) cannot produce more than one C<UTF-16> codepoint.  However,
+this does not mean that they cannot “affect” keys producing multi-codepoint strings.  (The
+only limitation for these strings is that one cannot be a prefix of another.)
+
+=item
+
+A keypress may be combined with “modifier keys” (like C<Shift>, C<right-Control> etc.) in up
+to 125 ways.  
+See L<"Notes on the finer details of assigning modifier-bitmap bits">.
+
+=item
+
+A keypress (with particular modifier keys) may produce
+L<a string with up to 125 characters|"Keyboard input on Windows, Part II: The semantic of ToUnicode()">.
+
+See L<"More (random) rambling on assignment of key combinations"> for more details.
+
+=item
+
+The mapping from “a combination of modifier keys” to a column in the translation table goes
+by C<OR>ing certain bitmaps assigned to the modifier keys.  The width of these bitmaps is 16,
+so one can support a huge “orthogonal set” to distinguish all useful combinations of typical
+modifiers (2 each of C<Shift>, C<Control>, C<Alt>, C<Windows>, as well as C<Kana>, C<Menu-key>
+and maybe even C<CapsLock>).
+
+(The actual limit is in the count 125 of possible usable columns — as well as some obscure bugs which
+may be triggered in the installer if the C<.dll> is too large.)
+
+=item
+
+If one uses C<SGCAPS> flag for a partiular key — to have customizable bindings (this affects
+the case when only C<Shift> and C<CapsLock> are active), one can still assign deadkeys to such
+key (with certain modifiers).
+
+The only limitation is that the each of the C<Shift-> and no-C<Shift-> position cannot produce
+deadkeys B<both> “with” and “without” C<CapsLock>.  In presence of other modifiers there is no
+restriction!
+
+(Moreover, by (creatively) combining C<SGCAPS> with C<CAPLOK> even with this limitation one can
+cover all the cases of up to two deadkeys on 4 possible combinations of C<Shift> and C<CapsLock>.
+However, one may need to duplicate the corresponding C<DEADKEY> section with another prefix key.)
+
+(In fact, “ultra-creatively” duplicating with the ”new” deadkey “coded” as C<WCH_DEAD=0xF001>
+(so in the section C<DEADKEY F001>) one can also support one key with up to 3 deadkeys out
+of 4 possible combinations of C<Shift> and C<CapsLock>.)
 
 =back
 
@@ -4105,7 +4489,7 @@ Set a global flag disabling processing of C<WM_(SYS)COMMAND> in the application;
 
 =item *
 
-Call TranslateAccelerator() with an improbably virtual key (C<VK_OEM_AX> or
+Call TranslateAccelerator() with an improbable virtual key (C<VK_OEM_AX> or
 some such) and appropriate ad hoc translation table;
 
 =item *
@@ -4231,7 +4615,8 @@ combinations.  The mapping from modifiers to columns should not be necessarily 1
 
 =head2 Windows combines modifier bitmaps for C<lCtrl>, C<Alt> and C<rAlt> on C<AltGr>
 
-(At least when C<AltGr> is special in the keyboard,) the modifier bitmap bound to this
+(When a keyboard is marked with the C<KLLF_ALTGR> flag — so C<AltGr> is special in the keyboard, and mocks pressing of 2 keys:
+C<lCtrl> then C<rAlt> — with the same timestamp) the modifier bitmap bound to this
 key is actually bit-or of bitmaps above.  Essentially, this prohibits assigning
 interesting flag combinations to C<lCtrl>.
 
@@ -4269,7 +4654,7 @@ and which are not.  The latter keypresses are candidates to be checked whether t
 of the application.
 
 For final keypresses of a character-generating key-sequence, an application gets a notification
-from the ReadConsoleEvent() API call that this keypress generates a character.  However, for the 
+from the ReadConsoleInput() API call that this keypress generates a character.  However, for the 
 keypresses of the sequence which are non the last one (“dead” keys), there is no such notification.
 
 Therefore, there is no way to avoid dead keys triggering actions in an application.  What is the
@@ -4287,7 +4672,7 @@ loop of the console, so cannot query GetKeyboardLayout() of this thread.  Hence 
 useless too.
 
 (There may be a lousy workaround: run ToUnicodeEx() on B<all> the installed keyboard layouts, and
-check which of them are excluded by comparing with results of ReadConsoleEvent().  Interpret
+check which of them are excluded by comparing with results of ReadConsoleInput().  Interpret
 contradictions as user changing the keyboard layout.  Of course, on several keypresses following
 a change of keyboard layout one may get unexpected results.  And if two similar
 keyboards are installed, one may also never get definite answer on which of them is currently active.)
@@ -4303,7 +4688,7 @@ Such a way is not documented.
 
 =item *
 
-Watch the character reported by ReadConsoleEvent() on the C<KEYUP> event for deadkeys.  This is
+Watch the character reported by ReadConsoleInput() on the C<KEYUP> event for deadkeys.  This is
 the character which a deadkey would produce if it is pressed twice (and is 0 if pressing it twice
 results in a deadkey again).  The only explanation for this I can fathom is that the console's
 message queue thread calls such a non-disturbing-state version of ToUnicode().
@@ -4346,7 +4731,7 @@ the second situation, although undocumented, is well-engineered, so let us docum
 here.  (These two should better be documented together, since pasting may fake input by
 repeated character-by-numeric-code.)
 
-Pasting happens character-by-character (more precise, by UTF-16 codepoints), but C<ReadConsoleEvents()>
+Pasting happens character-by-character (more precise, by UTF-16 codepoints), but C<ReadConsoleInput()>
 would group them together:
 
 =over 4
@@ -4473,7 +4858,8 @@ by pressing it again.  Do not know how to reproduce this.  It is interesting to
 note that one of the bits in the mask of the C<Menu> key is 0x80, and there is
 a define for this bit in F<kbd.h> named C<KBDGRPSELTAP> — but it is undocumented,
 and, judging by names, one might think that C<KBDGRPSELTAP> would work in pair with the flag
-C<GRPSELTAP> of C<VK_TO_WCHARSn->Attributes>.)
+C<GRPSELTAP> of C<VK_TO_WCHARSn→Attributes>.  [But in fact it is a remnant of never-included-in-the-kernel
+attempt to support ISO keyboard concepts.])
 
 B<NOTES:> Apparently, key up/down for many combinations of C<lCtrl+rCtrl+char> are
 not delivered to applications.
@@ -4734,6 +5120,44 @@ Set C<$ENV{UI_KEYBOARDLAYOUT_UNRESOLVED}> to enable warnings.  Then do
 
   perl -wlane "next unless /^Unresolved: <(.*?)>/; $s{$1}++; END{print qq($s{$_}\t$_) for keys %s}" oxx | sort -n > oxx-sorted-kw
 
+=head1 More (random) rambling on assignment of key combinations
+
+(Here we continue the discussion in L<"A convenient assignment of KBD* bitmaps to modifier keys">.  This stems from an obsolete
+assumption that it makes sense to assign to L<Win> key the modifier flags C<CTRL|X1>:
+
+  lCtrl		Win	 lAlt		rAlt			Menu		rCtrl
+  CTRL|LOYA	CTRL|X1	 ALT|KANA	CTRL|ALT|LOYA|X1	CTRL|ALT|X2	CTRL|ALT|ROYA
+
+Nowadays I would use C<CTRL|X3> instead.)
+
+B<NOTES:> All the combinations involving at most one of C<lCtrl>, C<Win> or 
+C<rAlt> give distinct ORed masks.  This completely preserving all
+application-visible properties of keyboard events [except those with C<lCtrl-Win-lAlt->
+modifiers; this combination is equivalent to C<lAlt-rAlt->].
+The only combination of C<LOYA,KANA,X1,X2,ROYA> which may appear with
+different C<CTRL,ALT> bits is C<LOYA|X1>; hence there are 33 possible combinations
+of C<CTRL,ALT,LOYA,KANA,X1,X2,ROYA>.
+
+
+Indeed, C<CTRL> is determined by C<LOYA|X1|X2|ROYA>. 
+If one of C<KANA,X2,ROYA> is present, then C<ALT> is set; so assume C<KANA,X2,ROYA> are not present. 
+But then, if C<ALT> B<may be> set, then both C<LOYA|X1> B<must> be present; which gives the
+only duplication.
+
+Leaving out 5 combinations of C<lCtrl>, C<Win>, C<lAlt> [8, minus the empty one, and 
+C<lCtrl+lAlt>, which is avoided by most application due to its similarity to C<AltGr=rAlt>,
+and C<lCtrl+Win+lAlt> which is undistinguishable by the mask from C<lAlt+rAlt>]
+to have bindable keypresses in applications, and having C<rCtrl> as equivalent to
+C<lCtrl>, this gives 27 C<Shift>-pairs which may produce characters.
+
+B<NOTE:> C<lCtrl+Win+lAlt> being undistinguishable by the mask from C<lAlt+rAlt>
+is not a big deal, since there is no standard keyboard shortcuts involving C<Ctrl+Win+Alt>.
+
+B<NOTE:> Combinations of C<lCtrl> with C<rCtrl> L<cause several problems|"C<lCtrl-rCtrl> combination: multiple problems">;
+likewise for L<combinations of C<lAlt> with C<rAlt> |"C<lAlt-rAlt> combination: many keys are not delivered to applications">.
+B<Summary:> These seem to be combinations of keyboard’s hardware problems with (rare, unreproducible)
+software-being-stuck-in-unexpected-state problems (should not one try to switch between keyboard layout then?!).
+
 =head1 SEE ALSO
 
 The keyboard(s) generated with this module: L<UI::KeyboardLayout::izKeys>, L<http://k.ilyaz.org/>
@@ -4974,7 +5398,15 @@ VK_OEM_8 Kana modifier - Using instead of AltGr
 Limitations of using KANA toggle
 
   http://www.kbdedit.com/manual/ex12_trilang_ser_cyr_lat_gre.html
-  
+
+KANALOK documented:
+
+  http://www.kbdedit.com/manual/high_level_kanalok.html
+
+(Essentially, when C<KBDKANA> modifier-flag is assigned on C<VK_KANA> — as opposed on, e.g., C<VK_OEM_8> — the “is-pressed” state of
+C<VK_KANA> is toggled on each keypress, but the C<KBDKANA> bit is not (?) set in the “current keyboard state”.  Instead, keys with
+C<KANALOK> flag react on “calculated KBDKANA” which is found by the “pressed state” of VK_KANA.)
+
 FE (Far Eastern) keyboard source code example (NEC AT is 106 with SPECIAL MULTIVK flags changed on some scancodes, OEM_7/8 producing 0x1e 0x1f, and no OEM_102):
   
   http://read.pudn.com/downloads3/sourcecode/windows/248345/win2k/private/ntos/w32/ntuser/kbd/fe_kbds/jpn/ibm02/kbdibm02.c__.htm
@@ -5215,6 +5647,7 @@ Windows shortcuts:
 
 On meaning of Unicode math codepoints
 
+  https://en.wikipedia.org/wiki/Mathematical_Alphanumeric_Symbols
   http://milde.users.sourceforge.net/LUCR/Math/unimathsymbols.pdf
   http://milde.users.sourceforge.net/LUCR/Math/data/unimathsymbols.txt
   http://www.ams.org/STIX/bnb/stix-tbl.ascii-2006-10-20
@@ -5272,7 +5705,7 @@ I<You can snag C<unichars>, C<uniprops>, and C<uninames> from L<http://training.
 
 Tom's unicode scripts
 
-  http://search.cpan.org/~bdfoy/Unicode-Tussle-1.03/lib/Unicode/Tussle.pm
+  https://search.cpan.org/~bdfoy/Unicode-Tussle-1.03/lib/Unicode/Tussle.pm
 
 =head2 F<.XCompose>: on docs and examples
 
@@ -5567,7 +6000,9 @@ Define an extra element in VK keys: linkable.  Should be sorted first in the kbd
 and there should be the same number in linked lists.  Non-linkable keys should not
 be linked together by deadkey access...
 
-Interaction of FromToFlipShift with SelectRX not intuitive.  This works: Diacritic[<sub>](SelectRX[[0-9]](FlipShift(Latin)))
+Interaction of FromToFlipShift with SelectRX not intuitive.  This works: Diacritic[<sub>](SelectRX[[0-9]](FlipShift(Face(Latin))))
+
+FlipShift is not reliable without an explicit argument (when used with multiple-personalities???)
 
 DefinedTo cannot be put on Cyrillic 3a9 (yo to superscript disappears - due to duplication???).
 
@@ -5779,10 +6214,10 @@ Long s and "preceded by" are not handled since the table has its own (useless) c
  ░▒▓
 
 
-=head2 Implementation details
+=head2 Implementation details: C<FullFace(FNAME)>
 
-Since the C<FullFace[FNAME]> accessor may have different effects at different moment of
-a face C<FNAME> synthesis, here is the order in which C<FullFace[FNAME]> changes:
+Since the C<FullFace(FNAME)> accessor may have different effects at different moment of
+a face C<FNAME> synthesis, here is the order in which C<FullFace(FNAME)> changes:
 
   ini_layers:   essentially, contains what is given in the key “layers” of the face recipe
 	Later, a version of these layers with exportable keys marked is created as ini_layers_prefix.
@@ -5847,7 +6282,7 @@ sub parse_add_configstring ($$$) {		# Trailing whitespace is ignored, whitespace
   $s =~ s/^\x{FEFF}//;			# BOM are not stripped by Perl from UTF-8 files with -C31
   (my $pre, my %f) =  split m(^\[((?:visual\s*->\s*)?[\w/]*)\]\s*$ \n?)mx, $s;	# //x is needed to avoid $\
   warn "Part before the first section in configfile ignored: `$pre'" if length $pre;
-  for my $k (keys %f) {
+  for my $k (sort keys %f) {
 # warn "Section `$k'";
     my($v, $V, @V) = $f{$k};
     if ($k =~ s{^visual\s*->\s*}{[unparsed]/}) {		# Make sure that prefixes do not allow visual line to be confused with a config
@@ -6002,6 +6437,32 @@ sub decode_kbd_layers ($@) {
   my(%seen, %out);
   $seen{$_}++ and die "Duplicate layer name `$_'" for @{$opt->{layer_names}};
   @out{ @{$opt->{layer_names}} } = @out;
+  for my $i ( 0 .. ($#{ $opt->{layer_names} } - 1) ) {
+    my($base,$shift) = ($out[$i], $out[$i+1]);
+    $out{$opt->{layer_names}[$i] . '²'} ||= [ map [$base->[$_][0], $shift->[$_][0]], 0..$#$base ];  # ²: Layer, and the next “as shifted”
+    next if $i > $#{ $opt->{layer_names} } - 3;
+    ($base,$shift) = ($out[$i+2], $out[$i+3]);
+    $out{$opt->{layer_names}[$i] . '²⁺'} ||= [ map [$base->[$_][0], $shift->[$_][0]], 0..$#$base ]; # ²⁺: two next layers (likewise)
+###	warn "Created ² etc appended-names for layer $opt->{layer_names}[$i]";
+  }
+  my $ii = 0;
+  if (0) {		# Cannot do this: the subdivision into rows is not preserved by the parser! ???
+  for my $pre_row ( 0 .. @{ $opt->{rect_horizontal_counts} } - 2) {
+    my $C = $opt->{rect_horizontal_counts}[$pre_row];
+    for my $iii ( 0 .. $C - 1) {
+      my $I = $ii + $iii;
+      my $i = $I + $C;
+      next if $i > $#{ $opt->{layer_names} };		# Next row may be shorter
+      my($base,$shift) = ($out[$i], $out[$i+1]);
+      $out{$opt->{layer_names}[$I] . '₁'} ||= [ map [$base->[$_][0]], 0..$#$base ];  # In the next row listing layer-names
+      next if $i > $#{ $opt->{layer_names} } - 1;
+      $out{$opt->{layer_names}[$I] . '₂'} ||= [ map [$base->[$_][0], $shift->[$_][0]], 0..$#$base ];  # As ² but in the next row
+      next if $i > $#{ $opt->{layer_names} } - 3;
+      ($base,$shift) = ($out[$i+2], $out[$i+3]);
+      $out{$opt->{layer_names}[$I] . '₂₊'} ||= [ map [$base->[$_][0], $shift->[$_][0]], 0..$#$base ];  # As ²⁺ but in the next row
+    }
+    $ii += $C;
+  }}
   \%out, \@counts, $opt->{keyline_offsets};
 }
 
@@ -6058,10 +6519,11 @@ sub decode_rect_layers ($@) {
   @out{ @{$opt->{layer_names}} } = @out;
   for my $i ( 0 .. ($#{ $opt->{layer_names} } - 1) ) {
     my($base,$shift) = ($out[$i], $out[$i+1]);
-    $out{$opt->{layer_names}[$i] . '²'} ||= [ map [$base->[$_][0], $shift->[$_][0]], 0..$#$base ];
+    $out{$opt->{layer_names}[$i] . '²'} ||= [ map [$base->[$_][0], $shift->[$_][0]], 0..$#$base ];  # ²: Layer, and the next “as shifted”
     next if $i > $#{ $opt->{layer_names} } - 3;
     ($base,$shift) = ($out[$i+2], $out[$i+3]);
-    $out{$opt->{layer_names}[$i] . '²⁺'} ||= [ map [$base->[$_][0], $shift->[$_][0]], 0..$#$base ];
+    $out{$opt->{layer_names}[$i] . '²⁺'} ||= [ map [$base->[$_][0], $shift->[$_][0]], 0..$#$base ]; # ²⁺: two next layers (likewise)
+###	warn "Created ² etc appended-names for rect layer $opt->{layer_names}[$i]";
   }
   my $ii = 0;
   for my $pre_row ( 0 .. @{ $opt->{rect_horizontal_counts} } - 2) {
@@ -6071,12 +6533,12 @@ sub decode_rect_layers ($@) {
       my $i = $I + $C;
       next if $i > $#{ $opt->{layer_names} };		# Next row may be shorter
       my($base,$shift) = ($out[$i], $out[$i+1]);
-      $out{$opt->{layer_names}[$I] . '₁'} ||= [ map [$base->[$_][0]], 0..$#$base ];
+      $out{$opt->{layer_names}[$I] . '₁'} ||= [ map [$base->[$_][0]], 0..$#$base ];  # In the next row listing layer-names
       next if $i > $#{ $opt->{layer_names} } - 1;
-      $out{$opt->{layer_names}[$I] . '₂'} ||= [ map [$base->[$_][0], $shift->[$_][0]], 0..$#$base ];
+      $out{$opt->{layer_names}[$I] . '₂'} ||= [ map [$base->[$_][0], $shift->[$_][0]], 0..$#$base ];  # As ² but in the next row
       next if $i > $#{ $opt->{layer_names} } - 3;
       ($base,$shift) = ($out[$i+2], $out[$i+3]);
-      $out{$opt->{layer_names}[$I] . '₂₊'} ||= [ map [$base->[$_][0], $shift->[$_][0]], 0..$#$base ];
+      $out{$opt->{layer_names}[$I] . '₂₊'} ||= [ map [$base->[$_][0], $shift->[$_][0]], 0..$#$base ];  # As ²⁺ but in the next row
     }
     $ii += $C;
   }
@@ -6230,7 +6692,7 @@ sub pre_link_layers ($$$;$$) {	# Un-obscure non-alphanum bindings from the first
     @free_first = (1,0) if 1 == ($obsc[0] || 0) and $free_first[0] = 0 and not defined $C[1][1]; # un-Shift ONLY if needed
     @map{@obsc} = @free_first[0 .. $#obsc] unless $skipfix;
 #    %map = map +($_, $free_first[$map{$_}]), keys %map;
-    for my $k (keys %map) {
+    for my $k (sort keys %map) {
       if ($skipfix) {
         my $s = $k ? ' (shifted)' : '';
         warn "Key `$C[0][$k]'$s in layer $Hn->[0] does not match symbol $c[0][$k] in layer $hn->[0], and skipfix is requested...\n"
@@ -6417,15 +6879,52 @@ sub __dbg_latin_CtrlD ($) {
   die "Got \\x0d (=$K)" if $K and ($K eq "\x09" or $K eq '000d');
 }
 
+sub revive_layer ($$$$) {	# What is the difference with make_translated_layers()???  Supporting the fundamental layers???
+  my($self, $f, $ln, $l) = (shift, shift, shift, shift);
+  next if $self->{layers}{$l};		# Else, auto-vivify
+  my $ll = $l;
+#warn "Creating layer `$l' for face `$f'...";
+  my @r = $self->layer_recipe($l);
+  $ll = $r[0] if @r;
+  warn "Massaging: Using layout_recipe `$ll' for layer '$l'\n" if debug_face_layout_recipes and exists $self->{layer_recipes}{$l};
+	warn "  mk_tr_lyrs 0" if debug_stacking_ord;
+  $ll = $self->make_translated_layers($ll, $f, [$ln], '0000');
+#warn "... Result `@$ll' --> $self->{layers}{$ll->[0]}";
+  (debug_face_layout_recipes and warn "Massaging: Using layout_recipe `$ll->[0]' for layer '$l'\n"),
+  $self->{layers}{$l} = $self->{layers}{$ll->[0]} unless $self->{layers}{$l};		# Could autovivify in between???
+}
+
+my $w_o;
+sub order_faces_4_massage ($) {		# process LinkFace first (if no loops)
+  my($self, $prekeys) = (shift, 1e300);
+  my(@res, @RES, %seen) = [sort keys %{$self->{faces}}];
+  while ($prekeys > $#{$res[-1]}) {	# Construct chains of LinkFace'ing; next element is made of linkface's of the previous one
+    $prekeys = $#{$res[-1]};
+    push @res, [];
+    for my $f (@{$res[-2]}) {
+      next if 'HASH' ne ref $self->{faces}{$f} or $f =~ m(\bVK$);			# "parent" taking keys for a child
+      if (my $LF = $self->{faces}{$f}{LinkFace}) {
+        push @{$res[-1]}, $LF;
+      }
+    }
+  }
+  for my $r (reverse @res) {
+    push @RES, grep !$seen{$_}++, sort @$r;	# reverse? ??? Voodoo !!!  Sorting changes the result... XXXX
+  }
+  warn 'Face order `', join("' `", @RES), "'" unless $w_o++;
+  @RES
+}
+
+
 sub massage_faces ($) {
   my $self = shift;
 # warn "Massaging faces...";
-  for my $f (keys %{$self->{faces}}) {		# Needed for (pre_)link_layers...
+  for my $f ($self->order_faces_4_massage) {		# Needed for (pre_)link_layers...
     next if 'HASH' ne ref $self->{faces}{$f} or $f =~ m(\bVK$);			# "parent" taking keys for a child
 #warn "Massaging face `$f'...";
     for my $key ( qw( Flip_AltGr_Key Diacritic_if_undef DeadChar_DefaultTranslation DeadChar_32bitTranslation extra_report_DeadChar
     		      PrefixChains ctrl_after_modcol create_alpha_ctrl keep_missing_ctrl output_layers
-		      output_layers_WIN output_layers_XKB skip_extra_layers_WIN Prefix_Base_Altern
+		      output_layers_WIN output_layers_XKB skip_extra_layers_WIN Prefix_Base_Altern Prefix_Force_Altern
     		      layers_modifiers layers_mods_keys mods_keys_KBD AltGrInv_AltGr_as_Ctrl
 		      ComposeKey_Show AltGr_Invert_Show Apple_Override Apple_Duplicate Apple_HexInput 
     		      ComposeKey Explicit_AltGr_Invert Auto_Diacritic_Start CapsLOCKoverride
@@ -6465,16 +6964,15 @@ sub massage_faces ($) {
       $self->face_by_face_recipe($f, $f);
     }
     for my $ln ( 0..$#{$self->{faces}{$f}{layers} || []} ) {
-      my $ll = my $l = $self->{faces}{$f}{layers}[$ln];
-      next if $self->{layers}{$l};		# Else, auto-vivify
-#warn "Creating layer `$l' for face `$f'...";
-      my @r = $self->layer_recipe($l);
-      $ll = $r[0] if @r;
-      warn "Massaging: Using layout_recipe `$ll' for layer '$l'\n" if debug_face_layout_recipes and exists $self->{layer_recipes}{$l};
-      $ll = $self->make_translated_layers($ll, $f, [$ln], '0000');
-#warn "... Result `@$ll' --> $self->{layers}{$ll->[0]}";
-      $self->{layers}{$l} = $self->{layers}{$ll->[0]} unless $self->{layers}{$l};		# Could autovivify in between???
+      my $l = $self->{faces}{$f}{layers}[$ln];
+      $self->revive_layer($f, $ln, $l) unless $self->{layers}{$l};
     }
+###        warn "Layer names (face=`$f', layer[0]=`$self->{faces}{$f}{layers}[0]'):\n\t`", join("'\n\t`", sort keys %{$self->{layers}}), "'"
+###	  	if debug_face_layout_recipes or not defined $self->{layers}{$self->{faces}{$f}{layers}[0]};
+  }
+
+  for my $f ($self->order_faces_4_massage) {		# Needed for LinkFace inside massage_VK()...  Breaks CopticTens etc.
+    next if 'HASH' ne ref $self->{faces}{$f} or $f =~ m(\bVK$);			# "parent" taking keys for a child
     (my ($seen, $seen_dead), $self->{faces}{$f}{'[dead_in_VK]'}) = $self->massage_VK($f);
     $self->{faces}{$f}{'[dead_in_VK_array]'} = $seen_dead;
     $self->{faces}{$f}{'[coverage_hex]'}{$self->key2hex($_)}++ for @$seen;
@@ -6501,9 +6999,13 @@ sub massage_faces ($) {
     $self->{faces}{$f}{'[g_offsets]'} = $o if $o;
   }
 #  $self->__dbg_latin_CtrlD;
-  for my $f (keys %{$self->{faces}}) {	# Needed for face_make_backlinks: must know which keys in faces will be finally present
+  for my $f ($self->order_faces_4_massage) {	# Needed for face_make_backlinks: must know which keys in faces will be finally present
     next if 'HASH' ne ref $self->{faces}{$f} or $f =~ m(\bVK$);			# "parent" taking keys for a child
     for my $F (@{ $self->{faces}{$f}{AltGrCharSubstitutionFaces} || []}) {	# Now has a chance to have real layers
+      unless ($self->{faces}{$F}{layers}) {
+        next unless $self->{face_recipes}{$F};
+        $self->face_by_face_recipe($F, $f);
+      }
       for my $L (0..$#{$self->{faces}{$f}{layers}}) {
         my $from  = $self->{faces}{$f}{layers}[$L];
         next unless my $to = $self->{faces}{$F}{layers}[$L];
@@ -6520,24 +7022,35 @@ sub massage_faces ($) {
     }  
   }		# ^^^ This is not used yet???
 #  $self->__dbg_latin_CtrlD;
-  for my $f (keys %{$self->{faces}}) {	# Needed for face_make_backlinks: must know which keys in faces will be finally present
+  for my $f ($self->order_faces_4_massage) {	# Needed for face_make_backlinks: must know which keys in faces will be finally present
     next if 'HASH' ne ref $self->{faces}{$f} or $f =~ m(\bVK$);			# "parent" taking keys for a child
+    my $linked = $self->{faces}{$f}{LinkFace};
     for my $N (0..$#{ $self->{faces}{$f}{AltGrCharSubstitutionLayers} || []}) {	# Now has a chance to have real layers
       my $TO = my $to = $self->{faces}{$f}{AltGrCharSubstitutionLayers}[$N];
       my $from  = $self->{faces}{$f}{layers}[$N] or next;
+      $self->revive_layer($f, $N, $TO) unless $self->{layers}{$TO};
       $_ = $self->{layers}{$_} for $from, $to;
+      my $from_linked;
+      if ($linked) {
+	$from_linked = $self->{faces}{$linked}{layers}[$N];
+	$from_linked = $self->{layers}{$from_linked} if defined $from_linked;
+      }
       for my $k (0..$#$from) {
-        next unless $from->[$k] and $to->[$k];
+        next unless ($from->[$k] or $from_linked and $from_linked->[$k]) and $to->[$k];
         for my $shift (0..1) {
-          next unless defined (my $s = $from->[$k][$shift]) and defined (my $ss = $to->[$k][$shift]);
+          next unless defined (my $s = ($from->[$k][$shift] or $from_linked and $from_linked->[$k][$shift]))
+			and defined (my $ss = $to->[$k][$shift]);
           $_ and ref and $_ = $_->[0] for $s, $ss;
           push @{ $self->{faces}{$f}{'[AltSubstitutions]'}{$s} }, [$ss, "L=$TO"];
         }
       }
-    }  
+    }
+    if ($f =~ /^(Latin|CyrillicPhonetic|GreekPoly|Hebrew)$/ and $self->{faces}{$f}{'[AltSubstitutions]'}) {
+      warn "  `$f' AltSubstitutions: ", join '', sort keys %{$self->{faces}{$f}{'[AltSubstitutions]'}};
+    }
   }
 #  $self->__dbg_latin_CtrlD;
-  for my $f (keys %{$self->{faces}}) {	# Linking uses the number of slots in layer 0 as the limit; fill to make into max
+  for my $f ($self->order_faces_4_massage) {	# Linking uses the number of slots in layer 0 as the limit; fill to make into max
     next if 'HASH' ne ref $self->{faces}{$f} or $f =~ m(\bVK$);			# "parent" taking keys for a child
     my $L = $self->{faces}{$f}{layers};
     my @last = map $#{$self->{layers}{$_}}, @$L;
@@ -6546,7 +7059,7 @@ sub massage_faces ($) {
     push @{$self->{layers}{$L->[0]}}, [] for 1..($last-$last[0]);
   }
 #  $self->__dbg_latin_CtrlD;
-  for my $f (keys %{$self->{faces}}) {	# Needed for face_make_backlinks: must know which keys in faces will be finally present
+  for my $f ($self->order_faces_4_massage) {	# Needed for face_make_backlinks: must know which keys in faces will be finally present
     next if 'HASH' ne ref $self->{faces}{$f} or $f =~ m(\bVK$);			# "parent" taking keys for a child
     next unless defined (my $o = $self->{faces}{$f}{LinkFace});
     $self->export_layers($o, $f);			# Process recipes
@@ -6554,12 +7067,12 @@ sub massage_faces ($) {
 # warn("pre_link <$o> <$f>\n") if defined $o;
   }
 #  $self->__dbg_latin_CtrlD;
-  for my $f (keys %{$self->{faces}}) {
+  for my $f ($self->order_faces_4_massage) {
     next if 'HASH' ne ref $self->{faces}{$f} or $f =~ m(\bVK$);			# "parent" taking keys for a child
     $self->face_make_backlinks($f, $self->{faces}{$f}{'[char2key_prefer_first]'}, $self->{faces}{$f}{'[char2key_prefer_last]'});
   }
 #  $self->__dbg_latin_CtrlD;
-  for my $f (keys %{$self->{faces}}) {
+  for my $f ($self->order_faces_4_massage) {
     next if 'HASH' ne ref $self->{faces}{$f} or $f =~ m(\bVK$);			# "parent" taking keys for a child
     my $o = $self->{faces}{$f}{LinkFace};
     next unless defined $o;
@@ -6567,7 +7080,7 @@ sub massage_faces ($) {
     $self->faces_link_via_backlinks($o, $f);
   }
 #  $self->__dbg_latin_CtrlD;
-  for my $f (keys %{$self->{faces}}) {
+  for my $f ($self->order_faces_4_massage) {
     next if 'HASH' ne ref $self->{faces}{$f} or $f =~ m(\bVK$);			# "parent" taking keys for a child
     if (defined( my $r = $self->{faces}{$f}{"[CapsLOCKoverride]"} )) {
       warn "Massaging CapsLock for face `$f'...\n" if debug_face_layout_recipes;
@@ -6667,13 +7180,21 @@ sub massage_hash_values($) {
 }
 #use Dumpvalue;
 
-sub print_codepoint ($$;$) {
-  my ($self, $k, $prefix) = (shift, shift, shift);
+sub print_codepoint ($$;$$) {	# $postfix may be a name of base-font.  Then the coverage_how is used instead of $postfix
+  my ($self, $k, $prefix, $postfix) = (shift, shift, shift, shift);
   my $K = ($k =~ /$rxCombining/ ? " $k" : $k);
+  if (defined $postfix) {
+    my $how = $self->{faces}{$postfix}{'[coverage_how]'}{$k};
+#    $how2 =~ s/(1+)/length $1/e;
+#    defined($how) ? $how .= " $how2" : $how = $how2 if $how2;
+    $postfix = '' if $self->{faces}{$postfix}{'[coverage_how]'};
+    $postfix = " $how" if $how;
+  }
   $prefix = '' unless defined $prefix;
+  $postfix = '' unless defined $postfix;
   my $kk = join '.', map $self->key2hex($_), split //, $k;
   my $UN = join ' + ', map $self->UName($_, 'verbose', 'vbell'), split //, $k;
-  printf "%s%s\t<%s>\t%s\n", $prefix, $kk, $K, $UN;
+  printf "%s%s\t<%s>%s\t%s\n", $prefix, $kk, $K, $postfix, $UN;
 }
 
 sub require_unidata_age ($) {
@@ -6741,44 +7262,55 @@ sub print_coverage ($$) {
   printf "######### %i = %i + %i + %i%s [direct + via single prefix keys and “extra layers” (both=%i) + via repeated prefix key] chars\n",
     @{ $self->{faces}{$F}{'[coverage0]'} } + $c1 + $c2 - $multi_c[0] - $multi_c[1],
     scalar @{ $self->{faces}{$F}{'[coverage0]'} } - $multi_c[0],
-    $c1 - $multi_c[1], $c2, $more, @{ $self->{faces}{$F}{'[coverage00+]'} } + $c1 - $multi_c[0] - $multi_c[1];
-  for my $k (@{ $self->{faces}{$F}{'[coverage00+]'} }) {
-    $self->print_codepoint($k);
+    $c1 - $multi_c[1], $c2, $more, @{ $self->{faces}{$F}{'[coverage0oneChar]'} } + $c1 - $multi_c[0] - $multi_c[1];
+  print "Marks mean: b = “in base face”, each of: e = “base with extra modifiers”, 1 = “with single prefix key”, 2/3 likewise, 9=“>3 | ∞”\n" .
+  		"\t\t①/②/③/⑨ = “needs ‘extra modifiers’-prefix”, ⓕ/ƒ/ᶠ/φ = “via flat map”, Ⓕ/F/ℱ/Φ = “with extra (impossible!)”; likewise\n" .
+  		"\t\tⓔ/ₑ/ᵉ/ε | Ⓔ/E/ᴱ/έ ⫿ ⓐ/a/ᵃ/α | Ⓐ/A/ᴬ/ά = “on Arrow-like keys (⫿ with-AltGr-inversion)”, ⇑⤊^⦽|⇡⥀ˆꞈ = “on AltGr-inverted Ctrl-keys”.\n";
+  for my $k (@{ $self->{faces}{$F}{'[coverage0oneChar]'} }) {
+    $self->print_codepoint($k, undef, $F);
   }
   print "############# Base multi-char strings:\n";
-  for my $k (@{ $self->{faces}{$F}{'[coverage00++]'} }) {
-    $self->print_codepoint($k);
+  for my $k (@{ $self->{faces}{$F}{'[coverage0multiChar]'} }) {
+    $self->print_codepoint($k, undef, $F);
   }
-  print "############# Via single prefix keys:\n";
+  print "############# Via single prefix keys (or with extra modifiers):\n";
   for my $k (@{ $self->{faces}{$F}{'[coverage1only]'} }) {
-    $self->print_codepoint($k) if 2 > length $k;
+    $self->print_codepoint($k, undef, $F) if 2 > length $k;
   }
-  print "############# Multi-char via single prefix keys:\n";
+  print "############# Multi-char via single prefix keys (or with extra modifiers):\n";
   for my $k (@{ $self->{faces}{$F}{'[coverage1only]'} }) {
-    $self->print_codepoint($k) if 1 < length $k;
+    $self->print_codepoint($k, undef, $F) if 1 < length $k;
   }
   my $h1 = $self->{faces}{$F}{'[coverage1only_hash]'};
   print "############# Via repeated prefix keys:\n";
   for my $k (@{ $self->{faces}{$F}{'[coverage1]'} }) {
-    $h1->{$k} or $self->print_codepoint($k) if 2 > length $k;
+    $h1->{$k} or $self->print_codepoint($k, undef, $F) if 2 > length $k;
   }
   print "############# Multi-char via repeated prefix keys:\n";
   for my $k (@{ $self->{faces}{$F}{'[coverage1]'} }) {
-    $h1->{$k} or $self->print_codepoint($k) if 1 < length $k;
+    $h1->{$k} or $self->print_codepoint($k, undef, $F) if 1 < length $k;
   }
-  print "############# Only via Compose key:\n";
+  print "############# Difficult to reach (or unreachable) in prefix maps (prefix = +2, “extra” modifiers = +1, etc. ⇒ >4):\n";
+  for my $c (sort keys %{ $self->{faces}{$F}{'[coverage_difficulty]'} }) {
+    $self->print_codepoint($c, undef, $F) if $self->{faces}{$F}{'[coverage_difficulty]'}{$c} > 4;
+  }
+  print "############# Went through the cracks in accounting:\n";
+  for my $k (sort keys %{ $self->{faces}{$F}{'[coverage_how]'} }) {
+    $self->print_codepoint($k, '¿ ', $F) unless $self->{faces}{$F}{'[coverage_hash]'}{$k};
+  }
+  print "############# Via Compose key, but not simply accessible:\n";
   for my $k (@comp) {
-    $self->print_codepoint($k, '= ');
+    $self->print_codepoint($k, '= ', $F);
   }
   print "############# Have lost the competition (for prefixed position), but available elsewhere:\n";
   for my $k (sort keys %{ $self->{faces}{$F}{'[in_dia_chains]'} }) {
     next unless $self->{faces}{$F}{'[coverage_hash]'}{$k} and not $self->{faces}{$F}{'[from_dia_chains]'}{$k};
-    $self->print_codepoint($k, '+ ');		# May be in from_dia_chains, but be obscured later...
+    $self->print_codepoint($k, '+ ', $F);		# May be in from_dia_chains, but be obscured later...
   }
   print "############# Have lost the competition (not counting those explicitly prohibited by \\\\):\n";
   for my $k (sort keys %{ $self->{faces}{$F}{'[in_dia_chains]'} }) {
     next if $self->{faces}{$F}{'[coverage_hash]'}{$k};
-    $self->print_codepoint($k, '- ');
+    $self->print_codepoint($k, '- ', $F);
   }
   my ($tot_diac, $lost_diac) = (0,0);
   $tot_diac++, $self->{faces}{$F}{'[coverage_hash]'}{$_} || $lost_diac++ 
@@ -6786,7 +7318,7 @@ sub print_coverage ($$) {
   print "############# Lost among known classified modifiers/standalone/combining ($lost_diac/$tot_diac):\n";
   for my $k (sort keys %{ $self->{'[map2diac]'} }) {
     next if $self->{faces}{$F}{'[coverage_hash]'}{$k};
-    $self->print_codepoint($k, '?- ');
+    $self->print_codepoint($k, '?- ', $F);
   }
   print "############# Per key list:\n";
   my $OOut = $self->print_table_coverage($F);
@@ -7140,8 +7672,8 @@ in <b>.kbdd</b> files (usually <code>SPACE</code>).$more
 <p>Hover mouse over any appropriate place to get more information.
 In popups: brackets enclose Script, Range, “1st Unicode version with this character”;
 braces enclose “the reason why this position was assigned to this character” (<code>VisLr</code> means that a visual table was 
-used; in <code>Subst{HOW}</code>, <code>L=Layer</code> and <code>F=Face</code> mean that a “BlueKey” substitution rule was defined
-via a special layer/face).
+used; in <code>Subst{HOW}</code>, <code>L=Layer</code> and <code>F=Face</code> mean that a “BlueKey” substitution
+rule was defined via a special layer/face — see C<AltGrCharSubstitutions>, C<AltGrCharSubstitutionFaces> and C<AltGrCharSubstitutionLayers>).
 </body>
 </html>
 EOP
@@ -7169,14 +7701,14 @@ sub coverage_face0 ($$;$) {
       $H->{'[layer0coverage0]'} = [sort keys %seen];
     }
   }
-  $H->{'[coverage0_prefix]'} = \%seen_prefix;
-  $H->{'[coverage0]'} = [sort keys %seen];
-  $H->{'[coverage00]'}   = [grep {  2>length and 0x10000 > ord } @{$H->{'[coverage0]'}}];
-  $H->{'[coverage0+]'}   = [grep {!(2>length and 0x10000 > ord)} @{$H->{'[coverage0]'}}];
-  $H->{'[coverage00+]'}  = [grep {  2>length                   } @{$H->{'[coverage0]'}}];
-  $H->{'[coverage00++]'} = [grep {  1<length                   } @{$H->{'[coverage0]'}}];
+  $H->{'[coverage0_prefix]'} = \%seen_prefix;		# prefix keys available on $F
+  $H->{'[coverage0]'} = [sort keys %seen];		# non-prefix chars available on $F
+  $H->{'[coverage0oneUTF16]'} = [grep {  2>length and 0x10000 > ord } @{$H->{'[coverage0]'}}];	# may be easy-postfixes on Windows
+# $H->{'[coverage0+]'}        = [grep {!(2>length and 0x10000 > ord)} @{$H->{'[coverage0]'}}];	# 1.74 has only partial support for these
+  $H->{'[coverage0oneChar]'}  = [grep {  2>length                   } @{$H->{'[coverage0]'}}];	# only for stats
+  $H->{'[coverage0multiChar]'} = [grep {  1<length                  } @{$H->{'[coverage0]'}}];	# only for stats
   $H->{'[imported]'} = [sort keys %imported];
-  $H->{'[coverage00hash]'} = { map { ($_, 1) } @{ $H->{'[coverage00]'} } };
+  $H->{'[coverage0oneUTF16hash]'} = { map { ($_, 1) } @{ $H->{'[coverage0oneUTF16]'} } };
   $H->{'[coverage0]'};
 }
 
@@ -7206,6 +7738,7 @@ sub massage_imported ($$) {
     my $KK = $self->key2hex($K);
     if (my $over = $H->{'[AdddeadkeyLayers]'}{$KK}) {
 #warn "face `$F': additional bindings for deadkey $KK exist.\n";
+	warn "  mk_tr_lyrs_st 0" if debug_stacking_ord;
       $LL = [$self->make_translated_layers_stack($over, $LL)];
     }
     $H->{'[imported2key_all]'}{"$k:$face"} = $self->charhex2key($KK);
@@ -7303,6 +7836,8 @@ sub new_from_configfile_string ($$) {
     $self->massage_full;
 }
 
+sub doout ($$) {my(undef, $in) = (shift,shift); return '[u/d]' unless defined $in; $in = $in->[0] if ref $in;  $in . chr hex $in};
+
 sub massage_full($) {
     my $self = shift;
     my ($layers, $counts, $offsets) = $self->fill_kbd_layers($self);
@@ -7315,15 +7850,58 @@ sub massage_full($) {
     $self->massage_faces;
     
     $self->massage_deadkeys_win($self);		# Process (embedded) MSKLC-style deadkey maps
-    $self->scan_for_DeadKey_Maps();		# Makes a direct-access synonym, scan for DeadKey_Maps* keys
+    $self->scan_for_DeadKey_Maps();		# Makes a direct-access synonym, scan for DeadKey_Map* keys
     $self->create_DeadKey_Maps();
     $self->create_composite_layers;		# Needs to be after simple deadkey maps are known
+
+    ### Not implemented yet!!! XXXXX ????  (The logic moved from output_deadkeys())
+    for my $F (keys %{ $self->{faces} }) {	# Fine-tune inverted-AltGr faces
+      next if 'HASH' ne ref $self->{faces}{$F} or $F =~ /\bVK$/;			# "parent" taking keys for a child
+      next if $F =~ /#\@?#\@?(Inv)?#\@?/;		# Face-on-a-deadkey
+      my $H = $self->{faces}{$F};
+
+    my($flip_AltGr_hex, %nn) =  $H->{'[Flip_AltGr_Key]'};
+    $flip_AltGr_hex = $self->key2hex($self->charhex2key($flip_AltGr_hex)) if defined $flip_AltGr_hex;
+    for my $deadKey ( sort keys %{ $H->{'[deadkeyFaceHexMap]'} } ) {
+      next if $H->{'[only_extra]'}{$self->charhex2key($deadKey)};
+
+      next unless $deadKey eq ($flip_AltGr_hex || 'n/a');
+      my($is_invAltGr_Base_with_chain, $invertAlt, $AMap) = (1, 1, {});	# XXXX under the preceding assumption only ???
+
+      my $auto_inv_AltGr = $H->{'[deadkeyInvAltGrKey]'}{$deadKey};
+      $auto_inv_AltGr = $self->key2hex($auto_inv_AltGr) if defined $auto_inv_AltGr;
+##        (my $nonempty, my $MAP) = $self->output_deadkeys($F, $deadKey, $H->{'[dead2]'}, $flip_AltGr_hex, $auto_inv_AltGr);
+##        $self->massage_main_Inv_AltGr($F);		# Moved from output_deadkeys()
+
+  my($map_AltGr_over, $over_dead2);
+  if (my $override_InvAltGr = $H->{'[InvAltGrFace]'}{''}) { # NOW: needed only for invAltGr
+    $map_AltGr_over = $self->linked_faces_2_hex_map($F, $override_InvAltGr);
+  }
+  $over_dead2 = $H->{'[dead2]'}->{$self->charhex2key($flip_AltGr_hex)} || {} if defined $flip_AltGr_hex;	# used in CyrPhonetic v0.04
+  my $dead2 = { %{ $H->{'[DEAD]'} }, %{ $H->{'[dead_in_VK]'} } };
+
+  	## joined_map is a merge of enhanced-map (via alternative chars, like Menu-*), flat-map, and merged-multichar-map
+  	my %joined_map = ();	# XXXX ????
+    my @keys = sort keys %joined_map;			# Sorting not OK for 6-byte keys - but after joining they disappear
+    my %sp;	# XXXX ????  Should be obtained from scancodes
+    @keys = (grep((!/^d[89a-f]/i and  lc(chr hex $_) ne uc(chr hex $_)and not $sp{chr hex $_} ),		      @keys),
+             grep((!/^d[89a-f]/i and (lc(chr hex $_) eq uc chr hex $_ and (chr hex $_) !~ /\p{Blank}/) and not $sp{chr hex $_}), @keys),
+            grep((!/^d[89a-f]/i and ((lc(chr hex $_) eq uc chr hex $_ and (chr hex $_) =~ /\p{Blank}/) or $sp{chr hex $_}) and $_ ne '0020'), @keys),
+             grep(                                                  /^d[89a-f]/i,  @keys),	# 16-bit surrogates
+             grep(				                    $_ eq '0020',  @keys));	# make SPACE last
+    for my $n (@keys) {	# Only 4-byte keys reach this (except for Apple)
+      my ($alt_n, $use_dead2) = (($is_invAltGr_Base_with_chain and defined $map_AltGr_over->{$n})
+        			 ? ($n, $over_dead2) 
+        			 : (($invertAlt ? $AMap->{$n} : $n), $dead2));
+    }
+      }
+    }
 
     for my $F (keys %{ $self->{faces} }) {
       next if 'HASH' ne ref $self->{faces}{$F} or $F =~ /\bVK$/;			# "parent" taking keys for a child
       $self->coverage_face0($F);		# creates coverage0, imported array (c0 excludes diacritics), coverage0_prefix hash
     }
-    for my $F (keys %{ $self->{faces} }) {
+    for my $F (sort keys %{ $self->{faces} }) {
       next if 'HASH' ne ref $self->{faces}{$F} or $F =~ /\bVK$/;			# "parent" taking keys for a child
       $self->massage_imported($F);		# calc new values for imported prefix keys, augments imported maps with Add-maps
     }
@@ -7372,90 +7950,210 @@ sub massage_full($) {
 #      warn "   Keys HexMap: ", join ', ', sort keys %{$self->{faces}{$F}{'[deadkeyFaceHexMap]'}};
     }
 
-    for my $F (keys %{ $self->{faces} }) {	# Finally, (collect the stats ???), make Compose
+    for my $F (sort keys %{ $self->{faces} }) {	# Finally, collect the reachable no-prefix keys (include extra), make Compose
       next if 'HASH' ne ref $self->{faces}{$F} or $F =~ /\bVK$/;			# "parent" taking keys for a child
       next if $F =~ /#\@?#\@?(Inv)?#\@?/;		# Face-on-a-deadkey
-      my(%seenExtra, %seenExtraFull);
+      my(%seenExtra, %seenExtraWithPrefix, %seenExtraPrefix);
       my @extras = ( "@{ $self->{faces}{$F}{'[output_layers]'} || [''] }" =~ /\bprefix(?:\w*)=([0-9a-fA-F]{4,6}\b|.(?![^ ]))/g );
       my %is_extra = map { ($self->charhex2key($_), 1) } @extras;	# extra layers (on bizarre modifiers)
-      for my $deadKEY ( sort keys %{ $self->{faces}{$F}{'[deadkeyFace]'}} ) {
+      for my $deadKEY ( sort keys %{ $self->{faces}{$F}{'[deadkeyFace]'}} ) {	# process Extra-basekeys
         my $deadKey = $self->charhex2key($deadKEY);
         next unless $is_extra{$deadKey};
-        my $FFF = $self->{faces}{$F}{'[deadkeyFace]'}{$deadKEY};
-        my $cov1 = $self->{faces}{$FFF}{'[coverage0]'}	# XXXX not layer0coverage0 - may slide down to layer0
+	# warn "$F ExtraPrefix=$deadKEY\n";
+        my($FFF,$C) = $self->{faces}{$F}{'[deadkeyFace]'}{$deadKEY};
+        my $cov1 = $self->{faces}{$FFF}{'[coverage0]'}	# (non-prefix base keys) XXXX not layer0coverage0 - may slide down to layer0
           or warn("Deadkey `$deadKey' on face `$F' -> unmassaged face"), next;
-        $seenExtraFull{$_}++
-          for map {ref() ? $_->[0] : $_} @$cov1, keys %{$self->{faces}{$FFF}{'[coverage0_prefix]'}};
-        $seenExtra{$_}++
-          for map {ref() ? $_->[0] : $_} grep !(ref and $_->[2]), @$cov1;	# Skip 2nd level deadkeys
+        $seenExtraWithPrefix{$_}++, $seenExtra{$_}++          for map {ref() ? $_->[0] : $_} @$cov1;
+        $seenExtraWithPrefix{$_}++, $seenExtraPrefix{$_}++    for keys %{$self->{faces}{$FFF}{'[coverage0_prefix]'}};
       }
-      $self->{faces}{$F}{'[coverageExtra]'} = \%seenExtra;	# duplicated below???
-      $self->{faces}{$F}{'[coverageExtraFull]'} = \%seenExtraFull;
+      $self->{faces}{$F}{'[coverageExtra]'} = \%seenExtra;
+      $self->{faces}{$F}{'[coverageExtraPrefix]'} = \%seenExtraPrefix;
+      $self->{faces}{$F}{'[coverageExtraInclPrefix]'} = \%seenExtraWithPrefix;	# used in massage_flat_maps_extra_keys()
+      # warn "$F coverageExtraPrefix; ". join('  ', keys %seenExtraPrefix) . "\n" if keys %seenExtraPrefix;
+      warn "$F coverageExtraPrefix HIDDEN; ", join('  ', grep !$self->{faces}{$F}{'[deadkeyFace]'}{$_},
+						map $self->key2hex($_), sort keys %seenExtraPrefix) . "\n" if keys %seenExtraPrefix;
       
       next unless my $prefix = $self->{faces}{$F}{'[ComposeKey]'};
       $self->auto_dead_can_wrap($F);					# All manual deadkeys are set, so auto may be flexible
       $self->create_composekey($F, $prefix);
     }
 
-    $self->massage_flat_maps_extra_keys();	# Process Flat extra maps
+    $self->massage_flat_maps_extra_keys();	# Process Flat extra maps (used on Windows only); fill FlatPrefixMapFiltered, report results
 
-    for my $F (keys %{ $self->{faces} }) {	# Finally, collect the stats
+    for my $F (sort keys %{ $self->{faces} }) {	# Handle enhanced maps (used on Windows only)
       next if 'HASH' ne ref $self->{faces}{$F} or $F =~ /\bVK$/;			# "parent" taking keys for a child
       next if $F =~ /#\@?#\@?(Inv)?#\@?/;		# Face-on-a-deadkey
-      my($seen_prefix, %seen0, %seen00, %seen1, %seen1only, %seenExtra) = $self->{faces}{$F}{'[coverage0_prefix]'};
+      my $H = $self->{faces}{$F};
+      next unless defined( my $enhGray = $H->{'[Prefix_Base_Altern]'} );
+      $self->export_layers($enhGray, $F);			# Process recipes
+      $self->face_make_backlinks($enhGray, undef, undef, 'skipfix');	# no prefer-1st/last; without skipfix errors on 2nd call
+      my %enhForce = map {($self->keys2hex($_), 1)} @{$H->{'[Prefix_Force_Altern]'} || []};
+      for my $deadKey ( sort keys %{ $H->{'[deadkeyFaceHexMap]'} } ) {
+        next if $H->{'[only_extra]'}{$self->charhex2key($deadKey)};
+        next unless my $dF = $H->{'[deadkeyFace]'}{$deadKey};	# may be Compose etc
+#        if ("$F//$deadKey" eq "Latin//00a3") {
+#          my $layers = $H->{'[deadkeyLayers]'}{$deadKey};
+#	  warn " make enh map $F//$deadKey: `$_': ", $self->layer2string($self->{layers}{$_}), "\n" for @$layers;
+#        }
+    #	or warn "d=$deadKey; <", join(' ', keys %{$H->{'[deadkeyFace]'}}), '>';
+        $self->faces_link_via_backlinks($enhGray, $dF);
+        $H->{'[enhGrayHexMaps]'}{$deadKey} = my $enhMaps = [map $self->linked_faces_2_hex_map($enhGray, $dF, $_), 0, 1];	# 2 maps
+        $H->{'[enhGrayHexMapsForce]'}{$deadKey} = [map {	# submaps made of keys in 'Prefix_Force_Altern' and with defined values
+	  my $m = $enhMaps->[$_];			# These bindings are prefered to those present also on non-enhGray maps
+	  + { map { ($_, $m->{$_})} grep {$enhForce{$_} and defined $m->{$_}} keys %$m }} (0, 1)];
+        my @LLL = map $self->{layers}{$_}, @{ $self->{faces}{$dF}{layers} };
+        my($n, %agi_ctrl) = '[]';
+        if (defined $self->{faces}{$F}{'[Flip_AltGr_Key]'} or defined $self->{faces}{$F}{'[invAltGr_Accessor]'}) {
+          my ($first_ctrl, $post_ctrl) = map $self->{faces}{$F}{"[$_]"} || 0, qw(start_ctrl0 end_ctrl);
+          $n = "[$first_ctrl .. $post_ctrl]";
+          for my $k ($first_ctrl .. $post_ctrl) {
+            for my $shft ('','s') {
+              my $kk = "agi_c${shft}_" . ($k-$first_ctrl);
+              my $c = $LLL[1][$k][!!$shft];
+              $agi_ctrl{$kk} = $c;
+            }
+          }
+        }
+        $self->{faces}{$F}{'[Inv_AltGr_Ctrl_Keys]'}{$deadKey} = \%agi_ctrl;
+#        warn " agi_ctrl($F : $deadKey $n): ", join ' ', map {defined() ? (ref() ? $_->[0] : $_) : '[u/d]'} %agi_ctrl, "\n";
+      }
+    }
+
+    for my $F (sort keys %{ $self->{faces} }) {	# Finally, collect the stats
+      next if 'HASH' ne ref $self->{faces}{$F} or $F =~ /\bVK$/;			# "parent" taking keys for a child
+      next if $F =~ /#\@?#\@?(Inv)?#\@?/;		# Face-on-a-deadkey
+      my $H = $self->{faces}{$F};
+      my($prefix_in_base, %SEEN, %seen0oneUTF16, %seen1, %seen1only, %seenExtra) = $H->{'[coverage0_prefix]'};
       # warn("Face `$F' has no [deadkeyFace]"), 
-      next unless $self->{faces}{$F}{'[deadkeyFace]'};
+      next unless $H->{'[deadkeyFace]'};
 #      next;
-      my (%check_later, %coverage1_prefix);
-#      warn "......  face `$F',\tprefixes0 ", keys %$seen_prefix;
-#      $seen_prefix = {%$seen_prefix};			# Deep copy
-#      $seen_prefix->{$_}++ for @{ $self->{faces}{$F}{'[dead_in_VK_array]'} || [] };
-      my @extras = ( "@{ $self->{faces}{$F}{'[output_layers]'} || [''] }" =~ /\bprefix(?:\w*)=([0-9a-fA-F]{4,6}\b|.(?![^ ]))/g );
+      my (%check_later, %coverage1_prefix, %prefix_with_1prefix,  %prefix_with_2prefices, @difficult, %difficult, %reach_how);
+#      warn "......  face `$F',\tprefixes0 ", keys %$prefix_in_base;
+#      $prefix_in_base = {%$prefix_in_base};			# Deep copy
+#      $prefix_in_base->{$_}++ for @{ $H->{'[dead_in_VK_array]'} || [] };
+      my @extras = ( "@{ $H->{'[output_layers]'} || [''] }" =~ /\bprefix(?:\w*)=([0-9a-fA-F]{4,6}\b|.(?![^ ]))/g );
       my %is_extra = map { ($self->charhex2key($_), 1) } @extras;	# extra layers (on bizarre modifiers)
-      for my $deadKEY ( sort keys %{ $self->{faces}{$F}{'[deadkeyFace]'}} ) {
-        unless (%seen0) {				# Do not calculate if $F has no deadkeys...
-          $seen0{$_}++ for @{ $self->{faces}{$F}{'[coverage00]'} };
-          %seen00 = %seen0;
+      $reach_how{$_} = 'b', $difficult[0]{$_}++ for @{ $H->{'[coverage0]'} };
+      $reach_how{$_} ||= '', $reach_how{$_} .= 'e', $difficult[1]{$_}++ for keys %{ $H->{'[coverageExtra]'} };
+      
+      for my $pass (1,2,3) {
+       for my $deadKEY ( sort keys %{ $H->{'[deadkeyFace]'}} ) {
+        unless (%SEEN) {				# Do not calculate if $F has no deadkeys...
+          $seen0oneUTF16{$_}++ for @{ $H->{'[coverage0oneUTF16]'} };
+          %SEEN = %seen0oneUTF16;	# XXX $SEEN includes $seen0oneUTF16 and $seen1 ???
         }
         ### XXXXX Directly linked faces may have some chars unreachable via the switch-prefixKey
-        my ($deadKey, $not_in_0) = $self->charhex2key($deadKEY);
+        my ($deadKey, $not_in_base, $in_1prefix, $in_2prefices, $dK_of_extra) = $self->charhex2key($deadKEY);
         # It does not make sense to not include it into the summary: 0483 on US is such...
-        $not_in_0++, $check_later{$deadKey}++ unless $seen_prefix->{$deadKey};	# For multi-prefix maps, and extra layers
-        my ($FFF, @dd2) = $self->{faces}{$F}{'[deadkeyFace]'}{$deadKEY};
-        my $cov1 = $self->{faces}{$FFF}{$is_extra{$deadKey} ? '[coverage0]' : '[coverage00]'}	# XXXX not layer0coverage0 - may slide down to layer0
+        $not_in_base++, $check_later{$deadKey}++ unless $prefix_in_base->{$deadKey};	# For multi-prefix maps, and extra layers
+        next if $pass > 1 and not $not_in_base or $pass == 1 and $not_in_base;		# 1st: in base; 2nd: needs 1 prefix
+        $in_1prefix = $prefix_with_1prefix{$deadKEY} if $pass > 1 and $not_in_base;
+        next if $pass == 2 and not $in_1prefix or $pass > 2 and $in_1prefix;		# Third: 1 prefix is not enough
+        $in_2prefices = $prefix_with_2prefices{$deadKEY} if $pass == 3 and ($not_in_base and not $in_1prefix);
+        
+        $dK_of_extra = $H->{'[coverageExtraPrefix]'}{$deadKey};	# compose keys are not in deadkeyFace, so we do not see them here
+        # warn "See $F\[$deadKEY] from extra only" if $not_in_base and $dK_of_extra;
+        my ($FFF, @dd2) = $H->{'[deadkeyFace]'}{$deadKEY};
+        my $cov1 = $self->{faces}{$FFF}{$is_extra{$deadKey} ? '[coverage0]' : '[coverage0oneUTF16]'}	# XXXX not layer0coverage0 - may slide down to layer0
           or warn("Deadkey `$deadKey' on face `$F' -> unmassaged face"), next;
-        ($seen0{$_}++ or $seen1{$_}++), 
-          ($not_in_0 and not $is_extra{$deadKey}) || $seen00{$_} || $seen1only{$_}++,	# Only for multi-prefix maps
-          $is_extra{$deadKey} && $seenExtra{$_}++					# Only for extra modifiers maps
+        my($map, %haveChar, %havePref, %cDifc) = $self->linked_faces_2_hex_map($F, $FFF);	# hex → hex
+        my $enhGrayMapsForce = $H->{'[enhGrayHexMapsForce]'}{$deadKEY} || [{},{}];	# prefered to those present also on non-extra maps
+        delete $map->{$_} for keys %{$enhGrayMapsForce->[0]}, keys %{$enhGrayMapsForce->[1]};
+        $cDifc{$_} = 1, $haveChar{$_} = '1①2②3③9⑨' for grep defined, map {($_ and ref $_) ? $_->[0] : $_} grep ($_ and not (ref $_ and $_->[2])), values %$map;
+        $havePref{$_} = 1    for grep defined, map {($_ and ref $_) ? $_->[0] : $_} grep ($_ and     (ref $_ and $_->[2])), values %$map;
+        if (my $Emap = $H->{'[enhGrayHexMaps]'}{$deadKEY}) {
+#          warn "map/emap $F [$deadKEY]: @{[%$map]}[0,1] / @{[%{$Emap->[0]}]}[0,1]\n";
+          my %mapAltGr  = map {("0$_", $Emap->[1]{$_})} keys %{$Emap->[1]};
+          my %mapF = ((map {("0$_", $enhGrayMapsForce->[1]{$_})} keys %{$enhGrayMapsForce->[1]}), %{$enhGrayMapsForce->[0]});
+	  for my $extrakeyMap ($Emap->[0] || {}, \%mapAltGr) {
+	    warn " ... extra-key map $F [$deadKEY]: ", join(' ' ,
+ 		map {$_ . (chr hex) . " ⇒ " . $self->doout($extrakeyMap->{$_})} sort keys %$extrakeyMap), "\n" if warnReached and %$extrakeyMap;
+#  warn " ... wholemap $F [$deadKEY]: ", join(' ' ,
+#	map {$_ . (chr hex) . " ⇒ " . $self->doout($map->{$_})} sort keys %$map), "\n"; # if warnReached and %$map;
+	  }
+          $cDifc{$_} ||= 2, $haveChar{$_} ||= 'ⓔⒺₑEᵉᴱεέ' for grep defined, map {($_ and ref $_) ? $_->[0] : $_} grep ($_ and not (ref $_ and $_->[2])), values %{$Emap->[0]};
+          $cDifc{$_} ||= 4, $haveChar{$_} ||= 'ⓐⒶaAᵃᴬαά' for grep defined, map {($_ and ref $_) ? $_->[0] : $_} grep ($_ and not (ref $_ and $_->[2])), values %mapAltGr;
+          $havePref{$_} ||= 'E'                          for grep defined, map {($_ and ref $_) ? $_->[0] : $_} grep ($_ and     (ref $_ and $_->[2])), values %{$Emap->[0]}, values %mapAltGr;
+        }
+        my($mapAi_C, $flat) = ($H->{'[Inv_AltGr_Ctrl_Keys]'}{$deadKEY} || {}, $H->{"[FlatPrefixMapAccessibleHex]"}{$deadKEY} || {});
+# warn " lookup flat  $F / $deadKEY: <", join("> <", %$flat), ">\n";
+# warn " lookup ACtrl $F / $deadKEY: <", join("> <", map $_->[0], grep defined, values %$mapAi_C), ">\n";
+        $cDifc{$_} ||= 3, $haveChar{$_} ||= '⇑⇡⤊⥀^ˆ⦽ꞈ' for map $self->key2hex($_), grep defined, map {($_ and ref $_) ? $_->[0] : $_} grep ($_ and not (ref $_ and $_->[2])), values %$mapAi_C;
+        $havePref{$_} ||= '⇑'                          for map $self->key2hex($_), grep defined, map {($_ and ref $_) ? $_->[0] : $_} grep ($_ and     (ref $_ and $_->[2])), values %$mapAi_C;
+          $SEEN{$self->charhex2key($_)}++,
+        $cDifc{$_} ||= 2, $haveChar{$_} ||= 'ⓕⒻƒFᶠℱφΦ' for grep defined, map {($_ and ref $_) ? $_->[0] : $_} grep ($_ and not (ref $_ and $_->[2])), keys %$flat;
+        $havePref{$_} ||= 'ⓕ'                          for grep defined, map {($_ and ref $_) ? $_->[0] : $_} grep ($_ and     (ref $_ and $_->[2])), keys %$flat;
+        unless ($is_extra{$deadKey}) {
+#	  my $is_extra = ($not_in_base ? ($dK_of_extra ? 1  :  2 ) : 0) + 3*($pass - 1);
+	  my $diffclty = $pass - 1 + !!($pass == 3 and not $in_2prefices);
+	  my $D = !!$dK_of_extra + 2*$diffclty;
+	  for my $c (keys %haveChar) {
+	    my $cc = $self->charhex2key($c);
+            $reach_how{$cc} .= substr $haveChar{$c}, $D, 1;
+            my $d = $diffclty + $cDifc{$c} + 1;		# base:0, every prefix = +2, extra modifier = +1 etc
+            $difficult[$d]{$cc}++;
+            $difficult{$cc}++;
+          }
+        }
+        my %flat = map {("fl=$_", $_)} keys %$flat;
+#	        warn "Flat in [$deadKEY] $F: ", join(' ', sort @reached), "\n" if warnReached;
+  #    warn " agi_ctrl: ", join ' ', map {(not $_ or /agi/) ? $_ : $self->doout($_)} %agi_ctrl, "\n";
+#        warn "   agi_ctrl($F : $deadKEY): ", join ' ', map {defined() ? (ref() ? $_->[0] : $_) : '[u/d]'} %$mapAi_C, "\n";
+
+        my @reached = map $self->charhex2key($_), keys %haveChar;
+#        my @reached_prefix = $self->charhex2key($_->[0]), grep +($_ and ref $_ and $_->[2]), values %$map;
+        my(%reached, %u) = map +($_, 1), @reached;		# , map chr, 0..0x1F; control-chars ∉ the base map, but can be produced on Win
+        warn "Reached in [$deadKEY] $F: ", join(' ', sort @reached), "\n" if warnReached;
+### my @e = each %$map; warn "map-start $F=>$FFF: $e[0] <@{ref $e[1] ? $e[1] : [$e[1]||'---']}>\n";
+        ($SEEN{$_}++ or $seen1{$_}++),		# micro-optimization
+          $reached{$_} || $u{$_}++,
+          ($not_in_base and not $is_extra{$deadKey}) || $seen0oneUTF16{$_} || $seen1only{$_}++,	# Only for multi-prefix maps
             for map {ref() ? $_->[0] : $_} grep !(ref and $_->[2]), @$cov1;	# Skip 2nd level deadkeys
-        if (my $d2 = $self->{faces}{$F}{'[dead2]'}{$deadKey}) {
-          my $map = $self->linked_faces_2_hex_map($F, $FFF);
+#        !$is_extra{$deadKey} && ($reach_how{$_} ||= '', $reach_how{$_} .= (($not_in_base and $dK_of_extra) ? 'Ⓔ' : 'E')),
+#          $_ eq '⏩' && warn "See ⏩ on [$deadKEY] !base=$not_in_base deadKey_of_ExtraFace=$dK_of_extra; of $F\n"
+###          $is_extra{$deadKey} && $seenExtra{$_}++					# Only for extra modifiers maps
+#            for keys %{$H->{'[coverageExtra]'}};
+	%u and warn "Unreached: <<$_>> in [$deadKEY] of $F\n" for join ' ', sort keys %u;
+        if (my $d2 = $H->{'[dead2]'}{$deadKey}) {
 #          warn "linked map (face=$F) = ", keys %$d2;
           @dd2 = map $self->charhex2key($_), map {($_ and ref $_) ? $_->[0] : $_} map $map->{$self->key2hex($_)}, keys %$d2;
 #          warn "sub-D2 (face=$F) = ", @dd2;
         }
         #warn "2nd level prefixes for `$deadKey': ",  keys %{$self->{faces}{$FFF}{'[coverage0_prefix]'} || {}};
-        #warn "2nd level prefixes for `$deadKey':  <@dd2> ", keys %{$self->{faces}{$F}{'[dead2]'}{$deadKey} || {}};
-        unless ($not_in_0) {
+        #warn "2nd level prefixes for `$deadKey':  <@dd2> ", keys %{$H->{'[dead2]'}{$deadKey} || {}};
+        unless ($not_in_base) {
 #          warn "sub-cov0 (face=$F) = ", keys %{ $self->{faces}{$FFF}{'[coverage0_prefix]'} || {} };
-          $coverage1_prefix{$_}++  for keys %{ $self->{faces}{$FFF}{'[coverage0_prefix]'} || {} };
+          $coverage1_prefix{$_}++  for keys %{ $self->{faces}{$FFF}{'[coverage0_prefix]'} || {} };  # XXXX prefix keys (maybe unreachable???)
 #          warn "sub-D2 (face=$F) = ", @dd2;
           $coverage1_prefix{$_}++  for @dd2;
         }
-#        warn "......  deadkey `$deadKey' reached0 in face `$F'" unless $not_in_0;
+#        warn "......  deadkey `$deadKey' reached0 in face `$F'" unless $not_in_base;
+	%prefix_with_1prefix = (%prefix_with_1prefix, %havePref) if $pass == 1;		# Hex
+	%prefix_with_2prefices = (%prefix_with_2prefices, %havePref) if $pass == 2;	# Hex
+#	%prefix_with_3prefices = (%prefix_with_3prefices, %havePref) if $pass == 3;	# Hex
+       }
       }
-      
-      my @check      = grep { !$coverage1_prefix{$_} and !$is_extra{$_} } keys %check_later;
-      my @only_extra = grep { !$coverage1_prefix{$_} and  $is_extra{$_} } keys %check_later;
-      $self->{faces}{$F}{'[only_extra]'} = { map {($_, 1)} @only_extra };
+      for my $c (keys %difficult) {
+        $difficult{$c} = 9;
+        for my $d (0..8) {
+          $difficult{$c} = $d, last if $difficult[$d]{$c};
+        }
+      }
+      my @check      = grep { !$coverage1_prefix{$_} and !$is_extra{$_} } sort keys %check_later;  # dead: ∉ base ∪ 1-prefix ∪ extra
+      my @only_extra = grep { !$coverage1_prefix{$_} and  $is_extra{$_} } sort keys %check_later;
+      $H->{'[only_extra]'} = { map {($_, 1)} @only_extra };  # extra layers which are not reachable by 2 prefix keys
 
       my $_s = (@check > 1 ? 's' : '');
-      warn("Prefix key$_s <@check> not reached (without double prefix keys?) in face `$F'; later=", keys %check_later, " ; cov1=", keys %coverage1_prefix) if @check;
-      $self->{faces}{$F}{'[coverage1]'} = [sort keys %seen1];
-      $self->{faces}{$F}{'[coverage1only]'} = [sort keys %seen1only];
-      $self->{faces}{$F}{'[coverage1only_hash]'} = \%seen1only;
-      $self->{faces}{$F}{'[coverage_hash]'} = \%seen0;
-      $self->{faces}{$F}{'[coverageExtra]'} = \%seenExtra;	# also done above???
+      warn("Prefix key$_s <@check> not reached (without double prefix keys?) in face `$F'; later=", sort(keys %check_later), " ; cov1=", sort keys %coverage1_prefix) if @check;
+      $H->{'[coverage1]'} = [sort keys %seen1];
+      $H->{'[coverage1only]'} = [sort keys %seen1only];
+      $H->{'[coverage1only_hash]'} = \%seen1only;
+      $H->{'[coverage_hash]'} = \%SEEN;
+      $H->{'[coverage_how]'} = \%reach_how;
+      $H->{'[coverage_difficulty]'} = \%difficult;
+      warn "$F coverage_how: ", join('  ', map +"$_ $reach_how{$_}", sort keys %reach_how), "\n"
+      	if warnReached and ( keys %{$H->{'[deadkeyFace]'}} or keys %{$H->{'[coverageExtra]'}} );
+#      $H->{'[coverageExtra]'} = \%seenExtra;	# also done above???
     }
     $self
 }
@@ -7792,6 +8490,8 @@ sub last_pre_funckeys($$) {
     $min_sec = 1e300;
     $min_sec > $_->[0] and $min_sec = $_->[0] for values %start_SEC;
   }
+##  warn "Layer disappeared: `$l0'; layer names:\n\t`", join("'\n\t`", sort keys %{$self->{layers}}), "'"
+##  	unless defined $self->{layers}{$l0};
   my $post_main = @{ $self->{layers}{$l0} };
   if ($post_main >= $min_sec) {
     $post_main = $min_sec;
@@ -7806,16 +8506,21 @@ sub last_pre_funckeys($$) {
 sub massage_VK ($$) {
   my ($self, $f, %seen, %seen_dead, @dead, @ctrl) = (shift, shift);
   my $l0 = $self->{faces}{$f}{layers}[0];
+      warn "Finding last key for face `$f' layer[0] = `$l0'...\n" if debug_face_layout_recipes;
   my $post_main = $self->last_pre_funckeys($l0);
 
   if (my $LF = $self->{faces}{$f}{LinkFace}) {
     my $l00 = ($self->export_layers($LF))->[0];
+    $self->revive_layer($LF, 0, $l00) unless $self->{layers}{$l00};
+      warn "Finding last key for face `$f' LinkFace = `$l00'...\n" if debug_face_layout_recipes;
     my $post_main0 = $self->last_pre_funckeys($l00);
     $post_main = $post_main0 if $post_main0 > $post_main;
   }
 
   if (defined (my $b = $self->{faces}{$f}{BaseLayer})) { # Cannot bump into known keycodes
+	warn "  mk_tr_lyrs 1" if debug_stacking_ord;
     $b = $self->make_translated_layers($b, $f, [0])->[0] if defined $b and not $self->{layers}{$b};
+      warn "Finding last key for face `$f' BaseLayer = `$b'...\n" if debug_face_layout_recipes;
     my $post_main0 = $self->last_pre_funckeys($b);
     $post_main = $post_main0 if $post_main0 > $post_main;
   }
@@ -8057,16 +8762,19 @@ sub flatten_unit ($$$$) {
 }
 
 my %double_scan_VK = ('56 OEM_102' => '7D OEM_8',	# ISO vs JIS (right) keyboard
-	#	      '73 ABNT_C1' => '7E ABNT_C2',	# ABNT (right) = JIS (left) keyboard vs ABNT (numpad)
-	#	      '53 DECIMAL' => '7E ABNT_C2',	# NUMPAD-period vs ABNT (numpad) [Does not work??? DECIMAL too late?]
-		      '34 OEM_PERIOD' => '7E ABNT_C2',	# period vs ABNT (numpad)
-		      '7B NONCONVERT' => '79 CONVERT');	# JIS keyboard: left of SPACE, right of SPACE
+	#	      '73 ABNT_C1' => '7E ABNT_C2',	# ABNT2 (right) = JIS (left) keyboard vs ABNT2 (numpad)
+	#	      '53 DECIMAL' => '7E ABNT_C2',	# NUMPAD-period vs ABNT2 (numpad) [Does not work??? DECIMAL too late?]
+	#	      '34 OEM_PERIOD' => '7E ABNT_C2',	# period vs ABNT2 (numpad)
+		      '33 OEM_COMMA' => '7E ABNT_C2',	# comma vs ABNT2 (numpad) — should be the opposite of DECIMAL!
+	#	      '7B NONCONVERT' => '79 CONVERT',	# JIS keyboard: left of SPACE, right of SPACE
+		      '39 SPACE' => '79 CONVERT/7B NONCONVERT',	# JIS keyboard: right of SPACE, left of SPACE
+);
 my %shift_control_extra = (2 => "\x00", 6 => "\x1e", OEM_MINUS => "\x1f");
 
 { my(%seen, %seen_scan, %seen_VK, @add_scan_VK, @ligatures, @decimal);
   sub reset_units ($) { @decimal = @ligatures = @add_scan_VK = %seen_scan = %seen_VK = %seen = () }
 
-  sub output_unit00 ($$$$$$$;$$) {	# $U->[$i] is the entry for the key in the layer No. $i
+  sub output_unit00 ($$$$$$$;$$) {	# $UU->[$i] is the entry for the key in the layer No. $i; $N is an ordinal of a key; $k is VK_-names
     my ($self, $face, $k, $UU, $N, $deadkeys, $Used, $known_scancode, $skippable) = (shift, shift, shift, shift, shift, shift, shift, shift, shift);
     my $sc = ($known_scancode or $scan_codes{$k}) or warn("Can't find the scancode for the key `$k'"), return;
     my ($cnt, @KK) = 0;
@@ -8086,11 +8794,13 @@ my %shift_control_extra = (2 => "\x00", 6 => "\x1e", OEM_MINUS => "\x1f");
     my $b = $KK[0];
     $b = $b->[0] if $b and ref $b;
     @cntrl = chr hex $do_control{$b}		if $do_control{$b || 'N/A'};	# \ ---> ^\
+    @cntrl = chr hex substr $oem_control{$k}, 1 if !@cntrl and $oem_control{$k};
     @cntrl = @{ $default_bind{$k}[1] } if !@cntrl and $default_bind{$k}[1];
     my $create_a_c = $self->{faces}{$face}{'[create_alpha_ctrl]'};
     $create_a_c = $create_alpha_ctrl unless defined $create_a_c;
     @cntrl = (chr(0x1F & ord $k)) x $create_a_c if $k =~ /^[A-Z]$/ and $create_a_c;
     @cntrl = (undef, $shift_control_extra{$k})  if $create_a_c > 1 and $shift_control_extra{$k};
+    @cntrl = ($shift_control_extra{$k}) x 2     if $create_a_c > 1 and $k eq '2';
     $cnt ||= @cntrl;
     return if $skippable and not $cnt;
 
@@ -8156,7 +8866,7 @@ $capslock\t$keys\t// $expl$expl1
 EOP
   }
 
-  sub output_unit0 ($$$$$$$;$$) {
+  sub output_unit0 ($$$$$$$;$$) {		# $u is an ordinal of a key
     my(@i) = &output_unit00 or return;
     my @add = split '/', ($double_scan_VK{uc "$i[0] $i[1]"} || '');
 #warn "<<<<< Secondary key <$add> for <$i[0] $i[1]>" if $add;
@@ -8210,7 +8920,7 @@ EOP
     @o
   }
 
-  sub base_unit ($$$$) {
+  sub base_unit ($$$$) {	# Find a suitable “ID” for this position in the layout (VK_-name for f-key groups, or key of %oem_keys)
     my ($self, $basesub, $u, $ingroup, $k) = (shift, shift, shift, shift);
     if (!$ingroup) {
       my @c = map $self->{layers}{$_}[$u][0], @$basesub;
@@ -8228,7 +8938,7 @@ EOP
     [1, $k]
   }
   
-  sub output_unit ($$$$$$$$) {		# $u is an ordinal of a key
+  sub output_unit ($$$$$$$$) {		# $u is an ordinal of a key; $baseK contains the VK_-names
     my ($self, $face, $layers, $u, $deadkeys, $Used, $canskip, $baseK, $k) = (shift, shift, shift, shift, shift, shift, shift, shift);
     my $U = [map $self->{layers}{$_}[$u], @$layers];
     defined ($k = $baseK->[$u]) or return;
@@ -8236,14 +8946,14 @@ EOP
   }
 }
 
-sub output_layout_win ($$$$$$$) {
+sub output_layout_win ($$$$$$$) {	# $baseK contains the VK_-names
   my ($self, $face, $layers, $deadkeys, $Used, $cnt, $baseK) = (shift, shift, shift, shift, shift, shift, shift);
 #  die "Count of non-VK entries mismatched: $cnt vs ", scalar @{$self->{layers}{$layers->[0]}}
 #    unless $cnt <= scalar @{$self->{layers}{$layers->[0]}};
   map $self->output_unit($face, $layers, $_, $deadkeys, $Used, $_ >= $cnt, $baseK), 0..$#$baseK;
 }
 
-sub output_VK_win ($$$) {
+sub output_VK_win ($$$) {	# Not used anymore!!!  XXXX ???
   my ($self, $face, $Used, @O) = (shift, shift, shift);
   my $VK = $self->{faces}{$face}{'[VK_off]'};
   for my $k (keys %$VK) {
@@ -8554,7 +9264,7 @@ sub linked_faces_2_hex_map ($$$$) {
 #  $remap ||= {map +(chr hex $_, chr hex $remap->{$_}), keys %$cover};		# This one in terms of chars, not hex
   my @k = keys %$remap;
 # warn "Map `$name' -> '$b': <", join('> <', map +($self->key2hex($_), $self->key2hex($remap->{$_})), @k), '>';
-  return { map +($self->key2hex($_), (defined $remap->{$_} ? $self->KEY2hex($remap->{$_}) : undef)), @k }
+  return { map +($self->keys2hex($_), (defined $remap->{$_} ? $self->KEY2hex($remap->{$_}) : undef)), @k }
 }
 
 my $dead_descr;
@@ -8620,18 +9330,14 @@ sub output_deadkeys ($$$$$$;$) {	# Emits 1 or 2 maps; for the 2nd, uses $prefix_
     $dead2 = { %{ $H->{'[DEAD]'} }, %{ $H->{'[dead_in_VK]'} } };
 #    $docs ||= 'AltGr-inverted base face';
   }
-  my @enhMap = ({}, {});
-  if (!$OUT_Apple and ($D ne ($flip_AltGr_hex || 'n/a')) and defined( my $extra = $H->{'[Prefix_Base_Altern]'} )) {{
-    $self->export_layers($extra, $nameF);			# Process recipes
-    my $dF = $self->{faces}{$nameF}{'[deadkeyFace]'}{$d} or last;	# may be Compose etc
-#	or warn "d=$d; <", join(' ', keys %{$self->{faces}{$nameF}{'[deadkeyFace]'}}), '>';
-    $self->face_make_backlinks($extra, undef, undef, 'skipfix');	# no prefer-1st/last; without skipfix errors on 2nd call
-    $self->faces_link_via_backlinks($extra, $dF);
-    @enhMap = map $self->linked_faces_2_hex_map($extra, $dF, $_), 0, 1;
-  }}
-  my($flat, @flatMap) = ($self->{faces}{$nameF}{'[FlatPrefixMapFiltered]'}{$d}, {}, {});
-  if (!$OUT_Apple and $flat) {
-    $flatMap[0] = $flat;		# do not put anything into AltGr_Inverted map
+  my $enhMaps = my $enhGrayMapsForce = [{}, {}];
+  $enhMaps      = $H->{'[enhGrayHexMaps]'}{$d}      if !$OUT_Apple and $D ne ($flip_AltGr_hex || 'n/a') and $H->{'[enhGrayHexMaps]'}{$d};
+  $enhGrayMapsForce = $H->{'[enhGrayHexMapsForce]'}{$d} if $enhMaps != $enhGrayMapsForce and $H->{'[enhGrayHexMapsForce]'}{$d};
+  my %enhForce = map {($self->keys2hex($_), 1)} @{$H->{'[Prefix_Force_Altern]'} || []};
+  my($flat, $flatInv, @flatMap) = (map($self->{faces}{$nameF}{"[FlatPrefixMapFiltered$_]"}{$d}, ('', 'Inv')), {}, {});
+  if (!$OUT_Apple and ($flat or $flatInv)) {
+    $flatMap[0] = $flat || {};
+    $flatMap[1] = $flatInv || {};
   }
 
 # warn "output map for `$D' invert=", !!$is_invAltGr_Base_with_chain, ' <',join('> <', sort keys %$dead2),'>';
@@ -8639,20 +9345,54 @@ sub output_deadkeys ($$$$$$;$) {	# Emits 1 or 2 maps; for the 2nd, uses $prefix_
     my $invertAlt = $invertAlt0 || $is_invAltGr_Base_with_chain;
     my $map = $maps[$invertAlt0];
     $d = $DD[$invertAlt0];
-    my($enhMap, $flMap) = ($enhMap[$invertAlt0], $flatMap[$invertAlt0]);
-    $map = {%$enhMap, %$flMap, %$map};
+    my($enhMap, $enhMapForce, $flMap) = ($enhMaps->[$invertAlt0], $enhGrayMapsForce->[$invertAlt0], $flatMap[$invertAlt0]);
+    if (warnReached and my %enhMapForce = %$enhMapForce) {
+  	warn " enhForce: ", join ' ', %enhForce, "\n";
+  	warn " enhMap(for Force): ", join ' ', map {defined() ? $_ : '[u/d]'} %$enhMap, "\n";
+  	warn " enhMapForce: ", join ' ', %enhMapForce, "\n";
+    }
+# warn " ... enhmap $nameF [$d]: ", join(' ' , map {"$_ ⇒ " . (defined $enhMap->{$_} ? $enhMap->{$_} : '[u/d]')} sort keys %$enhMap), "\n" if %$enhMap;
+#  	warn " map $nameF [$d]: ", join ' ', map {defined() ? $_ : '[u/d]'} %$map, "\n";
+    $map = {%$enhMap, %$flMap, %$map, %$enhMapForce};
+    my (%joined_map, %loopOK);
+    for my $hex (sort keys %$map) {	# Temprorarily???  Map joined keys to itself without resolving conficts (sort: consistent EXPL)
+      $joined_map{$hex} = $map->{$hex}, next if $OUT_Apple or $hex =~ /^[a-f\d]{4}$/;
+      my(@comp,%seen,$seen) = split /\./, ($hex =~ /^[a-f\d]+$/
+		                           ? $self->keys2hex(to_UTF16LE_units(chr hex $hex))
+	        	                   : $hex);
+      $seen{$_}++ and $seen++ for @comp;
+      warn("Skipping a binding for $hex in deadkey=$d: conflicts"), next
+        if $seen or grep exists $map->{$_} || exists $joined_map{$_} && not($joined_map{$_}[0] eq $d and $joined_map{$_}[2]==1), @comp;
+      for my $c (0..$#comp) {
+        if ($c==$#comp) {
+          my @b = @{$map->{$hex}||[]};
+          $b[3] ||= '';
+          $b[3] .= " [from multicomponent source $hex]";
+          $joined_map{$comp[$c]} = \@b;
+        } else {
+          $loopOK{$comp[$c]}++;
+          if (exists $joined_map{$comp[$c]}) {
+            $joined_map{$comp[$c]}[3] =~ s/(?<=source\b)/s/; #/
+            $joined_map{$comp[$c]}[3] .= ", $hex";
+          } else {
+            $joined_map{$comp[$c]} = [$d, undef, 1, "Component=" . ($c+1) . " of ". ($#comp+1) . " of multicomponent source $hex"];
+          }
+        }
+      }
+    }
     my $docs1 = (defined $docs ? sprintf("\t// %s%s", ($invertAlt0 ? 'AltGr inverted: ' : ''), $docs) : '');
     $OUT .= "DEADKEY\t$d$docs1\n\n";
     my $OUT_Apple_map = $d;
     # Good order: first alphanum, then punctuation, then space
-    my @keys = sort keys %$map;			# Sorting not OK for 6-byte keys - but can't have them on Win
-    @keys = (grep(( lc(chr hex $_) ne uc(chr hex $_)and not $sp{chr hex $_} ),		      @keys),
-             grep(((lc(chr hex $_) eq uc chr hex $_ and (chr hex $_) !~ /\p{Blank}/) and not $sp{chr hex $_}), @keys),
-            grep((((lc(chr hex $_) eq uc chr hex $_ and (chr hex $_) =~ /\p{Blank}/) or $sp{chr hex $_}) and $_ ne '0020'), @keys),
+    my @keys = sort keys %joined_map;			# Sorting not OK for 6-byte keys - but after joining they disappear
+    @keys = (grep((!/^d[89a-f]/i and  lc(chr hex $_) ne uc(chr hex $_)and not $sp{chr hex $_} ),		      @keys),
+             grep((!/^d[89a-f]/i and (lc(chr hex $_) eq uc chr hex $_ and (chr hex $_) !~ /\p{Blank}/) and not $sp{chr hex $_}), @keys),
+            grep((!/^d[89a-f]/i and ((lc(chr hex $_) eq uc chr hex $_ and (chr hex $_) =~ /\p{Blank}/) or $sp{chr hex $_}) and $_ ne '0020'), @keys),
+             grep(                                                  /^d[89a-f]/i,  @keys),	# 16-bit surrogates
              grep(				                    $_ eq '0020',  @keys));	# make SPACE last
-    for my $n (@keys) {	# Not OK for 6-byte keys (impossible on Win)
-#      warn "doing $n\n";
-      my ($to, $import_dead, $EXPL) = $map->{$n};
+    for my $n (@keys) {	# Only 4-byte keys reach this (except for Apple)
+###      warn("do/skip $n in dk=$d\n") if $n =~ /[^a-f\d]/i or hex $n >= 0x10000;
+      my ($to, $import_dead, $EXPL) = my $map_n = $joined_map{$n};
       if ($to and 'ARRAY' eq ref $to) {
         $EXPL = $to->[3]; 
         $EXPL =~ s/(?=\p{NonspacingMark})/ /g if $EXPL;
@@ -8661,15 +9401,21 @@ sub output_deadkeys ($$$$$$;$) {	# Emits 1 or 2 maps; for the 2nd, uses $prefix_
       }
       warn "0000: face `$nameF' d=`$d': $n --> $to" if $to and $to eq '0000';
       $to = '0000' if $to and $to eq '000000';		# A way to protect from a warning above!
-      my $map_n = $map->{$n};
       $map_n = $map_n->[0] if $map_n and ref $map_n;
-      $H->{'[32-bit]'}{chr hex $map_n}++, next if hex $n > 0xFFFF and $map_n;	# Cannot be put in a map...
-      if ($to and hex $to > 0xFFFF) {		# Value cannot be put in a map...
+###      $H->{'[32-bit]'}{chr hex $map_n}++, next if hex $n > 0xFFFF and $map_n;	# Cannot be put in a map...
+      $H->{'[32-bit]'}{chr hex $map_n}++ if $n !~ /\./ and hex $n > 0xFFFF and $map_n;	# Cannot be put in a map...
+      $n = $self->keys2hex(to_UTF16LE_units(chr hex $n)) if hex(my $n_high = $n) >= 0x10000;
+      if ($to and hex $to > 0xFFFF) {{		# Value cannot be put in a map...
 #        warn "32-bit: n=$n map{n}=$map_n to=$to";
         $H->{'[32-bit]'}{chr hex $map_n}++;
-        next unless defined ($to = $H->{'[DeadChar_32bitTranslation]'});
+        last unless defined ($to = $H->{'[DeadChar_32bitTranslation]'});
         $to =~ s/^\s+//;	$to =~ s/\s+$//;
         $to = $self->key2hex($to);
+      }}
+      if ($n =~ /[^a-f\d]/i or hex $n >= 0x10000) {
+        next if $OUT_Apple;
+        die "Unexpected $n in dk=$d", ($to ? "  -> $to" : '' );
+        next;
       }
       my $was_to = $to;
       $to ||= $default or next;
@@ -8691,16 +9437,16 @@ sub output_deadkeys ($$$$$$;$) {	# Emits 1 or 2 maps; for the 2nd, uses $prefix_
 	}
 	($DEAD, $to) = ('@', $DD[1]);	# Join Inv to not-Inv on $flip_AltGr_hex; Do not overwrite existing binding...  Warn???
       }
-      $to = $default
+      $to = $default			# Do not remap a Ctrl-char to Ctrl-char
         if !($DEAD or $import_dead)
            and defined $default and (0x7f == hex $to or 0x20 > hex $to) and (0x7f == hex $n or 0x20 > hex $n);
-      if (($DEAD or $import_dead) and $d eq $to) {
+      if (($DEAD or $import_dead) and $d eq $to and not $loopOK{$n}) {
         if (($flip_AltGr_hex or 'n/a') eq $d) {		# This is what routinely happens in Flip_AltGr face
           $import_dead = $DEAD = '';
           $to = $H->{'[DeadChar_32bitTranslation]'} || '003f';	# ? = U+003f
           $to =~ s/^\s+//;	$to =~ s/\s+$//;
           $to = $self->key2hex($to);
-          $EXPL = 'removal of immediate deadkey loop';
+          $EXPL = 'removal of immediate deadkey loop in flip_AltGr variant of the base';
         } else {
           warn "Immediate deadkey loop: face `$nameF' d=`$d': $n --> $to";
         }
@@ -8712,8 +9458,10 @@ sub output_deadkeys ($$$$$$;$) {	# Emits 1 or 2 maps; for the 2nd, uses $prefix_
       my $to1 = $self->control2prt(chr hex $to);
 #      warn "Both import_dead and DEAD properties hold for `$from' --> '$to1' via deadkey $d face=$nameF" if $DEAD and $import_dead;
       $DEAD = '@' if $import_dead;
-      $OUT .= sprintf "%s\t%s%s\t// %s -> %s%s\n", $n, $to, $DEAD, $from, $to1, $expl;
-      $OUT_Apple->{$n}{$OUT_Apple_map} = [$to, undef, $DEAD && 1] if $OUT_Apple and 0x20 <= hex $n and 0x7f != hex $n;
+      my $FROM = ($n =~ /^d[89a-f]/i ? '[u16]' : $from);
+      $OUT .= sprintf "%s\t%s%s\t// %s -> %s%s\n", $n, $to, $DEAD, $FROM, $to1, $expl;
+      $OUT_Apple->{$n_high}{$OUT_Apple_map} = [$to, undef, $DEAD && 1]
+        if $OUT_Apple and $n_high !~ /\./ and 0x20 <= hex $n_high and 0x7f != hex $n_high;
     }
     $OUT .= "\n";
     $keys ||= @keys;
@@ -9059,7 +9807,8 @@ sub make_translator ($$$$$) {		# translator may take some values from "environme
   if ($name =~ /^FromTo(FlipShift)?\[(.+)\]$/) {
     my $flip = $1;
     my ($f,$t) = split /,/, "$2", 2;
-    exists $self->{layers}{$_} or $_ = ($self->make_translated_layers($_, $face, [$N], $deadkey))->[0]
+    exists $self->{layers}{$_} or 	(debug_stacking_ord and warn "  mk_tr_lyrs 2"),
+						$_ = ($self->make_translated_layers($_, $face, [$N], $deadkey))->[0]
       for $f, $t;		# Be conservative for caching...
     my $B = "~~~{$f>>>$t}";
     $_ = $self->{layers}{$_} for $f, $t;
@@ -9077,7 +9826,8 @@ sub make_translator ($$$$$) {		# translator may take some values from "environme
   }
   if ($name =~ /^InheritPrefixKeys\[(.+)\]$/) {
     my $base = $1;
-    exists $self->{layers}{$_} or $_= ($self->make_translated_layers($_, $face, [$N], $deadkey))->[0]
+    exists $self->{layers}{$_} or (debug_stacking_ord and warn "  mk_tr_lyrs 3"),
+    					$_= ($self->make_translated_layers($_, $face, [$N], $deadkey))->[0]
       for $base;
     my $baseL = $self->{layers}{$base};
     my (%h);
@@ -9272,8 +10022,9 @@ print 'Extracted ', $self->array2string(\@out), " deadKey=$deadkey\n" if printSO
     my $to = $self->charhex2key($1);
     return sub ($) { my $c = shift; defined $c or return $c; $self->document_char($to, 'DefinedTo', $c) }, '';
   }
-  if ($name =~ /^ByPairs((Inv)?Prefix)?(Flat)?(Apple)?\[(.+)\]$/) {
-    my ($prefix, $invert, $flat, $Apple, $in, @Pairs, %Map) = ($1, $2, $3, $4, $5);
+  if ($name =~ /^ByPairs(Inv)?(Prefix)?(Flat)?(Apple)?\[(.+)\]$/) {
+    my ($invert, $prefix, $flat, $Apple, $in, @Pairs, %Map) = ($1, $2, $3, $4, $5);
+    die "Inversion is tested only with flat maps or a prefix key: <<<$in>>> in `$face´" if $invert and not ($flat or $prefix);
     $in =~ s/^\s+//;
     @Pairs = split /\s+(?!\p{NonspacingMark})/, $in;
     for my $p (@Pairs) {
@@ -9297,9 +10048,11 @@ print 'Extracted ', $self->array2string(\@out), " deadKey=$deadkey\n" if printSO
       $self->{faces}{$face}{'[AppleMap]'}[$N]{$_} = $Map{$_} for keys %Map;
       return $translators{Empty}, '';
     }
-    if ($flat and $deadkey and not $N) {
-      $self->{faces}{$face}{'[FlatPrefixMap]'}{$deadkey}{$self->key2hex($_)}
-        = $self->document_char($Map{$_}, 'explicit tuneup') for keys %Map;
+    if ($flat and not $N) {
+      die "<<<Flat>>> makes sense only in toplevel descriptions of satellite faces: <<<$in>>> in `$face´" unless $deadkey;
+      my $inv = $invert ? 'Inv' : '';
+      $self->{faces}{$face}{"[FlatPrefixMap$inv]"}{$deadkey}{$self->key2hex($_)}
+        = $self->document_char($Map{$_}, 'explicit flat tuneup') for keys %Map;
       $used_deadkey = "/$deadkey";
     }
     return sub ($) { my $c = shift; defined $c or return $c; $c = $c->[0] if 'ARRAY' eq ref $c; $self->document_char($Map{$c}, 'explicit tuneup') }, $used_deadkey;
@@ -9436,36 +10189,45 @@ sub make_translated_layers_noid ($$$@) {		# Stacking
   @$_ == $c or die "Stacking: number of layers ", scalar(@$_), " != number of layers $c of the reference face"
     for @_;
   my @R = map $self->{layers}{$_}, @$refr;
+  my $dbg = debug_noid; # && ((join ' ', map @$_, @_) =~ /US_Base_Compose/ and "@$refr" =~ /Greek/);
   if ($whole) {
     my $last = $#{$R[0]};
     for my $key (0..$last) {
       for my $l (@R) {
-        $seen[$key]{$_}++ for map {ref() ? $_->[0] : $_} grep defined, @{ $l->[$key] };
+        $seen[$key]{$_}++ for map {ref() ? (!!$_->[2]||0) . $_->[0] : "0$_"} grep defined, @{ $l->[$key] };
 #warn "$key of $last: keys=", join(',',keys %{$seen[$key]});
       }
     }
   }
-  my $name = 'NOID([' . join('], [', map {join ' +++ ', @$_} @_) . '])';
+#  my $name = 'NOID([' . join('], [', map {join ' +++ ', @$_} @_) . '])';
   for my $l (0..$c-1) {
-    my (@layers) = map $_->[$l], @_;
+    my (@layers,$rel) = map $_->[$l], @_;
     if ($whole) {
-      $name .= "'"	# Keep names of layers distinct, but since they are all interdependent, do not construct basing on layer names
+      $rel = "*\[$whole]";
+#      $name .= "'"	# Keep names of layers distinct, but since they are all interdependent, do not construct basing on layer names
+#      $name = "NOID*[$whole](" . (join ' +++ ', @layers) . ')'
     } else {
-      $name = "NOID[$refr->[$l]](" . (join ' +++ ', @layers) . ')'
+      $rel = "[$refr->[$l]]";
     }
+    my $name = "NOID$rel(" . (join ' =||= ', @layers) . ')';
     push @out, $name;
 #warn ". Doing layer number $l, name=`$name'...";
-    next if exists $self->{layers}{$name};
-    my ($Refr, @L, @keys) = map $self->{layers}{$_}, $refr->[$l], @layers;
-    for my $ll (@L) {
+    warn "Do layerN=$l\n" if debug_noid and $dbg;
+    (debug_noid and warn "layer exists: $name\n"), next if exists $self->{layers}{$name};
+    my (undef, @L, @keys) = map $self->{layers}{$_}, $refr->[$l], @layers;
+    for my $llN (0..$#L) {
+      warn "Do part:layerN=${llN}:$l\n" if debug_noid and $dbg;
+      my $ll = $L[$llN];
 #warn "... Another layer for $l...";
       for my $k (0..$#$ll) {
         for my $kk (0..$#{$ll->[$k]}) {
-#warn "...... On $k/$kk: I see `$ll->[$k][$kk]'; seen=`$seen[$k]{$ll->[$k][$kk]}'; keys=", join(',',keys %{$seen[$k]}) if defined $ll->[$k][$kk];
 	  my $ch = $ll->[$k][$kk];
 	  my $rch = $R[$l][$k][$kk];
-	  $ch = $ch->[0] if $ch and ref $ch;
-	  $rch = $rch->[0] if $rch and ref $rch;
+	  $ch = (ref $ch ? (!!$ch->[2]||0) . $ch->[0] : "0$ch") if defined $ch;
+	  $rch = (ref $rch ? (!!$rch->[2]||0) . $rch->[0] : "0$rch") if defined $rch;
+	  warn "...... On $llN:$l $k/$kk: I see `$ch'; seen=`",($seen[$k]{$ch} || 'N/A'), "'; keys=", join(',',sort keys %{$seen[$k]})
+	    if debug_noid and defined $ll->[$k][$kk];
+          ### (debug_noid and warn "   ... Use it\n"),
           $keys[$k][$kk] = $ll->[$k][$kk] 	# Deep copy
             if defined $ch and not defined $keys[$k][$kk] 
                and ($whole ? !$seen[$k]{$ch} : $ch ne ( defined $rch ? $rch : '' ));
@@ -9526,6 +10288,7 @@ sub layers_by_face_recipe ($$$;$) {
 #print "face recipe `$face'\n";
   my $LL = $self->{faces}{$base}{layers};
   warn "Using face_recipes for `$face', base=$base ==> `$r'\n" if debug_face_layout_recipes;
+	(debug_stacking_ord and warn "  mk_tr_lyrs 4 (b=$base;;; f=$face)");
   my $L = $self->{faces}{$face}{layers} = $self->make_translated_layers($r, $base, [0..$#$LL]);
 #print "face recipe `$face'  -> ", $self->array2string($L), "\n";
 #  warn "Using face_recipes `$face'  -> ", $self->array2string($L) if debug_face_layout_recipes;
@@ -9550,6 +10313,7 @@ sub pseudo_layer ($$$$;$) {
   ($l = $self->layer_recipe($l)) =~ s/^\s+// if exists $self->{layer_recipes}{$ll};
   warn "pseudo_layer(`$recipe'): Using layout_recipe `$l' for layer '$ll'\n" if debug_face_layout_recipes and exists $self->{layer_recipes}{$ll};
   return $l if $self->{layers}{$l};
+	  (debug_stacking_ord and warn "  mk_tr_lyrs 5");
   ($self->make_translated_layers($l, $face, [$N]))->[0]
 #  die "Component `$l' of a pseudo-layer cannot be resolved"
 }
@@ -9586,6 +10350,7 @@ sub pseudo_layer0 ($$$$) {
     # Analogue of NOID with the principal layers as reference, and layers of DeadKey as sources
     my($notsame, $case) = ($1,$2);
     my $hexPrefix = $self->key2hex($self->charhex2key($3));
+	warn "  mk_tr_lyrs pre-7 e_D_M" if debug_stacking_ord;
     $self->ensure_DeadKey_Map($face, $hexPrefix);
     my $layers = $self->{faces}{$face}{'[deadkeyLayers]'}{$hexPrefix} or die "Unknown prefix character `$hexPrefix´ in layers-from-prefix-key";
     return $layers->[$N] if $N or not $notsame;
@@ -9650,10 +10415,11 @@ sub make_translated_layers ($$$$;$$) {		# support Self/FlipLayers/LinkFace/FlipS
   if (@parts > 1) {
 #warn "parts of the translation spec: <", join('> <', @parts), '>';
     my @layers = map $self->make_translated_layers($_, $face, $NN, $deadkey), @parts;
-    warn "Stacking/NOID for layers `@parts'", (join "\n\t", '', map {join ' &&& ', @$_} @layers), "\n" if debug_noid or debug_stacking;
+    warn "Stacking/NOID for layers `@parts'", (join "\n\t", '', map {join ' &&& ', @$_} @layers), "\n"
+      if debug_noid and $noid or debug_stacking;
 #print "Stacking for `$recipe'\n" if $DEBUG;
 #Dumpvalue->new()->dumpValue(\@layers) if $DEBUG;
-    return [$self->make_translated_layers_noid($noid eq 'NotSameKey', @layers)]
+    return [$self->make_translated_layers_noid($noid eq 'NotSameKey' && " $parts[0] ", @layers)]
       if $noid;
     return [$self->make_translated_layers_stack(@layers)];
   }
@@ -9708,7 +10474,9 @@ sub massage_translated_layers ($$$$;$) {
   return $in unless my $r = $self->get_deep($self, 'faces', (my @p = split m(/), $face), '[Diacritic_if_undef]');
   $r =~ s/^\s+//;
 #warn "	-> end recipe `$r'";
+	warn "  mk_tr_lyrs 6" if debug_stacking_ord;
   my $post = $self->make_translated_layers($r, $face, $NN, $deadkey);
+	warn "  mk_tr_lyrs_st 1" if debug_stacking_ord;
   return [$self->make_translated_layers_stack($in, $post)];
 }
 
@@ -9728,6 +10496,7 @@ sub create_inverted_face ($$$$$) {
   $LL = $H->{layers} if $KK eq '';
   %Map = ($flip_AltGr, [$chain->{$KK and $self->charhex2key($KK)}, undef, 1, 'AltGrInv-faces-chain']) 
     if defined $flip_AltGr and defined $chain->{$KK and $self->charhex2key($KK)};  				    
+	warn "  patch_face 0 f=$F k=$KK" if debug_stacking_ord;
   $self->patch_face($LL, $new_facename, $H->{"[InvdeadkeyLayers]"}{$KK}, $KK, \%Map, $F, 'invert');
 
 # warn "Joining <$F>, <$new_facename>";
@@ -9816,6 +10585,7 @@ sub ensure_DeadKey_Map_by_recipe ($$$$;$$) {
   my $massage = !($recipe =~ s/\s+NoDefaultTranslation$//);
   $layers ||= [ 0 .. $#{$self->{faces}{$F}{layers}} ];
 #warn "Doing key `$hexPrefix' inv=`$inv' face=`$F', recipe=`$recipe'";
+	warn "  mk_tr_lyrs 7 (F=$F, p=$hexPrefix)" if debug_stacking_ord;
   my $new = $self->make_translated_layers($recipe, $F, $layers, $hexPrefix);
   $new = $self->massage_translated_layers($new,    $F, $layers, $hexPrefix) if $massage and not $inv;
   for my $NN (0..$#$layers) {	# Create a layer according to the spec
@@ -9835,10 +10605,10 @@ sub ensure_DeadKey_Map ($$$;$) {
   $hexPrefixWas = $hexPrefix unless defined $hexPrefixWas;
   my $H = $self->{faces}{$F};
   my $v0 = $H->{'[DeadKey__Maps]'}{$hexPrefixWas};
-  for my $inv (keys %$v0) {
+  for my $inv (sort keys %$v0) {
     my $v1 = $v0->{$inv};
     my $K = (($inv and "$inv $hexPrefix" eq "Inv 0000") ? '' : $hexPrefix);
-    for my $layers (keys %$v1) {
+    for my $layers (sort keys %$v1) {
       my $recipe = $self->recipe2str($v1->{$layers});
       $layers = ($layers eq 'All' ? '' : [$layers]);
       $self->ensure_DeadKey_Map_by_recipe($F, $K, $recipe, $layers, $inv);
@@ -9849,18 +10619,18 @@ sub ensure_DeadKey_Map ($$$;$) {
 sub create_DeadKey_Maps ($) {
   my ($self, %h, $expl) = (shift);
 #Dumpvalue->new()->dumpValue($self);
-  for my $F (keys %{ $self->{faces} }) {
+  for my $F ($self->order_faces_4_massage) {
     next if 'HASH' ne ref $self->{faces}{$F} or $F =~ /\bVK$/;			# "parent" taking keys for a child
     my $H = $self->{faces}{$F};
     my $flip_AltGr = $H->{'[Flip_AltGr_Key]'};
     $flip_AltGr = (defined $flip_AltGr) ? $self->charhex2key($flip_AltGr) : 'N/A';
     # Treat first the specific maps (for one deadkey) then the deadkeys which were not seen via the universal map
-    for my $key (keys %{$H->{'[DeadKey__Maps]'}}) {
-      my $v0 = $H->{'[DeadKey__Maps]'}{$key};
+    for my $key (sort keys %{$H->{'[DeadKey__Maps]'}}) {
+###      my $v0 = $H->{'[DeadKey__Maps]'}{$key};
       my @keys = (($key ne '')
       		   ? $key 
       		   : (grep {not $H->{'[DeadKey__Maps]'}{$_} and not $H->{'[ComposeKeys]'}{$_}} 
-			map $self->key2hex($_), grep $_ ne $flip_AltGr, keys %{ $H->{'[DEAD]'} }));
+			map $self->key2hex($_), grep $_ ne $flip_AltGr, sort keys %{ $H->{'[DEAD]'} }));
       $self->ensure_DeadKey_Map($F, $_, $key) for @keys;
     }
   }
@@ -9916,12 +10686,13 @@ sub create_prefix_chains ($) {
         $KK{$from}{$start} = [$to, undef, $Kn != $#prefix || !$trail_nonprefix, 'PrefixChains'];
       }
     }
-    warn "... <$F>: ", join '|', map {$_ . '(' . join(',', keys %{$KK{$_}}) . ')'} keys %KK if keys %KK;
-    for my $K (keys %KK) {
+    warn "... PrefixChains from(to1,to2) <$F>: ", join '|', map {$_ . '(' . join(',', sort keys %{$KK{$_}}) . ')'} sort keys %KK if keys %KK;
+    for my $K (sort keys %KK) {
       my $KK = $self->key2hex($K);
       die "Key `$KK=$K' in PrefixChain for font=`$F' is not a prefix" unless my $KF = $H->{'[deadkeyFace]'}{$KK};
       my $new_facename = "$F*==>*Chain*$KK";
       my $LL = $H->{'[deadkeyLayers]'}{$KK};
+	warn "  patch_face 1" if debug_stacking_ord;
       $self->patch_face($LL, $new_facename, undef, "chain-in-$KK", $KK{$K}, $F, !'invert');
       $H->{'[deadkeyFace]'}{$KK} = $new_facename;
       $H->{'[deadkeyLayers]'}{$KK} = $self->{faces}{$new_facename}{layers};
@@ -9940,7 +10711,7 @@ sub link_composite_layers ($) {		# as above, but finish
     next if @FF == 1 or $FF[-1] eq 'VK';
     push(@HH, $self->get_deep($self, @FF)), pop @FF while @FF;
     my $H = $HH[0];
-    for my $new_facename (values %{$H->{'[deadkeyFace]'}}) {
+    for my $new_facename (sort values %{$H->{'[deadkeyFace]'}}) {
 #warn "Joining <$F>, <$new_facename>";
       $self->link_layers($F, $new_facename, 'skipfix', 'no-slot-warn');
     }
@@ -9951,7 +10722,7 @@ sub link_composite_layers ($) {		# as above, but finish
 sub create_inverted_faces ($) {
   my ($self) = (shift);
 #Dumpvalue->new()->dumpValue($self);
-  for my $F (keys %{$self->{faces} }) {
+  for my $F (sort keys %{$self->{faces} }) {
     next if 'HASH' ne ref $self->{faces}{$F} or $F =~ /\bVK$/;			# "parent" taking keys for a child
     my $H = $self->{faces}{$F};
     next unless $H->{'[deadkeyLayers]'};		# Are we in a no-nonsense Face-hash with defined deadkeys?
@@ -9986,7 +10757,7 @@ sub create_inverted_faces ($) {
       $prev = $K;
     }
     $H->{'[have_AltGr_chain]'} = 1 if length $prev;
-    for my $KK (keys %{$H->{'[deadkeyInvAltGrKey]'}}) {	# Now know which deadkeys take inversion, and via what prefix
+    for my $KK (sort keys %{$H->{'[deadkeyInvAltGrKey]'}}) {	# Now know which deadkeys take inversion, and via what prefix
       my $new = $self->create_inverted_face($F, $KK, \%chain, $flip_AltGr);
       $self->coverage_face0($new);
     }
@@ -9999,30 +10770,36 @@ sub create_inverted_faces ($) {
 sub massage_flat_maps_extra_keys ($) {
   my $self = shift;
   my @F = grep m(^faces(/.*)?$), @{$self->{'[keys]'}};
-  my (@Fok, @Fok0);
+  my (@Fok, @Fok0, @Fnok);
   for my $FF (@F) {
     (my $F = $FF) =~ s(^faces/?)();
-    my(@FF, @HH) = split m(/), $FF;
+    my(@FF, @HH, @FokF) = split m(/), $FF;
     next if @FF == 1 or $FF[-1] eq 'VK';
-    push @Fok, $F;
+    push @Fok, $F;				# Assumed base faces
     my($H) = $self->get_deep($self, @FF);
-    my $Cov = $H->{'[coverageExtraFull]'};
+    my $Cov = $H->{'[coverageExtraInclPrefix]'};
 ##    warn join ',', sort keys %$Cov;
-    for my $dead (keys %{$H->{'[FlatPrefixMap]'}}) {
-      my $c = '';
-      for my $cHex (keys %{$H->{'[FlatPrefixMap]'}{$dead}}) {
+    for my $inv ('', 'Inv') {
+     for my $dead (sort keys %{$H->{"[FlatPrefixMap$inv]"}}) {
+      my($sk, @c) = ('');
+      for my $cHex (sort keys %{$H->{"[FlatPrefixMap$inv]"}{$dead}}) {
         my $chr = $self->charhex2key($cHex);
-        next unless $Cov->{$chr};
-        my $to = $H->{'[FlatPrefixMap]'}{$dead}{$cHex};	# key (documented)
+        my $to = $H->{"[FlatPrefixMap$inv]"}{$dead}{$cHex};	# key (documented)
         my @to0 = @$to;
         $to0[0] = $self->key2hex($to->[0]);		# hex
-        $H->{'[FlatPrefixMapFiltered]'}{$dead}{$cHex} = \@to0;
-        $c .= ",$cHex⇒$to0[0]";
+        $sk .= ",$cHex⇒$to0[0]", next unless $Cov->{$chr};
+        $H->{"[FlatPrefixMapFiltered$inv]"}{$dead}{$cHex} = \@to0;
+        push @c, "$cHex⇒$to0[0]";
+        $H->{"[FlatPrefixMapAccessibleHex]"}{$dead}{$to0[0]} = 1;
       }
-      push @Fok0, "$F→$dead$c";
+      push @FokF, "$dead$inv⇝ " . join ',', @c if @c;
+      push @Fnok, "$F→$dead$inv$sk" if length $sk;
+     }
     }
+    push @Fok0, "\t... Flatmap $F:\t@FokF\n" if @FokF;
   }
-  warn "\tFok: @Fok\n\t...: @Fok0\n";
+  warn join '', "\tBase Faces: @Fok\n", @Fok0 if @Fok0 or @Fnok;
+  warn "\t... Flatmaps with no basekey: @Fnok\n" if @Fnok;
   $self
 }
 
@@ -10049,6 +10826,29 @@ sub patch_face ($$$$$$$;$) {	# flip layers paying attention to linked AltGr-inve
   @n1 = map $self->flip_layer_N($_, $#$LL), @n1 if $inv;
   my @invLL = @$LL[@n1];
   push @prefix, \@K if @K;
+  if (not $mapId and $inv) {	# remove unreachable stuff (as early as possible) to simplify inspection of coverage
+    my @oNames = @invLL;  @invLL = ();
+    for my $li (0..$#oNames) {
+      my $oname = $oNames[$li];
+      my $nname = "$face##InvStrict$li#" . $oname;
+      $self->{layers}{$nname} = $self->deep_copy($self->{layers}{$oname});
+      push @invLL, $nname;
+    }
+    my @LLL = map $self->{layers}{$_}, @invLL;
+    for my $k (0..$#{$LLL[0]}) {
+      if (defined $LLL[0][$k] and defined $LLL[1][$k]) {
+        for my $shft (0, 1) {
+          unless (defined $LLL[0][$k][$shft] and defined $LLL[1][$k][$shft]) {
+            undef $LLL[$_][$k][$shft] for 0, 1;
+          }
+        }
+      } else {
+        $LLL[$_][$k] = [] for 0, 1;
+      }
+    }
+  }
+  my @p;
+	(@p = map "<@$_>", @prefix), warn "  mk_tr_lyrs_st 2 (((@p)))\t[[[@invLL]]]" if debug_stacking_ord;
   $self->{faces}{$newname}{layers} = [$self->make_translated_layers_stack(@prefix, \@invLL)];
 }
 
@@ -10064,13 +10864,14 @@ sub fmt_bitmap_mods ($$$;$) {
   $O
 }
 
-sub BaseKeys ($$) {
-  my($self, $K) = (shift, shift);
+sub Base_VK_names ($$) { # returns array of VK_-names: default names (based on BaseLayer), f-key names, or those from .../VK
+  my($self, $K) = (shift, shift);					# name is undef if this is a “fake” position
   my $F = $self->get_deep($self, @$K);		# Presumably a face hash, as in $K = [qw(faces US)]
   return $F->{baseKeysWin} if $F->{baseKeysWin};
   my $cnt = $F->{'[non_VK]'};
   my $b = $F->{BaseLayer};
   my $layers = $F->{layers};
+	warn "  mk_tr_lyrs 8" if debug_stacking_ord;
   $b = $self->make_translated_layers($b, $K->[-1], [0])->[0] if defined $b and not $self->{layers}{$b};
   my $basesub = [((defined $b) ? $b : ()), $F->{layers}[0]];
   my $max = -1;
@@ -10083,7 +10884,7 @@ sub BaseKeys ($$) {
 #  warn("base:   max=$max  cnt=$cnt");
   for my $u (0..$max) {
     my $c = $self->base_unit($basesub, $u, $u >= $cnt);	# [0 || 1 (!in_main_island), VK, raw]
-    my($k, $kk) = ($c->[1], $c->[2]);			# uc(With prepended #), orig (or undef if not array)
+    my($k, $kk) = ($c->[1], $c->[2]);			# uc(With appended #), orig (or undef if not array)
     if (!$c->[0]) {					# Main island of keyboard
       $k = $oem_keys{$k} or warn("Can't find a key with VKEY `[@$c]', unit=$u, lim=$cnt", (defined $k and " k=<<$k>>")), return
         unless $k =~ /^[A-Z0-9]$/;
@@ -10097,7 +10898,7 @@ sub BaseKeys ($$) {
     push @oo, $kk;
   }
   my $o = $F->{'[VK_off]'};
-  for my $b (\@o, \@oo) {			# Explicitly add via-VK keys
+  for my $b (\@o, \@oo) {	# Fill the VK names assigned in “layoutName”/VK section
     for my $vk (keys %$o) {
       warn "[@$K]: $vk defined on \@$o->{$vk} as $b->[$o->{$vk}]" if defined $b->[$o->{$vk}];
       $b->[$o->{$vk}] = $vk unless defined $b->[$o->{$vk}];
@@ -10114,7 +10915,7 @@ sub fill_win_template ($$$;$$) {
   my @K = qw( COMPANYNAME LAYOUTNAME COPYR_YEARS LOCALE_NAME LOCALE_ID DLLNAME SORT_ORDER_ID_ LANGUAGE_NAME );
   my ($self, $t, $k, $dummy, $dummyDscr, %h) = (shift, shift, shift, shift, shift);
   $self->reset_units;
-  my $B = $self->BaseKeys($k);
+  my $B = $self->Base_VK_names($k);
 # Dumpvalue->new()->dumpValue($self);
   my $idx = $self->get_deep($self, @$k, 'MetaData_Index');
   $h{$_} = $self->get_deep_via_parents($self, $idx, @$k, $_) for @K;
@@ -10237,7 +11038,7 @@ sub fill_osx_template ($$) {
   my @K = qw( OSX_LAYOUTNAME LAYOUTNAME OSX_ID OSX_ADD_VERSION OSX_DUP_KEYS COPYR_YEARS COMPANYNAME );
   my ($self, $k, %h, %ids) = (shift, shift);
   $self->reset_units;
-  my $B = $self->BaseKeys($k);
+  my $B = $self->Base_VK_names($k);
 # Dumpvalue->new()->dumpValue($self);
   my $idx = $self->get_deep($self, @$k, 'MetaData_Index');
   $h{$_} = $self->get_deep_via_parents($self, $idx, @$k, $_) for @K;
@@ -10606,14 +11407,15 @@ my %uni_manual = (phonetized => [qw( 0 ə  s ʃ  z ʒ  j ɟ  v ⱱ  n ɳ  N ⁿ 
                      π ⲡ Π Ⲡ ρ ⲣ Ρ Ⲣ σ ⲥ Σ Ⲥ τ ⲧ Τ Ⲧ υ ⲩ Υ Ⲩ φ ⲫ Φ Ⲫ χ ⲭ Χ Ⲭ ψ ⲯ Ψ Ⲯ ω ⲱ Ω Ⲱ  )],
 		  latin2extracoptic => [qw( - ⸗
                      s ϣ S Ϣ f ϥ F Ϥ x ϧ X Ϧ h ϩ H Ϩ j ϫ J Ϫ t ϯ T Ϯ p ⳁ P Ⳁ a ⳉ A Ⳉ )],
-		  addline    => [qw( 0 ∅  ∅ ⦱  + ∦  ∫ ⨏  • ⊝  / ⫽  ⫽ ⫻  ∮ ⨔  × ⨳  × ⩐ )],	#   ∮ ⨔ a cheat
+		  addline    => [qw( 0 ∅  ∅ ⦱  + ∦  ∫ ⨏  • ⊝  / ⫽  ⫽ ⫻  ∮ ⨔  × ⨳  × ⩐  ⊊ ⊈  ⊋ ⊉  ⫋ ⫅  ⫌ ⫆
+		  		     ⪇ ⪙  ⪈ ⪚  ≦ ≨  ≧ ≩)],	#   ∮ ⨔ a cheat
 		  addhline   => [qw( = ≣  = ≡  ≡ ≣  † ‡  + ∦  / ∠  | ∟  . ∸  ∨ ⊻  ∧ ⊼  ◁ ⩤  * ⩮ 
 		  		     ⊨ ⫢  ⊦ ⊧  ⊤ ⫧  ⊥ ⫨  ⊣ ⫤  ⊳ ⩥  ⊲ ⩤  ⋄ ⟠  ∫ ⨍  ⨍ ⨎  • ⦵  ( ∈  ) ∋
-		  		     ∪ ⩌  ∩ ⩍  ≃ ≅  ⨯ ⨲ )],	# conflict with modifiers: qw( _ ‗ ); ( ∈  ) ∋ not very useful - but logical - with ∈∋ as bluekeys...  2 ƻ destructive
+		  		     ∪ ⩌  ∩ ⩍  ≃ ≅  ⨯ ⨲  < ⪕  ≤ ⪛  ⪇ ⩽  ≦ ⫹  > ⪖  ≥ ⪜ ⪈ ⩾  ≧ ⫺ )],	# conflict with modifiers: qw( _ ‗ ); ( ∈  ) ∋ not very useful - but logical - with ∈∋ as bluekeys...  2 ƻ destructive
 		  addvline   => [qw( ⊢ ⊩  ⊣ ⫣  ⊤ ⫪  ⊥ ⫫  □ ⎅  | ‖  ‖ ⦀  ∫ ⨒  ≢ ⩨  ⩨ ⩩  • ⦶  
 		  		     \ ⫮  ° ⫯  . ⫰  ⫲ ⫵  ∞ ⧞  = ⧧  ⧺ ⧻  + ⧺  ∩ ⨙  ∪ ⨚  0 ⦽  _ ⟂  _ ∟ )],		#  + ⫲ 
-		  addtilde   => [qw( 0 ∝  / ∡  \ ∢  ∫ ∱  ∮ ⨑  : ∻  - ≂  ≠ ≆  ~ ≋  ~ ≈  ∼ ≈  ≃ ≊  ≈ ≋  = ≌  
-		  		     ≐ ≏  ( ⟅  ) ⟆  ∧ ⩄  ∨ ⩅  ∩ ⩆  ∪ ⩇  )],	# not on 2A**
+		  addtilde   => [qw( 0 ∝  / ∡  \ ∢  ∫ ∱  ∮ ⨑  : ∻  - ≂  ≠ ≆  ~ ≋  ~ ≈  ∼ ≈  ≃ ≊  ≈ ≋  = ≌  ⪇ ⋦  ≦ ≴  ⪈ ⋧  ≧ ≵
+		  		     ≐ ≏  ( ⟅  ) ⟆  ∧ ⩄  ∨ ⩅  ∩ ⩆  ∪ ⩇  ≤ ⪍  ≥ ⪎  ⊊ ≴  ⊋ ≵  ⫋ ⋦  ⫌ ⋧)],	# not on 2A**
 		  adddot     => [qw( : ⫶  " ∵  ∫ ⨓  ∮ ⨕  □ ⊡  ◇ ⟐  ( ⦑  ) ⦒  ≟ ≗  ≐ ≑
 		  		     - ┄  — ┄  ─ ┈  ━ ┅  ═ ┉  | ┆  │ ┊  ┃ ┇  ║ ┋ )],	# ⫶ is tricolon, not vert. …   "; (m-)dash/bar, (b)[h/v]draw, bold/dbl
 		  adddottop  => [qw( + ∔ )],
@@ -10622,32 +11424,34 @@ my %uni_manual = (phonetized => [qw( 0 ə  s ʃ  z ʒ  j ɟ  v ⱱ  n ɳ  N ⁿ 
 		  addright   => [qw( = ≕  × ⨵  × ⋊  / ⋌  + ⨮  - ∹  ∫ ⨔  ∮ ∲  ⊂ ⫏  ⊃ ⟉  ⊲ ⧏  ⊢ ⟝  ⊣ ⫣  
 		  		     ◇ ⟣  △ ⧩  • ⥁  ⋈ ⧒  ≟ ⩼  ≐ ≒  | ⩗  ⊳ ⫸  : ⧴)],	#  × ⨵ is hidden
 		  sharpen    => [qw( < ≺  > ≻  { ⊰  } ⊱  ( ⟨  ) ⟩  ∧ ⋏  ∨ ⋎  . ⋄  ⟨ ⧼  ⟩ ⧽  ∫ ⨘  
-		  		     ⊤ ⩚  ⊥ ⩛  ◇ ⟡  ▽ ⧍  • ⏣  ≟ ≙  + ⧾  - ⧿)],	# ⋆
+		  		     ⊤ ⩚  ⊥ ⩛  ◇ ⟡  ▽ ⧍  • ⏣  ≟ ≙  + ⧾  - ⧿  ⊊ ⪱  ⊋ ⪲  ⪇ ⪱  ⪈ ⪲  ⫋ ⪵  ⫌ ⪶  ≦ ⪳  ≧ ⪴ )],	# ⋆  ⪇≦ ⪈≧
 		  unsharpen  => [qw( < ⊏  > ⊐  ( ⟮  ) ⟯  ∩ ⊓  ∪ ⊔  ∧ ⊓  ∨ ⊔  . ∷  ∫ ⨒  ∮ ⨖  { ⦉  } ⦊
-		  		     / ⧄  \ ⧅  ° ⧇  ◇ ⌺  • ⌼  ≟ ≚  ≐ ∺  ( 〘  ) 〙  )],	#   + ⊞  - ⊟  * ⊠  . ⊡  × ⊠,   ( ⦗  ) ⦘  ( 〔  ) 〕
+		  		     / ⧄  \ ⧅  ° ⧇  ◇ ⌺  • ⌼  ≟ ≚  ≐ ∺  ( 〘  ) 〙  ⊊ ⋤  ⊋ ⋥  ⪇ ⋤  ⪈ ⋥  ⫋ ⋢  ⫌ ⋣  ≦ ⋢  ≧ ⋣ )],	#   + ⊞  - ⊟  * ⊠  . ⊡  × ⊠,   ( ⦗  ) ⦘  ( 〔  ) 〕
 		  whiten     => [qw( [ ⟦  ] ⟧  ( ⟬  ) ⟭  { ⦃  } ⦄  ⊤ ⫪  ⊥ ⫫  ; ⨟  ⊢ ⊫  ⊣ ⫥  ⊔ ⩏  ⊓ ⩎  ∧ ⩓  ∨ ⩔  _ ‗  = ≣
 		  		     : ⦂  | ⫾  | ⫿  • ○  < ⪡  > ⪢  ⊓ ⩎  ⊔ ⩏  )],	# or blacken □ ■  ◻ ◼  ◽ ◾  ◇ ◆  △ ▲  ▵ ▴  ▽ ▼  ▿ ▾
 		  quasisynon => [qw( ∈ ∊  ∋ ∍  ≠ ≶  ≠ ≷  = ≸  = ≹  ≼ ⊁  ≽ ⊀  ≺ ⋡  ≻ ⋠  < ≨  > ≩  Δ ∆
 		  		     ≤ ⪕  ≥ ⪖  ⊆ ⊅  ⊇ ⊄  ⊂ ⊉  ⊃ ⊈  ⊏ ⋣  ⊐ ⋢  ⊳ ⋬  ⊲ ⋭  … ⋯  / ⟋  \ ⟍
 		  		     ( ⦇  ) ⦈  [ ⨽  ] ⨼  ∅ ⌀
 		  		     ⊤ ⫟  ⊥ ⫠  ⟂ ⫛  □ ∎  ▽ ∀  ‖ ∥  ≟ ≞  ≟ ≜  ~ ‿  ~ ⁀  ■ ▬ )],	# ( ⟬  ) ⟭ < ≱  > ≰ ≤ ≯  ≥ ≮  * ⋆
-		  amplify    => [qw( < ≪  > ≫  ≪ ⋘  ≫ ⋙  ∩ ⋒  ∪ ⋓  ⊂ ⋐  ⊃ ⋑  ( ⟪  ) ⟫  ∼ ∿  = ≝  ∣ ∥  . ⋮  
+		  amplify    => [qw( < ≪  > ≫  ≪ ⋘  ≫ ⋙  ∩ ⋒  ∪ ⋓  ⊂ ⋐  ⊃ ⋑  ( ⟪  ) ⟫  ∼ ∿  = ≝  ∣ ∥  . ⋮  ⪇ ⪉  ≦ ⪅  ⪈ ⪊  ≧ ⪆
 		  		     ∈ ∊  ∋ ∍  - −  / ∕  \ ∖  √ ∛  ∛ ∜  ∫ ∬  ∬ ∭  ∭ ⨌  ∮ ∯  ∯ ∰  : ⦂  ` ⎖
 		  		     : ∶  ≈ ≋  ≏ ≎  ≡ ≣  × ⨯  + ∑  Π ∏  Σ ∑  ρ ∐  ∐ ⨿  ⊥ ⟘  ⊤ ⟙  ⟂ ⫡  ; ⨾  □ ⧈  ◇ ◈
 		  		     ⊲ ⨞  ⊢ ⊦  △ ⟁  ∥ ⫴  ⫴ ⫼  / ⫽  ⫽ ⫻  • ●  ⊔ ⩏  ⊓ ⩎  ∧ ⩕  ∨ ⩖  ▷ ⊳  ◁ ⊲
 		  		     ⋉ ⧔  ⋊ ⧕  ⋈ ⧓  ⪡ ⫷  ⪢ ⫸  ≟ ≛  ≐ ≎  ⊳ ⫐  ⊲ ⫏  { ❴  } ❵  × ⨶  )],	# `  ⋆ ☆  ⋆ ★ ;  ˆ ∧ conflicts with combining-ˆ; * ∏ stops propagation *->×->⋈, : ⦂ hidden; ∥ ⫴; × ⋈ not needed; ∰ ⨌ - ???; ≃ ≌ not useful
-		  turnaround => [qw( ∧ ∨  ∩ ∪  ∕ ∖  ⋏ ⋎  ∼ ≀  ⋯ ⋮  … ⋮  ⋰ ⋱  _ ‾
-		  		     8 ∞  ∆ ∇  Α ∀  Ε ∃  ∴ ∵  ≃ ≂
-		  		     ∈ ⫛  ∈ ∋  ∋ ⫙  ∉ ∌  ∊ ∍  ∏ ∐  ± ∓  ⊓ ⊔  ≶ ≷  ≸ ≹  ⋀ ⋁  ⋂ ⋃  ⋉ ⋊  ⋋ ⋌  ⋚ ⋛  ≤ ⋜  ≥ ⋝  ≼ ⋞  ≽ ⋟  )],			# XXXX Can't do both directions
+		  turnaround => [qw( ∧ ∨  ∩ ∪  ∕ ∖  ⋏ ⋎  ∼ ≀  ⋯ ⋮  … ⋮  ⋰ ⋱  _ ‾ 
+		  		     8 ∞  ∆ ∇  Α ∀  Ε ∃  ∴ ∵  ≃ ≂  ˆ ˯
+		  		     ∈ ⫛  ∈ ∋  ∋ ⫙  ∉ ∌  ∊ ∍  ∏ ∐  ± ∓  ⊓ ⊔  ≶ ≷  ≸ ≹
+		  		     ⋀ ⋁  ⋂ ⋃  ⋉ ⋊  ⋋ ⋌  ⋚ ⋛  ≤ ⋜  ≥ ⋝  ≼ ⋞  ≽ ⋟  )],		# XXXX Can't do both directions
 		  superize   => [qw( h ʱ  ' ʹ  < ˂  > ˃  ^ ˑ  ( ˓  ) ˒  ⊢ ˫  0 ᵊ  * ˟  × ˟  ~ ﹋  ≈ ﹌  ─ ‾
 		  		     □ ⸋  . ⸳  @ ♭), '#' => '♯'],				# ' Additions to <super>!
 		  subize     => [qw( < ˱  > ˲  _ ˍ  ' ˏ  " ˶  ˵ ˵  . ˳  ° ˳  ˘ ˯  ˘ ˬ  ( ˓  ) ˒  0 ₔ  ~ ﹏  ═ ‗), ',' => '¸'],	# '
 		  subize2    => [qw( < ˂  > ˃    )],		# these are in older Unicode, so would override if in subize
 		  # Most of these are for I/O on very ancient systems (only ∘ and ∅ are not auto-detected on quadapl):
 		  aplbox     => [qw( | ⌷  = ⌸  ÷ ⌹  ◇ ⌺  ∘ ⌻  ○ ⌼  / ⍁  \ ⍂  < ⍃  > ⍄  ← ⍇  → ⍈  ∨ ⍌  Δ ⍍  ↑ ⍐  ∧ ⍓  ∇ ⍔  ↓ ⍗  ' ⍞  : ⍠  ≠ ⍯  ? ⍰  ∅ ⎕ )], #'
-		  round      => [qw( < ⊂  > ⊃  = ≖  = ≗  = ≍  ∫ ∮  ∬ ∯  ∭ ∰  ∼ ∾  - ⊸  □ ▢  ∥ ≬  ‖ ≬  • ⦁
+		  round      => [qw( < ⊂  > ⊃  = ≖  = ≗  = ≍  ∫ ∮  ∬ ∯  ∭ ∰  ∼ ∾  - ⊸  □ ▢  □ ∷  ∥ ≬  ‖ ≬  • ⦁
 		  		     … ∴  ≡ ≋  ⊂ ⟃  ⊃ ⟄  ⊤ ⫙  ⊥ ⟒  ( ⦖  ) ⦕  ( ⦓  ) ⦔  ( ⦅  ) ⦆  ⊳ ⪧  ⊲ ⪦  ≟ ≘  ≐ ≖  . ∘
-		  		     [ ⟬  ] ⟭  { ⧼  } ⧽  % ⦼  % ‰  × ⦻  ⨯ ⨷  ∧ ∩ ∨ ∪ )]);	#   = ≈
+		  		     [ ⟬  ] ⟭  { ⧼  } ⧽  % ⦼  % ‰  × ⦻  ⨯ ⨷  ∧ ∩ ∨ ∪ )],	#   = ≈
+		  hattify    => [qw(⊊ ⋨  ⊋ ⋩  ⫋ ⪹  ⫌ ⪺)]);
 
 sub parse_NameList ($$) {
   my ($self, $f, $k, $kk, $name, $_c, %basic, %cached_full, %compose, $version,
@@ -10848,6 +11652,7 @@ sub parse_NameList ($$) {
       next if $raw =~ /-SYMBOL$/ and 0 <= index($append, "SYMBOL");	# <calculated-SYMBOL>
       warn "raw=`$raw', prepend=<$prepend>, append=<$append>, base=$Cand->[0]\n" if debug_GUESS_MASSAGE;
       $t++;
+		warn "cand1=`$Cand->[1]' c=`$c'" unless defined $Cand->[0];
       $b = "$prepend$Cand->[0]$append";
       $b =~ s/\bTWO-HEADED\b/TWO HEADED/ unless $N{$b};
       $b =~ s/\bTIMES\b/MULTIPLICATION SIGN/ unless $N{$b};
@@ -10975,7 +11780,30 @@ sub print_decompositions($;$) {
   }
 }
 
-sub print_compositions($$) {
+sub print_compositions_ch_filter($;$$) {
+  my $self = shift;
+  my $filter = (@_ and shift);
+  my $comp = @_ ? shift : do {   my $f = $self->get_NamesList;
+	  $self->load_compositions($f) if defined $f;
+	  $self->{Compositions}} ;
+  my %F = map +($_,1), @$filter;
+  for my $c ($filter ? @$filter : sort keys %$comp) {	# composing char
+    warn("Unknown composition prefex: [[[$c]]]"), next unless exists $comp->{$c};
+    print "$c\n"; 
+    for my $b (sort keys %{$comp->{$c}}) {	# base char
+      my $arr = $comp->{$c}{$b};
+      my @out = map +($_->[0] ? '? ' : '= ') . $_->[1], @$arr;
+      print "\t$b\t->\t", join(",\t\t", @out), "\n";
+    }
+  }
+}
+
+sub print_compositions_ch($;$) {
+  my $self = shift;
+  $self->print_compositions_ch_filter(undef, @_);
+}
+
+sub print_compositions($;$) {
   goto &print_compositions_ch if @_ == 1;
   my ($self, $comp) = (shift, shift);
   for my $c (sort {fromHEX $a <=> fromHEX $b or $a cmp $b} keys %$comp) {	# composing char
@@ -10983,21 +11811,6 @@ sub print_compositions($$) {
     for my $b (sort {fromHEX $a <=> fromHEX $b or $a cmp $b} keys %{$comp->{$c}}) {	# base char
       my $arr = $comp->{$c}{$b};
       my @out = map +($_->[0] ? '?' : '=') . $_->[1], @$arr;
-      print "\t$b\t->\t", join(",\t\t", @out), "\n";
-    }
-  }
-}
-
-sub print_compositions_ch($$) {
-  my $self = shift;
-  my $comp = @_ ? shift : do {   my $f = $self->get_NamesList;
-	  $self->load_compositions($f) if defined $f;
-	  $self->{Compositions}} ;
-  for my $c (sort keys %$comp) {	# composing char
-    print "$c\n"; 
-    for my $b (sort keys %{$comp->{$c}}) {	# base char
-      my $arr = $comp->{$c}{$b};
-      my @out = map +($_->[0] ? '? ' : '= ') . $_->[1], @$arr;
       print "\t$b\t->\t", join(",\t\t", @out), "\n";
     }
   }
@@ -12730,15 +13543,16 @@ sub merge_hash_to ($$$) {	# We do NOT do deep copy
 sub create_composeArray ($$$) {
   my ($self, $key, $method) = (shift, shift, shift);
   my $names = $self->get__value($key) or return;
-  my @A;
+  my @A; # my $H;
   for my $fn (@$names) {
     $self->composefile_2_array($method, $fn, my $a = []);
     push @A, $a;
-#    $self->compose_array_2_hash($a, my $h = {});
-#    $self->merge_hash_to($h, $H);
-# warn "CP< ", join ', ', keys %$h;
+##    $self->compose_array_2_hash($a, my $h = {});
+####    $self->merge_hash_to($h, $H);
+##    warn "$fn: CP<\n" if printSkippedComposeKey;
+##    warn "CP< ", join ', ', keys %$h if printSkippedComposeKey;
   }
-# warn "CP= ", join ', ', keys %$H;
+#  warn "CP= ", join ', ', keys %$H if printSkippedComposeKey;
   \@A;
 }
 
@@ -12873,8 +13687,8 @@ sub create_composekey ($$$) {
     $self->{'[ComposeArrays]'} = \@Arrays;
     $self->{'[ComposeShowIdx]'} = \@Show;
   }
-  my($v, $vv) = map $self->{faces}{$F}{$_}, qw( [coverage00hash] [coverageExtra] );
-#  warn "Filter hashes $F ", scalar keys %$v, ' ', scalar keys %$vv, ' ', scalar @{$self->{faces}{$F}{'[coverage00]'}};
+  my($v, $vv) = map $self->{faces}{$F}{$_}, qw( [coverage0oneUTF16hash] [coverageExtra] );
+#  warn "Filter hashes $F ", scalar keys %$v, ' ', scalar keys %$vv, ' ', scalar @{$self->{faces}{$F}{'[coverage0oneUTF16]'}};
   for my $A (@Arrays) {		# one per type
     my($arr, $pref) = @$A;
     my @NN;
@@ -12882,7 +13696,7 @@ sub create_composekey ($$$) {
       my @N;
       for my $l (@$a) {
         my($out, $term, @in) = @$l;
-        next if grep {not ($v->{$_} or $vv->{$_})} @in;
+        next if grep {not ($v->{$_} or $vv->{$_} or $linked and $linked->{$_})} @in;
 # my $c;
 # warn "in=<@in>, k=$c, 00=", !!$v->{$c}, " Extra=", !!$vv->{$c} if ($c) = grep {ord() <= 0x30ff and ord >= 0x30f0} @in;
         push @N, $l;
@@ -12957,7 +13771,7 @@ sub XKB_key ($$$;$$$$) {			# unfinished ( ##### is for Apple parts needing work)
   my $F = $self->get_deep($self, @$K);		# Presumably a face hash, as in $K = [qw(faces US)]
   my $L = [map $self->{layers}{$_}, @{$F->{layers}}];
   $L = $L->[$l];
-  my $B = $use_base && $self->BaseKeys($K);	# Partially implemented: use BaseKeys instead of the real $F (VK_ code)
+  my $B = $use_base && $self->Base_VK_names($K);	# Partially implemented: use Base_VK_names instead of the real $F (VK_ code)
   $B = [map {defined() && /^\w$/ ? lc $_ : $_} @$B] if ($use_base || 0) > 0;
   my @AppleMap;					##### = _AppleMap unless @AppleMap;
   warn 'AppleMap too long' if $#AppleMap >= 127;
@@ -13109,7 +13923,7 @@ sub output_unit_XKB ($$$$$$$$) {
 sub output_layout_XKB ($$) {
   my ($self, $k) = (shift, shift, shift, shift);
   $self->reset_units;
-  my $B = $self->BaseKeys($k);
+  my $B = $self->Base_VK_names($k);
 # Dumpvalue->new()->dumpValue($self);
 # warn "Translate: ", %h;
   my $F = $self->get_deep($self, @$k);		# Presumably a face hash, as in $k = [qw(faces US)]
@@ -13289,7 +14103,7 @@ sub AppleMap_Base ($$) {
   @AppleMap = _AppleMap unless @AppleMap;
   warn 'AppleMap too long' if $#AppleMap >= 127;
   $self->reset_units;
-  my $BB = $self->BaseKeys($K);		# VK per position (except via-VK keys)
+  my $BB = $self->Base_VK_names($K);		# VK per position (except via-VK keys)
   my $B = $F->{baseKeysRaw};		# chars on key (if the first occurence???) OR VK
   my(@o, @A, @AA);			# A: kbdd --> Apple;	AA: Apple --> kbdd
   $_ = [@$_] for $B, $BB;		# 1-level deep copy
@@ -13378,8 +14192,8 @@ EOS
 my $merge_states_6_and_4 = 1;
 my $do_hex5 = 0;			# Won’t install with this…  (Even with $merge_states_6_and_4)
 
-sub output_hex_input ($$$) {		# only 4-hex-digits input supported now.  First state in $states{'1of4'}[0].
-  my($self, $states, $HEX, $o) = (shift, shift, shift, '');
+sub output_hex_input ($$$) {	# above 4-hex-digits input often overloads stack of Apple’s programs.  At start state in $states{'1of4'}[0].
+  my($self, $states, $HEX, $o) = (shift, shift, shift, '');	# $HEX one of "-u\x20_+=0-9a-f"
   unless ($HEX =~ /[0-9a-f]/i) {
     return $do_hex5 ? <<EOS : <<EOS;
             <!-- switch 4-to-5-to-6-digit-HEX input -->
@@ -13604,7 +14418,7 @@ sub AppleMap_i_j ($$$$$;$$$$) {	# http://forums.macrumors.com/archive/index.php/
   my $F = $self->get_deep($self, @$K);		# Presumably a face hash, as in $K = [qw(faces US)]
   my $L = [map $self->{layers}{$_}, @{$F->{layers}}];
   $L = $L->[$l];
-  my $B = $use_base && $self->BaseKeys($K);	# Partially implemented: use BaseKeys instead of the real $F (VK_ code)
+  my $B = $use_base && $self->Base_VK_names($K);	# Partially implemented: use Base_VK_names instead of the real $F (VK_ code)
   $B = [map {defined() && /^\w$/ ? lc $_ : $_} @$B] if ($use_base || 0) > 0;
   @AppleMap = _AppleMap unless @AppleMap;
   warn 'AppleMap too long' if $#AppleMap >= 127;

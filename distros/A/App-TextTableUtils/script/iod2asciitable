@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-10'; # DATE
+our $DATE = '2023-12-03'; # DATE
 our $DIST = 'App-TextTableUtils'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 my ($ifmt, $ofmt) = $0 =~ /(\w+)2(\w+)\z/ or die "Please call me as <foo>2<bar> (not $0)";
 
@@ -20,8 +20,8 @@ my %Opts;
         "backend|b=s" => \$Opts{backend},
         "transpose|t" => \$Opts{transpose},
         "csv-sep|s=s" => \$Opts{csv_sep},
-        "csv-quote|s=s" => \$Opts{csv_quote},
-        "csv-escape|s=s" => \$Opts{csv_escape},
+        "csv-quote|q=s" => \$Opts{csv_quote},
+        "csv-escape|e=s" => \$Opts{csv_escape},
         "csv-loose|l" => \$Opts{csv_loose}
     ) or die "$0: Error in getting options, bailing out\n";
 }
@@ -196,7 +196,7 @@ iod2asciitable - Convert/render {CSV,TSV,INI,IOD,JSON/Perl array-of-arrays} into
 
 =head1 VERSION
 
-This document describes version 0.009 of iod2asciitable (from Perl distribution App-TextTableUtils), released on 2023-03-10.
+This document describes version 0.010 of iod2asciitable (from Perl distribution App-TextTableUtils), released on 2023-12-03.
 
 =head1 SYNOPSIS
 

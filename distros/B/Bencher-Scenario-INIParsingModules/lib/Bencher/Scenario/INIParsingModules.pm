@@ -7,9 +7,9 @@ use warnings;
 use File::ShareDir::Tarball qw(dist_dir);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-10'; # DATE
+our $DATE = '2024-02-19'; # DATE
 our $DIST = 'Bencher-Scenario-INIParsingModules'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our $scenario = {
     summary => 'Benchmark INI parsing modules',
@@ -36,7 +36,11 @@ our $scenario = {
         },
         {
             module => 'Config::INI::Tiny',
-            code_template => 'Config::INI::Tiny->new->to_hash(do { local $/; open my $fh, "<", <filename> or die; scalar readline($fh) } )',
+            code_template => 'state $cfg = Config::INI::Tiny->new; $cfg->to_hash(do { local $/; open my $fh, "<", <filename> or die; scalar readline($fh) } )',
+        },
+        {
+            module => 'Config::Tiny',
+            code_template => 'Config::Tiny->read(<filename>)',
         },
     ],
 
@@ -69,7 +73,7 @@ Bencher::Scenario::INIParsingModules - Benchmark INI parsing modules
 
 =head1 VERSION
 
-This document describes version 0.002 of Bencher::Scenario::INIParsingModules (from Perl distribution Bencher-Scenario-INIParsingModules), released on 2022-08-10.
+This document describes version 0.003 of Bencher::Scenario::INIParsingModules (from Perl distribution Bencher-Scenario-INIParsingModules), released on 2024-02-19.
 
 =head1 SYNOPSIS
 
@@ -91,15 +95,17 @@ Packaging a benchmark script as a Bencher scenario makes it convenient to includ
 
 Version numbers shown below are the versions used when running the sample benchmark.
 
-L<Config::INI::Reader> 0.025
+L<Config::INI::Reader> 0.029
 
-L<Config::INI::Tiny> 0.105
+L<Config::INI::Tiny> 0.106
 
 L<Config::IOD::INI::Reader> 0.345
 
 L<Config::IniFiles> 3.000003
 
-L<Config::Simple::Conf> 2.006
+L<Config::Simple::Conf> 2.007
+
+L<Config::Tiny> 2.30
 
 =head1 BENCHMARK PARTICIPANTS
 
@@ -141,7 +147,15 @@ Code template:
 
 Code template:
 
- Config::INI::Tiny->new->to_hash(do { local $/; open my $fh, "<", <filename> or die; scalar readline($fh) } )
+ state $cfg = Config::INI::Tiny->new; $cfg->to_hash(do { local $/; open my $fh, "<", <filename> or die; scalar readline($fh) } )
+
+
+
+=item * Config::Tiny (perl_code)
+
+Code template:
+
+ Config::Tiny->read(<filename>)
 
 
 
@@ -155,71 +169,89 @@ Code template:
 
 =back
 
-=head1 SAMPLE BENCHMARK RESULTS
+=head1 BENCHMARK SAMPLE RESULTS
 
-Run on: perl: I<< v5.34.0 >>, CPU: I<< Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz (2 cores) >>, OS: I<< GNU/Linux Ubuntu version 20.04 >>, OS kernel: I<< Linux version 5.4.0-91-generic >>.
+=head2 Sample benchmark #1
 
-Benchmark with default options (C<< bencher -m INIParsingModules >>):
+Run on: perl: I<< v5.38.0 >>, CPU: I<< Intel(R) Core(TM) i5-10400 CPU @ 2.90GHz (6 cores) >>, OS: I<< GNU/Linux Debian version 12 >>, OS kernel: I<< Linux version 6.1.0-13-amd64 >>.
+
+Benchmark command (default options):
+
+ % bencher -m INIParsingModules
+
+Result formatted as table:
 
  #table1#
  +--------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
  | participant              | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
  +--------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
- | Config::IniFiles         |       262 |     3.81  |                 0.00% |               999.44% | 3.1e-06 |      20 |
- | Config::INI::Reader      |      1100 |     0.93  |               308.82% |               168.93% | 9.6e-07 |      20 |
- | Config::Simple::Conf     |      1800 |     0.55  |               592.50% |                58.76% | 6.9e-07 |      20 |
- | Config::IOD::INI::Reader |      1940 |     0.516 |               639.37% |                48.70% | 4.3e-07 |      20 |
- | Config::INI::Tiny        |      2900 |     0.35  |               999.44% |                 0.00% | 4.2e-07 |      21 |
+ | Config::IniFiles         |       343 |     2.91  |                 0.00% |               992.43% | 1.8e-06 |      20 |
+ | Config::Tiny             |      1400 |     0.715 |               307.40% |               168.15% |   4e-07 |      21 |
+ | Config::INI::Reader      |      1440 |     0.696 |               318.78% |               160.86% | 2.6e-07 |      20 |
+ | Config::Simple::Conf     |      2550 |     0.393 |               641.94% |                47.24% | 3.2e-07 |      20 |
+ | Config::IOD::INI::Reader |      2600 |     0.38  |               666.95% |                42.44% | 5.7e-07 |      20 |
+ | Config::INI::Tiny        |      3750 |     0.267 |               992.43% |                 0.00% | 2.3e-07 |      20 |
  +--------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
 
 
-Formatted as L<Benchmark.pm|Benchmark> result:
+The above result formatted in L<Benchmark.pm|Benchmark> style:
 
-           Rate   C:I  CI:R  CS:C  CII:R  CI:T 
-  C:I     262/s    --  -75%  -85%   -86%  -90% 
-  CI:R   1100/s  309%    --  -40%   -44%  -62% 
-  CS:C   1800/s  592%   69%    --    -6%  -36% 
-  CII:R  1940/s  638%   80%    6%     --  -32% 
-  CI:T   2900/s  988%  165%   57%    47%    -- 
+           Rate   C:I   C:T  CI:R  CS:C  CII:R  CI:T 
+  C:I     343/s    --  -75%  -76%  -86%   -86%  -90% 
+  C:T    1400/s  306%    --   -2%  -45%   -46%  -62% 
+  CI:R   1440/s  318%    2%    --  -43%   -45%  -61% 
+  CS:C   2550/s  640%   81%   77%    --    -3%  -32% 
+  CII:R  2600/s  665%   88%   83%    3%     --  -29% 
+  CI:T   3750/s  989%  167%  160%   47%    42%    -- 
  
  Legends:
    C:I: participant=Config::IniFiles
+   C:T: participant=Config::Tiny
    CI:R: participant=Config::INI::Reader
    CI:T: participant=Config::INI::Tiny
    CII:R: participant=Config::IOD::INI::Reader
    CS:C: participant=Config::Simple::Conf
 
-Benchmark module startup overhead (C<< bencher -m INIParsingModules --module-startup >>):
+=head2 Sample benchmark #2
+
+Benchmark command (benchmarking module startup overhead):
+
+ % bencher -m INIParsingModules --module-startup
+
+Result formatted as table:
 
  #table2#
  +--------------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
  | participant              | time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
  +--------------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
- | Config::IniFiles         |      35   |              28.6 |                 0.00% |               447.31% | 5.1e-05 |      20 |
- | Config::INI::Reader      |      22   |              15.6 |                54.81% |               253.54% | 3.3e-05 |      20 |
- | Config::IOD::INI::Reader |      13   |               6.6 |               166.37% |               105.47% | 1.5e-05 |      20 |
- | Config::INI::Tiny        |      12   |               5.6 |               185.94% |                91.41% | 1.4e-05 |      20 |
- | Config::Simple::Conf     |      12   |               5.6 |               187.40% |                90.43% | 1.3e-05 |      21 |
- | perl -e1 (baseline)      |       6.4 |               0   |               447.31% |                 0.00% | 1.9e-05 |      20 |
+ | Config::IniFiles         |      25   |              22.2 |                 0.00% |               804.11% | 2.8e-05 |      20 |
+ | Config::INI::Reader      |      16   |              13.2 |                54.78% |               484.14% | 8.8e-05 |      20 |
+ | Config::IOD::INI::Reader |       9.3 |               6.5 |               169.29% |               235.74% | 3.8e-05 |      21 |
+ | Config::Simple::Conf     |       7.7 |               4.9 |               223.96% |               179.08% | 6.1e-05 |      21 |
+ | Config::INI::Tiny        |       7.3 |               4.5 |               243.23% |               163.41% | 9.7e-06 |      20 |
+ | Config::Tiny             |       4   |               1.2 |               530.17% |                43.47% | 3.7e-05 |      26 |
+ | perl -e1 (baseline)      |       2.8 |               0   |               804.11% |                 0.00% | 1.1e-05 |      20 |
  +--------------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
 
 
-Formatted as L<Benchmark.pm|Benchmark> result:
+The above result formatted in L<Benchmark.pm|Benchmark> style:
 
-                          Rate   C:I  CI:R  CII:R  CI:T  CS:C  perl -e1 (baseline) 
-  C:I                   28.6/s    --  -37%   -62%  -65%  -65%                 -81% 
-  CI:R                  45.5/s   59%    --   -40%  -45%  -45%                 -70% 
-  CII:R                 76.9/s  169%   69%     --   -7%   -7%                 -50% 
-  CI:T                  83.3/s  191%   83%     8%    --    0%                 -46% 
-  CS:C                  83.3/s  191%   83%     8%    0%    --                 -46% 
-  perl -e1 (baseline)  156.2/s  446%  243%   103%   87%   87%                   -- 
+                          Rate   C:I  CI:R  CII:R  CS:C  CI:T   C:T  perl -e1 (baseline) 
+  C:I                   40.0/s    --  -36%   -62%  -69%  -70%  -84%                 -88% 
+  CI:R                  62.5/s   56%    --   -41%  -51%  -54%  -75%                 -82% 
+  CII:R                107.5/s  168%   72%     --  -17%  -21%  -56%                 -69% 
+  CS:C                 129.9/s  224%  107%    20%    --   -5%  -48%                 -63% 
+  CI:T                 137.0/s  242%  119%    27%    5%    --  -45%                 -61% 
+  C:T                  250.0/s  525%  300%   132%   92%   82%    --                 -30% 
+  perl -e1 (baseline)  357.1/s  792%  471%   232%  175%  160%   42%                   -- 
  
  Legends:
-   C:I: mod_overhead_time=28.6 participant=Config::IniFiles
-   CI:R: mod_overhead_time=15.6 participant=Config::INI::Reader
-   CI:T: mod_overhead_time=5.6 participant=Config::INI::Tiny
-   CII:R: mod_overhead_time=6.6 participant=Config::IOD::INI::Reader
-   CS:C: mod_overhead_time=5.6 participant=Config::Simple::Conf
+   C:I: mod_overhead_time=22.2 participant=Config::IniFiles
+   C:T: mod_overhead_time=1.2 participant=Config::Tiny
+   CI:R: mod_overhead_time=13.2 participant=Config::INI::Reader
+   CI:T: mod_overhead_time=4.5 participant=Config::INI::Tiny
+   CII:R: mod_overhead_time=6.5 participant=Config::IOD::INI::Reader
+   CS:C: mod_overhead_time=4.9 participant=Config::Simple::Conf
    perl -e1 (baseline): mod_overhead_time=0 participant=perl -e1 (baseline)
 
 To display as an interactive HTML table on a browser, you can add option C<--format html+datatables>.
@@ -256,7 +288,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2019 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

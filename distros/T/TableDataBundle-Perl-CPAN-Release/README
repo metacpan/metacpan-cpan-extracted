@@ -3,9 +3,9 @@ NAME
     that contain CPAN releases data
 
 VERSION
-    This document describes version 20231126.0 of
+    This document describes version 20231228.0 of
     TableDataBundle::Perl::CPAN::Release (from Perl distribution
-    TableDataBundle-Perl-CPAN-Release), released on 2023-11-26.
+    TableDataBundle-Perl-CPAN-Release), released on 2023-12-28.
 
 DESCRIPTION
     This distribution contains the following TableData:: modules:

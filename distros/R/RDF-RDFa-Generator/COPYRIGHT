@@ -6,6 +6,7 @@ Source: https://metacpan.org/release/RDF-RDFa-Generator
 Files: Changes
  META.json
  META.yml
+ dist.ini
  doap.ttl
  lib/RDF/RDFa/Generator/HTML/Head.pm
  lib/RDF/RDFa/Generator/HTML/Hidden.pm
@@ -14,7 +15,7 @@ Files: Changes
  t/02_kk_namespaces.t
  t/03_kk_attean.t
  t/uninit_lang_warning.t
-Copyright: Copyright 2018 Kjetil Kjernsmo and Toby Inkster.
+Copyright: Copyright 2024 Kjetil Kjernsmo and Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: INSTALL
@@ -42,23 +43,19 @@ Files: lib/RDF/RDFa/Generator/HTML/Pretty/Note.pm
 Copyright: Copyright (C) 2010 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: dist.ini
-Copyright: Copyright 2017 Kjetil Kjernsmo and Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: Makefile.PL
-Copyright: Copyright 2013 Toby Inkster.
+Copyright: Copyright 2020 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0
- This software is Copyright (c) 2018 by the copyright holder(s).
+ This software is Copyright (c) 2024 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2018 by the copyright holder(s).
+ This software is Copyright (c) 2024 by the copyright holder(s).
  
  This is free software, licensed under:
  

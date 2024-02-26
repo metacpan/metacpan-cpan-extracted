@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-19'; # DATE
+our $DATE = '2023-12-01'; # DATE
 our $DIST = 'App-CompleteCLIs'; # DIST
-our $VERSION = '0.152'; # VERSION
+our $VERSION = '0.153'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Complete/Pod/complete_pod",
@@ -40,7 +40,7 @@ complete-pod - Complete with installed Perl .pod names
 
 =head1 VERSION
 
-This document describes version 0.152 of complete-pod (from Perl distribution App-CompleteCLIs), released on 2023-01-19.
+This document describes version 0.153 of complete-pod (from Perl distribution App-CompleteCLIs), released on 2023-12-01.
 
 =head1 SYNOPSIS
 

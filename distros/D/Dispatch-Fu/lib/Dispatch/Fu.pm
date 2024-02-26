@@ -5,9 +5,9 @@ use warnings;
 use Exporter qw/import/;
 use Carp qw/carp croak/;
 
-our $VERSION       = q{1.05};
-our @EXPORT        = qw(dispatch on cases xdefault);
-our @EXPORT_OK     = qw(dispatch on cases xdefault);
+our $VERSION       = q{1.06};
+our @EXPORT        = qw(dispatch on cases xdefault xshift_and_deref);
+our @EXPORT_OK     = qw(dispatch on cases xdefault xshift_and_deref);
 
 my $DISPATCH_TABLE = {};
 
@@ -74,7 +74,14 @@ sub xdefault($;$) {
   if ($case and grep { /$case/ } (cases)){
     return $case;
   }
-  return $default // q{default};
+  return (defined $default) ? $default : q{default};
+}
+
+# for multi-assignment syntax, given the first reference in the parameter list; e.g., "my ($x, $y, $z) = ..."
+sub xshift_and_deref(@) {
+    return %{ +shift } if ref $_[0] eq q{HASH};
+    return @{ +shift } if ref $_[0] eq q{ARRAY};
+    return shift @_    if ref $_[0] eq q{SCALAR};
 }
 
 # utility sub to force a BLOCK into a sub reference
@@ -85,6 +92,8 @@ sub _to_sub (&) {
 1;
 
 __END__
+
+=pod
 
 =head1 NAME
 
@@ -343,7 +352,7 @@ the way to pass arbitrary data into C<dispatch>. E.g.,
     ...                    
     return $key;           
 
-  } $INPUT,                ## <><~ the single scalar reference to be passed to the C<dispatch> BLOCK
+  } $INPUT,                   # <><~ the single scalar reference to be passed to the C<dispatch> BLOCK
   ...
 
 =item C<on>
@@ -368,8 +377,8 @@ BLOCK must return strictly only the keys that are defined via C<on>.
    on case4 => sub { my $INPUT = shift; ... },
    on case5 => sub { my $INPUT = shift; ... };
 
-Note: when the subroutine associated with each I<case> is dispatched, the C<$INPUT> scalar is provide
-as input.
+Note: when the subroutine associated with each I<case> is dispatched, the
+C<$INPUT> scalar is provide as input.
 
   my $INPUT = [qw/foo bar baz 1 3 4 5/];
 
@@ -380,7 +389,7 @@ as input.
     ...                         
     return $key;                
 
-  } $INPUT,                     # <~ the single scalar reference to be passed to the C<dispatch> BLOCK
+  } $INPUT,                   # <~ the single scalar reference to be passed to the C<dispatch> BLOCK
    on default  => sub {
      my $INPUT = shift;
      do_default($INPUT);
@@ -393,6 +402,37 @@ as input.
      my $INPUT = shift;
      do_key2(qw/some other inputs entirely/);
    };
+
+=item C<xshift_and_deref> ARRAY
+
+Used within C<dispatch> and static key handlers defined by C<on> to provide a
+single statement for C<shift @_>, then an immediate I<dereferencing> of the
+C<SCALAR> reference based on it's reference I<type> based on the results of
+C<CORE::ref> (or just, C<ref>. E.g.,
+
+  my ($thing1, $thing2, $thing3) = xshift_and_deref @_;
+
+And as part of a mostly complete C<dispatch> block,
+
+  dispatch {
+    my ($thing1, $thing2, $thing3) = xshift_and_deref @_; # <~ HERE
+    ...
+    return q{do_dis} if ...;
+    return q{do_dat};
+  } [ qw/thing1 thing2 thing3/ ],
+  on do_dis => sub {
+    my ($thing1, $thing2, $thing3) = xshift_and_deref @_; # <~ HERE
+    ...
+  },
+  on do_dat => sub {
+    my ($thing1, $thing2, $thing3) = xshift_and_deref @_; # <~ HERE
+    ...
+  };
+
+This makes dealing with C<REF>s passed into C<dispatch> (and additinally into
+the static key handler) very convenient. It eliminates potentally many lines
+of boilerplate code that is meant simply for getting the contents of C<$_[0]>
+into a set of explicit variables inside of C<dispatch>.
 
 =back
 
@@ -434,8 +474,8 @@ the misplaced semicolon below:
 This module will also throw an exeption (via C<croak>) if C<dispatch> is
 defined, but there are no C<on> statements. This covers the situation where
 a semicolon has also snuck in prematurely; E.g., the following examples will
-die because due to lack of C<on> cases before C<on> warns that it's being used
-in a useless context:
+die because due to lack of C<on> cases before C<on> warns that it's being
+used in a useless context:
 
   my $result  = dispatch {
 
@@ -455,3 +495,5 @@ O. ODLER 558 L<< <oodler@cpan.org> >>.
 =head1 LICENSE AND COPYRIGHT
 
 Same as Perl.
+
+=cut

@@ -1,4 +1,4 @@
-# Copyright 2012, 2013, 2014, 2015, 2017, 2020 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2015, 2017, 2020, 2024 Kevin Ryde
 
 # This file is part of Upfiles.
 #
@@ -22,7 +22,7 @@ use Time::HiRes;
 use List::Util 'min';
 
 use vars '$VERSION';
-$VERSION = 15;
+$VERSION = 16;
 
 # uncomment this to run the ### lines
 #use Smart::Comments;

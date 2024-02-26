@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,13 +59,13 @@ sub new {
 
 
 # Run Operation Request
-# PostAutofitWorksheetRowRequest.name : The workbook name.  ,
+# PostAutofitWorksheetRowRequest.name : The file name.  ,
 # PostAutofitWorksheetRowRequest.sheetName : The worksheet name.  ,
-# PostAutofitWorksheetRowRequest.rowIndex : Row index.  ,
-# PostAutofitWorksheetRowRequest.firstColumn : First column index.  ,
-# PostAutofitWorksheetRowRequest.lastColumn : Last column index.  ,
-# PostAutofitWorksheetRowRequest.folder : Original workbook folder.  ,
-# PostAutofitWorksheetRowRequest.storageName : Storage name.   
+# PostAutofitWorksheetRowRequest.rowIndex : The row index.  ,
+# PostAutofitWorksheetRowRequest.firstColumn : The first column index.  ,
+# PostAutofitWorksheetRowRequest.lastColumn : The last column index.  ,
+# PostAutofitWorksheetRowRequest.folder : The folder where the file is situated.  ,
+# PostAutofitWorksheetRowRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -76,7 +76,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_autofit_worksheet_row' } = { 
-    	summary => 'Autofits row in worksheet.',
+    	summary => 'Autofit a row in the worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -145,7 +145,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -159,35 +159,35 @@ __PACKAGE__->method_documentation({
      'row_index' => {
      	datatype => 'int',
      	base_name => 'rowIndex',
-     	description => 'Row index.',
+     	description => 'The row index.',
      	format => '',
      	read_only => '',
      		},
      'first_column' => {
      	datatype => 'int',
      	base_name => 'firstColumn',
-     	description => 'First column index.',
+     	description => 'The first column index.',
      	format => '',
      	read_only => '',
      		},
      'last_column' => {
      	datatype => 'int',
      	base_name => 'lastColumn',
-     	description => 'Last column index.',
+     	description => 'The last column index.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

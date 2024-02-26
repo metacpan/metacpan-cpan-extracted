@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Jgo - Package for language Ngomba
 
 package Locale::CLDR::Locales::Jgo;
 # This file auto generated from Data\common\main\jgo.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -202,25 +202,17 @@ has 'characters' => (
 		no warnings 'experimental::regex_sets';
 		return {
 			auxiliary => qr{[e o q r x]},
-			index => ['A', 'B', 'C', 'D', 'Ɛ', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ŋ', 'Ɔ', 'P', '{Pf}', 'S', '{Sh}', 'T', '{Ts}', 'U', 'Ʉ', '{Ʉ\u0308}', 'V', 'W', 'Ẅ', 'Y', 'Z', 'Ꞌ'],
-			main => qr{[a á â ǎ b c d ɛ {ɛ́} {ɛ̀} {ɛ̂} {ɛ̌} {ɛ̄} f g h i í î ǐ j k l m ḿ {m̀} {m̄} n ń ǹ {n̄} ŋ {ŋ́} {ŋ̀} {ŋ̄} ɔ {ɔ́} {ɔ̂} {ɔ̌} p {pf} s {sh} t {ts} u ú û ǔ ʉ {ʉ́} {ʉ̂} {ʉ̌} {ʉ̈} v w ẅ y z ꞌ]},
-			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			index => ['A', 'B', 'C', 'D', 'Ɛ', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ŋ', 'Ɔ', 'P', '{Pf}', 'S', '{Sh}', 'T', '{Ts}', 'U', 'Ʉ{Ʉ̈}', 'V', 'WẄ', 'Y', 'Z', 'Ꞌ'],
+			main => qr{[aáâǎ b c d ɛ{ɛ́}{ɛ̀}{ɛ̂}{ɛ̌}{ɛ̄} f g h iíîǐ j k l mḿ{m̀}{m̄} nńǹ{n̄} ŋ{ŋ́}{ŋ̀}{ŋ̄} ɔ{ɔ́}{ɔ̂}{ɔ̌} p {pf} s {sh} t {ts} uúûǔ ʉ{ʉ́}{ʉ̂}{ʉ̌}{ʉ̈} v wẅ y z ꞌ]},
 			punctuation => qr{[\- ‑ , ; \: ! ? . ‹ › « »]},
 		};
 	},
 EOT
 : sub {
-		return { index => ['A', 'B', 'C', 'D', 'Ɛ', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ŋ', 'Ɔ', 'P', '{Pf}', 'S', '{Sh}', 'T', '{Ts}', 'U', 'Ʉ', '{Ʉ\u0308}', 'V', 'W', 'Ẅ', 'Y', 'Z', 'Ꞌ'], };
+		return { index => ['A', 'B', 'C', 'D', 'Ɛ', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ŋ', 'Ɔ', 'P', '{Pf}', 'S', '{Sh}', 'T', '{Ts}', 'U', 'Ʉ{Ʉ̈}', 'V', 'WẄ', 'Y', 'Z', 'Ꞌ'], };
 },
 );
 
-
-has 'more_information' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{?},
-);
 
 has 'quote_start' => (
 	is			=> 'ro',
@@ -258,61 +250,51 @@ has 'units' => (
 				'long' => {
 					# Long Unit Identifier
 					'duration-day' => {
-						'name' => q(lɛ́Ꞌ),
 						'one' => q({0} lɛ́Ꞌ),
 						'other' => q({0} lɛ́Ꞌ),
 					},
 					# Core Unit Identifier
 					'day' => {
-						'name' => q(lɛ́Ꞌ),
 						'one' => q({0} lɛ́Ꞌ),
 						'other' => q({0} lɛ́Ꞌ),
 					},
 					# Long Unit Identifier
 					'duration-hour' => {
-						'name' => q(háwa),
 						'one' => q({0} háwa),
 						'other' => q({0} háwa),
 					},
 					# Core Unit Identifier
 					'hour' => {
-						'name' => q(háwa),
 						'one' => q({0} háwa),
 						'other' => q({0} háwa),
 					},
 					# Long Unit Identifier
 					'duration-minute' => {
-						'name' => q(minút),
 						'one' => q({0} minút),
 						'other' => q({0} minút),
 					},
 					# Core Unit Identifier
 					'minute' => {
-						'name' => q(minút),
 						'one' => q({0} minút),
 						'other' => q({0} minút),
 					},
 					# Long Unit Identifier
 					'duration-month' => {
-						'name' => q(pɛsaŋ),
 						'one' => q(pɛsaŋ {0}),
 						'other' => q(pɛsaŋ {0}),
 					},
 					# Core Unit Identifier
 					'month' => {
-						'name' => q(pɛsaŋ),
 						'one' => q(pɛsaŋ {0}),
 						'other' => q(pɛsaŋ {0}),
 					},
 					# Long Unit Identifier
 					'duration-year' => {
-						'name' => q(ŋguꞋ),
 						'one' => q(ŋguꞋ {0}),
 						'other' => q(ŋguꞋ {0}),
 					},
 					# Core Unit Identifier
 					'year' => {
-						'name' => q(ŋguꞋ),
 						'one' => q(ŋguꞋ {0}),
 						'other' => q(ŋguꞋ {0}),
 					},
@@ -388,20 +370,6 @@ has 'listPatterns' => (
 		} }
 );
 
-has 'default_numbering_system' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> 'latn',
-);
-
-has native_numbering_system => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> 'latn',
-);
-
 has 'number_symbols' => (
 	is			=> 'ro',
 	isa			=> HashRef,
@@ -409,63 +377,9 @@ has 'number_symbols' => (
 	default		=> sub { {
 		'latn' => {
 			'decimal' => q(,),
-			'exponential' => q(E),
 			'group' => q(.),
-			'infinity' => q(∞),
-			'list' => q(;),
-			'minusSign' => q(-),
-			'nan' => q(NaN),
-			'perMille' => q(‰),
-			'percentSign' => q(%),
-			'plusSign' => q(+),
 		},
 	} }
-);
-
-has 'number_formats' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		decimalFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0.###',
-				},
-			},
-		},
-		percentFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0%',
-				},
-			},
-		},
-		scientificFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#E0',
-				},
-			},
-		},
-} },
-);
-
-has 'number_currency_formats' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'latn' => {
-			'pattern' => {
-				'default' => {
-					'standard' => {
-						'positive' => '¤ #,##0.00',
-					},
-				},
-			},
-		},
-} },
 );
 
 has 'currencies' => (
@@ -489,7 +403,6 @@ has 'currencies' => (
 			},
 		},
 		'XAF' => {
-			symbol => 'FCFA',
 			display_name => {
 				'currency' => q(Fɛlâŋ),
 			},
@@ -510,103 +423,6 @@ has 'calendar_months' => (
 	default		=> sub { {
 			'gregorian' => {
 				'format' => {
-					abbreviated => {
-						nonleap => [
-							'Nduŋmbi Saŋ',
-							'Pɛsaŋ Pɛ́pá',
-							'Pɛsaŋ Pɛ́tát',
-							'Pɛsaŋ Pɛ́nɛ́kwa',
-							'Pɛsaŋ Pataa',
-							'Pɛsaŋ Pɛ́nɛ́ntúkú',
-							'Pɛsaŋ Saambá',
-							'Pɛsaŋ Pɛ́nɛ́fɔm',
-							'Pɛsaŋ Pɛ́nɛ́pfúꞋú',
-							'Pɛsaŋ Nɛgɛ́m',
-							'Pɛsaŋ Ntsɔ̌pmɔ́',
-							'Pɛsaŋ Ntsɔ̌ppá'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'Nduŋmbi Saŋ',
-							'Pɛsaŋ Pɛ́pá',
-							'Pɛsaŋ Pɛ́tát',
-							'Pɛsaŋ Pɛ́nɛ́kwa',
-							'Pɛsaŋ Pataa',
-							'Pɛsaŋ Pɛ́nɛ́ntúkú',
-							'Pɛsaŋ Saambá',
-							'Pɛsaŋ Pɛ́nɛ́fɔm',
-							'Pɛsaŋ Pɛ́nɛ́pfúꞋú',
-							'Pɛsaŋ Nɛgɛ́m',
-							'Pɛsaŋ Ntsɔ̌pmɔ́',
-							'Pɛsaŋ Ntsɔ̌ppá'
-						],
-						leap => [
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'Nduŋmbi Saŋ',
-							'Pɛsaŋ Pɛ́pá',
-							'Pɛsaŋ Pɛ́tát',
-							'Pɛsaŋ Pɛ́nɛ́kwa',
-							'Pɛsaŋ Pataa',
-							'Pɛsaŋ Pɛ́nɛ́ntúkú',
-							'Pɛsaŋ Saambá',
-							'Pɛsaŋ Pɛ́nɛ́fɔm',
-							'Pɛsaŋ Pɛ́nɛ́pfúꞋú',
-							'Pɛsaŋ Nɛgɛ́m',
-							'Pɛsaŋ Ntsɔ̌pmɔ́',
-							'Pɛsaŋ Ntsɔ̌ppá'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'Nduŋmbi Saŋ',
@@ -638,24 +454,6 @@ has 'calendar_days' => (
 	default		=> sub { {
 			'gregorian' => {
 				'format' => {
-					abbreviated => {
-						mon => 'Mɔ́ndi',
-						tue => 'Ápta Mɔ́ndi',
-						wed => 'Wɛ́nɛsɛdɛ',
-						thu => 'Tɔ́sɛdɛ',
-						fri => 'Fɛlâyɛdɛ',
-						sat => 'Sásidɛ',
-						sun => 'Sɔ́ndi'
-					},
-					narrow => {
-						mon => 'Mɔ́',
-						tue => 'ÁM',
-						wed => 'Wɛ́',
-						thu => 'Tɔ́',
-						fri => 'Fɛ',
-						sat => 'Sá',
-						sun => 'Sɔ́'
-					},
 					wide => {
 						mon => 'Mɔ́ndi',
 						tue => 'Ápta Mɔ́ndi',
@@ -667,15 +465,6 @@ has 'calendar_days' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						mon => 'Mɔ́ndi',
-						tue => 'Ápta Mɔ́ndi',
-						wed => 'Wɛ́nɛsɛdɛ',
-						thu => 'Tɔ́sɛdɛ',
-						fri => 'Fɛlâyɛdɛ',
-						sat => 'Sásidɛ',
-						sun => 'Sɔ́ndi'
-					},
 					narrow => {
 						mon => 'Mɔ́',
 						tue => 'ÁM',
@@ -684,15 +473,6 @@ has 'calendar_days' => (
 						fri => 'Fɛ',
 						sat => 'Sá',
 						sun => 'Sɔ́'
-					},
-					wide => {
-						mon => 'Mɔ́ndi',
-						tue => 'Ápta Mɔ́ndi',
-						wed => 'Wɛ́nɛsɛdɛ',
-						thu => 'Tɔ́sɛdɛ',
-						fri => 'Fɛlâyɛdɛ',
-						sat => 'Sásidɛ',
-						sun => 'Sɔ́ndi'
 					},
 				},
 			},
@@ -708,7 +488,7 @@ has 'day_periods' => (
 			'format' => {
 				'abbreviated' => {
 					'am' => q{mbaꞌmbaꞌ},
-					'pm' => q{ŋka mbɔ́t nji},
+					'pm' => q{ŋka mbɔ́t nji},
 				},
 				'wide' => {
 					'am' => q{mbaꞌmbaꞌ},
@@ -727,10 +507,6 @@ has 'eras' => (
 		'generic' => {
 		},
 		'gregorian' => {
-			abbreviated => {
-				'0' => 'BCE',
-				'1' => 'CE'
-			},
 			wide => {
 				'0' => 'tsɛttsɛt mɛŋguꞌ mi ɛ́ lɛɛnɛ Kɛlísɛtɔ gɔ ńɔ́',
 				'1' => 'tsɛttsɛt mɛŋguꞌ mi ɛ́ fúnɛ Kɛlísɛtɔ tɔ́ mɔ́'
@@ -828,27 +604,9 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			fallback => '{0} – {1}',
-		},
-		'gregorian' => {
-			fallback => '{0} – {1}',
-		},
 	} },
 );
 
-has 'time_zone_names' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default	=> sub { {
-		hourFormat => q(+HH:mm;-HH:mm),
-		gmtFormat => q(GMT{0}),
-		gmtZeroFormat => q(GMT),
-		regionFormat => q({0}),
-		fallbackFormat => q({1} ({0})),
-	 } }
-);
 no Moo;
 
 1;

@@ -4,12 +4,12 @@ use strict;
 use Acme::CPANModulesUtil::Misc;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-10-06'; # DATE
+our $DATE = '2023-10-29'; # DATE
 our $DIST = 'Acme-CPANModules-HashUtilities'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 our $LIST = {
-    summary => "Modules that manipulate hashes",
+    summary => "List of modules that manipulate hashes",
     description => <<'_',
 
 Most of the time, you don't need modules to manipulate hashes; Perl's built-in
@@ -105,7 +105,7 @@ _
 Acme::CPANModulesUtil::Misc::populate_entries_from_module_links_in_description;
 
 1;
-# ABSTRACT: Modules that manipulate hashes
+# ABSTRACT: List of modules that manipulate hashes
 
 __END__
 
@@ -115,11 +115,11 @@ __END__
 
 =head1 NAME
 
-Acme::CPANModules::HashUtilities - Modules that manipulate hashes
+Acme::CPANModules::HashUtilities - List of modules that manipulate hashes
 
 =head1 VERSION
 
-This document describes version 0.003 of Acme::CPANModules::HashUtilities (from Perl distribution Acme-CPANModules-HashUtilities), released on 2023-10-06.
+This document describes version 0.004 of Acme::CPANModules::HashUtilities (from Perl distribution Acme-CPANModules-HashUtilities), released on 2023-10-29.
 
 =head1 DESCRIPTION
 

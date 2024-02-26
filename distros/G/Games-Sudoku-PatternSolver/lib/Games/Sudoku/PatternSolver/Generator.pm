@@ -57,7 +57,8 @@ our $LOOSE_MODE  = 0; # whether to allow puzzles to have < 8 different givens (s
       # given a possible solution, reduce the given values in random order until a proper sudoku is found that cannot be further reduced
       # (searching for a rating > 0.65 may take a while)
 
-      local $SIG{INT} = set_exit_handler(sub {print "BOOO!\n"});
+      # my $old_handler = $SIG{INT};
+      # local $SIG{INT} = set_exit_handler(sub {print "BOOO!\n", &$old_handler() if ref($old_handler);});
       #my $solve_tries = 0;
 
       while (1) {
@@ -266,10 +267,10 @@ sub set_exit_handler {
   my ($sub_to_execute) = @_;
 
   return $Games::Sudoku::PatternSolver::exitHandler = sub {
-    print "Exit on user request.\n";
+    #print "Exit on user request.\n";
     &$sub_to_execute if $sub_to_execute;
-    Time::HiRes::sleep 0.2;
-    CORE::exit(0);
+    #Time::HiRes::sleep 0.2;
+    #CORE::exit(0);
   };
 }
 
@@ -278,11 +279,11 @@ sub set_exit_handler {
 __END__
 
 =head1 NAME
- 
+
 Games::Sudoku::PatternSolver::Generator - produces 9x9 Sudoku solution grids and 9x9 Sudoku puzzles
- 
+
 =head1 DESCRIPTION
- 
+
 This sub module uses the L<Games::Sudoku::PatternSolver>'s POM ability (Pattern Overlay Method) to build solution grids 
 and enables L<PatternSolver::CPLogic|Games::Sudoku::PatternSolver/"PatternSolver::CPLogic"> to provide some indication of rating with the generated puzzles.
 
@@ -292,11 +293,11 @@ random order in which cell values are tried to be removed that make the essentia
 All Sudoku that are returned from the iterator I<builder> are well-posed (have a unique solution) and reduced (removing any of the givens would lead to > 1 solution).
 
 =head1 METHODS
- 
+
 =over 1
- 
+
 =item * get_sudoku_builder()
-  
+
  $sudoku_builder = get_sudoku_builder( start_grid, start_with, shuffle_symbols );
 
 All 3 parameters are optional:
@@ -338,26 +339,37 @@ The return value $sudoku_builder is a subref which on every call will return a r
  $solution_string = &$grid_builder( E<lt>shuffle_symbolsE<gt> ); 
 
 =back
- 
+
 The iterator returned from get_grid_builder() can produce fully filled sudoku grids at a fairly high rate. 
 Like the solver, it also uses plain overlay of random patterns (POM) and no biased methods. (As the Latin Squares would.) 
 The grids are spread absolutely randomly across the Sudoku space.
- 
+
 =head1 EXPORTS
- 
+
 The module optionally exports get_sudoku_builder(), get_grid_builder() and provides the import tag ':all'.
- 
+
+=head1 SCRIPTS
+
+=head2 sudogen
+
+After installation of Games::Sudoku::PatternSolver this command line script should be in your path.
+Flexible output options are available. Invoke C<E<gt>sudogen -h> for details.
+
 =head1 SEE ALSO
- 
+
+L<Games::Sudoku::Html> play entire lists of standard sudoku interactively in your browser 
+
+L<Games::Sudoku::Pdf> create pdf files from sixteen variants of 9x9 sudoku
+
 L<https://www.sudokuwiki.org/Pattern_Overlay>, L<https://sites.math.washington.edu/~morrow/mcm/team2280.pdf>
- 
+
 =head1 AUTHOR
- 
+
 Steffen Heinrich
- 
+
 =head1 LICENSE
- 
+
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
- 
+
 =cut

@@ -8,7 +8,7 @@ use AsposeCellsCloud::Request::PostWorksheetTextSearch;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**name** | **string** | The workbook name. |
+**name** | **string** | The file name. |
 **sheet_name** | **string** | The worksheet name. |
 **text** | **string** | Text to search. |
 **folder** | **string** | Original workbook folder. |

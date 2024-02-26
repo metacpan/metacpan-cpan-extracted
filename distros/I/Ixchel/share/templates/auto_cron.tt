@@ -37,7 +37,7 @@
 */5 * * * * root /usr/bin/env [% config.snmp.extend_env %] [% config.snmp.extend_base_dir %]/logsize -b 2> /dev/null > /dev/null
 [% END %]
 [% IF config.snmp.extends.hv_monitor.enable %]
-*/5 * * * * root /usr/bin/env [% config.snmp.extend_env %] hv_monitor -c > /var/cache/hv_monitor.json -c 2> /dev/null
+*/5 * * * * root /usr/bin/env [% config.snmp.extend_env %] hv_monitor -c > /var/cache/hv-monitor.json -c 2> /dev/null
 [% END %]
 [% IF config.suricata.enable && config.suricata_extract.enable %]
 [% config.suricata_extract.interval %] root /usr/bin/env [% config.snmp.extend_env %] suricata_extract_submit 2> /dev/null > /dev/null

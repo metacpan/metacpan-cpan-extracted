@@ -1,3 +1,16 @@
+0.023   2024-01-15  Released-By: PERLANCAR; Urgency: low
+
+        - No spec changes.
+
+        - [tabledata Sample::DeNiro] [doc] mention
+          {Array,Hash}Data::Sample::DeNiro.
+
+
+0.022   2024-01-15  Released-By: PERLANCAR; Urgency: medium
+
+        - Update data of Sample::DeNiro.
+
+
 0.021   2024-01-15  Released-By: PERLANCAR; Urgency: medium
 
         - Add role: TableDataRole::Util::GetRowByPos.

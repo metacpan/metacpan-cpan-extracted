@@ -1,6 +1,6 @@
 #!perl -w
 
-# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2020 Kevin Ryde
+# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2020, 2023, 2024 Kevin Ryde
 
 # This file is part of Upfiles.
 #
@@ -22,7 +22,7 @@ use strict;
 use warnings;
 use App::Upfiles;
 
-our $VERSION = 15;
+our $VERSION = 16;
 
 my $upf = App::Upfiles->new;
 exit $upf->command_line;
@@ -71,10 +71,12 @@ Transfer (SFTP)>).
 
 B<upfiles> records files sent in an SQLite3 database file F<.upfiles.sqdb>
 in each local toplevel directory, for example
-F</my/directory/.upfiles.sqdb>.  Local changes are identified by traversing
-the local tree and comparing file modtimes and sizes against what the
-database records was last sent.  This is faster than asking the remote
-server what files etc it's got.
+
+    /my/directory/.upfiles.sqdb
+
+Local changes are identified by traversing the local tree and comparing file
+modtimes and sizes against what the database records was last sent.  This is
+faster than asking the remote server what files etc it's got.
 
 For convenience, some local files are always excluded from the upload.
 Currently these are
@@ -102,6 +104,23 @@ links within the uploaded tree.  (Or SFTP below has symlinks.)
 Filenames containing CR or LF characters (\r, \n) cannot be sent by FTP
 protocol and Upfiles will refuse to operate on them.
 
+=head2 Passive FTP
+
+Option C<passive =E<gt> 1> selects "passive" mode FTP,
+
+    upfiles (local   => '/my/directory',
+             remote  => 'ftp://fred@example.com/pub/fred',
+             passive => 1);
+
+This has the usual FTP meaning and is likely necessary when you're behind a
+firewall or IPv4 NAT which prevents you receiving incoming connections.  The
+symptom under NAT might be a message from the server like
+
+    I won't open a connection to 192.168.0.1 (only to ...)
+
+The hint is that 192.168... is a local private range address, unknown and
+unreachable in the outside world.
+
 =head2 FTP Security
 
 FTP can be used with SSL encryption and end-to-end destination verification
@@ -118,7 +137,7 @@ the remote URL,
 
 Or, on the usual FTP connection a C<TLS> command is given to encrypt the
 command channel (and data channels) from that point onwards.  For this, give
-remote URL with plain C<ftp>, plus C<use_TLS> option,
+remote URL with plain C<ftp>, then C<use_TLS> option,
 
     upfiles (local   => '/my/directory',
              remote  => 'ftp://fred@example.com/pub/fred',
@@ -139,15 +158,15 @@ transfer.  Upfiles can use this by setting the remote URL to C<sftp>.
              remote => 'sftp://fred@example.com/home/fred/mydir');
 
 This requires Perl L<Net::SFTP::Foreign> and suitable L<ssh(1)> program.
-The C<remote> URL target directory is a full filesystem path, the same as
-seen in the C<ssh> shell.
+The C<remote> URL target directory is a full filesystem path, in the form
+seen in the C<ssh> shell on that system.
 
 C<ssh> has various user authentication methods.  No-password operation can
 be had by putting your public key on the remote machine.  For password
 operation, C<upfiles> looks in F<~/.netrc> for a password by username and
 host similar to plain FTP.  If not found there then the C<ssh> program will
-query.  (Not sure if querying is a good idea, might prefer to immediately
-abort.)
+query.  (Not sure whether querying is a good idea, might prefer to
+immediately abort.)
 
 See L</DEBUGGING> below on protocol tracing.
 
@@ -173,11 +192,17 @@ with "@" syntax, like
 The "scheme" part can be C<ftp>, C<ftps> or C<sftp>.  A password is sought
 in F<~/.netrc> by username and machine name.
 
+=item C<passive> (0 or 1, default 0)
+
+For FTP (including C<ftps>), if set to 0 then use "active" mode, or if 1
+then use "passive" mode.  Active might not work behind a firewall or IPv4
+NAT.  Passive should work in all cases.
+
 =item C<use_TLS> (0 or 1, default 0)
 
-For an C<ftp> remote, if set to 1 then use the C<TLS> command to give an SSL
+For C<ftp> remote, if set to 1 then use the C<TLS> command to give an SSL
 secure protocol with the server.  This is highly recommended when supported
-by the server (or instead C<ftps> or C<sftp> too).
+by the server (or equally good C<ftps> or C<sftp>).
 
 For C<ftps>, this option is ignored, as the connection is secured before any
 commands at all.
@@ -250,14 +275,14 @@ exit).
     telnet example.com 21
 
 Server support for C<TLS> command can be checked in the usual way by the
-C<FEAT> command (which in an ftp client might have to be sent by C<quot
-feat>) and looking for C<AUTH TLS> in its response.  The initial text banner
-message often says something for human readers too.  The C<use_TLS> option
-should then work, or not, according to server support.
+C<FEAT> command (which in an ftp client program might have to be sent by
+C<quot feat>) and looking for C<AUTH TLS> in its response.  The initial text
+banner message often says something for human readers too.  The C<use_TLS>
+option should then work, or not, according to server support.
 
 For C<ftps> (FTP with SSL on port 990), if no server is listening on that
-port then the host might either immediately give "connection refused", or
-could ignore so that C<upfiles> times-out.  If a suitable SSL-enabled C<ftp>
+port then the host might either immediately say "connection refused", or
+might ignore so that C<upfiles> times-out.  If a suitable SSL-enabled C<ftp>
 program is not at hand then raw telnet equivalent though SSL can be had with
 either
 
@@ -269,10 +294,10 @@ username with C<-l>).  Its C<-v> can be repeated for ever greater verbosity.
 
     ssh -v -l fred example.com
 
-On first connection to a new host, C<ssh> will usually ask whether to accept
-the host certificate.  This happens when run through C<upfiles> too.
+On first connection to a new remote host, C<ssh> will usually ask whether to
+accept the host certificate.  This happens when run through C<upfiles> too.
 Ideally you should have some separate independent way to validate or get a
-certificate so you know to whom you're speaking.  Likewise SSL setups.
+certificate so you know who you're talking to.  Likewise SSL setups.
 
 =head1 ENVIRONMENT VARIABLES
 
@@ -319,18 +344,19 @@ would be faster.  The temp file and rename adds a round trip too, but is
 desirable so anyone looking doesn't see half a file.  Perhaps an option
 could turn this off if not needed (such as upfiles to a remote backup).  For
 reference, C<Net::SFTP::Foreign> has its own atomic option in C<put()>, but
-think it's still just a client side action so recording temporaries in the
+think it's still just a client side action, so recording temporaries in the
 database is a better cleanup if interrupted.
 
-The temporary files are named using the local C<$$> PID added to the target
-filename.  This is enough to protect against simultaneous uploads from the
-same source machine, but potentially not if you're networked and are foolish
-enough to C<upfiles> the same tree simultaneously from two different source
-machines.  For FTP, havoc probably ensues.  For SFTP, no-overwrite is usedso
-should make an error.  FTP C<STOU> would guarantee uniqueness, but does it
-have a window while the name comes back which if interrupted could leave the
-file created but unknown to upfiles?  C<Net::FTP> C<put_unique()> doesn't
-return the name until the transfer completes too.
+The temporary files are named using the local C<$$> process ID added to the
+target filename.  This is enough to protect against simultaneous uploads
+from the same source machine, but potentially not if you're networked and
+are foolish enough to C<upfiles> the same tree simultaneously from two
+different source machines.  For FTP, havoc probably ensues.  For SFTP,
+no-overwrite is used so should make an error.  FTP C<STOU> would guarantee
+uniqueness, but does it have a window while the name comes back which if
+interrupted could leave the file created but unknown to upfiles?
+C<Net::FTP> C<put_unique()> doesn't return the name until the transfer
+completes too.
 
 For FTP, there's a small chance of a 2-arg C<SITE UTIME> attempt looking
 like 5-arg to a C<pure-ftpd> pre-1.0.33 server (circa 2011), if the filename
@@ -340,12 +366,11 @@ filenames should be unlikely, and there's no problem with new enough
 C<pure-ftpd> which has C<MDTM>.
 
 There's no support for a proxy connection to the remote system.  The squid
-CONNECT style which gives a pass-through socket wouldn't be too hard, and
-C<ssh> can be made to speak through such things too.  The http-only style,
-where http PUT must be given for FTP upload, is irritating and makes the
-proxy a man-in-the-middle which you have to trust.  If a http PUT upload
-method was of interest then such proxying might follow from that easily
-enough.
+CONNECT style which makes a pass-through socket wouldn't be hard, and C<ssh>
+can be made to speak through such things too.  The HTTP-only style, where
+HTTP PUT must be given for FTP upload, is irritating and makes the proxy a
+man-in-the-middle which you have to trust.  If a HTTP PUT upload method was
+of interest then such proxying might follow from that easily enough.
 
 File sizes and totals are reported in kbytes (of 1024 bytes).  Probably
 should jump to mbytes or even gbytes at some sensible threshold.
@@ -382,7 +407,7 @@ L<http://user42.tuxfamily.org/upfiles/index.html>
 
 =head1 LICENSE
 
-Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2020 Kevin Ryde
+Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2020, 2023, 2024 Kevin Ryde
 
 Upfiles is free software; you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software

@@ -3,7 +3,7 @@ use strict;
 
 package RT::Extension::FormTools;
 
-our $VERSION = '1.04';
+our $VERSION = '1.07';
 
 RT->AddStyleSheets('rt-extension-formtools.css');
 RT->AddJavaScript('rt-extension-formtools.js');
@@ -174,6 +174,25 @@ To configure elements or add text content, click the pencil icon.
 
 Click the plus (+) to create new pages. To change the order of the pages,
 click the gearbox and update the sort order.
+
+=head4 HTML Element
+
+One of the available components is "HTML Element" and this accepts HTML
+that will be displayed on the form in the location you select. This allows
+you to place blocks of text that include additional interactive elements
+like links (anchor tags).
+
+If you place one of these blocks on the Result page, you can also reference
+information about the ticket just created by the form. You can use all
+variables defined for
+L<Simple templates|https://docs.bestpractical.com/rt/latest/customizing/templates.html#Selected-Simple-template-variables>
+in RT. As with RT templates, place the variables in curly braces in your
+HTML. For example, if you wanted to include a link to the created ticket,
+you could define it like this:
+
+    <p>You can review your ticket regarding
+    <a href="/Ticket/Display.html?id={$TicketId}">{$TicketSubject}</a>
+    and check there for status updates. You should also receive email.</p>
 
 =head3 Description
 

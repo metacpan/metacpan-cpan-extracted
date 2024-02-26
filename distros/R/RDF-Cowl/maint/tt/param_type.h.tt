@@ -1,0 +1,44 @@
+#include <ulib.h>
+
+#undef COWL_PUBLIC
+#define COWL_PUBLIC COWL_PUBLIC
+
+#undef COWL_INLINE
+#define COWL_INLINE COWL_INLINE
+
+#undef ULIB_PUBLIC
+#define ULIB_PUBLIC ULIB_PUBLIC
+
+#undef ULIB_INLINE
+#define ULIB_INLINE ULIB_INLINE
+
+#undef ulib_unused
+#define ulib_unused
+
+/* Empty defines for parts of the declarations that are not needed */
+/* UVec */
+#undef P_UVEC_DEF_TYPE
+#define P_UVEC_DEF_TYPE(T)
+
+/*
+#undef P_UVEC_DEF_INLINE
+#define P_UVEC_DEF_INLINE(T,SCOPE)
+
+#undef P_UVEC_DEF_INLINE_EQUATABLE
+#define P_UVEC_DEF_INLINE_EQUATABLE(T,SCOPE)
+*/
+
+/* UHash */
+#undef P_UHASH_DEF_TYPE_PI
+#define P_UHASH_DEF_TYPE_PI(T, uh_key, uh_val)
+
+/*
+#undef P_UHASH_DEF_INLINE
+#define P_UHASH_DEF_INLINE(T, SCOPE)
+*/
+
+#line 1 "START"
+
+UVEC_DECL_EQUATABLE_SPEC(CowlObjectPtr, COWL_PUBLIC)
+
+UHASH_DECL_PI_SPEC(CowlObjectTable, CowlAny *, CowlAny *, COWL_PUBLIC)

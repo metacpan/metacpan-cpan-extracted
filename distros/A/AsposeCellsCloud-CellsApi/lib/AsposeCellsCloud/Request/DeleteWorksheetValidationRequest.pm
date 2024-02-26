@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -62,8 +62,8 @@ sub new {
 # DeleteWorksheetValidationRequest.name : The workbook name.  ,
 # DeleteWorksheetValidationRequest.sheetName : The worksheet name.  ,
 # DeleteWorksheetValidationRequest.validationIndex : The validation index.  ,
-# DeleteWorksheetValidationRequest.folder : Original workbook folder.  ,
-# DeleteWorksheetValidationRequest.storageName : Storage name.   
+# DeleteWorksheetValidationRequest.folder : The folder where the file is situated.  ,
+# DeleteWorksheetValidationRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'delete_worksheet_validation' } = { 
-    	summary => 'Deletes a validation by index in worksheet.',
+    	summary => 'Delete a validation by index in worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -158,14 +158,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,12 +59,12 @@ sub new {
 
 
 # Run Operation Request
-# PostWorkbookGetSmartMarkerResultRequest.name : The workbook name.  ,
+# PostWorkbookGetSmartMarkerResultRequest.name : The file name.  ,
 # PostWorkbookGetSmartMarkerResultRequest.xmlFile : The xml file full path, if empty the data is read from request body.  ,
-# PostWorkbookGetSmartMarkerResultRequest.folder : Original workbook folder.  ,
-# PostWorkbookGetSmartMarkerResultRequest.outPath : Path to save result  ,
-# PostWorkbookGetSmartMarkerResultRequest.storageName : Storage name.  ,
-# PostWorkbookGetSmartMarkerResultRequest.outStorageName : Storage name.   
+# PostWorkbookGetSmartMarkerResultRequest.folder : The folder where the file is situated.  ,
+# PostWorkbookGetSmartMarkerResultRequest.outPath : The path to save result  ,
+# PostWorkbookGetSmartMarkerResultRequest.storageName : The storage name where the file is situated.  ,
+# PostWorkbookGetSmartMarkerResultRequest.outStorageName : The storage name where the result file is situated.   
 
 {
     my $params = {
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_workbook_get_smart_marker_result' } = { 
-    	summary => 'Smart marker processing result.',
+    	summary => 'Smart marker processing.',
         params => $params,
         returns => 'string',
     };
@@ -138,7 +138,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -152,28 +152,28 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'out_path' => {
      	datatype => 'string',
      	base_name => 'outPath',
-     	description => 'Path to save result',
+     	description => 'The path to save result',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'out_storage_name' => {
      	datatype => 'string',
      	base_name => 'outStorageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the result file is situated.',
      	format => '',
      	read_only => '',
      		},    

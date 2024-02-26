@@ -8,9 +8,9 @@ package Text::Table::Sprintf;
 #END IFUNBUILT
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-01-07'; # DATE
+our $DATE = '2023-11-11'; # DATE
 our $DIST = 'Text-Table-Sprintf'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 our %FEATURES = (
     set_v => {
@@ -24,7 +24,10 @@ our %FEATURES = (
             can_align_cell_containing_newline        => 0,
             can_use_box_character                    => 0,
             can_customize_border                     => 0,
-            can_halign                               => 0,
+            can_halign                               => {
+                value => 1,
+                summary => 'Only support l (left) and r (right) alignment, not c (center)',
+            },
             can_halign_individual_row                => 0,
             can_halign_individual_column             => 0,
             can_halign_individual_cell               => 0,
@@ -69,10 +72,20 @@ sub table {
         }
     }
 
+    # determine the alignment of each column
+    my @aligns = @$rows ? (map {'l'} @{$rows->[0]}) : ();
+    if ($params{align}) {
+        if (ref $params{align} eq 'ARRAY') {
+            @aligns = @{ $params{align} }
+        } else {
+            $_ = $params{align} for @aligns;
+        }
+    }
+
     # determine the sprintf format for a single row
     my $rowfmt = join(
         "",
-        (map { ($_ ? "" : "|") . " %-$widths[$_]s |" } 0..$#widths),
+        (map { ($_ ? "" : "|") . " %".($aligns[$_] eq 'r' ? '':'-')."$widths[$_]s |" } 0..$#widths),
         "\n");
     my $line = join(
         "",
@@ -103,7 +116,12 @@ sub table {
     sprintf $tblfmt, map { @$_ } @$rows;
 }
 
-*generate_table = \&table;
+{
+#IFUNBUILT
+# #     no warnings 'once';
+#END IFUNBUILT
+    *generate_table = \&table;
+}
 
 1;
 # ABSTRACT: Generate simple text tables from 2D arrays using sprintf()
@@ -120,7 +138,7 @@ Text::Table::Sprintf - Generate simple text tables from 2D arrays using sprintf(
 
 =head1 VERSION
 
-This document describes version 0.006 of Text::Table::Sprintf (from Perl distribution Text-Table-Sprintf), released on 2022-01-07.
+This document describes version 0.008 of Text::Table::Sprintf (from Perl distribution Text-Table-Sprintf), released on 2023-11-11.
 
 =head1 SYNOPSIS
 
@@ -210,7 +228,10 @@ Value: no.
 
 Provide a way for user to specify horizontal alignment (leftE<sol>middleE<sol>right) of cells.
 
-Value: no.
+Value: yes.
+
+Only support l (left) and r (right) alignment, not c (center).
+
 
 =item * can_halign_individual_cell
 
@@ -358,19 +379,27 @@ The C<table> function understands these arguments, which are passed as a hash.
 
 =over
 
-=item * rows (aoaos)
+=item * rows
 
-Takes an array reference which should contain one or more rows of data, where
-each row is an array reference.
+Aoaos. Required. Takes an array reference which should contain one or more rows
+of data, where each row is an array reference.
 
-=item * header_row (bool)
+=item * header_row
 
-If given a true value, the first row in the data will be interpreted as a header
-row, and separated from the rest of the table with a ruled line.
+Bool. Optional. Defaults to false. If given a true value, the first row in the
+data will be interpreted as a header row, and separated from the rest of the
+table with a ruled line.
 
-=item * separate_row (bool)
+=item * separate_rows
 
-If set to true, will draw separator line between data rows.
+Bool. Optional. Defaults to false. If set to true, will draw separator line
+between data rows.
+
+=item * align
+
+Str or array of str. Optional. Declare alignment for all columns or for
+individul columns. Valid alignment value is 'l' (for left) or 'r' (for right),
+center alignment is currently not supported. Default alignment is left.
 
 =back
 
@@ -391,8 +420,8 @@ Source repository is at L<https://github.com/perlancar/perl-Text-Table-Sprintf>.
 L<Text::Table::Tiny>
 
 Other text table modules listed in L<Acme::CPANModules::TextTable>. The selling
-point of Text::Table::Sprintf is performance and light footprint (just about a
-page of code that does not use I<any> module, core or otherwise).
+point of Text::Table::Sprintf is performance and light footprint (just about two
+pages of code that does not use I<any> module, core or otherwise).
 
 =head1 AUTHOR
 
@@ -411,13 +440,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

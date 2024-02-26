@@ -78,10 +78,12 @@ $descriptor{LICENSE}  = "gpl_3";
 $descriptor{META_MERGE} = {
   "meta-spec" => { version => 2 },
   resources => {
-    web => 'http://github.com/PDLPorters/pdl-fftw3',
-    bugtracker => { web => 'http://github.com/PDLPorters/pdl-fftw3/issues' },
-    url => 'git://github.com/PDLPorters/pdl-fftw3.git',
-    type => 'git',
+    bugtracker => { web => 'https://github.com/PDLPorters/pdl-fftw3/issues' },
+    repository  => {
+      web => 'https://github.com/PDLPorters/pdl-fftw3',
+      url => 'git://github.com/PDLPorters/pdl-fftw3.git',
+      type => 'git',
+    },
     x_IRC => 'irc://irc.perl.org/#pdl',
   },
   prereqs => {

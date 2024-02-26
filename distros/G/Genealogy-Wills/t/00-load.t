@@ -12,7 +12,7 @@ require_ok('Genealogy::Wills') || print 'Bail out!';
 
 # Smoker testing can do sanity checking without building the database
 if((!$ENV{'AUTOMATED_TESTING'}) && (!$ENV{'GITHUB_ACTIONS'}) &&
-   (!-r 'lib/Genealogy/Wills/database/wills.sql')) {
+   (!-r 'lib/Genealogy/Wills/data/wills.sql')) {
 	diag('Database not installed');
 	print 'Bail out!';
 }

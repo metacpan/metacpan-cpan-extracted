@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -128,28 +128,28 @@ __PACKAGE__->method_documentation({
      'end_column' => {
      	datatype => 'int',
      	base_name => 'EndColumn',
-     	description => '',
+     	description => 'The end column index.',
      	format => '',
      	read_only => '',
      		},
      'end_row' => {
      	datatype => 'int',
      	base_name => 'EndRow',
-     	description => '',
+     	description => 'The end row index.',
      	format => '',
      	read_only => '',
      		},
      'start_column' => {
      	datatype => 'int',
      	base_name => 'StartColumn',
-     	description => '',
+     	description => 'The start column index.',
      	format => '',
      	read_only => '',
      		},
      'start_row' => {
      	datatype => 'int',
      	base_name => 'StartRow',
-     	description => '',
+     	description => 'The start row index.',
      	format => '',
      	read_only => '',
      		},    

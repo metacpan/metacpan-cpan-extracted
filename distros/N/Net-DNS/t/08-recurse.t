@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 08-recurse.t 1959 2024-01-17 08:55:01Z willem $ -*-perl-*-
+# $Id: 08-recurse.t 1965 2024-02-14 09:19:32Z willem $ -*-perl-*-
 #
 
 use strict;
@@ -51,44 +51,9 @@ plan tests => 12;
 NonFatalBegin();
 
 
-for my $res ( Net::DNS::Resolver::Recurse->new( debug => 0 ) ) {
-
-	ok( $res->isa('Net::DNS::Resolver::Recurse'), 'new() created object' );
-
-	my $reply = $res->send( 'www.net-dns.org', 'A' );
-	is( ref($reply), 'Net::DNS::Packet', 'query returned a packet' );
-}
-
-
-for my $res ( Net::DNS::Resolver::Recurse->new( debug => 0 ) ) {    # test the callback
-
-	my $count = 0;
-
-	$res->callback( sub { $count++ } );
-
-	$res->send( 'a.t.net-dns.org', 'A' );
-
-	ok( $count >= 3, "Lookup took $count queries" );
-}
-
-
-for my $res ( Net::DNS::Resolver::Recurse->new( debug => 0 ) ) {
-
-	my $count = 0;
-
-	$res->callback( sub { $count++ } );
-
-	$res->send( '2a04:b900:0:0:8:0:0:60', 'PTR' );
-
-	ok( $count >= 3, "Reverse lookup took $count queries" );
-}
-
-
 SKIP: {
 	my $res = Net::DNS::Resolver::Recurse->new();
-	is( scalar( $res->hints() ), 0, 'hints() initially empty' );
-	$res->hints(@hints);
-	is( scalar( $res->hints ), scalar(@hints), 'hints() set' );
+	ok( $res->isa('Net::DNS::Resolver::Recurse'), 'new() created object' );
 
 	my $reply = $res->send( '.', 'NS' );
 	is( ref($reply), 'Net::DNS::Packet', 'response received for priming query' );
@@ -107,12 +72,45 @@ SKIP: {
 }
 
 
+for my $res ( Net::DNS::Resolver::Recurse->new( debug => 0 ) ) {
+	my $reply = $res->send( 'www.net-dns.org', 'A' );
+	is( ref($reply), 'Net::DNS::Packet', 'query returned a packet' );
+}
+
+
+for my $res ( Net::DNS::Resolver::Recurse->new( debug => 0 ) ) {    # test the callback
+	my $count = 0;
+	$res->callback( sub { $count++ } );
+
+	$res->send( 'a.t.net-dns.org', 'A' );
+
+	ok( $count >= 3, "Lookup took $count queries" );
+}
+
+
+for my $res ( Net::DNS::Resolver::Recurse->new( debug => 0 ) ) {
+	my $count = 0;
+	$res->callback( sub { $count++ } );
+
+	$res->send( '2a04:b900:0:0:8:0:0:60', 'PTR' );
+
+	ok( $count >= 3, "Reverse lookup took $count queries" );
+}
+
+
 for my $res ( Net::DNS::Resolver::Recurse->new() ) {
+	is( scalar( $res->hints() ), 0, 'hints() initially empty' );
+	$res->hints(@hints);
+	is( scalar( $res->hints ), scalar(@hints), 'hints() set' );
+}
+
+
+for my $res ( Net::DNS::Resolver::Recurse->new( debug => 0 ) ) {
 	$res->callback(
 		sub {
 			my $reply = shift;
 			my ($q)	  = $reply->question;
-			my ($a)	  = ( $reply->answer, $reply->authority );
+			my ($a)	  = ( $reply->authority, $reply->answer );
 			$a->{owner} = Net::DNS::DomainName->new('bogus.example')
 					if lc( $a->owner ) eq lc( $q->qname );
 		} );

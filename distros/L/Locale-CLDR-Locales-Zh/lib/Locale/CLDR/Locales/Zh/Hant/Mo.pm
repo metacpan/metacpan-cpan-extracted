@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Zh::Hant::Mo - Package for language Chinese
 
 package Locale::CLDR::Locales::Zh::Hant::Mo;
 # This file auto generated from Data\common\main\zh_Hant_MO.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -24,6 +24,36 @@ use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
 extends('Locale::CLDR::Locales::Zh::Hant::Hk');
+has 'display_name_language' => (
+	is			=> 'ro',
+	isa			=> CodeRef,
+	init_arg	=> undef,
+	default		=> sub {
+		 sub {
+			 my %languages = (
+				'yue@alt=menu' => '粵語',
+
+			);
+			if (@_) {
+				return $languages{$_[0]};
+			}
+			return \%languages;
+		}
+	},
+);
+
+has 'display_name_region' => (
+	is			=> 'ro',
+	isa			=> HashRef[Str],
+	init_arg	=> undef,
+	default		=> sub {
+		{
+			'CI@alt=variant' => '象牙海岸',
+
+		}
+	},
+);
+
 has 'currencies' => (
 	is			=> 'ro',
 	isa			=> HashRef,

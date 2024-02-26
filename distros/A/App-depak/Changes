@@ -1,3 +1,8 @@
+0.587   2023-11-20  Released-By: PERLANCAR; Urgency: medium
+
+        - Update module name: File::MoreUtil -> File::Util::Test.
+
+
 0.586   2023-07-11  Released-By: PERLANCAR; Urgency: medium
 
         - No functional changes.

@@ -1,8 +1,8 @@
 Build.PL
 lib/Locale/CLDR/Locales/Ccp.pm
-lib/Locale/CLDR/Locales/Ccp/Any.pm
-lib/Locale/CLDR/Locales/Ccp/Any/Bd.pm
-lib/Locale/CLDR/Locales/Ccp/Any/In.pm
+lib/Locale/CLDR/Locales/Ccp/Cakm.pm
+lib/Locale/CLDR/Locales/Ccp/Cakm/Bd.pm
+lib/Locale/CLDR/Locales/Ccp/Cakm/In.pm
 MANIFEST			This list of files
 README
 t/00-load.t

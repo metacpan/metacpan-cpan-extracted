@@ -1,11 +1,11 @@
 NAME
-    Acme::CPANModules::WorkingWithCSV - Working with CSV (comma-separated
-    value) data in Perl
+    Acme::CPANModules::WorkingWithCSV - List of modules/applications to work
+    with CSV (comma-separated value) data in Perl
 
 VERSION
-    This document describes version 0.002 of
+    This document describes version 0.003 of
     Acme::CPANModules::WorkingWithCSV (from Perl distribution
-    Acme-CPANModules-WorkingWithCSV), released on 2022-12-02.
+    Acme-CPANModules-WorkingWithCSV), released on 2023-10-31.
 
 DESCRIPTION
     The following are tools (modules and scripts) to work with the CSV
@@ -21,7 +21,7 @@ DESCRIPTION
     Generating CSV from Perl array/structure
 
     Text::CSV (as well as Text::CSV_XS) can render a line of CSV from Perl
-    array(ref) with their "say()" method.
+    array(ref) with their say() method.
 
     dd2csv from App::CSVUtils
 
@@ -110,6 +110,10 @@ DESCRIPTION
 
     csv-setop from App::CSVUtils
 
+    ** Other modules/unorganized
+
+    Data::CTable
+
 ACME::CPANMODULES ENTRIES
     Text::CSV
         Author: ISHIGAKI <https://metacpan.org/author/ISHIGAKI>
@@ -137,6 +141,9 @@ ACME::CPANMODULES ENTRIES
 
     csvgrep
         Author: NEILB <https://metacpan.org/author/NEILB>
+
+    Data::CTable
+        Author: CHTHORMAN <https://metacpan.org/author/CHTHORMAN>
 
 FAQ
   What is an Acme::CPANModules::* module?
@@ -210,7 +217,8 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2023, 2022 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

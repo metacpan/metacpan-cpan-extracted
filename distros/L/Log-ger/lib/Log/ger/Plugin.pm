@@ -6,9 +6,9 @@ use warnings;
 use Log::ger::Util;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-10-29'; # DATE
+our $DATE = '2023-12-29'; # DATE
 our $DIST = 'Log-ger'; # DIST
-our $VERSION = '0.041'; # VERSION
+our $VERSION = '0.042'; # VERSION
 
 sub set {
     my $pkg = shift;
@@ -71,7 +71,7 @@ Log::ger::Plugin - Use a plugin
 
 =head1 VERSION
 
-version 0.041
+version 0.042
 
 =head1 SYNOPSIS
 

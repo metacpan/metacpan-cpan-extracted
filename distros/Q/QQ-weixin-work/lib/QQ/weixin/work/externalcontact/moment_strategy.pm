@@ -9,6 +9,9 @@ QQ::weixin::work::externalcontact::moment_strategy
 =head1 DESCRIPTION
 
 客户朋友圈规则组管理
+最后更新：2023/12/01
+
+=head2 SYNOPSIS
 
 L<https://developer.work.weixin.qq.com/document/path/94890>
 
@@ -21,10 +24,24 @@ use LWP::UserAgent;
 use JSON;
 use utf8;
 
-our $VERSION = '0.06';
+our $VERSION = '0.10';
 our @EXPORT = qw/ list get get_range create edit del /;
 
 =head1 FUNCTION
+
+=head2 权限说明
+
+调用客户朋友圈规则组相关接口的应用需要满足如下的权限：
+
+	应用类型	权限要求
+	自建应用	配置到「客户联系 可调用接口的应用」中
+	代开发应用	具有「管理客户朋友圈规则组」权限
+	第三方应用	具有「管理客户朋友圈规则组」权限
+
+提示
+应用仅能获取和管理由本应用创建的规则组
+
+注： 从2023年12月1日0点起，不再支持通过系统应用secret调用接口，存量企业暂不受影响 查看详情
 
 =head2 list(access_token, hash);
 
@@ -47,14 +64,10 @@ L<https://developer.work.weixin.qq.com/document/path/94890#获取规则组列表
 
 =head4 参数说明：
 
-    参数	            必须	说明
+	参数	            必须	说明
     access_token	是	调用接口凭证
 	cursor	否	分页查询游标，首次调用可不填
 	limit	否	分页大小,默认为1000，最大不超过1000
-
-=head4 权限说明：
-
-仅可使用“客户联系”secret获取的accesstoken来调用（accesstoken如何获取？）
 
 =head3 RETURN 返回结果：
 
@@ -75,7 +88,7 @@ L<https://developer.work.weixin.qq.com/document/path/94890#获取规则组列表
 
 =head4 RETURN 参数说明：
 
-    参数	        说明
+	参数	        说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	strategy_id	规则组id
@@ -120,13 +133,9 @@ L<https://developer.work.weixin.qq.com/document/path/94890#获取规则组详情
 
 =head4 参数说明：
 
-    参数	            必须	说明
+	参数	            必须	说明
     access_token	是	调用接口凭证
 	strategy_id	是	规则组id
-
-=head4 权限说明：
-
-仅可使用“客户联系”secret获取的accesstoken来调用（accesstoken如何获取？）
 
 =head3 RETURN 返回结果：
 
@@ -153,7 +162,7 @@ L<https://developer.work.weixin.qq.com/document/path/94890#获取规则组详情
 
 =head4 RETURN 参数说明：
 
-    参数	        说明
+	参数	        说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	strategy_id	规则组id
@@ -208,15 +217,11 @@ L<https://developer.work.weixin.qq.com/document/path/94890#获取规则组管理
 
 =head4 参数说明：
 
-    参数	            必须	说明
+	参数	            必须	说明
     access_token	是	调用接口凭证
 	strategy_id	是	规则组id
 	cursor	否	分页游标
 	limit	否	每个分页的成员/部门节点数，默认为1000，最大为1000
-
-=head4 权限说明：
-
-仅可使用“客户联系”secret获取的accesstoken来调用（accesstoken如何获取？）
 
 =head3 RETURN 返回结果：
 
@@ -239,7 +244,7 @@ L<https://developer.work.weixin.qq.com/document/path/94890#获取规则组管理
 
 =head4 RETURN 参数说明：
 
-    参数	        说明
+	参数	        说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	range.type	节点类型，1-成员 2-部门
@@ -308,7 +313,7 @@ L<https://developer.work.weixin.qq.com/document/path/94890#创建新的规则组
 
 =head4 参数说明：
 
-    参数	            必须	说明
+	参数	            必须	说明
     access_token	是	调用接口凭证
 	parent_id	否	父规则组id
 	strategy_name	是	规则组名称
@@ -324,10 +329,6 @@ L<https://developer.work.weixin.qq.com/document/path/94890#创建新的规则组
 管理组的最大层级为5层
 每个管理组的管理范围内最多支持3000个节点
 
-=head4 权限说明：
-
-仅可使用“客户联系”secret获取的accesstoken来调用（accesstoken如何获取？）
-
 =head3 RETURN 返回结果：
 
     {
@@ -338,7 +339,7 @@ L<https://developer.work.weixin.qq.com/document/path/94890#创建新的规则组
 
 =head4 RETURN 参数说明：
 
-    参数	        说明
+	参数	        说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	strategy_id	规则组id
@@ -415,7 +416,7 @@ L<https://developer.work.weixin.qq.com/document/path/94890#编辑规则组及其
 
 =head4 参数说明：
 
-    参数	            必须	说明
+	参数	            必须	说明
     access_token	是	调用接口凭证
 	strategy_id	是	规则组id
 	strategy_name	否	规则组名称
@@ -431,10 +432,6 @@ L<https://developer.work.weixin.qq.com/document/path/94890#编辑规则组及其
 如果规则组具有父规则组，则其管理范围必须是父规则组的子集，且将完全继承父规则组的权限配置(privilege将被忽略)
 每个管理组的管理范围内最多支持3000个节点
 
-=head4 权限说明：
-
-仅可使用“客户联系”secret获取的accesstoken来调用（accesstoken如何获取？）
-
 =head3 RETURN 返回结果：
 
     {
@@ -444,7 +441,7 @@ L<https://developer.work.weixin.qq.com/document/path/94890#编辑规则组及其
 
 =head4 RETURN 参数说明：
 
-    参数	        说明
+	参数	        说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 
@@ -487,13 +484,9 @@ L<https://developer.work.weixin.qq.com/document/path/94890#删除规则组>
 
 =head4 参数说明：
 
-    参数	            必须	说明
+	参数	            必须	说明
     access_token	是	调用接口凭证
 	strategy_id	是	规则组id
-
-=head4 权限说明：
-
-仅可使用“客户联系”secret获取的accesstoken来调用（accesstoken如何获取？）
 
 =head3 RETURN 返回结果：
 
@@ -504,7 +497,7 @@ L<https://developer.work.weixin.qq.com/document/path/94890#删除规则组>
 
 =head4 RETURN 参数说明：
 
-    参数	        说明
+	参数	        说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 
@@ -526,8 +519,6 @@ sub del {
     }
     return 0;
 }
-
-
 
 1;
 __END__

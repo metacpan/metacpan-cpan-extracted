@@ -1,3 +1,11 @@
+0.003   2024-02-19  Released-By: PERLANCAR; Urgency: medium
+
+        - Add participant: Config::Tiny (GH#1).
+
+        - [participant Config::INI::Tiny] Cache object (though it doesn't seem
+          to affect the benchmark much).
+
+
 0.002   2022-08-10  Released-By: PERLANCAR; Urgency: medium
 
         - Add participant: Config::INI::Tiny.
@@ -6,4 +14,3 @@
 0.001   2019-04-23  Released-By: PERLANCAR
 
         - First release.
-

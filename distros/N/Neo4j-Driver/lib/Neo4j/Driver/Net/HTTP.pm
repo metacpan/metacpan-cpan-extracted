@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Net::HTTP;
 # ABSTRACT: Network controller for Neo4j HTTP
-$Neo4j::Driver::Net::HTTP::VERSION = '0.44';
+$Neo4j::Driver::Net::HTTP::VERSION = '0.45';
 
 # This package is not part of the public Neo4j::Driver API.
 

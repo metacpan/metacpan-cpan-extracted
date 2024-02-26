@@ -1,7 +1,7 @@
 Build.PL
 lib/Locale/CLDR/Locales/Guz.pm
-lib/Locale/CLDR/Locales/Guz/Any.pm
-lib/Locale/CLDR/Locales/Guz/Any/Ke.pm
+lib/Locale/CLDR/Locales/Guz/Latn.pm
+lib/Locale/CLDR/Locales/Guz/Latn/Ke.pm
 MANIFEST			This list of files
 README
 t/00-load.t

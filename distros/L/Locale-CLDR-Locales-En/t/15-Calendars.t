@@ -97,7 +97,7 @@ $day_period_data = $locale->get_day_period('1210');
 is($day_period_data, 'in the afternoon', 'Day period data PM');
 
 my $date_format = $locale->date_format_full;
-is($date_format, 'EEEE, d MMMM y', 'Date Format Full');
+is($date_format, 'EEEE d MMMM y', 'Date Format Full');
 $date_format = $locale->date_format_long;
 is($date_format, 'd MMMM y', 'Date Format Long');
 $date_format = $locale->date_format_medium;
@@ -115,9 +115,9 @@ $time_format = $locale->time_format_short;
 is($time_format, 'HH:mm', 'Time Format Short');
 
 my $date_time_format = $locale->datetime_format_full;
-is($date_time_format, "EEEE, d MMMM y 'at' HH:mm:ss zzzz", 'Date Time Format Full');
+is($date_time_format, "EEEE d MMMM y, HH:mm:ss zzzz", 'Date Time Format Full');
 $date_time_format = $locale->datetime_format_long;
-is($date_time_format, "d MMMM y 'at' HH:mm:ss z", 'Date Time Format Long');
+is($date_time_format, "d MMMM y, HH:mm:ss z", 'Date Time Format Long');
 $date_time_format = $locale->datetime_format_medium;
 is($date_time_format, 'd MMM y, HH:mm:ss', 'Date Time Format Medium');
 $date_time_format = $locale->datetime_format_short;

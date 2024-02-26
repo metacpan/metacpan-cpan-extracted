@@ -13,31 +13,51 @@
 #define CLUSTER_USERNAME "default"
 #define CLUSTER_PASSWORD "secretword"
 
+int connect_success_counter;
+int connect_failure_counter;
+void connect_callback(const redisContext *c, int status) {
+    (void)c;
+    if (status == REDIS_OK)
+        connect_success_counter++;
+    else
+        connect_failure_counter++;
+}
+void reset_counters(void) {
+    connect_success_counter = connect_failure_counter = 0;
+}
+
 // Connecting to a password protected cluster and
 // providing a correct password.
-void test_password_ok() {
+void test_password_ok(void) {
     redisClusterContext *cc = redisClusterContextInit();
     assert(cc);
     redisClusterSetOptionAddNodes(cc, CLUSTER_NODE_WITH_PASSWORD);
     redisClusterSetOptionPassword(cc, CLUSTER_PASSWORD);
+    redisClusterSetConnectCallback(cc, connect_callback);
 
     int status;
     status = redisClusterConnect2(cc);
     ASSERT_MSG(status == REDIS_OK, cc->errstr);
+    assert(connect_success_counter == 1); // for CLUSTER NODES
     load_redis_version(cc);
+    assert(connect_success_counter == 2); // for checking redis version
 
     // Test connection
     redisReply *reply;
     reply = redisClusterCommand(cc, "SET key1 Hello");
     CHECK_REPLY_OK(cc, reply);
     freeReplyObject(reply);
-
     redisClusterFree(cc);
+
+    // Check counters incremented by connect callback
+    assert(connect_success_counter == 3); // for SET (to a different node)
+    assert(connect_failure_counter == 0);
+    reset_counters();
 }
 
 // Connecting to a password protected cluster and
 // providing wrong password.
-void test_password_wrong() {
+void test_password_wrong(void) {
     redisClusterContext *cc = redisClusterContextInit();
     assert(cc);
     redisClusterSetOptionAddNodes(cc, CLUSTER_NODE_WITH_PASSWORD);
@@ -58,7 +78,7 @@ void test_password_wrong() {
 
 // Connecting to a password protected cluster and
 // not providing any password.
-void test_password_missing() {
+void test_password_missing(void) {
     redisClusterContext *cc = redisClusterContextInit();
     assert(cc);
     redisClusterSetOptionAddNodes(cc, CLUSTER_NODE_WITH_PASSWORD);
@@ -76,7 +96,7 @@ void test_password_missing() {
 
 // Connect to a cluster and authenticate using username and password,
 // i.e. 'AUTH <username> <password>'
-void test_username_ok() {
+void test_username_ok(void) {
     if (redis_version_less_than(6, 0))
         return;
 
@@ -99,7 +119,7 @@ void test_username_ok() {
 }
 
 // Test of disabling the use of username after it was enabled.
-void test_username_disabled() {
+void test_username_disabled(void) {
     if (redis_version_less_than(6, 0))
         return;
 
@@ -135,7 +155,7 @@ void test_username_disabled() {
 }
 
 // Connect and handle two clusters simultaneously
-void test_multicluster() {
+void test_multicluster(void) {
     int ret;
     redisReply *reply;
 
@@ -184,7 +204,7 @@ void test_multicluster() {
 }
 
 /* Connect to a non-routable address which results in a connection timeout. */
-void test_connect_timeout() {
+void test_connect_timeout(void) {
     struct timeval timeout = {0, 200000};
 
     redisClusterContext *cc = redisClusterContextInit();
@@ -193,17 +213,21 @@ void test_connect_timeout() {
     /* Configure a non-routable IP address and a timeout */
     redisClusterSetOptionAddNodes(cc, "192.168.0.0:7000");
     redisClusterSetOptionConnectTimeout(cc, timeout);
+    redisClusterSetConnectCallback(cc, connect_callback);
 
     int status = redisClusterConnect2(cc);
     assert(status == REDIS_ERR);
     assert(cc->err == REDIS_ERR_IO);
     assert(strcmp(cc->errstr, "Connection timed out") == 0);
+    assert(connect_success_counter == 0);
+    assert(connect_failure_counter == 1);
+    reset_counters();
 
     redisClusterFree(cc);
 }
 
 /* Connect using a pre-configured command timeout */
-void test_command_timeout() {
+void test_command_timeout(void) {
     struct timeval timeout = {0, 10000};
 
     redisClusterContext *cc = redisClusterContextInit();
@@ -214,9 +238,9 @@ void test_command_timeout() {
     int status = redisClusterConnect2(cc);
     ASSERT_MSG(status == REDIS_OK, cc->errstr);
 
-    nodeIterator ni;
-    initNodeIterator(&ni, cc);
-    cluster_node *node = nodeNext(&ni);
+    redisClusterNodeIterator ni;
+    redisClusterInitNodeIterator(&ni, cc);
+    redisClusterNode *node = redisClusterNodeNext(&ni);
     assert(node);
 
     /* Simulate a command timeout */
@@ -238,7 +262,7 @@ void test_command_timeout() {
 }
 
 /* Connect and configure a command timeout while connected. */
-void test_command_timeout_set_while_connected() {
+void test_command_timeout_set_while_connected(void) {
     struct timeval timeout = {0, 10000};
 
     redisClusterContext *cc = redisClusterContextInit();
@@ -248,9 +272,9 @@ void test_command_timeout_set_while_connected() {
     int status = redisClusterConnect2(cc);
     ASSERT_MSG(status == REDIS_OK, cc->errstr);
 
-    nodeIterator ni;
-    initNodeIterator(&ni, cc);
-    cluster_node *node = nodeNext(&ni);
+    redisClusterNodeIterator ni;
+    redisClusterInitNodeIterator(&ni, cc);
+    redisClusterNode *node = redisClusterNodeNext(&ni);
     assert(node);
 
     redisReply *reply;
@@ -318,7 +342,7 @@ void commandCallback(redisClusterAsyncContext *cc, void *r, void *privdata) {
 
 // Connecting to a password protected cluster using
 // the async API, providing correct password.
-void test_async_password_ok() {
+void test_async_password_ok(void) {
     redisClusterAsyncContext *acc = redisClusterAsyncContextInit();
     assert(acc);
     redisClusterAsyncSetConnectCallback(acc, callbackExpectOk);
@@ -349,7 +373,7 @@ void test_async_password_ok() {
 
 // Connecting to a password protected cluster using
 // the async API, providing wrong password.
-void test_async_password_wrong() {
+void test_async_password_wrong(void) {
     redisClusterAsyncContext *acc = redisClusterAsyncContextInit();
     assert(acc);
     redisClusterAsyncSetConnectCallback(acc, callbackExpectOk);
@@ -375,7 +399,7 @@ void test_async_password_wrong() {
     ret = redisClusterAsyncCommand(acc, commandCallback, &r, "SET key1 Hello");
     assert(ret == REDIS_ERR);
     assert(acc->err == REDIS_ERR_OTHER);
-    assert(strcmp(acc->errstr, "node get by table error") == 0);
+    assert(strcmp(acc->errstr, "slotmap not available") == 0);
 
     event_base_dispatch(base);
 
@@ -385,7 +409,7 @@ void test_async_password_wrong() {
 
 // Connecting to a password protected cluster using
 // the async API, not providing a password.
-void test_async_password_missing() {
+void test_async_password_missing(void) {
     redisClusterAsyncContext *acc = redisClusterAsyncContextInit();
     assert(acc);
     redisClusterAsyncSetConnectCallback(acc, callbackExpectOk);
@@ -408,7 +432,7 @@ void test_async_password_missing() {
     ret = redisClusterAsyncCommand(acc, commandCallback, &r, "SET key1 Hello");
     assert(ret == REDIS_ERR);
     assert(acc->err == REDIS_ERR_OTHER);
-    assert(strcmp(acc->errstr, "node get by table error") == 0);
+    assert(strcmp(acc->errstr, "slotmap not available") == 0);
 
     event_base_dispatch(base);
 
@@ -417,7 +441,7 @@ void test_async_password_missing() {
 }
 
 // Connect to a cluster and authenticate using username and password
-void test_async_username_ok() {
+void test_async_username_ok(void) {
     if (redis_version_less_than(6, 0))
         return;
 
@@ -463,7 +487,7 @@ void test_async_username_ok() {
 }
 
 // Connect and handle two clusters simultaneously using the async API
-void test_async_multicluster() {
+void test_async_multicluster(void) {
     int ret;
 
     redisClusterAsyncContext *acc1 = redisClusterAsyncContextInit();
@@ -529,7 +553,7 @@ void test_async_multicluster() {
 }
 
 /* Connect to a non-routable address which results in a connection timeout. */
-void test_async_connect_timeout() {
+void test_async_connect_timeout(void) {
     struct timeval timeout = {0, 200000};
 
     redisClusterAsyncContext *acc = redisClusterAsyncContextInit();
@@ -554,7 +578,7 @@ void test_async_connect_timeout() {
 }
 
 /* Connect using a pre-configured command timeout */
-void test_async_command_timeout() {
+void test_async_command_timeout(void) {
     struct timeval timeout = {0, 10000};
 
     redisClusterAsyncContext *acc = redisClusterAsyncContextInit();
@@ -569,9 +593,9 @@ void test_async_command_timeout() {
     assert(status == REDIS_OK);
     assert(acc->cc->err == 0);
 
-    nodeIterator ni;
-    initNodeIterator(&ni, acc->cc);
-    cluster_node *node = nodeNext(&ni);
+    redisClusterNodeIterator ni;
+    redisClusterInitNodeIterator(&ni, acc->cc);
+    redisClusterNode *node = redisClusterNodeNext(&ni);
     assert(node);
 
     /* Simulate a command timeout and expect a timeout error */
@@ -587,7 +611,7 @@ void test_async_command_timeout() {
     event_base_free(base);
 }
 
-int main() {
+int main(void) {
 
     test_password_ok();
     test_password_wrong();

@@ -100,7 +100,7 @@ FOOTER
     my $header = <<"HEADER";
 ${E}head1 NAME
 
-callbackery.cfg - The Apliance FRONTEND Builder config file
+callbackery.cfg - The Appliance FRONTEND Builder config file
 
 ${E}head1 SYNOPSIS
 

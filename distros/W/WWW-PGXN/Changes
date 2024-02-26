@@ -1,5 +1,12 @@
 Revision history for Perl extension WWW-PGXN.
 
+0.13.0  2024-02-17T22:23:29Z
+      - Added CI tests for Perls 5.10 - 5.38 on Linux, macOS, and Windows.
+      - Fixed test failures caused by line endings on Windows (probably only
+        when checked out by Git).
+      - Updated relevant URLs from http to https.
+      - Modernized Build.PL to comply with CPAN Meta Spec v2.
+
 0.12.4  2013-11-06T05:56:15Z
       - Removed the Pod tests from the distribution.
       - Fixed user agent string so it actually includes the version number.

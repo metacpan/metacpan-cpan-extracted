@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Th - Package for language Thai
 
 package Locale::CLDR::Locales::Th;
 # This file auto generated from Data\common\main\th.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -238,22 +238,6 @@ has 'algorithmic_number_format_data' => (
     } },
 );
 
-# Need to add code for Key type pattern
-sub display_name_pattern {
-	my ($self, $name, $region, $script, $variant) = @_;
-
-	my $display_pattern = '{0} ({1})';
-	$display_pattern =~s/\{0\}/$name/g;
-	my $subtags = join '{0}, {1}', grep {$_} (
-		$region,
-		$script,
-		$variant,
-	);
-
-	$display_pattern =~s/\{1\}/$subtags/g;
-	return $display_pattern;
-}
-
 has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
@@ -282,6 +266,7 @@ has 'display_name_language' => (
  				'am' => 'อัมฮารา',
  				'an' => 'อารากอน',
  				'ang' => 'อังกฤษโบราณ',
+ 				'ann' => 'โอโบโล',
  				'anp' => 'อังคิกา',
  				'ar' => 'อาหรับ',
  				'ar_001' => 'อาหรับมาตรฐานสมัยใหม่',
@@ -298,6 +283,7 @@ has 'display_name_language' => (
  				'asa' => 'อาซู',
  				'ase' => 'ภาษามืออเมริกัน',
  				'ast' => 'อัสตูเรียส',
+ 				'atj' => 'อะทิคาเมก',
  				'av' => 'อาวาร์',
  				'avk' => 'โคตาวา',
  				'awa' => 'อวธี',
@@ -320,6 +306,7 @@ has 'display_name_language' => (
  				'bfd' => 'บาฟัต',
  				'bfq' => 'พทคะ',
  				'bg' => 'บัลแกเรีย',
+ 				'bgc' => 'หริยนวี',
  				'bgn' => 'บาลูจิตะวันตก',
  				'bho' => 'โภชปุรี',
  				'bi' => 'บิสลามา',
@@ -365,14 +352,22 @@ has 'display_name_language' => (
  				'chy' => 'เชเยนเน',
  				'ckb' => 'เคิร์ดตอนกลาง',
  				'ckb@alt=variant' => 'เคิร์ดโซรานี',
+ 				'clc' => 'ชิลโคติน',
  				'co' => 'คอร์ซิกา',
  				'cop' => 'คอปติก',
  				'cps' => 'กาปิซนอน',
  				'cr' => 'ครี',
+ 				'crg' => 'มิชิฟ',
  				'crh' => 'ตุรกีไครเมีย',
+ 				'crj' => 'ครีตะวันออกเฉียงใต้',
+ 				'crk' => 'เพลนส์ครี',
+ 				'crl' => 'ครีตะวันออกเฉียงเหนือ',
+ 				'crm' => 'มูสครี',
+ 				'crr' => 'อัลกอนควินแคโรไลนา',
  				'crs' => 'ครีโอลเซเซลส์ฝรั่งเศส',
  				'cs' => 'เช็ก',
  				'csb' => 'คาซูเบียน',
+ 				'csw' => 'สวอมปีครี',
  				'cu' => 'เชอร์ชสลาวิก',
  				'cv' => 'ชูวัช',
  				'cy' => 'เวลส์',
@@ -437,8 +432,8 @@ has 'display_name_language' => (
  				'fon' => 'ฟอน',
  				'fr' => 'ฝรั่งเศส',
  				'fr_CA' => 'ฝรั่งเศส - แคนาดา',
- 				'fr_CH' => 'ฝรั่งเศส (สวิส)',
- 				'frc' => 'ฝรั่งเศสกาฌ็อง',
+ 				'fr_CH' => 'ฝรั่งเศส - สวิส',
+ 				'frc' => 'ฝรั่งเศสเคจัน',
  				'frm' => 'ฝรั่งเศสกลาง',
  				'fro' => 'ฝรั่งเศสโบราณ',
  				'frp' => 'อาร์พิตา',
@@ -478,8 +473,10 @@ has 'display_name_language' => (
  				'hai' => 'ไฮดา',
  				'hak' => 'จีนแคะ',
  				'haw' => 'ฮาวาย',
+ 				'hax' => 'เฮดาใต้',
  				'he' => 'ฮิบรู',
  				'hi' => 'ฮินดี',
+ 				'hi_Latn@alt=variant' => 'อังกฤษแบบอินเดีย',
  				'hif' => 'ฮินดีฟิจิ',
  				'hil' => 'ฮีลีกัยนน',
  				'hit' => 'ฮิตไตต์',
@@ -491,6 +488,7 @@ has 'display_name_language' => (
  				'ht' => 'เฮติครีโอล',
  				'hu' => 'ฮังการี',
  				'hup' => 'ฮูปา',
+ 				'hur' => 'ฮัลโกเมเลม',
  				'hy' => 'อาร์เมเนีย',
  				'hz' => 'เฮเรโร',
  				'ia' => 'อินเตอร์ลิงกัว',
@@ -501,6 +499,7 @@ has 'display_name_language' => (
  				'ig' => 'อิกโบ',
  				'ii' => 'เสฉวนยี่',
  				'ik' => 'อีนูเปียก',
+ 				'ikt' => 'อินุกติตุตแคนาดาตะวันตก',
  				'ilo' => 'อีโลโก',
  				'inh' => 'อินกุช',
  				'io' => 'อีโด',
@@ -524,7 +523,7 @@ has 'display_name_language' => (
  				'kaj' => 'คจู',
  				'kam' => 'คัมบา',
  				'kaw' => 'กวี',
- 				'kbd' => 'คาร์บาเดีย',
+ 				'kbd' => 'คาบาร์เดีย',
  				'kbl' => 'คาเนมบู',
  				'kcg' => 'ทีแยป',
  				'kde' => 'มาคอนเด',
@@ -556,7 +555,7 @@ has 'display_name_language' => (
  				'krc' => 'คาราไช-บัลคาร์',
  				'kri' => 'คริโอ',
  				'krj' => 'กินารายอา',
- 				'krl' => 'แกรเลียน',
+ 				'krl' => 'คารีเลียน',
  				'kru' => 'กุรุข',
  				'ks' => 'แคชเมียร์',
  				'ksb' => 'ชัมบาลา',
@@ -567,6 +566,7 @@ has 'display_name_language' => (
  				'kut' => 'คูเทไน',
  				'kv' => 'โกมิ',
  				'kw' => 'คอร์นิช',
+ 				'kwk' => 'ควักวาลา',
  				'ky' => 'คีร์กีซ',
  				'la' => 'ละติน',
  				'lad' => 'ลาดิโน',
@@ -574,20 +574,22 @@ has 'display_name_language' => (
  				'lah' => 'ลาฮ์นดา',
  				'lam' => 'แลมบา',
  				'lb' => 'ลักเซมเบิร์ก',
- 				'lez' => 'เลซเกียน',
+ 				'lez' => 'เลซเกีย',
  				'lfn' => 'ลิงกัวฟรังกาโนวา',
  				'lg' => 'ยูกันดา',
  				'li' => 'ลิมเบิร์ก',
  				'lij' => 'ลิกูเรีย',
+ 				'lil' => 'ลิลลูเอต',
  				'liv' => 'ลิโวเนีย',
  				'lkt' => 'ลาโกตา',
  				'lmo' => 'ลอมบาร์ด',
  				'ln' => 'ลิงกาลา',
  				'lo' => 'ลาว',
  				'lol' => 'มองโก',
- 				'lou' => 'ภาษาครีโอลุยเซียนา',
+ 				'lou' => 'ครีโอลุยเซียนา',
  				'loz' => 'โลซิ',
  				'lrc' => 'ลูรีเหนือ',
+ 				'lsm' => 'ซาเมีย',
  				'lt' => 'ลิทัวเนีย',
  				'ltg' => 'ลัตเกล',
  				'lu' => 'ลูบา-กาตองกา',
@@ -617,7 +619,7 @@ has 'display_name_language' => (
  				'mga' => 'ไอริชกลาง',
  				'mgh' => 'มากัววา-มีทโท',
  				'mgo' => 'เมตา',
- 				'mh' => 'มาร์แชลลิส',
+ 				'mh' => 'มาร์แชลล์',
  				'mi' => 'เมารี',
  				'mic' => 'มิกแมก',
  				'min' => 'มีนังกาเบา',
@@ -626,6 +628,7 @@ has 'display_name_language' => (
  				'mn' => 'มองโกเลีย',
  				'mnc' => 'แมนจู',
  				'mni' => 'มณีปุระ',
+ 				'moe' => 'อินนุ-ไอมุน',
  				'moh' => 'โมฮอว์ก',
  				'mos' => 'โมซี',
  				'mr' => 'มราฐี',
@@ -634,7 +637,7 @@ has 'display_name_language' => (
  				'mt' => 'มอลตา',
  				'mua' => 'มันดัง',
  				'mul' => 'หลายภาษา',
- 				'mus' => 'ครีก',
+ 				'mus' => 'มัสคีกี',
  				'mwl' => 'มีรันดา',
  				'mwr' => 'มารวาฑี',
  				'mwv' => 'เม็นตาไว',
@@ -678,29 +681,36 @@ has 'display_name_language' => (
  				'nzi' => 'นซิมา',
  				'oc' => 'อ็อกซิตัน',
  				'oj' => 'โอจิบวา',
+ 				'ojb' => 'โอจิบเวตะวันตกเฉียงเหนือ',
+ 				'ojc' => 'โอจิบเวตอนกลาง',
+ 				'ojs' => 'ออจิ-ครี',
+ 				'ojw' => 'โอจิบเวตะวันตก',
+ 				'oka' => 'โอคานากัน',
  				'om' => 'โอโรโม',
  				'or' => 'โอดิยา',
  				'os' => 'ออสเซเตีย',
  				'osa' => 'โอซากี',
  				'ota' => 'ตุรกีออตโตมัน',
  				'pa' => 'ปัญจาบ',
- 				'pag' => 'ปางาซีนัน',
+ 				'pag' => 'ปังกาซีนัน',
  				'pal' => 'ปะห์ลาวี',
- 				'pam' => 'ปัมปางา',
+ 				'pam' => 'ปัมปังกา',
  				'pap' => 'ปาเปียเมนโต',
  				'pau' => 'ปาเลา',
  				'pcd' => 'ปิการ์',
- 				'pcm' => 'พิดจิน',
+ 				'pcm' => 'ไนจีเรียนพิดจิน',
  				'pdc' => 'เยอรมันเพนซิลเวเนีย',
  				'pdt' => 'เพลาท์ดิช',
  				'peo' => 'เปอร์เซียโบราณ',
  				'pfl' => 'เยอรมันพาลาทิเนต',
  				'phn' => 'ฟินิเชีย',
  				'pi' => 'บาลี',
+ 				'pis' => 'พิดจิน',
  				'pl' => 'โปแลนด์',
  				'pms' => 'พีดมอนต์',
  				'pnt' => 'พอนติก',
  				'pon' => 'พอห์นเพ',
+ 				'pqm' => 'มาเลไซท์-ปัสมาโควดี',
  				'prg' => 'ปรัสเซีย',
  				'pro' => 'โปรวองซาลโบราณ',
  				'ps' => 'พัชโต',
@@ -712,7 +722,7 @@ has 'display_name_language' => (
  				'quc' => 'กีเช',
  				'qug' => 'ควิชัวไฮแลนด์ชิมโบราโซ',
  				'raj' => 'ราชสถาน',
- 				'rap' => 'ราปานู',
+ 				'rap' => 'ราปานูอี',
  				'rar' => 'ราโรทองกา',
  				'rgn' => 'โรมัณโญ',
  				'rhg' => 'โรฮิงญา',
@@ -727,7 +737,7 @@ has 'display_name_language' => (
  				'ru' => 'รัสเซีย',
  				'rue' => 'รูซิน',
  				'rug' => 'โรเวียนา',
- 				'rup' => 'อาโรมาเนียน',
+ 				'rup' => 'อาโรมาเนีย',
  				'rw' => 'รวันดา',
  				'rwk' => 'รวา',
  				'sa' => 'สันสกฤต',
@@ -763,6 +773,7 @@ has 'display_name_language' => (
  				'sid' => 'ซิดาโม',
  				'sk' => 'สโลวัก',
  				'sl' => 'สโลวีเนีย',
+ 				'slh' => 'ลูชูตซีดใต้',
  				'sli' => 'ไซลีเซียตอนล่าง',
  				'sly' => 'เซลายาร์',
  				'sm' => 'ซามัว',
@@ -776,12 +787,13 @@ has 'display_name_language' => (
  				'sog' => 'ซอกดีน',
  				'sq' => 'แอลเบเนีย',
  				'sr' => 'เซอร์เบีย',
- 				'srn' => 'ซูรินาเม',
+ 				'srn' => 'สรานานตองโก',
  				'srr' => 'เซแรร์',
  				'ss' => 'สวาติ',
  				'ssy' => 'ซาโฮ',
  				'st' => 'โซโทใต้',
  				'stq' => 'ฟรีเซียนซัทเธอร์แลนด์',
+ 				'str' => 'สเตรตส์ซาลิช',
  				'su' => 'ซุนดา',
  				'suk' => 'ซูคูมา',
  				'sus' => 'ซูซู',
@@ -789,11 +801,12 @@ has 'display_name_language' => (
  				'sv' => 'สวีเดน',
  				'sw' => 'สวาฮีลี',
  				'sw_CD' => 'สวาฮีลี - คองโก',
- 				'swb' => 'โคเมอเรียน',
+ 				'swb' => 'โคเมอเรีย',
  				'syc' => 'ซีเรียแบบดั้งเดิม',
  				'syr' => 'ซีเรีย',
  				'szl' => 'ไซลีเซีย',
  				'ta' => 'ทมิฬ',
+ 				'tce' => 'ทัชโชนใต้',
  				'tcy' => 'ตูลู',
  				'te' => 'เตลูกู',
  				'tem' => 'ทิมเน',
@@ -801,7 +814,9 @@ has 'display_name_language' => (
  				'ter' => 'เทเรโน',
  				'tet' => 'เตตุม',
  				'tg' => 'ทาจิก',
+ 				'tgx' => 'ทากิช',
  				'th' => 'ไทย',
+ 				'tht' => 'ทาลทาน',
  				'ti' => 'ติกริญญา',
  				'tig' => 'ตีเกร',
  				'tiv' => 'ทิฟ',
@@ -813,17 +828,19 @@ has 'display_name_language' => (
  				'tli' => 'ทลิงกิต',
  				'tly' => 'ทาลิช',
  				'tmh' => 'ทามาเชก',
- 				'tn' => 'บอตสวานา',
+ 				'tn' => 'สวานา',
  				'to' => 'ตองกา',
  				'tog' => 'ไนอะซาตองกา',
+ 				'tok' => 'โทคิโพนา',
  				'tpi' => 'ท็อกพิซิน',
  				'tr' => 'ตุรกี',
  				'tru' => 'ตูโรโย',
  				'trv' => 'ทาโรโก',
- 				'ts' => 'ซิตซองกา',
+ 				'ts' => 'ซองกา',
  				'tsd' => 'ซาโคเนีย',
  				'tsi' => 'ซิมชีแอน',
  				'tt' => 'ตาตาร์',
+ 				'ttm' => 'ทัชโชนเหนือ',
  				'ttt' => 'ตัตมุสลิม',
  				'tum' => 'ทุมบูกา',
  				'tvl' => 'ตูวาลู',
@@ -851,9 +868,9 @@ has 'display_name_language' => (
  				'vot' => 'โวทิก',
  				'vro' => 'โวโร',
  				'vun' => 'วุนจู',
- 				'wa' => 'วาโลนี',
+ 				'wa' => 'วอลลูน',
  				'wae' => 'วัลเซอร์',
- 				'wal' => 'วาลาโม',
+ 				'wal' => 'โวแลตตา',
  				'war' => 'วาเรย์',
  				'was' => 'วาโช',
  				'wbp' => 'วอล์เพอร์รี',
@@ -905,10 +922,12 @@ has 'display_name_script' => (
 	default		=> sub {
 		sub {
 			my %scripts = (
-			'Afak' => 'อะฟาคา',
+			'Adlm' => 'อัดลัม',
+ 			'Afak' => 'อะฟาคา',
  			'Aghb' => 'แอลเบเนีย คอเคเซีย',
  			'Arab' => 'อาหรับ',
  			'Arab@alt=variant' => 'เปอร์เซีย-อาหรับ',
+ 			'Aran' => 'นาสตาลิก',
  			'Armi' => 'อิมพีเรียล อราเมอิก',
  			'Armn' => 'อาร์เมเนีย',
  			'Avst' => 'อเวสตะ',
@@ -923,8 +942,8 @@ has 'display_name_script' => (
  			'Brai' => 'เบรลล์',
  			'Bugi' => 'บูกิส',
  			'Buhd' => 'บูฮิด',
- 			'Cakm' => 'ชากมา',
- 			'Cans' => 'สัญลักษณ์ชนเผ่าพื้นเมืองแคนาดา',
+ 			'Cakm' => 'จักม่า',
+ 			'Cans' => 'อักษรพยางค์ของชาวอะบอริจินในแคนาดา',
  			'Cari' => 'คาเรีย',
  			'Cham' => 'จาม',
  			'Cher' => 'เชอโรกี',
@@ -1026,6 +1045,7 @@ has 'display_name_script' => (
  			'Plrd' => 'สัทศาสตร์พอลลาร์ด',
  			'Prti' => 'พาร์เทียอินสคริปชันแนล',
  			'Rjng' => 'เรจัง',
+ 			'Rohg' => 'ฮะนีฟี',
  			'Roro' => 'รองโกรองโก',
  			'Runr' => 'รูนิก',
  			'Samr' => 'ซามาเรีย',
@@ -1241,6 +1261,7 @@ has 'display_name_region' => (
  			'IM' => 'เกาะแมน',
  			'IN' => 'อินเดีย',
  			'IO' => 'บริติชอินเดียนโอเชียนเทร์ริทอรี',
+ 			'IO@alt=chagos' => 'หมู่เกาะชากอส',
  			'IQ' => 'อิรัก',
  			'IR' => 'อิหร่าน',
  			'IS' => 'ไอซ์แลนด์',
@@ -1307,6 +1328,7 @@ has 'display_name_region' => (
  			'NR' => 'นาอูรู',
  			'NU' => 'นีอูเอ',
  			'NZ' => 'นิวซีแลนด์',
+ 			'NZ@alt=variant' => 'เอาเตอารัว นิวซีแลนด์',
  			'OM' => 'โอมาน',
  			'PA' => 'ปานามา',
  			'PE' => 'เปรู',
@@ -1366,6 +1388,7 @@ has 'display_name_region' => (
  			'TN' => 'ตูนิเซีย',
  			'TO' => 'ตองกา',
  			'TR' => 'ตุรกี',
+ 			'TR@alt=variant' => 'ทูร์เคีย',
  			'TT' => 'ตรินิแดดและโตเบโก',
  			'TV' => 'ตูวาลู',
  			'TW' => 'ไต้หวัน',
@@ -1552,22 +1575,23 @@ has 'display_name_type' => (
  				'yes' => q{จัดเรียงความสำคัญของตัวพิมพ์},
  			},
  			'collation' => {
- 				'big5han' => q{เรียงตามอักษรจีนดั้งเดิม},
- 				'dictionary' => q{เรียงตามพจนานุกรม},
+ 				'big5han' => q{ลำดับการจัดเรียงตามอักษรจีนดั้งเดิม},
+ 				'compat' => q{ลำดับการจัดเรียงก่อนหน้านี้ ตามความเหมาะสม},
+ 				'dictionary' => q{ลำดับการจัดเรียงตามพจนานุกรม},
  				'ducet' => q{ลำดับการจัดเรียงตาม Unicode เริ่มต้น},
  				'eor' => q{กฎการเรียงลำดับตามแบบยุโรป},
- 				'gb2312han' => q{เรียงตามอักษรจีนประยุกต์},
- 				'phonebook' => q{เรียงตามสมุดโทรศัพท์},
- 				'phonetic' => q{ลำดักการจัดเรียงตามคำอ่าน},
- 				'pinyin' => q{เรียงตามการถอดเสียงภาษาจีน},
- 				'reformed' => q{เรียงตามลำดับล่าสุด},
+ 				'gb2312han' => q{ลำดับการจัดเรียงตามอักษรจีนประยุกต์},
+ 				'phonebook' => q{ลำดับการจัดเรียงตามสมุดโทรศัพท์},
+ 				'phonetic' => q{ลำดับการจัดเรียงตามการออกเสียง},
+ 				'pinyin' => q{ลำดับการจัดเรียงตามการถอดเสียงภาษาจีน},
+ 				'reformed' => q{ลำดับการจัดเรียงตามลำดับล่าสุด},
  				'search' => q{การค้นหาทั่วไป},
  				'searchjl' => q{ค้นหาตามพยัญชนะขึ้นต้นที่เป็นฮันกึล},
  				'standard' => q{ลำดับการจัดเรียงแบบมาตรฐาน},
- 				'stroke' => q{เรียงตามการลากเส้น},
- 				'traditional' => q{เรียงตามแบบดั้งเดิม},
- 				'unihan' => q{เรียงลำดับตามจำนวนขีด},
- 				'zhuyin' => q{จัดเรียงตามการสะกดแบบจู้อิน},
+ 				'stroke' => q{ลำดับการจัดเรียงตามการลากเส้น},
+ 				'traditional' => q{ลำดับการจัดเรียงตามแบบดั้งเดิม},
+ 				'unihan' => q{ลำดับการจัดเรียงตามจำนวนขีด},
+ 				'zhuyin' => q{ลำดับการจัดเรียงตามการสะกดแบบจู้อิน},
  			},
  			'colnormalization' => {
  				'no' => q{จัดเรียงโดยไม่ต้องทำให้เป็นแบบปกติ},
@@ -1617,7 +1641,7 @@ has 'display_name_type' => (
  				'bali' => q{ตัวเลขบาหลี},
  				'beng' => q{ตัวเลขบังกลาเทศ},
  				'brah' => q{ตัวเลขพราหมี},
- 				'cakm' => q{ตัวเลขชากมา},
+ 				'cakm' => q{ตัวเลขจักม่า},
  				'cham' => q{ตัวเลขชาม},
  				'deva' => q{ตัวเลขเทวนาครี},
  				'ethi' => q{ตัวเลขเอธิโอเปีย},
@@ -1716,9 +1740,9 @@ has 'characters' => (
 		return {
 			auxiliary => qr{[​]},
 			index => ['ก', 'ข', 'ฃ', 'ค', 'ฅ', 'ฆ', 'ง', 'จ', 'ฉ', 'ช', 'ซ', 'ฌ', 'ญ', 'ฎ', 'ฏ', 'ฐ', 'ฑ', 'ฒ', 'ณ', 'ด', 'ต', 'ถ', 'ท', 'ธ', 'น', 'บ', 'ป', 'ผ', 'ฝ', 'พ', 'ฟ', 'ภ', 'ม', 'ย', 'ร', 'ฤ', 'ล', 'ฦ', 'ว', 'ศ', 'ษ', 'ส', 'ห', 'ฬ', 'อ', 'ฮ'],
-			main => qr{[ฯ ๆ ๎ ์ ็ ่ ้ ๊ ๋ ก ข ฃ ค ฅ ฆ ง จ ฉ ช ซ ฌ ญ ฎ ฏ ฐ ฑ ฒ ณ ด ต ถ ท ธ น บ ป ผ ฝ พ ฟ ภ ม ย ร ฤ ล ฦ ว ศ ษ ส ห ฬ อ ฮ ํ ะ ั า ๅ ำ ิ ี ึ ื ุ ู เ แ โ ใ ไ ฺ]},
-			numbers => qr{[% , \- . ‑ ‰ + 0 1 2 3 4 5 6 7 8 9]},
-			punctuation => qr{[! " # ' ( ) * , \- . / \: @ \[ \] ‐ ‑ – — ‘ ’ “ ” … ′ ″]},
+			main => qr{[ฯๆ ๎ ์ ็ ่ ้ ๊ ๋ ก ข ฃ ค ฅ ฆ ง จ ฉ ช ซ ฌ ญ ฎ ฏ ฐ ฑ ฒ ณ ด ต ถ ท ธ น บ ป ผ ฝ พ ฟ ภ ม ย ร ฤ ล ฦ ว ศ ษ ส ห ฬ อ ฮ ํ ะ ั าๅ ำ ิ ี ึ ื ุ ู เ แ โ ใ ไ ฺ]},
+			numbers => qr{[\-‑,.%‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[\-‐‑–—,\:!.…'‘’"“”()\[\]@*/#′″]},
 		};
 	},
 EOT
@@ -1727,68 +1751,6 @@ EOT
 },
 );
 
-
-has 'ellipsis' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub {
-		return {
-			'final' => '{0}…',
-			'initial' => '…{0}',
-			'medial' => '{0}…{1}',
-			'word-final' => '{0} …',
-			'word-initial' => '… {0}',
-			'word-medial' => '{0} … {1}',
-		};
-	},
-);
-
-has 'more_information' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{?},
-);
-
-has 'quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{“},
-);
-
-has 'quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{”},
-);
-
-has 'alternate_quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{‘},
-);
-
-has 'alternate_quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{’},
-);
-
-has 'duration_units' => (
-	is			=> 'ro',
-	isa			=> HashRef[Str],
-	init_arg	=> undef,
-	default		=> sub { {
-				hm => 'h:mm',
-				hms => 'h:mm:ss',
-				ms => 'm:ss',
-			} }
-);
 
 has 'units' => (
 	is			=> 'ro',
@@ -1805,237 +1767,11 @@ has 'units' => (
 						'name' => q(สี่ทิศหลัก),
 					},
 					# Long Unit Identifier
-					'1024p1' => {
-						'1' => q(กิบิ{0}),
-					},
-					# Core Unit Identifier
-					'1024p1' => {
-						'1' => q(กิบิ{0}),
-					},
-					# Long Unit Identifier
-					'1024p2' => {
-						'1' => q(เมบิ{0}),
-					},
-					# Core Unit Identifier
-					'1024p2' => {
-						'1' => q(เมบิ{0}),
-					},
-					# Long Unit Identifier
-					'1024p3' => {
-						'1' => q(จิบิ{0}),
-					},
-					# Core Unit Identifier
-					'1024p3' => {
-						'1' => q(จิบิ{0}),
-					},
-					# Long Unit Identifier
-					'1024p4' => {
-						'1' => q(เทบิ{0}),
-					},
-					# Core Unit Identifier
-					'1024p4' => {
-						'1' => q(เทบิ{0}),
-					},
-					# Long Unit Identifier
-					'1024p5' => {
-						'1' => q(เพบิ{0}),
-					},
-					# Core Unit Identifier
-					'1024p5' => {
-						'1' => q(เพบิ{0}),
-					},
-					# Long Unit Identifier
-					'1024p6' => {
-						'1' => q(เอ็กซ์บิ{0}),
-					},
-					# Core Unit Identifier
-					'1024p6' => {
-						'1' => q(เอ็กซ์บิ{0}),
-					},
-					# Long Unit Identifier
-					'1024p7' => {
-						'1' => q(เซบิ{0}),
-					},
-					# Core Unit Identifier
-					'1024p7' => {
-						'1' => q(เซบิ{0}),
-					},
-					# Long Unit Identifier
-					'1024p8' => {
-						'1' => q(โยบี{0}),
-					},
-					# Core Unit Identifier
-					'1024p8' => {
-						'1' => q(โยบี{0}),
-					},
-					# Long Unit Identifier
-					'10p-1' => {
-						'1' => q(เดซิ{0}),
-					},
-					# Core Unit Identifier
-					'1' => {
-						'1' => q(เดซิ{0}),
-					},
-					# Long Unit Identifier
-					'10p-12' => {
-						'1' => q(พิโค{0}),
-					},
-					# Core Unit Identifier
-					'12' => {
-						'1' => q(พิโค{0}),
-					},
-					# Long Unit Identifier
-					'10p-15' => {
-						'1' => q(เฟมโต{0}),
-					},
-					# Core Unit Identifier
-					'15' => {
-						'1' => q(เฟมโต{0}),
-					},
-					# Long Unit Identifier
-					'10p-18' => {
-						'1' => q(อัตโต{0}),
-					},
-					# Core Unit Identifier
-					'18' => {
-						'1' => q(อัตโต{0}),
-					},
-					# Long Unit Identifier
-					'10p-2' => {
-						'1' => q(เซนติ{0}),
-					},
-					# Core Unit Identifier
-					'2' => {
-						'1' => q(เซนติ{0}),
-					},
-					# Long Unit Identifier
-					'10p-21' => {
-						'1' => q(เซปโต{0}),
-					},
-					# Core Unit Identifier
-					'21' => {
-						'1' => q(เซปโต{0}),
-					},
-					# Long Unit Identifier
-					'10p-24' => {
-						'1' => q(ยอกโต{0}),
-					},
-					# Core Unit Identifier
-					'24' => {
-						'1' => q(ยอกโต{0}),
-					},
-					# Long Unit Identifier
-					'10p-3' => {
-						'1' => q(มิลลิ{0}),
-					},
-					# Core Unit Identifier
-					'3' => {
-						'1' => q(มิลลิ{0}),
-					},
-					# Long Unit Identifier
-					'10p-6' => {
-						'1' => q(ไมโคร{0}),
-					},
-					# Core Unit Identifier
-					'6' => {
-						'1' => q(ไมโคร{0}),
-					},
-					# Long Unit Identifier
-					'10p-9' => {
-						'1' => q(นาโน{0}),
-					},
-					# Core Unit Identifier
-					'9' => {
-						'1' => q(นาโน{0}),
-					},
-					# Long Unit Identifier
-					'10p1' => {
-						'1' => q(เดคา{0}),
-					},
-					# Core Unit Identifier
-					'10p1' => {
-						'1' => q(เดคา{0}),
-					},
-					# Long Unit Identifier
-					'10p12' => {
-						'1' => q(เทระ{0}),
-					},
-					# Core Unit Identifier
-					'10p12' => {
-						'1' => q(เทระ{0}),
-					},
-					# Long Unit Identifier
-					'10p15' => {
-						'1' => q(เพตะ{0}),
-					},
-					# Core Unit Identifier
-					'10p15' => {
-						'1' => q(เพตะ{0}),
-					},
-					# Long Unit Identifier
-					'10p18' => {
-						'1' => q(เอกซะ{0}),
-					},
-					# Core Unit Identifier
-					'10p18' => {
-						'1' => q(เอกซะ{0}),
-					},
-					# Long Unit Identifier
-					'10p2' => {
-						'1' => q(เฮกโต{0}),
-					},
-					# Core Unit Identifier
-					'10p2' => {
-						'1' => q(เฮกโต{0}),
-					},
-					# Long Unit Identifier
-					'10p21' => {
-						'1' => q(เซตตะ{0}),
-					},
-					# Core Unit Identifier
-					'10p21' => {
-						'1' => q(เซตตะ{0}),
-					},
-					# Long Unit Identifier
-					'10p24' => {
-						'1' => q(ยอตตะ{0}),
-					},
-					# Core Unit Identifier
-					'10p24' => {
-						'1' => q(ยอตตะ{0}),
-					},
-					# Long Unit Identifier
-					'10p3' => {
-						'1' => q(กิโล{0}),
-					},
-					# Core Unit Identifier
-					'10p3' => {
-						'1' => q(กิโล{0}),
-					},
-					# Long Unit Identifier
-					'10p6' => {
-						'1' => q(เมกะ{0}),
-					},
-					# Core Unit Identifier
-					'10p6' => {
-						'1' => q(เมกะ{0}),
-					},
-					# Long Unit Identifier
-					'10p9' => {
-						'1' => q(จิกะ{0}),
-					},
-					# Core Unit Identifier
-					'10p9' => {
-						'1' => q(จิกะ{0}),
-					},
-					# Long Unit Identifier
 					'acceleration-g-force' => {
-						'name' => q(แรง G),
 						'other' => q({0} แรง G),
 					},
 					# Core Unit Identifier
 					'g-force' => {
-						'name' => q(แรง G),
 						'other' => q({0} แรง G),
 					},
 					# Long Unit Identifier
@@ -2049,84 +1785,12 @@ has 'units' => (
 						'other' => q({0} เมตรต่อวินาทีกำลังสอง),
 					},
 					# Long Unit Identifier
-					'angle-arc-minute' => {
-						'name' => q(ลิปดา),
-						'other' => q({0} ลิปดา),
-					},
-					# Core Unit Identifier
-					'arc-minute' => {
-						'name' => q(ลิปดา),
-						'other' => q({0} ลิปดา),
-					},
-					# Long Unit Identifier
-					'angle-arc-second' => {
-						'name' => q(พิลิปดา),
-						'other' => q({0} พิลิปดา),
-					},
-					# Core Unit Identifier
-					'arc-second' => {
-						'name' => q(พิลิปดา),
-						'other' => q({0} พิลิปดา),
-					},
-					# Long Unit Identifier
 					'angle-degree' => {
-						'name' => q(องศา),
 						'other' => q({0} องศา),
 					},
 					# Core Unit Identifier
 					'degree' => {
-						'name' => q(องศา),
 						'other' => q({0} องศา),
-					},
-					# Long Unit Identifier
-					'angle-radian' => {
-						'name' => q(เรเดียน),
-						'other' => q({0} เรเดียน),
-					},
-					# Core Unit Identifier
-					'radian' => {
-						'name' => q(เรเดียน),
-						'other' => q({0} เรเดียน),
-					},
-					# Long Unit Identifier
-					'angle-revolution' => {
-						'name' => q(รอบ),
-						'other' => q({0} รอบ),
-					},
-					# Core Unit Identifier
-					'revolution' => {
-						'name' => q(รอบ),
-						'other' => q({0} รอบ),
-					},
-					# Long Unit Identifier
-					'area-acre' => {
-						'name' => q(เอเคอร์),
-						'other' => q({0} เอเคอร์),
-					},
-					# Core Unit Identifier
-					'acre' => {
-						'name' => q(เอเคอร์),
-						'other' => q({0} เอเคอร์),
-					},
-					# Long Unit Identifier
-					'area-dunam' => {
-						'name' => q(ดูนัม),
-						'other' => q({0} ดูนัม),
-					},
-					# Core Unit Identifier
-					'dunam' => {
-						'name' => q(ดูนัม),
-						'other' => q({0} ดูนัม),
-					},
-					# Long Unit Identifier
-					'area-hectare' => {
-						'name' => q(เฮกตาร์),
-						'other' => q({0} เฮกตาร์),
-					},
-					# Core Unit Identifier
-					'hectare' => {
-						'name' => q(เฮกตาร์),
-						'other' => q({0} เฮกตาร์),
 					},
 					# Long Unit Identifier
 					'area-square-centimeter' => {
@@ -2153,13 +1817,11 @@ has 'units' => (
 					# Long Unit Identifier
 					'area-square-inch' => {
 						'name' => q(ตารางนิ้ว),
-						'other' => q({0} ตร.นิ้ว),
 						'per' => q({0} ต่อตารางนิ้ว),
 					},
 					# Core Unit Identifier
 					'square-inch' => {
 						'name' => q(ตารางนิ้ว),
-						'other' => q({0} ตร.นิ้ว),
 						'per' => q({0} ต่อตารางนิ้ว),
 					},
 					# Long Unit Identifier
@@ -2209,26 +1871,6 @@ has 'units' => (
 						'other' => q({0} ตารางหลา),
 					},
 					# Long Unit Identifier
-					'concentr-item' => {
-						'name' => q(รายการ),
-						'other' => q({0} รายการ),
-					},
-					# Core Unit Identifier
-					'item' => {
-						'name' => q(รายการ),
-						'other' => q({0} รายการ),
-					},
-					# Long Unit Identifier
-					'concentr-karat' => {
-						'name' => q(กะรัต),
-						'other' => q({0} กะรัต),
-					},
-					# Core Unit Identifier
-					'karat' => {
-						'name' => q(กะรัต),
-						'other' => q({0} กะรัต),
-					},
-					# Long Unit Identifier
 					'concentr-milligram-ofglucose-per-deciliter' => {
 						'name' => q(มิลลิกรัมต่อเดซิลิตร),
 						'other' => q({0} มิลลิกรัมต่อเดซิลิตร),
@@ -2249,33 +1891,19 @@ has 'units' => (
 						'other' => q({0} มิลลิโมลต่อลิตร),
 					},
 					# Long Unit Identifier
-					'concentr-mole' => {
-						'name' => q(โมล),
-						'other' => q({0} โมล),
-					},
-					# Core Unit Identifier
-					'mole' => {
-						'name' => q(โมล),
-						'other' => q({0} โมล),
-					},
-					# Long Unit Identifier
 					'concentr-percent' => {
-						'name' => q(เปอร์เซ็นต์),
 						'other' => q({0} เปอร์เซ็นต์),
 					},
 					# Core Unit Identifier
 					'percent' => {
-						'name' => q(เปอร์เซ็นต์),
 						'other' => q({0} เปอร์เซ็นต์),
 					},
 					# Long Unit Identifier
 					'concentr-permille' => {
-						'name' => q(เปอร์มิลล์),
 						'other' => q({0} เปอร์มิลล์),
 					},
 					# Core Unit Identifier
 					'permille' => {
-						'name' => q(เปอร์มิลล์),
 						'other' => q({0} เปอร์มิลล์),
 					},
 					# Long Unit Identifier
@@ -2290,12 +1918,10 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'concentr-permyriad' => {
-						'name' => q(เปอร์มีเรียด),
 						'other' => q({0} เปอร์มีเรียด),
 					},
 					# Core Unit Identifier
 					'permyriad' => {
-						'name' => q(เปอร์มีเรียด),
 						'other' => q({0} เปอร์มีเรียด),
 					},
 					# Long Unit Identifier
@@ -2331,12 +1957,10 @@ has 'units' => (
 					# Long Unit Identifier
 					'consumption-mile-per-gallon-imperial' => {
 						'name' => q(ไมล์ต่อแกลลอนอังกฤษ),
-						'other' => q({0} ไมล์ต่อแกลลอนอังกฤษ),
 					},
 					# Core Unit Identifier
 					'mile-per-gallon-imperial' => {
 						'name' => q(ไมล์ต่อแกลลอนอังกฤษ),
-						'other' => q({0} ไมล์ต่อแกลลอนอังกฤษ),
 					},
 					# Long Unit Identifier
 					'coordinate' => {
@@ -2351,26 +1975,6 @@ has 'units' => (
 						'north' => q({0}เหนือ),
 						'south' => q({0}ใต้),
 						'west' => q({0}ตะวันตก),
-					},
-					# Long Unit Identifier
-					'digital-bit' => {
-						'name' => q(บิต),
-						'other' => q({0} บิต),
-					},
-					# Core Unit Identifier
-					'bit' => {
-						'name' => q(บิต),
-						'other' => q({0} บิต),
-					},
-					# Long Unit Identifier
-					'digital-byte' => {
-						'name' => q(ไบต์),
-						'other' => q({0} ไบต์),
-					},
-					# Core Unit Identifier
-					'byte' => {
-						'name' => q(ไบต์),
-						'other' => q({0} ไบต์),
 					},
 					# Long Unit Identifier
 					'digital-gigabit' => {
@@ -2463,137 +2067,79 @@ has 'units' => (
 						'other' => q({0} เทราไบต์),
 					},
 					# Long Unit Identifier
-					'duration-century' => {
-						'name' => q(ศตวรรษ),
-						'other' => q({0} ศตวรรษ),
-					},
-					# Core Unit Identifier
-					'century' => {
-						'name' => q(ศตวรรษ),
-						'other' => q({0} ศตวรรษ),
-					},
-					# Long Unit Identifier
 					'duration-day' => {
-						'name' => q(วัน),
-						'other' => q({0} วัน),
 						'per' => q({0} ต่อวัน),
 					},
 					# Core Unit Identifier
 					'day' => {
-						'name' => q(วัน),
-						'other' => q({0} วัน),
 						'per' => q({0} ต่อวัน),
 					},
 					# Long Unit Identifier
-					'duration-decade' => {
-						'name' => q(ทศวรรษ),
-						'other' => q({0} ทศวรรษ),
-					},
-					# Core Unit Identifier
-					'decade' => {
-						'name' => q(ทศวรรษ),
-						'other' => q({0} ทศวรรษ),
-					},
-					# Long Unit Identifier
 					'duration-hour' => {
-						'name' => q(ชั่วโมง),
 						'other' => q({0} ชั่วโมง),
 						'per' => q({0} ต่อชั่วโมง),
 					},
 					# Core Unit Identifier
 					'hour' => {
-						'name' => q(ชั่วโมง),
 						'other' => q({0} ชั่วโมง),
 						'per' => q({0} ต่อชั่วโมง),
 					},
 					# Long Unit Identifier
 					'duration-microsecond' => {
-						'name' => q(ไมโครวินาที),
 						'other' => q({0} ไมโครวินาที),
 					},
 					# Core Unit Identifier
 					'microsecond' => {
-						'name' => q(ไมโครวินาที),
 						'other' => q({0} ไมโครวินาที),
 					},
 					# Long Unit Identifier
-					'duration-millisecond' => {
-						'name' => q(มิลลิวินาที),
-						'other' => q({0} มิลลิวินาที),
-					},
-					# Core Unit Identifier
-					'millisecond' => {
-						'name' => q(มิลลิวินาที),
-						'other' => q({0} มิลลิวินาที),
-					},
-					# Long Unit Identifier
 					'duration-minute' => {
-						'name' => q(นาที),
-						'other' => q({0} นาที),
 						'per' => q({0} ต่อนาที),
 					},
 					# Core Unit Identifier
 					'minute' => {
-						'name' => q(นาที),
-						'other' => q({0} นาที),
 						'per' => q({0} ต่อนาที),
 					},
 					# Long Unit Identifier
 					'duration-month' => {
-						'name' => q(เดือน),
-						'other' => q({0} เดือน),
 						'per' => q({0} ต่อเดือน),
 					},
 					# Core Unit Identifier
 					'month' => {
-						'name' => q(เดือน),
-						'other' => q({0} เดือน),
 						'per' => q({0} ต่อเดือน),
 					},
 					# Long Unit Identifier
 					'duration-nanosecond' => {
-						'name' => q(นาโนวินาที),
 						'other' => q({0} นาโนวินาที),
 					},
 					# Core Unit Identifier
 					'nanosecond' => {
-						'name' => q(นาโนวินาที),
 						'other' => q({0} นาโนวินาที),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
-						'name' => q(วินาที),
 						'other' => q({0} วินาที),
 						'per' => q({0} ต่อวินาที),
 					},
 					# Core Unit Identifier
 					'second' => {
-						'name' => q(วินาที),
 						'other' => q({0} วินาที),
 						'per' => q({0} ต่อวินาที),
 					},
 					# Long Unit Identifier
 					'duration-week' => {
-						'name' => q(สัปดาห์),
-						'other' => q({0} สัปดาห์),
 						'per' => q({0} ต่อสัปดาห์),
 					},
 					# Core Unit Identifier
 					'week' => {
-						'name' => q(สัปดาห์),
-						'other' => q({0} สัปดาห์),
 						'per' => q({0} ต่อสัปดาห์),
 					},
 					# Long Unit Identifier
 					'duration-year' => {
-						'name' => q(ปี),
-						'other' => q({0} ปี),
 						'per' => q({0} ต่อปี),
 					},
 					# Core Unit Identifier
 					'year' => {
-						'name' => q(ปี),
-						'other' => q({0} ปี),
 						'per' => q({0} ต่อปี),
 					},
 					# Long Unit Identifier
@@ -2618,22 +2164,18 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'electric-ohm' => {
-						'name' => q(โอห์ม),
 						'other' => q({0} โอห์ม),
 					},
 					# Core Unit Identifier
 					'ohm' => {
-						'name' => q(โอห์ม),
 						'other' => q({0} โอห์ม),
 					},
 					# Long Unit Identifier
 					'electric-volt' => {
-						'name' => q(โวลต์),
 						'other' => q({0} โวลต์),
 					},
 					# Core Unit Identifier
 					'volt' => {
-						'name' => q(โวลต์),
 						'other' => q({0} โวลต์),
 					},
 					# Long Unit Identifier
@@ -2647,64 +2189,12 @@ has 'units' => (
 						'other' => q({0} หน่วยความร้อนอังกฤษ),
 					},
 					# Long Unit Identifier
-					'energy-calorie' => {
-						'name' => q(แคลอรี),
-						'other' => q({0} แคลอรี),
-					},
-					# Core Unit Identifier
-					'calorie' => {
-						'name' => q(แคลอรี),
-						'other' => q({0} แคลอรี),
-					},
-					# Long Unit Identifier
 					'energy-electronvolt' => {
-						'name' => q(อิเล็กตรอนโวลต์),
 						'other' => q({0} อิเล็กตรอนโวลต์),
 					},
 					# Core Unit Identifier
 					'electronvolt' => {
-						'name' => q(อิเล็กตรอนโวลต์),
 						'other' => q({0} อิเล็กตรอนโวลต์),
-					},
-					# Long Unit Identifier
-					'energy-foodcalorie' => {
-						'name' => q(แคลอรี),
-						'other' => q({0} แคลอรี),
-					},
-					# Core Unit Identifier
-					'foodcalorie' => {
-						'name' => q(แคลอรี),
-						'other' => q({0} แคลอรี),
-					},
-					# Long Unit Identifier
-					'energy-joule' => {
-						'name' => q(จูล),
-						'other' => q({0} จูล),
-					},
-					# Core Unit Identifier
-					'joule' => {
-						'name' => q(จูล),
-						'other' => q({0} จูล),
-					},
-					# Long Unit Identifier
-					'energy-kilocalorie' => {
-						'name' => q(กิโลแคลอรี),
-						'other' => q({0} กิโลแคลอรี),
-					},
-					# Core Unit Identifier
-					'kilocalorie' => {
-						'name' => q(กิโลแคลอรี),
-						'other' => q({0} กิโลแคลอรี),
-					},
-					# Long Unit Identifier
-					'energy-kilojoule' => {
-						'name' => q(กิโลจูล),
-						'other' => q({0} กิโลจูล),
-					},
-					# Core Unit Identifier
-					'kilojoule' => {
-						'name' => q(กิโลจูล),
-						'other' => q({0} กิโลจูล),
 					},
 					# Long Unit Identifier
 					'energy-kilowatt-hour' => {
@@ -2738,22 +2228,18 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'force-newton' => {
-						'name' => q(นิวตัน),
 						'other' => q({0} นิวตัน),
 					},
 					# Core Unit Identifier
 					'newton' => {
-						'name' => q(นิวตัน),
 						'other' => q({0} นิวตัน),
 					},
 					# Long Unit Identifier
 					'force-pound-force' => {
-						'name' => q(แรงปอนด์),
 						'other' => q({0} แรงปอนด์),
 					},
 					# Core Unit Identifier
 					'pound-force' => {
-						'name' => q(แรงปอนด์),
 						'other' => q({0} แรงปอนด์),
 					},
 					# Long Unit Identifier
@@ -2795,14 +2281,6 @@ has 'units' => (
 					'megahertz' => {
 						'name' => q(เมกะเฮิรตซ์),
 						'other' => q({0} เมกะเฮิรตซ์),
-					},
-					# Long Unit Identifier
-					'graphics-dot' => {
-						'name' => q(ดอท),
-					},
-					# Core Unit Identifier
-					'dot' => {
-						'name' => q(ดอท),
 					},
 					# Long Unit Identifier
 					'graphics-dot-per-centimeter' => {
@@ -2865,16 +2343,6 @@ has 'units' => (
 						'other' => q({0} พิกเซลต่อนิ้ว),
 					},
 					# Long Unit Identifier
-					'length-astronomical-unit' => {
-						'name' => q(หน่วยดาราศาสตร์),
-						'other' => q({0} หน่วยดาราศาสตร์),
-					},
-					# Core Unit Identifier
-					'astronomical-unit' => {
-						'name' => q(หน่วยดาราศาสตร์),
-						'other' => q({0} หน่วยดาราศาสตร์),
-					},
-					# Long Unit Identifier
 					'length-centimeter' => {
 						'name' => q(เซนติเมตร),
 						'other' => q({0} เซนติเมตร),
@@ -2908,46 +2376,34 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-fathom' => {
-						'name' => q(ฟาทอม),
 						'other' => q({0} ฟาทอม),
 					},
 					# Core Unit Identifier
 					'fathom' => {
-						'name' => q(ฟาทอม),
 						'other' => q({0} ฟาทอม),
 					},
 					# Long Unit Identifier
 					'length-foot' => {
-						'name' => q(ฟุต),
-						'other' => q({0} ฟุต),
 						'per' => q({0} ต่อฟุต),
 					},
 					# Core Unit Identifier
 					'foot' => {
-						'name' => q(ฟุต),
-						'other' => q({0} ฟุต),
 						'per' => q({0} ต่อฟุต),
 					},
 					# Long Unit Identifier
 					'length-furlong' => {
-						'name' => q(เฟอร์ลอง),
 						'other' => q({0} เฟอร์ลอง),
 					},
 					# Core Unit Identifier
 					'furlong' => {
-						'name' => q(เฟอร์ลอง),
 						'other' => q({0} เฟอร์ลอง),
 					},
 					# Long Unit Identifier
 					'length-inch' => {
-						'name' => q(นิ้ว),
-						'other' => q({0} นิ้ว),
 						'per' => q({0} ต่อนิ้ว),
 					},
 					# Core Unit Identifier
 					'inch' => {
-						'name' => q(นิ้ว),
-						'other' => q({0} นิ้ว),
 						'per' => q({0} ต่อนิ้ว),
 					},
 					# Long Unit Identifier
@@ -2963,55 +2419,29 @@ has 'units' => (
 						'per' => q({0} ต่อกิโลเมตร),
 					},
 					# Long Unit Identifier
-					'length-light-year' => {
-						'name' => q(ปีแสง),
-						'other' => q({0} ปีแสง),
-					},
-					# Core Unit Identifier
-					'light-year' => {
-						'name' => q(ปีแสง),
-						'other' => q({0} ปีแสง),
-					},
-					# Long Unit Identifier
 					'length-meter' => {
-						'name' => q(เมตร),
 						'other' => q({0} เมตร),
 						'per' => q({0} ต่อเมตร),
 					},
 					# Core Unit Identifier
 					'meter' => {
-						'name' => q(เมตร),
 						'other' => q({0} เมตร),
 						'per' => q({0} ต่อเมตร),
 					},
 					# Long Unit Identifier
 					'length-micrometer' => {
-						'name' => q(ไมโครเมตร),
 						'other' => q({0} ไมโครเมตร),
 					},
 					# Core Unit Identifier
 					'micrometer' => {
-						'name' => q(ไมโครเมตร),
 						'other' => q({0} ไมโครเมตร),
 					},
 					# Long Unit Identifier
-					'length-mile' => {
-						'name' => q(ไมล์),
-						'other' => q({0} ไมล์),
-					},
-					# Core Unit Identifier
-					'mile' => {
-						'name' => q(ไมล์),
-						'other' => q({0} ไมล์),
-					},
-					# Long Unit Identifier
 					'length-mile-scandinavian' => {
-						'name' => q(ไมล์สแกนดิเนเวีย),
 						'other' => q({0} ไมล์สแกนดิเนเวีย),
 					},
 					# Core Unit Identifier
 					'mile-scandinavian' => {
-						'name' => q(ไมล์สแกนดิเนเวีย),
 						'other' => q({0} ไมล์สแกนดิเนเวีย),
 					},
 					# Long Unit Identifier
@@ -3035,64 +2465,12 @@ has 'units' => (
 						'other' => q({0} นาโนเมตร),
 					},
 					# Long Unit Identifier
-					'length-nautical-mile' => {
-						'name' => q(ไมล์ทะเล),
-						'other' => q({0} ไมล์ทะเล),
-					},
-					# Core Unit Identifier
-					'nautical-mile' => {
-						'name' => q(ไมล์ทะเล),
-						'other' => q({0} ไมล์ทะเล),
-					},
-					# Long Unit Identifier
-					'length-parsec' => {
-						'name' => q(พาร์เซก),
-						'other' => q({0} พาร์เซก),
-					},
-					# Core Unit Identifier
-					'parsec' => {
-						'name' => q(พาร์เซก),
-						'other' => q({0} พาร์เซก),
-					},
-					# Long Unit Identifier
-					'length-picometer' => {
-						'name' => q(พิโกเมตร),
-						'other' => q({0} พิโกเมตร),
-					},
-					# Core Unit Identifier
-					'picometer' => {
-						'name' => q(พิโกเมตร),
-						'other' => q({0} พิโกเมตร),
-					},
-					# Long Unit Identifier
-					'length-point' => {
-						'name' => q(จุด),
-						'other' => q({0} จุด),
-					},
-					# Core Unit Identifier
-					'point' => {
-						'name' => q(จุด),
-						'other' => q({0} จุด),
-					},
-					# Long Unit Identifier
 					'length-solar-radius' => {
-						'name' => q(รัศมีวงกลมของดวงอาทิตย์),
 						'other' => q({0} รัศมีวงกลมของดวงอาทิตย์),
 					},
 					# Core Unit Identifier
 					'solar-radius' => {
-						'name' => q(รัศมีวงกลมของดวงอาทิตย์),
 						'other' => q({0} รัศมีวงกลมของดวงอาทิตย์),
-					},
-					# Long Unit Identifier
-					'length-yard' => {
-						'name' => q(หลา),
-						'other' => q({0} หลา),
-					},
-					# Core Unit Identifier
-					'yard' => {
-						'name' => q(หลา),
-						'other' => q({0} หลา),
 					},
 					# Long Unit Identifier
 					'light-candela' => {
@@ -3115,74 +2493,36 @@ has 'units' => (
 						'other' => q({0} ลูเมน),
 					},
 					# Long Unit Identifier
-					'light-lux' => {
-						'name' => q(ลักซ์),
-						'other' => q({0} ลักซ์),
-					},
-					# Core Unit Identifier
-					'lux' => {
-						'name' => q(ลักซ์),
-						'other' => q({0} ลักซ์),
-					},
-					# Long Unit Identifier
 					'light-solar-luminosity' => {
-						'name' => q(ความสว่างดวงอาทิตย์),
 						'other' => q({0} ความสว่างดวงอาทิตย์),
 					},
 					# Core Unit Identifier
 					'solar-luminosity' => {
-						'name' => q(ความสว่างดวงอาทิตย์),
 						'other' => q({0} ความสว่างดวงอาทิตย์),
 					},
 					# Long Unit Identifier
-					'mass-carat' => {
-						'name' => q(กะรัต),
-						'other' => q({0} กะรัต),
-					},
-					# Core Unit Identifier
-					'carat' => {
-						'name' => q(กะรัต),
-						'other' => q({0} กะรัต),
-					},
-					# Long Unit Identifier
 					'mass-dalton' => {
-						'name' => q(ดัลตัน),
 						'other' => q({0} ดัลตัน),
 					},
 					# Core Unit Identifier
 					'dalton' => {
-						'name' => q(ดัลตัน),
 						'other' => q({0} ดัลตัน),
 					},
 					# Long Unit Identifier
 					'mass-earth-mass' => {
-						'name' => q(มวลของโลก),
 						'other' => q({0} มวลของโลก),
 					},
 					# Core Unit Identifier
 					'earth-mass' => {
-						'name' => q(มวลของโลก),
 						'other' => q({0} มวลของโลก),
 					},
 					# Long Unit Identifier
-					'mass-grain' => {
-						'name' => q(เกรน),
-						'other' => q({0} เกรน),
-					},
-					# Core Unit Identifier
-					'grain' => {
-						'name' => q(เกรน),
-						'other' => q({0} เกรน),
-					},
-					# Long Unit Identifier
 					'mass-gram' => {
-						'name' => q(กรัม),
 						'other' => q({0} กรัม),
 						'per' => q({0} ต่อกรัม),
 					},
 					# Core Unit Identifier
 					'gram' => {
-						'name' => q(กรัม),
 						'other' => q({0} กรัม),
 						'per' => q({0} ต่อกรัม),
 					},
@@ -3197,16 +2537,6 @@ has 'units' => (
 						'name' => q(กิโลกรัม),
 						'other' => q({0} กิโลกรัม),
 						'per' => q({0} ต่อกิโลกรัม),
-					},
-					# Long Unit Identifier
-					'mass-metric-ton' => {
-						'name' => q(เมตริกตัน),
-						'other' => q({0} เมตริกตัน),
-					},
-					# Core Unit Identifier
-					'metric-ton' => {
-						'name' => q(เมตริกตัน),
-						'other' => q({0} เมตริกตัน),
 					},
 					# Long Unit Identifier
 					'mass-microgram' => {
@@ -3230,67 +2560,45 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'mass-ounce' => {
-						'name' => q(ออนซ์),
-						'other' => q({0} ออนซ์),
 						'per' => q({0} ต่อออนซ์),
 					},
 					# Core Unit Identifier
 					'ounce' => {
-						'name' => q(ออนซ์),
-						'other' => q({0} ออนซ์),
 						'per' => q({0} ต่อออนซ์),
 					},
 					# Long Unit Identifier
-					'mass-ounce-troy' => {
-						'name' => q(ทรอยออนซ์),
-						'other' => q({0} ทรอยออนซ์),
-					},
-					# Core Unit Identifier
-					'ounce-troy' => {
-						'name' => q(ทรอยออนซ์),
-						'other' => q({0} ทรอยออนซ์),
-					},
-					# Long Unit Identifier
 					'mass-pound' => {
-						'name' => q(ปอนด์),
-						'other' => q({0} ปอนด์),
 						'per' => q({0} ต่อปอนด์),
 					},
 					# Core Unit Identifier
 					'pound' => {
-						'name' => q(ปอนด์),
-						'other' => q({0} ปอนด์),
 						'per' => q({0} ต่อปอนด์),
 					},
 					# Long Unit Identifier
 					'mass-solar-mass' => {
-						'name' => q(มวลดวงอาทิตย์),
 						'other' => q({0} มวลดวงอาทิตย์),
 					},
 					# Core Unit Identifier
 					'solar-mass' => {
-						'name' => q(มวลดวงอาทิตย์),
 						'other' => q({0} มวลดวงอาทิตย์),
 					},
 					# Long Unit Identifier
 					'mass-stone' => {
-						'name' => q(สโตน),
 						'other' => q({0} สโตน),
 					},
 					# Core Unit Identifier
 					'stone' => {
-						'name' => q(สโตน),
 						'other' => q({0} สโตน),
 					},
 					# Long Unit Identifier
-					'mass-ton' => {
-						'name' => q(ตัน),
-						'other' => q({0} ตัน),
+					'mass-tonne' => {
+						'name' => q(เมตริกตัน),
+						'other' => q({0} เมตริกตัน),
 					},
 					# Core Unit Identifier
-					'ton' => {
-						'name' => q(ตัน),
-						'other' => q({0} ตัน),
+					'tonne' => {
+						'name' => q(เมตริกตัน),
+						'other' => q({0} เมตริกตัน),
 					},
 					# Long Unit Identifier
 					'per' => {
@@ -3299,66 +2607,6 @@ has 'units' => (
 					# Core Unit Identifier
 					'per' => {
 						'1' => q({0}ต่อ{1}),
-					},
-					# Long Unit Identifier
-					'power-gigawatt' => {
-						'name' => q(กิกะวัตต์),
-						'other' => q({0} กิกะวัตต์),
-					},
-					# Core Unit Identifier
-					'gigawatt' => {
-						'name' => q(กิกะวัตต์),
-						'other' => q({0} กิกะวัตต์),
-					},
-					# Long Unit Identifier
-					'power-horsepower' => {
-						'name' => q(แรงม้า),
-						'other' => q({0} แรงม้า),
-					},
-					# Core Unit Identifier
-					'horsepower' => {
-						'name' => q(แรงม้า),
-						'other' => q({0} แรงม้า),
-					},
-					# Long Unit Identifier
-					'power-kilowatt' => {
-						'name' => q(กิโลวัตต์),
-						'other' => q({0} กิโลวัตต์),
-					},
-					# Core Unit Identifier
-					'kilowatt' => {
-						'name' => q(กิโลวัตต์),
-						'other' => q({0} กิโลวัตต์),
-					},
-					# Long Unit Identifier
-					'power-megawatt' => {
-						'name' => q(เมกะวัตต์),
-						'other' => q({0} เมกะวัตต์),
-					},
-					# Core Unit Identifier
-					'megawatt' => {
-						'name' => q(เมกะวัตต์),
-						'other' => q({0} เมกะวัตต์),
-					},
-					# Long Unit Identifier
-					'power-milliwatt' => {
-						'name' => q(มิลลิวัตต์),
-						'other' => q({0} มิลลิวัตต์),
-					},
-					# Core Unit Identifier
-					'milliwatt' => {
-						'name' => q(มิลลิวัตต์),
-						'other' => q({0} มิลลิวัตต์),
-					},
-					# Long Unit Identifier
-					'power-watt' => {
-						'name' => q(วัตต์),
-						'other' => q({0} วัตต์),
-					},
-					# Core Unit Identifier
-					'watt' => {
-						'name' => q(วัตต์),
-						'other' => q({0} วัตต์),
 					},
 					# Long Unit Identifier
 					'power2' => {
@@ -3375,46 +2623,6 @@ has 'units' => (
 					# Core Unit Identifier
 					'power3' => {
 						'other' => q(ลูกบาศก์{0}),
-					},
-					# Long Unit Identifier
-					'pressure-atmosphere' => {
-						'name' => q(บรรยากาศ),
-						'other' => q({0} บรรยากาศ),
-					},
-					# Core Unit Identifier
-					'atmosphere' => {
-						'name' => q(บรรยากาศ),
-						'other' => q({0} บรรยากาศ),
-					},
-					# Long Unit Identifier
-					'pressure-bar' => {
-						'name' => q(บาร์),
-						'other' => q({0} บาร์),
-					},
-					# Core Unit Identifier
-					'bar' => {
-						'name' => q(บาร์),
-						'other' => q({0} บาร์),
-					},
-					# Long Unit Identifier
-					'pressure-hectopascal' => {
-						'name' => q(เฮกโตปาสกาล),
-						'other' => q({0} เฮกโตปาสกาล),
-					},
-					# Core Unit Identifier
-					'hectopascal' => {
-						'name' => q(เฮกโตปาสกาล),
-						'other' => q({0} เฮกโตปาสกาล),
-					},
-					# Long Unit Identifier
-					'pressure-inch-ofhg' => {
-						'name' => q(นิ้วปรอท),
-						'other' => q({0} นิ้วปรอท),
-					},
-					# Core Unit Identifier
-					'inch-ofhg' => {
-						'name' => q(นิ้วปรอท),
-						'other' => q({0} นิ้วปรอท),
 					},
 					# Long Unit Identifier
 					'pressure-kilopascal' => {
@@ -3435,16 +2643,6 @@ has 'units' => (
 					'megapascal' => {
 						'name' => q(เมกะปาสคาล),
 						'other' => q({0} เมกะปาสคาล),
-					},
-					# Long Unit Identifier
-					'pressure-millibar' => {
-						'name' => q(มิลลิบาร์),
-						'other' => q({0} มิลลิบาร์),
-					},
-					# Core Unit Identifier
-					'millibar' => {
-						'name' => q(มิลลิบาร์),
-						'other' => q({0} มิลลิบาร์),
 					},
 					# Long Unit Identifier
 					'pressure-millimeter-ofhg' => {
@@ -3477,6 +2675,16 @@ has 'units' => (
 						'other' => q({0} ปอนด์ต่อตารางนิ้ว),
 					},
 					# Long Unit Identifier
+					'speed-beaufort' => {
+						'name' => q(โบฟอร์ต),
+						'other' => q(โบฟอร์ต {0}),
+					},
+					# Core Unit Identifier
+					'beaufort' => {
+						'name' => q(โบฟอร์ต),
+						'other' => q(โบฟอร์ต {0}),
+					},
+					# Long Unit Identifier
 					'speed-kilometer-per-hour' => {
 						'name' => q(กิโลเมตรต่อชั่วโมง),
 						'other' => q({0} กิโลเมตรต่อชั่วโมง),
@@ -3487,23 +2695,11 @@ has 'units' => (
 						'other' => q({0} กิโลเมตรต่อชั่วโมง),
 					},
 					# Long Unit Identifier
-					'speed-knot' => {
-						'name' => q(นอต),
-						'other' => q({0} นอต),
-					},
-					# Core Unit Identifier
-					'knot' => {
-						'name' => q(นอต),
-						'other' => q({0} นอต),
-					},
-					# Long Unit Identifier
 					'speed-meter-per-second' => {
-						'name' => q(เมตรต่อวินาที),
 						'other' => q({0} เมตรต่อวินาที),
 					},
 					# Core Unit Identifier
 					'meter-per-second' => {
-						'name' => q(เมตรต่อวินาที),
 						'other' => q({0} เมตรต่อวินาที),
 					},
 					# Long Unit Identifier
@@ -3518,33 +2714,19 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'temperature-celsius' => {
-						'name' => q(องศาเซลเซียส),
 						'other' => q({0} องศาเซลเซียส),
 					},
 					# Core Unit Identifier
 					'celsius' => {
-						'name' => q(องศาเซลเซียส),
 						'other' => q({0} องศาเซลเซียส),
 					},
 					# Long Unit Identifier
 					'temperature-fahrenheit' => {
-						'name' => q(องศาฟาเรนไฮต์),
 						'other' => q({0} องศาฟาเรนไฮต์),
 					},
 					# Core Unit Identifier
 					'fahrenheit' => {
-						'name' => q(องศาฟาเรนไฮต์),
 						'other' => q({0} องศาฟาเรนไฮต์),
-					},
-					# Long Unit Identifier
-					'temperature-generic' => {
-						'name' => q(°),
-						'other' => q({0}°),
-					},
-					# Core Unit Identifier
-					'generic' => {
-						'name' => q(°),
-						'other' => q({0}°),
 					},
 					# Long Unit Identifier
 					'temperature-kelvin' => {
@@ -3577,33 +2759,19 @@ has 'units' => (
 						'other' => q({0} ปอนด์-ฟุต),
 					},
 					# Long Unit Identifier
-					'volume-acre-foot' => {
-						'name' => q(เอเคอร์-ฟุต),
-						'other' => q({0} เอเคอร์-ฟุต),
-					},
-					# Core Unit Identifier
-					'acre-foot' => {
-						'name' => q(เอเคอร์-ฟุต),
-						'other' => q({0} เอเคอร์-ฟุต),
-					},
-					# Long Unit Identifier
 					'volume-barrel' => {
-						'name' => q(บาร์เรล),
 						'other' => q({0} บาร์เรล),
 					},
 					# Core Unit Identifier
 					'barrel' => {
-						'name' => q(บาร์เรล),
 						'other' => q({0} บาร์เรล),
 					},
 					# Long Unit Identifier
 					'volume-bushel' => {
-						'name' => q(บุชเชล),
 						'other' => q({0} บุชเชล),
 					},
 					# Core Unit Identifier
 					'bushel' => {
-						'name' => q(บุชเชล),
 						'other' => q({0} บุชเชล),
 					},
 					# Long Unit Identifier
@@ -3692,12 +2860,10 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'volume-cup' => {
-						'name' => q(ถ้วย),
 						'other' => q({0} ถ้วย),
 					},
 					# Core Unit Identifier
 					'cup' => {
-						'name' => q(ถ้วย),
 						'other' => q({0} ถ้วย),
 					},
 					# Long Unit Identifier
@@ -3721,26 +2887,6 @@ has 'units' => (
 						'other' => q({0} เดซิลิตร),
 					},
 					# Long Unit Identifier
-					'volume-dessert-spoon' => {
-						'name' => q(ช้อนขนม),
-						'other' => q({0} ช้อนขนม),
-					},
-					# Core Unit Identifier
-					'dessert-spoon' => {
-						'name' => q(ช้อนขนม),
-						'other' => q({0} ช้อนขนม),
-					},
-					# Long Unit Identifier
-					'volume-dessert-spoon-imperial' => {
-						'name' => q(ช้อนขนม - อังกฤษ),
-						'other' => q({0} ช้อนขนม - อังกฤษ),
-					},
-					# Core Unit Identifier
-					'dessert-spoon-imperial' => {
-						'name' => q(ช้อนขนม - อังกฤษ),
-						'other' => q({0} ช้อนขนม - อังกฤษ),
-					},
-					# Long Unit Identifier
 					'volume-dram' => {
 						'name' => q(แดรม),
 						'other' => q({0} แดรม),
@@ -3751,57 +2897,29 @@ has 'units' => (
 						'other' => q({0} แดรม),
 					},
 					# Long Unit Identifier
-					'volume-drop' => {
-						'name' => q(หยด),
-						'other' => q({0} หยด),
-					},
-					# Core Unit Identifier
-					'drop' => {
-						'name' => q(หยด),
-						'other' => q({0} หยด),
-					},
-					# Long Unit Identifier
-					'volume-fluid-ounce' => {
-						'name' => q(ฟลูอิดออนซ์),
-						'other' => q({0} ฟลูอิดออนซ์),
-					},
-					# Core Unit Identifier
-					'fluid-ounce' => {
-						'name' => q(ฟลูอิดออนซ์),
-						'other' => q({0} ฟลูอิดออนซ์),
-					},
-					# Long Unit Identifier
 					'volume-fluid-ounce-imperial' => {
-						'name' => q(ออนซ์ของเหลวแบบอังกฤษ),
-						'other' => q({0} ออนซ์ของเหลวแบบอังกฤษ),
+						'name' => q(ฟลูอิดออนซ์ระบบอิมพีเรียล),
+						'other' => q({0} ฟลูอิดออนซ์ระบบอิมพีเรียล),
 					},
 					# Core Unit Identifier
 					'fluid-ounce-imperial' => {
-						'name' => q(ออนซ์ของเหลวแบบอังกฤษ),
-						'other' => q({0} ออนซ์ของเหลวแบบอังกฤษ),
+						'name' => q(ฟลูอิดออนซ์ระบบอิมพีเรียล),
+						'other' => q({0} ฟลูอิดออนซ์ระบบอิมพีเรียล),
 					},
 					# Long Unit Identifier
 					'volume-gallon' => {
-						'name' => q(แกลลอน),
-						'other' => q({0} แกลลอน),
 						'per' => q({0} ต่อแกลลอน),
 					},
 					# Core Unit Identifier
 					'gallon' => {
-						'name' => q(แกลลอน),
-						'other' => q({0} แกลลอน),
 						'per' => q({0} ต่อแกลลอน),
 					},
 					# Long Unit Identifier
 					'volume-gallon-imperial' => {
-						'name' => q(แกลลอนอังกฤษ),
-						'other' => q({0} แกลลอนอังกฤษ),
 						'per' => q({0} ต่อแกลลอนอังกฤษ),
 					},
 					# Core Unit Identifier
 					'gallon-imperial' => {
-						'name' => q(แกลลอนอังกฤษ),
-						'other' => q({0} แกลลอนอังกฤษ),
 						'per' => q({0} ต่อแกลลอนอังกฤษ),
 					},
 					# Long Unit Identifier
@@ -3815,36 +2933,14 @@ has 'units' => (
 						'other' => q({0} เฮกโตลิตร),
 					},
 					# Long Unit Identifier
-					'volume-jigger' => {
-						'name' => q(จิกเกอร์),
-						'other' => q({0} จิกเกอร์),
-					},
-					# Core Unit Identifier
-					'jigger' => {
-						'name' => q(จิกเกอร์),
-						'other' => q({0} จิกเกอร์),
-					},
-					# Long Unit Identifier
 					'volume-liter' => {
-						'name' => q(ลิตร),
 						'other' => q({0} ลิตร),
 						'per' => q({0} ต่อลิตร),
 					},
 					# Core Unit Identifier
 					'liter' => {
-						'name' => q(ลิตร),
 						'other' => q({0} ลิตร),
 						'per' => q({0} ต่อลิตร),
-					},
-					# Long Unit Identifier
-					'volume-megaliter' => {
-						'name' => q(เมกะลิตร),
-						'other' => q({0} เมกะลิตร),
-					},
-					# Core Unit Identifier
-					'megaliter' => {
-						'name' => q(เมกะลิตร),
-						'other' => q({0} เมกะลิตร),
 					},
 					# Long Unit Identifier
 					'volume-milliliter' => {
@@ -3855,36 +2951,6 @@ has 'units' => (
 					'milliliter' => {
 						'name' => q(มิลลิลิตร),
 						'other' => q({0} มิลลิลิตร),
-					},
-					# Long Unit Identifier
-					'volume-pinch' => {
-						'name' => q(หยิบมือ),
-						'other' => q({0} หยิบมือ),
-					},
-					# Core Unit Identifier
-					'pinch' => {
-						'name' => q(หยิบมือ),
-						'other' => q({0} หยิบมือ),
-					},
-					# Long Unit Identifier
-					'volume-pint' => {
-						'name' => q(ไพนต์),
-						'other' => q({0} ไพนต์),
-					},
-					# Core Unit Identifier
-					'pint' => {
-						'name' => q(ไพนต์),
-						'other' => q({0} ไพนต์),
-					},
-					# Long Unit Identifier
-					'volume-pint-metric' => {
-						'name' => q(ไพนต์เมตริก),
-						'other' => q({0} ไพนต์เมตริก),
-					},
-					# Core Unit Identifier
-					'pint-metric' => {
-						'name' => q(ไพนต์เมตริก),
-						'other' => q({0} ไพนต์เมตริก),
 					},
 					# Long Unit Identifier
 					'volume-quart' => {
@@ -3937,230 +3003,6 @@ has 'units' => (
 						'name' => q(ทิศ),
 					},
 					# Long Unit Identifier
-					'1024p1' => {
-						'1' => q(กิบิ{0}),
-					},
-					# Core Unit Identifier
-					'1024p1' => {
-						'1' => q(กิบิ{0}),
-					},
-					# Long Unit Identifier
-					'1024p2' => {
-						'1' => q(เมบิ{0}),
-					},
-					# Core Unit Identifier
-					'1024p2' => {
-						'1' => q(เมบิ{0}),
-					},
-					# Long Unit Identifier
-					'1024p3' => {
-						'1' => q(จิบิ{0}),
-					},
-					# Core Unit Identifier
-					'1024p3' => {
-						'1' => q(จิบิ{0}),
-					},
-					# Long Unit Identifier
-					'1024p4' => {
-						'1' => q(เทบิ{0}),
-					},
-					# Core Unit Identifier
-					'1024p4' => {
-						'1' => q(เทบิ{0}),
-					},
-					# Long Unit Identifier
-					'1024p5' => {
-						'1' => q(เพบิ{0}),
-					},
-					# Core Unit Identifier
-					'1024p5' => {
-						'1' => q(เพบิ{0}),
-					},
-					# Long Unit Identifier
-					'1024p6' => {
-						'1' => q(เอ็กซ์บิ{0}),
-					},
-					# Core Unit Identifier
-					'1024p6' => {
-						'1' => q(เอ็กซ์บิ{0}),
-					},
-					# Long Unit Identifier
-					'1024p7' => {
-						'1' => q(เซบิ{0}),
-					},
-					# Core Unit Identifier
-					'1024p7' => {
-						'1' => q(เซบิ{0}),
-					},
-					# Long Unit Identifier
-					'1024p8' => {
-						'1' => q(โยบี{0}),
-					},
-					# Core Unit Identifier
-					'1024p8' => {
-						'1' => q(โยบี{0}),
-					},
-					# Long Unit Identifier
-					'10p-1' => {
-						'1' => q(เดซิ{0}),
-					},
-					# Core Unit Identifier
-					'1' => {
-						'1' => q(เดซิ{0}),
-					},
-					# Long Unit Identifier
-					'10p-12' => {
-						'1' => q(พิโค{0}),
-					},
-					# Core Unit Identifier
-					'12' => {
-						'1' => q(พิโค{0}),
-					},
-					# Long Unit Identifier
-					'10p-15' => {
-						'1' => q(เฟมโต{0}),
-					},
-					# Core Unit Identifier
-					'15' => {
-						'1' => q(เฟมโต{0}),
-					},
-					# Long Unit Identifier
-					'10p-18' => {
-						'1' => q(อัตโต{0}),
-					},
-					# Core Unit Identifier
-					'18' => {
-						'1' => q(อัตโต{0}),
-					},
-					# Long Unit Identifier
-					'10p-2' => {
-						'1' => q(เซนติ{0}),
-					},
-					# Core Unit Identifier
-					'2' => {
-						'1' => q(เซนติ{0}),
-					},
-					# Long Unit Identifier
-					'10p-21' => {
-						'1' => q(เซปโต{0}),
-					},
-					# Core Unit Identifier
-					'21' => {
-						'1' => q(เซปโต{0}),
-					},
-					# Long Unit Identifier
-					'10p-24' => {
-						'1' => q(ยอกโต{0}),
-					},
-					# Core Unit Identifier
-					'24' => {
-						'1' => q(ยอกโต{0}),
-					},
-					# Long Unit Identifier
-					'10p-3' => {
-						'1' => q(มิลลิ{0}),
-					},
-					# Core Unit Identifier
-					'3' => {
-						'1' => q(มิลลิ{0}),
-					},
-					# Long Unit Identifier
-					'10p-6' => {
-						'1' => q(ไมโคร{0}),
-					},
-					# Core Unit Identifier
-					'6' => {
-						'1' => q(ไมโคร{0}),
-					},
-					# Long Unit Identifier
-					'10p-9' => {
-						'1' => q(นาโน{0}),
-					},
-					# Core Unit Identifier
-					'9' => {
-						'1' => q(นาโน{0}),
-					},
-					# Long Unit Identifier
-					'10p1' => {
-						'1' => q(เดคา{0}),
-					},
-					# Core Unit Identifier
-					'10p1' => {
-						'1' => q(เดคา{0}),
-					},
-					# Long Unit Identifier
-					'10p12' => {
-						'1' => q(เทระ{0}),
-					},
-					# Core Unit Identifier
-					'10p12' => {
-						'1' => q(เทระ{0}),
-					},
-					# Long Unit Identifier
-					'10p15' => {
-						'1' => q(เพตะ{0}),
-					},
-					# Core Unit Identifier
-					'10p15' => {
-						'1' => q(เพตะ{0}),
-					},
-					# Long Unit Identifier
-					'10p18' => {
-						'1' => q(เอกซะ{0}),
-					},
-					# Core Unit Identifier
-					'10p18' => {
-						'1' => q(เอกซะ{0}),
-					},
-					# Long Unit Identifier
-					'10p2' => {
-						'1' => q(เฮกโต{0}),
-					},
-					# Core Unit Identifier
-					'10p2' => {
-						'1' => q(เฮกโต{0}),
-					},
-					# Long Unit Identifier
-					'10p21' => {
-						'1' => q(เซตตะ{0}),
-					},
-					# Core Unit Identifier
-					'10p21' => {
-						'1' => q(เซตตะ{0}),
-					},
-					# Long Unit Identifier
-					'10p24' => {
-						'1' => q(ยอตตะ{0}),
-					},
-					# Core Unit Identifier
-					'10p24' => {
-						'1' => q(ยอตตะ{0}),
-					},
-					# Long Unit Identifier
-					'10p3' => {
-						'1' => q(กิโล{0}),
-					},
-					# Core Unit Identifier
-					'10p3' => {
-						'1' => q(กิโล{0}),
-					},
-					# Long Unit Identifier
-					'10p6' => {
-						'1' => q(เมกะ{0}),
-					},
-					# Core Unit Identifier
-					'10p6' => {
-						'1' => q(เมกะ{0}),
-					},
-					# Long Unit Identifier
-					'10p9' => {
-						'1' => q(จิกะ{0}),
-					},
-					# Core Unit Identifier
-					'10p9' => {
-						'1' => q(จิกะ{0}),
-					},
-					# Long Unit Identifier
 					'acceleration-g-force' => {
 						'other' => q({0}G),
 					},
@@ -4193,14 +3035,6 @@ has 'units' => (
 					# Core Unit Identifier
 					'arc-second' => {
 						'other' => q({0}พิลิปดา),
-					},
-					# Long Unit Identifier
-					'angle-degree' => {
-						'other' => q({0}°),
-					},
-					# Core Unit Identifier
-					'degree' => {
-						'other' => q({0}°),
 					},
 					# Long Unit Identifier
 					'angle-radian' => {
@@ -4300,12 +3134,10 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'concentr-item' => {
-						'name' => q(รายการ),
 						'other' => q({0}รายการ),
 					},
 					# Core Unit Identifier
 					'item' => {
-						'name' => q(รายการ),
 						'other' => q({0}รายการ),
 					},
 					# Long Unit Identifier
@@ -4410,17 +3242,11 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'coordinate' => {
-						'east' => q({0} ตอ),
-						'north' => q({0} น),
 						'south' => q({0}ต),
-						'west' => q({0} ตต),
 					},
 					# Core Unit Identifier
 					'coordinate' => {
-						'east' => q({0} ตอ),
-						'north' => q({0} น),
 						'south' => q({0}ต),
-						'west' => q({0} ตต),
 					},
 					# Long Unit Identifier
 					'digital-bit' => {
@@ -4520,12 +3346,10 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'duration-day' => {
-						'name' => q(วัน),
 						'other' => q({0}วัน),
 					},
 					# Core Unit Identifier
 					'day' => {
-						'name' => q(วัน),
 						'other' => q({0}วัน),
 					},
 					# Long Unit Identifier
@@ -4538,52 +3362,42 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'duration-hour' => {
-						'name' => q(ชั่วโมง),
 						'other' => q({0}ชม.),
 					},
 					# Core Unit Identifier
 					'hour' => {
-						'name' => q(ชั่วโมง),
 						'other' => q({0}ชม.),
 					},
 					# Long Unit Identifier
 					'duration-microsecond' => {
-						'name' => q(ไมโครวินาที),
 						'other' => q({0}ไมโครวิ),
 					},
 					# Core Unit Identifier
 					'microsecond' => {
-						'name' => q(ไมโครวินาที),
 						'other' => q({0}ไมโครวิ),
 					},
 					# Long Unit Identifier
 					'duration-millisecond' => {
-						'name' => q(มิลลิวินาที),
 						'other' => q({0} มิลลิวิ),
 					},
 					# Core Unit Identifier
 					'millisecond' => {
-						'name' => q(มิลลิวินาที),
 						'other' => q({0} มิลลิวิ),
 					},
 					# Long Unit Identifier
 					'duration-minute' => {
-						'name' => q(นาที),
 						'other' => q({0}นาที),
 					},
 					# Core Unit Identifier
 					'minute' => {
-						'name' => q(นาที),
 						'other' => q({0}นาที),
 					},
 					# Long Unit Identifier
 					'duration-month' => {
-						'name' => q(เดือน),
 						'other' => q({0}เดือน),
 					},
 					# Core Unit Identifier
 					'month' => {
-						'name' => q(เดือน),
 						'other' => q({0}เดือน),
 					},
 					# Long Unit Identifier
@@ -4597,6 +3411,14 @@ has 'units' => (
 						'other' => q({0}นาโนวิ),
 					},
 					# Long Unit Identifier
+					'duration-quarter' => {
+						'other' => q({0}ไตรมาส),
+					},
+					# Core Unit Identifier
+					'quarter' => {
+						'other' => q({0}ไตรมาส),
+					},
+					# Long Unit Identifier
 					'duration-second' => {
 						'name' => q(วิ),
 						'other' => q({0}วิ),
@@ -4608,22 +3430,18 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'duration-week' => {
-						'name' => q(สัปดาห์),
 						'other' => q({0}สัปดาห์),
 					},
 					# Core Unit Identifier
 					'week' => {
-						'name' => q(สัปดาห์),
 						'other' => q({0}สัปดาห์),
 					},
 					# Long Unit Identifier
 					'duration-year' => {
-						'name' => q(ปี),
 						'other' => q({0}ปี),
 					},
 					# Core Unit Identifier
 					'year' => {
-						'name' => q(ปี),
 						'other' => q({0}ปี),
 					},
 					# Long Unit Identifier
@@ -4668,12 +3486,10 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'energy-calorie' => {
-						'name' => q(แคลอรี),
 						'other' => q({0}แคลอรี),
 					},
 					# Core Unit Identifier
 					'calorie' => {
-						'name' => q(แคลอรี),
 						'other' => q({0}แคลอรี),
 					},
 					# Long Unit Identifier
@@ -4688,12 +3504,10 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'energy-foodcalorie' => {
-						'name' => q(แคลอรี),
 						'other' => q({0}แคลอรี),
 					},
 					# Core Unit Identifier
 					'foodcalorie' => {
-						'name' => q(แคลอรี),
 						'other' => q({0}แคลอรี),
 					},
 					# Long Unit Identifier
@@ -4706,12 +3520,10 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'energy-kilocalorie' => {
-						'name' => q(กิโลแคลอรี),
 						'other' => q({0}kcal),
 					},
 					# Core Unit Identifier
 					'kilocalorie' => {
-						'name' => q(กิโลแคลอรี),
 						'other' => q({0}kcal),
 					},
 					# Long Unit Identifier
@@ -4808,22 +3620,18 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'graphics-dot-per-centimeter' => {
-						'name' => q(dpcm),
 						'other' => q({0}dpcm),
 					},
 					# Core Unit Identifier
 					'dot-per-centimeter' => {
-						'name' => q(dpcm),
 						'other' => q({0}dpcm),
 					},
 					# Long Unit Identifier
 					'graphics-dot-per-inch' => {
-						'name' => q(dpi),
 						'other' => q({0}dpi),
 					},
 					# Core Unit Identifier
 					'dot-per-inch' => {
-						'name' => q(dpi),
 						'other' => q({0}dpi),
 					},
 					# Long Unit Identifier
@@ -4876,12 +3684,10 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-centimeter' => {
-						'name' => q(ซม.),
 						'other' => q({0}ซม.),
 					},
 					# Core Unit Identifier
 					'centimeter' => {
-						'name' => q(ซม.),
 						'other' => q({0}ซม.),
 					},
 					# Long Unit Identifier
@@ -4934,12 +3740,10 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-kilometer' => {
-						'name' => q(กม.),
 						'other' => q({0}กม.),
 					},
 					# Core Unit Identifier
 					'kilometer' => {
-						'name' => q(กม.),
 						'other' => q({0}กม.),
 					},
 					# Long Unit Identifier
@@ -4952,12 +3756,10 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-meter' => {
-						'name' => q(เมตร),
 						'other' => q({0}ม.),
 					},
 					# Core Unit Identifier
 					'meter' => {
-						'name' => q(เมตร),
 						'other' => q({0}ม.),
 					},
 					# Long Unit Identifier
@@ -4990,12 +3792,10 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'length-millimeter' => {
-						'name' => q(มม.),
 						'other' => q({0}มม.),
 					},
 					# Core Unit Identifier
 					'millimeter' => {
-						'name' => q(มม.),
 						'other' => q({0}มม.),
 					},
 					# Long Unit Identifier
@@ -5128,31 +3928,19 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'mass-gram' => {
-						'name' => q(กรัม),
 						'other' => q({0}ก.),
 					},
 					# Core Unit Identifier
 					'gram' => {
-						'name' => q(กรัม),
 						'other' => q({0}ก.),
 					},
 					# Long Unit Identifier
 					'mass-kilogram' => {
-						'name' => q(กก.),
 						'other' => q({0}กก.),
 					},
 					# Core Unit Identifier
 					'kilogram' => {
-						'name' => q(กก.),
 						'other' => q({0}กก.),
-					},
-					# Long Unit Identifier
-					'mass-metric-ton' => {
-						'other' => q({0}ต.),
-					},
-					# Core Unit Identifier
-					'metric-ton' => {
-						'other' => q({0}ต.),
 					},
 					# Long Unit Identifier
 					'mass-microgram' => {
@@ -5223,12 +4011,12 @@ has 'units' => (
 						'other' => q({0}ตัน),
 					},
 					# Long Unit Identifier
-					'per' => {
-						'1' => q({0}/{1}),
+					'mass-tonne' => {
+						'other' => q({0}ต.),
 					},
 					# Core Unit Identifier
-					'per' => {
-						'1' => q({0}/{1}),
+					'tonne' => {
+						'other' => q({0}ต.),
 					},
 					# Long Unit Identifier
 					'power-gigawatt' => {
@@ -5296,12 +4084,10 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'pressure-hectopascal' => {
-						'name' => q(เฮกโตปาสกาล),
 						'other' => q({0}hPa),
 					},
 					# Core Unit Identifier
 					'hectopascal' => {
-						'name' => q(เฮกโตปาสกาล),
 						'other' => q({0}hPa),
 					},
 					# Long Unit Identifier
@@ -5361,6 +4147,14 @@ has 'units' => (
 						'other' => q({0}psi),
 					},
 					# Long Unit Identifier
+					'speed-beaufort' => {
+						'other' => q(B{0}),
+					},
+					# Core Unit Identifier
+					'beaufort' => {
+						'other' => q(B{0}),
+					},
+					# Long Unit Identifier
 					'speed-kilometer-per-hour' => {
 						'name' => q(กม./ชม.),
 						'other' => q({0}กม./ชม.),
@@ -5401,22 +4195,18 @@ has 'units' => (
 					# Long Unit Identifier
 					'temperature-celsius' => {
 						'name' => q(°C),
-						'other' => q({0}°C),
 					},
 					# Core Unit Identifier
 					'celsius' => {
 						'name' => q(°C),
-						'other' => q({0}°C),
 					},
 					# Long Unit Identifier
 					'temperature-fahrenheit' => {
 						'name' => q(°F),
-						'other' => q({0}°F),
 					},
 					# Core Unit Identifier
 					'fahrenheit' => {
 						'name' => q(°F),
-						'other' => q({0}°F),
 					},
 					# Long Unit Identifier
 					'temperature-kelvin' => {
@@ -5646,12 +4436,10 @@ has 'units' => (
 					},
 					# Long Unit Identifier
 					'volume-liter' => {
-						'name' => q(ลิตร),
 						'other' => q({0}ล.),
 					},
 					# Core Unit Identifier
 					'liter' => {
-						'name' => q(ลิตร),
 						'other' => q({0}ล.),
 					},
 					# Long Unit Identifier
@@ -5857,12 +4645,28 @@ has 'units' => (
 						'1' => q(ยอกโต{0}),
 					},
 					# Long Unit Identifier
+					'10p-27' => {
+						'1' => q(รอนโต{0}),
+					},
+					# Core Unit Identifier
+					'27' => {
+						'1' => q(รอนโต{0}),
+					},
+					# Long Unit Identifier
 					'10p-3' => {
 						'1' => q(มิลลิ{0}),
 					},
 					# Core Unit Identifier
 					'3' => {
 						'1' => q(มิลลิ{0}),
+					},
+					# Long Unit Identifier
+					'10p-30' => {
+						'1' => q(เควกโต{0}),
+					},
+					# Core Unit Identifier
+					'30' => {
+						'1' => q(เควกโต{0}),
 					},
 					# Long Unit Identifier
 					'10p-6' => {
@@ -5937,12 +4741,28 @@ has 'units' => (
 						'1' => q(ยอตตะ{0}),
 					},
 					# Long Unit Identifier
+					'10p27' => {
+						'1' => q(รอนนะ{0}),
+					},
+					# Core Unit Identifier
+					'10p27' => {
+						'1' => q(รอนนะ{0}),
+					},
+					# Long Unit Identifier
 					'10p3' => {
 						'1' => q(กิโล{0}),
 					},
 					# Core Unit Identifier
 					'10p3' => {
 						'1' => q(กิโล{0}),
+					},
+					# Long Unit Identifier
+					'10p30' => {
+						'1' => q(เควตตะ{0}),
+					},
+					# Core Unit Identifier
+					'10p30' => {
+						'1' => q(เควตตะ{0}),
 					},
 					# Long Unit Identifier
 					'10p6' => {
@@ -5963,12 +4783,10 @@ has 'units' => (
 					# Long Unit Identifier
 					'acceleration-g-force' => {
 						'name' => q(แรง G),
-						'other' => q({0} G),
 					},
 					# Core Unit Identifier
 					'g-force' => {
 						'name' => q(แรง G),
-						'other' => q({0} G),
 					},
 					# Long Unit Identifier
 					'acceleration-meter-per-square-second' => {
@@ -6003,12 +4821,10 @@ has 'units' => (
 					# Long Unit Identifier
 					'angle-degree' => {
 						'name' => q(องศา),
-						'other' => q({0}°),
 					},
 					# Core Unit Identifier
 					'degree' => {
 						'name' => q(องศา),
-						'other' => q({0}°),
 					},
 					# Long Unit Identifier
 					'angle-radian' => {
@@ -6299,94 +5115,6 @@ has 'units' => (
 						'other' => q({0} ไบต์),
 					},
 					# Long Unit Identifier
-					'digital-gigabit' => {
-						'name' => q(Gb),
-						'other' => q({0} Gb),
-					},
-					# Core Unit Identifier
-					'gigabit' => {
-						'name' => q(Gb),
-						'other' => q({0} Gb),
-					},
-					# Long Unit Identifier
-					'digital-gigabyte' => {
-						'name' => q(GB),
-						'other' => q({0} GB),
-					},
-					# Core Unit Identifier
-					'gigabyte' => {
-						'name' => q(GB),
-						'other' => q({0} GB),
-					},
-					# Long Unit Identifier
-					'digital-kilobit' => {
-						'name' => q(kb),
-						'other' => q({0} kb),
-					},
-					# Core Unit Identifier
-					'kilobit' => {
-						'name' => q(kb),
-						'other' => q({0} kb),
-					},
-					# Long Unit Identifier
-					'digital-kilobyte' => {
-						'name' => q(kB),
-						'other' => q({0} kB),
-					},
-					# Core Unit Identifier
-					'kilobyte' => {
-						'name' => q(kB),
-						'other' => q({0} kB),
-					},
-					# Long Unit Identifier
-					'digital-megabit' => {
-						'name' => q(Mb),
-						'other' => q({0} Mb),
-					},
-					# Core Unit Identifier
-					'megabit' => {
-						'name' => q(Mb),
-						'other' => q({0} Mb),
-					},
-					# Long Unit Identifier
-					'digital-megabyte' => {
-						'name' => q(MB),
-						'other' => q({0} MB),
-					},
-					# Core Unit Identifier
-					'megabyte' => {
-						'name' => q(MB),
-						'other' => q({0} MB),
-					},
-					# Long Unit Identifier
-					'digital-petabyte' => {
-						'name' => q(PB),
-					},
-					# Core Unit Identifier
-					'petabyte' => {
-						'name' => q(PB),
-					},
-					# Long Unit Identifier
-					'digital-terabit' => {
-						'name' => q(Tb),
-						'other' => q({0} Tb),
-					},
-					# Core Unit Identifier
-					'terabit' => {
-						'name' => q(Tb),
-						'other' => q({0} Tb),
-					},
-					# Long Unit Identifier
-					'digital-terabyte' => {
-						'name' => q(TB),
-						'other' => q({0} TB),
-					},
-					# Core Unit Identifier
-					'terabyte' => {
-						'name' => q(TB),
-						'other' => q({0} TB),
-					},
-					# Long Unit Identifier
 					'duration-century' => {
 						'name' => q(ศตวรรษ),
 						'other' => q({0} ศตวรรษ),
@@ -6485,6 +5213,18 @@ has 'units' => (
 						'other' => q({0} นาโนวิ),
 					},
 					# Long Unit Identifier
+					'duration-quarter' => {
+						'name' => q(ไตรมาส),
+						'other' => q({0} ไตรมาส),
+						'per' => q({0}/ไตรมาส),
+					},
+					# Core Unit Identifier
+					'quarter' => {
+						'name' => q(ไตรมาส),
+						'other' => q({0} ไตรมาส),
+						'per' => q({0}/ไตรมาส),
+					},
+					# Long Unit Identifier
 					'duration-second' => {
 						'name' => q(วินาที),
 						'other' => q({0} วิ),
@@ -6543,22 +5283,18 @@ has 'units' => (
 					# Long Unit Identifier
 					'electric-ohm' => {
 						'name' => q(โอห์ม),
-						'other' => q({0} Ω),
 					},
 					# Core Unit Identifier
 					'ohm' => {
 						'name' => q(โอห์ม),
-						'other' => q({0} Ω),
 					},
 					# Long Unit Identifier
 					'electric-volt' => {
 						'name' => q(โวลต์),
-						'other' => q({0} V),
 					},
 					# Core Unit Identifier
 					'volt' => {
 						'name' => q(โวลต์),
-						'other' => q({0} V),
 					},
 					# Long Unit Identifier
 					'energy-british-thermal-unit' => {
@@ -6673,46 +5409,6 @@ has 'units' => (
 					# Core Unit Identifier
 					'pound-force' => {
 						'name' => q(แรงปอนด์),
-					},
-					# Long Unit Identifier
-					'frequency-gigahertz' => {
-						'name' => q(GHz),
-						'other' => q({0} GHz),
-					},
-					# Core Unit Identifier
-					'gigahertz' => {
-						'name' => q(GHz),
-						'other' => q({0} GHz),
-					},
-					# Long Unit Identifier
-					'frequency-hertz' => {
-						'name' => q(Hz),
-						'other' => q({0} Hz),
-					},
-					# Core Unit Identifier
-					'hertz' => {
-						'name' => q(Hz),
-						'other' => q({0} Hz),
-					},
-					# Long Unit Identifier
-					'frequency-kilohertz' => {
-						'name' => q(kHz),
-						'other' => q({0} kHz),
-					},
-					# Core Unit Identifier
-					'kilohertz' => {
-						'name' => q(kHz),
-						'other' => q({0} kHz),
-					},
-					# Long Unit Identifier
-					'frequency-megahertz' => {
-						'name' => q(MHz),
-						'other' => q({0} MHz),
-					},
-					# Core Unit Identifier
-					'megahertz' => {
-						'name' => q(MHz),
-						'other' => q({0} MHz),
 					},
 					# Long Unit Identifier
 					'graphics-dot' => {
@@ -7033,16 +5729,6 @@ has 'units' => (
 						'per' => q({0}/กก.),
 					},
 					# Long Unit Identifier
-					'mass-metric-ton' => {
-						'name' => q(ต.),
-						'other' => q({0} ต.),
-					},
-					# Core Unit Identifier
-					'metric-ton' => {
-						'name' => q(ต.),
-						'other' => q({0} ต.),
-					},
-					# Long Unit Identifier
 					'mass-microgram' => {
 						'name' => q(มคก.),
 						'other' => q({0} มคก.),
@@ -7123,12 +5809,14 @@ has 'units' => (
 						'other' => q({0} ตัน),
 					},
 					# Long Unit Identifier
-					'per' => {
-						'1' => q({0}/{1}),
+					'mass-tonne' => {
+						'name' => q(ต.),
+						'other' => q({0} ต.),
 					},
 					# Core Unit Identifier
-					'per' => {
-						'1' => q({0}/{1}),
+					'tonne' => {
+						'name' => q(ต.),
+						'other' => q({0} ต.),
 					},
 					# Long Unit Identifier
 					'power-gigawatt' => {
@@ -7303,42 +5991,18 @@ has 'units' => (
 					# Long Unit Identifier
 					'temperature-celsius' => {
 						'name' => q(องศาเซลเซียส),
-						'other' => q({0}°C),
 					},
 					# Core Unit Identifier
 					'celsius' => {
 						'name' => q(องศาเซลเซียส),
-						'other' => q({0}°C),
 					},
 					# Long Unit Identifier
 					'temperature-fahrenheit' => {
 						'name' => q(องศาฟาเรนไฮต์),
-						'other' => q({0}°F),
 					},
 					# Core Unit Identifier
 					'fahrenheit' => {
 						'name' => q(องศาฟาเรนไฮต์),
-						'other' => q({0}°F),
-					},
-					# Long Unit Identifier
-					'temperature-generic' => {
-						'name' => q(°),
-						'other' => q({0}°),
-					},
-					# Core Unit Identifier
-					'generic' => {
-						'name' => q(°),
-						'other' => q({0}°),
-					},
-					# Long Unit Identifier
-					'temperature-kelvin' => {
-						'name' => q(K),
-						'other' => q({0} K),
-					},
-					# Core Unit Identifier
-					'kelvin' => {
-						'name' => q(K),
-						'other' => q({0} K),
 					},
 					# Long Unit Identifier
 					'volume-acre-foot' => {
@@ -7689,16 +6353,9 @@ has 'listPatterns' => (
 	default		=> sub { {
 				start => q({0} {1}),
 				middle => q({0} {1}),
-				end => q({0} และ {1}),
-				2 => q({0} {1}),
+				end => q({0} และ{1}),
+				2 => q({0}และ{1}),
 		} }
-);
-
-has 'default_numbering_system' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> 'latn',
 );
 
 has native_numbering_system => (
@@ -7708,82 +6365,12 @@ has native_numbering_system => (
 	default		=> 'thai',
 );
 
-has 'minimum_grouping_digits' => (
-	is			=>'ro',
-	isa			=> Int,
-	init_arg	=> undef,
-	default		=> 1,
-);
-
-has 'number_symbols' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'latn' => {
-			'decimal' => q(.),
-			'exponential' => q(E),
-			'group' => q(,),
-			'infinity' => q(∞),
-			'list' => q(;),
-			'minusSign' => q(-),
-			'nan' => q(NaN),
-			'perMille' => q(‰),
-			'percentSign' => q(%),
-			'plusSign' => q(+),
-			'superscriptingExponent' => q(×),
-			'timeSeparator' => q(:),
-		},
-	} }
-);
-
 has 'number_formats' => (
 	is			=> 'ro',
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
 		decimalFormat => {
-			'default' => {
-				'1000' => {
-					'other' => '0K',
-				},
-				'10000' => {
-					'other' => '00K',
-				},
-				'100000' => {
-					'other' => '000K',
-				},
-				'1000000' => {
-					'other' => '0M',
-				},
-				'10000000' => {
-					'other' => '00M',
-				},
-				'100000000' => {
-					'other' => '000M',
-				},
-				'1000000000' => {
-					'other' => '0B',
-				},
-				'10000000000' => {
-					'other' => '00B',
-				},
-				'100000000000' => {
-					'other' => '000B',
-				},
-				'1000000000000' => {
-					'other' => '0T',
-				},
-				'10000000000000' => {
-					'other' => '00T',
-				},
-				'100000000000000' => {
-					'other' => '000T',
-				},
-				'standard' => {
-					'default' => '#,##0.###',
-				},
-			},
 			'long' => {
 				'1000' => {
 					'other' => '0 พัน',
@@ -7823,24 +6410,6 @@ has 'number_formats' => (
 				},
 			},
 			'short' => {
-				'1000' => {
-					'other' => '0K',
-				},
-				'10000' => {
-					'other' => '00K',
-				},
-				'100000' => {
-					'other' => '000K',
-				},
-				'1000000' => {
-					'other' => '0M',
-				},
-				'10000000' => {
-					'other' => '00M',
-				},
-				'100000000' => {
-					'other' => '000M',
-				},
 				'1000000000' => {
 					'other' => '0B',
 				},
@@ -7849,29 +6418,6 @@ has 'number_formats' => (
 				},
 				'100000000000' => {
 					'other' => '000B',
-				},
-				'1000000000000' => {
-					'other' => '0T',
-				},
-				'10000000000000' => {
-					'other' => '00T',
-				},
-				'100000000000000' => {
-					'other' => '000T',
-				},
-			},
-		},
-		percentFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0%',
-				},
-			},
-		},
-		scientificFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#E0',
 				},
 			},
 		},
@@ -7905,110 +6451,86 @@ has 'currencies' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'ADP' => {
-			symbol => 'ADP',
 			display_name => {
 				'currency' => q(เปเซตาอันดอร์รา),
 			},
 		},
 		'AED' => {
-			symbol => 'AED',
 			display_name => {
 				'currency' => q(เดอร์แฮมสหรัฐอาหรับเอมิเรตส์),
-				'other' => q(เดอร์แฮมสหรัฐอาหรับเอมิเรตส์),
 			},
 		},
 		'AFA' => {
-			symbol => 'AFA',
 			display_name => {
 				'currency' => q(อัฟกานีอัฟกานิสถาน \(1927–2002\)),
 			},
 		},
 		'AFN' => {
-			symbol => 'AFN',
 			display_name => {
 				'currency' => q(อัฟกานิอัฟกานิสถาน),
-				'other' => q(อัฟกานิอัฟกานิสถาน),
 			},
 		},
 		'ALL' => {
-			symbol => 'ALL',
 			display_name => {
 				'currency' => q(เลกแอลเบเนีย),
-				'other' => q(เลกแอลเบเนีย),
 			},
 		},
 		'AMD' => {
-			symbol => 'AMD',
 			display_name => {
 				'currency' => q(แดรมอาร์เมเนีย),
-				'other' => q(แดรมอาร์เมเนีย),
 			},
 		},
 		'ANG' => {
-			symbol => 'ANG',
 			display_name => {
 				'currency' => q(กิลเดอร์เนเธอร์แลนด์แอนทิลลิส),
-				'other' => q(กิลเดอร์เนเธอร์แลนด์แอนทิลลิส),
 			},
 		},
 		'AOA' => {
-			symbol => 'AOA',
 			display_name => {
 				'currency' => q(กวานซาแองโกลา),
-				'other' => q(กวานซาแองโกลา),
 			},
 		},
 		'AOK' => {
-			symbol => 'AOK',
 			display_name => {
 				'currency' => q(กวานซาแองโกลา \(1977–1990\)),
 			},
 		},
 		'AON' => {
-			symbol => 'AON',
 			display_name => {
 				'currency' => q(นิวกวานซาแองโกลา \(1990–2000\)),
 			},
 		},
 		'AOR' => {
-			symbol => 'AOR',
 			display_name => {
 				'currency' => q(กวานซารีจัสทาโดแองโกลา \(1995–1999\)),
 			},
 		},
 		'ARA' => {
-			symbol => 'ARA',
 			display_name => {
 				'currency' => q(ออสตรัลอาร์เจนตินา),
 			},
 		},
 		'ARL' => {
-			symbol => 'ARL',
 			display_name => {
 				'currency' => q(เปโซเลย์อาร์เจนตินา \(1970–1983\)),
 			},
 		},
 		'ARM' => {
-			symbol => 'ARM',
 			display_name => {
 				'currency' => q(เปโซอาร์เจนตินา \(1881–1970\)),
 			},
 		},
 		'ARP' => {
-			symbol => 'ARP',
 			display_name => {
 				'currency' => q(เปโซอาร์เจนตินา \(1983–1985\)),
 			},
 		},
 		'ARS' => {
-			symbol => 'ARS',
 			display_name => {
 				'currency' => q(เปโซอาร์เจนตินา),
-				'other' => q(เปโซอาร์เจนตินา),
 			},
 		},
 		'ATS' => {
-			symbol => 'ATS',
 			display_name => {
 				'currency' => q(ชิลลิงออสเตรีย),
 			},
@@ -8017,1407 +6539,1076 @@ has 'currencies' => (
 			symbol => 'AU$',
 			display_name => {
 				'currency' => q(ดอลลาร์ออสเตรเลีย),
-				'other' => q(ดอลลาร์ออสเตรเลีย),
 			},
 		},
 		'AWG' => {
-			symbol => 'AWG',
 			display_name => {
 				'currency' => q(ฟลอรินอารูบา),
-				'other' => q(ฟลอรินอารูบา),
 			},
 		},
 		'AZM' => {
-			symbol => 'AZM',
 			display_name => {
 				'currency' => q(มานัตอาเซอร์ไบจาน \(1993–2006\)),
 			},
 		},
 		'AZN' => {
-			symbol => 'AZN',
 			display_name => {
 				'currency' => q(มานัตอาเซอร์ไบจาน),
-				'other' => q(มานัตอาเซอร์ไบจาน),
 			},
 		},
 		'BAD' => {
-			symbol => 'BAD',
 			display_name => {
 				'currency' => q(ดีนาร์บอสเนีย-เฮอร์เซโกวีนา),
 			},
 		},
 		'BAM' => {
-			symbol => 'BAM',
 			display_name => {
 				'currency' => q(มาร์กบอสเนีย-เฮอร์เซโกวีนา),
-				'other' => q(มาร์กบอสเนีย-เฮอร์เซโกวีนา),
 			},
 		},
 		'BAN' => {
-			symbol => 'BAN',
 			display_name => {
 				'currency' => q(ดีนาร์ใหม่บอสเนีย-เฮอร์เซโกวีนา \(1994–1997\)),
 			},
 		},
 		'BBD' => {
-			symbol => 'BBD',
 			display_name => {
 				'currency' => q(ดอลลาร์บาร์เบโดส),
-				'other' => q(ดอลลาร์บาร์เบโดส),
 			},
 		},
 		'BDT' => {
-			symbol => 'BDT',
 			display_name => {
 				'currency' => q(ตากาบังกลาเทศ),
-				'other' => q(ตากาบังกลาเทศ),
 			},
 		},
 		'BEC' => {
-			symbol => 'BEC',
 			display_name => {
 				'currency' => q(ฟรังก์เบลเยียม \(เปลี่ยนแปลงได้\)),
 			},
 		},
 		'BEF' => {
-			symbol => 'BEF',
 			display_name => {
 				'currency' => q(ฟรังก์เบลเยียม),
 			},
 		},
 		'BEL' => {
-			symbol => 'BEL',
 			display_name => {
 				'currency' => q(ฟรังก์เบลเยียม \(การเงิน\)),
 			},
 		},
 		'BGL' => {
-			symbol => 'BGL',
 			display_name => {
 				'currency' => q(ฮาร์ดเลฟบัลแกเรีย),
 			},
 		},
 		'BGM' => {
-			symbol => 'BGM',
 			display_name => {
 				'currency' => q(โซเชียลลิสต์เลฟบัลแกเรีย),
 			},
 		},
 		'BGN' => {
-			symbol => 'BGN',
 			display_name => {
 				'currency' => q(เลฟบัลแกเรีย),
-				'other' => q(เลฟบัลแกเรีย),
 			},
 		},
 		'BGO' => {
-			symbol => 'BGO',
 			display_name => {
 				'currency' => q(เลฟบัลเกเรีย \(1879–1952\)),
 			},
 		},
 		'BHD' => {
-			symbol => 'BHD',
 			display_name => {
 				'currency' => q(ดีนาร์บาห์เรน),
-				'other' => q(ดีนาร์บาห์เรน),
 			},
 		},
 		'BIF' => {
-			symbol => 'BIF',
 			display_name => {
 				'currency' => q(ฟรังก์บุรุนดี),
-				'other' => q(ฟรังก์บุรุนดี),
 			},
 		},
 		'BMD' => {
-			symbol => 'BMD',
 			display_name => {
 				'currency' => q(ดอลลาร์เบอร์มิวดา),
-				'other' => q(ดอลลาร์เบอร์มิวดา),
 			},
 		},
 		'BND' => {
-			symbol => 'BND',
 			display_name => {
 				'currency' => q(ดอลลาร์บรูไน),
-				'other' => q(ดอลลาร์บรูไน),
 			},
 		},
 		'BOB' => {
-			symbol => 'BOB',
 			display_name => {
 				'currency' => q(โบลิเวียโนโบลิเวีย),
-				'other' => q(โบลิเวียโนโบลิเวีย),
 			},
 		},
 		'BOL' => {
-			symbol => 'BOL',
 			display_name => {
 				'currency' => q(โบลิเวียโนโบลิเวีย \(1863–1963\)),
 			},
 		},
 		'BOP' => {
-			symbol => 'BOP',
 			display_name => {
 				'currency' => q(เปโซโบลิเวีย),
 			},
 		},
 		'BOV' => {
-			symbol => 'BOV',
 			display_name => {
 				'currency' => q(มฟดอลโบลิเวีย),
 			},
 		},
 		'BRB' => {
-			symbol => 'BRB',
 			display_name => {
 				'currency' => q(ครูเซโรโนโวบราซิล \(1967–1986\)),
 			},
 		},
 		'BRC' => {
-			symbol => 'BRC',
 			display_name => {
 				'currency' => q(ครูซาโดบราซิล),
 			},
 		},
 		'BRE' => {
-			symbol => 'BRE',
 			display_name => {
 				'currency' => q(ครูเซโรบราซิล \(1990–1993\)),
 			},
 		},
 		'BRL' => {
-			symbol => 'R$',
 			display_name => {
 				'currency' => q(เรียลบราซิล),
-				'other' => q(เรียลบราซิล),
 			},
 		},
 		'BRN' => {
-			symbol => 'BRN',
 			display_name => {
 				'currency' => q(ครูซาโดโนโวบราซิล),
 			},
 		},
 		'BRR' => {
-			symbol => 'BRR',
 			display_name => {
 				'currency' => q(ครูเซโรบราซิล),
 			},
 		},
 		'BRZ' => {
-			symbol => 'BRZ',
 			display_name => {
 				'currency' => q(ครูเซโรบราซิล \(1942–1967\)),
 			},
 		},
 		'BSD' => {
-			symbol => 'BSD',
 			display_name => {
 				'currency' => q(ดอลลาร์บาฮามาส),
-				'other' => q(ดอลลาร์บาฮามาส),
 			},
 		},
 		'BTN' => {
-			symbol => 'BTN',
 			display_name => {
 				'currency' => q(เอ็งกุลตรัมภูฏาน),
-				'other' => q(เอ็งกุลตรัมภูฏาน),
 			},
 		},
 		'BUK' => {
-			symbol => 'BUK',
 			display_name => {
 				'currency' => q(จ๊าดพม่า),
 			},
 		},
 		'BWP' => {
-			symbol => 'BWP',
 			display_name => {
 				'currency' => q(ปูลาบอตสวานา),
-				'other' => q(ปูลาบอตสวานา),
 			},
 		},
 		'BYB' => {
-			symbol => 'BYB',
 			display_name => {
 				'currency' => q(นิวรูเบิลเบลารุส \(1994–1999\)),
 			},
 		},
 		'BYN' => {
-			symbol => 'BYN',
+			symbol => 'р.',
 			display_name => {
 				'currency' => q(รูเบิลเบลารุส),
-				'other' => q(รูเบิลเบลารุส),
 			},
 		},
 		'BYR' => {
-			symbol => 'BYR',
 			display_name => {
 				'currency' => q(รูเบิลเบลารุส \(2000–2016\)),
-				'other' => q(รูเบิลเบลารุส \(2000–2016\)),
 			},
 		},
 		'BZD' => {
-			symbol => 'BZD',
 			display_name => {
 				'currency' => q(ดอลลาร์เบลีซ),
-				'other' => q(ดอลลาร์เบลีซ),
 			},
 		},
 		'CAD' => {
-			symbol => 'CA$',
 			display_name => {
 				'currency' => q(ดอลลาร์แคนาดา),
-				'other' => q(ดอลลาร์แคนาดา),
 			},
 		},
 		'CDF' => {
-			symbol => 'CDF',
 			display_name => {
 				'currency' => q(ฟรังก์คองโก),
-				'other' => q(ฟรังก์คองโก),
 			},
 		},
 		'CHE' => {
-			symbol => 'CHE',
 			display_name => {
 				'currency' => q(ยูโรดับเบิลยูไออาร์),
 			},
 		},
 		'CHF' => {
-			symbol => 'CHF',
 			display_name => {
 				'currency' => q(ฟรังก์สวิส),
-				'other' => q(ฟรังก์สวิส),
 			},
 		},
 		'CHW' => {
-			symbol => 'CHW',
 			display_name => {
 				'currency' => q(ฟรังก์ดับเบิลยูไออาร์),
 			},
 		},
 		'CLE' => {
-			symbol => 'CLE',
 			display_name => {
 				'currency' => q(เอสคูโดชิลี),
 			},
 		},
 		'CLF' => {
-			symbol => 'CLF',
 			display_name => {
 				'currency' => q(ฟูเมนโตชิลี),
 			},
 		},
 		'CLP' => {
-			symbol => 'CLP',
 			display_name => {
 				'currency' => q(เปโซชิลี),
-				'other' => q(เปโซชิลี),
 			},
 		},
 		'CNH' => {
-			symbol => 'CNH',
 			display_name => {
 				'currency' => q(หยวน),
-				'other' => q(หยวน),
 			},
 		},
 		'CNY' => {
-			symbol => 'CN¥',
 			display_name => {
 				'currency' => q(หยวนจีน),
-				'other' => q(หยวนจีน),
 			},
 		},
 		'COP' => {
-			symbol => 'COP',
 			display_name => {
 				'currency' => q(เปโซโคลอมเบีย),
-				'other' => q(เปโซโคลอมเบีย),
 			},
 		},
 		'COU' => {
-			symbol => 'COU',
 			display_name => {
 				'currency' => q(วาเลอร์เรียลโคลอมเบีย),
 			},
 		},
 		'CRC' => {
-			symbol => 'CRC',
 			display_name => {
 				'currency' => q(โกลองคอสตาริกา),
-				'other' => q(โกลองคอสตาริกา),
 			},
 		},
 		'CSD' => {
-			symbol => 'CSD',
 			display_name => {
 				'currency' => q(ดีนาร์เซอร์เบียเก่า),
 			},
 		},
 		'CSK' => {
-			symbol => 'CSK',
 			display_name => {
 				'currency' => q(ฮาร์ดโครูนาเช็กโกสโลวัก),
 			},
 		},
 		'CUC' => {
-			symbol => 'CUC',
 			display_name => {
 				'currency' => q(เปโซคิวบา \(แปลงสภาพ\)),
-				'other' => q(เปโซคิวบา \(แปลงสภาพ\)),
 			},
 		},
 		'CUP' => {
-			symbol => 'CUP',
 			display_name => {
 				'currency' => q(เปโซคิวบา),
-				'other' => q(เปโซคิวบา),
 			},
 		},
 		'CVE' => {
-			symbol => 'CVE',
 			display_name => {
 				'currency' => q(เอสคูโดเคปเวิร์ด),
-				'other' => q(เอสคูโดเคปเวิร์ด),
 			},
 		},
 		'CYP' => {
-			symbol => 'CYP',
 			display_name => {
 				'currency' => q(ปอนด์ไซปรัส),
 			},
 		},
 		'CZK' => {
-			symbol => 'CZK',
 			display_name => {
 				'currency' => q(โครูนาสาธารณรัฐเช็ก),
-				'other' => q(โครูนาสาธารณรัฐเช็ก),
 			},
 		},
 		'DDM' => {
-			symbol => 'DDM',
 			display_name => {
 				'currency' => q(มาร์กเยอรมันตะวันออก),
 			},
 		},
 		'DEM' => {
-			symbol => 'DEM',
 			display_name => {
 				'currency' => q(มาร์กเยอรมัน),
 			},
 		},
 		'DJF' => {
-			symbol => 'DJF',
 			display_name => {
 				'currency' => q(ฟรังก์จิบูตี),
-				'other' => q(ฟรังก์จิบูตี),
 			},
 		},
 		'DKK' => {
-			symbol => 'DKK',
 			display_name => {
 				'currency' => q(โครนเดนมาร์ก),
-				'other' => q(โครนเดนมาร์ก),
 			},
 		},
 		'DOP' => {
-			symbol => 'DOP',
 			display_name => {
 				'currency' => q(เปโซโดมินิกัน),
-				'other' => q(เปโซโดมินิกัน),
 			},
 		},
 		'DZD' => {
-			symbol => 'DZD',
 			display_name => {
 				'currency' => q(ดีนาร์แอลจีเรีย),
-				'other' => q(ดีนาร์แอลจีเรีย),
 			},
 		},
 		'ECS' => {
-			symbol => 'ECS',
 			display_name => {
 				'currency' => q(ซูเกรเอกวาดอร์),
 			},
 		},
 		'ECV' => {
-			symbol => 'ECV',
 			display_name => {
 				'currency' => q(วาเลอร์คอนสแตนต์เอกวาดอร์),
 			},
 		},
 		'EEK' => {
-			symbol => 'EEK',
 			display_name => {
 				'currency' => q(ครูนเอสโตเนีย),
 			},
 		},
 		'EGP' => {
-			symbol => 'EGP',
 			display_name => {
 				'currency' => q(ปอนด์อียิปต์),
-				'other' => q(ปอนด์อียิปต์),
 			},
 		},
 		'ERN' => {
-			symbol => 'ERN',
 			display_name => {
 				'currency' => q(แนกฟาเอริเทรีย),
-				'other' => q(แนกฟาเอริเทรีย),
 			},
 		},
 		'ESA' => {
-			symbol => 'ESA',
 			display_name => {
 				'currency' => q(เปเซตาสเปน \(บัญชีเอ\)),
 			},
 		},
 		'ESB' => {
-			symbol => 'ESB',
 			display_name => {
 				'currency' => q(เปเซตาสเปน \(บัญชีที่เปลี่ยนแปลงได้\)),
 			},
 		},
 		'ESP' => {
-			symbol => 'ESP',
 			display_name => {
 				'currency' => q(เปเซตาสเปน),
 			},
 		},
 		'ETB' => {
-			symbol => 'ETB',
 			display_name => {
 				'currency' => q(เบอรร์เอธิโอเปีย),
-				'other' => q(เบอรร์เอธิโอเปีย),
 			},
 		},
 		'EUR' => {
-			symbol => '€',
 			display_name => {
 				'currency' => q(ยูโร),
-				'other' => q(ยูโร),
 			},
 		},
 		'FIM' => {
-			symbol => 'FIM',
 			display_name => {
 				'currency' => q(มาร์กกาฟินแลนด์),
 			},
 		},
 		'FJD' => {
-			symbol => 'FJD',
 			display_name => {
 				'currency' => q(ดอลลาร์ฟิจิ),
-				'other' => q(ดอลลาร์ฟิจิ),
 			},
 		},
 		'FKP' => {
-			symbol => 'FKP',
 			display_name => {
 				'currency' => q(ปอนด์หมู่เกาะฟอล์กแลนด์),
-				'other' => q(ปอนด์หมู่เกาะฟอล์กแลนด์),
 			},
 		},
 		'FRF' => {
-			symbol => 'FRF',
 			display_name => {
 				'currency' => q(ฟรังก์ฝรั่งเศส),
 			},
 		},
 		'GBP' => {
-			symbol => '£',
 			display_name => {
 				'currency' => q(ปอนด์สเตอร์ลิง \(สหราชอาณาจักร\)),
-				'other' => q(ปอนด์สเตอร์ลิง \(สหราชอาณาจักร\)),
 			},
 		},
 		'GEK' => {
-			symbol => 'GEK',
 			display_name => {
 				'currency' => q(คูปอนลาริตจอร์เจีย),
 			},
 		},
 		'GEL' => {
-			symbol => 'GEL',
 			display_name => {
 				'currency' => q(ลารีจอร์เจีย),
-				'other' => q(ลารีจอร์เจีย),
 			},
 		},
 		'GHC' => {
-			symbol => 'GHC',
 			display_name => {
 				'currency' => q(เซดีกานา \(1979–2007\)),
 			},
 		},
 		'GHS' => {
-			symbol => 'GHS',
 			display_name => {
 				'currency' => q(เซดีกานา),
-				'other' => q(เซดีกานา),
 			},
 		},
 		'GIP' => {
-			symbol => 'GIP',
 			display_name => {
 				'currency' => q(ปอนด์ยิบรอลตาร์),
-				'other' => q(ปอนด์ยิบรอลตาร์),
 			},
 		},
 		'GMD' => {
-			symbol => 'GMD',
 			display_name => {
 				'currency' => q(ดาลาซีแกมเบีย),
-				'other' => q(ดาลาซีแกมเบีย),
 			},
 		},
 		'GNF' => {
-			symbol => 'GNF',
 			display_name => {
 				'currency' => q(ฟรังก์กินี),
-				'other' => q(ฟรังก์กินี),
 			},
 		},
 		'GNS' => {
-			symbol => 'GNS',
 			display_name => {
 				'currency' => q(ไซลีกินี),
 			},
 		},
 		'GQE' => {
-			symbol => 'GQE',
 			display_name => {
 				'currency' => q(เอ็กเวเลอิเควทอเรียลกินี),
 			},
 		},
 		'GRD' => {
-			symbol => 'GRD',
 			display_name => {
 				'currency' => q(ดรัชมากรีก),
 			},
 		},
 		'GTQ' => {
-			symbol => 'GTQ',
 			display_name => {
 				'currency' => q(เควตซัลกัวเตมาลา),
-				'other' => q(เควตซัลกัวเตมาลา),
 			},
 		},
 		'GWE' => {
-			symbol => 'GWE',
 			display_name => {
 				'currency' => q(เอสคูโดกินีโปรตุเกส),
 			},
 		},
 		'GWP' => {
-			symbol => 'GWP',
 			display_name => {
 				'currency' => q(เปโซกินี-บิสเซา),
 			},
 		},
 		'GYD' => {
-			symbol => 'GYD',
 			display_name => {
 				'currency' => q(ดอลลาร์กายอานา),
-				'other' => q(ดอลลาร์กายอานา),
 			},
 		},
 		'HKD' => {
-			symbol => 'HK$',
 			display_name => {
 				'currency' => q(ดอลลาร์ฮ่องกง),
-				'other' => q(ดอลลาร์ฮ่องกง),
 			},
 		},
 		'HNL' => {
-			symbol => 'HNL',
 			display_name => {
 				'currency' => q(เลมปิราฮอนดูรัส),
-				'other' => q(เลมปิราฮอนดูรัส),
 			},
 		},
 		'HRD' => {
-			symbol => 'HRD',
 			display_name => {
 				'currency' => q(ดีนาร์โครเอเชีย),
 			},
 		},
 		'HRK' => {
-			symbol => 'HRK',
 			display_name => {
 				'currency' => q(คูนาโครเอเชีย),
-				'other' => q(คูนาโครเอเชีย),
 			},
 		},
 		'HTG' => {
-			symbol => 'HTG',
 			display_name => {
 				'currency' => q(กูร์ดเฮติ),
-				'other' => q(กูร์ดเฮติ),
 			},
 		},
 		'HUF' => {
-			symbol => 'HUF',
 			display_name => {
 				'currency' => q(ฟอรินต์ฮังการี),
-				'other' => q(ฟอรินต์ฮังการี),
 			},
 		},
 		'IDR' => {
-			symbol => 'IDR',
 			display_name => {
 				'currency' => q(รูเปียห์อินโดนีเซีย),
-				'other' => q(รูเปียห์อินโดนีเซีย),
 			},
 		},
 		'IEP' => {
-			symbol => 'IEP',
 			display_name => {
 				'currency' => q(ปอนด์ไอริช),
 			},
 		},
 		'ILP' => {
-			symbol => 'ILP',
 			display_name => {
 				'currency' => q(ปอนด์อิสราเอล),
 			},
 		},
 		'ILS' => {
-			symbol => '₪',
 			display_name => {
 				'currency' => q(นิวเชเกลอิสราเอล),
-				'other' => q(นิวเชเกลอิสราเอล),
 			},
 		},
 		'INR' => {
-			symbol => '₹',
 			display_name => {
 				'currency' => q(รูปีอินเดีย),
-				'other' => q(รูปีอินเดีย),
 			},
 		},
 		'IQD' => {
-			symbol => 'IQD',
 			display_name => {
 				'currency' => q(ดีนาร์อิรัก),
-				'other' => q(ดีนาร์อิรัก),
 			},
 		},
 		'IRR' => {
-			symbol => 'IRR',
 			display_name => {
 				'currency' => q(เรียลอิหร่าน),
-				'other' => q(เรียลอิหร่าน),
 			},
 		},
 		'ISK' => {
-			symbol => 'ISK',
 			display_name => {
 				'currency' => q(โครนาไอซ์แลนด์),
-				'other' => q(โครนาไอซ์แลนด์),
 			},
 		},
 		'ITL' => {
-			symbol => 'ITL',
 			display_name => {
 				'currency' => q(ลีราอิตาลี),
 			},
 		},
 		'JMD' => {
-			symbol => 'JMD',
 			display_name => {
 				'currency' => q(ดอลลาร์จาเมกา),
-				'other' => q(ดอลลาร์จาเมกา),
 			},
 		},
 		'JOD' => {
-			symbol => 'JOD',
 			display_name => {
 				'currency' => q(ดีนาร์จอร์แดน),
-				'other' => q(ดีนาร์จอร์แดน),
 			},
 		},
 		'JPY' => {
 			symbol => '¥',
 			display_name => {
 				'currency' => q(เยนญี่ปุ่น),
-				'other' => q(เยนญี่ปุ่น),
 			},
 		},
 		'KES' => {
-			symbol => 'KES',
 			display_name => {
 				'currency' => q(ชิลลิงเคนยา),
-				'other' => q(ชิลลิงเคนยา),
 			},
 		},
 		'KGS' => {
-			symbol => 'KGS',
 			display_name => {
 				'currency' => q(ซอมคีร์กีซสถาน),
-				'other' => q(ซอมคีร์กีซสถาน),
 			},
 		},
 		'KHR' => {
-			symbol => 'KHR',
 			display_name => {
 				'currency' => q(เรียลกัมพูชา),
-				'other' => q(เรียลกัมพูชา),
 			},
 		},
 		'KMF' => {
-			symbol => 'KMF',
 			display_name => {
 				'currency' => q(ฟรังก์คอโมโรส),
-				'other' => q(ฟรังก์คอโมโรส),
 			},
 		},
 		'KPW' => {
-			symbol => 'KPW',
 			display_name => {
 				'currency' => q(วอนเกาหลีเหนือ),
-				'other' => q(วอนเกาหลีเหนือ),
 			},
 		},
 		'KRH' => {
-			symbol => 'KRH',
 			display_name => {
 				'currency' => q(ฮวานเกาหลีใต้ \(1953–1962\)),
 			},
 		},
 		'KRO' => {
-			symbol => 'KRO',
 			display_name => {
 				'currency' => q(วอนเกาหลีใต้ \(1945–1953\)),
 			},
 		},
 		'KRW' => {
-			symbol => '₩',
 			display_name => {
 				'currency' => q(วอนเกาหลีใต้),
-				'other' => q(วอนเกาหลีใต้),
 			},
 		},
 		'KWD' => {
-			symbol => 'KWD',
 			display_name => {
 				'currency' => q(ดีนาร์คูเวต),
-				'other' => q(ดีนาร์คูเวต),
 			},
 		},
 		'KYD' => {
-			symbol => 'KYD',
 			display_name => {
 				'currency' => q(ดอลลาร์หมู่เกาะเคย์แมน),
-				'other' => q(ดอลลาร์หมู่เกาะเคย์แมน),
 			},
 		},
 		'KZT' => {
-			symbol => 'KZT',
 			display_name => {
 				'currency' => q(เทงเจคาซัคสถาน),
-				'other' => q(เทงเจคาซัคสถาน),
 			},
 		},
 		'LAK' => {
-			symbol => 'LAK',
 			display_name => {
 				'currency' => q(กีบลาว),
-				'other' => q(กีบลาว),
 			},
 		},
 		'LBP' => {
-			symbol => 'LBP',
 			display_name => {
 				'currency' => q(ปอนด์เลบานอน),
-				'other' => q(ปอนด์เลบานอน),
 			},
 		},
 		'LKR' => {
-			symbol => 'LKR',
 			display_name => {
 				'currency' => q(รูปีศรีลังกา),
-				'other' => q(รูปีศรีลังกา),
 			},
 		},
 		'LRD' => {
-			symbol => 'LRD',
 			display_name => {
 				'currency' => q(ดอลลาร์ไลบีเรีย),
-				'other' => q(ดอลลาร์ไลบีเรีย),
 			},
 		},
 		'LSL' => {
-			symbol => 'LSL',
 			display_name => {
 				'currency' => q(โลตีเลโซโท),
 			},
 		},
 		'LTL' => {
-			symbol => 'LTL',
 			display_name => {
 				'currency' => q(ลีตัสลิทัวเนีย),
-				'other' => q(ลีตัสลิทัวเนีย),
 			},
 		},
 		'LTT' => {
-			symbol => 'LTT',
 			display_name => {
 				'currency' => q(ทาโลนัสลิทัวเนีย),
 			},
 		},
 		'LUC' => {
-			symbol => 'LUC',
 			display_name => {
 				'currency' => q(คอนเวอร์ทิเบิลฟรังก์ลักเซมเบิร์ก),
 			},
 		},
 		'LUF' => {
-			symbol => 'LUF',
 			display_name => {
 				'currency' => q(ฟรังก์ลักเซมเบิร์ก),
 			},
 		},
 		'LUL' => {
-			symbol => 'LUL',
 			display_name => {
 				'currency' => q(ไฟแนลเชียลฟรังก์ลักเซมเบิร์ก),
 			},
 		},
 		'LVL' => {
-			symbol => 'LVL',
 			display_name => {
 				'currency' => q(ลัตส์ลัตเวีย),
-				'other' => q(ลัตส์ลัตเวีย),
 			},
 		},
 		'LVR' => {
-			symbol => 'LVR',
 			display_name => {
 				'currency' => q(รูเบิลลัตเวีย),
 			},
 		},
 		'LYD' => {
-			symbol => 'LYD',
 			display_name => {
 				'currency' => q(ดีนาร์ลิเบีย),
-				'other' => q(ดีนาร์ลิเบีย),
 			},
 		},
 		'MAD' => {
-			symbol => 'MAD',
 			display_name => {
 				'currency' => q(ดีแรห์มโมร็อกโก),
-				'other' => q(ดีแรห์มโมร็อกโก),
 			},
 		},
 		'MAF' => {
-			symbol => 'MAF',
 			display_name => {
 				'currency' => q(ฟรังก์โมร็อกโก),
 			},
 		},
 		'MCF' => {
-			symbol => 'MCF',
 			display_name => {
 				'currency' => q(ฟรังก์โมนาโก),
 			},
 		},
 		'MDC' => {
-			symbol => 'MDC',
 			display_name => {
 				'currency' => q(บัตรปันส่วนมอลโดวา),
 			},
 		},
 		'MDL' => {
-			symbol => 'MDL',
 			display_name => {
 				'currency' => q(ลิวมอลโดวา),
-				'other' => q(ลิวมอลโดวา),
 			},
 		},
 		'MGA' => {
-			symbol => 'MGA',
 			display_name => {
 				'currency' => q(อาเรียรีมาลากาซี),
-				'other' => q(อาเรียรีมาลากาซี),
 			},
 		},
 		'MGF' => {
-			symbol => 'MGF',
 			display_name => {
 				'currency' => q(ฟรังก์มาดากัสการ์),
 			},
 		},
 		'MKD' => {
-			symbol => 'MKD',
 			display_name => {
 				'currency' => q(ดีนาร์มาซิโดเนีย),
-				'other' => q(ดีนาร์มาซิโดเนีย),
 			},
 		},
 		'MKN' => {
-			symbol => 'MKN',
 			display_name => {
 				'currency' => q(ดีนาร์มาซิโดเนีย \(1992–1993\)),
 			},
 		},
 		'MLF' => {
-			symbol => 'MLF',
 			display_name => {
 				'currency' => q(ฟรังก์มาลี),
 			},
 		},
 		'MMK' => {
-			symbol => 'MMK',
 			display_name => {
 				'currency' => q(จ๊าตพม่า),
-				'other' => q(จ๊าตพม่า),
 			},
 		},
 		'MNT' => {
-			symbol => 'MNT',
 			display_name => {
 				'currency' => q(ทูกริกมองโกเลีย),
-				'other' => q(ทูกริกมองโกเลีย),
 			},
 		},
 		'MOP' => {
-			symbol => 'MOP',
 			display_name => {
 				'currency' => q(ปาตากามาเก๊า),
-				'other' => q(ปาตากามาเก๊า),
 			},
 		},
 		'MRO' => {
-			symbol => 'MRO',
 			display_name => {
 				'currency' => q(อูกียามอริเตเนีย \(1973–2017\)),
-				'other' => q(อูกียามอริเตเนีย \(1973–2017\)),
 			},
 		},
 		'MRU' => {
-			symbol => 'MRU',
 			display_name => {
 				'currency' => q(อูกียามอริเตเนีย),
-				'other' => q(อูกียามอริเตเนีย),
 			},
 		},
 		'MTL' => {
-			symbol => 'MTL',
 			display_name => {
 				'currency' => q(ลีรามอลตา),
 			},
 		},
 		'MTP' => {
-			symbol => 'MTP',
 			display_name => {
 				'currency' => q(ปอนด์มอลตา),
 			},
 		},
 		'MUR' => {
-			symbol => 'MUR',
 			display_name => {
 				'currency' => q(รูปีมอริเชียส),
-				'other' => q(รูปีมอริเชียส),
 			},
 		},
 		'MVR' => {
-			symbol => 'MVR',
 			display_name => {
 				'currency' => q(รูฟิยามัลดีฟส์),
-				'other' => q(รูฟิยามัลดีฟส์),
 			},
 		},
 		'MWK' => {
-			symbol => 'MWK',
 			display_name => {
 				'currency' => q(ควาชามาลาวี),
-				'other' => q(ควาชามาลาวี),
 			},
 		},
 		'MXN' => {
-			symbol => 'MX$',
 			display_name => {
 				'currency' => q(เปโซเม็กซิโก),
-				'other' => q(เปโซเม็กซิโก),
 			},
 		},
 		'MXP' => {
-			symbol => 'MXP',
 			display_name => {
 				'currency' => q(เงินเปโซเม็กซิโก \(1861–1992\)),
 			},
 		},
 		'MXV' => {
-			symbol => 'MXV',
 			display_name => {
 				'currency' => q(ยูนิแดด ดี อินเวอร์ชั่น เม็กซิโก),
 			},
 		},
 		'MYR' => {
-			symbol => 'MYR',
 			display_name => {
 				'currency' => q(ริงกิตมาเลเซีย),
-				'other' => q(ริงกิตมาเลเซีย),
 			},
 		},
 		'MZE' => {
-			symbol => 'MZE',
 			display_name => {
 				'currency' => q(เอสคูโดโมซัมบิก),
 			},
 		},
 		'MZM' => {
-			symbol => 'MZM',
 			display_name => {
 				'currency' => q(เมติคัลโมซัมบิกเก่า),
 			},
 		},
 		'MZN' => {
-			symbol => 'MZN',
 			display_name => {
 				'currency' => q(เมติคัลโมซัมบิก),
-				'other' => q(เมติคัลโมซัมบิก),
 			},
 		},
 		'NAD' => {
-			symbol => 'NAD',
 			display_name => {
 				'currency' => q(ดอลลาร์นามิเบีย),
-				'other' => q(ดอลลาร์นามิเบีย),
 			},
 		},
 		'NGN' => {
-			symbol => 'NGN',
 			display_name => {
 				'currency' => q(ไนราไนจีเรีย),
-				'other' => q(ไนราไนจีเรีย),
 			},
 		},
 		'NIC' => {
-			symbol => 'NIC',
 			display_name => {
 				'currency' => q(คอร์โดบานิการากัว),
 			},
 		},
 		'NIO' => {
-			symbol => 'NIO',
 			display_name => {
 				'currency' => q(กอร์โดบานิการากัว),
-				'other' => q(กอร์โดบานิการากัว),
 			},
 		},
 		'NLG' => {
-			symbol => 'NLG',
 			display_name => {
 				'currency' => q(กิลเดอร์เนเธอร์แลนด์),
 			},
 		},
 		'NOK' => {
-			symbol => 'NOK',
 			display_name => {
 				'currency' => q(โครนนอร์เวย์),
-				'other' => q(โครนนอร์เวย์),
 			},
 		},
 		'NPR' => {
-			symbol => 'NPR',
 			display_name => {
 				'currency' => q(รูปีเนปาล),
-				'other' => q(รูปีเนปาล),
 			},
 		},
 		'NZD' => {
-			symbol => 'NZ$',
 			display_name => {
 				'currency' => q(ดอลลาร์นิวซีแลนด์),
-				'other' => q(ดอลลาร์นิวซีแลนด์),
 			},
 		},
 		'OMR' => {
-			symbol => 'OMR',
 			display_name => {
 				'currency' => q(เรียลโอมาน),
-				'other' => q(เรียลโอมาน),
 			},
 		},
 		'PAB' => {
-			symbol => 'PAB',
 			display_name => {
 				'currency' => q(บัลบัวปานามา),
-				'other' => q(บัลบัวปานามา),
 			},
 		},
 		'PEI' => {
-			symbol => 'PEI',
 			display_name => {
 				'currency' => q(อินตีเปรู),
 			},
 		},
 		'PEN' => {
-			symbol => 'PEN',
 			display_name => {
 				'currency' => q(ซอลเปรู),
-				'other' => q(ซอลเปรู),
 			},
 		},
 		'PES' => {
-			symbol => 'PES',
 			display_name => {
 				'currency' => q(ซอลเปรู \(1863–1965\)),
 				'other' => q(ซอลเปรู\(1863–1965\)),
 			},
 		},
 		'PGK' => {
-			symbol => 'PGK',
 			display_name => {
 				'currency' => q(กีนาปาปัวนิวกินี),
-				'other' => q(กีนาปาปัวนิวกินี),
 			},
 		},
 		'PHP' => {
 			symbol => 'PHP',
 			display_name => {
 				'currency' => q(เปโซฟิลิปปินส์),
-				'other' => q(เปโซฟิลิปปินส์),
 			},
 		},
 		'PKR' => {
-			symbol => 'PKR',
 			display_name => {
 				'currency' => q(รูปีปากีสถาน),
-				'other' => q(รูปีปากีสถาน),
 			},
 		},
 		'PLN' => {
-			symbol => 'PLN',
 			display_name => {
 				'currency' => q(ซลอตีโปแลนด์),
-				'other' => q(ซลอตีโปแลนด์),
 			},
 		},
 		'PLZ' => {
-			symbol => 'PLZ',
 			display_name => {
 				'currency' => q(ซลอตีโปแลนด์ \(1950–1995\)),
 			},
 		},
 		'PTE' => {
-			symbol => 'PTE',
 			display_name => {
 				'currency' => q(เอสคูโดโปรตุเกส),
 			},
 		},
 		'PYG' => {
-			symbol => 'PYG',
 			display_name => {
 				'currency' => q(กวารานีปารากวัย),
-				'other' => q(กวารานีปารากวัย),
 			},
 		},
 		'QAR' => {
-			symbol => 'QAR',
 			display_name => {
 				'currency' => q(เรียลกาตาร์),
-				'other' => q(เรียลกาตาร์),
 			},
 		},
 		'RHD' => {
-			symbol => 'RHD',
 			display_name => {
 				'currency' => q(ดอลลาร์โรดีเซีย),
 			},
 		},
 		'ROL' => {
-			symbol => 'ROL',
 			display_name => {
 				'currency' => q(ลิวโรมาเนียเก่า),
 			},
 		},
 		'RON' => {
-			symbol => 'RON',
 			display_name => {
 				'currency' => q(ลิวโรมาเนีย),
-				'other' => q(ลิวโรมาเนีย),
 			},
 		},
 		'RSD' => {
-			symbol => 'RSD',
 			display_name => {
 				'currency' => q(ดีนาร์เซอร์เบีย),
-				'other' => q(ดีนาร์เซอร์เบีย),
 			},
 		},
 		'RUB' => {
-			symbol => 'RUB',
+			symbol => '₽',
 			display_name => {
 				'currency' => q(รูเบิลรัสเซีย),
-				'other' => q(รูเบิลรัสเซีย),
 			},
 		},
 		'RUR' => {
-			symbol => 'RUR',
 			display_name => {
 				'currency' => q(รูเบิลรัสเซีย \(1991–1998\)),
 			},
 		},
 		'RWF' => {
-			symbol => 'RWF',
 			display_name => {
 				'currency' => q(ฟรังก์รวันดา),
-				'other' => q(ฟรังก์รวันดา),
 			},
 		},
 		'SAR' => {
-			symbol => 'SAR',
 			display_name => {
 				'currency' => q(ริยัลซาอุดีอาระเบีย),
-				'other' => q(ริยัลซาอุดีอาระเบีย),
 			},
 		},
 		'SBD' => {
-			symbol => 'SBD',
 			display_name => {
 				'currency' => q(ดอลลาร์หมู่เกาะโซโลมอน),
-				'other' => q(ดอลลาร์หมู่เกาะโซโลมอน),
 			},
 		},
 		'SCR' => {
-			symbol => 'SCR',
 			display_name => {
 				'currency' => q(รูปีเซเชลส์),
-				'other' => q(รูปีเซเชลส์),
 			},
 		},
 		'SDD' => {
-			symbol => 'SDD',
 			display_name => {
 				'currency' => q(ดีนาร์ซูดานเก่า),
 			},
 		},
 		'SDG' => {
-			symbol => 'SDG',
 			display_name => {
 				'currency' => q(ปอนด์ซูดาน),
-				'other' => q(ปอนด์ซูดาน),
 			},
 		},
 		'SDP' => {
-			symbol => 'SDP',
 			display_name => {
 				'currency' => q(ปอนด์ซูดานเก่า),
 			},
 		},
 		'SEK' => {
-			symbol => 'SEK',
 			display_name => {
 				'currency' => q(โครนาสวีเดน),
-				'other' => q(โครนาสวีเดน),
 			},
 		},
 		'SGD' => {
-			symbol => 'SGD',
 			display_name => {
 				'currency' => q(ดอลลาร์สิงคโปร์),
-				'other' => q(ดอลลาร์สิงคโปร์),
 			},
 		},
 		'SHP' => {
-			symbol => 'SHP',
 			display_name => {
 				'currency' => q(ปอนด์เซนต์เฮเลนา),
-				'other' => q(ปอนด์เซนต์เฮเลนา),
 			},
 		},
 		'SIT' => {
-			symbol => 'SIT',
 			display_name => {
 				'currency' => q(ทอลาร์สโลวีเนีย),
 			},
 		},
 		'SKK' => {
-			symbol => 'SKK',
 			display_name => {
 				'currency' => q(โครูนาสโลวัก),
 			},
 		},
-		'SLL' => {
-			symbol => 'SLL',
+		'SLE' => {
 			display_name => {
 				'currency' => q(ลีโอนเซียร์ราลีโอน),
-				'other' => q(ลีโอนเซียร์ราลีโอน),
+			},
+		},
+		'SLL' => {
+			display_name => {
+				'currency' => q(ลีโอนเซียร์ราลีโอน \(1964—2022\)),
 			},
 		},
 		'SOS' => {
-			symbol => 'SOS',
 			display_name => {
 				'currency' => q(ชิลลิงโซมาเลีย),
-				'other' => q(ชิลลิงโซมาเลีย),
 			},
 		},
 		'SRD' => {
-			symbol => 'SRD',
 			display_name => {
 				'currency' => q(ดอลลาร์ซูรินาเม),
-				'other' => q(ดอลลาร์ซูรินาเม),
 			},
 		},
 		'SRG' => {
-			symbol => 'SRG',
 			display_name => {
 				'currency' => q(กิลเดอร์ซูรินาเม),
 			},
 		},
 		'SSP' => {
-			symbol => 'SSP',
 			display_name => {
 				'currency' => q(ปอนด์ซูดานใต้),
-				'other' => q(ปอนด์ซูดานใต้),
 			},
 		},
 		'STD' => {
-			symbol => 'STD',
 			display_name => {
 				'currency' => q(ดอบราเซาตูเมและปรินซิปี \(1977–2017\)),
-				'other' => q(ดอบราเซาตูเมและปรินซิปี \(1977–2017\)),
 			},
 		},
 		'STN' => {
-			symbol => 'STN',
 			display_name => {
 				'currency' => q(ดอบราเซาตูเมและปรินซิปี),
-				'other' => q(ดอบราเซาตูเมและปรินซิปี),
 			},
 		},
 		'SUR' => {
-			symbol => 'SUR',
 			display_name => {
 				'currency' => q(รูเบิลโซเวียต),
 			},
 		},
 		'SVC' => {
-			symbol => 'SVC',
 			display_name => {
 				'currency' => q(โคลอนเอลซัลวาดอร์),
 			},
 		},
 		'SYP' => {
-			symbol => 'SYP',
 			display_name => {
 				'currency' => q(ปอนด์ซีเรีย),
-				'other' => q(ปอนด์ซีเรีย),
 			},
 		},
 		'SZL' => {
-			symbol => 'SZL',
 			display_name => {
 				'currency' => q(ลิลันเจนีสวาซิ),
-				'other' => q(ลิลันเจนีสวาซิ),
 			},
 		},
 		'THB' => {
@@ -9428,325 +7619,253 @@ has 'currencies' => (
 			},
 		},
 		'TJR' => {
-			symbol => 'TJR',
 			display_name => {
 				'currency' => q(รูเบิลทาจิกิสถาน),
 			},
 		},
 		'TJS' => {
-			symbol => 'TJS',
 			display_name => {
 				'currency' => q(โซโมนิทาจิกิสถาน),
-				'other' => q(โซโมนิทาจิกิสถาน),
 			},
 		},
 		'TMM' => {
-			symbol => 'TMM',
 			display_name => {
 				'currency' => q(มานัตเติร์กเมนิสถาน \(1993–2009\)),
 			},
 		},
 		'TMT' => {
-			symbol => 'TMT',
 			display_name => {
 				'currency' => q(มานัตเติร์กเมนิสถาน),
-				'other' => q(มานัตเติร์กเมนิสถาน),
 			},
 		},
 		'TND' => {
-			symbol => 'TND',
 			display_name => {
 				'currency' => q(ดีนาร์ตูนิเซีย),
-				'other' => q(ดีนาร์ตูนิเซีย),
 			},
 		},
 		'TOP' => {
-			symbol => 'TOP',
 			display_name => {
 				'currency' => q(พาแองกาตองกา),
-				'other' => q(พาแองกาตองกา),
 			},
 		},
 		'TPE' => {
-			symbol => 'TPE',
 			display_name => {
 				'currency' => q(เอสคูโดติมอร์),
 			},
 		},
 		'TRL' => {
-			symbol => 'TRL',
 			display_name => {
 				'currency' => q(ลีราตุรกีเก่า),
 			},
 		},
 		'TRY' => {
-			symbol => 'TRY',
 			display_name => {
 				'currency' => q(ลีราตุรกี),
-				'other' => q(ลีราตุรกี),
 			},
 		},
 		'TTD' => {
-			symbol => 'TTD',
 			display_name => {
 				'currency' => q(ดอลลาร์ตรินิแดดและโตเบโก),
-				'other' => q(ดอลลาร์ตรินิแดดและโตเบโก),
 			},
 		},
 		'TWD' => {
 			symbol => 'NT$',
 			display_name => {
 				'currency' => q(ดอลลาร์ไต้หวันใหม่),
-				'other' => q(ดอลลาร์ไต้หวันใหม่),
 			},
 		},
 		'TZS' => {
-			symbol => 'TZS',
 			display_name => {
 				'currency' => q(ชิลลิงแทนซาเนีย),
-				'other' => q(ชิลลิงแทนซาเนีย),
 			},
 		},
 		'UAH' => {
-			symbol => 'UAH',
 			display_name => {
 				'currency' => q(ฮรีฟเนียยูเครน),
-				'other' => q(ฮรีฟเนียยูเครน),
 			},
 		},
 		'UAK' => {
-			symbol => 'UAK',
 			display_name => {
 				'currency' => q(คาร์โบวาเนตซ์ยูเครน),
 			},
 		},
 		'UGS' => {
-			symbol => 'UGS',
 			display_name => {
 				'currency' => q(ชิลลิงยูกันดา \(1966–1987\)),
 			},
 		},
 		'UGX' => {
-			symbol => 'UGX',
 			display_name => {
 				'currency' => q(ชิลลิงยูกันดา),
-				'other' => q(ชิลลิงยูกันดา),
 			},
 		},
 		'USD' => {
-			symbol => 'US$',
 			display_name => {
 				'currency' => q(ดอลลาร์สหรัฐ),
-				'other' => q(ดอลลาร์สหรัฐ),
 			},
 		},
 		'USN' => {
-			symbol => 'USN',
 			display_name => {
 				'currency' => q(ดอลลาร์สหรัฐ \(วันถัดไป\)),
-				'other' => q(ดอลลาร์สหรัฐ \(วันถัดไป\)),
 			},
 		},
 		'USS' => {
-			symbol => 'USS',
 			display_name => {
 				'currency' => q(ดอลลาร์สหรัฐ \(วันเดียวกัน\)),
-				'other' => q(ดอลลาร์สหรัฐ \(วันเดียวกัน\)),
 			},
 		},
 		'UYI' => {
-			symbol => 'UYI',
 			display_name => {
 				'currency' => q(เปโซเอนยูนิแดดเซสอินเด็กซาแดสอุรุกวัย),
 			},
 		},
 		'UYP' => {
-			symbol => 'UYP',
 			display_name => {
 				'currency' => q(เปโซอุรุกวัย \(1975–1993\)),
 			},
 		},
 		'UYU' => {
-			symbol => 'UYU',
 			display_name => {
 				'currency' => q(เปโซอุรุกวัย),
-				'other' => q(เปโซอุรุกวัย),
 			},
 		},
 		'UZS' => {
-			symbol => 'UZS',
 			display_name => {
 				'currency' => q(ซอมอุซเบกิสถาน),
-				'other' => q(ซอมอุซเบกิสถาน),
 			},
 		},
 		'VEB' => {
-			symbol => 'VEB',
 			display_name => {
 				'currency' => q(โบลิวาร์เวเนซุเอลา \(1871–2008\)),
 			},
 		},
 		'VEF' => {
-			symbol => 'VEF',
 			display_name => {
 				'currency' => q(โบลิวาร์เวเนซุเอลา),
-				'other' => q(โบลิวาร์เวเนซุเอลา),
 			},
 		},
 		'VES' => {
-			symbol => 'VES',
 			display_name => {
 				'currency' => q(โบลีวาร์เวเนซุเอลา),
 				'other' => q(โบลีวาร์แห่งเวเนซุเอลา),
 			},
 		},
 		'VND' => {
-			symbol => '₫',
 			display_name => {
 				'currency' => q(ดองเวียดนาม),
-				'other' => q(ดองเวียดนาม),
 			},
 		},
 		'VNN' => {
-			symbol => 'VNN',
 			display_name => {
 				'currency' => q(ดองเวียดนาม \(1978–1985\)),
 			},
 		},
 		'VUV' => {
-			symbol => 'VUV',
 			display_name => {
 				'currency' => q(วาตูวานูอาตู),
-				'other' => q(วาตูวานูอาตู),
 			},
 		},
 		'WST' => {
-			symbol => 'WST',
 			display_name => {
 				'currency' => q(ทาลาซามัว),
-				'other' => q(ทาลาซามัว),
 			},
 		},
 		'XAF' => {
-			symbol => 'FCFA',
 			display_name => {
 				'currency' => q(ฟรังก์เซฟาธนาคารรัฐแอฟริกากลาง),
-				'other' => q(ฟรังก์เซฟาธนาคารรัฐแอฟริกากลาง),
 			},
 		},
 		'XAG' => {
-			symbol => 'XAG',
 			display_name => {
 				'currency' => q(เงิน),
 			},
 		},
 		'XAU' => {
-			symbol => 'XAU',
 			display_name => {
 				'currency' => q(ทอง),
 			},
 		},
 		'XBA' => {
-			symbol => 'XBA',
 			display_name => {
 				'currency' => q(หน่วยคอมโพสิตยุโรป),
 			},
 		},
 		'XBB' => {
-			symbol => 'XBB',
 			display_name => {
 				'currency' => q(หน่วยโมเนทารียุโรป),
 			},
 		},
 		'XBC' => {
-			symbol => 'XBC',
 			display_name => {
 				'currency' => q(หน่วยบัญชียุโรป [XBC]),
 			},
 		},
 		'XBD' => {
-			symbol => 'XBD',
 			display_name => {
 				'currency' => q(หน่วยบัญชียุโรป [XBD]),
 			},
 		},
 		'XCD' => {
-			symbol => 'EC$',
 			display_name => {
 				'currency' => q(ดอลลาร์แคริบเบียนตะวันออก),
-				'other' => q(ดอลลาร์แคริบเบียนตะวันออก),
 			},
 		},
 		'XDR' => {
-			symbol => 'XDR',
 			display_name => {
 				'currency' => q(สิทธิถอนเงินพิเศษ),
 			},
 		},
 		'XEU' => {
-			symbol => 'XEU',
 			display_name => {
 				'currency' => q(หน่วยสกุลเงินยุโรป),
 			},
 		},
 		'XFO' => {
-			symbol => 'XFO',
 			display_name => {
 				'currency' => q(ฟรังก์ทองฝรั่งเศส),
 			},
 		},
 		'XFU' => {
-			symbol => 'XFU',
 			display_name => {
 				'currency' => q(ฟรังก์ยูไอซีฝรั่งเศส),
 			},
 		},
 		'XOF' => {
-			symbol => 'F CFA',
 			display_name => {
 				'currency' => q(ฟรังก์เซฟาธนาคารกลางรัฐแอฟริกาตะวันตก),
-				'other' => q(ฟรังก์เซฟาธนาคารกลางรัฐแอฟริกาตะวันตก),
 			},
 		},
 		'XPD' => {
-			symbol => 'XPD',
 			display_name => {
 				'currency' => q(พัลเลเดียม),
 			},
 		},
 		'XPF' => {
-			symbol => 'CFPF',
 			display_name => {
 				'currency' => q(ฟรังก์ซีเอฟพี),
-				'other' => q(ฟรังก์ซีเอฟพี),
 			},
 		},
 		'XPT' => {
-			symbol => 'XPT',
 			display_name => {
 				'currency' => q(แพลตินัม),
 			},
 		},
 		'XRE' => {
-			symbol => 'XRE',
 			display_name => {
 				'currency' => q(กองทุนไรเน็ต),
 			},
 		},
 		'XSU' => {
-			symbol => 'XSU',
 			display_name => {
 				'currency' => q(ซูเกร),
 			},
 		},
 		'XTS' => {
-			symbol => 'XTS',
 			display_name => {
 				'currency' => q(รหัสทดสอบสกุลเงิน),
 			},
 		},
 		'XUA' => {
-			symbol => 'XUA',
 			display_name => {
 				'currency' => q(หน่วยบัญชี เอดีบี),
 			},
@@ -9759,94 +7878,76 @@ has 'currencies' => (
 			},
 		},
 		'YDD' => {
-			symbol => 'YDD',
 			display_name => {
 				'currency' => q(ดีนาร์เยเมน),
 			},
 		},
 		'YER' => {
-			symbol => 'YER',
 			display_name => {
 				'currency' => q(เรียลเยเมน),
-				'other' => q(เรียลเยเมน),
 			},
 		},
 		'YUD' => {
-			symbol => 'YUD',
 			display_name => {
 				'currency' => q(ฮาร์ดดีนาร์ยูโกสลาเวีย),
 			},
 		},
 		'YUM' => {
-			symbol => 'YUM',
 			display_name => {
 				'currency' => q(โนวิย์ดีนาร์ยูโกสลาเวีย),
 			},
 		},
 		'YUN' => {
-			symbol => 'YUN',
 			display_name => {
 				'currency' => q(คอนเวอร์ทิเบิลดีนาร์ยูโกสลาเวีย),
 			},
 		},
 		'YUR' => {
-			symbol => 'YUR',
 			display_name => {
 				'currency' => q(ดีนาร์ปฏิรูปยูโกสลาเวีย \(1992–1993\)),
 			},
 		},
 		'ZAL' => {
-			symbol => 'ZAL',
 			display_name => {
 				'currency' => q(แรนด์แอฟริกาใต้ \(การเงิน\)),
 			},
 		},
 		'ZAR' => {
-			symbol => 'ZAR',
 			display_name => {
 				'currency' => q(แรนด์แอฟริกาใต้),
-				'other' => q(แรนด์แอฟริกาใต้),
 			},
 		},
 		'ZMK' => {
-			symbol => 'ZMK',
 			display_name => {
 				'currency' => q(ควาชาแซมเบีย \(1968–2012\)),
 			},
 		},
 		'ZMW' => {
-			symbol => 'ZMW',
 			display_name => {
 				'currency' => q(ควาชาแซมเบีย),
-				'other' => q(ควาชาแซมเบีย),
 			},
 		},
 		'ZRN' => {
-			symbol => 'ZRN',
 			display_name => {
 				'currency' => q(นิวแซร์คองโก),
 			},
 		},
 		'ZRZ' => {
-			symbol => 'ZRZ',
 			display_name => {
 				'currency' => q(แซร์คองโก),
 			},
 		},
 		'ZWD' => {
-			symbol => 'ZWD',
 			display_name => {
 				'currency' => q(ดอลลาร์ซิมบับเว),
 			},
 		},
 		'ZWL' => {
-			symbol => 'ZWL',
 			display_name => {
 				'currency' => q(ดอลลาร์ซิมบับเว \(2009\)),
 			},
 		},
 		'ZWR' => {
-			symbol => 'ZWR',
 			display_name => {
 				'currency' => q(ดอลลาร์ซิมบับเว \(2008\)),
 			},
@@ -9862,103 +7963,6 @@ has 'calendar_months' => (
 	default		=> sub { {
 			'chinese' => {
 				'format' => {
-					abbreviated => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'1',
@@ -9982,46 +7986,6 @@ has 'calendar_months' => (
 			},
 			'coptic' => {
 				'format' => {
-					abbreviated => {
-						nonleap => [
-							'เทาท์',
-							'บาบา',
-							'ฮาเทอร์',
-							'เคียฟ',
-							'โทบา',
-							'อัมเชอร์',
-							'บารัมฮัท',
-							'บาราเมาดา',
-							'บาชันส์',
-							'พาโอนา',
-							'อีเปป',
-							'เมสรา',
-							'นาซี'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12',
-							'13'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'เทาท์',
@@ -10037,188 +8001,6 @@ has 'calendar_months' => (
 							'อีเปป',
 							'เมสรา',
 							'นาซี'
-						],
-						leap => [
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'เทาท์',
-							'บาบา',
-							'ฮาเทอร์',
-							'เคียฟ',
-							'โทบา',
-							'อัมเชอร์',
-							'บารัมฮัท',
-							'บาราเมาดา',
-							'บาชันส์',
-							'พาโอนา',
-							'อีเปป',
-							'เมสรา',
-							'นาซี'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12',
-							'13'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'เทาท์',
-							'บาบา',
-							'ฮาเทอร์',
-							'เคียฟ',
-							'โทบา',
-							'อัมเชอร์',
-							'บารัมฮัท',
-							'บาราเมาดา',
-							'บาชันส์',
-							'พาโอนา',
-							'อีเปป',
-							'เมสรา',
-							'นาซี'
-						],
-						leap => [
-							
-						],
-					},
-				},
-			},
-			'dangi' => {
-				'format' => {
-					abbreviated => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
 						],
 						leap => [
 							
@@ -10228,108 +8010,6 @@ has 'calendar_months' => (
 			},
 			'ethiopic' => {
 				'format' => {
-					abbreviated => {
-						nonleap => [
-							'เมสเคอเรม',
-							'เตเกมท',
-							'เฮดาร์',
-							'ทาฮ์ซัส',
-							'เทอร์',
-							'เยคาทิท',
-							'เมกาบิต',
-							'เมียเซีย',
-							'เจนบอต',
-							'เซเน',
-							'ฮัมเล',
-							'เนแฮซ',
-							'พากูเมน'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12',
-							'13'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'เมสเคอเรม',
-							'เตเกมท',
-							'เฮดาร์',
-							'ทาฮ์ซัส',
-							'เทอร์',
-							'เยคาทิท',
-							'เมกาบิต',
-							'เมียเซีย',
-							'เจนบอต',
-							'เซเน',
-							'ฮัมเล',
-							'เนแฮซ',
-							'พากูเมน'
-						],
-						leap => [
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'เมสเคอเรม',
-							'เตเกมท',
-							'เฮดาร์',
-							'ทาฮ์ซัส',
-							'เทอร์',
-							'เยคาทิท',
-							'เมกาบิต',
-							'เมียเซีย',
-							'เจนบอต',
-							'เซเน',
-							'ฮัมเล',
-							'เนแฮซ',
-							'พากูเมน'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12',
-							'13'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'เมสเคอเรม',
@@ -10373,25 +8053,6 @@ has 'calendar_months' => (
 							
 						],
 					},
-					narrow => {
-						nonleap => [
-							'ม.ค.',
-							'ก.พ.',
-							'มี.ค.',
-							'เม.ย.',
-							'พ.ค.',
-							'มิ.ย.',
-							'ก.ค.',
-							'ส.ค.',
-							'ก.ย.',
-							'ต.ค.',
-							'พ.ย.',
-							'ธ.ค.'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'มกราคม',
@@ -10413,25 +8074,6 @@ has 'calendar_months' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'ม.ค.',
-							'ก.พ.',
-							'มี.ค.',
-							'เม.ย.',
-							'พ.ค.',
-							'มิ.ย.',
-							'ก.ค.',
-							'ส.ค.',
-							'ก.ย.',
-							'ต.ค.',
-							'พ.ย.',
-							'ธ.ค.'
-						],
-						leap => [
-							
-						],
-					},
 					narrow => {
 						nonleap => [
 							'ม.ค.',
@@ -10446,25 +8088,6 @@ has 'calendar_months' => (
 							'ต.ค.',
 							'พ.ย.',
 							'ธ.ค.'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'มกราคม',
-							'กุมภาพันธ์',
-							'มีนาคม',
-							'เมษายน',
-							'พฤษภาคม',
-							'มิถุนายน',
-							'กรกฎาคม',
-							'สิงหาคม',
-							'กันยายน',
-							'ตุลาคม',
-							'พฤศจิกายน',
-							'ธันวาคม'
 						],
 						leap => [
 							
@@ -10474,138 +8097,6 @@ has 'calendar_months' => (
 			},
 			'hebrew' => {
 				'format' => {
-					abbreviated => {
-						nonleap => [
-							'ทิชรี',
-							'เฮวาน',
-							'กีสเลฟ',
-							'เตเวต',
-							'เชวัต',
-							'อาดาร์ I',
-							'อาดาร์',
-							'นิสซาน',
-							'อิยาร์',
-							'สีวัน',
-							'ตามูซ',
-							'อัฟ',
-							'เอลอุล'
-						],
-						leap => [
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12',
-							'13'
-						],
-						leap => [
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'ทิชรี',
-							'เฮวาน',
-							'กีสเลฟ',
-							'เตเวต',
-							'เชวัต',
-							'อาดาร์ I',
-							'อาดาร์',
-							'นิสซาน',
-							'อิยาร์',
-							'สีวัน',
-							'ตามูซ',
-							'อัฟ',
-							'เอลอุล'
-						],
-						leap => [
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'ทิชรี',
-							'เฮวาน',
-							'กีสเลฟ',
-							'เตเวต',
-							'เชวัต',
-							'อาดาร์ I',
-							'อาดาร์',
-							'นิสซาน',
-							'อิยาร์',
-							'สีวัน',
-							'ตามูซ',
-							'อัฟ',
-							'เอลอุล'
-						],
-						leap => [
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12',
-							'13'
-						],
-						leap => [
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'ทิชรี',
@@ -10636,103 +8127,6 @@ has 'calendar_months' => (
 			},
 			'indian' => {
 				'format' => {
-					abbreviated => {
-						nonleap => [
-							'จิตรา',
-							'วิสาขา',
-							'เชษฐา',
-							'อัษฎา',
-							'ศรวณา',
-							'พัตรา',
-							'อัศวิชา',
-							'การติกา',
-							'มฤคศิรา',
-							'ปุษยา',
-							'มาฆะ',
-							'ผลคุณี'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'จิตรา',
-							'วิสาขา',
-							'เชษฐา',
-							'อัษฎา',
-							'ศรวณา',
-							'พัตรา',
-							'อัศวิชา',
-							'การติกา',
-							'มฤคศิรา',
-							'ปุษยา',
-							'มาฆะ',
-							'ผลคุณี'
-						],
-						leap => [
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'จิตรา',
-							'วิสาขา',
-							'เชษฐา',
-							'อัษฎา',
-							'ศรวณา',
-							'พัตรา',
-							'อัศวิชา',
-							'การติกา',
-							'มฤคศิรา',
-							'ปุษยา',
-							'มาฆะ',
-							'ผลคุณี'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'จิตรา',
@@ -10775,84 +8169,6 @@ has 'calendar_months' => (
 							
 						],
 					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'มุฮะร์รอม',
-							'ซอฟาร์',
-							'รอบี I',
-							'รอบี II',
-							'จุมาดา I',
-							'จุมาดา II',
-							'รอจับ',
-							'ชะอะบาน',
-							'รอมะดอน',
-							'เชาวัล',
-							'ซุลกิอฺดะฮฺ',
-							'ซุลหิจญะฮฺ'
-						],
-						leap => [
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'มุฮัร.',
-							'เศาะ.',
-							'รอบี I',
-							'รอบี II',
-							'จุมาดา I',
-							'จุมาดา II',
-							'เราะ.',
-							'ชะอ์.',
-							'เราะมะ.',
-							'เชาว.',
-							'ซุลกิอฺ.',
-							'ซุลหิจ.'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'มุฮะร์รอม',
@@ -10876,103 +8192,6 @@ has 'calendar_months' => (
 			},
 			'persian' => {
 				'format' => {
-					abbreviated => {
-						nonleap => [
-							'ฟาร์วาร์ดิน',
-							'ออร์ดิเบเฮชต์',
-							'คอร์แดด',
-							'เตอร์',
-							'มอร์แดด',
-							'ชาหริวาร์',
-							'เมฮร์',
-							'อะบาน',
-							'อะซาร์',
-							'เดย์',
-							'บาฮ์มาน',
-							'เอสฟานด์'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'ฟาร์วาร์ดิน',
-							'ออร์ดิเบเฮชต์',
-							'คอร์แดด',
-							'เตอร์',
-							'มอร์แดด',
-							'ชาหริวาร์',
-							'เมฮร์',
-							'อะบาน',
-							'อะซาร์',
-							'เดย์',
-							'บาฮ์มาน',
-							'เอสฟานด์'
-						],
-						leap => [
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'ฟาร์วาร์ดิน',
-							'ออร์ดิเบเฮชต์',
-							'คอร์แดด',
-							'เตอร์',
-							'มอร์แดด',
-							'ชาหริวาร์',
-							'เมฮร์',
-							'อะบาน',
-							'อะซาร์',
-							'เดย์',
-							'บาฮ์มาน',
-							'เอสฟานด์'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'ฟาร์วาร์ดิน',
@@ -11013,24 +8232,6 @@ has 'calendar_days' => (
 						sat => 'ส.',
 						sun => 'อา.'
 					},
-					narrow => {
-						mon => 'จ',
-						tue => 'อ',
-						wed => 'พ',
-						thu => 'พฤ',
-						fri => 'ศ',
-						sat => 'ส',
-						sun => 'อา'
-					},
-					short => {
-						mon => 'จ.',
-						tue => 'อ.',
-						wed => 'พ.',
-						thu => 'พฤ.',
-						fri => 'ศ.',
-						sat => 'ส.',
-						sun => 'อา.'
-					},
 					wide => {
 						mon => 'วันจันทร์',
 						tue => 'วันอังคาร',
@@ -11042,15 +8243,6 @@ has 'calendar_days' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						mon => 'จ.',
-						tue => 'อ.',
-						wed => 'พ.',
-						thu => 'พฤ.',
-						fri => 'ศ.',
-						sat => 'ส.',
-						sun => 'อา.'
-					},
 					narrow => {
 						mon => 'จ',
 						tue => 'อ',
@@ -11059,24 +8251,6 @@ has 'calendar_days' => (
 						fri => 'ศ',
 						sat => 'ส',
 						sun => 'อา'
-					},
-					short => {
-						mon => 'จ.',
-						tue => 'อ.',
-						wed => 'พ.',
-						thu => 'พฤ.',
-						fri => 'ศ.',
-						sat => 'ส.',
-						sun => 'อา.'
-					},
-					wide => {
-						mon => 'วันจันทร์',
-						tue => 'วันอังคาร',
-						wed => 'วันพุธ',
-						thu => 'วันพฤหัสบดี',
-						fri => 'วันศุกร์',
-						sat => 'วันเสาร์',
-						sun => 'วันอาทิตย์'
 					},
 				},
 			},
@@ -11090,33 +8264,6 @@ has 'calendar_quarters' => (
 	default		=> sub { {
 			'gregorian' => {
 				'format' => {
-					abbreviated => {0 => 'ไตรมาส 1',
-						1 => 'ไตรมาส 2',
-						2 => 'ไตรมาส 3',
-						3 => 'ไตรมาส 4'
-					},
-					narrow => {0 => '1',
-						1 => '2',
-						2 => '3',
-						3 => '4'
-					},
-					wide => {0 => 'ไตรมาส 1',
-						1 => 'ไตรมาส 2',
-						2 => 'ไตรมาส 3',
-						3 => 'ไตรมาส 4'
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {0 => 'ไตรมาส 1',
-						1 => 'ไตรมาส 2',
-						2 => 'ไตรมาส 3',
-						3 => 'ไตรมาส 4'
-					},
-					narrow => {0 => '1',
-						1 => '2',
-						2 => '3',
-						3 => '4'
-					},
 					wide => {0 => 'ไตรมาส 1',
 						1 => 'ไตรมาส 2',
 						2 => 'ไตรมาส 3',
@@ -11585,14 +8732,12 @@ has 'day_periods' => (
 				'abbreviated' => {
 					'afternoon1' => q{ในตอนบ่าย},
 					'afternoon2' => q{บ่าย},
-					'am' => q{ก่อนเที่ยง},
 					'evening1' => q{ในตอนเย็น},
 					'evening2' => q{ค่ำ},
 					'midnight' => q{เที่ยงคืน},
 					'morning1' => q{ในตอนเช้า},
 					'night1' => q{กลางคืน},
 					'noon' => q{เที่ยง},
-					'pm' => q{หลังเที่ยง},
 				},
 				'narrow' => {
 					'afternoon1' => q{เที่ยง},
@@ -11607,54 +8752,36 @@ has 'day_periods' => (
 					'pm' => q{p},
 				},
 				'wide' => {
-					'afternoon1' => q{ในตอนบ่าย},
-					'afternoon2' => q{บ่าย},
 					'am' => q{ก่อนเที่ยง},
-					'evening1' => q{ในตอนเย็น},
-					'evening2' => q{ค่ำ},
-					'midnight' => q{เที่ยงคืน},
-					'morning1' => q{ในตอนเช้า},
-					'night1' => q{กลางคืน},
-					'noon' => q{เที่ยง},
 					'pm' => q{หลังเที่ยง},
 				},
 			},
 			'stand-alone' => {
 				'abbreviated' => {
-					'afternoon1' => q{ในตอนบ่าย},
+					'afternoon1' => q{ตอนบ่าย},
 					'afternoon2' => q{บ่าย},
 					'am' => q{ก่อนเที่ยง},
-					'evening1' => q{ในตอนเย็น},
+					'evening1' => q{ตอนเย็น},
 					'evening2' => q{ค่ำ},
-					'midnight' => q{เที่ยงคืน},
-					'morning1' => q{ในตอนเช้า},
+					'morning1' => q{ตอนเช้า},
 					'night1' => q{กลางคืน},
-					'noon' => q{เที่ยง},
 					'pm' => q{หลังเที่ยง},
 				},
 				'narrow' => {
 					'afternoon1' => q{ช่วงเที่ยง},
 					'afternoon2' => q{บ่าย},
-					'am' => q{ก่อนเที่ยง},
 					'evening1' => q{เย็น},
 					'evening2' => q{ค่ำ},
-					'midnight' => q{เที่ยงคืน},
 					'morning1' => q{เช้า},
 					'night1' => q{กลางคืน},
-					'noon' => q{เที่ยง},
-					'pm' => q{หลังเที่ยง},
 				},
 				'wide' => {
 					'afternoon1' => q{ในตอนบ่าย},
 					'afternoon2' => q{บ่าย},
-					'am' => q{ก่อนเที่ยง},
 					'evening1' => q{ในตอนเย็น},
 					'evening2' => q{ค่ำ},
-					'midnight' => q{เที่ยงคืน},
 					'morning1' => q{ในตอนเช้า},
 					'night1' => q{กลางคืน},
-					'noon' => q{เที่ยง},
-					'pm' => q{หลังเที่ยง},
 				},
 			},
 		},
@@ -11686,10 +8813,6 @@ has 'eras' => (
 		},
 		'gregorian' => {
 			abbreviated => {
-				'0' => 'ก่อน ค.ศ.',
-				'1' => 'ค.ศ.'
-			},
-			narrow => {
 				'0' => 'ก่อน ค.ศ.',
 				'1' => 'ค.ศ.'
 			},
@@ -11991,10 +9114,6 @@ has 'date_formats' => (
 		'coptic' => {
 		},
 		'dangi' => {
-			'full' => q{EEEE, U MMMM d},
-			'long' => q{U MMMM d},
-			'medium' => q{U MMM d},
-			'short' => q{y-M-d},
 		},
 		'ethiopic' => {
 		},
@@ -12011,18 +9130,10 @@ has 'date_formats' => (
 			'short' => q{d/M/yy},
 		},
 		'hebrew' => {
-			'full' => q{EEEEที่ d MMMM G y},
-			'long' => q{d MMMM G y},
-			'medium' => q{d MMM G y},
-			'short' => q{d/M/y G},
 		},
 		'indian' => {
 		},
 		'islamic' => {
-			'full' => q{EEEEที่ d MMMM G y},
-			'long' => q{d MMMM G y},
-			'medium' => q{d MMM G y},
-			'short' => q{d/M/y G},
 		},
 		'japanese' => {
 			'full' => q{EEEEที่ d MMMM ปีGที่ y},
@@ -12131,34 +9242,9 @@ has 'datetime_formats_available_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'buddhist' => {
-			E => q{ccc},
-			Ed => q{E d},
-			Gy => q{G y},
-			GyMMM => q{MMM G y},
-			GyMMMEEEEd => q{EEEEที่ d MMM G y},
-			GyMMMEd => q{E d MMM G y},
-			GyMMMd => q{d MMM G y},
-			GyMd => q{d/M/y},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
-			MEd => q{E d/M},
-			MMM => q{LLL},
-			MMMEEEEd => q{EEEEที่ d MMM},
-			MMMEd => q{E d MMM},
+			GyMd => q{d/M/GGGGG y},
 			MMMMEEEEd => q{EEEEที่ d MMMM},
 			MMMMEd => q{E d MMMM},
-			MMMMd => q{d MMMM},
-			MMMd => q{d MMM},
-			Md => q{d/M},
-			d => q{d},
-			h => q{h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			ms => q{mm:ss},
-			y => q{G y},
-			yyyy => q{G y},
 			yyyyM => q{M/y},
 			yyyyMEd => q{E d/M/y},
 			yyyyMMM => q{MMM y},
@@ -12171,41 +9257,18 @@ has 'datetime_formats_available_formats' => (
 			yyyyQQQQ => q{QQQQ y},
 		},
 		'generic' => {
-			Bh => q{h B},
-			Bhm => q{h:mm B},
-			Bhms => q{h:mm:ss B},
-			E => q{ccc},
-			EBhm => q{E h:mm B},
-			EBhms => q{E h:mm:ss B},
-			EHm => q{E HH:mm},
-			EHms => q{E HH:mm:ss},
 			Ed => q{E d},
-			Ehm => q{E h:mm a},
-			Ehms => q{E h:mm:ss a},
-			Gy => q{G y},
 			GyMMM => q{MMM G y},
 			GyMMMEEEEd => q{EEEEที่ d MMM G y},
 			GyMMMEd => q{E d MMM G y},
 			GyMMMd => q{d MMM G y},
 			GyMd => q{d/M/y GGGGG},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
 			MEd => q{E d/M},
-			MMM => q{LLL},
 			MMMEEEEd => q{EEEEที่ d MMM},
 			MMMEd => q{E d MMM},
 			MMMMd => q{d MMMM},
 			MMMd => q{d MMM},
 			Md => q{d/M},
-			d => q{d},
-			h => q{h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			ms => q{mm:ss},
-			y => q{G y},
-			yyyy => q{G y},
 			yyyyM => q{M/y G},
 			yyyyMEd => q{E d/M/y GGGGG},
 			yyyyMMM => q{MMM G y},
@@ -12218,31 +9281,15 @@ has 'datetime_formats_available_formats' => (
 			yyyyQQQQ => q{QQQQ G y},
 		},
 		'gregorian' => {
-			Bh => q{h B},
-			Bhm => q{h:mm B},
-			Bhms => q{h:mm:ss B},
-			E => q{ccc},
-			EBhm => q{E h:mm B},
-			EBhms => q{E h:mm:ss B},
 			EHm => q{E HH:mm น.},
-			EHms => q{E HH:mm:ss},
 			Ed => q{E d},
-			Ehm => q{E h:mm a},
-			Ehms => q{E h:mm:ss a},
-			Gy => q{G y},
 			GyMMM => q{MMM G y},
 			GyMMMEEEEd => q{EEEEที่ d MMM G y},
 			GyMMMEd => q{E d MMM G y},
 			GyMMMd => q{d MMM G y},
 			GyMd => q{d/M/GGGGG y},
-			H => q{HH},
 			Hm => q{HH:mm น.},
-			Hms => q{HH:mm:ss},
-			Hmsv => q{HH:mm:ss v},
-			Hmv => q{HH:mm v},
-			M => q{L},
 			MEd => q{E d/M},
-			MMM => q{LLL},
 			MMMEEEEd => q{EEEEที่ d MMM},
 			MMMEd => q{E d MMM},
 			MMMMEEEEd => q{EEEEที่ d MMMM},
@@ -12251,24 +9298,17 @@ has 'datetime_formats_available_formats' => (
 			MMMMd => q{d MMMM},
 			MMMd => q{d MMM},
 			Md => q{d/M},
-			d => q{d},
-			h => q{h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			hmsv => q{h:mm:ss a v},
 			hmv => q{h:mm น. a v},
 			mmss => q{mm:ss},
-			ms => q{mm:ss},
-			y => q{y},
 			yM => q{M/y},
 			yMEd => q{E d/M/y},
 			yMMM => q{MMM y},
 			yMMMEEEEd => q{EEEEที่ d MMM y},
 			yMMMEd => q{E d MMM y},
-			yMMMM => q{MMMM G y},
-			yMMMMEEEEd => q{EEEEที่ d MMMM G y},
-			yMMMMEd => q{E d MMMM G y},
-			yMMMMd => q{d MMMM G y},
+			yMMMM => q{MMMM y},
+			yMMMMEEEEd => q{EEEEที่ d MMMM y},
+			yMMMMEd => q{E d MMMM y},
+			yMMMMd => q{d MMMM y},
 			yMMMd => q{d MMM y},
 			yMd => q{d/M/y},
 			yQQQ => q{QQQ y},
@@ -12276,89 +9316,22 @@ has 'datetime_formats_available_formats' => (
 			yw => q{สัปดาห์ที่ w ของปี Y},
 		},
 		'islamic' => {
-			Ed => q{E d},
-			Gy => q{G y},
-			GyMMM => q{MMM G y},
-			GyMMMEd => q{E d MMM G y},
-			GyMMMd => q{d MMM G y},
-			M => q{L},
 			MEd => q{E, d/M},
-			MMM => q{LLL},
-			MMMEd => q{E d MMM},
-			MMMd => q{d MMM},
-			Md => q{d/M},
-			d => q{d},
-			y => q{G y},
-			yyyy => q{G y},
-			yyyyM => q{M/y G},
-			yyyyMEd => q{E d/M/y GGGGG},
-			yyyyMMM => q{MMM G y},
-			yyyyMMMEd => q{E d MMM G y},
-			yyyyMMMd => q{d MMM G y},
-			yyyyMd => q{d/M/y GGGGG},
-			yyyyQQQ => q{QQQ G y},
-			yyyyQQQQ => q{QQQQ G y},
 		},
 		'japanese' => {
-			Ed => q{E d},
-			Gy => q{G y},
-			GyMMM => q{MMM G y},
-			GyMMMEd => q{E d MMM G y},
-			GyMMMd => q{d MMM G y},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
 			MEd => q{E, d/M},
-			MMM => q{LLL},
-			MMMEd => q{E d MMM},
-			MMMd => q{d MMM},
-			Md => q{d/M},
-			d => q{d},
-			h => q{h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			ms => q{mm:ss},
-			y => q{G y},
-			yyyy => q{G y},
 			yyyyM => q{M/GGGGG y},
 			yyyyMEd => q{E d/M/GGGGG y},
-			yyyyMMM => q{MMM G y},
-			yyyyMMMEd => q{E d MMM G y},
-			yyyyMMMd => q{d MMM G y},
 			yyyyMd => q{d/M/GGGGG y},
-			yyyyQQQ => q{QQQ G y},
-			yyyyQQQQ => q{QQQQ G y},
 		},
 		'roc' => {
-			Ed => q{E d},
 			Gy => q{ปีGที่ y},
-			GyMMM => q{MMM G y},
-			GyMMMEd => q{E d MMM G y},
-			GyMMMd => q{d MMM G y},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
 			MEd => q{E, d/M},
-			MMM => q{LLL},
-			MMMEd => q{E d MMM},
-			MMMd => q{d MMM},
-			Md => q{d/M},
-			d => q{d},
-			h => q{h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			ms => q{mm:ss},
 			y => q{ปีGที่ y},
 			yyyy => q{ปีGที่ y},
 			yyyyM => q{M/GGGGG y},
 			yyyyMEd => q{E d/M/GGGGG y},
-			yyyyMMM => q{MMM G y},
-			yyyyMMMEd => q{E d MMM G y},
-			yyyyMMMd => q{d MMM G y},
 			yyyyMd => q{d/M/GGGGG y},
-			yyyyQQQ => q{QQQ G y},
 		},
 	} },
 );
@@ -12368,9 +9341,6 @@ has 'datetime_formats_append_item' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			'Timezone' => '{0} {1}',
-		},
 	} },
 );
 
@@ -12380,67 +9350,16 @@ has 'datetime_formats_interval' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'buddhist' => {
-			H => {
-				H => q{H–H},
-			},
 			Hm => {
 				H => q{H:mm–H:mm},
 				m => q{H:mm–H:mm},
-			},
-			Hmv => {
-				H => q{H:mm–H:mm v},
-				m => q{H:mm–H:mm v},
-			},
-			Hv => {
-				H => q{H–H v},
-			},
-			M => {
-				M => q{M–M},
 			},
 			MEd => {
 				M => q{E d – E d/M},
 				d => q{E d – E d/M},
 			},
-			MMM => {
-				M => q{LLL–LLL},
-			},
-			MMMEEEEd => {
-				M => q{EEEEที่ d MMM – EEEEที่ d MMM},
-				d => q{EEEEที่ d – EEEEที่ d MMM},
-			},
 			MMMEd => {
-				M => q{E d MMM – E d MMM},
 				d => q{E d – E d MMM},
-			},
-			MMMd => {
-				M => q{d MMM – d MMM},
-				d => q{d – d MMM},
-			},
-			Md => {
-				M => q{d/M – d/M},
-				d => q{d/M – d/M},
-			},
-			d => {
-				d => q{d–d},
-			},
-			fallback => '{0} - {1}',
-			h => {
-				a => q{h a – h a},
-				h => q{h–h a},
-			},
-			hm => {
-				a => q{h:mm a – h:mm a},
-				h => q{h:mm–h:mm a},
-				m => q{h:mm–h:mm a},
-			},
-			hmv => {
-				a => q{h:mm a – h:mm a v},
-				h => q{h:mm–h:mm a v},
-				m => q{h:mm–h:mm a v},
-			},
-			hv => {
-				a => q{h a – h a v},
-				h => q{h–h a v},
 			},
 			y => {
 				y => q{y–y},
@@ -12528,10 +9447,6 @@ has 'datetime_formats_interval' => (
 			H => {
 				H => q{H–H},
 			},
-			Hm => {
-				H => q{HH:mm–HH:mm},
-				m => q{HH:mm–HH:mm},
-			},
 			Hmv => {
 				H => q{H:mm–H:mm v},
 				m => q{H:mm–H:mm v},
@@ -12545,9 +9460,6 @@ has 'datetime_formats_interval' => (
 			MEd => {
 				M => q{E d/M – E d/M},
 				d => q{E d/M – E d/M},
-			},
-			MMM => {
-				M => q{LLL–LLL},
 			},
 			MMMEEEEd => {
 				M => q{EEEEที่ d MMM – EEEEที่ d MMM},
@@ -12565,31 +9477,7 @@ has 'datetime_formats_interval' => (
 				M => q{d/M – d/M},
 				d => q{d/M – d/M},
 			},
-			d => {
-				d => q{d–d},
-			},
 			fallback => '{0} - {1}',
-			h => {
-				a => q{h a – h a},
-				h => q{h–h a},
-			},
-			hm => {
-				a => q{h:mm a – h:mm a},
-				h => q{h:mm–h:mm a},
-				m => q{h:mm–h:mm a},
-			},
-			hmv => {
-				a => q{h:mm a – h:mm a v},
-				h => q{h:mm–h:mm a v},
-				m => q{h:mm–h:mm a v},
-			},
-			hv => {
-				a => q{h a – h a v},
-				h => q{h–h a v},
-			},
-			y => {
-				y => q{G y–y},
-			},
 			yM => {
 				M => q{M/y – M/y G},
 				y => q{M/y – M/y G},
@@ -12656,7 +9544,7 @@ has 'datetime_formats_interval' => (
 				G => q{E d MMM G y – E d MMM G y},
 				M => q{E d MMM – E d MMM G y},
 				d => q{E d MMM – E d MMM G y},
-				y => q{E d MMM y – E d MMM y},
+				y => q{E d MMM G y – E d MMM y},
 			},
 			GyMMMd => {
 				G => q{d MMM G y – d MMM G y},
@@ -12670,9 +9558,6 @@ has 'datetime_formats_interval' => (
 				d => q{d/MM/GGGGG y – d/MM/GGGGG y},
 				y => q{d/MM/GGGGG y – d/MM/GGGGG y},
 			},
-			H => {
-				H => q{HH–HH},
-			},
 			Hm => {
 				H => q{HH:mm น. – HH:mm น.},
 				m => q{HH:mm น. – HH:mm น.},
@@ -12680,9 +9565,6 @@ has 'datetime_formats_interval' => (
 			Hmv => {
 				H => q{H:mm น. – H:mm น. v},
 				m => q{H:mm น. – H:mm น. v},
-			},
-			Hv => {
-				H => q{HH–HH v},
 			},
 			M => {
 				M => q{M–M},
@@ -12704,37 +9586,12 @@ has 'datetime_formats_interval' => (
 			},
 			MMMd => {
 				M => q{d MMM – d MMM},
-				d => q{MMM d–d},
 			},
 			Md => {
 				M => q{d/M – d/M},
 				d => q{d/M – d/M},
 			},
-			d => {
-				d => q{d–d},
-			},
 			fallback => '{0} – {1}',
-			h => {
-				a => q{h a – h a},
-				h => q{h–h a},
-			},
-			hm => {
-				a => q{h:mm a – h:mm a},
-				h => q{h:mm–h:mm a},
-				m => q{h:mm–h:mm a},
-			},
-			hmv => {
-				a => q{h:mm a – h:mm a v},
-				h => q{h:mm–h:mm a v},
-				m => q{h:mm–h:mm a v},
-			},
-			hv => {
-				a => q{h a – h a v},
-				h => q{h–h a v},
-			},
-			y => {
-				y => q{y–y},
-			},
 			yM => {
 				M => q{M/y – M/y},
 				y => q{M/y – M/y},
@@ -12768,14 +9625,14 @@ has 'datetime_formats_interval' => (
 				y => q{EEEEที่ d MMMM G y – EEEEที่ d MMMM y},
 			},
 			yMMMMEd => {
-				M => q{E d MMMM – E d MMMM G y},
-				d => q{E d – E d MMMM G y},
-				y => q{E d MMMM G y – E d MMMM G y},
+				M => q{E d MMMM – E d MMMM y},
+				d => q{E d – E d MMMM y},
+				y => q{E d MMMM y – E d MMMM y},
 			},
 			yMMMMd => {
-				M => q{d MMMM – d MMMM G y},
-				d => q{d–d MMMM G y},
-				y => q{d MMMM G y – d MMMM G y},
+				M => q{d MMMM – d MMMM y},
+				d => q{d–d MMMM y},
+				y => q{d MMMM y – d MMMM y},
 			},
 			yMMMd => {
 				M => q{d MMM – d MMM y},
@@ -12908,105 +9765,10 @@ has 'cyclic_name_sets' => (
 			},
 		},
 		'dangi' => {
-			'dayParts' => {
-				'format' => {
-					'abbreviated' => {
-						0 => q(จื่อ),
-						1 => q(โฉ่ว),
-						2 => q(อิ๋น),
-						3 => q(เหม่า),
-						4 => q(เฉิน),
-						5 => q(ซื่อ),
-						6 => q(อู้),
-						7 => q(เว่ย),
-						8 => q(เซิน),
-						9 => q(โหย่ว),
-						10 => q(ซู),
-						11 => q(ฮ่าย),
-					},
-				},
-			},
 			'years' => {
 				'format' => {
 					'abbreviated' => {
-						0 => q(เจี่ยจื่อ),
-						1 => q(อี๋โฉ่ว),
-						2 => q(ปิ่งอิ๋น),
-						3 => q(ติงเหม่า),
-						4 => q(อู้เฉิน),
-						5 => q(จี่ซื่อ),
-						6 => q(เกิงอู้),
-						7 => q(ซินเว่ย),
-						8 => q(เหรินเซิน),
 						9 => q(กุ๋่ยโหย่ว),
-						10 => q(เจ่ียซู),
-						11 => q(อี๋ฮ่าย),
-						12 => q(ปิ๋ิ่งจื่อ),
-						13 => q(ติงโฉ่ว),
-						14 => q(อู้อิ๋น),
-						15 => q(จี๋เหม่า),
-						16 => q(เกิงเฉิน),
-						17 => q(ซินซื่อ),
-						18 => q(เหรินอู้),
-						19 => q(กุ่ยเว่ย),
-						20 => q(เจี่ยเซิน),
-						21 => q(อี๋โหย่ว),
-						22 => q(ปิ่งซู),
-						23 => q(ติงฮ่าย),
-						24 => q(อู้จื่อ),
-						25 => q(จี๋โฉ่ว),
-						26 => q(เกิงอิ๋น),
-						27 => q(ซินเหม่า),
-						28 => q(เหรินเฉิน),
-						29 => q(กุ่ยซ่อ),
-						30 => q(เจ่ียอู้),
-						31 => q(อี่เว่ย),
-						32 => q(ป่ิงเซิน),
-						33 => q(ติงโหย่ว),
-						34 => q(อู้ซู),
-						35 => q(จี่ฮ่าย),
-						36 => q(เกิงจื่อ),
-						37 => q(ซินโฉ่ว),
-						38 => q(เหรินอิ๋น),
-						39 => q(กุ๋ยเหม่า),
-						40 => q(เจี่ยเฉิน),
-						41 => q(อี่ซ่ือ),
-						42 => q(ป่ิงอู้),
-						43 => q(ติงเว่ย),
-						44 => q(อู้เซิน),
-						45 => q(จี๋โหย่ว),
-						46 => q(เกิงซู),
-						47 => q(ซินฮ่าย),
-						48 => q(เหรินจ่ือ),
-						49 => q(กุ๋่ยโฉ่ว),
-						50 => q(เจี่ยอิ๋น),
-						51 => q(อ๋ีเหม่า),
-						52 => q(ปิ่งเฉิน),
-						53 => q(ติงซื่อ),
-						54 => q(อู้อู้),
-						55 => q(จ่ีเว่ย),
-						56 => q(เกิงเซิน),
-						57 => q(ซินโหย่ว),
-						58 => q(เหรินซู),
-						59 => q(กุ่ยฮ่าย),
-					},
-				},
-			},
-			'zodiacs' => {
-				'format' => {
-					'abbreviated' => {
-						0 => q(หนู),
-						1 => q(วัว),
-						2 => q(เสือ),
-						3 => q(กระต่าย),
-						4 => q(มังกร),
-						5 => q(งู),
-						6 => q(ม้า),
-						7 => q(แพะ),
-						8 => q(ลิง),
-						9 => q(ไก่ตัวผู้),
-						10 => q(สุนัข),
-						11 => q(หมู),
 					},
 				},
 			},
@@ -13019,13 +9781,9 @@ has 'time_zone_names' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default	=> sub { {
-		hourFormat => q(+HH:mm;-HH:mm),
-		gmtFormat => q(GMT{0}),
-		gmtZeroFormat => q(GMT),
 		regionFormat => q(เวลา{0}),
 		regionFormat => q(เวลาออมแสง{0}),
 		regionFormat => q(เวลามาตรฐาน{0}),
-		fallbackFormat => q({1} ({0})),
 		'Acre' => {
 			long => {
 				'daylight' => q#เวลาฤดูร้อนอาเกร#,
@@ -13335,6 +10093,9 @@ has 'time_zone_names' => (
 		},
 		'America/Chihuahua' => {
 			exemplarCity => q#ชีวาวา#,
+		},
+		'America/Ciudad_Juarez' => {
+			exemplarCity => q#ซิวดัดฮัวเรซ#,
 		},
 		'America/Coral_Harbour' => {
 			exemplarCity => q#คอรัลฮาร์เบอร์#,
@@ -14058,7 +10819,7 @@ has 'time_zone_names' => (
 			},
 		},
 		'Atlantic/Azores' => {
-			exemplarCity => q#อาซอเรส#,
+			exemplarCity => q#อะโซร์ส#,
 		},
 		'Atlantic/Bermuda' => {
 			exemplarCity => q#เบอร์มิวดา#,
@@ -14967,6 +11728,9 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Johnston' => {
 			exemplarCity => q#จอห์นสตัน#,
+		},
+		'Pacific/Kanton' => {
+			exemplarCity => q#แคนทอน#,
 		},
 		'Pacific/Kiritimati' => {
 			exemplarCity => q#คิริทิมาตี#,

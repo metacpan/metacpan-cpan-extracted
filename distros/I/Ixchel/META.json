@@ -67,6 +67,6 @@
          "web" : "https://github.com/LilithSec/Ixchel"
       }
    },
-   "version" : "v0.7.0",
+   "version" : "v0.9.3",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

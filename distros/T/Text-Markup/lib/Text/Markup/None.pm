@@ -7,13 +7,19 @@ use Text::Markup;
 use HTML::Entities;
 use File::BOM qw(open_bom);
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
+
+ sub import {
+    # Set a regex if passed one.
+    Text::Markup->register( none => $_[1] ) if $_[1];
+}
 
 sub parser {
     my ($file, $encoding, $opts) = @_;
     open_bom my $fh, $file, ":encoding($encoding)";
     local $/;
     my $html = encode_entities(<$fh>, '<>&"');
+    return undef unless $html =~ /\S/;
     utf8::encode($html);
     return $html if { @{ $opts } }->{raw};
     return qq{<html>
@@ -51,6 +57,12 @@ on a L<BOM|https://www.unicode.org/unicode/faq/utf_bom.html#BOM>, encodes all
 entities, and then returns an HTML string with the file in a C<< <pre> >>
 element. This will be handy for files that really are nothing but plain text,
 like F<README> files.
+
+By default this parser is not associated with any file extensions. To have
+Text::Markup also recognize files for this module, load it directly and pass
+a regular expression matching the desired extension(s), like so:
+
+  use Text::Markup::None qr{te?xt};
 
 Normally this module returns the output wrapped in a minimal HTML document
 skeleton. If you would like the raw output without the skeleton, you can pass

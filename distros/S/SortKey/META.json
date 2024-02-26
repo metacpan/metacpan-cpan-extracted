@@ -39,7 +39,7 @@
    "provides" : {
       "SortKey" : {
          "file" : "lib/SortKey.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.1.1"
       }
    },
    "release_status" : "stable",
@@ -54,7 +54,7 @@
          "web" : "https://github.com/perlancar/perl-SortKey"
       }
    },
-   "version" : "0.1.0",
+   "version" : "0.1.1",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038002"
@@ -421,7 +421,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::AppendPrepend",
                         "name" : "@Author::PERLANCAR/AppendPrepend",
-                        "version" : "0.01"
+                        "version" : "0.021"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::EnsureUniqueSections",

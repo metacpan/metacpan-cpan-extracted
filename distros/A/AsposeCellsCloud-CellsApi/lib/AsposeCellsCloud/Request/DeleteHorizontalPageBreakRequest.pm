@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -61,9 +61,9 @@ sub new {
 # Run Operation Request
 # DeleteHorizontalPageBreakRequest.name : The workbook name.  ,
 # DeleteHorizontalPageBreakRequest.sheetName : The worksheet name.  ,
-# DeleteHorizontalPageBreakRequest.index : Removes the HPageBreak element at a specified name. Element index, zero based.  ,
-# DeleteHorizontalPageBreakRequest.folder : Original workbook folder.  ,
-# DeleteHorizontalPageBreakRequest.storageName : Storage name.   
+# DeleteHorizontalPageBreakRequest.index : Removes the horizontal page break element at a specified name. Element index, zero based.  ,
+# DeleteHorizontalPageBreakRequest.folder : The folder where the file is situated.  ,
+# DeleteHorizontalPageBreakRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -74,7 +74,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'delete_horizontal_page_break' } = { 
-    	summary => 'Delete a horizontal page breaks in worksheet.',
+    	summary => 'Delete a horizontal page break in the worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -151,21 +151,21 @@ __PACKAGE__->method_documentation({
      'index' => {
      	datatype => 'int',
      	base_name => 'index',
-     	description => 'Removes the HPageBreak element at a specified name. Element index, zero based.',
+     	description => 'Removes the horizontal page break element at a specified name. Element index, zero based.',
      	format => '',
      	read_only => '',
      		},
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

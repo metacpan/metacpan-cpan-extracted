@@ -2,8 +2,8 @@ NAME
     App::FoodAdditivesUtils - Utilities related to food additives
 
 VERSION
-    This document describes version 0.005 of App::FoodAdditivesUtils (from
-    Perl distribution App-FoodAdditivesUtils), released on 2023-02-05.
+    This document describes version 0.006 of App::FoodAdditivesUtils (from
+    Perl distribution App-FoodAdditivesUtils), released on 2023-12-12.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
@@ -87,6 +87,8 @@ SOURCE
     <https://github.com/perlancar/perl-App-FoodAdditivesUtils>.
 
 SEE ALSO
+    App::FoodColorUtils
+
 AUTHOR
     perlancar <perlancar@cpan.org>
 

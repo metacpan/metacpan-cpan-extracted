@@ -22,22 +22,23 @@ name: Locale-CLDR-Locales-Vai
 provides:
   Locale::CLDR::Locales::Vai:
     file: lib/Locale/CLDR/Locales/Vai.pm
-    version: v0.40.1
+    version: v0.44.0
   Locale::CLDR::Locales::Vai::Latn:
     file: lib/Locale/CLDR/Locales/Vai/Latn.pm
-    version: v0.40.1
+    version: v0.44.0
   Locale::CLDR::Locales::Vai::Latn::Lr:
     file: lib/Locale/CLDR/Locales/Vai/Latn/Lr.pm
-    version: v0.40.1
+    version: v0.44.0
   Locale::CLDR::Locales::Vai::Vaii:
     file: lib/Locale/CLDR/Locales/Vai/Vaii.pm
-    version: v0.40.1
+    version: v0.44.0
   Locale::CLDR::Locales::Vai::Vaii::Lr:
     file: lib/Locale/CLDR/Locales/Vai/Vaii/Lr.pm
-    version: v0.40.1
+    version: v0.44.0
 requires:
   DateTime: '0.72'
-  Locale::CLDR: v0.40.1
+  Locale::CLDR: v0.44.0
+  Locale::CLDR::Locales::Root: v0.44.0
   Moo: '2'
   MooX::ClassAttribute: '0.011'
   Type::Tiny: '0'
@@ -47,5 +48,5 @@ resources:
   bugtracker: https://github.com/ThePilgrim/perlcldr/issues
   homepage: https://github.com/ThePilgrim/perlcldr
   repository: https://github.com/ThePilgrim/perlcldr.git
-version: v0.40.1
+version: v0.44.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

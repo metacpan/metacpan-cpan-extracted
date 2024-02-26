@@ -425,7 +425,8 @@ subtest 'callback' => sub
 
 done_testing();
 
-package MyObject;
+package
+    MyObject;
 BEGIN
 {
     use strict;

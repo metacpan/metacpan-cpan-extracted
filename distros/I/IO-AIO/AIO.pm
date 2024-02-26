@@ -173,7 +173,7 @@ use common::sense;
 use base 'Exporter';
 
 BEGIN {
-   our $VERSION = 4.79;
+   our $VERSION = 4.81;
 
    our @AIO_REQ = qw(aio_sendfile aio_seek aio_read aio_write aio_open aio_close
                      aio_stat aio_lstat aio_unlink aio_rmdir aio_readdir aio_readdirx
@@ -415,9 +415,6 @@ priority, so the effect is cumulative.
 Asynchronously open or create a file and call the callback with a newly
 created filehandle for the file (or C<undef> in case of an error).
 
-The pathname passed to C<aio_open> must be absolute. See API NOTES, above,
-for an explanation.
-
 The C<$flags> argument is a bitmask. See the C<Fcntl> module for a
 list. They are the same as used by C<sysopen>.
 
@@ -586,9 +583,6 @@ Works almost exactly like perl's C<stat> or C<lstat> in void context. The
 callback will be called after the stat and the results will be available
 using C<stat _> or C<-s _> and other tests (with the exception of C<-B>
 and C<-T>).
-
-The pathname passed to C<aio_stat> must be absolute. See API NOTES, above,
-for an explanation.
 
 Currently, the stats are always 64-bit-stats, i.e. instead of returning an
 error when stat'ing a large file, the results will be silently truncated
@@ -983,6 +977,11 @@ sub aio_copy($$;$) {
          aioreq_pri $pri;
          add $grp aio_open $dst, O_CREAT | O_WRONLY | O_TRUNC, 0200, sub {
             if (my $dst_fh = $_[0]) {
+
+               # best-effort preallocate
+               aioreq_pri $pri;
+               add $grp aio_allocate $dst_fh, IO::AIO::FALLOC_FL_KEEP_SIZE, 0, $stat[7], sub { };
+
                aioreq_pri $pri;
                add $grp aio_sendfile $dst_fh, $src_fh, 0, $stat[7], sub {
                   if ($_[0] == $stat[7]) {

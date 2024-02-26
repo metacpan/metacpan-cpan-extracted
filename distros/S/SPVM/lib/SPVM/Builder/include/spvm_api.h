@@ -205,7 +205,7 @@ void SPVM_API_print(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* string);
 void SPVM_API_say(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* string);
 void SPVM_API_fprint(SPVM_ENV* env, SPVM_VALUE* stack, FILE* fh, SPVM_OBJECT* string);
 void SPVM_API_print_stderr(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* string);
-void SPVM_API_warn(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* string, const char* class_dir, const char* class_rel_file, int32_t line);
+void SPVM_API_warn(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* string, const char* file, int32_t line);
 
 // New object
 SPVM_OBJECT* SPVM_API_new_object(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_RUNTIME_BASIC_TYPE* basic_type);
@@ -347,5 +347,7 @@ FILE* SPVM_API_spvm_stdin(SPVM_ENV* env, SPVM_VALUE* stack);
 FILE* SPVM_API_spvm_stdout(SPVM_ENV* env, SPVM_VALUE* stack);
 
 FILE* SPVM_API_spvm_stderr(SPVM_ENV* env, SPVM_VALUE* stack);
+
+int32_t SPVM_API_check_bootstrap_method(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name);
 
 #endif

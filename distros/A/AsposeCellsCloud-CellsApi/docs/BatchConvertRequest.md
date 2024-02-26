@@ -15,6 +15,8 @@ Name | Type | Description | Notes
 **OutFolder** | **string** | The directory that stores files whose format conversion was successful. |
 **OutStorage** | **string** | Aspose Cloud storage name. |
 **Region** | **string** | The regional settings for workbook. |
+**PageWideFitOnPerSheet** | **boolean** |  |
+**PageTallFitOnPerSheet** | **boolean** |  |
 **SaveOptions** | **SaveOptions** | Indicates save options. |  
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

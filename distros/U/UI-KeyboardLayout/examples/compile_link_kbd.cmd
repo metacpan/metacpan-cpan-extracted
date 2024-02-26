@@ -37,7 +37,8 @@ if not "%extra_c_files%" == "" %Keyboard_Layout_Creator%\bin\i386\cl.exe      %c
 %Keyboard_Layout_Creator%\bin\i386\link.exe %link_opts% -merge:.rdata=.data %link_opts2% -MACHINE:IX86 %link_opts3% -libpath:%Keyboard_Layout_Creator%\lib\i386 %link_opts4%
 mkdir %process_kbd%\i386
 move /y %process_kbd%.dll %process_kbd%\i386\%process_kbd%.dll
-del %extra_obj_files% %process_kbd%.obj %process_kbd%.exp %process_kbd%.lib %process_kbd%.res
+
+if exist "%process_kbd%\i386\%process_kbd%.dll" del %extra_obj_files% %process_kbd%.obj %process_kbd%.exp %process_kbd%.lib %process_kbd%.res
 
 if not "%extra_c_files%" == "" %Keyboard_Layout_Creator%\bin\i386\IA64\cl.exe      %cl_opts% %extra_c_files%
 %Keyboard_Layout_Creator%\bin\i386\IA64\cl.exe %cl_opts% %process_kbd%.c
@@ -45,7 +46,8 @@ if not "%extra_c_files%" == "" %Keyboard_Layout_Creator%\bin\i386\IA64\cl.exe   
 %Keyboard_Layout_Creator%\bin\i386\link.exe %link_opts% -merge:.srdata=.data %link_opts2% /MACHINE:IA64 %link_opts3% -libpath:%Keyboard_Layout_Creator%\lib\ia64 %link_opts4%
 mkdir %process_kbd%\ia64
 move /y %process_kbd%.dll %process_kbd%\ia64\%process_kbd%.dll
-del %extra_obj_files% %process_kbd%.obj %process_kbd%.exp %process_kbd%.lib %process_kbd%.res
+
+if exist "%process_kbd%\ia64\%process_kbd%.dll" del %extra_obj_files% %process_kbd%.obj %process_kbd%.exp %process_kbd%.lib %process_kbd%.res
 
 if not "%extra_c_files%" == "" %Keyboard_Layout_Creator%\bin\i386\amd64\cl.exe      %cl_opts% %extra_c_files%
 %Keyboard_Layout_Creator%\bin\i386\amd64\cl.exe %cl_opts% %process_kbd%.c
@@ -53,7 +55,8 @@ if not "%extra_c_files%" == "" %Keyboard_Layout_Creator%\bin\i386\amd64\cl.exe  
 %Keyboard_Layout_Creator%\bin\i386\link.exe %link_opts% -merge:.rdata=.data %link_opts2% -MACHINE:AMD64 %link_opts3% -libpath:%Keyboard_Layout_Creator%\lib\amd64 %link_opts4%
 mkdir %process_kbd%\amd64
 move /y %process_kbd%.dll %process_kbd%\amd64\%process_kbd%.dll
-del %extra_obj_files% %process_kbd%.obj %process_kbd%.exp %process_kbd%.lib %process_kbd%.res
+
+if exist "%process_kbd%\amd64\%process_kbd%.dll" del %extra_obj_files% %process_kbd%.obj %process_kbd%.exp %process_kbd%.lib %process_kbd%.res
 
 if not "%extra_c_files%" == "" %Keyboard_Layout_Creator%\bin\i386\cl.exe      %cl_opts% -DBUILD_WOW6432 -D_WOW6432_ %extra_c_files%
 %Keyboard_Layout_Creator%\bin\i386\cl.exe %cl_opts% -DBUILD_WOW6432 -D_WOW6432_ %process_kbd%.c
@@ -61,4 +64,5 @@ if not "%extra_c_files%" == "" %Keyboard_Layout_Creator%\bin\i386\cl.exe      %c
 %Keyboard_Layout_Creator%\bin\i386\link.exe %link_opts% -merge:.rdata=.data %link_opts2% -MACHINE:IX86 %link_opts3% -libpath:%Keyboard_Layout_Creator%\lib\i386 %link_opts4%
 mkdir %process_kbd%\wow64
 move /y %process_kbd%.dll %process_kbd%\wow64\%process_kbd%.dll
-del %extra_obj_files% %process_kbd%.obj %process_kbd%.exp %process_kbd%.lib %process_kbd%.res
+
+if exist "%process_kbd%\wow64\%process_kbd%.dll" del %extra_obj_files% %process_kbd%.obj %process_kbd%.exp %process_kbd%.lib %process_kbd%.res

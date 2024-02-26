@@ -10,7 +10,7 @@ use Role::Tiny;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2024-01-15'; # DATE
 our $DIST = 'TableDataRoles-Standard'; # DIST
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.023'; # VERSION
 
 with 'TableDataRole::Spec::Basic';
 
@@ -131,7 +131,7 @@ TableDataRole::Munge::Filter - Role to filter rows from another tabledata
 
 =head1 VERSION
 
-This document describes version 0.021 of TableDataRole::Munge::Filter (from Perl distribution TableDataRoles-Standard), released on 2024-01-15.
+This document describes version 0.023 of TableDataRole::Munge::Filter (from Perl distribution TableDataRoles-Standard), released on 2024-01-15.
 
 =head1 SYNOPSIS
 

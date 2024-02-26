@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-08-27'; # DATE
+our $DATE = '2023-12-15'; # DATE
 our $DIST = 'App-CheckArchiveFilename'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 our %SPEC;
 
@@ -23,6 +23,11 @@ $SPEC{check_archive_filename} = {
             greedy => 1,
         },
     },
+    examples => [
+        {
+            argv => [qw/foo.bar qux.Zip quux.tar.xz/],
+        },
+    ],
 };
 sub check_archive_filename {
     require Filename::Archive;
@@ -82,7 +87,7 @@ App::CheckArchiveFilename - Return information about archive & compressor types 
 
 =head1 VERSION
 
-This document describes version 0.007 of App::CheckArchiveFilename (from Perl distribution App-CheckArchiveFilename), released on 2023-08-27.
+This document describes version 0.008 of App::CheckArchiveFilename (from Perl distribution App-CheckArchiveFilename), released on 2023-12-15.
 
 =head1 FUNCTIONS
 
@@ -94,6 +99,53 @@ Usage:
  check_archive_filename(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Return information about archive & compressor types from filenames.
+
+Examples:
+
+=over
+
+=item * Example #1:
+
+ check_archive_filename(filenames => ["foo.bar", "qux.Zip", "quux.tar.xz"]);
+
+Result:
+
+ [
+   200,
+   "OK",
+   [
+     { filename => "foo.bar", is_archive => 0 },
+     {
+       filename => "qux.Zip",
+       is_archive => 1,
+       archive_name => "Zip",
+       filename_without_suffix => "qux",
+       archive_suffix => ".Zip",
+     },
+     {
+       filename                => "quux.tar.xz",
+       is_archive              => 1,
+       is_compressed           => 1,
+       archive_name            => "tar",
+       compressor_name         => "XZ",
+       compressor_suffix       => ".xz",
+       archive_suffix          => ".tar",
+       filename_without_suffix => "quux",
+     },
+   ],
+   {
+     "table.fields" => [
+       "filename",
+       "is_archive",
+       "is_compressed",
+       "archive_name",
+       "compressor_name",
+       "compressor_suffix",
+     ],
+   },
+ ]
+
+=back
 
 This function is not exported.
 

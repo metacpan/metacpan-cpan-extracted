@@ -1,0 +1,60 @@
+# PODNAME: RDF::Cowl::Lib::Gen::Class::ObjPropExp
+# ABSTRACT: Generated docs for RDF::Cowl::ObjPropExp
+
+## DO NOT EDIT
+## Generated via maint/tt/Class.pod.tt
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+RDF::Cowl::Lib::Gen::Class::ObjPropExp - Generated docs for RDF::Cowl::ObjPropExp
+
+=head1 VERSION
+
+version 1.0.0
+
+=head1 MAIN MODULE
+
+L<RDF::Cowl::ObjPropExp>
+
+=head1 METHODS
+
+=head2 is_inverse
+
+B<Signature>:
+
+  $self->is_inverse()
+
+B<Params>:
+
+  CowlAnyObjPropExp $exp 
+
+Documentation:
+
+  Returns true if the object property expression is inverse.
+  
+  @param exp The object property expression.
+  @return True if the expression is inverse, false otherwise.
+
+=over 2
+
+B<C function name>: C<< cowl_obj_prop_exp_is_inverse >>
+
+=back
+
+=head1 AUTHOR
+
+Zakariyya Mughal <zmughal@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 by Auto-Parallel Technologies, Inc..
+
+This is free software, licensed under Eclipse Public License - v 2.0.
+
+=cut

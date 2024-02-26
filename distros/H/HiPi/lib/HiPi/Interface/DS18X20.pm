@@ -1,7 +1,7 @@
 #########################################################################################
 # Package        HiPi::Interface::DS18X20
 # Description  : 1 Wire Thermometers 
-# Copyright    : Copyright (c) 2013-2017 Mark Dootson
+# Copyright    : Copyright (c) 2013-2023 Mark Dootson
 # License      : This is free software; you can redistribute it and/or modify it under
 #                the same terms as the Perl 5 programming language system itself.
 #########################################################################################
@@ -16,14 +16,14 @@ use parent qw( HiPi::Interface );
 use HiPi::Device::OneWire;
 use Carp;
 
-our $VERSION ='0.81';
+our $VERSION ='0.91';
 
 __PACKAGE__->create_accessors( qw( id correction divider) );
 
-sub list_slaves {
+sub list_devices {
     my($class) = @_;
-    my @slaves = grep { $_->{family} =~ /^(10|28)$/ } ( HiPi::Device::OneWire->list_slaves() );
-    return @slaves;
+    my @devices = grep { $_->{family} =~ /^(10|28)$/ } ( HiPi::Device::OneWire->list_devices() );
+    return @devices;
 }
 
 sub new {
@@ -43,14 +43,20 @@ sub temperature {
     
     if($data !~ /YES/) {
         # invalid crc
-        croak qq(CRC check failed or invalid device for id ) . $self->id;
+        carp qq(CRC check failed or invalid device for id ) . $self->id;
+        return undef;
     }
     if($data =~ /t=(\D*\d+)/i) {
         return ( $1 + $self->correction ) / $self->divider;
     } else {
-        croak qq(Could not parse temperature data for device ) . $self->id;
+        carp qq(Could not parse temperature data for device ) . $self->id;
+        return undef;
     }
 }
+
+## legacy calls
+
+*HiPi::Interface::DS18X20::list_slaves = \&list_devices;
 
 1;
 

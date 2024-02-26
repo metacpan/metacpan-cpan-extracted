@@ -1,5 +1,31 @@
 Revision history for Perl extension Net::SAML2.
 
+0.78 -- Sun Feb 25 21:09:15 AST 2024
+
+    [Compatibility Deprecation Warning]
+    - id is renamed to issuer.  Current code simply warns.
+    - See 0.77 for other deprecated changes
+
+    [Significant Changes]
+    - MockSAML IdP is a tested implementation
+    - Signature bug fix
+    - Deprecate id - use issuer to instantiate objects
+    - testapp changes for deprecation and to support MockSAML
+
+    [Detailed Change Log]
+    - 49c8a8a Add missing pod for new function
+    - 7a7e167 testapp: use SSL_verify_mode to disable verification via config
+    - 35c8b65 s/NET::SAML2/Net::SAML2/
+    - 1bd4efe Change $sp->id to $sp->issuer in t/09-authn-request.t
+    - f3e3ec4 Add deprecation warning to id() method
+    - 99bb04c testapp: add relaystate for a redirect binding
+    - 116d948 testapp: id has been deprecated use issuer
+    - c53ba9d Rename id to issuer for Net::SAML2::SP
+    - b98a763 Fix signature location bug
+    - b8a297a Increment Repo Version
+    - 9c7d980 v0.77
+    - edc6a88 Increment Version for a Release
+
 0.77 -- Fri Feb 02 23:45:43 AST 2024
 
     [Compatibility Deprecation Warning]

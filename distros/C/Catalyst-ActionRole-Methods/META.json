@@ -1,10 +1,11 @@
 {
    "abstract" : "Dispatch by HTTP Methods",
    "author" : [
+      "Aristotle Pagaltzis <pagaltzis@gmx.de>",
       "John Napiorkowski <jjnapiork@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -13,23 +14,28 @@
       "version" : 2
    },
    "name" : "Catalyst-ActionRole-Methods",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
-      "configure" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
+      "build" : {},
+      "configure" : {},
       "runtime" : {
          "requires" : {
             "Catalyst" : "5.90060",
-            "Moose::Role" : "2.0602"
+            "Moose::Role" : "2.0602",
+            "perl" : "5.008003"
          }
       },
       "test" : {
          "requires" : {
+            "Catalyst::Controller" : "0",
             "Catalyst::Test" : "0",
             "HTTP::Request::Common" : "0",
-            "Test::Most" : "0"
+            "Test::More" : "0.88"
          }
       }
    },
@@ -38,16 +44,20 @@
       "bugtracker" : {
          "web" : "https://github.com/jjn1056/Catalyst-ActionRole-Methods/issues"
       },
-      "homepage" : "https://github.com/jjn1056/Catalyst-ActionRole-Methods",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/jjn1056/Catalyst-ActionRole-Methods.git",
          "web" : "https://github.com/jjn1056/Catalyst-ActionRole-Methods"
       }
    },
-   "version" : "0.004",
-   "x_generated_by_perl" : "v5.34.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "version" : "0.103",
+   "x_copyright" : {
+      "holder" : "Aristotle Pagaltzis",
+      "year" : 2024
+   },
+   "x_serialization_backend" : "JSON::PP version 4.02",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
-

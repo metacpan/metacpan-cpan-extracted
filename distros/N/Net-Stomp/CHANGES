@@ -1,5 +1,10 @@
 Revision history for Perl module Net::Stomp:
 
+0.62 2024-02-08
+ - "failover" URL now works together with "ssl" and "ssl_options"
+   constructor arguments by applying the same SSL settings to all
+   hosts in the failover URL.
+
 0.61 2021-04-13
  - Avoid referencing $frame if it's undefined (thanks Lee Burton
    N6UDP)

@@ -1,12 +1,12 @@
 package Locale::CLDR::Transformations::Any::Latn::Ethi;
-# This file auto generated from Data\common\transforms\Latin-Ethiopic.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+# This file auto generated from Data\common\transforms\und-Ethi-t-und-latn.xml
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -33,36 +33,8 @@ has 'transforms' => (
 			],
 		},
 		{
-			type => 'conversion',
+			type => '',
 			data => [
-				{
-					before  => q(),
-					after   => q(),
-					replace => q(ha),
-					result  => q(ሀ),
-					revisit => 0,
-				},
-				{
-					before  => q(),
-					after   => q(),
-					replace => q(he),
-					result  => q(ሄ),
-					revisit => 0,
-				},
-				{
-					before  => q(),
-					after   => q(),
-					replace => q(hi),
-					result  => q(ሂ),
-					revisit => 0,
-				},
-				{
-					before  => q(),
-					after   => q(),
-					replace => q(hī),
-					result  => q(ህ),
-					revisit => 0,
-				},
 			]
 		},
 	] },

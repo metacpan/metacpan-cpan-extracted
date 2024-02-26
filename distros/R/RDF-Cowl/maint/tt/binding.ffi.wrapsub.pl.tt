@@ -1,0 +1,39 @@
+[% IF
+	# any of the conditions below
+	binding.is_constructor
+	|| binding.args.size > 0
+	|| binding.return_type.meta.null_on_error
+	|| binding.return_type.meta.retained
+	|| binding.return_type.meta.unretained
+	|| binding.return_type.meta.is_cowlanystar
+-%]
+	=> sub {
+		my $RETVAL;
+		my $xs    = shift;
+[% IF binding.is_constructor -%]
+		my $class = shift;
+[% END %]
+
+[% INCLUDE binding.ffi.sig.pl.tt positional_and_named_sig = 0 -%]
+
+[% IF binding.return_type.meta.null_on_error -%]
+		die "[%- INCLUDE "class-name.tt" %]::[% binding.perl_func_name %]: error: returned NULL" unless defined $RETVAL;
+[% END
+%][%
+   IF binding.return_type.meta.is_cowlanystar -%]
+		$RETVAL = $RETVAL->_REBLESS;
+[% END
+%][%
+   IF binding.return_type.meta.retained -%]
+		$RDF::Cowl::Object::_INSIDE_OUT{$$RETVAL}{retained} = 1;
+[%  ELSIF binding.return_type.meta.unretained -%]
+		$RDF::Cowl::Object::_INSIDE_OUT{$$RETVAL}{retained} = 0;
+		$RETVAL = $RETVAL->retain;
+[% END
+-%]
+		return $RETVAL;
+	}
+[% END -%]
+[%#-
+# vim: ft=tt2
+-%]

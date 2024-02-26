@@ -1,0 +1,30 @@
+# [-Perl::Critic::Policy::Miscellanea::RequireRcsKeywords]
+# [-Miscellanea::RequireRcsKeywords]
+
+# [-Modules::RequireVersionVar]
+
+[-CodeLayout::ProhibitParensWithBuiltins]
+[-CodeLayout::RequireTidyCode]
+
+[-RegularExpressions::RequireExtendedFormatting]
+[-RegularExpressions::RequireDotMatchAnything]
+[-RegularExpressions::RequireLineBoundaryMatching]
+
+[-InputOutput::RequireCheckedSyscalls]
+
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = Modern::Perl
+
+[TestingAndDebugging::RequireUseWarnings]
+equivalent_modules = Modern::Perl
+
+# [-Documentation::PodSpelling]
+
+[Subroutines::ProhibitUnusedPrivateSubroutines]
+private_name_regex = _(?!build|trigger_)\w+
+
+[-ControlStructures::ProhibitUnlessBlocks]
+
+[-ControlStructures::ProhibitPostfixControls]
+[-Subroutines::ProhibitSubroutinePrototypes]
+[-Subroutines::ProhibitExplicitReturnUndef]

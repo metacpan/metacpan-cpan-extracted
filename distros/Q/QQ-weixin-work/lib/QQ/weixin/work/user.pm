@@ -19,17 +19,18 @@ use LWP::UserAgent;
 use JSON;
 use utf8;
 
-our $VERSION = '0.06';
+our $VERSION = '0.10';
 our @EXPORT = qw/ create get update delete batchdelete
                   simplelist list convert_to_openid convert_to_userid authsucc
-                  get_active_stat getuserid
-                  getuserinfo get_mobile_hashcode /;
+                  get_active_stat getuserid get_userid_by_email list_id
+                  getuserinfo get_mobile_hashcode tfa_succ /;
 
 =head1 FUNCTION
 
 =head2 create(access_token, hash);
 
 创建成员
+最后更新：2023/09/27
 
 =head2 SYNOPSIS
 
@@ -39,78 +40,84 @@ L<https://developer.work.weixin.qq.com/document/path/90195>
 
 =head4 请求包结构体为：
 
-    {
-      "userid": "zhangsan",
-      "name": "张三",
-      "alias": "jackzhang",
-      "mobile": "13800000000",
-      "department": [1, 2],
-      "order":[10,40],
-      "position": "产品经理",
-      "gender": "1",
-      "email": "zhangsan@gzdev.com",
-      "is_leader_in_dept": [1, 0],
-      "enable":1,
-      "avatar_mediaid": "2-G6nrLmr5EC3MNb_-zL1dDdzkd0p7cNliYu9V5w7o8K0",
-      "telephone": "020-123456",
-      "address": "广州市海珠区新港中路",
-      "extattr": {
-        "attrs": [
-            {
-                "type": 0,
-                "name": "文本名称",
-                "text": {
-                    "value": "文本"
-                }
-            },
-            {
-                "type": 1,
-                "name": "网页名称",
-                "web": {
-                    "url": "http://www.test.com",
-                    "title": "标题"
-                }
-            }
-        ]
-      },
-      "to_invite": true,
-      "external_position": "高级产品经理",
-      "external_profile": {
-        "external_corp_name": "企业简称",
-        "external_attr": [
-            {
-                "type": 0,
-                "name": "文本名称",
-                "text": {
-                    "value": "文本"
-                }
-            },
-            {
-                "type": 1,
-                "name": "网页名称",
-                "web": {
-                    "url": "http://www.test.com",
-                    "title": "标题"
-                }
-            },
-            {
-                "type": 2,
-                "name": "测试app",
-                "miniprogram": {
-                    "appid": "wx8bd8012614784fake",
-                    "pagepath": "/index",
-                    "title": "my miniprogram"
-                }
-            }
-        ]
-      }
-    }
+	{
+		"userid": "zhangsan",
+		"name": "张三",
+		"alias": "jackzhang",
+		"mobile": "+86 13800000000",
+		"department": [1, 2],
+		"order":[10,40],
+		"position": "产品经理",
+		"gender": "1",
+		"email": "zhangsan@gzdev.com",
+		"biz_mail":"zhangsan@qyycs2.wecom.work",
+		"is_leader_in_dept": [1, 0],
+		"direct_leader":["lisi"],
+		"enable":1,
+		"avatar_mediaid": "2-G6nrLmr5EC3MNb_-zL1dDdzkd0p7cNliYu9V5w7o8K0",
+		"telephone": "020-123456",
+		"address": "广州市海珠区新港中路",
+		"main_department": 1,
+		"extattr": {
+			"attrs": [
+				{
+					"type": 0,
+					"name": "文本名称",
+					"text": {
+						"value": "文本"
+					}
+				},
+				{
+					"type": 1,
+					"name": "网页名称",
+					"web": {
+						"url": "http://www.test.com",
+						"title": "标题"
+					}
+				}
+			]
+		},
+		"to_invite": true,
+		"external_position": "高级产品经理",
+		"external_profile": {
+			"external_corp_name": "企业简称",
+			"wechat_channels": {
+				"nickname": "视频号名称"
+			},
+			"external_attr": [
+				{
+					"type": 0,
+					"name": "文本名称",
+					"text": {
+						"value": "文本"
+					}
+				},
+				{
+					"type": 1,
+					"name": "网页名称",
+					"web": {
+						"url": "http://www.test.com",
+						"title": "标题"
+					}
+				},
+				{
+					"type": 2,
+					"name": "测试app",
+					"miniprogram": {
+						"appid": "wx8bd8012614784fake",
+						"pagepath": "/index",
+						"title": "my miniprogram"
+					}
+				}
+			]
+		}
+	}
 
 =head4 参数说明：
 
     参数	            必须	说明
-    access_token	是	调用接口凭证。获取方法查看“获取access_token”
-	userid	是	成员UserID。对应管理端的帐号，企业内必须唯一。长度为1~64个字节。只能由数字、字母和“_-@.”四种字符组成，且第一个字符必须是数字或字母。系统进行唯一性检查时会忽略大小写。
+	access_token	是	调用接口凭证。获取方法查看“获取access_token”
+	userid	是	成员UserID。对应管理端的账号，企业内必须唯一。长度为1~64个字节。只能由数字、字母和“_-@.”四种字符组成，且第一个字符必须是数字或字母。系统进行唯一性检查时会忽略大小写。
 	name	是	成员名称。长度为1~64个utf8字符
 	alias	否	成员别名。长度1~64个utf8字符
 	mobile	否	手机号码。企业内必须唯一，mobile/email二者不能同时为空
@@ -119,10 +126,10 @@ L<https://developer.work.weixin.qq.com/document/path/90195>
 	position	否	职务信息。长度为0~128个字符
 	gender	否	性别。1表示男性，2表示女性
 	email	否	邮箱。长度6~64个字节，且为有效的email格式。企业内必须唯一，mobile/email二者不能同时为空
-	biz_mail	否	企业邮箱。仅对开通企业邮箱的企业有效。长度6~64个字节，且为有效的企业邮箱格式。企业内必须唯一。未填写则系统会为用户生成默认企业邮箱（可修改一次）
+	biz_mail	否	企业邮箱。仅对开通企业邮箱的企业有效。长度6~64个字节，且为有效的企业邮箱格式。企业内必须唯一。未填写则系统会为用户生成默认企业邮箱（由系统生成的邮箱可修改一次，2022年4月25日之后创建的成员需通过企业管理后台-协作-邮件-邮箱管理-成员邮箱修改）
 	telephone	否	座机。32字节以内，由纯数字、“-”、“+”或“,”组成。
 	is_leader_in_dept	否	个数必须和参数department的个数一致，表示在所在的部门内是否为部门负责人。1表示为部门负责人，0表示非部门负责人。在审批(自建、第三方)等应用里可以用来标识上级审批人
-	direct_leader	否	直属上级UserID，设置范围为企业内成员，可以设置最多5个上级
+	direct_leader	否	直属上级UserID，设置范围为企业内成员，可以设置最多1个上级
 	avatar_mediaid	否	成员头像的mediaid，通过素材管理接口上传图片获得的mediaid
 	enable	否	启用/禁用成员。1表示启用成员，0表示禁用成员
 	extattr	否	自定义字段。自定义字段需要先在WEB管理端添加，见扩展属性添加方法，否则忽略未知属性的赋值。
@@ -181,6 +188,7 @@ sub create {
 =head2 get(access_token, userid);
 
 读取成员
+最后更新：2023/10/23
 
 =head2 SYNOPSIS
 
@@ -213,7 +221,7 @@ L<https://developer.work.weixin.qq.com/document/path/90196>
 		"email": "zhangsan@gzdev.com",
 		"biz_mail":"zhangsan@qyycs2.wecom.work",
 		"is_leader_in_dept": [1, 0],
-		"direct_leader":["lisi","wangwu"],
+		"direct_leader":["lisi"],
 		"avatar": "http://wx.qlogo.cn/mmopen/ajNVdqHZLLA3WJ6DSZUfiakYe37PKnQhBIeOQBO4czqrnZDS79FH5Wm5m4X69TBicnHFlhiafvDwklOpZeXYQQ2icg/0",
 		"thumb_avatar": "http://wx.qlogo.cn/mmopen/ajNVdqHZLLA3WJ6DSZUfiakYe37PKnQhBIeOQBO4czqrnZDS79FH5Wm5m4X69TBicnHFlhiafvDwklOpZeXYQQ2icg/100",
 		"telephone": "020-123456",
@@ -277,7 +285,6 @@ L<https://developer.work.weixin.qq.com/document/path/90196>
 		}
 	}
 
-
 =head4 RETURN 参数说明
 
     参数	        说明
@@ -330,6 +337,7 @@ sub get {
 =head2 update(access_token, hash);
 
 更新成员
+最后更新：2023/09/07
 
 =head2 SYNOPSIS
 
@@ -339,71 +347,77 @@ L<https://developer.work.weixin.qq.com/document/path/90197>
 
 =head4 请求包体:
 
-    {
-      "userid": "zhangsan",
-      "name": "李四",
-      "department": [1],
-      "order": [10],
-      "position": "后台工程师",
-      "mobile": "13800000000",
-      "gender": "1",
-      "email": "zhangsan@gzdev.com",
-      "is_leader_in_dept": [1],
-      "enable": 1,
-      "avatar_mediaid": "2-G6nrLmr5EC3MNb_-zL1dDdzkd0p7cNliYu9V5w7o8K0",
-      "telephone": "020-123456",
-      "alias": "jackzhang",
-      "address": "广州市海珠区新港中路",
-      "extattr": {
-        "attrs": [
-            {
-                "type": 0,
-                "name": "文本名称",
-                "text": {
-                    "value": "文本"
-                }
-            },
-            {
-                "type": 1,
-                "name": "网页名称",
-                "web": {
-                    "url": "http://www.test.com",
-                    "title": "标题"
-                }
-            }
-        ]
-      },
-      "external_position": "工程师",
-      "external_profile": {
-        "external_corp_name": "企业简称",
-        "external_attr": [
-            {
-                "type": 0,
-                "name": "文本名称",
-                "text": {
-                    "value": "文本"
-                }
-            },
-            {
-                "type": 1,
-                "name": "网页名称",
-                "web": {
-                    "url": "http://www.test.com",
-                    "title": "标题"
-                }
-            },
-            {
-                "type": 2,
-                "name": "测试app",
-                "miniprogram": {
-                    "appid": "wx8bd80126147dFAKE",
-                    "pagepath": "/index",
-                    "title": "my miniprogram"
-                }
-            }
-        ]
-      }
-    }
+	{
+		"userid": "zhangsan",
+		"name": "李四",
+		"department": [1],
+		"order": [10],
+		"position": "后台工程师",
+		"mobile": "13800000000",
+		"gender": "1",
+		"email": "zhangsan@gzdev.com",
+		"biz_mail":"zhangsan@qyycs2.wecom.work",
+		"is_leader_in_dept": [1],
+		"direct_leader":["lisi"],
+		"enable": 1,
+		"avatar_mediaid": "2-G6nrLmr5EC3MNb_-zL1dDdzkd0p7cNliYu9V5w7o8K0",
+		"telephone": "020-123456",
+		"alias": "jackzhang",
+		"address": "广州市海珠区新港中路",
+		"main_department": 1,
+		"extattr": {
+			"attrs": [
+				{
+					"type": 0,
+					"name": "文本名称",
+					"text": {
+						"value": "文本"
+					}
+				},
+				{
+					"type": 1,
+					"name": "网页名称",
+					"web": {
+						"url": "http://www.test.com",
+						"title": "标题"
+					}
+				}
+			]
+		},
+		"external_position": "工程师",
+		"external_profile": {
+			"external_corp_name": "企业简称",
+			"wechat_channels": {
+				"nickname": "视频号名称",
+			},
+			"external_attr": [
+				{
+					"type": 0,
+					"name": "文本名称",
+					"text": {
+						"value": "文本"
+					}
+				},
+				{
+					"type": 1,
+					"name": "网页名称",
+					"web": {
+						"url": "http://www.test.com",
+						"title": "标题"
+					}
+				},
+				{
+					"type": 2,
+					"name": "测试app",
+					"miniprogram": {
+						"appid": "wx8bd80126147dFAKE",
+						"pagepath": "/index",
+						"title": "my miniprogram"
+					}
+				}
+			]
+		}
+	}
 
 =head4 参数说明：
 
@@ -482,6 +496,7 @@ sub update {
 =head2 delete(access_token, userid);
 
 删除成员
+最后更新：2021/08/09
 
 =head2 SYNOPSIS
 
@@ -535,6 +550,7 @@ sub delete {
 =head2 batchdelete(access_token, hash);
 
 批量删除成员
+最后更新：2019/06/13
 
 =head2 SYNOPSIS
 
@@ -590,9 +606,10 @@ sub batchdelete {
     return 0;
 }
 
-=head2 simplelist(access_token, department_id, fetch_child);
+=head2 simplelist(access_token, department_id);
 
 获取部门成员
+最后更新：2022/08/22
 
 =head2 SYNOPSIS
 
@@ -600,12 +617,17 @@ L<https://work.weixin.qq.com/api/doc/90000/90135/90200>
 
 =head3 请求说明：
 
+	企业通讯录安全特别重要，企业微信将持续升级加固通讯录接口的安全机制，以下是关键的变更点：
+
+	【重要】从2022年8月15日10点开始，“企业管理后台 - 管理工具 - 通讯录同步”的新增IP将不能再调用此接口，企业可通过「获取成员ID列表」和「获取部门ID列表」接口获取userid和部门ID列表。查看调整详情
+
 =head4 参数说明：
 
     参数	            必须	说明
     access_token	是	调用接口凭证
     department_id	是	获取的部门id
-    fetch_child	否	是否递归获取子部门下面的成员：1-递归获取，0-只获取本部门
+
+	如需获取该部门及其子部门的所有成员，需先获取该部门下的子部门，然后再获取子部门下的部门成员，逐层递归获取。
 
 =head3 权限说明
 
@@ -643,12 +665,11 @@ sub simplelist {
     if ( @_ && $_[0] && $_[1] ) {
         my $access_token = $_[0];
         my $department_id = $_[1];
-        my $fetch_child = $_[2] || 0;
         my $ua = LWP::UserAgent->new;
         $ua->timeout(30);
         $ua->env_proxy;
 
-        my $response = $ua->get("https://qyapi.weixin.qq.com/cgi-bin/user/simplelist?access_token=$access_token&department_id=$department_id&fetch_child=$fetch_child");
+        my $response = $ua->get("https://qyapi.weixin.qq.com/cgi-bin/user/simplelist?access_token=$access_token&department_id=$department_id");
         if ($response->is_success) {
             return from_json($response->decoded_content,{utf8 => 1, allow_nonref => 1});
         }
@@ -657,9 +678,10 @@ sub simplelist {
     return 0;
 }
 
-=head2 list(access_token, department_id, fetch_child);
+=head2 list(access_token, department_id);
 
 获取部门成员详情
+最后更新：2023/09/07
 
 =head2 SYNOPSIS
 
@@ -667,12 +689,19 @@ L<https://developer.work.weixin.qq.com/document/path/90201>
 
 =head3 请求说明：
 
+	应用只能获取可见范围内的成员信息，且每种应用获取的字段有所不同，在返回结果说明中会逐个说明。企业通讯录安全特别重要，企业微信持续升级加固通讯录接口的安全机制，以下是关键的变更点：
+
+	从2022年6月20号20点开始，除通讯录同步以外的基础应用（如客户联系、微信客服、会话存档、日程等），以及新创建的自建应用与代开发应用，调用该接口时，不再返回以下字段：头像、性别、手机、邮箱、企业邮箱、员工个人二维码、地址，应用需要通过oauth2手工授权的方式获取管理员与员工本人授权的字段。
+
+	【重要】从2022年8月15日10点开始，“企业管理后台 - 管理工具 - 通讯录同步”的新增IP将不能再调用此接口，企业可通过「获取成员ID列表」和「获取部门ID列表」接口获取userid和部门ID列表。查看调整详情。
+
 =head4 参数说明：
 
     参数	            必须	说明
     access_token	是	调用接口凭证
     department_id	是	获取的部门id
-    fetch_child	    否	1/0：是否递归获取子部门下面的成员
+
+	如需获取该部门及其子部门的所有成员，需先获取该部门下的子部门，然后再获取子部门下的部门成员，逐层递归获取。
 
 =head3 权限说明
 
@@ -680,81 +709,85 @@ L<https://developer.work.weixin.qq.com/document/path/90201>
 
 =head3 RETURN 返回结果
 
-    {
-        "errcode": 0,
-        "errmsg": "ok",
-        "userlist": [
-            {
-              "userid": "zhangsan",
-              "name": "李四",
-              "department": [1, 2],
-              "order": [1, 2],
-              "position": "后台工程师",
-              "mobile": "13800000000",
-              "gender": "1",
-              "email": "zhangsan@gzdev.com",
-              "is_leader_in_dept": [1, 0],
-              "avatar": "http://wx.qlogo.cn/mmopen/ajNVdqHZLLA3WJ6DSZUfiakYe37PKnQhBIeOQBO4czqrnZDS79FH5Wm5m4X69TBicnHFlhiafvDwklOpZeXYQQ2icg/0",
-              "thumb_avatar": "http://wx.qlogo.cn/mmopen/ajNVdqHZLLA3WJ6DSZUfiakYe37PKnQhBIeOQBO4czqrnZDS79FH5Wm5m4X69TBicnHFlhiafvDwklOpZeXYQQ2icg/100",
-              "telephone": "020-123456",
-              "enable": 1,
-              "alias": "jackzhang",
-              "status": 1,
-              "address": "广州市海珠区新港中路",
-              "hide_mobile" : 0,
-              "english_name" : "jacky",
-              "extattr": {
-                "attrs": [
-                    {
-                        "type": 0,
-                        "name": "文本名称",
-                        "text": {
-                            "value": "文本"
-                        }
-                    },
-                    {
-                        "type": 1,
-                        "name": "网页名称",
-                        "web": {
-                            "url": "http://www.test.com",
-                            "title": "标题"
-                        }
-                    }
-                ]
-              },
-              "qr_code": "https://open.work.weixin.qq.com/wwopen/userQRCode?vcode=xxx",
-              "external_position": "产品经理",
-              "external_profile": {
-                "external_corp_name": "企业简称",
-                "external_attr": [{
-                        "type": 0,
-                        "name": "文本名称",
-                        "text": {
-                            "value": "文本"
-                        }
-                    },
-                    {
-                        "type": 1,
-                        "name": "网页名称",
-                        "web": {
-                            "url": "http://www.test.com",
-                            "title": "标题"
-                        }
-                    },
-                    {
-                        "type": 2,
-                        "name": "测试app",
-                        "miniprogram": {
-                            "appid": "wx8bd80126147dFAKE",
-                            "pagepath": "/index",
-                            "title": "miniprogram"
-                        }
-                    }
-                ]
-              }
-            }
-        ]
-    }
+	{
+		"errcode": 0,
+		"errmsg": "ok",
+		"userlist": [{
+			"userid": "zhangsan",
+			"name": "李四",
+			"department": [1, 2],
+			"order": [1, 2],
+			"position": "后台工程师",
+			"mobile": "13800000000",
+			"gender": "1",
+			"email": "zhangsan@gzdev.com",
+			"biz_mail":"zhangsan@qyycs2.wecom.work",
+			"is_leader_in_dept": [1, 0],
+			"direct_leader":["lisi"],
+			"avatar": "http://wx.qlogo.cn/mmopen/ajNVdqHZLLA3WJ6DSZUfiakYe37PKnQhBIeOQBO4czqrnZDS79FH5Wm5m4X69TBicnHFlhiafvDwklOpZeXYQQ2icg/0",
+			"thumb_avatar": "http://wx.qlogo.cn/mmopen/ajNVdqHZLLA3WJ6DSZUfiakYe37PKnQhBIeOQBO4czqrnZDS79FH5Wm5m4X69TBicnHFlhiafvDwklOpZeXYQQ2icg/100",
+			"telephone": "020-123456",
+			"alias": "jackzhang",
+			"status": 1,
+			"address": "广州市海珠区新港中路",
+			"english_name" : "jacky",
+			"open_userid": "xxxxxx",
+			"main_department": 1,
+			"extattr": {
+				"attrs": [
+					{
+						"type": 0,
+						"name": "文本名称",
+						"text": {
+							"value": "文本"
+						}
+					},
+					{
+						"type": 1,
+						"name": "网页名称",
+						"web": {
+							"url": "http://www.test.com",
+							"title": "标题"
+						}
+					}
+				]
+			},
+			"qr_code": "https://open.work.weixin.qq.com/wwopen/userQRCode?vcode=xxx",
+			"external_position": "产品经理",
+			"external_profile": {
+				"external_corp_name": "企业简称",
+				"wechat_channels": {
+					"nickname": "视频号名称",
+					"status": 1
+				},
+				"external_attr": [{
+						"type": 0,
+						"name": "文本名称",
+						"text": {
+							"value": "文本"
+						}
+					},
+					{
+						"type": 1,
+						"name": "网页名称",
+						"web": {
+							"url": "http://www.test.com",
+							"title": "标题"
+						}
+					},
+					{
+						"type": 2,
+						"name": "测试app",
+						"miniprogram": {
+							"appid": "wx8bd80126147dFAKE",
+							"pagepath": "/index",
+							"title": "miniprogram"
+						}
+					}
+				]
+			}
+		}]
+	}
 
 =head4 RETURN 参数说明
 
@@ -793,12 +826,11 @@ sub list {
     if ( @_ && $_[0] && $_[1] ) {
         my $access_token = $_[0];
         my $department_id = $_[1];
-        my $fetch_child = $_[2] || 0;
         my $ua = LWP::UserAgent->new;
         $ua->timeout(30);
         $ua->env_proxy;
 
-        my $response = $ua->get("https://qyapi.weixin.qq.com/cgi-bin/user/list?access_token=$access_token&department_id=$department_id&fetch_child=$fetch_child");
+        my $response = $ua->get("https://qyapi.weixin.qq.com/cgi-bin/user/list?access_token=$access_token&department_id=$department_id");
         if ($response->is_success) {
             return from_json($response->decoded_content,{utf8 => 1, allow_nonref => 1});
         }
@@ -809,7 +841,10 @@ sub list {
 
 =head2 convert_to_openid(access_token, hash);
 
-userid与openid互换: userid转openid
+userid与openid互换:
+最后更新：2022/01/20
+
+userid转openid
 
 =head2 SYNOPSIS
 
@@ -940,6 +975,7 @@ sub convert_to_userid {
 =head2 authsucc(access_token, userid);
 
 二次验证
+最后更新：2023/11/15
 
 =head2 SYNOPSIS
 
@@ -1058,6 +1094,7 @@ sub get_active_stat {
 =head2 getuserid(access_token, hash);
 
 手机号获取userid
+最后更新：2022/08/16
 
 =head2 SYNOPSIS
 
@@ -1096,11 +1133,11 @@ L<https://developer.work.weixin.qq.com/document/path/95402>
     参数	    说明
     errcode	返回码
     errmsg	对返回码的文本描述内容
-    userid	成员UserID。对应管理端的帐号，企业内必须唯一。不区分大小写，长度为1~64个字节
+    userid	成员UserID。对应管理端的帐号，企业内必须唯一。不区分大小写，长度为1~64个字节。注意：第三方应用获取的值是密文的userid
 
 =head3 更多说明
 
-    请确保手机号的正确性，若出错的次数较多，会导致1天不可调用。
+    请确保手机号的正确性，若出错的次数超出企业规模人数的20%，会导致1天不可调用。
 
 =cut
 
@@ -1113,6 +1150,166 @@ sub getuserid {
         $ua->env_proxy;
 
         my $response = $ua->post("https://qyapi.weixin.qq.com/cgi-bin/user/getuserid?access_token=$access_token",Content => to_json($json,{allow_nonref=>1}),Content_type =>'application/json');
+        if ($response->is_success) {
+            return from_json($response->decoded_content,{utf8 => 1, allow_nonref => 1});
+        }
+
+    }
+    return 0;
+}
+
+=head2 get_userid_by_email(access_token, hash);
+
+邮箱获取userid
+最后更新：2022/07/19
+
+=head2 SYNOPSIS
+
+L<https://developer.work.weixin.qq.com/document/path/95895>
+
+=head3 请求说明：
+
+通过邮箱获取其所对应的userid。
+
+=head4 请求包结构体为：
+
+	{
+		"email":"12345@qq.com",
+		"email_type":1
+	}
+
+=head4 参数说明：
+
+    参数	            必须	说明
+    access_token	是	调用接口凭证，授权企业的token（通过获取企业凭证获取）或上游获取的下游企业的token（通过获取下级/下游企业的access_token）
+	email	是	邮箱
+	email_type	否	邮箱类型：1-企业邮箱（默认）；2-个人邮箱
+
+=head3 权限说明
+
+    应用须拥有指定成员的查看权限。
+
+=head3 RETURN 返回结果
+
+    {
+		"errcode": 0,
+		"errmsg": "ok",
+		"userid": "zhangsan"
+    }
+
+=head3 RETURN 参数说明
+
+    参数	    说明
+    errcode	返回码
+    errmsg	对返回码的文本描述内容
+    userid	成员UserID。注意：已升级openid的代开发或第三方，获取的是密文userid
+
+=head3 更多说明
+
+    请确保邮箱的正确性，若出错的次数较多，会导致1天不可调用。（限制阈值取决于安装企业的员工规模）
+
+=cut
+
+sub get_userid_by_email {
+    if ( @_ && $_[0] && ref $_[1] eq 'HASH' ) {
+        my $access_token = $_[0];
+        my $json = $_[1];
+        my $ua = LWP::UserAgent->new;
+        $ua->timeout(30);
+        $ua->env_proxy;
+
+        my $response = $ua->post("https://qyapi.weixin.qq.com/cgi-bin/user/get_userid_by_email?access_token=$access_token",Content => to_json($json,{allow_nonref=>1}),Content_type =>'application/json');
+        if ($response->is_success) {
+            return from_json($response->decoded_content,{utf8 => 1, allow_nonref => 1});
+        }
+
+    }
+    return 0;
+}
+
+=head2 list_id(access_token, hash);
+
+获取成员ID列表
+最后更新：2022/08/09
+
+=head2 SYNOPSIS
+
+L<https://developer.work.weixin.qq.com/document/path/96067>
+
+=head3 请求说明：
+
+	获取企业成员的userid与对应的部门ID列表，预计于2022年8月8号发布。若需要获取其他字段，参见「适配建议」。
+
+=head4 请求包结构体为：
+
+	{
+		"cursor": "xxxxxxx",
+		"limit": 10000
+	}
+
+=head4 参数说明：
+
+    参数	            必须	说明
+    access_token	是	调用接口凭证，授权企业的token（通过获取企业凭证获取）或上游获取的下游企业的token（通过获取下级/下游企业的access_token）
+	email	是	邮箱
+	email_type	否	邮箱类型：1-企业邮箱（默认）；2-个人邮箱
+
+=head3 权限说明
+
+    应用须拥有指定成员的查看权限。	
+=head4 参数说明：
+
+    参数	            必须	说明
+    access_token	是	调用接口凭证
+    cursor	否	用于分页查询的游标，字符串类型，由上一次调用返回，首次调用不填
+	limit	否	分页，预期请求的数据量，取值范围 1 ~ 10000
+
+=head3 权限说明
+
+	仅支持通过“通讯录同步secret”调用。
+
+=head3 RETURN 返回结果
+
+	{
+		"errcode": 0,
+		"errmsg": "ok",
+		"next_cursor": "aaaaaaaaa",
+		"dept_user": [
+			{
+				"userid": "zhangsan",
+				"department": 1
+			},
+			{
+				"userid": "zhangsan",
+				"department": 2
+			}，
+			{
+				"userid": "lisi",
+				"department": 2
+			}
+	}
+
+=head4 RETURN 参数说明
+
+    参数	        说明
+    errcode	返回码
+	errmsg	对返回码的文本描述内容
+	next_cursor	分页游标，下次请求时填写以获取之后分页的记录。如果该字段返回空则表示已没有更多数据
+	dept_user	用户-部门关系列表
+	userid	用户userid，当用户在多个部门下时会有多条记录
+	department	用户所属部门
+
+=cut
+
+sub list_id {
+    if ( @_ && $_[0] && $_[1] ) {
+        my $access_token = $_[0];
+        my $json = $_[1];
+        my $ua = LWP::UserAgent->new;
+        $ua->timeout(30);
+        $ua->env_proxy;
+
+        my $response = $ua->post("https://qyapi.weixin.qq.com/cgi-bin/user/list_id?access_token=$access_token",Content => to_json($json,{allow_nonref=>1}),Content_type =>'application/json');
         if ($response->is_success) {
             return from_json($response->decoded_content,{utf8 => 1, allow_nonref => 1});
         }
@@ -1182,12 +1379,12 @@ L<https://work.weixin.qq.com/api/doc/90000/90135/91023>
 sub getuserinfo {
     if ( @_ && $_[0] && $_[1] ) {
         my $access_token = $_[0];
-        my $code = $_[1];
+        my $json = $_[1];
         my $ua = LWP::UserAgent->new;
         $ua->timeout(30);
         $ua->env_proxy;
 
-        my $response = $ua->get("https://qyapi.weixin.qq.com/cgi-bin/user/getuserinfo?access_token=$access_token&code=$code");
+        my $response = $ua->post("https://qyapi.weixin.qq.com/cgi-bin/user/getuserinfo?access_token=$access_token",Content => to_json($json,{allow_nonref=>1}),Content_type =>'application/json');
         if ($response->is_success) {
             return from_json($response->decoded_content,{utf8 => 1, allow_nonref => 1});
         }
@@ -1260,6 +1457,67 @@ sub get_mobile_hashcode {
     return 0;
 }
 
+=head2 tfa_succ(access_token, hash);
+
+使用二次验证
+最后更新：2023/11/15
+
+=head2 SYNOPSIS
+
+L<https://developer.work.weixin.qq.com/document/path/99500>
+
+=head3 请求说明：
+
+=head4 请求包结构体为：
+
+	{
+		"userid":"USERID",
+		"tfa_code": "TFA_CODE"
+	}
+
+=head4 参数说明：
+
+	参数	            必须	说明
+    access_token	是	调用接口凭证
+    userid	是	用户的userid
+	tfa_code	是	获取用户二次验证信息接口返回的tfa_code,tfa_code五分钟内有效且只能使用一次
+
+=head3 权限说明
+
+	仅『通讯录同步』或者自建应用可调用，如用自建应用调用，用户需要在二次验证范围和应用可见范围内。
+	并发限制：20
+
+=head3 RETURN 返回结果
+
+    {
+        "errcode": 0,
+        "errmsg": "ok"
+    }
+
+=head3 RETURN 参数说明
+
+	参数	    说明
+    errcode	返回码
+    errmsg	对返回码的文本描述内容
+
+=cut
+
+sub tfa_succ {
+    if ( @_ && $_[0] && ref $_[1] eq 'HASH' ) {
+        my $access_token = $_[0];
+        my $json = $_[1];
+        my $ua = LWP::UserAgent->new;
+        $ua->timeout(30);
+        $ua->env_proxy;
+
+        my $response = $ua->post("https://qyapi.weixin.qq.com/cgi-bin/user/tfa_succ?access_token=$access_token",Content => to_json($json,{allow_nonref=>1}),Content_type =>'application/json');
+        if ($response->is_success) {
+            return from_json($response->decoded_content,{utf8 => 1, allow_nonref => 1});
+        }
+
+    }
+    return 0;
+}
 
 1;
 __END__

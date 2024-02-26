@@ -1,3 +1,13 @@
+0.007   2024-01-15  Released-By: PERLANCAR; Urgency: medium
+
+        - Add entry: Hash::Util::Pick.
+
+
+0.006   2024-01-15  Released-By: PERLANCAR; Urgency: medium
+
+        - Add entry: Sub::Fp.
+
+
 0.005   2023-09-25  Released-By: PERLANCAR; Urgency: medium
 
         - Add entry: Is::Bot.

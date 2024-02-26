@@ -1,28 +1,35 @@
 ---
 abstract: 'Dispatch by HTTP Methods'
 author:
+  - 'Aristotle Pagaltzis <pagaltzis@gmx.de>'
   - 'John Napiorkowski <jjnapiork@cpan.org>'
 build_requires:
+  Catalyst::Controller: '0'
   Catalyst::Test: '0'
   HTTP::Request::Common: '0'
-  Test::Most: '0'
-configure_requires:
-  ExtUtils::MakeMaker: '0'
+  Test::More: '0.88'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Catalyst-ActionRole-Methods
+no_index:
+  directory:
+    - t
+    - inc
 requires:
   Catalyst: '5.90060'
   Moose::Role: '2.0602'
+  perl: '5.008003'
 resources:
   bugtracker: https://github.com/jjn1056/Catalyst-ActionRole-Methods/issues
-  homepage: https://github.com/jjn1056/Catalyst-ActionRole-Methods
+  license: http://dev.perl.org/licenses/
   repository: https://github.com/jjn1056/Catalyst-ActionRole-Methods.git
-version: '0.004'
-x_generated_by_perl: v5.34.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+version: '0.103'
+x_copyright:
+  holder: 'Aristotle Pagaltzis'
+  year: 2024
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

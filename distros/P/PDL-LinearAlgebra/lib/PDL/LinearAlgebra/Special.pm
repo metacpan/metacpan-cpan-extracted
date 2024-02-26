@@ -53,7 +53,7 @@ Construct Hilbert matrix from specifications list or template ndarray
 
 =cut
 
-sub mhilb { 
+sub mhilb {
 	if(ref($_[0]) && ref($_[0]) eq 'PDL'){
 		 my $pdl = shift;
 		 $pdl->mhilb(@_);
@@ -112,9 +112,9 @@ mvander(M,P) is a rectangular version of mvander(P) with M Columns.
 
 =cut
 
-sub mvander($;$) { 
+sub mvander($;$) {
 	my $exp =  @_ == 2 ? sequence(shift) : sequence($_[0]->dim(-1));
-	$_[0]->dummy(-2)**$exp;	
+	$_[0]->dummy(-2)**$exp;
 }
 
 =head2 mpart
@@ -153,7 +153,7 @@ Handles complex data.
 
 =for usage
 
- mhankel(c,r), where c and r are vectors, returns matrix whose first column 
+ mhankel(c,r), where c and r are vectors, returns matrix whose first column
  is c and whose last row is r. The last element of c prevails.
  mhankel(c) returns matrix with element below skew diagonal (anti-diagonal) equals
  to zero. If c is a scalar number, make it from sequence beginning at one.
@@ -204,7 +204,7 @@ Handles complex data.
 
 =for usage
 
- mtoeplitz(c,r), where c and r are vectors, returns matrix whose first column 
+ mtoeplitz(c,r), where c and r are vectors, returns matrix whose first column
  is c and whose last row is r. The last element of c prevails.
  mtoeplitz(c) returns symmetric matrix.
 
@@ -248,7 +248,7 @@ Return Pascal matrix (from Pascal's triangle) of order N.
 
 This matrix is obtained by writing Pascal's triangle (whose elements are binomial
 coefficients from index and/or index sum) as a matrix and truncating appropriately.
-The symmetric Pascal is positive definite, it's inverse has integer entries.
+The symmetric Pascal is positive definite, its inverse has integer entries.
 
 Their determinants are all equal to one and:
 
@@ -261,32 +261,19 @@ Their determinants are all equal to one and:
 *mpascal = \&PDL::mpascal;
 sub PDL::mpascal {
 	my ($m, $n) = @_;
-	my $mat;
-	$mat = eval {
-		require PDL::Stats::Distributions;
-		$mat = xvals($m);
-		if ($n > 1){
-			return (PDL::Stats::Distributions::choose($mat + $mat->dummy(0),$mat))[0];
-		}
-		else{
-			$mat = PDL::Stats::Distributions::choose($mat,$mat->dummy(0));
-			return $n ? $mat->xchg(0,1)->mtri(1) : $mat->mtri;
-		}
-	};
-	return $mat if !$@;
-	$mat = eval {
+	my $mat = eval {
 		require PDL::GSLSF::GAMMA;
 		if ($n > 1){
-			$mat = xvals($m);
+			my $mat = xvals($m);
 			return (PDL::GSLSF::GAMMA::gsl_sf_choose($mat + $mat->dummy(0),$mat))[0];
 		}else{
-			$mat = xvals($m, $m);
+			my $mat = xvals($m, $m);
 			return (PDL::GSLSF::GAMMA::gsl_sf_choose($mat->tritosym,$mat->xchg(0,1)->tritosym))[0]->mtri($n);
 		}
 	};
 	return $mat if !$@;
-	warn("mpascal: can't compute binomial coefficients with neither".
-		" PDL::Stats::Distributions nor PDL::GSLSF::GAMMA\n");
+	warn("mpascal: can't compute binomial coefficients without".
+		" PDL::GSLSF::GAMMA\n");
 	return;
 }
 

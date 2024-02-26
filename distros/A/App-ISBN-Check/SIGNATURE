@@ -1,0 +1,61 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 a44b0f949bb16a33cc0360550c478495adbe6cadf2805c5c481daab8548ffb77 CONCEPT
+SHA256 0bb51f06d88bed68257c28beaf52a7f4e0c48da6026734626709636763ebd448 Changes
+SHA256 e1b5402606e2ae425ca3fc4434a8dc66ddca4bceb4e0062e1c532dd113eb435b Check.pm
+SHA256 e9721661dbfb60dadebf3cd197cbc00239895aa73fb3431e19490cfad301cf99 LICENSE
+SHA256 736c39c4a593543648ad35272102785a4256dfd19f5cebd52ade3a06b03ce837 MANIFEST
+SHA256 23bba53eb0d23f5e5e6af9be1c821404243963c46d8311833ee3e5afacd0e43a META.yml
+SHA256 c64141d469ade7e77d393d6637e54c1716e865dbc9c9bffd5ec934335cbf2608 Makefile.PL
+SHA256 dfacbb8992a3aca4182f397771b6d41d19e63fb4f7c07885608ec673738a7e07 README
+SHA256 e3a3dbd8ff5e9808cf09e089f5fa150af8e907e645dc9acc8105e5f483d773b0 bin/isbn-check
+SHA256 f9d78c9efefb7036a45cf3f17438fa27712c8b4ac5d65ac217fd6e6b87dad1d9 examples/check_example_isbns.pl
+SHA256 ce5cf8d83459dc8a91f1da562424ef4b48b1995ef393f745ee0464cfefe04b67 examples/print_help.pl
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 63ec8405523ae67c33823dcf4b136a46f0711fb17a8b58b49ddd922ed6b69611 inc/Module/Install/Scripts.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 6ad8bb07a85a270de3d26b5fa69d64f09b36bd5701eeac6dab1622c07b63eed0 t/App-ISBN-Check/01-use.t
+SHA256 d724c29e38509f5de5eb63c19c860e20751b56a525802b9f6a94f22277c4436c t/App-ISBN-Check/02-version.t
+SHA256 ca4d6609380d96411b614824efb2dc0d3525ee6e0c9e9b75d8a47bbedeaa721a t/App-ISBN-Check/03-new.t
+SHA256 e58cdf5f2a58f00dfb73f80fc3cef186dfef2827acf4bd8da7d0cf00fe74ac40 t/App-ISBN-Check/04-run.t
+SHA256 d47d19765343fc595a004f2812a41a0c39bca85eeb7c168a8b8b803dfeaed194 t/data/bad_isbns.txt
+SHA256 fcd91efb7a975eceeeb8db711d5ea10e7a2e95563ee29d3d7bc32122e43c7cb3 t/data/right_isbns.txt
+SHA256 b58c6283606f225a9bc9da3dad53bffae103707b1d33b3833b53b0c2ec0a2544 xt/App-ISBN-Check/01-pod_coverage.t
+SHA256 3c19627c7d7c18cd0a075f006b3e00c021dbcbb5b55a738fd6ddf6719af8610e xt/App-ISBN-Check/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEEbhzVZugfHqSVNvE7YSp92FNcjtAFAmXbjb4ACgkQYSp92FNc
+jtAo8Av/ZuOnz9kK0OrJuxwm6XW+StDrvbR+m2ZP7gyZUR3avmjIFbz9F8jwLMMy
++l2zBiwLrT1dPVy2SkZahc054fSZtKjXUaG1CXSZv5KYlBWGFMLOoNQTBHHdXwVc
+OlxpjL71ArHeY6OveHMiIbUJC+yKHDghIMN5/nsvbUFrXi8N7ItzVsH1tNzi5Apy
+iX4gUHXmKWWlJ0OuAVpZ3/Rj6JVtq9mXwcPnHbzyt9WSn8GRvtGbg1dxP3+lb6W2
+7jcm9mal9pP0upw82SmmZ+05cK6q73SorB1ZwuH6Nt58DFYHV+vk6iV6s9qML4I+
+6ROzgwnMcQxj50khQUOYz8s+HdkeEXTuefhe8eKHzudZCf/286ZaGhy+8rCW0nGz
+tYjLtlBKXKduIzmYGo7W7Ba3cQzrDdVPJAzopVq3fkVgF7rSpxfYqd1kSlQwWpIa
+e9Tqd7GWvk9oTQ7AgCiBmOSpX06mz1l9UhF7l7KVl2DNgrskLk1jLwIPn0kUEqTG
+i4Ecn1b5
+=0OJi
+-----END PGP SIGNATURE-----

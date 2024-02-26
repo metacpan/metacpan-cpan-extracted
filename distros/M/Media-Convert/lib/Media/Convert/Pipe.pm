@@ -173,7 +173,7 @@ has 'askip' => (
 Boolean. If true, the C<run> method performs a two-pass encode, rather
 than a single-pass encode.
 
-Two-pass encodes will generate a better end result, but require more
+Two-pass encodes may generate a better end result, but require more
 time to perform.
 
 =cut

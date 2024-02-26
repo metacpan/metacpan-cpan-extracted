@@ -12,9 +12,9 @@ use Getopt::Long::More;
 use Sort::Sub ();
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-08-06'; # DATE
+our $DATE = '2023-11-28'; # DATE
 our $DIST = 'App-subsort'; # DIST
-our $VERSION = '0.048'; # VERSION
+our $VERSION = '0.049'; # VERSION
 
 my %opts = (
     ignore_case => 0,
@@ -249,7 +249,7 @@ sortsub - Sort lines of text (or records) using Sort::Sub routines
 
 =head1 VERSION
 
-This document describes version 0.048 of sortsub (from Perl distribution App-subsort), released on 2023-08-06.
+This document describes version 0.049 of sortsub (from Perl distribution App-subsort), released on 2023-11-28.
 
 =head1 SYNOPSIS
 
@@ -258,18 +258,22 @@ This document describes version 0.048 of sortsub (from Perl distribution App-sub
 Examples:
 
  % subsort naturally data.txt
- % subsort naturally -r data.txt
- % subsort 'naturally<r>' data.txt
- % some-cmd | subsort by_several -A first='by_length<r>' -A second=numerically data.txt
+ % some-cmd-that-outputs-lines | subsort naturally -r  ; # reverse order
+ % subsort 'naturally<r>' data.txt                     ; # ditto
+ % some-cmd-that-outputs-line | subsort by_several -A first='by_length<r>' -A second=numerically  ; # multiple sort orders
 
 Some other examples:
 
  # like Unix's tac
  % subsort record-by-reverse-order data.txt
 
-To list all available routines:
+To list all available (installed) routines:
 
  % subsort -l
+
+To see all available routines on CPAN (using L<lcpan>):
+
+ % lcpan mods --namespace Sort::Sub -l
 
 =head1 DESCRIPTION
 

@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,14 +59,14 @@ sub new {
 
 
 # Run Operation Request
-# DeleteWorksheetConditionalFormattingAreaRequest.name : The workbook name.  ,
+# DeleteWorksheetConditionalFormattingAreaRequest.name : The file name.  ,
 # DeleteWorksheetConditionalFormattingAreaRequest.sheetName : The worksheet name.  ,
 # DeleteWorksheetConditionalFormattingAreaRequest.startRow : The start row of the range.  ,
 # DeleteWorksheetConditionalFormattingAreaRequest.startColumn : The start column of the range.  ,
 # DeleteWorksheetConditionalFormattingAreaRequest.totalRows : The number of rows of the range.  ,
 # DeleteWorksheetConditionalFormattingAreaRequest.totalColumns : The number of columns of the range.  ,
-# DeleteWorksheetConditionalFormattingAreaRequest.folder : Original workbook folder.  ,
-# DeleteWorksheetConditionalFormattingAreaRequest.storageName : Storage name.   
+# DeleteWorksheetConditionalFormattingAreaRequest.folder : The folder where the file is situated.  ,
+# DeleteWorksheetConditionalFormattingAreaRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -77,7 +77,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'delete_worksheet_conditional_formatting_area' } = { 
-    	summary => 'Removes cell area from conditional formatting.',
+    	summary => 'Remove cell area from conditional formatting.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -150,7 +150,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -192,14 +192,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

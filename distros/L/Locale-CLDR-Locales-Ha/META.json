@@ -34,7 +34,8 @@
       "runtime" : {
          "requires" : {
             "DateTime" : "0.72",
-            "Locale::CLDR" : "v0.40.1",
+            "Locale::CLDR" : "v0.44.0",
+            "Locale::CLDR::Locales::Root" : "v0.44.0",
             "Moo" : "2",
             "MooX::ClassAttribute" : "0.011",
             "Type::Tiny" : "0",
@@ -46,23 +47,35 @@
    "provides" : {
       "Locale::CLDR::Locales::Ha" : {
          "file" : "lib/Locale/CLDR/Locales/Ha.pm",
-         "version" : "v0.40.1"
+         "version" : "v0.44.0"
       },
-      "Locale::CLDR::Locales::Ha::Any" : {
-         "file" : "lib/Locale/CLDR/Locales/Ha/Any.pm",
-         "version" : "v0.40.1"
+      "Locale::CLDR::Locales::Ha::Arab" : {
+         "file" : "lib/Locale/CLDR/Locales/Ha/Arab.pm",
+         "version" : "v0.44.0"
       },
-      "Locale::CLDR::Locales::Ha::Any::Gh" : {
-         "file" : "lib/Locale/CLDR/Locales/Ha/Any/Gh.pm",
-         "version" : "v0.40.1"
+      "Locale::CLDR::Locales::Ha::Arab::Ng" : {
+         "file" : "lib/Locale/CLDR/Locales/Ha/Arab/Ng.pm",
+         "version" : "v0.44.0"
       },
-      "Locale::CLDR::Locales::Ha::Any::Ne" : {
-         "file" : "lib/Locale/CLDR/Locales/Ha/Any/Ne.pm",
-         "version" : "v0.40.1"
+      "Locale::CLDR::Locales::Ha::Arab::Sd" : {
+         "file" : "lib/Locale/CLDR/Locales/Ha/Arab/Sd.pm",
+         "version" : "v0.44.0"
       },
-      "Locale::CLDR::Locales::Ha::Any::Ng" : {
-         "file" : "lib/Locale/CLDR/Locales/Ha/Any/Ng.pm",
-         "version" : "v0.40.1"
+      "Locale::CLDR::Locales::Ha::Latn" : {
+         "file" : "lib/Locale/CLDR/Locales/Ha/Latn.pm",
+         "version" : "v0.44.0"
+      },
+      "Locale::CLDR::Locales::Ha::Latn::Gh" : {
+         "file" : "lib/Locale/CLDR/Locales/Ha/Latn/Gh.pm",
+         "version" : "v0.44.0"
+      },
+      "Locale::CLDR::Locales::Ha::Latn::Ne" : {
+         "file" : "lib/Locale/CLDR/Locales/Ha/Latn/Ne.pm",
+         "version" : "v0.44.0"
+      },
+      "Locale::CLDR::Locales::Ha::Latn::Ng" : {
+         "file" : "lib/Locale/CLDR/Locales/Ha/Latn/Ng.pm",
+         "version" : "v0.44.0"
       }
    },
    "release_status" : "stable",
@@ -75,6 +88,6 @@
          "url" : "https://github.com/ThePilgrim/perlcldr.git"
       }
    },
-   "version" : "v0.40.1",
+   "version" : "v0.44.0",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

@@ -34,7 +34,7 @@
          "requires" : {
             "Data::Clone" : "0",
             "Data::Dmp" : "0.242",
-            "Data::Dump" : "0",
+            "Data::Dump::SortKeys" : "0",
             "Data::Sah" : "0.914",
             "Data::Sah::Util::Type" : "0.45",
             "Markdown::To::POD" : "0",
@@ -42,6 +42,8 @@
             "Moose" : "0",
             "Pod::Weaver::Role::AddTextToSection" : "0.06",
             "Pod::Weaver::Role::Section" : "0",
+            "Sort::Sub" : "0.120",
+            "Sort::Sub::sah_schema_clause" : "0",
             "String::PodQuote" : "0",
             "perl" : "5.010001",
             "strict" : "0"
@@ -59,7 +61,7 @@
    "provides" : {
       "Pod::Weaver::Plugin::Sah::Schemas" : {
          "file" : "lib/Pod/Weaver/Plugin/Sah/Schemas.pm",
-         "version" : "0.078"
+         "version" : "0.079"
       }
    },
    "release_status" : "stable",
@@ -74,7 +76,7 @@
          "web" : "https://github.com/perlancar/perl-Pod-Weaver-Plugin-Sah-Schemas"
       }
    },
-   "version" : "0.078",
+   "version" : "0.079",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038002"

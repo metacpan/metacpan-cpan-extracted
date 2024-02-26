@@ -1,5 +1,9 @@
 # Version/Revision history
 
+1.08 Sun 18 Feb 2024 13:25:18 MSK
+    * Added the preforked_run method
+    * Added acruxconfig attribute
+
 1.07 Tue 19 Dec 2023 14:58:27 MSK
     * Bug fixed: added additional condition to check file size while uploading file
     * Bug fixed: added WWW::Suffit::Server routes namespace by initialize

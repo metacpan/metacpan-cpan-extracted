@@ -753,7 +753,7 @@ my $Nplans = 0;
     eval( 'irfft4( sequence(2,3,3,4,4), sequence(5,3,4,4) );' );
     ok_should_make_plan( ! $@, "real-backward dimensionality baseline 2" );
 
-    eval( 'irfft4( sequence(2,3,3,4,4,3), sequence(5,3,4,4) );' );
+    eval( 'irfft4( sequence(2,3,3,4,4), sequence(5,3,4,4,3) );' );
     ok_should_reuse_plan( ! $@, "real-backward dimensionality baseline - extra dims should be ok" );
 
     eval( 'irfft4( sequence(3,3,3,4,4,3), sequence(5,3,4,4) );' );

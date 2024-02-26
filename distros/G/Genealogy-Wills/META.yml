@@ -7,6 +7,7 @@ build_requires:
   IPC::System::Simple: '0'
   Test::Carp: '0'
   Test::Most: '0'
+  Test::Needs: '0'
   Test::NoWarnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -26,6 +27,7 @@ requires:
   DBD::SQLite: '0'
   DBD::SQLite::Constants: '0'
   DBI: '0'
+  Database::Abstraction: '0.04'
   Error::Simple: '0'
   File::Basename: '0'
   File::HomeDir: '0'
@@ -47,5 +49,5 @@ resources:
   bugtracker: https://github.com/nigelhorne/Genealogy-Wills/issues
   homepage: https://sites.rootsweb.com/~obituary
   repository: git://github.com/nigelhorne/Genealogy-Wills.git
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

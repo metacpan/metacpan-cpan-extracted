@@ -21,16 +21,16 @@ name: PGXN-API
 provides:
   PGXN::API:
     file: lib/PGXN/API.pm
-    version: v0.20.0
+    version: v0.20.1
   PGXN::API::Indexer:
     file: lib/PGXN/API/Indexer.pm
-    version: v0.20.0
+    version: v0.20.1
   PGXN::API::Router:
     file: lib/PGXN/API/Router.pm
-    version: v0.20.0
+    version: v0.20.1
   PGXN::API::Sync:
     file: lib/PGXN/API/Sync.pm
-    version: v0.20.0
+    version: v0.20.1
 requires:
   Archive::Zip: '1.30'
   CommonMark: '0.290000'
@@ -56,12 +56,12 @@ requires:
   Plack::App::File: '0'
   Plack::Builder: '0'
   Plack::Middleware::JSONP: '0'
-  Text::Markup: '0.15'
+  Text::Markup: '0.33'
   URI::Template: '0.16'
   XML::LibXML: '1.70'
   namespace::autoclean: '0.11'
   perl: '5.014'
 resources:
   homepage: http://api.pgxn.org/
-version: v0.20.0
+version: v0.20.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

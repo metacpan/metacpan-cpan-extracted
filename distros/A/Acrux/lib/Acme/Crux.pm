@@ -21,6 +21,31 @@ The CTK::App of the next generation
 
     my $app = Acme::Crux->new(
         project     => 'MyApp',
+        moniker     => 'myapp',
+
+        options     => {foo => 'bar'},
+
+        plugins     => { foo => 'MyApp::Foo', bar => 'MyApp::Bar' },
+        preload     => 'Config, Log',
+
+        cachedir    => '/var/cache/myapp',
+        configfile  => '/etc/myapp/myapp.conf',
+        datadir     => '/var/lib/myapp',
+        docdir      => '/usr/share/doc/myapp',
+        lockdir     => '/var/lock/myapp',
+        logdir      => '/var/log/myapp',
+        logfile     => '/var/log/myapp/myapp.log',
+        pidfile     => '/var/run/myapp/myapp.pid',
+        root        => '/etc/myapp',
+        rundir      => '/var/run/myapp',
+        sharedir    => '/usr/share/myapp',
+        spooldir    => '/var/spool/myapp',
+        tempdir     => '/tmp/myapp',
+        webdir      => '/var/www/myapp',
+
+        debug       => 0,
+        test        => 0,
+        verbose     => 0,
     );
 
 =head1 ATTRIBUTES
@@ -29,7 +54,7 @@ This class implements the following attributes
 
 =head2 cachedir
 
-    cachedir => "/var/cache/myapp"
+    cachedir => '/var/cache/myapp'
 
 Cache dir for project cache files
 
@@ -51,7 +76,7 @@ Default: /etc/<MONIKER>/<MONIKER>.conf
 
 =head2 datadir
 
-    datadir => "/var/lib/myapp"
+    datadir => '/var/lib/myapp'
 
 Data dir of project
 
@@ -72,7 +97,7 @@ Default: 0
 
 =head2 docdir
 
-    docdir => "/usr/share/doc/myapp"
+    docdir => '/usr/share/doc/myapp'
 
 Doc dir for project documentation
 
@@ -83,7 +108,7 @@ Default: /usr/share/doc/<MONIKER>
 
 =head2 lockdir
 
-    lockdir => "/var/lock/myapp"
+    lockdir => '/var/lock/myapp'
 
 Lock dir for project lock files
 
@@ -94,7 +119,7 @@ Default: /var/lock/<MONIKER>
 
 =head2 logdir
 
-    logdir => "/var/log/myapp"
+    logdir => '/var/log/myapp'
 
 Log dir for project logging
 
@@ -116,7 +141,7 @@ Default: /var/log/<MONIKER>/<MONIKER>.log
 
 =head2 moniker
 
-    moniker => 'myapp',
+    moniker => 'myapp'
 
 This attribute sets moniker of project name.
 
@@ -183,7 +208,7 @@ Default plugins:
 
 =head2 project
 
-    project => 'MyApp',
+    project => 'MyApp'
 
 Name of project
 
@@ -194,7 +219,7 @@ Default: script name (without file extension) or invocant class
 
 =head2 root
 
-    root => "/etc/myapp"
+    root => '/etc/myapp'
 
 Root dir of project
 
@@ -205,7 +230,7 @@ Default: /etc/<MONIKER>
 
 =head2 rundir
 
-    rundir => "/var/run/myapp"
+    rundir => '/var/run/myapp'
 
 Run dir for project pid files
 
@@ -216,7 +241,7 @@ Default: /var/run/<MONIKER>
 
 =head2 sharedir
 
-    sharedir => "/usr/share/myapp"
+    sharedir => '/usr/share/myapp'
 
 Share dir for project
 
@@ -227,7 +252,7 @@ Default: /usr/share/<MONIKER>
 
 =head2 spooldir
 
-    spooldir => "/var/spool/myapp"
+    spooldir => '/var/spool/myapp'
 
 Spool is the dir for project pool data
 
@@ -238,7 +263,7 @@ Default: /var/spool/<MONIKER>
 
 =head2 tempdir
 
-    tempdir => "/tmp/myapp"
+    tempdir => '/tmp/myapp'
 
 Temp dir for project temporary files
 
@@ -257,7 +282,6 @@ Test mode
 
 Default: 0
 
-
 =head2 verbose
 
     verbose => 1
@@ -270,7 +294,7 @@ Default: 0
 
 =head2 webdir
 
-    webdir => "/var/www/myapp"
+    webdir => '/var/www/myapp'
 
 Web dir for project web files (DocumentRoot)
 
@@ -587,7 +611,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Carp qw/carp croak/;
 use Time::HiRes qw/gettimeofday tv_interval/;

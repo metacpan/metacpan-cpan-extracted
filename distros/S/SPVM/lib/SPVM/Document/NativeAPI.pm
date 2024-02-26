@@ -4,7 +4,7 @@ SPVM::Document::NativeAPI - Native APIs
 
 =head1 Description
 
-The native APIs of L<SPVM> are the APIs written by the C language for various operations.
+The native APIs in L<SPVM> are the APIs written by the C language for various operations.
 
 These APIs are used in L<native classes|SPVM::Document::NativeClass>.
 
@@ -1892,7 +1892,7 @@ Prints a string and C<\n> to stdout. This is the same operator as the say operat
 
 =head2 warn
 
-C<void (*warn)(SPVM_ENV* env, SPVM_VALUE* stack, void* string, const char* class_dir, const char* class_rel_file, int32_t line);>
+C<void (*warn)(SPVM_ENV* env, SPVM_VALUE* stack, void* string, const char* file, int32_t line);>
 
 Operates the warn operator.
 
@@ -1913,6 +1913,14 @@ Gets the standard output opened for SPVM.
 C<FILE* (*spvm_stderr)(SPVM_ENV* env, SPVM_VALUE* stack);>
 
 Gets the standard error opened for SPVM.
+
+=head2 check_bootstrap_method
+
+C<int32_t (*check_bootstrap_method)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name);>
+
+Checks the definition of the bootstrap method.
+
+If it is invalid, return non-zero, otherwise return 0.
 
 =head1 Native API IDs
 
@@ -2130,6 +2138,7 @@ Native APIs have its IDs. These IDs are permanently same for the binary compatib
   209 spvm_stdin,
   210 spvm_stdout,
   211 spvm_stderr,
+  212 check_bootstrap_method
 
 =head1 Constant Values
 

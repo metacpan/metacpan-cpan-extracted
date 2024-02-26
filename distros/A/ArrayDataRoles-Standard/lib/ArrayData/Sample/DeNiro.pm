@@ -9,7 +9,7 @@ use Role::Tiny::With;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2024-01-15'; # DATE
 our $DIST = 'ArrayDataRoles-Standard'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 with 'ArrayDataRole::Source::LinesInDATA';
 
@@ -26,7 +26,7 @@ ArrayData::Sample::DeNiro - List of Robert De Niro's movies, in chronological or
 
 =head1 VERSION
 
-This document describes version 0.008 of ArrayData::Sample::DeNiro (from Perl distribution ArrayDataRoles-Standard), released on 2024-01-15.
+This document describes version 0.009 of ArrayData::Sample::DeNiro (from Perl distribution ArrayDataRoles-Standard), released on 2024-01-15.
 
 =head1 HOMEPAGE
 
@@ -35,6 +35,12 @@ Please visit the project's homepage at L<https://metacpan.org/release/ArrayDataR
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-ArrayDataRoles-Standard>.
+
+=head1 SEE ALSO
+
+L<HashData::Sample::DeNiro>
+
+L<TableData::Sample::DeNiro>
 
 =head1 AUTHOR
 

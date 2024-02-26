@@ -1278,7 +1278,9 @@ BOOT:
     const_iv (FS_IOC_SETFLAGS)
     const_iv (FS_IOC_GETVERSION)
     const_iv (FS_IOC_SETVERSION)
+#if HAVE_FIEMAP /* broken on musl for, like, foreever */
     const_iv (FS_IOC_FIEMAP)
+#endif
     const_iv (FS_IOC_FSGETXATTR)
     const_iv (FS_IOC_FSSETXATTR)
     const_iv (FS_IOC_SET_ENCRYPTION_POLICY)
@@ -2915,7 +2917,7 @@ fexecve (SV *fh, SV *args, SV *envs = &PL_sv_undef)
           }
         else
           envp = extract_stringvec (envs, "IO::AIO::fexecve: envs must be an array of strings");
-#if _POSIX_VERSION >= 200809L
+#if HAVE_FEXECVE
           RETVAL = fexecve (fd, argv, envp);
 #else
           RETVAL = (errno = ENOSYS, -1);
@@ -2943,7 +2945,7 @@ umount (octet_string path, int flags = 0)
           RETVAL = (errno = ENOSYS, -1);
 #endif
         else
-#if HAVE_MOUNT
+#if HAVE_UMOUNT
           RETVAL = umount (path);
 #else
           RETVAL = (errno = ENOSYS, -1);

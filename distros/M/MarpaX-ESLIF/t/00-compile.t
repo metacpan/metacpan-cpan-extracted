@@ -35,10 +35,7 @@ my @module_files = (
 
 
 
-# fake home for cpan-testers
-use File::Temp;
-local $ENV{HOME} = File::Temp::tempdir( CLEANUP => 1 );
-
+# no fake home requested
 
 my @switches = (
     -d 'blib' ? '-Mblib' : '-Ilib',

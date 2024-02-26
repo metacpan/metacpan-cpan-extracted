@@ -8,9 +8,9 @@ use AsposeCellsCloud::Request::GetWorksheetCellsRangeValue;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**name** | **string** | The workbook name. |
+**name** | **string** | The file name. |
 **sheet_name** | **string** | The worksheet name. |
-**namerange** | **string** | range name. |
+**namerange** | **string** | The range name. |
 **first_row** | **int** | Gets the index of the first row of the range. |
 **first_column** | **int** | Gets the index of the first columnn of the range. |
 **row_count** | **int** | Gets the count of rows in the range. |

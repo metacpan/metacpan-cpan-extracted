@@ -212,6 +212,40 @@ The CMDB type is control by `cmdb/.cmdb_type`. Setting the contents to
 for example `YAMLwithRoles` will cause `YAMLwithRoles` to be used as
 the CMDB.
 
+```
+   ,-----------------------------------------------------.                                                                    
+   |shell_conf                                           |                                                                    
+   |-----------------------------------------------------|                                                                    
+   |./$group/$system.sh                                  |                                                                    
+   |ran under ./$group/                                  |                                                                    
+   |                                                     |                                                                    
+   |Dirs matching ./$dir/.not_a_system_group are ignored.|                                                                    
+   `-----------------------------------------------------'                                                                    
+                               |                                                                                              
+                               |                                                                                              
+               ,------------------------------.  ,-------------------.   ,---------------------------------------------------.
+               |CMDB                          |  |CMDB_YAMLwithRoles |   |CMDB_YAMLwithRoles_Roles                           |
+               |------------------------------|  |-------------------|   |---------------------------------------------------|
+               |Rex CMDB under ./cmdb         |--|cmdb/{$system}.yaml|---|.roles variable read and roles/$role.yaml merged in|
+               |Settable via ./cmdb/.cmdb_type|  |cmdb/default.yaml  |   `---------------------------------------------------'
+               `------------------------------'  `-------------------'                                                        
+                               |                                                                                              
+,------------------------------------------------------------.                                                                
+|munger                                                      |                                                                
+|------------------------------------------------------------|                                                                
+|$found_vars hash ref                                        |                                                                
+|Any changes to it will be reflected in the generated output.|                                                                
+`------------------------------------------------------------'                                                                
+                               |                                                                                              
+                                                                                                                              
+                       ,-------------.                                                                                        
+                       |end          |                                                                                        
+                       |-------------|                                                                                        
+                       |write file(s)|                                                                                        
+                       `-------------'                                                                                        
+
+```
+
 ## Integration With Ansible
 
 This may easily be integrated with ansible such as like below.

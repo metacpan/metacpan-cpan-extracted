@@ -1,0 +1,68 @@
+{
+   "abstract" : "A module to allow Spring-Boot esq route declarations in Dancer2",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dancer2-Controllers",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "examples",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Attribute::Handlers" : "0.99",
+            "Dancer2" : "v1.1.0",
+            "Moose" : "2.2207",
+            "MooseX::MethodAttributes" : "0.32",
+            "namespace::clean" : "0.27",
+            "perl" : "5.024"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTTP::Request::Common" : "6.45",
+            "Test::Exception" : "0.43",
+            "Test::Simple" : "1.302195"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/rawleyfowler/Dancer2-Controllers/issues"
+      },
+      "license" : [
+         "http://www.opensource.org/licenses/mit"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/rawleyfowler/Dancer2-Controllers"
+      }
+   },
+   "version" : "1.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

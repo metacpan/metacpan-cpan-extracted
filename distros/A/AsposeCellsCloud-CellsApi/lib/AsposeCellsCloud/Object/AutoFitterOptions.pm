@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -132,13 +132,6 @@ __PACKAGE__->method_documentation({
      	format => '',
      	read_only => '',
      		},
-     'auto_fit_merged_cells' => {
-     	datatype => 'boolean',
-     	base_name => 'AutoFitMergedCells',
-     	description => 'Indicates whether auto fit row height when the cells is merged in a row.                        The default value is false.',
-     	format => '',
-     	read_only => '',
-     		},
      'ignore_hidden' => {
      	datatype => 'boolean',
      	base_name => 'IgnoreHidden',
@@ -192,7 +185,6 @@ __PACKAGE__->method_documentation({
 
 __PACKAGE__->swagger_types( {
     'auto_fit_merged_cells_type' => 'string',
-    'auto_fit_merged_cells' => 'boolean',
     'ignore_hidden' => 'boolean',
     'only_auto' => 'boolean',
     'default_edit_language' => 'string',
@@ -204,7 +196,6 @@ __PACKAGE__->swagger_types( {
 
 __PACKAGE__->attribute_map( {
     'auto_fit_merged_cells_type' => 'AutoFitMergedCellsType',
-    'auto_fit_merged_cells' => 'AutoFitMergedCells',
     'ignore_hidden' => 'IgnoreHidden',
     'only_auto' => 'OnlyAuto',
     'default_edit_language' => 'DefaultEditLanguage',

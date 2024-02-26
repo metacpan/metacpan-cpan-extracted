@@ -98,31 +98,31 @@ $day_period_data = $locale->get_day_period('1210');
 is($day_period_data, 'на обяд', 'Day period data PM');
 
 my $date_format = $locale->date_format_full;
-is($date_format, 'EEEE, d MMMM y \'г\'.', 'Date Format Full');
+is($date_format, 'EEEE, d MMMM y \'г\'.', 'Date Format Full');
 $date_format = $locale->date_format_long;
-is($date_format, 'd MMMM y \'г\'.', 'Date Format Long');
+is($date_format, 'd MMMM y \'г\'.', 'Date Format Long');
 $date_format = $locale->date_format_medium;
-is($date_format, 'd.MM.y \'г\'.', 'Date Format Medium');
+is($date_format, 'd.MM.y \'г\'.', 'Date Format Medium');
 $date_format = $locale->date_format_short;
-is($date_format, 'd.MM.yy \'г\'.', 'Date Format Short');
+is($date_format, 'd.MM.yy \'г\'.', 'Date Format Short');
 
 my $time_format = $locale->time_format_full;
 is($time_format, q(H:mm:ss 'ч'. zzzz), 'Time Format Full');
 $time_format = $locale->time_format_long;
 is($time_format, q(H:mm:ss 'ч'. z), 'Time Format Long');
 $time_format = $locale->time_format_medium;
-is($time_format, q(H:mm:ss 'ч'.), 'Time Format Medium');
+is($time_format, q(H:mm:ss), 'Time Format Medium');
 $time_format = $locale->time_format_short;
-is($time_format, q(H:mm 'ч'.), 'Time Format Short');
+is($time_format, q(H:mm), 'Time Format Short');
 
 my $date_time_format = $locale->datetime_format_full;
-is($date_time_format, "EEEE, d MMMM y 'г'., H:mm:ss 'ч'. zzzz", 'Date Time Format Full');
+is($date_time_format, "EEEE, d MMMM y 'г'., H:mm:ss 'ч'. zzzz", 'Date Time Format Full');
 $date_time_format = $locale->datetime_format_long;
-is($date_time_format, "d MMMM y 'г'., H:mm:ss 'ч'. z", 'Date Time Format Long');
+is($date_time_format, "d MMMM y 'г'., H:mm:ss 'ч'. z", 'Date Time Format Long');
 $date_time_format = $locale->datetime_format_medium;
-is($date_time_format, q(d.MM.y 'г'., H:mm:ss 'ч'.), 'Date Time Format Medium');
+is($date_time_format, q(d.MM.y 'г'., H:mm:ss), 'Date Time Format Medium');
 $date_time_format = $locale->datetime_format_short;
-is($date_time_format, q(d.MM.yy 'г'., H:mm 'ч'.), 'Date Time Format Short');
+is($date_time_format, q(d.MM.yy 'г'., H:mm), 'Date Time Format Short');
 
 is ($locale->prefers_24_hour_time(), 1, 'Prefers 24 hour time');
 is ($locale->first_day_of_week(), 1, 'First day of week recoded for DateTime');

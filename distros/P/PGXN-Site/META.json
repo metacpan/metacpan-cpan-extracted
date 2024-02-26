@@ -14,12 +14,6 @@
    },
    "name" : "PGXN-Site",
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Module::Build" : "0.4209",
-            "Text::MultiMarkdown" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
             "Module::Build" : "0.4209"
@@ -76,37 +70,37 @@
    "provides" : {
       "PGXN::Site" : {
          "file" : "lib/PGXN/Site.pm",
-         "version" : "v0.23.4"
+         "version" : "v0.23.7"
       },
       "PGXN::Site::Controller" : {
          "file" : "lib/PGXN/Site/Controller.pm",
-         "version" : "v0.23.4"
+         "version" : "v0.23.7"
       },
       "PGXN::Site::Locale" : {
          "file" : "lib/PGXN/Site/Locale.pm",
-         "version" : "v0.23.4"
+         "version" : "v0.23.7"
       },
       "PGXN::Site::Locale::en" : {
          "file" : "lib/PGXN/Site/Locale/en.pm",
-         "version" : "v0.23.4"
+         "version" : "v0.23.7"
       },
       "PGXN::Site::Locale::fr" : {
          "file" : "lib/PGXN/Site/Locale/fr.pm",
-         "version" : "v0.23.4"
+         "version" : "v0.23.7"
       },
       "PGXN::Site::Router" : {
          "file" : "lib/PGXN/Site/Router.pm",
-         "version" : "v0.23.4"
+         "version" : "v0.23.7"
       },
       "PGXN::Site::Templates" : {
          "file" : "lib/PGXN/Site/Templates.pm",
-         "version" : "v0.23.4"
+         "version" : "v0.23.7"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "homepage" : "https://www.pgxn.org/"
    },
-   "version" : "v0.23.4",
+   "version" : "v0.23.7",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

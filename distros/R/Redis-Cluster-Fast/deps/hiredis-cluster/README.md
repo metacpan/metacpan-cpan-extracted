@@ -53,8 +53,8 @@ Prerequisites:
 * CMake and GNU Make (but see [Alternative build using Makefile
   directly](#alternative-build-using-makefile-directly) below for how to build
   without CMake)
-* [hiredis](https://github.com/redis/hiredis); downloaded automatically by
-  default, but see build options below
+* [hiredis >= v1.0.0](https://github.com/redis/hiredis); downloaded automatically by
+  default, see [build options](#build-options) to disable.
 * [libevent](https://libevent.org/) (`libevent-dev` in Debian); can be avoided
   if building without tests (DISABLE_TESTS=ON)
 * OpenSSL (`libssl-dev` in Debian) if building with TLS support
@@ -132,10 +132,25 @@ a static library, a similar limitation exists in the CMake files in hiredis v1.0
 
 The only option that exists in the Makefile is to enable SSL/TLS support via `USE_SSL=1`
 
+By default the hiredis library (and headers) installed on the system is used,
+but alternative installations can be used by defining the compiler flags
+`CFLAGS` and `LDFLAGS`.
+
 See [`examples/using_make/build.sh`](examples/using_make/build.sh) for an
-example build.
+example build using an alternative hiredis installation.
+
+Build failures like
+`hircluster_ssl.h:33:10: fatal error: hiredis/hiredis_ssl.h: No such file or directory`
+indicates that hiredis is not installed on the system, or that a given `CFLAGS` is wrong.
+Use the previous mentioned build example as reference.
 
 ### Running the tests
+
+Prerequisites:
+
+* Perl with [JSON module](https://metacpan.org/pod/JSON).
+  Can be installed using `sudo cpan JSON`.
+* [Docker](https://docs.docker.com/engine/install/)
 
 Some tests needs a Redis cluster and that can be setup by the make targets
 `start`/`stop`. The clusters will be setup using Docker and it may take a while
@@ -166,10 +181,19 @@ using following access ports:
 ### Connecting
 
 The function `redisClusterContextInit` is used to create a `redisClusterContext`.
-The function `redisClusterSetOptionAddNodes` is used to add one or many Redis Cluster addresses.
-The function `redisClusterConnect2` is used to connect to the Redis Cluster.
 The context is where the state for connections is kept.
-The `redisClusterContext`struct has an integer `err` field that is non-zero when the connection is
+
+The function `redisClusterSetOptionAddNodes` is used to add one or many Redis Cluster addresses.
+
+The functions `redisClusterSetOptionUsername` and
+`redisClusterSetOptionPassword` are used to configure authentication, causing
+the AUTH command to be sent on every new connection to Redis.
+
+For more options, see the file [`hircluster.h`](hircluster.h).
+
+The function `redisClusterConnect2` is used to connect to the Redis Cluster.
+
+The `redisClusterContext` struct has an integer `err` field that is non-zero when the connection is
 in an error state. The field `errstr` will contain a string with a description of the error.
 After trying to connect to Redis using `redisClusterContext` you should check the `err` field to see
 if establishing the connection was successful:
@@ -182,6 +206,49 @@ if (cc != NULL && cc->err) {
     // handle error
 }
 ```
+
+#### Events per cluster context
+
+There is a hook to get notified when certain events occur.
+
+```c
+int redisClusterSetEventCallback(redisClusterContext *cc,
+                                 void(fn)(const redisClusterContext *cc, int event,
+                                          void *privdata),
+                                 void *privdata);
+```
+
+The callback is called with `event` set to one of the following values:
+
+* `HIRCLUSTER_EVENT_SLOTMAP_UPDATED` when the slot mapping has been updated;
+* `HIRCLUSTER_EVENT_READY` when the slot mapping has been fetched for the first
+  time and the client is ready to accept commands, useful when initiating the
+  client with `redisClusterAsyncConnect2()` where a client is not immediately
+  ready after a successful call;
+* `HIRCLUSTER_EVENT_FREE_CONTEXT` when the cluster context is being freed, so
+  that the user can free the event privdata.
+
+#### Events per connection
+
+There is a hook to get notified about connect and reconnect attempts.
+This is useful for applying socket options or access endpoint information for a connection to a particular node.
+The callback is registered using the following function:
+
+```c
+int redisClusterSetConnectCallback(redisClusterContext *cc,
+                                   void(fn)(const redisContext *c, int status));
+```
+
+The callback is called just after connect, before TLS handshake and Redis authentication.
+
+On successful connection, `status` is set to `REDIS_OK` and the redisContext
+(defined in hiredis.h) can be used, for example, to see which IP and port it's
+connected to or to set socket options directly on the file descriptor which can
+be accessed as `c->fd`.
+
+On failed connection attempt, this callback is called with `status` set to
+`REDIS_ERR`. The `err` field in the `redisContext` can be used to find out
+the cause of the error.
 
 ### Sending commands
 
@@ -204,6 +271,19 @@ anywhere in an argument:
 reply = redisClusterCommand(clustercontext, "SET key:%s %s", myid, value);
 ```
 
+Commands will be sent to the cluster node that the client perceives handling the given key.
+If the cluster topology has changed the Redis node might respond with a redirection error
+which the client will handle, update its slotmap and resend the command to correct node.
+The reply will in this case arrive from the correct node.
+
+If a node is unreachable, for example if the command times out or if the connect
+times out, it can indicated that there has been a failover and the node is no
+longer part of the cluster. In this case, `redisClusterCommand` returns NULL and
+sets `err` and `errstr` on the cluster context, but additionally, hiredis
+cluster schedules a slotmap update to be performed when the next command is
+sent. That means that if you try the same command again, there is a good chance
+the command will be sent to another node and the command may succeed.
+
 ### Sending multi-key commands
 
 Hiredis-cluster supports mget/mset/del multi-key commands.
@@ -222,8 +302,13 @@ When there is a need to send commands to a specific node, the following low-leve
 reply = redisClusterCommandToNode(clustercontext, node, "DBSIZE");
 ```
 
-The function handles printf like arguments similar to `redisClusterCommand()`, but will
+This function handles printf like arguments similar to `redisClusterCommand()`, but will
 only attempt to send the command to the given node and will not perform redirects or retries.
+
+If the command times out or the connection to the node fails, a slotmap update
+is scheduled to be performed when the next command is sent.
+`redisClusterCommandToNode` also performs a slotmap update if it has previously
+been scheduled.
 
 ### Teardown
 
@@ -244,7 +329,7 @@ int redisClusterAppendCommand(redisClusterContext *cc, const char *format, ...);
 int redisClusterAppendCommandArgv(redisClusterContext *cc, int argc, const char **argv);
 
 /* Send a command to a specific cluster node */
-int redisClusterAppendCommandToNode(redisClusterContext *cc, cluster_node *node,
+int redisClusterAppendCommandToNode(redisClusterContext *cc, redisClusterNode *node,
                                     const char *format, ...);
 ```
 After calling either function one or more times, `redisClusterGetReply` can be used to receive the
@@ -282,41 +367,107 @@ for hiredis-cluster as well.
 
 ### Connecting
 
-The function `redisAsyncConnect` can be used to establish a non-blocking connection to
-Redis. It returns a pointer to the newly created `redisAsyncContext` struct. The `err` field
-should be checked after creation to see if there were errors creating the connection.
-Because the connection that will be created is non-blocking, the kernel is not able to
-instantly return if the specified host and port is able to accept a connection.
+There are two alternative ways to initiate a cluster client which also determines
+how the client behaves during the initial connect.
+
+The first alternative is to use the function `redisClusterAsyncConnect`, which initially
+connects to the cluster in a blocking fashion and waits for the slotmap before returning.
+Any command sent by the user thereafter will create a new non-blocking connection,
+unless a non-blocking connection already exists to the destination.
+The function returns a pointer to a newly created `redisClusterAsyncContext` struct and
+its `err` field should be checked to make sure the initial slotmap update was successful.
+
 ```c
+// Insufficient error handling for brevity.
 redisClusterAsyncContext *acc = redisClusterAsyncConnect("127.0.0.1:6379", HIRCLUSTER_FLAG_NULL);
 if (acc->err) {
-    printf("Error: %s\n", acc->errstr);
-    // handle error
+    printf("error: %s\n", acc->errstr);
+    exit(1);
+}
+
+// Attach an event engine. In this example we use libevent.
+struct event_base *base = event_base_new();
+redisClusterLibeventAttach(acc, base);
+```
+
+The second alternative is to use `redisClusterAsyncContextInit` and `redisClusterAsyncConnect2`
+which avoids the initial blocking connect. This connection alternative requires an attached
+event engine when `redisClusterAsyncConnect2` is called, but the connect and the initial
+slotmap update is done in a non-blocking fashion.
+
+This means that commands sent directly after `redisClusterAsyncConnect2` may fail
+because the initial slotmap has not yet been retrieved and the client doesn't know which
+cluster node to send the command to. You may use the [eventCallback](#events-per-cluster-context)
+to be notified when the slotmap is updated and the client is ready to accept commands.
+An crude example of using the eventCallback can be found in [this testcase](tests/ct_async.c).
+
+```c
+// Insufficient error handling for brevity.
+redisClusterAsyncContext *acc = redisClusterAsyncContextInit();
+
+// Add a cluster node address for the initial connect.
+redisClusterSetOptionAddNodes(acc->cc, "127.0.0.1:6379");
+
+// Attach an event engine. In this example we use libevent.
+struct event_base *base = event_base_new();
+redisClusterLibeventAttach(acc, base);
+
+if (redisClusterAsyncConnect2(acc) != REDIS_OK) {
+    printf("error: %s\n", acc->errstr);
+    exit(1);
 }
 ```
 
-The cluster asynchronous context can hold a disconnect callback function that is called when the
-connection is disconnected (either because of an error or per user request). This function should
-have the following prototype:
-```c
-void(const redisAsyncContext *c, int status);
-```
-On a disconnect, the `status` argument is set to `REDIS_OK` when disconnection was initiated by the
-user, or `REDIS_ERR` when the disconnection was caused by an error. When it is `REDIS_ERR`, the `err`
-field in the context can be accessed to find out the cause of the error.
+#### Events per cluster context
 
-You dont need to reconnect in the disconnect callback, hiredis-cluster will reconnect by itself when next command for this Redis node is handled.
+Use [`redisClusterSetEventCallback`](#events-per-cluster-context) with `acc->cc`
+as the context to get notified when certain events occur.
 
-Setting the disconnect callback can only be done once per context. For subsequent calls it will
-return `REDIS_ERR`. The function to set the disconnect callback has the following prototype:
+#### Events per connection
+
+Because the connections that will be created are non-blocking,
+the kernel is not able to instantly return if the specified
+host and port is able to accept a connection.
+Instead, use a connect callback to be notified when a connection
+is established or failed.
+Similarily, a disconnect callback can be used to be notified about
+a disconnected connection (either because of an error or per user request).
+The callbacks are installed using the following functions:
+
 ```c
-int redisClusterAsyncSetDisconnectCallback(redisClusterAsyncContext *acc, redisDisconnectCallback *fn);
+int redisClusterAsyncSetConnectCallback(redisClusterAsyncContext *acc,
+                                        redisConnectCallback *fn);
+int redisClusterAsyncSetDisonnectCallback(redisClusterAsyncContext *acc,
+                                          redisConnectCallback *fn);
 ```
+
+The callback functions should have the following prototype,
+aliased to `redisConnectCallback`:
+
+```c
+void(const redisAsyncContext *ac, int status);
+```
+
+On a connection attempt, the `status` argument is set to `REDIS_OK`
+when the connection was successful.
+The file description of the connection socket can be retrieved
+from a redisAsyncContext as `ac->c->fd`.
+On a disconnect, the `status` argument is set to `REDIS_OK`
+when disconnection was initiated by the user,
+or `REDIS_ERR` when the disconnection was caused by an error.
+When it is `REDIS_ERR`, the `err` field in the context can be accessed
+to find out the cause of the error.
+
+You don't need to reconnect in the disconnect callback.
+Hiredis-cluster will reconnect by itself when the next command for this Redis node is handled.
+
+Setting the connect and disconnect callbacks can only be done once per context.
+For subsequent calls it will return `REDIS_ERR`.
 
 ### Sending commands and their callbacks
 
 In an asynchronous cluster context, commands are automatically pipelined due to the nature of an event loop.
-Therefore, unlike the synchronous cluster API, there is only a single way to send commands.
+Therefore, unlike the synchronous API, there is only a single way to send commands.
 Because commands are sent to Redis Cluster asynchronously, issuing a command requires a callback function
 that is called when the reply is received. Reply callbacks should have the following prototype:
 ```c
@@ -325,30 +476,53 @@ void(redisClusterAsyncContext *acc, void *reply, void *privdata);
 The `privdata` argument can be used to carry arbitrary data to the callback from the point where
 the command is initially queued for execution.
 
-The functions that can be used to issue commands in an asynchronous context are:
+The most commonly used functions to issue commands in an asynchronous context are:
 ```c
 int redisClusterAsyncCommand(redisClusterAsyncContext *acc,
                              redisClusterCallbackFn *fn,
                              void *privdata, const char *format, ...);
-int redisClusterAsyncCommandToNode(redisClusterAsyncContext *acc,
-                                   cluster_node *node,
-                                   redisClusterCallbackFn *fn, void *privdata,
-                                   const char *format, ...);
-int redisClusterAsyncFormattedCommandToNode(redisClusterAsyncContext *acc,
-                                            cluster_node *node,
-                                            redisClusterCallbackFn *fn,
-                                            void *privdata, char *cmd, int len);
+int redisClusterAsyncCommandArgv(redisClusterAsyncContext *acc,
+                                 redisClusterCallbackFn *fn, void *privdata,
+                                 int argc, const char **argv,
+                                 const size_t *argvlen);
+int redisClusterAsyncFormattedCommand(redisClusterAsyncContext *acc,
+                                      redisClusterCallbackFn *fn,
+                                      void *privdata, char *cmd, int len);
 ```
 These functions works like their blocking counterparts. The return value is `REDIS_OK` when the command
-was successfully added to the output buffer and `REDIS_ERR` otherwise. Example: when the connection
-is being disconnected per user-request, no new commands may be added to the output buffer and `REDIS_ERR` is
-returned on calls to the `redisClusterAsyncCommand` family.
+was successfully added to the output buffer and `REDIS_ERR` otherwise. When the connection is being
+disconnected per user-request, no new commands may be added to the output buffer and `REDIS_ERR` is
+returned.
 
 If the reply for a command with a `NULL` callback is read, it is immediately freed. When the callback
 for a command is non-`NULL`, the memory is freed immediately following the callback: the reply is only
 valid for the duration of the callback.
 
 All pending callbacks are called with a `NULL` reply when the context encountered an error.
+
+### Sending commands to a specific node
+
+When there is a need to send commands to a specific node, the following low-level API can be used.
+
+```c
+int redisClusterAsyncCommandToNode(redisClusterAsyncContext *acc,
+                                   redisClusterNode *node,
+                                   redisClusterCallbackFn *fn, void *privdata,
+                                   const char *format, ...);
+int redisClusterAsyncCommandArgvToNode(redisClusterAsyncContext *acc,
+                                       redisClusterNode *node,
+                                       redisClusterCallbackFn *fn,
+                                       void *privdata, int argc,
+                                       const char **argv,
+                                       const size_t *argvlen);
+int redisClusterAsyncFormattedCommandToNode(redisClusterAsyncContext *acc,
+                                            redisClusterNode *node,
+                                            redisClusterCallbackFn *fn,
+                                            void *privdata, char *cmd, int len);
+```
+
+These functions will only attempt to send the command to a specific node and will not perform redirects or retries,
+but communication errors will trigger a slotmap update just like the commonly used API.
 
 ### Disconnecting
 
@@ -366,6 +540,47 @@ callbacks have been executed. After this, the disconnection callback is executed
 
 There are a few hooks that need to be set on the cluster context object after it is created.
 See the `adapters/` directory for bindings to *libevent* and a range of other event libraries.
+
+## Other details
+
+### Cluster node iterator
+
+A `redisClusterNodeIterator` can be used to iterate on all known master nodes in a cluster context.
+First it needs to be initiated using `redisClusterInitNodeIterator()` and then you can repeatedly
+call `redisClusterNodeNext()` to get the next node from the iterator.
+
+```c
+void redisClusterInitNodeIterator(redisClusterNodeIterator *iter,
+                                  redisClusterContext *cc);
+redisClusterNode *redisClusterNodeNext(redisClusterNodeIterator *iter);
+```
+
+The iterator will handle changes due to slotmap updates by restarting the iteration, but on the new
+set of master nodes. There is no bookkeeping for already iterated nodes when a restart is triggered,
+which means that a node can be iterated over more than once depending on when the slotmap update happened
+and the change of cluster nodes.
+
+Note that when `redisClusterCommandToNode` is called, a slotmap update can
+happen if it has been scheduled by the previous command, for example if the
+previous call to `redisClusterCommandToNode` timed out or the node wasn't
+reachable.
+
+To detect when the slotmap has been updated, you can check if the iterator's
+slotmap version (`iter.route_version`) is equal to the current cluster context's
+slotmap version (`cc->route_version`). If it isn't, it means that the slotmap
+has been updated and the iterator will restart itself at the next call to
+`redisClusterNodeNext`.
+
+Another way to detect that the slotmap has been updated is to [register an event
+callback](#events-per-cluster-context) and look for the event
+`HIRCLUSTER_EVENT_SLOTMAP_UPDATED`.
+
+### Random number generator
+
+This library uses [random()](https://linux.die.net/man/3/random) while selecting
+a node used for requesting the cluster topology (slotmap). A user should seed
+the random number generator using [srandom()](https://linux.die.net/man/3/srandom)
+to get less predictability in the node selection.
 
 ### Allocator injection
 

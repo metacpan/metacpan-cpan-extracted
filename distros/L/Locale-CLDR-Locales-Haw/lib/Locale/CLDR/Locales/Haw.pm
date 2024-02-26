@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Haw - Package for language Hawaiian
 
 package Locale::CLDR::Locales::Haw;
 # This file auto generated from Data\common\main\haw.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -133,8 +133,7 @@ has 'characters' => (
 		return {
 			auxiliary => qr{[b c d f g j q r s t v x y z]},
 			index => ['A', 'E', 'I', 'O', 'U', 'B', 'C', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'ʻ', 'X', 'Y', 'Z'],
-			main => qr{[a ā e ē i ī o ō u ū h k l m n p w ʻ]},
-			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			main => qr{[aā eē iī oō uū h k l m n p w ʻ]},
 		};
 	},
 EOT
@@ -152,100 +151,76 @@ has 'units' => (
 				'long' => {
 					# Long Unit Identifier
 					'duration-day' => {
-						'name' => q(lā),
 						'one' => q({0} lā),
 						'other' => q({0} lā),
 					},
 					# Core Unit Identifier
 					'day' => {
-						'name' => q(lā),
 						'one' => q({0} lā),
 						'other' => q({0} lā),
 					},
 					# Long Unit Identifier
 					'duration-hour' => {
-						'name' => q(hola),
 						'one' => q({0} hola),
 						'other' => q({0} hola),
 					},
 					# Core Unit Identifier
 					'hour' => {
-						'name' => q(hola),
 						'one' => q({0} hola),
 						'other' => q({0} hola),
 					},
 					# Long Unit Identifier
 					'duration-minute' => {
-						'name' => q(minuke),
 						'one' => q({0} minuke),
 						'other' => q({0} minuke),
 					},
 					# Core Unit Identifier
 					'minute' => {
-						'name' => q(minuke),
 						'one' => q({0} minuke),
 						'other' => q({0} minuke),
 					},
 					# Long Unit Identifier
 					'duration-month' => {
-						'name' => q(mahina),
 						'one' => q({0} mahina),
 						'other' => q({0} mahina),
 					},
 					# Core Unit Identifier
 					'month' => {
-						'name' => q(mahina),
 						'one' => q({0} mahina),
 						'other' => q({0} mahina),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
-						'name' => q(kekona),
 						'one' => q({0} kekona),
 						'other' => q({0} kekona),
 					},
 					# Core Unit Identifier
 					'second' => {
-						'name' => q(kekona),
 						'one' => q({0} kekona),
 						'other' => q({0} kekona),
 					},
 					# Long Unit Identifier
 					'duration-week' => {
-						'name' => q(pule),
 						'one' => q({0} pule),
 						'other' => q({0} pule),
 					},
 					# Core Unit Identifier
 					'week' => {
-						'name' => q(pule),
 						'one' => q({0} pule),
 						'other' => q({0} pule),
 					},
 					# Long Unit Identifier
 					'duration-year' => {
-						'name' => q(makahiki),
 						'one' => q({0} makahiki),
 						'other' => q({0} makahiki),
 					},
 					# Core Unit Identifier
 					'year' => {
-						'name' => q(makahiki),
 						'one' => q({0} makahiki),
 						'other' => q({0} makahiki),
 					},
 				},
 				'narrow' => {
-					# Long Unit Identifier
-					'temperature-celsius' => {
-						'one' => q({0}°C),
-						'other' => q({0}°C),
-					},
-					# Core Unit Identifier
-					'celsius' => {
-						'one' => q({0}°C),
-						'other' => q({0}°C),
-					},
 					# Long Unit Identifier
 					'temperature-fahrenheit' => {
 						'one' => q({0}°),
@@ -318,62 +293,6 @@ has 'units' => (
 			} }
 );
 
-has 'minimum_grouping_digits' => (
-	is			=>'ro',
-	isa			=> Int,
-	init_arg	=> undef,
-	default		=> 1,
-);
-
-has 'number_symbols' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'latn' => {
-			'decimal' => q(.),
-			'exponential' => q(E),
-			'group' => q(,),
-			'infinity' => q(∞),
-			'minusSign' => q(-),
-			'nan' => q(NaN),
-			'perMille' => q(‰),
-			'percentSign' => q(%),
-			'plusSign' => q(+),
-			'superscriptingExponent' => q(×),
-		},
-	} }
-);
-
-has 'number_formats' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		decimalFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0.###',
-				},
-			},
-		},
-		percentFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0%',
-				},
-			},
-		},
-		scientificFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#E0',
-				},
-			},
-		},
-} },
-);
-
 has 'number_currency_formats' => (
 	is			=> 'ro',
 	isa			=> HashRef,
@@ -433,84 +352,6 @@ has 'calendar_months' => (
 							
 						],
 					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'Ianuali',
-							'Pepeluali',
-							'Malaki',
-							'ʻApelila',
-							'Mei',
-							'Iune',
-							'Iulai',
-							'ʻAukake',
-							'Kepakemapa',
-							'ʻOkakopa',
-							'Nowemapa',
-							'Kekemapa'
-						],
-						leap => [
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'Ian.',
-							'Pep.',
-							'Mal.',
-							'ʻAp.',
-							'Mei',
-							'Iun.',
-							'Iul.',
-							'ʻAu.',
-							'Kep.',
-							'ʻOk.',
-							'Now.',
-							'Kek.'
-						],
-						leap => [
-							
-						],
-					},
-					narrow => {
-						nonleap => [
-							'1',
-							'2',
-							'3',
-							'4',
-							'5',
-							'6',
-							'7',
-							'8',
-							'9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'Ianuali',
@@ -551,62 +392,6 @@ has 'calendar_days' => (
 						sat => 'P6',
 						sun => 'LP'
 					},
-					narrow => {
-						mon => 'M',
-						tue => 'T',
-						wed => 'W',
-						thu => 'T',
-						fri => 'F',
-						sat => 'S',
-						sun => 'S'
-					},
-					short => {
-						mon => 'P1',
-						tue => 'P2',
-						wed => 'P3',
-						thu => 'P4',
-						fri => 'P5',
-						sat => 'P6',
-						sun => 'LP'
-					},
-					wide => {
-						mon => 'Poʻakahi',
-						tue => 'Poʻalua',
-						wed => 'Poʻakolu',
-						thu => 'Poʻahā',
-						fri => 'Poʻalima',
-						sat => 'Poʻaono',
-						sun => 'Lāpule'
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						mon => 'P1',
-						tue => 'P2',
-						wed => 'P3',
-						thu => 'P4',
-						fri => 'P5',
-						sat => 'P6',
-						sun => 'LP'
-					},
-					narrow => {
-						mon => 'M',
-						tue => 'T',
-						wed => 'W',
-						thu => 'T',
-						fri => 'F',
-						sat => 'S',
-						sun => 'S'
-					},
-					short => {
-						mon => 'P1',
-						tue => 'P2',
-						wed => 'P3',
-						thu => 'P4',
-						fri => 'P5',
-						sat => 'P6',
-						sun => 'LP'
-					},
 					wide => {
 						mon => 'Poʻakahi',
 						tue => 'Poʻalua',
@@ -618,88 +403,6 @@ has 'calendar_days' => (
 					},
 				},
 			},
-	} },
-);
-
-has 'calendar_quarters' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-			'gregorian' => {
-				'format' => {
-					abbreviated => {0 => 'Q1',
-						1 => 'Q2',
-						2 => 'Q3',
-						3 => 'Q4'
-					},
-					narrow => {0 => '1',
-						1 => '2',
-						2 => '3',
-						3 => '4'
-					},
-					wide => {0 => 'Q1',
-						1 => 'Q2',
-						2 => 'Q3',
-						3 => 'Q4'
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {0 => 'Q1',
-						1 => 'Q2',
-						2 => 'Q3',
-						3 => 'Q4'
-					},
-					narrow => {0 => '1',
-						1 => '2',
-						2 => '3',
-						3 => '4'
-					},
-					wide => {0 => 'Q1',
-						1 => 'Q2',
-						2 => 'Q3',
-						3 => 'Q4'
-					},
-				},
-			},
-	} },
-);
-
-has 'day_periods' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'gregorian' => {
-			'format' => {
-				'abbreviated' => {
-					'am' => q{AM},
-					'pm' => q{PM},
-				},
-				'narrow' => {
-					'am' => q{AM},
-					'pm' => q{PM},
-				},
-				'wide' => {
-					'am' => q{AM},
-					'pm' => q{PM},
-				},
-			},
-			'stand-alone' => {
-				'abbreviated' => {
-					'am' => q{AM},
-					'pm' => q{PM},
-				},
-				'narrow' => {
-					'am' => q{AM},
-					'pm' => q{PM},
-				},
-				'wide' => {
-					'am' => q{AM},
-					'pm' => q{PM},
-				},
-			},
-		},
 	} },
 );
 
@@ -711,14 +414,6 @@ has 'eras' => (
 		'generic' => {
 		},
 		'gregorian' => {
-			abbreviated => {
-				'0' => 'BCE',
-				'1' => 'CE'
-			},
-			wide => {
-				'0' => 'BCE',
-				'1' => 'CE'
-			},
 		},
 	} },
 );
@@ -751,10 +446,10 @@ has 'time_formats' => (
 		'generic' => {
 		},
 		'gregorian' => {
-			'full' => q{h:mm:ss a zzzz},
-			'long' => q{h:mm:ss a z},
-			'medium' => q{h:mm:ss a},
-			'short' => q{h:mm a},
+			'full' => q{h:mm:ss a zzzz},
+			'long' => q{h:mm:ss a z},
+			'medium' => q{h:mm:ss a},
+			'short' => q{h:mm a},
 		},
 	} },
 );
@@ -781,45 +476,28 @@ has 'datetime_formats_available_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'gregorian' => {
-			E => q{ccc},
-			EHm => q{E HH:mm},
-			EHms => q{E HH:mm:ss},
 			Ed => q{E d},
-			Ehm => q{E h:mm a},
-			Ehms => q{E h:mm:ss a},
+			Ehm => q{E h:mm a},
+			Ehms => q{E h:mm:ss a},
 			Gy => q{y G},
 			GyMMM => q{MMM y G},
 			GyMMMEd => q{E, d MMM y G},
 			GyMMMd => q{d MMM y G},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			Hmsv => q{HH:mm:ss v},
-			Hmv => q{HH:mm v},
-			M => q{L},
 			MEd => q{E, d/M},
-			MMM => q{LLL},
 			MMMEd => q{E, d MMM},
-			MMMMd => q{MMMM d},
 			MMMd => q{d MMM},
 			Md => q{d/M},
-			d => q{d},
-			h => q{h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			hmsv => q{h:mm:ss a v},
-			hmv => q{h:mm a v},
-			ms => q{mm:ss},
-			y => q{y},
+			h => q{h a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
+			hmsv => q{h:mm:ss a v},
+			hmv => q{h:mm a v},
 			yM => q{M/y},
 			yMEd => q{E, d/M/y},
 			yMMM => q{MMM y},
 			yMMMEd => q{E, d MMM y},
-			yMMMM => q{y MMMM},
 			yMMMd => q{d MMM y},
 			yMd => q{d/M/y},
-			yQQQ => q{y QQQ},
-			yQQQQ => q{y QQQQ},
 		},
 	} },
 );
@@ -829,9 +507,6 @@ has 'datetime_formats_append_item' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			'Timezone' => '{0} {1}',
-		},
 	} },
 );
 
@@ -841,98 +516,67 @@ has 'datetime_formats_interval' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'gregorian' => {
-			H => {
-				H => q{HH–HH},
-			},
-			Hm => {
-				H => q{HH:mm–HH:mm},
-				m => q{HH:mm–HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm–HH:mm v},
-				m => q{HH:mm–HH:mm v},
-			},
-			Hv => {
-				H => q{HH–HH v},
-			},
-			M => {
-				M => q{MM–MM},
-			},
 			MEd => {
-				M => q{MM-dd, E – MM-dd, E},
-				d => q{MM-dd, E – MM-dd, E},
-			},
-			MMM => {
-				M => q{LLL–LLL},
+				M => q{MM-dd, E – MM-dd, E},
+				d => q{MM-dd, E – MM-dd, E},
 			},
 			MMMEd => {
-				M => q{MMM d, E – MMM d, E},
-				d => q{MMM d, E – MMM d, E},
+				M => q{MMM d, E – MMM d, E},
+				d => q{MMM d, E – MMM d, E},
 			},
 			MMMd => {
-				M => q{MMM d – MMM d},
-				d => q{MMM d–d},
+				M => q{MMM d – MMM d},
 			},
 			Md => {
-				M => q{MM-dd – MM-dd},
-				d => q{MM-dd – MM-dd},
+				M => q{MM-dd – MM-dd},
+				d => q{MM-dd – MM-dd},
 			},
-			d => {
-				d => q{d–d},
-			},
-			fallback => '{0} – {1}',
 			h => {
-				a => q{h a – h a},
-				h => q{h–h a},
+				a => q{h a – h a},
+				h => q{h–h a},
 			},
 			hm => {
-				a => q{h:mm a – h:mm a},
-				h => q{h:mm–h:mm a},
-				m => q{h:mm–h:mm a},
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
 			},
 			hmv => {
-				a => q{h:mm a – h:mm a v},
-				h => q{h:mm–h:mm a v},
-				m => q{h:mm–h:mm a v},
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
 			},
 			hv => {
-				a => q{h a – h a v},
-				h => q{h–h a v},
-			},
-			y => {
-				y => q{y–y},
+				a => q{h a – h a v},
+				h => q{h–h a v},
 			},
 			yM => {
-				M => q{y-MM – y-MM},
-				y => q{y-MM – y-MM},
+				M => q{y-MM – y-MM},
+				y => q{y-MM – y-MM},
 			},
 			yMEd => {
-				M => q{y-MM-dd, E – y-MM-dd, E},
-				d => q{y-MM-dd, E – y-MM-dd, E},
-				y => q{y-MM-dd, E – y-MM-dd, E},
+				M => q{y-MM-dd, E – y-MM-dd, E},
+				d => q{y-MM-dd, E – y-MM-dd, E},
+				y => q{y-MM-dd, E – y-MM-dd, E},
 			},
 			yMMM => {
-				M => q{y MMM–MMM},
-				y => q{y MMM – y MMM},
+				y => q{y MMM – y MMM},
 			},
 			yMMMEd => {
-				M => q{y MMM d, E – MMM d, E},
-				d => q{y MMM d, E – MMM d, E},
-				y => q{y MMM d, E – y MMM d, E},
+				M => q{y MMM d, E – MMM d, E},
+				d => q{y MMM d, E – MMM d, E},
+				y => q{y MMM d, E – y MMM d, E},
 			},
 			yMMMM => {
-				M => q{y MMMM–MMMM},
-				y => q{y MMMM – y MMMM},
+				y => q{y MMMM – y MMMM},
 			},
 			yMMMd => {
-				M => q{y MMM d – MMM d},
-				d => q{y MMM d–d},
-				y => q{y MMM d – y MMM d},
+				M => q{y MMM d – MMM d},
+				y => q{y MMM d – y MMM d},
 			},
 			yMd => {
-				M => q{y-MM-dd – y-MM-dd},
-				d => q{y-MM-dd – y-MM-dd},
-				y => q{y-MM-dd – y-MM-dd},
+				M => q{y-MM-dd – y-MM-dd},
+				d => q{y-MM-dd – y-MM-dd},
+				y => q{y-MM-dd – y-MM-dd},
 			},
 		},
 	} },

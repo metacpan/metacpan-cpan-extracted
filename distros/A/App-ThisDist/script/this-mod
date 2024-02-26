@@ -10,9 +10,9 @@ use Cwd;
 use Getopt::Long;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-05'; # DATE
+our $DATE = '2024-01-06'; # DATE
 our $DIST = 'App-ThisDist'; # DIST
-our $VERSION = '0.022'; # VERSION
+our $VERSION = '0.023'; # VERSION
 
 my ($quiet, $namespace_prefix, $extract_version);
 $namespace_prefix = $ENV{PERL_THIS_MOD_NAMESPACE_PREFIX};
@@ -56,7 +56,7 @@ this-mod - Return name of Perl module associated with the current directory
 
 =head1 VERSION
 
-This document describes version 0.022 of this-mod (from Perl distribution App-ThisDist), released on 2024-01-05.
+This document describes version 0.023 of this-mod (from Perl distribution App-ThisDist), released on 2024-01-06.
 
 =head1 SYNOPSIS
 

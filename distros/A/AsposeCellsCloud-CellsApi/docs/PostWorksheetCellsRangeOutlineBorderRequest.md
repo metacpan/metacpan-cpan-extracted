@@ -8,9 +8,9 @@ use AsposeCellsCloud::Request::PostWorksheetCellsRangeOutlineBorder;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**name** | **string** | The workbook name. |
+**name** | **string** | The file name. |
 **sheet_name** | **string** | The worksheet name. |
-**range_operate** | **RangeSetOutlineBorderRequest** | Range Set OutlineBorder Request. |
+**range_operate** | **RangeSetOutlineBorderRequest** | RangeSetOutlineBorderRequest Range Set OutlineBorder Request. |
 **folder** | **string** | Original workbook folder. |
 **storage_name** | **string** | Storage name. |  
 

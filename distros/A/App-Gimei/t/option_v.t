@@ -1,6 +1,5 @@
 use v5.36;
 
-use App::Gimei;
 use lib ".";
 use t::Util qw(run);
 

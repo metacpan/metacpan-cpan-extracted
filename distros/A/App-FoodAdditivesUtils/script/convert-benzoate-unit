@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-05'; # DATE
+our $DATE = '2023-12-12'; # DATE
 our $DIST = 'App-FoodAdditivesUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/FoodAdditivesUtils/convert_benzoate_unit",
@@ -41,7 +41,7 @@ convert-benzoate-unit - Convert a benzoate quantity from one unit to another
 
 =head1 VERSION
 
-This document describes version 0.005 of convert-benzoate-unit (from Perl distribution App-FoodAdditivesUtils), released on 2023-02-05.
+This document describes version 0.006 of convert-benzoate-unit (from Perl distribution App-FoodAdditivesUtils), released on 2023-12-12.
 
 =head1 SYNOPSIS
 

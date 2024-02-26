@@ -3,17 +3,17 @@ package Data::Sah::Compiler;
 use 5.010;
 use strict;
 use warnings;
+use Log::ger;
 
 #use Carp;
 use Mo qw(default);
 use Role::Tiny::With;
-use Log::ger;
 use Scalar::Util qw(blessed);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-19'; # DATE
+our $DATE = '2024-02-16'; # DATE
 our $DIST = 'Data-Sah'; # DIST
-our $VERSION = '0.914'; # VERSION
+our $VERSION = '0.917'; # VERSION
 
 our %coercer_cache; # key=type, value=coercer coderef
 
@@ -620,13 +620,15 @@ sub compile {
 
     # normalize schema
     my $schema0 = $args{schema} or $self->_die($cd, "No schema");
+    #log_trace("TMP1: got schema=%s", $schema0);
     my $nschema;
     if ($args{schema_is_normalized}) {
         $nschema = $schema0;
-        #$log->tracef("schema already normalized, skipped normalization");
+        #log_trace("TMP1: schema already normalized, skipped normalization");
     } else {
-        $nschema = $main->normalize_schema($schema0);
-        #$log->tracef("normalized schema=%s", $nschema);
+        require Data::Sah::Normalize;
+        $nschema = Data::Sah::Normalize::normalize_schema($schema0);
+        #log_trace("TMP1: normalized schema=%s", $nschema);
     }
     $cd->{nschema} = $nschema;
     local $cd->{schema} = $nschema;
@@ -751,7 +753,7 @@ Data::Sah::Compiler - Base class for Sah compilers (Data::Sah::Compiler::*)
 
 =head1 VERSION
 
-This document describes version 0.914 of Data::Sah::Compiler (from Perl distribution Data-Sah), released on 2022-10-19.
+This document describes version 0.917 of Data::Sah::Compiler (from Perl distribution Data-Sah), released on 2024-02-16.
 
 =for Pod::Coverage ^(check_compile_args|def|expr|init_cd|literal|name|add_module|add_compile_module|add_runtime_module)$
 
@@ -1237,7 +1239,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

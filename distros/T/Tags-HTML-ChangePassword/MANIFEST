@@ -23,5 +23,7 @@ SIGNATURE
 t/Tags-HTML-ChangePassword/01-use.t
 t/Tags-HTML-ChangePassword/02-version.t
 t/Tags-HTML-ChangePassword/03-new.t
+t/Tags-HTML-ChangePassword/04-cleanup.t
+t/Tags-HTML-ChangePassword/05-init.t
 xt/Tags-HTML-ChangePassword/01-pod_coverage.t
 xt/Tags-HTML-ChangePassword/02-pod.t

@@ -1,4 +1,6 @@
-use Dispatch::Fu;    # exports 'dispatch' and 'on', which are needed
+use strict;
+use warnings;
+use Dispatch::Fu;
 
 use Test::More tests => 5;
 
@@ -40,7 +42,7 @@ $INPUT = q{not a case};
 
 $results = dispatch {
     my $input_str = shift;
-    xdefault $input_str;    # if $input_str is not in supported cases, return the string 'default'
+    xdefault $input_str;                   # if $input_str is not in supported cases, return the string 'default'
 }
 $INPUT,
   on default => sub { 6 },
@@ -57,7 +59,7 @@ $INPUT = undef;
 
 $results = dispatch {
     my $input_str = shift;
-    xdefault $input_str;    # if $input_str is not in supported cases, return the string 'default'
+    xdefault $input_str;                   # if $input_str is not in supported cases, return the string 'default'
 }
 $INPUT,
   on default => sub { 6 },
@@ -74,7 +76,7 @@ $INPUT = undef;
 
 $results = dispatch {
     my $input_str = shift;
-    xdefault $input_str, q{case0};    # if $input_str is not in supported cases, return the string 'default'
+    xdefault $input_str, q{case0};         # if $input_str is not in supported cases, return the string 'default'
 }
 $INPUT,
   on default => sub { 6 },

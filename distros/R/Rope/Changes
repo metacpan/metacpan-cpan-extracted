@@ -3,3 +3,5 @@ Revision history for Rope
 0.01    Date/time
         First version, released on an unsuspecting world.
 
+0.08    2024-02-06
+	Set minimum perl version 5.18.

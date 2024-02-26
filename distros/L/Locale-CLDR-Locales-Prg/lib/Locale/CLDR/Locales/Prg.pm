@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Prg - Package for language Prussian
 
 package Locale::CLDR::Locales::Prg;
 # This file auto generated from Data\common\main\prg.xml
-#	on Tue  5 Dec  1:27:44 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -24,27 +24,11 @@ use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
 extends('Locale::CLDR::Locales::Root');
-# Need to add code for Key type pattern
-sub display_name_pattern {
-	my ($self, $name, $region, $script, $variant) = @_;
-
-	my $display_pattern = '{0} ({1})';
-	$display_pattern =~s/\{0\}/$name/g;
-	my $subtags = join '{0}, {1}', grep {$_} (
-		$region,
-		$script,
-		$variant,
-	);
-
-	$display_pattern =~s/\{1\}/$subtags/g;
-	return $display_pattern;
-}
-
 has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'ar' => 'arābiskan',
@@ -57,7 +41,6 @@ has 'display_name_language' => (
  				'en_AU' => 'Austrālijas ēngliskan',
  				'en_CA' => 'Kanādas ēngliskan',
  				'en_GB' => 'brītiskan ēngliskan',
- 				'en_GB@alt=short' => 'brītiskan ēngliskan',
  				'en_US' => 'amērikaniskan ēngliskan',
  				'en_US@alt=short' => 'APW ēngliskan',
  				'es' => 'špāniskan',
@@ -127,7 +110,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'001' => 'swītai',
  			'002' => 'Afrika',
@@ -196,7 +179,6 @@ has 'display_name_region' => (
  			'MC' => 'Mōnakō',
  			'MD' => 'Mōldawija',
  			'ME' => 'Mōntenegran',
- 			'MK' => 'Macedōnija',
  			'MT' => 'Mālta',
  			'MX' => 'Meksiku',
  			'NI' => 'Nikarāgwa',
@@ -259,7 +241,7 @@ has 'display_name_measurement_system' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'metric' => q{mētriskan},
  			'UK' => q{brītiskan},
@@ -273,7 +255,7 @@ has 'display_name_code_patterns' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'language' => 'Bilā: {0}',
  			'script' => 'Skriptan: {0}',
@@ -292,15 +274,15 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			index => ['A', 'Ā', 'B', 'C', 'D', 'Ḑ', 'E', 'Ē', 'F', 'G', 'Ģ', 'H', 'I', 'Ī', 'J', 'K', 'Ķ', 'L', 'M', 'N', 'Ņ', 'O', 'Ō', 'P', 'Q', 'R', 'Ŗ', 'S', 'Š', 'T', 'Ț', 'U', 'Ū', 'V', 'W', 'X', 'Y', 'Z', 'Ž'],
-			main => qr{[a ā b c d ḑ e ē f g ģ h i ī j k ķ l m n ņ o ō p q r ŗ s š t ț u ū v w x y z ž]},
-			numbers => qr{[  \- , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
-			punctuation => qr{[\- ‐ – — , ; \: ! ? . … “ „ ( ) \[ \] \{ \}]},
+			index => ['AĀ', 'B', 'C', 'DḐ', 'EĒ', 'F', 'GĢ', 'H', 'IĪ', 'J', 'KĶ', 'L', 'M', 'NŅ', 'OŌ', 'P', 'Q', 'RŖ', 'SŠ', 'TȚ', 'UŪ', 'V', 'W', 'X', 'Y', 'ZŽ'],
+			main => qr{[aā b c dḑ eē f gģ h iī j kķ l m nņ oō p q rŗ sš tț uū v w x y zž]},
+			numbers => qr{[  \- ‑ , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[\- ‐‑ – — , ; \: ! ? . … “„ ( ) \[ \] \{ \}]},
 		};
 	},
 EOT
 : sub {
-		return { index => ['A', 'Ā', 'B', 'C', 'D', 'Ḑ', 'E', 'Ē', 'F', 'G', 'Ģ', 'H', 'I', 'Ī', 'J', 'K', 'Ķ', 'L', 'M', 'N', 'Ņ', 'O', 'Ō', 'P', 'Q', 'R', 'Ŗ', 'S', 'Š', 'T', 'Ț', 'U', 'Ū', 'V', 'W', 'X', 'Y', 'Z', 'Ž'], };
+		return { index => ['AĀ', 'B', 'C', 'DḐ', 'EĒ', 'F', 'GĢ', 'H', 'IĪ', 'J', 'KĶ', 'L', 'M', 'NŅ', 'OŌ', 'P', 'Q', 'RŖ', 'SŠ', 'TȚ', 'UŪ', 'V', 'W', 'X', 'Y', 'ZŽ'], };
 },
 );
 
@@ -333,25 +315,6 @@ has 'alternate_quote_end' => (
 	default		=> qq{“},
 );
 
-has 'duration_units' => (
-	is			=> 'ro',
-	isa			=> HashRef[Str],
-	init_arg	=> undef,
-	default		=> sub { {
-				hm => 'h:mm',
-				hms => 'h:mm:ss',
-				ms => 'm:ss',
-			} }
-);
-
-has 'units' => (
-	is			=> 'ro',
-	isa			=> HashRef[HashRef[HashRef[Str]]],
-	init_arg	=> undef,
-	default		=> sub { {
-			} }
-);
-
 has 'yesstr' => (
 	is			=> 'ro',
 	isa			=> RegexpRef,
@@ -371,25 +334,9 @@ has 'listPatterns' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-				start => q({0}, {1}),
-				middle => q({0}, {1}),
 				end => q({0} be {1}),
 				2 => q({0} be {1}),
 		} }
-);
-
-has 'default_numbering_system' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> 'latn',
-);
-
-has native_numbering_system => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> 'latn',
 );
 
 has 'number_symbols' => (
@@ -400,40 +347,8 @@ has 'number_symbols' => (
 		'latn' => {
 			'decimal' => q(,),
 			'group' => q( ),
-			'minusSign' => q(-),
-			'percentSign' => q(%),
-			'plusSign' => q(+),
 		},
 	} }
-);
-
-has 'number_formats' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		decimalFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0.###',
-				},
-			},
-		},
-		percentFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0%',
-				},
-			},
-		},
-		scientificFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#E0',
-				},
-			},
-		},
-} },
 );
 
 has 'number_currency_formats' => (
@@ -477,9 +392,6 @@ has 'currencies' => (
 		'EUR' => {
 			display_name => {
 				'currency' => q(eurō),
-				'one' => q(eurō),
-				'other' => q(eurō),
-				'zero' => q(eurō),
 			},
 		},
 		'GBP' => {
@@ -560,25 +472,6 @@ has 'calendar_months' => (
 							
 						],
 					},
-					narrow => {
-						nonleap => [
-							'R',
-							'W',
-							'P',
-							'S',
-							'Z',
-							'S',
-							'L',
-							'D',
-							'S',
-							'S',
-							'L',
-							'S'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'rags',
@@ -600,25 +493,6 @@ has 'calendar_months' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'rag',
-							'was',
-							'pūl',
-							'sak',
-							'zal',
-							'sīm',
-							'līp',
-							'dag',
-							'sil',
-							'spa',
-							'lap',
-							'sal'
-						],
-						leap => [
-							
-						],
-					},
 					narrow => {
 						nonleap => [
 							'R',
@@ -633,25 +507,6 @@ has 'calendar_months' => (
 							'S',
 							'L',
 							'S'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'rags',
-							'wassarins',
-							'pūlis',
-							'sakkis',
-							'zallaws',
-							'sīmenis',
-							'līpa',
-							'daggis',
-							'sillins',
-							'spallins',
-							'lapkrūtis',
-							'sallaws'
 						],
 						leap => [
 							
@@ -678,15 +533,6 @@ has 'calendar_days' => (
 						sat => 'sab',
 						sun => 'nad'
 					},
-					narrow => {
-						mon => 'P',
-						tue => 'W',
-						wed => 'P',
-						thu => 'K',
-						fri => 'P',
-						sat => 'S',
-						sun => 'N'
-					},
 					wide => {
 						mon => 'panadīli',
 						tue => 'wisasīdis',
@@ -698,15 +544,6 @@ has 'calendar_days' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						mon => 'pan',
-						tue => 'wis',
-						wed => 'pus',
-						thu => 'ket',
-						fri => 'pēn',
-						sat => 'sab',
-						sun => 'nad'
-					},
 					narrow => {
 						mon => 'P',
 						tue => 'W',
@@ -715,15 +552,6 @@ has 'calendar_days' => (
 						fri => 'P',
 						sat => 'S',
 						sun => 'N'
-					},
-					wide => {
-						mon => 'panadīli',
-						tue => 'wisasīdis',
-						wed => 'pussisawaiti',
-						thu => 'ketwirtiks',
-						fri => 'pēntniks',
-						sat => 'sabattika',
-						sun => 'nadīli'
 					},
 				},
 			},
@@ -742,11 +570,6 @@ has 'calendar_quarters' => (
 						2 => '3. k.',
 						3 => '4. k.'
 					},
-					narrow => {0 => '1',
-						1 => '2',
-						2 => '3',
-						3 => '4'
-					},
 					wide => {0 => '1. ketwirts',
 						1 => '2. ketwirts',
 						2 => '3. ketwirts',
@@ -758,16 +581,6 @@ has 'calendar_quarters' => (
 						1 => '2. ketw.',
 						2 => '3. ketw.',
 						3 => '4. ketw.'
-					},
-					narrow => {0 => '1',
-						1 => '2',
-						2 => '3',
-						3 => '4'
-					},
-					wide => {0 => '1. ketwirts',
-						1 => '2. ketwirts',
-						2 => '3. ketwirts',
-						3 => '4. ketwirts'
 					},
 				},
 			},
@@ -781,10 +594,6 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'am' => q{AM},
-					'pm' => q{PM},
-				},
 				'wide' => {
 					'am' => q{ankstāinan},
 					'pm' => q{pa pussideinan},
@@ -872,34 +681,28 @@ has 'datetime_formats_available_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'gregorian' => {
-			E => q{ccc},
 			EHm => q{E, HH:mm},
 			EHms => q{E, HH:mm:ss},
 			Ed => q{E, d.},
-			Ehm => q{E, h:mm a},
-			Ehms => q{E, h:mm:ss a},
+			Ehm => q{E, h:mm a},
+			Ehms => q{E, h:mm:ss a},
 			Gy => q{y 'm'. G},
 			GyMMM => q{y 'm'. MMM G},
 			GyMMMEd => q{E, dd.MM 'st'. y G},
 			GyMMMd => q{dd.MM 'st'. y G},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
 			Hmsv => q{HH:mm:ss; v},
 			Hmv => q{HH:mm; v},
 			M => q{L.},
 			MEd => q{E, d.M},
-			MMM => q{LLL},
 			MMMEd => q{E, d. MMM},
 			MMMd => q{d. MMM},
 			Md => q{d.M},
 			d => q{d.},
-			h => q{h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			hmsv => q{h:mm:ss a; v},
-			hmv => q{h:mm a; v},
-			ms => q{mm:ss},
+			h => q{h a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
+			hmsv => q{h:mm:ss a; v},
+			hmv => q{h:mm a; v},
 			y => q{y 'm'.},
 			yM => q{M.y},
 			yMEd => q{E, d.M.y},
@@ -918,9 +721,6 @@ has 'datetime_formats_append_item' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			'Timezone' => '{0} {1}',
-		},
 	} },
 );
 
@@ -929,40 +729,23 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			fallback => '{0} – {1}',
-		},
 		'gregorian' => {
-			H => {
-				H => q{HH–HH},
-			},
-			Hm => {
-				H => q{HH:mm–HH:mm},
-				m => q{HH:mm–HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm–HH:mm v},
-				m => q{HH:mm–HH:mm v},
-			},
-			Hv => {
-				H => q{HH–HH v},
-			},
 			M => {
 				M => q{M.–M.},
 			},
 			MEd => {
-				M => q{E, dd.MM – E, dd.MM},
-				d => q{E, dd.MM – E, dd.MM},
+				M => q{E, dd.MM – E, dd.MM},
+				d => q{E, dd.MM – E, dd.MM},
 			},
 			MMM => {
 				M => q{MMM–MMM},
 			},
 			MMMEd => {
-				M => q{E, d. MMM – E, d. MMM},
-				d => q{E, d. – E, d. MMM},
+				M => q{E, d. MMM – E, d. MMM},
+				d => q{E, d. – E, d. MMM},
 			},
 			MMMd => {
-				M => q{d. MMM – d. MMM},
+				M => q{d. MMM – d. MMM},
 				d => q{d.–d. MMM},
 			},
 			Md => {
@@ -972,54 +755,50 @@ has 'datetime_formats_interval' => (
 			d => {
 				d => q{d.–d.},
 			},
-			fallback => '{0} – {1}',
 			h => {
-				a => q{h a – h a},
-				h => q{h–h a},
+				a => q{h a – h a},
+				h => q{h–h a},
 			},
 			hm => {
-				a => q{h:mm a – h:mm a},
-				h => q{h:mm–h:mm a},
-				m => q{h:mm–h:mm a},
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
 			},
 			hmv => {
-				a => q{h:mm a – h:mm a v},
-				h => q{h:mm–h:mm a v},
-				m => q{h:mm–h:mm a v},
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
 			},
 			hv => {
-				a => q{h a – h a v},
-				h => q{h–h a v},
-			},
-			y => {
-				y => q{y–y},
+				a => q{h a – h a v},
+				h => q{h–h a v},
 			},
 			yM => {
 				M => q{MM.y–MM.y},
 				y => q{MM.y–MM.y},
 			},
 			yMEd => {
-				M => q{E, dd.MM.y – E, dd.MM.y},
-				d => q{E, dd.MM.y – E, dd.MM.y},
-				y => q{E, dd.MM.y – E, dd.MM.y},
+				M => q{E, dd.MM.y – E, dd.MM.y},
+				d => q{E, dd.MM.y – E, dd.MM.y},
+				y => q{E, dd.MM.y – E, dd.MM.y},
 			},
 			yMMM => {
 				M => q{y 'm'. MMM–MMM},
-				y => q{y 'm'. MMM – y 'm'. MMM},
+				y => q{y 'm'. MMM – y 'm'. MMM},
 			},
 			yMMMEd => {
-				M => q{E, dd.MM – E, dd.MM 'st'. y},
-				d => q{E, dd. – E, dd.MM 'st'. y},
-				y => q{E, dd.MM 'st'. y – E, dd.MM 'st'. y},
+				M => q{E, dd.MM – E, dd.MM 'st'. y},
+				d => q{E, dd. – E, dd.MM 'st'. y},
+				y => q{E, dd.MM 'st'. y – E, dd.MM 'st'. y},
 			},
 			yMMMM => {
 				M => q{y 'mettas' MMMM–MMMM},
-				y => q{y 'mettas' MMMM – y 'mettas' MMMM},
+				y => q{y 'mettas' MMMM – y 'mettas' MMMM},
 			},
 			yMMMd => {
 				M => q{dd.MM–dd.MM 'st'. y},
 				d => q{dd.–dd.MM 'st'. y},
-				y => q{dd.MM 'st'. y – dd.MM 'st'. y},
+				y => q{dd.MM 'st'. y – dd.MM 'st'. y},
 			},
 			yMd => {
 				M => q{dd.MM.y–dd.MM.y},
@@ -1035,13 +814,9 @@ has 'time_zone_names' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default	=> sub { {
-		hourFormat => q(+HH:mm;-HH:mm),
-		gmtFormat => q(GMT{0}),
-		gmtZeroFormat => q(GMT),
 		regionFormat => q(Kerdā: {0}),
 		regionFormat => q(Daggas kerdā: {0}),
 		regionFormat => q(Zēimas kerdā: {0}),
-		fallbackFormat => q({1} ({0})),
 		'America_Central' => {
 			long => {
 				'daylight' => q#Centrālas Amērikas daggas kerdā#,

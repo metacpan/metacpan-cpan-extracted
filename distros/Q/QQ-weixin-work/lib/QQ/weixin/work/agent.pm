@@ -19,14 +19,16 @@ use LWP::UserAgent;
 use JSON;
 use utf8;
 
-our $VERSION = '0.06';
-our @EXPORT = qw/ get list set set_workbench_template get_workbench_template set_workbench_data /;
+our $VERSION = '0.10';
+our @EXPORT = qw/ get list set
+				set_workbench_template get_workbench_template set_workbench_data /;
 
 =head1 FUNCTION
 
 =head2 get(access_token,agentid);
 
 获取指定的应用详情
+最后更新：2023/10/31
 
 =head2 SYNOPSIS
 
@@ -34,11 +36,9 @@ L<https://developer.work.weixin.qq.com/document/path/90227#获取指定的应用
 
 =head3 请求说明：
 
-对于互联企业的应用，如果需要获取应用可见范围内其他互联企业的部门与成员，请调用互联企业-获取应用可见范围接口
-
 =head4 参数说明：
 
-    参数	            必须	说明
+	参数	            必须	说明
     access_token	是	调用接口凭证
     agentid	是	应用id
 
@@ -48,7 +48,7 @@ L<https://developer.work.weixin.qq.com/document/path/90227#获取指定的应用
 
 =head3 RETURN 返回结果：
 
-    {
+	{
 	   "errcode": 0,
 	   "errmsg": "ok",
 	   "agentid": 1000005,
@@ -77,7 +77,7 @@ L<https://developer.work.weixin.qq.com/document/path/90227#获取指定的应用
 
 =head4 RETURN 参数说明：
 
-    参数	        说明
+	参数	        说明
     errcode	出错返回码，为0表示成功，非0表示调用失败
 	errmsg	返回码提示语
 	agentid	企业应用id
@@ -87,7 +87,7 @@ L<https://developer.work.weixin.qq.com/document/path/90227#获取指定的应用
 	allow_userinfos	企业应用可见范围（人员），其中包括userid
 	allow_partys	企业应用可见范围（部门）
 	allow_tags	企业应用可见范围（标签）
-	close	企业应用是否被停用
+	close	企业应用是否被停用。0：未被停用；1：被停用
 	redirect_domain	企业应用可信域名
 	report_location_flag	企业应用是否打开地理位置上报 0：不上报；1：进入会话上报；
 	isreportenter	是否上报用户进入应用事件。0：不接收；1：接收
@@ -116,6 +116,7 @@ sub get {
 =head2 list(access_token);
 
 获取access_token对应的应用列表
+最后更新：2023/10/31
 
 =head2 SYNOPSIS
 
@@ -125,7 +126,7 @@ L<https://developer.work.weixin.qq.com/document/path/90227#获取access-token对
 
 =head4 参数说明：
 
-    参数	            必须	说明
+	参数	            必须	说明
     access_token	是	调用接口凭证
 
 =head4 权限说明：
@@ -148,14 +149,14 @@ L<https://developer.work.weixin.qq.com/document/path/90227#获取access-token对
 
 =head4 RETURN 参数说明：
 
-    参数	        说明
+	参数	        说明
     errcode	    出错返回码，为0表示成功，非0表示调用失败
     errmsg	返回码提示语
     agentlist	AgentItemArray	当前凭证可访问的应用列表
 
 AgentItem 结构：
 
-    参数	类型	说明
+	参数	类型	说明
     agentid	Integer	企业应用id
     name	String	企业应用名称
     square_logo_url	String	企业应用方形头像url
@@ -181,6 +182,7 @@ sub list {
 =head2 set(access_token, hash);
 
 设置应用
+最后更新：2021/06/24
 
 =head2 SYNOPSIS
 
@@ -203,7 +205,7 @@ L<https://developer.work.weixin.qq.com/document/path/90228>
 
 =head4 参数说明：
 
-    参数	必须	说明
+	参数	必须	说明
     access_token	是	调用接口凭证
     agentid	是	企业应用的id
     report_location_flag	否	企业应用是否打开地理位置上报 0：不上报；1：进入会话上报；
@@ -227,7 +229,7 @@ L<https://developer.work.weixin.qq.com/document/path/90228>
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
     errmsg	对返回码的文本描述内容
 
@@ -249,6 +251,10 @@ sub set {
     }
     return 0;
 }
+
+=head2 设置工作台自定义展示
+
+最后更新：2023/03/27
 
 =head2 set_workbench_template(access_token, hash);
 
@@ -277,7 +283,7 @@ L<https://developer.work.weixin.qq.com/document/path/92535#设置应用在工作
 
 =head4 参数说明：
 
-    参数	必须	说明
+	参数	必须	说明
     access_token	是	调用接口凭证
 	type	是	模版类型，目前支持的自定义类型包括 "keydata"、 "image"、 "list"、 "webview" 。若设置的type为 "normal",则相当于从自定义模式切换为普通宫格或者列表展示模式
 	agentid	是	应用id
@@ -300,7 +306,7 @@ L<https://developer.work.weixin.qq.com/document/path/92535#设置应用在工作
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
     errmsg	对返回码的文本描述内容
 
@@ -341,7 +347,7 @@ L<https://developer.work.weixin.qq.com/document/path/92535#获取应用在工作
 
 =head4 参数说明：
 
-    参数	必须	说明
+	参数	必须	说明
     access_token	是	调用接口凭证
 	agentid	是	应用id
 
@@ -358,7 +364,7 @@ L<https://developer.work.weixin.qq.com/document/path/92535#获取应用在工作
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
     errmsg	对返回码的文本描述内容
 
@@ -429,7 +435,7 @@ L<https://developer.work.weixin.qq.com/document/path/92535#设置应用在用户
 
 =head4 参数说明：
 
-    参数	必须	说明
+	参数	必须	说明
     access_token	是	调用接口凭证
 	agentid	是	应用id
 	userid	是	需要设置的用户的userid

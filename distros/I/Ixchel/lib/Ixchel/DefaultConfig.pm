@@ -11,11 +11,11 @@ Ixchel::DefaultConfig - The default config used for with Ixchel.
 
 =head1 VERSION
 
-Version 0.2.0
+Version 0.3.0
 
 =cut
 
-our $VERSION = '0.2.0';
+our $VERSION = '0.3.0';
 
 =head1 SYNOPSIS
 
@@ -42,15 +42,23 @@ sub get {
 			multi_instance    => 0,
 			config_base       => '/usr/local/etc/suricata',
 			instances         => {},
-			config            => { 'rule-files' => ['suricata.rules'] },
+			config            => { 'rule-files' => [] },
 			enable            => 0,
 			enable_fastlog    => 1,
 			enable_syslog     => 0,
 			filestore_enable  => 1,
 			dhcp_in_alert_eve => 0,
 			enable_pcap_log   => 0,
-			base_config       => 'https://raw.githubusercontent.com/OISF/suricata/master/suricata.yaml.in',
-			base_fill_in      => {
+			auto_threading    => {
+				enable  => 0,
+				exclude => undef,
+			},
+			auto_sensor_name => {
+				enable => 1,
+				full   => 0,
+			},
+			base_config  => 'https://raw.githubusercontent.com/OISF/suricata/master/suricata.yaml.in',
+			base_fill_in => {
 				e_logdir             => '/var/log/suricata/',
 				e_magic_file_comment => '',
 				e_magic_file         => '/usr/share/misc/magic',
@@ -69,10 +77,6 @@ sub get {
 				syslog_format   => '[%i] <%d> -- ',
 				syslog_json     => 0,
 			},
-			lilith => {
-				enable => 0,
-				config => {},
-			},
 			update => {
 				enable       => 0,
 				no_reload    => 0,
@@ -90,6 +94,14 @@ sub get {
 				conf_file    => undef,
 				update_file  => undef,
 				when         => '33 0 * * *',
+			},
+		},
+		lilith => {
+			enable      => 0,
+			config      => {},
+			auto_config => {
+				enabled => 1,
+				full    => 0,
 			},
 		},
 		suricata_extract => {
@@ -125,6 +137,7 @@ sub get {
 		},
 		cape => {
 			enable => 0,
+			eve    => '/opt/CAPEv2/log/eve.json',
 		},
 		mariadb => {
 			enable => 0,

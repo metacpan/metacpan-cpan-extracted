@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,12 +59,12 @@ sub new {
 
 
 # Run Operation Request
-# GetWorksheetPictureWithFormatRequest.name : The workbook name.  ,
+# GetWorksheetPictureWithFormatRequest.name : The file name.  ,
 # GetWorksheetPictureWithFormatRequest.sheetName : The worksheet name.  ,
-# GetWorksheetPictureWithFormatRequest.pictureNumber : The picture number.  ,
+# GetWorksheetPictureWithFormatRequest.pictureNumber : The picture index.  ,
 # GetWorksheetPictureWithFormatRequest.format : Picture conversion format(PNG/TIFF/JPEG/GIF/EMF/BMP).  ,
-# GetWorksheetPictureWithFormatRequest.folder : Original workbook folder.  ,
-# GetWorksheetPictureWithFormatRequest.storageName : Storage name.   
+# GetWorksheetPictureWithFormatRequest.folder : The folder where the file is situated.  ,
+# GetWorksheetPictureWithFormatRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_worksheet_picture_with_format' } = { 
-    	summary => 'Gets a picture by number in worksheet.',
+    	summary => 'Retrieve a picture by number in the worksheet.',
         params => $params,
         returns => 'string',
     };
@@ -142,7 +142,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -156,7 +156,7 @@ __PACKAGE__->method_documentation({
      'picture_number' => {
      	datatype => 'int',
      	base_name => 'pictureNumber',
-     	description => 'The picture number.',
+     	description => 'The picture index.',
      	format => '',
      	read_only => '',
      		},
@@ -170,14 +170,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

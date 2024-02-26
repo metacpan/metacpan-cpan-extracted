@@ -1,7 +1,7 @@
 ---
-abstract: unknown
+abstract: 'Perl interface to zlib/zlib-ng compression libraries'
 author:
-  - unknown
+  - 'Paul Marquess <pmqs@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
@@ -23,5 +23,5 @@ resources:
   bugtracker: https://github.com/pmqs/Compress-Raw-Zlib/issues
   homepage: https://github.com/pmqs/Compress-Raw-Zlib
   repository: git://github.com/pmqs/Compress-Raw-Zlib.git
-version: '2.206'
+version: '2.209'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -19,29 +19,32 @@ use LWP::UserAgent;
 use JSON;
 use utf8;
 
-our $VERSION = '0.06';
-our @EXPORT = qw/ get_follow_user_list
-				add_contact_way get_contact_way list_contact_way update_contact_way del_contact_way close_temp_chat
-				list get remark
+our $VERSION = '0.10';
+our @EXPORT = qw/ get_follow_user_list list get remark
 				get_corp_tag_list add_corp_tag edit_corp_tag del_corp_tag
 				get_strategy_tag_list add_strategy_tag edit_strategy_tag del_strategy_tag
 				mark_tag
-				transfer_customer transfer_result
 				get_unassigned_list
+				transfer_customer transfer_result
 				opengid_to_chatid
-				add_moment_task get_moment_task_result
+				add_contact_way get_contact_way list_contact_way update_contact_way del_contact_way close_temp_chat
+				add_moment_task get_moment_task_result cancel_moment_task
 				get_moment_list get_moment_task get_moment_customer_list get_moment_send_result get_moment_comments
-				add_msg_template
+				customer_acquisition_quota
+				add_msg_template remind_groupmsg_send cancel_groupmsg_send
 				get_groupmsg_list_v2 get_groupmsg_task get_groupmsg_send_result
-				send_welcome_msg get_user_behavior_data
+				send_welcome_msg 
+				get_user_behavior_data
 				add_product_album get_product_album get_product_album_list update_product_album delete_product_album
-				add_intercept_rule get_intercept_rule_list get_intercept_rule update_intercept_rule del_intercept_rule /;
+				add_intercept_rule get_intercept_rule_list get_intercept_rule update_intercept_rule del_intercept_rule
+				contact_list /;
  
 =head1 FUNCTION
 
 =head2 get_follow_user_list(access_token);
 
 获取配置了客户联系功能的成员列表
+最后更新：2023/12/01
 
 =head2 SYNOPSIS
 
@@ -53,14 +56,19 @@ L<https://developer.work.weixin.qq.com/document/path/92571>
 
 =head4 参数说明：
 
-    参数	            必须	说明
+	参数	            必须	说明
     access_token	是	调用接口凭证
 
 =head4 权限说明：
 
-企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）；
-第三方应用需具有“企业客户权限->客户基础信息”权限
-第三方/自建应用只能获取到可见范围内的配置了客户联系功能的成员。
+调用接口的应用需要满足如下的权限：
+
+	应用类型	权限要求
+	自建应用	配置到「客户联系 可调用接口的应用」中
+	代开发应用	具有「客户基础信息」权限
+	第三方应用	具有「客户基础信息」权限
+
+应用仅可获取可见范围内的成员。
 
 =head3 RETURN 返回结果：
 
@@ -75,7 +83,7 @@ L<https://developer.work.weixin.qq.com/document/path/92571>
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	follow_user	配置了客户联系功能的成员userid列表
@@ -98,601 +106,10 @@ sub get_follow_user_list {
     return 0;
 }
 
-=head2 add_contact_way(access_token, hash);
-
-配置客户联系「联系我」方式
-
-=head2 SYNOPSIS
-
-L<https://developer.work.weixin.qq.com/document/path/92572#配置客户联系「联系我」方式>
-
-=head3 请求说明：
-
-企业可以在管理后台-客户联系-加客户中配置成员的「联系我」的二维码或者小程序按钮，客户通过扫描二维码或点击小程序上的按钮，即可获取成员联系方式，主动联系到成员。
-企业可通过此接口为具有客户联系功能的成员生成专属的「联系我」二维码或者「联系我」按钮。
-如果配置的是「联系我」按钮，需要开发者的小程序接入小程序插件。
-
-注意:
-通过API添加的「联系我」不会在管理端进行展示，每个企业可通过API最多配置50万个「联系我」。
-用户需要妥善存储返回的config_id，config_id丢失可能导致用户无法编辑或删除「联系我」。
-临时会话模式不占用「联系我」数量，但每日最多添加10万个，并且仅支持单人。
-临时会话模式的二维码，添加好友完成后该二维码即刻失效。
-
-=head4 请求包结构体为：
-
-	{
-	   "type" :1,
-	   "scene":1,
-	   "style":1,
-	   "remark":"渠道客户",
-	   "skip_verify":true,
-	   "state":"teststate",
-	   "user" : ["zhangsan", "lisi", "wangwu"],
-	   "party" : [2, 3],
-	   "is_temp":true,
-	   "expires_in":86400,
-	   "chat_expires_in":86400,
-	   "unionid":"oxTWIuGaIt6gTKsQRLau2M0AAAA",
-	   "conclusions":
-	   {
-			"text": 
-			{
-				"content":"文本消息内容"
-			},
-			"image": 
-			{
-				"media_id": "MEDIA_ID"
-			},
-			"link":
-			{
-				"title": "消息标题",
-				"picurl": "https://example.pic.com/path",
-				"desc": "消息描述",
-				"url": "https://example.link.com/path"
-			},
-			"miniprogram":
-			{
-				"title": "消息标题",
-				"pic_media_id": "MEDIA_ID",
-				"appid": "wx8bd80126147dfAAA",
-				"page": "/path/index.html"
-			}
-	   }
-	}
-
-=head4 参数说明：
-
-    参数	必须	说明
-    access_token	是	调用接口凭证
-	type	是	联系方式类型,1-单人, 2-多人
-	scene	是	场景，1-在小程序中联系，2-通过二维码联系
-	style	否	在小程序中联系时使用的控件样式，详见附表
-	remark	否	联系方式的备注信息，用于助记，不超过30个字符
-	skip_verify	否	外部客户添加时是否无需验证，默认为true
-	state	否	企业自定义的state参数，用于区分不同的添加渠道，在调用“获取外部联系人详情”时会返回该参数值，不超过30个字符
-	user	否	使用该联系方式的用户userID列表，在type为1时为必填，且只能有一个
-	party	否	使用该联系方式的部门id列表，只在type为2时有效
-	is_temp	否	是否临时会话模式，true表示使用临时会话模式，默认为false
-	expires_in	否	临时会话二维码有效期，以秒为单位。该参数仅在is_temp为true时有效，默认7天，最多为14天
-	chat_expires_in	否	临时会话有效期，以秒为单位。该参数仅在is_temp为true时有效，默认为添加好友后24小时，最多为14天
-	unionid	否	可进行临时会话的客户unionid，该参数仅在is_temp为true时有效，如不指定则不进行限制
-	conclusions	否	结束语，会话结束时自动发送给客户，可参考“结束语定义”，仅在is_temp为true时有效
-
-=head3 权限说明
-
-注意，每个联系方式最多配置100个使用成员（包含部门展开后的成员）
-当设置为临时会话模式时（即is_temp为true），联系人仅支持配置为单人，暂不支持多人
-使用unionid需要调用方（企业或服务商）的企业微信“客户联系”中已绑定微信开发者账户
-
-=head3 RETURN 返回结果
-
-    {
-	   "errcode": 0,
-	   "errmsg": "ok",
-	   "config_id":"42b34949e138eb6e027c123cba77fAAA",
-	   "qr_code":"http://p.qpic.cn/wwhead/duc2TvpEgSdicZ9RrdUtBkv2UiaA/0"
-	}
-
-=head4 RETURN 参数说明
-
-    参数	    说明
-    errcode	返回码
-	errmsg	对返回码的文本描述内容
-	config_id	新增联系方式的配置id
-	qr_code	联系我二维码链接，仅在scene为2时返回
-
-=cut
-
-sub add_contact_way {
-    if ( @_ && $_[0] && ref $_[1] eq 'HASH' ) {
-        my $access_token = $_[0];
-        my $json = $_[1];
-        my $ua = LWP::UserAgent->new;
-        $ua->timeout(30);
-        $ua->env_proxy;
-
-        my $response = $ua->post("https://qyapi.weixin.qq.com/cgi-bin/externalcontact/add_contact_way?access_token=$access_token",Content => to_json($json,{allow_nonref=>1}),Content_type =>'application/json');
-        if ($response->is_success) {
-            return from_json($response->decoded_content,{utf8 => 1, allow_nonref => 1});
-        }
-
-    }
-    return 0;
-}
-
-=head2 get_contact_way(access_token, hash);
-
-获取企业已配置的「联系我」方式
-
-=head2 SYNOPSIS
-
-L<https://developer.work.weixin.qq.com/document/path/92572#获取企业已配置的「联系我」方式>
-
-=head3 请求说明：
-
-获取企业配置的「联系我」二维码和「联系我」小程序按钮。
-
-=head4 请求包结构体为：
-
-	{
-	   "config_id":"42b34949e138eb6e027c123cba77fad7"
-	}
-
-=head4 参数说明：
-
-    参数	必须	说明
-    access_token	是	调用接口凭证
-	config_id	是	联系方式的配置id
-
-=head3 权限说明
-
-=head3 RETURN 返回结果
-
-    {
-	   "errcode": 0,
-	   "errmsg": "ok",
-	   "contact_way":
-		{
-			"config_id":"42b34949e138eb6e027c123cba77fAAA",
-			"type":1,
-			"scene":1,
-			"style":2,
-			"remark":"test remark",
-			"skip_verify":true,
-			"state":"teststate",
-			"qr_code":"http://p.qpic.cn/wwhead/duc2TvpEgSdicZ9RrdUtBkv2UiaA/0",
-			"user" : ["zhangsan", "lisi", "wangwu"],
-			"party" : [2, 3],
-			"is_temp":true,
-			"expires_in":86400,
-			"chat_expires_in":86400,
-			"unionid":"oxTWIuGaIt6gTKsQRLau2M0AAAA",
-			"conclusions":
-			{
-				"text": 
-				{
-					"content":"文本消息内容"
-				},
-				"image": 
-				{
-					"pic_url": "http://p.qpic.cn/pic_wework/XXXXX"
-				},
-				"link": 
-				{
-					"title": "消息标题",
-					"picurl": "https://example.pic.com/path",
-					"desc": "消息描述",
-					"url": "https://example.link.com/path"
-				},
-				"miniprogram": 
-				{
-					"title": "消息标题",
-					"pic_media_id": "MEDIA_ID",
-					 "appid": "wx8bd80126147dfAAA",
-					"page": "/path/index"
-				}
-			}
-		}
-	}
-
-=head4 RETURN 参数说明
-
-    参数	    说明
-    errcode	返回码
-	errmsg	对返回码的文本描述内容
-	config_id	新增联系方式的配置id
-	type	联系方式类型，1-单人，2-多人
-	scene	场景，1-在小程序中联系，2-通过二维码联系
-	is_temp	是否临时会话模式，默认为false，true表示使用临时会话模式
-	remark	联系方式的备注信息，用于助记
-	skip_verify	外部客户添加时是否无需验证
-	state	企业自定义的state参数，用于区分不同的添加渠道，在调用“获取外部联系人详情”时会返回该参数值
-	style	小程序中联系按钮的样式，仅在scene为1时返回，详见附录
-	qr_code	联系二维码的URL，仅在scene为2时返回
-	user	使用该联系方式的用户userID列表
-	party	使用该联系方式的部门id列表
-	expires_in	临时会话二维码有效期，以秒为单位
-	chat_expires_in	临时会话有效期，以秒为单位
-	unionid	可进行临时会话的客户unionid
-	conclusions	结束语，可参考“结束语定义”
-
-=cut
-
-sub get_contact_way {
-    if ( @_ && $_[0] && ref $_[1] eq 'HASH' ) {
-        my $access_token = $_[0];
-        my $json = $_[1];
-        my $ua = LWP::UserAgent->new;
-        $ua->timeout(30);
-        $ua->env_proxy;
-
-        my $response = $ua->post("https://qyapi.weixin.qq.com/cgi-bin/externalcontact/get_contact_way?access_token=$access_token",Content => to_json($json,{allow_nonref=>1}),Content_type =>'application/json');
-        if ($response->is_success) {
-            return from_json($response->decoded_content,{utf8 => 1, allow_nonref => 1});
-        }
-
-    }
-    return 0;
-}
-
-=head2 list_contact_way(access_token, hash);
-
-获取企业已配置的「联系我」列表
-
-=head2 SYNOPSIS
-
-L<https://developer.work.weixin.qq.com/document/path/92572#获取企业已配置的「联系我」列表>
-
-=head3 请求说明：
-
-获取企业配置的「联系我」二维码和「联系我」小程序插件列表。不包含临时会话。
-注意，该接口仅可获取2021年7月10日以后创建的「联系我」
-
-=head4 请求包结构体为：
-
-	{
-	   "start_time":1622476800,
-	   "end_time":1625068800,
-	   "cursor":"CURSOR",
-	   "limit":1000
-	}
-
-=head4 参数说明：
-
-    参数	必须	说明
-    access_token	是	调用接口凭证
-	start_time	否	「联系我」创建起始时间戳, 默认为90天前
-	end_time	否	「联系我」创建结束时间戳, 默认为当前时间
-	cursor	否	分页查询使用的游标，为上次请求返回的 next_cursor
-	limit	否	每次查询的分页大小，默认为100条，最多支持1000条
-
-=head3 权限说明
-
-=head3 RETURN 返回结果
-
-    {
-	   "errcode": 0,
-	   "errmsg": "ok",
-		"contact_way":
-		[
-			{
-				"config_id":"534b63270045c9ABiKEE814ef56d91c62f"
-			}，
-			{
-				"config_id":"87bBiKEE811c62f63270041c62f5c9A4ef"
-			}
-		],
-		"next_cursor":"NEXT_CURSOR"
-	}
-
-=head4 RETURN 参数说明
-
-    参数	    说明
-    errcode	返回码
-	errmsg	对返回码的文本描述内容
-	contact_way.config_id	联系方式的配置id
-	next_cursor	分页参数，用于查询下一个分页的数据，为空时表示没有更多的分页
-
-=cut
-
-sub list_contact_way {
-    if ( @_ && $_[0] && ref $_[1] eq 'HASH' ) {
-        my $access_token = $_[0];
-        my $json = $_[1];
-        my $ua = LWP::UserAgent->new;
-        $ua->timeout(30);
-        $ua->env_proxy;
-
-        my $response = $ua->post("https://qyapi.weixin.qq.com/cgi-bin/externalcontact/list_contact_way?access_token=$access_token",Content => to_json($json,{allow_nonref=>1}),Content_type =>'application/json');
-        if ($response->is_success) {
-            return from_json($response->decoded_content,{utf8 => 1, allow_nonref => 1});
-        }
-
-    }
-    return 0;
-}
-
-=head2 update_contact_way(access_token, hash);
-
-更新企业已配置的「联系我」方式
-
-=head2 SYNOPSIS
-
-L<https://developer.work.weixin.qq.com/document/path/92572#更新企业已配置的「联系我」方式>
-
-=head3 请求说明：
-
-更新企业配置的「联系我」二维码和「联系我」小程序按钮中的信息，如使用人员和备注等。
-
-=head4 请求包结构体为：
-
-	{
-	   "config_id":"42b34949e138eb6e027c123cba77fAAA",
-	   "remark":"渠道客户",
-	   "skip_verify":true,
-	   "style":1,
-	   "state":"teststate",
-	   "user" : ["zhangsan", "lisi", "wangwu"],
-	   "party" : [2, 3],
-		"expires_in":86400,
-		"chat_expires_in":86400,
-		 "unionid":"oxTWIuGaIt6gTKsQRLau2M0AAAA",
-		 "conclusions":
-		 {
-			"text":
-			{
-				"content":"文本消息内容"
-			},
-			"image": 
-			{
-				"media_id": "MEDIA_ID"
-			},
-			"link": 
-			{
-				"title": "消息标题",
-				"picurl": "https://example.pic.com/path",
-				"desc": "消息描述",
-				"url": "https://example.link.com/path"
-			},
-			"miniprogram": 
-			{
-				"title": "消息标题",
-				"pic_media_id": "MEDIA_ID",
-				"appid": "wx8bd80126147dfAAA",
-				"page": "/path/index"
-			}
-	   }
-	}
-
-=head4 参数说明：
-
-    参数	必须	说明
-    access_token	是	调用接口凭证
-	config_id	是	企业联系方式的配置id
-	remark	否	联系方式的备注信息，不超过30个字符，将覆盖之前的备注
-	skip_verify	否	外部客户添加时是否无需验证
-	style	否	样式，只针对“在小程序中联系”的配置生效
-	state	否	企业自定义的state参数，用于区分不同的添加渠道，在调用“获取外部联系人详情”时会返回该参数值
-	user	否	使用该联系方式的用户列表，将覆盖原有用户列表
-	party	否	使用该联系方式的部门列表，将覆盖原有部门列表，只在配置的type为2时有效
-	expires_in	否	临时会话二维码有效期，以秒为单位，该参数仅在临时会话模式下有效
-	chat_expires_in	否	临时会话有效期，以秒为单位，该参数仅在临时会话模式下有效
-	unionid	否	可进行临时会话的客户unionid，该参数仅在临时会话模式有效，如不指定则不进行限制
-	conclusions	否	结束语，会话结束时自动发送给客户，可参考“结束语定义”，仅临时会话模式（is_temp为true）可设置
-
-注意：已失效的临时会话联系方式无法进行编辑
-当临时会话模式时（即is_temp为true），联系人仅支持配置为单人，暂不支持多人
-
-=head3 权限说明
-
-=head3 RETURN 返回结果
-
-    {
-	   "errcode": 0,
-	   "errmsg": "ok"
-	}
-
-=head4 RETURN 参数说明
-
-    参数	    说明
-    errcode	返回码
-	errmsg	对返回码的文本描述内容
-
-=cut
-
-sub update_contact_way {
-    if ( @_ && $_[0] && ref $_[1] eq 'HASH' ) {
-        my $access_token = $_[0];
-        my $json = $_[1];
-        my $ua = LWP::UserAgent->new;
-        $ua->timeout(30);
-        $ua->env_proxy;
-
-        my $response = $ua->post("https://qyapi.weixin.qq.com/cgi-bin/externalcontact/update_contact_way?access_token=$access_token",Content => to_json($json,{allow_nonref=>1}),Content_type =>'application/json');
-        if ($response->is_success) {
-            return from_json($response->decoded_content,{utf8 => 1, allow_nonref => 1});
-        }
-
-    }
-    return 0;
-}
-
-=head2 del_contact_way(access_token, hash);
-
-删除企业已配置的「联系我」方式
-
-=head2 SYNOPSIS
-
-L<https://developer.work.weixin.qq.com/document/path/92572#删除企业已配置的「联系我」方式>
-
-=head3 请求说明：
-
-删除一个已配置的「联系我」二维码或者「联系我」小程序按钮。
-
-=head4 请求包结构体为：
-
-	{
-	   "config_id":"42b34949e138eb6e027c123cba77fAAA"
-	}
-
-=head4 参数说明：
-
-    参数	必须	说明
-    access_token	是	调用接口凭证
-	config_id	是	企业联系方式的配置id
-
-=head3 权限说明
-
-=head3 RETURN 返回结果
-
-    {
-	   "errcode": 0,
-	   "errmsg": "ok"
-	}
-
-=head4 RETURN 参数说明
-
-    参数	    说明
-    errcode	返回码
-	errmsg	对返回码的文本描述内容
-
-=cut
-
-sub del_contact_way {
-    if ( @_ && $_[0] && ref $_[1] eq 'HASH' ) {
-        my $access_token = $_[0];
-        my $json = $_[1];
-        my $ua = LWP::UserAgent->new;
-        $ua->timeout(30);
-        $ua->env_proxy;
-
-        my $response = $ua->post("https://qyapi.weixin.qq.com/cgi-bin/externalcontact/del_contact_way?access_token=$access_token",Content => to_json($json,{allow_nonref=>1}),Content_type =>'application/json');
-        if ($response->is_success) {
-            return from_json($response->decoded_content,{utf8 => 1, allow_nonref => 1});
-        }
-
-    }
-    return 0;
-}
-
-=head2 close_temp_chat(access_token, hash);
-
-结束临时会话
-
-=head2 SYNOPSIS
-
-L<https://developer.work.weixin.qq.com/document/path/92572#结束临时会话>
-
-=head3 请求说明：
-
-将指定的企业成员和客户之前的临时会话断开，断开前会自动下发已配置的结束语。
-
-=head4 请求包结构体为：
-
-	{
-		"userid":"zhangyisheng",
-		"external_userid":"woAJ2GCAAAXtWyujaWJHDDGi0mACHAAA"
-	}
-
-=head4 参数说明：
-
-    参数	必须	说明
-    access_token	是	调用接口凭证
-	userid	是	企业成员的userid
-	external_userid	是	客户的外部联系人userid
-
-注意：请保证传入的企业成员和客户之间有仍然有效的临时会话, 通过其他方式的添加外部联系人无法通过此接口关闭会话。
-
-=head3 权限说明
-
-=head3 RETURN 返回结果
-
-    {
-	   "errcode": 0,
-	   "errmsg": "ok"
-	}
-
-=head4 RETURN 参数说明
-
-    参数	    说明
-    errcode	返回码
-	errmsg	对返回码的文本描述内容
-
-=head3 结束语定义
-
-=head4 字段内容：
-
-    "conclusions":
-	{
-		"text":
-			{
-				"content":"文本消息内容"
-			},
-			"image": 
-			{
-				"media_id": "MEDIA_ID",
-				"pic_url": "http://p.qpic.cn/pic_wework/XXXXX"
-			},
-			"link": 
-			{
-				"title": "消息标题",
-				"picurl": "https://example.pic.com/path",
-				"desc": "消息描述",
-				"url": "https://example.link.com/path"
-			},
-			"miniprogram": 
-			{
-				"title": "消息标题",
-				"pic_media_id": "MEDIA_ID",
-				"appid": "wx8bd80126147dfAAA",
-				"page": "/path/index"
-			}
-	   }
-	}
-
-=head4 参数说明
-
-	参数	说明
-	text.content	消息文本内容,最长为4000字节
-	image.media_id	图片的media_id
-	image.pic_url	图片的url
-	link.title	图文消息标题，最长为128字节
-	link.picurl	图文消息封面的url
-	link.desc	图文消息的描述，最长为512字节
-	link.url	图文消息的链接
-	miniprogram.title	小程序消息标题，最长为64字节
-	miniprogram.pic_media_id	小程序消息封面的mediaid，封面图建议尺寸为520*416
-	miniprogram.appid	小程序appid，必须是关联到企业的小程序应用
-	miniprogram.page	小程序page路径
-
-text、image、link和miniprogram四者不能同时为空；
-text与另外三者可以同时发送，此时将会以两条消息的形式触达客户;
-image、link和miniprogram只能有一个，如果三者同时填，则按image、link、miniprogram的优先顺序取参，也就是说，如果image与link同时传值，则只有image生效;
-media_id可以通过素材管理接口获得;
-构造结束语使用image消息时，只能填写meida_id字段,获取含有image结构的联系我方式时，返回pic_url字段。
-
-=cut
-
-sub close_temp_chat {
-    if ( @_ && $_[0] && ref $_[1] eq 'HASH' ) {
-        my $access_token = $_[0];
-        my $json = $_[1];
-        my $ua = LWP::UserAgent->new;
-        $ua->timeout(30);
-        $ua->env_proxy;
-
-        my $response = $ua->post("https://qyapi.weixin.qq.com/cgi-bin/externalcontact/close_temp_chat?access_token=$access_token",Content => to_json($json,{allow_nonref=>1}),Content_type =>'application/json');
-        if ($response->is_success) {
-            return from_json($response->decoded_content,{utf8 => 1, allow_nonref => 1});
-        }
-
-    }
-    return 0;
-}
-
 =head2 list(access_token);
 
 获取客户列表
+最后更新：2023/12/01
 
 =head2 SYNOPSIS
 
@@ -704,15 +121,22 @@ L<https://developer.work.weixin.qq.com/document/path/92113>
 
 =head4 参数说明：
 
-    参数	            必须	说明
+	参数	            必须	说明
     access_token	是	调用接口凭证
     userid	是	企业成员的userid
 
 =head4 权限说明：
 
-企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）；
-第三方应用需具有“企业客户权限->客户基础信息”权限
-第三方/自建应用只能获取到可见范围内的配置了客户联系功能的成员。
+调用接口的应用需要满足如下的权限：
+
+	应用类型	权限要求
+	自建应用	配置到「客户联系 可调用接口的应用」中
+	代开发应用	具有「客户基础信息」权限
+	第三方应用	具有「客户基础信息」权限
+
+应用只能获取到可见范围内的配置了客户联系功能的成员。
+
+注： 从2023年12月1日0点起，不再支持通过系统应用secret调用接口，存量企业暂不受影响 查看详情
 
 =head3 RETURN 返回结果：
 
@@ -728,7 +152,7 @@ L<https://developer.work.weixin.qq.com/document/path/92113>
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	external_userid	外部联系人的userid列表
@@ -752,9 +176,10 @@ sub list {
     return 0;
 }
 
-=head2 get(access_token);
+=head2 get(access_token, external_userid, cursor);
 
 获取客户详情
+最后更新：2023/12/01
 
 =head2 SYNOPSIS
 
@@ -766,21 +191,27 @@ L<https://developer.work.weixin.qq.com/document/path/92114>
 
 =head4 参数说明：
 
-    参数	            必须	说明
+	参数	            必须	说明
     access_token	是	调用接口凭证
     external_userid	是	外部联系人的userid，注意不是企业成员的帐号
 	cursor	否	上次请求返回的next_cursor
 	
 =head4 权限说明：
 
-企业需要使用系统应用“客户联系”或配置到“可调用应用”列表中的自建应用的secret所获取的accesstoken来调用（accesstoken如何获取？）；
-第三方应用需具有“企业客户权限->客户基础信息”权限
-第三方/自建应用调用时，返回的跟进人follow_user仅包含应用可见范围之内的成员。
-当客户在企业内的跟进人超过500人时需要使用cursor参数进行分页获取
+调用接口的应用需要满足如下的权限：
+
+	应用类型	权限要求
+	自建应用	配置到「客户联系 可调用接口的应用」中
+	代开发应用	具有「客户基础信息」权限
+	第三方应用	具有「客户基础信息」权限
+
+应用只能获取到可见范围内的成员;当客户在企业内的跟进人超过500人时需要使用cursor参数进行分页获取。
+
+注： 从2023年12月1日0点起，不再支持通过系统应用secret调用接口，存量企业暂不受影响 查看详情
 
 =head3 RETURN 返回结果：
 
-    {
+	{
 	   "errcode": 0,
 	   "errmsg": "ok",
 	   "external_contact":
@@ -862,7 +293,11 @@ L<https://developer.work.weixin.qq.com/document/path/92114>
 				  "13000000002"
 				],
 			   "oper_userid":"rocky",
-			   "add_way":1
+			   "add_way":10,
+			   "wechat_channels": {
+				 "nickname": "视频号名称",
+				 "source": 1
+			   }
 			},
 			{
 			  "userid":"tommy",
@@ -879,7 +314,7 @@ L<https://developer.work.weixin.qq.com/document/path/92114>
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	external_userid	外部联系人的userid
@@ -887,10 +322,10 @@ L<https://developer.work.weixin.qq.com/document/path/92114>
 	avatar	外部联系人头像，代开发自建应用需要管理员授权才可以获取，第三方不可获取，上游企业不可获取下游企业客户该字段
 	type	外部联系人的类型，1表示该外部联系人是微信用户，2表示该外部联系人是企业微信用户
 	gender	外部联系人性别 0-未知 1-男性 2-女性。第三方不可获取，上游企业不可获取下游企业客户该字段，返回值为0，表示未定义
-	unionid	外部联系人在微信开放平台的唯一身份标识（微信unionid），通过此字段企业可将外部联系人与公众号/小程序用户关联起来。仅当联系人类型是微信用户，且企业绑定了微信开发者ID有此字段。查看绑定方法。第三方不可获取，上游企业不可获取下游企业客户的unionid字段
+	unionid	外部联系人在微信开放平台的唯一身份标识（微信unionid），通过此字段企业可将外部联系人与公众号/小程序用户关联起来。仅当联系人类型是微信用户，且企业绑定了微信开发者ID有此字段。查看绑定方法。第三方应用和代开发应用均不可获取，上游企业不可获取下游企业客户的unionid字段
 	position	外部联系人的职位，如果外部企业或用户选择隐藏职位，则不返回，仅当联系人类型是企业微信用户时有此字段
 	corp_name	外部联系人所在企业的简称，仅当联系人类型是企业微信用户时有此字段
-	corp_full_name	外部联系人所在企业的主体名称，仅当联系人类型是企业微信用户时有此字段
+	corp_full_name	外部联系人所在企业的主体名称，仅当联系人类型是企业微信用户时有此字段。仅企业自建应用可获取；第三方应用、代开发应用、上下游应用不可获取，返回内容为企业名称，即corp_name。
 	external_profile	外部联系人的自定义展示信息，可以有多个字段和多种类型，包括文本，网页和小程序，仅当联系人类型是企业微信用户时有此字段，字段详情见对外属性；
 	follow_user.userid	添加了此外部联系人的企业成员userid
 	follow_user.remark	该成员对此外部联系人的备注
@@ -898,15 +333,18 @@ L<https://developer.work.weixin.qq.com/document/path/92114>
 	follow_user.createtime	该成员添加此外部联系人的时间
 	follow_user.tags.group_name	该成员添加此外部联系人所打标签的分组名称（标签功能需要企业微信升级到2.7.5及以上版本）
 	follow_user.tags.tag_name	该成员添加此外部联系人所打标签名称
-	follow_user.tags.type	该成员添加此外部联系人所打标签类型, 1-企业设置，2-用户自定义，3-规则组标签（仅系统应用返回）
+	follow_user.tags.type	该成员添加此外部联系人所打标签类型, 1-企业设置，2-用户自定义，3-规则组标签
 	follow_user.tags.tag_id	该成员添加此外部联系人所打企业标签的id，用户自定义类型标签（type=2）不返回
-	follow_user.remark_corp_name	该成员对此客户备注的企业名称
+	follow_user.remark_corp_name	该成员对此微信客户备注的企业名称（仅微信客户有该字段）
 	follow_user.remark_mobiles	该成员对此客户备注的手机号码，代开发自建应用需要管理员授权才可以获取，第三方不可获取，上游企业不可获取下游企业客户该字段
 	follow_user.add_way	该成员添加此客户的来源，具体含义详见来源定义
+	follow_user.wechat_channels	该成员添加此客户的来源add_way为10时，对应的视频号信息
+	follow_user.wechat_channels.nickname	视频号名称
+	follow_user.wechat_channels.source	视频号添加场景，0-未知 1-视频号主页 2-视频号直播间 3-视频号留资服务（微信版本要求：iOS ≥ 8.0.20，Android ≥ 8.0.21，且添加时间不早于2022年4月21日。否则添加场景值为0）
 	follow_user.oper_userid	发起添加的userid，如果成员主动添加，为成员的userid；如果是客户主动添加，则为客户的外部联系人userid；如果是内部成员共享/管理员分配，则为对应的成员/管理员userid
-	follow_user.state	企业自定义的state参数，用于区分客户具体是通过哪个「联系我」添加，由企业通过创建「联系我」方式指定
+	follow_user.state	企业自定义的state参数，用于区分客户具体是通过哪个「联系我」或获客链接添加；由企业通过创建「联系我」或在获客链接中添加customer_channel参数进行指定
 	next_cursor	分页的cursor，当跟进人多于500人时返回
-
+	
 注1：如果是微信用户，则返回其微信昵称。如果是企业微信联系人，则返回其设置对外展示的别名或实名
 
 =head3 来源定义
@@ -923,7 +361,15 @@ add_way表示添加客户的来源，有固定的值，而state表示此客户�
 	6	微信联系人
 	8	安装第三方应用时自动添加的客服人员
 	9	搜索邮箱
-	10	视频号主页添加
+	10	视频号添加
+	11	通过日程参与人添加
+	12	通过会议参与人添加
+	13	添加微信好友对应的企业微信
+	14	通过智慧硬件专属客服添加
+	15	通过上门服务客服添加
+	16	通过获客链接添加
+	17	通过定制开发添加
+	18	通过需求回复添加
 	201	内部成员共享
 	202	管理员/负责人分配
 
@@ -933,11 +379,12 @@ sub get {
     if ( @_ && $_[0] && $_[1] ) {
         my $access_token = $_[0];
         my $userid = $_[1];
+        my $cursor = $_[2] || 0;
         my $ua = LWP::UserAgent->new;
         $ua->timeout(30);
         $ua->env_proxy;
 
-        my $response = $ua->get("https://qyapi.weixin.qq.com/cgi-bin/externalcontact/get?access_token=$access_token&userid=$userid");
+        my $response = $ua->get("https://qyapi.weixin.qq.com/cgi-bin/externalcontact/get?access_token=$access_token&external_userid=$userid&cursor=$cursor");
         if ($response->is_success) {
             return from_json($response->decoded_content,{utf8 => 1, allow_nonref => 1});
         }
@@ -949,6 +396,7 @@ sub get {
 =head2 remark(access_token, hash);
 
 修改客户备注信息
+最后更新：2023/12/01
 
 =head2 SYNOPSIS
 
@@ -956,7 +404,7 @@ L<https://developer.work.weixin.qq.com/document/path/92115>
 
 =head3 请求说明：
 
-将指定的企业成员和客户之前的临时会话断开，断开前会自动下发已配置的结束语。
+企业可通过此接口修改指定用户添加的客户的备注信息。
 
 =head4 请求包结构体为：
 
@@ -975,7 +423,7 @@ L<https://developer.work.weixin.qq.com/document/path/92115>
 
 =head4 参数说明：
 
-    参数	必须	说明
+	参数	必须	说明
     access_token	是	调用接口凭证
 	userid	是	企业成员的userid
 	external_userid	是	外部联系人userid
@@ -993,8 +441,14 @@ remark_pic_mediaid可以通过素材管理接口获得。
 
 =head3 权限说明
 
-企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
-第三方应用需具有“企业客户权限->客户基础信息”权限
+调用接口的应用需要满足如下的权限：
+
+	应用类型	权限要求
+	自建应用	配置到「客户联系 可调用接口的应用」中
+	代开发应用	具有「客户基础信息」权限
+	第三方应用	具有「客户基础信息」权限
+
+应用仅可编辑可见范围内的成员添加的企业客户备注信息。
 
 =head3 RETURN 返回结果
 
@@ -1005,7 +459,7 @@ remark_pic_mediaid可以通过素材管理接口获得。
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 
@@ -1027,6 +481,26 @@ sub remark {
     }
     return 0;
 }
+
+=head2 管理企业标签
+
+最后更新：2023/12/01
+企业客户标签是针对企业的外部联系人进行标记和分类的标签，由企业统一配置后，企业成员可使用此标签对客户进行标记。
+
+=head2 SYNOPSIS
+
+L<https://developer.work.weixin.qq.com/document/path/92117>
+
+=head3 权限说明
+
+调用接口的应用需要满足如下的权限：
+
+	应用类型	权限要求
+	自建应用	配置到「客户联系 可调用接口的应用」中
+	代开发应用	具有「管理企业客户标签」权限(添加、编辑、删除)或「客户基础信息」（读取）
+	第三方应用	具有「管理企业客户标签」权限(添加、编辑、删除)或「客户基础信息」（读取）
+
+应用仅能编辑和删除本应用创建的标签
 
 =head2 get_corp_tag_list(access_token, hash);
 
@@ -1057,7 +531,7 @@ L<https://developer.work.weixin.qq.com/document/path/92117#获取企业标签库
 
 =head4 参数说明：
 
-    参数	必须	说明
+	参数	必须	说明
     access_token	是	调用接口凭证
 	tag_id	否	要查询的标签id
 	group_id	否	要查询的标签组id，返回该标签组以及其下的所有标签信息
@@ -1065,15 +539,9 @@ L<https://developer.work.weixin.qq.com/document/path/92117#获取企业标签库
 若tag_id和group_id均为空，则返回所有标签。
 同时传递tag_id和group_id时，忽略tag_id，仅以group_id作为过滤条件。
 
-=head3 权限说明
-
-对于获取企业标签库接口，企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）
-第三方可读写企业标签，但需有企业客户权限。特别的，添加/编辑/删除客户标签，需具有“企业客户权限->客户联系->管理企业客户标签”权限
-自建/第三方应用仅能编辑和删除本应用创建的标签，使用“客户联系”所获取的accesstoken进行调用则可编辑/删除所有的标签和标签组。
-
 =head3 RETURN 返回结果
 
-    {
+	{
 		"errcode": 0,
 		"errmsg": "ok",
 		"tag_group": [{
@@ -1102,7 +570,7 @@ L<https://developer.work.weixin.qq.com/document/path/92117#获取企业标签库
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	tag_group	标签组列表
@@ -1147,7 +615,7 @@ L<https://developer.work.weixin.qq.com/document/path/92117#添加企业客户标
 
 =head3 请求说明：
 
-企业可通过此接口向客户标签库中添加新的标签组和标签，每个企业最多可配置3000个企业标签。
+企业可通过此接口向客户标签库中添加新的标签组和标签，每个企业最多可配置10000个企业标签。
 
 =head4 请求包结构体为：
 
@@ -1169,7 +637,7 @@ L<https://developer.work.weixin.qq.com/document/path/92117#添加企业客户标
 
 =head4 参数说明：
 
-    参数	必须	说明
+	参数	必须	说明
     access_token	是	调用接口凭证
 	group_id	否	标签组id
 	group_name	否	标签组名称，最长为30个字符
@@ -1183,12 +651,6 @@ L<https://developer.work.weixin.qq.com/document/path/92117#添加企业客户标
 如果填写了group_id参数，则group_name和标签组的order参数会被忽略。
 不支持创建空标签组。
 标签组内的标签不可同名，如果传入多个同名标签，则只会创建一个。
-
-=head3 权限说明
-
-对于获取企业标签库接口，企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）
-第三方可读写企业标签，但需有企业客户权限。特别的，添加/编辑/删除客户标签，需具有“企业客户权限->客户联系->管理企业客户标签”权限
-自建/第三方应用仅能编辑和删除本应用创建的标签，使用“客户联系”所获取的accesstoken进行调用则可编辑/删除所有的标签和标签组。
 
 =head3 RETURN 返回结果
 
@@ -1218,7 +680,7 @@ L<https://developer.work.weixin.qq.com/document/path/92117#添加企业客户标
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	tag_group.group_id	标签组id
@@ -1273,7 +735,7 @@ L<https://developer.work.weixin.qq.com/document/path/92117#编辑企业客户标
 
 =head4 参数说明：
 
-    参数	必须	说明
+	参数	必须	说明
     access_token	是	调用接口凭证
 	id	是	标签或标签组的id
 	name	否	新的标签或标签组名称，最长为30个字符
@@ -1281,12 +743,6 @@ L<https://developer.work.weixin.qq.com/document/path/92117#编辑企业客户标
 	agentid	否	授权方安装的应用agentid。仅旧的第三方多应用套件需要填此参数
 
 注意:修改后的标签组不能和已有的标签组重名，标签也不能和同一标签组下的其他标签重名。
-
-=head3 权限说明
-
-对于获取企业标签库接口，企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）
-第三方可读写企业标签，但需有企业客户权限。特别的，添加/编辑/删除客户标签，需具有“企业客户权限->客户联系->管理企业客户标签”权限
-自建/第三方应用仅能编辑和删除本应用创建的标签，使用“客户联系”所获取的accesstoken进行调用则可编辑/删除所有的标签和标签组。
 
 =head3 RETURN 返回结果
 
@@ -1297,7 +753,7 @@ L<https://developer.work.weixin.qq.com/document/path/92117#编辑企业客户标
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 
@@ -1348,7 +804,7 @@ L<https://developer.work.weixin.qq.com/document/path/92117#删除企业客户标
 
 =head4 参数说明：
 
-    参数	必须	说明
+	参数	必须	说明
     access_token	是	调用接口凭证
 	tag_id	否	标签的id列表
 	group_id	否	标签组的id列表
@@ -1356,12 +812,6 @@ L<https://developer.work.weixin.qq.com/document/path/92117#删除企业客户标
 
 tag_id和group_id不可同时为空。
 如果一个标签组下所有的标签均被删除，则标签组会被自动删除。
-
-=head3 权限说明
-
-对于获取企业标签库接口，企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）
-第三方可读写企业标签，但需有企业客户权限。特别的，添加/编辑/删除客户标签，需具有“企业客户权限->客户联系->管理企业客户标签”权限
-自建/第三方应用仅能编辑和删除本应用创建的标签，使用“客户联系”所获取的accesstoken进行调用则可编辑/删除所有的标签和标签组。
 
 =head3 RETURN 返回结果
 
@@ -1372,7 +822,7 @@ tag_id和group_id不可同时为空。
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 
@@ -1394,6 +844,29 @@ sub del_corp_tag {
     }
     return 0;
 }
+
+=head2 管理企业规则组下的客户标签
+
+最后更新：2023/12/01
+企业规则组下的客户标签仅可被该规则组管理范围内的企业成员使用。
+
+=head2 SYNOPSIS
+
+L<https://developer.work.weixin.qq.com/document/path/94882>
+
+=head3 权限说明:
+
+调用的应用需要满足如下的权限
+
+	应用类型	权限要求
+	自建应用	配置到「客户联系 可调用接口的应用」中
+	代开发应用	具有「管理客户联系规则组」权限
+	第三方应用	具有「管理客户联系规则组」权限
+
+提示
+应用仅能获取和管理由本应用创建的规则组标签
+ 
+注： 从2023年12月1日0点起，不再支持通过系统应用secret调用接口，存量企业暂不受影响 查看详情
 
 =head2 get_strategy_tag_list(access_token, hash);
 
@@ -1425,7 +898,7 @@ L<https://developer.work.weixin.qq.com/document/path/94882#获取指定规则组
 
 =head4 参数说明：
 
-    参数	必须	说明
+	参数	必须	说明
     access_token	是	调用接口凭证
 	strategy_id	否	规则组id
 	tag_id	否	要查询的标签id
@@ -1433,10 +906,6 @@ L<https://developer.work.weixin.qq.com/document/path/94882#获取指定规则组
 
 若tag_id和group_id均为空，则返回所有标签。
 同时传递tag_id和group_id时，忽略tag_id，仅以group_id作为过滤条件。
-
-=head3 权限说明
-
-仅可使用“客户联系”secret获取的accesstoken来调用（accesstoken如何获取？）
 
 =head3 RETURN 返回结果
 
@@ -1467,7 +936,7 @@ L<https://developer.work.weixin.qq.com/document/path/94882#获取指定规则组
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	tag_group	标签组列表
@@ -1511,7 +980,7 @@ L<https://developer.work.weixin.qq.com/document/path/94882#为指定规则组创
 
 =head3 请求说明：
 
-企业可通过此接口向规则组中添加新的标签组和标签，每个企业的企业标签和规则组标签合计最多可配置3000个。注意，仅可在一级规则组下添加标签。
+企业可通过此接口向规则组中添加新的标签组和标签，每个企业的企业标签和规则组标签合计最多可配置10000个。注意，仅可在一级规则组下添加标签。
 
 =head4 请求包结构体为：
 
@@ -1533,7 +1002,7 @@ L<https://developer.work.weixin.qq.com/document/path/94882#为指定规则组创
 
 =head4 参数说明：
 
-    参数	必须	说明
+	参数	必须	说明
     access_token	是	调用接口凭证
 	strategy_id	是	规则组id
 	group_id	否	标签组id
@@ -1547,10 +1016,6 @@ L<https://developer.work.weixin.qq.com/document/path/94882#为指定规则组创
 如果填写的group_name和此规则组下的其他标签组同名，则会将相关标签加入已存在的同名标签组下
 不支持创建空标签组。
 标签组内的标签不可同名，如果传入多个同名标签，则只会创建一个。
-
-=head3 权限说明
-
-仅可使用“客户联系”secret获取的accesstoken来调用（accesstoken如何获取？）
 
 =head3 RETURN 返回结果
 
@@ -1580,7 +1045,7 @@ L<https://developer.work.weixin.qq.com/document/path/94882#为指定规则组创
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	tag_group.group_id	标签组id
@@ -1634,17 +1099,13 @@ L<https://developer.work.weixin.qq.com/document/path/94882#编辑指定规则组
 
 =head4 参数说明：
 
-    参数	必须	说明
+	参数	必须	说明
     access_token	是	调用接口凭证
 	id	是	标签或标签组的id
 	name	否	新的标签或标签组名称，最长为30个字符
 	order	否	标签/标签组的次序值。order值大的排序靠前。有效的值范围是[0, 2^32)
 
 注意:修改后的标签组不能和已有的标签组重名，标签也不能和同一标签组下的其他标签重名。
-
-=head3 权限说明
-
-仅可使用“客户联系”secret获取的accesstoken来调用（accesstoken如何获取？）
 
 =head3 RETURN 返回结果
 
@@ -1655,7 +1116,7 @@ L<https://developer.work.weixin.qq.com/document/path/94882#编辑指定规则组
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 
@@ -1705,17 +1166,13 @@ L<https://developer.work.weixin.qq.com/document/path/94882#删除指定规则组
 
 =head4 参数说明：
 
-    参数	必须	说明
+	参数	必须	说明
     access_token	是	调用接口凭证
 	tag_id	否	标签的id列表
 	group_id	否	标签组的id列表
 
 tag_id和group_id不可同时为空。
 如果一个标签组下所有的标签均被删除，则标签组会被自动删除。
-
-=head3 权限说明
-
-仅可使用“客户联系”secret获取的accesstoken来调用（accesstoken如何获取？）
 
 =head3 RETURN 返回结果
 
@@ -1752,6 +1209,7 @@ sub del_strategy_tag {
 =head2 mark_tag(access_token, hash);
 
 编辑客户企业标签
+最后更新：2023/12/01
 
 =head2 SYNOPSIS
 
@@ -1759,7 +1217,7 @@ L<https://developer.work.weixin.qq.com/document/path/92118>
 
 =head3 请求说明：
 
-企业可通过此接口为指定成员的客户添加上由企业统一配置的标签。
+企业可通过此接口为指定成员的客户添加上由企业统一配置的标签；注意，每个成员对同一个客户最多可以添加3000个标签。
 
 =head4 请求包结构体为：
 
@@ -1772,7 +1230,7 @@ L<https://developer.work.weixin.qq.com/document/path/92118>
 
 =head4 参数说明：
 
-    参数	必须	说明
+	参数	必须	说明
     access_token	是	调用接口凭证
 	userid	是	添加外部联系人的userid
 	external_userid	是	外部联系人userid
@@ -1785,8 +1243,15 @@ add_tag和remove_tag不可同时为空。
 
 =head3 权限说明
 
-企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
-第三方应用需具有“企业客户权限->客户基础信息”权限
+调用接口的应用需要满足如下的权限：
+
+	应用类型	权限要求
+	自建应用	配置到「客户联系 可调用接口的应用」中
+	代开发应用	具有「客户基础信息」权限
+	第三方应用	具有「客户基础信息」权限
+
+应用只能编辑可见范围内的成员添加的企业客户标签。
+如果要使用某个客户联系规则组下的企业客户标签，则规则组必须由同一个应用创建并且相关成员在规则组的管理范围内。
 
 =head3 RETURN 返回结果
 
@@ -1797,7 +1262,7 @@ add_tag和remove_tag不可同时为空。
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 
@@ -1820,9 +1285,95 @@ sub mark_tag {
     return 0;
 }
 
+=head2 get_unassigned_list(access_token, hash);
+
+获取待分配的离职成员列表
+最后更新：2023/12/01
+
+=head2 SYNOPSIS
+
+L<https://developer.work.weixin.qq.com/document/path/92124>
+
+=head3 请求说明：
+
+企业和第三方可通过此接口，获取所有离职成员的客户列表，并可进一步调用分配离职成员的客户接口将这些客户重新分配给其他企业成员。
+
+=head4 请求包结构体为：
+
+	{
+	  "page_id":0,
+	  "cursor":"",
+	  "page_size":100
+	}
+
+=head4 参数说明：
+
+	参数	必须	说明
+    access_token	是	调用接口凭证
+	page_id	否	分页查询，要查询页号，从0开始
+	page_size	否	每次返回的最大记录数，默认为1000，最大值为1000
+	cursor	否	分页查询游标，字符串类型，适用于数据量较大的情况，如果使用该参数则无需填写page_id，该参数由上一次调用返回
+
+=head3 权限说明
+
+企业需要使用配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）
+第三方应用需拥有“企业客户权限->客户联系->分配离职成员的客户”权限
+
+=head3 RETURN 返回结果
+
+    {
+	   "errcode":0,
+	   "errmsg":"ok",
+	   "info":[
+	   {
+			"handover_userid":"zhangsan",
+			"external_userid":"woAJ2GCAAAd4uL12hdfsdasassdDmAAAAA",
+			"dimission_time":1550838571
+	   },
+	   {
+			"handover_userid":"lisi",
+			"external_userid":"wmAJ2GCAAAzLTI123ghsdfoGZNqqAAAA",
+			"dimission_time":1550661468
+		}
+	 ],
+	 "is_last":false,
+	 "next_cursor":"aSfwejksvhToiMMfFeIGZZ"
+	}
+
+=head4 RETURN 参数说明
+
+	参数	    说明
+    errcode	返回码
+	errmsg	对返回码的文本描述内容
+	info.handover_userid	离职成员的userid
+	info.external_userid	外部联系人userid
+	info.dimission_time	成员离职时间
+	is_last	是否是最后一条记录
+	next_cursor	分页查询游标,已经查完则返回空("")，使用page_id作为查询参数时不返回
+
+=cut
+
+sub get_unassigned_list {
+    if ( @_ && $_[0] && ref $_[1] eq 'HASH' ) {
+        my $access_token = $_[0];
+        my $json = $_[1];
+        my $ua = LWP::UserAgent->new;
+        $ua->timeout(30);
+        $ua->env_proxy;
+
+        my $response = $ua->post("https://qyapi.weixin.qq.com/cgi-bin/externalcontact/get_unassigned_list?access_token=$access_token",Content => to_json($json,{allow_nonref=>1}),Content_type =>'application/json');
+        if ($response->is_success) {
+            return from_json($response->decoded_content,{utf8 => 1, allow_nonref => 1});
+        }
+
+    }
+    return 0;
+}
+
 =head2 transfer_customer(access_token, hash);
 
 分配在职成员的客户
+最后更新：2023/12/01
 
 =head2 SYNOPSIS
 
@@ -1847,19 +1398,24 @@ L<https://developer.work.weixin.qq.com/document/path/92125>
 
 =head4 参数说明：
 
-    参数	必须	说明
+	参数	必须	说明
     access_token	是	调用接口凭证
 	handover_userid	是	原跟进成员的userid
 	takeover_userid	是	接替成员的userid
 	external_userid	是	客户的external_userid列表，每次最多分配100个客户
 	transfer_success_msg	否	转移成功后发给客户的消息，最多200个字符，不填则使用默认文案
 
+提示
+原跟进成员和接替成员在最近一年内需要登录过至少一次企业微信。
+
 external_userid必须是handover_userid的客户（即配置了客户联系功能的成员所添加的联系人）。
 为保障客户服务体验，90个自然日内，在职成员的每位客户仅可被转接2次。
+如果接替成员在转接前已成为客户好友，则不会触发添加企业客户事件。
+如果客户曾经被接替成员转移给其他成员，其他成员再次将此客户转移给此接替成员时，不会触发添加企业客户事件。
 
 =head3 权限说明
 
-企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
+企业需要使用配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
 第三方应用需拥有“企业客户权限->客户联系->在职继承”权限
 接替成员必须在此第三方应用或自建应用的可见范围内。
 接替成员需要配置了客户联系功能。
@@ -1885,7 +1441,7 @@ external_userid必须是handover_userid的客户（即配置了客户联系功�
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	customer.external_userid	客户的external_userid
@@ -1915,6 +1471,7 @@ sub transfer_customer {
 =head2 transfer_result(access_token, hash);
 
 查询客户接替状态
+最后更新：2023/12/01
 
 =head2 SYNOPSIS
 
@@ -1934,7 +1491,7 @@ L<https://developer.work.weixin.qq.com/document/path/94088>
 
 =head4 参数说明：
 
-    参数	必须	说明
+	参数	必须	说明
     access_token	是	调用接口凭证
 	handover_userid	是	原添加成员的userid
 	takeover_userid	是	接替成员的userid
@@ -1974,7 +1531,7 @@ L<https://developer.work.weixin.qq.com/document/path/94088>
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	customer.external_userid	转接客户的外部联系人userid
@@ -2003,98 +1560,10 @@ sub transfer_result {
     return 0;
 }
 
-=head2 get_unassigned_list(access_token, hash);
-
-获取待分配的离职成员列表
-
-=head2 SYNOPSIS
-
-L<https://developer.work.weixin.qq.com/document/path/92124>
-
-=head3 请求说明：
-
-企业和第三方可通过此接口，获取所有离职成员的客户列表，并可进一步调用分配离职成员的客户接口将这些客户重新分配给其他企业成员。
-
-=head4 请求包结构体为：
-
-	{
-	  "page_id":0,
-	  "cursor":"",
-	  "page_size":100
-	}
-
-=head4 参数说明：
-
-    参数	必须	说明
-    access_token	是	调用接口凭证
-	page_id	否	分页查询，要查询页号，从0开始
-	page_size	否	每次返回的最大记录数，默认为1000，最大值为1000
-	cursor	否	分页查询游标，字符串类型，适用于数据量较大的情况，如果使用该参数则无需填写page_id，该参数由上一次调用返回
-
-注意:
-当page_id为1，page_size为100时，表示取第101到第200条记录。
-page_id和page_size参数仅适用于记录数小于五万条的情况,即 page_id*page_size < 50000；
-如果记录数大于五万，则需要使用cursor参数。
-
-=head3 权限说明
-
-企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）
-第三方应用需拥有“企业客户权限->客户联系->分配离职成员的客户”权限
-
-=head3 RETURN 返回结果
-
-    {
-	   "errcode":0,
-	   "errmsg":"ok",
-	   "info":[
-	   {
-			"handover_userid":"zhangsan",
-			"external_userid":"woAJ2GCAAAd4uL12hdfsdasassdDmAAAAA",
-			"dimission_time":1550838571
-	   },
-	   {
-			"handover_userid":"lisi",
-			"external_userid":"wmAJ2GCAAAzLTI123ghsdfoGZNqqAAAA",
-			"dimission_time":1550661468
-		}
-	 ],
-	 "is_last":false,
-	 "next_cursor":"aSfwejksvhToiMMfFeIGZZ"
-	}
-
-=head4 RETURN 参数说明
-
-    参数	    说明
-    errcode	返回码
-	errmsg	对返回码的文本描述内容
-	info.handover_userid	离职成员的userid
-	info.external_userid	外部联系人userid
-	info.dimission_time	成员离职时间
-	is_last	是否是最后一条记录
-	next_cursor	分页查询游标,已经查完则返回空("")，使用page_id作为查询参数时不返回
-
-=cut
-
-sub get_unassigned_list {
-    if ( @_ && $_[0] && ref $_[1] eq 'HASH' ) {
-        my $access_token = $_[0];
-        my $json = $_[1];
-        my $ua = LWP::UserAgent->new;
-        $ua->timeout(30);
-        $ua->env_proxy;
-
-        my $response = $ua->post("https://qyapi.weixin.qq.com/cgi-bin/externalcontact/get_unassigned_list?access_token=$access_token",Content => to_json($json,{allow_nonref=>1}),Content_type =>'application/json');
-        if ($response->is_success) {
-            return from_json($response->decoded_content,{utf8 => 1, allow_nonref => 1});
-        }
-
-    }
-    return 0;
-}
-
 =head2 opengid_to_chatid(access_token, hash);
 
 客户群opengid转换
+最后更新：2023/12/01
 
 =head2 SYNOPSIS
 
@@ -2112,13 +1581,13 @@ L<https://developer.work.weixin.qq.com/document/path/94822>
 
 =head4 参数说明：
 
-    参数	必须	说明
+	参数	必须	说明
     access_token	是	调用接口凭证
 	opengid	是	小程序在微信获取到的群ID，参见wx.getGroupEnterInfo
 
 =head3 权限说明
 
-企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）
+企业需要使用配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）
 第三方应用需具有“企业客户权限->客户基础信息”权限
 对于第三方/自建应用，群主必须在应用的可见范围
 仅支持企业服务人员创建的客户群
@@ -2134,7 +1603,7 @@ L<https://developer.work.weixin.qq.com/document/path/94822>
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	chat_id	客户群ID，可以用来调用获取客户群详情
@@ -2158,9 +1627,635 @@ sub opengid_to_chatid {
     return 0;
 }
 
+=head2 联系我与客户入群方式
+
+客户联系「联系我」管理
+最后更新：2023/12/01
+
+=head2 SYNOPSIS
+
+L<https://developer.work.weixin.qq.com/document/path/92228>
+
+=head3 权限说明
+
+调用接口的应用需要满足如下的权限：
+
+	应用类型	权限要求
+	自建应用	配置到「客户联系 可调用接口的应用」中
+	代开发应用	具有「配置「联系我」二维码」权限
+	第三方应用	具有「配置「联系我」二维码」权限
+
+传入的成员和部门需要在此应用的可见范围内。
+配置的使用成员必须在企业微信激活且已经过实名认证且配置了客户联系功能。。
+临时会话的二维码具有有效期，添加企业成员后仅能在指定有效期内进行会话，仅支持医疗行业企业创建。
+临时会话模式可以配置会话结束时自动发送给用户的结束语。
+
+=head2 add_contact_way(access_token, hash);
+
+配置客户联系「联系我」方式
+
+=head2 SYNOPSIS
+
+L<https://developer.work.weixin.qq.com/document/path/92228#配置客户联系「联系我」方式>
+
+=head3 请求说明：
+
+企业可以在管理后台-客户联系-加客户中配置成员的「联系我」的二维码或者小程序按钮，客户通过扫描二维码或点击小程序上的按钮，即可获取成员联系方式，主动联系到成员。
+企业可通过此接口为具有客户联系功能的成员生成专属的「联系我」二维码或者「联系我」按钮。
+如果配置的是「联系我」按钮，需要开发者的小程序接入小程序插件。
+
+注意:
+通过API添加的「联系我」不会在管理端进行展示，每个企业可通过API最多配置50万个「联系我」。
+用户需要妥善存储返回的config_id，config_id丢失可能导致用户无法编辑或删除「联系我」。
+临时会话模式不占用「联系我」数量，但每日最多添加10万个，并且仅支持单人。
+临时会话模式的二维码，添加好友完成后该二维码即刻失效。
+
+=head4 请求包结构体为：
+
+	{
+	   "type" :1,
+	   "scene":1,
+	   "style":1,
+	   "remark":"渠道客户",
+	   "skip_verify":true,
+	   "state":"teststate",
+	   "user" : ["zhangsan", "lisi", "wangwu"],
+	   "party" : [2, 3],
+	   "is_temp":true,
+	   "expires_in":86400,
+	   "chat_expires_in":86400,
+	   "unionid":"oxTWIuGaIt6gTKsQRLau2M0AAAA",
+	   "is_exclusive":true,
+	   "conclusions":
+	   {
+			"text": 
+			{
+				"content":"文本消息内容"
+			},
+			"image": 
+			{
+				"media_id": "MEDIA_ID"
+			},
+			"link":
+			{
+				"title": "消息标题",
+				"picurl": "https://example.pic.com/path",
+				"desc": "消息描述",
+				"url": "https://example.link.com/path"
+			},
+			"miniprogram":
+			{
+				"title": "消息标题",
+				"pic_media_id": "MEDIA_ID",
+				"appid": "wx8bd80126147dfAAA",
+				"page": "/path/index.html"
+			}
+	   }
+	}
+
+=head4 参数说明：
+
+	参数	必须	说明
+    access_token	是	调用接口凭证
+	type	是	联系方式类型,1-单人, 2-多人
+	scene	是	场景，1-在小程序中联系，2-通过二维码联系
+	style	否	在小程序中联系时使用的控件样式，详见附表
+	remark	否	联系方式的备注信息，用于助记，不超过30个字符
+	skip_verify	否	外部客户添加时是否无需验证，默认为true
+	state	否	企业自定义的state参数，用于区分不同的添加渠道，在调用“获取外部联系人详情”时会返回该参数值，不超过30个字符
+	user	否	使用该联系方式的用户userID列表，在type为1时为必填，且只能有一个
+	party	否	使用该联系方式的部门id列表，只在type为2时有效
+	is_temp	否	是否临时会话模式，true表示使用临时会话模式，默认为false
+	expires_in	否	临时会话二维码有效期，以秒为单位。该参数仅在is_temp为true时有效，默认7天，最多为14天
+	chat_expires_in	否	临时会话有效期，以秒为单位。该参数仅在is_temp为true时有效，默认为添加好友后24小时，最多为14天
+	unionid	否	可进行临时会话的客户unionid，该参数仅在is_temp为true时有效，如不指定则不进行限制
+	is_exclusive	否	是否开启同一外部企业客户只能添加同一个员工，默认为否，开启后，同一个企业的客户会优先添加到同一个跟进人
+	conclusions	否	结束语，会话结束时自动发送给客户，可参考“结束语定义”，仅在is_temp为true时有效
+
+=head3 权限说明
+
+注意，每个联系方式最多配置100个使用成员（包含部门展开后的成员）
+当设置为临时会话模式时（即is_temp为true），联系人仅支持配置为单人，暂不支持多人
+使用unionid需要调用方（企业或服务商）的企业微信“客户联系”中已绑定微信开发者账户
+
+=head3 RETURN 返回结果
+
+    {
+	   "errcode": 0,
+	   "errmsg": "ok",
+	   "config_id":"42b34949e138eb6e027c123cba77fAAA",
+	   "qr_code":"http://p.qpic.cn/wwhead/duc2TvpEgSdicZ9RrdUtBkv2UiaA/0"
+	}
+
+=head4 RETURN 参数说明
+
+	参数	    说明
+    errcode	返回码
+	errmsg	对返回码的文本描述内容
+	config_id	新增联系方式的配置id
+	qr_code	联系我二维码链接，仅在scene为2时返回
+
+=cut
+
+sub add_contact_way {
+    if ( @_ && $_[0] && ref $_[1] eq 'HASH' ) {
+        my $access_token = $_[0];
+        my $json = $_[1];
+        my $ua = LWP::UserAgent->new;
+        $ua->timeout(30);
+        $ua->env_proxy;
+
+        my $response = $ua->post("https://qyapi.weixin.qq.com/cgi-bin/externalcontact/add_contact_way?access_token=$access_token",Content => to_json($json,{allow_nonref=>1}),Content_type =>'application/json');
+        if ($response->is_success) {
+            return from_json($response->decoded_content,{utf8 => 1, allow_nonref => 1});
+        }
+
+    }
+    return 0;
+}
+
+=head2 get_contact_way(access_token, hash);
+
+获取企业已配置的「联系我」方式
+
+=head2 SYNOPSIS
+
+L<https://developer.work.weixin.qq.com/document/path/92228#获取企业已配置的「联系我」方式>
+
+=head3 请求说明：
+
+获取企业配置的「联系我」二维码和「联系我」小程序按钮。
+
+=head4 请求包结构体为：
+
+	{
+	   "config_id":"42b34949e138eb6e027c123cba77fad7"
+	}
+
+=head4 参数说明：
+
+	参数	必须	说明
+    access_token	是	调用接口凭证
+	config_id	是	联系方式的配置id
+
+=head3 权限说明
+
+=head3 RETURN 返回结果
+
+	{
+	   "errcode": 0,
+	   "errmsg": "ok",
+	   "contact_way":
+		{
+			"config_id":"42b34949e138eb6e027c123cba77fAAA",
+			"type":1,
+			"scene":1,
+			"style":2,
+			"remark":"test remark",
+			"skip_verify":true,
+			"state":"teststate",
+			"qr_code":"http://p.qpic.cn/wwhead/duc2TvpEgSdicZ9RrdUtBkv2UiaA/0",
+			"user" : ["zhangsan", "lisi", "wangwu"],
+			"party" : [2, 3],
+			"is_temp":true,
+			"expires_in":86400,
+			"chat_expires_in":86400,
+			"unionid":"oxTWIuGaIt6gTKsQRLau2M0AAAA",
+			"conclusions":
+			{
+				"text": 
+				{
+					"content":"文本消息内容"
+				},
+				"image": 
+				{
+					"pic_url": "http://p.qpic.cn/pic_wework/XXXXX"
+				},
+				"link": 
+				{
+					"title": "消息标题",
+					"picurl": "https://example.pic.com/path",
+					"desc": "消息描述",
+					"url": "https://example.link.com/path"
+				},
+				"miniprogram": 
+				{
+					"title": "消息标题",
+					"pic_media_id": "MEDIA_ID",
+					 "appid": "wx8bd80126147dfAAA",
+					"page": "/path/index"
+				}
+			}
+		}
+	}
+
+=head4 RETURN 参数说明
+
+	参数	    说明
+    errcode	返回码
+	errmsg	对返回码的文本描述内容
+	config_id	新增联系方式的配置id
+	type	联系方式类型，1-单人，2-多人
+	scene	场景，1-在小程序中联系，2-通过二维码联系
+	is_temp	是否临时会话模式，默认为false，true表示使用临时会话模式
+	remark	联系方式的备注信息，用于助记
+	skip_verify	外部客户添加时是否无需验证
+	state	企业自定义的state参数，用于区分不同的添加渠道，在调用“获取外部联系人详情”时会返回该参数值
+	style	小程序中联系按钮的样式，仅在scene为1时返回，详见附录
+	qr_code	联系二维码的URL，仅在scene为2时返回
+	user	使用该联系方式的用户userID列表
+	party	使用该联系方式的部门id列表
+	expires_in	临时会话二维码有效期，以秒为单位
+	chat_expires_in	临时会话有效期，以秒为单位
+	unionid	可进行临时会话的客户unionid
+	conclusions	结束语，可参考“结束语定义”
+
+=cut
+
+sub get_contact_way {
+    if ( @_ && $_[0] && ref $_[1] eq 'HASH' ) {
+        my $access_token = $_[0];
+        my $json = $_[1];
+        my $ua = LWP::UserAgent->new;
+        $ua->timeout(30);
+        $ua->env_proxy;
+
+        my $response = $ua->post("https://qyapi.weixin.qq.com/cgi-bin/externalcontact/get_contact_way?access_token=$access_token",Content => to_json($json,{allow_nonref=>1}),Content_type =>'application/json');
+        if ($response->is_success) {
+            return from_json($response->decoded_content,{utf8 => 1, allow_nonref => 1});
+        }
+
+    }
+    return 0;
+}
+
+=head2 list_contact_way(access_token, hash);
+
+获取企业已配置的「联系我」列表
+
+=head2 SYNOPSIS
+
+L<https://developer.work.weixin.qq.com/document/path/92228#获取企业已配置的「联系我」列表>
+
+=head3 请求说明：
+
+获取企业配置的「联系我」二维码和「联系我」小程序插件列表。不包含临时会话。
+注意，该接口仅可获取2021年7月10日以后创建的「联系我」
+
+=head4 请求包结构体为：
+
+	{
+	   "start_time":1622476800,
+	   "end_time":1625068800,
+	   "cursor":"CURSOR",
+	   "limit":1000
+	}
+
+=head4 参数说明：
+
+	参数	必须	说明
+    access_token	是	调用接口凭证
+	start_time	否	「联系我」创建起始时间戳, 默认为90天前
+	end_time	否	「联系我」创建结束时间戳, 默认为当前时间
+	cursor	否	分页查询使用的游标，为上次请求返回的 next_cursor
+	limit	否	每次查询的分页大小，默认为100条，最多支持1000条
+
+=head3 权限说明
+
+=head3 RETURN 返回结果
+
+    {
+	   "errcode": 0,
+	   "errmsg": "ok",
+		"contact_way":
+		[
+			{
+				"config_id":"534b63270045c9ABiKEE814ef56d91c62f"
+			}，
+			{
+				"config_id":"87bBiKEE811c62f63270041c62f5c9A4ef"
+			}
+		],
+		"next_cursor":"NEXT_CURSOR"
+	}
+
+=head4 RETURN 参数说明
+
+	参数	    说明
+    errcode	返回码
+	errmsg	对返回码的文本描述内容
+	contact_way.config_id	联系方式的配置id
+	next_cursor	分页参数，用于查询下一个分页的数据，为空时表示没有更多的分页
+
+=cut
+
+sub list_contact_way {
+    if ( @_ && $_[0] && ref $_[1] eq 'HASH' ) {
+        my $access_token = $_[0];
+        my $json = $_[1];
+        my $ua = LWP::UserAgent->new;
+        $ua->timeout(30);
+        $ua->env_proxy;
+
+        my $response = $ua->post("https://qyapi.weixin.qq.com/cgi-bin/externalcontact/list_contact_way?access_token=$access_token",Content => to_json($json,{allow_nonref=>1}),Content_type =>'application/json');
+        if ($response->is_success) {
+            return from_json($response->decoded_content,{utf8 => 1, allow_nonref => 1});
+        }
+
+    }
+    return 0;
+}
+
+=head2 update_contact_way(access_token, hash);
+
+更新企业已配置的「联系我」方式
+
+=head2 SYNOPSIS
+
+L<https://developer.work.weixin.qq.com/document/path/92228#更新企业已配置的「联系我」方式>
+
+=head3 请求说明：
+
+更新企业配置的「联系我」二维码和「联系我」小程序按钮中的信息，如使用人员和备注等。
+
+=head4 请求包结构体为：
+
+	{
+	   "config_id":"42b34949e138eb6e027c123cba77fAAA",
+	   "remark":"渠道客户",
+	   "skip_verify":true,
+	   "style":1,
+	   "state":"teststate",
+	   "user" : ["zhangsan", "lisi", "wangwu"],
+	   "party" : [2, 3],
+		"expires_in":86400,
+		"chat_expires_in":86400,
+		 "unionid":"oxTWIuGaIt6gTKsQRLau2M0AAAA",
+		 "conclusions":
+		 {
+			"text":
+			{
+				"content":"文本消息内容"
+			},
+			"image": 
+			{
+				"media_id": "MEDIA_ID"
+			},
+			"link": 
+			{
+				"title": "消息标题",
+				"picurl": "https://example.pic.com/path",
+				"desc": "消息描述",
+				"url": "https://example.link.com/path"
+			},
+			"miniprogram": 
+			{
+				"title": "消息标题",
+				"pic_media_id": "MEDIA_ID",
+				"appid": "wx8bd80126147dfAAA",
+				"page": "/path/index"
+			}
+	   }
+	}
+
+=head4 参数说明：
+
+	参数	必须	说明
+    access_token	是	调用接口凭证
+	config_id	是	企业联系方式的配置id
+	remark	否	联系方式的备注信息，不超过30个字符，将覆盖之前的备注
+	skip_verify	否	外部客户添加时是否无需验证
+	style	否	样式，只针对“在小程序中联系”的配置生效
+	state	否	企业自定义的state参数，用于区分不同的添加渠道，在调用“获取外部联系人详情”时会返回该参数值
+	user	否	使用该联系方式的用户列表，将覆盖原有用户列表
+	party	否	使用该联系方式的部门列表，将覆盖原有部门列表，只在配置的type为2时有效
+	expires_in	否	临时会话二维码有效期，以秒为单位，该参数仅在临时会话模式下有效
+	chat_expires_in	否	临时会话有效期，以秒为单位，该参数仅在临时会话模式下有效
+	unionid	否	可进行临时会话的客户unionid，该参数仅在临时会话模式有效，如不指定则不进行限制
+	conclusions	否	结束语，会话结束时自动发送给客户，可参考“结束语定义”，仅临时会话模式（is_temp为true）可设置
+
+注意：已失效的临时会话联系方式无法进行编辑
+当临时会话模式时（即is_temp为true），联系人仅支持配置为单人，暂不支持多人
+
+=head3 权限说明
+
+=head3 RETURN 返回结果
+
+    {
+	   "errcode": 0,
+	   "errmsg": "ok"
+	}
+
+=head4 RETURN 参数说明
+
+	参数	    说明
+    errcode	返回码
+	errmsg	对返回码的文本描述内容
+
+=cut
+
+sub update_contact_way {
+    if ( @_ && $_[0] && ref $_[1] eq 'HASH' ) {
+        my $access_token = $_[0];
+        my $json = $_[1];
+        my $ua = LWP::UserAgent->new;
+        $ua->timeout(30);
+        $ua->env_proxy;
+
+        my $response = $ua->post("https://qyapi.weixin.qq.com/cgi-bin/externalcontact/update_contact_way?access_token=$access_token",Content => to_json($json,{allow_nonref=>1}),Content_type =>'application/json');
+        if ($response->is_success) {
+            return from_json($response->decoded_content,{utf8 => 1, allow_nonref => 1});
+        }
+
+    }
+    return 0;
+}
+
+=head2 del_contact_way(access_token, hash);
+
+删除企业已配置的「联系我」方式
+
+=head2 SYNOPSIS
+
+L<https://developer.work.weixin.qq.com/document/path/92228#删除企业已配置的「联系我」方式>
+
+=head3 请求说明：
+
+删除一个已配置的「联系我」二维码或者「联系我」小程序按钮。
+
+=head4 请求包结构体为：
+
+	{
+	   "config_id":"42b34949e138eb6e027c123cba77fAAA"
+	}
+
+=head4 参数说明：
+
+	参数	必须	说明
+    access_token	是	调用接口凭证
+	config_id	是	企业联系方式的配置id
+
+=head3 权限说明
+
+=head3 RETURN 返回结果
+
+    {
+	   "errcode": 0,
+	   "errmsg": "ok"
+	}
+
+=head4 RETURN 参数说明
+
+	参数	    说明
+    errcode	返回码
+	errmsg	对返回码的文本描述内容
+
+=cut
+
+sub del_contact_way {
+    if ( @_ && $_[0] && ref $_[1] eq 'HASH' ) {
+        my $access_token = $_[0];
+        my $json = $_[1];
+        my $ua = LWP::UserAgent->new;
+        $ua->timeout(30);
+        $ua->env_proxy;
+
+        my $response = $ua->post("https://qyapi.weixin.qq.com/cgi-bin/externalcontact/del_contact_way?access_token=$access_token",Content => to_json($json,{allow_nonref=>1}),Content_type =>'application/json');
+        if ($response->is_success) {
+            return from_json($response->decoded_content,{utf8 => 1, allow_nonref => 1});
+        }
+
+    }
+    return 0;
+}
+
+=head2 close_temp_chat(access_token, hash);
+
+结束临时会话
+
+=head2 SYNOPSIS
+
+L<https://developer.work.weixin.qq.com/document/path/92228#结束临时会话>
+
+=head3 请求说明：
+
+将指定的企业成员和客户之前的临时会话断开，断开前会自动下发已配置的结束语。
+
+=head4 请求包结构体为：
+
+	{
+		"userid":"zhangyisheng",
+		"external_userid":"woAJ2GCAAAXtWyujaWJHDDGi0mACHAAA"
+	}
+
+=head4 参数说明：
+
+	参数	必须	说明
+    access_token	是	调用接口凭证
+	userid	是	企业成员的userid
+	external_userid	是	客户的外部联系人userid
+
+注意：请保证传入的企业成员和客户之间有仍然有效的临时会话, 通过其他方式的添加外部联系人无法通过此接口关闭会话。
+
+=head3 权限说明
+
+=head3 RETURN 返回结果
+
+    {
+	   "errcode": 0,
+	   "errmsg": "ok"
+	}
+
+=head4 RETURN 参数说明
+
+	参数	    说明
+    errcode	返回码
+	errmsg	对返回码的文本描述内容
+
+=head3 结束语定义
+
+=head4 字段内容：
+
+    "conclusions":
+	{
+		"text":
+			{
+				"content":"文本消息内容"
+			},
+			"image": 
+			{
+				"media_id": "MEDIA_ID",
+				"pic_url": "http://p.qpic.cn/pic_wework/XXXXX"
+			},
+			"link": 
+			{
+				"title": "消息标题",
+				"picurl": "https://example.pic.com/path",
+				"desc": "消息描述",
+				"url": "https://example.link.com/path"
+			},
+			"miniprogram": 
+			{
+				"title": "消息标题",
+				"pic_media_id": "MEDIA_ID",
+				"appid": "wx8bd80126147dfAAA",
+				"page": "/path/index"
+			}
+	   }
+	}
+
+=head4 参数说明
+
+	参数	说明
+	text.content	消息文本内容,最长为4000字节
+	image.media_id	图片的media_id
+	image.pic_url	图片的url
+	link.title	图文消息标题，最长为128字节
+	link.picurl	图文消息封面的url
+	link.desc	图文消息的描述，最长为512字节
+	link.url	图文消息的链接
+	miniprogram.title	小程序消息标题，最长为64字节
+	miniprogram.pic_media_id	小程序消息封面的mediaid，封面图建议尺寸为520*416
+	miniprogram.appid	小程序appid，必须是关联到企业的小程序应用
+	miniprogram.page	小程序page路径
+
+text、image、link和miniprogram四者不能同时为空；
+text与另外三者可以同时发送，此时将会以两条消息的形式触达客户;
+image、link和miniprogram只能有一个，如果三者同时填，则按image、link、miniprogram的优先顺序取参，也就是说，如果image与link同时传值，则只有image生效;
+media_id可以通过素材管理接口获得;
+构造结束语使用image消息时，只能填写meida_id字段,获取含有image结构的联系我方式时，返回pic_url字段。
+
+=cut
+
+sub close_temp_chat {
+    if ( @_ && $_[0] && ref $_[1] eq 'HASH' ) {
+        my $access_token = $_[0];
+        my $json = $_[1];
+        my $ua = LWP::UserAgent->new;
+        $ua->timeout(30);
+        $ua->env_proxy;
+
+        my $response = $ua->post("https://qyapi.weixin.qq.com/cgi-bin/externalcontact/close_temp_chat?access_token=$access_token",Content => to_json($json,{allow_nonref=>1}),Content_type =>'application/json');
+        if ($response->is_success) {
+            return from_json($response->decoded_content,{utf8 => 1, allow_nonref => 1});
+        }
+
+    }
+    return 0;
+}
+
+=head2 客户朋友圈
+
+企业发表内容到客户的朋友圈
+最后更新：2023/12/20
+
+=head2 SYNOPSIS
+
+L<https://developer.work.weixin.qq.com/document/path/95094>
+
 =head2 add_moment_task(access_token, hash);
 
-企业发表内容到客户的朋友圈-创建发表任务
+创建发表任务
 
 =head2 SYNOPSIS
 
@@ -2211,7 +2306,7 @@ L<https://developer.work.weixin.qq.com/document/path/95094#创建发表任务>
 
 =head4 参数说明：
 
-    参数	必须	说明
+	参数	必须	说明
     access_token		调用接口凭证
 	visible_range	否	指定的发表范围；若未指定，则表示执行者为应用可见范围内所有成员
 	sender_list	否	发表任务的执行者列表，详见下文的“可见范围说明”
@@ -2240,14 +2335,16 @@ visible_range，分以下几种情况：
 若只指定external_contact_list，即指定了可见该朋友圈的目标客户，此时会将该发表任务推给这些目标客户的应用可见范围内的跟进人。
 若同时指定sender_list以及external_contact_list，会将该发表任务推送给sender_list指定的且在应用可见范围内的执行者，执行者发表后仅external_contact_list指定的客户可见。
 若未指定visible_range，则可见客户的范围为该应用可见范围内执行者的客户，执行者为应用可见范围内所有成员。
+
 注：若指定external_contact_list列表，则该条朋友圈为部分可见；否则为公开
 
 =head3 权限说明
 
-企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
+企业需要使用配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
 自建应用调用，只会返回应用可见范围内用户的发送情况。
 第三方应用或代开发自建应用调用需要企业授权客户朋友圈下发表到成员客户的朋友圈的权限
 企业每分钟创建朋友圈的频率：10条/分钟
+企业每个月允许通过api创建的朋友圈次数限制：10万
 
 =head3 RETURN 返回结果
 
@@ -2259,7 +2356,7 @@ visible_range，分以下几种情况：
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	jobid	异步任务id，最大长度为64字节，24小时有效；可使用获取发表朋友圈任务结果查询任务状态
@@ -2285,7 +2382,7 @@ sub add_moment_task {
 
 =head2 get_moment_task_result(access_token, hash);
 
-企业发表内容到客户的朋友圈-获取任务创建结果
+获取任务创建结果
 
 =head2 SYNOPSIS
 
@@ -2297,7 +2394,7 @@ L<https://developer.work.weixin.qq.com/document/path/95094#获取任务创建结
 
 =head4 参数说明：
 
-    参数	必须	说明
+	参数	必须	说明
     access_token		调用接口凭证
 	jobid	是	异步任务id，最大长度为64字节，由创建发表内容到客户朋友圈任务接口获取
 
@@ -2328,7 +2425,7 @@ L<https://developer.work.weixin.qq.com/document/path/95094#获取任务创建结
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	status	任务状态，整型，1表示开始创建任务，2表示正在创建任务中，3表示创建任务已完成
@@ -2358,9 +2455,82 @@ sub get_moment_task_result {
     return 0;
 }
 
+=head2 cancel_moment_task(access_token, hash);
+
+停止发表企业朋友圈
+最后更新：2023/12/01
+
+=head2 SYNOPSIS
+
+L<https://developer.work.weixin.qq.com/document/path/97612>
+
+=head3 请求说明：
+
+企业和第三方应用可调用此接口，停止尚未发送的企业朋友圈发送任务。
+
+=head4 请求包结构体为：
+
+	{
+		"moment_id":"momXXXXXXXXXX"
+	}
+
+=head4 参数说明：
+
+	参数	必须	说明
+    access_token		调用接口凭证
+	moment_id	是	朋友圈id，可通过获取客户朋友圈企业发表的列表接口获取朋友圈企业发表的列表
+
+=head3 权限说明
+
+企业需要使用配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
+第三方应用或代开发自建应用调用需要企业授权客户朋友圈下发表到成员客户的朋友圈的权限
+
+=head3 RETURN 返回结果
+
+    {
+		"errcode":0,
+		"errmsg":"ok"
+	}
+
+=head4 RETURN 参数说明
+
+	参数	    说明
+    errcode	返回码
+	errmsg	对返回码的文本描述内容
+	
+注意，此接口无法撤回已经发表到客户朋友圈的信息。
+
+=cut
+
+sub cancel_moment_task {
+    if ( @_ && $_[0] && ref $_[1] eq 'HASH' ) {
+        my $access_token = $_[0];
+        my $json = $_[1];
+        my $ua = LWP::UserAgent->new;
+        $ua->timeout(30);
+        $ua->env_proxy;
+
+        my $response = $ua->post("https://qyapi.weixin.qq.com/cgi-bin/externalcontact/cancel_moment_task?access_token=$access_token",Content => to_json($json,{allow_nonref=>1}),Content_type =>'application/json');
+        if ($response->is_success) {
+            return from_json($response->decoded_content,{utf8 => 1, allow_nonref => 1});
+        }
+
+    }
+    return 0;
+}
+
+=head2 客户朋友圈
+
+获取客户朋友圈全部的发表记录
+最后更新：2023/12/01
+
+=head2 SYNOPSIS
+
+L<https://developer.work.weixin.qq.com/document/path/93333>
+
 =head2 get_moment_list(access_token, hash);
 
-获取客户朋友圈全部的发表记录-获取企业全部的发表列表
+获取企业全部的发表列表
 
 =head2 SYNOPSIS
 
@@ -2383,7 +2553,7 @@ L<https://developer.work.weixin.qq.com/document/path/93333#获取企业全部的
 
 =head4 参数说明：
 
-    参数	必须	说明
+	参数	必须	说明
     access_token	是	调用接口凭证
 	start_time	是	朋友圈记录开始时间。Unix时间戳
 	end_time	是	朋友圈记录结束时间。Unix时间戳
@@ -2400,13 +2570,13 @@ web管理端会展示企业成员所有已经发表的朋友圈（包括已经�
 
 =head3 权限说明
 
-企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
+企业需要使用配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
 自建应用调用，只会返回应用可见范围内用户的发送情况。
 第三方应用调用需要企业授权客户朋友圈下获取企业全部的发表记录的权限
 
 =head3 RETURN 返回结果
 
-    {
+	{
 		"errcode":0,
 		"errmsg":"ok",
 		"next_cursor":"CURSOR",
@@ -2414,7 +2584,7 @@ web管理端会展示企业成员所有已经发表的朋友圈（包括已经�
 			{
 				"moment_id":"momxxx",
 				"creator":"xxxx",
-				"create_time":"xxxx",
+				"create_time":1605000000,
 				"create_type":1,
 				"visible_type":1,
 				"text":{
@@ -2442,7 +2612,7 @@ web管理端会展示企业成员所有已经发表的朋友圈（包括已经�
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	next_cursor	分页游标，下次请求时填写以获取之后分页的记录，如果已经没有更多的数据则返回空
@@ -2483,7 +2653,7 @@ sub get_moment_list {
 
 =head2 get_moment_task(access_token, hash);
 
-获取客户朋友圈全部的发表记录-获取客户朋友圈企业发表的列表
+获取客户朋友圈企业发表的列表
 
 =head2 SYNOPSIS
 
@@ -2503,7 +2673,7 @@ L<https://developer.work.weixin.qq.com/document/path/93333#获取客户朋友圈
 
 =head4 参数说明：
 
-    参数	必须	说明
+	参数	必须	说明
     access_token	是	调用接口凭证
 	moment_id	是	朋友圈id,仅支持企业发表的朋友圈id
 	cursor	否	用于分页查询的游标，字符串类型，由上一次调用返回，首次调用可不填
@@ -2531,7 +2701,7 @@ L<https://developer.work.weixin.qq.com/document/path/93333#获取客户朋友圈
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	next_cursor	分页游标，再下次请求时填写以获取之后分页的记录，如果已经没有更多的数据则返回空
@@ -2560,7 +2730,7 @@ sub get_moment_task {
 
 =head2 get_moment_customer_list(access_token, hash);
 
-获取客户朋友圈全部的发表记录-获取客户朋友圈发表时选择的可见范围
+获取客户朋友圈发表时选择的可见范围
 
 =head2 SYNOPSIS
 
@@ -2581,7 +2751,7 @@ L<https://developer.work.weixin.qq.com/document/path/93333#获取客户朋友圈
 
 =head4 参数说明：
 
-    参数	必须	说明
+	参数	必须	说明
     access_token	是	调用接口凭证
 	moment_id	是	朋友圈id
 	userid	是	企业发表成员userid，如果是企业创建的朋友圈，可以通过获取客户朋友圈企业发表的列表获取已发表成员userid，如果是个人创建的朋友圈，创建人userid就是企业发表成员userid
@@ -2610,7 +2780,7 @@ L<https://developer.work.weixin.qq.com/document/path/93333#获取客户朋友圈
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	next_cursor	分页游标，再下次请求时填写以获取之后分页的记录，如果已经没有更多的数据则返回空
@@ -2639,7 +2809,7 @@ sub get_moment_customer_list {
 
 =head2 get_moment_send_result(access_token, hash);
 
-获取客户朋友圈全部的发表记录-获取客户朋友圈发表后的可见客户列表
+获取客户朋友圈发表后的可见客户列表
 
 =head2 SYNOPSIS
 
@@ -2660,7 +2830,7 @@ L<https://developer.work.weixin.qq.com/document/path/93333#获取客户朋友圈
 
 =head4 参数说明：
 
-    参数	必须	说明
+	参数	必须	说明
     access_token	是	调用接口凭证
 	moment_id	是	朋友圈id
 	userid	是	企业发表成员userid，如果是企业创建的朋友圈，可以通过获取客户朋友圈企业发表的列表获取已发表成员userid，如果是个人创建的朋友圈，创建人userid就是企业发表成员userid
@@ -2688,7 +2858,7 @@ L<https://developer.work.weixin.qq.com/document/path/93333#获取客户朋友圈
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	next_cursor	分页游标，再下次请求时填写以获取之后分页的记录，如果已经没有更多的数据则返回空
@@ -2716,7 +2886,7 @@ sub get_moment_send_result {
 
 =head2 get_moment_comments(access_token, hash);
 
-获取客户朋友圈全部的发表记录-获取客户朋友圈的互动数据
+获取客户朋友圈的互动数据
 
 =head2 SYNOPSIS
 
@@ -2735,7 +2905,7 @@ L<https://developer.work.weixin.qq.com/document/path/93333#获取客户朋友圈
 
 =head4 参数说明：
 
-    参数	必须	说明
+	参数	必须	说明
     access_token	是	调用接口凭证
 	moment_id	是	朋友圈id
 	userid	是	企业发表成员userid，如果是企业创建的朋友圈，可以通过获取客户朋友圈企业发表的列表获取已发表成员userid，如果是个人创建的朋友圈，创建人userid就是企业发表成员userid
@@ -2775,7 +2945,7 @@ L<https://developer.work.weixin.qq.com/document/path/93333#获取客户朋友圈
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	comment_list	评论列表
@@ -2806,9 +2976,84 @@ sub get_moment_comments {
     return 0;
 }
 
+=head2 customer_acquisition_quota(access_token);
+
+获客助手额度管理与使用统计
+最后更新：2023/08/08
+
+查询剩余使用量
+
+=head2 SYNOPSIS
+
+L<https://developer.work.weixin.qq.com/document/path/97375#查询剩余使用量>
+
+=head3 请求说明：
+
+企业可通过此接口查询当前剩余的使用量。
+
+=head4 参数说明：
+
+	参数	            必须	说明
+    access_token	是	调用接口凭证
+
+=head4 权限说明：
+
+企业需要使用配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）；
+第三方或代开发应用需具有“企业客户权限->获客助手”权限
+不支持客户联系系统应用调用
+
+=head3 RETURN 返回结果：
+
+	{
+	   "errcode": 0,
+	   "errmsg": "ok",
+	   "total":1000,
+	   "balance":500,
+	   "quota_list":
+	   [
+			{
+					"expire_date":1689350400,
+					"balance":200
+				},
+				{
+					"expire_date":1692028800,
+					"balance":300
+				}
+	   ]
+	}
+
+=head4 RETURN 参数说明
+
+	参数	    说明
+    errcode	返回码
+	errmsg	对返回码的文本描述内容
+	total	历史累计使用量
+	balance	剩余使用量
+	quota_list.expire_date	额度过期时间戳，为过期日的零点，实际过期时间取决于额度的购买时间
+	quota_list.balance	即将过期额度数量
+
+=cut
+
+sub customer_acquisition_quota {
+    if ( @_ && $_[0] ) {
+        my $access_token = $_[0];
+        my $ua = LWP::UserAgent->new;
+        $ua->timeout(30);
+        $ua->env_proxy;
+
+        my $response = $ua->get("https://qyapi.weixin.qq.com/cgi-bin/externalcontact/customer_acquisition_quota?access_token=$access_token");
+        if ($response->is_success) {
+            return from_json($response->decoded_content,{utf8 => 1, allow_nonref => 1});
+        }
+
+    }
+    return 0;
+}
+
 =head2 add_msg_template(access_token, hash);
 
 创建企业群发
+最后更新：2023/12/01
 
 =head2 SYNOPSIS
 
@@ -2819,6 +3064,7 @@ L<https://developer.work.weixin.qq.com/document/path/92135>
 企业跟第三方应用可通过此接口添加企业群发消息的任务并通知成员发送给相关客户或客户群。（注：企业微信终端需升级到2.7.5版本及以上）
 注意：调用该接口并不会直接发送消息给客户/客户群，需要成员确认后才会执行发送（客服人员的企业微信需要升级到2.7.5及以上版本）
 旧接口创建企业群发已经废弃，接口升级后支持发送视频文件，并且支持最多同时发送9个附件。
+仅会推送给最后跟客户进行聊天互动的企业成员。
 每位客户/每个客户群每天可接收1条群发消息，可以是企业统一创建发送的，也可以是成员自己创建发送的；超过接收上限的客户/客户群将无法再收到群发消息。
 
 =head4 请求包结构体为：
@@ -2829,7 +3075,21 @@ L<https://developer.work.weixin.qq.com/document/path/92135>
 			"woAJ2GCAAAXtWyujaWJHDDGi0mACAAAA",
 			"wmqfasd1e1927831123109rBAAAA"
 		],
+		"chat_id_list":["wr2GCAAAXtWyujaWJHDDGasdadAAA"],
+		"tag_filter":
+		{
+			"group_list":
+			[
+				{
+					"tag_list":["ete19278asuMT123109rBAAAA","ete19MT12278109UYteaBAAAA"]
+				},
+				{
+					"tag_list":["eteIlKKHSDfuMT18Kg9rBAAAA"]
+				}
+			]
+		},
 		"sender": "zhangsan",
+		"allow_select":true,
 		"text": {
 			"content": "文本消息内容"
 		},
@@ -2870,11 +3130,14 @@ L<https://developer.work.weixin.qq.com/document/path/92135>
 
 =head4 参数说明：
 
-    参数	必须	说明
+	参数	必须	说明
     access_token	是	调用接口凭证
 	chat_type	否	群发任务的类型，默认为single，表示发送给客户，group表示发送给客户群
-	external_userid	否	客户的外部联系人id列表，仅在chat_type为single时有效，不可与sender同时为空，最多可传入1万个客户
+	external_userid	否	客户的externaluserid列表，仅在chat_type为single时有效，最多可一次指定1万个客户
+	chat_id_list	否	客户群id列表，仅在chat_type为group时有效，最多可一次指定2000个客户群。指定群id之后，收到任务的群主无须再选择客户群，仅对4.1.10及以上版本的企业微信终端生效
+	tag_filter.group_list.tag_list	否	要进行群发的客户标签列表，同组标签之间按或关系进行筛选，不同组标签按且关系筛选，每组最多指定100个标签，支持规则组标签
 	sender	否	发送企业群发消息的成员userid，当类型为发送给客户群时必填
+	allow_select	否	是否允许成员在待发送客户列表中重新进行选择，默认为false，仅支持客户群发场景
 	text.content	否	消息文本内容，最多4000个字节
 	attachments	否	附件，最多支持添加9个附件
 	attachments.msgtype	是	附件类型，可选image、link、miniprogram或者video
@@ -2890,14 +3153,15 @@ L<https://developer.work.weixin.qq.com/document/path/92135>
 	miniprogram.page	是	小程序page路径
 	video.media_id	是	视频的media_id，可以通过素材管理接口获得
 	file.media_id	是	文件的media_id，可以通过素材管理接口获得
-
-* text和attachments不能同时为空
+ 
+对于客户群发，sender，external_userid，tag_filter不可同时为空，如果指定了external_userid,则tag_filter不生效
+text和attachments不能同时为空
 attachments中每个附件信息必须与msgtype一致，例如，msgtype指定为image，则需要填写image.pic_url或者image.media_id，否则会报错。
 media_id和pic_url只需填写一个，两者同时填写时使用media_id，二者不可同时为空
 
 =head3 权限说明
 
-企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
+企业需要使用配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
 自建应用只能给应用可见范围内的成员进行推送。
 第三方应用需具有“企业客户权限->客户联系->群发消息给客户和客户群”权限。
 当只提供sender参数时，相当于选取了这个成员所有的客户。
@@ -2914,7 +3178,7 @@ media_id和pic_url只需填写一个，两者同时填写时使用media_id，二
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	fail_list	无效或无法发送的external_userid列表
@@ -2939,9 +3203,143 @@ sub add_msg_template {
     return 0;
 }
 
-=head2 get_groupmsg_list_v2(access_token, hash);
+=head2 remind_groupmsg_send(access_token, hash);
 
-获取企业的全部群发记录-获取群发记录列表
+提醒成员群发
+最后更新：2023/12/01
+
+=head2 SYNOPSIS
+
+L<https://developer.work.weixin.qq.com/document/path/97610>
+
+=head3 请求说明：
+
+企业和第三方应用可调用此接口，重新触发群发通知，提醒成员完成群发任务，24小时内每个群发最多触发三次提醒。
+
+=head4 请求包结构体为：
+
+	{
+		"msgid": "msgGCAAAXtWyujaWJHDDGi0mACAAAA",
+	}
+
+=head4 参数说明：
+
+	参数	必须	说明
+    access_token	是	调用接口凭证
+	msgid	是	群发消息的id，通过获取群发记录列表接口返回
+
+=head3 权限说明
+
+企业需要使用配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
+自建应用调用，只会返回应用可见范围内用户的发送情况。
+第三方应用调用需要企业授权客户联系下群发消息给客户和客户群的权限
+
+=head3 RETURN 返回结果
+
+    {
+		"errcode": 0,
+		"errmsg": "ok"
+	}
+
+=head4 RETURN 参数说明
+
+	参数	    说明
+    errcode	返回码
+	errmsg	对返回码的文本描述内容
+
+=cut
+
+sub remind_groupmsg_send {
+    if ( @_ && $_[0] && ref $_[1] eq 'HASH' ) {
+        my $access_token = $_[0];
+        my $json = $_[1];
+        my $ua = LWP::UserAgent->new;
+        $ua->timeout(30);
+        $ua->env_proxy;
+
+        my $response = $ua->post("https://qyapi.weixin.qq.com/cgi-bin/externalcontact/remind_groupmsg_send?access_token=$access_token",Content => to_json($json,{allow_nonref=>1}),Content_type =>'application/json');
+        if ($response->is_success) {
+            return from_json($response->decoded_content,{utf8 => 1, allow_nonref => 1});
+        }
+
+    }
+    return 0;
+}
+
+=head2 cancel_groupmsg_send(access_token, hash);
+
+停止企业群发
+最后更新：2023/12/01
+
+=head2 SYNOPSIS
+
+L<https://developer.work.weixin.qq.com/document/path/97611>
+
+=head3 请求说明：
+
+企业和第三方应用可调用此接口，停止无需成员继续发送的企业群发
+
+=head4 请求包结构体为：
+
+	{
+		"msgid": "msgGCAAAXtWyujaWJHDDGi0mACAAAA",
+	}
+
+=head4 参数说明：
+
+	参数	必须	说明
+    access_token	是	调用接口凭证
+	msgid	是	群发消息的id，通过获取群发记录列表接口返回
+
+=head3 权限说明
+
+企业需要使用配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
+自建应用调用，只会返回应用可见范围内用户的发送情况。
+第三方应用调用需要企业授权客户联系下群发消息给客户和客户群的权限
+
+=head3 RETURN 返回结果
+
+    {
+		"errcode": 0,
+		"errmsg": "ok"
+	}
+
+=head4 RETURN 参数说明
+
+	参数	    说明
+    errcode	返回码
+	errmsg	对返回码的文本描述内容
+	
+注意，此接口无法撤回已经群发给客户的消息。
+
+=cut
+
+sub cancel_groupmsg_send {
+    if ( @_ && $_[0] && ref $_[1] eq 'HASH' ) {
+        my $access_token = $_[0];
+        my $json = $_[1];
+        my $ua = LWP::UserAgent->new;
+        $ua->timeout(30);
+        $ua->env_proxy;
+
+        my $response = $ua->post("https://qyapi.weixin.qq.com/cgi-bin/externalcontact/cancel_groupmsg_send?access_token=$access_token",Content => to_json($json,{allow_nonref=>1}),Content_type =>'application/json');
+        if ($response->is_success) {
+            return from_json($response->decoded_content,{utf8 => 1, allow_nonref => 1});
+        }
+
+    }
+    return 0;
+}
+
+=head2 获取企业的全部群发记录
+
+最后更新：2022/11/03
+
+=head2 SYNOPSIS
+
+L<https://developer.work.weixin.qq.com/document/path/93338>
+
+=head3 概述
 
 企业跟第三方应用可通过该接口获取群发给客户的消息和群发到客户群的消息
 
@@ -2950,6 +3348,18 @@ sub add_msg_template {
 管理员或者业务负责人创建内容，成员确认后，即可发送给客户或者客户群
 个人发表
 成员自己创建的内容，可直接发送给客户或客户群
+
+=head4 接口调用权限说明
+
+允许使用“客户联系”secret调用
+允许自建应用：使用配置到“可调用应用”列表中的应用secret所获取的accesstoken来调用（accesstoken如何获取？）
+允许第三方应用：第三方应用需授权企业客户权限下群发消息给客户和客户群的权限
+第三方应用必须在服务商管理端申请“企业客户权限->客户联系->群发消息给客户和客户群”权限。
+对于历史已安装的企业，之前未授权该权限的，需要管理员去企业微信web管理端“应用管理->应用详情页->授权信息”中同意授权变更后才允许调用。
+
+=head2 get_groupmsg_list_v2(access_token, hash);
+
+获取企业的全部群发记录-获取群发记录列表
 
 =head2 SYNOPSIS
 
@@ -2973,7 +3383,7 @@ L<https://developer.work.weixin.qq.com/document/path/93338#获取群发记录列
 
 =head4 参数说明：
 
-    参数	必须	说明
+	参数	必须	说明
     access_token	是	调用接口凭证
 	chat_type	是	群发任务的类型，默认为single，表示发送给客户，group表示发送给客户群
 	start_time	是	群发任务记录开始时间
@@ -2996,7 +3406,7 @@ L<https://developer.work.weixin.qq.com/document/path/93338#获取群发记录列
 
 =head3 RETURN 返回结果
 
-    {
+	{
 		"errcode":0,
 		"errmsg":"ok",
 		"next_cursor":"CURSOR",
@@ -3054,7 +3464,7 @@ L<https://developer.work.weixin.qq.com/document/path/93338#获取群发记录列
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	next_cursor	分页游标，再下次请求时填写以获取之后分页的记录，如果已经没有更多的数据则返回空
@@ -3120,7 +3530,7 @@ L<https://developer.work.weixin.qq.com/document/path/93338#获取群发成员发
 
 =head4 参数说明：
 
-    参数	必须	说明
+	参数	必须	说明
     access_token	是	调用接口凭证
 	msgid	是	群发消息的id，通过获取群发记录列表接口返回
 	limit	否	返回的最大记录数，整型，最大值1000，默认值500，超过最大值时取默认值
@@ -3149,7 +3559,7 @@ L<https://developer.work.weixin.qq.com/document/path/93338#获取群发成员发
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	next_cursor	分页游标，再下次请求时填写以获取之后分页的记录，如果已经没有更多的数据则返回空
@@ -3200,7 +3610,7 @@ L<https://developer.work.weixin.qq.com/document/path/93338#获取企业群发成
 
 =head4 参数说明：
 
-    参数	必须	说明
+	参数	必须	说明
     access_token	是	调用接口凭证	 
 	msgid	是	群发消息的id，通过获取群发记录列表接口返回	 
 	userid	是	发送成员userid，通过[获取群发成员发送任务列表](#获取群发成员发送任务列表 )接口返回	
@@ -3232,7 +3642,7 @@ L<https://developer.work.weixin.qq.com/document/path/93338#获取企业群发成
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	next_cursor	分页游标，再下次请求时填写以获取之后分页的记录，如果已经没有更多的数据则返回空
@@ -3268,6 +3678,7 @@ sub get_groupmsg_send_result {
 =head2 send_welcome_msg(access_token, hash);
 
 发送新客户欢迎语
+最后更新：2023/12/01
 
 =head2 SYNOPSIS
 
@@ -3275,11 +3686,17 @@ L<https://developer.work.weixin.qq.com/document/path/92137>
 
 =head3 请求说明：
 
-企业微信在向企业推送添加外部联系人事件时，会额外返回一个welcome_code，企业以此为凭据调用接口，即可通过成员向新添加的客户发送个性化的欢迎语。
-为了保证用户体验以及避免滥用，企业仅可在收到相关事件后20秒内调用，且只可调用一次。
-如果企业已经在管理端为相关成员配置了可用的欢迎语，则推送添加外部联系人事件时不会返回welcome_code。
-每次添加新客户时可能有多个企业自建应用/第三方应用收到带有welcome_code的回调事件，但仅有最先调用的可以发送成功。后续调用将返回41051（externaluser has started chatting）错误，请用户根据实际使用需求，合理设置应用可见范围，避免冲突。
-旧接口发送新客户欢迎语已经废弃，接口升级后支持发送视频文件，并且最多支持同时发送9个附件
+企业微信在向企业推送添加外部联系人事件时，会额外返回一个welcome_code，企业以此为凭据调用接口，即可通过成员向新添加的客户发送个性化的欢迎语。调用此接口前，请明确以下信息:
+
+说明
+1.为了保证用户体验以及避免滥用，企业仅可在收到相关事件后20秒内调用，且只可调用一次。
+2.如果企业已经在管理端为相关成员配置了可用的欢迎语，则推送添加外部联系人事件时不会返回welcome_code。
+3.如果欢迎语已成功下发给客户，应用再调用该接口时，将返回41051（externaluser has started chatting）。
+4.长期未登录企业微信的成员无法发送欢迎语。
+5.每次添加新客户时可能有多个企业自建应用/第三方应用收到带有welcome_code的回调事件，当多个应用同时调用发送欢迎语接口时，仅最先调用接口的应用可以成功，其他应用返回41096(welcome msg is being distributed)错误。请注意，返回41096错误码表示当前已有其他应用正在发送欢迎语，不代表欢迎语已经下发成功，存在下发失败的可能性，故调用方可以重试；如果返回了41051，则代表欢迎语已成功下发，无需重试。为了保证用户体验，请根据实际业务需求，合理配置应用可见范围。
+
+提示
+旧接口发送新客户欢迎语已经废弃，接口升级后支持发送视频文件，并且最多支持同时发送9个附件。
 
 =head4 请求包结构体为：
 
@@ -3326,7 +3743,7 @@ L<https://developer.work.weixin.qq.com/document/path/92137>
 
 =head4 参数说明：
 
-    参数	必须	说明
+	参数	必须	说明
     access_token	是	调用接口凭证
 	welcome_code	是	通过添加外部联系人事件推送给企业的发送欢迎语的凭证，有效期为20秒
 	text.content	否	消息文本内容,最长为4000字节
@@ -3352,7 +3769,7 @@ media_id和pic_url只需填写一个，两者同时填写时使用media_id，二
 
 =head3 权限说明
 
-企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
+企业需要使用配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
 第三方应用需要拥有“企业客户权限->客户联系->给客户发送欢迎语”权限
 企业成员需在应用的可见范围内
 
@@ -3365,7 +3782,7 @@ media_id和pic_url只需填写一个，两者同时填写时使用media_id，二
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 
@@ -3391,6 +3808,7 @@ sub send_welcome_msg {
 =head2 get_user_behavior_data(access_token, hash);
 
 获取「联系客户统计」数据
+最后更新：2023/12/01
 
 =head2 SYNOPSIS
 
@@ -3418,7 +3836,7 @@ L<https://developer.work.weixin.qq.com/document/path/92132>
 
 =head4 参数说明：
 
-    参数	必须	说明
+	参数	必须	说明
     access_token	是	调用接口凭证
 	userid	否	成员ID列表，最多100个
 	partyid	否	部门ID列表，最多100个
@@ -3433,7 +3851,7 @@ userid和partyid不可同时为空;
 
 =head3 权限说明
 
-企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
+企业需要使用配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
 第三方应用使用，需具有“企业客户权限->客户联系->获取成员联系客户的数据统计”权限。
 第三方/自建应用调用时传入的userid和partyid要在应用的可见范围内;
 
@@ -3469,7 +3887,7 @@ userid和partyid不可同时为空;
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	behavior_data.stat_time	数据日期，为当日0点的时间戳
@@ -3500,6 +3918,25 @@ sub get_user_behavior_data {
     return 0;
 }
 
+=head2 管理商品图册
+
+最后更新：2023/12/16
+
+=head3 请求说明：
+
+企业和第三方应用可以通过此接口增加商品
+
+=head4 权限说明
+
+调用接口的应用需要满足如下的权限：
+
+	应用类型	权限要求
+	自建应用	配置到「客户联系 可调用接口的应用」中
+	代开发应用	具有「管理商品图册」权限
+	第三方应用	具有「管理商品图册」权限
+
+注： 从2023年12月1日0点起，不再支持通过系统应用secret调用接口，存量企业暂不受影响 查看详情
+
 =head2 add_product_album(access_token, hash);
 
 管理商品图册-创建商品图册
@@ -3507,10 +3944,6 @@ sub get_user_behavior_data {
 =head2 SYNOPSIS
 
 L<https://developer.work.weixin.qq.com/document/path/95096#创建商品图册>
-
-=head3 请求说明：
-
-企业和第三方应用可以通过此接口增加商品
 
 =head4 请求包结构体为：
 
@@ -3530,7 +3963,7 @@ L<https://developer.work.weixin.qq.com/document/path/95096#创建商品图册>
 
 =head4 参数说明：
 
-    参数	必须	说明
+	参数	必须	说明
     access_token	是	调用接口凭证
 	description	是	商品的名称、特色等;不超过300个字
 	price	是	商品的价格，单位为分；最大不超过5万元
@@ -3539,13 +3972,6 @@ L<https://developer.work.weixin.qq.com/document/path/95096#创建商品图册>
 	image.media_id	否	图片的media_id，仅支持通过上传附件资源接口获得的资源
 
 =head3 权限说明
-
-允许使用“客户联系”secret调用
-允许自建应用：使用配置到“可调用应用”列表中的应用secret所获取的accesstoken来调用（accesstoken如何获取？）
-允许第三方应用：第三方应用需授权企业客户权限下管理商品图册的权限
-第三方应用必须在服务商管理端申请“企业客户权限->客户联系->管理商品图册”权限。
-允许代开发自建应用：应用需授权企业客户权限下管理商品图册的权限
-应用需授权“企业客户权限->客户联系->管理商品图册”权限。
 
 =head3 RETURN 返回结果
 
@@ -3557,7 +3983,7 @@ L<https://developer.work.weixin.qq.com/document/path/95096#创建商品图册>
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	product_id	商品id
@@ -3601,14 +4027,12 @@ L<https://developer.work.weixin.qq.com/document/path/95096#获取商品图册>
 
 =head4 参数说明：
 
-    参数	必须	说明
+	参数	必须	说明
     access_token	是	调用接口凭证
     product_id	是		商品id
 
 =head3 权限说明
 
-企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
-第三方应用或代开发自建应用调用需要企业授权客户联系下管理商品图册的权限
 可获取企业内所有企业级的商品图册
 
 =head3 RETURN 返回结果
@@ -3635,7 +4059,7 @@ L<https://developer.work.weixin.qq.com/document/path/95096#获取商品图册>
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	product	商品详情
@@ -3688,16 +4112,14 @@ L<https://developer.work.weixin.qq.com/document/path/95096#获取商品图册列
 
 =head4 参数说明：
 
-    参数	必须	说明
+	参数	必须	说明
     access_token	是	调用接口凭证
 	limit	否	返回的最大记录数，整型，最大值100，默认值50，超过最大值时取默认值
 	cursor	否	用于分页查询的游标，字符串类型，由上一次调用返回，首次调用可不填
 
 =head3 权限说明
 
-企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
 自建应用调用，只会返回应用可见范围内用户的情况。
-第三方应用或代开发自建应用调用需要企业授权客户联系下管理商品图册的权限
 
 =head3 RETURN 返回结果
 
@@ -3725,7 +4147,7 @@ L<https://developer.work.weixin.qq.com/document/path/95096#获取商品图册列
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	next_cursor	用于分页查询的游标，字符串类型，用于下一次调用
@@ -3788,7 +4210,7 @@ L<https://developer.work.weixin.qq.com/document/path/95096#编辑商品图册>
 
 =head4 参数说明：
 
-    参数	必须	说明
+	参数	必须	说明
     access_token	是	调用接口凭证
 	product_id	是	商品id
 	description	是	商品的名称、特色等;不超过300个字
@@ -3802,9 +4224,7 @@ L<https://developer.work.weixin.qq.com/document/path/95096#编辑商品图册>
 
 =head3 权限说明
 
-企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
-第三方应用或代开发自建应用调用需要企业授权客户联系下管理商品图册的权限
-应用只修改应用自己创建的商品图册；客户联系系统应用可修改所有商品图册
+应用只修改应用自己创建的商品图册
 
 =head3 RETURN 返回结果
 
@@ -3815,7 +4235,7 @@ L<https://developer.work.weixin.qq.com/document/path/95096#编辑商品图册>
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	
@@ -3858,15 +4278,13 @@ L<https://developer.work.weixin.qq.com/document/path/95096#删除商品图册>
 
 =head4 参数说明：
 
-    参数	必须	说明
+	参数	必须	说明
     access_token	是	调用接口凭证
 	product_id	是	商品id
 
 =head3 权限说明
 
-企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
-第三方应用或代开发自建应用调用需要企业授权客户联系下管理商品图册的权限
-应用只可删除应用自己创建的商品图册；客户联系系统应用可删除所有商品图册
+应用只可删除应用自己创建的商品图册
 
 =head3 RETURN 返回结果
 
@@ -3877,7 +4295,7 @@ L<https://developer.work.weixin.qq.com/document/path/95096#删除商品图册>
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	
@@ -3899,6 +4317,25 @@ sub delete_product_album {
     }
     return 0;
 }
+
+=head2 管理聊天敏感词
+
+最后更新：2023/12/01
+
+=head3 请求说明：
+
+企业与第三方应用可通过该接口管理聊天敏感词
+
+=head4 权限说明
+
+调用接口的应用需要满足如下的权限：
+
+	应用类型	权限要求
+	自建应用	配置到「客户联系 可调用接口的应用」中
+	代开发应用	具有「管理敏感词」权限
+	第三方应用	具有「管理敏感词」权限
+
+注： 从2023年12月1日0点起，不再支持通过系统应用secret调用接口，存量企业暂不受影响 查看详情
 
 =head2 add_intercept_rule(access_token, hash);
 
@@ -3929,7 +4366,7 @@ L<https://developer.work.weixin.qq.com/document/path/95097#新建敏感词规则
 
 =head4 参数说明：
 
-    参数	必须	说明
+	参数	必须	说明
     access_token	是	调用接口凭证
 	rule_name	是	规则名称，长度1~20个utf8字符
 	word_list	是	敏感词列表，敏感词长度1~32个utf8字符，列表大小不能超过300个
@@ -3943,13 +4380,6 @@ L<https://developer.work.weixin.qq.com/document/path/95097#新建敏感词规则
 
 =head3 权限说明
 
-允许使用“客户联系”secret调用
-允许自建应用：使用配置到“可调用应用”列表中的应用secret所获取的accesstoken来调用（accesstoken如何获取？）
-允许第三方应用：第三方应用需授权企业客户权限下管理敏感词的权限
-第三方应用必须在服务商管理端申请“企业客户权限->客户联系->管理敏感词”权限。
-允许代开发自建应用：应用需授权企业客户权限下管理敏感词的权限
-应用必须授权“企业客户权限->客户联系->管理敏感词”权限。
-
 =head3 RETURN 返回结果
 
     {
@@ -3960,7 +4390,7 @@ L<https://developer.work.weixin.qq.com/document/path/95097#新建敏感词规则
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	rule_id	规则id
@@ -3998,13 +4428,11 @@ L<https://developer.work.weixin.qq.com/document/path/95097#获取敏感词规则
 
 =head4 参数说明：
 
-    参数	必须	说明
+	参数	必须	说明
     access_token	是	调用接口凭证
 
 =head3 权限说明
 
-企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
-第三方应用或者代开发自建应用调用需要企业授权客户联系下管理敏感词的权限
 可获取企业所有敏感词规则
 
 =head3 RETURN 返回结果
@@ -4023,7 +4451,7 @@ L<https://developer.work.weixin.qq.com/document/path/95097#获取敏感词规则
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	rule_id	规则id
@@ -4068,14 +4496,12 @@ L<https://developer.work.weixin.qq.com/document/path/95097#获取敏感词规则
 
 =head4 参数说明：
 
-    参数	必须	说明
+	参数	必须	说明
     access_token	是	调用接口凭证
 	rule_id	是	规则id
 
 =head3 权限说明
 
-企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
-第三方应用或者代开发自建应用调用需要企业授权客户联系下管理敏感词的权限
 使用范围只返回应用可见范围内的成员跟部门
 
 =head3 RETURN 返回结果
@@ -4103,7 +4529,7 @@ L<https://developer.work.weixin.qq.com/document/path/95097#获取敏感词规则
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	rule_id	规则id
@@ -4172,7 +4598,7 @@ L<https://developer.work.weixin.qq.com/document/path/95097#修改敏感词规则
 
 =head4 参数说明：
 
-    参数	必须	说明
+	参数	必须	说明
     access_token	是	调用接口凭证
 	rule_id	是	规则id
 	rule_name	否	规则名称，长度1~20个utf8字符
@@ -4191,9 +4617,7 @@ L<https://developer.work.weixin.qq.com/document/path/95097#修改敏感词规则
 
 =head3 权限说明
 
-企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
-第三方应用或者代开发自建应用调用需要企业授权客户联系下管理敏感词的权限
-应用只可修改应用自己创建的敏感词规则；客户联系系统应用可修改所有规则
+应用只可修改应用自己创建的敏感词规则
 
 =head3 RETURN 返回结果
 
@@ -4204,7 +4628,7 @@ L<https://developer.work.weixin.qq.com/document/path/95097#修改敏感词规则
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	
@@ -4247,15 +4671,13 @@ L<https://developer.work.weixin.qq.com/document/path/95097#删除敏感词规则
 
 =head4 参数说明：
 
-    参数	必须	说明
+	参数	必须	说明
     access_token	是	调用接口凭证
 	rule_id	是	规则id
 
 =head3 权限说明
 
-企业需要使用“客户联系”secret或配置到“可调用应用”列表中的自建应用secret所获取的accesstoken来调用（accesstoken如何获取？）。
-第三方应用或者代开发自建应用调用需要企业授权客户联系下管理敏感词的权限
-应用只可删除应用自己创建的敏感词规则；客户联系系统应用可删除所有规则
+应用只可删除应用自己创建的敏感词规则
 
 =head3 RETURN 返回结果
 
@@ -4266,7 +4688,7 @@ L<https://developer.work.weixin.qq.com/document/path/95097#删除敏感词规则
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
 	errmsg	对返回码的文本描述内容
 	
@@ -4289,6 +4711,124 @@ sub del_intercept_rule {
     return 0;
 }
 
+=head2 contact_list(access_token, hash);
+
+获取已服务的外部联系人
+最后更新：2023/11/30
+
+=head2 SYNOPSIS
+
+L<https://developer.work.weixin.qq.com/document/path/99434>
+
+=head3 请求说明：
+
+企业可通过此接口获取所有已服务的外部联系人，及其添加人和加入的群聊。外部联系人分为客户和其他外部联系人，如果是客户，接口将返回外部联系人临时ID和externaluserid；如果是其他外部联系人，接口将只返回外部联系人临时ID。
+
+企业可通过外部联系人临时ID排除重复数据，外部联系人临时ID有效期为4小时。
+
+=head4 请求包结构体为：
+
+	{
+		"cursor":"CURSOR",
+		"limit":1000
+	}
+
+=head4 参数说明：
+
+	参数	必须	说明
+    access_token	是	调用接口凭证
+	cursor	否	用于分页查询的游标，字符串类型，由上一次调用返回，首次调用可不填
+	limit	否	返回的最大记录数，整型，默认为1000
+
+注意
+cursor具有有效期，请勿缓存后使用
+
+=head3 权限说明
+
+调用的应用需要满足如下的权限
+
+应用类型	权限要求
+自建应用	配置到「客户联系 可调用接口的应用」中
+代开发应用	暂不支持
+第三方应用	暂不支持
+注： 从2023年12月1日0点起，不再支持通过系统应用secret调用接口，存量企业暂不受影响 查看详情
+
+=head3 RETURN 返回结果
+
+	{
+	   "errcode": 0,
+	   "errmsg": "ok",
+	   "info_list":
+	   [
+			{
+				"is_customer":false,
+				"name":"***开",
+				"tmp_openid":"TMP_ID",
+				"follow_userid":"USER_ID",
+				"chat_name":"外联群1",
+				"add_time":1694418699
+			  },
+			  {
+				"is_customer":true,
+				"tmp_openid":"TMP_ID",
+				"external_userid":"woAJ2GCAAAXtWyujaWJHDDGi0mACHAAA",
+				"follow_userid":"USER_ID",
+				"add_time":1694418699
+			  },
+			  {
+				"is_customer":true,
+				"tmp_openid":"TMP_ID",
+				"external_userid":"woAJ2GCAAAXtWyujaWJHDDGi0mACHAAA",
+				"chat_id":"CHATID",
+				"add_time":1694418699
+			  },
+				{
+				"is_customer":false,
+				"tmp_openid":"TMP_ID",
+				"name":"***开",
+				"follow_userid":"USER_ID",
+				"add_time":1694418699
+			  }
+	   ],
+	   "next_cursor":"NEXT_CURSOR"
+	}
+
+=head4 RETURN 参数说明
+
+	参数	    说明
+    errcode	返回码
+	errmsg	对返回码的文本描述内容
+	info_list.is_customer	是否被成员标记为客户
+	info_list.tmp_openid	外部联系人临时ID
+	info_list.external_userid	外部联系人的externaluserid（如果是客户才返回）
+	info_list.name	脱敏后的外部联系人昵称（如果是其他外部联系人才返回）
+	info_list.follow_userid	添加此外部联系人的企业成员或外部联系人所在群聊的群主userid
+	info_list.chat_id	外部联系人所在的群聊ID（如果群聊被成员标记为客户群才返回）
+	info_list.chat_name	外部联系人所在群聊的群名（如果群聊未被成员标记为客户群才返回）
+	info_list.add_time	外部联系人首次添加/进群的时间
+	next_cursor	分页游标，再下次请求时填写以获取之后分页的记录，如果已经没有更多的数据则返回空,有效期为4小时
+
+提示
+外部联系人临时id是一个外部联系人的唯一标识，企业可根据此id对外部联系人进行去重统计。但外部联系人临时id仅在一轮遍历查询（从首个分页查询开始到最后一个分页查询完毕）中唯一；每次请求首个数据分页（cursor为空）时，返回的外部联系人临时id和next_cursor将发生变化。
+	
+=cut
+
+sub contact_list {
+    if ( @_ && $_[0] && ref $_[1] eq 'HASH' ) {
+        my $access_token = $_[0];
+        my $json = $_[1];
+        my $ua = LWP::UserAgent->new;
+        $ua->timeout(30);
+        $ua->env_proxy;
+
+        my $response = $ua->post("https://qyapi.weixin.qq.com/cgi-bin/externalcontact/contact_list?access_token=$access_token",Content => to_json($json,{allow_nonref=>1}),Content_type =>'application/json');
+        if ($response->is_success) {
+            return from_json($response->decoded_content,{utf8 => 1, allow_nonref => 1});
+        }
+
+    }
+    return 0;
+}
 
 1;
 __END__

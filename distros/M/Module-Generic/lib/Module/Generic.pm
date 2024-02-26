@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.34.0
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v0.35.1
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2024/01/29
+## Modified 2024/02/24
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -51,7 +51,7 @@ BEGIN
     our @EXPORT      = qw( );
     our @EXPORT_OK   = qw( subclasses );
     our %EXPORT_TAGS = ();
-    our $VERSION     = 'v0.34.0';
+    our $VERSION     = 'v0.35.1';
     # local $^W;
     # mod_perl/2.0.10
     if( exists( $ENV{MOD_PERL} )
@@ -5029,11 +5029,37 @@ sub _set_get_scalar : lvalue
     my $this  = $self->_obj2h;
     my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
 
+    my $callbacks = {};
+    my $def = {};
+    if( ref( $field ) eq 'HASH' )
+    {
+        $def = $field;
+        if( CORE::exists( $def->{field} ) && 
+            defined( $def->{field} ) && 
+            CORE::length( $def->{field} ) )
+        {
+            $field = $def->{field};
+        }
+        else
+        {
+            $field = undef;
+        }
+        $callbacks = $def->{callbacks} if( CORE::exists( $def->{callbacks} ) && ref( $def->{callbacks} ) eq 'HASH' );
+    }
+
     return( $self->_set_get_callback({
         get => sub
         {
             my $self = shift( @_ );
-            return( $data->{ $field } );
+            my $v = $data->{ $field };
+            # If we have a callback, call it and get the resulting value
+            if( scalar( keys( %$callbacks ) ) && 
+                CORE::exists( $callbacks->{get} ) &&
+                ref( $callbacks->{get} ) eq 'CODE' )
+            {
+                $v = $callbacks->{get}->( $self, $v );
+            }
+            return( $v );
         },
         set => sub
         {
@@ -5046,7 +5072,28 @@ sub _set_get_scalar : lvalue
                 return( $self->error( "Method $field takes only a scalar, but value provided ($val) is a reference" ) );
             }
             # return( $data->{ $field } = $val );
-            return( $data->{ $field } = $val );
+            $data->{ $field } = $val;
+
+            if( scalar( keys( %$callbacks ) ) && 
+                ( CORE::exists( $callbacks->{add} ) || CORE::exists( $callbacks->{set} ) ) )
+            {
+                my $coderef;
+                foreach my $t ( qw( add set ) )
+                {
+                    if( CORE::exists( $callbacks->{ $t } ) )
+                    {
+                        $coderef = ref( $callbacks->{ $t } ) eq 'CODE'
+                            ? $callbacks->{ $t }
+                            : $self->can( $callbacks->{ $t } );
+                        last if( defined( $coderef ) );
+                    }
+                }
+                if( defined( $coderef ) && ref( $coderef ) eq 'CODE' )
+                {
+                    $coderef->( $self, $data->{ $field } );
+                }
+            }
+            return( $data->{ $field } );
         },
         field => $field,
     }, @_ ) );
@@ -5074,7 +5121,7 @@ sub _set_get_scalar_as_object : lvalue
         {
             $field = undef;
         }
-        $callbacks = $def->{callbacks};
+        $callbacks = $def->{callbacks} if( CORE::exists( $def->{callbacks} ) && ref( $def->{callbacks} ) eq 'HASH' );
     }
 
     return( $self->_set_get_callback({
@@ -9094,7 +9141,7 @@ Module::Generic - Generic Module to inherit from
 
 =head1 VERSION
 
-    v0.34.0
+    v0.35.1
 
 =head1 DESCRIPTION
 
@@ -9781,6 +9828,10 @@ See also L</"colour_format"> and L</"colour_parse">
 =head2 message_frame
 
 Return the optional hash reference of parameters, if any, that can be provided as the last argument to L</message>
+
+=head2 messagec
+
+This is an alias for L</message_colour>
 
 =head2 messagef
 
@@ -11581,6 +11632,39 @@ This is a useful callback when the module instantiation either does not use the 
 
 Provided with an object property name, and a string, possibly a number or anything really and this will set the property value accordingly. Very straightforward.
 
+Alternatively, you can pass an hash reference instead of an object property to provide callbacks that will be called upon addition or removal of value.
+
+This hash reference can contain the following properties:
+
+=over 4
+
+=item field
+
+The object property name
+
+=item callbacks
+
+An hash reference of operation type C<add> (or C<set>), or C<get> to callback subroutine name or code reference pairs.
+
+=back
+
+For example:
+
+    sub name { return( shift->set_get_scalar({
+        field => 'name',
+        callbacks => 
+        {
+            set => '_some_add_callback',
+            get => sub
+            {
+                my $self = shift( @_ );
+                # do something that returns a value.
+            },
+        },
+    }), @_ ); }
+
+The value of the callback can be either a subroutine name or a code reference.
+
 It returns the currently value stored.
 
 =head2 _set_get_scalar_as_object
@@ -11616,7 +11700,7 @@ The object property name
 
 =item callbacks
 
-An hash reference of operation type C<add> (or C<set>) to callback subroutine name or code reference pairs.
+An hash reference of operation type C<add> (or C<set>), or C<get> to callback subroutine name or code reference pairs.
 
 =back
 

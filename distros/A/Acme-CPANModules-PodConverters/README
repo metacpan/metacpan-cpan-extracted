@@ -1,56 +1,94 @@
 NAME
-    Acme::CPANModules::PodConverters - Modules to convert POD to/from other
-    formats
+    Acme::CPANModules::PodConverters - List of modules to convert POD
+    to/from other formats
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     Acme::CPANModules::PodConverters (from Perl distribution
-    Acme-CPANModules-PodConverters), released on 2019-12-26.
+    Acme-CPANModules-PodConverters), released on 2023-10-31.
 
 DESCRIPTION
-    Modules to convert POD to/from other formats.
-
-INCLUDED MODULES
-    *   POD::Text - POD to formatted text
+ACME::CPANMODULES ENTRIES
+    POD::Text
+        POD to formatted text.
 
         Distribution includes pod2text
 
-    *   POD::Man - POD to formatted *roff input (Unix manpage)
+    POD::Man
+        POD to formatted *roff input (Unix manpage).
 
         Distribution includes pod2man
 
-    *   Pod::Html - POD to HTML
+    Pod::Html
+        POD to HTML.
+
+        Author: RJBS <https://metacpan.org/author/RJBS>
 
         Distribution includes pod2html
 
-    *   App::podtohtml - Alternative CLI to convert POD to HTML
+    App::podtohtml
+        Alternative CLI to convert POD to HTML.
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
         Distribution comes with podtohtml. Fix some annoyances with
         Pod::Html/pod2html which leaves temporary files lying around in
         current directory. Add templates, sending HTML to browser, and tab
         completion.
 
-    *   Pod::Simple::HTML - Another module to convert POD to HTML
+    Pod::Simple::HTML
+        Another module to convert POD to HTML.
 
-    *   Pod::Pdf - POD to PDF
+        Author: KHW <https://metacpan.org/author/KHW>
 
-    *   Pod::Markdown - POD to Markdown
+    Pod::Pdf
+        POD to PDF.
 
-    *   Pod::HTML2Pod - HTML to POD
+        Author: AJFRY <https://metacpan.org/author/AJFRY>
 
-    *   Markdown::Pod - Markdown to POD
+    Pod::Markdown
+        POD to Markdown.
+
+        Author: RWSTAUNER <https://metacpan.org/author/RWSTAUNER>
+
+    Pod::HTML2Pod
+        HTML to POD.
+
+        Author: SBURKE <https://metacpan.org/author/SBURKE>
+
+    Markdown::Pod
+        Markdown to POD.
+
+        Author: KEEDI <https://metacpan.org/author/KEEDI>
 
         Have some annoyances so I created <Markdown::To::POD>
 
-    *   Markdown::To::POD - Markdown to POD
+    Markdown::To::POD
+        Markdown to POD.
 
-    *   App::MarkdownUtils - Contains CLI for converting Markdown to POD,
-        <prog:markdown-to-pod>
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    App::MarkdownUtils
+        Contains CLI for converting Markdown to POD, <prog:markdown-to-pod>.
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
 FAQ
-  What are ways to use this module?
-    Aside from reading it, you can install all the listed modules using
-    cpanmodules:
+  What is an Acme::CPANModules::* module?
+    An Acme::CPANModules::* module, like this module, contains just a list
+    of module names that share a common characteristics. It is a way to
+    categorize modules and document CPAN. See Acme::CPANModules for more
+    details.
+
+  What are ways to use this Acme::CPANModules module?
+    Aside from reading this Acme::CPANModules module's POD documentation,
+    you can install all the listed modules (entries) using cpanm-cpanmodules
+    script (from App::cpanm::cpanmodules distribution):
+
+     % cpanm-cpanmodules -n PodConverters
+
+    Alternatively you can use the cpanmodules CLI (from App::cpanmodules
+    distribution):
 
         % cpanmodules ls-entries PodConverters | cpanm -n
 
@@ -58,9 +96,15 @@ FAQ
 
         % perl -MAcme::CM::Get=PodConverters -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
 
-    This module also helps lcpan produce a more meaningful result for "lcpan
-    related-mods" when it comes to finding related modules for the modules
-    listed in this Acme::CPANModules module.
+    or directly:
+
+        % perl -MAcme::CPANModules::PodConverters -E'say $_->{module} for @{ $Acme::CPANModules::PodConverters::LIST->{entries} }' | cpanm -n
+
+    This Acme::CPANModules module also helps lcpan produce a more meaningful
+    result for "lcpan related-mods" command when it comes to finding related
+    modules for the modules listed in this Acme::CPANModules module. See
+    App::lcpan::Cmd::related_mods for more details on how "related modules"
+    are found.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -69,14 +113,6 @@ HOMEPAGE
 SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-Acme-CPANModules-PodConverters>.
-
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-PodC
-    onverters>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
     <https://orgmode.org>
@@ -88,9 +124,34 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2023, 2019 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-PodC
+    onverters>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

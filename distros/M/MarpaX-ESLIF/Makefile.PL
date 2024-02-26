@@ -6,387 +6,25 @@ use strict;
 use warnings;
 
 use 5.010;
-use ExtUtils::MakeMaker '7.20';
+use ExtUtils::MakeMaker;
 
-my $have_cppguess;
-BEGIN {
-  use File::Spec;                     # Formally it is not necessary I believe to do it here
-  # Make sure we have our 'inc' directory prepended the perl search path
-  my $inc_dir = File::Spec->catdir(File::Spec->curdir, 'inc');
-  unshift(@INC, $inc_dir);
-  #
-  # ExtUtils::CppGuess does not install everywhere.
-  # This is why we provide it explicitely, we are ok if it fails at run-time
-  # by enclosing its usage in try/catch
-  #
-  $have_cppguess = eval 'use ExtUtils::CppGuess 0.26; 1;';
-}
 use Config;
-use Config::AutoConf;
-use ExtUtils::CBuilder;
-use Cwd qw/abs_path/;
 use ExtUtils::Constant qw /constant_types C_constant XS_constant autoload/;
-use File::Basename;
 use File::Find;
-use File::Which;
+use File::Spec;
 use IO::Handle;
-use Perl::OSType qw/is_os_type/;
+use Probe::Perl;
 use Try::Tiny;
 
-autoflush STDOUT 1;
-autoflush STDERR 1;
+$| = 1;
 
 #
-# Our distribution have both C and CPP files, and we want to make sure that modifying
-# CFLAGS will not affect cpp files. Since we require a version of ExtUtils::CBuilder
-# that support the environment variables, explicitely setting the environment variables
-# from default ExtUtils::Cbuilder will ensure cc and cpp settings will become independant
-# if we are doing to modify any of them.
-# We do that for linker settings as well for coherency although we will NEVER touch them.
-# OTHERLDFLAGS will be specific to this makefile.
+# Generate constant types
 #
-# Take care: with ExtUtils::CBuilder, $ENV{CFLAGS} and $ENV{LDFLAGS} are appended to default perl compile flags, not the others
-#
-#
-my %cbuilder_config = ExtUtils::CBuilder->new()->get_config;
-$ENV{CC} = $cbuilder_config{cc} // 'cc';
-$ENV{CFLAGS} //= '';
-$ENV{CFLAGS} .= ' -DNDEBUG';
-$ENV{CXX} = $cbuilder_config{cxx} // $ENV{CC};
-$ENV{CXXFLAGS} = $cbuilder_config{cxxflags} // $cbuilder_config{ccflags} // '';
-$ENV{LD} = $cbuilder_config{ld} // $ENV{CC};
-$ENV{LDFLAGS} //= '';
-# OTHERLDFLAGS remains local and must affect ONLY this process, not sub-processes
-my @OTHERLDFLAGS = ();
-#
-print "==========================================\n";
-print "Original compilers and linker settings as per ExtUtils::CBuilder\n";
-print "\n";
-print "CC           (overwrite) $ENV{CC}\n";
-print "CFLAGS       (    fixed) " . ($cbuilder_config{ccflags} // '') . "\n";
-print "CFLAGS       (   append) $ENV{CFLAGS}\n";
-print "CXX          (overwrite) $ENV{CXX}\n";
-print "CXXFLAGS     (overwrite) $ENV{CXXFLAGS}\n";
-print "LD           (overwrite) $ENV{LD}\n";
-print "LDFLAGS      (    fixed) " . ($cbuilder_config{ldflags} // '') . "\n";
-print "LDFLAGS      (   append) $ENV{LDFLAGS}\n";
-print "==========================================\n";
-print "\n";
-
-my $ac = Config::AutoConf->new();
-$ac->check_cc;
-
-#
-# We want to align lua integer type with perl ivtype
-#
-my $ivtype = $Config{ivtype} || '';
-if ($ivtype eq 'int') {
-  $ac->msg_notice("Use int for lua_Integer");
-  $ENV{CFLAGS} .= " -DLUA_INT_TYPE=1";
-  $ENV{CXXFLAGS} .= " -DLUA_INT_TYPE=1";
-} elsif ($ivtype eq 'long') {
-  $ac->msg_notice("Use long for lua_Integer");
-  $ENV{CFLAGS} .= " -DLUA_INT_TYPE=2";
-  $ENV{CXXFLAGS} .= " -DLUA_INT_TYPE=2";
-} elsif ($ivtype eq 'long long') {
-  $ac->msg_notice("Use long long for lua_Integer");
-  $ENV{CFLAGS} .= " -DLUA_INT_TYPE=3";
-  $ENV{CXXFLAGS} .= " -DLUA_INT_TYPE=3";
-} else {
-  $ac->msg_notice("No exact map found in lua for perl integer type \"$ivtype\": use long long for lua_Integer");
-  $ENV{CFLAGS} .= " -DLUA_INT_TYPE=3";
-  $ENV{CXXFLAGS} .= " -DLUA_INT_TYPE=3";
-}
-
-#
-# We want to align lua float type with perl nvtype
-#
-my $nvtype = $Config{nvtype} || '';
-if ($nvtype eq 'float') {
-  $ac->msg_notice("Use float for lua_Number");
-  $ENV{CFLAGS} .= " -DLUA_FLOAT_TYPE=1";
-  $ENV{CXXFLAGS} .= " -DLUA_FLOAT_TYPE=1";
-} elsif ($nvtype eq 'double') {
-  $ac->msg_notice("Use double for lua_Number");
-  $ENV{CFLAGS} .= " -DLUA_FLOAT_TYPE=2";
-  $ENV{CXXFLAGS} .= " -DLUA_FLOAT_TYPE=2";
-} elsif ($nvtype eq 'long double') {
-  $ac->msg_notice("Use long double for lua_Number");
-  $ENV{CFLAGS} .= " -DLUA_FLOAT_TYPE=3";
-  $ENV{CXXFLAGS} .= " -DLUA_FLOAT_TYPE=3";
-} else {
-  $ac->msg_notice("No exact map found in lua for perl double type \"$nvtype\": use long double for lua_Number");
-  $ENV{CFLAGS} .= " -DLUA_FLOAT_TYPE=3";
-  $ENV{CXXFLAGS} .= " -DLUA_FLOAT_TYPE=3";
-}
-#
-# Guess CXX configuration
-#
-#
-# Sun C compiler is a special case, we know that guess_compiler will always get it wrong
-#
-my $sunc = 0;
-$ac->msg_checking(sprintf "if this is Sun C compiler");
-if ($ac->link_if_else("#ifdef __SUNPRO_C\n#else\n#error \"this is not Sun C compiler\"\n#endif\nint main() { return 0; }")) {
-  $ac->msg_result('yes');
-  my $cc = which($ENV{CC}) || '';
-  if (! $cc) {
-    #
-    # Should never happen since we checked that the compiler works
-    #
-    $ac->msg_notice("Warning! Sun C compiler working but which() on its location returned false !?");
-  } else {
-    #
-    # $cc should be a full path
-    #
-    $cc = abs_path($cc);
-    my $ccdir = dirname($cc) || File::Spec->curdir();
-    my $cxx = File::Spec->catfile($ccdir, 'CC');
-    # We always give precedence to CC that should be at the same location of the C compiler
-    #
-    if (! which($cxx)) {
-      #
-      # No CC at the same location?
-      #
-      $ac->msg_notice("Warning! Sun C compiler detected but no CC found at the same location - trying with default search path");
-      $cxx = 'CC';
-    } else {
-      #
-      # Could it be that this CC is also the one that is, eventually, in the path?
-      #
-      my $cxxfromPATH = which('CC') || '';
-      if ($cxxfromPATH) {
-        $cxxfromPATH = abs_path($cxxfromPATH);
-        my $cxxfromWhich = abs_path($cxx);
-        if ($cxxfromWhich eq $cxxfromPATH) {
-          $ac->msg_notice("Sun C compiler detected and its CC counterpart is already in the search path");
-          $cxx = 'CC';
-        }
-      }
-    }
-    if (which($cxx)) {
-      $ac->msg_notice("Forcing CXX to $cxx");
-      $ENV{CXX} = $cxx;
-      #
-      # We got "CC" executable - no need of eventual -x c++ that perl may have add
-      #
-      if ($ENV{CXXFLAGS} =~ s/\-x\s+c\+\+\s*//) {
-        $ac->msg_notice("Removed -x c++ from CXXFLAGS");
-      }
-    } else {
-      $ac->msg_notice("Warning! Sun C compiler detected but no CC found neither in path neither where is the C compiler");
-    }
-    #
-    # In any case, add -lCrun and do not execute guess_compiler - cross fingers if we did not managed to find CXX
-    #
-    $ac->msg_notice("Adding -lCrun to OTHERLDFLAGS");
-    push(@OTHERLDFLAGS, '-lCrun');
-    $sunc = 1;
-  }
-} else {
-  $ac->msg_result('no');
-}
-if ($have_cppguess && ! $sunc) {
-  try {
-    my ($cxx_guess, $extra_cxxflags_guess, $extra_ldflags_guess) = guess_compiler($ac);
-    if (defined($cxx_guess) && (length($cxx_guess) > 0) && which($cxx_guess)) {
-      $ac->msg_notice("Setting CXX to $cxx_guess");
-      $ENV{CXX} = $cxx_guess;
-      if (defined($extra_cxxflags_guess) && (length($extra_cxxflags_guess) > 0)) {
-        $ac->msg_notice("Appending $extra_cxxflags_guess to CXXFLAGS");
-        $ENV{CXXFLAGS} .= " $extra_cxxflags_guess";
-      }
-      if (defined($extra_ldflags_guess) && (length($extra_ldflags_guess) > 0)) {
-        $ac->msg_notice("Pushing $extra_ldflags_guess to OTHERLDFLAGS");
-        push(@OTHERLDFLAGS, $extra_ldflags_guess)
-      }
-    }
-  };
-}
-if ((! "$ENV{CXX}") || (! which($ENV{CXX}))) {
-  $ac->msg_notice("Fallback mode trying to guess from C compiler");
-  my $cc_basename = basename($ENV{CC});
-  my $cc_dirname = dirname($ENV{CC});
-  #
-  # Traditionally xxxxcc becomes xxxx++
-  #
-  if ($cc_basename =~ /cc$/i) {
-    my $cxx_basename = $cc_basename;
-    $cxx_basename =~ s/cc$/++/;
-    my $cxx = File::Spec->catfile($cc_dirname, $cxx_basename);
-    if (which($cxx)) {
-      $ac->msg_notice("Setting CXX to found $cxx");
-      $ENV{CXX} = $cxx;
-    }
-  }
-  #
-  # Or xxxxlang becomes lang++
-  #
-  elsif ($cc_basename =~ /lang$/i) {
-    my $cxx_basename = $cc_basename;
-    $cxx_basename .= "++";
-    my $cxx = File::Spec->catfile($cc_dirname, $cxx_basename);
-    if (which($cxx)) {
-      $ac->msg_notice("Setting CXX to found $cxx");
-      $ENV{CXX} = $cxx;
-    }
-  }
-  #
-  # Cross fingers, and use C compiler
-  #
-  else {
-    $ac->msg_notice("Setting CXX to fallback $ENV{CC}");
-    $ENV{CXX} = $ENV{CC};
-  }
-}
-
-# -------------
-# CC and CFLAGS
-# --------------
-#
-my $isc99 = 0;
-if (($cbuilder_config{cc} // 'cc') ne 'cl') {
-    $ac->msg_checking("if C99 is enabled by default:");
-    if (try_compile("#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L\n#error \"C99 is not enabled\"\n#endif\nint main(){return 0;}")) {
-        $ac->msg_result('yes');
-        $isc99 = 1;
-    } else {
-        $ac->msg_result('no');
-        $ac->msg_notice("what CFLAGS is required for C99:");
-        $ac->msg_result('');
-        foreach my $flag (qw/-std=gnu99 -std=c99 -c99 -AC99 -xc99=all -qlanglvl=extc99/) {
-            $ac->msg_checking("if flag $flag works:");
-            if (try_compile("#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L\n#error \"C99 is not enabled\"\n#endif\nint main(){return 0;}", $flag)) {
-                $ac->msg_result('yes');
-                $ENV{CFLAGS} .= " $flag";
-                $isc99 = 1;
-                last;
-            } else {
-                $ac->msg_result('no');
-            }
-        }
-    }
-}
-
-#
-# When the compiler is clang, there is a bug with inlining, c.f. for example
-# https://sourceforge.net/p/resil/tickets/6/
-#
-if (is_os_type('Unix', 'darwin') && ! $isc99)
-{
-  $ac->msg_checking(sprintf "if this is clang compiler");
-  if ($ac->link_if_else("#ifndef __clang__\n#error \"this is not clang compiler\"\n#endif\nint main() { return 0; }")) {
-      $ac->msg_result('yes');
-      #
-      # C.f. http://clang.llvm.org/compatibility.html#inline
-      #      https://bugzilla.mozilla.org/show_bug.cgi?id=917526
-      #
-      $ac->msg_notice("Adding -std=gnu89 to CFLAGS for inline semantics");
-      $ENV{CFLAGS} .= ' -std=gnu89';
-  } else {
-      $ac->msg_result('no');
-  }
-}
-
-if ($^O eq "netbsd" && ! $isc99) {
-  #
-  # We need long long, that C99 guarantees, else _NETBSD_SOURCE will do it
-  #
-  $ac->msg_notice("NetBSD platform: Append _NETBSD_SOURCE to CFLAGS to have long long");
-  $ENV{CFLAGS} .= ' -D_NETBSD_SOURCE';
-}
-
-#
-# On windows we are using dlfcn-win32 that will imply a dependency on psapi. We verify this library is available
-#
-
-if (is_os_type('Windows')) {
-  $ac->msg_notice("Windows platform: Append -D__NO_INLINE__ to CFLAGS and CXXFLAGS");
-  $ENV{CFLAGS} .= ' -D__NO_INLINE__';
-  $ENV{CXXFLAGS} .= ' -D__NO_INLINE__';
-  $ac->msg_notice("Windows platform: Determining the need for -lpsapi");
-  $ac->push_libraries('psapi');
-  if ($ac->link_if_else("#include <windows.h>\n#include <psapi.h>\nint main() { EnumProcessModules(NULL, NULL, 0, NULL); }")) {
-    if (basename($Config{cc}) =~ /^cl/i) {
-      $ac->msg_notice("Windows platform: Adding psapi.lib to OTHERLDFLAGS");
-      push(@OTHERLDFLAGS, "psapi.lib");
-    } else {
-      $ac->msg_notice("Windows platform: Adding -lpsapi to OTHERLDFLAGS");
-      push(@OTHERLDFLAGS, "-lpsapi");
-    }
-  }
-}
-
-# goto no_tweak_on_optimization_flags;
-$ac->msg_checking("optimization flags:");
-$ac->msg_result('');
-if (($cbuilder_config{cc} // 'cc') eq 'cl') {
-    foreach my $flag ("/O2") {
-        $ac->msg_checking("if flag $flag works:");
-        if (try_compile("#include <stdlib.h>\nint main() {\n  exit(0);\n}\n", $flag)) {
-            $ac->msg_result('yes');
-            $ENV{PERL_EXTUTILS_CBUILDER_CONFIG_optimize} .= " $flag";
-            last;
-        } else {
-            $ac->msg_result('no');
-        }
-    }
-} else {
-    #
-    # Some versions of gcc may not yell with bad options unless -Werror is set.
-    # Check that flag and set it temporarly.
-    #
-    my $tmpflag = '-Werror';
-    $ac->msg_checking("if flag $tmpflag works:");
-    if (try_compile("#include <stdlib.h>\nint main() {\n  exit(0);\n}\n", $tmpflag)) {
-        $ac->msg_result('yes');
-    } else {
-        $ac->msg_result('no');
-        $tmpflag = '';
-    }
-
-    #
-    # We test AIX case first because it overlaps with general O3
-    #
-    foreach my $flag ("-O3 -qstrict", # xlc
-                      "-O3",          # cl, gcc
-                      "-xO3"          # CC
-                      ) {
-        $ac->msg_checking("if flag $flag works:");
-        if (try_compile("#include <stdlib.h>\nint main() {\n  exit(0);\n}\n", "$tmpflag $flag")) {
-            $ac->msg_result('yes');
-            $ENV{PERL_EXTUTILS_CBUILDER_CONFIG_optimize} .= " $flag";
-            last;
-        } else {
-            $ac->msg_result('no');
-        }
-    }
-}
-no_tweak_on_optimization_flags:
-
-my $OTHERLDFLAGS = join(' ', @OTHERLDFLAGS);
-print "\n";
-print "==========================================\n";
-print "Tweaked compilers and linker settings\n";
-print "\n";
-print "CC           (overwrite) $ENV{CC}\n";
-print "CFLAGS       (    fixed) " . ($cbuilder_config{ccflags} // '') . "\n";
-print "CFLAGS       (   append) $ENV{CFLAGS}\n";
-print "CXX          (overwrite) $ENV{CXX}\n";
-print "CXXFLAGS     (overwrite) $ENV{CXXFLAGS}\n";
-print "LD           (overwrite) $ENV{LD}\n";
-print "LDFLAGS      (    fixed) " . ($cbuilder_config{ldflags} // '') . "\n";
-print "LDFLAGS      (   append) $ENV{LDFLAGS}\n";
-print "OTHERLDFLAGS             $OTHERLDFLAGS\n";
-print "==========================================\n";
-print "\n";
-
 my $fh;
-print "Generating constant types\n";
 open($fh, '>', 'c-constant-types.inc') || die "Cannot open c-constant-types.inc, $!";
 print $fh constant_types();
 close($fh) || warn "Failed to close c-constant-types.inc, $!";
-
 my %types = ( 'event' => { pkg => 'MarpaX::ESLIF::Event::Type', constants => [qw/MARPAESLIF_EVENTTYPE_NONE MARPAESLIF_EVENTTYPE_COMPLETED MARPAESLIF_EVENTTYPE_NULLED MARPAESLIF_EVENTTYPE_PREDICTED MARPAESLIF_EVENTTYPE_BEFORE MARPAESLIF_EVENTTYPE_AFTER MARPAESLIF_EVENTTYPE_EXHAUSTED MARPAESLIF_EVENTTYPE_DISCARD/] }, 'value' => { pkg => 'MarpaX::ESLIF::Value::Type', constants => [qw/MARPAESLIF_VALUE_TYPE_UNDEF MARPAESLIF_VALUE_TYPE_CHAR MARPAESLIF_VALUE_TYPE_SHORT MARPAESLIF_VALUE_TYPE_INT MARPAESLIF_VALUE_TYPE_LONG MARPAESLIF_VALUE_TYPE_FLOAT MARPAESLIF_VALUE_TYPE_DOUBLE MARPAESLIF_VALUE_TYPE_PTR MARPAESLIF_VALUE_TYPE_ARRAY MARPAESLIF_VALUE_TYPE_BOOL MARPAESLIF_VALUE_TYPE_STRING MARPAESLIF_VALUE_TYPE_ROW MARPAESLIF_VALUE_TYPE_TABLE MARPAESLIF_VALUE_TYPE_LONG_DOUBLE/] }, 'loggerLevel' => { pkg => 'MarpaX::ESLIF::Logger::Level', constants => [qw/GENERICLOGGER_LOGLEVEL_TRACE GENERICLOGGER_LOGLEVEL_DEBUG GENERICLOGGER_LOGLEVEL_INFO GENERICLOGGER_LOGLEVEL_NOTICE GENERICLOGGER_LOGLEVEL_WARNING GENERICLOGGER_LOGLEVEL_ERROR GENERICLOGGER_LOGLEVEL_CRITICAL GENERICLOGGER_LOGLEVEL_ALERT GENERICLOGGER_LOGLEVEL_EMERGENCY/] }, 'rulePropertyBitSet' => { pkg => 'MarpaX::ESLIF::Rule::PropertyBitSet', constants => [qw/MARPAESLIF_RULE_IS_ACCESSIBLE MARPAESLIF_RULE_IS_NULLABLE MARPAESLIF_RULE_IS_NULLING MARPAESLIF_RULE_IS_LOOP MARPAESLIF_RULE_IS_PRODUCTIVE/] }, 'symbolPropertyBitSet' => { pkg => 'MarpaX::ESLIF::Symbol::PropertyBitSet', constants => [qw/MARPAESLIF_SYMBOL_IS_ACCESSIBLE MARPAESLIF_SYMBOL_IS_NULLABLE MARPAESLIF_SYMBOL_IS_NULLING MARPAESLIF_SYMBOL_IS_PRODUCTIVE MARPAESLIF_SYMBOL_IS_START MARPAESLIF_SYMBOL_IS_TERMINAL/] }, 'symbolEventBitSet' => { pkg => 'MarpaX::ESLIF::Symbol::EventBitSet', constants => [qw/MARPAESLIF_SYMBOL_EVENT_COMPLETION MARPAESLIF_SYMBOL_EVENT_NULLED MARPAESLIF_SYMBOL_EVENT_PREDICTION/] }, 'symbol' => { pkg => 'MarpaX::ESLIF::Symbol::Type', constants => [qw/MARPAESLIF_SYMBOLTYPE_TERMINAL MARPAESLIF_SYMBOLTYPE_META/] });
 
 foreach (sort keys %types) {
@@ -395,10 +33,10 @@ foreach (sort keys %types) {
   open($fh, '>', "c-$_-types.inc") || die "Cannot open c-$_-types.inc, $!";
   print $fh C_constant($pkg, "${_}_constant", undef, undef, undef, undef, @{$types{$_}->{constants}});
   close($fh) || warn "Failed to close c-$_-types.inc, $!";
-
+  #
   # This is a bit vicious but in our case these are NOT macros but ENUMS !
   # We know what were are doing and replace all #ifdef MARPAESLIF_xxx and #ifdef GENERICLOGGER_xxx by #if 1
-
+  #
   print "Tweaking $pkg C $_ types to work with enums\n";
   open($fh, '<', "c-$_-types.inc") || die "Failed to open c-$_-types.inc, $!";
   my $content = do { local $/; <$fh> };
@@ -414,7 +52,7 @@ foreach (sort keys %types) {
   close($fh) || warn "Failed to close xs-$_-types.inc, $!";
 
   print "Generating $pkg AUTOLOAD\n";
-  my $autoload = autoload($pkg, '5.10', 1);
+  my $autoload = replace_autoload_tabs(autoload($pkg, '5.10', 1));
 
   my @pkg = split(/::/, $pkg);
   $pkg[-1] .= '.pm';
@@ -429,99 +67,43 @@ foreach (sort keys %types) {
   close($fh) || warn "Failed to close $pkgfile, $!";
 }
 
-my_spawn($^X, File::Spec->catfile('src', 'CMakeObjects.PL'));
+#
+# Build marpaESLIF
+#
+my $perl_exe = Probe::Perl->find_perl_interpreter();
+my @args = ($perl_exe, File::Spec->catfile('etc', 'compile_marpaESLIF.pl'));
+system(@args) == 0 || die "$!";
+#
+# Recuperate eventual OTHERLDFLAGS
+#
+my $otherldflags = 'OTHERLDFLAGS.txt';
+my @OTHERLDFLAGS = ();
+open(my $otherldflags_fd, '<', $otherldflags) || die "Cannot open $otherldflags, $!";
+while (defined(my $line = <$otherldflags_fd>)) {
+    $line =~ s/[\r\n]+//g;
+    push(@OTHERLDFLAGS, $line);
+}
+close($otherldflags_fd) || warn "Cannot close $otherldflags, $!";
+print "ESLIF compilation says \@OTHERLDFLAGS = @OTHERLDFLAGS\n";
+#
+# Recuperate eventual CFLAGS
+#
+my $cflags = 'CFLAGS.txt';
+my $CFLAGS = '';
+open(my $cflags_fd, '<', $cflags) || die "Cannot open $cflags, $!";
+do { local $/; $CFLAGS = <$cflags_fd> };
+$CFLAGS =~ s/[\r\n]+/ /g;
+close($cflags_fd) || warn "Cannot close $cflags, $!";
+print "ESLIF compilation says \$CFLAGS = $CFLAGS\n";
+
 my @ldfrom = ();
-my %unique = ();
+find({ wanted => sub { push(@ldfrom, $_) if (-f $_) }, no_chdir => 1 }, 'objs');
 
-find({ wanted => sub {
-                       if (-f $_) {
-                         my $cpath = File::Spec->canonpath($_);
-                         if (basename(dirname($cpath)) eq 'obj4perl') {
-                           if (! ${unique}{basename($cpath)}++) {
-                             push(@ldfrom, $cpath);
-                           }
-                         }
-                       }
-                     },
-      no_chdir => 1 }, File::Spec->curdir);
-
-print "Linking ESLIF\$(OBJ_EXT) using: @ldfrom\n";
-
-#
-# Inspired by Inline-CPP-0.74/inc/ILCPPConfig/CompilerGuess.pm
-#
-sub guess_compiler {
-  my ($ac) = @_;
-
-  my $guesser = ExtUtils::CppGuess->new(cc => $ENV{CC});
-  #
-  # We work quite like Module::Build in the sense that we are appending
-  # flags.
-  #
-  my %module_build_options = $guesser->module_build_options;
-  my $cxx_guess            = $module_build_options{config}->{cc} // '';
-  my $extra_cxxflags_guess = $module_build_options{extra_compiler_flags} // '';
-  my $extra_ldflags_guess  = $module_build_options{extra_linker_flags} // '';
-  $ac->msg_notice("ExtUtils::CppGuess says \$cxx_guess=$cxx_guess, \$extra_cxxflags_guess=$extra_cxxflags_guess, \$extra_ldflags_guess=$extra_ldflags_guess");
-
-  return ($cxx_guess, $extra_cxxflags_guess, $extra_ldflags_guess);
-}
-
-sub try_compile {
-    my ($csource, $extra_compiler_flags) = @_;
-
-    my $fh = File::Temp->new(UNLINK => 0, SUFFIX => '.c');
-    print $fh "$csource\n";
-    close($fh);
-    my $source = $fh->filename;
-    my $rc = 0;
-
-    try {
-        my $cbuilder = ExtUtils::CBuilder->new();
-        my $obj = basename($cbuilder->object_file($source));
-        $cbuilder->compile(
-            source               => $source,
-            object_file          => $obj,
-            extra_compiler_flags => $extra_compiler_flags
-            );
-        $rc = 1;
-    };
-    unlink $fh->filename;
-
-    return $rc;
-}
-
-sub my_spawn {
-    my (@cmd) = @_;
-
-    die "Empty command to execute" unless @cmd;
-
-    print "=== Command: @cmd\n";
-
-    my $pid = fork() // die "Failed to fork, $!";
-    $pid ? my_spawn_parent_side($pid, @cmd) : my_spawn_child_side(@cmd);
-}
-
-sub my_spawn_child_side {
-    my (@cmd) = @_;
-
-    exec { $cmd[0] } @cmd;
-    die "=== Command: @cmd, $!"; # Should never be executed
-}
-
-sub my_spawn_parent_side {
-    my ($pid, @cmd ) = @_;
-
-    my $kid = waitpid($pid, 0);
-    warn "=== Command: @cmd, waitpid on PID $pid returned child PID $kid?" unless $kid == $pid;
-    my $exit_value = $? >> 8;
-    my $signal = $? & 127;
-    my $core_dump = $? & 128;
-    if ($exit_value) {
-        die "=== Command: @cmd, exit value $exit_value (signal=$signal, core_dump=$core_dump)\n";
-    } else {
-        print STDOUT "=== Command: @cmd, exit value $exit_value\n";
-    }
+sub replace_autoload_tabs {
+    my ($autoload) = @_;
+    $autoload =~ s/^\t/        /mg; # For the cases we know for pretty indentation
+    $autoload =~ s/\t/    /g; # For all the other cases
+    return $autoload;
 }
 
 my %WriteMakefileArgs = (
@@ -529,28 +111,26 @@ my %WriteMakefileArgs = (
   "AUTHOR" => "Jean-Damien Durand <jeandamiendurand\@free.fr>",
   "CONFIGURE_REQUIRES" => {
     "Archive::Tar" => 0,
-    "Capture::Tiny" => 0,
+    "Carp" => 0,
     "Config" => 0,
     "Config::AutoConf" => 0,
-    "Config::AutoConf::INI" => "0.005",
+    "Cwd" => 0,
     "ExtUtils::CBuilder" => "0.280224",
     "ExtUtils::Constant" => 0,
-    "ExtUtils::MakeMaker" => "7.20",
+    "ExtUtils::MakeMaker" => 0,
     "File::Basename" => 0,
     "File::Copy" => 0,
-    "File::Copy::Recursive" => 0,
     "File::Find" => 0,
     "File::Path" => 0,
     "File::Spec" => 0,
     "File::Temp" => 0,
-    "File::Which" => "1.23",
+    "File::Which" => 0,
     "File::chdir" => 0,
     "IO::Handle" => 0,
     "POSIX" => 0,
     "Perl::OSType" => 0,
-    "Try::Tiny" => 0,
-    "diagnostics" => 0,
-    "strict" => 0
+    "Probe::Perl" => 0,
+    "Try::Tiny" => 0
   },
   "DISTNAME" => "MarpaX-ESLIF",
   "LICENSE" => "perl",
@@ -569,26 +149,21 @@ my %WriteMakefileArgs = (
     "overload" => 0,
     "parent" => 0,
     "strict" => 0,
-    "vars" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "Data::Dumper" => 0,
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
-    "File::Temp" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Log::Any" => 0,
     "Log::Any::Adapter" => 0,
-    "Log::Any::Adapter::Log4perl" => 0,
-    "Log::Any::Adapter::Util" => "1.03",
-    "Log::Log4perl" => "1.32",
     "POSIX" => 0,
     "Safe::Isa" => 0,
-    "Test::Deep" => "1.128",
+    "Test::Deep" => 0,
     "Test::Deep::NoTest" => 0,
-    "Test::More" => "1.3",
+    "Test::More" => 0,
     "Test::More::UTF8" => 0,
     "Try::Tiny" => 0,
     "diagnostics" => 0,
@@ -597,7 +172,7 @@ my %WriteMakefileArgs = (
     "threads::shared" => 0,
     "utf8" => 0
   },
-  "VERSION" => "6.0.29",
+  "VERSION" => "6.0.33.3",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -606,9 +181,10 @@ my %WriteMakefileArgs = (
 %WriteMakefileArgs = (
     %WriteMakefileArgs,
     OBJECT => 'ESLIF$(OBJ_EXT)',
-    LDFROM => join(' ', '$(OBJECT)', @ldfrom),
+    INC => join(' ', "-I" . File::Spec->catdir('extract', 'marpaESLIF', 'include'), "-I" . File::Spec->catdir('extract', 'genericLogger', 'include'), "-I" . File::Spec->catdir('extract', 'genericStack', 'include')),
+    LDFROM => join(' ', '$(OBJECT)', sort @ldfrom),
     dynamic_lib => { OTHERLDFLAGS => join(' ', @OTHERLDFLAGS) },
-    INC => join(' ', map { "-I$_ " } (File::Spec->catdir('src', 'output', 'include'), File::Spec->catdir('src', 'include'), File::Spec->catdir('src', 'output', '3rdparty', 'genericLogger', 'output', 'include'), File::Spec->catdir('src', 'output', '3rdparty', 'genericLogger', 'include'), File::Spec->catdir('src', 'output', '3rdparty', 'genericStack', 'include'), File::Spec->catdir('src', 'output', '3rdparty', 'genericHash', 'include') ) ),
+    CCFLAGS => "$Config::Config{ccflags} $CFLAGS",
 );
 
 my %FallbackPrereqs = (
@@ -618,22 +194,18 @@ my %FallbackPrereqs = (
   "Encode" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
-  "File::Temp" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "JSON::MaybeXS" => "1.004000",
   "Log::Any" => 0,
   "Log::Any::Adapter" => 0,
-  "Log::Any::Adapter::Log4perl" => 0,
-  "Log::Any::Adapter::Util" => "1.03",
-  "Log::Log4perl" => "1.32",
   "Math::BigFloat" => 0,
   "Math::BigInt" => 0,
   "POSIX" => 0,
   "Safe::Isa" => 0,
-  "Test::Deep" => "1.128",
+  "Test::Deep" => 0,
   "Test::Deep::NoTest" => 0,
-  "Test::More" => "1.3",
+  "Test::More" => 0,
   "Test::More::UTF8" => 0,
   "Try::Tiny" => 0,
   "XSLoader" => 0,
@@ -647,7 +219,6 @@ my %FallbackPrereqs = (
   "threads" => 0,
   "threads::shared" => 0,
   "utf8" => 0,
-  "vars" => 0,
   "warnings" => 0
 );
 

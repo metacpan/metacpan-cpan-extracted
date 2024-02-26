@@ -3,8 +3,8 @@ NAME
     files
 
 VERSION
-    This document describes version 0.003 of Spreadsheet::Examples (from
-    Perl distribution Spreadsheet-Examples), released on 2023-11-09.
+    This document describes version 0.004 of Spreadsheet::Examples (from
+    Perl distribution Spreadsheet-Examples), released on 2023-11-17.
 
 DESCRIPTION
     This distribution contains, in its share directory, a collection of
@@ -35,6 +35,12 @@ HOMEPAGE
 SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-Spreadsheet-Examples>.
+
+SEE ALSO
+    Acme::CPANModules::Spreadsheet for spreadsheet-related modules.
+
+    Other *::Examples modules e.g. TextDoc::Examples. Also see
+    Acme::CPANModules::TextDoc.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

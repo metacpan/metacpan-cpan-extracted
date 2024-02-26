@@ -1,0 +1,20 @@
+package RDF::Cowl::Lib::Gen::Types;
+# ABSTRACT: Private class for FFI::Platypus types
+
+## DO NOT EDIT
+## Generated via maint/tt/Types.pm.tt
+
+use strict;
+use warnings;
+use RDF::Cowl::Lib;
+
+my $ffi = RDF::Cowl::Lib->ffi;
+
+[% FOREACH type = types -%]
+$ffi->type( [% perlstring(type.typename) %] => [% perlstring(type.alias) %] );
+[% END -%]
+
+1;
+[%#-
+# vim: ft=tt2
+-%]

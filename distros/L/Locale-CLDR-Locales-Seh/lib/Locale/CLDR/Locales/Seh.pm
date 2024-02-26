@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Seh - Package for language Sena
 
 package Locale::CLDR::Locales::Seh;
 # This file auto generated from Data\common\main\seh.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -329,8 +329,7 @@ has 'characters' => (
 		no warnings 'experimental::regex_sets';
 		return {
 			index => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
-			main => qr{[a á à â ã b c ç d e é ê f g h i í j k l m n o ó ò ô õ p q r s t u ú v w x y z]},
-			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			main => qr{[aáàâã b cç d eéê f g h ií j k l m n oóòôõ p q r s t uú v w x y z]},
 		};
 	},
 EOT
@@ -339,34 +338,6 @@ EOT
 },
 );
 
-
-has 'quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{“},
-);
-
-has 'quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{”},
-);
-
-has 'alternate_quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{‘},
-);
-
-has 'alternate_quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{’},
-);
 
 has 'yesstr' => (
 	is			=> 'ro',
@@ -637,9 +608,14 @@ has 'currencies' => (
 				'currency' => q(Libra de Santa Helena),
 			},
 		},
-		'SLL' => {
+		'SLE' => {
 			display_name => {
 				'currency' => q(Leone de Serra Leoa),
+			},
+		},
+		'SLL' => {
+			display_name => {
+				'currency' => q(Leone de Serra Leoa \(1964—2022\)),
 			},
 		},
 		'SOS' => {
@@ -905,18 +881,14 @@ has 'datetime_formats_available_formats' => (
 			HHmm => q{HH:mm},
 			HHmmss => q{HH:mm:ss},
 			Hm => q{H:mm},
-			M => q{L},
 			MEd => q{E, dd/MM},
-			MMM => q{LLL},
 			MMMEd => q{E, d MMM},
 			MMMMEd => q{E, d MMMM},
 			MMMMd => q{d MMMM},
 			MMMd => q{d MMM},
 			MMdd => q{dd/MM},
 			Md => q{d/M},
-			d => q{d},
 			mmss => q{mm:ss},
-			ms => q{mm:ss},
 			y => q{y},
 			yM => q{MM/y},
 			yMEd => q{E, dd/MM/y},
@@ -932,19 +904,14 @@ has 'datetime_formats_available_formats' => (
 			HHmm => q{HH:mm},
 			HHmmss => q{HH:mm:ss},
 			Hm => q{H:mm},
-			M => q{L},
 			MEd => q{E, dd/MM},
-			MMM => q{LLL},
 			MMMEd => q{E, d MMM},
 			MMMMEd => q{E, d MMMM},
 			MMMMd => q{d MMMM},
 			MMMd => q{d MMM},
 			MMdd => q{dd/MM},
 			Md => q{d/M},
-			d => q{d},
 			mmss => q{mm:ss},
-			ms => q{mm:ss},
-			y => q{y},
 			yM => q{MM/y},
 			yMEd => q{E, dd/MM/y},
 			yMM => q{MM/y},
@@ -952,8 +919,6 @@ has 'datetime_formats_available_formats' => (
 			yMMMEd => q{E, d 'de' MMM 'de' y},
 			yMMMM => q{MMMM 'de' y},
 			yMMMd => q{d 'de' MMM 'de' y},
-			yQQQ => q{y QQQ},
-			yQQQQ => q{y QQQQ},
 		},
 	} },
 );

@@ -1,10 +1,10 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::code_from_str;
 
-our $DATE = '2023-09-05'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2023-12-20'; # DATE
+our $VERSION = '0.003'; # VERSION
 
-our $rschema = do{my$var={base=>"code",clsets_after_base=>[{description=>"\nThis schema accepts coderef or string which will be eval'ed to coderef. Note\nthat this means allowing your user to provide arbitrary Perl code for you to\nexecute! Make sure first and foremost that security-wise this is acceptable in\nyour case.\n\nBy default `eval()` is performed in the `main` namespace and without stricture\nor warnings. See the parameterized version <pm:Sah::PSchema::code_from_str> if\nyou want to customize the `eval()`.\n\n",examples=>[],prefilters=>[["Code::eval",{}]],summary=>"Coderef from eval\\`ed string"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["code"],type=>"code",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
+our $rschema = do{my$var={base=>"code",clsets_after_base=>[{description=>"\nThis schema accepts coderef or string which will be eval'ed to coderef. Note\nthat this means allowing your user to provide arbitrary Perl code for you to\nexecute! Make sure first and foremost that security-wise this is acceptable in\nyour case.\n\nBy default `eval()` is performed in the `main` namespace and without stricture\nor warnings. See the parameterized version <pm:Sah::PSchema::code_from_str> if\nyou want to customize the `eval()`.\n\nWhat's the difference between this schema and `str_or_code` (from\n<pm:Sah::Schemas::Str>)? Both this schema and `str_or_code` accept string, but\nthis schema will directly compile any input string while `str_or_code` will only\nconvert string to code if it is in the form of `sub { ... }`. In other words,\nthis schema will always produce coderef, while `str_or_code` can produce strings\nalso.\n\n",examples=>[],prefilters=>[["Code::eval",{}]],summary=>"Coderef from eval\\`ed string"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["code"],type=>"code",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
 1;
 # ABSTRACT: Coderef from eval\`ed string
@@ -21,7 +21,7 @@ Sah::SchemaR::code_from_str - Coderef from eval\`ed string
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::SchemaR::code_from_str (from Perl distribution Sah-Schemas-Code), released on 2023-09-05.
+This document describes version 0.003 of Sah::SchemaR::code_from_str (from Perl distribution Sah-Schemas-Code), released on 2023-12-20.
 
 =head1 DESCRIPTION
 

@@ -4,10 +4,11 @@ use Test::Exception;
 use ok( 'Locale::CLDR' );
 my $locale;
 
-diag( "Testing Locale::CLDR v0.40.1, Perl $], $^X" );
+diag( "Testing Locale::CLDR v0.44.0, Perl $], $^X" );
 use ok 'Locale::CLDR::Locales::El';
-use ok 'Locale::CLDR::Locales::El::Any::Cy';
-use ok 'Locale::CLDR::Locales::El::Any::Gr';
-use ok 'Locale::CLDR::Locales::El::Any';
+use ok 'Locale::CLDR::Locales::El::Grek::Cy';
+use ok 'Locale::CLDR::Locales::El::Grek::Gr';
+use ok 'Locale::CLDR::Locales::El::Grek';
+use ok 'Locale::CLDR::Locales::El::Polyton';
 
 done_testing();

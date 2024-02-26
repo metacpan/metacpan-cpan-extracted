@@ -347,6 +347,14 @@ static void eio_destroy (eio_req *req);
 # define EIO_PATH_MIN 8160
 #endif
 
+#if defined(O_PATH)
+# define EIO_O_PATH O_PATH
+#elif defined(O_SEARCH)
+# define EIO_O_PATH O_SEARCH
+#else
+# define EIO_O_PATH 0
+#endif
+
 #define EIO_PATH_MAX (PATH_MAX <= EIO_PATH_MIN ? EIO_PATH_MIN : PATH_MAX)
 
 /* buffer size for various temporary buffers */
@@ -1416,7 +1424,7 @@ eio__scandir (eio_req *req, etp_worker *self)
 #else
   #if HAVE_AT
     {
-      int fd = openat (WD2FD (req->wd), req->ptr1, O_CLOEXEC | O_SEARCH | O_DIRECTORY | O_NONBLOCK);
+      int fd = openat (WD2FD (req->wd), req->ptr1, O_CLOEXEC | O_RDONLY | O_DIRECTORY | O_NONBLOCK);
 
       if (fd < 0)
         return;
@@ -1679,7 +1687,7 @@ eio__wd_open_sync (struct etp_tmpbuf *tmpbuf, eio_wd wd, const char *path)
     return EIO_INVALID_WD;
 
 #if HAVE_AT
-  fd = openat (WD2FD (wd), path, O_CLOEXEC | O_SEARCH | O_DIRECTORY | O_NONBLOCK);
+  fd = openat (WD2FD (wd), path, EIO_O_PATH | O_DIRECTORY | O_NONBLOCK | O_CLOEXEC);
 
   /* 0 is a valid fd, but we use it for EIO_CWD, so in the very unlikely */
   /* case of fd 0 being available (almost certainly an a pplication bug) */
@@ -1768,7 +1776,7 @@ eio__truncateat (int dirfd, const char *path, off_t length)
 static int
 eio__statvfsat (int dirfd, const char *path, struct statvfs *buf)
 {
-  int fd = openat (dirfd, path, O_SEARCH | O_CLOEXEC | O_NONBLOCK);
+  int fd = openat (dirfd, path, EIO_O_PATH | O_CLOEXEC | O_NONBLOCK);
   int res;
 
   if (fd < 0)

@@ -84,8 +84,8 @@ use PDL::LinearAlgebra::Real;
   package # hide from CPAN
     PDL::Complex;
 	my $warningFlag;
-  	BEGIN{
-  		$warningFlag = $^W;
+	BEGIN{
+		$warningFlag = $^W;
 		$^W = 0;
 	}
 	use overload (
@@ -119,6 +119,7 @@ PDL::LinearAlgebra::Complex - PDL interface to the lapack linear algebra program
 This module provides an interface to parts of the lapack library (complex numbers).
 These routines accept either float or double ndarrays.
 
+=cut
 EOD
 
 pp_defc("gtsv",
@@ -1193,8 +1194,8 @@ EOF
 		{
 			integer i__1 = maxwrk;
 			integer i__2 = $SIZE(n) + $SIZE(n) * FORTRAN(ilaenv)(&c__1, "ZUNGQR"
-		    		, " ", &(integer){$SIZE(n)}, &c__1, &(integer){$SIZE(n)}, &c_n1, (ftnlen)6, (ftnlen)1);
-	    		maxwrk = max(i__1,i__2);
+				, " ", &(integer){$SIZE(n)}, &c__1, &(integer){$SIZE(n)}, &c_n1, (ftnlen)6, (ftnlen)1);
+			maxwrk = max(i__1,i__2);
 			pjobvsl = \'V\';
 		}
 		lwork = max(maxwrk,minwrk);
@@ -1256,7 +1257,7 @@ Complex version of L<PDL::LinearAlgebra::Real/ggeesx>
 pp_defc("heev",
        _decl => <<'EOF',
 		extern int FORTRAN($TFD(c,z)heev)(char *jobz, char *uplo, integer *n, $GENERIC() *a,
-	 	integer *lda, $GENERIC() *w, $GENERIC() *work, integer *lwork, $GENERIC() *rwork,
+		integer *lda, $GENERIC() *w, $GENERIC() *work, integer *lwork, $GENERIC() *rwork,
 		integer *info);
 EOF
        HandleBad => 0,
@@ -1314,7 +1315,7 @@ Complex version of L<PDL::LinearAlgebra::Real/syev> for Hermitian matrix
 pp_defc("heevd",
        _decl => <<'EOF',
 		extern int FORTRAN($TFD(c,z)heevd)(char *jobz, char *uplo, integer *n, $GENERIC() *a,
-	 	integer *lda, $GENERIC() *w, $GENERIC() *work, integer *lwork, $GENERIC() *rwork, integer *lrwork,
+		integer *lda, $GENERIC() *w, $GENERIC() *work, integer *lwork, $GENERIC() *rwork, integer *lrwork,
 		integer *iwork, integer *liwork, integer *info);
 EOF
        HandleBad => 0,
@@ -1946,7 +1947,7 @@ Complex version of L<PDL::LinearAlgebra::Real/gesvx>.
 
     trans:  Specifies the form of the system of equations:
             = 0:  A * X = B     (No transpose)   
-            = 1:  A\' * X = B  (Transpose)   
+            = 1:  A\' * X = B  (Transpose)
             = 2:  A**H * X = B  (Conjugate transpose)  
 ');
 
@@ -2696,7 +2697,7 @@ EOF
 		&lwork,
 		$P(info));
 		free (work);
-             	}
+		}
 ');
 
 pp_defc("sytf2",
@@ -3022,8 +3023,8 @@ Complex version of L<PDL::LinearAlgebra::Real/getrs>
     Arguments   
     =========   
 	trans:   = 0:  No transpose;
-            	 = 1:  Transpose; 
-            	 = 2:  Conjugate transpose;
+		 = 1:  Transpose;
+		 = 2:  Conjugate transpose;
 
 ');
 
@@ -3160,8 +3161,8 @@ Complex version of L<PDL::LinearAlgebra::Real/trtrs>
     Arguments   
     =========   
 	trans:   = 0:  No transpose;
-            	 = 1:  Transpose; 
-            	 = 2:  Conjugate transpose;
+		 = 1:  Transpose;
+		 = 2:  Conjugate transpose;
 
 ');
 
@@ -3213,8 +3214,8 @@ Complex version of L<PDL::LinearAlgebra::Real/latrs>
     Arguments   
     =========   
 	trans:   = 0:  No transpose;
-            	 = 1:  Transpose; 
-            	 = 2:  Conjugate transpose;
+		 = 1:  Transpose;
+		 = 2:  Conjugate transpose;
 ');
 
 pp_defc("gecon",
@@ -4156,7 +4157,7 @@ Complex version of L<PDL::LinearAlgebra::Real/orghr>
 pp_defc("hseqr",
        _decl => <<'EOF',
 		extern int FORTRAN($TFD(c,z)hseqr)(char *job, char *compz, integer *n, integer *ilo,
-	 	integer *ihi, $GENERIC() *h__, integer *ldh, $GENERIC() *w, 
+		integer *ihi, $GENERIC() *h__, integer *ldh, $GENERIC() *w,
 		$GENERIC() *z__, integer *ldz, $GENERIC() *work, 
 		integer *lwork, integer *info);
 EOF
@@ -4507,12 +4508,12 @@ Complex version of L<PDL::LinearAlgebra::Real/gemm>.
     Arguments   
     =========   
 	transa:  = 0:  No transpose;
-            	 = 1:  Transpose; 
-            	 = 2:  Conjugate transpose;
+		 = 1:  Transpose;
+		 = 2:  Conjugate transpose;
 
 	transb:  = 0:  No transpose;
-            	 = 1:  Transpose; 
-            	 = 2:  Conjugate transpose;
+		 = 1:  Transpose;
+		 = 2:  Conjugate transpose;
 
 ');
 
@@ -4569,12 +4570,12 @@ Complex version of L<PDL::LinearAlgebra::Real/rmgemm>.
     Arguments   
     =========   
 	transa:  = 0:  No transpose;
-            	 = 1:  Transpose; 
-            	 = 2:  Conjugate transpose;
+		 = 1:  Transpose;
+		 = 2:  Conjugate transpose;
 
 	transb:  = 0:  No transpose;
-            	 = 1:  Transpose; 
-            	 = 2:  Conjugate transpose;
+		 = 1:  Transpose;
+		 = 2:  Conjugate transpose;
 
 ');
 }
@@ -4946,49 +4947,31 @@ EOF
 ################################################################################
 pp_def(
 	'ctricpy',
-	Pars => 'A(c=2,m,n);int uplo();[o] C(c=2,m,n)',
+	Pars => 'A(c=2,m,n);[o] C(c=2,m,n)',
+	OtherPars => 'int uplo',
+	OtherParsDefaults => {uplo => 0},
+	ArgOrder => [qw(A uplo C)],
 	Code => '
-		PDL_Indx i, j, k;
-		
-		if ($uplo())
+		if ($COMP(uplo))
 		{
-			for (i = 0; i < $SIZE(n);i++)
-			{
-				k = min(i,($SIZE(m)-1));
-				for (j = 0; j <= k; j++)
-				{
-	               			$C(c=>0,m=>j,n=>i) = $A(c=>0,m=>j,n=>i);
-					$C(c=>1,m=>j,n=>i) = $A(c=>1,m=>j,n=>i);
-				}
-			}
+			broadcastloop %{
+				loop (n,m) %{
+					loop(c) %{ $C() = $A(); %}
+					if (m >= n) break;
+				%}
+			%}
 		}
 		else
 		{
-			for (i = 0; i < $SIZE(n);i++)
-			{
-				for (j = i; j < $SIZE(m); j++)
-				{
-	               			$C(c=>0,m=>j,n=>i) = $A(c=>0,m=>j,n=>i);
-					$C(c=>1,m=>j,n=>i) = $A(c=>1,m=>j,n=>i);
-				
-				}
-				if (i >= $SIZE(m))
-					break;
-			}
+			broadcastloop %{
+				loop (m,n) %{
+					loop(c) %{ $C() = $A(); %}
+					if (n >= m) break;
+				%}
+			%}
 		}
-		
-
 	',
-	Doc => <<EOT
-
-=for ref
-
-Copy triangular part to another matrix. If uplo == 0 copy upper triangular part.
-
-=cut
-
-EOT
-
+	Doc => undef
 );
 
 pp_bless('PDL');
@@ -4999,41 +4982,27 @@ pp_def(
 	Pars => 'x(c,n,m);y(c,n,p);[o]out(c,n,q);',
 	RedoDimsCode => '$SIZE(q) = $SIZE(m) + $SIZE(n);',
 	Code => '
-	  register PDL_Indx i,j;
-	  loop(m)%{
-		  loop(n)%{
-			  loop(c)%{
-				$out(c=>c,n=>n,q=>m) = $x(c=>c,n=>n,m=>m);
-			%}
-		  %}
+	  loop(m,n,c) %{
+		$out(q=>m) = $x();
 	  %}
-	  j=0;
-	  for (i = $SIZE(m); i < $SIZE(q) ;i++,j++)
+	  register PDL_Indx i,j=0;
+	  for (i = $SIZE(m); i < $SIZE(q); i++,j++)
 	  {
-		  loop(n)%{
-			loop(c)%{
-				$out(c=>c,n=>n,q=>i) = $y(c=>c,n=>n,p=>j);
-			%}
+		  loop(n,c) %{
+			$out(q=>i) = $y(p=>j);
 		  %}
 	  }	
 	',
 
        BackCode => '
-	  register PDL_Indx i,j;
-	  loop(m)%{
-		  loop(n)%{
-			loop(c)%{
-				$x(c=>c,n=>n,m=>m) = $out(c=>c,n=>n,q=>m);
-			%}
-		  %}
+	  loop(m,n,c) %{
+		$x() = $out(q=>m);
 	  %}
-	  j=0;
+	  register PDL_Indx i,j=0;
 	  for (i = $SIZE(m); i < $SIZE(q) ;i++,j++)
 	  {
-		  loop(n)%{
-			loop(c)%{
-				$y(c=>c,n=>n,p=>j) = $out(c=>c,n=>n,q=>i);
-			%}
+		  loop(n,c)%{
+			$y(p=>j) = $out(q=>i);
 		  %}
 	  }
        ',
@@ -5073,11 +5042,9 @@ EOF
 	char ptrans = \'N\';	
 	$GENERIC() alpha[2] = {1,0};
 	$GENERIC() beta[2] = {0,0};
-	loop(n0)%{
-		loop(n1)%{
-			$Y(c=>0,n0=>n0,n1=>n1) = (n0 == n1) ?  ($GENERIC()) 1.0 : ($GENERIC()) 0.0;
-			$Y(c=>1,n0=>n0,n1=>n1) = ($GENERIC()) 0.0;
-		%}	
+	loop(n0,n1) %{
+		$Y(c=>0) = (n0 == n1) ?  ($GENERIC()) 1.0 : ($GENERIC()) 0.0;
+		$Y(c=>1) = ($GENERIC()) 0.0;
 	%}
 	$out(c=>0,p=>0) = 1;
 	$out(c=>1,p=>0) = 0;
@@ -5099,39 +5066,25 @@ EOF
 
 		memmove($P(Y), $P(rwork), 2* $SIZE(n) * $SIZE(n) * sizeof($GENERIC()));
 
-//		loop(n1)
-//		%{
-//			loop(n0)
-//			%{
-//				$Y(c=>0,n0=>n0,n1=>n1) = $P(rwork)[((n1*$SIZE(n))+n0)*2];
-//				$Y(c=>1,n0=>n0,n1=>n1) = $P(rwork)[((n1*$SIZE(n))+n0)*2+1];
-//			%}	
+//		loop(n1,n0,c) %{
+//			$Y() = $P(rwork)[((n1*$SIZE(n))+n0)*2+c];
 //		%}
 
 		c$TFD(f,d)trace($SIZE(n), $P(Y), &tr[0]);
 
-		b[0] = $out(c=>0,p=>i) = - tr[0] / i;
-		b[1] = $out(c=>1,p=>i) = - tr[1] / i;
-		for (j = 0; j < $SIZE(n); j++)
-		{
-			$Y(c=>0,n0=>j,n1=>j) +=  b[0];
-			$Y(c=>1,n0=>j,n1=>j) +=  b[1];
-		}
+		loop(c) %{ b[c] = $out(p=>i) = - tr[c] / i; %}
+		loop (n0,c) %{
+			$Y(n1=>n0) += b[c];
+		%}
 	}
 
 	k = $SIZE(n);
 	c$TFD(f,d)trace(k, $P(rwork), &tr[0]);
-	$out(c=>0,p=>k) = - tr[0] / k;
-	$out(c=>1,p=>k) = - tr[1] / k;
+	loop(c) %{ $out(p=>k) = - tr[c] / k; %}
 	if ((k+1) & 1)
 	{
-		loop(n0)
-		%{
-			loop(n1)
-			%{
-				$Y(c=>0,n0=>n0,n1=>n1) = -$Y(c=>0,n0=>n0,n1=>n1);
-				$Y(c=>1,n0=>n0,n1=>n1) = -$Y(c=>1,n0=>n0,n1=>n1);
-			%}	
+		loop(n0,n1,c) %{
+			$Y() = -$Y();
 		%}
 	}
 	'

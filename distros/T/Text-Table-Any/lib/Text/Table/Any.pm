@@ -8,9 +8,9 @@ use Exporter qw(import);
 our @EXPORT_OK = qw(generate_table);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-03'; # DATE
+our $DATE = '2023-11-11'; # DATE
 our $DIST = 'Text-Table-Any'; # DIST
-our $VERSION = '0.115'; # VERSION
+our $VERSION = '0.117'; # VERSION
 
 our %BACKEND_FEATURES = (
     "Term::Table" => {
@@ -617,7 +617,7 @@ Text::Table::Any - Generate text table using one of several backends
 
 =head1 VERSION
 
-This document describes version 0.115 of Text::Table::Any (from Perl distribution Text-Table-Any), released on 2022-07-03.
+This document describes version 0.117 of Text::Table::Any (from Perl distribution Text-Table-Any), released on 2023-11-11.
 
 =head1 SYNOPSIS
 
@@ -669,7 +669,7 @@ To specify some other options:
  print generate_table(
      rows => $rows,
      header_row => 0,   # default is true
-     separate_row => 1, # default is false
+     separate_rows => 1, # default is false
      caption => "Some of the new distributions released in Jan 2022",
      backend => "Text::Table::Org",
  );
@@ -911,8 +911,12 @@ Optional. Str. Caption of the table.
 Optional. Array of Str or Str.
 
 This takes an array ref with one entry per column, to specify the alignment of
-that column. Legal values are 'l', 'c', and 'r'. You can also specify a single
-alignment for all columns.
+that column. Legal values are 'l', 'c', and 'r' (for left, center, and right,
+respectively). You can also specify a single alignment for all columns.
+
+Not all backends support this. For example, L<Text::Table::Sprintf> prior to
+0.007 does not support this at all. Starting from 0.007, only support left and
+right alignment.
 
 Note that some backends like L<Text::ANSITable> and L<Text::Table::More> support
 per-row or per-cell or even conditional alignment. Some backends like
@@ -971,7 +975,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

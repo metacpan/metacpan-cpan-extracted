@@ -12,9 +12,9 @@ extends 'Data::Sah::Compiler::perl::TH';
 with 'Data::Sah::Type::array';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-19'; # DATE
+our $DATE = '2024-02-16'; # DATE
 our $DIST = 'Data-Sah'; # DIST
-our $VERSION = '0.914'; # VERSION
+our $VERSION = '0.917'; # VERSION
 
 sub handle_type {
     my ($self, $cd) = @_;
@@ -81,13 +81,15 @@ sub superclause_has_elems {
     } elsif ($which eq 'check_each_elem') {
         $self_th->compiler->_die_unimplemented_clause($cd);
     } elsif ($which eq 'uniq') {
-        $self_th->compiler->_die_unimplemented_clause($cd);
+        $self_th->compiler->_die_unimplemented_clause($cd, "for now you can use eData::Sah::Filter::perl::Array::check_uniq instead");
     } elsif ($which eq 'exists') {
         $self_th->compiler->_die_unimplemented_clause($cd);
     }
 }
 
 sub clause_elems {
+    require Data::Sah::Normalize;
+
     my ($self_th, $cd) = @_;
     my $c  = $self_th->compiler;
     my $cv = $cd->{cl_value};
@@ -104,7 +106,7 @@ sub clause_elems {
 
         for my $i (0..@$cv-1) {
             local $cd->{spath} = [@{$cd->{spath}}, $i];
-            my $nsch = $c->main->normalize_schema($cv->[$i]);
+            my $nsch = Data::Sah::Normalize::normalize_schema($cv->[$i]);
             my $edt = "$dt\->[$i]";
             my %iargs = %{$cd->{args}};
             $iargs{outer_cd}             = $cd;
@@ -148,7 +150,7 @@ Data::Sah::Compiler::perl::TH::array - perl's type handler for type "array"
 
 =head1 VERSION
 
-This document describes version 0.914 of Data::Sah::Compiler::perl::TH::array (from Perl distribution Data-Sah), released on 2022-10-19.
+This document describes version 0.917 of Data::Sah::Compiler::perl::TH::array (from Perl distribution Data-Sah), released on 2024-02-16.
 
 =for Pod::Coverage ^(clause_.+|superclause_.+)$
 
@@ -184,7 +186,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

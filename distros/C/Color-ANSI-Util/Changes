@@ -1,3 +1,8 @@
+0.165   2024-02-23  Released-By: PERLANCAR; Urgency: medium
+
+        - More proper try-catch with eval (GH#4).
+
+
 0.164   2020-06-09  Released-By: PERLANCAR; Urgency: medium
 
 	- Add option for ansi_reset() to conditionally return reset

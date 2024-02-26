@@ -6,7 +6,7 @@ use Storable; # RT117983
 use Class::Autouse qw{Carp Locale::Language Locale::Object::Country Locale::Object::DB I18N::AcceptLanguage I18N::LangTags::Detect};
 
 use vars qw($VERSION);
-our $VERSION = '0.65';
+our $VERSION = '0.66';
 
 =head1 NAME
 
@@ -14,7 +14,7 @@ CGI::Lingua - Create a multilingual web page
 
 =head1 VERSION
 
-Version 0.65
+Version 0.66
 
 =cut
 
@@ -586,6 +586,8 @@ sub _find_language {
 								eval {
 									$language_name = $self->_code2countryname($variety);
 								};
+							} elsif($self->{_logger}) {
+								$self->{_logger}->debug("Can't find the country code for $variety in Locale::Object::DB");
 							}
 						}
 						if($@ || !defined($language_name)) {
@@ -596,7 +598,8 @@ sub _find_language {
 						} else {
 							$self->{_sublanguage} = $language_name;
 							if($self->{_logger}) {
-								$self->{_logger}->debug('variety name ', $self->{_sublanguage});
+								# Don't use ',' or else t/logger.t will fail
+								$self->{_logger}->debug('variety name ' . $self->{_sublanguage});
 							}
 							if($self->{_cache} && !defined($from_cache)) {
 								if($self->{_logger}) {
@@ -1214,12 +1217,14 @@ sub time_zone {
 		return $self->{_timezone};
 	}
 
-	if($self->{_have_geoip} == -1) {
-		$self->_load_geoip();
-	}
 	if(my $ip = $ENV{'REMOTE_ADDR'}) {
+		if($self->{_have_geoip} == -1) {
+			$self->_load_geoip();
+		}
 		if($self->{_have_geoip} == 1) {
-			$self->{_timezone} = $self->{_geoip}->time_zone($ip);
+			eval {
+				$self->{_timezone} = $self->{_geoip}->time_zone($ip);
+			};
 		}
 		if(!$self->{_timezone}) {
 			if(eval { require LWP::Simple::WithCache; require JSON::Parse } ) {
@@ -1388,10 +1393,6 @@ L<http://cpants.cpanauthors.org/dist/CGI-Lingua>
 
 L<http://matrix.cpantesters.org/?dist=CGI-Lingua>
 
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/CGI-Lingua>
-
 =item * CPAN Testers Dependencies
 
 L<http://deps.cpantesters.org/?module=CGI::Lingua>
@@ -1402,7 +1403,7 @@ L<http://deps.cpantesters.org/?module=CGI::Lingua>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010-2023 Nigel Horne.
+Copyright 2010-2024 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

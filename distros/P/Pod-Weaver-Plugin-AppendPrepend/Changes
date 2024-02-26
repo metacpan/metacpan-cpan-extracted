@@ -1,5 +1,19 @@
-Revision history for Pod-Weaver-Plugin-AppendPrepend
+0.021   2024-02-06  Released-By: PERLANCAR; Urgency: low
 
-0.01    2015-04-04 (PERLANCAR)
+        - No functional changes.
+
+        - Edit Changes.
+
+
+0.020   2024-02-06  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+        - [incompatible change] When target headline to append/prepend does not
+          exist, now we skip adding the content instead of dying. To get the old
+          behavior, set configuration 'ignore' to false.
+
+        - Add configuration: ignore.
+
+
+0.01    2015-04-04  Released-By: PERLANCAR
 
         - First release.

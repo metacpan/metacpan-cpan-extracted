@@ -1,0 +1,27 @@
+Revision history for perl distribition Mojolicious::Plugin::Config::Structured
+
+1.004      2024-02-23T12:30:09-04:00
+  - modernization improvements
+  - bail out if structure file missing
+
+1.003      2020-08-27T09:40:00-05:00
+  - support passing through hooks
+
+1.002      2020-08-27T09:38:00-05:00
+  - code improvements and bug fixes
+
+1.001      2020-03-06T11:00:00-04:00
+  - code improvements and bug fixes
+
+1.000      2019-10-11T10:03:00-05:00
+  - major refactoring
+  - split out from Config::Structured
+
+0.003      2018-12-18T13:25:00-04:00
+  - improving logical flow and error reporting
+
+0.002      2018-11-29T09:25:00-04:00
+  - restoring necessary imports
+
+0.001      2018-11-29T09:19:00-04:00
+  - initial release

@@ -3,9 +3,9 @@ package Sah::Schema::re_or_code_from_str;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-09-09'; # DATE
+our $DATE = '2023-12-20'; # DATE
 our $DIST = 'Sah-Schemas-Re'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 our $schema = [any => {
     summary => 'Regex (convertable from string of the form `/.../`) or coderef (convertable from string of the form `sub { ... }`)',
@@ -91,7 +91,7 @@ Sah::Schema::re_or_code_from_str - Regex (convertable from string of the form `/
 
 =head1 VERSION
 
-This document describes version 0.005 of Sah::Schema::re_or_code_from_str (from Perl distribution Sah-Schemas-Re), released on 2023-09-09.
+This document describes version 0.006 of Sah::Schema::re_or_code_from_str (from Perl distribution Sah-Schemas-Re), released on 2023-12-20.
 
 =head1 SYNOPSIS
 
@@ -151,11 +151,11 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data);
  
  # a sample valid data
- $data = qr();
+ $data = "//";
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
- $data = "qr(foo(";
+ $data = "/foo";
  my $errmsg = $validator->($data); # => "Not of type object"
 
 Often a schema has coercion rule or default value rules, so after validation the
@@ -166,12 +166,12 @@ validated value will be different from the original. To return the validated
  my $res = $validator->($data); # [$errmsg, $validated_val]
  
  # a sample valid data
- $data = qr();
+ $data = "//";
  my $res = $validator->($data); # => ["",qr()]
  
  # a sample invalid data
- $data = "qr(foo(";
- my $res = $validator->($data); # => ["Not of type object","qr(foo("]
+ $data = "/foo";
+ my $res = $validator->($data); # => ["Not of type object","/foo"]
 
 Data::Sah can also create validator that returns a hash of detailed error
 message. Data::Sah can even create validator that targets other language, like

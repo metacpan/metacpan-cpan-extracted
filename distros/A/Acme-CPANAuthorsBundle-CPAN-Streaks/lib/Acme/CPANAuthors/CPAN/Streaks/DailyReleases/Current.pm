@@ -4,26 +4,36 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-02-01'; # DATE
+our $DATE = '2024-02-21'; # DATE
 our $DIST = 'Acme-CPANAuthorsBundle-CPAN-Streaks'; # DIST
-our $VERSION = '20240201.0'; # VERSION
+our $VERSION = '20240221.0'; # VERSION
 
 use Acme::CPANAuthors::Register (
+    'KIMOTO' => '',
+    'PMQS' => '',
+    'JV' => '',
+    'LITCHIE' => '',
     'PERLANCAR' => '',
-    'LEONT' => '',
-    'AJNN' => '',
-    'BDFOY' => '',
-    'BPS' => '',
-    'DERIV' => '',
-    'EXIFTOOL' => '',
-    'GHE' => '',
-    'HOCHSTEN' => '',
-    'KARASIK' => '',
-    'MANWAR' => '',
-    'SHLOMIF' => '',
-    'SYBER' => '',
-    'WYANT' => '',
-    'TANIGUCHI' => '',
+    'NHORNE' => '',
+    'OETIKER' => '',
+    'TYRRMINAL' => '',
+    'ABALAMA' => '',
+    'FASTLY' => '',
+    'JIMAVERA' => '',
+    'KJETILK' => '',
+    'OALDERS' => '',
+    'OODLER' => '',
+    'RAWLEYFOW' => '',
+    'SANKO' => '',
+    'VOLKENING' => '',
+    'CRORAA' => '',
+    'DWHEELER' => '',
+    'ETJ' => '',
+    'GBROWN' => '',
+    'JDDPAUSE' => '',
+    'KRYDE' => '',
+    'MLEHMANN' => '',
+    'VVELOX' => '',
 );
 
 
@@ -42,33 +52,43 @@ Acme::CPANAuthors::CPAN::Streaks::DailyReleases::Current - Authors with ongoing 
 
 =head1 VERSION
 
-This document describes version 20240201.0 of Acme::CPANAuthors::CPAN::Streaks::DailyReleases::Current (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-02-01.
+This document describes version 20240221.0 of Acme::CPANAuthors::CPAN::Streaks::DailyReleases::Current (from Perl distribution Acme-CPANAuthorsBundle-CPAN-Streaks), released on 2024-02-21.
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-Current standings (as of 2024-02-01, produced by L<cpan-streaks>):
+Current standings (as of 2024-02-21, produced by L<cpan-streaks>):
 
-  +-----------+------+------------+-------------+
-  | author    |  len | start_date | status      |
-  +-----------+------+------------+-------------+
-  | PERLANCAR | 1722 | 2019-05-17 | ongoing     |
-  | LEONT     |    5 | 2024-01-27 | might-break |
-  | AJNN      |    2 | 2024-01-30 | might-break |
-  | BDFOY     |    1 | 2024-01-31 | might-break |
-  | BPS       |    1 | 2024-01-31 | might-break |
-  | DERIV     |    1 | 2024-01-31 | might-break |
-  | EXIFTOOL  |    1 | 2024-01-31 | might-break |
-  | GHE       |    1 | 2024-01-31 | might-break |
-  | HOCHSTEN  |    1 | 2024-01-31 | might-break |
-  | KARASIK   |    1 | 2024-01-31 | might-break |
-  | MANWAR    |    1 | 2024-01-31 | might-break |
-  | SHLOMIF   |    1 | 2024-01-31 | might-break |
-  | SYBER     |    1 | 2024-01-31 | might-break |
-  | WYANT     |    1 | 2024-01-31 | might-break |
-  | TANIGUCHI |    1 | 2024-02-01 | ongoing     |
-  +-----------+------+------------+-------------+
+  +-----------+-----+------------+-------------+
+  | author    | len | start_date | status      |
+  +-----------+-----+------------+-------------+
+  | KIMOTO    |   3 | 2024-02-18 | ongoing     |
+  | PMQS      |   3 | 2024-02-18 | ongoing     |
+  | JV        |   2 | 2024-02-18 | might-break |
+  | LITCHIE   |   2 | 2024-02-18 | might-break |
+  | PERLANCAR |   2 | 2024-02-18 | might-break |
+  | NHORNE    |   2 | 2024-02-19 | ongoing     |
+  | OETIKER   |   2 | 2024-02-19 | ongoing     |
+  | TYRRMINAL |   2 | 2024-02-19 | ongoing     |
+  | ABALAMA   |   1 | 2024-02-19 | might-break |
+  | FASTLY    |   1 | 2024-02-19 | might-break |
+  | JIMAVERA  |   1 | 2024-02-19 | might-break |
+  | KJETILK   |   1 | 2024-02-19 | might-break |
+  | OALDERS   |   1 | 2024-02-19 | might-break |
+  | OODLER    |   1 | 2024-02-19 | might-break |
+  | RAWLEYFOW |   1 | 2024-02-19 | might-break |
+  | SANKO     |   1 | 2024-02-19 | might-break |
+  | VOLKENING |   1 | 2024-02-19 | might-break |
+  | CRORAA    |   1 | 2024-02-20 | ongoing     |
+  | DWHEELER  |   1 | 2024-02-20 | ongoing     |
+  | ETJ       |   1 | 2024-02-20 | ongoing     |
+  | GBROWN    |   1 | 2024-02-20 | ongoing     |
+  | JDDPAUSE  |   1 | 2024-02-20 | ongoing     |
+  | KRYDE     |   1 | 2024-02-20 | ongoing     |
+  | MLEHMANN  |   1 | 2024-02-20 | ongoing     |
+  | VVELOX    |   1 | 2024-02-20 | ongoing     |
+  +-----------+-----+------------+-------------+
 
 =head1 HOMEPAGE
 

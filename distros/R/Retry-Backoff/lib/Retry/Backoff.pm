@@ -6,12 +6,12 @@ use warnings;
 use Log::ger;
 
 use Exporter 'import';
-use Time::HiRes qw(time);
+use Time::HiRes qw(time sleep);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-08'; # DATE
+our $DATE = '2024-02-24'; # DATE
 our $DIST = 'Retry-Backoff'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 our @EXPORT_OK = qw(retry);
 
@@ -133,7 +133,7 @@ Retry::Backoff - Retry a piece of code, with backoff strategies
 
 =head1 VERSION
 
-This document describes version 0.005 of Retry::Backoff (from Perl distribution Retry-Backoff), released on 2023-01-08.
+This document describes version 0.006 of Retry::Backoff (from Perl distribution Retry-Backoff), released on 2024-02-24.
 
 =head1 SYNOPSIS
 
@@ -285,7 +285,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2021, 2019 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2019 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

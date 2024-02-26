@@ -40,9 +40,9 @@
 #define UNUSED(x) (void)(x)
 
 #define HIREDIS_CLUSTER_MAJOR 0
-#define HIREDIS_CLUSTER_MINOR 10
+#define HIREDIS_CLUSTER_MINOR 11
 #define HIREDIS_CLUSTER_PATCH 0
-#define HIREDIS_CLUSTER_SONAME 0.10
+#define HIREDIS_CLUSTER_SONAME 0.11
 
 #define REDIS_CLUSTER_SLOTS 16384
 
@@ -62,6 +62,11 @@
  * Default is the 'cluster nodes' command. */
 #define HIRCLUSTER_FLAG_ROUTE_USE_SLOTS 0x4000
 
+/* Events, for redisClusterSetEventCallback() */
+#define HIRCLUSTER_EVENT_SLOTMAP_UPDATED 1
+#define HIRCLUSTER_EVENT_READY 2
+#define HIRCLUSTER_EVENT_FREE_CONTEXT 3
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -74,7 +79,7 @@ typedef int(adapterAttachFn)(redisAsyncContext *, void *);
 typedef int(sslInitFn)(redisContext *, void *);
 typedef void(redisClusterCallbackFn)(struct redisClusterAsyncContext *, void *,
                                      void *);
-typedef struct cluster_node {
+typedef struct redisClusterNode {
     sds name;
     sds addr;
     sds host;
@@ -84,23 +89,24 @@ typedef struct cluster_node {
     int failure_count; /* consecutive failing attempts in async */
     redisContext *con;
     redisAsyncContext *acon;
+    int64_t lastConnectionAttempt; /* Timestamp */
     struct hilist *slots;
     struct hilist *slaves;
     struct hiarray *migrating; /* copen_slot[] */
     struct hiarray *importing; /* copen_slot[] */
-} cluster_node;
+} redisClusterNode;
 
 typedef struct cluster_slot {
     uint32_t start;
     uint32_t end;
-    cluster_node *node; /* master that this slot region belong to */
+    redisClusterNode *node; /* master that this slot region belong to */
 } cluster_slot;
 
 typedef struct copen_slot {
-    uint32_t slot_num;  /* slot number */
-    int migrate;        /* migrating or importing? */
-    sds remote_name;    /* name of node this slot migrating to/importing from */
-    cluster_node *node; /* master that this slot belong to */
+    uint32_t slot_num; /* slot number */
+    int migrate;       /* migrating or importing? */
+    sds remote_name;   /* name of node this slot migrating to/importing from */
+    redisClusterNode *node; /* master that this slot belong to */
 } copen_slot;
 
 /* Context for accessing a Redis Cluster */
@@ -116,19 +122,22 @@ typedef struct redisClusterContext {
     char *username;                  /* Authenticate using user */
     char *password;                  /* Authentication password */
 
-    struct dict *nodes;     /* Known cluster_nodes*/
-    uint64_t route_version; /* Increased when the node lookup table changes */
-    cluster_node **table;   /* cluster_node lookup table */
+    struct dict *nodes;       /* Known redisClusterNode's */
+    uint64_t route_version;   /* Increased when the node lookup table changes */
+    redisClusterNode **table; /* redisClusterNode lookup table */
 
     struct hilist *requests; /* Outstanding commands (Pipelining) */
 
-    int retry_count;           /* Current number of failing attempts */
-    int need_update_route;     /* Indicator for redisClusterReset() (Pipel.) */
-    int64_t update_route_time; /* Timestamp for next required route update
-                                  (Async mode only) */
+    int retry_count;       /* Current number of failing attempts */
+    int need_update_route; /* Indicator for redisClusterReset() (Pipel.) */
 
     void *ssl; /* Pointer to a redisSSLContext when using SSL/TLS. */
     sslInitFn *ssl_init_fn; /* Func ptr for SSL context initiation */
+
+    void (*on_connect)(const struct redisContext *c, int status);
+    void (*event_callback)(const struct redisClusterContext *cc, int event,
+                           void *privdata);
+    void *event_privdata;
 
 } redisClusterContext;
 
@@ -138,6 +147,8 @@ typedef struct redisClusterAsyncContext {
 
     int err;          /* Error flags, 0 when there is no error */
     char errstr[128]; /* String representation of error when applicable */
+
+    int64_t lastSlotmapUpdateAttempt; /* Timestamp */
 
     void *adapter;              /* Adapter to the async event library */
     adapterAttachFn *attach_fn; /* Func ptr for attaching the async library */
@@ -151,12 +162,12 @@ typedef struct redisClusterAsyncContext {
 
 } redisClusterAsyncContext;
 
-typedef struct nodeIterator {
+typedef struct redisClusterNodeIterator {
     redisClusterContext *cc;
     uint64_t route_version;
     int retries_left;
     dictIterator di;
-} nodeIterator;
+} redisClusterNodeIterator;
 
 /*
  * Synchronous API
@@ -166,8 +177,6 @@ redisClusterContext *redisClusterConnect(const char *addrs, int flags);
 redisClusterContext *redisClusterConnectWithTimeout(const char *addrs,
                                                     const struct timeval tv,
                                                     int flags);
-/* Deprecated function, replaced by redisClusterConnect() */
-redisClusterContext *redisClusterConnectNonBlock(const char *addrs, int flags);
 int redisClusterConnect2(redisClusterContext *cc);
 
 redisClusterContext *redisClusterContextInit(void);
@@ -195,6 +204,24 @@ int redisClusterSetOptionMaxRetry(redisClusterContext *cc, int max_retry_count);
 /* Deprecated function, replaced with redisClusterSetOptionMaxRetry() */
 void redisClusterSetMaxRedirect(redisClusterContext *cc,
                                 int max_redirect_count);
+/* A hook for connect and reconnect attempts, e.g. for applying additional
+ * socket options. This is called just after connect, before TLS handshake and
+ * Redis authentication.
+ *
+ * On successful connection, `status` is set to `REDIS_OK` and the file
+ * descriptor can be accessed as `c->fd` to apply socket options.
+ *
+ * On failed connection attempt, this callback is called with `status` set to
+ * `REDIS_ERR`. The `err` field in the `redisContext` can be used to find out
+ * the cause of the error. */
+int redisClusterSetConnectCallback(redisClusterContext *cc,
+                                   void(fn)(const redisContext *c, int status));
+
+/* A hook for events. */
+int redisClusterSetEventCallback(redisClusterContext *cc,
+                                 void(fn)(const redisClusterContext *cc,
+                                          int event, void *privdata),
+                                 void *privdata);
 
 /* Blocking
  * The following functions will block for a reply, or return NULL if there was
@@ -203,7 +230,7 @@ void redisClusterSetMaxRedirect(redisClusterContext *cc,
 
 /* Variadic commands (like printf) */
 void *redisClusterCommand(redisClusterContext *cc, const char *format, ...);
-void *redisClusterCommandToNode(redisClusterContext *cc, cluster_node *node,
+void *redisClusterCommandToNode(redisClusterContext *cc, redisClusterNode *node,
                                 const char *format, ...);
 /* Variadic using va_list */
 void *redisClustervCommand(redisClusterContext *cc, const char *format,
@@ -222,8 +249,9 @@ void *redisClusterFormattedCommand(redisClusterContext *cc, char *cmd, int len);
 
 /* Variadic commands (like printf) */
 int redisClusterAppendCommand(redisClusterContext *cc, const char *format, ...);
-int redisClusterAppendCommandToNode(redisClusterContext *cc, cluster_node *node,
-                                    const char *format, ...);
+int redisClusterAppendCommandToNode(redisClusterContext *cc,
+                                    redisClusterNode *node, const char *format,
+                                    ...);
 /* Variadic using va_list */
 int redisClustervAppendCommand(redisClusterContext *cc, const char *format,
                                va_list ap);
@@ -239,10 +267,11 @@ int redisClusterGetReply(redisClusterContext *cc, void **reply);
 /* Reset context after a performed pipelining */
 void redisClusterReset(redisClusterContext *cc);
 
+/* Update the slotmap by querying any node. */
+int redisClusterUpdateSlotmap(redisClusterContext *cc);
+
 /* Internal functions */
-int cluster_update_route(redisClusterContext *cc);
-redisContext *ctx_get_by_node(redisClusterContext *cc,
-                              struct cluster_node *node);
+redisContext *ctx_get_by_node(redisClusterContext *cc, redisClusterNode *node);
 struct dict *parse_cluster_nodes(redisClusterContext *cc, char *str,
                                  int str_len, int flags);
 struct dict *parse_cluster_slots(redisClusterContext *cc, redisReply *reply,
@@ -260,8 +289,11 @@ int redisClusterAsyncSetConnectCallback(redisClusterAsyncContext *acc,
 int redisClusterAsyncSetDisconnectCallback(redisClusterAsyncContext *acc,
                                            redisDisconnectCallback *fn);
 
+/* Connect and update slotmap, will block until complete. */
 redisClusterAsyncContext *redisClusterAsyncConnect(const char *addrs,
                                                    int flags);
+/* Connect and update slotmap asynchronously using configured event engine. */
+int redisClusterAsyncConnect2(redisClusterAsyncContext *acc);
 void redisClusterAsyncDisconnect(redisClusterAsyncContext *acc);
 
 /* Commands */
@@ -269,7 +301,7 @@ int redisClusterAsyncCommand(redisClusterAsyncContext *acc,
                              redisClusterCallbackFn *fn, void *privdata,
                              const char *format, ...);
 int redisClusterAsyncCommandToNode(redisClusterAsyncContext *acc,
-                                   cluster_node *node,
+                                   redisClusterNode *node,
                                    redisClusterCallbackFn *fn, void *privdata,
                                    const char *format, ...);
 int redisClustervAsyncCommand(redisClusterAsyncContext *acc,
@@ -279,27 +311,44 @@ int redisClusterAsyncCommandArgv(redisClusterAsyncContext *acc,
                                  redisClusterCallbackFn *fn, void *privdata,
                                  int argc, const char **argv,
                                  const size_t *argvlen);
+int redisClusterAsyncCommandArgvToNode(redisClusterAsyncContext *acc,
+                                       redisClusterNode *node,
+                                       redisClusterCallbackFn *fn,
+                                       void *privdata, int argc,
+                                       const char **argv,
+                                       const size_t *argvlen);
 
 /* Use a Redis protocol encoded string as command */
 int redisClusterAsyncFormattedCommand(redisClusterAsyncContext *acc,
                                       redisClusterCallbackFn *fn,
                                       void *privdata, char *cmd, int len);
 int redisClusterAsyncFormattedCommandToNode(redisClusterAsyncContext *acc,
-                                            cluster_node *node,
+                                            redisClusterNode *node,
                                             redisClusterCallbackFn *fn,
                                             void *privdata, char *cmd, int len);
 
 /* Internal functions */
 redisAsyncContext *actx_get_by_node(redisClusterAsyncContext *acc,
-                                    cluster_node *node);
+                                    redisClusterNode *node);
 
 /* Cluster node iterator functions */
-void initNodeIterator(nodeIterator *iter, redisClusterContext *cc);
-cluster_node *nodeNext(nodeIterator *iter);
+void redisClusterInitNodeIterator(redisClusterNodeIterator *iter,
+                                  redisClusterContext *cc);
+redisClusterNode *redisClusterNodeNext(redisClusterNodeIterator *iter);
 
 /* Helper functions */
 unsigned int redisClusterGetSlotByKey(char *key);
-cluster_node *redisClusterGetNodeByKey(redisClusterContext *cc, char *key);
+redisClusterNode *redisClusterGetNodeByKey(redisClusterContext *cc, char *key);
+
+/* Old names of renamed functions and types, kept for backward compatibility. */
+#ifndef HIRCLUSTER_NO_OLD_NAMES
+#define cluster_update_route redisClusterUpdateSlotmap
+#define initNodeIterator redisClusterInitNodeIterator
+#define nodeNext redisClusterNodeNext
+#define redisClusterConnectNonBlock redisClusterConnect
+typedef struct redisClusterNode cluster_node;
+typedef struct redisClusterNodeIterator nodeIterator;
+#endif
 
 #ifdef __cplusplus
 }

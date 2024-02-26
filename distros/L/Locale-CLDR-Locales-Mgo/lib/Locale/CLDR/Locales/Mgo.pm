@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Mgo - Package for language Metaʼ
 
 package Locale::CLDR::Locales::Mgo;
 # This file auto generated from Data\common\main\mgo.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -93,20 +93,6 @@ has 'display_name_type' => (
 	},
 );
 
-has 'display_name_code_patterns' => (
-	is			=> 'ro',
-	isa			=> HashRef[Str],
-	init_arg	=> undef,
-	default		=> sub {
-		{
-			'language' => '{0}',
- 			'script' => '{0}',
- 			'region' => '{0}',
-
-		}
-	},
-);
-
 has 'characters' => (
 	is			=> 'ro',
 	isa			=> HashRef,
@@ -118,9 +104,8 @@ has 'characters' => (
 		return {
 			auxiliary => qr{[c h l q v x]},
 			index => ['A', 'B', '{CH}', 'D', 'E', 'Ə', 'F', 'G', '{GH}', 'I', 'J', 'K', 'M', 'N', 'Ŋ', 'O', 'Ɔ', 'P', 'R', 'S', 'T', 'U', 'W', 'Y', 'Z', 'ʼ'],
-			main => qr{[a à b {ch} d e è ə {ə̀} f g {gh} i ì j k m n ŋ o ò ɔ {ɔ̀} p r s t u ù w y z ʼ]},
-			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
-			punctuation => qr{[, ; \: ! ? . ' ‘ ’ " “ ”]},
+			main => qr{[aà b {ch} d eè ə{ə̀} f g {gh} iì j k m n ŋ oò ɔ{ɔ̀} p r s t uù w y z ʼ]},
+			punctuation => qr{[, ; \: ! ? . '‘’ "“”]},
 		};
 	},
 EOT
@@ -130,121 +115,11 @@ EOT
 );
 
 
-has 'ellipsis' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub {
-		return {
-			'final' => '{0}…',
-			'initial' => '…{0}',
-			'medial' => '{0}…{1}',
-		};
-	},
-);
-
-has 'more_information' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{?},
-);
-
-has 'quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{“},
-);
-
-has 'quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{”},
-);
-
-has 'alternate_quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{‘},
-);
-
-has 'alternate_quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{’},
-);
-
 has 'units' => (
 	is			=> 'ro',
 	isa			=> HashRef[HashRef[HashRef[Str]]],
 	init_arg	=> undef,
 	default		=> sub { {
-				'long' => {
-					# Long Unit Identifier
-					'duration-day' => {
-						'name' => q(d),
-						'one' => q({0} d),
-						'other' => q({0} d),
-					},
-					# Core Unit Identifier
-					'day' => {
-						'name' => q(d),
-						'one' => q({0} d),
-						'other' => q({0} d),
-					},
-					# Long Unit Identifier
-					'duration-hour' => {
-						'name' => q(h),
-						'one' => q({0} h),
-						'other' => q({0} h),
-					},
-					# Core Unit Identifier
-					'hour' => {
-						'name' => q(h),
-						'one' => q({0} h),
-						'other' => q({0} h),
-					},
-					# Long Unit Identifier
-					'duration-minute' => {
-						'name' => q(min),
-						'one' => q({0} min),
-						'other' => q({0} min),
-					},
-					# Core Unit Identifier
-					'minute' => {
-						'name' => q(min),
-						'one' => q({0} min),
-						'other' => q({0} min),
-					},
-					# Long Unit Identifier
-					'duration-month' => {
-						'name' => q(m),
-						'one' => q({0} m),
-						'other' => q({0} m),
-					},
-					# Core Unit Identifier
-					'month' => {
-						'name' => q(m),
-						'one' => q({0} m),
-						'other' => q({0} m),
-					},
-					# Long Unit Identifier
-					'duration-second' => {
-						'name' => q(s),
-						'one' => q({0} s),
-						'other' => q({0} s),
-					},
-					# Core Unit Identifier
-					'second' => {
-						'name' => q(s),
-						'one' => q({0} s),
-						'other' => q({0} s),
-					},
-				},
 				'short' => {
 					# Long Unit Identifier
 					'duration-day' => {
@@ -261,14 +136,6 @@ has 'units' => (
 					# Core Unit Identifier
 					'hour' => {
 						'name' => q(h),
-					},
-					# Long Unit Identifier
-					'duration-minute' => {
-						'name' => q(min),
-					},
-					# Core Unit Identifier
-					'minute' => {
-						'name' => q(min),
 					},
 					# Long Unit Identifier
 					'duration-month' => {
@@ -304,93 +171,12 @@ has 'nostr' => (
 	default		=> sub { qr'^(?i:ideg.|no|n)$' }
 );
 
-has 'default_numbering_system' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> 'latn',
-);
-
-has native_numbering_system => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> 'latn',
-);
-
-has 'number_symbols' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'latn' => {
-			'decimal' => q(.),
-			'exponential' => q(E),
-			'group' => q(,),
-			'infinity' => q(∞),
-			'list' => q(;),
-			'minusSign' => q(-),
-			'nan' => q(NaN),
-			'perMille' => q(‰),
-			'percentSign' => q(%),
-			'plusSign' => q(+),
-		},
-	} }
-);
-
-has 'number_formats' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		decimalFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0.###',
-				},
-			},
-		},
-		percentFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0%',
-				},
-			},
-		},
-		scientificFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#E0',
-				},
-			},
-		},
-} },
-);
-
-has 'number_currency_formats' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'latn' => {
-			'pattern' => {
-				'default' => {
-					'standard' => {
-						'positive' => '¤ #,##0.00',
-					},
-				},
-			},
-		},
-} },
-);
-
 has 'currencies' => (
 	is			=> 'ro',
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
 		'XAF' => {
-			symbol => 'FCFA',
 			display_name => {
 				'currency' => q(shirè),
 			},
@@ -430,25 +216,6 @@ has 'calendar_months' => (
 							
 						],
 					},
-					narrow => {
-						nonleap => [
-							'M1',
-							'A2',
-							'M3',
-							'N4',
-							'F5',
-							'I6',
-							'A7',
-							'I8',
-							'K9',
-							'10',
-							'11',
-							'12'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'iməg mbegtug',
@@ -470,25 +237,6 @@ has 'calendar_months' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'mbegtug',
-							'imeg àbùbì',
-							'imeg mbəŋchubi',
-							'iməg ngwə̀t',
-							'iməg fog',
-							'iməg ichiibɔd',
-							'iməg àdùmbə̀ŋ',
-							'iməg ichika',
-							'iməg kud',
-							'iməg tèsiʼe',
-							'iməg zò',
-							'iməg krizmed'
-						],
-						leap => [
-							
-						],
-					},
 					narrow => {
 						nonleap => [
 							'M1',
@@ -503,25 +251,6 @@ has 'calendar_months' => (
 							'10',
 							'11',
 							'12'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'iməg mbegtug',
-							'imeg àbùbì',
-							'imeg mbəŋchubi',
-							'iməg ngwə̀t',
-							'iməg fog',
-							'iməg ichiibɔd',
-							'iməg àdùmbə̀ŋ',
-							'iməg ichika',
-							'iməg kud',
-							'iməg tèsiʼe',
-							'iməg zò',
-							'iməg krizmed'
 						],
 						leap => [
 							
@@ -539,24 +268,6 @@ has 'calendar_days' => (
 	default		=> sub { {
 			'gregorian' => {
 				'format' => {
-					abbreviated => {
-						mon => 'Aneg 2',
-						tue => 'Aneg 3',
-						wed => 'Aneg 4',
-						thu => 'Aneg 5',
-						fri => 'Aneg 6',
-						sat => 'Aneg 7',
-						sun => 'Aneg 1'
-					},
-					narrow => {
-						mon => 'A2',
-						tue => 'A3',
-						wed => 'A4',
-						thu => 'A5',
-						fri => 'A6',
-						sat => 'A7',
-						sun => 'A1'
-					},
 					short => {
 						mon => '2',
 						tue => '3',
@@ -577,15 +288,6 @@ has 'calendar_days' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						mon => 'Aneg 2',
-						tue => 'Aneg 3',
-						wed => 'Aneg 4',
-						thu => 'Aneg 5',
-						fri => 'Aneg 6',
-						sat => 'Aneg 7',
-						sun => 'Aneg 1'
-					},
 					narrow => {
 						mon => 'A2',
 						tue => 'A3',
@@ -595,46 +297,8 @@ has 'calendar_days' => (
 						sat => 'A7',
 						sun => 'A1'
 					},
-					short => {
-						mon => '2',
-						tue => '3',
-						wed => '4',
-						thu => '5',
-						fri => '6',
-						sat => '7',
-						sun => '1'
-					},
-					wide => {
-						mon => 'Aneg 2',
-						tue => 'Aneg 3',
-						wed => 'Aneg 4',
-						thu => 'Aneg 5',
-						fri => 'Aneg 6',
-						sat => 'Aneg 7',
-						sun => 'Aneg 1'
-					},
 				},
 			},
-	} },
-);
-
-has 'day_periods' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'gregorian' => {
-			'format' => {
-				'abbreviated' => {
-					'am' => q{AM},
-					'pm' => q{PM},
-				},
-				'wide' => {
-					'am' => q{AM},
-					'pm' => q{PM},
-				},
-			},
-		},
 	} },
 );
 
@@ -646,10 +310,6 @@ has 'eras' => (
 		'generic' => {
 		},
 		'gregorian' => {
-			abbreviated => {
-				'0' => 'BCE',
-				'1' => 'CE'
-			},
 		},
 	} },
 );
@@ -715,12 +375,6 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			d => q{d},
-		},
-		'gregorian' => {
-			d => q{d},
-		},
 	} },
 );
 
@@ -737,27 +391,9 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			fallback => '{0} – {1}',
-		},
-		'gregorian' => {
-			fallback => '{0} – {1}',
-		},
 	} },
 );
 
-has 'time_zone_names' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default	=> sub { {
-		hourFormat => q(+HH:mm;-HH:mm),
-		gmtFormat => q(GMT{0}),
-		gmtZeroFormat => q(GMT),
-		regionFormat => q({0}),
-		fallbackFormat => q({1} ({0})),
-	 } }
-);
 no Moo;
 
 1;

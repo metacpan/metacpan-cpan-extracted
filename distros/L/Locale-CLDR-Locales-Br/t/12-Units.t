@@ -41,8 +41,8 @@ is($locale->unit(1, 'centimeter', 'narrow'), '1cm', 'Breton narrow 1 centimetre'
 is($locale->unit(2, 'centimeter', 'narrow'), '2cm', 'Breton narrow 2 centimetres');
 is($locale->unit(1, 'centimeter', 'short'), '1 cm', 'Breton short 1 centimetre');
 is($locale->unit(2, 'centimeter', 'short'), '2 cm', 'Breton short 2 centimetres');
-is($locale->unit(1, 'centimeter'), '1 c\'hentimetr', 'Breton long 1 centimetre');
-is($locale->unit(2, 'centimeter'), '2 gentimetr', 'Breton long 2 centimetres');
+is($locale->unit(1, 'centimeter'), '1 santimetr', 'Breton long 1 centimetre');
+is($locale->unit(2, 'centimeter'), '2 santimetr', 'Breton long 2 centimetres');
 is($locale->unit(1, 'cubic-kilometer', 'narrow'), '1km³', 'Breton narrow 1 cubic kilometre');
 is($locale->unit(2, 'cubic-kilometer', 'narrow'), '2km³', 'Breton narrow 2 cubic kilometres');
 is($locale->unit(1, 'cubic-kilometer', 'short'), '1 km³', 'Breton short 1 cubic kilometre');

@@ -68,6 +68,7 @@
             "Pod::Usage" : "0",
             "Try::Tiny" : "0",
             "Type::Tiny" : "2.000000",
+            "Types::Path::Tiny" : "0",
             "Types::Self" : "0",
             "Types::URI" : "0",
             "autodie" : "0",
@@ -82,8 +83,7 @@
          "requires" : {
             "File::Touch" : "0",
             "File::Which" : "0",
-            "PAUSE::Packages" : "0",
-            "Path::Class" : "0",
+            "Path::Tiny" : "0.119",
             "Test::More" : "0.98",
             "Test::RequiresInternet" : "0.02"
          }
@@ -92,7 +92,7 @@
    "provides" : {
       "OrePAN2" : {
          "file" : "lib/OrePAN2.pm",
-         "version" : "0.51"
+         "version" : "0.52"
       },
       "OrePAN2::Auditor" : {
          "file" : "lib/OrePAN2/Auditor.pm"
@@ -131,7 +131,7 @@
          "web" : "https://github.com/tokuhirom/OrePAN2"
       }
    },
-   "version" : "0.51",
+   "version" : "0.52",
    "x_authority" : "cpan:TOKUHIROM",
    "x_contributors" : [
       "Chad Granum <exodist7@gmail.com>",

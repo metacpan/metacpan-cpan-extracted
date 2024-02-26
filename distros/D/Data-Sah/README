@@ -2,8 +2,8 @@ NAME
     Data::Sah - Fast and featureful data structure validation
 
 VERSION
-    This document describes version 0.914 of Data::Sah (from Perl
-    distribution Data-Sah), released on 2022-10-19.
+    This document describes version 0.917 of Data::Sah (from Perl
+    distribution Data-Sah), released on 2024-02-16.
 
 SYNOPSIS
     Non-OO interface:
@@ -353,11 +353,11 @@ FAQ
     independent of Data::Sah, it needs to contain the compiler code itself
     (or an interpreter) to compile or evaluate the generated schema.
 
-    However, an "eval_schema()" Sah function which uses Data::Sah can be
+    However, an eval_schema() Sah function which uses Data::Sah can be
     trivially declared and target the Perl compiler.
 
   How to display the validator code being generated?
-    Use the "source => 1" option in "gen_validator()".
+    Use the "source => 1" option in gen_validator().
 
     If you use the OO interface, e.g.:
 
@@ -366,11 +366,10 @@ FAQ
 
     then the generated code is in "$cd->{result}" and you can just print it.
 
-    If you generate validator using "gen_validator()", you can set
-    environment LOG_SAH_VALIDATOR_CODE or package variable
-    $Log_Validator_Code to true and the generated code will be logged at
-    trace level using Log::ger. The log can be displayed using, e.g.,
-    Log::ger::Output::Screen:
+    If you generate validator using gen_validator(), you can set environment
+    LOG_SAH_VALIDATOR_CODE or package variable $Log_Validator_Code to true
+    and the generated code will be logged at trace level using Log::ger. The
+    log can be displayed using, e.g., Log::ger::Output::Screen:
 
      % LOG_SAH_VALIDATOR_CODE=1 TRACE=1 \
        perl -MLog::ger::LevelFromEnv -MLog::ger::Output=Screen \
@@ -565,13 +564,15 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 CONTRIBUTORS
-    *   Michal Sedlák <sedlakmichal@gmail.com>
+    *   mauke <lukasmai.403@gmail.com>
+
+    *   Michal SedlÃ¡k <sedlakmichal@gmail.com>
 
     *   Steven Haryanto <stevenharyanto@gmail.com>
 
     *   Steven Haryanto <steven@masterweb.net>
 
-    *   Szymon Nieznański <s.nez@member.fsf.org>
+    *   Szymon NieznaÅski <s.nez@member.fsf.org>
 
 CONTRIBUTING
     To contribute, you can send patches by email/via RT, or send pull
@@ -590,8 +591,8 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016,
-    2015, 2014, 2013, 2012 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2024, 2022, 2021, 2020, 2019, 2018, 2017,
+    2016, 2015, 2014, 2013, 2012 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

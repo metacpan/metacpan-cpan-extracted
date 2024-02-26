@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-19'; # DATE
+our $DATE = '2023-12-01'; # DATE
 our $DIST = 'App-CompleteCLIs'; # DIST
-our $VERSION = '0.152'; # VERSION
+our $VERSION = '0.153'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Complete/Firefox/complete_firefox_profile_name",
@@ -25,7 +25,7 @@ my $cmdline = Perinci::CmdLine::Any->new(
 
 $cmdline->run;
 
-# ABSTRACT: complete-firefox-profile-name
+# ABSTRACT: Complete from a list of Firefox profile names
 # PODNAME: complete-firefox-profile-name
 
 __END__
@@ -36,11 +36,11 @@ __END__
 
 =head1 NAME
 
-complete-firefox-profile-name - complete-firefox-profile-name
+complete-firefox-profile-name - Complete from a list of Firefox profile names
 
 =head1 VERSION
 
-This document describes version 0.152 of complete-firefox-profile-name (from Perl distribution App-CompleteCLIs), released on 2023-01-19.
+This document describes version 0.153 of complete-firefox-profile-name (from Perl distribution App-CompleteCLIs), released on 2023-12-01.
 
 =head1 SYNOPSIS
 

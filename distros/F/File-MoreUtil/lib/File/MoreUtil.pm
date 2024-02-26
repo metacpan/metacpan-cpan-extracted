@@ -9,9 +9,9 @@ use Cwd ();
 use Exporter 'import';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-08'; # DATE
+our $DATE = '2023-11-02'; # DATE
 our $DIST = 'File-MoreUtil'; # DIST
-our $VERSION = '0.626'; # VERSION
+our $VERSION = '0.628'; # VERSION
 
 our @EXPORT_OK = qw(
                        file_exists
@@ -29,6 +29,9 @@ our @EXPORT_OK = qw(
                        dir_only_has_files
                        dir_only_has_dot_files
                        dir_only_has_non_dot_files
+                       dir_only_has_subdirs
+                       dir_only_has_dot_subdirs
+                       dir_only_has_non_dot_subdirs
 
                        get_dir_entries
                        get_dir_dot_entries
@@ -39,6 +42,8 @@ our @EXPORT_OK = qw(
                        get_dir_files
                        get_dir_dot_files
                        get_dir_non_dot_files
+                       get_dir_only_file
+                       get_dir_only_subdir
                );
 
 our %SPEC;
@@ -182,6 +187,19 @@ sub dir_has_subdirs {
     0;
 }
 
+sub dir_only_has_subdirs {
+    my ($dir) = @_;
+    return undef unless (-d $dir);
+    return undef unless opendir my($dh), $dir;
+    my $has_subdirs;
+    while (defined(my $e = readdir $dh)) {
+        next if $e eq '.' || $e eq '..';
+        return 0 unless -d "$dir/$e";
+        $has_subdirs++;
+    }
+    $has_subdirs ? 1:0;
+}
+
 sub dir_has_non_subdirs {
     my ($dir) = @_;
     return undef unless (-d $dir);
@@ -208,6 +226,20 @@ sub dir_has_dot_subdirs {
     0;
 }
 
+sub dir_only_has_dot_subdirs {
+    my ($dir) = @_;
+    return undef unless (-d $dir);
+    return undef unless opendir my($dh), $dir;
+    my $has_dot_subdirs;
+    while (defined(my $e = readdir $dh)) {
+        next if $e eq '.' || $e eq '..';
+        return 0 unless $e =~ /\A\./;
+        return 0 unless -d "$dir/$e";
+        $has_dot_subdirs++;
+    }
+    $has_dot_subdirs ? 1:0;
+}
+
 sub dir_has_non_dot_subdirs {
     my ($dir) = @_;
     return undef unless (-d $dir);
@@ -220,6 +252,20 @@ sub dir_has_non_dot_subdirs {
         return 1;
     }
     0;
+}
+
+sub dir_only_has_non_dot_subdirs {
+    my ($dir) = @_;
+    return undef unless (-d $dir);
+    return undef unless opendir my($dh), $dir;
+    my $has_nondot_subdirs;
+    while (defined(my $e = readdir $dh)) {
+        next if $e eq '.' || $e eq '..';
+        return 0 if $e =~ /\A\./;
+        return 0 unless -d "$dir/$e";
+        $has_nondot_subdirs++;
+    }
+    $has_nondot_subdirs ? 1:0;
 }
 
 sub get_dir_entries {
@@ -244,7 +290,7 @@ sub get_dir_files {
     my ($dir) = @_;
     $dir //= ".";
     opendir my($dh), $dir or die "Can't opendir $dir: $!";
-    my @res = grep { $_ ne '.' && $_ ne '..' && -f } readdir $dh;
+    my @res = grep { $_ ne '.' && $_ ne '..' && (-f "$dir/$_")} readdir $dh;
     closedir $dh; # we're so nice
     @res;
 }
@@ -253,7 +299,7 @@ sub get_dir_dot_files {
     my ($dir) = @_;
     $dir //= ".";
     opendir my($dh), $dir or die "Can't opendir $dir: $!";
-    my @res = grep { $_ ne '.' && $_ ne '..' && /\A\./ && -f } readdir $dh;
+    my @res = grep { $_ ne '.' && $_ ne '..' && /\A\./ && (-f "$dir/$_")} readdir $dh;
     closedir $dh; # we're so nice
     @res;
 }
@@ -262,7 +308,7 @@ sub get_dir_non_dot_files {
     my ($dir) = @_;
     $dir //= ".";
     opendir my($dh), $dir or die "Can't opendir $dir: $!";
-    my @res = grep { $_ ne '.' && $_ ne '..' && !/\A\./ && -f } readdir $dh;
+    my @res = grep { $_ ne '.' && $_ ne '..' && !/\A\./ && (-f "$dir/$_")} readdir $dh;
     closedir $dh; # we're so nice
     @res;
 }
@@ -271,7 +317,7 @@ sub get_dir_subdirs {
     my ($dir) = @_;
     $dir //= ".";
     opendir my($dh), $dir or die "Can't opendir $dir: $!";
-    my @res = grep { $_ ne '.' && $_ ne '..' && !(-l) && (-d _) } readdir $dh;
+    my @res = grep { $_ ne '.' && $_ ne '..' && !(-l "$dir/$_") && (-d _) } readdir $dh;
     closedir $dh; # we're so nice
     @res;
 }
@@ -280,7 +326,7 @@ sub get_dir_non_subdirs {
     my ($dir) = @_;
     $dir //= ".";
     opendir my($dh), $dir or die "Can't opendir $dir: $!";
-    my @res = grep { $_ ne '.' && $_ ne '..' && ((-l) || !(-d _)) } readdir $dh;
+    my @res = grep { $_ ne '.' && $_ ne '..' && ((-l "$dir/$_") || !(-d _)) } readdir $dh;
     closedir $dh; # we're so nice
     @res;
 }
@@ -289,7 +335,7 @@ sub get_dir_dot_subdirs {
     my ($dir) = @_;
     $dir //= ".";
     opendir my($dh), $dir or die "Can't opendir $dir: $!";
-    my @res = grep { $_ ne '.' && $_ ne '..' && /\A\./ && !(-l) && (-d _) } readdir $dh;
+    my @res = grep { $_ ne '.' && $_ ne '..' && /\A\./ && !(-l "$dir/$_") && (-d _) } readdir $dh;
     closedir $dh; # we're so nice
     @res;
 }
@@ -298,9 +344,39 @@ sub get_dir_non_dot_subdirs {
     my ($dir) = @_;
     $dir //= ".";
     opendir my($dh), $dir or die "Can't opendir $dir: $!";
-    my @res = grep { $_ ne '.' && $_ ne '..' && !/\A\./ && !(-l) && (-d _) } readdir $dh;
+    my @res = grep { $_ ne '.' && $_ ne '..' && !/\A\./ && !(-l "$dir/$_") && (-d _) } readdir $dh;
     closedir $dh; # we're so nice
     @res;
+}
+
+sub get_dir_only_file {
+    my ($dir) = @_;
+    $dir //= ".";
+    opendir my($dh), $dir or die "Can't opendir $dir: $!";
+    my $res;
+    while (defined(my $e = readdir $dh)) {
+        next if $e eq '.' || $e eq '..';
+        return unless -f "$dir/$e";
+        return if defined $res;
+        $res = $e;
+    }
+    return unless defined $res;
+    $res;
+}
+
+sub get_dir_only_subdir {
+    my ($dir) = @_;
+    $dir //= ".";
+    opendir my($dh), $dir or die "Can't opendir $dir: $!";
+    my $res;
+    while (defined(my $e = readdir $dh)) {
+        next if $e eq '.' || $e eq '..';
+        return unless -d "$dir/$e";
+        return if defined $res;
+        $res = $e;
+    }
+    return unless defined $res;
+    $res;
 }
 
 1;
@@ -318,7 +394,7 @@ File::MoreUtil - File-related utilities
 
 =head1 VERSION
 
-This document describes version 0.626 of File::MoreUtil (from Perl distribution File-MoreUtil), released on 2022-08-08.
+This document describes version 0.628 of File::MoreUtil (from Perl distribution File-MoreUtil), released on 2023-11-02.
 
 =head1 SYNOPSIS
 
@@ -333,6 +409,12 @@ This document describes version 0.626 of File::MoreUtil (from Perl distribution 
      dir_has_non_subdirs
      dir_has_dot_subdirs
      dir_has_non_dot_subdirs
+     dir_only_has_files
+     dir_only_has_dot_files
+     dir_only_has_non_dot_files
+     dir_only_has_subdirs
+     dir_only_has_dot_subdirs
+     dir_only_has_non_dot_subdirs
 
      get_dir_entries
      get_dir_dot_entries
@@ -343,6 +425,8 @@ This document describes version 0.626 of File::MoreUtil (from Perl distribution 
      get_dir_files
      get_dir_dot_files
      get_dir_non_dot_files
+     get_dir_only_file
+     get_dir_only_subdir
  );
 
  print "file exists" if file_exists("/path/to/file/or/dir");
@@ -536,6 +620,33 @@ Will return true if C<$dir> exists and has one or more plain non-dot files in it
 *and* does not have anything else. See L</dir_has_files> for the definition of
 plain files.
 
+=head2 dir_only_has_subdirs
+
+Usage:
+
+ dir_only_has_subdirs($dir) => BOOL
+
+Will return true if C<$dir> exists and has one or more subdirectories in it
+*and* does not have anything else.
+
+=head2 dir_only_has_dot_subdirs
+
+Usage:
+
+ dir_only_has_dot_subdirs($dir) => BOOL
+
+Will return true if C<$dir> exists and has one or more dot subdirectories in it
+*and* does not have anything else.
+
+=head2 dir_only_has_non_dot_subdirs
+
+Usage:
+
+ dir_only_has_non_dot_subdirs($dir) => BOOL
+
+Will return true if C<$dir> exists and has one or more plain non-dot
+subdirectories in it *and* does not have anything else.
+
 =head2 get_dir_entries
 
 Usage:
@@ -664,6 +775,24 @@ Basically a shortcut for something like:
 
  my @non_dot_subdirnames = do { opendir my $dh, $dir; grep { !/\A\./ && -d } readdir $dh };
 
+=head2 get_dir_only_file
+
+Usage:
+
+ my $filename = get_dir_only_file([ $dir ]);
+
+Return filename inside directory C<$dir> (or current directory if unspecified)
+only if C<$dir> has a single plain file and nothing else.
+
+=head2 get_dir_only_subdir
+
+Usage:
+
+ my $subdirname = get_dir_only_subdir([ $dir ]);
+
+Return subdirectory name inside directory C<$dir> (or current directory if
+unspecified) only if C<$dir> has a single subdirectory and nothing else.
+
 =head1 FAQ
 
 =head2 Where is file_empty()?
@@ -681,7 +810,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/File-MoreU
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-SHARYANTO-File-Util>.
+Source repository is at L<https://github.com/perlancar/perl-File-MoreUtil>.
 
 =head1 SEE ALSO
 
@@ -717,7 +846,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2019, 2017, 2015, 2014, 2013 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2021, 2020, 2019, 2017, 2015, 2014, 2013 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

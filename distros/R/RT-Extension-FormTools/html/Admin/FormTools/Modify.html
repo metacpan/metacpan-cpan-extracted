@@ -420,7 +420,7 @@
 %         $i = 0;
 %         for my $item ( grep { $_->{type} ne 'hidden' || $_->{'input-name'} ne 'create_ticket' } @{$form->{'formtools-pages'}{$page_name}{content} || []} ) {
             <div class="modal fade formtools-element-modal" id="formtools-element-<% $form_page_id{$page_name} %>-<% $i %>-modal" tabindex="-1" role="dialog" data-type="<% $item->{type} %>" data-name="<% $item->{arguments} && $item->{arguments}{name} ? $item->{arguments}{name} : '' %>">
-              <div class="modal-dialog <% $item->{type} eq 'component' && %dependent_custom_fields && !RT::Extension::FormTools::is_core_field($item->{arguments}{name}) ? 'modal-lg' : '' %>" role="document">
+              <div class="modal-dialog <% $item->{type} eq 'component' && $item->{comp_name} ne 'ShowChoices' && %dependent_custom_fields && !RT::Extension::FormTools::is_core_field($item->{arguments}{name}) ? 'modal-lg' : '' %>" role="document">
                 <div class="modal-content">
                   <form class="formtools-element-form">
                     <div class="modal-header">

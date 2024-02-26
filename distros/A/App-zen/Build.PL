@@ -2,7 +2,7 @@
 use warnings;
 use strict;
 use Module::Build;
- 
+
 my $build=Module::Build->new(
   module_name => 'App::zen',
   license => 'perl',
@@ -14,6 +14,12 @@ my $build=Module::Build->new(
   },
   requires => {
     'JSON' => 0,
+    'HTTP::Server::Simple' => 0,
+    'File::Slurp' => 0,
+    'File::Type' => 0,
+    'HTTP::Server::Simple::CGI' => 0,
+    'File::Basename' => 0,
+    'File::Path' => 0,
   },
   create_makefile_pl => 'traditional' # don't require having Module::Build for end-users
 )->create_build_script;

@@ -4,7 +4,7 @@ Genealogy::Wills - Lookup in a database of wills
 
 # VERSION
 
-Version 0.03
+Version 0.04
 
 # SYNOPSIS
 
@@ -19,7 +19,7 @@ Version 0.03
 
 Creates a Genealogy::Wills object.
 
-Takes two optionals arguments:
+Takes two optional arguments:
 	directory: that is the directory containing obituaries.sql
 	logger: an object to send log messages to
 
@@ -62,16 +62,12 @@ You can also look for information at:
 
     [http://matrix.cpantesters.org/?dist=Genealogy-Wills](http://matrix.cpantesters.org/?dist=Genealogy-Wills)
 
-- CPAN Ratings
-
-    [http://cpanratings.perl.org/d/Genealogy-Wills](http://cpanratings.perl.org/d/Genealogy-Wills)
-
 - CPAN Testers Dependencies
 
     [http://deps.cpantesters.org/?module=Genealogy::Wills](http://deps.cpantesters.org/?module=Genealogy::Wills)
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2023 Nigel Horne.
+Copyright 2023-2024 Nigel Horne.
 
 This program is released under the following licence: GPL2

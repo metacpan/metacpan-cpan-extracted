@@ -1,12 +1,12 @@
 package Locale::CLDR::Locales::Root;
 # This file auto generated from Data\common\main\root.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -14,6 +14,18 @@ use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
+
+has 'segmentation_parent' => (
+	is => 'ro',
+	isa => Str,
+	init_arg => undef,
+	default => sub {
+    my $self = shift;
+    my $mod_ref = ref $self;
+    no strict 'refs';
+    return ${ "${mod_ref}::ISA" }[0];
+},
+);
 
 has 'GraphemeClusterBreak_variables' => (
 	is => 'ro',
@@ -33,10 +45,11 @@ has 'GraphemeClusterBreak_variables' => (
 		'$T' => '\p{Grapheme_Cluster_Break=T}',
 		'$LV' => '\p{Grapheme_Cluster_Break=LV}',
 		'$LVT' => '\p{Grapheme_Cluster_Break=LVT}',
-		'$Virama' => '[\p{Gujr}\p{sc=Telu}\p{sc=Mlym}\p{sc=Orya}\p{sc=Beng}\p{sc=Deva}&\p{Indic_Syllabic_Category=Virama}]',
-		'$LinkingConsonant' => '[\p{Gujr}\p{sc=Telu}\p{sc=Mlym}\p{sc=Orya}\p{sc=Beng}\p{sc=Deva}&\p{Indic_Syllabic_Category=Consonant}]',
+		'$ConjunctLinkingScripts' => '[\p{Gujr}\p{sc=Telu}\p{sc=Mlym}\p{sc=Orya}\p{sc=Beng}\p{sc=Deva}]',
+		'$ConjunctLinker' => '\p{Indic_Conjunct_Break=Linker}',
+		'$LinkingConsonant' => '\p{Indic_Conjunct_Break=Consonant}',
 		'$ExtPict' => '\p{Extended_Pictographic}',
-		'$ExtCccZwj' => '[[$Extend-\p{ccc=0}] $ZWJ]',
+		'$ExtCccZwj' => '[\p{Indic_Conjunct_Break=Linker}\p{Indic_Conjunct_Break=Extend}]',
 	]}
 );
 
@@ -54,7 +67,7 @@ has 'GraphemeClusterBreak_rules' => (
 		'9' => ' × ($Extend | $ZWJ) ',
 		'9.1' => ' × $SpacingMark ',
 		'9.2' => ' $Prepend × ',
-		'9.3' => ' $LinkingConsonant $ExtCccZwj* $Virama $ExtCccZwj* × $LinkingConsonant ',
+		'9.3' => ' $LinkingConsonant $ExtCccZwj* $ConjunctLinker $ExtCccZwj* × $LinkingConsonant ',
 		'11' => ' $ExtPict $Extend* $ZWJ × $ExtPict ',
 		'12' => ' ^ ($RI $RI)* $RI × $RI ',
 		'13' => ' [^$RI] ($RI $RI)* $RI × $RI ',
@@ -69,10 +82,10 @@ has 'WordBreak_variables' => (
 		'$LF' => '\p{Word_Break=LF}',
 		'$Newline' => '\p{Word_Break=Newline}',
 		'$Extend' => '\p{Word_Break=Extend}',
-		'$Format' => '\p{Word_Break=Format}',
+		'$Format' => '[\p{Word_Break=Format}]',
 		'$Katakana' => '\p{Word_Break=Katakana}',
 		'$ALetter' => '\p{Word_Break=ALetter}',
-		'$MidLetter' => '\p{Word_Break=MidLetter}',
+		'$MidLetter' => '[\p{Word_Break = MidLetter} - [\: ﹕ ：]]',
 		'$MidNum' => '\p{Word_Break=MidNum}',
 		'$MidNumLet' => '\p{Word_Break=MidNumLet}',
 		'$Numeric' => '\p{Word_Break=Numeric}',
@@ -193,7 +206,10 @@ has 'LineBreak_variables' => (
 	init_arg => undef,
 	default => sub {[
 		'$AI' => '\p{Line_Break=Ambiguous}',
+		'$AK' => '\p{Line_Break=Aksara}',
 		'$AL' => '\p{Line_Break=Alphabetic}',
+		'$AP' => '\p{Line_Break=Aksara_Prebase}',
+		'$AS' => '\p{Line_Break=Aksara_Start}',
 		'$B2' => '\p{Line_Break=Break_Both}',
 		'$BA' => '\p{Line_Break=Break_After}',
 		'$BB' => '\p{Line_Break=Break_Before}',
@@ -201,7 +217,6 @@ has 'LineBreak_variables' => (
 		'$CB' => '\p{Line_Break=Contingent_Break}',
 		'$CL' => '\p{Line_Break=Close_Punctuation}',
 		'$CP' => '\p{Line_Break=CP}',
-		'$CP30' => '[$CP - [\p{ea=F}\p{ea=W}\p{ea=H}]]',
 		'$CM1' => '\p{Line_Break=Combining_Mark}',
 		'$CR' => '\p{Line_Break=Carriage_Return}',
 		'$EX' => '\p{Line_Break=Exclamation}',
@@ -221,7 +236,6 @@ has 'LineBreak_variables' => (
 		'$NS' => '\p{Line_Break=Nonstarter}',
 		'$NU' => '\p{Line_Break=Numeric}',
 		'$OP' => '\p{Line_Break=Open_Punctuation}',
-		'$OP30' => '[$OP - [\p{ea=F}\p{ea=W}\p{ea=H}]]',
 		'$PO' => '\p{Line_Break=Postfix_Numeric}',
 		'$PR' => '\p{Line_Break=Prefix_Numeric}',
 		'$QU' => '\p{Line_Break=Quotation}',
@@ -229,6 +243,8 @@ has 'LineBreak_variables' => (
 		'$SG' => '\p{Line_Break=Surrogate}',
 		'$SP' => '\p{Line_Break=Space}',
 		'$SY' => '\p{Line_Break=Break_Symbols}',
+		'$VF' => '\p{Line_Break=Virama_Final}',
+		'$VI' => '\p{Line_Break=Virama}',
 		'$WJ' => '\p{Line_Break=Word_Joiner}',
 		'$XX' => '\p{Line_Break=Unknown}',
 		'$ZW' => '\p{Line_Break=ZWSpace}',
@@ -238,7 +254,14 @@ has 'LineBreak_variables' => (
 		'$EM' => '\p{Line_Break=E_Modifier}',
 		'$ZWJ_O' => '\p{Line_Break=ZWJ}',
 		'$ZWJ' => '\p{Line_Break=ZWJ}',
+		'$QU_Pi' => '[$QU & \p{gc=Pi}]',
+		'$QU_Pf' => '[$QU & \p{gc=Pf}]',
+		'$DottedCircle' => '◌',
+		'$CP30' => '[$CP-[\p{ea=F}\p{ea=W}\p{ea=H}]]',
+		'$OP30' => '[$OP-[\p{ea=F}\p{ea=W}\p{ea=H}]]',
 		'$ExtPictUnassigned' => '[\p{Extended_Pictographic}&\p{gc=Cn}]',
+		'$sot' => '^',
+		'$eot' => '(?!.)',
 		'$CM' => '[$CM1 $ZWJ]',
 		'$AL' => '[$AI $AL $SG $XX $SA]',
 		'$NS' => '[$NS $CJ]',
@@ -248,16 +271,17 @@ has 'LineBreak_variables' => (
 		'$Spec3a_' => '[^ $SP $BA $HY $CM]',
 		'$Spec3b_' => '[^ $BA $HY $CM]',
 		'$Spec4_' => '[^ $NU $CM]',
-		'$Spec5_' => '[$BK $CB $CR $LF $NL $SP $ZW]',
 		'$AI' => '($AI $X)',
+		'$AK' => '($AK $X)',
 		'$AL' => '($AL $X)',
+		'$AP' => '($AP $X)',
+		'$AS' => '($AS $X)',
 		'$B2' => '($B2 $X)',
 		'$BA' => '($BA $X)',
 		'$BB' => '($BB $X)',
 		'$CB' => '($CB $X)',
 		'$CL' => '($CL $X)',
 		'$CP' => '($CP $X)',
-		'$CP30' => '($CP30 $X)',
 		'$CM' => '($CM $X)',
 		'$EX' => '($EX $X)',
 		'$GL' => '($GL $X)',
@@ -274,19 +298,25 @@ has 'LineBreak_variables' => (
 		'$NS' => '($NS $X)',
 		'$NU' => '($NU $X)',
 		'$OP' => '($OP $X)',
-		'$OP30' => '($OP30 $X)',
 		'$PO' => '($PO $X)',
 		'$PR' => '($PR $X)',
 		'$QU' => '($QU $X)',
 		'$SA' => '($SA $X)',
 		'$SG' => '($SG $X)',
 		'$SY' => '($SY $X)',
+		'$VF' => '($VF $X)',
+		'$VI' => '($VI $X)',
 		'$WJ' => '($WJ $X)',
 		'$XX' => '($XX $X)',
 		'$RI' => '($RI $X)',
 		'$EB' => '($EB $X)',
 		'$EM' => '($EM $X)',
 		'$ZWJ' => '($ZWJ $X)',
+		'$QU_Pi' => '($QU_Pi $X)',
+		'$QU_Pf' => '($QU_Pf $X)',
+		'$DottedCircle' => '($DottedCircle $X)',
+		'$CP30' => '($CP30 $X)',
+		'$OP30' => '($OP30 $X)',
 		'$AL' => '($AL | ^ $CM | (?<=$Spec1_) $CM)',
 	]}
 );
@@ -318,7 +348,8 @@ has 'LineBreak_rules' => (
 		'13.03' => ' $Spec4_ $CM+ × ($CL | $CP | $IS | $SY) ',
 		'13.04' => ' ^ $CM+ × ($CL | $CP | $IS | $SY) ',
 		'14' => ' $OP $SP* × ',
-		'15' => ' $QU $SP* × $OP ',
+		'15.11' => ' ( $sot | $BK | $CR | $LF | $NL | $OP | $QU | $GL | $SP | $ZW ) $QU_Pi $SP* × ',
+		'15.21' => ' × $QU_Pf ( $SP | $GL | $WJ | $CL | $QU | $CP | $EX | $IS | $SY | $BK | $CR | $LF | $NL | $ZW | $eot ) ',
 		'16' => ' ($CL | $CP) $SP* × $NS ',
 		'17' => ' $B2 $SP* × $B2 ',
 		'18' => ' $SP ÷ ',
@@ -326,14 +357,13 @@ has 'LineBreak_rules' => (
 		'19.02' => ' $QU × ',
 		'20.01' => ' ÷ $CB ',
 		'20.02' => ' $CB ÷ ',
-		'20.09' => ' $Spec5_ $HY × $AL ',
 		'21.01' => ' × $BA ',
 		'21.02' => ' × $HY ',
 		'21.03' => ' × $NS ',
 		'21.04' => ' $BB × ',
 		'21.1' => ' $HL ($HY | $BA) × ',
 		'21.2' => ' $SY × $HL ',
-		'22.01' => ' × $IN ',
+		'22' => ' × $IN ',
 		'23.02' => ' ($AL | $HL) × $NU ',
 		'23.03' => ' $NU × ($AL | $HL) ',
 		'23.12' => ' $PR × ($ID | $EB | $EM) ',
@@ -348,14 +378,17 @@ has 'LineBreak_rules' => (
 		'26.01' => ' $JL × $JL | $JV | $H2 | $H3 ',
 		'26.02' => ' $JV | $H2 × $JV | $JT ',
 		'26.03' => ' $JT | $H3 × $JT ',
-		'27.01' => ' $JL | $JV | $JT | $H2 | $H3 × $IN ',
-		'27.02' => ' $JL | $JV | $JT | $H2 | $H3 × $PO ',
-		'27.03' => ' $PR × $JL | $JV | $JT | $H2 | $H3 ',
+		'27.01' => ' $JL | $JV | $JT | $H2 | $H3 × $PO ',
+		'27.02' => ' $PR × $JL | $JV | $JT | $H2 | $H3 ',
 		'28' => ' ($AL | $HL) × ($AL | $HL) ',
+		'28.11' => ' $AP × ($AK | $DottedCircle | $AS) ',
+		'28.12' => ' ($AK | $DottedCircle | $AS) × ($VF | $VI) ',
+		'28.13' => ' ($AK | $DottedCircle | $AS) $VI × ($AK | $DottedCircle) ',
+		'28.14' => ' ($AK | $DottedCircle | $AS) × ($AK | $DottedCircle | $AS) $VF ',
 		'29' => ' $IS × ($AL | $HL) ',
 		'30.01' => ' ($AL | $HL | $NU) × $OP30 ',
 		'30.02' => ' $CP30 × ($AL | $HL | $NU) ',
-		'30.11' => ' ^ ($RI $RI)* $RI × $RI ',
+		'30.11' => ' $sot ($RI $RI)* $RI × $RI ',
 		'30.12' => ' [^$RI] ($RI $RI)* $RI × $RI ',
 		'30.13' => ' $RI ÷ $RI ',
 		'30.21' => ' $EB × $EM ',
@@ -366,7 +399,7 @@ has 'valid_algorithmic_formats' => (
     is => 'ro',
     isa => ArrayRef,
     init_arg => undef,
-    default => sub {[ 'armenian-lower','armenian-upper','cyrillic-lower','ethiopic','georgian','greek-lower','greek-upper','hebrew','hebrew-item','roman-lower','roman-upper','tamil','digits-ordinal','spellout-numbering-year','spellout-numbering','spellout-cardinal','spellout-ordinal' ]},
+    default => sub {[ 'armenian-lower','armenian-upper','cyrillic-lower','ethiopic','georgian','greek-lower','greek-upper','hebrew','hebrew-item','roman-lower','roman-upper','tamil','zz-default','digits-ordinal','spellout-numbering-year','spellout-numbering','spellout-cardinal','spellout-ordinal' ]},
 );
 
 has 'algorithmic_number_format_data' => (
@@ -3810,6 +3843,20 @@ has 'algorithmic_number_format_data' => (
 				},
 			},
 		},
+		'zz-default' => {
+			'public' => {
+				'0' => {
+					base_value => q(0),
+					divisor => q(1),
+					rule => q(=#,##0=),
+				},
+				'max' => {
+					base_value => q(0),
+					divisor => q(1),
+					rule => q(=#,##0=),
+				},
+			},
+		},
     } },
 );
 
@@ -4104,12 +4151,28 @@ has 'units' => (
 						'1' => q(y{0}),
 					},
 					# Long Unit Identifier
+					'10p-27' => {
+						'1' => q(r{0}),
+					},
+					# Core Unit Identifier
+					'27' => {
+						'1' => q(r{0}),
+					},
+					# Long Unit Identifier
 					'10p-3' => {
 						'1' => q(m{0}),
 					},
 					# Core Unit Identifier
 					'3' => {
 						'1' => q(m{0}),
+					},
+					# Long Unit Identifier
+					'10p-30' => {
+						'1' => q(q{0}),
+					},
+					# Core Unit Identifier
+					'30' => {
+						'1' => q(q{0}),
 					},
 					# Long Unit Identifier
 					'10p-6' => {
@@ -4184,12 +4247,28 @@ has 'units' => (
 						'1' => q(Y{0}),
 					},
 					# Long Unit Identifier
+					'10p27' => {
+						'1' => q(R{0}),
+					},
+					# Core Unit Identifier
+					'10p27' => {
+						'1' => q(R{0}),
+					},
+					# Long Unit Identifier
 					'10p3' => {
 						'1' => q(k{0}),
 					},
 					# Core Unit Identifier
 					'10p3' => {
 						'1' => q(k{0}),
+					},
+					# Long Unit Identifier
+					'10p30' => {
+						'1' => q(Q{0}),
+					},
+					# Core Unit Identifier
+					'10p30' => {
+						'1' => q(Q{0}),
 					},
 					# Long Unit Identifier
 					'10p6' => {
@@ -4738,6 +4817,18 @@ has 'units' => (
 					'nanosecond' => {
 						'name' => q(ns),
 						'other' => q({0} ns),
+					},
+					# Long Unit Identifier
+					'duration-quarter' => {
+						'name' => q(qtr),
+						'other' => q({0} q),
+						'per' => q({0}/q),
+					},
+					# Core Unit Identifier
+					'quarter' => {
+						'name' => q(qtr),
+						'other' => q({0} q),
+						'per' => q({0}/q),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
@@ -5350,16 +5441,6 @@ has 'units' => (
 						'per' => q({0}/kg),
 					},
 					# Long Unit Identifier
-					'mass-metric-ton' => {
-						'name' => q(t),
-						'other' => q({0} t),
-					},
-					# Core Unit Identifier
-					'metric-ton' => {
-						'name' => q(t),
-						'other' => q({0} t),
-					},
-					# Long Unit Identifier
 					'mass-microgram' => {
 						'name' => q(μg),
 						'other' => q({0} μg),
@@ -5442,6 +5523,16 @@ has 'units' => (
 					'ton' => {
 						'name' => q(tn),
 						'other' => q({0} tn),
+					},
+					# Long Unit Identifier
+					'mass-tonne' => {
+						'name' => q(t),
+						'other' => q({0} t),
+					},
+					# Core Unit Identifier
+					'tonne' => {
+						'name' => q(t),
+						'other' => q({0} t),
 					},
 					# Long Unit Identifier
 					'per' => {
@@ -5630,6 +5721,16 @@ has 'units' => (
 					'pound-force-per-square-inch' => {
 						'name' => q(psi),
 						'other' => q({0} psi),
+					},
+					# Long Unit Identifier
+					'speed-beaufort' => {
+						'name' => q(Bft),
+						'other' => q(B {0}),
+					},
+					# Core Unit Identifier
+					'beaufort' => {
+						'name' => q(Bft),
+						'other' => q(B {0}),
 					},
 					# Long Unit Identifier
 					'speed-kilometer-per-hour' => {
@@ -6114,8 +6215,8 @@ has 'listPatterns' => (
 	default		=> sub { {
 				start => q({0}, {1}),
 				middle => q({0}, {1}),
-				end => q({0}, or {1}),
-				2 => q({0} or {1}),
+				end => q({0}, {1}),
+				2 => q({0}, {1}),
 		} }
 );
 
@@ -6146,6 +6247,7 @@ has 'number_symbols' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'adlm' => { 'alias' => 'latn' },
+		'ahom' => { 'alias' => 'latn' },
 		'arab' => {
 			'decimal' => q(٫),
 			'exponential' => q(اس),
@@ -6176,19 +6278,23 @@ has 'number_symbols' => (
 		},
 		'bali' => { 'alias' => 'latn' },
 		'beng' => { 'alias' => 'latn' },
+		'bhks' => { 'alias' => 'latn' },
 		'brah' => { 'alias' => 'latn' },
 		'cakm' => { 'alias' => 'latn' },
 		'cham' => { 'alias' => 'latn' },
 		'deva' => { 'alias' => 'latn' },
+		'diak' => { 'alias' => 'latn' },
 		'fullwide' => { 'alias' => 'latn' },
 		'gong' => { 'alias' => 'latn' },
 		'gonm' => { 'alias' => 'latn' },
 		'gujr' => { 'alias' => 'latn' },
 		'guru' => { 'alias' => 'latn' },
 		'hanidec' => { 'alias' => 'latn' },
+		'hmng' => { 'alias' => 'latn' },
 		'hmnp' => { 'alias' => 'latn' },
 		'java' => { 'alias' => 'latn' },
 		'kali' => { 'alias' => 'latn' },
+		'kawi' => { 'alias' => 'latn' },
 		'khmr' => { 'alias' => 'latn' },
 		'knda' => { 'alias' => 'latn' },
 		'lana' => { 'alias' => 'latn' },
@@ -6210,18 +6316,31 @@ has 'number_symbols' => (
 		},
 		'lepc' => { 'alias' => 'latn' },
 		'limb' => { 'alias' => 'latn' },
+		'mathbold' => { 'alias' => 'latn' },
+		'mathdbl' => { 'alias' => 'latn' },
+		'mathmono' => { 'alias' => 'latn' },
+		'mathsanb' => { 'alias' => 'latn' },
+		'mathsans' => { 'alias' => 'latn' },
 		'mlym' => { 'alias' => 'latn' },
+		'modi' => { 'alias' => 'latn' },
 		'mong' => { 'alias' => 'latn' },
+		'mroo' => { 'alias' => 'latn' },
 		'mtei' => { 'alias' => 'latn' },
 		'mymr' => { 'alias' => 'latn' },
 		'mymrshan' => { 'alias' => 'latn' },
+		'mymrtlng' => { 'alias' => 'latn' },
+		'nagm' => { 'alias' => 'latn' },
+		'newa' => { 'alias' => 'latn' },
 		'nkoo' => { 'alias' => 'latn' },
 		'olck' => { 'alias' => 'latn' },
 		'orya' => { 'alias' => 'latn' },
 		'osma' => { 'alias' => 'latn' },
 		'rohg' => { 'alias' => 'latn' },
 		'saur' => { 'alias' => 'latn' },
+		'segment' => { 'alias' => 'latn' },
 		'shrd' => { 'alias' => 'latn' },
+		'sind' => { 'alias' => 'latn' },
+		'sinh' => { 'alias' => 'latn' },
 		'sora' => { 'alias' => 'latn' },
 		'sund' => { 'alias' => 'latn' },
 		'takr' => { 'alias' => 'latn' },
@@ -6230,7 +6349,11 @@ has 'number_symbols' => (
 		'telu' => { 'alias' => 'latn' },
 		'thai' => { 'alias' => 'latn' },
 		'tibt' => { 'alias' => 'latn' },
+		'tirh' => { 'alias' => 'latn' },
+		'tnsa' => { 'alias' => 'latn' },
 		'vaii' => { 'alias' => 'latn' },
+		'wara' => { 'alias' => 'latn' },
+		'wcho' => { 'alias' => 'latn' },
 	} }
 );
 
@@ -6240,6 +6363,9 @@ has 'number_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		adlm => {
+			'alias' => 'latn',
+		},
+		ahom => {
 			'alias' => 'latn',
 		},
 		arab => {
@@ -6252,6 +6378,9 @@ has 'number_formats' => (
 			'alias' => 'latn',
 		},
 		beng => {
+			'alias' => 'latn',
+		},
+		bhks => {
 			'alias' => 'latn',
 		},
 		brah => {
@@ -6350,6 +6479,9 @@ has 'number_formats' => (
 		deva => {
 			'alias' => 'latn',
 		},
+		diak => {
+			'alias' => 'latn',
+		},
 		fullwide => {
 			'alias' => 'latn',
 		},
@@ -6368,10 +6500,19 @@ has 'number_formats' => (
 		hanidec => {
 			'alias' => 'latn',
 		},
+		hmng => {
+			'alias' => 'latn',
+		},
+		hmnp => {
+			'alias' => 'latn',
+		},
 		java => {
 			'alias' => 'latn',
 		},
 		kali => {
+			'alias' => 'latn',
+		},
+		kawi => {
 			'alias' => 'latn',
 		},
 		khmr => {
@@ -6395,10 +6536,31 @@ has 'number_formats' => (
 		limb => {
 			'alias' => 'latn',
 		},
+		mathbold => {
+			'alias' => 'latn',
+		},
+		mathdbl => {
+			'alias' => 'latn',
+		},
+		mathmono => {
+			'alias' => 'latn',
+		},
+		mathsanb => {
+			'alias' => 'latn',
+		},
+		mathsans => {
+			'alias' => 'latn',
+		},
 		mlym => {
 			'alias' => 'latn',
 		},
+		modi => {
+			'alias' => 'latn',
+		},
 		mong => {
+			'alias' => 'latn',
+		},
+		mroo => {
 			'alias' => 'latn',
 		},
 		mtei => {
@@ -6408,6 +6570,15 @@ has 'number_formats' => (
 			'alias' => 'latn',
 		},
 		mymrshan => {
+			'alias' => 'latn',
+		},
+		mymrtlng => {
+			'alias' => 'latn',
+		},
+		nagm => {
+			'alias' => 'latn',
+		},
+		newa => {
 			'alias' => 'latn',
 		},
 		nkoo => {
@@ -6442,7 +6613,16 @@ has 'number_formats' => (
 				},
 			},
 		},
+		segment => {
+			'alias' => 'latn',
+		},
 		shrd => {
+			'alias' => 'latn',
+		},
+		sind => {
+			'alias' => 'latn',
+		},
+		sinh => {
 			'alias' => 'latn',
 		},
 		sora => {
@@ -6469,7 +6649,19 @@ has 'number_formats' => (
 		tibt => {
 			'alias' => 'latn',
 		},
+		tirh => {
+			'alias' => 'latn',
+		},
+		tnsa => {
+			'alias' => 'latn',
+		},
 		vaii => {
+			'alias' => 'latn',
+		},
+		wara => {
+			'alias' => 'latn',
+		},
+		wcho => {
 			'alias' => 'latn',
 		},
 } },
@@ -6481,6 +6673,9 @@ has 'number_currency_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'adlm' => {
+			'alias' => 'latn',
+		},
+		'ahom' => {
 			'alias' => 'latn',
 		},
 		'arab' => {
@@ -6504,6 +6699,9 @@ has 'number_currency_formats' => (
 		'beng' => {
 			'alias' => 'latn',
 		},
+		'bhks' => {
+			'alias' => 'latn',
+		},
 		'brah' => {
 			'alias' => 'latn',
 		},
@@ -6514,6 +6712,9 @@ has 'number_currency_formats' => (
 			'alias' => 'latn',
 		},
 		'deva' => {
+			'alias' => 'latn',
+		},
+		'diak' => {
 			'alias' => 'latn',
 		},
 		'fullwide' => {
@@ -6534,10 +6735,19 @@ has 'number_currency_formats' => (
 		'hanidec' => {
 			'alias' => 'latn',
 		},
+		'hmng' => {
+			'alias' => 'latn',
+		},
+		'hmnp' => {
+			'alias' => 'latn',
+		},
 		'java' => {
 			'alias' => 'latn',
 		},
 		'kali' => {
+			'alias' => 'latn',
+		},
+		'kawi' => {
 			'alias' => 'latn',
 		},
 		'khmr' => {
@@ -6585,10 +6795,31 @@ has 'number_currency_formats' => (
 		'limb' => {
 			'alias' => 'latn',
 		},
+		'mathbold' => {
+			'alias' => 'latn',
+		},
+		'mathdbl' => {
+			'alias' => 'latn',
+		},
+		'mathmono' => {
+			'alias' => 'latn',
+		},
+		'mathsanb' => {
+			'alias' => 'latn',
+		},
+		'mathsans' => {
+			'alias' => 'latn',
+		},
 		'mlym' => {
 			'alias' => 'latn',
 		},
+		'modi' => {
+			'alias' => 'latn',
+		},
 		'mong' => {
+			'alias' => 'latn',
+		},
+		'mroo' => {
 			'alias' => 'latn',
 		},
 		'mtei' => {
@@ -6598,6 +6829,15 @@ has 'number_currency_formats' => (
 			'alias' => 'latn',
 		},
 		'mymrshan' => {
+			'alias' => 'latn',
+		},
+		'mymrtlng' => {
+			'alias' => 'latn',
+		},
+		'nagm' => {
+			'alias' => 'latn',
+		},
+		'newa' => {
 			'alias' => 'latn',
 		},
 		'nkoo' => {
@@ -6618,7 +6858,16 @@ has 'number_currency_formats' => (
 		'saur' => {
 			'alias' => 'latn',
 		},
+		'segment' => {
+			'alias' => 'latn',
+		},
 		'shrd' => {
+			'alias' => 'latn',
+		},
+		'sind' => {
+			'alias' => 'latn',
+		},
+		'sinh' => {
 			'alias' => 'latn',
 		},
 		'sora' => {
@@ -6645,7 +6894,19 @@ has 'number_currency_formats' => (
 		'tibt' => {
 			'alias' => 'latn',
 		},
+		'tirh' => {
+			'alias' => 'latn',
+		},
+		'tnsa' => {
+			'alias' => 'latn',
+		},
 		'vaii' => {
+			'alias' => 'latn',
+		},
+		'wara' => {
+			'alias' => 'latn',
+		},
+		'wcho' => {
 			'alias' => 'latn',
 		},
 } },
@@ -6799,6 +7060,9 @@ has 'currencies' => (
 		},
 		'JPY' => {
 			symbol => 'JP¥',
+		},
+		'KGS' => {
+			symbol => '⃀',
 		},
 		'KHR' => {
 			symbol => '៛',
@@ -9440,7 +9704,7 @@ has 'datetime_formats_interval' => (
 			d => {
 				d => q{d–d},
 			},
-			fallback => '{0} – {1}',
+			fallback => '{0} – {1}',
 			h => {
 				a => q{h a – h a},
 				h => q{h–h a},
@@ -9594,7 +9858,7 @@ has 'datetime_formats_interval' => (
 			d => {
 				d => q{d–d},
 			},
-			fallback => '{0} – {1}',
+			fallback => '{0} – {1}',
 			h => {
 				a => q{h a – h a},
 				h => q{h–h a},
@@ -9736,7 +10000,7 @@ has 'datetime_formats_interval' => (
 			d => {
 				d => q{d–d},
 			},
-			fallback => '{0} – {1}',
+			fallback => '{0} – {1}',
 			h => {
 				a => q{h a – h a},
 				h => q{h–h a},
@@ -10095,8 +10359,26 @@ has 'time_zone_names' => (
 		'Africa/Asmera' => {
 			exemplarCity => q#Asmara#,
 		},
+		'Africa/Sao_Tome' => {
+			exemplarCity => q#São Tomé#,
+		},
+		'America/Asuncion' => {
+			exemplarCity => q#Asunción#,
+		},
+		'America/Bahia_Banderas' => {
+			exemplarCity => q#Bahía de Banderas#,
+		},
+		'America/Cancun' => {
+			exemplarCity => q#Cancún#,
+		},
+		'America/Ciudad_Juarez' => {
+			exemplarCity => q#Ciudad Juárez#,
+		},
 		'America/Coral_Harbour' => {
 			exemplarCity => q#Atikokan#,
+		},
+		'America/Curacao' => {
+			exemplarCity => q#Curaçao#,
 		},
 		'America/Godthab' => {
 			exemplarCity => q#Nuuk#,
@@ -10128,6 +10410,9 @@ has 'time_zone_names' => (
 		'America/Lower_Princes' => {
 			exemplarCity => q#Lower Prince’s Quarter#,
 		},
+		'America/Merida' => {
+			exemplarCity => q#Mérida#,
+		},
 		'America/North_Dakota/Beulah' => {
 			exemplarCity => q#Beulah, North Dakota#,
 		},
@@ -10141,7 +10426,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Ittoqqortoormiit#,
 		},
 		'America/St_Barthelemy' => {
-			exemplarCity => q#St. Barthelemy#,
+			exemplarCity => q#St. Barthélemy#,
 		},
 		'America/St_Johns' => {
 			exemplarCity => q#St. John’s#,
@@ -10189,6 +10474,12 @@ has 'time_zone_names' => (
 		},
 		'Etc/Unknown' => {
 			exemplarCity => q#Unknown#,
+		},
+		'Europe/Kiev' => {
+			exemplarCity => q#Kyiv#,
+		},
+		'Indian/Reunion' => {
+			exemplarCity => q#Réunion#,
 		},
 		'Pacific/Ponape' => {
 			exemplarCity => q#Pohnpei#,

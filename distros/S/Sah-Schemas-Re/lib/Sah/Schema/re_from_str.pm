@@ -3,14 +3,14 @@ package Sah::Schema::re_from_str;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-09-09'; # DATE
+our $DATE = '2023-12-20'; # DATE
 our $DIST = 'Sah-Schemas-Re'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 our $schema = [
     re => {
         summary => 'Regexp object from string using Regexp::From::String\'s str_to_re()',
-        description => <<'_',
+        description => <<'MARKDOWN',
 
 This schema accepts Regexp object or string which will be coerced to Regexp object
 using <pm:Regexp::From::String>'s `str_to_re()` function.
@@ -20,7 +20,13 @@ specify metacharacters as if you are writing a literal regexp pattern in Perl.
 Otherwise, your string will be `quotemeta()`-ed first then compiled to Regexp
 object. This means in the second case you cannot specify metacharacters.
 
-_
+What's the difference between this schema and `str_or_re` (from
+<pm:Sah::Schemas::Str>)? Both this schema and `str_or_re` accept string, but
+this schema will still coerce strings not in the form of `/.../` or `qr(...)` to
+regexp object, while `str_or_re` will leave the string as-is. In other words,
+this schema always converts input to Regexp object while `str_or_re` does not.
+
+MARKDOWN
 
         prefilters => [ ['Re::re_from_str'=>{}] ],
 
@@ -44,7 +50,7 @@ Sah::Schema::re_from_str - Regexp object from string
 
 =head1 VERSION
 
-This document describes version 0.005 of Sah::Schema::re_from_str (from Perl distribution Sah-Schemas-Re), released on 2023-09-09.
+This document describes version 0.006 of Sah::Schema::re_from_str (from Perl distribution Sah-Schemas-Re), released on 2023-12-20.
 
 =for Pod::Coverage ^(.+)$
 
@@ -172,6 +178,12 @@ Basically, if string is of the form of C</.../> or C<qr(...)>, then you could
 specify metacharacters as if you are writing a literal regexp pattern in Perl.
 Otherwise, your string will be C<quotemeta()>-ed first then compiled to Regexp
 object. This means in the second case you cannot specify metacharacters.
+
+What's the difference between this schema and C<str_or_re> (from
+L<Sah::Schemas::Str>)? Both this schema and C<str_or_re> accept string, but
+this schema will still coerce strings not in the form of C</.../> or C<qr(...)> to
+regexp object, while C<str_or_re> will leave the string as-is. In other words,
+this schema always converts input to Regexp object while C<str_or_re> does not.
 
 =head1 HOMEPAGE
 

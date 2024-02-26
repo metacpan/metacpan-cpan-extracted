@@ -74,11 +74,9 @@ Sets the line to start compiling by the L</"compile"> method.
 
 =head2 compile
 
-C<method compile : void ($basic_type_name : string);>
+C<method compile : void ($class_name : string);>
 
-Compiles the specified class and the classes that are load in the specified class. 
-
-Returns 1 on success, 0 on failure.
+Compiles a class given by the class name $class_name.
 
 This method can be called multiple times.
 
@@ -105,6 +103,68 @@ The return value is a L<Native::Runtime|SPVM::Native::Runtime> object.
 C<method get_class_file : L<Native::ClassFile|SPVM::Native::ClassFile> ($class_name : string);>
 
 Gets a L<Native::ClassFile> object by a class name, and returns it.
+
+=head2 compile_anon_class
+
+C<native method compile_anon_class : string ($source : string);>
+
+Compiles a anon class, and return the generated anon class name.
+
+
+This method can be called multiple times. 
+Exceptions:
+
+If compilation errors occurred, an exception is thrown set eval_errro_id to the basic type ID of the L<Error::Compile|SPVM::Error::Compile> class.
+
+Examples:
+  
+  use Native;
+  use Native::Compiler;
+  use Native::MethodCall;
+  
+  my $compiler = Native->get_current_compiler;
+  
+  my $source = <<'EOS';
+class {
+  static method sum : int ($num1 : int, $num2 : int) {
+    return $num1 + $num2;
+  }
+}
+EOS
+  $compiler->set_start_file(__FILE__);
+  $compiler->set_start_line(__LINE__ + 1);
+  my $anon_class_name = $compiler->compile_anon_class($source);;
+  
+  my $ret = Native::MethodCall->call_class_method($anon_class_name, "sum", [(object)1, 2]);;
+  
+  say $ret->(Int)->value;
+
+=head2 eval_string
+
+  method eval_string : string ($main_source : string);
+
+This method emulates L<Perl's string eval|https://perldoc.perl.org/functions/eval#String-eval>.
+
+This method creates the following source code.
+
+  "
+  class {
+  static method main : void () {
+  #line 1
+  $main_source
+  }
+  }
+  "
+
+And calls L</"compile_anon_class"> given this source code and gets the anon class name.
+
+And calls L<call_class_method|SPVM::Native::MethodCall/"call_class_method"> in the Native::MethodCall class.
+
+  Native::MethodCall->call_class_method($anon_class_name, "main");
+
+Examples:
+
+  Compiler->eval_string("my $total = 1 + 2; say $total;");
 
 =head1 See Also
 

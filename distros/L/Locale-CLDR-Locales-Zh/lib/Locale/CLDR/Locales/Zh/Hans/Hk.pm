@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Zh::Hans::Hk - Package for language Chinese
 
 package Locale::CLDR::Locales::Zh::Hans::Hk;
 # This file auto generated from Data\common\main\zh_Hans_HK.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -68,6 +68,14 @@ has 'units' => (
 					},
 				},
 				'narrow' => {
+					# Long Unit Identifier
+					'concentr-karat' => {
+						'other' => q({0}开),
+					},
+					# Core Unit Identifier
+					'karat' => {
+						'other' => q({0}开),
+					},
 					# Long Unit Identifier
 					'length-foot' => {
 						'other' => q({0}英尺),
@@ -161,7 +169,6 @@ has 'currencies' => (
 		'KYD' => {
 			display_name => {
 				'currency' => q(开曼群岛元),
-				'other' => q(开曼群岛元),
 			},
 		},
 		'NIO' => {
@@ -172,6 +179,7 @@ has 'currencies' => (
 		'XAG' => {
 			display_name => {
 				'currency' => q(白银),
+				'other' => q(白银),
 			},
 		},
 	} },
@@ -530,6 +538,7 @@ has 'datetime_formats_available_formats' => (
 		'buddhist' => {
 			M => q{L},
 			MEd => q{M/dE},
+			MMM => q{M月},
 		},
 		'generic' => {
 			HHmm => q{HH:mm},
@@ -577,6 +586,12 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'buddhist' => {
+			Hv => {
+				H => q{vHH–HH},
+			},
+			fallback => '{0}–{1}',
+		},
 		'generic' => {
 			Hmv => {
 				H => q{vHH:mm–HH:mm},

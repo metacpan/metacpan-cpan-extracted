@@ -2,7 +2,7 @@
 ## no critic: TestingAndDebugging::RequireUseStrict
 package App::fsql;
 
-our $VERSION = '0.232'; # VERSION
+our $VERSION = '0.233'; # VERSION
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2023-12-29'; # DATE
 our $DIST = 'App-fsql'; # DIST
@@ -22,7 +22,7 @@ App::fsql - Perform SQL queries against {CSV/TSV/LTSV/JSON/YAML files,TableData 
 
 =head1 VERSION
 
-This document describes version 0.232 of App::fsql (from Perl distribution App-fsql), released on 2023-12-29.
+This document describes version 0.233 of App::fsql (from Perl distribution App-fsql), released on 2023-12-29.
 
 =head1 SYNOPSIS
 

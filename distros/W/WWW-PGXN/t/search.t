@@ -19,7 +19,7 @@ SEARCHER: {
 }
 
 # Set up the WWW::PGXN object.
-my $pgxn = new_ok 'WWW::PGXN', [ url => 'http://api.pgxn.org/' ];
+my $pgxn = new_ok 'WWW::PGXN', [ url => 'https://api.pgxn.org/' ];
 
 # Make sure the search methods dispatch as they should.
 my $fetched_url;
@@ -40,7 +40,7 @@ for my $in (qw(docs dists extensions users tags)) {
     is_deeply $fetched_url->query_form_hash, { l => 10, q => 'whü', o => 2 },
         "Should have requested the proper $in URL query form";
     $fetched_url->query_form([]);
-    is $fetched_url, "http://api.pgxn.org/search/$in",
+    is $fetched_url, "https://api.pgxn.org/search/$in",
         "Should have requested the proper $in URL host and path";
 }
 

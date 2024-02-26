@@ -2,9 +2,10 @@ package Tickit::Widget::Statusbar;
 # ABSTRACT: Terminal widget for showing status, CPU and memory
 use strict;
 use warnings;
-use parent qw(Tickit::ContainerWidget);
+use Object::Pad;
+class Tickit::Widget::Statusbar :isa(Tickit::ContainerWidget);
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 =head1 NAME
 
@@ -56,11 +57,11 @@ Not too many user-serviceable parts inside as yet. This is likely to change in f
 
 =cut
 
-sub lines { 1 }
-sub cols  { 1 }
+method lines { 1 }
+method cols  { 1 }
 
-sub children {
-    @{shift->{children}};
+method children {
+    @{$self->{children}};
 }
 
 =head2 new
@@ -69,12 +70,8 @@ Instantiates the status bar.
 
 =cut
 
-sub new {
-    my $class = shift;
-    my %args = @_;
-
+BUILD (%args) {
     my $status = delete($args{status}) // '';
-    my $self = $class->SUPER::new(%args);
     $self->{children} = [];
     $self->update_status($status);
 
@@ -90,25 +87,20 @@ sub new {
     return $self;
 }
 
-sub add {
-    my $self = shift;
-    my $w = shift;
+method add ($w, @args) {
     unshift @{$self->{children}}, $w;
-    $self->SUPER::add($w, @_);
+    $self->SUPER::add($w, @args);
 }
 
-sub add_icon {
-    my $self = shift;
-    my $txt = shift;
+method add_icon ($txt, @args) {
     my $w = Tickit::Widget::Statusbar::Icon->new;
     $w->set_icon($txt);
     unshift @{$self->{children}}, $w;
-    $self->SUPER::add($w, @_);
+    $self->SUPER::add($w, @args);
     $w
 }
 
-sub children_changed {
-    my $self = shift;
+method children_changed {
     return unless my $win = $self->window;
     my $x = $win->cols;
     for my $child (reverse $self->children) {
@@ -127,23 +119,19 @@ sub children_changed {
     }
 }
 
-sub reshape {
-    my $self = shift;
+method reshape {
     $self->children_changed;
     $self->SUPER::reshape(@_);
 }
 
-sub window_gained {
-    my $self = shift;
+method window_gained {
     $self->SUPER::window_gained(@_);
     $self->children_changed;
 }
 
-sub status { shift->{status} }
+method status { $self->{status} }
 
-sub render_to_rb {
-    my ($self, $rb, $rect) = @_;
-
+method render_to_rb ($rb, $rect) {
     my $txt = substrwidth $self->status, $rect->left, $rect->cols;
     my $base_pen = $self->get_style_pen;
     if(defined(my $v = $self->status)) {
@@ -172,10 +160,9 @@ Returns $self.
 
 =cut
 
-sub update_status {
-    my $self = shift;
+method update_status ($status = '') {
     my $old_status = $self->{status};
-    $self->{status} = shift // '';
+    $self->{status} = $status;
     $self->{status} = String::Tagged->new($self->{status}) unless blessed $self->{status};
     $self->{status}->merge_tags(sub {
         my ($k, $left, $right) = @_;

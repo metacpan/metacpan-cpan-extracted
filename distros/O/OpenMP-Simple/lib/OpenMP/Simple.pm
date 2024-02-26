@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Alien::OpenMP;
 
-our $VERSION = q{0.0.3};
+our $VERSION = q{0.0.5};
 
 sub Inline {
   my ($self, $lang) = @_;
@@ -30,27 +30,27 @@ All setters EXCEPT the LOCK retoutines,
 
 /* %ENV Update Macros */
 
-#define PerlOMP_ENV_SET_DEFAULT_DEVICE                      \
+#define PerlOMP_UPDATE_WITH_ENV__DEFAULT_DEVICE                      \
     char *num = getenv("OMP_DEFAULT_DEVICE");               \
     omp_set_default_device(atoi(num));                      ///< read and update with $ENV{OMP_NUM_TEAMS}
 
-#define PerlOMP_ENV_SET_TEAMS_THREAD_LIMIT                  \
+#define PerlOMP_UPDATE_WITH_ENV__TEAMS_THREAD_LIMIT                  \
     char *num = getenv("OMP_TEAMS_THREAD_LIMIT");           \
     omp_set_teams_thread_limit(atoi(num));                  ///< read and update with $ENV{OMP_NUM_TEAMS}
 
-#define PerlOMP_ENV_SET_NUM_TEAMS                           \
+#define PerlOMP_UPDATE_WITH_ENV__NUM_TEAMS                           \
     char *num = getenv("OMP_NUM_TEAMS");                    \
     omp_set_num_teams(atoi(num));                           ///< read and update with $ENV{OMP_NUM_TEAMS}
 
-#define PerlOMP_ENV_SET_MAX_ACTIVE_LEVELS                   \
+#define PerlOMP_UPDATE_WITH_ENV__MAX_ACTIVE_LEVELS                   \
     char *num = getenv("OMP_MAX_ACTIVE_LEVELS");            \
     omp_set_max_active_levels(atoi(num));                   ///< read and update with $ENV{OMP_MAX_ACTIVE_LEVELS}
 
-#define PerlOMP_ENV_SET_NUM_THREADS                         \
+#define PerlOMP_UPDATE_WITH_ENV__NUM_THREADS                         \
     char *num = getenv("OMP_NUM_THREADS");                  \
     omp_set_num_threads(atoi(num));                         ///< read and update with $ENV{OMP_NUM_THREADS}
 
-#define PerlOMP_ENV_SET_DYNAMIC                             \
+#define PerlOMP_UPDATE_WITH_ENV__DYNAMIC                             \
     char *VALUE = getenv("OMP_DYNAMIC");                    \
     if (VALUE == NULL) {                                    \
       omp_set_dynamic(VALUE);                               \
@@ -62,7 +62,7 @@ All setters EXCEPT the LOCK retoutines,
       omp_set_dynamic(NULL);                                \
     };                                                      ///> read and update with $ENV{OMP_DYNAMIC} 
 
-#define PerlOMP_ENV_SET_NESTED                              \
+#define PerlOMP_UPDATE_WITH_ENV__NESTED                              \
     char *VALUE = getenv("OMP_NESTED");                     \
     if (VALUE == NULL) {                                    \
       omp_set_nested(VALUE);                                \
@@ -74,7 +74,7 @@ All setters EXCEPT the LOCK retoutines,
       omp_set_nested(NULL);                                 \
     };                                                      ///> read and update with $ENV{OMP_NESTED} 
 
-#define PerlOMP_ENV_SET_SCHEDULE                            \
+#define PerlOMP_UPDATE_WITH_ENV__SCHEDULE                            \
     char *str = getenv("OMP_SCHEDULE");                     \
     omp_sched_t SCHEDULE = omp_sched_static;                \
     int CHUNK = 1; char *pt;                                \
@@ -110,7 +110,7 @@ All setters EXCEPT the LOCK retoutines,
  * @param[out] void 
  */ 
 
-void PerlOMP_1D_Array_TO_FLOAT_ARRAY_1D(SV *Aref, int numElements, float retArray[numElements]) {
+void PerlOMP_1D_Array_TO_1D_FLOAT_ARRAY(SV *Aref, int numElements, float retArray[numElements]) {
   for (int i=0; i<numElements; i++) {
     SV **element = av_fetch((AV*)SvRV(Aref), i, 0);
     retArray[i] = SvNV(*element);
@@ -127,7 +127,7 @@ void PerlOMP_1D_Array_TO_FLOAT_ARRAY_1D(SV *Aref, int numElements, float retArra
 */
  
 // contribued by CPAN's NERDVANA - thank you!
-void PerlOMP_2D_AoA_TO_FLOAT_ARRAY_2D(SV *AoA, int numRows, int rowSize, float retArray[numRows][rowSize]) {
+void PerlOMP_2D_AoA_TO_2D_FLOAT_ARRAY(SV *AoA, int numRows, int rowSize, float retArray[numRows][rowSize]) {
   SV **AVref;
   if (!SvROK(AoA) || SvTYPE(SvRV(AoA)) != SVt_PVAV)
     croak("Expected Arrayref");
@@ -153,7 +153,7 @@ void PerlOMP_2D_AoA_TO_FLOAT_ARRAY_2D(SV *AoA, int numRows, int rowSize, float r
  * "#pragma omp for" work sharing construct
 */
 
-void PerlOMP_1D_Array_TO_INT_ARRAY_1D(SV *Aref, int numElements, int retArray[numElements]) {
+void PerlOMP_1D_Array_TO_1D_INT_ARRAY(SV *Aref, int numElements, int retArray[numElements]) {
   for (int i=0; i<numElements; i++) {
     SV **element = av_fetch((AV*)SvRV(Aref), i, 0);
     retArray[i] = SvIV(*element);
@@ -169,7 +169,7 @@ void PerlOMP_1D_Array_TO_INT_ARRAY_1D(SV *Aref, int numElements, int retArray[nu
  * "#pragma omp for" work sharing construct
 */
  
-void PerlOMP_2D_AoA_TO_INT_ARRAY_2D(SV *AoA, int numRows, int rowSize, int retArray[numRows][rowSize]) {
+void PerlOMP_2D_AoA_TO_2D_INT_ARRAY(SV *AoA, int numRows, int rowSize, int retArray[numRows][rowSize]) {
   SV **AVref;
   for (int i=0; i<numRows; i++) {
     AVref = av_fetch((AV*)SvRV(AoA), i, 0);
@@ -208,87 +208,146 @@ OpenMP::Simple - Provides some DWIM helpers for using OpenMP via C<Inline::C>.
         C                 => 'DATA',
         with              => qw/OpenMP::Simple/,
     );
-    
-=head1 DESCRIPTION
 
-This module attempts to ease the transition for those more familiar with programming C with OpenMP
-than they are with Perl or using C<Inline::C> within their Perl programs. It build upon the configuration
-information that is provided for by C<Alien::OpenMP>, and appends to the C<AUTO_INCLUDE> literal
-lines of C code that defines useful macros and data conversion functions (Perl to C, C to Perl).
+Note: while not C<experimental> per se, this module is still in a very fluid
+state. It is actively being used as the basis for real world codes. As
+more experience and intuition is gained by using it, this interface
+will only improve. Feedback is very valuable, so please reach out to L<<
+OODLER <oodler@cpan.org> >> or visit the I<Perl+OpenMP> Github repository,
+L<https://github.com/Perl-OpenMP>.
 
-In addition to helping to deal with getting data structures that are very common in the computational
-domains into and out of these C<Inline::C>'d routines that leverage I<OpenMP>, this module provides
-macros that are designed to provide behavior that is assumed to work when executing a binary that has
-been compiled with OpenMP support, such as the awareness of the current state of the C<OMP_NUM_THREADS>
-environmental variable.
+=head1 DESCRIPTION AND DISCUSSION
+
+Contained here is essentially a set of macros and C<Inline::C> defined C<C>
+functions that make it easier for Perl programs to interface basic Perl
+structures more directly with C<Inline::C> functions for use with OpenMP It
+also containes macros that emulate the access of OpenMP programs to C<%ENV>
+at program start up, and through this module, during runtime. Note: normal
+OpenMP programs do not re-sample C<%ENV> during runtime, but C<OpenMP::Simple>
+provides macros to do just that; so this module provides an additional
+level of control that so that C<OpenMP::Environment> may be used effectively
+during the running of a Perl program that contains C<Inline::C> functions
+with OpenMP inside of them.
+
+As a reminder, the OpenMP standard has several aspects that work in concert
+to make shared memory programming (with SMP threads) more accessible. These
+aspects may be summarized as the following:
+
+=over 4
+
+=item a runtime and library of functions that may be used to programatically
+affect execution and work distribution; here is where this module,
+L<OpenMP::Simple> makes a contribution to extending the promise of OpenMP
+to Perl programmers.
+
+=item a set of environmental variables (i.e., C<%ENV>) that can be used to
+control the OpenMP runtime; this aspect is where the L<OpenMP::Environment>
+module comes into play.
+
+=item work sharing constructs used to implicitly share memory and executions
+among a series of threads; these are implemented directly into the C<C> code,
+and is also where most of the hard work for anyone (including Perl programmers)
+exists. I.e., making OpenMP more I<perlish>. It also may including in the
+future, using OpenMP I<inside> of the C<perl> interpreter itself; but this
+is the domain of core Perl maintainers and experts in language semantics.
+No attempt has been made so far to address this large and very fruitful area
+of exploration.
+
+=back
+
+This module attempts to ease the transition for those more familiar with
+programming C with OpenMP than they are with Perl or using C<Inline::C>
+within their Perl programs. It build upon the configuration information that
+is provided for by C<Alien::OpenMP>, and appends to the C<AUTO_INCLUDE>
+literal lines of C code that defines useful macros and data conversion
+functions (Perl to C, C to Perl).
+
+In addition to helping to deal with getting data structures that are very
+common in the computational domains into and out of these C<Inline::C>'d
+routines that leverage I<OpenMP>, this module provides macros that are
+designed to provide behavior that is assumed to work when executing a binary
+that has been compiled with OpenMP support, such as the awareness of the
+current state of the C<OMP_NUM_THREADS> environmental variable.
 
 =head1 PROVIDED MACROS
 
 =head2 Updating Runtime with Environmental Variables
 
-When C<Inline::C> compiles and loads these shared libraries once, when the script is first loaded. At
-this time, the OpenMP runtime inspects C<%ENV>; but the environment is not automatically updated as
-whenever the runtime interfaces to the compiled library is used. The following macros offer a very
-concise and convenient way to update in the runtime based on the values of the respective environmental
-variables. They are designed with the use of C<OpenMP::Environment> in mind, which provides an OpenMP
-specific OOP interface to getting and setting these variables. Nearly all of them correspond to a way
-to C<set> them in the OpenMP runtime (provided by the compiler's implementation, e.g., C<omp.h>). 
+When C<Inline::C> compiles and loads these shared libraries once, when the
+script is first loaded. At this time, the OpenMP runtime inspects C<%ENV>;
+but the environment is not automatically updated as whenever the runtime
+interfaces to the compiled library is used. The following macros offer
+a very concise and convenient way to update in the runtime based on the
+values of the respective environmental variables. They are designed with the
+use of C<OpenMP::Environment> in mind, which provides an OpenMP specific
+OOP interface to getting and setting these variables. Nearly all of them
+correspond to a way to C<set> them in the OpenMP runtime (provided by the
+compiler's implementation, e.g., C<omp.h>).
 
-All MACROS have at least 1 test. Please those in the Github repository to get an idea of how to use
-C<OpenMP::Simple>'s macros with C<OpenMP::Environment>.
+All MACROS have at least 1 test. Please those in the Github repository to get
+an idea of how to use C<OpenMP::Simple>'s macros with C<OpenMP::Environment>.
 
 =over 4
 
-=item C<PerlOMP_ENV_SET_NUM_THREADS>
+=item C<PerlOMP_UPDATE_WITH_ENV__NUM_THREADS>
 
-Updates the OpenMP runtime with the value of the environmental variable, C<$ENV{OMP_NUM_THREADS}>,
-which is managed via C<< OpenMP::Environment->omp_num_threads[int numThreads]); >>.
+Updates the OpenMP runtime with the value of the environmental
+variable, C<$ENV{OMP_NUM_THREADS}>, which is managed via C<<
+OpenMP::Environment->omp_num_threads[int numThreads]); >>.
 
-=item C<PerlOMP_ENV_SET_DEFAULT_DEVICE>
+=item C<PerlOMP_UPDATE_WITH_ENV__DEFAULT_DEVICE>
 
-Updates the OpenMP runtime with the value of the environmental variable, C<$ENV{OMP_DEFAULT_DEVICE}>,
-which is managed via C<< OpenMP::Environment->omp_default_device([int deviceNo]); >>.
+Updates the OpenMP runtime with the value of the environmental
+variable, C<$ENV{OMP_DEFAULT_DEVICE}>, which is managed via C<<
+OpenMP::Environment->omp_default_device([int deviceNo]); >>.
 
-=item C<PerlOMP_ENV_SET_MAX_ACTIVE_LEVELS>
+=item C<PerlOMP_UPDATE_WITH_ENV__MAX_ACTIVE_LEVELS>
 
-Updates the OpenMP runtime with the value of the environmental variable, C<$ENV{OMP_MAX_ACTIVE_LEVELS}>,
-which is managed via C<< OpenMP::Environment->omp_max_active_levels([int maxLevel]); >>.
+Updates the OpenMP runtime with the value of the environmental
+variable, C<$ENV{OMP_MAX_ACTIVE_LEVELS}>, which is managed via C<<
+OpenMP::Environment->omp_max_active_levels([int maxLevel]); >>.
 
-=item C<PerlOMP_ENV_SET_DYNAMIC>
+=item C<PerlOMP_UPDATE_WITH_ENV__DYNAMIC>
 
-Updates the OpenMP runtime with the value of the environmental variable, C<$ENV{OMP_DYNAMIC}>,
-which is managed via C<< OpenMP::Environment->omp_dynamic(['true'|'false']); >>.
+Updates the OpenMP runtime with the value of the environmental
+variable, C<$ENV{OMP_DYNAMIC}>, which is managed via C<<
+OpenMP::Environment->omp_dynamic(['true'|'false']); >>.
 
-=item C<PerlOMP_ENV_SET_NESTED>
+=item C<PerlOMP_UPDATE_WITH_ENV__NESTED>
 
-Updates the OpenMP runtime with the value of the environmental variable, C<$ENV{OMP_NESTED}>,
-which is managed via C<< OpenMP::Environment->omp_nested(['true'|'false']); >>.
+Updates the OpenMP runtime with the value of the environmental
+variable, C<$ENV{OMP_NESTED}>, which is managed via C<<
+OpenMP::Environment->omp_nested(['true'|'false']); >>.
 
-=item C<PerlOMP_ENV_SET_SCHEDULE>
+=item C<PerlOMP_UPDATE_WITH_ENV__SCHEDULE>
 
-Updates the OpenMP runtime with the value of the environmental variable, C<$ENV{OMP_SCHEDULE}>,
-which is managed via C<< OpenMP::Environment->omp_schedule(...); >>.
+Updates the OpenMP runtime with the value of the environmental
+variable, C<$ENV{OMP_SCHEDULE}>, which is managed via C<<
+OpenMP::Environment->omp_schedule(...); >>.
 
 Note: The schedule syntax is of the form I<schedule[;chunkSize]>.
 
-=item C<PerlOMP_ENV_SET_TEAMS_THREAD_LIMIT>
+=item C<PerlOMP_UPDATE_WITH_ENV__TEAMS_THREAD_LIMIT>
 
-Updates the OpenMP runtime with the value of the environmental variable, C<$ENV{OMP_TEAMS_THREAD_LIMIT}>,
-which is managed via C<< OpenMP::Environment->omp_([int limit]); >>.
+Updates the OpenMP runtime with the value of the environmental
+variable, C<$ENV{OMP_TEAMS_THREAD_LIMIT}>, which is managed via C<<
+OpenMP::Environment->omp_([int limit]); >>.
 
 Note: Not supported until GCC 12.3.0
 
-=item C<PerlOMP_ENV_SET_NUM_TEAMS>
+=item C<PerlOMP_UPDATE_WITH_ENV__NUM_TEAMS>
 
-Updates the OpenMP runtime with the value of the environmental variable, C<$ENV{OMP_NUM_TEAMS}>,
-which is managed via C<< OpenMP::Environment->omp_([int num]); >>.
+Updates the OpenMP runtime with the value of the environmental variable,
+C<$ENV{OMP_NUM_TEAMS}>, which is managed via C<< OpenMP::Environment->omp_([int
+num]); >>.
 
 Note: Not supported until GCC 12.3.0
 
 =item C<PerlOMP_RET_ARRAY_REF_ret>
 
-(may not be needed) - creates a new C<AV*> and sets it I<mortal> (doesn't survive outside of the
-current scope). Used when wanting to return an array reference that's been populated via C<av_push>.
+(may not be needed) - creates a new C<AV*> and sets it I<mortal> (doesn't
+survive outside of the current scope). Used when wanting to return an array
+reference that's been populated via C<av_push>.
 
 =back
 
@@ -296,29 +355,29 @@ current scope). Used when wanting to return an array reference that's been popul
 
 =over 4
 
-=item C<PerlOMP_2D_AoA_TO_FLOAT_ARRAY_2D(AoA, num_nodes, dims, nodes)>
+=item C<PerlOMP_2D_AoA_TO_2D_FLOAT_ARRAY(AoA, num_nodes, dims, nodes)>
 
-Used to extract the contents of a 2D rectangular Perl array reference that has been used to
-represent a 2D matrix.
+Used to extract the contents of a 2D rectangular Perl array reference that
+has been used to represent a 2D matrix.
 
     float nodes[num_nodes][dims];
-    PerlOMP_2D_AoA_TO_FLOAT_ARRAY_2D(AoA, num_nodes, dims, nodes);
+    PerlOMP_2D_AoA_TO_2D_FLOAT_ARRAY(AoA, num_nodes, dims, nodes);
 
 =back
 
 =head1 SEE ALSO
 
-This is a module that aims at making it easier to bootstrap Perl+OpenMP programs. It is
-designed to work together with L<OpenMP::Environment>.
+This is a module that aims at making it easier to bootstrap Perl+OpenMP
+programs. It is designed to work together with L<OpenMP::Environment>.
 
 This module heavily favors the C<GOMP> implementation of the OpenMP
-specification within gcc. In fact, it has not been tested with any
-other implementations.
+specification within gcc. In fact, it has not been tested with any other
+implementations.
 
 L<https://gcc.gnu.org/onlinedocs/libgomp/index.html>
 
-Please also see the C<rperl> project for a glimpse into the potential
-future of Perl+OpenMP, particularly in regards to thread-safe data structures.
+Please also see the C<rperl> project for a glimpse into the potential future
+of Perl+OpenMP, particularly in regards to thread-safe data structures.
 
 L<https://www.rperl.org>
 

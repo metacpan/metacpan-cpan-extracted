@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ti - Package for language Tigrinya
 
 package Locale::CLDR::Locales::Ti;
 # This file auto generated from Data\common\main\ti.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -24,22 +24,6 @@ use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
 extends('Locale::CLDR::Locales::Root');
-# Need to add code for Key type pattern
-sub display_name_pattern {
-	my ($self, $name, $region, $script, $variant) = @_;
-
-	my $display_pattern = '{0} ({1})';
-	$display_pattern =~s/\{0\}/$name/g;
-	my $subtags = join '{0}፣ {1}', grep {$_} (
-		$region,
-		$script,
-		$variant,
-	);
-
-	$display_pattern =~s/\{1\}/$subtags/g;
-	return $display_pattern;
-}
-
 has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
@@ -47,54 +31,105 @@ has 'display_name_language' => (
 	default		=> sub {
 		 sub {
 			 my %languages = (
-				'af' => 'ኣፍሪካንስ',
+				'ab' => 'ኣብካዝኛ',
+ 				'ace' => 'ኣቸኒዝኛ',
+ 				'ada' => 'ኣዳንግሜ',
+ 				'ady' => 'ኣዲጊ',
+ 				'af' => 'ኣፍሪካንስ',
  				'agq' => 'ኣገም',
+ 				'ain' => 'ኣይኑ',
  				'ak' => 'ኣካን',
+ 				'ale' => 'ኣለውትኛ',
+ 				'alt' => 'ደቡባዊ ኣልታይ',
  				'am' => 'ኣምሓርኛ',
+ 				'an' => 'ኣራጎንኛ',
+ 				'ann' => 'ኦቦሎ',
+ 				'anp' => 'ኣንጂካ',
+ 				'apc' => 'ሌቫንቲናዊ ዓረብ',
  				'ar' => 'ዓረብ',
  				'ar_001' => 'ዘመናዊ ምዱብ ዓረብ',
+ 				'arn' => 'ማፑቺ',
+ 				'arp' => 'ኣራፓሆ',
+ 				'ars' => 'ናጅዲ ዓረብኛ',
  				'as' => 'ኣሳሜዝኛ',
  				'asa' => 'ኣሱ',
  				'ast' => 'ኣስቱርያን',
+ 				'atj' => 'ኣቲካመክ',
+ 				'av' => 'ኣቫር',
+ 				'awa' => 'ኣዋዲ',
+ 				'ay' => 'ኣይማራ',
  				'az' => 'ኣዘርባጃንኛ',
  				'az@alt=short' => 'ኣዘሪ',
+ 				'ba' => 'ባሽኪር',
+ 				'ban' => 'ባሊንኛ',
  				'bas' => 'ባሳ',
  				'be' => 'ቤላሩስኛ',
  				'bem' => 'ቤምባ',
  				'bez' => 'በና',
  				'bg' => 'ቡልጋርኛ',
+ 				'bgc' => 'ሃርያንቪ',
+ 				'bho' => 'ቦጅፑሪ',
+ 				'bi' => 'ቢስላማ',
+ 				'bin' => 'ቢኒ',
+ 				'bla' => 'ሲክሲካ',
  				'bm' => 'ባምባራ',
  				'bn' => 'በንጋሊ',
  				'bo' => 'ቲበታንኛ',
  				'br' => 'ብረቶንኛ',
  				'brx' => 'ቦዶ',
  				'bs' => 'ቦዝንኛ',
+ 				'bug' => 'ቡጊንኛ',
+ 				'byn' => 'ብሊን',
  				'ca' => 'ካታላን',
+ 				'cay' => 'ካዩጋ',
  				'ccp' => 'ቻክማ',
  				'ce' => 'ቸቸንይና',
  				'ceb' => 'ሰብዋኖ',
  				'cgg' => 'ቺጋ',
+ 				'ch' => 'ቻሞሮ',
+ 				'chk' => 'ቹኪዝኛ',
+ 				'chm' => 'ማሪ',
+ 				'cho' => 'ቾክቶ',
+ 				'chp' => 'ቺፐውያን',
  				'chr' => 'ቸሮኪ',
+ 				'chy' => 'ሻያን',
  				'ckb' => 'ሶራኒ ኩርዲሽ',
  				'ckb@alt=variant' => 'ማእከላይ ኩርዲሽ',
+ 				'clc' => 'ቺልኮቲን',
  				'co' => 'ኮርስኛ',
+ 				'crg' => 'ሚቺፍ',
+ 				'crj' => 'ደቡባዊ ምብራቕ ክሪ',
+ 				'crk' => 'ክሪ ፕሌንስ',
+ 				'crl' => 'ሰሜናዊ ምብራቕ ክሪ',
+ 				'crm' => 'ሙስ ክሪ',
+ 				'crr' => 'ካቶሊና አልጎንጉያኛ',
  				'cs' => 'ቸክኛ',
+ 				'csw' => 'ክሪ ረግረግ',
  				'cu' => 'ቤተ-ክርስትያን ስላቭኛ',
+ 				'cv' => 'ቹቫሽኛ',
  				'cy' => 'ዌልስኛ',
  				'da' => 'ዳኒሽ',
+ 				'dak' => 'ዳኮታ',
+ 				'dar' => 'ዳርግዋ',
  				'dav' => 'ታይታ',
  				'de' => 'ጀርመን',
+ 				'dgr' => 'ዶግሪብ',
  				'dje' => 'ዛርማ',
  				'doi' => 'ዶግሪ',
  				'dsb' => 'ታሕተዋይ ሶርብኛ',
  				'dua' => 'ድዋላ',
+ 				'dv' => 'ዲቨሂ',
  				'dyo' => 'ጆላ-ፎኒይ',
  				'dz' => 'ድዞንግካ',
+ 				'dzg' => 'ዳዛጋ',
  				'ebu' => 'ኤምቡ',
  				'ee' => 'ኢው',
+ 				'efi' => 'ኤፊክ',
+ 				'eka' => 'ኤካጁክ',
  				'el' => 'ግሪኽኛ',
  				'en' => 'እንግሊዝኛ',
  				'en_US' => 'እንግሊዝኛ (ሕቡራት መንግስታት)',
+ 				'en_US@alt=short' => 'እንግሊዝኛ (ሕ.መ.)',
  				'eo' => 'ኤስፐራንቶ',
  				'es' => 'ስጳንኛ',
  				'et' => 'ኤስቶንኛ',
@@ -105,137 +140,231 @@ has 'display_name_language' => (
  				'ff' => 'ፉላ',
  				'fi' => 'ፊንላንድኛ',
  				'fil' => 'ፊሊፒንኛ',
+ 				'fj' => 'ፊጅያንኛ',
  				'fo' => 'ፋሮእይና',
+ 				'fon' => 'ፎን',
  				'fr' => 'ፈረንሳይኛ',
  				'frc' => 'ካጁን ፈረንሳይ',
+ 				'frr' => 'ሰሜናዊ ፍሪስኛ',
  				'fur' => 'ፍርዩልኛ',
  				'fy' => 'ምዕራባዊ ፍሪስኛ',
  				'ga' => 'ኣየርላንድኛ',
+ 				'gaa' => 'ጋ',
  				'gd' => 'ስኮትላንዳዊ ጋኤሊክኛ',
+ 				'gez' => 'ግእዝ',
+ 				'gil' => 'ጊልበርትኛ',
  				'gl' => 'ጋሊሽያን',
  				'gn' => 'ጓራኒ',
+ 				'gor' => 'ጎሮንታሎ',
  				'gsw' => 'ስዊዘርላንዳዊ ጀርመን',
  				'gu' => 'ጉጃራቲ',
  				'guz' => 'ጉሲ',
  				'gv' => 'ማንክስ',
+ 				'gwi' => 'ጒቺን',
  				'ha' => 'ሃውሳ',
+ 				'hai' => 'ሃይዳ',
  				'haw' => 'ሃዋይኛ',
+ 				'hax' => 'ደቡባዊ ሃይዳ',
  				'he' => 'እብራይስጢ',
  				'hi' => 'ሂንዲ',
+ 				'hi_Latn@alt=variant' => 'ሂንግሊሽ',
+ 				'hil' => 'ሂሊጋይኖን',
  				'hmn' => 'ህሞንግ',
  				'hr' => 'ክሮኤሽያን',
  				'hsb' => 'ላዕለዋይ ሶርብኛ',
  				'ht' => 'ክርዮል ሃይትኛ',
  				'hu' => 'ሃንጋርኛ',
+ 				'hup' => 'ሁፓ',
+ 				'hur' => 'ሃልኮመለም',
  				'hy' => 'ኣርሜንኛ',
+ 				'hz' => 'ሄረሮ',
  				'ia' => 'ኢንተርሊንጓ',
+ 				'iba' => 'ኢባን',
+ 				'ibb' => 'ኢቢብዮ',
  				'id' => 'ኢንዶነዥኛ',
  				'ig' => 'ኢግቦ',
  				'ii' => 'ሲችዋን ዪ',
+ 				'ikt' => 'ምዕራባዊ ካናዳዊ ኢናክቲቱት',
+ 				'ilo' => 'ኢሎካኖ',
+ 				'inh' => 'ኢንጉሽኛ',
+ 				'io' => 'ኢዶ',
  				'is' => 'ኣይስላንድኛ',
  				'it' => 'ጥልያን',
+ 				'iu' => 'ኢናክቲቱት',
  				'ja' => 'ጃፓንኛ',
- 				'jgo' => 'ንጎምባ',
+ 				'jbo' => 'ሎጅባን',
+ 				'jgo' => 'ኤንጎምባ',
  				'jmc' => 'ማኬም',
  				'jv' => 'ጃቫንኛ',
  				'ka' => 'ጆርጅያንኛ',
  				'kab' => 'ካቢልኛ',
+ 				'kac' => 'ካቺን',
+ 				'kaj' => 'ጅጁ',
  				'kam' => 'ካምባ',
+ 				'kbd' => 'ካባርድኛ',
+ 				'kcg' => 'ታያፕ',
  				'kde' => 'ማኮንደ',
  				'kea' => 'ክርዮል ኬፕ ቨርድኛ',
+ 				'kfo' => 'ኮሮ',
  				'kgp' => 'ካይንጋንግ',
+ 				'kha' => 'ካሲ',
  				'khq' => 'ኮይራ ቺኒ',
  				'ki' => 'ኪኩዩ',
+ 				'kj' => 'ክዋንያማ',
  				'kk' => 'ካዛክ',
  				'kkj' => 'ካኮ',
  				'kl' => 'ግሪንላንድኛ',
  				'kln' => 'ካለንጂን',
  				'km' => 'ክመር',
+ 				'kmb' => 'ኪምቡንዱ',
  				'kn' => 'ካንናዳ',
  				'ko' => 'ኮርይኛ',
  				'kok' => 'ኮንካኒ',
+ 				'kpe' => 'ክፐለ',
+ 				'kr' => 'ካኑሪ',
+ 				'krc' => 'ካራቻይ-ባልካርኛ',
+ 				'krl' => 'ካረልኛ',
+ 				'kru' => 'ኩሩክ',
  				'ks' => 'ካሽሚሪ',
  				'ksb' => 'ሻምባላ',
  				'ksf' => 'ባፍያ',
  				'ksh' => 'ኮልሽ',
  				'ku' => 'ኩርዲሽ',
+ 				'kum' => 'ኩሚይክ',
+ 				'kv' => 'ኮሚ',
  				'kw' => 'ኮርንኛ',
+ 				'kwk' => 'ክዋክዋላ',
  				'ky' => 'ኪርጊዝኛ',
  				'la' => 'ላቲን',
+ 				'lad' => 'ላዲኖ',
  				'lag' => 'ላንጊ',
  				'lb' => 'ሉክሰምበርግኛ',
+ 				'lez' => 'ለዝግኛ',
  				'lg' => 'ጋንዳ',
+ 				'li' => 'ሊምበርግኛ',
  				'lij' => 'ሊጉርኛ',
+ 				'lil' => 'ሊሉት',
  				'lkt' => 'ላኮታ',
+ 				'lmo' => 'ሎምባርድኛ',
  				'ln' => 'ሊንጋላ',
  				'lo' => 'ላኦ',
  				'lou' => 'ክርዮል ሉዊዝያና',
+ 				'loz' => 'ሎዚ',
  				'lrc' => 'ሰሜናዊ ሉሪ',
+ 				'lsm' => 'ሳምያ',
  				'lt' => 'ሊትዌንኛ',
  				'lu' => 'ሉባ-ካታንጋ',
+ 				'lua' => 'ሉባ-ሉልዋ',
+ 				'lun' => 'ሉንዳ',
  				'luo' => 'ሉኦ',
+ 				'lus' => 'ማይዞ',
  				'luy' => 'ሉይያ',
  				'lv' => 'ላትቭኛ',
+ 				'mad' => 'ማዱሪዝኛ',
+ 				'mag' => 'ማጋሂ',
  				'mai' => 'ማይቲሊ',
+ 				'mak' => 'ማካሳር',
  				'mas' => 'ማሳይ',
+ 				'mdf' => 'ሞክሻ',
+ 				'men' => 'መንዴ',
  				'mer' => 'መሩ',
  				'mfe' => 'ክርዮል ማውሪሽይና',
  				'mg' => 'ማላጋሲ',
  				'mgh' => 'ማክዋ-ሜቶ',
  				'mgo' => 'መታ',
+ 				'mh' => 'ማርሻሊዝኛ',
  				'mi' => 'ማኦሪ',
+ 				'mic' => 'ሚክማክ',
+ 				'min' => 'ሚናንግካባው',
  				'mk' => 'መቄዶንኛ',
  				'ml' => 'ማላያላም',
  				'mn' => 'ሞንጎልኛ',
  				'mni' => 'ማኒፑሪ',
+ 				'moe' => 'ኢኑ-ኤመን',
+ 				'moh' => 'ሞሃውክ',
+ 				'mos' => 'ሞሲ',
  				'mr' => 'ማራቲ',
  				'ms' => 'ማላይኛ',
  				'mt' => 'ማልትኛ',
  				'mua' => 'ሙንዳንግ',
  				'mul' => 'ዝተፈላለዩ ቋንቋታት',
+ 				'mus' => 'ክሪክ',
+ 				'mwl' => 'ሚራንዲዝኛ',
  				'my' => 'በርምኛ',
+ 				'myv' => 'ኤርዝያ',
  				'mzn' => 'ማዛንደራኒ',
+ 				'na' => 'ናውርዋንኛ',
+ 				'nap' => 'ናፖሊታንኛ',
  				'naq' => 'ናማ',
  				'nb' => 'ኖርወያዊ ቦክማል',
- 				'nd' => 'ሰሜን ንደበለ',
+ 				'nd' => 'ሰሜን ኤንደበለ',
  				'nds' => 'ትሑት ጀርመን',
  				'nds_NL' => 'ትሑት ሳክሰን',
  				'ne' => 'ኔፓሊ',
+ 				'new' => 'ነዋሪ',
+ 				'ng' => 'ኤንዶንጋ',
+ 				'nia' => 'ንያስ',
+ 				'niu' => 'ንዌንኛ',
  				'nl' => 'ዳች',
  				'nl_BE' => 'ፍላሚሽ',
  				'nmg' => 'ክዋስዮ',
  				'nn' => 'ኖርወያዊ ናይኖርስክ',
- 				'nnh' => 'ንጌምቡን',
+ 				'nnh' => 'ኤንጌምቡን',
  				'no' => 'ኖርወይኛ',
+ 				'nog' => 'ኖጋይኛ',
+ 				'nqo' => 'ኤንኮ',
+ 				'nr' => 'ደቡብ ኤንደበለ',
+ 				'nso' => 'ሰሜናዊ ሶቶ',
  				'nus' => 'ንዌር',
  				'nv' => 'ናቫሆ',
  				'ny' => 'ንያንጃ',
  				'nyn' => 'ንያንኮል',
  				'oc' => 'ኦክሲታንኛ',
+ 				'ojb' => 'ሰሜናዊ ምዕራብ ኦጂብዋ',
+ 				'ojc' => 'ማእከላይ ኦጂብዋ',
+ 				'ojs' => 'ኦጂ-ክሪ',
+ 				'ojw' => 'ምዕራባዊ ኦጂብዋ',
+ 				'oka' => 'ኦካናጋን',
  				'om' => 'ኦሮሞ',
  				'or' => 'ኦድያ',
  				'os' => 'ኦሰትኛ',
  				'pa' => 'ፑንጃቢ',
+ 				'pag' => 'ፓንጋሲናን',
+ 				'pam' => 'ፓምፓንጋ',
+ 				'pap' => 'ፓፕያመንቶ',
+ 				'pau' => 'ፓላውኛ',
  				'pcm' => 'ፒጂን ናይጀርያ',
+ 				'pis' => 'ፒጂን',
  				'pl' => 'ፖሊሽ',
+ 				'pqm' => 'ማሊሲት-ፓሳማኳዲ',
  				'prg' => 'ፕሩስኛ',
  				'ps' => 'ፓሽቶ',
  				'pt' => 'ፖርቱጊዝኛ',
  				'qu' => 'ቀችዋ',
+ 				'raj' => 'ራጃስታኒ',
+ 				'rap' => 'ራፓኑይ',
+ 				'rar' => 'ራሮቶንጋንኛ',
  				'rhg' => 'ሮሂንግያ',
+ 				'rif' => 'ሪፍኛ',
  				'rm' => 'ሮማንሽ',
  				'rn' => 'ኪሩንዲ',
  				'ro' => 'ሩማንኛ',
  				'ro_MD' => 'ሞልዶቨኛ',
  				'rof' => 'ሮምቦ',
  				'ru' => 'ሩስኛ',
+ 				'rup' => 'ኣሩማንኛ',
  				'rw' => 'ኪንያርዋንዳ',
  				'rwk' => 'ርዋ',
  				'sa' => 'ሳንስክሪት',
+ 				'sad' => 'ሳንዳወ',
  				'sah' => 'ሳኻ',
  				'saq' => 'ሳምቡሩ',
  				'sat' => 'ሳንታሊ',
+ 				'sba' => 'ኤንጋምባይ',
  				'sbp' => 'ሳንጉ',
+ 				'sc' => 'ሳርዲንኛ',
+ 				'scn' => 'ሲሲልኛ',
+ 				'sco' => 'ስኮትኛ',
  				'sd' => 'ሲንድሂ',
  				'se' => 'ሰሜናዊ ሳሚ',
  				'seh' => 'ሰና',
@@ -243,50 +372,88 @@ has 'display_name_language' => (
  				'sg' => 'ሳንጎ',
  				'sh' => 'ሰርቦ-ክሮኤሽያን',
  				'shi' => 'ታቸልሂት',
+ 				'shn' => 'ሻን',
  				'si' => 'ሲንሃላ',
  				'sk' => 'ስሎቫክኛ',
  				'sl' => 'ስሎቬንኛ',
+ 				'slh' => 'ደቡባዊ ሉሹትሲድ',
  				'sm' => 'ሳሞእኛ',
  				'smn' => 'ሳሚ ኢናሪ',
+ 				'sms' => 'ሳሚ ስኮልት',
  				'sn' => 'ሾና',
+ 				'snk' => 'ሶኒንከ',
  				'so' => 'ሶማሊ',
  				'sq' => 'ኣልባንኛ',
- 				'sr' => 'ሰርብኛ',
+ 				'sr' => 'ቃንቃ ሰርቢያ',
+ 				'srn' => 'ስራናን ቶንጎ',
+ 				'ss' => 'ስዋዚ',
  				'st' => 'ደቡባዊ ሶቶ',
+ 				'str' => 'ሳሊሽ መጻብቦታት',
  				'su' => 'ሱንዳንኛ',
+ 				'suk' => 'ሱኩማ',
  				'sv' => 'ስዊድንኛ',
  				'sw' => 'ስዋሂሊ',
  				'sw_CD' => 'ስዋሂሊ (ኮንጎ)',
+ 				'swb' => 'ኮሞርኛ',
+ 				'syr' => 'ሱርስት',
  				'ta' => 'ታሚል',
+ 				'tce' => 'ደቡባዊ ታትቾን',
  				'te' => 'ተሉጉ',
+ 				'tem' => 'ቲምኔ',
  				'teo' => 'ተሶ',
+ 				'tet' => 'ቲተም',
  				'tg' => 'ታጂክኛ',
+ 				'tgx' => 'ታጊሽ',
  				'th' => 'ታይኛ',
+ 				'tht' => 'ታልተን',
  				'ti' => 'ትግርኛ',
+ 				'tig' => 'ትግረ',
  				'tk' => 'ቱርክመንኛ',
  				'tlh' => 'ክሊንጎን',
+ 				'tli' => 'ትሊንጊት',
+ 				'tn' => 'ስዋና',
  				'to' => 'ቶንጋንኛ',
+ 				'tok' => 'ቶኪ ፖና',
+ 				'tpi' => 'ቶክ ፒሲን',
  				'tr' => 'ቱርክኛ',
+ 				'trv' => 'ታሮኮ',
+ 				'ts' => 'ሶንጋ',
  				'tt' => 'ታታር',
+ 				'ttm' => 'ሰሜናዊ ታትቾን',
+ 				'tum' => 'ተምቡካ',
+ 				'tvl' => 'ቱቫልዋንኛ',
  				'tw' => 'ትዊ',
  				'twq' => 'ታሳዋቅ',
+ 				'ty' => 'ታሂትኛ',
+ 				'tyv' => 'ቱቪንኛ',
  				'tzm' => 'ማእከላይ ኣትላስ ታማዛይት',
+ 				'udm' => 'ዩድሙርት',
  				'ug' => 'ኡይጉር',
  				'uk' => 'ዩክረይንኛ',
+ 				'umb' => 'ኣምቡንዱ',
  				'und' => 'ዘይተፈልጠ ቋንቋ',
  				'ur' => 'ኡርዱ',
  				'uz' => 'ኡዝበክኛ',
  				'vai' => 'ቫይ',
+ 				've' => 'ቨንዳ',
+ 				'vec' => 'ቬንቲያንኛ',
  				'vi' => 'ቬትናምኛ',
  				'vo' => 'ቮላፑክ',
  				'vun' => 'ቩንጆ',
+ 				'wa' => 'ዋሎን',
  				'wae' => 'ዋልሰር',
+ 				'wal' => 'ዎላይታኛ',
+ 				'war' => 'ዋራይ',
  				'wo' => 'ዎሎፍ',
+ 				'wuu' => 'ቻይናዊ ዉ',
+ 				'xal' => 'ካልምይክ',
  				'xh' => 'ኮሳ',
  				'xog' => 'ሶጋ',
  				'yav' => 'ያንግበን',
+ 				'ybb' => 'የምባ',
  				'yi' => 'ይሁድኛ',
  				'yo' => 'ዮሩባ',
+ 				'yrl' => 'ኒንጋቱ',
  				'yue' => 'ካንቶንኛ',
  				'yue@alt=menu' => 'ቻይናዊ ካንቶንኛ',
  				'zgh' => 'ሞሮካዊ ምዱብ ታማዛይት',
@@ -297,7 +464,9 @@ has 'display_name_language' => (
  				'zh_Hant' => 'ባህላዊ ቻይንኛ',
  				'zh_Hant@alt=long' => 'ባህላዊ ማንዳሪን ቻይንኛ',
  				'zu' => 'ዙሉ',
+ 				'zun' => 'ዙኚ',
  				'zxx' => 'ቋንቋዊ ትሕዝቶ የለን',
+ 				'zza' => 'ዛዛኪ',
 
 			);
 			if (@_) {
@@ -421,6 +590,7 @@ has 'display_name_region' => (
  			'CN' => 'ቻይና',
  			'CO' => 'ኮሎምብያ',
  			'CP' => 'ደሴት ክሊፐርቶን',
+ 			'CQ' => 'ሳርክ',
  			'CR' => 'ኮስታ ሪካ',
  			'CU' => 'ኩባ',
  			'CV' => 'ኬፕ ቨርደ',
@@ -530,7 +700,7 @@ has 'display_name_region' => (
  			'MN' => 'ሞንጎልያ',
  			'MO' => 'ፍሉይ ምምሕዳራዊ ዞባ ማካው (ቻይና)',
  			'MO@alt=short' => 'ማካው',
- 			'MP' => 'ደሴታት ሰሜናዊ ማርያና',
+ 			'MP' => 'ሰሜናዊ ደሴታት ማርያና',
  			'MQ' => 'ማርቲኒክ',
  			'MR' => 'ማውሪታንያ',
  			'MS' => 'ሞንትሰራት',
@@ -556,7 +726,7 @@ has 'display_name_region' => (
  			'OM' => 'ዖማን',
  			'PA' => 'ፓናማ',
  			'PE' => 'ፔሩ',
- 			'PF' => 'ፈረንሳይ ፖሊነዥያ',
+ 			'PF' => 'ፈረንሳዊት ፖሊነዥያ',
  			'PG' => 'ፓፕዋ ኒው ጊኒ',
  			'PH' => 'ፊሊፒንስ',
  			'PK' => 'ፓኪስታን',
@@ -713,8 +883,7 @@ has 'characters' => (
 		return {
 			auxiliary => qr{[᎐ ᎑ ᎒ ᎓ ᎔ ᎕ ᎖ ᎗ ᎘ ᎙ ሇ ⶀ ᎀ ᎁ ᎂ ᎃ ⶁ ⶂ ⶃ ⶄ ቇ ᎄ ᎅ ᎆ ᎇ ⶅ ⶆ ⶇ ኇ ⶈ ⶉ ⶊ ኯ ዏ ⶋ ዯ ⶌ ዸ ዹ ዺ ዻ ዼ ዽ ዾ ዿ ⶍ ⶎ ጏ ጘ ጙ ጚ ጛ ጜ ጝ ጞ ጟ ⶓ ⶔ ⶕ ⶖ ⶏ ⶐ ⶑ ᎈ ᎉ ᎊ ᎋ ᎌ ᎍ ᎎ ᎏ ⶒ ፘ ፙ ፚ ⶠ ⶡ ⶢ ⶣ ⶤ ⶥ ⶦ ⶨ ⶩ ⶪ ⶫ ⶬ ⶭ ⶮ ⶰ ⶱ ⶲ ⶳ ⶴ ⶵ ⶶ ⶸ ⶹ ⶺ ⶻ ⶼ ⶽ ⶾ ⷀ ⷁ ⷂ ⷃ ⷄ ⷅ ⷆ ⷈ ⷉ ⷊ ⷋ ⷌ ⷍ ⷎ ⷐ ⷑ ⷒ ⷓ ⷔ ⷕ ⷖ ⷘ ⷙ ⷚ ⷛ ⷜ ⷝ ⷞ]},
 			index => ['ሀ', 'ለ', 'ሐ', 'መ', 'ሠ', 'ረ', 'ሰ', 'ሸ', 'ቀ', 'ቈ', 'ቐ', 'ቘ', 'በ', 'ቨ', 'ተ', 'ቸ', 'ኀ', 'ኈ', 'ነ', 'ኘ', 'አ', 'ከ', 'ኰ', 'ኸ', 'ዀ', 'ወ', 'ዐ', 'ዘ', 'ዠ', 'የ', 'ደ', 'ጀ', 'ገ', 'ጐ', 'ጠ', 'ጨ', 'ጰ', 'ጸ', 'ፀ', 'ፈ', 'ፐ'],
-			main => qr{[፟ ሀ-ሆ ለ-ቆ ቈ ቊ-ቍ ቐ-ቖ ቘ ቚ-ቝ በ-ኆ ኈ ኊ-ኍ ነ-ኮ ኰ ኲ-ኵ ኸ-ኾ ዀ ዂ-ዅ ወ-ዎ ዐ-ዖ ዘ-ዮ ደ-ዷ ጀ-ጎ ጐ ጒ-ጕ ጠ-ፗ]},
-			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			main => qr{[፟ ሀ ሁ ሂ ሃ ሄ ህ ሆ ለ ሉ ሊ ላ ሌ ል ሎ ሏ ሐ ሑ ሒ ሓ ሔ ሕ ሖ ሗ መ ሙ ሚ ማ ሜ ም ሞ ሟ ሠ ሡ ሢ ሣ ሤ ሥ ሦ ሧ ረ ሩ ሪ ራ ሬ ር ሮ ሯ ሰ ሱ ሲ ሳ ሴ ስ ሶ ሷ ሸ ሹ ሺ ሻ ሼ ሽ ሾ ሿ ቀ ቁ ቂ ቃ ቄ ቅ ቆ ቈ ቊ ቋ ቌ ቍ ቐ ቑ ቒ ቓ ቔ ቕ ቖ ቘ ቚ ቛ ቜ ቝ በ ቡ ቢ ባ ቤ ብ ቦ ቧ ቨ ቩ ቪ ቫ ቬ ቭ ቮ ቯ ተ ቱ ቲ ታ ቴ ት ቶ ቷ ቸ ቹ ቺ ቻ ቼ ች ቾ ቿ ኀ ኁ ኂ ኃ ኄ ኅ ኆ ኈ ኊ ኋ ኌ ኍ ነ ኑ ኒ ና ኔ ን ኖ ኗ ኘ ኙ ኚ ኛ ኜ ኝ ኞ ኟ አ ኡ ኢ ኣ ኤ እ ኦ ኧ ከ ኩ ኪ ካ ኬ ክ ኮ ኰ ኲ ኳ ኴ ኵ ኸ ኹ ኺ ኻ ኼ ኽ ኾ ዀ ዂ ዃ ዄ ዅ ወ ዉ ዊ ዋ ዌ ው ዎ ዐ ዑ ዒ ዓ ዔ ዕ ዖ ዘ ዙ ዚ ዛ ዜ ዝ ዞ ዟ ዠ ዡ ዢ ዣ ዤ ዥ ዦ ዧ የ ዩ ዪ ያ ዬ ይ ዮ ደ ዱ ዲ ዳ ዴ ድ ዶ ዷ ጀ ጁ ጂ ጃ ጄ ጅ ጆ ጇ ገ ጉ ጊ ጋ ጌ ግ ጎ ጐ ጒ ጓ ጔ ጕ ጠ ጡ ጢ ጣ ጤ ጥ ጦ ጧ ጨ ጩ ጪ ጫ ጬ ጭ ጮ ጯ ጰ ጱ ጲ ጳ ጴ ጵ ጶ ጷ ጸ ጹ ጺ ጻ ጼ ጽ ጾ ጿ ፀ ፁ ፂ ፃ ፄ ፅ ፆ ፇ ፈ ፉ ፊ ፋ ፌ ፍ ፎ ፏ ፐ ፑ ፒ ፓ ፔ ፕ ፖ ፗ]},
 		};
 	},
 EOT
@@ -723,25 +892,6 @@ EOT
 },
 );
 
-
-has 'ellipsis' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub {
-		return {
-			'final' => '{0}…',
-			'word-initial' => '… {0}',
-		};
-	},
-);
-
-has 'more_information' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{?},
-);
 
 has 'quote_start' => (
 	is			=> 'ro',
@@ -771,17 +921,6 @@ has 'alternate_quote_end' => (
 	default		=> qq{”},
 );
 
-has 'duration_units' => (
-	is			=> 'ro',
-	isa			=> HashRef[Str],
-	init_arg	=> undef,
-	default		=> sub { {
-				hm => 'h:mm',
-				hms => 'h:mm:ss',
-				ms => 'm:ss',
-			} }
-);
-
 has 'units' => (
 	is			=> 'ro',
 	isa			=> HashRef[HashRef[HashRef[Str]]],
@@ -791,14 +930,10 @@ has 'units' => (
 					# Long Unit Identifier
 					'duration-century' => {
 						'name' => q(ዘመናት),
-						'one' => q({0} ዘመን),
-						'other' => q({0} ዘመናት),
 					},
 					# Core Unit Identifier
 					'century' => {
 						'name' => q(ዘመናት),
-						'one' => q({0} ዘመን),
-						'other' => q({0} ዘመናት),
 					},
 					# Long Unit Identifier
 					'duration-decade' => {
@@ -820,29 +955,35 @@ has 'units' => (
 					'year' => {
 						'name' => q(ዓመታት),
 					},
+					# Long Unit Identifier
+					'power2' => {
+						'one' => q(ትርብዒት {0}),
+						'other' => q(ትርብዒት {0}),
+					},
+					# Core Unit Identifier
+					'power2' => {
+						'one' => q(ትርብዒት {0}),
+						'other' => q(ትርብዒት {0}),
+					},
+					# Long Unit Identifier
+					'power3' => {
+						'one' => q(ኪዩቢክ {0}),
+						'other' => q(ኪዩቢክ {0}),
+					},
+					# Core Unit Identifier
+					'power3' => {
+						'one' => q(ኪዩቢክ {0}),
+						'other' => q(ኪዩቢክ {0}),
+					},
 				},
 				'narrow' => {
 					# Long Unit Identifier
-					'duration-century' => {
-						'name' => q(ዘመን),
-						'one' => q({0} ዘመን),
-						'other' => q({0} ዘመናት),
-					},
-					# Core Unit Identifier
-					'century' => {
-						'name' => q(ዘመን),
-						'one' => q({0} ዘመን),
-						'other' => q({0} ዘመናት),
-					},
-					# Long Unit Identifier
 					'duration-decade' => {
-						'name' => q(ዓሰርተ ዓመት),
 						'one' => q({0} ዓ.ዓ.),
 						'other' => q({0} ዓ.ዓ.),
 					},
 					# Core Unit Identifier
 					'decade' => {
-						'name' => q(ዓሰርተ ዓመት),
 						'one' => q({0} ዓ.ዓ.),
 						'other' => q({0} ዓ.ዓ.),
 					},
@@ -897,23 +1038,9 @@ has 'listPatterns' => (
 	default		=> sub { {
 				start => q({0}፣ {1}),
 				middle => q({0}፣ {1}),
-				end => q({0}፣ {1}),
+				end => q({0}ን {1}ን),
 				2 => q({0}ን {1}ን),
 		} }
-);
-
-has 'default_numbering_system' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> 'latn',
-);
-
-has native_numbering_system => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> 'latn',
 );
 
 has traditional_numbering_system => (
@@ -923,93 +1050,12 @@ has traditional_numbering_system => (
 	default		=> 'ethi',
 );
 
-has 'minimum_grouping_digits' => (
-	is			=>'ro',
-	isa			=> Int,
-	init_arg	=> undef,
-	default		=> 1,
-);
-
-has 'number_symbols' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'latn' => {
-			'decimal' => q(.),
-			'exponential' => q(E),
-			'group' => q(,),
-			'infinity' => q(∞),
-			'minusSign' => q(-),
-			'nan' => q(NaN),
-			'perMille' => q(‰),
-			'percentSign' => q(%),
-			'plusSign' => q(+),
-			'superscriptingExponent' => q(×),
-			'timeSeparator' => q(:),
-		},
-	} }
-);
-
 has 'number_formats' => (
 	is			=> 'ro',
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
 		decimalFormat => {
-			'default' => {
-				'1000' => {
-					'one' => '0 ሽ',
-					'other' => '0 ሽ',
-				},
-				'10000' => {
-					'one' => '00 ሽ',
-					'other' => '00 ሽ',
-				},
-				'100000' => {
-					'one' => '000 ሽ',
-					'other' => '000 ሽ',
-				},
-				'1000000' => {
-					'one' => '0 ሚ',
-					'other' => '0 ሚ',
-				},
-				'10000000' => {
-					'one' => '00 ሚ',
-					'other' => '00 ሚ',
-				},
-				'100000000' => {
-					'one' => '000 ሚ',
-					'other' => '000 ሚ',
-				},
-				'1000000000' => {
-					'one' => '0 ቢ',
-					'other' => '0 ቢ',
-				},
-				'10000000000' => {
-					'one' => '00 ቢ',
-					'other' => '00 ቢ',
-				},
-				'100000000000' => {
-					'one' => '000 ቢ',
-					'other' => '000 ቢ',
-				},
-				'1000000000000' => {
-					'one' => '0 ት',
-					'other' => '0 ት',
-				},
-				'10000000000000' => {
-					'one' => '00 ት',
-					'other' => '00 ት',
-				},
-				'100000000000000' => {
-					'one' => '000 ት',
-					'other' => '000 ት',
-				},
-				'standard' => {
-					'default' => '#,##0.###',
-				},
-			},
 			'long' => {
 				'1000' => {
 					'one' => '0 ሽሕ',
@@ -1111,20 +1157,6 @@ has 'number_formats' => (
 				},
 			},
 		},
-		percentFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0%',
-				},
-			},
-		},
-		scientificFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#E0',
-				},
-			},
-		},
 } },
 );
 
@@ -1136,9 +1168,6 @@ has 'number_currency_formats' => (
 		'latn' => {
 			'pattern' => {
 				'default' => {
-					'accounting' => {
-						'positive' => '¤#,##0.00',
-					},
 					'standard' => {
 						'positive' => '¤#,##0.00',
 					},
@@ -1153,9 +1182,6 @@ has 'currencies' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'BMD' => {
-			symbol => '$',
-		},
 		'BRL' => {
 			display_name => {
 				'currency' => q(የብራዚል ሪል),
@@ -1165,32 +1191,22 @@ has 'currencies' => (
 			symbol => 'CNY',
 			display_name => {
 				'currency' => q(ዩዋን ቻይና),
-				'one' => q(ዩዋን ቻይና),
-				'other' => q(ዩዋን ቻይና),
 			},
 		},
 		'ERN' => {
-			symbol => 'ERN',
 			display_name => {
 				'currency' => q(ናቕፋ),
-				'one' => q(ናቕፋ),
-				'other' => q(ናቕፋ),
 			},
 		},
 		'ETB' => {
 			symbol => 'Br',
 			display_name => {
 				'currency' => q(ብር),
-				'one' => q(ብር),
-				'other' => q(ብር),
 			},
 		},
 		'EUR' => {
-			symbol => '€',
 			display_name => {
 				'currency' => q(ዩሮ),
-				'one' => q(ዩሮ),
-				'other' => q(ዩሮ),
 			},
 		},
 		'GBP' => {
@@ -1207,8 +1223,6 @@ has 'currencies' => (
 			symbol => 'JPY',
 			display_name => {
 				'currency' => q(የን ጃፓን),
-				'one' => q(የን ጃፓን),
-				'other' => q(የን ጃፓን),
 			},
 		},
 		'RUB' => {
@@ -1217,25 +1231,18 @@ has 'currencies' => (
 			},
 		},
 		'USD' => {
-			symbol => 'US$',
 			display_name => {
 				'currency' => q(ዶላር ኣመሪካ),
-				'one' => q(ዶላር ኣመሪካ),
-				'other' => q(ዶላር ኣመሪካ),
 			},
 		},
 		'XAG' => {
 			display_name => {
 				'currency' => q(ብሩር),
-				'one' => q(ብሩር),
-				'other' => q(ብሩር),
 			},
 		},
 		'XAU' => {
 			display_name => {
 				'currency' => q(ወርቂ),
-				'one' => q(ወርቂ),
-				'other' => q(ወርቂ),
 			},
 		},
 		'XXX' => {
@@ -1275,25 +1282,6 @@ has 'calendar_months' => (
 							
 						],
 					},
-					narrow => {
-						nonleap => [
-							'ጥ',
-							'ለ',
-							'መ',
-							'ሚ',
-							'ግ',
-							'ሰ',
-							'ሓ',
-							'ነ',
-							'መ',
-							'ጥ',
-							'ሕ',
-							'ታ'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'ጥሪ',
@@ -1315,25 +1303,6 @@ has 'calendar_months' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'ጥሪ',
-							'ለካ',
-							'መጋ',
-							'ሚያ',
-							'ግን',
-							'ሰነ',
-							'ሓም',
-							'ነሓ',
-							'መስ',
-							'ጥቅ',
-							'ሕዳ',
-							'ታሕ'
-						],
-						leap => [
-							
-						],
-					},
 					narrow => {
 						nonleap => [
 							'ጥ',
@@ -1348,25 +1317,6 @@ has 'calendar_months' => (
 							'ጥ',
 							'ሕ',
 							'ታ'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'ጥሪ',
-							'ለካቲት',
-							'መጋቢት',
-							'ሚያዝያ',
-							'ግንቦት',
-							'ሰነ',
-							'ሓምለ',
-							'ነሓሰ',
-							'መስከረም',
-							'ጥቅምቲ',
-							'ሕዳር',
-							'ታሕሳስ'
 						],
 						leap => [
 							
@@ -1393,24 +1343,6 @@ has 'calendar_days' => (
 						sat => 'ቀዳ',
 						sun => 'ሰን'
 					},
-					narrow => {
-						mon => 'ሰ',
-						tue => 'ሰ',
-						wed => 'ረ',
-						thu => 'ሓ',
-						fri => 'ዓ',
-						sat => 'ቀ',
-						sun => 'ሰ'
-					},
-					short => {
-						mon => 'ሰኑ',
-						tue => 'ሰሉ',
-						wed => 'ረቡ',
-						thu => 'ሓሙ',
-						fri => 'ዓር',
-						sat => 'ቀዳ',
-						sun => 'ሰን'
-					},
 					wide => {
 						mon => 'ሰኑይ',
 						tue => 'ሰሉስ',
@@ -1422,15 +1354,6 @@ has 'calendar_days' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						mon => 'ሰኑ',
-						tue => 'ሰሉ',
-						wed => 'ረቡ',
-						thu => 'ሓሙ',
-						fri => 'ዓር',
-						sat => 'ቀዳ',
-						sun => 'ሰን'
-					},
 					narrow => {
 						mon => 'ሰ',
 						tue => 'ሰ',
@@ -1439,24 +1362,6 @@ has 'calendar_days' => (
 						fri => 'ዓ',
 						sat => 'ቀ',
 						sun => 'ሰ'
-					},
-					short => {
-						mon => 'ሰኑ',
-						tue => 'ሰሉ',
-						wed => 'ረቡ',
-						thu => 'ሓሙ',
-						fri => 'ዓር',
-						sat => 'ቀዳ',
-						sun => 'ሰን'
-					},
-					wide => {
-						mon => 'ሰኑይ',
-						tue => 'ሰሉስ',
-						wed => 'ረቡዕ',
-						thu => 'ሓሙስ',
-						fri => 'ዓርቢ',
-						sat => 'ቀዳም',
-						sun => 'ሰንበት'
 					},
 				},
 			},
@@ -1474,28 +1379,6 @@ has 'calendar_quarters' => (
 						1 => 'ር2',
 						2 => 'ር3',
 						3 => 'ር4'
-					},
-					narrow => {0 => '1',
-						1 => '2',
-						2 => '3',
-						3 => '4'
-					},
-					wide => {0 => '1ይ ርብዒ',
-						1 => '2ይ ርብዒ',
-						2 => '3ይ ርብዒ',
-						3 => '4ይ ርብዒ'
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {0 => 'ር1',
-						1 => 'ር2',
-						2 => 'ር3',
-						3 => 'ር4'
-					},
-					narrow => {0 => '1',
-						1 => '2',
-						2 => '3',
-						3 => '4'
 					},
 					wide => {0 => '1ይ ርብዒ',
 						1 => '2ይ ርብዒ',
@@ -1518,28 +1401,6 @@ has 'day_periods' => (
 					'am' => q{ቅ.ቀ.},
 					'pm' => q{ድ.ቀ.},
 				},
-				'narrow' => {
-					'am' => q{ቅ.ቀ.},
-					'pm' => q{ድ.ቀ.},
-				},
-				'wide' => {
-					'am' => q{ቅ.ቀ.},
-					'pm' => q{ድ.ቀ.},
-				},
-			},
-			'stand-alone' => {
-				'abbreviated' => {
-					'am' => q{ቅ.ቀ.},
-					'pm' => q{ድ.ቀ.},
-				},
-				'narrow' => {
-					'am' => q{ቅ.ቀ.},
-					'pm' => q{ድ.ቀ.},
-				},
-				'wide' => {
-					'am' => q{ቅ.ቀ.},
-					'pm' => q{ድ.ቀ.},
-				},
 			},
 		},
 	} },
@@ -1550,17 +1411,6 @@ has 'eras' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'buddhist' => {
-			abbreviated => {
-				'0' => 'BE'
-			},
-			narrow => {
-				'0' => 'BE'
-			},
-			wide => {
-				'0' => 'BE'
-			},
-		},
 		'generic' => {
 		},
 		'gregorian' => {
@@ -1581,8 +1431,6 @@ has 'date_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'buddhist' => {
-		},
 		'generic' => {
 			'full' => q{EEEE፣ d MMMM y G},
 			'long' => q{d MMMM y G},
@@ -1603,8 +1451,6 @@ has 'time_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'buddhist' => {
-		},
 		'generic' => {
 		},
 		'gregorian' => {
@@ -1621,17 +1467,15 @@ has 'datetime_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'buddhist' => {
-		},
 		'generic' => {
-			'full' => q{{1} ሰዓት {0}},
-			'long' => q{{1} ሰዓት {0}},
+			'full' => q{{1} {0}},
+			'long' => q{{1} {0}},
 			'medium' => q{{1} {0}},
 			'short' => q{{1} {0}},
 		},
 		'gregorian' => {
-			'full' => q{{1} ሰዓት {0}},
-			'long' => q{{1} ሰዓት {0}},
+			'full' => q{{1} {0}},
+			'long' => q{{1} {0}},
 			'medium' => q{{1} {0}},
 			'short' => q{{1} {0}},
 		},
@@ -1644,39 +1488,19 @@ has 'datetime_formats_available_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-			Bh => q{h B},
-			Bhm => q{h:mm B},
-			Bhms => q{h:mm:ss B},
-			E => q{ccc},
-			EBhm => q{E h:mm B},
-			EBhms => q{E h:mm:ss B},
-			EHm => q{E HH:mm},
-			EHms => q{E HH:mm:ss},
 			Ed => q{E d},
-			Ehm => q{E h:mm a},
-			Ehms => q{E h:mm:ss a},
 			Gy => q{y G},
 			GyMMM => q{MMM y G},
 			GyMMMEd => q{E፣ d MMM y G},
 			GyMMMd => q{d MMM y G},
 			GyMd => q{d/M/y GGGGG},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
 			MEd => q{E፣ d/M},
-			MMM => q{LLL},
 			MMMEd => q{E፣ d MMM},
 			MMMMd => q{d MMMM},
 			MMMMdd => q{dd MMMM},
 			MMMd => q{d MMM},
 			MMdd => q{dd/MM},
 			Md => q{d/M},
-			d => q{d},
-			h => q{h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			ms => q{mm:ss},
 			y => q{y G},
 			yMM => q{MM/y},
 			yMMMM => q{MMMM y},
@@ -1693,12 +1517,6 @@ has 'datetime_formats_available_formats' => (
 			yyyyQQQQ => q{QQQQ y G},
 		},
 		'gregorian' => {
-			Bh => q{h B},
-			Bhm => q{h:mm B},
-			Bhms => q{h:mm:ss B},
-			E => q{ccc},
-			EBhm => q{E h:mm B},
-			EBhms => q{E h:mm:ss B},
 			EHm => q{E፣ HH:mm},
 			EHms => q{E፣ HH:mm:ss},
 			Ed => q{E d},
@@ -1709,14 +1527,7 @@ has 'datetime_formats_available_formats' => (
 			GyMMMEd => q{E፣ d MMM y G},
 			GyMMMd => q{d MMM y G},
 			GyMd => q{d/M/y GGGGG},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			Hmsv => q{HH:mm:ss v},
-			Hmv => q{HH:mm v},
-			M => q{L},
 			MEd => q{E፣ d/M},
-			MMM => q{LLL},
 			MMMEd => q{E፣ d MMM},
 			MMMMW => q{ሰሙን W ናይ MMMM},
 			MMMMd => q{d MMMM},
@@ -1724,19 +1535,10 @@ has 'datetime_formats_available_formats' => (
 			MMMd => q{d MMM},
 			MMdd => q{d/M},
 			Md => q{d/M},
-			d => q{d},
-			h => q{h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			hmsv => q{h:mm:ss a v},
-			hmv => q{h:mm a v},
-			ms => q{mm:ss},
-			y => q{y},
 			yM => q{M/y},
 			yMEd => q{E፣ d/M/y},
 			yMM => q{M/y},
 			yMMM => q{MMM y},
-			yMMMEd => q{y MMM d, E},
 			yMMMM => q{MMMM y},
 			yMMMd => q{d MMM y},
 			yMd => q{d/M/y},
@@ -1752,9 +1554,6 @@ has 'datetime_formats_append_item' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			'Timezone' => '{0} {1}',
-		},
 	} },
 );
 
@@ -1764,39 +1563,15 @@ has 'datetime_formats_interval' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-			H => {
-				H => q{HH–HH},
-			},
-			Hv => {
-				H => q{HH–HH v},
-			},
 			M => {
 				M => q{M–M},
 			},
 			fallback => '{0} – {1}',
-			h => {
-				a => q{h a – h a},
-				h => q{h–h a},
-			},
 			hm => {
-				a => q{h:mm a – h:mm a},
 				h => q{h:mm – h:mm a},
-			},
-			hv => {
-				a => q{h a – h a v},
-				h => q{h–h a v},
 			},
 		},
 		'gregorian' => {
-			Bh => {
-				B => q{h B – h B},
-				h => q{h–h B},
-			},
-			Bhm => {
-				B => q{h:mm B – h:mm B},
-				h => q{h:mm–h:mm B},
-				m => q{h:mm–h:mm B},
-			},
 			Gy => {
 				G => q{y G – y G},
 				y => q{y–y G},
@@ -1835,20 +1610,6 @@ has 'datetime_formats_interval' => (
 				d => q{d/M/y – d/M/y GGGGG},
 				y => q{d/M/y – d/M/y GGGGG},
 			},
-			H => {
-				H => q{HH–HH},
-			},
-			Hm => {
-				H => q{HH:mm–HH:mm},
-				m => q{HH:mm–HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm–HH:mm v},
-				m => q{HH:mm–HH:mm v},
-			},
-			Hv => {
-				H => q{HH–HH v},
-			},
 			M => {
 				M => q{M–M},
 			},
@@ -1871,30 +1632,10 @@ has 'datetime_formats_interval' => (
 				M => q{d/M – d/M},
 				d => q{d/M – d/M},
 			},
-			d => {
-				d => q{d–d},
-			},
 			fallback => '{0} – {1}',
-			h => {
-				a => q{h a – h a},
-				h => q{h–h a},
-			},
 			hm => {
-				a => q{h:mm a – h:mm a},
 				h => q{h:mm – h:mm a},
 				m => q{h:mm – h:mm a},
-			},
-			hmv => {
-				a => q{h:mm a – h:mm a v},
-				h => q{h:mm–h:mm a v},
-				m => q{h:mm–h:mm a v},
-			},
-			hv => {
-				a => q{h a – h a v},
-				h => q{h–h a v},
-			},
-			y => {
-				y => q{y–y},
 			},
 			yM => {
 				M => q{M/y – M/y},
@@ -1937,13 +1678,9 @@ has 'time_zone_names' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default	=> sub { {
-		hourFormat => q(+HH:mm;-HH:mm),
-		gmtFormat => q(GMT{0}),
-		gmtZeroFormat => q(GMT),
 		regionFormat => q(ግዜ {0}),
 		regionFormat => q(ግዜ ክረምቲ {0}),
 		regionFormat => q(ምዱብ ግዜ {0}),
-		fallbackFormat => q({1} ({0})),
 		'Acre' => {
 			long => {
 				'daylight' => q#ግዜ ክረምቲ ኣክሪ#,
@@ -2241,6 +1978,9 @@ has 'time_zone_names' => (
 		},
 		'America/Chihuahua' => {
 			exemplarCity => q#ቺዋዋ#,
+		},
+		'America/Ciudad_Juarez' => {
+			exemplarCity => q#ሲዩዳድ ጁዋረዝ#,
 		},
 		'America/Coral_Harbour' => {
 			exemplarCity => q#ኣቲኮካን#,
@@ -3219,6 +2959,11 @@ has 'time_zone_names' => (
 				'standard' => q#ግዜ ፈረንሳዊ ደቡባዊ ግዝኣታትን ኣንታርቲክን#,
 			},
 		},
+		'GMT' => {
+			long => {
+				'standard' => q#GMT#,
+			},
+		},
 		'Galapagos' => {
 			long => {
 				'standard' => q#ግዜ ጋላፓጎስ#,
@@ -3348,6 +3093,9 @@ has 'time_zone_names' => (
 		},
 		'Pacific/Johnston' => {
 			exemplarCity => q#ጆንስተን#,
+		},
+		'Pacific/Kanton' => {
+			exemplarCity => q#ካንቶን#,
 		},
 		'Pacific/Kiritimati' => {
 			exemplarCity => q#ኪሪቲማቲ#,

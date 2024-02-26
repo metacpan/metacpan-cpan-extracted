@@ -1,0 +1,161 @@
+{
+   "abstract" : "performs rule-based data transfigurations of arbitrary structures",
+   "author" : [
+      "Mark Tyrrell <mark@tyrrminal.dev>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Data-Transfigure",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Compare" : "1.29",
+            "DateTime::Format::Duration::ISO8601" : "0.008",
+            "Module::Util" : "1.09",
+            "Object::Pad" : "0.802",
+            "Readonly" : "2.05",
+            "String::CamelSnakeKebab" : "0.06",
+            "perl" : "5.026000"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "DBIx::Class" : "0",
+            "DBIx::Class::InflateColumn::Time" : "v0.0.1",
+            "DBIx::Class::Relationship::Predicate" : "0.07",
+            "DateTime" : "0",
+            "DateTime::Duration" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "JSON::Validator" : "v5.1.4",
+            "Test2::Suite" : "0.000155",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Data::Transfigure" : {
+         "file" : "lib/Data/Transfigure.pm",
+         "version" : "1.01"
+      },
+      "Data::Transfigure::Constants" : {
+         "file" : "lib/Data/Transfigure/Constants.pm",
+         "version" : "1.01"
+      },
+      "Data::Transfigure::Default" : {
+         "file" : "lib/Data/Transfigure/Default.pm",
+         "version" : "1.01"
+      },
+      "Data::Transfigure::Default::ToString" : {
+         "file" : "lib/Data/Transfigure/Default/ToString.pm",
+         "version" : "1.01"
+      },
+      "Data::Transfigure::HashKeys::CamelCase" : {
+         "file" : "lib/Data/Transfigure/HashKeys/CamelCase.pm",
+         "version" : "1.01"
+      },
+      "Data::Transfigure::HashKeys::CapitalizedIDSuffix" : {
+         "file" : "lib/Data/Transfigure/HashKeys/CapitalizedIDSuffix.pm",
+         "version" : "1.01"
+      },
+      "Data::Transfigure::HashKeys::SnakeCase" : {
+         "file" : "lib/Data/Transfigure/HashKeys/SnakeCase.pm",
+         "version" : "1.01"
+      },
+      "Data::Transfigure::Node" : {
+         "file" : "lib/Data/Transfigure/Node.pm",
+         "version" : "1.01"
+      },
+      "Data::Transfigure::Position" : {
+         "file" : "lib/Data/Transfigure/Position.pm",
+         "version" : "1.01"
+      },
+      "Data::Transfigure::Predicate" : {
+         "file" : "lib/Data/Transfigure/Predicate.pm",
+         "version" : "1.01"
+      },
+      "Data::Transfigure::Schema" : {
+         "file" : "lib/Data/Transfigure/Schema.pm",
+         "version" : "1.01"
+      },
+      "Data::Transfigure::Tree" : {
+         "file" : "lib/Data/Transfigure/Tree.pm",
+         "version" : "1.01"
+      },
+      "Data::Transfigure::Type" : {
+         "file" : "lib/Data/Transfigure/Type.pm",
+         "version" : "1.01"
+      },
+      "Data::Transfigure::Type::DBIx" : {
+         "file" : "lib/Data/Transfigure/Type/DBIx.pm",
+         "version" : "1.01"
+      },
+      "Data::Transfigure::Type::DBIx::Recursive" : {
+         "file" : "lib/Data/Transfigure/Type/DBIx/Recursive.pm",
+         "version" : "1.01"
+      },
+      "Data::Transfigure::Type::DateTime" : {
+         "file" : "lib/Data/Transfigure/Type/DateTime.pm",
+         "version" : "1.01"
+      },
+      "Data::Transfigure::Type::DateTime::Duration" : {
+         "file" : "lib/Data/Transfigure/Type/DateTime/Duration.pm",
+         "version" : "1.01"
+      },
+      "Data::Transfigure::Value" : {
+         "file" : "lib/Data/Transfigure/Value.pm",
+         "version" : "1.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tyrrminal/data-transfigure/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/tyrrminal/data-transfigure.git",
+         "web" : "https://github.com/tyrrminal/data-transfigure.git"
+      }
+   },
+   "version" : "1.01",
+   "x_generated_by_perl" : "v5.38.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_spdx_expression" : "MIT"
+}
+

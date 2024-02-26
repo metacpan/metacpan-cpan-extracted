@@ -1,5 +1,8 @@
 Revision history for Variable-OnDestruct
 
+0.07      2024-02-24 21:55:59+01:00 Europe/Brussels
+          - Don't catch exceptions from destruct handlers
+
 0.06      2022-08-18 17:23:20+02:00 Europe/Amsterdam
           - Add on_destruct_fifo
 

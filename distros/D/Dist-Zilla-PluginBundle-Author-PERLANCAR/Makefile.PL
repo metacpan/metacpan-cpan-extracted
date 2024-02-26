@@ -58,6 +58,7 @@ my %WriteMakefileArgs = (
     "Dist::Zilla::Plugin::UploadToCPAN::WWWPAUSESimple" => 0,
     "Dist::Zilla::PluginBundle::Filter" => 0,
     "Dist::Zilla::Role::BeforeBuild" => 0,
+    "Dist::Zilla::Role::PluginBundle::Config::Slicer" => 0,
     "Dist::Zilla::Role::PluginBundle::Easy" => 0,
     "Module::Version" => 0,
     "Moose" => 0,
@@ -76,7 +77,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.609",
+  "VERSION" => "0.610",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -125,6 +126,7 @@ my %FallbackPrereqs = (
   "Dist::Zilla::Plugin::UploadToCPAN::WWWPAUSESimple" => 0,
   "Dist::Zilla::PluginBundle::Filter" => 0,
   "Dist::Zilla::Role::BeforeBuild" => 0,
+  "Dist::Zilla::Role::PluginBundle::Config::Slicer" => 0,
   "Dist::Zilla::Role::PluginBundle::Easy" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,

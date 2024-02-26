@@ -1,3 +1,8 @@
+0.008   2023-12-28  Released-By: PERLANCAR; Urgency: medium
+
+        - Add option: --percent (-p).
+
+
 0.007   2022-05-20  Released-By: PERLANCAR; Urgency: medium
 
         - [ux] Add -a as shortcut for --sort=asciibetically.

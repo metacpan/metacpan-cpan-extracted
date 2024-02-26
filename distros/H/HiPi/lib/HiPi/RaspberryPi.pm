@@ -14,11 +14,12 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION ='0.89';
+our $VERSION ='0.91';
 
 my ( $btype1, $btype2, $btype3, $btype4) = ( 1, 2, 3, 4 );
 
-my $israspberry = 0;
+my $israspberry  = 0;
+my $israspberry1 = 0;
 my $israspberry2 = 0;
 my $israspberry3 = 0;
 my $israspberry4 = 0;
@@ -270,34 +271,46 @@ my %_revinfostash = (
         '4' => 'BCM2712',
     },
     processor_info => {
+        'UNKNOWN' => {
+            arm                 => 'UNKNOWN',
+            cores               => 1,
+            architecture_width  => 32,
+            hardware            => 'UNKNOWN',
+            raspios_supported   => [ 'armhf' ],
+        },
         'BCM2835' => {
             arm                 => 'ARM1176',
             cores               => 1,
             architecture_width  => 32,
+            hardware            => 'BCM2835',
             raspios_supported   => [ 'armhf' ],
         },
         'BCM2836' => {
             arm                 => 'Cortex-A7',
             cores               => 4,
             architecture_width  => 32,
+            hardware            => 'BCM2835',
             raspios_supported   => [ 'armhf' ],
         },
         'BCM2837' => {
             arm                 => 'Cortex-A53',
             cores               => 4,
             architecture_width  => 64,
+            hardware            => 'BCM2835',
             raspios_supported   => [ 'armhf', 'arm64' ],
         },
         'BCM2711' => {
             arm                 => 'Cortex-A72',
             cores               => 4,
             architecture_width  => 64,
+            hardware            => 'BCM2835',
             raspios_supported   => [ 'armhf', 'arm64' ],
         },
         'BCM2712' => {
             arm                 => 'Cortex-A76',
             cores               => 4,
             architecture_width  => 64,
+            hardware            => 'RP1',
             raspios_supported   => [ 'armhf', 'arm64' ],
         },
     },
@@ -381,6 +394,7 @@ my %_revinfostash = (
     },
     extended_release => {
         'a03111' => 'Q2 2019', #	4B	1.1	1GB	Sony UK
+        'a03115' => 'Q1 2022', #	4B	1.5	1GB	Sony UK
         
         'b03111' => 'Q2 2019', #	4B	1.1	2GB	Sony UK
         'b03112' => 'Q1 2020', #	4B	1.2	2GB	Sony UK
@@ -392,8 +406,12 @@ my %_revinfostash = (
         'c03114' => 'Q2 2020', #	4B	1.4	4GB	Sony UK
         'c03115' => 'Q1 2022', #	4B	1.5	4GB	Sony UK
         
+        'c04170' => 'Q4 2023', #	5B	1.0	4GB	Sony UK
+        
         'd03114' => 'Q2 2020', #	4B	1.4	8GB	Sony UK
         'd03115' => 'Q1 2022', #	4B	1.5	8GB	Sony UK
+        
+        'd04170' => 'Q4 2023', #	5B	1.0	8GB	Sony UK
     },
 );
 
@@ -435,7 +453,7 @@ sub processor { return $_config->{processor}; }
 
 sub has_rp1 { return ( $israspberry5 ) ? 1 : 0; }
 
-sub hardware { return $_config->{hardware}; }
+sub hardware { return $_config->{processor_info}->{hardware}; }
 
 sub model_name { return $_config->{modelname}; }
 
@@ -505,23 +523,20 @@ sub _configure {
         }
     }
     
-    my $hardware = ($_cpuinfostash{Hardware}) ?  $_cpuinfostash{Hardware} : 'BCM2709';
     my $serial = ($_cpuinfostash{Serial}) ?  $_cpuinfostash{Serial} : 'SERIALNONOTFOUND';
     my $short_serial = $serial;
     $short_serial =~ s/^(.{8})(.{8})$/$2/;
-    my $board_type = ( $hardware eq 'BCM2708' ) ? 2 : 3;
-    my $defaultkey = ( $board_type == 3  ) ? 'unknownex' : 'unknown';
+    my $defaultkey = 'unknownex';
     my $rev = ($_cpuinfostash{Revision}) ?  lc( $_cpuinfostash{Revision} ) : $defaultkey;
     $rev =~ s/^\s+//;
     $rev =~ s/\s+$//;
-        
-    $israspberry = $_cpuinfostash{Hardware} && $_cpuinfostash{Hardware} =~ /^BCM(27|28)/;
-        
+    
     if ( $rev =~ /(beta|unknown|unknownex)$/) {
         my $infokey = exists($_revstash{$rev}) ? $rev : $defaultkey;
         $_config = { %{ $_revstash{$infokey} } };
-        $_config->{processor} = 'BCM2835';
+        $_config->{processor} = 'UNKNOWN';
         $_config->{revision} = 'UNKNOWN';
+        $_config->{processor_info} = $_revinfostash{processor_info}->{'UNKNOWN'};
     } else {
         # is this a scheme 0 or 1 number
         my $revnum = oct( '0x' . $rev );
@@ -563,12 +578,12 @@ sub _configure {
             $binfo->{model_name} = $device_tree_boardname if $device_tree_boardname;
             $binfo->{memory}   = $_revinfostash{memsize}->{$s_memory} || 256;
             $binfo->{manufacturer} = $_revinfostash{manufacturer}->{$s_manufacturer} || 'Sony';
-            $binfo->{board_type} =  $_revinfostash{board_type}->{$s_raspberry_type} || $board_type;
+            $binfo->{board_type} =  $_revinfostash{board_type}->{$s_raspberry_type} || 3;
             $binfo->{processor} = $_revinfostash{processor}->{$s_processor} || 'BCM2835';
             $binfo->{revision} = $rev;
             $binfo->{revisionnumber} = $s_revision;
             $binfo->{processor_info} = $_revinfostash{processor_info}->{$binfo->{processor}};
-            
+                        
             $israspberry2 = ( $s_raspberry_type == 4 ) ? 1 : 0;
             
             $israspberry3 = ( $s_raspberry_type == 8  ||
@@ -585,12 +600,18 @@ sub _configure {
             
             $israspberry5 = ( $s_raspberry_type == 23 ) ? 1 : 0;
             
+            $israspberry = (
+                $israspberry2 || $israspberry3 || $israspberry4 || $israspberry5
+            ) ? 1 : 0;
+            
             $_config = { %$binfo };
         } else {
             my $infokey = exists($_revstash{$rev}) ? $rev : $defaultkey;
             $_config = { %{ $_revstash{$infokey} } };
             $_config->{processor} = 'BCM2835';
             $_config->{revisionnumber} = 0;
+            $_config->{processor_info} = $_revinfostash{processor_info}->{'BCM2835'};
+            $israspberry = exists($_revstash{$rev}) ? 1 : 0;
         }
         
     }    
@@ -605,7 +626,6 @@ sub _configure {
         $homedir = (getpwuid($<))[7];
     }
     
-    $_config->{hardware} = $hardware;
     $_config->{serial}  = $serial;
     $_config->{short_serial}  = $short_serial;
     
@@ -651,7 +671,7 @@ sub dump_board_info {
     $dump .= qq(Manufacturer     : $_config->{manufacturer}\n);
     $dump .= qq(Memory           : $_config->{memory}\n);
     $dump .= qq(Processor        : $processor\n);
-    $dump .= qq(Hardware         : $_config->{hardware}\n);
+    $dump .= qq(Hardware         : ) . hardware() . qq(\n);
     my $description = board_description();
     $dump .= qq(Description      : $description\n);
     $dump .= qq(Revision         : $_config->{revision}\n);

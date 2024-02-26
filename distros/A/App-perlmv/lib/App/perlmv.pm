@@ -3,9 +3,9 @@
 package App::perlmv;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-15'; # DATE
+our $DATE = '2023-11-17'; # DATE
 our $DIST = 'App-perlmv'; # DIST
-our $VERSION = '0.608'; # VERSION
+our $VERSION = '0.609'; # VERSION
 
 use 5.010001;
 use strict;
@@ -16,7 +16,7 @@ use Cwd qw(abs_path getcwd);
 #use Data::Dump qw(dump);
 use File::Copy;
 use File::Find;
-use File::MoreUtil qw(l_abs_path);
+use File::Util::Test qw(l_abs_path);
 use File::Path qw(make_path);
 use File::Spec;
 use Getopt::Long::Complete qw(GetOptionsWithCompletion);
@@ -646,7 +646,7 @@ App::perlmv - Rename files using Perl code
 
 =head1 VERSION
 
-This document describes version 0.608 of App::perlmv (from Perl distribution App-perlmv), released on 2023-07-15.
+This document describes version 0.609 of App::perlmv (from Perl distribution App-perlmv), released on 2023-11-17.
 
 =for Pod::Coverage ^(.*)$
 

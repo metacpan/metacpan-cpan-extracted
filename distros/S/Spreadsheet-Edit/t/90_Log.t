@@ -77,7 +77,8 @@ sub checklog(&$;$$) {
 sub _inner {
   my ($pkg,$fn,$lno,$subname) = @{ nearest_call() };
   my @abbr = abbrev_call_fn_ln_subname();
-  warn ivis '$pkg $lno $subname abbrev=@abbr\n';
+  # Avoid 'warn' here -- I suspect some test harnesses make it Carp::Always
+  print STDERR ivis '$pkg $lno $subname abbrev=@abbr\n';
 }
 sub interm {
   &_inner;

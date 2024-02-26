@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Sr::Latn::Ba - Package for language Serbian
 
 package Locale::CLDR::Locales::Sr::Latn::Ba;
 # This file auto generated from Data\common\main\sr_Latn_BA.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -31,35 +31,22 @@ has 'display_name_language' => (
 	default		=> sub {
 		 sub {
 			 my %languages = (
-				'ar_001' => 'savremeni standardni arapski',
- 				'arn' => 'mapudungun',
- 				'be' => 'bjeloruski',
+				'be' => 'bjeloruski',
  				'bm' => 'bamanankan',
  				'bn' => 'bangla',
+ 				'crl' => 'sjeveroistočni kri',
  				'de' => 'njemački',
  				'de_CH' => 'švajcarski visoki njemački',
- 				'en_GB' => 'engleski (Velika Britanija)',
- 				'es_ES' => 'španski (Evropa)',
- 				'fa_AF' => 'dari',
+ 				'frr' => 'sjevernofrizijski',
  				'gsw' => 'njemački (Švajcarska)',
  				'ht' => 'haićanski kreolski',
- 				'lo' => 'laoški',
  				'lrc' => 'sjeverni luri',
- 				'moh' => 'mohok',
  				'nd' => 'sjeverni ndebele',
  				'nds' => 'niskonjemački',
- 				'nqo' => 'n’ko',
- 				'pt_PT' => 'portugalski (Portugal)',
+ 				'nso' => 'sjeverni soto',
+ 				'ojb' => 'sjeverozapadni odžibva',
  				'se' => 'sjeverni sami',
- 				'shi' => 'južni šilha',
- 				'si' => 'sinhalski',
- 				'sw_CD' => 'kisvahili',
- 				'tzm' => 'centralnoatlaski tamašek',
- 				'xh' => 'isikosa',
- 				'zgh' => 'standardni marokanski tamašek',
- 				'zh_Hans' => 'pojednostavljeni kineski',
- 				'zh_Hant' => 'tradicionalni kineski',
- 				'zu' => 'isizulu',
+ 				'ttm' => 'sjeverni tučon',
 
 			);
 			if (@_) {
@@ -83,32 +70,37 @@ has 'display_name_region' => (
  			'021' => 'Sjeverna Amerika',
  			'154' => 'Sjeverna Evropa',
  			'AC' => 'ostrvo Asension',
+ 			'AX' => 'Olandska ostrva',
+ 			'BL' => 'Sen Bartelemi',
+ 			'BN' => 'Bruneji',
+ 			'BV' => 'ostrvo Buve',
  			'BY' => 'Bjelorusija',
  			'CC' => 'Kokosova (Kiling) ostrva',
- 			'CG' => 'Kongo',
  			'CP' => 'ostrvo Kliperton',
- 			'CV' => 'Kabo Verde',
  			'CZ' => 'Češka Republika',
  			'DE' => 'Njemačka',
+ 			'FK' => 'Foklandska ostrva',
  			'FK@alt=variant' => 'Folklandska (Malvinska) ostrva',
+ 			'FO' => 'Farska ostrva',
  			'GS' => 'Južna Džordžija i Južna Sendvička ostrva',
  			'GU' => 'Gvam',
+ 			'GW' => 'Gvineja Bisao',
  			'HK' => 'Hongkong (SAO Kine)',
  			'HM' => 'ostrvo Herd i ostrva Makdonald',
- 			'KN' => 'Sveti Kits i Nevis',
+ 			'KM' => 'Komori',
  			'KP' => 'Sjeverna Koreja',
  			'MK' => 'Sjeverna Makedonija',
- 			'MO' => 'SAR Makao',
+ 			'MM' => 'Mjanmar (Burma)',
  			'MP' => 'Sjeverna Marijanska ostrva',
  			'NF' => 'ostrvo Norfok',
  			'NU' => 'Nijue',
- 			'PM' => 'Sveti Pjer i Mikelon',
  			'PS' => 'palestinske teritorije',
  			'RE' => 'Reunion',
+ 			'TF' => 'Francuske južne teritorije',
  			'UM' => 'Spoljna ostrva SAD',
  			'VC' => 'Sveti Vinsent i Grenadini',
- 			'VG' => 'Britanska Djevičanska Ostrva',
- 			'VI' => 'Američka Djevičanska Ostrva',
+ 			'VG' => 'Britanska Djevičanska ostrva',
+ 			'VI' => 'Američka Djevičanska ostrva',
 
 		}
 	},
@@ -134,9 +126,14 @@ has 'display_name_type' => (
 	default		=> sub {
 		{
 			'collation' => {
+ 				'compat' => q{prethodni redoslijed sortiranja, zbog kompatibilnosti},
+ 				'dictionary' => q{redoslijed sortiranja u rječniku},
  				'ducet' => q{podrazumijevani Unicode redoslijed sortiranja},
+ 				'phonetic' => q{fonetski redoslijed sortiranja},
+ 				'reformed' => q{reformisani redoslijed sortiranja},
  				'search' => q{pretraga opšte namjene},
  				'standard' => q{standardni redoslijed sortiranja},
+ 				'unihan' => q{redoslijed sortiranja radikalnih poteza},
  			},
  			'numbers' => {
  				'mymr' => q{mjanmarske cifre},
@@ -161,6 +158,42 @@ has 'units' => (
 						'1' => q(jobi{0}),
 					},
 					# Long Unit Identifier
+					'10p-30' => {
+						'1' => q(q{0}),
+					},
+					# Core Unit Identifier
+					'30' => {
+						'1' => q(q{0}),
+					},
+					# Long Unit Identifier
+					'10p27' => {
+						'1' => q(R{0}),
+					},
+					# Core Unit Identifier
+					'10p27' => {
+						'1' => q(R{0}),
+					},
+					# Long Unit Identifier
+					'10p30' => {
+						'1' => q(Q{0}),
+					},
+					# Core Unit Identifier
+					'10p30' => {
+						'1' => q(Q{0}),
+					},
+					# Long Unit Identifier
+					'acceleration-g-force' => {
+						'few' => q({0} G),
+						'one' => q({0} ge sila),
+						'other' => q({0} ge sila),
+					},
+					# Core Unit Identifier
+					'g-force' => {
+						'few' => q({0} G),
+						'one' => q({0} ge sila),
+						'other' => q({0} ge sila),
+					},
+					# Long Unit Identifier
 					'duration-century' => {
 						'few' => q({0} vijeka),
 						'name' => q(vijekovi),
@@ -177,7 +210,6 @@ has 'units' => (
 					# Long Unit Identifier
 					'duration-month' => {
 						'few' => q({0} mjeseca),
-						'name' => q(mjeseci),
 						'one' => q({0} mjesec),
 						'other' => q({0} mjeseci),
 						'per' => q({0} mjesečno),
@@ -185,7 +217,6 @@ has 'units' => (
 					# Core Unit Identifier
 					'month' => {
 						'few' => q({0} mjeseca),
-						'name' => q(mjeseci),
 						'one' => q({0} mjesec),
 						'other' => q({0} mjeseci),
 						'per' => q({0} mjesečno),
@@ -207,6 +238,42 @@ has 'units' => (
 						'per' => q({0} nedjeljno),
 					},
 					# Long Unit Identifier
+					'electric-milliampere' => {
+						'few' => q({0} mA),
+						'one' => q({0} miliamper),
+						'other' => q({0} miliampera),
+					},
+					# Core Unit Identifier
+					'milliampere' => {
+						'few' => q({0} mA),
+						'one' => q({0} miliamper),
+						'other' => q({0} miliampera),
+					},
+					# Long Unit Identifier
+					'energy-kilojoule' => {
+						'few' => q({0} kJ),
+						'one' => q({0} kilodžul),
+						'other' => q({0} kilodžula),
+					},
+					# Core Unit Identifier
+					'kilojoule' => {
+						'few' => q({0} kJ),
+						'one' => q({0} kilodžul),
+						'other' => q({0} kilodžula),
+					},
+					# Long Unit Identifier
+					'frequency-hertz' => {
+						'few' => q({0} Hz),
+						'one' => q({0} herc),
+						'other' => q({0} herca),
+					},
+					# Core Unit Identifier
+					'hertz' => {
+						'few' => q({0} Hz),
+						'one' => q({0} herc),
+						'other' => q({0} herca),
+					},
+					# Long Unit Identifier
 					'length-light-year' => {
 						'few' => q({0} svjetlosne godine),
 						'name' => q(svjetlosne godine),
@@ -223,30 +290,162 @@ has 'units' => (
 					# Long Unit Identifier
 					'mass-grain' => {
 						'few' => q({0} grana),
-						'name' => q(gran),
 						'one' => q({0} gran),
 						'other' => q({0} granova),
 					},
 					# Core Unit Identifier
 					'grain' => {
 						'few' => q({0} grana),
-						'name' => q(gran),
 						'one' => q({0} gran),
 						'other' => q({0} granova),
+					},
+					# Long Unit Identifier
+					'pressure-inch-ofhg' => {
+						'few' => q({0} inHg),
+						'one' => q({0} inč živinog stuba),
+						'other' => q({0} inča živinog stuba),
+					},
+					# Core Unit Identifier
+					'inch-ofhg' => {
+						'few' => q({0} inHg),
+						'one' => q({0} inč živinog stuba),
+						'other' => q({0} inča živinog stuba),
+					},
+					# Long Unit Identifier
+					'pressure-millibar' => {
+						'few' => q({0} mbar),
+						'one' => q({0} milibar),
+						'other' => q({0} milibara),
+					},
+					# Core Unit Identifier
+					'millibar' => {
+						'few' => q({0} mbar),
+						'one' => q({0} milibar),
+						'other' => q({0} milibara),
+					},
+					# Long Unit Identifier
+					'speed-beaufort' => {
+						'few' => q(B {0}),
+						'name' => q(Bft),
+						'one' => q(B {0}),
+						'other' => q(B {0}),
+					},
+					# Core Unit Identifier
+					'beaufort' => {
+						'few' => q(B {0}),
+						'name' => q(Bft),
+						'one' => q(B {0}),
+						'other' => q(B {0}),
+					},
+					# Long Unit Identifier
+					'volume-acre-foot' => {
+						'few' => q({0} aker stope),
+						'one' => q({0} ac ft),
+						'other' => q({0} aker stopa),
+					},
+					# Core Unit Identifier
+					'acre-foot' => {
+						'few' => q({0} aker stope),
+						'one' => q({0} ac ft),
+						'other' => q({0} aker stopa),
+					},
+					# Long Unit Identifier
+					'volume-gallon-imperial' => {
+						'few' => q({0} gal Imp.),
+						'one' => q({0} imp. galon),
+						'other' => q({0} imp. galona),
+					},
+					# Core Unit Identifier
+					'gallon-imperial' => {
+						'few' => q({0} gal Imp.),
+						'one' => q({0} imp. galon),
+						'other' => q({0} imp. galona),
 					},
 				},
 				'narrow' => {
 					# Long Unit Identifier
+					'duration-month' => {
+						'few' => q({0} mjes.),
+						'one' => q({0} m),
+						'other' => q({0} m),
+					},
+					# Core Unit Identifier
+					'month' => {
+						'few' => q({0} mjes.),
+						'one' => q({0} m),
+						'other' => q({0} m),
+					},
+					# Long Unit Identifier
+					'duration-second' => {
+						'few' => q({0} s),
+						'one' => q({0} sek),
+						'other' => q({0} s),
+					},
+					# Core Unit Identifier
+					'second' => {
+						'few' => q({0} s),
+						'one' => q({0} sek),
+						'other' => q({0} s),
+					},
+					# Long Unit Identifier
+					'duration-week' => {
+						'few' => q({0} n),
+						'one' => q({0} ned.),
+						'other' => q({0} n),
+					},
+					# Core Unit Identifier
+					'week' => {
+						'few' => q({0} n),
+						'one' => q({0} ned.),
+						'other' => q({0} n),
+					},
+					# Long Unit Identifier
+					'duration-year' => {
+						'few' => q({0} god.),
+						'one' => q({0} g),
+						'other' => q({0} g),
+					},
+					# Core Unit Identifier
+					'year' => {
+						'few' => q({0} god.),
+						'one' => q({0} g),
+						'other' => q({0} g),
+					},
+					# Long Unit Identifier
+					'power-horsepower' => {
+						'few' => q({0} hp),
+						'one' => q({0} ks),
+						'other' => q({0} ks),
+					},
+					# Core Unit Identifier
+					'horsepower' => {
+						'few' => q({0} hp),
+						'one' => q({0} ks),
+						'other' => q({0} ks),
+					},
+					# Long Unit Identifier
+					'speed-beaufort' => {
+						'few' => q(B {0}),
+						'name' => q(Bft),
+						'one' => q(B {0}),
+						'other' => q(B {0}),
+					},
+					# Core Unit Identifier
+					'beaufort' => {
+						'few' => q(B {0}),
+						'name' => q(Bft),
+						'one' => q(B {0}),
+						'other' => q(B {0}),
+					},
+					# Long Unit Identifier
 					'volume-barrel' => {
 						'few' => q({0} bbl),
-						'name' => q(bbl),
 						'one' => q({0}bbl),
 						'other' => q({0}bbl),
 					},
 					# Core Unit Identifier
 					'barrel' => {
 						'few' => q({0} bbl),
-						'name' => q(bbl),
 						'one' => q({0}bbl),
 						'other' => q({0}bbl),
 					},
@@ -277,6 +476,18 @@ has 'units' => (
 						'name' => q(i. d. k.),
 						'one' => q({0} i. d. k.),
 						'other' => q({0} i. d. k.),
+					},
+					# Long Unit Identifier
+					'volume-gallon-imperial' => {
+						'few' => q({0} gal Imp.),
+						'one' => q({0}/gal Imp),
+						'other' => q({0}/gal Imp),
+					},
+					# Core Unit Identifier
+					'gallon-imperial' => {
+						'few' => q({0} gal Imp.),
+						'one' => q({0}/gal Imp),
+						'other' => q({0}/gal Imp),
 					},
 				},
 				'short' => {
@@ -317,18 +528,16 @@ has 'units' => (
 						'other' => q({0} granova),
 					},
 					# Long Unit Identifier
-					'volume-dessert-spoon' => {
-						'few' => q({0} dstspn),
-						'name' => q(dstspn),
-						'one' => q({0} dstspn),
-						'other' => q({0} dstspn),
+					'speed-beaufort' => {
+						'few' => q(B {0}),
+						'one' => q(B {0}),
+						'other' => q(B {0}),
 					},
 					# Core Unit Identifier
-					'dessert-spoon' => {
-						'few' => q({0} dstspn),
-						'name' => q(dstspn),
-						'one' => q({0} dstspn),
-						'other' => q({0} dstspn),
+					'beaufort' => {
+						'few' => q(B {0}),
+						'one' => q(B {0}),
+						'other' => q(B {0}),
 					},
 				},
 			} }
@@ -382,17 +591,6 @@ has 'calendar_days' => (
 	default		=> sub { {
 			'gregorian' => {
 				'format' => {
-					wide => {
-						mon => 'ponedjeljak',
-						tue => 'utorak',
-						wed => 'srijeda',
-						thu => 'četvrtak',
-						fri => 'petak',
-						sat => 'subota',
-						sun => 'nedjelja'
-					},
-				},
-				'stand-alone' => {
 					abbreviated => {
 						mon => 'pon',
 						tue => 'uto',
@@ -426,31 +624,6 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'generic') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
-				}
-				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
-				}
-				last SWITCH;
-				}
 			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
@@ -493,20 +666,15 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'afternoon1' => q{po pod.},
-					'am' => q{prije podne},
-					'evening1' => q{veče},
-					'midnight' => q{ponoć},
-					'morning1' => q{jutro},
-					'noon' => q{podne},
-					'pm' => q{po podne},
+					'am' => q{prije podne},
+					'pm' => q{po podne},
 				},
 				'narrow' => {
-					'afternoon1' => q{po pod.},
-					'evening1' => q{veče},
+					'afternoon1' => q{po podne},
+					'evening1' => q{uveče},
 					'midnight' => q{ponoć},
-					'morning1' => q{jutro},
-					'night1' => q{noć},
+					'morning1' => q{ujutro},
+					'night1' => q{noću},
 					'noon' => q{podne},
 				},
 				'wide' => {
@@ -515,10 +683,6 @@ has 'day_periods' => (
 				},
 			},
 			'stand-alone' => {
-				'abbreviated' => {
-					'am' => q{prije podne},
-					'pm' => q{po podne},
-				},
 				'narrow' => {
 					'am' => q{a},
 					'pm' => q{p},
@@ -537,8 +701,6 @@ has 'eras' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-		},
 		'gregorian' => {
 			wide => {
 				'0' => 'prije nove ere'
@@ -552,8 +714,6 @@ has 'date_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-		},
 		'gregorian' => {
 		},
 	} },
@@ -564,8 +724,6 @@ has 'time_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-		},
 		'gregorian' => {
 		},
 	} },
@@ -576,8 +734,6 @@ has 'datetime_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-		},
 		'gregorian' => {
 		},
 	} },
@@ -604,39 +760,6 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			MMMEd => {
-				M => q{E, d. MMM – E, d. MMM},
-				d => q{E, d. MMM – E, d. MMM},
-			},
-			yMd => {
-				M => q{d.M.y. – d.M.y. GGGGG},
-			},
-		},
-		'gregorian' => {
-			MEd => {
-				M => q{E, MM-dd – E, MM-dd},
-				d => q{E, MM-dd – E, MM-dd},
-			},
-			Md => {
-				M => q{MM-dd – MM-dd},
-				d => q{MM-dd – MM-dd},
-			},
-			yM => {
-				M => q{y-MM – y-MM},
-				y => q{y-MM – y-MM},
-			},
-			yMEd => {
-				M => q{E, y-MM-dd – E, y-MM-dd},
-				d => q{E, y-MM-dd – E, y-MM-dd},
-				y => q{E, y-MM-dd – E, y-MM-dd},
-			},
-			yMd => {
-				M => q{y-MM-dd – y-MM-dd},
-				d => q{y-MM-dd – y-MM-dd},
-				y => q{y-MM-dd – y-MM-dd},
-			},
-		},
 	} },
 );
 
@@ -677,6 +800,7 @@ has 'time_zone_names' => (
 		'Alaska' => {
 			long => {
 				'daylight' => q#Aljaska, ljetnje vrijeme#,
+				'generic' => q#Aljaska#,
 				'standard' => q#Aljaska, standardno vrijeme#,
 			},
 		},
@@ -955,6 +1079,7 @@ has 'time_zone_names' => (
 		'Cuba' => {
 			long => {
 				'daylight' => q#Kuba, ljetnje vrijeme#,
+				'generic' => q#Kuba#,
 				'standard' => q#Kuba, standardno vrijeme#,
 			},
 		},
@@ -1075,12 +1200,14 @@ has 'time_zone_names' => (
 		'Greenland_Eastern' => {
 			long => {
 				'daylight' => q#Istočni Grenland, ljetnje vrijeme#,
+				'generic' => q#Istočni Grenland#,
 				'standard' => q#Istočni Grenland, standardno vrijeme#,
 			},
 		},
 		'Greenland_Western' => {
 			long => {
 				'daylight' => q#Zapadni Grenland, ljetnje vrijeme#,
+				'generic' => q#Zapadni Grenland#,
 				'standard' => q#Zapadni Grenland, standardno vrijeme#,
 			},
 		},
@@ -1273,6 +1400,7 @@ has 'time_zone_names' => (
 		'Mexico_Pacific' => {
 			long => {
 				'daylight' => q#Meksički Pacifik, ljetnje vrijeme#,
+				'generic' => q#Meksički Pacifik#,
 				'standard' => q#Meksički Pacifik, standardno vrijeme#,
 			},
 		},
@@ -1322,6 +1450,7 @@ has 'time_zone_names' => (
 		'Newfoundland' => {
 			long => {
 				'daylight' => q#Njufaundlend, ljetnje vrijeme#,
+				'generic' => q#Njufaundlend#,
 				'standard' => q#Njufaundlend, standardno vrijeme#,
 			},
 		},
@@ -1407,6 +1536,7 @@ has 'time_zone_names' => (
 		'Pierre_Miquelon' => {
 			long => {
 				'daylight' => q#Sen Pjer i Mikelon, ljetnje vrijeme#,
+				'generic' => q#Sen Pjer i Mikelon#,
 				'standard' => q#Sen Pjer i Mikelon, standardno vrijeme#,
 			},
 		},

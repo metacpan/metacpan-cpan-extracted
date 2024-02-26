@@ -26,4 +26,4 @@ my $dt_da_dk = DateTime->new(
 	time_zone  => 'Europe/London',
 );
 
-is ($dt_da_dk->format_cldr($locale->datetime_format_full), 'tirsdag den 25. oktober 1966 kl. 07.15.47 Europe/London', 'Date Time Format Full Danish Dutch');
+is ($dt_da_dk->format_cldr($locale->datetime_format_full), 'tirsdag den 25. oktober 1966 07.15.47 Europe/London', 'Date Time Format Full Danish Dutch');

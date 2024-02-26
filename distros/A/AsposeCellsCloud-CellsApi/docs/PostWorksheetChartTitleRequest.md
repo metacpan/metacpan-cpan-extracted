@@ -11,7 +11,7 @@ Name | Type | Description | Notes
 **name** | **string** | The file name. |
 **sheet_name** | **string** | The worksheet name. |
 **chart_index** | **int** | The chart index. |
-**title** | **Title** | Chart title |
+**title** | **Title** | TitleChart title |
 **folder** | **string** | The folder where the file is situated. |
 **storage_name** | **string** | The storage name where the file is situated. |  
 

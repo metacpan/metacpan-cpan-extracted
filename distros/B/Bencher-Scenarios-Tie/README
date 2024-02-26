@@ -2,11 +2,15 @@ NAME
     Bencher::Scenarios::Tie - Scenarios to benchmark tie() mechanism
 
 VERSION
-    This document describes version 0.001 of Bencher::Scenarios::Tie (from
-    Perl distribution Bencher-Scenarios-Tie), released on 2023-12-26.
+    This document describes version 0.002 of Bencher::Scenarios::Tie (from
+    Perl distribution Bencher-Scenarios-Tie), released on 2023-12-27.
 
 DESCRIPTION
     This distribution contains the following Bencher scenario modules:
+
+    *   Bencher::Scenario::Tie::Hash
+
+    *   Bencher::Scenario::Tie::Array
 
     *   Bencher::Scenario::Tie::Scalar
 

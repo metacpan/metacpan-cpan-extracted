@@ -1,5 +1,5 @@
 
- Games::Sudoku::PatternSolver - solve, generate and play standard 9x9 Sudoku.
+ Games::Sudoku::PatternSolver - solve and generate standard 9x9 Sudoku.
 
  A lesser-known approach to solving sudoku by use of distribution patterns. (POM / Pattern Overlay Method)
  It is a recursive, nondeterministic, depth-first, backtracking way to tackle the 'Exact Cover Problem',

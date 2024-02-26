@@ -19,10 +19,10 @@ name: App-depak
 provides:
   App::depak:
     file: lib/App/depak.pm
-    version: '0.586'
+    version: '0.587'
   Perinci::CmdLine::depak:
     file: lib/Perinci/CmdLine/depak.pm
-    version: '0.586'
+    version: '0.587'
 recommends:
   Perl::Squish: '0'
   Perl::Strip: '0'
@@ -46,11 +46,11 @@ requires:
   ExtUtils::MakeMaker: '0'
   File::Copy: '0'
   File::Find: '0'
-  File::MoreUtil: '0.625'
   File::Path: '0'
   File::Slurper: '0'
   File::Spec: '0'
   File::Temp: '0.2307'
+  File::Util::Test: '0.628'
   File::chdir: '0'
   IPC::System::Options: '0.339'
   Log::ger: '0.038'
@@ -72,7 +72,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-depak
   homepage: https://metacpan.org/release/App-depak
   repository: git://github.com/perlancar/perl-App-depak.git
-version: '0.586'
+version: '0.587'
 x_Dist_Zilla:
   perl:
     version: '5.038000'
@@ -156,7 +156,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Filter/PERLANCAR::BeforeBuild'
-      version: '0.608'
+      version: '0.610'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Filter/Rinci::AbstractFromMeta'

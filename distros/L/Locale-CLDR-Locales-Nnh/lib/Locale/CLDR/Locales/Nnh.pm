@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Nnh - Package for language Ngiemboon
 
 package Locale::CLDR::Locales::Nnh;
 # This file auto generated from Data\common\main\nnh.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -105,15 +105,14 @@ has 'characters' => (
 		no warnings 'experimental::regex_sets';
 		return {
 			auxiliary => qr{[q r x]},
-			index => ['A', 'B', 'C', 'D', 'E', 'Ɛ', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ŋ', 'O', 'Ɔ', 'P', '{Pf}', 'R', 'S', '{Sh}', 'T', '{Ts}', 'U', 'Ʉ', 'V', 'W', 'Ẅ', 'Y', 'Ÿ', 'Z', 'ʼ'],
-			main => qr{[a á à â ǎ b c d e é è ê ě ɛ {ɛ́} {ɛ̀} {ɛ̂} {ɛ̌} f g h i í ì j k l m ḿ n ń ŋ o ó ò ô ǒ ɔ {ɔ́} {ɔ̀} {ɔ̂} {ɔ̌} p {pf} s {sh} t {ts} u ú ù û ǔ ʉ {ʉ́} {ʉ̀} {ʉ̂} {ʉ̌} v w ẅ y ÿ z ʼ]},
-			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
-			punctuation => qr{[, ; \: ! ? . ' ‘ ’ « »]},
+			index => ['A', 'B', 'C', 'D', 'E', 'Ɛ', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ŋ', 'O', 'Ɔ', 'P', '{Pf}', 'R', 'S', '{Sh}', 'T', '{Ts}', 'U', 'Ʉ', 'V', 'WẄ', 'YŸ', 'Z', 'ʼ'],
+			main => qr{[aáàâǎ b c d eéèêě ɛ{ɛ́}{ɛ̀}{ɛ̂}{ɛ̌} f g h iíì j k l mḿ nń ŋ oóòôǒ ɔ{ɔ́}{ɔ̀}{ɔ̂}{ɔ̌} p {pf} s {sh} t {ts} uúùûǔ ʉ{ʉ́}{ʉ̀}{ʉ̂}{ʉ̌} v wẅ yÿ z ʼ]},
+			punctuation => qr{[, ; \: ! ? . '‘’ « »]},
 		};
 	},
 EOT
 : sub {
-		return { index => ['A', 'B', 'C', 'D', 'E', 'Ɛ', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ŋ', 'O', 'Ɔ', 'P', '{Pf}', 'R', 'S', '{Sh}', 'T', '{Ts}', 'U', 'Ʉ', 'V', 'W', 'Ẅ', 'Y', 'Ÿ', 'Z', 'ʼ'], };
+		return { index => ['A', 'B', 'C', 'D', 'E', 'Ɛ', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ŋ', 'O', 'Ɔ', 'P', '{Pf}', 'R', 'S', '{Sh}', 'T', '{Ts}', 'U', 'Ʉ', 'V', 'WẄ', 'YŸ', 'Z', 'ʼ'], };
 },
 );
 
@@ -154,42 +153,8 @@ has 'number_symbols' => (
 		'latn' => {
 			'decimal' => q(,),
 			'group' => q(.),
-			'list' => q(;),
-			'percentSign' => q(%),
 		},
 	} }
-);
-
-has 'number_formats' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		decimalFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0.###',
-				},
-			},
-		},
-} },
-);
-
-has 'number_currency_formats' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		'latn' => {
-			'pattern' => {
-				'default' => {
-					'standard' => {
-						'positive' => '¤ #,##0.00',
-					},
-				},
-			},
-		},
-} },
 );
 
 has 'currencies' => (
@@ -198,7 +163,6 @@ has 'currencies' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'XAF' => {
-			symbol => 'FCFA',
 			display_name => {
 				'currency' => q(feláŋ CFA),
 			},
@@ -214,65 +178,6 @@ has 'calendar_months' => (
 	default		=> sub { {
 			'gregorian' => {
 				'format' => {
-					abbreviated => {
-						nonleap => [
-							'saŋ tsetsɛ̀ɛ lùm',
-							'saŋ kàg ngwóŋ',
-							'saŋ lepyè shúm',
-							'saŋ cÿó',
-							'saŋ tsɛ̀ɛ cÿó',
-							'saŋ njÿoláʼ',
-							'saŋ tyɛ̀b tyɛ̀b mbʉ̀ŋ',
-							'saŋ mbʉ̀ŋ',
-							'saŋ ngwɔ̀ʼ mbÿɛ',
-							'saŋ tàŋa tsetsáʼ',
-							'saŋ mejwoŋó',
-							'saŋ lùm'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'saŋ tsetsɛ̀ɛ lùm',
-							'saŋ kàg ngwóŋ',
-							'saŋ lepyè shúm',
-							'saŋ cÿó',
-							'saŋ tsɛ̀ɛ cÿó',
-							'saŋ njÿoláʼ',
-							'saŋ tyɛ̀b tyɛ̀b mbʉ̀ŋ',
-							'saŋ mbʉ̀ŋ',
-							'saŋ ngwɔ̀ʼ mbÿɛ',
-							'saŋ tàŋa tsetsáʼ',
-							'saŋ mejwoŋó',
-							'saŋ lùm'
-						],
-						leap => [
-							
-						],
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'saŋ tsetsɛ̀ɛ lùm',
-							'saŋ kàg ngwóŋ',
-							'saŋ lepyè shúm',
-							'saŋ cÿó',
-							'saŋ tsɛ̀ɛ cÿó',
-							'saŋ njÿoláʼ',
-							'saŋ tyɛ̀b tyɛ̀b mbʉ̀ŋ',
-							'saŋ mbʉ̀ŋ',
-							'saŋ ngwɔ̀ʼ mbÿɛ',
-							'saŋ tàŋa tsetsáʼ',
-							'saŋ mejwoŋó',
-							'saŋ lùm'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'saŋ tsetsɛ̀ɛ lùm',
@@ -304,53 +209,6 @@ has 'calendar_days' => (
 	default		=> sub { {
 			'gregorian' => {
 				'format' => {
-					abbreviated => {
-						mon => 'mvfò lyɛ̌ʼ',
-						tue => 'mbɔ́ɔntè mvfò lyɛ̌ʼ',
-						wed => 'tsètsɛ̀ɛ lyɛ̌ʼ',
-						thu => 'mbɔ́ɔntè tsetsɛ̀ɛ lyɛ̌ʼ',
-						fri => 'mvfò màga lyɛ̌ʼ',
-						sat => 'màga lyɛ̌ʼ',
-						sun => 'lyɛʼɛ́ sẅíŋtè'
-					},
-					short => {
-						mon => 'mvfò lyɛ̌ʼ',
-						tue => 'mbɔ́ɔntè mvfò lyɛ̌ʼ',
-						wed => 'tsètsɛ̀ɛ lyɛ̌ʼ',
-						thu => 'mbɔ́ɔntè tsetsɛ̀ɛ lyɛ̌ʼ',
-						fri => 'mvfò màga lyɛ̌ʼ',
-						sat => 'màga lyɛ̌ʼ',
-						sun => 'lyɛʼɛ́ sẅíŋtè'
-					},
-					wide => {
-						mon => 'mvfò lyɛ̌ʼ',
-						tue => 'mbɔ́ɔntè mvfò lyɛ̌ʼ',
-						wed => 'tsètsɛ̀ɛ lyɛ̌ʼ',
-						thu => 'mbɔ́ɔntè tsetsɛ̀ɛ lyɛ̌ʼ',
-						fri => 'mvfò màga lyɛ̌ʼ',
-						sat => 'màga lyɛ̌ʼ',
-						sun => 'lyɛʼɛ́ sẅíŋtè'
-					},
-				},
-				'stand-alone' => {
-					abbreviated => {
-						mon => 'mvfò lyɛ̌ʼ',
-						tue => 'mbɔ́ɔntè mvfò lyɛ̌ʼ',
-						wed => 'tsètsɛ̀ɛ lyɛ̌ʼ',
-						thu => 'mbɔ́ɔntè tsetsɛ̀ɛ lyɛ̌ʼ',
-						fri => 'mvfò màga lyɛ̌ʼ',
-						sat => 'màga lyɛ̌ʼ',
-						sun => 'lyɛʼɛ́ sẅíŋtè'
-					},
-					short => {
-						mon => 'mvfò lyɛ̌ʼ',
-						tue => 'mbɔ́ɔntè mvfò lyɛ̌ʼ',
-						wed => 'tsètsɛ̀ɛ lyɛ̌ʼ',
-						thu => 'mbɔ́ɔntè tsetsɛ̀ɛ lyɛ̌ʼ',
-						fri => 'mvfò màga lyɛ̌ʼ',
-						sat => 'màga lyɛ̌ʼ',
-						sun => 'lyɛʼɛ́ sẅíŋtè'
-					},
 					wide => {
 						mon => 'mvfò lyɛ̌ʼ',
 						tue => 'mbɔ́ɔntè mvfò lyɛ̌ʼ',
@@ -373,10 +231,6 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'am' => q{mbaʼámbaʼ},
-					'pm' => q{ncwònzém},
-				},
-				'wide' => {
 					'am' => q{mbaʼámbaʼ},
 					'pm' => q{ncwònzém},
 				},

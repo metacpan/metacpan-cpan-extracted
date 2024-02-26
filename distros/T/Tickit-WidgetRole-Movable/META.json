@@ -4,7 +4,7 @@
       "Tom Molesworth <TEAM@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -13,31 +13,42 @@
       "version" : 2
    },
    "name" : "Tickit-WidgetRole-Movable",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "share",
+         "shares",
+         "t",
+         "xt"
+      ]
+   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "perl" : "5.014000"
-         }
-      },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.48"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "develop" : {
          "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::PluginBundle::Author::TEAM" : "0",
+            "Software::License::Perl_5" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::EOL" : "0",
+            "Test::MinimumVersion" : "0",
             "Test::Mojibake" : "0",
-            "Test::More" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
             "Test::Pod" : "1.41",
-            "Test::Pod::LinkCheck" : "0",
-            "Test::Synopsis" : "0",
+            "Test::Portability::Files" : "0",
             "Test::Version" : "1"
          }
       },
       "runtime" : {
          "requires" : {
-            "Tickit" : "0.46",
-            "Tickit::Widget" : "0",
+            "Tickit" : "0.74",
+            "Tickit::Widget" : "0.58",
             "parent" : "0"
          }
       },
@@ -55,15 +66,31 @@
          }
       }
    },
+   "provides" : {
+      "Tickit::WidgetRole::Movable" : {
+         "file" : "lib/Tickit/WidgetRole/Movable.pm",
+         "version" : "0.004"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-tickit-widgetrole-movable at rt.cpan.org",
-         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Tickit-WidgetRole-Movable"
+         "web" : "https://github.com/team-at-cpan/Tickit-WidgetRole-Movable/issues"
       },
-      "homepage" : "http://search.cpan.org/dist/Tickit-WidgetRole-Movable/"
+      "homepage" : "https://github.com/team-at-cpan/Tickit-WidgetRole-Movable",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/team-at-cpan/Tickit-WidgetRole-Movable.git",
+         "web" : "https://github.com/team-at-cpan/Tickit-WidgetRole-Movable"
+      }
    },
-   "version" : "0.003",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "version" : "0.004",
+   "x_authority" : "cpan:TEAM",
+   "x_contributors" : [
+      "Tom Molesworth <tom@perlsite.co.uk>"
+   ],
+   "x_generated_by_perl" : "v5.38.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

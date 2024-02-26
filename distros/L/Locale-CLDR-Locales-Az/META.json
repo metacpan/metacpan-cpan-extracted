@@ -34,7 +34,8 @@
       "runtime" : {
          "requires" : {
             "DateTime" : "0.72",
-            "Locale::CLDR" : "v0.40.1",
+            "Locale::CLDR" : "v0.44.0",
+            "Locale::CLDR::Locales::Root" : "v0.44.0",
             "Moo" : "2",
             "MooX::ClassAttribute" : "0.011",
             "Type::Tiny" : "0",
@@ -46,23 +47,39 @@
    "provides" : {
       "Locale::CLDR::Locales::Az" : {
          "file" : "lib/Locale/CLDR/Locales/Az.pm",
-         "version" : "v0.40.1"
+         "version" : "v0.44.0"
+      },
+      "Locale::CLDR::Locales::Az::Arab" : {
+         "file" : "lib/Locale/CLDR/Locales/Az/Arab.pm",
+         "version" : "v0.44.0"
+      },
+      "Locale::CLDR::Locales::Az::Arab::Iq" : {
+         "file" : "lib/Locale/CLDR/Locales/Az/Arab/Iq.pm",
+         "version" : "v0.44.0"
+      },
+      "Locale::CLDR::Locales::Az::Arab::Ir" : {
+         "file" : "lib/Locale/CLDR/Locales/Az/Arab/Ir.pm",
+         "version" : "v0.44.0"
+      },
+      "Locale::CLDR::Locales::Az::Arab::Tr" : {
+         "file" : "lib/Locale/CLDR/Locales/Az/Arab/Tr.pm",
+         "version" : "v0.44.0"
       },
       "Locale::CLDR::Locales::Az::Cyrl" : {
          "file" : "lib/Locale/CLDR/Locales/Az/Cyrl.pm",
-         "version" : "v0.40.1"
+         "version" : "v0.44.0"
       },
       "Locale::CLDR::Locales::Az::Cyrl::Az" : {
          "file" : "lib/Locale/CLDR/Locales/Az/Cyrl/Az.pm",
-         "version" : "v0.40.1"
+         "version" : "v0.44.0"
       },
       "Locale::CLDR::Locales::Az::Latn" : {
          "file" : "lib/Locale/CLDR/Locales/Az/Latn.pm",
-         "version" : "v0.40.1"
+         "version" : "v0.44.0"
       },
       "Locale::CLDR::Locales::Az::Latn::Az" : {
          "file" : "lib/Locale/CLDR/Locales/Az/Latn/Az.pm",
-         "version" : "v0.40.1"
+         "version" : "v0.44.0"
       }
    },
    "release_status" : "stable",
@@ -75,6 +92,6 @@
          "url" : "https://github.com/ThePilgrim/perlcldr.git"
       }
    },
-   "version" : "v0.40.1",
+   "version" : "v0.44.0",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

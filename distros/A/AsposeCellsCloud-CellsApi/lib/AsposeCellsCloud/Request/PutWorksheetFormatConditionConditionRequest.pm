@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -59,15 +59,15 @@ sub new {
 
 
 # Run Operation Request
-# PutWorksheetFormatConditionConditionRequest.name : The workbook name.  ,
+# PutWorksheetFormatConditionConditionRequest.name : The file name.  ,
 # PutWorksheetFormatConditionConditionRequest.sheetName : The worksheet name.  ,
 # PutWorksheetFormatConditionConditionRequest.index : Gets the Conditional Formatting element at the specified index.  ,
 # PutWorksheetFormatConditionConditionRequest.type : Format condition type(CellValue/Expression/ColorScale/DataBar/IconSet/Top10/UniqueValues/DuplicateValues/ContainsText/NotContainsText/BeginsWith/EndsWith/ContainsBlanks/NotContainsBlanks/ContainsErrors/NotContainsErrors/TimePeriod/AboveAverage).  ,
 # PutWorksheetFormatConditionConditionRequest.operatorType : Represents the operator type of conditional format and data validation(Between/Equal/GreaterThan/GreaterOrEqual/LessThan/None/NotBetween/NotEqual).  ,
 # PutWorksheetFormatConditionConditionRequest.formula1 : The value or expression associated with conditional formatting.  ,
 # PutWorksheetFormatConditionConditionRequest.formula2 : The value or expression associated with conditional formatting.  ,
-# PutWorksheetFormatConditionConditionRequest.folder : Original workbook folder.  ,
-# PutWorksheetFormatConditionConditionRequest.storageName : Storage name.   
+# PutWorksheetFormatConditionConditionRequest.folder : The folder where the file is situated.  ,
+# PutWorksheetFormatConditionConditionRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -78,7 +78,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'put_worksheet_format_condition_condition' } = { 
-    	summary => 'Adds a condition for format condition.',
+    	summary => 'Add a condition for the format condition in the worksheet.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -157,7 +157,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The workbook name.',
+     	description => 'The file name.',
      	format => '',
      	read_only => '',
      		},
@@ -206,14 +206,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

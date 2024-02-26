@@ -1,15 +1,16 @@
 NAME
-    Acme::CPANModules::Parse::HumanDate - Modules that parse human date/time
-    expression
+    Acme::CPANModules::Parse::HumanDate - List of modules that parse human
+    date/time expression
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     Acme::CPANModules::Parse::HumanDate (from Perl distribution
-    Acme-CPANModules-Parse-HumanDate), released on 2021-09-11.
+    Acme-CPANModules-Parse-HumanDate), released on 2023-10-31.
 
 DESCRIPTION
-ACME::MODULES ENTRIES
-    *   DateTime::Format::Natural
+ACME::CPANMODULES ENTRIES
+    DateTime::Format::Natural
+        Author: SCHUBIGER <https://metacpan.org/author/SCHUBIGER>
 
         Compared to DateTime::Format::Flexible, this module can also parse
         duration in addition to date/time, e.g.:
@@ -21,7 +22,8 @@ ACME::MODULES ENTRIES
         Speed-wise, I'd say the two modules are roughly comparable. For some
         patterns one might be faster than the other.
 
-    *   DateTime::Format::Flexible
+    DateTime::Format::Flexible
+        Author: THINC <https://metacpan.org/author/THINC>
 
         One advantage of this over DateTime::Format::Natural is its time
         zone support, e.g.:
@@ -33,7 +35,8 @@ ACME::MODULES ENTRIES
         Speed-wise, I'd say the two modules are roughly comparable. For some
         patterns one might be faster than the other.
 
-    *   Date::Parse
+    Date::Parse
+        Author: ATOOMIC <https://metacpan.org/author/ATOOMIC>
 
         This module can parse several formats, but does not really fall into
         "human date/time parser" as it lacks support for casual expression
@@ -106,13 +109,14 @@ CONTRIBUTING
 
     If you want to build the distribution (e.g. to try to install it locally
     on your system), you can install Dist::Zilla,
-    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
-    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
-    steps required beyond that are considered a bug and can be reported to
-    me.
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2023, 2021 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

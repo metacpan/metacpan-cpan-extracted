@@ -1,3 +1,12 @@
+0.006   2023-11-03  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Add parsed result in explanation form in result.
+
+        - Parse BPOM RI prefix as well as POM.
+
+        - [test] Remove copy-pasted test file from another distribution.
+
+
 0.005   2023-10-03  Released-By: PERLANCAR; Urgency: medium
 
         - Support ereg-RBA.

@@ -1,3 +1,5 @@
+If --debug, then echo (live) all command output to screen
+
 Add '--env VAR VAL' to automatically set evironmentvariables during build.
 
 Add user defines at the top of the SPEC file

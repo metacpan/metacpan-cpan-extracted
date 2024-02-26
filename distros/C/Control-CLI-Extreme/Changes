@@ -112,3 +112,15 @@ Revision history for Control-CLI-Extreme
 1.10	2023-10-08
 	* Improvements to Ipanema family type prompt regex pattern
 	* Update to default Y/N Confirmation propmt regex
+
+1.11	2024-02-25
+	* Introduced new family type ISWmarvell for ISW-24W-4X which uses a Marvell chipset
+	  and a different software operating system with a different CLI. Both ISW and
+	  ISWmarvell family types return true for attribute is_isw and both now support new
+	  attribute is_isw_marvell which can be used to differentiate between them.
+	* Y/N confirm prompts can now send "y" with or without newline character based on family type
+	* Detection of Extreme Networks Cloud APs (HiveOS, ex Aerohive) was failing with latest firmware
+	* New Universal Hardware series 4120 and 4220 have a restricted CLI, which has a prompt ending in "=";
+	  adapted module to work with modified prompt.
+	* Updated ISW error patterns
+	* Removed useless debug level line in module constructor

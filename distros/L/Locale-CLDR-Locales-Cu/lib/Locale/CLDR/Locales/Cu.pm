@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Cu - Package for language Church Slavic
 
 package Locale::CLDR::Locales::Cu;
 # This file auto generated from Data\common\main\cu.xml
-#	on Tue  5 Dec  1:05:28 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.4');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -28,7 +28,7 @@ has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		 sub {
 			 my %languages = (
 				'ab' => 'а҆бха́зскїй',
@@ -99,9 +99,7 @@ has 'display_name_script' => (
  			'Cyrl' => 'кѷри́ллица',
  			'Glag' => 'глаго́лица',
  			'Hans' => 'хи́нскаѧ ᲂу҆проще́ннаѧ',
- 			'Hans@alt=stand-alone' => 'хи́нскаѧ ᲂу҆проще́ннаѧ',
  			'Hant' => 'хи́нскаѧ традїцїо́ннаѧ',
- 			'Hant@alt=stand-alone' => 'хи́нскаѧ традїцїо́ннаѧ',
  			'Latn' => 'латі́ница',
  			'Zxxx' => 'безпи́сьменный',
  			'Zzzz' => 'невѣ̑домаѧ пи́сьмена',
@@ -119,7 +117,7 @@ has 'display_name_region' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'AU' => 'А҆ѵстралі́ѧ',
  			'BR' => 'бразі́лїа',
@@ -169,7 +167,7 @@ has 'display_name_measurement_system' => (
 	is			=> 'ro',
 	isa			=> HashRef[Str],
 	init_arg	=> undef,
-	default		=> sub { 
+	default		=> sub {
 		{
 			'metric' => q{метрі́ческаѧ},
  			'UK' => q{а҆нглі́йскаѧ},
@@ -177,16 +175,6 @@ has 'display_name_measurement_system' => (
 
 		}
 	},
-);
-
-has 'text_orientation' => (
-	is			=> 'ro',
-	isa			=> HashRef[Str],
-	init_arg	=> undef,
-	default		=> sub { return {
-			lines => 'top-to-bottom',
-			characters => 'left-to-right',
-		}}
 );
 
 has 'characters' => (
@@ -198,16 +186,16 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{[҈҉‌‍꙰꙱꙲︯ ҄ ︮ ꙯ ⷶ ꙣ ⷷ ꙴ ꙃ ꙅ ꙵ ꙶ ꙇ ꙉ ⷸ ꙥ ꙧ ҥ ꙩꙫꙭꙮꚙꚛ ⷫ ҁ ⷵ ⷮ ꙷ ⷹ ꚞ ꙻ ⷰ ꙡ џ ⷲ ⷳ ꙏ ꙸ ꙑ ꙹ ꙺ ⷺ ꙓ ⷻ ꙕ ⷼ ѥ ꚟ ⷽ ꙙ ⷾ ꙛ ѩ ꙝ ѭ ⷿ ꙟ]},
-			index => ['А', 'Б', 'В', 'Г', 'Д', 'Є', 'Ж', 'Ѕ', 'З', 'И', 'І', 'К', 'Л', 'М', 'Н', 'Ѻ', 'О', 'П', 'Р', 'С', 'Т', 'Ꙋ', 'Ф', 'Х', 'Ѡ', 'Ѿ', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Ѣ', 'Ю', 'Ѫ', 'Ꙗ', 'Ѧ', 'Ѯ', 'Ѱ', 'Ѳ', 'Ѵ'],
-			main => qr{[҇꙽ ҃ ҂ а б ⷠ в ⷡ г ⷢ д ⷣ е є ж ⷤ ⷥ ѕ з ꙁ и й і ї к ⷦ л ⷧ м ⷨ н ⷩ ѻ о ⷪ п р ⷬ с ⷭ т у ꙋ ф х ⷯ ѡ ѿ ꙍ ѽ ц ч ⷱ ш щ ⸯ ꙿ ъ ы ь ѣ ю ѫ ꙗ ѧ ѯ ѱ ѳ ѵ ѷ ⷴ]},
-			numbers => qr{[  \- , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
-			punctuation => qr{[_ \- ‐ – — ⹃ , ; \: ! ? . ( ) ꙳ / ꙾]},
+			auxiliary => qr{[҈ ҉‌‍ ꙰ ꙱ ꙲ ︯ ҄ ︮ ꙯ ⷶ ꙣ ⷷ ꙴ ꙃ ꙅ ꙵ ꙶ ꙇ ꙉ ⷸ ꙥ ꙧ ҥ ꙩꙫꙭꙮꚙꚛ ⷫ ҁ ⷵ ⷮ ꙷ ⷹ ꚞ ꙻ ⷰ ꙡ џ ⷲ ⷳ ꙏ ꙸ ꙑ ꙹ ꙺ ⷺ ꙓ ⷻ ꙕ ⷼ ѥ ꚟ ⷽ ꙙ ⷾ ꙛ ѩ ꙝ ѭ ⷿ ꙟ]},
+			index => ['А', 'Б', 'В', 'Г', 'Д', 'Є', 'Ж', 'Ѕ', 'З', 'И', 'І', 'К', 'Л', 'М', 'Н', 'ѺО', 'П', 'Р', 'С', 'Т', 'Ꙋ', 'Ф', 'Х', 'Ѡ', 'Ѿ', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Ѣ', 'Ю', 'Ѫ', 'ꙖѦ', 'Ѯ', 'Ѱ', 'Ѳ', 'Ѵ'],
+			main => qr{[҇ ꙽ ҃ ҂ а б ⷠ в ⷡ г ⷢ д ⷣ еє ж ⷤ ⷥ ѕ зꙁ ий ії к ⷦ л ⷧ м ⷨ н ⷩ ѻо ⷪ п р ⷬ с ⷭ т у ꙋ ф х ⷯ ѡ ѿ ꙍ ѽ ц ч ⷱ ш щ ⸯ ꙿ ъ ы ь ѣ ю ѫ ꙗѧ ѯ ѱ ѳ ѵѷ ⷴ]},
+			numbers => qr{[  \- ‑ , % ‰ + 0 1 2 3 4 5 6 7 8 9]},
+			punctuation => qr{[_ \- ‐‑ – — ⹃ , ; \: ! ? . ( ) ꙳ / ꙾]},
 		};
 	},
 EOT
 : sub {
-		return { index => ['А', 'Б', 'В', 'Г', 'Д', 'Є', 'Ж', 'Ѕ', 'З', 'И', 'І', 'К', 'Л', 'М', 'Н', 'Ѻ', 'О', 'П', 'Р', 'С', 'Т', 'Ꙋ', 'Ф', 'Х', 'Ѡ', 'Ѿ', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Ѣ', 'Ю', 'Ѫ', 'Ꙗ', 'Ѧ', 'Ѯ', 'Ѱ', 'Ѳ', 'Ѵ'], };
+		return { index => ['А', 'Б', 'В', 'Г', 'Д', 'Є', 'Ж', 'Ѕ', 'З', 'И', 'І', 'К', 'Л', 'М', 'Н', 'ѺО', 'П', 'Р', 'С', 'Т', 'Ꙋ', 'Ф', 'Х', 'Ѡ', 'Ѿ', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Ѣ', 'Ю', 'Ѫ', 'ꙖѦ', 'Ѯ', 'Ѱ', 'Ѳ', 'Ѵ'], };
 },
 );
 
@@ -240,25 +228,6 @@ has 'alternate_quote_end' => (
 	default		=> qq{“},
 );
 
-has 'duration_units' => (
-	is			=> 'ro',
-	isa			=> HashRef[Str],
-	init_arg	=> undef,
-	default		=> sub { {
-				hm => 'h:mm',
-				hms => 'h:mm:ss',
-				ms => 'm:ss',
-			} }
-);
-
-has 'units' => (
-	is			=> 'ro',
-	isa			=> HashRef[HashRef[HashRef[Str]]],
-	init_arg	=> undef,
-	default		=> sub { {
-			} }
-);
-
 has 'yesstr' => (
 	is			=> 'ro',
 	isa			=> RegexpRef,
@@ -278,18 +247,9 @@ has 'listPatterns' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-				start => q({0}, {1}),
-				middle => q({0}, {1}),
-				end => q({0}, {1}),
-				2 => q({0}, {1}),
+				end => q({0} и҆ {1}),
+				2 => q({0} и҆ {1}),
 		} }
-);
-
-has 'default_numbering_system' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> 'latn',
 );
 
 has traditional_numbering_system => (
@@ -307,10 +267,6 @@ has 'number_symbols' => (
 		'latn' => {
 			'decimal' => q(,),
 			'group' => q( ),
-			'infinity' => q(∞),
-			'minusSign' => q(-),
-			'percentSign' => q(%),
-			'plusSign' => q(+),
 		},
 	} }
 );
@@ -320,24 +276,10 @@ has 'number_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		decimalFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0.###',
-				},
-			},
-		},
 		percentFormat => {
 			'default' => {
 				'standard' => {
 					'default' => '#,##0 %',
-				},
-			},
-		},
-		scientificFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#E0',
 				},
 			},
 		},
@@ -367,63 +309,55 @@ has 'currencies' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'BRL' => {
-			symbol => 'R$',
 			display_name => {
 				'currency' => q(бразі́льскїй реа́лъ),
 				'other' => q(бразі́льскагѡ реа́ла),
 			},
 		},
 		'BYN' => {
-			symbol => 'BYN',
+			symbol => 'р.',
 			display_name => {
 				'currency' => q(бѣлорꙋ́сскїй рꙋ́бль),
 				'other' => q(бѣлорꙋ́сскагѡ рꙋблѧ̀),
 			},
 		},
 		'BYR' => {
-			symbol => 'BYR',
 			display_name => {
 				'currency' => q(бѣлорꙋ́сскїй рꙋ́бль \(2000–2016\)),
 				'other' => q(бѣлорꙋ́сскагѡ рꙋблѧ̀ \(2000–2016\)),
 			},
 		},
 		'CNY' => {
-			symbol => 'CN¥',
 			display_name => {
 				'currency' => q(хи́нскїй ю҆а́нь),
 				'other' => q(хи́нскагѡ ю҆а́нѧ),
 			},
 		},
 		'EUR' => {
-			symbol => '€',
 			display_name => {
 				'currency' => q(є҆́ѵрѡ),
 				'other' => q(є҆́ѵра),
 			},
 		},
 		'GBP' => {
-			symbol => '£',
 			display_name => {
 				'currency' => q(а҆нглі́йскїй фꙋ́нтъ сте́рлингѡвъ),
 				'other' => q(а҆нглі́йскагѡ фꙋ́нта сте́рлингѡвъ),
 			},
 		},
 		'INR' => {
-			symbol => '₹',
 			display_name => {
 				'currency' => q(і҆нді́йскаѧ рꙋ́пїѧ),
 				'other' => q(і҆нді́йскїѧ рꙋ́пїи),
 			},
 		},
 		'JPY' => {
-			symbol => 'JP¥',
 			display_name => {
 				'currency' => q(ꙗ҆пѡ́нскаѧ і҆е́на),
 				'other' => q(ꙗ҆пѡ́нскїѧ і҆е́ны),
 			},
 		},
 		'KGS' => {
-			symbol => 'KGS',
 			display_name => {
 				'currency' => q(кирги́зскїй сꙋ́мъ),
 				'other' => q(кирги́зскагѡ сꙋ́ма),
@@ -493,25 +427,6 @@ has 'calendar_months' => (
 							
 						],
 					},
-					narrow => {
-						nonleap => [
-							'І҆',
-							'Ф',
-							'М',
-							'А҆',
-							'М',
-							'І҆',
-							'І҆',
-							'А҆',
-							'С',
-							'Ѻ҆',
-							'Н',
-							'Д'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'і҆аннꙋа́рїа',
@@ -533,25 +448,6 @@ has 'calendar_months' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'і҆аⷩ҇',
-							'феⷡ҇',
-							'маⷬ҇',
-							'а҆пⷬ҇',
-							'маꙵ',
-							'і҆ꙋⷩ҇',
-							'і҆ꙋⷧ҇',
-							'а҆́ѵⷢ҇',
-							'сеⷫ҇',
-							'ѻ҆кⷮ',
-							'ноеⷨ',
-							'деⷦ҇'
-						],
-						leap => [
-							
-						],
-					},
 					narrow => {
 						nonleap => [
 							'І҆',
@@ -611,24 +507,6 @@ has 'calendar_days' => (
 						sat => 'сꙋⷠ҇',
 						sun => 'ндⷧ҇ѧ'
 					},
-					narrow => {
-						mon => 'П',
-						tue => 'В',
-						wed => 'С',
-						thu => 'Ч',
-						fri => 'П',
-						sat => 'С',
-						sun => 'Н'
-					},
-					short => {
-						mon => 'пнⷣе',
-						tue => 'втоⷬ҇',
-						wed => 'срⷣе',
-						thu => 'чеⷦ҇',
-						fri => 'пѧⷦ҇',
-						sat => 'сꙋⷠ҇',
-						sun => 'ндⷧ҇ѧ'
-					},
 					wide => {
 						mon => 'понедѣ́льникъ',
 						tue => 'вто́рникъ',
@@ -640,15 +518,6 @@ has 'calendar_days' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						mon => 'пнⷣе',
-						tue => 'втоⷬ҇',
-						wed => 'срⷣе',
-						thu => 'чеⷦ҇',
-						fri => 'пѧⷦ҇',
-						sat => 'сꙋⷠ҇',
-						sun => 'ндⷧ҇ѧ'
-					},
 					narrow => {
 						mon => 'П',
 						tue => 'В',
@@ -657,24 +526,6 @@ has 'calendar_days' => (
 						fri => 'П',
 						sat => 'С',
 						sun => 'Н'
-					},
-					short => {
-						mon => 'пнⷣе',
-						tue => 'втоⷬ҇',
-						wed => 'срⷣе',
-						thu => 'чеⷦ҇',
-						fri => 'пѧⷦ҇',
-						sat => 'сꙋⷠ҇',
-						sun => 'ндⷧ҇ѧ'
-					},
-					wide => {
-						mon => 'понедѣ́льникъ',
-						tue => 'вто́рникъ',
-						wed => 'среда̀',
-						thu => 'четверто́къ',
-						fri => 'пѧто́къ',
-						sat => 'сꙋббѡ́та',
-						sun => 'недѣ́лѧ'
 					},
 				},
 			},
@@ -688,16 +539,6 @@ has 'calendar_quarters' => (
 	default		=> sub { {
 			'gregorian' => {
 				'format' => {
-					abbreviated => {0 => 'а҃_ѧ че́тверть',
-						1 => 'в҃_ѧ че́тверть',
-						2 => 'г҃_ѧ че́тверть',
-						3 => 'д҃_ѧ че́тверть'
-					},
-					narrow => {0 => 'а҃',
-						1 => 'в҃',
-						2 => 'г҃',
-						3 => 'д҃'
-					},
 					wide => {0 => 'а҃_ѧ че́тверть',
 						1 => 'в҃_ѧ че́тверть',
 						2 => 'г҃_ѧ че́тверть',
@@ -715,11 +556,6 @@ has 'calendar_quarters' => (
 						2 => 'г҃',
 						3 => 'д҃'
 					},
-					wide => {0 => 'а҃_ѧ че́тверть',
-						1 => 'в҃_ѧ че́тверть',
-						2 => 'г҃_ѧ че́тверть',
-						3 => 'д҃_ѧ че́тверть'
-					},
 				},
 			},
 	} },
@@ -733,24 +569,6 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'am' => q{ДП},
-					'pm' => q{ПП},
-				},
-				'wide' => {
-					'am' => q{ДП},
-					'pm' => q{ПП},
-				},
-			},
-			'stand-alone' => {
-				'abbreviated' => {
-					'am' => q{ДП},
-					'pm' => q{ПП},
-				},
-				'narrow' => {
-					'am' => q{ДП},
-					'pm' => q{ПП},
-				},
-				'wide' => {
 					'am' => q{ДП},
 					'pm' => q{ПП},
 				},
@@ -772,7 +590,6 @@ has 'eras' => (
 				'1' => 'ѿ р. х.'
 			},
 			wide => {
-				'0' => 'пре́дъ р. х.',
 				'1' => 'по р. х.'
 			},
 		},
@@ -785,10 +602,6 @@ has 'date_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-			'full' => q{G y MMMM d, EEEE},
-			'long' => q{G y MMMM d},
-			'medium' => q{G y MMM d},
-			'short' => q{GGGGG y-MM-dd},
 		},
 		'gregorian' => {
 			'full' => q{EEEE, d MMMM 'л'. y.},
@@ -821,10 +634,6 @@ has 'datetime_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-			'full' => q{{1} {0}},
-			'long' => q{{1} {0}},
-			'medium' => q{{1} {0}},
-			'short' => q{{1} {0}},
 		},
 		'gregorian' => {
 			'full' => q{{1} {0}},
@@ -870,13 +679,9 @@ has 'time_zone_names' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default	=> sub { {
-		hourFormat => q(+HH:mm;-HH:mm),
-		gmtFormat => q(GMT{0}),
-		gmtZeroFormat => q(GMT),
 		regionFormat => q({0} (вре́мѧ)),
 		regionFormat => q({0} (лѣ́тнее вре́мѧ)),
 		regionFormat => q({0} (зи́мнее вре́мѧ)),
-		fallbackFormat => q({1} ({0})),
 		'America_Central' => {
 			long => {
 				'daylight' => q#среднеамерїка́нское лѣ́тнее вре́мѧ#,

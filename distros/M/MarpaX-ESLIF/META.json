@@ -4,7 +4,7 @@
       "Jean-Damien Durand <jeandamiendurand@free.fr>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -15,44 +15,39 @@
    "name" : "MarpaX-ESLIF",
    "no_index" : {
       "directory" : [
-         "blog",
-         "etc",
+         "eg",
          "examples",
-         "src",
+         "inc",
+         "share",
          "t",
          "xt"
-      ],
-      "file" : [
-         "lib/MarpaX/ESLIF/Value/Type.pm"
       ]
    },
    "prereqs" : {
       "configure" : {
          "requires" : {
             "Archive::Tar" : "0",
-            "Capture::Tiny" : "0",
+            "Carp" : "0",
             "Config" : "0",
             "Config::AutoConf" : "0",
-            "Config::AutoConf::INI" : "0.005",
+            "Cwd" : "0",
             "ExtUtils::CBuilder" : "0.280224",
             "ExtUtils::Constant" : "0",
-            "ExtUtils::MakeMaker" : "7.20",
+            "ExtUtils::MakeMaker" : "0",
             "File::Basename" : "0",
             "File::Copy" : "0",
-            "File::Copy::Recursive" : "0",
             "File::Find" : "0",
             "File::Path" : "0",
             "File::Spec" : "0",
             "File::Temp" : "0",
-            "File::Which" : "1.23",
+            "File::Which" : "0",
             "File::chdir" : "0",
             "IO::Handle" : "0",
             "POSIX" : "0",
             "Perl::OSType" : "0",
+            "Probe::Perl" : "0",
             "Try::Tiny" : "0",
-            "diagnostics" : "0",
-            "perl" : "5.006",
-            "strict" : "0"
+            "perl" : "5.006"
          },
          "suggests" : {
             "ExtUtils::CppGuess" : "0.26"
@@ -60,23 +55,50 @@
       },
       "develop" : {
          "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::Plugin::Authority" : "0",
+            "Dist::Zilla::Plugin::AutoMetaResources" : "0",
+            "Dist::Zilla::Plugin::AutoPrereqs" : "0",
+            "Dist::Zilla::Plugin::CPANFile" : "0",
+            "Dist::Zilla::Plugin::ChangelogFromGit::CPAN::Changes" : "0",
+            "Dist::Zilla::Plugin::DynamicPrereqs" : "0",
+            "Dist::Zilla::Plugin::GatherFile" : "0",
+            "Dist::Zilla::Plugin::Git::Contributors" : "0",
+            "Dist::Zilla::Plugin::Git::NextVersion" : "0",
+            "Dist::Zilla::Plugin::GitHub::Meta" : "0",
+            "Dist::Zilla::Plugin::MetaTests" : "0",
+            "Dist::Zilla::Plugin::MinimumPerl" : "0",
+            "Dist::Zilla::Plugin::MojibakeTests" : "0",
+            "Dist::Zilla::Plugin::OurPkgVersion" : "0",
+            "Dist::Zilla::Plugin::PodWeaver" : "0",
+            "Dist::Zilla::Plugin::Prereqs" : "0",
+            "Dist::Zilla::Plugin::Prereqs::AuthorDeps" : "0",
+            "Dist::Zilla::Plugin::Test::CPAN::Changes" : "0",
+            "Dist::Zilla::Plugin::Test::CPAN::Meta::JSON" : "0",
+            "Dist::Zilla::Plugin::Test::Kwalitee" : "0",
+            "Dist::Zilla::Plugin::Test::MinimumVersion" : "0",
+            "Dist::Zilla::Plugin::Test::NoTabs" : "0",
+            "Dist::Zilla::Plugin::Test::Perl::Critic" : "0",
+            "Dist::Zilla::Plugin::Test::Pod::Coverage::Configurable" : "0",
+            "Dist::Zilla::Plugin::Test::Portability" : "0",
+            "Dist::Zilla::Plugin::Test::Synopsis" : "0",
+            "Dist::Zilla::Plugin::Test::Version" : "0",
+            "Dist::Zilla::PluginBundle::Starter::Git" : "0",
             "Pod::Coverage::TrustPod" : "0",
-            "Pod::Wordlist" : "0",
+            "Pod::Weaver::PluginBundle::RJBS" : "0",
+            "Software::License::Perl_5" : "0",
             "Test::CPAN::Changes" : "0.19",
             "Test::CPAN::Meta" : "0",
             "Test::CPAN::Meta::JSON" : "0.16",
-            "Test::DistManifest" : "0",
-            "Test::EOL" : "0",
             "Test::Kwalitee" : "1.21",
             "Test::MinimumVersion" : "0",
             "Test::Mojibake" : "0",
             "Test::More" : "0.96",
+            "Test::NoTabs" : "0",
             "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
-            "Test::Pod::LinkCheck" : "0",
             "Test::Portability::Files" : "0",
-            "Test::Spelling" : "0.12",
             "Test::Synopsis" : "0",
             "Test::Version" : "1"
          }
@@ -96,7 +118,6 @@
             "parent" : "0",
             "perl" : "5.010",
             "strict" : "0",
-            "vars" : "0",
             "warnings" : "0"
          }
       },
@@ -108,19 +129,15 @@
             "Data::Dumper" : "0",
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
-            "File::Temp" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Log::Any" : "0",
             "Log::Any::Adapter" : "0",
-            "Log::Any::Adapter::Log4perl" : "0",
-            "Log::Any::Adapter::Util" : "1.03",
-            "Log::Log4perl" : "1.32",
             "POSIX" : "0",
             "Safe::Isa" : "0",
-            "Test::Deep" : "1.128",
+            "Test::Deep" : "0",
             "Test::Deep::NoTest" : "0",
-            "Test::More" : "1.3",
+            "Test::More" : "0",
             "Test::More::UTF8" : "0",
             "Try::Tiny" : "0",
             "diagnostics" : "0",
@@ -135,108 +152,107 @@
    "provides" : {
       "MarpaX::ESLIF" : {
          "file" : "lib/MarpaX/ESLIF.pm",
-         "version" : "v6.0.29"
+         "version" : "v6.0.33.3"
       },
       "MarpaX::ESLIF::Base" : {
          "file" : "lib/MarpaX/ESLIF/Base.pm",
-         "version" : "v6.0.29"
+         "version" : "v6.0.33.3"
       },
       "MarpaX::ESLIF::Event::Type" : {
          "file" : "lib/MarpaX/ESLIF/Event/Type.pm",
-         "version" : "v6.0.29"
+         "version" : "v6.0.33.3"
       },
       "MarpaX::ESLIF::Grammar" : {
          "file" : "lib/MarpaX/ESLIF/Grammar.pm",
-         "version" : "v6.0.29"
+         "version" : "v6.0.33.3"
       },
       "MarpaX::ESLIF::Grammar::Properties" : {
          "file" : "lib/MarpaX/ESLIF/Grammar/Properties.pm",
-         "version" : "v6.0.29"
+         "version" : "v6.0.33.3"
       },
       "MarpaX::ESLIF::Grammar::Rule::Properties" : {
          "file" : "lib/MarpaX/ESLIF/Grammar/Rule/Properties.pm",
-         "version" : "v6.0.29"
+         "version" : "v6.0.33.3"
       },
       "MarpaX::ESLIF::Grammar::Symbol::Properties" : {
          "file" : "lib/MarpaX/ESLIF/Grammar/Symbol/Properties.pm",
-         "version" : "v6.0.29"
+         "version" : "v6.0.33.3"
       },
       "MarpaX::ESLIF::JSON" : {
          "file" : "lib/MarpaX/ESLIF/JSON.pm",
-         "version" : "v6.0.29"
+         "version" : "v6.0.33.3"
       },
       "MarpaX::ESLIF::JSON::Decoder" : {
          "file" : "lib/MarpaX/ESLIF/JSON/Decoder.pm",
-         "version" : "v6.0.29"
+         "version" : "v6.0.33.3"
       },
       "MarpaX::ESLIF::JSON::Decoder::RecognizerInterface" : {
          "file" : "lib/MarpaX/ESLIF/JSON/Decoder/RecognizerInterface.pm",
-         "version" : "v6.0.29"
+         "version" : "v6.0.33.3"
       },
       "MarpaX::ESLIF::JSON::Encoder" : {
          "file" : "lib/MarpaX/ESLIF/JSON/Encoder.pm",
-         "version" : "v6.0.29"
+         "version" : "v6.0.33.3"
       },
       "MarpaX::ESLIF::Logger::Level" : {
          "file" : "lib/MarpaX/ESLIF/Logger/Level.pm",
-         "version" : "v6.0.29"
+         "version" : "v6.0.33.3"
       },
       "MarpaX::ESLIF::Recognizer" : {
          "file" : "lib/MarpaX/ESLIF/Recognizer.pm",
-         "version" : "v6.0.29"
+         "version" : "v6.0.33.3"
       },
       "MarpaX::ESLIF::RegexCallout" : {
          "file" : "lib/MarpaX/ESLIF/RegexCallout.pm",
-         "version" : "v6.0.29"
+         "version" : "v6.0.33.3"
       },
       "MarpaX::ESLIF::Rule::PropertyBitSet" : {
          "file" : "lib/MarpaX/ESLIF/Rule/PropertyBitSet.pm",
-         "version" : "v6.0.29"
+         "version" : "v6.0.33.3"
       },
       "MarpaX::ESLIF::String" : {
          "file" : "lib/MarpaX/ESLIF/String.pm",
-         "version" : "v6.0.29"
+         "version" : "v6.0.33.3"
       },
       "MarpaX::ESLIF::Symbol" : {
          "file" : "lib/MarpaX/ESLIF/Symbol.pm",
-         "version" : "v6.0.29"
+         "version" : "v6.0.33.3"
       },
       "MarpaX::ESLIF::Symbol::EventBitSet" : {
          "file" : "lib/MarpaX/ESLIF/Symbol/EventBitSet.pm",
-         "version" : "v6.0.29"
+         "version" : "v6.0.33.3"
       },
       "MarpaX::ESLIF::Symbol::PropertyBitSet" : {
          "file" : "lib/MarpaX/ESLIF/Symbol/PropertyBitSet.pm",
-         "version" : "v6.0.29"
+         "version" : "v6.0.33.3"
       },
       "MarpaX::ESLIF::Symbol::Type" : {
          "file" : "lib/MarpaX/ESLIF/Symbol/Type.pm",
-         "version" : "v6.0.29"
+         "version" : "v6.0.33.3"
       },
       "MarpaX::ESLIF::Value" : {
          "file" : "lib/MarpaX/ESLIF/Value.pm",
-         "version" : "v6.0.29"
+         "version" : "v6.0.33.3"
+      },
+      "MarpaX::ESLIF::Value::Type" : {
+         "file" : "lib/MarpaX/ESLIF/Value/Type.pm",
+         "version" : "v6.0.33.3"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/jddurand/c-marpaeslif/issues"
+         "web" : "https://github.com/jddurand/c-marpaESLIFPerl/issues"
       },
       "homepage" : "https://metacpan.org/release/MarpaX-ESLIF",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/jddurand/c-marpaeslif.git",
-         "web" : "https://github.com/jddurand/c-marpaeslif"
+         "url" : "git://github.com/jddurand/c-marpaESLIFPerl.git",
+         "web" : "https://github.com/jddurand/c-marpaESLIFPerl"
       }
    },
-   "version" : "6.0.29",
+   "version" : "6.0.33.3",
    "x_authority" : "cpan:JDDPAUSE",
-   "x_contributors" : [
-      "Jean-Damien Durand <Jean-Damien.Durand@newaccess.ch>",
-      "Jeffrey Kegler <jeffreykegler@jeffreykegler.com>",
-      "Jeffrey Kegler <jeffreykegler@protonmail.com>"
-   ],
    "x_generated_by_perl" : "v5.26.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.11",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

@@ -2,7 +2,7 @@ package Bundle::Locale::CLDR::Westerneurope;
 
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 =head1 NAME
 
@@ -10,145 +10,169 @@ Bundle::Locale::CLDR::Westerneurope
 
 =head1 CONTENTS
 
-Locale::CLDR::Locales::Br 0.40.1
+Locale::CLDR::Locales::Br 0.44.0
 
-Locale::CLDR::Locales::Ca 0.40.1
+Locale::CLDR::Locales::Ca 0.44.0
 
-Locale::CLDR::Locales::De 0.40.1
+Locale::CLDR::Locales::Co 0.44.0
 
-Locale::CLDR::Locales::Fr 0.40.1
+Locale::CLDR::Locales::De 0.44.0
 
-Locale::CLDR::Locales::Fy 0.40.1
+Locale::CLDR::Locales::Fr 0.44.0
 
-Locale::CLDR::Locales::It 0.40.1
+Locale::CLDR::Locales::Fy 0.44.0
 
-Locale::CLDR::Locales::Lb 0.40.1
+Locale::CLDR::Locales::It 0.44.0
 
-Locale::CLDR::Locales::Nl 0.40.1
+Locale::CLDR::Locales::Lb 0.44.0
 
-Locale::CLDR::Locales::Pt 0.40.1
+Locale::CLDR::Locales::Nl 0.44.0
 
-Locale::CLDR::Locales::Rm 0.40.1
+Locale::CLDR::Locales::Oc 0.44.0
 
-Locale::CLDR::Locales::Dsb 0.40.1
+Locale::CLDR::Locales::Pt 0.44.0
 
-Locale::CLDR::Locales::Gsw 0.40.1
+Locale::CLDR::Locales::Rm 0.44.0
 
-Locale::CLDR::Locales::Hsb 0.40.1
+Locale::CLDR::Locales::Wa 0.44.0
 
-Locale::CLDR::Locales::Ksh 0.40.1
+Locale::CLDR::Locales::Dsb 0.44.0
 
-Locale::CLDR::Locales::Nds 0.40.1
+Locale::CLDR::Locales::Frr 0.44.0
 
-Locale::CLDR::Locales::Wae 0.40.1
+Locale::CLDR::Locales::Gsw 0.44.0
 
-Locale::CLDR::Locales::Br::Any 0.40.1
+Locale::CLDR::Locales::Hsb 0.44.0
 
-Locale::CLDR::Locales::Ca::Any 0.40.1
+Locale::CLDR::Locales::Ksh 0.44.0
 
-Locale::CLDR::Locales::De::Any 0.40.1
+Locale::CLDR::Locales::Nds 0.44.0
 
-Locale::CLDR::Locales::Fr::Any 0.40.1
+Locale::CLDR::Locales::Wae 0.44.0
 
-Locale::CLDR::Locales::Fy::Any 0.40.1
+Locale::CLDR::Locales::Br::Latn 0.44.0
 
-Locale::CLDR::Locales::It::Any 0.40.1
+Locale::CLDR::Locales::Ca::Latn 0.44.0
 
-Locale::CLDR::Locales::Lb::Any 0.40.1
+Locale::CLDR::Locales::Co::Latn 0.44.0
 
-Locale::CLDR::Locales::Nl::Any 0.40.1
+Locale::CLDR::Locales::De::Latn 0.44.0
 
-Locale::CLDR::Locales::Pt::Any 0.40.1
+Locale::CLDR::Locales::Fr::Latn 0.44.0
 
-Locale::CLDR::Locales::Rm::Any 0.40.1
+Locale::CLDR::Locales::Fy::Latn 0.44.0
 
-Locale::CLDR::Locales::Dsb::Any 0.40.1
+Locale::CLDR::Locales::It::Latn 0.44.0
 
-Locale::CLDR::Locales::Gsw::Any 0.40.1
+Locale::CLDR::Locales::Lb::Latn 0.44.0
 
-Locale::CLDR::Locales::Hsb::Any 0.40.1
+Locale::CLDR::Locales::Nl::Latn 0.44.0
 
-Locale::CLDR::Locales::Ksh::Any 0.40.1
+Locale::CLDR::Locales::Oc::Latn 0.44.0
 
-Locale::CLDR::Locales::Nds::Any 0.40.1
+Locale::CLDR::Locales::Pt::Latn 0.44.0
 
-Locale::CLDR::Locales::Wae::Any 0.40.1
+Locale::CLDR::Locales::Rm::Latn 0.44.0
 
-Locale::CLDR::Locales::Br::Any::Fr 0.40.1
+Locale::CLDR::Locales::Wa::Latn 0.44.0
 
-Locale::CLDR::Locales::Ca::Any::Fr 0.40.1
+Locale::CLDR::Locales::Dsb::Latn 0.44.0
 
-Locale::CLDR::Locales::De::Any::At 0.40.1
+Locale::CLDR::Locales::Frr::Latn 0.44.0
 
-Locale::CLDR::Locales::De::Any::Be 0.40.1
+Locale::CLDR::Locales::Gsw::Latn 0.44.0
 
-Locale::CLDR::Locales::De::Any::Ch 0.40.1
+Locale::CLDR::Locales::Hsb::Latn 0.44.0
 
-Locale::CLDR::Locales::De::Any::De 0.40.1
+Locale::CLDR::Locales::Ksh::Latn 0.44.0
 
-Locale::CLDR::Locales::De::Any::Li 0.40.1
+Locale::CLDR::Locales::Nds::Latn 0.44.0
 
-Locale::CLDR::Locales::De::Any::Lu 0.40.1
+Locale::CLDR::Locales::Wae::Latn 0.44.0
 
-Locale::CLDR::Locales::En::Any::At 0.40.1
+Locale::CLDR::Locales::Br::Latn::Fr 0.44.0
 
-Locale::CLDR::Locales::En::Any::Be 0.40.1
+Locale::CLDR::Locales::Ca::Latn::Fr 0.44.0
 
-Locale::CLDR::Locales::En::Any::Ch 0.40.1
+Locale::CLDR::Locales::Co::Latn::Fr 0.44.0
 
-Locale::CLDR::Locales::En::Any::De 0.40.1
+Locale::CLDR::Locales::De::Latn::At 0.44.0
 
-Locale::CLDR::Locales::En::Any::Nl 0.40.1
+Locale::CLDR::Locales::De::Latn::Be 0.44.0
 
-Locale::CLDR::Locales::Fr::Any::Be 0.40.1
+Locale::CLDR::Locales::De::Latn::Ch 0.44.0
 
-Locale::CLDR::Locales::Fr::Any::Ch 0.40.1
+Locale::CLDR::Locales::De::Latn::De 0.44.0
 
-Locale::CLDR::Locales::Fr::Any::Fr 0.40.1
+Locale::CLDR::Locales::De::Latn::Li 0.44.0
 
-Locale::CLDR::Locales::Fr::Any::Lu 0.40.1
+Locale::CLDR::Locales::De::Latn::Lu 0.44.0
 
-Locale::CLDR::Locales::Fr::Any::Mc 0.40.1
+Locale::CLDR::Locales::En::Latn::At 0.44.0
 
-Locale::CLDR::Locales::Fy::Any::Nl 0.40.1
+Locale::CLDR::Locales::En::Latn::Be 0.44.0
 
-Locale::CLDR::Locales::It::Any::Ch 0.40.1
+Locale::CLDR::Locales::En::Latn::Ch 0.44.0
 
-Locale::CLDR::Locales::Lb::Any::Lu 0.40.1
+Locale::CLDR::Locales::En::Latn::De 0.44.0
 
-Locale::CLDR::Locales::Nl::Any::Be 0.40.1
+Locale::CLDR::Locales::En::Latn::Nl 0.44.0
 
-Locale::CLDR::Locales::Nl::Any::Nl 0.40.1
+Locale::CLDR::Locales::Fr::Latn::Be 0.44.0
 
-Locale::CLDR::Locales::Pt::Any::Ch 0.40.1
+Locale::CLDR::Locales::Fr::Latn::Ch 0.44.0
 
-Locale::CLDR::Locales::Pt::Any::Lu 0.40.1
+Locale::CLDR::Locales::Fr::Latn::Fr 0.44.0
 
-Locale::CLDR::Locales::Pt::Any::Pt 0.40.1
+Locale::CLDR::Locales::Fr::Latn::Lu 0.44.0
 
-Locale::CLDR::Locales::Rm::Any::Ch 0.40.1
+Locale::CLDR::Locales::Fr::Latn::Mc 0.44.0
 
-Locale::CLDR::Locales::Dsb::Any::De 0.40.1
+Locale::CLDR::Locales::Fy::Latn::Nl 0.44.0
 
-Locale::CLDR::Locales::En::Any::001 0.40.1
+Locale::CLDR::Locales::It::Latn::Ch 0.44.0
 
-Locale::CLDR::Locales::En::Any::150 0.40.1
+Locale::CLDR::Locales::Lb::Latn::Lu 0.44.0
 
-Locale::CLDR::Locales::Gsw::Any::Ch 0.40.1
+Locale::CLDR::Locales::Nl::Latn::Be 0.44.0
 
-Locale::CLDR::Locales::Gsw::Any::Fr 0.40.1
+Locale::CLDR::Locales::Nl::Latn::Nl 0.44.0
 
-Locale::CLDR::Locales::Gsw::Any::Li 0.40.1
+Locale::CLDR::Locales::Oc::Latn::Fr 0.44.0
 
-Locale::CLDR::Locales::Hsb::Any::De 0.40.1
+Locale::CLDR::Locales::Pt::Latn::Ch 0.44.0
 
-Locale::CLDR::Locales::Ksh::Any::De 0.40.1
+Locale::CLDR::Locales::Pt::Latn::Lu 0.44.0
 
-Locale::CLDR::Locales::Nds::Any::De 0.40.1
+Locale::CLDR::Locales::Pt::Latn::Pt 0.44.0
 
-Locale::CLDR::Locales::Nds::Any::Nl 0.40.1
+Locale::CLDR::Locales::Rm::Latn::Ch 0.44.0
 
-Locale::CLDR::Locales::Wae::Any::Ch 0.40.1
+Locale::CLDR::Locales::Wa::Latn::Be 0.44.0
+
+Locale::CLDR::Locales::Dsb::Latn::De 0.44.0
+
+Locale::CLDR::Locales::En::Latn::001 0.44.0
+
+Locale::CLDR::Locales::En::Latn::150 0.44.0
+
+Locale::CLDR::Locales::Frr::Latn::De 0.44.0
+
+Locale::CLDR::Locales::Gsw::Latn::Ch 0.44.0
+
+Locale::CLDR::Locales::Gsw::Latn::Fr 0.44.0
+
+Locale::CLDR::Locales::Gsw::Latn::Li 0.44.0
+
+Locale::CLDR::Locales::Hsb::Latn::De 0.44.0
+
+Locale::CLDR::Locales::Ksh::Latn::De 0.44.0
+
+Locale::CLDR::Locales::Nds::Latn::De 0.44.0
+
+Locale::CLDR::Locales::Nds::Latn::Nl 0.44.0
+
+Locale::CLDR::Locales::Wae::Latn::Ch 0.44.0
 
 
 =cut

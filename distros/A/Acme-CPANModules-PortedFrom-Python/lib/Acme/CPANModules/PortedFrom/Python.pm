@@ -3,12 +3,12 @@ package Acme::CPANModules::PortedFrom::Python;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-04-23'; # DATE
+our $DATE = '2024-01-15'; # DATE
 our $DIST = 'Acme-CPANModules-PortedFrom-Python'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $LIST = {
-    summary => "Modules/applications that are ported from (or inspired by) ".
+    summary => "List of modules/applications that are ported from (or inspired by) ".
         "Python libraries",
     description => <<'_',
 
@@ -62,11 +62,14 @@ required."
 
 _
         },
+        {
+            module => 'Sub::Fp',
+        },
     ],
 };
 
 1;
-# ABSTRACT: Modules/applications that are ported from (or inspired by) Python libraries
+# ABSTRACT: List of modules/applications that are ported from (or inspired by) Python libraries
 
 __END__
 
@@ -76,11 +79,11 @@ __END__
 
 =head1 NAME
 
-Acme::CPANModules::PortedFrom::Python - Modules/applications that are ported from (or inspired by) Python libraries
+Acme::CPANModules::PortedFrom::Python - List of modules/applications that are ported from (or inspired by) Python libraries
 
 =head1 VERSION
 
-This document describes version 0.007 of Acme::CPANModules::PortedFrom::Python (from Perl distribution Acme-CPANModules-PortedFrom-Python), released on 2023-04-23.
+This document describes version 0.009 of Acme::CPANModules::PortedFrom::Python (from Perl distribution Acme-CPANModules-PortedFrom-Python), released on 2024-01-15.
 
 =head1 DESCRIPTION
 
@@ -124,6 +127,10 @@ From the module's documentation: "This package is a port of Plotly's Dash to
 Perl. Dash makes building analytical web applications very easy. No JavaScript
 required."
 
+
+=item L<Sub::Fp>
+
+Author: L<ODDTUPLE|https://metacpan.org/author/ODDTUPLE>
 
 =back
 
@@ -203,7 +210,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022, 2021, 2020, 2018 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2022, 2021, 2020, 2018 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

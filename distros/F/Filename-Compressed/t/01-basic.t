@@ -34,7 +34,7 @@ is_deeply(check_compressed_filename(filename=>"foo.XZ"),
               uncompressed_filename=>'foo',
           });
 # ci=0
-is_deeply(check_compressed_filename(filename=>"foo.XZ", ci=>0), 0);
+is_deeply(check_compressed_filename(filename=>"foo.XZ", ignore_case=>0), 0);
 
 DONE_TESTING:
 done_testing;

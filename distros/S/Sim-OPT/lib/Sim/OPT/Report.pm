@@ -91,12 +91,12 @@ sub newretrieve
 
   my %dt = %{ $_[0] };
 
-  my %dirfiles = %{ $dt{dirfiles} }; 
-  my $resfile = $dt{resfile}; 
+  my %dirfiles = %{ $dt{dirfiles} };
+  my $resfile = $dt{resfile};
   my $flfile = $dt{flfile};
-  my %vehicles = %{ $dt{vehicles} }; 
+  my %vehicles = %{ $dt{vehicles} };
   my $precious = $dt{precious};
-  my %inst = %{ $dt{inst} }; 
+  my %inst = %{ $dt{inst} };
   my %dowhat = %{ $dt{dowhat} };
   #my $csim = $dt{csim};
   my $postprocessga = $dt{postprocessga};
@@ -179,8 +179,8 @@ sub newretrieve
   my $numberof_simtools = scalar ( keys %{ $dowhat{simtools} } );
 
   my $shortresfile = $resfile;
-  $shortresfile =~ s/$thisto// ; 
-  $shortresfile =~ s/\/cfg\///; 
+  $shortresfile =~ s/$thisto// ;
+  $shortresfile =~ s/\/cfg\///;
   #say $tee "IN RETRIEVE: \$shortresfile: $shortresfile, \$resfile: $resfile, \$to: $to, \$thisto: $thisto, \$cleanto: $cleanto";
 
   my $shortflfile = $flfile;
@@ -272,23 +272,23 @@ YYY
           print `$printthis`;
           say $tee "$printthis";
         }
-        
+
         my $olddest =  "$retfile" . ".old";
         `mv -f $retfile $olddest`;
-        
+
         open (OLDDEST, "$olddest" ) or die;
         my @oldlines = <OLDDEST>;
         close OLDDEST;
-        
+
         open(NEWDEST, ">$retfile") or die;
-        
+
         foreach my $line ( @oldlines )
         {
           chomp $line;
           print NEWDEST "$line,";
         }
         close NEWDEST;
-     
+
         #print $tee "
 #Retrieving results for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", simulation period $counttheme, retrieve period $countreport\n $printthis";
 
@@ -421,14 +421,14 @@ $retrdata[0]
 $retrdata[1]
 $retrdata[2]
 d
+>
+$retfile
+$retfile
 $where
 b
 $what
 -
 $howmuch
->
-$retfile
-$retfile
 m
 -
 -
@@ -442,7 +442,7 @@ TTT
           say $tee "THERE ALREADY IS A RETFILE!";
         }
       }
-      
+
       if ( ($exeonfiles eq "y") or ( $dowhat{newretrieve} eq "y" ) )
       {
 
@@ -910,7 +910,7 @@ TTT
       say $tee "rm -f $resfile";
     }
   }
-  
+
   if ( $dowhat{newerasefl} eq "y" )
   {
     if ( -e $flfile )
@@ -1097,8 +1097,8 @@ sub newreport # This function retrieves the results of interest from the texts f
   #say $tee "PROBING THE EXISTANCE OF $repfile";
 
   #say $tee "FIRE: $file";
-  
-  
+
+
 
   if ( ( ( $fire eq "yes" ) or ( $dowhat{reportbasics} eq "y" ) ) and ( $precomputed eq "" ) )
   {
@@ -1121,12 +1121,12 @@ sub newreport # This function retrieves the results of interest from the texts f
         chomp $line;
         $line =~ s/^(\s+)//;
         $line =~ s/^ +//;
-        
+
         ###if ( $line =~ /$hpattern/ ) ###CHANGED
         if ( $line =~ /^$hpattern/ )
         { #say $tee "CHECK LINE-$line";
-          chomp $line; 
-	  
+          chomp $line;
+
           $line =~ s/:\s/:/g;
           $line =~ s/(\s+)/ /g;
           $line =~ s/ /,/g; #say $tee "CHECK TREATEDLINE-$line";
@@ -1202,7 +1202,7 @@ sub newreport # This function retrieves the results of interest from the texts f
             my $foundhit = 0;
             my $countlin = 0;
             my $countli = 0;
-	    
+
 	    if ( $dowhat{simplifiedreport} eq "y" )
             {
 	      say $tee "EXECUTING ON simplifiedreport. Now looking for _ $textpattern _ in $retfile.";
@@ -1210,7 +1210,7 @@ sub newreport # This function retrieves the results of interest from the texts f
 
             foreach my $line ( @lines )
             {
-              chomp $line;     
+              chomp $line;
 
               if ( $dowhat{simplifiedreport} eq "y" )
               {
@@ -1221,7 +1221,7 @@ sub newreport # This function retrieves the results of interest from the texts f
                 if ( $thisline =~ /^$textpattern/ )
                 {
 	          chomp $thisline;
-                  
+
                   $thisline =~ s/:\s/:/g;
                   $thisline =~ s/(\s+)/ /g;
                   $thisline =~ s/ /,/g;
@@ -1229,7 +1229,7 @@ sub newreport # This function retrieves the results of interest from the texts f
 		  print $tee "SIMPLIFIEDREPORT: $thisto,$thisline,";
 		}
               }
-	      
+
 	      $line =~ s/^(\s+)//;
               $line =~ s/:\s/:/g;
               $line =~ s/(\s+)/ /g;

@@ -1,0 +1,305 @@
+# PODNAME: RDF::Cowl::Lib::Gen::Class::SymTable
+# ABSTRACT: Generated docs for RDF::Cowl::SymTable
+
+## DO NOT EDIT
+## Generated via maint/tt/Class.pod.tt
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+RDF::Cowl::Lib::Gen::Class::SymTable - Generated docs for RDF::Cowl::SymTable
+
+=head1 VERSION
+
+version 1.0.0
+
+=head1 MAIN MODULE
+
+L<RDF::Cowl::SymTable>
+
+=head1 METHODS
+
+=head2 get_prefix_ns_map
+
+B<Signature>:
+
+  $self->get_prefix_ns_map(BoolLike|InstanceOf["boolean"] $reverse)
+
+B<Params>:
+
+  CowlSymTable $st 
+  BoolLike|InstanceOf["boolean"] $reverse 
+
+Documentation:
+
+  Gets the map that associates prefixes to namespaces.
+  
+  @param st The symbol table.
+  @param reverse If true, the reversed map (namespaces to prefixes) is returned.
+  @return Prefix to namespace map. Throws exception on error.
+
+Throws exception on error.
+
+=over 2
+
+B<C function name>: C<< cowl_sym_table_get_prefix_ns_map >>
+
+=back
+
+=head2 get_ns
+
+B<Signature>:
+
+  $self->get_ns(CowlString $prefix)
+
+B<Params>:
+
+  CowlSymTable $st 
+  CowlString $prefix 
+
+Documentation:
+
+  Returns the namespace associated with the specified prefix.
+  
+  @param st The symbol table.
+  @param prefix The prefix.
+  @return Namespace associated with the prefix, or NULL if the prefix cannot be found.
+
+=over 2
+
+B<C function name>: C<< cowl_sym_table_get_ns >>
+
+=back
+
+=head2 get_prefix
+
+B<Signature>:
+
+  $self->get_prefix(CowlString $ns)
+
+B<Params>:
+
+  CowlSymTable $st 
+  CowlString $ns 
+
+Documentation:
+
+  Returns the prefix associated with the specified namespace.
+  
+  @param st The symbol table.
+  @param ns The namespace.
+  @return Prefix associated with the namespace, or NULL if the prefix cannot be found.
+
+=over 2
+
+B<C function name>: C<< cowl_sym_table_get_prefix >>
+
+=back
+
+=head2 register_prefix
+
+B<Signature>:
+
+  $self->register_prefix(CowlString $prefix, CowlString $ns, BoolLike|InstanceOf["boolean"] $overwrite)
+
+B<Params>:
+
+  CowlSymTable $st 
+  CowlString $prefix 
+  CowlString $ns 
+  BoolLike|InstanceOf["boolean"] $overwrite 
+
+Documentation:
+
+  Registers the specified prefix-namespace mapping.
+  
+  @param st The symbol table.
+  @param prefix The prefix.
+  @param ns The namespace.
+  @param overwrite If true, the new mapping overwrites the previous one.
+  @return Return code.
+
+=over 2
+
+B<C function name>: C<< cowl_sym_table_register_prefix >>
+
+=back
+
+=head2 register_prefix_raw
+
+B<Signature>:
+
+  $self->register_prefix_raw(UString $prefix, UString $ns, BoolLike|InstanceOf["boolean"] $overwrite)
+
+B<Params>:
+
+  CowlSymTable $st 
+  UString $prefix 
+  UString $ns 
+  BoolLike|InstanceOf["boolean"] $overwrite 
+
+Documentation:
+
+  Registers the specified prefix-namespace mapping.
+  
+  @param st The symbol table.
+  @param prefix The prefix.
+  @param ns The namespace.
+  @param overwrite If true, the new mapping overwrites the previous one.
+  @return Return code.
+
+=over 2
+
+B<C function name>: C<< cowl_sym_table_register_prefix_raw >>
+
+=back
+
+=head2 unregister_prefix
+
+B<Signature>:
+
+  $self->unregister_prefix(CowlString $prefix)
+
+B<Params>:
+
+  CowlSymTable $st 
+  CowlString $prefix 
+
+Documentation:
+
+  Unregisters the specified prefix.
+  
+  @param st The symbol table.
+  @param prefix The prefix.
+  @return Return code.
+
+=over 2
+
+B<C function name>: C<< cowl_sym_table_unregister_prefix >>
+
+=back
+
+=head2 unregister_ns
+
+B<Signature>:
+
+  $self->unregister_ns(CowlString $ns)
+
+B<Params>:
+
+  CowlSymTable $st 
+  CowlString $ns 
+
+Documentation:
+
+  Unregisters the specified namespace.
+  
+  @param st The symbol table.
+  @param ns The namespace.
+  @return Return code.
+
+=over 2
+
+B<C function name>: C<< cowl_sym_table_unregister_ns >>
+
+=back
+
+=head2 merge
+
+B<Signature>:
+
+  $self->merge(CowlSymTable $src, BoolLike|InstanceOf["boolean"] $overwrite)
+
+B<Params>:
+
+  CowlSymTable $dst 
+  CowlSymTable $src 
+  BoolLike|InstanceOf["boolean"] $overwrite 
+
+Documentation:
+
+  Merges the contents of a symbol table in the current one.
+  
+  @param dst The destination symbol table.
+  @param src The source symbol table.
+  @param overwrite If true, conflicting prefixes are overwritten in the destination.
+  @return Return code.
+
+=over 2
+
+B<C function name>: C<< cowl_sym_table_merge >>
+
+=back
+
+=head2 get_full_iri
+
+B<Signature>:
+
+  $self->get_full_iri(UString $ns, UString $rem)
+
+B<Params>:
+
+  CowlSymTable $st 
+  UString $ns 
+  UString $rem 
+
+Documentation:
+
+  Retrieves the full IRI associated with the specified short IRI.
+  
+  @param st The symbol table.
+  @param ns The short namespace.
+  @param rem The remainder.
+  @return IRI instance. Throws exception on error.
+
+Throws exception on error.
+
+=over 2
+
+B<C function name>: C<< cowl_sym_table_get_full_iri >>
+
+=back
+
+=head2 parse_full_iri
+
+B<Signature>:
+
+  $self->parse_full_iri(UString $short_iri)
+
+B<Params>:
+
+  CowlSymTable $st 
+  UString $short_iri 
+
+Documentation:
+
+  Retrieves the full IRI associated with the specified short IRI.
+  
+  @param st The symbol table.
+  @param short_iri The short IRI.
+  @return IRI instance. Throws exception on error.
+
+Throws exception on error.
+
+=over 2
+
+B<C function name>: C<< cowl_sym_table_parse_full_iri >>
+
+=back
+
+=head1 AUTHOR
+
+Zakariyya Mughal <zmughal@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 by Auto-Parallel Technologies, Inc..
+
+This is free software, licensed under Eclipse Public License - v 2.0.
+
+=cut

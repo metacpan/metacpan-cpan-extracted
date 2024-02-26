@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2023 Aspose.Cells Cloud
+Copyright (c) 2024 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -60,8 +60,8 @@ sub new {
 
 # Run Operation Request
 # DeleteDocumentPropertiesRequest.name : The workbook name.  ,
-# DeleteDocumentPropertiesRequest.folder : Original workbook folder.  ,
-# DeleteDocumentPropertiesRequest.storageName : Storage name.   
+# DeleteDocumentPropertiesRequest.folder : The folder where the file is situated.  ,
+# DeleteDocumentPropertiesRequest.storageName : The storage name where the file is situated.   
 
 {
     my $params = {
@@ -72,7 +72,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'delete_document_properties' } = { 
-    	summary => 'Delete all custom document properties and clean built-in ones.',
+    	summary => 'Delete all custom document properties and reset built-in ones.',
         params => $params,
         returns => 'CellsCloudResponse',
     };
@@ -130,14 +130,14 @@ __PACKAGE__->method_documentation({
      'folder' => {
      	datatype => 'string',
      	base_name => 'folder',
-     	description => 'Original workbook folder.',
+     	description => 'The folder where the file is situated.',
      	format => '',
      	read_only => '',
      		},
      'storage_name' => {
      	datatype => 'string',
      	base_name => 'storageName',
-     	description => 'Storage name.',
+     	description => 'The storage name where the file is situated.',
      	format => '',
      	read_only => '',
      		},    

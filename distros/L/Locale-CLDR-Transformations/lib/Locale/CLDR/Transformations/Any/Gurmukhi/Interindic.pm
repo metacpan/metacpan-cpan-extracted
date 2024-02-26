@@ -1,12 +1,12 @@
 package Locale::CLDR::Transformations::Any::Gurmukhi::Interindic;
 # This file auto generated from Data\common\transforms\Gurmukhi-InterIndic.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';

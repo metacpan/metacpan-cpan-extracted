@@ -5,7 +5,7 @@ package TableData::Test::Source::DBI;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2024-01-15'; # DATE
 our $DIST = 'TableDataRoles-Standard'; # DIST
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.023'; # VERSION
 
 use alias::module 'TableData::DBI';
 
@@ -24,7 +24,37 @@ TableData::Test::Source::DBI - Alias package for TableData::DBI
 
 =head1 VERSION
 
-This document describes version 0.021 of TableData::Test::Source::DBI (from Perl distribution TableDataRoles-Standard), released on 2024-01-15.
+This document describes version 0.023 of TableData::Test::Source::DBI (from Perl distribution TableDataRoles-Standard), released on 2024-01-15.
+
+=head1 SYNOPSIS
+
+To use from Perl code:
+
+ use TableData::Test::Source::DBI;
+
+ my $td = TableData::Test::Source::DBI->new;
+
+ # Iterate rows of the table
+ $td->each_row_arrayref(sub { my $row = shift; ... });
+ $td->each_row_hashref (sub { my $row = shift; ... });
+
+ # Get the list of column names
+ my @columns = $td->get_column_names;
+
+ # Get the number of rows
+ my $row_count = $td->get_row_count;
+
+See also L<TableDataRole::Spec::Basic> for other methods.
+
+To use from command-line (using L<tabledata> CLI):
+
+ # Display as ASCII table and view with pager
+ % tabledata Test::Source::DBI --page
+
+ # Get number of rows
+ % tabledata --action count_rows Test::Source::DBI
+
+See the L<tabledata> CLI's documentation for other available actions and options.
 
 =head1 HOMEPAGE
 

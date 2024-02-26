@@ -11,9 +11,14 @@ unzip src.zip text-tables
 
   fix the version number (appears once) in HOWTO-install-deinstall-and-tables
   change the end of HOWTO-install-deinstall-and-tables to the content of text-tables
-      (Fix 2 lines [Cyrillic last but one, Hebrew after /?] in the inserted part — visible in FCW.)
+      (Fix 2–4 lines [Cyrillic: last but one (after 5th column), last (after 2nd), Hebrew: line after /?; last but one (after 2nd, 4th column)] in the inserted part
+		 — visible in FCW.)
       	Only the second one is visible if Emacs on Unix, showing in a console on Windows.
 
+cd ..
+rm CURRENT-prev
+mv CURRENT CURRENT-prev
+ln -s v0.???? CURRENT
 ========================= Build
 
 #set PERL5OPT=&& D:\Programs\cygwin\bin\perl.exe  -wC31 -I UI-KeyboardLayout/lib UI-KeyboardLayout/examples/build-iz.pl UI-KeyboardLayout/examples/izKeys.kbdd

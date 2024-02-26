@@ -1,3 +1,11 @@
+0.009   2024-01-15  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [arraydata Sample::DeNiro] [doc] Mention
+          {Hash,Table}Data::Sample::DeNiro.
+
+
 0.008   2024-01-15  Released-By: PERLANCAR; Urgency: medium
 
         - Add arraydata: Sample::DeNiro.

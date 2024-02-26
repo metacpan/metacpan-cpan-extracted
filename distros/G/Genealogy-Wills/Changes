@@ -1,5 +1,9 @@
 Revision history for Genealogy::Wills
 
+0.04	Sun Feb 18 22:25:31 EST 2024
+	Added first, last, year as an index
+	Use Database::Abstraction
+
 0.03	Sun Oct 15 16:48:19 EDT 2023
 	Latest DB.pm from NJH-Snippets
 

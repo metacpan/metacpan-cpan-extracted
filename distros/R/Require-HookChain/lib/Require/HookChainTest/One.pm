@@ -3,9 +3,9 @@ package Require::HookChainTest::One;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-23'; # DATE
+our $DATE = '2023-12-05'; # DATE
 our $DIST = 'Require-HookChain'; # DIST
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 $Require::HookChainTest::var1 = 1;
 
@@ -24,7 +24,7 @@ Require::HookChainTest::One - A dummy module used in testing Require::HookChain
 
 =head1 VERSION
 
-This document describes version 0.015 of Require::HookChainTest::One (from Perl distribution Require-HookChain), released on 2023-07-23.
+This document describes version 0.016 of Require::HookChainTest::One (from Perl distribution Require-HookChain), released on 2023-12-05.
 
 =head1 HOMEPAGE
 

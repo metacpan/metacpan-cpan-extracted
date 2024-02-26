@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-17'; # DATE
+our $DATE = '2024-01-18'; # DATE
 our $DIST = 'App-LevenshteinUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/LevenshteinUtils/editdist",
@@ -38,7 +38,7 @@ editdist - Calculate edit distance using one of several algorithm
 
 =head1 VERSION
 
-This document describes version 0.001 of editdist (from Perl distribution App-LevenshteinUtils), released on 2024-01-17.
+This document describes version 0.002 of editdist (from Perl distribution App-LevenshteinUtils), released on 2024-01-18.
 
 =head1 SYNOPSIS
 

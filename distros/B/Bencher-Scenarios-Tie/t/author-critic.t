@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/Bencher/Scenario/Tie/Scalar.pm','lib/Bencher/Scenarios/Tie.pm'];
+my $filenames = ['lib/Bencher/Scenario/Tie/Array.pm','lib/Bencher/Scenario/Tie/Hash.pm','lib/Bencher/Scenario/Tie/Scalar.pm','lib/Bencher/Scenarios/Tie.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

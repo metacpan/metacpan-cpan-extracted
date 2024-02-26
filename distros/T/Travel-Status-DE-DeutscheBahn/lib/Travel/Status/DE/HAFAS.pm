@@ -20,7 +20,7 @@ use Travel::Status::DE::HAFAS::Message;
 use Travel::Status::DE::HAFAS::Polyline qw(decode_polyline);
 use Travel::Status::DE::HAFAS::StopFinder;
 
-our $VERSION = '5.04';
+our $VERSION = '5.05';
 
 # {{{ Endpoint Definition
 
@@ -125,7 +125,7 @@ my %hafas_instance = (
 				type => 'IPH',
 				name => 'oebbPROD-ADHOC',
 			},
-			ver  => '1.41',
+			ver  => '1.57',
 			auth => {
 				type => 'AID',
 				aid  => 'OWDL4fE4' . 'ixNiPBBm',
@@ -968,7 +968,7 @@ monitors
 
 =head1 VERSION
 
-version 5.04
+version 5.05
 
 =head1 DESCRIPTION
 

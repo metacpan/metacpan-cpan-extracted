@@ -2,8 +2,8 @@ NAME
     Algorithm::Backoff - Various backoff strategies for retry
 
 VERSION
-    This document describes version 0.009 of Algorithm::Backoff (from Perl
-    distribution Algorithm-Backoff), released on 2019-06-20.
+    This document describes version 0.010 of Algorithm::Backoff (from Perl
+    distribution Algorithm-Backoff), released on 2024-02-24.
 
 SYNOPSIS
      # 1. pick a strategy and instantiate
@@ -14,8 +14,10 @@ SYNOPSIS
          #delay_on_success => 0, # optional, default 0
      );
 
-     # 2. log success/failure and get a new number of seconds to delay, timestamp is
-     # optional but must be monotonically increasing.
+     # 2. log success/failure and get a new number of seconds to delay. if you don't
+     # want to log for the current time, you can pass a timestamp (number of seconds
+     # passed since some reference value, like a Unix epoch) as the argument, which
+     # should be monotonically increasing.
 
      my $secs = $ab->failure(); # => 2
      my $secs = $ab->success(); # => 0
@@ -26,6 +28,12 @@ DESCRIPTION
     backoff strategies for setting delay between retry attempts.
 
     This class ("Algorithm::Backoff") is a base class only.
+
+    Algorithm::Backoff does not actually provide a function/method to retry
+    a piece of code. It only contains the backoff strategies and splits the
+    actual delaying to another module (e.g. Retry::Backoff). This allows for
+    things like printing/returning all the retries and their delay amounts
+    without actually doing the delay (e.g. in show-backoff-delays script).
 
 METHODS
   new
@@ -68,8 +76,8 @@ METHODS
      my $secs = $obj->success([ $timestamp ]);
 
     Log a successful attempt. If not specified, $timestamp defaults to
-    current time. Will return the suggested number of seconds to wait before
-    doing another attempt.
+    current Unix timestamp. Will return the suggested number of seconds to
+    wait before doing another attempt.
 
   failure
     Usage:
@@ -77,9 +85,9 @@ METHODS
      my $secs = $obj->failure([ $timestamp ]);
 
     Log a failed attempt. If not specified, $timestamp defaults to current
-    time. Will return the suggested number of seconds to wait before doing
-    another attempt, or -1 if it suggests that one gives up (e.g. if
-    "max_attempts" parameter has been exceeded).
+    Unix timestamp. Will return the suggested number of seconds to wait
+    before doing another attempt, or -1 if it suggests that one gives up
+    (e.g. if "max_attempts" parameter has been exceeded).
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -89,13 +97,6 @@ SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-Algorithm-Backoff>.
 
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Algorithm-Backoff>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
 SEE ALSO
     Retry::Backoff - an application of Algorithm::Backoff to retry a piece
     of code using various backoff strategies.
@@ -103,18 +104,48 @@ SEE ALSO
     App::AlgorithmBackoffUtils - various CLI's related to
     Algorithm::Backoff.
 
-    Action::Retry - Somehow I didn't find this module before writing
-    Algorithm::Backoff. Otherwise I probably would not have created
-    Algorithm::Backoff. But Algorithm::Backoff offers an alternative
-    interface, some additional parameters (like delay on success and jitter
-    factor), a lighter footprint (no Moo), and a couple more strategies.
+    Action::Retry - A prior art for Algorithm::Backoff. Somehow I didn't
+    find this module before writing Algorithm::Backoff. But
+    Algorithm::Backoff offers an alternative interface (a split of actual
+    sleep/retry vs the algorithm), and some additional parameters (like
+    delay on success and jitter factor), a lighter footprint (no Moo), and a
+    couple more strategies.
 
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTORS
+    *   Brendan Byrd <brendan.byrd@grantstreet.com>
+
+    *   SineSwiper <GitHub@ResonatorSoft.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2024, 2019 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Algorithm-Backoff>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

@@ -6,9 +6,9 @@ use warnings;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-23'; # DATE
+our $DATE = '2024-01-13'; # DATE
 our $DIST = 'App-SubtitleUtils'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 our @EXPORT_OK = qw(
                        srtparse
@@ -306,7 +306,7 @@ _
             schema => 'filename*',
             'x.completion' => [filename => {file_ext_filter=>qr/\.srt$/i}],
             req => 1,
-            pos => 0,
+            pos => 1,
         },
     },
     examples => [
@@ -345,7 +345,7 @@ App::SubtitleUtils - Utilities related to video subtitles
 
 =head1 VERSION
 
-This document describes version 0.012 of App::SubtitleUtils (from Perl distribution App-SubtitleUtils), released on 2022-11-23.
+This document describes version 0.013 of App::SubtitleUtils (from Perl distribution App-SubtitleUtils), released on 2024-01-13.
 
 =head1 DESCRIPTION
 
@@ -353,31 +353,33 @@ This distributions provides the following command-line utilities:
 
 =over
 
-=item * L<srtadjust>
+=item 1. L<rename-subtitle-files-like-their-movie-files>
 
-=item * L<srtcalc>
+=item 2. L<srtadjust>
 
-=item * L<srtcheck>
+=item 3. L<srtcalc>
 
-=item * L<srtcombine2text>
+=item 4. L<srtcheck>
 
-=item * L<srtcombinetext>
+=item 5. L<srtcombine2text>
 
-=item * L<srtparse>
+=item 6. L<srtcombinetext>
 
-=item * L<srtrenumber>
+=item 7. L<srtparse>
 
-=item * L<srtscale>
+=item 8. L<srtrenumber>
 
-=item * L<srtshift>
+=item 9. L<srtscale>
 
-=item * L<srtsplit>
+=item 10. L<srtshift>
 
-=item * L<subscale>
+=item 11. L<srtsplit>
 
-=item * L<subshift>
+=item 12. L<subscale>
 
-=item * L<vtt2srt>
+=item 13. L<subshift>
+
+=item 14. L<vtt2srt>
 
 =back
 
@@ -622,7 +624,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2022, 2021, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

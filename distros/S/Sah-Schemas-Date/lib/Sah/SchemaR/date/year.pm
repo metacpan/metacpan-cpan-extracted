@@ -1,8 +1,8 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::date::year;
 
-our $DATE = '2022-10-12'; # DATE
-our $VERSION = '0.018'; # VERSION
+our $DATE = '2023-12-09'; # DATE
+our $VERSION = '0.019'; # VERSION
 
 our $rschema = do{my$var={base=>"int",clsets_after_base=>[{examples=>[{summary=>"Empty string",valid=>0,value=>""},{summary=>"There is no AD 0; AD starts from 1",valid=>0,value=>0},{valid=>1,value=>1},{valid=>1,value=>2021},{valid=>1,value=>10000},{summary=>"Not an integer",valid=>0,value=>1.1}],min=>1,summary=>"Year number (AD, starting from 1), e.g. 2022"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["int"],type=>"int",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
@@ -21,7 +21,7 @@ Sah::SchemaR::date::year - Year number (AD, starting from 1), e.g. 2022
 
 =head1 VERSION
 
-This document describes version 0.018 of Sah::SchemaR::date::year (from Perl distribution Sah-Schemas-Date), released on 2022-10-12.
+This document describes version 0.019 of Sah::SchemaR::date::year (from Perl distribution Sah-Schemas-Date), released on 2023-12-09.
 
 =head1 DESCRIPTION
 
@@ -61,7 +61,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2019 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020, 2019 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

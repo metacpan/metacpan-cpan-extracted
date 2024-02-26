@@ -6,10 +6,14 @@ use warnings;
 
 use Test::More;
 
-plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
+    'Bencher/Scenario/Tie/Array.pm',
+    'Bencher/Scenario/Tie/Hash.pm',
     'Bencher/Scenario/Tie/Scalar.pm',
+    'Bencher/ScenarioR/Tie/Array.pm',
+    'Bencher/ScenarioR/Tie/Hash.pm',
     'Bencher/ScenarioR/Tie/Scalar.pm',
     'Bencher/Scenarios/Tie.pm'
 );

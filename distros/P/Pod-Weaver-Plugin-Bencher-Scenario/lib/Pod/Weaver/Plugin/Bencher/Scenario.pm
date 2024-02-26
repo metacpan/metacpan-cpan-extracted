@@ -1,10 +1,5 @@
 package Pod::Weaver::Plugin::Bencher::Scenario;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-31'; # DATE
-our $DIST = 'Pod-Weaver-Plugin-Bencher-Scenario'; # DIST
-our $VERSION = '0.252'; # VERSION
-
 use 5.010001;
 use Moose;
 with 'Pod::Weaver::Role::AddTextToSection';
@@ -36,6 +31,11 @@ use Perinci::Result::Format::Lite;
 use Perinci::Sub::Normalize qw(normalize_function_metadata);
 use Perinci::Sub::ConvertArgs::Argv qw(convert_args_to_argv);
 use String::ShellQuote;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2024-02-13'; # DATE
+our $DIST = 'Pod-Weaver-Plugin-Bencher-Scenario'; # DIST
+our $VERSION = '0.253'; # VERSION
 
 sub __ver_or_vers {
     my $v = shift;
@@ -129,7 +129,7 @@ sub __render_run_on {
 }
 
 sub _process_bencher_scenario_or_acme_cpanmodules_module {
-    no strict 'refs';
+    no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
 
     my ($self, $document, $input, $package) = @_;
 
@@ -239,7 +239,7 @@ sub _process_bencher_scenario_or_acme_cpanmodules_module {
             my $i = -1;
             for (@{ $self->sample_bench }) {
                 $i++;
-                my $res = eval $_;
+                my $res = eval $_; ## no critic: BuiltinFunctions::ProhibitStringyEval
                 $self->log_fatal(["Invalid sample_bench[$i] specification: %s", $@]) if $@;
 
                 if ($res->{args}) {
@@ -599,8 +599,8 @@ sub _list_my_scenario_modules {
     @res;
 }
 
-sub _process_bencher_scenarios_module {
-    no strict 'refs';
+sub _process_bencher_scenariobundle_module {
+    no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
 
     my ($self, $document, $input, $package) = @_;
 
@@ -656,7 +656,7 @@ sub weave_section {
             $self->_process_bencher_scenario_or_acme_cpanmodules_module($document, $input, $package);
         }
     }
-    if ($filename =~ m!^lib/(Bencher/Scenarios/.+)\.pm$!) {
+    if ($filename =~ m!^lib/(Bencher/ScenarioBundle/.+)\.pm$!) {
         {
             # since Bencher::Scenario PW plugin might be called more than once,
             # we avoid duplicate processing via a state variable
@@ -664,7 +664,7 @@ sub weave_section {
             last if $mem{$filename}++;
             $package = $1;
             $package =~ s!/!::!g;
-            $self->_process_bencher_scenarios_module($document, $input, $package);
+            $self->_process_bencher_scenariobundle_module($document, $input, $package);
         }
     }
 }
@@ -684,7 +684,7 @@ Pod::Weaver::Plugin::Bencher::Scenario - Plugin to use when building Bencher::Sc
 
 =head1 VERSION
 
-This document describes version 0.252 of Pod::Weaver::Plugin::Bencher::Scenario (from Perl distribution Pod-Weaver-Plugin-Bencher-Scenario), released on 2021-07-31.
+This document describes version 0.253 of Pod::Weaver::Plugin::Bencher::Scenario (from Perl distribution Pod-Weaver-Plugin-Bencher-Scenario), released on 2024-02-13.
 
 =head1 SYNOPSIS
 
@@ -730,7 +730,7 @@ alternatives.
 
 =back
 
-For each C<lib/Bencher/Scenarios/*> module file:
+For each C<lib/Bencher/ScenarioBundle/*> module file:
 
 =over
 
@@ -819,14 +819,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Pod-Weaver
 
 Source repository is at L<https://github.com/perlancar/perl-Pod-Weaver-Plugin-Bencher-Scenario>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Plugin-Bencher-Scenario>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Bencher>
@@ -839,11 +831,37 @@ L<Acme::CPANModules>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2024, 2020, 2019, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Plugin-Bencher-Scenario>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

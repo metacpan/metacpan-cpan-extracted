@@ -1,0 +1,49 @@
+[%- SET tab_char = "\t" -%]
+[% BLOCK arg_pos -%]
+[% FOREACH arg = binding.args -%]
+[%	arg.type_tiny.type %], { name => [% perlstring(arg.id) %],[% IF arg.meta.tail_optional %] default => undef,[% END %] },
+[% END -%]
+[% END -%]
+[% BLOCK arg_named -%]
+[% FOREACH arg = binding.args -%]
+[%	perlstring(arg.id) %] => [% arg.type_tiny.type %], {[% IF arg.meta.optional %] default => undef,[% END %] },
+[% END -%]
+[% END -%]
+[%- IF binding.args.size > 0 -%]
+[% # Positional and Named signature
+   IF positional_and_named_sig -%]
+[% SET tab_indent_level = 6 -%]
+		state $signature = signature(
+			strictness => STRICT,
+			multi => [
+				{
+					pos => [
+[%						INCLUDE arg_pos FILTER indent(tab_char.repeat(tab_indent_level)) -%]
+					],
+				},
+				{
+					named => [
+[%						INCLUDE arg_named FILTER indent(tab_char.repeat(tab_indent_level)) -%]
+					],
+				}
+			],
+		);
+[% # Positional signature only
+   ELSE -%]
+[% SET tab_indent_level = 4 -%]
+		state $signature = signature(
+			strictness => STRICT,
+			pos => [
+[%				INCLUDE arg_pos FILTER indent(tab_char.repeat(tab_indent_level)) -%]
+			],
+		);
+[% END  -%]
+
+		$RETVAL = $xs->( &$signature );
+[% # No argument list
+   ELSE -%]
+		$RETVAL = $xs->( @_ );
+[% END -%]
+[%#-
+# vim: ft=tt2
+-%]

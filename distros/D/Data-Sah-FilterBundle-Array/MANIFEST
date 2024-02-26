@@ -7,6 +7,7 @@ META.yml
 Makefile.PL
 README
 dist.ini
+lib/Data/Sah/Filter/perl/Array/arrayify.pm
 lib/Data/Sah/Filter/perl/Array/dupenum.pm
 lib/Data/Sah/Filter/perl/Array/dupestr.pm
 lib/Data/Sah/FilterBundle/Array.pm

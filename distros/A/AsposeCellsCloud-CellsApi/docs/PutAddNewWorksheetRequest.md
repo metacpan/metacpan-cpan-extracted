@@ -8,12 +8,12 @@ use AsposeCellsCloud::Request::PutAddNewWorksheet;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**name** | **string** | The workbook name. |
+**name** | **string** | The file name. |
 **sheet_name** | **string** | The new sheet name. |
 **position** | **int** | The new sheet position. |
 **sheettype** | **string** | Specifies the worksheet type(VB/Worksheet/Chart/BIFF4Macro/InternationalMacro/Other/Dialog). |
-**folder** | **string** | Original workbook folder. |
-**storage_name** | **string** | Storage name. |  
+**folder** | **string** | The folder where the file is situated. |
+**storage_name** | **string** | The storage name where the file is situated. |  
 
 [[Back to Model list]](../README.md#documentation-for-requests) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

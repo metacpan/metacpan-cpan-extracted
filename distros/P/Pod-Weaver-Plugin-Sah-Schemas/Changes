@@ -1,3 +1,9 @@
+0.079   2024-01-12  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] In generated SAH SCHEMA DEFINITION section, sort schema clauses
+          using Sort::Sub::sah_schema_clause.
+
+
 0.078   2024-01-08  Released-By: PERLANCAR; Backward-Incompatible: yes; Urgency: medium
 
         - [incompatible change] Default show_source configuration to true.

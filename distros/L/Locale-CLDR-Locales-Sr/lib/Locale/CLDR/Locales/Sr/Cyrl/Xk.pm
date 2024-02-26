@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Sr::Cyrl::Xk - Package for language Serbian
 
 package Locale::CLDR::Locales::Sr::Cyrl::Xk;
 # This file auto generated from Data\common\main\sr_Cyrl_XK.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -41,7 +41,6 @@ has 'display_name_language' => (
  				'nqo' => 'н’ко',
  				'shi' => 'јужни шилха',
  				'si' => 'синхалски',
- 				'tzm' => 'централноатласки тамашек',
  				'xh' => 'исикоса',
  				'zgh' => 'стандардни марокански тамашек',
  				'zu' => 'исизулу',
@@ -83,27 +82,6 @@ has 'calendar_months' => (
 	default		=> sub { {
 			'gregorian' => {
 				'format' => {
-					abbreviated => {
-						nonleap => [
-							'јан',
-							'феб',
-							'март',
-							'апр',
-							'мај',
-							'јун',
-							'јул',
-							'авг',
-							'септ',
-							'окт',
-							'нов',
-							'дец'
-						],
-						leap => [
-							
-						],
-					},
-				},
-				'stand-alone' => {
 					abbreviated => {
 						nonleap => [
 							'јан',

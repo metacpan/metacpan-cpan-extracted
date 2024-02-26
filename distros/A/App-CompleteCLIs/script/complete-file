@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-19'; # DATE
+our $DATE = '2023-12-01'; # DATE
 our $DIST = 'App-CompleteCLIs'; # DIST
-our $VERSION = '0.152'; # VERSION
+our $VERSION = '0.153'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Complete/File/complete_file",
@@ -40,7 +40,7 @@ complete-file - Complete file and directory from local filesystem
 
 =head1 VERSION
 
-This document describes version 0.152 of complete-file (from Perl distribution App-CompleteCLIs), released on 2023-01-19.
+This document describes version 0.153 of complete-file (from Perl distribution App-CompleteCLIs), released on 2023-12-01.
 
 =head1 SYNOPSIS
 
@@ -48,7 +48,7 @@ B<complete-file> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, 
 
 B<complete-file> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<complete-file> [B<L<--allow-dot|/"--disallow-dot">>|B<L<--disallow-dot|/"--disallow-dot">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--exclude-dir|/"--exclude-dir">>|B<L<--include-dir|/"--exclude-dir">>] [B<L<--file-ext-filter|/"--file-ext-filter=s">>=I<any>|B<L<--file-ext-filter-json|/"--file-ext-filter=s">>=I<json>] [B<L<--file-regex-filter|/"--file-regex-filter=s">>=I<re>] [B<L<--filter|/"--filter=s">>=I<any>|B<L<--filter-json|/"--filter=s">>=I<json>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--handle-tilde|/"--no-handle-tilde">>|B<L<--no-handle-tilde|/"--no-handle-tilde">>|B<L<--nohandle-tilde|/"--no-handle-tilde">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--starting-path|/"--starting-path=s">>=I<str>] -- E<lt>I<L<word|/"--word=s*">>E<gt>
+B<complete-file> [B<L<--allow-dot|/"--disallow-dot">>|B<L<--disallow-dot|/"--disallow-dot">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--exclude-dir|/"--exclude-dir">>|B<L<--include-dir|/"--exclude-dir">>] [B<L<--exclude-leaf|/"--exclude-leaf">>|B<L<--include-leaf|/"--exclude-leaf">>] [B<L<--file-ext-filter|/"--file-ext-filter=s">>=I<any>|B<L<--file-ext-filter-json|/"--file-ext-filter=s">>=I<json>] [B<L<--file-regex-filter|/"--file-regex-filter=s">>=I<re>] [B<L<--filter|/"--filter=s">>=I<any>|B<L<--filter-json|/"--filter=s">>=I<json>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--handle-tilde|/"--no-handle-tilde">>|B<L<--no-handle-tilde|/"--no-handle-tilde">>|B<L<--nohandle-tilde|/"--no-handle-tilde">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--recurse|/"--recurse, -r">>|B<L<-r|/"--recurse, -r">>|B<L<--no-recurse|/"--recurse, -r">>|B<L<--norecurse|/"--recurse, -r">>] [B<L<--recurse-matching|/"--recurse-matching=s">>=I<str>] [B<L<--starting-path|/"--starting-path=s">>=I<str>] -- E<lt>I<L<word|/"--word=s*">>E<gt>
 
 =head1 OPTIONS
 
@@ -64,10 +64,35 @@ This is most useful when combined with C<starting_path> option to prevent user
 going up/outside the starting path.
 
 
+=item B<--exclude-dir>
+
+(No description)
+
+
+=item B<--exclude-leaf>
+
+(No description)
+
+
 =item B<--no-handle-tilde>
 
 (No description)
 
+
+=item B<--recurse>, B<-r>
+
+(No description)
+
+
+=item B<--recurse-matching>=I<s>
+
+Default value:
+
+ "level-by-level"
+
+Valid values:
+
+ ["level-by-level","all-at-once"]
 
 =item B<--starting-path>=I<s>
 
@@ -90,14 +115,6 @@ Can also be specified as the 1st command-line argument.
 =head2 Filtering options
 
 =over
-
-=item B<--exclude-dir>
-
-This is also an alternative to specifying full C<filter>. Set this to true if you
-do not want directories.
-
-If you only want directories, take a look at C<complete_dir()>.
-
 
 =item B<--file-ext-filter-json>=I<s>
 

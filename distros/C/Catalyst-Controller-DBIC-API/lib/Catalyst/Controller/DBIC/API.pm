@@ -1,5 +1,5 @@
 package Catalyst::Controller::DBIC::API;
-$Catalyst::Controller::DBIC::API::VERSION = '2.008001';
+$Catalyst::Controller::DBIC::API::VERSION = '2.009000';
 #ABSTRACT: Provides a DBIx::Class web service automagically
 use Moose;
 BEGIN { extends 'Catalyst::Controller'; }
@@ -448,11 +448,15 @@ sub validate_object {
             }
 
             # check for multiple values
-            if ( ref($value) && !( reftype($value) eq reftype(JSON::MaybeXS::true) ) )
-            {
-                require Data::Dumper;
-                die
-                    "Multiple values for '${key}': ${\Data::Dumper::Dumper($value)}";
+            if ( ref($value) && !( reftype($value) eq reftype(JSON::MaybeXS::true) ) ) {
+                # PostgreSQL supports arrays
+                unless (ref($value) eq 'ARRAY'
+                    && $self->stored_result_source->schema->storage->sqlt_type eq 'PostgreSQL'
+                    && $object->result_source->column_info($key)->{data_type} =~ /\[\]$/) {
+                    require Data::Dumper;
+                    die
+                        "Multiple values for '${key}': ${\Data::Dumper::Dumper($value)}";
+                }
             }
 
             # check exists so we don't just end up with hash of undefs
@@ -684,7 +688,7 @@ Catalyst::Controller::DBIC::API - Provides a DBIx::Class web service automagical
 
 =head1 VERSION
 
-version 2.008001
+version 2.009000
 
 =head1 SYNOPSIS
 
@@ -1343,7 +1347,7 @@ Samuel Kaufman <sam@socialflow.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Luke Saunders, Nicholas Perez, Alexander Hartmaier, et al.
+This software is copyright (c) 2024 by Luke Saunders, Nicholas Perez, Alexander Hartmaier, et al.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

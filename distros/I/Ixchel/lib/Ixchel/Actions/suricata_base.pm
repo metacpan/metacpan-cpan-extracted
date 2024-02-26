@@ -158,7 +158,8 @@ sub action_extra {
 	my @to_remove = (
 		'.logging.outputs', '.outputs',     '.af-packet', '.pcap',
 		'.include',         '.rule-files',  '.af-xdp',    '.napatech',
-		'.dpdk',            '.sensor-name', '.nflog',     '.netmap'
+		'.dpdk',            '.sensor-name', '.nflog',     '.netmap',
+		'.pfring',
 	);
 	eval {
 		my ( $tnp_fh, $tmp_file ) = tempfile();

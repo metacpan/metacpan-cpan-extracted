@@ -8,9 +8,9 @@ use AsposeCellsCloud::Request::PostWorksheetCellsRangeColumnWidth;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**name** | **string** | The workbook name. |
+**name** | **string** | The file name. |
 **sheet_name** | **string** | The worksheet name. |
-**range** | **Range** | The range object. |
+**range** | **Range** | Range The range object. |
 **value** | **double** | Sets the column width of this range. |
 **folder** | **string** | Original workbook folder. |
 **storage_name** | **string** | Storage name. |  

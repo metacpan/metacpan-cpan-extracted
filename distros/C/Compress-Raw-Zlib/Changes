@@ -1,6 +1,40 @@
 CHANGES
 -------
 
+  2.209 26 February 2024
+
+      * version 2.209
+        Mon Feb 26 15:54:39 2024 +0000
+        b8c062949b7e89a2f1643825f6b66f79b2ba3b68
+
+      * #31 Fix build failure with "c++-compat" warnings
+        Mon Feb 26 15:20:07 2024 +0000
+        d9af6f896accf755fa1ef486cf128fdf66314213
+
+  2.208 18 February 2024
+
+      * #30 Fix for READMEmd target
+        Mon Feb 19 09:09:05 2024 +0000
+        6945e13819aa525ab1e5d61362e171011aae9e7b
+
+  2.207 18 February 2024
+
+      * #28 use zlib 1.3.1 in examples
+        Tue Feb 13 09:34:23 2024 +0000
+        4292a3b6e2151404b8b544c20b7e54512ca2852f
+
+      * #28 include zlib-1.3.1 source
+        Tue Feb 13 09:31:12 2024 +0000
+        e2bd28778a465ce8205233a3ec0e8c2f4c28f705
+
+      * #29 Add author & absrtract to Makefile.PL & meta.*
+        Sat Feb 10 16:17:15 2024 +0000
+        0d4b451e1788300f3ffa21b3bf76e0ac26bcc32c
+
+      * #28 upgrade to zlib 1.3.1 for upstream testing
+        Thu Jan 25 09:56:35 2024 +0000
+        6c0ab334eacaf26203efccbb491d1ae86221cf3e
+
   2.206 25 July 2023
 
       * 2.206

@@ -33,6 +33,6 @@ is_deeply($t2->get_next_item, [1973,98,"Mean Streets"]);
 is_deeply($t2->get_next_row_hashref , {Year=>1974,Score=>97,Title=>"The Godfather,Part II"});
 $t2->reset_iterator;
 is_deeply($t2->get_next_row_hashref , {Year=>1973,Score=>98,Title=>"Mean Streets"});
-is($t2->get_row_count, 9);
+is($t2->get_row_count, 10);
 
 done_testing;

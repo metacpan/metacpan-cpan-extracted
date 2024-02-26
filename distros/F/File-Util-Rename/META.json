@@ -47,11 +47,11 @@
    "provides" : {
       "File::Util::Rename" : {
          "file" : "lib/File/Util/Rename.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "File::Util::Rename::NoClobber" : {
          "file" : "lib/File/Util/Rename/NoClobber.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -66,7 +66,7 @@
          "web" : "https://github.com/perlancar/perl-File-Util-Rename"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038002"
@@ -433,7 +433,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::AppendPrepend",
                         "name" : "@Author::PERLANCAR/AppendPrepend",
-                        "version" : "0.01"
+                        "version" : "0.021"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::EnsureUniqueSections",

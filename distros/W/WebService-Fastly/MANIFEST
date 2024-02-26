@@ -87,6 +87,7 @@ docs/ContactResponse.md
 docs/ContactResponseAllOf.md
 docs/Content.md
 docs/ContentApi.md
+docs/CreateResponseObjectRequest.md
 docs/Customer.md
 docs/CustomerApi.md
 docs/CustomerResponse.md
@@ -942,6 +943,7 @@ lib/WebService/Fastly/Object/Contact.pm
 lib/WebService/Fastly/Object/ContactResponse.pm
 lib/WebService/Fastly/Object/ContactResponseAllOf.pm
 lib/WebService/Fastly/Object/Content.pm
+lib/WebService/Fastly/Object/CreateResponseObjectRequest.pm
 lib/WebService/Fastly/Object/Customer.pm
 lib/WebService/Fastly/Object/CustomerResponse.pm
 lib/WebService/Fastly/Object/CustomerResponseAllOf.pm

@@ -1,3 +1,10 @@
+0.016   2023-12-05  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Direct reader to Require::HookPlugin.
+
+
 0.015   2023-07-23  Released-By: PERLANCAR; Urgency: medium
 
         - [test] [bugfix] Add basic tests for all hooks, fix a couple of bugs

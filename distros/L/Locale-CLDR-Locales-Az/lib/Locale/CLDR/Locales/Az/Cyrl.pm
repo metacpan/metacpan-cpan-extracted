@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Az::Cyrl - Package for language Azerbaijani
 
 package Locale::CLDR::Locales::Az::Cyrl;
 # This file auto generated from Data\common\main\az_Cyrl.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -23,7 +23,7 @@ use if $^V ge v5.12.0, feature => 'unicode_strings';
 use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
-extends('Locale::CLDR::Locales::Az');
+extends('Locale::CLDR::Locales::Root');
 has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
@@ -118,6 +118,7 @@ has 'display_name_language' => (
  				'en_GB' => 'Британија инҝилисҹәси',
  				'en_GB@alt=short' => 'инҝилис (Б.К.)',
  				'en_US' => 'Америка инҝилисҹәси',
+ 				'en_US@alt=short' => 'инҝилис (АБШ)',
  				'eo' => 'есперанто',
  				'es' => 'испан',
  				'es_419' => 'Латын Америкасы испанҹасы',
@@ -777,7 +778,6 @@ has 'characters' => (
 			auxiliary => qr{[ц щ ъ ь э ю я]},
 			index => ['А', 'Ә', 'Б', 'В', 'Г', 'Ғ', 'Д', 'Е', 'Ж', 'З', 'И', 'Й', 'Ј', 'К', 'Ҝ', 'Л', 'М', 'Н', 'О', 'Ө', 'П', 'Р', 'С', 'Т', 'У', 'Ү', 'Ф', 'Х', 'Һ', 'Ч', 'Ҹ', 'Ш', 'Ы'],
 			main => qr{[а ә б в г ғ д е ж з и й ј к ҝ л м н о ө п р с т у ү ф х һ ч ҹ ш ы]},
-			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
 		};
 	},
 EOT
@@ -822,39 +822,9 @@ has 'number_symbols' => (
 	default		=> sub { {
 		'latn' => {
 			'decimal' => q(,),
-			'exponential' => q(E),
 			'group' => q(.),
-			'infinity' => q(∞),
-			'list' => q(;),
-			'minusSign' => q(-),
-			'nan' => q(NaN),
-			'perMille' => q(‰),
-			'percentSign' => q(%),
-			'plusSign' => q(+),
 		},
 	} }
-);
-
-has 'number_formats' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-		decimalFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0.###',
-				},
-			},
-		},
-		percentFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0%',
-				},
-			},
-		},
-} },
 );
 
 has 'number_currency_formats' => (
@@ -865,9 +835,6 @@ has 'number_currency_formats' => (
 		'latn' => {
 			'pattern' => {
 				'default' => {
-					'accounting' => {
-						'positive' => '#,##0.00 ¤',
-					},
 					'standard' => {
 						'positive' => '#,##0.00 ¤',
 					},
@@ -939,25 +906,6 @@ has 'calendar_months' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'јан',
-							'фев',
-							'мар',
-							'апр',
-							'май',
-							'ијн',
-							'ијл',
-							'авг',
-							'сен',
-							'окт',
-							'ној',
-							'дек'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'Јанвар',
@@ -998,24 +946,6 @@ has 'calendar_days' => (
 						sat => 'Ш.',
 						sun => 'Б.'
 					},
-					narrow => {
-						mon => '1',
-						tue => '2',
-						wed => '3',
-						thu => '4',
-						fri => '5',
-						sat => '6',
-						sun => '7'
-					},
-					short => {
-						mon => 'Б.Е.',
-						tue => 'Ч.А.',
-						wed => 'Ч.',
-						thu => 'Ҹ.А.',
-						fri => 'Ҹ.',
-						sat => 'Ш.',
-						sun => 'Б.'
-					},
 					wide => {
 						mon => 'базар ертәси',
 						tue => 'чәршәнбә ахшамы',
@@ -1027,15 +957,6 @@ has 'calendar_days' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						mon => 'Б.Е.',
-						tue => 'Ч.А.',
-						wed => 'Ч.',
-						thu => 'Ҹ.А.',
-						fri => 'Ҹ.',
-						sat => 'Ш.',
-						sun => 'Б.'
-					},
 					narrow => {
 						mon => '1',
 						tue => '2',
@@ -1044,24 +965,6 @@ has 'calendar_days' => (
 						fri => '5',
 						sat => '6',
 						sun => '7'
-					},
-					short => {
-						mon => 'Б.Е.',
-						tue => 'Ч.А.',
-						wed => 'Ч.',
-						thu => 'Ҹ.А.',
-						fri => 'Ҹ.',
-						sat => 'Ш.',
-						sun => 'Б.'
-					},
-					wide => {
-						mon => 'базар ертәси',
-						tue => 'чәршәнбә ахшамы',
-						wed => 'чәршәнбә',
-						thu => 'ҹүмә ахшамы',
-						fri => 'ҹүмә',
-						sat => 'шәнбә',
-						sun => 'базар'
 					},
 				},
 			},
@@ -1206,52 +1109,6 @@ has 'day_periods' => (
 					'noon' => q{ҝ},
 					'pm' => q{п},
 				},
-				'wide' => {
-					'afternoon1' => q{ҝүндүз},
-					'am' => q{АМ},
-					'evening1' => q{ахшамүстү},
-					'midnight' => q{ҝеҹәјары},
-					'morning1' => q{сүбһ},
-					'morning2' => q{сәһәр},
-					'night1' => q{ахшам},
-					'night2' => q{ҝеҹә},
-					'noon' => q{ҝүнорта},
-					'pm' => q{ПМ},
-				},
-			},
-			'stand-alone' => {
-				'abbreviated' => {
-					'afternoon1' => q{ҝүндүз},
-					'evening1' => q{ахшамүстү},
-					'midnight' => q{ҝеҹәјары},
-					'morning1' => q{сүбһ},
-					'morning2' => q{сәһәр},
-					'night1' => q{ахшам},
-					'night2' => q{ҝеҹә},
-					'noon' => q{ҝүнорта},
-				},
-				'narrow' => {
-					'afternoon1' => q{ҝүндүз},
-					'evening1' => q{ахшамүстү},
-					'midnight' => q{ҝеҹәјары},
-					'morning1' => q{сүбһ},
-					'morning2' => q{сәһәр},
-					'night1' => q{ахшам},
-					'night2' => q{ҝеҹә},
-					'noon' => q{ҝүнорта},
-				},
-				'wide' => {
-					'afternoon1' => q{ҝүндүз},
-					'am' => q{АМ},
-					'evening1' => q{ахшамүстү},
-					'midnight' => q{ҝеҹәјары},
-					'morning1' => q{сүбһ},
-					'morning2' => q{сәһәр},
-					'night1' => q{ахшам},
-					'night2' => q{ҝеҹә},
-					'noon' => q{ҝүнорта},
-					'pm' => q{ПМ},
-				},
 			},
 		},
 	} },
@@ -1335,7 +1192,6 @@ has 'datetime_formats_available_formats' => (
 			GyMMMEd => q{G d MMM y, E},
 			GyMMMd => q{G d MMM y},
 			MEd => q{dd.MM, E},
-			MMM => q{LLL},
 			MMMEd => q{d MMM, E},
 			MMMd => q{d MMM},
 			Md => q{dd.MM},
@@ -1352,7 +1208,6 @@ has 'datetime_formats_available_formats' => (
 			GyMMMEd => q{G d MMM y, E},
 			GyMMMd => q{G d MMM y},
 			MEd => q{dd.MM, E},
-			MMM => q{LLL},
 			MMMEd => q{d MMM, E},
 			MMMMW => q{MMMM, W 'һәфтә'},
 			MMMd => q{d MMM},
@@ -1385,10 +1240,6 @@ has 'datetime_formats_interval' => (
 			MEd => {
 				M => q{dd.MM, E – dd.MM, E},
 				d => q{dd.MM, E – dd.MM, E},
-			},
-			MMMEd => {
-				M => q{MMM d, E – MMM d, E},
-				d => q{MMM d, E – MMM d, E},
 			},
 			Md => {
 				M => q{dd.MM – dd.MM},
@@ -1467,7 +1318,6 @@ has 'datetime_formats_interval' => (
 			},
 			yMMMd => {
 				M => q{d MMM y – d MMM},
-				d => q{y MMM d–d},
 				y => q{d MMM y – d MMM y},
 			},
 			yMd => {

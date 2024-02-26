@@ -14,6 +14,6 @@ use ok 'Locale::CLDR';
 my $locale = Locale::CLDR->new('ca');
 
 my $test = Locale::CLDR->new('en_latn_US');
-is ($locale->code_pattern('language', $test), 'Idioma: anglès', 'Code pattern Language');
+is ($locale->code_pattern('language', $test), 'Llengua: anglès', 'Code pattern Language');
 is ($locale->code_pattern('script', $test), 'Escriptura: llatí', 'Code pattern script');
 is ($locale->code_pattern('region', $test), 'Regió: Estats Units', 'Code pattern region');

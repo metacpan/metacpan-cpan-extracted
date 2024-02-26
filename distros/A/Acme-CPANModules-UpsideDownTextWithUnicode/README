@@ -1,21 +1,56 @@
 NAME
-    Acme::CPANModules::UpsideDownTextWithUnicode - Modules that can flip
-    Latin text (make your text look upside down) using Unicode characters
+    Acme::CPANModules::UpsideDownTextWithUnicode - List of modules that can
+    flip Latin text (make your text look upside down) using Unicode
+    characters
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     Acme::CPANModules::UpsideDownTextWithUnicode (from Perl distribution
-    Acme-CPANModules-UpsideDownTextWithUnicode), released on 2019-01-09.
+    Acme-CPANModules-UpsideDownTextWithUnicode), released on 2023-10-31.
 
-DESCRIPTION
-    Modules that can flip Latin text (make your text look upside down) using
-    Unicode characters.
+ACME::CPANMODULES ENTRIES
+    Text::UpsideDown
+        First released in 2008, comes with a CLI called `ud`.
 
-INCLUDED MODULES
-    *   Text::UpsideDown - First released in 2008, comes with a CLI called
-        `ud`
+        Author: DOHERTY <https://metacpan.org/author/DOHERTY>
 
-    *   Acme::Flip - A 2009 reinvention of Text::UpsideDown, without any CLI
+    Acme::Flip
+        A 2009 reinvention of Text::UpsideDown, without any CLI.
+
+        Author: LKUNDRAK <https://metacpan.org/author/LKUNDRAK>
+
+FAQ
+  What is an Acme::CPANModules::* module?
+    An Acme::CPANModules::* module, like this module, contains just a list
+    of module names that share a common characteristics. It is a way to
+    categorize modules and document CPAN. See Acme::CPANModules for more
+    details.
+
+  What are ways to use this Acme::CPANModules module?
+    Aside from reading this Acme::CPANModules module's POD documentation,
+    you can install all the listed modules (entries) using cpanm-cpanmodules
+    script (from App::cpanm::cpanmodules distribution):
+
+     % cpanm-cpanmodules -n UpsideDownTextWithUnicode
+
+    Alternatively you can use the cpanmodules CLI (from App::cpanmodules
+    distribution):
+
+        % cpanmodules ls-entries UpsideDownTextWithUnicode | cpanm -n
+
+    or Acme::CM::Get:
+
+        % perl -MAcme::CM::Get=UpsideDownTextWithUnicode -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
+
+    or directly:
+
+        % perl -MAcme::CPANModules::UpsideDownTextWithUnicode -E'say $_->{module} for @{ $Acme::CPANModules::UpsideDownTextWithUnicode::LIST->{entries} }' | cpanm -n
+
+    This Acme::CPANModules module also helps lcpan produce a more meaningful
+    result for "lcpan related-mods" command when it comes to finding related
+    modules for the modules listed in this Acme::CPANModules module. See
+    App::lcpan::Cmd::related_mods for more details on how "related modules"
+    are found.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -27,14 +62,6 @@ SOURCE
     <https://github.com/perlancar/perl-Acme-CPANModules-UpsideDownTextWithUn
     icode>.
 
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Upsi
-    deDownTextWithUnicode>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
 SEE ALSO
     Acme::CPANModules - about the Acme::CPANModules namespace
 
@@ -43,9 +70,34 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2023, 2019 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Upsi
+    deDownTextWithUnicode>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

@@ -22,3 +22,9 @@
 4) 创建QQ::weixin::work::dial
 5) 创建QQ::weixin::work::oa::calendar
 6) 创建QQ::weixin::work::oa::schedule
+
+2022-02-11 QQ::weixin::work v0.06
+更新
+
+2022-04-30 QQ::weixin::work v0.08
+添加media的upload

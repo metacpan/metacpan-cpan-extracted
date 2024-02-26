@@ -1,3 +1,20 @@
+0.012   2024-01-18  Released-By: PERLANCAR; Urgency: medium
+
+        - Add entry: App::grep::similar::text.
+
+
+0.011   2023-11-17  Released-By: PERLANCAR; Urgency: medium
+
+        - Add entry: App::wcgrep.
+
+
+0.010   2023-10-29  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Tweak Abstract (add 'List of ...') to follow convention.
+
+
 0.009   2021-11-26  Released-By: PERLANCAR; Urgency: medium
 
 	- Minor wording tweak and formatting fix.

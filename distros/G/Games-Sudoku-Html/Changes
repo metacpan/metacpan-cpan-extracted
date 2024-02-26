@@ -1,0 +1,8 @@
+
+Changes for Games::Sudoku::Html
+
+v0.06 
+
+	scripts/sudoku2html.pl added.
+	Moved the former release of Games::Sudoku::PatternSolver::PlayerIf v0.05 to this independent distro.
+

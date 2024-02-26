@@ -1,10 +1,15 @@
-0.02    2017-03-21 (PERLANCAR)
+0.021   2023-11-20  Released-By: PERLANCAR; Urgency: medium
+
+        - Update module name: File::MoreUtil -> File::Util::Test.
+
+
+0.02    2017-03-21  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [build] Rebuild to remove unneeded dependency on Perl::osnames.
 
 
-0.01    2015-11-20 (PERLANCAR)
+0.01    2015-11-20  Released-By: PERLANCAR
 
         - First release.

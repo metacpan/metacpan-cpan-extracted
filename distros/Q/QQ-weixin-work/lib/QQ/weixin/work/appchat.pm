@@ -19,7 +19,7 @@ use LWP::UserAgent;
 use JSON;
 use utf8;
 
-our $VERSION = '0.06';
+our $VERSION = '0.10';
 our @EXPORT = qw/ create update get send /;
 
 =head1 FUNCTION
@@ -27,6 +27,7 @@ our @EXPORT = qw/ create update get send /;
 =head2 create(access_token, hash);
 
 创建群聊会话
+最后更新：2022/08/18
 
 =head2 SYNOPSIS
 
@@ -36,16 +37,16 @@ L<https://developer.work.weixin.qq.com/document/path/90245>
 
 =head4 请求包结构体为：
 
-  {
-    "name" : "NAME",
-    "owner" : "userid1",
-    "userlist" : ["userid1", "userid2", "userid3"],
-    "chatid" : "CHATID"
-  }
+	{
+		"name" : "NAME",
+		"owner" : "userid1",
+		"userlist" : ["userid1", "userid2", "userid3"],
+		"chatid" : "CHATID"
+	}
 
 =head4 参数说明：
 
-    参数	必须	说明
+	参数	必须	说明
     access_token	是	调用接口凭证
     name	否	群聊名，最多50个utf8字符，超过将截断
     owner	否	指定群主的id。如果不指定，系统会随机从userlist中选一人作为群主
@@ -55,20 +56,23 @@ L<https://developer.work.weixin.qq.com/document/path/90245>
 =head3 权限说明
 
 只允许企业自建应用调用，且应用的可见范围必须是根部门；
+
+=head4 限制说明：
+
 群成员人数不可超过管理端配置的“群成员人数上限”，且最大不可超过2000人；
 每企业创建群数不可超过1000/天；
 
 =head3 RETURN 返回结果
 
-    {
+	{
 	   "errcode" : 0,
 	   "errmsg" : "ok",
 	   "chatid" : "CHATID"
-	 }
+	}
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
     errmsg	对返回码的文本描述内容
     chatid	群聊的唯一标志
@@ -97,26 +101,27 @@ sub create {
 =head2 update(access_token, hash);
 
 修改群聊会话
+最后更新：2023/04/13
 
 =head2 SYNOPSIS
 
-L<https://developer.work.weixin.qq.com/document/path/90246>
+L<https://developer.work.weixin.qq.com/document/path/98913>
 
 =head3 请求说明：
 
 =head4 请求包结构体为：
 
-  {
-    "chatid" : "CHATID",
-    "name" : "NAME",
-    "owner" : "userid2",
-    "add_user_list" : ["userid1", "userid2", "userid3"],
-    "del_user_list" : ["userid3", "userid4"]
-  }
+	{
+		"chatid" : "CHATID",
+		"name" : "NAME",
+		"owner" : "userid2",
+		"add_user_list" : ["userid1", "userid2", "userid3"],
+		"del_user_list" : ["userid3", "userid4"]
+	}
 
 =head4 参数说明：
 
-    参数	必须	说明
+	参数	必须	说明
     access_token	是	调用接口凭证
     chatid	是	群聊id
     name	否	新的群聊名。若不需更新，请忽略此参数。最多50个utf8字符，超过将截断
@@ -126,10 +131,13 @@ L<https://developer.work.weixin.qq.com/document/path/90246>
 
 =head3 权限说明
 
-只允许企业自建应用调用，且应用的可见范围必须是根部门；
-chatid所代表的群必须是该应用所创建；
-群成员人数不可超过2000人；
-每企业变更群的次数不可超过1000次/小时；
+只允许企业自建应用调用，且应用的可见范围必须是根部门。
+
+=head4 限制说明：
+
+chatid所代表的群必须是该应用所创建。
+群成员人数不可超过2000人。
+每企业变更群的次数不可超过1000次/小时。
 
 =head3 RETURN 返回结果
 
@@ -140,7 +148,7 @@ chatid所代表的群必须是该应用所创建；
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
     errmsg	对返回码的文本描述内容
 
@@ -166,6 +174,7 @@ sub update {
 =head2 get(access_token, chatid);
 
 获取群聊会话
+最后更新：2023/04/13
 
 =head2 SYNOPSIS
 
@@ -175,7 +184,7 @@ L<https://developer.work.weixin.qq.com/document/path/90247>
 
 =head4 参数说明：
 
-    参数	            必须	说明
+	参数	            必须	说明
     access_token	是	调用接口凭证
     chatid	是	群聊id
 
@@ -200,7 +209,7 @@ chatid所代表的群必须是该应用所创建；
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
     errmsg	对返回码的文本描述内容
     chat_info	群聊信息
@@ -231,6 +240,7 @@ sub get {
 =head2 send(access_token, hash);
 
 应用推送消息
+最后更新：2024/01/10
 
 =head2 SYNOPSIS
 
@@ -246,15 +256,18 @@ L<https://developer.work.weixin.qq.com/document/path/90248>
 
 =head4 参数说明：
 
-    参数	            必须	说明
+	参数	            必须	说明
     access_token	是	调用接口凭证
 
 =head3 权限说明
 
-只允许企业自建应用调用，且应用的可见范围必须是根部门；
-chatid所代表的群必须是该应用所创建；
-每企业消息发送量不可超过2万人次/分，不可超过30万人次/小时（若群有100人，每发一次消息算100人次）；
-每个成员在群中收到的应用消息不可超过200条/分，1万条/天，超过会被丢弃（接口不会报错）；
+只允许企业自建应用调用，且应用的可见范围必须是根部门。
+
+=head4 限制说明：
+
+chatid所代表的群必须是该应用所创建。
+每企业消息发送量不可超过2万人次/分，不可超过30万人次/小时（若群有100人，每发一次消息算100人次）。
+出于对成员的保护，每个成员在群中收到的同一个应用的消息不可超过200条/分，1万条/天，超过会被丢弃，而接口不会报错。（若应用创建了两个群，成员张三同时在这两个群中，应用往第一个群发送1条消息，再往第二个群发送2条消息，则张三累计收到该应用3条消息）。
 
 =head3 RETURN 返回结果
 
@@ -265,7 +278,7 @@ chatid所代表的群必须是该应用所创建；
 
 =head4 RETURN 参数说明
 
-    参数	    说明
+	参数	    说明
     errcode	返回码
     errmsg	对返回码的文本描述内容
 

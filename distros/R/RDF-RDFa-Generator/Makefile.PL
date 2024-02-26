@@ -10,8 +10,8 @@ my $meta = {
                           "Kjetil Kjernsmo (KJETILK) <kjetilk\@cpan.org>",
                         ],
   "dynamic_config"   => 0,
-  "generated_by"     => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
-  "keywords"         => [],
+  "generated_by"     => "Dist::Inkt::Profile::KJETILK version 0.101, CPAN::Meta::Converter version 2.150010",
+  "keywords"         => ["Semantic Web"],
   "license"          => ["perl_5"],
   "meta-spec"        => {
                           url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -45,13 +45,22 @@ my $meta = {
                                        },
                         },
   "provides"         => {
-                          "RDF::RDFa::Generator"                     => { file => "lib/RDF/RDFa/Generator.pm", version => "0.200" },
-                          "RDF::RDFa::Generator::HTML::Head"         => { file => "lib/RDF/RDFa/Generator/HTML/Head.pm", version => "0.200" },
-                          "RDF::RDFa::Generator::HTML::Hidden"       => { file => "lib/RDF/RDFa/Generator/HTML/Hidden.pm", version => "0.200" },
-                          "RDF::RDFa::Generator::HTML::Pretty"       => { file => "lib/RDF/RDFa/Generator/HTML/Pretty.pm", version => "0.200" },
+                          "RDF::RDFa::Generator"                     => { file => "lib/RDF/RDFa/Generator.pm", version => 0.204 },
+                          "RDF::RDFa::Generator::HTML::Head"         => {
+                                                                          file => "lib/RDF/RDFa/Generator/HTML/Head.pm",
+                                                                          version => "0.201_01",
+                                                                        },
+                          "RDF::RDFa::Generator::HTML::Hidden"       => {
+                                                                          file => "lib/RDF/RDFa/Generator/HTML/Hidden.pm",
+                                                                          version => "0.201_01",
+                                                                        },
+                          "RDF::RDFa::Generator::HTML::Pretty"       => {
+                                                                          file => "lib/RDF/RDFa/Generator/HTML/Pretty.pm",
+                                                                          version => "0.201_01",
+                                                                        },
                           "RDF::RDFa::Generator::HTML::Pretty::Note" => {
                                                                           file => "lib/RDF/RDFa/Generator/HTML/Pretty/Note.pm",
-                                                                          version => "0.200",
+                                                                          version => "0.201_01",
                                                                         },
                         },
   "release_status"   => "stable",
@@ -69,7 +78,7 @@ my $meta = {
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/project",
                           x_IRC        => "irc://irc.perl.org/#perlrdf",
                         },
-  "version"          => "0.200",
+  "version"          => 0.204,
   "x_contributors"   => ["ZORAN <zoran\@cpan.org>"],
   "x_static_install" => 1,
 };
@@ -145,28 +154,8 @@ else
 	}
 }
 
-sub FixMakefile
-{
-	return unless -d 'inc';
-	my $file = shift;
-	
-	local *MAKEFILE;
-	open MAKEFILE, "< $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	my $makefile = do { local $/; <MAKEFILE> };
-	close MAKEFILE or die $!;
-	
-	$makefile =~ s/\b(test_harness\(\$\(TEST_VERBOSE\), )/$1'inc', /;
-	$makefile =~ s/( -I\$\(INST_ARCHLIB\))/ -Iinc$1/g;
-	$makefile =~ s/( "-I\$\(INST_LIB\)")/ "-Iinc"$1/g;
-	$makefile =~ s/^(FULLPERL = .*)/$1 "-Iinc"/m;
-	$makefile =~ s/^(PERL = .*)/$1 "-Iinc"/m;
-	
-	open  MAKEFILE, "> $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	print MAKEFILE $makefile or die $!;
-	close MAKEFILE or die $!;
-}
 
 my $mm = WriteMakefile(%WriteMakefileArgs);
-FixMakefile($mm->{FIRST_MAKEFILE} || 'Makefile');
+
 exit(0);
 

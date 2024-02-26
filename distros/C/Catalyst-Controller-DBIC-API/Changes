@@ -1,4 +1,9 @@
-Revision history for Catalyst-Controller-DBIC-API: 2.008001
+Revision history for Catalyst-Controller-DBIC-API: 2.009000
+
+2.009000  2024-02-21 11:52:13+01:00 Europe/Vienna
+  - Add support for PostgreSQL array columns
+  - Fix t/rpc/update.t (RT#150855)
+    because of a change in URI 5.19
 
 2.008001  2019-11-26 16:39:44+01:00 Europe/Vienna
   - Add support for has_many relationships (RT#65168)

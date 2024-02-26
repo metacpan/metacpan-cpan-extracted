@@ -7,9 +7,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-30'; # DATE
+our $DATE = '2024-02-19'; # DATE
 our $DIST = 'Bencher'; # DIST
-our $VERSION = '1.062.2'; # VERSION
+our $VERSION = '1.062.4'; # VERSION
 
 binmode(STDOUT, ":encoding(utf8)");
 Perinci::CmdLine::Any->new(
@@ -34,7 +34,7 @@ bencher - A benchmark framework (CLI)
 
 =head1 VERSION
 
-This document describes version 1.062.2 of bencher (from Perl distribution Bencher), released on 2022-11-30.
+This document describes version 1.062.4 of bencher (from Perl distribution Bencher), released on 2024-02-19.
 
 =head1 SYNOPSIS
 
@@ -1591,7 +1591,7 @@ For fish and zsh, install L<shcompgen> as described above.
 
 This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
 
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/bencher.conf>, F</home/u1/bencher.conf>, or F</etc/bencher.conf>.
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/s1/.config/bencher.conf>, F</home/s1/bencher.conf>, or F</etc/bencher.conf>.
 
 All found files will be read and merged.
 
@@ -1712,9 +1712,9 @@ Set default for C<--results-dir>.
 
 =head1 FILES
 
-=head2 /home/u1/.config/bencher.conf
+=head2 /home/s1/.config/bencher.conf
 
-=head2 /home/u1/bencher.conf
+=head2 /home/s1/bencher.conf
 
 =head2 /etc/bencher.conf
 
@@ -1760,7 +1760,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

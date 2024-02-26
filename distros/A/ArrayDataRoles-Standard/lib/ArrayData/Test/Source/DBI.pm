@@ -7,7 +7,7 @@ use alias::module 'ArrayData::DBI';
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2024-01-15'; # DATE
 our $DIST = 'ArrayDataRoles-Standard'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 1;
 # ABSTRACT: Alias package for ArrayData::DBI
@@ -24,7 +24,7 @@ ArrayData::Test::Source::DBI - Alias package for ArrayData::DBI
 
 =head1 VERSION
 
-This document describes version 0.008 of ArrayData::Test::Source::DBI (from Perl distribution ArrayDataRoles-Standard), released on 2024-01-15.
+This document describes version 0.009 of ArrayData::Test::Source::DBI (from Perl distribution ArrayDataRoles-Standard), released on 2024-01-15.
 
 =head1 HOMEPAGE
 

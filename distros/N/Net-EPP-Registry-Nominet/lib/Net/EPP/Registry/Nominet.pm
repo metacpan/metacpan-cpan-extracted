@@ -28,7 +28,7 @@ use constant EPP_XMLNS	=> 'urn:ietf:params:xml:ns:epp-1.0';
 use vars qw($Error $Code $Message);
 
 BEGIN {
-	our $VERSION = '0.08';
+	our $VERSION = '0.09';
 }
 
 # file-scoped lexicals
@@ -242,13 +242,25 @@ sub _go_connect {
 	# Connect to server
 	eval { $self->{greeting} = $self->connect (%params); };
 	unless ($self->{greeting}) {
-		$self->{connected} = 0;
+		$self->{connected} = undef;
 		warn 'No greeting returned: cannot continue';
 		warn ($@) if $@;
 		return undef;
 	}
 	$self->{connected}      = 1;
 }
+
+# Workaround for connection status bug in Net::EPP::Simple
+# https://github.com/gbxyz/perl-net-epp/issues/2
+sub connect {
+	my ($self, %params) = @_;
+
+	my $meth = '_connect_' . (defined ($self->{sock}) ? 'unix' : 'tcp');
+	$self->{connected} = $self->$meth (%params);
+
+	return ($params{'no_greeting'} ? 1 : $self->get_frame);
+}
+
 
 =pod
 
@@ -1825,7 +1837,7 @@ sub _send_frame {
 		$Code   = 0;
 		$Error  = "No response from server";
 		warn $Error;
-		$self->{connected}     = 0;
+		$self->{connected}     = undef;
 		$self->{authenticated} = 0;
 		if ($self->{reconnect}) {
 			# Attempt to reconnect
@@ -1897,7 +1909,7 @@ Pete Houston <cpan@openstrike.co.uk>
 
 =head1 Licence
 
-This software is copyright © 2013-2023 by Pete Houston. It is released
+This software is copyright © 2013-2024 by Pete Houston. It is released
 under the Artistic Licence (version 2) and the
 GNU General Public Licence (version 2).
 

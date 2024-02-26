@@ -1,12 +1,12 @@
 package Locale::CLDR::Transformations::Any::Fa::Fa_fonipa;
 # This file auto generated from Data\common\transforms\fa-fa_FONIPA.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -108,7 +108,14 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(([َ ِ ُ ٓ ا و ی])ّ),
+					replace => q(وّ),
+					result  => q(vv),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(([َُِ])ّ),
 					result  => q(ّ),
 					revisit => 2,
 				},
@@ -122,29 +129,113 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(ِیْ),
+					replace => q(ِی),
 					result  => q(ej),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(یوْ),
+					result  => q(iːv),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(ه[^ \p{L} \p{M} \p{N}]),
+					replace => q(یو),
+					result  => q(iːv),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(هٔ[^ \p{L} \p{M} \p{N}]),
+					replace => q(یو),
+					result  => q(iːv),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(یو),
+					result  => q(juː),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(َوْ),
-					result  => q(ov),
+					result  => q(av),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
-					replace => q(ِی),
-					result  => q(iː),
+					replace => q(ء),
+					result  => q(ʔ),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(أَ),
+					result  => q(ʔæ),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(أ),
+					result  => q(ʔ),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(ؤ),
+					result  => q(ʔ),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(یْٔ),
+					result  => q(ʔ),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(یِٔ),
+					result  => q(ʔe),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(یٔ),
+					result  => q(ʔ),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q([^ \p{L} \p{M} \p{N}]),
 					replace => q(َه),
 					result  => q(æ),
+					revisit => 0,
+				},
+				{
+					before  => q([^ːeoæ]),
+					after   => q([^ \p{L} \p{M} \p{N}]),
+					replace => q(هٔ),
+					result  => q(eje),
+					revisit => 0,
+				},
+				{
+					before  => q([e]),
+					after   => q([^ \p{L} \p{M} \p{N}]),
+					replace => q(هٔ),
+					result  => q(je),
 					revisit => 0,
 				},
 				{
@@ -191,22 +282,50 @@ has 'transforms' => (
 				},
 				{
 					before  => q(),
-					after   => q([^ \p{L} \p{M} \p{N}]),
-					replace => q(هٔ),
-					result  => q(jæ),
-					revisit => 0,
-				},
-				{
-					before  => q(),
 					after   => q(),
 					replace => q(یٰ),
 					result  => q(ɒː),
 					revisit => 0,
 				},
 				{
+					before  => q([m n p b t d k ɡ ʔ f v s z ʃ ʒ ʁ ɢ h χ \N{U+74.361.283} \N{U+64.361.292} l ɾ]),
+					after   => q([َ ِ ُ ٓ ا و ی]),
+					replace => q(وی),
+					result  => q(uːj),
+					revisit => 0,
+				},
+				{
+					before  => q([m n p b t d k ɡ ʔ f v s z ʃ ʒ ʁ ɢ h χ \N{U+74.361.283} \N{U+64.361.292} l ɾ]),
+					after   => q(),
+					replace => q(ْیو),
+					result  => q(juː),
+					revisit => 0,
+				},
+				{
+					before  => q([m n p b t d k ɡ ʔ f v s z ʃ ʒ ʁ ɢ h χ \N{U+74.361.283} \N{U+64.361.292} l ɾ]),
+					after   => q([َ ِ ُ ٓ ا و ی]),
+					replace => q(ْی),
+					result  => q(j),
+					revisit => 0,
+				},
+				{
+					before  => q([m n p b t d k ɡ ʔ f v s z ʃ ʒ ʁ ɢ h χ \N{U+74.361.283} \N{U+64.361.292} l ɾ]),
+					after   => q([َ ِ ُ ٓ ا و ی]),
+					replace => q(ی),
+					result  => q(iːj),
+					revisit => 0,
+				},
+				{
 					before  => q(),
 					after   => q([َ ِ ُ ٓ ا و ی]),
 					replace => q(ی),
+					result  => q(j),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(یْ),
 					result  => q(j),
 					revisit => 0,
 				},
@@ -246,6 +365,13 @@ has 'transforms' => (
 					revisit => 0,
 				},
 				{
+					before  => q([^ \p{L} \p{M} \p{N}]),
+					after   => q(),
+					replace => q(اُو),
+					result  => q(o),
+					revisit => 0,
+				},
+				{
 					before  => q(),
 					after   => q(),
 					replace => q(اُ),
@@ -253,10 +379,17 @@ has 'transforms' => (
 					revisit => 0,
 				},
 				{
-					before  => q(),
+					before  => q([^ \p{L} \p{M} \p{N}]),
 					after   => q(),
 					replace => q(او),
 					result  => q(uː),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(او),
+					result  => q(ɒːv),
 					revisit => 0,
 				},
 				{
@@ -276,8 +409,29 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
+					replace => q(هِّ),
+					result  => q(hhe),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
 					replace => q(هِ),
-					result  => q(e),
+					result  => q(he),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(خوا),
+					result  => q(χɒː),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(خوی),
+					result  => q(χiː),
 					revisit => 0,
 				},
 				{
@@ -288,7 +442,28 @@ has 'transforms' => (
 					revisit => 0,
 				},
 				{
+					before  => q(),
+					after   => q(ه[^ \p{L} \p{M} \p{N}]),
+					replace => q(و),
+					result  => q(v),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(هٔ[^ \p{L} \p{M} \p{N}]),
+					replace => q(و),
+					result  => q(v),
+					revisit => 0,
+				},
+				{
 					before  => q([m n p b t d k ɡ ʔ f v s z ʃ ʒ ʁ ɢ h χ \N{U+74.361.283} \N{U+64.361.292} l ɾ]),
+					after   => q(),
+					replace => q(و),
+					result  => q(uː),
+					revisit => 0,
+				},
+				{
+					before  => q([m n p b t d k ɡ ʔ f v s z ʃ ʒ ʁ ɢ h χ \N{U+74.361.283} \N{U+64.361.292} l ɾ]ّ),
 					after   => q(),
 					replace => q(و),
 					result  => q(uː),
@@ -310,9 +485,23 @@ has 'transforms' => (
 				},
 				{
 					before  => q(),
+					after   => q([َ ِ ُ ٓ ا و ی]),
+					replace => q(ُو),
+					result  => q(ov),
+					revisit => 0,
+				},
+				{
+					before  => q(),
 					after   => q(),
-					replace => q(و),
-					result  => q(),
+					replace => q(ُؤ),
+					result  => q(oʔ),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(ُو),
+					result  => q(o),
 					revisit => 0,
 				},
 				{
@@ -367,7 +556,7 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
-					replace => q([عء]),
+					replace => q(ع),
 					result  => q(ʔ),
 					revisit => 0,
 				},

@@ -51,7 +51,7 @@
    "provides" : {
       "Filename::Video" : {
          "file" : "lib/Filename/Video.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
@@ -66,7 +66,7 @@
          "web" : "https://github.com/perlancar/perl-Filename-Video"
       }
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038002"

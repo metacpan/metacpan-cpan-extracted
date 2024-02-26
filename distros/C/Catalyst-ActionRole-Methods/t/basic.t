@@ -1,4 +1,6 @@
-use Test::Most;
+use strict; use warnings;
+
+use Test::More 0.88;
 
 {  
   package MyApp::Controller::Root;
@@ -70,6 +72,17 @@ use HTTP::Request::Common;
   ok my $res = request(GET '/fail');
   is $res->code, 405;
   is $res->header( 'Allow' ), '';
+  isnt $res->content_length, 0;
+  like $res->content, qr/ GET /;
+}
+
+{
+  ok my $res = request(OPTIONS '/22');
+  is $res->code, 204;
+  is $res->content_type, '';
+  is $res->content_length, undef;
+  is $res->header( 'Allow' ), 'GET, HEAD, POST';
+  is $res->content, '';
 }
 
 done_testing;

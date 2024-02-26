@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ee - Package for language Ewe
 
 package Locale::CLDR::Locales::Ee;
 # This file auto generated from Data\common\main\ee.xml
-#	on Sun  7 Jan  2:30:41 pm GMT
+#	on Sun 25 Feb 10:41:40 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.40.1');
+our $VERSION = version->declare('v0.44.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -456,22 +456,6 @@ has 'algorithmic_number_format_data' => (
 		},
     } },
 );
-
-# Need to add code for Key type pattern
-sub display_name_pattern {
-	my ($self, $name, $region, $script, $variant) = @_;
-
-	my $display_pattern = '{0} ({1})';
-	$display_pattern =~s/\{0\}/$name/g;
-	my $subtags = join '{0}, {1}', grep {$_} (
-		$region,
-		$script,
-		$variant,
-	);
-
-	$display_pattern =~s/\{1\}/$subtags/g;
-	return $display_pattern;
-}
 
 has 'display_name_language' => (
 	is			=> 'ro',
@@ -1266,7 +1250,6 @@ has 'display_name_type' => (
  				'reformed' => q{nugbugbɔtoɖo ƒe ɖoɖomɔ nu},
  				'search' => q{nudidi hena zazã gbadza},
  				'searchjl' => q{nudidi le hangul ƒe ɖoɖo gbãtɔ nu},
- 				'standard' => q{standard},
  				'stroke' => q{stroke ɖoɖomɔ nu},
  				'traditional' => q{blema ɖoɖomɔ nu},
  				'unihan' => q{ɖoɖomɔnutɔxɛ manɔŋu stroke ƒe ɖoɖo nu},
@@ -1367,11 +1350,10 @@ has 'characters' => (
 	sub {
 		no warnings 'experimental::regex_sets';
 		return {
-			auxiliary => qr{[ă â å ä ā æ c ç ĕ ê ë ĭ î ï j ñ ŏ ô ö ø œ q ŭ û ü ÿ]},
+			auxiliary => qr{[ăâåäā æ cç ĕêë ĭîï j ñ ŏôöø œ q ŭûü ÿ]},
 			index => ['A', 'B', 'D', 'Ɖ', 'E', 'Ɛ', 'F', 'Ƒ', 'G', 'Ɣ', 'H', 'X', 'I', 'K', 'L', 'M', 'N', 'Ŋ', 'O', 'Ɔ', 'P', 'R', 'S', 'T', 'U', 'V', 'Ʋ', 'W', 'Y', 'Z'],
-			main => qr{[a á à ã b d ɖ e é è ẽ ɛ {ɛ́} {ɛ̀} {ɛ̃} f ƒ g ɣ h x i í ì ĩ k l m n ŋ o ó ò õ ɔ {ɔ́} {ɔ̀} {ɔ̃} p r s t u ú ù ũ v ʋ w y z]},
-			numbers => qr{[\- ‑ , . % ‰ + 0 1 2 3 4 5 6 7 8 9]},
-			punctuation => qr{[\- ‐ ‑ – — , ; \: ! ? . … ' ‘ ’ " “ ” ( ) \[ \] \{ \} § @ * / \& # † ‡ ′ ″]},
+			main => qr{[aáàã b d ɖ eéèẽ ɛ{ɛ́}{ɛ̀}{ɛ̃} f ƒ g ɣ h x iíìĩ k l m n ŋ oóòõ ɔ{ɔ́}{ɔ̀}{ɔ̃} p r s t uúùũ v ʋ w y z]},
+			punctuation => qr{[\- ‐‑ – — , ; \: ! ? . … '‘’ "“” ( ) \[ \] \{ \} § @ * / \& # † ‡ ′ ″]},
 		};
 	},
 EOT
@@ -1381,52 +1363,11 @@ EOT
 );
 
 
-has 'ellipsis' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub {
-		return {
-			'final' => '{0}…',
-			'initial' => '…{0}',
-			'medial' => '{0}…{1}',
-		};
-	},
-);
-
 has 'more_information' => (
 	is			=> 'ro',
 	isa			=> Str,
 	init_arg	=> undef,
 	default		=> qq{...},
-);
-
-has 'quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{“},
-);
-
-has 'quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{”},
-);
-
-has 'alternate_quote_start' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{‘},
-);
-
-has 'alternate_quote_end' => (
-	is			=> 'ro',
-	isa			=> Str,
-	init_arg	=> undef,
-	default		=> qq{’},
 );
 
 has 'duration_units' => (
@@ -1447,52 +1388,14 @@ has 'units' => (
 	default		=> sub { {
 				'long' => {
 					# Long Unit Identifier
-					'duration-day' => {
-						'name' => q(ŋkekewo),
-						'one' => q(ŋkeke {0}),
-						'other' => q(ŋkeke {0}),
-					},
-					# Core Unit Identifier
-					'day' => {
-						'name' => q(ŋkekewo),
-						'one' => q(ŋkeke {0}),
-						'other' => q(ŋkeke {0}),
-					},
-					# Long Unit Identifier
-					'duration-hour' => {
-						'name' => q(gaƒoƒowo),
-						'one' => q(gaƒoƒo {0}),
-						'other' => q(gaƒoƒo {0}),
-					},
-					# Core Unit Identifier
-					'hour' => {
-						'name' => q(gaƒoƒowo),
-						'one' => q(gaƒoƒo {0}),
-						'other' => q(gaƒoƒo {0}),
-					},
-					# Long Unit Identifier
 					'duration-minute' => {
-						'name' => q(aɖabaƒoƒowo),
 						'one' => q(aɖabaƒoƒo {0}),
 						'other' => q(aɖabaƒoƒo {0}),
 					},
 					# Core Unit Identifier
 					'minute' => {
-						'name' => q(aɖabaƒoƒowo),
 						'one' => q(aɖabaƒoƒo {0}),
 						'other' => q(aɖabaƒoƒo {0}),
-					},
-					# Long Unit Identifier
-					'duration-month' => {
-						'name' => q(ɣletiwo),
-						'one' => q(ɣleti {0}),
-						'other' => q(ɣleti {0}),
-					},
-					# Core Unit Identifier
-					'month' => {
-						'name' => q(ɣletiwo),
-						'one' => q(ɣleti {0}),
-						'other' => q(ɣleti {0}),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
@@ -1505,30 +1408,6 @@ has 'units' => (
 						'name' => q(sekend),
 						'one' => q(sekend {0} wo),
 						'other' => q(sekend {0} wo),
-					},
-					# Long Unit Identifier
-					'duration-week' => {
-						'name' => q(kɔsiɖawo),
-						'one' => q(kɔsiɖa {0}),
-						'other' => q(kɔsiɖa {0}),
-					},
-					# Core Unit Identifier
-					'week' => {
-						'name' => q(kɔsiɖawo),
-						'one' => q(kɔsiɖa {0}),
-						'other' => q(kɔsiɖa {0}),
-					},
-					# Long Unit Identifier
-					'duration-year' => {
-						'name' => q(ƒewo),
-						'one' => q(ƒe {0}),
-						'other' => q(ƒe {0}),
-					},
-					# Core Unit Identifier
-					'year' => {
-						'name' => q(ƒewo),
-						'one' => q(ƒe {0}),
-						'other' => q(ƒe {0}),
 					},
 					# Long Unit Identifier
 					'length-kilometer' => {
@@ -1559,50 +1438,26 @@ has 'units' => (
 					# Long Unit Identifier
 					'duration-day' => {
 						'name' => q(ŋkeke),
-						'one' => q(ŋkeke {0}),
-						'other' => q(ŋkeke {0}),
 					},
 					# Core Unit Identifier
 					'day' => {
 						'name' => q(ŋkeke),
-						'one' => q(ŋkeke {0}),
-						'other' => q(ŋkeke {0}),
 					},
 					# Long Unit Identifier
 					'duration-hour' => {
 						'name' => q(gaƒoƒo),
-						'one' => q(gaƒoƒo {0}),
-						'other' => q(gaƒoƒo {0}),
 					},
 					# Core Unit Identifier
 					'hour' => {
 						'name' => q(gaƒoƒo),
-						'one' => q(gaƒoƒo {0}),
-						'other' => q(gaƒoƒo {0}),
 					},
 					# Long Unit Identifier
 					'duration-minute' => {
 						'name' => q(aɖabaƒoƒo),
-						'one' => q(a {0}),
-						'other' => q(a {0}),
 					},
 					# Core Unit Identifier
 					'minute' => {
 						'name' => q(aɖabaƒoƒo),
-						'one' => q(a {0}),
-						'other' => q(a {0}),
-					},
-					# Long Unit Identifier
-					'duration-month' => {
-						'name' => q(ɣletiwo),
-						'one' => q(ɣleti {0}),
-						'other' => q(ɣleti {0}),
-					},
-					# Core Unit Identifier
-					'month' => {
-						'name' => q(ɣletiwo),
-						'one' => q(ɣleti {0}),
-						'other' => q(ɣleti {0}),
 					},
 					# Long Unit Identifier
 					'duration-second' => {
@@ -1617,26 +1472,18 @@ has 'units' => (
 					# Long Unit Identifier
 					'duration-week' => {
 						'name' => q(kɔsiɖa),
-						'one' => q(kɔsiɖa {0}),
-						'other' => q(kɔsiɖa {0}),
 					},
 					# Core Unit Identifier
 					'week' => {
 						'name' => q(kɔsiɖa),
-						'one' => q(kɔsiɖa {0}),
-						'other' => q(kɔsiɖa {0}),
 					},
 					# Long Unit Identifier
 					'duration-year' => {
 						'name' => q(ƒe),
-						'one' => q(ƒe {0}),
-						'other' => q(ƒe {0}),
 					},
 					# Core Unit Identifier
 					'year' => {
 						'name' => q(ƒe),
-						'one' => q(ƒe {0}),
-						'other' => q(ƒe {0}),
 					},
 				},
 				'short' => {
@@ -1745,8 +1592,6 @@ has 'listPatterns' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-				start => q({0}, {1}),
-				middle => q({0}, {1}),
 				end => q({0}, kple {1}),
 				2 => q({0} kple {1}),
 		} }
@@ -1765,16 +1610,7 @@ has 'number_symbols' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'latn' => {
-			'decimal' => q(.),
-			'exponential' => q(E),
-			'group' => q(,),
-			'infinity' => q(∞),
-			'minusSign' => q(-),
 			'nan' => q(mnn),
-			'perMille' => q(‰),
-			'percentSign' => q(%),
-			'plusSign' => q(+),
-			'superscriptingExponent' => q(×),
 		},
 	} }
 );
@@ -1785,59 +1621,6 @@ has 'number_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		decimalFormat => {
-			'default' => {
-				'1000' => {
-					'one' => '0K',
-					'other' => '0K',
-				},
-				'10000' => {
-					'one' => '00K',
-					'other' => '00K',
-				},
-				'100000' => {
-					'one' => '000K',
-					'other' => '000K',
-				},
-				'1000000' => {
-					'one' => '0M',
-					'other' => '0M',
-				},
-				'10000000' => {
-					'one' => '00M',
-					'other' => '00M',
-				},
-				'100000000' => {
-					'one' => '000M',
-					'other' => '000M',
-				},
-				'1000000000' => {
-					'one' => '0B',
-					'other' => '0B',
-				},
-				'10000000000' => {
-					'one' => '00B',
-					'other' => '00B',
-				},
-				'100000000000' => {
-					'one' => '000B',
-					'other' => '000B',
-				},
-				'1000000000000' => {
-					'one' => '0T',
-					'other' => '0T',
-				},
-				'10000000000000' => {
-					'one' => '00T',
-					'other' => '00T',
-				},
-				'100000000000000' => {
-					'one' => '000T',
-					'other' => '000T',
-				},
-				'standard' => {
-					'default' => '#,##0.###',
-				},
-			},
 			'long' => {
 				'1000' => {
 					'one' => 'akpe 0',
@@ -1889,30 +1672,6 @@ has 'number_formats' => (
 				},
 			},
 			'short' => {
-				'1000' => {
-					'one' => '0K',
-					'other' => '0K',
-				},
-				'10000' => {
-					'one' => '00K',
-					'other' => '00K',
-				},
-				'100000' => {
-					'one' => '000K',
-					'other' => '000K',
-				},
-				'1000000' => {
-					'one' => '0M',
-					'other' => '0M',
-				},
-				'10000000' => {
-					'one' => '00M',
-					'other' => '00M',
-				},
-				'100000000' => {
-					'one' => '000M',
-					'other' => '000M',
-				},
 				'1000000000' => {
 					'one' => '0B',
 					'other' => '0B',
@@ -1924,32 +1683,6 @@ has 'number_formats' => (
 				'100000000000' => {
 					'one' => '000B',
 					'other' => '000B',
-				},
-				'1000000000000' => {
-					'one' => '0T',
-					'other' => '0T',
-				},
-				'10000000000000' => {
-					'one' => '00T',
-					'other' => '00T',
-				},
-				'100000000000000' => {
-					'one' => '000T',
-					'other' => '000T',
-				},
-			},
-		},
-		percentFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#,##0%',
-				},
-			},
-		},
-		scientificFormat => {
-			'default' => {
-				'standard' => {
-					'default' => '#E0',
 				},
 			},
 		},
@@ -1985,142 +1718,100 @@ has 'currencies' => (
 		'ADP' => {
 			display_name => {
 				'currency' => q(andorraga peseta),
-				'one' => q(andorraga peseta),
-				'other' => q(andorraga peseta),
 			},
 		},
 		'AED' => {
 			display_name => {
 				'currency' => q(united arab emiratesga dirham),
-				'one' => q(united arab emiratesga dirham),
-				'other' => q(united arab emiratesga dirham),
 			},
 		},
 		'AFA' => {
 			display_name => {
 				'currency' => q(afghanistanga afghani \(1927–2002\)),
-				'one' => q(afghanistanga afghani \(1927–2002\)),
-				'other' => q(afghanistanga afghani \(1927–2002\)),
 			},
 		},
 		'AFN' => {
 			display_name => {
 				'currency' => q(afghanistanga afghani),
-				'one' => q(afghanistanga afghani),
-				'other' => q(afghanistanga afghani),
 			},
 		},
 		'ALK' => {
 			display_name => {
 				'currency' => q(albaniaga lek \(1946–1965\)),
-				'one' => q(albaniaga lek \(1946–1965\)),
-				'other' => q(albaniaga lek \(1946–1965\)),
 			},
 		},
 		'ALL' => {
-			symbol => 'ALL',
 			display_name => {
 				'currency' => q(albaniaga lek),
-				'one' => q(albaniaga lek),
-				'other' => q(albaniaga lek),
 			},
 		},
 		'AMD' => {
 			display_name => {
 				'currency' => q(armeniaga dram),
-				'one' => q(armeniaga dram),
-				'other' => q(armeniaga dram),
 			},
 		},
 		'ANG' => {
-			symbol => 'ANG',
 			display_name => {
 				'currency' => q(netherlands antilleaga guilder),
-				'one' => q(netherlands antilleaga guilder),
-				'other' => q(netherlands antilleaga guilder),
 			},
 		},
 		'AOA' => {
 			display_name => {
 				'currency' => q(angolaga kwanza),
-				'one' => q(angolaga kwanza),
-				'other' => q(angolaga kwanza),
 			},
 		},
 		'AOK' => {
 			display_name => {
 				'currency' => q(angolaga kwanza \(1977–1991\)),
-				'one' => q(angolaga kwanza \(1977–1991\)),
-				'other' => q(angolaga kwanza \(1977–1991\)),
 			},
 		},
 		'AON' => {
 			display_name => {
 				'currency' => q(angolaga kwanza \(1990–2000\)),
-				'one' => q(angolaga kwanza \(1990–2000\)),
-				'other' => q(angolaga kwanza \(1990–2000\)),
 			},
 		},
 		'AOR' => {
 			display_name => {
 				'currency' => q(angolaga kwanza xoxotɔ \(1995–1999\)),
-				'one' => q(angolaga kwanza xoxotɔ \(1995–1999\)),
-				'other' => q(angolaga kwanza xoxotɔ \(1995–1999\)),
 			},
 		},
 		'ARA' => {
 			display_name => {
 				'currency' => q(argentinaga austral),
-				'one' => q(argentinaga austral),
-				'other' => q(argentinaga austral),
 			},
 		},
 		'ARL' => {
 			display_name => {
 				'currency' => q(argentinaga peso ley \(1970–1983\)),
-				'one' => q(argentinaga peso ley \(1970–1983\)),
-				'other' => q(argentinaga peso ley \(1970–1983\)),
 			},
 		},
 		'ARM' => {
 			display_name => {
 				'currency' => q(argentinaga peso \(1881–1970\)),
-				'one' => q(argentinaga peso \(1881–1970\)),
-				'other' => q(argentinaga peso \(1881–1970\)),
 			},
 		},
 		'ARP' => {
 			display_name => {
 				'currency' => q(argentinaga peso \(1983–1985\)),
-				'one' => q(argentinaga peso \(1983–1985\)),
-				'other' => q(argentinaga peso \(1983–1985\)),
 			},
 		},
 		'ARS' => {
-			symbol => 'ARS',
 			display_name => {
 				'currency' => q(argentinaga peso),
-				'one' => q(argentinaga peso),
-				'other' => q(argentinaga peso),
 			},
 		},
 		'ATS' => {
 			display_name => {
 				'currency' => q(ɔstriaga schilling),
-				'one' => q(ɔstriaga schilling),
-				'other' => q(ɔstriaga schilling),
 			},
 		},
 		'AUD' => {
 			symbol => 'AU$',
 			display_name => {
 				'currency' => q(Australiaga dollar),
-				'one' => q(Australiaga dollar),
-				'other' => q(Australiaga dollar),
 			},
 		},
 		'AWG' => {
-			symbol => 'AWG',
 			display_name => {
 				'currency' => q(arubaga lorin),
 				'one' => q(arubaga florin),
@@ -2130,174 +1821,121 @@ has 'currencies' => (
 		'AZM' => {
 			display_name => {
 				'currency' => q(azerbaidzanga manat \(1993–2006\)),
-				'one' => q(azerbaidzanga manat \(1993–2006\)),
-				'other' => q(azerbaidzanga manat \(1993–2006\)),
 			},
 		},
 		'AZN' => {
 			display_name => {
 				'currency' => q(azerbaidzanga manat),
-				'one' => q(azerbaidzanga manat),
-				'other' => q(azerbaidzanga manat),
 			},
 		},
 		'BAD' => {
 			display_name => {
 				'currency' => q(bosnia-herzegovinaga dinar \(1992–1994\)),
-				'one' => q(bosnia-herzegovinaga dinar \(1992–1994\)),
-				'other' => q(bosnia-herzegovinaga dinar \(1992–1994\)),
 			},
 		},
 		'BAM' => {
-			symbol => 'BAM',
 			display_name => {
 				'currency' => q(bosnia-herzegovinaga convertible mark),
-				'one' => q(bosnia-herzegovinaga convertible mark),
-				'other' => q(bosnia-herzegovinaga convertible mark),
 			},
 		},
 		'BAN' => {
 			display_name => {
 				'currency' => q(bosnia kple herzegovinaga dinar yeyètɔ \(1994–1997\)),
-				'one' => q(bosnia kple herzegovinaga dinar yeyètɔ \(1994–1997\)),
-				'other' => q(bosnia kple herzegovinaga dinar yeyètɔ \(1994–1997\)),
 			},
 		},
 		'BBD' => {
-			symbol => 'BBD',
 			display_name => {
 				'currency' => q(barbadosga dollar),
-				'one' => q(barbadosga dollar),
-				'other' => q(barbadosga dollar),
 			},
 		},
 		'BDT' => {
 			display_name => {
 				'currency' => q(bangladeshga taka),
-				'one' => q(bangladeshga taka),
-				'other' => q(bangladeshga taka),
 			},
 		},
 		'BEC' => {
 			display_name => {
 				'currency' => q(beldziumga franc \(convertible\)),
-				'one' => q(beldziumga franc \(convertible\)),
-				'other' => q(beldziumga franc \(convertible\)),
 			},
 		},
 		'BEF' => {
 			display_name => {
 				'currency' => q(beldziumga franc),
-				'one' => q(beldziumga franc),
-				'other' => q(beldziumga franc),
 			},
 		},
 		'BEL' => {
 			display_name => {
 				'currency' => q(beldziumga franc \(financial\)),
-				'one' => q(beldziumga franc \(financial\)),
-				'other' => q(beldziumga franc \(financial\)),
 			},
 		},
 		'BGL' => {
 			display_name => {
 				'currency' => q(bɔlgariaga hard lev),
-				'one' => q(bɔlgariaga hard lev),
-				'other' => q(bɔlgariaga hard lev),
 			},
 		},
 		'BGM' => {
 			display_name => {
 				'currency' => q(bɔlgariaga socialist lev),
-				'one' => q(bɔlgariaga socialist lev),
-				'other' => q(bɔlgariaga socialist lev),
 			},
 		},
 		'BGN' => {
-			symbol => 'BGN',
 			display_name => {
 				'currency' => q(bulgariaga lev),
-				'one' => q(bulgariaga lev),
-				'other' => q(bulgariaga lev),
 			},
 		},
 		'BGO' => {
 			display_name => {
 				'currency' => q(bulgariaga lev \(1879–1952\)),
-				'one' => q(bulgariaga lev \(1879–1952\)),
-				'other' => q(bulgariaga lev \(1879–1952\)),
 			},
 		},
 		'BHD' => {
 			display_name => {
 				'currency' => q(bahrainga dinar),
-				'one' => q(bahrainga dinar),
-				'other' => q(bahrainga dinar),
 			},
 		},
 		'BIF' => {
 			display_name => {
 				'currency' => q(burundiga franc),
-				'one' => q(burundiga franc),
-				'other' => q(burundiga franc),
 			},
 		},
 		'BMD' => {
-			symbol => 'BMD',
 			display_name => {
 				'currency' => q(bermudaga dollar),
-				'one' => q(bermudaga dollar),
-				'other' => q(bermudaga dollar),
 			},
 		},
 		'BND' => {
 			display_name => {
 				'currency' => q(bruneiga dollar),
-				'one' => q(bruneiga dollar),
-				'other' => q(bruneiga dollar),
 			},
 		},
 		'BOB' => {
-			symbol => 'BOB',
 			display_name => {
 				'currency' => q(boliviaga boliviano),
-				'one' => q(boliviaga boliviano),
-				'other' => q(boliviaga boliviano),
 			},
 		},
 		'BOL' => {
 			display_name => {
 				'currency' => q(boliviaga boliviano \(1863–1963\)),
-				'one' => q(boliviaga boliviano \(1863–1963\)),
-				'other' => q(boliviaga boliviano \(1863–1963\)),
 			},
 		},
 		'BOP' => {
 			display_name => {
 				'currency' => q(boliviaga peso),
-				'one' => q(boliviaga peso),
-				'other' => q(boliviaga peso),
 			},
 		},
 		'BOV' => {
 			display_name => {
 				'currency' => q(boliviaga mvdol),
-				'one' => q(boliviaga mvdol),
-				'other' => q(boliviaga mvdol),
 			},
 		},
 		'BRB' => {
 			display_name => {
 				'currency' => q(braziliaga cruzeiro xoxotɔ \(1967–1986\)),
-				'one' => q(braziliaga cruzeiro xoxotɔ \(1967–1986\)),
-				'other' => q(braziliaga cruzeiro xoxotɔ \(1967–1986\)),
 			},
 		},
 		'BRC' => {
 			display_name => {
 				'currency' => q(brazilia cruzado \(1986–1989\)),
-				'one' => q(brazilia cruzado \(1986–1989\)),
-				'other' => q(brazilia cruzado \(1986–1989\)),
 			},
 		},
 		'BRE' => {
@@ -2308,61 +1946,43 @@ has 'currencies' => (
 			},
 		},
 		'BRL' => {
-			symbol => 'R$',
 			display_name => {
 				'currency' => q(braziliaga real),
-				'one' => q(braziliaga real),
-				'other' => q(braziliaga real),
 			},
 		},
 		'BRN' => {
 			display_name => {
 				'currency' => q(brazilia cruzado xoxotɔ \(1989–1990\)),
-				'one' => q(brazilia cruzado xoxotɔ \(1989–1990\)),
-				'other' => q(brazilia cruzado xoxotɔ \(1989–1990\)),
 			},
 		},
 		'BRR' => {
 			display_name => {
 				'currency' => q(braziliaga cruzeiro \(1993–1994\)),
-				'one' => q(braziliaga cruzeiro \(1993–1994\)),
-				'other' => q(braziliaga cruzeiro \(1993–1994\)),
 			},
 		},
 		'BRZ' => {
 			display_name => {
 				'currency' => q(braziliaga cruzeiro \(1942–1967\)),
-				'one' => q(braziliaga cruzeiro \(1942–1967\)),
-				'other' => q(braziliaga cruzeiro \(1942–1967\)),
 			},
 		},
 		'BSD' => {
-			symbol => 'BSD',
 			display_name => {
 				'currency' => q(bahamasga dollar),
-				'one' => q(bahamasga dollar),
-				'other' => q(bahamasga dollar),
 			},
 		},
 		'BTN' => {
 			display_name => {
 				'currency' => q(bhutanga ngultrum),
-				'one' => q(bhutanga ngultrum),
-				'other' => q(bhutanga ngultrum),
 			},
 		},
 		'BUK' => {
 			display_name => {
 				'currency' => q(burmaga kyat),
-				'one' => q(burmaga kyat),
-				'other' => q(burmaga kyat),
 			},
 		},
 		'BWP' => {
 			display_name => {
 				'currency' => q(botswanaga pula),
-				'one' => q(botswanaga pula),
-				'other' => q(botswanaga pula),
 			},
 		},
 		'BYB' => {
@@ -2373,7 +1993,7 @@ has 'currencies' => (
 			},
 		},
 		'BYN' => {
-			symbol => 'BYN',
+			symbol => 'р.',
 			display_name => {
 				'currency' => q(belarusiaga ruble),
 				'one' => q(belarusiaga ruble),
@@ -2388,26 +2008,18 @@ has 'currencies' => (
 			},
 		},
 		'BZD' => {
-			symbol => 'BZD',
 			display_name => {
 				'currency' => q(belizega dollar),
-				'one' => q(belizega dollar),
-				'other' => q(belizega dollar),
 			},
 		},
 		'CAD' => {
-			symbol => 'CA$',
 			display_name => {
 				'currency' => q(canadaga dollar),
-				'one' => q(canadaga dollar),
-				'other' => q(canadaga dollar),
 			},
 		},
 		'CDF' => {
 			display_name => {
 				'currency' => q(kongoga franc),
-				'one' => q(kongoga franc),
-				'other' => q(kongoga franc),
 			},
 		},
 		'CHE' => {
@@ -2418,11 +2030,8 @@ has 'currencies' => (
 			},
 		},
 		'CHF' => {
-			symbol => 'CHF',
 			display_name => {
 				'currency' => q(switzerlandga franc),
-				'one' => q(switzerlandga franc),
-				'other' => q(switzerlandga franc),
 			},
 		},
 		'CHW' => {
@@ -2435,23 +2044,16 @@ has 'currencies' => (
 		'CLE' => {
 			display_name => {
 				'currency' => q(tsilega escudo),
-				'one' => q(tsilega escudo),
-				'other' => q(tsilega escudo),
 			},
 		},
 		'CLF' => {
 			display_name => {
 				'currency' => q(tsilegakɔnta dzidzenu UF),
-				'one' => q(tsilegakɔnta dzidzenu UF),
-				'other' => q(tsilegakɔnta dzidzenu UF),
 			},
 		},
 		'CLP' => {
-			symbol => 'CLP',
 			display_name => {
 				'currency' => q(chilega peso),
-				'one' => q(chilega peso),
-				'other' => q(chilega peso),
 			},
 		},
 		'CNX' => {
@@ -2462,93 +2064,63 @@ has 'currencies' => (
 			},
 		},
 		'CNY' => {
-			symbol => 'CN¥',
 			display_name => {
 				'currency' => q(Chinesega yuan),
-				'one' => q(Chinesega yuan),
-				'other' => q(Chinesega yuan),
 			},
 		},
 		'COP' => {
-			symbol => 'COP',
 			display_name => {
 				'currency' => q(colombiaga peso),
-				'one' => q(colombiaga peso),
-				'other' => q(colombiaga peso),
 			},
 		},
 		'COU' => {
 			display_name => {
 				'currency' => q(kolombiaga vavãtɔ),
-				'one' => q(kolombiaga vavãtɔ),
-				'other' => q(kolombiaga vavãtɔ),
 			},
 		},
 		'CRC' => {
-			symbol => 'CRC',
 			display_name => {
 				'currency' => q(costa ricaga colón),
-				'one' => q(costa ricaga colón),
-				'other' => q(costa ricaga colón),
 			},
 		},
 		'CSD' => {
 			display_name => {
 				'currency' => q(serbiaga dinar \(2002–2006\)),
-				'one' => q(serbiaga dinar \(2002–2006\)),
-				'other' => q(serbiaga dinar \(2002–2006\)),
 			},
 		},
 		'CSK' => {
 			display_name => {
 				'currency' => q(tsɛkoslovakiaga hard koruna),
-				'one' => q(tsɛkoslovakiaga hard koruna),
-				'other' => q(tsɛkoslovakiaga hard koruna),
 			},
 		},
 		'CUC' => {
-			symbol => 'CUC',
 			display_name => {
 				'currency' => q(cubaga convertible peso),
-				'one' => q(cubaga convertible peso),
-				'other' => q(cubaga convertible peso),
 			},
 		},
 		'CUP' => {
-			symbol => 'CUP',
 			display_name => {
 				'currency' => q(cubaga peso),
-				'one' => q(cubaga peso),
-				'other' => q(cubaga peso),
 			},
 		},
 		'CVE' => {
 			display_name => {
 				'currency' => q(kape verdega escudo),
-				'one' => q(kape verdega escudo),
-				'other' => q(kape verdega escudo),
 			},
 		},
 		'CYP' => {
 			display_name => {
 				'currency' => q(saipriɔtga pound),
-				'one' => q(saipriɔtga pound),
-				'other' => q(saipriɔtga pound),
 			},
 		},
 		'CZK' => {
-			symbol => 'CZK',
 			display_name => {
 				'currency' => q(czechga koruna),
-				'one' => q(czechga koruna),
-				'other' => q(czechga koruna),
 			},
 		},
 		'DDM' => {
 			display_name => {
 				'currency' => q(ɣedzeƒe germaniaga mark),
-				'one' => q(ɣedzeƒe germaniaga mark),
-				'other' => q(ɣedzeƒe germaniaga mark),
 			},
 		},
 		'DEM' => {
@@ -2566,15 +2138,11 @@ has 'currencies' => (
 			},
 		},
 		'DKK' => {
-			symbol => 'DKK',
 			display_name => {
 				'currency' => q(denmarkga krone),
-				'one' => q(denmarkga krone),
-				'other' => q(denmarkga krone),
 			},
 		},
 		'DOP' => {
-			symbol => 'DOP',
 			display_name => {
 				'currency' => q(dominicaga peso),
 				'one' => q(dominikaga peso),
@@ -2584,50 +2152,36 @@ has 'currencies' => (
 		'DZD' => {
 			display_name => {
 				'currency' => q(aldzeriaga dinar),
-				'one' => q(aldzeriaga dinar),
-				'other' => q(aldzeriaga dinar),
 			},
 		},
 		'ECS' => {
 			display_name => {
 				'currency' => q(ekuadɔga sucre),
-				'one' => q(ekuadɔga sucre),
-				'other' => q(ekuadɔga sucre),
 			},
 		},
 		'ECV' => {
 			display_name => {
 				'currency' => q(ekuadɔ dzidzenu matrɔmatrɔ),
-				'one' => q(ekuadɔ dzidzenu matrɔmatrɔ),
-				'other' => q(ekuadɔ dzidzenu matrɔmatrɔ),
 			},
 		},
 		'EEK' => {
 			display_name => {
 				'currency' => q(estoniaga kroon),
-				'one' => q(estoniaga kroon),
-				'other' => q(estoniaga kroon),
 			},
 		},
 		'EGP' => {
 			display_name => {
 				'currency' => q(egyptega pound),
-				'one' => q(egyptega pound),
-				'other' => q(egyptega pound),
 			},
 		},
 		'ERN' => {
 			display_name => {
 				'currency' => q(eritreaga nakfa),
-				'one' => q(eritreaga nakfa),
-				'other' => q(eritreaga nakfa),
 			},
 		},
 		'ESA' => {
 			display_name => {
 				'currency' => q(spaniaga peseta \(A\)),
-				'one' => q(spaniaga peseta \(A\)),
-				'other' => q(spaniaga peseta \(A\)),
 			},
 		},
 		'ESB' => {
@@ -2647,12 +2201,9 @@ has 'currencies' => (
 		'ETB' => {
 			display_name => {
 				'currency' => q(ethiopiaga birr),
-				'one' => q(ethiopiaga birr),
-				'other' => q(ethiopiaga birr),
 			},
 		},
 		'EUR' => {
-			symbol => '€',
 			display_name => {
 				'one' => q(euro),
 				'other' => q(euro),
@@ -2661,45 +2212,31 @@ has 'currencies' => (
 		'FIM' => {
 			display_name => {
 				'currency' => q(finlandga markka),
-				'one' => q(finlandga markka),
-				'other' => q(finlandga markka),
 			},
 		},
 		'FJD' => {
 			display_name => {
 				'currency' => q(fidziga dollar),
-				'one' => q(fidziga dollar),
-				'other' => q(fidziga dollar),
 			},
 		},
 		'FKP' => {
-			symbol => 'FKP',
 			display_name => {
 				'currency' => q(falkland islands pound),
-				'one' => q(falkland islands pound),
-				'other' => q(falkland islands pound),
 			},
 		},
 		'FRF' => {
 			display_name => {
 				'currency' => q(frentsiga franc),
-				'one' => q(frentsiga franc),
-				'other' => q(frentsiga franc),
 			},
 		},
 		'GBP' => {
-			symbol => '£',
 			display_name => {
 				'currency' => q(britainga pound),
-				'one' => q(britainga pound),
-				'other' => q(britainga pound),
 			},
 		},
 		'GEK' => {
 			display_name => {
 				'currency' => q(dzɔdziaga kupon larit),
-				'one' => q(dzɔdziaga kupon larit),
-				'other' => q(dzɔdziaga kupon larit),
 			},
 		},
 		'GEL' => {
@@ -2712,195 +2249,132 @@ has 'currencies' => (
 		'GHC' => {
 			display_name => {
 				'currency' => q(ghana siɖi \(1979–2007\)),
-				'one' => q(ghana siɖi \(1979–2007\)),
-				'other' => q(ghana siɖi \(1979–2007\)),
 			},
 		},
 		'GHS' => {
 			symbol => 'GH₵',
 			display_name => {
 				'currency' => q(ghana siɖi),
-				'one' => q(ghana siɖi),
-				'other' => q(ghana siɖi),
 			},
 		},
 		'GIP' => {
-			symbol => 'GIP',
 			display_name => {
 				'currency' => q(gilbratarga pound),
-				'one' => q(gilbratarga pound),
-				'other' => q(gilbratarga pound),
 			},
 		},
 		'GMD' => {
 			display_name => {
 				'currency' => q(gambiaga dalasi),
-				'one' => q(gambiaga dalasi),
-				'other' => q(gambiaga dalasi),
 			},
 		},
 		'GNF' => {
 			display_name => {
 				'currency' => q(giniga franc),
-				'one' => q(giniga franc),
-				'other' => q(giniga franc),
 			},
 		},
 		'GNS' => {
 			display_name => {
 				'currency' => q(giniga syli),
-				'one' => q(giniga syli),
-				'other' => q(giniga syli),
 			},
 		},
 		'GQE' => {
 			display_name => {
 				'currency' => q(ekuatorial giniga ekwele),
-				'one' => q(ekuatorial giniga ekwele),
-				'other' => q(ekuatorial giniga ekwele),
 			},
 		},
 		'GRD' => {
 			display_name => {
 				'currency' => q(grisiga drachma),
-				'one' => q(grisiga drachma),
-				'other' => q(grisiga drachma),
 			},
 		},
 		'GTQ' => {
-			symbol => 'GTQ',
 			display_name => {
 				'currency' => q(guatemalaga quetzal),
-				'one' => q(guatemalaga quetzal),
-				'other' => q(guatemalaga quetzal),
 			},
 		},
 		'GWE' => {
 			display_name => {
 				'currency' => q(pɔtugaltɔwo ƒe giniga escudo),
-				'one' => q(pɔtugaltɔwo ƒe giniga escudo),
-				'other' => q(pɔtugaltɔwo ƒe giniga escudo),
 			},
 		},
 		'GWP' => {
 			display_name => {
 				'currency' => q(gini-bisau peso),
-				'one' => q(gini-bisau peso),
-				'other' => q(gini-bisau peso),
 			},
 		},
 		'GYD' => {
-			symbol => 'GYD',
 			display_name => {
 				'currency' => q(guyanaga dollar),
-				'one' => q(guyanaga dollar),
-				'other' => q(guyanaga dollar),
 			},
 		},
 		'HKD' => {
-			symbol => 'HK$',
 			display_name => {
 				'currency' => q(Hong Kongga dollar),
-				'one' => q(Hong Kongga dollar),
-				'other' => q(Hong Kongga dollar),
 			},
 		},
 		'HNL' => {
-			symbol => 'HNL',
 			display_name => {
 				'currency' => q(honduraga lempira),
-				'one' => q(honduraga lempira),
-				'other' => q(honduraga lempira),
 			},
 		},
 		'HRD' => {
 			display_name => {
 				'currency' => q(kroatiaga dinar),
-				'one' => q(kroatiaga dinar),
-				'other' => q(kroatiaga dinar),
 			},
 		},
 		'HRK' => {
-			symbol => 'HRK',
 			display_name => {
 				'currency' => q(croatiaga kuna),
-				'one' => q(croatiaga kuna),
-				'other' => q(croatiaga kuna),
 			},
 		},
 		'HTG' => {
-			symbol => 'HTG',
 			display_name => {
 				'currency' => q(haitiga gourde),
-				'one' => q(haitiga gourde),
-				'other' => q(haitiga gourde),
 			},
 		},
 		'HUF' => {
-			symbol => 'HUF',
 			display_name => {
 				'currency' => q(hungariaga forint),
-				'one' => q(hungariaga forint),
-				'other' => q(hungariaga forint),
 			},
 		},
 		'IDR' => {
-			symbol => 'IDR',
 			display_name => {
 				'currency' => q(Indonesiaga rupiah),
-				'one' => q(Indonesiaga rupiah),
-				'other' => q(Indonesiaga rupiah),
 			},
 		},
 		'IEP' => {
 			display_name => {
 				'currency' => q(ireland pound),
-				'one' => q(ireland pound),
-				'other' => q(ireland pound),
 			},
 		},
 		'ILP' => {
 			display_name => {
 				'currency' => q(israelga pound),
-				'one' => q(israelga pound),
-				'other' => q(israelga pound),
 			},
 		},
 		'ILR' => {
 			display_name => {
 				'currency' => q(israelga sheqel \(1980–1985\)),
-				'one' => q(israelga sheqel \(1980–1985\)),
-				'other' => q(israelga sheqel \(1980–1985\)),
 			},
 		},
 		'ILS' => {
-			symbol => '₪',
 			display_name => {
 				'currency' => q(israelga yeyetɔ sheqel),
-				'one' => q(israelga yeyetɔ sheqel),
-				'other' => q(israelga yeyetɔ sheqel),
 			},
 		},
 		'INR' => {
-			symbol => '₹',
 			display_name => {
 				'currency' => q(Indiaga rupee),
-				'one' => q(Indiaga rupee),
-				'other' => q(Indiaga rupee),
 			},
 		},
 		'IQD' => {
 			display_name => {
 				'currency' => q(irakga dinar),
-				'one' => q(irakga dinar),
-				'other' => q(irakga dinar),
 			},
 		},
 		'IRR' => {
 			display_name => {
 				'currency' => q(iranga rial),
-				'one' => q(iranga rial),
-				'other' => q(iranga rial),
 			},
 		},
 		'ISJ' => {
@@ -2911,155 +2385,108 @@ has 'currencies' => (
 			},
 		},
 		'ISK' => {
-			symbol => 'ISK',
 			display_name => {
 				'currency' => q(icelandga króna),
-				'one' => q(icelandga króna),
-				'other' => q(icelandga króna),
 			},
 		},
 		'ITL' => {
 			display_name => {
 				'currency' => q(italiaga lira),
-				'one' => q(italiaga lira),
-				'other' => q(italiaga lira),
 			},
 		},
 		'JMD' => {
-			symbol => 'JMD',
 			display_name => {
 				'currency' => q(jamaicaga dollar),
-				'one' => q(jamaicaga dollar),
-				'other' => q(jamaicaga dollar),
 			},
 		},
 		'JOD' => {
 			display_name => {
 				'currency' => q(yɔdanga dinar),
-				'one' => q(yɔdanga dinar),
-				'other' => q(yɔdanga dinar),
 			},
 		},
 		'JPY' => {
-			symbol => 'JP¥',
 			display_name => {
 				'currency' => q(Japanesega yen),
-				'one' => q(Japanesega yen),
-				'other' => q(Japanesega yen),
 			},
 		},
 		'KES' => {
 			display_name => {
 				'currency' => q(kenyaga shilling),
-				'one' => q(kenyaga shilling),
-				'other' => q(kenyaga shilling),
 			},
 		},
 		'KGS' => {
 			display_name => {
 				'currency' => q(kirgistanga som),
-				'one' => q(kirgistanga som),
-				'other' => q(kirgistanga som),
 			},
 		},
 		'KHR' => {
 			display_name => {
 				'currency' => q(kambodiaga riel),
-				'one' => q(kambodiaga riel),
-				'other' => q(kambodiaga riel),
 			},
 		},
 		'KMF' => {
 			display_name => {
 				'currency' => q(komoroga franc),
-				'one' => q(komoroga franc),
-				'other' => q(komoroga franc),
 			},
 		},
 		'KPW' => {
 			display_name => {
 				'currency' => q(dziehe koreaga won),
-				'one' => q(dziehe koreaga won),
-				'other' => q(dziehe koreaga won),
 			},
 		},
 		'KRH' => {
 			display_name => {
 				'currency' => q(anyiehe koreaga hwan \(1953–1962\)),
-				'one' => q(anyiehe koreaga hwan \(1953–1962\)),
-				'other' => q(anyiehe koreaga hwan \(1953–1962\)),
 			},
 		},
 		'KRO' => {
 			display_name => {
 				'currency' => q(anyiehe koreaga won \(1945–1953\)),
-				'one' => q(anyiehe koreaga won \(1945–1953\)),
-				'other' => q(anyiehe koreaga won \(1945–1953\)),
 			},
 		},
 		'KRW' => {
-			symbol => '₩',
 			display_name => {
 				'currency' => q(South Koreaga won),
-				'one' => q(South Koreaga won),
-				'other' => q(South Koreaga won),
 			},
 		},
 		'KWD' => {
 			display_name => {
 				'currency' => q(kuwaitga dinar),
-				'one' => q(kuwaitga dinar),
-				'other' => q(kuwaitga dinar),
 			},
 		},
 		'KYD' => {
-			symbol => 'KYD',
 			display_name => {
 				'currency' => q(cayman islandsga dollar),
-				'one' => q(cayman islandsga dollar),
-				'other' => q(cayman islandsga dollar),
 			},
 		},
 		'KZT' => {
 			display_name => {
 				'currency' => q(kazakhstanga tenge),
-				'one' => q(kazakhstanga tenge),
-				'other' => q(kazakhstanga tenge),
 			},
 		},
 		'LAK' => {
 			display_name => {
 				'currency' => q(laosga kip),
-				'one' => q(laosga kip),
-				'other' => q(laosga kip),
 			},
 		},
 		'LBP' => {
 			display_name => {
 				'currency' => q(lebanonga pound),
-				'one' => q(lebanonga pound),
-				'other' => q(lebanonga pound),
 			},
 		},
 		'LKR' => {
 			display_name => {
 				'currency' => q(sri lankaga rupee),
-				'one' => q(sri lankaga rupee),
-				'other' => q(sri lankaga rupee),
 			},
 		},
 		'LRD' => {
 			display_name => {
 				'currency' => q(liberiaga dollar),
-				'one' => q(liberiaga dollar),
-				'other' => q(liberiaga dollar),
 			},
 		},
 		'LSL' => {
 			display_name => {
 				'currency' => q(lesotoga loti),
-				'one' => q(lesotoga loti),
-				'other' => q(lesotoga loti),
 			},
 		},
 		'LTL' => {
@@ -3072,29 +2499,21 @@ has 'currencies' => (
 		'LTT' => {
 			display_name => {
 				'currency' => q(lithuaniaga talonas),
-				'one' => q(lithuaniaga talonas),
-				'other' => q(lithuaniaga talonas),
 			},
 		},
 		'LUC' => {
 			display_name => {
 				'currency' => q(lazembɔgga convertible franc),
-				'one' => q(lazembɔgga convertible franc),
-				'other' => q(lazembɔgga convertible franc),
 			},
 		},
 		'LUF' => {
 			display_name => {
 				'currency' => q(lazembɔgga franc),
-				'one' => q(lazembɔgga franc),
-				'other' => q(lazembɔgga franc),
 			},
 		},
 		'LUL' => {
 			display_name => {
 				'currency' => q(lazembɔgga gadzikpɔ franc),
-				'one' => q(lazembɔgga gadzikpɔ franc),
-				'other' => q(lazembɔgga gadzikpɔ franc),
 			},
 		},
 		'LVL' => {
@@ -3107,69 +2526,49 @@ has 'currencies' => (
 		'LVR' => {
 			display_name => {
 				'currency' => q(latviaga ruble),
-				'one' => q(latviaga ruble),
-				'other' => q(latviaga ruble),
 			},
 		},
 		'LYD' => {
 			display_name => {
 				'currency' => q(libyaga dinar),
-				'one' => q(libyaga dinar),
-				'other' => q(libyaga dinar),
 			},
 		},
 		'MAD' => {
 			display_name => {
 				'currency' => q(morokoga dirham),
-				'one' => q(morokoga dirham),
-				'other' => q(morokoga dirham),
 			},
 		},
 		'MAF' => {
 			display_name => {
 				'currency' => q(morokoga franc),
-				'one' => q(morokoga franc),
-				'other' => q(morokoga franc),
 			},
 		},
 		'MCF' => {
 			display_name => {
 				'currency' => q(monegaskga franc),
-				'one' => q(monegaskga franc),
-				'other' => q(monegaskga franc),
 			},
 		},
 		'MDC' => {
 			display_name => {
 				'currency' => q(moldovaga cupon),
-				'one' => q(moldovaga cupon),
-				'other' => q(moldovaga cupon),
 			},
 		},
 		'MDL' => {
-			symbol => 'MDL',
 			display_name => {
 				'currency' => q(moldovaga leu),
-				'one' => q(moldovaga leu),
-				'other' => q(moldovaga leu),
 			},
 		},
 		'MGA' => {
 			display_name => {
 				'currency' => q(malagasega ariary),
-				'one' => q(malagasega ariary),
-				'other' => q(malagasega ariary),
 			},
 		},
 		'MGF' => {
 			display_name => {
 				'currency' => q(malagasega franc),
-				'one' => q(malagasega franc),
-				'other' => q(malagasega franc),
 			},
 		},
 		'MKD' => {
-			symbol => 'MKD',
 			display_name => {
 				'currency' => q(marcedoniaga denar),
 				'one' => q(makedoniaga denar),
@@ -3186,93 +2585,66 @@ has 'currencies' => (
 		'MLF' => {
 			display_name => {
 				'currency' => q(maliga franc),
-				'one' => q(maliga franc),
-				'other' => q(maliga franc),
 			},
 		},
 		'MMK' => {
 			display_name => {
 				'currency' => q(myanmaga kyat),
-				'one' => q(myanmaga kyat),
-				'other' => q(myanmaga kyat),
 			},
 		},
 		'MNT' => {
 			display_name => {
 				'currency' => q(mongoliaga tugrik),
-				'one' => q(mongoliaga tugrik),
-				'other' => q(mongoliaga tugrik),
 			},
 		},
 		'MOP' => {
 			display_name => {
 				'currency' => q(makanesega pataca),
-				'one' => q(makanesega pataca),
-				'other' => q(makanesega pataca),
 			},
 		},
 		'MRO' => {
 			display_name => {
 				'currency' => q(mɔritaniaga ouguiya \(1973–2017\)),
-				'one' => q(mɔritaniaga ouguiya \(1973–2017\)),
-				'other' => q(mɔritaniaga ouguiya \(1973–2017\)),
 			},
 		},
 		'MRU' => {
 			display_name => {
 				'currency' => q(mɔritaniaga ouguiya),
-				'one' => q(mɔritaniaga ouguiya),
-				'other' => q(mɔritaniaga ouguiya),
 			},
 		},
 		'MTL' => {
 			display_name => {
 				'currency' => q(maltaga lira),
-				'one' => q(maltaga lira),
-				'other' => q(maltaga lira),
 			},
 		},
 		'MTP' => {
 			display_name => {
 				'currency' => q(maltaga pound),
-				'one' => q(maltaga pound),
-				'other' => q(maltaga pound),
 			},
 		},
 		'MUR' => {
 			display_name => {
 				'currency' => q(mɔritiusga rupee),
-				'one' => q(mɔritiusga rupee),
-				'other' => q(mɔritiusga rupee),
 			},
 		},
 		'MVR' => {
 			display_name => {
 				'currency' => q(maldiviaga rufiyaa),
-				'one' => q(maldiviaga rufiyaa),
-				'other' => q(maldiviaga rufiyaa),
 			},
 		},
 		'MWK' => {
 			display_name => {
 				'currency' => q(malawiga kwacha),
-				'one' => q(malawiga kwacha),
-				'other' => q(malawiga kwacha),
 			},
 		},
 		'MXN' => {
-			symbol => 'MX$',
 			display_name => {
 				'currency' => q(mexicoga peso),
-				'one' => q(mexicoga peso),
-				'other' => q(mexicoga peso),
 			},
 		},
 		'MYR' => {
 			display_name => {
 				'currency' => q(malaysiaga ringit),
-				'one' => q(malaysiaga ringit),
-				'other' => q(malaysiaga ringit),
 			},
 		},
 		'MZN' => {
@@ -3283,97 +2655,66 @@ has 'currencies' => (
 		'NAD' => {
 			display_name => {
 				'currency' => q(namibiaga dollar),
-				'one' => q(namibiaga dollar),
-				'other' => q(namibiaga dollar),
 			},
 		},
 		'NGN' => {
 			display_name => {
 				'currency' => q(naidzeriaga naira),
-				'one' => q(naidzeriaga naira),
-				'other' => q(naidzeriaga naira),
 			},
 		},
 		'NIC' => {
 			display_name => {
 				'currency' => q(nikaraguaga córdoba \(1988–1991\)),
-				'one' => q(nikaraguaga córdoba \(1988–1991\)),
-				'other' => q(nikaraguaga córdoba \(1988–1991\)),
 			},
 		},
 		'NIO' => {
-			symbol => 'NIO',
 			display_name => {
 				'currency' => q(nicaraguaga córdoba),
-				'one' => q(nicaraguaga córdoba),
-				'other' => q(nicaraguaga córdoba),
 			},
 		},
 		'NLG' => {
 			display_name => {
 				'currency' => q(hollandga guilder),
-				'one' => q(hollandga guilder),
-				'other' => q(hollandga guilder),
 			},
 		},
 		'NOK' => {
-			symbol => 'NOK',
 			display_name => {
 				'currency' => q(norwayga krone),
-				'one' => q(norwayga krone),
-				'other' => q(norwayga krone),
 			},
 		},
 		'NPR' => {
 			display_name => {
 				'currency' => q(nepalga rupee),
-				'one' => q(nepalga rupee),
-				'other' => q(nepalga rupee),
 			},
 		},
 		'NZD' => {
-			symbol => 'NZ$',
 			display_name => {
 				'currency' => q(new zealanɖga dollar),
-				'one' => q(new zealanɖga dollar),
-				'other' => q(new zealanɖga dollar),
 			},
 		},
 		'OMR' => {
 			display_name => {
 				'currency' => q(omanga rial),
-				'one' => q(omanga rial),
-				'other' => q(omanga rial),
 			},
 		},
 		'PAB' => {
-			symbol => 'PAB',
 			display_name => {
 				'currency' => q(panamaga balboa),
-				'one' => q(panamaga balboa),
-				'other' => q(panamaga balboa),
 			},
 		},
 		'PEI' => {
 			display_name => {
 				'currency' => q(peruga inti),
-				'one' => q(peruga inti),
-				'other' => q(peruga inti),
 			},
 		},
 		'PEN' => {
-			symbol => 'PEN',
 			display_name => {
 				'currency' => q(peruga sol),
-				'one' => q(peruga sol),
-				'other' => q(peruga sol),
 			},
 		},
 		'PES' => {
 			display_name => {
 				'currency' => q(peruga sol \(1863–1965\)),
-				'one' => q(peruga sol \(1863–1965\)),
-				'other' => q(peruga sol \(1863–1965\)),
 			},
 		},
 		'PGK' => {
@@ -3398,11 +2739,8 @@ has 'currencies' => (
 			},
 		},
 		'PLN' => {
-			symbol => 'PLN',
 			display_name => {
 				'currency' => q(polandga zloty),
-				'one' => q(polandga zloty),
-				'other' => q(polandga zloty),
 			},
 		},
 		'PLZ' => {
@@ -3415,147 +2753,101 @@ has 'currencies' => (
 		'PTE' => {
 			display_name => {
 				'currency' => q(pɔtugalga escudo),
-				'one' => q(pɔtugalga escudo),
-				'other' => q(pɔtugalga escudo),
 			},
 		},
 		'PYG' => {
-			symbol => 'PYG',
 			display_name => {
 				'currency' => q(paraguayga guarani),
-				'one' => q(paraguayga guarani),
-				'other' => q(paraguayga guarani),
 			},
 		},
 		'QAR' => {
 			display_name => {
 				'currency' => q(katarga rial),
-				'one' => q(katarga rial),
-				'other' => q(katarga rial),
 			},
 		},
 		'RHD' => {
 			display_name => {
 				'currency' => q(rhodesiaga dollar),
-				'one' => q(rhodesiaga dollar),
-				'other' => q(rhodesiaga dollar),
 			},
 		},
 		'ROL' => {
 			display_name => {
 				'currency' => q(romaniaga leu \(1952–2006\)),
-				'one' => q(romaniaga leu \(1952–2006\)),
-				'other' => q(romaniaga leu \(1952–2006\)),
 			},
 		},
 		'RON' => {
-			symbol => 'RON',
 			display_name => {
 				'currency' => q(romaniaga leu),
-				'one' => q(romaniaga leu),
-				'other' => q(romaniaga leu),
 			},
 		},
 		'RSD' => {
-			symbol => 'RSD',
 			display_name => {
 				'currency' => q(serbiaga dinar),
-				'one' => q(serbiaga dinar),
-				'other' => q(serbiaga dinar),
 			},
 		},
 		'RUB' => {
-			symbol => 'RUB',
 			display_name => {
 				'currency' => q(russiaga ruble),
-				'one' => q(russiaga ruble),
-				'other' => q(russiaga ruble),
 			},
 		},
 		'RUR' => {
 			display_name => {
 				'currency' => q(rɔtsiaga ruble \(1991–1998\)),
-				'one' => q(rɔtsiaga ruble \(1991–1998\)),
-				'other' => q(rɔtsiaga ruble \(1991–1998\)),
 			},
 		},
 		'RWF' => {
 			display_name => {
 				'currency' => q(rwandaga franc),
-				'one' => q(rwandaga franc),
-				'other' => q(rwandaga franc),
 			},
 		},
 		'SAR' => {
-			symbol => 'SAR',
 			display_name => {
 				'currency' => q(Saudi Arabiaga riyal),
-				'one' => q(Saudi Arabiaga riyal),
-				'other' => q(Saudi Arabiaga riyal),
 			},
 		},
 		'SBD' => {
 			display_name => {
 				'currency' => q(solomon ƒudomekpo dukɔwo ƒe ga dollar),
-				'one' => q(solomon ƒudomekpo dukɔwo ƒe ga dollar),
-				'other' => q(solomon ƒudomekpo dukɔwo ƒe ga dollar),
 			},
 		},
 		'SCR' => {
 			display_name => {
 				'currency' => q(sɛtselsga rupee),
-				'one' => q(sɛtselsga rupee),
-				'other' => q(sɛtselsga rupee),
 			},
 		},
 		'SDD' => {
 			display_name => {
 				'currency' => q(sudanga dinar \(1992–2007\)),
-				'one' => q(sudanga dinar \(1992–2007\)),
-				'other' => q(sudanga dinar \(1992–2007\)),
 			},
 		},
 		'SDG' => {
 			display_name => {
 				'currency' => q(sudanga pound),
-				'one' => q(sudanga pound),
-				'other' => q(sudanga pound),
 			},
 		},
 		'SDP' => {
 			display_name => {
 				'currency' => q(sudanga pound \(1957–1998\)),
-				'one' => q(sudanga pound \(1957–1998\)),
-				'other' => q(sudanga pound \(1957–1998\)),
 			},
 		},
 		'SEK' => {
-			symbol => 'SEK',
 			display_name => {
 				'currency' => q(swedenga krone),
-				'one' => q(swedenga krone),
-				'other' => q(swedenga krone),
 			},
 		},
 		'SGD' => {
 			display_name => {
 				'currency' => q(singapɔga dollar),
-				'one' => q(singapɔga dollar),
-				'other' => q(singapɔga dollar),
 			},
 		},
 		'SHP' => {
 			display_name => {
 				'currency' => q(saint helenaga pound),
-				'one' => q(saint helenaga pound),
-				'other' => q(saint helenaga pound),
 			},
 		},
 		'SIT' => {
 			display_name => {
 				'currency' => q(slovaniaga tolar),
-				'one' => q(slovaniaga tolar),
-				'other' => q(slovaniaga tolar),
 			},
 		},
 		'SKK' => {
@@ -3565,170 +2857,125 @@ has 'currencies' => (
 				'other' => q(slovakiaga koruna),
 			},
 		},
-		'SLL' => {
+		'SLE' => {
 			display_name => {
 				'currency' => q(sierra leonega leone),
-				'one' => q(sierra leonega leone),
-				'other' => q(sierra leonega leone),
+			},
+		},
+		'SLL' => {
+			display_name => {
+				'currency' => q(sierra leonega leone \(1964—2022\)),
 			},
 		},
 		'SOS' => {
 			display_name => {
 				'currency' => q(somaliaga shilling),
-				'one' => q(somaliaga shilling),
-				'other' => q(somaliaga shilling),
 			},
 		},
 		'SRD' => {
-			symbol => 'SRD',
 			display_name => {
 				'currency' => q(surinamga dollar),
-				'one' => q(surinamga dollar),
-				'other' => q(surinamga dollar),
 			},
 		},
 		'SRG' => {
 			display_name => {
 				'currency' => q(surinamega guilder),
-				'one' => q(surinamega guilder),
-				'other' => q(surinamega guilder),
 			},
 		},
 		'SSP' => {
 			display_name => {
 				'currency' => q(anyiehe sudanga pound),
-				'one' => q(anyiehe sudanga pound),
-				'other' => q(anyiehe sudanga pound),
 			},
 		},
 		'STD' => {
 			display_name => {
 				'currency' => q(são tomé kple príncipega dobra \(1977–2017\)),
-				'one' => q(são tomé kple príncipega dobra \(1977–2017\)),
-				'other' => q(são tomé kple príncipega dobra \(1977–2017\)),
 			},
 		},
 		'STN' => {
 			display_name => {
 				'currency' => q(são tomé kple príncipega dobra),
-				'one' => q(são tomé kple príncipega dobra),
-				'other' => q(são tomé kple príncipega dobra),
 			},
 		},
 		'SUR' => {
 			display_name => {
 				'currency' => q(sovietga rouble),
-				'one' => q(sovietga rouble),
-				'other' => q(sovietga rouble),
 			},
 		},
 		'SVC' => {
 			display_name => {
 				'currency' => q(salvadɔga colón),
-				'one' => q(salvadɔga colón),
-				'other' => q(salvadɔga colón),
 			},
 		},
 		'SYP' => {
 			display_name => {
 				'currency' => q(syriaga pound),
-				'one' => q(syriaga pound),
-				'other' => q(syriaga pound),
 			},
 		},
 		'SZL' => {
 			display_name => {
 				'currency' => q(swaziga lilangeni),
-				'one' => q(swaziga lilangeni),
-				'other' => q(swaziga lilangeni),
 			},
 		},
 		'THB' => {
 			symbol => '฿',
 			display_name => {
 				'currency' => q(Thailandga baht),
-				'one' => q(Thailandga baht),
-				'other' => q(Thailandga baht),
 			},
 		},
 		'TJR' => {
 			display_name => {
 				'currency' => q(tajikistanga ruble),
-				'one' => q(tajikistanga ruble),
-				'other' => q(tajikistanga ruble),
 			},
 		},
 		'TJS' => {
 			display_name => {
 				'currency' => q(tajikistanga somoni),
-				'one' => q(tajikistanga somoni),
-				'other' => q(tajikistanga somoni),
 			},
 		},
 		'TMM' => {
 			display_name => {
 				'currency' => q(turkmenistanga manat \(1993–2009\)),
-				'one' => q(turkmenistanga manat \(1993–2009\)),
-				'other' => q(turkmenistanga manat \(1993–2009\)),
 			},
 		},
 		'TMT' => {
 			display_name => {
 				'currency' => q(turkmenistanga manat),
-				'one' => q(turkmenistanga manat),
-				'other' => q(turkmenistanga manat),
 			},
 		},
 		'TND' => {
 			display_name => {
 				'currency' => q(tunisiaga dinar),
-				'one' => q(tunisiaga dinar),
-				'other' => q(tunisiaga dinar),
 			},
 		},
 		'TOP' => {
 			display_name => {
 				'currency' => q(tonagaga pa’anga),
-				'one' => q(tonagaga pa’anga),
-				'other' => q(tonagaga pa’anga),
 			},
 		},
 		'TPE' => {
 			display_name => {
 				'currency' => q(timɔga escudo),
-				'one' => q(timɔga escudo),
-				'other' => q(timɔga escudo),
 			},
 		},
 		'TRL' => {
 			display_name => {
 				'currency' => q(tɛkiiga lira \(1922–2005\)),
-				'one' => q(tɛkiiga lira \(1922–2005\)),
-				'other' => q(tɛkiiga lira \(1922–2005\)),
 			},
 		},
 		'TRY' => {
-			symbol => 'TRY',
 			display_name => {
 				'currency' => q(Turkishga lira),
-				'one' => q(Turkishga lira),
-				'other' => q(Turkishga lira),
 			},
 		},
 		'TTD' => {
-			symbol => 'TTD',
 			display_name => {
 				'currency' => q(trinidad & tobagoga dollar),
-				'one' => q(trinidad & tobagoga dollar),
-				'other' => q(trinidad & tobagoga dollar),
 			},
 		},
 		'TWD' => {
-			symbol => 'NT$',
 			display_name => {
 				'currency' => q(Taiwanga dollar),
-				'one' => q(Taiwanga dollar),
-				'other' => q(Taiwanga dollar),
 			},
 		},
 		'TZS' => {
@@ -3739,11 +2986,8 @@ has 'currencies' => (
 			},
 		},
 		'UAH' => {
-			symbol => 'UAH',
 			display_name => {
 				'currency' => q(ukrainega hryvnia),
-				'one' => q(ukrainega hryvnia),
-				'other' => q(ukrainega hryvnia),
 			},
 		},
 		'UAK' => {
@@ -3756,152 +3000,106 @@ has 'currencies' => (
 		'UGS' => {
 			display_name => {
 				'currency' => q(ugandaga shilling \(1966–1987\)),
-				'one' => q(ugandaga shilling \(1966–1987\)),
-				'other' => q(ugandaga shilling \(1966–1987\)),
 			},
 		},
 		'UGX' => {
 			display_name => {
 				'currency' => q(ugandaga shilling),
-				'one' => q(ugandaga shilling),
-				'other' => q(ugandaga shilling),
 			},
 		},
 		'USD' => {
-			symbol => 'US$',
 			display_name => {
 				'currency' => q(us ga dollar),
-				'one' => q(us ga dollar),
-				'other' => q(us ga dollar),
 			},
 		},
 		'USN' => {
 			display_name => {
 				'currency' => q(us ga dollar \(ŋkeke si gbɔna tɔ\)),
-				'one' => q(us ga dollar \(ŋkeke si gbɔna tɔ\)),
-				'other' => q(us ga dollar \(ŋkeke si gbɔna tɔ\)),
 			},
 		},
 		'USS' => {
 			display_name => {
 				'currency' => q(us ga dollar \(ŋkeke ma ke tɔ\)),
-				'one' => q(us ga dollar \(ŋkeke ma ke tɔ\)),
-				'other' => q(us ga dollar \(ŋkeke ma ke tɔ\)),
 			},
 		},
 		'UYI' => {
 			display_name => {
 				'currency' => q(uruguayga peso UYI),
-				'one' => q(uruguayga peso UYI),
-				'other' => q(uruguayga peso UYI),
 			},
 		},
 		'UYP' => {
 			display_name => {
 				'currency' => q(uruguayga peso \(1975–1993\)),
-				'one' => q(uruguayga peso \(1975–1993\)),
-				'other' => q(uruguayga peso \(1975–1993\)),
 			},
 		},
 		'UYU' => {
-			symbol => 'UYU',
 			display_name => {
 				'currency' => q(uruguayga peso),
-				'one' => q(uruguayga peso),
-				'other' => q(uruguayga peso),
 			},
 		},
 		'UZS' => {
 			display_name => {
 				'currency' => q(uzbekistanga som),
-				'one' => q(uzbekistanga som),
-				'other' => q(uzbekistanga som),
 			},
 		},
 		'VEB' => {
 			display_name => {
 				'currency' => q(venezuelaga bolívar \(1871–2008\)),
-				'one' => q(venezuelaga bolívar \(1871–2008\)),
-				'other' => q(venezuelaga bolívar \(1871–2008\)),
 			},
 		},
 		'VEF' => {
-			symbol => 'VEF',
 			display_name => {
 				'currency' => q(venezuelaga bolívar \(2008–2018\)),
-				'one' => q(venezuelaga bolívar \(2008–2018\)),
-				'other' => q(venezuelaga bolívar \(2008–2018\)),
 			},
 		},
 		'VES' => {
 			display_name => {
 				'currency' => q(venezuelaga bolívar),
-				'one' => q(venezuelaga bolívar),
-				'other' => q(venezuelaga bolívar),
 			},
 		},
 		'VND' => {
-			symbol => '₫',
 			display_name => {
 				'currency' => q(vietnamga dong),
-				'one' => q(vietnamga dong),
-				'other' => q(vietnamga dong),
 			},
 		},
 		'VNN' => {
 			display_name => {
 				'currency' => q(vietnamga dong \(1978–1985\)),
-				'one' => q(vietnamga dong \(1978–1985\)),
-				'other' => q(vietnamga dong \(1978–1985\)),
 			},
 		},
 		'VUV' => {
 			display_name => {
 				'currency' => q(vanuatuga vatu),
-				'one' => q(vanuatuga vatu),
-				'other' => q(vanuatuga vatu),
 			},
 		},
 		'WST' => {
 			display_name => {
 				'currency' => q(samaoga tala),
-				'one' => q(samaoga tala),
-				'other' => q(samaoga tala),
 			},
 		},
 		'XAF' => {
 			display_name => {
 				'currency' => q(ɣetoɖofe afrikaga CFA franc BEAC),
-				'one' => q(ɣetoɖofe afrikaga CFA franc BEAC),
-				'other' => q(ɣetoɖofe afrikaga CFA franc BEAC),
 			},
 		},
 		'XAG' => {
 			display_name => {
 				'currency' => q(klosalo),
-				'one' => q(klosalo),
-				'other' => q(klosalo),
 			},
 		},
 		'XAU' => {
 			display_name => {
 				'currency' => q(sika),
-				'one' => q(sika),
-				'other' => q(sika),
 			},
 		},
 		'XBA' => {
 			display_name => {
 				'currency' => q(europa dzidzenu xba),
-				'one' => q(europa dzidzenu xba),
-				'other' => q(europa dzidzenu xba),
 			},
 		},
 		'XBB' => {
 			display_name => {
 				'currency' => q(europa gadzidzenu xbb),
-				'one' => q(europa gadzidzenu xbb),
-				'other' => q(europa gadzidzenu xbb),
 			},
 		},
 		'XBC' => {
@@ -3919,25 +3117,18 @@ has 'currencies' => (
 			},
 		},
 		'XCD' => {
-			symbol => 'EC$',
 			display_name => {
 				'currency' => q(east caribbeanga dollar),
-				'one' => q(east caribbeanga dollar),
-				'other' => q(east caribbeanga dollar),
 			},
 		},
 		'XDR' => {
 			display_name => {
 				'currency' => q(gaɖuɖu ɖoɖo tɔxɛ),
-				'one' => q(gaɖuɖu ɖoɖo tɔxɛ),
-				'other' => q(gaɖuɖu ɖoɖo tɔxɛ),
 			},
 		},
 		'XEU' => {
 			display_name => {
 				'currency' => q(europa gaɖuɖu),
-				'one' => q(europa gaɖuɖu),
-				'other' => q(europa gaɖuɖu),
 			},
 		},
 		'XFO' => {
@@ -3950,43 +3141,31 @@ has 'currencies' => (
 		'XFU' => {
 			display_name => {
 				'currency' => q(frentsi UIC-franc),
-				'one' => q(frentsi UIC-franc),
-				'other' => q(frentsi UIC-franc),
 			},
 		},
 		'XOF' => {
 			display_name => {
 				'currency' => q(ɣetoɖofe afrikaga CFA franc BCEAO),
-				'one' => q(ɣetoɖofe afrikaga CFA franc BCEAO),
-				'other' => q(ɣetoɖofe afrikaga CFA franc BCEAO),
 			},
 		},
 		'XPD' => {
 			display_name => {
 				'currency' => q(palladiumga),
-				'one' => q(palladiumga),
-				'other' => q(palladiumga),
 			},
 		},
 		'XPF' => {
 			display_name => {
 				'currency' => q(CFP ga franc),
-				'one' => q(CFP ga franc),
-				'other' => q(CFP ga franc),
 			},
 		},
 		'XPT' => {
 			display_name => {
 				'currency' => q(platinum),
-				'one' => q(platinum),
-				'other' => q(platinum),
 			},
 		},
 		'XRE' => {
 			display_name => {
 				'currency' => q(RINET gadodo XRE),
-				'one' => q(RINET gadodo XRE),
-				'other' => q(RINET gadodo XRE),
 			},
 		},
 		'XTS' => {
@@ -3999,86 +3178,61 @@ has 'currencies' => (
 		'XXX' => {
 			display_name => {
 				'currency' => q(gaɖuɖu manya),
-				'one' => q(gaɖuɖu manya),
-				'other' => q(gaɖuɖu manya),
 			},
 		},
 		'YDD' => {
 			display_name => {
 				'currency' => q(yemeniga dinar),
-				'one' => q(yemeniga dinar),
-				'other' => q(yemeniga dinar),
 			},
 		},
 		'YER' => {
 			display_name => {
 				'currency' => q(yemeniga rial),
-				'one' => q(yemeniga rial),
-				'other' => q(yemeniga rial),
 			},
 		},
 		'YUD' => {
 			display_name => {
 				'currency' => q(yugoslaviaga hard dinar \(1966–1990\)),
-				'one' => q(yugoslaviaga hard dinar \(1966–1990\)),
-				'other' => q(yugoslaviaga hard dinar \(1966–1990\)),
 			},
 		},
 		'YUM' => {
 			display_name => {
 				'currency' => q(yugoslaviaga yeyetɔ dinar \(1994–2002\)),
-				'one' => q(yugoslaviaga yeyetɔ dinar \(1994–2002\)),
-				'other' => q(yugoslaviaga yeyetɔ dinar \(1994–2002\)),
 			},
 		},
 		'YUN' => {
 			display_name => {
 				'currency' => q(yugoslaviaga convertible dinar \(1990–1992\)),
-				'one' => q(yugoslaviaga convertible dinar \(1990–1992\)),
-				'other' => q(yugoslaviaga convertible dinar \(1990–1992\)),
 			},
 		},
 		'YUR' => {
 			display_name => {
 				'currency' => q(yugoslaviaga dinar \(1992–1993\)),
-				'one' => q(yugoslaviaga dinar \(1992–1993\)),
-				'other' => q(yugoslaviaga dinar \(1992–1993\)),
 			},
 		},
 		'ZAL' => {
 			display_name => {
 				'currency' => q(anyiehe afrikaga rand \(gadzikpɔtɔ\)),
-				'one' => q(anyiehe afrikaga rand \(gadzikpɔtɔ\)),
-				'other' => q(anyiehe afrikaga rand \(gadzikpɔtɔ\)),
 			},
 		},
 		'ZAR' => {
-			symbol => 'ZAR',
 			display_name => {
 				'currency' => q(South Africaga rand),
-				'one' => q(South Africaga rand),
-				'other' => q(South Africaga rand),
 			},
 		},
 		'ZMK' => {
 			display_name => {
 				'currency' => q(zambiaga kwacha \(1968–2012\)),
-				'one' => q(zambiaga kwacha \(1968–2012\)),
-				'other' => q(zambiaga kwacha \(1968–2012\)),
 			},
 		},
 		'ZMW' => {
 			display_name => {
 				'currency' => q(zambiaga kwacha),
-				'one' => q(zambiaga kwacha),
-				'other' => q(zambiaga kwacha),
 			},
 		},
 		'ZRN' => {
 			display_name => {
 				'currency' => q(zairega yeyetɔ zaire),
-				'one' => q(zairega yeyetɔ zaire),
-				'other' => q(zairega yeyetɔ zaire),
 			},
 		},
 		'ZRZ' => {
@@ -4091,22 +3245,16 @@ has 'currencies' => (
 		'ZWD' => {
 			display_name => {
 				'currency' => q(zimbabwega dollar \(1980–2008\)),
-				'one' => q(zimbabwega dollar \(1980–2008\)),
-				'other' => q(zimbabwega dollar \(1980–2008\)),
 			},
 		},
 		'ZWL' => {
 			display_name => {
 				'currency' => q(zimbabwega dollar \(2009\)),
-				'one' => q(zimbabwega dollar \(2009\)),
-				'other' => q(zimbabwega dollar \(2009\)),
 			},
 		},
 		'ZWR' => {
 			display_name => {
 				'currency' => q(zimbabwega dollar \(2008\)),
-				'one' => q(zimbabwega dollar \(2008\)),
-				'other' => q(zimbabwega dollar \(2008\)),
 			},
 		},
 	} },
@@ -4179,25 +3327,6 @@ has 'calendar_months' => (
 							
 						],
 					},
-					wide => {
-						nonleap => [
-							'dzove',
-							'dzodze',
-							'tedoxe',
-							'afɔfiẽ',
-							'damɛ',
-							'masa',
-							'siamlɔm',
-							'deasiamime',
-							'anyɔnyɔ',
-							'kele',
-							'adeɛmekpɔxe',
-							'dzome'
-						],
-						leap => [
-							
-						],
-					},
 				},
 			},
 			'coptic' => {
@@ -4243,71 +3372,9 @@ has 'calendar_months' => (
 						],
 					},
 				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'dzv',
-							'dzd',
-							'ted',
-							'afɔ',
-							'dam',
-							'mas',
-							'sia',
-							'dea',
-							'any',
-							'kel',
-							'ade',
-							'dzm',
-							'foa'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'dzove',
-							'dzodze',
-							'tedoxe',
-							'afɔfiẽ',
-							'damɛ',
-							'masa',
-							'siamlɔm',
-							'deasiamime',
-							'anyɔnyɔ',
-							'kele',
-							'adeɛmekpɔxe',
-							'dzome',
-							'ƒoave'
-						],
-						leap => [
-							
-						],
-					},
-				},
 			},
 			'ethiopic' => {
 				'format' => {
-					abbreviated => {
-						nonleap => [
-							'dzove',
-							'dzodze',
-							'tedoxe',
-							'afɔfiẽ',
-							'damɛ',
-							'masa',
-							'siamlɔm',
-							'deasiamime',
-							'anyɔnyɔ',
-							'kele',
-							'adeɛmekpɔxe',
-							'dzome',
-							'ƒoave'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'dzove',
@@ -4393,25 +3460,6 @@ has 'calendar_months' => (
 							
 						],
 					},
-					narrow => {
-						nonleap => [
-							'd',
-							'd',
-							't',
-							'a',
-							'd',
-							'm',
-							's',
-							'd',
-							'a',
-							'k',
-							'a',
-							'd'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'dzove',
@@ -4433,25 +3481,6 @@ has 'calendar_months' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'dzv',
-							'dzd',
-							'ted',
-							'afɔ',
-							'dam',
-							'mas',
-							'sia',
-							'dea',
-							'any',
-							'kel',
-							'ade',
-							'dzm'
-						],
-						leap => [
-							
-						],
-					},
 					narrow => {
 						nonleap => [
 							'd',
@@ -4471,55 +3500,10 @@ has 'calendar_months' => (
 							
 						],
 					},
-					wide => {
-						nonleap => [
-							'dzove',
-							'dzodze',
-							'tedoxe',
-							'afɔfĩe',
-							'dama',
-							'masa',
-							'siamlɔm',
-							'deasiamime',
-							'anyɔnyɔ',
-							'kele',
-							'adeɛmekpɔxe',
-							'dzome'
-						],
-						leap => [
-							
-						],
-					},
 				},
 			},
 			'hebrew' => {
 				'format' => {
-					abbreviated => {
-						nonleap => [
-							'dzove',
-							'dzodze',
-							'tedoxe',
-							'afɔfiẽ',
-							'damɛ',
-							'masa',
-							'siamlɔm',
-							'deasiamime',
-							'anyɔnyɔ',
-							'kele',
-							'adeɛmekpɔxe',
-							'dzome',
-							'ƒoave'
-						],
-						leap => [
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							undef(),
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'dzove',
@@ -4644,25 +3628,6 @@ has 'calendar_months' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'dzv',
-							'dzd',
-							'ted',
-							'afɔ',
-							'dam',
-							'mas',
-							'sia',
-							'dea',
-							'any',
-							'kel',
-							'ade',
-							'dzm'
-						],
-						leap => [
-							
-						],
-					},
 					wide => {
 						nonleap => [
 							'dzove',
@@ -4686,46 +3651,6 @@ has 'calendar_months' => (
 			},
 			'islamic' => {
 				'format' => {
-					abbreviated => {
-						nonleap => [
-							'dzv',
-							'dzd',
-							'ted',
-							'afɔ',
-							'dam',
-							'mas',
-							'sia',
-							'dea',
-							'any',
-							'kel',
-							'ade',
-							'dzm'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'dzove',
-							'dzodze',
-							'tedoxe',
-							'afɔfiẽ',
-							'damɛ',
-							'masa',
-							'siamlɔm',
-							'deasiamime',
-							'anyɔnyɔ',
-							'kele',
-							'adeɛmekpɔxe',
-							'dzome'
-						],
-						leap => [
-							
-						],
-					},
-				},
-				'stand-alone' => {
 					abbreviated => {
 						nonleap => [
 							'dzv',
@@ -4807,46 +3732,6 @@ has 'calendar_months' => (
 						],
 					},
 				},
-				'stand-alone' => {
-					abbreviated => {
-						nonleap => [
-							'dzv',
-							'dzd',
-							'ted',
-							'afɔ',
-							'dam',
-							'mas',
-							'sia',
-							'dea',
-							'any',
-							'kel',
-							'ade',
-							'dzm'
-						],
-						leap => [
-							
-						],
-					},
-					wide => {
-						nonleap => [
-							'dzove',
-							'dzodze',
-							'tedoxe',
-							'afɔfiẽ',
-							'damɛ',
-							'masa',
-							'siamlɔm',
-							'deasiamime',
-							'anyɔnyɔ',
-							'kele',
-							'adeɛmekpɔxe',
-							'dzome'
-						],
-						leap => [
-							
-						],
-					},
-				},
 			},
 	} },
 );
@@ -4867,24 +3752,6 @@ has 'calendar_days' => (
 						sat => 'mem',
 						sun => 'kɔs'
 					},
-					narrow => {
-						mon => 'd',
-						tue => 'b',
-						wed => 'k',
-						thu => 'y',
-						fri => 'f',
-						sat => 'm',
-						sun => 'k'
-					},
-					short => {
-						mon => 'dzo',
-						tue => 'bla',
-						wed => 'kuɖ',
-						thu => 'yaw',
-						fri => 'fiɖ',
-						sat => 'mem',
-						sun => 'kɔs'
-					},
 					wide => {
 						mon => 'dzoɖa',
 						tue => 'blaɖa',
@@ -4896,15 +3763,6 @@ has 'calendar_days' => (
 					},
 				},
 				'stand-alone' => {
-					abbreviated => {
-						mon => 'dzo',
-						tue => 'bla',
-						wed => 'kuɖ',
-						thu => 'yaw',
-						fri => 'fiɖ',
-						sat => 'mem',
-						sun => 'kɔs'
-					},
 					narrow => {
 						mon => 'd',
 						tue => 'b',
@@ -4913,24 +3771,6 @@ has 'calendar_days' => (
 						fri => 'f',
 						sat => 'm',
 						sun => 'k'
-					},
-					short => {
-						mon => 'dzo',
-						tue => 'bla',
-						wed => 'kuɖ',
-						thu => 'yaw',
-						fri => 'fiɖ',
-						sat => 'mem',
-						sun => 'kɔs'
-					},
-					wide => {
-						mon => 'dzoɖa',
-						tue => 'blaɖa',
-						wed => 'kuɖa',
-						thu => 'yawoɖa',
-						fri => 'fiɖa',
-						sat => 'memleɖa',
-						sun => 'kɔsiɖa'
 					},
 				},
 			},
@@ -4944,23 +3784,6 @@ has 'calendar_quarters' => (
 	default		=> sub { {
 			'gregorian' => {
 				'format' => {
-					abbreviated => {0 => 'k1',
-						1 => 'k2',
-						2 => 'k3',
-						3 => 'k4'
-					},
-					narrow => {0 => '1',
-						1 => '2',
-						2 => '3',
-						3 => '4'
-					},
-					wide => {0 => 'kɔta gbãtɔ',
-						1 => 'kɔta evelia',
-						2 => 'kɔta etɔ̃lia',
-						3 => 'kɔta enelia'
-					},
-				},
-				'stand-alone' => {
 					abbreviated => {0 => 'k1',
 						1 => 'k2',
 						2 => 'k3',
@@ -5385,56 +4208,14 @@ has 'day_periods' => (
 					'pm' => q{ɣetrɔ},
 				},
 				'narrow' => {
-					'afternoon1' => q{ŋdɔ},
-					'afternoon2' => q{ɣetrɔ},
 					'am' => q{ŋ},
-					'evening1' => q{fiẽ},
-					'morning1' => q{fɔŋli},
-					'morning2' => q{ŋdi},
-					'night1' => q{zã},
 					'pm' => q{ɣ},
-				},
-				'wide' => {
-					'afternoon1' => q{ŋdɔ},
-					'afternoon2' => q{ɣetrɔ},
-					'am' => q{ŋdi},
-					'evening1' => q{fiẽ},
-					'morning1' => q{fɔŋli},
-					'morning2' => q{ŋdi},
-					'night1' => q{zã},
-					'pm' => q{ɣetrɔ},
 				},
 			},
 			'stand-alone' => {
-				'abbreviated' => {
-					'afternoon1' => q{ŋdɔ},
-					'afternoon2' => q{ɣetrɔ},
-					'am' => q{ŋdi},
-					'evening1' => q{fiẽ},
-					'morning1' => q{fɔŋli},
-					'morning2' => q{ŋdi},
-					'night1' => q{zã},
-					'pm' => q{ɣetrɔ},
-				},
 				'narrow' => {
-					'afternoon1' => q{ŋdɔ},
-					'afternoon2' => q{ɣetrɔ},
 					'am' => q{ŋ},
-					'evening1' => q{fiẽ},
-					'morning1' => q{fɔŋli},
-					'morning2' => q{ŋdi},
-					'night1' => q{zã},
 					'pm' => q{ɣ},
-				},
-				'wide' => {
-					'afternoon1' => q{ŋdɔ},
-					'afternoon2' => q{ɣetrɔ},
-					'am' => q{ŋdi},
-					'evening1' => q{fiẽ},
-					'morning1' => q{fɔŋli},
-					'morning2' => q{ŋdi},
-					'night1' => q{zã},
-					'pm' => q{ɣetrɔ},
 				},
 			},
 		},
@@ -5462,8 +4243,7 @@ has 'eras' => (
 				'1' => 'Yŋ'
 			},
 			narrow => {
-				'0' => 'hY',
-				'1' => 'Yŋ'
+				'0' => 'hY'
 			},
 			wide => {
 				'0' => 'Hafi Yesu Va',
@@ -5624,30 +4404,22 @@ has 'datetime_formats_available_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'buddhist' => {
-			h => q{a 'ga' h},
 			hm => q{a 'ga' h: 'aɖabaƒoƒo' mm},
 			hms => q{a 'ga' h: 'aɖabaƒoƒo' mm:ss},
 			ms => q{'ga' mm:ss},
 		},
 		'generic' => {
-			E => q{ccc},
 			Ed => q{E d},
 			Gy => q{y G},
 			GyMMM => q{MMM y G},
 			GyMMMEd => q{E, MMM d 'lia' y G},
 			GyMMMd => q{MMM d 'lia', y G},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
 			MEd => q{E, M/d},
-			MMM => q{LLL},
 			MMMEd => q{E, MMM d 'lia'},
 			MMMMEd => q{E, MMMM d 'lia'},
 			MMMMd => q{MMMM d 'lia'},
 			MMMd => q{MMM d 'lia'},
 			Md => q{M/d},
-			d => q{d},
 			h => q{a 'ga' h},
 			hm => q{a 'ga' h:mm},
 			hms => q{a 'ga' h:mm:ss},
@@ -5668,7 +4440,6 @@ has 'datetime_formats_available_formats' => (
 			Bh => q{'ga' h 'le' B 'me'},
 			Bhm => q{'ga' h 'aɖabaƒoƒo' mm 'le' B 'me'},
 			Bhms => q{h:mm:ss 'le' B 'me'},
-			E => q{ccc},
 			EBhm => q{'ga' h:mm 'le' E B 'me'},
 			EBhms => q{'ga' h:mm:ss 'le' E B 'me'},
 			EHm => q{E 'ga' HH:mm},
@@ -5680,28 +4451,21 @@ has 'datetime_formats_available_formats' => (
 			GyMMM => q{MMM y G},
 			GyMMMEd => q{E, MMM d 'lia' y G},
 			GyMMMd => q{MMM d 'lia', y G},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
 			Hmsv => q{'ga' HH:mm:ss 'le' v},
 			Hmv => q{'ga' HH:mm 'le' v},
-			M => q{L},
 			MEd => q{E, M/d},
-			MMM => q{LLL},
 			MMMEd => q{E, MMM d 'lia'},
 			MMMMEd => q{E, MMMM d 'lia'},
 			MMMMW => q{MMMM 'ƒe' 'kɔsiɖa' W 'lia'},
 			MMMMd => q{MMMM d 'lia'},
 			MMMd => q{MMM d 'lia'},
 			Md => q{M/d},
-			d => q{d},
 			h => q{a 'ga' h},
 			hm => q{a 'ga' h:mm},
 			hms => q{a 'ga' h:mm:ss},
 			hmsv => q{a 'ga' h:mm:ss 'le' v},
 			hmv => q{a 'ga' h:mm 'le' v},
 			ms => q{'aɖabaƒoƒo' mm:ss},
-			y => q{y},
 			yM => q{M/y},
 			yMEd => q{E, M/d/y},
 			yMMM => q{MMM y},
@@ -5715,15 +4479,9 @@ has 'datetime_formats_available_formats' => (
 		},
 		'japanese' => {
 			MMMEd => q{E MMM d 'lia'},
-			hms => q{a 'ga' h:mm:ss},
-			ms => q{'aɖabaƒoƒo' mm:ss},
 		},
 		'roc' => {
 			MMMEd => q{E MMM d 'lia'},
-			h => q{a 'ga' h},
-			hm => q{a 'ga' h:mm},
-			hms => q{a 'ga' h:mm:ss},
-			ms => q{'aɖabaƒoƒo' mm:ss},
 		},
 	} },
 );
@@ -5733,9 +4491,6 @@ has 'datetime_formats_append_item' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			'Timezone' => '{0} {1}',
-		},
 	} },
 );
 
@@ -5745,26 +4500,12 @@ has 'datetime_formats_interval' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
-			H => {
-				H => q{HH–HH},
-			},
-			Hm => {
-				H => q{HH:mm–HH:mm},
-				m => q{HH:mm–HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm–HH:mm v},
-				m => q{HH:mm–HH:mm v},
-			},
-			Hv => {
-				H => q{HH–HH v},
-			},
 			M => {
 				M => q{'ɣleti' M 'lia' – 'ɣleti' M 'lia'},
 			},
 			MEd => {
-				M => q{E, M/d – E, M/d},
-				d => q{E, M/d – E, M/d},
+				M => q{E, M/d – E, M/d},
+				d => q{E, M/d – E, M/d},
 			},
 			MMM => {
 				M => q{MMM–MMM},
@@ -5778,88 +4519,67 @@ has 'datetime_formats_interval' => (
 				d => q{MMM d 'lia' – d 'lia'},
 			},
 			Md => {
-				M => q{M/d – M/d},
-				d => q{M/d – M/d},
+				M => q{M/d – M/d},
+				d => q{M/d – M/d},
 			},
-			d => {
-				d => q{d–d},
-			},
-			fallback => '{0} - {1}',
 			h => {
-				a => q{a h – a h},
-				h => q{a h–h},
+				a => q{a h – a h},
+				h => q{a h–h},
 			},
 			hm => {
-				a => q{a 'ga' h:mm – a 'ga' h:mm},
+				a => q{a 'ga' h:mm – a 'ga' h:mm},
 				h => q{a 'ga' h:mm - 'ga' h:mm},
 				m => q{a 'ga' h:mm – 'ga' h:mm},
 			},
 			hmv => {
-				a => q{a 'ga' h:mm – a 'ga' h:mm v},
+				a => q{a 'ga' h:mm – a 'ga' h:mm v},
 				h => q{a 'ga' h:mm–h:mm v},
-				m => q{a h:mm–h:mm v},
+				m => q{a h:mm–h:mm v},
 			},
 			hv => {
-				a => q{a h – a h v},
+				a => q{a h – a h v},
 				h => q{a 'ga' h–h v},
 			},
-			y => {
-				y => q{G y–y},
-			},
 			yM => {
-				M => q{M/y – M/y G},
-				y => q{M/y – M/y G},
+				M => q{M/y – M/y G},
+				y => q{M/y – M/y G},
 			},
 			yMEd => {
-				M => q{E, M/d/y – E, M/d/y G},
-				d => q{E, M/d/y – E, M/d/y G},
-				y => q{E, M/d/y – E, M/d/y G},
+				M => q{E, M/d/y – E, M/d/y G},
+				d => q{E, M/d/y – E, M/d/y G},
+				y => q{E, M/d/y – E, M/d/y G},
 			},
 			yMMM => {
 				M => q{MMM–MMM y G},
-				y => q{MMM y – MMM y G},
+				y => q{MMM y – MMM y G},
 			},
 			yMMMEd => {
 				M => q{E, MMM d 'lia' – E, MMM d 'lia', y G},
 				d => q{E, MMM d 'lia' – E, MMM d 'lia', y G},
-				y => q{E, MMM d 'lia', y – E, MMM d 'lia', y G},
+				y => q{E, MMM d 'lia', y – E, MMM d 'lia', y G},
 			},
 			yMMMM => {
 				M => q{MMMM–MMMM y G},
-				y => q{MMMM y – MMMM y G},
+				y => q{MMMM y – MMMM y G},
 			},
 			yMMMd => {
 				M => q{MMM d 'lia' – MMM d 'lia', y G},
 				d => q{MMM d 'lia' – d 'lia' , y G},
-				y => q{MMM d 'lia' , y – MMM d 'lia', y G},
+				y => q{MMM d 'lia' , y – MMM d 'lia', y G},
 			},
 			yMd => {
-				M => q{M/d/y – M/d/y G},
-				d => q{M/d/y – M/d/y G},
-				y => q{M/d/y – M/d/y G},
+				M => q{M/d/y – M/d/y G},
+				d => q{M/d/y – M/d/y G},
+				y => q{M/d/y – M/d/y G},
 			},
 		},
 		'gregorian' => {
-			H => {
-				H => q{HH–HH},
-			},
-			Hm => {
-				H => q{HH:mm–HH:mm},
-				m => q{HH:mm–HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm–HH:mm v},
-				m => q{HH:mm–HH:mm v},
-			},
-			Hv => {
-				H => q{HH–HH v},
-			},
 			M => {
 				M => q{'ɣleti' M 'lia' – 'ɣleti' M 'lia'},
 			},
 			MEd => {
-				M => q{E, M/d – E, M/d},
-				d => q{E, M/d – E, M/d},
+				M => q{E, M/d – E, M/d},
+				d => q{E, M/d – E, M/d},
 			},
 			MMM => {
 				M => q{MMM–MMM},
@@ -5873,65 +4593,58 @@ has 'datetime_formats_interval' => (
 				d => q{MMM d 'lia' – d 'lia'},
 			},
 			Md => {
-				M => q{M/d – M/d},
-				d => q{M/d – M/d},
+				M => q{M/d – M/d},
+				d => q{M/d – M/d},
 			},
-			d => {
-				d => q{d–d},
-			},
-			fallback => '{0} - {1}',
 			h => {
-				a => q{a h – a h},
-				h => q{a h–h},
+				a => q{a h – a h},
+				h => q{a h–h},
 			},
 			hm => {
-				a => q{a 'ga' h:mm – a 'ga' h:mm},
+				a => q{a 'ga' h:mm – a 'ga' h:mm},
 				h => q{a 'ga' h:mm - 'ga' h:mm},
 				m => q{a 'ga' h:mm – 'ga' h:mm},
 			},
 			hmv => {
-				a => q{a 'ga' h:mm – a 'ga' h:mm v},
+				a => q{a 'ga' h:mm – a 'ga' h:mm v},
 				h => q{a 'ga' h:mm–h:mm v},
-				m => q{a h:mm–h:mm v},
+				m => q{a h:mm–h:mm v},
 			},
 			hv => {
-				a => q{a h – a h v},
+				a => q{a h – a h v},
 				h => q{a 'ga' h–h v},
 			},
-			y => {
-				y => q{y–y},
-			},
 			yM => {
-				M => q{M/y – M/y},
-				y => q{M/y – M/y},
+				M => q{M/y – M/y},
+				y => q{M/y – M/y},
 			},
 			yMEd => {
-				M => q{E, M/d/y – E, M/d/y},
-				d => q{E, M/d/y – E, M/d/y},
-				y => q{E, M/d/y – E, M/d/y},
+				M => q{E, M/d/y – E, M/d/y},
+				d => q{E, M/d/y – E, M/d/y},
+				y => q{E, M/d/y – E, M/d/y},
 			},
 			yMMM => {
 				M => q{MMM–MMM y},
-				y => q{MMM y – MMM y},
+				y => q{MMM y – MMM y},
 			},
 			yMMMEd => {
 				M => q{E, MMM d 'lia' – E, MMM d 'lia', y},
 				d => q{E, MMM d 'lia' – E, MMM d 'lia', y},
-				y => q{E, MMM d 'lia', y – E, MMM d 'lia', y},
+				y => q{E, MMM d 'lia', y – E, MMM d 'lia', y},
 			},
 			yMMMM => {
 				M => q{MMMM–MMMM y},
-				y => q{MMMM y – MMMM y},
+				y => q{MMMM y – MMMM y},
 			},
 			yMMMd => {
 				M => q{MMM d 'lia' – MMM d 'lia', y},
 				d => q{MMM d 'lia' – d 'lia' , y},
-				y => q{MMM d 'lia' , y – MMM d 'lia', y},
+				y => q{MMM d 'lia' , y – MMM d 'lia', y},
 			},
 			yMd => {
-				M => q{M/d/y – M/d/y},
-				d => q{M/d/y – M/d/y},
-				y => q{M/d/y – M/d/y},
+				M => q{M/d/y – M/d/y},
+				d => q{M/d/y – M/d/y},
+				y => q{M/d/y – M/d/y},
 			},
 		},
 	} },
@@ -5942,13 +4655,10 @@ has 'time_zone_names' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default	=> sub { {
-		hourFormat => q(+HH:mm;-HH:mm),
 		gmtFormat => q({0} GMT),
-		gmtZeroFormat => q(GMT),
 		regionFormat => q({0} gaƒoƒo me),
 		regionFormat => q({0} kele gaƒoƒo me),
 		regionFormat => q({0} nutome gaƒoƒo me),
-		fallbackFormat => q({1} ({0})),
 		'Acre' => {
 			long => {
 				'daylight' => q#Eker dzomeŋɔli gaƒoƒome#,
@@ -5960,162 +4670,6 @@ has 'time_zone_names' => (
 			long => {
 				'standard' => q#Afghanistan gaƒoƒo me#,
 			},
-		},
-		'Africa/Abidjan' => {
-			exemplarCity => q#Abidjan#,
-		},
-		'Africa/Accra' => {
-			exemplarCity => q#Accra#,
-		},
-		'Africa/Addis_Ababa' => {
-			exemplarCity => q#Addis Ababa#,
-		},
-		'Africa/Algiers' => {
-			exemplarCity => q#Algiers#,
-		},
-		'Africa/Asmera' => {
-			exemplarCity => q#Asmara#,
-		},
-		'Africa/Bamako' => {
-			exemplarCity => q#Bamako#,
-		},
-		'Africa/Bangui' => {
-			exemplarCity => q#Bangui#,
-		},
-		'Africa/Banjul' => {
-			exemplarCity => q#Banjul#,
-		},
-		'Africa/Bissau' => {
-			exemplarCity => q#Bissau#,
-		},
-		'Africa/Blantyre' => {
-			exemplarCity => q#Blantyre#,
-		},
-		'Africa/Brazzaville' => {
-			exemplarCity => q#Brazzaville#,
-		},
-		'Africa/Bujumbura' => {
-			exemplarCity => q#Bujumbura#,
-		},
-		'Africa/Cairo' => {
-			exemplarCity => q#Cairo#,
-		},
-		'Africa/Casablanca' => {
-			exemplarCity => q#Casablanca#,
-		},
-		'Africa/Ceuta' => {
-			exemplarCity => q#Ceuta#,
-		},
-		'Africa/Conakry' => {
-			exemplarCity => q#Conakry#,
-		},
-		'Africa/Dakar' => {
-			exemplarCity => q#Dakar#,
-		},
-		'Africa/Dar_es_Salaam' => {
-			exemplarCity => q#Dar es Salaam#,
-		},
-		'Africa/Djibouti' => {
-			exemplarCity => q#Djibouti#,
-		},
-		'Africa/Douala' => {
-			exemplarCity => q#Douala#,
-		},
-		'Africa/El_Aaiun' => {
-			exemplarCity => q#El Aaiun#,
-		},
-		'Africa/Freetown' => {
-			exemplarCity => q#Freetown#,
-		},
-		'Africa/Gaborone' => {
-			exemplarCity => q#Gaborone#,
-		},
-		'Africa/Harare' => {
-			exemplarCity => q#Harare#,
-		},
-		'Africa/Johannesburg' => {
-			exemplarCity => q#Johannesburg#,
-		},
-		'Africa/Juba' => {
-			exemplarCity => q#Juba#,
-		},
-		'Africa/Kampala' => {
-			exemplarCity => q#Kampala#,
-		},
-		'Africa/Khartoum' => {
-			exemplarCity => q#Khartoum#,
-		},
-		'Africa/Kigali' => {
-			exemplarCity => q#Kigali#,
-		},
-		'Africa/Kinshasa' => {
-			exemplarCity => q#Kinshasa#,
-		},
-		'Africa/Lagos' => {
-			exemplarCity => q#Lagos#,
-		},
-		'Africa/Libreville' => {
-			exemplarCity => q#Libreville#,
-		},
-		'Africa/Lome' => {
-			exemplarCity => q#Lome#,
-		},
-		'Africa/Luanda' => {
-			exemplarCity => q#Luanda#,
-		},
-		'Africa/Lubumbashi' => {
-			exemplarCity => q#Lubumbashi#,
-		},
-		'Africa/Lusaka' => {
-			exemplarCity => q#Lusaka#,
-		},
-		'Africa/Malabo' => {
-			exemplarCity => q#Malabo#,
-		},
-		'Africa/Maputo' => {
-			exemplarCity => q#Maputo#,
-		},
-		'Africa/Maseru' => {
-			exemplarCity => q#Maseru#,
-		},
-		'Africa/Mbabane' => {
-			exemplarCity => q#Mbabane#,
-		},
-		'Africa/Mogadishu' => {
-			exemplarCity => q#Mogadishu#,
-		},
-		'Africa/Monrovia' => {
-			exemplarCity => q#Monrovia#,
-		},
-		'Africa/Nairobi' => {
-			exemplarCity => q#Nairobi#,
-		},
-		'Africa/Ndjamena' => {
-			exemplarCity => q#Ndjamena#,
-		},
-		'Africa/Niamey' => {
-			exemplarCity => q#Niamey#,
-		},
-		'Africa/Nouakchott' => {
-			exemplarCity => q#Nouakchott#,
-		},
-		'Africa/Ouagadougou' => {
-			exemplarCity => q#Ouagadougou#,
-		},
-		'Africa/Porto-Novo' => {
-			exemplarCity => q#Porto-Novo#,
-		},
-		'Africa/Sao_Tome' => {
-			exemplarCity => q#Sao Tome#,
-		},
-		'Africa/Tripoli' => {
-			exemplarCity => q#Tripoli#,
-		},
-		'Africa/Tunis' => {
-			exemplarCity => q#Tunis#,
-		},
-		'Africa/Windhoek' => {
-			exemplarCity => q#Windhoek#,
 		},
 		'Africa_Central' => {
 			long => {
@@ -6174,446 +4728,14 @@ has 'time_zone_names' => (
 				'standard' => q#Amazon nutome gaƒoƒo me#,
 			},
 		},
-		'America/Adak' => {
-			exemplarCity => q#Adak#,
-		},
-		'America/Anchorage' => {
-			exemplarCity => q#Anchorage#,
-		},
-		'America/Anguilla' => {
-			exemplarCity => q#Anguilla#,
-		},
-		'America/Antigua' => {
-			exemplarCity => q#Antigua#,
-		},
-		'America/Araguaina' => {
-			exemplarCity => q#Araguaina#,
-		},
-		'America/Argentina/La_Rioja' => {
-			exemplarCity => q#La Rioja#,
-		},
-		'America/Argentina/Rio_Gallegos' => {
-			exemplarCity => q#Rio Gallegos#,
-		},
-		'America/Argentina/Salta' => {
-			exemplarCity => q#Salta#,
-		},
-		'America/Argentina/San_Juan' => {
-			exemplarCity => q#San Juan#,
-		},
-		'America/Argentina/San_Luis' => {
-			exemplarCity => q#San Luis#,
-		},
-		'America/Argentina/Tucuman' => {
-			exemplarCity => q#Tucuman#,
-		},
-		'America/Argentina/Ushuaia' => {
-			exemplarCity => q#Ushuaia#,
-		},
-		'America/Aruba' => {
-			exemplarCity => q#Aruba#,
-		},
-		'America/Asuncion' => {
-			exemplarCity => q#Asuncion#,
-		},
-		'America/Bahia' => {
-			exemplarCity => q#Bahia#,
-		},
 		'America/Bahia_Banderas' => {
 			exemplarCity => q#Bahia Banderas#,
-		},
-		'America/Barbados' => {
-			exemplarCity => q#Barbados#,
-		},
-		'America/Belem' => {
-			exemplarCity => q#Belem#,
-		},
-		'America/Belize' => {
-			exemplarCity => q#Belize#,
-		},
-		'America/Blanc-Sablon' => {
-			exemplarCity => q#Blanc-Sablon#,
-		},
-		'America/Boa_Vista' => {
-			exemplarCity => q#Boa Vista#,
-		},
-		'America/Bogota' => {
-			exemplarCity => q#Bogota#,
-		},
-		'America/Boise' => {
-			exemplarCity => q#Boise#,
-		},
-		'America/Buenos_Aires' => {
-			exemplarCity => q#Buenos Aires#,
-		},
-		'America/Cambridge_Bay' => {
-			exemplarCity => q#Cambridge Bay#,
-		},
-		'America/Campo_Grande' => {
-			exemplarCity => q#Campo Grande#,
 		},
 		'America/Cancun' => {
 			exemplarCity => q#Cancun#,
 		},
-		'America/Caracas' => {
-			exemplarCity => q#Caracas#,
-		},
-		'America/Catamarca' => {
-			exemplarCity => q#Catamarca#,
-		},
-		'America/Cayenne' => {
-			exemplarCity => q#Cayenne#,
-		},
-		'America/Cayman' => {
-			exemplarCity => q#Cayman#,
-		},
-		'America/Chicago' => {
-			exemplarCity => q#Chicago#,
-		},
-		'America/Chihuahua' => {
-			exemplarCity => q#Chihuahua#,
-		},
-		'America/Coral_Harbour' => {
-			exemplarCity => q#Atikokan#,
-		},
-		'America/Cordoba' => {
-			exemplarCity => q#Cordoba#,
-		},
-		'America/Costa_Rica' => {
-			exemplarCity => q#Costa Rica#,
-		},
-		'America/Creston' => {
-			exemplarCity => q#Creston#,
-		},
-		'America/Cuiaba' => {
-			exemplarCity => q#Cuiaba#,
-		},
-		'America/Curacao' => {
-			exemplarCity => q#Curacao#,
-		},
-		'America/Danmarkshavn' => {
-			exemplarCity => q#Danmarkshavn#,
-		},
-		'America/Dawson' => {
-			exemplarCity => q#Dawson#,
-		},
-		'America/Dawson_Creek' => {
-			exemplarCity => q#Dawson Creek#,
-		},
-		'America/Denver' => {
-			exemplarCity => q#Denver#,
-		},
-		'America/Detroit' => {
-			exemplarCity => q#Detroit#,
-		},
-		'America/Dominica' => {
-			exemplarCity => q#Dominica#,
-		},
-		'America/Edmonton' => {
-			exemplarCity => q#Edmonton#,
-		},
-		'America/Eirunepe' => {
-			exemplarCity => q#Eirunepe#,
-		},
-		'America/El_Salvador' => {
-			exemplarCity => q#El Salvador#,
-		},
-		'America/Fort_Nelson' => {
-			exemplarCity => q#Fort Nelson#,
-		},
-		'America/Fortaleza' => {
-			exemplarCity => q#Fortaleza#,
-		},
-		'America/Glace_Bay' => {
-			exemplarCity => q#Glace Bay#,
-		},
-		'America/Godthab' => {
-			exemplarCity => q#Nuuk#,
-		},
-		'America/Goose_Bay' => {
-			exemplarCity => q#Goose Bay#,
-		},
-		'America/Grand_Turk' => {
-			exemplarCity => q#Grand Turk#,
-		},
-		'America/Grenada' => {
-			exemplarCity => q#Grenada#,
-		},
-		'America/Guadeloupe' => {
-			exemplarCity => q#Guadeloupe#,
-		},
-		'America/Guatemala' => {
-			exemplarCity => q#Guatemala#,
-		},
-		'America/Guayaquil' => {
-			exemplarCity => q#Guayaquil#,
-		},
-		'America/Guyana' => {
-			exemplarCity => q#Guyana#,
-		},
-		'America/Halifax' => {
-			exemplarCity => q#Halifax#,
-		},
-		'America/Havana' => {
-			exemplarCity => q#Havana#,
-		},
-		'America/Hermosillo' => {
-			exemplarCity => q#Hermosillo#,
-		},
-		'America/Indiana/Knox' => {
-			exemplarCity => q#Knox, Indiana#,
-		},
-		'America/Indiana/Marengo' => {
-			exemplarCity => q#Marengo, Indiana#,
-		},
-		'America/Indiana/Petersburg' => {
-			exemplarCity => q#Petersburg, Indiana#,
-		},
-		'America/Indiana/Tell_City' => {
-			exemplarCity => q#Tell City, Indiana#,
-		},
-		'America/Indiana/Vevay' => {
-			exemplarCity => q#Vevay, Indiana#,
-		},
-		'America/Indiana/Vincennes' => {
-			exemplarCity => q#Vincennes, Indiana#,
-		},
-		'America/Indiana/Winamac' => {
-			exemplarCity => q#Winamac, Indiana#,
-		},
-		'America/Indianapolis' => {
-			exemplarCity => q#Indianapolis#,
-		},
-		'America/Inuvik' => {
-			exemplarCity => q#Inuvik#,
-		},
-		'America/Iqaluit' => {
-			exemplarCity => q#Iqaluit#,
-		},
-		'America/Jamaica' => {
-			exemplarCity => q#Jamaica#,
-		},
-		'America/Jujuy' => {
-			exemplarCity => q#Jujuy#,
-		},
-		'America/Juneau' => {
-			exemplarCity => q#Juneau#,
-		},
-		'America/Kentucky/Monticello' => {
-			exemplarCity => q#Monticello, Kentucky#,
-		},
-		'America/Kralendijk' => {
-			exemplarCity => q#Kralendijk#,
-		},
-		'America/La_Paz' => {
-			exemplarCity => q#La Paz#,
-		},
-		'America/Lima' => {
-			exemplarCity => q#Lima#,
-		},
-		'America/Los_Angeles' => {
-			exemplarCity => q#Los Angeles#,
-		},
-		'America/Louisville' => {
-			exemplarCity => q#Louisville#,
-		},
-		'America/Lower_Princes' => {
-			exemplarCity => q#Lower Prince’s Quarter#,
-		},
-		'America/Maceio' => {
-			exemplarCity => q#Maceio#,
-		},
-		'America/Managua' => {
-			exemplarCity => q#Managua#,
-		},
-		'America/Manaus' => {
-			exemplarCity => q#Manaus#,
-		},
-		'America/Marigot' => {
-			exemplarCity => q#Marigot#,
-		},
-		'America/Martinique' => {
-			exemplarCity => q#Martinique#,
-		},
-		'America/Matamoros' => {
-			exemplarCity => q#Matamoros#,
-		},
-		'America/Mazatlan' => {
-			exemplarCity => q#Mazatlan#,
-		},
-		'America/Mendoza' => {
-			exemplarCity => q#Mendoza#,
-		},
-		'America/Menominee' => {
-			exemplarCity => q#Menominee#,
-		},
 		'America/Merida' => {
 			exemplarCity => q#Merida#,
-		},
-		'America/Metlakatla' => {
-			exemplarCity => q#Metlakatla#,
-		},
-		'America/Mexico_City' => {
-			exemplarCity => q#Mexico City#,
-		},
-		'America/Miquelon' => {
-			exemplarCity => q#Miquelon#,
-		},
-		'America/Moncton' => {
-			exemplarCity => q#Moncton#,
-		},
-		'America/Monterrey' => {
-			exemplarCity => q#Monterrey#,
-		},
-		'America/Montevideo' => {
-			exemplarCity => q#Montevideo#,
-		},
-		'America/Montserrat' => {
-			exemplarCity => q#Montserrat#,
-		},
-		'America/Nassau' => {
-			exemplarCity => q#Nassau#,
-		},
-		'America/New_York' => {
-			exemplarCity => q#New York#,
-		},
-		'America/Nipigon' => {
-			exemplarCity => q#Nipigon#,
-		},
-		'America/Nome' => {
-			exemplarCity => q#Nome#,
-		},
-		'America/Noronha' => {
-			exemplarCity => q#Noronha#,
-		},
-		'America/North_Dakota/Beulah' => {
-			exemplarCity => q#Beulah, North Dakota#,
-		},
-		'America/North_Dakota/Center' => {
-			exemplarCity => q#Center, North Dakota#,
-		},
-		'America/North_Dakota/New_Salem' => {
-			exemplarCity => q#New Salem, North Dakota#,
-		},
-		'America/Ojinaga' => {
-			exemplarCity => q#Ojinaga#,
-		},
-		'America/Panama' => {
-			exemplarCity => q#Panama#,
-		},
-		'America/Pangnirtung' => {
-			exemplarCity => q#Pangnirtung#,
-		},
-		'America/Paramaribo' => {
-			exemplarCity => q#Paramaribo#,
-		},
-		'America/Phoenix' => {
-			exemplarCity => q#Phoenix#,
-		},
-		'America/Port-au-Prince' => {
-			exemplarCity => q#Port-au-Prince#,
-		},
-		'America/Port_of_Spain' => {
-			exemplarCity => q#Port of Spain#,
-		},
-		'America/Porto_Velho' => {
-			exemplarCity => q#Porto Velho#,
-		},
-		'America/Puerto_Rico' => {
-			exemplarCity => q#Puerto Rico#,
-		},
-		'America/Punta_Arenas' => {
-			exemplarCity => q#Punta Arenas#,
-		},
-		'America/Rainy_River' => {
-			exemplarCity => q#Rainy River#,
-		},
-		'America/Rankin_Inlet' => {
-			exemplarCity => q#Rankin Inlet#,
-		},
-		'America/Recife' => {
-			exemplarCity => q#Recife#,
-		},
-		'America/Regina' => {
-			exemplarCity => q#Regina#,
-		},
-		'America/Resolute' => {
-			exemplarCity => q#Resolute#,
-		},
-		'America/Rio_Branco' => {
-			exemplarCity => q#Rio Branco#,
-		},
-		'America/Santarem' => {
-			exemplarCity => q#Santarem#,
-		},
-		'America/Santiago' => {
-			exemplarCity => q#Santiago#,
-		},
-		'America/Santo_Domingo' => {
-			exemplarCity => q#Santo Domingo#,
-		},
-		'America/Sao_Paulo' => {
-			exemplarCity => q#Sao Paulo#,
-		},
-		'America/Scoresbysund' => {
-			exemplarCity => q#Ittoqqortoormiit#,
-		},
-		'America/Sitka' => {
-			exemplarCity => q#Sitka#,
-		},
-		'America/St_Barthelemy' => {
-			exemplarCity => q#St. Barthelemy#,
-		},
-		'America/St_Johns' => {
-			exemplarCity => q#St. John’s#,
-		},
-		'America/St_Kitts' => {
-			exemplarCity => q#St. Kitts#,
-		},
-		'America/St_Lucia' => {
-			exemplarCity => q#St. Lucia#,
-		},
-		'America/St_Thomas' => {
-			exemplarCity => q#St. Thomas#,
-		},
-		'America/St_Vincent' => {
-			exemplarCity => q#St. Vincent#,
-		},
-		'America/Swift_Current' => {
-			exemplarCity => q#Swift Current#,
-		},
-		'America/Tegucigalpa' => {
-			exemplarCity => q#Tegucigalpa#,
-		},
-		'America/Thule' => {
-			exemplarCity => q#Thule#,
-		},
-		'America/Thunder_Bay' => {
-			exemplarCity => q#Thunder Bay#,
-		},
-		'America/Tijuana' => {
-			exemplarCity => q#Tijuana#,
-		},
-		'America/Toronto' => {
-			exemplarCity => q#Toronto#,
-		},
-		'America/Tortola' => {
-			exemplarCity => q#Tortola#,
-		},
-		'America/Vancouver' => {
-			exemplarCity => q#Vancouver#,
-		},
-		'America/Whitehorse' => {
-			exemplarCity => q#Whitehorse#,
-		},
-		'America/Winnipeg' => {
-			exemplarCity => q#Winnipeg#,
-		},
-		'America/Yakutat' => {
-			exemplarCity => q#Yakutat#,
-		},
-		'America/Yellowknife' => {
-			exemplarCity => q#Yellowknife#,
 		},
 		'America_Central' => {
 			long => {
@@ -6650,39 +4772,6 @@ has 'time_zone_names' => (
 				'standard' => q#Anadir gaƒoƒoɖoanyime#,
 			},
 		},
-		'Antarctica/Casey' => {
-			exemplarCity => q#Casey#,
-		},
-		'Antarctica/Davis' => {
-			exemplarCity => q#Davis#,
-		},
-		'Antarctica/DumontDUrville' => {
-			exemplarCity => q#Dumont d’Urville#,
-		},
-		'Antarctica/Macquarie' => {
-			exemplarCity => q#Macquarie#,
-		},
-		'Antarctica/Mawson' => {
-			exemplarCity => q#Mawson#,
-		},
-		'Antarctica/McMurdo' => {
-			exemplarCity => q#McMurdo#,
-		},
-		'Antarctica/Palmer' => {
-			exemplarCity => q#Palmer#,
-		},
-		'Antarctica/Rothera' => {
-			exemplarCity => q#Rothera#,
-		},
-		'Antarctica/Syowa' => {
-			exemplarCity => q#Syowa#,
-		},
-		'Antarctica/Troll' => {
-			exemplarCity => q#Troll#,
-		},
-		'Antarctica/Vostok' => {
-			exemplarCity => q#Vostok#,
-		},
 		'Apia' => {
 			long => {
 				'daylight' => q#Apia kele gaƒoƒo me#,
@@ -6711,9 +4800,6 @@ has 'time_zone_names' => (
 				'standard' => q#Arabia nutome gaƒoƒo me#,
 			},
 		},
-		'Arctic/Longyearbyen' => {
-			exemplarCity => q#Longyearbyen#,
-		},
 		'Argentina' => {
 			long => {
 				'daylight' => q#Argentina dzomeŋɔli gaƒoƒo me#,
@@ -6735,251 +4821,11 @@ has 'time_zone_names' => (
 				'standard' => q#Armenia nutome gaƒoƒo me#,
 			},
 		},
-		'Asia/Aden' => {
-			exemplarCity => q#Aden#,
-		},
-		'Asia/Almaty' => {
-			exemplarCity => q#Almaty#,
-		},
-		'Asia/Amman' => {
-			exemplarCity => q#Amman#,
-		},
-		'Asia/Anadyr' => {
-			exemplarCity => q#Anadyr#,
-		},
-		'Asia/Aqtau' => {
-			exemplarCity => q#Aqtau#,
-		},
-		'Asia/Aqtobe' => {
-			exemplarCity => q#Aqtobe#,
-		},
-		'Asia/Ashgabat' => {
-			exemplarCity => q#Ashgabat#,
-		},
-		'Asia/Atyrau' => {
-			exemplarCity => q#Atyrau#,
-		},
-		'Asia/Baghdad' => {
-			exemplarCity => q#Baghdad#,
-		},
-		'Asia/Bahrain' => {
-			exemplarCity => q#Bahrain#,
-		},
-		'Asia/Baku' => {
-			exemplarCity => q#Baku#,
-		},
-		'Asia/Bangkok' => {
-			exemplarCity => q#Bangkok#,
-		},
-		'Asia/Barnaul' => {
-			exemplarCity => q#Barnaul#,
-		},
-		'Asia/Beirut' => {
-			exemplarCity => q#Beirut#,
-		},
-		'Asia/Bishkek' => {
-			exemplarCity => q#Bishkek#,
-		},
-		'Asia/Brunei' => {
-			exemplarCity => q#Brunei#,
-		},
-		'Asia/Calcutta' => {
-			exemplarCity => q#Kolkata#,
-		},
-		'Asia/Chita' => {
-			exemplarCity => q#Chita#,
-		},
-		'Asia/Choibalsan' => {
-			exemplarCity => q#Choibalsan#,
-		},
-		'Asia/Colombo' => {
-			exemplarCity => q#Colombo#,
-		},
-		'Asia/Damascus' => {
-			exemplarCity => q#Damascus#,
-		},
-		'Asia/Dhaka' => {
-			exemplarCity => q#Dhaka#,
-		},
-		'Asia/Dili' => {
-			exemplarCity => q#Dili#,
-		},
-		'Asia/Dubai' => {
-			exemplarCity => q#Dubai#,
-		},
-		'Asia/Dushanbe' => {
-			exemplarCity => q#Dushanbe#,
-		},
-		'Asia/Famagusta' => {
-			exemplarCity => q#Famagusta#,
-		},
-		'Asia/Gaza' => {
-			exemplarCity => q#Gaza#,
-		},
-		'Asia/Hebron' => {
-			exemplarCity => q#Hebron#,
-		},
-		'Asia/Hong_Kong' => {
-			exemplarCity => q#Hong Kong#,
-		},
-		'Asia/Hovd' => {
-			exemplarCity => q#Hovd#,
-		},
-		'Asia/Irkutsk' => {
-			exemplarCity => q#Irkutsk#,
-		},
-		'Asia/Jakarta' => {
-			exemplarCity => q#Jakarta#,
-		},
-		'Asia/Jayapura' => {
-			exemplarCity => q#Jayapura#,
-		},
-		'Asia/Jerusalem' => {
-			exemplarCity => q#Jerusalem#,
-		},
-		'Asia/Kabul' => {
-			exemplarCity => q#Kabul#,
-		},
-		'Asia/Kamchatka' => {
-			exemplarCity => q#Kamchatka#,
-		},
-		'Asia/Karachi' => {
-			exemplarCity => q#Karachi#,
-		},
 		'Asia/Katmandu' => {
 			exemplarCity => q#Kathmandu nutomegaƒoƒome#,
 		},
-		'Asia/Khandyga' => {
-			exemplarCity => q#Khandyga#,
-		},
-		'Asia/Krasnoyarsk' => {
-			exemplarCity => q#Krasnoyarsk#,
-		},
-		'Asia/Kuala_Lumpur' => {
-			exemplarCity => q#Kuala Lumpur#,
-		},
-		'Asia/Kuching' => {
-			exemplarCity => q#Kuching#,
-		},
-		'Asia/Kuwait' => {
-			exemplarCity => q#Kuwait#,
-		},
 		'Asia/Macau' => {
 			exemplarCity => q#Macau#,
-		},
-		'Asia/Magadan' => {
-			exemplarCity => q#Magadan#,
-		},
-		'Asia/Makassar' => {
-			exemplarCity => q#Makassar#,
-		},
-		'Asia/Manila' => {
-			exemplarCity => q#Manila#,
-		},
-		'Asia/Muscat' => {
-			exemplarCity => q#Muscat#,
-		},
-		'Asia/Nicosia' => {
-			exemplarCity => q#Nicosia#,
-		},
-		'Asia/Novokuznetsk' => {
-			exemplarCity => q#Novokuznetsk#,
-		},
-		'Asia/Novosibirsk' => {
-			exemplarCity => q#Novosibirsk#,
-		},
-		'Asia/Omsk' => {
-			exemplarCity => q#Omsk#,
-		},
-		'Asia/Oral' => {
-			exemplarCity => q#Oral#,
-		},
-		'Asia/Phnom_Penh' => {
-			exemplarCity => q#Phnom Penh#,
-		},
-		'Asia/Pontianak' => {
-			exemplarCity => q#Pontianak#,
-		},
-		'Asia/Pyongyang' => {
-			exemplarCity => q#Pyongyang#,
-		},
-		'Asia/Qatar' => {
-			exemplarCity => q#Qatar#,
-		},
-		'Asia/Qyzylorda' => {
-			exemplarCity => q#Qyzylorda#,
-		},
-		'Asia/Rangoon' => {
-			exemplarCity => q#Yangon#,
-		},
-		'Asia/Riyadh' => {
-			exemplarCity => q#Riyadh#,
-		},
-		'Asia/Saigon' => {
-			exemplarCity => q#Ho Chi Minh#,
-		},
-		'Asia/Sakhalin' => {
-			exemplarCity => q#Sakhalin#,
-		},
-		'Asia/Samarkand' => {
-			exemplarCity => q#Samarkand#,
-		},
-		'Asia/Seoul' => {
-			exemplarCity => q#Seoul#,
-		},
-		'Asia/Shanghai' => {
-			exemplarCity => q#Shanghai#,
-		},
-		'Asia/Singapore' => {
-			exemplarCity => q#Singapore#,
-		},
-		'Asia/Srednekolymsk' => {
-			exemplarCity => q#Srednekolymsk#,
-		},
-		'Asia/Taipei' => {
-			exemplarCity => q#Taipei#,
-		},
-		'Asia/Tashkent' => {
-			exemplarCity => q#Tashkent#,
-		},
-		'Asia/Tbilisi' => {
-			exemplarCity => q#Tbilisi#,
-		},
-		'Asia/Tehran' => {
-			exemplarCity => q#Tehran#,
-		},
-		'Asia/Thimphu' => {
-			exemplarCity => q#Thimphu#,
-		},
-		'Asia/Tokyo' => {
-			exemplarCity => q#Tokyo#,
-		},
-		'Asia/Tomsk' => {
-			exemplarCity => q#Tomsk#,
-		},
-		'Asia/Ulaanbaatar' => {
-			exemplarCity => q#Ulaanbaatar#,
-		},
-		'Asia/Urumqi' => {
-			exemplarCity => q#Urumqi#,
-		},
-		'Asia/Ust-Nera' => {
-			exemplarCity => q#Ust-Nera#,
-		},
-		'Asia/Vientiane' => {
-			exemplarCity => q#Vientiane#,
-		},
-		'Asia/Vladivostok' => {
-			exemplarCity => q#Vladivostok#,
-		},
-		'Asia/Yakutsk' => {
-			exemplarCity => q#Yakutsk#,
-		},
-		'Asia/Yekaterinburg' => {
-			exemplarCity => q#Yekaterinburg#,
-		},
-		'Asia/Yerevan' => {
-			exemplarCity => q#Yerevan#,
 		},
 		'Atlantic' => {
 			long => {
@@ -6988,71 +4834,8 @@ has 'time_zone_names' => (
 				'standard' => q#Atlantic nutome gaƒoƒome#,
 			},
 		},
-		'Atlantic/Azores' => {
-			exemplarCity => q#Azores#,
-		},
-		'Atlantic/Bermuda' => {
-			exemplarCity => q#Bermuda#,
-		},
-		'Atlantic/Canary' => {
-			exemplarCity => q#Canary#,
-		},
-		'Atlantic/Cape_Verde' => {
-			exemplarCity => q#Cape Verde#,
-		},
-		'Atlantic/Faeroe' => {
-			exemplarCity => q#Faroe#,
-		},
-		'Atlantic/Madeira' => {
-			exemplarCity => q#Madeira#,
-		},
-		'Atlantic/Reykjavik' => {
-			exemplarCity => q#Reykjavik#,
-		},
-		'Atlantic/South_Georgia' => {
-			exemplarCity => q#South Georgia#,
-		},
-		'Atlantic/St_Helena' => {
-			exemplarCity => q#St. Helena#,
-		},
-		'Atlantic/Stanley' => {
-			exemplarCity => q#Stanley#,
-		},
-		'Australia/Adelaide' => {
-			exemplarCity => q#Adelaide#,
-		},
-		'Australia/Brisbane' => {
-			exemplarCity => q#Brisbane#,
-		},
-		'Australia/Broken_Hill' => {
-			exemplarCity => q#Broken Hill#,
-		},
 		'Australia/Currie' => {
 			exemplarCity => q#Currie#,
-		},
-		'Australia/Darwin' => {
-			exemplarCity => q#Darwin#,
-		},
-		'Australia/Eucla' => {
-			exemplarCity => q#Eucla#,
-		},
-		'Australia/Hobart' => {
-			exemplarCity => q#Hobart#,
-		},
-		'Australia/Lindeman' => {
-			exemplarCity => q#Lindeman#,
-		},
-		'Australia/Lord_Howe' => {
-			exemplarCity => q#Lord Howe#,
-		},
-		'Australia/Melbourne' => {
-			exemplarCity => q#Melbourne#,
-		},
-		'Australia/Perth' => {
-			exemplarCity => q#Perth#,
-		},
-		'Australia/Sydney' => {
-			exemplarCity => q#Sydney#,
 		},
 		'Australia_Central' => {
 			long => {
@@ -7231,191 +5014,18 @@ has 'time_zone_names' => (
 		'Etc/Unknown' => {
 			exemplarCity => q#Du manya#,
 		},
-		'Europe/Amsterdam' => {
-			exemplarCity => q#Amsterdam#,
-		},
-		'Europe/Andorra' => {
-			exemplarCity => q#Andorra#,
-		},
-		'Europe/Astrakhan' => {
-			exemplarCity => q#Astrakhan#,
-		},
-		'Europe/Athens' => {
-			exemplarCity => q#Athens#,
-		},
-		'Europe/Belgrade' => {
-			exemplarCity => q#Belgrade#,
-		},
-		'Europe/Berlin' => {
-			exemplarCity => q#Berlin#,
-		},
-		'Europe/Bratislava' => {
-			exemplarCity => q#Bratislava#,
-		},
-		'Europe/Brussels' => {
-			exemplarCity => q#Brussels#,
-		},
-		'Europe/Bucharest' => {
-			exemplarCity => q#Bucharest#,
-		},
-		'Europe/Budapest' => {
-			exemplarCity => q#Budapest#,
-		},
-		'Europe/Busingen' => {
-			exemplarCity => q#Busingen#,
-		},
-		'Europe/Chisinau' => {
-			exemplarCity => q#Chisinau#,
-		},
-		'Europe/Copenhagen' => {
-			exemplarCity => q#Copenhagen#,
-		},
 		'Europe/Dublin' => {
-			exemplarCity => q#Dublin#,
 			long => {
 				'daylight' => q#Ireland nutome gaƒoƒo me#,
 			},
 		},
-		'Europe/Gibraltar' => {
-			exemplarCity => q#Gibraltar#,
-		},
-		'Europe/Guernsey' => {
-			exemplarCity => q#Guernsey#,
-		},
-		'Europe/Helsinki' => {
-			exemplarCity => q#Helsinki#,
-		},
-		'Europe/Isle_of_Man' => {
-			exemplarCity => q#Isle of Man#,
-		},
-		'Europe/Istanbul' => {
-			exemplarCity => q#Istanbul#,
-		},
-		'Europe/Jersey' => {
-			exemplarCity => q#Jersey#,
-		},
-		'Europe/Kaliningrad' => {
-			exemplarCity => q#Kaliningrad#,
-		},
 		'Europe/Kiev' => {
 			exemplarCity => q#Kiev#,
 		},
-		'Europe/Kirov' => {
-			exemplarCity => q#Kirov#,
-		},
-		'Europe/Lisbon' => {
-			exemplarCity => q#Lisbon#,
-		},
-		'Europe/Ljubljana' => {
-			exemplarCity => q#Ljubljana#,
-		},
 		'Europe/London' => {
-			exemplarCity => q#London#,
 			long => {
 				'daylight' => q#British dzomeŋɔli gaƒoƒo me#,
 			},
-		},
-		'Europe/Luxembourg' => {
-			exemplarCity => q#Luxembourg#,
-		},
-		'Europe/Madrid' => {
-			exemplarCity => q#Madrid#,
-		},
-		'Europe/Malta' => {
-			exemplarCity => q#Malta#,
-		},
-		'Europe/Mariehamn' => {
-			exemplarCity => q#Mariehamn#,
-		},
-		'Europe/Minsk' => {
-			exemplarCity => q#Minsk#,
-		},
-		'Europe/Monaco' => {
-			exemplarCity => q#Monaco#,
-		},
-		'Europe/Moscow' => {
-			exemplarCity => q#Moscow#,
-		},
-		'Europe/Oslo' => {
-			exemplarCity => q#Oslo#,
-		},
-		'Europe/Paris' => {
-			exemplarCity => q#Paris#,
-		},
-		'Europe/Podgorica' => {
-			exemplarCity => q#Podgorica#,
-		},
-		'Europe/Prague' => {
-			exemplarCity => q#Prague#,
-		},
-		'Europe/Riga' => {
-			exemplarCity => q#Riga#,
-		},
-		'Europe/Rome' => {
-			exemplarCity => q#Rome#,
-		},
-		'Europe/Samara' => {
-			exemplarCity => q#Samara#,
-		},
-		'Europe/San_Marino' => {
-			exemplarCity => q#San Marino#,
-		},
-		'Europe/Sarajevo' => {
-			exemplarCity => q#Sarajevo#,
-		},
-		'Europe/Saratov' => {
-			exemplarCity => q#Saratov#,
-		},
-		'Europe/Simferopol' => {
-			exemplarCity => q#Simferopol#,
-		},
-		'Europe/Skopje' => {
-			exemplarCity => q#Skopje#,
-		},
-		'Europe/Sofia' => {
-			exemplarCity => q#Sofia#,
-		},
-		'Europe/Stockholm' => {
-			exemplarCity => q#Stockholm#,
-		},
-		'Europe/Tallinn' => {
-			exemplarCity => q#Tallinn#,
-		},
-		'Europe/Tirane' => {
-			exemplarCity => q#Tirane#,
-		},
-		'Europe/Ulyanovsk' => {
-			exemplarCity => q#Ulyanovsk#,
-		},
-		'Europe/Uzhgorod' => {
-			exemplarCity => q#Uzhgorod#,
-		},
-		'Europe/Vaduz' => {
-			exemplarCity => q#Vaduz#,
-		},
-		'Europe/Vatican' => {
-			exemplarCity => q#Vatican#,
-		},
-		'Europe/Vienna' => {
-			exemplarCity => q#Vienna#,
-		},
-		'Europe/Vilnius' => {
-			exemplarCity => q#Vilnius#,
-		},
-		'Europe/Volgograd' => {
-			exemplarCity => q#Volgograd#,
-		},
-		'Europe/Warsaw' => {
-			exemplarCity => q#Warsaw#,
-		},
-		'Europe/Zagreb' => {
-			exemplarCity => q#Zagreb#,
-		},
-		'Europe/Zaporozhye' => {
-			exemplarCity => q#Zaporozhye#,
-		},
-		'Europe/Zurich' => {
-			exemplarCity => q#Zurich#,
 		},
 		'Europe_Central' => {
 			long => {
@@ -7538,39 +5148,6 @@ has 'time_zone_names' => (
 			long => {
 				'standard' => q#India gaƒoƒo me#,
 			},
-		},
-		'Indian/Antananarivo' => {
-			exemplarCity => q#Antananarivo#,
-		},
-		'Indian/Chagos' => {
-			exemplarCity => q#Chagos#,
-		},
-		'Indian/Christmas' => {
-			exemplarCity => q#Christmas#,
-		},
-		'Indian/Cocos' => {
-			exemplarCity => q#Cocos#,
-		},
-		'Indian/Comoro' => {
-			exemplarCity => q#Comoro#,
-		},
-		'Indian/Kerguelen' => {
-			exemplarCity => q#Kerguelen#,
-		},
-		'Indian/Mahe' => {
-			exemplarCity => q#Mahe#,
-		},
-		'Indian/Maldives' => {
-			exemplarCity => q#Maldives#,
-		},
-		'Indian/Mauritius' => {
-			exemplarCity => q#Mauritius#,
-		},
-		'Indian/Mayotte' => {
-			exemplarCity => q#Mayotte#,
-		},
-		'Indian/Reunion' => {
-			exemplarCity => q#Reunion#,
 		},
 		'Indian_Ocean' => {
 			long => {
@@ -7826,122 +5403,11 @@ has 'time_zone_names' => (
 				'standard' => q#Omsk nutome gaƒoƒo me#,
 			},
 		},
-		'Pacific/Apia' => {
-			exemplarCity => q#Apia#,
-		},
-		'Pacific/Auckland' => {
-			exemplarCity => q#Auckland#,
-		},
-		'Pacific/Bougainville' => {
-			exemplarCity => q#Bougainville#,
-		},
-		'Pacific/Chatham' => {
-			exemplarCity => q#Chatham#,
-		},
-		'Pacific/Easter' => {
-			exemplarCity => q#Easter#,
-		},
-		'Pacific/Efate' => {
-			exemplarCity => q#Efate#,
-		},
 		'Pacific/Enderbury' => {
 			exemplarCity => q#Enderbury#,
 		},
-		'Pacific/Fakaofo' => {
-			exemplarCity => q#Fakaofo#,
-		},
-		'Pacific/Fiji' => {
-			exemplarCity => q#Fiji#,
-		},
-		'Pacific/Funafuti' => {
-			exemplarCity => q#Funafuti#,
-		},
-		'Pacific/Galapagos' => {
-			exemplarCity => q#Galapagos#,
-		},
-		'Pacific/Gambier' => {
-			exemplarCity => q#Gambier#,
-		},
-		'Pacific/Guadalcanal' => {
-			exemplarCity => q#Guadalcanal#,
-		},
-		'Pacific/Guam' => {
-			exemplarCity => q#Guam#,
-		},
 		'Pacific/Honolulu' => {
 			exemplarCity => q#Honolulu#,
-		},
-		'Pacific/Johnston' => {
-			exemplarCity => q#Johnston#,
-		},
-		'Pacific/Kiritimati' => {
-			exemplarCity => q#Kiritimati#,
-		},
-		'Pacific/Kosrae' => {
-			exemplarCity => q#Kosrae#,
-		},
-		'Pacific/Kwajalein' => {
-			exemplarCity => q#Kwajalein#,
-		},
-		'Pacific/Majuro' => {
-			exemplarCity => q#Majuro#,
-		},
-		'Pacific/Marquesas' => {
-			exemplarCity => q#Marquesas#,
-		},
-		'Pacific/Midway' => {
-			exemplarCity => q#Midway#,
-		},
-		'Pacific/Nauru' => {
-			exemplarCity => q#Nauru#,
-		},
-		'Pacific/Niue' => {
-			exemplarCity => q#Niue#,
-		},
-		'Pacific/Norfolk' => {
-			exemplarCity => q#Norfolk#,
-		},
-		'Pacific/Noumea' => {
-			exemplarCity => q#Noumea#,
-		},
-		'Pacific/Pago_Pago' => {
-			exemplarCity => q#Pago Pago#,
-		},
-		'Pacific/Palau' => {
-			exemplarCity => q#Palau#,
-		},
-		'Pacific/Pitcairn' => {
-			exemplarCity => q#Pitcairn#,
-		},
-		'Pacific/Ponape' => {
-			exemplarCity => q#Pohnpei#,
-		},
-		'Pacific/Port_Moresby' => {
-			exemplarCity => q#Port Moresby#,
-		},
-		'Pacific/Rarotonga' => {
-			exemplarCity => q#Rarotonga#,
-		},
-		'Pacific/Saipan' => {
-			exemplarCity => q#Saipan#,
-		},
-		'Pacific/Tahiti' => {
-			exemplarCity => q#Tahiti#,
-		},
-		'Pacific/Tarawa' => {
-			exemplarCity => q#Tarawa#,
-		},
-		'Pacific/Tongatapu' => {
-			exemplarCity => q#Tongatapu#,
-		},
-		'Pacific/Truk' => {
-			exemplarCity => q#Chuuk#,
-		},
-		'Pacific/Wake' => {
-			exemplarCity => q#Wake#,
-		},
-		'Pacific/Wallis' => {
-			exemplarCity => q#Wallis#,
 		},
 		'Pakistan' => {
 			long => {

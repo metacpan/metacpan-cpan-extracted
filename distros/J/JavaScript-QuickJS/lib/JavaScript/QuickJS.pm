@@ -47,7 +47,7 @@ your system.
 
 use XSLoader;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 XSLoader::load( __PACKAGE__, $VERSION );
 
@@ -140,7 +140,7 @@ Untrapped exceptions in JavaScript will be rethrown as Perl exceptions.
 
 $JS_CODE is a I<character> string.
 
-=head2 $obj = $PROMISE = I<OBJ>->eval_module( $JS_CODE )
+=head2 $promise = I<OBJ>->eval_module( $JS_CODE )
 
 Runs $JS_CODE as a module, which enables ES6 module syntax.
 Note that no values can be returned directly in this mode of execution.
@@ -365,12 +365,6 @@ V8 versions.
 L<SpiderMonkey|https://spidermonkey.dev/> engine to Perl.
 
 =back
-
-=head1 TODO
-
-Upstream QuickJS seems to lack active maintenance. It may be advantageous
-to switch to one of its forks (like
-L<quickjs-ng|https://github.com/quickjs-ng/quickjs>).
 
 =head1 LICENSE & COPYRIGHT
 

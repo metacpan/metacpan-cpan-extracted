@@ -1,6 +1,6 @@
 use strict; use warnings;
 use EAI::File; use Test::File; use Test::More; use Data::Dumper; use File::Spec;
-use Test::More tests => 16; 
+use Test::More tests => 17; 
 
 require './t/setup.pl';
 chdir "./t";
@@ -41,6 +41,13 @@ $expected_datastruct = [{col1 => "val11",col2 => "val21",col3 => "val31"},{col1 
 readText($File,$data,["Testout.txt"]);
 is_deeply($data,$expected_datastruct,"read in tab sep data is expected content");
 
+# 5a read data from tab separated file, autoformat
+$File = {format_autoheader =>1, format_sep => "\t", filename => "Testout.txt",};
+$data =[];
+$expected_datastruct = [{col1 => "val11",col2 => "val21",col3 => "val31"},{col1 => "val12",col2 => "val22",col3 => "val32"}];
+readText($File,$data,["Testout.txt"]);
+is_deeply($data,$expected_datastruct,"read in autoformat tab sep data is expected content");
+
 # 6 read csv data from file including quotes in header and values
 $File = {format_skip => 1, format_sep => ",", format_quotedcsv => 1, format_header => "col 1,col2,col3", format_targetheader => "col 1,col2,col3",filename => "Testout.csv",};
 $data =[];
@@ -69,7 +76,7 @@ $expected_datastruct = [{col1 => "val11",col3 => "val31"},{col1 => "val12",col3 
 readExcel($File,$data,["Testout.xls"]);
 is_deeply($data,$expected_datastruct,"read in excel xls data is expected content");
 
-# 10 read data from excel xls file using format_headerColumns
+# 10 read data from excel xls file using format_headerColumns with error
 $File =  {format_xlformat => "xls", format_skip => 1, format_worksheetID=>1, format_headerColumns => [1,3], format_header => "col1\tcol2\tcol3",format_targetheader => "col1\tcol2\tcol3",filename => "Testout.xls",};
 $data =[];
 $expected_datastruct = []; # expect empty array returned due to error.

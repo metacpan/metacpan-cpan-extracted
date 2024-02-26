@@ -1,0 +1,15 @@
+# [% binding.c_func_name %]
+$ffi->attach( [
+ [% perlstring('COWL_WRAP_' _ binding.c_func_name) %]
+ => [% perlstring(binding.perl_func_name) %] ] =>
+	[
+[% FOREACH arg = binding.args -%]
+		arg [% perlstring( arg.meta.optional ? 'opaque' : arg.ffi_type ) %] => [% perlstring(arg.id) %],
+[% END -%]
+	],
+	=> [% perlstring(binding.return_type.ffi_type) %]
+[% INCLUDE binding.ffi.wrapsub.pl.tt -%]
+);
+[%#-
+# vim: ft=tt2
+-%]

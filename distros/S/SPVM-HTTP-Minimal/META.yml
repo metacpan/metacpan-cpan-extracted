@@ -19,8 +19,10 @@ no_index:
     - inc
 requires:
   SPVM: '0.9706'
+  SPVM::File::Temp: '0.021'
   SPVM::IO: '0.211'
+  SPVM::Mozilla::CA: '0.001'
   SPVM::Regex: '0.243'
 resources: {}
-version: '0.002'
+version: '0.003'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

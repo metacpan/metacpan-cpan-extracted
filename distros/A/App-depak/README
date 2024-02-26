@@ -2,8 +2,8 @@ NAME
     App::depak - Pack dependencies onto your script file
 
 VERSION
-    This document describes version 0.586 of App::depak (from Perl
-    distribution App-depak), released on 2023-07-11.
+    This document describes version 0.587 of App::depak (from Perl
+    distribution App-depak), released on 2023-11-20.
 
 SYNOPSIS
     See depak.

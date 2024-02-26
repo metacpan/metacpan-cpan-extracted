@@ -7,7 +7,7 @@ package MarpaX::ESLIF::Grammar::Symbol::Properties;
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '6.0.29'; # VERSION
+our $VERSION = '6.0.33.3'; # VERSION
 
 
 #
@@ -314,6 +314,9 @@ sub getVerbose {
     goto &isVerbose
 }
 
+
+1;
+
 __END__
 
 =pod
@@ -326,7 +329,7 @@ MarpaX::ESLIF::Grammar::Symbol::Properties - ESLIF Grammar Symbol Properties
 
 =head1 VERSION
 
-version 6.0.29
+version 6.0.33.3
 
 =head1 SYNOPSIS
 
@@ -403,7 +406,7 @@ Alias to isDiscard()
 
 Returns if this is a RHS of a discard rule
 
-=head2 $self->isDiscardRhs
+=head2 $self->getDiscardRhs
 
 Returns if this is a RHS of a discard rule
 
@@ -515,7 +518,7 @@ Returns the discard event, null if there is none
 
 Returns the discard event initial state, meaningless if there is no discard event
 
-=head2 $self->isDiscardEventInitialState
+=head2 $self->getDiscardEventInitialState
 
 Returns the discard event initial state, meaningless if there is no discard event
 
@@ -572,8 +575,6 @@ Calls to grammar's currentSymbolProperties() or symbolPropertiesByLevel() method
 =head1 SEE ALSO
 
 L<MarpaX::ESLIF::Symbol::Type>, L<MarpaX::ESLIF::Symbol::PropertyBitSet>, L<MarpaX::ESLIF::Symbol::EventBitSet>
-
-1;
 
 =head1 AUTHOR
 

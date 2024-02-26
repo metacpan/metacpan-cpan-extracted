@@ -73,8 +73,8 @@ sub extract_section ($$;$) {
   $in
 }
 
-sub fix_liga ($$) {
-  my($in, $LIGS, %idx) = (shift, shift);
+sub fix_liga ($$;$) {
+  my($in, $LIGS, $allow_junk, %idx) = (shift, shift, shift);
   my @in = split /(?<=,)(?=\s*\{)/, $in;
   my $z = pop @in;
   for my $l (@in) {
@@ -82,7 +82,7 @@ sub fix_liga ($$) {
     my $LIGs = $LIGS->{$vk} or die "Can't find WCH_LGTRs for <$vk>";
     defined (my $LIG = $LIGs->[$idx{$vk}++ || 0]) or die "Too many LIGATURES for <$vk>: I see $idx{$vk}; command line argument too low?";
     my $exp = substr $LIG, 0, 1;
-    $i == $LIG or $i == $exp or die "Unexpectedly broken LIGATURE for <$vk>: see $i, expect $exp or $LIG (in [@$LIGs])";
+    $i == $LIG or $i == $exp or $allow_junk or die "Unexpectedly broken LIGATURE for <$vk>: see $i, expect $exp or $LIG (in [@$LIGs]) for <<$l>>";
     $l =~ s/^(\s*\{\s*\S+\s*,\s*)(\d+)\b/$1$LIG/ or die "Panic in s///???";
   }
   join '', @in, $z
@@ -123,6 +123,9 @@ if (@ARGV == 1) {
 }
 
 my @prev_len = (8, 1);
+my $Allow_junk;
+$Allow_junk = shift if @ARGV == 5;	# Unsupported now
+
 if (@ARGV == 4) {
   my($src_klc, $src_c, @b_len) = (shift, shift, shift, shift);
   @ARGV = $src_klc;
@@ -155,7 +158,7 @@ if (@ARGV == 4) {
 #    $c_file =~ s<(\{\s*\(\s*PVK_TO_WCHARS1\s*\)\s*aVkToWch)$s(\s*,\s*)$s(\s*,\s*sizeof\s*\(\s*aVkToWch)$s>
     		($1$S$2$S$3$S$4)s;	#    {  (PVK_TO_WCHARS1)aVkToWch2, 2, sizeof(aVkToWch2[0]) },
   }
-  $c_file =~ s/(\baLigature\s*\[\s*\]\s*=\s*\{\s*)(.*?)(?=\s*\}\s*;)/ $1 . fix_liga $2, \%LIG /se
+  $c_file =~ s/(\baLigature\s*\[\s*\]\s*=\s*\{\s*)(.*?)(?=\s*\}\s*;)/ $1 . fix_liga $2, \%LIG, $Allow_junk /se
     or $c_file !~ /\baLigature\b/ or die "Can't find LIGATURE table definition";
 
   my $masks = extract_section $klc, 'SHIFTSTATE', 'strip';	# Semantic of empty lines unclear; for now, ignore

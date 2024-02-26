@@ -1,5 +1,7 @@
 Build.PL
 lib/Locale/CLDR/Locales/Sat.pm
+lib/Locale/CLDR/Locales/Sat/Deva.pm
+lib/Locale/CLDR/Locales/Sat/Deva/In.pm
 lib/Locale/CLDR/Locales/Sat/Olck.pm
 lib/Locale/CLDR/Locales/Sat/Olck/In.pm
 MANIFEST			This list of files

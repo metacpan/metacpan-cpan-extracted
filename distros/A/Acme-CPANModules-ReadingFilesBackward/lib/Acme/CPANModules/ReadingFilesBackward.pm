@@ -1,15 +1,16 @@
 package Acme::CPANModules::ReadingFilesBackward;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-01'; # DATE
-our $DIST = 'Acme-CPANModules-ReadingFilesBackward'; # DIST
-our $VERSION = '0.002'; # VERSION
-
 use strict;
+
 use Acme::CPANModulesUtil::Misc;
 
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-10-31'; # DATE
+our $DIST = 'Acme-CPANModules-ReadingFilesBackward'; # DIST
+our $VERSION = '0.003'; # VERSION
+
 our $LIST = {
-    summary => 'Reading files backward (in reverse)',
+    summary => 'List of modules to read files backward (in reverse)',
     description => <<'_',
 
 Probably the fastest way, if you are on a Unix system, is to use the **tac**
@@ -49,7 +50,7 @@ _
 Acme::CPANModulesUtil::Misc::populate_entries_from_module_links_in_description;
 
 1;
-# ABSTRACT: Reading files backward (in reverse)
+# ABSTRACT: List of modules to read files backward (in reverse)
 
 __END__
 
@@ -59,15 +60,13 @@ __END__
 
 =head1 NAME
 
-Acme::CPANModules::ReadingFilesBackward - Reading files backward (in reverse)
+Acme::CPANModules::ReadingFilesBackward - List of modules to read files backward (in reverse)
 
 =head1 VERSION
 
-This document describes version 0.002 of Acme::CPANModules::ReadingFilesBackward (from Perl distribution Acme-CPANModules-ReadingFilesBackward), released on 2020-03-01.
+This document describes version 0.003 of Acme::CPANModules::ReadingFilesBackward (from Perl distribution Acme-CPANModules-ReadingFilesBackward), released on 2023-10-31.
 
 =head1 DESCRIPTION
-
-Reading files backward (in reverse).
 
 Probably the fastest way, if you are on a Unix system, is to use the B<tac>
 command, which can read a file line by line in reverse order, or paragraph by
@@ -99,24 +98,40 @@ is slightly faster than File::Bidirectional, but File::Bidirectional can read
 forward as well as backward. I now simply prefer PerlIO::reverse because I don't
 have to use a custom API for reading files.
 
-=head1 INCLUDED MODULES
+=head1 ACME::CPANMODULES ENTRIES
 
 =over
 
-=item * L<PerlIO::reverse>
+=item L<PerlIO::reverse>
 
-=item * L<File::ReadBackward>
+Author: L<GFUJI|https://metacpan.org/author/GFUJI>
 
-=item * L<File::Bidirectional>
+=item L<File::ReadBackward>
+
+=item L<File::Bidirectional>
+
+Author: L<KIANWIN|https://metacpan.org/author/KIANWIN>
 
 =back
 
 =head1 FAQ
 
-=head2 What are ways to use this module?
+=head2 What is an Acme::CPANModules::* module?
 
-Aside from reading it, you can install all the listed modules using
-L<cpanmodules>:
+An Acme::CPANModules::* module, like this module, contains just a list of module
+names that share a common characteristics. It is a way to categorize modules and
+document CPAN. See L<Acme::CPANModules> for more details.
+
+=head2 What are ways to use this Acme::CPANModules module?
+
+Aside from reading this Acme::CPANModules module's POD documentation, you can
+install all the listed modules (entries) using L<cpanm-cpanmodules> script (from
+L<App::cpanm::cpanmodules> distribution):
+
+ % cpanm-cpanmodules -n ReadingFilesBackward
+
+Alternatively you can use the L<cpanmodules> CLI (from L<App::cpanmodules>
+distribution):
 
     % cpanmodules ls-entries ReadingFilesBackward | cpanm -n
 
@@ -124,9 +139,15 @@ or L<Acme::CM::Get>:
 
     % perl -MAcme::CM::Get=ReadingFilesBackward -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
 
-This module also helps L<lcpan> produce a more meaningful result for C<lcpan
-related-mods> when it comes to finding related modules for the modules listed
-in this Acme::CPANModules module.
+or directly:
+
+    % perl -MAcme::CPANModules::ReadingFilesBackward -E'say $_->{module} for @{ $Acme::CPANModules::ReadingFilesBackward::LIST->{entries} }' | cpanm -n
+
+This Acme::CPANModules module also helps L<lcpan> produce a more meaningful
+result for C<lcpan related-mods> command when it comes to finding related
+modules for the modules listed in this Acme::CPANModules module.
+See L<App::lcpan::Cmd::related_mods> for more details on how "related modules"
+are found.
 
 =head1 HOMEPAGE
 
@@ -135,14 +156,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Acme-CPANM
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Acme-CPANModules-ReadingFilesBackward>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-ReadingFilesBackward>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -156,11 +169,37 @@ L<cpanmodules> - CLI tool to let you browse/view the lists
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2020, 2019 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-ReadingFilesBackward>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut
