@@ -14,7 +14,7 @@ WriteMakefile(
     PREREQ_PM => {
        "JSON"        => "2.00",
        "Carp"=> "1.00",
-       "URI"  =>"1.00" ,
+       "URI"  =>"5.16" ,
        "perl" => "5.004",
        "HTTP::Request" => "6.00",
        "Data::UUID" => "1.00",

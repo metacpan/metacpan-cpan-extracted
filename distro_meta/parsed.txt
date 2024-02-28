@@ -90477,3 +90477,5 @@ S/SB/SBECK/Test-Inter-1.11.tar.gz
 H/HA/HANJE/Tk-AppWindow-0.02.tar.gz
 D/DE/DERF/Travel-Routing-DE-HAFAS-0.04.tar.gz
 F/FA/FASTLY/WebService-Fastly-6.02.tar.gz
+E/ES/ESTRELOW/LWP-UserAgent-msgraph-0.12.tar.gz
+P/PL/PLICEASE/Test2-Tools-PerlCritic-0.08.tar.gz

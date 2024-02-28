@@ -1,5 +1,8 @@
 Revision history for Test2-Tools-PerlCritic
 
+0.08      2024-02-28 15:47:17 -0700
+  - Added Test2::Tools::PerlCritic::Util module (gh#12)
+
 0.07      2024-02-12 16:13:47 -0700
   - New hook violations (gh#11)
 

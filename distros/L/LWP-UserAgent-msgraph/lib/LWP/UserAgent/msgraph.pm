@@ -3,7 +3,7 @@ package LWP::UserAgent::msgraph;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.12';
 
 use parent 'LWP::UserAgent';
 
@@ -26,7 +26,7 @@ sub new($%) {
    my %args=@_;
 
    #This are our lwp-extended options
-   for (qw(appid secret grant_type scope persistent sid base store return_url tenant local_port)) {
+   for (qw(appid secret grant_type scope persistent sid base store redirect_uri tenant local_port)) {
       if (exists $args{$_}) {
          $internals{$_}= $args{$_};
          delete $args{$_};
@@ -34,7 +34,7 @@ sub new($%) {
    }
 
    #Some defaults
-   unless (exists $internals{sid}) {
+   unless (exists $internals{sid} && defined $internals{sid}) {
       my $guid=Data::UUID->new;
       $internals{sid}=$guid->create_str();
    }
@@ -63,6 +63,7 @@ sub new($%) {
       $internals{store}="$tmpdir/$sid.tmp";
    }
 
+   #We retrieve previous stored runtime data if we persist
    if ($internals{persistent} && -r $internals{store}) {
       my $stored=retrieve($internals{store});
       croak 'Mismatch persistent session' unless ($stored->{sid} eq $sid);
@@ -76,8 +77,46 @@ sub new($%) {
       $self->{$_} = $internals{$_};
    }
 
+   #We adopt a previous token if there was any
+   $self->default_header('Authorization' => "Bearer ".$internals{access_token}) if ($internals{persistent} && exists $internals{access_token} );
+
    return $self;
 
+}
+
+sub storedata($) {
+
+   my $self=shift();
+   my $data={};
+
+   #This is a subset of the runtime data. It's important that the secret is out
+   for (qw(access_token expires expires_in refresh_token token_type scope appid sid redirect_uri console)) {
+      $data->{$_}=$self->{$_};
+   }
+
+   return $data;
+}
+
+sub session_dump($) {
+   
+   my $self=shift();
+
+   return to_json($self->storedata());
+}
+
+sub session_restore($$) {
+
+   my $self=shift();
+   my $json=shift();
+
+   my $data=from_json($json);
+
+   for (qw(access_token expires expires_in refresh_token token_type scope appid sid redirect_uri console)) {
+      $self->{$_}=$data->{$_};
+   }
+
+   $self->default_header('Authorization' => "Bearer ".$self->{access_token});
+   return $self;
 }
 
 sub writestore($) {
@@ -86,13 +125,49 @@ sub writestore($) {
 
    croak 'Wrong writestore call on non-persistant client' unless ($self->{persistent});
 
-   my $data={};
+   return store $self->storedata(), $self->{store};
+}
 
-   #This is a subset of the runtime data. It's important that the secret is out
-   for (qw(access_token expires expires_in refresh_token token_type scope appid sid redirect_uri console)) {
-      $data->{$_}=$self->{$_};
+sub refreshtoken($) {
+
+   my $self=shift();
+
+   my $ua = LWP::UserAgent->new;
+   my $r=$ua->post('https://login.microsoftonline.com/organizations/oauth2/v2.0/token',
+      [client_id=>$self->{appid},
+       scope=>$self->{scope},
+       refresh_token=>$self->{refresh_token},
+       redirect_uri=> $self->{redirect_uri},
+       grant_type=>'refresh_token',
+       client_secret=>$self->{secret} ]);
+   if ($r->is_success) {
+      my $data=decode_json($r->decoded_content);
+      my $token=$data->{access_token};      
+
+      for (keys %$data) {
+         $self->{$_}=$data->{$_};
+      }
+
+      $self->{expires}=(time + $data->{expires_in});
+      $self->writestore() if ($self->{presistent});
+      $self->default_header('Authorization' => "Bearer ".$token);
+  
+      $self->writestore() if ($self->{persistent});
+      return $token;
+    } else {
+      croak "Refresh token auth fail";
+    }      
+}
+
+sub newtoken($) {
+
+   my $self=shift();
+
+   if ($self->{refresh_token}) {
+      return $self->refreshtoken;
+   } else {
+      return $self->auth();
    }
-   return store $data, $self->{store};
 }
 
 sub request {
@@ -102,6 +177,10 @@ sub request {
    $url =~ s/^\///;
 
    my $abs_uri=URI->new_abs($url, $self->{base}.'/');
+
+   if ($self->{expires} < time()) {
+      $self->newtoken();
+   }
 
    my $req=HTTP::Request->new($method,"$abs_uri");
    $req->header('Content-Type' => 'application/json');
@@ -114,13 +193,20 @@ sub request {
    $self->{code}=$res->code;
 
    if ($res->is_success) {
-      my $data=from_json($res->decoded_content);
-      if (exists $data->{'@odata.nextLink'}) {
-         $self->{nextLink}=$data->{'@odata.nextLink'};
-      } else {
-         $self->{nextLink}=0;
-      }
-      return $data;
+      if ($res->header('content-type') =~ /^application\/json/) {
+         
+         my $data=from_json($res->decoded_content);
+
+         #Here we save the nextLink for further use
+         if (exists $data->{'@odata.nextLink'}) {
+            $self->{nextLink}=$data->{'@odata.nextLink'};
+         } else {
+            $self->{nextLink}=0;
+         }
+         return $data;
+     } else {
+        return 0;
+     }
    } else {
       croak $res->decoded_content
    }
@@ -222,7 +308,7 @@ sub auth {
 
       $post=HTTP::Request::Common::POST($self->tokenendpoint(),
          [client_id => $self->{appid},
-          scope => 'https://graph.microsoft.com/.default',
+          scope => $self->{scope},
           client_secret=> $self->{secret},
           grant_type => $self->{grant_type}
       ]);
@@ -234,6 +320,7 @@ sub auth {
       $code=$self->consolecode() unless ($code || ! $self->{console});
       croak 'Missing or invalid authorization code' unless ($code);
 
+      #print "Using scope ".$self->{scope}."\n";
       $post=HTTP::Request::Common::POST($self->tokenendpoint(),
          [client_id => $self->{appid},
           scope => $self->{scope},
@@ -263,6 +350,8 @@ sub auth {
    $self->writestore() if ($self->{presistent});
    $self->default_header('Authorization' => "Bearer ".$self->{access_token});
   
+   $self->writestore() if ($self->{persistent});
+
    return $data->{access_token};
 }
 
@@ -410,7 +499,7 @@ LWP::UserAgent::msgraph
 
 =head1 VERSION
 
-version 0.05
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -462,9 +551,14 @@ properly. Missing mandatory options will result in error
    secret           shared secret needed for handshake
    tenant           Tenant id
    grant_type       Authorizations scheme (client_credentials,authorization_code)
+   scope            List of permissions requested as in 'perm1 perm2 perm3...'
    console          Indicates whether interaction with a user is possible
    redirect_uri     Redirect URI for delegated auth challenge
    local_port       tcp port for mini http server. Defaults to 8081
+   sid              Session id. Defaults to a random UUID
+   persistent       Whether to keep the session data between runs
+   store            Filename for session data. Defaults to a temp file
+   base             Base URL for MS Graph calls. Defaults to https://graph.microsoft.com/v1.0
 
 =head1 auth
 
@@ -475,6 +569,9 @@ This method performs the authentication handshake sequence with the MS
 Graph platform. The optional parameter is the authorization code obtained
 from a challenge with the impersonated user. If this is an application 
 non-delegated client, then the $challenge is not needed.
+
+The challenge code is not kept, but the token is. The token is saved for future requests. 
+This method returns the token obtained.
 
 If used in a web application, you should have redirected the user to the authendpoint() location
 and then capture the resulting code listening for the redirect_uri.
@@ -494,18 +591,38 @@ localhost URL must be registered in Azure.
    $ua->request(PATCH => '/me', {officeLocation => $mynewoffice});
 
 The request method makes a call to a MS Graph endpoint url and returns the
-corresponding response object. An optional perl structure might be
+corresponding response object as a perl structure. An optional perl structure might be
 supplied as the payload (body) for the request.
 
 The MS Graph has a rich set of API calls for different operations. Check the
 EXAMPLES section for more tips.
+
+You should call request() only after a successful auth() call. If a refresh_token
+is issued by MS Graph, then request() will handle the token refresh transparently.
+
+=head1 get
+
+   my $me=$ua->get('/me');
+   print "Hello $me->{displayName}";
+
+Issues a GET request to the MS Graph endpoint and returns the response as a perl structure.
+
+=head1 post
+
+   my $folder=$ua->post('/me/drive/root/children', {name => 'newfolder', folder => {}});
+
+Issues a POST request to the MS Graph endpoint and returns the response as a perl structure.
+The second parameter is the payload for the POST request, as a perl reference.
+
 
 =head1 code
 
    print "It worked" if ($ua->code == 201);
 
 A code() method is supplied as a convenient way of getting the last HTTP response
-code.
+code. This mitht be important, since the original HTTP::Respone is lost in the
+normal operations. You may check L<HTTP::Status> for the meaning and further
+processing of the codes.  
 
 =head1 next
 
@@ -527,18 +644,52 @@ authorization. This is on offline method, the resulting uri is computed from the
    $location=$ua->tokenendpoint()
 
 Returns the oauth 2.0 token endpoint as an url string. This url is used internally to get
-the authentication token.
+the authentication token. This is an offline method.
+
+=head1 It's not persistance, it's no cookie. It's Session data
+
+MS Graph implements an OAuth 2.0 authentication scheme. This means that the application asks
+for an authentication token first and then uses this token for further requests. If you are
+building a backend application that offers several services, this means that you must keep the token between runs.
+In a backend for a web application, in theory the token could be kept in the browser local storage, but that's
+not the approach of LWP::UserAgent::msgraph.
+
+The approach is to store the token under the backend application realm. This is done by the persistent
+option.
+
+=head2 sid
+
+   $sid=$ua->sid();
+
+Returns the session id. This is a random UUID by default. This is used as a key for the session data. If you are building
+a backend application, you may send this back to the client side in order to keep the session data between runs.
+Once the sid is created, you can use it in further calls.
+
+   my $sid=<something from the client side>;
+   my $ua=LWP::UserAgent->new(sid => $sid, persistent => 1);
+
+By default, UUID based sid are provided. You can use your own sid scheme, but you must ensure that it's unique.   
+
+=head2 store
+
+   my $sid=<something from the client side>
+   my $ua=LWP::UserAgent->new(sid => $sid, persistent => 1, store => "some clever app data location/$sid");
+
+The store option is used to set the filename for the session data. This is a Storable file. If the store option is not
+set, a temporary file is used. The store option is used in conjunction with the persistent option. The OAuth token
+is kept in this store. The Application's shared secret is not.
 
 =head1 Changes from the default LWP::UserAgent behavior
 
 This class inherits from L<LWP::UserAgent>, but some changes apply. If you are used to
-LWP::UserAgent standart tweaks and shortcuts, you should read this.
+LWP::UserAgent standard tweaks and shortcuts, you should read this.
 
 The request() method accepts a perl structure which will be sent 
 as a JSON body to the MS Graph endoint. Instead of an L<HTTP::Response>
 object, request() will return whatever object is returned by the
 MS Graph method, as a perl structure. The L<JSON> module is used as
-a serialization engine.
+a serialization engine. The HTTP::Response object is not kept. 
+The code() method is provided to check the HTTP response code.
 
 request() will use the right Authorization header based on the initial handshake.
 The get(), post(), patch(), delete(), put(), delete() methods are setup so
@@ -551,6 +702,43 @@ The simple_request() method is kept unchanged, but will use the
 right Bearer token authentication. So, if you need more control over the request, you can use
 this method. You must add the JSON serialization, though.
 
+Also note that in d LWP, an URL starting with a '/' is considered a root-relative URL. In LWP::UserAgent::msgraph,
+it's considered relative to the base URL. This is a convenience for MS Graph calls, since MS Graph documentation
+often uses this convention. simple_request() retains the original root-relative behavior. This is why $ua->get('/me') works.
 
+=head1 Requirements
+
+This module requires the following modules:
+
+=over
+
+=item L<LWP::UserAgent> for all the base HTTP operations.
+
+=item L<JSON> for the JSON serialization/deserialization.
+
+=item L<Storable> for the session data storage.
+
+=item L<Data::UUID> for the session id generation.
+
+=item L<HTTP::Server::Simple::CGI> and L<Net::EmptyPort> for the http localhost miniserver feature
+
+=item L<HTTP::Request::Common> is used for the handshake, since it's still multipart/form-data based
+
+=back
+
+
+=head1 TO-DO
+
+This module is a work in progress. The following features are planned:
+
+=over 
+
+=item Certificate based authentication
+
+=item Allow for a custom storable mechanism, so the session data can be kept in a database or in an encrypted form
+
+=item Provide useful samples for the most common MS Graph operations
+
+=back
 
 =cut

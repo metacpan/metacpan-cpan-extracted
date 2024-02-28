@@ -13,9 +13,11 @@ corpus/lib1/Baz.pm
 corpus/lib1/Foo.pm
 dist.ini
 lib/Test2/Tools/PerlCritic.pm
+lib/Test2/Tools/PerlCritic/Util.pm
 perlcritic
 t/00_diag.t
 t/test2_tools_perlcritic.t
+t/test2_tools_perlcritic_util.t
 xt/author/eol.t
 xt/author/no_tabs.t
 xt/author/pod.t

@@ -16,7 +16,7 @@ use Class::Tiny qw( critic test_name files _hooks );
 our @EXPORT = qw( perl_critic_ok );
 
 # ABSTRACT: Testing tools to enforce Perl::Critic policies
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 
 sub BUILDARGS
@@ -361,7 +361,7 @@ Test2::Tools::PerlCritic - Testing tools to enforce Perl::Critic policies
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 

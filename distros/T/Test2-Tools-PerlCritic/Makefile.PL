@@ -3,7 +3,7 @@ BEGIN {
   my %missing = map {
     eval qq{ require $_ };
     $@ ? ($_=>1) : ()
-  } qw( Carp Exporter base experimental strict warnings );
+  } qw( Carp Data::Dumper Digest::MD5 Exporter base experimental strict warnings );
   if(%missing)
   {
     print "Your Perl is missing core modules: @{[ sort keys %missing ]}\n";
@@ -48,7 +48,8 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.020000",
   "NAME"             => "Test2::Tools::PerlCritic",
   "PM"               => {
-    "lib/Test2/Tools/PerlCritic.pm" => "\$(INST_LIB)/Test2/Tools/PerlCritic.pm"
+    "lib/Test2/Tools/PerlCritic.pm"      => "\$(INST_LIB)/Test2/Tools/PerlCritic.pm",
+    "lib/Test2/Tools/PerlCritic/Util.pm" => "\$(INST_LIB)/Test2/Tools/PerlCritic/Util.pm"
   },
   "PREREQ_PM" => {
     "Class::Tiny"         => 0,
@@ -62,7 +63,7 @@ my %WriteMakefileArgs = (
     "Perl::Critic::Policy" => 0,
     "Test2::V0"            => "0.000121"
   },
-  "VERSION" => "0.07",
+  "VERSION" => "0.08",
   "test"    => {
     "TESTS" => "t/*.t"
   }
