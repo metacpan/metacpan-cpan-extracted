@@ -923,6 +923,7 @@ my %IS_INFIX = (METARELOP => 1,    # [CONSTANT]
   SUPERSCRIPTOP => 1000, SUBSCRIPTOP => 1000);
 
 sub textrec {
+  no warnings 'recursion';
   my ($node, $outer_bp, $outer_name) = @_;
   return '[missing]' unless defined $node;
   $node = realizeXMNode($node);
@@ -961,6 +962,7 @@ sub textrec {
     return '[' . (p_getValue($node) || '') . ']'; } }
 
 sub textrec_apply {
+  no warnings 'recursion';
   my ($name, $op, @args) = @_;
   my $role = ((ref $op ne 'ARRAY') && $op->getAttribute('role')) || 'Unknown';
   if (($role =~ /^(SUB|SUPER)SCRIPTOP$/) && (($op->getAttribute('scriptpos') || '') =~ /^pre\d+$/)) {
@@ -1008,7 +1010,11 @@ sub is_genuinely_unparsed {
     if (!$node->getAttribute('idref')) {
       return 1; }
     else {
-      return is_genuinely_unparsed(realizeXMNode($node), $document); } }
+      my $real_node = realizeXMNode($node);
+      # Note that some parses fail with an ARRAY ref [ltx:Error,...]
+      # so realizeXMNode may fail!
+      return 1 if (ref $real_node) !~ /^XML::LibXML/;
+      return is_genuinely_unparsed($real_node, $document); } }
   elsif ($tag eq 'ltx:XMDual') {
     my ($content, $presentation) = element_nodes($node);
     return is_genuinely_unparsed($content, $document); }
@@ -1168,10 +1174,10 @@ sub Absent {
   return New('absent'); }
 
 sub InvisibleTimes {
-  return New('times', "\x{2062}", role => 'MULOP', font => LaTeXML::Common::Font->new()); }
+  return New('times', "\x{2062}", role => 'MULOP'); }
 
 sub InvisibleComma {
-  return New(undef, "\x{2063}", role => 'PUNCT', font => LaTeXML::Common::Font->new()); }
+  return New(undef, "\x{2063}", role => 'PUNCT'); }
 
 # Get n-th arg of an XMApp.
 # However, this is really only used to get the script out of a sub/super script
@@ -1406,19 +1412,22 @@ sub Fence {
     return InterpretDelimited(New($op, undef, ($decl_id ? (decl_id => $decl_id) : ())), @stuff); } }
 
 # Compose a complex relational operator from two tokens, such as >=, >>
+# (similar to CatSymbols, but specialized to relops)
 sub TwoPartRelop {
   my ($op1, $op2) = @_;
   $op1 = Lookup($op1);
   $op2 = Lookup($op2);
-  my $m1 = p_getTokenMeaning($op1);
-  my $m2 = p_getTokenMeaning($op2);
+  my $m1   = p_getTokenMeaning($op1);
+  my $m2   = p_getTokenMeaning($op2);
+  my $font = p_getAttribute($op1, '_font');
   my $meaning;
   if ($m1 eq $m2) {
     $meaning = "much-$m1"; }
   else {
     $meaning = "$m1-or-$m2"; }
   my $content = $op1->textContent . $op2->textContent;
-  return ['ltx:XMTok', { role => "RELOP", meaning => $meaning }, $content]; }
+  return ['ltx:XMTok', { role => "RELOP", meaning => $meaning, ($font ? (_font => $font) : ()) },
+    $content]; }
 
 # NOTE: It might be best to separate the multiple Formulae into separate XMath's???
 # but only at the top level!
@@ -1464,6 +1473,7 @@ sub NewList {
 # flattenning portions that have the same operator
 # ie. a + b + c - d  =>  (- (+ a b c) d)
 sub LeftRec {
+  no warnings 'recursion';
   my ($arg1, @more) = @_;
   if (@more) {
     my $op     = shift(@more);

@@ -3,8 +3,11 @@ use warnings;
 use Test::More 0.88;
 
 BEGIN {
-  eval { require B::Hooks::EndOfScope::XS }
-    or plan skip_all => "XS functionality not available";
+  my $has_xs = eval { require B::Hooks::EndOfScope::XS };
+  die 'author tests require additional prerequisites for testing the XS path!' if not $has_xs
+      and ($ENV{AUTHOR_TESTING} or $ENV{RELEASE_TESTING});
+
+  $has_xs or plan skip_all => 'XS functionality not available';
 
   B::Hooks::EndOfScope::XS->import();
 }

@@ -4,13 +4,13 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Flickr-API",
    "no_index" : {
@@ -22,8 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "Test::Script" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -49,6 +48,11 @@
             "parent" : "0",
             "perl" : "5.008"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Script" : "0"
+         }
       }
    },
    "release_status" : "stable",
@@ -57,5 +61,6 @@
          "url" : "https://github.com/iamcal/perl-Flickr-API"
       }
    },
-   "version" : "1.28"
+   "version" : "1.29",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

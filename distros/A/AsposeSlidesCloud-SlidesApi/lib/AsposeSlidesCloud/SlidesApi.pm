@@ -17112,6 +17112,104 @@ sub get_color_scheme {
 }
 
 #
+# get_comment_authors
+#
+# Lists comment authors.
+# 
+# @param string $name Document name. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_comment_authors' } = { 
+    	summary => 'Lists comment authors.',
+        params => $params,
+        returns => 'CommentAuthors',
+        };
+}
+# @return CommentAuthors
+#
+sub get_comment_authors {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling get_comment_authors");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/comments/authors';
+
+    my $_method = 'GET';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CommentAuthors', $response);
+    return $_response_object;
+}
+
+#
 # get_disc_usage
 #
 # Get disc usage

@@ -9,6 +9,7 @@ Schedule::SGELK
 =head1 SYNOPSIS
 
 A module for submitting jobs to an SGE queue.
+
   use Schedule::SGELK
   my $sge=Schedule::SGELK->new(verbose=>1,numnodes=>5,numcpus=>8,workingdir=>"SGE/",waitForEachJobToStart=>1);
   $sge->set("jobname","thisisaname");
@@ -22,9 +23,11 @@ A module for submitting jobs to an SGE queue.
   $sge->pleaseExecute_andWait("sleep 60");
 
 A quick test for this module is the following one-liner
+
   perl -MSchedule::SGELK -e '$sge=Schedule::SGELK->new(numnodes=>5); for(1..3){$sge->pleaseExecute("sleep 3");}$sge->wrapItUp();'
 
 Another quick test is to use the test() method, if you want to see standardized text output (see test() below)
+
   perl -MSchedule::SGELK -e '$sge=Schedule::SGELK->new(-numnodes=>2,-numcpus=>8); $sge->test(\%tmpSettings);'
   
 
@@ -52,7 +55,7 @@ use File::Temp qw/tempdir/;
 use String::Escape qw/escape/;
 use version 0.77;
 
-our $VERSION = version->declare("v1.5");
+our $VERSION = version->declare("v1.6.0");
 
 my $has_threads=eval{
   return 0; # this isn't working yet
@@ -89,8 +92,9 @@ END{
 
 =item sub new
 
-create a new instance of a scheduler.
+create a new instance of a scheduler.  
 Arguments and their defaults:
+
   numnodes=>50 maximum nodes to use
   numcpus=>128 maximum cpus that will be used per node in a script
   maxslots=>9999 maximum slots that you can use. Useful if you want to be limited by total slots instead of nodes or CPUs. E.g. {numnodes=>100,numcpus=>1,maxslots=>20}
@@ -228,6 +232,7 @@ sub settings{
 =item pleaseExecute()
 
 This is the main method. It will submit a command to the cluster.
+
   $sge->set("jobname","a_nu_start");
   $sge->pleaseExecute("someCommand with parameters");
 
@@ -678,7 +683,7 @@ ten jobs that print debugging information.
 
 You can give an optional hash argument to send other settings as described in new().
 
-perl -MSchedule::SGELK -e '$sge=Schedule::SGELK->new(-numnodes=>2,-numcpus=>8); $sge->test(\%tmpSettings);'
+  perl -MSchedule::SGELK -e '$sge=Schedule::SGELK->new(-numnodes=>2,-numcpus=>8); $sge->test(\%tmpSettings);'
 
 =back
 

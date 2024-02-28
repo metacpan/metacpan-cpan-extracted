@@ -84,4 +84,18 @@ use Acme::PM::Berlin::Meetings;
     is $dt, '2020-10-28T19:00:00';
 }
 
+# Switch from 19h -> 18h
+
+{
+    my $now = DateTime->new(day => 24, month => 3, year => 2023, hour => 21, time_zone => 'Europe/Berlin');
+    my $dt = Acme::PM::Berlin::Meetings::next_meeting_dt($now);
+    is $dt, '2023-03-29T19:00:00';
+}
+
+{
+    my $now = DateTime->new(day => 24, month => 5, year => 2023, hour => 21, time_zone => 'Europe/Berlin');
+    my $dt = Acme::PM::Berlin::Meetings::next_meeting_dt($now);
+    is $dt, '2023-05-31T18:00:00';
+}
+
 __END__

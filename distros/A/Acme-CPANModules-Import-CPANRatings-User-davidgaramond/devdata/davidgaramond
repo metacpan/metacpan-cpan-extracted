@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    
+    
+    <link rel="shortcut icon" href="//cdn.perl.org/perlweb/favicon.ico" />
+
+    <title>Reviews by David Garamond - cpanratings.perl.org</title>
+
+    
+
+    
+      <link rel="stylesheet" type="text/css" href="//cdn.perl.org/perlweb/css/cpanratings.css" /> 
+      <link rel="stylesheet" type="text/css" href="//cdn.perl.org/perlweb/css/perlweb_bootstrap.min.css" /> 
+
+
+    <!-- Fonts -->
+    <link href='https://fonts.googleapis.com/css?family=Lato:400,100,300,700,900' rel='stylesheet' type='text/css'>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    
+
+    
+     <script type="text/javascript">
+       var global_auth_token = "";
+     </script>
+    
+  </head>
+  <body class="page-cpanratings section_onion">
+    <nav class="navbar navbar-inverse" data-height="120">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">
+            
+            <img src="//cdn.perl.org/perlweb/images/logo_cpanratings.svg" alt="Reviews by David Garamond | Perl, modern programming" class="page-logo">
+          </a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+          
+<ul class="list-inline text-center nav navbar-nav navbar-right">
+    <li class="sub">
+        <a href="/search">Search</a>
+    </li>
+    <li class="sub">
+        <a href="/about.html">About</a>
+    </li>
+    <li class="sub">
+        <a href="https://log.perl.org/2018/06/cpan-ratings-read-only.html">
+          <b>Read-Only</b>
+        </a>
+    </li>
+</ul>
+
+
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    
+    <div class="jumbotron jumbotron-internal">
+      <div class="container text-center">
+          <h1>Reviews by David Garamond</h1>
+          <p></p>
+      </div>
+    </div>
+    
+
+    <div class="container">
+    
+
+
+
+<p>
+<a href="/user/davidgaramond.rss">RSS</a>
+
+</p>
+
+<div id="reviews">
+
+
+<div class="review" data-review="7486" data-user="8653">
+<a name="7486"></a>
+<h3 class="review_header">
+
+
+
+<a href="/dist/Perl6-Say">
+
+
+Perl6-Say</a>
+
+   (<a href="https://metacpan.org/release/Perl6-Say/">0.16</a>)
+
+
+
+
+<img src="//cdn.perl.org/perlweb/cpanratings/images/stars-2.0.png" alt="**">
+
+</h3>
+
+
+
+<blockquote class="review_text">
+Ok, it's not 2004 anymore, I suggest we retire or start to deprecate this module? This module now requires Perl 5.8, and Perl 5.10+ has &quot;say&quot; built in, so basically this is a module specifically for 5.8 *only*.
+</blockquote>
+
+
+<div class="review_footer">
+<p class="review_attribution">
+<a href="/user/davidgaramond">David Garamond</a> - 2010-07-14T08:22:41
+(<a href="/dist/Perl6-Say#7486">permalink</a>)
+</p>
+
+<div class="helpfulq">
+
+5 out of 10 found this review helpful.
+
+Was this review helpful to you?&nbsp;
+
+<!-- we should add non-js links to rate stuff helpful/not helpful too... -->
+
+<span class="helpful helpful_yes">Yes</span>
+<span class="helpful helpful_no" >No</span>
+<span class="thanks"></span>
+</div><!-- helpfulq -->
+
+</div><!-- review_footer -->
+
+</div>
+
+
+<div class="review" data-review="7444" data-user="8653">
+<a name="7444"></a>
+<h3 class="review_header">
+
+
+
+<a href="/dist/Data-Rmap">
+
+
+Data-Rmap</a>
+
+   (<a href="https://metacpan.org/release/Data-Rmap/">0.62</a>)
+
+
+
+
+<img src="//cdn.perl.org/perlweb/cpanratings/images/stars-5.0.png" alt="*****">
+
+</h3>
+
+
+
+<blockquote class="review_text">
+I was looking for a simple way to transform all DateTime objects in my data structure into string (e.g. &quot;2010-07-06&quot;). After failed experiment with Data::Walk and dumping Data::Transformer due to unsightly interface, I found Data::Rmap. It's straightforward to choose.<br><br>My only complaint would be the name: it's not immediately searchable (I was searching for 'data modify', 'data walk', 'data traverse', 'modify data inplace', and the like). Also, the name &quot;map&quot; suggests that the function will return a copy of the data (like Perl's builtin map) instead of modifying inplace.
+</blockquote>
+
+
+<div class="review_footer">
+<p class="review_attribution">
+<a href="/user/davidgaramond">David Garamond</a> - 2010-07-05T20:25:20
+(<a href="/dist/Data-Rmap#7444">permalink</a>)
+</p>
+
+<div class="helpfulq">
+
+Was this review helpful to you?&nbsp;
+
+<!-- we should add non-js links to rate stuff helpful/not helpful too... -->
+
+<span class="helpful helpful_yes">Yes</span>
+<span class="helpful helpful_no" >No</span>
+<span class="thanks"></span>
+</div><!-- helpfulq -->
+
+</div><!-- review_footer -->
+
+</div>
+
+
+<div class="review" data-review="7442" data-user="8653">
+<a name="7442"></a>
+<h3 class="review_header">
+
+
+
+<a href="/dist/Data-Walk">
+
+
+Data-Walk</a>
+
+   (<a href="https://metacpan.org/release/Data-Walk/">1.00</a>)
+
+
+
+
+<img src="//cdn.perl.org/perlweb/cpanratings/images/stars-4.0.png" alt="****">
+
+</h3>
+
+
+
+<blockquote class="review_text">
+Nice interface (the analogy to File::Find certainly helps) and very straightforward to use, but one thing I can't do is modify the data inplace. I spent about an of hours trying to make Data::Walk do inplace modification, but finally gave up and use Data::Rmap instead.
+</blockquote>
+
+
+<div class="review_footer">
+<p class="review_attribution">
+<a href="/user/davidgaramond">David Garamond</a> - 2010-07-05T19:38:12
+(<a href="/dist/Data-Walk#7442">permalink</a>)
+</p>
+
+<div class="helpfulq">
+
+1 out of 1 found this review helpful.
+
+Was this review helpful to you?&nbsp;
+
+<!-- we should add non-js links to rate stuff helpful/not helpful too... -->
+
+<span class="helpful helpful_yes">Yes</span>
+<span class="helpful helpful_no" >No</span>
+<span class="thanks"></span>
+</div><!-- helpfulq -->
+
+</div><!-- review_footer -->
+
+</div>
+
+
+<div class="review" data-review="7440" data-user="8653">
+<a name="7440"></a>
+<h3 class="review_header">
+
+
+
+<a href="/dist/Data-Transformer">
+
+
+Data-Transformer</a>
+
+   (<a href="https://metacpan.org/release/Data-Transformer/">0.04</a>)
+
+
+
+
+<img src="//cdn.perl.org/perlweb/cpanratings/images/stars-2.0.png" alt="**">
+
+</h3>
+
+
+
+<blockquote class="review_text">
+Frankly, I don't like the interface. I suspect most people would like to just specify one callback function instead of one for each type. Also I don't like having to work with $$_ ($_ should perhaps be aliased to the real data). As the Data::Transformer's POD also said, those looking for alternatives can checkout Data::Walk and Data::Rmap, which I recommend instead.<br>
+
+</blockquote>
+
+
+<div class="review_footer">
+<p class="review_attribution">
+<a href="/user/davidgaramond">David Garamond</a> - 2010-07-05T19:35:03
+(<a href="/dist/Data-Transformer#7440">permalink</a>)
+</p>
+
+<div class="helpfulq">
+
+1 out of 2 found this review helpful.
+
+Was this review helpful to you?&nbsp;
+
+<!-- we should add non-js links to rate stuff helpful/not helpful too... -->
+
+<span class="helpful helpful_yes">Yes</span>
+<span class="helpful helpful_no" >No</span>
+<span class="thanks"></span>
+</div><!-- helpfulq -->
+
+</div><!-- review_footer -->
+
+</div>
+
+
+<div class="review" data-review="7438" data-user="8653">
+<a name="7438"></a>
+<h3 class="review_header">
+
+
+
+<a href="/dist/Data-Traverse">
+
+
+Data-Traverse</a>
+
+   (<a href="https://metacpan.org/release/Data-Traverse/">0.03</a>)
+
+
+
+
+<img src="//cdn.perl.org/perlweb/cpanratings/images/stars-2.0.png" alt="**">
+
+</h3>
+
+
+
+<blockquote class="review_text">
+I find the interface rather unintuitive, because I expect data to be in $_ (instead of type). For those looking for alternatives, see also Data::Walk (which provides breadth-first as well as depth-first) and Data::Rmap (which provides inplace modification).<br>
+
+</blockquote>
+
+
+<div class="review_footer">
+<p class="review_attribution">
+<a href="/user/davidgaramond">David Garamond</a> - 2010-07-05T19:32:01
+(<a href="/dist/Data-Traverse#7438">permalink</a>)
+</p>
+
+<div class="helpfulq">
+
+1 out of 2 found this review helpful.
+
+Was this review helpful to you?&nbsp;
+
+<!-- we should add non-js links to rate stuff helpful/not helpful too... -->
+
+<span class="helpful helpful_yes">Yes</span>
+<span class="helpful helpful_no" >No</span>
+<span class="thanks"></span>
+</div><!-- helpfulq -->
+
+</div><!-- review_footer -->
+
+</div>
+
+
+<div class="review" data-review="7254" data-user="8653">
+<a name="7254"></a>
+<h3 class="review_header">
+
+
+
+<a href="/dist/Regexp-Grammars">
+
+
+Regexp-Grammars</a>
+
+   (<a href="https://metacpan.org/release/Regexp-Grammars/">1.002</a>)
+
+
+
+
+<img src="//cdn.perl.org/perlweb/cpanratings/images/stars-4.0.png" alt="****">
+
+</h3>
+
+
+
+<blockquote class="review_text">
+Parse::RecDescent is dead. Long live Regexp::Grammars!<br><br>As Damian himself has said/presented, RG is the successor for the popular PRD.<br><br>The docs of RG is not as complete (yet) as PRD's.<br><br>The PRD grammar syntax is also nicer/cleaner (due to RG having some restrictions because you are writing your grammar inside a regex).<br><br>RG doesn't (yet) have some of the features of PRD, like &lt;leftop&gt; and &lt;rightop&gt;. But it does have most of the features, and add a few of its own.<br><br>RG performs significantly faster than PRD.<br><br>In general, whenever you consider PRD to be a good candidate of tool to solve your problem, consider using RG.<br><br>But you need Perl 5.10+ to use RG, as it depends on regex features not found in older Perl.<br>
+
+</blockquote>
+
+
+<div class="review_footer">
+<p class="review_attribution">
+<a href="/user/davidgaramond">David Garamond</a> - 2010-04-14T12:27:09
+(<a href="/dist/Regexp-Grammars#7254">permalink</a>)
+</p>
+
+<div class="helpfulq">
+
+7 out of 7 found this review helpful.
+
+Was this review helpful to you?&nbsp;
+
+<!-- we should add non-js links to rate stuff helpful/not helpful too... -->
+
+<span class="helpful helpful_yes">Yes</span>
+<span class="helpful helpful_no" >No</span>
+<span class="thanks"></span>
+</div><!-- helpfulq -->
+
+</div><!-- review_footer -->
+
+</div>
+
+
+<div class="review" data-review="7252" data-user="8653">
+<a name="7252"></a>
+<h3 class="review_header">
+
+
+
+<a href="/dist/Parse-RecDescent">
+
+
+Parse-RecDescent</a>
+
+   (<a href="https://metacpan.org/release/Parse-RecDescent/">1.965001</a>)
+
+
+
+
+<img src="//cdn.perl.org/perlweb/cpanratings/images/stars-3.0.png" alt="***">
+
+</h3>
+
+
+
+<blockquote class="review_text">
+Responding to previous comment from MB: &quot;Have you the time to do this Damian?&quot; The answer is yes, in the form of Regexp::Grammars, which Damian said himself is the successor of Parse::RecDescent.<br><br>To give credit to this module, PRD is very featureful and easy to use, it's very convenient to generate parsers, and the docs is quite complete. The only problem with it is, as many have pointed out, speed.<br><br>It is *seriously* slow, with parser generation can take up to half a second on my laptop with a moderate grammar (200-400 lines) and parsing can take seconds even minutes for a moderately long string. It is orders of magnitude slower than other parsers. Do think a few times before deciding you can take the performance hit of PRD.<br><br>For alternatives, try Regexp::Grammars. (Or Parse::Yapp or Parse::EYapp, as other reviewers have written.)
+</blockquote>
+
+
+<div class="review_footer">
+<p class="review_attribution">
+<a href="/user/davidgaramond">David Garamond</a> - 2010-04-14T12:21:31
+(<a href="/dist/Parse-RecDescent#7252">permalink</a>)
+</p>
+
+<div class="helpfulq">
+
+3 out of 4 found this review helpful.
+
+Was this review helpful to you?&nbsp;
+
+<!-- we should add non-js links to rate stuff helpful/not helpful too... -->
+
+<span class="helpful helpful_yes">Yes</span>
+<span class="helpful helpful_no" >No</span>
+<span class="thanks"></span>
+</div><!-- helpfulq -->
+
+</div><!-- review_footer -->
+
+</div>
+
+
+<div class="review" data-review="6551" data-user="8653">
+<a name="6551"></a>
+<h3 class="review_header">
+
+
+
+<a href="/dist/Test-Seperate">
+
+
+Test-Seperate</a>
+
+   (<a href="https://metacpan.org/release/Test-Seperate/">0.002</a>)
+
+
+
+</h3>
+
+
+
+<blockquote class="review_text">
+Sorry, just commenting the name, shouldn't it be Separate?
+</blockquote>
+
+
+<div class="review_footer">
+<p class="review_attribution">
+<a href="/user/davidgaramond">David Garamond</a> - 2009-11-03T08:25:20
+(<a href="/dist/Test-Seperate#6551">permalink</a>)
+</p>
+
+<div class="helpfulq">
+
+1 out of 2 found this review helpful.
+
+Was this review helpful to you?&nbsp;
+
+<!-- we should add non-js links to rate stuff helpful/not helpful too... -->
+
+<span class="helpful helpful_yes">Yes</span>
+<span class="helpful helpful_no" >No</span>
+<span class="thanks"></span>
+</div><!-- helpfulq -->
+
+</div><!-- review_footer -->
+
+</div>
+
+
+<div class="review" data-review="6537" data-user="8653">
+<a name="6537"></a>
+<h3 class="review_header">
+
+
+
+<a href="/dist/File-Size">
+
+
+File-Size</a>
+
+   (<a href="https://metacpan.org/release/File-Size/">0.06</a>)
+
+
+
+
+<img src="//cdn.perl.org/perlweb/cpanratings/images/stars-2.0.png" alt="**">
+
+</h3>
+
+
+
+<blockquote class="review_text">
+Frankly I prefer the name and interface of Filesys::DiskUsage. Sadly, despite the docs mentioning &quot;blocks&quot;, this module doesn't really count block usage like the Unix &quot;du&quot; command, because it doesn't take multiple hard links into account.<br><br>Even more sadly, Filesys::DiskUsage doesn't either.<br><br>I guess I'll have to do with 'system &quot;du $file&quot;' command for now.<br>
+
+</blockquote>
+
+
+<div class="review_footer">
+<p class="review_attribution">
+<a href="/user/davidgaramond">David Garamond</a> - 2009-10-27T23:03:39
+(<a href="/dist/File-Size#6537">permalink</a>)
+</p>
+
+<div class="helpfulq">
+
+1 out of 2 found this review helpful.
+
+Was this review helpful to you?&nbsp;
+
+<!-- we should add non-js links to rate stuff helpful/not helpful too... -->
+
+<span class="helpful helpful_yes">Yes</span>
+<span class="helpful helpful_no" >No</span>
+<span class="thanks"></span>
+</div><!-- helpfulq -->
+
+</div><!-- review_footer -->
+
+</div>
+
+
+<div class="review" data-review="6472" data-user="8653">
+<a name="6472"></a>
+<h3 class="review_header">
+
+
+
+<a href="/dist/DateTime">
+
+
+DateTime</a>
+
+   (<a href="https://metacpan.org/release/DateTime/">0.50</a>)
+
+
+
+
+<img src="//cdn.perl.org/perlweb/cpanratings/images/stars-5.0.png" alt="*****">
+
+</h3>
+
+
+
+<blockquote class="review_text">
+*THE* definitive date/time handling module in Perl (and even maybe in all major programming languages). Can't believe I went through all the pain of reinventing the wheel, and using various date/time modules of various quality &amp; interface. If only I had known DateTime earlier.<br><br>Look no more, DateTime it is.<br>
+
+</blockquote>
+
+
+<div class="review_footer">
+<p class="review_attribution">
+<a href="/user/davidgaramond">David Garamond</a> - 2009-10-07T01:32:56
+(<a href="/dist/DateTime#6472">permalink</a>)
+</p>
+
+<div class="helpfulq">
+
+4 out of 5 found this review helpful.
+
+Was this review helpful to you?&nbsp;
+
+<!-- we should add non-js links to rate stuff helpful/not helpful too... -->
+
+<span class="helpful helpful_yes">Yes</span>
+<span class="helpful helpful_no" >No</span>
+<span class="thanks"></span>
+</div><!-- helpfulq -->
+
+</div><!-- review_footer -->
+
+</div>
+
+
+<div class="review" data-review="4684" data-user="8653">
+<a name="4684"></a>
+<h3 class="review_header">
+
+
+
+<a href="/dist/Data-Rx">
+
+
+Data-Rx</a>
+
+   (<a href="https://metacpan.org/release/Data-Rx/">0.001</a>)
+
+
+
+
+<img src="//cdn.perl.org/perlweb/cpanratings/images/stars-5.0.png" alt="*****">
+
+</h3>
+
+
+
+<blockquote class="review_text">
+I've been mulling over writing this kind of module (planning to call it Schema::Nested or something), but never got around to do it. Thankfully somebody stepped up and did it! Keep up the good work, will be looking forward to future releases (especially i'm hoping for some subclassing mechanism, for better reuse of schemas).<br>
+
+</blockquote>
+
+
+<div class="review_footer">
+<p class="review_attribution">
+<a href="/user/davidgaramond">David Garamond</a> - 2008-09-03T03:35:55
+(<a href="/dist/Data-Rx#4684">permalink</a>)
+</p>
+
+<div class="helpfulq">
+
+3 out of 3 found this review helpful.
+
+Was this review helpful to you?&nbsp;
+
+<!-- we should add non-js links to rate stuff helpful/not helpful too... -->
+
+<span class="helpful helpful_yes">Yes</span>
+<span class="helpful helpful_no" >No</span>
+<span class="thanks"></span>
+</div><!-- helpfulq -->
+
+</div><!-- review_footer -->
+
+</div>
+
+
+<div class="review" data-review="4106" data-user="8653">
+<a name="4106"></a>
+<h3 class="review_header">
+
+
+
+<a href="/dist/DBI-Mysqlsimple">
+
+
+DBI-Mysqlsimple</a>
+
+   (<a href="https://metacpan.org/release/DBI-Mysqlsimple/">0.02</a>)
+
+
+
+
+<img src="//cdn.perl.org/perlweb/cpanratings/images/stars-1.0.png" alt="*">
+
+</h3>
+
+
+
+<blockquote class="review_text">
+I agree with the previous reviewer. IMO, overall this module is not necessary. Plain DBI is actually simple enough for simple cases. Maybe the author of Mysqlsimple did not realize this. Let's compare:<br><br>* Retrieving a single row:<br>
+Mysqlsimple: my ($v1,$v2) = $db-&gt;get_row(&quot;select v1,v2 from table&quot;);<br>
+DBI: my ($v1, $v2) = $dbh-&gt;selectrow_array(&quot;select v1,v2 from table&quot;);<br><br>* Retrieving a single row (with params):<br>
+Mysqlsimple: my ($v1,$v2) = $db-&gt;get_row(&quot;select v1,v2 from table where cond1=? and cond2=?&quot;, [$cond1,$cond2]);<br>
+DBI: my ($v1,$v2) = $db-&gt;selectrow_array(&quot;select v1,v2 from table where cond1=? and cond2=?&quot;, {}, $cond1,$cond2);<br><br>* Retrieving all rows with params:<br>
+Mysqlsimple: my $rows = $db-&gt;get_rows(..., [$param1, $param2]);<br>
+DBI: my $rows = $dbh-&gt;selectall_arrayref(..., {}, $param1, $param2);<br><br>* do() with params:<br>
+Mysqlsimple: my $rows = $db-&gt;do(..., [$param1, $param2]);<br>
+DBI: my $rows = $dbh-&gt;do(..., {}, $param1, $param2);<br><br>As you can see, the differences are minimal.<br>
+
+</blockquote>
+
+
+<div class="review_footer">
+<p class="review_attribution">
+<a href="/user/davidgaramond">David Garamond</a> - 2008-05-03T20:46:28
+(<a href="/dist/DBI-Mysqlsimple#4106">permalink</a>)
+</p>
+
+<div class="helpfulq">
+
+4 out of 4 found this review helpful.
+
+Was this review helpful to you?&nbsp;
+
+<!-- we should add non-js links to rate stuff helpful/not helpful too... -->
+
+<span class="helpful helpful_yes">Yes</span>
+<span class="helpful helpful_no" >No</span>
+<span class="thanks"></span>
+</div><!-- helpfulq -->
+
+</div><!-- review_footer -->
+
+</div>
+
+
+<div class="review" data-review="3794" data-user="8653">
+<a name="3794"></a>
+<h3 class="review_header">
+
+
+
+<a href="/dist/Carp-Always">
+
+
+Carp-Always</a>
+
+   (<a href="https://metacpan.org/release/Carp-Always/">0.09</a>)
+
+
+
+
+<img src="//cdn.perl.org/perlweb/cpanratings/images/stars-5.0.png" alt="*****">
+
+</h3>
+
+
+
+<blockquote class="review_text">
+Modules like this deserve to be more well-known and should perhaps included in core Perl (or even become a command-line switch). I'm never comfortable with Carp and all the &quot;complexity&quot; of using it. What I wanted is simple, when debugging I want all die()'s (and perhaps warn() too, but much less often) to print a stack trace.<br><br>Call me inflicted with Ruby- or Python-envy, but it's been so ridiculous wanting to print out stack traces in Perl. I don't want to have to change/rewrite all my die()'s to croak() or confess()! And what about library codes which use die()?<br><br>Thank God somebody wrote Carp::Always.
+</blockquote>
+
+
+<div class="review_footer">
+<p class="review_attribution">
+<a href="/user/davidgaramond">David Garamond</a> - 2008-02-15T18:41:17
+(<a href="/dist/Carp-Always#3794">permalink</a>)
+</p>
+
+<div class="helpfulq">
+
+8 out of 8 found this review helpful.
+
+Was this review helpful to you?&nbsp;
+
+<!-- we should add non-js links to rate stuff helpful/not helpful too... -->
+
+<span class="helpful helpful_yes">Yes</span>
+<span class="helpful helpful_no" >No</span>
+<span class="thanks"></span>
+</div><!-- helpfulq -->
+
+</div><!-- review_footer -->
+
+</div>
+
+
+<div class="review" data-review="3548" data-user="8653">
+<a name="3548"></a>
+<h3 class="review_header">
+
+
+
+<a href="/dist/Data-Dump">
+
+
+Data-Dump</a>
+
+   (<a href="https://metacpan.org/release/Data-Dump/">1.08</a>)
+
+
+
+
+<img src="//cdn.perl.org/perlweb/cpanratings/images/stars-5.0.png" alt="*****">
+
+</h3>
+
+
+
+<blockquote class="review_text">
+I've envied Ruby users which can use just &quot;p&quot; to print out data structures instead of us which used to have to do 'use Data::Dumper; print Dumper(...);'. And even then there's this '$VAR1 = ' garbage which 99% of the time is not wanted. Which often makes me wonder, shouldn't P in Perl stand for Practical?<br><br>With Data::Dump we're still a bit behind but closer. One rant is the with the doc: the pp() function should perhaps be advertised more prominently, since I suspect that's what most users want most of the time.
+</blockquote>
+
+
+<div class="review_footer">
+<p class="review_attribution">
+<a href="/user/davidgaramond">David Garamond</a> - 2007-12-06T03:02:17
+(<a href="/dist/Data-Dump#3548">permalink</a>)
+</p>
+
+<div class="helpfulq">
+
+12 out of 13 found this review helpful.
+
+Was this review helpful to you?&nbsp;
+
+<!-- we should add non-js links to rate stuff helpful/not helpful too... -->
+
+<span class="helpful helpful_yes">Yes</span>
+<span class="helpful helpful_no" >No</span>
+<span class="thanks"></span>
+</div><!-- helpfulq -->
+
+</div><!-- review_footer -->
+
+</div>
+
+
+<div class="review" data-review="3462" data-user="8653">
+<a name="3462"></a>
+<h3 class="review_header">
+
+
+
+<a href="/dist/V">
+
+
+V</a>
+
+   (<a href="https://metacpan.org/release/V/">0.13</a>)
+
+
+
+
+<img src="//cdn.perl.org/perlweb/cpanratings/images/stars-5.0.png" alt="*****">
+
+</h3>
+
+
+
+<blockquote class="review_text">
+What a nice little module. It is by far the easiest to review ;-)<br><br>I have been using my own little script called &quot;pmversion&quot; which serves the same exact purpose. I guess I'll be using V from this moment on. It's amazing doing something as basic as showing a module's version had not been this easy or even easier.<br>
+
+</blockquote>
+
+
+<div class="review_footer">
+<p class="review_attribution">
+<a href="/user/davidgaramond">David Garamond</a> - 2007-11-17T08:30:20
+(<a href="/dist/V#3462">permalink</a>)
+</p>
+
+<div class="helpfulq">
+
+2 out of 2 found this review helpful.
+
+Was this review helpful to you?&nbsp;
+
+<!-- we should add non-js links to rate stuff helpful/not helpful too... -->
+
+<span class="helpful helpful_yes">Yes</span>
+<span class="helpful helpful_no" >No</span>
+<span class="thanks"></span>
+</div><!-- helpfulq -->
+
+</div><!-- review_footer -->
+
+</div>
+
+
+<div class="review" data-review="3458" data-user="8653">
+<a name="3458"></a>
+<h3 class="review_header">
+
+
+
+<a href="/dist/Test-Unit">
+
+
+Test-Unit</a>
+
+   (<a href="https://metacpan.org/release/Test-Unit/">0.25</a>)
+
+
+
+
+<img src="//cdn.perl.org/perlweb/cpanratings/images/stars-4.0.png" alt="****">
+
+</h3>
+
+
+
+<blockquote class="review_text">
+Test::Unit is of course a fine module. But if you are shopping around for testing framework, I recommend you try Test::Class instead, which combines the best of two worlds. First, you get xUnit style, but I think with a slightly simpler interface. Second, you get to use all the standard Perl testing stuffs like Test::Simple, Test::More and Test::Harness. This is better because it's what most Perl modules use (so you might be more familiar with it if you're a Perl programmer), plus there are more kinds of &quot;assert&quot; functions in Test::More and friends compared to Test::Unit::Assert.
+</blockquote>
+
+
+<div class="review_footer">
+<p class="review_attribution">
+<a href="/user/davidgaramond">David Garamond</a> - 2007-11-17T03:47:49
+(<a href="/dist/Test-Unit#3458">permalink</a>)
+</p>
+
+<div class="helpfulq">
+
+4 out of 5 found this review helpful.
+
+Was this review helpful to you?&nbsp;
+
+<!-- we should add non-js links to rate stuff helpful/not helpful too... -->
+
+<span class="helpful helpful_yes">Yes</span>
+<span class="helpful helpful_no" >No</span>
+<span class="thanks"></span>
+</div><!-- helpfulq -->
+
+</div><!-- review_footer -->
+
+</div>
+
+
+<div class="review" data-review="3441" data-user="8653">
+<a name="3441"></a>
+<h3 class="review_header">
+
+
+
+<a href="/dist/Module-Build">
+
+
+Module-Build</a>
+
+   (<a href="https://metacpan.org/release/Module-Build/">0.2808</a>)
+
+
+
+
+<img src="//cdn.perl.org/perlweb/cpanratings/images/stars-3.0.png" alt="***">
+
+</h3>
+
+
+
+<blockquote class="review_text">
+Here's the short story: first there's Exutils::MakeMaker, which requires make and hard to extend, but everybody uses it due to lack of alternatives. Then came Module::Build which is pure perl and easier to use for authors, but breaks compatibility. Users can no longer use the 'perl Makefile.PL &amp;&amp; make &amp;&amp; make install' mantra. Plus, it used to not support PREFIX. Plus, MB-based modules require MB which is not by default installed. This pisses *a lot* of people.<br><br>Lesson to learn: maintaining backward-compatibility is very important, especially for end users. I think the intention of MB is a good one, but the execution could be a bit better. For example, perhaps the &quot;Build.PL&quot; script could've still just been named &quot;Makefile.PL&quot;, couldn't it?<br><br>I recommend people shopping for a module installer to look at Module::Install instead. MI is a middle ground between Eu::MM and MB. It's pure perl and easy to extend but it also allows users (and CPAN.pm et al) to install modules the old way. It embeds a copy of itself in every MI-based modules, so there's no depedency hell. Best of both worlds.
+</blockquote>
+
+
+<div class="review_footer">
+<p class="review_attribution">
+<a href="/user/davidgaramond">David Garamond</a> - 2007-11-09T19:10:58
+(<a href="/dist/Module-Build#3441">permalink</a>)
+</p>
+
+<div class="helpfulq">
+
+14 out of 21 found this review helpful.
+
+Was this review helpful to you?&nbsp;
+
+<!-- we should add non-js links to rate stuff helpful/not helpful too... -->
+
+<span class="helpful helpful_yes">Yes</span>
+<span class="helpful helpful_no" >No</span>
+<span class="thanks"></span>
+</div><!-- helpfulq -->
+
+</div><!-- review_footer -->
+
+</div>
+
+
+<div class="review" data-review="3439" data-user="8653">
+<a name="3439"></a>
+<h3 class="review_header">
+
+
+
+<a href="/dist/YAML-LibYAML">
+
+
+YAML-LibYAML</a>
+
+   (<a href="https://metacpan.org/release/YAML-LibYAML/">0.26</a>)
+
+
+
+
+<img src="//cdn.perl.org/perlweb/cpanratings/images/stars-5.0.png" alt="*****">
+
+</h3>
+
+
+
+<blockquote class="review_text">
+It's about time Perl gets a complete and proper YAML parser. This is it. In the past I've been bitten by a couple of YAML's and YAML::Syck's minor bugs, in addition to several crashes (don't know how they are recently). But using YAML::XS (YAML-LibYAML) I get the feeling, for the first time, of a first class parser comparable in stability and completeness to that in Ruby and Python.
+</blockquote>
+
+
+<div class="review_footer">
+<p class="review_attribution">
+<a href="/user/davidgaramond">David Garamond</a> - 2007-11-09T15:47:57
+(<a href="/dist/YAML-LibYAML#3439">permalink</a>)
+</p>
+
+<div class="helpfulq">
+
+4 out of 5 found this review helpful.
+
+Was this review helpful to you?&nbsp;
+
+<!-- we should add non-js links to rate stuff helpful/not helpful too... -->
+
+<span class="helpful helpful_yes">Yes</span>
+<span class="helpful helpful_no" >No</span>
+<span class="thanks"></span>
+</div><!-- helpfulq -->
+
+</div><!-- review_footer -->
+
+</div>
+
+
+
+
+
+
+</div>
+
+    </div>
+
+    
+
+    <div class="container-fluid space-top-xl">
+      <footer class="row">
+        
+        <div class="footer">
+
+        
+          <ul class="col-xs-12 col-sm-2 list-unstyled">
+            <li><h4>Perl.org</h4></li>
+            <li><a href="http://www.perl.org/">www</a></li>
+            <li><a href="http://blogs.perl.org/">blogs</a></li>
+            <li><a href="http://jobs.perl.org/">jobs</a></li>
+            <li><a href="http://learn.perl.org/">learn</a></li>
+            <li><a href="http://dev.perl.org/">dev</a></li>
+          </ul>
+          <ul class="col-xs-12 col-sm-2 list-unstyled">
+            <li><h4>Connect</h4></li>
+            <li><a href="/siteinfo.html">Site Info</a></li>
+            <!--li><a href="#" class="links">Facebook</a></li>
+            <li><a href="#" class="links">Twitter</a></li-->
+          </ul>
+          <div class="col-xs-12 footer-info">
+            <p class="copyright">
+                <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/3.0/us/"><img alt="Creative Commons License" style="border-width:0" src="//cdn.perl.org/perlweb/images/icons/creativecommons-by-nc-nd-3.0-us-80x15.png" /></a> Â© 2002-2018 Perl.org
+            </p>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+
+<script type="text/javascript">
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-50555-8', 'auto');
+  ga('require', 'linkid', 'linkid.js');
+  ga('set', 'dimension1', window.location.protocol);
+  ga('send', 'pageview');
+</script>
+<script type="text/javascript" src="//cdn.perl.org/perlweb/js/perlweb_bootstrap.min.js" charset="UTF-8"></script>
+<script type="text/javascript" src="//cdn.perl.org/perlweb/common/jquery.cookie.js" charset="UTF-8"></script>
+<script type="text/javascript" src="//cdn.perl.org/perlweb/cpanratings/cpanratings.js" charset="UTF-8"></script>
+
+
+
+    
+  </body>
+</html>
+
+

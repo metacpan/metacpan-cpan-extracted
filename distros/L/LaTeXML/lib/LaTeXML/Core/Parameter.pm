@@ -84,11 +84,10 @@ sub read {
   # Hmmm, seem to still need it...
   if ($$self{semiverbatim}) {    # Open coded setupCatcodes
     $STATE->beginSemiverbatim(@{ $$self{semiverbatim} }); }
-
+  no warnings 'recursion';
   my $value = &{ $$self{reader} }($gullet, @{ $$self{extra} || [] });
   $value = $value->neutralize(@{ $$self{semiverbatim} }) if $$self{semiverbatim} && (ref $value)
     && $value->can('neutralize');
-  $value = $value->packParameters if $value && $$self{packParameters};
   if ($$self{semiverbatim}) {    # Open coded revertCatcodes
     $STATE->endSemiverbatim(); }
   if ((!defined $value) && !$$self{optional}) {
@@ -96,6 +95,9 @@ sub read {
       "Missing argument " . Stringify($self) . " for " . Stringify($fordefn),
       "Ended at " . ToString($gullet->getLocator));
     $value = T_OTHER('missing'); }
+  elsif ($value && $$self{optional} && $$self{type} =~ /^OptionalMatch/) {
+    # experiment: skip spaces after a successful OptionalMatch read
+    $gullet->skipSpaces; }
   return $value; }
 
 # This is needed by structured parameter types like KeyVals
@@ -106,7 +108,6 @@ sub reparse {
   my ($self, $gullet, $tokens) = @_;
   # Needs neutralization, since the keyvals may have been tokenized already???
   # perhaps a better test would involve whether $tokens is, in fact, Tokens?
-  $tokens = $tokens->packParameters if $tokens && $$self{packParameters};
   if (($$self{type} eq 'Plain') || $$self{undigested}) {    # Gack!
     return $tokens; }
   elsif ($$self{semiverbatim}) {                            # Needs neutralization
@@ -117,7 +118,7 @@ sub reparse {
         my @tokens = $tokens->unlist;
         if (@tokens    # Strip outer braces from dimensions & friends
           && ($$self{type} =~ /^(?:Number|Dimension|Glue|MuDimension|MuGlue)$/)
-          && $tokens[0]->equals(T_BEGIN) && $tokens[-1]->equals(T_END)) {
+          && ($tokens[0]->getCatcode == CC_BEGIN) && ($tokens[-1]->getCatcode == CC_END)) {
           shift(@tokens); pop(@tokens); }
         $gulletx->unread(@tokens);    # but put back tokens to be read
         my $value = $self->read($gulletx);
@@ -125,6 +126,7 @@ sub reparse {
         return $value; }); } }
 
 sub digest {
+  no warnings 'recursion';
   my ($self, $stomach, $value, $fordefn) = @_;
   # If semiverbatim, Expand (before digest), so tokens can be neutralized; BLECH!!!!
   if ($$self{semiverbatim}) {
@@ -134,7 +136,7 @@ sub digest {
           my ($igullet) = @_;
           $igullet->unread($value);
           my @tokens = ();
-          while (defined(my $token = $igullet->readXToken(1, 1))) {
+          while (defined(my $token = $igullet->getPendingComment || $igullet->readXToken(1))) {
             push(@tokens, $token); }
           $value = Tokens(@tokens);
           $value = $value->neutralize; }); } }

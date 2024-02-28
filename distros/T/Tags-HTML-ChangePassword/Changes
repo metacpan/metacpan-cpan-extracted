@@ -1,3 +1,9 @@
+0.04 2024-02-27T22:03:30+01:00
+ - Add tests for prepare().
+ - Add tests for process().
+ - Fix error message.
+ - Remove obsolete module usage from doc example.
+
 0.03 2024-02-26T11:03:48+01:00
  - Add error to init() and prepare() without data.
  - Add missing cleanup() method to doc.

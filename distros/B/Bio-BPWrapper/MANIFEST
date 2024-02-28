@@ -1,5 +1,4 @@
 bin/bioaln
-bin/biopop
 bin/bioseq
 bin/biotree
 Build.PL
@@ -12,7 +11,6 @@ README.md
 doc/bpwrapper-reference-card.pdf
 
 lib/Bio/BPWrapper/AlnManipulations.pm
-lib/Bio/BPWrapper/PopManipulations.pm
 lib/Bio/BPWrapper/SeqManipulations.pm
 lib/Bio/BPWrapper/TreeManipulations.pm
 lib/Bio/BPWrapper.pm

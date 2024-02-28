@@ -19,4 +19,14 @@
   <para xml:id="p5">
     <p>main after 2</p>
   </para>
+  <para xml:id="p6">
+    <p>inner-3-before</p>
+  </para>
+  <para xml:id="p7">
+    <p>main after 3</p>
+  </para>
+  <para xml:id="p8">
+    <p>CHANGE ENDCHAR AND CATCODES
+mainbeforeinner-beforeinner-aftermainafterinner-2-beforemainafter2inner-3-beforemainafter3</p>
+  </para>
 </document>

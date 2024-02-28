@@ -57,17 +57,17 @@ sub revertArguments {
   return @tokens; }
 
 sub readArguments {
+  no warnings 'recursion';
   my ($self, $gullet, $fordefn) = @_;
   my @args = ();
-  $gullet->setup_scan();
   my ($p, $v);
   return map { $p = $_; $v = $p && $p->read($gullet, $fordefn); ($$p{novalue} ? () : $v); } @$self; }
 
 sub readArgumentsAndDigest {
+  no warnings 'recursion';
   my ($self, $stomach, $fordefn) = @_;
   my @args   = ();
   my $gullet = $stomach->getGullet;
-  $gullet->setup_scan();
   foreach my $parameter (@$self) {
     my $value = $parameter->read($gullet, $fordefn);
     if (!$$parameter{novalue}) {
@@ -79,6 +79,7 @@ sub reparseArgument {
   my ($self, $gullet, $tokens) = @_;
   if (defined $tokens) {
     return $gullet->readingFromMouth(LaTeXML::Core::Mouth->new(), sub {    # start with empty mouth
+        no warnings 'recursion';
         my ($gulletx) = @_;
         $gulletx->unread($tokens);                                         # but put back tokens to be read
         my @values = $self->readArguments($gulletx);

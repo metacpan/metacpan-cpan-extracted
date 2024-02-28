@@ -1,13 +1,15 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
-use rlib '../lib';
 use v5.10;
+
+use Path::Tiny;
+use lib path($0)->absolute->parent->sibling('lib')->stringify;
+use Pod::Usage;
+use Getopt::Long qw( :config bundling permute no_getopt_compat );
+
 use Bio::BPWrapper;
 use Bio::BPWrapper::TreeManipulations;
-use Data::Dumper;
-use Getopt::Long qw( :config bundling permute no_getopt_compat );
-use Pod::Usage;
 
 use constant PROGRAM => File::Basename::basename(__FILE__);
 
@@ -23,6 +25,7 @@ GetOptions(\%opts,
 	   "clean-br|b",
 	   "clean-boot|B",
 	   "cut-tree=f", # cut tree to identify groups
+	   "cut-sis=i", # identify sister node with fewer than i descendants
 	   "del-otus|d=s",
 	   "del-low-boot|D=f",
 	   "del-short-br|E=f",
@@ -31,6 +34,7 @@ GetOptions(\%opts,
 	   "dist-all",
 	   "ead", # edge-length abundance distribution; O'Dwyer et al. PNAS (2015)
 	   "input|i=s",
+	   "ids-all",
 	   "label-nodes",
 	   "label-selected-nodes=s", # based on a file
 	   "lca=s",
@@ -52,8 +56,11 @@ GetOptions(\%opts,
 #	   "sort-child=s", # sort child by height (default) or others (to make output tree consistent)
 	   "subset|s=s",
 	   "swap-otus=s", # ??
+	   "tips-to-root", 
 	   "tree-shape", # for apTreeshape package
+	   "trim-tips=f",
 	   "walk|w=s",
+	   "walk-edge=s",
 #	   "rmbl|R",
 #          "bootclean|b:f",
 #          "collapse|c=s@",
@@ -132,7 +139,11 @@ Remove all branch support values.
 
 Identify clades based on branches that bisected by a cut line (half way to max by default).
 
-Through error if cut is greater than the least deep OTU.
+Through error if cut is greater than the least deep OTU (based on node height, which is the distance from root)
+
+=item --cut-sis "cutoff"
+
+Prefix node id by "cut_" to cut if the number of descendant nodes are < number
 
 =item --del-otus, -d 'otu1,out2,etc'
 
@@ -162,9 +173,13 @@ Prints half-matrix list of distances between I<all> leaves.
 
 Edge-length abundance distribution, a statistics of tree balance (O'Dwyer et al. PNAS 2015)
 
+=item --ids-all
+
+Print ids for all nodes (internal nodes included) in the order of tree traversal from root
+
 =item --input, -i 'format'
 
-Input file format. Accepts newick and nhx.
+Input file format. Accepts newick and nhx. Now also a parent-child table.
 
 =item --label-nodes
 
@@ -230,7 +245,7 @@ Rename tips according to a 2-column table
 
 =item --reroot, -r 'newroot'
 
-Reroot tree to specified node by creating new branch.
+Reroot tree to specified node by creating new branch, by either an OTU name (-r "otu:id"), or by using an internal node id (-r "intid:xxx"). Note that an OTU could be named by either way, but an internal node by on the "intid" tag.
 
 =item --rotate-node 'inode_internal_id'
 
@@ -248,13 +263,25 @@ Creates a tree of only the specified leaves/nodes and their descendants. Specify
 
 Output tree with each possible pairs swapped (can't remember why this method was written, please ignore)
 
+=item --tips-to-root
+
+Print all tip distances to root
+
 =item --tree-shape
 
 Print a matrix of tree shapes (input file for R Package apTreeshape)
 
+=item --trim-tips 'num'
+
+Trim from tips, as oppose to cut-tree (from root)
+
 =item --walk, -w 'otu'
 
 Walks along the tree starting from the specified OTU and prints the total distance traveled while reaching each other OTU. Does not count any segment more than once. Useful when calculating evolutionary distance from a reference OTU.
+
+=item --walk-edge 'otu'
+
+Traverse tree starting from the specified OTU and prints the edges while reaching each other OTU. Does not count any edge more than once. Used for, e.g., transforming tree into network
 
 =back
 
@@ -308,12 +335,6 @@ Rocky Bernstein (testing & release)
 =item  *
 Yözen Hernández yzhernand at gmail dot com (initial design of implementation)
 
-=item *
-Pedro Pegan (developer)
-
-=item *
-Lia Di (developer, --mid-point)
-
 =item  *
 Weigang Qiu <weigang@genectr.hunter.cuny.edu> (maintainer)
 
@@ -339,10 +360,7 @@ Add documentation in POD in biotree
 =over 4
 
 =item *
-Bug: Bio::Tree reroot produces trees unreadable by R package "ape"
-
-=item *
-consistency index for DNA/protein alignments
+Place holder
 
 =back
 
@@ -351,7 +369,7 @@ consistency index for DNA/protein alignments
 =over 4
 
 =item *
-Hernandez, Bernstein, Qiu, et al (2017). "BpWrappers: Command-line utilities for manipulation of sequences, alignments, and phylogenetic trees based on BioPerl". (In prep).
+Hernandez, Bernstein, Pagan, Vargas, McCaig, Laracuente, Di, Vieira, and Qiu (2018). "BpWrapper: BioPerl-based sequence and tree utilities for rapid prototyping of bioinformatics pipelines". BMC Bioinformatics. 19:76. https://doi.org/10.1186/s12859-018-2074-9
 
 =item *
 Stajich et al (2002). "The BioPerl Toolkit: Perl Modules for the Life Sciences". Genome Research 12(10):1611-1618.

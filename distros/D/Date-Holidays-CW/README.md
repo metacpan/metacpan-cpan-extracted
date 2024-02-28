@@ -7,7 +7,7 @@ A [Date::Holidays](https://metacpan.org/pod/Date%3A%3AHolidays) family member fr
     use Date::Holidays::CW;
 
     if (my $thing = is_holiday(2020, 10, 2, lang => 'en')) {
-        print "It is $thing!", $/; # prints 'Day of the country Curacoa!'
+        print "It is $thing!", $/; # prints 'Day of the country Curaçao!'
     }
 
 # METHODS
@@ -44,5 +44,5 @@ Similar API to the other functions, returns an hashref for the year.
 
 # UTF-8
 
-Be aware that we return UTF-8 when Papiamento or Dutch is chosen. So make sure
-you set your enconding to UTF-8, otherwise you may see weird things.
+Be aware that we return UTF-8. Please set your enconding to UTF-8, otherwise
+you may see weird things.

@@ -9,7 +9,7 @@ BEGIN {
 	use_ok('Geo::Coder::Abbreviations');
 }
 
-BASICS: {
+ABBREVIATIONS: {
 	SKIP: {
 		skip('Online tests disabled', 20) unless(-e 't/online.enabled');
 		if(my $abbr = new_ok('Geo::Coder::Abbreviations')) {

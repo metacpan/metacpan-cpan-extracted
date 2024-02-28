@@ -39,6 +39,7 @@
       "test" : {
          "requires" : {
             "Test::Most" : "0",
+            "Test::Needs" : "0",
             "Test::NoWarnings" : "0"
          }
       }
@@ -57,6 +58,6 @@
          "x_repository" : "https://github.com/nigelhorne/Geo-Coder-Abbreviations"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -24,6 +24,9 @@ use base qw(LaTeXML::Common::Object);
 
 our $READLINE_PROGRESS_QUANTUM = 25;
 
+# NOTE: that the following methods are (potentially) polymorphic w/Mouty types; Use $self->method
+#  new, initialize, finish, hasMoreInput, getNextLine, getLocator, getSource, stringify
+
 # Factory method;
 # Create an appropriate Mouth
 # options are
@@ -60,7 +63,7 @@ sub new {
     at_letter      => ($options{at_letter}      ? 1 : 0),
     notes          => ($options{notes}          ? 1 : 0),
   }, $class;
-  $self->openString($string);
+  openString($self, $string);
   $self->initialize;
   return $self; }
 
@@ -147,11 +150,11 @@ sub getNextLine {
 
 sub hasMoreInput {
   my ($self) = @_;
-  return !$self->isEOL || scalar(@{ $$self{buffer} }); }
+  return !isEOL($self) || scalar(@{ $$self{buffer} }); }
 
-# Get the next character & it's catcode from the input,
+# Get the next character & it's catcode from the current line of input, even ignored chars
 # handling TeX's "^^" encoding.
-# Note that this is the only place where catcode lookup is done,
+# Note that this is the only place where catcode lookup is done (well almost),
 # and that it is somewhat `inlined'.
 sub getNextChar {
   my ($self) = @_;
@@ -211,7 +214,7 @@ sub handle_escape {    # Read control sequence
   # Bit I believe that he does NOT mean within control sequences
   my $cs = "\\" . $ch;    # I need this standardized to be able to lookup tokens (A better way???)
   if ((defined $cc) && ($cc == CC_LETTER)) {    # For letter, read more letters for csname.
-    while ((($ch, $cc) = getNextChar($self)) && $ch && ($cc == CC_LETTER)) {
+    while ((($ch, $cc) = getNextChar($self)) && (defined $ch) && ($cc == CC_LETTER)) {
       $cs .= $ch; }
     # We WILL skip spaces, but not till next token is read (in case catcode changes!!!!)
     $$self{skipping_spaces} = 1;
@@ -222,11 +225,9 @@ sub handle_EOL {
   my ($self) = @_;
   # Note that newines should be converted to space (with " " for content)
   # but it makes nicer XML with occasional \n. Hopefully, this is harmless?
-  my $token = ($$self{colno} == 1
-    ? T_CS('\par')
-    : ($STATE->lookupValue('PRESERVE_NEWLINES') ? Token("\n", CC_SPACE) : T_SPACE));
+  # Note also that \par special handling is done in readToken
   $$self{colno} = $$self{nchars};    # Ignore any remaining characters after EOL
-  return $token; }
+  return ($STATE->lookupValue('PRESERVE_NEWLINES') ? Token("\n", CC_SPACE) : T_SPACE); }
 
 sub handle_space {
   my ($self) = @_;
@@ -316,14 +317,18 @@ sub readToken {
 
       $$self{chars}  = splitChars($line);
       $$self{nchars} = scalar(@{ $$self{chars} });
-      # In state N, skip spaces
-      while (($$self{colno} < $$self{nchars})
-        # DIRECT ACCESS to $STATE's catcode table!!!
-        && (($$STATE{catcode}{ $$self{chars}[$$self{colno}] }[0] || CC_OTHER) == CC_SPACE)) {
-        $$self{colno}++; }
-      # If upcoming line is empty, and there is no recognizable EOL, fake one
-      return T_MARKER('EOL') if $read_mode
-        && ($$self{colno} >= $$self{nchars}) && ((!defined $eolch) || ($eolch ne "\r"));
+      # In state N, skip leading spaces & ignored, possibly decoding (trailing space removed above)
+      my ($ch, $cc);
+      while ((($ch, $cc) = getNextChar($self)) && (defined $ch)
+        && (($cc == CC_SPACE) || ($cc == CC_IGNORE))) { }
+      if ((defined $ch) && ($cc == CC_EOL)) {    # Eolch already? empty line!
+        $$self{colno} = $$self{nchars};          # ignore rest of line.
+        return T_CS('\par'); }
+      elsif (($$self{nchars} == 0) || ($$self{colno} > $$self{nchars})) {    # Past end of line?
+            # If upcoming line is empty, and there is no recognizable EOL, fake one
+        return T_MARKER('EOL') if $read_mode && ((!defined $eolch) || ($eolch ne "\r")); }
+      else {    # Back up over peeked char
+        $$self{colno}--; }
       # Sneak a comment out, every so often.
       if ((($$self{lineno} % $READLINE_PROGRESS_QUANTUM) == 0) && $STATE->lookupValue('INCLUDE_COMMENTS')) {
         return T_COMMENT("**** " . ($$self{shortsource} || 'String') . " Line $$self{lineno} ****"); }
@@ -342,7 +347,6 @@ sub readToken {
     my $token = (defined $cc ? $DISPATCH[$cc] : undef);
     $token = &$token($self, $ch) if ref $token eq 'CODE';
     return $token if defined $token;    # Else, repeat till we get something or run out.
-
   }
   return; }
 
@@ -353,7 +357,7 @@ sub readToken {
 sub readTokens {
   my ($self) = @_;
   my @tokens = ();
-  while (defined(my $token = $self->readToken())) {
+  while (defined(my $token = readToken($self))) {
     push(@tokens, $token); }
   while (@tokens && $tokens[-1]->getCatcode == CC_SPACE) {    # Remove trailing space
     pop(@tokens); }
@@ -388,20 +392,25 @@ sub readRawLine {
       $$self{colno}  = $$self{nchars}; } }
   return $line; }
 
+# Be Careful! This is used BOTH for flushing input for \endinput
+# and for detecting line end for \read
 sub isEOL {
   my ($self) = @_;
   my $savecolno = $$self{colno};
-  # We have to peek past any to-be-skipped spaces!!!!
-  if ($$self{skipping_spaces}) {
-    my ($ch, $cc);
-    while ((($ch, $cc) = getNextChar($self)) && (defined $ch) && ($cc == CC_SPACE)) { }
-    $$self{colno}-- if ($$self{colno} <= $$self{nchars}) && (defined $cc) && ($cc != CC_SPACE);
-    if ((defined $cc) && ($cc == CC_EOL)) {    # If we've got an EOL
-      getNextChar($self);
-      $$self{colno}-- if ($$self{colno} < $$self{nchars}); } }
+  # We have to peek past any ignored tokens & also spaces, if skipping
+  my $skipcc = ($$self{skipping_spaces} ? CC_SPACE : -1);
+  my ($ch, $cc);
+  while ((($ch, $cc) = getNextChar($self)) && (defined $ch)
+    && (($cc == $skipcc) || ($cc == CC_IGNORE))) { }
+  $$self{colno}-- if ($$self{colno} <= $$self{nchars}) && (defined $cc);    # Back-up if too far.
+      # If skipping spaces (really, reading for input (\endinput) ?), jump to end of EOL or comments
+  if ($$self{skipping_spaces} &&
+    (defined $cc) && (($cc == CC_EOL) || ($cc == CC_COMMENT))) {    # If we've got EOL|Comment
+    $$self{colno} = $$self{nchars}; }
   my $eol = $$self{colno} >= $$self{nchars};
   $$self{colno} = $savecolno;
   return $eol; }
+
 #======================================================================
 1;
 

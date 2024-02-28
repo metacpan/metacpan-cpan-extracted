@@ -94,7 +94,7 @@ sub run_bio_program($$$$;$)
 	# FIXME use a better diff test.
 	if ($OSNAME eq 'MSWin32') {
 	    # Windows doesn't do diff.
-	    diag("Got:\n", $output, "Need:\n", $right_string);
+	    Test::More::diag("Got:\n", $output, "Need:\n", $right_string);
 	} else {
 	    my $output = `diff -au $full_check_filename $got_filename 2>&1`;
 	    my $rc = $? >> 8;

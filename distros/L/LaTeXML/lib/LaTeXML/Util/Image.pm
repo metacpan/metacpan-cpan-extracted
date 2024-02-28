@@ -46,6 +46,11 @@ sub image_candidates {
   $path =~ s/^("+)(.+)\g1$/$2/;    # unwrap if in quotes
   my $searchpaths = $STATE->lookupValue('GRAPHICSPATHS');
   my @candidates  = pathname_findall($path, types => ['*'], paths => $searchpaths);
+  if (!@candidates) {
+    # if we have no candidates, also consult kpsewhich,
+    # e.g. for "example-image-a"
+    if (my $kpse_found = pathname_kpsewhich("$path.png", "$path.pdf")) {
+      @candidates = ($kpse_found); } }
   if (my $base = $STATE->lookupValue('SOURCEDIRECTORY')) {
     @candidates = map { pathname_relative($_, $base) } @candidates; }
   return ($path, @candidates); }
@@ -141,9 +146,9 @@ sub image_graphicx_parse {
     $aspect, $angle, $rotfirst, $mag, @bb, @vp,) = ('', '', '', 0, 0, 0, 0, '', 0, '', 1, 0);
   my @unknown = ();
   my @ignore  = @{ $options{ignore_options} || [] };
-  foreach (split(',', $transformstring || '')) {
+  foreach (split(/(?<!\\),/, $transformstring || '')) {
     if (/^\s*(\w+)(?:=\s*(.*))?\s*$/) {
-      $_ = $1; $v = $2 || '';
+      $_ = $1; $v = $2 || ''; $v =~ s/\\,/,/g;
       my $op = $_;
       if (grep { $op eq $_ } @ignore) { }                          # Ignore this option
       elsif (/^bb$/)                  { @bb                 = map { to_bp($_) } split(' ', $v); }
@@ -263,9 +268,10 @@ sub image_graphicx_sizer {
 # No need to necessarily read the image!
 
 # Check if the transform (parsed from above) is trivial
+# at most scaling; no rotations, reflectiosn or clipping.
 sub image_graphicx_is_trivial {
   my ($transform) = @_;
-  return !grep { !($_->[0] =~ /^scale/) } @$transform; }
+  return !grep { ($_->[0] =~ /^(?:rotate|reflect|trim|clip)$/) } @$transform; }
 
 # Make the transform (parsed from above) trivial
 # by removing any non-scaling operations!
@@ -273,7 +279,7 @@ sub image_graphicx_trivialize {
   my ($transform) = @_;
   return [grep { ($_->[0] =~ /^scale/) } @$transform]; }
 
-# sub trivial_scaling {
+# trivial_scaling: for transforms containing ONLY scale, scale-to
 sub image_graphicx_trivial {
   my ($source, $transform, %properties) = @_;
   my ($w, $h) = image_size($source);
@@ -292,7 +298,8 @@ sub image_graphicx_trivial {
 
 #======================================================================
 # Transform the image, returning (image,width,height);
-# sub complex_transform {
+# complex transform for transforms containing ONLY
+#   scale, scale-to, rotate, reflect, trim, clip.
 sub image_graphicx_complex {
   my ($source, $transform, %properties) = @_;
   my $dpi      = ($properties{DPI} || $DPI);
@@ -336,7 +343,7 @@ sub image_graphicx_complex {
   # Get some defaults from the read-in image.
   my ($imagedpi) = image_getvalue($image, 'x-resolution');
   # image_setvalue($image,debug=>'exception');
-  my ($bg) = image_getvalue($image, 'transparent-color');
+  my ($bg) = image_getvalue($image, 'mattecolor');
   $background = "rgba($bg)" if $bg;    # Use background from image, if any.
   my ($hasalpha) = image_getvalue($image, 'matte');
   Debug("Read $source to $w x $h") if $LaTeXML::DEBUG{images};
@@ -420,7 +427,7 @@ sub image_graphicx_complex {
   if (my $quality = $properties{quality}) {
     image_setvalue($image, quality => $properties{quality}) or return; }
 
-  if ($upsample != 1) {    # Now downsample
+  if ($properties{prescale} && ($upsample != 1)) {    # Now downsample IF actually upsampled!
     image_internalop($image, 'Scale', geometry => $w / $upsample . 'x' . $h / $upsample) or return;
     ($w, $h) = image_getvalue($image, 'width', 'height');
     Debug("  Downsampled to $w x $h") if $LaTeXML::DEBUG{images}; }

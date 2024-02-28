@@ -1,0 +1,27 @@
+---
+GnuCash:
+  file:    /home/pdurden/Documents/Personal/GnuCash/GnuCash-Dev/south_florida_jubilee_chorus.gnucash
+  format:  us
+  memo:    Monthly membership dues
+  account: Assets:Accounts Receivable
+
+MembershipTypes:
+  default:
+    name:    Regular Member
+    account: Income:Membership Dues
+    amount:  40.00
+  others:
+    - name:    Dual Member
+      account: Income:Membership Dues
+      match:   Dual
+      amount:  20.00
+    - name:    Youth Member
+      account: Income:Membership Dues
+      match:   Youth
+      amount:  20.00
+    - name:    Lifetime Member
+      account: Income:Membership Dues
+      match:   Lifetime
+      amount:  20.00
+
+

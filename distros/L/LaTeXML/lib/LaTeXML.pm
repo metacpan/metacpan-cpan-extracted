@@ -30,7 +30,7 @@ use LaTeXML::Util::ObjectDB;
 use LaTeXML::Post::Scan;
 use vars qw($VERSION);
 # This is the main version of LaTeXML being claimed.
-use version; our $VERSION = version->declare("0.8.7");
+use version; our $VERSION = version->declare("0.8.8");
 use LaTeXML::Version;
 # Derived, more informative version numbers
 our $FULLVERSION = "LaTeXML version $LaTeXML::VERSION"
@@ -278,6 +278,9 @@ sub convert {
           return $rescued; }); } }
   $$runtime{status}      = $latexml->getStatusMessage;
   $$runtime{status_code} = $latexml->getStatusCode;
+
+  $latexml->showProfile();    # Show profile (if any)
+
   # 2.2 Bookkeeping in case in-eval perl die() deaths occurred
   if ($eval_report) {
     $$runtime{status} .= "\n" . $eval_report . "\n";
@@ -503,8 +506,10 @@ sub convert_post {
           require LaTeXML::Post::MathML::Presentation;
           push(@mprocs, LaTeXML::Post::MathML::Presentation->new(
               linelength => $$opts{linelength},
-              (defined $$opts{plane1} ? (plane1     => $$opts{plane1}) : (plane1 => 1)),
-              ($$opts{hackplane1}     ? (hackplane1 => 1)              : ()),
+              (defined $$opts{plane1}         ? (plane1         => $$opts{plane1}) : (plane1 => 1)),
+              ($$opts{hackplane1}             ? (hackplane1     => 1)              : ()),
+              (defined $$opts{invisibletimes} ? (invisibletimes => $$opts{invisibletimes}) :
+                  (invisibletimes => 1)),
               %PostOPS)); }
         elsif ($fmt eq 'cmml') {
           require LaTeXML::Post::MathML::Content;
@@ -701,6 +706,7 @@ sub new_latexml {
 
   # TODO: Do again, need to do this in a GOOD way as well:
   $latexml->digestFile($_, noinitialize => 1) foreach (@str_pre);
+
   return $latexml;
 }
 

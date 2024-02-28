@@ -49,7 +49,7 @@ use SNMP::Info::Aggregate 'agg_ports_ifstack';
 
 our ($DEBUG, $VERSION, %MIBS, %FUNCS, %GLOBALS, %MUNGE);
 
-$VERSION = '3.95';
+$VERSION = '3.970001';
 
 %MIBS = (
   %SNMP::Info::IEEE802dot3ad::MIBS,
@@ -153,6 +153,8 @@ sub agg_ports_propvirtual {
   foreach my $idx ( keys %$ifStack ) {
       my ( $higher, $lower ) = split /\./, $idx;
       next if ( $higher == 0 or $lower == 0 );
+      next unless exists $ifType->{ $higher } and defined $ifType->{ $higher };
+
       if ( $ifType->{ $higher } eq 'propVirtual' ) {
 
           # lower needs also to be configured in pagpEthcOperationMode

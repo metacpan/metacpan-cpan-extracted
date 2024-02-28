@@ -2,11 +2,8 @@
 lib/Schedule/SGELK.pm
 Makefile.PL
 MANIFEST			This list of files
-README
 README.md
 README.more.md
-README.pod
-Schedule-SGELK-v1.5.tar.gz
 t/01.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

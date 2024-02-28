@@ -11,7 +11,7 @@ use DateTime::Duration;
 use Travel::Routing::DE::HAFAS::Utils;
 use Travel::Routing::DE::HAFAS::Connection::Section;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 Travel::Routing::DE::HAFAS::Connection->mk_ro_accessors(
 	qw(changes duration sched_dep rt_dep sched_arr rt_arr dep arr dep_platform arr_platform dep_loc arr_loc dep_cancelled arr_cancelled is_cancelled load)
@@ -160,6 +160,23 @@ sub sections {
 	return;
 }
 
+sub TO_JSON {
+	my ($self) = @_;
+
+	my $ret = { %{$self} };
+
+	for my $k ( keys %{$ret} ) {
+		if ( ref( $ret->{$k} ) eq 'DateTime' ) {
+			$ret->{$k} = $ret->{$k}->epoch;
+		}
+		if ( ref( $ret->{$k} ) eq 'DateTime::Duration' ) {
+			$ret->{$k} = [ $ret->{$k}->in_units( 'days', 'hours', 'minutes' ) ];
+		}
+	}
+
+	return $ret;
+}
+
 # }}}
 
 1;
@@ -181,7 +198,7 @@ Travel::Routing::DE::HAFAS::Connection - A single connection between two stops
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 DESCRIPTION
 

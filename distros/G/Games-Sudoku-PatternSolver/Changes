@@ -1,28 +1,36 @@
 
 Changes for Games::Sudoku::PatternSolver
 
-v0.06 
+v0.07 2024/02/27
+
+	Exchanged some exceptionally long lasting test puzzles in 03-games.t and added tests for solution counts.
+	Small syntax changes to reduce required perl from 5.10.0 to 5.06.0.
+	Changed the shebang in exe script from '/usr/bin/env perl' to just 'perl'. (Slaven Rezic)
+	Renamed sudogen.pl to sudogen to make it look command-like.
+	Examples for generator output usage (play, print) added to documentation.
+
+v0.06 2024/02/24
 
 	scripts/sudogen.pl added.
-	Move the PlayerIf into its own distribution Games::Sudoku::Html.
+	Moved the PlayerIf into its own distribution Games::Sudoku::Html.
 	Use known candidate positions in the solver's pattern pruning. (Making Solver and generator a tad faster.)
 	New Test ensures that advanced logic is not commented out.  
 
-v0.05 2024.01.12
+v0.05 2024/01/12
 
     Fixed a hard coded skip of advanced methods in CPLogic::apply_logic().
 
-v0.04 2024.01.12
+v0.04 2024/01/12
 
-    Fixed test 'solution equals seed grid' (01-generate.pl)
+    Fixed test 'solution equals seed grid' (01-generate.t)
       to allow puzzles with < 9 different clues. 
     Cut down on redundant tests in 03-games.t.
 
-v0.03 2024.01.11
+v0.03 2024/01/11
 
     Fixed inadvertent edit in PatterSolver::Generator 
 
-v0.02 2024.01.11
+v0.02 2024/01/11
 
     Dependencies corrected.
     Require perl 5.10.0.
@@ -30,7 +38,7 @@ v0.02 2024.01.11
     Set attribute endTime even without backtracking, if logic solved.
     POD updated to catch up with actual state.
 
-v0.01 2024.01.09
+v0.01 2024/01/09
 
     Releasing first version of Games::Sudoku::PatternSolver
 

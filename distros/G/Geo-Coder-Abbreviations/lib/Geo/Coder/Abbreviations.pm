@@ -11,12 +11,12 @@ Geo::Coder::Abbreviations - Quick and Dirty Interface to https://github.com/mapb
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
 our %abbreviations;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 # This is giving 404 errors at the moment
 #	https://github.com/mapbox/mapbox-java/issues/1460
@@ -45,7 +45,7 @@ sub new {
 	my $class = ref($proto) || $proto;
 
 	if(!defined($class)) {
-		# Using CGI::Info->new(), not CGI::Info::new()
+		# Using Geo::Coder::Abbreviations->new(), not Geo::Coder::Abbreviations::new()
 		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
 		# return;
 
@@ -122,6 +122,34 @@ sub abbreviate {
 	return $self->{'table'}->{uc(shift)};
 }
 
+=head2 normalize
+
+Normalize and abbreviate street names - useful for comparisons
+
+=cut
+
+sub normalize
+{
+	my $self = shift;
+        my $street = shift;
+
+        $street = uc($street);
+        if($street =~ /(.+)\s+(.+)\s+(.+)/) {
+                my $a;
+                if((lc($2) ne 'cross') && ($a = $self->abbreviate($2))) {
+                        $street = "$1 $a $3";
+                } elsif($a = $self->abbreviate($3)) {
+                        $street = "$1 $2 $a";
+                }
+        } elsif($street =~ /(.+)\s(.+)$/) {
+                if(my $a = $self->abbreviate($2)) {
+                        $street = "$1 $a";
+                }
+        }
+        $street =~ s/^0+//;     # Turn 04th St into 4th St
+        return $street;
+}
+
 =head1 SEE ALSO
 
 L<https://github.com/mapbox/geocoder-abbreviations>
@@ -161,7 +189,7 @@ L<http://search.cpan.org/dist/Geo-Coder-Abbreviations/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2020-2023 Nigel Horne.
+Copyright 2020-2024 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

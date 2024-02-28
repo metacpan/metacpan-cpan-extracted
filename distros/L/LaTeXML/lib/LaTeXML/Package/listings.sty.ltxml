@@ -123,8 +123,9 @@ DefMacro('\lstinputlisting OptionalKeyVals:LST Semiverbatim', sub {
     my $text = listingsReadRawFile($gullet, $file);
     $STATE->getStomach->bgroup;
     lstActivate($keyvals);
-    AssignValue('LST@toctitle', $file);    # so it shows up in list of..
-    return lstProcessDisplay($file, $text); });
+    my $name = lstGetTokens('name');
+    $name = $file if IsEmpty($name);
+    return lstProcessDisplay($name, $text); });
 
 NewCounter('lstlisting', 'document', idprefix => 'LST');
 DefMacro('\ext@lstlisting', 'lol');
@@ -159,30 +160,37 @@ sub lstProcessBlock {
   AssignValue('LISTINGS_DATA_' . $c   => $text, 'global');
   return (
     [@{ LookupValue('LISTINGS_PREAMBLE_BEFORE') },
-      Invocation(T_CS('\@@listings@block'), $c, lstProcess('block', $text))],
+      Invocation(T_CS('\@@listings@block'), $c, lstProcess('block', $text), $name)],
     [@{ LookupValue('LISTINGS_POSTAMBLE') },
       T_END]); }
 
+our %lstFilenameRPL = (
+  '_' => T_CS('\textunderscore'), '$' => T_CS('\textdollar'),
+  ## '-' => T_CS('\textendash')  # Probably unwise, since it ends up in dataname
+);
+
 sub lstProcessDisplay {
   my ($name, $text) = @_;
-  # Hmm.. should locally define \lstname to be either name or the file...
+  # reencode certain chars, so typewriter-like, but not typewriter font.
+  $name = Tokens(map { $lstFilenameRPL{ ToString($_) } || $_; } $name->unlist) if $name;
   my ($body, $trailer) = lstProcessBlock($name, $text);
+  AssignValue('LST@toctitle', $name);    # so it shows up in list of..
   my @body = @$body;
   # Figure out whether the display is numbered, or has a caption or titles.
   my @caption = ();
   my ($numbered, $labelled, $caption, $x);
-  if (($x = lstGetTokens('caption')) && scalar($x->unlist)) {
+  if (($x = lstGetTokens('caption')) && !IsEmpty($x)) {
     my @t  = $x->unlist;
     my @tc = ();
     if (Equals($t[0], T_OTHER('['))) {
       while (!Equals($t[0], T_OTHER(']'))) { push(@tc, shift(@t)); } }
     $numbered = 1;
     $caption  = Invocation(T_CS('\lstlisting@makecaption'), (@tc ? Tokens(@tc) : undef), Tokens(@t)); }
-  elsif (($x = lstGetTokens('title')) && scalar($x->unlist)) {
+  elsif (($x = lstGetTokens('title')) && !IsEmpty($x)) {
     $caption = Invocation(T_CS('\lstlisting@maketitle'), $x); }
-  elsif (($x = lstGetTokens('toctitle')) && scalar($x->unlist)) {
+  elsif (($x = lstGetTokens('toctitle')) && !IsEmpty($x)) {
     $caption = Invocation(T_CS('\lstlisting@maketoctitle'), $x); }
-  if (($x = lstGetTokens('label')) && scalar($x->unlist)) {
+  if (($x = lstGetTokens('label')) && !IsEmpty($x)) {
     $labelled = 1;
     unshift(@body, Invocation(T_CS('\label'), $x)); }
   if ($caption) {
@@ -200,7 +208,7 @@ sub lstProcessDisplay {
     ($numbered || $caption ? (T_CS('\par')) : ()),
     T_BEGIN,
     ($name ? (T_CS('\def'), T_CS('\lstname'), T_BEGIN, $name->unlist, T_END) : ()),
-    ($numbered
+    ($numbered || !IsEmpty($name)
       ? Invocation(T_CS('\@listings'), Tokens(@body))
       : ($caption
         ? Invocation(T_CS('\@@listings'), Tokens(@body))
@@ -247,8 +255,8 @@ DefConstructor('\@@listings {}',
   beforeDigest => sub { beforeFloat('lstlisting'); },
   afterDigest  => sub { afterFloat($_[1]); });
 
-DefConstructor('\@@listings@block {} {}',
-"<ltx:listing class='ltx_lstlisting' data='#data' datamimetype='#datamimetype' dataencoding='#dataencoding'>#2</ltx:listing>",
+DefConstructor('\@@listings@block {} {} {}',
+"<ltx:listing class='ltx_lstlisting' data='#data' datamimetype='#datamimetype' dataencoding='#dataencoding' dataname='#3'>#2</ltx:listing>",
   afterDigest => sub {
     my ($stomach, $whatsit) = @_;
     # Could have some options about encoding?
@@ -282,7 +290,7 @@ sub listingsReadRawString {
       if ($mathescape && ($token->getString eq '$')) {
         if ($inmath) { $inmath = 0; $STATE = $EMPTY_CATTABLE; }
         else         { $inmath = 1; $STATE = $SAVESTATE; } }
-      if ($inmath && $token->equals(T_BEGIN)) {
+      if ($inmath && ($token->getCatcode == CC_BEGIN)) {
         push(@tokens, T_BEGIN, $gullet->readBalanced->unlist, T_END); }
       elsif (!$inmath && ($token->getCatcode == CC_CS)) {    # Dumb down CS if already seen by Gullet
         my $name = $token->getString;
@@ -694,9 +702,9 @@ sub lstActivateLanguage {
   if ($language) {
     while (1) {
       # Construct the language$dialect that we're trying to find.
-      my $d = ($dialect && $dialect->unlist ? $dialect : LookupValue('LSTDD@' . $language));
+      my $d = (IsEmpty($dialect) ? LookupValue('LSTDD@' . $language) : $dialect);
       $name = 'LST@LANGUAGE@' . $language;
-      if ($d && $d->unlist) {
+      if (!IsEmpty($d)) {
         $d = uc(ToString($d)); $d =~ s/\s+//g;
         $name .= '$' . $d; }
       # language definition is loaded!
@@ -862,7 +870,7 @@ DefKeyVal('LST', 'numberstyle',      '');
 DefKeyVal('LST', 'numbersep',        'Dimension');
 DefKeyVal('LST', 'numberblanklines', '', 'true');
 DefKeyVal('LST', 'firstnumber',      '');
-DefKeyVal('LST', 'name',             '');
+DefKeyVal('LST', 'name',             'Semiverbatim');
 NewCounter('lstnumber');
 DefMacro('\thelstnumber', '\arabic{lstnumber}');
 
@@ -932,7 +940,7 @@ sub lstExtractColor {
   my ($stomach, $cmd) = @_;
   my $color;
   $stomach->bgroup;
-  if ($cmd->unlist) {
+  if (!IsEmpty($cmd)) {
     Digest($cmd);
     $color = LookupValue('font')->getColor; }
   $stomach->egroup;
@@ -1116,12 +1124,12 @@ use Data::Dumper;
 DefPrimitive('\@lstdefinelanguage []{}[]{} SkipSpaces RequiredKeyVals:LST []', sub {
     my ($stomach, $dialect, $language, $base_dialect, $base_language, $keyvals, $aspects) = @_;
     my @base = ();
-    if ($base_language->unlist) {
+    if (!IsEmpty($base_language)) {
       push(@base, T_OTHER('['), $base_dialect->unlist, T_OTHER(']')) if $base_dialect;
       push(@base, $base_language->unlist); }
     $language = uc(ToString($language)); $language =~ s/\s+//g;
     my $name = 'LST@LANGUAGE@' . $language;
-    if ($dialect && $dialect->unlist) {
+    if (!IsEmpty($dialect)) {
       $dialect = uc(ToString($dialect)); $dialect =~ s/\s+//g;
       $name .= '$' . $dialect; }
     $keyvals->setValue('language', Tokens(@base)) if @base;    # Probably don't need to clone, first?
@@ -1277,14 +1285,12 @@ sub lstProcess {
   local $LaTeXML::ESCAPE_RE = join('|', map { $$delimiters{$_}{open} }
       grep { $$delimiters{$_}{escape} } sort keys %$delimiters);
   local $LaTeXML::QUOTED_RE = "\\\\\\\\";    # start w/ backslashed backslash?
-  local $LaTeXML::SPACE     = (lstGetBoolean('showspaces') ? T_CS('\@lst@visible@space') : T_CS("~"));
-  local $LaTeXML::CASE_SENSITIVE = lstGetBoolean('sensitive');
-  # Don't these need \Q,\E?
-  #  local $LaTeXML::LITERATE_RE    = join('|', map { "\\Q" . $$_[0] . "\\E"; } @$literate);
-  local $LaTeXML::LITERATE_RE       = join('|', map { $$_[0]; } @$literate);
-  local $LaTeXML::LITERATE_INNER_RE = join('|', map { $$_[0]; } grep { !$$_[2]; } @$literate);
-  if (!$LaTeXML::CASE_SENSITIVE) {    # Clunky, inefficient, but until we know, we don't know
-    foreach my $word (keys %$words) {    # Modify in place (they'll get rebuilt if/when needed)
+  local $LaTeXML::SPACE     = (lstGetBoolean('showspaces') ? T_CS('\@lst@visible@space') : T_CS(" "));
+  local $LaTeXML::CASE_SENSITIVE    = lstGetBoolean('sensitive');
+  local $LaTeXML::LITERATE_RE       = join('|', map { quotemeta($$_[0]); } @$literate);
+  local $LaTeXML::LITERATE_INNER_RE = join('|', map { quotemeta($$_[0]); } grep { !$$_[2]; } @$literate);
+  if (!$LaTeXML::CASE_SENSITIVE) {           # Clunky, inefficient, but until we know, we don't know
+    foreach my $word (keys %$words) {        # Modify in place (they'll get rebuilt if/when needed)
       $$words{ uc($word) } = $$words{$word}; } }
 
 # === Start processing
@@ -1349,7 +1355,16 @@ sub lstProcess_internal {
   my $classes    = LookupValue('LST_CLASSES');
   my $literate   = LookupValue('LST_LITERATE');
   my $lit_re     = ($end_re ? $LaTeXML::LITERATE_INNER_RE : $LaTeXML::LITERATE_RE);
+  my $loop_guard = 'loop guard';
+
   while ($LaTeXML::listing ne '') {
+    if ($LaTeXML::listing eq $loop_guard) {
+      # we must make headway on every step, or we risk infinite loops
+      Error('listing', 'infinite_loop', undef,
+        "lstProcess_internal failed to execute correctly.", "content was: '$loop_guard'");
+      $LaTeXML::listing = '';
+      last; }
+    $loop_guard = $LaTeXML::listing;
     # Matched the ending regular expression? (typically a close delimiter)
     if ($end_re && $LaTeXML::listing =~ s/^($end_re)//s) {
       $LaTeXML::colnum += length($1);
@@ -1443,7 +1458,6 @@ sub lstProcess_internal {
     elsif ($LaTeXML::QUOTED_RE && $LaTeXML::listing =~ s/^($LaTeXML::QUOTED_RE)//) { # Something quoted.
           # Don't just past together, and watch for leading \ (a common quoter)
       lstProcessPush(map { ($_ eq '\\' ? T_CS('\textbackslash') : T_OTHER($_)) } split('', $1));
-
       $LaTeXML::colnum += length($1); }
     else {
       if ($LaTeXML::listing =~ s/^(.)//s) {    # Anything else, just pass through.
@@ -1459,8 +1473,9 @@ sub TokenizeBalanced {
   my @toks =
     my $level = 0;
   foreach my $t ($tokens->unlist) {
-    if    (T_BEGIN->equals($t)) { $level++; }
-    elsif (T_END->equals($t))   { $level--; } }
+    my $cc = $t->getCatcode;
+    if    ($cc == CC_BEGIN) { $level++; }
+    elsif ($cc == CC_END)   { $level--; } }
   if ($level != 0) {    # Probably doesn't work all the time, but let's try
     my @toks = $tokens->unlist;
     while ($level > 0) { push(@toks, T_END);      $level--; }
@@ -1526,6 +1541,8 @@ DefConstructor('\@lst@startline{}', "<ltx:listingline xml:id='#id'>#1",
 DefConstructor('\@lst@endline',      "</ltx:listingline>");
 DefConstructor('\@lst@linenumber{}', "<ltx:tags><ltx:tag>#1</ltx:tag></ltx:tags>");
 
+DefMacro('\lstnumbertyperefname', 'line');
+
 DefConstructor('\@lst@visible@space', "\x{2423}");
 
 sub lstDoNumber {
@@ -1534,8 +1551,7 @@ sub lstDoNumber {
       || ((($LaTeXML::linenum - 1) % lstGetNumber('stepnumber')) == 0))
     && (lstGetBoolean('numberblanklines') || !$isempty)) {
     AssignValue('LISTINGS_NEEDS_NUMBER' => 0);
-    return Invocation(T_CS('\@lst@linenumber'),
-      Tokens(T_BEGIN, lstGetTokens('numberstyle')->unlist, T_CS('\thelstnumber'), T_END)); }
+    return Invocation(T_CS('\lx@make@tags'), T_OTHER('lstnumber')); }
   else {
     return Invocation(T_CS('\@lst@linenumber'), Tokens()); } }
 

@@ -2,13 +2,11 @@
 
 =head1 NAME
 
-Games::Sudoku::PatternSolver - Solve, generate and play Sudoku 9x9 grids.
+Games::Sudoku::PatternSolver - Solve and generate Sudoku 9x9 puzzles.
 
 =head1 DESCRIPTION
 
 A Sudoku solver and generator. It works by application of the pattern overlay method (POM) in a backtracking process.
-
-Lists of generated puzzles may get exported to html and can be played in a browser.
 
 B<Note:> I<For this module the term 'pattern' refers to a 9x9 matrix, holding the final 9 positions of any single symbol.>
 
@@ -26,54 +24,55 @@ B<Note:> I<For this module the term 'pattern' refers to a 9x9 matrix, holding th
 
   $generator = get_sudoku_builder( $solution );
   $sudokuHash = &$generator();
-
-  use Games::Sudoku::PatternSolver::Html qw( sudoku_html_page );
-
-  @list = ( [$sudokuHash->{strPuzzle}, "<descriptive text with properties, rating, source, etc.>"], ... )
-  $htmlpage = sudoku_html_page( \@list )
+  print $sudokuHash->{strPuzzle}, "\n";
 
 =head1 MODULES AND UTILITIES
 
 =head2 PatternSolver
 
-L<Games::Sudoku::PatternSolver> can solve any standard 9x9 puzzle.
+Can solve any valid standard 9x9 puzzle.
 
-It is unique in that it tries to find a combination of 9 out of 46656 unique patterns in which a number may be placed on the grid. 
-And if a faulty puzzle has very many solutions the solver will find them all, given sufficient time and computer memory and $MAX_SOLUTIONS is false.
+It is notable in that it tries to find a combination of 9 out of 46656 unique patterns in which a number may be placed on the grid. 
+If a faulty puzzle has very many solutions and the $MAX_SOLUTIONS switch is false, the solver can find them all, 
+given sufficient time and computer memory.
 
 =head3 solve( <puzzle> )
 
 The input can be an 81-character string with zeroes or non-digits for empty cells, it can be 81 individual values, an arrayref with these or a 9x9 AoA.
 
-The return value is an unblessed hash reference, populated with properties of the puzzle and the results of the solving process.
+The return value is an unblessed hash reference, populated with properties of the puzzle and the results of the solving process:
 
 =over 3
 
-=item * strPuzzle, givensCount, uniqueGivens
+=item strPuzzle
+
+=item givensCount
+
+=item uniqueGivens
 
 Describing the puzzle.
 
-=item * seconds
+=item seconds
 
 Time needed for the entire solving process.
 
-=item * solutionCount
+=item solutionCount
 
 Normally == '1'. Is subject to $MAX_SOLUTIONS and the nature of the puzzle.
 
-=item * solutions
+=item solutions
 
 An arrayref with string representation of the one or more solutions.
 
-=item * logicSolved
+=item logicSolved
 
 Boolean, telling whether the limited power from L<PatternSolver::CPLogic|/"PatternSolver::CPLogic"> sufficed for completion.
 
-=item * logicFilled
+=item logicFilled
 
 Number of cells filled by naked/hidden singles.
 
-=item * candidatesDropped
+=item candidatesDropped
 
 Number of individual candidates dropped from any cells without a value yet.
 
@@ -154,6 +153,26 @@ It is amazing to see how many very different puzzles can be produced from a sing
 Absolutely random solution grids may be produced from a sub returned by C<get_grid_builder()>.
 A boolean parameter <shuffle> passed to this sub, determines if the first row in the grids produced will always be 1 .. 9. (But is not minlexed!)
 
+=head3 Play Sudoku
+
+With L<Games::Sudoku::Html> installed, the generated puzzles can get written to a single html page and selectively played in a web browser.
+
+  use Games::Sudoku::Html qw( sudoku_html_page );
+  @list = ( [$sudokuHash->{strPuzzle}, "<descriptive text with properties, rating, source, etc.>"], ... )
+  $htmlpage = sudoku_html_page( \@list )
+
+Or directly evoked from the command line:
+
+  sudogen -C50 -GE | sudoku2html -o my_50_easy_sudoku.html
+
+Generates one Page with 50 Sudoku of grade E(asy).
+
+=head3 Print Sudoku
+
+With Games::Sudoku::Pdf installed, the generated puzzles can be easily exported to pdf files:
+
+  sudogen -C50 -GE | sudoku2pdf -o my_50_easy_sudoku.pdf
+
 =head2 PatternSolver::Patterns
 
 Internal module to access the serialized patterns. 
@@ -163,13 +182,13 @@ The method C<init_patterns()> could be used to re-create the file with the 46656
 
 =over 3
 
-=item * L<examples/solve.pl>
+=item * examples/solve.pl
 
 Basic use of L<PatternSolver::solve()|/"solve-puzzle">.
 
-=item * L<examples/play.pl>
+=item * examples/play.pl
 
-Use of L<PatternSolver::Generator::get_sudoku_builder()|Games::Sudoku::PatternSolver::Generator/"get_sudoku_builder()"> to create Sudoku lists and how to export them to playable html pages.
+Use of L<get_sudoku_builder()|Games::Sudoku::PatternSolver::Generator/"get_sudoku_builder"> to create Sudoku lists and how to export them to playable html pages.
 
 =back
 

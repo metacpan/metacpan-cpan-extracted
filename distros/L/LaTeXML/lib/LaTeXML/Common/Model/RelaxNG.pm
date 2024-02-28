@@ -280,7 +280,7 @@ sub scanPattern_attribute {
   else {
     my $namenode = shift(@children);
     my @names    = $self->scanNameClass($namenode, 1, $ns);
-    return map { ['attribute', $_, $self->scanChildren($ns, @children)] } @names; } }
+    return (map { ['attribute', $_, $self->scanChildren($ns, @children)] } @names); } }
 
 sub scanChildren {
   my ($self, $ns, @children) = @_;
@@ -343,12 +343,12 @@ sub scanNameClass {
     my @exceptions = ();    # Check for exceptions!
     if (my @children = getElements($node)) {
       @exceptions = map { $self->scanNameClass($_, $forattr, $ns) } @children; }
-    return ('*:*', @exceptions); }
+    return filterNames('*', '*:*', @exceptions); }
   elsif ($relaxop eq 'rng:nsName') {
     my @exceptions = ();    # Check for exceptions!
     if (my @children = getElements($node)) {
       @exceptions = map { $self->scanNameClass($_, $forattr, $ns) } @children; }
-    return ($$self{model}->encodeQName($node->getAttribute('ns') || $ns, '*'), @exceptions); }
+    return filterNames($$self{model}->encodeQName($node->getAttribute('ns') // $ns, '*'), @exceptions); }
   elsif ($relaxop eq 'rng:choice') {
     my %names = ();
     foreach my $choice ($node->childNodes) {
@@ -364,6 +364,19 @@ sub scanNameClass {
     Fatal('misdefined', $op, undef,
 "Expected a RelaxNG name element (rng:name|rng:anyName|rng:nsName|rng:choice|rng:except), got '$op'");
     return; } }
+
+# collapse redundancies like having both *:* and !*:*
+sub filterNames {
+  my (@names) = @_;
+  my %include = ();
+  my %exclude = ();
+  foreach my $name (@names) {
+    if ($name =~ /^\!(.*)$/) { $exclude{$name} = $1; }
+    else                     { $include{$name} = $name; } }
+  foreach my $name (keys %exclude) {
+    if ($include{ $exclude{$name} }) {
+      delete $include{ $exclude{$name} }; delete $exclude{$name}; } }
+  return ((sort keys %include), (sort keys %exclude)); }    # Put exclusions last, for documentation
 
 #======================================================================
 # Simplify
@@ -456,16 +469,20 @@ sub simplify {
         $$self{elementreversedefs}{ $args[0][1] } = $qname;
         return @args; }
       else {
-        my $prev  = $$self{defs}{$qname};
-        my $prevc = $$self{def_combiner}{$qname};
-        my @xargs = grep { !eqOp($_, 'doc') } @args;    # Remove annotations
-        if ($prev) {                                    # Previoud definition?
+        my $prev     = $$self{defs}{$qname};
+        my $prevc    = $$self{def_combiner}{$qname};
+        my @xargs    = grep { !eqOp($_, 'doc') } @args;    # Remove annotations
+        my @prevargs = ();
+        if ($prev) {                                       # Previoud definition?
+          if ((ref $prev) && ($$prev[0] eq 'combination')) {
+            @prevargs = @$prev[2 .. $#{$prev}]; }
+          else {
+            @prevargs = ($prev); }
           if (($combination eq 'group') && ($prevc eq 'group')) {    # apparently RE-defining $qname?
             $prev = undef; }
           elsif (($combination eq 'group') && ($prevc ne 'group')) {    # Use old combination!?!?!?!?
             $combination = $prevc; } }
-        $$self{defs}{$qname} = simplifyCombination(['combination', $combination,
-            ($prev ? @$prev : ()), @xargs]);
+        $$self{defs}{$qname} = simplifyCombination(['combination', $combination, @prevargs, @xargs]);
         $$self{def_combiner}{$qname} = $combination;
         return ([$op, $qname, @args]); } }
     else {
@@ -501,7 +518,7 @@ sub simplifyCombination {
       @stuff = map { ((ref $_) && ($$_[0] eq 'combination') && ($$_[1] eq $op)
           ? @$_[2 .. $#$_] : ($_)) }
         @stuff; }
-    return [$c, $op, @stuff]; }
+    return (($op eq 'group') && (scalar(@stuff) == 1) ? $stuff[0] : [$c, $op, @stuff]); }
   else {
     return $combination; } }
 
@@ -526,8 +543,9 @@ sub showSchema {
 #======================================================================
 # The svg schema can only just barely be read in and recognized,
 # but it is structured in a way that makes a joke of our attempt at automatic documentation
-my $SKIP_SVG  = 1;    # [CONFIGURABLE?]
-my $SKIP_ARIA = 1;
+my $SKIP_SVG   = 1;    # [CONFIGURABLE?]
+my $SKIP_ARIA  = 1;
+my $SKIP_XHTML = 1;
 
 sub documentModules {
   my ($self) = @_;
@@ -549,10 +567,10 @@ sub documentModules {
 sub cleanTeX {
   my ($string) = @_;
   return '\typename{text}' if $string eq '#PCDATA';
+  $string =~ s/^urn:x-LaTeXML:RelaxNG://;    # Remove the urn part, if any
   $string =~ s/\#/\\#/g;
-  $string =~ s/<([^>]*)>/\\texttt{$1}/g;    # An apparent convention <sometext> == ttfont?
+  $string =~ s/<([^>]*)>/\\texttt{$1}/g;     # An apparent convention <sometext> == ttfont?
   $string =~ s/_/\\_/g;
-  $string =~ s/\*/any/g;                    # ????
   return $string; }
 
 sub cleanTeXName {
@@ -589,10 +607,18 @@ sub toTeX {
       my $content = join(' ', map { $self->toTeX($_) } @spec);
       return "\\item[\\textit{Start}]\\textbf{==}\\ $content" . ($docs ? " \\par$docs" : ''); }
     elsif ($op eq 'grammar') {    # Don't otherwise mention it?
-      return join("\n", map { $self->toTeX($_) } @data); }
+      my (@mods, @rest);          # Collapse any iniitial module inclusions for brevity
+      foreach my $datum (@data) {
+        if ((ref $datum eq 'ARRAY') && ($$datum[0] eq 'module')) {
+          push(@mods, $$datum[1]); }
+        else { push(@rest, $datum); } }
+      return join("\n",
+        (@mods
+          ? '\item[\textit{Included}]' . join(', ', map { '\moduleref{' . cleanTeX($_) . '}'; } @mods)
+          : ()),
+        map { $self->toTeX($_) } @rest); }
     elsif ($op eq 'module') {
-      $name =~ s/^urn:x-LaTeXML:RelaxNG://;    # Remove the urn part.
-      if (($name =~ /^svg/) && $SKIP_SVG) {
+      if (($name =~ /:svg:/) && $SKIP_SVG) {
         return '\item[\textit{Module }' . cleanTeX($name) . '] included.'; }
       else {
         return '\item[\textit{Module }\moduleref{' . cleanTeX($name) . '}] included.'; } }
@@ -606,37 +632,41 @@ sub toTeX_ref {
   my ($self, $op, $name) = @_;
   if (my $el = $$self{elementdefs}{$name}) {
     $el = cleanTeXName($el);
-    return "\\elementref{$el}"; }
+    return ($SKIP_XHTML && ($el eq 'xhtml:*') ? '\texttt{xhtml:*}' : "\\elementref{$el}"); }
+  elsif ($name =~ /_(?:attributes|model)$/) {
+    return $self->toTeX($$self{defs}{$name}); }
   else {
     $name =~ s/^\w+://;    # Strip off qualifier!!!! (watch for clash in docs?)
-    return "\\patternref{" . cleanTeX($name) . "}"; } }
+    return ($SKIP_SVG && ($name eq 'svg') ? '\texttt{svg:svg}'
+      : "\\patternref{" . cleanTeX($name) . "}"); } }
 
 sub toTeX_def {
   my ($self, $combiner, $name, @data) = @_;
   my $qname = $name;
   return "" if ($name =~ /\baria\b/) && $SKIP_ARIA;
+  return "" if $name =~ /_(?:attributes|model)$/;
   $name =~ s/^\w+://;    # Strip off qualifier!!!! (watch for clash in docs?)
+  return "" if $SKIP_SVG && ($name =~ /^svg/);
   $name = cleanTeX($name);
   my ($docs, @spec)    = $self->toTeXExtractDocs(@data);
   my ($attr, $content) = $self->toTeXBody(@spec);
+
   if ($combiner) {
     my $body = $attr;
     $body .= '\item[' . ($combiner eq 'choice' ? '\textbar=' : '\&=') . '] ' . $content if $content;
     $$self{defined_patterns}{$name} = -1 unless defined $$self{defined_patterns}{$name};
     return "\\patternadd{$name}{$docs}{$body}\n"; }
-  #      elsif((scalar(@data)==1) && (ref $data[0] eq 'ARRAY') && ($data[0][0] eq 'grammar')){
   else {
     $attr    = '\item[\textit{Attributes:}] \textit{empty}' if !$attr    && ($name =~ /\\_attributes/);
     $content = '\textit{empty}'                             if !$content && ($name =~ /\\_model/);
     my $body = $attr;
     $body .= '\item[\textit{Content}:] ' . $content if $content;
-    my ($xattr, $xcontent) = $self->toTeXBody($$self{defs}{$qname});
-    $body .= '\item[\textit{Expansion}:] ' . $xcontent
-      if !$attr && !$xattr && $xcontent && ($xcontent ne $content);
-    if ($name !~ /_(?:attributes|model)$/) { # Skip the "used by" if element-specific attributes or moel.
-
-      if (my $uses = $self->getSymbolUses($qname)) {
-        $body .= '\item[\textit{Used by}:] ' . $uses; } }
+    if (!$attr && $self->toTeX_isContent($$self{defs}{$qname})) {
+      my ($xattr, $xcontent) = $self->toTeXBody($$self{defs}{$qname});
+      $body .= '\item[\textit{Expansion}:] ' . $xcontent
+        if !$xattr && $xcontent && ($xcontent ne $content); }
+    if (my $uses = $self->getSymbolUses($qname)) {
+      $body .= '\item[\textit{Used by}:] ' . $uses; }
     if ((defined $$self{defined_patterns}{$name}) && ($$self{defined_patterns}{$name} > 0)) { # Already been defined???
       return ''; }
     else {
@@ -647,13 +677,12 @@ sub toTeX_element {
   my ($self, $name, @data) = @_;
   my $qname = $name;
   $name =~ s/^ltx://;
+  return "" if $SKIP_XHTML && ($name eq 'xhtml:*');
   $name = cleanTeXName($name);
   my ($docs, @spec)    = $self->toTeXExtractDocs(@data);
   my ($attr, $content) = $self->toTeXBody(@spec);
   $content = "\\typename{empty}" unless $content;
   # Shorten display for element-specific attributes & model, ASSUMING they immediately folllow!
-  $attr    = '' if $attr eq '\item[\textit{Attributes}:] \patternref{' . $name . '\\_attributes}';
-  $content = '' if $content eq '\patternref{' . $name . '\\_model}';
   my $body = $attr;
   $body .= '\item[\textit{Content}:] ' . $content if $content;
   if (my $ename = $$self{elementreversedefs}{$qname}) {
@@ -666,12 +695,15 @@ sub toTeX_attribute {
   $name = cleanTeXName($name);
   my ($docs, @spec) = $self->toTeXExtractDocs(@data);
   my $content = join(' ', map { $self->toTeX($_) } @spec) || '\typename{text}';
+  if ($name =~ /^!(.*)/) {    # Excluded attribute?
+    return "\\item[\\textit{Exluding attribute }]\\texttt{$1}"; }
   return "\\attrdef{$name}{$docs}{$content}"; }
 
 sub toTeX_combination {
   my ($self, $name, @data) = @_;
   if ($name eq 'group') {
-    return "(" . join(', ', map { $self->toTeX($_) } @data) . ")"; }
+    return (scalar(@data) == 1 ? $self->toTeX($data[0])
+      : "(" . join(', ', map { $self->toTeX($_) } @data) . ")"); }
   elsif ($name eq 'interleave') {
     return "(" . join(' ~\&~ ', map { $self->toTeX($_) } @data) . ")"; }    # ?
   elsif ($name eq 'choice') {
@@ -680,11 +712,11 @@ sub toTeX_combination {
     if ((@data == 1) && eqOp($data[0], 'attribute')) {
       return $self->toTeX($data[0]); }
     else {
-      return $self->toTeX($data[0]) . "?"; } }
+      return $self->toTeX($data[0]) . '\textsuperscript{?}'; } }
   elsif ($name eq 'zeroOrMore') {
-    return $self->toTeX($data[0]) . "*"; }
+    return $self->toTeX($data[0]) . '\textsuperscript{*}'; }
   elsif ($name eq 'oneOrMore') {
-    return $self->toTeX($data[0]) . "+"; }
+    return $self->toTeX($data[0]) . '\textsuperscript{*}'; }
   elsif ($name eq 'list') {
     return "(" . join(', ', map { $self->toTeX($_) } @data) . ")"; }    # ?
   else {
@@ -695,9 +727,9 @@ sub getSymbolUses {
   my ($self, $qname) = @_;
   if (my $uses = $$self{usesname}{$qname}) {
     my @uses = sort keys %$uses;
-    @uses = grep { !/\bSVG./ } @uses if $SKIP_SVG;                      # !!!
+    @uses = grep { !/\bSVG./ } @uses if $SKIP_SVG;                                               # !!!
+    @uses = map  { (/pattern:[^:]*:(.*?)_(?:attributes|model)$/ ? "element:$1" : $_); } @uses;
     return join(', ',
-      (map { /^pattern:[^:]*:(.*)$/ ? ('\patternref{' . cleanTeX($1) . '}')     : () } @uses),
       (map { /^pattern:[^:]*:(.*)$/ ? ('\patternref{' . cleanTeX($1) . '}')     : () } @uses),
       (map { /^element:(.*)$/       ? ('\elementref{' . cleanTeXName($1) . '}') : () } @uses)); }
   else {
@@ -715,37 +747,55 @@ sub toTeXExtractDocs {
       push(@rest, $item); } }
   return ($docs, @rest); }
 
-# Format the attributes & content model of a named pattern or element.
+# Partition & format the attributes & content model of a named pattern or element.
 # This generates a sequence of \item's to be put in a definition list.
 sub toTeXBody {
   my ($self, @data) = @_;
-  my (@attributes, @content, @patterns);
+  my (@attributes, @content, @attrpatterns);
   while (my $item = shift(@data)) {
     if (ref $item eq 'ARRAY') {
       my ($op, $name, @args) = @$item;
-      # NOTE: W/o the simplification of optional(attribute), above,
-      # we've got to do some extra work here!
       if ($op eq 'attribute') {
         push(@attributes, $self->toTeX($item)); }
-      elsif (($op eq 'combination') && ($name eq 'optional')
-        && (@args == 1) && eqOp($args[0], 'attribute')) {
-        unshift(@data, $args[0]); }
-      # Note dubious assumption about naming convention!
+      elsif (($op eq 'combination') && $self->toTeX_isAttributes($item)) {
+        unshift(@data, @args); }
+      # Directly include <element>_attributes or _model values
+      elsif (($op eq 'ref') && ($name =~ /_(?:attributes|model)$/)) {
+        unshift(@data, $$self{defs}{$name}); }
       elsif (($op eq 'ref') && ($name =~ /[^a-zA-Z]attributes$/)) {
-        push(@patterns, $self->toTeX($item)); }
+        push(@attrpatterns, $self->toTeX($item)); }
       else {
         push(@content, $self->toTeX($item)); } }
     else {
       push(@content, $self->toTeX($item)); } }
   return
-    (join('', (@patterns
-        ? '\item[\textit{'
-          . ((grep { $_ !~ /[^a-zA-Z]attributes\}*?$/ } @patterns) ? 'Includes' : 'Attributes')
-          . '}:] '
-          . join(', ', @patterns)
-        : ''),
+    (join('', (@attrpatterns ? '\item[\textit{Attributes}:] ' . join(', ', @attrpatterns) : ''),
       @attributes),
     join(', ', @content)); }
+
+sub toTeX_isAttributes {
+  my ($self, $item) = @_;
+  if (ref $item eq 'ARRAY') {
+    my ($op, $name, @args) = @$item;
+    if    ($op eq 'attribute') { return 1; }
+    elsif ($op eq 'ref') {
+      return $self->toTeX_isAttributes($$self{defs}{$name}); }
+    elsif (($op eq 'combination') && ($name =~ /^(?:optional|choice|group|zeroOrMore|oneOrMore)$/)) {
+      return !grep { !$self->toTeX_isAttributes($_); } @args; } }
+  return 0; }
+
+sub toTeX_isContent {
+  my ($self, $item) = @_;
+  if (ref $item eq 'ARRAY') {
+    my ($op, $name, @args) = @$item;
+    if    ($op eq 'element') { return 1; }
+    elsif ($op eq 'grammar') { return 1; }
+    #    elsif (($op eq 'ref') && ($name =~ /[^a-zA-Z](?:model|class)$/)) { return 1; }
+    elsif ($op eq 'ref') {
+      return $$self{elementdefs}{$name} || $self->toTeX_isContent($$self{defs}{$name}); }
+    elsif (($op eq 'combination') && ($name =~ /^(?:optional|choice|group|zeroOrMore|oneOrMore)$/)) {
+      return !grep { !$self->toTeX_isContent($_); } @args; } }
+  return ($item && ($item eq '#PCDATA')); }
 
 #======================================================================
 1;

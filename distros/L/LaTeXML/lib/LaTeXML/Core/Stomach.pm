@@ -28,7 +28,7 @@ use LaTeXML::Common::Font;
 use LaTeXML::Common::Color;
 use LaTeXML::Core::Definition;
 use Scalar::Util qw(blessed);
-use base qw(LaTeXML::Common::Object);
+use base         qw(LaTeXML::Common::Object);
 
 #**********************************************************************
 sub new {
@@ -89,14 +89,14 @@ sub getScriptLevel {
 sub digestNextBody {
   my ($self, $terminal) = @_;
   no warnings 'recursion';
-  my $startloc  = $self->getLocator;
+  my $startloc  = getLocator($self);
   my $initdepth = scalar(@{ $$self{boxing} });
   my $token;
   local @LaTeXML::LIST = ();
   my $alignment = $STATE->lookupValue('Alignment');
   my @aug       = ();
 
-  while (defined($token = $$self{gullet}->readXToken(1, 1))) {    # Done if we run out of tokens
+  while (defined($token = $$self{gullet}->getPendingComment || $$self{gullet}->readXToken(1))) {
     if ($alignment && scalar(@LaTeXML::LIST) && (Equals($token, T_ALIGN) ||
         Equals($token, T_CS('\cr')) || Equals($token, T_CS('\hidden@cr')) ||
         Equals($token, T_CS('\hidden@crcr')))) {
@@ -104,7 +104,7 @@ sub digestNextBody {
       # So if we already have some digested boxes available, return them here.
       $$self{gullet}->unread($token);
       return @LaTeXML::LIST; }
-    my @r = $self->invokeToken($token);
+    my @r = invokeToken($self, $token);
     push(@LaTeXML::LIST, @r);
     push(@aug, $token, @r);
     last if $terminal and Equals($token, $terminal);
@@ -127,13 +127,14 @@ sub digest {
     $$self{gullet}->readingFromMouth(LaTeXML::Core::Mouth->new(), sub {
       my ($gullet) = @_;
       $gullet->unread($tokens);
-      $STATE->clearPrefixes;                                             # prefixes shouldn't apply here.
+      $STATE->clearPrefixes;    # prefixes shouldn't apply here.
       my $ismath    = $STATE->lookupValue('IN_MATH');
       my $initdepth = scalar(@{ $$self{boxing} });
       local @LaTeXML::LIST = ();
-      while (defined(my $token = $$self{gullet}->readXToken(1, 1))) {    # Done if we run out of tokens
-        push(@LaTeXML::LIST, $self->invokeToken($token));
-        last if $initdepth > scalar(@{ $$self{boxing} }); }              # if we've closed the initial mode.
+      while (defined(my $token =
+            $$self{gullet}->getPendingComment || $$self{gullet}->readXToken(1))) {
+        push(@LaTeXML::LIST, invokeToken($self, $token));
+        last if $initdepth > scalar(@{ $$self{boxing} }); }    # if we've closed the initial mode.
       List(@LaTeXML::LIST, mode => ($ismath ? 'math' : 'text'));
     }); }
 
@@ -167,13 +168,13 @@ INVOKE:
   my $meaning = $STATE->lookupDigestableDefinition($token);
 
   if (!$meaning) {
-    @result = $self->invokeToken_undefined($token); }
+    @result = invokeToken_undefined($self, $token); }
   elsif ($meaning->isaToken) {    # Common case
     my $cc = $meaning->getCatcode;
     if ($cc == CC_CS) {
-      @result = $self->invokeToken_undefined($token); }
+      @result = invokeToken_undefined($self, $token); }
     elsif ($CATCODE_ABSORBABLE[$cc]) {
-      @result = $self->invokeToken_simple($token, $meaning); }
+      @result = invokeToken_simple($self, $token, $meaning); }
     else {
       # Special error guard for the align char "&":
       # Locally deactivate to avoid a flurry of errors in the same table.
@@ -184,7 +185,7 @@ INVOKE:
         if Equals($token, T_ALIGN);
       Error('misdefined', $token, $self,
         "The token " . Stringify($token) . " should never reach Stomach!");
-      @result = $self->invokeToken_simple($token, $meaning); } }
+      @result = invokeToken_simple($self, $token, $meaning); } }
   # A math-active character will (typically) be a macro,
   # but it isn't expanded in the gullet, but later when digesting, in math mode (? I think)
   elsif ($meaning->isExpandable) {
@@ -220,19 +221,19 @@ sub makeMisdefinedError {
 sub invokeToken_undefined {
   my ($self, $token) = @_;
   $STATE->generateErrorStub($self, $token);
-  $self->getGullet->unread($token);    # Retry
+  $$self{gullet}->unread($token);    # Retry
   return; }
 
 sub invokeToken_simple {
   my ($self, $token, $meaning) = @_;
   my $cc   = $meaning->getCatcode;
   my $font = $STATE->lookupValue('font');
-  $STATE->clearPrefixes;               # prefixes shouldn't apply here.
   if ($cc == CC_SPACE) {
+    $STATE->clearPrefixes;                   # prefixes shouldn't apply here.
     if ($STATE->lookupValue('IN_MATH')) {    # (but in Preamble, OK ?)
       return (); }
     else {
-      return Box($meaning->toString, $font, $self->getGullet->getLocator, $meaning); } }
+      return Box($meaning->toString, $font, $$self{gullet}->getLocator, $meaning); } }
   elsif ($cc == CC_COMMENT) {                # Note: Comments need char decoding as well!
     my $comment = LaTeXML::Package::FontDecodeString($meaning->toString, undef, 1);
     # However, spaces normally would have be digested away as positioning...
@@ -240,6 +241,7 @@ sub invokeToken_simple {
     $comment =~ s/\Q$badspace\E/ /g;
     return LaTeXML::Core::Comment->new($comment); }
   else {
+    $STATE->clearPrefixes;                          # prefixes shouldn't apply here.
     return Box(LaTeXML::Package::FontDecodeString($meaning->toString, undef, 1),
       undef, undef, $meaning); } }
 
@@ -267,7 +269,7 @@ sub pushStackFrame {
   $STATE->assignValue(afterAssignment       => undef,                   'local');  # ALWAYS bind this!
   $STATE->assignValue(groupNonBoxing        => $nobox,                  'local');  # ALWAYS bind this!
   $STATE->assignValue(groupInitiator        => $LaTeXML::CURRENT_TOKEN, 'local');
-  $STATE->assignValue(groupInitiatorLocator => $self->getLocator,       'local');
+  $STATE->assignValue(groupInitiatorLocator => getLocator($self),       'local');
   push(@{ $$self{boxing} }, $LaTeXML::CURRENT_TOKEN) unless $nobox;    # For begingroup/endgroup
   return; }
 
@@ -310,11 +312,6 @@ sub currentFrameMessage {
 sub bgroup {
   my ($self) = @_;
   pushStackFrame($self, 0);
-  # NOTE: This is WRONG; should really only track "scanned" (not digested) braces
-  # Alas, there're too many code structuring differences between TeX and LaTeXML
-  # to find all the places to manage it.
-  # So, let's try this for now...
-  $LaTeXML::ALIGN_STATE++;
   return; }
 
 sub egroup {
@@ -322,10 +319,9 @@ sub egroup {
   if (    ##$STATE->isValueBound('MODE', 0) ||    # Last stack frame was a mode switch!?!?!
     $STATE->lookupValue('groupNonBoxing')) {    # or group was opened with \begingroup
     Error('unexpected', $LaTeXML::CURRENT_TOKEN, $self, "Attempt to close boxing group",
-      $self->currentFrameMessage); }
+      currentFrameMessage($self)); }
   else {                                        # Don't pop if there's an error; maybe we'll recover?
     popStackFrame($self, 0); }
-  $LaTeXML::ALIGN_STATE--;
   return; }
 
 sub begingroup {
@@ -338,7 +334,7 @@ sub endgroup {
   if (    ##$STATE->isValueBound('MODE', 0) ||    # Last stack frame was a mode switch!?!?!
     !$STATE->lookupValue('groupNonBoxing')) {    # or group was opened with \bgroup
     Error('unexpected', $LaTeXML::CURRENT_TOKEN, $self, "Attempt to close non-boxing group",
-      $self->currentFrameMessage); }
+      currentFrameMessage($self)); }
   else {                                         # Don't pop if there's an error; maybe we'll recover?
     popStackFrame($self, 1); }
   return; }
@@ -377,8 +373,8 @@ sub setMode {
 
 sub beginMode {
   my ($self, $mode) = @_;
-  $self->pushStackFrame;    # Effectively bgroup
-  $self->setMode($mode);
+  pushStackFrame($self);    # Effectively bgroup
+  setMode($self, $mode);
   return; }
 
 sub endMode {
@@ -386,9 +382,9 @@ sub endMode {
   if ((!$STATE->isValueBound('MODE', 0))    # Last stack frame was NOT a mode switch!?!?!
     || ($STATE->lookupValue('MODE') ne $mode)) {    # Or was a mode switch to a different mode
     Error('unexpected', $LaTeXML::CURRENT_TOKEN, $self, "Attempt to end mode $mode",
-      $self->currentFrameMessage); }
+      currentFrameMessage($self)); }
   else {    # Don't pop if there's an error; maybe we'll recover?
-    $self->popStackFrame; }    # Effectively egroup.
+    popStackFrame($self); }    # Effectively egroup.
   return; }
 
 #**********************************************************************

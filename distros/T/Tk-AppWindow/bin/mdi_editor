@@ -1,0 +1,153 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Tk;
+
+#########################################
+# First define the content manager. a content manager handles the basic tasks like loading, saving, 
+# displaying and modifying files. The content manager does the actual work.
+
+package TextManager;
+
+use base qw(Tk::Derived Tk::AppWindow::BaseClasses::ContentManager);
+Construct Tk::Widget 'TextManager';
+require Tk::TextUndo;
+
+sub Populate {
+	my ($self,$args) = @_;
+	
+	$self->SUPER::Populate($args);
+	my $text = $self->Scrolled('TextUndo',
+		-scrollbars => 'ose',
+	)->pack(-expand => 1, -fill => 'both');
+	$self->CWidg($text);
+	$text->bind('<Control-a>', [$text, 'selectAll']);
+	$text->bind('<Control-Z>', [$text, 'redo']);
+
+	$self->ConfigSpecs(
+		-contentbackground => [{-background => $text}],
+		-contentforeground => [{-foreground => $text}],
+		-contentfont => [{-font => $text}],
+		-contenttabs => [{-tabs => $text}],
+		-contentwrap => [{-wrap => $text}],
+		-background => ['SELF', 'DESCENDANTS'],
+		DEFAULT => [$text],
+	);
+}
+
+sub ConfigureCM {
+	my $self = shift;
+	my $plug = $self->Extension;
+	my $cmopt = $plug->configGet('-contentmanageroptions');
+	for (@$cmopt) {
+		my $val = $plug->configGet($_);
+		if ((defined $val) and ($val ne '')) {
+# 			$val = [$val] if $_ eq '-contenttabs';
+			$self->configure($_, $val) ;
+		}
+	}
+}
+
+
+sub doClear {
+	my $self = shift;
+	my $t = $self->CWidg;
+	$t->delete('0.0', 'end');
+	$t->editReset;
+}
+
+sub doLoad {
+	my ($self, $file) = @_;
+	my $t = $self->CWidg;
+	$t->Load($file);
+	$t->editModified(0);
+	return 1
+}
+
+sub doSave {
+	my ($self, $file) = @_;
+	my $t = $self->CWidg;
+	$t->Save($file);
+	$t->editModified(0);
+	return 1
+}
+
+sub doSelect {
+	$_[0]->CWidg->focus
+}
+
+sub IsModified {
+	my $self = shift;
+	return $self->CWidg->editModified;	
+}
+
+
+########################################
+# Let the show begin
+
+package main;
+
+require Tk::AppWindow;
+
+my $se = Tk::AppWindow->new(
+# 	-appname => 'Sed',
+	-contentmanagerclass => 'TextManager',
+	-contentmanageroptions => ['-contentbackground', '-contentfont', '-contentforeground', '-contenttabs', '-contentwrap'],
+# 	-contentmanageroptions => ['-contentbackground', '-contentfont', '-contentforeground', '-contentwrap'],
+	-mainmenuitems => [
+#This table is best viewed with tabsize 3.
+#			 type					menupath			label						cmd						icon					keyb			config variable
+ 		[	'menu', 				'View',			"~Edit" 	], 
+		[	'menu_normal',		'Edit::',		"~Copy",					'<Control-c>',				'edit-copy',		'*CTRL+C'			], 
+		[	'menu_normal',		'Edit::',		"C~ut",					'<Control-x>'	,			'edit-cut',			'*CTRL+X'			], 
+		[	'menu_normal',		'Edit::',		"~Paste",				'<Control-v>'	,			'edit-paste',		'*CTRL+V'			], 
+ 		[	'menu_separator',	'Edit::', 		'e1' ], 
+		[	'menu_normal',		'Edit::',		"U~ndo",					'<Control-z>'	,			'edit-undo',		'*CTRL+Z'			], 
+		[	'menu_normal',		'Edit::',		"~Redo",					'<Control-Z>'	,			'edit-redo',		'*CTRL+SHIFT+Z'	], 
+		[	'menu_separator',	'Edit::', 		'e2' ], 
+		[	'menu_normal',		'Edit::',		"~Select all",			'<Control-a>',				'edit-select-all','*CTRL+A'			], 
+	],
+	-extensions => [qw[Art Balloon MDI ToolBar StatusBar MenuBar Navigator Help Settings]],
+	-toolitems => [
+#			 type					label			cmd					icon					help		
+		[	'tool_separator' ],
+		[	'tool_button',		'Copy',		'<Control-c>',		'edit-copy',		'Copy selected text to clipboard'], 
+		[	'tool_button',		'Cut',		'<Control-x>',		'edit-cut',			'Move selected text to clipboard'], 
+		[	'tool_button',		'Paste',		'<Control-v>',		'edit-paste',		'Paste clipboard content into document'], 
+		[	'tool_separator' ],
+		[	'tool_button',		'Undo',		'<Control-z>',		'edit-undo',		'Undo last action'], 
+		[	'tool_button',		'Redo',		'<Control-Z>',		'edit-redo',		'Cancel undo'], 
+	],
+	-useroptions => [
+		'*page' => 'Editing',
+		'*section' => 'User interface',
+		-contentforeground => ['color', 'Foreground'],
+		-contentbackground => ['color', 'Background'],
+		-contentfont => ['font', 'Font'],
+		'*end',
+		'*section' => 'Editor settings',
+		-contenttabs => ['text', 'Tab size'],
+		-contentwrap => ['radio', 'Wrap', -values => [qw[none char word]]],
+		'*end',
+# 		'*page' => 'Icons',
+# 		-icontheme => ['list', 'Icon theme', 'available_icon_themes'],
+# 		-iconsize => ['list', 'Icon size', 'available_icon_sizes'],
+		'*page' => 'Bars',
+# 		'*section' => 'Menubar',
+# 		-menuiconsize => ['list', 'Icon size', 'available_icon_sizes'],
+# 		'*end',
+		'*section' => 'Toolbar',
+		-toolbarvisible => ['boolean', 'Visible at launch'],
+# 		-tooliconsize => ['list', 'Icon size', 'available_icon_sizes'],
+		-tooltextposition => ['radio', 'Text position', -values => [qw[none left right top bottom]]],
+		'*end',
+		'*section' => 'Statusbar',
+		-statusbarvisible => ['boolean', 'Visible at launch'],
+		'*end',
+	],
+	-verbose => 1,
+);
+$se->MainLoop;
+

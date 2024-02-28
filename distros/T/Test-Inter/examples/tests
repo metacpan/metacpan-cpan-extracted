@@ -3,7 +3,7 @@
 use Test::Inter;
 $o = new Test::Inter;
 
-print "The following tests test some improperly formed tests\n\n";
+print "The following demonstrates some improperly formed tests\n\n";
 
 sub func1 {
   my($a,$b) = @_;
@@ -13,7 +13,7 @@ sub func1 {
   elsif ($a eq 'e'  &&  $b eq 'f') { return 3; }
 }
 
-print "The 2nd one fails with 'expected results for some, not others\n\n";
+print "The 2nd one fails with 'expected results for some tests, not others'\n\n";
 $o->tests(func  => \&func1,
           tests => "a b => 1
 

@@ -60,7 +60,7 @@ sub new {
     if (ref($Config->get_config('admin')) eq 'HASH') {
     
         if ($Config->get_config('admin')->{'enabled'}) {
-            foreach my $service (keys $Config->get_config('admin')->{'modules'}) {
+            foreach my $service (keys %{$Config->get_config('admin')->{'modules'}}) {
                 
                 my $service_conf = $Config->get_config('admin')->{'modules'}->{$service};
                 

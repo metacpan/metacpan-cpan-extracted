@@ -1,0 +1,257 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+
+# PODNAME: opnpost
+# ABSTRACT: A OPN User agent that post stuf
+
+use FindBin;
+use Getopt::Long;
+use LWP::UserAgent;
+use HTTP::Cookies;
+use HTTP::Request;
+use IO::All;
+use Data::Dumper;
+use Pod::Usage;
+use XML::LibXML;
+
+my $script_name = $FindBin::Script;
+my %options = (
+    timeout      => 60,
+    X            => 'POST',
+    'ca-path'    => '/etc/ssl/certs',
+);
+
+my @required = qw(content endpoint);
+my @options = qw(help endpoint=s content=s content-type=s timeout=i k d v cc=s ca=s ca-path=s X=s man redir=s@ agent=s r);
+
+if ($script_name eq 'opnpost') {
+    push(@required, 'content-type');
+    push(@options, 'wrap-soap');
+    push(@options, 'soap-version=s');
+    push(@options, 'soap-action=s');
+}
+elsif ($script_name eq 'opnsoap') {
+    $options{'content-type'} = 'application/xml';
+    $options{'soap-version'} = 1.1;
+    push(@options, 'wrap-soap');
+    push(@options, 'soap-version=s');
+    push(@options, 'soap-action=s');
+}
+elsif ($script_name eq 'opnjson') {
+    $options{'content-type'} = 'application/json';
+}
+
+{
+    local $SIG{__WARN__} = sub { die shift };
+    my $ok = eval { GetOptions(\%options, @options) };
+    if (!$ok) {
+        die($@);
+    }
+}
+
+if ($options{man}) {
+    pod2usage({-verbose => 3});
+}
+elsif ($options{help}) {
+    pod2usage({-verbose => 1});
+}
+
+my $missing;
+foreach (@required) {
+    if (!$options{$_}) {
+        $missing = 1;
+        warn "Required option $_ missing\n";
+    }
+}
+if ($missing) {
+    print STDERR "\n";
+    pod2usage({-verbose => 1, -exit => 1});
+}
+
+my $content = scalar io->catfile($options{content})->slurp;
+
+if ($options{'wrap-soap'}) {
+    $content = _soap_envelope($content);
+
+}
+
+my $ua = LWP::UserAgent->new(
+    agent                 => $options{agent} // "How-about-no/-1",
+    cookie_jar            => HTTP::Cookies->new(),
+    protocols_allowed     => [qw(https http)],
+    timeout               => $options{timeout},
+    requests_redirectable => $options{redir} // [qw(GET HEAD)],
+    ssl_opts              => {
+        $options{k} ? (verify_hostname => 0, SSL_verify_mode => 0) : (),
+        $options{ca} ? (SSL_ca_file => $options{ca})
+        : (SSL_ca_path => $options{'ca-path'}),
+        $options{cc}
+        ? (
+            SSL_cert_file => $options{cc},
+            SSL_key_file  => $options{cc}
+            )
+        : ()
+    }
+);
+
+my $req = HTTP::Request->new(
+    $options{X} => $options{endpoint},
+    HTTP::Headers->new(
+        Content_Type => $options{'content-type'},
+        exists $options{'soap-action'} ?
+        ( SOAPAction   => sprintf('"%s"', $options{'soap-action'}) ) : (),
+    ),
+    $content,
+);
+
+my $res = $ua->request($req);
+if ($res->is_success) {
+
+    if ($options{v}) {
+        print $req->as_string, $/, $res->as_string, $/;
+    }
+    else {
+        print $res->decoded_content, $/;
+    }
+}
+else {
+    die $req->as_string, $/, $res->as_string, $/;
+}
+
+sub _soap_envelope {
+    my ($xml) = @_;
+
+
+    # Strip the XML decl of the XML if it exists
+    $xml = XML::LibXML->load_xml(string => $xml)->findnodes('//*')->[0];
+
+    my $env = "";
+    if (defined $options{'soap-version'}  && $options{'soap-version'} == 1.1) {
+        $env = q{<?xml version="1.0" encoding="utf-8"?>
+    <soap-env:Envelope xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/">
+      <soap-env:Body>%s</soap-env:Body>
+    </soap-env:Envelope>};
+    }
+    else {
+        $env = q{<?xml version="1.0" encoding="utf-8"?>
+    <soap-env:Envelope xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/">
+      <soap-env:Body>%s</soap-env:Body>
+    </soap-env:Envelope>};
+
+    }
+    return sprintf($env, $xml);
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+opnpost - A OPN User agent that post stuf
+
+=head1 VERSION
+
+version 0.001
+
+=head1 SYNOPSIS
+
+opnpost opnjson opnsoap OPTIONS
+
+=head1 DESCRIPTION
+
+opnpost is a generic useragent that posts data to a particual endpoint.
+It is basicly wget or curl, but only for POSTING data.
+opnsoap is a client for posting SOAP and opnjson is a client for posting JSON
+
+=head1 NAME
+
+opnpost opnjson opnsoap - A OPN UA poster boy object
+
+=head1 OPTIONS
+
+=over
+
+=item endpoint
+
+The end point you want to talk to. Required
+
+=item content_type
+
+Required when using opnua.
+
+Defaults to C<application/json; charset=UTF-8> for opnjson.
+Defaults to C<application/xml; charset=UTF-8> for opnsoap.
+
+=item content
+
+Path to content file
+
+=item k
+
+Disable SSL checks
+
+=item v
+
+Verbose mode
+
+=item timeout
+
+Defaults to 60 seconds
+
+=item ca
+
+CA certificate file
+
+=item ca-path
+
+CA certificate path, defaults to C</etc/ssl/certs>
+
+=item cc
+
+Client certifcate file, requires both secret and public key to be present.
+
+=item X
+
+Set the request type, defaults to C<POST>
+
+=item soap-action
+
+The soap action
+
+=item wrap-soap
+
+Wrap the message in a soap envelop
+
+=item soap-version
+
+The SOAP version used by wrap-soap
+
+=back
+
+=head1 AUTHOR
+
+Wesley Schwengle
+
+=head1 LICENSE and COPYRIGHT
+
+This code is placed in the public domain.
+
+Wesley Schwengle, 2017
+
+=head1 AUTHOR
+
+Wesley Schwengle <waterkip@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2024 by Wesley Schwengle.
+
+This is free software, licensed under:
+
+  The (three-clause) BSD License
+
+=cut

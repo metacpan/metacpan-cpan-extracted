@@ -1,4 +1,10 @@
 Tk::CodeText module changes log
+28 Feb 2024
+	Update to version 0.46
+	Focus now goes to the find ebtry search and replace frame appears
+	Removed <FocusIn> and <FocusOut> bindings. I thought they made sense, they don't.
+
+
 01 Oct 2023
 	Update to version 0.45
 	Added option -menutiems for the left-click popup menu.
@@ -88,6 +94,7 @@ Tk::CodeText module changes log
 
 02 February 2003
 	First alpha version 0.1
+
 
 
 

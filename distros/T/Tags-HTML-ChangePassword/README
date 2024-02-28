@@ -121,7 +121,7 @@ ERRORS
              No messages to init.
 
      prepare():
-             No message types to init.
+             No message types to prepare.
 
      process():
              From Tags::HTML::process():
@@ -254,7 +254,6 @@ EXAMPLE2
      use Plack::Runner;
      use Tags::HTML::ChangePassword;
      use Tags::Output::Indent;
-     use Unicode::UTF8 qw(decode_utf8);
  
      my $css = CSS::Struct::Output::Indent->new;
      my $tags = Tags::Output::Indent->new(
@@ -308,5 +307,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

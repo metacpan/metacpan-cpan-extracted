@@ -110,6 +110,8 @@ DefKeyVal('Hyp', 'baseurl', 'Semiverbatim');
 
 sub hyperref_setoption {
   my ($key, $value) = @_;
+  if ($key eq 'colorlinks' and ToString($value) eq 'true') {
+    RequirePackage('color'); }
   AssignMapping('Hyperref_options', $key, $value);
   if ($key eq 'baseurl') {
     AssignValue(BASE_URL => ToString($value)); }
@@ -151,18 +153,18 @@ DefRegister('\pdfcompresslevel', Number(0));
 # Additional User Macros
 
 # \href{url}{text}
-DefMacro('\href HyperVerbatim {}', '\@@Url\href{}{}{#1}{#2}');
+DefMacro('\href HyperVerbatim {}', '\lx@hyper@url@\href{}{}{#1}{#2}');
 
-# \url{url} from url.sty... well sorta
+# Redefine \url{url} from url.sty...
 # It's slightly different in that it expands the argument
 # Redefine \@url to sanitize the argument less
-DefMacro('\@Url Token', sub {
+DefMacro('\lx@hyper@url Token', sub {
     my ($gullet, $cmd) = @_;
     my ($open, $close, $url);
     $open = $gullet->readToken;
     StartSemiverbatim('%');
     Let('~', T_OTHER('~'));    # Needs special protection?
-    if ($open->equals(T_BEGIN)) {
+    if ($open->getCatcode == CC_BEGIN) {
       $open = T_OTHER('{'); $close = T_OTHER('}');
       $url  = $gullet->readBalanced(1); }            # Expand as we go!
     else {
@@ -172,14 +174,26 @@ DefMacro('\@Url Token', sub {
     my @toks = grep { $_->getCatcode != CC_SPACE; } $url->unlist;
     # Identical with url's \@Url except, let CS's through!
     @toks = map { (($_->getCatcode == CC_CS) ? $_ : T_OTHER(ToString($_))) } @toks;
-    (Invocation(T_CS('\@@Url'),
+    (Invocation(T_CS('\lx@hyper@url@'),
         T_OTHER(ToString($cmd)), Tokens($open), Tokens($close),
         Tokens(@toks),
         Tokens(T_CS('\UrlFont'), T_CS('\UrlLeft'), @toks, T_CS('\UrlRight')))->unlist,
       T_CS('\endgroup')); });
 
+# RE-define from url w
+DefMacro('\url', '\begingroup\lx@hyper@url\url', locked => 1);
+
+DefConstructor('\lx@hyper@url@ Undigested {}{} Semiverbatim {}',
+  "?#isMath(<ltx:XMWrap class='#class' href='#href'>#5</ltx:XMWrap>)"    # Allow this to work in Math!
+    . " (<ltx:ref href='#href' class='#class'>#5</ltx:ref>)",
+  properties => sub { (href => ComposeURL(LookupValue('BASE_URL'), $_[4]),
+      class => sub { my $c = ToString($_[1]); $c =~ s/^\\//; 'ltx_' . $c; }); },
+  sizer     => '#5',
+  reversion => '#1#2#4#3');
+
 # \nolinkurl{url}
-DefConstructor('\nolinkurl Semiverbatim', '#1');
+DefConstructor('\nolinkurl Semiverbatim',
+  "<ltx:ref href='#1' class='ltx_nolink' >#1</ltx:ref>");
 
 # \hyperbaseurl{url}
 DefPrimitive('\hyperbaseurl Semiverbatim', sub { AssignValue(BASE_URL => ToString($_[1])); });
@@ -213,6 +227,7 @@ sub localized_anchor {
   my ($document, $whatsit) = @_;
   my $model      = $STATE->getModel;
   my $node       = $document->getNode;
+  my $id         = $whatsit->getProperty('id');
   my @candidates = ($node);
   my $candidate;
   while ($candidate = pop(@candidates)) {
@@ -222,13 +237,12 @@ sub localized_anchor {
       unshift(@candidates, $candidate->childNodes); }
     elsif ($type = XML_TEXT_NODE) {
       last; } }
-  my $id = $whatsit->getProperty('id');
   if ($candidate) {
     my $anchor = $document->wrapNodes('ltx:anchor', $candidate);
     $anchor->setAttribute('xml:id', $id);
     $document->closeNode($anchor) if $document->isOpen($anchor); }
   else {
-    Error("No available insertion point for ltx:anchor, failing \\hypertarget to $id"); }
+    Warn("No available insertion point for ltx:anchor, failing \\hypertarget to $id"); }
   return; }
 
 # \hyperdef{category}{name}{text}

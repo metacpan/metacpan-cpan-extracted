@@ -2,7 +2,7 @@ use v5.36;
 
 package App::Gimei::Runner;
 
-binmode STDOUT, ":utf8";
+binmode STDOUT, ":encoding(UTF-8)";
 
 use Getopt::Long;
 use Pod::Usage;

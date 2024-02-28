@@ -126,6 +126,24 @@ if($mpfr) {
     cmp_ok(nv2s($num), 'eq', Math::MPFR::nvtoa($num), "fmtpy() format agrees with nvtoa(): " . sprintf("%.${fmt}g", $num));
   }
 
+  my $nvprec = Math::Ryu::MAX_DEC_DIG - 2;
+  my $nv = ('6' . ('0' x $nvprec) . '.0') + 0;
+  cmp_ok(nv2s($nv),  'eq', Math::MPFR::nvtoa($nv), "6e+${nvprec} ok");
+  cmp_ok(nv2s(-$nv),  'eq', Math::MPFR::nvtoa(-$nv), "-6e+${nvprec} ok");
+
+  $nv = ('6125' . ('0' x ($nvprec - 3)) . '.0') + 0;
+  cmp_ok(nv2s($nv),  'eq', Math::MPFR::nvtoa($nv), "6.125e+${nvprec} ok");
+  cmp_ok(nv2s(-$nv),  'eq', Math::MPFR::nvtoa(-$nv), "-6.125e+${nvprec} ok");
+
+  $nvprec++;
+  $nv = ('6' . ('0' x $nvprec) . '.0') + 0;
+  cmp_ok(nv2s($nv),  'eq', Math::MPFR::nvtoa($nv), "6e+${nvprec}  ok");
+  cmp_ok(nv2s(-$nv),  'eq', Math::MPFR::nvtoa(-$nv), "-6e+${nvprec}  ok");
+
+  $nv = ('6125' . ('0' x ($nvprec - 3)) . '.0') + 0;
+  cmp_ok(nv2s($nv),  'eq', Math::MPFR::nvtoa($nv), "6.125e+${nvprec} ok");
+  cmp_ok(nv2s(-$nv),  'eq', Math::MPFR::nvtoa(-$nv), "-6.125e+${nvprec} ok");
+
 }
 
 done_testing();

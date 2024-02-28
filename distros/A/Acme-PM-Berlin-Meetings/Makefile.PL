@@ -78,7 +78,7 @@ only-convert-for-berlin-pm-org:
 	[ -s "${BERLINPM_GITHUB_IO_DIR}" ]
 	cd ${BERLINPM_GITHUB_IO_DIR}/javascripts && git pull
 	${PERL} -c script/pmmeetings2bbd.pl
-	${PERL} script/pmmeetings2bbd.pl -r data/berlin-pm-meetings.org | ${PERL} ${BBBIKE_DIR}/miscsrc/bbd2geojson -combine -bbbgeojsonp - > ${BERLINPM_GITHUB_IO_DIR}/javascripts/berlin-pm.geojsonp~
+	${PERL} script/pmmeetings2bbd.pl -r data/berlin-pm-meetings.org | ${PERL} -Iinternal ${BBBIKE_DIR}/miscsrc/bbd2geojson -combine -combinemodule Acme::PM::Berlin::Meetings::GeoJSONCombiner -bbbgeojsonp - > ${BERLINPM_GITHUB_IO_DIR}/javascripts/berlin-pm.geojsonp~
 	mv ${BERLINPM_GITHUB_IO_DIR}/javascripts/berlin-pm.geojsonp~ ${BERLINPM_GITHUB_IO_DIR}/javascripts/berlin-pm.geojsonp
 
 push-convert-for-berlin-pm-org:

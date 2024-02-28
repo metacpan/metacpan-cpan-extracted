@@ -664,6 +664,7 @@ use DB_File;
 use Unicode::Normalize;
 use LaTeXML::Post;    # to import error handling...
 use LaTeXML::Common::Error;
+use URI::file;
 use base qw(LaTeXML::Common::Object);
 our $NSURI = "http://dlmf.nist.gov/LaTeXML";
 our $XPATH = LaTeXML::Common::XML::XPath->new(ltx => $NSURI);
@@ -855,6 +856,8 @@ sub setDocument_internal {
     $self->addNodes($node, @children); }
   else {
     Fatal('unexpected', $root, undef, "Dont know how to use '$root' as document element"); }
+  # set URI to destination
+  $$self{document}->setURI(URI::file->new($self->getDestination));
   return $self; }
 
 our @MonthNames = (qw( January February March April May June
@@ -1080,6 +1083,7 @@ sub getQName {
 # we have to orient everything towards appending.
 # In particular, see the perversity in the following few methods.
 sub addNodes {
+  no warnings 'recursion';
   my ($self, $node, @data) = @_;
   foreach my $child (@data) {
     if (ref $child eq 'ARRAY') {
@@ -1316,6 +1320,7 @@ sub markXMNodeVisibility {
   return; }
 
 sub markXMNodeVisibility_aux {
+  no warnings 'recursion';
   my ($self, $node, $cvis, $pvis) = @_;
   return unless $node;
   my $qname = $self->getQName($node);

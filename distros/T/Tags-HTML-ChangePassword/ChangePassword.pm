@@ -12,7 +12,7 @@ use Tags::HTML::Messages;
 
 Readonly::Array our @FORM_METHODS => qw(post get);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Constructor.
 sub new {
@@ -90,7 +90,7 @@ sub _prepare {
 	my ($self, $message_types_hr) = @_;
 
 	if (! defined $message_types_hr) {
-		err 'No message types to init.';
+		err 'No message types to prepare.';
 	}
 
 	$self->{'_message_types'} = $message_types_hr;
@@ -410,7 +410,7 @@ Returns undef.
          No messages to init.
 
  prepare():
-         No message types to init.
+         No message types to prepare.
 
  process():
          From Tags::HTML::process():
@@ -549,7 +549,6 @@ Returns undef.
  use Plack::Runner;
  use Tags::HTML::ChangePassword;
  use Tags::Output::Indent;
- use Unicode::UTF8 qw(decode_utf8);
  
  my $css = CSS::Struct::Output::Indent->new;
  my $tags = Tags::Output::Indent->new(
@@ -628,6 +627,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

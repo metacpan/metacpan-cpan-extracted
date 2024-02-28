@@ -62,7 +62,7 @@ sub thmtools_style {
   if (my $bodyfont = $kv && $kv->getValue('bodyfont')) {
     $parameters{'\thm@bodyfont'} = $bodyfont; }
   if (my $headformat = ToString(($kv && $kv->getValue('headformat')) || '')) {
-    $parameters{'\thm@swap'} = $headformat eq 'swapnumber'; }
+    $parameters{'thm@swap'} = $headformat eq 'swapnumber'; }
 
   saveTheoremStyle($name, %parameters);
   return; }
@@ -70,9 +70,11 @@ sub thmtools_style {
 DefPrimitive('\declaretheorem OptionalKeyVals {}', sub {
     my ($stomach, $kv, $thmset) = @_;
     # Activate any requested style
-    my $name = ToString($thmset);
-    if (my $style = ToString($kv && $kv->getValue('style')) || 'plain') {
-      useTheoremStyle($style); }
+    my $name  = ToString($thmset);
+    my $style = $kv && $kv->getValue('style');
+    if ($style) {
+      $style = ToString(Digest($style)); }
+    useTheoremStyle($style || 'plain');
     thmtools_style($name, $kv);
     useTheoremStyle($name);
     my $type = ($kv

@@ -37,13 +37,13 @@ WriteMakefile(
         resources => {
             license    => 'http://dev.perl.org/licenses/',
             homepage   => 'https://metacpan.org/module/Net::AMQP::RabbitMQ::PP',
-            bugtracker => 'https://github.com/Humanstate/net-amqp-rabbitmq/issues',
-            repository => 'https://github.com/Humanstate/net-amqp-rabbitmq'
+            bugtracker => 'https://github.com/PayProp/net-amqp-rabbitmq/issues',
+            repository => 'https://github.com/PayProp/net-amqp-rabbitmq'
         },
         repository => {
             type => 'git',
-            url  => 'https://github.com/Humanstate/net-amqp-rabbitmq.git',
-            web  => 'https://github.com/Humanstate/net-amqp-rabbitmq',
+            url  => 'https://github.com/PayProp/net-amqp-rabbitmq.git',
+            web  => 'https://github.com/PayProp/net-amqp-rabbitmq',
         },
     },
     test => {

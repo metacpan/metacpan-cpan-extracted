@@ -1,0 +1,106 @@
+=head1 NAME
+
+Tk::AppWindow::CookBook::ContentManager - Write your own content manager
+
+=head1 OTHER RECIPIES
+
+=over 4
+
+=item L<Tk::AppWindow::CookBook::Extension>
+
+=item L<Tk::AppWindow::CookBook::Plugin>
+
+=back
+
+=head1 A SIMPLE TEXT CONTENT MANAGER
+
+ package TextManager;
+
+ use base qw(Tk::Derived Tk::AppWindow::BaseClasses::ContentManager);
+ Construct Tk::Widget 'TextManager';
+ require Tk::TextUndo;
+
+ sub Populate {
+    my ($self,$args) = @_;
+ 
+    $self->SUPER::Populate($args);
+ 
+    my $text = $self->Scrolled('TextUndo',
+       -scrollbars => 'ose',
+    )->pack(-expand => 1, -fill => 'both');
+    $self->CWidg($text);
+    $text->bind('<Control-a>', [$text, 'selectAll']);
+    $text->bind('<Control-Z>', [$text, 'redo']);
+ 
+    #########################################################
+    # The options below also have to be defined during the  #
+    # initialization of your application                    #
+    #########################################################
+    $self->ConfigSpecs(
+       -contentbackground => [{-background => $text}],
+       -contentforeground => [{-foreground => $text}],
+       -contentfont => [{-font => $text}],
+       -contenttabs => [{-tabs => $text}],
+       -contentwrap => [{-wrap => $text}],
+       -background => ['SELF', 'DESCENDANTS'],
+       DEFAULT => [$text],
+    );
+ }
+
+ sub doClear {
+    my $self = shift;
+    my $t = $self->CWidg;
+    $t->delete('0.0', 'end');
+    $t->editReset;
+ }
+
+ sub doLoad {
+    my ($self, $file) = @_;
+    my $t = $self->CWidg;
+    $t->Load($file);
+    $t->editModified(0);
+    return 1
+ }
+
+ sub doSave {
+    my ($self, $file) = @_;
+    my $t = $self->CWidg;
+    $t->Save($file);
+    $t->editModified(0);
+    return 1
+ }
+
+ sub doSelect {
+    $_[0]->CWidg->focus
+ }
+
+ sub IsModified {
+    my $self = shift;
+    return $self->CWidg->editModified;	
+ }
+
+
+=head1 AUTHOR
+
+Hans Jeuken (hanje at cpan dot org)
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Tk::AppWindow>
+
+=item L<Tk::AppWindow::BaseClasses::ContentManager>
+
+=item L<Tk::AppWindow::Ext::MDI>
+
+=back
+
+=cut
+
+
+
+
+
+
+

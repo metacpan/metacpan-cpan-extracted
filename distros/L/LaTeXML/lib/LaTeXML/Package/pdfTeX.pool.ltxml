@@ -170,12 +170,12 @@ DefParameterType('OpenAnnotSpecification', sub {
     return; }
   , optional => 1, undigested => 1);
 
-DefPrimitive('\pdfannot OpenAnnotSpecification', undef);
+DefPrimitive('\pdfannot OpenAnnotSpecification', sub { (); });
 
 # \pdfstartlink [ rule spec ] [ attr spec ] action spec (h, m)
-DefPrimitive('\pdfstartlink', undef);
+DefPrimitiveI('\pdfstartlink', undef, sub { (); });
 # \pdfendlink (h, m)
-DefPrimitive('\pdfendlink', undef);
+DefPrimitiveI('\pdfendlink', undef, sub { (); });
 # \pdfoutline outline spec (h, v, m)
 # \pdfdest dest spec (h, v, m)
 # \pdfthread thread spec (h, v, m)
@@ -187,8 +187,8 @@ DefPrimitive('\pdfendlink', undef);
 DefMacro('\pdfinfo{}', '');
 
 DefMacro('\pdfcatalog{} OpenActionSpecification', '');
-DefMacro('\pdfnames{}',                           {});
-DefMacro('\pdftrailer{}',                         {});
+DefMacro('\pdfnames{}',                           '');
+DefMacro('\pdftrailer{}',                         '');
 DefMacro('\pdfmapfile{}',                         '');
 DefMacro('\pdfmapline{}',                         '');
 # \pdffontattr font general text
@@ -196,11 +196,11 @@ DefMacro('\pdfmapline{}',                         '');
 # \vadjust [ pre spec ] filler { vertical mode material } (h, m)
 DefMacro('\quitvmode', '');
 # \pdfliteral [ pdfliteral spec ] general text (h, v, m)
-DefPrimitive('\pdfliteral OptionalMatch:direct OptionalMatch:page GeneralText', undef);
+DefPrimitive('\pdfliteral OptionalMatch:direct OptionalMatch:page GeneralText', sub { (); });
 # \special pdfspecial spec
 # \pdfresettimer
-DefPrimitive('\pdfresettimer',           undef);
-DefPrimitive('\pdfresettimerresettimer', undef);
+DefPrimitive('\pdfresettimer',           sub { (); });
+DefPrimitive('\pdfresettimerresettimer', sub { (); });
 # \pdfsetrandomseed number
 # \pdfnoligatures font
 # \pdfprimitive control sequence
@@ -279,4 +279,6 @@ DefMacro('\pdfstrcmp Expanded Expanded', sub {
     return ($cmp == 1 ? T_OTHER('1')
       : ($cmp == 0 ? T_OTHER('0')
         : Tokens(T_OTHER('-'), T_OTHER('1')))); });
+
+DefMacro('\pdfglyphtounicode{}{}', Tokens());
 1;

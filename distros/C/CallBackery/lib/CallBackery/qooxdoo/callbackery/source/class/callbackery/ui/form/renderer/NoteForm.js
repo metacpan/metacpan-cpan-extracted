@@ -139,7 +139,7 @@ qx.Class.define("callbackery.ui.form.renderer.NoteForm", {
             // add the items
             var msg = callbackery.ui.MsgBox.getInstance();
             var that = this;
-            for (var i = 0; i < items.length; i++) {
+            for (let i = 0; i < items.length; i++) {
                 (function () { // context
                     let label = that._createLabel(names[i], items[i]);
                     let item = items[i];
@@ -147,7 +147,13 @@ qx.Class.define("callbackery.ui.form.renderer.NoteForm", {
                         marginTop: 2,
                         marginBottom: 2
                     });
-                    var labelName = names[i];
+                    let labelName = names[i];
+
+                    // rerender form to update required flag
+                    item.addListener("changeRequired", (e) => {
+                        that._onChangeLocale(e);
+                    }, that);
+
                     // allow form items without label
                     if (label) {
 
@@ -183,6 +189,7 @@ qx.Class.define("callbackery.ui.form.renderer.NoteForm", {
                         });
                     }
                     that._add(item, { row: that._row + 1, column: 1 });
+
                     if (itemOptions != null && itemOptions[i] != null) {
                         if (itemOptions[i].note) {
                             that._gotNote = true;

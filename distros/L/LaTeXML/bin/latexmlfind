@@ -61,7 +61,12 @@ our $ROOT_OBJECT = { type => 'Document',
 
 foreach my $symbol (@symbols) {
   collect_matches("Symbols \"$symbol\"",
-    "//ltx:Math[descendant::ltx:XMTok[\@name='$symbol' or text()='$symbol']]"); }
+    "//ltx:Math[descendant::ltx:XMTok[\@name='$symbol' or text()='$symbol']"
+      #                        BUT which isn't in presentation branch of an XMDual!!
+      #                        ie. no ancestor w/preceding sibling has parent = XMDual
+      . "[not(ancestor-or-self::*[preceding-sibling::*][parent::ltx:XMDual])]"
+
+      . "]"); }
 foreach my $spec (@unknowns) {
   my $symbol = $spec;
   my $font;
@@ -72,6 +77,9 @@ foreach my $spec (@unknowns) {
       #                         whose name or content is the requested symbol
       . "[\@name='$symbol' or text()='$symbol']"
       . ($font ? "[\@font='$font']" : '')
+      #                         BUT which isn't in presentation branch of an XMDual!!
+      #                        ie. no ancestor w/preceding sibling has parent = XMDual
+      . "[not(ancestor-or-self::*[preceding-sibling::*][parent::ltx:XMDual])]"
       . "]"); }
 
 foreach my $symbol (@posfuncs) {
@@ -117,7 +125,7 @@ sub collect_matches {
   my ($description, $xpath) = @_;
   my @nodes = $XPATH->findnodes($xpath, $DOC);
   print "Query $description appears in " . scalar(@nodes) . " places\n" if $verbosity > -1;
-  print "  [XPath = \"$xpath\"]\n"                                      if $verbosity > 0;
+  print "  [XPath = \"$xpath\"]\n" if $verbosity > 0;
   foreach my $node (@nodes) {
     my $object = id_object($node);
     push(@{ $$object{items} }, $node); }
@@ -136,9 +144,9 @@ sub id_object {
     my $parent_object = id_object($node);
     my $type          = $node->localname;
     my $labels        = $node->getAttribute('labels');
-    my ($refnum)      = $XPATH->findnodes("child::ltx:tags/ltx:tag[\@refnum]/text()", $node);
-    my ($title)       = $XPATH->findnodes("child::ltx:toctitle | child::ltx:title",   $node);
-    my $desc          = ($refnum ? ($title ? "$refnum. " . $title->textContent : $refnum)
+    my ($refnum) = $XPATH->findnodes("child::ltx:tags/ltx:tag[\@refnum]/text()", $node);
+    my ($title)  = $XPATH->findnodes("child::ltx:toctitle | child::ltx:title",   $node);
+    my $desc = ($refnum ? ($title ? "$refnum. " . $title->textContent : $refnum)
       : ($title ? $title->textContent : ''));
     $desc =~ s/\s+/ /g;
     $OBJECTS{$id} = $object

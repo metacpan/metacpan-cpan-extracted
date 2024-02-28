@@ -1,0 +1,36 @@
+version: "3"
+services:
+  centos:
+    depends_on:
+      - cratedb
+      - mysql
+    build:
+      context: .
+      dockerfile: ./Docker/httpd
+    volumes: 
+      - ./Service-Engine:/export/HTDOCS/HMLv2/
+    ports:
+      - "81:80"
+    container_name: centos
+    tty: true
+    privileged: true
+    platform: linux/amd64
+  mysql:
+    build:
+       dockerfile: ./Docker/mysql
+    container_name: mysql
+    tty: true
+    ports:
+      - "3307:3306"
+    volumes:
+      - dbdata:/var/lib/mysql
+  cratedb:
+    build:
+       dockerfile: ./Docker/cratedb
+    container_name: cratedb
+    ports:
+      - "4200:4200"
+      - "5432:5432"
+volumes:
+  dbdata:
+  logs:

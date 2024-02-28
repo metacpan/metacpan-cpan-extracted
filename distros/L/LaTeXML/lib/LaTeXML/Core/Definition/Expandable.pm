@@ -20,24 +20,31 @@ use LaTeXML::Core::Token;
 use LaTeXML::Core::Tokens;
 use LaTeXML::Core::Parameters;
 use LaTeXML::Package qw(TokenizeInternal);
-use base qw(LaTeXML::Core::Definition);
+use base             qw(LaTeXML::Core::Definition);
 
 sub new {
   my ($class, $cs, $parameters, $expansion, %traits) = @_;
-  $expansion = Tokens($expansion) if ref $expansion eq 'LaTeXML::Core::Token';
   my $source = $STATE->getStomach->getGullet->getMouth;
-  if (ref $expansion eq 'LaTeXML::Core::Tokens') {
+  my $type   = ref $expansion;
+  # expansion must end up Tokens or CODE
+  if (!$type) {
+    $expansion = TokenizeInternal($expansion)->packParameters; }
+  elsif ($type eq 'LaTeXML::Core::Token') {
+    $expansion = TokensI($expansion); }
+  elsif ($type eq 'LaTeXML::Core::Tokens') {
     Fatal('misdefined', $cs, $source, "Expansion of '" . ToString($cs) . "' has unbalanced {}",
       "Expansion is " . ToString($expansion)) unless $expansion->isBalanced;
-    # rescan for match tokens and unwrap dont_expand...
-    $expansion = $expansion->packParameters unless $traits{nopackParameters};
-  }
+    $expansion = $expansion->packParameters unless $traits{nopackParameters}; }
+  elsif ($type ne 'CODE') {
+    Error('misdefined', $cs, $source,
+      "Expansion of '" . ToString($cs) . "' cannot be of type '$type'");
+    $expansion = TokensI(); }
   return bless { cs => $cs, parameters => $parameters, expansion => $expansion,
-    locator      => $source->getLocator,
-    isProtected  => $traits{protected} || $STATE->getPrefix('protected'),
-    isOuter      => $traits{outer}     || $STATE->getPrefix('outer'),
-    isLong       => $traits{long}      || $STATE->getPrefix('long'),
-    isExpandable => 1,
+    locator     => $source->getLocator,
+    isProtected => $traits{protected} || $STATE->getPrefix('protected'),
+    isOuter     => $traits{outer}     || $STATE->getPrefix('outer'),
+    isLong      => $traits{long}      || $STATE->getPrefix('long'),
+    hasCCARG    => (($type ne 'CODE') && (grep { $$_[1] == CC_ARG; } $expansion->unlist) ? 1 : 0),
     %traits }, $class; }
 
 sub isExpandable {
@@ -45,39 +52,32 @@ sub isExpandable {
 
 sub getExpansion {
   my ($self) = @_;
-  my $expansion = $$self{expansion};
-  if (!ref $expansion) {    # Tokenization DEFERRED till actually used (shaves > 5%)
-    $expansion = TokenizeInternal($expansion);
-    # rescan for match tokens and unwrap dont_expand...
-    $expansion = $expansion->packParameters;
-    $$self{expansion} = $expansion; }
-  return $expansion; }
+  return $$self{expansion}; }
 
 # Expand the expandable control sequence. This should be carried out by the Gullet.
+# This MUST return Tokens() or undef. (NOT a Token)
 sub invoke {
   no warnings 'recursion';
   my ($self, $gullet, $onceonly) = @_;
   # shortcut for "trivial" macros; but only if not tracing & profiling!!!!
-  my $tracing   = $STATE->lookupValue('TRACINGMACROS');
-  my $profiled  = $STATE->lookupValue('PROFILING') && ($LaTeXML::CURRENT_TOKEN || $$self{cs});
-  my $expansion = $self->getExpansion;
+  my $_tracing  = $STATE->lookupValue('TRACING') || 0;
+  my $tracing   = ($_tracing & TRACE_MACROS);
+  my $profiled  = ($_tracing & TRACE_PROFILE) && ($LaTeXML::CURRENT_TOKEN || $$self{cs});
+  my $expansion = $$self{expansion};
   my $etype     = ref $expansion;
-  my $iscode    = $etype eq 'CODE';
   my $result;
   my $parms = $$self{parameters};
 
-  if ($iscode) {
+  LaTeXML::Core::Definition::startProfiling($profiled, 'expand') if $profiled;
+  if ($etype eq 'CODE') {
     # Harder to emulate \tracingmacros here.
     my @args = ($parms ? $parms->readArguments($gullet, $self) : ());
-    LaTeXML::Core::Definition::startProfiling($profiled, 'expand') if $profiled;
     $result = Tokens(&$expansion($gullet, @args));
-    if ($tracing || $LaTeXML::DEBUG{tracing}) {    # More involved...
+    if ($tracing) {
       Debug($self->tracingCSName . ' ==> ' . tracetoString($result));
       Debug($self->tracingArgs(@args)) if @args; } }
-  elsif (!$$self{parameters}) {                    # Trivial macro
-    LaTeXML::Core::Definition::startProfiling($profiled, 'expand') if $profiled;
-    Debug($self->tracingCSName . ' ->' . tracetoString($expansion))
-      if $tracing || $LaTeXML::DEBUG{tracing};
+  elsif (!$parms) {    # Trivial macro
+    Debug($self->tracingCSName . ' ->' . tracetoString($expansion)) if $tracing;
     # For trivial expansion, make sure we don't get \cs or \relax\cs direct recursion!
     if (!$onceonly && $$self{cs}) {
       my ($t0, $t1) = ($etype eq 'LaTeXML::Core::Tokens'
@@ -87,21 +87,22 @@ sub invoke {
         Error('recursion', $$self{cs}, $gullet,
           "Token " . Stringify($$self{cs}) . " expands into itself!",
           "defining as empty");
-        $expansion = Tokens(); } }
+        $expansion = TokensI(); } }
     $result = $expansion; }
   else {
-    my @args = ($parms ? $parms->readArguments($gullet, $self) : ());
-    # for "real" macros, make sure all args are Tokens
-    my $r;
-    my @targs = map { ($_ && ($r = ref $_)
-          && (($r eq 'LaTeXML::Core::Token') || ($r eq 'LaTeXML::Core::Tokens'))
-        ? $_ : Tokens(Revert($_))); } @args;
-    if ($tracing || $LaTeXML::DEBUG{tracing}) {    # More involved...
+    my @args = $parms->readArguments($gullet, $self);
+    if ($$self{hasCCARG}) {    # Do we actually need to substitute the args in?
+      my $r;                   # Make sure they are actually Tokens!
+      @args = map { ($_ && ($r = ref $_)
+            && (($r eq 'LaTeXML::Core::Token') || ($r eq 'LaTeXML::Core::Tokens'))
+          ? $_ : Tokens(Revert($_))); } @args;
+      $result = $expansion->substituteParameters(@args); }
+    else {
+      $result = $expansion; }
+    if ($tracing) {    # More involved...
       Debug($self->tracingCSName . ' ->' . tracetoString($expansion));
-      Debug($self->tracingArgs(@targs)) if @args; }
-    LaTeXML::Core::Definition::startProfiling($profiled, 'expand') if $profiled;
-    $result = $expansion->substituteParameters(@targs); }
-  # Getting exclusive requires dubious Gullet support!
+      Debug($self->tracingArgs(@args)) if @args; } }
+  # Getting exclusive profiling requires dubious Gullet support!
   $result = Tokens($result, T_MARKER($profiled)) if $profiled;
   return $result; }
 
@@ -115,7 +116,7 @@ sub equals {
   my ($self, $other) = @_;
   return (defined $other && (ref $self) eq (ref $other))
     && Equals($self->getParameters, $other->getParameters)
-    && Equals($self->getExpansion,  $other->getExpansion); }
+    && Equals($$self{expansion},    $$other{expansion}); }
 
 #======================================================================
 1;

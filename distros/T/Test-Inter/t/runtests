@@ -15,9 +15,9 @@ if [ -z "$TI_QUIET" ]; then
    export TI_QUIET
 fi
 
-if [ "$RELEASE_TESTING" != "0" ]; then
-   RELEASE_TESTING=1
-   export RELEASE_TESTING
+if [ "$Test_Inter_RELEASE_TESTING" != "0" ]; then
+   Test_Inter_RELEASE_TESTING=1
+   export Test_Inter_RELEASE_TESTING
 fi
 
 if [ "$1" = "-T" ]; then

@@ -45,6 +45,8 @@ lib/AsposeSlidesCloud/Object/ClosePathSegment.pm
 lib/AsposeSlidesCloud/Object/ColorChangeEffect.pm
 lib/AsposeSlidesCloud/Object/ColorReplaceEffect.pm
 lib/AsposeSlidesCloud/Object/ColorScheme.pm
+lib/AsposeSlidesCloud/Object/CommentAuthor.pm
+lib/AsposeSlidesCloud/Object/CommentAuthors.pm
 lib/AsposeSlidesCloud/Object/CommonSlideViewProperties.pm
 lib/AsposeSlidesCloud/Object/Connector.pm
 lib/AsposeSlidesCloud/Object/CubicBezierToPathSegment.pm

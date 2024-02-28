@@ -21,8 +21,7 @@ use warnings;
 use LaTeXML::Package;
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Let('\@xp', '\expandafter');
-Let('\@nx', '\noexpand');
+RequirePackage('amsgen');
 
 # Core is defined in LaTeX.ltxml
 
@@ -53,7 +52,7 @@ DefPrimitive('\theoremstyle{}', sub {
       Warn("undefined", "theoremstyle", $_[0], "Unknown theorem style '$style', reverting to 'plain'.");
       $style    = 'plain';
       $style_cs = T_CS('\th@plain'); }
-    AssignValue('\thm@style' => $style);
+    AssignRegister('\thm@style' => $style);
     Digest($style_cs);
     return; });
 
@@ -75,9 +74,15 @@ DefPrimitive('\newtheoremstyle{}{}{}{}{}{}{}{}{}', sub {
     my ($stomach, $name, $spaceabove, $spacebelow, $bodyfont,
       $indent, $headfont, $headpunct, $spaceafter, $headspec) = @_;
     my $headformatter;
-    if ($headspec->unlist) {    # If spec given, create formatter macro
+    if (!IsEmpty($headspec)) {    # If spec given, create formatter macro
       $headformatter = T_CS('\format@title@theoremstyle@' . ToString($name));
-      DefMacroI($headformatter, convertLaTeXArgs(3, 0), $headspec); }
+      DefMacroI($headformatter, convertLaTeXArgs(3, 0),
+        # amsthm.sty uses the code below to ignore \thmname, \thmnumber, \thmnote
+        # if the respective arguments are empty
+        Tokens(TokenizeInternal('\@ifempty{#1}{\let\thmname\@gobble}{\let\thmname\@iden}' .
+              '\@ifempty{#2}{\let\thmnumber\@gobble}{\let\thmnumber\@iden}' .
+              '\@ifempty{#3}{\let\thmnote\@gobble}{\let\thmnote\@iden}'),
+          $headspec)); }
 
     $name = ToString($name);
     saveTheoremStyle($name,
@@ -133,8 +138,8 @@ DefMacro('\qedhere', sub {
 
 DefMacro('\proofname', 'Proof');
 DefPrimitive('\th@proof', sub {
-    AssignValue('\thm@headfont' => T_CS('\itshape'));
-    AssignValue('\thm@bodyfont' => T_CS('\normalfont'));
+    AssignRegister('\thm@headfont' => T_CS('\itshape'));
+    AssignRegister('\thm@bodyfont' => T_CS('\normalfont'));
     return; });
 
 # Note that you get EITHER \proofname OR [#1] but NOT both!!!
@@ -183,8 +188,8 @@ else {
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 # from older versions of amsthm.sty
-DefPrimitive('\theorembodyfont{}',   sub { AssignValue('\thm@bodyfont' => $_[1]); });
-DefPrimitive('\theoremheaderfont{}', sub { AssignValue('\thm@headfont' => $_[1]); });
+DefPrimitive('\theorembodyfont{}',   sub { AssignRegister('\thm@bodyfont' => $_[1]); });
+DefPrimitive('\theoremheaderfont{}', sub { AssignRegister('\thm@headfont' => $_[1]); });
 DefRegister('\theorempreskipamount'  => Glue(0));
 DefRegister('\theorempostskipamount' => Glue(0));
 

@@ -1,0 +1,115 @@
+=head1 NAME
+
+Tk::AppWindow::CookBook::Extension - Write your own extension
+
+=head1 OTHER RECIPIES
+
+=over 4
+
+=item L<Tk::AppWindow::CookBook::Plugin>
+
+=item L<Tk::AppWindow::CookBook::ContentManager>
+
+=back
+
+=head1 AN ABSTRACT RECIPY
+
+ package Tk::AppWindow::Ext::Abstract;
+ 
+ use strict;
+ use warnings;
+
+ use base qw( Tk::AppWindow::BaseClasses::Extension );
+ 
+ sub new {
+    my $class = shift;
+    my $self = $class->SUPER::new(@_);
+ 
+    #load required extensions
+    $self->Require('OtherExt1', 'OtherExt2');
+
+    #configure options the classic way
+    $self->addPreConfig(
+       -option1 => ['PASSIVE', undef, undef, 'default value'],
+       -option2 => ['CALLBACK', undef, undef, ['Method2', $self]],
+	 );
+ 
+	 #configure options through configInit
+	 $self->configInit(
+       -option3 => ['Method3', $self, 'default value')],
+    );
+ 
+    #configure commands
+    $self->cmdConfig(
+       command1 => ['Command1', $self],
+    );
+
+    #do postconfig stuff
+    $self->addPostConfig('DoPostConfig', $self);
+ 
+    return $self;
+ }
+
+ sub Command1 {
+    my ($self, $value) = @_;
+    print "Command1 width value $value\n";
+    return $value * 2
+ }
+ 
+ sub DoPostConfig {
+    my $self = shift;
+    print "We are done configuring\n"; 
+ }
+
+ sub MenuItems {
+    my $self = shift;
+    return (
+ #	      type	             menupath				     label					    cmd			       icon					      keyb			
+		[	'menu_normal',		  'appname::Quit',	"~Command1", 	'command1',		'help-about',		'SHIFT+F1'	], 
+		[	'menu_separator',	'appname::Quit',	'h1'], 
+    )
+ }
+ 
+ sub Method2 {
+ 	my ($self, $val) = @_;
+ 	$self->{VALUE2} = $val if defined $val;
+ 	return $self->{VALUE2}
+ }
+
+ sub Method3 {
+ 	my ($self, $val) = @_;
+ 	$self->{VALUE3} = $val if defined $val;
+ 	return $self->{VALUE3}
+ }
+
+ sub ToolItems {
+    my $self = shift;
+  	 return (
+ #     type					        label		     cmd					    icon					    help		
+       [ 'tool_button', 'Command1', 'command1',	'help-about',	'Run command1'],
+       [ 'tool_separator' ],
+    )
+ }
+
+=head1 AUTHOR
+
+Hans Jeuken (hanje at cpan dot org)
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Tk::AppWindow>
+
+=item L<Tk::AppWindow::BaseClasses::Extension>
+
+=back
+
+=cut
+
+
+
+
+
+
+

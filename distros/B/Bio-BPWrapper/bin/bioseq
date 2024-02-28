@@ -3,10 +3,13 @@
 use strict;
 use warnings;
 use v5.10;
-use rlib '../lib';
-use Bio::BPWrapper::SeqManipulations;
-use Getopt::Long qw( :config bundling permute no_getopt_compat );
+
 use Pod::Usage;
+use Getopt::Long qw( :config bundling permute no_getopt_compat );
+use Path::Tiny;
+use lib path($0)->absolute->parent->sibling('lib')->stringify;
+
+use Bio::BPWrapper::SeqManipulations;
 
 ####################### Option parsing ######################
 my %opts;
@@ -33,17 +36,20 @@ GetOptions(
     "linearize|L",
     "mol-wt",
     "no-gaps|g",
+    "num-gaps-dna",
+    "num-gaps-aa",
     "num-seq|n",
     "output|o=s",
     "pick|p=s",
     "reloop|R=i", # recircularize a genome at "loop_at"
     "remove-stop|X", # for PAML/codeml
-    "restrict|x=s",
-    "restrict-coord=s",
+#    "restrict|x=s",
+#    "restrict-coord=s",
     "revcom|r",
     "sort=s",
     "split-cdhit=s",
     "subseq|s=s",
+    "syn-code",
     "translate|t=i",
     "fetch|f=s", # Retrieve sequence by accession number; broken by NCBI protocol change
  #   "longest-orf|C",
@@ -127,7 +133,7 @@ B<bioseq> [-h | --help | -V | --version | --man]
  bioseq --count-codons cds_fasta              # Codon counts (for coding sequences)
  bioseq --hydroB pep_fasta                    # Hydrophobicity score (for protein seq)
  bioseq --input 'genbank' --feat2fas file.gb  # extract genbank features to FASTA
- bioseq --restrict 'EcoRI' dna_fasta          # Fragments from restriction digest
+ # bioseq --restrict 'EcoRI' dna_fasta          # Fragments from restriction digest (disabled)
 
 =head3 Serialize with pipes
 
@@ -244,6 +250,20 @@ Find and return the longest ORF (return the original if no error for -t1, i.e., 
 
 Print lower and upper bound of molecular weight
 
+=item --num-gaps-dna
+
+Print number of non-ATCG's for a dna sequence. 
+
+Redirect STDERR to a file to view non-ATCG positions, e.g.,:
+ bioseq --num-gaps-dna seq.fas > out 2> log
+
+=item --num-gaps-aa
+
+Print number of non-AA's for a protein sequence. 
+
+Redirect STDERR to a file to view non-AA positions, e.g.,:
+ bioseq --num-gaps-aa seq.pep > out 2> log
+
 =item --no-gaps, -g
 
 Remove gaps
@@ -275,9 +295,9 @@ Select a list of sequences:
 
 Re-circularize a bacterial genome by starting at a specified position. For example, for sequence "ABCDE",  C<bioseq -R'2'> would generate "BCDEA".
 
-=item --rename, -N 'file'
+=item --rename, -N 'file'; or --rename "id:old_name;new_name" (for replacing a single id)
 
-Append sequence names specified by a file (two tab-separated columns: old_name, new_name)
+Append sequence names specified by a file (two tab-separated columns: old_name, new_name), or a single id
 
 =item --remove-stop, -X
 
@@ -285,19 +305,19 @@ Remove stop codons (e.g., for PAML input)
 
 =item --restrict, -x 'RE'
 
-Predicted fragments from digestion by a specified restriction enzyme.
+Predicted fragments from digestion by a specified restriction enzyme. Disabled (not part of bioperl dist)
 
 =item --restrict-coord 'RE'
 
-Predicted fragments from digestion by a specified restriction enzyme.  Outputs cooridnates of overhangs in BED format.
+Predicted fragments from digestion by a specified restriction enzyme.  Outputs cooridnates of overhangs in BED format. Disabled (not part of bioperl dist)
 
 =item --revcom | -r
 
 Reverse complement.
 
-=item --sort 'id|length'
+=item --sort 'id|length|file:<filename>'
 
-Sort by id or length (Contributor: Jeffery Rosario; Fall 2017)
+Sort by id, length, or a file with an intended order of seq ids (Contributor: Jeffery Rosario; Fall 2017)
 
 =item --split-cdhit 'cdhit .clstr file'
 
@@ -306,6 +326,10 @@ Parse cdhit output .clstr file and generate a FASTA file for each CDHIT family.
 =item --subseq | -s 'beginning_index,ending_index'
 
 Select substring (of the 1st sequence).
+
+=item --syn-code 
+
+Randomly substitute each codon with a synonymous one for a coding sequence
 
 =item --translate | -t [1|3|6]
 

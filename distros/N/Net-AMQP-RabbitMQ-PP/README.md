@@ -2,12 +2,6 @@
 
 Net::AMQP::RabbitMQ::PP - Pure perl AMQP client for RabbitMQ
 
-<div>
-
-    <a href='https://travis-ci.org/Humanstate/net-amqp-rabbitmq?branch=master'><img src='https://travis-ci.org/Humanstate/net-amqp-rabbitmq.svg?branch=master' alt='Build Status' /></a>
-    <a href='https://coveralls.io/r/Humanstate/net-amqp-rabbitmq?branch=master'><img src='https://coveralls.io/repos/Humanstate/net-amqp-rabbitmq/badge.png?branch=master' alt='Coverage Status' /></a>
-</div>
-
 # SYNOPSIS
 
     use Net::AMQP::RabbitMQ::PP;
@@ -22,11 +16,11 @@ Net::AMQP::RabbitMQ::PP - Pure perl AMQP client for RabbitMQ
 
 # DESCRIPTION
 
-Like [Net::RabbitMQ](https://metacpan.org/pod/Net::RabbitMQ) but pure perl rather than a wrapper around librabbitmq.
+Like [Net::RabbitMQ](https://metacpan.org/pod/Net%3A%3ARabbitMQ) but pure perl rather than a wrapper around librabbitmq.
 
 # VERSION
 
-0.09
+0.11
 
 # SUBROUTINES/METHODS
 
@@ -49,13 +43,14 @@ Connect to the server. Default arguments are shown below:
                 timeout        => undef,
                 username       => 'guest',
                 password       => 'guest',
-                virtualhost    => '/',
+                virtual_host   => '/',
                 heartbeat      => undef,
                 socket_timeout => 5,
+                frame_max      => 131072,
         );
 
 connect can also take a secure flag for SSL connections, this will only work if
-[IO::Socket::SSL](https://metacpan.org/pod/IO::Socket::SSL) is available. You can also pass SSL specific arguments through
+[IO::Socket::SSL](https://metacpan.org/pod/IO%3A%3ASocket%3A%3ASSL) is available. You can also pass SSL specific arguments through
 in the connect method and these will be passed through
 
         $mq->connect(
@@ -72,7 +67,7 @@ Disconnects from the server
 
 ## set\_keepalive
 
-Set a keep alive poller. Note: requires [Socket::Linux](https://metacpan.org/pod/Socket::Linux)
+Set a keep alive poller. Note: requires [Socket::Linux](https://metacpan.org/pod/Socket%3A%3ALinux)
 
         $mq->set_keepalive(
                 idle     => $secs, # time between last meaningful packet and first keep alive
@@ -277,7 +272,7 @@ TODO
 # BUGS, LIMITATIONS, AND CAVEATS
 
 Please report all bugs to the issue tracker on github.
-https://github.com/Humanstate/net-amqp-rabbitmq/issues
+https://github.com/PayProp/net-amqp-rabbitmq/issues
 
 One known limitation is that we cannot automatically send heartbeat frames in
 a useful way.
@@ -294,7 +289,7 @@ MQHOST is not set they will be skipped.
 # SUPPORT
 
 Use the issue tracker on github to reach out for support.
-https://github.com/Humanstate/net-amqp-rabbitmq/issues
+https://github.com/PayProp/net-amqp-rabbitmq/issues
 
 # AUTHOR
 
@@ -313,6 +308,7 @@ Contributors:
 
         Ben Kaufman
         Jonathan Briggs
+        Piotr Malek
 
 # LICENSE AND COPYRIGHT
 
@@ -326,6 +322,6 @@ LICENSE file included with this module.
 
 # SEE ALSO
 
-[Net::RabbitMQ](https://metacpan.org/pod/Net::RabbitMQ)
+[Net::RabbitMQ](https://metacpan.org/pod/Net%3A%3ARabbitMQ)
 
-[Net::AMQP](https://metacpan.org/pod/Net::AMQP)
+[Net::AMQP](https://metacpan.org/pod/Net%3A%3AAMQP)

@@ -3,7 +3,7 @@ package Net::AMQP::RabbitMQ::PP;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use Carp;
 use Cwd;
@@ -175,7 +175,7 @@ sub _startup {
 		# Can plug all sorts of random stuff in here.
 		platform => 'Perl/NetAMQP',
 		product => Cwd::abs_path( $PROGRAM_NAME ),
-		information => 'http://github.com/Humanstate/net-amqp-rabbitmq',
+		information => 'http://github.com/PayProp/net-amqp-rabbitmq',
 		version => $VERSION,
 		host => hostname(),
 	);
@@ -917,10 +917,6 @@ __END__
 
 Net::AMQP::RabbitMQ::PP - Pure perl AMQP client for RabbitMQ
 
-=for html
-<a href='https://travis-ci.org/Humanstate/net-amqp-rabbitmq?branch=master'><img src='https://travis-ci.org/Humanstate/net-amqp-rabbitmq.svg?branch=master' alt='Build Status' /></a>
-<a href='https://coveralls.io/r/Humanstate/net-amqp-rabbitmq?branch=master'><img src='https://coveralls.io/repos/Humanstate/net-amqp-rabbitmq/badge.png?branch=master' alt='Coverage Status' /></a>
-
 =head1 SYNOPSIS
 
     use Net::AMQP::RabbitMQ::PP;
@@ -939,7 +935,7 @@ Like L<Net::RabbitMQ> but pure perl rather than a wrapper around librabbitmq.
 
 =head1 VERSION
 
-0.10
+0.11
 
 =head1 SUBROUTINES/METHODS
 
@@ -962,7 +958,7 @@ Connect to the server. Default arguments are shown below:
 		timeout        => undef,
 		username       => 'guest',
 		password       => 'guest',
-		virtualhost    => '/',
+		virtual_host   => '/',
 		heartbeat      => undef,
 		socket_timeout => 5,
 		frame_max      => 131072,
@@ -1191,7 +1187,7 @@ TODO
 =head1 BUGS, LIMITATIONS, AND CAVEATS
 
 Please report all bugs to the issue tracker on github.
-https://github.com/Humanstate/net-amqp-rabbitmq/issues
+https://github.com/PayProp/net-amqp-rabbitmq/issues
 
 One known limitation is that we cannot automatically send heartbeat frames in
 a useful way.
@@ -1208,7 +1204,7 @@ MQHOST is not set they will be skipped.
 =head1 SUPPORT
 
 Use the issue tracker on github to reach out for support.
-https://github.com/Humanstate/net-amqp-rabbitmq/issues
+https://github.com/PayProp/net-amqp-rabbitmq/issues
 
 =head1 AUTHOR
 

@@ -81,7 +81,7 @@ sub check {
 
     my $condition = 'info';
     my $state = 'ok'; 
-    my $msg = uc($condition) . ": $EngineName::$EngineInstance memory usage report: $mem_usage";
+    my $msg = uc($condition) . ": " . $EngineName . "::" . $EngineInstance . " memory usage report: $mem_usage";
     my $data = {'condition'=>$condition, 'state'=>$state, 'msg'=>$msg, 'time'=>time()};
     
     my $status = {

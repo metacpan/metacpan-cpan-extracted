@@ -27,6 +27,10 @@ You may want to check out Aspose free [Powerpoint to PDF](https://products.aspos
 **Web:** HTML/HTML5
 **Other:** MPEG4, SWF (export whole presentations)
 
+## Enhancements in Version 24.2
+
+* Added **GetCommentAuthors** method to get list of comment authors.
+
 ## Enhancements in Version 24.1
 
 * Added **GetAvailableFonts** method to get list of installed system & custom fonts.

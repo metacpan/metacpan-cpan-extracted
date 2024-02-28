@@ -41,10 +41,10 @@ no_index:
 provides:
   App::Music::ChordPro:
     file: lib/ChordPro.pm
-    version: v6.50.6
+    version: v6.50.7
   chordpro:
     file: script/chordpro
-    version: v6.50.6
+    version: v6.50.7
 requires:
   Data::Printer: '1.001001'
   File::HomeDir: '1.004'
@@ -65,5 +65,5 @@ resources:
   homepage: https://chordpro.org
   license: https://dev.perl.org/licenses/
   repository: git://github.com/ChordPro/chordpro.git
-version: v6.050.6
+version: v6.050.7
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

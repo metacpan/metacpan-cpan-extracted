@@ -278,8 +278,8 @@ sub DecodeColor {
   my $dec_re         = qr/[+-]*(?:\d*\.?\d*)/;
   # <ext_expr>     : <core_model>,<div>:<expr1><dec1>;...;<exprk><deck>
   #                     | <core_model>:<expr1><dec1>;...;<exprk><deck>
-  my $ext_expr_re = qr/($core_model_re)(,($div_re))?:\s*
-                       (($expr_re|$name_re),$dec_re(?:;\s*(?:$expr_re|$name_re),$dec_re)*)/x;
+  my $ext_expr_re = qr/($core_model_re)(,\s*($div_re))?:\s*
+                       (($expr_re|$name_re),\s*$dec_re(?:;\s*(?:$expr_re|$name_re),\s*$dec_re)*)/x;
   # <color_expr>   : <name> | <expr> | <ext_expt>
   my $color_expr_re = qr/$expr_re|$ext_expr_re/;
   my $function_re   = qr/wheel|twheel/;
@@ -290,7 +290,7 @@ sub DecodeColor {
   my $color_re = qr/($color_expr_re)(($func_expr_re)*)/;
 
   my $color;
-  if ($expression =~ /^$color_re$/) {
+  if ($expression =~ /^$color_re\s*$/) {
     #DG: Dear reader, I present to you: maintenance hell:
     my $prefix     = $2 || $10;
     my $name       = $3 || $11;
@@ -305,13 +305,17 @@ sub DecodeColor {
     if (defined $core_model) {    # Extended color expression: combine colors as on a pallete
       $color = Black->convert($core_model);
       my $dectot = 0;
-      while ($exprs =~ s/($expr_re),($dec_re)//) {
+      while ($exprs =~ s/($expr_re),\s*($dec_re)//) {
         my $dec = $6; $dec =~ s/--//g;
         next if !$dec || $dec eq '.';    # the contribution is 0!
         $dectot += $dec;
         push(@pallete, [DecodeColor($1), $dec]); }
       $div = $dectot unless $div;
       foreach my $cp (@pallete) {
+        # IMPORTANT: if we need to scale, first convert to RGB,
+        # or we risk losing scaling precision on any zero-valued components.
+        $$cp[0] = $$cp[0]->convert($color->model) unless $color->model eq $$cp[0]->model;
+        # now it is safe to scale:
         $color = $color->add($$cp[0]->scale($$cp[1] / $div)); } }
     else {    # Standard Color Expression: <prefix><name><mix_expr><postfix>
       $color = ($postfix && ($postfix =~ /!!\[(\d+)\]/)    # Note "out-of-order" effect!
@@ -418,7 +422,7 @@ DefPrimitive('\XC@definecolor[]{}[]{}{}', sub {
     # and return a box, so it can be recorded?
     # but we don't want the \XC@ version, and we're not handling the prefix anyway...
     Box(undef, undef, undef,
-      Invocation(T_CS('\definecolor'), ($type && $type->unlist ? $type : undef),
+      Invocation(T_CS('\definecolor'), (IsEmpty($type) ? undef : $type),
         $name, $models, $specs)); });
 
 DefPrimitive('\XC@providecolor[]{}[]{}{}', sub {
@@ -433,7 +437,7 @@ DefPrimitive('\XC@providecolor[]{}[]{}{}', sub {
     AssignValue('xglobal@' => 0);
     Box(undef, undef, undef,
       #      Invocation(T_CS('\XC@providecolor'),$type,$name,$prefix,$models,$specs)); });
-      Invocation(T_CS('\providecolor'), ($type && $type->unlist ? $type : undef),
+      Invocation(T_CS('\providecolor'), (IsEmpty($type) ? undef : $type),
         $name, $models, $specs)); });
 
 # \colorlet[<type>]{<name>}[<num_model>]{<color>}
@@ -715,8 +719,8 @@ DefPrimitive('\rowcolors OptionalMatch:* []{Number}{}{}', sub {
     DefMacroI('\@xcolor@row@after',      undef, $commands);
     DefMacroI('\@xcolor@tabular@before', undef, $commands);
     AssignValue(tabular_row_color_first => $first->valueOf);
-    AssignValue(tabular_row_color_odd   => ($oddcolor->unlist ? ParseXColor(undef, $oddcolor) : undef));
-    AssignValue(tabular_row_color_even => ($evencolor->unlist ? ParseXColor(undef, $evencolor) : undef)); });
+    AssignValue(tabular_row_color_odd => (IsEmpty($oddcolor) ? undef : ParseXColor(undef, $oddcolor)));
+    AssignValue(tabular_row_color_even => (IsEmpty($evencolor) ? undef : ParseXColor(undef, $evencolor))); });
 
 DefConditional('\if@rowcolors', undef);
 RawTeX('\@rowcolorstrue');
@@ -818,13 +822,13 @@ DefPrimitive('\lshift Variable', sub {
     my ($stomach, $var) = @_;
     return () unless $var;
     my ($defn, @args) = @$var;
-    $defn->setValue($defn->valueOf(@args)->multiply(10), @args); });
+    $defn->setValue($defn->valueOf(@args)->multiply(10), undef, @args); });
 
 DefPrimitive('\llshift Variable', sub {
     my ($stomach, $var) = @_;
     return () unless $var;
     my ($defn, @args) = @$var;
-    $defn->setValue($defn->valueOf(@args)->multiply(100), @args); });
+    $defn->setValue($defn->valueOf(@args)->multiply(100), undef, @args); });
 
 DefMacro('\lshiftnum {}', sub {
     my ($gullet, $num) = @_;
@@ -838,25 +842,25 @@ DefPrimitive('\lshiftset Variable {}', sub {
     my ($stomach, $var, $num) = @_;
     return () unless $var;
     my ($defn, @args) = @$var;
-    $defn->setValue((10 * ToString(Expand($num)) . 'pt'), @args); });
+    $defn->setValue((10 * ToString(Expand($num)) . 'pt'), undef, @args); });
 
 DefPrimitive('\llshiftset Variable {}', sub {
     my ($stomach, $var, $num) = @_;
     return () unless $var;
     my ($defn, @args) = @$var;
-    $defn->setValue((100 * ToString(Expand($num)) . 'pt'), @args); });
+    $defn->setValue((100 * ToString(Expand($num)) . 'pt'), undef, @args); });
 
 DefPrimitive('\rshift Variable', sub {
     my ($stomach, $var) = @_;
     return () unless $var;
     my ($defn, @args) = @$var;
-    $defn->setValue($defn->valueOf(@args)->multiply(0.1), @args); });
+    $defn->setValue($defn->valueOf(@args)->multiply(0.1), undef, @args); });
 
 DefPrimitive('\rrshift Variable', sub {
     my ($stomach, $var) = @_;
     return () unless $var;
     my ($defn, @args) = @$var;
-    $defn->setValue($defn->valueOf(@args)->multiply(0.01), @args); });
+    $defn->setValue($defn->valueOf(@args)->multiply(0.01), undef, @args); });
 
 #\fcolorbox{name}{text} or \fcolorbox[model]{spec}{text}
 DefConstructor('\fcolorbox[]{}{} Undigested',

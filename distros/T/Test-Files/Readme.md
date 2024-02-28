@@ -16,7 +16,7 @@ If necessary, some files as well as some parts of contents can be excluded from 
 
 # SYNOPSIS
 
-All examples listed below can be found and executed using **xt/synposis.t**.
+All examples listed below can be found and executed using **xt/synopsis.t**.
 ```perl
   use Path::Tiny qw( path );
   use Test::Files;

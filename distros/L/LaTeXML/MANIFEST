@@ -409,6 +409,7 @@ lib/LaTeXML/Package/book.cls.ltxml
 lib/LaTeXML/Package/bookman.sty.ltxml
 lib/LaTeXML/Package/bookmark.sty.ltxml
 lib/LaTeXML/Package/booktabs.sty.ltxml
+lib/LaTeXML/Package/boxedminipage.sty.ltxml
 lib/LaTeXML/Package/braket.sty.ltxml
 lib/LaTeXML/Package/breakurl.sty.ltxml
 lib/LaTeXML/Package/calc.sty.ltxml
@@ -425,6 +426,7 @@ lib/LaTeXML/Package/circuitikz.sty.ltxml
 lib/LaTeXML/Package/cite.sty.ltxml
 lib/LaTeXML/Package/citesort.sty.ltxml
 lib/LaTeXML/Package/cleveref.sty.ltxml
+lib/LaTeXML/Package/cmap.sty.ltxml
 lib/LaTeXML/Package/cmbright.sty.ltxml
 lib/LaTeXML/Package/color.sty.ltxml
 lib/LaTeXML/Package/colordvi.sty.ltxml
@@ -457,6 +459,7 @@ lib/LaTeXML/Package/elsarticle.cls.ltxml
 lib/LaTeXML/Package/ed.sty.ltxml
 lib/LaTeXML/Package/expl3.sty.ltxml
 lib/LaTeXML/Package/expl3.ltx.ltxml
+lib/LaTeXML/Package/expl3.lua.ltxml
 lib/LaTeXML/Package/expl3.pool.ltxml
 lib/LaTeXML/Package/emulateapj.cls.ltxml
 lib/LaTeXML/Package/emulateapj.sty.ltxml
@@ -528,6 +531,7 @@ lib/LaTeXML/Package/icml_support.sty.ltxml
 lib/LaTeXML/Package/icml.sty.ltxml
 lib/LaTeXML/Package/ieeeconf.cls.ltxml
 lib/LaTeXML/Package/IEEEtran.cls.ltxml
+lib/LaTeXML/Package/ifdraft.sty.ltxml
 lib/LaTeXML/Package/ifetex.sty.ltxml
 lib/LaTeXML/Package/ifluatex.sty.ltxml
 lib/LaTeXML/Package/ifpdf.sty.ltxml
@@ -577,6 +581,7 @@ lib/LaTeXML/Package/lxRDFa.sty.ltxml
 lib/LaTeXML/Package/ly1.fontmap.ltxml
 lib/LaTeXML/Package/makecell.sty.ltxml
 lib/LaTeXML/Package/makeidx.sty.ltxml
+lib/LaTeXML/Package/marginnote.sty.ltxml
 lib/LaTeXML/Package/marvosym.sty.ltxml
 lib/LaTeXML/Package/mathabx.sty.ltxml
 lib/LaTeXML/Package/mathbbol.sty.ltxml
@@ -624,6 +629,7 @@ lib/LaTeXML/Package/pdfpages.sty.ltxml
 lib/LaTeXML/Package/pdfsync.sty.ltxml
 lib/LaTeXML/Package/pdftexcmds.sty.ltxml
 lib/LaTeXML/Package/pgf.sty.ltxml
+lib/LaTeXML/Package/pgfcircutils.tex.ltxml
 lib/LaTeXML/Package/pgfkeys.code.tex.ltxml
 lib/LaTeXML/Package/pgfmath.code.tex.ltxml
 lib/LaTeXML/Package/pgfmathcalc.code.tex.ltxml
@@ -702,6 +708,7 @@ lib/LaTeXML/Package/t1enc.sty.ltxml
 lib/LaTeXML/Package/t2a.fontmap.ltxml
 lib/LaTeXML/Package/t2b.fontmap.ltxml
 lib/LaTeXML/Package/t2c.fontmap.ltxml
+lib/LaTeXML/Package/t5enc.def.ltxml
 lib/LaTeXML/Package/tablefootnote.sty.ltxml
 lib/LaTeXML/Package/tabularx.sty.ltxml
 lib/LaTeXML/Package/tabulary.sty.ltxml
@@ -719,6 +726,7 @@ lib/LaTeXML/Package/titling.sty.ltxml
 lib/LaTeXML/Package/tikz-3dplot.sty.ltxml
 lib/LaTeXML/Package/tikz.sty.ltxml
 lib/LaTeXML/Package/tikzbricks.sty.ltxml
+lib/LaTeXML/Package/tikz-cd.sty.ltxml
 lib/LaTeXML/Package/times.sty.ltxml
 lib/LaTeXML/Package/tocbibind.sty.ltxml
 lib/LaTeXML/Package/todonotes.sty.ltxml
@@ -776,6 +784,7 @@ lib/LaTeXML/texmf/lxRDFa.sty
 t/000_test_context.t
 t/00_unittest.t
 t/002_unit_findfile.t
+t/003_unit_imagemagick.t
 t/05_tokenize.t
 t/10_expansion.t
 t/12_grouping.t
@@ -791,6 +800,8 @@ t/53_alignment.t
 t/55_theorem.t
 t/56_ams.t
 t/65_graphics.t
+t/66_pgf.tt
+t/67_tikz.tt
 t/70_parse.t
 t/80_complex.t
 t/81_babel.t
@@ -932,6 +943,12 @@ t/complex/cleveref_minimal.xml
 t/complex/equationnest.pdf
 t/complex/equationnest.tex
 t/complex/equationnest.xml
+t/complex/figure_dual_caption.pdf
+t/complex/figure_dual_caption.tex
+t/complex/figure_dual_caption.xml
+t/complex/figure_mixed_content.pdf
+t/complex/figure_mixed_content.tex
+t/complex/figure_mixed_content.xml
 t/complex/hyperchars.pdf
 t/complex/hyperchars.tex
 t/complex/hyperchars.xml
@@ -1134,6 +1151,7 @@ t/expansion/endinput.pdf
 t/expansion/endinput.tex
 t/expansion/endinputinner.tex
 t/expansion/endinputinner2.tex
+t/expansion/endinputinner3.tex
 t/expansion/endinput.xml
 t/expansion/env.pdf
 t/expansion/env.tex
@@ -1141,6 +1159,9 @@ t/expansion/env.xml
 t/expansion/environments.pdf
 t/expansion/environments.tex
 t/expansion/environments.xml
+t/expansion/escapechar.pdf
+t/expansion/escapechar.tex
+t/expansion/escapechar.xml
 t/expansion/etex.pdf
 t/expansion/etex.tex
 t/expansion/etex-mydim.tex
@@ -1569,6 +1590,12 @@ t/parse/terms.xml
 t/parse/vertbars.pdf
 t/parse/vertbars.tex
 t/parse/vertbars.xml
+t/pgf/stress_pgfmath.pdf
+t/pgf/stress_pgfmath.tex
+t/pgf/stress_pgfmath.xml
+t/pgf/stress_pgfplots.pdf
+t/pgf/stress_pgfplots.tex
+t/pgf/stress_pgfplots.xml
 t/post/hyperref-post.xml
 t/post/hyperref.xml
 t/post/simplemath-post.xml
@@ -1645,6 +1672,9 @@ t/structure/fancyhdr.xml
 t/structure/figures.pdf
 t/structure/figures.tex
 t/structure/figures.xml
+t/structure/figure_grids.pdf
+t/structure/figure_grids.tex
+t/structure/figure_grids.xml
 t/structure/filelist.pdf
 t/structure/filelist.tex
 t/structure/filelist.xml
@@ -1698,6 +1728,9 @@ t/structure/sec.xml
 t/structure/titlepage.pdf
 t/structure/titlepage.tex
 t/structure/titlepage.xml
+t/structure/subcaption.pdf
+t/structure/subcaption.tex
+t/structure/subcaption.xml
 t/structure/svabstract.pdf
 t/structure/svabstract.tex
 t/structure/svabstract.xml
@@ -1713,6 +1746,33 @@ t/theorem/ntheorem.xml
 t/theorem/theorem.pdf
 t/theorem/theorem.tex
 t/theorem/theorem.xml
+t/tikz/3d-cone.pdf
+t/tikz/3d-cone.tex
+t/tikz/3d-cone.xml
+t/tikz/ac-drive-voltage.pdf
+t/tikz/ac-drive-voltage.tex
+t/tikz/ac-drive-voltage.xml
+t/tikz/consort-flowchart.pdf
+t/tikz/consort-flowchart.tex
+t/tikz/consort-flowchart.xml
+t/tikz/ac-drive-components.pdf
+t/tikz/ac-drive-components.tex
+t/tikz/ac-drive-components.xml
+t/tikz/atoms-and-orbitals.pdf
+t/tikz/atoms-and-orbitals.tex
+t/tikz/atoms-and-orbitals.xml
+t/tikz/cycle.pdf
+t/tikz/cycle.tex
+t/tikz/cycle.xml
+t/tikz/dominoes.pdf
+t/tikz/dominoes.tex
+t/tikz/dominoes.xml
+t/tikz/tikz_figure.pdf
+t/tikz/tikz_figure.tex
+t/tikz/tikz_figure.xml
+t/tikz/unit_tests_by_silviu.pdf
+t/tikz/unit_tests_by_silviu.tex
+t/tikz/unit_tests_by_silviu.xml
 t/tokenize/alltt.pdf
 t/tokenize/alltt.tex
 t/tokenize/alltt.xml
@@ -1739,6 +1799,9 @@ t/tokenize/newlines.pdf
 t/tokenize/newlines-input.tex
 t/tokenize/newlines.tex
 t/tokenize/newlines.xml
+t/tokenize/par.pdf
+t/tokenize/par.tex
+t/tokenize/par.xml
 t/tokenize/percent.pdf
 t/tokenize/percent.tex
 t/tokenize/percent.xml
@@ -1756,5 +1819,6 @@ t/tokenize/toberead.txt
 t/tokenize/verbata.pdf
 t/tokenize/verbata.tex
 t/tokenize/verbata.xml
+t/unit/triangle.pdf
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

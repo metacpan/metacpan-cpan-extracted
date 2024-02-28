@@ -9,28 +9,16 @@ Similar to how Spring-Boot declares their routes, except without annotations.
 ```perl
 package MyApp::Controller;
 
-use Moo;
+use Moose;
 
-use strict;
-use warnings;
+BEGIN { extends 'Dancer2::Controllers::Controller' }
 
-with 'Dancer2::Controllers::Controller';
-
-sub hello_world {
+sub hello_world : Route(get => /) {
     "Hello World!";
 }
 
-sub foo {
+sub foo : Route(get => /foo) {
     "Foo!"
-}
-
-sub routes {
-    return [ 
-        [ 'get' => '/' => 'hello_world' ],
-        [ 'get' => '/foo' => 'foo' ],
-        # Or, pass inline subs
-        [ 'get' => '/inline' => sub { 'Inline!!!' } ]
-    ];
 }
 
 1;

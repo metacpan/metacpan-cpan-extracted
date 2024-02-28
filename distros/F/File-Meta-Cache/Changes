@@ -1,4 +1,22 @@
 Revision history for Perl extension File::Meta::Cache.
+v0.3.0 2024-02-27
+  [fixes]
+    - Allow files to be closed correctly when the meta cache is disabled
+    - Close filehandle before fd if present to prevent warning
+
+  [features]
+    - optional callback can be specified when running sweeper. Called on each invalidated entry
+  
+  [deprications]
+    - constants used for cache entry fields have been renamed. Old namew will
+      be removed in a later version
+    - Noted deprications in POD
+
+  [other]
+    - updated Makefile with newer versions of dependencies
+    - https for github link
+    - added Perl 5.38 to CI
+
 v0.2.0 2023-09-05
   [fixes]
     - disable method now closes file descriptors correctly

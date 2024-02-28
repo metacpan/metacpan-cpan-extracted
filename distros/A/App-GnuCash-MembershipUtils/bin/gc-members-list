@@ -1,0 +1,321 @@
+#!/usr/bin/env perl
+##----------------------------------------------------------------------------
+## :mode=perl:indentSize=2:tabSize=2:noTabs=true:
+##****************************************************************************
+## NOTES:
+##  * Before comitting this file to the repository, ensure Perl Critic can be
+##    invoked at the HARSH [3] level with no errors
+##****************************************************************************
+use strict;
+use warnings;
+use feature 'say';
+
+## Cannot use Find::Bin because script may be invoked as an
+## argument to another script, so instead we use __FILE__
+use File::Basename qw(dirname fileparse basename);
+use File::Spec;
+## Add script directory
+use lib File::Spec->catdir(File::Spec->splitdir(dirname(__FILE__)));
+## Add script directory/lib
+use lib File::Spec->catdir(File::Spec->splitdir(dirname(__FILE__)), qq{lib});
+## Add script directory/../lib
+use lib File::Spec->catdir(
+  File::Spec->splitdir(dirname(__FILE__)), 
+  qq{..}, 
+  qq{lib});
+use App::GnuCash::MembershipUtils qw( :all );
+use Getopt::Long;
+use Pod::Usage;
+use Cwd qw(abs_path);
+use Readonly;
+use Data::Dump qw( pp );
+
+
+## Used for the version string
+Readonly::Scalar my $VERSION       => qq{0.01};
+Readonly::Scalar my $DEFAULT_TITLE => qq{GnuCash Memebers List};
+
+##--------------------------------------------------------
+## Return codes for booleans
+##--------------------------------------------------------
+Readonly::Scalar my $FALSE => 0;
+Readonly::Scalar my $TRUE  => 1;
+
+##--------------------------------------------------------
+## A list of all command line options
+## For GetOptions the following parameter indicaters are used
+##    = Required parameter
+##    : Optional parameter
+##        s String parameter
+##        i Integer parameter
+##        f Real number (float)
+##    + Parameter is inremented for each occurrence on
+##      command line
+##    ! boolean parameter that also allows "no-xxx"
+## If a parameter is not indicated, then a value of 1
+## indicates the parameter was found on the command line
+##--------------------------------------------------------
+#<<< begin perltidy exclusion zone
+my @CommandLineOptions = (
+  "all|a",
+  "help|h|?",
+  "man|m",
+  "version|v",
+  "config|c:s",
+  "file|f:s",
+  "debug|d+",
+);
+#>>> end perltidy exclusion zone
+
+##--------------------------------------------------------
+## A hash to hold all default values for command line
+## options
+##--------------------------------------------------------
+#<<< begin perltidy exclusion zone
+my %gOptions = (
+  "all"     => 0,
+  "help"    => 0,
+  "man"     => 0,
+  "version" => 0,
+  "debug"   => 0,
+  "config"  => "GnuCashMembershipUtils.yml",
+  "file"    => undef,
+);
+#>>> end perltidy exclusion zone
+
+##----------------------------------------------------------------------------
+## process_commandline($allow_extra_args)
+##   Process all the command line options
+##      $allow_extra_args - If TRUE, leave any unrecognized arguments in
+##          @ARGV. If FALSE, consider unrecognized arguements an error.
+##          (DEFAULT: FALSE)
+##----------------------------------------------------------------------------
+sub process_commandline
+{
+  my $allow_extra_args = shift;
+  ## Pass through un-handled options in @ARGV
+  Getopt::Long::Configure("pass_through");
+  GetOptions(\%gOptions, @CommandLineOptions);
+
+  ## See if --man was on the command line
+  if ($gOptions{man})
+  {
+    pod2usage(
+      -input    => \*DATA,
+      -message  => "\n",
+      -exitval  => 1,
+      -verbose  => 99,
+      -sections => '.*',     ## ALL sections
+    );
+  }
+
+  ## See if --help was on the command line
+  display_usage_and_exit(qq{}) if ($gOptions{help});
+
+  ## See if --version was on the command line
+  if ($gOptions{version})
+  {
+    print(qq{"$DEFAULT_TITLE" v$VERSION\n});
+    exit(1);
+  }
+
+  ## Determine the path to the script
+  $gOptions{ScriptPath} = abs_path($0);
+  $gOptions{ScriptPath} =~ s!/?[^/]*/*$!!x;
+  $gOptions{ScriptPath} .= "/" if ($gOptions{ScriptPath} !~ /\/$/x);
+
+  ## See if we are running in windows
+  if ($^O =~ /^MSWin/x)
+  {
+    ## Set the value
+    $gOptions{IsWindows} = $TRUE;
+    ## Get the 8.3 short name (eliminates spaces and quotes)
+    $gOptions{ScriptPathShort} = Win32::GetShortPathName($gOptions{ScriptPath});
+  }
+  else
+  {
+    ## Set the value
+    $gOptions{IsWindows} = $FALSE;
+    ## Non-windows OSes don't care about short names
+    $gOptions{ScriptPathShort} = $gOptions{ScriptPath};
+  }
+
+  ## See if there were any unknown parameters on the command line
+  if (@ARGV && !$allow_extra_args)
+  {
+    display_usage_and_exit("\n\nERROR: Invalid "
+        . (scalar(@ARGV) > 1 ? "arguments" : "argument") . ":\n  "
+        . join("\n  ", @ARGV)
+        . "\n\n");
+  }
+
+  return ($TRUE);
+}
+
+##----------------------------------------------------------------------------
+##     @fn display_usage_and_exit($message, $filenameexitval)
+##  @brief Display the usage with the given message and exit with the given
+##         value
+##  @param $message - Message to display. DEFAULT: ""
+##  @param $exitval - Exit vaule DEFAULT: 1
+## @return NONE
+##   @note
+##----------------------------------------------------------------------------
+sub display_usage_and_exit
+{
+  my $message = shift // qq{};
+  my $exitval = shift // 1;
+
+  pod2usage(
+    -input   => \*DATA,
+    -message => $message,
+    -exitval => $exitval,
+    -verbose => 1,
+  );
+
+  return;
+}
+
+##----------------------------------------------------------------------------
+## MAIN
+##----------------------------------------------------------------------------
+## Set STDOUT to autoflush
+$| = 1;    ## no critic (RequireLocalizedPunctuationVars)
+
+## Parse the command line
+process_commandline();
+
+my ($error, $config) = get_config($gOptions{config});
+
+if ($error) {
+  printf STDERR "Error getting config: %s\n", $error;
+  exit(1);
+}
+
+my $schema;
+($error, $schema) = open_gnucash(get_gnucash_filename($gOptions{file}, $config));
+if ($error) {
+  printf STDERR "Error opening GnuCahs file: %s\n", $error;
+  exit(1);
+}
+
+my $warning;
+($error, $warning) = validate_accounts_in_config({
+  schema => $schema,
+  config => $config,
+});
+say STDERR $warning if ($warning);
+if ($error) {
+  say STDERR $error;
+  exit(1);
+}
+
+
+my @members = get_all_members({
+  active_only => !$gOptions{all},
+  schema      => $schema,
+  config      => $config,
+  debug       => $gOptions{debug},
+});
+
+if ($gOptions{debug}) {
+  say pp(\@members);
+}
+
+my @columns = qw( name );
+push(@columns, qw( active )) if ($gOptions{all});
+push(@columns, qw( membership_type membership_amount));
+
+my @widths;
+for my $column (@columns) {
+  say "Assembling values for the '$column' field..." if ($gOptions{debug});
+  my @values = ( 
+    map { $_->{$column} } @members
+  );
+  push(@values, $column);
+
+  say pp(\@values) if ($gOptions{debug});
+
+  push(@widths, max_length(@values));
+}
+
+my $header = "",
+my $uline  = "";
+for my $idx (0 .. $#columns) {
+  $header .= sprintf("%*s  ", -1 * $widths[$idx], title_case($columns[$idx]));
+  $uline  .= ("-" x $widths[$idx]) . "  ";
+}
+say $header;
+say $uline;
+
+for my $member (@members) {
+  my $line = "";
+  for my $idx (0 .. $#columns) {
+    $line .= sprintf("%*s  ", -1 * $widths[$idx], $member->{$columns[$idx]});
+  }
+  say $line;
+}
+
+exit(0);
+
+__END__
+
+__DATA__
+
+##----------------------------------------------------------------------------
+## By placing the POD in the DATA section, we can use
+##   pod2usage(input => \*DATA)
+## even if the script is compiled using PerlApp, perl2exe or Perl::PAR
+##----------------------------------------------------------------------------
+
+=head1 NAME
+
+gc-members-list - List all active members
+ 
+=head1 DESCRIPTION
+
+Lists all members and optionally their membership type as defined by their
+C<notes> field.
+
+=head1 SYNOPSIS
+
+  # List active members
+  gc-members-list
+
+  # List all members
+  gc-members-list --all
+
+  # Provide a config file and GnuCash file 
+  gc-members-list --config my-config.yaml --file my-organization.gnuash
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--config> I<ConfigFilename>, B<-c> I<ConfigFilename>
+
+Specify the filename for the config file.
+
+=item B<--file> I<GnuCashFilename>, B<-f> I<GnuCashFilename>
+
+Specify the filename for the GnuCash file.
+
+=item B<--all>, B<-a>
+
+  Display both active and inactive members.
+
+=item B<--version>, B<-v>
+
+  Print version information and exit.
+
+=item B<--help>, B<-h>, B<-?>
+
+  Display basic help.
+
+=item B<--man>, B<-m>
+
+  Display more detailed help.
+
+=back
+
+=cut

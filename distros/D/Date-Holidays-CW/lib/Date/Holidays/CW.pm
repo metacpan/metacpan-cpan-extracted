@@ -1,9 +1,10 @@
+use utf8;
 package Date::Holidays::CW;
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 use strict;
 use warnings;
 
-# ABSTRACT: Curacoa's official holidays
+# ABSTRACT: Curaçao's official holidays
 
 use Exporter qw(import);
 
@@ -36,8 +37,8 @@ my %FIXED_DATES = (
         m   => 10,
         d   => 2,
         pap => "Dia di Pais K\x{00f2}rsou",
-        nl  => "Dag van het land Cura\x{00e7}oa",
-        en  => 'Day of the country Curacoa',
+        nl  => 'Dag van het land Curaçao',
+        en  => 'Day of the country Curaçao',
     },
     wimlex => {
         m   => 4,
@@ -284,18 +285,18 @@ __END__
 
 =head1 NAME
 
-Date::Holidays::CW - Curacoa's official holidays
+Date::Holidays::CW - Curaçao's official holidays
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
     use Date::Holidays::CW;
 
     if (my $thing = is_holiday(2020, 10, 2, lang => 'en')) {
-        print "It is $thing!", $/; # prints 'Day of the country Curacoa!'
+        print "It is $thing!", $/; # prints 'Day of the country Curaçao!'
     }
 
 =head1 DESCRIPTION
@@ -336,8 +337,8 @@ Similar API to the other functions, returns an hashref for the year.
 
 =head1 UTF-8
 
-Be aware that we return UTF-8 when Papiamento or Dutch is chosen. So make sure
-you set your enconding to UTF-8, otherwise you may see weird things.
+Be aware that we return UTF-8. Please set your enconding to UTF-8, otherwise
+you may see weird things.
 
 =head1 AUTHOR
 

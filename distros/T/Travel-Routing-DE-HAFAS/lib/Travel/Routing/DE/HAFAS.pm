@@ -18,7 +18,7 @@ use Travel::Routing::DE::HAFAS::Connection;
 use Travel::Status::DE::HAFAS::Location;
 use Travel::Status::DE::HAFAS::Message;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 # {{{ Endpoint Definition
 
@@ -108,8 +108,19 @@ my %hafas_instance = (
 	'ÖBB' => {
 		mgate       => 'https://fahrplan.oebb.at/bin/mgate.exe',
 		name        => 'Österreichische Bundesbahnen',
-		productbits =>
-		  [qw[ice ice ice regio regio s bus ferry u tram ice ondemand ice]],
+		productbits => [
+			[ ice_rj => 'long distance trains' ],
+			[ sev    => 'rail replacement service' ],
+			[ ic_ec  => 'long distance trains' ],
+			[ d_n    => 'night trains and rapid trains' ],
+			[ regio  => 'regional trains' ],
+			[ s      => 'suburban trains' ],
+			[ bus    => 'busses' ],
+			[ ferry  => 'maritime transit' ],
+			[ u      => 'underground' ],
+			[ tram   => 'trams' ],
+			[ other  => 'other transit services' ]
+		],
 		request => {
 			client => {
 				id   => 'OEBB',
@@ -117,7 +128,7 @@ my %hafas_instance = (
 				type => 'IPH',
 				name => 'oebbPROD-ADHOC',
 			},
-			ver  => '1.41',
+			ver  => '1.57',
 			auth => {
 				type => 'AID',
 				aid  => 'OWDL4fE4' . 'ixNiPBBm',
@@ -379,7 +390,12 @@ sub mot_mask {
 
 	my %mot_pos;
 	for my $i ( 0 .. $#{ $hafas_instance{$service}{productbits} } ) {
-		$mot_pos{ $hafas_instance{$service}{productbits}[$i] } = $i;
+		if ( ref( $hafas_instance{$service}{productbits}[$i] ) eq 'ARRAY' ) {
+			$mot_pos{ $hafas_instance{$service}{productbits}[$i][0] } = $i;
+		}
+		else {
+			$mot_pos{ $hafas_instance{$service}{productbits}[$i] } = $i;
+		}
 	}
 
 	if ( my @mots = @{ $self->{exclusive_mots} // [] } ) {
@@ -662,7 +678,7 @@ Travel::Routing::DE::HAFAS - Interface to HAFAS itinerary services
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 DESCRIPTION
 

@@ -1,19 +1,17 @@
 use 5.024000;
 use ExtUtils::MakeMaker;
-# See lib/ExtUtils/MakeMaker.pm for details of how to influence
-# the contents of the Makefile that is written.
 WriteMakefile(
   NAME              => 'File::Meta::Cache',
   VERSION_FROM      => 'lib/File/Meta/Cache.pm', 
   PREREQ_PM         => {
-    "Object::Pad"=>"0.78",
-    "Log::OK"=>0,
+    "Object::Pad"=>"0.808",
+    "Log::OK"=>"v0.2.1",
     "Log::ger"=>0,
-    "constant::more"=>0,
+    "constant::more"=>"v0.3.0",
 
   }, 
   ABSTRACT_FROM     => 'lib/File/Meta/Cache.pod', 
-  AUTHOR            => 'Ruben Westerberg <drclaw@local>',
+  AUTHOR            => 'Ruben Westerberg <drclaw@mac.com>',
   LICENSE           => 'mit',
   META_ADD => {
     "meta-spec" => {
@@ -23,7 +21,7 @@ WriteMakefile(
       repository =>{
         type => "git",
         url => "git://github.com/drclaw1394/perl-file-meta-cache.git",
-        web => "http://github.com/drclaw1394/perl-file-meta-cache",
+        web => "https://github.com/drclaw1394/perl-file-meta-cache",
       }
     }
   }

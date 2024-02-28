@@ -37,6 +37,7 @@ Version 0.48
 0.46 -- Updating Mysql to use utf8mb4
 0.47 -- Removing unused code
 0.48 -- Updating Email Lib
+0.49 -- Adding CrateDB Logging
 
 =cut
 
@@ -48,7 +49,7 @@ our $Data;
 our $EngineName;
 our $EngineInstance;
 our $EngineConfig;
-our $VERSION = '0.47';
+our $VERSION = '0.49';
 our $Modules = {};
 our $ModuleMethods = {};
 our $Alert;

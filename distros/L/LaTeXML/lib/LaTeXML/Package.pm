@@ -81,7 +81,8 @@ our @EXPORT = (qw(&DefAutoload &DefExpandable
   # Mid-level support for writing definitions.
   qw(&Expand &Invocation &Digest &DigestText &DigestIf &DigestLiteral
     &RawTeX &Let &StartSemiverbatim &EndSemiverbatim
-    &Tokenize &TokenizeInternal),
+    &Tokenize &TokenizeInternal
+    &IsEmpty),
 
   # Font encoding
   qw(&DeclareFontMap &FontDecode &FontDecodeString &LoadFontMap),
@@ -383,8 +384,7 @@ sub Let {
   # If strings are given, assume CS tokens (most common case)
   $token1 = T_CS($token1) unless ref $token1;
   $token2 = T_CS($token2) unless ref $token2;
-  $STATE->assignMeaning($token1,
-    ($token2->get_dont_expand ? $token2 : $STATE->lookupMeaning($token2)), $scope);
+  $STATE->assignMeaning($token1, $STATE->lookupMeaning($token2), $scope);
   AfterAssignment();
   return; }
 
@@ -564,7 +564,7 @@ sub ComposeURL {
 my $parameter_options = {    # [CONSTANT]
   nargs        => 1, reversion   => 1, optional => 1, novalue => 1,
   beforeDigest => 1, afterDigest => 1,
-  semiverbatim => 1, undigested  => 1, packParameters => 1 };
+  semiverbatim => 1, undigested  => 1 };
 
 sub DefParameterType {
   my ($type, $reader, %options) = @_;
@@ -584,6 +584,27 @@ sub DefColumnType {
   else {
     Warn('expected', 'character', undef, "Expected Column specifier"); }
   return; }
+
+#======================================================================
+# Allocated registers.
+# We ASSUME the same set of \count positions used by TeX & LaTeX
+# for recording the next available position in \count,\dimen,\skip,\muskip.
+our %allocations = (
+  '\count' => '\count10', '\dimen' => '\count11', '\skip' => '\count12', '\muskip' => '\count13',
+  '\box'   => '\count14', '\toks'  => '\count15');
+
+sub allocateRegister {
+  my ($type) = @_;
+  if (my $addr = $allocations{$type}) {    # $addr is a Register but MUST be stored as \count<#>
+    if (my $n = $STATE->lookupValue($addr)) {
+      my $next = $n->valueOf + 1;
+      $STATE->assignValue($addr => Number($next), 'global');
+      return $type . $next; }
+    else {                                 # If allocations not set up, punt to unallocated register
+      return; } }
+  else {
+    Error('misdefined', $type, undef, "Type $type is not an allocated register type");
+    return; } }
 
 #======================================================================
 # Counters
@@ -612,15 +633,14 @@ sub DefColumnType {
 sub NewCounter {
   my ($ctr, $within, %options) = @_;
   my $unctr = "UN$ctr";    # UNctr is counter for generating ID's for UN-numbered items.
-  if ($within && ($within ne 'document') && !LookupValue("\\c\@$within")) {
+  if ($within && ($within ne 'document') && !LookupDefinition(T_CS("\\c\@$within"))) {
     NewCounter($within); }
-  DefRegisterI(T_CS("\\c\@$ctr"), undef, Number(0));
-  AssignValue("\\c\@$ctr" => Number(0), 'global');
+  my $cs = T_CS("\\c\@$ctr");
+  DefRegisterI($cs, undef, Number(0), allocate => '\count');
   AfterAssignment();
   AssignValue("\\cl\@$ctr" => Tokens(), 'global') unless LookupValue("\\cl\@$ctr");
   DefRegisterI(T_CS("\\c\@$unctr"), undef, Number(0));
-  AssignValue("\\c\@$unctr"  => Number(0), 'global');
-  AssignValue("\\cl\@$unctr" => Tokens(),  'global') unless LookupValue("\\cl\@$unctr");
+  AssignValue("\\cl\@$unctr" => Tokens(), 'global') unless LookupValue("\\cl\@$unctr");
   my $x;
   AssignValue("\\cl\@$within" =>
       Tokens(T_CS($ctr), T_CS($unctr), (($x = LookupValue("\\cl\@$within")) ? $x->unlist : ())),
@@ -655,7 +675,7 @@ sub NewCounter {
 sub CounterValue {
   my ($ctr) = @_;
   $ctr = ToString(Expand($ctr)) if ref $ctr;
-  my $value = LookupValue('\c@' . $ctr);
+  my $value = LookupRegister('\c@' . $ctr);
   if (!$value) {
     Warn('undefined', $ctr, $STATE->getStomach,
       "Counter '$ctr' was not defined; assuming 0");
@@ -671,7 +691,7 @@ sub AfterAssignment {
 sub SetCounter {
   my ($ctr, $value) = @_;
   $ctr = ToString(Expand($ctr)) if ref $ctr;
-  AssignValue('\c@' . $ctr => $value, 'global');
+  AssignRegister('\c@' . $ctr => $value, 'global');
   AfterAssignment();
   DefMacroI(T_CS("\\\@$ctr\@ID"), undef, Tokens(Explode($value->valueOf)), scope => 'global');
   return; }
@@ -680,17 +700,18 @@ sub AddToCounter {
   my ($ctr, $value) = @_;
   $ctr = ToString(Expand($ctr)) if ref $ctr;
   my $v = CounterValue($ctr)->add($value);
-  AssignValue('\c@' . $ctr => $v, 'global');
+  AssignRegister('\c@' . $ctr => $v, 'global');
   AfterAssignment();
   DefMacroI(T_CS("\\\@$ctr\@ID"), undef, Tokens(Explode($v->valueOf)), scope => 'global');
   return; }
 
 sub StepCounter {
   my ($ctr, $noreset) = @_;
-  my $value = CounterValue($ctr);
-  AssignValue("\\c\@$ctr" => $value->add(Number(1)), 'global');
+  my $value    = CounterValue($ctr);
+  my $newvalue = $value->add(Number(1));
+  AssignRegister("\\c\@$ctr" => $newvalue, 'global');
   AfterAssignment();
-  DefMacroI(T_CS("\\\@$ctr\@ID"), undef, Tokens(Explode(LookupValue('\c@' . $ctr)->valueOf)),
+  DefMacroI(T_CS("\\\@$ctr\@ID"), undef, Tokens(Explode($newvalue->valueOf)),
     scope => 'global');
   # and reset any within counters!
   if (!$noreset) {
@@ -817,9 +838,9 @@ sub RefStepID {
 
 sub ResetCounter {
   my ($ctr) = @_;
-  AssignValue('\c@' . $ctr   => Number(0), 'global');
-  AssignValue('\c@UN' . $ctr => Number(0), 'global');    # ?????
-  DefMacroI(T_CS("\\\@$ctr\@ID"), undef, Tokens(Explode(LookupValue('\c@' . $ctr)->valueOf)),
+  AssignRegister('\c@' . $ctr   => Number(0), 'global');
+  AssignRegister('\c@UN' . $ctr => Number(0), 'global') unless $ctr =~ /^UN/;    # but not UNUN
+  DefMacroI(T_CS("\\\@$ctr\@ID"), undef, Tokens(T_OTHER('0')),
     scope => 'global');
   # and reset any within counters!
   if (my $nested = LookupValue("\\cl\@$ctr")) {
@@ -953,6 +974,33 @@ sub TokenizeInternal {
   local $STATE = $STY_CATTABLE;
   return LaTeXML::Core::Mouth->new($string)->readTokens; }
 
+# Check whether all these things are "empty" (spaces are NOT empty!!)
+# short-circuit: return 0 quickly if anything is NOT empty.
+sub IsEmpty {
+  my (@things) = @_;
+  foreach my $thing (@things) {
+    my $ref = ref $thing;
+    if    (!$thing)                          { }
+    elsif ($ref eq 'LaTeXML::Core::Comment') { }
+    elsif ($ref eq 'LaTeXML::Core::Tokens') {
+      return 0 unless IsEmpty($thing->unlist); }
+    elsif ($ref eq 'LaTeXML::Core::Token') {
+      my $cc = $$thing[1];
+      return 0 if ($cc == CC_LETTER) || ($cc == CC_OTHER) || ($cc == CC_ACTIVE) || ($cc == CC_CS); }
+    elsif (!$thing->getProperty('isEmpty')) {
+      if ($ref eq 'LaTeXML::Core::Box') {
+        my $s = $thing->getString;
+        return 0 if (defined $s) && length($s); }
+      elsif ($ref eq 'LaTeXML::Core::List') {
+        return 0 unless IsEmpty($thing->unlist); }
+      elsif ($ref eq 'LaTeXML::Core::Whatsit') {
+        # Sneaky Whatsit property for something (an arg) that stands-in for the whatsit's content.
+        if (my $body = $thing->getProperty('content_box')) {
+          return 0 unless IsEmpty($body); }
+        else {
+          return 0; } } } }
+  return 1; }
+
 #======================================================================
 # Non-exported support for defining forms.
 #======================================================================
@@ -985,17 +1033,18 @@ sub DefAutoload {
   my $csname = (ref $cs ? ToString($cs) : $cs);
   $csname = '\\' . $csname unless $cs =~ /^\\/;
   $cs     = T_CS($csname)  unless ref $cs;
-  if ($defnfile =~ /^(.*?)\.(pool|sty|cls)\.ltxml$/) {
+  $defnfile =~ s/\.ltxml$//;
+  if ($defnfile =~ /^(.*?)\.(pool|sty|cls)$/) {
     my ($name, $type) = ($1, $2);
     # if already loaded, or set, DONT redefine!
     if (!(
         LookupValue($name . '.' . $type . '_loaded')       ||
         LookupValue($name . '.' . $type . '.ltxml_loaded') ||
         LookupMeaning($cs))) {
-
+      AssignMapping('autoload_' . $defnfile, $csname => 1);
       DefMacroI($cs, undef, sub {
-          $STATE->assign_internal('meaning', $csname => undef, 'global');    # UNDEFINE (no recurse)
-          if    ($type eq 'pool') { LoadPool($name); }                       # Load appropriate definitions
+          ClearAutoLoad($defnfile);
+          if    ($type eq 'pool') { LoadPool($name); }         # Load appropriate definitions
           elsif ($type eq 'cls')  { LoadClass($name); }
           else                    { RequirePackage($name); }
           ($cs); }); } }    # Then return the original cs, so that it's be re-tried.
@@ -1003,6 +1052,13 @@ sub DefAutoload {
     Warning('unexpected', $defnfile, undef, "Don't know how to autoload $csname from $defnfile"); }
   return; }
 
+# Undefine ALL autoload triggers for this definition file.
+sub ClearAutoLoad {
+  my ($defnfile) = @_;
+  $defnfile =~ s/\.ltxml$//;
+  foreach my $trigger (LookupMappingKeys('autoload_' . $defnfile)) {
+    $STATE->assign_internal('meaning', $trigger => undef, 'global'); }
+  return; }
 #======================================================================
 # Defining Expandable Control Sequences.
 #======================================================================
@@ -1178,13 +1234,6 @@ sub DefPrimitive {
 
 sub DefPrimitiveI {
   my ($cs, $paramlist, $replacement, %options) = @_;
-  my $string = $replacement;
-  Warn('misdefined', $cs, undef, "Option alias ignored if replacement is not string")
-    if ref $replacement && defined $options{alias};
-  $replacement = sub { Box($string, undef, undef,
-      Invocation($options{alias} || $cs, @_[1 .. $#_]),
-      (defined $string ? () : (isEmpty => 1))); }    # Just marker for reversion?
-    unless ref $replacement;
   $cs        = coerceCS($cs);
   $paramlist = parseParameters($paramlist, $cs) if defined $paramlist && !ref $paramlist;
   my $mode    = $options{mode};
@@ -1204,13 +1253,15 @@ sub DefPrimitiveI {
           : ($bounded ? (sub { $_[0]->egroup; }) : ()))),
       outer    => $options{outer},
       long     => $options{long},
-      isPrefix => $options{isPrefix}),
+      isPrefix => $options{isPrefix},
+      alias    => $options{alias},
+      ),
     $options{scope});
   AssignValue(ToString($cs) . ":locked" => 1) if $options{locked};
   return; }
 
 my $register_options = {    # [CONSTANT]
-  readonly => 1, getter => 1, setter => 1, name => 1 };
+  readonly => 1, getter => 1, setter => 1, address => 1, allocate => 1 };
 my %register_types = (      # [CONSTANT]
   'LaTeXML::Common::Number'    => 'Number',
   'LaTeXML::Common::Dimension' => 'Dimension',
@@ -1230,23 +1281,17 @@ sub DefRegisterI {
   my ($cs, $paramlist, $value, %options) = @_;
   $cs        = coerceCS($cs);
   $paramlist = parseParameters($paramlist, $cs) if defined $paramlist && !ref $paramlist;
-  my $type   = $register_types{ ref $value };
-  my $name   = ToString($options{name} || $cs);
-  my $getter = $options{getter}
-    || sub { LookupValue(join('', $name, map { ToString($_) } @_)) || $value; };
-  my $setter = $options{setter}
-    || ($options{readonly}
-    ? sub { my ($v, @args) = @_;
-      Warn('unexpected', $name, $STATE->getStomach,
-        "Can't assign readonly register $name to " . ToString($v)); return; }
-    : sub { my ($v, @args) = @_;
-      AssignValue(join('', $name, map { ToString($_) } @args) => $v); });
-  # Not really right to set the value!
-  AssignValue(ToString($cs) => $value) if defined $value;
+  my $type    = $register_types{ ref $value };
+  my $address = ($options{address} ? ToString($options{address})
+    : ($options{allocate} ? allocateRegister($options{allocate}) : undef));
+  $address = ToString($cs) unless $address;
+  if ((defined $value) && ((!defined $options{address}) || !defined LookupValue($address))) {
+    AssignValue($address => $value, 'global'); }    # Assign, but do not RE-assign
   $STATE->installDefinition(LaTeXML::Core::Definition::Register->new($cs, $paramlist,
-      replacement  => $name,
+      address      => $address,
       registerType => $type,
-      getter       => $getter, setter => $setter,
+      getter       => $options{getter}, setter => $options{setter},
+      default      => $value,
       readonly     => $options{readonly}),
     'global');
   return; }
@@ -1279,11 +1324,11 @@ sub LookupDimension {
   return Dimension(0); }
 
 sub AssignRegister {
-  my ($cs, $value, @parameters) = @_;
+  my ($cs, $value, $scope, @parameters) = @_;
   my $defn;
   $cs = T_CS($cs) unless ref $cs;
   if (($defn = $STATE->lookupDefinition($cs)) && $defn->isRegister) {
-    return $defn->setValue($value, @parameters); }
+    return $defn->setValue($value, $scope, @parameters); }
   else {
     Warn('expected', 'register', $STATE->getStomach,
       "The control sequence " . ToString($cs) . " is not a register");
@@ -1374,7 +1419,7 @@ sub DefConstructorI {
 # so all ID's can stay in the desired format?
 sub getXMArgID {
   StepCounter('@XMARG');
-  DefMacroI(T_CS('\@@XMARG@ID'), undef, Tokens(Explode(LookupValue('\c@@XMARG')->valueOf)),
+  DefMacroI(T_CS('\@@XMARG@ID'), undef, Tokens(Explode(LookupRegister('\c@@XMARG')->valueOf)),
     scope => 'global');
   return Expand(T_CS('\the@XMARG@ID')); }
 
@@ -1399,7 +1444,7 @@ sub dualize_arglist {
   my $i = 0;
   foreach my $arg (@args) {
     $i++;
-    if (!(defined $arg) || !$arg->unlist) {        # undefined or empty args, just pass through
+    if (!(defined $arg) || IsEmpty($arg)) {        # undefined or empty args, just pass through
       push(@pargs, $arg);
       push(@cargs, $arg); }
     elsif ($used{$i}) {                            # used in presentation?
@@ -1574,7 +1619,8 @@ sub defmath_rewrite {
 
 sub defmath_common_constructor_options {
   my ($cs, $presentation, %options) = @_;
-  my $sizer = inferSizer($options{sizer}, $options{reversion});
+  my $sizer          = inferSizer($options{sizer}, $options{reversion});
+  my $presentation_s = $presentation && ToString($presentation);
   return (
     alias => $options{alias} || $cs->getString,
     (defined $options{reversion} ? (reversion => $options{reversion}) : ()),
@@ -1600,8 +1646,8 @@ sub defmath_common_constructor_options {
       stretchy           => $options{stretchy},
       operator_stretchy  => $options{operator_stretchy},
       font               => ($options{mathstyle}
-        ? sub { LookupValue('font')->merge(mathstyle => $options{mathstyle})->specialize($presentation); }
-        : sub { LookupValue('font')->specialize($presentation); }),
+        ? sub { LookupValue('font')->merge(mathstyle => $options{mathstyle})->specialize($presentation_s); }
+        : sub { LookupValue('font')->specialize($presentation_s); }),
       lpadding => $options{lpadding},
       rpadding => $options{rpadding} },
     scope => $options{scope}); }
@@ -1772,10 +1818,18 @@ sub DefEnvironmentI {
   my $mode = $options{mode};
   $name      = ToString($name)                    if ref $name;
   $paramlist = parseParameters($paramlist, $name) if defined $paramlist && !ref $paramlist;
+  # Magic form: CS with name \begin{env} bypasses some LaTeX
+  # However, in pure LaTeX would usually have expanded to \env
+  # and would have skipped spaces before parsing args, if any.
+  my $paramlist_skips;
+  if ($paramlist && $paramlist->getNumArgs) {
+    $paramlist_skips = LaTeXML::Core::Parameters->new(
+      LaTeXML::Core::Parameter->new('SkipSpaces', 'SkipSpaces'),
+      $paramlist->getParameters); }
   # This is for the common case where the environment is opened by \begin{env}
   my $sizer = inferSizer($options{sizer}, $options{reversion});
   $STATE->installDefinition(LaTeXML::Core::Definition::Constructor
-      ->new(T_CS("\\begin{$name}"), $paramlist, $replacement,
+      ->new(T_CS("\\begin{$name}"), $paramlist_skips, $replacement,
       beforeDigest => flatten(($options{requireMath} ? (sub { requireMath($name); }) : ()),
         ($options{forbidMath} ? (sub { forbidMath($name); }) : ()),
         sub { $_[0]->bgroup; },
@@ -1962,8 +2016,6 @@ sub FindFile_aux {
       return $file . '.ltxml' if -f ($file . '.ltxml'); }    # No need to search, just check if it exists.
     return $file if -f $file;    # No need to search, just check if it exists.
     return; }                    # otherwise we're never going to find it.
-  elsif (pathname_is_nasty($file)) {    # If it is a nasty filename, we won't touch it.
-    return; }                           # we DO NOT want to pass this to kpathse or such!
 
   # Note that the strategy is complicated by the fact that
   # (1) we prefer .ltxml bindings, if present
@@ -1972,7 +2024,7 @@ sub FindFile_aux {
   # (4) depending on switches we may EXCLUDE .ltxml OR raw tex OR allow both.
   # (5) we may allow interpreting raw TeX/sty/whatever files individually or broadly
   # (6) but we may also want to override an apparently "versioned" file, preferring the ltxml
-  my $paths         = LookupValue('SEARCHPATHS');
+  my $paths         = LookupValue('SEARCHPATHS') // [];
   my $urlbase       = LookupValue('URLBASE');
   my $nopaths       = LookupValue('REMOTE_REQUEST');
   my $ltxml_paths   = $nopaths ? [] : $paths;
@@ -1999,8 +2051,7 @@ sub FindFile_aux {
   # Otherwise, pass on to kpsewhich
   # Depending on flags, maybe search for ltxml in texmf or for plain tex in ours!
   # The main point, though, is to we make only ONE (more) call.
-  return if grep { pathname_is_nasty($_) } @$paths;    # SECURITY! No nasty paths in cmdline
-      # Do we need to sanitize these environment variables?
+  # Do we need to sanitize these environment variables?
   my @candidates = (((!$options{noltxml} && !$nopaths) ? ("$file.ltxml") : ()),
     (!$options{notex} ? ($file) : ()));
   local $ENV{TEXINPUTS} = join($Config::Config{'path_sep'},
@@ -2084,10 +2135,6 @@ sub FindFile_fallback {
   else {
     return; } }
 
-sub pathname_is_nasty {
-  my ($pathname) = @_;
-  return $pathname =~ /[^\w\-_\+\=\/\\\.~\:\s]/; }
-
 sub maybeReportSearchPaths {
   if (LookupValue('SEARCHPATHS_REPORTED')) {
     return (); }
@@ -2120,12 +2167,12 @@ sub InputContent {
 # But we may have implemented a .sty.ltxml, so we override the .tex.
 # Is this actually safe, or should we be explicilty providing .tex.ltxml ?
 
-my $input_options = {};    # [CONSTANT]
+my $input_options = { reloadable => 1 };    # [CONSTANT]
 
 sub Input {
   my ($request, %options) = @_;
   $request = ToString($request);
-  $request =~ s/^("+)(.+)\g1$/$2/;    # unwrap if in quotes \input{"file name"}
+  $request =~ s/^("+)(.+)\g1$/$2/;          # unwrap if in quotes \input{"file name"}
   CheckOptions("Input ($request)", $input_options, %options);
   # HEURISTIC! First check if equivalent style file, but only under very specific circumstances
   if (pathname_is_literaldata($request)) {
@@ -2145,7 +2192,7 @@ sub Input {
   # Next special case: If we were currently reading a "known" style or binding file,
   # then this file, even if .tex, must also be definitions rather than content.!!(?)
   if (LookupValue('INTERPRETING_DEFINITIONS')) {
-    InputDefinitions($request); }
+    InputDefinitions($request, %options); }
   elsif (my $path = FindFile($request)) {    # Found something plausible..
     my ($ignoredir, $type);
     if (pathname_is_literaldata($path)) {
@@ -2154,10 +2201,10 @@ sub Input {
       ($ignoredir, $request, $type) = pathname_split($path); }
     # Should we be doing anything about options in the next 2 cases?..... I kinda think not, but?
     if ($type eq 'ltxml') {    # it's a LaTeXML binding.
-      loadLTXML($request, $path); }
+      loadLTXML($request, $path, reloadable => $options{reloadable}); }
     # Else some sort of "known" definitions type file, but not simply 'tex'
     elsif (($type ne 'tex') && (pathname_is_raw($path))) {
-      loadTeXDefinitions($request, $path, fordefinitions => 1, notes => 1); }
+      loadTeXDefinitions($request, $path, fordefinitions => 1, notes => 1, reloadable => $options{reloadable}); }
     else {
       loadTeXContent($path); } }
   else {    # Couldn't find anything?
@@ -2171,7 +2218,7 @@ sub Input {
 # Pass in the "requested path" to the next two, since that's what gets
 # recorded as having been loaded (by \@ifpackageloade, eg).
 sub loadLTXML {
-  my ($request, $pathname) = @_;
+  my ($request, $pathname, %options) = @_;
   # Note: $type will typically be ltxml and $name will include the .sty, .cls or whatever.
   # Note: we're NOT expecting (allowing?) either literal nor remote data objects here.
   if (my $p = pathname_is_literaldata($pathname) || pathname_is_url($pathname)) {
@@ -2185,11 +2232,13 @@ sub loadLTXML {
   # We want to check against the original request, but WITH the type
   $request .= '.' . $type unless $request =~ /\Q.$type\E$/;    # make sure the .ltxml is added here
   my $trequest = $request; $trequest =~ s/\.ltxml$//;          # and NOT added here!
-  return if LookupValue($request . '_loaded') || LookupValue($trequest . '_loaded')
-    || LookupValue($name . '_loaded') || LookupValue($ltxname . '_loaded');
+  return if !$options{reloadable}
+    && (LookupValue($request . '_loaded') || LookupValue($trequest . '_loaded')
+    || LookupValue($name . '_loaded') || LookupValue($ltxname . '_loaded'));
   # Note (only!) that the ltxml version of this was loaded; still could load raw tex!
   AssignValue($request . '_loaded' => 1, 'global');
   AssignValue($ltxname . '_loaded' => 1, 'global') if $ltxname ne $request;
+  ClearAutoLoad($request);
   $STATE->getStomach->getGullet->readingFromMouth(LaTeXML::Core::Mouth::Binding->new($pathname), sub {
       do $pathname;
       Fatal('die', $pathname, $STATE->getStomach->getGullet,
@@ -2200,7 +2249,8 @@ sub loadLTXML {
   Let(T_CS('\ver@' . $trequest), T_CS('\fmtversion'), 'global');
   return; }
 
-my $loadtexdefinitions_options = { fordefinitions => 1, at_letter => 1, notes => 1 };   # [CONSTANT]
+my $loadtexdefinitions_options = { fordefinitions => 1, at_letter => 1, notes => 1,
+  reloadable => 1 };    # [CONSTANT]
 
 sub loadTeXDefinitions {
   my ($request, $pathname, %options) = @_;
@@ -2215,8 +2265,9 @@ sub loadTeXDefinitions {
     # It's probably even the ltxml version is asking for it!!
     # Of course, now it will be marked and wont get reloaded!
     #
-    return if LookupValue($request . '_loaded') && !pathname_is_reloadable($pathname);
-    AssignValue($request . '_loaded' => 1, 'global'); }
+    return if LookupValue($request . '_loaded') && !$options{reloadable};
+    AssignValue($request . '_loaded' => 1, 'global');
+    ClearAutoLoad($request); }
 
   my $stomach = $STATE->getStomach;
   # Note that we are reading definitions (and recursive input is assumed also definitions)
@@ -2404,7 +2455,7 @@ sub AddToMacro {
 my $inputdefinitions_options = {    # [CONSTANT]
   options   => 1, withoptions      => 1, handleoptions => 1,
   type      => 1, as_class         => 1, noltxml       => 1, notex => 1, noerror => 1, after => 1,
-  at_letter => 1, searchpaths_only => 1 };
+  at_letter => 1, searchpaths_only => 1, reloadable    => 1 };
 #   options=>[options...]
 #   withoptions=>boolean : pass options from calling class/package
 #   after=>code or tokens or string as $name.$type-h@@k macro. (executed after the package is loaded)
@@ -2442,9 +2493,18 @@ sub InputDefinitions {
         "previously loaded with '$prevoptions'") unless $curroptions eq $prevoptions; } }
   if (my $file = FindFile($filename, type => $options{type},
       notex => $options{notex}, noltxml => $options{noltxml}, searchpaths_only => $options{searchpaths_only})) {
+    my $pushpop = LookupDefinition(T_CS('\@pushfilename'))
+      && LookupDefinition(T_CS('\@popfilename'));
     if ($options{handleoptions}) {
-# Note: this is trying to emulate the LaTeX 2 (latex.ltx) use of \@pushfilename. For expl3, see expl3.sty.ltxml
-      Digest(T_CS('\@pushfilename'));
+      # Bookkeeping of what is being loaded so that LaTeX can run hooks.
+      # Tricky: expl3 wants to know the fill CURRENTLY being read; \@currname,\@currext set LATER.
+      # Recent expl3 appends \@expl@push@filename@aux@@ which takes THREE arguments!!!
+      # These arguments mysteriously appear in \@onefilewith@ptions, MUCH later than \@pushfilename
+      # We place the neaded data after \@pushfilename, but since we're Digesting in isolation,
+      # they'll disappear if they aren't consumed by expl3.  Whew!
+      Digest(Tokens(T_CS('\@pushfilename'),
+          T_BEGIN, T_END, T_BEGIN, T_END, T_BEGIN, Explode($name), T_END))
+        if $pushpop;
       # For \RequirePackageWithOptions, pass the options from the outer class/style to the inner one.
       if (my $passoptions = $options{withoptions} && $prevname
         && LookupValue('opt@' . $prevname . "." . $prevext)) {
@@ -2478,7 +2538,7 @@ sub InputDefinitions {
       my @n = Explode($e ? $n . '.' . $e : $n);
       DefMacroI('\@filelist', undef, (@p ? Tokens(@p, T_OTHER(','), @n) : Tokens(@n))); }
     if ($ftype eq 'ltxml') {
-      loadLTXML($filename, $file); }                                              # Perl module.
+      loadLTXML($filename, $file, reloadable => $options{reloadable}); }          # Perl module.
     else {
       # Special case -- add a default resource if we're loading a raw .cls file as a first choice.
       # Raw class interpretations needs _some_ styling as baseline.
@@ -2490,7 +2550,7 @@ sub InputDefinitions {
       Digest(T_CS('\\' . $name . '.' . $astype . '-h@@k'));
       DefMacroI('\@currname', undef, Tokens(Explode($prevname))) if $prevname;
       DefMacroI('\@currext',  undef, Tokens(Explode($prevext)))  if $prevext;
-      Digest(T_CS('\@popfilename'));
+      Digest(T_CS('\@popfilename')) if $pushpop;
       resetOptions(); }    # And reset options afterwards, too.
     return $file; }
   elsif (!$options{noerror}) {
@@ -2728,6 +2788,7 @@ sub LoadFontMap {
     if ($map = LookupValue($encoding . '_fontmap')) {           # Got map?
       AssignValue($encoding . '_fontmap_failed_to_load' => 0); }
     else {
+      Info('fontmap', $encoding, undef, "Couldn't find fontmap for '$encoding'");
       AssignValue($encoding . '_fontmap_failed_to_load' => 1, 'global'); } }
   return $map; }
 
@@ -2818,45 +2879,38 @@ sub DefLigature {
       %options });
   return; }
 
-my $old_math_ligature_options = {};                                                     # [CONSTANT]
-my $math_ligature_options     = { matcher => 1, role => 1, name => 1, meaning => 1 };   # [CONSTANT]
+my $math_ligature_options = { matcher => 1, role => 1, name => 1, meaning => 1 };    # [CONSTANT]
 
 sub DefMathLigature {
-  if ((scalar(@_) % 2) == 1) {                                                          # Old style!
-    my ($matcher, %options) = @_;
-    Info('deprecated', 'ligature', undef, "Old style arguments to DefMathLigature; please update");
-    CheckOptions("DefMathLigature", $old_math_ligature_options, %options);
-    UnshiftValue('MATH_LIGATURES', { old_style => 1, matcher => $matcher }); }          # Install it...
-  else {                                                                                # new style!
-    my (%options) = @_;
-    my $matcher = $options{matcher};
-    delete $options{matcher};
-    my ($pattern) = grep { !$$math_ligature_options{$_} } keys %options;
-    my $replacement = $pattern && $options{$pattern};
-    delete $options{$pattern} if $replacement;
-    CheckOptions("DefMathLigature", $math_ligature_options, %options);    # Check remaining options
-    if ($matcher && $pattern) {
-      Error('misdefined', 'MathLigature', undef,
-        "DefMathLigature only gets one of matcher or pattern=>replacement keywords");
-      return; }
-    elsif ($pattern) {
-      my @chars    = reverse(split(//, $pattern));
-      my $ntomatch = scalar(@chars);
-      my %attr     = %options;
-      $matcher = sub {
-        my ($document, $node) = @_;
-        foreach my $char (@chars) {
-          return unless
-            ($node
-            && ($document->getModel->getNodeQName($node) eq 'ltx:XMTok')
-            && (($node->textContent || '') eq $char));
-          $node = $node->previousSibling; }
-        return ($ntomatch, $replacement, %attr); }; }
-    elsif (!$matcher) {
-      Error('misdefined', 'MathLigature', undef,
-        "DefMathLigature missing matcher or pattern=>replacement keywords");
-      return; }
-    UnshiftValue('MATH_LIGATURES', { matcher => $matcher }); }    # Install it...
+  my (%options) = @_;
+  my $matcher = $options{matcher};
+  delete $options{matcher};
+  my ($pattern) = grep { !$$math_ligature_options{$_} } keys %options;
+  my $replacement = $pattern && $options{$pattern};
+  delete $options{$pattern} if $replacement;
+  CheckOptions("DefMathLigature", $math_ligature_options, %options);    # Check remaining options
+  if ($matcher && $pattern) {
+    Error('misdefined', 'MathLigature', undef,
+      "DefMathLigature only gets one of matcher or pattern=>replacement keywords");
+    return; }
+  elsif ($pattern) {
+    my @chars    = reverse(split(//, $pattern));
+    my $ntomatch = scalar(@chars);
+    my %attr     = %options;
+    $matcher = sub {
+      my ($document, $node) = @_;
+      foreach my $char (@chars) {
+        return unless
+          ($node
+          && ($document->getModel->getNodeQName($node) eq 'ltx:XMTok')
+          && (($node->textContent || '') eq $char));
+        $node = $node->previousSibling; }
+      return ($ntomatch, $replacement, %attr); }; }
+  elsif (!$matcher) {
+    Error('misdefined', 'MathLigature', undef,
+      "DefMathLigature missing matcher or pattern=>replacement keywords");
+    return; }
+  UnshiftValue('MATH_LIGATURES', { matcher => $matcher });    # Install it...
   return; }
 
 #======================================================================
@@ -3407,7 +3461,7 @@ specifies if it is not allowed to change this value.
 
 =item C<getter=E<gt>I<code>(@args)>,
 
-=item C<setter=E<gt>I<code>($value,@args)>
+=item C<setter=E<gt>I<code>($value,$scope,@args)>
 
 By default I<value> is stored in the State's Value table under a name concatenating the
 control sequence and argument values.  These options allow other means of fetching and
@@ -4588,7 +4642,7 @@ Likely values include (the values aren't required to be in this set):
  shape  : upright, italic, slanted, smallcaps
  size   : tiny, footnote, small, normal, large,
           Large, LARGE, huge, Huge
- color  : any named color, default is black
+ color  : any color, default is Black
 
 Some families will only be used in math.
 This function returns nothing so it can be easily used in beforeDigest, afterDigest.

@@ -3,7 +3,6 @@ use warnings;
 use Test::More tests => 17;
 use Storable;
 use Flickr::API;
-use 5.010;
 
 
 my $config_file;

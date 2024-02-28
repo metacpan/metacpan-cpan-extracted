@@ -79,6 +79,7 @@ sub loadSchema {
     $self->loadCompiledSchema($compiled); }
   else {
     $$self{schema}->loadSchema; }
+  $self->loadInternalExtensions;
   $self->describeModel if $LaTeXML::Common::Model::DEBUG;
   $$self{schema_loaded} = 1;
   return $$self{schema}; }
@@ -86,6 +87,33 @@ sub loadSchema {
 sub addSchemaDeclaration {
   my ($self, $document, $tag) = @_;
   $$self{schema}->addSchemaDeclaration($document, $tag);
+  return; }
+
+sub loadInternalExtensions {
+  my ($self) = @_;
+  if (!exists $$self{tagprop}{'ltx:_CaptureBlock_'}) {
+    # Synthesize ltx:_CaptureBlock_ to act like the union of ltx:block, ltx:para,
+    $self->synthesizeElement('ltx:_CaptureBlock_',
+      qw(ltx:block ltx:logical-block ltx:sectional-block Caption));
+    $$self{tagprop}{'ltx:_CaptureBlock_'}{model}{'svg:g'}             = 1;
+    $$self{tagprop}{'ltx:_CaptureBlock_'}{model}{'svg:foreignObject'} = 1;
+  }
+  return; }
+
+# Clone the tagprop's (allowed content & attributes) of @other to $tag
+sub synthesizeElement {
+  my ($self, $tag, @others) = @_;
+  $$self{tagprop}{$tag} = {} unless $$self{tagprop}{$tag};
+  my $capture = $$self{tagprop}{$tag};
+  foreach my $other (@others) {
+    if (my $content = $$self{schemaclass}{$other}) {
+      foreach my $child (keys %$content) {
+        $$capture{model}{$child} = $$content{$child}; } }
+    elsif (my $entry = $$self{tagprop}{$other}) {
+      foreach my $child (keys %{ $$entry{model} }) {
+        $$capture{model}{$child} = $$entry{model}{$child}; }
+      foreach my $attr (keys %{ $$entry{attributes} }) {
+        $$capture{attributes}{$attr} = $$entry{attributes}{$attr}; } } }
   return; }
 
 #=====================================================================
@@ -118,7 +146,7 @@ sub loadCompiledSchema {
       $self->addTagAttribute($tag, split(/,/, $attr));
       $self->addTagContent($tag, split(/,/, $children)); }
 
-    elsif ($line =~ /^([^:=]+):=(.*?)$/) {
+    elsif ($line =~ /^([^:=]+):=\(?([^)]*?)\)?$/) {
       my ($classname, $elements) = ($1, $2);
       $self->setSchemaClass($classname, { map { ($_ => 1) } split(/,/, $elements) }); }
     elsif ($line =~ /^([^=]+)=(.*?)$/) {
@@ -368,6 +396,7 @@ sub setSchemaClass {
 # NOTE: These are public, but perhaps should be passed
 # to submodel, in case it can evolve to more precision?
 # However, it would need more context to do that.
+# NOTE: That * matches any NON-namespaced name; *:* matches any namespaced name
 
 # Can an element with (qualified name) $tag contain a $childtag element?
 sub canContain {
@@ -377,7 +406,8 @@ sub canContain {
   return 0 if !$tag || ($tag eq '#PCDATA') || ($tag eq '#Comment');
   return 1 if $tag =~ /(.*?:)?_Capture_$/;                          # with or without namespace prefix
   return 1 if $tag eq '_WildCard_';
-  return 1 if $childtag =~ /(.*?:)?_Capture_$/;
+  return 1 if $childtag =~ /(.*?:)?_Capture_$/;                     # anything can contain these
+  return 1 if $childtag =~ /(.*?:)?_CaptureBlock_$/;
   return 1 if $childtag eq '_WildCard_';
   return 1 if $childtag eq '#Comment';
   return 1 if $childtag eq '#ProcessingInstruction';
@@ -396,13 +426,15 @@ sub canContain {
       : ($$model{"!$childtag"} ? 0
         : ($$model{"$chns:*"} ? 1
           : ($$model{"!$chns:*"} ? 0
-            : ($$model{'*:*'} ? 1
-              : 0))))); }
+            : ($$model{'!*:*'} ? 0
+              : ($$model{'*:*'} ? 1
+                : 0)))))); }
   else {
     return ($$model{$childtag} ? 1
       : ($$model{"!$childtag"} ? 0
-        : ($$model{'*:*'} ? 1
-          : 0))); } }
+        : ($$model{'!*'} ? 0
+          : ($$model{'*'} ? 1
+            : 0)))); } }
 
 # NOTE: Currently the Document class already allows ANY namespaced attributes!
 # (which is very unmodular, although it does have to arrange for namespace declarations)
@@ -414,7 +446,8 @@ sub canHaveAttribute {
   return 0 if $tag eq '#Document';
   return 0 if $tag eq '#ProcessingInstruction';
   return 0 if $tag eq '#DTD';
-  return 1 if $tag =~ /(.*?:)?_Capture_$/;
+  return 1 if $tag    =~ /(.*?:)?_Capture_$/;
+  return 1 if $attrib =~ /^_/;
   return 1 if $$self{permissive};
   my ($tagns,  $tagname)  = ($tag    =~ /^(\w+):(\w*)$/ ? ($1, $2) : ('', $tag));
   my ($attrns, $attrname) = ($attrib =~ /^(\w+):(\w*)$/ ? ($1, $2) : ('', $attrib));
@@ -432,16 +465,25 @@ sub canHaveAttribute {
       : ($$attr{"!$attrib"} ? 0
         : ($$attr{"$attrns:*"} ? 1
           : ($$attr{"!$attrns:*"} ? 0
-            : ($$attr{'*:*'} ? 1
-              : ($$attr{'!*:*'} ? 0
+            : ($$attr{'!*:*'} ? 0
+              : ($$attr{'*:*'} ? 1
                 : 0)))))); }
   else {
     return ($$attr{$attrib} ? 1
       : ($$attr{"!$attrib"} ? 0
-        : 0)); } }
+        : ($$attr{'!*'} ? 0
+          : ($$attr{'*'} ? 1
+            : 0)))); } }
+
+sub getSchemaClassNames {
+  my ($self, $classname) = @_;
+  $self->loadSchema unless $$self{schema_loaded};
+  my $class_data = $$self{schemaclass}{$classname};
+  return $class_data ? (keys %$class_data) : (); }
 
 sub isInSchemaClass {
   my ($self, $classname, $tag) = @_;
+  $self->loadSchema unless $$self{schema_loaded};
   $tag = $self->getNodeQName($tag) if ref $tag;    # In case tag is a node.
   my $class = $$self{schemaclass}{$classname};
   return $class && $$class{$tag}; }

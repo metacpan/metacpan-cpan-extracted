@@ -8,7 +8,7 @@
       "R. Bernstein"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4232",
    "license" : [
       "perl_5"
    ],
@@ -20,7 +20,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "rlib" : "0.02"
+            "Path::Tiny" : "0.058"
          }
       },
       "configure" : {
@@ -30,30 +30,26 @@
       },
       "runtime" : {
          "requires" : {
-            "Bio::DB::GenBank" : "0",
-            "Bio::Restriction::Analysis" : "0",
-            "XML::DOM::XPath" : "0.14",
-            "perl" : "v5.14.0",
-            "rlib" : "0.02"
+            "Bio::DB::RefSeq" : "0",
+            "BioPerl" : "1.007008",
+            "Path::Tiny" : "0.058",
+            "perl" : "v5.14.0"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.81",
-            "rlib" : "0.02"
+            "Path::Tiny" : "0.058",
+            "Test::More" : "0.81"
          }
       }
    },
    "provides" : {
       "Bio::BPWrapper" : {
          "file" : "lib/Bio/BPWrapper.pm",
-         "version" : "1.13"
+         "version" : "1.15"
       },
       "Bio::BPWrapper::AlnManipulations" : {
          "file" : "lib/Bio/BPWrapper/AlnManipulations.pm"
-      },
-      "Bio::BPWrapper::PopManipulations" : {
-         "file" : "lib/Bio/BPWrapper/PopManipulations.pm"
       },
       "Bio::BPWrapper::SeqManipulations" : {
          "file" : "lib/Bio/BPWrapper/SeqManipulations.pm",
@@ -66,12 +62,12 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/bioperl/bp-utils/issues"
+         "web" : "https://github.com/bioperl/p5-bpwrapper/issues"
       },
       "repository" : {
-         "url" : "https://github.com/bioperl/bp-utils"
+         "url" : "https://github.com/bioperl/p5-bpwrapper"
       }
    },
-   "version" : "1.13",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "1.15",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

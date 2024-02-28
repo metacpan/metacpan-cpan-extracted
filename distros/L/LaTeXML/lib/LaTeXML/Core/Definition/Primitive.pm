@@ -15,19 +15,21 @@ use warnings;
 use LaTeXML::Global;
 use LaTeXML::Common::Object;
 use LaTeXML::Common::Error;
+use LaTeXML::Core::Box;
+use LaTeXML::Core::Token;
+use LaTeXML::Core::Tokens;
 use base qw(LaTeXML::Core::Definition);
 
 # Known traits:
 #    isPrefix : whether this primitive is a TeX prefix, \global, etc.
 sub new {
   my ($class, $cs, $parameters, $replacement, %traits) = @_;
-  # Could conceivably have $replacement being a List or Box?
-  my $source = $STATE->getStomach->getGullet->getMouth;
-  Fatal('misdefined', $cs, $source, "Primitive replacement for '" . ToString($cs) . "' is not CODE",
+  Error('misdefined', $cs, $STATE->getStomach,
+    "Primitive replacement for '" . ToString($cs) . "' is not a string or CODE",
     "Replacement is $replacement")
-    unless ref $replacement eq 'CODE';
+    if (ref $replacement) && (ref $replacement ne 'CODE');
   return bless { cs => $cs, parameters => $parameters, replacement => $replacement,
-    locator => $source->getLocator,
+    locator => $STATE->getStomach->getGullet->getMouth->getLocator,
     %traits }, $class; }
 
 sub isPrefix {
@@ -49,18 +51,27 @@ sub executeAfterDigest {
 # Digest the primitive; this should occur in the stomach.
 sub invoke {
   my ($self, $stomach) = @_;
-  my $profiled = $STATE->lookupValue('PROFILING') && ($LaTeXML::CURRENT_TOKEN || $$self{cs});
-  my $tracing  = $STATE->lookupValue('TRACINGCOMMANDS') || $LaTeXML::DEBUG{tracing};
+  my $_tracing = $STATE->lookupValue('TRACING') || 0;
+  my $tracing  = ($_tracing & TRACE_COMMANDS);
+  my $profiled = ($_tracing & TRACE_PROFILE) && ($LaTeXML::CURRENT_TOKEN || $$self{cs});
+
   LaTeXML::Core::Definition::startProfiling($profiled, 'digest') if $profiled;
   Debug('{' . $self->tracingCSName . '}')                        if $tracing;
   my @result = ($self->executeBeforeDigest($stomach));
   my $parms  = $$self{parameters};
   my @args   = ($parms ? $parms->readArguments($stomach->getGullet, $self) : ());
   Debug($self->tracingArgs(@args)) if $tracing && @args;
-  push(@result,
-    &{ $$self{replacement} }($stomach, @args),
-    $self->executeAfterDigest($stomach));
+  my $replacement = $$self{replacement};
 
+  if (!ref $replacement) {
+    my $alias = $$self{alias};
+    $alias = T_CS($alias) if $alias && !ref $alias;
+    push(@result, Box($replacement, undef, undef,
+        Tokens($alias || $$self{cs}, ($parms ? $parms->revertArguments(@args) : ())),
+        (defined $replacement ? () : (isEmpty => 1)))); }
+  else {
+    push(@result, &{ $$self{replacement} }($stomach, @args)); }
+  push(@result, $self->executeAfterDigest($stomach));
   LaTeXML::Core::Definition::stopProfiling($profiled, 'digest') if $profiled;
   return @result; }
 

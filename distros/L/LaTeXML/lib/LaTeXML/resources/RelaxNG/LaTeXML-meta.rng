@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  /=====================================================================\ 
+  /=====================================================================\
   |  LaTeXML-meta.rnc                                                   |
   | RelaxNG model for LaTeXML generated documents                       |
   |=====================================================================|
@@ -22,7 +22,6 @@ they can appear in both inline and block contexts.</a:documentation>
       <ref name="indexmark"/>
       <ref name="glossarydefinition"/>
       <ref name="rdf"/>
-      <ref name="ERROR"/>
       <ref name="resource"/>
       <ref name="navigation"/>
     </choice>
@@ -106,7 +105,7 @@ It's content allows both inline and block-level content.</a:documentation>
   <!-- ====================================================================== -->
   <define name="indexmark">
     <element name="indexmark">
-      <a:documentation>Metadata to record an indexing position. The content is 
+      <a:documentation>Metadata to record an indexing position. The content is
 a sequence of \elementref{indexphrase}, each representing a level in
 a multilevel indexing entry.</a:documentation>
       <ref name="indexmark_attributes"/>
@@ -253,25 +252,6 @@ used to crossreference.</a:documentation>
     <a:documentation>Content model for \elementref{rdf}</a:documentation>
     <ref name="Flow.model"/>
   </define>
-  <!-- ====================================================================== -->
-  <define name="ERROR">
-    <element name="ERROR">
-      <a:documentation>error object for undefined control sequences, or whatever</a:documentation>
-      <ref name="ERROR_attributes"/>
-      <ref name="ERROR_model"/>
-    </element>
-  </define>
-  <define name="ERROR_attributes">
-    <a:documentation>Attributes for \elementref{ERROR}.</a:documentation>
-    <ref name="Common.attributes"/>
-    <ref name="ID.attributes"/>
-  </define>
-  <define name="ERROR_model">
-    <a:documentation>Content model for \elementref{ERROR}.</a:documentation>
-    <zeroOrMore>
-      <text/>
-    </zeroOrMore>
-  </define>
   <!--
     ======================================================================
     Document-level (or sub-document level) Meta objects
@@ -314,7 +294,15 @@ used to crossreference.</a:documentation>
   <define name="navigation">
     <element name="navigation">
       <a:documentation>Records navigation cross-referencing information,
-or serves as a container for page navigational blocks.</a:documentation>
+or serves as a container for page navigational blocks.
+An \elementref{inline-logical-block} child should have attribute \attr{class}
+being one of \texttt{ltx_page_navbar}, \texttt{ltx_page_header}
+or \texttt{ltx_page_footer} and its contents will be used to create those components of webpages.
+Lacking those, a \elementref{TOC} requests a table of contents
+in the navigation bar. Page headers and footers will be synthesized from
+Links from the current page or document to related ones;
+these are represented by \elementref{ref} elements with \attr{rel}
+being up, down, previous, next, and so forth.</a:documentation>
       <ref name="navigation_attributes"/>
       <ref name="navigation_model"/>
     </element>
@@ -324,21 +312,12 @@ or serves as a container for page navigational blocks.</a:documentation>
     <ref name="Common.attributes"/>
   </define>
   <define name="navigation_model">
-    <a:documentation>Content model for \elementref{navigation}.
-A \elementref{inline-para} child should have attribute \attr{class}
-being one of \texttt{ltx_page_navbar}, \texttt{ltx_page_header}
-or \texttt{ltx_page_footer} and its contents will be used to create those components of webpages.
-Lacking those, a \elementref{TOC} requests a table of contents
-in the navigation bar. Page headers and footers will be synthesized from
-Links from the current page or document to related ones;
-these are represented by \elementref{ref} elements with \attr{rel}
-being up, down, previous, next, and so forth.
- top-level elements, presumably block-level,</a:documentation>
+    <a:documentation>Content model for \elementref{navigation}.</a:documentation>
     <zeroOrMore>
       <choice>
         <ref name="ref"/>
         <ref name="TOC"/>
-        <ref name="inline-para"/>
+        <ref name="inline-logical-block"/>
       </choice>
     </zeroOrMore>
   </define>

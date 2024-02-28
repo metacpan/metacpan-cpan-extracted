@@ -5,7 +5,7 @@
       "Lee Johnson <leejo@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_2"
    ],
@@ -53,21 +53,21 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/Humanstate/net-amqp-rabbitmq/issues"
+         "web" : "https://github.com/PayProp/net-amqp-rabbitmq/issues"
       },
       "homepage" : "https://metacpan.org/module/Net::AMQP::RabbitMQ::PP",
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "https://github.com/Humanstate/net-amqp-rabbitmq"
+         "url" : "https://github.com/PayProp/net-amqp-rabbitmq"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_repository" : {
       "type" : "git",
-      "url" : "https://github.com/Humanstate/net-amqp-rabbitmq.git",
-      "web" : "https://github.com/Humanstate/net-amqp-rabbitmq"
+      "url" : "https://github.com/PayProp/net-amqp-rabbitmq.git",
+      "web" : "https://github.com/PayProp/net-amqp-rabbitmq"
    },
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

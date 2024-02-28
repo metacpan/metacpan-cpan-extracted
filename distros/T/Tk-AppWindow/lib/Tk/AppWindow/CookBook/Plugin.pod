@@ -1,0 +1,103 @@
+=head1 NAME
+
+Tk::AppWindow::CookBook::Plugin - Write your own plugin
+
+=head1 OTHER RECIPIES
+
+=over 4
+
+=item L<Tk::AppWindow::CookBook::Extension>
+
+=item L<Tk::AppWindow::CookBook::ContentManager>
+
+=back
+
+=head1 AN ABSTRACT PLUGIN
+
+ package Tk::AppWindow::Plugins::Abstract;
+ 
+ use strict;
+ use warnings;
+ 
+ use base qw( Tk::AppWindow::BaseClasses::Plugin );
+ 
+ #The description section of your pod is shown in the plugins dialog.
+ 
+ =head1 DESCRIPTION
+ 
+ This is an abstract plugin
+
+ =cut
+
+ sub new {
+    my $class = shift;
+    my $self = $class->SUPER::new(@_, 'RequiredExtension');
+    return undef unless defined $self;
+ 
+    $self->cmdHookBefore('command1', 'Hook1', $self);
+    $self->cmdHookAfter('command1', 'Hook2', $self);
+
+    $self->configHookBefore('-configvariable', 'Hook3', $self);
+    $self->configHookAfter('-configvariable', 'Hook4', $self);
+ 
+    return $self;
+ }
+ 
+ sub Hook1 {
+ 	my $self = shift;
+ 	print "before command1\n"
+ 	return @_
+ }
+ 
+ sub Hook2 {
+ 	my $self = shift;
+ 	print "after command1\n"
+ 	return @_
+ }
+ 
+ sub Hook3 {
+ 	my $self = shift;
+ 	print "before -configvariable\n"
+ 	return @_
+ }
+ 
+ sub Hook4 {
+ 	my $self = shift;
+ 	print "after -configvariable\n"
+ 	return @_
+ }
+ 
+ sub Unload {
+    my $self = shift;
+    $self->cmdUnhookBefore('command1', 'Hook1', $self);
+    $self->cmdUnhookAfter('command1', 'Hook2', $self);
+    $self->configUnhookBefore('configvariable', 'Hook3', $self);
+    $self->configUnhookAfter('configvariable', 'Hook4', $self);
+    return 1
+ }
+
+=head1 AUTHOR
+
+Hans Jeuken (hanje at cpan dot org)
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Tk::AppWindow>
+
+=item L<Tk::AppWindow::BaseClasses::Plugin>
+
+=item L<Tk::AppWindow::Ext::Plugins>
+
+=back
+
+=cut
+
+
+
+
+
+
+
+

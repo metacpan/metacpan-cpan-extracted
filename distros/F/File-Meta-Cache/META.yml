@@ -1,7 +1,7 @@
 ---
 abstract: 'Cache open file descriptors and stat meta data'
 author:
-  - 'Ruben Westerberg <drclaw@local>'
+  - 'Ruben Westerberg <drclaw@mac.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
@@ -18,11 +18,11 @@ no_index:
     - t
     - inc
 requires:
-  Log::OK: '0'
+  Log::OK: v0.2.1
   Log::ger: '0'
-  Object::Pad: '0.78'
-  constant::more: '0'
+  Object::Pad: '0.808'
+  constant::more: v0.3.0
 resources:
   repository: git://github.com/drclaw1394/perl-file-meta-cache.git
-version: v0.2.0
+version: v0.3.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,184 @@
+=head1 NAME
+
+Tk::AppWindow::OverView - Getting started with L<Tk::AppWindow>
+
+=head1 DESCRIPTION
+
+This document gives a brief overview of techniques used.
+
+=head1 CALLBACKS
+
+Besides regular Tk callbacks B<Tk::AppWindow>heavily relies on callbacks from the
+module L<Tk::AppWindow::BaseClasses::Callback>. This type of callback is used in
+commands and configvariables.
+
+It allows the addition and removal of hooks. A hook is a routine linked to the callback
+that is executed before of after the execution of the actual callback. This is used mainly
+in plugins.
+
+=head1 COMMANDS
+
+The method B<cmdConfig> in B<Tk::AppWindow> allows you to issue commands that later can be executed
+through the method B<cmdExecute>. Plugins can hook onto these commands. You can give parameters to a command.
+
+=head1 CONFIGVARIABLES
+
+B<Tk::AppWindow> extends on Perl/Tk's option system with I<-configvariables>. You may modify all
+configvariables with B<configPut> and retrieve the values with B<configGet>. You can add configvariables to
+the B<AppWindow> object the following ways:
+
+=over 4
+
+These ways use the classical L<Tk::ConfigSpecs> method and should always be added before B<AppWindow>'s ConfigSpecs call.
+That means that beside B<-preconfig> this can only be done during initialization of extensions. It also means that only
+the B<PASSIVE> and B<CALLBACK> types make any sense. You specify them as:
+
+ -option1 => ['PASSIVE', 'optionName', 'OptionClass', $defaultvalue'],
+ -option2 => ['CALLBACK', undef, undef, ['Method', $obj]],
+
+=over 4
+
+=item B<The -preconfig option>
+
+Specify this option at create time.
+
+=item B<AddPreConfig method>
+
+This method is called during initialization of extensions when needed.
+
+=back
+
+The second way is through the B<ConfigInit> method. It is sort of a replacement
+of the classical B<METHOD>. They are immediately available upon creation. And you can
+apply hooks to them.
+
+ $app->configInit('-option1' => ['Method', $obj]);
+ $app->configInit('-option2' => sub { $var = shift; return $var});
+
+=back
+
+=head1 EXTENSIONS
+
+Extensions are modules that add functionality to L<Tk::AppWindow>. By default
+they live in B<Tk::AppWindow::Ext>. You may define an extra name space using the
+B<-namespace> option.
+
+Extensions can add config variables and commands to L<Tk::Appindow>. They can add
+entries into toolbars and menus. Some extensions depend on others. They will be loaded
+automatically.
+
+Without extensions loaded, Tk::AppWindow is no more than a sophisticated mainwindow.
+
+The following extenstion are available within Tk::AppWindow:
+
+=over 4
+
+=item B<Art>
+
+Everything about images and icons
+
+=item B<Balloon>
+
+Central balloon widget for your application
+
+=item B<ConfigFolder>
+
+Store settings and temp files in a configfolder
+
+=item B<Help>
+
+Help center
+
+=item B<Keyboard>
+
+All about keyboard bindings
+
+=item B<MDI>
+
+Multiple Document Interface
+
+=item B<MenuBar>
+
+Menus and stuff
+
+=item B<Navigator>
+
+Navigate your documents in a multiple document interface.
+
+=item B<NavigatorPanel>
+
+Panel used by Nnavigator
+
+=item B<Panels>
+
+Arrange your panels, like Toolbar, StatusBar, NavigatorPanel, ToolPanel and Work area.
+
+=item B<Plugins>
+
+Manage your plugins
+
+=item B<SDI>
+
+Single document interface
+
+=item B<Settings>
+
+Init and edit your application settings.
+
+=item B<StatusBar>
+
+Log messages and special events.
+
+=item B<ToolBar>
+
+What to say?
+
+=item B<ToolPanel>
+
+Panel like NavigatorPanel. By default on the right hand side.
+
+=item B<WebBrowser>
+
+Interface to your webbrowser.
+
+=back
+
+=head1 HOOKS
+
+Hooks are a feature of the L<Tk::AppWindow::BaseClasses::Callback> object.
+All commands and config variables of the B<configInit>type can have hooks
+applied to them. Used mainly to facilitate loading and unloading of plugins.
+
+=head1 PLUGINS
+
+Plugins are modules that add functionality to L<Tk::AppWindow>. Unlike extensions
+they can be loaded and unloaded by the end user at request. By default
+they live in B<Tk::AppWindow::Plugins>. You may define an extra name space using the
+B<-namespace> option. Plugins are handled by the Plugins extension.
+
+Plugins can add commands, menu entries, panel entries and toolbar entries. Plugins can
+not add config variables.
+
+=head1 AUTHOR
+
+Hans Jeuken (hanje at cpan dot org)
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Tk::AppWindow>
+
+=item L<Tk::AppWindow::BaseClasses::Extension>
+
+=back
+
+=cut
+
+
+
+
+
+
+
+

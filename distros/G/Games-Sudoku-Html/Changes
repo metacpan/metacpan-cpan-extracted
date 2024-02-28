@@ -1,7 +1,12 @@
 
 Changes for Games::Sudoku::Html
 
-v0.06 
+v0.07 2024-02-26
+
+	Changed the shebang in exe script from '/usr/bin/env perl' to just 'perl'. (Slaven Rezic)
+	Renamed sudoku2html.pl to sudoku2html to make it look command-like.
+
+v0.06 2024-02-24
 
 	scripts/sudoku2html.pl added.
 	Moved the former release of Games::Sudoku::PatternSolver::PlayerIf v0.05 to this independent distro.

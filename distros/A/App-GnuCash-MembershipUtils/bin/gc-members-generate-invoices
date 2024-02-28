@@ -1,0 +1,559 @@
+#!/usr/bin/env perl
+##----------------------------------------------------------------------------
+## :mode=perl:indentSize=2:tabSize=2:noTabs=true:
+##****************************************************************************
+## NOTES:
+##  * Before comitting this file to the repository, ensure Perl Critic can be
+##    invoked at the HARSH [3] level with no errors
+##****************************************************************************
+use strict;
+use warnings;
+use feature qw( say state );
+
+## Cannot use Find::Bin because script may be invoked as an
+## argument to another script, so instead we use __FILE__
+use File::Basename qw(dirname fileparse basename);
+use File::Spec;
+## Add script directory
+use lib File::Spec->catdir(File::Spec->splitdir(dirname(__FILE__)));
+## Add script directory/lib
+use lib File::Spec->catdir(File::Spec->splitdir(dirname(__FILE__)), qq{lib});
+## Add script directory/../lib
+use lib File::Spec->catdir(
+  File::Spec->splitdir(dirname(__FILE__)), 
+  qq{..}, 
+  qq{lib});
+use App::GnuCash::MembershipUtils qw( :all );
+use Getopt::Long qw( :config no_ignore_case bundling );
+use Pod::Usage;
+use Cwd qw(abs_path);
+use Readonly;
+use Data::Dump qw( pp );
+use Text::CSV;
+use DateTime;
+use DateTime::Format::DateParse;
+
+Readonly::Hash my %DATE_FORMATS => (
+    us     => "%m/%d/%Y",   # MM/DD/YYYY
+    uk     => "%d/%m/%Y",   # DD/MM/YYYY
+    iso    => "%Y-%m-%d",   # YYYY-MM-DD
+    europe => "%d.%m.%Y",   # DD.MM.YYYY
+);
+
+## Used for the version string
+Readonly::Scalar my $VERSION       => qq{0.01};
+Readonly::Scalar my $DEFAULT_TITLE => qq{GnuCash Members Generate Invoices};
+
+##--------------------------------------------------------
+## Return codes for booleans
+##--------------------------------------------------------
+Readonly::Scalar my $FALSE => 0;
+Readonly::Scalar my $TRUE  => 1;
+
+##--------------------------------------------------------
+## A list of all command line options
+## For GetOptions the following parameter indicaters are used
+##    = Required parameter
+##    : Optional parameter
+##        s String parameter
+##        i Integer parameter
+##        f Real number (float)
+##    + Parameter is inremented for each occurrence on
+##      command line
+##    ! boolean parameter that also allows "no-xxx"
+## If a parameter is not indicated, then a value of 1
+## indicates the parameter was found on the command line
+##--------------------------------------------------------
+#<<< begin perltidy exclusion zone
+my @CommandLineOptions = (
+  "config|c:s",
+  "debug|d+",
+  "due|D:s",
+  "file|f:s",
+  "format|F:s",
+  "help|h|?",
+  "man|M",
+  "memo|m:s",
+  "note|n:s",
+  "opened|O:s",
+  "outfile|o:s",
+  "version|v",
+);
+#>>> end perltidy exclusion zone
+
+##--------------------------------------------------------
+## A hash to hold all default values for command line
+## options
+##--------------------------------------------------------
+#<<< begin perltidy exclusion zone
+my %gOptions = (
+  "config"  => "GnuCashMembershipUtils.yml",
+  "debug"   => 0,
+  "due"     => undef,
+  "file"    => undef,
+  "format"  => undef,
+  "help"    => 0,
+  "man"     => 0,
+  "memo"    => undef,
+  "note"    => undef,
+  "open"    => undef,
+  "version" => 0,
+);
+#>>> end perltidy exclusion zone
+
+## This is the column order required by GnuCash
+Readonly::Array my @CSV_COLUMNS => qw(
+    id
+    date_opened
+    owner_id
+    billingid
+    notes
+    date
+    desc
+    action
+    account
+    quantity
+    price
+    disc_type
+    disc_how
+    discount
+    taxable
+    taxincluded
+    tax_table
+    date_posted
+    due_date
+    account_posted
+    memo_posted
+    accu_splits
+);
+
+##----------------------------------------------------------------------------
+## process_commandline($allow_extra_args)
+##   Process all the command line options
+##      $allow_extra_args - If TRUE, leave any unrecognized arguments in
+##          @ARGV. If FALSE, consider unrecognized arguements an error.
+##          (DEFAULT: FALSE)
+##----------------------------------------------------------------------------
+sub process_commandline
+{
+  my $allow_extra_args = shift;
+  ## Pass through un-handled options in @ARGV
+  Getopt::Long::Configure("pass_through");
+  GetOptions(\%gOptions, @CommandLineOptions);
+
+  ## See if --man was on the command line
+  if ($gOptions{man})
+  {
+    pod2usage(
+      -input    => \*DATA,
+      -message  => "\n",
+      -exitval  => 1,
+      -verbose  => 99,
+      -sections => '.*',     ## ALL sections
+    );
+  }
+
+  ## See if --help was on the command line
+  display_usage_and_exit(qq{}) if ($gOptions{help});
+
+  ## See if --version was on the command line
+  if ($gOptions{version})
+  {
+    print(qq{"$DEFAULT_TITLE" v$VERSION\n});
+    exit(1);
+  }
+
+  ## Determine the path to the script
+  $gOptions{ScriptPath} = abs_path($0);
+  $gOptions{ScriptPath} =~ s!/?[^/]*/*$!!x;
+  $gOptions{ScriptPath} .= "/" if ($gOptions{ScriptPath} !~ /\/$/x);
+
+  ## See if we are running in windows
+  if ($^O =~ /^MSWin/x)
+  {
+    ## Set the value
+    $gOptions{IsWindows} = $TRUE;
+    ## Get the 8.3 short name (eliminates spaces and quotes)
+    $gOptions{ScriptPathShort} = Win32::GetShortPathName($gOptions{ScriptPath});
+  }
+  else
+  {
+    ## Set the value
+    $gOptions{IsWindows} = $FALSE;
+    ## Non-windows OSes don't care about short names
+    $gOptions{ScriptPathShort} = $gOptions{ScriptPath};
+  }
+
+  ## See if there were any unknown parameters on the command line
+  if (@ARGV && !$allow_extra_args)
+  {
+    display_usage_and_exit("\n\nERROR: Invalid "
+        . (scalar(@ARGV) > 1 ? "arguments" : "argument") . ":\n  "
+        . join("\n  ", @ARGV)
+        . "\n\n");
+  }
+
+  return ($TRUE);
+}
+
+##----------------------------------------------------------------------------
+##     @fn display_usage_and_exit($message, $filenameexitval)
+##  @brief Display the usage with the given message and exit with the given
+##         value
+##  @param $message - Message to display. DEFAULT: ""
+##  @param $exitval - Exit vaule DEFAULT: 1
+## @return NONE
+##   @note
+##----------------------------------------------------------------------------
+sub display_usage_and_exit
+{
+  my $message = shift // qq{};
+  my $exitval = shift // 1;
+
+  pod2usage(
+    -input   => \*DATA,
+    -message => $message,
+    -exitval => $exitval,
+    -verbose => 1,
+  );
+
+  return;
+}
+
+##----------------------------------------------------------------------------
+##
+##----------------------------------------------------------------------------
+
+sub format_date {
+    my $dt        = shift;
+    state $format = $DATE_FORMATS{lc($gOptions{format})};
+
+    return $dt->strftime($format);
+}
+
+##----------------------------------------------------------------------------
+## MAIN
+##----------------------------------------------------------------------------
+## Set STDOUT to autoflush
+$| = 1;    ## no critic (RequireLocalizedPunctuationVars)
+
+## Parse the command line
+process_commandline();
+
+my $dt_tz = DateTime::TimeZone->new( name => 'local' );
+my $inv_open_dt;
+if ($gOptions{open}) {
+    $inv_open_dt = DateTime::Format::DateParse->parse_datetime($gOptions{open});
+} else {
+    # Default is first of the current month
+    $inv_open_dt = DateTime->today( time_zone => $dt_tz, )->set_day(1);
+}
+
+my $inv_due_dt;
+if ($gOptions{due}) {
+    $inv_due_dt = DateTime::Format::DateParse->parse_datetime($gOptions{due});
+} else {
+    # Default is last of current month.
+    # This is done by getting the 1st day of next month and subtrating 1 day
+    $inv_due_dt = DateTime->today( time_zone => $dt_tz, )->set_day(1)->add(months => 1)->subtract(days => 1);
+}
+
+if ($inv_open_dt > $inv_due_dt) {
+  printf STDERR "ERROR: The opening date cannot be after the due date!\n";
+  exit(1);
+}
+
+my ($error, $config) = get_config($gOptions{config}, $gOptions{debug});
+
+if ($error) {
+  printf STDERR "Error getting config: %s\n", $error;
+  exit(1);
+}
+
+$gOptions{format} //= $config->{GnuCash}{format};
+unless ($DATE_FORMATS{lc($gOptions{format})}) {
+    printf STDERR "Invalid date format option '%s'. Must be one of '%s'\n",
+        $gOptions{format},
+        join("', '", keys(%DATE_FORMATS));
+    exit(1);
+}
+
+$gOptions{memo} //= $config->{GnuCash}{memo};
+
+$gOptions{note} //= $inv_open_dt->strftime("%B membership dues");
+
+unless ($gOptions{outfile}) {
+    $gOptions{outfile} = DateTime->today( time_zone => $dt_tz, )->strftime("%Y-%m-%d_gnucash_customer_invoices.csv");
+}
+
+my $schema;
+($error, $schema) = open_gnucash(get_gnucash_filename($gOptions{file}, $config));
+if ($error) {
+  printf STDERR "Error opening GnuCash file: %s\n", $error;
+  exit(1);
+}
+
+my $warning;
+($error, $warning) = validate_accounts_in_config({
+  schema => $schema,
+  config => $config,
+});
+say STDERR $warning if ($warning);
+if ($error) {
+  say STDERR $error;
+  exit(1);
+}
+
+my @members = get_all_members({
+  active_only => 1,
+  schema      => $schema,
+  config      => $config,
+  debug       => $gOptions{debug},
+});
+
+my $last_inv_id = $schema->resultset('Invoice')->last_invoice_id;
+my $next_inv_id = $last_inv_id + 1;
+printf(
+    join(
+        "\n",
+        "Output File:   '%s'",
+        "Opening Date:  %s",
+        "Due Date:      %s",
+        "Item Memo:     '%s'",
+        "Invoice Memo:  '%s'",
+        "First Invoice: '%06d'",
+        "",
+    ),
+    $gOptions{outfile},
+    format_date($inv_open_dt),
+    format_date($inv_due_dt),
+    $gOptions{memo},
+    $gOptions{note},
+    $next_inv_id,
+);
+
+my $csv = Text::CSV->new ({
+  # Cannot quote spaces, or GnuCash won't find your accounts
+  quote_space => 0,
+  sep_char    => ';',
+  binary      => 1,
+  auto_diag   => 1,
+});
+
+my %inv_template = (
+  date_opened    => format_date($inv_open_dt),
+  date           => format_date($inv_open_dt),
+  date_posted    => format_date($inv_open_dt),
+  due_date       => format_date($inv_due_dt),
+  quantity       => 1,
+  account_posted => $config->{GnuCash}{account},
+  memo_posted    => $gOptions{note},
+  accu_splits    => "Y",
+);
+
+## no critic (InputOutput::RequireBriefOpen)
+if (open my $fh, ">:encoding(utf8)", $gOptions{outfile}) {
+  for my $member (@members) {
+      my %inv = (
+        %inv_template,
+          id       => sprintf("%06d", $next_inv_id++),
+          owner_id => $member->{id},
+          account  => $member->{membership_account},
+          price    => $member->{membership_amount},
+          desc     => join(" - ", grep { length } ($member->{membership_type}, $gOptions{memo})),
+      );
+      $csv->say ($fh, [ map { $inv{$_} } @CSV_COLUMNS ]);
+  }
+  close($fh);
+} else {
+  say STDERR "Error writing '$gOptions{outfile}': $!";
+  exit(1);
+}
+## use critic
+#      "First Invoice: '%06d'"
+printf("Last Invoice:  '%06d'\n", --$next_inv_id);
+exit(0);
+
+__END__
+
+__DATA__
+
+##----------------------------------------------------------------------------
+## By placing the POD in the DATA section, we can use
+##   pod2usage(input => \*DATA)
+## even if the script is compiled using PerlApp, perl2exe or Perl::PAR
+##----------------------------------------------------------------------------
+
+=head1 NAME
+
+gc-members-generate-invoices - Generate a CSV file suitable for importing into GnuCash.
+ 
+=head1 DESCRIPTION
+
+Generate a CSV file suitable for importing into GnuCash.
+
+=head1 SYNOPSIS
+
+  gc-members-generate-invoices
+
+  # Provide a config file and GnuCash file 
+  gc-members-generate-invoices --config my-config.yml --file my-organization.gnucash
+
+  # Provide a note when posting the invoices
+  gc-members-generate-invoices --config my-config.yml --note "January dues"
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--config> I<ConfigFilename>, B<-c> I<ConfigFilename>
+
+Specify the filename for the config file.
+
+=item B<--file> I<GnuCashFilename>, B<-f> I<GnuCashFilename>
+
+Specify the filename for the GnuCash file.
+
+=item B<--due> I<DueDate>, B<-D> I<DueDate>
+
+Specify the due date for the posted invoices. Defaults to the last day
+of the current month.
+
+=item B<--opened> I<OpenedDate>, B<-O> I<OpenedDate>
+
+Specify the opened and invoice date for the posted invoices. Defaults to the first day
+of the current month.
+
+=item B<--format> I<DateFormat>, B<-F> I<DateFormat>
+
+Specify the date format used in GnuCash. B<NOTE:> This must match the format specified in
+GnuCash Preferences.
+
+Must be one of the following:
+
+=over
+
+=item US
+
+MM/DD/YYYY
+
+=item UK
+
+DD/MM/YYYY
+
+=item EUROPE
+
+DD.MM.YYYY
+
+=item ISO
+
+YYYY-MM-DD
+
+=back
+
+DEFAULT: C<US>
+
+=item B<--memo> I<InvoiceMemo>, B<-m> I<InvoiceMemo>
+
+Specify the memo to be joined to the membership type and used as the description
+for the item within the invoice.
+
+=item B<--note> I<PostingNote>, B<-n> I<PostingNote>
+
+Specify the note to be used when posting the invoice. This shows as the invoice 
+description when viewing the customer report in GnuCash. Defaults to "XXXX membership dues"
+where XXXX is the name of the month for the B<--open> date. For example "April membership dues"
+
+=item B<--outfile> I<OutputFilename>, B<-o> I<OutputFilename>
+
+Specify the output filename to use when generating the CSV file.
+
+Defaults to C<YYYY-MM-DD_gnucash_customer_invoices.csv> where I<YYYY-MM-DD>
+is today's date in C<ISO> format.
+
+=item B<--version>, B<-v>
+
+  Print version information and exit.
+
+=item B<--help>, B<-h>, B<-?>
+
+  Display basic help.
+
+=item B<--man>, B<-m>
+
+  Display more detailed help.
+
+=back
+
+=head1 GnuCash CSV Invoice Import Format
+
+As documented on the L<GnuCash website|https://www.gnucash.org/docs/v4/C/gnucash-guide/busnss-imp-bills-invoices.html>
+
+    * id - The invoice ID. If the invoice ID is blank, GnuCash replaces it with the invoice ID
+            from the previous row. If the invoice ID already exists, GnuCash will add the entries
+            to the existing invoice (unless it is already posted).
+
+    * date_opened - Use the same date format as defined in Preferences. Defaulted to today's date
+            if left blank, or if the date provided is not valid.
+
+    * owner_id - Customer or vendor number. Mandatory in the first data row of an invoice. If not
+            provided, all rows of the same invoice will be ignored.
+
+    * billingid - Billing ID. Optional
+
+    * notes - Invoice notes. Optional.
+
+    * date - The date of the entry. Defaulted to date opened if left blank, or if the date provided
+            is not valid.
+
+    * desc - Description. Optional
+
+    * action - Action. Optional
+
+    * account - Account for the entry. Mandatory in each row. If not provided or invalid, all rows
+            of the same invoice will be ignored.
+
+    * quantity - Quantity. Defaulted to 1 if left blank.
+
+    * price - Price. Mandatory for each row. If not provided, all rows of the same invoice will be
+            ignored.
+
+    * disc_type - Type of discount. Optional. Only relevant for invoices, not for bills.
+            Use "%" or blank for percentage value, anything else for monetary value.
+
+    * disc_how - Discount how. Optional. Only relevant for invoices, not for bills. Use ">"
+            for discount applied after tax, "=" for discount and tax applied before tax, and
+            "<", blank or anything else for discount applied before tax.
+
+    * discount - Amount or percentage of discount. Optional. Only relevant for invoices, not
+            for bills
+
+    * taxable - Is this entry taxable? Optional. Use "Y" or "X" for yes, "N" or blank for no.
+
+    * taxincluded - Is tax included in the item price? Optional. Use "Y" or "X" for yes, "N"
+            or blank for no.
+
+    * tax_table - Tax table. Optional. If the tax table provided does not exist, it will be
+            blank in the invoice.
+
+    * date_posted - Date posted. Optional. Use the same date format as defined in Preferences.
+            If you provide a date posted for the first row of an invoice, GnuCash will attempt
+            to also post the invoice (as opposed to only saving or updating it).
+
+    * due_date - Due date. Optional. Use the same date format as defined in Preferences.
+            Defaulted to date posted, if left blank. Only relevant in the first row of an
+            invoice, if the invoice is posted.
+
+    * account_posted - Post to account, for vendor or customer posting. Only mandatory in the
+            first row of an invoice, if the invoice is posted.
+
+    * memo_posted - Memo. Optional. Only relevant in the first row of an invoice, if the
+            invoice is posted.
+
+    * accu_splits - Accumulate splits? Optional. Use "Y" or "X" for yes, "N" or blank for no.
+            Only relevant in the first row of an invoice, if the invoice is posted. If you use
+            a spreadsheet program to create the import file, it is advised not to use blank for
+            no, because a final column with only blanks may not be recognized as relevant data
+            when the spreadsheet program creates the csv file.
+
+=cut

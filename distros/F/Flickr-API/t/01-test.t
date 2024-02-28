@@ -29,7 +29,7 @@ SKIP: {
 	skip "skipping error code check, since we couldn't reach the API", 1
 		if $rsp->rc() ne '200';
 	# this error code may change in future!
-	is($rsp->error_code(), 112, 'checking the error code for "method not found"');
+	is($rsp->error_code(), 212, 'checking the error code for "method not found"');
 }
 
 

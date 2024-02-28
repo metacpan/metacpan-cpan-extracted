@@ -34,7 +34,7 @@ If all files in the directory being tested fulfill certain requirements.
 
 =head1 SYNOPSIS
 
-All examples listed below can be found and executed using B<xt/synposis.t>.
+All examples listed below can be found and executed using B<xt/synopsis.t>.
 
   use Path::Tiny qw( path );
   use Test::Files;

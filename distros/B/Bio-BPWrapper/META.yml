@@ -7,12 +7,12 @@ author:
   - 'W.-G. Qiu'
   - 'R. Bernstein'
 build_requires:
+  Path::Tiny: '0.058'
   Test::More: '0.81'
-  rlib: '0.02'
 configure_requires:
   Module::Build: '0.4214'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4232, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,24 +21,21 @@ name: Bio-BPWrapper
 provides:
   Bio::BPWrapper:
     file: lib/Bio/BPWrapper.pm
-    version: '1.13'
+    version: '1.15'
   Bio::BPWrapper::AlnManipulations:
     file: lib/Bio/BPWrapper/AlnManipulations.pm
-  Bio::BPWrapper::PopManipulations:
-    file: lib/Bio/BPWrapper/PopManipulations.pm
   Bio::BPWrapper::SeqManipulations:
     file: lib/Bio/BPWrapper/SeqManipulations.pm
     version: '1.0'
   Bio::BPWrapper::TreeManipulations:
     file: lib/Bio/BPWrapper/TreeManipulations.pm
 requires:
-  Bio::DB::GenBank: '0'
-  Bio::Restriction::Analysis: '0'
-  XML::DOM::XPath: '0.14'
+  Bio::DB::RefSeq: '0'
+  BioPerl: '1.007008'
+  Path::Tiny: '0.058'
   perl: v5.14.0
-  rlib: '0.02'
 resources:
-  bugtracker: https://github.com/bioperl/bp-utils/issues
-  repository: https://github.com/bioperl/bp-utils
-version: '1.13'
+  bugtracker: https://github.com/bioperl/p5-bpwrapper/issues
+  repository: https://github.com/bioperl/p5-bpwrapper
+version: '1.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

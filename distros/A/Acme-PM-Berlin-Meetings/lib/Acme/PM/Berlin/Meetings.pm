@@ -3,7 +3,7 @@
 #
 # Author: Slaven Rezic
 #
-# Copyright (C) 2010,2012,2015,2016,2017,2020 Slaven Rezic. All rights reserved.
+# Copyright (C) 2010,2012,2015,2016,2017,2020,2024 Slaven Rezic. All rights reserved.
 # This package is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -14,7 +14,7 @@
 package Acme::PM::Berlin::Meetings;
 
 use strict;
-our $VERSION = '202009.26';
+our $VERSION = '202402.28';
 
 use Exporter 'import'; # needs Exporter 5.57
 our @EXPORT = qw(next_meeting);
@@ -99,7 +99,9 @@ sub _get_dec_meeting {
 
 sub _adjust_hour {
     my $dt = shift;
-    if ($dt->year >= 2016) {
+    if ($dt->year >= 2024 || ($dt->year == 2023 && $dt->month >= 5)) {
+	$dt->set(hour => 18);
+    } elsif ($dt->year >= 2016) {
 	$dt->set(hour => 19);
     } else {
 	$dt->set(hour => 20);

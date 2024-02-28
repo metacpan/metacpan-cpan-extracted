@@ -6,7 +6,8 @@ use warnings;
 use v5.10;
 use Getopt::Long qw( :config bundling permute no_getopt_compat );
 use Pod::Usage;
-use rlib '../lib';
+use Path::Tiny;
+use lib path($0)->absolute->parent->sibling('lib')->stringify;
 
 use Pod::Usage;
 use Bio::BPWrapper;
@@ -25,6 +26,7 @@ GetOptions(
     "avg-pid|a",
     "binary", # 0/1 for binary sites (for phylip legacy programs)
     "bin-inform", # extract binary & informative sites (for clique): discard constant, 3/4-states, non-informative
+    "bin-ref=s",
     "boot|b",
     "codon-view|c:20",    # Optional value, default 20
     "con-blocks|B:6",
@@ -44,6 +46,7 @@ GetOptions(
     "num-seq|n",
     "output|o=s",
     "pair-diff", # pairwise sequence diff
+    "pair-diff-ref=s", # pairwise sequence diff to a ref seq
     "pep2dna|P=s",
     "permute-states|M",
     "phy-nonint", # non-interleaved phylip (for e.g.,clique)
@@ -163,6 +166,10 @@ Print only binary informative sites (e.g., for parsimony analysis). Example PHYL
 
  bioaln --bin-inform --binary -o'phylip' foo.aln > foo.phy
 
+=item --bin-ref "ref-id"
+
+Transform DNA strings into binary strings according to a reference seq. Gapped & non-binary sites skipped (with position returned as STDERR). 
+
 =item --boot, -b
 
 Produced a bootstrapped alignment. To produce multiple bootstrapped alignments, use a BASH loop, e.g.:
@@ -248,9 +255,13 @@ alignments of the same set of samples to a single one for making a "supertree".
 
    bioaln --concat gene1.aln gene2.aln gene3.aln gene4.aln
 
-or using wildcard to specify multiple files:
+or using wildcard to specify multiple files (check with "ls *.aln" first to make sure of alignment order):
 
    bioaln --concat gene*.aln
+
+Two outputs:
+ 1. concated alignment (in STANDOUT)
+ 2. "concat.log" file, which shows mapped positions for a reference seq (specified by "-r" otherwise first sequence)
 
 =item --consensus, -C 'percent' (default 50)
 
@@ -333,7 +344,11 @@ Output file format. Common ones include 'clustalw' (default), 'fasta' and 'phyli
 
 =item --pair-diff
 
-Print pairwise sequence differences, including columns: seqA, seqB, num_variable_sites (no gap), num_pair_diff (no gap), total_pair_length (no gap), percent identity, fraction diff, and pair_diff/num_variable
+Print pairwise sequence differences, including columns: seqA, seqB, num_variable_sites (no gap), num_pair_diff (no gap), total_pair_length (no gap), percent identity, fraction diff, and pair_diff/num_variable. For DNA seqs, it counts any non-ATCG's (e.g., N,n) as invalid, making it more robust than relying soly on percent_diff()
+
+=item --pair-diff-ref <id>
+
+Print pairwise sequence differences to a specified sequence. For DNA seqs, it counts any non-ATCG's (e.g., N,n) as invalid, making it more robust than relying soly on percent_differece().
 
 =item --pep2dna, -P 'unaligned-cds-file' <protein_alignment>
 

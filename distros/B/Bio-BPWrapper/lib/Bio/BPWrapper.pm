@@ -3,9 +3,10 @@
 
 package Bio::BPWrapper;
 
-our $VERSION = '1.13';
-use strict; use warnings;
+use strict;
+use warnings;
 use 5.010;
+our $VERSION = '1.15';
 
 use constant PROGRAM => 'Bio::BPWrapper';
 

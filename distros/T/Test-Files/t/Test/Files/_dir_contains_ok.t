@@ -10,8 +10,6 @@ use Test::Files::Constants qw( $FMT_ABSENT $FMT_FAILED_TO_SEE $FMT_UNEXPECTED );
 const my $MISSING_FILE => 'MISSING_FILE';
 my $expected;
 
-plan( 5 );
-
 {
   my $mockThis = mock $CLASS => ( override => [ _validate_args => sub { 'ERROR' } ] );
   is( $METHOD_REF->( $TEMP_DIR, [] ), [ 'ERROR' ], 'invalid arguments' );
@@ -84,3 +82,5 @@ is(
   $expected,
   'detect unaccessible file, name pattern omitted'
 );
+
+done_testing();

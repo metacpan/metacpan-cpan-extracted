@@ -2,18 +2,16 @@ use strict;
 use warnings;
 package File::Meta::Cache;
 
-our $VERSION="v0.2.0";
+our $VERSION="v0.3.0";
 
 # Default Opening Mode
 use Fcntl qw(O_RDONLY);
-use constant::more {
-  key_=>0,
-  fd_=>1,
-  fh_=>2,
-  stat_=>3,
-  valid_=>4,
-  user_=>5
-};
+
+# NOTE: This contants will be depricated in a later version
+use constant::more key_=>0, fd_=>1, fh_=>2, stat_=>3, valid_=>4, user_=>5;
+
+# Use these keys instead
+use constant::more qw<KEY=0 FD FH STAT VALID USER>;
 
 use Object::Pad;
 
@@ -59,6 +57,7 @@ BUILD{
 
 method sweeper {
   $_sweeper//= sub {
+    my $cb=shift;
     my $i=0;
     my $entry;
     my $closer=$self->closer;
@@ -67,7 +66,10 @@ method sweeper {
 
       # If the cached_ field reaches 1, this is the last code to use it. so close it
       # 
-      $closer->($entry) if($entry->[valid_]==1);
+      if($entry->[VALID]==1){
+        $closer->($entry);
+        $cb and $cb->($entry);
+      }
       last if ++$i >= $_sweep_size;
     }
   }
@@ -79,17 +81,17 @@ method sweeper {
 method opener{
   $_opener//=
   sub {
-    my ( $key_path, $mode, $force)=@_;
+    my ( $KEYpath, $mode, $force)=@_;
     my $in_fd;
 
     # Entry is identified by the path, however, the actual data can come from another file
     # 
-    my $existing_entry=$_cache{$key_path};
+    my $existing_entry=$_cache{$KEYpath};
     $mode//=O_RDONLY;
     if(!$existing_entry or $force){
-        Log::OK::TRACE and log_trace __PACKAGE__.": Searching for: $key_path";
+        Log::OK::TRACE and log_trace __PACKAGE__.": Searching for: $KEYpath";
 
-        my @stat=stat $key_path;
+        my @stat=stat $KEYpath;
         
         # If the stat fail or is not a file return undef.
         # If this is a reopen(force), the force close the file to invalidate the cache
@@ -100,8 +102,8 @@ method opener{
         };
 
         my @entry;
-        #$in_fd=POSIX::open($key_path, $mode);
-        $in_fd=$_open->($key_path, $mode);
+        #$in_fd=POSIX::open($KEYpath, $mode);
+        $in_fd=$_open->($KEYpath, $mode);
 
 
 
@@ -109,35 +111,40 @@ method opener{
           
           if($existing_entry){
             # Duplicate and Close unused fd
-            #POSIX::dup2 $in_fd, $existing_entry->[fd_];
-            $_dup2->($in_fd, $existing_entry->[fd_]);
+            #POSIX::dup2 $in_fd, $existing_entry->[FD];
+            $_dup2->($in_fd, $existing_entry->[FD]);
             #POSIX::close $in_fd;
             $_close->($in_fd);
 
             # Copy stat into existing array 
-            $existing_entry->[stat_]->@*=@stat;
+            $existing_entry->[STAT]->@*=@stat;
           }
           else {
             # Only create a file handle if its enabled
-            open($entry[fh_], "+<&=$in_fd") unless($_no_fh);
+            open($entry[FH], "+<&=$in_fd") unless($_no_fh);
 
-            $entry[stat_]=\@stat;
-            $entry[key_]=$key_path;
-            $entry[fd_]=$in_fd;
-            $entry[valid_]=1;#$count;
+            $entry[STAT]=\@stat;
+            $entry[KEY]=$KEYpath;
+            $entry[FD]=$in_fd;
+            $entry[VALID]=1;#$count;
 
             $existing_entry =\@entry;
-            $_cache{$key_path}=$existing_entry if($_enabled);
+            if($_enabled){
+              $_cache{$KEYpath}=$existing_entry;
+              $existing_entry->[VALID]++;
+            }
           }
         }
         else {
-          Log::OK::ERROR and log_error __PACKAGE__." Error opening file $key_path: $!";
+          Log::OK::ERROR and log_error __PACKAGE__." Error opening file $KEYpath: $!";
         }
     }
+    else {
+      # Increment the  counter of existing
+      #
+      $existing_entry->[VALID]++;
+    }
 
-    # Increment the  counter 
-    #
-    $existing_entry->[valid_]++ if $existing_entry;
     $existing_entry;
   }
 }
@@ -150,7 +157,7 @@ method disable{
   $_enabled=undef;
   for(values %_cache){
     #POSIX::close($_cache{$_}[0]);
-    $_close->($_->[fd_]);
+    $_close->($_->[FD]);
   }
   %_cache=();
   $self;
@@ -162,27 +169,22 @@ method disable{
 method closer {
   $_closer//=sub {
       my $entry=$_[0];
-      if(--$entry->[valid_] <=0 or $_[1]){
-        my $actual=delete $_cache{$entry->[key_]};
-        if($actual){
-          # Attempt to close only if the entry exists
-          $actual->[valid_]=0;  #Mark as invalid
-          #POSIX::close($actual->[fd_]);
-          $_close->($actual->[fd_]);
-          $actual->[fh_]=undef;
-        }
-        else {
-          die "Entry does not exist";
-        }
+      if(--$entry->[VALID] <=0 or $_[1]){
+        # Delete from cache
+        delete $_cache{$entry->[KEY]};
+        # Attempt to close only if the entry exists
+        $entry->[VALID]=0;  #Mark as invalid
+        $entry->[FH]=undef;
+        $_close->($entry->[FD]);
       }
   }
 }
 
 method updater{
   $_updater//=sub {
-    # To a stat on the entry 
-    $_[0][stat_]->@*=stat $_[0][key_];
-    unless($_[0][stat_]->@* and -f _){
+    # Do a stat on the entry 
+    $_[0][STAT]->@*=stat $_[0][KEY];
+    unless($_[0][STAT]->@* and -f _){
       # This is an error force close the file
       $_closer->($_[0], 1 );
     }
@@ -196,13 +198,17 @@ method open {
   $self->opener->&*;
 }
 
+# First argument is entry, second is force flag
 method close {
   $self->closer->&*;
 }
+
+# First argument is entry
 method update{
   $self->updater->&*;
 }
 
+# First argument is callback to call if close is called
 method sweep {
   $self->sweeper->&*;
 }

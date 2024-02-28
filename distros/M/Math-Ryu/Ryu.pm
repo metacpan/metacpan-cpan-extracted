@@ -60,7 +60,7 @@ require Exporter;
 *import = \&Exporter::import;
 require DynaLoader;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 DynaLoader::bootstrap Math::Ryu $VERSION;
 
@@ -69,7 +69,7 @@ my @tagged = qw(
   pn pnv sn snv
   n2s
   s2d
-  fmtpy
+  fmtpy fmtpy_pp
   ryu_lln
   );
 
@@ -112,7 +112,7 @@ sub n2s {
   return nv2s($arg);
 }
 
-sub fmtpy {
+sub fmtpy_pp {
   # The given argument will be either 'Infinity', '-Infinity', 'NaN'
   # or a finite value of the form "mantissaEexponent".
   # The mantissa portion will include a decimal point (with that decimal
@@ -174,7 +174,12 @@ sub fmtpy {
     # that the exponent is preceded by a '+' or '-' sign, and that
     # negative exponents consist of at least 2 digits.
     $s =~ s/e/e\+/i if $parts[1] > 0;
-    return $sign . lc($s) if ($parts[1] < -4 || $parts[1] > 0);
+    $s =~ s/e\-/e\-0/i if ($parts[1] < -4 && $parts[1] > -10);
+    return $sign . lc($s) if ($parts[1] < -4 || $parts[1] > MAX_DEC_DIG - 2);
+
+    if($parts[1] >= 0 ) { # $parts[1] is in the range 1..(MAX_DEC_DIG - 2)
+      return $sign . $parts[0] . (0 x $parts[1]) . '.0';
+    }
 
     # Return, eg, 6E-3 as "0.006".
     return $sign . '0.' . ('0' x (abs($parts[1]) - 1)) . $parts[0] ;

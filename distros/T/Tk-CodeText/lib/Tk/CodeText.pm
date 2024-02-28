@@ -9,7 +9,7 @@ Tk::CodeText - Programmer's Swiss army knife Text widget.
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.45';
+$VERSION = '0.46';
 
 use base qw(Tk::Derived Tk::Frame);
 
@@ -465,6 +465,7 @@ sub Populate {
 	$self->Advertise(Folds => $folds);
 	$self->Advertise(Statusbar => $statusbar);
 	$self->Advertise(Foldsmenu => $fmenu);
+	$self->Advertise(FindEntry => $e);
 
 	# hack for getting proper bitmap foreground
 	my $l = $self->Label;
@@ -511,8 +512,6 @@ sub Populate {
 
 	#configure all the bindings for the text widget
 	$text->bind('<KeyPress>', [$self, 'OnKeyPress', Ev('K') ]);
-	$text->bind('<FocusIn>', [$self, 'OnFocusIn']);
-	$text->bind('<FocusOut>', [$self, 'OnFocusOut']);
 	#lazy events
 	my @levents = qw(
 		ButtonPress ButtonRelease-1 
@@ -622,6 +621,7 @@ sub FindAndOrReplace {
 		-fill => 'x',
 		-before => $self->Subwidget('Statusbar'),
 	);
+	$self->Subwidget('FindEntry')->focus;
 	$self->toplevel->geometry($geosave);
 
 }
@@ -1067,21 +1067,6 @@ sub NoHighlighting {
 	return $self->{NOHIGHLIGHTING}
 }
 
-sub OnFocusIn {
-	my $self = shift;
-	my $flag = $self->{'nohl_save'};
-	$self->NoHighlighting($flag) if defined $flag;
-	$self->highlightLoop;
-	$self->Subwidget('Statusbar')->updateResume;
-}
-
-sub OnFocusOut {
-	my $self = shift;
-	$self->{'nohl_save'} = $self->NoHighlighting;
-	$self->NoHighlighting(1);
-	$self->Subwidget('Statusbar')->updatePause;
-}
-
 sub OnKeyPress {
 	my ($self, $key) = @_;
 	if (length($key) > 1) {
@@ -1471,6 +1456,7 @@ If you find any, please contact the author.
 1;
 
 __END__
+
 
 
 

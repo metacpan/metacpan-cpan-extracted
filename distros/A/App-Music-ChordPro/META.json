@@ -78,11 +78,11 @@
    "provides" : {
       "App::Music::ChordPro" : {
          "file" : "lib/ChordPro.pm",
-         "version" : "v6.50.6"
+         "version" : "v6.50.7"
       },
       "chordpro" : {
          "file" : "script/chordpro",
-         "version" : "v6.50.6"
+         "version" : "v6.50.7"
       }
    },
    "release_status" : "stable",
@@ -101,6 +101,6 @@
          "web" : "https://github.com/ChordPro/chordpro"
       }
    },
-   "version" : "v6.050.6",
+   "version" : "v6.050.7",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

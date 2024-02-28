@@ -7,7 +7,15 @@ use warnings;
 use Benchmark;
 
 use Math::Ryu qw(:all);
-use Math::MPFR qw(:mpfr);
+
+$mpfr = 1;
+eval{require Math::MPFR;};
+
+if($@) { $mpfr = 0 }
+elsif($Math::MPFR::VERSION < 4.14) { $mpfr = 0 }
+elsif(Math::MPFR::MPFR_VERSION_MAJOR() < 3 ||
+     (Math::MPFR::MPFR_VERSION_MAJOR() == 3  &&
+     Math::MPFR::MPFR_VERSION_PATCHLEVEL() < 6)) { $mpfr = 0 }
 
 if   (Math::Ryu::MAX_DEC_DIG == 17) { *NVtos =\&d2s  }
 elsif(Math::Ryu::MAX_DEC_DIG == 21) { *NVtos =\&ld2s }
@@ -55,17 +63,8 @@ timethese (1, {
  'sprintf'    => '$r = sprintf("%.${fmt}g", $_) for @nums;',
 });
 
-$mpfr = 1;
-eval{require Math::MPFR;};
-
-if($@) { $mpfr = 0 }
-elsif($Math::MPFR::VERSION < 4.14) { $mpfr = 0 }
-elsif(Math::MPFR::MPFR_VERSION_MAJOR() < 3 ||
-     (Math::MPFR::MPFR_VERSION_MAJOR() == 3  &&
-     Math::MPFR::MPFR_VERSION_PATCHLEVEL() < 6)) { $mpfr = 0 }
-
 if($mpfr) {
   timethese (1, {
-   'mpfr_fmt' => '$r = nvtoa($_) for @nums;',
+   'mpfr_fmt' => '$r = Math::MPFR::nvtoa($_) for @nums;',
   });
 }

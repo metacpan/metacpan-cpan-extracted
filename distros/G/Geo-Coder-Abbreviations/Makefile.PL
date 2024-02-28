@@ -40,6 +40,7 @@ WriteMakefile(
 	}, TEST_REQUIRES => {
 		'Test::Most' => 0,
 		'Test::NoWarnings' => 0,
+		'Test::Needs' => 0
 		# 'Test::Kwalitee' => 0,
 	}, PREREQ_PM => {
 		'JSON::MaybeXS' => 0,

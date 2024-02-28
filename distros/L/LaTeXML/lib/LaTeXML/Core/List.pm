@@ -63,6 +63,7 @@ sub unlist {
   return @{ $$self{boxes} }; }
 
 sub revert {
+  no warnings 'recursion';
   my ($self) = @_;
   return map { $_->revert } $self->unlist; }
 
@@ -72,6 +73,7 @@ sub toString {
 
 # Methods for overloaded operators
 sub stringify {
+  no warnings 'recursion';
   my ($self) = @_;
   my $type = ref $self;
   $type =~ s/^LaTeXML:://;

@@ -8,3 +8,9 @@ perl -I../lib tests.t 1
 perl -I../lib use_ok.1.t 1
 perl -I../lib use_ok.2.t 1
 perl -I../lib use_ok.3.t 1
+perl -I../lib vars.1.t 1
+perl -I../lib vars.2.t 1
+perl -I../lib vars.3.t 1
+perl -I../lib vars.4.t 1
+perl -I../lib vars.5.t 1
+perl -I../lib vars.other.t 1

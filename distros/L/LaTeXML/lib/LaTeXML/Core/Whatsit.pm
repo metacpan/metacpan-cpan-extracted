@@ -175,6 +175,7 @@ sub getString {
 
 # Methods for overloaded operators
 sub stringify {
+  no warnings 'recursion';
   my ($self) = @_;
   my $hasbody = defined $$self{properties}{body};
   return "Whatsit[" . join(',', $self->getDefinition->getCS->getCSName,
@@ -196,6 +197,7 @@ sub equals {
   return !(@a || @b); }
 
 sub beAbsorbed {
+  no warnings 'recursion';
   my ($self, $document) = @_;
   # Significant time is consumed here, and associated with a specific CS,
   # so we should be profiling as well!
@@ -210,7 +212,7 @@ sub beAbsorbed {
         "Whatsit absorb limit of $LaTeXML::ABSORB_LIMIT exceeded, infinite loop?"); } }
 
   my $defn     = $self->getDefinition;
-  my $profiled = $STATE->lookupValue('PROFILING') && $defn->getCS;
+  my $profiled = (($STATE->lookupValue('TRACING') || 0) & TRACE_PROFILE) && $defn->getCS;
   LaTeXML::Core::Definition::startProfiling($profiled, 'absorb') if $profiled;
   my @result = $defn->doAbsorbtion($document, $self);
   LaTeXML::Core::Definition::stopProfiling($profiled, 'absorb') if $profiled;
@@ -242,6 +244,7 @@ sub computeSize {
         @boxes = $boxes[0]->unlist; } }
     else {
       push(@boxes, $sizer); }
+    no warnings 'recursion';
     return $$props{font}->computeBoxesSize([@boxes], %options); } }
 
 #======================================================================

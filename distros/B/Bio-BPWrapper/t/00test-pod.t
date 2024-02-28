@@ -1,5 +1,6 @@
 #!/usr/bin/env perl
-use strict; use warnings;
+use strict;
+use warnings;
 use Test::More;
 use File::Spec;
 use File::Basename;

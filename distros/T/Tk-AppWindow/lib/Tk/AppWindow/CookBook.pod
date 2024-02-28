@@ -1,0 +1,242 @@
+=head1 NAME
+
+Tk::AppWindow::CookBook - Some recipies
+
+=head1 OTHER RECIPIES
+
+=over 4
+
+=item L<Tk::AppWindow::CookBook::Extension>
+
+=item L<Tk::AppWindow::CookBook::Plugin>
+
+=item L<Tk::AppWindow::CookBook::ContentManager>
+
+=back
+
+=head1 A SIMPLE IMAGE VIEWER
+
+  #!/usr/bin/perl
+  
+  use strict;
+  use warnings;
+  
+  
+  ################################################################
+  # First define the content manager. a content manager handles  #
+  # the basic tasks like loading, saving, displaying and         #
+  # modifying files. The content manager does the actual work.   #
+  ################################################################
+  package ImageManager;
+  
+  use base qw(Tk::Derived Tk::AppWindow::BaseClasses::ContentManager);
+  Construct Tk::Widget 'ImageManager';
+  require Tk::Pane;
+  require Tk::Photo;
+  use Tk::PNG;
+  use File::Basename;
+  use MIME::Base64;
+  use Imager;
+  
+  #Determining which image types we can use;
+  my %photoext = ();
+  my @types = keys %Imager::formats;
+  for (@types) {
+     $photoext{'.jpg'} = 1 if $_ eq 'jpeg';
+     $photoext{".$_"} = 1;
+  }
+  
+  sub Populate {
+     my ($self, $args) = @_;
+     
+     $self->SUPER::Populate($args);
+     #We create a scrolled pane as main viewer. 
+     #In it we pack a label with the image.
+     my $pn = $self->Scrolled('Pane',
+        -scrollbars => 'osoe',
+     )->pack(-expand => 1, -fill => 'both');
+     $self->CWidg($pn);
+     $self->{FILE} = '';
+     $self->{IMAGE} = undef;
+     $self->ConfigSpecs(
+        -zoomto => ['PASSIVE', undef, undef, 'fit'],
+        DEFAULT => [$pn],
+     );
+  }
+  
+  #overwritten method
+  sub doClear {
+     my $self = shift;
+     $self->{FILE} = '';
+     $self->ViewerClear;
+     $self->{IMAGE} = undef;
+  }
+  
+  #overwritten method
+  sub doLoad {
+     my ($self, $file) = @_;
+     $self->{FILE} = $file;
+     if (-e $file) {
+        my ($name,$path,$suffix) = fileparse(lc($file), keys %photoext);
+        if (exists $photoext{lc($suffix)}) {
+           my $img = Imager->new;
+           $img->read(file=>$file) or warn "Cannot read: ", $img->errstr;
+           $self->{IMAGE} = $img if defined $img;
+        } else {
+           warn "Not an image $file"
+        }
+     } else {
+        warn "$file does not exist";
+     }
+     $self->after(100, ['ZoomDefault', $self]);
+     return 1
+  }
+  
+  sub ZoomDefault {
+     my $self = shift;
+     my $scale = $self->cget('-zoomto');
+     if ($scale eq 'fit') {
+        $self->ZoomToFit
+     } else {
+        $self->Zoom($scale)
+     }
+  }
+  
+  sub Zoom {
+     my ($self, $perc) = @_;
+     return $self->ZoomToFit if $perc eq 'fit';
+     my $scale = $perc / 100;
+     my $img = $self->{IMAGE};
+     if (defined $img) {
+        my $width = int($img->getwidth * $scale);
+        my $height = int($img->getheight * $scale);
+        my $new = $img->scale(xpixels => $width, ypixels => $height);
+        $self->ViewerClear;
+        my $data;
+        $new->write(data => \$data, type => 'png');
+        my $l = $self->CWidg->Label(
+           -image => $self->Photo(
+              -data => encode_base64($data), 
+              -format => 'png',
+           ),
+        )->pack;
+        $self->{LABEL} = $l;
+     }
+  }
+  
+  sub ZoomToFit {
+     my $self = shift;
+     my $img = $self->{IMAGE};
+     if (defined $img) {
+        my $pane = $self->CWidg;
+        my $x = $pane->width - 4;
+        my $y = $pane->height - 4;
+        my $width = $img->getwidth;
+        my $height = $img->getheight;
+        my $scale;
+        my $xs = $x / $width;
+        my $ys = $y / $height;
+        if ($xs > $ys) {
+           $scale = $ys
+        } else {
+           $scale = $xs
+        }
+        $self->Zoom($scale * 100);
+     }
+  }
+  
+  sub ViewerClear {
+     my $self = shift;
+     my $i = $self->{LABEL};
+     $i->destroy if defined $i;
+     $self->{LABEL} = undef;
+     $self->update;
+  }
+  
+  ################################################################
+  # Now that we have a content manager ...                       #
+  # We can define the main package                               #
+  ################################################################
+  
+  package main;
+  
+  require Tk::AppWindow;
+  
+  my @scales = (400, 200, 100, 50, 25, 10);
+  
+  my $iv;
+  $iv = Tk::AppWindow->new(
+     -appname => 'Siv',
+     -contentmanagerclass => 'ImageManager',
+     -contentmanageroptions => ['-scaleto'],
+     -extensions => [qw[Art Balloon MDI ToolBar StatusBar MenuBar Navigator Settings]],
+     -readonly => 1,
+     -mainmenuitems => [
+        [   'menu',             'View',         "~Zoom"    ], 
+        [   'menu_normal',      'Zoom::',      "~Fit",         'scaletofit',            'transform-scale' ], 
+        [   'menu_normal',      'Zoom::',      "400",         'scaleto400',            'transform-scale' ], 
+        [   'menu_normal',      'Zoom::',      "200",         'scaleto200',            'transform-scale' ], 
+        [   'menu_normal',      'Zoom::',      "100",         'scaleto100',            'transform-scale' ], 
+        [   'menu_normal',      'Zoom::',      "50",         'scaleto50',            'transform-scale' ], 
+        [   'menu_normal',      'Zoom::',      "25",         'scaleto25',            'transform-scale' ], 
+        [   'menu_normal',      'Zoom::',      "10",         'scaleto10',            'transform-scale' ], 
+     ],
+     -useroptions => [
+        '*page' => 'Bars',
+         '*section' => 'Menubar',
+         -menuiconsize => ['list', 'Icon size', -values => sub { return $iv->cmdExecute('available_icon_sizes') }],
+         '*end',
+        '*section' => 'Toolbar',
+        -toolbarvisible => ['boolean', 'Visible at launch'],
+         -tooliconsize => ['list', 'Icon size', -values => sub { return $iv->cmdExecute('available_icon_sizes') }],
+        -tooltextposition => ['radio', 'Text position', -values => [qw[none left right top bottom]]],
+        '*end',
+        '*section' => 'Statusbar',
+        -statusbarvisible => ['boolean', 'Visible at launch'],
+        '*end',
+     ],
+     -verbose => 1,
+  );
+  
+  $iv->cmdConfig('scaletofit' => [\&Zoom, 'fit']);
+  for (@scales) {
+     my $scale = $_;
+     $iv->cmdConfig("scaleto$scale" => [\&Zoom, $scale])
+  }
+  
+  $iv->MainLoop;
+  
+  sub Zoom {
+     my $perc = shift;
+     my $mdi = $iv->extGet('MDI');
+     my $sel = $mdi->docSelected;
+     if (defined $sel) {
+        my $doc = $mdi->docGet($sel);
+        $doc->Zoom($perc);
+     }
+  }
+
+=head1 AUTHOR
+
+Hans Jeuken (hanje at cpan dot org)
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Tk::AppWindow>
+
+=item L<Tk::AppWindow::BaseClasses::Extension>
+
+=item L<Tk::AppWindow::BaseClasses::SidePanel>
+
+=item L<Tk::AppWindow::Ext::Panels>
+
+=back
+
+=cut
+
+
+
+
+

@@ -16,7 +16,7 @@ use Storable qw(store_fd retrieve_fd);
 
 our @ISA = qw(LWP::UserAgent);
 
-our $VERSION = '1.28';
+our $VERSION = '1.29';
 
 sub new {
     my ($class, $args) = @_;

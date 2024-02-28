@@ -1,3 +1,8 @@
+1.02
+     - Fix fmtpy_pp() to handle values like '6E15' correctly. (In 1.01, they appear
+       as '6e+15', but python3 has '6000000000000000.0'.)
+     - Rewrite fmtpy() in C. (The earlier pure perl implementation is still available
+       as fmtpy_pp
 1.01
      - Fix s2d() to handle Inf and NaN.
      - Add new functions pn, pnv, sn, snv.

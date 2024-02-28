@@ -4,6 +4,7 @@ author:
   - 'Nigel Horne <njh@bandsman.co.uk>'
 build_requires:
   Test::Most: '0'
+  Test::Needs: '0'
   Test::NoWarnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -26,5 +27,5 @@ requires:
 resources:
   bugtracker: https://github.com/nigelhorne/Geo-Coder-Abbreviations/issues
   repository: git://github.com/nigelhorne/Geo-Coder-Abbreviations.git
-version: '0.06'
+version: '0.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

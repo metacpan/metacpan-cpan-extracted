@@ -46,17 +46,19 @@ sub get {
     
     my ($self) = @_;
     
-    # YOUR CODE GOES HERE
+    my @to_process = ();
     
-    # === some tests
     my $dbh = $Data->prod_mysql();
-    my ($value) = $dbh->selectrow_array("SELECT NOW()");
-    say($value);
-    # === end tests
     
-    # return an array reference of items to process in the worker module
-    return [$value];
+    my $post_sql = "SELECT id, content FROM posts";
+    my $post_sth = $dbh->prepare($post_sql);
+    $post_sth->execute();
     
+    while (my ($id, $content) = $post_sth->fetchrow_array()) {
+        push @to_process, {id=>$id, content=>$content};
+    }
+    
+    return \@to_process;
 }
 
 1;

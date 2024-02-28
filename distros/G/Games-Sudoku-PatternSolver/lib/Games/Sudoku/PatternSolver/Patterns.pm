@@ -3,7 +3,7 @@ package Games::Sudoku::PatternSolver::Patterns;
 use strict;
 use warnings;
 
-require 5.10.0;
+require 5.06.0;
 
 our @ISA = qw( Exporter );
 our @EXPORT_OK = qw( init_patterns init_fields build_groups print_grid_from_vector get_intersections field_coordinates );
@@ -162,8 +162,8 @@ sub create_patterns {
 }
 
 sub print_grid_from_vector {
-  my ($vector) = shift;
-  my ($symbol) = shift() // 'X';
+  my ($vector, $symbol) = @_;
+  $symbol = 'X' unless defined($symbol);
 
   my $bits = $vector->to_Bin();
   $bits =~ s/0/ /g;

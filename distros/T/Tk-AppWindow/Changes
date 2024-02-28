@@ -1,0 +1,11 @@
+Revision history for Perl extension Tk::AppWindow.
+
+0.02 Wed Feb 28 2024
+	- first version for cpan.
+	
+0.01  Sun Dec 19 23:09:57 2021
+	- original version; created by h2xs 1.23 with options
+		-X -n Tk::AppWindow
+
+
+

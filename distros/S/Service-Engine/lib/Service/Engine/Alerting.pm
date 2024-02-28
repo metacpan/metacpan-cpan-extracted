@@ -47,7 +47,7 @@ sub new {
         
         if ($AlertingConfig->{'enabled'}) {
              $Log->log({'msg'=>"Alerting enabled",'level'=>2});
-            foreach my $service (keys $AlertingConfig->{'modules'}) {
+            foreach my $service (keys %{ $AlertingConfig->{'modules'} }) {
                 my $module_config = $AlertingConfig->{'modules'}->{$service};
                 if (ref($module_config) eq 'HASH' && keys %{$module_config}) {
                     foreach my $handle (keys %{$module_config}) { 

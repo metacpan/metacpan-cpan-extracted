@@ -4,7 +4,7 @@ Geo::Coder::Abbreviations - Quick and Dirty Interface to https://github.com/mapb
 
 # VERSION
 
-Version 0.06
+Version 0.07
 
 # SYNOPSIS
 
@@ -30,6 +30,10 @@ Abbreviate a place.
     my $abbr = Geo::Coder::Abbreviations->new();
     print $abbr->abbreviate('Road'), "\n";      # prints 'RD'
     print $abbr->abbreviate('RD'), "\n";        # prints 'RD'
+
+## normalize
+
+Normalize and abbreviate street names - useful for comparisons
 
 # SEE ALSO
 
@@ -66,6 +70,6 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2020-2023 Nigel Horne.
+Copyright 2020-2024 Nigel Horne.
 
 This program is released under the following licence: GPL2

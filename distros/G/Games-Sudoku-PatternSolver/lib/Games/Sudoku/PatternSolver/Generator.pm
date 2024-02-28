@@ -3,7 +3,7 @@ package Games::Sudoku::PatternSolver::Generator;
 use strict;
 use warnings;
 
-require 5.10.0;
+require 5.06.0;
 
 use Games::Sudoku::PatternSolver::Patterns qw( init_patterns );
 use Games::Sudoku::PatternSolver qw( solve print_grid );
@@ -47,8 +47,8 @@ our $LOOSE_MODE  = 0; # whether to allow puzzles to have < 8 different givens (s
 
     my $check_reducibility = ($start_grid_string && $start_grid_string =~ /[^1-9]/) ? 1 : 0;
 
-    $start_with //= 40;
-    $shuffle_symbols //= 1;
+    $start_with      = 40 unless defined($start_with);
+    $shuffle_symbols =  1 unless defined($shuffle_symbols);
 
     $grid_builder ||= get_grid_builder();
     my $next_grid_str = $start_grid_string || &$grid_builder($shuffle_symbols);
@@ -146,8 +146,8 @@ sub drop_values {
 
   my $dropped_count = 0;
   while ( $dropped_count < $to_drop ) {
-    my $field_index = shift @$fields_to_try
-      // return $dropped_count;
+    my $field_index = shift @$fields_to_try;
+    return $dropped_count unless defined($field_index);
     my $symbol = $grid->[$field_index];
     print "dropped $symbol from $field_index\n" if $VERBOSE;
     die "Unexpected symbol '$symbol' in position $field_index!" if (!$symbol || $symbol eq '.');
@@ -294,17 +294,15 @@ All Sudoku that are returned from the iterator I<builder> are well-posed (have a
 
 =head1 METHODS
 
-=over 1
-
-=item * get_sudoku_builder()
+=head2 get_sudoku_builder()
 
  $sudoku_builder = get_sudoku_builder( start_grid, start_with, shuffle_symbols );
 
 All 3 parameters are optional:
 
-=over 2
+=over 4
 
-=item start_grid (default none)
+=item * start_grid (default none)
 
 A grid string (81 chars) to start from, typically a complete solution as produced by the L<grid_builder|get_grid_builder>.
 
@@ -314,13 +312,13 @@ The generated puzzles in this case, despite being all different in nature, will 
 
 If you pass a grid with any missing values (a puzzle) it will just be checked and reported if the puzzle could be reduced any further and still be well-formed.   
 
-=item start_with (default 40)
+=item * start_with (default 40)
 
 Number of random values to drop from the grid before checking the number of solutions for uniqueness kicks in.
 A smaller number could lead to more unnecessary solution checking up front.
 Too big a number might start the checking too often on a grid already overly reduced, which has more than one solution and has thus to start over.
 
-=item shuffle_symbols (default true)
+=item * shuffle_symbols (default true)
 
 If false (and no start_grid was given), all puzzle's solutions will have the first row '123456789'. 
 
@@ -333,12 +331,10 @@ The return value $sudoku_builder is a subref which on every call will return a r
  		print $puzzle->{strPuzzle}; 
  }
 
-=item * get_grid_builder()
+=head2 get_grid_builder()
 
  $grid_builder = get_grid_builder();
- $solution_string = &$grid_builder( E<lt>shuffle_symbolsE<gt> ); 
-
-=back
+ $solution_string = &$grid_builder( <shuffle_symbols> ); 
 
 The iterator returned from get_grid_builder() can produce fully filled sudoku grids at a fairly high rate. 
 Like the solver, it also uses plain overlay of random patterns (POM) and no biased methods. (As the Latin Squares would.) 
@@ -357,11 +353,9 @@ Flexible output options are available. Invoke C<E<gt>sudogen -h> for details.
 
 =head1 SEE ALSO
 
-L<Games::Sudoku::Html> play entire lists of standard sudoku interactively in your browser 
+L<Games::Sudoku::Html> to play entire lists of standard sudoku interactively in your browser 
 
-L<Games::Sudoku::Pdf> create pdf files from sixteen variants of 9x9 sudoku
-
-L<https://www.sudokuwiki.org/Pattern_Overlay>, L<https://sites.math.washington.edu/~morrow/mcm/team2280.pdf>
+L<Games::Sudoku::Pdf> to create pdf files from sixteen variants of 9x9 sudoku
 
 =head1 AUTHOR
 

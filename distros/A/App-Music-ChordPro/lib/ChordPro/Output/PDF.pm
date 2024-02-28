@@ -2736,7 +2736,7 @@ sub prepare_assets {
 	    $w = $elt->{opts}->{width}
 	      if $elt->{opts}->{width} && $elt->{opts}->{width} < $w;
 
-	    my $res = $hd->( $s, $w, $elt );
+	    my $res = $hd->( $s, elt => $elt, pagewidth => $w );
 	    if ( $res ) {
 		$res->{opts} = { %{ $res->{opts} // {} },
 				 %{ $elt->{opts} // {} } };
@@ -2748,6 +2748,15 @@ sub prepare_assets {
 		      "\n" )
 		  if $config->{debug}->{images};
 		$s->{assets}->{$id} = $res;
+	    }
+	    else {
+		# Substitute alert image.
+		$s->{assets}->{$id} = $res =
+		  { type => "image",
+		    line => $elt->{line},
+		    subtype => "xform",
+		    data => TextLayoutImageElement::alert(60),
+		    opts => { %{$elt->{opts}//{}} } };
 	    }
 
 	    # If the delegate produced an SVG, continue processing.

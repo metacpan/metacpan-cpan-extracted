@@ -1,5 +1,8 @@
 Revision history for Geo::Coder::Abbreviations
 
+0.07	Tue Feb 27 11:07:01 EST 2024
+	Added normalize()
+
 0.06	Thu Jun  8 10:26:44 EDT 2023
 	Use JSON::MaybeXS instead of JSON
 	Fix code for online/offline testing

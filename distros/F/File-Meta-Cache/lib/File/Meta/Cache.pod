@@ -24,19 +24,19 @@ File::Meta::Cache - Cache open file descriptors and stat meta data
   
     ###
 
-  if($entry and $entry->[File::Meta::Cache::valid_]){
+  if($entry and $entry->[File::Meta::Cache::VALID]){
     # Work with the file
     #
-    for($entry->[File::Meta::Cache::fh_]){
+    for($entry->[File::Meta::Cache::FH]){
 
         sysread $_, my  $buffer, ...;
     }
 
     # Set user defined data in entry if no already defined
     #
-    $entry->[File::Meta::Cache::user_]=//
+    $entry->[File::Meta::Cache::USER]=//
     [
-      "Content-Length: $entry->[File::Meta::Cache::stat_][7],
+      "Content-Length: $entry->[File::Meta::Cache::STAT][7],
     ];
   }
   else {
@@ -72,7 +72,7 @@ the file, appropriate calls to C<seek> (or C<pread>/C<pwrite> via C<IO::FD>)
 will need to be performed to set the position for correct IO operation.
 
 
-Each cached entry contains a C<user_> field, which allows the user to store
+Each cached entry contains a C<USER> field, which allows the user to store
 associated meta data with the entry. For example this could be used to store
 pre rendered HTTP headers (content-type, content-length, etag, modification
 headers, etc), which only need to be computed when the file was opened.
@@ -92,39 +92,47 @@ functional API for best performance for high frequency access.
 
 A cache entry is an anonymous array with the following fields:
   
- key_ fd_ fh_ stat_ valid_ user_
-  0    1   2    3     4      5
+ New constant name:         KEY  FD  FH   STAT  VALID   USER
+ Depricated constant name:  key_ fd_ fh_  stat_ valid_  user_
+                    values: 0    1   2    3     4       5
 
 This are constants defined in the C<File::Meta::Cache> package, which can be
 used as indexes into the array.
 
-=head3 key_ (=0)
+B<NOTE:> from v0.3.0, the field index contants have been renamed. The old names
+are depricated and will be removed in a later version. Please use the new names.
+  
+
+      
+
+=head3 KEY (=0) 
 
 The key to the cache table, which is the file path used when calling the
 C<open> method.
 
-=head3 fd_ (=1)
+
+=head3 FD (=1)
 
 The file descriptor of the opened file.  This can be used directly with
 L<POSIX> or C<IO::FD> module for IO operations.
 
-=head3 fh_ (=2)
+=head3 FH (=2)
 
 The file handle of the opened file. This will undefined if the cache was
 initialised with C<no_fh> parameter.
 
 
-=head3 stat_ (=3)
+=head3 STAT (=3)
 
 This is the reference to an array of stat information from the C<stat> call.
 
-=head3 valid_ (=4)
+=head3 VALID (=4)
 
 A value indicating if the cache entry is current or has been invalidated. If it
 is greater than 0, the entry is still considered fresh and valid.  If it is 0,
 the cache entry has be removed from the cache and the file has been closed.
 
-=head3 user_ (=5)
+=head3 USER (=5)
 
 A general purpose field for storing user associated data with the cache entry.
 This could pre computed/rendered data based on the stat information.

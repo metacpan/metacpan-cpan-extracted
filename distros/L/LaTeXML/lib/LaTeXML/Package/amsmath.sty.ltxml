@@ -41,6 +41,21 @@ RequirePackage('amsopn');
 DefMacroI('\AmSfont', undef, Tokens());
 DefMacroI('\AmS',     undef, "AmS");
 
+# Unhandled options (for now)
+foreach my $option (qw(
+  centertags tbtags
+  sumlimits nosumlimits
+  intlimits nointlimits
+  namelimits nonamelimits
+  alignedleftspaceyes alignedleftspaceno alignedleftspaceyesifneg)) {
+  DeclareOption($option, undef); }
+
+DeclareOption('reqno', sub { AssignMapping('DOCUMENT_CLASSES', ltx_leqno => undef); });
+DeclareOption('leqno', sub { AssignMapping('DOCUMENT_CLASSES', ltx_leqno => 1); });
+DeclareOption('fleqn', sub { AssignMapping('DOCUMENT_CLASSES', ltx_fleqn => 1); });
+
+ProcessOptions();
+
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 # Section 3:  Displayed equations
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -803,10 +818,10 @@ DefConstructor('\lx@ams@matrix@ RequiredKeyVals:lx@GEN DigestedBody',
     my $nc = ($alignment ? scalar(@{ $$alignment{columnwidths} }) : 0);
     (($nc > 10 ? Invocation(T_CS('\setcounter'), T_OTHER('MaxMatrixCols'), T_OTHER($nc)) : ()),
       ($name ? (T_CS('\begin'), T_BEGIN, Revert($name), T_END) : ()),
-      ($align && $align->unlist ?
-          ($kv->getValue('alignment-required')
-          ? (T_BEGIN, Revert($align), T_END) : (T_OTHER('['), Revert($align), T_OTHER(']')))
-        : ()),
+      (IsEmpty($align)
+        ? ()
+        : ($kv->getValue('alignment-required')
+          ? (T_BEGIN, Revert($align), T_END) : (T_OTHER('['), Revert($align), T_OTHER(']')))),
       Revert($body),
       ($name ? (T_CS('\end'), T_BEGIN, Revert($name), T_END) : ())); }
 );
@@ -843,26 +858,7 @@ DefMacro('\matrix@check{}', Tokens());
 # \! == \negthinspace
 # \negmedspace
 # \negthickspace
-# I think only these are new
-
-DefConstructorI('\thinspace', undef,
-  "?#isMath(<ltx:XMHint name='thinspace' width='#width'/>)(\x{2009})",
-  properties => { isSpace => 1, width => sub { LookupValue('\thinmuskip'); } });
-DefConstructorI('\negthinspace', undef,
-  "?#isMath(<ltx:XMHint name='negthinspace' width='#width'/>)()",
-  properties => { isSpace => 1, width => sub { LookupValue('\thinmuskip')->negate; } });
-DefConstructorI('\medspace', undef,
-  "?#isMath(<ltx:XMHint name='medspace' width='#width'/>)()",
-  properties => { isSpace => 1, width => sub { LookupValue('\medmuskip'); } });
-DefConstructorI('\negmedspace', undef,
-  "?#isMath(<ltx:XMHint name='negmedspace' width='#width'/>)()",
-  properties => { isSpace => 1, width => sub { LookupValue('\medmuskip')->negate; } });
-DefConstructorI('\thickspace', undef,
-  "?#isMath(<ltx:XMHint name='thickspace' width='#width'/>)(\x{2004})",
-  properties => { isSpace => 1, width => sub { LookupValue('\thickmuskip'); } });
-DefConstructorI('\negthickspace', undef,
-  "?#isMath(<ltx:XMHint name='negthickspace' width='#width'/>)(\x{2004})",
-  properties => { isSpace => 1, width => sub { LookupValue('\thickmuskip')->negate; } });
+# these are now native to LaTeX (see section C.7.7 Spacing)
 
 DefConstructor('\mspace{MuDimension}', "<ltx:XMHint name='mspace' width='#1'/>");
 
@@ -933,7 +929,7 @@ DefConstructor('\boxed@text{}',
     . "</ltx:Math>",
   mode         => 'math', bounded => 1,
   beforeDigest => sub {
-    Let("\\\\", '\@block@cr'); },
+    Let("\\\\", '\lx@newline'); },
   alias => '\boxed');
 
 DefMath('\implies',   "\x{27F9}", role => 'ARROW', meaning => 'implies');

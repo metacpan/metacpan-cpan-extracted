@@ -8,7 +8,6 @@ use Plack::App::Tags::HTML;
 use Plack::Runner;
 use Tags::HTML::ChangePassword;
 use Tags::Output::Indent;
-use Unicode::UTF8 qw(decode_utf8);
 
 my $css = CSS::Struct::Output::Indent->new;
 my $tags = Tags::Output::Indent->new(

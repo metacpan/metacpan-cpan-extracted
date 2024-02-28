@@ -1,11 +1,11 @@
-package B::Hooks::EndOfScope; # git description: 0.25-2-g173e4cd
+package B::Hooks::EndOfScope; # git description: 0.26-9-g54103ed
 # ABSTRACT: Execute code after a scope finished compilation
 # KEYWORDS: code hooks execution scope
 
 use strict;
 use warnings;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 use 5.006001;
 
@@ -36,7 +36,7 @@ B::Hooks::EndOfScope - Execute code after a scope finished compilation
 
 =head1 VERSION
 
-version 0.26
+version 0.27
 
 =head1 SYNOPSIS
 
@@ -64,10 +64,10 @@ This is exported by default. See L<Sub::Exporter> on how to customize it.
 
 =head2 Pure-perl mode caveat
 
-This caveat applies to B<any> version of perl where L<Variable::Magic>
+This caveat applies to B<any> version of perl where L<Variable::OnDestruct>
 is unavailable or otherwise disabled.
 
-While L<Variable::Magic> has access to some very dark sorcery to make it
+While L<Variable::OnDestruct> has access to some very dark sorcery to make it
 possible to throw an exception from within a callback, the pure-perl
 implementation does not have access to these hacks. Therefore, what
 would have been a B<compile-time exception> is instead B<converted to a
@@ -92,7 +92,7 @@ older perl versions, the implementation of B::Hooks::EndOfScope deliberately
 leaks a single empty hash for every scope being cleaned. This is done to
 avoid the memory corruption associated with the bug mentioned above.
 
-In order to stabilize this workaround use of L<Variable::Magic> is disabled
+In order to stabilize this workaround use of L<Variable::OnDestruct> is disabled
 on perls prior to version 5.8.4. On such systems loading/requesting
 L<B::Hooks::EndOfScope::XS> explicitly will result in a compile-time
 exception.
@@ -114,7 +114,7 @@ file F<t/02-localise.t> included with the distribution.
 
 L<Sub::Exporter>
 
-L<Variable::Magic>
+L<Variable::OnDestruct>
 
 =head1 SUPPORT
 
@@ -137,7 +137,7 @@ Peter Rabbitson <ribasushi@leporine.io>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Christian Walde Graham Knop Simon Wilper Tatsuhiko Miyagawa Tomas Doran
+=for stopwords Karen Etheridge Graham Knop Christian Walde Simon Wilper Tatsuhiko Miyagawa Tomas Doran
 
 =over 4
 
@@ -147,11 +147,11 @@ Karen Etheridge <ether@cpan.org>
 
 =item *
 
-Christian Walde <walde.christian@googlemail.com>
+Graham Knop <haarg@haarg.org>
 
 =item *
 
-Graham Knop <haarg@haarg.org>
+Christian Walde <walde.christian@googlemail.com>
 
 =item *
 

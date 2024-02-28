@@ -41,10 +41,17 @@ our @EXPORT = qw( &pathname_find &pathname_findall &pathname_kpsewhich
   &pathname_relative &pathname_absolute &pathname_to_url
   &pathname_is_absolute &pathname_is_contained
   &pathname_is_url &pathname_is_literaldata
-  &pathname_is_raw &pathname_is_reloadable
+  &pathname_is_raw
   &pathname_protocol
   &pathname_cwd &pathname_chdir &pathname_mkdir &pathname_copy
   &pathname_installation);
+
+my $ISWINDOWS;
+
+BEGIN {
+  $ISWINDOWS = $^O =~ /^(MSWin|NetWare|cygwin)/i;
+  require Win32::ShellQuote if $ISWINDOWS;
+}
 
 # NOTE: For absolute pathnames, the directory component starts with
 # whatever File::Spec considers to be the volume, or "/".
@@ -54,7 +61,6 @@ our @EXPORT = qw( &pathname_find &pathname_findall &pathname_kpsewhich
 ### my $SEP         = '/';                          # [CONSTANT]
 # Some indicators that this is not sufficient? (calls to libraries/externals???)
 # PRELIMINARY test, probably need to be even more careful
-my $ISWINDOWS   = $^O =~ /^(MSWin|NetWare|cygwin)/i;
 my $SEP         = ($ISWINDOWS ? '\\' : '/');    # [CONSTANT]
 my $KPATHSEP    = ($ISWINDOWS ? ';'  : ':');    # [CONSTANT]
 my $LITERAL_RE  = '(?:literal)(?=:)';           # [CONSTANT]
@@ -182,15 +188,6 @@ sub pathname_is_contained {
 sub pathname_is_raw {
   my ($pathname) = @_;
   return ($pathname =~ /\.(tex|pool|sty|cls|clo|cnf|cfg|ldf|def|dfu)$/); }
-
-# Check whether a pathname is reloadable as a TeX definition
-sub pathname_is_reloadable {
-  my ($pathname) = @_;
-  my ($dir, $name, $type) = pathname_split($pathname);
-  # babel.sty exception:
-  # we know the same .ldf file may be reloaded with a different option,
-  # to load an adjacently defined language, so allow that.
-  return $type eq 'ldf'; }
 
 # pathname_relative($pathname,$base) => $relativepathname
 # If $pathname is an absolute, non-URL pathname,
@@ -400,6 +397,8 @@ our $kpse_toolchain = "";
 
 sub pathname_kpsewhich {
   my (@candidates) = @_;
+  # ($kpsewhich,@candidates) MUST NOT be empty to guarantee that Perl runs $kpsewhich directly
+  # rather than through a shell or cmd.exe
   return             unless $kpsewhich && @candidates;
   build_kpse_cache() unless $kpse_cache;
   foreach my $file (@candidates) {
@@ -409,7 +408,10 @@ sub pathname_kpsewhich {
   # For multiple calls, this is slower in general. But MiKTeX, eg., doesn't use texmf ls-R files!
   if ($kpse_toolchain) {
     push(@candidates, $kpse_toolchain); }
-  if ($kpsewhich && open(my $resfh, '-|', $kpsewhich, @candidates)) {
+  if ($kpsewhich && open(my $resfh, '-|',
+      # on Windows, ($kpsewhich, @candidates) is joined into a single string, which most binaries
+      # parse with CommandLineToArgvW, so the arguments must be escaped accordingly
+      $ISWINDOWS ? Win32::ShellQuote::quote_system_list($kpsewhich, @candidates) : ($kpsewhich, @candidates))) {
     my $result = <$resfh>;     # we only need the first line
     { local $/; <$resfh>; }    # discard the rest of the output
     close($resfh);             # ignore exit status (only one of @candidates exists, usually)
@@ -449,9 +451,11 @@ sub build_kpse_cache {
         if    (/^%/) { }
         elsif (/^(.*?):$/) {    # Move to a new subdirectory
           $subdir = $1;
-          $subdir =~ s|^\./||;                             # remove prefix
-          my $d = $dir . '/' . $subdir;                    # Hopefully OS safe, for comparison?
-          $skip = !grep { $d =~ /^\Q$_\E/ } @filters; }    # check if one of the TeX paths
+          $subdir =~ s|^\./||;                           # remove prefix
+          my $d = $dir . '/' . $subdir;                  # Hopefully OS safe, for comparison?
+          $skip = !grep { $d =~ /^\Q$_\E/ } @filters;    # check if one of the TeX paths
+          $skip |= ($d =~ m|-dev[$//]|) unless $LaTeXML::DEBUG{'latex-dev'};
+        }
         elsif (!$skip) {
           # Is it safe to use '/' here?
           my $sep = '/';
@@ -529,11 +533,6 @@ with a leading "literal:" protocol.
 =item C<< $boole = pathname_is_raw($path); >>
 
 Check if pathname indicates a raw TeX source or definition file.
-
-=item C<< $boole = pathname_is_reloadable($path); >>
-
-Check for pathname exceptions where the same TeX definition file
-can be meaningfully reloaded. For example, babel.sty ".ldf" files
 
 =item C<< $rel = pathname_is_contained($path,$base); >>
 

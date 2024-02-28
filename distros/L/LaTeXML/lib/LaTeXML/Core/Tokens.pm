@@ -19,7 +19,7 @@ use LaTeXML::Core::Token;
 use base qw(LaTeXML::Common::Object);
 use base qw(Exporter);
 our @EXPORT = (    # Global STATE; This gets bound by LaTeXML.pm
-  qw(&Tokens)
+  qw(&Tokens &TokensI),
 );
 
 #======================================================================
@@ -36,6 +36,10 @@ sub Tokens {
     @tokens;
   return bless [@tokens], 'LaTeXML::Core::Tokens'; }
 
+sub TokensI {
+  my (@tokens) = @_;
+  return bless [@tokens], 'LaTeXML::Core::Tokens'; }
+
 #======================================================================
 # Return a list of the tokens making up this Tokens
 sub unlist {
@@ -50,40 +54,40 @@ sub clone {
 # Return a string containing the TeX form of the Tokens
 sub revert {
   my ($self) = @_;
-  return map { ($$_[1] == CC_SMUGGLE_THE ? $$_[2] : $_); } @$self; }
+  return @$self; }
 
 # toString is used often, and for more keyword-like reasons,
 # NOT for creating valid TeX (use revert or UnTeX for that!)
 sub toString {
   my ($self) = @_;
-  return join('', map { $_->toString } @$self); }
+  return join('', map { ($$_[1] == CC_COMMENT ? '' : $_->toString) } @$self); }
 
 # Methods for overloaded ops.
+
+# Compare two Tokens lists, ignoring comments & markers
 sub equals {
   my ($a, $b) = @_;
   return 0 unless defined $b && (ref $a) eq (ref $b);
   my @a = @$a;
   my @b = @$b;
-  while (@a && @b && ($a[0]->equals($b[0]))) {
-    shift(@a); shift(@b); }
-  return !(@a || @b); }
+  while (@a || @b) {
+    if (@a && (($a[0]->[1] == CC_COMMENT) || ($a[0]->[1] == CC_MARKER))) { shift(@a); next; }
+    if (@b && (($b[0]->[1] == CC_COMMENT) || ($b[0]->[1] == CC_MARKER))) { shift(@b); next; }
+    return unless @a && @b && shift(@a)->equals(shift(@b)); }
+  return 1; }
 
 sub stringify {
   my ($self) = @_;
   return "Tokens[" . join(',', map { $_->toString } @$self) . "]"; }
 
 sub beDigested {
+  no warnings 'recursion';
   my ($self, $stomach) = @_;
   return $stomach->digest($self); }
 
 sub neutralize {
   my ($self, @extraspecials) = @_;
-  # Remove dont_expand, but preserve SMUGGLE_THE
   return Tokens(map { $_->neutralize(@extraspecials) } @$self); }
-
-sub without_dont_expand {
-  my ($self) = @_;
-  return Tokens(map { $_->without_dont_expand } @$self); }
 
 sub isBalanced {
   my ($self) = @_;
@@ -91,15 +95,18 @@ sub isBalanced {
   foreach my $t (@$self) {
     my $cc = $$t[1];    # INLINE
     $level++ if $cc == CC_BEGIN;
-    $level-- if $cc == CC_END; }
+    if ($cc == CC_END) {
+      $level--;
+      # Note that '{ }} {' is still unbalanced
+      # even though the left and right braces match in count.
+      last if $level < 0; } }
   return $level == 0; }
 
 # NOTE: Assumes each arg either undef or also Tokens
 # Using inline accessors on those assumptions
 sub substituteParameters {
   my ($self, @args) = @_;
-  my @in = @{$self};    # ->unlist
-  return $self unless grep { $$_[1] == CC_ARG; } @in;
+  my @in     = @{$self};    # ->unlist
   my @result = ();
   while (my $token = shift(@in)) {
     if ($$token[1] != CC_ARG) {    # Non-match; copy it
@@ -109,11 +116,9 @@ sub substituteParameters {
         push(@result, (ref $arg eq 'LaTeXML::Core::Token' ? $arg : @$arg)); } } }    # ->unlist
   return bless [@result], 'LaTeXML::Core::Tokens'; }
 
-# Process the CC_PARAM tokens for use as a macro body (and other token lists)
-# Groups PARAM+OTHER token pair into match tokens.
-# Collapses PARAM+PARAM token pair into a single PARAM
-# B book suggests running this
-# and remove dont_expand markers.
+# Packs repeated CC_PARAM tokens into CC_ARG tokens for use as a macro body (and other token lists)
+# Also unwraps \noexpand tokens, since that is also needed for macro bodies
+# (but not strictly part of packing parameters)
 sub packParameters {
   my ($self)    = @_;
   my @rescanned = ();
@@ -122,7 +127,6 @@ sub packParameters {
   while (my $t = shift @toks) {
     if ($$t[1] == CC_PARAM && @toks) {
       $repacked = 1;
-      # NOTE for future cleanup: Only CC_CS & CC_ACTIVE should ever get with_dont_expand!
       my $next_t  = shift @toks;
       my $next_cc = $next_t && $$next_t[1];
       if ($next_cc == CC_OTHER) {
@@ -133,10 +137,7 @@ sub packParameters {
       else {    # any other case, preserve as-is, let the higher level call resolve any errors
                 # e.g. \detokenize{#,} is legal, while \textbf{#,} is not
         Error('misdefined', 'expansion', undef, "Parameter has a malformed arg, should be #1-#9 or ##. ",
-          "In expansion " . ToString(Tokens(@toks))); } }
-    elsif (my $inner = $$t[2]) {    # Open-coded $t->without_dont_expand
-      $repacked = 1;
-      push(@rescanned, ($$inner[2] || $inner)); }
+          "In expansion " . ToString($self)); } }
     else {
       push(@rescanned, $t); } }
   return ($repacked ? bless [@rescanned], 'LaTeXML::Core::Tokens' : $self); }

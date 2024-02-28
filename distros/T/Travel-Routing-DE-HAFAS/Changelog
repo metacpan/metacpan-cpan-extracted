@@ -1,3 +1,9 @@
+Travel::Routing::DE::HAFAS 0.04 - Mon Feb 26 2024
+
+    * hafas: Add --raw-json option
+    * Handle undefined occupancy and partial cancellations
+    * Update ÖBB modes of transport (mot list)
+
 Travel::Routing::DE::HAFAS 0.03 - Sun Dec 10 2023
 
     * hafas: Add --depart and -a / --arrive options

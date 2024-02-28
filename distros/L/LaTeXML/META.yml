@@ -4,43 +4,40 @@ author:
   - 'Bruce Miller <bruce.miller@nist.gov>'
   - 'Deyan Ginev <deyan.ginev@gmail.com>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
-configure_requires:
-  version: '0.77'
+  ExtUtils::MakeMaker: 0
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.120921'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: '1.4'
+  version: 1.4
 name: LaTeXML
 no_index:
   directory:
     - t
     - inc
 requires:
-  Archive::Zip: '0'
-  DB_File: '0'
-  File::Which: '0'
-  Getopt::Long: '2.37'
-  IO::Handle: '0'
-  IO::String: '0'
-  Image::Size: '0'
-  JSON::XS: '0'
-  LWP: '0'
-  MIME::Base64: '0'
-  Parse::RecDescent: '0'
-  Pod::Parser: '0'
-  Test::More: '0'
-  Text::Unidecode: '0'
-  Time::HiRes: '0'
-  URI: '0'
-  XML::LibXML: '1.61'
-  XML::LibXSLT: '1.58'
-  perl: '5.010001'
-  version: '0'
+  Archive::Zip: 0
+  DB_File: 0
+  File::Which: 0
+  Getopt::Long: 2.37
+  IO::Handle: 0
+  IO::String: 0
+  Image::Size: 0
+  JSON::XS: 0
+  LWP: 0
+  MIME::Base64: 0
+  Parse::RecDescent: 0
+  Pod::Parser: 0
+  Test::More: 0
+  Text::Unidecode: 0
+  Time::HiRes: 0
+  URI: 0
+  XML::LibXML: 1.61
+  XML::LibXSLT: 1.58
+  perl: 5.010001
+  version: 0
 resources:
   bugtracker: https://github.com/brucemiller/LaTeXML/issues
   repository: https://github.com/brucemiller/LaTeXML.git
-version: 0.8.7
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: v0.8.8

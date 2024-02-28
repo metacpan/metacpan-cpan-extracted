@@ -1,8 +1,8 @@
 package Games::Sudoku::PatternSolver;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
-require 5.10.0;
+require 5.06.0;
 
 use Bit::Vector qw();
 use Time::HiRes qw();
@@ -116,7 +116,7 @@ sub solve_puzzle {
   my $symbol_counts  = $puzzle->{symbolCounts};
 
   #  so far, only symbols with at least 1 given appear here
-  my @by_count = sort {(($symbol_counts->{$b} // 0) <=> ($symbol_counts->{$a} // 0)) || ($a cmp $b)} keys %$symbol_counts;
+  my @by_count = sort {((defined($symbol_counts->{$b}) ? $symbol_counts->{$b} : 0) <=> (defined($symbol_counts->{$a}) ? $symbol_counts->{$a} : 0)) || ($a cmp $b)} keys %$symbol_counts;
 
   my $no_clue_patterns;
   if ($USE_LOGIC) {
@@ -344,7 +344,8 @@ sub prepare_solution_string {
   my @chars = ('0') x 81;
 
   for (my $symbol_index = 0; $symbol_index < 9; $symbol_index++) {
-    my $symbol = $symbols->[$symbol_index] // last;
+    my $symbol = $symbols->[$symbol_index];
+    defined($symbol) or last;
     my $symbol_vector = $pattern_vectors->{$symbol} or last;
     $chars[$_] = $symbol for $symbol_vector->Index_List_Read();
   }
@@ -497,7 +498,7 @@ sub _read_puzzle {
 sub sweep {
   my ($puzzle, $thorough) = @_;
 
-  $thorough //= 1;
+  $thorough = 1 unless defined($thorough);
 
   if ($thorough) {
     delete $puzzle->{$_} for qw(

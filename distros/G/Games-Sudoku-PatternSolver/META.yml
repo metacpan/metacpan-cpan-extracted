@@ -22,6 +22,6 @@ requires:
   Bit::Vector: '0'
   List::Util: '0'
   Time::HiRes: '0'
-  perl: '5.010000'
-version: '0.06'
+  perl: '5.006000'
+version: '0.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

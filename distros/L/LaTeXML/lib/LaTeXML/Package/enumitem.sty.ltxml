@@ -97,9 +97,8 @@ sub beginEnumItemize {
       $llabel = Tokens(T_CS('\label' . $counter . ToString(Tokens(roman($level - 1)))), $llabel); }
     DefMacroI('\the' . $usecounter,   undef, $llabel);
     DefMacroI('\label' . $usecounter, undef, $llabel);
-###    DefMacroI('\fnum@' . $usecounter, undef,
-###      '{\makelabel{\fnum@font@' . $usecounter . '\label' . $usecounter . '}}');
-  }
+    DefMacroI('\fnum@' . $usecounter, undef,
+      Tokens(T_BEGIN, T_CS('\makelabel'), T_BEGIN, T_CS('\label' . $usecounter), T_END, T_END)); }
   if (my $label = $$hash{ref}) {
     my $llabel = replace_star($label, T_OTHER($usecounter));
     # This is a Hotfix.
@@ -110,7 +109,6 @@ sub beginEnumItemize {
     DefMacroI('\the' . $usecounter, undef, $llabel); }
   if (my $font = $$hash{font} || $$hash{format}) {
     DefMacroI('\fnum@font@' . $usecounter, undef, $font); }
-
   return beginItemize($type, $counter, %$hash); }
 
 sub replace_star {
@@ -137,15 +135,11 @@ DefMacro('\restartlist{}', sub {
     # Assme we reset all levels? Assume no more than 6 levels?
     for (my $i = 0 ; $i < 6 ; $i++) {
       my $r = ToString(Tokens(roman($i)));
-      if (LookupValue('\c@' . $counter . $r)) {
+      if (LookupDefinition('\c@' . $counter . $r)) {
         SetCounter($counter . $r, Number(0)); } }
     return; });
 
 #======================================================================
-
-# But first, a stub that ignores the new optional arg to itemize, etal.
-# Since the keyvals contain Registers, Dimensions, macros, etc,
-# we'll use OptionalUndigested for what will eventually be OptionalKeywords
 if (!LookupValue('enumitem@loadonly')) {
   DefEnvironment('{itemize} OptionalKeyVals:enumitem',
     "<ltx:itemize xml:id='#id'>#body</ltx:itemize>",
@@ -219,6 +213,11 @@ DefPrimitive('\setlist Optional RequiredKeyVals:enumitem', sub {
         foreach my $level (@levels) {
           store_enumitem_defaults('enumitem_' . $name . $level . '_defaults', $kv); } } }
     return; });
+
+# These are obsolete
+DefMacro('\setitemize Optional {}',     '\setlist[itemize,#1]{#2}');
+DefMacro('\setenumerate Optional {}',   '\setlist[enumerate,#1]{#2}');
+DefMacro('\setdescription Optional {}', '\setlist[description,#1]{#2}');
 
 sub store_enumitem_defaults {
   my ($name, $kv) = @_;

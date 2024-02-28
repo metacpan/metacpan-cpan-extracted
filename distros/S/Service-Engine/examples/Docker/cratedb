@@ -1,0 +1,14 @@
+# FROM crate:latest
+FROM crate:latest
+
+# Create a non-root user
+RUN useradd -ms /bin/bash hmg
+
+# Copy the custom entrypoint script
+RUN chown -R hmg /crate
+RUN chown -R hmg /data
+
+# Switch to the non-root user
+USER hmg
+
+CMD [ "crate" ]

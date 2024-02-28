@@ -75,7 +75,7 @@
         <tag role="refnum">2</tag>
         <tag role="typerefnum">Table 2</tag>
       </tags>
-      <inline-block depth="0.0pt" height="67.5pt" width="174.0pt" xscale="1.5" xtranslate="29.0pt" yscale="0.75" ytranslate="11.3pt">
+      <inline-block depth="0.0pt" height="67.5pt" width="259.0pt" xscale="1.5" xtranslate="43.2pt" yscale="0.75" ytranslate="11.3pt">
         <tabular class="ltx_guessed_headers" vattach="middle">
           <tbody>
             <tr>
@@ -122,7 +122,7 @@
         <tag role="refnum">3</tag>
         <tag role="typerefnum">Table 3</tag>
       </tags>
-      <inline-block depth="0.0pt" height="90.0pt" width="116.0pt" xscale="-1" yscale="1">
+      <inline-block depth="0.0pt" height="90.0pt" width="172.7pt" xscale="-1" yscale="1">
         <tabular class="ltx_guessed_headers" vattach="middle">
           <tbody>
             <tr>
@@ -169,8 +169,8 @@
         <tag role="refnum">4</tag>
         <tag role="typerefnum">Table 4</tag>
       </tags>
-      <inline-block angle="45" depth="0.0pt" height="145.7pt" innerdepth="0.0pt" innerheight="90.0pt" innerwidth="116.0pt" width="145.7pt" xtranslate="14.83pt" ytranslate="-27.83pt">
-        <tabular class="ltx_centering ltx_guessed_headers" vattach="middle">
+      <inline-block angle="45" depth="0.0pt" height="185.7pt" innerdepth="0.0pt" innerheight="90.0pt" innerwidth="172.7pt" width="185.7pt" xtranslate="6.53pt" ytranslate="-47.87pt">
+        <tabular class="ltx_guessed_headers" vattach="middle">
           <tbody>
             <tr>
               <td align="center" border="b l r t" rowspan="5" thead="column"><inline-block angle="90" depth="0.0pt" height="48.1pt" innerdepth="1.6pt" innerheight="5.6pt" innerwidth="48.1pt" width="7.1pt" xtranslate="-20.49pt" ytranslate="-19.71pt">
@@ -247,62 +247,19 @@ End here</p>
       <tabular vattach="middle">
         <tbody>
           <tr>
-            <td align="center" border="l r t"><text framecolor="black" framed="rectangle">—<inline-block angle="0" depth="18.0pt" height="25.0pt" innerdepth="18.0pt" innerheight="25.0pt" innerwidth="72.3pt" width="72.3pt" xtranslate="0pt" ytranslate="26.96pt">
+            <td align="center" border="l r t"><text framecolor="#000000" framed="rectangle">—<inline-block angle="0" depth="18.0pt" height="25.0pt" innerdepth="18.0pt" innerheight="25.0pt" innerwidth="72.3pt" width="72.3pt" xtranslate="0pt" ytranslate="26.96pt">
                   <p><inline-block class="ltx_parbox" framed="rectangle" vattach="middle" width="72.3pt">
                       <p>Save
 the whales Save the whale Save the <ref class="ltx_href" href="http://dlmf.nist.gov/LaTeXML/">Kitty!</ref> Save the whale</p>
                     </inline-block></p>
                 </inline-block>—</text></td>
-            <td align="center" border="r t"><text framecolor="black" framed="rectangle">—<inline-block angle="-40" depth="60.2pt" height="19.1pt" innerdepth="18.0pt" innerheight="25.0pt" innerwidth="72.3pt" width="83.0pt" xtranslate="5.35pt" ytranslate="-15.06pt">
+            <td align="center" border="r t"><text framecolor="#000000" framed="rectangle">—<inline-block angle="-40" depth="60.2pt" height="19.1pt" innerdepth="18.0pt" innerheight="25.0pt" innerwidth="72.3pt" width="83.0pt" xtranslate="5.35pt" ytranslate="-15.06pt">
                   <p><inline-block class="ltx_parbox" framed="rectangle" vattach="middle" width="72.3pt">
                       <p>Save
 the whales Save the whale Save the <ref class="ltx_href" href="http://dlmf.nist.gov/LaTeXML/">Kitty!</ref> Save the whale</p>
                     </inline-block></p>
                 </inline-block>—</text></td>
-            <td align="center" border="r t"><text framecolor="black" framed="rectangle">—<inline-block angle="-80" depth="74.3pt" height="4.3pt" innerdepth="18.0pt" innerheight="25.0pt" innerwidth="72.3pt" width="54.8pt" xtranslate="-8.71pt" ytranslate="-29.49pt">
-                  <p><inline-block class="ltx_parbox" framed="rectangle" vattach="middle" width="72.3pt">
-                      <p>Save
-the whales Save the whale Save the <ref class="ltx_href" href="http://dlmf.nist.gov/LaTeXML/">Kitty!</ref> Save the whale</p>
-                    </inline-block></p>
-                </inline-block>—</text></td>
-          </tr>
-          <tr>
-            <td align="center" border="l r">0<Math mode="inline" tex="{}^{\mathrm{o}}" text="^o" xml:id="S2.F1.m1">
-                <XMath>
-                  <XMApp role="FLOATSUPERSCRIPT" scriptpos="1">
-                    <XMTok fontsize="63%" role="UNKNOWN">o</XMTok>
-                  </XMApp>
-                </XMath>
-              </Math></td>
-            <td align="center" border="r">-40<Math mode="inline" tex="{}^{\mathrm{o}}" text="^o" xml:id="S2.F1.m2">
-                <XMath>
-                  <XMApp role="FLOATSUPERSCRIPT" scriptpos="1">
-                    <XMTok fontsize="63%" role="UNKNOWN">o</XMTok>
-                  </XMApp>
-                </XMath>
-              </Math></td>
-            <td align="center" border="r">-80<Math mode="inline" tex="{}^{\mathrm{o}}" text="^o" xml:id="S2.F1.m3">
-                <XMath>
-                  <XMApp role="FLOATSUPERSCRIPT" scriptpos="1">
-                    <XMTok fontsize="63%" role="UNKNOWN">o</XMTok>
-                  </XMApp>
-                </XMath>
-              </Math></td>
-          </tr>
-          <tr>
-            <td align="center" border="l r t"><text framecolor="black" framed="rectangle">—<inline-block angle="-120" depth="75.1pt" height="9.0pt" innerdepth="18.0pt" innerheight="25.0pt" innerwidth="72.3pt" width="73.3pt" xtranslate="0.53pt" ytranslate="-27.56pt">
-                  <p><inline-block class="ltx_parbox" framed="rectangle" vattach="middle" width="72.3pt">
-                      <p>Save
-the whales Save the whale Save the <ref class="ltx_href" href="http://dlmf.nist.gov/LaTeXML/">Kitty!</ref> Save the whale</p>
-                    </inline-block></p>
-                </inline-block>—</text></td>
-            <td align="center" border="r t"><text framecolor="black" framed="rectangle">—<inline-block angle="-160" depth="48.2pt" height="16.9pt" innerdepth="18.0pt" innerheight="25.0pt" innerwidth="72.3pt" width="82.6pt" xtranslate="5.16pt" ytranslate="-10.16pt">
-                  <p><inline-block class="ltx_parbox" framed="rectangle" vattach="middle" width="72.3pt">
-                      <p>Save
-the whales Save the whale Save the <ref class="ltx_href" href="http://dlmf.nist.gov/LaTeXML/">Kitty!</ref> Save the whale</p>
-                    </inline-block></p>
-                </inline-block>—</text></td>
-            <td align="center" border="r t"><text framecolor="black" framed="rectangle">—<inline-block angle="-200" depth="23.5pt" height="41.6pt" innerdepth="18.0pt" innerheight="25.0pt" innerwidth="72.3pt" width="82.6pt" xtranslate="5.16pt" ytranslate="21.39pt">
+            <td align="center" border="r t"><text framecolor="#000000" framed="rectangle">—<inline-block angle="-80" depth="74.3pt" height="4.3pt" innerdepth="18.0pt" innerheight="25.0pt" innerwidth="72.3pt" width="54.8pt" xtranslate="-8.71pt" ytranslate="-29.49pt">
                   <p><inline-block class="ltx_parbox" framed="rectangle" vattach="middle" width="72.3pt">
                       <p>Save
 the whales Save the whale Save the <ref class="ltx_href" href="http://dlmf.nist.gov/LaTeXML/">Kitty!</ref> Save the whale</p>
@@ -310,42 +267,24 @@ the whales Save the whale Save the <ref class="ltx_href" href="http://dlmf.nist.
                 </inline-block>—</text></td>
           </tr>
           <tr>
-            <td align="center" border="l r">120<Math mode="inline" tex="{}^{\mathrm{o}}" text="^o" xml:id="S2.F1.m4">
-                <XMath>
-                  <XMApp role="FLOATSUPERSCRIPT" scriptpos="1">
-                    <XMTok fontsize="63%" role="UNKNOWN">o</XMTok>
-                  </XMApp>
-                </XMath>
-              </Math></td>
-            <td align="center" border="r">-160<Math mode="inline" tex="{}^{\mathrm{o}}" text="^o" xml:id="S2.F1.m5">
-                <XMath>
-                  <XMApp role="FLOATSUPERSCRIPT" scriptpos="1">
-                    <XMTok fontsize="63%" role="UNKNOWN">o</XMTok>
-                  </XMApp>
-                </XMath>
-              </Math></td>
-            <td align="center" border="r">-200<Math mode="inline" tex="{}^{\mathrm{o}}" text="^o" xml:id="S2.F1.m6">
-                <XMath>
-                  <XMApp role="FLOATSUPERSCRIPT" scriptpos="1">
-                    <XMTok fontsize="63%" role="UNKNOWN">o</XMTok>
-                  </XMApp>
-                </XMath>
-              </Math></td>
+            <td align="center" border="l r">0<sup><text font="italic" fontsize="90%">o</text></sup></td>
+            <td align="center" border="r">-40<sup><text font="italic" fontsize="90%">o</text></sup></td>
+            <td align="center" border="r">-80<sup><text font="italic" fontsize="90%">o</text></sup></td>
           </tr>
           <tr>
-            <td align="center" border="l r t"><text framecolor="black" framed="rectangle">—<inline-block angle="-240" depth="12.5pt" height="71.6pt" innerdepth="18.0pt" innerheight="25.0pt" innerwidth="72.3pt" width="73.3pt" xtranslate="0.53pt" ytranslate="0.91pt">
+            <td align="center" border="l r t"><text framecolor="#000000" framed="rectangle">—<inline-block angle="-120" depth="75.1pt" height="9.0pt" innerdepth="18.0pt" innerheight="25.0pt" innerwidth="72.3pt" width="73.3pt" xtranslate="0.53pt" ytranslate="-27.56pt">
                   <p><inline-block class="ltx_parbox" framed="rectangle" vattach="middle" width="72.3pt">
                       <p>Save
 the whales Save the whale Save the <ref class="ltx_href" href="http://dlmf.nist.gov/LaTeXML/">Kitty!</ref> Save the whale</p>
                     </inline-block></p>
                 </inline-block>—</text></td>
-            <td align="center" border="r t"><text framecolor="black" framed="rectangle">—<inline-block angle="-280" depth="3.1pt" height="75.5pt" innerdepth="18.0pt" innerheight="25.0pt" innerwidth="72.3pt" width="54.8pt" xtranslate="-8.71pt" ytranslate="-5.74pt">
+            <td align="center" border="r t"><text framecolor="#000000" framed="rectangle">—<inline-block angle="-160" depth="48.2pt" height="16.9pt" innerdepth="18.0pt" innerheight="25.0pt" innerwidth="72.3pt" width="82.6pt" xtranslate="5.16pt" ytranslate="-10.16pt">
                   <p><inline-block class="ltx_parbox" framed="rectangle" vattach="middle" width="72.3pt">
                       <p>Save
 the whales Save the whale Save the <ref class="ltx_href" href="http://dlmf.nist.gov/LaTeXML/">Kitty!</ref> Save the whale</p>
                     </inline-block></p>
                 </inline-block>—</text></td>
-            <td align="center" border="r t"><text framecolor="black" framed="rectangle">—<inline-block angle="-320" depth="13.8pt" height="65.6pt" innerdepth="18.0pt" innerheight="25.0pt" innerwidth="72.3pt" width="83.0pt" xtranslate="5.35pt" ytranslate="4.55pt">
+            <td align="center" border="r t"><text framecolor="#000000" framed="rectangle">—<inline-block angle="-200" depth="23.5pt" height="41.6pt" innerdepth="18.0pt" innerheight="25.0pt" innerwidth="72.3pt" width="82.6pt" xtranslate="5.16pt" ytranslate="21.39pt">
                   <p><inline-block class="ltx_parbox" framed="rectangle" vattach="middle" width="72.3pt">
                       <p>Save
 the whales Save the whale Save the <ref class="ltx_href" href="http://dlmf.nist.gov/LaTeXML/">Kitty!</ref> Save the whale</p>
@@ -353,27 +292,34 @@ the whales Save the whale Save the <ref class="ltx_href" href="http://dlmf.nist.
                 </inline-block>—</text></td>
           </tr>
           <tr>
-            <td align="center" border="b l r">-240<Math mode="inline" tex="{}^{\mathrm{o}}" text="^o" xml:id="S2.F1.m7">
-                <XMath>
-                  <XMApp role="FLOATSUPERSCRIPT" scriptpos="1">
-                    <XMTok fontsize="63%" role="UNKNOWN">o</XMTok>
-                  </XMApp>
-                </XMath>
-              </Math></td>
-            <td align="center" border="b r">-280<Math mode="inline" tex="{}^{\mathrm{o}}" text="^o" xml:id="S2.F1.m8">
-                <XMath>
-                  <XMApp role="FLOATSUPERSCRIPT" scriptpos="1">
-                    <XMTok fontsize="63%" role="UNKNOWN">o</XMTok>
-                  </XMApp>
-                </XMath>
-              </Math></td>
-            <td align="center" border="b r">-320<Math mode="inline" tex="{}^{\mathrm{o}}" text="^o" xml:id="S2.F1.m9">
-                <XMath>
-                  <XMApp role="FLOATSUPERSCRIPT" scriptpos="1">
-                    <XMTok fontsize="63%" role="UNKNOWN">o</XMTok>
-                  </XMApp>
-                </XMath>
-              </Math></td>
+            <td align="center" border="l r">120<sup><text font="italic" fontsize="90%">o</text></sup></td>
+            <td align="center" border="r">-160<sup><text font="italic" fontsize="90%">o</text></sup></td>
+            <td align="center" border="r">-200<sup><text font="italic" fontsize="90%">o</text></sup></td>
+          </tr>
+          <tr>
+            <td align="center" border="l r t"><text framecolor="#000000" framed="rectangle">—<inline-block angle="-240" depth="12.5pt" height="71.6pt" innerdepth="18.0pt" innerheight="25.0pt" innerwidth="72.3pt" width="73.3pt" xtranslate="0.53pt" ytranslate="0.91pt">
+                  <p><inline-block class="ltx_parbox" framed="rectangle" vattach="middle" width="72.3pt">
+                      <p>Save
+the whales Save the whale Save the <ref class="ltx_href" href="http://dlmf.nist.gov/LaTeXML/">Kitty!</ref> Save the whale</p>
+                    </inline-block></p>
+                </inline-block>—</text></td>
+            <td align="center" border="r t"><text framecolor="#000000" framed="rectangle">—<inline-block angle="-280" depth="3.1pt" height="75.5pt" innerdepth="18.0pt" innerheight="25.0pt" innerwidth="72.3pt" width="54.8pt" xtranslate="-8.71pt" ytranslate="-5.74pt">
+                  <p><inline-block class="ltx_parbox" framed="rectangle" vattach="middle" width="72.3pt">
+                      <p>Save
+the whales Save the whale Save the <ref class="ltx_href" href="http://dlmf.nist.gov/LaTeXML/">Kitty!</ref> Save the whale</p>
+                    </inline-block></p>
+                </inline-block>—</text></td>
+            <td align="center" border="r t"><text framecolor="#000000" framed="rectangle">—<inline-block angle="-320" depth="13.8pt" height="65.6pt" innerdepth="18.0pt" innerheight="25.0pt" innerwidth="72.3pt" width="83.0pt" xtranslate="5.35pt" ytranslate="4.55pt">
+                  <p><inline-block class="ltx_parbox" framed="rectangle" vattach="middle" width="72.3pt">
+                      <p>Save
+the whales Save the whale Save the <ref class="ltx_href" href="http://dlmf.nist.gov/LaTeXML/">Kitty!</ref> Save the whale</p>
+                    </inline-block></p>
+                </inline-block>—</text></td>
+          </tr>
+          <tr>
+            <td align="center" border="b l r">-240<sup><text font="italic" fontsize="90%">o</text></sup></td>
+            <td align="center" border="b r">-280<sup><text font="italic" fontsize="90%">o</text></sup></td>
+            <td align="center" border="b r">-320<sup><text font="italic" fontsize="90%">o</text></sup></td>
           </tr>
         </tbody>
       </tabular>
@@ -448,7 +394,7 @@ the whales Save the whale Save the <ref class="ltx_href" href="http://dlmf.nist.
         </tabular>
       </quote>
     </para>
-    <table angle="90" depth="0.0pt" height="588.2pt" inlist="lot" innerdepth="1.0pt" innerheight="198.0pt" innerwidth="588.2pt" labels="LABEL:rotfloat2" width="199.0pt" xml:id="S2.T5" xtranslate="-194.61pt" ytranslate="-194.11pt">
+    <table angle="90" depth="0.0pt" height="585.8pt" inlist="lot" innerdepth="1.0pt" innerheight="219.1pt" innerwidth="585.8pt" labels="LABEL:rotfloat2" width="220.1pt" xml:id="S2.T5" xtranslate="-182.85pt" ytranslate="-182.35pt">
       <tags>
         <tag>Table 5</tag>
         <tag role="autoref">Table 5</tag>
@@ -466,9 +412,13 @@ the whales Save the whale Save the <ref class="ltx_href" href="http://dlmf.nist.
             <td align="left" border="t" thead="column">Pottery</td>
             <td align="left" border="t" thead="column">Flint</td>
             <td align="left" border="t" thead="column">Animal</td>
-            <td align="justify" border="t" thead="column" width="72.3pt"><p vattach="top">Stone</p></td>
+            <td align="justify" border="t" thead="column" vattach="top"><inline-block vattach="top">
+                <p width="72.3pt">Stone</p>
+              </inline-block></td>
             <td align="left" border="t" thead="column">Other</td>
-            <td align="justify" border="r t" thead="column" width="72.3pt"><p vattach="top">C14 Dates</p></td>
+            <td align="justify" border="r t" thead="column" vattach="top"><inline-block vattach="top">
+                <p width="72.3pt">C14 Dates</p>
+              </inline-block></td>
           </tr>
           <tr>
             <td border="l" thead="column"/>
@@ -479,15 +429,15 @@ the whales Save the whale Save the <ref class="ltx_href" href="http://dlmf.nist.
             <td thead="column"/>
             <td thead="column"/>
             <td align="left" thead="column">Bones</td>
-            <td thead="column" width="72.3pt"/>
+            <td thead="column" vattach="top"/>
             <td thead="column"/>
-            <td border="r" thead="column" width="72.3pt"/>
+            <td border="r" thead="column" vattach="top"/>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td align="left" border="l t" colspan="10"><text font="bold">Grooved Ware</text></td>
-            <td border="r t" width="72.3pt"/>
+            <td border="r t" vattach="top"/>
           </tr>
           <tr>
             <td align="left" border="l">784</td>
@@ -506,17 +456,19 @@ the whales Save the whale Save the <ref class="ltx_href" href="http://dlmf.nist.
                   <XMTok meaning="times" role="MULOP">×</XMTok>
                 </XMath>
               </Math>8</td>
-            <td width="72.3pt"/>
+            <td vattach="top"/>
             <td align="left"><Math mode="inline" tex="\times" text="*" xml:id="S2.T5.m3">
                 <XMath>
                   <XMTok meaning="times" role="MULOP">×</XMTok>
                 </XMath>
               </Math>2 bone</td>
-            <td align="justify" border="r" width="72.3pt"><p vattach="top">2150<Math mode="inline" tex="\pm" text="plus-or-minus" xml:id="S2.T5.m4">
-                  <XMath>
-                    <XMTok meaning="plus-or-minus" name="pm" role="ADDOP">±</XMTok>
-                  </XMath>
-                </Math> 100 BC</p></td>
+            <td align="justify" border="r" vattach="top"><inline-block vattach="top">
+                <p width="72.3pt">2150<Math mode="inline" tex="\pm" text="plus-or-minus" xml:id="S2.T5.m4">
+                    <XMath>
+                      <XMTok meaning="plus-or-minus" name="pm" role="ADDOP">±</XMTok>
+                    </XMath>
+                  </Math> 100 BC</p>
+              </inline-block></td>
           </tr>
           <tr>
             <td align="left" border="l">785</td>
@@ -535,9 +487,13 @@ the whales Save the whale Save the <ref class="ltx_href" href="http://dlmf.nist.
                   <XMTok meaning="times" role="MULOP">×</XMTok>
                 </XMath>
               </Math>21</td>
-            <td align="justify" width="72.3pt"><p vattach="top">Hammerstone</p></td>
+            <td align="justify" vattach="top"><inline-block vattach="top">
+                <p width="72.3pt">Hammerstone</p>
+              </inline-block></td>
             <td align="left">—</td>
-            <td align="justify" border="r" width="72.3pt"><p vattach="top">—</p></td>
+            <td align="justify" border="r" vattach="top"><inline-block vattach="top">
+                <p width="72.3pt">—</p>
+              </inline-block></td>
           </tr>
           <tr>
             <td align="left" border="l">962</td>
@@ -556,17 +512,21 @@ the whales Save the whale Save the <ref class="ltx_href" href="http://dlmf.nist.
                   <XMTok meaning="times" role="MULOP">×</XMTok>
                 </XMath>
               </Math>57*</td>
-            <td align="justify" width="72.3pt"><p vattach="top">—</p></td>
+            <td align="justify" vattach="top"><inline-block vattach="top">
+                <p width="72.3pt">—</p>
+              </inline-block></td>
             <td align="left">—</td>
-            <td align="justify" border="r" width="72.3pt"><p vattach="top">1990 <Math mode="inline" tex="\pm" text="plus-or-minus" xml:id="S2.T5.m9">
-                  <XMath>
-                    <XMTok meaning="plus-or-minus" name="pm" role="ADDOP">±</XMTok>
-                  </XMath>
-                </Math> 80 BC (Layer 4) 1870 <Math mode="inline" tex="\pm" text="plus-or-minus" xml:id="S2.T5.m10">
-                  <XMath>
-                    <XMTok meaning="plus-or-minus" name="pm" role="ADDOP">±</XMTok>
-                  </XMath>
-                </Math>90 BC (Layer 1)</p></td>
+            <td align="justify" border="r" vattach="top"><inline-block vattach="top">
+                <p width="72.3pt">1990 <Math mode="inline" tex="\pm" text="plus-or-minus" xml:id="S2.T5.m9">
+                    <XMath>
+                      <XMTok meaning="plus-or-minus" name="pm" role="ADDOP">±</XMTok>
+                    </XMath>
+                  </Math> 80 BC (Layer 4) 1870 <Math mode="inline" tex="\pm" text="plus-or-minus" xml:id="S2.T5.m10">
+                    <XMath>
+                      <XMTok meaning="plus-or-minus" name="pm" role="ADDOP">±</XMTok>
+                    </XMath>
+                  </Math>90 BC (Layer 1)</p>
+              </inline-block></td>
           </tr>
           <tr>
             <td align="left" border="l">983</td>
@@ -585,13 +545,17 @@ the whales Save the whale Save the <ref class="ltx_href" href="http://dlmf.nist.
                   <XMTok meaning="times" role="MULOP">×</XMTok>
                 </XMath>
               </Math>8</td>
-            <td align="justify" width="72.3pt"><p vattach="top">—</p></td>
+            <td align="justify" vattach="top"><inline-block vattach="top">
+                <p width="72.3pt">—</p>
+              </inline-block></td>
             <td align="left">Fired clay</td>
-            <td align="justify" border="r" width="72.3pt"><p vattach="top">—</p></td>
+            <td align="justify" border="r" vattach="top"><inline-block vattach="top">
+                <p width="72.3pt">—</p>
+              </inline-block></td>
           </tr>
           <tr>
             <td align="left" border="l" colspan="10"><text font="bold">Beaker</text></td>
-            <td border="r" width="72.3pt"/>
+            <td border="r" vattach="top"/>
           </tr>
           <tr>
             <td align="left" border="l">552</td>
@@ -602,9 +566,13 @@ the whales Save the whale Save the <ref class="ltx_href" href="http://dlmf.nist.
             <td align="left">P7–14</td>
             <td align="left">—</td>
             <td align="left">—</td>
-            <td align="justify" width="72.3pt"><p vattach="top">—</p></td>
+            <td align="justify" vattach="top"><inline-block vattach="top">
+                <p width="72.3pt">—</p>
+              </inline-block></td>
             <td align="left">—</td>
-            <td align="justify" border="r" width="72.3pt"><p vattach="top">—</p></td>
+            <td align="justify" border="r" vattach="top"><inline-block vattach="top">
+                <p width="72.3pt">—</p>
+              </inline-block></td>
           </tr>
           <tr>
             <td align="left" border="l">790</td>
@@ -619,9 +587,13 @@ the whales Save the whale Save the <ref class="ltx_href" href="http://dlmf.nist.
                 </XMath>
               </Math>12</td>
             <td align="left">—</td>
-            <td align="justify" width="72.3pt"><p vattach="top">Quartzite-lump</p></td>
+            <td align="justify" vattach="top"><inline-block vattach="top">
+                <p width="72.3pt">Quartzite-lump</p>
+              </inline-block></td>
             <td align="left">—</td>
-            <td align="justify" border="r" width="72.3pt"><p vattach="top">—</p></td>
+            <td align="justify" border="r" vattach="top"><inline-block vattach="top">
+                <p width="72.3pt">—</p>
+              </inline-block></td>
           </tr>
           <tr>
             <td align="left" border="b l">794</td>
@@ -636,9 +608,13 @@ the whales Save the whale Save the <ref class="ltx_href" href="http://dlmf.nist.
                 </XMath>
               </Math>3</td>
             <td align="left" border="b">—</td>
-            <td align="justify" border="b" width="72.3pt"><p vattach="top">—</p></td>
+            <td align="justify" border="b" vattach="top"><inline-block vattach="top">
+                <p width="72.3pt">—</p>
+              </inline-block></td>
             <td align="left" border="b">—</td>
-            <td align="justify" border="b r" width="72.3pt"><p vattach="top">—</p></td>
+            <td align="justify" border="b r" vattach="top"><inline-block vattach="top">
+                <p width="72.3pt">—</p>
+              </inline-block></td>
           </tr>
         </tbody>
       </tabular>

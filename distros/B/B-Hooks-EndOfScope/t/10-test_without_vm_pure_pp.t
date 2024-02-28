@@ -36,7 +36,7 @@ for my $fn (@files) {
   note "retesting $fn";
   my @cmd = (
     $^X,
-    $has_dh ? '-MDevel::Hide=Variable::Magic' : (),
+    $has_dh ? '-MDevel::Hide=Variable::OnDestruct' : (),
     $fn
   );
 

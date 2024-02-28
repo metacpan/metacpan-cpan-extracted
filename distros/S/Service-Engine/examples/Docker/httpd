@@ -1,0 +1,74 @@
+FROM centos:centos7.9.2009
+
+RUN yum update -y
+RUN yum install -y epel-release
+RUN yum install -y http://rpms.remirepo.net/enterprise/remi-release-7.rpm
+RUN yum install -y \
+    sudo \
+    gcc \
+    gcc-c++ \
+    make \
+    wget \
+    mod_perl \
+    perl \
+    cpan \
+    perl-devel \
+    perl-CPAN \
+    perl-JSON \
+    perl-App-cpanminus \
+    perl-Crypt-OpenSSL-Random \
+    perl-Crypt-OpenSSL-RSA \
+    perl-libapreq2 \
+    perl-DBD-MySQL \
+    mod_perl \
+    mariadb-server \
+    postgresql-server \
+    postgresql-devel \
+    telnet
+
+RUN yum groupinstall 'Development Tools' -y
+
+ENV PATH=/usr/local/share/perl5/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/root/bin
+ENV PERL_PATH=/usr/local/share/perl5
+ENV PERL5LIB=$PERL_PATH:$PERL_PATH/lib/perl5:/etc/httpd/lib/repo/common/perl/lib
+ENV PERL_MM_OPT="INSTALL_BASE=$PERL_PATH"
+ENV PERL_MB_OPT="--install_base $PERL_PATH"
+ENV PATH="$PERL_PATH/bin:$PATH"
+
+RUN cpanm --notest -l $PERL_PATH \
+        CGI \
+        Cache::Memcached::Fast \ 
+        Carp \
+        DBI \
+        DBD::Crate \
+        DBD::Pg \
+        Data::Dumper \
+        File::Pid \
+        File::Slurp \
+        File::stat \
+        HTML::FormatText \
+        HTML::TokeParser \
+        HTML::TreeBuilder \
+        IO::Multiplex \
+        JSON \
+        LWP::UserAgent \
+        List::Util \
+        MIME::Entity \
+        Mail::SendGrid::SmtpApiHeader \
+        Memory::Usage \
+        Module::Runtime \
+        Net::SMTP \
+        Net::Server::HTTP \
+        Net::Server::Multiplex \
+        RedisDB \
+        Search::Elasticsearch \
+        Thread::Queue \
+        Time::localtime \
+        URI::Escape \
+        base \
+        strict \
+        threads \
+        threads::shared \
+        warnings
+
+ENTRYPOINT ["/usr/sbin/httpd", "-D", "FOREGROUND"]

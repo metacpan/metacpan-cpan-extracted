@@ -21,6 +21,7 @@ use LaTeXML::Package;
 #   endmarks
 #   list of theorem (which should actually be covered in some postprocessor?)
 RequirePackage('amsthm');
+RequirePackage('ifthen');
 # but re-redefine from amsthm from LaTeX; use save note font as head font
 DefRegister('\thm@notefont' => Tokens(T_CS('\the'), T_CS('\thm@headfont')));
 
@@ -122,20 +123,20 @@ setSavableTheoremParameters(qw(
     \thm@numbering \thm@prework \thm@postwork \thm@symbol));
 
 DefMacro('\theoremheaderfont{}', sub {
-    AssignValue('\thm@headfont' => $_[1]); });
+    AssignRegister('\thm@headfont' => $_[1]); });
 
 DefMacro('\theoremseparator{}', sub {
-    AssignValue('\thm@headpunct' => $_[1]); });
+    AssignRegister('\thm@headpunct' => $_[1]); });
 DefMacro('\theoremsymbol{}', sub {
-    AssignValue('\thm@symbol' => $_[1]); });
+    AssignRegister('\thm@symbol' => $_[1]); });
 
 # ???
 DefMacro('\theoremprework{}', sub {
-    AssignValue('\thm@prework' => $_[1]); });
+    AssignRegister('\thm@prework' => $_[1]); });
 DefMacro('\theorempostwork{}', sub {
-    AssignValue('\thm@postwork' => $_[1]); });
+    AssignRegister('\thm@postwork' => $_[1]); });
 DefMacro('\theoremnumbering{}', sub {
-    AssignValue('\thm@numbering' => T_CS('\\' . ToString($_[1]))); });
+    AssignRegister('\thm@numbering' => T_CS('\\' . ToString($_[1]))); });
 
 # This should turn on the same parameters as the env,
 # much like \theoremstyle{style} does, givcen a theoremstyle
@@ -176,12 +177,12 @@ Let('\renewtheorem', '\newtheorem');
 DefConstructorI('\lx@addframing', undef, sub {
     my ($doc, %props) = @_;
     my $node = $doc->getElement;
-    $doc->addClass($node, 'ltx_framed');
+    $doc->setAttribute($node, framed => 'rectangle');
     my $css = $node->getAttribute('cssstyle');
     my $pad = 'padding:' . $props{margin} . 'pt;';
     $doc->setAttribute($node, cssstyle => ($css ? $css . ';' . $pad : $pad)); },
   properties => sub { (framecolor => Black,
-      margin => LookupValue('\FrameSep')->ptValue); });
+      margin => LookupRegister('\FrameSep')->ptValue); });
 
 # Since \theoremframecommand can be defined to be pretty much anything,
 # we don't have a good handle on what colors, etc, it may use.
@@ -234,7 +235,7 @@ DefPrimitive('\lx@ntheorem@newtheoremstyle{}{}{}{}{}{}', sub {
       '\thm@headstyling' => $headstyle,
       'thm@swap'         => ToString($swap) eq 'S',
       '\thm@numbering'   => $numbering,
-      '\thm@symbol'      => LookupValue('\thm@symbol'),
+      '\thm@symbol'      => LookupRegister('\thm@symbol'),
     );
     DefMacroI(T_CS('\th@' . $name), undef, sub { useTheoremStyle($name); });
     return; });

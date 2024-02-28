@@ -41,7 +41,6 @@ ok $entry2==$entry, "Same entry";
 #
 ok $entry->[File::Meta::Cache::valid_]==3, "Reference count";
 
-
 #Close the entry
 $cache->close($entry);
 
@@ -105,14 +104,23 @@ $cache->update($entry);
 # File size should be updated with an update
 #
 ok $entry->[File::Meta::Cache::stat_][7]== 10, "File size";
-# Clean up
-
-unlink $_ for @file;
 
 # Very basic code coverage of disable and enable
 
 ok defined $cache->disable, "Disable ok";
 
+# Attempt to open now when disabled, should give multiple fds
+my $dis_entry1=$cache->open($file[0],0);
+my $dis_entry2=$cache->open($file[0],0);
+ok $dis_entry1->[File::Meta::Cache::fd_] != $dis_entry2->[File::Meta::Cache::fd_], "Opened new fd when disabled";
+ok $dis_entry1->[File::Meta::Cache::valid_] ==1 , "Disabled ref count ok";
+ok $dis_entry2->[File::Meta::Cache::valid_] ==1 , "Disabled ref count ok";
+
+
+
 ok defined $cache->enable;
 
+# Clean up
+
+unlink $_ for @file;
 done_testing;

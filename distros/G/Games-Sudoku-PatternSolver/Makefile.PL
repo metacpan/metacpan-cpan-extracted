@@ -5,7 +5,7 @@ WriteMakefile(
     VERSION_FROM      => 'lib/Games/Sudoku/PatternSolver.pm',
     AUTHOR            => 'Steffen Heinrich <she@cpan.org>',
     LICENSE           => 'perl_5',
-    MIN_PERL_VERSION  => '5.10.0',
+    MIN_PERL_VERSION  => '5.06.0',
     PREREQ_PM         => {
     	'Bit::Vector'       => 0,
     	'List::Util'        => 0,
@@ -13,7 +13,7 @@ WriteMakefile(
     	'Time::HiRes'       => 0,
     },
     EXE_FILES => [
-      'scripts/sudogen.pl',
+      'scripts/sudogen',
     ],
     dist              => {
     	# all the files on my external NTFS disk have all permissions set, 

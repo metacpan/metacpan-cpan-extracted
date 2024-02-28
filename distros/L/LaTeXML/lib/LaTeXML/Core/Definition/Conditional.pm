@@ -28,14 +28,17 @@ sub new {
   my ($class, $cs, $parameters, $test, %traits) = @_;
   my $source = $STATE->getStomach->getGullet->getMouth;
   return bless { cs => $cs, parameters => $parameters, test => $test,
-    locator      => $source->getLocator,
-    isExpandable => 1,
+    locator => $source->getLocator,
     %traits }, $class; }
+
+sub isExpandable {
+  return 1; }
 
 sub getTest {
   my ($self) = @_;
   return $$self{test}; }
 
+# This MUST return Tokens() or undef. (NOT a Token)
 sub invoke {
   my ($self, $gullet) = @_;
   # A real conditional must have condition_type set
@@ -66,7 +69,7 @@ sub invoke_conditional {
   my $parms = $$self{parameters};
   my @args  = ($parms ? $parms->readArguments($gullet) : ());
   $$LaTeXML::IFFRAME{parsing} = 0;    # Now, we're done parsing the Test clause.
-  my $tracing = $STATE->lookupValue('TRACINGCOMMANDS') || $LaTeXML::DEBUG{tracing};
+  my $tracing = ($STATE->lookupValue('TRACING') || 0) & TRACE_COMMANDS;
   if ($tracing) {
     Debug('{' . $self->tracingCSName . "} [#$ifid]");
     Debug($self->tracingArgs(@args)) if @args; }
@@ -114,14 +117,16 @@ sub skipConditionalBody {
   my $level = 1;
   my $n_ors = 0;
   my $start = $gullet->getLocator;
-  # NOTE: Open-coded manipulation of if_stack!, Gullet and Token's
+  # NOTE: Open-coded manipulation of if_stack!, Gullet and Token's; Must be fast!
   # [we're only reading tokens & looking up, so State shouldn't change behind our backs]
   my $stack = $STATE->lookupValue('if_stack');
   while (1) {
     my ($t, $cond_type);
     while ($t = shift(@{ $$gullet{pushback} }) || $$gullet{mouth}->readToken()) {
-      $t = $$t[2] if $$t[1] == CC_SMUGGLE_THE;
-      if ($LaTeXML::Core::State::CATCODE_ACTIVE_OR_CS[$$t[1]]
+      my $cc = $$t[1];
+      if    ($cc == CC_BEGIN) { $LaTeXML::ALIGN_STATE++; }
+      elsif ($cc == CC_END)   { $LaTeXML::ALIGN_STATE--; }
+      elsif ($LaTeXML::Core::State::CATCODE_ACTIVE_OR_CS[$cc]
         && ($cond_type = $STATE->lookupConditional($t))) {
         last; } }
     last unless $cond_type;
@@ -133,17 +138,17 @@ sub skipConditionalBody {
         shift(@$stack); }           # then DO pop that conditional's frame; it's DONE!
       elsif (!--$level) {           # If no more nesting, we're done.
         shift(@$stack);             # Done with this frame
-        return $t; } }              # AND Return the finishing token.
+        return TokensI($t); } }     # AND Return the finishing token.
     elsif ($level > 1) { }                                    # Ignore \else,\or nested in the body.
     elsif (($cond_type eq 'or') && (++$n_ors == $nskips)) {
-      return $t; }
+      return TokensI($t); }
     elsif (($cond_type eq 'else') && $nskips
       # Found \else and we're looking for one?
       # Make sure this \else is NOT for a nested \if that is part of the test clause!
       && ($$stack[0] eq $LaTeXML::IFFRAME)) {
       # No need to actually call elseHandler, but note that we've seen an \else!
       $$stack[0]{elses} = 1;
-      return $t; } }    # } #}
+      return TokensI($t); } }    # } #}
   Error('expected', '\fi', $gullet, "Missing \\fi or \\else, conditional fell off end",
     "Conditional started at " . ToString($start));
   return; }
@@ -157,7 +162,7 @@ sub invoke_else {
         . " since we seem not to be in a conditional");
     return; }
   elsif ($$stack[0]{parsing}) {     # Defer expanding the \else if we're still parsing the test
-    return Tokens(T_CS('\relax'), $LaTeXML::CURRENT_TOKEN); }
+    return TokensI(T_CS('\relax'), $LaTeXML::CURRENT_TOKEN); }
   elsif ($$stack[0]{elses}) {       # Already seen an \else's at this level?
     Error('unexpected', $LaTeXML::CURRENT_TOKEN, $gullet,
       "Extra " . Stringify($LaTeXML::CURRENT_TOKEN),
@@ -169,7 +174,7 @@ sub invoke_else {
     Debug('{' . ToString($LaTeXML::CURRENT_TOKEN) . '}'
         . " [for " . ToString($$LaTeXML::IFFRAME{token}) . " #" . $$LaTeXML::IFFRAME{ifid}
         . " skipping to " . ToString($t) . "]")
-      if $STATE->lookupValue('TRACINGCOMMANDS') || $LaTeXML::DEBUG{tracing};
+      if ($STATE->lookupValue('TRACING') || 0) & TRACE_COMMANDS;
     return; } }
 
 sub invoke_fi {
@@ -181,13 +186,13 @@ sub invoke_fi {
         . " since we seem not to be in a conditional");
     return; }
   elsif ($$stack[0]{parsing}) {     # Defer expanding the \else if we're still parsing the test
-    return Tokens(T_CS('\relax'), $LaTeXML::CURRENT_TOKEN); }
+    return TokensI(T_CS('\relax'), $LaTeXML::CURRENT_TOKEN); }
   else {                            # "expand" by removing the stack entry for this level
     local $LaTeXML::IFFRAME = $$stack[0];
     $STATE->shiftValue('if_stack');    # Done with this frame
     Debug('{' . ToString($LaTeXML::CURRENT_TOKEN) . '}'
         . " [for " . Stringify($$LaTeXML::IFFRAME{token}) . " #" . $$LaTeXML::IFFRAME{ifid} . "]")
-      if $STATE->lookupValue('TRACINGCOMMANDS') || $LaTeXML::DEBUG{tracing};
+      if ($STATE->lookupValue('TRACING') || 0) & TRACE_COMMANDS;
     return; } }
 
 sub equals {

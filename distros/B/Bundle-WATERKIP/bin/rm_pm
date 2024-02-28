@@ -1,0 +1,60 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+
+# PODNAME: rm_pm
+# ABSTRACT: Remove installed modules by name
+
+use ExtUtils::Packlist;
+use ExtUtils::Installed;
+
+$ARGV[0] or die "Usage: $0 Module::Name\n";
+
+my $mod = $ARGV[0];
+
+my $inst = ExtUtils::Installed->new();
+
+foreach my $item (sort($inst->files($mod))) {
+  _unlink_file($item);
+}
+
+my $packfile = $inst->packlist($mod)->packlist_file();
+_unlink_file($packfile);
+
+sub _unlink_file {
+    my $file = shift;
+    if (unlink($file)) {
+        print "Removed $file\n";
+    }
+    else {
+        print "Unable to remove $file\n";
+    }
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+rm_pm - Remove installed modules by name
+
+=head1 VERSION
+
+version 0.001
+
+=head1 AUTHOR
+
+Wesley Schwengle <waterkip@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2024 by Wesley Schwengle.
+
+This is free software, licensed under:
+
+  The (three-clause) BSD License
+
+=cut

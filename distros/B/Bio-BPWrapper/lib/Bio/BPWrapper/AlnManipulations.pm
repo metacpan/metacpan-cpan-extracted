@@ -82,6 +82,7 @@ my %opt_dispatch = (
     "aln-index" => \&colnum_from_residue_pos,
     "list-ids" => \&list_ids,
     "pair-diff" => \&pair_diff,
+    "pair-diff-ref" => \&pair_diff_ref,
     "permute-states" => \&permute_states,
     "pep2dna" => \&protein_to_dna,
     "resample" => \&sample_seqs,
@@ -94,6 +95,7 @@ my %opt_dispatch = (
     "gap-states2" => \&gap_states_matrix,
     "trim-ends" => \&trim_ends,
     "bin-inform" => \&binary_informative,
+    "bin-ref" => \&binary_ref,
     "phy-nonint" => \&phylip_non_interleaved
    );
 
@@ -275,18 +277,64 @@ sub gap_char {
     }
 }
 
+sub pair_diff_ref {
+    my $refId = $opts{'pair-diff-ref'};
+    my (@seqs, $refSeq);
+    foreach my $seq ($aln->each_seq()) { 
+	if ($seq->id eq $refId) {
+	    $refSeq = $seq;
+	} else {
+	    push @seqs, $seq;
+	}
+    }
+
+    die "ref seq $refId not found\n" unless $refSeq;
+
+    @seqs = sort { $a->id() cmp $b->id() } @seqs;
+    for (my $i=0; $i < $#seqs; $i++) {
+	my $idB = $seqs[$i]->id();
+	my $seqB = $seqs[$i];
+	my $pair = new Bio::SimpleAlign;
+	$pair->add_seq($refSeq);
+	$pair->add_seq($seqB);
+#	$pair = $pair->remove_gaps(); # not relialbe, e.g., n/N for DNA seqs
+	my $ct_diff = 0;
+	my $ct_valid = 0;
+#	my $matchLine = $pair->match_line();
+#	my @match_symbols = split //, $matchLine;
+	for (my $j = 1; $j <= $pair->length; $j++) {
+	    my $mA = $refSeq->subseq($j,$j);
+	    my $mB = $seqB->subseq($j,$j);
+	    next if $refSeq->alphabet eq 'dna' && $seqB->alphabet eq 'dna' && ($mA !~ /^[ATCG]$/i || $mB !~ /^[ATCG]$/i);
+#		next if $match_symbols[$i] eq '*';
+	    next if $mA eq '-' || $mB eq '-'; 
+	    $ct_valid++;
+	    $ct_diff++ unless $mA eq $mB;
+#	    next if $match_symbols[$i] eq '*'; 
+	}
+	my $pairdiff = $pair->percentage_identity();
+	print join "\t", ($refId, $idB, $ct_diff, $ct_valid, $pair->length());
+	printf "\t%.4f\t%.4f\n", $pairdiff, 1-$pairdiff/100;
+    }
+    exit;
+}
+
 sub pair_diff {
     my $alnBack = $aln;
-    $alnBack = $alnBack->remove_gaps();
+    my $lenTotal = $alnBack->length();
+#    $alnBack = $alnBack->remove_gaps();
     my $matchLineFull = $alnBack->match_line();
     my @match_symbols_full = split //, $matchLineFull;
-    my $num_var = 0; # de-gapped variable sites
+    my $num_var = 0; # contain gaps
+#    my $num_var = 0; # de-gapped variable sites
     for (my $i = 0; $i < $alnBack->length; $i++) {
 	next if $match_symbols_full[$i] eq '*'; 
 	$num_var++;
     }
 
     my (@seqs);
+    print join "\t", qw(seq_1 seq_2 len_gapless len_variable diff_gapless diff_variable len_aln identitty fac_diff frac_gapless frac_variable);
+    print "\n";
     foreach my $seq ($aln->each_seq()) { push @seqs, $seq }
     @seqs = sort { $a->id() cmp $b->id() } @seqs;
     for (my $i=0; $i < $#seqs; $i++) {
@@ -298,19 +346,27 @@ sub pair_diff {
 	    my $pair = new Bio::SimpleAlign;
 	    $pair->add_seq($seqA);
 	    $pair->add_seq($seqB);
-	    $pair = $pair->remove_gaps();
+#	    $pair = $pair->remove_gaps(); # unreliable: e.g., "n", "N" in DNA seqs
 #	    my $mask = $seqA->seq ^ $seqB->seq; #  (exclusive or) operator: returns "\0" if same
 	    my $ct_diff = 0;
-	    my $matchLine = $pair->match_line();
-	    my @match_symbols = split //, $matchLine;
-	    for (my $i = 0; $i < $pair->length; $i++) {
-		next if $match_symbols[$i] eq '*'; 
-		$ct_diff++;
+	    my $ct_valid = 0;
+	    my $gap_included_diff = 0;
+#	    my $matchLine = $pair->match_line();
+#	    my @match_symbols = split //, $matchLine;
+	    for (my $j = 1; $j <= $pair->length; $j++) {
+		my $mA = $seqA->subseq($j,$j);
+		my $mB = $seqB->subseq($j,$j);
+		next if $seqA->alphabet eq 'dna' && $seqB->alphabet eq 'dna' && ($mA !~ /^[ATCG]$/i || $mB !~ /^[ATCG]$/i);
+		$gap_included_diff++ unless $mA eq $mB;
+#		next if $match_symbols[$i] eq '*'; 
+		next if $mA eq '-' || $mB eq '-';
+		$ct_valid++;
+		$ct_diff++ unless $mA eq $mB;
 	    }
 #	    while ($mask =~ /[^\0]/g) { $ct_diff++ }
 	    my $pairdiff = $pair->percentage_identity();
-	    print join "\t", ($idA, $idB, $num_var, $ct_diff, $pair->length());
-	    printf "\t%.4f\t%.4f\t%.4f\n", $pairdiff, 1-$pairdiff/100, $ct_diff/$num_var;
+	    print join "\t", ($idA, $idB, $ct_valid, $num_var, $ct_diff, $gap_included_diff, $pair->length());
+	    printf "\t%.4f\t%.4f\t%.4f\t%.4f\n", $pairdiff, 1-$pairdiff/100, $ct_diff/$ct_valid, $gap_included_diff/$num_var;
 	}
     }
     exit;
@@ -728,7 +784,15 @@ L<Bio::SimpleAlign-E<gt>set_new_reference()|https://metacpan.org/pod/Bio::Simple
 =cut
 
 sub change_ref {
-    $aln = $aln->set_new_reference($opts{"ref-seq"})
+    my @newAlns;
+    if ($opts{'concat'}) {
+	foreach (@alns) {
+	    push @newAlns, $_->set_new_reference($opts{"ref-seq"})
+	}
+	@alns = @newAlns;
+    } else {
+	$aln = $aln->set_new_reference($opts{"ref-seq"})
+    }
 }
 
 
@@ -829,6 +893,56 @@ sub binary_informative {
     $aln = $new_aln
 }
 
+sub binary_ref {
+    my $new_aln = Bio::SimpleAlign->new();
+    my $len=$aln->length();
+    my (@seq_ids, @inf_sites, %bin_chars, @ref_states);
+    my $refId = $opts{'bin-ref'} || die "need ref id as an argument\n";
+    # Go through each column and save variable sites
+    my $ref_bases = &_get_a_site_v2(); #print Dumper($ref_bases); exit;
+    my $seenRef = 0;
+    foreach (sort keys %$ref_bases) { 
+	push @seq_ids, $_;
+	next unless $_ eq $refId;
+	$seenRef++;
+    }
+    die "ref seq not found: $refId\n" unless $seenRef;
+
+    for (my $i=1; $i<=$len; $i++) {
+	my (%seen, @bases);
+	foreach my $id (@seq_ids) { push @bases, $ref_bases->{$id}->{$i}; }
+	%seen = %{&_seen_bases(\@bases)};
+	next if &_has_gap( [ values %seen ] ); # skip gaps
+	next if keys %seen != 2; # skip multi-states or constant sites
+	my ($base1, $base2) = sort keys %seen;
+	if ($base1 eq $ref_bases->{$refId}->{$i}) { # base1 is ref
+	    $bin_chars{$i}{$base1} = 1;
+	    $bin_chars{$i}{$base2} = 0;
+	} else { # base2 is ref
+	    $bin_chars{$i}{$base1} = 0;
+	    $bin_chars{$i}{$base2} = 1;
+	}
+	push @inf_sites, $i;
+    }
+
+    die "no binary sites\n" unless @inf_sites;
+    foreach (@inf_sites) { warn $_, "\n" }
+
+    # Recreate the object for output
+    foreach my $id (@seq_ids) {
+        my $seq_str;
+        foreach my $i (@inf_sites) {
+            $seq_str .= $bin_chars{$i}->{$ref_bases->{$id}->{$i}};
+        }
+        my $loc_seq = Bio::LocatableSeq->new(-seq => $seq_str, -id => $id, -start => 1);
+        my $end = $loc_seq->end;
+        $loc_seq->end($end);
+        $new_aln->add_seq($loc_seq)
+    }
+    $aln = $new_aln
+}
+
+
 =head2 variable_sites()
 
 Extracts variable sites.
@@ -895,11 +1009,71 @@ L<Bio::Align::UtilitiesE<gt>cat()|https://metacpan.org/pod/Bio::Align::Utilities
 
 =cut
 
-
+##################################################################
+# 2/26/2021: add position map (for rate4site applications)
+##############################################################
 sub concat {
-    $aln = cat(@alns)
+    $aln = cat(@alns);
+    warn "Alignment concated. Getting position maps...\n";
+    my $refSeq = $opts{"ref-seq"} ? $aln->get_seq_by_id($opts{"ref-seq"}) : $aln->get_seq_by_pos(1);
+#    my $refSeq = $aln->get_seq_by_pos(1);
+    my @refGenesInOrder = map { $_ -> get_seq_by_id($refSeq->id) } @alns;
+    # remap start & end for individual gene alignments, sync pos with concatenated aln:
+    my $pos = 0;
+    my %geneRange;
+    for (my $i = 0; $i <= $#refGenesInOrder; $i++) {
+	my $start = $pos + 1;
+	$pos += $refGenesInOrder[$i]->length();
+	my $end = $pos;
+	$geneRange{$i+1} = {'start' => $start, 
+			    'end' => $end, 
+	};
+    }
+
+#    warn Dumper(\%geneRange);
+
+    my @locTable;
+    for (my $i = 1; $i <= $refSeq->length(); $i++) {
+	next if $refSeq->subseq($i, $i) eq '-';
+	my ($inGene, $posGene) = &__gene_order($i, \%geneRange);
+	push @locTable, {
+	    'pos_concat' => $i,
+	    'pos_unaligned' => $refSeq->location_from_column($i)->start(),
+	    'gene_order' => $inGene,
+	    'pos_gene_aln' => $posGene,
+	    'pos_gene_unaligned' => $refGenesInOrder[$inGene-1]->location_from_column($posGene)->start() 
+	};
+    }
+    open LOG, ">concat.log";
+    print LOG join "\t", ("seq_id", "pos_concat", "pos_residue", "gene", "pos_gene_aligned", "pos_gene");
+    print LOG "\n"; 
+    foreach (@locTable) {
+	print LOG join "\t", (
+	    $refSeq->id(),
+	    $_->{pos_concat}, 
+	    $_->{pos_unaligned}, 
+	    $_->{gene_order},
+	    $_->{pos_gene_aln},
+	    $_->{pos_gene_unaligned}
+	);
+	print LOG "\n";
+    }
+    close LOG;
+    warn "Position map of reference seq is saved in file concat.log\n";
 }
 
+sub __gene_order {
+    my $pos = shift;
+    my $ref = shift;
+    my %range = %$ref;
+    foreach my $gene (keys %range) {
+	next unless $pos >= $range{$gene}->{start} && $pos <= $range{$gene}->{end};
+	return ($gene, $pos - $range{$gene}->{'start'} + 1) 
+    }
+    die "Not found in any genes: position $pos\n";
+}
+
+#######################################
 
 sub conserved_blocks {
     my $len=$aln->length();

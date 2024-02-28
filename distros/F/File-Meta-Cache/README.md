@@ -25,19 +25,19 @@ my $entry=$opener->("path to file");
 
   ###
 
-if($entry and $entry->[File::Meta::Cache::valid_]){
+if($entry and $entry->[File::Meta::Cache::VALID]){
   # Work with the file
   #
-  for($entry->[File::Meta::Cache::fh_]){
+  for($entry->[File::Meta::Cache::FH]){
 
       sysread $_, my  $buffer, ...;
   }
 
   # Set user defined data in entry if no already defined
   #
-  $entry->[File::Meta::Cache::user_]=//
+  $entry->[File::Meta::Cache::USER]=//
   [
-    "Content-Length: $entry->[File::Meta::Cache::stat_][7],
+    "Content-Length: $entry->[File::Meta::Cache::STAT][7],
   ];
 }
 else {
@@ -60,7 +60,7 @@ reduces the number of open file descriptors required, which allows more files
 to be accessed without adjusting process/user resource limits. 
 
 Files are 'opened' and 'closed' via the cache in order to track how many
-references to an entry are active (not perl reference counting btw). When an
+references to an entry are active (not Perl reference counting BTW). When an
 entry has no references, it is eligible to be removed by 'sweeping' the cache.
 This should be done a regular interval to keep the meta data fresh, but long
 enough to make the cache useful.  To make this module event system agnostic it
@@ -71,14 +71,14 @@ users of the same entry must track their own file positions. When doing IO on
 the file, appropriate calls to `seek` (or `pread`/`pwrite` via `IO::FD`)
 will need to be performed to set the position for correct IO operation.
 
-Each cached entry contains a `user_` field, which allows the user to store
+Each cached entry contains a `USER` field, which allows the user to store
 associated meta data with the entry. For example this could be used to store
 pre rendered HTTP headers (content-type, content-length, etag, modification
 headers, etc), which only need to be computed when the file was opened.
 
 Note this module is tuned for performance rather than nice programming style.
 Thus fields within a cache entry are accessible by their position in an array
-instead of a nice hash name or accessor methods.  
+instead of a nice hash name or accessors methods.  
 
 # API
 
@@ -90,39 +90,43 @@ functional API for best performance for high frequency access.
 A cache entry is an anonymous array with the following fields:
 
 ```perl
-key_ fd_ fh_ stat_ valid_ user_
- 0    1   2    3     4      5
+New constant name:         KEY  FD  FH   STAT  VALID   USER
+Depricated constant name:  key_ fd_ fh_  stat_ valid_  user_
+                   values: 0    1   2    3     4       5
 ```
 
 This are constants defined in the `File::Meta::Cache` package, which can be
 used as indexes into the array.
 
-### key\_ (=0)
+**NOTE:** from v0.3.0, the field index contants have been renamed. The old names
+are depricated and will be removed in a later version. Please use the new names.
+
+### KEY (=0) 
 
 The key to the cache table, which is the file path used when calling the
 `open` method.
 
-### fd\_ (=1)
+### FD (=1)
 
 The file descriptor of the opened file.  This can be used directly with
 [POSIX](https://metacpan.org/pod/POSIX) or `IO::FD` module for IO operations.
 
-### fh\_ (=2)
+### FH (=2)
 
 The file handle of the opened file. This will undefined if the cache was
 initialised with `no_fh` parameter.
 
-### stat\_ (=3)
+### STAT (=3)
 
 This is the reference to an array of stat information from the `stat` call.
 
-### valid\_ (=4)
+### VALID (=4)
 
 A value indicating if the cache entry is current or has been invalidated. If it
 is greater than 0, the entry is still considered fresh and valid.  If it is 0,
 the cache entry has be removed from the cache and the file has been closed.
 
-### user\_ (=5)
+### USER (=5)
 
 A general purpose field for storing user associated data with the cache entry.
 This could pre computed/rendered data based on the stat information.

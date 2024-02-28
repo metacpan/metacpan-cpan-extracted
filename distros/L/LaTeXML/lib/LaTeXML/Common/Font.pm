@@ -20,6 +20,7 @@ use LaTeXML::Common::Number;
 use LaTeXML::Common::Dimension;
 use LaTeXML::Common::Font::Metric;
 use LaTeXML::Common::Font::StandardMetrics;
+use LaTeXML::Common::Color;
 use List::Util qw(min max sum);
 use base qw(LaTeXML::Common::Object);
 
@@ -34,7 +35,7 @@ DebuggableFeature('size-detailed', "Show sizing of boxes in detail");
 my $DEFFAMILY     = 'serif';      # [CONSTANT]
 my $DEFSERIES     = 'medium';     # [CONSTANT]
 my $DEFSHAPE      = 'upright';    # [CONSTANT]
-my $DEFCOLOR      = 'black';      # [CONSTANT]
+my $DEFCOLOR      = Black;        # [CONSTANT]
 my $DEFBACKGROUND = undef;        # [CONSTANT] no color; transparent
 my $DEFOPACITY    = '1';          # [CONSTANT]
 my $DEFENCODING   = 'OT1';        # [CONSTANT]
@@ -262,6 +263,7 @@ sub toString {
 
 # Perhaps it is more useful to list only the non-default components?
 sub stringify {
+  no warnings 'recursion';
   my ($self) = @_;
   my ($fam, $ser, $shp, $siz, $col, $bkg, $opa, $enc, $lang, $mstyle, $flags) = @$self;
   $fam = 'serif' if $fam && ($fam eq 'math');
@@ -871,7 +873,7 @@ The attributes are
  size   : TINY, Tiny, tiny, SMALL, Small, small,
           normal, Normal, large, Large, LARGE,
           huge, Huge, HUGE, gigantic, Gigantic, GIGANTIC
- color  : any named color, default is black
+ color  : any named color, default is Black
 
 They are usually merged against the current font, attempting to mimic the,
 sometimes counter-intuitive, way that TeX does it,  particularly for math

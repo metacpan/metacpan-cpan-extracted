@@ -12,7 +12,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.52'
   File::ShareDir::Install: '0.13'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,13 +30,13 @@ requires:
   Try::Tiny: '0.12'
   perl: '5.010001'
 resources:
-  bugtracker: https://github.com/Humanstate/net-amqp-rabbitmq/issues
+  bugtracker: https://github.com/PayProp/net-amqp-rabbitmq/issues
   homepage: https://metacpan.org/module/Net::AMQP::RabbitMQ::PP
   license: http://dev.perl.org/licenses/
-  repository: https://github.com/Humanstate/net-amqp-rabbitmq
-version: '0.10'
+  repository: https://github.com/PayProp/net-amqp-rabbitmq
+version: '0.11'
 x_repository:
   type: git
-  url: https://github.com/Humanstate/net-amqp-rabbitmq.git
-  web: https://github.com/Humanstate/net-amqp-rabbitmq
+  url: https://github.com/PayProp/net-amqp-rabbitmq.git
+  web: https://github.com/PayProp/net-amqp-rabbitmq
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

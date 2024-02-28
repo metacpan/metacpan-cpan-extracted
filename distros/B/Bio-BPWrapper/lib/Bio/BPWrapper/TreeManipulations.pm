@@ -1,5 +1,5 @@
 =encoding utf8
-.
+
 =head1 NAME
 
 Bio::BPWrapper::TreeManipulations - Functions for biotree
@@ -40,7 +40,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK);
 
 @EXPORT      = qw(print_tree_shape edge_length_abundance swap_otus getdistance
                   sister_pairs countOTU reroot clean_tree delete_otus initialize
-                  write_out bin);
+                  write_out bin walk_edge cut_sister);
 
 =head1 SUBROUTINES
 
@@ -63,13 +63,94 @@ sub initialize {
     $out_format = $opts{"output"} // "newick";
     $print_tree = 0;    # Trigger printing the tree.
     my $file = shift || "STDIN";
-    $in = Bio::TreeIO->new(-format => $in_format, ($file eq "STDIN") ? (-fh => \*STDIN) : (-file => $file));
-    $tree  =   $in->next_tree(); # get the first tree (and ignore the rest)
+    if ($in_format eq 'edge') {
+	$tree = &edge2tree($file);
+    } else {
+	$in = Bio::TreeIO->new(-format => $in_format, ($file eq "STDIN") ? (-fh => \*STDIN) : (-file => $file));
+	$tree  =   $in->next_tree(); # get the first tree (and ignore the rest)
+    }
     $out      = Bio::TreeIO->new(-format => $out_format);
     @nodes    = $tree->get_nodes;
     $rootnode = $tree->get_root_node;
     foreach (@nodes) { push @otus, $_ if $_->is_Leaf }
 }
+
+# label low-desc sisters as "cut-nodes" 
+sub cut_sister {
+    my $cutoff = $opts{'cut-sis'} || die "$0 --cut-sis <n>\n";
+    foreach my $nd (@nodes) { 
+	my $decCts = 0;
+	my $id = $nd->id() || $nd->internal_id();
+	if ($nd->is_Leaf) {
+	    $nd->id("cut_". $id); # label to cut 
+	    next;
+	}
+	
+	foreach ($nd->get_all_Descendents) {
+	    $decCts++;
+	}
+ 	next if $decCts >= $cutoff; # don't cut
+	$nd->id("cut_". $id); # label to cut 
+    }
+    $print_tree = 1;
+}
+
+sub edge2tree {
+    my $edgeFile = shift;
+    open EG, "<", $edgeFile || die "can't read parent-child edge file\n";
+    $rootnode = Bio::Tree::Node->new(-id=>'root');
+    my $tr = Bio::Tree::Tree->new();
+    my @nds = ($rootnode);
+    my %parent;
+    my %seen_edge;
+    while(<EG>) {
+	next unless /^(\S+)\s+(\S+)/;
+	my ($pa, $ch) = ($1, $2);
+	$seen_edge{$pa}{$ch}++; # number of events
+	$parent{$ch} = $pa unless $parent{$ch}; # seen before
+    }
+    close EG;
+
+#    print Dumper(\%parent);
+
+    my %seen_parent;
+    my %add_node;
+#    my @nds;
+    foreach my $ch (keys %parent) {
+	my $pa = $parent{$ch};
+	$seen_parent{$pa}++; 
+	push @nds, Bio::Tree::Node->new(-id=>$ch, -branch_length => $seen_edge{$pa}{$ch});
+	$add_node{$ch}++;
+    }
+
+    # special treatment to set outgroup (which has no parent specified in the edge table) as root
+    # add all as chid of root
+    foreach my $pa (keys %seen_parent) {
+	next if $add_node{$pa};
+	my $orphan = Bio::Tree::Node->new(-id=>$pa, -branch_length => 1); # ST213 in test file "edges-pars.tsv"
+	push @nds, $orphan;
+	$parent{$pa} = 'root';
+    }
+
+    # attach descendant
+#    my %attached;
+    foreach my $node (@nds) {
+	next if $node eq $rootnode;
+	my $id = $node->id(); # print $id, "\t";
+	my $p_id = $parent{$id}; # print $p_id, "\n";
+#	next if $attached{$p_id}++;
+	my @nds = grep { $_->id() eq $p_id } @nds;
+	if (@nds) {
+	    my $p_node = shift @nds;
+	    $p_node->add_Descendent($node);
+	} else {
+	    die "no parent $id\n";
+	}
+    }    
+    $tr->set_root_node($rootnode);
+    return $tr;
+}
+
 
 sub reorder_by_ref {
     die "reference node id missing\n" unless $opts{'ref'};
@@ -110,6 +191,81 @@ sub _flip_if_not_in_top_clade { # by resetting creation_id & sortby option of ea
     }
 }
 
+
+# trim a node to a single OTU representative if all branch lengths of its descendant OTUs <= $cut
+sub trim_tips {
+    die "Usage: $0 --trim-tips <num>\n" unless $opts{'trim-tips'};
+    my $cut = $opts{'trim-tips'};
+
+    my @trim_nodes;
+    my $group_ct = 0;
+    &identify_nodes_to_trim_by_walk_from_root($rootnode, \$cut, \@trim_nodes, \$group_ct);
+    my %otu_sets;
+    my $set_ct = 1;
+    foreach my $ref_trim (@trim_nodes) {
+	foreach (@$ref_trim) {
+	    $otu_sets{$_} = $set_ct;
+	}
+	$set_ct++;
+#	print STDERR join "\t", sort @$ref_trim;
+#	print STDERR "\n";
+    }
+
+
+    foreach (@otus) {
+	next if $otu_sets{$_->id};
+	$otu_sets{$_->id} = $set_ct++;
+    }
+    #    print Dumper(\%otu_sets);
+    print STDERR "#Trim tree from tip  with a cutoff of d=$cut\n";
+    print STDERR "otu\tnr_set_id\n";
+    foreach (sort {$otu_sets{$a} <=> $otu_sets{$b}} keys %otu_sets) {
+	print STDERR $_, "\t", $otu_sets{$_}, "\n";
+    }
+
+    $print_tree = 1;
+}
+
+sub identify_nodes_to_trim_by_walk_from_root {
+    my $node = shift; # internal node only
+    my $ref_cut = shift;
+    my $ref_group = shift;
+    my $ref_ct = shift;
+
+    return if $node->is_Leaf;
+    my %des_otus; # save distances
+    my $trim = 1; # default to trim
+    # trim a node if all OTU distance to it is <= cut
+    foreach my $des ($node -> get_all_Descendents()) {
+	next unless $des->is_Leaf;
+	#push @des_otus, $des;
+	# distance to a desc OTU
+	my $dist = $tree->distance($node, $des);
+	$des_otus{$des->id} = { 'otu' => $des, 'dist' => $dist };
+	$trim = 0 if $dist > $$ref_cut; # don't trim is any distance to OTU > $cut
+    }
+
+    if ($trim) { # trim &  retain the first OTU; stop descending
+	my @leafs = sort keys %des_otus; # make a copy
+	my $pa = $node->ancestor();
+	$pa -> remove_Descendent($node); # clear this node as a des of parent
+	my $retain = shift @leafs;
+	my $retain_node = $des_otus{$retain}->{'otu'};
+	my $d = $node->branch_length() + $des_otus{$retain}->{'dist'};  
+	$retain_node->branch_length($d); # keep distance to tip
+	$pa->add_Descendent($retain_node); # add retained OTU to parent
+	
+	# collect all OTUs for a trimmed inode
+	push @$ref_group, [keys %des_otus];
+	$$ref_ct++;
+	return;
+    } else { # don't trim
+	foreach my $des ($node->each_Descendent()) {
+	    &identify_nodes_to_trim_by_walk_from_root($des, $ref_cut, $ref_group, $ref_ct); 
+	}
+    }
+}
+
 sub cut_tree {
     my @otu_hts;
     $rootnode->{height} = 0;
@@ -121,6 +277,7 @@ sub cut_tree {
 
     @otu_hts = sort {$a <=> $b} @otu_hts;
     my $least_otu_height = shift @otu_hts;
+    die "Usage: $0 --cut-tree <num>\n" unless $opts{'cut-tree'};
     my $cut = $opts{'cut-tree'} || 0.5 * $least_otu_height; # default to cut the branches traversing the line that is 1/2 of least deep OTU
     die "Cut tree at $cut, greater than least-deep OTU ($least_otu_height). Lower cut value.\n" if $cut >= $least_otu_height;
 
@@ -280,6 +437,11 @@ sub assign_inode_ycoord {
     $node->{'ycoord'} = $sorted[0] + 1 / 2 * ($sorted[-1] - $sorted[0])
 }
 
+sub tips_to_root {
+    foreach (@otus) {
+	printf "%s\t%.6f\n", $_->id(), distance_to_root($_);
+    }
+}
 
 sub distance_to_root {
     my $node = shift;
@@ -614,10 +776,25 @@ Reroot tree to node in C<$opts{'reroot'}> by creating new branch.
 =cut
 
 sub reroot {
-    my $outgroup_id = $opts{'reroot'};
-    my $outgroup    = $tree->find_node($outgroup_id);
+    #    my $outgroup_id = $opts{'reroot'};
+    my ($tag, $out_id) = split(':', $opts{'reroot'});
+    my $outgroup;
+    if ($tag eq 'otu') { # leaf id
+	$outgroup    = $tree->find_node($out_id)
+    } elsif ($tag eq 'intid') { # internal id
+	for my $nd (@nodes) {
+	    if ($nd->internal_id() == $out_id) {
+		$outgroup = $nd;
+		last
+	    }
+	}
+    }
+    else {
+	die("Need a tag: otu:<otu_id>, or intid:<internal_id>\n");
+    }
 #    my $newroot     = $outgroup->create_node_on_branch(-FRACTION => 0.5, -ANNOT => {id => 'newroot'});
-#    $tree->reroot($outgroup);
+    #    $tree->reroot($outgroup);
+    die "outgroup not found: $out_id" unless $outgroup;
     $tree->reroot_at_midpoint($outgroup);
     $print_tree = 1;
 }
@@ -745,7 +922,7 @@ sub subset {
 
 # Print OTU names and lengths
 sub print_leaves_lengths {
-    foreach (@nodes) { say $_->id(), "\t", $_->branch_length() if $_->is_Leaf() }
+    foreach (@nodes) { say $_->id(), "\t", $_->branch_length() || 0 if $_->is_Leaf() }
 }
 
 # Get LCA
@@ -903,11 +1080,36 @@ sub walk {
         $visited{$curnode} = 1;
         @dpair = ($last_curnode, $curnode);
         $totlen += $tree->distance(-nodes => \@dpair);
-        _desclen($curnode, \%visited, \$totlen, \$vcount);
+        &_desclen($curnode, \%visited, \$totlen, \$vcount);
         $last_curnode = $curnode;
         $curnode = $curnode->ancestor
     }
 }
+
+sub walk_edge {
+    my $startleaf = $tree->find_node($opts{'walk-edge'});
+    my $curnode   = $startleaf->ancestor;
+    my $last_curnode = $startleaf;
+    my @decs;
+    my %visited;
+    my $totlen = 0;
+    my @dpair;
+    my $vcount = 0;
+
+    $visited{$startleaf} = 1;
+
+    while ($curnode) {
+        $visited{$curnode} = 1;
+        @dpair = ($last_curnode, $curnode);
+        my $pairLen = $tree->distance(-nodes => \@dpair);
+	say join "\t", ($curnode->id() || $curnode->internal_id(), $last_curnode->id() || $last_curnode->internal_id(), $pairLen);
+	$totlen += $pairLen;
+        &_desclen($curnode, \%visited, \$totlen, \$vcount);
+        $last_curnode = $curnode;
+        $curnode = $curnode->ancestor
+    }
+}
+
 
 # works for RAxML bipartition output and FastTree output with bootstrap values as node names
 sub delete_low_boot_support {
@@ -981,9 +1183,12 @@ Call this after calling C<#initialize(\%opts)>.
 
 sub write_out {
     my $opts = shift;
+    print_all_node_ids() if $opts->{'ids-all'};
     rename_tips() if $opts->{'rename-tips'};
     write_tab_tree() if $opts->{'as-text'};
     cut_tree() if $opts->{'cut-tree'};
+    trim_tips() if $opts->{'trim-tips'};
+    cut_sister() if $opts->{'cut-sis'};
     mid_point_root() if $opts->{'mid-point'};
     pars_binary() if $opts->{'ci'};
     getdistance() if $opts->{'dist'};
@@ -1004,10 +1209,12 @@ sub write_out {
     print_all_lengths() if $opts->{'length-all'};
     random_tree() if defined($opts->{'random'});
     depth_to_root() if $opts->{'depth'};
+    tips_to_root() if $opts->{'tips-to-root'};
     rotate_an_in_node() if $opts->{'rotate-node'};
 #    sort_child() if $opts->{'sort-child'};
     alldesc() if $opts->{'otus-desc'};
     walk() if $opts->{'walk'};
+    walk_edge() if $opts->{'walk-edge'};
     multi2bi() if $opts->{'multi2bi'};
     clean_tree() if $opts->{'clean-br'} || $opts->{'clean-boot'};
     delete_otus() if $opts->{'del-otus'};
@@ -1071,10 +1278,11 @@ sub _name2node {
 
 # _each_leaf ($node): returns a list of all OTU's descended from this node, if any
 sub _each_leaf {
-	my @leaves;
-	return $_[0] if $_[0]->is_Leaf;
-	for ($_[0]->get_all_Descendents) { push (@leaves, $_) if $_->is_Leaf }
-	return @leaves
+    my $nd = shift;
+    my @leaves;
+    return ($nd) if $nd->is_Leaf;
+    for ($nd->get_all_Descendents) { push (@leaves, $_) if $_->is_Leaf }
+    return @leaves
 }
 
 # main routine to walk up from root
@@ -1103,7 +1311,7 @@ sub _wu {
 		next if exists($visited{$_});
 		$visited{$_} = 1;
 		push @$node_list_ref, $_;
-		_wu($_, \%visited, $node_list_ref)
+		&_wu($_, \%visited, $node_list_ref)
 	}
 }
 
@@ -1111,8 +1319,17 @@ sub _wu {
 sub _walk_up {
 	my %visited;
 	my @node_list = $_[0];
-	_wu($_[0], \%visited, \@node_list);
+	&_wu($_[0], \%visited, \@node_list);
 	return @node_list
+}
+
+sub print_all_node_ids {
+    my %visited;
+    my @node_list = ($rootnode);
+    &_wu($rootnode, \%visited, \@node_list);
+    foreach (@node_list) {
+	print $_->id() || $_->internal_id(), "\n";
+    }
 }
 
 sub _treeheight {
@@ -1159,7 +1376,8 @@ sub _desclen {
 	$dist = $tree->distance(-nodes => \@dpair);
 	$$totlen += $dist;
 	$$vcountref++;
-	say	$_->id, "\t$$totlen\t$$vcountref"
+	say join "\t", ($curnode->id() || $curnode->internal_id(), $_->id() || $_->internal_id(), $dist) if $opts{'walk-edge'};
+	say	$_->id, "\t$$totlen\t$$vcountref" if $opts{'walk'}
     }
 
     for (@nd) {
@@ -1168,8 +1386,9 @@ sub _desclen {
 	$dpair[0] = $curnode;
 	$dpair[1] = $_;
 	$dist = $tree->distance(-nodes => \@dpair);
+	say join "\t", ($curnode->id() || $curnode->internal_id(), $_->id() || $_->internal_id(), $dist) if $opts{'walk-edge'};
 	$$totlen += $dist;
-	_desclen($_, \%visited, $totlen, $vcountref)
+	&_desclen($_, \%visited, $totlen, $vcountref)
     }
 }
 
@@ -1187,7 +1406,7 @@ L<bioatree>: command-line tool for tree manipulations
 
 =item *
 
-L<Qiu Lab wiki page|http://diverge.hunter.cuny.edu/labwiki/Bioutils>
+L<Qiu Lab wiki page|http://wiki.genometracker.org/>
 
 =item *
 

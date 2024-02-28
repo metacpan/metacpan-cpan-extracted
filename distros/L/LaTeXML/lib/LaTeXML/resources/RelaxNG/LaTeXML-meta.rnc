@@ -1,4 +1,4 @@
-# /=====================================================================\ 
+# /=====================================================================\
 # |  LaTeXML-meta.rnc                                                   |
 # | RelaxNG model for LaTeXML generated documents                       |
 # |=====================================================================|
@@ -14,7 +14,7 @@ default namespace = "http://dlmf.nist.gov/LaTeXML"
 
 ## Meta elements are generally hidden;
 ## they can appear in both inline and block contexts.
-Meta.class   |= note | declare | indexmark | glossarydefinition | rdf | ERROR | resource | navigation
+Meta.class   |= note | declare | indexmark | glossarydefinition | rdf | resource | navigation
 
 #======================================================================
 
@@ -68,7 +68,7 @@ declare_model =
 #======================================================================
 
 indexmark =
-## Metadata to record an indexing position. The content is 
+## Metadata to record an indexing position. The content is
 ## a sequence of \elementref{indexphrase}, each representing a level in
 ## a multilevel indexing entry.
 element indexmark { indexmark_attributes, indexmark_model }
@@ -149,7 +149,7 @@ element glossaryphrase { glossaryphrase_attributes, glossaryphrase_model }
 glossaryphrase_attributes =
   Common.attributes,
   IDREF.attributes,
-  
+
   ## a flattened form of the phrase for generating an \attr{ID}.
   attribute key { text }?,
   ## a keyword naming the format of this phrase (to match \attr{show} in \elementref{glossaryref}).
@@ -173,20 +173,6 @@ rdf_attributes =
 rdf_model = Flow.model
 
 #======================================================================
-
-ERROR =
-## error object for undefined control sequences, or whatever
-element ERROR { ERROR_attributes, ERROR_model }
-
-## Attributes for \elementref{ERROR}.
-ERROR_attributes =
-  Common.attributes,
-  ID.attributes
-
-## Content model for \elementref{ERROR}.
-ERROR_model = text*
-
-#======================================================================
 # Document-level (or sub-document level) Meta objects
 
 resource =
@@ -194,7 +180,7 @@ resource =
 element resource { resource_attributes, resource_model }
 
 ## Attributes for \elementref{resource}.
-resource_attributes = 
+resource_attributes =
   Common.attributes,
 
   ## the source url to the resource
@@ -218,13 +204,7 @@ resource_model = text*
 navigation =
 ## Records navigation cross-referencing information,
 ## or serves as a container for page navigational blocks.
-element navigation { navigation_attributes, navigation_model }
-
-## Attributes for \elementref{navigation}.
-navigation_attributes = Common.attributes
-
-## Content model for \elementref{navigation}.
-## A \elementref{inline-para} child should have attribute \attr{class}
+## An \elementref{inline-logical-block} child should have attribute \attr{class}
 ## being one of \texttt{ltx_page_navbar}, \texttt{ltx_page_header}
 ## or \texttt{ltx_page_footer} and its contents will be used to create those components of webpages.
 ## Lacking those, a \elementref{TOC} requests a table of contents
@@ -232,7 +212,13 @@ navigation_attributes = Common.attributes
 ## Links from the current page or document to related ones;
 ## these are represented by \elementref{ref} elements with \attr{rel}
 ## being up, down, previous, next, and so forth.
-##  top-level elements, presumably block-level,
-navigation_model = ( ref | TOC | inline-para )*
+
+element navigation { navigation_attributes, navigation_model }
+
+## Attributes for \elementref{navigation}.
+navigation_attributes = Common.attributes
+
+## Content model for \elementref{navigation}.
+navigation_model = ( ref | TOC | inline-logical-block )*
 
 #======================================================================

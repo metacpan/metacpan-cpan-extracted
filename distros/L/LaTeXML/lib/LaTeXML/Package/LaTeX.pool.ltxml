@@ -15,6 +15,7 @@ use strict;
 use warnings;
 use LaTeXML::Package;
 use LaTeXML::Util::Pathname;
+use List::Util qw(min max);
 
 #**********************************************************************
 # Organized following
@@ -283,10 +284,21 @@ EOTeX
 # C.1.6 The \\ Command
 #======================================================================
 # In math, \\ is just a formatting hint, unless within an array, cases, .. environment.
-DefConstructor("\\\\ OptionalMatch:* [Glue]",
-  "?#isMath(<ltx:XMHint name='newline'/>)(<ltx:break/>)",
+DefConstructor('\lx@newline OptionalMatch:* [Glue]', sub {
+    my ($document, $star, $skip, %props) = @_;
+    if ($STATE->lookupValue('IN_MATH')) {
+      $document->insertElement('ltx:XMHint', undef, name => 'newline'); }
+    else {
+      my $context = $document->getElement;
+      if    (!$context || $context->getAttribute('_vertical_mode_')) { }
+      elsif (($document->getNodeQName($context) eq 'ltx:p')
+        && $context->parentNode->getAttribute('_vertical_mode_')) {
+        $document->maybeCloseElement('ltx:p'); }
+      elsif ($document->canContain($context, 'ltx:break')) {
+        $document->insertElement('ltx:break'); } } },
   reversion  => Tokens(T_CS("\\\\"), T_CR),
   properties => { isBreak => 1 });
+Let('\\\\', '\lx@newline');
 
 DefConstructor('\newline',
   "?#isMath(<ltx:XMHint name='newline'/>)(<ltx:break/>)",
@@ -418,20 +430,24 @@ Let(T_CS('\enddocument'), T_CS('\end{document}'), 'global');
 
 # Logos
 # \TeX is in TeX.pool.ltxml
-##DefConstructorI('\LaTeX',  undef, 'LaTeX');
-##DefConstructorI('\LaTeXe', undef, 'LaTeX2e');
-DefMacroI('\LaTeX',  undef, 'LaTeX');
-DefMacroI('\LaTeXe', undef, 'LaTeX2e');
 DefConstructor('\LaTeX',
-  "<ltx:text class='ltx_LaTeX_logo' cssstyle='letter-spacing:-0.2em; margin-right:0.2em'>"
-    . "L<ltx:text fontsize='80%' yoffset='0.4ex'>A</ltx:text>"
-    . "T<ltx:text yoffset='-0.4ex'>E</ltx:text>X</ltx:text>",
+  "<ltx:text class='ltx_LaTeX_logo' cssstyle='letter-spacing:-0.2em; margin-right:0.1em'>"
+    . "L"
+    . "<ltx:text cssstyle='font-variant:small-caps;' yoffset='0.4ex'>a</ltx:text>"
+    . "T"
+    . "<ltx:text cssstyle='font-variant:small-caps;font-size:120%' yoffset='-0.2ex'>e</ltx:text>"
+    . "X"
+    . "</ltx:text>",
   sizer => sub { (Dimension('2.6em'), Dimension('1.6ex'), Dimension('0.5ex')); });
 DefConstructor('\LaTeXe',
-  "<ltx:text class='ltx_LaTeX_logo' cssstyle='letter-spacing:-0.2em; margin-right:0.2em'>"
-    . "L<ltx:text fontsize='80%' yoffset='0.4ex'>A</ltx:text>"
-    . "T<ltx:text yoffset='-0.4ex'>E</ltx:text>X"
-    . "\x{2002}2<ltx:text yoffset='-0.4em'>\x{03B5}</ltx:text></ltx:text>",
+  "<ltx:text class='ltx_LaTeX_logo' cssstyle='letter-spacing:-0.2em; margin-right:0.1em'>"
+    . "L"
+    . "<ltx:text cssstyle='font-variant:small-caps;' yoffset='0.4ex'>a</ltx:text>"
+    . "T"
+    . "<ltx:text cssstyle='font-variant:small-caps;font-size:120%' yoffset='-0.2ex'>e</ltx:text>"
+    . "X"
+    . "\x{2002}2<ltx:text cssstyle='font-style:italic' yoffset='-0.3ex'>\x{03B5}</ltx:text>"
+    . "</ltx:text>",
   sizer => sub { (Dimension('3.7em'), Dimension('1.6ex'), Dimension('0.5ex')); });
 
 DefMacroI('\fmtname',    undef, 'LaTeX2e');
@@ -509,6 +525,7 @@ DefConstructor('\lx@note[]{}[]{}',
     . "#4"
     . "</ltx:note>",
   mode         => 'text', bounded => 1,
+  sizer        => '#mark',
   beforeDigest => sub { reenterTextMode(1); neutralizeFont(); },
   properties   => sub {
     my $type = ToString($_[2]);
@@ -632,7 +649,6 @@ DefMacro('\@startsection{}{}{}{}{}{} OptionalMatch:*', sub {
       else {                    # otherwise, just unset the flag?
         $STATE->assignValue('IN_MATH' => 0, 'global'); } }
     ### Main logic
-    my $ctr = LookupValue('counter_for_' . ToString($type)) || ToString($type);
     $level = ToString($level);
     if ($flag) {                # No number, not in TOC
       (T_CS('\par'), T_CS('\@startsection@hook'), T_CS('\\@@unnumbered@section'),
@@ -687,7 +703,7 @@ DefConstructor('\@@numbered@section{} Undigested OptionalUndigested Undigested',
       $props{backmatterelement} = LookupMapping('BACKMATTER_ELEMENT', 'ltx:' . $type); }
     $props{title}    = $xtitle;
     $props{toctitle} = $xtoctitle
-      if $xtoctitle && $xtoctitle->unlist && (ToString($xtoctitle) ne ToString($xtitle));
+      if !IsEmpty($xtoctitle) && (ToString($xtoctitle) ne ToString($xtitle));
     return %props; });
 
 # No tags, at all? Consider...
@@ -930,13 +946,13 @@ DefPrimitive('\DeclareOption{}{}', sub {
         DeclareOption(ToString($option), $code)); });
 
 DefPrimitive('\PassOptionsToPackage{}{}', sub {
-    my ($stomach, $name, $options) = @_;
+    my ($stomach, $options, $name) = @_;
     $name = ToString($name);
     $name =~ s/\s+//g;
     PassOptions($name, 'sty', split(/\s*,\s*/, ToString(Expand($options)))); });
 
 DefPrimitive('\PassOptionsToClass{}{}', sub {
-    my ($stomach, $name, $options) = @_;
+    my ($stomach, $options, $name) = @_;
     $name = ToString($name);
     $name =~ s/\s+//g;
     PassOptions($name, 'cls', split(/\s*,\s*/, ToString(Expand($options)))); });
@@ -1337,85 +1353,71 @@ DefMacroI('\@evenfoot', undef, Tokens());
 #**********************************************************************
 
 DefEnvironment('{center}', sub {
-    $_[0]->maybeCloseElement('ltx:p');                        # this starts a new vertical block
-    aligningEnvironment('center', 'ltx_centering', @_); },    # aligning will take care of \\\\ "rows"
-  beforeDigest => sub {
-    Let('\par', '\inner@par');
-    Let('\\\\', '\inner@par'); });
+    $_[0]->maybeCloseElement('ltx:p');                         # this starts a new vertical block
+    aligningEnvironment('center', 'ltx_centering', @_); });    # aligning will take care of \\\\ "rows"
+
 # HOWEVER, define a plain \center to act like \centering (?)
 DefMacroI('\center',    undef, '\centering');
 DefMacroI('\endcenter', undef, '');
 
 DefEnvironment('{flushleft}', sub {
     $_[0]->maybeCloseElement('ltx:p');    # this starts a new vertical block
-    aligningEnvironment('left', 'ltx_align_left', @_); },
-  beforeDigest => sub {
-    Let('\par', '\inner@par');
-    Let('\\\\', '\inner@par'); });
+    aligningEnvironment('left', 'ltx_align_left', @_); });
 DefEnvironment('{flushright}', sub {
     $_[0]->maybeCloseElement('ltx:p');    # this starts a new vertical block
-    aligningEnvironment('right', 'ltx_align_right', @_); },
-  beforeDigest => sub {
-    Let('\par', '\inner@par');
-    Let('\\\\', '\inner@par'); });
+    aligningEnvironment('right', 'ltx_align_right', @_); });
 
 # These add an operation to be carried out on the current node & following siblings, when the current group ends.
 # These operators will add alignment (class) attributes to each "line" in the current block.
-#DefPrimitiveI('\centering',   undef, sub { UnshiftValue(beforeAfterGroup=>T_CS('\@add@centering')); });
-# NOTE: THere's a problem here.  The current method seems to work right for these operators
-# appearing within the typical environments.  HOWEVER, it doesn't work for a simple \bgroup or \begingroup!!!
-# (they don't create a node! or even a whatsit!)
-DefConstructorI('\centering', undef,
-  sub { AssignValue(ALIGNING_NODE => $_[0]->getElement); return; },
+sub setupAligningContext {
+  my ($document) = @_;
+  my $node = $document->getElement;
+  AssignValue(ALIGNING_NODE => [$node, $node->lastChild]) if $node;
+  return; }
+
+sub applyAligningContext {
+  my ($document, $align, $class) = @_;
+  if (my $container = LookupValue('ALIGNING_NODE')) {
+    my ($node, $previous) = @$container;
+    my @children = $node->childNodes;
+    while (my $skip = shift(@children)) {
+      last if !$previous || $previous->isSameNode($skip); }
+    while (my $child = shift(@children)) {
+      setAlignOrClass($document, $child, $align, $class) if $child->nodeType == XML_ELEMENT_NODE; } }
+  return; }
+
+DefConstructorI('\centering', undef, \&setupAligningContext,
   beforeDigest => sub { UnshiftValue(beforeAfterGroup => T_CS('\@add@centering')); });
-DefConstructorI('\raggedright', undef,
-  sub { AssignValue(ALIGNING_NODE => $_[0]->getElement); return; },
+DefConstructorI('\raggedright', undef, \&setupAligningContext,
   beforeDigest => sub { UnshiftValue(beforeAfterGroup => T_CS('\@add@raggedright')); });
-DefConstructorI('\raggedleft', undef,
-  sub { AssignValue(ALIGNING_NODE => $_[0]->getElement); return; },
+DefConstructorI('\raggedleft', undef, \&setupAligningContext,
   beforeDigest => sub { UnshiftValue(beforeAfterGroup => T_CS('\@add@raggedleft')); });
 
 DefConstructorI('\@add@centering', undef,
-  sub { if (my $node = LookupValue('ALIGNING_NODE')) {
-      map { setAlignOrClass($_[0], $_, 'center', 'ltx_centering') }
-        $_[0]->getChildElements($node); } });
+  sub { applyAligningContext($_[0], 'center', 'ltx_centering'); });
 # Note that \raggedright is essentially align left
 DefConstructorI('\@add@raggedright', undef,
-  sub { if (my $node = LookupValue('ALIGNING_NODE')) {
-      map { setAlignOrClass($_[0], $_, undef, 'ltx_align_left') }
-        $_[0]->getChildElements($node); } });
+  sub { applyAligningContext($_[0], undef, 'ltx_align_left'); });
 DefConstructorI('\@add@raggedleft', undef,
-  sub { if (my $node = LookupValue('ALIGNING_NODE')) {
-      map { setAlignOrClass($_[0], $_, undef, 'ltx_align_right') }
-        $_[0]->getChildElements($node); } });
-
+  sub { applyAligningContext($_[0], undef, 'ltx_align_right'); });
 DefConstructorI('\@add@flushright', undef,
-  sub { if (my $node = LookupValue('ALIGNING_NODE')) {
-      map { setAlignOrClass($_[0], $_, 'right', 'ltx_align_right') }
-        $_[0]->getChildElements($node); } });
+  sub { applyAligningContext($_[0], 'right', 'ltx_align_right'); });
 DefConstructorI('\@add@flushleft', undef,
-  sub { if (my $node = LookupValue('ALIGNING_NODE')) {
-      map { setAlignOrClass($_[0], $_, 'left', 'ltx_align_left') }
-        $_[0]->getChildElements($node); } });
+  sub { applyAligningContext($_[0], 'left', 'ltx_align_left'); });
 
 #======================================================================-
 # C.6.1 Quotations and Verse
 #======================================================================-
-DefConstructor('\@block@cr[Dimension]', "<ltx:break/>\n",
-  reversion => Tokens(T_CS("\\\\"), T_CR));
+Let('\@block@cr', '\lx@newline');    # Obsolete, but in case still used
 DefEnvironment('{quote}',
   '<ltx:quote>#body</ltx:quote>',
-  beforeDigest => sub { Let('\\\\', '\@block@cr'); Let('\par', '\@block@cr') },
-  mode         => 'text');
+  mode => 'text');
 DefEnvironment('{quotation}',
   '<ltx:quote>#body</ltx:quote>',
-  beforeDigest => sub { Let('\\\\', '\@block@cr'); Let('\par', '\@block@cr') },
-  mode         => 'text');
-# NOTE: Handling of \\ within these environments?
+  mode => 'text');
 DefEnvironment('{verse}',
   '<ltx:quote role="verse">#body</ltx:quote>',
-  beforeDigest => sub { Let('\\\\', '\@block@cr'); Let('\par', '\@block@cr') },
-  mode         => 'text');
+  mode => 'text');
 
 #======================================================================
 # C.6.2 List-Making environments
@@ -1455,7 +1457,8 @@ sub beginItemize {
   my $outerlevel   = $outercounter && (LookupValue($outercounter . 'level') || 0);
   $counter = '@item' unless $counter;
   my $listlevel = (LookupValue('itemization_level') || 0) + 1;    # level for this list overall
-  my $level     = (LookupValue($counter . 'level')  || 0) + 1;    # level for lists of specific type
+  my $level     = LookupValue($counter . 'level') || 0;           # level for lists of specific type
+  $level++ unless $options{nolevel};
   AssignRegister('\itemsep' => LookupDimension('\lx@default@itemsep'));
   AssignValue('itemization_level' => $listlevel);
   AssignValue($counter . 'level'  => $level);
@@ -1472,9 +1475,9 @@ sub beginItemize {
 ##    Let(T_CS('\@listcontext'), T_CS('\@currentlabel')); }
   AssignValue(itemcounter => $usecounter);
   my $listcounter = '@itemize' . $listpostfix;
-  if (!LookupValue('\c@' . $listcounter)) {    # Create new list counters as needed
-    NewCounter($listcounter); }                #,  $outercounter.ToString(Tokens(roman($outerlevel))),
-  if ($outercounter) {                         # Make this list's ID relative to outer list's ID
+  if (!LookupDefinition(T_CS('\c@' . $listcounter))) {    # Create new list counters as needed
+    NewCounter($listcounter); }    #,  $outercounter.ToString(Tokens(roman($outerlevel))),
+  if ($outercounter) {             # Make this list's ID relative to outer list's ID
     my $outerusecounter = $outercounter . ToString(Tokens(roman($outerlevel)));
     DefMacroI('\the' . $listcounter . '@ID', undef,
       '\the' . $outerusecounter . '@ID.I' . '\arabic{' . $listcounter . '}');
@@ -1485,7 +1488,8 @@ sub beginItemize {
       'global');
   }
   # format the id of \item's relative to the id of this list
-  DefMacroI('\the' . $usecounter . '@ID', undef, '\the' . $listcounter . '@ID.i' . '\@' . $usecounter . '@ID');
+  DefMacroI(T_CS('\the' . $usecounter . '@ID'), undef,
+    Tokens(T_CS('\the' . $listcounter . '@ID'), T_OTHER('.i'), T_CS('\@' . $usecounter . '@ID')));
 
   my $series;
   if ($series = $options{series}) {
@@ -1500,7 +1504,6 @@ sub beginItemize {
         LookupValue('enumitem_series_' . $series . '_last') || Number(0)); } }
   else {
     ResetCounter($usecounter); }
-
 ##  return RefStepCounter('@itemize' . $listpostfix); }
   return (RefStepCounter('@itemize' . $listpostfix),
     counter => $usecounter, series => $series); }    # So end can save counter value
@@ -1522,7 +1525,7 @@ sub RefStepItemCounter {
     $attr{itemsep} = $sep; }
   if (defined $tag) {
     my @props = RefStepID($counter);
-    if ((ref $tag) && !scalar($tag->unlist)) {    # empty tag?
+    if (IsEmpty($tag)) {    # empty tag?
       return (@props); }
     else {
       my $ttag      = (ref $tag              ? $tag                      : T_OTHER($tag));
@@ -1707,9 +1710,15 @@ DefMacroI('\typerefnum@@itemiv', undef, '\lx@poormans@ordinal{@itemiv} \itemtype
 #----------------------------------------------------------------------
 # Basic enumeration bits
 
-# Class file should have
+# Class file normally would have
 #  NewCounter for enumi,...,
 #  define \labelenumi,... and probably \p@enumii...
+NewCounter('enumi',   undef, idwithin => '@itemizei', idprefix => 'i');
+NewCounter('enumii',  undef, idwithin => 'enumi',     idprefix => 'i');
+NewCounter('enumiii', undef, idwithin => 'enumii',    idprefix => 'i');
+NewCounter('enumiv',  undef, idwithin => 'enumiii',   idprefix => 'i');
+NewCounter('enumv',   undef, idwithin => 'enumiv',    idprefix => 'i');    # A couple of extra
+NewCounter('enumvi',  undef, idwithin => 'enumv',     idprefix => 'i');
 
 # How the refnums look... (probably should be in class file, but already here)
 DefMacroI('\p@enumii',  undef, '\theenumi');
@@ -1859,8 +1868,8 @@ DefRegister('\@itemdepth' => Number(0));
 #======================================================================
 
 # NOTE: how's the best way to get verbatim material through?
-DefEnvironment('{verbatim}',  '<ltx:verbatim>#body</ltx:verbatim>');
-DefEnvironment('{verbatim*}', '<ltx:verbatim>#body</ltx:verbatim>');
+#DefEnvironment('{verbatim}',  '<ltx:verbatim>#body</ltx:verbatim>');
+#DefEnvironment('{verbatim*}', '<ltx:verbatim>#body</ltx:verbatim>');
 
 DefMacroI('\@verbatim', undef,
   '\par\aftergroup\lx@end@verbatim\lx@@verbatim');    # Close enough?
@@ -1884,39 +1893,57 @@ DefConstructorI('\lx@end@verbatim', undef,
 # and also the usual environment capture.
 DefConstructorI(T_CS('\begin{verbatim}'), undef,
   "<ltx:verbatim font='#font'>#body</ltx:verbatim>",
-  beforeDigest => [sub { $_[0]->bgroup;
-      my @stuff = ();
-      if (my $b = LookupValue('@environment@verbatim@atbegin')) {
-        push(@stuff, Digest(@$b)); }
-      AssignValue(current_environment => 'verbatim');
-      DefMacroI('\@currenvir', undef, 'verbatim');
-      MergeFont(family => 'typewriter');
-      # Digest(T_CS('\par')); # NO! See beforeConstruct!
-      @stuff; }],
-  afterDigest => [sub {
-      my ($stomach, $whatsit) = @_;
-      #      $stomach->egroup;
-      my $font   = $whatsit->getFont;
-      my $loc    = $whatsit->getLocator;
-      my $end    = "\\end{verbatim}";
-      my @lines  = ();
-      my $gullet = $stomach->getGullet;
-      while (defined(my $line = $gullet->readRawLine)) {
-        # The raw chars will still have to be decoded (but not space!!)
-        $line = join('', map { ($_ eq ' ' ? ' ' : FontDecodeString($_, 'OT1_typewriter')) }
-            split(//, $line));
-        if ($line =~ /^(.*?)\\end\{verbatim\}(.*?)$/) {
-          push(@lines, $1 . "\n"); $gullet->unread(Tokenize($2), T_CR);
-          last; }
-        push(@lines, $line . "\n"); }
-      pop(@lines) if $lines[-1] eq "\n";
-      # Note last line ends up as Whatsit's "trailer"
-      if (my $b = LookupValue('@environment@verbatim@atend')) {
-        push(@lines, ToString(Digest(@$b))); }
-      $stomach->egroup;
-      $whatsit->setBody(map { Box($_, $font, $loc, T_OTHER($_)) } @lines, $end);
-      return; }],
+  beforeDigest    => [sub { beforeDigestVerbatim(0, @_); }],
+  afterDigest     => [sub { afterDigestVerbatim(0, @_); }],
   beforeConstruct => sub { $_[0]->maybeCloseElement('ltx:p'); });
+
+DefConstructorI(T_CS('\begin{verbatim*}'), undef,
+  "<ltx:verbatim font='#font'>#body</ltx:verbatim>",
+  beforeDigest    => [sub { beforeDigestVerbatim(1, @_); }],
+  afterDigest     => [sub { afterDigestVerbatim(1, @_); }],
+  beforeConstruct => sub { $_[0]->maybeCloseElement('ltx:p'); });
+
+sub beforeDigestVerbatim {
+  my ($starred, $stomach) = @_;
+  $stomach->bgroup;
+  my @stuff = ();
+  if (my $b = LookupValue('@environment@verbatim@atbegin')) {
+    push(@stuff, Digest(@$b)); }
+  AssignValue(current_environment => 'verbatim');
+  DefMacroI('\@currenvir', undef, 'verbatim');
+  MergeFont(family => 'typewriter');
+  # Digest(T_CS('\par')); # NO! See beforeConstruct!
+  return @stuff; }
+
+sub afterDigestVerbatim {
+  my ($starred, $stomach, $whatsit) = @_;
+  #      $stomach->egroup;
+  my $font   = $whatsit->getFont;
+  my $loc    = $whatsit->getLocator;
+  my $end    = $starred ? '\end{verbatim*}' : '\end{verbatim}';
+  my $space  = $starred ? "\x{2423}"        : ' ';
+  my @lines  = ();
+  my $gullet = $stomach->getGullet;
+  while (defined(my $line = $gullet->readRawLine)) {
+    my ($exiting, $remaining) = (0, undef);
+    if ($line =~ /^(.*?)\Q$end\E(.*?)$/) {
+      $exiting   = 1;
+      $line      = $1;
+      $remaining = $2; }
+    # The raw chars will still have to be decoded (but not space!!)
+    $line = join('', map { ($_ eq ' ' ? $space : FontDecodeString($_, 'OT1_typewriter')) }
+        split(//, $line));
+    push(@lines, $line . "\n");
+    if ($exiting) {
+      $gullet->unread(Tokenize($remaining), T_CR);
+      last; } }
+  pop(@lines) if $lines[-1] eq "\n";
+  # Note last line ends up as Whatsit's "trailer"
+  if (my $b = LookupValue('@environment@verbatim@atend')) {
+    push(@lines, ToString(Digest(@$b))); }
+  $stomach->egroup;
+  $whatsit->setBody(map { Box($_, $font, $loc, T_OTHER($_)) } @lines, $end);
+  return; }
 
 DefPrimitiveI('\@vobeyspaces', undef, sub {
     AssignCatcode(" " => 13);
@@ -1931,11 +1958,14 @@ DefMacroI('\verb', undef, sub {
     StartSemiverbatim('%', '\\', '{', '}');
     $STATE->assignCatcode(' ', CC_ACTIVE);
     my $init;
+    my $skippedSpace = 0;
     # As of texlive 2021, DO skip spaces before delimiter (even tho we've changed catcodes)
+    # but if we do skip spaces, * can be the delimiter
     do { $init = $gullet->readToken();
+      $skippedSpace = 1 if (defined $init && $init->getString eq ' ');
     } while (defined $init && $init->getString eq ' ');
     my $starred = 0;
-    if (T_OTHER('*')->equals($init)) {
+    if (T_OTHER('*')->equals($init) && !$skippedSpace) {
       $starred = 1;
       do { $init = $gullet->readToken();
       } while (defined $init && $init->getString eq ' '); }
@@ -1963,16 +1993,19 @@ DefPrimitive('\lx@use@visiblespace', sub {
     Let(T_ACTIVE(' '), T_OTHER("\x{2423}"));    # Visible space
 });
 
-DefConstructor('\@internal@verb{} Undigested {}',
-  "?#isMath(<ltx:XMTok font='#font'>#text</ltx:XMTok>)"
-    . "(<ltx:verbatim font='#font'>#text</ltx:verbatim>)",
-  properties => sub { (text => ToString($_[3])); },
-  font       => { family => 'typewriter', series => 'medium', shape => 'upright' },
-  #  bounded         => 1,
+# Arrange to digest the body in text mode, to keep (eg) "_" from turning to "\_"
+DefMacro('\@internal@verb{}{}{}', '\ifmmode\@internal@math@verb{#1}{#2}{#3}\else\@internal@text@verb{#1}{#2}{#3}\fi');
+DefConstructor('\@internal@math@verb{} Undigested {}',
+  "<ltx:XMTok font='#font'>#3</ltx:XMTok>",
+  mode      => 'text',
+  font      => { family => 'typewriter', series => 'medium', shape => 'upright' },
+  reversion => '\verb#1#2#3#2');
+DefConstructor('\@internal@text@verb{} Undigested {}',
+  "<ltx:verbatim font='#font'>#3</ltx:verbatim>",
+  font            => { family => 'typewriter', series => 'medium', shape => 'upright' },
   beforeConstruct => sub {
     my ($doc, $whatsit) = @_;
-    if (!$whatsit->isMath) {
-      $doc->canContain($doc->getElement, '#PCDATA') || $doc->openElement('ltx:p'); } },
+    $doc->canContain($doc->getElement, '#PCDATA') || $doc->openElement('ltx:p'); },
   reversion => '\verb#1#2#3#2');
 
 # This is defined by the alltt package.
@@ -2245,12 +2278,13 @@ Tag('ltx:Math', afterOpen => sub { GenerateID(@_, 'm'); });
 # They provide an environment to wrap around equations,
 # which hijack the equation counter to sub-number within the group.
 DefConstructor('\lx@equationgroup@subnumbering@begin',
-  "<ltx:equationgroup xml:id='#id'>",
+  "<ltx:equationgroup xml:id='#id'>"
+    . "#tags",
   afterDigest => sub {
     my ($stomach, $whatsit) = @_;
     my %eqn   = RefStepCounter('equation');
     my $eqnum = Expand(T_CS('\theequation'));
-    AssignValue(SAVED_EQUATION_NUMBER => LookupValue('\c@equation'));
+    AssignValue(SAVED_EQUATION_NUMBER => LookupRegister('\c@equation'));
     $whatsit->setProperties(%eqn);
     ResetCounter('equation');
     DefMacroI('\theequation',    undef, UnTeX($eqnum) . '\alph{equation}');
@@ -2259,7 +2293,8 @@ Tag('ltx:equationgroup', autoClose => 1);
 DefConstructor('\lx@equationgroup@subnumbering@end', sub {
     $_[0]->maybeCloseElement('ltx:equationgroup'); },
   afterDigest => sub {
-    AssignValue('\c@equation', LookupValue('SAVED_EQUATION_NUMBER'), 'global'); });
+    AssignRegister('\c@equation', LookupValue('SAVED_EQUATION_NUMBER'), 'global');
+  });
 
 #======================================================================
 # ========================================
@@ -2386,6 +2421,7 @@ sub eqnarrayBindings {
       properties  => { preserve_structure => 1, attributes => {%attributes} }));
 
   Let("\\\\",                    '\@alignment@newline');
+  Let('\lx@intercol',            '\lx@math@intercol');
   Let('\@row@before',            '\eqnarray@row@before');
   Let('\@row@after',             '\eqnarray@row@after');
   Let('\lx@eqnarray@save@label', '\label');
@@ -2565,7 +2601,26 @@ DefConstructor('\lx@stackrel{}{}',
 #======================================================================-
 # C.7.7 Spacing
 #======================================================================-
-# All this is already in TeX.pool
+# some of this is already in TeX.pool.  the rest was in amsmath, but is now native to LaTeX
+
+DefConstructorI('\thinspace', undef,
+  "?#isMath(<ltx:XMHint name='thinspace' width='#width'/>)(\x{2009})",
+  properties => { isSpace => 1, width => sub { LookupRegister('\thinmuskip'); } });
+DefConstructorI('\negthinspace', undef,
+  "?#isMath(<ltx:XMHint name='negthinspace' width='#width'/>)()",
+  properties => { isSpace => 1, width => sub { LookupRegister('\thinmuskip')->negate; } });
+DefConstructorI('\medspace', undef,
+  "?#isMath(<ltx:XMHint name='medspace' width='#width'/>)()",
+  properties => { isSpace => 1, width => sub { LookupRegister('\medmuskip'); } });
+DefConstructorI('\negmedspace', undef,
+  "?#isMath(<ltx:XMHint name='negmedspace' width='#width'/>)()",
+  properties => { isSpace => 1, width => sub { LookupRegister('\medmuskip')->negate; } });
+DefConstructorI('\thickspace', undef,
+  "?#isMath(<ltx:XMHint name='thickspace' width='#width'/>)(\x{2004})",
+  properties => { isSpace => 1, width => sub { LookupRegister('\thickmuskip'); } });
+DefConstructorI('\negthickspace', undef,
+  "?#isMath(<ltx:XMHint name='negthickspace' width='#width'/>)(\x{2004})",
+  properties => { isSpace => 1, width => sub { LookupRegister('\thickmuskip')->negate; } });
 
 #======================================================================
 # C.7.8 Changing Style
@@ -2923,21 +2978,22 @@ DefPrimitive('\renewenvironment OptionalMatch:* {}[Number][]{}{}', sub {
 # The core non-customizable part is defined here.
 # For customizable theorems, see amsthm.
 AssignValue('thm@swap' => 0);
-DefRegister('\thm@style'       => Tokenize('plain'));
-DefRegister('\thm@headfont'    => Tokens(T_CS('\bfseries')));
-DefRegister('\thm@notefont'    => Tokens(T_CS('\the'), T_CS('\thm@headfont')));
-DefRegister('\thm@bodyfont'    => Tokens(T_CS('\itshape')));
-DefRegister('\thm@headpunct'   => Tokens());
-DefRegister('\thm@styling'     => Tokens());
-DefRegister('\thm@headstyling' => Tokens());
-DefRegister('\thm@prework'     => Tokens());
-DefRegister('\thm@postwork'    => Tokens());
-DefRegister('\thm@symbol'      => Tokens());
-DefRegister('\thm@numbering'   => Tokens(T_CS('\arabic')));
+DefRegister('\thm@style'         => Tokenize('plain'));
+DefRegister('\thm@headfont'      => Tokens(T_CS('\bfseries')));
+DefRegister('\thm@notefont'      => Tokens(T_CS('\the'), T_CS('\thm@headfont')));
+DefRegister('\thm@bodyfont'      => Tokens(T_CS('\itshape')));
+DefRegister('\thm@headformatter' => Tokens());
+DefRegister('\thm@headpunct'     => Tokens());
+DefRegister('\thm@styling'       => Tokens());
+DefRegister('\thm@headstyling'   => Tokens());
+DefRegister('\thm@prework'       => Tokens());
+DefRegister('\thm@postwork'      => Tokens());
+DefRegister('\thm@symbol'        => Tokens());
+DefRegister('\thm@numbering'     => Tokens(T_CS('\arabic')));
 
 DefPrimitive('\th@plain', sub {
-    AssignValue('\thm@bodyfont'    => T_CS('\itshape'));
-    AssignValue('\thm@headstyling' => T_CS('\lx@makerunin'));
+    AssignRegister('\thm@bodyfont'    => T_CS('\itshape'));
+    AssignRegister('\thm@headstyling' => T_CS('\lx@makerunin'));
     return; });
 
 DefMacroI('\lx@makerunin',   undef, '\@ADDCLASS{ltx_runin}');
@@ -2975,8 +3031,10 @@ sub useTheoremStyle {
   if (my $params = LookupValue('THEOREM_' . ToString($name) . '_PARAMETERS')) {
     for my $param_key (keys %$savable) {
       if (exists $$params{$param_key}) {
-        AssignValue($param_key => $$params{$param_key}); }
-  } }
+        if ($param_key =~ /^\\/) {
+          AssignRegister($param_key => $$params{$param_key}); }
+        else {
+          AssignValue($param_key => $$params{$param_key}); } } } }
   return; }
 
 sub saveTheoremStyle {
@@ -3001,9 +3059,9 @@ sub defineNewTheorem {
   $listname =~ s/'/prime/g;
   $listname =~ s/\?/question/g;
   $listname =~ s/\#/hash/g;
-  $otherthmset = $otherthmset       && ToString($otherthmset);
-  $type        = undef unless $type && $type->unlist;
-  $within      = $within ? ToString($within) : undef;
+  $otherthmset = $otherthmset && ToString($otherthmset);
+  $type        = undef if IsEmpty($type);
+  $within      = $within ? ToString(Digest($within)) : undef;
 
   my $counter = $otherthmset || $thmset;
   $counter =~ s/\s+/./;    # convert spaces to period?
@@ -3011,14 +3069,14 @@ sub defineNewTheorem {
     AssignMapping('counter_for_type', $thmset => $counter);
     DefMacroI(T_CS('\the' . $thmset), undef, T_CS('\the' . $counter), scope => 'global');
   }
-  my $style     = ToString(LookupValue('\thm@style'));        # The name of the style
-  my $numbering = ToString(LookupValue('\thm@numbering'));    # The number style macro
+  my $style     = ToString(LookupRegister('\thm@style'));        # The name of the style
+  my $numbering = ToString(LookupRegister('\thm@numbering'));    # The number style macro
   $flag = 1 unless $numbering;
   if (!$otherthmset) {
     my $idprefix = "Thm$classname";
     $idprefix =~ s/\*/./g;
 
-    if (!LookupValue('\c@' . $counter)) {                     # if isn't already defined...
+    if (!LookupDefinition(T_CS('\c@' . $counter))) {             # if isn't already defined...
       NewCounter($counter, $within, idprefix => $idprefix); }
     DefMacroI(T_CS("\\the$counter"), undef,
       ($within
@@ -3027,7 +3085,10 @@ sub defineNewTheorem {
       scope => 'global') if $numbering; }
 
   my %parameters = %{ LookupValue('SAVABLE_THEOREM_PARAMETERS') };
-  saveTheoremStyle($thmset, map { ($_ => LookupValue($_)) } keys %parameters);
+  my %saved      = ();
+  foreach my $key (keys %parameters) {
+    $saved{$key} = ($key =~ /^\\/ ? LookupRegister($key) : LookupValue($key)); }
+  saveTheoremStyle($thmset, %saved);
 
   my $thmname = '\\lx@name@' . $thmset;
   DefMacroI($thmname, undef, $type, scope => 'global');
@@ -3042,9 +3103,9 @@ sub defineNewTheorem {
     scope => 'global');
   # amsthm allows you to define your own title formatter
   # if there was one defined, use it, else define a new one.
-  my $headformatter = LookupValue('\thm@headformatter');
+  my $headformatter = LookupRegister('\thm@headformatter');
   DefMacroI('\format@title@' . $thmset, convertLaTeXArgs(1, 0),
-    ($headformatter
+    (!IsEmpty($headformatter)
       ? Tokens(
         T_CS('\the'), T_CS('\thm@headfont'),
         $headformatter->unlist,
@@ -3304,11 +3365,13 @@ DefMacro('\@caption@@@{}{}{}',
 # Note that the counters only get incremented by \caption, NOT by \table, \figure, etc.
 DefPrimitive('\@@add@caption@counters', sub {
     my $captype = ToString(Digest(T_CS('\@captype')));
-    my %props   = RefStepCounter($captype);
+    my $pre     = LookupValue('PREINCREMENTED_' . $captype);    # If pre-incremented by beforeFloat
+    my %props   = ($pre ? %$pre : RefStepCounter($captype));
     my $inlist  = ToString(Digest(T_CS('\ext@' . $captype)));
-    AssignValue($captype . "_tags"   => $props{tags}, 'global');
-    AssignValue($captype . "_id"     => $props{id},   'global');
-    AssignValue($captype . "_inlist" => $inlist,      'global'); });
+    AssignValue('PREINCREMENTED_' . $captype => undef,        'global');
+    AssignValue($captype . "_tags"           => $props{tags}, 'global');
+    AssignValue($captype . "_id"             => $props{id},   'global');
+    AssignValue($captype . "_inlist"         => $inlist,      'global'); });
 
 sub RescueCaptionCounters {
   my ($captype, $whatsit) = @_;
@@ -3328,78 +3391,131 @@ DefConstructor('\@@generic@caption[]{}', "<ltx:text class='ltx_caption'>#2</ltx:
     Error('unexpected', '\caption', $_[0],
       "Use of \\caption outside any known float"); });
 
-sub add_subfigure_row_breaks {
-  my ($document, $node, $whatsit, @contents) = @_;
-  my $textwidth     = ($whatsit->getProperty('floatwidth') || Dimension('345pt'))->valueOf();
-  my $current_width = 0;
-  my @new_contents  = ();
-  for my $block (@contents) {
-    my $block_name = $document->getNodeQName($block);
-    if ($block_name eq 'ltx:break') {
+our $FIGURE_PANEL_CLASS = 'ltx_figure_panel';
+
+# most block-level elements are expected horizontally standalone in a {figure}.
+# (especially ones that directly match LaTeX {envs})
+our %standalone_panel_names = map { $_ => 1 }
+  qw(ltx:p ltx:listing ltx:math ltx:itemize ltx:enumerate ltx:quote ltx:theorem ltx:proof
+  ltx:description ltx:equation ltx:equationgroup ltx:verbatim);
+
+sub arrange_panels_and_breaks {
+  my ($document, $node, $whatsit) = @_;
+  my $float_width = ($whatsit->getProperty('floatwidth') || Dimension('345pt'))->valueOf();
+  # Note that 0.0625x minimal panel width will naturally enforce a limit of max 16 panels per row.
+  # except that we are currently under-sizing(?) some individual subfigures, so enforce max 32.
+  my $min_panel_width = 0.03125 * $float_width;
+  my $current_width   = 0;
+  my @all_panels      = ();
+  my @all_contents    = ();
+  # row contents will bookkeep triples of [node, name(optional), width(optional)]
+  my @row_contents      = ();
+  my $panels_found      = 0;
+  my $panel_break_names = LookupValue('figure_panel_break_names');
+  if (!$panel_break_names) {
+    # initialize schema-based tag names on first call for a given document;
+    my $model = $STATE->getModel;
+    $panel_break_names = { map { $_ => 1 } ('ltx:break',
+        $model->getSchemaClassNames('Meta'),
+        $model->getSchemaClassNames('SectionalFrontMatter'),
+        $model->getSchemaClassNames('Caption')) };
+    # what to do with footnotes? Move from Meta to Misc class?
+    $$panel_break_names{'ltx:note'} = undef;
+    AssignValue('figure_panel_break_names', $panel_break_names, 'global'); }
+  for my $child (element_nodes($node)) {
+    my $child_name = $document->getNodeQName($child);
+    if ($$panel_break_names{$child_name}) {
       # reset bookkeeping on prior breaks, be they author-deposited or computed
-      $current_width = 0; }
+      # (caption/metadata bits also flush the current line, but we avoid the explicit break element)
+      $current_width = 0;
+      push(@all_contents, map { $$_[0] } @row_contents);
+      push(@all_contents, $child);
+      @row_contents = (); }
     else {
-      my $block_width = $document->getNodeBox($block)->getWidth->valueOf();
-      if (@new_contents && ($current_width + $block_width > $textwidth)) {
+      my $is_standalone = $standalone_panel_names{$child_name};
+      if ($is_standalone && @row_contents) {
+        # if standalone, finalize current row content, and add a break
+        my $break = $document->insertElementBefore($child, 'break', 'class' => 'ltx_break');
+        push(@all_contents, map { $$_[0] } @row_contents);
+        push(@all_contents, $break);
+        $current_width = 0;
+        @row_contents  = (); }
+      my $child_width = $document->getNodeBox($child)->getWidth->valueOf();
+      if (@row_contents && ($current_width + $child_width > $float_width)) {
         # break when we exceed the line width, to keep close with the PDF arrangement
-        my $break = $document->insertElementBefore($block, 'break', 'class' => 'ltx_break');
-        push(@new_contents, $break);
-        $current_width = $block_width; }
+        my $break = $document->insertElementBefore($child, 'break', 'class' => 'ltx_break');
+        push(@all_contents, map { $$_[0] } @row_contents);
+        push(@all_contents, $break);
+        $document->addClass($child, $FIGURE_PANEL_CLASS);
+        @row_contents = ([$child, $child_name, $child_width]);
+        push(@all_panels, $child);
+        $current_width = $child_width; }
       else {
-        $current_width += $block_width; } }
-    push(@new_contents, $block); }
-  return @new_contents; }
+        # check if we can merge into the previous element
+        if (my $prev_panel = pop(@row_contents)) {
+          my $prev_node  = $$prev_panel[0];
+          my $prev_width = $$prev_panel[2] || $document->getNodeBox($prev_node)->getWidth->valueOf();
+          # Heuristic:
+          # Do the widths indicate a large(8x) size discrepancy? Or a very small joint size?
+          # If so, contain the two pieces in a single panel.
+          my $prev_name = $$prev_panel[1] || $document->getNodeQName($prev_node);
+          if (($prev_width > 0 && $child_width > 0 &&
+              (max($prev_width, $child_width) / min($prev_width, $child_width) > 8)) ||
+            ($prev_width + $child_width < $min_panel_width)) {
+            # avoid markup complexity - any time we do a merge, require a ltx:block marked as a panel.
+            # if one exists, reuse, otherwise create a wrapping one.
+            #my $prev_name = $$prev_panel[1] || $document->getNodeQName($prev_node);
+            if ($prev_name eq 'ltx:block') {
+              $child->unbindNode;
+              $prev_node->appendChild($child);
+              push(@row_contents, [$prev_node, $prev_name, $prev_width + $child_width]);
+            } elsif ($child_name eq 'ltx:block') {
+              $prev_node->unbindNode;
+              $child->appendChild($prev_node);
+              push(@row_contents, [$child, $child_name, $prev_width + $child_width]);
+              push(@all_panels,   $child);
+            } else {    # create a new block to hold the two siblings.
+              my $block = $document->wrapNodes('ltx:block', $prev_node, $child);
+              push(@row_contents, [$block, 'ltx:block', $prev_width + $child_width]);
+              pop(@all_panels); push(@all_panels, $block);
+          } }
+          else {
+            # otherwise keep the last panel as-is, and append a sibling
+            push(@row_contents, $prev_panel);
+            push(@row_contents, [$child, $child_name, $child_width]);
+            push(@all_panels,   $child); } }
+        else {    # no last panel? just add the child
+          push(@row_contents, [$child, $child_name, $child_width]);
+          push(@all_panels,   $child);
+          # yet if standalone, finalize current row content, and add a break
+          if ($is_standalone && @row_contents) {
+            push(@all_contents, map { $$_[0] } @row_contents);
+            if (my $trailer = $child->nextSibling) {
+              if (!$$panel_break_names{ $document->getNodeQName($trailer) }) {
+                my $break = $document->insertElementBefore($trailer, 'break', 'class' => 'ltx_break');
+                push(@all_contents, $break); } }
+            @row_contents  = ();
+            $current_width = 0; } }
+        $current_width += $child_width; } } }
+  push(@all_contents, map { $$_[0] } @row_contents);
+  # simplify: if we only ever added 1 panel, remove its class (so that we only mark complex figures)
+  if (scalar(@all_panels) > 1) {
+    for my $panel (@all_panels) {
+      $document->addClass($panel, $FIGURE_PANEL_CLASS); } }
+  return @all_contents; }
 
-sub add_subfigure_row_sizes {
-  my ($document, $node, $whatsit, @contents) = @_;
-  my @row = ();
-  for my $child (@contents) {
-    if ($document->getNodeQName($child) eq 'ltx:break') {
-      next unless @row;
-      my $row_size      = scalar(@row);
-      my $row_size_attr = "ltx_flex_size_$row_size";
-      if ($row_size > 4) {    # add a generic class for larger rows, to style together easily
-        $row_size_attr .= " ltx_flex_size_many"; }
-      for my $cell (@row) {
-        my $class = $cell->getAttribute('class') || '';
-        $class .= ' ' if $class;
-        $cell->setAttribute('class', $class . $row_size_attr); }
-      @row = (); }
-    else {
-      push(@row, $child); } }
-  # Don't forget the last row, if any
-  if (@row) {
-    my $row_size      = scalar(@row);
-    my $row_size_attr = "ltx_flex_size_$row_size";
-    if ($row_size > 4) {    # add a generic class for larger rows, to style together easily
-      $row_size_attr .= " ltx_flex_size_many"; }
-    for my $cell (@row) {
-      my $class = $cell->getAttribute('class') || '';
-      $class .= ' ' if $class;
-      $cell->setAttribute('class', $class . $row_size_attr); } }
-  return; }
-
-# Feature 1: Add flex classes to each subfigure cell in a figure.
-# Feature 2: Add identifiers on each figure
-sub SubfigureAndID {
+sub BuildPanelsAndID {
   my ($document, $node, $whatsit, $id_kind) = @_;
-  # 1. Flex
-  # A little verbose, but much easier to do than XSLT 1.0 would allow.
-  my $contents_count = 0;    # count with author breaks excluded
-  my @contents       = grep { my $name = $document->getNodeQName($_);
-    my $ok = ($name =~ /^ltx:(?:graphics|float|figure|table|tabular|break|inline-para|inline-block|listing)$/);
-    $contents_count += 1 if $ok and $name ne 'ltx:break';
-    $ok; } element_nodes($node);
-  if ($contents_count > 1) {
-    @contents = add_subfigure_row_breaks($document, $node, $whatsit, @contents);
-    add_subfigure_row_sizes($document, $node, $whatsit, @contents); }
+  # 1. Each figure/table/float is comprised of 1 or more "panels", possibly separated by line-breaks,
+  #     where multiple panels tend to correspond to subfigures/subtables/subfloats.
+  my @contents = arrange_panels_and_breaks($document, $node, $whatsit);
   # 2. IDs
   # Note that even without \caption, we'd probably like to have xml:id.
   return GenerateID($document, $node, $whatsit, $id_kind); }
 
-Tag('ltx:figure', afterClose => sub { SubfigureAndID(@_, 'fig'); });
-Tag('ltx:float',  afterClose => sub { SubfigureAndID(@_, 'tab'); });
-Tag('ltx:table',  afterClose => sub { SubfigureAndID(@_, 'tab'); });
+Tag('ltx:figure', afterClose => sub { BuildPanelsAndID(@_, 'fig'); });
+Tag('ltx:float',  afterClose => sub { BuildPanelsAndID(@_, 'tab'); });
+Tag('ltx:table',  afterClose => sub { BuildPanelsAndID(@_, 'tab'); });
 
 # These may need to float up to where they're allowed,
 # or they may need to close <p> or similar.
@@ -3412,14 +3528,20 @@ sub beforeFloat {
   #Debug("FLOAT begin $type". join(',',map { $_."=".ToString($options{$_}); } sort keys %options));
   DefMacroI('\@captype', undef, $type);
   AssignRegister('\hsize' => LookupDimension($options{double} ? '\textwidth' : '\columnwidth'));
+  if (my $main = $options{preincrement}) {
+    if (($type ne (LookupValue('LAST_FLOATTYPE') || ''))    # first of subtype?
+      && !IfCondition('\iflx@donecaption')) {               # If main caption NOT already appeared?
+      AssignValue('PREINCREMENTED_' . $main => { RefStepCounter($main) }, 'global'); } }
   return; }
 
 sub afterFloat {
   my ($whatsit) = @_;
   my $type = ToString(Expand(T_CS('\@captype')));
+  AssignValue('PREINCREMENTED_' . $type => undef, 'global');
   #Debug("FLOAT end $type");
   $whatsit->setProperty(floatwidth => LookupRegister('\hsize'));
   RescueCaptionCounters($type, $whatsit);
+  AssignValue(LAST_FLOATTYPE => $type, 'global');
   return; }
 
 DefEnvironment('{figure}[]',
@@ -3544,12 +3666,13 @@ DefMacro('\@dblfloatplacement', '');
 # C.9.2 Marginal Notes
 #======================================================================
 
-AssignValue(marginparclass => undef);
+DefConditional('\if@reversemargin');
+Let('\reversemarginpar', '\@reversemargintrue');
+Let('\normalmarginpar',  '\@reversemarginfalse');
 DefConstructor('\marginpar[]{}',
-  "<ltx:note role='margin' class='#class'><ltx:inline-para>#2</ltx:inline-para></ltx:note>",
-  properties => sub { (class => LookupValue('marginparclass')); });
-DefPrimitiveI('\reversemarginpar', undef, sub { AssignValue(marginparclass => 'ltx_marginpar_reverse'); });
-DefPrimitiveI('\normalmarginpar', undef, sub { AssignValue(marginparclass => undef); });
+"?#1(<ltx:note role='margin' class='ltx_marginpar_left'><ltx:inline-logical-block>#1</ltx:inline-logical-block></ltx:note>"
+    . "?#2(<ltx:note role='margin' class='ltx_marginpar_right'><ltx:inline-logical-block>#2</ltx:inline-logical-block></ltx:note>))"
+    . "(<ltx:note role='margin' class='ltx_marginpar'><ltx:inline-logical-block>#2</ltx:inline-logical-block></ltx:note>)");
 DefRegister('\marginparpush', Dimension(0));
 
 #**********************************************************************
@@ -3577,11 +3700,14 @@ DefMacroI('\@tabbing@nexttab', undef, '\@tabbing@nexttab@marker&');
 DefMacro('\@tabbing@newline OptionalMatch:* [Dimension]', '\@tabbing@newline@marker\cr');
 DefMacroI('\@tabbing@kill', undef, '\@tabbing@kill@marker\cr\@tabbing@start@tabs');
 
-DefConstructorI('\@tabbing@tabset@marker',  undef, '', reversion => '\=');
-DefConstructorI('\@tabbing@nexttab@marker', undef, '', reversion => '\>');
+DefConstructorI('\@tabbing@tabset@marker', undef, '', reversion => '\=',
+  properties => { alignmentSkippable => 1 });
+DefConstructorI('\@tabbing@nexttab@marker', undef, '', reversion => '\>',
+  properties => { alignmentSkippable => 1 });
 DefConstructorI('\@tabbing@newline@marker', undef, '', reversion => Tokens(T_CS("\\\\"), T_CR));
 DefConstructorI('\@tabbing@kill@marker', undef, '', reversion => '\kill',
-  afterDigest => sub { LookupValue('Alignment')->removeRow; return; });
+  afterDigest => sub { LookupValue('Alignment')->removeRow; return; },
+  properties  => { alignmentSkippable => 1 });
 
 AssignValue(tabbing_start_tabs => Tokens());
 DefMacroI('\@tabbing@start@tabs', undef, sub { LookupValue('tabbing_start_tabs')->unlist; });
@@ -3611,7 +3737,8 @@ DefMacro('\@tabbing@accent{}', sub { T_CS('\@tabbing@' . ToString($_[1])); });
 sub tabbingBindings {
   AssignValue(Alignment => LaTeXML::Core::Alignment->new(
       template => LaTeXML::Core::Alignment::Template->new(
-        repeated => [{ after => Tokens(T_CS('\hfil')) }]),
+        repeated => [{ before => Tokens(T_CS('\lx@text@intercol')),
+            after => Tokens(T_CS('\hfil'), T_CS('\lx@text@intercol')) }]),
       openContainer  => sub { $_[0]->openElement('ltx:tabular', @_[1 .. $#_]); },
       closeContainer => sub { $_[0]->closeElement('ltx:tabular'); },
       openRow        => sub { $_[0]->openElement('ltx:tr', @_[1 .. $#_]); },
@@ -3687,6 +3814,7 @@ sub tabularBindings {
     $properties{strut} = LookupRegister('\baselineskip')->multiply(1.5); }    # Account for html space
   alignmentBindings($template, 'text', %properties);
   Let("\\\\",            '\@tabularcr');
+  Let('\lx@intercol',    '\lx@text@intercol');
   Let('\tabularnewline', "\\\\");
   # NOTE: Fit this back in!!!!!!!
   # # Do like AddToMacro, but NOT global!
@@ -3802,8 +3930,11 @@ DefPrimitive('\@array@bindings [] AlignmentTemplate', sub {
     if ($str != 1) {
       $$attr{rowsep} = Dimension(($str - 1) . 'em'); }
     alignmentBindings($template, 'math', attributes => $attr);
-    MergeFont(mathstyle => 'text');
-    Let("\\\\", '\@alignment@newline');
+    if (my $font = LookupValue('font')) {
+      if (($font->getMathstyle || 'text') eq 'display') {
+        MergeFont(mathstyle => 'text'); } }
+    Let("\\\\",         '\@alignment@newline');
+    Let('\lx@intercol', '\lx@math@intercol');
     return; });
 
 DefMacro('\array[]{}',
@@ -4164,8 +4295,8 @@ DefConstructor('\lx@mung@bibliography@pre', sub {
 DefConstructorI('\lx@bibnewblock', undef, sub {
     $_[0]->openElement('ltx:bibblock') if $_[0]->isOpenable('ltx:bibblock'); });
 Let('\newblock', '\lx@bibnewblock');
-Tag('ltx:bibitem',  autoClose => 1);
-Tag('ltx:bibblock', autoClose => 1);
+Tag('ltx:bibitem',  autoOpen => 1, autoClose => 1);
+Tag('ltx:bibblock', autoOpen => 1, autoClose => 1);
 
 #----------------------------------------------------------------------
 # We've got the same problem as LaTeX: Lather, Rinse, Repeat.
@@ -4233,7 +4364,7 @@ DefMacro('\cite[] Semiverbatim', sub {
     my ($gullet, $post, $keys) = @_;
     my ($style, $open, $close, $ns)
       = map { LookupValue($_) } qw(CITE_STYLE CITE_OPEN CITE_CLOSE CITE_NOTE_SEPARATOR);
-    $post = undef unless $post && $post->unlist;
+    $post = undef if IsEmpty($post);
     Invocation(T_CS('\@@cite'),
       Tokens(Explode('cite')),
       Tokens($open,
@@ -4348,9 +4479,14 @@ our %index_style = (textbf => 'bold', bf => 'bold', textrm => '', rm => '',
 sub process_index_phrases {
   my ($gullet, $phrases, $inlist) = @_;
   my @expansion = ();
+  my @tokens    = $phrases->unlist;
+  # check we have a well-formed argument
+  return unless @tokens;
+  if (!$phrases->isBalanced) {    # if ill-formed, discard;
+    Warn("malformed", "indexentry", $gullet,
+      'index entry has unbalanced groups, discarding: "' . ToString($phrases) . '"');
+    return; }
   # Split the text into phrases, separated by "!"
-  my @tokens = $phrases->unlist;
-  return                      unless @tokens;
   push(@tokens, T_OTHER('!')) unless $tokens[-1]->getString eq '!';    # Add terminal !
   my @phrase = ();
   my @sortas = ();
@@ -4388,7 +4524,30 @@ sub process_index_phrases {
     T_BEGIN, @expansion, T_END);
   return @expansion; }
 
-DefMacro('\index{}', \&process_index_phrases);
+# read verbatim, as if with LaTeX's \@sanitize;
+# useful for \index (maybe others?)
+DefParameterType('SanitizedVerbatim', sub {
+    my ($gullet) = @_;
+    $gullet->readUntil(T_BEGIN);
+    # crucial: deactivate the backslash to avoid activating command sequences
+    # chars switched to CC_OTHER by \@sanitize: ' ', '\\', '$', '&', '#', '^', '_', '%', '~'
+    # some of those are already in state's "SPECIALS", so only adding the rest:
+    StartSemiverbatim(' ', '\\', '%');
+    my $arg = $gullet->readBalanced();
+    EndSemiverbatim();
+    # now that we have the semiverbatim tokens, retokenize.
+    # this may seem like wasted work, but it avoids very unfortunate error propagation in cases
+    # where the \index argument was malformed for one reason or another.
+    #
+    # the strangeness comes from the original TeX workflow requiring multiple conversion calls,
+    # alongside a call to the `makeidx` binary, which we don't do in latexml. This parameter type
+    # emulates one important aspect implied by those steps.
+    $arg = TokenizeInternal(UnTeX($arg));
+    return $arg; },
+  reversion => sub { (T_BEGIN, Revert($_[0]), T_END); });
+
+# real-world LaTeX \index
+DefMacro('\index SanitizedVerbatim', \&process_index_phrases);
 
 Tag('ltx:indexphrase',    afterClose => \&addIndexPhraseKey);
 Tag('ltx:glossaryphrase', afterClose => \&addIndexPhraseKey);
@@ -4592,19 +4751,19 @@ DefMacro('\stretch{}', '0pt plus #1fill\relax');
 
 DefPrimitive('\newlength DefToken', sub {
     my ($stomach, $cs) = @_;
-    DefRegisterI($cs, undef, Glue(0)); });
+    DefRegisterI($cs, undef, Glue(0), allocate => '\skip'); });
 DefPrimitive('\setlength {Variable}{Dimension}', sub {
     my ($stomach, $variable, $length) = @_;
     my ($defn, @params) = @$variable;
     if (ref $defn) {
-      $defn->setValue($length, @params); }
+      $defn->setValue($length, undef, @params); }
     return; });
 DefPrimitive('\addtolength {Variable}{Dimension}', sub {
     my ($stomach, $variable, $length) = @_;
     my ($defn, @params) = @$variable;
     if (ref $defn) {
       my $oldlength = $defn->valueOf(@params);
-      $defn->setValue($defn->valueOf(@params)->add($length), @params); }
+      $defn->setValue($defn->valueOf(@params)->add($length), undef, @params); }
     return; });
 
 DefMacro('\@settodim{}{}{}',
@@ -4613,14 +4772,6 @@ DefMacroI('\settoheight', undef, '\@settodim\ht');
 DefMacroI('\settodepth',  undef, '\@settodim\dp');
 DefMacroI('\settowidth',  undef, '\@settodim\wd');
 DefMacro('\@settopoint{}', '\divide#1\p@\multiply#1\p@');
-
-# Assuming noone tries to get clever with figuring out the allocation of
-# numbers, these become simple DefRegister's
-DefPrimitive('\newcount DefToken',  sub { DefRegisterI($_[1], undef, Number(0)); });
-DefPrimitive('\newdimen DefToken',  sub { DefRegisterI($_[1], undef, Dimension(0)); });
-DefPrimitive('\newskip DefToken',   sub { DefRegisterI($_[1], undef, Glue(0)); });
-DefPrimitive('\newmuskip DefToken', sub { DefRegisterI($_[1], undef, MuGlue(0)); });
-DefPrimitive('\newtoks DefToken',   sub { DefRegisterI($_[1], undef, Tokens()); });
 
 DefRegister('\fill', Glue('0pt plus 1fill'));
 
@@ -4689,7 +4840,7 @@ DefMacro('\framebox', '\@ifnextchar(\pic@framebox\@framebox', robust => 1);
 DefConstructor('\@framebox[Dimension][]{}',
   "?#mathframe(<ltx:XMArg enclose='box'>#inner</ltx:XMArg>)"
     . "(<ltx:text ?#width(width='#width') ?#align(align='#align')"
-    . " framed='rectangle' framecolor='#framecolor'"
+    . " framed='rectangle' framecolor='#framecolor' cssstyle='#cssstyle'"
     . " _noautoclose='1'>#3</ltx:text>)",
   alias        => '\framebox', sizer => '#3',
   beforeDigest => sub {
@@ -4698,9 +4849,11 @@ DefConstructor('\@framebox[Dimension][]{}',
     $stomach->beginMode('text');
     AssignValue(FRAME_IN_MATH => $wasmath); },
   properties => sub {
+    my $sep = LookupRegister('\fboxsep')->toAttribute;
     (($_[2] ? (align => $makebox_alignment{ ToString($_[2]) }) : ()),
       framecolor => LookupValue('font')->getColor,
-      ($_[1] ? (width => $_[1]) : ())); },
+      ($sep ne '3.0pt' ? (cssstyle => 'padding:' . $sep) : ()),
+      ($_[1]           ? (width    => $_[1])             : ())); },
   afterDigest => sub {
     my ($stomach, $whatsit) = @_;
     my $wasmath = LookupValue('FRAME_IN_MATH');
@@ -4718,7 +4871,8 @@ DefConstructor('\@framebox[Dimension][]{}',
     my $model = $document->getModel;
     # and that child can have the framed attribute
     if ((scalar(@c) == 1)
-      && $document->canHaveAttribute($model->getNodeQName($c[0]), 'framed')) {
+      && $document->canHaveAttribute($model->getNodeQName($c[0]), 'framed')
+      && !$c[0]->hasAttribute('framed')) {
       # unwrap, copying the attributes
       $document->unwrapNodes($node);
       foreach my $k (qw(width align framed)) {
@@ -4763,16 +4917,10 @@ RawTeX(<<'EOL');
 \DeclareRobustCommand\usebox[1]{\leavevmode\copy #1\relax}
 EOL
 
-# A soft sorta \par that only closes an ltx:p, but not ltx:para
-DefConstructor('\lx@parboxnewline[]', sub {
-    my ($document, $ignore, %props) = @_;
-    $document->maybeCloseElement('ltx:p');
-    return; },
-  properties => { isBreak => 1 });
-
+Let('\lx@parboxnewline', '\lx@newline');    # Obsolete, but in case still used
 # NOTE: There are 2 extra arguments (See LaTeX Companion, p.866)
-# for height and inner-pos.  We're ignoring them, for now, though.
-DefConstructor('\parbox[] OptionalUndigested OptionalUndigested {Dimension} VBoxContents', sub {
+# for height and inner-pos.  We're ignoring inner-pos, for now, though.
+DefConstructor('\parbox[] [Dimension] OptionalUndigested {Dimension} VBoxContents', sub {
     my ($document, $attachment, $b, $c, $width, $body, %props) = @_;
     insertBlock($document, $body,
       width   => $width,
@@ -4787,8 +4935,9 @@ DefConstructor('\parbox[] OptionalUndigested OptionalUndigested {Dimension} VBox
   mode         => 'text', bounded => 1,
   robust       => 1,
   beforeDigest => sub {
-    AssignValue('\hsize' => $_[4]);
-    Let('\\\\', '\lx@parboxnewline'); });
+    reenterTextMode(1);    # actually vertical mode!
+    AssignRegister('\hsize' => $_[4]);
+    Let('\\\\', '\lx@newline'); });
 DefMacroI('\@parboxrestore', undef, Tokens());
 
 DefConditional('\if@minipage');
@@ -4797,7 +4946,6 @@ DefEnvironment('{minipage}[][][]{Dimension}', sub {
     my ($document, $attachment, $b, $c, $width, %props) = @_;
     my $vattach = translateAttachment($attachment);
     insertBlock($document, $props{body},
-      para    => 1,
       width   => $width,
       vattach => $vattach,
       class   => 'ltx_minipage');
@@ -4808,10 +4956,11 @@ DefEnvironment('{minipage}[][][]{Dimension}', sub {
       width   => $_[4],
       vattach => translateAttachment($_[1])); },
   beforeDigest => sub {
+    reenterTextMode(1);    # actually vertical mode!
     Digest(T_CS('\@minipagetrue'));
-    AssignValue('\hsize' => $_[4]);
-    # this conflicts (& not needed?) with insertBlock
-    Let('\\\\', '\lx@parboxnewline'); });
+    AssignRegister('\hsize' => $_[4]);
+    Let('\\\\', '\lx@newline');
+  });
 
 DefConstructor('\rule[Dimension]{Dimension}{Dimension}',
   "<ltx:rule ?#offset(yoffset='#offset') width='#width' height='#height'/>",
@@ -4821,6 +4970,8 @@ DefConstructor('\raisebox{Dimension}[Dimension][Dimension]{}',
   mode         => 'text', bounded => 1,
   beforeDigest => sub { reenterTextMode(); },
   sizer        => sub { raisedSizer($_[0]->getArg(4), $_[0]->getArg(1)); });
+
+DefMacro('\@finalstrut{}', '\unskip\ifhmode\nobreak\fi\vrule\@width\z@\@height\z@\@depth\dp#1');
 
 #**********************************************************************
 # C.14 Pictures and Color
@@ -4891,13 +5042,13 @@ sub pxValue {
 #----------------------------------------------------------------------
 # Picture parameters.
 DefRegister('\unitlength', Dimension('1pt'));
-DefPrimitiveI('\thinlines',  undef, sub { AssignValue('\@wholewidth', Dimension('0.4pt')); });
-DefPrimitiveI('\thicklines', undef, sub { AssignValue('\@wholewidth', Dimension('0.8pt')); });
+DefPrimitiveI('\thinlines',  undef, sub { AssignRegister('\@wholewidth', Dimension('0.4pt')); });
+DefPrimitiveI('\thicklines', undef, sub { AssignRegister('\@wholewidth', Dimension('0.8pt')); });
 DefRegister('\@wholewidth' => Dimension('0.4pt'));
 DefRegister('\@halfwidth'  => Dimension('0.2pt'));
 DefMacro('\linethickness{}', '\@wholewidth #1\relax');
 
-DefPrimitive('\arrowlength{Dimension}', sub { AssignValue('\arrowlength', $_[1]); });
+DefPrimitive('\arrowlength{Dimension}', sub { AssignValue('arrowlength', $_[1]); });
 
 #----------------------------------------------------------------------
 # Picture transformation support
@@ -4915,7 +5066,7 @@ sub picScale {
   my ($value) = @_;
   # Vain attempt at proper type coercion
   my $type = ref $value;
-  my $unit = LookupValue('\unitlength');
+  my $unit = LookupRegister('\unitlength');
   if    (!$value) { }
   elsif ($type eq 'LaTeXML::Common::Number') {
     return $unit->multiply($value); }
@@ -4927,10 +5078,11 @@ sub picScale {
 
 sub picProperties {
   my (%props) = @_;
-  if (($props{stroke} || 'black') ne 'none') {
-    $props{thick} = ptValue(LookupValue('\@wholewidth')); }
-  if (my $arrowlength = LookupValue('\arrowlength')) {
+  if (($props{stroke} || '') ne 'none') {
+    $props{thick} = ptValue(LookupRegister('\@wholewidth')); }
+  if (my $arrowlength = LookupValue('arrowlength')) {
     $props{arrowlength} = ptValue($arrowlength); }
+  $props{color} = Black unless defined $props{color};
   return %props; }
 
 #----------------------------------------------------------------------
@@ -4969,7 +5121,7 @@ DefEnvironment('{picture} Pair OptionalPair',
   beforeDigest => \&before_picture,
   properties   => sub {
     my ($stomach, $size, $pos) = @_;
-    picProperties(unitlength => LookupValue('\unitlength'),
+    picProperties(unitlength => LookupRegister('\unitlength'),
       width      => $size && picScale($size->getX),
       height     => $size && picScale($size->getY),
       depth      => Dimension(0),
@@ -4994,11 +5146,11 @@ DefConstructor('\lx@pic@put Pair{}',
   mode  => 'text');
 
 DefConstructor('\line Pair:Number {Float}',
-  "<ltx:line points='#points' stroke='black' stroke-width='#thick'/>",
+  "<ltx:line points='#points' stroke='#color' stroke-width='#thick'/>",
   alias      => '\line',
   properties => sub { picProperties(points => '0,0 ' . slopeToPicCoord($_[1], $_[2])->pxValue()); });
 DefConstructor('\vector Pair:Number {Float}',
-  "<ltx:line points='#points' stroke='black' stroke-width='#thick' terminators='->'"
+  "<ltx:line points='#points' stroke='#color' stroke-width='#thick' terminators='->'"
     . " arrowlength='#arrowlength'/>",
   alias      => '\vector',
   properties => sub { picProperties(points => '0,0 ' . slopeToPicCoord($_[1], $_[2])->pxValue()); });
@@ -5008,11 +5160,11 @@ DefConstructor('\circle OptionalMatch:* {Float}',
   properties => sub {
     my ($stomach, $filled, $dia) = @_;
     picProperties(radius => picScale($dia)->multiply(0.5)->pxValue,
-      ($filled ? 'fill' : 'stroke') => 'black'); });
+      ($filled ? 'fill' : 'stroke') => Black); });
 
 DefConstructor('\oval [Float] Pair []',
   "<ltx:rect x='#x' y='#y' width='#width' height='#height' rx='#radius'"
-    . "  stroke='black' fill='none' part='#3' stroke-width='#thick'/>",
+    . "  stroke='#color' fill='none' part='#3' stroke-width='#thick'/>",
   alias      => '\oval',
   properties => sub {
     my ($stomach, $r, $size, $part) = @_;
@@ -5028,7 +5180,7 @@ DefConstructor('\oval [Float] Pair []',
     ); });
 
 DefConstructor('\qbezier [Number] Pair Pair Pair',
-"<ltx:bezier ?#1(displayedpoints='#1') points='&ptValue(#pt)' stroke='black' stroke-width='#thick' />",
+"<ltx:bezier ?#1(displayedpoints='#1') points='&ptValue(#pt)' stroke='#color' stroke-width='#thick' />",
   alias      => '\qbezier',
   properties => sub {
     picProperties(pt => PairList(picScale($_[2]), picScale($_[3]), picScale($_[4]))); });
@@ -5043,7 +5195,7 @@ DefConstructor('\lx@pic@bezier {Number} Pair Pair Pair',
 # Generic boxing command (frames, dash, etc)
 DefConstructor('\pic@makebox@ Undigested RequiredKeyVals Pair []{}',
   "?#framed(<ltx:rect x='0' y='0' width='#fwidth' height='#fheight'"
-    . " stroke='black' stroke-width='#thick' fill='none' stroke-dasharray='#dash'/>)()"
+    . " stroke='#color' stroke-width='#thick' fill='none' stroke-dasharray='#dash'/>)()"
     . "<ltx:g class='makebox' innerwidth='#width' innerheight='#height' innerdepth='#depth'"
     . " transform='translate(#xshift,#yshift)'>#box</ltx:g>",
   reversion    => '#1#3[#4]{#5}',
@@ -5328,36 +5480,35 @@ Let('\normalcolor', '\relax');
 DefMacro('\symbol{}', '\char#1\relax');
 
 # These in LaTeX, but not in the book...
-DefPrimitiveI('\textdollar',           undef, "\$");
-DefPrimitiveI('\textemdash',           undef, "\x{2014}");       # EM DASH
-DefPrimitiveI('\textendash',           undef, "\x{2013}");       # EN DASH
-DefPrimitiveI('\textexclamdown',       undef, UTF(0xA1));        # INVERTED EXCLAMATION MARK
-DefPrimitiveI('\textquestiondown',     undef, UTF(0xBF));        # INVERTED QUESTION MARK
-DefPrimitiveI('\textquotedblleft',     undef, "\x{201C}");       # LEFT DOUBLE QUOTATION MARK
-DefPrimitiveI('\textquotedblright',    undef, "\x{201D}");       # RIGHT DOUBLE QUOTATION MARK
-DefPrimitiveI('\textquotedbl',         undef, "\"");             # plain ascii DOUBLE QUOTATION
-DefPrimitiveI('\textquoteleft',        undef, "\x{2018}");       # LEFT SINGLE QUOTATION MARK
-DefPrimitiveI('\textquoteright',       undef, "\x{2019}");       # RIGHT SINGLE QUOTATION MARK
-DefPrimitiveI('\textsterling',         undef, UTF(0xA3));        # POUND SIGN
-DefPrimitiveI('\textasteriskcentered', undef, "*");
-DefPrimitiveI('\textbackslash',        undef, UTF(0x5C));        # REVERSE SOLIDUS
-DefPrimitiveI('\textbar',              undef, "|");
-DefPrimitiveI('\textbraceleft',        undef, "{");
-DefPrimitiveI('\textbraceright',       undef, "}");
-DefPrimitiveI('\textbullet',           undef, "\x{2022}");       # BULLET
-DefPrimitiveI('\textdaggerdbl',        undef, "\x{2021}");       # DOUBLE DAGGER
-DefPrimitiveI('\textdagger',           undef, "\x{2020}");       # DAGGER
-DefPrimitiveI('\textparagraph',        undef, UTF(0xB6));        # PILCROW SIGN
-DefPrimitiveI('\textsection',          undef, UTF(0xA7));        # SECTION SIGN
-DefAccent('\textcircled', UTF(0x20DD), UTF(0x25EF));             # Defined in TeX.pool
+DefPrimitiveI('\textdollar',               undef, "\$");
+DefPrimitiveI('\textemdash',               undef, "\x{2014}");    # EM DASH
+DefPrimitiveI('\textendash',               undef, "\x{2013}");    # EN DASH
+DefPrimitiveI('\textexclamdown',           undef, UTF(0xA1));     # INVERTED EXCLAMATION MARK
+DefPrimitiveI('\textquestiondown',         undef, UTF(0xBF));     # INVERTED QUESTION MARK
+DefPrimitiveI('\textquotedblleft',         undef, "\x{201C}");    # LEFT DOUBLE QUOTATION MARK
+DefPrimitiveI('\textquotedblright',        undef, "\x{201D}");    # RIGHT DOUBLE QUOTATION MARK
+DefPrimitiveI('\textquotedbl',             undef, "\"");          # plain ascii DOUBLE QUOTATION
+DefPrimitiveI('\textquoteleft',            undef, "\x{2018}");    # LEFT SINGLE QUOTATION MARK
+DefPrimitiveI('\textquoteright',           undef, "\x{2019}");    # RIGHT SINGLE QUOTATION MARK
+DefPrimitiveI('\textsterling',             undef, UTF(0xA3));     # POUND SIGN
+DefPrimitiveI('\textasteriskcentered',     undef, "*");
+DefPrimitiveI('\textbackslash',            undef, UTF(0x5C));     # REVERSE SOLIDUS
+DefPrimitiveI('\textbar',                  undef, "|");
+DefPrimitiveI('\textbraceleft',            undef, "{");
+DefPrimitiveI('\textbraceright',           undef, "}");
+DefPrimitiveI('\textbullet',               undef, "\x{2022}");    # BULLET
+DefPrimitiveI('\textdaggerdbl',            undef, "\x{2021}");    # DOUBLE DAGGER
+DefPrimitiveI('\textdagger',               undef, "\x{2020}");    # DAGGER
+DefPrimitiveI('\textparagraph',            undef, UTF(0xB6));     # PILCROW SIGN
+DefPrimitiveI('\textsection',              undef, UTF(0xA7));     # SECTION SIGN
 DefPrimitiveI('\textless',                 undef, "<");
 DefPrimitiveI('\textgreater',              undef, ">");
-DefPrimitiveI('\textcopyright',            undef, UTF(0xA9));    # COPYRIGHT SIGN
+DefPrimitiveI('\textcopyright',            undef, UTF(0xA9));     # COPYRIGHT SIGN
 DefPrimitiveI('\textasciicircum',          undef, "^");
 DefPrimitiveI('\textasciitilde',           undef, "~");
-DefPrimitiveI('\textcompwordmark',         undef, "");           # ???
-DefPrimitiveI('\textcapitalcompwordmark',  undef, "");           # ???
-DefPrimitiveI('\textascendercompwordmark', undef, "");           # ???
+DefPrimitiveI('\textcompwordmark',         undef, "");            # ???
+DefPrimitiveI('\textcapitalcompwordmark',  undef, "");            # ???
+DefPrimitiveI('\textascendercompwordmark', undef, "");            # ???
 DefPrimitiveI('\textunderscore',           undef, "_");
 DefPrimitiveI('\textvisiblespace', undef, "\x{2423}"); # SYMBOL FOR SPACE;  Not really the right symbol!
 DefPrimitiveI('\textellipsis',   undef, "\x{2026}");    # HORIZONTAL ELLIPSIS
@@ -5365,14 +5516,46 @@ DefPrimitiveI('\textregistered', undef, UTF(0xAE));     # REGISTERED SIGN
 DefPrimitiveI('\texttrademark',  undef, "\x{2122}");    # TRADE MARK SIGN
 DefConstructor('\textsuperscript{}', "<ltx:sup>#1</ltx:sup>",
   mode => 'text');
+DefConstructor('\@textsuperscript{}', "<ltx:sup>#1</ltx:sup>",
+  mode => 'text', locked => 1);
 # This is something coming from xetex/xelatex ? Why define this way?
 #DefConstructor('\realsuperscript{}', "<ltx:text yoffset='0.5em' _noautoclose='1'>#1</ltx:text>");
 DefConstructor('\realsuperscript{}', "<ltx:sup>#1</ltx:sup>",
   mode => 'text');
 DefPrimitiveI('\textordfeminine',  undef, UTF(0xAA));    # FEMININE ORDINAL INDICATOR
 DefPrimitiveI('\textordmasculine', undef, UTF(0xBA));    # MASCULINE ORDINAL INDICATOR
-DefPrimitiveI('\SS', undef, 'SS',                        # ?
-  locked => 1);                                          # cause it shows up in uclist!
+
+our %unicode_enclosed_alphanumerics = (
+  0  => "\x{24EA}", 1  => "\x{2460}", 2  => "\x{2461}", 3  => "\x{2462}", 4  => "\x{2463}",
+  5  => "\x{2464}", 6  => "\x{2465}", 7  => "\x{2466}", 8  => "\x{2467}", 9  => "\x{2468}",
+  10 => "\x{2469}", 11 => "\x{246A}", 12 => "\x{246B}", 13 => "\x{246C}", 14 => "\x{246D}",
+  15 => "\x{246E}", 16 => "\x{246F}", 17 => "\x{2470}", 18 => "\x{2471}", 19 => "\x{2472}",
+  20 => "\x{2473}",
+  a  => "\x{24D0}", b => "\x{24D1}", c   => "\x{24D2}", d   => "\x{24D3}", e   => "\x{24D4}",
+  f  => "\x{24D5}", g => "\x{24D6}", h   => "\x{24D7}", i   => "\x{24D8}", j   => "\x{24D9}",
+  k  => "\x{24DA}", l => "\x{24DB}", 'm' => "\x{24DC}", n   => "\x{24DD}", o   => "\x{24DE}",
+  p  => "\x{24DF}", q => "\x{24E0}", r   => "\x{24E1}", 's' => "\x{24E2}", t   => "\x{24E3}",
+  u  => "\x{24E4}", v => "\x{24E5}", w   => "\x{24E6}", x   => "\x{24E7}", y   => "\x{24E8}",
+  z  => "\x{24E9}", A => "\x{24B6}", B   => "\x{24B7}", C   => "\x{24B8}", D   => "\x{24B9}",
+  E  => "\x{24BA}", F => "\x{24BB}", G   => "\x{24BC}", H   => "\x{24BD}", I   => "\x{24BE}",
+  J  => "\x{24BF}", K => "\x{24C0}", L   => "\x{24C1}", 'M' => "\x{24C2}", N   => "\x{24C3}",
+  O  => "\x{24C4}", P => "\x{24C5}", Q   => "\x{24C6}", R   => "\x{24C7}", 'S' => "\x{24C8}",
+  T  => "\x{24C9}", U => "\x{24CA}", V   => "\x{24CB}", W   => "\x{24CC}", X   => "\x{24CD}",
+  Y  => "\x{24CE}", Z => "\x{24CF}");
+DefPrimitive('\textcircled {}', sub {
+    my ($stomach, $arg) = @_;
+    my $text = ToString($arg);
+    # if we know of a circled unicode character - use it,
+    # if not - use the combining accent.
+    # For now supports the range 0 to 20 as well as the latin alphabet.
+    my $is_number = $text =~ /^\d+$/;
+    my $content   = $unicode_enclosed_alphanumerics{$text} || "$text\x{20DD}";
+    my %props     = $STATE->lookupValue('IN_MATH') ?
+      (role => ($is_number ? 'NUMBER' : 'UNKNOWN'), meaning => "circled-$text") : ();
+    return Box($content, undef, undef, undef, %props); });
+
+DefPrimitiveI('\SS', undef, 'SS',    # ?
+  locked => 1);                      # cause it shows up in uclist!
 DefMacroI('\dag',  undef, '\ifmmode{\dagger}\else\textdagger\fi');
 DefMacroI('\ddag', undef, '\ifmmode{\ddagger}\else\textdaggerdbl\fi');
 
@@ -6253,6 +6436,5 @@ Let('\@kernel@before@begindocument',            '\@empty');
 Let('\@kernel@after@begindocument',             '\@empty');
 Let('\conditionally@traceon',                   '\@empty');
 Let('\conditionally@traceoff',                  '\@empty');
-
 #**********************************************************************
 1;

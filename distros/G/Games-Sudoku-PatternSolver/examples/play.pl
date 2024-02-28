@@ -4,7 +4,10 @@ use strict;
 use warnings;
 
 use Games::Sudoku::PatternSolver::Generator qw( get_sudoku_builder );
-use Games::Sudoku::Html  qw( sudoku_html_page );
+eval {require Games::Sudoku::Html} or do {
+  warn "You must have Games::Sudoku::Html installed to run this example.\n";
+  exit 1;
+};
 
 $Games::Sudoku::PatternSolver::Generator::LOOSE_MODE = 1;
 
@@ -15,6 +18,9 @@ my $generator = get_sudoku_builder();
 
 my @buffer = ();
 
+print "You are going to create a page with $to_create Sudoku of mixed difficulty.\n";
+print "The time for that is depending on chance and your platform speed.\n";
+print "Wait for the progress output to console to end, or press Ctrl+C.\n";
 for (my $count = 1; $count <= $to_create; $count++) {
   my $sudoku = &$generator();
 
@@ -48,7 +54,7 @@ for (my $count = 1; $count <= $to_create; $count++) {
   push @buffer, [$sudoku->{strPuzzle}, $description];
 }
 
-if (my $page = sudoku_html_page(\@buffer)) {
+if (my $page = Games::Sudoku::Html::sudoku_html_page(\@buffer)) {
   open my $export, '>:utf8', $file or die "Open '$file':\n" . $!;
   print $export $page;
   print "You may now open '$file' in your browser\n";

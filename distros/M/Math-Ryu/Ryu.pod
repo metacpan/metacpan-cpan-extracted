@@ -141,6 +141,7 @@ Math::Ryu - perl interface to Ryu (NV-to-string conversion).
     '1.4142135623730950488016887242096982E0' (for square root of 2).
 
   $str = fmtpy($s);
+    ( Originally a pure perl sub - still accessible as fmtpy_pp(). )
     The argument $s is a string as returned by either d2s() or ld2s()
     or q2s(). We aim to reformat $s to be the same as the string that
     python3 would produce, and then return it as $str.

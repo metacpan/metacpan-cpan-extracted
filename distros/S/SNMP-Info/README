@@ -2,7 +2,7 @@ NAME
     SNMP::Info - OO Interface to Network devices and MIBs through SNMP
 
 VERSION
-    SNMP::Info - Version 3.95
+    SNMP::Info - Version 3.970001
 
 AUTHOR
     SNMP::Info is maintained by team of Open Source authors headed by Eric
@@ -1111,15 +1111,15 @@ USAGE
         Offline
             Causes SNMP::Info to avoid network activity and return data only
             from its cache. If you ask for something not in the cache, an
-            error is thrown. See also the "cache()" and "offline()" methods.
+            error is thrown. See also the cache() and offline() methods.
 
             (default 0, which means "online")
 
         Cache
             Pass in a HashRef to prime the cache of retrieved data. Useful
             for creating an instance in "Offline" mode from a previously
-            dumped cache. See also the "cache()" method to retrieve a cache
-            after running actial queries.
+            dumped cache. See also the cache() method to retrieve a cache
+            after running actual queries.
 
         OTHER
             All other arguments are passed to SNMP::Session.
@@ -1425,8 +1425,8 @@ USAGE
         ("ifAlias")
 
   Interface Statistics
-    $info->i_octet_in(), $info->i_octets_out(), $info->i_octet_in64(),
-    $info->i_octets_out64()
+    $info->i_octet_in(), $info->i_octet_out(), $info->i_octet_in64(),
+    $info->i_octet_out64()
         Bandwidth.
 
         Number of octets sent/received on the interface including framing
@@ -2059,9 +2059,9 @@ SNMP::INFO INTERNALS
     munge_ip()
         Takes a binary IP and makes it dotted ASCII.
 
-    munge_inetaddress
+    munge_inetaddress()
         Takes a binary IP address as defined by the SNMP InetAddress type
-        and returns it as human readable string;
+        and returns it as human readable string.
 
     munge_mac()
         Takes an octet stream (HEX-STRING) and returns a colon separated

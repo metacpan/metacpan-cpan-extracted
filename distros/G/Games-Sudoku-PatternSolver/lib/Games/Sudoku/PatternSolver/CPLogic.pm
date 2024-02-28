@@ -3,7 +3,7 @@ package Games::Sudoku::PatternSolver::CPLogic;
 use strict;
 use warnings;
 
-require 5.10.0;
+require 5.06.0;
 
 use Bit::Vector;
 use Algorithm::Combinatorics qw(combinations);

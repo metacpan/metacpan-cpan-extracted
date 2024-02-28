@@ -40,7 +40,7 @@ sub new {
     # this works by adding the connection handles to $attributes->{'handles'}->{handlename}
     # save the handle label to $Handles->{$label} = $type;
     if (ref($Config->get_config('data')) eq 'HASH') {
-        foreach my $service (keys $Config->get_config('data')) {
+        foreach my $service (keys %{ $Config->get_config('data') }) {
             my $handles = $Config->get_config('data')->{$service};
             if (ref($handles) eq 'HASH' && keys %{$handles}) {
                 foreach my $handle (keys %{$handles}) {

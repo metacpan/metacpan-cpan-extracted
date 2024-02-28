@@ -1,5 +1,8 @@
 Revision history for Perl extension App-Gimei
 
+v0.2.6 2024-02-27T17:11:58Z
+    - fix garbled text in help option
+
 v0.2.5 2024-02-22T19:26:26Z
     - introduce Generators
     - Parser was defined as a class

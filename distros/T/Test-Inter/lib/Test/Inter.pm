@@ -1,5 +1,5 @@
 package Test::Inter;
-# Copyright (c) 2010-2019 Sullivan Beck. All rights reserved.
+# Copyright (c) 2010-2024 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -14,7 +14,7 @@ use IO::File;
 use Cwd 'abs_path';
 
 our($VERSION);
-$VERSION = '1.10';
+$VERSION='1.11';
 
 ###############################################################################
 # BASE METHODS
@@ -75,31 +75,25 @@ sub new {
 
    no strict 'refs';
    foreach my $opt (@opts) {
-      if (! exists $o{$opt}) {
-         $self->_die("Invalid option to new method: $opt");
-      }
-
       my $OPT = uc("ti_$opt");
 
-      if (exists $opts{opt}  ||
-          exists $ENV{$OPT}  ||
-          defined ${ "main::$OPT" }) {
-
-         my $val;
-         if (defined ${ "main::$OPT" }) {
-            $val = ${ "main::$OPT" };
-         } elsif (exists $ENV{$OPT}) {
-            $val = $ENV{$OPT};
-         } else {
-            $val = $opts{$opt};
-         }
-
-         &{ "Test::Inter::$opt" }($self,$val);
+      my $val;
+      if (defined ${ "main::$OPT" }) {
+         $val = ${ "main::$OPT" };
+      } elsif (exists $ENV{$OPT}) {
+         $val = $ENV{$OPT};
+      } elsif (exists $opts{$opt}) {
+         $val = $opts{$opt};
+      } else {
+         next;
       }
+
+      &{ "Test::Inter::$opt" }($self,$val);
    }
 
+   # uncoverable branch true
    if ($$self{'mode'} ne 'test') {
-      print "\nRunning $name...\n";
+      print "\nRunning $name...\n";  # uncoverable statement
    }
 
    # We assume that the module is distributed in a directory with the correct
@@ -111,16 +105,24 @@ sub new {
 
    my($moddir,$testdir,$libdir);
 
+   # uncoverable branch false
+   # uncoverable branch true count:2
+   # uncoverable branch false count:2
+   # uncoverable branch true count:3
+   # uncoverable branch false count:3
    if (-f "$0") {
       $moddir = dirname(dirname(abs_path($0)));
    } elsif (-d "./t") {
-      $moddir = dirname(abs_path('.'));
+      $moddir = dirname(abs_path('.'));   # uncoverable statement
    } elsif (-d "../t") {
-      $moddir = dirname(abs_path('..'));
+      $moddir = dirname(abs_path('..'));  # uncoverable statement
    }
+
+   # uncoverable branch false
    if (-d "$moddir/t") {
       $testdir = "$moddir/t";
    }
+   # uncoverable branch false
    if (-d "$moddir/lib") {
       $libdir  = "$moddir/lib";
    }

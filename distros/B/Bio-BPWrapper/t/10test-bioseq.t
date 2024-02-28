@@ -1,6 +1,8 @@
 #!/usr/bin/env perl
-use rlib '.';
-use strict; use warnings;
+use strict;
+use warnings;
+use Path::Tiny;
+use lib path($0)->absolute->parent->stringify;
 use Test::More;
 use Helper;
 
@@ -39,8 +41,6 @@ my $multi_opts = [
      'pick-order-2,4.right', 'pick seqs by order delimited by commas'],
     ["--pick order:2-4", 'test-bioseq.nuc',
      'pick-order-2-4.right', 'pick seqs by order with range'],
-    ["--restrict EcoRI", 'test-bioseq-re.fas',
-     'restrict.right', 'restriction cut'],
     ["--hydroB", 'test-bioseq.pep',
      'hydroB.right', 'Hydrophobicity score'],
     ["--input genbank --output fasta", "test-bioseq.gb",

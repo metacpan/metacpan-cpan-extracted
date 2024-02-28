@@ -44,8 +44,6 @@ package will check and install that.
 
 Each script, [`bioaln`](https://github.com/bioperl/p5-bpwrapper/wiki/bioaln), [`biopop`](https://metacpan.org/pod/distribution/Bio-BPWrapper/bin/biopop), [`bioseq`](https://github.com/bioperl/p5-bpwrapper/wiki/bioseq) and [`biotree`](https://github.com/bioperl/p5-bpwrapper/wiki/biotree) give shorter usage help when given command-line option `--help`. Manual-page help is also giving the option `--man`.
 
-Documentation is maintained in [this project's wiki](https://github.com/bioperl/p5-bpwrapper/wiki).
-
 A help file with use cases is maintained at: http://diverge.hunter.cuny.edu/labwiki/Bioutils
 
 # Install from CPAN
@@ -57,6 +55,16 @@ The git code generally has the newest code. If git is not your thing, you can al
    $ cpanm --sudo Bio::BPWrapper
 
 ```
+
+A note on CPAN use with "sudo" (quote by Rocky):
+
+ "sudo cpan" can have problems because "sudo"  runs as root but with the environment variables like PATH and PERL5LIB that were setas they were before "sudo" is run. 
+
+In particular things like /root/.cpan/build/rlib-0.02-1 or anything under /root aren't going to be available because /root/.cpan is probably not going to be seen by the "cpan" command or whatever command is used to build the package. (Alternatives like , "cpanm", would have the same  problem too.).  So above we see a mismatched mixture of install places: some things /root/.cpan and some things /usr/share/perl/5.30. 
+
+So something like "sudo su -" followed by cpan or cpanm probably would work better.  The dash is important here so that the root environment gets set which presumably would set PATH and PERL5LIB to have things in /root/.cpan.
+
+If this is intended to be installed only for one person, better in my opinion would be for the user to install her/his own Perl rather than use the system Perl using Perlbrew and not use sudo su or root at all.
 
 # Install and run from docker
 

@@ -209,8 +209,8 @@ CREATING A TEST
 
         The name may not have a '#' in it.
 
-        The name is completely optional, but makes the results more
-        readable.
+        The name is completely optional, but can serve to make the results
+        more readable.
 
     An expected result
         In order to test something, you need to know what result was

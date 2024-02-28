@@ -5,13 +5,13 @@
       "Deyan Ginev <deyan.ginev@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.120921",
    "license" : [
       "open_source"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "LaTeXML",
    "no_index" : {
@@ -24,11 +24,6 @@
       "build" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
-         }
-      },
-      "configure" : {
-         "requires" : {
-            "version" : "0.77"
          }
       },
       "runtime" : {
@@ -67,6 +62,5 @@
          "web" : "https://github.com/brucemiller/LaTeXML"
       }
    },
-   "version" : "0.8.7",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "v0.8.8"
 }

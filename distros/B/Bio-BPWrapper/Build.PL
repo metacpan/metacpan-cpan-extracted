@@ -35,8 +35,8 @@ my $builder = Module::Build->new(
 
     meta_merge => {
         resources => {
-            bugtracker  => 'https://github.com/bioperl/bp-utils/issues',
-            repository  => 'https://github.com/bioperl/bp-utils',
+            bugtracker  => 'https://github.com/bioperl/p5-bpwrapper/issues',
+            repository  => 'https://github.com/bioperl/p5-bpwrapper',
         }
     },
 
@@ -45,15 +45,15 @@ my $builder = Module::Build->new(
 
     },
     build_requires => {
-        'rlib'                    => '0.02',
+        'Path::Tiny'                    => '0.058',
     },
 
     requires => {
         'perl'                              => 'v5.14',
-        'Bio::Restriction::Analysis'        => 0,
-        'Bio::DB::GenBank'                  => 0,
-	'XML::DOM::XPath'                   => '0.14',
-        'rlib'                              => '0.02',
+        'BioPerl'                           => 'v1.7.8',
+        #'Bio::Restriction::Analysis'        => 0,
+        'Bio::DB::RefSeq'                   => 0,
+        'Path::Tiny'                        => '0.058',
     },
 
     provides => {
@@ -78,7 +78,7 @@ my $builder = Module::Build->new(
 
     test_requires => {
         'Test::More'                        => '0.81',
-        'rlib'                              => '0.02',
+        'Path::Tiny'                        => '0.058',
     },
 
     );

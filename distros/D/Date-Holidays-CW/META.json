@@ -1,5 +1,5 @@
 {
-   "abstract" : "Curacoa's official holidays",
+   "abstract" : "Cura\u00e7ao's official holidays",
    "author" : [
       "Wesley Schwengle <waterkip@cpan.org>"
    ],
@@ -68,7 +68,7 @@
    "provides" : {
       "Date::Holidays::CW" : {
          "file" : "lib/Date/Holidays/CW.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -79,12 +79,12 @@
          "web" : "https://gitlab.com/waterkip/p5-date-holidays-cw"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_contributors" : [
       "Wesley Schwengle <waterkip@cpan.org>"
    ],
    "x_generated_by_perl" : "v5.38.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
-   "x_spdx_expression" : "BSD"
+   "x_spdx_expression" : "BSD-3-Clause"
 }
 

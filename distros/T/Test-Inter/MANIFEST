@@ -14,6 +14,7 @@ lib/Test/Inter.pod
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
 README
 t/_pod.t
 t/_pod_coverage.t
@@ -32,5 +33,11 @@ t/tests.t
 t/use_ok.1.t
 t/use_ok.2.t
 t/use_ok.3.t
+t/vars.1.t
+t/vars.2.t
+t/vars.3.t
+t/vars.4.t
+t/vars.5.t
+t/vars.other.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

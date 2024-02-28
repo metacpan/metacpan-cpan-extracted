@@ -1,0 +1,77 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+
+# SPDX-FileContributor: Wesley Schwengle <waterkip@cpan.org>
+#
+# SPDX-License-Identifier: BSD
+
+# ABSTRACT: Show vacation days for the day
+# PODNAME: today-is
+
+use Date::Holidays;
+use DateTime;
+
+binmode STDOUT, ":utf8";
+
+my $today = DateTime->now();
+
+my $end = $ARGV[0]
+        ? $today->clone->add(days   => $ARGV[0])
+        : $today->clone->add(months => 1);
+
+my %dh;
+
+my @countries = qw(nl aw bq cw);
+
+foreach (@countries) {
+  $dh{$_} = Date::Holidays->new(countrycode => $_);
+}
+
+my $day = $today->clone;
+while ($day <= $end) {
+  $day->add(days => 1);
+  foreach (@countries) {
+    _is_holiday($dh{$_}, $day);
+  }
+}
+
+
+sub _is_holiday {
+  my $dh  = shift;
+  my $day = shift;
+
+  my $is = $dh->is_holiday_dt($day, gov => 1);
+  return unless $is;
+  printf("%s is %s in %s\n", $day->ymd, $is, $dh->{_countrycode});
+}
+
+# vim: ft=perl
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+today-is - Show vacation days for the day
+
+=head1 VERSION
+
+version 0.001
+
+=head1 AUTHOR
+
+Wesley Schwengle <waterkip@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2024 by Wesley Schwengle.
+
+This is free software, licensed under:
+
+  The (three-clause) BSD License
+
+=cut

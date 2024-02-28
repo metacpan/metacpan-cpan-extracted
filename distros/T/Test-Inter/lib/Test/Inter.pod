@@ -1,4 +1,4 @@
-# Copyright (c) 2010-2019 Sullivan Beck. All rights reserved.
+# Copyright (c) 2010-2024 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -231,7 +231,8 @@ one was specified).
 
 The name may not have a '#' in it.
 
-The name is completely optional, but makes the results more readable.
+The name is completely optional, but can serve to make the results
+more readable.
 
 =item B<An expected result>
 

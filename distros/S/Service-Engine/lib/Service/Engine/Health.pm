@@ -65,7 +65,7 @@ sub new {
     if (ref($Config->get_config('health')) eq 'HASH') {
     
         my @options = ();
-        foreach my $service (keys $Config->get_config('health')->{'modules'}) {
+        foreach my $service (keys %{$Config->get_config('health')->{'modules'}}) {
                     
             my $service_conf = $Config->get_config('health')->{'modules'}->{$service};
             

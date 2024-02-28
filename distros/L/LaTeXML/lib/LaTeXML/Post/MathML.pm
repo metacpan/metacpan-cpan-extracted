@@ -18,8 +18,8 @@ use LaTeXML::Util::Unicode;
 use LaTeXML::Post;
 use LaTeXML::Common::Font;
 use List::Util qw(max);
-use base qw(LaTeXML::Post::MathProcessor);
-use base qw(Exporter);
+use base       qw(LaTeXML::Post::MathProcessor);
+use base       qw(Exporter);
 our @EXPORT = (
   qw( &DefMathML ),
   qw( &pmml &pmml_scriptsize &pmml_smaller
@@ -308,12 +308,14 @@ sub pmml_smaller {
 # Convert a node that will automatically be made scriptsize,
 # such as sub- or superscripts.
 sub pmml_scriptsize {
+  no warnings 'recursion';
   my ($script) = @_;
   local $LaTeXML::MathML::STYLE = $style_script_step{$LaTeXML::MathML::STYLE};
   local $LaTeXML::MathML::SIZE  = $stylesize{$LaTeXML::MathML::STYLE};
   return ($script ? pmml($script) : ['m:mrow']); }
 
 sub pmml {
+  no warnings 'recursion';
   my ($node) = @_;
   return unless $node;
   # [since we follow split/scan, use the fragid, not xml:id! TO SOLVE LATER]
@@ -384,6 +386,7 @@ sub getXMHintSpacing {
 my $NBSP = pack('U', 0xA0);                                               # CONSTANT
 
 sub pmml_internal {
+  no warnings 'recursion';
   my ($node) = @_;
   return ['m:merror', {}, ['m:mtext', {}, "Missing Subexpression"]] unless $node;
   my $self = $LaTeXML::Post::MATHPROCESSOR;
@@ -508,6 +511,7 @@ sub pmml_internal {
     return ['m:mtext', {}, $text]; } }
 
 sub needsMathstyle {
+  no warnings 'recursion';
   my ($node) = @_;
   if (ref $node eq 'ARRAY') {
     my ($tag, $attr, @children) = @$node;
@@ -613,6 +617,7 @@ sub pmml_punctuate {
 # args are XMath nodes
 # This is suitable for use as an Apply handler.
 sub pmml_infix {
+  no warnings 'recursion';
   my ($op, @args) = @_;
   $op = realize($op) if ref $op;
   return ['m:mrow', {}] unless $op && @args;    # ??
@@ -693,7 +698,8 @@ sub stylizeContent {
     if (my $default = $role && $default_token_content{$role}) {
       $text = $default; }
     else {
-      $text = ($iselement ? $item->getAttribute('name') || $item->getAttribute('meaning') || $role : '?');
+      $text = ($iselement ? ($item->getAttribute('name') || $item->getAttribute('meaning')
+            || $role || '') : '?');
       $color = 'red'; } }
   elsif (($text eq '-') && $role && (($role eq 'ADDOP') || ($role eq 'OPERATOR'))) { # MathML Core prefers unicode minus
     $text = "\x{2212}"; }
@@ -703,23 +709,30 @@ sub stylizeContent {
     elsif (!$variant)            { $variant = 'normal'; } }    # must say so explicitly.
   elsif ($font && !$variant) {
     Warn('unexpected', $font, undef, "Unrecognized font variant '$font'"); $variant = ''; }
+  elsif ($variant eq 'normal') {    # normal is default for any other tokens, so omit
+    $variant = undef; }
   # Should we map to Unicode's Plane 1 blocks for Mathematical Alphanumeric Symbols?
   # Only upper & lower case latin & greek, and also numerals can be mapped.
   # For each mathvariant, and for each of those 5 groups, there is a linear mapping,
   # EXCEPT for chars defined before Plain 1, which already exist in lower blocks.
   # Get desired mapping strategy
-  my $plane1     = $$LaTeXML::Post::MATHPROCESSOR{plane1};
-  my $plane1hack = $$LaTeXML::Post::MATHPROCESSOR{hackplane1};
-  my $u_variant  = $variant
+  my $plane1         = $$LaTeXML::Post::MATHPROCESSOR{plane1};
+  my $plane1hack     = $$LaTeXML::Post::MATHPROCESSOR{hackplane1};
+  my $invisibletimes = $$LaTeXML::Post::MATHPROCESSOR{invisibletimes};
+  # just in case, default to "true" (classic behavior), if not specified
+  $invisibletimes = 1 unless defined $invisibletimes;
+  my $u_variant = $variant
     && ($plane1hack ? $plane1hackable{$variant}
     : ($plane1 ? $variant : undef));
-  my $u_text = $u_variant && unicode_convert($text, $u_variant);
+  my $u_text = ($tag ne 'm:mtext') && $u_variant && unicode_convert($text, $u_variant);
   if ((defined $u_text) && ($u_text ne '')) {    # didn't remap the text ? Keep text & variant
-    $text    = $u_text;
+    $text    = $u_text || '';
     $variant = ($plane1hack && ($variant ne $u_variant) && ($variant =~ /^bold/)
       ? 'bold' : undef); }                       # Possibly keep variant bold
                                                  # Use class (css) to patchup some weak translations
-  if    (!$font) { }
+  if ($text =~ /^\p{Format}*$/) {                # Only Formatting (eg. InvisibleTImes) (or empty)
+    $font = $variant = $color = $bgcolor = $opacity = undef; }    # Needs no viz. styling attributes
+  elsif (!$font) { }
   elsif ($font =~ /caligraphic/) {
     # Note that this is unlikely to have effect when plane1 chars are used!
     $class = ($class ? $class . ' ' : '') . 'ltx_font_mathcaligraphic'; }
@@ -729,6 +742,11 @@ sub stylizeContent {
     $class = ($class ? $class . ' ' : '') . 'ltx_font_oldstyle'; }
   elsif ($font =~ /smallcaps/) {
     $class = ($class ? $class . ' ' : '') . 'ltx_font_smallcaps'; }
+  elsif ($variant && ($variant ne 'normal')) {    # Any left-over mathvariant? Punt to CSS
+    $class = ($class ? $class . ' ' : '') . 'ltx_mathvariant_' . $variant; }
+  if ($tag eq 'm:mtext') {
+    $variant = undef; }
+
   if ($opacity) {
     $cssstyle = ($cssstyle ? $cssstyle . ';' : '') . "opacity:$opacity"; }
 
@@ -736,11 +754,16 @@ sub stylizeContent {
   my %props = ($tag eq 'm:mo' ? opdict_lookup($text, $role) : ());
 
   # Resolve stretch & size
-  $stretchy = undef if ($tag ne 'm:mo');                          # Only allowed on m:mo!
-  $size     = undef if $stretchy;                                 # Ignore size, if we're stretching.
+  $stretchy = undef if ($tag ne 'm:mo');             # Only allowed on m:mo!
+  $size     = undef if $stretchy;                    # Ignore size, if we're stretching.
   my $stretchyhack = undef;
   if ($text =~ /^[\x{2061}\x{2062}\x{2063}]*$/) {    # invisible get no size or stretchiness
-    $stretchy = $size = undef; }
+    $stretchy = $size = undef;
+    # If requested, switch implied mo to space
+    if ($text eq "\x{2062}" and not($invisibletimes)) {
+      # and set lspace/rspace to 0 until we have browser interop.
+      $props{lspace} = $props{rspace} = $props{force_lspace} = $props{force_rspace} = '0em';
+      $text = "\x{200B}"; } }
   if ($size) {
     if ($size eq ($LaTeXML::MathML::SIZE || 'text')) {    # If default size, no need to mention.
       $size = undef; }
@@ -786,6 +809,9 @@ sub stylizeContent {
     # Store spacing for later spacing resolution
     (defined $props{lspace} ? (_lspace => $props{lspace}) : ()),
     (defined $props{rspace} ? (_rspace => $props{rspace}) : ()),
+    # explicitly set for zero-width space, until we get browser interop
+    (defined $props{force_lspace} ? (lspace => $props{force_lspace}) : ()),
+    (defined $props{force_rspace} ? (rspace => $props{force_rspace}) : ()),
   ); }
 
 # Generally, $item in the following ought to be a string.
@@ -853,6 +879,7 @@ sub pmml_script {
       $prescripts, $postscripts); } }
 
 sub pmml_script_mid_layout {
+  no warnings 'recursion';
   my ($base, $midscripts, $emb_left, $emb_right) = @_;
 
   if (scalar(@$midscripts) == 0) {
@@ -1018,6 +1045,9 @@ sub pmml_text_aux {
     elsif (($tag eq 'ltx:text')    # ltx:text element is fine, if we can manage the attributes!
       && (!grep { $node->hasAttribute($_) } qw(framed framecolor))) {
       return pmml_maybe_resize($node, pmml_row(map { pmml_text_aux($_, %attr) } $node->childNodes)); }
+    elsif ($tag eq 'ltx:picture') {    # Embeded pictures might legitimately have nested math?
+      return ['m:mtext', {},
+        $LaTeXML::Post::MATHPROCESSOR->convertXMTextContent($LaTeXML::Post::DOCUMENT, 1, $node)]; }
     else {
       # We could just recurse on raw content like this, but it loses a lot...
       ###      map(pmml_text_aux($_,%attr), $node->childNodes); }}
@@ -1066,7 +1096,7 @@ sub space_walk {
     space_walk($self, $prev);
     while (my $next = shift(@nodes)) {
       my $invisop;    # Save Invisible operators as potential target for (l|r)space
-      if (($$next[0] eq 'm:mo') && $$next[2] && ($$next[2] =~ /^[\x{2061}\x{2062}\x{2063}]*$/)) {
+      if (($$next[0] eq 'm:mo') && $$next[2] && ($$next[2] =~ /^[\x{200B}\x{2061}\x{2062}\x{2063}]*$/)) {
         $invisop = $next;
         $next    = shift(@nodes);
         last unless $next; }
@@ -1257,6 +1287,7 @@ sub cmml_top {
   return cmml_contents($node); }
 
 sub cmml {
+  no warnings 'recursion';
   my ($node) = @_;
   if (getQName($node) eq 'ltx:XMRef') {
     $node = realize($node); }
@@ -1266,6 +1297,7 @@ sub cmml {
   return $result; }
 
 sub cmml_internal {
+  no warnings 'recursion';
   my ($node) = @_;
   return ['m:merror', {}, ['m:mtext', {}, "Missing Subexpression"]] unless $node;
   $node = realize($node) if getQName($node) eq 'ltx:XMRef';
@@ -1477,6 +1509,7 @@ DefMathML("Token:APPLYOP:?",  \&pmml_mo, undef);  # APPLYOP is (only) \x{2061}; 
 DefMathML("Token:OPERATOR:?", \&pmml_mo, undef);
 
 DefMathML('Apply:?:?', sub {
+    no warnings 'recursion';
     my ($op, @args) = @_;
     my $pop   = pmml($op);
     my $inner = $pop;
@@ -1488,6 +1521,7 @@ DefMathML('Apply:?:?', sub {
       $pop, ($is_mo ? () : pmml_mo("\x{2061}")),    # FUNCTION APPLICATION only if not an m:mo
       map { pmml($_) } @args]; },
   sub {
+    no warnings 'recursion';
     my ($op, @args) = @_;
     return ['m:apply', {}, cmml($op), map { cmml($_) } @args]; });
 
