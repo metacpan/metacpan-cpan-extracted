@@ -539,8 +539,8 @@ void SPVM_API_call_instance_method_static_by_name(SPVM_ENV* env, SPVM_VALUE* sta
     return;
   };
   
-  if (object->type_dimension > 0) {
-    *error_id = SPVM_API_die(env, stack, "The type dimension of the invocant must be equal to 0.", func_name, file, line);
+  if (!SPVM_API_isa(env, stack, object, basic_type, 0)) {
+    *error_id = SPVM_API_die(env, stack, "The invocant must be assigned to the \"%s\" class.", basic_type_name, func_name, file, line);
     return;
   };
   
@@ -589,26 +589,27 @@ void* SPVM_API_new_object_by_name(SPVM_ENV* env, SPVM_VALUE* stack, const char* 
   
   void* basic_type = SPVM_API_get_basic_type(env, stack, basic_type_name);
   if (!basic_type) {
-    SPVM_API_die(env, stack, "The %s class is not found.", basic_type_name, func_name, file, line);
-    *error_id = 1;
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" class is not found.", basic_type_name, func_name, file, line);
     return NULL;
   };
   
   void* object = SPVM_API_new_object(env, stack, basic_type);
   
+  if (!object) {
+    *error_id = SPVM_API_die(env, stack, "The creation of the object of the \"%s\" class failed.", basic_type_name, func_name, file, line);
+    return NULL;
+  }
+  
   return object;
 }
 
 SPVM_OBJECT* SPVM_API_new_pointer_object_by_name(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, void* pointer, int32_t* error_id, const char* func_name, const char* file, int32_t line) {
-  *error_id = 0;
   
-  void* basic_type = SPVM_API_get_basic_type(env, stack, basic_type_name);
-  if (!basic_type) {
-    *error_id = 1;
-    SPVM_API_die(env, stack, "The %s class is not found.", basic_type_name, func_name, file, line);
-    return NULL;
-  };
-  SPVM_OBJECT* object = SPVM_API_new_pointer_object(env, stack, basic_type, pointer);
+  void* object = SPVM_API_new_object_by_name(env, stack, basic_type_name, error_id, func_name, file, line);
+  
+  if (object) {
+    SPVM_API_set_pointer(env, stack, object, pointer);
+  }
   
   return object;
 }
@@ -618,26 +619,34 @@ SPVM_OBJECT* SPVM_API_new_object_array_by_name(SPVM_ENV* env, SPVM_VALUE* stack,
   
   void* basic_type = SPVM_API_get_basic_type(env, stack, basic_type_name);
   if (!basic_type) {
-    SPVM_API_die(env, stack, "The %s class is not found.", basic_type_name, func_name, file, line);
-    *error_id = 1;
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" class is not found.", basic_type_name, func_name, file, line);
     return NULL;
   };
   
-  void* object = SPVM_API_new_object_array(env, stack, basic_type, length);
+  void* array = SPVM_API_new_object_array(env, stack, basic_type, length);
   
-  return object;
+  if (!array) {
+    *error_id = SPVM_API_die(env, stack, "The creation of the array of the \"%s\" class failed.", basic_type_name, func_name, file, line);
+    return NULL;
+  }
+  
+  return array;
 }
 
 SPVM_OBJECT* SPVM_API_new_muldim_array_by_name(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, int32_t type_dimension, int32_t length, int32_t* error_id, const char* func_name, const char* file, int32_t line) {  *error_id = 0;
   
   void* basic_type = SPVM_API_get_basic_type(env, stack, basic_type_name);
   if (!basic_type) {
-    SPVM_API_die(env, stack, "The %s class is not found.", basic_type_name, func_name, file, line);
-    *error_id = 1;
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" class is not found.", basic_type_name, func_name, file, line);
     return NULL;
   };
   
   void* object = SPVM_API_new_muldim_array(env, stack, basic_type, type_dimension, length);
+  
+  if (!object) {
+    *error_id = SPVM_API_die(env, stack, "The creation of the multi-dimensional array of the \"%s\" class with the dimension %d failed.", basic_type_name, type_dimension, func_name, file, line);
+    return NULL;
+  }
   
   return object;
 }
@@ -647,14 +656,18 @@ SPVM_OBJECT* SPVM_API_new_mulnum_array_by_name(SPVM_ENV* env, SPVM_VALUE* stack,
   
   void* basic_type = SPVM_API_get_basic_type(env, stack, basic_type_name);
   if (!basic_type) {
-    SPVM_API_die(env, stack, "The %s class is not found.", basic_type_name, func_name, file, line);
-    *error_id = 1;
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" class is not found.", basic_type_name, func_name, file, line);
     return NULL;
   };
   
-  void* object = SPVM_API_new_mulnum_array(env, stack, basic_type, length);
+  void* array = SPVM_API_new_mulnum_array(env, stack, basic_type, length);
   
-  return object;
+  if (!array) {
+    *error_id = SPVM_API_die(env, stack, "The creation of the multi-numeric array of the \"%s\" class failed.", basic_type_name, func_name, file, line);
+    return NULL;
+  }
+  
+  return array;
 }
 
 int8_t SPVM_API_get_class_var_byte(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_RUNTIME_CLASS_VAR* class_var) {
@@ -797,15 +810,13 @@ int8_t SPVM_API_get_class_var_byte_by_name(SPVM_ENV* env, SPVM_VALUE* stack, con
   
   SPVM_RUNTIME_BASIC_TYPE* basic_type = SPVM_API_get_basic_type(env, stack, basic_type_name);
   if (!basic_type) {
-    SPVM_API_die(env, stack, "The %s class is not found.", basic_type_name, func_name, file, line);
-    *error_id = 1;
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" class is not found.", basic_type_name, func_name, file, line);
     return 0;
   }
   
   SPVM_RUNTIME_CLASS_VAR* class_var = SPVM_API_BASIC_TYPE_get_class_var_by_name(env->runtime, basic_type, class_var_name);
   if (!class_var) {
-    *error_id = 1;
-    SPVM_API_die(env, stack, "The %s class variable in the %s class is not found.", class_var_name, basic_type_name, func_name, file, line);
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" class variable in the \"%s\" class is not found.", class_var_name, basic_type_name, func_name, file, line);
     return 0;
   };
   
@@ -818,15 +829,13 @@ int16_t SPVM_API_get_class_var_short_by_name(SPVM_ENV* env, SPVM_VALUE* stack, c
   
   SPVM_RUNTIME_BASIC_TYPE* basic_type = SPVM_API_get_basic_type(env, stack, basic_type_name);
   if (!basic_type) {
-    SPVM_API_die(env, stack, "The %s class is not found.", basic_type_name, func_name, file, line);
-    *error_id = 1;
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" class is not found.", basic_type_name, func_name, file, line);
     return 0;
   }
   
   SPVM_RUNTIME_CLASS_VAR* class_var = SPVM_API_BASIC_TYPE_get_class_var_by_name(env->runtime, basic_type, class_var_name);
   if (!class_var) {
-    *error_id = 1;
-    SPVM_API_die(env, stack, "The %s class variable in the %s class is not found.", class_var_name, basic_type_name, func_name, file, line);
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" class variable in the \"%s\" class is not found.", class_var_name, basic_type_name, func_name, file, line);
     return 0;
   };
   
@@ -839,15 +848,13 @@ int32_t SPVM_API_get_class_var_int_by_name(SPVM_ENV* env, SPVM_VALUE* stack, con
   
   SPVM_RUNTIME_BASIC_TYPE* basic_type = SPVM_API_get_basic_type(env, stack, basic_type_name);
   if (!basic_type) {
-    SPVM_API_die(env, stack, "The %s class is not found.", basic_type_name, func_name, file, line);
-    *error_id = 1;
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" class is not found.", basic_type_name, func_name, file, line);
     return 0;
   }
   
   SPVM_RUNTIME_CLASS_VAR* class_var = SPVM_API_BASIC_TYPE_get_class_var_by_name(env->runtime, basic_type, class_var_name);
   if (!class_var) {
-    *error_id = 1;
-    SPVM_API_die(env, stack, "The %s class variable in the %s class is not found.", class_var_name, basic_type_name, func_name, file, line);
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" class variable in the \"%s\" class is not found.", class_var_name, basic_type_name, func_name, file, line);
     return 0;
   };
   
@@ -860,15 +867,13 @@ int64_t SPVM_API_get_class_var_long_by_name(SPVM_ENV* env, SPVM_VALUE* stack, co
   
   SPVM_RUNTIME_BASIC_TYPE* basic_type = SPVM_API_get_basic_type(env, stack, basic_type_name);
   if (!basic_type) {
-    SPVM_API_die(env, stack, "The %s class is not found.", basic_type_name, func_name, file, line);
-    *error_id = 1;
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" class is not found.", basic_type_name, func_name, file, line);
     return 0;
   }
   
   SPVM_RUNTIME_CLASS_VAR* class_var = SPVM_API_BASIC_TYPE_get_class_var_by_name(env->runtime, basic_type, class_var_name);
   if (!class_var) {
-    *error_id = 1;
-    SPVM_API_die(env, stack, "The %s class variable in the %s class is not found.", class_var_name, basic_type_name, func_name, file, line);
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" class variable in the \"%s\" class is not found.", class_var_name, basic_type_name, func_name, file, line);
     return 0;
   };
   
@@ -881,15 +886,13 @@ float SPVM_API_get_class_var_float_by_name(SPVM_ENV* env, SPVM_VALUE* stack, con
   
   SPVM_RUNTIME_BASIC_TYPE* basic_type = SPVM_API_get_basic_type(env, stack, basic_type_name);
   if (!basic_type) {
-    SPVM_API_die(env, stack, "The %s class is not found.", basic_type_name, func_name, file, line);
-    *error_id = 1;
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" class is not found.", basic_type_name, func_name, file, line);
     return 0;
   }
   
   SPVM_RUNTIME_CLASS_VAR* class_var = SPVM_API_BASIC_TYPE_get_class_var_by_name(env->runtime, basic_type, class_var_name);
   if (!class_var) {
-    *error_id = 1;
-    SPVM_API_die(env, stack, "The %s class variable in the %s class is not found.", class_var_name, basic_type_name, func_name, file, line);
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" class variable in the \"%s\" class is not found.", class_var_name, basic_type_name, func_name, file, line);
     return 0;
   };
   
@@ -902,15 +905,13 @@ double SPVM_API_get_class_var_double_by_name(SPVM_ENV* env, SPVM_VALUE* stack, c
   
   SPVM_RUNTIME_BASIC_TYPE* basic_type = SPVM_API_get_basic_type(env, stack, basic_type_name);
   if (!basic_type) {
-    SPVM_API_die(env, stack, "The %s class is not found.", basic_type_name, func_name, file, line);
-    *error_id = 1;
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" class is not found.", basic_type_name, func_name, file, line);
     return 0;
   }
   
   SPVM_RUNTIME_CLASS_VAR* class_var = SPVM_API_BASIC_TYPE_get_class_var_by_name(env->runtime, basic_type, class_var_name);
   if (!class_var) {
-    *error_id = 1;
-    SPVM_API_die(env, stack, "The %s class variable in the %s class is not found.", class_var_name, basic_type_name, func_name, file, line);
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" class variable in the \"%s\" class is not found.", class_var_name, basic_type_name, func_name, file, line);
     return 0;
   };
   
@@ -923,15 +924,13 @@ SPVM_OBJECT* SPVM_API_get_class_var_object_by_name(SPVM_ENV* env, SPVM_VALUE* st
   
   SPVM_RUNTIME_BASIC_TYPE* basic_type = SPVM_API_get_basic_type(env, stack, basic_type_name);
   if (!basic_type) {
-    SPVM_API_die(env, stack, "The %s class is not found.", basic_type_name, func_name, file, line);
-    *error_id = 1;
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" class is not found.", basic_type_name, func_name, file, line);
     return 0;
   }
   
   SPVM_RUNTIME_CLASS_VAR* class_var = SPVM_API_BASIC_TYPE_get_class_var_by_name(env->runtime, basic_type, class_var_name);
   if (!class_var) {
-    *error_id = 1;
-    SPVM_API_die(env, stack, "The %s class variable in the %s class is not found.", class_var_name, basic_type_name, func_name, file, line);
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" class variable in the \"%s\" class is not found.", class_var_name, basic_type_name, func_name, file, line);
     return 0;
   };
   
@@ -950,15 +949,13 @@ void SPVM_API_set_class_var_byte_by_name(SPVM_ENV* env, SPVM_VALUE* stack, const
   
   SPVM_RUNTIME_BASIC_TYPE* basic_type = SPVM_API_get_basic_type(env, stack, basic_type_name);
   if (!basic_type) {
-    SPVM_API_die(env, stack, "The %s class is not found.", basic_type_name, func_name, file, line);
-    *error_id = 1;
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" class is not found.", basic_type_name, func_name, file, line);
     return;
   }
   
   SPVM_RUNTIME_CLASS_VAR* class_var = SPVM_API_BASIC_TYPE_get_class_var_by_name(env->runtime, basic_type, class_var_name);
   if (!class_var) {
-    *error_id = 1;
-    SPVM_API_die(env, stack, "The %s class variable in the %s class is not found.", class_var_name, basic_type_name, func_name, file, line);
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" class variable in the \"%s\" class is not found.", class_var_name, basic_type_name, func_name, file, line);
     return;
   };
   
@@ -970,15 +967,13 @@ void SPVM_API_set_class_var_short_by_name(SPVM_ENV* env, SPVM_VALUE* stack, cons
   
   SPVM_RUNTIME_BASIC_TYPE* basic_type = SPVM_API_get_basic_type(env, stack, basic_type_name);
   if (!basic_type) {
-    SPVM_API_die(env, stack, "The %s class is not found.", basic_type_name, func_name, file, line);
-    *error_id = 1;
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" class is not found.", basic_type_name, func_name, file, line);
     return;
   }
   
   SPVM_RUNTIME_CLASS_VAR* class_var = SPVM_API_BASIC_TYPE_get_class_var_by_name(env->runtime, basic_type, class_var_name);
   if (!class_var) {
-    *error_id = 1;
-    SPVM_API_die(env, stack, "The %s class variable in the %s class is not found.", class_var_name, basic_type_name, func_name, file, line);
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" class variable in the \"%s\" class is not found.", class_var_name, basic_type_name, func_name, file, line);
     return;
   };
   
@@ -990,15 +985,13 @@ void SPVM_API_set_class_var_int_by_name(SPVM_ENV* env, SPVM_VALUE* stack, const 
   
   SPVM_RUNTIME_BASIC_TYPE* basic_type = SPVM_API_get_basic_type(env, stack, basic_type_name);
   if (!basic_type) {
-    SPVM_API_die(env, stack, "The %s class is not found.", basic_type_name, func_name, file, line);
-    *error_id = 1;
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" class is not found.", basic_type_name, func_name, file, line);
     return;
   }
   
   SPVM_RUNTIME_CLASS_VAR* class_var = SPVM_API_BASIC_TYPE_get_class_var_by_name(env->runtime, basic_type, class_var_name);
   if (!class_var) {
-    *error_id = 1;
-    SPVM_API_die(env, stack, "The %s class variable in the %s class is not found.", class_var_name, basic_type_name, func_name, file, line);
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" class variable in the \"%s\" class is not found.", class_var_name, basic_type_name, func_name, file, line);
     return;
   };
   
@@ -1010,15 +1003,13 @@ void SPVM_API_set_class_var_long_by_name(SPVM_ENV* env, SPVM_VALUE* stack, const
   
   SPVM_RUNTIME_BASIC_TYPE* basic_type = SPVM_API_get_basic_type(env, stack, basic_type_name);
   if (!basic_type) {
-    SPVM_API_die(env, stack, "The %s class is not found.", basic_type_name, func_name, file, line);
-    *error_id = 1;
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" class is not found.", basic_type_name, func_name, file, line);
     return;
   }
   
   SPVM_RUNTIME_CLASS_VAR* class_var = SPVM_API_BASIC_TYPE_get_class_var_by_name(env->runtime, basic_type, class_var_name);
   if (!class_var) {
-    *error_id = 1;
-    SPVM_API_die(env, stack, "The %s class variable in the %s class is not found.", class_var_name, basic_type_name, func_name, file, line);
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" class variable in the \"%s\" class is not found.", class_var_name, basic_type_name, func_name, file, line);
     return;
   };
   
@@ -1030,15 +1021,13 @@ void SPVM_API_set_class_var_float_by_name(SPVM_ENV* env, SPVM_VALUE* stack, cons
   
   SPVM_RUNTIME_BASIC_TYPE* basic_type = SPVM_API_get_basic_type(env, stack, basic_type_name);
   if (!basic_type) {
-    SPVM_API_die(env, stack, "The %s class is not found.", basic_type_name, func_name, file, line);
-    *error_id = 1;
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" class is not found.", basic_type_name, func_name, file, line);
     return;
   }
   
   SPVM_RUNTIME_CLASS_VAR* class_var = SPVM_API_BASIC_TYPE_get_class_var_by_name(env->runtime, basic_type, class_var_name);
   if (!class_var) {
-    *error_id = 1;
-    SPVM_API_die(env, stack, "The %s class variable in the %s class is not found.", class_var_name, basic_type_name, func_name, file, line);
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" class variable in the \"%s\" class is not found.", class_var_name, basic_type_name, func_name, file, line);
     return;
   };
   
@@ -1050,15 +1039,13 @@ void SPVM_API_set_class_var_double_by_name(SPVM_ENV* env, SPVM_VALUE* stack, con
   
   SPVM_RUNTIME_BASIC_TYPE* basic_type = SPVM_API_get_basic_type(env, stack, basic_type_name);
   if (!basic_type) {
-    SPVM_API_die(env, stack, "The %s class is not found.", basic_type_name, func_name, file, line);
-    *error_id = 1;
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" class is not found.", basic_type_name, func_name, file, line);
     return;
   }
   
   SPVM_RUNTIME_CLASS_VAR* class_var = SPVM_API_BASIC_TYPE_get_class_var_by_name(env->runtime, basic_type, class_var_name);
   if (!class_var) {
-    *error_id = 1;
-    SPVM_API_die(env, stack, "The %s class variable in the %s class is not found.", class_var_name, basic_type_name, func_name, file, line);
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" class variable in the \"%s\" class is not found.", class_var_name, basic_type_name, func_name, file, line);
     return;
   };
   
@@ -1070,15 +1057,13 @@ void SPVM_API_set_class_var_object_by_name(SPVM_ENV* env, SPVM_VALUE* stack, con
   
   SPVM_RUNTIME_BASIC_TYPE* basic_type = SPVM_API_get_basic_type(env, stack, basic_type_name);
   if (!basic_type) {
-    SPVM_API_die(env, stack, "The %s class is not found.", basic_type_name, func_name, file, line);
-    *error_id = 1;
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" class is not found.", basic_type_name, func_name, file, line);
     return;
   }
   
   SPVM_RUNTIME_CLASS_VAR* class_var = SPVM_API_BASIC_TYPE_get_class_var_by_name(env->runtime, basic_type, class_var_name);
   if (!class_var) {
-    *error_id = 1;
-    SPVM_API_die(env, stack, "The %s class variable in the %s class is not found.", class_var_name, basic_type_name, func_name, file, line);
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" class variable in the \"%s\" class is not found.", class_var_name, basic_type_name, func_name, file, line);
     return;
   };
   
@@ -1090,49 +1075,49 @@ void SPVM_API_set_class_var_string_by_name(SPVM_ENV* env, SPVM_VALUE* stack, con
 }
 
 int8_t SPVM_API_get_field_byte(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, SPVM_RUNTIME_FIELD* field) {
-
+  
   int8_t value = *(int8_t*)((intptr_t)object + SPVM_API_RUNTIME_get_object_data_offset(env->runtime) + field->offset);
-
+  
   return value;
 }
 
 int16_t SPVM_API_get_field_short(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, SPVM_RUNTIME_FIELD* field) {
-
+  
   int16_t value = *(int16_t*)((intptr_t)object + SPVM_API_RUNTIME_get_object_data_offset(env->runtime) + field->offset);
   
   return value;
 }
 
 int32_t SPVM_API_get_field_int(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, SPVM_RUNTIME_FIELD* field) {
-
+  
   int32_t value = *(int32_t*)((intptr_t)object + SPVM_API_RUNTIME_get_object_data_offset(env->runtime) + field->offset);
   
   return value;
 }
 
 int64_t SPVM_API_get_field_long(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, SPVM_RUNTIME_FIELD* field) {
-
+  
   int64_t value = *(int64_t*)((intptr_t)object + SPVM_API_RUNTIME_get_object_data_offset(env->runtime) + field->offset);
   
   return value;
 }
 
 float SPVM_API_get_field_float(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, SPVM_RUNTIME_FIELD* field) {
-
+  
   float value = *(float*)((intptr_t)object + SPVM_API_RUNTIME_get_object_data_offset(env->runtime) + field->offset);
   
   return value;
 }
 
 double SPVM_API_get_field_double(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, SPVM_RUNTIME_FIELD* field) {
-
+  
   double value = *(double*)((intptr_t)object + SPVM_API_RUNTIME_get_object_data_offset(env->runtime) + field->offset);
   
   return value;
 }
 
 SPVM_OBJECT* SPVM_API_get_field_object(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, SPVM_RUNTIME_FIELD* field) {
-
+  
   SPVM_OBJECT* value_maybe_weaken = *(SPVM_OBJECT**)((intptr_t)object + SPVM_API_RUNTIME_get_object_data_offset(env->runtime) + field->offset);
   SPVM_OBJECT* value = SPVM_API_get_object_no_weaken_address(env, stack, value_maybe_weaken);
   
@@ -1140,7 +1125,7 @@ SPVM_OBJECT* SPVM_API_get_field_object(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OB
 }
 
 SPVM_OBJECT** SPVM_API_get_field_object_ref(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, SPVM_RUNTIME_FIELD* field) {
-
+  
   SPVM_OBJECT** object_ref = (SPVM_OBJECT**)((intptr_t)object + SPVM_API_RUNTIME_get_object_data_offset(env->runtime) + field->offset);
   
   return object_ref;
@@ -1154,46 +1139,39 @@ SPVM_OBJECT* SPVM_API_get_field_string(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OB
 }
 
 void SPVM_API_set_field_byte(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, SPVM_RUNTIME_FIELD* field, int8_t value) {
-
-  // Get field value
+  
   *(int8_t*)((intptr_t)object + SPVM_API_RUNTIME_get_object_data_offset(env->runtime) + field->offset) = value;
 }
 
 void SPVM_API_set_field_short(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, SPVM_RUNTIME_FIELD* field, int16_t value) {
-
-  // Get field value
+  
   *(int16_t*)((intptr_t)object + SPVM_API_RUNTIME_get_object_data_offset(env->runtime) + field->offset) = value;
 }
 
 void SPVM_API_set_field_int(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, SPVM_RUNTIME_FIELD* field, int32_t value) {
-
-  // Get field value
+  
   *(int32_t*)((intptr_t)object + SPVM_API_RUNTIME_get_object_data_offset(env->runtime) + field->offset) = value;
 }
 
 void SPVM_API_set_field_long(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, SPVM_RUNTIME_FIELD* field, int64_t value) {
-
-  // Get field value
+  
   *(int64_t*)((intptr_t)object + SPVM_API_RUNTIME_get_object_data_offset(env->runtime) + field->offset) = value;
 }
 
 void SPVM_API_set_field_float(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, SPVM_RUNTIME_FIELD* field, float value) {
-
-  // Get field value
+  
   *(float*)((intptr_t)object + SPVM_API_RUNTIME_get_object_data_offset(env->runtime) + field->offset) = value;
 }
 
 void SPVM_API_set_field_double(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, SPVM_RUNTIME_FIELD* field, double value) {
-
-  // Get field value
+  
   *(double*)((intptr_t)object + SPVM_API_RUNTIME_get_object_data_offset(env->runtime) + field->offset) = value;
 }
 
 void SPVM_API_set_field_object(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, SPVM_RUNTIME_FIELD* field, SPVM_OBJECT* value) {
-
-  // Get field value
+  
   void* object_ref = (void**)((intptr_t)object + SPVM_API_RUNTIME_get_object_data_offset(env->runtime) + field->offset);
-
+  
   SPVM_API_assign_object(env, stack, object_ref, value);
 }
 
@@ -1217,9 +1195,8 @@ int8_t SPVM_API_get_field_byte_by_name(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OB
   
   SPVM_RUNTIME_FIELD* field = SPVM_API_get_field(env, stack, object, field_name);
   if (!field) {
-    *error_id = 1;
     const char* basic_type_name = SPVM_API_get_object_basic_type_name(env, stack, object);
-    SPVM_API_die(env, stack, "The %s field is not found in the %s class or its super class.", field_name, basic_type_name, func_name, file, line);
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" field is not found in the \"%s\" class or its super class.", field_name, basic_type_name, func_name, file, line);
     return 0;
   };
   int8_t value = SPVM_API_get_field_byte(env, stack, object, field);
@@ -1241,9 +1218,8 @@ int16_t SPVM_API_get_field_short_by_name(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_
   
   SPVM_RUNTIME_FIELD* field = SPVM_API_get_field(env, stack, object, field_name);
   if (!field) {
-    *error_id = 1;
     const char* basic_type_name = SPVM_API_get_object_basic_type_name(env, stack, object);
-    SPVM_API_die(env, stack, "The %s field is not found in the %s class or its super class.", field_name, basic_type_name, func_name, file, line);
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" field is not found in the \"%s\" class or its super class.", field_name, basic_type_name, func_name, file, line);
     return 0;
   };
   int16_t value = SPVM_API_get_field_short(env, stack, object, field);
@@ -1265,9 +1241,8 @@ int32_t SPVM_API_get_field_int_by_name(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OB
   
   SPVM_RUNTIME_FIELD* field = SPVM_API_get_field(env, stack, object, field_name);
   if (!field) {
-    *error_id = 1;
     const char* basic_type_name = SPVM_API_get_object_basic_type_name(env, stack, object);
-    SPVM_API_die(env, stack, "The %s field is not found in the %s class or its super class.", field_name, basic_type_name, func_name, file, line);
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" field is not found in the \"%s\" class or its super class.", field_name, basic_type_name, func_name, file, line);
     return 0;
   };
   int32_t value = SPVM_API_get_field_int(env, stack, object, field);
@@ -1289,9 +1264,8 @@ int64_t SPVM_API_get_field_long_by_name(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_O
   
   SPVM_RUNTIME_FIELD* field = SPVM_API_get_field(env, stack, object, field_name);
   if (!field) {
-    *error_id = 1;
     const char* basic_type_name = SPVM_API_get_object_basic_type_name(env, stack, object);
-    SPVM_API_die(env, stack, "The %s field is not found in the %s class or its super class.", field_name, basic_type_name, func_name, file, line);
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" field is not found in the \"%s\" class or its super class.", field_name, basic_type_name, func_name, file, line);
     return 0;
   };
   int64_t value = SPVM_API_get_field_long(env, stack, object, field);
@@ -1313,9 +1287,8 @@ float SPVM_API_get_field_float_by_name(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OB
   
   SPVM_RUNTIME_FIELD* field = SPVM_API_get_field(env, stack, object, field_name);
   if (!field) {
-    *error_id = 1;
     const char* basic_type_name = SPVM_API_get_object_basic_type_name(env, stack, object);
-    SPVM_API_die(env, stack, "The %s field is not found in the %s class or its super class.", field_name, basic_type_name, func_name, file, line);
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" field is not found in the \"%s\" class or its super class.", field_name, basic_type_name, func_name, file, line);
     return 0;
   };
   float value = SPVM_API_get_field_float(env, stack, object, field);
@@ -1337,9 +1310,8 @@ double SPVM_API_get_field_double_by_name(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_
   
   SPVM_RUNTIME_FIELD* field = SPVM_API_get_field(env, stack, object, field_name);
   if (!field) {
-    *error_id = 1;
     const char* basic_type_name = SPVM_API_get_object_basic_type_name(env, stack, object);
-    SPVM_API_die(env, stack, "The %s field is not found in the %s class or its super class.", field_name, basic_type_name, func_name, file, line);
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" field is not found in the \"%s\" class or its super class.", field_name, basic_type_name, func_name, file, line);
     return 0;
   };
   double value = SPVM_API_get_field_double(env, stack, object, field);
@@ -1361,9 +1333,8 @@ SPVM_OBJECT* SPVM_API_get_field_object_by_name(SPVM_ENV* env, SPVM_VALUE* stack,
   
   SPVM_RUNTIME_FIELD* field = SPVM_API_get_field(env, stack, object, field_name);
   if (!field) {
-    *error_id = 1;
     const char* basic_type_name = SPVM_API_get_object_basic_type_name(env, stack, object);
-    SPVM_API_die(env, stack, "The %s field is not found in the %s class or its super class.", field_name, basic_type_name, func_name, file, line);
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" field is not found in the \"%s\" class or its super class.", field_name, basic_type_name, func_name, file, line);
     return NULL;
   };
   SPVM_OBJECT* value = SPVM_API_get_field_object(env, stack, object, field);
@@ -1384,13 +1355,15 @@ SPVM_OBJECT** SPVM_API_get_field_object_ref_by_name(SPVM_ENV* env, SPVM_VALUE* s
   };
   
   SPVM_RUNTIME_FIELD* field = SPVM_API_get_field(env, stack, object, field_name);
+  
   if (!field) {
-    *error_id = 1;
     const char* basic_type_name = SPVM_API_get_object_basic_type_name(env, stack, object);
-    SPVM_API_die(env, stack, "The %s field is not found in the %s class or its super class.", field_name, basic_type_name, func_name, file, line);
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" field is not found in the \"%s\" class or its super class.", field_name, basic_type_name, func_name, file, line);
     return NULL;
   };
+  
   SPVM_OBJECT** object_ref = SPVM_API_get_field_object_ref(env, stack, object, field);
+  
   return object_ref;
 }
 
@@ -1398,23 +1371,22 @@ SPVM_OBJECT* SPVM_API_get_field_object_defined_and_has_pointer_by_name(SPVM_ENV*
   
   *error_id = 0;
   
-  void* obj_runtime = env->get_field_object_by_name(env, stack, object, field_name, error_id, func_name, file_name, line);
+  void* obj_field = env->get_field_object_by_name(env, stack, object, field_name, error_id, func_name, file_name, line);
   
   if (*error_id) { return NULL; }
   
-  if (!obj_runtime) {
-    *error_id = env->die(env, stack, "The %s field must be defined.", field_name, func_name, file_name, line);
-    return NULL;
+  if (!obj_field) {
+    *error_id = env->die(env, stack, "The \"%s\" field must be defined.", field_name, func_name, file_name, line);
+    return obj_field;
   }
   
-  void* runtime = env->get_pointer(env, stack, obj_runtime);
+  void* field = env->get_pointer(env, stack, obj_field);
   
-  if (!runtime) {
-    *error_id = env->die(env, stack, "The pointer of the %s field must be defined.", field_name, func_name, file_name, line);
-    return NULL;
+  if (!field) {
+    *error_id = env->die(env, stack, "The pointer of the \"%s\" field must be defined.", field_name, func_name, file_name, line);
   }
   
-  return obj_runtime;
+  return obj_field;
 }
 
 SPVM_OBJECT* SPVM_API_get_field_string_by_name(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, const char* field_name, int32_t* error_id, const char* func_name, const char* file, int32_t line) {
@@ -1427,8 +1399,7 @@ const char* SPVM_API_get_field_string_chars_by_name(SPVM_ENV* env, SPVM_VALUE* s
   
   SPVM_RUNTIME_FIELD* field = SPVM_API_get_field(env, stack, object, field_name);
   if (!field) {
-    *error_id = 1;
-    SPVM_API_die(env, stack, "The %s field is not found.", field_name, func_name, file, line);
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" field is not found.", field_name, func_name, file, line);
     return NULL;
   };
   SPVM_OBJECT* value = SPVM_API_get_field_string(env, stack, object, field);
@@ -1456,9 +1427,8 @@ void SPVM_API_set_field_byte_by_name(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJE
   
   SPVM_RUNTIME_FIELD* field = SPVM_API_get_field(env, stack, object, field_name);
   if (!field) {
-    *error_id = 1;
     const char* basic_type_name = SPVM_API_get_object_basic_type_name(env, stack, object);
-    SPVM_API_die(env, stack, "The %s field is not found in the %s class or its super class.", field_name, basic_type_name, func_name, file, line);
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" field is not found in the \"%s\" class or its super class.", field_name, basic_type_name, func_name, file, line);
     return;
   }
   SPVM_API_set_field_byte(env, stack, object, field, value);
@@ -1479,9 +1449,8 @@ void SPVM_API_set_field_short_by_name(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJ
   
   SPVM_RUNTIME_FIELD* field = SPVM_API_get_field(env, stack, object, field_name);
   if (!field) {
-    *error_id = 1;
     const char* basic_type_name = SPVM_API_get_object_basic_type_name(env, stack, object);
-    SPVM_API_die(env, stack, "The %s field is not found in the %s class or its super class.", field_name, basic_type_name, func_name, file, line);
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" field is not found in the \"%s\" class or its super class.", field_name, basic_type_name, func_name, file, line);
     return;
   };
   SPVM_API_set_field_short(env, stack, object, field, value);
@@ -1502,9 +1471,8 @@ void SPVM_API_set_field_int_by_name(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJEC
   
   SPVM_RUNTIME_FIELD* field = SPVM_API_get_field(env, stack, object, field_name);
   if (!field) {
-    *error_id = 1;
     const char* basic_type_name = SPVM_API_get_object_basic_type_name(env, stack, object);
-    SPVM_API_die(env, stack, "The %s field is not found in the %s class or its super class.", field_name, basic_type_name, func_name, file, line);
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" field is not found in the \"%s\" class or its super class.", field_name, basic_type_name, func_name, file, line);
     return;
   };
   SPVM_API_set_field_int(env, stack, object, field, value);
@@ -1525,9 +1493,8 @@ void SPVM_API_set_field_long_by_name(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJE
   
   SPVM_RUNTIME_FIELD* field = SPVM_API_get_field(env, stack, object, field_name);
   if (!field) {
-    *error_id = 1;
     const char* basic_type_name = SPVM_API_get_object_basic_type_name(env, stack, object);
-    SPVM_API_die(env, stack, "The %s field is not found in the %s class or its super class.", field_name, basic_type_name, func_name, file, line);
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" field is not found in the \"%s\" class or its super class.", field_name, basic_type_name, func_name, file, line);
     return;
   };
   SPVM_API_set_field_long(env, stack, object, field, value);
@@ -1547,9 +1514,8 @@ void SPVM_API_set_field_float_by_name(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJ
   
   SPVM_RUNTIME_FIELD* field = SPVM_API_get_field(env, stack, object, field_name);
   if (!field) {
-    *error_id = 1;
     const char* basic_type_name = SPVM_API_get_object_basic_type_name(env, stack, object);
-    SPVM_API_die(env, stack, "The %s field is not found in the %s class or its super class.", field_name, basic_type_name, func_name, file, line);
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" field is not found in the \"%s\" class or its super class.", field_name, basic_type_name, func_name, file, line);
     return;
   };
   SPVM_API_set_field_float(env, stack, object, field, value);
@@ -1570,9 +1536,8 @@ void SPVM_API_set_field_double_by_name(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OB
   
   SPVM_RUNTIME_FIELD* field = SPVM_API_get_field(env, stack, object, field_name);
   if (!field) {
-    *error_id = 1;
     const char* basic_type_name = SPVM_API_get_object_basic_type_name(env, stack, object);
-    SPVM_API_die(env, stack, "The %s field is not found in the %s class or its super class.", field_name, basic_type_name, func_name, file, line);
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" field is not found in the \"%s\" class or its super class.", field_name, basic_type_name, func_name, file, line);
     return;
   };
   SPVM_API_set_field_double(env, stack, object, field, value);
@@ -1593,9 +1558,8 @@ void SPVM_API_set_field_object_by_name(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OB
   
   SPVM_RUNTIME_FIELD* field = SPVM_API_get_field(env, stack, object, field_name);
   if (!field) {
-    *error_id = 1;
     const char* basic_type_name = SPVM_API_get_object_basic_type_name(env, stack, object);
-    SPVM_API_die(env, stack, "The %s field is not found in the %s class or its super class.", field_name, basic_type_name, func_name, file, line);
+    *error_id = SPVM_API_die(env, stack, "The \"%s\" field is not found in the \"%s\" class or its super class.", field_name, basic_type_name, func_name, file, line);
     return;
   };
   SPVM_API_set_field_object(env, stack, object, field, value);
@@ -1982,7 +1946,6 @@ int32_t SPVM_API_enter_scope(SPVM_ENV* env, SPVM_VALUE* stack){
 
 SPVM_OBJECT* SPVM_API_get_type_name_no_mortal(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object) {
   
-  
   assert(object);
   
   SPVM_RUNTIME* runtime = env->runtime;
@@ -2000,16 +1963,18 @@ SPVM_OBJECT* SPVM_API_get_type_name_no_mortal(SPVM_ENV* env, SPVM_VALUE* stack, 
   
   void* obj_type_name = SPVM_API_new_string_no_mortal(env, stack, NULL, length);
   
-  char* type_name = (char*)SPVM_API_get_chars(env, stack, obj_type_name);
-  
-  int32_t type_name_index = 0;
-  sprintf((char*)type_name, "%s", basic_type_name);
-  type_name_index += strlen(basic_type_name);
-  
-  int32_t dim_index;
-  for (dim_index = 0; dim_index < type_dimension; dim_index++) {
-    sprintf((char*)(type_name + type_name_index), "[]");
-    type_name_index += 2;
+  if (obj_type_name) {
+    char* type_name = (char*)SPVM_API_get_chars(env, stack, obj_type_name);
+    
+    int32_t type_name_index = 0;
+    sprintf((char*)type_name, "%s", basic_type_name);
+    type_name_index += strlen(basic_type_name);
+    
+    int32_t dim_index;
+    for (dim_index = 0; dim_index < type_dimension; dim_index++) {
+      sprintf((char*)(type_name + type_name_index), "[]");
+      type_name_index += 2;
+    }
   }
   
   return obj_type_name;
@@ -2054,29 +2019,31 @@ SPVM_OBJECT* SPVM_API_get_compile_type_name_no_mortal(SPVM_ENV* env, SPVM_VALUE*
   
   void* obj_compile_type_name = SPVM_API_new_string_no_mortal(env, stack, NULL, compile_type_name_length);
   
-  char* compile_type_name = (char*)SPVM_API_get_chars(env, stack, obj_compile_type_name);
-  
-  if (type_flag & SPVM_NATIVE_C_TYPE_FLAG_MUTABLE) {
-    sprintf(compile_type_name, "mutable ");
-    compile_type_name += strlen("mutable ");
+  if (obj_compile_type_name) {
+    char* compile_type_name = (char*)SPVM_API_get_chars(env, stack, obj_compile_type_name);
+    
+    if (type_flag & SPVM_NATIVE_C_TYPE_FLAG_MUTABLE) {
+      sprintf(compile_type_name, "mutable ");
+      compile_type_name += strlen("mutable ");
+    }
+    
+    sprintf(compile_type_name, "%s", basic_type_name);
+    compile_type_name += strlen(basic_type_name);
+    
+    for (int32_t type_dimension_index = 0; type_dimension_index < type_dimension; type_dimension_index++) {
+      sprintf(compile_type_name, "[]");
+      compile_type_name += 2;
+    }
+    
+    // Reference
+    if (type_flag & SPVM_NATIVE_C_TYPE_FLAG_REF) {
+      sprintf(compile_type_name, "*");
+      compile_type_name += 1;
+    }
+    
+    *compile_type_name = '\0';
+    compile_type_name++;
   }
-  
-  sprintf(compile_type_name, "%s", basic_type_name);
-  compile_type_name += strlen(basic_type_name);
-  
-  for (int32_t type_dimension_index = 0; type_dimension_index < type_dimension; type_dimension_index++) {
-    sprintf(compile_type_name, "[]");
-    compile_type_name += 2;
-  }
-  
-  // Reference
-  if (type_flag & SPVM_NATIVE_C_TYPE_FLAG_REF) {
-    sprintf(compile_type_name, "*");
-    compile_type_name += 1;
-  }
-  
-  *compile_type_name = '\0';
-  compile_type_name++;
   
   return obj_compile_type_name;
 }
@@ -2132,26 +2099,29 @@ SPVM_OBJECT* SPVM_API_new_stack_trace_no_mortal(SPVM_ENV* env, SPVM_VALUE* stack
   
   // Create exception message
   void* new_exception = SPVM_API_new_string_no_mortal(env, stack, NULL, total_length);
-  const char* new_exception_bytes = SPVM_API_get_chars(env, stack, new_exception);
   
-  memcpy(
-    (void*)(new_exception_bytes),
-    (void*)(exception_bytes),
-    exception_length
-  );
-  
-  sprintf(
-    (char*)new_exception_bytes + exception_length,
-    "%s%s%s%s%s%s%s%" PRId32,
-    new_line_part,
-    basic_type_name,
-    arrow_part,
-    method_name,
-    at_part,
-    class_file,
-    line_part,
-    line
-  );
+  if (new_exception) {
+    const char* new_exception_bytes = SPVM_API_get_chars(env, stack, new_exception);
+    
+    memcpy(
+      (void*)(new_exception_bytes),
+      (void*)(exception_bytes),
+      exception_length
+    );
+    
+    sprintf(
+      (char*)new_exception_bytes + exception_length,
+      "%s%s%s%s%s%s%s%" PRId32,
+      new_line_part,
+      basic_type_name,
+      arrow_part,
+      method_name,
+      at_part,
+      class_file,
+      line_part,
+      line
+    );
+  }
   
   return new_exception;
 }
@@ -2194,7 +2164,7 @@ void SPVM_API_say(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* string) {
   fputc('\n', runtime->spvm_stdout);
 }
 
-void SPVM_API_warn(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* string, const char* file, int32_t line) {
+void SPVM_API_warn(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* string, const char* basic_type_name, const char* method_name, const char* file, int32_t line) {
   
   FILE* spvm_stderr = SPVM_API_RUNTIME_get_spvm_stderr(env->runtime);
   
@@ -2209,7 +2179,7 @@ void SPVM_API_warn(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* string, const 
       // Add line and file information if last character is not '\n'
       int32_t add_line_file;
       if (bytes[string_length - 1] != '\n') {
-        fprintf(spvm_stderr, "\n  at %s line %d\n", file, line);
+        fprintf(spvm_stderr, "\n  %s->%s at %s line %d\n", basic_type_name, method_name, file, line);
       }
     }
     else {
@@ -2221,7 +2191,7 @@ void SPVM_API_warn(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* string, const 
   }
   
   if (empty_or_undef) {
-    fprintf(spvm_stderr, "Warning\n  at %s line %d\n", file, line);
+    fprintf(spvm_stderr, "Warning\n  %s->%s at %s line %d\n", basic_type_name, method_name, file, line);
   }
 }
 
@@ -2240,15 +2210,17 @@ SPVM_OBJECT* SPVM_API_concat_no_mortal(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OB
   int32_t string3_length = string1_length + string2_length;
   SPVM_OBJECT* string3 = SPVM_API_new_string_no_mortal(env, stack, NULL, string3_length);
   
-  const char* string1_bytes = SPVM_API_get_chars(env, stack, string1);
-  const char* string2_bytes = SPVM_API_get_chars(env, stack, string2);
-  char* string3_bytes = (char*)SPVM_API_get_chars(env, stack, string3);
-  
-  if (string1_length > 0) {
-    memcpy(string3_bytes, string1_bytes, string1_length);
-  }
-  if (string2_length) {
-    memcpy(string3_bytes + string1_length, string2_bytes, string2_length);
+  if (string3) {
+    const char* string1_bytes = SPVM_API_get_chars(env, stack, string1);
+    const char* string2_bytes = SPVM_API_get_chars(env, stack, string2);
+    char* string3_bytes = (char*)SPVM_API_get_chars(env, stack, string3);
+    
+    if (string1_length > 0) {
+      memcpy(string3_bytes, string1_bytes, string1_length);
+    }
+    if (string2_length) {
+      memcpy(string3_bytes + string1_length, string2_bytes, string2_length);
+    }
   }
   
   return string3;
@@ -2752,11 +2724,11 @@ SPVM_OBJECT* SPVM_API_new_object_no_mortal(SPVM_ENV* env, SPVM_VALUE* stack, SPV
   SPVM_RUNTIME* runtime = env->runtime;
   
   if (!basic_type) {
-    return NULL;
+    assert(0);
   }
   
   if (basic_type->category != SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_CLASS) {
-    return NULL;
+    assert(0);
   }
   
   // Alloc body length + 1
@@ -2764,9 +2736,6 @@ SPVM_OBJECT* SPVM_API_new_object_no_mortal(SPVM_ENV* env, SPVM_VALUE* stack, SPV
   
   size_t alloc_size = (size_t)SPVM_API_RUNTIME_get_object_data_offset(env->runtime) + basic_type->fields_size + 1;
   
-  if (!basic_type) {
-    return NULL;
-  }
   SPVM_OBJECT* object = SPVM_API_new_object_common(env, stack, alloc_size, basic_type, 0, fields_length, 0);
   
   return object;
@@ -2776,7 +2745,9 @@ SPVM_OBJECT* SPVM_API_new_pointer_object_no_mortal(SPVM_ENV* env, SPVM_VALUE* st
   
   void* obj_object = SPVM_API_new_object_no_mortal(env, stack, basic_type);
   
-  SPVM_API_set_pointer(env, stack, obj_object, pointer);
+  if (obj_object) {
+    SPVM_API_set_pointer(env, stack, obj_object, pointer);
+  }
   
   return obj_object;
 }
@@ -2798,8 +2769,10 @@ SPVM_OBJECT* SPVM_API_new_string_nolen_no_mortal(SPVM_ENV* env, SPVM_VALUE* stac
   
   SPVM_OBJECT* object = SPVM_API_new_string_no_mortal(env, stack, NULL, length);
   
-  if (bytes != NULL && length > 0) {
-    memcpy((void*)((intptr_t)object + SPVM_API_RUNTIME_get_object_data_offset(env->runtime)), (char*)bytes, length);
+  if (object) {
+    if (bytes != NULL && length > 0) {
+      memcpy((void*)((intptr_t)object + SPVM_API_RUNTIME_get_object_data_offset(env->runtime)), (char*)bytes, length);
+    }
   }
   
   return object;
@@ -2816,7 +2789,6 @@ SPVM_OBJECT* SPVM_API_new_string_nolen(SPVM_ENV* env, SPVM_VALUE* stack, const c
 }
 
 SPVM_OBJECT* SPVM_API_new_string_no_mortal(SPVM_ENV* env, SPVM_VALUE* stack, const char* bytes, int32_t length) {
-  
   
   if (length < 0) {
     return NULL;
@@ -2871,6 +2843,10 @@ SPVM_OBJECT* SPVM_API_new_byte_array_no_mortal(SPVM_ENV* env, SPVM_VALUE* stack,
 
 SPVM_OBJECT* SPVM_API_new_short_array_no_mortal(SPVM_ENV* env, SPVM_VALUE* stack, int32_t length) {
   
+  if (length < 0) {
+    return NULL;
+  }
+  
   size_t alloc_size = (size_t)SPVM_API_RUNTIME_get_object_data_offset(env->runtime) + sizeof(int16_t) * (length + 1);
   
   SPVM_RUNTIME_BASIC_TYPE* basic_type = SPVM_API_get_basic_type_by_id(env, stack, SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT);
@@ -2881,6 +2857,10 @@ SPVM_OBJECT* SPVM_API_new_short_array_no_mortal(SPVM_ENV* env, SPVM_VALUE* stack
 }
 
 SPVM_OBJECT* SPVM_API_new_int_array_no_mortal(SPVM_ENV* env, SPVM_VALUE* stack, int32_t length) {
+  
+  if (length < 0) {
+    return NULL;
+  }
   
   size_t alloc_size = (size_t)SPVM_API_RUNTIME_get_object_data_offset(env->runtime) + sizeof(int32_t) * (length + 1);
   
@@ -2908,6 +2888,10 @@ SPVM_OBJECT* SPVM_API_new_long_array_no_mortal(SPVM_ENV* env, SPVM_VALUE* stack,
 
 SPVM_OBJECT* SPVM_API_new_float_array_no_mortal(SPVM_ENV* env, SPVM_VALUE* stack, int32_t length) {
   
+  if (length < 0) {
+    return NULL;
+  }
+  
   size_t alloc_size = (size_t)SPVM_API_RUNTIME_get_object_data_offset(env->runtime) + sizeof(float) * (length + 1);
   
   SPVM_RUNTIME_BASIC_TYPE* basic_type = SPVM_API_get_basic_type_by_id(env, stack, SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT);
@@ -2919,6 +2903,10 @@ SPVM_OBJECT* SPVM_API_new_float_array_no_mortal(SPVM_ENV* env, SPVM_VALUE* stack
 
 SPVM_OBJECT* SPVM_API_new_double_array_no_mortal(SPVM_ENV* env, SPVM_VALUE* stack, int32_t length) {
   
+  if (length < 0) {
+    return NULL;
+  }
+  
   size_t alloc_size = (size_t)SPVM_API_RUNTIME_get_object_data_offset(env->runtime) + sizeof(double) * (length + 1);
   
   SPVM_RUNTIME_BASIC_TYPE* basic_type = SPVM_API_get_basic_type_by_id(env, stack, SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE);
@@ -2929,6 +2917,10 @@ SPVM_OBJECT* SPVM_API_new_double_array_no_mortal(SPVM_ENV* env, SPVM_VALUE* stac
 }
 
 SPVM_OBJECT* SPVM_API_new_object_array_no_mortal(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_RUNTIME_BASIC_TYPE* basic_type, int32_t length) {
+  
+  if (length < 0) {
+    return NULL;
+  }
   
   SPVM_RUNTIME* runtime = env->runtime;
   
@@ -2964,6 +2956,10 @@ SPVM_OBJECT* SPVM_API_new_object_array(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_RU
 
 SPVM_OBJECT* SPVM_API_new_muldim_array_no_mortal(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_RUNTIME_BASIC_TYPE* basic_type, int32_t type_dimension, int32_t length) {
   
+  if (length < 0) {
+    return NULL;
+  }
+  
   if (type_dimension < 2) {
     return NULL;
   }
@@ -2971,11 +2967,12 @@ SPVM_OBJECT* SPVM_API_new_muldim_array_no_mortal(SPVM_ENV* env, SPVM_VALUE* stac
     return NULL;
   }
   
-  size_t alloc_size = (size_t)SPVM_API_RUNTIME_get_object_data_offset(env->runtime) + sizeof(void*) * (length + 1);
-  
   if (!basic_type) {
     return NULL;
   }
+  
+  size_t alloc_size = (size_t)SPVM_API_RUNTIME_get_object_data_offset(env->runtime) + sizeof(void*) * (length + 1);
+  
   SPVM_OBJECT* object = SPVM_API_new_object_common(env, stack, alloc_size, basic_type, type_dimension, length, 0);
   
   return object;
@@ -3042,8 +3039,12 @@ SPVM_OBJECT* SPVM_API_new_mulnum_array(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_RU
 }
 
 SPVM_OBJECT* SPVM_API_new_array_proto_no_mortal(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* array, int32_t length) {
-
+  
   if (array == NULL) {
+    return NULL;
+  }
+  
+  if (!SPVM_API_is_array(env, stack, array)) {
     return NULL;
   }
   
@@ -3300,23 +3301,15 @@ void* SPVM_API_new_memory_block(SPVM_ENV* env, SPVM_VALUE* stack, size_t size) {
   
   SPVM_RUNTIME* runtime = env->runtime;
   
-  assert(size > 0);
-  
-  if ((uint64_t)size > (uint64_t)SIZE_MAX) {
-    return NULL;
-  }
-  
   void* block = SPVM_ALLOCATOR_alloc_memory_block_unmanaged((size_t)size);
   
-  SPVM_MUTEX* runtime_mutex_atomic = runtime->mutex_atomic;
-  {
+  if (block) {
+    SPVM_MUTEX* runtime_mutex_atomic = runtime->mutex_atomic;
+    
     SPVM_MUTEX_lock(runtime_mutex_atomic);
     
     runtime->memory_blocks_count++;
     
-    SPVM_MUTEX_unlock(runtime_mutex_atomic);
-  }
-  
 #ifdef SPVM_DEBUG_MEMORY
     {
       SPVM_MUTEX_reader_lock(runtime_mutex_atomic);
@@ -3324,6 +3317,10 @@ void* SPVM_API_new_memory_block(SPVM_ENV* env, SPVM_VALUE* stack, size_t size) {
       SPVM_MUTEX_reader_unlock(runtime_mutex_atomic);
     }
 #endif
+    
+    SPVM_MUTEX_unlock(runtime_mutex_atomic);
+    
+  }
   
   return block;
 }
@@ -3342,9 +3339,6 @@ void SPVM_API_free_memory_block(SPVM_ENV* env, SPVM_VALUE* stack, void* block) {
       
       runtime->memory_blocks_count--;
       
-      SPVM_MUTEX_unlock(runtime_mutex_atomic);
-    }
-    
 #ifdef SPVM_DEBUG_MEMORY
     {
       SPVM_MUTEX_reader_lock(runtime_mutex_atomic);
@@ -3352,6 +3346,9 @@ void SPVM_API_free_memory_block(SPVM_ENV* env, SPVM_VALUE* stack, void* block) {
       SPVM_MUTEX_reader_unlock(runtime_mutex_atomic);
     }
 #endif
+      
+      SPVM_MUTEX_unlock(runtime_mutex_atomic);
+    }
   }
 }
 
@@ -3372,6 +3369,7 @@ int32_t SPVM_API_get_memory_blocks_count(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 SPVM_OBJECT* SPVM_API_copy_no_mortal(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object) {
+  
   if (!object) {
     return NULL;
   }
@@ -3399,7 +3397,7 @@ SPVM_OBJECT* SPVM_API_copy_no_mortal(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJE
     memcpy(new_object_bytes, object_bytes, element_size * length);
   }
   else {
-    new_object = NULL;
+    assert(0);
   }
   
   return new_object;
@@ -3417,27 +3415,35 @@ SPVM_OBJECT* SPVM_API_copy(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object
 
 void SPVM_API_shorten(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* string, int32_t new_length) {
   
-  
-  if (string != NULL) {
-    if (SPVM_API_is_string(env, stack, string)) {
-      if (!SPVM_API_is_read_only(env, stack, string)) {
-        int32_t length = SPVM_API_length(env, stack, string);
-        
-        if (new_length > length) {
-          new_length = length;
-        }
-        else if (new_length < 0) {
-          new_length = 0;
-        }
-        
-        SPVM_API_set_length(env, stack, string, new_length);
-        char* chars = (char*)SPVM_API_get_chars(env, stack, string);
-        if (new_length > length) {
-          memset(chars + new_length, 0, new_length - length);
-        }
-      }
-    }
+  if (!string) {
+    return;
   }
+  
+  if (!SPVM_API_is_string(env, stack, string)) {
+    return;
+  }
+  
+  if (SPVM_API_is_read_only(env, stack, string)) {
+    return;
+  }
+  
+  int32_t length = SPVM_API_length(env, stack, string);
+  
+  if (!(new_length >= 0)) {
+    return;
+  }
+  
+  if (!(new_length < length)) {
+    return;
+  }
+  
+  SPVM_API_set_length(env, stack, string, new_length);
+  
+  char* chars = (char*)SPVM_API_get_chars(env, stack, string);
+  
+  assert(length - new_length > 0);
+  
+  memset(chars + new_length, 0, length - new_length);
 }
 
 int32_t SPVM_API_elem_isa(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* array, SPVM_OBJECT* element) {
@@ -3458,7 +3464,6 @@ int32_t SPVM_API_elem_isa(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* array, 
 
 int32_t SPVM_API_is_type(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, SPVM_RUNTIME_BASIC_TYPE* basic_type, int32_t type_dimension) {
   
-  // Object must be not null
   assert(object);
   
   int32_t is_type = 0;
@@ -3473,6 +3478,7 @@ int32_t SPVM_API_is_type(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, 
 int32_t SPVM_API_is_type_by_name(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, const char* basic_type_name, int32_t type_dimension) {
   
   SPVM_RUNTIME_BASIC_TYPE* basic_type = SPVM_API_get_basic_type(env, stack, basic_type_name);
+  
   if (!basic_type) {
     return 0;
   };
@@ -3521,8 +3527,7 @@ int32_t SPVM_API_get_basic_type_id_by_name(SPVM_ENV* env, SPVM_VALUE* stack, con
   
   int32_t basic_type_id = SPVM_API_get_basic_type_id(env, stack, basic_type_name);
   if (basic_type_id < 0) {
-    *error_id = 1;
-    SPVM_API_die(env, stack, "The %s basic type is not found.", basic_type_name, func_name, file, line);
+    *error_id = SPVM_API_die(env, stack, "The %s basic type is not found.", basic_type_name, func_name, file, line);
   };
   return basic_type_id;
 }
@@ -3532,8 +3537,7 @@ SPVM_RUNTIME_BASIC_TYPE* SPVM_API_get_basic_type_by_name(SPVM_ENV* env, SPVM_VAL
   
   void* basic_type = SPVM_API_get_basic_type(env, stack, basic_type_name);
   if (!basic_type) {
-    *error_id = 1;
-    SPVM_API_die(env, stack, "The %s basic type is not found.", basic_type_name, func_name, file, line);
+    *error_id = SPVM_API_die(env, stack, "The %s basic type is not found.", basic_type_name, func_name, file, line);
   };
   
   return basic_type;
@@ -3635,19 +3639,9 @@ double SPVM_API_get_version_number(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_RUNTIM
   
   int32_t version_string_length = strlen(version_string);
   
-  char version_string_without_hyphen[20] = {0};
-  int32_t version_string_without_hyphen_length = 0;
-  for (int32_t i = 0; i < version_string_length; i++) {
-    char ch = version_string[i];
-    if (!(ch == '_')) {
-      version_string_without_hyphen[version_string_without_hyphen_length] = ch;
-      version_string_without_hyphen_length++;
-    }
-  }
-  
   char *end;
   errno = 0;
-  double version_number = strtod(version_string_without_hyphen, &end);
+  double version_number = strtod(version_string, &end);
   assert(*end == '\0');
   assert(errno == 0);
   
@@ -3854,12 +3848,11 @@ int32_t SPVM_API_call_method_common(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_RUNTI
 
 int32_t SPVM_API_push_mortal(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object) {
   
-  
-  SPVM_OBJECT*** current_mortal_stack_ptr = (SPVM_OBJECT***)&stack[SPVM_API_C_STACK_INDEX_MORTAL_STACK];
-  int32_t* current_mortal_stack_top_ptr = (int32_t*)&stack[SPVM_API_C_STACK_INDEX_MORTAL_STACK_TOP];
-  int32_t* current_mortal_stack_capacity_ptr = (int32_t*)&stack[SPVM_API_C_STACK_INDEX_MORTAL_STACK_CAPACITY];
-  
   if (object != NULL) {
+    SPVM_OBJECT*** current_mortal_stack_ptr = (SPVM_OBJECT***)&stack[SPVM_API_C_STACK_INDEX_MORTAL_STACK];
+    int32_t* current_mortal_stack_top_ptr = (int32_t*)&stack[SPVM_API_C_STACK_INDEX_MORTAL_STACK_TOP];
+    int32_t* current_mortal_stack_capacity_ptr = (int32_t*)&stack[SPVM_API_C_STACK_INDEX_MORTAL_STACK_CAPACITY];
+    
     // Extend mortal stack
     if (*current_mortal_stack_top_ptr >= *current_mortal_stack_capacity_ptr) {
       int32_t new_mortal_stack_capacity = *current_mortal_stack_capacity_ptr * 2;

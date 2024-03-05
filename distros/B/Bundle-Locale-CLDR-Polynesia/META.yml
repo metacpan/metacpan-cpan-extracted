@@ -22,7 +22,7 @@ name: Bundle-Locale-CLDR-Polynesia
 provides:
   Bundle::Locale::CLDR::Polynesia:
     file: lib/Bundle/Locale/CLDR/Polynesia.pm
-    version: v0.44.0
+    version: v0.44.1
 requires:
   DateTime: '0.72'
   Moo: '2'
@@ -34,5 +34,5 @@ resources:
   bugtracker: https://github.com/ThePilgrim/perlcldr/issues
   homepage: https://github.com/ThePilgrim/perlcldr
   repository: https://github.com/ThePilgrim/perlcldr.git
-version: v0.44.0
+version: v0.44.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

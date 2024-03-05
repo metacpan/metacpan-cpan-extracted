@@ -118,10 +118,6 @@ Support timezones of the format +500.  David Coppit
 
 Make sure that &DateCalc($date1,"") returns an error.  Jim Anderson
 
-Change the Jan1Week1 variable to accept the values "m1-m7" (1st week contains
-Jan X) or "d1-d7" (1st week contains the 1st dX day of week ... so d1
-means that the 1st week of the year contains the 1st Monday).
-
 Free up the '%u', '%h', and '%X' printf formats. Reserve '%X' for
   extended formats (%Xa, %Xb, ...).
 

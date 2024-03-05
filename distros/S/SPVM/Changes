@@ -1,3 +1,55 @@
+0.989082 2023-03-01
+  [New Features]
+    * The spvm_warn function in native APIs outputs the function name, the file name, and the line number.
+    * The spvm_warnf function in native APIs outputs the function name, the file name, and the line number.
+  [New Features and Incompatible Changes and Breaking Binary Compatibility]
+    * The warn operator outputs the function name. This change cuases breaking binary compatibility of the warn operator.
+    * Change the definition of the warn native API.
+      [Before]
+      void (*warn)(SPVM_ENV* env, SPVM_VALUE* stack, void* string, const char* file, int32_t line);
+      [After]
+      void (*warn)(SPVM_ENV* env, SPVM_VALUE* stack, void* string, const char* basic_type_name, const char* method_name, const char* file, int32_t line);
+  [Document Improvement and Fix]
+    * Fix and improve the documents of native APIs.
+  [Bug Fix]
+    * Fix the bug that the shorten native API cannot culcurate the length of \0 filling.
+    
+0.989081 2023-02-29
+  [Document Improvement]
+    * Improve the documents of native APIs.
+  [Bug Fix]
+    * Fix the error id set by native APIs. This was wrongly 1. The correct value is the basic type ID of the Error class.
+    * Fix the error id set by spvm_vm.c. This was wrongly 1. The correct value is the basic type ID of the Error class.
+    * Fix the error id set by spvm_implement.h. This was wrongly 1. The correct value is the basic type ID of the Error class.
+    * Fix the bug that the count of memory blocks is incremented when the memory is not allocated in some errors.
+    * Fix the bug that even if an object creating failed and logic access to object.
+  [Exception Messages Changes]
+    * Symbol names in exception messages in native APIs are quoted by "".
+  [Changes]
+    * Add the logic to thrown an exception in the following native APIs when creating object failed.
+    
+      new_object_by_name
+      
+      new_pointer_object_by_name
+      
+      new_object_array_by_name
+      
+      new_muldim_array_by_name
+      
+      new_mulnum_array_by_name
+   * Check assignability in the call_instance_method_static_by_name native API.
+   * Check the type of the prototype array in the new_array_proto_no_mortal native API.
+  [Incompatible Changes]
+    * The copy_no_mortal native API does not return NULL if the argument object is invalid type. This is replaced with an assersion.
+    
+0.989080 2023-02-23
+  [Document Improvement]
+    * Add SPVM::Document page.
+    * Improve the documents of native APIs.
+  [Document Changes]
+    * "Execution Environemnt" is renamed to "Runtime Environment".
+    * "Call Stack" is renamed to "Runtime Stack".
+    
 0.989080 2023-02-23
   [Document Fix]
     * Fix language specification document pathes.

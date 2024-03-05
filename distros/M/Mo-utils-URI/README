@@ -7,6 +7,7 @@ SYNOPSIS
      check_location($self, $key);
      check_uri($self, $key);
      check_url($self, $key);
+     check_urn($self, $key);
 
 DESCRIPTION
     Mo utilities for URI checking of data objects.
@@ -40,6 +41,15 @@ SUBROUTINES
 
     Returns undef.
 
+  "check_urn"
+     check_urn($self, $key);
+
+    Check parameter defined by $key which is valid URN.
+
+    Put error if check isn't ok.
+
+    Returns undef.
+
 ERRORS
      check_location():
              Parameter '%s' doesn't contain valid location.
@@ -53,6 +63,10 @@ ERRORS
              Parameter '%s' doesn't contain valid URL.
                      Value: %s
 
+     check_urn():
+             Parameter '%s' doesn't contain valid URN.
+                     Value: %s
+
 EXAMPLE1
      use strict;
      use warnings;
@@ -62,7 +76,7 @@ EXAMPLE1
      my $self = {
              'key' => 'https://skim.cz',
      };
-     check_uri($self, 'key');
+     check_location($self, 'key');
 
      # Print out.
      print "ok\n";
@@ -75,14 +89,14 @@ EXAMPLE2
      use warnings;
 
      use Error::Pure;
-     use Mo::utils::URI qw(check_uri);
+     use Mo::utils::URI qw(check_location);
 
      $Error::Pure::TYPE = 'Error';
 
      my $self = {
              'key' => 'urn:isbn:9788072044948',
      };
-     check_uri($self, 'key');
+     check_location($self, 'key');
 
      # Print out.
      print "ok\n";
@@ -164,6 +178,43 @@ EXAMPLE6
      # Output like:
      # #Error [..utils.pm:?] Parameter 'key' doesn't contain valid URL.
 
+EXAMPLE7
+     use strict;
+     use warnings;
+
+     use Mo::utils::URI qw(check_urn);
+
+     my $self = {
+             'key' => 'urn:isbn:0451450523',
+     };
+     check_urn($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE8
+     use strict;
+     use warnings;
+
+     use Error::Pure;
+     use Mo::utils::URI qw(check_urn);
+
+     $Error::Pure::TYPE = 'Error';
+
+     my $self = {
+             'key' => 'bad_urn',
+     };
+     check_urn($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [..utils.pm:?] Parameter 'key' doesn't contain valid URN.
+
 DEPENDENCIES
     Data::Validate::URI, Error::Pure, Exporter, Readonly, URI.
 
@@ -199,5 +250,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.01
+    0.02
 

@@ -13,7 +13,7 @@ Neo4j::Driver::Types - Type mapping from Neo4j to Perl and vice versa
 
 =head1 VERSION
 
-version 0.45
+version 0.46
 
 =head1 MAPPING
 
@@ -208,7 +208,6 @@ version of L<Neo4j::Driver>:
 
 =item *
 Byte arrays are not supported as query parameters.
-Byte arrays are coded as unblessed strings in Jolt results.
 
 =item *
 Temporal and spatial values are not supported as query parameters.

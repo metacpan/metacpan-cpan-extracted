@@ -1,5 +1,5 @@
 package Net::Silverpeak::Orchestrator;
-$Net::Silverpeak::Orchestrator::VERSION = '0.008000';
+$Net::Silverpeak::Orchestrator::VERSION = '0.010000';
 # ABSTRACT: Silverpeak Orchestrator REST API client library
 
 use 5.024;
@@ -181,11 +181,43 @@ sub delete_templategroup($self, $name) {
 }
 
 
+sub has_segmentation_enabled ($self) {
+    my $res = $self->get('/gms/rest/vrf/config/enable');
+    $self->_error_handler($res)
+        unless $res->code == 200;
+    return $res->data->{enable};
+}
+
+
+sub get_vrf_zones_map ($self) {
+    my $res = $self->get("/gms/rest/zones/vrfZonesMap");
+    $self->_error_handler($res)
+        unless $res->code == 200;
+    return $res->data;
+}
+
+
 sub get_vrf_by_id ($self) {
     my $res = $self->get("/gms/rest/vrf/config/segments");
     $self->_error_handler($res)
         unless $res->code == 200;
     return $res->data;
+}
+
+
+sub get_vrf_security_policies_by_ids ($self, $source_vrf_id, $destination_vrf_id) {
+    my $res = $self->get('/gms/rest/vrf/config/securityPolicies/' . $source_vrf_id . '_' . $destination_vrf_id);
+    $self->_error_handler($res)
+        unless $res->code == 200;
+    return $res->data;
+}
+
+
+sub update_vrf_security_policies_by_ids ($self, $source_vrf_id, $destination_vrf_id, $data) {
+    my $res = $self->post('/gms/rest/vrf/config/securityPolicies/' . $source_vrf_id . '_' . $destination_vrf_id, $data);
+    $self->_error_handler($res)
+        unless $res->code == 204;
+    return 1;
 }
 
 
@@ -452,7 +484,7 @@ Net::Silverpeak::Orchestrator - Silverpeak Orchestrator REST API client library
 
 =head1 VERSION
 
-version 0.008000
+version 0.010000
 
 =head1 SYNOPSIS
 
@@ -544,9 +576,31 @@ Returns true on success.
 
 Throws an exception on error.
 
+=head2 has_segmentation_enabled
+
+Returns true if segmentation is enabled, else false.
+
+=head2 get_vrf_zones_map
+
+Returns a hashref of firewall zones indexed by VRF id and firewall zone id.
+
 =head2 get_vrf_by_id
 
 Returns a hashref of VRFs indexed by their id.
+
+=head2 get_vrf_security_policies_by_ids
+
+Takes the source and destination vrf ids.
+
+Returns a hashref containing all settings and security policies of a vrf.
+
+=head2 update_vrf_security_policies_by_ids
+
+Takes the source and destination vrf ids.
+
+Returns true on success.
+
+Throws an exception on error.
 
 =head2 list_appliances
 
@@ -735,7 +789,7 @@ Alexander Hartmaier <abraxxa@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Alexander Hartmaier.
+This software is copyright (c) 2024 by Alexander Hartmaier.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

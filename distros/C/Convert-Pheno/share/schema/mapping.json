@@ -23,7 +23,8 @@
       "required": [
         "id",
         "source",
-        "ontology"
+        "ontology",
+        "version"
       ],
       "properties": {
         "id": {
@@ -38,6 +39,9 @@
         },
         "ontology": {
           "$ref": "#/$defs/objectField/properties/ontology"
+        },
+        "version": {
+          "$ref": "#/$defs/stringField"
         },
         "description": {
           "$ref": "#/$defs/stringField"
@@ -87,6 +91,7 @@
   "$defs": {
     "objectField": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "fields": {
           "type": "array",
@@ -94,13 +99,13 @@
             "type": "string"
           }
         },
-        "dict": {
+        "dictionary": {
           "type": "object",
           "additionalProperties": {
             "type": "string"
           }
         },
-        "radio": {
+        "selector": {
           "type": "object",
           "additionalProperties": {
             "type": "object"
@@ -122,7 +127,7 @@
             "hpo"
           ]
         },
-        "map": {
+        "mapping": {
           "type": "object",
           "additionalProperties": {
             "type": "string"

@@ -2,7 +2,7 @@ NAME
     Mo::utils::Language - Mo language utilities.
 
 SYNOPSIS
-     use Mo::utils qw(check_language);
+     use Mo::utils::Language qw(check_language);
 
      check_language($self, $key);
 
@@ -20,8 +20,8 @@ SUBROUTINES
 
 ERRORS
      check_language():
-             Language code '%s' isn't ISO 639-1 code.
-             Language with ISO 639-1 code '%s' doesn't exist.
+             Parameter '%s' doesn't contain valid ISO 639-1 code.
+                     Value: %s
 
 EXAMPLE1
      use strict;
@@ -81,10 +81,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2022-2023 Michal Josef Špaček
+    © 2022-2024 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.02
+    0.04
 

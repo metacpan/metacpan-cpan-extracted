@@ -1,0 +1,111 @@
+NAME
+    Data::Text::Simple - Data object for text in language.
+
+SYNOPSIS
+     use Data::Text::Simple;
+
+     my $obj = Data::Text::Simple->new(%params);
+     my $id = $obj->id;
+     my $lang = $obj->lang;
+     my $text = $obj->text;
+
+METHODS
+  "new"
+     my $obj = Data::Text::Simple->new(%params);
+
+    Constructor.
+
+    *       "id"
+
+            Id of record. Id could be number.
+
+            It's optional.
+
+            Default value is undef.
+
+    *       "lang"
+
+            Language ISO 639-1 code.
+
+            It's optional.
+
+    *       "text"
+
+            Main text.
+
+            It's required.
+
+    Returns instance of object.
+
+  "id"
+     my $id = $obj->id;
+
+    Get id.
+
+    Returns number.
+
+  "lang"
+     my $lang = $obj->lang;
+
+    Get language ISO 639-1 code.
+
+    Returns string.
+
+  "text"
+     my $text = $obj->text;
+
+    Get text.
+
+    Returns string.
+
+ERRORS
+     new():
+             From Mo::utils:
+                     Parameter 'id' must be a number.
+                             Value: %s
+                     Parameter 'text' is required.
+             From Mo::utils::Language:
+                     Parameter 'lang' doesn't contain valid ISO 639-1 code.
+                             Value: %s
+
+EXAMPLE
+     use strict;
+     use warnings;
+
+     use Data::Text::Simple;
+
+     my $obj = Data::Text::Simple->new(
+             'id' => 7,
+             'lang' => 'en',
+             'text' => 'This is a text.',
+     );
+
+     # Print out.
+     print 'Id: '.$obj->id."\n";
+     print 'Language: '.$obj->lang."\n";
+     print 'Text: '.$obj->text."\n";
+
+     # Output:
+     # Id: 7
+     # Language: en
+     # Text: This is a text.
+
+DEPENDENCIES
+    Mo, Mo::utils, Mo::utils::Language.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Data-Text-Simple>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2023-2024 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

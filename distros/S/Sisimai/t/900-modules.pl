@@ -4,10 +4,10 @@ sub list {
     my $f = [ qw|
         Address.pm
         ARF.pm
-        Data.pm
-            Data/JSON.pm
-            Data/YAML.pm
         DateTime.pm
+        Fact.pm
+            Fact/JSON.pm
+            Fact/YAML.pm
         Lhost.pm
             Lhost/Activehunter.pm
             Lhost/Amavis.pm
@@ -64,7 +64,6 @@ sub list {
             Lhost/Yahoo.pm
             Lhost/Yandex.pm
             Lhost/Zoho.pm
-        MIME.pm
         Mail.pm
             Mail/Mbox.pm
             Mail/Maildir.pm
@@ -74,6 +73,8 @@ sub list {
         MDA.pm
         Order.pm
         Reason.pm
+            Reason/AuthFailure.pm
+            Reason/BadReputation.pm
             Reason/Blocked.pm
             Reason/ContentError.pm
             Reason/Delivered.pm
@@ -88,12 +89,15 @@ sub list {
             Reason/MesgTooBig.pm
             Reason/NoRelaying.pm
             Reason/NotAccept.pm
+            Reason/NotCompliantRFC.pm
             Reason/NetworkError.pm
             Reason/OnHold.pm
             Reason/PolicyViolation.pm
             Reason/Rejected.pm
+            Reason/RequirePTR.pm
             Reason/SecurityError.pm
             Reason/SpamDetected.pm
+            Reason/Speeding.pm
             Reason/Suspend.pm
             Reason/SyntaxError.pm
             Reason/SystemError.pm
@@ -104,25 +108,30 @@ sub list {
             Reason/Vacation.pm
             Reason/VirusDetected.pm
         RFC1894.pm
+        RFC2045.pm
         RFC3464.pm
         RFC3834.pm
         RFC5322.pm
+        RFC5965.pm
         Rhost.pm
             Rhost/Cox.pm
-            Rhost/ExchangeOnline.pm
             Rhost/FrancePTT.pm
             Rhost/GoDaddy.pm
-            Rhost/GoogleApps.pm
+            Rhost/Google.pm
             Rhost/IUA.pm
             Rhost/KDDI.pm
+            Rhost/Microsoft.pm
             Rhost/Mimecast.pm
             Rhost/NTTDOCOMO.pm
             Rhost/Spectrum.pm
-            Rhost/TencentQQ.pm
+            Rhost/Tencent.pm
         SMTP.pm
+            SMTP/Command.pm
+            SMTP/Error.pm
             SMTP/Error.pm
             SMTP/Reply.pm
             SMTP/Status.pm
+            SMTP/Transcript.pm
         String.pm
         Time.pm
     | ];

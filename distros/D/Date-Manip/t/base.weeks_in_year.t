@@ -13,8 +13,8 @@ $dmt->config("forcedate","now,America/New_York");
 sub test {
    my(@test)=@_;
    if ($test[0] eq "config") {
-      $dmt->config("jan1week1",$test[1]);
       $dmt->config("firstday",$test[2]);
+      $dmt->config("week1ofyear",$test[1]);
       return 0;
    }
    my @ret = $obj->weeks_in_year(@test);
@@ -22,7 +22,7 @@ sub test {
 }
 
 my $tests="
-config 0 1 => 0
+config jan4 1 => 0
 
 2006 => 52
 
@@ -39,7 +39,7 @@ config 0 1 => 0
 2000 => 52
 
 
-config 0 7 => 0
+config jan4 7 => 0
 
 2006 => 52
 
@@ -56,7 +56,7 @@ config 0 7 => 0
 2000 => 52
 
 
-config 1 1 => 0
+config jan1 1 => 0
 
 2006 => 53
 
@@ -73,7 +73,7 @@ config 1 1 => 0
 2000 => 53
 
 
-config 1 7 => 0
+config jan1 7 => 0
 
 2006 => 52
 

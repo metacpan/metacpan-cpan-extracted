@@ -4,7 +4,7 @@ use warnings;
 
 package Neo4j::Driver::Plugin;
 # ABSTRACT: Plug-in interface for Neo4j::Driver
-$Neo4j::Driver::Plugin::VERSION = '0.45';
+$Neo4j::Driver::Plugin::VERSION = '0.46';
 
 1;
 
@@ -20,25 +20,7 @@ Neo4j::Driver::Plugin - Plug-in interface for Neo4j::Driver
 
 =head1 VERSION
 
-version 0.45
-
-=head1 DESCRIPTION
-
-This is the abstract base class for L<Neo4j::Driver> plug-ins.
-All plug-ins must inherit from L<Neo4j::Driver::Plugin>
-(or perform the role another way). For a description of the
-required behaviour for plug-ins, see L</"METHODS"> below.
-
-Plug-ins can be used to extend and customise L<Neo4j::Driver>
-to a significant degree. Upon being loaded, a plug-in will be
-asked to register event handlers with the driver. Handlers
-are references to custom subroutines defined by the plug-in.
-They will be invoked when the event they were registered for
-is triggered. Events triggered by the driver are specified in
-L</"EVENTS"> below. Plug-ins can also define custom events.
-
-I<The plug-in interface as described in this document is available
-since version 0.34.>
+version 0.46
 
 =head1 SYNPOSIS
 
@@ -71,19 +53,36 @@ since version 0.34.>
 =head1 WARNING: EXPERIMENTAL
 
 The design of the plug-in API is not finalised.
-You should probably let me know if you already are writing
-plug-ins, so that I can try to accommodate your use case
-and give you advance notice of changes.
 
 B<The entire plug-in API is currently experimental.>
 
-The driver's C<plugin()> method is
-L<experimental|Neo4j::Driver/"Plug-in modules"> as well.
+As such, it is subject to unannounced modification or removal
+in future versions. Expect your code to break if you depend
+upon this feature.
 
-I'm grateful for any feedback you I<(yes, you!)> might have on
-this driver's plug-in API. Please open a GitHub issue or get in
-touch via email (make sure you mention Neo4j in the subject to
-beat the spam filters).
+If you feel the plug-in API is useful, please let me know
+(for example, in a GitHub issue). Your feedback will inform
+decisions on future changes to the API. I'd also be happy
+to consider declaring parts of the API stable if I knew
+somebody other than myself was using it.
+
+=head1 DESCRIPTION
+
+This is the abstract base class for L<Neo4j::Driver> plug-ins.
+All plug-ins must inherit from L<Neo4j::Driver::Plugin>
+(or perform the role another way). For a description of the
+required behaviour for plug-ins, see L</"METHODS"> below.
+
+Plug-ins can be used to extend and customise L<Neo4j::Driver>
+to a significant degree. Upon being loaded, a plug-in will be
+asked to register event handlers with the driver. Handlers
+are references to custom subroutines defined by the plug-in.
+They will be invoked when the event they were registered for
+is triggered. Events triggered by the driver are specified in
+L</"EVENTS"> below. Plug-ins can also define custom events.
+
+I<The plug-in interface as described in this document is available
+since version 0.34.>
 
 =head1 EVENTS
 

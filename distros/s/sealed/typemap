@@ -1,0 +1,13 @@
+PADOFFSET	T_UV
+PADNAMELIST*    T_OBJ
+PADNAME*        T_OBJ
+PADLIST*        T_OBJ
+
+INPUT
+T_OBJ
+	if (SvROK($arg)) {
+	    IV tmp = SvIV((SV*)SvRV($arg));
+	    $var = INT2PTR($type,tmp);
+	}
+	else
+	    croak(\"$var is not a reference\")

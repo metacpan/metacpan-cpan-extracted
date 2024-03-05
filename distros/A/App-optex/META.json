@@ -4,7 +4,7 @@
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.20",
+   "generated_by" : "Minilla/v3.1.23",
    "license" : [
       "perl_5"
    ],
@@ -42,12 +42,12 @@
       },
       "runtime" : {
          "requires" : {
-            "Getopt::EX" : "v1.28.0",
-            "Getopt::EX::Hashed" : "1.03",
+            "Getopt::EX" : "v2.1.6",
+            "Getopt::EX::Hashed" : "1.0503",
             "Hash::Util" : "0",
             "List::Util" : "1.45",
             "TOML" : "0.95",
-            "Text::ANSI::Tabs" : "0.07",
+            "Text::ANSI::Tabs" : "1.03",
             "Text::VisualWidth::PP" : "0.05",
             "Time::Piece" : "0",
             "perl" : "5.014"
@@ -65,7 +65,7 @@
    "provides" : {
       "App::optex" : {
          "file" : "lib/App/optex.pm",
-         "version" : "v0.6.0"
+         "version" : "v0.99.0"
       },
       "App::optex::Tmpfile" : {
          "file" : "lib/App/optex/Tmpfile.pm"
@@ -98,7 +98,7 @@
          "web" : "https://github.com/kaz-utashiro/optex"
       }
    },
-   "version" : "v0.6",
+   "version" : "v0.99",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>",

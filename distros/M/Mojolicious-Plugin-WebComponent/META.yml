@@ -1,0 +1,40 @@
+---
+abstract: 'An effort to make creating and using custom web components easier'
+author:
+  - 'Russell Shingleton <reshingleton@gmail.com>'
+build_requires: {}
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-WebComponent
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Mojolicious::Plugin::WebComponent:
+    file: lib/Mojolicious/Plugin/WebComponent.pm
+    version: '0.06'
+requires:
+  Mojolicious: '0'
+  perl: v5.20.0
+resources:
+  bugtracker: https://github.com/rshingleton/Mojolicious-Plugin-WebComponent/issues
+  homepage: https://github.com/rshingleton/Mojolicious-Plugin-WebComponent
+  repository: https://github.com/rshingleton/Mojolicious-Plugin-WebComponent.git
+version: '0.06'
+x_contributors:
+  - 'shingler <shingler@oclc.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

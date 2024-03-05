@@ -59,10 +59,15 @@ ERRORS
      new():
              From Mo::utils:
                      Parameter 'text' has length greater than '4096'.
+                             Value: %s
                      Parameter 'text' is required.
+                             Value: %s
                      Parameter 'type' must be one of defined strings.
+                             String: %s
+                             Possible strings: %s
              From Mo::utils::Language:
-                     Language code 'xx' isn't ISO 639-1 code.
+                     Parameter 'lang' doesn't contain valid ISO 639-1 code.
+                             Value: %s
 
 EXAMPLE
      use strict;
@@ -97,10 +102,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2023 Michal Josef Špaček
+    © 2023-2024 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.02
+    0.03
 

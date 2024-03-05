@@ -5,12 +5,12 @@ use strict;
 use warnings;
 
 sub description { 'Microsoft Exchange Server 2003' }
-sub make {
+sub inquire {
     # Detect an error from Microsoft Exchange Server 2003
     # @param    [Hash] mhead    Message headers of a bounce email
     # @param    [String] mbody  Message body of a bounce email
     # @return   [Hash]          Bounce data list and message/rfc822 part
-    # @return   [Undef]         failed to parse or the arguments are missing
+    # @return   [undef]         failed to parse or the arguments are missing
     # @since v4.1.1
     my $class = shift;
     my $mhead = shift // return undef;
@@ -40,8 +40,8 @@ sub make {
             last if $match;
         }
 
-        last unless scalar @{ $mhead->{'received'} };
-        for my $e ( @{ $mhead->{'received'} } ) {
+        last unless scalar $mhead->{'received'}->@*;
+        for my $e ( $mhead->{'received'}->@* ) {
             # Received: by ***.**.** with Internet Mail Service (5.5.2657.72)
             next unless rindex($e, ' with Internet Mail Service (') > -1;
             $match = 1;
@@ -52,7 +52,7 @@ sub make {
     return undef unless $match;
 
     state $indicators = __PACKAGE__->INDICATORS;
-    state $rebackbone = qr|^Content-Type:[ ]message/rfc822|m;
+    state $boundaries = ['Content-Type: message/rfc822'];
     state $startingof = {
         'message' => ['Your message'],
         'error'   => ['did not reach the following recipient(s):'],
@@ -86,7 +86,7 @@ sub make {
     };
 
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
-    my $emailsteak = Sisimai::RFC5322->fillet($mbody, $rebackbone);
+    my $emailparts = Sisimai::RFC5322->part($mbody, $boundaries);
     my $readcursor = 0;     # (Integer) Points the current cursor position
     my $recipients = 0;     # (Integer) The number of 'Final-Recipient' header
     my $statuspart = 0;     # (Integer) Flag, 1 = have got delivery status part.
@@ -98,9 +98,9 @@ sub make {
     };
     my $v = undef;
 
-    for my $e ( split("\n", $emailsteak->[0]) ) {
-        # Read error messages and delivery status lines from the head of the email
-        # to the previous line of the beginning of the original message.
+    for my $e ( split("\n", $emailparts->[0]) ) {
+        # Read error messages and delivery status lines from the head of the email to the previous
+        # line of the beginning of the original message.
         unless( $readcursor ) {
             # Beginning of the bounce message or message/delivery-status part
             $readcursor |= $indicators->{'deliverystatus'} if index($e, $startingof->{'message'}->[0]) == 0;
@@ -124,8 +124,7 @@ sub make {
             #     MSEXCH:IMS:KIJITORA CAT:EXAMPLE:EXCHANGE 0 (000C05A6) Unknown Recipient
             $v = $dscontents->[-1];
 
-            if( $e =~ /\A[ \t]*([^ ]+[@][^ ]+) on[ \t]*.*\z/ ||
-                $e =~ /\A[ \t]*.+(?:SMTP|smtp)=([^ ]+[@][^ ]+) on[ \t]*.*\z/ ) {
+            if( Sisimai::String->aligned(\$e, ['@', ' on ']) ) {
                 # kijitora@example.co.jp on Thu, 29 Apr 2007 16:51:51 -0500
                 #   kijitora@example.com on 4/29/99 9:19:59 AM
                 if( $v->{'recipient'} ) {
@@ -133,13 +132,16 @@ sub make {
                     push @$dscontents, __PACKAGE__->DELIVERYSTATUS;
                     $v = $dscontents->[-1];
                 }
-                $v->{'recipient'} = $1;
+
+                my $p1 = index(lc $e, 'smtp='); $p1 = $p1 == -1 ? 0 : $p1 + 5;
+                my $p2 = index($e, ' on ') + 1;
+                $v->{'recipient'} = Sisimai::Address->s3s4(substr($e, $p1, $p2));
                 $v->{'msexch'} = 0;
                 $recipients++;
 
-            } elsif( $e =~ /\A[ \t]+(MSEXCH:.+)\z/ ) {
+            } elsif( index($e, ' ') == 0 && index($e, 'MSEXCH:') > 0 ) {
                 #     MSEXCH:IMS:KIJITORA CAT:EXAMPLE:EXCHANGE 0 (000C05A6) Unknown Recipient
-                $v->{'diagnosis'} .= $1;
+                $v->{'diagnosis'} .= substr($e, index($e, 'MSEXCH:'),);
 
             } else {
                 next if $v->{'msexch'};
@@ -161,24 +163,23 @@ sub make {
             #  Subject: ...
             #  Sent:    Thu, 29 Apr 2010 18:14:35 +0000
             #
-            if( $e =~ /\A[ \t]+To:[ \t]+(.+)\z/ ) {
+            if( index($e, '  To:  ') == 0 || index($e, '      To: ') == 0 ) {
                 #  To:      shironeko@example.jp
                 next if $connheader->{'to'};
-                $connheader->{'to'} = $1;
+                $connheader->{'to'} = substr($e, rindex($e, ' ') + 1,);
                 $connvalues++;
 
-            } elsif( $e =~ /\A[ \t]+Subject:[ \t]+(.+)\z/ ) {
+            } elsif( index($e, '      Subject: ') == 0  || index($e, '  Subject: ') == 0 ) {
                 #  Subject: ...
                 next if length $connheader->{'subject'};
-                $connheader->{'subject'} = $1;
+                $connheader->{'subject'} = substr($e, rindex($e, ' ') + 1,);
                 $connvalues++;
 
-            } elsif( $e =~ m|\A[ \t]+Sent:[ \t]+([A-Z][a-z]{2},.+[-+]\d{4})\z| ||
-                     $e =~ m|\A[ \t]+Sent:[ \t]+(\d+[/]\d+[/]\d+[ \t]+\d+:\d+:\d+[ \t].+)|) {
+            } elsif( index($e, '  Sent: ') == 0 || index($e, '      Sent: ') == 0 ) {
                 #  Sent:    Thu, 29 Apr 2010 18:14:35 +0000
                 #  Sent:    4/29/99 9:19:59 AM
                 next if $connheader->{'date'};
-                $connheader->{'date'} = $1;
+                $connheader->{'date'} = substr($e, index($e, ':') + 2,);
                 $connvalues++;
             }
         } # End of error message part
@@ -189,14 +190,14 @@ sub make {
         $e->{'diagnosis'} = Sisimai::String->sweep($e->{'diagnosis'});
         delete $e->{'msexch'};
 
-        if( $e->{'diagnosis'} =~ /\AMSEXCH:.+[ \t]*[(]([0-9A-F]{8})[)][ \t]*(.*)\z/ ) {
+        if( index($e->{'diagnosis'}, 'MSEXCH:') == 0 ) {
             #     MSEXCH:IMS:KIJITORA CAT:EXAMPLE:EXCHANGE 0 (000C05A6) Unknown Recipient
-            my $capturedcode = $1;
-            my $errormessage = $2;
+            my $capturedcode = substr($e->{'diagnosis'}, index($e->{'diagnosis'}, '(') + 1, 8);
+            my $errormessage = substr($e->{'diagnosis'}, index($e->{'diagnosis'}, ')') + 1,  );
 
             for my $r ( keys %$errorcodes ) {
                 # Find captured code from the error code table
-                next unless grep { $capturedcode eq $_ } @{ $errorcodes->{ $r } };
+                next unless grep { $capturedcode eq $_ } $errorcodes->{ $r }->@*;
                 $e->{'reason'} = $r;
                 $e->{'status'} = Sisimai::SMTP::Status->code($r) || '';
                 last;
@@ -213,13 +214,13 @@ sub make {
         delete $e->{'alterrors'};
     }
 
-    unless( length $emailsteak->[1] ) {
+    unless( length $emailparts->[1] ) {
         # When original message does not included in the bounce message
-        $emailsteak->[1] .= sprintf("From: %s\n", $connheader->{'to'});
-        $emailsteak->[1] .= sprintf("Date: %s\n", $connheader->{'date'});
-        $emailsteak->[1] .= sprintf("Subject: %s\n", $connheader->{'subject'});
+        $emailparts->[1] .= sprintf("From: %s\n", $connheader->{'to'});
+        $emailparts->[1] .= sprintf("Date: %s\n", $connheader->{'date'});
+        $emailparts->[1] .= sprintf("Subject: %s\n", $connheader->{'subject'});
     }
-    return { 'ds' => $dscontents, 'rfc822' => $emailsteak->[1] };
+    return { 'ds' => $dscontents, 'rfc822' => $emailparts->[1] };
 }
 
 1;
@@ -229,8 +230,7 @@ __END__
 
 =head1 NAME
 
-Sisimai::Lhost::Exchange2003 - bounce mail parser class for C<Microsft Exchange
-Server 2003>.
+Sisimai::Lhost::Exchange2003 - bounce mail parser class for C<Microsft Exchange Server 2003>.
 
 =head1 SYNOPSIS
 
@@ -238,8 +238,7 @@ Server 2003>.
 
 =head1 DESCRIPTION
 
-Sisimai::Lhost::Exchange parses a bounce email which created by
-C<Microsoft Exchange Server 2003>.
+Sisimai::Lhost::Exchange parses a bounce email which created by C<Microsoft Exchange Server 2003>.
 Methods in the module are called from only Sisimai::Message.
 
 =head1 CLASS METHODS
@@ -250,11 +249,11 @@ C<description()> returns description string of this module.
 
     print Sisimai::Lhost::Exchange2003->description;
 
-=head2 C<B<make(I<header data>, I<reference to body string>)>>
+=head2 C<B<inquire(I<header data>, I<reference to body string>)>>
 
 
-C<make()> method parses a bounced email and return results as a array reference.
-See Sisimai::Message for more details.
+C<inquire()> method parses a bounced email and return results as a array reference. See Sisimai::Message
+for more details.
 
 =head1 AUTHOR
 
@@ -262,7 +261,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2020 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2023 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

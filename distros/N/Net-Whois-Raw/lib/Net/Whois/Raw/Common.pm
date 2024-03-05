@@ -1,5 +1,5 @@
 package Net::Whois::Raw::Common;
-$Net::Whois::Raw::Common::VERSION = '2.99037';
+$Net::Whois::Raw::Common::VERSION = '2.99038';
 # ABSTRACT: Helper for Net::Whois::Raw.
 
 use Encode;
@@ -606,7 +606,7 @@ Net::Whois::Raw::Common - Helper for Net::Whois::Raw.
 
 =head1 VERSION
 
-version 2.99037
+version 2.99038
 
 =head1 AUTHOR
 
@@ -614,7 +614,7 @@ Alexander Nalobin <alexander@nalobin.ru>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2002-2022 by Alexander Nalobin.
+This software is copyright (c) 2002-2024 by Alexander Nalobin.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

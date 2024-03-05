@@ -22,19 +22,19 @@ name: Locale-CLDR-Locales-Ga
 provides:
   Locale::CLDR::Locales::Ga:
     file: lib/Locale/CLDR/Locales/Ga.pm
-    version: v0.44.0
+    version: v0.44.1
   Locale::CLDR::Locales::Ga::Latn:
     file: lib/Locale/CLDR/Locales/Ga/Latn.pm
-    version: v0.44.0
+    version: v0.44.1
   Locale::CLDR::Locales::Ga::Latn::Gb:
     file: lib/Locale/CLDR/Locales/Ga/Latn/Gb.pm
-    version: v0.44.0
+    version: v0.44.1
   Locale::CLDR::Locales::Ga::Latn::Ie:
     file: lib/Locale/CLDR/Locales/Ga/Latn/Ie.pm
-    version: v0.44.0
+    version: v0.44.1
 requires:
   DateTime: '0.72'
-  Locale::CLDR: v0.44.0
+  Locale::CLDR: v0.44.1
   Moo: '2'
   MooX::ClassAttribute: '0.011'
   Type::Tiny: '0'
@@ -44,5 +44,5 @@ resources:
   bugtracker: https://github.com/ThePilgrim/perlcldr/issues
   homepage: https://github.com/ThePilgrim/perlcldr
   repository: https://github.com/ThePilgrim/perlcldr.git
-version: v0.44.0
+version: v0.44.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

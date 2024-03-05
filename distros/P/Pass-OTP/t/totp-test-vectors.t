@@ -23,7 +23,7 @@ sub is_totp {
 
     is(
         Pass::OTP::otp(
-        secret    => $seeds{$opts{algorithm}},
+        secret    => $seeds{lc $opts{algorithm}},
         algorithm => $opts{algorithm},
         now       => $opts{now},
         digits    => 8,
@@ -63,4 +63,6 @@ is_totp(now => 20000000000, algorithm => 'sha256', totp => '77737706');
 is_totp(now => 20000000000, algorithm => 'sha512', totp => '47863826');
 
 
-done_testing(19);
+is_totp(now => 59, algorithm => 'SHA512', totp => '90693936');
+
+done_testing(20);

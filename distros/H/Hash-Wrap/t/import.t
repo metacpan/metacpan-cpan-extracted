@@ -12,10 +12,7 @@ my %hash = ( a => 1, b => 2 );
 
 my $q = P1::wrap_hash( \%hash );
 
-ok (
-   lives { $q->a },
-   'use Hash::Wrap;'
-) or note $@;
+ok( lives { $q->a }, 'use Hash::Wrap;' ) or note $@;
 
 
 {
@@ -24,10 +21,10 @@ ok (
     use Hash::Wrap ();
 }
 
-like (
-    dies { P2::wrap_hash( ) },
-      qr{undefined subroutine.*at t/import.t}i,
-      q[don't export]
-    );
+like(
+    dies { P2::wrap_hash() },
+    qr{undefined subroutine.*at t/import.t}i,
+    q[don't export]
+);
 
 done_testing;

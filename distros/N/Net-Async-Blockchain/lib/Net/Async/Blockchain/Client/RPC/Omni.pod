@@ -62,7 +62,7 @@ L<Future> - list of the total token balances of the whole wallet.
 
 =item L<Net::Async::Blockchain::Client::RPC::BTC>
 
-L<get_balances|Net::Async::Blockchain::Client::RPC::BTC/get_balances>, L<get_block|Net::Async::Blockchain::Client::RPC::BTC/get_block>, L<get_block_hash|Net::Async::Blockchain::Client::RPC::BTC/get_block_hash>, L<get_last_block|Net::Async::Blockchain::Client::RPC::BTC/get_last_block>, L<get_raw_transaction|Net::Async::Blockchain::Client::RPC::BTC/get_raw_transaction>, L<get_transaction|Net::Async::Blockchain::Client::RPC::BTC/get_transaction>, L<list_by_addresses|Net::Async::Blockchain::Client::RPC::BTC/list_by_addresses>, L<validate_address|Net::Async::Blockchain::Client::RPC::BTC/validate_address>
+L<get_balance|Net::Async::Blockchain::Client::RPC::BTC/get_balance>, L<get_balances|Net::Async::Blockchain::Client::RPC::BTC/get_balances>, L<get_block|Net::Async::Blockchain::Client::RPC::BTC/get_block>, L<get_block_hash|Net::Async::Blockchain::Client::RPC::BTC/get_block_hash>, L<get_last_block|Net::Async::Blockchain::Client::RPC::BTC/get_last_block>, L<get_raw_transaction|Net::Async::Blockchain::Client::RPC::BTC/get_raw_transaction>, L<get_transaction|Net::Async::Blockchain::Client::RPC::BTC/get_transaction>, L<list_by_addresses|Net::Async::Blockchain::Client::RPC::BTC/list_by_addresses>, L<validate_address|Net::Async::Blockchain::Client::RPC::BTC/validate_address>
 
 =item L<Net::Async::Blockchain::Client::RPC>
 

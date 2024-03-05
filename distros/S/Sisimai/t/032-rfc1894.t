@@ -3,16 +3,16 @@ use Test::More;
 use lib qw(./lib ./blib/lib);
 use Sisimai::RFC1894;
 
-my $PackageName = 'Sisimai::RFC1894';
-my $MethodNames = {
-    'class'  => ['FIELDTABLE', 'field', 'match'],
+my $Package = 'Sisimai::RFC1894';
+my $Methods = {
+    'class'  => ['FIELDINDEX', 'FIELDTABLE', 'field', 'match', 'label'],
     'object' => [],
 };
 
-use_ok $PackageName;
-can_ok $PackageName, @{ $MethodNames->{'class'} };
+use_ok $Package;
+can_ok $Package, @{ $Methods->{'class'} };
 
-MAKE_TEST: {
+MAKETEST: {
     my $RFC1894Field1 = [
         'Reporting-MTA: dns; neko.example.jp',
         'Received-From-MTA: dns; mx.libsisimai.org',
@@ -35,14 +35,20 @@ MAKE_TEST: {
         'Date: Sat, 9 Jun 2018 03:06:57 +0900 (JST)',
     ];
     my $v = undef;
+    my $q = undef;
 
-    $v = $PackageName->FIELDTABLE;
-    isa_ok $v, 'HASH', '->table returns Hash';
+    $v = $Package->FIELDINDEX;
+    isa_ok $v, 'ARRAY', '->FIELDINDEX() returns ARRAY';
+    ok scalar @$v,      '->FIELDINDEX() returns ARRAY';
+
+    $v = $Package->FIELDTABLE;
+    isa_ok $v, 'HASH',  '->FIELDTABLE() returns Hash';
     ok scalar keys %$v, '->FIELDTABLE() returns Hash';
 
     for my $e ( @$RFC1894Field1 ) {
-        is $PackageName->match($e), 1, '->match('.$e.') returns 1';
-        $v = $PackageName->field($e);
+        is $Package->match($e), 1, '->match('.$e.') returns 1';
+
+        $v = $Package->field($e);
         isa_ok $v, 'ARRAY', '->field('.$e.') returns Array';
         if( $v->[3] eq 'host' ) {
             is $v->[1], 'DNS', 'field->[1] is DNS';
@@ -51,11 +57,15 @@ MAKE_TEST: {
             is $v->[1], '';
         }
         like $v->[3], qr/(?:host|date)/;
+
+        $q = $Package->label($e);
+        is $q, $v->[0], '->label returns '.$q;
     }
 
     for my $e ( @$RFC1894Field2 ) {
-        is $PackageName->match($e), 2, '->match('.$e.') returns 2';
-        $v = $PackageName->field($e);
+        is $Package->match($e), 1, '->match('.$e.') returns 1';
+
+        $v = $Package->field($e);
         isa_ok $v, 'ARRAY', '->field('.$e.') returns Array';
         if( $v->[3] eq 'host' || $v->[3] eq 'addr' || $v->[3] eq 'code') {
             like $v->[1], qr/(?:DNS|RFC822|SMTP)/, 'field->[1] is DNS or RFC822 or SMTP';
@@ -64,15 +74,20 @@ MAKE_TEST: {
             is $v->[1], '';
         }
         like $v->[3], qr/(?:host|date|addr|list|stat|code)/;
+
+        $q = $Package->label($e);
+        is $q, $v->[0], '->label returns '.$q;
     }
 
     for my $e ( @$IsNotDSNField ) {
-        is $PackageName->match($e), 0, '->match('.$e.') returns 0';
-        $v = $PackageName->field($e);
-        is $v, undef, '->field('.$e.') returns undef';
-        is $v, undef, '->field returns undef';
-    }
+        is $Package->match($e), 0, '->match('.$e.') returns 0';
 
+        $v = $Package->field($e);
+        is $v, undef, '->field('.$e.') returns undef';
+
+        $q = $Package->label($e);
+        ok $q, '->label returns '.$q;
+    }
 }
 
 done_testing;

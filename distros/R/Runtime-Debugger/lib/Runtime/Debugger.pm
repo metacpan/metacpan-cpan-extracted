@@ -21,6 +21,7 @@ use 5.012;
 use strict;
 use warnings;
 use Data::Dumper;
+use Data::Printer;
 use Filter::Simple;
 use Term::ReadLine;
 use Term::ANSIColor qw( colored );
@@ -29,10 +30,10 @@ use Scalar::Util    qw( blessed reftype );
 use Class::Tiny     qw( term attr debug );
 use feature         qw( say state );
 use parent          qw( Exporter );
-use subs            qw( p uniq );
+use subs            qw( d uniq );
 
-our $VERSION = '0.12';
-our @EXPORT  = qw( run p );
+our $VERSION = '0.14';
+our @EXPORT  = qw( run np p d );
 our $FILTER  = 1;
 
 =head1 NAME
@@ -248,6 +249,7 @@ sub run {
     use warnings;
     use feature qw(say);
     my $repl = Runtime::Debugger->_init;
+    local $@;
     eval {
         while ( 1 ) {
             eval $repl->_step;
@@ -297,6 +299,7 @@ sub _init {
 
 sub _step {
     my ( $self ) = @_;
+    my $is_data_dumper_command = qr{ ^ d \b }x;
 
     if ( not $self->{vars_all} ) {
         $self->_setup_vars;
@@ -307,7 +310,7 @@ sub _step {
     say "input_after_readline=[$input]" if $self->debug;
 
     # Change '#1' to '--maxdepth=1'
-    if ( $input =~ / ^ p\b /x ) {
+    if ( $input =~ /$is_data_dumper_command/ ) {
         $input =~ s/
             \s*
             \#(\d)     #2 to --maxdepth=2
@@ -346,7 +349,8 @@ sub _complete {
     # Help or History command - complete the word.
     return $self->_complete_h( @_ ) if $line =~ / ^ \s* h \w* $ /x;
 
-    # Print command - space afterwards.
+    # Dump/Print command - space afterwards.
+    return $self->_complete_d( @_ ) if $line =~ / ^ \s* d $ /x;
     return $self->_complete_p( @_ ) if $line =~ / ^ \s* p $ /x;
 
     # Method call or coderef - append "(".
@@ -355,16 +359,7 @@ sub _complete {
 
     # Hash or hashref - Show possible keys and string variables.
     return $self->_complete_hash( "$1", @_ )
-      if substr( $line, 0, $end ) =~ /
-        (
-            [\$}@%]                 # Variable sigil.
-            (?:
-                (?!->|\s).)+        # Next if not a -> or space.
-        )
-        (?:->)?                     # Maybe a ->.
-        \{                          # Opening brace.
-        [^}]*                       # Any non braces.
-    $ /x;
+      if substr( $line, 0, $end ) =~ $self->_is_hash_match();
 
     # Otherwise assume its a variable.
     return $self->_complete_vars( @_ );
@@ -391,6 +386,14 @@ sub _complete_h {
         words   => [ "help", "hist" ],
         nospace => 1,
     );
+}
+
+sub _complete_d {
+    my $self = shift;
+    my ( $text, $line, $start, $end ) = @_;
+    $self->_dump_args( @_ ) if $self->debug;
+
+    $self->_match( words => ["d"] );
 }
 
 sub _complete_p {
@@ -491,6 +494,21 @@ sub _get_object_functions {
     \@functions;
 }
 
+sub _is_hash_match {
+    my ( $self ) = @_;
+
+    qr{
+        (
+            [\$\}@%]                 # Variable sigil.
+            (?: (?!->|\s). )+       # Next if not a -> or space.
+        )
+        (?:->)?                     # Maybe a ->.
+        \{                          # Opening brace.
+        [^\}]*                       # Any non braces.
+        $                           # EOL.
+    }x;
+}
+
 sub _complete_hash {
     my $self = shift;
     my ( $var, $text, $line, $start, $end ) = @_;
@@ -565,7 +583,8 @@ sub _define_commands {
     (
         "help",    # Changed in _step to $repl->help().
         "hist",    # Changed in _step to $repl->hist().
-        "p",       # Exporting it.
+        "p",       # From Data::Printer and exporting it.
+        "d",       # Exporting it.
         "q",       # Used in _step to stop the repl.
     );
 }
@@ -758,7 +777,8 @@ sub _define_help {
  <TAB>       - Show options.
  help        - Show this help section.
  hist [N=20] - Show last N commands.
- p DATA [#N] - Prety print data (with optional depth),
+ p VAR       - Data printer.
+ d DATA [#N] - Data dumper (with optional depth).
  q           - Quit debugger.
 HELP
 }
@@ -888,16 +908,16 @@ sub _save_history {
 
 # Print
 
-=head2 p
+=head2 d
 
 Data::Dumper::Dump anything.
 
- p 123
- p [1, 2, 3]
+ d 123
+ d [1, 2, 3]
 
 Can adjust the maxdepth (default is 1) to see with: "#Number".
 
- p { a => [1, 2, 3] } #1
+ d { a => [1, 2, 3] } #1
 
 Output:
 
@@ -909,7 +929,7 @@ Set maxdepth to '0' to show all nested structures.
 
 =cut
 
-sub p {
+sub d {
 
     # Use same function to change maxdepth of whats shown.
     my $maxdepth =
@@ -1021,6 +1041,27 @@ Tim Potapov, C<< <tim.potapov[AT]gmail.com> >> E<0x1f42a>E<0x1f977>
 
 Please report any (other) bugs or feature requests to L<https://github.com/poti1/runtime-debugger/issues>.
 
+=head2 Control-C
+
+Doing a Control-C may occassionally break the output in your terminal.
+
+Simply run any one of these:
+
+ reset
+ tset
+ stty echo
+
+=head2 undef Variable
+
+inside a long running (and perhaps complicated) script, a variable
+may become undef.
+
+It may be that the padwalker perhaps is confused (not sure).
+Try running this:
+
+ perl>delete $repl->{vars_all}
+
+Otherwise, restart the script.
 
 =head1 SUPPORT
 

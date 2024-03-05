@@ -1,3 +1,6 @@
+1.7     2024/03/02
+- fix algorithm case matching
+
 1.6     2023/09/13
 - fix SHA384 and SHA512 blocksize (#1)
 

@@ -10,7 +10,7 @@ App::Greple::xlate - grepleの翻訳サポートモジュール
 
 # VERSION
 
-Version 0.30
+Version 0.31
 
 # DESCRIPTION
 
@@ -158,7 +158,52 @@ Perlのpodスタイルで書かれたドキュメント内の通常のテキス�
 
 # COMMAND LINE INTERFACE
 
-コマンドラインからは、リポジトリに含まれる`xlate`コマンドを使用して、このモジュールを簡単に利用することができます。使用方法については、`xlate`のヘルプ情報を参照してください。
+配布物に含まれる`xlate`コマンドを使用することで、このモジュールを簡単にコマンドラインから利用することができます。使用方法については、`xlate`のヘルプ情報を参照してください。
+
+`xlate`コマンドはDocker環境と連携して動作するため、手元に何もインストールされていなくても、Dockerが利用可能であれば使用することができます。`-D`または`-C`オプションを使用してください。
+
+また、さまざまなドキュメントスタイルのためのメイクファイルが提供されているため、特別な指定なしに他の言語への翻訳も可能です。`-M`オプションを使用してください。
+
+Dockerとメイクオプションを組み合わせることもでき、Docker環境でメイクを実行することができます。
+
+`xlate -GC`のように実行すると、現在の作業ディレクトリがマウントされたシェルが起動します。
+
+詳細については、["関連記事"](#関連記事)セクションの日本語の記事を読んでください。
+
+    xlate [ options ] -t lang file [ greple options ]
+        -h   help
+        -v   show version
+        -d   debug
+        -n   dry-run
+        -a   use API
+        -c   just check translation area
+        -r   refresh cache
+        -s   silent mode
+        -e # translation engine (default "deepl")
+        -p # pattern to determine translation area
+        -w # wrap line by # width
+        -o # output format (default "xtxt", or "cm", "ifdef")
+        -f # from lang (ignored)
+        -t # to lang (required, no default)
+        -m # max length per API call
+        -l # show library files (XLATE.mk, xlate.el)
+        --   terminate option parsing
+    Make options
+        -M   run make
+        -n   dry-run
+    Docker options
+        -G   mount git top-level directory
+        -B   run in non-interactive (batch) mode
+        -R   mount read-only
+        -E * specify environment variable to be inherited
+        -I * specify altanative docker image (default: tecolicom/xlate:version)
+        -D * run xlate on the container with the rest parameters
+        -C * run following command on the container, or run shell
+
+    Control Files:
+        *.LANG    translation languates
+        *.FORMAT  translation foramt (xtxt, cm, ifdef)
+        *.ENGINE  translation engine (deepl or gpt3)
 
 # EMACS
 

@@ -1,0 +1,22 @@
+Revision history for Perl extension Mojolicious-Plugin-WebComponent
+
+0.06 2024-03-01T13:47:49Z
+    - fix a bug in the content injection where some invalid string data was left from a previous revision causing a javascript error
+
+0.05 2024-03-01T13:29:53Z
+    - remove manifest.t from test suite, not needed for this distribution
+
+0.04 2024-02-29T17:30:05Z
+    - update to fix test errors from github test runners failing due to node.js error introduced by default test.yaml
+    - increase minimum Perl version to fix test failure due to Mojolicious -signatures feature requiring v5.20+
+
+0.03 2024-02-29T17:08:39Z
+    - update minimum Perl version
+
+0.02 2024-02-29T17:00:34Z
+    - initial release
+
+0.01 2024-02-29T16:05:19Z
+
+    - original version
+

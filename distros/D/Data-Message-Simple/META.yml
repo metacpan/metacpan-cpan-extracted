@@ -25,7 +25,7 @@ no_index:
 requires:
   Mo: 0
   Mo::utils: 0.15
-  Mo::utils::Language: 0
+  Mo::utils::Language: 0.04
   Readonly: 0
   perl: 5.8.0
 resources:
@@ -33,4 +33,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Data-Message-Simple
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Data-Message-Simple
-version: '0.02'
+version: '0.03'

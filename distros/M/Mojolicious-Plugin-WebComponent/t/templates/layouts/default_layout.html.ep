@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+    <title>
+    <%= title %>
+    </title>
+
+    %= component 'system-hosts'
+</head>
+<body>
+<div class="h-100">
+    <main>
+        <div class="flex flex-column flex-fill">
+            <div class="container-fluid">
+                <!--CONTENT-->
+            <%= content %>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

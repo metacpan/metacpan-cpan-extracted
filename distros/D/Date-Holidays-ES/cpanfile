@@ -1,0 +1,8 @@
+requires 'Date::Holidays::Super';
+requires 'Date::Easter';
+requires 'Time::JulianDay';
+requires 'DateTime';
+
+on 'build', sub {
+    requires 'Test::More', '0.4234';
+};

@@ -1,0 +1,18 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"pls.inc": [
+			"/Users/jonasbn/.perlbrew/libs/perl-5.38.0@date-holidays-es/lib/perl5/darwin-2level",
+			"/Users/jonasbn/.perlbrew/libs/perl-5.38.0@date-holidays-es/lib/perl5",
+			"/Users/jonasbn/perl5/perlbrew/perls/perl-5.38.0/lib/site_perl/5.38.0/darwin-2level",
+			"/Users/jonasbn/perl5/perlbrew/perls/perl-5.38.0/lib/site_perl/5.38.0",
+			"/Users/jonasbn/perl5/perlbrew/perls/perl-5.38.0/lib/5.38.0/darwin-2level",
+			"/Users/jonasbn/perl5/perlbrew/perls/perl-5.38.0/lib/5.38.0"
+		],
+		"pls.syntax.perl": "/Users/jonasbn/perl5/perlbrew/perls/perl-5.38.0/bin/perl"
+	}
+}

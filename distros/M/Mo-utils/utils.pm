@@ -11,23 +11,15 @@ use Scalar::Util qw(blessed);
 
 Readonly::Array our @EXPORT_OK => qw(check_angle check_array check_array_object
 	check_array_required check_bool check_code check_isa check_length
-	check_length_fix check_number check_number_of_items check_regexp
-	check_required check_string_begin check_strings);
+	check_length_fix check_number check_number_of_items check_number_range
+	check_regexp check_required check_string_begin check_strings);
 
-our $VERSION = 0.22;
+our $VERSION = 0.23;
 
 sub check_angle {
 	my ($self, $key) = @_;
 
-	_check_key($self, $key) && return;
-
-	check_number($self, $key);
-
-	if ($self->{$key} < 0 || $self->{$key} > 360) {
-		err "Parameter '".$key."' must be a number between 0 and 360.",
-			'Value', $self->{$key},
-		;
-	}
+	check_number_range($self, $key, 0, 360);
 
 	return;
 }
@@ -183,6 +175,22 @@ sub check_number_of_items {
 	return;
 }
 
+sub check_number_range {
+	my ($self, $key, $min, $max) = @_;
+
+	_check_key($self, $key) && return;
+
+	check_number($self, $key);
+
+	if ($self->{$key} < $min || $self->{$key} > $max) {
+		err "Parameter '".$key."' must be a number between $min and $max.",
+			'Value', $self->{$key},
+		;
+	}
+
+	return;
+}
+
 sub check_regexp {
 	my ($self, $key, $regexp) = @_;
 
@@ -318,6 +326,7 @@ Mo::utils - Mo utilities.
  check_length_fix($self, $key, $length);
  check_number($self, $key);
  check_number_of_items($self, $list_method, $item_method, $object_name, $item_name);
+ check_number_range($self, $key, $min, $max);
  check_regexp($self, $key, $regexp);
  check_required($self, $key);
  check_string_begin($self, $key, $string_base);
@@ -466,6 +475,18 @@ Put error if check isn't ok.
 
 Returns undef.
 
+=head2 C<check_number_range>
+
+ check_number_range($self, $key, $min, $max);
+
+I<Since version 0.23.>
+
+Check if number defined by C<$key> is in range between C<$min> and C<$max>.
+
+Put error if check isn't ok.
+
+Returns undef.
+
 =head2 C<check_regexp>
 
  check_regexp($self, $key, $regexp);
@@ -572,6 +593,12 @@ Returns undef.
 
  check_number_of_items():
          %s for %s '%s' has multiple values.
+
+ check_number_range():
+         Parameter '%s' must be a number.
+                 Value: %s
+         Parameter '%s' must be a number between %s and %s.",
+                 Value: %s
 
  check_regexp():
          Parameter '%s' must have defined regexp.
@@ -1125,6 +1152,48 @@ Returns undef.
 
 =head1 EXAMPLE23
 
+=for comment filename=check_number_range_ok.pl
+
+ use strict;
+ use warnings;
+
+ use Mo::utils qw(check_number_range);
+
+ my $self = {
+         'key' => '10',
+ };
+ check_number_range($self, 'key', 1, 10);
+
+ # Print out.
+ print "ok\n";
+
+ # Output:
+ # ok
+
+=head1 EXAMPLE24
+
+=for comment filename=check_number_range_fail.pl
+
+ use strict;
+ use warnings;
+
+ $Error::Pure::TYPE = 'Error';
+
+ use Mo::utils qw(check_number_range);
+
+ my $self = {
+         'key' => 3,
+ };
+ check_number_range($self, 'key', 10, 12);
+
+ # Print out.
+ print "ok\n";
+
+ # Output like:
+ # #Error [...utils.pm:?] Parameter 'key' must be a number between 10 and 12.
+
+=head1 EXAMPLE25
+
 =for comment filename=check_regexp_ok.pl
 
  use strict;
@@ -1143,7 +1212,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE24
+=head1 EXAMPLE26
 
 =for comment filename=check_regexp_fail.pl
 
@@ -1166,7 +1235,7 @@ Returns undef.
  # Output like:
  # #Error [...utils.pm:?] Parameter 'key' does not match the specified regular expression.
 
-=head1 EXAMPLE25
+=head1 EXAMPLE27
 
 =for comment filename=check_required_ok.pl
 
@@ -1186,7 +1255,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE26
+=head1 EXAMPLE28
 
 =for comment filename=check_required_fail.pl
 
@@ -1209,7 +1278,7 @@ Returns undef.
  # Output like:
  # #Error [...utils.pm:?] Parameter 'key' is required.
 
-=head1 EXAMPLE27
+=head1 EXAMPLE29
 
 =for comment filename=check_string_begin_ok.pl
 
@@ -1229,7 +1298,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE28
+=head1 EXAMPLE30
 
 =for comment filename=check_string_begin_fail.pl
 
@@ -1252,7 +1321,7 @@ Returns undef.
  # Output like:
  # #Error [...utils.pm:?] Parameter 'key' must begin with defined string base.
 
-=head1 EXAMPLE29
+=head1 EXAMPLE31
 
 =for comment filename=check_strings_ok.pl
 
@@ -1272,7 +1341,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE30
+=head1 EXAMPLE32
 
 =for comment filename=check_strings_fail.pl
 
@@ -1343,6 +1412,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.22
+0.23
 
 =cut

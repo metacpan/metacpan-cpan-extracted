@@ -1,5 +1,8 @@
 # Revision history for Resource::Silo
 
+- 0.1202  Wed Feb 28 2024
+    - Documentation changes only
+
 - 0.12    Sun Feb 04 2024
     - [api] Added 'use Resource::Silo -shortcut => 'custom_function_name'
     - [doc] Rework documentation

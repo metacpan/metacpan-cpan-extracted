@@ -1,0 +1,4 @@
+<div>
+    <div>This is a custom web component</div>
+    <div id="message"></div>
+</div>

@@ -13,7 +13,7 @@ BEGIN {
         require Win32;
     }
 }
-our $VERSION = '1.52';
+our $VERSION = '1.53';
 
 sub ANY_PORT            { return 0 }
 sub _GETPWUID_DIR_INDEX { return 7 }
@@ -360,7 +360,10 @@ sub new {
         $profile->set_value( 'privacy.clearOnShutdown.sessions',    'true', 0 );
         $profile->set_value( 'privacy.clearOnShutdown.siteSettings', 'true',
             0 );
-        $profile->set_value( 'privacy.donottrackheader.enabled',   'true', 0 );
+        $profile->set_value( 'privacy.donottrackheader.enabled', 'true', 0 );
+        $profile->set_value( 'privacy.fingerprintingProtection', 'true', 0 );
+        $profile->set_value( 'privacy.fingerprintingProtection.pbmode',
+            'true', 0 );
         $profile->set_value( 'privacy.trackingprotection.enabled', 'true', 0 );
         $profile->set_value(
             'privacy.trackingprotection.fingerprinting.enabled',
@@ -527,7 +530,7 @@ Firefox::Marionette::Profile - Represents a prefs.js Firefox Profile
 
 =head1 VERSION
 
-Version 1.52
+Version 1.53
 
 =head1 SYNOPSIS
 

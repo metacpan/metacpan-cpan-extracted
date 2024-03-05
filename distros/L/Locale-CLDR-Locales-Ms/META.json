@@ -34,8 +34,7 @@
       "runtime" : {
          "requires" : {
             "DateTime" : "0.72",
-            "Locale::CLDR" : "v0.44.0",
-            "Locale::CLDR::Locales::Root" : "v0.44.0",
+            "Locale::CLDR" : "v0.44.1",
             "Moo" : "2",
             "MooX::ClassAttribute" : "0.011",
             "Type::Tiny" : "0",
@@ -47,39 +46,39 @@
    "provides" : {
       "Locale::CLDR::Locales::Ms" : {
          "file" : "lib/Locale/CLDR/Locales/Ms.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Ms::Arab" : {
          "file" : "lib/Locale/CLDR/Locales/Ms/Arab.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Ms::Arab::Bn" : {
          "file" : "lib/Locale/CLDR/Locales/Ms/Arab/Bn.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Ms::Arab::My" : {
          "file" : "lib/Locale/CLDR/Locales/Ms/Arab/My.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Ms::Latn" : {
          "file" : "lib/Locale/CLDR/Locales/Ms/Latn.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Ms::Latn::Bn" : {
          "file" : "lib/Locale/CLDR/Locales/Ms/Latn/Bn.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Ms::Latn::Id" : {
          "file" : "lib/Locale/CLDR/Locales/Ms/Latn/Id.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Ms::Latn::My" : {
          "file" : "lib/Locale/CLDR/Locales/Ms/Latn/My.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Ms::Latn::Sg" : {
          "file" : "lib/Locale/CLDR/Locales/Ms/Latn/Sg.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       }
    },
    "release_status" : "stable",
@@ -92,6 +91,6 @@
          "url" : "https://github.com/ThePilgrim/perlcldr.git"
       }
    },
-   "version" : "v0.44.0",
+   "version" : "v0.44.1",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

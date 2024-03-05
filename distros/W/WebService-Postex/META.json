@@ -4,7 +4,7 @@
       "Wesley Schwengle <waterkip@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "bsd"
    ],
@@ -64,7 +64,6 @@
       },
       "test" : {
          "requires" : {
-            "DateTime" : "0",
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
@@ -80,7 +79,7 @@
    "provides" : {
       "WebService::Postex" : {
          "file" : "lib/WebService/Postex.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
@@ -91,12 +90,12 @@
          "web" : "https://gitlab.com/opndev/perl5/webservice-postex"
       }
    },
-   "version" : "0.004",
+   "version" : "0.006",
    "x_contributors" : [
       "Wesley Schwengle <wesley@opndev.io>"
    ],
-   "x_generated_by_perl" : "v5.36.0",
+   "x_generated_by_perl" : "v5.38.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
-   "x_spdx_expression" : "BSD"
+   "x_spdx_expression" : "BSD-3-Clause"
 }
 

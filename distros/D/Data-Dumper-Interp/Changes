@@ -1,5 +1,9 @@
 (Recent) Revision history for Perl extension Data-Dumper-Interp
 
+7.008 - Remove multiple "use 5.xxx" which is deprecated in Perl 5.39.8
+7.005 - Windows portability; Rm multiple use VERSION (deprecated in perl 5.9)
+7.004 - 'd' method modifier ("debug friendly") enables 'condense' and, if
+        STDOUT is a utf-encoding handle, 'spacedots'.  Always used by dvis.
 7.003 - Fix bug where $. was not preserved on first call (termwidth detection)
 7.002 - Use wide chars only with Useqq("unicode") and utf STDOUT or ERR.
         'l' method modifier omits quotes in vis() string result.

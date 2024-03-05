@@ -7,11 +7,12 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'ExtUtils::CChecker',
    requires => {
+      'perl' => '5.014',
+
       'ExtUtils::CBuilder' => 0,
    },
    test_requires => {
-      'Test::More' => '0.88', # done_testing
-      'Test::Fatal' => 0,
+      'Test2::V0' => 0,
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires

@@ -42,7 +42,7 @@
    "provides" : {
       "SQL::Abstract::More" : {
          "file" : "lib/SQL/Abstract/More.pm",
-         "version" : "1.42"
+         "version" : "1.43"
       }
    },
    "release_status" : "stable",
@@ -54,6 +54,6 @@
          "url" : "https://github.com/damil/SQL-Abstract-More"
       }
    },
-   "version" : "1.42",
+   "version" : "1.43",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

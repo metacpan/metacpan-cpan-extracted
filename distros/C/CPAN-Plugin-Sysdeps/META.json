@@ -45,6 +45,6 @@
          "url" : "git://github.com/eserte/cpan-plugin-sysdeps.git"
       }
    },
-   "version" : "0.73",
+   "version" : "0.75",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

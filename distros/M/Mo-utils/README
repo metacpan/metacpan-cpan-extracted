@@ -18,6 +18,7 @@ SYNOPSIS
      check_length_fix($self, $key, $length);
      check_number($self, $key);
      check_number_of_items($self, $list_method, $item_method, $object_name, $item_name);
+     check_number_range($self, $key, $min, $max);
      check_regexp($self, $key, $regexp);
      check_required($self, $key);
      check_string_begin($self, $key, $string_base);
@@ -156,6 +157,17 @@ SUBROUTINES
 
     Returns undef.
 
+  "check_number_range"
+     check_number_range($self, $key, $min, $max);
+
+    *Since version 0.23.*
+
+    Check if number defined by $key is in range between $min and $max.
+
+    Put error if check isn't ok.
+
+    Returns undef.
+
   "check_regexp"
      check_regexp($self, $key, $regexp);
 
@@ -258,6 +270,12 @@ ERRORS
 
      check_number_of_items():
              %s for %s '%s' has multiple values.
+
+     check_number_range():
+             Parameter '%s' must be a number.
+                     Value: %s
+             Parameter '%s' must be a number between %s and %s.",
+                     Value: %s
 
      check_regexp():
              Parameter '%s' must have defined regexp.
@@ -747,6 +765,42 @@ EXAMPLE23
      use strict;
      use warnings;
 
+     use Mo::utils qw(check_number_range);
+
+     my $self = {
+             'key' => '10',
+     };
+     check_number_range($self, 'key', 1, 10);
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE24
+     use strict;
+     use warnings;
+
+     $Error::Pure::TYPE = 'Error';
+
+     use Mo::utils qw(check_number_range);
+
+     my $self = {
+             'key' => 3,
+     };
+     check_number_range($self, 'key', 10, 12);
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [...utils.pm:?] Parameter 'key' must be a number between 10 and 12.
+
+EXAMPLE25
+     use strict;
+     use warnings;
+
      use Mo::utils qw(check_regexp);
 
      my $self = {
@@ -760,7 +814,7 @@ EXAMPLE23
      # Output:
      # ok
 
-EXAMPLE24
+EXAMPLE26
      use strict;
      use warnings;
 
@@ -780,7 +834,7 @@ EXAMPLE24
      # Output like:
      # #Error [...utils.pm:?] Parameter 'key' does not match the specified regular expression.
 
-EXAMPLE25
+EXAMPLE27
      use strict;
      use warnings;
 
@@ -797,7 +851,7 @@ EXAMPLE25
      # Output:
      # ok
 
-EXAMPLE26
+EXAMPLE28
      use strict;
      use warnings;
 
@@ -817,7 +871,7 @@ EXAMPLE26
      # Output like:
      # #Error [...utils.pm:?] Parameter 'key' is required.
 
-EXAMPLE27
+EXAMPLE29
      use strict;
      use warnings;
 
@@ -834,7 +888,7 @@ EXAMPLE27
      # Output:
      # ok
 
-EXAMPLE28
+EXAMPLE30
      use strict;
      use warnings;
 
@@ -854,7 +908,7 @@ EXAMPLE28
      # Output like:
      # #Error [...utils.pm:?] Parameter 'key' must begin with defined string base.
 
-EXAMPLE29
+EXAMPLE31
      use strict;
      use warnings;
 
@@ -871,7 +925,7 @@ EXAMPLE29
      # Output:
      # ok
 
-EXAMPLE30
+EXAMPLE32
      use strict;
      use warnings;
 
@@ -920,5 +974,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.22
+    0.23
 

@@ -7,23 +7,45 @@ use Sort::Versions;
 
 use alienfile;
 
-# we support any CFITSIO library higher than this
-use constant CFITSIO_VERSION => '4.3.0';
+# tie versions of this module and CFITSIO.  CFITSIO's code is very
+# backwards compatible, but their build configuration may break, which
+# will cause the unnecessary failure to build this module.
 
-my %req_version = (
-    defined $ENV{ALIEN_CFITSIO_EXACT_VERSION}
-    ? ( exact_version => $ENV{ALIEN_CFITSIO_EXACT_VERSION} )
-    : ( atleast_version => $ENV{ALIEN_CFITSIO_ATLEAST_VERSION} // CFITSIO_VERSION ) );
+use constant CFITSIO_VERSION => '4.4.0';
 
-die( "This distribution only supports CFITSIO versions @{[ CFITSIO_VERSION]} or greater\n" )
-  if versioncmp( CFITSIO_VERSION, (values(%req_version))[0]) == 1;
+# allow tweaks for testing.
+# DON'T USE THIS UNLESS YOU LIKE TO PUT YOUR HAND ON A HOT STOVE.
+
+use constant { map { uc($_) => $_ } 'exact_version', 'atleast_version' };
+
+my %VersionMatchEnvs = (
+    ALIEN_CFITSIO_EXACT_VERSION => EXACT_VERSION,
+    ALIEN_CFITSIO_ATLEAST_VERSION => ATLEAST_VERSION,
+);
+
+my ( $version_match, @extra ) =  grep { defined $ENV{$_} } keys %VersionMatchEnvs;
+
+die( 'specify only one of the environment variables: ' . join( ', ', keys %VersionMatchEnvs ) ) if @extra;
+
+my $requested_version;
+if ( defined $version_match ) {
+    $requested_version = $ENV{$version_match};
+    $version_match = $VersionMatchEnvs{$version_match};
+}
+else {
+    $version_match = EXACT_VERSION;
+    $requested_version = CFITSIO_VERSION;
+}
+
+die( "This distribution only supports CFITSIO versions @{[ CFITSIO_VERSION]} or (usually) greater\n" )
+  if versioncmp( CFITSIO_VERSION, $requested_version) == 1;
 
 plugin 'Gather::IsolateDynamic';
 
 
 plugin PkgConfig => (
     pkg_name => 'cfitsio',
-    %req_version,
+    $version_match => $requested_version,
 );
 
 share {
@@ -37,11 +59,11 @@ share {
             my ( $orig, $build, @args ) = @_;
             my $ret  = $build->$orig( @args );
             my $list = $ret->{list};
-            if ( exists $req_version{exact_version} ) {
-                $ret->{list} = [ grep { $_->{version} eq $req_version{exact_version} } @$list ];
+            if ( $version_match eq EXACT_VERSION )  {
+                $ret->{list} = [ grep { $_->{version} eq $requested_version } @$list ];
             }
             else {
-                $ret->{list} = [grep { versioncmp( $req_version{atleast_version}, $_->{version} ) < 1 } @$list ];
+                $ret->{list} = [grep { versioncmp( $requested_version, $_->{version} ) < 1 } @$list ];
             }
             return $ret;
         } );

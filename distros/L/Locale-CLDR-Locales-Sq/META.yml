@@ -22,22 +22,22 @@ name: Locale-CLDR-Locales-Sq
 provides:
   Locale::CLDR::Locales::Sq:
     file: lib/Locale/CLDR/Locales/Sq.pm
-    version: v0.44.0
+    version: v0.44.1
   Locale::CLDR::Locales::Sq::Latn:
     file: lib/Locale/CLDR/Locales/Sq/Latn.pm
-    version: v0.44.0
+    version: v0.44.1
   Locale::CLDR::Locales::Sq::Latn::Al:
     file: lib/Locale/CLDR/Locales/Sq/Latn/Al.pm
-    version: v0.44.0
+    version: v0.44.1
   Locale::CLDR::Locales::Sq::Latn::Mk:
     file: lib/Locale/CLDR/Locales/Sq/Latn/Mk.pm
-    version: v0.44.0
+    version: v0.44.1
   Locale::CLDR::Locales::Sq::Latn::Xk:
     file: lib/Locale/CLDR/Locales/Sq/Latn/Xk.pm
-    version: v0.44.0
+    version: v0.44.1
 requires:
   DateTime: '0.72'
-  Locale::CLDR: v0.44.0
+  Locale::CLDR: v0.44.1
   Moo: '2'
   MooX::ClassAttribute: '0.011'
   Type::Tiny: '0'
@@ -47,5 +47,5 @@ resources:
   bugtracker: https://github.com/ThePilgrim/perlcldr/issues
   homepage: https://github.com/ThePilgrim/perlcldr
   repository: https://github.com/ThePilgrim/perlcldr.git
-version: v0.44.0
+version: v0.44.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

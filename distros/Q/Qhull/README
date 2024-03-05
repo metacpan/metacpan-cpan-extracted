@@ -1,0 +1,45 @@
+Qhull
+
+This is an alpha quality interface to the qhull <https://qhull.org>
+library and executables.
+
+At present this module punts to Qhull::PP, which is a wrapper around
+qhull executable, not the library.
+
+At present see Qhull::PP for a discussion of the arguments to qhull.
+
+  Future API
+
+qhull has an interesting manner of setting up options, used by both the
+executable and the library entry point. It may be impossible to get this
+to look Perlish, especially as the qhull manual page is required to
+properly use its facilities.
+
+The final interface, which will be the same for the library and the
+executable wrapper is still in flux.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2024 by Smithsonian Astrophysical
+Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007

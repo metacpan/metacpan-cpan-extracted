@@ -1,3 +1,7 @@
+0.76 2024-03-02
+    * Unset x_static_install , which means that some installers will actually
+      install the log_server script. Provided by zmughal.
+
 0.75 2023-07-21
     * Various build and test upgrades, no code changes, no need to upgrade
 

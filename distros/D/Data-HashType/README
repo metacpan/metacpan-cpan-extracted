@@ -17,7 +17,7 @@ METHODS
 
     *       "active"
 
-            Flag for activity of hash type. Possible valuea are 0/1. Default
+            Flag for activity of hash type. Possible value is 0/1. Default
             value is 1 (active).
 
     *       "id"
@@ -55,13 +55,14 @@ METHODS
 
 ERRORS
      new():
-             Parameter 'active' must be a bool (0/1).
-                     Value: %s
-             Parameter 'id' must be a number.
-                     Value: %s
-             Parameter 'name' has length greater than '50'.
-                     Value: %s
-             Parameter 'name' is required.
+             From Mo::utils:
+                     Parameter 'active' must be a bool (0/1).
+                             Value: %s
+                     Parameter 'id' must be a number.
+                             Value: %s
+                     Parameter 'name' has length greater than '50'.
+                             Value: %s
+                     Parameter 'name' is required.
 
 EXAMPLE
      use strict;
@@ -97,10 +98,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2023 Michal Josef Špaček
+    © 2023-2024 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.02
+    0.03
 

@@ -32,7 +32,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.88",
     "lib" => 0
   },
-  "VERSION" => "0.27",
+  "VERSION" => "0.28",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -55,7 +55,7 @@ my %FallbackPrereqs = (
 
 # inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.040
 if ("$]" >= 5.008004 and want_xs()) {
-  requires('Variable::OnDestruct', '0.07');
+  requires('Variable::Magic', '0.48');
 
   # make sure we smoke the pure-perl version fallback
   test_requires('Devel::Hide', '0.0007') if is_smoker();

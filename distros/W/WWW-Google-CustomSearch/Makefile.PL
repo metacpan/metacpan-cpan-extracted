@@ -31,12 +31,12 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'WWW::Google::CustomSearch'          => { file => 'lib/WWW/Google/CustomSearch.pm',         version => '0.39' },
-            'WWW::Google::CustomSearch::Item'    => { file => 'lib/WWW/Google/CustomSearch/Item.pm',    version => '0.39' },
-            'WWW::Google::CustomSearch::Page'    => { file => 'lib/WWW/Google/CustomSearch/Page.pm',    version => '0.39' },
-            'WWW::Google::CustomSearch::Params'  => { file => 'lib/WWW/Google/CustomSearch/Params.pm',  version => '0.39' },
-            'WWW::Google::CustomSearch::Request' => { file => 'lib/WWW/Google/CustomSearch/Request.pm', version => '0.39' },
-            'WWW::Google::CustomSearch::Result'  => { file => 'lib/WWW/Google/CustomSearch/Result.pm',  version => '0.39' },
+            'WWW::Google::CustomSearch'          => { file => 'lib/WWW/Google/CustomSearch.pm',         version => '0.40' },
+            'WWW::Google::CustomSearch::Item'    => { file => 'lib/WWW/Google/CustomSearch/Item.pm',    version => '0.40' },
+            'WWW::Google::CustomSearch::Page'    => { file => 'lib/WWW/Google/CustomSearch/Page.pm',    version => '0.40' },
+            'WWW::Google::CustomSearch::Params'  => { file => 'lib/WWW/Google/CustomSearch/Params.pm',  version => '0.40' },
+            'WWW::Google::CustomSearch::Request' => { file => 'lib/WWW/Google/CustomSearch/Request.pm', version => '0.40' },
+            'WWW::Google::CustomSearch::Result'  => { file => 'lib/WWW/Google/CustomSearch/Result.pm',  version => '0.40' },
         },
         resources => {
             repository => {

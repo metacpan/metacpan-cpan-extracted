@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc::TransferDaemon;
 # ABSTRACT: Service de transfert de fichiers
-$Koha::Contrib::Sudoc::TransferDaemon::VERSION = '2.43';
+$Koha::Contrib::Sudoc::TransferDaemon::VERSION = '2.45';
 use Moose;
 use Modern::Perl;
 use utf8;
@@ -138,7 +138,7 @@ Koha::Contrib::Sudoc::TransferDaemon - Service de transfert de fichiers
 
 =head1 VERSION
 
-version 2.43
+version 2.45
 
 =head1 AUTHOR
 

@@ -1,5 +1,18 @@
 Revision history for WebService-Postex
 
+0.006     2024-02-29 03:44:29Z
+
+    * 0.005 as a real release
+
+0.005     2024-02-07 19:15:03Z (TRIAL RELEASE)
+
+    BREAKING CHANGES
+    * Change Postex API to version 2
+      * All POST methods are now PUT
+      * Generation services have changed endpoints
+      * Removed function profile_file_upload. It is unclear what happened this
+        this call.
+
 0.004     2023-09-15 20:05:14Z
 
     * Change to Object::Pad from Moose

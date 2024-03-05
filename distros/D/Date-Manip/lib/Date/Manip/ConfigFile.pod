@@ -66,7 +66,8 @@ want to include.
 
   YYtoYYYY                = 89
   FirstDay                = 1
-  Jan1Week1               = 0
+  Use_POSIX_Printf        = 0
+  Week1ofYear             = jan4
   Printable               = 0
   DefaultTime             = midnight
   RecurRange              = none

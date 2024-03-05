@@ -16,6 +16,7 @@ plan tests => 9 + $no_warnings;
 
 use Neo4j::Driver;
 use Neo4j::Driver::Events;
+use Neo4j_Test::MockHTTP;
 
 
 my ($m, $p);
@@ -220,11 +221,14 @@ subtest 'errors' => sub {
 subtest 'register via driver' => sub {
 	my $d;
 	plan skip_all => '(driver constructor failed)' unless eval { $d = Neo4j::Driver->new };
-	plan tests => 3;
+	plan tests => 5;
 	lives_ok { $d->plugin( Neo4j_Test::Plugin::RegisterFoo->new ) } 'plugin with instance';
 	is $d->{plugins}->{_foo}, 'foo', 'package set _foo';
 	throws_ok { $d->plugin( Neo4j_Test::Plugin::RegisterFoo->new, 1 ) }
 		qr/\bplugin\b.*\bmore than one argument\b.*\bunsupported\b/i, 'extra';
+	lives_ok { $d->plugin( Neo4j_Test::MockHTTP->new )->session } 'get MockHTTP session';
+	throws_ok { $d->plugin( Neo4j_Test::Plugin::RegisterFoo->new ) }
+		qr/\bsequence\b.*\bplugin\b.*\bsession\b/i, 'wrong sequence';
 };
 
 

@@ -15,6 +15,26 @@ Also, the Changes document is automatically generated from the document:
 and that document should be considered the canonical source for all change
 related information.
 
+6.95  expected 2024-03-01
+  -  Better support for weeks of the year
+         Added the Week1ofYear config variable and deprecated the Jan1Week1
+         variable. The first week of the year can now be specified much more
+         easily.
+
+  -  Support for the standard POSIX strftime directives in printf
+         The Date::Manip::Date::printf method uses a set of directives which
+         is similar, but not identical, to the POSIX strftime directives.
+
+         A new config variable Use_POSIX_Printf has been added. If set, the
+         printf method will use the POSIX strftime directives more fully
+         (see the PRINTF DIRECTIVES section in the Date::Manip::Date POD for
+         more information).
+
+         Reported in GitHub #48
+
+  -  Time zone fixes
+         Newest zoneinfo data (tzdata 2024a).
+
 6.94  2024-01-09
   -  Time zone fixes
          The 6.93 release didn't include the windows timezone aliases from

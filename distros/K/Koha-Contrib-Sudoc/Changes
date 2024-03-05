@@ -1,5 +1,9 @@
 Revision history for Perl module Koha::Contrib::Sudoc
 
+2.44 2024-02-29
+
+  - Méthode GET en SFTP
+
 2.43 2024-01-18
 
   - Adaptation pour Elasticsearch 7

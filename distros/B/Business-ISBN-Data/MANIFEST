@@ -10,9 +10,12 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 README.pod
+t/business-isbn.t
 t/check_data_structure.t
 t/default_data.t
+t/get_data.t
 t/load.t
+t/parse.t
 t/pod.t
 t/pod_coverage.t
 t/test_manifest

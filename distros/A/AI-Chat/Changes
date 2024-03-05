@@ -1,0 +1,9 @@
+Revision history for AI-Chat
+
+0.2     3rd March 2024
+         Add 'debug' option to allow problems to be traced
+         Corrected grammar in POD
+
+0.1     2nd March 2024
+         First version, released on an unsuspecting world.
+

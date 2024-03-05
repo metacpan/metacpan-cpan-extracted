@@ -1,3 +1,8 @@
+0.23 2024-03-04T11:52:32+01:00
+ - Add check_number_range().
+ - Move error test in tests of check_number() to the end.
+ - Rewrite check_angle() to new check_number_range().
+
 0.22 2024-02-11T23:29:01+01:00
  - Add check_length_fix().
  - Add information about module version for checks in doc.

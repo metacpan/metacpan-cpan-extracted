@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ps - Package for language Pashto
 
 package Locale::CLDR::Locales::Ps;
 # This file auto generated from Data\common\main\ps.xml
-#	on Sun 25 Feb 10:41:40 am GMT
+#	on Thu 29 Feb  5:43:51 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.0');
+our $VERSION = version->declare('v0.44.1');
 
 use v5.10.1;
 use mro 'c3';

@@ -29,6 +29,8 @@ internal/langpod
 internal/leak.pl
 internal/module.isp
 internal/NOTES
+internal/printf_format.c
+internal/printf_format.pl
 internal/TODO
 internal/TODO.7
 internal/translate
@@ -889,6 +891,7 @@ lib/Date/Manip/Zones.pod
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
 README
 README.first
 t/.ppo.yaml
@@ -1003,6 +1006,8 @@ t/date.prev.t
 t/date.prev_business_day.t
 t/date.printf.0.t
 t/date.printf.1.t
+t/date.printf.2.t
+t/date.printf.weekofyear.t
 t/date.secs_since_1970_GMT.0.t
 t/date.secs_since_1970_GMT.1.t
 t/date.set.0.t

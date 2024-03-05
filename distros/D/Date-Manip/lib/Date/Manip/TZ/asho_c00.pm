@@ -6,9 +6,9 @@ Date::Manip::TZ::asho_c00;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Tue Jan  9 14:20:54 EST 2024
-#    Data version: tzdata2023d
-#    Code version: tzcode2023d
+#    Generated on: Fri Mar  1 11:04:42 EST 2024
+#    Data version: tzdata2024a
+#    Code version: tzcode2024a
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -25,7 +25,7 @@ END {
 }
 
 our ($VERSION);
-$VERSION='6.94';
+$VERSION='6.95';
 END { undef $VERSION; }
 
 %Dates         = (
@@ -65,14 +65,14 @@ END { undef $VERSION; }
    1947 =>
      [
         [ [1947,3,31,17,0,0],[1947,4,1,1,0,0],'+08:00:00',[8,0,0],
-          '+08',0,[1955,6,30,15,59,59],[1955,6,30,23,59,59],
-          '1947033117:00:00','1947040101:00:00','1955063015:59:59','1955063023:59:59' ],
+          '+08',0,[1955,6,30,16,59,59],[1955,7,1,0,59,59],
+          '1947033117:00:00','1947040101:00:00','1955063016:59:59','1955070100:59:59' ],
      ],
    1955 =>
      [
-        [ [1955,6,30,16,0,0],[1955,6,30,23,0,0],'+07:00:00',[7,0,0],
+        [ [1955,6,30,17,0,0],[1955,7,1,0,0,0],'+07:00:00',[7,0,0],
           '+07',0,[1959,12,31,15,59,59],[1959,12,31,22,59,59],
-          '1955063016:00:00','1955063023:00:00','1959123115:59:59','1959123122:59:59' ],
+          '1955063017:00:00','1955070100:00:00','1959123115:59:59','1959123122:59:59' ],
      ],
    1959 =>
      [

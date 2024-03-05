@@ -6,12 +6,12 @@ use warnings;
 
 # X-UI-Out-Filterresults: unknown:0;
 sub description { '1&1: https://www.1und1.de/' }
-sub make {
+sub inquire {
     # Detect an error from 1&1
     # @param    [Hash] mhead    Message headers of a bounce email
     # @param    [String] mbody  Message body of a bounce email
     # @return   [Hash]          Bounce data list and message/rfc822 part
-    # @return   [Undef]         failed to parse or the arguments are missing
+    # @return   [undef]         failed to parse or the arguments are missing
     # @since v4.1.9
     my $class = shift;
     my $mhead = shift // return undef;
@@ -21,7 +21,7 @@ sub make {
     return undef unless $mhead->{'subject'} eq 'Mail delivery failed: returning message to sender';
 
     state $indicators = __PACKAGE__->INDICATORS;
-    state $rebackbone = qr|^---[ ]The[ ]header[ ]of[ ]the[ ]original[ ]message[ ]is[ ]following[.][ ]---|m;
+    state $boundaries = ['--- The header of the original message is following. ---'];
     state $startingof = {
         'message' => ['This message was created automatically by mail delivery software'],
         'error'   => ['For the following reason:'],
@@ -29,14 +29,14 @@ sub make {
     state $messagesof = { 'mesgtoobig' => ['Mail size limit exceeded'] };
 
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
-    my $emailsteak = Sisimai::RFC5322->fillet($mbody, $rebackbone);
+    my $emailparts = Sisimai::RFC5322->part($mbody, $boundaries);
     my $readcursor = 0;     # (Integer) Points the current cursor position
     my $recipients = 0;     # (Integer) The number of 'Final-Recipient' header
     my $v = undef;
 
-    for my $e ( split("\n", $emailsteak->[0]) ) {
-        # Read error messages and delivery status lines from the head of the email
-        # to the previous line of the beginning of the original message.
+    for my $e ( split("\n", $emailparts->[0]) ) {
+        # Read error messages and delivery status lines from the head of the email to the previous
+        # line of the beginning of the original message.
         unless( $readcursor ) {
             # Beginning of the bounce message or message/delivery-status part
             $readcursor |= $indicators->{'deliverystatus'} if index($e, $startingof->{'message'}->[0]) == 0;
@@ -55,14 +55,15 @@ sub make {
         # http://postmaster.1and1.com/en/error-messages?ip=%1s
         $v = $dscontents->[-1];
 
-        if( $e =~ /\A([^ ]+[@][^ ]+?)[:]?\z/ ) {
-            # general@example.eu
+        if( $e =~ /\A\s*([^ ]+[@][^ ]+?)[:]?\z/ ) {
+            # general@example.eu OR
+            # the line begin with 4 space characters, end with ":" like "    neko@example.eu:"
             if( $v->{'recipient'} ) {
                 # There are multiple recipient addresses in the message body.
                 push @$dscontents, __PACKAGE__->DELIVERYSTATUS;
                 $v = $dscontents->[-1];
             }
-            $v->{'recipient'} = $1;
+            $v->{'recipient'} = Sisimai::Address->s3s4($e);
             $recipients++;
 
         } elsif( index($e, $startingof->{'error'}->[0]) == 0 ) {
@@ -84,31 +85,36 @@ sub make {
     }
     return undef unless $recipients;
 
+    require Sisimai::SMTP::Command;
     for my $e ( @$dscontents ) {
         $e->{'diagnosis'} ||= $e->{'alterrors'} || '';
+        $e->{'command'}     = Sisimai::SMTP::Command->find($e->{'diagnosis'});
 
-        if( $e->{'diagnosis'} =~ /host:[ ]+(.+?)[ ]+.+[ ]+reason:.+/ ) {
+        if( Sisimai::String->aligned(\$e->{'diagnosis'}, ['host: ', ' reason:']) ) {
             # SMTP error from remote server for TEXT command,
             #   host: smtp-in.orange.fr (193.252.22.65)
             #   reason: 550 5.2.0 Mail rejete. Mail rejected. ofr_506 [506]
-            $e->{'rhost'}   = $1;
-            $e->{'command'} = 'DATA' if $e->{'diagnosis'} =~ /for TEXT command/;
-            $e->{'spec'}    = 'SMTP' if $e->{'diagnosis'} =~ /SMTP error/;
+            my $p1 = index($e->{'diagnosis'}, 'host: ');
+            my $p2 = index($e->{'diagnosis'}, ' reason:');
+
+            $e->{'rhost'}   = Sisimai::String->sweep(substr($e->{'diagnosis'}, $p1 + 6, $p2 - $p1 - 6));
+            $e->{'command'} = 'DATA' if index($e->{'diagnosis'}, 'for TEXT command') > -1;
+            $e->{'spec'}    = 'SMTP' if index($e->{'diagnosis'}, 'SMTP error')       > -1;
             $e->{'status'}  = Sisimai::SMTP::Status->find($e->{'diagnosis'});
         } else {
             # For the following reason:
-            $e->{'diagnosis'} =~ s/\A$startingof->{'error'}->[0]//g;
+            substr($e->{'diagnosis'}, 0, length $startingof->{'error'}->[0], '');
         }
         $e->{'diagnosis'} = Sisimai::String->sweep($e->{'diagnosis'});
 
         SESSION: for my $r ( keys %$messagesof ) {
             # Verify each regular expression of session errors
-            next unless grep { index($e->{'diagnosis'}, $_) > -1 } @{ $messagesof->{ $r } };
+            next unless grep { index($e->{'diagnosis'}, $_) > -1 } $messagesof->{ $r }->@*;
             $e->{'reason'} = $r;
             last;
         }
     }
-    return { 'ds' => $dscontents, 'rfc822' => $emailsteak->[1] };
+    return { 'ds' => $dscontents, 'rfc822' => $emailparts->[1] };
 }
 
 1;
@@ -126,8 +132,8 @@ Sisimai::Lhost::EinsUndEins - bounce mail parser class for C<1&1>.
 
 =head1 DESCRIPTION
 
-Sisimai::Lhost::EinsUndEins parses a bounce email which created by C<1&1>.
-Methods in the module are called from only Sisimai::Message.
+Sisimai::Lhost::EinsUndEins parses a bounce email which created by C<1&1>. Methods in the module are
+called from only Sisimai::Message.
 
 =head1 CLASS METHODS
 
@@ -137,10 +143,10 @@ C<description()> returns description string of this module.
 
     print Sisimai::Lhost::EinsUndEins->description;
 
-=head2 C<B<make(I<header data>, I<reference to body string>)>>
+=head2 C<B<inquire(I<header data>, I<reference to body string>)>>
 
-C<make()> method parses a bounced email and return results as a array reference.
-See Sisimai::Message for more details.
+C<inquire()> method parses a bounced email and return results as a array reference. See Sisimai::Message
+for more details.
 
 =head1 AUTHOR
 
@@ -148,7 +154,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2021 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2024 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

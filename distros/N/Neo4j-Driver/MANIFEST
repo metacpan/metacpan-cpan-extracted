@@ -30,6 +30,7 @@ lib/Neo4j/Driver/StatementResult.pm
 lib/Neo4j/Driver/SummaryCounters.pm
 lib/Neo4j/Driver/TODO.pod
 lib/Neo4j/Driver/Transaction.pm
+lib/Neo4j/Driver/Type/Bytes.pm
 lib/Neo4j/Driver/Type/DateTime.pm
 lib/Neo4j/Driver/Type/Duration.pm
 lib/Neo4j/Driver/Type/Node.pm
@@ -55,6 +56,7 @@ t/lib/Neo4j_Test/NetModulePlugin.pm
 t/lib/Neo4j_Test/Sim.pm
 t/net-lwp.t
 t/plugins.t
+t/record-ambiguous.t
 t/record.t
 t/session-execute.t
 t/session.t

@@ -22,22 +22,22 @@ name: Locale-CLDR-Locales-Aa
 provides:
   Locale::CLDR::Locales::Aa:
     file: lib/Locale/CLDR/Locales/Aa.pm
-    version: v0.44.0
+    version: v0.44.1
   Locale::CLDR::Locales::Aa::Latn:
     file: lib/Locale/CLDR/Locales/Aa/Latn.pm
-    version: v0.44.0
+    version: v0.44.1
   Locale::CLDR::Locales::Aa::Latn::Dj:
     file: lib/Locale/CLDR/Locales/Aa/Latn/Dj.pm
-    version: v0.44.0
+    version: v0.44.1
   Locale::CLDR::Locales::Aa::Latn::Er:
     file: lib/Locale/CLDR/Locales/Aa/Latn/Er.pm
-    version: v0.44.0
+    version: v0.44.1
   Locale::CLDR::Locales::Aa::Latn::Et:
     file: lib/Locale/CLDR/Locales/Aa/Latn/Et.pm
-    version: v0.44.0
+    version: v0.44.1
 requires:
   DateTime: '0.72'
-  Locale::CLDR: v0.44.0
+  Locale::CLDR: v0.44.1
   Moo: '2'
   MooX::ClassAttribute: '0.011'
   Type::Tiny: '0'
@@ -47,5 +47,5 @@ resources:
   bugtracker: https://github.com/ThePilgrim/perlcldr/issues
   homepage: https://github.com/ThePilgrim/perlcldr
   repository: https://github.com/ThePilgrim/perlcldr.git
-version: v0.44.0
+version: v0.44.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

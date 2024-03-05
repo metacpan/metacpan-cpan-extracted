@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ff - Package for language Fula
 
 package Locale::CLDR::Locales::Ff;
 # This file auto generated from Data\common\main\ff.xml
-#	on Sun 25 Feb 10:41:40 am GMT
+#	on Thu 29 Feb  5:43:51 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.0');
+our $VERSION = version->declare('v0.44.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -328,10 +328,6 @@ has 'algorithmic_number_format_data' => (
 					divisor => q(1),
 					rule => q(ɓolum),
 				},
-				'x.x' => {
-					divisor => q(1),
-					rule => q(=#,##0.0=),
-				},
 				'1' => {
 					base_value => q(1),
 					divisor => q(1),
@@ -435,9 +431,13 @@ has 'algorithmic_number_format_data' => (
 					divisor => q(1),
 					rule => q(alaa limoore),
 				},
+				'x.x' => {
+					divisor => q(1),
+					rule => q(=#,##0.0=),
+				},
 				'max' => {
 					divisor => q(1),
-					rule => q(alaa limoore),
+					rule => q(=#,##0.0=),
 				},
 			},
 		},

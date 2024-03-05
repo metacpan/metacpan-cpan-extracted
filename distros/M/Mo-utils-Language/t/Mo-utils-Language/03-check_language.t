@@ -14,8 +14,8 @@ my $self = {
 eval {
 	check_language($self, 'key');
 };
-is($EVAL_ERROR, "Language code 'foo' isn't ISO 639-1 code.\n",
-	"Language code 'foo' isn't ISO 639-1 code.");
+is($EVAL_ERROR, "Parameter 'key' doesn't contain valid ISO 639-1 code.\n",
+	"Parameter 'key' doesn't contain valid ISO 639-1 code (foo).");
 clean();
 
 # Test.
@@ -25,8 +25,8 @@ $self = {
 eval {
 	check_language($self, 'key');
 };
-is($EVAL_ERROR, "Language code 'xx' isn't ISO 639-1 code.\n",
-	"Language code 'xx' isn't ISO 639-1 code.");
+is($EVAL_ERROR, "Parameter 'key' doesn't contain valid ISO 639-1 code.\n",
+	"Parameter 'key' doesn't contain valid ISO 639-1 code (xx).");
 clean();
 
 # Test.

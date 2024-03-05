@@ -60,4 +60,5 @@
 
 ^\.travis\.yml$
 ^appveyor\.yml$
+^\.github/.*
 ^CPAN-Plugin-Sysdeps-.*\.tar\.gz$

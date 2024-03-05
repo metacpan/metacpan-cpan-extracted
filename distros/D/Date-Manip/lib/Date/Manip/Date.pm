@@ -28,7 +28,7 @@ use Date::Manip::Base;
 use Date::Manip::TZ;
 
 our $VERSION;
-$VERSION='6.94';
+$VERSION='6.95';
 END { undef $VERSION; }
 
 ########################################################################
@@ -624,12 +624,20 @@ sub parse_format {
       } elsif ($g) {
          $y         = $dmt->_now('y',$noupdate)  if (! $y);
          $noupdate  = 1;
-         ($y,$m,$d) = @{ $dmb->_week_of_year($g,$w,1) };
+
+         my $currfirst = $dmb->_config('firstday');
+         $dmb->config('firstday',1);
+         ($y,$m,$d) = @{ $dmb->week_of_year($g,$w) };
+         $dmb->config('firstday',$currfirst);
 
       } elsif ($l) {
          $y         = $dmt->_now('y',$noupdate)  if (! $y);
          $noupdate  = 1;
-         ($y,$m,$d) = @{ $dmb->_week_of_year($l,$u,7) };
+
+         my $currfirst = $dmb->_config('firstday');
+         $dmb->config('firstday',7);
+         ($y,$m,$d) = @{ $dmb->week_of_year($l,$u) };
+         $dmb->config('firstday',$currfirst);
 
       } elsif ($m) {
          ($y,$m,$d) = $self->_def_date($y,$m,$d,\$noupdate);
@@ -3964,38 +3972,19 @@ sub week_of_year {
       return undef;
    }
 
-   my $dmt = $$self{'tz'};
-   my $dmb = $$dmt{'base'};
-   my $date     = $$self{'data'}{'date'};
-   my $y        = $$date[0];
+   my $dmt   = $$self{'tz'};
+   my $dmb   = $$dmt{'base'};
+   my $date  = $$self{'data'}{'date'};
+   my ($y,$m,$d) = @$date;
 
-   my($day,$dow,$doy,$f);
-   $doy = $dmb->day_of_year($date);
+   my $currfirst = $dmb->_config('firstday');
+   $dmb->config('firstday',$first);
+   my($yy,$wk) = $dmb->week_of_year([$y,$m,$d]);
+   $dmb->config('firstday',$currfirst);
 
-   # The date in January which must belong to the first week, and
-   # it's DayOfWeek.
-   if ($dmb->_config('jan1week1')) {
-      $day=1;
-   } else {
-      $day=4;
-   }
-   $dow = $dmb->day_of_week([$y,1,$day]);
-
-   # The start DayOfWeek. If $first is passed in, use it. Otherwise,
-   # use FirstDay.
-
-   if (! $first) {
-      $first = $dmb->_config('firstday');
-   }
-
-   # Find the pseudo-date of the first day of the first week (it may
-   # be negative meaning it occurs last year).
-
-   $first  -= 7  if ($first > $dow);
-   $day    -= ($dow-$first);
-
-   return 0  if ($day>$doy);    # Day is in last week of previous year
-   return (($doy-$day)/7 + 1);
+   return 53  if ($yy > $y);
+   return  0  if ($yy < $y);
+   return $wk;
 }
 
 sub complete {
@@ -4487,11 +4476,20 @@ sub _holidays {
 # PRINTF METHOD
 
 BEGIN {
-   my %pad_0  = map { $_,1 } qw ( Y m d H M S I j G W L U );
-   my %pad_sp = map { $_,1 } qw ( y f e k i );
-   my %hr     = map { $_,1 } qw ( H k I i );
-   my %dow    = map { $_,1 } qw ( v a A w );
-   my %num    = map { $_,1 } qw ( Y m d H M S y f e k I i j G W L U );
+   my %pad_0      = map { $_,1 } qw ( Y m d H M S I j G W L U );
+   my %pad_0_pos  = map { $_,1 } qw ( Y m d H M S I j G W L U V g );
+
+   my %pad_sp     = map { $_,1 } qw ( y f e k i );
+   my %pad_sp_pos = map { $_,1 } qw ( y f e k i l );
+
+   my %hr         = map { $_,1 } qw ( H k I i );
+   my %hr_pos     = map { $_,1 } qw ( H k I i l );
+
+   my %dow        = map { $_,1 } qw ( v a A w );
+   my %dow_pos    = map { $_,1 } qw ( v a A w u );
+
+   my %num        = map { $_,1 } qw ( Y m d H M S y f e k I i j G W L U );
+   my %num_pos    = map { $_,1 } qw ( Y m d H M S y f e k I i j G W L U g V C l u );
 
    sub printf {
       my($self,@in) = @_;
@@ -4502,6 +4500,8 @@ BEGIN {
 
       my $dmt = $$self{'tz'};
       my $dmb = $$dmt{'base'};
+
+      my $posix = $dmb->_config('use_posix_printf');
 
       my($y,$m,$d,$h,$mn,$s) = @{ $$self{'data'}{'date'} };
 
@@ -4564,30 +4564,58 @@ BEGIN {
 
             my ($val,$pad,$len,$dow);
 
-            if (exists $pad_0{$f}) {
+            if ((! $posix  &&  exists $pad_0{$f})  ||
+                ($posix  &&  exists $pad_0_pos{$f})) {
                $pad = '0';
             }
 
-            if (exists $pad_sp{$f}) {
+            if ((! $posix  &&  exists $pad_sp{$f})  ||
+                ($posix &&  exists $pad_sp_pos{$f})) {
                $pad = ' ';
             }
 
-            if ($f eq 'G'  ||  $f eq 'W') {
-               my($yy,$ww) = $dmb->_week_of_year(1,[$y,$m,$d]);
-               if ($f eq 'G') {
-                  $val = $yy;
-                  $len = 4;
-               } else {
-                  $val = $ww;
-                  $len = 2;
-               }
-            }
+            # Year/week
 
-            if ($f eq 'L'  ||  $f eq 'U') {
-               my($yy,$ww) = $dmb->_week_of_year(7,[$y,$m,$d]);
-               if ($f eq 'L') {
+            if ($f eq 'G'  ||
+                $f eq 'W'  ||
+                $f eq 'L'  ||
+                $f eq 'U'  ||
+                ($f eq 'g' && $posix)  ||
+                ($f eq 'V' && $posix)
+               ) {
+
+               my $week1ofyear;
+               my $firstday;
+               if ($f eq 'L' || $f eq 'U') {
+                  $firstday = 7;
+               } else {
+                  $firstday = 1;
+               }
+
+               if ($posix && ($f eq 'G' ||
+                              $f eq 'g' ||
+                              $f eq 'V' ||
+                              $f eq 'L')) {
+                  $week1ofyear = 'jan4';
+               } elsif ($posix && ($f eq 'W')) {
+                  $week1ofyear = 1;
+               } elsif ($posix && ($f eq 'U')) {
+                  $week1ofyear = 7;
+               } else {
+                  $week1ofyear = $dmb->_config('week1ofyear');
+               }
+
+               my($yy,$ww) = $dmb->_week_of_year($firstday,$week1ofyear,[$y,$m,$d]);
+               if ($f eq 'G'  ||
+                   $f eq 'L') {
                   $val = $yy;
                   $len = 4;
+
+               } elsif ($f eq 'g') {
+                  $yy  =~ /^..(..)/;
+                  $val = $1;
+                  $len = 2;
+
                } else {
                   $val = $ww;
                   $len = 2;
@@ -4597,6 +4625,12 @@ BEGIN {
             if ($f eq 'Y'  ||  $f eq 'y') {
                $val = $y;
                $len = 4;
+            }
+
+            if ($f eq 'C'  &&  $posix) {
+               $y   =~ /^(..)/;
+               $val = $1;
+               $len = 2;
             }
 
             if ($f eq 'm'  ||  $f eq 'f') {
@@ -4615,9 +4649,10 @@ BEGIN {
             }
 
 
-            if (exists $hr{$f}) {
+            if ((! $posix  &&  exists $hr{$f}) ||
+                (  $posix  &&  exists $hr_pos{$f})) {
                $val = $h;
-               if ($f eq 'I'  ||  $f eq 'i') {
+               if ($f eq 'I'  ||  $f eq 'i'  ||  $f eq 'l') {
                   $val -= 12  if ($val > 12);
                   $val  = 12  if ($val == 0);
                }
@@ -4634,13 +4669,18 @@ BEGIN {
                $len = 2;
             }
 
-            if (exists $dow{$f}) {
+            if ((! $posix  &&  exists $dow{$f})  ||
+                ($posix  &&  exists $dow_pos{$f})) {
                $dow = $dmb->day_of_week([$y,$m,$d]);
+               $dow = 7  if ($f eq 'u'  &&  $dow == 0);
+               $val = $dow;
+               $len = 1;
             }
 
             ###
 
-            if (exists $num{$f}) {
+            if ( (! $posix && exists $num{$f})  ||
+                 ($posix  &&  exists $num_pos{$f})) {
                while (length($val) < $len) {
                   $val = "$pad$val";
                }
@@ -4665,9 +4705,10 @@ BEGIN {
             } elsif ($f eq 'w') {
                $val = $dow;
 
-            } elsif ($f eq 'p') {
+            } elsif ($f eq 'p'  ||  ($f eq 'P' && $posix)) {
                my $i = ($h >= 12 ? 1 : 0);
                $val  = $$dmb{'data'}{'wordlist'}{'ampm'}[$i];
+               $val  = lc($val)  if ($f eq 'P');
 
             } elsif ($f eq 'Z') {
                $val  = $$self{'data'}{'abb'};
@@ -4694,7 +4735,7 @@ BEGIN {
                my $delta = $date2->calc($self);
                $val = $delta->printf('%sys');
 
-            } elsif ($f eq 'l') {
+            } elsif ($f eq 'l'  &&  ! $posix) {
                my $d0 = $self->new_date();
                my $d1 = $self->new_date();
                $d0->parse('-0:6:0:0:0:0:0'); # 6 months ago
@@ -4713,11 +4754,11 @@ BEGIN {
                $in  = '%a %b %e %H:%M:%S %Y' . $in;
                $val = '';
 
-            } elsif ($f eq 'C'  ||  $f eq 'u') {
+            } elsif (($f eq 'C'  &&  ! $posix) ||  $f eq 'u') {
                $in  = '%a %b %e %H:%M:%S %Z %Y' . $in;
                $val = '';
 
-            } elsif ($f eq 'g') {
+            } elsif ($f eq 'g'  &&  ! $posix) {
                $in  = '%a, %d %b %Y %H:%M:%S %Z' . $in;
                $val = '';
 
@@ -4737,7 +4778,7 @@ BEGIN {
                $in  = '%H:%M:%S' . $in;
                $val = '';
 
-            } elsif ($f eq 'V') {
+            } elsif ($f eq 'V'  &&  ! $posix) {
                $in  = '%m%d%H%M%y' . $in;
                $val = '';
 
@@ -4749,7 +4790,7 @@ BEGIN {
                $in  = '%Y%m%d%H%M%S' . $in;
                $val = '';
 
-            } elsif ($f eq 'P') {
+            } elsif ($f eq 'P'  &&  ! $posix) {
                $in  = '%Y%m%d%H:%M:%S' . $in;
                $val = '';
 
@@ -4758,7 +4799,11 @@ BEGIN {
                $val = '';
 
             } elsif ($f eq 'F') {
-               $in  = '%A, %B %e, %Y' . $in;
+               if ($posix) {
+                  $in = '%Y-%m-%d' . $in;
+               } else {
+                  $in  = '%A, %B %e, %Y' . $in;
+               }
                $val = '';
 
             } elsif ($f eq 'K') {
@@ -4774,7 +4819,11 @@ BEGIN {
                $val = '';
 
             } elsif ($f eq 'J') {
-               $in  = '%G-W%W-%w' . $in;
+               if ($posix) {
+                  $in  = '%G-W%V-%w' . $in;
+               } else {
+                  $in  = '%G-W%W-%w' . $in;
+               }
                $val = '';
 
             } elsif ($f eq 'n') {

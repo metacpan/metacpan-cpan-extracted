@@ -60,12 +60,6 @@ our $IS_WINDOWS = is_os_type('Windows');
 $| = 1;
 
 #
-# A global flag coming from environment that disabled JIT in PCRE2. This should never be needed, but JIT
-# MAY not compile on your architecture.
-#
-our $JIT = $ENV{MARPAESLIFPERL_JIT} // 1;
-
-#
 # Our distribution have both C and CPP files, and we want to make sure that modifying
 # CFLAGS will not affect cpp files. Since we require a version of ExtUtils::CBuilder
 # that support the environment variables, explicitely setting the environment variables
@@ -86,7 +80,7 @@ $ENV{CXXFLAGS} = $cbuilder_config{cxxflags} // $cbuilder_config{ccflags} // '';
 $ENV{LD} = $cbuilder_config{ld} // $ENV{CC};
 $ENV{LDFLAGS} //= '';
 my @OTHERLDFLAGS = ();
-my $optimize;
+my $optimize = '';
 
 print "==========================================\n";
 print "Original compilers and linker settings as per ExtUtils::CBuilder\n";
@@ -111,6 +105,8 @@ $ac->check_cc;
 # Sun C compiler is a special case, we know that guess_compiler will always get it wrong
 #
 my $sunc = 0;
+my $is_gnu = check_compiler_is_gnu($ac);
+my $is_clang = check_compiler_is_clang($ac);
 $ac->msg_checking(sprintf "if this is Sun C compiler");
 if ($ac->link_if_else("#ifdef __SUNPRO_C\n#else\n#error \"this is not Sun C compiler\"\n#endif\nint main() { return 0; }")) {
     $ac->msg_result('yes');
@@ -313,16 +309,16 @@ my $has_Werror = 0;
 if(! defined($ENV{MARPAESLIFPERL_OPTIM}) || $ENV{MARPAESLIFPERL_OPTIM}) {
     if(defined($ENV{MARPAESLIFPERL_OPTIM_FLAGS})) {
 	$optimize = "$ENV{MARPAESLIFPERL_OPTIM_FLAGS}";
+	$optimize =~ s/^\s*//;
+	$optimize =~ s/\s$//;
 	$ac->msg_notice("Forced optimization flags: $optimize");
     } else {
-	$ac->msg_checking("optimization flags:");
-	$ac->msg_result('');
 	if (($cbuilder_config{cc} // 'cc') eq 'cl') {
 	    foreach my $flag ("/O2") {
 		$ac->msg_checking("if flag $flag works:");
 		if (try_compile("#include <stdlib.h>\nint main() {\n  exit(0);\n}\n", { extra_compiler_flags => $flag })) {
 		    $ac->msg_result('yes');
-		    $optimize .= " $flag";
+		    $optimize = $flag;
 		    last;
 		} else {
 		    $ac->msg_result('no');
@@ -348,15 +344,17 @@ if(! defined($ENV{MARPAESLIFPERL_OPTIM}) || $ENV{MARPAESLIFPERL_OPTIM}) {
             my @flag_candidates = ();
             if ($sunc) {
                 push(@flag_candidates, "-xO3"); # CC
+            } elsif ($is_gnu || $is_clang) {
+                push(@flag_candidates, "-O3"); # gcc, clang
             } else {
-                push(@flag_candidates, "-O3 -qstrict"); # xlc
-                push(@flag_candidates, "-O3"); # cl, gcc, clang
+                push(@flag_candidates, "-O3 -qstrict"); # xlc maybe ?
+                push(@flag_candidates, "-O3"); # Others
             }
 	    foreach my $flag (@flag_candidates) {
 		$ac->msg_checking("if flag $flag works:");
 		if (try_compile("#include <stdlib.h>\nint main() {\n  exit(0);\n}\n", { extra_compiler_flags => "$tmpflag $flag" })) {
 		    $ac->msg_result('yes');
-		    $optimize .= " $flag";
+		    $optimize = $flag;
 		    last;
 		} else {
 		    $ac->msg_result('no');
@@ -503,8 +501,6 @@ my $have__O_BINARY = $ac->check_decl('_O_BINARY', { prologue => "#include <fcntl
 my $have_wcrtomb = $ac->check_decl('wcrtomb', { prologue => "#include <wchar.h>" });
 my $have_mbrtowc = $ac->check_decl('mbrtowc', { prologue => "#include <wchar.h>" });
 my $broken_wchar = check_broken_wchar($ac);
-my $is_gnu = check_compiler_is_gnu($ac);
-my $is_clang = check_compiler_is_clang($ac);
 if($has_Werror) {
     my $tmpflag = '-Werror=attributes';
     my $has_Werror_attributes = 0;
@@ -2472,7 +2468,7 @@ BODY
 sub check_compiler_is_gnu {
     my ($ac) = @_;
 
-    $ac->msg_checking('GNU compiler');
+    $ac->msg_checking('if this is GNU compiler');
     my $rc;
     my $prologue = <<PROLOGUE;
 #if !defined(__GNUC__)
@@ -2496,7 +2492,7 @@ PROLOGUE
 sub check_compiler_is_clang {
     my ($ac) = @_;
 
-    $ac->msg_checking('Clang compiler');
+    $ac->msg_checking('if this is Clang compiler');
     my $rc;
     my $prologue = <<PROLOGUE;
 #if !defined(__clang__)
@@ -2893,16 +2889,9 @@ sub process_genericLogger {
     #
     # Compile
     #
-    my $b = get_cbuilder();
     my @sources = ( File::Spec->catfile($outdir, 'src', 'genericLogger.c') );
     foreach my $source (@sources) {
-        $b->compile
-            (
-             source => $source,
-             include_dirs => \@include_dirs,
-             object_file => get_object_file($source),
-             extra_compiler_flags => \@extra_compiler_flags
-            );
+        build_object($source, include_dirs => \@include_dirs, extra_compiler_flags => \@extra_compiler_flags);
     }
 }
 
@@ -2964,7 +2953,6 @@ sub process_tconv {
     #
     # Compile
     #
-    my $b = get_cbuilder();
     my @sources =
         (
          File::Spec->catfile($outdir, 'src', 'tconv.c'),
@@ -2981,13 +2969,7 @@ sub process_tconv {
 	push(@include_dirs, File::Spec->catdir($EXTRACT_DIR, 'dlfcn-win32-1.4.1', 'src'));
     }
     foreach my $source (@sources) {
-        $b->compile
-            (
-             source => $source,
-             object_file => get_object_file($source),
-             include_dirs => \@include_dirs,
-             extra_compiler_flags => \@extra_compiler_flags
-            );
+        build_object($source, include_dirs => \@include_dirs, extra_compiler_flags => \@extra_compiler_flags);
     }
 }
 
@@ -3028,7 +3010,6 @@ sub process_marpaWrapper {
     #
     # Compile
     #
-    my $b = get_cbuilder();
     my @sources =
         (
          File::Spec->catfile($outdir, 'amalgamation', 'marpaWrapper.c')
@@ -3045,13 +3026,7 @@ sub process_marpaWrapper {
         );
 
     foreach my $source (@sources) {
-        $b->compile
-            (
-             source => $source,
-             object_file => get_object_file($source),
-             include_dirs => \@include_dirs,
-             extra_compiler_flags => \@extra_compiler_flags
-            );
+        build_object($source, include_dirs => \@include_dirs, extra_compiler_flags => \@extra_compiler_flags);
     }
 }
 
@@ -3149,7 +3124,6 @@ EXTRA_DEFINES
     #
     # Compile
     #
-    my $b = get_cbuilder();
     my @sources =
         (
          File::Spec->catfile($outdir, 'src', 'marpaESLIF.c')
@@ -3171,13 +3145,7 @@ EXTRA_DEFINES
         );
 
     foreach my $source (@sources) {
-        $b->compile
-            (
-             source => $source,
-             object_file => get_object_file($source),
-             include_dirs => \@include_dirs,
-             extra_compiler_flags => \@extra_compiler_flags
-            );
+        build_object($source, include_dirs => \@include_dirs, extra_compiler_flags => \@extra_compiler_flags);
     }
 }
 
@@ -3277,24 +3245,18 @@ sub process_libiconv {
     #
     # Compile
     #
-    my $b = get_cbuilder();
     my @sources = (
         File::Spec->catfile($outdir, 'libcharset', 'lib', 'localcharset.c'),
         File::Spec->catfile($outdir, 'lib', 'relocatable.c'),
         File::Spec->catfile($outdir, 'lib', 'iconv.c'),
         );
     generate_export_h($ac, $outdir, 'libiconv', undef, undef, undef, undef, "#define ICONV_CONST\n");
+    my @include_dirs = (
+        File::Spec->catdir($outdir, 'libcharset', 'include'),
+        File::Spec->catdir($outdir, 'include'),
+        );
     foreach my $source (@sources) {
-        $b->compile
-            (
-             source => $source,
-             object_file => get_object_file($source),
-             include_dirs => [
-                 File::Spec->catdir($outdir, 'libcharset', 'include'),
-                 File::Spec->catdir($outdir, 'include'),
-             ],
-             extra_compiler_flags => \@extra_compiler_flags
-            );
+        build_object($source, include_dirs => \@include_dirs, extra_compiler_flags => \@extra_compiler_flags);
     }
 }
 
@@ -3368,20 +3330,13 @@ PRMEM_H
     #
     # Compile
     #
-    my $b = get_cbuilder();
     my @include_dirs = (
         File::Spec->catdir($outdir, 'src', 'ext', 'libcharsetdetect', 'mozilla', 'extensions', 'universalchardet', 'src', 'base'),
         File::Spec->catdir($outdir, 'src', 'ext', 'libcharsetdetect', 'nspr-emu'),
         File::Spec->catdir($outdir, 'src', 'ext', 'libcharsetdetect'),
         );
     foreach my $source (@sources) {
-        $b->compile
-            (
-             source => $source,
-             object_file => get_object_file($source),
-             include_dirs => \@include_dirs,
-             'C++' => 1
-            );
+        build_object($source, include_dirs => \@include_dirs, 'C++' => 1);
     }
 }
 
@@ -3404,17 +3359,11 @@ sub process_dlfcn_win32 {
     #
     # Compile
     #
-    my $b = get_cbuilder();
     my @include_dirs = (
         File::Spec->catdir($outdir, 'src'),
         );
     foreach my $source (@sources) {
-        $b->compile
-            (
-             source => $source,
-             object_file => get_object_file($source),
-             include_dirs => \@include_dirs
-            );
+        build_object($source, include_dirs => \@include_dirs);
     }
 }
 
@@ -3454,46 +3403,11 @@ sub process_pcre2 {
     print $fh $content;
     close($fh) || warn "Cannot close $pcre2_h, $!";
 
-    my $b = get_cbuilder();
     my @include_dirs = ( File::Spec->catfile($outdir, 'src') );
-    copy(File::Spec->catfile($outdir, 'src', 'pcre2_chartables.c.dist'), File::Spec->catfile($outdir, 'src', 'pcre2_chartables.c'));
-    my @sources =
-        (
-         File::Spec->catfile($outdir, 'src', 'pcre2_auto_possess.c'),
-         File::Spec->catfile($outdir, 'src', 'pcre2_compile.c'),
-         File::Spec->catfile($outdir, 'src', 'pcre2_config.c'),
-         File::Spec->catfile($outdir, 'src', 'pcre2_context.c'),
-         File::Spec->catfile($outdir, 'src', 'pcre2_convert.c'),
-         File::Spec->catfile($outdir, 'src', 'pcre2_dfa_match.c'),
-         File::Spec->catfile($outdir, 'src', 'pcre2_error.c'),
-         File::Spec->catfile($outdir, 'src', 'pcre2_extuni.c'),
-         File::Spec->catfile($outdir, 'src', 'pcre2_find_bracket.c'),
-         File::Spec->catfile($outdir, 'src', 'pcre2_jit_compile.c'),
-         File::Spec->catfile($outdir, 'src', 'pcre2_maketables.c'),
-         File::Spec->catfile($outdir, 'src', 'pcre2_match.c'),
-         File::Spec->catfile($outdir, 'src', 'pcre2_match_data.c'),
-         File::Spec->catfile($outdir, 'src', 'pcre2_newline.c'),
-         File::Spec->catfile($outdir, 'src', 'pcre2_ord2utf.c'),
-         File::Spec->catfile($outdir, 'src', 'pcre2_pattern_info.c'),
-         File::Spec->catfile($outdir, 'src', 'pcre2_script_run.c'),
-         File::Spec->catfile($outdir, 'src', 'pcre2_serialize.c'),
-         File::Spec->catfile($outdir, 'src', 'pcre2_string_utils.c'),
-         File::Spec->catfile($outdir, 'src', 'pcre2_study.c'),
-         File::Spec->catfile($outdir, 'src', 'pcre2_substitute.c'),
-         File::Spec->catfile($outdir, 'src', 'pcre2_substring.c'),
-         File::Spec->catfile($outdir, 'src', 'pcre2_tables.c'),
-         File::Spec->catfile($outdir, 'src', 'pcre2_ucd.c'),
-         File::Spec->catfile($outdir, 'src', 'pcre2_valid_utf.c'),
-         File::Spec->catfile($outdir, 'src', 'pcre2_xclass.c'),
-         File::Spec->catfile($outdir, 'src', 'pcre2_chartables.c')
-        );
     my @extra_compiler_flags = ();
     push(@extra_compiler_flags, "-DDHAVE_CONFIG_H=1");
     push(@extra_compiler_flags, "-DPCRE2_CODE_UNIT_WIDTH=8");
     push(@extra_compiler_flags, "-DPCRE2_STATIC=1");
-    if ($JIT) {
-	push(@extra_compiler_flags, "-DSUPPORT_JIT=1");
-    }
     push(@extra_compiler_flags, "-DDHAVE_CONFIG_H=1");
     #
     # SUPPORT_UNICODE and EBCDIC are not compatible
@@ -3513,14 +3427,65 @@ sub process_pcre2 {
     push(@extra_compiler_flags, '-DPCRE2GREP_BUFSIZE=20480');
     push(@extra_compiler_flags, '-DMAX_NAME_SIZE=32');
     push(@extra_compiler_flags, '-DMAX_NAME_COUNT=10000');
+    #
+    # We check if pcre2_jit compiles. It happens that it does not, usually because
+    # of the compiler version
+    #
+    $ac->msg_checking("if enabling JIT in PCRE2 compiles");
+    my $pcre2_jit_compile_c = File::Spec->catfile($outdir, 'src', 'pcre2_jit_compile.c');
+    push(@extra_compiler_flags, "-DSUPPORT_JIT=1");
+    my $jit_is_ok = 1;
+    try {
+        build_object($pcre2_jit_compile_c, include_dirs => \@include_dirs, extra_compiler_flags => \@extra_compiler_flags);
+	$ac->msg_result("yes");
+    } catch {
+	$ac->msg_result("no");
+	pop(@extra_compiler_flags);
+	$jit_is_ok = 0;
+    };
+    #
+    # Compile all remaining PCRE2 files. See that $pcre2_jit_compile_c is still present in the source.
+    # But it compiles to a no-op if SUPPORT_JIT is not set.
+    #
+    copy(File::Spec->catfile($outdir, 'src', 'pcre2_chartables.c.dist'), File::Spec->catfile($outdir, 'src', 'pcre2_chartables.c'));
+    my @sources =
+        (
+         File::Spec->catfile($outdir, 'src', 'pcre2_auto_possess.c'),
+         File::Spec->catfile($outdir, 'src', 'pcre2_compile.c'),
+         File::Spec->catfile($outdir, 'src', 'pcre2_config.c'),
+         File::Spec->catfile($outdir, 'src', 'pcre2_context.c'),
+         File::Spec->catfile($outdir, 'src', 'pcre2_convert.c'),
+         File::Spec->catfile($outdir, 'src', 'pcre2_dfa_match.c'),
+         File::Spec->catfile($outdir, 'src', 'pcre2_error.c'),
+         File::Spec->catfile($outdir, 'src', 'pcre2_extuni.c'),
+         File::Spec->catfile($outdir, 'src', 'pcre2_find_bracket.c'),
+         File::Spec->catfile($outdir, 'src', 'pcre2_maketables.c'),
+         File::Spec->catfile($outdir, 'src', 'pcre2_match.c'),
+         File::Spec->catfile($outdir, 'src', 'pcre2_match_data.c'),
+         File::Spec->catfile($outdir, 'src', 'pcre2_newline.c'),
+         File::Spec->catfile($outdir, 'src', 'pcre2_ord2utf.c'),
+         File::Spec->catfile($outdir, 'src', 'pcre2_pattern_info.c'),
+         File::Spec->catfile($outdir, 'src', 'pcre2_script_run.c'),
+         File::Spec->catfile($outdir, 'src', 'pcre2_serialize.c'),
+         File::Spec->catfile($outdir, 'src', 'pcre2_string_utils.c'),
+         File::Spec->catfile($outdir, 'src', 'pcre2_study.c'),
+         File::Spec->catfile($outdir, 'src', 'pcre2_substitute.c'),
+         File::Spec->catfile($outdir, 'src', 'pcre2_substring.c'),
+         File::Spec->catfile($outdir, 'src', 'pcre2_tables.c'),
+         File::Spec->catfile($outdir, 'src', 'pcre2_ucd.c'),
+         File::Spec->catfile($outdir, 'src', 'pcre2_valid_utf.c'),
+         File::Spec->catfile($outdir, 'src', 'pcre2_xclass.c'),
+         File::Spec->catfile($outdir, 'src', 'pcre2_chartables.c')
+        );
+    if (! $jit_is_ok) {
+	#
+	# pcre2_jit_compile.c did not compile. Add it again, this time SUPPORT_JIT will not be set,
+	# so it must have to compile fine.
+	#
+	push(@sources, $pcre2_jit_compile_c);
+    }
     foreach my $source (@sources) {
-        $b->compile
-            (
-             source => $source,
-             object_file => get_object_file($source),
-             include_dirs => \@include_dirs,
-             extra_compiler_flags => \@extra_compiler_flags
-            );
+        build_object($source, include_dirs => \@include_dirs, extra_compiler_flags => \@extra_compiler_flags);
     }
 }
 
@@ -3651,14 +3616,56 @@ BODY
     }
 }
 
-#
-# A specialized ExtUtils::CBuilder new wrapper, that gets optimize flag but do not propagate it to the caller via CFLAGS.txt
-#
-sub get_cbuilder {
-    my %EXTUTILS_BUILDER_CONFIG = ();
-    if ($optimize) {
-        $EXTUTILS_BUILDER_CONFIG{optimize} = $optimize;
-    }
+sub build_object {
+    my ($source, %coptions) = @_;
 
-    return ExtUtils::CBuilder->new(config => \%EXTUTILS_BUILDER_CONFIG);
+    #
+    # We know that some platforms cannot compile with our optimization
+    # flags, in particular marpaESLIF.c that is very big, causing
+    # at least memory exhaustion.
+    #
+    my $has_optimize = ($optimize =~ /[^\s]/);
+    #
+    # If optimization flag is not empty, try first with it, else
+    # retry without optimization flag
+    #
+    my $b;
+    try {
+        if ($has_optimize) {
+            $b = ExtUtils::CBuilder->new(config => { optimize => $optimize});
+        } else {
+            $b = ExtUtils::CBuilder->new();
+        }
+        $b->compile(%coptions,
+                    #
+                    # We want to be sure the object file is where we want
+                    #
+                    source => $source,
+                    object_file => get_object_file($source)
+            );
+    } catch {
+        #
+        # This is a fatal error unless there is an optimization flag that we can skip
+        #
+        if (! $has_optimize) {
+            die "$_";
+        } else {
+            print "!\n! Compilation of $source with $optimize failed:\n! $_\n";
+        }
+        #
+        # By definition an optimization flag was set
+        #
+        print "! Retrying to compile $source without optimization flag\n";
+        #
+        # retry without optimize, and without try/catch
+        #
+        $b = ExtUtils::CBuilder->new();
+        $b->compile(%coptions,
+                    #
+                    # We want to be sure the object file is where we want
+                    #
+                    source => $source,
+                    object_file => get_object_file($source)
+            );
+    };
 }

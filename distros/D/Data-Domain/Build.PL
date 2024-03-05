@@ -12,6 +12,7 @@ my $builder = Module::Build->new(
       'autouse'         => 0,
       'experimental'    => 0,
       'match::simple'   => 0,
+      'Carp'            => 0,
       'Date::Calc'      => 0,
       'List::Util'      => 1.45,
       'List::MoreUtils' => 0,

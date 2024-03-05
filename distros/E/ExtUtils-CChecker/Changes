@@ -1,5 +1,13 @@
 Revision history for ExtUtils-CChecker
 
+0.12    2024-03-02
+        [CHANGES]
+         * Document the `->define` method
+         * Overall module style updates
+            + `use v5.14` in all files
+            + use `package NAME VER` syntax
+            + Use `Test2::V0` instead of `Test::More` + `Test::Fatal`
+
 0.11    2021-07-12
         [CHANGES]
          * Added `try_find_cflags_for`

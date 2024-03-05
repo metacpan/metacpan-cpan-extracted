@@ -51,6 +51,7 @@
             "MooseX::RW::Reader" : "0",
             "MooseX::RW::Reader::File" : "0",
             "Net::FTP" : "0",
+            "Net::SFTP::Foreign" : "0",
             "Path::Tiny" : "0",
             "Pod::Usage" : "0",
             "Search::Elasticsearch" : "0",
@@ -75,7 +76,7 @@
          "url" : "https://github.com/fredericd/koha-sudoc"
       }
    },
-   "version" : "2.43",
+   "version" : "2.45",
    "x_generated_by_perl" : "v5.34.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
    "x_spdx_expression" : "GPL-3.0-only"

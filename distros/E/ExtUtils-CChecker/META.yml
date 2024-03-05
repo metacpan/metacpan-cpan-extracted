@@ -3,12 +3,11 @@ abstract: 'configure-time utilities for using C headers,'
 author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
-  Test::Fatal: '0'
-  Test::More: '0.88'
+  Test2::V0: '0'
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,10 +16,11 @@ name: ExtUtils-CChecker
 provides:
   ExtUtils::CChecker:
     file: lib/ExtUtils/CChecker.pm
-    version: '0.11'
+    version: '0.12'
 requires:
   ExtUtils::CBuilder: '0'
+  perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.11'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -14,7 +14,7 @@ MarpaX::ESLIF::Value::Interface - MarpaX::ESLIF's value interface
 
 =head1 VERSION
 
-version 6.0.33.3
+version 6.0.33.4
 
 =head1 DESCRIPTION
 

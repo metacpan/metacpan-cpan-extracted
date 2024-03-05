@@ -1,6 +1,7 @@
 ##########################################################################
 #                                                                        #
-# (C) Copyright IBM Corporation 2002, 2013 All rights reserved.          #
+# (C) Copyright IBM Corporation 2002, 2016 All rights reserved.          #
+# (C) Copyright HCL Technologies Ltd. 2016, 2019.  All Rights Reserved.  #
 #                                                                        #
 # This program and the accompanying materials are made available under   #
 # the terms of the Common Public License v1.0 which accompanies this     #
@@ -13,6 +14,11 @@
 #                                                                        #
 ##########################################################################
 
+1.15  Modify CtCmd to honor changed umask (requires a companion ClearCase fix).
+1.14  Enable Perl 64 bit for linux_x86_64
+1.13  Repair routine signatures
+1.12  Change pfm_init() calls to ks_system_init(), to support thread-safety
+      changes in the core CC libraries.
 1.11  Updated Makefile.PL to add /opt/rational/common/shlib to the library
       search path. This is needed to find the SSL libraries. Updated 
       Makefile.PL to force a 32-bit compile on Linux and AIX just in case 

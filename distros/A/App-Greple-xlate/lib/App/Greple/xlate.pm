@@ -1,6 +1,6 @@
 package App::Greple::xlate;
 
-our $VERSION = "0.30";
+our $VERSION = "0.31";
 
 =encoding utf-8
 
@@ -16,7 +16,7 @@ App::Greple::xlate - translation support module for greple
 
 =head1 VERSION
 
-Version 0.30
+Version 0.31
 
 =head1 DESCRIPTION
 
@@ -225,8 +225,60 @@ you don't want to remove them and keep in the file, use C<accumulate>.
 =head1 COMMAND LINE INTERFACE
 
 You can easily use this module from the command line by using the
-C<xlate> command included in the repository. See the C<xlate> help
+C<xlate> command included in the distribution. See the C<xlate> help
 information for usage.
+
+The C<xlate> command works in concert with the Docker environment, so
+even if you do not have anything installed on hand, you can use it as
+long as Docker is available.  Use C<-D> or C<-C> option.
+
+Also, since makefiles for various document styles are provided,
+translation into other languages is possible without special
+specification.  Use C<-M> option.
+
+You can also combine the Docker and make options so that you can run
+make in a Docker environment.
+
+Running like C<xlate -GC> will launch a shell with the current working
+git repository mounted.
+
+Read Japanese article in L</SEE ALSO> section for detail.
+
+    xlate [ options ] -t lang file [ greple options ]
+	-h   help
+	-v   show version
+	-d   debug
+	-n   dry-run
+	-a   use API
+	-c   just check translation area
+	-r   refresh cache
+	-s   silent mode
+	-e # translation engine (default "deepl")
+	-p # pattern to determine translation area
+	-w # wrap line by # width
+	-o # output format (default "xtxt", or "cm", "ifdef")
+	-f # from lang (ignored)
+	-t # to lang (required, no default)
+	-m # max length per API call
+	-l # show library files (XLATE.mk, xlate.el)
+        --   terminate option parsing
+    Make options
+	-M   run make
+	-n   dry-run
+    Docker options
+	-G   mount git top-level directory
+	-B   run in non-interactive (batch) mode
+	-R   mount read-only
+	-E * specify environment variable to be inherited
+	-I * specify altanative docker image (default: tecolicom/xlate:version)
+	-D * run xlate on the container with the rest parameters
+	-C * run following command on the container, or run shell
+
+    Control Files:
+	*.LANG    translation languates
+	*.FORMAT  translation foramt (xtxt, cm, ifdef)
+	*.ENGINE  translation engine (deepl or gpt3)
+
 
 =head1 EMACS
 
@@ -364,6 +416,7 @@ our %opt = (
     method   => \(our $cache_method //= $ENV{GREPLE_XLATE_CACHE} || 'auto'),
     dryrun   => \(our $dryrun = 0),
     maxlen   => \(our $max_length = 0),
+    prompt   => \(our $prompt),
 );
 lock_keys %opt;
 sub opt :lvalue { ${$opt{+shift}} }
@@ -565,6 +618,7 @@ builtin xlate-cache:s      $cache_method
 builtin xlate-engine=s     $xlate_engine
 builtin xlate-dryrun       $dryrun
 builtin xlate-maxlen=i     $max_length
+builtin xlate-prompt=s     $prompt
 
 builtin deepl-auth-key=s   $App::Greple::xlate::deepl::auth_key
 builtin deepl-method=s     $App::Greple::xlate::deepl::method

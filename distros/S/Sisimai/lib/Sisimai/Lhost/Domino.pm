@@ -5,28 +5,36 @@ use strict;
 use warnings;
 use Sisimai::String;
 use Encode;
-use Encode::Guess; Encode::Guess->add_suspects(@{ Sisimai::String->encodenames });
+use Encode::Guess; Encode::Guess->add_suspects(Sisimai::String->encodenames->@*);
 
 sub description { 'IBM Domino Server' }
-sub make {
+sub inquire {
     # Detect an error from IBM Domino
     # @param    [Hash] mhead    Message headers of a bounce email
     # @param    [String] mbody  Message body of a bounce email
     # @return   [Hash]          Bounce data list and message/rfc822 part
-    # @return   [Undef]         failed to parse or the arguments are missing
+    # @return   [undef]         failed to parse or the arguments are missing
     # @since v4.0.2
     my $class = shift;
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
-    return undef unless $mhead->{'subject'} =~ /\ADELIVERY(?:[ ]|_)FAILURE:/;
+    my $match = 0;
+
+    while(1) {
+        $match ||= 1 if index($mhead->{'subject'}, 'DELIVERY FAILURE:') == 0;
+        $match ||= 1 if index($mhead->{'subject'}, 'DELIVERY_FAILURE:') == 0;
+        last;
+    }
+    return undef unless $match > 0;
 
     state $indicators = __PACKAGE__->INDICATORS;
-    state $rebackbone = qr|^Content-Type:[ ]message/rfc822|m;
+    state $boundaries = ['Content-Type: message/rfc822'];
     state $startingof = { 'message' => ['Your message'] };
     state $messagesof = {
         'userunknown' => [
             'not listed in Domino Directory',
             'not listed in public Name & Address Book',
+            'no se encuentra en el Directorio de Domino',
             "non répertorié dans l'annuaire Domino",
             'Domino ディレクトリには見つかりません',
         ],
@@ -34,20 +42,19 @@ sub make {
         'systemerror' => ['Several matches found in Domino Directory'],
     };
 
-    require Sisimai::RFC1894;
     my $fieldtable = Sisimai::RFC1894->FIELDTABLE;
     my $permessage = {};    # (Hash) Store values of each Per-Message field
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
-    my $emailsteak = Sisimai::RFC5322->fillet($mbody, $rebackbone);
+    my $emailparts = Sisimai::RFC5322->part($mbody, $boundaries);
     my $readcursor = 0;     # (Integer) Points the current cursor position
     my $recipients = 0;     # (Integer) The number of 'Final-Recipient' header
     my $subjecttxt = '';    # (String) The value of Subject:
     my $v = undef;
     my $p = '';
 
-    for my $e ( split("\n", $emailsteak->[0]) ) {
-        # Read error messages and delivery status lines from the head of the email
-        # to the previous line of the beginning of the original message.
+    for my $e ( split("\n", $emailparts->[0]) ) {
+        # Read error messages and delivery status lines from the head of the email to the previous
+        # line of the beginning of the original message.
         unless( $readcursor ) {
             # Beginning of the bounce message or message/delivery-status part
             $readcursor |= $indicators->{'deliverystatus'} if index($e, $startingof->{'message'}->[0]) == 0;
@@ -79,10 +86,10 @@ sub make {
             $v->{'recipient'} ||= $e;
             $recipients++;
 
-        } elsif( $e =~ /\A[ ][ ]([^ ]+[@][^ ]+)\z/ ) {
+        } elsif( index($e, '  ') == 0 && index($e, '@') > -1 && index($e, ' ', 3) < 0 ) {
             # Continued from the line "was not delivered to:"
             #   kijitora@example.net
-            $v->{'recipient'} = Sisimai::Address->s3s4($1);
+            $v->{'recipient'} = Sisimai::Address->s3s4(substr($e, 2,));
 
         } elsif( $e eq 'because:' ) {
             # because:
@@ -93,9 +100,9 @@ sub make {
                 # Error message, continued from the line "because:"
                 $v->{'diagnosis'} = $e;
 
-            } elsif( $e =~ /\A[ ][ ]Subject: (.+)\z/ ) {
+            } elsif( index($e, '  Subject: ') == 0 ) {
                 #   Subject: Nyaa
-                $subjecttxt = $1;
+                $subjecttxt = substr($e, 11,); 
 
             } elsif( my $f = Sisimai::RFC1894->match($e) ) {
                 # There are some fields defined in RFC3464, try to match
@@ -144,18 +151,17 @@ sub make {
 
         for my $r ( keys %$messagesof ) {
             # Check each regular expression of Domino error messages
-            next unless grep { index($e->{'diagnosis'}, $_) > -1 } @{ $messagesof->{ $r } };
+            next unless grep { index($e->{'diagnosis'}, $_) > -1 } $messagesof->{ $r }->@*;
             $e->{'reason'}   = $r;
             $e->{'status'} ||= Sisimai::SMTP::Status->code($r, 0) || '';
             last;
         }
     }
 
-    # Set the value of $subjecttxt as a Subject if there is no original
-    # message in the bounce mail.
-    $emailsteak->[1] .= sprintf("Subject: %s\n", $subjecttxt) unless $emailsteak->[1] =~ /^Subject:/m;
+    # Set the value of $subjecttxt as a Subject if there is no original message in the bounce mail.
+    $emailparts->[1] .= sprintf("Subject: %s\n", $subjecttxt) if index($emailparts->[1], "\nSubject:") < 0;
 
-    return { 'ds' => $dscontents, 'rfc822' => $emailsteak->[1] };
+    return { 'ds' => $dscontents, 'rfc822' => $emailparts->[1] };
 }
 
 1;
@@ -173,8 +179,8 @@ Sisimai::Lhost::Domino - bounce mail parser class for IBM Domino Server.
 
 =head1 DESCRIPTION
 
-Sisimai::Lhost::Domino parses a bounce email which created by IBM Domino Server.
-Methods in the module are called from only Sisimai::Message.
+Sisimai::Lhost::Domino parses a bounce email which created by IBM Domino Server. Methods in the module
+are called from only Sisimai::Message.
 
 =head1 CLASS METHODS
 
@@ -184,10 +190,10 @@ C<description()> returns description string of this module.
 
     print Sisimai::Lhost::Domino->description;
 
-=head2 C<B<make(I<header data>, I<reference to body string>)>>
+=head2 C<B<inquire(I<header data>, I<reference to body string>)>>
 
-C<make()> method parses a bounced email and return results as a array reference.
-See Sisimai::Message for more details.
+C<inquire()> method parses a bounced email and return results as a array reference. See Sisimai::Message
+for more details.
 
 =head1 AUTHOR
 
@@ -195,7 +201,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2021 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2023 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

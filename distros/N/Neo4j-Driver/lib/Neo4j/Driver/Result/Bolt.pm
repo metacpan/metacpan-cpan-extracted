@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Result::Bolt;
 # ABSTRACT: Bolt result handler
-$Neo4j::Driver::Result::Bolt::VERSION = '0.45';
+$Neo4j::Driver::Result::Bolt::VERSION = '0.46';
 
 # This package is not part of the public Neo4j::Driver API.
 
@@ -20,7 +20,8 @@ use Neo4j::Driver::Net::Bolt;
 
 my ($FALSE, $TRUE) = Neo4j::Driver::Result->_bool_values;
 
-my @valid_bolt_neo4j_types = qw( Neo4j::Bolt::Bytes
+my @valid_bolt_neo4j_types = qw(
+	Neo4j::Bolt::Bytes
 	Neo4j::Bolt::DateTime
 	Neo4j::Bolt::Duration
 	Neo4j::Bolt::Point

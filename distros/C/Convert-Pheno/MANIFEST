@@ -9,7 +9,8 @@ lib/Convert/Pheno.pm
 lib/Convert/Pheno/BFF.pm
 lib/Convert/Pheno/CDISC.pm
 lib/Convert/Pheno/CSV.pm
-lib/Convert/Pheno/IO.pm
+lib/Convert/Pheno/IO/CSVHandler.pm
+lib/Convert/Pheno/IO/FileIO.pm
 lib/Convert/Pheno/Mapping.pm
 lib/Convert/Pheno/OMOP.pm
 lib/Convert/Pheno/PXF.pm
@@ -32,6 +33,8 @@ share/ex/perl.pl
 share/ex/python.py
 share/schema/mapping.json
 t/args.t
+t/bff2csv/out/individuals.csv
+t/bff2jsonf/out/individuals.fold.json
 t/bff2pxf/in/individuals.json
 t/bff2pxf/in/README
 t/bff2pxf/out/pxf.json
@@ -64,6 +67,8 @@ t/pxf2bff/in/pxf.yaml
 t/pxf2bff/in/README
 t/pxf2bff/out/individuals.json
 t/pxf2bff/out/individuals.yaml
+t/pxf2csv/out/pxf.csv
+t/pxf2jsonf/out/pxf.fold.json
 t/redcap2bff/err/redcap_mapping_err1.yaml
 t/redcap2bff/err/redcap_mapping_err2.yaml
 t/redcap2bff/err/redcap_mapping_err3.yaml

@@ -8,16 +8,16 @@ use Readonly;
 use Test::More 'tests' => 11;
 use Test::NoWarnings;
 
-Readonly::Array our @RIGTH_UNITS => qw(foo-bar foo bar123 foo_bar);
+Readonly::Array our @RIGTH_CLASSES => qw(foo-bar foo bar123 foo_bar);
 
 # Test.
 my ($ret, $self);
-foreach my $right_unit (@RIGTH_UNITS) {
+foreach my $right_class (@RIGTH_CLASSES) {
 	$self = {
-		'key' => $right_unit,
+		'key' => $right_class,
 	};
 	$ret = check_css_class($self, 'key');
-	is($ret, undef, 'Right CSS unit is present ('.$right_unit.').');
+	is($ret, undef, 'Right CSS class is present ('.$right_class.').');
 }
 
 # Test.
@@ -25,12 +25,12 @@ $self = {
 	'key' => undef,
 };
 $ret = check_css_class($self, 'key');
-is($ret, undef, 'Right CSS unit is present (undef).');
+is($ret, undef, 'Right CSS class is present (undef).');
 
 # Test.
 $self = {};
 $ret = check_css_class($self, 'key');
-is($ret, undef, 'Right CSS unit is present (key is not exists).');
+is($ret, undef, 'Right CSS class is present (key is not exists).');
 
 # Test.
 $self = {

@@ -9,6 +9,7 @@ build_requires:
   Readonly: 0
   Test::More: 0
   Test::NoWarnings: 0
+  Unicode::UTF8: 0
 configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
@@ -37,4 +38,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Mo-utils-URI
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Mo-utils-URI
-version: '0.01'
+version: '0.02'

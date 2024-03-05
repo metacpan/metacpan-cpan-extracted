@@ -587,8 +587,8 @@ int32_t SPVM__TestCase__NativeAPI__check_native_api_constant_values(SPVM_ENV* en
 
 int32_t SPVM__TestCase__NativeAPI__spvm_warn(SPVM_ENV* env, SPVM_VALUE* stack) {
   
-  spvm_warn("spvm_warn test: %s %d", "aaa", 3);
-  spvm_warn("spvm_warn test:Foo");
+  spvm_warn("[Test Output]spvm_warn: %s %d", "aaa", 3);
+  spvm_warn("[Test Output]spvm_warn:Foo");
   
   stack[0].ival = 1;
   
@@ -597,8 +597,8 @@ int32_t SPVM__TestCase__NativeAPI__spvm_warn(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__TestCase__NativeAPI__spvm_warnf(SPVM_ENV* env, SPVM_VALUE* stack) {
   
-  spvm_warnf(env->api->runtime->get_spvm_stderr(env->runtime), "spvm_warnf test: %s %d", "aaa", 3);
-  spvm_warnf(env->api->runtime->get_spvm_stderr(env->runtime), "spvm_warnf test:Foo");
+  spvm_warnf(env->spvm_stderr(env, stack), "[Test Output]spvm_warnf: %s %d", "aaa", 3);
+  spvm_warnf(env->spvm_stderr(env, stack), "[Test Output]spvm_warnf:Foo");
   
   stack[0].ival = 1;
   
@@ -1931,14 +1931,14 @@ int32_t SPVM__TestCase__NativeAPI__enter_scope_leave_scope(SPVM_ENV* env, SPVM_V
   int32_t before_enter_memory_blocks_count = env->get_memory_blocks_count(env, stack);
   int32_t before_leave_memory_blocks_count;
   {
-    int32_t scope_id = env->enter_scope(env, stack);
+    int32_t mortal_stack_top = env->enter_scope(env, stack);
 
     env->new_int_array(env, stack, length);
     env->new_int_array(env, stack, length);
     env->new_int_array(env, stack, length);
     
     before_leave_memory_blocks_count = env->get_memory_blocks_count(env, stack);
-    env->leave_scope(env, stack, scope_id);
+    env->leave_scope(env, stack, mortal_stack_top);
   }
   
   int32_t after_leave_memory_blocks_counts = env->get_memory_blocks_count(env, stack);

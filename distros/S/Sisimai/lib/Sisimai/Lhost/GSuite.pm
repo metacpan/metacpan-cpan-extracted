@@ -5,12 +5,12 @@ use strict;
 use warnings;
 
 sub description { 'G Suite: https://gsuite.google.com/' }
-sub make {
+sub inquire {
     # Detect an error from G Suite (Transfer from G Suite to a destination host)
     # @param    [Hash] mhead    Message headers of a bounce email
     # @param    [String] mbody  Message body of a bounce email
     # @return   [Hash]          Bounce data list and message/rfc822 part
-    # @return   [Undef]         failed to parse or the arguments are missing
+    # @return   [undef]         failed to parse or the arguments are missing
     # @since v4.21.0
     my $class = shift;
     my $mhead = shift // return undef;
@@ -21,11 +21,10 @@ sub make {
     return undef unless $mhead->{'x-gm-message-state'};
 
     state $indicators = __PACKAGE__->INDICATORS;
-    state $rebackbone = qr<^Content-Type:[ ](?:message/rfc822|text/rfc822-headers)>m;
+    state $boundaries = ['Content-Type: message/rfc822', 'Content-Type: text/rfc822-headers'];
     state $markingsof = {
-        'message' => qr/\A[*][*][ ].+[ ][*][*]\z/,
-        'error'   => qr/\AThe[ ]response([ ]from[ ]the[ ]remote[ ]server)?[ ]was:\z/,
-        'html'    => qr{\AContent-Type:[ ]*text/html;[ ]*charset=['"]?(?:UTF|utf)[-]8['"]?\z},
+        'message' => ['** '],
+        'error'   => ['The response was:', 'The response from the remote server was:'],
     };
     state $messagesof = {
         'userunknown'  => ["because the address couldn't be found. Check for typos or unnecessary spaces and try again."],
@@ -33,12 +32,10 @@ sub make {
         'networkerror' => [' had no relevant answers.', ' responded with code NXDOMAIN'],
     };
 
-    require Sisimai::RFC1894;
     my $fieldtable = Sisimai::RFC1894->FIELDTABLE;
     my $permessage = {};    # (Hash) Store values of each Per-Message field
-
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
-    my $emailsteak = Sisimai::RFC5322->fillet($mbody, $rebackbone);
+    my $emailparts = Sisimai::RFC5322->part($mbody, $boundaries);
     my $readcursor = 0;     # (Integer) Points the current cursor position
     my $recipients = 0;     # (Integer) The number of 'Final-Recipient' header
     my $endoferror = 0;     # (Integer) Flag for a blank line after error messages
@@ -48,12 +45,12 @@ sub make {
     };
     my $v = undef;
 
-    for my $e ( split("\n", $emailsteak->[0]) ) {
-        # Read error messages and delivery status lines from the head of the email
-        # to the previous line of the beginning of the original message.
+    for my $e ( split("\n", $emailparts->[0]) ) {
+        # Read error messages and delivery status lines from the head of the email to the previous
+        # line of the beginning of the original message.
         unless( $readcursor ) {
             # Beginning of the bounce message or message/delivery-status part
-            $readcursor |= $indicators->{'deliverystatus'} if $e =~ $markingsof->{'message'};
+            $readcursor |= $indicators->{'deliverystatus'} if grep { index($e, $_) == 0 } $markingsof->{'message'}->@*;
         }
         next unless $readcursor & $indicators->{'deliverystatus'};
 
@@ -105,9 +102,9 @@ sub make {
                 next if $endoferror;
                 $v->{'diagnosis'} .= $e;
 
-            } elsif( $e =~ $markingsof->{'error'} ) {
+            } elsif( grep { index($e, $_) == 0 } $markingsof->{'error'}->@* ) {
                 # The response from the remote server was:
-                $anotherset->{'diagnosis'} .= $e;
+                $anotherset->{'diagnosis'} .= ' '.$e;
 
             } else {
                 # ** Address not found **
@@ -117,10 +114,9 @@ sub make {
                 #
                 # The response from the remote server was:
                 # 550 #5.1.0 Address rejected.
-                next if $e =~ /\AContent-Type:/;
+                next if index($e, 'Content-Type:') == 0;
                 if( $anotherset->{'diagnosis'} ) {
-                    # Continued error messages from the previous line like
-                    # "550 #5.1.0 Address rejected."
+                    # Continued error messages from the previous line like "550 #5.1.0 Address rejected."
                     next if $emptylines > 5;
                     unless( length $e ) {
                         # Count and next()
@@ -134,7 +130,7 @@ sub make {
                     #
                     # Your message wasn't delivered to * because the address couldn't be found.
                     # Check for typos or unnecessary spaces and try again.
-                    next unless $e =~ $markingsof->{'message'};
+                    next unless grep { index($e, $_) == 0 } $markingsof->{'message'}->@*;
                     $anotherset->{'diagnosis'} = $e;
                 }
             }
@@ -150,7 +146,7 @@ sub make {
         if( exists $anotherset->{'diagnosis'} && $anotherset->{'diagnosis'} ) {
             # Copy alternative error message
             $e->{'diagnosis'} ||= $anotherset->{'diagnosis'};
-            if( $e->{'diagnosis'} =~ /\A\d+\z/ ) {
+            if( index($e->{'diagnosis'}, ' ') < 0 && int($e->{'diagnosis'}) > 0 ) {
                 # Override the value of diagnostic code message
                 $e->{'diagnosis'} = $anotherset->{'diagnosis'};
 
@@ -187,12 +183,12 @@ sub make {
 
         for my $q ( keys %$messagesof ) {
             # Guess an reason of the bounce
-            next unless grep { index($e->{'diagnosis'}, $_) > -1 } @{ $messagesof->{ $q } };
+            next unless grep { index($e->{'diagnosis'}, $_) > -1 } $messagesof->{ $q }->@*;
             $e->{'reason'} = $q;
             last;
         }
     }
-    return { 'ds' => $dscontents, 'rfc822' => $emailsteak->[1] };
+    return { 'ds' => $dscontents, 'rfc822' => $emailparts->[1] };
 }
 
 1;
@@ -210,8 +206,8 @@ Sisimai::Lhost::GSuite - bounce mail parser class for C<G Suite>.
 
 =head1 DESCRIPTION
 
-Sisimai::Lhost::GSuite parses a bounce email which created by C<G Suite>.
-Methods in the module are called from only Sisimai::Message.
+Sisimai::Lhost::GSuite parses a bounce email which created by C<G Suite>. Methods in the module are
+called from only Sisimai::Message.
 
 =head1 CLASS METHODS
 
@@ -221,10 +217,10 @@ C<description()> returns description string of this module.
 
     print Sisimai::Lhost::GSuite->description;
 
-=head2 C<B<make(I<header data>, I<reference to body string>)>>
+=head2 C<B<inquire(I<header data>, I<reference to body string>)>>
 
-C<make()> method parses a bounced email and return results as a array reference.
-See Sisimai::Message for more details.
+C<inquire()> method parses a bounced email and return results as a array reference. See Sisimai::Message
+for more details.
 
 =head1 AUTHOR
 
@@ -232,7 +228,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017-2021 azumakuniyuki, All rights reserved.
+Copyright (C) 2017-2023 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

@@ -30,7 +30,11 @@ sub test_generator {
     is( $obj->a, 2, 'object scalar not independent of hash' );
 
 
-    like( dies { $obj->c }, qr/locate object method.*lvalue.t/, 'unknown attribute' );
+    like(
+        dies { $obj->c },
+        qr/locate object method.*lvalue.t/,
+        'unknown attribute'
+    );
 
     $hash{c} = 4;
     is( $obj->c, 4, 'retrieve value added through hash' );

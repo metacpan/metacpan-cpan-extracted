@@ -2,7 +2,7 @@ package WebService::Postex;
 use v5.26;
 use Object::Pad;
 
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 
 # ABSTRACT: A Postex WebService implemenation in Perl
 
@@ -44,53 +44,53 @@ method _call($req) {
     }
 
     my $json = decode_json($res->decoded_content);
-    if ($json->{status} eq 'error') {
+    if ($json->{data}{status} eq 'error') {
         die "Error occurred calling Postex", $/;
     }
     return $json;
 }
 
 method generation_rest_upload(%payload) {
-
-    my $uri = $self->_build_uri(qw(generation raw), $generator_id);
+    my $uri = $self->_build_uri('generators', $generator_id, 'generate');
     my $req = $self->_prepare_post($uri, %payload);
     return $self->_call($req);
 }
 
 method generation_rest_upload_check(%payload) {
-    my $uri = $self->_build_uri(qw(generation raw), $generator_id);
+    my $uri = $self->_build_uri('generators', $generator_id);
     my $req = $self->_prepare_get($uri, %payload);
     return $self->_call($req);
 }
 
 method generation_file_upload(%payload) {
-    my $uri = $self->_build_uri(qw(generation upload), $generator_id);
+    my $uri = $self->_build_uri('generators', $generator_id, 'generate');
     my $req = $self->_prepare_post($uri, %payload);
     return $self->_call($req);
 }
 
 method generation_file_upload_check(%payload) {
-    my $uri = $self->_build_uri(qw(generation upload), $generator_id);
+    my $uri = $self->_build_uri('generators', $generator_id, 'generate');
     my $req = $self->_prepare_get($uri, %payload);
     return $self->_call($req);
 }
 
 method generation_session_status($session_id) {
-    my $uri = $self->_build_uri(qw(generation session), $session_id);
+    my $uri = $self->_build_uri('generators', $generator_id, 'generate');
     my $req = $self->_prepare_get($uri);
     return $self->_call($req);
 }
 
 method profile_file_upload($recipient_id, %payload) {
+    die "Unsupported method", $/;
     my $uri = $self->_build_uri(qw(recipients upload), $recipient_id);
     my $req = $self->_prepare_post($uri, %payload);
     return $self->_call($req);
 }
 
-method _build_uri($type, $call, $id) {
+method _build_uri(@data) {
     my $uri = $base_uri->clone;
     my @segments = $uri->path_segments;
-    $uri->path_segments(@segments, qw(rest data v1), $type, $call, $id);
+    $uri->path_segments(@segments, qw(rest v2), @data);
     return $uri;
 }
 
@@ -117,7 +117,7 @@ method _prepare_request($uri, %payload) {
 }
 
 method _prepare_post($uri, %payload) {
-    return POST($self->_prepare_request($uri, %payload));
+    return PUT($self->_prepare_request($uri, %payload));
 }
 
 method _prepare_get($uri, %payload) {
@@ -138,7 +138,7 @@ WebService::Postex - A Postex WebService implemenation in Perl
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 

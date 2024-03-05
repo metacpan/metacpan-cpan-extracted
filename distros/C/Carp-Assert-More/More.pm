@@ -15,12 +15,12 @@ Carp::Assert::More - Convenience assertions for common situations
 
 =head1 VERSION
 
-Version 2.3.0
+Version 2.4.0
 
 =cut
 
 BEGIN {
-    $VERSION = '2.3.0';
+    $VERSION = '2.4.0';
     @ISA = qw(Exporter);
     @EXPORT = qw(
         assert_all_keys_in
@@ -28,6 +28,7 @@ BEGIN {
         assert_arrayref
         assert_arrayref_nonempty
         assert_arrayref_of
+        assert_arrayref_all
         assert_cmp
         assert_coderef
         assert_context_nonvoid
@@ -911,6 +912,57 @@ sub assert_arrayref_of($$;$) {
 }
 
 
+=head2 assert_arrayref_all( $aref, $sub [, $name] )
+
+Asserts that I<$aref> is reference to an array that has at least one
+element in it. Each element of the array is passed to subroutine I<$sub>
+which is assumed to be an assertion.
+
+For example:
+
+    my $aref_of_counts = get_counts();
+    assert_arrayref_all( $aref, \&assert_positive_integer, 'Counts are positive' );
+
+Whatever is passed as I<$name>, a string saying "Element #N" will be
+appended, where N is the zero-based index of the array.
+
+=cut
+
+sub assert_arrayref_all($$;$) {
+    my $aref = shift;
+    my $sub  = shift;
+    my $name = shift;
+
+    my @why;
+
+    assert_coderef( $sub, 'assert_arrayref_all requires a code reference' );
+
+    if ( ref($aref) eq 'ARRAY' || (Scalar::Util::blessed( $aref ) && $aref->isa( 'ARRAY' )) ) {
+        if ( @{$aref} ) {
+            my $inner_msg = defined($name) ? "$name: " : 'assert_arrayref_all: ';
+            my $n = 0;
+            for my $i ( @{$aref} ) {
+                $sub->( $i, "${inner_msg}Element #$n" );
+                ++$n;
+            }
+        }
+        else {
+            push @why, 'Array contains no elements';
+        }
+    }
+    else {
+        push @why, 'First argument to assert_arrayref_all was not an array';
+    }
+
+    if ( @why ) {
+        require Carp;
+        &Carp::confess( _failure_msg($name), @why );
+    }
+
+    return;
+}
+
+
 =head2 assert_aoh( $ref [, $name ] )
 
 Verifies that C<$array> is an arrayref, and that every element is a hashref.
@@ -1261,14 +1313,17 @@ but this will fail:
 
     something();
 
+If the C<$name> argument is not passed, a default message of "<funcname>
+must not be called in void context" is provided.
+
 =cut
 
 sub assert_context_nonvoid(;$) {
-    my $name = shift;
+    my @caller = caller(1);
 
-    my $wantarray = (caller(1))[5];
+    return if defined($caller[5]);
 
-    return if defined($wantarray);
+    my $name = shift // "$caller[3] must not be called in void context";
 
     require Carp;
     &Carp::confess( _failure_msg($name) );
@@ -1300,14 +1355,18 @@ but these will fail:
     something();
     my @things = something();
 
+If the C<$name> argument is not passed, a default message of "<funcname>
+must be called in scalar context" is provided.
+
 =cut
 
 sub assert_context_scalar(;$) {
-    my $name = shift;
-
-    my $wantarray = (caller(1))[5];
+    my @caller = caller(1);
+    my $wantarray = $caller[5];
 
     return if defined($wantarray) && !$wantarray;
+
+    my $name = shift // "$caller[3] must be called in scalar context";
 
     require Carp;
     &Carp::confess( _failure_msg($name) );

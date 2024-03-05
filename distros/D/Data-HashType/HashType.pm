@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 use Mo qw(build is);
-use Mo::utils qw(check_bool check_length check_number check_required);
+use Mo::utils 0.09 qw(check_bool check_length check_number check_required);
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 has active => (
 	is => 'ro',
@@ -73,7 +73,7 @@ Constructor.
 =item * C<active>
 
 Flag for activity of hash type.
-Possible valuea are 0/1.
+Possible value is 0/1.
 Default value is 1 (active).
 
 =item * C<id>
@@ -120,13 +120,14 @@ Returns string.
 =head1 ERRORS
 
  new():
-         Parameter 'active' must be a bool (0/1).
-                 Value: %s
-         Parameter 'id' must be a number.
-                 Value: %s
-         Parameter 'name' has length greater than '50'.
-                 Value: %s
-         Parameter 'name' is required.
+         From Mo::utils:
+                 Parameter 'active' must be a bool (0/1).
+                         Value: %s
+                 Parameter 'id' must be a number.
+                         Value: %s
+                 Parameter 'name' has length greater than '50'.
+                         Value: %s
+                 Parameter 'name' is required.
 
 =head1 EXAMPLE
 
@@ -170,12 +171,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2023 Michal Josef Špaček
+© 2023-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

@@ -36,7 +36,7 @@ requires:
 resources:
   bugtracker: https://github.com/regru/Net-Whois-Raw/issues
   repository: git://github.com/regru/Net-Whois-Raw.git
-version: '2.99037'
+version: '2.99038'
 x_contributors:
   - 'Ariel Brosh <schop@cpan.org>'
   - 'Gabor Szabo <szabgab@cpan.org>'

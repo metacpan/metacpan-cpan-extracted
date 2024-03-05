@@ -22,7 +22,7 @@ on 'test' => sub {
 # Develop phase dependencies are usually not installed, this is what we want as
 # Devel::Cover has many dependencies.
 on 'develop' => sub {
-  requires 'Devel::Cover';
+  recommends 'Devel::Cover';
 };
 
 # End of the template. You can add custom content below this line.

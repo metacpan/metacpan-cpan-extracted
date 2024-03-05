@@ -1,0 +1,104 @@
+NAME
+    Mo::utils::IRI - Mo utilities for IRI.
+
+SYNOPSIS
+     use Mo::utils::IRI qw(check_iri);
+
+     check_iri($self, $key);
+
+DESCRIPTION
+    Mo utilities for IRI checking of data objects.
+
+SUBROUTINES
+  "check_iri"
+     check_iri($self, $key);
+
+    Check parameter defined by $key which is valid IRI.
+
+    Put error if check isn't ok.
+
+    Returns undef.
+
+ERRORS
+     check_iri():
+             Parameter '%s' doesn't contain valid IRI.
+                     Value: %s
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use Mo::utils::IRI qw(check_iri);
+     use Unicode::UTF8 qw(decode_utf8);
+
+     my $self = {
+             'key' => decode_utf8('https://michal.josef.špaček'),
+     };
+     check_iri($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use Error::Pure;
+     use Mo::utils::IRI qw(check_iri);
+
+     $Error::Pure::TYPE = 'Error';
+
+     my $self = {
+             'key' => 'bad_iri',
+     };
+     check_iri($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [..utils.pm:?] Parameter 'key' doesn't contain valid IRI.
+
+DEPENDENCIES
+    Error::Pure, Exporter, Readonly, IRI.
+
+SEE ALSO
+    Mo  Micro Objects. Mo is less.
+
+    Mo::utils::CSS
+        Mo CSS utilities.
+
+    Mo::utils::Date
+        Mo date utilities.
+
+    Mo::utils::Language
+        Mo language utilities.
+
+    Mo::utils::Email
+        Mo utilities for email.
+
+    Mo::utils::URI
+        Mo utilities for URI.
+
+    Wikibase::Datatype::Utils
+        Wikibase datatype utilities.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Mo-utils-IRI>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2024 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

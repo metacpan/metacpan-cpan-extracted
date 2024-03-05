@@ -6,7 +6,7 @@ use Exporter    qw/import/;
 
 our @EXPORT = qw/maybe_preserve_spaces is_at_run_level decode_entities encode_entities/;
 
-our $VERSION = '2.04';
+our $VERSION = '2.05';
 
 sub maybe_preserve_spaces {
   my ($txt) = @_;

@@ -18,7 +18,7 @@ use overload '""' => \&_stringify,
              $] < 5.037 ? ('~~' => \&_matches) : ();  # fully deprecated, so cannot be overloaded
 use match::simple ();
 
-our $VERSION = "1.15";
+our $VERSION = "1.16";
 
 our $MESSAGE;            # global var for last message from _matches()
 our $MAX_DEEP = 100;     # limit for recursive calls to inspect()
@@ -36,7 +36,7 @@ my %SHORTCUTS;
 BEGIN {
   @CONSTRUCTORS = qw/Whatever Empty
                      Num Int Nat Date Time String Handle
-                     Enum List Struct One_of All_of/;
+                     Enum List Struct Struict One_of All_of/;
   %SHORTCUTS = (
     True      => [ -true    => 1        ],
     False     => [ -true    => 0        ],
@@ -206,10 +206,11 @@ my $builtin_msgs = {
   },
 };
 
-# inherit Int and Nat messages from Num messages
+# some domains inherit messages from their parent domain
 foreach my $language (keys %$builtin_msgs) {
   $builtin_msgs->{$language}{$_} = $builtin_msgs->{$language}{Num} 
     for qw/Int Nat/;
+  $builtin_msgs->{$language}{Struict} = $builtin_msgs->{$language}{Struct};
 }
 
 # default messages : english
@@ -236,7 +237,7 @@ sub messages { # class method
 
 
 sub inspect {
-  my ($self, $data, $context) = @_;
+  my ($self, $data, $context, $is_absent) = @_;
   no warnings 'recursion';
 
   # build a context if this is the top-level call
@@ -245,13 +246,16 @@ sub inspect {
   if (!defined $data) {
 
     # in validation mode, insert the default value into the tree of valid data
-    if (exists $context->{gather_valid_data} && exists $self->{-default}) { 
-      $context->{gather_valid_data} = does($self->{-default}, 'CODE') ? $self->{-default}->($context)
-                                                                      : $self->{-default};
+    if (exists $context->{gather_valid_data}) {
+      my $apply_default             = sub {my $default = $self->{$_[0]}; 
+                                           does($default, 'CODE') ? $default->($context) : $default};
+      $context->{gather_valid_data} = exists $self->{-default}                 ? $apply_default->('-default')
+                                    : $is_absent && exists $self->{-if_absent} ? $apply_default->('-if_absent')
+                                    :                                            undef;
     }
 
     # success if data was optional;
-    return if $self->{-optional} or exists $self->{-default};
+    return if $self->{-optional} or exists $self->{-default} or exists $self->{-if_absent};
 
     # otherwise fail, except for the 'Whatever' domain which is the only one to accept undef
     return $self->msg(UNDEFINED => '')
@@ -591,7 +595,7 @@ my @common_options = qw/-optional -name -messages
                         -true -isa -can -does -matches -ref
                         -has -returns
                         -blessed -package -isweak -readonly -tainted
-                        -default/;
+                        -default -if_absent/;
 
 sub _parse_args {
   my ($args_ref, $options_ref, $default_option, $arg_type) = @_;
@@ -1228,7 +1232,7 @@ sub _inspect {
     local $context->{path} = [@{$context->{path}}, $i];
     my $subdomain  = $self->_build_subdomain($items->[$i], $context)
       or next;
-    $msgs[$i]      = $subdomain->inspect($data->[$i], $context);
+    $msgs[$i]      = $subdomain->inspect($data->[$i], $context, ! exists $data->[$i]);
     $has_invalid ||= $msgs[$i];
 
     # re-inject the valid data for that slot
@@ -1384,7 +1388,7 @@ sub _inspect {
     local $context->{path} = [@{$context->{path}}, $field];
     my $field_spec = $self->{-fields}{$field};
     my $subdomain  = $self->_build_subdomain($field_spec, $context);
-    my $msg        = $subdomain->inspect($data->{$field}, $context);
+    my $msg        = $subdomain->inspect($data->{$field}, $context, ! exists $data->{$field});
     $msgs{$field}  = $msg if $msg;
 
     # re-inject the valid data for that field
@@ -1431,6 +1435,26 @@ sub func_signature {
   return sub {my $params =  $self->validate({@_});  %$params};
 }
 
+
+
+#======================================================================
+package Data::Domain::Struict; # domain for a strict Struct :-)
+#======================================================================
+use strict;
+use warnings;
+use Carp;
+use Scalar::Does qw/does/;
+our @ISA = 'Data::Domain::Struct';
+
+sub new {
+  my $class = shift;
+  my $self  = $class->SUPER::new(@_);
+
+  not exists $self->{-exclude} or croak "Struict(...): invalid option: '-exclude'";
+  $self->{-exclude} = '*';
+
+  return $self;
+}
 
 
 #======================================================================
@@ -1811,6 +1835,16 @@ If C<-default> is a coderef, that subroutine will be called with the current
 context as parameter (see L</Structure of context>); the resulting scalar value
 is inserted within the tree.
 
+=item C<-if_absent>
+
+Like C<-default> except that it will only be applied when a data member
+I<does not exist> in its parent structure (i.e. a missing field in a hash, or
+an element outside of the range of an array).
+
+This is useful for example when passing named arguments to a function,
+if you want to explicitly allow to pass C<undef> to an argument :
+
+   some_func(arg1 => 'foo', arg2 => undef) # arg1 is defined, arg2 is undef but present, arg3 is absent
 
 =item C<-name>
 
@@ -2495,8 +2529,8 @@ Specifies which fields are not allowed in the structure. The exclusion
 may be specified as an arrayref of field names, as a compiled regular
 expression, or as the string constant 'C<*>' or 'C<all>' (meaning that
 no hash key will be allowed except those explicitly listed in the
-C<-fields> option.
-
+C<-fields> option. The L</Struict> domain described below is syntactic sugar
+for a C<Struct> domain with option C<< -exclude => '*' >> automatically enabled.
 
 =item -may_ignore
 
@@ -2545,6 +2579,15 @@ C<$err> will contain :
     age      => "Int: invalid number",
     -exclude => "Struct: contains forbidden field(s): 'bar', 'foo'",
   }
+
+
+=head2 Struict
+
+  my $domain = Struict(foo => Int, bar => String);
+
+This is a pun for a "strict Struct" domain : it behaves exactly like C</Struct>, except
+that the option C<< -exclude => '*' >> is automatically enabled : therefore the domain is
+"strict" in the sense that it does not accept any additional key in the input hashref.
 
 
 =head2 One_of
@@ -3070,6 +3113,10 @@ Internal utility method for generating an error message.
 
 Method that returns the short name of the subclass of C<Data::Domain> (i.e.
 returns 'Int' for C<Data::Domain::Int>).
+
+=head3 name
+
+Returns the C<-name> domain parameter, or, if absent, the subclass.
 
 =head3 _expand_range
 

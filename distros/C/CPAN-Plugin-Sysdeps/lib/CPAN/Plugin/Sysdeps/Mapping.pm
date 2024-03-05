@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.73';
+our $VERSION = '0.75';
 
 # shortcuts
 #  os and distros
@@ -2873,6 +2873,14 @@ sub mapping {
        [package => 'netcdf']],
       [like_debian,
        [package => 'libnetcdf-dev']]],
+
+     [cpanmod => 'PDL::Opt::GLPK',
+      [os_freebsd,
+       [package => 'glpk']],
+      [like_debian,
+       [package => 'libglpk-dev']],
+      [like_fedora,
+       [package => 'glpk-devel']]],
 
      [cpanmod => 'PDL::Opt::QP',
       [os_freebsd,

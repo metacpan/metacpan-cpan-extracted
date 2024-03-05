@@ -14,7 +14,7 @@ MarpaX::ESLIF::BNF - MarpaX::ESLIF's BNF
 
 =head1 VERSION
 
-version 6.0.33.3
+version 6.0.33.4
 
 =head1 DESCRIPTION
 

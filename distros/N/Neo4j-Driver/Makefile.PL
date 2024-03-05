@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test::Neo4j::Types" => "0.03",
     "Test::Warnings" => "0.010"
   },
-  "VERSION" => "0.45",
+  "VERSION" => "0.46",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -5,13 +5,13 @@ use strict;
 use warnings;
 
 use Error::Pure qw(err);
-use List::Util qw(none);
+use List::Util 1.33 qw(none);
 use Locale::Language;
 use Readonly;
 
 Readonly::Array our @EXPORT_OK => qw(check_language);
 
-our $VERSION = 0.02;
+our $VERSION = 0.04;
 
 sub check_language {
 	my ($self, $key) = @_;
@@ -19,7 +19,9 @@ sub check_language {
 	_check_key($self, $key) && return;
 
 	if (none { $_ eq $self->{$key} } all_language_codes()) {
-		err "Language code '".$self->{$key}."' isn't ISO 639-1 code.";
+		err "Parameter '".$key."' doesn't contain valid ISO 639-1 code.",
+			'Value', $self->{$key},
+		;
 	}
 
 	return;
@@ -49,7 +51,7 @@ Mo::utils::Language - Mo language utilities.
 
 =head1 SYNOPSIS
 
- use Mo::utils qw(check_language);
+ use Mo::utils::Language qw(check_language);
 
  check_language($self, $key);
 
@@ -71,8 +73,8 @@ Returns undef.
 =head1 ERRORS
 
  check_language():
-         Language code '%s' isn't ISO 639-1 code.
-         Language with ISO 639-1 code '%s' doesn't exist.
+         Parameter '%s' doesn't contain valid ISO 639-1 code.
+                 Value: %s
 
 =head1 EXAMPLE1
 
@@ -155,12 +157,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2022-2023 Michal Josef Špaček
+© 2022-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.04
 
 =cut

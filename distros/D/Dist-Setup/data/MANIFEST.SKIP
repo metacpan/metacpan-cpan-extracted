@@ -11,6 +11,7 @@
 ^Makefile.old$
 ^MANIFEST\.bak$
 ^MANIFEST\.SKIP$
+^README(\..*)?^
 ^blib/
 ^cover_db/
 ^cpanfile\.snapshot$

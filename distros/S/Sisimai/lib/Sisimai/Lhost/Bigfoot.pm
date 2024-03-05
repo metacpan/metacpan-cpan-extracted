@@ -5,12 +5,12 @@ use strict;
 use warnings;
 
 sub description { 'Bigfoot: http://www.bigfoot.com' }
-sub make {
+sub inquire {
     # Detect an error from Bigfoot
     # @param    [Hash] mhead    Message headers of a bounce email
     # @param    [String] mbody  Message body of a bounce email
     # @return   [Hash]          Bounce data list and message/rfc822 part
-    # @return   [Undef]         failed to parse or the arguments are missing
+    # @return   [undef]         failed to parse or the arguments are missing
     # @since v4.1.10
     my $class = shift;
     my $mhead = shift // return undef;
@@ -19,32 +19,31 @@ sub make {
 
     # 'subject'  => qr/\AReturned mail: /,
     $match ||= 1 if rindex($mhead->{'from'}, '@bigfoot.com>') > -1;
-    $match ||= 1 if grep { rindex($_, '.bigfoot.com ') > -1 } @{ $mhead->{'received'} };
+    $match ||= 1 if grep { rindex($_, '.bigfoot.com ') > -1 } $mhead->{'received'}->@*;
     return undef unless $match;
 
+    require Sisimai::SMTP::Command;
     state $indicators = __PACKAGE__->INDICATORS;
-    state $rebackbone = qr|^Content-Type:[ ]message/partial|m;
-    state $markingsof = { 'message' => qr/\A[ \t]+[-]+[ \t]*Transcript of session follows/ };
+    state $boundaries = ['Content-Type: message/partial'];
+    state $markingsof = { 'message' => '   ----- Transcript of session follows -----' };
 
-    require Sisimai::RFC1894;
     my $fieldtable = Sisimai::RFC1894->FIELDTABLE;
     my $permessage = {};    # (Hash) Store values of each Per-Message field
-
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
-    my $emailsteak = Sisimai::RFC5322->fillet($mbody, $rebackbone);
+    my $emailparts = Sisimai::RFC5322->part($mbody, $boundaries);
     my $readcursor = 0;     # (Integer) Points the current cursor position
     my $recipients = 0;     # (Integer) The number of 'Final-Recipient' header
-    my $commandtxt = '';    # (String) SMTP Command name begin with the string '>>>'
+    my $thecommand = '';    # (String) SMTP Command name begin with the string '>>>'
     my $esmtpreply = '';    # (String) Reply from remote server on SMTP session
     my $v = undef;
     my $p = '';
 
-    for my $e ( split("\n", $emailsteak->[0]) ) {
-        # Read error messages and delivery status lines from the head of the email
-        # to the previous line of the beginning of the original message.
+    for my $e ( split("\n", $emailparts->[0]) ) {
+        # Read error messages and delivery status lines from the head of the email to the previous
+        # line of the beginning of the original message.
         unless( $readcursor ) {
             # Beginning of the bounce message or message/delivery-status part
-            $readcursor |= $indicators->{'deliverystatus'} if $e =~ $markingsof->{'message'};
+            $readcursor |= $indicators->{'deliverystatus'} if index($e, $markingsof->{'message'}) == 0;
             next;
         }
         next unless $readcursor & $indicators->{'deliverystatus'};
@@ -91,19 +90,19 @@ sub make {
                 #    ----- Transcript of session follows -----
                 # >>> RCPT TO:<destinaion@example.net>
                 # <<< 553 Invalid recipient destinaion@example.net (Mode: normal)
-                if( $e =~ /\A[>]{3}[ ]+([A-Z]{4})[ ]?/ ) {
+                if( index($e, '>>> ') == 0 ) {
                     # >>> DATA
-                    $commandtxt = $1;
+                    $thecommand = Sisimai::SMTP::Command->find($e);
 
-                } elsif( $e =~ /\A[<]{3}[ ]+(.+)\z/ ) {
+                } elsif( index($e, '<<< ') == 0 ) {
                     # <<< Response
-                    $esmtpreply = $1;
+                    $esmtpreply = substr($e, 4,);
                 }
             } else {
                 # Continued line of the value of Diagnostic-Code field
                 next unless index($p, 'Diagnostic-Code:') == 0;
-                next unless $e =~ /\A[ \t]+(.+)\z/;
-                $v->{'diagnosis'} .= ' '.$1;
+                next unless index($e, ' ') == 0;
+                $v->{'diagnosis'} .= Sisimai::String->sweep(substr($e, 1,));
             }
         }
     } continue {
@@ -118,10 +117,10 @@ sub make {
         $e->{ $_ } ||= $permessage->{ $_ } || '' for keys %$permessage;
 
         $e->{'diagnosis'} =  Sisimai::String->sweep($e->{'diagnosis'});
-        $e->{'command'} ||= $commandtxt || '';
+        $e->{'command'} ||= $thecommand || '';
         $e->{'command'} ||= 'EHLO' if $esmtpreply;
     }
-    return { 'ds' => $dscontents, 'rfc822' => $emailsteak->[1] };
+    return { 'ds' => $dscontents, 'rfc822' => $emailparts->[1] };
 }
 
 1;
@@ -139,8 +138,8 @@ Sisimai::Lhost::Bigfoot - bounce mail parser class for C<Bigfoot>.
 
 =head1 DESCRIPTION
 
-Sisimai::Lhost::Bigfoot parses a bounce email which created by C<Bigfoot>.
-Methods in the module are called from only Sisimai::Message.
+Sisimai::Lhost::Bigfoot parses a bounce email which created by C<Bigfoot>. Methods in the module are
+called from only Sisimai::Message.
 
 =head1 CLASS METHODS
 
@@ -150,10 +149,10 @@ C<description()> returns description string of this module.
 
     print Sisimai::Lhost::Bigfoot->description;
 
-=head2 C<B<make(I<header data>, I<reference to body string>)>>
+=head2 C<B<inquire(I<header data>, I<reference to body string>)>>
 
-C<make()> method parses a bounced email and return results as a array reference.
-See Sisimai::Message for more details.
+C<inquire()> method parses a bounced email and return results as a array reference. See Sisimai::Message
+for more details.
 
 =head1 AUTHOR
 
@@ -161,7 +160,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2020 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2023 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

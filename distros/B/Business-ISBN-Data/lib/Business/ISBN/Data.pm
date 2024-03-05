@@ -1,3 +1,4 @@
+use utf8;
 use 5.008;
 
 package Business::ISBN::Data;
@@ -7,7 +8,7 @@ use Carp                  qw(carp);
 use File::Basename        qw(dirname);
 use File::Spec::Functions qw(catfile);
 
-our $VERSION = '20240209.001';
+our $VERSION = '20240302.001';
 
 =encoding utf8
 
@@ -115,8 +116,8 @@ You may redistribute this under the terms of the Artistic License 2.0.
 sub _default_data {
 # BEGIN REPLACE
 	(
-	_data_date => 'Fri, 9 Feb 2024 03:41:02 GMT',
-	_serial    => 'e00fa467-961a-4104-a277-f80dd64e588e',
+	_data_date => 'Sat, 2 Mar 2024 03:41:11 GMT',
+	_serial    => '50f2bcad-a5b8-4998-8f4c-608d8ac33158',
 	_source    => __FILE__,
 	978 => {
 		0     => [ 'English language'             => [ '00', '19', '200', '227', '2280', '2289', '229', '368', '3690', '3699', '370', '638', '6390', '6397', '6398000', '6399999', '640', '644', '6450000', '6459999', '646', '647', '6480000', '6489999', '649', '654', '6550', '6559', '656', '699', '7000', '8499', '85000', '89999', '900000', '900370', '9003710', '9003719', '900372', '949999', '9500000', '9999999' ] ],
@@ -168,7 +169,7 @@ sub _default_data {
 		624   => [ 'Sri Lanka'                    => [ '00', '04', '200', '249', '5000', '6699', '93000', '99999' ] ],
 		625   => [ 'Türkiye'                      => [ '00', '01', '365', '442', '44300', '44499', '445', '449', '6000', '7793', '77940', '77949', '7795', '8499', '94000', '99999' ] ],
 		626   => [ 'Taiwan'                       => [ '00', '04', '300', '499', '7000', '7999', '95000', '99999' ] ],
-		627   => [ 'Pakistan'                     => [ '30', '31', '500', '524', '7500', '7999' ] ],
+		627   => [ 'Pakistan'                     => [ '30', '31', '500', '524', '7500', '7999', '94500', '94649' ] ],
 		628   => [ 'Colombia'                     => [ '00', '09', '500', '549', '7500', '8499', '95000', '99999' ] ],
 		629   => [ 'Malaysia'                     => [ '00', '02', '470', '499', '7500', '7999', '96500', '99999' ] ],
 		630   => [ 'Romania'                      => [ '300', '349', '6500', '6849' ] ],
@@ -381,7 +382,7 @@ sub _default_data {
 		99986 => [ 'Myanmar'                      => [ '0', '0', '50', '69', '950', '999' ] ],
 		99987 => [ 'Luxembourg'                   => [ '700', '999' ] ],
 		99988 => [ 'Sudan'                        => [ '0', '0', '50', '54', '800', '824' ] ],
-		99989 => [ 'Paraguay'                     => [ '0', '0', '50', '64', '900', '999' ] ],
+		99989 => [ 'Paraguay'                     => [ '0', '1', '50', '79', '900', '999' ] ],
 		99990 => [ 'Ethiopia'                     => [ '0', '0', '50', '54', '975', '999' ] ],
 		99992 => [ 'Oman'                         => [ '0', '1', '50', '64', '950', '999' ] ],
 		99993 => [ 'Mauritius'                    => [ '0', '1', '50', '54', '980', '999' ] ],
@@ -478,16 +479,6 @@ $Business::ISBN::MAX_COUNTRY_CODE_LENGTH = length(
 
 package # Hide from PAUSE
 	Business::ISBN;
-
-sub isbn_group_code_string_from_number {
-	return if $_[0] =~ /\A_/;
-	return $Business::ISBN::country_data{ $_[0] }[0] || '';
-	}
-
-sub isbn_publisher_ranges_from_group_number {
-	return if $_[0] =~ /\A_/;
-	return $Business::ISBN::country_data{ $_[0] }[1] || [];
-	}
 
 sub isbn_data_source {
 	return $Business::ISBN::country_data{ '_source' } || __FILE__

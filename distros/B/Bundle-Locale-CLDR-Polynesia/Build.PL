@@ -17,7 +17,7 @@ my $builder = Module::Build->new(
         ,
     },
     dist_author         => q{John Imrie <john.imrie1@gmail.com>},
-    dist_version        => '0.44.0',
+    dist_version        => '0.44.1',
     build_requires => {
         'ok'                => 0,
         'Test::Exception'   => 0,

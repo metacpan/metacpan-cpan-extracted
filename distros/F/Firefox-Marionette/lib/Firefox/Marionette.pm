@@ -72,7 +72,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '1.52';
+our $VERSION = '1.53';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -126,6 +126,14 @@ sub _DEFAULT_ADB_PORT               { return 5555 }
 sub _SHORT_GUID_BYTES               { return 9 }
 sub _DEFAULT_DOWNLOAD_TIMEOUT       { return 300 }
 sub _CREDENTIAL_ID_LENGTH           { return 32 }
+
+sub _FIREFOX_109_RV_MIN {
+    return 109;
+}    # https://bugzilla.mozilla.org/show_bug.cgi?id=1805967
+
+sub _FIREFOX_109_RV_MAX {
+    return 119;
+}    # https://bugzilla.mozilla.org/show_bug.cgi?id=1805967
 
 # sub _MAGIC_NUMBER_MOZL4Z            { return "mozLz40\0" }
 
@@ -219,6 +227,14 @@ sub languages {
         $self->set_pref( $pref_name, join q[, ], @new_languages );
     }
     return @old_languages;
+}
+
+sub _setup_trackable {
+    my ( $self, $trackable ) = @_;
+    my $value = $trackable ? 0 : 1;
+    $self->set_pref( 'privacy.fingerprintingProtection',        $value );
+    $self->set_pref( 'privacy.fingerprintingProtection.pbmode', $value );
+    return $self;
 }
 
 sub _setup_geo {
@@ -457,48 +473,309 @@ _JS_
     return $self;
 }
 
+sub _is_chrome_user_agent {
+    my ( $self, $user_agent ) = @_;
+    if ( $user_agent =~ /Chrome/smx ) {
+        return 1;
+    }
+    return;
+}
+
+sub _is_safari_user_agent {
+    my ( $self, $user_agent ) = @_;
+    if ( $user_agent =~ /Safari/smx ) {
+        return 1;
+    }
+    return;
+}
+
+sub _is_safari_and_iphone_user_agent {
+    my ( $self, $user_agent ) = @_;
+    if ( $user_agent =~ /iPhone/smx ) {
+        return 1;
+    }
+    return;
+}
+
+sub _is_trident_user_agent {
+    my ( $self, $user_agent ) = @_;
+    if ( $user_agent =~ /Trident/smx ) {
+        return 1;
+    }
+    return;
+}
+
+sub _parse_user_agent {
+    my ( $self, $user_agent ) = @_;
+    my ( $app_version, $platform, $vendor, $vendor_sub, $oscpu );
+
+    # https://developer.mozilla.org/en-US/docs/Web/API/Navigator/userAgent#value
+    if ( !defined $user_agent ) {
+        $user_agent = $self->{original_agent};
+    }
+    if (
+        $user_agent =~ m{^
+                                        [^\/]+\/ # appCodeName
+                                        ((5[.]0[ ][(][^; ]+)[^;]*;[ ] # appVersion
+                                        ([^;)]+)[;)] # platform
+					.*)
+				$}smx
+      )
+    {
+        ( my $webkit_app, $app_version, $platform ) = ( $1, $2, $3 );
+        $app_version .= q[)];
+        ( $vendor, $vendor_sub, $oscpu ) = ( q[], q[], $platform );
+        if ( $self->_is_chrome_user_agent($user_agent) ) {
+            $app_version = $webkit_app;
+            $vendor      = 'Google Inc.';
+            $vendor_sub  = q[];
+        }
+        elsif ( $self->_is_safari_user_agent($user_agent) ) {
+            $app_version = $webkit_app;
+            if ( $self->_is_safari_and_iphone_user_agent($user_agent) ) {
+                $platform = 'iPhone';
+                $oscpu    = undef;
+            }
+            else {
+                $platform = 'MacIntel';
+                $oscpu    = $platform;
+            }
+            $vendor     = 'Apple Computer, Inc.';
+            $vendor_sub = q[];
+        }
+        if ( $user_agent =~ /Win(?:32|64)/smx ) {
+            $platform = 'Win32';
+            if ( $self->_is_chrome_user_agent($user_agent) ) {
+                $oscpu = undef;
+            }
+            else {
+                $oscpu = $platform;
+            }
+        }
+        elsif ( $user_agent =~ /Intel[ ]Mac/smx ) {
+            $platform = 'MacIntel';
+        }
+        elsif ( $user_agent =~ /Android/smx ) {
+            $platform = 'Linux armv81';
+        }
+    }
+    else {
+        ( $app_version, $platform, $vendor, $vendor_sub, $oscpu ) =
+          ( q[], q[], q[], q[], q[] );
+    }
+    return ( $user_agent, $app_version, $platform, $vendor, $vendor_sub,
+        $oscpu );
+}
+
+sub _original_agent {
+    my ($self) = @_;
+    return $self->{original_agent};
+}
+
+sub _parse_original_agent {
+    my ($self)             = @_;
+    my $original_string    = $self->_original_agent();
+    my $general_token_re   = qr/(?:Mozilla\/5[.]0[ ])[(]/smx;
+    my $platform_re        = qr/([^)]*?);[ ]/smx;
+    my $gecko_version_re   = qr/rv:(\d+)[.]0[)][ ]/smx;
+    my $gecko_trail_re     = qr/Gecko\/20100101[ ]/smx;
+    my $firefox_version_re = qr/Firefox\/(\d+)[.]0/smx;
+    my ( $os_string, $rv_version, $firefox_version );
+
+    if ( $original_string =~
+m/^$general_token_re$platform_re$gecko_version_re$gecko_trail_re$firefox_version_re$/smx
+      )
+    {
+        ( $os_string, $rv_version, $firefox_version ) = ( $1, $2, $3 );
+    }
+    else {
+        Firefox::Marionette::Exception->throw('Failed to parse user agent');
+    }
+    return ( $os_string, $rv_version, $firefox_version );
+}
+
+sub _get_agent_from_hash {
+    my ( $self, %new_hash ) = @_;
+    my $new_agent;
+    my ( $os_string, $rv_version, $firefox_version ) =
+      $self->_parse_original_agent();
+    $rv_version = $firefox_version;
+    if ( $new_hash{increment} ) {
+        if ( $new_hash{increment} =~ /^\s*([-])?\s*(\d{1,3})\s*$/smx ) {
+            my ( $sign, $number ) = ( $1, $2 );
+            my $increment = int "$sign$number";
+            $rv_version      += $increment;
+            $firefox_version += $increment;
+            delete $new_hash{increment};
+        }
+        else {
+            Firefox::Marionette::Exception->throw(
+'The increment parameter for the agent method must be a positive or negative integer less than 1000.'
+            );
+        }
+    }
+    if ( $new_hash{version} ) {
+        if ( $new_hash{version} =~ /^\s*(\d{1,3})\s*$/smx ) {
+            my ($version) = ($1);
+            $rv_version      = $version;
+            $firefox_version = $version;
+            delete $new_hash{version};
+        }
+        else {
+            Firefox::Marionette::Exception->throw(
+'The version parameter for the agent method must be a positive less than 1000.'
+            );
+        }
+    }
+    if (   ( $rv_version >= _FIREFOX_109_RV_MIN() )
+        && ( $rv_version <= _FIREFOX_109_RV_MAX() ) )
+    {
+        $rv_version = _FIREFOX_109_RV_MIN();
+    }
+    if ( my $os = $new_hash{os} ) {
+        my %correct_os = (
+            linux     => 'Linux',
+            freebsd   => 'FreeBSD',
+            openbsd   => 'OpenBSD',
+            netbsd    => 'NetBSD',
+            dragonfly => 'DragonFly',
+            win32     =>
+              'Win64',    # https://bugzilla.mozilla.org/show_bug.cgi?id=1559747
+            win64  => 'Win64',
+            mac    => 'Intel Mac OS X',
+            darwin => 'Intel Mac OS X',
+        );
+        my %default_platform = (
+            linux     => 'X11',
+            freebsd   => 'X11',
+            openbsd   => 'X11',
+            netbsd    => 'X11',
+            dragonfly => 'X11',
+            win32     => 'Windows NT 10.0',
+            win64     => 'Windows NT 10.0',
+            mac       => 'Macintosh',
+            darwin    => 'Macintosh',
+        );
+        my %default_arch = (
+            linux     => 'x86_64',
+            netbsd    => 'amd64',
+            freebsd   => 'amd64',
+            openbsd   => 'amd64',
+            dragonfly => 'x86_64',
+            win32     =>
+              'x64',    # https://bugzilla.mozilla.org/show_bug.cgi?id=1559747
+            win64  => 'x64',
+            mac    => '14.3',    # try and keep to a recent release
+            darwin => '14.3',    # try and keep to a recent release
+        );
+        my $final_platform = $default_platform{ lc $os };
+        if ( defined $new_hash{platform} ) {
+            $final_platform = $new_hash{platform};
+        }
+        my $final_os   = $correct_os{ lc $os };
+        my $final_arch = $default_arch{ lc $os };
+        if ( defined $new_hash{arch} ) {
+            $final_arch = $new_hash{arch};
+        }
+        $os_string = join q[; ], $final_platform,
+          $self->_join_os_arch_in_agent( $final_os, $final_arch );
+        delete $new_hash{os};
+    }
+    $new_agent =
+        'Mozilla/5.0 ('
+      . $os_string . '; rv:'
+      . $rv_version
+      . '.0) Gecko/20100101 Firefox/'
+      . $firefox_version . '.0';
+    return $new_agent;
+}
+
+sub _join_os_arch_in_agent {
+    my ( $self, $os, $arch ) = @_;
+    if ( $os =~ /^Win(?:32|64)$/smx ) {
+        return join q[; ], $os, $arch;
+    }
+    else {
+        return join q[ ], $os, $arch;
+    }
+}
+
 sub agent {
-    my ( $self, @new ) = @_;
+    my ( $self, @new_list ) = @_;
     my $pref_name = 'general.useragent.override';
     my $old_agent =
       $self->script( $self->_compress_script('return navigator.userAgent') );
-    if ( ( scalar @new ) > 0 ) {
-        if ( defined $new[0] ) {
-            $self->set_pref( $pref_name, $new[0] );
-            my ( $webkit_app, $app_version, $platform ) =
-              ( q[], '5.0 (Windows)', 'Win32' );
-            my ( $vendor, $vendor_sub ) = ( q[], q[] );
-            my $webkit;
-            if ( $new[0] =~ /AppleWebKit/smx ) {
-                $webkit = 1;
-            }
-
-    # https://developer.mozilla.org/en-US/docs/Web/API/Navigator/userAgent#value
-            if (
-                $new[0] =~ m{^
-                                        [^\/]+\/ # appCodeName
-                                        (([^ ]+[ ][(][^ ]+)[^;]*;[ ] # appVersion
-                                        ([^;]+); # platform
-					.*)
-				$}smx
-              )
-            {
-                ( $webkit_app, $app_version, $platform ) = ( $1, $2, $3 );
-                $app_version .= q[)];
-                if ($webkit) {
-                    $app_version = $webkit_app;
-                    $vendor      = 'Google Inc.';
-                    $vendor_sub  = q[];
-                }
-            }
-            if ( $new[0] =~ /Win(?:32|64)/smx ) {
-                $platform = 'Win32';
-            }
-            $self->set_pref( 'general.platform.override',   $platform );
-            $self->set_pref( 'general.appversion.override', $app_version );
+    if ( !defined $self->{original_agent} ) {
+        $self->{original_agent} = $old_agent;
+    }
+    if ( ( scalar @new_list ) > 0 ) {
+        my $new_agent;
+        if ( !( ( scalar @new_list ) % 2 ) ) {
+            $new_agent = $self->_get_agent_from_hash(@new_list);
         }
         else {
-            $self->clear_pref($pref_name);
+            $new_agent = $new_list[0];
+        }
+        my (
+            $user_agent, $app_version, $platform,
+            $vendor,     $vendor_sub,  $oscpu
+        ) = $self->_parse_user_agent($new_agent);
+        $self->set_pref( $pref_name,                    $user_agent );
+        $self->set_pref( 'general.platform.override',   $platform );
+        $self->set_pref( 'general.appversion.override', $app_version );
+        $self->set_pref( 'general.oscpu.override',      $oscpu );
+        if ( $self->_is_chrome_user_agent($user_agent) ) {
+            $self->set_pref( 'network.http.accept',
+'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7'
+            );
+            $self->set_pref( 'network.http.accept-encoding',
+                'gzip, deflate, br' );
+            $self->set_pref( 'network.http.accept-encoding.secure',
+                'gzip, deflate, br' );
+        }
+        elsif ( $self->_is_safari_user_agent($user_agent) ) {
+            $self->set_pref( 'network.http.accept',
+'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+            );
+            $self->set_pref( 'network.http.accept-encoding',
+                'gzip, deflate, br' );
+            $self->set_pref( 'network.http.accept-encoding.secure',
+                'gzip, deflate, br' );
+        }
+        elsif ( $self->_is_trident_user_agent($user_agent) ) {
+
+    # https://stackoverflow.com/questions/1670329/ie-accept-headers-changing-why
+            $self->set_pref(
+                'network.http.accept',
+'image/jpeg, application/x-ms-application, image/gif, application/xaml+xml, image/pjpeg, application/x-ms-xbap, application/msword, application/vnd.ms-excel, application/x-shockwave-flash, */*',
+            );
+            $self->set_pref( 'network.http.accept-encoding', 'gzip, deflate' );
+            $self->set_pref( 'network.http.accept-encoding.secure',
+                'gzip, deflate' );
+        }
+        else {
+            $self->clear_pref('network.http.accept');
+            $self->clear_pref('network.http.accept-encoding');
+            $self->clear_pref('network.http.accept-encoding.secure');
+        }
+        my $false = $self->_translate_to_json_boolean(0);
+        $self->set_pref( 'privacy.donottrackheader.enabled', $false )
+          ;    # trying to blend in with the most common options
+        if ( $self->{stealth} ) {
+            $self->script(
+                $self->_compress_script(
+                    <<'_JS_' . Firefox::Marionette::Extension::Stealth->user_agent_contents() ), args => [ $user_agent, $app_version, $platform, $vendor, $vendor_sub, $oscpu ] );
+{
+  let navProto = Object.getPrototypeOf(window.navigator);
+  let winProto = Object.getPrototypeOf(window);
+  Object.defineProperty(navProto, 'userAgent', {value: arguments[0], writable: true});
+  Object.defineProperty(navProto, 'appVersion', {value: arguments[1], writable: true});
+  Object.defineProperty(navProto, 'platform', {value: arguments[2], writable: true});
+  Object.defineProperty(navProto, 'vendor', {value: arguments[3], writable: true});
+  Object.defineProperty(navProto, 'vendorSub', {value: arguments[4], writable: true});
+  Object.defineProperty(navProto, 'oscpu', {value: arguments[5], writable: true});
+}
+_JS_
         }
     }
 
@@ -923,7 +1200,7 @@ sub _adb {
 sub images {
     my ( $self, $from ) = @_;
     return grep { $_->url() }
-      map       { Firefox::Marionette::Image->new($_) }
+      map { Firefox::Marionette::Image->new($_) }
       $self->has( '//*[self::img or self::input]', undef, $from );
 }
 
@@ -1019,6 +1296,16 @@ sub _init {
     if ( defined $parameters{height} ) {
         $self->{window_height} = $parameters{height};
     }
+    if ( defined $parameters{trackable} ) {
+        $self->{trackable} = $parameters{trackable};
+    }
+    $self->_load_specified_extensions(%parameters);
+    $self->_determine_mime_types(%parameters);
+    return $self;
+}
+
+sub _load_specified_extensions {
+    my ( $self, %parameters ) = @_;
     if ( defined $parameters{har} ) {
         $self->{_har} = $parameters{har};
         require Firefox::Marionette::Extension::HarExportTrigger;
@@ -1027,6 +1314,11 @@ sub _init {
         $self->{stealth} = 1;
         require Firefox::Marionette::Extension::Stealth;
     }
+    return;
+}
+
+sub _determine_mime_types {
+    my ( $self, %parameters ) = @_;
     $self->{mime_types} = [
         qw(
           application/x-gzip
@@ -1067,7 +1359,7 @@ sub _init {
             $known_mime_types{$mime_type} = 1;
         }
     }
-    return $self;
+    return;
 }
 
 sub _check_for_existing_local_firefox_process {
@@ -2188,7 +2480,7 @@ sub webauthn_credentials {
     );
     my $response = $self->_get_response($message_id);
     return map { Firefox::Marionette::WebAuthn::Credential->new( %{$_} ) }
-      map      { $self->_decode_credential_user_handle($_) }
+      map { $self->_decode_credential_user_handle($_) }
       @{ $self->_response_result_value($response) };
 }
 
@@ -3898,6 +4190,19 @@ sub _install_extension {
     return;
 }
 
+sub _install_extension_by_handle {
+    my ( $self, $module, $name ) = @_;
+    $self->_build_local_extension_directory();
+    my $zip = $module->new();
+    my $path =
+      File::Spec->catfile( $self->{_local_extension_directory}, $name );
+    $zip->writeToFileNamed($path) == Archive::Zip::AZ_OK()
+      or Firefox::Marionette::Exception->throw(
+        "Failed to write to '$path':$EXTENDED_OS_ERROR");
+    $self->install( $path, 1 );
+    return;
+}
+
 sub _post_launch_checks_and_setup {
     my ( $self, $timeouts ) = @_;
     $self->_write_local_proxy( $self->_ssh() );
@@ -3905,7 +4210,8 @@ sub _post_launch_checks_and_setup {
         $self->timeouts($timeouts);
     }
     if ( $self->{stealth} ) {
-        $self->_install_extension( 'Firefox::Marionette::Extension::Stealth',
+        $self->_install_extension_by_handle(
+            'Firefox::Marionette::Extension::Stealth',
             'stealth-0.0.1.xpi' );
     }
     if ( $self->{_har} ) {
@@ -3925,6 +4231,9 @@ sub _post_launch_checks_and_setup {
     }
     if ( my $geo = delete $self->{geo} ) {
         $self->_setup_geo($geo);
+    }
+    if ( defined $self->{trackable} ) {
+        $self->_setup_trackable( delete $self->{trackable} );
     }
     return;
 }
@@ -8129,7 +8438,7 @@ sub new_session {
 }
 
 sub browser_version {
-    my ($self) = @_;
+    my ( $self, $new ) = @_;
     if ( defined $self->{_cached_per_instance}->{_browser_version} ) {
         return $self->{_cached_per_instance}->{_browser_version};
     }
@@ -8139,9 +8448,7 @@ sub browser_version {
           $self->{_initial_version}->{minor},
           $self->{_initial_version}->{patch};
     }
-    else {
-        return;
-    }
+    return;
 }
 
 sub _get_moz_headless {
@@ -11769,7 +12076,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 1.52
+Version 1.53
 
 =head1 SYNOPSIS
 
@@ -12054,7 +12361,7 @@ returns if pre-existing addons (extensions/themes) are allowed to run.  This wil
 
 =head2 agent
 
-accepts an optional value for the L<User-Agent|https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent> header and sets this using the profile preferences.  This value will be used on the next page load.  It returns the current value, such as 'Mozilla/5.0 (<system-information>) <platform> (<platform-details>) <extensions>'.  This value is retrieved with L<navigator.userAgent|https://developer.mozilla.org/en-US/docs/Web/API/Navigator/userAgent>.
+accepts an optional value for the L<User-Agent|https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent> header and sets this using the profile preferences and inserting L<javascript|/script> into the current page. It returns the current value, such as 'Mozilla/5.0 (<system-information>) <platform> (<platform-details>) <extensions>'.  This value is retrieved with L<navigator.userAgent|https://developer.mozilla.org/en-US/docs/Web/API/Navigator/userAgent>.
 
 This method can be used to set a user agent string like so;
 
@@ -12069,6 +12376,63 @@ This method can be used to set a user agent string like so;
 
     my $firefox = Firefox::Marionette->new();
     $firefox->agent($user_agent); # agent is now the most popular agent from useragents.me
+
+If the user agent string that is passed as a parameter looks like a L<Chrome|https://www.google.com/chrome/>, L<Edge|https://microsoft.com/edge> or L<Safari|https://www.apple.com/safari/> user agent string, then this method will also try and change other profile preferences to match the new agent string.  These parameters are;
+
+=over 4
+
+=item * general.appversion.override
+
+=item * general.oscpu.override
+
+=item * general.platform.override
+
+=item * network.http.accept
+
+=item * network.http.accept-encoding
+
+=item * network.http.accept-encoding.secure
+
+=item * privacy.donottrackheader.enabled
+
+=back
+
+In addition, this method will accept a hash of values as parameters as well.  When a hash is provided, this method will alter specific parts of the normal Firefox User Agent.  These hash parameters are;
+
+=over 4
+
+=item * os - The desired operating system, known values are "linux", "win32", "darwin", "freebsd", "netbsd", "openbsd" and "dragonfly"
+
+=item * version - A specific version of firefox, such as 120.
+
+=item * increment - A specific offset from the actual version of firefox, such as -5
+
+=back
+
+These parameters can be used to set a user agent string like so;
+
+    use Firefox::Marionette();
+    use strict;
+
+    my $firefox = Firefox::Marionette->new();
+    $firefox->agent(os => 'freebsd', version => 118);
+
+    # user agent is now equal to
+    # Mozilla/5.0 (X11; FreeBSD amd64; rv:109.0) Gecko/20100101 Firefox/118.0
+
+If the C<stealth> parameter has supplied to the L<new|/new> method, it will also attempt to change a number of javascript attributes to match the desired browser.  The following websites have been very useful in testing these ideas;
+
+=over 4
+
+=item * L<https://browserleaks.com/javascript>
+
+=item * L<https://www.amiunique.org/fingerprint>
+
+=item * L<https://bot.sannysoft.com/>
+
+=back
+
+See L<IMITATING OTHER BROWSERS|/IMITATING-OTHER-BROWSERS> a discussion of these types of techniques.  These changes are not foolproof, but it is interesting to see what can be done with modern browsers.  All this behaviour should be regarded as extremely experimental and subject to change.  Feedback welcome.
 
 =head2 alert_text
 
@@ -12909,7 +13273,7 @@ accepts a L<preference|http://kb.mozillazine.org/About:config> name.  See the L<
 
 =head2 har
 
-returns a hashref representing the L<http archive|https://en.wikipedia.org/wiki/HAR_(file_format)> of the session.  This function is subject to the L<script|Firefox::Marionette::Timeouts#script> timeout, which, by default is 30 seconds.  It is also possible for the function to hang (until the L<script|Firefox::Marionette::Timeouts#script> timeout) if the original L<devtools|https://developer.mozilla.org/en-US/docs/Tools> window is closed.  The hashref has been designed to be accepted by the L<Archive::Har|Archive::Har> module.  This function should be considered experimental.  Feedback welcome.
+returns a hashref representing the L<http archive|https://en.wikipedia.org/wiki/HAR_(file_format)> of the session.  This function is subject to the L<script|Firefox::Marionette::Timeouts#script> timeout, which, by default is 30 seconds.  It is also possible for the function to hang (until the L<script|Firefox::Marionette::Timeouts#script> timeout) if the original L<devtools|https://developer.mozilla.org/en-US/docs/Tools> window is closed.  The hashref has been designed to be accepted by the L<Archive::Har|Archive::Har> module.
 
     use Firefox::Marionette();
     use Archive::Har();
@@ -13458,13 +13822,15 @@ accepts an optional hash as a parameter.  Allowed keys are below;
 
 =item * sleep_time_in_ms - the amount of time (in milliseconds) that this module should sleep when unsuccessfully calling the subroutine provided to the L<await|/await> or L<bye|/bye> methods.  This defaults to "1" millisecond.
 
-=item * stealth - stops L<navigator.webdriver|https://developer.mozilla.org/en-US/docs/Web/API/Navigator/webdriver> from being accessible by the current web page. This is highly experimental.  See L<WEBSITES THAT BLOCK AUTOMATION|/WEBSITES-THAT-BLOCK-AUTOMATION> for a discussion.
+=item * stealth - stops L<navigator.webdriver|https://developer.mozilla.org/en-US/docs/Web/API/Navigator/webdriver> from being accessible by the current web page.  This is achieved by loading an L<extension|https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions>, which will automatically switch on the C<addons> parameter for the L<new|/new> method.  This is extremely experimental.  See L<IMITATING OTHER BROWSERS|/IMITATING-OTHER-BROWSERS> for a discussion.
 
 =item * survive - if this is set to a true value, firefox will not automatically exit when the object goes out of scope.  See the reconnect parameter for an experimental technique for reconnecting.
 
 =item * trust - give a path to a L<root certificate|https://en.wikipedia.org/wiki/Root_certificate> encoded as a L<PEM encoded X.509 certificate|https://datatracker.ietf.org/doc/html/rfc7468#section-5> that will be trusted for this session.
 
 =item * timeouts - a shortcut to allow directly providing a L<timeout|Firefox::Marionette::Timeout> object, instead of needing to use timeouts from the capabilities parameter.  Overrides the timeouts provided (if any) in the capabilities parameter.
+
+=item * trackable - if this is set, profile preferences will be L<set|/set_pref> to make it harder to be tracked by the L<browsers fingerprint|https://en.wikipedia.org/wiki/Device_fingerprint#Browser_fingerprint> across browser restarts.  This is on by default, but may be switched off by setting it to 0;
 
 =item * user - if the "host" parameter is also set, use L<ssh|https://man.openbsd.org/ssh.1> to create and automate firefox with the specified user.  See L<REMOTE AUTOMATION OF FIREFOX VIA SSH|/REMOTE-AUTOMATION-OF-FIREFOX-VIA-SSH> and L<NETWORK ARCHITECTURE|/NETWORK-ARCHITECTURE>.  The user will default to the current user name.  Authentication should be via public keys loaded into the local L<ssh-agent|https://man.openbsd.org/ssh-agent>.
 
@@ -14344,7 +14710,7 @@ There are a number of steps to getting L<WebGL|https://en.wikipedia.org/wiki/Web
 
 =over
 
-=item 1. The addons parameter to the L<new|/new> method must be set.  This will disable L<-safe-mode|http://kb.mozillazine.org/Command_line_arguments#List_of_command_line_arguments_.28incomplete.29>
+=item 1. The C<addons> parameter to the L<new|/new> method must be set.  This will disable L<-safe-mode|http://kb.mozillazine.org/Command_line_arguments#List_of_command_line_arguments_.28incomplete.29>
 
 =item 2. The visible parameter to the L<new|/new> method must be set.  This is due to L<an existing bug in Firefox|https://bugzilla.mozilla.org/show_bug.cgi?id=1375585>.
 
@@ -14380,9 +14746,27 @@ One aspect of L<Web Components|https://developer.mozilla.org/en-US/docs/Web/API/
 
 So, this module is designed to allow you to navigate the shadow DOM using normal find methods, but you must get the shadow element's shadow root and use that as the root for the search into the shadow DOM.  An important caveat is that L<xpath|https://bugzilla.mozilla.org/show_bug.cgi?id=1822311> and L<tag name|https://bugzilla.mozilla.org/show_bug.cgi?id=1822321> strategies do not officially work yet (and also the class name and name strategies).  This module works around the tag name, class name and name deficiencies by using the matching L<css selector|/find_selector> search if the original search throws a recognisable exception.  Therefore these cases may be considered to be extremely experimental and subject to change when Firefox gets the "correct" functionality.
 
+=head1 IMITATING OTHER BROWSERS
+
+There are a collection of methods and techniques that may be useful if you would like to change your geographic location or how the browser appears to your web site.
+
+=over
+
+=item * the C<stealth> parameter of the L<new|/new> method.  This method will stop the browser reporting itself as a robot and will also (when combined with the L<agent|/agent> method, change other javascript characteristics to match the L<User Agent|https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent> string.
+
+=item * the L<agent|/agent> method, which if supplied a recognisable L<User Agent|https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent>, will attempt to change other attributes to match the desired browser.  This is extremely experimental and feedback is welcome.
+
+=item * the L<geo|/geo> method, which allows the modification of the L<Geolocation|https://developer.mozilla.org/en-US/docs/Web/API/Geolocation> reported by the browser, but not the location produced by mapping the external IP address used by the browser (see the L<NETWORK ARCHITECTURE|/NETWORK-ARCHITECTURE> section for a discussion of different types of proxies that can be used to change your external IP address).
+
+=item * the L<languages|/languages> method, which can change the L<requested languages|https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language> for your browser session.
+
+=back
+
+This list of methods may grow.
+
 =head1 WEBSITES THAT BLOCK AUTOMATION
 
-Marionette L<by design|https://developer.mozilla.org/en-US/docs/Web/API/Navigator/webdriver> allows web sites to detect that the browser is being automated.  Firefox L<no longer (since version 88)|https://bugzilla.mozilla.org/show_bug.cgi?id=1632821> allows you to disable this functionality while you are automating the browser.  This can be overridden with the C<stealth> parameter for the L<new|/new> method.  This is very experimental and feedback is welcome.
+Marionette L<by design|https://developer.mozilla.org/en-US/docs/Web/API/Navigator/webdriver> allows web sites to detect that the browser is being automated.  Firefox L<no longer (since version 88)|https://bugzilla.mozilla.org/show_bug.cgi?id=1632821> allows you to disable this functionality while you are automating the browser, but this can be overridden with the C<stealth> parameter for the L<new|/new> method.  This is extremely experimental and feedback is welcome.
 
 If the web site you are trying to automate mysteriously fails when you are automating a workflow, but it works when you perform the workflow manually, you may be dealing with a web site that is hostile to automation.
 

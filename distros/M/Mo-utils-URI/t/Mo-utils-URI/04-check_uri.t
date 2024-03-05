@@ -5,8 +5,9 @@ use English;
 use Error::Pure::Utils qw(clean);
 use Mo::utils::URI qw(check_uri);
 use Readonly;
-use Test::More 'tests' => 14;
+use Test::More 'tests' => 15;
 use Test::NoWarnings;
+use Unicode::UTF8 qw(decode_utf8 encode_utf8);
 
 Readonly::Array our @RIGHT_URIS => qw(
 	http://skim.cz
@@ -21,8 +22,9 @@ Readonly::Array our @RIGHT_URIS => qw(
 	urn:isbn:0451450523
 	urn:oasis:names:specification:docbook:dtd:xml:4.1.2
 );
-Readonly::Array our @BAD_URIS => qw(
-	foo
+Readonly::Array our @BAD_URIS => (
+	'foo',
+	decode_utf8('https://michal.josef.špaček'),
 );
 
 # Test.
@@ -49,6 +51,6 @@ foreach my $bad_uri (@BAD_URIS) {
 		check_uri($self, 'key');
 	};
 	is($EVAL_ERROR, "Parameter 'key' doesn't contain valid URI.\n",
-		"Parameter 'key' doesn't contain valid URI ($bad_uri).");
+		encode_utf8("Parameter 'key' doesn't contain valid URI ($bad_uri)."));
 	clean();
 }

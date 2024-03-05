@@ -34,6 +34,7 @@ requires:
   File::Spec: '0.82'
   File::Temp: '0.17'
   HTML::Entities: '3.69'
+  URI: '1.76'
   if: '0'
   overload: '0'
   parent: '0.225'
@@ -46,5 +47,5 @@ resources:
   homepage: https://metacpan.org/module/CGI
   license: http://dev.perl.org/licenses/
   repository: https://github.com/leejo/CGI.pm
-version: '4.61'
+version: '4.62'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

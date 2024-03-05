@@ -4,7 +4,7 @@
 # ABSTRACT: Génération de fichier de localisation automatique dans le Sudoc
 
 package Main;
-$Main::VERSION = '2.43';
+$Main::VERSION = '2.45';
 use Modern::Perl;
 use utf8;
 use Getopt::Long;
@@ -61,7 +61,7 @@ sudoc-localisation - Génération de fichier de localisation automatique dans le
 
 =head1 VERSION
 
-version 2.43
+version 2.45
 
 =head1 AUTHOR
 

@@ -10,7 +10,7 @@ App::Greple::xlate - greple的翻译支持模块
 
 # VERSION
 
-Version 0.30
+Version 0.31
 
 # DESCRIPTION
 
@@ -158,7 +158,52 @@ Version 0.30
 
 # COMMAND LINE INTERFACE
 
-你可以通过使用版本库中的`xlate`命令从命令行轻松使用这个模块。请参阅 `xlate` 的帮助信息了解用法。
+通过使用发行版中的 `xlate` 命令，您可以轻松地从命令行使用该模块。有关用法，请参阅 `xlate` 帮助信息。
+
+`xlate` 命令与 Docker 环境协同工作，因此即使你手头没有安装任何东西，只要 Docker 可用，你就可以使用它。使用 `-D` 或 `-C` 选项。
+
+此外，由于提供了各种文档样式的 makefile，因此无需特别说明即可翻译成其他语言。使用 `-M` 选项。
+
+你还可以将 Docker 和 make 选项结合起来，以便在 Docker 环境中运行 make。
+
+像 `xlate -GC` 这样运行，会启动一个挂载了当前工作 git 仓库的 shell。
+
+详情请阅读 ["SEE ALSO"](#see-also) 部分的日文文章。
+
+    xlate [ options ] -t lang file [ greple options ]
+        -h   help
+        -v   show version
+        -d   debug
+        -n   dry-run
+        -a   use API
+        -c   just check translation area
+        -r   refresh cache
+        -s   silent mode
+        -e # translation engine (default "deepl")
+        -p # pattern to determine translation area
+        -w # wrap line by # width
+        -o # output format (default "xtxt", or "cm", "ifdef")
+        -f # from lang (ignored)
+        -t # to lang (required, no default)
+        -m # max length per API call
+        -l # show library files (XLATE.mk, xlate.el)
+        --   terminate option parsing
+    Make options
+        -M   run make
+        -n   dry-run
+    Docker options
+        -G   mount git top-level directory
+        -B   run in non-interactive (batch) mode
+        -R   mount read-only
+        -E * specify environment variable to be inherited
+        -I * specify altanative docker image (default: tecolicom/xlate:version)
+        -D * run xlate on the container with the rest parameters
+        -C * run following command on the container, or run shell
+
+    Control Files:
+        *.LANG    translation languates
+        *.FORMAT  translation foramt (xtxt, cm, ifdef)
+        *.ENGINE  translation engine (deepl or gpt3)
 
 # EMACS
 

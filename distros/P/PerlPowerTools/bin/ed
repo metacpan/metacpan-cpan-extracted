@@ -29,15 +29,11 @@ License: gpl
 #        - Because working on this is more fun than Y2K testing !
 #
 # Who:
-#
 #        George M Jones (gmj@infinet.com).  Please send changes to me.
 #
 # When:
 #        Version 0.1
 #          - 06/09/99 - Created (note that non-Y2K compliant date !!!)
-#
-# How (Usage):
-#        ed [-ddebugflags] [-v] [-] [file]
 #
 # Irony:  This was, of course, edited originaly with emacs...
 #
@@ -154,7 +150,7 @@ $SIG{HUP} = sub {
 
 
 my %opt;
-getopts('d:p:sv', \%opt) or &Usage;
+getopts('dp:sv', \%opt) or Usage();
 if (defined $opt{'p'}) {
     $Prompt = $opt{'p'};
 }
@@ -162,17 +158,11 @@ if ($opt{'v'}) {
     warn "perl ed version $VERSION\n";
     $EXTENDED_MESSAGES = 1;
 }
-if ($opt{'s'}) {
-    $SupressCounts = 1;
-}
 
-&Usage if scalar(@ARGV) > 1;
-my $fname = shift;
-if (!defined($fname) || $fname eq '-') {
-    $SupressCounts = 1;
-} else {
-    $args[0] = $fname;
-}
+$args[0] = shift;
+$args[0] = undef if (defined($args[0]) && $args[0] eq '-');
+Usage() if @ARGV;
+$SupressCounts = 1 if ($opt{'s'} || !defined($args[0]));
 
 &edEdit($NO_QUESTIONS_MODE,$NO_APPEND_MODE);
 
@@ -187,7 +177,7 @@ while (1) {
 
     if (&edParse) {
 
-        if ($opt{'d'} =~ /parse/) {
+        if ($opt{'d'}) {
             print "command: /$command/ ";
             print "adrs[0]: /$adrs[0]/ " if defined($adrs[0]);
             print "adrs[1]: /$adrs[1]/ " if defined($adrs[1]);
@@ -272,9 +262,9 @@ while (1) {
             &edPrint;
         } elsif ($command eq 'P') {
             edPrompt();
-        } elsif ($command =~ /^q$/) {
+        } elsif ($command eq 'q') {
             &edQuit($QUESTIONS_MODE);
-        } elsif ($command =~ /^Q$/) {
+        } elsif ($command eq 'Q') {
             &edQuit($NO_QUESTIONS_MODE);
         } elsif ($command eq 'h') {
             edHelp();
@@ -334,9 +324,8 @@ sub edHelp {
     }
     if ($toggle) {
         $EXTENDED_MESSAGES ^= 1;
-        return unless $EXTENDED_MESSAGES;
     }
-    if (defined $Error) {
+    if (defined($Error) && ($EXTENDED_MESSAGES || !$toggle)) {
          print "$Error\n";
     }
 }
@@ -485,12 +474,7 @@ sub edMove {
     }
 
     my $count = $end - $start + 1;
-    my @copy;
-    if ($count == 1) {
-        push @copy, $lines[$start];
-    } else {
-        @copy = @lines[$start .. $end];
-    }
+    my @copy = @lines[$start .. $end];
     if ($start > $dst && $end > $dst) {
         splice(@lines, $start, $count) if $delete;
         splice @lines, $dst + 1, 0, @copy;
@@ -515,8 +499,12 @@ sub edSubstitute {
     # parse args
 
     $adrs[0] = $CurrentLineNum unless (defined($adrs[0]));
-    $adrs[1] = $CurrentLineNum unless (defined($adrs[1]));
+    $adrs[1] = $adrs[0] unless (defined $adrs[1]);
 
+    if ($adrs[0] == 0 || $adrs[1] == 0) {
+        edWarn(E_ADDRBAD);
+        return;
+    }
     unless (defined($args[0])) {
         edWarn(E_PATTERN);
         return;
@@ -663,9 +651,6 @@ sub edWrite {
     $UserHasBeenWarned = 0;
     print "$chars\n" unless ($SupressCounts);
 
-    # v7 docs say to chmod 666 the file ... we're not going to
-    # follow the docs *that* closely today (6/16/99 ---gmj)
-
     if ($qflag) {
         exit 0;
     }
@@ -681,7 +666,7 @@ sub edWrite {
 
 sub edEdit {
     my($QuestionsMode,$InsertMode) = @_;
-    my(@tmp_lines, @tmp_lines2, $tmp_chars, $chars, $fh);
+    my(@tmp_lines, $chars, $fh);
 
     if ($InsertMode) {
         if (defined $adrs[1]) {
@@ -693,7 +678,7 @@ sub edEdit {
     } else {
         if (defined($adrs[0]) or defined($adrs[1])) {
             edWarn(E_ADDREXT);
-            return;
+            return 0;
         }
     }
 
@@ -716,13 +701,10 @@ sub edEdit {
         return 0;
     }
 
-    @tmp_lines = ();
-    $tmp_chars = 0;
     $chars = 0;
-
     while (<$fh>) {
         push @tmp_lines, $_;
-        $tmp_chars += length;
+        $chars += length;
     }
     unless (close $fh) {
         warn "$filename: $!\n";
@@ -731,7 +713,7 @@ sub edEdit {
     }
     if (substr($tmp_lines[-1], -1, 1) ne "\n") {
         $tmp_lines[-1] .= "\n";
-        $tmp_chars++;
+        $chars++;
         print "Newline appended\n";
     }
 
@@ -762,7 +744,6 @@ sub edEdit {
         $CurrentLineNum = maxline();
     }
 
-    $chars = $tmp_chars;
     $UserHasBeenWarned = 0;
     print "$chars\n" unless $SupressCounts;
     return 1;
@@ -799,37 +780,15 @@ sub edInsert {
         $tmp_chars += length;
     }
 
-    # now that we've got it, figure out what to do with it
+    my $src = $adrs[0];
+    $src-- if ($src && $Mode == $INSERT_MODE);
 
-    if ($Mode == $INSERT_MODE) {
-
-        shift @lines; # get rid of 0 line
-        if ($adrs[0] == 0 || $adrs[0] == 1) {
-            unshift(@lines,@tmp_lines);
-            $CurrentLineNum = scalar(@tmp_lines);
-        } else {
-            @tmp_lines2 = splice(@lines,0,$adrs[0]-1);
-            unshift(@lines,@tmp_lines);
-            unshift(@lines,@tmp_lines2);
-            $CurrentLineNum = $adrs[0] + scalar(@tmp_lines) - 1;
-        }
-        unshift @lines, undef; # put 0 line back
-
-    } elsif ($Mode == $APPEND_MODE) {
-
-        shift(@lines); # get rid of 0 line
-        if ($adrs[0] == 0) {
-            unshift(@lines,@tmp_lines);
-            $CurrentLineNum = scalar(@tmp_lines);
-        } else {
-            @tmp_lines2 = splice(@lines,0,$adrs[0]);
-            unshift(@lines,@tmp_lines);
-            unshift(@lines,@tmp_lines2);
-            $CurrentLineNum = $adrs[0] + scalar(@tmp_lines);
-        }
-        unshift(@lines,undef); # put 0 line back
-
-    }
+    shift @lines; # get rid of 0 line
+    @tmp_lines2 = splice @lines, 0, $src;
+    unshift @lines, @tmp_lines;
+    unshift @lines, @tmp_lines2;
+    $CurrentLineNum = $src + scalar(@tmp_lines);
+    unshift @lines, undef; # put 0 line back
 
     if ($tmp_chars) {
         $NeedToSave = 1;
@@ -1028,7 +987,7 @@ sub CalculateLine {
 
     my($myline);
 
-    if ($opt{'d'} =~ /parse/) {
+    if ($opt{'d'}) {
         print "expr1=/$expr1/\n" if (defined($expr1));
         print "decimaladr=/$decimaladr/\n" if (defined($decimaladr));
         print "dotadr=/$dotadr/\n" if (defined($dotadr));
@@ -1137,7 +1096,7 @@ sub edSearchBackward {
 #
 
 sub Usage {
-    die "Usage: ed [-p prompt] [-ddebugstring] [-sv] [file]\n";
+    die "Usage: ed [-p prompt] [-dsv] [file]\n";
 }
 
 #
@@ -1166,7 +1125,7 @@ ed - text editor
 
 =head1 SYNOPSIS
 
-ed [-p prompt] [-ddebugstring] [-sv] [file]
+ed [-p prompt] [-dsv] [file]
 
 =head1 DESCRIPTION
 
@@ -1207,9 +1166,9 @@ The following options are available:
 
 =over 4
 
-=item -ddebugstring
+=item -d
 
-Print debugging output. debugstring may be set to "parse".
+Print debugging information on standard output.
 
 =item -p STRING
 

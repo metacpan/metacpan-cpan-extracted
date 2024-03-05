@@ -312,9 +312,12 @@ use strict;
 use warnings;
 use Carp();
 use Config;
+use Socket();
 use English qw( -no_match_vars );
 
 @Test::Daemon::ISA = qw(Test::File::Temp);
+
+sub CONVERT_TO_PROCESS_GROUP { return -1 }
 
 my @sig_nums  = split q[ ], $Config{sig_num};
 my @sig_names = split q[ ], $Config{sig_name};
@@ -354,6 +357,42 @@ sub arguments {
     return @{ $self->{arguments} };
 }
 
+sub address {
+    my ($self) = @_;
+    return $self->{listen};
+}
+
+sub wait_until_port_open {
+    my ($self)     = @_;
+    my $address    = $self->address();
+    my $port       = $self->port();
+    my $found_port = 0;
+    while ( $found_port == 0 ) {
+        socket my $socket, Socket::PF_INET(), Socket::SOCK_STREAM(), 0
+          or Carp::croak("Failed to create a socket:$EXTENDED_OS_ERROR");
+        my $sock_addr =
+          Socket::pack_sockaddr_in( $port, Socket::inet_aton($address) );
+        if ( connect $socket, $sock_addr ) {
+            $found_port = $port;
+        }
+        else {
+            my $kid = waitpid $self->pid(), POSIX::WNOHANG();
+            if ( $kid == $self->pid() ) {
+                Carp::croak('Server died while waiting for port to open');
+            }
+            sleep 1;
+        }
+        close $socket
+          or Carp::croak("Failed to close test socket:$EXTENDED_OS_ERROR");
+    }
+    return;
+}
+
+sub directory {
+    my ($self) = @_;
+    return $self->{directory};
+}
+
 sub start {
     my ($self) = @_;
     my $dev_null = File::Spec->devnull();
@@ -364,6 +403,16 @@ sub start {
         eval {
             local $SIG{INT}  = 'DEFAULT';
             local $SIG{TERM} = 'DEFAULT';
+            if ( $self->{resetpg} ) {
+                setpgrp $PID, 0
+                  or Carp::croak(
+                    "Failed to reset process group:$EXTENDED_OS_ERROR");
+            }
+            if ( my $directory = $self->directory() ) {
+                chdir $directory
+                  or
+                  Carp::croak("Failed to chdir $directory:$EXTENDED_OS_ERROR");
+            }
             open STDOUT, q[>], $dev_null
               or Carp::croak(
                 "Failed to redirect STDOUT to $dev_null:$EXTENDED_OS_ERROR");
@@ -419,8 +468,34 @@ sub stop {
     return;
 }
 
+sub stop_process_group {
+    my ($self) = @_;
+    if ( my $pid = $self->{pid} ) {
+        my $pgrp = getpgrp $self->{pid}
+          or Carp::croak(
+            "Failed to get process group from $self->{pid}:$EXTENDED_OS_ERROR");
+        $pgrp *= CONVERT_TO_PROCESS_GROUP();
+
+        kill $signals_by_name{INT}, $pgrp;
+        my $kid = waitpid $pgrp, 0;
+        while ( $kid > 0 ) {
+            sleep 1;
+            $kid = waitpid $pgrp, POSIX::WNOHANG();
+            if ( $kid > 0 ) {
+                Carp::carp("Also gathered $kid");
+            }
+        }
+        delete $self->{pid};
+        return 0;
+    }
+    return;
+}
+
 sub DESTROY {
     my ($self) = @_;
+    if ( $self->{resetpg} ) {
+        $self->stop_process_group();
+    }
     if ( my $pid = delete $self->{pid} ) {
         while ( kill 0, $pid ) {
             kill $signals_by_name{TERM}, $pid;
@@ -436,6 +511,7 @@ package Test::Daemon::Nginx;
 use strict;
 use warnings;
 use Carp();
+use Crypt::URandom();
 use English qw( -no_match_vars );
 
 @Test::Daemon::Nginx::ISA = qw(Test::Daemon Test::Binary::Available);
@@ -856,12 +932,20 @@ sub new {
 sub connect_and_exit {
     my ( $class, $host ) = @_;
     my $binary = 'ssh';
-    if (!$class->SUPER::available( $binary, '-o', 'ConnectTimeout=5', '-o', 'BatchMode=yes', $host, 'exit 0' )) {
-	return 0;
+    if (
+        !$class->SUPER::available(
+            $binary,         '-o',  'ConnectTimeout=5', '-o',
+            'BatchMode=yes', $host, 'exit 0'
+        )
+      )
+    {
+        return 0;
     }
     my $port   = $class->new_port();
-    my $result = system {$binary} $binary, '-o', 'ConnectTimeout=5', '-o', 'BatchMode=yes',
-      '-o', 'StrictHostKeyChecking=accept-new', '-o', 'ExitOnForwardFailure=yes',
+    my $result = system {$binary} $binary, '-o', 'ConnectTimeout=5', '-o',
+      'BatchMode=yes',
+      '-o', 'StrictHostKeyChecking=accept-new', '-o',
+      'ExitOnForwardFailure=yes',
       '-L', "$port:127.0.0.1:22", $host, 'exit 0';
     return $result == 0 ? return 1 : return $result;
 }
@@ -882,8 +966,8 @@ sub available {
     my $listen        = $parameters{listen};
     my $port          = $class->new_port();
     my $config_handle = $class->_sshd_config(
-        listen     => $listen,
-        port       => $port
+        listen => $listen,
+        port   => $port
     );
     my $config_path = $config_handle->filename();
     return $class->SUPER::available( $ssh_binary, '-V' );
@@ -891,16 +975,219 @@ sub available {
 
 sub new {
     my ( $class, %parameters ) = @_;
-    my $listen        = $parameters{listen};
-    my $port          = $class->new_port();
-    my $ssh         = $class->SUPER::new(
-        debug         => $parameters{debug},
-        binary        => $ssh_binary,
-        listen        => $listen,
-        port          => $port,
-        arguments     => [ qw(-o ConnectTimeout=5 -o BatchMode=yes -o StrictHostKeyChecking=accept-new -o ExitOnForwardFailure=yes -ND), "$listen:$port", 'localhost' ]
+    my $listen = $parameters{listen};
+    my $port   = $class->new_port();
+    my $ssh    = $class->SUPER::new(
+        debug     => $parameters{debug},
+        binary    => $ssh_binary,
+        listen    => $listen,
+        port      => $port,
+        arguments => [
+            qw(-o ConnectTimeout=5 -o BatchMode=yes -o StrictHostKeyChecking=accept-new -o ExitOnForwardFailure=yes -ND),
+            "$listen:$port",
+            'localhost'
+        ]
     );
     return $ssh;
+}
+
+package Test::Daemon::Botd;
+
+use strict;
+use warnings;
+use Cwd();
+use Carp();
+use English qw( -no_match_vars );
+
+@Test::Daemon::Botd::ISA = qw(Test::Daemon Test::Binary::Available);
+
+my $yarn_binary =
+  __PACKAGE__->find_binary('yarnpkg') || __PACKAGE__->find_binary('yarn');
+
+sub botd_available {
+    my $cwd;
+    if (   ( Cwd::cwd() =~ /^(.*)$/smx )
+        && ( -d File::Spec->catdir( $1, 'BotD' ) ) )
+    {
+        return 1;
+    }
+    return;
+}
+
+sub available {
+    my ($class) = @_;
+    return $class->SUPER::available( $yarn_binary, '--version' );
+}
+
+sub new {
+    my ( $class, %parameters ) = @_;
+    my $listen = $parameters{listen};
+    my $port   = $class->new_port();
+    my $cwd;
+    if ( Cwd::cwd() =~ /^(.*)$/smx ) {
+        $cwd = $1;
+    }
+    else {
+        Carp::croak(q[Unable to untaint current working directory]);
+    }
+    my $git_repo_dir = File::Spec->catdir( $cwd, '.git' );
+    if ( -d $git_repo_dir ) {
+        system {'git'} 'git', 'submodule', 'init'
+          and Carp::croak("Failed to 'git submodule init':$EXTENDED_OS_ERROR");
+        system {'git'} 'git', 'submodule', 'update', '--remote'
+          and
+          Carp::croak("Failed to 'git submodule update':$EXTENDED_OS_ERROR");
+    }
+
+    my $botd_directory = File::Spec->catdir( $cwd, 'BotD' );
+    my $dev_null       = File::Spec->devnull();
+    if ( my $pid = fork ) {
+        waitpid $pid, 0;
+    }
+    elsif ( defined $pid ) {
+        eval {
+            local $SIG{INT}  = 'DEFAULT';
+            local $SIG{TERM} = 'DEFAULT';
+            chdir $botd_directory
+              or
+              Carp::croak("Failed to chdir $botd_directory:$EXTENDED_OS_ERROR");
+            open STDOUT, q[>], $dev_null
+              or Carp::croak(
+                "Failed to redirect STDOUT to $dev_null:$EXTENDED_OS_ERROR");
+            if ( !$parameters{debug} ) {
+                open STDERR, q[>], $dev_null
+                  or Carp::croak(
+                    "Failed to redirect STDERR to $dev_null:$EXTENDED_OS_ERROR"
+                  );
+            }
+            open STDIN, q[<], $dev_null
+              or Carp::croak(
+                "Failed to redirect STDIN to $dev_null:$EXTENDED_OS_ERROR");
+            exec {$yarn_binary} $yarn_binary, 'install'
+              or
+              Carp::croak("Failed to exec '$yarn_binary':$EXTENDED_OS_ERROR");
+        } or do {
+            Carp::carp($EVAL_ERROR);
+        };
+        exit 1;
+    }
+    else {
+        Carp::croak("Failed to fork:$EXTENDED_OS_ERROR");
+    }
+    my $botd = $class->SUPER::new(
+        debug     => $parameters{debug},
+        binary    => $yarn_binary,
+        directory => $botd_directory,
+        listen    => $listen,
+        resetpg   => 1,
+        port      => $port,
+        arguments =>
+          [ q[dev:playground], q[--host], $listen, q[--port], $port ],
+    );
+    return $botd;
+}
+
+sub stop {
+    my ($self) = @_;
+    return $self->stop_process_group();
+}
+
+package Test::Daemon::FingerprintJS;
+
+use strict;
+use warnings;
+use Cwd();
+use Carp();
+use English qw( -no_match_vars );
+
+@Test::Daemon::FingerprintJS::ISA = qw(Test::Daemon Test::Binary::Available);
+
+sub fingerprintjs_available {
+    my $cwd;
+    if (   ( Cwd::cwd() =~ /^(.*)$/smx )
+        && ( -d File::Spec->catdir( $1, 'fingerprintjs' ) ) )
+    {
+        return 1;
+    }
+    return;
+}
+
+sub available {
+    my ($class) = @_;
+    return $class->SUPER::available( $yarn_binary, '--version' );
+}
+
+sub new {
+    my ( $class, %parameters ) = @_;
+    my $listen = $parameters{listen};
+    my $port   = $class->new_port();
+    my $cwd;
+    if ( Cwd::cwd() =~ /^(.*)$/smx ) {
+        $cwd = $1;
+    }
+    else {
+        Carp::croak(q[Unable to untaint current working directory]);
+    }
+    my $git_repo_dir = File::Spec->catdir( $cwd, '.git' );
+    if ( -d $git_repo_dir ) {
+        system {'git'} 'git', 'submodule', 'init'
+          and Carp::croak("Failed to 'git submodule init':$EXTENDED_OS_ERROR");
+        system {'git'} 'git', 'submodule', 'update', '--remote'
+          and
+          Carp::croak("Failed to 'git submodule update':$EXTENDED_OS_ERROR");
+    }
+
+    my $fingerprintjs_directory = File::Spec->catdir( $cwd, 'fingerprintjs' );
+    my $dev_null                = File::Spec->devnull();
+    if ( my $pid = fork ) {
+        waitpid $pid, 0;
+    }
+    elsif ( defined $pid ) {
+        eval {
+            local $SIG{INT}  = 'DEFAULT';
+            local $SIG{TERM} = 'DEFAULT';
+            chdir $fingerprintjs_directory
+              or Carp::croak(
+                "Failed to chdir $fingerprintjs_directory:$EXTENDED_OS_ERROR");
+            open STDOUT, q[>], $dev_null
+              or Carp::croak(
+                "Failed to redirect STDOUT to $dev_null:$EXTENDED_OS_ERROR");
+            if ( !$parameters{debug} ) {
+                open STDERR, q[>], $dev_null
+                  or Carp::croak(
+                    "Failed to redirect STDERR to $dev_null:$EXTENDED_OS_ERROR"
+                  );
+            }
+            open STDIN, q[<], $dev_null
+              or Carp::croak(
+                "Failed to redirect STDIN to $dev_null:$EXTENDED_OS_ERROR");
+            exec {$yarn_binary} $yarn_binary, 'install'
+              or
+              Carp::croak("Failed to exec '$yarn_binary':$EXTENDED_OS_ERROR");
+        } or do {
+            Carp::carp($EVAL_ERROR);
+        };
+        exit 1;
+    }
+    else {
+        Carp::croak("Failed to fork:$EXTENDED_OS_ERROR");
+    }
+    my $fingerprintjs = $class->SUPER::new(
+        debug     => $parameters{debug},
+        binary    => $yarn_binary,
+        directory => $fingerprintjs_directory,
+        listen    => $listen,
+        resetpg   => 1,
+        port      => $port,
+        arguments =>
+          [ q[playground:start], q[--host], $listen, q[--port], $port ],
+    );
+    return $fingerprintjs;
+}
+
+sub stop {
+    my ($self) = @_;
+    return $self->stop_process_group();
 }
 
 1;

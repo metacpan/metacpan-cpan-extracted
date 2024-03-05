@@ -1,5 +1,8 @@
 Revision history for Map::Tube
 
+3.70  2024-02-29T21:15:00+00:00
+      - Corrected pod w.r.t the creator of new map Bielefeld.
+
 3.69  2024-01-28T17:20:00+00:00
       - Updated pod, new map Bielefeld.
       - Updated copyright year.

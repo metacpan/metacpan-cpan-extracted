@@ -1,11 +1,8 @@
+.editorconfig
 Build.PL
 Changes
 lib/ExtUtils/CChecker.pm
-LICENSE
 MANIFEST			This list of files
-META.json
-META.yml
-README
 t/00use.t
 t/01run.t
 t/02assert.t
@@ -14,3 +11,7 @@ t/04module_build.t
 t/05defines_to.t
 t/10find_cflags.t
 t/99pod.t
+README
+LICENSE
+META.yml
+META.json

@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver;
 # ABSTRACT: Neo4j community graph database driver for Bolt and HTTP
-$Neo4j::Driver::VERSION = '0.45';
+$Neo4j::Driver::VERSION = '0.46';
 
 use Carp qw(croak);
 
@@ -107,6 +107,8 @@ sub _check_uri {
 
 sub _fix_neo4j_uri {
 	my ($self) = @_;
+	
+	croak "The concurrent_tx config option may only be used with http:/https: URIs" if $self->{config}->{concurrent_tx};
 	
 	my $uri = $self->{config}->{uri};
 	$uri->scheme( exists $INC{'Neo4j/Bolt.pm'} ? 'bolt' : $self->{config}->{tls} ? 'https' : 'http' );
@@ -211,6 +213,7 @@ sub plugin {
 	my ($self, $package, @extra) = @_;
 	
 	croak "plugin() with more than one argument is unsupported" if @extra;
+	croak "Unsupported sequence: call plugin() before session()" if $self->{server_info};
 	$self->{plugins}->_register_plugin($package);
 	return $self;
 }
@@ -247,7 +250,7 @@ Neo4j::Driver - Neo4j community graph database driver for Bolt and HTTP
 
 =head1 VERSION
 
-version 0.45
+version 0.46
 
 =head1 SYNOPSIS
 
@@ -379,6 +382,18 @@ reference, the Neo4j server URI may be given as a scalar string.
 If C<new()> is called with no arguments, a default configuration
 will be used for the driver.
 
+=head2 plugin
+
+ $driver->plugin( $plugin );
+
+Load the given plug-in object into the driver. This method returns
+the modified driver, so that method chaining is possible.
+
+Details on the implementation of plug-ins including descriptions of
+individual event handlers are provided in L<Neo4j::Driver::Plugin>.
+Note that the plug-in API is experimental because some of its parts
+are still evolving.
+
 =head2 session
 
  $session = $driver->session;
@@ -396,28 +411,6 @@ in F<neo4j.conf>.
 
 The C<database> option is silently ignored when used with Neo4j
 S<versions 2> S<and 3>, which only support a single database.
-
-=head1 EXPERIMENTAL FEATURES
-
-L<Neo4j::Driver> implements the following experimental features.
-These are subject to unannounced modification or removal in future
-versions. Expect your code to break if you depend upon these
-features.
-
-=head2 Plug-in modules
-
- $driver->plugin(  Local::MyPlugin->new );
-
-The driver offers a simple plug-in interface. Plug-ins are modules
-providing handlers for events that may be triggered by the driver.
-Plug-ins are loaded by calling the C<plugin()> method with the
-the blessed instance of a plug-in as parameter.
-
-Details on the implementation of plug-ins including descriptions of
-individual events are provided in L<Neo4j::Driver::Plugin>.
-
-This feature is experimental because some parts of the plug-in
-API are still evolving.
 
 =head1 ENVIRONMENT
 

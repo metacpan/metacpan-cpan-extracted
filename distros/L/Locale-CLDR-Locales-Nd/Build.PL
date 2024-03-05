@@ -14,7 +14,7 @@ my $builder = Module::Build->new(
         'MooX::ClassAttribute'      => '0.011',
         'Type::Tiny'                => 0,
         'perl'                      => '5.10.1',
-        'Locale::CLDR'              => '0.44.0',
+        'Locale::CLDR'              => '0.44.1',
     },
     dist_author         => q{John Imrie <john.imrie1@gmail.com>},
     dist_version_from   => 'lib/Locale/CLDR/Locales/Nd.pm',

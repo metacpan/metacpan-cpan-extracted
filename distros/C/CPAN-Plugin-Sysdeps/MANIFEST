@@ -9,6 +9,7 @@ script/cpan-sysdeps
 script/test-sysdeps-roundtrip
 t/basic.t
 t/code.t
+t/detect_linux_distribution.t
 t/filtuninst.t
 t/instcmd.t
 t/lib/TestUtil.pm

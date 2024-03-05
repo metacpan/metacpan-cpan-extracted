@@ -8,7 +8,7 @@ require "tests.pl";
 
 our $obj = new Date::Manip::Date;
 $obj->config("forcedate","now,America/New_York");
-$obj->config(qw(Jan1Week1 1));
+$obj->config(qw(Week1ofYear jan1));
 
 sub test {
    my($date,$first) = @_;

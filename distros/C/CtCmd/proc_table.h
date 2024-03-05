@@ -1,6 +1,7 @@
 /*************************************************************************
 *                                                                        *
-* © Copyright IBM Corporation 2001, 2004. All rights reserved.           *
+* (C) Copyright IBM Corporation 2001, 2016. All rights reserved.         *
+* (C) Copyright HCL Technologies Ltd. 2017, 2019.  All Rights Reserved.  *
 *                                                                        *
 * This program and the accompanying materials are made available under   *
 * the terms of the Common Public License v1.0 which accompanies this     *
@@ -24,8 +25,8 @@ typedef  int (*gen_2_t)(gen_t,gen_t,enum_t);
 
 typedef struct {
     char *buffP;
-    int currSize;
-    int buffSize;
+    size_t currSize;
+    size_t buffSize;
 } BLOK;
 
 #define STANDARD (BLOK*) 0     
@@ -48,7 +49,7 @@ int client_meters_enabled = FALSE;
 void client_meters_finish_program(void){int empty = 1;}
 gen_t client_meters_create_region(const char *name){
   int empty = 1;
-  return (gen_t)empty;
+  return (gen_t)(intptr_t)empty;
 }
 void client_meters_exit_region(gen_t handle){int empty = 1;}
 void client_meters_enter_region(gen_t handle){int empty = 1;}
@@ -77,7 +78,12 @@ extern gen_t stg_create_area ( int );
 #ifdef ATRIA_WIN32_COMMON
 __declspec( dllimport )
 #endif 
-extern void pfm_init();
+extern void ks_system_init();
+
+#ifdef ATRIA_WIN32_COMMON
+__declspec( dllimport )
+#endif 
+extern void pfm_external_proc_init();
 
 #ifdef ATRIA_WIN32_COMMON
 __declspec( dllimport )
@@ -97,14 +103,10 @@ extern int cmdsyn_execv_dispatch (int,char **,gen_t,gen_t *,
 #ifdef ATRIA_WIN32_COMMON
 __declspec( dllimport )
 #endif
-extern int vob_ob_all_cache_action(int, int, int);
-
-#ifdef ATRIA_WIN32_COMMON
-__declspec( dllimport )
-#endif
-extern void pfm_int(void);
+extern int vob_ob_all_cache_action(void *, int, int);
 
 void blok_init (BLOK *);
 int dispatched_synv_call(int, char **, BLOK *, BLOK *, gen_t, gen_t *, gen_2_t *);
 int dispatched_syn_call (char *, BLOK *, BLOK *, gen_t , gen_t *, gen_2_t * );
+
 

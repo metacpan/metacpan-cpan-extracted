@@ -30,11 +30,38 @@ incompatible. These are marked with an exclamation mark (!).
 #=head1 VERSION 7.00 (expected 2025-03-01)
 #    Remove DM5
 #    Remove TZ variable
+#    Remove Jan1Week1 variable
 #=head1 VERSION 6.99 (expected )
 #=head1 VERSION 6.98 (expected 2024-12-01)
 #=head1 VERSION 6.97 (expected 2024-09-01)
 #=head1 VERSION 6.96 (expected 2024-06-01)
-#=head1 VERSION 6.95 (expected 2024-03-01)
+
+=head1 VERSION 6.95 (expected 2024-03-01)
+
+=over 5
+
+=item  Better support for weeks of the year
+
+Added the Week1ofYear config variable and deprecated the Jan1Week1 variable.
+The first week of the year can now be specified much more easily.
+
+=item  Support for the standard POSIX strftime directives in printf
+
+The Date::Manip::Date::printf method uses a set of directives which is
+similar, but not identical, to the POSIX strftime directives.
+
+A new config variable Use_POSIX_Printf has been added.  If set, the
+printf method will use the POSIX strftime directives more fully (see
+the PRINTF DIRECTIVES section in the Date::Manip::Date POD for more
+information).
+
+Reported in GitHub #48
+
+=item Time zone fixes
+
+Newest zoneinfo data (tzdata 2024a).
+
+=back
 
 =head1 VERSION 6.94 (2024-01-09)
 

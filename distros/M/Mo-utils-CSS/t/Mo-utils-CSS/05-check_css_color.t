@@ -8,7 +8,7 @@ use Readonly;
 use Test::More 'tests' => 59;
 use Test::NoWarnings;
 
-Readonly::Array our @RIGTH_UNITS => (
+Readonly::Array our @RIGTH_COLORS => (
 	'red',
 	'#F00', '#FF0000', '#FF000000',
 	'rgb(255,0,0)', 'rgba(255,0,0,0.3)',
@@ -17,12 +17,12 @@ Readonly::Array our @RIGTH_UNITS => (
 
 # Test.
 my ($ret, $self);
-foreach my $right_unit (@RIGTH_UNITS) {
+foreach my $right_color (@RIGTH_COLORS) {
 	$self = {
-		'key' => $right_unit,
+		'key' => $right_color,
 	};
 	$ret = check_css_color($self, 'key');
-	is($ret, undef, 'Right CSS color is present ('.$right_unit.').');
+	is($ret, undef, 'Right CSS color is present ('.$right_color.').');
 }
 
 # Test.

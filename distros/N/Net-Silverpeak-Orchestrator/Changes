@@ -1,5 +1,13 @@
 Revision history for Net-Silverpeak-Orchestrator
 
+0.010000  2024-03-04 14:28:16+01:00 Europe/Vienna
+    - add get_vrf_zones_map
+
+0.009000  2024-03-04 13:05:30+01:00 Europe/Vienna
+    - add has_segmentation_enabled
+    - add get_vrf_security_policies_by_ids
+    - add update_vrf_security_policies_by_ids
+
 0.008000  2023-09-14 14:21:59+02:00 Europe/Vienna
     - enable TLS verification by default
       by requiring HTTP::Tiny 0.088

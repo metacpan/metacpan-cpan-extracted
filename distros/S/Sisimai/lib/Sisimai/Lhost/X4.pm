@@ -5,18 +5,18 @@ use strict;
 use warnings;
 
 sub description { 'Unknown MTA #4 qmail clones' }
-sub make {
+sub inquire {
     # Detect an error from Unknown MTA #4, qmail clones
     # @param    [Hash] mhead    Message headers of a bounce email
     # @param    [String] mbody  Message body of a bounce email
     # @return   [Hash]          Bounce data list and message/rfc822 part
-    # @return   [Undef]         failed to parse or the arguments are missing
+    # @return   [undef]         failed to parse or the arguments are missing
     # @since v4.1.23
     my $class = shift;
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
     my $match = 0;
-    my $tryto = qr/\A[(]qmail[ ]+\d+[ ]+invoked[ ]+for[ ]+bounce[)]/;
+    my $tryto = [['(qmail ', 'invoked for bounce)'], ['(qmail ', 'invoked from ', 'network)']];
 
     # Pre process email headers and the body part of the message which generated
     # by qmail, see https://cr.yp.to/qmail.html
@@ -24,13 +24,16 @@ sub make {
     #         Subject: failure notice
     $match ||= 1 if index($mhead->{'subject'}, 'failure notice') == 0;
     $match ||= 1 if index($mhead->{'subject'}, 'Permanent Delivery Failure') == 0;
-    $match ||= 1 if grep { $_ =~ $tryto } @{ $mhead->{'received'} };
+    for my $e ( $mhead->{'received'}->@* ) {
+        # Received: (qmail 2222 invoked for bounce);29 Apr 2017 23:34:45 +0900
+        # Received: (qmail 2202 invoked from network); 29 Apr 2018 00:00:00 +0900
+        $match ||= 1 if grep { Sisimai::String->aligned(\$e, $_) } $tryto->@*;
+    }
     return undef unless $match;
 
     state $indicators = __PACKAGE__->INDICATORS;
-    state $rebackbone = qr/^---[ ](?:Below this line is a copy of the message|Original message follows)[.]/m;
-    state $startingof = { 'error'  => ['Remote host said:'] };
-    state $markingsof = {
+    state $boundaries = ['--- Below this line is a copy of the message.', 'Original message follows.'];
+    state $startingof = {
         #  qmail-remote.c:248|    if (code >= 500) {
         #  qmail-remote.c:249|      out("h"); outhost(); out(" does not like recipient.\n");
         #  qmail-remote.c:265|  if (code >= 500) quit("D"," failed on DATA command");
@@ -38,27 +41,40 @@ sub make {
         #
         # Characters: K,Z,D in qmail-qmqpc.c, qmail-send.c, qmail-rspawn.c
         #  K = success, Z = temporary error, D = permanent error
-        #
-        # MTA module for qmail clones
-        'message' => qr{\A(?>
-             He/Her[ ]is[ ]not[ ].+[ ]user
-            |Hi[.][ ].+[ ]unable[ ]to[ ]deliver[ ]your[ ]message[ ]to[ ]the[ ]following[ ]addresses
-            |Su[ ]mensaje[ ]no[ ]pudo[ ]ser[ ]entregado
-            |This[ ]is[ ]the[ ](?:
-                 machine[ ]generated[ ]message[ ]from[ ]mail[ ]service
-                |mail[ ]delivery[ ]agent[ ]at
-                )
-            |Unable[ ]to[ ]deliver[ ]message[ ]to[ ]the[ ]following[ ]address
-            |Unfortunately,[ ]your[ ]mail[ ]was[ ]not[ ]delivered[ ]to[ ]the[ ]following[ ]address:
-            |Your[ ](?:
-                 mail[ ]message[ ]to[ ]the[ ]following[ ]address
-                |message[ ]to[ ]the[ ]following[ ]addresses
-                )
-            |We're[ ]sorry[.]
-            )
-        }x,
+        'error'   => ['Remote host said:'],
+        'message' => [
+            'He/Her is not ',
+            'unable to deliver your message to the following addresses',
+            'Su mensaje no pudo ser entregado',
+            'This is the machine generated message from mail service',
+            'This is the mail delivery agent at',
+            'Unable to deliver message to the following address',
+            'Unfortunately, your mail was not delivered to the following address:',
+            'Your mail message to the following address',
+            'Your message to the following addresses',
+            "We're sorry.",
+        ],
+        'rhost'   => ['Giving up on ', 'Connected to ', 'remote host '],
     };
-
+    state $commandset = {
+        # Error text regular expressions which defined in qmail-remote.c
+        # qmail-remote.c:225|  if (smtpcode() != 220) quit("ZConnected to "," but greeting failed");
+        'conn' => [' but greeting failed.'],
+        # qmail-remote.c:231|  if (smtpcode() != 250) quit("ZConnected to "," but my name was rejected");
+        'ehlo' => [' but my name was rejected.'],
+        # qmail-remote.c:238|  if (code >= 500) quit("DConnected to "," but sender was rejected");
+        # reason = rejected
+        'mail' => [' but sender was rejected.'],
+        # qmail-remote.c:249|  out("h"); outhost(); out(" does not like recipient.\n");
+        # qmail-remote.c:253|  out("s"); outhost(); out(" does not like recipient.\n");
+        # reason = userunknown
+        'rcpt' => [' does not like recipient.'],
+        # qmail-remote.c:265|  if (code >= 500) quit("D"," failed on DATA command");
+        # qmail-remote.c:266|  if (code >= 400) quit("Z"," failed on DATA command");
+        # qmail-remote.c:271|  if (code >= 500) quit("D"," failed after I sent the message");
+        # qmail-remote.c:272|  if (code >= 400) quit("Z"," failed after I sent the message");
+        'data' => [' failed on DATA command', ' failed after I sent the message'],
+    };
     state $resmtp = {
         # Error text regular expressions which defined in qmail-remote.c
         # qmail-remote.c:225|  if (smtpcode() != 220) quit("ZConnected to "," but greeting failed");
@@ -82,19 +98,11 @@ sub make {
             )
         }x,
     };
-    state $rehost = qr{(?:
-        # qmail-remote.c:261|  if (!flagbother) quit("DGiving up on ","");
-         Giving[ ]up[ ]on[ ]([^ ]+[0-9a-zA-Z])[.]?\z
-        |Connected[ ]to[ ]([-0-9a-zA-Z.]+[0-9a-zA-Z])[ ]
-        |remote[ ]host[ ]([-0-9a-zA-Z.]+[0-9a-zA-Z])[ ]said:
-        )
-    }x;
 
     # qmail-send.c:922| ... (&dline[c],"I'm not going to try again; this message has been in the queue too long.\n")) nomem();
     state $hasexpired = 'this message has been in the queue too long.';
     # qmail-remote-fallback.patch
-    state $recommands = qr/Sorry,[ ]no[ ]SMTP[ ]connection[ ]got[ ]far[ ]enough;[ ]most[ ]progress[ ]was[ ]([A-Z]{4})[ ]/x;
-    state $reisonhold = qr/\A[^ ]+ does not like recipient[.][ \t]+.+this message has been in the queue too long[.]\z/;
+    state $onholdpair = [' does not like recipient.', 'this message has been in the queue too long.'];
     state $failonldap = {
         # qmail-ldap-1.03-20040101.patch:19817 - 19866
         'suspend'     => ['Mailaddress is administrative?le?y disabled'],   # 5.2.1
@@ -143,17 +151,17 @@ sub make {
     };
 
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
-    my $emailsteak = Sisimai::RFC5322->fillet($mbody, $rebackbone);
+    my $emailparts = Sisimai::RFC5322->part($mbody, $boundaries);
     my $readcursor = 0;     # (Integer) Points the current cursor position
     my $recipients = 0;     # (Integer) The number of 'Final-Recipient' header
     my $v = undef;
 
-    for my $e ( split("\n", $emailsteak->[0]) ) {
-        # Read error messages and delivery status lines from the head of the email
-        # to the previous line of the beginning of the original message.
+    for my $e ( split("\n", $emailparts->[0]) ) {
+        # Read error messages and delivery status lines from the head of the email to the previous
+        # line of the beginning of the original message.
         unless( $readcursor ) {
             # Beginning of the bounce message or message/delivery-status part
-            $readcursor |= $indicators->{'deliverystatus'} if $e =~ $markingsof->{'message'};
+            $readcursor |= $indicators->{'deliverystatus'} if grep { index($e, $_) > -1 } $startingof->{'message'}->@*;
             next;
         }
         next unless $readcursor & $indicators->{'deliverystatus'};
@@ -165,14 +173,14 @@ sub make {
         # Giving up on 192.0.2.153.
         $v = $dscontents->[-1];
 
-        if( $e =~ /\A(?:To[ ]*:)?[<](.+[@].+)[>]:[ \t]*\z/ ) {
+        if( index($e, '<') == 0 && Sisimai::String->aligned(\$e, ['<', '@', '>', ':']) ) {
             # <kijitora@example.jp>:
             if( $v->{'recipient'} ) {
                 # There are multiple recipient addresses in the message body.
                 push @$dscontents, __PACKAGE__->DELIVERYSTATUS;
                 $v = $dscontents->[-1];
             }
-            $v->{'recipient'} = $1;
+            $v->{'recipient'} = Sisimai::Address->s3s4(substr($e, index($e, '<'),));
             $recipients++;
 
         } elsif( scalar @$dscontents == $recipients ) {
@@ -182,7 +190,15 @@ sub make {
             $v->{'alterrors'}  = $e if index($e, $startingof->{'error'}->[0]) == 0;
 
             next if $v->{'rhost'};
-            $v->{'rhost'} = $1 if $e =~ $rehost;
+            for my $r ( $startingof->{'rhost'}->@* ) {
+                # Find a remote host name
+                my $p1 = index($e, $r); next if $p1 == -1;
+                my $cm = length $r;
+                my $p2 = index($e, ' ', $p1 + $cm + 1); $p2 = rindex($e, '.') if $p2 == -1;
+
+                $v->{'rhost'} = Sisimai::String->sweep(substr($e, $p1 + $cm, $p2 - $p1 - $cm));
+                last;
+            }
         }
     }
     return undef unless $recipients;
@@ -192,16 +208,16 @@ sub make {
 
         unless( $e->{'command'} ) {
             # Get the SMTP command name for the session
-            SMTP: for my $r ( keys %$resmtp ) {
+            SMTP: for my $r ( keys %$commandset ) {
                 # Verify each regular expression of SMTP commands
-                next unless $e->{'diagnosis'} =~ $resmtp->{ $r };
+                next unless grep { index($e->{'diagnosis'}, $_) > 0 } $commandset->{ $r }->@*;
                 $e->{'command'} = uc $r;
                 last;
             }
 
-            unless( $e->{'command'} ) {
-                # Verify each regular expression of patches
-                $e->{'command'} = uc $1 if $e->{'diagnosis'} =~ $recommands;
+            if( index($e->{'diagnosis'}, 'Sorry, no SMTP connection got far enough; most progress was ') > -1 ) {
+                # Get the last SMTP command:from the error message
+                $e->{'command'} ||= Sisimai::SMTP::Command->find($e->{'diagnosis'});
             }
         }
 
@@ -216,9 +232,8 @@ sub make {
 
         } else {
             # Try to match with each error message in the table
-            if( $e->{'diagnosis'} =~ $reisonhold ) {
-                # To decide the reason require pattern match with
-                # Sisimai::Reason::* modules
+            if( Sisimai::String->aligned(\$e->{'diagnosis'}, $onholdpair) ) {
+                # To decide the reason require pattern match with Sisimai::Reason::* modules
                 $e->{'reason'} = 'onhold';
 
             } else {
@@ -226,12 +241,12 @@ sub make {
                     # Verify each regular expression of session errors
                     if( $e->{'alterrors'} ) {
                         # Check the value of "alterrors"
-                        next unless grep { index($e->{'alterrors'}, $_) > -1 } @{ $messagesof->{ $r } };
+                        next unless grep { index($e->{'alterrors'}, $_) > -1 } $messagesof->{ $r }->@*;
                         $e->{'reason'} = $r;
                     }
                     last if $e->{'reason'};
 
-                    next unless grep { index($e->{'diagnosis'}, $_) > -1 } @{ $messagesof->{ $r } };
+                    next unless grep { index($e->{'diagnosis'}, $_) > -1 } $messagesof->{ $r }->@*;
                     $e->{'reason'} = $r;
                     last;
                 }
@@ -239,7 +254,7 @@ sub make {
                 unless( $e->{'reason'} ) {
                     LDAP: for my $r ( keys %$failonldap ) {
                         # Verify each regular expression of LDAP errors
-                        next unless grep { index($e->{'diagnosis'}, $_) > -1 } @{ $failonldap->{ $r } };
+                        next unless grep { index($e->{'diagnosis'}, $_) > -1 } $failonldap->{ $r }->@*;
                         $e->{'reason'} = $r;
                         last;
                     }
@@ -250,9 +265,9 @@ sub make {
                 }
             }
         }
-        $e->{'command'} ||= '';
+        $e->{'command'} ||= Sisimai::SMTP::Command->find($e->{'diagnosis'});
     }
-    return { 'ds' => $dscontents, 'rfc822' => $emailsteak->[1] };
+    return { 'ds' => $dscontents, 'rfc822' => $emailparts->[1] };
 }
 
 1;
@@ -262,8 +277,7 @@ __END__
 
 =head1 NAME
 
-Sisimai::Lhost::X4 - bounce mail parser class for Unknown MTA which is
-developed as a C<qmail> clone.
+Sisimai::Lhost::X4 - bounce mail parser class for Unknown MTA which is developed as a C<qmail> clone.
 
 =head1 SYNOPSIS
 
@@ -271,8 +285,8 @@ developed as a C<qmail> clone.
 
 =head1 DESCRIPTION
 
-Sisimai::Lhost::X4 parses a bounce email which created by some C<qmail>
-clone. Methods in the module are called from only Sisimai::Message.
+Sisimai::Lhost::X4 parses a bounce email which created by some C<qmail> clone. Methods in the module
+are called from only Sisimai::Message.
 
 =head1 CLASS METHODS
 
@@ -282,10 +296,10 @@ C<description()> returns description string of this module.
 
     print Sisimai::Lhost::X4->description;
 
-=head2 C<B<make(I<header data>, I<reference to body string>)>>
+=head2 C<B<inquire(I<header data>, I<reference to body string>)>>
 
-C<make()> method parses a bounced email and return results as a array reference.
-See Sisimai::Message for more details.
+C<inquire()> method parses a bounced email and return results as a array reference. See Sisimai::Message
+for more details.
 
 =head1 AUTHOR
 
@@ -293,7 +307,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2015-2020 azumakuniyuki, All rights reserved.
+Copyright (C) 2015-2023 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

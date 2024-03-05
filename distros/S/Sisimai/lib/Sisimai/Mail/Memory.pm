@@ -32,8 +32,8 @@ sub new {
     if( (substr($$argv1, 0, 5) || '') eq 'From ') {
         # UNIX mbox
         $param->{'payload'} = [split(/^From /m, $$argv1)];
-        shift @{ $param->{'payload'} };
-        $_ = 'From '.$_ for @{ $param->{'payload'} };
+        shift $param->{'payload'}->@*;
+        $_ = 'From '.$_ for $param->{'payload'}->@*;
     } else {
         $param->{'payload'} = [$$argv1];
     }
@@ -44,10 +44,10 @@ sub read {
     # Memory reader, works as a iterator.
     # @return   [String] Contents of a bounce mail
     my $self = shift;
-    return undef unless scalar @{ $self->{'payload'} };
+    return undef unless scalar $self->{'payload'}->@*;
 
     $self->{'offset'} += 1;
-    return shift @{ $self->{'payload'} };
+    return shift $self->{'payload'}->@*;
 }
 
 1;
@@ -69,8 +69,7 @@ Sisimai::Mail::Memory - Mailbox reader
 
 =head1 DESCRIPTION
 
-Sisimai::Mail::Memory is a class for reading a mailbox, files in Maildir/, or
-JSON string from variable.
+Sisimai::Mail::Memory is a class for reading a mailbox, files in Maildir/, or JSON string from variable.
 
 =head1 CLASS METHODS
 
@@ -99,12 +98,12 @@ C<size()> returns a memory size of the mailbox or JSON string.
 
 C<payload()> returns an array reference to each email message or JSON string
 
-    print scalar @{ $mailobj->payload };   # 17
+    print scalar $mailobj->payload->@*; # 17
 
 =head2 C<B<offset()>>
 
-C<offset()> returns an offset position for seeking "payload" list. The value of
-"offset" is an index number which have already read.
+C<offset()> returns an offset position for seeking "payload" list. The value of "offset" is an index
+number which have already read.
 
     print $mailobj->offset;   # 0
 
@@ -124,7 +123,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2018-2020 azumakuniyuki, All rights reserved.
+Copyright (C) 2018-2022 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

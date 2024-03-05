@@ -41,6 +41,7 @@ my $builder = $class->new(
         'Term::ReadLine::Gnu' => '1.44',
         'PadWalker'           => '2.5',
         'Class::Tiny'         => '1.008',
+        'Data::Printer'       => '1.002001',
     },
     add_to_cleanup => [ 'Runtime-Debugger-*', 'build_dir/', 'MANIFEST*.bak' ],
     meta_merge     => {

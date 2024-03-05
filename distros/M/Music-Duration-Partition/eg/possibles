@@ -1,0 +1,62 @@
+#!/usr/bin/env perl
+
+# Tally the number of possible motif lengths
+# Examples:
+# perl eg/possibles 4 1000
+# perl eg/possibles 8 1000 'hn qn' '1 2'
+
+use strict;
+use warnings;
+
+use Data::Dumper::Compact qw(ddc);
+use Algorithm::Combinatorics qw(partitions variations_with_repetition);
+use List::Util qw(min max);
+use Music::Duration::Partition ();
+use Statistics::Basic qw(mean);
+
+my $notes = shift || 4;
+my $max   = shift || 100;
+my $pool  = shift || 'hn qn ten';
+$pool = [ split ' ', $pool ];
+my $groups = shift || join ' ', ((1) x @$pool);
+$groups = [ split ' ', $groups ];
+
+my %seen;
+my (@mins, @maxs, @means);
+
+for my $n (1 .. $max) {
+    for my $p (partitions([ 1 .. $#$pool ])) {
+        next if $seen{ join ' ', $p }++;
+
+        my $i = 0;
+        my @data;
+
+        for my $v (variations_with_repetition($p, scalar(@$pool))) {
+            $i++;
+
+            my $mdp = Music::Duration::Partition->new(
+                size    => $notes,
+                pool    => $pool,
+                weights => $v,
+                groups  => $groups,
+            );
+            my $motif = $mdp->motif;
+            push @data, scalar(@$motif);
+#            print $i, ' (', scalar(@$motif), '): ', ddc($motif);
+        }
+
+        push @mins, min(@data);
+        push @maxs, max(@data);
+        push @means, mean(@data);
+#        printf "Min: %.4f, Max: %.4f, Mean: %.4f\n", min(@data), max(@data), mean(@data);
+    }
+}
+
+printf "\n%d iterations of a %d note pool: [%s] & groups: [%s]\nMeans of mins: %.4f, of maxs: %.4f, of means: %.4f\n",
+    $max,
+    $notes,
+    join(' ', @$pool),
+    join(' ', @$groups),
+    mean(@mins),
+    mean(@maxs),
+    mean(@means);

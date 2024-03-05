@@ -10,7 +10,7 @@ App::Greple::xlate - grepleのための翻訳サポートモジュール
 
 # VERSION
 
-Version 0.30
+Version 0.31
 
 # DESCRIPTION
 
@@ -158,7 +158,52 @@ Perlのpodスタイルで書かれたドキュメント内の通常のテキス�
 
 # COMMAND LINE INTERFACE
 
-リポジトリに含まれる `xlate` コマンドを使用することで、このモジュールをコマンドラインから簡単に使用できます。使用方法については、`xlate` のヘルプ情報を参照してください。
+このモジュールは、配布されている `xlate` コマンドを使ってコマンドラインから簡単に使用できます。使用方法については `xlate` のヘルプ情報を参照してください。
+
+`xlate` コマンドは Docker 環境と連携して動作するので、手元に何もインストールされていなくても、Docker が利用可能であれば使用できます。`-D` オプションまたは `-C` オプションを使用してください。
+
+また、さまざまなドキュメントスタイルのためのメイクファイルが提供されているので、特別な指定なしに他言語への翻訳も可能です。`-M` オプションを使用してください。
+
+Docker とメイクのオプションを組み合わせることで、Docker 環境内で make を実行することもできます。
+
+`xlate -GC` のように実行すると、現在の作業中の git リポジトリがマウントされたシェルが起動します。
+
+詳細については、下記の「参照」セクションにある日本語の記事をお読みください。
+
+    xlate [ options ] -t lang file [ greple options ]
+        -h   help
+        -v   show version
+        -d   debug
+        -n   dry-run
+        -a   use API
+        -c   just check translation area
+        -r   refresh cache
+        -s   silent mode
+        -e # translation engine (default "deepl")
+        -p # pattern to determine translation area
+        -w # wrap line by # width
+        -o # output format (default "xtxt", or "cm", "ifdef")
+        -f # from lang (ignored)
+        -t # to lang (required, no default)
+        -m # max length per API call
+        -l # show library files (XLATE.mk, xlate.el)
+        --   terminate option parsing
+    Make options
+        -M   run make
+        -n   dry-run
+    Docker options
+        -G   mount git top-level directory
+        -B   run in non-interactive (batch) mode
+        -R   mount read-only
+        -E * specify environment variable to be inherited
+        -I * specify altanative docker image (default: tecolicom/xlate:version)
+        -D * run xlate on the container with the rest parameters
+        -C * run following command on the container, or run shell
+
+    Control Files:
+        *.LANG    translation languates
+        *.FORMAT  translation foramt (xtxt, cm, ifdef)
+        *.ENGINE  translation engine (deepl or gpt3)
 
 # EMACS
 

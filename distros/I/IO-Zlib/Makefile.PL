@@ -12,6 +12,11 @@ my %options = (
     dist => { COMPRESS => "gzip", SUFFIX => "gz" }
 );
 
+if ($ExtUtils::MakeMaker::VERSION >= 6.31)
+{
+    $options{LICENSE} = 'perl_5';
+}
+
 if ($ExtUtils::MakeMaker::VERSION >= 6.50)
 {
     $options{META_MERGE} = {

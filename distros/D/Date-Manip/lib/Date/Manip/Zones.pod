@@ -5,9 +5,9 @@
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Tue Jan  9 14:21:49 EST 2024
-#    Data version: tzdata2023d
-#    Code version: tzcode2023d
+#    Generated on: Fri Mar  1 11:06:00 EST 2024
+#    Data version: tzdata2024a
+#    Code version: tzcode2024a
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -2119,13 +2119,15 @@ L<Date::Manip::TZ> module.
      0      +04:53:30   Asia/Omsk
      0      +04:54:00   Indian/Maldives
      0      +04:58:24   Asia/Bishkek
-     0      +05:00:00   Asia/Dushanbe
+     0      +05:00:00   Asia/Almaty
+                        Asia/Dushanbe
                         Asia/Tashkent
                         Asia/Aqtau
                         Asia/Aqtobe
                         Asia/Ashgabat
                         Asia/Atyrau
                         Asia/Oral
+                        Asia/Qostanay
                         Asia/Qyzylorda
                         Asia/Samarkand
                         Asia/Yekaterinburg
@@ -2136,10 +2138,8 @@ L<Date::Manip::TZ> module.
                         Antarctica/Mawson
                         Antarctica/Vostok
                         Asia/Bishkek
-                        Asia/Qostanay
                         Indian/Chagos
                         Asia/Omsk
-                        Asia/Almaty
                         Antarctica/Davis
      0      +05:07:48   Asia/Almaty
      0      +05:19:24   Asia/Colombo
@@ -2163,13 +2163,13 @@ L<Date::Manip::TZ> module.
      0      +05:53:28   Asia/Kolkata
      0      +05:58:36   Asia/Thimphu
      0      +06:00:00   Asia/Urumqi
-                        Asia/Almaty
                         Asia/Bishkek
                         Asia/Omsk
                         Asia/Dhaka
-                        Asia/Qostanay
                         Asia/Thimphu
                         Indian/Chagos
+                        Asia/Almaty
+                        Asia/Qostanay
                         Etc/GMT+6
                         S
                         Asia/Qyzylorda

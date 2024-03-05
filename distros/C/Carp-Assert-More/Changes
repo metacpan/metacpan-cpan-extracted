@@ -1,6 +1,20 @@
 Revision history for Perl extension Carp::Assert::More.
 
 
+2.4.0   Mon Mar  4 21:54:07 CST 2024
+        [ENHANCEMENTS]
+        New function assert_arrayref_all() calls an assertion function for every element in the array.
+
+            my $aref_of_counts = get_counts();
+            assert_arrayref_all( $aref, \&assert_positive_integer, 'Counts are positive' );
+
+        assert_context_scalar() now provides a default message of
+        "function_name must be called in scalar context".
+
+        assert_context_nonvoid() now provide a default message of
+        "function_name must not be called in void context".
+
+
 2.3.0   Tue May 30 21:52:20 CDT 2023
         [ENHANCEMENTS]
         Added assert_arrayref_of() to verify that all of the elements

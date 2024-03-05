@@ -58,7 +58,7 @@ is_deeply [$surgeon->headers], [qw/header1 header2 header3/],     "headers";
 is_deeply [$surgeon->footers], [qw/footer1 footer2 footer3/],     "footers";
 
 
-$surgeon->all_parts_do(replace => qr/\bSurgeon\b/ => sub {"Physician"}, cleanup_XML => 0);
+$surgeon->all_parts_do(replace => qr/\bSurgeon\b/ => sub {"Ph<y>sician"}, cleanup_XML => 0);
 
 
 

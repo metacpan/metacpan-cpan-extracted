@@ -1,0 +1,15 @@
+0.002   2024-02-24  Released-By: PERLANCAR; Urgency: medium
+
+        - [incompatible change] Ingredient and weight fields now must match
+          between CSV files.
+
+        - All extra fields from all individual formula CSVs will be shown in the
+          final mixed formula CSV.
+
+        - Add option: --ingredient-field, --weight-field to allow specifying
+          which field to contain ingredient and weight.
+
+
+0.001   2024-02-24  Released-By: PERLANCAR
+
+         - First release.

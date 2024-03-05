@@ -1,6 +1,17 @@
 Changelog for MarpaX-ESLIF
 
-6.0.33.3 2024-02-23T00:30:27
+6.0.33.4 2024-03-01T06:05:24
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Remove two uneeded $ac calls [ci skip]
+ - Try to limit $optimize flag v.s. compiler family [ci skip]
+ - Automatic retry of object compilation without optimization flag when the
+   later is set
+ - MarpaX/ESLIF.pm: Try to fix author/synopsis.t
+ - etc/compile_marpaESLIF.pl: Be more clever when determining possible
+   optimization flags, determine dynamically if jit can be enabled
+ - MarpaX/ESLIF.pm: Work on pod [ci skip]
+
+6.0.33.3 2024-02-23T00:30:27Z
  [Jean-Damien Durand <jeandamiendurand@free.fr>]
  - MarpaX/ESLIF.pm: Add JSON encoder/decoder example in synopsis
  - ESLIF/Introduction.pod: Fix for Pod::Weaver

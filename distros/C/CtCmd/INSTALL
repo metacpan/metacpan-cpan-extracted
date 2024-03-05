@@ -1,6 +1,7 @@
 ##########################################################################
 #                                                                        #
 # © Copyright IBM Corporation 2001, 2008 All rights reserved.            #
+# © Copyright HCL Technologies Ltd. 2016, 2022 All rights reserved.      #
 #                                                                        #
 # This program and the accompanying materials are made available under   #
 # the terms of the Common Public License v1.0 which accompanies this     #
@@ -14,20 +15,10 @@
 _________________________________________
 
 The ClearCase::CtCmd module requires Perl v5.6.1 or v5.8 or later.
-The ClearCase::CtCmd module requires that ClearCase be installed:
+Information on supported platforms for IBM Rational ClearCase is available at:
 
-Platform                    ClearCase Version
-_________________________________________
-
-Solaris 2.7, 2.8, 2.9,2.10    2002.05 or later
-HP-UX 11.00, 11.11            2002.05 "  "
-RH Linux 7.2, 7.3, 8.0, 9     2002.05 "  "
-AIX 4.3.3, 5.1, 5.2           2002.05 "  "
-Windows XP Pro                2002.05 "  "
-Windows 2000                  2002.05 "  "
-Windows NT 4.0                2002.05 "  "
-
-
+IBM Software Product Compatibility Reports
+https://www.ibm.com/software/reports/compatibility/clarity/index.html
 
 __________________________________________
 
@@ -52,7 +43,7 @@ may be useful for testing "make install".
 Note:  The CC class is for test purposes only, although it
 may be consulted for an indication of how ClearCase::CtCmd may be used.
 
-When the MVFS is not installed, e. g. with ClearCase LT, it is not possible
+When the MVFS is not installed, it is not possible
 to "make test".  However, in most cases, passing directly from a
 successful "make" to "make install" will be satisfactory.
 
@@ -69,16 +60,14 @@ __________________________________________
 
 UNIX/Linux:
 
-Set environment variable ATRIA_ROOT to the
-ClearCase installation path if different from /usr/atria:
-Linked install: set ATRIA_ROOT to network path.
+Set environment variable CLEARCASE_ROOT to the
+IBM Rational ClearCase installation path if different from /opt/rational/clearcase:
 
 If /var/tmp is not available, set environment variable CC_CTCMD_TMP
 to the path of an alternative directory.
 
 
 Solaris:
-
 CtCmd has used a Sun "interposing filter", implemented in libzuba.so, to tell
 the runtime loader to load RPC functions from the correct library. However,
 interposing filters are broken on Solaris 5.8 and 5.9 by some recent (as of
@@ -90,16 +79,6 @@ set environment variable LD_PRELOAD to /usr/ucblib/librpcsoc.so to run CtCmd.
 Note that ClearCase release 7 eliminates the need for the interposer and
 libzuba.so.  Currently we cannot remove it as we must stay backwards compatible
 with pre-7 releases.
-
-Note that CtCmd functions normally with certain Solaris 5.9 patches:
-112963-07   work
-112963-09   work
-112963-12   work
-112963-13   doesn't work
-112963-14   doesn't work
-112963-17   work
-112963-18   doesn't work
-112963-19   doesn't work
 
 If the wrong Perl interpreter or C compiler is found, please do
 ln -s <path to Perl> perl; ln -s <path to cc> cc,
@@ -114,7 +93,7 @@ AIX:
 The only way to run CtCmd with Perl 5.8.6 is to rebuild Perl 5.8.6 with
 the library link order changed to have -lc before -lnsl.
 
-Win32:
+Windows:
 
 Substitute "nmake" for "make" when building and installing.
 
@@ -128,13 +107,13 @@ from the command line without error messages before attempting
 installation.  The environment variables "inc" and "lib" must be set to
 the paths where the MS Visual Studio C include files and libraries are
 kept.  The user's PATH must include the path to the MSDEV ...\common\bin
-and ...\bin directories, as well as the path to cleartool and the Clearcase
+and ...\bin directories, as well as the path to cleartool and the IBM Rational ClearCase
 *.dll's.  Perl, version 5.6.1 or greater must be installed, and the
 installed Perl must have the necessary header and other files to allow
 installation of a Perl Module.
 
 If cmdsyn.lib or ks.lib is not being created it may be because the path to
-"dumpbin" or the path to the Clearcase libraries is not in the user's PATH.
+"dumpbin" or the path to the IBM Rational ClearCase libraries is not in the user's PATH.
 
 An error message "This shared resource does not exist" at the beginning
 of t/t1_createArch when nmaking test indicates that a view previously mapped
@@ -150,7 +129,6 @@ In case of "nmake test" failure to create test view:
 If the default view net name, "view", has been set to some other value with registry key
 HKEY_LOCAL_MACHINE:SYSTEM\CurrentControlSet\Services\Mvfs\Parameters\view_netname,
 set environment variable CC_VIEW_NETNAME=\\<view net name>\ before running
-"nmake test", or running the tests in the t directory explicitly. For example,
 "nmake test", or running the tests in the t directory explicitly. For example,
 
 set CC_VIEW_NETNAME=\\net\

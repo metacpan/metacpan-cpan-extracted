@@ -170,7 +170,9 @@ static SV* sign(Crypt_SMIME this, char* plaintext, unsigned int len) {
     for (i = 0; i < sk_X509_num(this->pubkeys_stack); i++) {
         X509* x509 = sk_X509_value(this->pubkeys_stack, i);
         assert(x509 != NULL);
-        if (CMS_add0_cert(cms, x509) != 1) {
+        /* CMS_add1_cert() increments the refcount in X509 and
+         * CMS_ContentInfo_free() decrements it. */
+        if (CMS_add1_cert(cms, x509) != 1) {
             if (ERR_GET_REASON(ERR_peek_last_error()) != CMS_R_CERTIFICATE_ALREADY_PRESENT) {
                 CMS_ContentInfo_free(cms);
                 BIO_free(inbuf);
@@ -228,7 +230,7 @@ static SV* signonly(Crypt_SMIME this, char* plaintext, unsigned int len) {
     for (i = 0; i < sk_X509_num(this->pubkeys_stack); i++) {
         X509* x509 = sk_X509_value(this->pubkeys_stack, i);
         assert(x509 != NULL);
-        if (CMS_add0_cert(cms, x509) != 1) {
+        if (CMS_add1_cert(cms, x509) != 1) {
             if (ERR_GET_REASON(ERR_peek_last_error()) != CMS_R_CERTIFICATE_ALREADY_PRESENT) {
                 CMS_ContentInfo_free(cms);
                 BIO_free(inbuf);
@@ -460,10 +462,7 @@ DESTROY(Crypt_SMIME this)
             EVP_PKEY_free(this->priv_key);
         }
         if (this->pubkeys_stack) {
-            /* X.509 certificates are shared between this and
-             * pubkeys_store. We only deallocate the stack here.
-             */
-            sk_X509_free(this->pubkeys_stack);
+            sk_X509_pop_free(this->pubkeys_stack, X509_free);
         }
         if (this->pubkeys_store) {
             X509_STORE_free(this->pubkeys_store);
@@ -565,7 +564,7 @@ setPublicKey(Crypt_SMIME this, SV* crt)
 
         /* 古い鍵があったら消す */
         if (this->pubkeys_stack) {
-            sk_X509_free(this->pubkeys_stack);
+            sk_X509_pop_free(this->pubkeys_stack, X509_free);
             this->pubkeys_stack = NULL;
         }
         if (this->pubkeys_store) {
@@ -669,10 +668,9 @@ _addPublicKey(Crypt_SMIME this, char* crt)
                 }
             }
 
-            /* X509_STORE_add_cert() has an undocumented behavior that
-             * increments a refcount in X509 unlike sk_X509_push(). So
-             * we must not call X509_dup() here.
-             */
+            /* X509_STORE_add_cert() internally increments the refcount in
+             * X509 unlike sk_X509_push(). So we must not call
+             * X509_up_ref() here. */
             if (X509_STORE_add_cert(this->pubkeys_store, pub_cert) == 0) {
                 X509_free(pub_cert);
                 BIO_free(buf);

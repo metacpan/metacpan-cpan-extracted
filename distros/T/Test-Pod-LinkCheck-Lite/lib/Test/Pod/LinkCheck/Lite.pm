@@ -8,7 +8,6 @@ use warnings;			# Core since 5.6.0
 use utf8;			# Core since 5.6.0
 
 use B::Keywords ();		# Not core
-use Carp ();			# Core since 5.0
 use Exporter ();		# Core since 5.0
 use File::Find ();		# Core since 5.0
 use File::Spec;			# Core since 5.4.5
@@ -21,7 +20,7 @@ use Pod::Simple::LinkSection;	# Core since 5.9.3 (part of Pod::Simple)
 use Storable ();		# Core since 5.7.3
 use Test::Builder ();		# Core since 5.6.2
 
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 
 our @ISA = qw{ Exporter };
 
@@ -649,21 +648,36 @@ sub __build_test_msg {
 # regular .pod documentation (e.g. perldelta.pod).
 sub _get_installed_doc_info {
     my ( $self, $module ) = @_;
-    my $pd = Pod::Perldoc->new();
 
-    local @INC = ( @{ $self->{add_dir} }, @INC );
+    # NOTE we have to do this by hand, because Pod::Perldoc searches
+    # Perl's bin/ BEFORE the contents of @INC.
+    ( my $file = $module ) =~ s(::)('/)g;
+    foreach my $dir ( @{ $self->{add_dir} } ) {
+	foreach my $ext ( '', qw{ .pod .pm } ) {
+	    my $path = "$dir/$file$ext";
+	    -e $path
+		and -s _
+		and -T _
+		and return {
+		file	=> $path,
+	    };
+	}
+    }
+
+    my $pd = Pod::Perldoc->new();
 
     # Pod::Perldoc writes to STDERR if the module (or whatever) is not
     # installed, so we localize STDERR and reopen it to the null device.
     # The reopen of STDERR is unchecked because if it fails we still
     # want to run the tests. They just may be noisy.
-    local *STDERR;
-    open STDERR, '>', File::Spec->devnull();	## no critic (RequireCheckedOpen)
+    my $path;
+    {
+	local *STDERR;
+	open STDERR, '>', File::Spec->devnull();	## no critic (RequireCheckedOpen)
 
-    # NOTE that grand_search_init() is undocumented.
-    my ( $path ) = $pd->grand_search_init( [ $module ] );
-
-    close STDERR;
+	# NOTE that grand_search_init() is undocumented.
+	( $path ) = $pd->grand_search_init( [ $module ] );
+    }
 
     defined $path
 	and return {
@@ -932,7 +946,6 @@ sub _handle_url {
 	or return $self->_fail( $link, 'contains no url' );
 
     if ( $url =~ m/ \A https : /smxi ) {
-	$DB::single = 1;
 	my ( $ok, $why ) = $self->can_ssl();
 	unless ( $ok ) {
 	    $self->{_ssl_warning}
@@ -1049,6 +1062,7 @@ sub _is_perl_file {
 
 package My_Parser;		## no critic (ProhibitMultiplePackages)
 
+use Carp ();
 use Pod::Simple::PullParser;	# Core since 5.9.3 (part of Pod::Simple)
 
 @My_Parser::ISA = qw{ Pod::Simple::PullParser };
@@ -1067,7 +1081,11 @@ sub run {
 	defined $source
 	    and $self->set_source( $source );
     my $attr = $self->_attr();
-    @{ $attr }{ qw{ line links sections ignore_tag } } = ( 1, [], {}, [] );
+    $attr->{ignore_tag} = [];
+    $attr->{line} = 1;
+    $attr->{links} = [];
+    $attr->{source} = $source;
+    $attr->{sections} = {};
     while ( my $token = $self->get_token() ) {
 	if ( my $code = $self->can( '__token_' . $token->type() ) ) {
 	    $code->( $self, $token );

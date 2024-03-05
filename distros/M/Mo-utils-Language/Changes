@@ -1,3 +1,12 @@
+0.04 2024-02-29T16:58:24+01:00
+ - Rewrite error message to version like Mo::utils.
+
+0.03 2024-02-29T16:38:22+01:00
+ - Add 1.33 version to load of List::Util.
+ - Fix ERROR section in doc.
+ - Fix SYNOPSIS section in doc.
+ - Update copyright years.
+
 0.02 2023-06-12T10:46:58+02:00
  - Add EXAMPLES to doc.
  - Add minimal version of Locale::Languages, removed from Perl core.

@@ -24,7 +24,7 @@ use feature         qw( say );
 my $my_str      = "Func1";
 my @my_array    = "array-my";
 my $my_arrayref = ["array-my"];
-my %my_hash     = qw(key1 a key2 b);
+my %my_hash     = ( key1 => "a", key2 => "b", key3 => { key3b => "val" } );
 my $my_hashref  = {qw(key1 a key2 b)};
 my $my_coderef  = sub { "coderef-my: @_" };
 my $my_obj      = bless { type => "my" }, "MyObj";
@@ -83,7 +83,7 @@ sub _define_expected_vars {
     my ( $_repl ) = @_;
 
     {
-        commands              => [ 'help', 'hist', 'p', 'q' ],
+        commands              => [ 'd', 'help', 'hist', 'p', 'q' ],
         commands_and_vars_all => [
             '$COMPLETION_RETURN', '$EOL',
             '$INSTR',             '$_repl',
@@ -100,31 +100,13 @@ sub _define_expected_vars {
             '%my_hash',           '%our_hash',
             '@my_array',          '@my_hash',
             '@our_array',         '@our_hash',
-            'help',               'hist',
-            'p',                  'q',
+            'd',                  'help',
+            'hist',               'p',
+            'q',
         ],
         debug        => 0,
         history_file => "$ENV{HOME}/.runtime_debugger_testmode.info",
         vars_all     => [
-            '$COMPLETION_RETURN', '$EOL',
-            '$INSTR',             '$_repl',
-            '$case',              '$eval_return',
-            '$my_array',          '$my_arrayref',
-            '$my_coderef',        '$my_hash',
-            '$my_hashref',        '$my_obj',
-            '$my_str',            '$our_array',
-            '$our_arrayref',      '$our_coderef',
-            '$our_hash',          '$our_hashref',
-            '$our_obj',           '$our_str',
-            '$repl',              '$stdin',
-            '$stdout',            '$step_return',
-            '%my_hash',           '%our_hash',
-            '@my_array',          '@my_hash',
-            '@our_array',         '@our_hash',
-            'help',               'hist',
-            'p',                  'q',
-        ],
-        vars_all => [
             '$COMPLETION_RETURN', '$EOL',
             '$INSTR',             '$_repl',
             '$case',              '$eval_return',
@@ -203,7 +185,8 @@ sub _define_help_stdout {
         ' <TAB>       - Show options.',
         ' help        - Show this help section.',
         ' hist [N=20] - Show last N commands.',
-        ' p DATA [#N] - Prety print data (with optional depth),',
+        ' p VAR       - Data printer.',
+        ' d DATA [#N] - Data dumper (with optional depth).',
         ' q           - Quit debugger.',
         ''
     ]
@@ -339,80 +322,80 @@ sub _define_test_cases {
             },
         },
 
-        # Print.
+        # Data Dumper.
         {
-            name             => 'Print literal',
-            input            => 'p 123',
+            name             => 'Dump literal',
+            input            => 'd 123',
             expected_results => {
-                line   => 'p 123',
+                line   => 'd 123',
                 stdout => ['123'],
             },
         },
         {
-            name             => 'Print TAB complete: "p<TAB>"',
-            input            => 'p' . $TAB,
+            name             => 'Dump TAB complete: "d<TAB>"',
+            input            => 'd' . $TAB,
             expected_results => {
-                line   => 'p ',
+                line   => 'd ',
                 stdout => [],
             },
         },
         {
-            name             => 'Print TAB complete: "p<TAB><TAB"',
-            input            => 'p' . $TAB . $TAB,
+            name             => 'Dump TAB complete: "d<TAB><TAB"',
+            input            => 'd' . $TAB . $TAB,
             expected_results => {
                 comp   => $_repl->{vars_all},
-                line   => 'p ',
+                line   => 'd ',
                 stdout => [],
             },
         },
 
-        # Print - TAB complete partial.
+        # Dump - TAB complete partial.
         {
-            name             => 'Print TAB complete: "p $<TAB>"',
-            input            => 'p $' . $TAB,
+            name             => 'Dump TAB complete: "d $<TAB>"',
+            input            => 'd $' . $TAB,
             expected_results => {
                 comp   => $_repl->{vars_scalar},
                 stdout => [],
             },
         },
         {
-            name             => 'Print TAB complete: p $o ',
-            input            => 'p $o' . $TAB,
+            name             => 'Dump TAB complete: d $o ',
+            input            => 'd $o' . $TAB,
             expected_results => {
                 comp   => [ grep { / ^ \$o /x } @{ $_repl->{vars_all} } ],
                 stdout => [],
             },
         },
         {
-            name  => 'Print TAB complete: p $o<TAB>_ ',
-            input => 'p $o' . $TAB . '_',    # Does not expand after tab.
+            name  => 'Dump TAB complete: d $o<TAB>_ ',
+            input => 'd $o' . $TAB . '_',    # Does not expand after tab.
             expected_results => {
                 comp   => [ grep { / ^ \$o /x } @{ $_repl->{vars_all} } ],
                 stdout => [],
             },
         },
         {
-            name             => 'Print TAB complete: p $<TAB>_str ',
-            input            => 'p $o' . $TAB . '_str',
+            name             => 'Dump TAB complete: d $<TAB>_str ',
+            input            => 'd $o' . $TAB . '_str',
             expected_results => {
                 comp   => [ grep { / ^ \$o /x } @{ $_repl->{vars_all} } ],
                 stdout => [],
             },
         },
         {
-            name             => 'Print TAB complete: "p $my_<TAB> . $our_str"',
-            input            => 'p $my_' . $TAB . ' . $our_str',
+            name             => 'Dump TAB complete: "d $my_<TAB> . $our_str"',
+            input            => 'd $my_' . $TAB . ' . $our_str',
             expected_results => {
                 comp   => [ grep { / ^ \$my_ /x } @{ $_repl->{vars_all} } ],
-                line   => 'p $my_ . $our_str',
+                line   => 'd $my_ . $our_str',
                 stdout => [],
             },
         },
         {
-            name             => 'Print TAB complete: "p $my_s<TAB> . $our_str"',
-            input            => 'p $my_s' . $TAB . ' . $our_str',
+            name             => 'Dump TAB complete: "d $my_s<TAB> . $our_str"',
+            input            => 'd $my_s' . $TAB . ' . $our_str',
             expected_results => {
-                line   => 'p $my_str . $our_str',
+                line   => 'd $my_str . $our_str',
                 stdout => [ '"' . $my_str . $our_str . '"' ],
             },
         },
@@ -614,7 +597,7 @@ sub _define_test_cases {
         # Can update an array.
         {
             name  => 'Can update an array - add element',
-            input => 'push @my_array, qw( elem1 elem2 ); p \@my_array',
+            input => 'push @my_array, qw( elem1 elem2 ); d \@my_array',
             expected_results => {
                 'stdout' =>
                   [ '[', '  "array-my",', '  "elem1",', '  "elem2"', ']' ]
@@ -622,7 +605,7 @@ sub _define_test_cases {
         },
         {
             name             => 'Can update an array - remove element',
-            input            => 'shift @my_array; p \@my_array',
+            input            => 'shift @my_array; d \@my_array',
             expected_results => {
                 'stdout' => [ '[', '  "elem1",', '  "elem2"', ']' ]
             },
@@ -701,6 +684,15 @@ sub _define_test_cases {
             },
         },
 
+#       # TAB after after hashref arrow (2nd level).
+#       {
+#           name             => 'TAB after after hashref arrow (2nd level) - "$my->"',
+#           input            => '$my_hashref->{k1}' . $TAB,
+#           expected_results => {
+#               line => '$my_hashref->{}{',
+#           },
+#       },
+
         # TAB after hashref arrow and brace.
         {
             name             => 'TAB after hashref arrow and brace - "$my->{"',
@@ -740,25 +732,46 @@ sub _define_test_cases {
             },
         },
 
+# TODO: TAB after hash brace (no arrow), 2nd level.
+#  {
+#      name             => 'TAB after hash brace (no arrow), 2nd level - "$my{key}{"',
+#      input            => '$my_hash{key3}{' . $TAB,
+#      expected_results => {
+#          comp => [ sort keys %{$my_hash{key3}} ],
+#          line => '$my_hash{key3}{',
+#      },
+#  },
+
         # Can update a hash.
         {
-            name             => 'Can update a hash - add key',
-            input            => '$my_hash{new_key} = "new_val"; p \%my_hash',
+            name  => 'Can update a hash - add key',
+            input => '$my_hash{new_key} = "new_val"; say np %my_hash',
             expected_results => {
-                'stdout' => [
+                stdout => [
                     '{',
-                    '  "key1" => "a",',
-                    '  "key2" => "b",',
-                    '  "new_key" => "new_val"', '}'
-                ]
+                    '    key1      "a",',
+                    '    key2      "b",',
+                    '    key3      {',
+                    '        key3b   "val"',
+                    '    },',
+                    '    new_key   "new_val"',
+                    '}',
+                ],
             },
         },
         {
             name             => 'Can update a hash - remove key',
-            input            => 'delete $my_hash{key1}; p \%my_hash',
+            input            => 'delete $my_hash{key1}; say np %my_hash',
             expected_results => {
-                'stdout' =>
-                  [ '{', '  "key2" => "b",', '  "new_key" => "new_val"', '}' ]
+                stdout => [
+                    '{',
+                    '    key2      "b",',
+                    '    key3      {',
+                    '        key3b   "val"',
+                    '    },',
+                    '    new_key   "new_val"',
+                    '}',
+                ],
             },
         },
 
@@ -829,7 +842,7 @@ sub _run_case {
             }
             else {
                 warn "Cannot apply 'nocolor' due to unsupport type '$ref'\n";
-                p $results_all;
+                d $results_all;
             }
         }
     }

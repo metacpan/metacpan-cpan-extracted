@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Record;
 # ABSTRACT: Container for Cypher result values
-$Neo4j::Driver::Record::VERSION = '0.45';
+$Neo4j::Driver::Record::VERSION = '0.46';
 
 use Carp qw(croak);
 use JSON::MaybeXS 1.003003 qw(is_bool);
@@ -38,6 +38,11 @@ sub get {
 		warnings::warnif ambiguous => "Ambiguous get() on " . __PACKAGE__ . " with multiple fields" if @{$self->{row}} > 1;
 		return $self->{row}->[0];
 	}
+	
+	croak "Field '' not present in query result" if ! length $field;
+	
+	my $unambiguous_key = $self->{column_keys}->{$field};
+	return $self->{row}->[$unambiguous_key] if defined $unambiguous_key;
 	
 	if ( _looks_like_int $field ) {
 		croak "Field $field not present in query result" if $field < 0 || $field >= @{$self->{row}};
@@ -114,7 +119,7 @@ Neo4j::Driver::Record - Container for Cypher result values
 
 =head1 VERSION
 
-version 0.45
+version 0.46
 
 =head1 SYNOPSIS
 

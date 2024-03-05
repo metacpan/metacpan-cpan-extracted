@@ -60,7 +60,7 @@
             "Test::Pod::No404s" : "0",
             "Test::Portability::Files" : "0",
             "Test::Spelling" : "0.12",
-            "Variable::OnDestruct" : "0.07"
+            "Variable::Magic" : "0.48"
          }
       },
       "runtime" : {
@@ -73,7 +73,7 @@
             "warnings" : "0"
          },
          "suggests" : {
-            "Variable::OnDestruct" : "0.07"
+            "Variable::Magic" : "0.48"
          }
       },
       "test" : {
@@ -170,15 +170,15 @@
    "provides" : {
       "B::Hooks::EndOfScope" : {
          "file" : "lib/B/Hooks/EndOfScope.pm",
-         "version" : "0.27"
+         "version" : "0.28"
       },
       "B::Hooks::EndOfScope::PP" : {
          "file" : "lib/B/Hooks/EndOfScope/PP.pm",
-         "version" : "0.27"
+         "version" : "0.28"
       },
       "B::Hooks::EndOfScope::XS" : {
          "file" : "lib/B/Hooks/EndOfScope/XS.pm",
-         "version" : "0.27"
+         "version" : "0.28"
       }
    },
    "release_status" : "stable",
@@ -194,10 +194,10 @@
          "web" : "https://github.com/karenetheridge/B-Hooks-EndOfScope"
       }
    },
-   "version" : "0.27",
+   "version" : "0.28",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.039006"
+         "version" : "5.038002"
       },
       "plugins" : [
          {
@@ -805,7 +805,7 @@
             "class" : "Dist::Zilla::Plugin::EnsureLatestPerl",
             "config" : {
                "Dist::Zilla::Plugin::EnsureLatestPerl" : {
-                  "Module::CoreList" : "5.20231230"
+                  "Module::CoreList" : "5.20240223"
                }
             },
             "name" : "@Author::ETHER/EnsureLatestPerl",
@@ -1023,7 +1023,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.27",
+                  "tag" : "0.28",
                   "tag_format" : "%v",
                   "tag_message" : "v%v%t"
                },
@@ -1300,7 +1300,7 @@
       "Tatsuhiko Miyagawa <miyagawa@bulknews.net>",
       "Tomas Doran <bobtfish@bobtfish.net>"
    ],
-   "x_generated_by_perl" : "v5.39.6",
+   "x_generated_by_perl" : "v5.38.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0

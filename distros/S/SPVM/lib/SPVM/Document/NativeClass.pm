@@ -182,9 +182,9 @@ The included header file C<spvm_native.h> is the header file of L<SPVM Native AP
 
 A native implementation function has two arguments.
 
-The first argument is the C<SPVM_ENV*> type and it should be named C<env>. This is an L<execution environment|Execution Environment>.
+The first argument is the C<SPVM_ENV*> type and it should be named C<env>. This is an L<runtime environment|Runtime Environment>.
 
-The second argument is the C<SPVM_VALUE*> type and it should be named C<stack>. This is an L<call stack|Call Stack>.
+The second argument is the C<SPVM_VALUE*> type and it should be named C<stack>. This is an L<runtime stack|Runtime Stack>.
 
   int32_t SPVM__MyClass__sum(SPVM_ENV* env, SPVM_VALUE* stack) {
   
@@ -220,9 +220,9 @@ The generated shared libraries exists under "work/lib" under the build directory
   # Windows
   ~/.spvm_build/work/object/MyClass.dll
 
-=head1 Execution Environment
+=head1 Runtime Environment
 
-The object of the C<SPVM_ENV*> type is an execution environement.
+The object of the C<SPVM_ENV*> type is an runtime environement.
 
   SPVM_ENV* env;
 
@@ -232,9 +232,9 @@ This object is passed as the first argument of a Native API.
   
   }
 
-=head1 Call Stack
+=head1 Runtime Stack
 
-A call stack is passed to the second argument of the definition of the native method.. Stack is used getting arguments and return the value.
+A runtime stack is passed to the second argument of the definition of the native method. A runtime stack is used getting arguments and return the value.
 
   int32_t SPVM__MyClass__sum(SPVM_ENV* env, SPVM_VALUE* stack) {
     
@@ -457,6 +457,10 @@ The return value of the method is stored in the first element of the stack.
 
   int32_t total = stack[0].ival;
 
+=head2 Arguments Width
+
+The width of the arguments is the length in units of the L<SPVM_VALUE|SPVM::Document::NativeClass/"Runtime Stack"> type.
+
 =head1 Scope
 
 Native method are entirely enclosed in scope.
@@ -471,11 +475,15 @@ Native APIs that normally create an object such as "new_object" will add the aut
 
 Use "enter_scope" to create a scope. The return value is the ID of that scope.
 
-  int32_t scope_id = env->enter_scope(env, stack);
+  int32_t mortal_stack_top = env->enter_scope(env, stack);
 
 Use "leave_scope" to leave the scope. For the argument, it is necessary to specify the scope ID obtained in "enter_scope".
 
-  env->leave_scope(env, stack, scope_id);
+  env->leave_scope(env, stack, mortal_stack_top);
+
+=head2 Mortal Stack
+
+A mortal stack is created for a stack. A mortal stack is the stack to push local variables to destroy at the end of the scope.
 
 =head1 Exception
 

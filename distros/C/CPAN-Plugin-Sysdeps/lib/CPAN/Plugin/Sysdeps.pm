@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps;
 use strict;
 use warnings;
 
-our $VERSION = '0.73';
+our $VERSION = '0.75';
 
 use List::Util 'first';
 
@@ -14,6 +14,8 @@ use constant SUPPORTED_NUMERICAL_OPS_RX => do {
     my $rx = '^(' . join('|', map { quotemeta } @{SUPPORTED_NUMERICAL_OPS()}) . ')$';
     qr{$rx};
 };
+
+our @OS_RELEASE_PATH_CANDIDATES = ('/etc/os-release', '/usr/lib/os-release');
 
 sub new {
     my($class, @args) = @_;
@@ -73,7 +75,7 @@ sub new {
 	if (defined $options->{linuxdistro}) {
 	    $linuxdistro = $options->{linuxdistro};
 	} else {
-	    $linuxdistro = lc $get_linux_info->()->{linuxdistro};
+	    $linuxdistro = $get_linux_info->()->{linuxdistro};
 	}
 
 	if (defined $options->{linuxdistroversion}) {
@@ -188,11 +190,36 @@ sub post_get {
 
 # Helpers/Internal functions/methods
 sub _detect_linux_distribution {
+    my $info = _detect_linux_distribution_os_release();
+    return $info if $info;
     if (-x '/usr/bin/lsb_release') {
 	_detect_linux_distribution_lsb_release();
     } else {
 	_detect_linux_distribution_fallback();
     }
+}
+
+sub _detect_linux_distribution_os_release {
+    my %info;
+    for my $candidate_file (@OS_RELEASE_PATH_CANDIDATES) {
+	if (open my $fh, '<', $candidate_file) {
+	    my %c;
+	    while(<$fh>) {
+		if (my($k,$v) = $_ =~ m{^(.*?)=["']?(.*?)["']?$}) {
+		    $c{$k} = $v;
+		}
+	    }
+	    $info{linuxdistro} = $c{ID};
+	    $info{linuxdistroversion} = $c{VERSION_ID};
+	    $info{linuxdistrocodename} = $c{VERSION_CODENAME};
+	    # heuristics
+	    if (!defined $info{linuxdistrocodename} && $info{linuxdistro} eq 'debian' && $c{VERSION} =~ m{^\d+\s+\((.+)\)$}) {
+		$info{linuxdistrocodename} = $1;
+	    }
+	    return \%info;
+	}
+    }
+    undef;
 }
 
 sub _detect_linux_distribution_lsb_release {
@@ -203,7 +230,7 @@ sub _detect_linux_distribution_lsb_release {
     while(<$fh>) {
 	chomp;
 	if      (m{^Distributor ID:\s+(.*)}) {
-	    $info{linuxdistro} = $1;
+	    $info{linuxdistro} = lc $1;
 	} elsif (m{^Release:\s+(.*)}) {
 	    $info{linuxdistroversion} = $1;
 	} elsif (m{^Codename:\s+(.*)}) {
@@ -221,15 +248,15 @@ sub _detect_linux_distribution_fallback {
     if (open my $fh, '<', '/etc/redhat-release') {
 	my $contents = <$fh>;
 	if ($contents =~ m{^(CentOS|Rocky|RedHat|Fedora) (?:Linux )?release (\d+)\S*( \((.*?)\))?}) {
-	    return {linuxdistro => $1, linuxdistroversion => $2, linuxdistrocodename => defined $3 ? $3 : ''};
+	    return {linuxdistro => lc $1, linuxdistroversion => $2, linuxdistrocodename => defined $3 ? $3 : ''};
 	}
     }
     if (open my $fh, '<', '/etc/issue') {
 	chomp(my $line = <$fh>);
 	if      ($line =~ m{^Linux Mint (\d+) (\S+)}) {
-	    return {linuxdistro => 'LinuxMint', linuxdistroversion => $1, linuxdistrocodename => $2};
+	    return {linuxdistro => lc('LinuxMint'), linuxdistroversion => $1, linuxdistrocodename => $2};
 	} elsif ($line =~ m{^(Debian) GNU/Linux (\d+)}) {
-	    my %info = (linuxdistro => $1, linuxdistroversion => $2);
+	    my %info = (linuxdistro => lc $1, linuxdistroversion => $2);
 	    $info{linuxdistrocodename} =
 		{
 		 6  => 'squeeze',
@@ -242,7 +269,7 @@ sub _detect_linux_distribution_fallback {
 		}->{$info{linuxdistroversion}};
 	    return \%info;
 	} elsif ($line =~ m{^(Ubuntu) (\d+\.\d+)}) {
-	    my %info = (linuxdistro => $1, linuxdistroversion => $2);
+	    my %info = (linuxdistro => lc $1, linuxdistroversion => $2);
 	    $info{linuxdistrocodename} =
 		{
 		 '12.04' => 'precise',
@@ -320,10 +347,11 @@ sub _map_cpandist {
     # also add support for numerical comparisons
     my $smartmatch = sub ($$) {
 	my($left, $right) = @_;
+	no warnings 'uninitialized';
 	if (ref $right eq 'Regexp') {
 	    return 1 if $left =~ $right;
 	} elsif (ref $right eq 'ARRAY') {
-	    return 1 if first { $_ eq $left } @$right;
+	    return 1 if first { (!defined $left && !defined $_) || ($_ eq $left) } @$right;
 	} elsif (ref $right eq 'HASH') {
 	    for my $op (keys %$right) {
 		if ($op !~ SUPPORTED_NUMERICAL_OPS_RX) {
@@ -337,6 +365,7 @@ sub _map_cpandist {
 	    }
 	    return 1;
 	} else {
+	    return 1 if !defined $left && !defined $right;
 	    return 1 if $left eq $right;
 	}
     };
@@ -823,8 +852,9 @@ Match a operating system (perl's C<$^O> value).
 
 =item linuxdistro => I<$value>
 
-Match a linux distribution name, as returned by C<lsb_release -is>.
-The distribution name is lowercased.
+Match a linux distribution name, as specified in the C<ID> field in
+F</etc/os-release>, or returned by C<lsb_release -is>. The
+distribution name is lowercased.
 
 There are special values C<~debian> to match Debian-like distributions
 (Ubuntu and LinuxMint) and C<~fedora> to match Fedora-like
@@ -944,9 +974,9 @@ older, then still the C<cpan-sysdeps> script can be used.
 It is assumed that some system dependencies are still installed: a
 C<make>, a suitable C compiler, maybe C<sudo>, C<patch> (e.g. if there
 are distroprefs using patch files) and of course C<perl>. On linux
-systems, C<lsb-release> is usually required (there's limited support
-for lsb-release-less operation on some Debian-like distributions). On
-Mac OS X systems C<homebrew> has to be installed.
+systems, the file F</etc/os-release> is required, otherwise fallbacks
+using C<lsb-release> and F</etc/redhat-release> and F</etc/issue> are
+trued.. On Mac OS X systems C<homebrew> has to be installed.
 
 =item * Batch mode
 
@@ -1041,7 +1071,7 @@ Slaven Rezic
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016,2017,2018,2019 by Slaven ReziE<x0107>
+Copyright (C) 2016,2017,2018,2019,2024 by Slaven ReziE<x0107>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

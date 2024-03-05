@@ -187,6 +187,7 @@ Domgoergen
 Doru
 dow
 DoW
+dowX
 DoY
 doy
 Drudis
@@ -250,6 +251,7 @@ filehandle
 FindWindowsTZName
 finnish
 FirstDay
+firstday
 foo
 ForceDate
 forcedate
@@ -346,6 +348,8 @@ IW
 IWn
 iX
 Jacek
+jan
+janX
 Jared
 Jasso
 Javier
@@ -518,6 +522,7 @@ Oelstrom
 offh
 offm
 offsetstr
+ofYear
 OldConfigFiles
 Ole
 OO
@@ -675,6 +680,7 @@ Stepan
 Stepp
 stormking
 str
+strftime
 Subramanian
 substr
 suid

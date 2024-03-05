@@ -6,32 +6,33 @@ use warnings;
 
 # Based on Sisimai::Lhost::Exim
 sub description { '@mail.ru: https://mail.ru' }
-sub make {
+sub inquire {
     # Detect an error from @mail.ru
     # @param    [Hash] mhead    Message headers of a bounce email
     # @param    [String] mbody  Message body of a bounce email
     # @return   [Hash]          Bounce data list and message/rfc822 part
-    # @return   [Undef]         failed to parse or the arguments are missing
+    # @return   [undef]         failed to parse or the arguments are missing
     # @since v4.1.4
     my $class = shift;
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
+    my $msgid = $mhead->{'message-id'} || return undef;
+    my $mfrom = lc $mhead->{'from'};
+    my $match = 0;
 
     # Message-Id: <E1P1YNN-0003AD-Ga@*.mail.ru>
-    return undef unless lc($mhead->{'from'}) =~ /[<]?mailer-daemon[@].*mail[.]ru[>]?/;
-    return undef unless $mhead->{'message-id'} =~ /[.](?:mail[.]ru|smailru[.]net)[>]\z/;
-    return undef unless $mhead->{'subject'} =~ qr{(?:
-         Mail[ ]delivery[ ]failed(:[ ]returning[ ]message[ ]to[ ]sender)?
-        |Warning:[ ]message[ ].+[ ]delayed[ ]+
-        |Delivery[ ]Status[ ]Notification
-        |Mail[ ]failure
-        |Message[ ]frozen
-        |error[(]s[)][ ]in[ ]forwarding[ ]or[ ]filtering
-        )
-    }x;
+    $match++ if index($mfrom, 'mailer-daemon@') > -1 && index($mfrom, 'mail.ru') > -1;
+    $match++ if index($msgid, '.mail.ru>')      >  0 || index($msgid, 'smailru.net>') >  0;
+    $match++ if grep { index($mhead->{'subject'}, $_) > -1 } ( 'Delivery Status Notification',
+                                                               'Mail delivery failed',
+                                                               'Mail failure',
+                                                               'Message frozen',
+                                                               'Warning: message ',
+                                                               'error(s) in forwarding or filtering');
+    return undef unless $match > 2;
 
     state $indicators = __PACKAGE__->INDICATORS;
-    state $rebackbone = qr|^------ This is a copy of the message, including all the headers[.] ------|m;
+    state $boundaries = ['------ This is a copy of the message, including all the headers. ------'];
     state $startingof = { 'message' => ['This message was created automatically by mail delivery software.'] };
     state $recommands = [
         qr/SMTP error from remote (?:mail server|mailer) after ([A-Za-z]{4})/,
@@ -65,15 +66,15 @@ sub make {
     };
 
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
-    my $emailsteak = Sisimai::RFC5322->fillet($mbody, $rebackbone);
+    my $emailparts = Sisimai::RFC5322->part($mbody, $boundaries);
     my $readcursor = 0;     # (Integer) Points the current cursor position
     my $recipients = 0;     # (Integer) The number of 'Final-Recipient' header
     my $localhost0 = '';    # (String) Local MTA
     my $v = undef;
 
-    for my $e ( split("\n", $emailsteak->[0]) ) {
-        # Read error messages and delivery status lines from the head of the email
-        # to the previous line of the beginning of the original message.
+    for my $e ( split("\n", $emailparts->[0]) ) {
+        # Read error messages and delivery status lines from the head of the email to the previous
+        # line of the beginning of the original message.
         unless( $readcursor ) {
             # Beginning of the bounce message or message/delivery-status part
             $readcursor |= $indicators->{'deliverystatus'} if index($e, $startingof->{'message'}->[0]) == 0;
@@ -101,14 +102,14 @@ sub make {
         #    host neko.example.jp [192.0.2.222]: 550 5.1.1 <kijitora@example.jp>... User Unknown
         $v = $dscontents->[-1];
 
-        if( $e =~ /\A[ \t]+([^ \t]+[@][^ \t]+[.][a-zA-Z]+)\z/ ) {
+        if( index($e, '  ') == 0 && index($e, '    ') < 0 && index($e, '@') > 1 ) {
             #   kijitora@example.jp
             if( $v->{'recipient'} ) {
                 # There are multiple recipient addresses in the message body.
                 push @$dscontents, __PACKAGE__->DELIVERYSTATUS;
                 $v = $dscontents->[-1];
             }
-            $v->{'recipient'} = $1;
+            $v->{'recipient'} = substr($e, 2,);
             $recipients++;
 
         } elsif( scalar @$dscontents == $recipients ) {
@@ -117,9 +118,8 @@ sub make {
             $v->{'diagnosis'} .= $e.' ';
 
         } else {
-            # Error message when email address above does not include '@'
-            # and domain part.
-            next unless $e =~ /\A[ \t]{4}/;
+            # Error message when email address above does not include '@' and domain part.
+            next unless index($e, '    ') == 0;
             $v->{'alterrors'} .= $e.' ';
         }
     }
@@ -142,10 +142,13 @@ sub make {
     }
     return undef unless $recipients;
 
-    if( scalar @{ $mhead->{'received'} } ) {
+    my $p1 = -1; my $p2 = -1;
+    if( scalar $mhead->{'received'}->@* ) {
         # Get the name of local MTA
         # Received: from marutamachi.example.org (c192128.example.net [192.0.2.128])
-        $localhost0 = $1 if $mhead->{'received'}->[-1] =~ /from[ \t]([^ ]+) /;
+        $p1 = index($mhead->{'received'}->[-1], 'from ');
+        $p2 = index($mhead->{'received'}->[-1], ' ', $p1 + 5);
+        $localhost0 = substr($mhead->{'received'}->[-1], $p1 + 5, $p2 - $p1 - 5) if $p1 > -1;
     }
 
     for my $e ( @$dscontents ) {
@@ -158,19 +161,22 @@ sub make {
             }
             delete $e->{'alterrors'};
         }
-        $e->{'diagnosis'} =  Sisimai::String->sweep($e->{'diagnosis'});
-        $e->{'diagnosis'} =~ s/\b__.+\z//;
+        $e->{'diagnosis'} = Sisimai::String->sweep($e->{'diagnosis'});
+        $p1 = rindex($e->{'diagnosis'}, '__');
+        $e->{'diagnosis'} = substr($e->{'diagnosis'}, 0, $p1 - 1) if $p1 > 2;
 
         unless( $e->{'rhost'} ) {
             # Get the remote host name
             # host neko.example.jp [192.0.2.222]: 550 5.1.1 <kijitora@example.jp>... User Unknown
-            $e->{'rhost'} = $1 if $e->{'diagnosis'} =~ /host[ \t]+([^ \t]+)[ \t]\[.+\]:[ \t]/;
+            $p1 = index($e->{'diagnosis'}, 'host ');
+            $p2 = index($e->{'diagnosis'}, ' ', $p1 + 5);
+            $e->{'rhost'} = substr($e->{'diagnosis'}, $p1 + 5, $p2 - $p1 - 5) if $p1 > -1;
 
             unless( $e->{'rhost'} ) {
-                if( scalar @{ $mhead->{'received'} } ) {
+                if( scalar $mhead->{'received'}->@* ) {
                     # Get localhost and remote host name from Received header.
                     my $r0 = $mhead->{'received'};
-                    $e->{'rhost'} = pop @{ Sisimai::RFC5322->received($r0->[-1]) };
+                    $e->{'rhost'} = pop Sisimai::RFC5322->received($r0->[-1])->@*;
                 }
             }
         }
@@ -198,7 +204,7 @@ sub make {
                 } else {
                     SESSION: for my $r ( keys %$messagesof ) {
                         # Verify each regular expression of session errors
-                        next unless grep { index($e->{'diagnosis'}, $_) > -1 } @{ $messagesof->{ $r } };
+                        next unless grep { index($e->{'diagnosis'}, $_) > -1 } $messagesof->{ $r }->@*;
                         $e->{'reason'} = $r;
                         last;
                     }
@@ -208,7 +214,7 @@ sub make {
         }
         $e->{'command'} ||= '';
     }
-    return { 'ds' => $dscontents, 'rfc822' => $emailsteak->[1] };
+    return { 'ds' => $dscontents, 'rfc822' => $emailparts->[1] };
 }
 
 1;
@@ -226,8 +232,8 @@ Sisimai::Lhost::MailRu - bounce mail parser class for C<@mail.ru>.
 
 =head1 DESCRIPTION
 
-Sisimai::Lhost::MailRu parses a bounce email which created by C<@mail.ru>.
-Methods in the module are called from only Sisimai::Message.
+Sisimai::Lhost::MailRu parses a bounce email which created by C<@mail.ru>. Methods in the module are
+called from only Sisimai::Message.
 
 =head1 CLASS METHODS
 
@@ -237,10 +243,10 @@ C<description()> returns description string of this module.
 
     print Sisimai::Lhost::MailRu->description;
 
-=head2 C<B<make(I<header data>, I<reference to body string>)>>
+=head2 C<B<inquire(I<header data>, I<reference to body string>)>>
 
-C<make()> method parses a bounced email and return results as a array reference.
-See Sisimai::Message for more details.
+C<inquire()> method parses a bounced email and return results as a array reference. See Sisimai::Message
+for more details.
 
 =head1 AUTHOR
 
@@ -248,7 +254,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2020 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2023 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

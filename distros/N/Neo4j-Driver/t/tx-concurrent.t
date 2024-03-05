@@ -19,7 +19,7 @@ use if $no_warnings = $ENV{AUTHOR_TESTING} ? 1 : 0, 'Test::Warnings';
 use Neo4j_Test;
 use Neo4j_Test::MockHTTP;
 
-plan tests => 14 + $no_warnings;
+plan tests => 15 + $no_warnings;
 
 
 my ($w, $d, $s, $t, $r);
@@ -130,6 +130,25 @@ subtest 'config for https: uri' => sub {
 	lives_ok { $d->config( uri => 'https:', concurrent_tx => undef ); } 'config undef lives';
 	lives_ok { $s = 0; $s = $d->session(database => 'dummy'); } 'session undef lives';
 	ok ! $s->{net}{want_concurrent}, 'concurrent tx https default off';
+};
+
+
+subtest 'config for neo4j: uri' => sub {
+	plan tests => 6;
+	# config 1
+	$d = Neo4j::Driver->new->plugin($mock_plugin);
+	lives_ok { $d->config( uri => 'neo4j:', concurrent_tx => 1 ); } 'config on lives';
+	throws_ok {
+		$d->session(database => 'dummy');
+	} qr/\bconcurrent_tx\b.*\bhttp\b/i, 'neo4j: session on dies';
+	# config 0
+	$d = Neo4j::Driver->new->plugin($mock_plugin);
+	lives_ok { $d->config( uri => 'neo4j:', concurrent_tx => 0 ); } 'config off lives';
+	lives_ok { $d->session(database => 'dummy'); } 'neo4j: session off lives';
+	# config undef
+	$d = Neo4j::Driver->new->plugin($mock_plugin);
+	lives_ok { $d->config( uri => 'neo4j:' ); } 'config undef lives';
+	lives_ok { $d->session(database => 'dummy'); } 'neo4j: session undef lives';
 };
 
 

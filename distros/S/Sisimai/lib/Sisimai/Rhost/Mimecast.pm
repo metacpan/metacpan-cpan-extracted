@@ -2,56 +2,22 @@ package Sisimai::Rhost::Mimecast;
 use feature ':5.10';
 use strict;
 use warnings;
+use Sisimai::SMTP::Reply;
 
 sub get {
     # Detect bounce reason from https://www.mimecast.com/
-    # @param    [Sisimai::Data] argvs   Parsed email object
+    # @param    [Sisimai::Fact] argvs   Parsed email object
     # @return   [String]                The bounce reason at Mimecast
     # @since v4.25.15
     my $class = shift;
     my $argvs = shift // return undef;
 
     return undef unless length $argvs->{'diagnosticcode'};
-    return undef unless $argvs->{'replycode'} =~ /\A[245]\d\d\z/;
+    return undef unless Sisimai::SMTP::Reply->test($argvs->{'replycode'});
 
     state $messagesof = {
         # https://community.mimecast.com/s/article/Mimecast-SMTP-Error-Codes-842605754
-        'blocked' => [
-            # - The sender's IP address has been blocked by a Blocked Senders Policy.
-            # - Remove the entry from the policy.
-            [421, 'sender address blocked'],
-
-            # - The Sender's IP address has been placed on the block list due to too many invalid
-            #   connections.
-            # - The sender's mail server must retry the connection. The mail server performing the
-            #   connection says the recipient address validation isn't responding.
-            [451, 'recipient temporarily unavailable'],
-
-            # - You've reached your mail server's limit.
-            # - Wait and try again. The mail server won't accept any messages until you're under
-            #   the limit.
-            [451, 'ip temporarily blacklisted'],
-
-            # - The sending mail server is subjected to Greylisting. This requires the server to
-            #   retry the connection, between one minute and 12 hours. Alternatively, the sender's
-            #   IP address has a poor reputation.
-            # - These reputation checks can be bypassed with an Auto Allow or Permitted Senders
-            #   policy. If it's legitimate traffic, amend your Greylisting policy.
-            [451, 'internal resources are temporarily unavailable'],
-
-            # - Ongoing reputation checks have resulted in the message being rejected due to poor
-            #   IP reputation. This could occur after a 4xx error.
-            # - Create an Auto Allow or Permitted Senders policy.
-            #   Note:
-            #     You can request a review of your source IP ranges by completing our online form.
-            [550, 'local ct ip reputation - (reject)'],
-
-            # - The sender's IP address is listed in an RBL. The text displayed is specific to the
-            #   RBL which lists the sender's IP address.
-            # - Bypass the RBL with an Auto Allow or Permitted Senders policy. Additionally request
-            #   the associated IP address from the RBL.
-            #[550, '< details of RBL >'], NEED AN ACTUAL ERROR MESSAGE STRING
-
+        'authfailure' => [
             # - The inbound message has been rejected because the originated IP address isn't list-
             #   ed in the published SPF records for the sending domain.
             # - Ensure all the IP addresses for your mail servers are listed in your SPF records.
@@ -72,6 +38,43 @@ sub get {
             #   ed in the published SPF records for the sending domain.
             # - Ensure all the IP addresses for your mail servers are listed in your SPF records.
             [550, 'dmarc sender invalid - envelope rejected'],
+        ],
+        'badreputation' => [
+            # - The sending mail server is subjected to Greylisting. This requires the server to
+            #   retry the connection, between one minute and 12 hours. Alternatively, the sender's
+            #   IP address has a poor reputation.
+            # - These reputation checks can be bypassed with an Auto Allow or Permitted Senders
+            #   policy. If it's legitimate traffic, amend your Greylisting policy.
+            [451, 'internal resources are temporarily unavailable'],
+
+            # - Ongoing reputation checks have resulted in the message being rejected due to poor
+            #   IP reputation. This could occur after a 4xx error.
+            # - Create an Auto Allow or Permitted Senders policy.
+            #   Note:
+            #     You can request a review of your source IP ranges by completing our online form.
+            [550, 'local ct ip reputation - (reject)'],
+        ],
+        'blocked' => [
+            # - The sender's IP address has been blocked by a Blocked Senders Policy.
+            # - Remove the entry from the policy.
+            [421, 'sender address blocked'],
+
+            # - The Sender's IP address has been placed on the block list due to too many invalid
+            #   connections.
+            # - The sender's mail server must retry the connection. The mail server performing the
+            #   connection says the recipient address validation isn't responding.
+            [451, 'recipient temporarily unavailable'],
+
+            # - You've reached your mail server's limit.
+            # - Wait and try again. The mail server won't accept any messages until you're under
+            #   the limit.
+            [451, 'ip temporarily blacklisted'],
+
+            # - The sender's IP address is listed in an RBL. The text displayed is specific to the
+            #   RBL which lists the sender's IP address.
+            # - Bypass the RBL with an Auto Allow or Permitted Senders policy. Additionally request
+            #   the associated IP address from the RBL.
+            #[550, '< details of RBL >'], NEED AN ACTUAL ERROR MESSAGE STRING
         ],
         'mesgtoobig' => [
             # - The email size either exceeds an Email Size Limit policy or is larger than the
@@ -266,16 +269,16 @@ sub get {
         ],
     };
 
-    my $esmtperror = lc  $argvs->{'diagnosticcode'} // 0;
-    my $esmtpreply = int $argvs->{'replycode'}      // 0;
+    my $issuedcode = lc $argvs->{'diagnosticcode'} // 0;
+    my $esmtpreply = int $argvs->{'replycode'}     // 0;
     my $reasontext = '';
 
     REASON: for my $e ( keys %$messagesof ) {
         # Try to find with each error message defined in $messagesof
-        for my $f ( @{ $messagesof->{ $e } } ) {
+        for my $f ( $messagesof->{ $e }->@* ) {
             # Find an error reason
             next unless $esmtpreply == $f->[0];
-            next unless index($esmtperror, $f->[1]) > -1;
+            next unless index($issuedcode, $f->[1]) > -1;
             $reasontext = $e;
             last REASON;
         }
@@ -298,13 +301,13 @@ Sisimai::Rhost::Mimecast - Detect the bounce reason returned from Mimecast
 
 =head1 DESCRIPTION
 
-Sisimai::Rhost detects the bounce reason from the content of Sisimai::Data object as an argument of
+Sisimai::Rhost detects the bounce reason from the content of Sisimai::Fact object as an argument of
 get() method when the value of C<rhost> or C<destination> of the object is "mimecast.com". This
-class is called only Sisimai::Data class.
+class is called only Sisimai::Fact class.
 
 =head1 CLASS METHODS
 
-=head2 C<B<get(I<Sisimai::Data Object>)>>
+=head2 C<B<get(I<Sisimai::Fact Object>)>>
 
 C<get()> detects the bounce reason.
 

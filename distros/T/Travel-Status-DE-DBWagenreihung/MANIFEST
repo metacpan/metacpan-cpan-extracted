@@ -1,14 +1,16 @@
+.mailmap
 bin/db-wagenreihung
 Build.PL
 Changelog
+cpanfile.snapshot
 lib/Travel/Status/DE/DBWagenreihung.pm
 lib/Travel/Status/DE/DBWagenreihung/Section.pm
 lib/Travel/Status/DE/DBWagenreihung/Wagon.pm
 MANIFEST			This list of files
-META.json
 README
 xt/00-compile-pm.t
 xt/01-compile-pl.t
 xt/02-compile-pod.t
 META.yml
+META.json
 SIGNATURE    Added here by Module::Build

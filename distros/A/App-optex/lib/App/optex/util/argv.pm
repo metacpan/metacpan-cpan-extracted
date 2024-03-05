@@ -26,6 +26,7 @@ my %options = (
     "times"     => "-M__PACKAGE__::times(count=\$<shift>) \$<move>",
     "reverse"   => "-M__PACKAGE__::reverse() \$<move>",
     "collect"   => "-M__PACKAGE__::collect(index=\$<shift>) \$<move>",
+    "filter"    => "-M__PACKAGE__::filter(command=\$<shift>) \$<move>",
     );
 
 sub enable {
@@ -212,7 +213,7 @@ Parameter B<:all> can be used to enable everything.
 
 You can use alternative names:
 
-    -Mutil::argv::enable(move=mynove,copy=mycopy)
+    -Mutil::argv::enable(move=mymove,copy=mycopy)
 
 =over 4
 
@@ -245,6 +246,15 @@ Exchanges following two arguments.  This is same as B<--move 1,1>.
 will print:
 
     bar foo
+
+=item B<--filter> I<command>
+
+Set input filter for each file argument.
+
+Next command passes the result of the C<expand> filter to the C<cat
+-n> for each file in the command line.
+
+    optex -Mutil::argv::enable=filter cat -n --filter=expand a b c
 
 =back
 

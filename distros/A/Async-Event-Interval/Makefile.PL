@@ -28,11 +28,12 @@ WriteMakefile(
         'ExtUtils::MakeMaker' => 0,
     },
     BUILD_REQUIRES => {
-        'Mock::Sub'  => 0,
-        'Test::More' => 0,
+        'Mock::Sub'        => 0,
+        'Test::More'       => 0,
+        'Test::SharedFork' => 0,
     },
     PREREQ_PM => {
-        'IPC::Shareable'        => 1.11,
+        'IPC::Shareable'        => 1.13,
         'Parallel::ForkManager' => 0,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

@@ -162,7 +162,7 @@ Next, I tried to determine which of those authors and packages are
 still active.  I'm not completely sure about some of the packages because
 frequently, those old packages have changed maintainers, been renamed,
 or been incorporated into other packages.  So the number of active
-packages is actually a lower limit.
+packages may be missing a couple.
 
 I found that:
 

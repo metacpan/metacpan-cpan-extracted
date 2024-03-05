@@ -56,7 +56,10 @@ if ( $request_path =~ qr{^/Search/} && (!$DECODED_ARGS->{Class} || $DECODED_ARGS
         my $current_search = $session{"CurrentSearchHash-RT::Tickets"} || $session{"CurrentSearchHash"} || {};
         my $query = $DECODED_ARGS->{'Query'} || $current_search->{'Query'};
         if ( $query ) {
-            PageMenu->child( 'gantt' => title => loc('Gantt Chart'), path => '/Search/JSGantt.html?Query=' . $query );
+            PageMenu->child(
+                'gantt' => title => loc('Gantt Chart'),
+                path => '/Search/JSGantt.html?' . $m->comp( '/Elements/QueryString', Query => $query, %$DECODED_ARGS ),
+            );
         }
     }
 }

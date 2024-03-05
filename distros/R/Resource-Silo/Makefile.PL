@@ -13,6 +13,7 @@ my %WriteMakefileArgs = (
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker'   => 7,
     },
+    BUILD_REQUIRES => {},
     TEST_REQUIRES => {
         'Test::More'            => 1.302015,
         'Test::Exception'       => 0.29,

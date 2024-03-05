@@ -1,17 +1,16 @@
 #!/usr/bin/perl
 
-use v5;
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use ExtUtils::CChecker;
 
 my $cc = ExtUtils::CChecker->new;
 
 ok( defined $cc, 'defined $cc' );
-isa_ok( $cc, "ExtUtils::CChecker", '$cc' );
+isa_ok( $cc, [ "ExtUtils::CChecker" ], '$cc' );
 
 ok( $cc->try_compile_run( "int main(void) { return 0; }\n" ), 'Trivial C program compiles and runs' );
 ok( !$cc->try_compile_run( "int foo bar splot\n" ), 'Broken C program does not compile and run' );
@@ -23,6 +22,6 @@ $cc->try_compile_run(
    define => "HAVE_C",
 );
 
-is_deeply( $cc->extra_compiler_flags, [ "-DHAVE_C" ], 'HAVE_C defined' );
+is( $cc->extra_compiler_flags, [ "-DHAVE_C" ], 'HAVE_C defined' );
 
 done_testing;

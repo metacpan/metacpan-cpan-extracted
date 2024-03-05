@@ -44,7 +44,7 @@ CONSTRUCTOR
 
  new
 
-       $cc = ExtUtils::CChecker->new( %args )
+       $cc = ExtUtils::CChecker->new( %args );
 
     Returns a new instance of a ExtUtils::CChecker object. Takes the
     following named parameters:
@@ -70,48 +70,55 @@ METHODS
 
  include_dirs
 
-       $dirs = $cc->include_dirs
+       $dirs = $cc->include_dirs;
 
     Returns the currently-configured include directories in an ARRAY
     reference.
 
  extra_compiler_flags
 
-       $flags = $cc->extra_compiler_flags
+       $flags = $cc->extra_compiler_flags;
 
     Returns the currently-configured extra compiler flags in an ARRAY
     reference.
 
  extra_linker_flags
 
-       $flags = $cc->extra_linker_flags
+       $flags = $cc->extra_linker_flags;
 
     Returns the currently-configured extra linker flags in an ARRAY
     reference.
 
  push_include_dirs
 
-       $cc->push_include_dirs( @dirs )
+       $cc->push_include_dirs( @dirs );
 
     Adds more include directories
 
  push_extra_compiler_flags
 
-       $cc->push_extra_compiler_flags( @flags )
+       $cc->push_extra_compiler_flags( @flags );
 
     Adds more compiler flags
 
  push_extra_linker_flags
 
-       $cc->push_extra_linker_flags( @flags )
+       $cc->push_extra_linker_flags( @flags );
 
     Adds more linker flags
 
+ define
+
+       $cc->define( $symbol );
+
+    Adds a new defined symbol directly; either by appending to the compiler
+    flags or writing it into the defines file.
+
  try_compile_run
 
-       $success = $cc->try_compile_run( %args )
+       $success = $cc->try_compile_run( %args );
     
-       $success = $cc->try_compile_run( $source )
+       $success = $cc->try_compile_run( $source );
 
     Try to compile, link, and execute a C program whose source is given.
     Returns true if the program compiled and linked, and exited
@@ -142,7 +149,7 @@ METHODS
 
  assert_compile_run
 
-       $cc->assert_compile_run( %args )
+       $cc->assert_compile_run( %args );
 
     Calls try_compile_run. If it fails, die with an OS unsupported message.
     Useful to call from Build.PL or Makefile.PL.
@@ -157,7 +164,7 @@ METHODS
 
  try_find_cflags_for
 
-       $success = $cc->try_find_cflags_for( %args )
+       $success = $cc->try_find_cflags_for( %args );
 
     Since version 0.11.
 
@@ -188,7 +195,7 @@ METHODS
 
  try_find_include_dirs_for
 
-       $success = $cc->try_find_include_dirs_for( %args )
+       $success = $cc->try_find_include_dirs_for( %args );
 
     Try to compile, link and execute the given source, using extra include
     directories.
@@ -219,7 +226,7 @@ METHODS
 
  try_find_libs_for
 
-       $success = $cc->try_find_libs_for( %args )
+       $success = $cc->try_find_libs_for( %args );
 
     Try to compile, link and execute the given source, when linked against
     a given set of extra libraries.
@@ -250,15 +257,15 @@ METHODS
 
  find_cflags_for
 
-       $cc->find_cflags_for( %args )
+       $cc->find_cflags_for( %args );
 
  find_include_dirs_for
 
-       $cc->find_include_dirs_for( %args )
+       $cc->find_include_dirs_for( %args );
 
  find_libs_for
 
-       $cc->find_libs_for( %args )
+       $cc->find_libs_for( %args );
 
     Calls try_find_cflags_for, try_find_include_dirs_for or
     try_find_libs_for respectively. If it fails, die with an OS unsupported
@@ -274,7 +281,7 @@ METHODS
 
  extend_module_build
 
-       $cc->extend_module_build( $build )
+       $cc->extend_module_build( $build );
 
     Since version 0.11.
 
@@ -282,7 +289,7 @@ METHODS
 
  new_module_build
 
-       $mb = $cc->new_module_build( %args )
+       $mb = $cc->new_module_build( %args );
 
     Construct and return a new Module::Build object, preconfigured with the
     include_dirs, extra_compiler_flags and extra_linker_flags options that

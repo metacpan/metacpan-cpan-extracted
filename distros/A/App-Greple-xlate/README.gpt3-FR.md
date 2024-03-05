@@ -10,7 +10,7 @@ App::Greple::xlate - module de support de traduction pour greple
 
 # VERSION
 
-Version 0.30
+Version 0.31
 
 # DESCRIPTION
 
@@ -158,7 +158,52 @@ Le module **xlate** peut stocker le texte traduit en cache pour chaque fichier e
 
 # COMMAND LINE INTERFACE
 
-Vous pouvez facilement utiliser ce module depuis la ligne de commande en utilisant la commande `xlate` incluse dans le référentiel. Consultez les informations d'aide de `xlate` pour connaître son utilisation.
+Vous pouvez facilement utiliser ce module depuis la ligne de commande en utilisant la commande `xlate` incluse dans la distribution. Consultez les informations d'aide de `xlate` pour connaître son utilisation.
+
+La commande `xlate` fonctionne en collaboration avec l'environnement Docker, donc même si vous n'avez rien d'installé sous la main, vous pouvez l'utiliser tant que Docker est disponible. Utilisez l'option `-D` ou `-C`.
+
+De plus, étant donné que des fichiers makefiles pour différents styles de documents sont fournis, la traduction dans d'autres langues est possible sans spécification spéciale. Utilisez l'option `-M`.
+
+Vous pouvez également combiner les options Docker et make afin de pouvoir exécuter make dans un environnement Docker.
+
+En lançant la commande `xlate -GC`, vous ouvrirez un shell avec le dépôt git de travail actuel monté.
+
+Lisez l'article japonais dans la section ["VOIR AUSSI"](#voir-aussi) pour plus de détails.
+
+    xlate [ options ] -t lang file [ greple options ]
+        -h   help
+        -v   show version
+        -d   debug
+        -n   dry-run
+        -a   use API
+        -c   just check translation area
+        -r   refresh cache
+        -s   silent mode
+        -e # translation engine (default "deepl")
+        -p # pattern to determine translation area
+        -w # wrap line by # width
+        -o # output format (default "xtxt", or "cm", "ifdef")
+        -f # from lang (ignored)
+        -t # to lang (required, no default)
+        -m # max length per API call
+        -l # show library files (XLATE.mk, xlate.el)
+        --   terminate option parsing
+    Make options
+        -M   run make
+        -n   dry-run
+    Docker options
+        -G   mount git top-level directory
+        -B   run in non-interactive (batch) mode
+        -R   mount read-only
+        -E * specify environment variable to be inherited
+        -I * specify altanative docker image (default: tecolicom/xlate:version)
+        -D * run xlate on the container with the rest parameters
+        -C * run following command on the container, or run shell
+
+    Control Files:
+        *.LANG    translation languates
+        *.FORMAT  translation foramt (xtxt, cm, ifdef)
+        *.ENGINE  translation engine (deepl or gpt3)
 
 # EMACS
 

@@ -254,16 +254,26 @@ It is sometimes necessary to know what day of week is regarded as
 first.  By default, this is set to Monday as that conforms to ISO
 8601, but many countries and people will prefer Sunday (and in a few
 cases, a different day may be desired).  Set the FirstDay variable to
-be the first day of the week (1=Monday, 7=Sunday).
+be a digit 1-7 corresponding to the day of the week (1=Monday to 7=Sunday).
 
-=item B<Jan1Week1>
+=item B<Week1ofYear>
 
-ISO 8601 states that the first week of the year is the one which contains
-Jan 4 (i.e. it is the first week in which most of the days in that week
-fall in that year).  This means that the first 3 days of the year may
-be treated as belonging to the last week of the previous year.  If this
-is set to non-nil, the ISO 8601 standard will be ignored and the first
-week of the year contains Jan 1.
+This variable (along with the FirstDay variable) is used to define
+exactly when the first week of the year begins.
+
+If the value is 'janX' (where X is a digit 1-7), then it means that the
+first week of the year contains that date.  The default ISO 8601 definition
+of a week is that it is the first week containing January 4, so the default
+value of this variable is 'jan4'.
+
+If the value is 'dowX' (where X is a digit 1-7), then the first week
+of the year is the one that contains the first occurrence of the DoW
+given (X=1 is Monday, X=7 is Sunday).  So, if you want the first week
+to be the one that contains the first Monday of the year, use 'dow1'.
+
+If the value is 'firstday', then the first week of the year is the one
+that contains the first occurrence of the DoW given in the FirstDay
+config variable.
 
 =item B<Printable>
 
@@ -514,22 +524,6 @@ time zone the computer is in.
 
 =over 4
 
-=item B<TZ>
-
-This variable is deprecated, but will be supported for several
-releases. The SetDate or ForceDate variables (described next) should be
-used instead.
-
-The following are equivalent:
-
-    $date->config("tz","Europe/Rome");
-    $date->config("setdate","now,Europe/Rome");
-
-or in the functional interface:
-
-    Date_Init("tz=Europe/Rome");
-    Date_Init("setdate=now,Europe/Rome");
-
 =item B<SetDate>
 
 The SetDate config variable is used to set the current date, time, or
@@ -684,9 +678,32 @@ deprecated.  They will be removed in a future Date::Manip release:
 
 =item B<TZ>
 
-This is discussed above. Use SetDate or ForceDate instead.
+This variable is deprecated.  It is scheduled to be removed in version
+7.00. The SetDate or ForceDate variables (described next) should be
+used instead.
 
-Scheduled for removal when 7.00 is released.
+The following are equivalent:
+
+    $date->config("tz","Europe/Rome");
+    $date->config("setdate","now,Europe/Rome");
+
+or in the functional interface:
+
+    Date_Init("tz=Europe/Rome");
+    Date_Init("setdate=now,Europe/Rome");
+
+=item B<Jan1Week1>
+
+This variable is deprecated.  It is scheduled to be removed in version
+7.00. The Week1ofYear variables (described next) should be used
+instead.
+
+ISO 8601 states that the first week of the year is the one which contains
+Jan 4 (i.e. it is the first week in which most of the days in that week
+fall in that year).  This means that the first 3 days of the year may
+be treated as belonging to the last week of the previous year.  If this
+is set to non-nil, the ISO 8601 standard will be ignored and the first
+week of the year contains Jan 1.
 
 =back
 

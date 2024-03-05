@@ -10,7 +10,7 @@ use Pod::Usage;
 use Test::More 0.88;
 use Test::Pod::LinkCheck::Lite qw{ :const };
 
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 
 my %opt = (
     ignore_url	=> [],
@@ -19,11 +19,12 @@ my $dump;
 
 GetOptions( \%opt,
     qw{
+	add_dir|add-dir=s@
 	allow_redirect_to_index|allow-redirect-to-index!
 	check_url|check-url! ignore_url|ignore-url=s@ man!
 	prohibit_redirect|prohibit-redirect!
     },
-    'dump!'	=> \$dump,
+    'dump=s'	=> \$dump,
     help	=> sub { pod2usage( { -verbose => 2 } ) },
 ) and 1 >= @ARGV or pod2usage( { -verbose => 0 } );
 
@@ -48,19 +49,16 @@ if ( ! @ARGV || -d $ARGV[0] ) {
     $tp->pod_file_ok( \"=pod\n\n$ARGV[0]" );
 }
 
-if ( $dump ) {
-    # The following require() is strictly pro forma, since
-    # Test::Pod::LinkCheck::Lite has already loaded it.
-    # The encapsulation violations in the following are UNSUPPORTED.
-    require Test::Builder;
-    my $TEST = Test::Builder->new();
-    $TEST->diag( '' );
-    $TEST->diag( 'Sections' );
-    $TEST->diag( "    $_" ) for sort keys %{ $tp->{_section} };
-    $TEST->diag( '' );
-    $TEST->diag( 'Links' );
+if ( defined $dump ) {
     require YAML;
-    $TEST->diag( YAML::Dump( [ $tp->{_links} ] ) );
+    $dump eq '-'
+	and $dump = \*STDOUT;
+    YAML::DumpFile( $dump, {
+	    Cache	=> $tp->{_cache},
+	    Links	=> $tp->{_links},
+	    Sections	=> $tp->{_section},
+	}
+    );
 }
 
 done_testing;
@@ -81,13 +79,25 @@ test-pod-links - Test a POD file, or literal POD.
 
 =head1 OPTIONS
 
-=head2 -allow-redirect-to-index
+=head2 --add-dir
+
+ --add-dir=eg/
+
+This option specifies a directory to add to the search for the targets
+of external POD links. This option can be specified multiple times. If
+not specified at all, the default is
+
+ --add-dir=blib/script
+
+provided that directory exists.
+
+=head2 --allow-redirect-to-index
 
 This Boolean option implies L<-prohibit-redirect|/-prohibit-redirect>,
 but sets the corresponding attribute to
 L<ALLOW_REDIRECT_TO_INDEX|Test::Pod::LinkCheck::Lite/ALLOW_REDIRECT_TO_INDEX>.
 
-=head2 -check-url
+=head2 --check-url
 
 This Boolean option specifies that World Wide Web access is allowed. If
 disallowed, URL links are  not checked, and the CPAN Meta database is
@@ -96,14 +106,18 @@ not considered when trying to check links to ininstalled modules.
 The default is C<-check_url>, but this option can be negated by specifying
 C<-nocheck-url>.
 
-=head2 -dump
+=head2 --dump
 
-If asserted, this Boolean option dumps selected object state after the
-test has been run. This option is unsupported, and may be changed or
-retracted without notice.
+ --dump=dump.yml
 
-As of this writing, it displays all the sections in the last file
-parsed, in ASCIIbetical order.
+This option produces a YAML dump of the object. There will be three keys
+in the output: C<Cache> is the cache of external modules referred to,
+C<Links> are the links to those external modules, and C<Sections> are
+the sections that can be used as targets to links. The output is written
+to the specified file.
+
+This option is unsupported, and may be changed or retracted without
+notice.
 
 =head2 -help
 

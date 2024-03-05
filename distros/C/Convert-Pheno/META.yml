@@ -29,6 +29,7 @@ requires:
   DBI: '1.643'
   Data::Leaf::Walker: '0.21'
   File::ShareDir::ProjectDistDir: '1.000009'
+  Hash::Fold: v1.0.0
   JSON::Validator: '5.14'
   JSON::XS: '4.03'
   Mojolicious: '9.33'
@@ -47,6 +48,6 @@ resources:
   homepage: https://github.com/CNAG-Biomedical-Informatics/convert-pheno
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/CNAG-Biomedical-Informatics/convert-pheno.git
-version: '0.17'
+version: '0.18'
 x_contributors: []
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

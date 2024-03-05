@@ -5,12 +5,12 @@ use warnings;
 
 use Mo qw(build is);
 use Mo::utils qw(check_length check_required check_strings);
-use Mo::utils::Language qw(check_language);
+use Mo::utils::Language 0.04 qw(check_language);
 use Readonly;
 
 Readonly::Array our @TYPES => qw(info error);
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 has lang => (
 	is => 'ro',
@@ -128,10 +128,15 @@ Returns string.
  new():
          From Mo::utils:
                  Parameter 'text' has length greater than '4096'.
-	         Parameter 'text' is required.
-	         Parameter 'type' must be one of defined strings.
+                         Value: %s
+                 Parameter 'text' is required.
+                         Value: %s
+                 Parameter 'type' must be one of defined strings.
+                         String: %s
+                         Possible strings: %s
          From Mo::utils::Language:
-	         Language code 'xx' isn't ISO 639-1 code.
+                 Parameter 'lang' doesn't contain valid ISO 639-1 code.
+                         Value: %s
 
 =head1 EXAMPLE
 
@@ -176,12 +181,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2023 Michal Josef Špaček
+© 2023-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

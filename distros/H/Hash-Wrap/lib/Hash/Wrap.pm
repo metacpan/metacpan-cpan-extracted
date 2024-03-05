@@ -11,7 +11,7 @@ use warnings;
 
 use Scalar::Util;
 use Digest::MD5;
-our $VERSION = '0.22';
+our $VERSION = '1.01';
 
 our @EXPORT = qw[ wrap_hash ];
 
@@ -31,15 +31,14 @@ sub _croak {
 sub _croak_class_method {
     my ( $class, $method ) = @_;
     $class = ref( $class ) || $class;
-    _croak ( qq[Can't locate class method "$method" via package "$class"] );
+    _croak( qq[Can't locate class method "$method" via package "$class"] );
 }
 
 sub _croak_object_method {
     my ( $object, $method ) = @_;
     my $class = Scalar::Util::blessed( $object ) || ref( $object ) || $object;
-    _croak ( qq[Can't locate object method "$method" via package "$class"] );
+    _croak( qq[Can't locate object method "$method" via package "$class"] );
 }
-
 
 sub _find_symbol {
     my ( $package, $symbol, $reftype ) = @_;
@@ -89,7 +88,6 @@ sub _generate_predicate {
 
     return $coderef;
 }
-
 
 sub _autoload {
     my ( $hash_class, $method, $object ) = @_;
@@ -176,7 +174,6 @@ sub import {
         if ( defined $name ) {
 
             if ( defined( my $reftype = Scalar::Util::reftype( $name ) ) ) {
-
                 _croak(
                     "-as must be undefined or a string or a reference to a scalar"
                   )
@@ -264,10 +261,11 @@ sub _build_class {
     my $rentry = $REGISTRY{$class} = { methods => {} };
 
     my %closures;
+    my @BODY;
     my %dict = (
         class                 => $class,
         signature             => '',
-        body                  => [],
+        body                  => \@BODY,
         autoload_attr         => '',
         validate_inline       => 'exists $self->{\<<KEY>>}',
         validate_method       => 'exists $self->{$key}',
@@ -296,22 +294,20 @@ sub _build_class {
 
     if ( $attr->{-exists} ) {
         $dict{exists} = $attr->{-exists} =~ PerlIdentifier ? $1 : 'exists';
-        push @{ $dict{body} }, q[ sub <<EXISTS>> { exists $_[0]->{$_[1] } } ];
-        $rentry->{methods}{$dict{exists}} = undef;
+        push @BODY, q[ sub <<EXISTS>> { exists $_[0]->{$_[1] } } ];
+        $rentry->{methods}{ $dict{exists} } = undef;
     }
 
     if ( $attr->{-defined} ) {
         $dict{defined} = $attr->{-defined} =~ PerlIdentifier ? $1 : 'defined';
-        push @{ $dict{body} }, q[ sub <<DEFINED>> { defined $_[0]->{$_[1] } } ];
-        $rentry->{methods}{$dict{defined}} = undef;
+        push @BODY, q[ sub <<DEFINED>> { defined $_[0]->{$_[1] } } ];
+        $rentry->{methods}{ $dict{defined} } = undef;
     }
 
     if ( $attr->{-immutable} ) {
         $dict{set} = <<'END';
-if ( @_ ) {
-  require Carp;
-  Carp::croak( q[Modification of a read-only value attempted])
-}
+  Hash::Wrap::_croak( q[Modification of a read-only value attempted])
+    if @_;
 END
     }
 
@@ -325,12 +321,37 @@ END
 
         $dict{recurse_limit} = --$attr->{-recurse} < 0 ? -1 : $attr->{-recurse};
 
+        $dict{quoted_key} = 'q[\<<KEY>>]';
+        $dict{hash_value} = '$self->{<<QUOTED_KEY>>}';
+
+        $dict{recurse_wrap_hash}
+          = '$<<CLASS>>::recurse_into_hash->( <<HASH_VALUE>> )';
+
         $dict{return_value} = <<'END';
-return 'HASH' eq (Scalar::Util::reftype( $self->{q[\<<KEY>>]} ) // '')
-        && ! Scalar::Util::blessed( $self->{q[\<<KEY>>]} )
-      ? $<<CLASS>>::recurse_into_hash->( $self->{q[\<<KEY>>]} )
-      : $self->{q[\<<KEY>>]};
+return 'HASH' eq (Scalar::Util::reftype( <<HASH_VALUE>> ) // '')
+        && ! Scalar::Util::blessed( <<HASH_VALUE>> )
+      ? <<WRAP_HASH_ENTRY>>
+      : <<HASH_VALUE>>;
 END
+        if ( $attr->{-copy} ) {
+
+            if ( $attr->{-immutable} ) {
+                $dict{wrap_hash_entry} = <<'END';
+                 do { Hash::Util::unlock_ref_value( $self, <<QUOTED_KEY>> );
+                      <<HASH_VALUE>> = <<RECURSE_WRAP_HASH>>;
+                      Hash::Util::lock_ref_value( $self, <<QUOTED_KEY>> );
+                    }
+END
+            }
+            else {
+                $dict{wrap_hash_entry}
+                  = '<<HASH_VALUE>> = <<RECURSE_WRAP_HASH>>';
+            }
+
+        }
+        else {
+            $dict{wrap_hash_entry} = '<<RECURSE_WRAP_HASH>>';
+        }
 
         # do a two-step initialization of the constructor.  If
         # the initialization sub is stored in $recurse_into_hash, and then
@@ -350,14 +371,13 @@ our $setup_recurse_into_hash = sub {
 $recurse_into_hash = $setup_recurse_into_hash;
 END
 
-        my %attr = ( %$attr,
-                     -recurse => --$attr->{-recurse} < 0 ? -1 : $attr->{-recurse},
-                   );
-        delete @attr{ qw( -as_scalar_ref -class -base -as ) };
-        $closures{'$attr'} =  \%attr;
+        my %attr = (
+            %$attr,
+            -recurse => --$attr->{-recurse} < 0 ? -1 : $attr->{-recurse},
+        );
+        delete @attr{qw( -as_scalar_ref -class -base -as )};
+        $closures{'$attr'} = \%attr;
     }
-
-
 
     if ( $attr->{-predicate} ) {
         $dict{predicate_template} = <<'END';
@@ -438,7 +458,8 @@ sub can {
 1;
 END
 
-    _compile_from_tpl( \$class_template, \%dict, \%closures )
+    _compile_from_tpl( \$class_template, \%dict,
+        keys %closures ? \%closures : () )
       or _croak_about_code( \$class_template, "class $class" );
 
     if ( !!$attr->{-new} ) {
@@ -486,15 +507,16 @@ sub _build_constructor {
     my ( $package, $name, $args ) = @_;
 
     # closure for user provided clone sub
-    my $clone;
+    my %closures;
 
     _croak( "cannot mix -copy and -clone" )
       if exists $args->{-copy} && exists $args->{-clone};
 
+    my @USE;
     my %dict = (
         package              => $package,
         constructor_name     => $name,
-        use                  => [],
+        use                  => \@USE,
         package_return_value => '1;',
     );
 
@@ -508,26 +530,38 @@ sub _build_constructor {
         }
     };
 
-    $dict{copy} = do {
-        if ( $args->{-copy} ) {
-            '$hash = { %{ $hash } };';
-        }
+    my @copy = (
+        'Hash::Wrap::_croak(q{the argument to <<PACKAGE>>::<<CONSTRUCTOR_NAME>> must not be an object})',
+        '  if Scalar::Util::blessed( $hash );'
+    );
 
-        elsif ( exists $args->{-clone} ) {
-            if ( 'CODE' eq ref $args->{-clone} ) {
-                $clone = $args->{-clone};
-                '$hash = $clone->($hash);';
-            }
-            else {
-                push @{ $dict{use} }, q[use Storable ();];
-                '$hash = Storable::dclone $hash;';
-            }
+    if ( $args->{-copy} ) {
+        push @copy, '$hash = { %{ $hash } };';
+    }
+
+    elsif ( exists $args->{-clone} ) {
+
+        if ( 'CODE' eq ref $args->{-clone} ) {
+            $closures{'clone'} = $args->{-clone};
+            # overwrite @copy, as the clone sub could take an object.
+            @copy = (
+                'state $clone = $CLOSURES->{clone};',
+                '$hash = $clone->($hash);',
+                'Hash::Wrap::_croak(q{the custom clone routine for <<PACKAGE>> returned an object instead of a plain hash})',
+                '  if Scalar::Util::blessed( $hash );'
+            );
         }
-    };
+        else {
+            push @USE,  q[use Storable ();];
+            push @copy, '$hash = Storable::dclone $hash;';
+        }
+    }
+
+    $dict{copy} = join "\n", @copy;
 
     $dict{lock} = do {
         if ( $args->{-immutable} ) {
-            push @{ $dict{use} }, q[use Hash::Util ();];
+            push @USE, q[use Hash::Util ();];
             'Hash::Util::lock_hash(%$hash)';
         }
         elsif ( defined $args->{-lockkeys} ) {
@@ -537,12 +571,12 @@ sub _build_constructor {
                     "-lockkeys: attribute name ($_) is not a valid Perl identifier"
                 ) for grep { $_ !~ PerlIdentifier } @{ $args->{-lockkeys} };
 
-                push @{ $dict{use} }, q[use Hash::Util ();];
+                push @USE, q[use Hash::Util ();];
                 'Hash::Util::lock_keys_plus(%$hash, qw{ '
                   . join( ' ', @{ $args->{-lockkeys} } ) . ' });';
             }
             elsif ( $args->{-lockkeys} ) {
-                push @{ $dict{use} }, q[use Hash::Util ();];
+                push @USE, q[use Hash::Util ();];
                 'Hash::Util::lock_keys(%$hash)';
             }
         }
@@ -558,7 +592,7 @@ sub _build_constructor {
     #<<< no tidy
     my $code = q[
     package <<PACKAGE>>;
-    <<CLOSURES>>
+
     <<USE>>
     use Scalar::Util ();
 
@@ -568,21 +602,20 @@ sub _build_constructor {
       my $class = <<CLASS>>
       my $hash = shift // {};
 
-      if ( 'HASH' ne Scalar::Util::reftype($hash) ) {
-         require Carp;
-         Carp::croak( "argument to <<PACKAGE>>::<<CONSTRUCTOR_NAME>> must be a hashref" )
-      }
+      Hash::Wrap::_croak( 'argument to <<PACKAGE>>::<<CONSTRUCTOR_NAME>> must be a hashref' )
+        if  'HASH' ne Scalar::Util::reftype($hash);
       <<COPY>>
       bless $hash, $class;
       <<LOCK>>
     }
     <<PACKAGE_RETURN_VALUE>>
+
     ];
     #>>>
 
-    my $result = _compile_from_tpl( \$code, \%dict, { '$clone' => $clone } )
-      || _croak(
-        "error generating constructor (as $name) subroutine: $@\n$code" );
+    my $result
+      = _compile_from_tpl( \$code, \%dict, keys %closures ? \%closures : () )
+      || _croak_about_code( \$code, "constructor (as $name) subroutine" );
 
     # caller asked for a coderef to be stuffed into a scalar
     ${$name} = $result if $args->{-as_scalar_ref};
@@ -590,26 +623,31 @@ sub _build_constructor {
 }
 
 sub _croak_about_code {
-    my ( $code, $what ) = @_;
-    my $error = $@;
+    my ( $code, $what, $error ) = @_;
+    $error //= $@;
     _line_number_code( $code );
     _croak( qq[error compiling $what: $error\n$$code] );
 }
 
 sub _line_number_code {
     my ( $code ) = @_;
-    my $space    = length( $$code =~ tr/\n// );
-    my $line     = 0;
+    chomp( $$code );
+    $$code .= "\n";
+    my $space = length( $$code =~ tr/\n// );
+    my $line  = 0;
     $$code =~ s/^/sprintf "%${space}d: ", ++$line/emg;
 }
-
 
 sub _compile_from_tpl {
     my ( $code, $dict, $closures ) = @_;
 
-    if ( defined $closures && %$closures) {
-        $dict->{closures}
-          = join( "\n", map { "my $_ = \$closures->{'$_'};" } keys %$closures );
+    if ( defined $closures && %$closures ) {
+
+        # add code to create lexicals if the keys begin with a q{$}
+        $dict->{closures} = join( "\n",
+            map { "my $_ = \$CLOSURES->{'$_'};" }
+              grep { substr( $_, 0, 1 ) eq q{$} }
+              keys %$closures );
     }
 
     _interpolate( $code, $dict );
@@ -620,8 +658,21 @@ sub _compile_from_tpl {
         print STDERR $code;
     }
 
+    _clean_eval( $code, exists $dict->{closures} ? $closures : () );
 
-    eval( $$code );    ## no critic (ProhibitStringyEval)
+}
+
+# eval in a clean lexical space.
+sub _clean_eval {
+    ## no critic (ProhibitStringyEval)
+    if ( @_ > 1 ) {
+        my $CLOSURES = $_[1];
+        eval( ${ $_[0] } );    ## no critic (ProhibitStringyEval)
+    }
+    else {
+        eval( ${ $_[0] } );    ## no critic (ProhibitStringyEval)
+    }
+
 }
 
 sub _interpolate {
@@ -678,7 +729,7 @@ Hash::Wrap - create on-the-fly objects from hashes
 
 =head1 VERSION
 
-version 0.22
+version 1.01
 
 =head1 SYNOPSIS
 
@@ -699,7 +750,7 @@ version 0.22
   my $copied = copied( { a => 1 } );
   print $copied->a;
 
-  # don't pollute up your namespace
+  # don't pollute your namespace
   my $wrap;
   use Hash::Wrap { -as => \$wrap};
   my $obj = $wrap->( { a => 1 } );
@@ -744,11 +795,13 @@ object construction and accessor behavior:
 
 =item *
 
-It's possible to use the passed hash directly, or make shallow or deep copies of it.
+It's possible to use the passed hash directly, or make shallow or deep
+copies of it.
 
 =item *
 
-Accessors can be customized so that accessing a non-existent element can throw an exception or return the undefined value.
+Accessors can be customized so that accessing a non-existent element
+can throw an exception or return the undefined value.
 
 =item *
 
@@ -763,7 +816,7 @@ On recent enough versions of Perl, accessors can be lvalues, e.g.
 =head2 Simple Usage
 
 C<use>'ing B<Hash::Wrap> without options imports a subroutine called
-C<wrap_hash> which takes a hash, blesses it into a wrapper class and
+B<wrap_hash> which takes a hash, blesses it into a wrapper class and
 returns the hash:
 
   use Hash::Wrap;
@@ -771,14 +824,19 @@ returns the hash:
   my $h = wrap_hash { a => 1 };
   print $h->a, "\n";             # prints 1
 
+B<[API change @ v1.0]>
+The passed hash must be a plain hash (i.e. not an object or blessed
+hash).  To pass an object, you must specify a custom clone subroutine
+returning a plain hashref via the L</-clone> option.
+
 The wrapper class has no constructor method, so the only way to create
-an object is via the C<wrap_hash> subroutine. (See L</WRAPPER CLASSES>
-for more about wrapper classes)  If C<wrap_hash> is called without
+an object is via the B<wrap_hash> subroutine. (See L</WRAPPER CLASSES>
+for more about wrapper classes) If B<wrap_hash> is called without
 arguments, it will create a hash for you.
 
 =head2 Advanced Usage
 
-=head3 C<wrap_hash> is an awful name for the constructor subroutine
+=head3 B<wrap_hash> is an awful name for the constructor subroutine
 
 So rename it:
 
@@ -805,8 +863,8 @@ or, if you want it to reflect the current package, try this:
   my $h = wrapit { a => 1 };
   $h->isa( 'Foo::wrapit' );  # returns true
 
-Again, the wrapper class has no constructor method, so the only way to create
-an object is via the generated subroutine.
+Again, the wrapper class has no constructor method, so the only way to
+create an object is via the generated subroutine.
 
 =head3 The Wrapper Class needs its own class constructor method
 
@@ -815,7 +873,7 @@ constructor method:
 
   use Hash::Wrap { -class => 'My::Class', -new => 1 };
 
-The default C<wrap_hash> constructor subroutine is still exported, so
+The default B<wrap_hash> constructor subroutine is still exported, so
 
   $h = My::Class->new( { a => 1 } );
 
@@ -857,9 +915,61 @@ It's possible to modify the constructor and accessors:
 
    1;
 
+=head2 Recursive wrapping
+
+B<Hash::Wrap> can automatically wrap nested hashes using the
+L</-recurse> option.
+
+=head3 Using the original hash
+
+The L</-recurse> option allows mapping nested hashes onto chained
+methods, e.g.
+
+   use Hash::Wrap { -recurse => -1, -as => 'recwrap' };
+
+   my %hash = ( a => { b => { c => 'd' } } );
+
+   my $wrap = recwrap(\%hash);
+
+   $wrap->a->b->c eq 'd'; # true
+
+Along the way, B<%hash>, B<$hash{a}>, B<$hash{b}>, B<$hash{c}> are all
+blessed into wrapping classes.
+
+=head3 Copying the original hash
+
+If L</-copy> is also specified, then the relationship between the
+nested hashes in the original hash and those hashes retrieved by
+wrapper methods depends upon what level in the structure has been
+wrapped.  For example,
+
+   use Hash::Wrap { -recurse => -1, -copy => 1, -as => 'copyrecwrap' };
+   use Scalar::Util 'refaddr';
+
+   my %hash = ( a => { b => { c => 'd' } } );
+
+   my $wrap = copyrecwrap(\%hash);
+
+   refaddr( $wrap ) != refaddr( \%hash );
+
+Because the C<< $wrap->a >> method hasn't been called, then the B<$hash{a}> structure
+has yet to be wrapped, so, using C<$wrap> as a hash,
+
+   refaddr( $wrap->{a} ) == refaddr( $hash{a} );
+
+However,
+
+   # invoking $wrap->a wraps a copy of $hash{a} because of the -copy
+   # attribute
+   refaddr( $wrap->a ) != refaddr( $hash{a} );
+
+   # so $wrap->{a} is no longer the same as $hash{a}:
+   refaddr( $wrap->{a} ) != refaddr( $hash{a} );
+   refaddr( $wrap->{a} ) == refaddr( $wrap->a );
+
 =head1 OPTIONS
 
-B<Hash::Wrap> works at compile time.  To modify its behavior pass it
+B<Hash::Wrap> works at import time.  To modify its behavior pass it
 options when it is C<use>'d:
 
   use Hash::Wrap { %options1 }, { %options2 }, ... ;
@@ -898,20 +1008,23 @@ Import the constructor subroutine with the given name.
 
 undefined
 
-Do not import the constructor. This is usually only used with the L</-new> option.
+Do not import the constructor. This is usually only used with the
+L</-new> option.
 
 =item *
 
 a scalar ref
 
-Do not import the constructor. Store a reference to the constructor into the scalar.
+Do not import the constructor. Store a reference to the constructor
+into the scalar.
 
 =item *
 
 The string C<-return>.
 
-Do not import the constructor. The constructor subroutine(s) will be returned
-from C<Hash::Import>'s C<import> method.  This is a fairly esoteric way of doing things:
+Do not import the constructor. The constructor subroutine(s) will be
+returned from C<Hash::Import>'s C<import> method.  This is a fairly
+esoteric way of doing things:
 
   require Hash::Wrap;
   ( $copy, $clone ) = Hash::Wrap->import( { -as => '-return', copy => 1 },
@@ -928,23 +1041,27 @@ hash. By default, the object uses the hash directly.
 
 =item C<-clone> => I<boolean> | I<coderef>
 
-Store the data in a deep copy of the hash. if I<true>, L<Storable/dclone>
-is used. If a coderef, it will be called as
+Store the data in a deep copy of the hash. if I<true>,
+L<Storable/dclone> is used. If a coderef, it will be called as
 
-   $clone = coderef->( $hash )
+   $clone = $coderef->( $hash )
+
+C<$coderef> must return a plain hashref.
 
 By default, the object uses the hash directly.
 
 =item C<-immutable> => I<boolean>
 
-The object's attributes and values are locked and may not be altered. Note that this
-locks the underlying hash.
+The object's attributes and values are locked and may not be
+altered. Note that this locks the underlying hash.
 
 =item C<-lockkeys> => I<boolean> | I<arrayref>
 
-If the value is I<true>, the object's attributes are restricted to the existing keys in the hash.
-If it is an array reference, it specifies which attributes are allowed, I<in addition to existing attributes>.
-The attribute's values are not locked.  Note that this locks the underlying hash.
+If the value is I<true>, the object's attributes are restricted to the
+existing keys in the hash.  If it is an array reference, it specifies
+which attributes are allowed, I<in addition to existing attributes>.
+The attribute's values are not locked.  Note that this locks the
+underlying hash.
 
 =back
 
@@ -970,15 +1087,17 @@ The hash entry I<must already exist> or this will throw an exception.
 
 lvalue subroutines are only available on Perl version 5.16 and later.
 
-If C<-lvalue = 1> this option will silently be ignored on earlier versions of Perl.
+If C<-lvalue = 1> this option will silently be ignored on earlier
+versions of Perl.
 
-If C<-lvalue = -1> this option will cause an exception on earlier versions of Perl.
+If C<-lvalue = -1> this option will cause an exception on earlier
+versions of Perl.
 
 =item C<-recurse> => I<integer level>
 
-Normally only the top level hash is wrapped in a class.  This option specifies
-how many levels deep into the hash hashes should be wrapped.  For example,
-if
+Normally only the top level hash is wrapped in a class.  This option
+specifies how many levels deep into the hash hashes should be wrapped.
+For example, if
 
  %h = ( l => 0, a => { l => 1, b => { l => 2, c => { l => 3 } } } };
 
@@ -999,8 +1118,8 @@ if
 
 For infinite recursion, set C<-recurse> to C<-1>.
 
-Constructors built for deeper hash levels will not heed the C<-as_scalar_ref>,
-C<-class>, C<-base>, or C<-as> attributes.
+Constructors built for deeper hash levels will not heed the
+C<-as_scalar_ref>, C<-class>, C<-base>, or C<-as> attributes.
 
 =back
 
@@ -1010,8 +1129,9 @@ C<-class>, C<-base>, or C<-as> attributes.
 
 =item C<-base> => I<boolean>
 
-If true, the enclosing package is converted into a proxy wrapper class.  This should
-not be used in conjunction with C<-class>.  See L</A stand alone Wrapper Class>.
+If true, the enclosing package is converted into a proxy wrapper
+class.  This should not be used in conjunction with C<-class>.  See
+L</A stand alone Wrapper Class>.
 
 =item C<-class> => I<class name>
 
@@ -1047,9 +1167,9 @@ C<new>. Otherwise C<-new> specifies the name of the method.
 =item C<-defined> => I<boolean> | I<Perl Identifier>
 
 Add a method which returns true if the passed hash key is defined or
-does not exist. If C<-defined> is a true boolean value, the method will be called
-C<defined>. Otherwise it specifies the name of the method. For
-example,
+does not exist. If C<-defined> is a true boolean value, the method
+will be called C<defined>. Otherwise it specifies the name of the
+method. For example,
 
    use Hash::Wrap { -defined => 1 };
    $obj = wrap_hash( { a => 1, b => undef } );
@@ -1080,7 +1200,7 @@ or
    $obj = wrap_hash( { a => 1 } );
    $obj->is_present( 'a' );
 
--item C<-predicate> => I<boolean>
+=item C<-predicate> => I<boolean>
 
 This adds the more traditionally named predicate methods, such as
 C<has_foo> for attribute C<foo>.  Note that this option makes any
@@ -1111,8 +1231,9 @@ It has the methods C<DESTROY>, C<AUTOLOAD> and C<can>.
 
 =item *
 
-It will have other methods if the C<-undef> and C<-exists> options are specified. It may
-have other methods if it is L<a stand alone class|/A stand alone Wrapper Class>.
+It will have other methods if the C<-undef> and C<-exists> options are
+specified. It may have other methods if it is L<a stand alone class|/A
+stand alone Wrapper Class>.
 
 =item *
 
@@ -1126,8 +1247,8 @@ It will have a constructor if either of C<-base> or C<-new> is specified.
 
 =item *
 
-Wrapper classes have C<DESTROY>, C<can> method, and
-C<AUTOLOAD> methods, which will mask hash keys with the same names.
+Wrapper classes have C<DESTROY>, C<can> method, and C<AUTOLOAD>
+methods, which will mask hash keys with the same names.
 
 =item *
 
@@ -1135,8 +1256,8 @@ Classes which are generated without the C<-base> or C<-new> options do
 not have a class constructor method, e.g C<< Class->new() >> will
 I<not> return a new object.  The only way to instantiate them is via
 the constructor subroutine generated via B<Hash::Wrap>.  This allows
-the underlying hash to have a C<new> attribute which would otherwise be
-masked by the constructor.
+the underlying hash to have a C<new> attribute which would otherwise
+be masked by the constructor.
 
 =back
 
@@ -1152,9 +1273,54 @@ Accessors for deleted elements are not removed.  The class's C<can>
 method will return C<undef> for them, but they are still available in
 the class's stash.
 
+=head2 Wrapping immutable structures
+
+Locked (e.g. immutable) hashes cannot be blessed into a class. This
+will cause B<Hash::Wrap> to fail if it is asked to work directly
+(without cloning or copying) on a locked hash or recursive wrapping is
+specified and the hash contains nested locked hashes.
+
+To create an immutable B<Hash::Wrap> object from an immutable hash,
+use the L</-copy> and L</-immutable> attributes.  The L</-copy>
+attribute performs a shallow copy of the hash which is then locked by
+L</-immutable>.  The default L</-clone> option will not work, as it
+will clone the immutability of the input hash.
+
+Adding the L</-recurse> option will properly create an immutable
+wrapped object when used on locked hashes. It does not suffer the
+issue described in L</Eventual immutability in nested
+structures> in L</Bugs>.
+
+=head2 Cloning with recursion
+
+Cloning by default uses L<Storable/dclone>, which performs a deep clone
+of the passed hash. In recursive mode, the clone operation is performed at every
+wrapping of a nested hash, causing some data to be repeatedly cloned.
+This does not create a memory leak, but it is inefficient.  Consider
+using L</-copy> instead of L</-clone> with L</-recurse>.
+
+=head1 BUGS
+
+=head2 Eventual immutability in nested structures
+
+Immutability is added to mutable nested structures as they are
+traversed via method calls.  This means that the hash underlying the
+wrapper object is not fully immutable until all nested hashes have
+been visited via methods.
+
+For example,
+
+  use Hash::Wrap { -immutable => 1, -recurse => -1, -as 'immutable' };
+
+  my $wrap = immutable( { a => { b => 2 } } );
+  $wrap->{a}    = 11; # expected fail: IMMUTABLE
+  $wrap->{a}{b} = 22; # unexpected success: NOT IMMUTABLE
+  $wrap->a;
+  $wrap->{a}{b} = 33; # expected fail: IMMUTABLE; $wrap->{a} is now locked
+
 =head1 EXAMPLES
 
-=head1 Existing keys are not compatible with method names
+=head2 Existing keys are not compatible with method names
 
 If a hash key contains characters that aren't legal in method names,
 there's no way to access that hash entry.  One way around this is to
@@ -1193,9 +1359,13 @@ throws by default, but can optionally return C<undef>
 
 =item * optionally stores the constructor in a scalar
 
-=item * optionally provides per-attribute predicate methods (e.g. C<has_foo>)
+=item * optionally provides per-attribute predicate methods
+(e.g. C<has_foo>)
 
-=item * optionally provides methods to check an attribute existence or whether its value is defined
+=item * optionally provides methods to check an attribute existence or
+whether its value is defined
+
+=item * can create immutable objects
 
 =back
 
@@ -1239,7 +1409,8 @@ about everything you'd like.  It has a very heavy set of dependencies.
 
 =item * can add generic accessor, mutator, and element management methods
 
-=item * accessing a non-existing element via an accessor creates it (not documented, but code implies it)
+=item * accessing a non-existing element via an accessor creates it
+(not documented, but code implies it)
 
 =item * C<can()> doesn't work
 

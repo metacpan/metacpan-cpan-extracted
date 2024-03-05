@@ -18,7 +18,8 @@ t/25-start.t
 t/30-status.t
 t/35-timeout.t
 t/40-event_crash.t
-t/45-params.t
+t/45-new_params_args.t
+t/46-callback_params.t
 t/50-info_events.t
 t/55-shared_event_state.t
 t/60-error_handling.t

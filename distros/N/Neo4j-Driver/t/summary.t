@@ -22,7 +22,10 @@ use Test::Warnings 0.010 qw(:no_end_test);
 my $no_warnings;
 use if $no_warnings = $ENV{AUTHOR_TESTING} ? 1 : 0, 'Test::Warnings';
 
-plan tests => 7 + 1 + $no_warnings;
+use Neo4j::Driver;
+use Neo4j_Test::MockHTTP;
+
+plan tests => 8 + 1 + $no_warnings;
 
 my $transaction = $driver->session->begin_transaction;
 
@@ -81,6 +84,37 @@ END
 	lives_and { ok @notifications = $r->notifications; } 'get notifications';
 	# NB: the server is a bit unreliable in providing notifications; if there are problems with this test, restarting the server usually helps
 	}
+};
+
+
+my $mock_plugin = Neo4j_Test::MockHTTP->new;
+{
+no warnings 'qw';
+$mock_plugin->response_for(undef, 'zero notes' => { jolt => [qw(
+	{"header":{}} {"summary":{"stats":{}}} {"info":{}}
+)]});
+$mock_plugin->response_for(undef, 'one note' => { jolt => [qw(
+	{"header":{}} {"summary":{"stats":{}}} {"info":{"notifications":["foobaz"]}}
+)]});
+$mock_plugin->response_for(undef, 'two notes' => { jolt => [qw(
+	{"header":{}} {"summary":{"stats":{}}} {"info":{"notifications":["foo","bar"]}}
+)]});
+}
+subtest 'summary notifications() wantarray' => sub {
+	plan tests => 1 + 3*3;
+	my $d = Neo4j::Driver->new('http:');
+	$d->plugin($mock_plugin);
+	my $sx;
+	lives_and { ok $sx = $d->session(database => 'dummy') } 'session';
+	lives_and { $r = 0; ok $r = $sx->run('zero notes')->summary } 'run 0';
+	lives_and { is_deeply [$r->notifications], [] } '0 notifications';
+	lives_and { is scalar($r->notifications), 0 } '0 notifications scalar context';
+	lives_and { $r = 0; ok $r = $sx->run('one note')->summary } 'run 1';
+	lives_and { is_deeply [$r->notifications], ['foobaz'] } '1 notification';
+	lives_and { is scalar($r->notifications), 1 } '1 notification scalar context';
+	lives_and { $r = 0; ok $r = $sx->run('two notes')->summary } 'run 2';
+	lives_and { is_deeply [$r->notifications], ['foo','bar'] } '2 notifications';
+	lives_and { is scalar($r->notifications), 2 } '2 notifications scalar context';
 };
 
 

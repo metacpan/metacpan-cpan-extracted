@@ -1,7 +1,7 @@
 #!perl
 use strict;
 use warnings;
-use Test::More tests => 20;
+use Test::More tests => 21;
 use Test::Warnings;
 use Clone qw/clone/;
 
@@ -404,6 +404,23 @@ subtest "Struct" => sub {
   ok($dom->inspect({x => 123, y => 456}), "Struct invalid key");
   ok($dom->inspect({a => "foo", b => "bar"}), "Struct invalid value");
 };
+
+
+
+#----------------------------------------------------------------------
+# Struict
+#----------------------------------------------------------------------
+
+subtest "Struict" => sub {
+  $dom = Struict(a => Int, b => String);
+  ok(!$dom->inspect({a => 123, b => 'xyz'}), "Struict ok");
+  my $msg = $dom->inspect({a => 123, b => 'xyz', c => 999});
+  like($msg->{-exclude}, qr/forbidden field/,   "Struict forbidden field");
+  $dom = eval {Struict(-fields => Struict(a => Int, b => String), -exclude => 'foobar')};
+  ok(!$dom && $@ =~ m(invalid option.*?-exclude), "Struict -exclude option is invalid");
+};
+
+
 
 #----------------------------------------------------------------------
 # One_of

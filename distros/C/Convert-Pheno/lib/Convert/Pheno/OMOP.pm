@@ -88,8 +88,8 @@ sub do_omop2bff {
     my $ohdsi_dic = $self->{data_ohdsi_dic};
     my $sth       = $self->{sth};
 
-    # Set default values
-    my $default_duration = 'P0Y';
+    # Default values to be used accross the module
+    my %default = ( duration => 'P0Y' );
 
     ####################################
     # START MAPPING TO BEACON V2 TERMS #
@@ -281,7 +281,7 @@ sub do_omop2bff {
             };
 
             $exposure->{date}     = $field->{observation_date};
-            $exposure->{duration} = $default_duration;
+            $exposure->{duration} = $default{duration};
 
             # _info
             $exposure->{_info}{$table}{OMOP_columns} = $field;
@@ -369,6 +369,12 @@ sub do_omop2bff {
     # Hard-coded $individual->{info}{dateOfBirth}
     $individual->{info}{dateOfBirth} =
       _map2iso8601( $person->{birth_datetime} );
+
+    # When we use --test we do not serialize changing (metaData) information
+    unless ( $self->{test} ) {
+        $individual->{info}{metaData}     = $self->{metaData};
+        $individual->{info}{convertPheno} = $self->{convertPheno};
+    }
 
     # =========================
     # interventionsOrProcedures

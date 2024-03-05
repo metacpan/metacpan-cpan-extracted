@@ -13,11 +13,13 @@ use Time::HiRes qw(gettimeofday);
 use POSIX qw(strftime);
 use Scalar::Util qw(looks_like_number);
 use List::Util qw(first);
+use Cwd qw(cwd);
+use Sys::Hostname;
 use Convert::Pheno::SQLite;
 binmode STDOUT, ':encoding(utf-8)';
 use Exporter 'import';
 our @EXPORT =
-  qw(map_ethnicity map_ontology dotify_and_coerce_number iso8601_time _map2iso8601 map_reference_range map_age_range map2redcap_dict map2ohdsi convert2boolean find_age randStr map_operator_concept_id map_info_field map_omop_visit_occurrence dot_date2iso remap_mapping_hash validate_format);
+  qw(map_ethnicity map_ontology dotify_and_coerce_number iso8601_time _map2iso8601 map_reference_range map_age_range map2redcap_dict map2ohdsi convert2boolean find_age randStr map_operator_concept_id map_info_field map_omop_visit_occurrence dot_date2iso remap_mapping_hash_term validate_format get_metaData get_info);
 
 use constant DEVEL_MODE => 0;
 
@@ -104,15 +106,19 @@ sub map_ontology {
 sub dotify_and_coerce_number {
 
     my $val = shift;
-    ( my $tr_val = $val ) =~ tr/,/./;
+
+    # Premature return
+    return undef unless ( defined $val && $val ne '' );
 
     # looks_like_number does not work with commas so we must tr first
-    #say "$val === ",  looks_like_number($val);
-    # coercing to number $tr_val and avoiding value = ""
-    return
-        looks_like_number($tr_val) ? 0 + $tr_val
-      : $val eq ''                 ? undef
-      :                              $val;
+    ( my $tr_val = $val ) =~ tr/,/./;
+
+    #print "#$val#$tr_val#\n";
+
+    # coercing to number $tr_val
+    return looks_like_number($tr_val)
+      ? 0 + $tr_val
+      : $val;
 }
 
 sub iso8601_time {
@@ -190,6 +196,8 @@ sub map2redcap_dict {
     #     _labels
     #  labels = 0
     #    'Field Note'
+
+    # NB: Some numeric fields will get stringified at $participant->{$field}
     return $labels
       ? $redcap_dict->{$field}{_labels}{ $participant->{$field} }
       : $redcap_dict->{$field}{'Field Note'};
@@ -425,20 +433,20 @@ sub is_multidimensional {
     return ref shift ? 1 : 0;
 }
 
-sub remap_mapping_hash {
+sub remap_mapping_hash_term {
 
-    my ( $mapping_file, $term ) = @_;
+    my ( $mapping_file_data, $term ) = @_;
     my %hash_out = map {
-            $_, exists $mapping_file->{$term}{$_}
-          ? $mapping_file->{$term}{$_}
+            $_ => exists $mapping_file_data->{$term}{$_}
+          ? $mapping_file_data->{$term}{$_}
           : undef
-    } (qw/fields dict map radio/);
+    } (qw/fields dictionary mapping selector/);
     $hash_out{ontology} =
-      exists $mapping_file->{$term}{ontology}
-      ? $mapping_file->{$term}{ontology}
-      : $mapping_file->{project}{ontology};
+      exists $mapping_file_data->{$term}{ontology}
+      ? $mapping_file_data->{$term}{ontology}
+      : $mapping_file_data->{project}{ontology};
     $hash_out{routesOfAdministration} =
-      $mapping_file->{$term}{routesOfAdministration}
+      $mapping_file_data->{$term}{routesOfAdministration}
       if $term eq 'treatments';
     return \%hash_out;
 }
@@ -453,12 +461,125 @@ sub validate_format {
     if ( $format eq 'pxf' ) {
         $result = exists $data->{subject} ? 1 : 0;
 
-    # BFF
+        # BFF
     }
     else {
         $result = !exists $data->{subject} ? 1 : 0;
     }
     return $result;
+}
+
+sub get_info {
+
+    my $self = shift;
+
+   # NB: Darwin does not have nproc to show #logical-cores, using sysctl instead
+    my $os = $^O;
+    chomp(
+        my $ncpuhost =
+          lc($os) eq 'darwin' ? qx{/usr/sbin/sysctl -n hw.logicalcpu}
+        : $os eq 'MSWin32' ? qx{wmic cpu get NumberOfLogicalProcessors}
+        :                    qx{/usr/bin/nproc} // 1
+    );
+
+    # For the Windows command, the result will also contain the string
+    # "NumberOfLogicalProcessors" which is the header of the output.
+    # So we need to extract the actual number from it:
+    if ( $os eq 'MSWin32' ) {
+        ($ncpuhost) = $ncpuhost =~ /(\d+)/;
+    }
+    $ncpuhost = 0 + $ncpuhost;    # coercing it to be a number
+
+    return {
+        user => $ENV{'LOGNAME'}
+          || $ENV{'USER'}
+          || $ENV{'USERNAME'}
+          || 'dummy-user',
+        username => $self->{username},
+        ncpuhost => $ncpuhost,
+        cwd      => cwd,
+        id       => $self->{id},
+        hostname => hostname,
+        version  => $::VERSION
+    };
+}
+
+sub get_metaData {
+
+    my $self = shift;
+
+    # Setting a few variables
+    my $username = $self->{username};
+
+    # Setting resources
+    my $resources = [
+        {
+            id   => 'icd10',
+            name =>
+'International Statistical Classification of Diseases and Related Health Problems 10th Revision',
+            url             => 'https://icd.who.int/browse10/2019/en#',
+            version         => '2019',
+            namespacePrefix => 'ICD10',
+            iriPrefix       => 'https://icd.who.int/browse10/2019/en#/'
+        },
+        {
+            id              => 'ncit',
+            name            => 'NCI Thesaurus',
+            url             => 'http://purl.obolibrary.org/obo/ncit.owl',
+            version         => '22.03d',
+            namespacePrefix => 'NCIT',
+            iriPrefix       => 'http://purl.obolibrary.org/obo/NCIT_'
+        },
+        {
+            id              => 'athena-ohdsi',
+            name            => 'Athena-OHDSI',
+            url             => 'https://athena.ohdsi.org',
+            version         => 'v5.3.1',
+            namespacePrefix => 'OHDSI',
+            iriPrefix       => 'http://www.fakeurl.com/OHDSI_'
+        },
+        {
+            id              => 'hp',
+            name            => 'Human Phenotype Ontology',
+            url             => 'http://purl.obolibrary.org/obo/hp.owl',
+            version         => '2023-04-05',
+            namespacePrefix => 'HP',
+            iriPrefix       => 'http://purl.obolibrary.org/obo/HP_'
+        },
+        {
+            id              => 'omim',
+            name            => 'Online Mendelian Inheritance in Man',
+            url             => 'https://www.omim.org',
+            version         => '2023-05-22',
+            namespacePrefix => 'OMIM',
+            iriPrefix       => 'http://omim.org/entry/'
+        },
+        {
+            id   => 'cdisc-terminology',
+            name => 'CDISC Terminology',
+            url  =>
+'https://www.cdisc.org/standards/terminology/controlled-terminology',
+            version         => '2023-01-24',
+            namespacePrefix => 'CDISC',
+            iriPrefix       => 'http://www.fakeurl.com/CDISC_'
+        }
+    ];
+    return {
+        created                  => iso8601_time(),
+        createdBy                => $username,
+        submittedBy              => $username,
+        phenopacketSchemaVersion => '2.0',
+        resources                => $resources,
+        externalReferences       => [
+            {
+                id        => 'PMID: 26262116',
+                reference =>
+                  'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4815923',
+                description =>
+'Observational Health Data Sciences and Informatics (OHDSI): Opportunities for Observational Researchers'
+            }
+        ]
+    };
 }
 
 1;

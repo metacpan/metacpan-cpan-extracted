@@ -1,11 +1,11 @@
-package B::Hooks::EndOfScope; # git description: 0.26-9-g54103ed
+package B::Hooks::EndOfScope; # git description: 0.27-8-gbe15c53
 # ABSTRACT: Execute code after a scope finished compilation
 # KEYWORDS: code hooks execution scope
 
 use strict;
 use warnings;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 use 5.006001;
 
@@ -36,7 +36,7 @@ B::Hooks::EndOfScope - Execute code after a scope finished compilation
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 SYNOPSIS
 
@@ -64,10 +64,10 @@ This is exported by default. See L<Sub::Exporter> on how to customize it.
 
 =head2 Pure-perl mode caveat
 
-This caveat applies to B<any> version of perl where L<Variable::OnDestruct>
+This caveat applies to B<any> version of perl where L<Variable::Magic>
 is unavailable or otherwise disabled.
 
-While L<Variable::OnDestruct> has access to some very dark sorcery to make it
+While L<Variable::Magic> has access to some very dark sorcery to make it
 possible to throw an exception from within a callback, the pure-perl
 implementation does not have access to these hacks. Therefore, what
 would have been a B<compile-time exception> is instead B<converted to a
@@ -92,7 +92,7 @@ older perl versions, the implementation of B::Hooks::EndOfScope deliberately
 leaks a single empty hash for every scope being cleaned. This is done to
 avoid the memory corruption associated with the bug mentioned above.
 
-In order to stabilize this workaround use of L<Variable::OnDestruct> is disabled
+In order to stabilize this workaround use of L<Variable::Magic> is disabled
 on perls prior to version 5.8.4. On such systems loading/requesting
 L<B::Hooks::EndOfScope::XS> explicitly will result in a compile-time
 exception.
@@ -114,7 +114,7 @@ file F<t/02-localise.t> included with the distribution.
 
 L<Sub::Exporter>
 
-L<Variable::OnDestruct>
+L<Variable::Magic>
 
 =head1 SUPPORT
 

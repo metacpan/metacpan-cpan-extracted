@@ -466,11 +466,12 @@ value given in the table below based on the FIRST condition that is true.
    $ymd = $dmb->week1_day1($y);
 
 This returns the date of the 1st day of the 1st week in the given year.
-Note that this uses the ISO 8601 definition of week, so the year returned
-may be the year before the one passed in.
 
-This uses the FirstDay and Jan1Week1 config variables to evaluate the
-results.
+Note that this uses the config variable Week1ofYear (and possibly
+FirstDay) to define when the first week begins, so refer to them for
+more information.  Also note that it depending on the value of these two
+variables, the date of the 1st day of the 1st week might actually be
+in the previous year.
 
 =item B<weeks_in_year>
 
@@ -495,8 +496,9 @@ The inverse operation is also available:
 
 which returns the first day of the given week.
 
-This uses the FirstDay and Jan1Week1 config variables to evaluate the
-results.
+Note that this uses the config variable Week1ofYear (and possibly
+FirstDay) to define when the first week begins, so refer to them for
+more information.
 
 =back
 

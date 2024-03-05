@@ -4,8 +4,8 @@ use Test2::V0;
 
 use Scalar::Util qw( blessed refaddr );
 
-use Hash::Wrap ( { -as => wrap_hash_asis =>  -lockkeys => 1 } );
-use Hash::Wrap ( { -as => wrap_hash_extra =>  -lockkeys => [ qw( f g h ) ] } );
+use Hash::Wrap ( { -as => wrap_hash_asis  => -lockkeys => 1 } );
+use Hash::Wrap ( { -as => wrap_hash_extra => -lockkeys => [qw( f g h )] } );
 
 subtest 'existing attrs only' => sub {
 
@@ -17,31 +17,24 @@ subtest 'existing attrs only' => sub {
 
     subtest 'existing attribute' => sub {
 
-        ok( lives { $obj->a(3) }, "set a" )
-            or note $@;
+        ok( lives { $obj->a( 3 ) }, "set a" )
+          or note $@;
 
         is( $obj->a, 3, "get a" );
     };
 
     subtest 'new attribute' => sub {
 
-        like(
-            dies { $hash{c} = 1 },
-            qr{access .* t/lockkeys.t},
-            'hash'
-            );
+        like( dies { $hash{c} = 1 }, qr{access .* t/lockkeys.t}, 'hash' );
 
         like(
             dies { $obj->{c} = 1 },
             qr{access .* t/lockkeys.t},
             'object hash'
-            );
+        );
 
-        like(
-            dies { $obj->c(2) },
-            qr{locate object method .* t/lockkeys.t},
-            'accessor'
-            );
+        like( dies { $obj->c( 2 ) },
+            qr{locate object method .* t/lockkeys.t}, 'accessor' );
     };
 };
 
@@ -62,9 +55,9 @@ subtest 'extra attrs' => sub {
     subtest 'non-existing but allowed attribute' => sub {
 
         ok( lives { $hash{f} = 2; }, "hash" )
-            or note $@;
+          or note $@;
         ok( lives { $obj->{g} = 3; }, "object hash" )
-            or note $@;
+          or note $@;
 
         is( $obj->f, 2, "f" );
         is( $obj->g, 3, "g" );
@@ -77,31 +70,28 @@ subtest 'extra attrs' => sub {
             dies { $hash{c} = 1 },
             qr{access .* t/lockkeys.t},
             'hash is locked'
-            );
+        );
 
         like(
             dies { $obj->{c} = 1 },
             qr{access .* t/lockkeys.t},
             'object hash is locked'
-            );
+        );
 
-        like(
-            dies { $obj->c(2) },
-            qr{locate object method .* t/lockkeys.t},
-            'accessor'
-            );
+        like( dies { $obj->c( 2 ) },
+            qr{locate object method .* t/lockkeys.t}, 'accessor' );
     };
 };
 
 subtest 'api' => sub {
 
-    like (
-          dies {
-              Hash::Wrap->import ( { -lockkeys => [ '-a' ] } );
-          },
-          qr{not a valid Perl identifier.*at t/lockkeys.t},
-          'invalid identifier'
-          );
+    like(
+        dies {
+            Hash::Wrap->import( { -lockkeys => ['-a'] } );
+        },
+        qr{not a valid Perl identifier.*at t/lockkeys.t},
+        'invalid identifier'
+    );
 
 };
 

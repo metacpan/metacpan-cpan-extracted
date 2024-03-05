@@ -6,12 +6,12 @@ use warnings;
 use Encode;
 
 sub description { 'Lotus Notes' }
-sub make {
+sub inquire {
     # Detect an error from Lotus Notes
     # @param    [Hash] mhead    Message headers of a bounce email
     # @param    [String] mbody  Message body of a bounce email
     # @return   [Hash]          Bounce data list and message/rfc822 part
-    # @return   [Undef]         failed to parse or the arguments are missing
+    # @return   [undef]         failed to parse or the arguments are missing
     # @since v4.1.1
     my $class = shift;
     my $mhead = shift // return undef;
@@ -19,7 +19,7 @@ sub make {
     return undef unless index($mhead->{'subject'}, 'Undeliverable message') == 0;
 
     state $indicators = __PACKAGE__->INDICATORS;
-    state $rebackbone = qr|^-------[ ]Returned[ ]Message[ ]--------|m;
+    state $boundaries = ['------- Returned Message --------'];
     state $startingof = { 'message' => ['------- Failure Reasons '] };
     state $messagesof = {
         'userunknown' => [
@@ -30,19 +30,22 @@ sub make {
     };
 
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
-    my $emailsteak = Sisimai::RFC5322->fillet($mbody, $rebackbone);
+    my $emailparts = Sisimai::RFC5322->part($mbody, $boundaries);
     my $readcursor = 0;     # (Integer) Points the current cursor position
     my $recipients = 0;     # (Integer) The number of 'Final-Recipient' header
     my $removedmsg = 'MULTIBYTE CHARACTERS HAVE BEEN REMOVED';
     my $encodedmsg = '';
     my $v = undef;
 
-    # Get character set name, Content-Type: text/plain; charset=ISO-2022-JP
-    my $characters = $mhead->{'content-type'} =~ /\A.+;[ ]*charset=(.+)\z/ ? lc $1 : '';
+    my $characters = '';
+    if( index($mhead->{'content-type'}, 'charset=') > 0 ) {
+        # Get character set name, Content-Type: text/plain; charset=ISO-2022-JP
+        $characters = lc substr($mhead->{'content-type'}, index($mhead->{'content-type'}, 'charset=') + 8,);
+    }
 
-    for my $e ( split("\n", $emailsteak->[0]) ) {
-        # Read error messages and delivery status lines from the head of the email
-        # to the previous line of the beginning of the original message.
+    for my $e ( split("\n", $emailparts->[0]) ) {
+        # Read error messages and delivery status lines from the head of the email to the previous
+        # line of the beginning of the original message.
         unless( $readcursor ) {
             # Beginning of the bounce message or message/delivery-status part
             $readcursor |= $indicators->{'deliverystatus'} if index($e, $startingof->{'message'}->[0]) == 0;
@@ -57,7 +60,7 @@ sub make {
         #
         # ------- Returned Message --------
         $v = $dscontents->[-1];
-        if( $e =~ /\A[^ ]+[@][^ ]+/ ) {
+        if( index($e, '@') > 1 && index($e, ' ') < 0 ) {
             # kijitora@notes.example.jp
             if( $v->{'recipient'} ) {
                 # There are multiple recipient addresses in the message body.
@@ -94,8 +97,10 @@ sub make {
 
     unless( $recipients ) {
         # Fallback: Get the recpient address from RFC822 part
-        if( $emailsteak->[1] =~ /^To:[ ]*(.+)$/m ) {
-            $v->{'recipient'} = Sisimai::Address->s3s4($1);
+        my $p1 = index($emailparts->[1], "\nTo: ");
+        my $p2 = index($emailparts->[1], "\n", $p1 + 6);
+        if( $p1 > 0 ) {
+            $v->{'recipient'} = Sisimai::Address->s3s4(substr($emailparts->[1], $p1 + 5, $p2 - $p1 - 5));
             $recipients++ if $v->{'recipient'};
         }
     }
@@ -107,13 +112,13 @@ sub make {
 
         for my $r ( keys %$messagesof ) {
             # Check each regular expression of Notes error messages
-            next unless grep { index($e->{'diagnosis'}, $_) > -1 } @{ $messagesof->{ $r } };
+            next unless grep { index($e->{'diagnosis'}, $_) > -1 } $messagesof->{ $r }->@*;
             $e->{'reason'} = $r;
             $e->{'status'} = Sisimai::SMTP::Status->code($r) || '';
             last;
         }
     }
-    return { 'ds' => $dscontents, 'rfc822' => $emailsteak->[1] };
+    return { 'ds' => $dscontents, 'rfc822' => $emailparts->[1] };
 }
 
 1;
@@ -131,9 +136,8 @@ Sisimai::Lhost::Notes - bounce mail parser class for C<Lotus Notes Server>.
 
 =head1 DESCRIPTION
 
-Sisimai::Lhost::Notes parses a bounce email which created by
-C<Lotus Notes Server>.
-Methods in the module are called from only Sisimai::Message.
+Sisimai::Lhost::Notes parses a bounce email which created by C<Lotus Notes Server>. Methods in the
+module are called from only Sisimai::Message.
 
 =head1 CLASS METHODS
 
@@ -143,10 +147,10 @@ C<description()> returns description string of this module.
 
     print Sisimai::Lhost::Notes->description;
 
-=head2 C<B<make(I<header data>, I<reference to body string>)>>
+=head2 C<B<inquire(I<header data>, I<reference to body string>)>>
 
-C<make()> method parses a bounced email and return results as a array reference.
-See Sisimai::Message for more details.
+C<inquire()> method parses a bounced email and return results as a array reference. See Sisimai::Message
+for more details.
 
 =head1 AUTHOR
 
@@ -154,7 +158,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2020 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2023 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

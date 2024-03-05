@@ -1,4 +1,5 @@
 package Date::Holidays::ES;
+
 use base 'Date::Holidays::Super';
 use warnings;
 use strict;
@@ -6,9 +7,9 @@ use strict;
 use Date::Easter ();
 use Time::JulianDay ();
 use Carp qw(croak);
+use utf8;
 
-our $VERSION = '0.02';
-
+our $VERSION = '0.03'; # VERSION (maintained by dzil)
 
 sub new {
     my $class = shift;
@@ -42,13 +43,13 @@ sub holidays {
     my $year = $params{'year'} or croak 'Missing year argument';
 
     my $holidays = {
-        '0101'  => 'Año Nuevo',
-        #'0106'  => 'Día de Reyes',
-        '0501'  => 'Día del Trabajo',
-        '1012'  => 'Día de la Hispanidad',
-        '1101'  => 'Día de Todos los Santos',
-        '1206'  => 'Día de la Constitución',
-        '1208'  => 'Día de la Inmaculada Concepción',
+        '0101'  => 'AÃ±o Nuevo',
+        #'0106'  => 'DÃ­a de Reyes',
+        '0501'  => 'DÃ­a del Trabajo',
+        '1012'  => 'DÃ­a de la Hispanidad',
+        '1101'  => 'DÃ­a de Todos los Santos',
+        '1206'  => 'DÃ­a de la ConstituciÃ³n',
+        '1208'  => 'DÃ­a de la Inmaculada ConcepciÃ³n',
         '1225'  => 'Navidad',
     };
 
@@ -90,6 +91,10 @@ sub holidays_es {
 
 __END__
 
+=pod
+
+=encoding utf8
+
 =head1 NAME
 
 Date::Holidays::ES - Spanish holidays
@@ -100,7 +105,7 @@ Date::Holidays::ES - Spanish holidays
 
   my $dh = Date::Holidays->new( countrycode => 'es' );
 
-  print "Woohoo" if $dh->is_holiday( 
+  print "Woohoo" if $dh->is_holiday(
     year  => $year,
     month => $month,
     day   => $day
@@ -116,12 +121,12 @@ Date::Holidays OO wrapper, but you can also use it directly.
 
 The following Spanish holidays have fixed dates:
 
-  1  Jan           Año Nuevo
-  1  May           Día del Trabajo
-  12 Oct           Día de la Hispanidad
-  1  Nov           Día de Todos los Santos
-  6  Dec           Día de la Constitución
-  8  Dec           Día de la Inmaculada Concepción
+  1  Jan           AÃ±o Nuevo
+  1  May           DÃ­a del Trabajo
+  12 Oct           DÃ­a de la Hispanidad
+  1  Nov           DÃ­a de Todos los Santos
+  6  Dec           DÃ­a de la ConstituciÃ³n
+  8  Dec           DÃ­a de la Inmaculada ConcepciÃ³n
   25 Dec           Navidad
 
 The following Spanish holiday hasn't a fixed date:
@@ -188,7 +193,7 @@ L<Date::Holidays>.
      my $year  = $dt->year;
      my $month = $dt->month;
      my $day   = $dt->day;
-     print "$holiday is on $day/$month/$year\n"; 
+     print "$holiday is on $day/$month/$year\n";
   }
 
 Arguments:
@@ -202,15 +207,21 @@ are L<DateTime> objects.
 
 =head1 SEE ALSO
 
-L<Date::Holidays>, L<DateTime> 
+L<Date::Holidays>, L<DateTime>
 
 =head1 AUTHOR
 
-Florian Merges, E<lt>fmerges@cpan.orgE<gt>
+=over
+
+=item * jonasbn, E<lt>jonasbn@cpan.orgE<gt>, current maintainer
+
+=item * Florian Merges, E<lt>fmerges@cpan.orgE<gt>
+
+=back
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2007 Florian Merges, All Rights Reserved.
+Copyright since 2007 Florian Merges, All Rights Reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

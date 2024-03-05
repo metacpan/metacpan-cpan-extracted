@@ -14,8 +14,8 @@ use FindBin;
 our $VERSION = 0.02;
 
 BEGIN {
-  if (not $ENV{EXTENDED_TESTING}) {
-    skip_all('Extended test. Set $ENV{EXTENDED_TESTING} to a true value to run.');
+  if ($ENV{HARNESS_ACTIVE} && !$ENV{EXTENDED_TESTING}) {
+    skip_all('Extended test. Run manually or set $ENV{EXTENDED_TESTING} to a true value to run.');
   }
 }
 
@@ -33,8 +33,10 @@ my $root = $FindBin::Bin.'/..';
 
 my $mode = (@ARGV && $ARGV[0] eq '--interactive') ? 'interactive' : 'list';
 
-my @base_cmd =
-    ('aspell', '--encoding=utf-8', "--home-dir=${root}", '--lang=en', '-p', '.aspelldict');
+my @base_cmd = (
+  'aspell', '--encoding=utf-8', "--home-dir=${root}", '--dont-backup',
+  '--lang=en', '-p', '.aspelldict'
+);
 
 # For some reasons, the --mode=perl option of Aspell does not work correctly (in
 # all cases, it would not handle POD content). so we are passing manually the

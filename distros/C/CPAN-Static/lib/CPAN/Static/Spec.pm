@@ -1,5 +1,5 @@
 package CPAN::Static::Spec;
-$CPAN::Static::Spec::VERSION = '0.004';
+$CPAN::Static::Spec::VERSION = '0.005';
 use strict;
 use warnings;
 
@@ -19,7 +19,7 @@ CPAN::Static::Spec - Static install specification for CPAN distributions
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 DESCRIPTION
 

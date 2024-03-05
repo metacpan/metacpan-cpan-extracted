@@ -10,11 +10,12 @@ configure_requires:
   DynaLoader: '0'
   ExtUtils::CBuilder: '0'
   ExtUtils::Embed: '0'
+  ExtUtils::MakeMaker: '6.31'
   File::Basename: '0'
   File::Glob: '0'
   File::Spec::Functions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -40,7 +41,7 @@ requires:
   Getopt::ArgvFile: '1.07'
   IO::Compress::Gzip: '0'
   Module::ScanDeps: '1.21'
-  PAR: '1.016'
+  PAR: '1.020'
   PAR::Dist: '0.22'
   Text::ParseWords: '0'
   perl: '5.008009'
@@ -48,5 +49,5 @@ resources:
   MailingList: mailto:par@perl.org
   bugtracker: https://github.com/rschupp/PAR-Packer/issues
   repository: git://github.com/rschupp/PAR-Packer.git
-version: '1.061'
+version: '1.062'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

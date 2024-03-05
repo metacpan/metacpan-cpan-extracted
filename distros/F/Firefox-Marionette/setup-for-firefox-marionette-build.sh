@@ -24,6 +24,7 @@ case $OSNAME in
 			fi
 			PACKAGES="dbus-x11 \
 						firefox \
+						git \
 						make \
 						mesa-dri-drivers \
 						nginx \
@@ -49,7 +50,8 @@ case $OSNAME in
 						perl-Test-Simple \
 						perl-XML-Parser \
 						squid \
-						xorg-x11-server-Xvfb"
+						xorg-x11-server-Xvfb \
+						yarnpkg"
 			rpm -q --quiet $PACKAGES || ${SUDO}$DNF install -y $PACKAGES
 			SOMETIMES_MISSING_PACKAGES="perl-Config-INI \
 						perl-DirHandle \
@@ -99,6 +101,7 @@ case $OSNAME in
 			fi
 			${SUDO}apt-get install -y \
 						dbus-x11 \
+						git \
 						libarchive-zip-perl \
 						libconfig-ini-perl \
 						libcrypt-urandom-perl \
@@ -117,15 +120,17 @@ case $OSNAME in
 						liburi-perl \
 						libxml-parser-perl \
 						make \
-                                                nginx \
-                                                openssh-server \
-                                                squid \
-						xvfb
+						nginx \
+						openssh-server \
+						squid \
+						xvfb \
+						yarnpkg
 		fi
 		if [ -e "/etc/alpine-release" ]
 		then
 			PACKAGES="dbus-x11 \
 				firefox \
+				git \
 				mesa-dri-nouveau \
 				nginx \
 				openssl \
@@ -141,6 +146,8 @@ case $OSNAME in
 				perl-json \
 				perl-pdf-api2 \
 				perl-term-readkey \
+				perl-test-pod \
+				perl-test-pod-coverage \
 				perl-test-simple \
 				perl-text-csv_xs \
 				perl-uri \
@@ -148,7 +155,10 @@ case $OSNAME in
 				make \
 				squid \
 				xauth \
-				xvfb"
+				xvfb \
+				yarn"
+			${SUDO}apk update
+			${SUDO}apk upgrade
 			INSTALL_PACKAGES=0
 			for PACKAGE_NAME in $PACKAGES
 			do
@@ -178,6 +188,7 @@ _APK_REPO_
 		;;
 	DragonFly)
 		PACKAGES="firefox \
+					git \
 					mesa-dri-gallium \
 					nginx \
 					openssl \
@@ -195,11 +206,16 @@ _APK_REPO_
 					p5-PDF-API2 \
 					p5-Text-CSV_XS \
 					p5-Term-ReadKey \
+					p5-Test-CheckManifest \
+					p5-Test-Pod \
+					p5-Test-Pod-Coverage \
 					p5-Test-Simple \
 					p5-XML-Parser \
 					squid \
 					xauth \
-					xorg-vfbserver"
+					xorg-vfbserver \
+					yarn"
+		${SUDO}pkg upgrade -y
 		pkg info $PACKAGES >/dev/null || ${SUDO}pkg install -y $PACKAGES
 		if [ ! -e /etc/machine-id ]
 		then
@@ -207,7 +223,8 @@ _APK_REPO_
 		fi
 		;;
 	FreeBSD)
-		PACKAGES="firefox \
+		PACKAGES="firefox-esr \
+					git \
 					nginx \
 					openssl \
 					perl5 \
@@ -224,11 +241,16 @@ _APK_REPO_
 					p5-PDF-API2 \
 					p5-Text-CSV_XS \
 					p5-Term-ReadKey \
+					p5-Test-CheckManifest \
+					p5-Test-Pod \
+					p5-Test-Pod-Coverage \
 					p5-Test-Simple \
 					p5-XML-Parser \
 					squid \
 					xauth \
-					xorg-vfbserver"
+					xorg-vfbserver \
+					yarn"
+		${SUDO}pkg upgrade -y
 		pkg info $PACKAGES >/dev/null || ${SUDO}pkg install -y $PACKAGES
 		mount | grep fdescfs >/dev/null || ${SUDO}mount -t fdescfs fdesc /dev/fd
 		if [ ! -e /etc/machine-id ]
@@ -238,7 +260,7 @@ _APK_REPO_
 		;;
 	OpenBSD)
 		PACKAGES="firefox \
-					firefox \
+					git \
 					nginx \
 					p5-Archive-Zip \
 					p5-JSON \
@@ -255,16 +277,24 @@ _APK_REPO_
 					p5-Sub-Exporter \
 					p5-Sub-Uplevel \
 					p5-Sub-Install \
+					p5-Test-CheckManifest \
+					p5-Test-Pod-Coverage \
 					p5-Text-CSV_XS \
 					p5-XML-Parser \
-					squid"
+					squid \
+					yarn"
+		${SUDO}pkg_add -u
 		pkg_info $PACKAGES >/dev/null || ${SUDO}pkg_add -I $PACKAGES
 		perl -MConfig::INI -e 'exit 0' || PERL_MM_USE_DEFAULT=1 ${SUDO_WITH_ENVIRONMENT} cpan Config::INI
 		perl -MCrypt::URandom -e 'exit 0' || PERL_MM_USE_DEFAULT=1 ${SUDO_WITH_ENVIRONMENT} cpan Crypt::URandom
 		;;
 	NetBSD)
 		PKG_PATH="http://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/$(uname -p)/$(uname -r|cut -f '1 2' -d.)/All/"
+		export PKG_PATH
+		${SUDO}pkg_add pkgin
 		PACKAGES="firefox \
+					git \
+					mozilla-rootcerts-openssl \
 					nginx \
 					openssl \
 					p5-Archive-Zip \
@@ -283,9 +313,15 @@ _APK_REPO_
 					p5-Sub-Uplevel \
 					p5-Sub-Install \
 					p5-Text-CSV_XS \
+					p5-Term-ReadKey \
+					p5-Test-CheckManifest \
+					p5-Test-Pod \
+					p5-Test-Pod-Coverage \
 					p5-XML-Parser \
-					squid"
+					squid \
+					yarn"
 		INSTALL_PACKAGES=""
+		${SUDO}pkgin upgrade
 		for NAME in $PACKAGES
 		do
 			pkgin list | grep $NAME >/dev/null 2>/dev/null || INSTALL_PACKAGES="$INSTALL_PACKAGES $NAME"

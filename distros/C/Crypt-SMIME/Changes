@@ -1,5 +1,10 @@
 Revision history for Crypt::SMIME
 
+0.29    Mon Mar  4 18:10:38 JST 2024
+        - Fixed a bug which could cause a double-free on X.509
+          structures in a certain scenario:
+          https://rt.cpan.org/Public/Bug/Display.html?id=152115
+
 0.28    Mon Oct 25 11:38:55 JST 2021
         - Support OpenSSL 3.0.
 

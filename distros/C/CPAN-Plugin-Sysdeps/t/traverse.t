@@ -8,6 +8,9 @@ use Test::More 'no_plan';
 use CPAN::Plugin::Sysdeps ();
 require_CPAN_Distribution;
 
+my @warnings;
+$SIG{__WARN__} = sub { push @warnings, @_ };
+
 my $cpandist = CPAN::Distribution->new(
 				       ID => 'X/XX/XXX/DummyDoesNotExist-1.0.tar.gz',
 				       CONTAINSMODS => { DummyDoesNotExist => undef },
@@ -26,3 +29,5 @@ my $cpandist = CPAN::Distribution->new(
     eval { $p->post_get($cpandist) };
     like $@, qr{'like' matches only for };
 }
+
+is_deeply \@warnings, [], 'no warnings';

@@ -5,10 +5,10 @@ use MooseX::StrictConstructor;
 use Moose::Util::TypeConstraints;
 use Carp::Clan                     qw(^MsOffice::Word::Surgeon); # will import carp, croak, etc.
 use POSIX                          qw(strftime);
-use MsOffice::Word::Surgeon::Utils qw(maybe_preserve_spaces);
+use MsOffice::Word::Surgeon::Utils qw(maybe_preserve_spaces encode_entities);
 use namespace::clean -except => 'meta';
 
-our $VERSION = '2.04';
+our $VERSION = '2.05';
 
 subtype 'Date_ISO',
   as      'Str',
@@ -50,14 +50,15 @@ sub as_xml {
 
   my $rev_id    = $self->rev_id;
   my $date      = $self->date;
-  my $author    = $self->author;
-  my $props     = $self->run && $self->run->props
-    ? "<w:rPr>" . $self->run->props . "</w:rPr>"
-                  : "";
+  my $author    = $self->author; encode_entities($author);
+  my $props     = $self->run && $self->run->props ? "<w:rPr>" . $self->run->props . "</w:rPr>"
+                                                  : "";
+
   my $xml       = "";
 
   if (my $to_delete = $self->to_delete) {
     my $space_attr = maybe_preserve_spaces($to_delete);
+    encode_entities($to_delete);
     $xml .= qq{<w:del w:id="$rev_id" w:author="$author" w:date="$date">}
             . qq{<w:r>$props}
                  . qq{<w:delText$space_attr>$to_delete</w:delText>}
@@ -66,6 +67,7 @@ sub as_xml {
   }
   if (my $to_insert = $self->to_insert) {
     my $space_attr = maybe_preserve_spaces($to_insert);
+    encode_entities($to_insert);
     $xml .= qq{<w:ins w:id="$rev_id" w:author="$author" w:date="$date">}
             . qq{<w:r>$props}
               . ($self->xml_before // '')

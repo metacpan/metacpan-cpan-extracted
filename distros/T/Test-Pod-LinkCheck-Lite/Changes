@@ -1,3 +1,10 @@
+0.013		2024-03-03	T. R. Wyant
+    Fix bug in add_dir functionality.
+
+    Have eg/test-pod-links --dump write to file, not test output.
+
+    Add option --add-dir to eg/test-pod-links
+
 0.012		2024-02-01	T. R. Wyant
     Add new() argument add_dir to cover links to odd places.
     The default is blib/script to cover links into script files.

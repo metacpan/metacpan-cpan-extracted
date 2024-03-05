@@ -1,10 +1,12 @@
 use strict;
 use warnings;
 
-use Test::More tests => 10;
-use Date::Holidays;
+use Test::More;
 
-{
+SKIP: {
+    eval { require Date::Holidays };
+    skip "Date::Holidays not installed", 4 if $@;
+
     my $dh = Date::Holidays->new( countrycode => 'ES' );
     isa_ok($dh, 'Date::Holidays');
 
@@ -14,6 +16,8 @@ use Date::Holidays;
 }
 
 {
+    use_ok('Date::Holidays::ES');
+
     my $dh = Date::Holidays::ES->new;
     isa_ok($dh, 'Date::Holidays::ES');
 
@@ -28,3 +32,5 @@ use Date::Holidays;
     my $christmas_dt = $yho->{Navidad};
     is($christmas_dt->day, '25', "Also Christmas");
 }
+
+done_testing();

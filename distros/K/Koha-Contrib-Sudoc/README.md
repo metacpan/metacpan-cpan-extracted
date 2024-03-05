@@ -4,7 +4,7 @@ Le **Chargeur Sudoc Koha** est un logiciel sous licence GNU GPL. Il permet de
 déployer un Catalogue [Koha](https://koha-community.org) dans le Sudoc. Ses
 principales caractéristiques sont les suivantes :
 
-- Gestion du protocole d'envoi des fichiers par l'ABES à l'établissement
+- Gestion du protocole d'envoi des fichiers par l'Abes à l'établissement
   en mode PUT.
 - Multi-établissements (ILN). L'outil peut gérer les chargements de
   plusieurs ILN fonctionnant sur un même serveur en tant qu'instances
@@ -42,7 +42,7 @@ Le catalogue du Système Universitaire de Documentation
 [Sudoc](http://www.sudoc.abes.fr) est le catalogue collectif français réalisé
 par les bibliothèques et centres de documentation de l'enseignement supérieur et
 de la recherche. Le Sudoc est géré par l'Agence bibliographique nationale de
-l'enseignement supérieur [ABES](http://www.abes.fr).  Le Sudoc comprend plus de
+l'enseignement supérieur [Abes](http://www.abes.fr).  Le Sudoc comprend plus de
 9 millions de notices bibliographiques qui décrivent tous les types de documents
 (livres, thèses, revues, ressources électroniques, documents audiovisuels,
 microformes, cartes, partitions, manuscrits et livres anciens...)
@@ -50,7 +50,7 @@ microformes, cartes, partitions, manuscrits et livres anciens...)
 Le *Chargeur Sudoc Koha* est une boîte à outils permettant l'échange de données
 entre le SIGB [Koha](https://www.koha-community.org) et le Sudoc. Différentes
 opérations sont à réaliser afin de *déployer* dans le Sudoc un établissement
-(ILN pour l'ABES) constitué d'une ou plusieurs bibliothèques (RCR). À chaque
+(ILN pour l'Abes) constitué d'une ou plusieurs bibliothèques (RCR). À chaque
 ILN, correspond une instance de Koha et à chaque RCR d'un ILN correspond une
 bibliothèque d'une instance Koha.
 
@@ -65,9 +65,9 @@ liens vers les notices du Sudoc.
 On passe ensuite à la phase de fonctionnement avec le Sudoc. À cette
 étape, l'ILN utilise le logiciel WinIBW afin de saisir ses notices
 bibliographiques et d'autorités directement dans le Sudoc. Les notices
-ainsi créées sont renvoyées par l'ABES à l'ILN qui les charge
+ainsi créées sont renvoyées par l'Abes à l'ILN qui les charge
 périodiquement dans son Catalogue Koha. Le Chargeur Sudoc gère à la fois
-les transferts de fichiers par l'ABES et le chargement des notices dans
+les transferts de fichiers par l'Abes et le chargement des notices dans
 un Catalogue Koha. 
 
 ## Installation
@@ -81,7 +81,7 @@ cpan Koha::Contrib::Sudoc
 ```
 
 Une fois le module installé, il faut créer un répertoire par ILN dans lequel
-seront placés les fichiers de notices fournis par l'ABES, ainsi que le fichier
+seront placés les fichiers de notices fournis par l'Abes, ainsi que le fichier
 de configuration du Chargeur, ses fichiers de log et, éventuellement, ses
 bibliothèques spécifiques de conversion/exemplariasation de notices.
 
@@ -132,7 +132,7 @@ production.
 
 ## Chargements réguliers
 
-Le Chargeur Sudoc distingue le transfert des fichiers de l'ABES de leur
+Le Chargeur Sudoc distingue le transfert des fichiers de l'Abes de leur
 chargement dans un/des catalogues Koha. Le chargeur peut fonctionner sur un
 serveur partagé disposant de plusieurs instances de Koha correspondant à des ILN
 distincts. 
@@ -141,7 +141,7 @@ Pour chaque ILN, il y a un *spool* de fichiers Sudoc qui sont placés dans trois
 sous-répertoires. Les fichiers passent d'un sous-répertoire à l'autre en
 fonction de l'avancement des traitements :
 
-- Les fichiers arrivent de l'ABES dans le sous-répertoire *staged* de l'ILN. Ils
+- Les fichiers arrivent de l'Abes dans le sous-répertoire *staged* de l'ILN. Ils
   y restent tout le temps du transfert par FTP. 
 - Quand ils sont entièrement téléchargés, les fichiers sont déplacés du
   sous-répertoire *staged* dans le sous-répertoire *waiting*.
@@ -154,24 +154,24 @@ fonction de l'avancement des traitements :
 ### Transferts Sudoc > Koha
 
 Le transfert de fichiers du serveur du Sudoc sur le serveur Koha se fait au
-moyen de la méthode *PUT* proposée par l'ABES. Le serveur Sudoc et le serveur
+moyen de la méthode *PUT* proposée par l'Abes. Le serveur Sudoc et le serveur
 Koha réalisent des actions et échangent des messages par courriel selon le
 protocole suivant :
 
 - **Sudoc** — Les notices de l'ILN sont extraites selon la périodicité qui a été
-  demandée à l'ABES.  Quand les fichiers sont prêts, un message est envoyé au
+  demandée à l'Abes.  Quand les fichiers sont prêts, un message est envoyé au
   serveur Koha, le message *status 9*.
 
 - **Koha** — Le message *status 9* est reçu par le serveur Koha. Un message GTD
-  est envoyé au serveur de l'ABES. Il est demandé que les fichiers soient
+  est envoyé au serveur de l'Abes. Il est demandé que les fichiers soient
   transférés dans le répertoire `var/spool/staged` de l'ILN. Le serveur FTP/SFTP
   du serveur Koha est configuré pour que sa racine pointe sur `var/spool`. La
-  commande GTD demande à l'ABES d'envoyer les fichiers dansle sous-répertoire
+  commande GTD demande à l'Abes d'envoyer les fichiers dansle sous-répertoire
   `staged`.
 
 - **Sudoc** — Réception du message GTD de l'ILN. Transfert des fichiers par FTP
   sur le serveur Koha dans le sous-répertoire de l'ILN. Quand le transfert est
-  terminé, envoi par l'ABES du message *GTD Status 0*. Koha::        Réception
+  terminé, envoi par l'Abes du message *GTD Status 0*. Koha::        Réception
   du message *GTD Status 0*. Les fichiers sont déplacés dans le spool de
   *staged* en *waiting*.
 
@@ -202,35 +202,36 @@ Le fonctionnement du daemon `sudoc trans` est piloté par la section
 
 **ATTENTION** — `sudoc trans` doit avoir les droits suffisants pour lire et
 écrire le fichier MBOX de la boîte aux lettres contenant les courriels envoyés
-par l'ABES.
+par l'Abes.
 
 **Méthode GET** — S'il n'est pas possible de mettre en place un serveur SFTP
 sur le serveur Koha, la méthode GET peut être utilisée pour récupérer les
-fichiers sur une machine intermédiaire de l'ABES. Il faut juste définir les
+fichiers sur une machine intermédiaire de l'Abes. Il faut juste définir les
 infos suivantes dans la section `trans` du fichier de configuration :
 
 ```yaml
   ftp_host: vermeil.sudoc.abes.fr
   login: ilnXXX
   password: abcefg1234
+  protocol: sftp (ou ftp)
 ```
 
 #### Précautions
 
-Dans certaines circonstances, il peut être nécessaire d'envoyer à l'ABES une
+Dans certaines circonstances, il peut être nécessaire d'envoyer à l'Abes une
 demande d'envoi de fichiers sans avoir reçu au préalable le message _status 9_.
-Pour se faire, il est nécessaire de connaître le _jobid_ ABES de son
-établissement : c'est l'identifiant ABES de la tâche automatisée qui extrait du
+Pour se faire, il est nécessaire de connaître le _jobid_ Abes de son
+établissement : c'est l'identifiant Abes de la tâche automatisée qui extrait du
 Sudoc les notices de l'établissement récemmment mises à jour. Cet identifiant se
-trouve dans les messages envoyés par l'ABES.
+trouve dans les messages envoyés par l'Abes.
 
 On peut alors lancer la commande suivante : `sudoc gtd`. Cette commande force
-l'envoi à l'ABES d'un message GTD. Le jobid demandé se trouve dans le paramètre
-_loading > jobid_. Le GTD demande à l'ABES de placer les fichiers directement
+l'envoi à l'Abes d'un message GTD. Le jobid demandé se trouve dans le paramètre
+_loading > jobid_. Le GTD demande à l'Abes de placer les fichiers directement
 dans le sous-répertoire `waiting` du spool.
 
 On peut alternativement utiliser la commande `sudoc chargeauto`. Cette commande
-envoie le GTD à l'ABES attend un certain délai (paramètre _loading > timeout >
+envoie le GTD à l'Abes attend un certain délai (paramètre _loading > timeout >
 transfer_) ; déplace les fichiers de `staged` dans `waiting` ; puis, si le
 paramètre _loading > auto_ est à 1, lance directement le chargement des notices.
 
@@ -246,7 +247,7 @@ commande `sudoc spool`. Cette commande renvoie la liste de tous les fichiers qui
 sont en cours de transfert, en attente de chargement ou qui ont été chargées. On
 a donc trois sous-répertoires :
 
-1. **staged** contenant les fichiers en cours de transfert par l'ABES
+1. **staged** contenant les fichiers en cours de transfert par l'Abes
 2. **waiting** contenant les fichiers en attente de chargement
 3. **done** contenant les fichiers qui ont été chargés.
 
@@ -265,19 +266,19 @@ Fichiers des notices biblio en attente de chargement :
 **Visualisation de fichiers** — On peut également voir le contenu d'un fichier
 spécifique avec la commande : `sudoc spool fichier1 fichier2 ...`. 
 
-**Nettoyage** — Les chargements réguliers peuvent transférer de l'ABES sur le
+**Nettoyage** — Les chargements réguliers peuvent transférer de l'Abes sur le
 serveur Koha des fichiers vides. C'est spécialement vrai si l'ILN a choisi des
 transferts quotidiens.  Ces fichiers peuvent être tous supprimés avec cette
 commande : `sudoc spool vide`.
 
 ### Chargements dans le Catalogue Koha
 
-L'ILN définit avec l'ABES les fichiers qu'il souhaite recevoir régulièrement.
+L'ILN définit avec l'Abes les fichiers qu'il souhaite recevoir régulièrement.
 Les notices bibliographiques des ressources cataloguées par l'établissement dans
 le Sudoc sont toujours transmises. Le chargeur Sudoc requiert que les notices
 envoyées soient encodées en UTF-8/NFC. Il est possible de demander à recevoir
 également les notices liées, les notices de collection par exemple. Enfin,
-l'ABES peut également transmettre des fichiers des autorités contenues dans les
+l'Abes peut également transmettre des fichiers des autorités contenues dans les
 différentes notices bibliographiques.
 
 Le Chargeur Sudoc dispose de deux commandes distinctes de chargement des notices
@@ -286,7 +287,7 @@ d'autorité.
 
 **NOTE** — Si vous n'avez pas utilisé `sudoc trans` pour placer vos fichiers de
 notices dans le spool de votre ILN, vous pouvez le faire à la main : Copiez dans
-`var/spool/waiting` les fichiers de l'ABES. Vous pouvez ensuite les lister avec
+`var/spool/waiting` les fichiers de l'Abes. Vous pouvez ensuite les lister avec
 la comamnde `sudoc spool`, puis les charger avec les commandes décrites
 ci-dessous.
 
@@ -445,23 +446,23 @@ Sudoc.
 #### Section transfert
 
 Une section *trans* détermine le fonctionnement du service de transfert `sudoc
-trans` des fichiers ABES :
+trans` des fichiers Abes :
 
 - **timeout** — Délai en minutes entre deux réveils du service de transfert. Par
   exemple, une valeur de `10` signifie que la boîte aux lettres Sudoc sera
   examinée toutes les dix minutes.
 
 - **email** — Section contenant les adresses de courrier électronique utilisées
-  par le protocole de transfert de fichiers entre l'ABES et le serveur Koha :
+  par le protocole de transfert de fichiers entre l'Abes et le serveur Koha :
 
-  - **abes** — Email de l'ABES à laquelle envoyer les messages. A priori c'est
+  - **abes** — Email de l'Abes à laquelle envoyer les messages. A priori c'est
     toujours l'adresse `abes_ftp@carmin.sudoc.abes.fr`
   - **koha** — Email du serveur Koha. C'est la boîte aux lettres de cette adresse
     qui est examinée par le service de transfert.
 
 - **mbox** — Chemin d'accès à la boîte aux lettres
   [MBOX](http://fr.wikipedia.org/wiki/Mbox) contenant les messages adressés au
-  serveur par l'ABES.
+  serveur par l'Abes.
 
 La section **loading** détermine si les notices seront chargées automatiquement
 dans Koha par le service de transfert après que les fichiers ont été transférés
@@ -471,7 +472,7 @@ utilisées par la commande `sudoc chargeauto`.
 - **auto** — Indique si les fichiers qui se trouvent dans le répertoire
   `waiting` du spool doivent être chargés dans le Catalogue Koha. 1=oui, 0=non.
   Le chargement est déclanché par la réception du message _status 0_ envoyé par
-  l'ABES quand le transfert par FTP/SFTP est achevé. En phase de test, on laisse
+  l'Abes quand le transfert par FTP/SFTP est achevé. En phase de test, on laisse
   ce paramètre à 0, et on utilise les commandes de chargement manuel des notices
   : `sudoc autorité` et `sudoc biblio`.
 
@@ -482,7 +483,7 @@ utilisées par la commande `sudoc chargeauto`.
 - **timeout** — Délai en minutes entre les deux étapes du chargement, envoi GTD
   et chargement proprement dit.
 
-  - **transfer** — Délai entre l'envoi à l'ABES de la commande GTD et le début du
+  - **transfer** — Délai entre l'envoi à l'Abes de la commande GTD et le début du
     chargement automatique des fichiers de notices. Ce paramètre est utilisé par
     les commandes `sudoc trans` et `sudoc chargeauto`.
   - **indexing** — Délai entre les chargements des fichiers du spool `waiting`.
@@ -700,13 +701,13 @@ Cette commande est à utiliser en vue d'une localisation automatique d'un
 Catalogue Koha dans le Sudoc. 
 
 La procédure et les fichiers attendus sont [documentés par
-l'ABES](http://documentation.abes.fr/sudoc/regles/Catalogage/Reprise_cat_locaux.htm).
+l'Abes](http://documentation.abes.fr/sudoc/regles/Catalogage/Reprise_cat_locaux.htm).
 
 À partir d'un Catalogue Koha, ce script génère des fichiers de clés de
-dédoublonnage qui doivent permettre à l'ABES de repérer dans le Sudoc les
-notices Koha. Ces fichiers sont demandés par l'ABES afin de réaliser soit un
+dédoublonnage qui doivent permettre à l'Abes de repérer dans le Sudoc les
+notices Koha. Ces fichiers sont demandés par l'Abes afin de réaliser soit un
 test de recouvrement soit une localisation automatique. Ces fichiers suivent la
-convention de nommage demandée par l'ABES : commence par une lettre (**p** pour
+convention de nommage demandée par l'Abes : commence par une lettre (**p** pour
 des PPN, **i** pour des ISBN, **r** pour Date-Auteur-Titre), suivi du RCR de la
 bibliothèque, puis le code de PEB (**u** disponible pour le PEB, ou **g** non
 disponible). Ces noms de fichiers sont suffixés d'un index. Par exemple :
@@ -749,7 +750,7 @@ de fichier de clés multiples : `i641767u_clemult.txt` :
   3255 LIT NOU AHA ԱՀԱ 3.1979
 ```
 
-Ces fichiers sont envoyés à l'ABES qui, en retour, soit renvoie un rapport de
+Ces fichiers sont envoyés à l'Abes qui, en retour, soit renvoie un rapport de
 taux de recouvrement soit procède à la localisation automatique des notices de
 chaque bibliothèque dans le Sudoc.
 
@@ -779,7 +780,7 @@ Ce script dispose de plusieurs paramètres :
 
 - **--test** — Fichiers de clés uniquement pour un test de recouvrement.
 
-- **--coteabes** — Spécifie le champ de la notice ABES où placer la cote Koha.
+- **--coteabes** — Spécifie le champ de la notice Abes où placer la cote Koha.
   Par exemple, pour une rétroconversion : `--coteabes 991\ \$a`. Par défaut,
   `930 $a`.
 
@@ -793,7 +794,7 @@ Ce script dispose de plusieurs paramètres :
 Cette commande ajoute à un catalogue Koha les PPN Sudoc des notices qui y ont
 été localisées automatiquement.
 
-Après une localisation automatique, l'ABES fournit un fichier d'équivalences
+Après une localisation automatique, l'Abes fournit un fichier d'équivalences
 entre les PPN des notices Sudoc et les biblionumber des notices Koha. Ce script
 modifie les notices Koha en y ajoutant en 009 le PPN du Sudoc.  
 

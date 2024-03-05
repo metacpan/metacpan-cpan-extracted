@@ -1,30 +1,176 @@
 package Firefox::Marionette::Extension::Stealth;
 
+use Archive::Zip();
 use strict;
 use warnings;
 
-our $VERSION = '1.52';
+our $VERSION = '1.53';
 
-sub as_string {
-    return <<'_BASE64_';
-UEsDBBQAAAAIABVRQ1j2/GCpkQAAANAAAAAKABwAY29udGVudC5qc1VUCQAD+XW9ZUJ2vWV1eAsA
-AQToAwAABOgDAABNjj0OwyAMhfecgg1YuEDUqerWqVIPgIxbiIKJjJMl6d1Llf5Nfpa+p/ctnlUF
-TpOogwoF5owkDhi94GnE12f0Dmjbd3tylaHhELlkdDyTpHbvKNfL2ehEA4K4of4VCo3Fh9a5zQSS
-ChmrViUxVceYy4LG9urRd+arELHx2/Zz+oS3lXV+mpDCMaYxmH2m7T0BUEsDBBQAAAAIANFWQ1jp
-hxjLTgAAAG8AAAAJABwAaW5qZWN0LmpzVVQJAAO6gL1l5IK9ZXV4CwABBOgDAAAE6AMAAMtJLVHI
-SywLKMovyVewVfBPykpNLtFLTy0Bi5RUFqT6p2mUZ+al5JfrAdVlpieW5BdpWnOlpOaklqTCteqV
-pyalFGWWpRYhS0FUI8sBAFBLAwQUAAAACACuiENYLJ9dYNwAAACiAQAADQAcAG1hbmlmZXN0Lmpz
-b25VVAkAA6jXvWWr171ldXgLAAEE6AMAAAToAwAAhVA9T8MwEN3zKyzPVQWMEWJkY4INVdbFvVCD
-Y1d356pS1f/O2UkbNhbL977Oz5fOGLtH9hSOEnKyvbGvgXDM575/A1IIRdC8C0KUg8GzYOIq3FTn
-BCmMyOJOSDzbnxqRYMI/Web/qDXBPm4fZuyINAWuMCv+qZCC4CWc8AOGplFAYODbfSmSvqzOuxbi
-c9JF4mZqDbq0s5UQf8BG2GeI0RWK/GJ3m5vge+aWoK2OK9fMDoZcxA0R0o9KhQreBVSSA6m19tmX
-qb1EgMTeFXXlSPphvHgbca0Fumv3C1BLAQIeAxQAAAAIABVRQ1j2/GCpkQAAANAAAAAKABgAAAAA
-AAEAAACkgQAAAABjb250ZW50LmpzVVQFAAP5db1ldXgLAAEE6AMAAAToAwAAUEsBAh4DFAAAAAgA
-0VZDWOmHGMtOAAAAbwAAAAkAGAAAAAAAAQAAAKSB1QAAAGluamVjdC5qc1VUBQADuoC9ZXV4CwAB
-BOgDAAAE6AMAAFBLAQIeAxQAAAAIAK6IQ1gsn11g3AAAAKIBAAANABgAAAAAAAEAAACkgWYBAABt
-YW5pZmVzdC5qc29uVVQFAAOo171ldXgLAAEE6AMAAAToAwAAUEsFBgAAAAADAAMA8gAAAIkCAAAA
-AA==
-_BASE64_
+my $inject_name  = 'inject.js';
+my $content_name = 'content.js';
+
+sub new {
+    my ($class) = @_;
+    my $zip = Archive::Zip->new();
+    my $manifest =
+      $zip->addString( $class->_manifest_contents(), 'manifest.json' );
+    $manifest->desiredCompressionMethod( Archive::Zip::COMPRESSION_DEFLATED() );
+    my $content = $zip->addString( $class->_content_contents(), $content_name );
+    $content->desiredCompressionMethod( Archive::Zip::COMPRESSION_DEFLATED() );
+    my $inject = $zip->addString( $class->_inject_contents(), $inject_name );
+    $inject->desiredCompressionMethod( Archive::Zip::COMPRESSION_DEFLATED() );
+    return $zip;
+}
+
+sub _manifest_contents {
+    my ($class) = @_;
+    return <<"_JS_";
+{
+  "description": "Firefox::Marionette Stealth extension",
+  "manifest_version": 2,
+  "name": "Firefox Marionette Stealth extension",
+  "version": "1.1",
+  "permissions": [
+    "activeTab"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["$content_name"],
+      "match_about_blank": true,
+      "run_at": "document_start",
+      "all_frames": true
+    }
+  ]
+}
+_JS_
+}
+
+sub _content_contents {
+    my ($class) = @_;
+    return <<"_JS_";
+{
+  let script = document.createElement('script');
+  script.src = chrome.runtime.getURL('$inject_name');
+  script.onload = function() { this.remove(); };
+  (document.head || document.documentElement).appendChild(script);
+}
+_JS_
+}
+
+sub _inject_contents {
+    my ($class) = @_;
+    return <<'_JS_' . $class->user_agent_contents();
+{
+  let navProto = Object.getPrototypeOf(window.navigator);
+  let winProto = Object.getPrototypeOf(window);
+  Object.defineProperty(navProto, 'webdriver', {value: false, writable: true, enumerable: false});
+}
+_JS_
+}
+
+sub user_agent_contents {
+    my ($class) = @_;
+    return <<'_JS_';
+{
+  let navProto = Object.getPrototypeOf(window.navigator);
+  let winProto = Object.getPrototypeOf(window);
+  let docProto = Object.getPrototypeOf(window.document);
+  let bluetooth = {
+                    getAvailability: function () { return new Promise((resolve, reject) => resolve(false))},
+               };
+  let chrome = {
+                  webstore: function () { },
+                  app: function () { },
+                  csi: function () { },
+                  loadTimes: function () { },
+                  runtime: { connect: function() { }, sendMessage: function() { } }
+               };
+  let canLoadAdAuctionFencedFrame = function() { return true };
+  let canShare = function() { return true };
+  let getUserMedia = window.navigator.mozGetUserMedia;
+  let clearAppBadge = function () { return new Promise((resolve, reject) => resolve(undefined))};
+  let clearOriginJoinedAdInterestGroup = function (url) { return new Promise((resolve, reject) => { if (new RegExp(/^https:/).exec(url)) { throw DOMException("Permission to leave interest groups denied.") } else { throw new TypeError("Failed to execute 'clearOriginJoinedAdInterestGroup' on 'Navigator': owner '" + url + "' must be a valid https origin") }})};
+  delete window.navigator.mozGetUserMedia;
+  let getBattery = function () { return new Promise((resolve, reject) => resolve({ charging: true, chargingTime: 0, dischargingTime: Infinity, level: 1, onchargingchange: null }))};
+  let downlink = (new Array(7.55, 1.6))[Math.floor(Math.random() * 2)];
+  let rtt = (new Array(0, 50, 100))[Math.floor(Math.random() * 3)];
+  let connection = { effectiveType: '4g', rtt: rtt, downlink: downlink, saveData: false };
+  let createAuctionNonce = function() { return crypto.randomUUID() };
+  let deprecatedReplaceInURN = function() { throw TypeError("Failed to execute 'deprecatedReplaceInURN' on 'Navigator': Passed URL must be a valid URN URL.") };
+  let deprecatedURNtoURL = function() { throw TypeError("Failed to execute 'deprecatedURNtoURL' on 'Navigator': Passed URL must be a valid URN URL.") };
+  let getGamePads = function() { return new Array( null, null, null, null ) };
+  let getInstalledRelatedApps = function() { return new Promise((resolve,reject) => resolve([])) };
+  let gpu = { wgslLanguageFeatures: { size: 0 } };
+  let hid = { getDevices: function() { return new Promise((resolve,reject) => resolve([])) }, requestDevices: function() { return new Promise((resolve, reject) => resolve([])) } };
+  let joinAdInterestGroup = function (group) { return new Promise((resolve, reject) => { throw new TypeError("Failed to execute 'joinAdInterestGroup' on 'Navigator': The provided value is not of type 'AuctionAdInterestGroup'.")})};
+  let keyboard = { getLayoutMap: function() { }, lock: function() { }, unlock: function() { } };
+  let leaveAdInterestGroup = function () { throw new TypeError("Failed to execute 'leaveAdInterestGroup' on 'Navigator': May only leaveAdInterestGroup from an https origin.")};
+  let locks = { query: function() { }, request: function() { } };
+  let login = { setStatus: function() { return undefined } };
+  if (navigator.userAgent.match(/Chrome/)) {
+    Object.defineProperty(navProto, 'vendor', {value: "Google Inc.", writable: true});
+    Object.defineProperty(navProto, 'productSub', {value: "20030107", writable: true});
+    Object.defineProperty(navProto, 'getUserMedia', {value: getUserMedia, writable: true, enumerable: true});
+    Object.defineProperty(navProto, 'webkitGetUserMedia', {value: getUserMedia, writable: true, enumerable: true});
+    try {
+      Object.defineProperty(navProto, 'bluetooth', {value: bluetooth, writable: true, enumerable: true});
+      Object.defineProperty(navProto, 'bluetooth', {value: bluetooth, writable: true, enumerable: true});
+    } catch(e) {
+      console.log("Unable to redefine bluetooth:" + e);
+    }
+    Object.defineProperty(winProto, 'chrome', {value: chrome, writable: true, enumerable: true});
+    Object.defineProperty(navProto, 'canLoadAdAuctionFencedFrame', {value: canLoadAdAuctionFencedFrame, writable: true, enumerable: true});
+    Object.defineProperty(navProto, 'canShare', {value: canShare, writable: true, enumerable: true});
+    Object.defineProperty(navProto, 'clearAppBadge', {value: clearAppBadge, writable: true, enumerable: true});
+    Object.defineProperty(navProto, 'clearOriginJoinedAdInterestGroup', {value: clearOriginJoinedAdInterestGroup, writable: true, enumerable: true});
+    Object.defineProperty(navProto, 'connection', {value: connection, writable: true, enumerable: true});
+    Object.defineProperty(navProto, 'createAuctionNonce', {value: createAuctionNonce, writable: true, enumerable: true});
+    Object.defineProperty(navProto, 'deprecatedReplaceInURN', {value: deprecatedReplaceInURN, writable: true, enumerable: true});
+    Object.defineProperty(navProto, 'deprecatedRunAdAuctionEnforcesKAnonymity', {value: false, writable: true, enumerable: true});
+    Object.defineProperty(navProto, 'deprecatedURNtoURL', {value: deprecatedURNtoURL, writable: true, enumerable: true});
+    Object.defineProperty(navProto, 'deviceMemory', {value: (navigator.hardwareConcurrency < 4 ? 4 : 8), writable: true, enumerable: true});
+    Object.defineProperty(navProto, 'getBattery', {value: getBattery, writable: true, enumerable: true});
+    Object.defineProperty(navProto, 'getGamePads', {value: getGamePads, writable: true, enumerable: true});
+    Object.defineProperty(navProto, 'getInstalledRelatedApps', {value: getInstalledRelatedApps, writable: true, enumerable: true});
+    if (!window.navigator.gpu) {
+      Object.defineProperty(navProto, 'gpu', {value: gpu, writable: true, enumerable: true});
+    }
+    Object.defineProperty(navProto, 'hid', {value: hid, writable: true, enumerable: true});
+    Object.defineProperty(navProto, 'ink', {value: {}, writable: true, enumerable: true});
+    Object.defineProperty(navProto, 'joinAdInterestGroup', {value: joinAdInterestGroup, writable: true, enumerable: true});
+    Object.defineProperty(navProto, 'keyboard', {value: keyboard, writable: true, enumerable: true});
+    Object.defineProperty(navProto, 'leaveAdInterestGroup', {value: leaveAdInterestGroup, writable: true, enumerable: true});
+    Object.defineProperty(navProto, 'locks', {value: locks, writable: true, enumerable: true});
+    Object.defineProperty(navProto, 'login', {value: login, writable: true, enumerable: true});
+    delete navProto.oscpu;
+  } else if (navigator.userAgent.match(/Safari/)) {
+    Object.defineProperty(navProto, 'vendor', {value: "Apple Computer, Inc.", writable: true});
+    Object.defineProperty(navProto, 'productSub', {value: "20030107", writable: true});
+    Object.defineProperty(navProto, 'getUserMedia', {value: getUserMedia, writable: true, enumerable: true});
+    Object.defineProperty(navProto, 'webkitGetUserMedia', {value: getUserMedia, writable: true, enumerable: true});
+    /* no bluetooth for Safari - https://developer.mozilla.org/en-US/docs/Web/API/Bluetooth#browser_compatibility */
+    Object.defineProperty(winProto, 'chrome', {value: chrome, writable: true, enumerable: true});
+    Object.defineProperty(navProto, 'canLoadAdAuctionFencedFrame', {value: canLoadAdAuctionFencedFrame, writable: true, enumerable: true});
+    Object.defineProperty(navProto, 'canShare', {value: canShare, writable: true, enumerable: true});
+    Object.defineProperty(navProto, 'clearAppBadge', {value: clearAppBadge, writable: true, enumerable: true});
+    Object.defineProperty(navProto, 'clearOriginJoinedAdInterestGroup', {value: clearOriginJoinedAdInterestGroup, writable: true, enumerable: true});
+    /* no connection for Safari - https://developer.mozilla.org/en-US/docs/Web/API/Navigator/connection#browser_compatibility */
+    /* no deviceMemory for Safari - https://developer.mozilla.org/en-US/docs/Web/API/Navigator/deviceMemory#browser_compatibility */
+    /* no getBattery for Safari - https://developer.mozilla.org/en-US/docs/Web/API/Navigator/getBattery#browser_compatibility */
+    delete navProto.oscpu;
+  } else if (navigator.userAgent.match(/Trident/)) {
+    Object.defineProperty(docProto, 'documentMode', {value: true, writable: true, enumerable: true});
+  }
+  if (navigator.userAgent.match(/^Mozilla\/5[.]0[ ][(][^)]*?;[ ]rv:\d+[.]0[)][ ]Gecko\/20100101[ ]Firefox\/\d+[.]0/)) {
+    Object.defineProperty(navProto, 'vendor', {value: "", writable: true});
+    Object.defineProperty(navProto, 'productSub', {value: "20100101", writable: true});
+  } else {
+    delete navProto.buildID;
+    delete window.InstallTrigger;
+  }
+}
+_JS_
 }
 
 1;    # Magic true value required at end of module
@@ -36,7 +182,7 @@ Firefox::Marionette::Extension::Stealth - Contains the Stealth Extension
 
 =head1 VERSION
 
-Version 1.52
+Version 1.53
 
 =head1 SYNOPSIS
 
@@ -52,9 +198,13 @@ This module contains the Stealth extension.  This module should not be used dire
 
 =head1 SUBROUTINES/METHODS
 
-=head2 as_string
+=head2 new
  
-Returns a base64 encoded copy of the Stealth extension.
+Returns a L<Archive::Zip|Archive::Zip> of the Stealth extension.
+
+=head2 user_agent_contents
+
+Returns the javascript used to setup a different (or the original) user agent as a string.
 
 =head1 DIAGNOSTICS
 

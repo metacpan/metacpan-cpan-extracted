@@ -19,7 +19,7 @@ use namespace::clean;
 # declare error-reporting functions from SQL::Abstract
 sub puke(@); sub belch(@);  # these will be defined later in import()
 
-our $VERSION = '1.42';
+our $VERSION = '1.43';
 our @ISA;
 
 sub import {
@@ -312,12 +312,15 @@ sub with {
   my @table_expressions = does($_[0], 'ARRAY') ? @_ : ( [ @_]);
   foreach my $table_expression (@table_expressions) {
     my %args = validate(@$table_expression, \%params_for_WITH);
+    my @cols = does($args{-columns}, 'ARRAY') ? @{$args{-columns}}
+             : $args{-columns}                ? ($args{-columns})
+             :                                  ();
     my ($sql, @bind) = $self->select(%{$args{-as_select}});
     $clone->{WITH}{sql} .= ", " if $clone->{WITH}{sql};
     $clone->{WITH}{sql} .= $args{-table};
-    $clone->{WITH}{sql} .= "(" . join(", ", @{$args{-columns}}) . ")" if $args{-columns};
+    $clone->{WITH}{sql} .= "(" . join(", ", @cols) . ")"   if @cols;
     $clone->{WITH}{sql} .= " AS ($sql) ";
-    $clone->{WITH}{sql} .= $args{-final_clause} . " "                 if $args{-final_clause};
+    $clone->{WITH}{sql} .= $args{-final_clause} . " "      if $args{-final_clause};
     push @{$clone->{WITH}{bind}}, @bind;
   }
 

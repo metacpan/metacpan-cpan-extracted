@@ -1,6 +1,7 @@
 ##########################################################################
 #                                                                        #
-# © Copyright IBM Corporation 2001, 2004. All rights reserved.           #
+# © Copyright IBM Corporation 2001, 2016.  All Rights Reserved.          #
+# © Copyright HCL Technologies Ltd. 2016, 2020.  All rights reserved.    #
 #                                                                        #
 # This program and the accompanying materials are made available under   #
 # the terms of the Common Public License v1.0 which accompanies this     #

@@ -17,8 +17,8 @@
 ]>
 <ISBNRangeMessage>
   <MessageSource>International ISBN Agency</MessageSource>
-  <MessageSerialNumber>e00fa467-961a-4104-a277-f80dd64e588e</MessageSerialNumber>
-  <MessageDate>Fri, 9 Feb 2024 03:41:02 GMT</MessageDate>
+  <MessageSerialNumber>50f2bcad-a5b8-4998-8f4c-608d8ac33158</MessageSerialNumber>
+  <MessageDate>Sat, 2 Mar 2024 03:41:11 GMT</MessageDate>
   <EAN.UCCPrefixes>
     <EAN.UCC>
       <Prefix>978</Prefix>
@@ -1487,7 +1487,15 @@
           <Length>4</Length>
         </Rule>
         <Rule>
-          <Range>8000000-9999999</Range>
+          <Range>8000000-9449999</Range>
+          <Length>0</Length>
+        </Rule>
+        <Rule>
+          <Range>9450000-9464999</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>9465000-9999999</Range>
           <Length>0</Length>
         </Rule>
       </Rules>
@@ -8167,19 +8175,19 @@
       <Agency>Paraguay</Agency>
       <Rules>
         <Rule>
-          <Range>0000000-0999999</Range>
+          <Range>0000000-1999999</Range>
           <Length>1</Length>
         </Rule>
         <Rule>
-          <Range>1000000-4999999</Range>
+          <Range>2000000-4999999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>
-          <Range>5000000-6499999</Range>
+          <Range>5000000-7999999</Range>
           <Length>2</Length>
         </Rule>
         <Rule>
-          <Range>6500000-8999999</Range>
+          <Range>8000000-8999999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>

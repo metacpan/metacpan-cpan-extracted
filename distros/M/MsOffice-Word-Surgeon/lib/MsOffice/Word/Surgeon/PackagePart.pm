@@ -19,7 +19,7 @@ use constant XML_SIMPLE_INDENT => 1;
 
 use namespace::clean -except => 'meta';
 
-our $VERSION = '2.04';
+our $VERSION = '2.05';
 
 
 #======================================================================
@@ -99,20 +99,19 @@ sub _runs {
     # build internal TEXT objects
   TXT:
     while (my ($xml_before_text, $txt_contents) = splice @txt_fragments, 0, 2) {
-      next TXT if !$xml_before_text && ( !(defined $txt_contents) || $txt_contents eq '');
-      push @texts, MsOffice::Word::Surgeon::Text->new(
-        xml_before   => $xml_before_text // '',
-        literal_text => $txt_contents    // '',
-       );
+      next TXT if !$xml_before_text && !$txt_contents;
+      $_ //= '' for $xml_before_text, $txt_contents;
+      decode_entities($txt_contents);
+      push @texts, MsOffice::Word::Surgeon::Text->new(xml_before   => $xml_before_text,
+                                                      literal_text => $txt_contents);
     }
 
     # assemble TEXT objects into a RUN object
     next RUN if !$xml_before_run && !@texts;
-    push @runs, MsOffice::Word::Surgeon::Run->new(
-      xml_before  => $xml_before_run // '',
-      props       => $props          // '',
-      inner_texts => \@texts,
-     );
+    $_ //= '' for $xml_before_run, $props;
+    push @runs, MsOffice::Word::Surgeon::Run->new(xml_before  => $xml_before_run,
+                                                  props       => $props,
+                                                  inner_texts => \@texts);
   }
 
   return \@runs;

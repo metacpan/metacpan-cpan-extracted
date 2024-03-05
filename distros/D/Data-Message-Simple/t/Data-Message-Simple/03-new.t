@@ -46,8 +46,8 @@ eval {
 		'text' => 'This is message.',
 	),
 };
-is($EVAL_ERROR, "Language code 'xx' isn't ISO 639-1 code.\n",
-	"Language code 'xx' isn't ISO 639-1 code.");
+is($EVAL_ERROR, "Parameter 'lang' doesn't contain valid ISO 639-1 code.\n",
+	"Parameter 'lang' doesn't contain valid ISO 639-1 code (xx).");
 clean();
 
 # Test.

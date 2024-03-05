@@ -5,12 +5,12 @@ use strict;
 use warnings;
 
 sub description { 'WebSense SurfControl' }
-sub make {
+sub inquire {
     # Detect an error from SurfControl
     # @param    [Hash] mhead    Message headers of a bounce email
     # @param    [String] mbody  Message body of a bounce email
     # @return   [Hash]          Bounce data list and message/rfc822 part
-    # @return   [Undef]         failed to parse or the arguments are missing
+    # @return   [undef]         failed to parse or the arguments are missing
     # @since v4.1.2
     my $class = shift;
     my $mhead = shift // return undef;
@@ -24,21 +24,20 @@ sub make {
     return undef unless $mhead->{'x-mailer'} eq 'SurfControl E-mail Filter';
 
     state $indicators = __PACKAGE__->INDICATORS;
-    state $rebackbone = qr|^Content-Type:[ ]message/rfc822|m;
+    state $boundaries = ['Content-Type: message/rfc822'];
     state $startingof = { 'message' => ['Your message could not be sent.'] };
 
-    require Sisimai::RFC1894;
     my $fieldtable = Sisimai::RFC1894->FIELDTABLE;
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
-    my $emailsteak = Sisimai::RFC5322->fillet($mbody, $rebackbone);
+    my $emailparts = Sisimai::RFC5322->part($mbody, $boundaries);
     my $readcursor = 0;     # (Integer) Points the current cursor position
     my $recipients = 0;     # (Integer) The number of 'Final-Recipient' header
     my $v = undef;
     my $p = '';
 
-    for my $e ( split("\n", $emailsteak->[0]) ) {
-        # Read error messages and delivery status lines from the head of the email
-        # to the previous line of the beginning of the original message.
+    for my $e ( split("\n", $emailparts->[0]) ) {
+        # Read error messages and delivery status lines from the head of the email to the previous
+        # line of the beginning of the original message.
         unless( $readcursor ) {
             # Beginning of the bounce message or message/delivery-status part
             $readcursor |= $indicators->{'deliverystatus'} if index($e, $startingof->{'message'}->[0]) == 0;
@@ -58,24 +57,26 @@ sub make {
         # --- Message non-deliverable.
         $v = $dscontents->[-1];
 
-        if( $e =~ /\AAddressed To:[ \t]*([^ ]+?[@][^ ]+?)\z/ ) {
+        if( index($e, 'Addressed To:') == 0 && index($e, '@') > 1 ) {
             # Addressed To: kijitora@example.com
             if( $v->{'recipient'} ) {
                 # There are multiple recipient addresses in the message body.
                 push @$dscontents, __PACKAGE__->DELIVERYSTATUS;
                 $v = $dscontents->[-1];
             }
-            $v->{'recipient'} = $1;
+            $v->{'recipient'} = Sisimai::Address->s3s4(substr($e, index($e, ':') + 2,));
             $recipients++;
 
-        } elsif( $e =~ /\A(?:Sun|Mon|Tue|Wed|Thu|Fri|Sat)[ \t,]/ ) {
+        } elsif( grep { index($e, $_) == 0 } (qw|Sun Mon Tue Wed Thu Fri Sat|) ) {
             # Thu 29 Apr 2010 23:34:45 +0900
             $v->{'date'} = $e;
 
-        } elsif( $e =~ /\A[^ ]+[@][^ ]+:[ \t]*\[(\d+[.]\d+[.]\d+[.]\d)\],[ \t]*(.+)\z/ ) {
+        } elsif( Sisimai::String->aligned(\$e, ['@', ':', ' ', '[', '],', '...']) ) {
             # kijitora@example.com: [192.0.2.5], 550 kijitora@example.com... No such user
-            $v->{'rhost'} = $1;
-            $v->{'diagnosis'} = $2;
+            my $p1 = index($e, '[');
+            my $p2 = index($e, '],', $p1 + 1);
+            $v->{'rhost'} = substr($e, $p1 + 1, $p2 - $p1 - 1);
+            $v->{'diagnosis'} = Sisimai::String->sweep(substr($e, $p2 + 2,));
 
         } else {
             # Fallback, parse RFC3464 headers.
@@ -89,8 +90,8 @@ sub make {
             } else {
                 # Continued line of the value of Diagnostic-Code field
                 next unless index($p, 'Diagnostic-Code:') == 0;
-                next unless $e =~ /\A[ \t]+(.+)\z/;
-                $v->{'diagnosis'} .= ' '.$1;
+                next unless index($e, ' ') == 0;
+                $v->{'diagnosis'} .= ' '.Sisimai::String->sweep($e);
             }
         }
     } continue {
@@ -100,7 +101,7 @@ sub make {
     return undef unless $recipients;
 
     $_->{'diagnosis'} = Sisimai::String->sweep($_->{'diagnosis'}) for @$dscontents;
-    return { 'ds' => $dscontents, 'rfc822' => $emailsteak->[1] };
+    return { 'ds' => $dscontents, 'rfc822' => $emailparts->[1] };
 }
 
 1;
@@ -118,8 +119,8 @@ Sisimai::Lhost::SurfControl - bounce mail parser class for C<SurfControl>.
 
 =head1 DESCRIPTION
 
-Sisimai::Lhost::SurfControl parses a bounce email which created by
-C<WebSense SurfControl>. Methods in the module are called from only Sisimai::Message.
+Sisimai::Lhost::SurfControl parses a bounce email which created by C<WebSense SurfControl>. Methods
+in the module are called from only Sisimai::Message.
 
 =head1 CLASS METHODS
 
@@ -129,10 +130,10 @@ C<description()> returns description string of this module.
 
     print Sisimai::Lhost::SurfControl->description;
 
-=head2 C<B<make(I<header data>, I<reference to body string>)>>
+=head2 C<B<inquire(I<header data>, I<reference to body string>)>>
 
-C<make()> method parses a bounced email and return results as a array reference.
-See Sisimai::Message for more details.
+C<inquire()> method parses a bounced email and return results as a array reference. See Sisimai::Message
+for more details.
 
 =head1 AUTHOR
 
@@ -140,7 +141,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2020 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2021,2023 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

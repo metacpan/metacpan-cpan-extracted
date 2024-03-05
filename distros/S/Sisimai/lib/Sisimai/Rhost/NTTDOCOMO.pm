@@ -4,21 +4,21 @@ use strict;
 use warnings;
 
 sub get {
-    # Detect bounce reason from NTT DOCOMO
-    # @param    [Sisimai::Data] argvs   Parsed email object
+    # Detect bounce reason from NTT docomo
+    # @param    [Sisimai::Fact] argvs   Parsed email object
     # @return   [String]                The bounce reason for docomo.ne.jp
     # @since v4.25.15
     my $class = shift;
     my $argvs = shift // return undef;
 
     my $messagesof = {
-        'mailboxfull' => qr/552 too much mail data/,
-        'toomanyconn' => qr/552 too many recipients/,
-        'syntaxerror' => qr/(?:503 bad sequence of commands|504 command parameter not implemented)/,
+        'mailboxfull' => ['552 too much mail data'],
+        'toomanyconn' => ['552 too many recipients'],
+        'syntaxerror' => ['503 bad sequence of commands', '504 command parameter not implemented'],
     };
     my $statuscode = $argvs->{'deliverystatus'}    || '';
-    my $commandtxt = $argvs->{'smtpcommand'}       || '';
-    my $esmtperror = lc $argvs->{'diagnosticcode'} || '';
+    my $thecommand = $argvs->{'smtpcommand'}       || '';
+    my $issuedcode = lc $argvs->{'diagnosticcode'} || '';
     my $reasontext = '';
 
     # Check the value of Status: field, an SMTP Reply Code, and the SMTP Command
@@ -52,7 +52,7 @@ sub get {
         # The value of "Diagnostic-Code:" field is not empty
         for my $e ( keys %$messagesof ) {
             # Try to match the value of "diagnosticcode"
-            next unless $esmtperror =~ $messagesof->{ $e };
+            next unless grep { index($issuedcode, $_) > -1 } $messagesof->{ $e }->@*;
             $reasontext = $e;
             last;
         }
@@ -62,7 +62,7 @@ sub get {
     # A bounce reason did not decide from a status code, an error message.
     if( $statuscode eq '5.0.0' ) {
         # Status: 5.0.0
-        if( $commandtxt eq 'RCPT' ) {
+        if( $thecommand eq 'RCPT' ) {
             # Your message to the following recipients cannot be delivered:
             #
             # <***@docomo.ne.jp>:
@@ -78,7 +78,7 @@ sub get {
             # Diagnostic-Code: smtp; 550 Unknown user ***@docomo.ne.jp
             $reasontext = 'userunknown';
 
-        } elsif( $commandtxt eq 'DATA' ) {
+        } elsif( $thecommand eq 'DATA' ) {
             # <***@docomo.ne.jp>: host mfsmax.docomo.ne.jp[203.138.181.240] said:
             # 550 Unknown user ***@docomo.ne.jp (in reply to end of DATA
             # command)
@@ -117,7 +117,7 @@ __END__
 
 =head1 NAME
 
-Sisimai::Rhost::NTTDOCOMO - Detect the bounce reason returned from NTT DOCOMO.
+Sisimai::Rhost::NTTDOCOMO - Detect the bounce reason returned from NTT docomo.
 
 =head1 SYNOPSIS
 
@@ -125,13 +125,13 @@ Sisimai::Rhost::NTTDOCOMO - Detect the bounce reason returned from NTT DOCOMO.
 
 =head1 DESCRIPTION
 
-Sisimai::Rhost detects the bounce reason from the content of Sisimai::Data
-object as an argument of get() method when the value of C<rhost> of the object
-is "mfsmax.docomo.ne.jp". This class is called only Sisimai::Data class.
+Sisimai::Rhost detects the bounce reason from the content of Sisimai::Fact object as an argument
+of get() method when the value of C<rhost> of the object is "mfsmax.docomo.ne.jp". This class is
+called only Sisimai::Fact class.
 
 =head1 CLASS METHODS
 
-=head2 C<B<get(I<Sisimai::Data Object>)>>
+=head2 C<B<get(I<Sisimai::Fact Object>)>>
 
 C<get()> detects the bounce reason.
 
@@ -141,7 +141,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2022 azumakuniyuki, All rights reserved.
+Copyright (C) 2022,2023 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

@@ -1,5 +1,7 @@
 Revision history for SQL-Abstract-More
 
+1.43 05.03.2024
+  - accept scalar in ->with(-columns => $scalar, ...) # this was documented but not implemented
 
 1.42 22.01.2024
   - backcompat : accept select(-from => $arrayref) and select(-from => $scalarref)

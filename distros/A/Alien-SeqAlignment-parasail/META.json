@@ -76,11 +76,21 @@
    "provides" : {
       "Alien::SeqAlignment::parasail" : {
          "file" : "lib/Alien/SeqAlignment/parasail.pm",
-         "version" : "0.01"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/chrisarg/Alien-SeqAlignment-parasail/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/chrisarg/Alien-SeqAlignment-parasail.git",
+         "web" : "https://github.com/chrisarg/Alien-SeqAlignment-parasail"
+      }
+   },
+   "version" : "0.03",
    "x_alienfile" : {
       "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.32",
       "requires" : {

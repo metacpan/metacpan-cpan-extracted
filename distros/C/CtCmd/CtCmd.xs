@@ -1,6 +1,7 @@
 /*************************************************************************
 *                                                                        *
-* © Copyright IBM Corporation 2001, 2012 All rights reserved.            *
+* (C) Copyright IBM Corp. 2001, 2016.  All Rights Reserved.              *
+* (C) Copyright HCL Technologies Ltd. 2016, 2020.  All Rights Reserved.  *
 *                                                                        *
 * This program and the accompanying materials are made available under   *
 * the terms of the Common Public License v1.0 which accompanies this     *
@@ -123,7 +124,7 @@ void
 cmdout (void *argP, char *strP)
 {
     BLOK *blokP;
-    int len;
+    size_t len;
     blokP = (BLOK *) argP;
     len = strlen (strP);
     if (blokP->currSize + len + 1 > blokP->buffSize) {
@@ -201,7 +202,7 @@ dispatched_synv_call (int argc, char * argv[], BLOK *outP, BLOK *errP, gen_t are
 
 int status;
 
-MODULE = ClearCase::CtCmd		PACKAGE = ClearCase::CtCmd	PREFIX=cmd_	
+MODULE = ClearCase::CtCmd	PACKAGE = ClearCase::CtCmd	PREFIX=cmd_	
 PROTOTYPES: ENABLE
 
 int
@@ -289,7 +290,6 @@ exec(...)
 	int gimme = GIMME_V;
 	int debug = 0;
 	int is_object;
-	SV* sv;
 	HV* myhash;
 	SV** out_p;
 	SV** err_p;
@@ -373,7 +373,8 @@ exec(...)
         return;
         }
 #endif
-	pfm_init ();
+        pfm_external_proc_init();
+	ks_system_init ();
 	vob_ob_all_cache_action(NULL,1,1);
 	if(argc == 2){   /* There is only one argument.  Treat it as a string. */
 	    status = dispatched_syn_call (
@@ -429,14 +430,14 @@ BOOT:
 #if PERL_REVISION == 5 && ((PERL_VERSION == 8 && PERL_SUBVERSION >= 6) || PERL_VERSION >= 9) && !defined(PERL_USE_SAFE_PUTENV)
 	/*
 	 * RATLC01540363: Make ClearCase::CtCmd module compatible with recent perl versions, starting of perl-5.10.0 and up to recent perl-5.16.0
-	 * The ClearCase core adds environment variables to the environment. When
+	 * The {ClearCase} core adds environment variables to the environment. When
 	 * it calls putenv to add an environment variable it passes a static buffer to
 	 * putenv. This conflicts with the assumption in the perl code that it is the
 	 * owner of the environment and as such all of the environment variables in
 	 * the environ array point to memory that it had allocated using malloc. So
 	 * during the destruction of the perl interpreter, perl calls free on all of
 	 * the pointers in the environ array which then triggers a crash in free
-	 * because free is trying to free the static buffer that the ClearCase
+	 * because free is trying to free the static buffer that the {ClearCase}
 	 * core had passed to putenv.
 	 * The workaround for this is to set the global variable PL_use_safe_putenv 
 	 * to 1. This tell the perl core that it isn't the sole owner of the environment

@@ -5,12 +5,12 @@ use strict;
 use warnings;
 
 sub description { 'Java Apache Mail Enterprise Server' }
-sub make {
+sub inquire {
     # Detect an error from ApacheJames
     # @param    [Hash] mhead    Message headers of a bounce email
     # @param    [String] mbody  Message body of a bounce email
     # @return   [Hash]          Bounce data list and message/rfc822 part
-    # @return   [Undef]         failed to parse or the arguments are missing
+    # @return   [undef]         failed to parse or the arguments are missing
     # @since v4.1.26
     my $class = shift;
     my $mhead = shift // return undef;
@@ -22,11 +22,11 @@ sub make {
     # 'message-id' => qr/\d+[.]JavaMail[.].+[@]/,
     $match ||= 1 if $mhead->{'subject'} eq '[BOUNCE]';
     $match ||= 1 if defined $mhead->{'message-id'} && rindex($mhead->{'message-id'}, '.JavaMail.') > -1;
-    $match ||= 1 if grep { rindex($_, 'JAMES SMTP Server') > -1 } @{ $mhead->{'received'} };
+    $match ||= 1 if grep { rindex($_, 'JAMES SMTP Server') > -1 } $mhead->{'received'}->@*;
     return undef unless $match;
 
     state $indicators = __PACKAGE__->INDICATORS;
-    state $rebackbone = qr|^Content-Type:[ ]message/rfc822|m;
+    state $boundaries = ['Content-Type: message/rfc822'];
     state $startingof = {
         # apache-james-2.3.2/src/java/org/apache/james/transport/mailets/
         #   AbstractNotify.java|124:  out.println("Error message below:");
@@ -36,17 +36,17 @@ sub make {
     };
 
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
-    my $emailsteak = Sisimai::RFC5322->fillet($mbody, $rebackbone);
+    my $emailparts = Sisimai::RFC5322->part($mbody, $boundaries);
     my $readcursor = 0;     # (Integer) Points the current cursor position
     my $recipients = 0;     # (Integer) The number of 'Final-Recipient' header
-    my $diagnostic = '';    # (String) Alternative diagnostic message
+    my $issuedcode = '';    # (String) Alternative diagnostic message
     my $subjecttxt = undef; # (String) Alternative Subject text
     my $gotmessage = 0;     # (Integer) Flag for error message
     my $v = undef;
 
-    for my $e ( split("\n", $emailsteak->[0]) ) {
-        # Read error messages and delivery status lines from the head of the email
-        # to the previous line of the beginning of the original message.
+    for my $e ( split("\n", $emailparts->[0]) ) {
+        # Read error messages and delivery status lines from the head of the email to the previous
+        # line of the beginning of the original message.
         unless( $readcursor ) {
             # Beginning of the bounce message or message/delivery-status part
             $readcursor |= $indicators->{'deliverystatus'} if index($e, $startingof->{'message'}->[0]) == 0;
@@ -66,23 +66,23 @@ sub make {
         #   Number of lines: 64
         $v = $dscontents->[-1];
 
-        if( $e =~ /\A[ ][ ]RCPT[ ]TO:[ ]([^ ]+[@][^ ]+)\z/ ) {
+        if( index($e, '  RCPT TO: ') == 0 ) {
             #   RCPT TO: kijitora@example.org
             if( $v->{'recipient'} ) {
                 # There are multiple recipient addresses in the message body.
                 push @$dscontents, __PACKAGE__->DELIVERYSTATUS;
                 $v = $dscontents->[-1];
             }
-            $v->{'recipient'} = $1;
+            $v->{'recipient'} = substr($e, 12,);
             $recipients++;
 
-        } elsif( $e =~ /\A[ ][ ]Sent[ ]date:[ ](.+)\z/ ) {
+        } elsif( index($e, '  Sent date: ') == 0 ) {
             #   Sent date: Thu Apr 29 01:20:50 JST 2015
-            $v->{'date'} = $1;
+            $v->{'date'} = substr($e, 13,);
 
-        } elsif( $e =~ /\A[ ][ ]Subject:[ ](.+)\z/ ) {
+        } elsif( index($e, '  Subject: ') == 0 ) {
             #   Subject: Nyaaan
-            $subjecttxt = $1;
+            $subjecttxt = substr($e, 11,)
 
         } else {
             next if $gotmessage == 1;
@@ -113,9 +113,9 @@ sub make {
 
     # Set the value of $subjecttxt as a Subject if there is no original message
     # in the bounce mail.
-    $emailsteak->[1] .= sprintf("Subject: %s\n", $subjecttxt) unless $emailsteak->[1] =~ /^Subject:/m;
-    $_->{'diagnosis'} = Sisimai::String->sweep($_->{'diagnosis'} || $diagnostic) for @$dscontents;
-    return { 'ds' => $dscontents, 'rfc822' => $emailsteak->[1] };
+    $emailparts->[1] .= sprintf("Subject: %s\n", $subjecttxt) if index($emailparts->[1], "\nSubject:") < 0;
+    $_->{'diagnosis'} = Sisimai::String->sweep($_->{'diagnosis'} || $issuedcode) for @$dscontents;
+    return { 'ds' => $dscontents, 'rfc822' => $emailparts->[1] };
 }
 
 1;
@@ -133,8 +133,8 @@ Sisimai::Lhost::ApacheJames - bounce mail parser class for C<ApacheJames>.
 
 =head1 DESCRIPTION
 
-Sisimai::Lhost::ApacheJames parses a bounce email which created by C<ApacheJames>.
-Methods in the module are called from only Sisimai::Message.
+Sisimai::Lhost::ApacheJames parses a bounce email which created by C<ApacheJames>. Methods in the
+module are called from only Sisimai::Message.
 
 =head1 CLASS METHODS
 
@@ -144,10 +144,10 @@ C<description()> returns description string of this module.
 
     print Sisimai::Lhost::ApacheJames->description;
 
-=head2 C<B<make(I<header data>, I<reference to body string>)>>
+=head2 C<B<inquire(I<header data>, I<reference to body string>)>>
 
-C<make()> method parses a bounced email and return results as a array reference.
-See Sisimai::Message for more details.
+C<inquire()> method parses a bounced email and return results as a array reference. See Sisimai::Message
+for more details.
 
 =head1 AUTHOR
 
@@ -155,7 +155,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2015-2020 azumakuniyuki, All rights reserved.
+Copyright (C) 2015-2023 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

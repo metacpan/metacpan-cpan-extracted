@@ -30,20 +30,24 @@ define pod <<"=cut"
 	-m # max length per API call
 	-l # show library files (XLATE.mk, xlate.el)
         --   terminate option parsing
+
     Make options
 	-M   run make
 	-n   dry-run
+
     Docker options
 	-G   mount git top-level directory
 	-B   run in non-interactive (batch) mode
 	-R   mount read-only
-	-E * specify environment variable to be inherited
-	-I * specify altanative docker image (default: tecolicom/xlate:version)
-#	-T * specify docker image version
+	-E # specify environment variable to be inherited
+	-I # specify altanative docker image (default: tecolicom/xlate:version)
+#	-T # specify docker image version
 #	-L   use the latest version
-#	-V * specify directory to be mounted (default: current directory)
+#	-V # specify directory to be mounted (default: current directory)
+
 	-D * run xlate on the container with the rest parameters
 	-C * run following command on the container, or run shell
+	N.B. -D/-C terminates option parsing
 
     Control Files:
 	*.LANG    translation languates
@@ -54,7 +58,7 @@ define pod <<"=cut"
 
 =head1 VERSION
 
-    Version 0.30
+    Version 0.31
 
 =cut
 
@@ -92,17 +96,16 @@ read_only=
 display=
 [ -e ${localtime:=/etc/localtime} ] || localtime=
 
-define DEFAULT_ENV <<EOF
-LESSANSIENDCHARS=mK
-LESS=-cR
-LANG
-TZ
-TERM_PROGRAM
-TERM_BGCOLOR
-COLORTERM
-DEEPL_AUTH_KEY
-OPENAI_API_KEY
+DEFAULT_ENV="$(sed 's/  */\n/g' <<-EOF
+	LANG TZ
+	LESS=-cR LESSANSIENDCHARS=mK
+	HTTP_PROXY HTTPS_PROXY
+	http_proxy https_proxy
+	TERM_PROGRAM TERM_BGCOLOR COLORTERM
+	DEEPL_AUTH_KEY
+	OPENAI_API_KEY
 EOF
+)"
 
 declare -a ENV
 
@@ -117,7 +120,7 @@ do
 	L)     version=:latest ;;
 	R)  mount_mode=ro ;;
 	E)
-	    DEFAULT_ENV+="$OPTARG"$'\n' ;;
+	    DEFAULT_ENV+=$'\n'"$OPTARG" ;;
 	G)
 	    [ "$XLATE_RUNNING_ON_DOCKER" ] && break
 	    if [ "${topdir:=$(git_topdir)}" ]
@@ -198,7 +201,12 @@ do
 	    exit
 	    ;;
 	h)
-	    sed -r -e '/^#/d' -e 's/^=[a-z]+[0-9]* *//' -e '/Version/q' <<< "$pod"
+	    sed -r \
+		-e '/^$/N' \
+		-e '/^\n*#/d' \
+		-e 's/^(\n*)=[a-z]+[0-9]* */\1/' \
+		-e '/Version/q' \
+		<<< "$pod"
 	    exit
 	    ;;
 	v)

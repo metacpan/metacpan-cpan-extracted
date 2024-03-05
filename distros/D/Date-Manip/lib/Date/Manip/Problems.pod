@@ -451,8 +451,8 @@ encourage the use of the OO interface whenever possible.
 
 =head1 BUGS AND QUESTIONS
 
-If you find a bug in Date::Manip, there are three ways to send it to me.
-In order of preference, they are:
+If you find a bug in Date::Manip, please let me know.  The best ways to
+contact me are:
 
 =over 4
 
@@ -471,20 +471,12 @@ if at all possible.
 You are welcome to send it directly to me by email.  The email address
 to use is:  sbeck@cpan.org.
 
-Please note that because cpan.org addresses are published, they are used by
-a lot of spammers and phishers.  Please include the name of the perl module
-in the subject line of ALL messages sent to my cpan.org address or it will
-likely be missed.
-
-=item CPAN Bug Tracking
-
-You can submit it using the CPAN tracking too.  This can be done at the
-following URL:
-
-L<http://rt.cpan.org/Public/Dist/Display.html?Name=Date-Manip>
-
-There was discussion of halting this service a while back (though it continues
-to function), so only use this as a last resort.
+There is some discussion of discontinuing CPAN email, so please use
+this as a last resort.  The GitHub method is strongly preferred.
+Also, because cpan.org addresses are published, they are used by a lot
+of spammers and phishers.  Please include the name of the perl module
+in the subject line of ALL messages sent to my cpan.org address or it
+will likely be overlooked.
 
 =back
 

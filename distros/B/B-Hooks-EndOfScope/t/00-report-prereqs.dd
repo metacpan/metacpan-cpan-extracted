@@ -31,7 +31,7 @@ do { my $x = {
                                       'Test::Pod::No404s' => '0',
                                       'Test::Portability::Files' => '0',
                                       'Test::Spelling' => '0.12',
-                                      'Variable::OnDestruct' => '0.07'
+                                      'Variable::Magic' => '0.48'
                                     }
                     },
        'runtime' => {
@@ -44,7 +44,7 @@ do { my $x = {
                                       'warnings' => '0'
                                     },
                       'suggests' => {
-                                      'Variable::OnDestruct' => '0.07'
+                                      'Variable::Magic' => '0.48'
                                     }
                     },
        'test' => {

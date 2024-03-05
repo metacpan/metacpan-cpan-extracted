@@ -5,48 +5,43 @@ use strict;
 use warnings;
 
 sub description { 'Exim' }
-sub make {
+sub inquire {
     # Detect an error from Exim
     # @param    [Hash] mhead    Message headers of a bounce email
     # @param    [String] mbody  Message body of a bounce email
     # @return   [Hash]          Bounce data list and message/rfc822 part
-    # @return   [Undef]         failed to parse or the arguments are missing
+    # @return   [undef]         failed to parse or the arguments are missing
     # @since v4.0.0
     my $class = shift;
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
-    my $match = 0;
-    return undef if $mhead->{'from'} =~/[@].+[.]mail[.]ru[>]?/;
+    return undef if index($mhead->{'from'}, '.mail.ru') > 0;
 
     # Message-Id: <E1P1YNN-0003AD-Ga@example.org>
     # X-Failed-Recipients: kijitora@example.ed.jp
+    my $match = 0;
+    my $msgid = $mhead->{'message-id'} || '';
     $match++ if index($mhead->{'from'}, 'Mail Delivery System') == 0;
-    $match++ if defined $mhead->{'message-id'} &&
-                $mhead->{'message-id'} =~ /\A[<]\w{7}[-]\w{6}[-]\w{2}[@]/;
-    $match++ if $mhead->{'subject'} =~ qr{(?:
-         Mail[ ]delivery[ ]failed(:[ ]returning[ ]message[ ]to[ ]sender)?
-        |Warning:[ ]message[ ][^ ]+[ ]delayed[ ]+
-        |Delivery[ ]Status[ ]Notification
-        |Mail[ ]failure
-        |Message[ ]frozen
-        |error[(]s[)][ ]in[ ]forwarding[ ]or[ ]filtering
-        )
-    }x;
+    $match++ if index($msgid, '<') == 0 && index($msgid, '-') == 8 && index($msgid, '@') == 18;
+    $match++ if grep { index($mhead->{'subject'}, $_) > -1 } ( 'Delivery Status Notification',
+                                                               'Mail delivery failed',
+                                                               'Mail failure',
+                                                               'Message frozen',
+                                                               'Warning: message ',
+                                                               'error(s) in forwarding or filtering');
     return undef if $match < 2;
 
     state $indicators = __PACKAGE__->INDICATORS;
-    state $rebackbone = qr{^(?:
+    state $boundaries = [
         # deliver.c:6423|          if (bounce_return_body) fprintf(f,
         # deliver.c:6424|"------ This is a copy of the message, including all the headers. ------\n");
         # deliver.c:6425|          else fprintf(f,
         # deliver.c:6426|"------ This is a copy of the message's headers. ------\n");
-         [-]+[ ]This[ ]is[ ]a[ ]copy[ ]of[ ](?:the|your)[ ]message,[ ]including[ ]all[ ]the[ ]headers[.][ ][-]+
-        |Content-Type:[ ]*message/rfc822\n(?:[\s\t]+.*?\n\n)?
-        )
-    }msx;
-    state $startingof = { 'deliverystatus' => ['Content-type: message/delivery-status'] };
-    state $markingsof = {
-        # Error text regular expressions which defined in exim/src/deliver.c
+        '------ This is a copy of the message, including all the headers. ------',
+        'Content-Type: message/rfc822',
+    ];
+    state $startingof = {
+        # Error text strings which defined in exim/src/deliver.c
         #
         # deliver.c:6292| fprintf(f,
         # deliver.c:6293|"This message was created automatically by mail delivery software.\n");
@@ -63,18 +58,19 @@ sub make {
         # deliver.c:6304|"could not be delivered to one or more of its recipients. The following\n"
         # deliver.c:6305|"address(es) failed:\n", sender_address);
         # deliver.c:6306|          }
-        'alias'   => qr/\A([ ]+an undisclosed address)\z/,
-        'message' => qr{\A(?>
-             This[ ]message[ ]was[ ]created[ ]automatically[ ]by[ ]mail[ ]delivery[ ]software[.]
-            |A[ ]message[ ]that[ ]you[ ]sent[ ]was[ ]rejected[ ]by[ ]the[ ]local[ ]scannning[ ]code
-            |A[ ]message[ ]that[ ]you[ ]sent[ ]contained[ ]one[ ]or[ ]more[ ]recipient[ ]addresses[ ]
-            |A[ ]message[ ]that[ ]you[ ]sent[ ]could[ ]not[ ]be[ ]delivered[ ]to[ ]all[ ]of[ ]its[ ]recipients
-            |Message[ ][^ ]+[ ](?:has[ ]been[ ]frozen|was[ ]frozen[ ]on[ ]arrival)
-            |The[ ][^ ]+[ ]router[ ]encountered[ ]the[ ]following[ ]error[(]s[)]:
-            )
-        }x,
-        'frozen'  => qr/\AMessage [^ ]+ (?:has been frozen|was frozen on arrival)/,
+        'deliverystatus' => ['Content-Type: message/delivery-status'],
+        'frozen'         => [' has been frozen', ' was frozen on arrival'],
+        'message'        => [
+            'This message was created automatically by mail delivery software.',
+            'A message that you sent was rejected by the local scannning code',
+            'A message that you sent contained one or more recipient addresses ',
+            'A message that you sent could not be delivered to all of its recipients',
+            ' has been frozen',
+            ' was frozen on arrival',
+            ' router encountered the following error(s):',
+        ],
     };
+    state $markingsof = { 'alias' => ' an undisclosed address' };
     state $recommands = [
         # transports/smtp.c:564|  *message = US string_sprintf("SMTP error from remote mail server after %s%s: "
         # transports/smtp.c:837|  string_sprintf("SMTP error from remote mail server after RCPT TO:<%s>: "
@@ -149,10 +145,9 @@ sub make {
         'was frozen on arrival by ',
     ];
 
-    require Sisimai::RFC1894;
     my $fieldtable = Sisimai::RFC1894->FIELDTABLE;
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
-    my $emailsteak = Sisimai::RFC5322->fillet($mbody, $rebackbone);
+    my $emailparts = Sisimai::RFC5322->part($mbody, $boundaries);
     my $readcursor = 0;     # (Integer) Points the current cursor position
     my $nextcursor = 0;
     my $recipients = 0;     # (Integer) The number of 'Final-Recipient' header
@@ -161,19 +156,19 @@ sub make {
     my $v = undef;
 
     if( $mhead->{'content-type'} ) {
-        # Get the boundary string and set regular expression for matching with
-        # the boundary string.
-        $boundary00 = Sisimai::MIME->boundary($mhead->{'content-type'});
+        # Get the boundary string and set regular expression for matching with the boundary string.
+        $boundary00 = Sisimai::RFC2045->boundary($mhead->{'content-type'});
     }
 
-    for my $e ( split("\n", $emailsteak->[0]) ) {
-        # Read error messages and delivery status lines from the head of the email
-        # to the previous line of the beginning of the original message.
+    my $p1 = -1; my $p2 = -1;
+    for my $e ( split("\n", $emailparts->[0]) ) {
+        # Read error messages and delivery status lines from the head of the email to the previous
+        # line of the beginning of the original message.
         unless( $readcursor ) {
             # Beginning of the bounce message or message/delivery-status part
-            if( $e =~ $markingsof->{'message'} ) {
+            if( grep { index($e, $_) > -1 } $startingof->{'message'}->@* ) {
                 $readcursor |= $indicators->{'deliverystatus'};
-                next unless $e =~ $markingsof->{'frozen'};
+                next unless grep { index($e, $_) > -1 } $startingof->{'frozen'}->@*;
             }
         }
         next unless $readcursor & $indicators->{'deliverystatus'};
@@ -189,103 +184,126 @@ sub make {
         #    host neko.example.jp [192.0.2.222]: 550 5.1.1 <kijitora@example.jp>... User Unknown
         $v = $dscontents->[-1];
 
-        if( $e =~ /\A[ \t]{2}([^ \t]+[@][^ \t]+[.]?[a-zA-Z]+)(:.+)?\z/ ||
-            $e =~ /\A[ \t]{2}[^ \t]+[@][^ \t]+[.][a-zA-Z]+[ ]<(.+?[@].+?)>:.+\z/ ||
-            $e =~ $markingsof->{'alias'} ) {
-            #   kijitora@example.jp
-            #   sabineko@example.jp: forced freeze
-            #   mikeneko@example.jp <nekochan@example.org>: ...
-            #
-            # deliver.c:4549|  printed = US"an undisclosed address";
-            #   an undisclosed address
-            #     (generated from kijitora@example.jp)
-            my $r = $1;
+        my $cv = '';
+        my $ce = 0;
+        while(1) {
+            # Check if the line matche the following patterns:
+            last unless index($e, '  ')        ==  0;   # The line should start with "  " (2 spaces)
+            last unless index($e, '@' )         >  1;   # "@" should be included (email)
+            last unless index($e, '.' )         >  1;   # "." should be included (domain part)
+            last unless index($e, 'pipe to |') == -1;   # Exclude "pipe to /path/to/prog" line
 
+            my $cx = substr($e, 2, 1);
+            last unless $cx ne ' ';
+            last unless $cx ne '<';
+
+            $ce = 1; last;
+        }
+
+        if( $ce == 1 || index($e, $markingsof->{'alias'}) > 0 ) {
+            # The line is including an email address
             if( $v->{'recipient'} ) {
-                # There are multiple recipient addresses in the message body.
                 push @$dscontents, __PACKAGE__->DELIVERYSTATUS;
                 $v = $dscontents->[-1];
             }
 
-            if( $e =~ /\A[ \t]+[^ \t]+[@][^ \t]+[.][a-zA-Z]+[ ]<(.+?[@].+?)>:.+\z/ ) {
-                # parser.c:743| while (bracket_count-- > 0) if (*s++ != '>')
-                # parser.c:744|   {
-                # parser.c:745|   *errorptr = s[-1] == 0
-                # parser.c:746|     ? US"'>' missing at end of address"
-                # parser.c:747|     : string_sprintf("malformed address: %.32s may not follow %.*s",
-                # parser.c:748|     s-1, (int)(s - US mailbox - 1), mailbox);
-                # parser.c:749|   goto PARSE_FAILED;
-                # parser.c:750|   }
-                $r = $1;
-                $v->{'diagnosis'} = $e;
+            if( index($e, $markingsof->{'alias'}) > 0 ) {
+                # The line does not include an email address
+                # deliver.c:4549|  printed = US"an undisclosed address";
+                #   an undisclosed address
+                #     (generated from kijitora@example.jp)
+                $cv = substr($e, 2,);
+
+            } else {
+                #   kijitora@example.jp
+                #   sabineko@example.jp: forced freeze
+                #   mikeneko@example.jp <nekochan@example.org>: ...
+                $p1 = index($e, ' <');
+                $p2 = index($e, '>:');
+
+                if( $p1 > 1 && $p2 > 1 ) {
+                    # There are an email address and an error message in the line
+                    # parser.c:743| while (bracket_count-- > 0) if (*s++ != '>')
+                    # parser.c:744|   {
+                    # parser.c:745|   *errorptr = s[-1] == 0
+                    # parser.c:746|     ? US"'>' missing at end of address"
+                    # parser.c:747|     : string_sprintf("malformed address: %.32s may not follow %.*s",
+                    # parser.c:748|     s-1, (int)(s - US mailbox - 1), mailbox);
+                    # parser.c:749|   goto PARSE_FAILED;
+                    # parser.c:750|   }
+                    $cv = Sisimai::Address->s3s4(substr($e, $p1 + 1, $p2 - $p1 - 1));
+                    $v->{'diagnosis'} = Sisimai::String->sweep(substr($e, $p2 + 1,));
+
+                } else {
+                    # There is an email address only in the line
+                    #   kijitora@example.jp
+                    $cv = Sisimai::Address->s3s4(substr($e, 2,));
+                }
             }
-            $v->{'recipient'} = $r;
+            $v->{'recipient'} = $cv;
             $recipients++;
 
-        } elsif( $e =~ /\A[ ]+[(]generated[ ]from[ ](.+)[)]\z/ ||
-                 $e =~ /\A[ ]+generated[ ]by[ ]([^ \t]+[@][^ \t]+)/ ) {
+        } elsif( index($e, ' (generated from ') > 0 || index($e, ' generated by ') > 0 ) {
             #     (generated from kijitora@example.jp)
             #  pipe to |/bin/echo "Some pipe output"
             #    generated by userx@myhost.test.ex
-            $v->{'alias'} = $1;
+            $v->{'alias'} = Sisimai::Address->s3s4(substr($e, rindex($e, ' ') + 1,));
 
         } else {
             next unless length $e;
 
-            if( $e =~ $markingsof->{'frozen'} ) {
+            if( grep { index($e, $_) > -1 } $startingof->{'frozen'}->@* ) {
                 # Message *** has been frozen by the system filter.
                 # Message *** was frozen on arrival by ACL.
                 $v->{'alterrors'} .= $e.' ';
 
-            } else {
-                if( $boundary00 ) {
-                    # --NNNNNNNNNN-eximdsn-MMMMMMMMMM
-                    # Content-type: message/delivery-status
-                    # ...
-                    if( Sisimai::RFC1894->match($e) ) {
-                        # $e matched with any field defined in RFC3464
-                        next unless my $o = Sisimai::RFC1894->field($e);
+            } elsif( $boundary00 ) {
+                # --NNNNNNNNNN-eximdsn-MMMMMMMMMM
+                # Content-type: message/delivery-status
+                # ...
+                if( Sisimai::RFC1894->match($e) ) {
+                    # $e matched with any field defined in RFC3464
+                    next unless my $o = Sisimai::RFC1894->field($e);
 
-                        if( $o->[-1] eq 'addr' ) {
-                            # Final-Recipient: rfc822;|/bin/echo "Some pipe output"
-                            next unless $o->[0] eq 'final-recipient';
-                            $v->{'spec'} ||= rindex($o->[2], '@') > -1 ? 'SMTP' : 'X-UNIX';
+                    if( $o->[-1] eq 'addr' ) {
+                        # Final-Recipient: rfc822;|/bin/echo "Some pipe output"
+                        next unless $o->[0] eq 'final-recipient';
+                        $v->{'spec'} ||= rindex($o->[2], '@') > -1 ? 'SMTP' : 'X-UNIX';
 
-                        } elsif( $o->[-1] eq 'code' ) {
-                            # Diagnostic-Code: SMTP; 550 5.1.1 <userunknown@example.jp>... User Unknown
-                            $v->{'spec'} = uc $o->[1];
-                            $v->{'diagnosis'} = $o->[2];
+                    } elsif( $o->[-1] eq 'code' ) {
+                        # Diagnostic-Code: SMTP; 550 5.1.1 <userunknown@example.jp>... User Unknown
+                        $v->{'spec'} = uc $o->[1];
+                        $v->{'diagnosis'} = $o->[2];
 
-                        } else {
-                            # Other DSN fields defined in RFC3464
-                            next unless exists $fieldtable->{ $o->[0] };
-                            $v->{ $fieldtable->{ $o->[0] } } = $o->[2];
-                        }
                     } else {
-                        # Error message ?
-                        next if $nextcursor;
-                        # Content-type: message/delivery-status
-                        $nextcursor = 1 if index($e, $startingof->{'deliverystatus'}) == 0;
-                        $v->{'alterrors'} .= $e.' ' if index($e, ' ') == 0;
+                        # Other DSN fields defined in RFC3464
+                        next unless exists $fieldtable->{ $o->[0] };
+                        $v->{ $fieldtable->{ $o->[0] } } = $o->[2];
                     }
                 } else {
-                    if( scalar @$dscontents == $recipients ) {
-                        # Error message
-                        next unless length $e;
-                        $v->{'diagnosis'} .= $e.' ';
+                    # Error message ?
+                    next if $nextcursor;
+                    # Content-type: message/delivery-status
+                    $nextcursor = 1 if index($e, $startingof->{'deliverystatus'}) == 0;
+                    $v->{'alterrors'} .= $e.' ' if index($e, ' ') == 0;
+                }
+            } else {
+                # There is no boundary string in $boundary00
+                if( scalar @$dscontents == $recipients ) {
+                    # Error message
+                    next unless length $e;
+                    $v->{'diagnosis'} .= $e.' ';
+
+                } else {
+                    # Error message when email address above does not include '@' and domain part.
+                    if( index($e, ' pipe to |/') > -1 ) {
+                        # pipe to |/path/to/prog ...
+                        #   generated by kijitora@example.com
+                        $v->{'diagnosis'} = $e;
 
                     } else {
-                        # Error message when email address above does not include '@'
-                        # and domain part.
-                        if( $e =~ m<\A[ ]+pipe[ ]to[ ][|]/[^ ]+> ) {
-                            # pipe to |/path/to/prog ...
-                            #   generated by kijitora@example.com
-                            $v->{'diagnosis'} = $e;
-
-                        } else {
-                            next unless index($e, '    ') == 0;
-                            $v->{'alterrors'} .= $e.' ';
-                        }
+                        next unless index($e, '    ') == 0;
+                        $v->{'alterrors'} .= $e.' ';
                     }
                 }
             }
@@ -307,7 +325,7 @@ sub make {
         if( defined $mhead->{'x-failed-recipients'} ) {
             # X-Failed-Recipients: kijitora@example.jp
             my @rcptinhead = split(',', $mhead->{'x-failed-recipients'});
-            for my $e ( @rcptinhead ) { $e =~ s/\A[ ]+//; $e =~ s/[ ]+\z// }
+            for my $e ( @rcptinhead ) { s/\A[ ]+//, s/[ ]+\z// for $e }
             $recipients = scalar @rcptinhead;
 
             for my $e ( @rcptinhead ) {
@@ -320,10 +338,12 @@ sub make {
     }
     return undef unless $recipients;
 
-    if( scalar @{ $mhead->{'received'} } ) {
+    if( scalar $mhead->{'received'}->@* ) {
         # Get the name of local MTA
         # Received: from marutamachi.example.org (c192128.example.net [192.0.2.128])
-        $localhost0 = $1 if $mhead->{'received'}->[-1] =~ /from[ \t]([^ ]+) /;
+        $p1 = index($mhead->{'received'}->[-1], 'from ');
+        $p2 = index($mhead->{'received'}->[-1], ' ', $p1 + 5);
+        $localhost0 = substr($mhead->{'received'}->[-1], $p1 + 5, $p2 - $p1 - 5) if $p1 > -1 && $p2 > $p1;
     }
 
     for my $e ( @$dscontents ) {
@@ -361,32 +381,27 @@ sub make {
                 # Override the value of diagnostic code message
                 $e->{'diagnosis'} = $e->{'alterrors'} if $e->{'alterrors'};
 
-            } else {
-                # Check the both value and try to match
-                if( length($e->{'diagnosis'}) < length($e->{'alterrors'}) ) {
-                    # Check the value of alterrors
-                    my $rxdiagnosis = qr/\Q$e->{'diagnosis'}\E/i;
-                    if( $e->{'alterrors'} =~ $rxdiagnosis ) {
-                        # Override the value of diagnostic code message because
-                        # the value of alterrors includes the value of diagnosis.
-                        $e->{'diagnosis'} = $e->{'alterrors'};
-                    }
-                }
+            } elsif( length($e->{'diagnosis'}) < length($e->{'alterrors'}) ) {
+                # Override the value of diagnostic code message with the value of alterrors because
+                # the latter includes the former.
+                $e->{'diagnosis'} = $e->{'alterrors'} if index(lc $e->{'alterrors'}, lc $e->{'diagnosis'}) > -1;
             }
             delete $e->{'alterrors'};
         }
-        $e->{'diagnosis'} =  Sisimai::String->sweep($e->{'diagnosis'});
-        $e->{'diagnosis'} =~ s/\b__.+\z//;
+        $e->{'diagnosis'} = Sisimai::String->sweep($e->{'diagnosis'}); $p1 = index($e->{'diagnosis'}, '__');
+        $e->{'diagnosis'} = substr($e->{'diagnosis'}, 0, $p1)       if $p1 > 1;
 
         unless( $e->{'rhost'} ) {
             # Get the remote host name
             # host neko.example.jp [192.0.2.222]: 550 5.1.1 <kijitora@example.jp>... User Unknown
-            $e->{'rhost'} = $1 if $e->{'diagnosis'} =~ /host[ \t]+([^ \t]+)[ \t]\[.+\]:[ \t]/;
+            $p1 = index($e->{'diagnosis'}, 'host ');
+            $p2 = index($e->{'diagnosis'}, ' ', $p1 + 5);
+            $e->{'rhost'} = substr($e->{'diagnosis'}, $p1 + 5, $p2 - $p1 - 5) if $p1 > -1;
 
-            if( ! $e->{'rhost'} && scalar @{ $mhead->{'received'} } ) {
+            if( ! $e->{'rhost'} && scalar $mhead->{'received'}->@* ) {
                 # Get localhost and remote host name from Received header.
                 my $r0 = $mhead->{'received'};
-                $e->{'rhost'} = pop @{ Sisimai::RFC5322->received($r0->[-1]) };
+                $e->{'rhost'} = pop Sisimai::RFC5322->received($r0->[-1])->@*;
             }
         }
 
@@ -406,85 +421,85 @@ sub make {
 
             } elsif( $e->{'command'} eq 'MAIL' ) {
                 # MAIL | Connected to 192.0.2.135 but sender was rejected.
-                # $e->{'reason'} = 'rejected';
                 $e->{'reason'} = 'onhold';
 
             } else {
                 # Verify each regular expression of session errors
                 SESSION: for my $r ( keys %$messagesof ) {
                     # Check each regular expression
-                    next unless grep { index($e->{'diagnosis'}, $_) > -1 } @{ $messagesof->{ $r } };
+                    next unless grep { index($e->{'diagnosis'}, $_) > -1 } $messagesof->{ $r }->@*;
                     $e->{'reason'} = $r;
                     last;
                 }
 
                 unless( $e->{'reason'} ) {
-                    # The reason "expired"
-                    $e->{'reason'} = 'expired' if grep { index($e->{'diagnosis'}, $_) > -1 } @$delayedfor;
+                    # The reason "expired", or "mailererror"
+                    $e->{'reason'}   = 'expired' if grep { index($e->{'diagnosis'}, $_) > -1 } @$delayedfor;
+                    $e->{'reason'} ||= 'mailererror' if index($e->{'diagnosis'}, 'pipe to |') > -1;
                 }
             }
         }
 
         STATUS: {
-            # Prefer the value of smtp reply code in Diagnostic-Code:
+            # Prefer the value of smtp reply code in Diagnostic-Code: field
             # See set-of-emails/maildir/bsd/exim-20.eml
+            #
             #   Action: failed
             #   Final-Recipient: rfc822;userx@test.ex
             #   Status: 5.0.0
             #   Remote-MTA: dns; 127.0.0.1
             #   Diagnostic-Code: smtp; 450 TEMPERROR: retry timeout exceeded
-            # The value of "Status:" indicates permanent error but the value
-            # of SMTP reply code in Diagnostic-Code: field is "TEMPERROR"!!!!
-            my $sv = $e->{'status'}    || Sisimai::SMTP::Status->find($e->{'diagnosis'}) || '';
-            my $rv = $e->{'replycode'} || Sisimai::SMTP::Reply->find($e->{'diagnosis'})  || '';
+            #
+            # The value of "Status:" indicates permanent error but the value of SMTP reply code in
+            # Diagnostic-Code: field is "TEMPERROR"!!!!
+            my $cs = $e->{'status'}    || Sisimai::SMTP::Status->find($e->{'diagnosis'}) || '';
+            my $cr = $e->{'replycode'} || Sisimai::SMTP::Reply->find($e->{'diagnosis'})  || '';
             my $s1 = 0; # First character of Status as integer
             my $r1 = 0; # First character of SMTP reply code as integer
             my $v1 = 0;
 
             FIND_CODE: while(1) {
                 # "Status:" field did not exist in the bounce message
-                last if $sv;
-                last unless $rv;
+                last if $cs;
+                last unless $cr;
 
-                # Check SMTP reply code
-                # Generate pseudo DSN code from SMTP reply code
-                $r1 = substr($rv, 0, 1);
+                # Check SMTP reply code, Generate pseudo DSN code from SMTP reply code
+                $r1 = substr($cr, 0, 1);
                 if( $r1 == 4 ) {
                     # Get the internal DSN(temporary error)
-                    $sv = Sisimai::SMTP::Status->code($e->{'reason'}, 1) || '';
+                    $cs = Sisimai::SMTP::Status->code($e->{'reason'}, 1) || '';
 
                 } elsif( $r1 == 5 ) {
                     # Get the internal DSN(permanent error)
-                    $sv = Sisimai::SMTP::Status->code($e->{'reason'}, 0) || '';
+                    $cs = Sisimai::SMTP::Status->code($e->{'reason'}, 0) || '';
                 }
                 last;
             }
 
-            $s1  = substr($sv, 0, 1) if $sv;
+            $s1  = substr($cs, 0, 1) if $cs;
             $v1  = $s1 + $r1;
             $v1 += substr($e->{'status'}, 0, 1) if $e->{'status'};
 
             if( $v1 > 0 ) {
-                # Status or SMTP reply code exists
-                # Set pseudo DSN into the value of "status" accessor
-                $e->{'status'} = $sv if $r1 > 0;
+                # Status or SMTP reply code exists, Set pseudo DSN into the value of "status" accessor
+                $e->{'status'} = $cs if $r1 > 0;
 
             } else {
                 # Neither Status nor SMTP reply code exist
                 if( $e->{'reason'} eq 'expired' || $e->{'reason'} eq 'mailboxfull' ) {
                     # Set pseudo DSN (temporary error)
-                    $sv = Sisimai::SMTP::Status->code($e->{'reason'}, 1) || '';
+                    $cs = Sisimai::SMTP::Status->code($e->{'reason'}, 1) || '';
 
                 } else {
                     # Set pseudo DSN (permanent error)
-                    $sv = Sisimai::SMTP::Status->code($e->{'reason'}, 0) || '';
+                    $cs = Sisimai::SMTP::Status->code($e->{'reason'}, 0) || '';
                 }
             }
-            $e->{'status'} ||= $sv;
+            $e->{'status'} ||= $cs;
         }
         $e->{'command'} ||= '';
     }
-    return { 'ds' => $dscontents, 'rfc822' => $emailsteak->[1] };
+    return { 'ds' => $dscontents, 'rfc822' => $emailparts->[1] };
 }
 
 1;
@@ -502,8 +517,8 @@ Sisimai::Lhost::Exim - bounce mail parser class for C<Exim>.
 
 =head1 DESCRIPTION
 
-Sisimai::Lhost::Exim parses a bounce email which created by C<Exim>.
-Methods in the module are called from only Sisimai::Message.
+Sisimai::Lhost::Exim parses a bounce email which created by C<Exim>. Methods in the module are called
+from only Sisimai::Message.
 
 =head1 CLASS METHODS
 
@@ -513,10 +528,10 @@ C<description()> returns description string of this module.
 
     print Sisimai::Lhost::Exim->description;
 
-=head2 C<B<make(I<header data>, I<reference to body string>)>>
+=head2 C<B<inquire(I<header data>, I<reference to body string>)>>
 
-C<make()> method parses a bounced email and return results as a array reference.
-See Sisimai::Message for more details.
+C<inquire()> method parses a bounced email and return results as a array reference. See Sisimai::Message
+for more details.
 
 =head1 AUTHOR
 
@@ -524,7 +539,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2021 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2023 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

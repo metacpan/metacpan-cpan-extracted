@@ -12,7 +12,7 @@ use Time::HiRes qw ( time sleep );
 use HTTP::Tiny;
 use HTTP::Daemon 6.05; # Our log server needs this, but we load it here to find its version
 
-our $VERSION = '0.75';
+our $VERSION = '0.76';
 
 =head1 NAME
 
@@ -468,7 +468,7 @@ None by default.
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 
-Copyright (C) 2003-2023 Max Maischein
+Copyright (C) 2003-2024 Max Maischein
 
 =head1 AUTHOR
 

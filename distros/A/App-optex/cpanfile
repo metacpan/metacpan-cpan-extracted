@@ -1,12 +1,12 @@
 requires 'perl', '5.014';
 
-requires 'Getopt::EX', 'v1.28.0';
-requires 'Getopt::EX::Hashed', '1.03';
+requires 'Getopt::EX', '2.1.6';
+requires 'Getopt::EX::Hashed', '1.0503';
 requires 'List::Util', '1.45';
 requires 'Hash::Util';
 requires 'TOML', '0.95';
 requires 'Text::VisualWidth::PP', '0.05';
-requires 'Text::ANSI::Tabs', '0.07';
+requires 'Text::ANSI::Tabs', '1.03';
 requires 'Time::Piece';
 
 on 'test' => sub {

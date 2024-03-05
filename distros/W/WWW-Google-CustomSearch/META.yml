@@ -20,22 +20,22 @@ no_index:
 provides:
   WWW::Google::CustomSearch:
     file: lib/WWW/Google/CustomSearch.pm
-    version: '0.39'
+    version: '0.40'
   WWW::Google::CustomSearch::Item:
     file: lib/WWW/Google/CustomSearch/Item.pm
-    version: '0.39'
+    version: '0.40'
   WWW::Google::CustomSearch::Page:
     file: lib/WWW/Google/CustomSearch/Page.pm
-    version: '0.39'
+    version: '0.40'
   WWW::Google::CustomSearch::Params:
     file: lib/WWW/Google/CustomSearch/Params.pm
-    version: '0.39'
+    version: '0.40'
   WWW::Google::CustomSearch::Request:
     file: lib/WWW/Google/CustomSearch/Request.pm
-    version: '0.39'
+    version: '0.40'
   WWW::Google::CustomSearch::Result:
     file: lib/WWW/Google/CustomSearch/Result.pm
-    version: '0.39'
+    version: '0.40'
 requires:
   JSON: '2.53'
   Moo: '2.000000'
@@ -46,5 +46,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/WWW-Google-CustomSearch.git
-version: '0.39'
+version: '0.40'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -15,25 +15,27 @@ use Hash::Wrap ( {
 );
 
 
-my %hash = ( a => 1, b => 2, c => [9] );
+sub my_hash { ( a => 1, b => 2, c => [9] ); }
 
 subtest "default" => sub {
-    my $obj = wrap_as_exists \%hash;
+    my %hash = my_hash;
+    my $obj  = wrap_as_exists \%hash;
 
-    is( $obj->a, 1, 'retrieve value' );
-    is( $obj->b, 2, 'retrieve another value' );
+    is( $obj->a, 1,   'retrieve value' );
+    is( $obj->b, 2,   'retrieve another value' );
     is( $obj->c, [9], 'retrieve another value' );
 
     ok( $obj->exists( 'a' ),  "a exists" );
     ok( !$obj->exists( 'd' ), "d does not exist" );
-    ok( ! exists $hash{d}, "exists doesn't autovivify" );
+    ok( !exists $hash{d},     "exists doesn't autovivify" );
 };
 
 subtest "rename" => sub {
-    my $obj = wrap_as_foo \%hash;
+    my %hash = my_hash;
+    my $obj  = wrap_as_foo \%hash;
 
-    is( $obj->a, 1, 'retrieve value' );
-    is( $obj->b, 2, 'retrieve another value' );
+    is( $obj->a, 1,   'retrieve value' );
+    is( $obj->b, 2,   'retrieve another value' );
     is( $obj->c, [9], 'retrieve another value' );
 
     ok( $obj->foo( 'a' ),  "a exists" );

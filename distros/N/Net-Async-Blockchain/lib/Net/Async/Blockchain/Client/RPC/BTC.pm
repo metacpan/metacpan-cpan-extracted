@@ -3,7 +3,7 @@ package Net::Async::Blockchain::Client::RPC::BTC;
 use strict;
 use warnings;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 =head1 NAME
 
@@ -191,6 +191,23 @@ L<Future> - json object with all balances in BTC
 sub get_balances {
     my ($self, @params) = @_;
     return $self->_request('getbalances', @params);
+}
+
+=head2 get_balance
+
+https://bitcoincore.org/en/doc/24.0.0/rpc/wallet/getbalance/
+
+=over 4
+
+=back
+
+L<Future> - numeric total amount in the wallet with n number of confirmations
+
+=cut
+
+sub get_balance {
+    my ($self, @params) = @_;
+    return $self->_request('getbalance', @params);
 }
 
 1;

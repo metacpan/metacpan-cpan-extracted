@@ -6,12 +6,12 @@ use warnings;
 
 # https://aws.amazon.com/ses/
 sub description { 'Amazon SES(Receiving): https://aws.amazon.com/ses/' };
-sub make {
+sub inquire {
     # Detect an error from Amazon SES/Receiving
     # @param    [Hash] mhead    Message headers of a bounce email
     # @param    [String] mbody  Message body of a bounce email
     # @return   [Hash]          Bounce data list and message/rfc822 part
-    # @return   [Undef]         failed to parse or the arguments are missing
+    # @return   [undef]         failed to parse or the arguments are missing
     # @since v4.1.29
     my $class = shift;
     my $mhead = shift // return undef;
@@ -22,7 +22,7 @@ sub make {
     return undef unless $mhead->{'x-ses-outgoing'};
 
     state $indicators = __PACKAGE__->INDICATORS;
-    state $rebackbone = qr|^content-type:[ ]text/rfc822-headers|m;
+    state $boundaries = ['Content-Type: text/rfc822-headers'];
     state $startingof = { 'message' => ['This message could not be delivered.'] };
     state $messagesof = {
         # The followings are error messages in Rule sets/*/Actions/Template
@@ -32,20 +32,18 @@ sub make {
         'contenterror' => ['Message content rejected'],
     };
 
-    require Sisimai::RFC1894;
     my $fieldtable = Sisimai::RFC1894->FIELDTABLE;
     my $permessage = {};    # (Hash) Store values of each Per-Message field
-
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
-    my $emailsteak = Sisimai::RFC5322->fillet($mbody, $rebackbone);
+    my $emailparts = Sisimai::RFC5322->part($mbody, $boundaries);
     my $readcursor = 0;     # (Integer) Points the current cursor position
     my $recipients = 0;     # (Integer) The number of 'Final-Recipient' header
     my $v = undef;
     my $p = '';
 
-    for my $e ( split("\n", $emailsteak->[0]) ) {
-        # Read error messages and delivery status lines from the head of the email
-        # to the previous line of the beginning of the original message.
+    for my $e ( split("\n", $emailparts->[0]) ) {
+        # Read error messages and delivery status lines from the head of the email to the previous
+        # line of the beginning of the original message.
         unless( $readcursor ) {
             # Beginning of the bounce message or message/delivery-status part
             $readcursor |= $indicators->{'deliverystatus'} if index($e, $startingof->{'message'}->[0]) == 0;
@@ -92,8 +90,8 @@ sub make {
         } else {
             # Continued line of the value of Diagnostic-Code field
             next unless index($p, 'Diagnostic-Code:') == 0;
-            next unless $e =~ /\A[ \t]+(.+)\z/;
-            $v->{'diagnosis'} .= ' '.$1;
+            next unless index($e, ' ') == 0;
+            $v->{'diagnosis'} .= ' '.Sisimai::String->sweep($e);
         }
     } continue {
         # Save the current line for the next loop
@@ -108,23 +106,25 @@ sub make {
         $e->{'diagnosis'} =~ y/\n/ /;
         $e->{'diagnosis'} =  Sisimai::String->sweep($e->{'diagnosis'});
 
-        if( $e->{'status'} =~ /\A[45][.][01][.]0\z/ ) {
+        if( index($e->{'status'}, '.0.0') > 0 || index($e->{'status'}, '.1.0') > 0 ) {
             # Get other D.S.N. value from the error message
             # 5.1.0 - Unknown address error 550-'5.7.1 ...
             my $errormessage = $e->{'diagnosis'};
-               $errormessage = $1 if $e->{'diagnosis'} =~ /["'](\d[.]\d[.]\d.+)['"]/;
-            $e->{'status'}   = Sisimai::SMTP::Status->find($errormessage) || $e->{'status'};
+            my $p1 =  index($e->{'diagnosis'}, "-'"); $p1 =  index($e->{'diagnosis'}, '-"') if $p1 < 0;
+            my $p2 = rindex($e->{'diagnosis'}, "' "); $p2 = rindex($e->{'diagnosis'}, '" ') if $p2 < 0;
+            $errormessage  = substr($e->{'diagnosis'}, $p1 + 2, $p2 - $p1 - 2) if $p1 > -1 && $p2 > -1;
+            $e->{'status'} = Sisimai::SMTP::Status->find($errormessage) || $e->{'status'};
         }
 
         SESSION: for my $r ( keys %$messagesof ) {
             # Verify each regular expression of session errors
-            next unless grep { index($e->{'diagnosis'}, $_) > -1 } @{ $messagesof->{ $r } };
+            next unless grep { index($e->{'diagnosis'}, $_) > -1 } $messagesof->{ $r }->@*;
             $e->{'reason'} = $r;
             last;
         }
         $e->{'reason'} ||= Sisimai::SMTP::Status->name($e->{'status'}) || '';
     }
-    return { 'ds' => $dscontents, 'rfc822' => $emailsteak->[1] };
+    return { 'ds' => $dscontents, 'rfc822' => $emailparts->[1] };
 }
 
 1;
@@ -153,10 +153,10 @@ C<description()> returns description string of this module.
 
     print Sisimai::Lhost::ReceivingSES->description;
 
-=head2 C<B<make(I<header data>, I<reference to body string>)>>
+=head2 C<B<inquire(I<header data>, I<reference to body string>)>>
 
-C<make()> method parses a bounced email and return results as a array reference.
-See Sisimai::Message for more details.
+C<inquire()> method parses a bounced email and return results as a array reference. See Sisimai::Message
+for more details.
 
 =head1 AUTHOR
 
@@ -164,7 +164,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2015-2020 azumakuniyuki, All rights reserved.
+Copyright (C) 2015-2023 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

@@ -34,7 +34,7 @@
       "runtime" : {
          "requires" : {
             "DateTime" : "0.72",
-            "Locale::CLDR" : "v0.44.0",
+            "Locale::CLDR" : "v0.44.1",
             "Moo" : "2",
             "MooX::ClassAttribute" : "0.011",
             "Type::Tiny" : "0",
@@ -46,123 +46,123 @@
    "provides" : {
       "Locale::CLDR::Locales::Ar" : {
          "file" : "lib/Locale/CLDR/Locales/Ar.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Ar::Arab" : {
          "file" : "lib/Locale/CLDR/Locales/Ar/Arab.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Ar::Arab::001" : {
          "file" : "lib/Locale/CLDR/Locales/Ar/Arab/001.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Ar::Arab::Ae" : {
          "file" : "lib/Locale/CLDR/Locales/Ar/Arab/Ae.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Ar::Arab::Bh" : {
          "file" : "lib/Locale/CLDR/Locales/Ar/Arab/Bh.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Ar::Arab::Dj" : {
          "file" : "lib/Locale/CLDR/Locales/Ar/Arab/Dj.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Ar::Arab::Dz" : {
          "file" : "lib/Locale/CLDR/Locales/Ar/Arab/Dz.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Ar::Arab::Eg" : {
          "file" : "lib/Locale/CLDR/Locales/Ar/Arab/Eg.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Ar::Arab::Eh" : {
          "file" : "lib/Locale/CLDR/Locales/Ar/Arab/Eh.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Ar::Arab::Er" : {
          "file" : "lib/Locale/CLDR/Locales/Ar/Arab/Er.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Ar::Arab::Il" : {
          "file" : "lib/Locale/CLDR/Locales/Ar/Arab/Il.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Ar::Arab::Iq" : {
          "file" : "lib/Locale/CLDR/Locales/Ar/Arab/Iq.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Ar::Arab::Jo" : {
          "file" : "lib/Locale/CLDR/Locales/Ar/Arab/Jo.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Ar::Arab::Km" : {
          "file" : "lib/Locale/CLDR/Locales/Ar/Arab/Km.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Ar::Arab::Kw" : {
          "file" : "lib/Locale/CLDR/Locales/Ar/Arab/Kw.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Ar::Arab::Lb" : {
          "file" : "lib/Locale/CLDR/Locales/Ar/Arab/Lb.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Ar::Arab::Ly" : {
          "file" : "lib/Locale/CLDR/Locales/Ar/Arab/Ly.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Ar::Arab::Ma" : {
          "file" : "lib/Locale/CLDR/Locales/Ar/Arab/Ma.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Ar::Arab::Mr" : {
          "file" : "lib/Locale/CLDR/Locales/Ar/Arab/Mr.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Ar::Arab::Om" : {
          "file" : "lib/Locale/CLDR/Locales/Ar/Arab/Om.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Ar::Arab::Ps" : {
          "file" : "lib/Locale/CLDR/Locales/Ar/Arab/Ps.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Ar::Arab::Qa" : {
          "file" : "lib/Locale/CLDR/Locales/Ar/Arab/Qa.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Ar::Arab::Sa" : {
          "file" : "lib/Locale/CLDR/Locales/Ar/Arab/Sa.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Ar::Arab::Sd" : {
          "file" : "lib/Locale/CLDR/Locales/Ar/Arab/Sd.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Ar::Arab::So" : {
          "file" : "lib/Locale/CLDR/Locales/Ar/Arab/So.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Ar::Arab::Ss" : {
          "file" : "lib/Locale/CLDR/Locales/Ar/Arab/Ss.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Ar::Arab::Sy" : {
          "file" : "lib/Locale/CLDR/Locales/Ar/Arab/Sy.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Ar::Arab::Td" : {
          "file" : "lib/Locale/CLDR/Locales/Ar/Arab/Td.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Ar::Arab::Tn" : {
          "file" : "lib/Locale/CLDR/Locales/Ar/Arab/Tn.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Ar::Arab::Ye" : {
          "file" : "lib/Locale/CLDR/Locales/Ar/Arab/Ye.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       }
    },
    "release_status" : "stable",
@@ -175,6 +175,6 @@
          "url" : "https://github.com/ThePilgrim/perlcldr.git"
       }
    },
-   "version" : "v0.44.0",
+   "version" : "v0.44.1",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

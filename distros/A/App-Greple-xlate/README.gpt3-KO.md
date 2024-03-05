@@ -10,7 +10,7 @@ App::Greple::xlate - greple을 위한 번역 지원 모듈
 
 # VERSION
 
-Version 0.30
+Version 0.31
 
 # DESCRIPTION
 
@@ -158,7 +158,52 @@ Version 0.30
 
 # COMMAND LINE INTERFACE
 
-이 저장소에 포함된 `xlate` 명령을 사용하여 이 모듈을 쉽게 명령 줄에서 사용할 수 있습니다. 사용법은 `xlate` 도움말 정보를 참조하십시오.
+이 배포에 포함된 `xlate` 명령을 사용하여 이 모듈을 쉽게 명령 줄에서 사용할 수 있습니다. 사용법은 `xlate` 도움말 정보를 참조하십시오.
+
+`xlate` 명령은 Docker 환경과 함께 작동하므로, 아무것도 설치하지 않은 상태에서 Docker가 사용 가능하다면 사용할 수 있습니다. `-D` 또는 `-C` 옵션을 사용하십시오.
+
+또한, 다양한 문서 스타일에 대한 makefile이 제공되므로, 특별한 지정 없이 다른 언어로 번역할 수 있습니다. `-M` 옵션을 사용하십시오.
+
+Docker와 make 옵션을 결합하여 Docker 환경에서 make를 실행할 수도 있습니다.
+
+`xlate -GC`와 같이 실행하면 현재 작업 중인 git 저장소가 마운트된 셸이 시작됩니다.
+
+자세한 내용은 ["SEE ALSO"](#see-also) 섹션에 있는 일본어 기사를 읽어보세요.
+
+    xlate [ options ] -t lang file [ greple options ]
+        -h   help
+        -v   show version
+        -d   debug
+        -n   dry-run
+        -a   use API
+        -c   just check translation area
+        -r   refresh cache
+        -s   silent mode
+        -e # translation engine (default "deepl")
+        -p # pattern to determine translation area
+        -w # wrap line by # width
+        -o # output format (default "xtxt", or "cm", "ifdef")
+        -f # from lang (ignored)
+        -t # to lang (required, no default)
+        -m # max length per API call
+        -l # show library files (XLATE.mk, xlate.el)
+        --   terminate option parsing
+    Make options
+        -M   run make
+        -n   dry-run
+    Docker options
+        -G   mount git top-level directory
+        -B   run in non-interactive (batch) mode
+        -R   mount read-only
+        -E * specify environment variable to be inherited
+        -I * specify altanative docker image (default: tecolicom/xlate:version)
+        -D * run xlate on the container with the rest parameters
+        -C * run following command on the container, or run shell
+
+    Control Files:
+        *.LANG    translation languates
+        *.FORMAT  translation foramt (xtxt, cm, ifdef)
+        *.ENGINE  translation engine (deepl or gpt3)
 
 # EMACS
 

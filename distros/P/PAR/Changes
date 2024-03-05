@@ -1,3 +1,11 @@
+1.020  2024-03-04
+
+- restructure _extract_inc(): always add XS DLLs in 
+  PAR_TEMP/inc to PAR::Heavy::FullCache, ie. even if PAR_TEMP/inc 
+  already exists (hence we don't need to extract the zip), cf. #11
+
+- bump minimum perl version to 5.8.9 everywhere
+
 1.019  2023-11-01
 
 - register XS DLLs extracted into $PAR_TEMP/inc with %PAR::Heavy::FullCache

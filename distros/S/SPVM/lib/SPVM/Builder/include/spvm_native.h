@@ -15,9 +15,9 @@
 
 #define SPVM_NATIVE_SET_POINTER(object, pointer) (*(void**)object = pointer)
 
-#define spvm_warn(format, ...) fprintf(stderr, format "\n", ##__VA_ARGS__)
+#define spvm_warnf(stream, format, ...) fprintf(stream, format "\n  %s at %s line %d\n", ##__VA_ARGS__, __func__, __FILE__, __LINE__)
 
-#define spvm_warnf(stream, format, ...) fprintf(stream, format "\n", ##__VA_ARGS__)
+#define spvm_warn(format, ...) spvm_warnf(stderr, format, ##__VA_ARGS__)
 
 typedef union spvm_value SPVM_VALUE;
 
@@ -216,9 +216,9 @@ struct spvm_env {
   void* (*new_object_array)(SPVM_ENV* env, SPVM_VALUE* stack, void* basic_type, int32_t length);
   void* (*new_object_array_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, int32_t length, int32_t* error_id, const char* func_name, const char* file, int32_t line);
   void* (*new_string_array)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t length);
-  void* (*new_muldim_array_no_mortal)(SPVM_ENV* env, SPVM_VALUE* stack, void* basic_type, int32_t element_dimension, int32_t length);
-  void* (*new_muldim_array)(SPVM_ENV* env, SPVM_VALUE* stack, void* basic_type, int32_t element_dimension, int32_t length);
-  void* (*new_muldim_array_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, int32_t element_dimension, int32_t length, int32_t* error_id, const char* func_name, const char* file, int32_t line);
+  void* (*new_muldim_array_no_mortal)(SPVM_ENV* env, SPVM_VALUE* stack, void* basic_type, int32_t type_dimension, int32_t length);
+  void* (*new_muldim_array)(SPVM_ENV* env, SPVM_VALUE* stack, void* basic_type, int32_t type_dimension, int32_t length);
+  void* (*new_muldim_array_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, int32_t type_dimension, int32_t length, int32_t* error_id, const char* func_name, const char* file, int32_t line);
   void* (*new_mulnum_array_no_mortal)(SPVM_ENV* env, SPVM_VALUE* stack, void* basic_type, int32_t length);
   void* (*new_mulnum_array)(SPVM_ENV* env, SPVM_VALUE* stack, void* basic_type, int32_t length);
   void* (*new_mulnum_array_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, int32_t length, int32_t* error_id, const char* func_name, const char* file, int32_t line);
@@ -273,10 +273,10 @@ struct spvm_env {
   int32_t (*get_elem_size)(SPVM_ENV* env, SPVM_VALUE* stack, void* array);
   void* (*get_type_name_no_mortal)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
   void* (*get_type_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
-  void* (*get_compile_type_name_no_mortal)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, int32_t dimension, int32_t flag);
-  void* (*get_compile_type_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, int32_t dimension, int32_t flag);
+  void* (*get_compile_type_name_no_mortal)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, int32_t type_dimension, int32_t type_flag);
+  void* (*get_compile_type_name)(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, int32_t type_dimension, int32_t type_flag);
   int32_t (*enter_scope)(SPVM_ENV* env, SPVM_VALUE* stack);
-  void (*leave_scope)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t scope_id);
+  void (*leave_scope)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t mortal_stack_top);
   int32_t (*push_mortal)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
   int32_t (*weaken)(SPVM_ENV* env, SPVM_VALUE* stack, void** object_address);
   int32_t (*isweak)(SPVM_ENV* env, SPVM_VALUE* stack, void** object);
@@ -299,7 +299,7 @@ struct spvm_env {
   void (*free_memory_block)(SPVM_ENV* env, SPVM_VALUE* stack, void* block);
   int32_t (*get_memory_blocks_count)(SPVM_ENV* env, SPVM_VALUE* stack);
   void (*say)(SPVM_ENV* env, SPVM_VALUE* stack, void* string);
-  void (*warn)(SPVM_ENV* env, SPVM_VALUE* stack, void* string, const char* file, int32_t line);
+  void (*warn)(SPVM_ENV* env, SPVM_VALUE* stack, void* string, const char* basic_type_name, const char* method_name, const char* file, int32_t line);
   FILE* (*spvm_stdin)(SPVM_ENV* env, SPVM_VALUE* stack);
   FILE* (*spvm_stdout)(SPVM_ENV* env, SPVM_VALUE* stack);
   FILE* (*spvm_stderr)(SPVM_ENV* env, SPVM_VALUE* stack);
@@ -490,11 +490,11 @@ struct spvm_api_string_buffer {
 
 struct spvm_api_type {
   int32_t (*can_assign)(void* runtime, void* dist_basic_type, int32_t dist_type_dimension, int32_t dist_type_flag, void* src_basic_type, int32_t src_type_dimension, int32_t src_type_flag);
-  int32_t (*get_type_width)(void* runtime, void* basic_type, int32_t dimension, int32_t flag);
-  int32_t (*is_object_type)(void* runtime, void* basic_type, int32_t type_dimension, int32_t flag);
-  int32_t (*is_any_object_type)(void* runtime, void* basic_type, int32_t type_dimension, int32_t flag);
-  int32_t (*is_object_array_type)(void* runtime, void* basic_type, int32_t dimension, int32_t flag);
-  int32_t (*is_any_object_array_type)(void* runtime, void* basic_type, int32_t type_dimension, int32_t flag);
+  int32_t (*get_type_width)(void* runtime, void* basic_type, int32_t type_dimension, int32_t type_flag);
+  int32_t (*is_object_type)(void* runtime, void* basic_type, int32_t type_dimension, int32_t type_flag);
+  int32_t (*is_any_object_type)(void* runtime, void* basic_type, int32_t type_dimension, int32_t type_flag);
+  int32_t (*is_object_array_type)(void* runtime, void* basic_type, int32_t type_dimension, int32_t type_flag);
+  int32_t (*is_any_object_array_type)(void* runtime, void* basic_type, int32_t type_dimension, int32_t type_flag);
 };
 
 enum {

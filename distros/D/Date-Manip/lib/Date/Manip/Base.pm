@@ -27,7 +27,7 @@ use Encode qw(encode_utf8 from_to find_encoding decode _utf8_off _utf8_on is_utf
 require Date::Manip::Lang::index;
 
 our $VERSION;
-$VERSION='6.94';
+$VERSION='6.95';
 END { undef $VERSION; }
 
 ###############################################################################
@@ -136,10 +136,17 @@ sub _init_config {
 
       'firstday'         => '',
 
-      # If this is 0, use the ISO 8601 standard that Jan 4 is in week
-      # 1.  If 1, make week 1 contain Jan 1.
+      # If this is a value 'jan1' to 'jan7', then it means that the first
+      # week of the year contains that date.  If the value is 'dow1' to
+      # 'dow7', then the first week of the year is the one that contains
+      # the first occurence of the DoW given.  If the value is 'firstday',
+      # then the first week of the year is the one that contains the first
+      # occurence of the DoW given in the FirstDay config variable.
+      #
+      # The default ISO 8601 definition is the first week is the one which
+      # contains Jan 4 (so at least 4 of the days).
 
-      'jan1week1'        => '',
+      'week1ofyear'      => '',
 
       # Date::Manip printable format
       #   0 = YYYYMMDDHH:MN:SS
@@ -178,11 +185,12 @@ sub _init_config {
 
       # Whether to use the default printf formats or the POSIX ones.
 
-      #'use_posix_printf' => 0,
+      'use_posix_printf' => 0,
 
       # *** DEPRECATED 7.0 ***
 
       'tz'               => '',
+      'jan1week1'        => '',
      };
 
    #
@@ -206,12 +214,11 @@ sub _init_config {
    $self->_config_var('workdaybeg',   '08:00:00');
    $self->_config_var('workdayend',   '17:00:00');
    $self->_config_var('workday24hr',  0);
-
    $self->_config_var('dateformat',   'US');
    $self->_config_var('yytoyyyy',     89);
-   $self->_config_var('jan1week1',    0);
    $self->_config_var('printable',    0);
    $self->_config_var('firstday',     1);
+   $self->_config_var('week1ofyear',  'jan4');
    $self->_config_var('workweekbeg',  1);
    $self->_config_var('workweekend',  5);
    $self->_config_var('language',     'english');
@@ -618,53 +625,72 @@ sub check_time {
 
 sub week1_day1 {
    my($self,$year)  = @_;
-   my $firstday  = $self->_config('firstday');
-   return $self->_week1_day1($firstday,$year);
+   my $firstday     = $self->_config('firstday');
+   my $week1ofyear  = $self->_config('week1ofyear');
+   $self->_week1_day1($year,$firstday,$week1ofyear);
 }
-
 sub _week1_day1 {
-   my($self,$firstday,$year) = @_;
-   my $jan1week1 = $self->_config('jan1week1');
-   return $$self{'cache'}{'week1day1'}{$firstday}{$jan1week1}{$year}
-     if (exists $$self{'cache'}{'week1day1'}{$firstday}{$jan1week1}{$year});
+   my($self,$year,$firstday,$week1ofyear) = @_;
+   return $$self{'cache'}{'week1day1'}{$firstday}{$week1ofyear}{$year}
+     if (exists $$self{'cache'}{'week1day1'}{$firstday}{$week1ofyear}{$year});
 
-   # First week contains either Jan 4 (default) or Jan 1
+   my($y,$m,$d,$firstdow);
 
-   my($y,$m,$d) = ($year,1,4);
-   $d           = 1       if ($jan1week1);
+   # Get the starting date.
+
+   if ($week1ofyear =~ /^jan([1-7])$/) {
+      # First week contains 1/D/YYYY where D is $1
+      ($y,$m,$d) = ($year,1,$1);
+   } else {
+      # First week contains the first DOW given by $1 or firstday
+      # We'll start at Jan 1.
+      if ($week1ofyear =~ /^dow([1-7])$/) {
+         $firstdow = $1;
+      } else {
+         $firstdow = $firstday;
+      }
+
+      # Start at Jan 1 and move forward to the first DOW
+      ($y,$m,$d) = ($year,1,1);
+   }
+
+   my $dow = $self->day_of_week([$y,$m,$d]);
+
+   # If we're looking for the first occurence of a DOW, move forward to it
+   # (counting today).
+
+   if ($firstdow) {
+      my $forward = $firstdow - $dow;
+      $forward   += 7   if ($forward < 0);
+      $d         += $forward;
+      $dow        = $firstdow;
+   }
 
    # Go back to the previous (counting today) $firstday
 
-   my $dow = $self->day_of_week([$y,$m,$d]);
-   if ($dow != $firstday) {
-      $firstday = 0  if ($firstday == 7);
-      $d -= ($dow-$firstday);
-      if ($d<1) {
-         $y--;
-         $m = 12;
-         $d += 31;
-      }
+   my $backward   = $dow - $firstday;
+   $backward     += 7   if ($backward < 0);
+   $d            -= $backward;
+   if ($d<1) {
+      $y--;
+      $m = 12;
+      $d += 31;
    }
 
-   $$self{'cache'}{'week1day1'}{$firstday}{$jan1week1}{$year} = [ $y,$m,$d ];
+   $$self{'cache'}{'week1day1'}{$firstday}{$week1ofyear}{$year} = [ $y,$m,$d ];
    return [$y,$m,$d];
 }
 
 sub weeks_in_year {
-   my($self,$y)  = @_;
-   my $firstday  = $self->_config('firstday');
-   return $self->_weeks_in_year($firstday,$y);
-}
-
-sub _weeks_in_year {
-   my($self,$firstday,$y) = @_;
-   my $jan1week1 = $self->_config('jan1week1');
-   return $$self{'cache'}{'wiy'}{$firstday}{$jan1week1}{$y}
-     if (exists $$self{'cache'}{'wiy'}{$firstday}{$jan1week1}{$y});
+   my($self,$y)     = @_;
+   my $firstday     = $self->_config('firstday');
+   my $week1ofyear  = $self->_config('week1ofyear');
+   return $$self{'cache'}{'wiy'}{$firstday}{$week1ofyear}{$y}
+     if (exists $$self{'cache'}{'wiy'}{$firstday}{$week1ofyear}{$y});
 
    # Get the week1 day1 dates for this year and the next one.
-   my ($y1,$m1,$d1) = @{ $self->_week1_day1($firstday,$y) };
-   my ($y2,$m2,$d2) = @{ $self->_week1_day1($firstday,$y+1) };
+   my ($y1,$m1,$d1) = @{ $self->_week1_day1($y,$firstday,$week1ofyear) };
+   my ($y2,$m2,$d2) = @{ $self->_week1_day1($y+1,$firstday,$week1ofyear) };
 
    # Calculate the number of days between them.
    my $diy          = $self->days_in_year($y);
@@ -680,31 +706,31 @@ sub _weeks_in_year {
    }
 
    $diy = $diy/7;
-   $$self{'cache'}{'wiy'}{$firstday}{$jan1week1}{$y} = $diy;
+   $$self{'cache'}{'wiy'}{$firstday}{$week1ofyear}{$y} = $diy;
    return $diy;
 }
 
 sub week_of_year {
-   my($self,@args) = @_;
-   my $firstday    = $self->_config('firstday');
-   return $self->_week_of_year($firstday,@args);
-}
+   my($self,@args)  = @_;
 
+   my $firstday     = $self->_config('firstday');
+   my $week1ofyear  = $self->_config('week1ofyear');
+   $self->_week_of_year($firstday,$week1ofyear,@args);
+}
 sub _week_of_year {
-   my($self,$firstday,@args) = @_;
-   my $jan1week1   = $self->_config('jan1week1');
+   my($self,$firstday,$week1ofyear,@args) = @_;
 
    if ($#args == 1) {
       # (y,m,d) = week_of_year(y,w)
       my($year,$w) = @args;
 
-      return $$self{'cache'}{'woy1'}{$firstday}{$jan1week1}{$year}{$w}
-        if (exists $$self{'cache'}{'woy1'}{$firstday}{$jan1week1}{$year}{$w});
+      return $$self{'cache'}{'woy'}{$firstday}{$week1ofyear}{$year}{$w}
+        if (exists $$self{'cache'}{'woy'}{$firstday}{$week1ofyear}{$year}{$w});
 
-      my $ymd = $self->_week1_day1($firstday,$year);
+      my $ymd = $self->_week1_day1($year,$firstday,$week1ofyear);
       $ymd = $self->calc_date_days($ymd,($w-1)*7)  if ($w > 1);
 
-      $$self{'cache'}{'woy1'}{$firstday}{$jan1week1}{$year}{$w} = $ymd;
+      $$self{'cache'}{'woy'}{$firstday}{$week1ofyear}{$year}{$w} = $ymd;
       return $ymd;
    }
 
@@ -714,9 +740,9 @@ sub _week_of_year {
    # Get the first day of the first week. If the date is before that,
    # it's the last week of last year.
 
-   my($y0,$m0,$d0) = @{ $self->_week1_day1($firstday,$y) };
+   my($y0,$m0,$d0) = @{ $self->_week1_day1($y,$firstday,$week1ofyear) };
    if ($y0==$y  &&  $m==1  &&  $d<$d0) {
-      return($y-1,$self->_weeks_in_year($firstday,$y-1));
+      return($y-1,$self->weeks_in_year($y-1));
    }
 
    # Otherwise, we'll figure out how many days are between the two and
@@ -732,7 +758,7 @@ sub _week_of_year {
 
    # Make sure we're not into the first week of next year.
 
-   if ($w>$self->_weeks_in_year($firstday,$y)) {
+   if ($w>$self->weeks_in_year($y)) {
       return($y+1,1);
    }
    return($y,$w);
@@ -1105,6 +1131,10 @@ sub _config_var_base {
       my $err = $self->_config_var_firstday($val);
       return  if ($err);
 
+   } elsif ($var eq 'week1ofyear') {
+      my $err = $self->_config_var_week1ofyear($val);
+      return  if ($err);
+
    } elsif ($var eq 'tz'  ||
             $var eq 'forcedate'  ||
             $var eq 'setdate') {
@@ -1129,12 +1159,22 @@ sub _config_var_base {
       return  if ($err);
 
    } elsif ($var eq 'dateformat'       ||
-            $var eq 'jan1week1'        ||
             $var eq 'printable'        ||
             $var eq 'tomorrowfirst'    ||
-            #$var eq 'use_posix_printf' ||
+            $var eq 'use_posix_printf' ||
             $var eq 'maxrecurattempts') {
       # do nothing
+
+   } elsif ($var eq 'jan1week1') {
+      carp "WARNING: the jan1week1 Date::Manip config variable is deprecated\n" .
+           "         and will be removed in version 7.00.  Please use\n" .
+           "         the Week1ofYear config variable instead.\n";
+      if ($val) {
+         $self->_config_var_base('week1ofyear','jan1');
+      } else {
+         $self->_config_var_base('week1ofyear','jan4');
+      }
+      return;
 
    } else {
       carp "ERROR: [config_var] invalid config variable: $var";
@@ -1312,6 +1352,19 @@ sub _config_var_firstday {
    }
 
    return 0;
+}
+
+sub _config_var_week1ofyear {
+   my($self,$val) = @_;
+   $val = lc($val);
+
+   if ($val =~ /^jan[1-7]$/  ||
+       $val =~ /^dow[1-7]$/  ||
+       $val eq 'firstday') {
+      return 0;
+   }
+   carp "ERROR: [config_var] invalid: Week1ofYear: $val";
+   return 1;
 }
 
 sub _config_var_defaulttime {

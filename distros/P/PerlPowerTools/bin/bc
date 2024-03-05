@@ -27,7 +27,7 @@ Run a bc program from FILE
 
 Run a bc program from standard input
 
-	bc [-bdiqswy] -
+	bc [-bdiqswy]
 
 =head1 DESCRIPTION
 
@@ -813,6 +813,7 @@ my @backup_sym_table;
 my $input;
 my $cur_file = '-';
 my $bignum = 0;
+my $do_stdin = 0;
 
 $debug = 0;
 sub debug(&) {
@@ -952,7 +953,6 @@ $YYERRCODE=256;
     0,    0,    0,    0,    0,  337,    0,    0,    0,    0,
  1278,    0,    0,    0,    0,    2,
 );
-$YYTABLESIZE=1405;
 @yytable = (                                             88,
    42,   24,   43,   42,   65,   43,   65,   65,   89,   63,
    61,   63,   62,   82,   64,   65,   64,   43,   44,   35,
@@ -2048,7 +2048,7 @@ sub command_line()
     }
   }
 # read from STDIN if no files are named on the command line
-  @file_list = ('-') if $#file_list < 0;
+  $do_stdin = 1 unless @file_list;
 }
 
 
@@ -2070,17 +2070,20 @@ sub next_file
     return 1;
 
   }
+  if ($do_stdin) {
+    $input = *STDIN;
+    $do_stdin = 0;
+    $cur_file = '-';
+    return 1;
+  }
   if (@file_list) {
     my $file = shift @file_list;
 
     debug { "reading from $file\n" };
 
-    if ($file eq '-') {
-      $input = STDIN;
-    } else {
-      open(IN, '<', $file) or die("$file: cannot open file: $!\n");
-      $input = IN;
-    }
+    die "path '$file' is a directory\n" if (-d $file);
+    open(IN, '<', $file) or die("cannot open '$file': $!\n");
+    $input = IN;
     $cur_file = $file;
     return 1;
 
@@ -2493,16 +2496,17 @@ sub exec_stmt
      }
 
 #     debug {"p: $name, $idx.\n"};
-     unless (defined($sym_table{$name.'[]'})
-	     and $sym_table{$name.'[]'}{'type'} eq 'array') {
+     $name .= '[]';
+     unless (defined($sym_table{$name})
+	     and $sym_table{$name}{'type'} eq 'array') {
 
-       $sym_table{$name.'[]'} = { type => 'array'};
+       $sym_table{$name} = { type => 'array'};
      }
-     unless ($sym_table{$name.'[]'}{'value'}[$idx]) {
-       $sym_table{$name.'[]'}{'value'}[$idx] = { type => 'var',
+     unless ($sym_table{$name}{'value'}[$idx]) {
+       $sym_table{$name}{'value'}[$idx] = { type => 'var',
 					    value => 0 };
      }
-     push(@ope_stack, $sym_table{$name.'[]'}{'value'}[$idx]{'value'});
+     push(@ope_stack, $sym_table{$name}{'value'}[$idx]{'value'});
      next INSTR;
 
    } elsif($_ eq '=V') {
@@ -2532,6 +2536,7 @@ sub exec_stmt
      $sym_table{$name}{'value'}[$idx] = { type => 'var',
 					  value => $value };
      push(@ope_stack, $value);
+     $return = 1; # do not print result
      next INSTR;
 
    } elsif($_ eq 'IF') {
@@ -2817,14 +2822,12 @@ sub catch
   local($signum) = @_;
   print STDERR "\n" if (-t STDERR && -t STDIN);
   &yyerror("Floating point exception") if $signum == 8;
-#  next outer;
   main();
 }
 
 # main program
 sub main
 {
-# outer:
   while(1)
     {
       $line = '';
@@ -2835,19 +2838,17 @@ sub main
     }
 }
 
-init_table();
-
-command_line();
-
 $SIG{'INT'} = 'catch';
 $SIG{'FPE'} = 'catch';
 
-select(STDERR); $| = 1;
+select(STDERR);
+$| = 1;
 select(STDOUT);
-&next_file;
 
+init_table();
+command_line();
+next_file();
 start_stmt();
-
 main();
 
 __END__

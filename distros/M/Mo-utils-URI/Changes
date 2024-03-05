@@ -1,2 +1,7 @@
+0.02 2024-02-29T22:04:40+01:00
+ - Add IRI to test as bad URI.
+ - Add tests for URL.
+ - Regen README file.
+
 0.01 2024-02-11T17:16:43+01:00
  - First version.

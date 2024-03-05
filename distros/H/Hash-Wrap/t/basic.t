@@ -22,7 +22,6 @@ subtest 'default' => sub {
     $hash{a} = 2;
     is( $obj->a, 2, 'object scalar not independent of hash' );
 
-
     like( dies { $obj->c }, qr/locate object method/, 'unknown attribute' );
 
     $obj->{c} = 3;
@@ -34,7 +33,6 @@ subtest 'default' => sub {
         qr/locate object method/,
         'retrieve deleted attribute'
     );
-
 
     $obj->a( 22 );
     is( $obj->a,  22, 'setter' );
@@ -51,12 +49,10 @@ subtest 'no hash' => sub {
     is( $hash->a, 1, "set" );
 };
 
-
 use Hash::Wrap ( {
     -as   => 'return_copied',
     -copy => 1,
-});
-
+} );
 
 subtest 'copied' => sub {
 
@@ -67,13 +63,12 @@ subtest 'copied' => sub {
 
     isnt( refaddr( $obj ), refaddr( $hash ), "same hash reference" );
 
-    is( $obj->a, 1, 'retrieve value' );
-    is( $obj->b, 2, 'retrieve another value' );
+    is( $obj->a, 1,   'retrieve value' );
+    is( $obj->b, 2,   'retrieve another value' );
     is( $obj->c, [9], 'retrieve another value' );
 
     $hash{a} = 2;
     is( $obj->a, 1, 'object scalar independent of hash' );
-
 
     $hash{c}->[0] = 10;
     is( $obj->c, [10], 'object arrayref contents not independent of hash' );
@@ -85,11 +80,10 @@ subtest 'copied' => sub {
 
 };
 
-use Hash::Wrap ({
+use Hash::Wrap ( {
     -as    => 'return_cloned',
     -clone => 1,
-});
-
+} );
 
 subtest 'cloned' => sub {
 
@@ -99,8 +93,8 @@ subtest 'cloned' => sub {
     my $obj = return_cloned $hash;
 
     isnt( refaddr( $obj ), refaddr( $hash ), "same hash reference" );
-    is( $obj->a, 1, 'retrieve value' );
-    is( $obj->b, 2, 'retrieve another value' );
+    is( $obj->a, 1,   'retrieve value' );
+    is( $obj->b, 2,   'retrieve another value' );
     is( $obj->c, [9], 'retrieve another value' );
 
     $hash{a} = 2;
@@ -111,24 +105,30 @@ subtest 'cloned' => sub {
 
 };
 
-use Hash::Wrap ( {
-        -as    => 'return_custom_cloned',
-        -clone => sub {
-            require Storable;
-            return Storable::dclone $_[0];
-        },
-    } );
 
 subtest 'custom cloned' => sub {
+
+    my $called_custom = !!0;
+
+    my ( $wrap ) = Hash::Wrap->import( {
+            -as    => '-return',
+            -clone => sub {
+                require Storable;
+                $called_custom = !!1;
+                return Storable::dclone $_[0];
+            },
+        } );
 
     my %hash = ( a => 1, b => 2, c => [9] );
     my $hash = \%hash;
 
-    my $obj = return_custom_cloned $hash;
+    my $obj = $wrap->( $hash );
+
+    is( $called_custom, T(), 'called our custom clone' );
 
     isnt( refaddr( $obj ), refaddr( $hash ), "same hash reference" );
-    is( $obj->a, 1, 'retrieve value' );
-    is( $obj->b, 2, 'retrieve another value' );
+    is( $obj->a, 1,   'retrieve value' );
+    is( $obj->b, 2,   'retrieve another value' );
     is( $obj->c, [9], 'retrieve another value' );
 
     $hash{a} = 2;
@@ -138,7 +138,6 @@ subtest 'custom cloned' => sub {
     is( $obj->c, [9], 'object arrayref contents independent of hash' );
 
 };
-
 
 use Hash::Wrap ( {
     -as    => 'return_created_class',
@@ -166,20 +165,28 @@ subtest 'cache + create class' => sub {
 
 };
 
-use Hash::Wrap ({
-    -as     => 'test_can',
-    -class  => 'My::TestCan',
-  });
-
+use Hash::Wrap ( {
+    -as    => 'test_can',
+    -class => 'My::TestCan',
+} );
 
 subtest 'can() on existing attribute without constructed accessor' => sub {
 
     my $obj = test_can { a => 1 };
 
-    ok(  lives { $obj->can('a') },
-         'constructs accessor' );
+    ok( lives { $obj->can( 'a' ) }, 'constructs accessor' );
 
 };
 
+subtest 'object' => sub {
+
+    like(
+        dies {
+            wrap_hash( bless {}, 'Foo' );
+        },
+        qr/must not be an object/
+    );
+
+};
 
 done_testing;

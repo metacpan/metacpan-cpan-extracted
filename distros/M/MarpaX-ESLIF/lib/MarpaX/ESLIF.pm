@@ -63,7 +63,7 @@ BEGIN {
 #
 BEGIN {
     #
-    our $VERSION = '6.0.33.3'; # VERSION
+    our $VERSION = '6.0.33.4'; # VERSION
     #
     # Note that $VERSION is always defined when you use a distributed CPAN package.
     # With old versions of perl, only the XSLoader::load(__PACKAGE__, $version) works.
@@ -123,7 +123,7 @@ MarpaX::ESLIF - ESLIF is Extended ScanLess InterFace
 
 =head1 VERSION
 
-version 6.0.33.3
+version 6.0.33.4
 
 =head1 SYNOPSIS
 
@@ -141,9 +141,11 @@ With a logger, using Log::Any::Adapter::Stderr as an example:
   my $eslif = MarpaX::ESLIF->new($log);
   printf "ESLIF library version: %s\n", $eslif->version;
 
-This class and its derivatives are thread-safe. Although there can be many ESLIF instances, in practice a single instance is enough, unless you want different logging interfaces. This is why the C<new> method is implemented as a I<multiton>. Once a MarpaX::ESLIF instance is created, the user should create a L<MarpaX::ESLIF::Grammar> instance to have a working grammar.
+This class and its derivatives are thread-safe. Although there can be many ESLIF instances, in practice a single instance is enough, unless you want different logging interfaces. This is why the C<new> method is implemented as a I<multiton> v.s. the logger: there is one MarpaX::ESLIF perl logger.
 
-A full example of a calculator with a I<self-contained grammar>, actions being writen in B<Lua>:
+Once created, one may want to create a grammar instance. This is provided by L<MarpaX::ESLIF::Grammar> class. The grammar can then be used to parse some input, using a I<recognizer>, or even to I<valuate> it.
+
+A recognizer is asking for an interface that you will implement that must provide some methods, e.g. on a string:
 
   package MyRecognizer;
   sub new {
@@ -154,14 +156,46 @@ A full example of a calculator with a I<self-contained grammar>, actions being w
   sub read                   { my ($self) = @_; defined($self->{data} = readline($self->{fh})) } # Reader
   sub isEof                  {  eof shift->{fh} } # End of data ?
   sub isCharacterStream      {                1 } # Character stream ?
-  sub encoding               {                  } # Encoding ?
+  sub encoding               {                  } # Encoding ? Let's ESLIF guess.
   sub data                   {    shift->{data} } # data
   sub isWithDisableThreshold {                0 } # Disable threshold warning ?
   sub isWithExhaustion       {                0 } # Exhaustion event ?
   sub isWithNewline          {                1 } # Newline count ?
   sub isWithTrack            {                0 } # Absolute position tracking ?
   1;
-  
+
+Valuation is also asking for an implementation of your own, that must provide some methods, e.g.:
+
+  package MyValue;
+  sub new                { bless { result => undef}, shift }
+  sub isWithHighRankOnly { 1 }  # When there is the rank adverb: highest ranks only ?
+  sub isWithOrderByRank  { 1 }  # When there is the rank adverb: order by rank ?
+  sub isWithAmbiguous    { 0 }  # Allow ambiguous parse ?
+  sub isWithNull         { 0 }  # Allow null parse ?
+  sub maxParses          { 0 }  # Maximum number of parse tree values
+  sub getResult          { my ($self) = @_; $self->{result} }
+  sub setResult          { my ($self, $result) = @_; $self->{result} = $result }
+  1;
+
+A full example of a calculator with a I<self-contained grammar>, using the recognizer and valuation implementation above, and actions writen in B<Lua>:
+
+  package MyRecognizer;
+  sub new {
+      my ($pkg, $string) = @_;
+      open my $fh, "<", \$string;
+      bless { data => undef, fh => $fh }, $pkg
+  }
+  sub read                   { my ($self) = @_; defined($self->{data} = readline($self->{fh})) } # Reader
+  sub isEof                  {  eof shift->{fh} } # End of data ?
+  sub isCharacterStream      {                1 } # Character stream ?
+  sub encoding               {                  } # Encoding ? Let's ESLIF guess.
+  sub data                   {    shift->{data} } # data
+  sub isWithDisableThreshold {                0 } # Disable threshold warning ?
+  sub isWithExhaustion       {                0 } # Exhaustion event ?
+  sub isWithNewline          {                1 } # Newline count ?
+  sub isWithTrack            {                0 } # Absolute position tracking ?
+  1;
+
   package MyValue;
   sub new                { bless { result => undef}, shift }
   sub isWithHighRankOnly { 1 }  # When there is the rank adverb: highest ranks only ?
@@ -228,15 +262,15 @@ The same but with actions writen in B<Perl>:
   sub read                   { my ($self) = @_; defined($self->{data} = readline($self->{fh})) } # Reader
   sub isEof                  {  eof shift->{fh} } # End of data ?
   sub isCharacterStream      {                1 } # Character stream ?
-  sub encoding               {                  } # Encoding ?
+  sub encoding               {                  } # Encoding ? Let's ESLIF guess.
   sub data                   {    shift->{data} } # data
   sub isWithDisableThreshold {                0 } # Disable threshold warning ?
   sub isWithExhaustion       {                0 } # Exhaustion event ?
   sub isWithNewline          {                1 } # Newline count ?
   sub isWithTrack            {                0 } # Absolute position tracking ?
   1;
-  
-  package MyValue;
+
+  package MyValue::Perl;
   sub new                { bless { result => undef}, shift }
   sub isWithHighRankOnly { 1 }  # When there is the rank adverb: highest ranks only ?
   sub isWithOrderByRank  { 1 }  # When there is the rank adverb: order by rank ?
@@ -274,7 +308,7 @@ The same but with actions writen in B<Perl>:
   foreach (sort { $a <=> $b} keys %tests) {
       my ($input, $value) = @{$tests{$_}};
       my $r = MyRecognizer->new($input);
-      my $v = MyValue->new();
+      my $v = MyValue::Perl->new();
       if (defined($value)) {
           ok($g->parse($r, $v), "'$input' parse is ok");
           ok($v->getResult == $value, "'$input' value is $value");
@@ -399,8 +433,6 @@ Alias to C<new>.
 Returns a string containing the current underlying ESLIF library version.
 
 =head1 NOTES
-
-The perl interface is an I<all-in-one> version of L<marpaESLIF|https://github.com/jddurand/c-marpaESLIF> library, which means that character conversion is using C<iconv> (or C<iconv>-like on Windows) instead of ICU, even if the later is available on your system.
 
 =head2 BOOLEAN TYPE
 

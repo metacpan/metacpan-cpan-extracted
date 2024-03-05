@@ -307,7 +307,7 @@ subtest 'stats' => sub {
 
 
 subtest 'support for get_person in LOMS plugin' => sub {
-	plan tests => 6;
+	plan tests => 9;
 	$r = $s->run('RETURN 1 AS one, 2 AS two')->single;
 	lives_and { warnings { is $r->{column_keys}->count, 2 } } 'ResultColumns count 2';
 	lives_and { warnings { is $r->{column_keys}->add('three'), 2 } } 'ResultColumns add';
@@ -315,6 +315,10 @@ subtest 'support for get_person in LOMS plugin' => sub {
 	$r->{row}->[2] = 'Three!';
 	lives_and { is $r->get(2), 'Three!' } 'ResultColumns get col by index';
 	lives_and { is $r->get('three'), 'Three!' } 'ResultColumns get col by name';
+	lives_and { warnings { is $r->{column_keys}->add("0"), 3 } } 'ResultColumns ambiguous add("0")';
+	$r->{row}->[3] = "four";
+	is $r->get( 0 ), 1, 'ResultColumns ambiguous get( 0 )';
+	is $r->get("0"), "four", 'ResultColumns ambiguous get("0")';
 	throws_ok {
 		$s->run('')->_column_keys;
 	} qr/missing columns/i, 'result missing columns';

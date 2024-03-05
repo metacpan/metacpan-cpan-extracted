@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Lb - Package for language Luxembourgish
 
 package Locale::CLDR::Locales::Lb;
 # This file auto generated from Data\common\main\lb.xml
-#	on Sun 25 Feb 10:41:40 am GMT
+#	on Thu 29 Feb  5:43:51 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.0');
+our $VERSION = version->declare('v0.44.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -163,6 +163,10 @@ has 'algorithmic_number_format_data' => (
 					divisor => q(1),
 					rule => q(null),
 				},
+				'x.x' => {
+					divisor => q(1),
+					rule => q(=%spellout-cardinal-masculine=),
+				},
 				'1' => {
 					base_value => q(1),
 					divisor => q(1),
@@ -231,13 +235,9 @@ has 'algorithmic_number_format_data' => (
 					divisor => q(1),
 					rule => q(net eng Nummer),
 				},
-				'x.x' => {
-					divisor => q(1),
-					rule => q(=%spellout-cardinal-masculine=),
-				},
 				'max' => {
 					divisor => q(1),
-					rule => q(=%spellout-cardinal-masculine=),
+					rule => q(net eng Nummer),
 				},
 			},
 		},
@@ -251,10 +251,6 @@ has 'algorithmic_number_format_data' => (
 					base_value => q(0),
 					divisor => q(1),
 					rule => q(null),
-				},
-				'x.x' => {
-					divisor => q(1),
-					rule => q(←← Komma →→),
 				},
 				'1' => {
 					base_value => q(1),
@@ -444,9 +440,13 @@ has 'algorithmic_number_format_data' => (
 					divisor => q(1),
 					rule => q(net eng Nummer),
 				},
+				'x.x' => {
+					divisor => q(1),
+					rule => q(←← Komma →→),
+				},
 				'max' => {
 					divisor => q(1),
-					rule => q(net eng Nummer),
+					rule => q(←← Komma →→),
 				},
 			},
 		},
@@ -460,6 +460,10 @@ has 'algorithmic_number_format_data' => (
 					base_value => q(0),
 					divisor => q(1),
 					rule => q(null),
+				},
+				'x.x' => {
+					divisor => q(1),
+					rule => q(=%spellout-cardinal-masculine=),
 				},
 				'1' => {
 					base_value => q(1),
@@ -524,13 +528,9 @@ has 'algorithmic_number_format_data' => (
 					divisor => q(1),
 					rule => q(net eng Nummer),
 				},
-				'x.x' => {
-					divisor => q(1),
-					rule => q(=%spellout-cardinal-masculine=),
-				},
 				'max' => {
 					divisor => q(1),
-					rule => q(=%spellout-cardinal-masculine=),
+					rule => q(net eng Nummer),
 				},
 			},
 		},
@@ -558,10 +558,6 @@ has 'algorithmic_number_format_data' => (
 					base_value => q(0),
 					divisor => q(1),
 					rule => q(=%spellout-cardinal-neuter=),
-				},
-				'x.x' => {
-					divisor => q(1),
-					rule => q(=0.0=),
 				},
 				'1010' => {
 					base_value => q(1010),
@@ -661,9 +657,13 @@ has 'algorithmic_number_format_data' => (
 					divisor => q(1),
 					rule => q(net eng Nummer),
 				},
+				'x.x' => {
+					divisor => q(1),
+					rule => q(=0.0=),
+				},
 				'max' => {
 					divisor => q(1),
-					rule => q(net eng Nummer),
+					rule => q(=0.0=),
 				},
 			},
 		},
@@ -677,10 +677,6 @@ has 'algorithmic_number_format_data' => (
 					base_value => q(0),
 					divisor => q(1),
 					rule => q(nullter),
-				},
-				'x.x' => {
-					divisor => q(1),
-					rule => q(=#,##0.0=.),
 				},
 				'1' => {
 					base_value => q(1),
@@ -785,9 +781,13 @@ has 'algorithmic_number_format_data' => (
 					divisor => q(1),
 					rule => q(net eng Nummer),
 				},
+				'x.x' => {
+					divisor => q(1),
+					rule => q(=#,##0.0=.),
+				},
 				'max' => {
 					divisor => q(1),
-					rule => q(net eng Nummer),
+					rule => q(=#,##0.0=.),
 				},
 			},
 		},
@@ -926,10 +926,6 @@ has 'algorithmic_number_format_data' => (
 					divisor => q(1),
 					rule => q(nullt),
 				},
-				'x.x' => {
-					divisor => q(1),
-					rule => q(=#,##0.0=.),
-				},
 				'1' => {
 					base_value => q(1),
 					divisor => q(1),
@@ -1033,9 +1029,13 @@ has 'algorithmic_number_format_data' => (
 					divisor => q(1),
 					rule => q(net eng Nummer),
 				},
+				'x.x' => {
+					divisor => q(1),
+					rule => q(=#,##0.0=.),
+				},
 				'max' => {
 					divisor => q(1),
-					rule => q(net eng Nummer),
+					rule => q(=#,##0.0=.),
 				},
 			},
 		},

@@ -1,7 +1,0 @@
-Revision history for Perl extension Date::Holidays::ES
-
-0.02  Mon Mar 12 00:55:23 2007
-    - Because of changes in Date::Holidays, Date::Holidays::Super is not
-      included with Date::Holidays. This was the reason the package broke
-      when installing it.
-0.01  Sat Jan 10 13:51:00 2007

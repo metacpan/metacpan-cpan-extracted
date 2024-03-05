@@ -1,7 +1,7 @@
 ---
 abstract: 'Interface to Deutsche Bahn Wagon Order API.'
 author:
-  - 'Copyright (C) 2018-2019 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>'
+  - 'Copyright (C) 2018-2019 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>'
 build_requires:
   Test::Compile: '0'
   Test::More: '0'
@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.4'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4232, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,13 +18,13 @@ name: Travel-Status-DE-DBWagenreihung
 provides:
   Travel::Status::DE::DBWagenreihung:
     file: lib/Travel/Status/DE/DBWagenreihung.pm
-    version: '0.08'
+    version: '0.10'
   Travel::Status::DE::DBWagenreihung::Section:
     file: lib/Travel/Status/DE/DBWagenreihung/Section.pm
-    version: '0.08'
+    version: '0.10'
   Travel::Status::DE::DBWagenreihung::Wagon:
     file: lib/Travel/Status/DE/DBWagenreihung/Wagon.pm
-    version: '0.08'
+    version: '0.10'
 requires:
   Carp: '0'
   Class::Accessor: '0'
@@ -37,5 +37,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/derf/Travel-Status-DE-DBWagenreihung
-version: '0.08'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

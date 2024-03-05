@@ -15,7 +15,7 @@ our %EXPORT_TAGS = (
    );
 Exporter::export_ok_tags('constants');
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 XSLoader::load(__PACKAGE__, $VERSION);
 

@@ -687,16 +687,21 @@ an error code is set).
 
    $wkno = $date->week_of_year([$first]);
 
-This figures out the week number. If $first is passed in, it must be
-between 1 and 7 and refers to the first day of the week. If $first is
-not passed in, the FirstDay config variable is used.
+This figures out the week number for the date stored in $date.  It uses
+the config variables FirstDay and Week1ofYear to determine this.  For
+historical reasons, an argument $first may be passed in.  It must be
+between 1 and 7 and refers to the first day of the week and overrides
+whatever the FirstDay variable is set to.
 
-NOTE: This routine should only be called in rare cases.  Use printf with
-the %W, %U, %J, %L formats instead.  This routine returns a week between 0
-and 53 which must then be "fixed" to get into the ISO 8601 weeks from 1 to
-53.  A date which returns a week of 0 actually belongs to the last week of
-the previous year.  A date which returns a week of 53 may belong to the
-first week of the next year.
+NOTE: This routine should only be called in rare cases.  Use printf
+with the %W, %U, %J, %L formats instead as that will always return the
+correct values for week and year.
+
+This routine returns a week between 0 and 53 which must then be
+"fixed" to get into the ISO 8601 weeks from 1 to 53.  A date which
+returns a week of 0 actually belongs to the last week of the previous
+year.  A date which returns a week of 53 may belong to the first week
+of the next year.
 
 =back
 
@@ -1636,7 +1641,9 @@ appear in a date or time are ignored (except in ISO 8601 formats).
 =head1 PRINTF DIRECTIVES
 
 The following printf directives are replaced with information
-from the date.
+from the date.  These all assume that the Use_POSIX_Printf config
+variable is unset.  If it is set, refer to POSIX PRINTF DIRECTIVES
+section below.
 
    Year
        %y     year                     - 00 to 99
@@ -1772,7 +1779,7 @@ NOTE 2:
 The %U, %W, %L, %G, and %J formats are used to support the ISO-8601 format:
 YYYY-wWW-D.  In this format, a date is written as a year, the week of the
 year, and the day of the week.  Technically, the week may be considered to
-start on any day of the week, but Sunday and Monday are the both common
+start on any day of the week, but Sunday and Monday are both common
 choices, so both are supported.
 
 The %W and %G formats return the week-of-year and the year treating weeks
@@ -1817,6 +1824,84 @@ but some offsets are irregular (+05:17:30). In this case, the string
 returned is +051730 which isn't RFC 822 compliant, but since RFC 822
 ignores this situation, I had to decide between returning an incorrect
 value, or breaking strict compliance, and I chose the second option.
+
+=head1 POSIX PRINTF DIRECTIVES
+
+For various reasons, a few of the printf directives in the
+Date::Manip::Date::printf method do not match the standard POSIX
+strftime directives.  For backward compatibility reasons, I'm not
+going to change that.  However, the Use_POSIX_Printf config variable
+can be set to 1 to use the POSIX formats instead of the default
+formats.
+
+When that variable is set, most of the printf formats described above
+are used, but the formats are replaced with their POSIX value:
+
+   %C   The century number (first two digits of the year).
+
+   %F   This is equivalent to %Y-%m-%d
+
+   %l   The hour (12-hour clock) padded with spaces
+
+   %P   Either 'am' or 'pm'.
+
+   %u   Day of week from 1-7 with Monday being 1.
+
+   %G   Similar to the %G format described above, but strictly adheres
+        to the ISO 8601 week definition where the first week of
+        the week is Monday and the first week of the year contains
+        Jan 4.
+
+   %g   Identical to %g but only has the last two digits of the year.
+
+   %W   Similar to the %W format described above, but with Monday
+        being the first day of the week and the first Monday in the
+        year being the first day of the first week.
+
+   %V   Similar to the %W format described above, but strictly adheres
+        to the ISO 8601 week definition where the first week of
+        the week is Monday and the first week of the year contains
+        Jan 4.
+
+   %L   The strftime function does not have a %L directive.  I have
+        set it anyway to be similar to the %L format above except
+        using Sunday as the first day of the week and the first week
+        of the year contains Jan 4 (so this is the equivalent of %G
+        but with Sunday being the first day of the week).
+
+   %U   Similar to the %U format described above but with Sunday being
+        the first day of the week and the first Sunday being the first
+        day of the first week.
+
+   %J   The strftime function does not have a %J directive, but in
+        order to support the ISO 8601 YYYY-wWW-D format, this is
+        equivalent to '%G-W%V-%w'.
+
+Note 1: The default (i.e. non-POSIX) Date::Manip printf formats are
+defined so that %G and %W use the exact same definition of week and
+likewise %L and %U use the same definition of weeks.  This means that
+you can use them to write a date in an ISO 8601 YYYY-wWW format.  In
+the POSIX strftime definitions, %G and %V work together, but there is
+no equivalent pair for Sunday being the first day of the week.
+
+The following POSIX strftime directives are not yet supported (though
+they may be in a future version of Date::Manip).  These will continue
+to return the values listed above from the non-POSIX formats.
+
+   %c, %x, %X
+        The strftime format give the preferred date/time representations
+        in the current locale.
+
+        Currently Date::Manip does not make use of locale information
+        so there is no locale-specific format.
+
+        The default format (which is the preferred date and time
+        format in America) is used in all locales.
+
+   %E, %O
+        Modifiers to create additional directives.
+
+   %+   Date and time in the format of the date command
 
 =head1 KNOWN BUGS
 

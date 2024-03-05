@@ -595,12 +595,15 @@ Figure out week number.  $first is the first day of the week which is
 usually 1 (Monday) or 7 (Sunday), but could be any number between 1 and 7
 in practice.
 
-NOTE: This routine should only be called in rare cases.  Use UnixDate with
-the %W, %U, %J, %L formats instead.  This routine returns a week between 0
-and 53 which must then be "fixed" to get into the ISO-8601 weeks from 1 to
-53.  A date which returns a week of 0 actually belongs to the last week of
-the previous year.  A date which returns a week of 53 may belong to the
-first week of the next year.
+NOTE: This routine should only be called in rare cases.  Use printf
+with the %W, %U, %J, %L formats instead as that will always return the
+correct values for week and year.
+
+This routine returns a week between 0 and 53 which must then be
+"fixed" to get into the ISO 8601 weeks from 1 to 53.  A date which
+returns a week of 0 actually belongs to the last week of the previous
+year.  A date which returns a week of 53 may belong to the first week
+of the next year.
 
 =item B<Date_LeapYear>
 

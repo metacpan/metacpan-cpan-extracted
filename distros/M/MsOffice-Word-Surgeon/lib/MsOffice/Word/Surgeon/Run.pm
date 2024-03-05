@@ -8,7 +8,7 @@ use Carp::Clan                     qw(^MsOffice::Word::Surgeon); # will import c
 
 use namespace::clean -except => 'meta';
 
-our $VERSION = '2.04';
+our $VERSION = '2.05';
 
 #======================================================================
 # ATTRIBUTES

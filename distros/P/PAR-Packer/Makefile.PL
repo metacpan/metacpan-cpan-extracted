@@ -15,7 +15,7 @@ if ($] == 5.010000) {
     exit 0;
 }
 
-sub if_win { return ($^O eq 'MSWin32') ? @_ : (); }
+sub for_win32 { return ($^O eq 'MSWin32') ? @_ : (); }
 
 my $have_cc = ExtUtils::CBuilder->new->have_compiler;
 warn "No compiler found, won't generate 'script/parl$Config{_exe}!\n"
@@ -32,6 +32,7 @@ WriteMakefile1(
     MIN_PERL_VERSION          => '5.008009',
 
     CONFIGURE_REQUIRES => {
+      'ExtUtils::MakeMaker'   => '6.31',        # for INSTALL_BASE
       'ExtUtils::Embed'       => 0,
       'ExtUtils::CBuilder'    => 0,
       'DynaLoader'            => 0,
@@ -46,7 +47,7 @@ WriteMakefile1(
       'Archive::Zip'          => '1.02',
       'Module::ScanDeps'      => '1.21',
       'PAR::Dist'             => '0.22',
-      'PAR'                   => '1.016',
+      'PAR'                   => '1.020',
       'Digest::SHA'           => '5.40',
       'Text::ParseWords'      => 0,
       'Getopt::ArgvFile'      => '1.07',
@@ -54,9 +55,12 @@ WriteMakefile1(
     TEST_REQUIRES => {
       'Test::More'            => 0,
       'IPC::Run3'             => '0.048',
-      # if_win(
-      # 'Win32::Exe'          => '0.17'),
+      for_win32(
+        'ExtUtils::Depends'   => 0,
+      # 'Win32::Exe'          => '0.17'
+      ),
     },
+    NEEDS_LINKING	      => $have_cc,
 
     MAN1PODS => {
       'script/par.pl'         => 'blib/man1/par.pl.1',
@@ -65,13 +69,16 @@ WriteMakefile1(
       $have_cc ? (
         'script/parl.pod'     => 'blib/man1/parl.1' ) : (),
     },
-    EXE_FILES		=> [
+    EXE_FILES => [
         'script/par.pl',
         'script/pp',
         'script/tkpp',
     ],
-    DIR                       => [ 't/data', $have_cc ? 'myldr' : () ],
-    NEEDS_LINKING	      => $have_cc,
+    DIR => [ 
+        't/data/XSFoo', 
+        $have_cc ? 'myldr' : () 
+    ],
+    clean => { FILES => 't/data/blib' },
 
     META_MERGE      => {
       'meta-spec'             => { version => 2 },
@@ -86,7 +93,7 @@ WriteMakefile1(
             'Tk::ColoredButton' => 0,
             'Tk::EntryCheck'  => 0,
             'Tk::Getopt'      => 0,
-            if_win(
+            for_win32(
               'Win32::Process' => 0),
           },
         },

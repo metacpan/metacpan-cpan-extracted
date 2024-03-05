@@ -1,0 +1,181 @@
+NAME
+    Data::Navigation::Item - Data object for navigation item.
+
+SYNOPSIS
+     use Data::Navigation::Item;
+
+     my $obj = Data::Navigation::Item->new(%params);
+     my $class = $obj->class;
+     my $desc = $obj->desc;
+     my $id = $obj->id;
+     my $image = $obj->image;
+     my $location = $obj->location;
+     my $title = $obj->title;
+
+METHODS
+  "new"
+     my $obj = Data::Navigation::Item->new(%params);
+
+    Constructor.
+
+    *       "class"
+
+            Navigation item class.
+
+            Value type is same as CSS class.
+
+            It's optional.
+
+            Default value is undef.
+
+    *       "desc"
+
+            Navigation item description.
+
+            Maximum length is 1000 characters.
+
+            Default value is undef.
+
+    *       "id"
+
+            Navigation item id. It's number.
+
+            It's optional.
+
+            Default value is undef.
+
+    *       "image"
+
+            Navigation item image location.
+
+            It's optional.
+
+            Default value is undef.
+
+    *       "location"
+
+            Navigation item location. Link to content.
+
+            It's optional.
+
+            Default value is undef.
+
+    *       "title"
+
+            Navigation item title.
+
+            Maximum length is 100 characters.
+
+            It's required.
+
+            Default value is undef.
+
+    Returns instance of object.
+
+  "class"
+     my $class = $obj->class;
+
+    Get navigation item class.
+
+    Returns string.
+
+  "desc"
+     my $desc = $obj->desc;
+
+    Get navigation item description.
+
+    Returns string.
+
+  "id"
+     my $id = $obj->id;
+
+    Get navigation item id.
+
+    Returns number.
+
+  "image"
+     my $image = $obj->image;
+
+    Get navigation item image location.
+
+    Returns string.
+
+  "location"
+     my $location = $obj->location;
+
+  "title"
+     my $title = $obj->title;
+
+    Get navigation item title;
+
+    Returns string.
+
+ERRORS
+     new():
+             From Mo::utils:
+                     Parameter 'class' has bad CSS class name.
+                             Value: %s
+                     Parameter 'class' has bad CSS class name (number on begin).
+                             Value: %s
+                     Parameter 'desc' has length greater than '1000'.
+                             Value: %s
+                     Parameter 'id' must be a number.
+                             Value: %s
+                     Parameter 'image' doesn't contain valid location.
+                             Value: %s
+                     Parameter 'location' doesn't contain valid location.
+                             Value: %s
+                     Parameter 'title' has length greater than '100'.
+                             Value: %s
+                     Parameter 'title' is required.
+
+EXAMPLE
+     use strict;
+     use warnings;
+
+     use Data::Navigation::Item;
+
+     my $obj = Data::Navigation::Item->new(
+             'class' => 'nav-item',
+             'desc' => 'This is description',
+             'id' => 1,
+             'image' => '/img/foo.png',
+             'location' => '/title',
+             'title' => 'Title',
+     );
+
+     # Print out.
+     print 'Class: '.$obj->class."\n";
+     print 'Description: '.$obj->desc."\n";
+     print 'Id: '.$obj->id."\n";
+     print 'Image: '.$obj->image."\n";
+     print 'Location: '.$obj->location."\n";
+     print 'Title: '.$obj->title."\n";
+
+     # Output:
+     # Class: nav-item
+     # Description: This is description
+     # Id: 1
+     # Image: /img/foo.png
+     # Location: /title
+     # Title: Title
+
+DEPENDENCIES
+    Mo, Mo::utils, Mo::utils::CSS, Mo::utils::URI.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Data-Navigation-Item>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2024 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

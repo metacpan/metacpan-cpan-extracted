@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Result::Jolt;
 # ABSTRACT: Jolt result handler
-$Neo4j::Driver::Result::Jolt::VERSION = '0.45';
+$Neo4j::Driver::Result::Jolt::VERSION = '0.46';
 
 # This package is not part of the public Neo4j::Driver API.
 
@@ -309,8 +309,8 @@ sub _deep_bless {
 	if ($sigil eq '#') {  # Bytes
 		$value =~ tr/ //d;  # spaces were allowed in the Jolt draft, but aren't actually implemented in Neo4j 4.2's jolt.JoltModule
 		$value = pack 'H*', $value;  # see neo4j#12660
-		utf8::downgrade($value);  # UTF8 flag should be off already, but let's make sure
-		return $value;
+		require Neo4j::Driver::Type::Bytes;
+		return bless \$value, 'Neo4j::Driver::Type::Bytes';
 	}
 	
 	die "Assertion failed: unexpected sigil: " . $sigil;

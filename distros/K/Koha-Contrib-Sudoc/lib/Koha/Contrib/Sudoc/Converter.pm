@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc::Converter;
 # ABSTRACT: Classe de base pour convertir les notices
-$Koha::Contrib::Sudoc::Converter::VERSION = '2.43';
+$Koha::Contrib::Sudoc::Converter::VERSION = '2.45';
 use Moose;
 use utf8;
 use Modern::Perl;
@@ -222,7 +222,7 @@ Koha::Contrib::Sudoc::Converter - Classe de base pour convertir les notices
 
 =head1 VERSION
 
-version 2.43
+version 2.45
 
 =head1 DESCRIPTION
 

@@ -35,7 +35,7 @@ sub test_generator {
     is( $hash{a}, 22, 'setter reflected in hash' );
 
     $ctx->release;
-};
+}
 
 use Hash::Wrap ( { -as => 'undefined', -undef => 1 } );
 
@@ -46,9 +46,9 @@ subtest 'default' => sub {
 };
 
 use Hash::Wrap ( {
-    -as     => 'undefined_created_class',
+    -as    => 'undefined_created_class',
     -undef => 1,
-    -class  => 'My::CreatedClass::Lvalue',
+    -class => 'My::CreatedClass::Lvalue',
 } );
 
 subtest 'create class' => sub {

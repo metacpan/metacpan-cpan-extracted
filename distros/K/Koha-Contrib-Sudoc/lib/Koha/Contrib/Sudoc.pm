@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc;
 # ABSTRACT: Chargeur Koha par Tamil
-$Koha::Contrib::Sudoc::VERSION = '2.43';
+$Koha::Contrib::Sudoc::VERSION = '2.45';
 use Moose;
 use Modern::Perl;
 use YAML qw( LoadFile Dump );
@@ -14,6 +14,7 @@ use Mail::Box::Manager;
 use DateTime;
 use File::ShareDir ':ALL';
 use Net::FTP;
+use Net::SFTP::Foreign;
 
 
 # L'instance de Koha de l'ILN courant
@@ -192,19 +193,39 @@ sub get {
     my $self = shift;
 
     my $c = $self->c->{trans};
+    my $ftp_host = $c->{ftp_host};
 
     # Si le serveur FTP n'est pas celui de l'ABES, on n'est pas en mode GET
-    return if $c->{ftp_host} !~ /abes/;
+    return if $ftp_host !~ /abes/;
 
-    my $ftp = Net::FTP->new($c->{ftp_host}, Debug => 0);
-    $ftp->login($c->{login}, $c->{password})
-      or die "Login au serveur FTP impossible : ", $ftp->message;
-    $ftp->binary();
     chdir($self->root . "/var/spool/waiting");
-    my @files = $ftp->ls();
-    for my $file (@files) {
-        $ftp->get($file);
-        $ftp->delete($file);
+
+    my $is_sftp = $c->{protocol} || '';
+    $is_sftp = $is_sftp =~ /sftp/;
+    if ($is_sftp) {
+        my %arg = (
+            user => $c->{login},
+            password => $c->{password},
+        );
+        my $ftp = Net::SFTP::Foreign->new($ftp_host, user => $c->{login}, password => $c->{password});
+        die "Login au serveur SFTP impossible : " . $ftp->error if $ftp->error;
+        my $files = $ftp->ls('.', names_only => 1);
+        for my $file (@$files) {
+            next if $file =~ /^\./;
+            $ftp->get($file);
+            $ftp->remove($file);
+        }
+    }
+    else {
+        my $ftp = Net::FTP->new($ftp_host, Debug => 0);
+        $ftp->login($c->{login}, $c->{password})
+          or die "Login au serveur FTP impossible : ", $ftp->message;
+        $ftp->binary();
+        my @files = $ftp->ls();
+        for my $file (@files) {
+            $ftp->get($file);
+            $ftp->delete($file);
+        }
     }
 }
 
@@ -292,7 +313,7 @@ Koha::Contrib::Sudoc - Chargeur Koha par Tamil
 
 =head1 VERSION
 
-version 2.43
+version 2.45
 
 =head1 DESCRIPTION
 

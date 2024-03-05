@@ -1,5 +1,8 @@
 Revision history for MsOffice-Word-Surgeon
 
+2.05    02.03.2024
+  - fix missing XML decode/encode operations on &<>
+
 2.04    13.02.2024
   - new method reveal_bookmarks()
 

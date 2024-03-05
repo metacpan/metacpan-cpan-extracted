@@ -1,7 +1,8 @@
 Alien::CFITSIO
 
-This module finds or builds the *CFITSIO* library. It supports *at
-least* version CFITSIO 4.1.0.
+This module finds or builds the CFITSIO
+<https://heasarc.gsfc.nasa.gov/docs/software/fitsio/fitsio.html>
+library. It supports CFITSIO version 4.4.0.
 
 INSTALLATION
 

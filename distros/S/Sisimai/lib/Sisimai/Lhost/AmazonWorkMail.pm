@@ -6,12 +6,12 @@ use warnings;
 
 # https://aws.amazon.com/workmail/
 sub description { 'Amazon WorkMail: https://aws.amazon.com/workmail/' }
-sub make {
+sub inquire {
     # Detect an error from Amazon WorkMail
     # @param    [Hash] mhead    Message headers of a bounce email
     # @param    [String] mbody  Message body of a bounce email
     # @return   [Hash]          Bounce data list and message/rfc822 part
-    # @return   [Undef]         failed to parse or the arguments are missing
+    # @return   [undef]         failed to parse or the arguments are missing
     # @since v4.1.29
     my $class = shift;
     my $mhead = shift // return undef;
@@ -31,22 +31,20 @@ sub make {
     return undef if $match < 2;
 
     state $indicators = __PACKAGE__->INDICATORS;
-    state $rebackbone = qr|^content-type:[ ]message/rfc822|m;
+    state $boundaries = ['Content-Type: message/rfc822'];
     state $startingof = { 'message' => ['Technical report:'] };
 
-    require Sisimai::RFC1894;
     my $fieldtable = Sisimai::RFC1894->FIELDTABLE;
     my $permessage = {};    # (Hash) Store values of each Per-Message field
-
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
-    my $emailsteak = Sisimai::RFC5322->fillet($mbody, $rebackbone);
+    my $emailparts = Sisimai::RFC5322->part($mbody, $boundaries);
     my $readcursor = 0;     # (Integer) Points the current cursor position
     my $recipients = 0;     # (Integer) The number of 'Final-Recipient' header
     my $v = undef;
 
-    for my $e ( split("\n", $emailsteak->[0]) ) {
-        # Read error messages and delivery status lines from the head of the email
-        # to the previous line of the beginning of the original message.
+    for my $e ( split("\n", $emailparts->[0]) ) {
+        # Read error messages and delivery status lines from the head of the email to the previous
+        # line of the beginning of the original message.
         unless( $readcursor ) {
             # Beginning of the bounce message or message/delivery-status part
             $readcursor |= $indicators->{'deliverystatus'} if index($e, $startingof->{'message'}->[0]) == 0;
@@ -106,20 +104,18 @@ sub make {
         $e->{ $_ } ||= $permessage->{ $_ } || '' for keys %$permessage;
         $e->{'diagnosis'} = Sisimai::String->sweep($e->{'diagnosis'});
 
-        if( $e->{'status'} =~ /\A[45][.][01][.]0\z/ ) {
+        if( index($e->{'status'}, '.0.0') > 0 || index($e->{'status'}, '.1.0') > 0 ) {
             # Get other D.S.N. value from the error message
             # 5.1.0 - Unknown address error 550-'5.7.1 ...
-            my $errormessage = $e->{'diagnosis'};
-               $errormessage = $1 if $e->{'diagnosis'} =~ /["'](\d[.]\d[.]\d.+)['"]/;
-            $e->{'status'}   = Sisimai::SMTP::Status->find($errormessage) || $e->{'status'};
+            $e->{'status'}   = Sisimai::SMTP::Status->find($e->{'diagnosis'}) || $e->{'status'};
         }
 
         # 554 4.4.7 Message expired: unable to deliver in 840 minutes.
         # <421 4.4.2 Connection timed out>
-        $e->{'replycode'} = $1 if $e->{'diagnosis'} =~ /[<]([245]\d\d)[ ].+[>]/;
-        $e->{'reason'}  ||= Sisimai::SMTP::Status->name($e->{'status'}) || '';
+        $e->{'replycode'} = Sisimai::SMTP::Reply->find($e->{'diagnosis'}) || '';
+        $e->{'reason'}  ||= Sisimai::SMTP::Status->name($e->{'status'})   || '';
     }
-    return { 'ds' => $dscontents, 'rfc822' => $emailsteak->[1] };
+    return { 'ds' => $dscontents, 'rfc822' => $emailparts->[1] };
 }
 
 1;
@@ -137,8 +133,8 @@ Sisimai::Lhost::AmazonWorkMail - bounce mail parser class for C<Amazon WorkMail>
 
 =head1 DESCRIPTION
 
-Sisimai::Lhost::AmazonWorkMail parses a bounce email which created by C<Amazon WorkMail>.
-Methods in the module are called from only Sisimai::Message.
+Sisimai::Lhost::AmazonWorkMail parses a bounce email which created by C<Amazon WorkMail>. Methods in
+the module are called from only Sisimai::Message.
 
 =head1 CLASS METHODS
 
@@ -148,10 +144,10 @@ C<description()> returns description string of this module.
 
     print Sisimai::Lhost::AmazonWorkMail->description;
 
-=head2 C<B<make(I<header data>, I<reference to body string>)>>
+=head2 C<B<inquire(I<header data>, I<reference to body string>)>>
 
-C<make()> method parses a bounced email and return results as a array reference.
-See Sisimai::Message for more details.
+C<inquire()> method parses a bounced email and return results as a array reference. See Sisimai::Message
+for more details.
 
 =head1 AUTHOR
 
@@ -159,7 +155,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2016-2020 azumakuniyuki, All rights reserved.
+Copyright (C) 2016-2021,2023 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

@@ -5,44 +5,46 @@ use warnings;
 
 # http://tools.ietf.org/html/rfc3834
 sub description { 'Detector for auto replied message' }
-sub make {
+sub inquire {
     # Detect auto reply message as RFC3834
     # @param    [Hash] mhead    Message headers of a bounce email
     # @param    [String] mbody  Message body of a bounce email
     # @return   [Hash]          Bounce data list and message/rfc822 part
-    # @return   [Undef]         failed to parse or the arguments are missing
+    # @return   [undef]         failed to parse or the arguments are missing
     # @since v4.1.28
     my $class = shift;
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
     my $leave = 0;
     my $match = 0;
+    my $lower = {};
 
     return undef unless keys %$mhead;
     return undef unless ref $mbody eq 'SCALAR';
 
-    my    $markingsof = { 'boundary' => qr/\A__SISIMAI_PSEUDO_BOUNDARY__\z/ };
-    state $autoreply1 = {
-        # http://www.iana.org/assignments/auto-submitted-keywords/auto-submitted-keywords.xhtml
-        'auto-submitted' => qr/\Aauto-(?:generated|replied|notified)/,
-        'x-apple-action' => qr/\Avacation\z/,
-        'precedence' => qr/\Aauto_reply\z/,
-        'subject' => qr/\A(?>
-             auto:
-            |auto[ ]response:
-            |automatic[ ]reply:
-            |out[ ]of[ ](?:the[ ])*office:
-            )
-        /x,
+    my $markingsof = { 'boundary' => '__SISIMAI_PSEUDO_BOUNDARY__' };
+    my $lowerlabel = ['from', 'to', 'subject', 'auto-submitted', 'precedence', 'x-apple-action'];
+
+    for my $e ( @$lowerlabel ) {
+        # Set lower-cased value of each header related to auto-response
+        next unless exists  $mhead->{ $e };
+        $lower->{ $e } = lc $mhead->{ $e };
+    }
+
+    state $donotparse = {
+        'from'    => ['root@', 'postmaster@', 'mailer-daemon@'],
+        'to'      => ['root@'],
+        'subject' => [
+            'security information for', # sudo(1)
+            'mail failure -',           # Exim
+        ],
     };
-    state $excludings = {
-        'subject' => qr{(?:
-              security[ ]information[ ]for  # sudo
-             |mail[ ]failure[ ][-]          # Exim
-             )
-        }x,
-        'from'    => qr/(?:root|postmaster|mailer-daemon)[@]/,
-        'to'      => qr/root[@]/,
+    state $autoreply0 = {
+        # http://www.iana.org/assignments/auto-submitted-keywords/auto-submitted-keywords.xhtml
+        'auto-submitted' => ['auto-generated', 'auto-replied', 'auto-notified'],
+        'precedence'     => ['auto_reply'],
+        'subject'        => ['auto:', 'auto response:', 'automatic reply:', 'out of office:', 'out of the office:'],
+        'x-apple-action' => ['vacation'],
     };
     state $subjectset = qr{\A(?>
          (?:.+?)?re:
@@ -53,21 +55,20 @@ sub make {
         [ ]*(.+)\z
     }x;
 
-    DETECT_EXCLUSION_MESSAGE: for my $e ( keys %$excludings ) {
+    DETECT_EXCLUSION_MESSAGE: for my $e ( keys %$donotparse ) {
         # Exclude message from root@
-        next unless exists $mhead->{ $e };
-        next unless defined $mhead->{ $e };
-        next unless lc($mhead->{ $e }) =~ $excludings->{ $e };
+        next unless exists  $lower->{ $e };
+        next unless grep { index($lower->{ $e }, $_) > -1 } $donotparse->{ $e }->@*;
         $leave = 1;
         last;
     }
     return undef if $leave;
 
-    DETECT_AUTO_REPLY_MESSAGE: for my $e ( keys %$autoreply1 ) {
+    DETECT_AUTO_REPLY_MESSAGE0: for my $e ( keys %$autoreply0 ) {
         # RFC3834 Auto-Submitted and other headers
-        next unless exists $mhead->{ $e };
-        next unless defined $mhead->{ $e };
-        next unless lc($mhead->{ $e }) =~ $autoreply1->{ $e };
+        next unless exists  $lower->{ $e };
+        next unless grep { index($lower->{ $e }, $_) == 0 } $autoreply0->{ $e }->@*;
+
         $match++;
         last;
     }
@@ -87,7 +88,6 @@ sub make {
         for my $e ('from', 'return-path') {
             # Get the recipient address
             next unless exists  $mhead->{ $e };
-            next unless defined $mhead->{ $e };
 
             $v->{'recipient'} = $mhead->{ $e };
             last;
@@ -102,17 +102,16 @@ sub make {
     return undef unless $recipients;
 
     if( $mhead->{'content-type'} ) {
-        # Get the boundary string and set regular expression for matching with
-        # the boundary string.
-        my $b0 = Sisimai::MIME->boundary($mhead->{'content-type'}, 0);
-        $markingsof->{'boundary'} = qr/\A\Q$b0\E\z/ if length $b0;
+        # Get the boundary string and set regular expression for matching with the boundary string.
+        my $q = Sisimai::RFC2045->boundary($mhead->{'content-type'}, 0);
+        $markingsof->{'boundary'} = $q if $q;
     }
 
     BODY_PARSER: {
         # Get vacation message
         for my $e ( split("\n", $$mbody) ) {
             # Read the first 5 lines except a blank line
-            $countuntil += 1 if $e =~ $markingsof->{'boundary'};
+            $countuntil += 1 if index($e, $markingsof->{'boundary'}) > -1;
 
             unless( length $e ) {
                 # Check a blank line
@@ -120,8 +119,8 @@ sub make {
                 next;
             }
             next unless rindex($e, ' ') > -1;
-            next if index($e, 'Content-Type') == 0;
-            next if index($e, 'Content-Transfer') == 0;
+            next if      index($e, 'Content-Type')     == 0;
+            next if      index($e, 'Content-Transfer') == 0;
 
             $v->{'diagnosis'} .= $e.' ';
             $haveloaded++;
@@ -136,7 +135,7 @@ sub make {
     $v->{'status'}    = '';
 
     # Get the Subject header from the original message
-    my $rfc822part = lc($mhead->{'subject'}) =~ $subjectset ? 'Subject: '.$1."\n" : '';
+    my $rfc822part = $lower->{'subject'} =~ $subjectset ? 'Subject: '.$1."\n" : '';
     return { 'ds' => $dscontents, 'rfc822' => $rfc822part };
 }
 
@@ -154,8 +153,8 @@ Sisimai::RFC3834 - RFC3834 auto reply message detector
 
 =head1 DESCRIPTION
 
-Sisimai::RFC3834 is a class which called from called from only Sisimai::Message
-when other Sisimai::Lhost::* modules did not detected a bounce reason.
+Sisimai::RFC3834 is a class which called from called from only Sisimai::Message when other
+Sisimai::Lhost::* modules did not detected a bounce reason.
 
 =head1 CLASS METHODS
 
@@ -165,10 +164,10 @@ C<description()> returns description string of this module.
 
     print Sisimai::RFC3834->description;
 
-=head2 C<B<make(I<header data>, I<reference to body string>)>>
+=head2 C<B<inquire(I<header data>, I<reference to body string>)>>
 
-C<make()> method parses an auto replied message and return results as an array
-reference. See Sisimai::Message for more details.
+C<inquire()> method parses an auto replied message and return results as an array reference. See
+Sisimai::Message for more details.
 
 =head1 AUTHOR
 
@@ -176,7 +175,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2015-2020,2023 azumakuniyuki, All rights reserved.
+Copyright (C) 2015-2023 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

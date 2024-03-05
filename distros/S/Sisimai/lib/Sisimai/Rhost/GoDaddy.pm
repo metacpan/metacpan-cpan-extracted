@@ -6,15 +6,15 @@ use warnings;
 # https://www.godaddy.com/help/what-does-my-email-bounceback-mean-3568
 sub get {
     # Detect bounce reason from GoDaddy (smtp.secureserver.net)
-    # @param    [Sisimai::Data] argvs   Parsed email object
+    # @param    [Sisimai::Fact] argvs   Parsed email object
     # @return   [String]                The bounce reason for GoDaddy
     # @see      https://www.godaddy.com/help/what-does-my-email-bounceback-mean-3568
     my $class = shift;
     my $argvs = shift // return undef;
-    return $argvs->reason if $argvs->reason;
+    return $argvs->{'reason'} if $argvs->{'reason'};
 
     state $errorcodes = {
-        'IB103' => 'blocked',       # 554 Connection refused. This IP has a poor reputation on Cloudmark Sender Intelligence (CSI). IB103
+        'IB103' => 'badreputation', # 554 Connection refused. This IP has a poor reputation on Cloudmark Sender Intelligence (CSI). IB103
         'IB104' => 'blocked',       # 554 Connection refused. This IP is listed on the Spamhaus Block List (SBL). IB104
         'IB105' => 'blocked',       # 554 Connection refused. This IP is listed on the Exploits Block List (XBL). IB105
         'IB106' => 'blocked',       # 554 Connection refused. This IP is listed on the Policy Block List (PBL). IB106
@@ -45,17 +45,17 @@ sub get {
         'userunknown' => ['Account does not exist', '550 Recipient not found.'],
     };
 
-    my $statusmesg = $argvs->diagnosticcode;
+    my $issuedcode = $argvs->{'diagnosticcode'};
+    my $positionib = index($issuedcode, ' IB');
     my $reasontext = '';
 
-    if( $statusmesg =~ /\s(IB\d{3})\b/ ) {
-        # 192.0.2.22 has sent to too many recipients this hour. IB607 ...
-        $reasontext = $errorcodes->{ $1 };
-    } else {
+    # 192.0.2.22 has sent to too many recipients this hour. IB607 ...
+    $reasontext = $errorcodes->{ substr($issuedcode, $positionib + 1, 5) } || '' if $positionib > 1;
+    if( length $reasontext == 0 ) {
         # 553 http://www.spamhaus.org/query/bl?ip=192.0.0.222
         for my $e ( keys %$messagesof ) {
-            for my $f ( @{ $messagesof->{ $e } } ) {
-                next if index($statusmesg, $f) == -1;
+            for my $f ( $messagesof->{ $e }->@* ) {
+                next if index($issuedcode, $f) == -1;
                 $reasontext = $e;
                 last
             }
@@ -80,13 +80,13 @@ Sisimai::Rhost::GoDaddy - Detect the bounce reason returned from GoDaddy.
 
 =head1 DESCRIPTION
 
-Sisimai::Rhost detects the bounce reason from the content of Sisimai::Data
-object as an argument of get() method when the value of C<rhost> of the object
-end with "secureserver.net". This class is called only Sisimai::Data class.
+Sisimai::Rhost detects the bounce reason from the content of Sisimai::Fact object as an argument
+of get() method when the value of C<rhost> of the object end with "secureserver.net". This class
+is called only Sisimai::Fact class.
 
 =head1 CLASS METHODS
 
-=head2 C<B<get(I<Sisimai::Data Object>)>>
+=head2 C<B<get(I<Sisimai::Fact Object>)>>
 
 C<get()> detects the bounce reason.
 
@@ -96,7 +96,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017-2018,2020 azumakuniyuki, All rights reserved.
+Copyright (C) 2017-2018,2020-2023 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

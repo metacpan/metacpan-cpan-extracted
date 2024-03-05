@@ -2,13 +2,13 @@ package MsOffice::Word::Surgeon::Text;
 use 5.24.0;
 use Moose;
 use MooseX::StrictConstructor;
-use MsOffice::Word::Surgeon::Utils qw(maybe_preserve_spaces is_at_run_level);
+use MsOffice::Word::Surgeon::Utils qw(maybe_preserve_spaces is_at_run_level encode_entities);
 use Carp::Clan                     qw(^MsOffice::Word::Surgeon); # will import carp, croak, etc.
 
 use namespace::clean -except => 'meta';
 
 
-our $VERSION = '2.04';
+our $VERSION = '2.05';
 
 #======================================================================
 # ATTRIBUTES
@@ -28,13 +28,12 @@ sub as_xml {
   my $xml = $self->xml_before // '';
   my $lit_txt = $self->literal_text;
   if (defined $lit_txt && $lit_txt ne '') {
-    my $space_attr  = maybe_preserve_spaces($lit_txt);
+    encode_entities($lit_txt);
+    my $space_attr = maybe_preserve_spaces($lit_txt);
     $xml .= "<w:t$space_attr>$lit_txt</w:t>";
   }
   return $xml;
 }
-
-
 
 sub merge {
   my ($self, $next_text) = @_;
@@ -46,7 +45,6 @@ sub merge {
   $self->{literal_text} .= $next_text->literal_text;
 
 }
-
 
 sub replace {
   my ($self, $pattern, $replacement, %args) = @_;
@@ -116,7 +114,7 @@ sub replace {
                                            (!$txt_before ? $maybe_xml_before->() : ()),
                                            %args);
 
-    my $replacement_is_xml = $replacement_contents =~ /^</;
+    my $replacement_is_xml = $replacement_contents =~ /^<w:/;
     if ($replacement_is_xml) {
       # if there was text before the match, add it as a new run
       if ($txt_before) {

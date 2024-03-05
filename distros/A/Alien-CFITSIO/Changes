@@ -1,5 +1,34 @@
 Revision history for Alien-CFITSIO
 
+v4.4.0.0  2024-03-04 12:43:10-05:00 America/New_York
+
+  [ENHANCEMENT]
+
+    * build CFITSIO v4.4.0. Work around change CFITSIO's Makefile.in to
+      allow setting DESTDIR in the environment
+
+v4.3.1.0  2024-03-01 15:39:21-05:00 America/New_York
+
+  [CHANGE IN DEFAULT INSTALLED VERSION]
+
+    * The default version of CFITSIO installed has changed from "any
+      version greater or equal to this distribution's version" to "the
+      version which exactly matches this distribution's version" (ignoring
+      the last stanza in the distriution's version)
+
+      The previous behavior was based on the fact that CFITSIO's API
+      is very backwards compatible, so pulling in a newer version
+      wasn't harmful (except maybe if you're relying upon buggy
+      behavior which is fixed in a newer version).
+
+      However, upstream CFITSIO's build process may change for later
+      versions, and this module will begin to fail to build through no
+      fault of its own, breaking dependencies.
+
+      Forcing an exact version of CFITSIO to be installed should
+      alleviate this.
+
+
 v4.3.0.0  2023-07-28 15:25:34-04:00 America/New_York
 
   [ENHANCEMENT]

@@ -3,22 +3,21 @@ use Test::More;
 use lib qw(./lib ./blib/lib);
 use Sisimai::SMTP::Status;
 
-my $PackageName = 'Sisimai::SMTP::Status';
-my $MethodNames = {
-    'class' => ['code', 'name', 'find'],
+my $Package = 'Sisimai::SMTP::Status';
+my $Methods = {
+    'class'  => ['code', 'name', 'test', 'find', 'prefer'],
     'object' => [],
 };
 
-use_ok $PackageName;
-can_ok $PackageName, @{ $MethodNames->{'class'} };
+use_ok $Package;
+can_ok $Package, @{ $Methods->{'class'} };
 
-MAKE_TEST: {
-    my $reasonlist = [
-        'blocked', 'contenterror', 'exceedlimit', 'expired', 'filtered', 'hasmoved',
-        'hostunknown', 'mailboxfull', 'mailererror', 'mesgtoobig', 'networkerror',
-        'norelaying', 'notaccept', 'onhold', 'policyviolation', 'rejected', 'securityerror',
-        'spamdetected', 'suspend', 'syntaxerror', 'systemerror', 'systemfull', 'toomanyconn',
-        'userunknown', 'virusdetected',
+MAKETEST: {
+    my $reasonlist = [qw/
+      authfailure badreputation blocked contenterror exceedlimit expired filtered hasmoved
+      hostunknown mailboxfull mailererror mesgtoobig networkerror notaccept onhold rejected
+      norelaying spamdetected virusdetected policyviolation securityerror speeding suspend
+      requireptr notcompliantrfc systemerror systemfull toomanyconn userunknown syntaxerror/
     ];
     my $statuslist = [ qw/
         2.1.5
@@ -44,21 +43,23 @@ MAKE_TEST: {
         'SMTP; 552-5.7.0 This message was blocked because its content presents a potential',
         'SMTP; 550 5.1.1 Requested action not taken: mailbox unavailable',
         'SMTP; 550 5.7.1 IP address blacklisted by recipient',
+        'SMTP; 550 5.7.25 The ip address sending this message does not have a ptr record setup',
+        'smtp; 550-5.7.1 This message is not RFC 5322 compliant. There are multiple Subject 550-5.7.1 headers',
     ];
     my $v = '';
 
-    is $PackageName->code(''), undef, '->code() = undef';
+    is $Package->code(''), undef, '->code() = undef';
     PSEUDO_STATUS_CODE: for my $e ( @$reasonlist ) {
-        $v = $PackageName->code($e);
+        $v = $Package->code($e);
         like $v, qr/\A5[.]\d[.]9\d+/, 'pseudo status code('.$e.') = '.$v;
 
-        $v = $PackageName->code($e, 1);
+        $v = $Package->code($e, 1);
         like $v, qr/\A[45][.]\d[.]9\d+/, 'pseudo status code('.$e.',1) = '.$v;
     }
 
-    is $PackageName->name(''), undef, '->name() = undef';
+    is $Package->name(''), undef, '->name() = undef';
     STANRDARD_STATUS_CODE: for my $e ( @$statuslist ) {
-        $v = $PackageName->name($e);
+        $v = $Package->name($e);
         if( $v eq 'delivered' ) {
             is $v, 'delivered', '->name('.$e.') returns delivered';
 
@@ -67,11 +68,25 @@ MAKE_TEST: {
         }
     }
 
-    is $PackageName->find(''), undef, '->find("") = undef';
+    is $Package->test(''), undef, '->test("") = undef';
+    is $Package->test('3.14'), 0, '->test("3.14") = 0';
+
+    is $Package->find(''), undef, '->find("") = undef';
     for my $e ( @$smtperrors ) {
-        $v = $PackageName->find($e);
-        like $v, qr/\A[245][.]\d[.]\d\z/, '->find() returns '.$v;
+        $v = $Package->find($e);
+        like $v, qr/\A[245][.]\d[.]\d{1,3}\z/, '->find() returns '.$v;
+        is $Package->test($v), 1, '->test() returns 1';
     }
+
+    is $Package->prefer(''), "", '->prefer("") = ""';
+    is $Package->prefer('5.2.2', ''), '5.2.2';
+    is $Package->prefer('', '5.3.5'), '5.3.5';
+    is $Package->prefer('5.0.0', '5.1.1'), '5.1.1';
+    is $Package->prefer('5.2.0', '5.2.1'), '5.2.1';
+    is $Package->prefer('5.2.1', '5.2.0'), '5.2.1';
+    is $Package->prefer('4.4.7', '4.2.2'), '4.2.2';
+    is $Package->prefer('5.7.8', '4.4.0', 550), '5.7.8';
+    is $Package->prefer('4.2.1', '5.7.0', 421), '4.2.1';
 }
 
 done_testing;

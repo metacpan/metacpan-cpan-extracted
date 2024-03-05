@@ -33,13 +33,16 @@ no_index:
 provides:
   Alien::SeqAlignment::parasail:
     file: lib/Alien/SeqAlignment/parasail.pm
-    version: '0.01'
+    version: '0.03'
 requires:
   Alien::Base: '0'
   parent: '0'
   strict: '0'
   warnings: '0'
-version: '0.01'
+resources:
+  bugtracker: https://github.com/chrisarg/Alien-SeqAlignment-parasail/issues
+  repository: git://github.com/chrisarg/Alien-SeqAlignment-parasail.git
+version: '0.03'
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:

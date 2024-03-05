@@ -13,7 +13,7 @@ Neo4j::Driver::Deprecations - Explains features that have been deprecated, but n
 
 =head1 VERSION
 
-version 0.45
+version 0.46
 
 =head1 OVERVIEW
 
@@ -125,7 +125,7 @@ See L<Neo4j::Driver::Plugin/"http_adapter_factory"> for details.
 
 At that point, your code setting the C<net_module> config option
 can simply be replaced by calls to
-L<"plugin" in Neo4j::Driver|Neo4j::Driver/"Plug-in modules">.
+L<Neo4j::Driver/"plugin">.
 
  # Deprecated config option:
  use Local::Foo;
@@ -458,6 +458,44 @@ simply use C<!!> to force evaluation in a boolean context.
  $val  = $session->run('RETURN false')->single->get;
  $ref  = ref $val;  # 'JSON::PP::Boolean'
  $bool = !! $val;
+
+=head2 Neo4j byte array type
+
+I<Direct unblessed string access deprecated in version 0.46
+and currently planned to be removed in S<Neo4j::Driver 1.00>
+and S<Neo4j::Bolt 0.5000>.>
+
+Support for Neo4j byte array types has always been problematic
+due to bugs and limitations in Neo4j itself. S<Version 0.46>
+adds support for L<Neo4j::Types::ByteArray> for Bolt and Jolt.
+Unfortunately, automatically detecting byte arrays in JSON
+result data isn't possible, and the same is true for result
+data from L<Neo4j::Bolt> S<version 0.4203> and earlier.
+
+Byte arrays will be made available as L<Neo4j::Types::ByteArray>
+values (Bolt and Jolt) and integer arrays (JSON); see also
+L<Neo4j::Driver::Types>. To correctly handle a value which
+you I<know> is a Neo4j byte array, but don't know how it was
+retrieved over the network, you need to account for both of
+the possible formats (or all three of them, if you include the
+unblessed string legacy format).
+
+ my $bytes = $record->get('bytearray');
+ if ($bytes isa Neo4j::Types::ByteArray) {
+   $bytes = $bytes->as_string;
+ }
+ elsif (ref $bytes eq 'ARRAY') {
+   # Legacy JSON, primarily Neo4j < 4.3
+   my $string = '';
+   for ($bytes->@*) {
+     $_ += 0x100 if $_ < 0;
+     $string .= chr;
+   }
+   $bytes = $string;
+ }
+ else {
+   # Legacy unblessed string: no action necessary
+ }
 
 =head2 Raw meta data access
 

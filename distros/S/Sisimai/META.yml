@@ -26,19 +26,19 @@ no_index:
 provides:
   Sisimai:
     file: lib/Sisimai.pm
-    version: v4.25.16
+    version: v5.0.1
   Sisimai::ARF:
     file: lib/Sisimai/ARF.pm
   Sisimai::Address:
     file: lib/Sisimai/Address.pm
-  Sisimai::Data:
-    file: lib/Sisimai/Data.pm
-  Sisimai::Data::JSON:
-    file: lib/Sisimai/Data/JSON.pm
-  Sisimai::Data::YAML:
-    file: lib/Sisimai/Data/YAML.pm
   Sisimai::DateTime:
     file: lib/Sisimai/DateTime.pm
+  Sisimai::Fact:
+    file: lib/Sisimai/Fact.pm
+  Sisimai::Fact::JSON:
+    file: lib/Sisimai/Fact/JSON.pm
+  Sisimai::Fact::YAML:
+    file: lib/Sisimai/Fact/YAML.pm
   Sisimai::Lhost:
     file: lib/Sisimai/Lhost.pm
   Sisimai::Lhost::Activehunter:
@@ -153,8 +153,6 @@ provides:
     file: lib/Sisimai/Lhost/qmail.pm
   Sisimai::MDA:
     file: lib/Sisimai/MDA.pm
-  Sisimai::MIME:
-    file: lib/Sisimai/MIME.pm
   Sisimai::Mail:
     file: lib/Sisimai/Mail.pm
   Sisimai::Mail::Maildir:
@@ -171,14 +169,22 @@ provides:
     file: lib/Sisimai/Order.pm
   Sisimai::RFC1894:
     file: lib/Sisimai/RFC1894.pm
+  Sisimai::RFC2045:
+    file: lib/Sisimai/RFC2045.pm
   Sisimai::RFC3464:
     file: lib/Sisimai/RFC3464.pm
   Sisimai::RFC3834:
     file: lib/Sisimai/RFC3834.pm
   Sisimai::RFC5322:
     file: lib/Sisimai/RFC5322.pm
+  Sisimai::RFC5965:
+    file: lib/Sisimai/RFC5965.pm
   Sisimai::Reason:
     file: lib/Sisimai/Reason.pm
+  Sisimai::Reason::AuthFailure:
+    file: lib/Sisimai/Reason/AuthFailure.pm
+  Sisimai::Reason::BadReputation:
+    file: lib/Sisimai/Reason/BadReputation.pm
   Sisimai::Reason::Blocked:
     file: lib/Sisimai/Reason/Blocked.pm
   Sisimai::Reason::ContentError:
@@ -209,16 +215,22 @@ provides:
     file: lib/Sisimai/Reason/NoRelaying.pm
   Sisimai::Reason::NotAccept:
     file: lib/Sisimai/Reason/NotAccept.pm
+  Sisimai::Reason::NotCompliantRFC:
+    file: lib/Sisimai/Reason/NotCompliantRFC.pm
   Sisimai::Reason::OnHold:
     file: lib/Sisimai/Reason/OnHold.pm
   Sisimai::Reason::PolicyViolation:
     file: lib/Sisimai/Reason/PolicyViolation.pm
   Sisimai::Reason::Rejected:
     file: lib/Sisimai/Reason/Rejected.pm
+  Sisimai::Reason::RequirePTR:
+    file: lib/Sisimai/Reason/RequirePTR.pm
   Sisimai::Reason::SecurityError:
     file: lib/Sisimai/Reason/SecurityError.pm
   Sisimai::Reason::SpamDetected:
     file: lib/Sisimai/Reason/SpamDetected.pm
+  Sisimai::Reason::Speeding:
+    file: lib/Sisimai/Reason/Speeding.pm
   Sisimai::Reason::Suspend:
     file: lib/Sisimai/Reason/Suspend.pm
   Sisimai::Reason::SyntaxError:
@@ -241,34 +253,38 @@ provides:
     file: lib/Sisimai/Rhost.pm
   Sisimai::Rhost::Cox:
     file: lib/Sisimai/Rhost/Cox.pm
-  Sisimai::Rhost::ExchangeOnline:
-    file: lib/Sisimai/Rhost/ExchangeOnline.pm
   Sisimai::Rhost::FrancePTT:
     file: lib/Sisimai/Rhost/FrancePTT.pm
   Sisimai::Rhost::GoDaddy:
     file: lib/Sisimai/Rhost/GoDaddy.pm
-  Sisimai::Rhost::GoogleApps:
-    file: lib/Sisimai/Rhost/GoogleApps.pm
+  Sisimai::Rhost::Google:
+    file: lib/Sisimai/Rhost/Google.pm
   Sisimai::Rhost::IUA:
     file: lib/Sisimai/Rhost/IUA.pm
   Sisimai::Rhost::KDDI:
     file: lib/Sisimai/Rhost/KDDI.pm
+  Sisimai::Rhost::Microsoft:
+    file: lib/Sisimai/Rhost/Microsoft.pm
   Sisimai::Rhost::Mimecast:
     file: lib/Sisimai/Rhost/Mimecast.pm
   Sisimai::Rhost::NTTDOCOMO:
     file: lib/Sisimai/Rhost/NTTDOCOMO.pm
   Sisimai::Rhost::Spectrum:
     file: lib/Sisimai/Rhost/Spectrum.pm
-  Sisimai::Rhost::TencentQQ:
-    file: lib/Sisimai/Rhost/TencentQQ.pm
+  Sisimai::Rhost::Tencent:
+    file: lib/Sisimai/Rhost/Tencent.pm
   Sisimai::SMTP:
     file: lib/Sisimai/SMTP.pm
+  Sisimai::SMTP::Command:
+    file: lib/Sisimai/SMTP/Command.pm
   Sisimai::SMTP::Error:
     file: lib/Sisimai/SMTP/Error.pm
   Sisimai::SMTP::Reply:
     file: lib/Sisimai/SMTP/Reply.pm
   Sisimai::SMTP::Status:
     file: lib/Sisimai/SMTP/Status.pm
+  Sisimai::SMTP::Transcript:
+    file: lib/Sisimai/SMTP/Transcript.pm
   Sisimai::String:
     file: lib/Sisimai/String.pm
   Sisimai::Time:
@@ -284,7 +300,7 @@ resources:
   bugtracker: https://github.com/sisimai/p5-sisimai/issues
   homepage: https://libsisimai.org/
   repository: git://github.com/sisimai/p5-sisimai.git
-version: v4.25.16
+version: v5.0.1
 x_contributors:
   - '0xcdcdcdcd <0xcdcdcdcd@gmail.com>'
   - 'Adrian Yee <adrian@gt.net>'
@@ -294,7 +310,6 @@ x_contributors:
   - 'Mutsutoshi Yoshimoto <negachov@gmail.com>'
   - 'Stefan Hornburg (Racke) <racke@linuxia.de>'
   - 'Valentin Henon <valentin.henon@gmail.com>'
-  - 'Valentin Henon <vhenon@mindbaz.com>'
   - 'Xavier <yadd@debian.org>'
   - 'Xavier Guimard <x.guimard@free.fr>'
   - 'azuma, kuniyuki <azumakuniyuki@users.noreply.github.com>'

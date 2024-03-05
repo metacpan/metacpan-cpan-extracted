@@ -115,7 +115,7 @@ use Neo4j::Types;
 
 my ($s, $r, $v, $e);
 
-plan tests => 1 + 9 + $no_warnings;
+plan tests => 1 + 10 + $no_warnings;
 
 
 lives_and { ok $s = Neo4j::Driver->new('http:')
@@ -139,7 +139,7 @@ sub id5 {
 
 
 subtest 'property types' => sub {
-	plan tests => 13;
+	plan tests => 16;
 	lives_and { ok $r = $s->run('property') } 'run';
 	lives_and { is $r->fetch->get(), undef } 'null';
 	lives_ok { $v = undef; $v = $r->fetch->get() } 'Boolean true';
@@ -151,7 +151,13 @@ subtest 'property types' => sub {
 	lives_and { is $r->fetch->get(), 13 } 'Integer';
 	lives_and { is $r->fetch->get(), 0.5 } 'Float';
 	lives_and { is $r->fetch->get(), 'hello' } 'String';
-	lives_and { is $r->fetch->get(), 'Foo' } 'Bytes';
+	lives_ok { $v = undef; $v = $r->fetch->get() } 'Bytes';
+	isa_ok $v, 'Neo4j::Types::ByteArray';
+	lives_and { is $v->as_string(), 'Foo' } 'Bytes as_string';
+	lives_and {
+		no warnings 'deprecated';
+		is "$v", 'Foo';
+	} 'Bytes stringify overload';
 	lives_and { ok ! $r->has_next } 'no has_next';
 };
 
@@ -382,6 +388,81 @@ subtest 'type errors' => sub {
 	lives_and { is id5($v, 'end_id'), undef } 'rDLX end_id';
 	lives_and { is $v->end_element_id(), '8::1:DLI' } 'rDLX end_element_id';
 	lives_and { ok ! $r->has_next } 'no has_next';
+};
+
+
+response_for 'no labels' => { jolt => single_column(
+	{ '()' => [ 1, undef, {} ] },
+)};
+response_for 'zero labels' => { jolt => single_column(
+	{ '()' => [ 1, [], {} ] },
+)};
+response_for 'one label' => { jolt => single_column(
+	{ '()' => [ 1, ['foobar'], {} ] },
+)};
+response_for 'two labels' => { jolt => single_column(
+	{ '()' => [ 1, ['foo', 'baz'], {} ] },
+)};
+response_for 'no labels' => { jolt => single_column(
+	{ '()' => [ 1, [], {} ] },
+)};
+response_for 'one label' => { jolt => single_column(
+	{ '()' => [ 1, ['foobar'], {} ] },
+)};
+response_for 'path zero' => { jolt => single_column( { '..' => [
+	{ '()' => [ 11, [], {} ] },
+]})};
+response_for 'path one' => { jolt => single_column( { '..' => [
+	{ '()' => [ 2, [], {} ] },
+	{ '->' => [ 3, 2, 'TEST', 4, {} ] },
+	{ '()' => [ 4, [], {} ] },
+]})};
+response_for 'path two' => { jolt => single_column( { '..' => [
+	{ '()' => [ 5, [], {} ] },
+	{ '->' => [ 6, 5, 'TEST', 7, {} ] },
+	{ '()' => [ 7, [], {} ] },
+	{ '->' => [ 8, 7, 'TEST', 9, {} ] },
+	{ '()' => [ 9, [], {} ] },
+]})};
+subtest 'types node/path wantarray' => sub {
+	plan tests => 4*3 + 3*7;
+	
+	lives_and { $r = 0; ok $r = $s->run('no labels')->single->get } 'run no labels';
+	lives_and { is_deeply [$r->labels], [] } 'labels undef';
+	lives_and { is scalar($r->labels), 0 } 'labels undef scalar context';
+	lives_and { $r = 0; ok $r = $s->run('zero labels')->single->get } 'run zero labels';
+	lives_and { is_deeply [$r->labels], [] } '0 labels';
+	lives_and { is scalar($r->labels), 0 } '0 labels scalar context';
+	lives_and { $r = 0; ok $r = $s->run('one label')->single->get } 'run one label';
+	lives_and { is_deeply [$r->labels], ['foobar'] } '1 label';
+	lives_and { is scalar($r->labels), 1 } '1 label scalar context';
+	lives_and { $r = 0; ok $r = $s->run('two labels')->single->get } 'run two labels';
+	lives_and { is_deeply [$r->labels], ['foo','baz'] } '2 labels';
+	lives_and { is scalar($r->labels), 2 } '2 labels scalar context';
+	
+	lives_and { $r = 0; ok $r = $s->run('path zero')->single->get } 'run path zero';
+	lives_and { is_deeply [map {$_->id} $r->elements], [11] } '1 element';
+	lives_and { is_deeply [map {$_->id} $r->nodes], [11] } '1 node';
+	lives_and { is_deeply [map {$_->id} $r->relationships], [] } '0 rels';
+	lives_and { is scalar($r->elements), 1 } '1 element scalar context';
+	lives_and { is scalar($r->nodes), 1 } '1 node scalar context';
+	lives_and { is scalar($r->relationships), 0 } '0 rels scalar context';
+	
+	lives_and { $r = 0; ok $r = $s->run('path one')->single->get } 'run path one';
+	lives_and { is_deeply [map {$_->id} $r->elements], [2,3,4] } '3 elements';
+	lives_and { is_deeply [map {$_->id} $r->nodes], [2,4] } '2 nodes';
+	lives_and { is_deeply [map {$_->id} $r->relationships], [3] } '1 rel';
+	lives_and { is scalar($r->elements), 3 } '3 elements scalar context';
+	lives_and { is scalar($r->nodes), 2 } '2 nodes scalar context';
+	lives_and { is scalar($r->relationships), 1 } '1 rel scalar context';
+	
+	lives_and { $r = 0; ok $r = $s->run('path two')->single->get } 'run path two';
+	lives_and { is_deeply [map {$_->id} $r->elements], [5,6,7,8,9] } '5 elements';
+	lives_and { is_deeply [map {$_->id} $r->nodes], [5,7,9] } '3 nodes';
+	lives_and { is_deeply [map {$_->id} $r->relationships], [6,8] } '2 rels';
+	lives_and { is scalar($r->elements), 5 } '5 elements scalar context';
+	lives_and { is scalar($r->nodes), 3 } '3 nodes scalar context';
+	lives_and { is scalar($r->relationships), 2 } '2 rels scalar context';
 };
 
 

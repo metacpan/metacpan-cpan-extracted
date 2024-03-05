@@ -6,26 +6,23 @@ use warnings;
 
 # https://aws.amazon.com/ses/
 sub description { 'Amazon SES(Sending): https://aws.amazon.com/ses/' };
-sub make {
+sub inquire {
     # Detect an error from Amazon SES
     # @param    [Hash] mhead    Message headers of a bounce email
     # @param    [String] mbody  Message body of a bounce email
     # @return   [Hash]          Bounce data list and message/rfc822 part
-    # @return   [Undef]         failed to parse or the arguments are missing
+    # @return   [undef]         failed to parse or the arguments are missing
     # @since v4.0.2
     my $class = shift;
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
 
     state $indicators = __PACKAGE__->INDICATORS;
-    state $rebackbone = qr|^content-type:[ ]message/rfc822|m;
-    state $startingof = {
-        'message' => ['The following message to <', 'An error occurred while trying to deliver the mail '],
-    };
+    state $boundaries = ['Content-Type: message/rfc822'];
+    state $startingof = { 'message' => ['The following message to <', 'An error occurred while trying to deliver the mail '] };
     state $messagesof = { 'expired' => ['Delivery expired'] };
-
-    my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
-    my $recipients = 0; # (Integer) The number of 'Final-Recipient' header
+    my    $dscontents = [__PACKAGE__->DELIVERYSTATUS];
+    my    $recipients = 0; # (Integer) The number of 'Final-Recipient' header
 
     if( index($$mbody, '{') == 0 ) {
         # The message body is JSON string
@@ -100,7 +97,7 @@ sub make {
             for my $e ( @$r ) {
                 # 'bouncedRecipients' => [ { 'emailAddress' => 'bounce@si...' }, ... ]
                 # 'complainedRecipients' => [ { 'emailAddress' => 'complaint@si...' }, ... ]
-                next unless Sisimai::RFC5322->is_emailaddress($e->{'emailAddress'});
+                next unless Sisimai::Address->is_emailaddress($e->{'emailAddress'});
 
                 $v = $dscontents->[-1];
                 if( $v->{'recipient'} ) {
@@ -121,17 +118,19 @@ sub make {
                     $v->{'action'} = $e->{'action'};
                     $v->{'status'} = $e->{'status'};
 
-                    if( $e->{'diagnosticCode'} =~ /\A(.+?);[ ]*(.+)\z/ ) {
+                    my $p0 = index($e->{'diagnosticCode'}, '; ');
+                    if( $p0 > 3 ) {
                         # Diagnostic-Code: SMTP; 550 5.1.1 <userunknown@example.jp>... User Unknown
-                        $v->{'spec'} = uc $1;
-                        $v->{'diagnosis'} = $2;
+                        $v->{'spec'}   = uc substr($e->{'diagnosticCode'}, 0, $p0);
+                        $v->{'diagnosis'} = substr($e->{'diagnosticCode'}, $p0 + 2,);
 
                     } else {
                         $v->{'diagnosis'} = $e->{'diagnosticCode'};
                     }
 
                     # 'reportingMTA' => 'dsn; a27-23.smtp-out.us-west-2.amazonses.com',
-                    $v->{'lhost'} = $1 if $o->{'reportingMTA'} =~ /\Adsn;[ ](.+)\z/;
+                    $p0 = index($o->{'reportingMTA'}, 'dsn; ');
+                    $v->{'lhost'} = Sisimai::String->sweep(substr($o->{'reportingMTA'}, $p0 + 5,)) if $p0 == 0;
 
                     if( exists $bouncetype->{ $o->{'bounceType'} } &&
                         exists $bouncetype->{ $o->{'bounceType'} }->{ $o->{'bounceSubType'} } ) {
@@ -164,7 +163,7 @@ sub make {
                 #       ],
                 #       'smtpResponse' => '250 2.6.0 Message received'
                 #   },
-                next unless Sisimai::RFC5322->is_emailaddress($e);
+                next unless Sisimai::Address->is_emailaddress($e);
 
                 $v = $dscontents->[-1];
                 if( $v->{'recipient'} ) {
@@ -177,14 +176,12 @@ sub make {
                 $v->{'lhost'}     = $o->{'reportingMTA'} || '';
                 $v->{'diagnosis'} = $o->{'smtpResponse'} || '';
                 $v->{'status'}    = Sisimai::SMTP::Status->find($v->{'diagnosis'}) || '';
-                $v->{'replycode'} = Sisimai::SMTP::Reply->find($v->{'diagnosis'})  || '';
                 $v->{'reason'}    = 'delivered';
                 $v->{'action'}    = 'delivered';
                 ($v->{'date'} = $o->{'timestamp'} || $p->{'mail'}->{'timestamp'}) =~ s/[.]\d+Z\z//;
             }
         } else {
-            # The value of "notificationType" is not any of "Bounce", "Complaint",
-            # or "Delivery".
+            # The value of "notificationType" is not any of "Bounce", "Complaint", or "Delivery".
             return undef;
         }
         return undef unless $recipients;
@@ -192,9 +189,9 @@ sub make {
         if( exists $p->{'mail'}->{'headers'} ) {
             # "headersTruncated":false,
             # "headers":[ { ...
-            for my $e ( @{ $p->{'mail'}->{'headers'} } ) {
+            for my $e ( $p->{'mail'}->{'headers'}->@* ) {
                 # 'headers' => [ { 'name' => 'From', 'value' => 'neko@nyaan.jp' }, ... ],
-                next unless $e->{'name'} =~ /\A(?:From|To|Subject|Message-ID|Date)\z/;
+                next unless grep { $e->{'name'} eq $_ } ('From', 'To', 'Subject', 'Message-ID', 'Date');
                 $rfc822head->{ lc $e->{'name'} } = $e->{'value'};
             }
         }
@@ -222,15 +219,14 @@ sub make {
         $match ||= 1 if $mhead->{'x-ses-outgoing'};
         return undef unless $match;
 
-        require Sisimai::RFC1894;
         my $fieldtable = Sisimai::RFC1894->FIELDTABLE;
         my $permessage = {};    # (Hash) Store values of each Per-Message field
         my $readcursor = 0;     # (Integer) Points the current cursor position
-        my $emailsteak = Sisimai::RFC5322->fillet($mbody, $rebackbone);
+        my $emailparts = Sisimai::RFC5322->part($mbody, $boundaries);
         my $v = undef;
         my $p = '';
 
-        for my $e ( split("\n", $emailsteak->[0]) ) {
+        for my $e ( split("\n", $emailparts->[0]) ) {
             # Read each line between the start of the message and the start of rfc822 part.
             unless( $readcursor ) {
                 # Beginning of the bounce message or message/delivery-status part
@@ -281,8 +277,8 @@ sub make {
             } else {
                 # Continued line of the value of Diagnostic-Code field
                 next unless index($p, 'Diagnostic-Code:') == 0;
-                next unless $e =~ /\A[ \t]+(.+)\z/;
-                $v->{'diagnosis'} .= ' '.$1;
+                next unless index($e, ' ') == 0;
+                $v->{'diagnosis'} .= ' '.$e;
             }
         } continue {
             # Save the current line for the next loop
@@ -293,26 +289,30 @@ sub make {
         for my $e ( @$dscontents ) {
             # Set default values if each value is empty.
             $e->{'lhost'} ||= $permessage->{'rhost'};
-            $e->{ $_ } ||= $permessage->{ $_ } || '' for keys %$permessage;
+            $e->{ $_ }    ||= $permessage->{ $_ } || '' for keys %$permessage;
 
             $e->{'diagnosis'} =~ y/\n/ /;
             $e->{'diagnosis'} =  Sisimai::String->sweep($e->{'diagnosis'});
-            if( $e->{'status'} =~ /\A[45][.][01][.]0\z/ ) {
+
+            if( index($e->{'status'}, '.0.0') > 0 || index($e->{'status'}, '.1.0') > 0 ) {
                 # Get other D.S.N. value from the error message
                 # 5.1.0 - Unknown address error 550-'5.7.1 ...
                 my $errormessage = $e->{'diagnosis'};
-                   $errormessage = $1 if $e->{'diagnosis'} =~ /["'](\d[.]\d[.]\d.+)['"]/;
-                $e->{'status'}   = Sisimai::SMTP::Status->find($errormessage) || $e->{'status'};
+                my $p1 =  index($e->{'diagnosis'}, "-'"); $p1 =  index($e->{'diagnosis'}, '-"') if $p1 < 0;
+                my $p2 = rindex($e->{'diagnosis'}, "' "); $p2 = rindex($e->{'diagnosis'}, '" ') if $p2 < 0;
+                $errormessage  = substr($e->{'diagnosis'}, $p1 + 2, $p2 - $p1 - 2) if $p1 > -1 && $p2 > -1;
+                $e->{'status'} = Sisimai::SMTP::Status->find($errormessage) || $e->{'status'};
             }
+            $e->{'replycode'} ||= Sisimai::SMTP::Reply->find($e->{'diagnosis'}, $e->{'status'});
 
             SESSION: for my $r ( keys %$messagesof ) {
                 # Verify each regular expression of session errors
-                next unless grep { index($e->{'diagnosis'}, $_) > -1 } @{ $messagesof->{ $r } };
+                next unless grep { index($e->{'diagnosis'}, $_) > -1 } $messagesof->{ $r }->@*;
                 $e->{'reason'} = $r;
                 last;
             }
         }
-        return { 'ds' => $dscontents, 'rfc822' => $emailsteak->[1] };
+        return { 'ds' => $dscontents, 'rfc822' => $emailparts->[1] };
     }
 }
 
@@ -331,9 +331,8 @@ Sisimai::Lhost::AmazonSES - bounce mail parser class for C<Amazon SES>.
 
 =head1 DESCRIPTION
 
-Sisimai::Lhost::AmazonSES parses a bounce email or a JSON string which created
-by C<Amazon Simple Email Service>. Methods in the module are called from only
-Sisimai::Message.
+Sisimai::Lhost::AmazonSES parses a bounce email or a JSON string which created by
+C<Amazon Simple Email Service>. Methods in the module are called from only C<Sisimai::Message>.
 
 =head1 CLASS METHODS
 
@@ -343,15 +342,15 @@ C<description()> returns description string of this module.
 
     print Sisimai::Lhost::AmazonSES->description;
 
-=head2 C<B<make(I<header data>, I<reference to body string>)>>
+=head2 C<B<inquire(I<header data>, I<reference to body string>)>>
 
-C<make()> method parses a bounced email and return results as a array reference.
-See Sisimai::Message for more details.
+C<inquire()> method parses a bounced email and return results as a array reference.
+See C<Sisimai::Message> for more details.
 
 =head2 C<B<json(I<Hash>)>>
 
-C<json()> method adapts Amazon SES bounce object (JSON) for Perl hash object
-used at Sisimai::Message class.
+C<json()> method adapts Amazon SES bounce object (JSON) for Perl hash object used at
+C<Sisimai::Message> class.
 
 =head1 AUTHOR
 
@@ -359,7 +358,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2021 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2023 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

@@ -1,7 +1,7 @@
 package PAR;
-$PAR::VERSION = '1.019';
+$PAR::VERSION = '1.020';
 
-use 5.006;
+use 5.008009;
 use strict;
 use warnings;
 use Config;
@@ -328,7 +328,6 @@ use vars qw(@UpgradeRepositoryObjects);  # If we have PAR::Repository::Client's 
 use vars qw(%FileCache);            # The Zip-file file-name-cache
                                     # Layout:
                                     # $FileCache{$ZipObj}{$FileName} = $Member
-use vars qw(%ArchivesExtracted);    # Associates archive-zip-object => full extraction path
 
 my $ver  = $Config{version};
 my $arch = $Config{archname};
@@ -391,11 +390,6 @@ sub import {
         push @PAR_INC, unpar($progname, undef, undef, 1);
 
         _extract_inc($progname);
-        if ($LibCache{$progname}) {
-          # XXX bad: this us just a good guess
-          require File::Spec;
-          $ArchivesExtracted{$progname} = File::Spec->catdir($ENV{PAR_TEMP}, 'inc');
-        }
 
         my $zip = $LibCache{$progname};
         my $member = _first_member( $zip,
@@ -678,53 +672,49 @@ sub _run_external_file {
 # Archive::Zip handle to the PAR_TEMP/inc directory.
 # returns that directory.
 sub _extract_inc {
-    my $file_or_azip_handle = shift;
-    my $dlext = defined($Config{dlext}) ? $Config{dlext} : '';
-    my $is_handle = ref($file_or_azip_handle) && $file_or_azip_handle->isa('Archive::Zip::Archive');
+    my ($file_or_azip_handle) = @_;
+
+    my ($file, $zip);
+    if (ref($file_or_azip_handle) && $file_or_azip_handle->isa('Archive::Zip::Archive')) {
+        $file = $file_or_azip_handle->fileName();
+        $zip = $file_or_azip_handle;
+    }
+    else {
+        $file = $file_or_azip_handle;
+
+        # Temporarily increase Archive::Zip::ChunkSize so that we may find
+        # the EOCD even if stuff has been appended (e.g.by OSX codesign)
+        # to the zip/executable.
+        my $chunksize = Archive::Zip::chunkSize();
+        Archive::Zip::setChunkSize(-s $file);
+        $zip = Archive::Zip->new();
+        $zip->read($file) == AZ_OK or die qq[can't read zip file "$file"];
+        Archive::Zip::setChunkSize($chunksize);
+    }
 
     require File::Spec;
-
+    my $dlext = defined($Config{dlext}) ? $Config{dlext} : '';
     my $inc = File::Spec->catdir($PAR::SetupTemp::PARTemp, "inc");
-    my $inc_lock = "$inc.lock";
-
     my $canary = File::Spec->catfile($PAR::SetupTemp::PARTemp, $PAR::SetupTemp::Canary);
-
-    # acquire the "wanna extract inc" lock
-    open my $lock, ">", $inc_lock or die qq[can't open "$inc_lock": $!];
-    flock($lock, LOCK_EX);
 
     unless (-d $inc && -e $canary)
     {
+        # acquire the "wanna extract inc" lock
+        my $inc_lock = "$inc.lock";
+        open my $lock, ">", $inc_lock or die qq[can't open "$inc_lock": $!];
+        flock($lock, LOCK_EX);
+
         mkdir($inc, 0755);
 
         EXTRACT: {
-            my $zip;
-            if ($is_handle) {
-                $zip = $file_or_azip_handle;
-            } else {
-                # First try to unzip the *fast* way.
-                eval {
-                    require Archive::Unzip::Burst;
-                    Archive::Unzip::Burst::unzip($file_or_azip_handle, $inc) == AZ_OK;
-                } and last EXTRACT;
+            # First try to unzip the *fast* way.
+            eval {
+                require Archive::Unzip::Burst;
+                Archive::Unzip::Burst::unzip($file_or_azip_handle, $inc) == AZ_OK;
+            } and last EXTRACT;
 
-                # Either failed to load Archive::Unzip::Burst or
-                # Archive::Unzip::Burst::unzip failed: fallback to slow way.
-                open my $fh, '<', $file_or_azip_handle
-                  or die "Cannot find '$file_or_azip_handle': $!";
-                binmode($fh);
-                bless($fh, 'IO::File');
-
-                # Temporarily increase Archive::Zip::ChunkSize so that we may find
-                # the EOCD even if stuff has been appended (e.g.by OSX codesign)
-                # to the zip/executable.
-                Archive::Zip::setChunkSize(-s $fh);
-                $zip = Archive::Zip->new;
-                $zip->readFromFileHandle($fh, $file_or_azip_handle) == AZ_OK
-                    or die "Read '$file_or_azip_handle' error: $!";
-                Archive::Zip::setChunkSize(64 * 1024);
-            }
-
+            # Either failed to load Archive::Unzip::Burst or
+            # Archive::Unzip::Burst::unzip failed: fallback to slow way.
             foreach my $name ($zip->memberNames()) {
                 $name =~ s{^/}{};
                 my $outfile =  File::Spec->catfile($inc, $name);
@@ -735,14 +725,8 @@ sub _extract_inc {
                 # it to "now" (making it younger than the canary file).
                 utime(undef, undef, $outfile);
 
-                if (my ($xs_dll) = $name =~ m{^lib/(auto/.*\.\Q$dlext\E)$}) {
-                    $PAR::Heavy::FullCache{$outfile} = $xs_dll;
-                    $PAR::Heavy::FullCache{$xs_dll} = $outfile;
-                }
             }
         }
-
-        $ArchivesExtracted{$is_handle ? $file_or_azip_handle->fileName() : $file_or_azip_handle} = $inc;
 
         # touch (and back-date) canary file
         open my $fh, ">", $canary;
@@ -754,20 +738,28 @@ mechanism (probably based on file modification times).
         close $fh;
         my $dateback = time() - $PAR::SetupTemp::CanaryDateBack;
         utime($dateback, $dateback, $canary);
+
+        # release the "wanna extract inc" lock
+        flock($lock, LOCK_UN);
+        close $lock;
     }
 
-    # release the "wanna extract inc" lock
-    flock($lock, LOCK_UN);
-    close $lock;
-
-    # add the freshly extracted directories to @INC,
+    # Add the existing perl module directories to @INC,
     # but make sure there's no duplicates
     my %inc_exists = map { ($_, 1) } @INC;
-    unshift @INC, grep !exists($inc_exists{$_}),
-                  grep -d,
-                  map File::Spec->catdir($inc, @$_),
-                  [ 'lib' ], [ 'arch' ], [ $arch ],
-                  [ $ver ], [ $ver, $arch ], [];
+    unshift @INC, grep { !exists($inc_exists{$_}) && -d $_ }
+                       map { File::Spec->catdir($inc, @$_) }
+                           [ 'lib' ], [ 'arch' ], [ $arch ], [ $ver ], [ $ver, $arch ], [];
+
+    # Add all XS DLLs to $PAR::Heavy::FullCache
+    foreach my $name ($zip->memberNames()) {
+        $name =~ s{^/}{};
+        if (my ($xs_dll) = $name =~ m{/(auto/.*\.\Q$dlext\E)$}) {
+            my $outfile = File::Spec->catfile($inc, $name);
+            $PAR::Heavy::FullCache{$outfile} = $xs_dll;
+            $PAR::Heavy::FullCache{$xs_dll} = $outfile;
+        }
+    }
 
     return $inc;
 }
@@ -865,15 +857,7 @@ sub _find_par_internals {
     my ($INC_ARY, $self, $file, $member_only) = @_;
 
     my $scheme;
-    foreach (@$INC_ARY ? @$INC_ARY : @INC) {
-        my $path = $_;
-        if ($] < 5.008001) {
-            # reassemble from "perl -Ischeme://path" autosplitting
-            $path = "$scheme:$path" if !@$INC_ARY
-                and $path and $path =~ m!//!
-                and $scheme and $scheme =~ /^\w+$/;
-            $scheme = $path;
-        }
+    foreach my $path (@$INC_ARY ? @$INC_ARY : @INC) {
         my $rv = unpar($path, $file, $member_only, 1) or next;
         $PAR_INC{$path}{$file} = 1;
         $INC{$file} = $LastTempFile if (lc($file) =~ /^(?!tk).*\.pm$/);
@@ -1259,8 +1243,10 @@ Steffen Mueller E<lt>smueller@cpan.orgE<gt>
 You can write
 to the mailing list at E<lt>par@perl.orgE<gt>, or send an empty mail to
 E<lt>par-subscribe@perl.orgE<gt> to participate in the discussion.
+Archives of the mailing list are available at
+E<lt>https://www.mail-archive.com/par@perl.org/E<gt> or E<lt>https://groups.google.com/g/perl.parE<gt>.
 
-Please submit bug reports to E<lt>bug-par@rt.cpan.orgE<gt>. If you need
+Please submit bug reports to E<lt>https://github.com/rschupp/PAR/issuesE<gt>. If you need
 support, however, joining the E<lt>par@perl.orgE<gt> mailing list is
 preferred.
 

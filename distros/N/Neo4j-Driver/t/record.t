@@ -37,7 +37,6 @@ subtest 'wrong/ambiguous field names for get()' => sub {
 	is $r->get( 1 ), 0, 'get( 1 )';
 	is $r->get("1"), 1, 'get("1")';
 	# other possibly ambiguous cases
-	dies_ok { $r->get("2"); } 'get("2") dies';
 	lives_ok { $w = warning { $r->get; }; } 'get without field lives';
 	(like $w, qr/\bambiguous\b.*\bget\b.*\bfield/i, 'get without field ambiguous') or diag 'got warning(s): ', explain($w);
 	dies_ok { $r->get("nAn"); } 'field treated as case sensitive';
@@ -51,6 +50,7 @@ subtest 'wrong/ambiguous field names for get()' => sub {
 	lives_and { is $r->get( 2.0 ), 2 } 'get(2.0)';
 	$q = 'RETURN 1 AS a';
 	lives_and { is $s->run($q)->single->get(), 1 } 'unambiguous get without field';
+	dies_ok { $s->run($q)->single->get(''); } 'no-name field';
 	dies_ok { $s->run($q)->single->get({}); } 'non-scalar field';
 	dies_ok { $s->run($q)->single->get(1); } 'index out of bounds';
 	dies_ok { $s->run($q)->single->get(-1); } 'index negative';

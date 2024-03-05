@@ -1,0 +1,312 @@
+NAME
+    App::CSVUtils::csv_mix_formulas - Mix several formulas/recipes (lists of
+    ingredients and their weights/volumes) into one, and output the combined
+    formula
+
+VERSION
+    This document describes version 0.002 of App::CSVUtils::csv_mix_formulas
+    (from Perl distribution App-CSVUtils-csv_mix_formulas), released on
+    2024-02-24.
+
+FUNCTIONS
+  csv_mix_formulas
+    Usage:
+
+     csv_mix_formulas(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Mix several formulas/recipes (lists of ingredients and their
+    weights/volumes) into one, and output the combined formula.
+
+    Each formula is a CSV comprised of at least two fields. The first field
+    (by default literally the first field, but can also be specified using
+    "--ingredient-field") is assumed to contain the name of ingredients. The
+    second field (by default literally the second field, but can also be
+    specified using "--weight-field") is assumed to contain the weight of
+    ingredients. A percent form is recognized and will be converted to its
+    decimal form (e.g. "60%" or "60.0 %" will become 0.6).
+
+    Example, mixing this CSV:
+
+     ingredient,%weight,extra-field1,extra-field2
+     water,80,foo,bar
+     sugar,15,foo,bar
+     citric acid,0.3,foo,bar
+     strawberry syrup,4.7,foo,bar
+
+    and this:
+
+     ingredient,%weight,extra-field1,extra-field2,extra-field3
+     lemon syrup,5.75,bar,baz,qux
+     citric acid,0.25,bar,baz,qux
+     sugar,14,bar,baz,qux
+     water,80,bar,baz,qux
+
+    will result in the following CSV. Note: 1) for the header, except for
+    the first two fields which are the ingredient name and weight which will
+    contain the mixed formula, the other fields will simply collect values
+    from all the CSV files. 2) for sorting order: decreasing weight then by
+    name.
+
+     ingredient,%weight,extra-field1,extra-field2,extra-field3
+     water,80,foo,bar,qux
+     sugar,14.5,foor,bar,qux
+     lemon syrup,2.875,bar,baz,qux
+     strawberry syrup,2.35,foo,bar,
+     citric acid,0.275,foo,bar,qux
+
+    Keywords: compositions, mixture, combine
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   ingredient_field => *str*
+
+        Specify field which contain the ingredient names.
+
+    *   inplace => *true*
+
+        Output to the same file as input.
+
+        Normally, you output to a different file than input. If you try to
+        output to the same file ("-o INPUT.csv -O") you will clobber the
+        input file; thus the utility prevents you from doing it. However,
+        with this "--inplace" option, you can output to the same file. Like
+        perl's "-i" option, this will first output to a temporary file in
+        the same directory as the input file then rename to the final file
+        at the end. You cannot specify output file ("-o") when using this
+        option, but you can specify backup extension with "-b" option.
+
+        Some caveats:
+
+        *   if input file is a symbolic link, it will be replaced with a
+            regular file;
+
+        *   renaming (implemented using rename()) can fail if input filename
+            is too long;
+
+        *   value specified in "-b" is currently not checked for acceptable
+            characters;
+
+        *   things can also fail if permissions are restrictive;
+
+    *   inplace_backup_ext => *str* (default: "")
+
+        Extension to add for backup of input file.
+
+        In inplace mode ("--inplace"), if this option is set to a non-empty
+        string, will rename the input file using this extension as a backup.
+        The old existing backup will be overwritten, if any.
+
+    *   input_escape_char => *str*
+
+        Specify character to escape value in field in input CSV, will be
+        passed to Text::CSV_XS.
+
+        Defaults to "\\" (backslash). Overrides "--input-tsv" option.
+
+    *   input_filenames => *array[filename]* (default: ["-"])
+
+        Input CSV files.
+
+        Use "-" to read from stdin.
+
+        Encoding of input file is assumed to be UTF-8.
+
+    *   input_header => *bool* (default: 1)
+
+        Specify whether input CSV has a header row.
+
+        By default, the first row of the input CSV will be assumed to
+        contain field names (and the second row contains the first data
+        row). When you declare that input CSV does not have header row
+        ("--no-input-header"), the first row of the CSV is assumed to
+        contain the first data row. Fields will be named "field1", "field2",
+        and so on.
+
+    *   input_quote_char => *str*
+
+        Specify field quote character in input CSV, will be passed to
+        Text::CSV_XS.
+
+        Defaults to """ (double quote). Overrides "--input-tsv" option.
+
+    *   input_sep_char => *str*
+
+        Specify field separator character in input CSV, will be passed to
+        Text::CSV_XS.
+
+        Defaults to "," (comma). Overrides "--input-tsv" option.
+
+    *   input_tsv => *true*
+
+        Inform that input file is in TSV (tab-separated) format instead of
+        CSV.
+
+        Overriden by "--input-sep-char", "--input-quote-char",
+        "--input-escape-char" options. If one of those options is specified,
+        then "--input-tsv" will be ignored.
+
+    *   output_always_quote => *bool* (default: 0)
+
+        Whether to always quote values.
+
+        When set to false (the default), values are quoted only when
+        necessary:
+
+         field1,field2,"field three contains comma (,)",field4
+
+        When set to true, then all values will be quoted:
+
+         "field1","field2","field three contains comma (,)","field4"
+
+    *   output_escape_char => *str*
+
+        Specify character to escape value in field in output CSV, will be
+        passed to Text::CSV_XS.
+
+        This is like "--input-escape-char" option but for output instead of
+        input.
+
+        Defaults to "\\" (backslash). Overrides "--output-tsv" option.
+
+    *   output_filename => *filename*
+
+        Output filename.
+
+        Use "-" to output to stdout (the default if you don't specify this
+        option).
+
+        Encoding of output file is assumed to be UTF-8.
+
+    *   output_format => *str*
+
+        A sprintf() template to format the weight.
+
+    *   output_header => *bool*
+
+        Whether output CSV should have a header row.
+
+        By default, a header row will be output *if* input CSV has header
+        row. Under "--output-header", a header row will be output even if
+        input CSV does not have header row (value will be something like
+        "col0,col1,..."). Under "--no-output-header", header row will *not*
+        be printed even if input CSV has header row. So this option can be
+        used to unconditionally add or remove header row.
+
+    *   output_percent => *bool*
+
+        If enabled, will convert output weights to percent with the percent
+        sign (e.g. 0.6 to "60%").
+
+    *   output_percent_nosign => *bool*
+
+        If enabled, will convert output weights to percent without the
+        percent sign (e.g. 0.6 to "60").
+
+    *   output_quote_char => *str*
+
+        Specify field quote character in output CSV, will be passed to
+        Text::CSV_XS.
+
+        This is like "--input-quote-char" option but for output instead of
+        input.
+
+        Defaults to """ (double quote). Overrides "--output-tsv" option.
+
+    *   output_quote_empty => *bool* (default: 0)
+
+        Whether to quote empty values.
+
+        When set to false (the default), empty values are not quoted:
+
+         field1,field2,,field4
+
+        When set to true, then empty values will be quoted:
+
+         field1,field2,"",field4
+
+    *   output_sep_char => *str*
+
+        Specify field separator character in output CSV, will be passed to
+        Text::CSV_XS.
+
+        This is like "--input-sep-char" option but for output instead of
+        input.
+
+        Defaults to "," (comma). Overrides "--output-tsv" option.
+
+    *   output_tsv => *bool*
+
+        Inform that output file is TSV (tab-separated) format instead of
+        CSV.
+
+        This is like "--input-tsv" option but for output instead of input.
+
+        Overriden by "--output-sep-char", "--output-quote-char",
+        "--output-escape-char" options. If one of those options is
+        specified, then "--output-tsv" will be ignored.
+
+    *   overwrite => *bool*
+
+        Whether to override existing output file.
+
+    *   weight_field => *str*
+
+        Specify field which contain the weights.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-CSVUtils-csv_mix_formulas>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-CSVUtils-csv_mix_formulas>.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-CSVUtils-csv_mix_
+    formulas>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

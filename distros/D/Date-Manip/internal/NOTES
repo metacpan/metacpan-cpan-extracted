@@ -9,6 +9,13 @@ It's also available in case someone ever chooses to fork the
 module (though I hope that won't be necessary).
 
 #########################################################################
+Update the windows zones.
+
+(cd internal; ./windows.compare)
+
+Make the changes in data.alias.pl .
+
+#########################################################################
 Get the newest tzdata package.
 
 The tzdata/tzcode archives are obtained from
@@ -105,13 +112,6 @@ problems.
 NOTE 4: If you see an error:
    [do_list] unknown alias [ZONE: Alias]
 removed the key/value pair in data.alias.pl
-
-#########################################################################
-Update the windows zones.
-
-(cd internal; ./windows.compare)
-
-Make the changes in data.alias.pl .
 
 #########################################################################
 Clean up stuff that shouldn't be in the manifest

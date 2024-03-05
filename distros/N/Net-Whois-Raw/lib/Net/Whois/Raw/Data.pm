@@ -1,5 +1,5 @@
 package Net::Whois::Raw::Data;
-$Net::Whois::Raw::Data::VERSION = '2.99037';
+$Net::Whois::Raw::Data::VERSION = '2.99038';
 # ABSTRACT: Config for Net::Whois::Raw.
 
 use utf8;
@@ -573,7 +573,7 @@ our %servers = qw(
     PM               whois.nic.pm
     PR               whois.nic.pr
     PT               whois.dns.pt
-    PW               whois.centralnic.com
+    PW               whois.nic.pw
     PY               whois.i-dns.net
     QA               whois.registry.qa
     RE               whois.nic.re
@@ -867,37 +867,37 @@ our %servers = qw(
     UY.COM      whois.centralnic.com
     ZA.COM      whois.centralnic.com
 
-    ART         whois.centralnic.com
-    BAR         whois.centralnic.com
-    COLLEGE     whois.centralnic.com
-    CONTACT     whois.centralnic.com
-    COOP        whois.centralnic.com
-    FAN         whois.centralnic.com
-    FANS        whois.centralnic.com
-    FEEDBACK    whois.centralnic.com
-    FORUM       whois.centralnic.com
-    HOST        whois.centralnic.com
-    LOVE        whois.centralnic.com
-    LPL         whois.centralnic.com
-    LPLFINANCIAL whois.centralnic.com
-    ONLINE      whois.centralnic.com
-    PID         whois.centralnic.com
-    PRESS       whois.centralnic.com
-    PROTECTION  whois.centralnic.com
-    REALTY      whois.centralnic.com
-    REIT        whois.centralnic.com
-    RENT        whois.centralnic.com
-    REST        whois.centralnic.com
-    SECURITY    whois.centralnic.com
-    SITE        whois.centralnic.com
-    SPACE       whois.centralnic.com
-    STORAGE     whois.centralnic.com
-    STORE       whois.centralnic.com
-    TECH        whois.centralnic.com
-    THEATRE     whois.centralnic.com
-    TICKETS     whois.centralnic.com
-    WEBSITE     whois.centralnic.com
-    XYZ         whois.centralnic.com
+    ART          whois.nic.art
+    BAR          whois.nic.bar
+    COLLEGE      whois.nic.college
+    CONTACT      whois.nic.contact
+    COOP         whois.nic.coop
+    FAN          whois.nic.fan
+    FANS         whois.nic.fans
+    FEEDBACK     whois.nic.feedback
+    FORUM        whois.nic.forum
+    HOST         whois.nic.host
+    LOVE         whois.nic.love
+    LPL          whois.nic.lpl
+    LPLFINANCIAL whois.nic.lplfinancial
+    ONLINE       whois.nic.online
+    PID          whois.nic.pid
+    PRESS        whois.nic.press
+    PROTECTION   whois.nic.protection
+    REALTY       whois.nic.realty
+    REIT         whois.nic.reit
+    RENT         whois.nic.rent
+    REST         whois.nic.rest
+    SECURITY     whois.nic.security
+    SITE         whois.nic.site
+    SPACE        whois.nic.space
+    STORAGE      whois.nic.storage
+    STORE        whois.nic.store
+    TECH         whois.nic.tech
+    THEATRE      whois.nic.theatre
+    TICKETS      whois.nic.tickets
+    WEBSITE      whois.nic.website
+    XYZ          whois.nic.xyz
 
     ORG.NS      whois.pir.org
     BIZ.NS      whois.biz
@@ -4485,7 +4485,7 @@ Net::Whois::Raw::Data - Config for Net::Whois::Raw.
 
 =head1 VERSION
 
-version 2.99037
+version 2.99038
 
 =head1 AUTHOR
 
@@ -4493,7 +4493,7 @@ Alexander Nalobin <alexander@nalobin.ru>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2002-2022 by Alexander Nalobin.
+This software is copyright (c) 2002-2024 by Alexander Nalobin.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

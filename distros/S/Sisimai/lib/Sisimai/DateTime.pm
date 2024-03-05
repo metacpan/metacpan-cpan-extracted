@@ -148,59 +148,6 @@ use constant TimeZones => {
     #'YEKT' => '+0500', # Yekaterinburg Time                UTC+05:00
 };
 
-sub to_second {
-    # Convert to second
-    # @param    [String] value  Digit and a unit of time
-    # @return   [Integer]       n: seconds
-    #                           0: 0 or invalid unit of time
-    # @example  Get the value of seconds
-    #   to_second('1d') #=> 86400
-    #   to_second('2h') #=>  7200
-    my $class = shift;
-    my $value = shift || return 0;
-
-    state $timeunit = {
-        'o' => ( BASE_D * BASE_Y * 4 ), # Olympiad, 4 years
-        'y' => ( BASE_D * BASE_Y ),     # Year, Gregorian Calendar
-        'q' => ( BASE_D * BASE_Y / 4 ), # Quarter, year/4
-        'l' => ( BASE_D * BASE_L ),     # Lunar month
-        'f' => ( BASE_D * 14 ),         # Fortnight, 2 weeks
-        'w' => ( BASE_D * 7 ),          # Week, 604800 seconds
-        'd' => BASE_D,                  # Day
-        'h' => 3600,                    # Hour
-        'b' => 86.4,                    # Beat, Swatch internet time: 1000b = 1d
-        'm' => 60,                      # Minute,
-        's' => 1,                       # Second
-    };
-    state $mathematicalconstant = {
-        'e' => CONST_E,
-        'p' => CONST_P,
-        'g' => CONST_E ** CONST_P,
-    };
-
-    my $getseconds = 0;
-    my $unitoftime = [keys %$timeunit];
-    my $mathconsts = [keys %$mathematicalconstant];
-
-    if( $value =~ /\A(\d+|\d+[.]\d+)([@$unitoftime])?\z/o ) {
-        # 1d, 1.5w
-        my $n = $1;
-        my $u = $2 // 'd';
-        $getseconds = $n * $timeunit->{ $u };
-
-    } elsif( $value =~ /\A(\d+|\d+[.]\d+)?([@$mathconsts])([@$unitoftime])?\z/o ) {
-        # 1pd, 1.5pw
-        my $n = $1 // 1;
-        my $m = $mathematicalconstant->{ $2 } // 0;
-        my $u = $3 // 'd';
-        $getseconds = $n * $m * $timeunit->{ $u };
-
-    } else {
-        $getseconds = 0;
-    }
-    return $getseconds;
-}
-
 sub monthname {
     # Month name list
     # @param    [Integer] argv1  Require full name or not
@@ -212,23 +159,8 @@ sub monthname {
     my $argv1 = shift // 0;
     my $value = $argv1 ? 'full' : 'abbr';
 
-    return @{ MonthName->{ $value } } if wantarray;
+    return MonthName->{ $value }->@* if wantarray;
     return MonthName->{ $value };
-}
-
-sub dayofweek {
-    # List of day of week
-    # @param    [Integer] argv1 Require full name
-    # @return   [Array, String] List of day of week or day of week
-    # @example  Get the names of each day of week
-    #   dayofweek()  #=> ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-    #   dayofweek(1) #=> ['Sunday', 'Monday', 'Tuesday', ...]
-    my $class = shift;
-    my $argv1 = shift // 0;
-    my $value = $argv1 ? 'full' : 'abbr';
-
-    return @{ DayOfWeek->{ $value } } if wantarray;
-    return DayOfWeek->{ $value };
 }
 
 sub parse {
@@ -243,9 +175,8 @@ sub parse {
     my $class = shift;
     my $argv1 = shift || return undef;
 
-    my $datestring = $argv1;
-       $datestring =~ s{[,](\d+)}{, $1};  # Thu,13 -> Thu, 13
-       $datestring =~ s{(\d{1,2}),}{$1};    # Apr 29, -> Apr 29
+    # "Apr 29", -> "Apr 29" "Thu,13" -> "Thu, 13"
+    my $datestring = $argv1; s/[,](\d+)/, $1/, s/(\d{1,2}),/$1/ for $datestring;
     my @timetokens = split(' ', $datestring);
     my $parseddate = '';    # [String]  Canonified Date/Time string
     my $afternoon1 = 0;     # [Integer] After noon flag
@@ -263,14 +194,14 @@ sub parse {
         # Parse each piece of time
         if( $p =~ /\A[A-Z][a-z]{2,}[,]?\z/ ) {
             # Day of week or Day of week; Thu, Apr, ...
-            $p =~ s/,\z//g if substr($p, -1, 1) eq ','; # "Thu," => "Thu"
-            $p =  substr($p, 0, 3) if length $p > 3;
+            substr($p, -1, 1, '') if substr($p, -1, 1) eq ','; # "Thu," => "Thu"
+            $p = substr($p, 0, 3) if length $p > 3;
 
-            if( grep { $p eq $_ } @{ DayOfWeek->{'abbr'} } ) {
+            if( grep { $p eq $_ } DayOfWeek->{'abbr'}->@* ) {
                 # Day of week; Mon, Thu, Sun,...
                 $v->{'a'} = $p;
 
-            } elsif( grep { $p eq $_ } @{ MonthName->{'abbr'} } ) {
+            } elsif( grep { $p eq $_ } MonthName->{'abbr'}->@* ) {
                 # Month name abbr.; Apr, May, ...
                 $v->{'M'} = $p;
             }
@@ -309,7 +240,7 @@ sub parse {
             # Time: 1:4 => 01:04:00
             $v->{'T'} = sprintf("%02d:%02d:00", $1, $2);
 
-        } elsif( $p =~ /\A[APap][Mm]\z/ ) {
+        } elsif( lc $p eq 'am' || lc $p eq 'pm' ) {
             # AM or PM
             $afternoon1 = 1;
 
@@ -406,8 +337,8 @@ sub parse {
 sub abbr2tz {
     # Abbreviation -> Tiemzone
     # @param    [String] argv1  Abbr. e.g.) JST, GMT, PDT
-    # @return   [String, Undef] +0900, +0000, -0600 or Undef if the argument is
-    #                           invalid format or not supported abbreviation
+    # @return   [String, undef] +0900, +0000, -0600 or undef if the argument is invalid format or
+    #                           not supported abbreviation
     # @example  Get the timezone string of "JST"
     #   abbr2tz('JST')  #=> '+0900'
     my $class = shift;
@@ -418,8 +349,7 @@ sub abbr2tz {
 sub tz2second {
     # Convert to second
     # @param    [String] argv1  Timezone string e.g) +0900
-    # @return   [Integer,Undef] n: seconds or Undef it the argument is invalid
-    #                           format string
+    # @return   [Integer,undef] n: seconds or undef it the argument is invalid format string
     # @see      second2tz
     # @example  Convert '+0900' to seconds
     #   tz2second('+0900')  #=> 32400
@@ -486,7 +416,7 @@ Sisimai::DateTime - Date and time utilities
 
 =head1 DESCRIPTION
 
-Sisimai::Tie provide methods for dealing date and time.
+Sisimai::DateTime provide methods for dealing date and time.
 
 =head1 CLASS METHODS
 
@@ -498,15 +428,6 @@ C<parse()> convert various date format string.
     my $y = '27 Apr 2009 08:08:54 +0900';
     print Sisimai::DateTime->parse($x);  # Fri, 9 Apr 2004 04:01:03 +0000
     print Sisimai::DateTime->parse($y);  # Thu, 27 Apr 2009 08:08:54 +0900
-
-=head2 C<B<to_second(I<String>)>>
-
-C<to_string()> convert a string to the value of seconds like followings:
-
-    print Sisimai::DateTime->to_second('1m');  # 60, 1 minute
-    print Sisimai::DateTime->to_second('2h');  # 7200, 2 hours
-    print Sisimai::DateTime->to_second('1d');  # 86400, 1 day
-    print Sisimai::DateTime->to_second('1w');  # 604800, 1 week
 
 =head2 C<B<abbr2tz(I<Abbr>)>>
 
@@ -522,7 +443,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2021 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2023 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

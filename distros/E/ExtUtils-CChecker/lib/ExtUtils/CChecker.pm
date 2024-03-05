@@ -1,15 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2024 -- leonerd@leonerd.org.uk
 
-package ExtUtils::CChecker;
+package ExtUtils::CChecker 0.12;
 
-use v5;
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.11';
 
 use Carp;
 
@@ -65,7 +62,7 @@ provides assistance here.
 
 =head2 new
 
-   $cc = ExtUtils::CChecker->new( %args )
+   $cc = ExtUtils::CChecker->new( %args );
 
 Returns a new instance of a C<ExtUtils::CChecker> object. Takes the following
 named parameters:
@@ -124,7 +121,7 @@ sub new
 
 =head2 include_dirs
 
-   $dirs = $cc->include_dirs
+   $dirs = $cc->include_dirs;
 
 Returns the currently-configured include directories in an ARRAY reference.
 
@@ -139,7 +136,7 @@ sub include_dirs
 
 =head2 extra_compiler_flags
 
-   $flags = $cc->extra_compiler_flags
+   $flags = $cc->extra_compiler_flags;
 
 Returns the currently-configured extra compiler flags in an ARRAY reference.
 
@@ -154,7 +151,7 @@ sub extra_compiler_flags
 
 =head2 extra_linker_flags
 
-   $flags = $cc->extra_linker_flags
+   $flags = $cc->extra_linker_flags;
 
 Returns the currently-configured extra linker flags in an ARRAY reference.
 
@@ -169,7 +166,7 @@ sub extra_linker_flags
 
 =head2 push_include_dirs
 
-   $cc->push_include_dirs( @dirs )
+   $cc->push_include_dirs( @dirs );
 
 Adds more include directories
 
@@ -183,7 +180,7 @@ sub push_include_dirs
 
 =head2 push_extra_compiler_flags
 
-   $cc->push_extra_compiler_flags( @flags )
+   $cc->push_extra_compiler_flags( @flags );
 
 Adds more compiler flags
 
@@ -197,7 +194,7 @@ sub push_extra_compiler_flags
 
 =head2 push_extra_linker_flags
 
-   $cc->push_extra_linker_flags( @flags )
+   $cc->push_extra_linker_flags( @flags );
 
 Adds more linker flags
 
@@ -245,6 +242,15 @@ sub fail
    die $message;
 }
 
+=head2 define
+
+   $cc->define( $symbol );
+
+Adds a new defined symbol directly; either by appending to the compiler flags
+or writing it into the defines file.
+
+=cut
+
 sub define
 {
    my $self = shift;
@@ -265,9 +271,9 @@ sub define
 
 =head2 try_compile_run
 
-   $success = $cc->try_compile_run( %args )
+   $success = $cc->try_compile_run( %args );
 
-   $success = $cc->try_compile_run( $source )
+   $success = $cc->try_compile_run( $source );
 
 Try to compile, link, and execute a C program whose source is given. Returns
 true if the program compiled and linked, and exited successfully. Returns
@@ -360,7 +366,7 @@ sub try_compile_run
 
 =head2 assert_compile_run
 
-   $cc->assert_compile_run( %args )
+   $cc->assert_compile_run( %args );
 
 Calls C<try_compile_run>. If it fails, die with an C<OS unsupported> message.
 Useful to call from F<Build.PL> or F<Makefile.PL>.
@@ -390,7 +396,7 @@ sub assert_compile_run
 
 =head2 try_find_cflags_for
 
-   $success = $cc->try_find_cflags_for( %args )
+   $success = $cc->try_find_cflags_for( %args );
 
 I<Since version 0.11.>
 
@@ -446,7 +452,7 @@ sub try_find_cflags_for
 
 =head2 try_find_include_dirs_for
 
-   $success = $cc->try_find_include_dirs_for( %args )
+   $success = $cc->try_find_include_dirs_for( %args );
 
 Try to compile, link and execute the given source, using extra include
 directories.
@@ -502,7 +508,7 @@ sub try_find_include_dirs_for
 
 =head2 try_find_libs_for
 
-   $success = $cc->try_find_libs_for( %args )
+   $success = $cc->try_find_libs_for( %args );
 
 Try to compile, link and execute the given source, when linked against a
 given set of extra libraries.
@@ -558,15 +564,15 @@ sub try_find_libs_for
 
 =head2 find_cflags_for
 
-   $cc->find_cflags_for( %args )
+   $cc->find_cflags_for( %args );
 
 =head2 find_include_dirs_for
 
-   $cc->find_include_dirs_for( %args )
+   $cc->find_include_dirs_for( %args );
 
 =head2 find_libs_for
 
-   $cc->find_libs_for( %args )
+   $cc->find_libs_for( %args );
 
 Calls C<try_find_cflags_for>, C<try_find_include_dirs_for> or
 C<try_find_libs_for> respectively. If it fails, die with an
@@ -603,7 +609,7 @@ foreach ( qw( find_cflags_for find_libs_for find_include_dirs_for ) ) {
 
 =head2 extend_module_build
 
-   $cc->extend_module_build( $build )
+   $cc->extend_module_build( $build );
 
 I<Since version 0.11.>
 
@@ -628,7 +634,7 @@ sub extend_module_build
 
 =head2 new_module_build
 
-   $mb = $cc->new_module_build( %args )
+   $mb = $cc->new_module_build( %args );
 
 Construct and return a new L<Module::Build> object, preconfigured with the
 C<include_dirs>, C<extra_compiler_flags> and C<extra_linker_flags> options

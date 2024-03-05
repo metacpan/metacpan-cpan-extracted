@@ -31,6 +31,7 @@
             "match::simple::XS" : "0"
          },
          "requires" : {
+            "Carp" : "0",
             "Date::Calc" : "0",
             "List::MoreUtils" : "0",
             "List::Util" : "1.45",
@@ -48,7 +49,7 @@
    "provides" : {
       "Data::Domain" : {
          "file" : "lib/Data/Domain.pm",
-         "version" : "1.15"
+         "version" : "1.16"
       },
       "Data::Domain::All_of" : {
          "file" : "lib/Data/Domain.pm"
@@ -86,6 +87,9 @@
       "Data::Domain::Struct" : {
          "file" : "lib/Data/Domain.pm"
       },
+      "Data::Domain::Struict" : {
+         "file" : "lib/Data/Domain.pm"
+      },
       "Data::Domain::Time" : {
          "file" : "lib/Data/Domain.pm"
       },
@@ -102,6 +106,6 @@
          "url" : "https://github.com/damil/Data-Domain"
       }
    },
-   "version" : "1.15",
+   "version" : "1.16",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

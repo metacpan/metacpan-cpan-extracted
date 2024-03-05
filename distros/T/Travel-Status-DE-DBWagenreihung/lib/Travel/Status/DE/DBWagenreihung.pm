@@ -3,8 +3,9 @@ package Travel::Status::DE::DBWagenreihung;
 use strict;
 use warnings;
 use 5.020;
+use utf8;
 
-our $VERSION = '0.08';
+our $VERSION = '0.10';
 
 use Carp qw(cluck confess);
 use JSON;
@@ -42,6 +43,7 @@ my %is_redesign = (
 );
 
 my %model_name = (
+	'011'      => [ 'ICE T', 'ÖBB 4011' ],
 	'401'      => ['ICE 1'],
 	'402'      => ['ICE 2'],
 	'403.S1'   => [ 'ICE 3',        'BR 403, 1. Serie' ],
@@ -55,7 +57,29 @@ my %model_name = (
 	'411.S2'   => [ 'ICE T',        'BR 411, 2. Serie' ],
 	'412'      => ['ICE 4'],
 	'415'      => [ 'ICE T', 'BR 415' ],
-	'475'      => [ 'TGV',   'BR 475' ],
+	'422'      => ['BR 422'],
+	'423'      => ['BR 423'],
+	'425'      => ['BR 425'],
+	'427'      => [ 'FLIRT', 'BR 427' ],
+	'428'      => [ 'FLIRT', 'BR 428' ],
+	'429'      => [ 'FLIRT', 'BR 429' ],
+	'430'      => ['BR 430'],
+	'440'      => [ 'Coradia Continental', 'BR 440' ],
+	'442'      => [ 'Talent 2',            'BR 442' ],
+	'445'      => [ 'Twindexx Vario',      'BR 445' ],
+	'446'      => [ 'Twindexx Vario',      'BR 446' ],
+	'462'      => [ 'Desiro HC',           'BR 462' ],
+	'463'      => [ 'Mireo',               'BR 463' ],
+	'475'      => [ 'TGV',                 'BR 475' ],
+	'612'      => [ 'RegioSwinger',        'BR 612' ],
+	'620'      => [ 'LINT 81',             'BR 620' ],
+	'622'      => [ 'LINT 54',             'BR 622' ],
+	'631'      => [ 'Link I',              'BR 631' ],
+	'632'      => [ 'Link II',             'BR 632' ],
+	'633'      => [ 'Link III',            'BR 633' ],
+	'640'      => [ 'LINT 27',             'BR 640' ],
+	'643'      => [ 'TALENT',              'BR 643' ],
+	'648'      => [ 'LINT 41',             'BR 648' ],
 	'IC2.TWIN' => ['IC 2 Twindexx'],
 	'IC2.KISS' => ['IC 2 KISS'],
 );
@@ -360,22 +384,31 @@ sub wagongroup_powertype {
 sub train_descriptions {
 	my ($self) = @_;
 
-	my @ret;
+	if ( exists $self->{train_descriptions} ) {
+		return @{ $self->{train_descriptions} };
+	}
+
+	if ( not exists $self->{wagons} ) {
+
+		# wagongroups are set while parsong wagons
+		$self->wagons;
+	}
 
 	for my $wagons ( @{ $self->{wagongroups} } ) {
-		my $desc     = $self->wagongroup_description( @{$wagons} );
+		my ( $short, $desc ) = $self->wagongroup_description( @{$wagons} );
 		my @sections = uniq map { $_->section } @{$wagons};
 
 		push(
-			@ret,
+			@{ $self->{train_descriptions} },
 			{
 				sections => [@sections],
+				short    => $short,
 				text     => $desc,
 			}
 		);
 	}
 
-	return @ret;
+	return @{ $self->{train_descriptions} };
 }
 
 sub wagongroup_description {
@@ -384,9 +417,11 @@ sub wagongroup_description {
 	my $powertype = $self->wagongroup_powertype(@wagons);
 	my @model     = $self->wagongroup_model(@wagons);
 
+	my $short;
 	my $ret = q{};
 
 	if (@model) {
+		$short = $model[0];
 		$ret .= $model[0];
 	}
 
@@ -395,13 +430,14 @@ sub wagongroup_description {
 			$ret = "Zug";
 		}
 		$ret .= " $power_desc{$powertype}";
+		$short //= $ret;
 	}
 
 	if ( @model > 1 ) {
 		$ret .= " ($model[1])";
 	}
 
-	return $ret;
+	return ( $short, $ret );
 }
 
 sub wagongroup_model {
@@ -426,6 +462,7 @@ sub wagongroup_subtype {
 	}
 
 	my %ml = (
+		'011'      => 0,
 		'401'      => 0,
 		'402'      => 0,
 		'403.S1'   => 0,
@@ -438,7 +475,29 @@ sub wagongroup_subtype {
 		'411.S2'   => 0,
 		'412'      => 0,
 		'415'      => 0,
+		'422'      => 0,
+		'423'      => 0,
+		'425'      => 0,
+		'427'      => 0,
+		'428'      => 0,
+		'429'      => 0,
+		'430'      => 0,
+		'440'      => 0,
+		'442'      => 0,
+		'445'      => 0,
+		'446'      => 0,
+		'462'      => 0,
+		'463'      => 0,
 		'475'      => 0,
+		'612'      => 0,
+		'620'      => 0,
+		'622'      => 0,
+		'631'      => 0,
+		'632'      => 0,
+		'633'      => 0,
+		'640'      => 0,
+		'643'      => 0,
+		'648'      => 0,
 		'IC2.TWIN' => 0,
 		'IC2.KISS' => 0,
 	);
@@ -491,8 +550,83 @@ sub wagongroup_subtype {
 		elsif ( $wagon->model == 415 ) {
 			$ml{'415'}++;
 		}
+		elsif ( $wagon->model == 422 or $wagon->model == 432 ) {
+			$ml{'422'}++;
+		}
+		elsif ( $wagon->model == 423 or $wagon->model == 433 ) {
+			$ml{'423'}++;
+		}
+		elsif ( $wagon->model == 425 or $wagon->model == 435 ) {
+			$ml{'425'}++;
+		}
+		elsif ( $wagon->model == 427 or $wagon->model == 827 ) {
+			$ml{'427'}++;
+		}
+		elsif ( $wagon->model == 428 or $wagon->model == 828 ) {
+			$ml{'428'}++;
+		}
+		elsif ( $wagon->model == 429 or $wagon->model == 829 ) {
+			$ml{'429'}++;
+		}
+		elsif ( $wagon->model == 430 or $wagon->model == 431 ) {
+			$ml{'430'}++;
+		}
+		elsif ($wagon->model == 440
+			or $wagon->model == 441
+			or $wagon->model == 841 )
+		{
+			$ml{'440'}++;
+		}
+		elsif ($wagon->model == 442
+			or $wagon->model == 443 )
+		{
+			$ml{'442'}++;
+		}
+		elsif ($wagon->model == 462
+			or $wagon->model == 862 )
+		{
+			$ml{'462'}++;
+		}
+		elsif ($wagon->model == 463
+			or $wagon->model == 863 )
+		{
+			$ml{'463'}++;
+		}
+		elsif ( $wagon->model == 445 ) {
+			$ml{'445'}++;
+		}
+		elsif ( $wagon->model == 446 ) {
+			$ml{'446'}++;
+		}
 		elsif ( $wagon->model == 475 ) {
 			$ml{'475'}++;
+		}
+		elsif ( $wagon->model == 612 ) {
+			$ml{'612'}++;
+		}
+		elsif ( $wagon->model == 620 or $wagon->model == 621 ) {
+			$ml{'620'}++;
+		}
+		elsif ( $wagon->model == 622 ) {
+			$ml{'622'}++;
+		}
+		elsif ( $wagon->model == 631 ) {
+			$ml{'631'}++;
+		}
+		elsif ( $wagon->model == 632 ) {
+			$ml{'632'}++;
+		}
+		elsif ( $wagon->model == 633 ) {
+			$ml{'633'}++;
+		}
+		elsif ( $wagon->model == 640 ) {
+			$ml{'640'}++;
+		}
+		elsif ( $wagon->model == 643 or $wagon->model == 943 ) {
+			$ml{'643'}++;
+		}
+		elsif ( $wagon->model == 648 ) {
+			$ml{'648'}++;
 		}
 		elsif ( $self->train_type eq 'IC' and $wagon->model == 110 ) {
 			$ml{'IC2.KISS'}++;
@@ -500,11 +634,14 @@ sub wagongroup_subtype {
 		elsif ( $self->train_type eq 'IC' and $wagon->is_dosto ) {
 			$ml{'IC2.TWIN'}++;
 		}
+		elsif ( substr( $wagon->uic_id, 4, 4 ) eq '4011' ) {
+			$ml{'011'}++;
+		}
 	}
 
 	my @likelihood = reverse sort { $ml{$a} <=> $ml{$b} } keys %ml;
 
-	if ( $ml{ $likelihood[0] } <= 2 ) {
+	if ( $ml{ $likelihood[0] } < 2 ) {
 
 		# inconclusive
 		return undef;
@@ -625,7 +762,7 @@ Travel::Status::DE::DBWagenreihung - Interface to Deutsche Bahn Wagon Order API.
 
 =head1 VERSION
 
-version 0.08
+version 0.10
 
 This is beta software. The API may change without notice.
 
@@ -736,8 +873,9 @@ on model and locomotive (if present). Each hash contains the keys B<text>
 
 =item $wr->wagongroup_description
 
-Returns a string describing the rolling stock used for this train based on
-model and locomotive (if present), e.g. "ICE 4 Hochgeschwindigkeitszug",
+Returns two strings describing the rolling stock used for this train based on
+model and locomotive (if present). The first one tries to be conscise (e.g.
+"ICE 4"). The second is more detailed, e.g. "ICE 4 Hochgeschwindigkeitszug",
 "IC 2 Twindexx mit elektrischer Lokomotive", or "Diesel-Triebzug".
 
 =item $wr->wagongroup_model
@@ -787,7 +925,7 @@ L<https://github.com/derf/Travel-Status-DE-DBWagenreihung>
 
 =head1 AUTHOR
 
-Copyright (C) 2018-2019 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2018-2019 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

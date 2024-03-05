@@ -106,6 +106,8 @@ perl -I../lib date.prev.t 1
 perl -I../lib date.prev_business_day.t 1
 perl -I../lib date.printf.0.t 1
 perl -I../lib date.printf.1.t 1
+perl -I../lib date.printf.2.t 1
+perl -I../lib date.printf.weekofyear.t 1
 perl -I../lib date.secs_since_1970_GMT.0.t 1
 perl -I../lib date.secs_since_1970_GMT.1.t 1
 perl -I../lib date.set.0.t 1

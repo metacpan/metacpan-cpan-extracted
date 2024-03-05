@@ -5,12 +5,12 @@ use strict;
 use warnings;
 
 sub description { 'Gmail: https://mail.google.com' }
-sub make {
+sub inquire {
     # Detect an error from Gmail
     # @param    [Hash] mhead    Message headers of a bounce email
     # @param    [String] mbody  Message body of a bounce email
     # @return   [Hash]          Bounce data list and message/rfc822 part
-    # @return   [Undef]         failed to parse or the arguments are missing
+    # @return   [undef]         failed to parse or the arguments are missing
     # @since v4.0.0
     my $class = shift;
     my $mhead = shift // return undef;
@@ -67,12 +67,11 @@ sub make {
     return undef unless index($mhead->{'subject'}, 'Delivery Status Notification') > -1;
 
     state $indicators = __PACKAGE__->INDICATORS;
-    state $rebackbone = qr/^[ ]*-----[ ](?:Original[ ]message|Message[ ]header[ ]follows)[ ]-----/m;
+    state $boundaries = ['----- Original message -----', '----- Message header follows -----'];
     state $startingof = {
         'message' => ['Delivery to the following recipient'],
         'error'   => ['The error that the other server returned was:'],
     };
-    state $markingsof = { 'start' => qr/Technical details of (?:permanent|temporary) failure:/ };
     state $messagesof = {
         'expired' => [
             'DNS Error: Could not contact DNS servers',
@@ -159,14 +158,14 @@ sub make {
     };
 
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
-    my $emailsteak = Sisimai::RFC5322->fillet($mbody, $rebackbone);
+    my $emailparts = Sisimai::RFC5322->part($mbody, $boundaries);
     my $readcursor = 0;     # (Integer) Points the current cursor position
     my $recipients = 0;     # (Integer) The number of 'Final-Recipient' header
     my $v = undef;
 
-    for my $e ( split("\n", $emailsteak->[0]) ) {
-        # Read error messages and delivery status lines from the head of the email
-        # to the previous line of the beginning of the original message.
+    for my $e ( split("\n", $emailparts->[0]) ) {
+        # Read error messages and delivery status lines from the head of the email to the previous
+        # line of the beginning of the original message.
         unless( $readcursor ) {
             # Beginning of the bounce message or message/delivery-status part
             $readcursor |= $indicators->{'deliverystatus'} if index($e, $startingof->{'message'}->[0]) == 0;
@@ -191,7 +190,7 @@ sub make {
         #
         $v = $dscontents->[-1];
 
-        if( $e =~ /\A[ \t]+([^ ]+[@][^ ]+)\z/ ) {
+        if( index($e, ' ') == 0 && index($e, '@') > 0 ) {
             # kijitora@example.jp: 550 5.2.2 <kijitora@example>... Mailbox Full
             if( $v->{'recipient'} ) {
                 # There are multiple recipient addresses in the message body.
@@ -199,8 +198,8 @@ sub make {
                 $v = $dscontents->[-1];
             }
 
-            my $r = Sisimai::Address->s3s4($1);
-            next unless Sisimai::RFC5322->is_emailaddress($r);
+            my $r = Sisimai::Address->s3s4(substr($e, rindex($e, ' ') + 1,));
+            next unless Sisimai::Address->is_emailaddress($r);
             $v->{'recipient'} = $r;
             $recipients++;
 
@@ -210,27 +209,29 @@ sub make {
     }
     return undef unless $recipients;
 
+    my $p1 = -1; my $p2 = -1;
     for my $e ( @$dscontents ) {
         $e->{'diagnosis'} = Sisimai::String->sweep($e->{'diagnosis'});
 
         unless( $e->{'rhost'} ) {
             # Get the value of remote host
-            if( $e->{'diagnosis'} =~ /[ \t]+by[ \t]+([^ ]+)[.][ \t]+\[(\d+[.]\d+[.]\d+[.]\d+)\][.]/ ) {
+            if( Sisimai::String->aligned(\$e->{'diagnosis'}, [' by ', '. [', ']. ']) ) {
                 # Google tried to deliver your message, but it was rejected by # the server
                 # for the recipient domain example.jp by mx.example.jp. [192.0.2.153].
-                my $hostname = $1;
-                my $ipv4addr = $2;
-                if( $hostname =~ /[-0-9a-zA-Z]+[.][a-zA-Z]+\z/ ) {
-                    # Maybe valid hostname
-                    $e->{'rhost'} = $hostname;
-                } else {
-                    # Use IP address instead
-                    $e->{'rhost'} = $ipv4addr;
-                }
+                $p1 = rindex($e->{'diagnosis'}, ' by ');
+                $p2 = rindex($e->{'diagnosis'}, '. [' );
+                my $hostname = substr($e->{'diagnosis'}, $p1 + 4, $p2 - $p1 - 4);
+                my $ipv4addr = substr($e->{'diagnosis'}, $p2 + 3, rindex($e->{'diagnosis'}, ']. ') - $p2 - 3);
+                my $lastchar = ord(uc substr($hostname, -1, 1));
+
+                $e->{'rhost'}   = $hostname if $lastchar > 64 && $lastchar < 91;
+                $e->{'rhost'} ||= $ipv4addr;
             }
         }
 
-        my $statecode0 = $e->{'diagnosis'} =~ /[(]state[ ](\d+)[)][.]/ ? $1 : 0;
+        $p1 = rindex($e->{'diagnosis'}, ' ');
+        $p2 = rindex($e->{'diagnosis'}, ')');
+        my $statecode0 = substr($e->{'diagnosis'}, $p1 + 1, $p2 - $p1 - 1) || 0;
         if( exists $statetable->{ $statecode0 } ) {
             # (state *)
             $e->{'reason'}  = $statetable->{ $statecode0 }->{'reason'};
@@ -239,7 +240,7 @@ sub make {
             # No state code
             SESSION: for my $r ( keys %$messagesof ) {
                 # Verify each regular expression of session errors
-                next unless grep { index($e->{'diagnosis'}, $_) > -1 } @{ $messagesof->{ $r } };
+                next unless grep { index($e->{'diagnosis'}, $_) > -1 } $messagesof->{ $r }->@*;
                 $e->{'reason'} = $r;
                 last;
             }
@@ -248,10 +249,10 @@ sub make {
 
         # Set pseudo status code and override bounce reason
         $e->{'status'} = Sisimai::SMTP::Status->find($e->{'diagnosis'}) || '';
-        next unless $e->{'status'} =~ /\A[45][.][1-7][.][1-9]\z/;
+        next if length($e->{'status'}) == 0 || index($e->{'status'}, '.0') > 0;
         $e->{'reason'} = Sisimai::SMTP::Status->name($e->{'status'}) || '';
     }
-    return { 'ds' => $dscontents, 'rfc822' => $emailsteak->[1] };
+    return { 'ds' => $dscontents, 'rfc822' => $emailparts->[1] };
 }
 
 1;
@@ -269,8 +270,8 @@ Sisimai::Lhost::Gmail - bounce mail parser class for C<Gmail>.
 
 =head1 DESCRIPTION
 
-Sisimai::Lhost::Gmail parses a bounce email which created by C<Gmail>.
-Methods in the module are called from only Sisimai::Message.
+Sisimai::Lhost::Gmail parses a bounce email which created by C<Gmail>. Methods in the module are
+called from only Sisimai::Message.
 
 =head1 CLASS METHODS
 
@@ -280,10 +281,10 @@ C<description()> returns description string of this module.
 
     print Sisimai::Lhost::Gmail->description;
 
-=head2 C<B<make(I<header data>, I<reference to body string>)>>
+=head2 C<B<inquire(I<header data>, I<reference to body string>)>>
 
-C<make()> method parses a bounced email and return results as a array reference.
-See Sisimai::Message for more details.
+C<inquire()> method parses a bounced email and return results as a array reference. See Sisimai::Message
+for more details.
 
 =head1 AUTHOR
 
@@ -291,7 +292,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2020 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2023 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

@@ -1,6 +1,16 @@
-Tue Jan 10 20:37:34 2023  Tom Hughes  <tom@compton.nu>
+Thu Feb 29 20:41:26 2024  Tom Hughes  <tom@compton.nu>
+
+        * Zlib.pm
+          Change version number to 1.15.
+
+Mon Feb  5 22:47:05 2024  Bence Cs  <bence98@sch.bme.hu>
 
         * Makefile.PL
+          Add LICENSE to options.
+
+Tue Jan 10 20:37:34 2023  Tom Hughes  <tom@compton.nu>
+
+        * Zlib.pm
           Change version number to 1.14.
 
 Tue Jan 10 20:36:36 2023  Graham Knop  <haarg@haarg.org>

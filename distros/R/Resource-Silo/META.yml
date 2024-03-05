@@ -3,7 +3,6 @@ abstract: 'lazy declarative resource container for Perl.'
 author:
   - 'Konstantin Uvarin <khedin@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
   Test::Exception: '0.29'
   Test::More: '1.302015'
 configure_requires:
@@ -29,5 +28,5 @@ requires:
 resources:
   bugtracker: https://github.com/dallaylaen/resource-silo-p5/issues
   repository: https://github.com/dallaylaen/resource-silo-p5.git
-version: '0.12'
+version: '0.1202'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

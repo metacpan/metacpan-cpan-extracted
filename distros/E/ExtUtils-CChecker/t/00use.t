@@ -1,11 +1,11 @@
 #!/usr/bin/perl
 
-use v5;
+use v5.14;
 use warnings;
-use strict;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( "ExtUtils::CChecker" );
+require ExtUtils::CChecker;
 
+pass( 'Modules loaded' );
 done_testing;

@@ -48,7 +48,8 @@ sub test_generator {
     $ctx->release;
 }
 
-use if $HAS_LVALUE,
+use
+  if $HAS_LVALUE,
   'Hash::Wrap' => ( { -as => 'lvalued_undef', -lvalue => 1, -undef => 1 } );
 
 subtest 'default' => sub {
@@ -57,13 +58,14 @@ subtest 'default' => sub {
 
 };
 
-use if $HAS_LVALUE,
+use
+  if $HAS_LVALUE,
   'Hash::Wrap' => ( {
-    -as     => 'created_class',
-    -lvalue => 1,
-    -undef => 1,
-    -class  => 'My::CreatedClass::LvalueUndef',
-} );
+      -as     => 'created_class',
+      -lvalue => 1,
+      -undef  => 1,
+      -class  => 'My::CreatedClass::LvalueUndef',
+  } );
 
 subtest 'create class' => sub {
 

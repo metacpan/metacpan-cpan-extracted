@@ -4,11 +4,9 @@ use strict;
 use warnings;
 use autodie;
 use feature qw(say);
-use Sys::Hostname;
-use Cwd qw(cwd abs_path);
 use Convert::Pheno::Mapping;
 use Exporter 'import';
-our @EXPORT = qw(do_pxf2bff get_metaData);
+our @EXPORT = qw(do_pxf2bff);
 
 #############
 #############
@@ -43,7 +41,8 @@ sub do_pxf2bff {
       exists $data->{phenopacket} ? $data->{phenopacket} : $data;
 
     # Validate format
-    die "Are you sure that your input is not already a bff?\n" unless validate_format($phenopacket, 'pxf');
+    die "Are you sure that your input is not already a bff?\n"
+      unless validate_format( $phenopacket, 'pxf' );
 
     # 2, 3 - /cohort and /family (unlikely)
     # NB: They usually contain info on many individuals and their own files)
@@ -65,16 +64,18 @@ sub do_pxf2bff {
         $phenopacket->{metaData} = delete $phenopacket->{meta_data};
     }
 
-    # Define defaults
-    my $default_date            = '1900-01-01';
-    my $default_duration        = 'P999Y';
-    my $default_value           = -1;
-    my $default_timestamp       = '1900-01-01T00:00:00Z';
-    my $default_iso8601duration = { iso8601duration => $default_duration };
-    my $default_ontology        = { id => 'NCIT:NA0000', label => 'NA' };
-    my $default_quantity        = {
-        unit  => $default_ontology,
-        value => $default_value
+    # Default values to be used accross the module
+    my %default = (
+        ontology  => { id => 'NCIT:NA0000', label => 'NA' },
+        date      => '1900-01-01',
+        duration  => 'P999Y',
+        value     => -1,
+        timestamp => '1900-01-01T00:00:00Z',
+    );
+    $default{iso8601duration} = { iso8601duration => $default{duration} };
+    $default{quantity}        = {
+        unit  => $default{ontology},
+        value => $default{value}
     };
 
     ####################################
@@ -133,10 +134,10 @@ sub do_pxf2bff {
               substr( $exposure->{occurrence}{timestamp}, 0, 10 );
 
             # Required properties
-            $exposure->{ageAtExposure} = $default_iso8601duration;
-            $exposure->{duration}      = $default_duration;
+            $exposure->{ageAtExposure} = $default{iso8601duration};
+            $exposure->{duration}      = $default{duration};
             unless ( exists $exposure->{unit} ) {
-                $exposure->{unit} = $default_ontology;
+                $exposure->{unit} = $default{ontology};
             }
 
             # Clean analog terms if exist
@@ -192,11 +193,11 @@ sub do_pxf2bff {
                 $procedure->{procedureCode} =
                   exists $action->{procedure}{code}
                   ? $action->{procedure}{code}
-                  : $default_ontology;
+                  : $default{ontology};
                 $procedure->{ageOfProcedure} =
                   exists $action->{procedure}{performed}
                   ? $action->{procedure}{performed}
-                  : $default_timestamp;
+                  : $default{timestamp};
 
                 # Clean analog terms if exist
                 for (qw/code performed/) {
@@ -234,7 +235,7 @@ sub do_pxf2bff {
             $measure->{measurementValue} =
                 exists $measure->{value}        ? $measure->{value}
               : exists $measure->{complexValue} ? $measure->{complexValue}
-              :                                   $default_value;
+              :                                   $default{value};
             $measure->{observationMoment} = $measure->{timeObserved}
               if exists $measure->{timeObserved};
 
@@ -307,7 +308,7 @@ sub do_pxf2bff {
                 $treatment->{treatmentCode} =
                   exists $action->{treatment}{agent}
                   ? $action->{treatment}{agent}
-                  : $default_ontology;
+                  : $default{ontology};
 
                 # Clean analog terms if exist
                 delete $treatment->{agent}
@@ -324,12 +325,12 @@ sub do_pxf2bff {
 
                         # quantity
                         unless ( exists $_->{quantity} ) {
-                            $_->{quantity} = $default_quantity;
+                            $_->{quantity} = $default{quantity};
                         }
 
                         #scheduleFrequency
                         unless ( exists $_->{scheduleFrequency} ) {
-                            $_->{scheduleFrequency} = $default_ontology;
+                            $_->{scheduleFrequency} = $default{ontology};
                         }
                     }
                 }
@@ -373,86 +374,6 @@ sub map_complexValue {
     }
 
     return 1;
-}
-
-sub get_metaData {
-
-    my $self = shift;
-
-    # NB: Q: Why inside PXF.pm and not inside BFF.pm?
-    #   : A: Because it's easier to remember (used in REDCap,pm, BFF.pm)
-
-    # Setting a few variables
-    my $user = $self->{username};
-
-   # NB: Darwin does not have nproc to show #logical-cores, using sysctl instead
-    my $os = $^O;
-    chomp(
-        my $ncpuhost =
-          lc($os) eq 'darwin' ? qx{/usr/sbin/sysctl -n hw.logicalcpu}
-        : $os eq 'MSWin32' ? qx{wmic cpu get NumberOfLogicalProcessors}
-        :                    qx{/usr/bin/nproc} // 1
-    );
-
-    # For the Windows command, the result will also contain the string
-    # "NumberOfLogicalProcessors" which is the header of the output.
-    # So we need to extract the actual number from it:
-    if ( $os eq 'MSWin32' ) {
-        ($ncpuhost) = $ncpuhost =~ /(\d+)/;
-    }
-    $ncpuhost = 0 + $ncpuhost;    # coercing it to be a number
-
-    my $info = {
-        user            => $user,
-        ncpuhost        => $ncpuhost,
-        cwd             => cwd,
-        hostname        => hostname,
-        'Convert-Pheno' => $::VERSION
-    };
-    my $resources = [
-        {
-            id   => 'ICD10',
-            name =>
-'International Statistical Classification of Diseases and Related Health Problems 10th Revision',
-            url             => 'https://icd.who.int/browse10/2019/en#',
-            version         => '2019',
-            namespacePrefix => 'ICD10',
-            iriPrefix       => 'https://icd.who.int/browse10/2019/en#/'
-        },
-        {
-            id              => 'NCIT',
-            name            => 'NCI Thesaurus',
-            url             => 'http://purl.obolibrary.org/obo/ncit.owl',
-            version         => '22.03d',
-            namespacePrefix => 'NCIT',
-            iriPrefix       => 'http://purl.obolibrary.org/obo/NCIT_'
-        },
-        {
-            id              => 'Athena-OHDSI',
-            name            => 'Athena-OHDSI',
-            url             => 'https://athena.ohdsi.org',
-            version         => 'v5.3.1',
-            namespacePrefix => 'OHDSI',
-            iriPrefix       => 'http://www.fakeurl.com/OHDSI_'
-        }
-    ];
-    return {
-        #_info => $info,         # Not allowed
-        created                  => iso8601_time(),
-        createdBy                => $user,
-        submittedBy              => $user,
-        phenopacketSchemaVersion => '2.0',
-        resources                => $resources,
-        externalReferences       => [
-            {
-                id        => 'PMID: 26262116',
-                reference =>
-                  'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4815923',
-                description =>
-'Observational Health Data Sciences and Informatics (OHDSI): Opportunities for Observational Researchers'
-            }
-        ]
-    };
 }
 
 1;

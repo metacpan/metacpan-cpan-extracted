@@ -1,3 +1,9 @@
+0.03 2024-03-01T00:35:00+01:00
+ - Fix typo in doc.
+ - Improve ERRORS section in doc.
+ - Update copyright years.
+ - Update minimal version of Mo::utils to 0.09.
+
 0.02 2023-09-01T14:12:51+02:00
  - Add ERRORS section to doc.
  - Reflect example name of real hash in Digest.

@@ -1,6 +1,6 @@
 package WWW::Google::CustomSearch::Result;
 
-$WWW::Google::CustomSearch::Result::VERSION   = '0.39';
+$WWW::Google::CustomSearch::Result::VERSION   = '0.40';
 $WWW::Google::CustomSearch::Result::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ WWW::Google::CustomSearch::Result - Placeholder for Google JSON/Atom Custom Sear
 
 =head1 VERSION
 
-Version 0.39
+Version 0.40
 
 =cut
 
@@ -39,7 +39,10 @@ sub BUILD {
     $self->{'url_type'} = $raw->{'url'}->{'type'};
 
     $raw->{'queries'}->{'request'}->[0]->{'api_key'} = $self->api_key;
-    $self->{'request'} = WWW::Google::CustomSearch::Request->new($raw->{'queries'}->{'request'}->[0]);
+
+    my $request_params = $raw->{'queries'}->{'request'}->[0];
+    $request_params->{totalResults} = $raw->{searchInformation}->{totalResults} || 0;
+    $self->{'request'} = WWW::Google::CustomSearch::Request->new($request_params);
 
     if (defined $raw->{'queries'}->{'nextPage'} && (scalar(@{$raw->{'queries'}->{'nextPage'}}))) {
         $raw->{'queries'}->{'nextPage'}->[0]->{'api_key'} = $self->api_key;

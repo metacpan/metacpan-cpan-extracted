@@ -1,26 +1,34 @@
 Revision history for perl distribution Dist-Setup
 
-0.09 - 2023-02-05
+0.10 - 2024-03-01
+
+ - Don’t create backup of the source files when running aspell.
+ - Add the README files to the MANIFEST.SKIP
+ - Let the user run our distribution tests manually without setting
+   ENV{EXTENDED_TESTING}.
+ - Only recommends instead of requiring Devel::Cover.
+
+0.09 - 2024-02-05
 
  - Improve spell checking for Perl files by manually calling the `context`
    aspell filter (instead of using the `perl` mode that does not work well).
 
-0.08 - 2023-02-04
+0.08 - 2024-02-04
 
  - Update the Git repository name to match the name of the binary.
 
-0.07 - 2023-02-04
+0.07 - 2024-02-04
 
  - Add POD documentation to the perl_dist_setup script and Dist::Setup module.
  - Improve the support for the `make cover` target.
 
-0.06 - 2023-02-03
+0.06 - 2024-02-03
 
  - Be more permissive with regex in PerlCritic
  - Add a Test::CPANfile test to check that all dependencies are listed.
  - Support for uploading the distribution right from the Makefile.
 
-0.05 - 2025-02-02
+0.05 - 2024-02-02
 
  - Add the missing Test2::V0 dependency in the cpanfile.
 

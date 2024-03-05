@@ -34,7 +34,7 @@
       "runtime" : {
          "requires" : {
             "DateTime" : "0.72",
-            "Locale::CLDR" : "v0.44.0",
+            "Locale::CLDR" : "v0.44.1",
             "Moo" : "2",
             "MooX::ClassAttribute" : "0.011",
             "Type::Tiny" : "0",
@@ -46,39 +46,39 @@
    "provides" : {
       "Locale::CLDR::Locales::Nl" : {
          "file" : "lib/Locale/CLDR/Locales/Nl.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Nl::Latn" : {
          "file" : "lib/Locale/CLDR/Locales/Nl/Latn.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Nl::Latn::Aw" : {
          "file" : "lib/Locale/CLDR/Locales/Nl/Latn/Aw.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Nl::Latn::Be" : {
          "file" : "lib/Locale/CLDR/Locales/Nl/Latn/Be.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Nl::Latn::Bq" : {
          "file" : "lib/Locale/CLDR/Locales/Nl/Latn/Bq.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Nl::Latn::Cw" : {
          "file" : "lib/Locale/CLDR/Locales/Nl/Latn/Cw.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Nl::Latn::Nl" : {
          "file" : "lib/Locale/CLDR/Locales/Nl/Latn/Nl.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Nl::Latn::Sr" : {
          "file" : "lib/Locale/CLDR/Locales/Nl/Latn/Sr.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       },
       "Locale::CLDR::Locales::Nl::Latn::Sx" : {
          "file" : "lib/Locale/CLDR/Locales/Nl/Latn/Sx.pm",
-         "version" : "v0.44.0"
+         "version" : "v0.44.1"
       }
    },
    "release_status" : "stable",
@@ -91,6 +91,6 @@
          "url" : "https://github.com/ThePilgrim/perlcldr.git"
       }
    },
-   "version" : "v0.44.0",
+   "version" : "v0.44.1",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

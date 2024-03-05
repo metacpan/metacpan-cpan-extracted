@@ -1,0 +1,10 @@
+% layout 'default_layout';
+% title 'Welcome';
+
+<div id="dashboard">
+    <my-component></my-component>
+</div>
+
+<script>
+
+</script>

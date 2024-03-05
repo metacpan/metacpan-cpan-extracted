@@ -5,10 +5,17 @@ use File::Copy::Recursive qw(dircopy);
 use HTTP::Tiny;
 use Carp;
 
+my $parasail_executable = 'parasail_aligner';
 ## not doing system install, so must deal with the package name
-## being not obvious
-plugin 'PkgConfig' =>
-  ( pkg_name => path( '.', 'lib', 'pkgconfig', 'parasail-1.pc' ), );
+
+
+ plugin 'PkgConfig' =>
+  ( pkg_name => 'parasail-1', );
+
+plugin 'Probe::CommandLine' => (
+  command   => $parasail_executable,
+  secondary => 1, 
+);
 
 share {
     my $install_root;
@@ -62,7 +69,7 @@ share {
         my $source_directory      = $build->{install_prop}->{extract};
         my $binary_dest_directory = path $install_root, 'bin';
         dircopy( path( $source_directory, 'bin' ), $binary_dest_directory );
-        $build->runtime_prop->{command} = 'parasail-aligner';
+        $build->runtime_prop->{command} = $parasail_executable;
         ## remove file statistics utility as it will be replicated in the
         ## perl interface
         my $stats_exec =

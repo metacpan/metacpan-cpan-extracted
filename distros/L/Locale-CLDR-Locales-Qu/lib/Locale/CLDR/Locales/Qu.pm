@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Qu - Package for language Quechua
 
 package Locale::CLDR::Locales::Qu;
 # This file auto generated from Data\common\main\qu.xml
-#	on Sun 25 Feb 10:41:40 am GMT
+#	on Thu 29 Feb  5:43:51 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.44.0');
+our $VERSION = version->declare('v0.44.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -48,10 +48,6 @@ has 'algorithmic_number_format_data' => (
 					base_value => q(0),
 					divisor => q(1),
 					rule => q(chusaq),
-				},
-				'x.x' => {
-					divisor => q(1),
-					rule => q(←← comma →→),
 				},
 				'1' => {
 					base_value => q(1),
@@ -151,9 +147,13 @@ has 'algorithmic_number_format_data' => (
 					divisor => q(1),
 					rule => q(mana yupay),
 				},
+				'x.x' => {
+					divisor => q(1),
+					rule => q(←← comma →→),
+				},
 				'max' => {
 					divisor => q(1),
-					rule => q(mana yupay),
+					rule => q(←← comma →→),
 				},
 			},
 		},

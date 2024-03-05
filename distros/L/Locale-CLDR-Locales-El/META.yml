@@ -22,22 +22,22 @@ name: Locale-CLDR-Locales-El
 provides:
   Locale::CLDR::Locales::El:
     file: lib/Locale/CLDR/Locales/El.pm
-    version: v0.44.0
+    version: v0.44.1
   Locale::CLDR::Locales::El::Grek:
     file: lib/Locale/CLDR/Locales/El/Grek.pm
-    version: v0.44.0
+    version: v0.44.1
   Locale::CLDR::Locales::El::Grek::Cy:
     file: lib/Locale/CLDR/Locales/El/Grek/Cy.pm
-    version: v0.44.0
+    version: v0.44.1
   Locale::CLDR::Locales::El::Grek::Gr:
     file: lib/Locale/CLDR/Locales/El/Grek/Gr.pm
-    version: v0.44.0
+    version: v0.44.1
   Locale::CLDR::Locales::El::Polyton:
     file: lib/Locale/CLDR/Locales/El/Polyton.pm
-    version: v0.44.0
+    version: v0.44.1
 requires:
   DateTime: '0.72'
-  Locale::CLDR: v0.44.0
+  Locale::CLDR: v0.44.1
   Moo: '2'
   MooX::ClassAttribute: '0.011'
   Type::Tiny: '0'
@@ -47,5 +47,5 @@ resources:
   bugtracker: https://github.com/ThePilgrim/perlcldr/issues
   homepage: https://github.com/ThePilgrim/perlcldr
   repository: https://github.com/ThePilgrim/perlcldr.git
-version: v0.44.0
+version: v0.44.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

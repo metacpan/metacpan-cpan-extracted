@@ -1,5 +1,11 @@
 Revision history for Async-Event-Interval
 
+1.13    2024-03-04
+    - Added ability to send in per-callback call parameters via the start()
+      method (closes #10)
+    - Add prereq of Test::SharedFork to keep tests in order in t/46
+    - Bumped prereq version of IPC::Shareable to 1.13
+
 1.12    2022-03-31
     - Only remove the Async::Event::Interval protected shared %events hash
       if it contains any keys (ie. event objects). When running in things

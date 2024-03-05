@@ -102,7 +102,7 @@ sub _EQ {
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '6.0.33.3'; # VERSION
+our $VERSION = '6.0.33.4'; # VERSION
 
 
 1;
@@ -119,7 +119,7 @@ MarpaX::ESLIF::Symbol - MarpaX::ESLIF's symbol
 
 =head1 VERSION
 
-version 6.0.33.3
+version 6.0.33.4
 
 =head1 SYNOPSIS
 

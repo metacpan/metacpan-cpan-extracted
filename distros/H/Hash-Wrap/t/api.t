@@ -80,30 +80,42 @@ ref_ok( *My::Import::CloneNoRename::wrap_hash{CODE},
 
 }
 
-is( My::StandAlone::Class->new( { } )->b, undef, "standalone class" );
+is( My::StandAlone::Class->new( {} )->b, undef, "standalone class" );
 
 {
 
     package My::Test::No::Sub;
 
-    use Hash::Wrap ( { -class => 'My::Test::No::Sub::Class', -new => 1, -as => undef, -undef => 1 } );
+    use Hash::Wrap ( {
+        -class => 'My::Test::No::Sub::Class',
+        -new   => 1,
+        -as    => undef,
+        -undef => 1
+    } );
 
 }
 
-is( My::Test::No::Sub::Class->new( { } )->b, undef, "standalone class" );
-{ no warnings 'once';
-  is ( *My::Test::No::Sub::wrap_hash{CODE}, undef, "stopping import of wrap_hash works" );
+is( My::Test::No::Sub::Class->new( {} )->b, undef, "standalone class" );
+{
+    no warnings 'once';
+    is( *My::Test::No::Sub::wrap_hash{CODE},
+        undef, "stopping import of wrap_hash works" );
 }
 
 {
     package My::Test::ClassName;
 
-    use Hash::Wrap ( { -class => '-caller', -new => 1, -as => 'wrapit', -undef => 1 } );
+    use Hash::Wrap (
+        { -class => '-caller', -new => 1, -as => 'wrapit', -undef => 1 } );
 
 }
 
 ref_ok( *My::Test::ClassName::wrapit{CODE}, 'CODE', "standalone class" );
-isa_ok( My::Test::ClassName::wrapit(), [ 'My::Test::ClassName::wrapit' ], '-class => -caller' );
+isa_ok(
+    My::Test::ClassName::wrapit(),
+    ['My::Test::ClassName::wrapit'],
+    '-class => -caller'
+);
 
 SKIP: {
     skip( ":lvalue support requires perl 5.16 or later" )
@@ -115,7 +127,7 @@ SKIP: {
         use if $HAS_LVALUE, 'Hash::Wrap', ( { -base => 1, -lvalue => 1 } );
     }
 
-    is( $My::Import::Default::LValue::meta->{-lvalue}, 1, "lvalue");
+    is( $My::Import::Default::LValue::meta->{-lvalue}, 1, "lvalue" );
 }
 
 done_testing;

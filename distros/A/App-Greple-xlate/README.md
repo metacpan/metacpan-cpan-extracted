@@ -11,7 +11,7 @@ App::Greple::xlate - translation support module for greple
 
 # VERSION
 
-Version 0.30
+Version 0.31
 
 # DESCRIPTION
 
@@ -203,8 +203,59 @@ data only when the cache file exists for target file.
 # COMMAND LINE INTERFACE
 
 You can easily use this module from the command line by using the
-`xlate` command included in the repository. See the `xlate` help
+`xlate` command included in the distribution. See the `xlate` help
 information for usage.
+
+The `xlate` command works in concert with the Docker environment, so
+even if you do not have anything installed on hand, you can use it as
+long as Docker is available.  Use `-D` or `-C` option.
+
+Also, since makefiles for various document styles are provided,
+translation into other languages is possible without special
+specification.  Use `-M` option.
+
+You can also combine the Docker and make options so that you can run
+make in a Docker environment.
+
+Running like `xlate -GC` will launch a shell with the current working
+git repository mounted.
+
+Read Japanese article in ["SEE ALSO"](#see-also) section for detail.
+
+    xlate [ options ] -t lang file [ greple options ]
+        -h   help
+        -v   show version
+        -d   debug
+        -n   dry-run
+        -a   use API
+        -c   just check translation area
+        -r   refresh cache
+        -s   silent mode
+        -e # translation engine (default "deepl")
+        -p # pattern to determine translation area
+        -w # wrap line by # width
+        -o # output format (default "xtxt", or "cm", "ifdef")
+        -f # from lang (ignored)
+        -t # to lang (required, no default)
+        -m # max length per API call
+        -l # show library files (XLATE.mk, xlate.el)
+        --   terminate option parsing
+    Make options
+        -M   run make
+        -n   dry-run
+    Docker options
+        -G   mount git top-level directory
+        -B   run in non-interactive (batch) mode
+        -R   mount read-only
+        -E * specify environment variable to be inherited
+        -I * specify altanative docker image (default: tecolicom/xlate:version)
+        -D * run xlate on the container with the rest parameters
+        -C * run following command on the container, or run shell
+
+    Control Files:
+        *.LANG    translation languates
+        *.FORMAT  translation foramt (xtxt, cm, ifdef)
+        *.ENGINE  translation engine (deepl or gpt3)
 
 # EMACS
 

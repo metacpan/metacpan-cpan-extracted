@@ -5,12 +5,12 @@ use strict;
 use warnings;
 
 sub description { 'Digital Arts m-FILTER' }
-sub make {
+sub inquire {
     # Detect an error from DigitalArts m-FILTER
     # @param    [Hash] mhead    Message headers of a bounce email
     # @param    [String] mbody  Message body of a bounce email
     # @return   [Hash]          Bounce data list and message/rfc822 part
-    # @return   [Undef]         failed to parse or the arguments are missing
+    # @return   [undef]         failed to parse or the arguments are missing
     # @since v4.1.1
     my $class = shift;
     my $mhead = shift // return undef;
@@ -22,26 +22,27 @@ sub make {
     return undef unless $mhead->{'subject'}  eq 'failure notice';
 
     state $indicators = __PACKAGE__->INDICATORS;
-    state $rebackbone = qr/^-------original[ ](?:message|mail[ ]info)/m;
+    state $boundaries = ['-------original message', '-------original mail info'];
     state $startingof = {
         'command'  => ['-------SMTP command'],
         'error'    => ['-------server message'],
     };
-    state $markingsof = { 'message' => qr/\A[^ ]+[@][^ ]+[.][a-zA-Z]+\z/ };
 
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
-    my $emailsteak = Sisimai::RFC5322->fillet($mbody, $rebackbone);
+    my $emailparts = Sisimai::RFC5322->part($mbody, $boundaries);
     my $readcursor = 0;     # (Integer) Points the current cursor position
     my $recipients = 0;     # (Integer) The number of 'Final-Recipient' header
     my $markingset = { 'diagnosis' => 0, 'command' => 0 };
     my $v = undef;
 
-    for my $e ( split("\n", $emailsteak->[0]) ) {
-        # Read error messages and delivery status lines from the head of the email
-        # to the previous line of the beginning of the original message.
+    for my $e ( split("\n", $emailparts->[0]) ) {
+        # Read error messages and delivery status lines from the head of the email to the previous
+        # line of the beginning of the original message.
         unless( $readcursor ) {
             # Beginning of the bounce message or message/delivery-status part
-            $readcursor |= $indicators->{'deliverystatus'} if $e =~ $markingsof->{'message'};
+            if( index($e, '@') > 1 && index($e, ' ') < 0 && Sisimai::Address->is_emailaddress($e) ) {
+                $readcursor |= $indicators->{'deliverystatus'};
+            }
         }
         next unless $readcursor & $indicators->{'deliverystatus'};
         next unless length $e;
@@ -63,7 +64,7 @@ sub make {
         # -------original message
         $v = $dscontents->[-1];
 
-        if( $e =~ /\A([^ ]+[@][^ ]+)\z/ ) {
+        if( index($e, '@') > 0 && index($e, ' ') < 0 ) {
             # 以下のメールアドレスへの送信に失敗しました。
             # kijitora@example.jp
             if( $v->{'recipient'} ) {
@@ -71,10 +72,10 @@ sub make {
                 push @$dscontents, __PACKAGE__->DELIVERYSTATUS;
                 $v = $dscontents->[-1];
             }
-            $v->{'recipient'} = $1;
+            $v->{'recipient'} = $e;
             $recipients++;
 
-        } elsif( $e =~ /\A[A-Z]{4}/ ) {
+        } elsif( length $e == 4 && index($e, ' ') < 0 ) {
             # -------SMTP command
             # DATA
             next if $v->{'command'};
@@ -104,18 +105,18 @@ sub make {
         $e->{'diagnosis'} = Sisimai::String->sweep($e->{'diagnosis'});
 
         # Get localhost and remote host name from Received header.
-        next unless scalar @{ $mhead->{'received'} };
+        next unless scalar $mhead->{'received'}->@*;
         my $rheads = $mhead->{'received'};
         my $rhosts = Sisimai::RFC5322->received($rheads->[-1]);
 
-        $e->{'lhost'} ||= shift @{ Sisimai::RFC5322->received($rheads->[0]) };
+        $e->{'lhost'} ||= shift Sisimai::RFC5322->received($rheads->[0])->@*;
         for my $ee ( @$rhosts ) {
             # Avoid "... by m-FILTER"
             next unless rindex($ee, '.') > -1;
             $e->{'rhost'} = $ee;
         }
     }
-    return { 'ds' => $dscontents, 'rfc822' => $emailsteak->[1] };
+    return { 'ds' => $dscontents, 'rfc822' => $emailparts->[1] };
 }
 
 1;
@@ -133,9 +134,8 @@ Sisimai::Lhost::mFILTER - bounce mail parser class for C<Digital Arts m-FILTER>.
 
 =head1 DESCRIPTION
 
-Sisimai::Lhost::mFILTER parses a bounce email which created by
-C<Digital Arts m-FILTER>.
-Methods in the module are called from only Sisimai::Message.
+Sisimai::Lhost::mFILTER parses a bounce email which created by C<Digital Arts m-FILTER>. Methods in
+the module are called from only Sisimai::Message.
 
 =head1 CLASS METHODS
 
@@ -145,10 +145,10 @@ C<description()> returns description string of this module.
 
     print Sisimai::Lhost::mFILTER->description;
 
-=head2 C<B<make(I<header data>, I<reference to body string>)>>
+=head2 C<B<inquire(I<header data>, I<reference to body string>)>>
 
-C<make()> method parses a bounced email and return results as a array reference.
-See Sisimai::Message for more details.
+C<inquire()> method parses a bounced email and return results as a array reference. See Sisimai::Message
+for more details.
 
 =head1 AUTHOR
 
@@ -156,7 +156,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2020 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2023 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

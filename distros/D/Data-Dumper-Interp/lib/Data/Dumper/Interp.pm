@@ -27,8 +27,8 @@ package
 package Data::Dumper::Interp;
 
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 997.999; }
-our $VERSION = '7.003'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-01-18'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '7.005'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2024-02-29'; # DATE from Dist::Zilla::Plugin::OurDate
 
 use Moose;
 
@@ -484,9 +484,9 @@ sub __getself_h {
 }
 
 sub _EnabUseqqFeature {
-  # Append <feature> to Useqq ONLY if Useqq has not been changed
-  # (indicated by "<pointy brackets>" in the value -- see $Useqq = ... )
-  # Does nothing unless the default enables extended features.
+  # Append <feature> to Useqq ONLY if Useqq has not been changed from the
+  # default (indicated by "<pointy brackets>" -- see setting of $Useqq = ... )
+  # AND the default enables some extended features.
   my ($self, $feature) = @_;
   my $curr = $self->Useqq;
   return $self if length($curr//"") <= 1
@@ -494,6 +494,11 @@ sub _EnabUseqqFeature {
                     || substr($curr,-1,1) ne ">";
 #btw '###ENABLE CHANGING Useqq; curr=', _dbvis($curr), "  \$Useqq=$Useqq";
   $self->Useqq($curr.$feature)
+}
+
+sub _utfoutput() {
+  # Delay testing STDOUT until the first actual call which needs to know
+  state $utf_output = grep /utf/i, PerlIO::get_layers(*STDOUT, output=>1);
 }
 
 sub _generate_sub($;$) {
@@ -511,7 +516,7 @@ sub _generate_sub($;$) {
   s/alvis/avisl/;  # backwards compat.
   s/hlvis/hvisl/;  # backwards compat.
 
-  # NOW visl means something else.
+  # Discontinued because NOW visl means something else.
   #s/^[^diha]*\K(?:lvis|visl)/avisl/; # 'visl' same as 'avisl' for bw compat.
 
   s/([ahid]?vis)// or error "can not infer the basic function";
@@ -561,7 +566,7 @@ sub _generate_sub($;$) {
       $code .= " { \@_ = ( &__getself" ;
     }
     elsif ($basename eq "dvis") {
-      $code .= " { \@_ = ( &__getself->_EnabUseqqFeature(':spacedots:condense')" ;
+      $code .= " { \@_ = ( &__getself->_EnabUseqqFeature(_utfoutput() ? ':spacedots:condense' : ':condense')" ;
       #$code .= " { \@_ = ( &__getself->_EnabUseqqFeature(':spacedots')" ;
     }
     else { oops }
@@ -569,7 +574,7 @@ sub _generate_sub($;$) {
     my $useqq = "";
     $useqq .= ":unicode:controlpics" if delete $mod{c};
     $useqq .= ":condense"            if delete $mod{C};
-    $code .= '->Debug(2)'            if delete $mod{d};
+    $code .= '->Debug(2)'            if delete $mod{D};
     $useqq .= ":hex"                 if delete $mod{h};
     $code .= '->Objects(0)'          if delete $mod{o};
     $useqq .= ":octets"              if delete $mod{O};
@@ -577,6 +582,9 @@ sub _generate_sub($;$) {
     $useqq .= ":underscores"         if delete $mod{u};
 
     $code .= "->Useqq(\$Useqq.'${useqq}')" if $useqq ne "";
+
+    $code .= "->_EnabUseqqFeature(_utfoutput() ? ':spacedots:condense' : ':condense')" if delete($mod{d}) or $basename eq "dvis";
+
     $code .= "->Useqq(0)"     if delete $mod{q};
 
     $code .= "->Maxdepth($N)" if defined($N);
@@ -623,10 +631,13 @@ sub _get_terminal_width() {  # returns undef if unknowable
     local *_; # Try to avoid clobbering special filehandle "_"
     # This does not actualy work; https://github.com/Perl/perl5/issues/19142
 
-    my $fh = -t STDERR ? *STDERR :
-             -t STDOUT ? *STDOUT :
-             -t STDIN  ? *STDIN  :
-        do{my $fh; for("/dev/tty",'CONOUT$') { last if open $fh, $_ } $fh} ;
+    my $fh =
+      -t STDOUT ? *STDOUT :
+      -t STDERR ? *STDERR :
+       # under Windows the filehandle must be an *output* handle
+       do{my $fh; for("/dev/tty",'CONOUT$') { last if open $fh, $_ } $fh}
+         || (-t STDIN && *STDIN)
+       ;
     my ($width, $height);
     if ($fh) {
       # Some platforms (bsd?) carp if the terminal size can not be determined.
@@ -1425,8 +1436,7 @@ sub _postprocess_DD_result {
   my $maxlinelen = $foldwidth1 || $foldwidth || INT_MAX;
   my $maxlineNlen = ($foldwidth // INT_MAX) - length($pad);
 
-  state $utf_output = grep /utf/i, PerlIO::get_layers(*STDOUT, output=>1);
-  if ($unesc_unicode && $utf_output) {
+  if ($unesc_unicode && _utfoutput()) {
     # Probably it's safe to use wide characters
     $COND_LB = "\N{LEFT DOUBLE PARENTHESIS}";
     $COND_RB = "\N{RIGHT DOUBLE PARENTHESIS}";
@@ -1816,9 +1826,9 @@ sub _postprocess_DD_result {
     $outstr =~ s/\A(?:${addrvis_re})?\{/(/ && $outstr =~ s/\}\z/)/s or oops;
   }
   elsif (index($listform,'l') >= 0) {
-    # show as a bare list without brackets
-    $outstr =~ s/\A(?:${addrvis_re})?\[(.*)\]\z/$1/s;
-    $outstr =~ s/\A(?:${addrvis_re})?\{(.*)\}\z/$1/s;
+    # show as a bare list without brackets; the brackets might be on own lines.
+    $outstr =~ s/\A(?:${addrvis_re})?\[\s*(.*?)\s*\]\z/$1/s;
+    $outstr =~ s/\A(?:${addrvis_re})?\{\s*(.*?)\s*\}\z/$1/s;
     # or a single string without "quote marks"
     $outstr =~ s/\A"(.*)"\z/$1/s;
   }
@@ -2274,6 +2284,8 @@ B<c> - Show control characters as "Control Picture" characters
 
 B<C> - condense strings of repeated characters
 
+B<d> - ("debug-friendly") Condense strings; show spaces as middle-dot if STDOUT is utf-encoding
+
 B<h> - show numbers > 9 in hexadecimal
 
 B<O> - Optimize for strings containing binary octets.
@@ -2513,8 +2525,8 @@ Repeated sequences in strings are shown as "⸨I<char>xI<repcount>⸩".
 For example
 
   vec(my $s, 31, 1) = 1;
-  say unpack "b*", ~$s;
-  say visnew->Useqq("unicode:condense")->visl(unpack "b*", ~$s);
+  say unpack "b*", $s;
+  say visnew->Useqq("unicode:condense")->visl(unpack "b*", $s);
     -->11111111111111111111111111111110
     -->⸨1×31⸩0
 
@@ -2530,8 +2542,9 @@ Show using Perl's qq{...} or qqX...Y syntax, rather than "double quotes".
 
 =back
 
-The default is C<Useqq('unicode')> except for
-functions/methods with 'q' in their name, which force C<Useqq(0)>.
+The default is C<Useqq('unicode')> except for C<dvis> which also
+enables 'condense' and possibly 'spacedots'.
+Functions/methods with 'q' in their name force C<Useqq(0)>;
 
 =head2 Quotekeys
 

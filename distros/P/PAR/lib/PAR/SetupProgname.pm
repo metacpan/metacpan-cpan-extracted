@@ -1,7 +1,7 @@
 package PAR::SetupProgname;
 $PAR::SetupProgname::VERSION = '1.002';
 
-use 5.006;
+use 5.008009;
 use strict;
 use warnings;
 use Config;
@@ -72,8 +72,10 @@ Steffen Mueller E<lt>smueller@cpan.orgE<gt>
 You can write
 to the mailing list at E<lt>par@perl.orgE<gt>, or send an empty mail to
 E<lt>par-subscribe@perl.orgE<gt> to participate in the discussion.
+Archives of the mailing list are available at
+E<lt>https://www.mail-archive.com/par@perl.org/E<gt> or E<lt>https://groups.google.com/g/perl.parE<gt>.
 
-Please submit bug reports to E<lt>bug-par@rt.cpan.orgE<gt>. If you need
+Please submit bug reports to E<lt>https://github.com/rschupp/PAR/issuesE<gt>. If you need
 support, however, joining the E<lt>par@perl.orgE<gt> mailing list is
 preferred.
 

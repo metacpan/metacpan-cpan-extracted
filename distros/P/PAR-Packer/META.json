@@ -4,7 +4,7 @@
       "Audrey Tang <cpan@audreyt.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -31,6 +31,7 @@
             "DynaLoader" : "0",
             "ExtUtils::CBuilder" : "0",
             "ExtUtils::Embed" : "0",
+            "ExtUtils::MakeMaker" : "6.31",
             "File::Basename" : "0",
             "File::Glob" : "0",
             "File::Spec::Functions" : "0"
@@ -53,7 +54,7 @@
             "Getopt::ArgvFile" : "1.07",
             "IO::Compress::Gzip" : "0",
             "Module::ScanDeps" : "1.21",
-            "PAR" : "1.016",
+            "PAR" : "1.020",
             "PAR::Dist" : "0.22",
             "Text::ParseWords" : "0",
             "perl" : "5.008009"
@@ -78,6 +79,6 @@
       },
       "x_MailingList" : "mailto:par@perl.org"
    },
-   "version" : "1.061",
+   "version" : "1.062",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

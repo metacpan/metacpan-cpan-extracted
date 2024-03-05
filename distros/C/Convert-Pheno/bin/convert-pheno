@@ -4,11 +4,11 @@
 #
 #   This file is part of Convert::Pheno
 #
-#   Last Modified: Jul/26/2023
+#   Last Modified: Feb/28/2024
 #
 #   $VERSION taken from Convert::Pheno
 #
-#   Copyright (C) 2022-2023 Manuel Rueda - CNAG (manuel.rueda@cnag.eu)
+#   Copyright (C) 2022-2024 Manuel Rueda - CNAG (manuel.rueda@cnag.eu)
 #
 #   License: Artistic License 2.0
 
@@ -17,18 +17,19 @@ package main;
 use strict;
 use warnings;
 use autodie;
-use feature qw(say);
+use feature      qw(say);
 use Getopt::Long qw(:config no_ignore_case);
 use Pod::Usage;
 use Data::Dumper;
 use Sys::Hostname;
-use POSIX qw(strftime);
-use File::Spec::Functions qw(catdir catfile);
+use POSIX                          qw(strftime);
+use File::Spec::Functions          qw(catdir catfile);
 use File::ShareDir::ProjectDistDir qw(dist_dir);
-use FindBin qw($Bin);
+use FindBin                        qw($Bin);
 use lib "$Bin/../lib";
 use Term::ANSIColor qw(:constants);
 use Convert::Pheno;
+use Convert::Pheno::IO::CSVHandler;
 
 $Data::Dumper::Sortkeys = 1;
 
@@ -49,6 +50,8 @@ GetOptions(
     'iomop=s{1,}'                 => \my @omop_files,                          # array
     'obff=s'                      => \my $out_bff,                             # string
     'opxf=s'                      => \my $out_pxf,                             # string
+    'ocsv=s'                      => \my $out_csv,                             # string
+    'ojsonf=s'                    => \my $out_jsonf,                           # string
     'out-dir=s'                   => \$out_dir,                                # string
     'help|?'                      => \my $help,                                # flag
     'man'                         => \my $man,                                 # flag
@@ -145,9 +148,11 @@ $ENV{'ANSI_COLORS_DISABLED'} = 1 unless $color;
 
 # Defining $out_file
 my $out_file =
-    $out_pxf ? catfile( $out_dir, $out_pxf )
-  : $out_bff ? catfile( $out_dir, $out_bff )
-  :            catfile( $out_dir, 'individuals.json' );
+    $out_pxf   ? catfile( $out_dir, $out_pxf )
+  : $out_bff   ? catfile( $out_dir, $out_bff )
+  : $out_csv   ? catfile( $out_dir, $out_csv )
+  : $out_jsonf ? catfile( $out_dir, $out_jsonf )
+  :              catfile( $out_dir, 'individuals.json' );
 
 # Defining $log_file
 my $log_file =
@@ -161,8 +166,16 @@ my $in_type =
   : $in_cdisc   ? 'cdisc'
   : @omop_files ? 'omop'
   :               'bff';
-my $out_type = $out_pxf ? 'pxf' : $out_bff ? 'bff' : 'bff';
-my $method   = $in_type . '2' . $out_type;
+my $out_type =
+    $out_pxf   ? 'pxf'
+  : $out_bff   ? 'bff'
+  : $out_csv   ? 'csv'
+  : $out_jsonf ? 'jsonf'
+  :              'bff';
+my $method = $in_type . '2' . $out_type;
+
+#Define job id
+my $id = time . substr( "00000$$", -5 );
 
 # Defining data as a hashref
 my $data = {
@@ -193,6 +206,7 @@ my $data = {
     stream                    => $stream,
     schema_file               => $schema_file,
     out_file                  => $out_file,
+    id                        => $id,
     test                      => $test,
     debug                     => $debug,
     log                       => $log,
@@ -243,6 +257,17 @@ sub convert {
     if ( $stream || $method eq 'omop2bff' || $method eq 'omop2pxf' ) {
         $convert->$method;
     }
+    elsif ( $method eq 'bff2csv' ||  $method eq 'pxf2csv' ) {
+        my $data = $convert->$method;
+        write_csv(    # Print data as CSV
+            {
+                sep      => $l_data->{sep} // ';',
+                filepath => $o_file,
+                headers  => get_headers($data),
+                data     => $data
+            }
+        );
+    }
     else {
         io_yaml_or_json(
             { filepath => $o_file, mode => 'write', data => $convert->$method }
@@ -258,7 +283,7 @@ sub program_header {
 *  Phenotypic Data Model Convert Tool  *
 *          - CONVERT-PHENO -           *
 *            Version: $version             *
-*   (C) 2022-2023 Manuel Rueda, CNAG   *
+*   (C) 2022-2024 Manuel Rueda, CNAG   *
 *       The Artistic License 2.0       *
 ****************************************
 EOF
@@ -304,7 +329,7 @@ sub write_log {
         date      => ( strftime "%a %b %e %H:%M:%S %Y", localtime ),
         ncpuhost  => $ncpuhost,
         hostname  => hostname,
-        id        => time . substr( "00000$$", -5 ),                   # string
+        id        => $data->{id},                                      # string
         version   => $VERSION,
              user => $ENV{'LOGNAME'}
           || $ENV{'USER'}
@@ -366,22 +391,27 @@ convert-pheno [-i input-type] <infile> [-o output-type] <outfile> [-options]
 
      Arguments:                       
        (input-type): 
-             -ibff                    Beacon v2 Models ("individuals" JSON|YAML) file
+             -ibff                    Beacon v2 Models ('individuals' JSON|YAML) file
              -iomop                   OMOP-CDM CSV files or PostgreSQL dump
              -ipxf                    Phenopacket v2 (JSON|YAML) file
              -iredcap (experimental)  REDCap (raw data) export CSV file
              -icdisc  (experimental)  CDISC-ODM v1 XML file
 
              (Wish-list)
-             #-openehr                openEHR
+             #-icsv                   Raw data CSV 
+             #-iopenehr               openEHR
              #-ifhir                  HL7/FHIR
 
        (output-type):
-             -obff                    Beacon v2 Models ("invididuals" JSON|YAML) file
+             -obff                    Beacon v2 Models ('individuals' JSON|YAML) file
              -opxf                    Phenopacket v2 (JSON|YAML) file
 
              (Wish-list)
              #-oomop                  OMOP-CDM PostgreSQL dump
+
+             Compatible with -i(bff|pxf):
+             -ocsv                    Data flattened to CSV
+             -ojsonf                  Data flattened to 1D-JSON
 
      Options:
        -exposures-file                CSV file with a list of 'concept_id' considered to be exposures (with -iomop)
@@ -445,7 +475,7 @@ Please download the C<Dockerfile> from the repo:
 
 And then run:
 
-  docker build -t cnag/convert-pheno:latest .
+  docker buildx build -t cnag/convert-pheno:latest .
 
 =head3 Additional instructions for Methods 1 and 2
 
@@ -624,7 +654,9 @@ B<Examples:>
 =head2 COMMON ERRORS AND SOLUTIONS
 
  * Error message: CSV_XS ERROR: 2023 - EIQ - QUO character not allowed @ rec 1 pos 21 field 1
-   Solution: Make sure you use the right character separator for your data. The script tries to guess it from the file extension (e.g. comma for csv), but sometimes extension and actual separator do not match.
+   Solution: Make sure you use the right character separator for your data. 
+             The script tries to guess it from the file extension (e.g. comma for csv), but sometimes extension and actual separator do not match. 
+             When using REDCap as input, make sure that <--iredcap> and <--rcd> files use the same separator field.
    Example for tab separator in CLI.
     --sep  $'\t' 
 
@@ -635,7 +667,7 @@ B<Examples:>
 
 The author requests that any published work that utilizes C<Convert-Pheno> includes a cite to the the following reference:
 
-Rueda, M et al., (2023). Convert-Pheno: A software toolkit for the interconversion of standard data models for phenotypic data. Journal of Biomedical Informatics. L<DOI|https://doi.org/10.1016/j.jbi.2023.104558>
+Rueda, M et al., (2024). Convert-Pheno: A software toolkit for the interconversion of standard data models for phenotypic data. Journal of Biomedical Informatics. L<DOI|https://doi.org/10.1016/j.jbi.2023.104558>
 
 =head1 AUTHOR 
 
@@ -643,7 +675,7 @@ Written by Manuel Rueda, PhD. Info about CNAG can be found at L<https://www.cnag
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2022-2023, Manuel Rueda - CNAG.
+Copyright (C) 2022-2024, Manuel Rueda - CNAG.
 
 This program is free software, you can redistribute it and/or modify it under the terms of the L<Artistic License version 2.0|perlartistic>.
 

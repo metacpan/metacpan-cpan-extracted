@@ -24,7 +24,10 @@ use Test::Warnings 0.010 qw(:no_end_test);
 my $no_warnings;
 use if $no_warnings = $ENV{AUTHOR_TESTING} ? 1 : 0, 'Test::Warnings';
 
-plan tests => 14 + 1 + $no_warnings;
+use Neo4j::Driver;
+use Neo4j_Test::MockHTTP;
+
+plan tests => 15 + 1 + $no_warnings;
 
 my $transaction = $driver->session->begin_transaction;
 $transaction->{return_stats} = 0;  # optimise sim
@@ -50,6 +53,37 @@ subtest 'keys()' => sub {
 	my @r = $s->run('RETURN 1 AS one, 2 AS two')->keys;
 	is $r[0], 'one', 'key 1';
 	is $r[1], 'two', 'key 2';
+};
+
+
+my $mock_plugin = Neo4j_Test::MockHTTP->new;
+{
+no warnings 'qw';
+$mock_plugin->response_for(undef, 'no keys' => { jolt => [qw(
+	{"header":{}} {"summary":{}} {"info":{}}
+)]});
+$mock_plugin->response_for(undef, 'one key' => { jolt => [qw(
+	{"header":{"fields":["A"]}} {"summary":{}} {"info":{}}
+)]});
+$mock_plugin->response_for(undef, 'three keys' => { jolt => [qw(
+	{"header":{"fields":["X","Y","Z"]}} {"summary":{}} {"info":{}}
+)]});
+}
+subtest 'result keys() wantarray' => sub {
+	plan tests => 1 + 3*3;
+	my $d = Neo4j::Driver->new('http:');
+	$d->plugin($mock_plugin);
+	my $sx;
+	lives_and { ok $sx = $d->session(database => 'dummy') } 'session';
+	lives_and { $r = 0; ok $r = $sx->run('no keys') } 'run 0';
+	lives_and { is_deeply [$r->keys], [] } '0 keys';
+	lives_and { is scalar($r->keys), 0 } '0 keys scalar context';
+	lives_and { $r = 0; ok $r = $sx->run('one key') } 'run 1';
+	lives_and { is_deeply [$r->keys], ['A'] } '1 key';
+	lives_and { is scalar($r->keys), 1 } '1 key scalar context';
+	lives_and { $r = 0; ok $r = $sx->run('three keys') } 'run 3';
+	lives_and { is_deeply [$r->keys], [qw(X Y Z)] } '3 keys';
+	lives_and { is scalar($r->keys), 3 } '3 keys scalar context';
 };
 
 

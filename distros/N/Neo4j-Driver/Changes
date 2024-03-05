@@ -1,5 +1,17 @@
 Revision history for Neo4j::Driver
 
+0.46  2024-03-03
+
+ - Add support for byte array values via Bolt and Jolt (Neo4j::Types v2).
+ - Fix Record->get() to not require its argument to be created as number when
+   used as index, or created as string when used as field name.
+ - Add check to prevent the HTTP-only concurrent_tx feature from being used
+   with neo4j: URIs.
+ - Add check to prevent plugin() after session().
+ - Update the "experimental" warning in the plug-in API documentation.
+ - Calling list methods in scalar context is no longer experimental.
+ - Avoid crash of types-temporal.t on Win32.
+
 0.45  2024-02-16
 
  - The boolean values used in HTTP query results are no longer chosen

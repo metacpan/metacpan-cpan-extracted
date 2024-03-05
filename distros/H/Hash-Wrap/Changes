@@ -1,5 +1,33 @@
 Revision history for Hash-Wrap
 
+1.01      2024-03-01 10:48:51-05:00 America/New_York
+
+  [TESTS]
+
+    * fix tests to require same Perl version as module (5.10) rather
+      than 5.18.
+
+1.00      2024-02-29 16:28:02-05:00 America/New_York
+
+  [BEHAVIOR CHANGE]
+
+    * wrapping an object is an error. Previously hash *values* which
+      were blessed hashes were not wrapped, but the actual passed hash
+      reference was allowed to be a blesed hash.  This change makes
+      the behavior consistent.
+
+  [BUG FIX]
+
+    * if the -copy attribute was set, recursively wrapped sub-hashes
+      did not correctly update their parent hash to point at the copy
+      of the sub-hash.
+
+  [DOCUMENTATION]
+
+    * describe interaction with input immutable hashes
+    * document "eventually" immutable operation with -copy,-immutable
+      on mutable hashes.
+
 0.22      2022-02-09 11:53:27-05:00 America/New_York
 
     * correct version numbers in distributed code

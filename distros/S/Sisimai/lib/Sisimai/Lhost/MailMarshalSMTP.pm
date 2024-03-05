@@ -5,12 +5,12 @@ use strict;
 use warnings;
 
 sub description { 'Trustwave Secure Email Gateway' }
-sub make {
+sub inquire {
     # Detect an error from MailMarshalSMTP
     # @param    [Hash] mhead    Message headers of a bounce email
     # @param    [String] mbody  Message body of a bounce email
     # @return   [Hash]          Bounce data list and message/rfc822 part
-    # @return   [Undef]         failed to parse or the arguments are missing
+    # @return   [undef]         failed to parse or the arguments are missing
     # @since v4.1.9
     my $class = shift;
     my $mhead = shift // return undef;
@@ -18,7 +18,6 @@ sub make {
     return undef unless index($mhead->{'subject'}, 'Undeliverable Mail: "') == 0;
 
     state $indicators = __PACKAGE__->INDICATORS;
-    state $rebackbone = qr/^[ \t]*[+]+[ \t]*/m;
     state $startingof = {
         'message'  => ['Your message:'],
         'error'    => ['Could not be delivered because of'],
@@ -31,15 +30,13 @@ sub make {
     my $endoferror = 0;     # (Integer) Flag for the end of error message
     my $v = undef;
 
-    if( my $boundary00 = Sisimai::MIME->boundary($mhead->{'content-type'}, 1) ) {
-        # Convert to regular expression
-        $rebackbone = qr/^\Q$boundary00\E/m;
-    }
-    my $emailsteak = Sisimai::RFC5322->fillet($mbody, $rebackbone);
+    my $boundaries = ['+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'];
+    my $q = Sisimai::RFC2045->boundary($mhead->{'content-type'}, 1); push @$boundaries, $q if $q;
+    my $emailparts = Sisimai::RFC5322->part($mbody, $boundaries);
 
-    for my $e ( split("\n", $emailsteak->[0]) ) {
-        # Read error messages and delivery status lines from the head of the email
-        # to the previous line of the beginning of the original message.
+    for my $e ( split("\n", $emailparts->[0]) ) {
+        # Read error messages and delivery status lines from the head of the email to the previous
+        # line of the beginning of the original message.
         unless( $readcursor ) {
             # Beginning of the bounce message or message/delivery-status part
             $readcursor |= $indicators->{'deliverystatus'} if index($e, $startingof->{'message'}->[0]) == 0;
@@ -58,7 +55,7 @@ sub make {
         #    dummyuser@blabla.xxxxxxxxxxxx.com
         $v = $dscontents->[-1];
 
-        if( $e =~ /\A[ \t]{4}([^ ]+[@][^ ]+)\z/ ) {
+        if( index($e, '    ') == 0 && index($e, '@') > 1 ) {
             # The following recipients were affected:
             #    dummyuser@blabla.xxxxxxxxxxxx.com
             if( $v->{'recipient'} ) {
@@ -66,7 +63,7 @@ sub make {
                 push @$dscontents, __PACKAGE__->DELIVERYSTATUS;
                 $v = $dscontents->[-1];
             }
-            $v->{'recipient'} = $1;
+            $v->{'recipient'} = substr($e, 4,);
             $recipients++;
 
         } else {
@@ -93,24 +90,30 @@ sub make {
                 # Reporting-MTA:      <relay.xxxxxxxxxxxx.com>
                 # MessageName:        <B549996730000.000000000001.0003.mml>
                 # Last-Attempt-Date:  <16:21:07 seg, 22 Dezembro 2014>
-                if( $e =~ /\AOriginal Sender:[ \t]+[<](.+)[>]\z/ ) {
+                my $p1 = index($e, '<');
+                my $p2 = index($e, '>');
+                if( index($e, 'Original Sender: ') == 0 ) {
                     # Original Sender:    <originalsender@example.com>
-                    # Use this line instead of "From" header of the original
-                    # message.
-                    $emailsteak->[1] .= sprintf("From: %s\n", $1);
+                    # Use this line instead of "From" header of the original message.
+                    $emailparts->[1] .= sprintf("From: %s\n", substr($e, $p1 + 1, $p2 - $p1 - 1));
 
-                } elsif( $e =~ /\ASender-MTA:[ \t]+[<](.+)[>]\z/ ) {
+                } elsif( index($e, 'Sender-MTA: ') == 0 ) {;
                     # Sender-MTA:         <10.11.12.13>
-                    $v->{'lhost'} = $1;
+                    $v->{'lhost'} = substr($e, $p1 + 1, $p2 - $p1 - 1);
 
-                } elsif( $e =~ /\AReporting-MTA:[ \t]+[<](.+)[>]\z/ ) {
+                } elsif( index($e , 'Reporting-MTA: ') == 0 ) {
                     # Reporting-MTA:      <relay.xxxxxxxxxxxx.com>
-                    $v->{'rhost'} = $1;
+                    $v->{'rhost'} = substr($e, $p1 + 1, $p2 - $p1 - 1);
 
-                } elsif( $e =~ /\A\s+(From|Subject):\s*(.+)\z/ ) {
+                } elsif( index($e, ' From:') > 0 || index($e, ' Subject:') > 0 ) {
                     #    From:    originalsender@example.com
                     #    Subject: ...
-                    $emailsteak->[1] .= sprintf("%s: %s\n", $1, $2);
+                    $p1 = index($e, ' From:'); $p1 = index($e, ' Subject:') if $p1 < 0;
+                    $p2 = index($e, ':');
+
+                    my $cf = substr($e, $p1 + 1, $p2 - $p1 - 1);
+                    my $cv = Sisimai::String->sweep(substr($e, $p2 + 1,));
+                    $emailparts->[1] .= sprintf("%s: %s\n", $cf, $cv);
                 }
             }
         }
@@ -118,7 +121,7 @@ sub make {
     return undef unless $recipients;
 
     $_->{'diagnosis'} = Sisimai::String->sweep($_->{'diagnosis'}) for @$dscontents;
-    return { 'ds' => $dscontents, 'rfc822' => $emailsteak->[1] };
+    return { 'ds' => $dscontents, 'rfc822' => $emailparts->[1] };
 }
 
 1;
@@ -128,8 +131,7 @@ __END__
 
 =head1 NAME
 
-Sisimai::Lhost::MailMarshalSMTP - bounce mail parser class for
-C<Trustwave Secure Email Gateway>.
+Sisimai::Lhost::MailMarshalSMTP - bounce mail parser class for C<Trustwave Secure Email Gateway>.
 
 =head1 SYNOPSIS
 
@@ -137,9 +139,8 @@ C<Trustwave Secure Email Gateway>.
 
 =head1 DESCRIPTION
 
-Sisimai::Lhost::MailMarshalSMTP parses a bounce email which created by
-C<Trustwave Secure Email Gateway>: formerly MailMarshal SMTP.
-Methods in the module are called from only Sisimai::Message.
+Sisimai::Lhost::MailMarshalSMTP parses a bounce email which created by C<Trustwave Secure Email Gateway>:
+formerly MailMarshal SMTP. Methods in the module are called from only Sisimai::Message.
 
 =head1 CLASS METHODS
 
@@ -149,10 +150,10 @@ C<description()> returns description string of this module.
 
     print Sisimai::Lhost::MailMarshalSMTP->description;
 
-=head2 C<B<make(I<header data>, I<reference to body string>)>>
+=head2 C<B<inquire(I<header data>, I<reference to body string>)>>
 
-C<make()> method parses a bounced email and return results as a array reference.
-See Sisimai::Message for more details.
+C<inquire()> method parses a bounced email and return results as a array reference. See Sisimai::Message
+for more details.
 
 =head1 AUTHOR
 
@@ -160,7 +161,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2021 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2021,2023 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

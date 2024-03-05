@@ -1,6 +1,27 @@
 Revision history for Runtime-Debugger
 
 ====
+0.14
+====
+
+2024-03-04
+
+Using:
+local $@
+
+Some cleanup.
+
+====
+0.13
+====
+
+2024-03-04
+Changed p to d.
+    Currently:
+    p - Data::Printer
+    d - Data::Dumper
+
+====
 0.12
 ====
 

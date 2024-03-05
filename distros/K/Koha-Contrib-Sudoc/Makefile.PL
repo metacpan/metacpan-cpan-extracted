@@ -58,6 +58,7 @@ my %WriteMakefileArgs = (
     "MooseX::RW::Reader" => 0,
     "MooseX::RW::Reader::File" => 0,
     "Net::FTP" => 0,
+    "Net::SFTP::Foreign" => 0,
     "Path::Tiny" => 0,
     "Pod::Usage" => 0,
     "Search::Elasticsearch" => 0,
@@ -69,7 +70,7 @@ my %WriteMakefileArgs = (
     "ZOOM" => 0,
     "utf8" => 0
   },
-  "VERSION" => "2.43",
+  "VERSION" => "2.45",
   "test" => {
     "TESTS" => ""
   }
@@ -106,6 +107,7 @@ my %FallbackPrereqs = (
   "MooseX::RW::Reader" => 0,
   "MooseX::RW::Reader::File" => 0,
   "Net::FTP" => 0,
+  "Net::SFTP::Foreign" => 0,
   "Path::Tiny" => 0,
   "Pod::Usage" => 0,
   "Search::Elasticsearch" => 0,

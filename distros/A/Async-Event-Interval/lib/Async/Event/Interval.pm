@@ -3,7 +3,7 @@ package Async::Event::Interval;
 use warnings;
 use strict;
 
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 
 use Carp qw(croak);
 use Data::Dumper;
@@ -123,13 +123,13 @@ sub shared_scalar {
     return \$scalar;
 }
 sub start {
-    my ($self) = @_;
+    my ($self, @callback_params) = @_;
     if ($self->_started){
         warn "Event already running...\n";
         return;
     }
     $self->_started(1);
-    $self->_event;
+    $self->_event(@callback_params);
 }
 sub status {
     my ($self) = @_;
@@ -207,7 +207,11 @@ sub _error_message {
     return $events{$self->id}->{error_message};
 }
 sub _event {
-    my ($self) = @_;
+    my ($self, @event_params) = @_;
+
+    my @callback_params = scalar @event_params
+        ? @event_params
+        : @{ $self->_args };
 
     for (0..1){
         my $pid = $self->_pm->start;
@@ -228,7 +232,7 @@ sub _event {
                 select(undef, undef, undef, $self->interval);
 
                 my $callback_success = eval {
-                    $self->_cb->(@{ $self->_args });
+                    $self->_cb->(@callback_params);
                     1;
                 };
 
@@ -246,7 +250,7 @@ sub _event {
         }
         else {
             my $callback_success = eval {
-                $self->_cb->(@{$self->_args});
+                $self->_cb->(@callback_params);
                 1;
             };
 
@@ -417,10 +421,26 @@ code will not be seen in the event, and vice-versa. See L</shared_scalar> if
 you'd like to use variables that can be shared between the main application and
 the events.
 
-=head2 start
+Also note: These parameters are sent into the event only once. Each
+time the callback is called, they will receive the exact same set of params.
+
+To have the event get different values in the params each time the callback is
+called, see L</start(@params)>.
+
+=head2 start(@params)
 
 Starts the event timer. Each time the interval is reached, the event callback
 is executed.
+
+Parameters:
+
+    @params
+
+Optional, List: A list of parameters that the callback will receive each time
+the callback is called. This is most effective in single-run mode so you can
+send in different parameter values on each incarnation. The parameters can be
+any type of any complexity. Your callback will get them in whatever order you
+send them in as.
 
 =head2 stop
 
@@ -624,12 +644,50 @@ can check the status of the event and restart it or whatever else you need.
         },
     );
 
-=head2 Event parameters
+=head2 Per callback execution parameters
 
-You can send in a list of parameters to the event callback. Changing these
-within the main program will have no effect on the values sent into the
-event itself. These parameter variables are copies and are not shared. For
-shared variables, see L</shared_scalar>.
+When using an event in a one-off situation where you restart the same event
+manually, you can send in parameters that differ for each execution.
+
+Send in a list of any data type. The list will be sent as-is to the callback.
+
+NOTE: Parameters sent in to the C<start()> method will override ones sent into
+the C<new()> method.
+
+For example:
+
+    use Async::Event::Interval
+
+    my @params = (
+        { a => 1 },
+        { b => 2 },
+        { c => 3 },
+    );
+
+    my $event = Async::Event::Interval->new(0, \&callback);
+
+    my $count = 0;
+
+    for my $href (@params) {
+        $event->start($count, $href);
+        while (! $event->waiting) {}
+    }
+
+    sub callback {
+        my ($count, $href) = @_;
+        my ($k, $v) = each %$href;
+        print "$count: $k = $v\n";
+    }
+
+=head2 Global event callback parameters
+
+You can send in a list of parameters to the event callback when instantiating
+the event. Note that these parameters will remain the same for every call of
+the callback.
+
+Changing these within the main program will have no effect on the values sent
+into the event itself. These parameter variables are copies and are not shared.
+For shared variables, see L</shared_scalar>.
 
     use Async::Event::Interval
 
@@ -745,7 +803,7 @@ Steve Bertrand, C<< <steveb at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2022 Steve Bertrand.
+Copyright 2024 Steve Bertrand.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

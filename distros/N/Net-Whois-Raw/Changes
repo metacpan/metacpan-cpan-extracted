@@ -1,5 +1,8 @@
 Revision history for Perl module Net::Whois::Raw.
 
+2.99038  Feb 29 2024 Alexander Nalobin
+    - Fix whois servers for some CentralNic tlds
+
 2.99037  Jun 21 2022 Alexander Nalobin
     - Fix whois servers for .ai
 

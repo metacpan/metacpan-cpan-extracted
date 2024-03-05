@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc::PPNize::Reader;
 # ABSTRACT: Reader du fichier ABES d'équivalence PPN biblionumber
-$Koha::Contrib::Sudoc::PPNize::Reader::VERSION = '2.43';
+$Koha::Contrib::Sudoc::PPNize::Reader::VERSION = '2.45';
 use Moose;
 
 with 'MooseX::RW::Reader::File';
@@ -35,7 +35,7 @@ Koha::Contrib::Sudoc::PPNize::Reader - Reader du fichier ABES d'équivalence PPN
 
 =head1 VERSION
 
-version 2.43
+version 2.45
 
 =head1 AUTHOR
 

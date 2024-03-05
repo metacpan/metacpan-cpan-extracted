@@ -1,6 +1,6 @@
 package Map::Tube;
 
-$Map::Tube::VERSION   = '3.69';
+$Map::Tube::VERSION   = '3.70';
 $Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube - Lightweight Routing Framework.
 
 =head1 VERSION
 
-Version 3.69
+Version 3.70
 
 =cut
 
@@ -65,13 +65,13 @@ documented in L<Map::Tube::Cookbook>.
     +---------------------+----------+------------------------------------------+
     | Author              | PAUSE ID | Map Count (City)                         |
     +---------------------+----------+------------------------------------------+
-    | Michal Josef Spacek | SKIM     | 23 (Bielefeld, Bucharest, Budapest,      |
-    |                     |          | Dnipropetrovsk, Kazan, Kharkiv, Kiev,    |
-    |                     |          | KualaLumpur, Malaga, Minsk, Moscow,      |
-    |                     |          | Nanjing, NizhnyNovgorod, Novosibirsk,    |
-    |                     |          | Prague, SaintPetersburg, Samara,         |
-    |                     |          | Singapore, Sofia, Tbilisi, Vienna,       |
-    |                     |          | Warsaw, Yekaterinburg)                   |
+    | Michal Josef Spacek | SKIM     | 22 (Bucharest, Budapest, Dnipropetrovsk, |
+    |                     |          | Kazan, Kharkiv, Kiev, KualaLumpur,       |
+    |                     |          | Malaga, Minsk, Moscow, Nanjing,          |
+    |                     |          | NizhnyNovgorod, Novosibirsk, Prague,     |
+    |                     |          | SaintPetersburg, Samara, Singapore,      |
+    |                     |          | Sofia, Tbilisi, Vienna, Warsaw,          |
+    |                     |          | Yekaterinburg                            |
     |                     |          |                                          |
     | Mohammad S Anwar    | MANWAR   | 7 (Barcelona, Delhi, Kolkatta, London,   |
     |                     |          | Madrid, NYC, Tokyo)                      |
@@ -91,6 +91,8 @@ documented in L<Map::Tube::Cookbook>.
     | Soren Lund          | SLU      | 1 (Copenhagen)                           |
     |                     |          |                                          |
     | FUNG Cheok Yin      | CYFUNG   | 1 (Hong Kong)                            |
+    |                     |          |                                          |
+    | Vitali Peil         | VPEIL    | 1 (Bielefeld)                            |
     +---------------------+----------+------------------------------------------+
 
 =cut

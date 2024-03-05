@@ -1,8 +1,9 @@
 #!/usr/bin/env -S perl -Ilib
-use Test::More tests => 1;
+use Test::More tests => 2;
 use POSIX 'dup2';
 dup2 fileno(STDERR), fileno(STDOUT);
 use strict;
+use warnings;
 use Benchmark ':all';
 our ($x, $z);
 $x = bless {}, "Foo";
@@ -14,8 +15,10 @@ BEGIN {
   package Foo;
   use base 'sealed';
   use sealed 'deparse';
-  sub foo  { shift }
-  sub bar  { shift . "->::Foo::bar" }
+  sub foo { shift }
+  sub bar  { 1 }
+  my $n;
+  sub _foo :Sealed { my Foo $x = shift; $n++ ? $x->bar : $x->main::reentrant }
 }
 sub func   {Foo::foo($x)}
 BEGIN{@::ISA=('Foo')}
@@ -32,12 +35,18 @@ sub also_sealed :Sealed {
         return sub :Sealed {
             my Foo $b = $a;
             $inner->foo($b->foo($inner->bar, $inner, $bench->cmpthese));
+            $a = $inner;
             $a->foo;
+            $b->bar;
         };
     }
-    sub render :Sealed { my main $b = $a; local our @Q=1; $b->foo }
     $a->bar();
 }
+
+sub reentrant :Sealed { my main $b = shift; local our @Q=1; my $c = $b->_foo }
+
+ok($y->main::reentrant()==1);
+
 my %tests = (
     func => \&func,
     method => \&method,
@@ -47,4 +56,5 @@ my %tests = (
 );
 
 cmpthese 20_000_000, \%tests;
+
 ok(1);

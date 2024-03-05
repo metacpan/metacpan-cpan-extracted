@@ -1,3 +1,7 @@
+0.05 2024-03-04T11:08:23+01:00
+ - Fix variable names and test messages in check_css_class() tests.
+ - Fix variable names and test messages in check_css_unit() tests.
+
 0.04 2024-02-03T10:39:58+01:00
  - Add information about module version for checks in doc.
  - Add tests for error parameters.
