@@ -5,14 +5,14 @@ use warnings
 
 use Test::Expander -tempdir => {};
 
-my ( $args_valid, $expected, $file_diff, $files_info );
+my ( $args_valid, $diff, $info_valid );
 my $mock_this = mock $CLASS => (
   override => [
-    _compare_files          => sub { $file_diff },
-    _get_two_files_info     => sub { $files_info },
-    _show_failure           => sub { is( [ @_[ 1 .. $#_ ] ], $expected, 'failure reported' ); return },
-    _show_result            => sub { is( [ @_[ 2 .. $#_ ] ], $expected, 'comparison result reported' ); return },
-    _validate_trailing_args => sub { $args_valid ? ( undef, $_[ 0 ]->[ 0 ], $_[ 0 ]->[ 1 ] ) : 'ARG ERROR' },
+    _compare_files          => sub { my ( $self ) = @_; $self->diag( $diff ); $self },
+    _get_two_files_info     => sub { shift->diag( $info_valid ? [] : [ 'INFO ERROR' ] ) },
+    _show_failure           => sub {},
+    _show_result            => sub { !@{ shift->diag } },
+    _validate_trailing_args => sub { shift->diag( $args_valid ? [] : [ 'ARGS ERROR' ] ) },
   ]
 );
 
@@ -20,24 +20,36 @@ plan( 4 );
 
 subtest 'invalid optional arguments' => sub {
   plan( 2 );
-  ( $args_valid, $expected, $file_diff, $files_info ) = ( 0, [ 'ARG ERROR' ], [], [] );
-  is( $METHOD_REF->( 'got_file', 'expected_file' ), undef, 'executed' );
+
+  my $self = $CLASS->_init;
+  ( $args_valid, $diff, $info_valid ) = ( 0, [], 1 );
+  ok( !$self->$METHOD( 'got_file', 'expected_file' ), 'failed' );
+  is( $self->diag, [ 'ARGS ERROR' ],                  'failure reported' );
 };
 
 subtest 'file info cannot be gathered' => sub {
   plan( 2 );
-  ( $args_valid, $expected, $file_diff, $files_info ) = ( 1, [ 'INFO ERROR' ], [], [ 'INFO ERROR' ] );
-  is( $METHOD_REF->( 'got_file', 'expected_file' ), undef, 'executed' );
+
+  my $self = $CLASS->_init;
+  ( $args_valid, $diff, $info_valid ) = ( 1, [], 0 );
+  ok( !$self->$METHOD( 'got_file', 'expected_file' ), 'failed' );
+  is( $self->diag, [ 'INFO ERROR' ],                  'failure reported' );
 };
 
 subtest 'expected file passed, differences detected' => sub {
   plan( 2 );
-  ( $args_valid, $expected, $file_diff, $files_info ) = ( 1, [ 'DIFF ERROR' ], [ 'DIFF ERROR' ], [] );
-  is( $METHOD_REF->( 'got_file', 'expected_file' ), undef, 'executed' );
+
+  my $self = $CLASS->_init;
+  ( $args_valid, $diff, $info_valid ) = ( 1, [ 'DIFF' ],  1 );
+  ok( !$self->$METHOD( 'got_file', 'expected_file' ), 'failed' );
+  is( $self->diag, [ 'DIFF' ],                        'differences reported' );
 };
 
 subtest 'expected content passed, differences detected' => sub {
   plan( 2 );
-  ( $args_valid, $expected, $file_diff, $files_info ) = ( 1, [ 'DIFF ERROR' ], [ 'DIFF ERROR' ], [] );
-  is( $METHOD_REF->( 'got_file', \'expected_content' ), undef, 'executed' );
+
+  my $self = $CLASS->_init;
+  ( $args_valid, $diff, $info_valid ) = ( 1, [ 'DIFF' ],  1 );
+  ok( !$self->$METHOD( 'got_file', \'expected_file' ), 'failed' );
+  is( $self->diag, [ 'DIFF' ],                         'differences reported' );
 };

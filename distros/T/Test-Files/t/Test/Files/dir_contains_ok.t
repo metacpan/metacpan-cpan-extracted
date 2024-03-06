@@ -5,20 +5,18 @@ use warnings
 
 use Test::Expander;
 
-my $diag;
 my $mockThis = mock $CLASS => (
   override => [
-    _dir_contains_ok        => sub { [] },
-    _show_failure           => sub { $_[ 1 ] },
-    _show_result            => sub {},
-    _validate_trailing_args => sub { ( $diag, {} ) },
-  ]
+    _dir_contains_ok        => sub {},
+    _show_failure           => sub {},
+    _show_result            => sub { 1 },
+    _validate_trailing_args => sub { shift },
+  ],
 );
 
 plan( 2 );
 
-$diag = undef;
-is( $METHOD_REF->( 'dir', [ 'file' ] ), $diag, 'comparison performed' );
+ok(  $METHOD_REF->( 'dir', [ 'file' ] ), 'comparison performed' );
 
-$diag = 'ERROR';
-is( $METHOD_REF->( 'dir', [ 'file' ] ), $diag, 'invalid arguments, comparison rejected' );
+$mockThis->override( diag => sub { [ 'ERROR' ] } );
+ok( !$METHOD_REF->( 'dir', [ 'file' ] ), 'invalid arguments, comparison rejected' );

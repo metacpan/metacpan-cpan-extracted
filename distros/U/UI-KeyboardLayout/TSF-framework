@@ -1,0 +1,1106 @@
+﻿https://blog.csdn.net/fishmai/article/details/60756753
+
+基于文本服务框架的拼音输入法研究与实现
+麦晓宇
+于 2017-03-07 11:18:57 发布
+阅读量7k
+收藏 19
+点赞数 9
+分类专栏： 输入法
+输入法 专栏收录该内容
+6 篇文章 5 订阅
+订阅专栏
+摘要：目前的输入法大多采用输入法管理器-输入法编辑器（IMM-IME）进行开发，对于微软发布的新型输入法技术―文本服务框架（TSF）的研究一直比较滞后，该文论述了 TSF 的基本构成、主要接口、输入法的具体实现方法以及后续的改进，并使用该技术实现一款基本 TSF 输入法，供相关领域的研究人员参考。 
+　　关键词：拼音输入法；文本服务框架；动态链接库；文本服务；输入法安装 
+　　中图分类号：TP311 文献标识码：A 文章编号：1009-3044（2016）11-0206-03 
+　　Abstract：Most of the current input method are developed by the method of the input method manager-input method editor（IMM-IME）， the research of the new IME technology―text service framework（TSF）that Microsoft released has been a lag. This paper discusses the basic composition of TSF， main interface and the concrete realization way of input method and subsequent improvements， and use this technology to achieve a basic TSF input， provides the reference for researchers in related fields. 
+　　Key words：pinyin input method； TSF； DLL； text service；installation of input method 
+　　1 背景 
+　　输入法是指为将各种按键序列转化为字符，输入计算机或其他设备（如手机、平板）而采用的编码方案，因此输入法的研究是信息处理的一个重要课题[1]。Windows 提供了两套输入法框架：在 Windows XP及之前，是 IMM（Input Method Manager），即输入法引擎，基于纯函数 API；Windows XP 及以后，提供了新的输入法框架 TSF（Text Service Framework），是基于 COM（组件对象模型）的。目前现有的各个版本输入法大多采用输入法管理器―输入法生成器（IMM-IME）框架进行开发，然而在 Windows 8系统中 Metro 风格的应用是不支持该框架的，在这些应用下进行输入，需要使用文本服务框架（TSF）开发的输入法。本文将主要介绍TSF框架的基本构成，输入法的设计以及安装要点。 
+　　2 TSF的构成和基本工作过程 
+　　2.1 基本概念 
+　　1）什么是 TSF 
+　　TSF 为高级文本和自然语言输入技术提供了一个简单、可扩展的框架，是一项从 Windows XP 开始提供的设备无关、语言无关的系统服务。TSF与传统 IME 相比虽然对键盘输入法的作用没有太大区别，但是支持 TSF 的应用程序可以从任何支持TSF的文本服务中接收文本输入（例如手写、语音输入），而不用考虑有关文本来源的具体细节。 
+　　2）TSF 体系结构[2] 
+　　TSF 主要由应用程序、文本服务和TSF管理器三个部分组成，其结构如图1所示： 
+　　应用程序（Applications）：应用程序的任务一般包括显示、直接编辑以及文本存储，通过实现 COM 服务来提供文本访问的能力。 
+　　文本服务（Text Services）：向应用程序提供文本，同样用 COM 实现，内置了注册为 TSF 的服务过程。多个文本服务允许同时被注册，可以包含文本的输入与输出，还可以作为一段文本的数据和属性的关联体。 
+　　TSF管理器（TSF Manager）：作为文本服务与应用程序之间中间层，TSF 管理器支持一个应用程序同时建立多个与文本服务之间的联系，共享文本内容。其功能是由操作系统实现的。 
+　　2.2 与应用程序的交互 
+　　TSF 的优点在于其设备无关，语言无关，并且可扩展的特性，同时能够给用户提供一致的输入体验。任何 TSF-enabled 的应用程序都能从任何 Text Service 接收文本，同时可以输出文本，而不需要知道文本来源的详细信息。同时，文本服务也不需要考虑各种不同应用之间的差别。 
+
+　　TSF 是应用与 IME 之间的中介，TSF 将输入事件传递给 IME 并在用户选择字符后接收从 IME返回的输入字符。 
+
+这篇从界面和系统的角度，介绍 Meow 输入法的整体构架。
+
+目录
+（一）：基本情况
+（二）：基础概念和常用接口
+（三）：整体构架
+（四）：编辑和候选
+（五）：界面管理和无界面模式
+（六）：词库和候选算法
+（七）：皮肤的实现
+（八）：其他杂事
+
+界面构成
+一个常见输入法由以下界面构成。
+// FIXME: 换掉这张美哭了的图。
+不同输入法在细节的选择上会不一样，比有些输入法没有编辑窗口，而有些输入法没有状态栏。
+Meow 选择的界面元素
+编辑窗口：包含编辑信息和候选数据。
+语言栏：仅含输入法图标。
+状态栏：由于控制了语言栏功能，还是需要一个语言栏辅助。
+关于语言栏
+个人觉得，界面上语言栏要谨慎使用。
+一是因为语言栏涉及一个宽度的问题，不少应用也会去主动修改语言栏宽度，XP上语言栏也有宽度刷新 BUG。
+二是不同操作系统语言栏有所差异。
+三是因为任务栏本来就挺多东西的。。。
+
+系统构架
+由于缺乏经验，我只能大概设计结构如下，具体还要在实践编程中调整。
+// FIXME: 这张图已经改了
+总体来说，输入法窗口和输入候选引擎，应该独立于 TextService，这样方便开发测试，也方便皮肤和候选引擎自由扩展。
+为避免不必要的复杂服，Meow 中避免创建线程，因此需要严格控制每个方法反应时间，这对候选引擎是一个挑战。
+
+TextService 文字服务
+TextService 是输入法的基础入口，维护输入法自身的状态。
+重要接口有  ITfTextInputProcessorEx 、 ITfThreadMgrEventSink 、 ITfThreadFocusSink 。
+
+ConfigurationManager 配置管理器
+配置管理器是个贯穿全局的管理器，任何模块都可以直接调用。
+
+WindowManager 窗口管理器
+实现和管理输入法的窗口和皮肤。
+
+CompositionManager 编辑管理器
+CompositionManager 通过处理键盘事件，配合 TextService 提供的状态信息，以及自身的状态机，处理按键输入的逻辑过程。
+重要接口有  ITfKeyEventSink 、 ITfTextEditSink 、 ITfCompositionSink 、 ITfEditSession 。
+//FIXME: 是否需要处理 ITfDisplayAttributeProvider、IEnumTfDisplayAttributeInfo、ITfDisplayAttributeInfo 还有待观察。
+
+CandidateManager 候选管理器
+CandidateManager 有两个任务。
+一个当然是跟候选引擎配合，响应 CompositionManager，生成 CandidateList。
+另一方面，CandidateManager 也负责将 CandidateList 的情况推送给其他模块，包括 WindowManager、CompositionManager 和生成 UIElement。
+
+逻辑要点说明
+ConfigurationManager 只是管理配置，并不维护当前输入法的状态。
+CompositionManager，CandidateManager 的关系更像是流程的两个步骤，即： 按键事件->CompositionManager->CandidateManager->UI 。
+在 UILess 模式下，CandidateManager 是 UIElement 的提供者，主要是因为 CandidateList 跟 ITfCandidateListUIElement 显然非常接近。
+TextService，CandidateManager 均会对 WindowManager 操作，在一些问题（如是否显示）上，前者优先级高于后者。
+WindowManager 主要任务是皮肤相关工作，跟输入法整体上处于松耦合。
+Engine 的主要任务是候选算法和词库处理，跟输入法整体上也处于松耦合。
+
+CandidateManager 和 CompositionManager
+从常理上说，CandidateList 的生成应该在 Composition 内部。但 CandidateManager 之所以独立于 CompositionManager，原因有以下几个：
+1、让 CompositionManager 单纯安心地去维护 Composition 状态。（这个任务已经够艰巨了）
+2、在 TSF 的概念里，Composition 本身就是跟 UI 和 CandidateList 无关的，TSF 里就没有 Composition Window 这个概念。
+3、UILess 模式的存在，使得 ITfCandidateListUIElement、WindowManager 需要一定的配合，而这个“配合”恰好需要发生在他们跟 CandidateList 交互的时候，而 CandidateList 的生成需要用 CompositionManager 的字符串，以及候选引擎。因此用一个模块将 UIElement、WindowManager、CandidateList 联系起来，作为一个整体来跟 CompositionManager、候选引擎 交互，代码会更简洁好懂。
+
+入口
+DLL 入口也就是那几个 DLL 函数，DLL 入口需要完成注册表注册工作，并且向外界提供 ClassFactory，通过 ClassFactory 可以获取 TextService。
+
+TextService
+输入法初始化和释放
+12345	
+TextService 被激活时，ActivateEx、Activate 会被调用，此时的工作便是初始化。
+TextService 被释放时，Deactivate 会被调用，此时的工作便是清理工作。
+可能会有多个 TextService 存在，但一个 TextService 只会被 Activate 一次，因此 Activate 之后，便可以使用类成员来存储当前输入法实例的状态。
+但 TextService 和被输入程序不是一对一关系，这取决于操作系统配置，有可能多个程序共用一个 TextService。
+输入法当前活动状态管理
+123456789	
+ITfThreadFocusSink ：在 Windows 里，Focus 的定义就是开始接受输入。这里利用 ITfThreadFocusSink 决定输入法状态栏是否显示。
+ITfThreadMgrEventSink ：输入法当前工作的目标只有可能是一个 ITfDocumentMgr，但这个 ITfDocumentMgr 可能是多个程序共用，也有可能一个程序拥有多个 ITfDocumentMgr，但必须只有一个是 Focus 的。如果  ITfThreadMgrEventSink::OnSetFocus  发生，则应该根据情况清理和初始化当前存储的所有 ITfContext 和 ITfDocumentMgr 相关的目标。OnPushContext、OnInitDocumentMgr 什么的，一般捕获不到，因为通常在输入法没有载入的时候，APP 已经完成了这些操作，所以输入法需要主动 GetFocus，取到 ITfDocumentMgr，再 GetTop，取 ITfContext。
+接口提供
+TextService 的 QueryInterface 为整个输入法提供接口查询，同时，各个 Manager 也是在 TextService 中初始化和保持，一般所有 Manager 都有一个指针找到自己所在的 TextService。
+
+ConfigurationManager、WindowManager
+目前还没有完整实现。
+
+CompositionManager
+CompositionManager 尝试从 TextService 分离出编辑相关的逻辑，从而方便和安全地管理编辑操作。
+12345678910111213	
+Composition 的过程被分离成 KeyEvent 和 EditSession 两个部分。
+KeyEvent ：处理发生在 ITfContext 上的键盘事件，正常情况下，一般只需要处理 KeyDown 事件。
+EditSession ：则是用来修改 ITfContext 上的文字（包括正在 composite 的文字）。因为 APP 和 IME 同时拥有对 ITfContext 写权限， TSF Manager 便使用 EditSession 来协调。因此想要更新文字，就必须调用一次 EditSession。
+正常情况下，Composition 的创建和销毁都是 IME 在 EditSession 中操作，但是在意外情况下，APP 会主动终止 Composition（比如 APP 关闭），此时 OnCompositionTerminated 会被调用。此外，EditSession 是可以异步执行的， ITfTextEditSink::OnEndEdit()  发生在每次 EditSession 终止。
+
+CandidateManager
+CompositionManager 会尝试拦截按键，并管理当前 composite 的状态，CandidateManager 则利用 CompositionManager 的 composite 结果，调用输入引擎生成 CandidateList，并调用对应 UI 模块（Window 或者 UIElement）。
+暂时无法提供更详细的资料因为我忒么还没写完。
+
+　　3 输入法的设计与具体实现 
+　　3.1 主要接口函数的实现 
+　　与传统 IME 必须要实现的 ImeInquire，ImeConfigure，ImeProcessKey，ImeToAsciiEx等接口函数[3]不同，文本服务框架包含了一组新的接口函数，具体实现方法也有所不同。其中一些重要的接口如下[4]： 
+　　文本输入处理（ITfTextInputProcessor）：ITfTextInputProcessor是创建文本服务需要实现的第一个接口，继承自 IUnknown 接口，由 TSF 管理器调用来实现文本服务的激活与停用。 
+　　线程管理器事件接收器（ITfThreadMgrEventSink）：该接口允许文本服务来接收与响应事件焦点的变化。在 TSF 中，事件通知由被称之为事件接收器的 COM 对象收取，因此，客户端需要实现一个 ITfThreadMgrEventSink 对象，并安装事件接收器，从而获得线程管理器发送的事件通知。在TSF中，应用程序和文本服务被定义为客户端。  　　文档管理器（ITfDocumentMgr）：文档管理器的作用是管理编辑的内容，开发者可通过ITfDocumentMgr 接口创建。每个文档管理器都维护着一个后进先出的缓冲区，通常称之为内容栈，用来存储对应的文档管理器所管理的编辑内容列表。 
+　　语言栏按钮项目信息（ITfLangBarItemButton）：该接口也继承自 IUnknown 接口，实现一些语言栏上按钮项的信息，例如图标、文本、点击弹出的菜单项等。 
+　　编辑会话（ITfEditSession）：编辑会话由文本服务实现并由TSF管理器调用来读取或者修改文本和属性的上下文。 
+　　输入组合（ITfComposition）：输入组合接口由 TSF 管理器实现，同样继承自 IUnknown 接口。应用程序显示什么样的文本，以及是否显示文本，需要获取输入组合的显示属性信息，通过判断输入组合是否存在，将其状态显示给用户。 
+　　编辑内容查看对象（ITfContextView）：文本服务为候选列表创建新的内容后，ITfContextView接口的 GetTextExt 方法可返回文本边界框的屏幕坐标。 
+　　除了以上接口，TSF 还有线程管理器（ITfThreadMgr）、客户端标识符（ITfClientId）、键盘事件接收器（ITfKeyEventSink）、属性设置（ITfProperty）等一些重要接口需要实现，此处不再一一赘述。 
+　　3.2 输入法的基本实现步骤 
+　　3.2.1 创建空白的动态链接库项目 
+　　输入法程序实际上就是一个动态链接库程序【5】，只是这个动态链接库较特殊，文件名的后缀是 .ime 而不是 .dll。 
+　　1）在 DLL_PROCESS_ATTACH 事件中，使用 RegisterClass 注册用户界面窗口类。可根据个人喜好设计的状态窗口、编码窗口以及候选窗口的属性。 
+　　2）在 DLL_PROCESS_DETACH 事件中，注销上述与注册的窗口对象并释放该对象使用的所有系统资源。 
+　　3.2.2 文本服务模块的设计 
+　　用户可使用语言栏或键盘来与文本服务进行交互，因此首先要创建一个文本服务并将其注册。要使文本服务被应用程序所使用，需要将其注册为标准 COM 嵌入进程服务项，即注册到文本服务框架中。TSF 通过 ITfInputProcessorProfiles 与 ITfCategoryMgr 两个接口来提供简单的注册过程支持。 
+　　线程管理器（ITfThreadMgr）是TSF Manager的基本组成部分，完成应用程序与客户端之间进行联系的公共任务，包括跟踪输入焦点的改变。同时线程管理器还负责向客户端发送事件通知，客户端通过实现 ITfThreadMgrEventSink 对象，并使用ITfSource：：AdviseSink方法安装事件接收器，获得事件通知。 
+　　文本服务使用文档管理器获取编辑内容，ITfTextEditSink 接口允许文本服务接收与响应焦点变化事件，对于一个文本服务或者应用程序来说，这个接口的实现是可选的。 
+　　需要注意的是，IME 必须与系统任务栏兼容[6]。任务栏仅为兼容的 IME 显示其图标，对于不兼容的则无法显示。我们需要将 IME 图标存储在 DLL 或 EXE 文件中，而不是独立的 .ico 文件中。 
+　　3.2.3 完成按键的映射 
+　　除了语言、手写识别，最常用的仍然是键盘的识别。按键的映射是输入法设计的一个重要部分，顾名思义，也是我们最熟悉的一个部分，这里通过虚键实现对一般按键与功能按键的响应，来完成输入过程。 
+　　首先需要使用 Windows 宏 MAKELANGID 创建语言标识符，它包含一个主要语言标识符与一个从语言标识符，返回值同样也是语言标识符，通过 ITfInputProcessorProfileMgr 的 RegisterProfile 方法来实现注册。对于拼音输入法，使用MAKELANGID（LANG_CHINESE，SUBLANG_CHINESE_SIMPLIFIED） 即可。 
+　　按键事件的处理受到几个因素的影响：键盘可用状态、键盘开启状态、输入状态、空闲状态、中英文状态等等，在 TSF 中，公共缓冲池为数据共享提供了数据存储和消息处理的机制，以支持客户端程序之间的数据共享。对于键盘来说，公共缓冲池 GUID_COMPARTMENT_KEYBOARD_DISABLED 针对的是编辑内容，是预定义的，如果它的值为非零值，那么键盘不可用；而GUID_COMPARTMENT_KEYBOARD_OPENCLOSE针对的是线程管理器，如果它为非零值，那么键盘处于开启状态。我们通过 ITfCompartmentMgr 接口的 GetCompartment 方法来检查键盘是否可用。关于按键的处理如图 2 所示： 
+　　接下来实现 ITfKeyEventSink 接口来处理击键事件，该接口包含了 OnKeyDowm、OnKeyUp、OnSetFocus 等方法分别处理按键按下、按键弹起与一个 TSF 文本服务接收或者失去键盘焦点时的事件。同时， ITfKeystrokeMgr 接口也同样重要，它允许文本服务与键盘管理器的交互。 
+　　3.2.4 输入组合与候选列表的处理 
+　　文本服务通过调用 ITfContextComposition：：StartComposition 方法创建输入组合，并通过创建 ITfCompositionSink 对象接收输入组合的事件消息，使用 ITfContextComposition：：EndComposition 方法来结束输入组合。 
+　　在创建输入组合的同时，文本服务需要提供在应用程序中区别组合输入文本与常规文本的显示属性支持，通过在 TF_DISPLAYATTRIBUTE 结构中定义文本前景色、背景色，下划线的样式、色彩、粗细等，来实现显示属性的提供。首先需要调用 ITfCategoryMgr：：RegisterCategory 方法，把文本服务注册为服务提供者，然后实现 ITfDisplayAttributeProvider 与 IEumTfDisplayAttributeInfo 接口并使它们可用，最后为文本服务提供的每种显示属性实现一个 ITfDisplayAttributeInfo 对象。  　　接下来是关于候选列表的处理，用户输入字符后，输入法需要提供一个合适的候选列表以便用户从中选择结果串。创建一个候选列表首先要实现候选窗口的创建与注册，然后完成事件的处理部分，如翻页、选择等，最后实现窗口的销毁和隐藏。需要通过ITfTextLayoutSink、ITfIntegratableCandidtateListUIElement等接口一一实现。 
+　　3.2.5 把文本服务注册为标准 COM 进程服务项 
+　　文本服务是作为一个 COM 来实现的，所有进程内 COM 服务器（In-Process COM Server）输出四个标准函数：DllRegisterServer、DllUnRegisterServer、DllGetClassObject和DllCanUnloadNow。我们需要在模块定义文件（.def）中导出这四个接口函数，这样才能够将输入法在系统中注册。 
+　　DllRegisterServer 用 Windows 注册表来注册 COM 对象，而 DllUnRegisterServer 与 DllRegisterServer 的作用正好相反， DllUnRegisterServer负责移除 DllRegisterServer 注册在 Windows 注册表中的所有项。 
+　　DllGetClassObject 负责提供给 COM 一个类厂，该类厂用于创建一个 COM 对象。而 COM 负责调用 DllCanUnloadNow 来看是否可以从内存中卸载 COM 服务器。 
+　　4 输入法的安装要点 
+　　关于输入法 ime 有两种安装方式： 
+　　1）使用第三方安装程序，如 Flexera Software提供的 InstallShield 来创建 IME 安装体验。使用这种方法导入自己的词库与所生成的 ime 文件，创建一个 Setup.exe 文件，从而可以让用户安装自己编写的 IME。具体步骤可参考 MSDN 支持文档。 
+
+　　2）使用 Regsvr32 命令。Regsvr32 命令用于注册动态链接库文件，是 Windows 系统提供的用来向系统注册或者卸载控件的命令，以命令行方式运行。具体步骤是将所生成的输入法 .ime 文件拷贝到系统 System 文件夹下，然后在 cmd 下运行 Regsvr32 输入法 .ime 即可。但是这种方式会有一些问题，输入法的图标无法使用，不过不影响测试。 
+
+   5 如何注册安装使用
+
+本文档仅对想重定义注册信息的人有用，否则使用输入法提供的安装文件即可。 
+  
+1 文件说明： 
+tsf-reg.exe 是32位注册程序，yong.dll是32位内置模块 
+tsf-reg64.exe是64位注册程序，yong.dll是64位内置模块 
+  
+对64位系统来说，需要同时注册32位和64位模块。 
+  
+2 参数说明 
+-n 你的输入法名字(在-i参数之前使用) 
+-i 执行安装 
+-u 执行卸载 
+-c 复制文件到system32目录下 
+-d 删除system32目录下的输入法 
+-l 指定安装输入法的语言 
+-ll 允许安装的输入法语言列表 
+  
+3 已知问题 
+使用了-c参数，会引发Win8的一个bug，64位系统中执行32位METRO程序时无法正确加载32位tsf模块
+
+
+
+Windows输入法技术TSF理论摘抄和源代码剖析摘抄
+自己线索总结
+
+CCompositionProcessorEngine和码表有关，拼音转换结果有关 
+_pTableDictionaryEngine码表相关 
+KeyHandler.cpp是处理加入的键 
+CCandidateWindow候选窗口 
+以前的状态栏变成什么了？好像和语言栏有关系 
+InitializeSampleIMECompartment，初始化com组件 
+SetupConfiguration();
+TF_PRESERVEDKEY预留键 
+pKS = pKeystroke->Append();
+添加一个并返回添加的指针
+数字签名
+Requirements for Windows 8 IMEs
+
+A third-party IME must meet these requirements:
+
+    Must be digitally signed.
+    Must be Text Services Framework (TSF) aware, and proper IME flags must be set to run properly in Windows 8.
+    Must follow UX guidelines for Metro style apps and be compatible with Metro style apps.
+
+A third-party IME that doesn't meet these requirements is blocked from running in the Metro environment, but it can still run on the desktop.
+Also, Windows Defender removes malicious IMEs from the system. Because of this, it's important that you familiarize yourself with the IME coding requirements for Windows 8. For more info, see Guidelines and checklist for IME development.
+---------------------------------------------------------------
+是不是一个TextService.dll没有数字签名时，metro下就不允许调用该输入法呢？还有，个人数字证书（非受信任的）对其进行签名有用吗？ 
+你的所有以来的可执行代码需要签名。 
+你无法确保所有的用户都会手动将你的证书加为受信用户，所以要使用受信机构颁发的证书。
+架构理解
+
+不过根据我的了解，TFS分为两部分，一部分是接受文字输入的地方，另一部分就是接受文字输出的地方。一般认为如果你非要这么做的话，你可能需要伪造一个看不见的输入框，然后强制打开某个输入法来输入文字，然后你再设置sink监听回来。
+通用元素
+接口或界面
+问题总结
+
+正常情况下，使用ITfKeystrokeMgr::PreserveKey(...)注册的组合键事件，应该在ITfKeyEventSink::OnPreservedKey()中获得响应。 
+但在某些程序中，虽然ITfKeystrokeMgr::PreserveKey(...)成功，但是当按下组合键时，ITfKeyEventSink::OnPreservedKey()却无法响应。
+
+已经发现的程序有：
+1）IE在打开google.com.hk之后，页面内的搜索框内无法响应 
+2）QQ聊天窗口中，无法响应 
+附：在windows 8.1其它所有程序中可正常使用的输入法程序，下载页面http://chinput.com/thread-1768-1-1.html，可在上述程序及其它程序中尝试使用SHIFT+SPACE切换半角/全角，即可发现问题。
+
+win7下的微软拼音，以及win8下的搜狗或QQ输入法等，都不再使用旧的IMM了，我用
+https://social.technet.microsoft.com/Forums/office/zh-CN/002efcfc-8d21-4674-b93b-53c8424d448e/vista-api-immgetdescription?forum=2087
+这个帖子里的代码来获取当前激活的TSF输入法，以及强行激活为别的输入法，都可以成功，但仅限于当前程序自己创建的窗口，我现在想用自己的后台程序，获取和设置任意前台窗口的TSF输入法，总是无效（函数返回都是S_OK）
+我试过用ITfThreadMgr的AssociateFocus(GetForegroundWindow(), pDocMgr, &pPrevDocMgr)
+还有AttachThreadInput(GetWindowThreadProcessId(GetForegroundWindow(), NULL), GetCurrentThreadId(), TRUE); 依然没用，用IMM相关函数都可以设置的。。。请问下大神我这个需求在TSF上可以实现吗?
+Win8支持
+
+的确是这样，输入法直接在Win8style程序是无法使用的。需要进行声明:
+To declare an IME as compatible with Metro style apps, set the dwCaps field withTF_IPP_CAPS_IMMERSIVESUPPORT.
+怎么安装
+
+微软网站上也没说编程安装的方法，不过说了用installshield可以安装
+例子
+
+例程
+链接：http://pan.baidu.com/s/1kTxmnnp 密码：mxjb
+求帮忙调试一下Tibetan_input下的那个源码，第二个可以作为参考。（其实两个都有很多问题）
+安装
+CTF框架
+
+CTF框架下，一个输入法为一个TIP（Text Input Processor），其首先必须注册为一个COM组件。通过ITfInputProcessorProfileMgr::RegisterProfile()接口注册TIP的CLSID和ProfileID。这等价于下面写注册表的方式： 
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\CTF\TIP\{CLSID}\LanguageProfile\[langid]\{guidProfile}
+Description=SZ:
+IconFile=SZ:
+IconIndex=DWORD:
+Enable=DWORD:[0|1]
+SubstituteLayout=SZ:
+CLSID 代表TIP，同时指容纳TIP的COM的GUID，ProfileID是指具体某个输入法的ID，一个COM可以包含多个输入法ProfileID。譬如，微软拼音2010就在一个COM中实现了两个输入法：新体验和简捷，以满足不同用户需求。 
+或者使用老接口来注册 
+1) 通过ITfInputProcessorProfiles::Register()注册CLSID
+2) 通过ITfInputProcessorProfiles::AddLanguageProfile()添加language profile
+-可以添加不同语言的多种的profile
+这等价于： 
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\CTF\TIP\{CLSID}\LanguageProfile\[langid]\{guidProfile}
+Description=SZ:
+IconFile=SZ:
+IconIndex=DWORD:
+3) 通过ITfInputProcesorProfiles::EnableLanguageProfileByDefault()来缺省Enable或disable 某profile.
+- 这个设置是系统级别，即应用于不同系统中的不同用户.
+- 如果没有调用此接口，默认是enable
+- 可以在HKCU中覆盖此设置 
+这等价于： 
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\CTF\TIP\{CLSID}\LanguageProfile\[langid]\{guidProfile}
+Enable=DWORD:[0|1]
+4) 设置profile的名字：调用ITfInputProcessorProfilesEx::SetLanguageProfileDisplayName().
+- 可选步骤. 注意设置不同语言的名字。 
+这等价于： 
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\CTF\TIP\{CLSID}\LanguageProfile\[langid]\{guidProfile}
+Display Description=SZ:
+5) 设置可替换的keyboard layout (仅使用键盘TIP)
+- ITfInputProcessorProfiles::SubstituteKeyboardLayout() 为profile设置可替换的hkl。 
+当焦点从Cicero aware 的控件切换到non-Cicero aware的控件上时，这个hkl会被用到。这等价于： 
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\CTF\TIP\{CLSID}\LanguageProfile\[langid]\{guidProfile}
+SubstituteLayout=SZ:
+可选 – 在控制面板输入法对话框中隐藏profile
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\CTF\TIP\{CLSID}\LanguageProfile\[langid]\{guidProfile}
+HiddenInSettingUI=DWORD:[0|1]
+如果此键值不存在，则默认为0，即此profile显示在控制面板输入法对话框中 
+顺便提一下，在当前用户下设置默认输入法： 
+ITfInputProcessorProfile::SetDefaultLanguageProfile()
+这只影响到新创建线程，而不会对已经运行的线程产生影响。当然，重启后，在所有线程都会生效。次接口只会影响当前用户，对系统中其他用户无影响 
+这等价于： 
+HKEY_CURRENT_USER\SOFTWARE\Microsoft\CTF\Assembly\[langid]\{TIP’sCategory}
+Default=SZ:TIP’sCLSID
+KayboardLayout=DWORD:
+Profile=SZ:TIP’s guidProfile
+从上面可以看到，无论哪种框架，都需要向注册表HKEY_LOCAL_MACHINE路径写入输入法信息，另外不同输入法也可能注册自己的组件到操作系统中，所以安装时： 
+第一，需要administrator权限；要求所用户必须属于administrators组的成员； 
+第二，如果系统中安装了某些安全软件，其可能阻挡写入注册表系统路径（如HKEY_LOCAL_MACHINE），这时候安装就不能成功。要么暂时关闭其功能，要么在其提示是选择“允许写入”，要么卸载它后再安装。
+重要引导
+
+在了解了TSF的强大之后，很容易产生一个疑问，TSF是如何将应用程序和 Text Service 隔离开的呢？这里简单介绍下TSF 的工作原理。 
+首先需要知道，基于TSF 框架的输入法 实际上是一个COM程序。也就是说，微软为我们提供了很多的虚基类，然后我们需要实现一个COM 程序。 
+（1）首先要确认，在应用程序和 Text Service 之间进行传递的是一个 text stream(文本流)，既然是 text stream, 肯定要有text（可以理解成 text stream 的载体），比如说notepad，word，各种输入框，都可以理解成是一个text。TSF 的处理是首先由应用程序创建一个 Thread Manager，创建方法是通过 CoCreateInstance 创建一个组件对象，对应的，微软提供的接口是 ITfThreadMgr。 
+（2）创建好Thread Manager 之后，用 Thread Manager 来创建一个 Document Manager(文档管理器)，方法是 ITfThreadMgr::CreateDocumentMgr。应用程序会为每一个不同的Document 创建一个 Document Manager
+（3）创建 Document Manager 后，用 ITfDocumentMgr 来创建一个 edit context，方法是 ITfDocumentMgr::CreateContext。 
+实际上，Thread Manager 为每个 Document Manager 都维护了一个 context stack，新创建的context 被压入到了栈中。 
+那么，Text Service 是如何往context 中写入text stream 的呢？对于这个问题，首先Text Service 要获得一个context。 
+当 Text Service 获取一个context 时，很容易想到，此时可能有很多个Document Manager,可能有更多的context，到底获取哪一个呢？ 
+（1）首先获取当前处于焦点的Document Manager，采用的方法是ITfThreadMgr::GetFocus，得到一个Document Manager 对象 
+（2）获取之前得到的 Document Manager 的 context stack 中的栈顶 context，方法是 ITfDocumentMgr::GetTop
+至此，应用程序和 Text Service 通过 Thread Manager 创建的某个 context 产生了连接。 
+那么，TSF 是如何进行 Text Stores(文本存储)呢？这个问题，微软也为我们提供了相应的接口。 
+比如说，我们可以实现一个TTsfTextStore，可以继承 ITextStoreAcp，这个接口中有一些函数，可以在TTsfTextStore 中实现这些函数，这些函数中就有传递 text stream 的实现。给出一个ITextStoreAcp 中的函数列表： 
+/* ITextStoreACP Interfaces */ 
+HRESULT       STDMETHODCALLTYPE     AdviseSink(REFIID riid, IUnknown* punk, DWORD dwMask);
+HRESULT    STDMETHODCALLTYPE      UnadviseSink(IUnknown* punk);
+HRESULT    STDMETHODCALLTYPE      RequestLock(DWORD dwLockFlags, HRESULT* phrSession);
+HRESULT    STDMETHODCALLTYPE      GetStatus(TS_STATUS* pdcs);
+HRESULT    STDMETHODCALLTYPE      QueryInsert(LONG acpTestStart, LONG acpTestEnd, ULONG cch, LONG* pacpResultStart, LONG* pacpResultEnd);
+HRESULT    STDMETHODCALLTYPE      GetSelection(ULONG ulIndex, ULONG ulCount, TS_SELECTION_ACP* pSelection, ULONG* pcFetched);
+HRESULT    STDMETHODCALLTYPE      SetSelection(ULONG ulCount, const TS_SELECTION_ACP* pSelection);
+HRESULT    STDMETHODCALLTYPE      GetText(LONG acpStart, LONG acpEnd, WCHAR* pchPlain, ULONG cchPlainReq, ULONG* pcchPlainOut, TS_RUNINFO* prgRunInfo, ULONG ulRunInfoReq, ULONG* pulRunInfoOut, LONG* pacpNext);
+HRESULT    STDMETHODCALLTYPE      SetText(DWORD dwFlags, LONG acpStart, LONG acpEnd, const WCHAR* pchText, ULONG cch, TS_TEXTCHANGE* pChange);
+HRESULT    STDMETHODCALLTYPE      GetFormattedText(LONG acpStart, LONG acpEnd, IDataObject* *ppDataObject);
+HRESULT    STDMETHODCALLTYPE      GetEmbedded(LONG acpPos, REFGUID rguidService, REFIID riid, IUnknown* *ppunk);
+HRESULT    STDMETHODCALLTYPE      QueryInsertEmbedded(const GUID* pguidService, const FORMATETC* pFormatEtc, BOOL* pfInsertable);
+HRESULT    STDMETHODCALLTYPE      InsertEmbedded(DWORD dwFlags, LONG acpStart, LONG acpEnd, IDataObject* pDataObject, TS_TEXTCHANGE* pChange);
+HRESULT    STDMETHODCALLTYPE      RequestSupportedAttrs(DWORD dwFlags, ULONG cFilterAttrs, const TS_ATTRID* paFilterAttrs);
+HRESULT    STDMETHODCALLTYPE      RequestAttrsAtPosition(LONG acpPos, ULONG cFilterAttrs, const TS_ATTRID* paFilterAttrs, DWORD dwFlags);
+HRESULT    STDMETHODCALLTYPE         RequestAttrsTransitioningAtPosition(LONG acpPos, ULONG cFilterAttrs, const TS_ATTRID* paFilterAttrs, DWORD dwFlags);
+HRESULT    STDMETHODCALLTYPE      FindNextAttrTransition(LONG acpStart, LONG acpHalt, ULONG cFilterAttrs, const TS_ATTRID* paFilterAttrs, DWORD dwFlags, LONG* pacpNext, BOOL* pfFound, LONG* plFoundOffset);
+HRESULT    STDMETHODCALLTYPE      RetrieveRequestedAttrs(ULONG ulCount, TS_ATTRVAL* paAttrVals, ULONG* pcFetched);
+HRESULT    STDMETHODCALLTYPE      GetEndACP(LONG* pacp);
+HRESULT    STDMETHODCALLTYPE      GetActiveView(TsViewCookie* pvcView);
+HRESULT    STDMETHODCALLTYPE      GetACPFromPoint(TsViewCookie vcView, const POINT* pt, DWORD dwFlags, LONG* pacp);
+HRESULT    STDMETHODCALLTYPE      GetTextExt(TsViewCookie vcView, LONG acpStart, LONG acpEnd, RECT* prc, BOOL* pfClipped);
+HRESULT    STDMETHODCALLTYPE      GetScreenExt(TsViewCookie vcView, RECT* prc);
+HRESULT    STDMETHODCALLTYPE      GetWnd(TsViewCookie vcView, HWND* phwnd);
+HRESULT    STDMETHODCALLTYPE      InsertTextAtSelection(DWORD dwFlags, const WCHAR* pchText, ULONG cch, LONG* pacpStart, LONG* pacpEnd, TS_TEXTCHANGE* pChange);
+HRESULT    STDMETHODCALLTYPE      InsertEmbeddedAtSelection(DWORD dwFlags, IDataObject* pDataObject, LONG* pacpStart, LONG* pacpEnd, TS_TEXTCHANGE* pChange);
+当然，通常情况下，我们不需要实现全部的函数，只需要根据自己的需求，实现部分函数即可。
+状态栏
+
+有个问题困惑我好几天了，不知大家可否帮我解惑，以google输入法为例
+
+把输入光标放到一个文本文件中，并选择google输入法后，会出现一个状态栏。如果把光标移到别的程序中，google输入法被切换掉后，该状态栏消失
+
+现在问题是，我根据tsf写的输入法，用什么事件接收器能感知到当前context失去输入焦点了？
+我现在是在()中把状态栏显示出来，然后在ITfTextInputProcessor:: Deactive()中销毁，现在对现象是打开文本选择输入法，状态栏出现，直到文本关闭后状态栏才能销毁。找了好久也没找到正确对方法，还望大家不吝赐教！
+
+UINT WMAPP_FOCUS = RegisterWindowMessage(L"TargetAppFocus");
+
+STDAPI CTextService::OnSetFocus(ITfDocumentMgr *pDocMgrFocus, ITfDocumentMgr *pDocMgrPrevFocus) 
+{
+PostMessage(_hStatusWnd, WMAPP_FOCUS, NULL, 0);
+
+_InitTextEditSink(pDocMgrFocus);
+
+return S_OK;
+}
+
+
+LRESULT WINAPI StatusWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+//----处理 目标窗口 焦点 切换----//
+if(message==WMAPP_FOCUS)
+{
+if(GetFocus()==NULL)
+ShowWindow(hWnd, SW_HIDE);
+else
+ShowWindow(hWnd, SW_SHOWNOACTIVATE);
+return 0L;
+}
+问题flip selection，和flip doc不起作用。
+
+输入法注册：
+编译生成tsfcase.dll文件到指定路径，如：x:\tsfcase.dll，然后用Regsvr32.exe x:\tsfcase.dll注册输入法（vista下需要写成bat文件，然后以管理员身份执行）。然后，打开一个文本文件选择英文输入法，再选择该输入法，它的名字是Case Text Service，该输入法会在语言栏上额外加一个图标，点击它弹出操作菜单。包括show snoop wnd（显示监视窗口），hello world（插入字符串hello world！），flip selcetion（转换选中字符串的大小写），flip doc（转换整个文档的大小写），flip keystrokes（转换键盘输入大小写）
+
+调试：
+与一般dll调试类似，在调试命令中加入x:\windows\nodepad.exe
+然后调试启动nodepad，选择该输入法，即可进入断点。
+
+问题：
+现在问题是flip selection，和flip doc不起作用。
+跟踪至函数ToggleCase发现，下面这句有问题：
+if (pRange->GetText(ec, dwFlags, achText, ARRAYSIZE(achText), &cch) != S_OK)
+cch始终是0，致使该循环break跳出。
+该函数如下：
+void ToggleCase(TfEditCookie ec, ITfRange *pRange, BOOL fIgnoreRangeEnd)
+{
+ITfRange *pRangeToggle;
+ULONG cch;
+ULONG i;
+DWORD dwFlags;
+WCHAR achText[64];
+
+// backup the current range
+if (pRange->Clone(&pRangeToggle) != S_OK)
+return;
+
+dwFlags = TF_TF_MOVESTART | (fIgnoreRangeEnd ? TF_TF_IGNOREEND : 0);
+
+while (TRUE)
+{
+// grab the next block of chars
+if (pRange->GetText(ec, dwFlags, achText, ARRAYSIZE(achText), &cch) != S_OK)
+break;
+
+// out of text?
+if (cch == 0)
+{
+break;
+}
+
+// toggle the case
+for (i=0; i<cch; i++)
+{
+achText[i] = ToggleChar(achText[i]);
+}
+
+// shift pRangeToggle so it covers just the text we read
+if (pRangeToggle->ShiftEndToRange(ec, pRange, TF_ANCHOR_START) != S_OK)
+break;
+
+// replace the text
+pRangeToggle->SetText(ec, 0, achText, cch);
+
+// prepare for next iteration
+pRangeToggle->Collapse(ec, TF_ANCHOR_END);
+}
+
+pRangeToggle->Release();
+}
+
+是因为 notepad 的 tsf 支持是通过 CUAS实现的. 所以並不完全支持 TSF 的 text store界面来对文字内容存取.
+
+
+
+VwTextStore is the point of interaction between Fieldworks and Text Services. VwTxtSrc designates VwTextStore as a friend class.
+
+Events:
+
+Amongst other things, it receives messages from Text Services, listens for mouse events, manipulates the document and responds to internal Fieldworks events, such as document changes and lazy box changes.
+
+The messages from text services arrive through the interface methods provided by ITfContextOwnerCompositionSink and ITextStoreACP.
+
+Storage:
+
+What kind of changes can happen to the document that do not come from text services is not known (clipboard, formatting etc. possibly)
+
+The section of the document which is being edited is stored as a DocMgr. This interface looks pretty simple. It is not clear how much of the document is stored at one time (assumedly the amount which is seen on the screen, which would be dictated by the lazy box mechanism).
+
+Porting:
+
+This class will be replaced in Linux Fieldworks by VwTextInputManager.
+Contents  [hide] 
+
+    1 Public Methods
+        1.1 ITextStoreACP methods.
+        1.2 ITfContextOwnerCompositionSink methods
+        1.3 ITfMouseTrackerACP
+        1.4 Other Public Methods.
+
+Public Methods
+ITextStoreACP methods.
+
+    STDMETHOD AdviseSink (REFIID riid, IUnknown * punk, DWORD dwMask);
+    STDMETHOD UnadviseSink (IUnknown * punk);
+    STDMETHOD RequestLock (DWORD dwLockFlags, HRESULT * phrSession);
+    STDMETHOD GetStatus (TS_STATUS * pdcs);
+    STDMETHOD QueryInsert (LONG acpTestStart, LONG acpTestEnd, ULONG cch, LONG * pacpResultStart, LONG * pacpResultEnd);
+
+    STDMETHOD GetSelection (ULONG ulIndex, ULONG ulCount, TS_SELECTION_ACP * pSelection, ULONG * pcFetched);
+    STDMETHOD SetSelection (ULONG ulCount, const TS_SELECTION_ACP * pSelection);
+    STDMETHOD GetText (LONG acpStart, LONG acpEnd, WCHAR * pchPlain, ULONG cchPlainReq, ULONG * pcchPlainOut, TS_RUNINFO * prgRunInfo, ULONG ulRunInfoReq, ULONG * pulRunInfoOut, LONG * pacpNext);
+    STDMETHOD SetText (DWORD dwFlags, LONG acpStart, LONG acpEnd, const WCHAR * pchText, ULONG cch, TS_TEXTCHANGE * pChange);
+
+These look fairly GtkIM like.
+
+    STDMETHOD GetFormattedText (LONG acpStart, LONG acpEnd, IDataObject ** ppDataObject);
+
+Embedding not supported
+
+    STDMETHOD GetEmbedded (LONG acpPos, REFGUID rguidService, REFIID riid, IUnknown ** ppunk);
+    STDMETHOD QueryInsertEmbedded (const GUID * pguidService, const FORMATETC * pFormatEtc, BOOL * pfInsertable);
+    STDMETHOD InsertEmbedded (DWORD dwFlags, LONG acpStart, LONG acpEnd, IDataObject * pDataObject, TS_TEXTCHANGE * pChange);
+
+    STDMETHOD RequestSupportedAttrs (DWORD dwFlags, ULONG cFilterAttrs, const TS_ATTRID * paFilterAttrs);
+    STDMETHOD RequestAttrsAtPosition (LONG acpPos, ULONG cFilterAttrs, const TS_ATTRID * paFilterAttrs, DWORD dwFlags);
+    STDMETHOD RequestAttrsTransitioningAtPosition (LONG acpPos, ULONG cFilterAttrs, const TS_ATTRID * paFilterAttrs, DWORD dwFlags);
+    STDMETHOD FindNextAttrTransition (LONG acpStart, LONG acpHalt, ULONG cFilterAttrs, const TS_ATTRID * paFilterAttrs, DWORD dwFlags, LONG * pacpNext, BOOL * pfFound, LONG * plFoundOffset);
+    STDMETHOD RetrieveRequestedAttrs (ULONG ulCount, TS_ATTRVAL * paAttrVals, ULONG * pcFetched);
+    STDMETHOD GetEndACP (LONG * pacp);
+    STDMETHOD GetActiveView (TsViewCookie * pvcView);
+
+    STDMETHOD GetACPFromPoint (TsViewCookie vcView, const POINT * pt, DWORD dwFlags, LONG * pacp);
+
+    STDMETHOD GetTextExt (TsViewCookie vcView, LONG acpStart, LONG acpEnd, RECT * prc, BOOL * pfClipped);
+    STDMETHOD GetScreenExt (TsViewCookie vcView, RECT * prc);
+    STDMETHOD GetWnd (TsViewCookie vcView, HWND * phwnd);
+
+    STDMETHOD InsertTextAtSelection (DWORD dwFlags, const WCHAR * pchText, ULONG cch, LONG * pacpStart, LONG * pacpEnd, TS_TEXTCHANGE * pChange);
+
+Equivalent to IM commit callback and keyboard event handler?
+
+    STDMETHOD InsertEmbeddedAtSelection (DWORD dwFlags, IDataObject * pDataObject, LONG * pacpStart, LONG * pacpEnd, TS_TEXTCHANGE * pChange);
+
+ITfContextOwnerCompositionSink methods
+
+These methods appear to have a close correlation with the GtkIMContext signals.
+
+    STDMETHOD OnStartComposition ITfCompositionView *pComposition, BOOL *pfOk);
+        Eqivalent to preedit-start
+    STDMETHOD OnUpdateComposition ITfCompositionView *pComposition, ITfRange *pRangeNew);
+        Eqivalent to preedit-changed
+    STDMETHOD OnEndComposition ITfCompositionView *pComposition);
+        Eqivalent to preedit-end
+
+ITfMouseTrackerACP
+
+    STDMETHOD AdviseMouseSink (ITfRangeACP * range, ITfMouseSink* pSink, DWORD* pdwCookie);
+        Asks to receive mouse events affecting a particular range.
+        Probably causes MouseEvent() to be called
+        Does not handle multiple paragraphs
+    STDMETHOD UnadviseMouseSink (DWORD dwCookie);
+        Asks to stop receiving mouse events as asked for by AdviseMouseSink()
+
+Other Public Methods.
+
+    void OnDocChange ();
+        Mainly just talks to Windows
+        Also calls OnLayoutChange ()
+    void OnSelChange (int nHow);
+        Seems to just call methods of AdviseSink
+    void OnLayoutChange ();
+        Mainly calls AdviseSink methods
+        Also calls DoDisplayAttrs ()
+    void SetFocus ();
+        Sets the focus of the ThreadMgr
+    void Init ();
+        Sets up ThreadMgr and DocMgr
+    void Close ();
+        Just clears memory
+    void AddToKeepList (LazinessIncreaser *pli);
+        Calls one method on pli using what looks like FW classes
+    bool MouseEvent (int xd, int yd, RECT rcSrc1, RECT rcDst1, VwMouseEvent me);
+        Long method (>100 lines) which seems to be interested in finding where a click landed in a root box
+        Most execution paths just end the composition (Reset the input method in GTK speak)
+        Some windows, some FW
+
+
+
+　　6 结束语 
+　　作为新一代输入法框架，TSF 是一个允许进行高级的、来源无关的文本输入的应用编程接口，它为高级文本和自然语言输入技术提供了一个简单和可扩展的框架。本文主要讨论了 TSF 的基本概念以及注意事项，并且使用 TSF 实现了一款简单的输入法软件。关于图标不能显示的问题还有待解决，另外，对于一个完整的输入法来说还有软键盘、鼠标输入、系统图标、菜单设置、输入法皮肤等方面需要一一实现[7]，同时，输入效率也是一个不容忽视的部分，有关输入转换算法还需要进一步的研究。 
+　　参考文献： 
+　　[1] 李培峰， 朱巧明. 析 Windows 95/98/NT 平台多文种 IME 的设计技术[J]. 计算机工程与科学， 2000， 22（4）： 67-70. 
+　　[2] 王世元. 基于文本服务框架的拼音输入法客户端设计与实现[D]. 哈尔滨： 哈尔滨工业大学， 2013. 
+　　[3] 胡宇晓， 马少平， 夏莹. 基于 IMM-IME 输入法接口的实现方法[J]. 计算机工程与应用， 2002（1）： 117-124. 
+　　[4] Microsoft Corporation Company. Text Services Framework[EB/OL]. http：//msdn.microsoft.com/zh-cn/library/windows/apps/ms629032.aspx. 
+　　[5] 刘政怡， 李炜， 吴建国. 基于IMM-IME的汉字键盘输入法编程技术研究[J]. 计算机技术与发展， 2006， 16（12）： 43-48. 
+　　[6] Microsoft Corporation Company. Requirements for IME development[EB/OL]. http：//msdn.microsoft.com/en-us/library/windows/apps/hh967425.aspx. 
+　　[7] 焦翠珍， 戴文华. 输入法程序设计技术初探[N]. 咸宁师专学报， 200， 21（3）： 73-77.
+麦晓宇
+关注
+
+    9
+    19
+    觉得还不错? 一键收藏
+    0
+
+专栏目录
+TSF 输入法开发例子 TSF example
+05-17
+BasicTextService.zip CandidateList.zip Composition.zip CompositionStringUnderline.zip IconInLanguageBar.zip Keyboard.zip PropertyMonitor.zip PropertyTextService.zip TextInsertion.zip TrackFocus.zip TrackTextChange.zip
+基于云模型的文本数字水印算法研究与实现
+04-17
+提出了基于云模型的文本水印算法。利用云模型的随机性和模糊性，设定云模型的参数作为密钥，通过正向云发生器产生水印信息，水印映射到坐标轴上形成一幅云图。采用小波域自适应量化的方法，根据嵌入位置的不同选取不同的量化系数，将水印嵌入到载体文本中。提取后既可以对云进行视觉上的判断，又能通过逆向云发生器得到云模型的参数，并且给出了定量判断的方法。实验结果表明：基于云模型的文本水印算法比传统水印具有更高的鲁棒性和不可感知性，可有效保护文本作品的版权。
+TSF输入法
+2-24
+从上面构架图可以看到,TSF提供一个位于应用和输入法实现的间接层(一个Text service/TIP可以是一个输入法,或语音识别,PunCha:记住,TIP就是一个输入法提供的一个服务,比如百度输入法提供“语音、手写、键盘”输入,那就是3个Tip,但是一...
+...编写 和 安装 输入法 教程(1)_tsf 输入法如何调试
+2-21
+编写输入法有几种方式,如外挂式,IME式,TSF式,今天我们主要介绍IME式( 输入法接口式(Input Method Editor-IME)) 1,输入法是什么东西? 编写输入法其实就是编写一个DLL ,一个导出一些操作系统约定函数的DLL,操作系统通过这些函数和我们...
+基于seq2seq实现的搜喵中文文本拼音输入法.zip
+最新发布
+08-24
+拼音输入的本质上就是一个序列到序列的模型：输入拼音序列，输出汉字序列。所以天然适合用在诸如机器翻译的seq2seq模型上。 模型初始输入是一个随机采样的拼音字母的character embedding，经过一个CBHG的模型，输出是五千个汉字对应的label。 详细介绍参考：https://blog.csdn.net/sheziqiong/article/details/132467183
+计算机研究 -基于知识图谱的文本自动生成技术的研究与实现.pdf
+06-29
+计算机研究 -基于知识图谱的文本自动生成技术的研究与实现.pdf
+基于TSF框架的输入法注册流程分析_tsf输入法注册
+3-2
+基于TSF框架的输入法其实本质上就是一个COM程序,通过regsvr32.exe进行注册,注册的命令如下所示. regsvr32.exe sogou.ime//注册输入法 regsvr32.exe /u sogou.ime//取消注册输入法 1.调用对应的注册回调函数 ...
+使用TSF在Vista、Win7下精确切换输入法
+2-21
+namespaceTSF { [StructLayout( LayoutKind.Sequential )] internalstructTF_LANGUAGEPROFILE { internalGuid clsid; internalshortlangid; internalGuid catid; [MarshalAs( UnmanagedType.Bool )] ...
+基于机器学习的文本分类研究与实现
+04-27
+随着互联网技术的快速发展，互联网上的文本数据变得越来越多，传统的人工文本类 别划分方法已经无法应对当前的数据量，自动文本分类技术成为研究的热点。作为文本挖 掘技术的主要分支，文本分类技术可以有效解决大数据发展下的文本自动分类需求。特征 选择和文本分类算法是文本分类技术的两个关键部分，本文主要针对这两个部分进行研究。 在特征选择部分，本文提出一种基于卡方统计量(CHI)和互信息(MI)的混合特征 选择方法(CHMI)，该方法首先针对卡方统计量方法对低频词敏感的缺点，引入词频因子 进行改进，然后使用调节参数改善互信息方法对类别敏感的不足，最终结合改进后的两种 方法，得到对低频词和类别均有较好处理效果的混合特征选择方法。实验结果表明，与传 统的卡方统计量方法和互信息方法相比，本文方法在支持向量机、朴素贝叶斯和K最近邻 分类器上，均可以有效提高文本分类的准确率。 在文本分类算法部分，分类器采用支持向量机，支持向量机的核心是核函数，本文提 出一种基于多项式核函数和高斯核函数的混合核函数。该核函数具有多项式核函数和高斯 核函数的优点，既具有多项式核函数能够提取整体特征的能力，又利用高斯核函数对局部
+2.1计算机输入法
+weixin_46048542的博客
+2910
+输入方式 （1）键盘输入 熟悉键盘布局 （2）非键盘输入(自动输入) 手写输入 通过笔尖或指尖 实时识别 扫描输入 基于图像像素 ●语音输入 怎样在计算机中输入中文? （1）用键盘输入中文 需要熟悉键盘布局 掌握一定的输入方法:拼音，五笔等 （2）手写输入中文 需要不大常用的输入设备:手写板或者支持手写输入的笔等: 正确书写中文; （3）语音输入 （4）扫描输入等 用户输入过程统共分几步? 应用程序(记事本，浏览…能接收输入信息(键盘，语音… ; 将接收的信息通知给输入法进行分析处理: 输入法能
+C# 输入法_c# tsf 切换输入法
+2-13
+if(ImmGetOpenStatus(HIme))//如果输入法处于打开状态 { intiMode=0; intiSentence=0; boolbSuccess=ImmGetConversionStatus(HIme,refiMode,refiSentence);//检索输入法信息 if(bSuccess)
+TSF输入法框架的工作原理_tsf 获取文本
+1-11
+首先需要知道,基于TSF框架的输入法 实际上是一个COM程序。也就是说,微软为我们提供了很多的虚基类,然后我们需要实现一个COM 程序。 (1)首先要确认,在应用程序和 Text Service 之间进行传递的是一个 text stream(文本流),既然是 text...
+输入法TSF框架候选栏定位研究
+yang1fei2的博客
+833
+原文链接 在开发输入法应用的时候，我们需要让候选栏时刻跟踪输入光标的位置，来进行输入。但候选栏定位不准,一直会困扰输入法的开发者。windows老的输入法框架imm在部分场景下比如chrome应用中会定位不准，而新的输入法框架TSF在部分应用中也会定位不准比如Notepad++等应用。 解决定位不准的问题，通常有两种方案 1.通过应用获取输入光标的位置然后进行候选定位 2.通过TSF框架预先上屏占位符号进行定位 两种方案各有利弊，这里我介绍一下两种方案 1.通过应用的输入光标进行定位，获取光
+文本服务框架的使用
+fishmai的专栏
+3571
+本节向软件开发者介绍了如何创建文本服务和支持TSF的应用程序的指导方针和标准实现方式。 　　在Microsoft®平台软件开发包（SDK）的samples文件夹的winui子文件夹下提供了一组可供编译的TSF应用程序和文本服务的范例源代码。 　　•　公共组成部分 　　•　应用程序 　　•　文本服务 下列软件组件被用于支持TSF的应用程序和文本服务中或者由它们来实现
+逗比的输入法实现（二）：基础概念和常用接口
+fishmai的专栏
+4295
+为什么叫 Meow？因为这是给猫用的输入法。。。 目录 （一）：基本情况 （二）：基础概念和常用接口 （三）：整体构架 （四）：编辑和候选 （五）：界面管理和无界面模式 （六）：词库和候选算法 （七）：皮肤的实现 （八）：其他杂事 TSF vs IMM32 输入法广泛使用 IMM32 接口，也发展成熟，XP 开始微软推广 TSF，Vista 操作系统默认开启了 T
+基于python的机器学习文本情感系统设计与实现.docx
+08-17
+基于python的机器学习文本情感系统设计与实现
+动态输入法 TSF 启动过程分析
+Endless Encoding
+320
+dTyperJar 还有两个重要的成员函数：setJvm() 和 startup(). 在 setJvm()中，把 penv0, mainclass0 进行本地存储，penv0->GetJavaVM(&jvm);在 CSmapleIME 中启动的 jvm，其环境指针 penv0，主类 mainclass0，主类实例 dTyper0，通过 _pCompositionProcessorEngine->setJvm()传递给其成员 ->dTyperJar。至此，dTyper 完成了初始化，可以执行打字功能。
+如何让全屏游戏的文本编辑框支持IME和TSF输入法
+Libresoft实验室
+5465
+如何让全屏游戏的文本编辑框支持IME和TSF输入法本文主要解决游戏在全屏状态下文本编辑框无法显示组词窗口和候选词窗口的问题 文章首发：blog.csdn.net/goodboychina/导致这个问题的原因是TSF与IME不兼容，且从Win7开始TSF（高级文字服务）默认是开启状态，并且无法关闭。这个情况在Win8下更严重。 要解决这个问题要从TSF框架的引入导致的兼容性问题入手。首先先了解下文
+Basic Server设置动态IP
+热门推荐
+qq_45769990的博客
+1万+
+1.首先新建一个basic server 虚拟主机 2.输入账户 密码 此密码 输入时看不见 正常输入即可 3.输入 ifconfig 查看当前配置网络 3.输入 vi /etc/sysconfig/network-scripts/ifcfg-eth0 编辑信息 3.1 输入i进入编辑模式 把onboot改为yes 按ESC键 然后输入：wq 保存并退出 3.2输入 cat /etc/sysconfig/network-scripts/ifcfg-eth0查看信息 3.3确认无误,重启网关 输
+TSF输入法列表获取
+harvardfeng的专栏
+2562
+TSF： Microsoft Windows 文本服务框架(TSF) 是一个包含在Windows XP 及其后继版本操作系统的系统服务。TSF为高级文本输入的通信以及自然语言技术提供了一个简单的可扩展的框架。 以上引自百度百科。 引用Winapi.MsCTF单元，如果没有去高版本XE里面搜一搜，或者百度一下。 procedure TForm1.btnSTFCli
+隐马尔科夫模型python实现简单拼音输入法
+861
+在网上看到一篇关于隐马尔科夫模型的介绍，觉得简直不能再神奇，又在网上找到大神的一篇关于如何用隐马尔可夫模型实现中文拼音输入的博客，无奈大神没给可以运行的代码，只能纯手动网上找到了结巴分词的词库，根据此训练得出隐马尔科夫模型，用维特比算法实现了一个简单的拼音输入法。githuh地址：https://github.com/LiuRoy/Pinyin_Demo 原理简介 隐马尔科夫模型 ...
+UILess Mode Overview
+fishmai的专栏
+927
+How to create UILessMode Making UI-less Thread: The application can make a UI Less Thread by ITfThreadMgrEx::ActivateEx with ITF_AE_UIELEMENTENABLEDONLY. When ThreadMgr is activated with this fla
+基于cnn的新闻文本多标签分类算法研究与实现
+06-28
+### 回答1： 基于CNN的新闻文本多标签分类算法研究与实现是一项研究如何使用卷积神经网络（CNN）来对新闻文本进行多标签分类的工作。该算法可以自动地将新闻文本分类到多个标签中，从而提高了分类的准确性和效率。该算法的实现需要对CNN的原理和技术进行深入研究，并结合实际的数据集进行训练和测试。该算法的研究和实现对于提高新闻分类的准确性和效率具有重要的意义。 ### 回答2： 近年来，随着互联网和社交媒体的普及，新闻报道数量不断增加，并且涉及到的话题越来越广泛复杂。因此，对新闻进行多标签分类（Multi-label Classification）成为一项重要的挑战。在传统文本分类方法中，往往只能将文本划分为单一标签，无法解决多标签分类问题。而基于卷积神经网络（CNN）的新闻文本多标签分类算法，则成为目前比较有效的解决方案之一。 基于CNN的新闻文本多标签分类算法的实现主要分为以下几个步骤： 1. 数据预处理：对新闻文本进行分词、停用词过滤、词干提取等操作，将文本转化为固定长度的向量形式。 2. 构建CNN模型：将文本向量作为CNN的输入，通过卷积层和池化层进行特征提取，再通过全连接层进行分类预测，最终输出多个不同的标签。 3. 模型训练：采用标准的反向传播算法，通过最小化损失函数的方式对模型进行训练。 4. 模型评估：使用评估指标（如准确率、宏平均F1、微平均F1等）对训练的模型进行评估。 在实际应用中，基于CNN的新闻文本多标签分类算法可以广泛应用于新闻推荐、舆情分析、文本智能分类等领域。同时，该算法也存在一些问题，如需要标记大量数据、模型容易过拟合等。因此，未来还需要继续进行深入的研究和改进。 总之，基于CNN的新闻文本多标签分类算法是目前比较有效的解决方案之一，可以帮助人们更加准确、高效地管理和浏览海量的新闻数据。 ### 回答3： 随着互联网技术的发展，新闻信息的数量呈现井喷式增长，如何利用新技术对这些海量新闻信息进行自动化处理成为了亟待解决的问题。其中，一项重要的任务便是新闻文本的多标签分类。为此，本文将介绍基于卷积神经网络（CNN）的新闻文本多标签分类算法研究与实现。 1. CNN的工作原理与应用 卷积神经网络是一种深度学习模型，最早应用于图像识别领域。其基本工作原理是：通过卷积核对输入的信号进行滑动窗口的卷积操作，从而提取出突出的特征信息，并依次经过多层卷积层、池化层和全连接层的处理，最终输出分类结果。 近几年，CNN在文本分类领域的研究也取得了许多成果。其常见的应用包括情感分类、垃圾邮件识别、事件检测等。此外，CNN还被用于新闻文本的多标签分类任务，成为了一种有效的解决方案。 2. 新闻文本多标签分类任务的定义与挑战 新闻文本多标签分类任务，是指对一篇新闻进行多个标签的判别，通常标签数量较多，常见的标签包含标题、摘要、正文、时间、地点等信息。挑战在于如何对这些标签进行有效的抽取和表示，保证高质量的分类结果。 3. 基于CNN的新闻文本多标签分类算法 具体而言，该算法主要分为以下几个步骤： （1）文本预处理：将原始文本分词、停用词过滤、去除非中文字符等操作，将其转化为数字表示的向量； （2）卷积层处理：将预处理后的文本数据作为输入，进行卷积操作并提取特征信息，得到多维特征向量； （3）池化层处理：通过对卷积层输出进行池化操作，压缩特征向量的维度减少计算负担； （4）全连接层处理：对池化层提取的特征向量进行全连接操作，进一步提取新的特征信息并完成标签的判别； （5）模型训练：使用大量标注数据进行模型的训练，使其可以准确地完成标签的分类； （6）模型评估：通过测试集对训练好的模型进行性能评估，包括准确率、召回率、F1分数等指标。 该算法的优点在于可以充分利用文本中的局部特征，有效降低文本分类的计算复杂度，同时在标签数量较多的情况下也能有较好的表现。 4. 结论 基于CNN的新闻文本多标签分类算法是一种有效的解决方案，可以实现高效、准确、自动化地对海量新闻信息进行分类处理，是新闻领域中不可缺少的技术之一。
+“相关推荐”对你有帮助么？
+
+    非常没帮助
+    没帮助
+    一般
+    有帮助
+    非常有帮助
+
+    关于我们
+    招贤纳士
+    商务合作
+    寻求报道
+    400-660-0108
+    kefu@csdn.net
+    在线客服
+    工作时间 8:30-22:00
+
+    公安备案号11010502030143
+    京ICP备19004658号
+    京网文〔2020〕1039-165号
+    经营性网站备案信息
+    北京互联网违法和不良信息举报中心
+    家长监护
+    网络110报警服务
+    中国互联网举报中心
+    Chrome商店下载
+    账号管理规范
+    版权与免责声明
+    版权申诉
+    出版物许可证
+    营业执照
+    ©1999-2024北京创新乐知网络技术有限公司
+
+麦晓宇
+码龄12年
+广东欧珀通信有限公司
+
+443
+    原创
+
+2万+
+    周排名
+
+199万+
+    总排名
+
+249万+
+    访问
+
+    等级
+
+2万+
+    积分
+
+687
+    粉丝
+
+413
+    获赞
+
+156
+    评论
+
+1706
+    收藏
+
+领英
+持续创作
+1024勋章
+笔耕不辍
+创作能手
+私信
+关注
+写文章
+热门文章
+
+    音频格式DTS 和 AC3 和 AAC简单介绍及HDTV 43572
+    微信小程序架构解析，工作原理解析 37129
+    QQ互联登录提示redirect uri is illegal(100010)完美解决方法 37073
+    Referer详解 35819
+    Android面试题【高级工程师版】 33779
+
+分类专栏
+
+    qt
+    4篇
+    生活立方
+    1篇
+    android逆向
+    6篇
+    ios
+    131篇
+    server
+    14篇
+    voip
+    1篇
+    编译器
+    7篇
+    编译器调试器
+    8篇
+    机器学习
+    5篇
+    大数据
+    5篇
+    音视频
+    31篇
+    android
+    109篇
+    中间件
+    4篇
+    产品经理
+    1篇
+    代码生成自动化
+    1篇
+    IOS逆向
+    8篇
+    软件测试
+    1篇
+    PC开发
+    19篇
+    C++学习
+    7篇
+    GUI框架
+    1篇
+    MFC
+    6篇
+    Flex
+    7篇
+    四柱预测学
+    8篇
+    情感生活
+    2篇
+    vs ide
+    1篇
+    数据库
+    7篇
+    经验教训
+    3篇
+    调试
+    7篇
+    web建站
+    2篇
+    软件工程
+    2篇
+    eclipse
+    3篇
+    软件工具使用
+    1篇
+    php
+    1篇
+    项目管理
+    7篇
+    工作流
+    1篇
+    软件生涯
+    3篇
+    高效学习
+    2篇
+    战略管理
+    1篇
+    软件调试
+    4篇
+    领导力
+    2篇
+    架构师
+    5篇
+    amr
+    2篇
+    chrome
+    1篇
+    架构
+    10篇
+    架构师考试
+    1篇
+    性能测试
+    3篇
+    scm
+    3篇
+    大数据处理
+    1篇
+    加密安全
+    4篇
+    网络架设
+    2篇
+    读书笔记
+    2篇
+    javascript
+    2篇
+    手机
+    3篇
+    开发环境搭建
+    2篇
+    性能
+    6篇
+    软件
+    1篇
+    android调试
+    12篇
+    时间管理
+    2篇
+    电商
+    1篇
+    生活
+    1篇
+    证券
+    3篇
+    理财
+    7篇
+    android测试
+    1篇
+    dephi
+    1篇
+    深度学习
+    6篇
+    文本编辑器
+    3篇
+    游戏地图编辑器
+    1篇
+    图像处理
+    9篇
+    字体
+    2篇
+    智能家居
+    2篇
+    直播
+    5篇
+    easydarwin
+    5篇
+    opengl
+    6篇
+    http server
+    2篇
+    wifidog
+    2篇
+    输入法
+    6篇
+    C#
+    11篇
+    vb
+    1篇
+    ffmpeg
+    4篇
+    xcode
+    25篇
+    java
+    11篇
+    jvm
+    10篇
+    objc
+    8篇
+    svn
+    2篇
+    mac
+    21篇
+    mach-o
+    4篇
+    lldb
+    4篇
+    消息推送
+    1篇
+    工具效率
+    3篇
+    llvm
+    2篇
+    UI框架
+    4篇
+    apple审核
+    1篇
+    crash
+    3篇
+    脚本编译
+    2篇
+    appcode
+    dyld
+    gdb
+    1篇
+    DTrace
+    1篇
+    sqlite
+    3篇
+    网络优化
+    6篇
+    app
+    3篇
+    启动
+    3篇
+    swift
+    5篇
+    架构-网络
+    3篇
+    数据库
+    摄像头
+    1篇
+    webrtc
+    5篇
+    内存管理
+    5篇
+    cpu
+    2篇
+    基础库
+    4篇
+    go
+    1篇
+    cocos2d
+    1篇
+    动画库
+    1篇
+    网络
+    2篇
+    react native
+    4篇
+    开源库
+    6篇
+    android studio
+    10篇
+    linux
+    1篇
+    gradle
+    2篇
+    buck
+    2篇
+    android framework
+    6篇
+    并发
+    1篇
+    sourcetree
+    1篇
+    多线程
+    1篇
+    sdk
+    1篇
+    jdk
+    1篇
+    推送
+    1篇
+    anr
+    2篇
+    存活率
+    1篇
+    android源代码分析
+    安全
+    1篇
+    atlas
+    1篇
+    spot
+    后台
+    9篇
+    运维
+    3篇
+    spark
+    1篇
+    elk
+    1篇
+    iphonex
+    1篇
+    redis
+    2篇
+    tcpip
+    1篇
+    分布式存储
+    2篇
+    代码review
+    1篇
+    架构-领域驱动开发
+    1篇
+    区块链
+    tensorflow
+    1篇
+    caffe
+    1篇
+    clang
+    3篇
+    reactnative
+    1篇
+    前端开发
+    5篇
+    keras
+    1篇
+    gis
+    1篇
+    linux内核
+    1篇
+
+最新评论
+
+    代码review总结
+
+    wjb6318: mvpd 是什么？
+    构造并发送Beacon帧以伪造任意WiFi热点
+
+    w-blueing: 你好就是这个帧能连接上吗
+    apk破解实战
+
+    qq_40785436: 大神，您能帮俺破解一个app吗？如果破解成功有偿道谢。
+    Android云真机原理以及云真机平台搭建实践
+
+    Edward.W: 可惜去年没看到这篇文章。去年我搭建了一个类似的平台，具体没有什么问题，就是再显示的时候发现大多数播放raw bytes的js库都只支持baseline类型的。最终使用了h264-converter，一个ts的库，才能播放这个high类型的h264裸流。
+    利用Wifidog实现微信wifi连接
+
+    SDCGD: 你好，wifidog和portal是啥关系？谢谢
+
+您愿意向朋友推荐“博客详情页”吗？
+
+    强烈不推荐
+    不推荐
+    一般般
+    推荐
+    强烈推荐
+
+最新文章
+
+    如何打造自动驾驶的数据闭环
+    联邦学习开源框架方案选型
+    mindspore详解
+
+2022年26篇
+2021年12篇
+2020年14篇
+2019年26篇
+2018年29篇
+2017年246篇
+2016年537篇
+2015年44篇
+目录
+
+    Windows输入法技术TSF理论摘抄和源代码剖析摘抄
+        自己线索总结
+        数字签名
+            Requirements for Windows 8 IMEs
+        架构理解
+        通用元素
+        接口或界面
+        问题总结
+        Win8支持
+        怎么安装
+        例子
+        安装
+        CTF框架
+        重要引导
+        状态栏
+        问题flip selection，和flip doc不起作用。
+        Contents
+        Public Methods
+            ITextStoreACP methods.
+            ITfContextOwnerCompositionSink methods
+            ITfMouseTrackerACP
+            Other Public Methods.
+

@@ -1,6 +1,6 @@
 package UI::KeyboardLayout;
 
-$VERSION = $VERSION = "0.75";
+$VERSION = $VERSION = "0.76";
 
 binmode $DB::OUT, ':utf8' if $DB::OUT;		# (older) Perls had "Wide char in Print" in debugger otherwise
 binmode $DB::LINEINFO, ':utf8' if $DB::LINEINFO;		# (older) Perls had "Wide char in Print" in debugger otherwise
@@ -100,7 +100,8 @@ UI::KeyboardLayout - Module for designing keyboard layouts
   # Combines new()->parse_add_configfile()->massage_full():
   my $k = UI::KeyboardLayout:: -> new_from_configfile_string($i)
              -> fill_win_template( 1, [qw(faces CyrillicPhonetic)] ); 
-  print $k;
+  print $k;	# optional arguments 'dummy' (and possibly 'dummyname')
+		# to fill_win_template() to make an 'extra-dummy' version
   
   open my $f, '<', "$ENV{HOME}/Downloads/NamesList.txt" or die;
   my $k = UI::KeyboardLayout::->new();
@@ -274,7 +275,10 @@ mappings and deadkey names from such sections.  The name of the section becomes 
 name of the mapping functions which may be used inside the C<Diacritic_*> rule
 (or in a recipe for a computed layer).
 
-A content of C<KBD> section consists of C<#>-comment lines and "the mapping 
+C<KBD> sections come in two styles: freehand and rectangular.  In this section we
+focus on the freehand style
+
+A content of a freehand C<KBD> section consists of C<#>-comment lines and "the mapping 
 lines"; every "mapping line" encodes one row in a keyboard (in one or several 
 layouts).  (But the make up of rows of this keyboard may be purely imaginary; 
 it is normal to have a "keyboard" with one row of numbers 0...9.)
@@ -310,6 +314,40 @@ and it is longer than 1 char, it must be started or terminated by C<in_key_separ
 To simplify BiDi keyboards, a line may optionally be prefixed with the L<C<LRO/RLO>|http://en.wikipedia.org/wiki/Unicode_character_property#Bidirectional_writing>
 character; if so, it may optionally be ended by spaces and the L<C<PDF>|http://en.wikipedia.org/wiki/Unicode_character_property#Bidirectional_writing> character.
 For compatibility with other components, layer names should not contain characters C<+()[]>.
+
+For example, with suitable configuration settings the first two config-lines of the table below may describe a first row of a
+certain keyboard (with two keys!) in 5 layouts:
+
+  111   1①/₁¹/--𐋡         2②/₂²/--𐋢
+  222   [1]‼{1}/002f.o    [2]‼{2}/+±
+  111   a/α/ⲁ             s/σ/ⲥ        d/δ/ⲇ
+  222   𝒶/𝕒               𝓈/𝕤          𝒹/𝕕
+
+If so, the third and the fourth row would describe the second row of the keyboard (with 3 keys).  Assuming C<in_key_separator=/>,
+the first and the third row concern 3 layouts, while the second and the fourth concern 2 more layouts.  (So this corresponds to
+C<visual_per_row_counts=3,2>.)
+
+Assuming C<in_key_separator=‼>, the 4th layout (the first one in the even rows — starting with C<222>) has on the top-left key
+C<[1]> in the unshifted position, and C<{1}> in the shifted one.  The third layout on this key has nothing in the unshifted
+position, and C<𐋡> in the shifted one.  The second layout on the bottom-right key produces C<σ> and C<Σ> in the unshifted/shifted
+positions.  Likewise the 5th one produces C<𝕤> and C<𝕊> (if this module has access to Unicode tables allowing it to guess that
+C<𝕤/𝕊> “behave like” a case-pair — this is not specified in Unicode, but may be guessed by the names of these characters).
+
+For the top-left key in 5th layout, we needed hex to encode the content (which is C</>) since it coincides with the separator.
+
+=head2 Rectangular visual layout tables
+
+TBC ........................
+
+If a layer C<NAME> is define visually as a part of a list of layers, then the layer C<NAME²> is defined made of this layer (in the
+unshifted position) and the next layer “shifted up”.  Similarly, the layer C<NAME²⁺> is mad of the next 2 layers after
+those in C<NAME²>. 
+
+Likewise, for RECT visual layers, C<NAME₁> is the corresponding layers in the next row of rectangles; C<NAME₂>, C<NAME₂₊> are made
+as above of pairs of corresponding layers in the next row of rectangles.  Moreover, the face C<NAME⁴> is a shortcut for
+C<Layers(NAME²+Name²⁺)>, and C<NAME₄> for C<Layers(NAME²+Name₂)>.
+
+TBC ........................ (some accessible not only from rectangular…)
 
 =head2 Inclusion of F<.klc> files
 
@@ -395,7 +433,8 @@ C<Layers(LayerName+Other)>).  Depending on the recipe, these calls may result in
 of the resulting layers, or in different layouts.
 
 A recipe may be of three kinds: it is either a "first comer wins" which is a space-separated collection of
-simpler recipes, or C<SELECTOR(COMPONENTS)>, or a "mutator": C<MUTATOR(BASE)> or just C<MUTATOR>.
+simpler recipes, or C<SELECTOR(COMPONENTS)>, or a "mutator": C<MUTATOR(BASE)> or just C<MUTATOR>.  (There is
+also a syntax of mutator of different form: C<prefix=HEX> or C<prefixNOTSAME=HEX>; see below.)
 All recipes must be C<()>-balanced
 and C<[]>-balanced; so must be the C<MUTATOR>s; in turn, the C<BASE> is either a 
 layer name, or another recipe.  A layer name must be defined either in a visual C<KBD> section,
@@ -417,6 +456,9 @@ is construted in steps for its C<Layers> declaration, C<LinkFace> and specific C
 C<Layers> declaration.  Use C<FullFace(NAME)> to address the “synthesized” state of the face (the result depends on which moment
 this state is accessed!).  (Likewise for C<FullFlipLayers>.)  See also L<"Implementation details: C<FullFace(FNAME)>">.
 
+The selector C<Shortcut(FACE_RECIPE_NAME)> is same as Face(), but does not reset the active prefix, and makes no caching (so
+may be used in different contexts with different results).
+
 The simplest forms of C<MUTATORS> are C<Id, lc, uc, ucfirst, Empty> (note that
 C<uc>/C<lc>/C<ucfirst> return C<undefined> when case-conversion results in no
 change; use C<maybe_uc>/C<maybe_lc>/C<maybe_ucfirst> if one wants them to behave
@@ -430,6 +472,8 @@ characters not appearing as FROM become undefined by C<ByPairs>.
 (As usual, characters may be replaced by hex numbers with 4 or more hex digits;
 separate the number from a neighboring word character by C<.> [dot].)
 
+The C<Flat>/C<Inv> variants: TBC ................
+
 All mutators must have a form C<WORD> or C<WORD[PARAMETERS]>, with C<PARAMETERS>
 C<(),[]>-balanced.  Other simple mutators are C<dectrl> (converts
 control-char [those between 0x00 and 0x1f] to the corresponding [uppercase] character), 
@@ -439,7 +483,7 @@ which match, converts everything else to C<undefined>), C<FromTo[LAYER_FROM,LAYE
 (similar to C<ByPairs>, but pairs all characters in the layers based on their position),
 C<DefinedTo[CHAR]> (all defined characters are converted to C<CHAR>).
 
-The mutator C<Imported[NAME]> is similar to <ByPairs>, but takes the F<.klc>-style
+The mutator C<Imported[NAME]> is similar to C<ByPairs>, but takes the F<.klc>-style
 visual C<DEADKEYS/NAME> section as the description of the mutation.  C<NAME> may
 be followed by a character as in C<NAME,CHAR>; if not, C<CHAR> is the prefix key from
 the recipe's execution parameters.
@@ -498,7 +542,32 @@ a layout where C<:> is at position of C<.>, but on the second [=other] layer (es
 if the base layout is the standard one, it binds the character C<:> to the keypress C<AltGr-.>).
 
 To simplify formatting of F<.kbdd> files, a recipe may be an array reference.
-The string may be split on spaces, or split after comma or C<|>.
+The string may be split on spaces (but not after comma or C<|>), or split after comma or C<|>.
+(Another good alternative is to use the-split-line C<+>-syntax for assignments.)
+
+=head2 The C<prefix=HEX> or C<prefixNOTSAME=HEX> and C<prefixNOTSAMEcase=HEX> mutators
+
+The former case imports a fully defined face corresponding to the prefix key C<HEX>. 
+The other cases do likewise, but massage the base layer in the positions without a “new” binding.
+Here a binding is “new” if not present I<on the same key> in the base face (on any layer/C<Shift>-state).
+
+More precisely, the imported positions on this key on other layers with “new bindins” may be
+copied to “non-new” positions in layer 0.  Here the same C<Shift>-state is either preserved,
+or — unless in the last flavor — “raised”,
+as in copying from C<AltGr> to C<Shift> — if this adds a not-yet-created binding.  (The first “new”
+binding wins — although this may be important only with more than 2 layers.)
+
+(Compare with the C<prefixNOTSAME=HEX> field of
+L<the C<@output_layers> configuration variable|"More than 2 layers and/or exotic modifier keys"> — but
+there a binding is not “new” if it is present I<anywhere> on the base face.)
+
+B<WARNING:> there is no attempt to resolve infinite loops of importing.  In particular,
+C<prefix=> should not create circular dependency between prefixes, or be used in “principal”
+(=non-DeadKey) face.
+
+=head2 The C<NOID()>, C<NotSameKey()>
+
+TBC ......................
 
 =head2 The C<Mutate[RULES]> mutator
 
@@ -507,11 +576,9 @@ of the results of application of these rules.  Grouping the rules allows
 one a flexible way to control what I<the best> actually means.  The rules may
 be separated by comma, by C<|>, or by C<|||> (interchangeable with C<||||>).
 
-In the simplest case of grouping, C<RULES> form a C<|>-separated list, and
-each group consists of one rule.  Then I<the best> result is one coming from
-an earlier rule.  The groups are separated by C<|>, and the rules inside the
-group are separated by comma; if more than one rule appears in a group, a
-different kind of competition appears (inside the group).  
+The simplest case of competition between results produced by different rules is for rules in different
+C<|>-separated groups: then “the earlier rule producing results wins”.  However, the rules not separated
+by C<|> I<compete by “quality”> of their results.
 
 The I<quality> of the generated characters is a list C<UNICODE_AGE, HONEST, 
 UNICODE_BLOCK, IN_CASE_PAIR, FROM_NON_ALTGR_POSITION>
@@ -545,6 +612,10 @@ by application of C<RULES>.  With the C<Hack> modifier, the generated characters
 are not counted as “obtained by logical rules” when statistics for the generated
 keyboard layout are calculated.
 
+=head2 Macro-ization of recipes
+
+… is acteually described inside the following section.
+
 =head2 Linked prefixes
 
 On top of what is explained above, there is a way to arrange “linking” of two prefix keys;
@@ -575,7 +646,8 @@ if C<PRE-GROUPS1> is empty, this should be written as one of
   secondary	= PRE-GROUPS2||||SHARED||||POST-GROUPS2
 
 These rules are to allow macro-ization of the common parts of the primary
-and secondary recipe.  Put the common parts as a value of the key
+and secondary recipe.  (Although macro-ization may be useful for non-paired
+recipes too!)  Put the common parts as a value of the key
 C<Named_DIA_Recipe__***> (here C<***> denotes a word), and replace them by
 the macro C<< <NAMED-***> >> in the recipes.
 
@@ -594,16 +666,16 @@ inverted group; the 3rd of toplevel C<||||>-groups is the “extra” group.
 
 “Penalize/prohibit” lists start anew in every top-level group.
 
-=head2 Atomic mutators rules
+=head2 Atomic mogrifying rules
 
 As explained above, the individual RULES in C<Mutate[RULES]> may be
 separated by C<,> or C<|>, or C<|||> or C<||||>.  Such an individual
-rule is a combination of I<atomic rules> combined by C<+> operators,
+rule is a combination of I<atomic mogrifying rules> combined by C<+> operators,
 and/or preceded by C<-> prefix (with understanding that C<+-> must
 be replaced by C<-->).  The prefix C<-> means I<inversion> of the
 rule; the operator C<+> is the composition of the rules.
 
-B<Example:> the atomic rule C<< <super> >> converts its input character into
+B<Example:> the atomic mogrifying rule C<< <super> >> converts its input character into
 its superscript forms (if such forms exist; for example, C<a> may
 be converted to C<ᵃ> or C<ª>).  The atomic rules C<lc>, C<uc>, C<ucfirst>
 behave the same as the corresponding MUTATORs.   The atomic rule C<dectrl>
@@ -611,10 +683,16 @@ converts a control-character to the corresponding “uppercase” character:
 C<^A> is converted to C<A>, and C<^\> is converted to C<\>.  (The last
 4 rules cannot be inverted by C<->.)
 
-The composition is performed (as usual) from right to left.  B<Example:> the
+The composition is performed (as usual) from right to left (the part on the right
+is executed first (“as usual”; compare with C<log sin I<x>>).  B<Example:> the
 indivial rule C<< <super>+lc+dectrl >> converts C<^A> to C<ᵃ> or C<ª>.
 
-In addition to rules listed above, the atomic rules may be of the
+Any combining Unicode character defines the corresponding atomic mogrifier.  It
+may result in the corresponding
+L<precomposed form|https://en.wikipedia.org/wiki/Precomposed_character>; additionally,
+it is extended “to commute with” 
+
+In addition to rules listed above, the atomic mogrifiers may be of the
 following types:
 
 =over
@@ -622,11 +700,13 @@ following types:
 =item *
 
 A hex number with ≥4 digits, or a character: implements the composition
-inverting (compatibility or not) Unicode decompositions into two characters;
-the character in the rule must the first character of the decomposition.
-Here “Unicode decompositions” are either deduced from Unicode decomposition
+inverting (compatibility or not) Unicode decompositions into “the base” and
+“the combining character”; such mogrifier matches the composing character,
+and sends the base to “the composed form”.
+
+Here “Unicode decompositions” are either deduced from explicit Unicode decomposition
 rules (with compatibility decompositions having lower priority), or deduced
-basing on splitting the name of the character into parts.
+basing on splitting the name of the character into suitable parts.
 
 =item *
 
@@ -635,14 +715,17 @@ C<< <pseudo-upgrade> >> is an inversion of a Unicode decomposition which goes fr
 
 =item *
 
-Flavors of characters C<< <FLAVOR> >> from Unicode tables come from Unicode 
+Flavors of characters C<< <FLAVOR> >> from the Unicode tables come from Unicode 
 1-character to 1-character decompositions
 marked with C<< <FLAVOR> >>.  B<Example:> C<< <sub> >> for a subscript form;
 or C<< <final> >>.
 
 =item *
 
-C<< <font=***> >> rules TBC ..........................................
+C<< <font=font␣name> >> rules convert a letter (and a digit) to the corresponding
+codepoint in L<Unicode Math Alphabets|https://en.wikipedia.org/wiki/Mathematical_Alphanumeric_Symbols>.
+(Replace spaces in the “name of the font” [such as C<DOUBLE STRUCK>] by dash=C<-> and lowercase it; so the corresponding
+rule is C<< <font=double-struck> >>.)
 
 =item *
 
@@ -655,7 +738,7 @@ in L<"SYNOPSIS">.  The following “keywords” are processed by the algorithm:
 
   WITH, OVER, ABOVE, PRECEDED BY, BELOW (only with LONG DASH)
 
-are separators;
+in the Unicode name are considered “to be separators”; and
   
   COMBINING CYRILLIC LETTER, BARRED, SLANTED, APPROXIMATELY, ASYMPTOTICALLY, 
   SMALL (not near LETTER), ALMOST, SQUARED, BIG, N-ARY, LARGE, LUNATE,
@@ -664,11 +747,13 @@ are separators;
   BROKEN, TURNED, INSULAR, SANS-SERIF, REVERSED, OPEN, CLOSED, DOTLESS, TAILLESS, FINAL
   BAR, SYMBOL, OPERATOR, SIGN, ROTUNDA, LONGA, IN TRIANGLE, SMALL CAPITAL (as smallcaps)
 
-are modifiers.  For an C<APL FUNCTIONAL SYMBOL>, one scans for
+are mogrifiers.  For an C<APL FUNCTIONAL SYMBOL>, one scans for
 
   QUAD, UNDERBAR, TILDE, DIAERESIS, VANE, STILE, JOT, OVERBAR, BAR
 
-TBC ..........................................
+In particular, the mogrifier C<< <pseudo-calculated-operator> >> may convert the character
+C<\> (named C<REVERSE SOLIDUS>) to the Unicode character C<U+29f5=⧵> with the name
+C<REVERSE SOLIDUS OPERATOR>.
 
 =item *
 
@@ -677,7 +762,7 @@ their middle letter, as well as C<SCHWA> of C<0>.
 
 =item *
 
-C<< <pseudo-fake-***> >> rules are obtained by scanning the name for
+C<< <pseudo-fake-***> >> rules are obtained by scanning the names of the Unicode characters for
 
   WHITE, BLACK, CIRCLED, BUT NOT 
 
@@ -687,38 +772,216 @@ as well as for C<UM> (as C<umify>), paleo-Latin digraphs and C<CON/VEND>
 (as C<doubleletter-middle-welsh>), C<MODIFIER LETTER> (possibly with C<RAISED>
 or C<LOW>; as C<sub/super>).
 
-=item *
-
-Manual prearranged rules TBC ..........................................
+For example, C<△> may be converted to C<▲=BLACK UP-POINTING TRIANGLE> by C<< <pseudo-fake-black> >>.
 
 =item *
 
-C<< <subst-***> >> Explicit named substitution rules TBC ..........................................
+C<< <pseudo-faked-***> >> rules are, first: the special case C<calculated-SYMBOL> converting C<MICRO SIGN> (C<µ>) to
+C<GREEK LETTER MU> (C<μ>).  In addition, C<greekize> converts a Latin letter into B<the Latin variant of the corresponding Greek
+letter (e.g., C<f> ⇝ C<LATIN SMALL LETTER PHI=ɸ>).  Finally, C<latinize> does the same, but “starting with a Greek letter”.
 
 =item *
 
-C<< <reveal-substkeys> >> Prohibits handling non-substituted input TBC ..........................................
+C<< <subst-***> >> Explicitly defined named substitution rules.  A rule is defined in C<Substitutions> section of F<.kbdd>.  E.g.,
+the row
+
+  @Zuang_tones=2ƨ,3з,4ч,5ƽ,6ƅ,@Ƨ,#З,$Ч,%Ƽ,^Ƅ
+
+defines the rule C<< <subst-Zuang_tones> >> which, in particular, converts C<#> to C<U+0417=З>.
 
 =item *
 
-C<< <any-***> >> rules TBC ..........................................
+Manual prearranged rules C<< <pseudo-manual-***> >> are like <subst-***>, but use the tables supplied in this Perl module.
+Currently the following rules are defined:
+
+  phonetized phonetize2 phonetize3 phonetize0	# different “priorities” of translation
+  paleo greek2coptic latin2extracoptic
+  addline addhline addvline addtilde adddot adddottop addleft addright
+  sharpen unsharpen whiten quasisynon amplify turnaround superize subize subize2
+  aplbox round hattify
+
+They are intended “to do what the name says”.  For example, C<addleft> either adds left arrow, or adds something on the left of
+the glyph.
+
+=item *
+
+C<< <reveal-substkey> >> if it is the only mogrifier, or is at the right end of a mogrifier composition chain: processes only
+“the substitution=mirroring keys” (see L<"Input substitution in atomic mogrifiers"> below).
+
+(Obsolete synonym: C<< <reveal-greenkey> >> ???)
+
+=item *
+
+C<< <any-***> >> and C<< <any1-***> >> rules (may be prepended by C<reverse->, as well as C<other-> may be put before these
+stars).  The tail C<***> is several words (connected by C<->), optionally appended by a list (joined by C<->) of C<!> followed
+by several words-connected-by-C<->.
+
+For example, applying C<< <any-hook-!above> >> is equivalent to joining the results of applying all atomic mogrifiers having C<hook>
+in their name (as well as 1-character mutators having it in their lower-case Unicode name), but not having C<above> in these names.
+(Note that C<hook> would not be looked at immediately after C<< < >> — but as a special case, C<< <font=***> >> mogrifiers can be
+matched by C<font>.)
+
+C<reverse-> flips the order of the list of found atomic mogrifiers.  With C<any1-> the mogrifiers having the word C<AND> in their name
+are omitted (so C<< <any1-acute> >> is similar to C<< <any-acute-!AND> >> — and they would not convert C<s> to
+C<ṥ=U+1E65=LATIN SMALL LETTER S WITH ACUTE AND DOT ABOVE>).
+
+Currently, C<other-> omits exact matches for the supplied match-string.  (It seems that intent was to omit matches where the
+part inside C<< < > >> is an exact match???
 
 =back
 
-=head2 Input substitution in atomic rules
+=head2 Input substitution in atomic mogrifiers
 
-TBC ..........................................
+There are situations when “logically defined” mogrifiers are not enough.  For example, suppose that my mogrifiers produce “very
+logical results” when applied to characters C<△> and C<□> — however, I want them to give the same results when applied to characters
+C<3> and C<4>.  For this, we may declare that a keypress producing C<3> also has “an invisible output C<△>”; likewise for C<4> and
+C<□>.
+
+Such “substitution keys” are defined in the C<AlternCharSubstitutions>, C<AlternCharSubstitutionLayers> and
+C<AlternCharSubstitutionFaces> array directives similar to
+
+  @AlternCharSubstitutions=3△,4□,0338∕,06ff÷
+  @AlternCharSubstitutionLayers=Blue,Blue-AltGr
+
+here in addition to every key binding being “mirrored” by the corresponding binding in layers C<Blue> + C<Blue-AltGr>, a binding 
+resulting in the combining-slash C<U+0338=◌̸> is “mirrored” by the binding producing C<U+2215=DIVISION SLASH=∕>.  When mogrifiers
+are applied to a key binding, they are also applied to the “mirrored bindings”, and the results “compete for being included” all
+together (on equal footings).
+
+=head2 The C<AssignTo> directive
+
+This is a pseudo-mutator restricting the assignment to special “extension chunks” of a face or a layer.  Recall that usually, to
+understand how a particular “position in a layers” corrresponds to a key in a physical keyboard, this module inspects the binding
+in the C<BaseLayer> — which is assumed to be “as expected”.  However, some keys are not expected do not produce characters, so
+cannot be identified this way.  To circuvent this, we allow chunks-with-known-maps-to-physical keys, named C<FKEYS> (24 standard
+keys up to C<F24>), C<ARROWS> and C<NUMPAD> (16 keys arranged in the order of the left table in:
+
+  789/   ⌈⊓⌉⧄
+  456*   ⊏□⊐⊠
+  123-   ⌊⊔⌋⊟
+  0.↲+   ▭⊡▯⊞
+
+ — so one can easily assign the them using rectangle-block).  For example, defining layers C<IsleDigits> and C<DirCharsRect> by
+these blocks, the mutator
+
+   AssignTo[ARROWS,16](Id(RectArr))
+ 
+Would bind the arrow keys (on the numeric keyboard, and — on Windows — elsewhere) to the shapes on the right.  (In the defined
+layer, pressing C<End> produces C<⌊>.)  Likewise, with
+
+   AssignTo[ARROWS,16](FromTo[ 7√ 9ℊ ](FlipShift(Id(IsleDigits))))
+
+pressing C<Shift-Home> produces C<√>.
+
+ TBC ..................
+
 
 =head2 The C<Mutate2Self> mutator
 
-TBC ..............................
+Finds “the most convenient default bindings” for the “diacritic key map” when the
+following key is non-alphanumeric.  This is based on “the ID” of the prefix key
+(this is, for example, in the definition of C<DeadKey_Map0138> the ID is C<U+0138>.
 
-=head2 Pseudo-mutators for generation of documentation
+This ID should be a value in the C<Diacritics> section of F<.kbdd>.  The first such
+row is taken, and one of the characters in (one of the 7) corresponding lists is
+returned.
+
+B<Warning:> in “real keyboard layout”, this is most probably used only as a
+fallback — so many of these bindings are going to be overwritten by “other mutators”
+in the recipe describing the action of a prefix key.  (Nevertheless, the list below is
+made to cover as many of the characters in the sublists accessible as possible,
+I<effectively assuming> that many of these bindings are not overwritten. — This is an
+obvious contradiction of intents! — Partially remedied by multiple alternative ways of access…)
+
+The unifying factor is that “spacing variants” of diacritics are accessed mostly via C<Space>,
+and the “combining variants” are accessed mostly C<AltGr>-modified non-alphabetic keys.
+For example, currently:
+
+=over 4
+
+=item *
+
+A double-press of the diacritic key returns the first I<combining character>
+(“non-spacing”) from this list.
+
+=item *
+
+Sends C<Space> to the first I<spacing modifier> character of this list (ignoring ASCII chars: those up to C<~=U+007e>).
+
+Likewise, the other characters bound to C<Space> (with C<Shift> and C<AltGr>-modifiers)
+are sent to the following Unicode spacing modifiers in the lists.  (More such spacing
+modifiers are produced by control-characters — see below.)
+
+=item *
+
+Sends C<|> and C<\> to the first two elements of the “vertical-etc” or “prime-like-or-centered” sublists of
+spacing characters.
+
+=item *
+
+Likewise, combining these with C<AltGr> produces combining characters of similar types (penalizing the first 2 in each “non-primary”
+subgroup).
+
+=item *
+
+Sends C</> and C<?> to the second pair of elements of the “prime-like-or-centered” sublist of
+spacing characters (penalizing as above).
+
+=item *
+
+Sends C<-> and C<_> to the second pair of elements of the “lowered” sublist (and the following sublists) of
+spacing characters (penalizing as above).
+
+=item *
+
+Likewise, modifying these with C<AltGr> produces combining characters of similar types.
+
+=item *
+
+Likewise, modifying C<;> and C<:> with C<AltGr> produces the first two of math-combining-characters-for-symbols (or other
+combining chars, penalizing as above).
+
+=item *
+
+Likewise, C<[ { ] }> (and C<-> and C<_> with C<AltGr>) produce the third (etc.) math-combining-character-for-symbols (or other
+combining chars, penalizing as above).
+
+=item *
+
+C<'> and C<"> (possibly modified by C<AltGr>) produce the second (and the following) combining characters in the list (penalizing
+as above).
+
+=item *
+
+As a last resort for combining characters, C<AltGr>-modified C<` 1 2 3 4 5 6 7 8 9 0 = [ ] , .> access third-etc.
+combining characters (penalizing as above).
+
+=item *
+
+As a last resort for spacing characters: in addition to what is produced by C<Space> (possibly modified by C<Shift> etc.), more
+spacing modifiers are produced by control-characters emitted by a special key (such as C<Enter>, C<Tab>, C<Ctrl-Enter>,
+C<Esc> and C<Ctrl>-variants of C<[ ] \> — or C<Esc> — then C<Backspace>, then C<Ctrl>
+variants of C<Backspace _ ^ @> — which is the same as C<2>).
+
+(When choosing which non-spacing modifier to choos, the first 2 elements in each
+sublist are penalized — they may be easier entered by other ways described above.)
+
+=back
+
+=head2 Other mutators
+
+C<IfPrefix[PREFIX1,PREFIX2,…](RECIPES)> (and C<IfNotPrefox>). — Suitable for
+putting into default bindings.  TBC ...................
+
+=head2 Pseudo-mutators for generation of documentation/etc.
 
 A few mutators do not introduce any characters (in other words, they behave as 
 C<Empty>) but are used for their side effects: in prefix-key recipes, 
 C<PrefixDocs[STRING]> introduces documentation of what the prefix key is intended
-for.  Likewise, C<HTML_classes[HOW]> allows adding CSS classes to highlight 
+for.  Moreover, C<X11symbol[NAME]> gives the “symbol name C<NAME> for C<X11>” keysymbol
+(such as C<dead_lowline>) generated by this prefix key.
+
+Likewise, C<HTML_classes[HOW]> allows adding CSS classes to highlight 
 parts of HTML output generated by this module, the parts corresponding to selected
 characters in a face.
 
@@ -746,6 +1009,8 @@ On characters
   very-special need-learn may-guess	# provide green/brown/yellow-outlines
   special				# provide blue outline (thick unless combined with 
   thinspecial				#                   <-- this)
+
+options oneRow, startKey, cntKeys: TBC .......................
 
 =head2 Extra CSS classes for documentation
 
@@ -782,7 +1047,7 @@ a case pair of mogrified-uc:
   Extracted [ …list… ] deadKey=02dc
 
 In this one, C<│> separates mogrifications with different priorities (based on
-Unicode ages, whether the atomic mutator was compatibility/synthetic one, and the
+Unicode ages, whether the atomic mogrifier was compatibility/synthetic one, and the
 Unicode block).
 
   / ║ ║ ║ ║ ║   │ ∴   ║ ║
@@ -815,7 +1080,7 @@ back is separated by C<┋>.
 When bit 0x80 is set, much more lower-level debugging info is printed.  The
 arrays at separate depth mean: group number, priority, not-cased-pair, layer
 number, subgroup, is-uc.  When bit 0x100 is set, the debugging output for
-combining atomic mutators is enabled.
+combining atomic mogrifiers is enabled.
 
 =head2 Personalities
 
@@ -856,10 +1121,10 @@ preceded by horizontal space.  Seven elements should contain:
  Combining below (or above if base char is below)
  Vertical combining and dotlike Combining
 
-These lists determine what a C<Diacritic2Self> filter of satellite face processor 
+These lists determine what a C<Mutate2Self> filter of satellite face processor 
 will produce when followed by whitespace characters 
 (possibly with modifiers) C<SPACE ENTER TAB BACKSPACE>.  (So, if F<.kbdd> file
-uses C<Diacritic2Self>) this determines what diacritic prefix keys produce.
+uses C<Mutate2Self>) this determines what diacritic prefix keys produce.
 
 =head2 Compose Key
 
@@ -917,8 +1182,84 @@ Unicode name of the character will be used.
 
 =head2 More than 2 layers and/or exotic modifier keys
 
-This is controlled by C<output_layers>, C<mods_keys_KBD>, and C<layers_mods_keys>
-configuration arrays.  TBC..................................
+This is controlled by C<output_layers>, C<mods_keys_KBD>, C<modkeys_vk> and C<layers_mods_keys>
+configuration arrays.  The array C<modkeys_vk> is converted to a hash mapping “a new symbol”
+(arbitrary) for a modifier key to the tail of the corresponding Windows’ C<VK_>-code.
+For example, one can request that the modifier key known to this F<.kbdd> file as C<rM> is
+triggered by C<VK_RGROUPSHIFT> (likewise for C<M>) by using the array
+
+  @modkeys_vk=M,GROUPSHIFT,rM,RGROUPSHIFT
+
+C<@mods_keys_KBD> describes
+L<the C<KBD>-bits in the Windows’ key-modifers-bitmap|"Keyboard input on Windows, Part II: The semantic of ToUnicode()">
+raised by every modifier.  This array is converted to a hash, the keys can be one of C<S C A>
+(for C<Shift>, C<Ctrl>, C<Alt>) possibly prepended by C<l> or C<r> (for “left” and “right”
+flavors), as well as the keys defined in C<modkeys_vk> hash.  The values are combinations
+of C<S C A K X Y Z T U V W> (for bits from 0x1 to 0x400); the bits C<X Y> have aliases
+C<R L> (for C<Roya> and C<Loya>).
+
+For example,
+
+  @mods_keys_KBD=lC,CL,lA,AK,rA,CALZ,M,CAT,rC,CAR
+
+describes the bindings from L<"A convenient assignment of KBD* bitmaps to modifier keys">.
+
+C<@layers_mods_keys> is the list giving the collection of modifiers keys (such as C<lA>, C<C> or C<rC>, etc.)
+triggering the given layer.  (Since a layer already covers two states of C<Shift> key, it should not appear.)
+For example, if layer 0 is the default (no modifiers), layer 1 is triggered by C<AltGr> (which is C<rA> as “right-C<Alt>),
+and layer 2 is triggered by C<AltGr-Menu> (with C<Menu> known to this C<.kbdd> as C<M> — defined by C<@modkeys_vk>), then use
+
+  @layers_mods_keys=,rA,rAM
+
+(We do not describe here how to redefine C<Menu> key to send C<VK_RGROUPSHIFT>; currently one seems to need to edit the
+generated C<.h> file; TBC ..................................)
+
+Finally, C<@output_layers> describes how to “fill” these layers.  Currently, the elements may be numbers (the ordinal of the layer
+of the current face), or have the form C<prefixNOTSAME=HEX> or C<prefixNOTSAMEcase=HEX> or C<prefix=HEX>.  Here C<HEX> (such as
+C<9f03) is the “id” of a diacritic defined elsewhere in the F<.kbdd> file.  (For example, by defining C<DeadKey_Map9f03>.)
+
+  @output_layers=0,1,prefixNOTSAME=9f03
+
+These “fake” prefix keys are considered to be “fake” and are not emitted “as prefix keys” in the generated C<MSKLC> keyboard
+description.
+
+With C<NOTSAME>, the layers of the C<HEX>-face are “squeezed” into one layer.  For this, whatever is accessible anywhere on the
+“non-extra” layers of the base face is considered “free”, so the content of the higher layers of the C<HEX>-face may be “moved to
+its 0th layer”.  Moreover (unless C<case> is specified), if C<key> and C<AltGr-key> are “not free”, but C<Shift-key> is “free”, then
+the content of C<AltGr-key> is moved to the C<Shift-key>.
+
+=head2 Apple keyboards
+
+The mneumonics (“terminator”) shown after C<AltGr_Invert>-prefix or C<Compose>-prefix keys are pressed are controlled by the
+settings C<AltGr_Invert_Show> and C<ComposeKey_Show>.  For other prefix keys this is controlled by C<Show[NNNN]> directive on the
+C<DeadKey_> descriptor.
+
+The name of the layout is controlled via C<LAYOUTNAME> with C<OSX_ADD_VERSION>, or by C<OSX_LAYOUTNAME>.
+
+Duplication of keys on Mac is controlled by the setting C<@Apple_Duplicate> (has a sane default: C<PC_Menu>, C<F20> duplicate
+ISO-keys, etc.).  The format is TBC .................
+
+Extra Apple bindings may be inserted by (temporarily???) C<Apple_Override> (by C<Mods+VK> or by C<Prefix+Char>).  TBC .........
+
+=head2 More settings describing the keyboard
+
+C<CapsLOCKoverride>:  Face recipe to use where the “naive rules” of behaviour of C<CapsLock> are not enough.
+
+C<AltGrInv_AltGr_as_Ctrl>: not used???!!!
+
+C<@skip_extra_layers_WIN>: lists C<VK_>-codes (with C<VK_> omitted) of keys on which “extra layers” should be ignored.
+
+C<Prefix_Base_Altern>: the recipe for the face used on Windows as an “alternative base” for generation of prefix key maps.  For
+example, when we want to access the binding at the position of C<F9>-key of the target keymap, but the base face does not
+emit anything at this position, on Windows such position is not accessible.  However, if C<Kana-F9> emits a string, then
+using the face for C<Kana->prefix as C<Prefix_Base_Altern> allows pressing C<Kana-F9> after the prefix key to reach the binding
+at the position of C<F9>.
+
+C<WindowsEmitDeadkeyDescrREX> matches the DeadKey descriptions to not include into the generated DLL (to save space).
+See L<Windows’ limits for size of the layout DLL|"If data in KEYNAME_DEAD takes too much space, keyboard is mis-installed, and “Language Bar” goes crazy">.
+(A nice value with a lot of Compose bindings is C<< ^(?!.*\bCompose\s+(Compose\b|(?!key)\S+)) >>.)
+
+C<@Prefix_Force_Altern> TBC ..................
 
 =head2 CAVEATS for German/French/BÉPO/Neo keyboards
 
@@ -1537,7 +1878,7 @@ on the other hand, one should probably remove C<?> since C<AltGr-?> should bette
 be "set in stone" to denote C<¿>.  If one adds Greek, then the calculatable positions
 for aspiration are on C<[ ]> (or on C<( )>).  Of widely used Latin diacritics, this
 leaves out I<ring/hacek/breve/horn/ogonek/comma> (and doubled I<grave/acute>);
-these diacretics should be either “mixed in” with similar "calculatable" diacritics
+these diacritics should be either “mixed in” with similar "calculatable" diacritics
 (for example, <AltGr-,> may either create a character with cedilla, or with
 ogonek — depending on the character), or should be assigned on less intuitive positions.
 
@@ -1758,7 +2099,7 @@ useful when designing such preferences.  (This module can take most of such choi
 automatically due to knowledge of L<Unicode ages|http://www.unicode.org/Public/UNIDATA/DerivedAge.txt> 
 of characters; this age correlates well with expected frequency of use.)
 
-Another trick discussed below is implementing a rare diacritic X by applying the diacretic Y to a character
+Another trick discussed below is implementing a rare diacritic X by applying the diacritic Y to a character
 with pre-composed diacritic Z.
 
 U-caron: ǔ, Ǔ which is used to indicate u in the third tone of Chinese language pinyin.
@@ -3247,7 +3588,103 @@ bindings — freeing it for application accelerators.
 to redeem the trouble!  For example, it is desired for C<AltGr> to “behave the
 same” on the base personality and on its 3 companions, as well as generate
 SanSerif/Bold/Italic variants of Latin/Greek by adding 3 modifiers.  Is it even
-possible?!)
+possible?!  See below…)
+
+=head2 Almost orthogonality — with C<Win>-key
+
+To answer the last question at least partially, consider the following way of binding:
+
+      |	  ∅   M    C    MC     A   AM   AC    AMC
+  —————————————————————————————————————————————————
+  ∅   |	  L   Gr   —    Scr    Lᴬ  Grᴬ  BbB   Frk
+  C   |	  —       Lˢˢ          〃    〃    〃     〃
+   A  |	  —             Scrᴮ   Lᴮ  Grᴮ  Mono  Frkᴮ
+  CA  |	  —       Lᴮˢˢ  Grᴮˢˢ  〃    〃    〃     〃
+   W  |	  —   ¿?   —    ¿?     Lᴵ  Grᴵ  Lᴵˢˢ
+  CW  |	  —   ¿?   —    ¿?     〃    〃    〃     〃
+   WA |	  —   ¿?              Cyrᴬ Hbrᴬ Lᵗᵉⁿ  Grᵗᵉⁿ
+  CWA |	 Cyr Hbr  Lᴮⁱ   Grᴮᴵ   〃    〃    〃     〃
+
+with
+
+=over 4
+
+=item
+
+Columns are combinations of “keys on the right of Spacebar: C<AltGr>, C<Menu>, C<rCtrl>” (shortened to one letter).
+
+=item
+
+Rows are cominations of keys “on the left of Spacebar: C<lCtrl> C<Win> C<lAlt>”.
+
+=item
+
+Dashes “C<—>” mean “this position should not be bound — to free it to application accelerators”;
+
+=item
+
+Ditto marks “〃” mean “same as above it” — the limitation due to C<KLLF_ALTGR>.
+
+=item
+
+C<L>/C<Gr>/C<Cyr>/C<Hbr> mean 4 personalities (these particular names are just for illustrative purposes), the superscripts mean:
+C<ᴬ>: C<AltGr>-flavor, C<ᴮ>: Bold, C<ᴵ>: Italic, C<ˢˢ>: SansSerif, C<ᵗᵉⁿ>: “Tensor” = C<ᴮᴵˢˢ>.
+
+(Although the name C<Gr> is arbitrary, I<on “Math-font” flavors> this B<indeed means “Greek”>.  So maybe it is better to call it
+I<Oriental> 😃.)
+
+=item
+
+C<Bbb>/C<Mono>/C<Scr>/C<Frk> mean flavors of “fancy” math charactre: C<Blackboard-Bold> 𝔸𝕒𝔹𝕓, C<Monospaced> 𝙰𝚊𝙱𝚋, C<Script> 𝒜𝒶ℬ𝒷,
+C<Frakture> 𝔄𝔞𝔅𝔟 (the last two may be boldified).
+
+=item
+
+“C<¿?>” marks “questionable positions”, where the system-accelerator-based-on-VK_-code can trigger???
+
+=back
+
+With this, one can have
+
+=over 4
+
+=item
+
+Convenient access to C<L>/C<Gr> personalities (including C<AltGr>-versions) and “fancy math” (with C<lAlt> meaning “(un)Bold” — same
+as below).  
+
+=item
+
+Non-convenient (but easy-to-memorize: C<left-CWA>) access to C<Cyr>/C<Hbr>-personalities (including C<AltGr>-versions) and
+“acceptable” way to reach “Tensor Math-fonts”.
+
+=item
+
+Access to “Math-font” flavors is non-orthogonal, “but almost”: starting from C<AltGr>-C<L>-personality, the orthogonal accessors are
+“the usual C<Gr>-switch”, C<lAlt> for “Bold”, C<Win> for “Italic”, and C<rCtrl> for “SansSerif”.  
+
+=item
+
+But not all flavors can be accessed by combining these orthogonal accessors. — One may need to replace C<AltGr> by C<lCtrl>.
+(This works only with C<rCtrl>-active.)
+
+=item
+
+The final inconvenience is with “Bold-Italic Math fonts”: they are accessed by the preceding rule “as if it had ‘SansSerif’ added”.
+
+=back
+
+(As the 3rd/4th personalities go, one can duplicate them — at least non-C<AltGr> versions — to easier to access (but “non-orthogonal”)
+free slots at the top-left of the table.  And if one can live with another modifier key replacing C<AltGr> as the accessor to its
+second layer, one can even add a 5th personality into the unused space of the table above.)
+
+B<Summary>: This way of access trades the convenience of access to the 3rd/4th personalities (of
+L<C<izKeys>-type access|http://k.ilyaz.org/#advMods>) for simple access to C<AltGr>-layer of the 2nd personality, a
+kind-of-orthogonality of “Math-fonts”, and for freeing C<lCtrl-lAlt> for accelerators.  (Just in case, recall again: here I<we do
+not even try> to make “Math-fonts” easily-accessible!  This is just an illustration that even with Windows’ ideosyncrasies, I<a
+logical> way of access can be “almost at reach”. — To make things convenient, there should be a way of “latching” the modifier
+keys for a short time — for example, I<until B<all> the modifier keys are released>.)
+
 
 =head2 Notes on the finer details of assigning modifier-bitmap bits
 
@@ -3322,7 +3759,9 @@ a keypress (with different “modifiers”) to 125.
 
 How can one keyboard layout (done in software!) retain functionality when used with different physical keyboards?
 
-Three keyboards above have L<extra keys|https://www.win.tue.nl/~aeb/linux/kbd/scancodes-8.html>,
+Three keyboards above have L<extra keys|https://www.win.tue.nl/~aeb/linux/kbd/scancodes-8.html> (see also
+L<https://kbdlayout.info/kbdibm02/scancodes> — changing 
+“Arrangement” if needed, as well as L<https://bsakatu.net/doc/virtual-key-of-windows/> — and the references there),
 with their positions on the “main island” of the keyboard and scancodes
 (as well as intended translations to C<VK_>codes) as in:
 
@@ -3332,7 +3771,9 @@ with their positions on the “main island” of the keyboard and scancodes
   Brazilian(ABNT2)      56→OEM_102     73→ABNT_C1       ---
   Japanese(JIS)            ---         73→OEM_102    7D→OEM_8
 
-(These keys are positioned right-of-C<left_Shift>, left-of-C<right_Shift>,  left-of-C<Backspace>.)
+(These keys are positioned right-of-C<left_Shift>, left-of-C<right_Shift>,  left-of-C<Backspace>.  Inspect
+L<these images|https://kbdlayout.info/kbdibm02/scancodes>; one can change the shown physical keyboard by changing C<Arrangement>,
+and change the labels on the keys — below-right of the image. — Also try changing the layout — in URL — to C<kbdbr>.)
 
 Recall that a scancode is a signal from hardware (+drivers), while the C<VK_>code is calculated based on the scancode.
 B<CONCLUSION:> these assignments are incompatible in one keyboard layout (due to conflicts of ABNT2/JIS with the translation of the
@@ -3391,6 +3832,8 @@ B<WARNING:> some versions of Firefox may lock when switching to certain keyboard
 L<"Can an application on Windows accept keyboard events?  Part II: special key events">).
 With v.55 such a lock would not occur when one
 removes the binding for C<OEM_8> from this keyboard.  Caveat emptor!
+
+B<NOTE:> for yet more exotic keys search for C<exotic virtual> in L<"SEE ALSO">.
 
 =head1 WINDOWS GOTCHAS
 
@@ -4179,6 +4622,16 @@ L<"WORKAROUND: a summary of the productive “alternative” workflow with F<.kl
 another one.  The format of keyboard layout tables allows them to share a
 modification column.  The format of F<.klc> files does not allow sharing.)
 
+=head2 F<kbdutool> cannot reasonably handle C<NUMPADn> keys and C<DECIMAL>
+
+F<kbdutool> requires that every C<VK_>-code is assigned a scancode.  The keys above
+are not assigned scancodes (on non-exotic keyboards), but are instead
+translated from C<Insert>/C<End>/etc. as needed by the kernel.
+
+(Unchecked) workaround: use fake scancodes (for example, C<0xe0e*> are not used
+by known physical keyboards, so redefining the actions of these scancodes should not
+cause conflicts.
+
 =head2 F<kbdutool> forgets to emit C<aVkToWch3>/6/8
 
 If the F<.klc> file has many modification columns, the emitted aVkToWcharTable 
@@ -4196,6 +4649,33 @@ L<"WORKAROUND: a summary of the productive “alternative” workflow with F<.kl
 The offset of this structure should be no more than 0x10000.  Thus keyboards
 with large tables of prefixed keys may fail to load.  This may be related to
 the bug L<"If data in C<KEYNAME_DEAD> takes too much space, keyboard is mis-installed, and “Language Bar” goes crazy">.
+
+Time to switch to direct generation of F<.C> files?  (See
+L<"WORKAROUND: a summary of the productive “alternative” workflow with F<.klc>">.)
+
+=head2 F<kbdutool> finicky with NumPad keys
+
+B<Background:> on non-exotic keyboards C<NUMPAD>n and C<DECIMAL> are not assigned scancodes, but are translated from
+C<Insert>/C<End>/etc. C<VK_>-codes as needed by the kernel.  On the other hand, F<kbdutool> I<requires B<a specific>> scancode
+assigned to each line in the C<LAYOUT> section.  In particular, one needs to be inventive with assigning characters to these NumPad
+C<VK_>-codes.
+
+What happens is that F<kbdutool> handles “fake” scancodes (such as C<0xE0E3>) assigned to C<NUMPAD>n reasonably well (meaning: it is
+I<the other bugs> described above which are going to be triggered 😦 — but one of these bugs is that F<kbdutool> does not update
+C<E0>-map — which is good for “fake” codes!).  However, C<DECIMAL> B<must be assigned> to the scancode C<0x53>.  (This is
+handled automatically for F<.klc> files produced by this module.)
+
+=head2 F<kbdutool> may assign scancodes wrongly
+
+While F<kbdutool> allows assigning a C<VK_>-code to a scancode (one can use an “ultra-short line” like
+
+  e05d  KANA
+
+to make “the Menu key” into C<VK_KANA>), such scancodes are not included into “the special table for C<e0>-bindings” of the
+generated C file.
+
+To add insult to injury, the entry for C<e05d> may actually I<be omitted> from this table (at least when one moves C<APPS> binding
+to a different scancode).  
 
 Time to switch to direct generation of F<.C> files?  (See
 L<"WORKAROUND: a summary of the productive “alternative” workflow with F<.klc>">.)
@@ -4262,9 +4742,9 @@ or use the C</verbose> option on the linker to get more detailed output:
 
 (Some of the steps below may be omitted depending on how complicated
 your F<.klc> layout is; for practical implementation, see
-L<the example of F<.klc> creation|http://cpansearch.perl.org/src/ILYAZ/UI-KeyboardLayout/examples/build-iz.pl>
+L<the example of F<.klc> creation|https://search.cpan.org/~ilyaz/UI-KeyboardLayout/examples/build-iz.pl>
 and L<the example of F<.klc> to F<.dll> 
-processing|http://cpansearch.perl.org/src/ILYAZ/UI-KeyboardLayout/examples/build_here.cmd>):
+processing|https://search.cpan.org/~ilyaz/UI-KeyboardLayout/examples/build_here.cmd>):
 
 =over 4
 
@@ -4275,10 +4755,14 @@ C<LAYOUT>, C<DEADKEY>, C<KEYNAME_DEAD> sections, no C<LIGATURE> section).  Run
 it through GUI MSKLC (C<Alt-P Enter>, then C<Alt-P B Enter Enter>, C<Alt-F4>).
 Store the generated F<setup.exe>, rename the directory.
 
+Can be made by giving optional arguments C<'dummy', 'dummyname'> to fill_win_template();
+see L<"SYNOPSIS">.
+
 =item
 
 Make a “less dummied” F<.klc> file (as above, but with the correct “description” on
-the C<KBD> line).  Do as above, and mix in the F<setup.exe> from the previous step.
+the C<KBD> line).  (Can be made by giving optional argument C<'dummy'> to fill_win_template();
+see L<"SYNOPSIS">.)  Do as above, and mix in the F<setup.exe> from the previous step.
 
 This makes a correct “installation framework”. — But it has I<very wrong> F<.dll>
 files!
@@ -4288,97 +4772,37 @@ the C<KBD> line changes.
 
 =item
 
-Run the “real” F<.klc> file through the F<kbdutool> CLI:
+Convert to C with
 
-  kbdutool.exe -v -w -s -u FILENAME.klc
-
-Fix errors (if any!) in the generated F<.H> files (using scripts and patches if needed).
-(In my experience, even if F<kbdutool.exe> fails, it still creates useful F<.rc> and
-F<.def> files, and a file F<.h> which is either correct, or easy-to-fix: look for
-C<#ERROR#> strings).
-
-=item
-
-Create the correct F<.c> file with
-
-  perl ../examples/klc2c.pl FILENAME.klc >C_NAME.c
+  perl -wC31 %ex%/klc2c.pl FILENAME.klc >C_NAME.c
 
 Here C<C_NAME> is the name from C<KBD> line of F<.klc> file.  (This would
-overwrite the F<.c> file created on preceding step.)
+overwrite the F<.c> file created on preceding step.  This would also create
+one extra C file, and a header file — as well as a F<.rc> file and F<.def> 
+file — but it would not overwrite these files if present.)
 
-(This assumes that we are in a subdirectory created in the distribution
-directory of <UI::KeyboardLayout>).
-
-=item
-
-Copy the files F<msklc_altgr.c>, F<msklc_altgr_r2l.c>, F<msklc_lig4.h>
-from the
-L<directory F<examples> of the distribution of this Perl module|https://search.cpan.org/~ilyaz/UI-KeyboardLayout/examples/>.
+(This assumes that C<%ex% expands to the name of F<./examples> subdirectory
+in the distribution of <UI::KeyboardLayout>).
 
 =item
 
 Compile the resulting B<C> files.   For example, one can use
 
-  %ex%\compile_link_kbd.cmd --with-extra-c msklc_altgr iz-la-4s
+  %ex%\compile_link_kbd.cmd --with-extra-c C_NAME_extra C_NAME
 
-=item
-
-Mix the generated F<.dll> files
-with the install package made above.
-
-=back
-
-However, one should remember that:
-
-=over 4
-
-=item
-
-The format of F<.klc> files understood by F<MSKLC> is C<UTF-16LE> with C<BOM>.
-Convert, for example, as in
-
-  ( perl -we "print qq(\xff\xfe)" && iconv -f UTF-8 -t UTF-16LE %%f ) > %%f-16
-
-=item
-
-Run
-
-  kbdutool.exe -v -w -s -u FILENAME.klc
-
-with the “honest” F<.klc> file.  In my experience, even if F<kbdutool.exe> fails,
-it still creates useful F<.rc> and F<.def> files, and a file F<.h> which is
-either correct, or easy-to-fix (look for C<#ERROR#> strings).
-
-=item
-
-Unfortunately, F<kbdutool.exe> has problems with long input lines.  So when
-running it as above, one may 
-need to remove a few lines in the C<LAYOUT> section to avoid buffer overflows.
-One may also need to shorten the lines by stripping away the comments (as in
-
-  perl -wlpe "s/^(.{250}[\x80-\xBF]*).*/$1/s" %src%/ooo-us >ooo-us-shorten
-
- — but this should be done before conversion to C<UTF-16LE-BOM>).
-
-(If one does not remove lines with “unusual” C<VK_>-codes and scancodes,) this
-would not affect the generated files — except F<.c> file which we are
-going to overwrite anyway.
- 
-=item
-
-The script F<klc2c.pl> has certain limitations (listed at the start of the file).
-However, I expect it to handle everything-non-tricky (except the C<ATTRIBUTES>
-section — for which one may need to substitute F<msklc_altgr> by
-F<msklc_altgr_r2l> (after C<--with-extra-c> above) if C<RTL_LTR> flag is there).
-
-(These attributes affect only one line in these files — proceed likewise with 
-other C<ATTRIBUTE>s.)
+Here C<C_NAME> is as above.  This assumes that the directory named as C<C_NAME>
+contains the distribution files (F<.exe> and F<.msi>) created on the first
+two steps.
 
 =back
+
+However, one should remember that the script F<klc2c.pl> is still (as of 2024)
+pretty new; its limitations are listed at the start of the file.
+(However, I expect it to handle everything-not-extremely-tricky now.)
 
 This workflow (except the second part) is used by the example script
-L<F<examples/build_here.cmd>|https://search.cpan.org/~ilyaz/UI-KeyboardLayout/examples/build_here.cmd>
-used for generation of L<I<izKeys> layouts|http://k.ilyaz.org>.  This script
+L<F<examples/build_here.cmd>|https://search.cpan.org/~ilyaz/UI-KeyboardLayout/examples/build_here.cmd>.
+It is a part of the pathway used for generation of L<I<izKeys> layouts|http://k.ilyaz.org>.  This script
 assumes that the “fake” distributions (or the distributions of older versions)
 are in subdirectories F<iz-la-4s> etc. of the current directory, and that the
 F<.klc> files are in the parent directory (C<%src> above); moreover, it assumes
@@ -4386,9 +4810,7 @@ that C<%Keyboard_Layout_Creator%> is set so that
 
   %Keyboard_Layout_Creator%\bin\i386\kbdutool.exe
 
-exists).
-
-=back
+exists — although now it uses only the C compiler from this distribution).
 
 =head1 Workarounds for WINDOWS GOTCHAS for application developers (problems in kernel)
 
@@ -4920,9 +5342,9 @@ easy.  There is L<documentation of obvious errors in the naming|http://unicode.o
 
 However, this module tries to extract a certain amount of I<orthogonality>
 from the giant heap of characters defined in Unicode; the principal concept
-is “a mutator”.  Most mutators are defined by programmatic inspection of names 
+is “a mogrifier”.  Most mogrifiers are defined by programmatic inspection of names 
 of characters and relations between names of different characters.  (In other
-words, we base such mutators on names, not glyphs.)  Here we 
+words, we base such mogrifiers on names, not glyphs.)  Here we 
 sketch the irregularities uncovered during this process.
 
 APL symbols with C<UP TACK> and C<DOWN TACK> look reverted w.r.t. other
@@ -5086,7 +5508,7 @@ C<HEART> means C<WHITE HEART SUIT>.  C<TRIPLE HORIZONTAL BAR> looks genuinely mi
 
 C<SEMIDIRECT PRODUCT> means one of two, left or right???
 
-This better be convertible by rounding/sharpening mutators, but see
+This better be convertible by rounding/sharpening mogrifiers, but see
 C<BUT NOT/WITH NOT/OR NOT/AND SINGLE LINE NOT/ABOVE SINGLE LINE NOT/ABOVE NOT>
 
   2268    LESS-THAN BUT NOT EQUAL TO;             1.1
@@ -5467,6 +5889,27 @@ Scancodes visible on the low level:
 Scancodes visible on Windows (with USB)
 
   http://download.microsoft.com/download/1/6/1/161ba512-40e2-4cc9-843a-923143f3456c/translate.pdf
+
+Detailed description of production of scancodes (see after C<===>), including C<0x80xx> codes (and C<0xe2> Logitech prefix):
+
+  http://www.fysh.org/~zefram/keyboard/xt_scancodes.txt
+
+Ultra-exotic virtual keys
+
+See
+
+  https://learn.microsoft.com/en-us/previous-versions/aa931968(v=msdn.10)
+
+(note that C<OEM_ATTN OEM_COPY OEM_CUSEL OEM_ENLW> do not seem to have any scancodes assigned anywhere…).
+
+See also L<this discussion|https://stackoverflow.com/questions/11740958/js-what-keyboard-keys-are-specified-for-key-codes-in-intervals-146-185-193-218>.
+and L<these lists and references|https://bsakatu.net/doc/virtual-key-of-windows/>.
+
+(L<One of (industrial) keyboards with C<OEM_FJ_000>-key|https://geekhack.org/index.php?topic=60355.0> is a part of
+L<a huge family|https://telcontar.net/KBK/Fujitsu/series>.
+
+The less exotic “largish” keyboards are discussed in
+L<"Issues with support of European(ISO)/Brazilian(ABNT2)/Japanese(JIS) physical keyboards">.
 
 X11 XKB docs:
 
@@ -5947,13 +6390,12 @@ Print with something like (loading in a web browser after this):
 
 =head1 LIMITATIONS
 
-Currently only output for Windows keyboard layout drivers (via MSKLC) is available.
-
-Currently only the keyboards with US-mapping of hardware keys to "the etched
-symbols" are supported (think of German physical keyboards where Y/Z keycaps
-are swapped: Z is etched between T and U, and Y is to the left of X, or French
-which swaps A and Q, or French or Russian physical keyboards which have more
-alphabetical keys than 26).
+For the keyboards with non-US mapping of hardware keys to "the etched
+symbols", one should use the C<VK> section to describe the mapping of the
+C<VK_>-codes to scancodes.  (Recall that on German physical keyboards the Y/Z keycaps
+are swapped: Z is etched between T and U, and Y is to the left of X.  French
+keyboards swap A and Q as well as W and Z.   Moreover, French or Russian physical
+keyboards have more alphabetical keys than 26.)
 
 While the architecture of assembling a keyboard of small easy-to-describe
 pieces is (IMO) elegant and very powerful, and is proven to be useful, it 
@@ -5961,7 +6403,7 @@ still looks like a collection of independent hacks.  Many of these hacks
 look quite similar; it would be great to find a way to unify them, so 
 reduce the repertoir of operations for assembly.
 
-The current documentation of the module’s functionality is not complete.
+The current documentation of the module’s functionality is not fully complete.
 
 The implementation of the module is crumbling under its weight.  Its 
 evolution was by bloating (even when some design features were simplified).
@@ -5971,7 +6413,7 @@ to incredible amounts.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2011-2013 Ilya Zakharevich <ilyaz@cpan.org>
+Copyright (c) 2011-2024 Ilya Zakharevich <ilyaz@cpan.org>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.0 or,
@@ -6928,7 +7370,7 @@ sub massage_faces ($) {
     		      layers_modifiers layers_mods_keys mods_keys_KBD AltGrInv_AltGr_as_Ctrl
 		      ComposeKey_Show AltGr_Invert_Show Apple_Override Apple_Duplicate Apple_HexInput 
     		      ComposeKey Explicit_AltGr_Invert Auto_Diacritic_Start CapsLOCKoverride
-    		      WindowsEmitDeadkeyDescrREX ExtraChars) ) {
+    		      WindowsEmitDeadkeyDescrREX ExtraChars modkeys_vk) ) {
       $self->{faces}{$f}{"[$key]"} = $self->get_deep_via_parents($self, undef, 'faces', (split m(/), $f), $key);
     }
     $self->{faces}{$f}{'[char2key_prefer_first]'}{$_}++ 		# Make a hash
@@ -6976,7 +7418,10 @@ sub massage_faces ($) {
     (my ($seen, $seen_dead), $self->{faces}{$f}{'[dead_in_VK]'}) = $self->massage_VK($f);
     $self->{faces}{$f}{'[dead_in_VK_array]'} = $seen_dead;
     $self->{faces}{$f}{'[coverage_hex]'}{$self->key2hex($_)}++ for @$seen;
-    for my $S (@{ $self->{faces}{$f}{AltGrCharSubstitutions} || []}) {
+    $self->{faces}{$f}{"Altern$_"} ||= $self->{faces}{$f}{"AltGr$_"}
+       for qw(CharSubstitutions CharSubstitutionFaces CharSubstitutionLayers);
+    # Obsolete names
+    for my $S (@{ $self->{faces}{$f}{AlternCharSubstitutions} || []}) {
       my $s = $self->stringHEX2string($S);
       $s =~ s/\p{Blank}(?=\p{NonspacingMark})//g;
       die "Expect 2 chars in AltGr-char substitution rule; I see <$s> (from <$S>)" unless 2 == (my @s = split //, $s);
@@ -7001,7 +7446,7 @@ sub massage_faces ($) {
 #  $self->__dbg_latin_CtrlD;
   for my $f ($self->order_faces_4_massage) {	# Needed for face_make_backlinks: must know which keys in faces will be finally present
     next if 'HASH' ne ref $self->{faces}{$f} or $f =~ m(\bVK$);			# "parent" taking keys for a child
-    for my $F (@{ $self->{faces}{$f}{AltGrCharSubstitutionFaces} || []}) {	# Now has a chance to have real layers
+    for my $F (@{ $self->{faces}{$f}{AlternCharSubstitutionFaces} || []}) {	# Now has a chance to have real layers
       unless ($self->{faces}{$F}{layers}) {
         next unless $self->{face_recipes}{$F};
         $self->face_by_face_recipe($F, $f);
@@ -7025,8 +7470,8 @@ sub massage_faces ($) {
   for my $f ($self->order_faces_4_massage) {	# Needed for face_make_backlinks: must know which keys in faces will be finally present
     next if 'HASH' ne ref $self->{faces}{$f} or $f =~ m(\bVK$);			# "parent" taking keys for a child
     my $linked = $self->{faces}{$f}{LinkFace};
-    for my $N (0..$#{ $self->{faces}{$f}{AltGrCharSubstitutionLayers} || []}) {	# Now has a chance to have real layers
-      my $TO = my $to = $self->{faces}{$f}{AltGrCharSubstitutionLayers}[$N];
+    for my $N (0..$#{ $self->{faces}{$f}{AlternCharSubstitutionLayers} || []}) {	# Now has a chance to have real layers
+      my $TO = my $to = $self->{faces}{$f}{AlternCharSubstitutionLayers}[$N];
       my $from  = $self->{faces}{$f}{layers}[$N] or next;
       $self->revive_layer($f, $N, $TO) unless $self->{layers}{$TO};
       $_ = $self->{layers}{$_} for $from, $to;
@@ -7673,7 +8118,7 @@ in <b>.kbdd</b> files (usually <code>SPACE</code>).$more
 In popups: brackets enclose Script, Range, “1st Unicode version with this character”;
 braces enclose “the reason why this position was assigned to this character” (<code>VisLr</code> means that a visual table was 
 used; in <code>Subst{HOW}</code>, <code>L=Layer</code> and <code>F=Face</code> mean that a “BlueKey” substitution
-rule was defined via a special layer/face — see C<AltGrCharSubstitutions>, C<AltGrCharSubstitutionFaces> and C<AltGrCharSubstitutionLayers>).
+rule was defined via a special layer/face — see C<AlternCharSubstitutions>, C<AlternCharSubstitutionFaces> and C<AlternCharSubstitutionLayers>).
 </body>
 </html>
 EOP
@@ -8228,8 +8673,18 @@ my %oem_keys = do {{ no warnings 'qw' ; reverse (qw(
 		# e013 Word; e014 Excel; e015 Calendar; e016 Log Off; e017 Cut; e018 Copy; e01e ApplicationRight
 		# e03b -- e044 (Microsoft/Logitech Fkeys_without_Flock, F1...F10)
 		# e063 Wake; e064 My Pictures [or Keypad-) ]
-	# For type 4 of keyboard (same as types 1,3, except OEM_AX, (NON)CONVERT, ABNT_C1)
-	#   except KANA,(NON)CONVERT,; scancode of YEN,| for OEM_8 is our invention; after OEM_8 all is junk (non-scancodes???)...
+
+		#     (for yet more VK_-symbols see https://learn.microsoft.com/en-us/previous-versions/aa931968(v=msdn.10))
+				# OEM_ATTN OEM_COPY OEM_CUSEL OEM_ENLW do not have any scancodes assigned anywhere???
+		# The discussion: https://stackoverflow.com/questions/11740958/js-what-keyboard-keys-are-specified-for-key-codes-in-intervals-146-185-193-218
+
+		#  More details in (change “Arrangement” if needed): https://kbdlayout.info/kbdibm02/scancodes
+		#   see also this (and references there): https://bsakatu.net/doc/virtual-key-of-windows/
+		    #   One of (industrial) keyboards with 000-key: https://geekhack.org/index.php?topic=60355.0
+		    #     (Part of a huge family: https://telcontar.net/KBK/Fujitsu/series
+
+	# Before OEM_8:   For type 4 of keyboard (same as types 1,3, except OEM_AX, (NON)CONVERT, ABNT_C1)
+	#   except KANA,(NON)CONVERT; after OEM_8 all is junk (non-scancodes???)...
 my %scan_codes = (reverse qw(
   02	1
   03	2
@@ -8280,25 +8735,13 @@ my %scan_codes = (reverse qw(
   35	OEM_2
   39	SPACE
   56	OEM_102
-  53	DECIMAL
 
   01	ESCAPE
-  0C	OEM_MINUS
-  0D	OEM_PLUS
   0E	BACK
   0F	TAB
-  1A	OEM_4
-  1B	OEM_6
   1C	RETURN
   1D	LCONTROL
-  27	OEM_1
-  28	OEM_7
-  29	OEM_3
   2A	LSHIFT
-  2B	OEM_5
-  33	OEM_COMMA
-  34	OEM_PERIOD
-  35	OEM_2
   36	RSHIFT
   37	MULTIPLY
   38	LMENU
@@ -8329,7 +8772,6 @@ my %scan_codes = (reverse qw(
   52	INSERT
   e053	DELETE
   54	SNAPSHOT
-  56	OEM_102
   57	F11
   58	F12
   59	CLEAR
@@ -8364,6 +8806,7 @@ my %scan_codes = (reverse qw(
   7C	TAB
   7E	ABNT_C2
   7F	OEM_PA2
+
   e010	MEDIA_PREV_TRACK
   e019	MEDIA_NEXT_TRACK
   e01C	RETURN
@@ -8388,7 +8831,6 @@ my %scan_codes = (reverse qw(
   e050	DOWN
   e051	NEXT
   e052	INSERT
-  e053	DELETE
   e05B	LWIN
   e05C	RWIN
   e05D	APPS
@@ -8406,52 +8848,7 @@ my %scan_codes = (reverse qw(
   e11D	PAUSE
 
   7D	OEM_8
-
-  10	SHIFT
-  11	CONTROL
-  12	MENU
-  15	KANA
-  15	HANGUL
-  17	JUNJA
-  18	FINAL
-  19	HANJA
-  19	KANJI
-  1C	CONVERT
-  1D	NONCONVERT
-  1E	ACCEPT
-  1F	MODECHANGE
-  29	SELECT
-  2A	PRINT
-  2B	EXECUTE
-
-  60	NUMPAD0
-  61	NUMPAD1
-  62	NUMPAD2
-  63	NUMPAD3
-  64	NUMPAD4
-  65	NUMPAD5
-  66	NUMPAD6
-  67	NUMPAD7
-  68	NUMPAD8
-  69	NUMPAD9
-  6C	SEPARATOR
-  B4	MEDIA_LAUNCH_MAIL
-  B5	MEDIA_LAUNCH_MEDIA_SELECT
-  B6	MEDIA_LAUNCH_APP1
-  B7	MEDIA_LAUNCH_APP2
-
-  E5	PROCESSKEY
-  E7	PACKET
-  F6	ATTN
-  F7	CRSEL
-  F8	EXSEL
-  FA	PLAY
-  FC	NONAME
-  FD	PA1
-  FE	OEM_CLEAR
-
 ));	# http://www.opensource.apple.com/source/WebCore/WebCore-1C25/platform/gdk/KeyboardCodes.h
-	# the part after PAUSE is junk...
 
 # [ ] \ space
 my %oem_control = (qw(
@@ -8546,6 +8943,8 @@ sub massage_VK ($$) {
   $self->{faces}{$f}{'[scancodes]'} = \ my %scan;
   for my $K (reverse sort keys %$VK) {			# want SPACE to come before ABNT_* and OEM_102	;-)
     my ($v, @C) = $VK->{$K};
+    die("Can't reset the scancode for the VK key `$K'") if @$v < 2 and not length $v->[0];
+    $scan{$K} = $v->[0],  $self->{faces}{$f}{'[scancodes_more]'}{$v->[0]} = $K, next unless @$v > 1;	# Do not modify %VK_off; only memorize the scancode
     $v->[0] = $scan_codes{$K} or die("Can't find the scancode for the VK key `$K'")
       unless length $v->[0];
     $scan{$K} = $v->[0];
@@ -8732,23 +9131,23 @@ sub flatten_unit ($$$$) {
         $LL = $self->{faces}{$face}{'[deadkeyLayers]'}{$c} or die "Unknown prefix character `$c´ in extra layers";
       }
       my @L = map $self->{layers}{$_}[$N], @$LL;
-      my(@CC, @pp, @OK);
+      my(@CC, @pp, @OK);				# char/is_prefix/???  ; Indexed by $sh=Shift_state
       # With notsame, squeeze a face into a layer; dups are marked “free”, so have a chance to squeeze Alt to Shift (w/o “case”)
       for my $l (@L[0 .. ($notsame ? $b-1 : 0)]) {
         my(%s1, @unsh);		# s1 is "seen in this layer"
         for my $sh (0..$#$l) {	# These `map´s have 1 arg
           my @C = map {defined() ? (ref() ? $self->dead_with_inversion(!'hex', $_, $face, $self->{faces}{$face}) : $_) : $_} $l->[$sh];
           my @p = map {defined() ? (ref() ? $_->[2] : 0 ) : 0 } $l->[$sh];
-          next unless defined (my $c = $C[0]);
-          my $pref = !!$p[0] || 0;
-          ($CC[$sh], $pp[$sh]) = ($c, $pref) unless defined $CC[$sh];	# fallback
+          next unless defined (my $c = $C[0]);				# Get rid of this fake array with 1 element
+          my $pref = !!$p[0] || 0;					# Likewise
+          ($CC[$sh], $pp[$sh]) = ($c, $pref) unless defined $CC[$sh];	# fallback: fill if not defined yet in preceding layers
           $cnt++ if defined $CC[$sh];
-          next if $num;
-#          $ss{$C[0]}++ if $num;
+          next if $num;					# Continue for “extra” layers only
+#          $ss{$C[0]}++ if $num;			# Fill into the same Shift-position if “not-anywhere-in-the-main-layers”
           ($CC[$sh], $pp[$sh], $OK[$sh], $s1{"$pref$c"}) = ($c, $pref, 1,1) if !$OK[$sh] and not $ss{"$pref$c"};
           ($CC[$sh], $pp[$sh], $OK[$sh], $s1{"$unsh[1]$unsh[0]"}) = (@unsh, 1,1)		# use unshifted if needed
             if $sh and !$OK[$sh] and defined $unsh[0] and not $ss{"$unsh[1]$unsh[0]"} and not $s1{"$unsh[1]$unsh[0]"};
-          @unsh = ($c, $pref) unless $case or $sh;		# move AltGr-LETTER to Shift-LETTER if free (may omit `or $sh´)
+          @unsh = ($c, $pref) unless $case or $sh;	# move AltGr-LETTER to Shift-LETTER if free and not $case (may omit `or $sh´)
           $cnt++ if defined $CC[$sh];
         }
       }
@@ -8769,14 +9168,19 @@ my %double_scan_VK = ('56 OEM_102' => '7D OEM_8',	# ISO vs JIS (right) keyboard
 	#	      '7B NONCONVERT' => '79 CONVERT',	# JIS keyboard: left of SPACE, right of SPACE
 		      '39 SPACE' => '79 CONVERT/7B NONCONVERT',	# JIS keyboard: right of SPACE, left of SPACE
 );
-my %shift_control_extra = (2 => "\x00", 6 => "\x1e", OEM_MINUS => "\x1f");
+my %shift_control_extra = (2 => "\x00", 6 => "\x1e", OEM_MINUS => "\x1f");	# unshifted 2 hardwired below
 
 { my(%seen, %seen_scan, %seen_VK, @add_scan_VK, @ligatures, @decimal);
   sub reset_units ($) { @decimal = @ligatures = @add_scan_VK = %seen_scan = %seen_VK = %seen = () }
 
   sub output_unit00 ($$$$$$$;$$) {	# $UU->[$i] is the entry for the key in the layer No. $i; $N is an ordinal of a key; $k is VK_-names
     my ($self, $face, $k, $UU, $N, $deadkeys, $Used, $known_scancode, $skippable) = (shift, shift, shift, shift, shift, shift, shift, shift, shift);
-    my $sc = ($known_scancode or $scan_codes{$k}) or warn("Can't find the scancode for the key `$k'"), return;
+    my $sc = ($known_scancode or $self->{faces}{$face}{'[scancodes]'}{$k} or $scan_codes{$k}
+    			      or $k eq 'DECIMAL' and '53'	# kbdutool only accepts DECIMAL on 53
+			      or $k =~ /^(?:NUMPAD(\d)|DECIMAL)$/ and (defined $1 ? "E0E$1" : 'E0EA'))
+      or warn("Can't find the scancode for the key `$k'"), return;
+    $sc =~ /^E0E/ and warn "Redirected numpad key $k to a fake scancode $sc";
+    $self->{faces}{$face}{'[emitted_scancodes]'}{$sc}++;
     my ($cnt, @KK) = 0;
     my $skip = grep $k eq $_, @{$self->{faces}{$face}{'[skip_extra_layers_WIN]'}};
     my $flat = $self->flatten_unit($face, $N,
@@ -8946,11 +9350,20 @@ EOP
   }
 }
 
+sub output_layout_win_only_scancodes ($$) {
+  my ($self, $face) = (shift, shift);
+  my $only_sc = $self->{faces}{$face}{'[scancodes_more]'} || {};
+  my $emitted = $self->{faces}{$face}{'[emitted_scancodes]'} || {};	# Now all the unit00 are done, so this is filled
+  map "$_\t$only_sc->{$_}\n", grep !$emitted->{$_}, keys %$only_sc;
+}
+
 sub output_layout_win ($$$$$$$) {	# $baseK contains the VK_-names
   my ($self, $face, $layers, $deadkeys, $Used, $cnt, $baseK) = (shift, shift, shift, shift, shift, shift, shift);
 #  die "Count of non-VK entries mismatched: $cnt vs ", scalar @{$self->{layers}{$layers->[0]}}
 #    unless $cnt <= scalar @{$self->{layers}{$layers->[0]}};
-  map $self->output_unit($face, $layers, $_, $deadkeys, $Used, $_ >= $cnt, $baseK), 0..$#$baseK;
+  ( map($self->output_unit($face, $layers, $_, $deadkeys, $Used, $_ >= $cnt, $baseK), 0..$#$baseK),
+    output_layout_win_only_scancodes($self, $face)
+  );
 }
 
 sub output_VK_win ($$$) {	# Not used anymore!!!  XXXX ???
@@ -9030,6 +9443,7 @@ LOCALEID	"SORT_ORDER_ID_LOCALE_ID"
 
 VERSION	1.0
 
+MODIFIERS
 SHIFTSTATE
 
 BITS_TEMPLATE
@@ -9037,6 +9451,7 @@ ATTRIBS
 LAYOUT		;an extra '@' at the end is a dead key
 
 //SC	VK_		Cap	COL_HEADERS
+// in this row ⒸⒶ mean “right”:	COL_HUMAN
 //--	----		----	COL_EXPL
 LAYOUT_KEYS
 DO_LIGA
@@ -9490,26 +9905,26 @@ sub massage_diacritics ($) {			# "
 }
 
 sub extract_diacritic ($$$$$$@) {
-  my ($self, $dia, $idx, $which, $need, $skip2, @elt0) = (shift, shift, shift, shift, shift, shift);
-  my @v  = map @$_, my $elt0 = shift;			# first one full
+  my ($self, $dia, $idx, $which, $warn_after__need, $skip2) = (shift, shift, shift, shift, shift, shift);
+  my(@v, @elt0)  = map @$_, my $elt0 = shift;			# first one full
   push @v, map @$_[($skip2 ? 2 : 0)..$#$_], @_;		# join the rest, omitting the first 2 (assumed: accessible in other ways)
-  @elt0 = $elt0 if $skip2 and $skip2 eq 'skip2-include0';
+  @elt0 = $elt0 if $skip2 and $skip2 eq 'skip2-include0';	# include penalized “first 2 of 0th group”; the caller adjusts $idx
   push @v, grep defined, map @$_[0..1], @elt0, @_ if $skip2;
 #  @v = grep +((ord $_) >= 128 and $_ ne $dia), @v;
   @v = grep +(ord $_) >= 0x80, @v;
   die "diacritic `  $dia  ' has no $which no.$idx (0-based) assigned" 
-    unless $idx >= $need or defined $v[$idx];
+    unless $idx >= $warn_after__need or defined $v[$idx];
 # warn "Translating for dia=<$dia>: idx=$idx <$which> -> <$v[$idx]> of <@v>" if defined $v[$idx];
   return $v[$idx];
 }
 
 sub diacritic2self ($$$$$$$$$) {
-  my ($self, $dia, $c, $face, $N, $space, $c_base, $c_noalt, $seen_before) = (shift, shift, shift, shift, shift, shift, shift, shift, shift);
+  my ($self, $dia, $c, $face, $layer_N, $space, $c_base, $c_noalt, $seen_before) = (shift, shift, shift, shift, shift, shift, shift, shift, shift);
 #  warn("Translating for dia=<$dia>: got undef"),
   return $c unless defined $c;
 #  $c = $c->[0] if 'ARRAY' eq ref $c;			# Prefix keys behave as usual keys
 #  return undef if
-  my $prefix = (ref $c and $c->[2]);			# Ignore deadkeys (unless we act on $c_base or $c_noalt - UNIMPLEMENTED);
+  my $is_prefix = (ref $c and $c->[2]);			# Ignore deadkeys (unless we act on $c_base or $c_noalt - UNIMPLEMENTED);
   $_ and 'ARRAY' eq ref $_ and $_ = $_->[0] for $c, $c_base, $c_noalt;			# Prefix keys behave as usual keys
 #warn "  Translating for dia=<$dia>: got <$c>";
   die "`  $dia  ' not a known diacritic" unless my $name = $self->{'[map2diac]'}{$dia};
@@ -9520,8 +9935,8 @@ sub diacritic2self ($$$$$$$$$) {
   my $flip_AltGr = $self->{faces}{$face}{'[Flip_AltGr_Key]'};
   $flip_AltGr = $self->charhex2key($flip_AltGr) if defined $flip_AltGr;
   $flip_AltGr = 'n/a' unless defined $flip_AltGr;
-  my $is_flip_AltGr = (defined $flip_AltGr and $prefix and $c eq $flip_AltGr);
-  if ($c eq $dia and $prefix) {
+  my $is_flip_AltGr = (defined $flip_AltGr and $is_prefix and $c eq $flip_AltGr);
+  if ($c eq $dia and $is_prefix) {
 #warn "Translating2combining dia=<$dia>: got <$c>  --> <$v->[4][0]>";
     # This happens with caron which reaches breve as the first:
 #    warn "The diacritic `  $dia  ' differs from the first non-7bit entry `  $first  ' in its list" unless $dia eq $first;
@@ -9529,49 +9944,49 @@ sub diacritic2self ($$$$$$$$$) {
     return $v->[4][0];
   }
   my $limits = $self->{Diacritics_Limits}{ALL} || [(0) x 7];
-  if ($space->{$c}) {	# SPACE is handled above (we assume it is on index 0)...
-    # ~ and ^ have only 3 spacing variants; one of them must be on ' ' - and we omit the first 2 of non-principal block...
+  if ($space->{$c}) {	# index on the SPACE key (0-based, but SPACE is handled above — we assume it is on index 0)
+    # ~ and ^ have only 3 spacing variants; one of them must be on ' ' - and we omit the first 2 of the non-principal block...
     return $self->extract_diacritic($dia, $space->{$c}, 'spacing variant', $limits->[0], 'skip2', @$v[0..3]);
   } elsif (0 <= (my $off = index "\r\t\n\x1b\x1d\x1c\b\x7f\x1e\x1f\x00", $c)
-	   and not $prefix) {	# Enter, Tab, C-Enter, C-[, C-], C-\, Bspc, C-Bspc, C-^, C-_, C-@
+	   and not $is_prefix) {	# Enter, Tab, C-Enter, C-[, C-], C-\, Bspc, C-Bspc, C-^, C-_, C-@
     # ~ and ^ have only 3 spacing variants; one of them must be on ' '
     return $self->extract_diacritic($dia, $spaces + $off, 'spacing variant', $limits->[0], 'skip2', @$v[0..3]);
-  } elsif (!$spaces and $c =~ /^\p{Blank}$/ and not $prefix) {	# NBSP and, (eg) Thin space 2007	-> second/third modifier
+  } elsif (!$spaces and $c =~ /^\p{Blank}$/ and not $is_prefix) {	# NBSP and, (eg) Thin space 2007	-> second/third modifier
     # ~ and ^ have only 3 spacing variants; one of them must be on ' '
     my @pre = grep /^\p{Blank}$/, keys %$seen_before;	# no prefix keys in $seen_before
     push @pre, 'something' unless $seen_before->{' '};	# there is no sense to address slot number 0
     return $self->extract_diacritic($dia, scalar @pre, 'spacing variant', $limits->[0], 'skip2', @$v[0..3]);
   }
-  if ($c eq "|" or $c eq "\\" and not $prefix) {
+  if ($c eq "|" or $c eq "\\" and not $is_prefix) {
 #warn "Translating2vertical dia=<$dia>: got <$c>  --> <$v->[4][0]>";	# Skip2 would hurt, since macron+\ is defined:
     return $self->extract_diacritic($dia, ($c eq "|"), 'vertical+etc spacing variant', $limits->[2], !'skip2', @$v[2..3]);
   }
-  if ($N == 1 and $c_noalt and ($c_noalt eq "|" or $c_noalt eq "\\")) {
-#warn "Translating2vertical dia=<$dia>: got <$c>  --> <$v->[4][0]>";	# Skip2 would hurt, since macron+\ is defined:
+  if ($layer_N == 1 and $c_noalt and ($c_noalt eq "|" or $c_noalt eq "\\")) {
+#warn "Translating2vertical dia=<$dia>: got <$c>  --> <$v->[4][0]>";	
     return $self->extract_diacritic($dia, ($c_noalt eq "|"), 'vertical+dotlike combining', $limits->[6], 'skip2', @$v[6,7,4,5]);
   }
-  if ($c eq "/" or $c eq "?" and not $prefix) {
+  if ($c eq "/" or $c eq "?" and not $is_prefix) {
     return $self->extract_diacritic($dia, ($c eq "?"), 'prime-like+etc spacing variant', $limits->[3], 'skip2', @$v[3]);
   }
   if ($c_noalt and ($c_noalt eq "'" or $c_noalt eq '"')) {
-    return $self->extract_diacritic($dia, 1 + ($c_noalt eq '"') + 2*$N, 'combining', $limits->[4], 'skip2', @$v[4..7]);	# 1 for double-prefix
+    return $self->extract_diacritic($dia, 1 + ($c_noalt eq '"') + 2*$layer_N, 'combining', $limits->[4], 'skip2', @$v[4..7]);	# 1 for double-prefix
   }
-  if ($c eq "_" or $c eq "-" and not $prefix) {
+  if ($c eq "_" or $c eq "-" and not $is_prefix) {
     return $self->extract_diacritic($dia, ($c eq "_"), 'lowered+etc spacing variant', $limits->[1], 'skip2', @$v[1..3]);
   }
-  if ($N == 1 and $c_noalt and ($c_noalt eq "_" or $c_noalt eq "-")) {
+  if ($layer_N == 1 and $c_noalt and ($c_noalt eq "_" or $c_noalt eq "-")) {
     return $self->extract_diacritic($dia, ($c_noalt eq "_"), 'lowered combining', $limits->[5], 'skip2', @$v[5..7,4]);
   }
-  if ($N == 1 and $c_noalt and ($c_noalt eq ";" or $c_noalt eq ":")) {
+  if ($layer_N == 1 and $c_noalt and ($c_noalt eq ";" or $c_noalt eq ":")) {
     return $self->extract_diacritic($dia, ($c_noalt eq ":"), 'combining for symbols', $limits->[7], 'skip2', @$v[7,4..6]);
   }
-  if ($N == 1 and defined $c_base and 0 <= (my $ind = index "`1234567890=[],.'", $c_base)) {
+  if ($layer_N == 1 and defined $c_base and 0 <= (my $ind = index "`1234567890=[],.'", $c_base)) {
     return $self->extract_diacritic($dia, 2 + $ind, 'combining', $limits->[4], 'skip2-include0', @$v[4..7]);	# -1 for `, 1+2 for double-prefix and AltGr-/?
   }
-  if ($N == 0 and 0 <= (my $ind = index "[{]}", $c) and not $prefix) {
+  if ($layer_N == 0 and 0 <= (my $ind = index "[{]}", $c) and not $is_prefix) {
     return $self->extract_diacritic($dia, 2 + $ind, 'combining for symbols', $limits->[7], 'skip2-include0', @$v[7,4..6]);
   }
-  if ($N == 1 and $c_noalt and ($c_noalt eq "/" or $c_noalt eq "?")) {
+  if ($layer_N == 1 and $c_noalt and ($c_noalt eq "/" or $c_noalt eq "?")) {
     return $self->extract_diacritic($dia, 6 + ($c_noalt eq "?"), 'combining for symbols', $limits->[7], 'skip2-include0', @$v[7,4..6]);
   }
   return undef;
@@ -10346,14 +10761,14 @@ sub pseudo_layer0 ($$$$) {
     return ($self->export_layers("$3", $face, !!$1))->[$m1 ? $N : $N1]
       if $recipe =~ /^(Full)?(?:(Face)|FlipLayers)\((.*)\)$/ and ($m1 = $2, 1);
   }
-  if ($recipe =~ /^prefix(NOTSAME(case)?)?=(.+)$/) {	# `case´ unsupported
+  if ($recipe =~ /^prefix(NOTSAME(case)?)?=(.+)$/) {
     # Analogue of NOID with the principal layers as reference, and layers of DeadKey as sources
     my($notsame, $case) = ($1,$2);
     my $hexPrefix = $self->key2hex($self->charhex2key($3));
 	warn "  mk_tr_lyrs pre-7 e_D_M" if debug_stacking_ord;
     $self->ensure_DeadKey_Map($face, $hexPrefix);
     my $layers = $self->{faces}{$face}{'[deadkeyLayers]'}{$hexPrefix} or die "Unknown prefix character `$hexPrefix´ in layers-from-prefix-key";
-    return $layers->[$N] if $N or not $notsame;
+    return $layers->[$N] if $N or not $notsame;		# After this $N==0 and $notsame
     my $name = "NOTSAME[$face]$layers->[$N]";
     return $self->{layers}{$name} if $self->{layers}{$name};
     my @LL = map $self->{layers}{$_}, @$layers;
@@ -10361,22 +10776,23 @@ sub pseudo_layer0 ($$$$) {
     my @L0 = map $self->{layers}{$_}, @$L0;
     my @OUT;
     for my $charN (0..$face->{'[non_VK]'}-1) {
-      my (@L, %ss) = map $_->[$charN], @LL;
+      my (@L, %seen_baseface) = map $_->[$charN], @LL;	# %seen_baseface: chars present in the base face in this position
       for my $layers0 (map $_->[$charN], @$L0) {
         for my $sh (@$layers0) {
-          $ss{ref($sh) ? $sh->[0] : $sh}++ if defined $sh;
+          $seen_baseface{ref($sh) ? $sh->[0] : $sh}++ if defined $sh;
         }
       }
-      my(@CC, @pp, @OK);
+      my(@CC, @pp, @OK);	# Inspect this position in Layer 0 (or all if $notsame and emitting layer 0: this hold automatically!???):
       for my $l (@L[0 .. (($notsame && !$N) ? @{ $self->{faces}{$face}{layers} } - 1 : 0)]) {
         my(%s1, @was, @out);
         for my $sh (0..$#$l) {		# $self->dead_with_inversion(!'hex', $_, $face, $self->{faces}{$face})
           my @C = map {defined() ? (ref() ? $_->[0] : $_) : $_} $l->[$sh];
           my @p = map {defined() ? (ref() ? $_->[2] : 0 ) : 0 } $l->[$sh];
-          ($CC[$sh], $pp[$sh]) = ($C[0], $p[0]) if not defined $CC[$sh] and defined $C[0];
-          ($CC[$sh], $pp[$sh], $OK[$sh], $s1{$C[0]}) = ($C[0], $p[0], 1,1) if !$OK[$sh] and defined $C[0] and not $ss{$C[0]};
-          ($CC[$sh], $pp[$sh], $OK[$sh], $s1{$was[0]}) = (@was, 1,1)		# use unshifted if needed
-            if $sh and !$OK[$sh] and defined $C[0] and defined $was[0] and not $ss{$was[0]} and not $s1{$was[0]};
+          ($CC[$sh], $pp[$sh]) = ($C[0], $p[0]) if not defined $CC[$sh] and defined $C[0];	# fallback: merge to L=0 even if dup
+          ($CC[$sh], $pp[$sh], $OK[$sh], $s1{$C[0]}) = ($C[0], $p[0], 1,1) if !$OK[$sh] and defined $C[0] and not $seen_baseface{$C[0]};
+          ($CC[$sh], $pp[$sh], $OK[$sh], $s1{$was[0]}) = (@was, 1,1)	# Do layer>0 !Shift ⇝ Shift-layer0 if not dup and not used yet
+            if !$case and $sh and !$OK[$sh] and defined $C[0] and defined $was[0]
+		and not $seen_baseface{$was[0]} and not $s1{$was[0]};
           @was = ($C[0], $p[0]) unless $sh;		# may omit `unless´
 #          $cnt++ if defined $CC[$sh];
         }
@@ -10934,7 +11350,7 @@ sub fill_win_template ($$$;$$) {
     $h{ATTRIBS} = '';				# default
   }
   if ($dummy) {
-    @h{qw(DO_LIGA COL_HEADERS COL_EXPL KEYNAMES_DEAD DEADKEYS)} = ('') x 5;
+    @h{qw(DO_LIGA COL_HEADERS COL_EXPL KEYNAMES_DEAD DEADKEYS MODIFIERS)} = ('') x 6;
     @h{qw(LAYOUT_KEYS BITS_TEMPLATE)} = (<<EOT, <<EOT);
 10	Q	0	q	-1	-1	// LATIN SMALL LETTER Q, <none>, <none>
 EOT
@@ -10993,12 +11409,26 @@ EOPREF
   #warn "Translate: ", %h;
     $h{DEADKEYS} = $OUT;
     $h{KEYNAMES_DEAD} = $OUT_NAMES;
-    my %mods = qw( S 1 C 2 A 4 K 8 X 16 Y 32 Z 64 T 128 R 16 L 32);
+    my %modsF = qw( SHIFT 1 CTRL 2 ALT 4 KANA 8 X 16 Y 32 Z 64 T 128 U 256 V 512 W 1024 ROYA 16 LOYA 32 GRPSELTAP 128 );
+    my %mods =   map {(substr($_,0, 1), $modsF{$_})} keys %modsF;
+    my(%mfFULL, $mks) = map {(substr($_,0, 1), length > 1 ? $_ : "_$_")}  keys %modsF;
+    if (@{ $mks = $F->{'[mods_keys_KBD]'} }) {
+      my(%mks) = @$mks;
+      $h{MODIFIERS} = "MODIFIERS\n";
+      my %vk = (qw(S SHIFT C CONTROL A MENU), @{$F->{'[modkeys_vk]'} || []});
+      (my $vkRX = join '', keys %vk) =~ /\W/ and die 'Non-letter in @modkeys_vk = (' . join(" ", sort keys %vk) . ')'; # XXX Needed???
+      for my $K (sort keys %mks) {	# ??? Need to take into account @modkeys_vk  XXX
+        my($preK, $KK) = ($K =~ /^([lr]?)([$vkRX])$/) or die "Unexpected key <<<$K>>> of mods_keys_KBD";	# [ACKLR-Z]
+        $h{MODIFIERS} .= "    \U$preK\E$vk{$KK}\tKBD" . join(' | KBD', map "$mfFULL{$_}", split //, $mks{$K}) . "\n" ;
+      }
+      $h{MODIFIERS} .= "\n" ;
+    }
     $_ += 0 for values %mods;			# Convert to numbers, so | works as expected
     my @cols;
-    my %tr_mods_keys = ( @{ $F->{'[mods_keys_KBD]'} || [qw(rA CA)] } );
-    my $mods_keys = $F->{'[layers_mods_keys]'} || ['', 'rA'];
-    my $mods = $F->{'[layers_modifiers]'} || []; # || ['', 'CA'];	# Plain, and Control-Alt
+    my %tr_mods_keys = ( @{ $F->{'[mods_keys_KBD]'} || (@{$F->{layers}} > 1 ? [qw(rA CA)] : [] ) } );
+    my $mods_keys = $F->{'[layers_mods_keys]'} || (@{$F->{layers}} > 1 ? ['', 'rA'] : ['']);
+    my $mods = $F->{'[layers_modifiers]'} || []; # || ['', 'CA'];	# Plain, and Control-Alt (Obsolete variant)
+    my @hCols = map {my $in = $_; $in =~ s/rC/Ⓒ/; $in =~ s/rA/Ⓐ/; $in =~ s/l(?=CA)//g;  $in } @$mods_keys; # human-readable ⒸⒶ ⇒ right
     $#$mods = $#$mods_keys if $#$mods < $#$mods_keys;
     for my $MOD ( @$mods ) {
       my $mask = 0;
@@ -11011,7 +11441,8 @@ EOPREF
       $mask |= $mods{$_} for split //, $mod;
       push @cols, $mask;
     }
-    @cols = map {($_, $_ | $mods{S})} @cols;	# Add shift
+    @cols  = map {($_, $_ | $mods{S})} @cols;	# Add shift
+    @hCols = map {($_, "${_}S")}       @hCols;	# Add shift
 
     my($ctrl_f,$ctrl_F) = ($mods{C}, $tr_mods_keys{lC} || $tr_mods_keys{C} || $tr_mods_keys{rC} || 'C');	# Prefer left-Ctrl
     # $ctrl_f |= $mods{$_} for split //, $ctrl_F;		# kbdutool complains if there is no column for 'C'
@@ -11020,10 +11451,13 @@ EOPREF
     $pre_ctrl = 2*$ctrl_after unless defined $pre_ctrl;
     my $create_a_c = $self->get_deep($self, @$k, '[create_alpha_ctrl]');
     $create_a_c = $create_alpha_ctrl unless defined $create_a_c;
-    splice @cols, $pre_ctrl, 0, $ctrl_f, ($create_a_c>1 ? $ctrl_f|$mods{S} : ());	# Control (and maybe Control-Shift)
-    splice @cols, 15, 0, $mods{A} if @cols >= 16;	# col=15 is the fake one; assigning it to Alt is the best palliative to fixing MSKLC
+    splice @cols,  $pre_ctrl, 0, $ctrl_f, ($create_a_c>1 ? $ctrl_f|$mods{S} : ());	# Control (and maybe Control-Shift)
+    splice @hCols, $pre_ctrl, 0, "C",     ($create_a_c>1 ? "CS" : ());			# Control (and maybe Control-Shift)
+    splice @cols,  15, 0, $mods{A}  if @cols >= 16;	# col=15 is the fake one; assigning it to Alt is the best palliative to fixing MSKLC
+    splice @hCols, 15, 0, 'Invalid' if @cols >= 16;		# due to KBDALT stripping, the column for Alt is not reachable anyway
     $h{COL_HEADERS} = join "\t", map sprintf('%-3d[%d]', $cols[$_], $_), 0..$#cols;
-    $h{COL_EXPL} = join "\t", map $self->fmt_bitmap_mods($cols[$_], $_, 'short'), 0..$#cols;
+    $h{COL_EXPL}  = join "\t", map $self->fmt_bitmap_mods($cols[$_], $_, 'short'), 0..$#cols;
+    $h{COL_HUMAN} = join "\t", map $hCols[$_],                                     0..$#cols;
     $h{BITS_TEMPLATE} = join "\n", map { "$cols[$_]\t// Column " . (4+$_) . " :\t" . $self->fmt_bitmap_mods($cols[$_], $_) } 0..$#cols;
   #  $h{BITS_TEMPLATE} =~ s(^(?=.*\bInvalid$))(#)m;					# XXX Actually, MSKLC is not ignoring the leading #
   }
@@ -11938,7 +12372,7 @@ warn "done undo <$C> <@$m>: -> ", $self->array2string(\@out) if warnDO_COMPOSE; 
 sub compound_composition ($$$) {
   my ($self, $M, $C, $doc, $doc1, @res, %seen) = (shift, shift, shift, '', '');
   return undef unless defined $C;
-  $doc1 = $C->[3] if 'ARRAY' eq ref $C and defined $C->[3];	# may be used via <reveal-substkeys, when $M is empty
+  $doc1 = $C->[3] if 'ARRAY' eq ref $C and defined $C->[3];	# may be used via <reveal-substkey>, when $M is empty
   $doc = "$doc1 ⇒ " if length $doc1;
   $C = $C->[0] if 'ARRAY' eq ref $C;
 warn "composing `$M' with base <$C>" if warnDO_COMPOSE;
@@ -11962,6 +12396,7 @@ warn "composing `$M' with base <$C>" if warnDO_COMPOSE;
       }
     } else {
 #warn "compose `$m' with bases <", join('> <', map $_->[1], @$C), '>';
+#      warn "composition <<<$m>>> unknown" unless keys %{ $self->{Compositions}{$m} } or $m eq '<reveal-substkey>';
       @res = map $self->{Compositions}{$m}{$_->[1]}, @$C;
     }
     @res = map @$_, grep defined, @res;
@@ -11972,10 +12407,10 @@ warn "composing `$M' with base <$C>" if warnDO_COMPOSE;
 }
 
 sub compound_composition_many ($$$$) {		# As above, but takes an array of [char, docs]
-  my ($self, $M, $CC, $ini, @res) = (shift, shift, shift, shift);
+  my ($self, $M, $CC, $ini) = (shift, shift, shift, shift);
   return undef unless $CC;
   my $doc = (($ini and ref $ini and defined $ini->[3]) ? "$ini->[3] ⇒ Subst{" : '');
-  my $doc1 = $doc && '}';
+  my($doc1, @res) = $doc && '}';
   for my $C (@$CC) {
 #    $C = $C->[0] if 'ARRAY' eq ref $C;
     next unless defined $C;
@@ -12032,10 +12467,13 @@ warn "compounding ", $self->array2string($C) if warnSORTCOMPOSE;
       }
       for my $L (0..$#C) {		# Layer number; indexes a shift-pair
 #        my @res2 = map {defined($_) ? $self->{Compositions}{$M}{$_} : undef } @{ $C[$L] };
-        my @Res2 = map $self->compound_composition($M, $_), @{ $C->[$L] };	# elt: [$synth, $char]
+###	$M =~ s/^<reveal-(?:green|subst)key>$//; # Hack: the rule <reveal-substkey> ⇝ an empty rule — which always succeeds
         my @working_with = grep defined, @{ $C[$L] };				# ., KP_Decimal gives [. undef]
+        my @Res2 = map $self->compound_composition($M, $_), @{ $C->[$L] };	# elt: [$synth, $char]
 warn "compound  `$M' of [@working_with] -> ", $self->array2string(\@Res2) if warnSORTCOMPOSE;
-        (my $MMM = $M) =~ s/(^|\+)<reveal-(?:green|subst)key>$//; # Hack: the rule <reveal-substkey> always fails if present, empty always succeeds
+		# Now retry with substituted keys $Sub; Hack: the rule <reveal-substkey> is unknown to the rest of this module,
+		# so always fails if present in a chain, here we remove it — and an empty mogrifier list always succeeds
+        (my $MMM = $M) =~ s/(^|\+)<reveal-(?:green|subst)key>$//; # 
         my @Res3 = map $self->compound_composition_many($MMM, (defined() ? $Sub->{($_ and ref) ? $_->[0] : $_} : $_), $_), 
         	   @{ $C->[$L] };
 warn "compound+ `$M' of [@working_with] -> ", $self->array2string(\@Res3) if warnSORTCOMPOSE;

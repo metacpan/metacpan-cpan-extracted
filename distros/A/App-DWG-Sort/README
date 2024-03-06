@@ -1,0 +1,42 @@
+NAME
+    dwg-sort - Tool to sort DWG files by version.
+
+SYNOPSIS
+     dwg-sort [-h] [--version] directory
+
+DESCRIPTION
+    Tool is looking for all DWG files in directory and move them to
+    directories named after DWG magic strings.
+
+ARGUMENTS
+    *       "-h"
+
+            Print help.
+
+    *       "--version"
+
+            Print version of script.
+
+    *       "directory"
+
+            Directory with DWG files.
+
+EXAMPLE
+     dwg-sort -h
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/App-DWG-Sort>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2024 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

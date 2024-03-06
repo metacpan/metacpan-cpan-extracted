@@ -5,6 +5,8 @@ README
 TODO-apple
 TODO-X11
 TODO
+TSF-framework---autotranslated
+TSF-framework
 t/UI-KeyboardLayout.t
 lib/UI/KeyboardLayout.pm
 lib/UI/KeyboardLayout/izKeys.pod

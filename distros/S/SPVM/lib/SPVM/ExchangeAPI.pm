@@ -69,16 +69,16 @@ sub new_object_array {
   my ($basic_type_name, $type_dimension) = $self->_parse_type_name($type_name);
   
   unless (defined $basic_type_name) {
-    confess "The type name \$type_name was parsed, but the class name could not be extracted";
+    confess("The type name \$type_name was parsed, but the class name could not be extracted");
   }
   
   unless ($type_dimension == 1) {
-    confess "The dimension of the type \$type_name must be 1";
+    confess("The dimension of the type \$type_name must be 1");
   }
   
   my $ret;
   eval { $ret = $self->_xs_new_object_array($basic_type_name, $array) };
-  if ($@) { confess $@ }
+  if ($@) { confess($@) }
   
   return $ret;
 }
@@ -89,16 +89,16 @@ sub new_object_array_len {
   my ($basic_type_name, $type_dimension) = $self->_parse_type_name($type_name);
   
   unless (defined $basic_type_name) {
-    confess "The type name \$type_name was parsed, but the class name could not be extracted";
+    confess("The type name \$type_name was parsed, but the class name could not be extracted");
   }
   
   unless ($type_dimension == 1) {
-    confess "The dimension of the type \$type_name must be 1";
+    confess("The dimension of the type \$type_name must be 1");
   }
   
   my $ret;
   eval { $ret = $self->_xs_new_object_array_len($basic_type_name, $length) };
-  if ($@) { confess $@ }
+  if ($@) { confess($@) }
   
   return $ret;
 }
@@ -125,7 +125,7 @@ sub new_options {
   my ($self, $options) = @_;
   
   unless (ref $options eq 'HASH') {
-    confess "\$options must be a hash reference";
+    confess("\$options must be a hash reference");
   }
   
   my $array_ref = [];
@@ -134,7 +134,7 @@ sub new_options {
     my $value = $options->{$name};
     if (defined $value) {
       unless (blessed $value && $value->isa('SPVM::BlessedObject')) {
-        confess "The value of \$options must be a SPVM::BlessedObject object";
+        confess("The value of \$options must be an SPVM::BlessedObject object");
       }
     }
     push @$array_ref, $obj_name, $value;
@@ -151,16 +151,16 @@ sub new_mulnum_array {
   my ($basic_type_name, $type_dimension) = $self->_parse_type_name($type_name);
   
   unless (defined $basic_type_name) {
-    confess "The type name \$type_name was parsed, but the class name could not be extracted";
+    confess("The type name \$type_name was parsed, but the class name could not be extracted");
   }
   
   unless ($type_dimension == 1) {
-    confess "The dimension of the type \$type_name must be 1";
+    confess("The dimension of the type \$type_name must be 1");
   }
   
   my $ret;
   eval { $ret = $self->_xs_new_mulnum_array($basic_type_name, $array) };
-  if ($@) { confess $@ }
+  if ($@) { confess($@) }
   
   return $ret;
 }
@@ -171,16 +171,16 @@ sub new_mulnum_array_len {
   my ($basic_type_name, $type_dimension) = $self->_parse_type_name($type_name);
   
   unless (defined $basic_type_name) {
-    confess "The type name \$type_name was parsed, but the class name could not be extracted";
+    confess("The type name \$type_name was parsed, but the class name could not be extracted");
   }
   
   unless ($type_dimension == 1) {
-    confess "The dimension of the type \$type_name must be 1";
+    confess("The dimension of the type \$type_name must be 1");
   }
   
   my $ret;
   eval { $ret = $self->_xs_new_mulnum_array_len($basic_type_name, $length) };
-  if ($@) { confess $@ }
+  if ($@) { confess($@) }
   
   return $ret;
 }
@@ -191,15 +191,15 @@ sub new_mulnum_array_from_bin {
   my ($basic_type_name, $type_dimension) = $self->_parse_type_name($type_name);
   
   unless (defined $basic_type_name) {
-    confess "The type name \$type_name was parsed, but the class name could not be extracted";
+    confess("The type name \$type_name was parsed, but the class name could not be extracted");
   }
   
   unless ($type_dimension == 1) {
-    confess "The dimension of the type \$type_name must be 1";
+    confess("The dimension of the type \$type_name must be 1");
   }
   my $ret;
   eval { $ret = $self->_xs_new_mulnum_array_from_bin($basic_type_name, $binary) };
-  if ($@) { confess $@ }
+  if ($@) { confess($@) }
   
   return $ret;
 }
@@ -210,16 +210,16 @@ sub new_muldim_array {
   my ($basic_type_name, $type_dimension) = $self->_parse_type_name($type_name);
   
   unless (defined $basic_type_name) {
-    confess "The type name \$type_name was parsed, but the class name could not be extracted";
+    confess("The type name \$type_name was parsed, but the class name could not be extracted");
   }
   
   unless ($type_dimension >= 2 && $type_dimension <= 255) {
-    confess "The dimension of the type \$type_name must be greater than or equal to 2 and less than or equal to 255";
+    confess("The dimension of the type \$type_name must be greater than or equal to 2 and less than or equal to 255");
   }
   
   my $ret;
   eval { $ret = $self->_xs_new_muldim_array($basic_type_name, $type_dimension, $array) };
-  if ($@) { confess $@ }
+  if ($@) { confess($@) }
   
   return $ret;
 }
@@ -230,16 +230,16 @@ sub new_muldim_array_len {
   my ($basic_type_name, $type_dimension) = $self->_parse_type_name($type_name);
   
   unless (defined $basic_type_name) {
-    confess "The type name \$type_name was parsed, but the class name could not be extracted";
+    confess("The type name \$type_name was parsed, but the class name could not be extracted");
   }
   
   unless ($type_dimension >= 2 && $type_dimension <= 255) {
-    confess "The dimension of the type \$type_name must be greater than or equal to 2 and less than or equal to 255";
+    confess("The dimension of the type \$type_name must be greater than or equal to 2 and less than or equal to 255");
   }
   
   my $ret;
   eval { $ret = $self->_xs_new_muldim_array_len($basic_type_name, $type_dimension, $length) };
-  if ($@) { confess $@ }
+  if ($@) { confess($@) }
   
   return $ret;
 }
@@ -262,37 +262,37 @@ sub new_error {
 
 # other functions is implemented in SPVM.xs
 
-sub new_string { my $ret; eval { $ret =  &_xs_new_string(@_) }; if ($@) { confess $@ } $ret}
-sub new_address_object { my $ret; eval { $ret =  &_xs_new_address_object(@_) }; if ($@) { confess $@ } $ret}
-sub new_byte_array { my $ret; eval { $ret =  &_xs_new_byte_array(@_) }; if ($@) { confess $@ } $ret}
-sub new_byte_array_unsigned { my $ret; eval { $ret =  &_xs_new_byte_array_unsigned(@_) }; if ($@) { confess $@ } $ret}
-sub new_byte_array_len { my $ret; eval { $ret =  &_xs_new_byte_array_len(@_) }; if ($@) { confess $@ } $ret}
-sub new_byte_array_from_bin { my $ret; eval { $ret =  &_xs_new_byte_array_from_bin(@_) }; if ($@) { confess $@ } $ret}
-sub new_short_array { my $ret; eval { $ret =  &_xs_new_short_array(@_) }; if ($@) { confess $@ } $ret}
-sub new_short_array_unsigned { my $ret; eval { $ret =  &_xs_new_short_array_unsigned(@_) }; if ($@) { confess $@ } $ret}
-sub new_short_array_len { my $ret; eval { $ret =  &_xs_new_short_array_len(@_) }; if ($@) { confess $@ } $ret}
-sub new_short_array_from_bin { my $ret; eval { $ret =  &_xs_new_short_array_from_bin(@_) }; if ($@) { confess $@ } $ret}
-sub new_int_array { my $ret; eval { $ret =  &_xs_new_int_array(@_) }; if ($@) { confess $@ } $ret}
-sub new_int_array_unsigned { my $ret; eval { $ret =  &_xs_new_int_array_unsigned(@_) }; if ($@) { confess $@ } $ret}
-sub new_int_array_len { my $ret; eval { $ret =  &_xs_new_int_array_len(@_) }; if ($@) { confess $@ } $ret}
-sub new_int_array_from_bin { my $ret; eval { $ret =  &_xs_new_int_array_from_bin(@_) }; if ($@) { confess $@ } $ret}
-sub new_long_array { my $ret; eval { $ret =  &_xs_new_long_array(@_) }; if ($@) { confess $@ } $ret}
-sub new_long_array_unsigned { my $ret; eval { $ret =  &_xs_new_long_array_unsigned(@_) }; if ($@) { confess $@ } $ret}
-sub new_long_array_len { my $ret; eval { $ret =  &_xs_new_long_array_len(@_) }; if ($@) { confess $@ } $ret}
-sub new_long_array_from_bin { my $ret; eval { $ret =  &_xs_new_long_array_from_bin(@_) }; if ($@) { confess $@ } $ret}
-sub new_double_array { my $ret; eval { $ret =  &_xs_new_double_array(@_) }; if ($@) { confess $@ } $ret}
-sub new_double_array_len { my $ret; eval { $ret =  &_xs_new_double_array_len(@_) }; if ($@) { confess $@ } $ret}
-sub new_double_array_from_bin { my $ret; eval { $ret =  &_xs_new_double_array_from_bin(@_) }; if ($@) { confess $@ } $ret}
-sub new_float_array { my $ret; eval { $ret =  &_xs_new_float_array(@_) }; if ($@) { confess $@ } $ret}
-sub new_float_array_len { my $ret; eval { $ret =  &_xs_new_float_array_len(@_) }; if ($@) { confess $@ } $ret}
-sub new_float_array_from_bin { my $ret; eval { $ret =  &_xs_new_float_array_from_bin(@_) }; if ($@) { confess $@ } $ret}
-sub new_string_array { my $ret; eval { $ret =  &_xs_new_string_array(@_) }; if ($@) { confess $@ } $ret}
-sub new_string_array_len { my $ret; eval { $ret =  &_xs_new_string_array_len(@_) }; if ($@) { confess $@ } $ret}
-sub dump { my $ret; eval { $ret =  &_xs_dump(@_) }; if ($@) { confess $@ } $ret}
-sub get_exception { my $ret; eval { $ret =  &_xs_get_exception(@_) }; if ($@) { confess $@ } $ret}
-sub set_exception { my $ret; eval { $ret =  &_xs_set_exception(@_) }; if ($@) { confess $@ } $ret}
-sub get_memory_blocks_count { my $ret; eval { $ret =  &_xs_get_memory_blocks_count(@_) }; if ($@) { confess $@ } $ret}
-sub call_method { my $ret; eval { $ret =  &_xs_call_method(@_) }; if ($@) { confess $@ } $ret}
+sub new_string { my $ret; eval { $ret =  &_xs_new_string(@_) }; if ($@) { confess($@) } $ret}
+sub new_address_object { my $ret; eval { $ret =  &_xs_new_address_object(@_) }; if ($@) { confess($@) } $ret}
+sub new_byte_array { my $ret; eval { $ret =  &_xs_new_byte_array(@_) }; if ($@) { confess($@) } $ret}
+sub new_byte_array_unsigned { my $ret; eval { $ret =  &_xs_new_byte_array_unsigned(@_) }; if ($@) { confess($@) } $ret}
+sub new_byte_array_len { my $ret; eval { $ret =  &_xs_new_byte_array_len(@_) }; if ($@) { confess($@) } $ret}
+sub new_byte_array_from_bin { my $ret; eval { $ret =  &_xs_new_byte_array_from_bin(@_) }; if ($@) { confess($@) } $ret}
+sub new_short_array { my $ret; eval { $ret =  &_xs_new_short_array(@_) }; if ($@) { confess($@) } $ret}
+sub new_short_array_unsigned { my $ret; eval { $ret =  &_xs_new_short_array_unsigned(@_) }; if ($@) { confess($@) } $ret}
+sub new_short_array_len { my $ret; eval { $ret =  &_xs_new_short_array_len(@_) }; if ($@) { confess($@) } $ret}
+sub new_short_array_from_bin { my $ret; eval { $ret =  &_xs_new_short_array_from_bin(@_) }; if ($@) { confess($@) } $ret}
+sub new_int_array { my $ret; eval { $ret =  &_xs_new_int_array(@_) }; if ($@) { confess($@) } $ret}
+sub new_int_array_unsigned { my $ret; eval { $ret =  &_xs_new_int_array_unsigned(@_) }; if ($@) { confess($@) } $ret}
+sub new_int_array_len { my $ret; eval { $ret =  &_xs_new_int_array_len(@_) }; if ($@) { confess($@) } $ret}
+sub new_int_array_from_bin { my $ret; eval { $ret =  &_xs_new_int_array_from_bin(@_) }; if ($@) { confess($@) } $ret}
+sub new_long_array { my $ret; eval { $ret =  &_xs_new_long_array(@_) }; if ($@) { confess($@) } $ret}
+sub new_long_array_unsigned { my $ret; eval { $ret =  &_xs_new_long_array_unsigned(@_) }; if ($@) { confess($@) } $ret}
+sub new_long_array_len { my $ret; eval { $ret =  &_xs_new_long_array_len(@_) }; if ($@) { confess($@) } $ret}
+sub new_long_array_from_bin { my $ret; eval { $ret =  &_xs_new_long_array_from_bin(@_) }; if ($@) { confess($@) } $ret}
+sub new_double_array { my $ret; eval { $ret =  &_xs_new_double_array(@_) }; if ($@) { confess($@) } $ret}
+sub new_double_array_len { my $ret; eval { $ret =  &_xs_new_double_array_len(@_) }; if ($@) { confess($@) } $ret}
+sub new_double_array_from_bin { my $ret; eval { $ret =  &_xs_new_double_array_from_bin(@_) }; if ($@) { confess($@) } $ret}
+sub new_float_array { my $ret; eval { $ret =  &_xs_new_float_array(@_) }; if ($@) { confess($@) } $ret}
+sub new_float_array_len { my $ret; eval { $ret =  &_xs_new_float_array_len(@_) }; if ($@) { confess($@) } $ret}
+sub new_float_array_from_bin { my $ret; eval { $ret =  &_xs_new_float_array_from_bin(@_) }; if ($@) { confess($@) } $ret}
+sub new_string_array { my $ret; eval { $ret =  &_xs_new_string_array(@_) }; if ($@) { confess($@) } $ret}
+sub new_string_array_len { my $ret; eval { $ret =  &_xs_new_string_array_len(@_) }; if ($@) { confess($@) } $ret}
+sub dump { my $ret; eval { $ret =  &_xs_dump(@_) }; if ($@) { confess($@) } $ret}
+sub get_exception { my $ret; eval { $ret =  &_xs_get_exception(@_) }; if ($@) { confess($@) } $ret}
+sub set_exception { my $ret; eval { $ret =  &_xs_set_exception(@_) }; if ($@) { confess($@) } $ret}
+sub get_memory_blocks_count { my $ret; eval { $ret =  &_xs_get_memory_blocks_count(@_) }; if ($@) { confess($@) } $ret}
+sub call_method { my $ret; eval { $ret =  &_xs_call_method(@_) }; if ($@) { confess($@) } $ret}
 
 1;
 
@@ -322,7 +322,7 @@ C<SPVM::ExchangeAPI> is APIs to convert Perl data structures to/from SPVM data s
 
 =head1 Loading SPVM Class
   
-  # Load a SPVM class
+  # Load an SPVM class
   use SPVM 'SomeClass';
   
   # Load only SPVM module
@@ -330,7 +330,7 @@ C<SPVM::ExchangeAPI> is APIs to convert Perl data structures to/from SPVM data s
 
 The C<use> statement loads a L<SPVM> class.
 
-A SPVM class is loaded and is bound to a Perl module.
+An SPVM class is loaded and is bound to a Perl module.
 
 The bound Perl class name is prefixed with C<SPVM::>.
 
@@ -395,7 +395,7 @@ C<stack> must be a L<SPVM::Bulder::Stack> or L<SPVM::BlessedObject::Class> objec
 
   my $spvm_string = $api->new_string($string);
 
-Converts the Perl scalar $string to a SPVM string using perlapi L<SvPV|https://perldoc.perl.org/perlapi#SvPV>, and returns the object that converts it to a L<SPVM::BlessedObject::String> object.
+Converts the Perl scalar $string to an SPVM string using perlapi L<SvPV|https://perldoc.perl.org/perlapi#SvPV>, and returns the object that converts it to a L<SPVM::BlessedObject::String> object.
 
 If $string is undef, returns undef.
 
@@ -403,7 +403,7 @@ If $string is a L<SPVM::BlessedObject::String> object, returns itself.
 
 Exceptions:
 
-$string must be a non-reference scalar or a SPVM::BlessedObject::String object or undef. Otherwise an exception is thrown.
+$string must be a non-reference scalar or an SPVM::BlessedObject::String object or undef. Otherwise an exception is thrown.
 
 Examples:
 
@@ -415,7 +415,7 @@ Examples:
   
   my $spvm_array = $api->new_byte_array($array);
 
-Converts the Perl array reference $array to a SPVM byte array, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object.
+Converts the Perl array reference $array to an SPVM byte array, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object.
 
 Each element is converted by the conversion of L</"byte Type Argument">.
 
@@ -427,7 +427,7 @@ Exceptions:
 
 $array: If it is a reference, it must be an array reference. Otherwise an exception is thrown.
 
-$array: If it is a SPVM::BlessedObject::Array object, the type must be the byte[] type. Otherwise an exception is thrown.
+$array: If it is an SPVM::BlessedObject::Array object, the type must be the byte[] type. Otherwise an exception is thrown.
 
 Examples:
 
@@ -445,7 +445,7 @@ The same as the L</"new_byte_array"> method, but each element is converted by th
 
   my $spvm_array= $api->new_byte_array_len($length);
 
-Creates a SPVM byte array with the length $length, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object.
+Creates an SPVM byte array with the length $length, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object.
 
 Exceptions:
 
@@ -460,9 +460,9 @@ Examples:
 
   my $spvm_array = $api->new_byte_array_from_bin($binary);
 
-Converts the binary date $binary to a SPVM byte array, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object.
+Converts the binary date $binary to an SPVM byte array, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object.
 
-$binary is copied to a SPVM byte array by the C<memcpy> function in the C laugnage. The length of the array is calcurated from $binary.
+$binary is copied to an SPVM byte array by the C<memcpy> function in the C laugnage. The length of the array is calcurated from $binary.
 
 Exceptions:
 
@@ -483,7 +483,7 @@ Examples:
   
   my $spvm_array = $api->new_short_array($array);
 
-Converts the Perl array reference $array to a SPVM short array, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object.
+Converts the Perl array reference $array to an SPVM short array, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object.
 
 Each element is converted by the conversion of L</"short Type Argument">.
 
@@ -495,7 +495,7 @@ Exceptions:
 
 $array: If it is a reference, it must be an array reference. Otherwise an exception is thrown.
 
-$array: If it is a SPVM::BlessedObject::Array object, the type must be the short[] type. Otherwise an exception is thrown.
+$array: If it is an SPVM::BlessedObject::Array object, the type must be the short[] type. Otherwise an exception is thrown.
 
 Examples:
 
@@ -513,7 +513,7 @@ The same as the L</"new_short_array"> method, but each element is converted by t
 
   my $spvm_array = $api->new_short_array_len($length);
 
-Creates a SPVM short array with the length $length, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object.
+Creates an SPVM short array with the length $length, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object.
 
 Exceptions:
 
@@ -528,9 +528,9 @@ Examples:
 
   my $spvm_array = $api->new_short_array_from_bin($binary);
 
-Converts the binary date $binary to a SPVM short array, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object.
+Converts the binary date $binary to an SPVM short array, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object.
 
-$binary is copied to a SPVM short array by the C<memcpy> function in the C laugnage. The length of the array is calcurated from $binary.
+$binary is copied to an SPVM short array by the C<memcpy> function in the C laugnage. The length of the array is calcurated from $binary.
 
 Exceptions:
 
@@ -547,7 +547,7 @@ Examples:
   
   my $spvm_array = $api->new_int_array($array);
 
-Converts the Perl array reference $array to a SPVM int array, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object.
+Converts the Perl array reference $array to an SPVM int array, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object.
 
 Each element is converted by the conversion of L</"int Type Argument">.
 
@@ -559,7 +559,7 @@ Exceptions:
 
 $array: If it is a reference, it must be an array reference. Otherwise an exception is thrown.
 
-$array: If it is a SPVM::BlessedObject::Array object, the type must be the int[] type. Otherwise an exception is thrown.
+$array: If it is an SPVM::BlessedObject::Array object, the type must be the int[] type. Otherwise an exception is thrown.
 
 Examples:
 
@@ -577,7 +577,7 @@ The same as the L</"new_int_array"> method, but each element is converted by the
 
   my $spvm_array = $api->new_int_array_len($length);
 
-Creates a SPVM int array with the length $length, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object.
+Creates an SPVM int array with the length $length, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object.
 
 Exceptions:
 
@@ -592,9 +592,9 @@ Examples:
 
   my $spvm_array = $api->new_int_array_from_bin($binary);
 
-Converts the binary date $binary to a SPVM int array, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object.
+Converts the binary date $binary to an SPVM int array, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object.
 
-$binary is copied to a SPVM int array by the C<memcpy> function in the C laugnage. The length of the array is calcurated from $binary.
+$binary is copied to an SPVM int array by the C<memcpy> function in the C laugnage. The length of the array is calcurated from $binary.
 
 Exceptions:
 
@@ -611,7 +611,7 @@ Examples:
   
   my $spvm_array = $api->new_long_array($array);
 
-Converts the Perl array reference $array to a SPVM long array, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object. Each element is converted by the conversion of L</"long Type Argument">.
+Converts the Perl array reference $array to an SPVM long array, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object. Each element is converted by the conversion of L</"long Type Argument">.
 
 If $array is undef, returns undef.
 
@@ -619,7 +619,7 @@ Exceptions:
 
 $array: If it is a reference, it must be an array reference. Otherwise an exception is thrown.
 
-$array: If it is a SPVM::BlessedObject::Array object, the type must be the long[] type. Otherwise an exception is thrown.
+$array: If it is an SPVM::BlessedObject::Array object, the type must be the long[] type. Otherwise an exception is thrown.
 
 Examples:
 
@@ -637,7 +637,7 @@ The same as the L</"new_long_array"> method, but each element is converted by th
 
   my $spvm_array = $api->new_long_array_len($length);
 
-Creates a SPVM long array with the length $length, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object.
+Creates an SPVM long array with the length $length, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object.
 
 Exceptions:
 
@@ -652,9 +652,9 @@ Examples:
 
   my $spvm_array = $api->new_long_array_from_bin($binary);
 
-Converts the binary date $binary to a SPVM long array, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object.
+Converts the binary date $binary to an SPVM long array, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object.
 
-$binary is copied to a SPVM long array by the C<memcpy> function in the C laugnage. The length of the array is calcurated from $binary.
+$binary is copied to an SPVM long array by the C<memcpy> function in the C laugnage. The length of the array is calcurated from $binary.
 
 Exceptions:
 
@@ -671,7 +671,7 @@ Examples:
   
   my $spvm_array = $api->new_float_array($array);
 
-Converts the Perl array reference $array to a SPVM float array, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object.
+Converts the Perl array reference $array to an SPVM float array, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object.
 
 Each element is converted by the conversion of L</"float Type Argument">.
 
@@ -683,7 +683,7 @@ Exceptions:
 
 $array: If it is a reference, it must be an array reference. Otherwise an exception is thrown.
 
-$array: If it is a SPVM::BlessedObject::Array object, the type must be the float[] type. Otherwise an exception is thrown.
+$array: If it is an SPVM::BlessedObject::Array object, the type must be the float[] type. Otherwise an exception is thrown.
 
 Examples:
 
@@ -693,7 +693,7 @@ Examples:
 
   my $spvm_array = $api->new_float_array_len($length);
 
-Creates a SPVM float array with the length $length, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object.
+Creates an SPVM float array with the length $length, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object.
 
 Exceptions:
 
@@ -708,9 +708,9 @@ Examples:
 
   my $spvm_array = $api->new_float_array_from_bin($binary);
 
-Converts the binary date $binary to a SPVM float array, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object.
+Converts the binary date $binary to an SPVM float array, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object.
 
-$binary is copied to a SPVM float array by the C<memcpy> function in the C laugnage. The length of the array is calcurated from $binary.
+$binary is copied to an SPVM float array by the C<memcpy> function in the C laugnage. The length of the array is calcurated from $binary.
 
 Exceptions:
 
@@ -727,7 +727,7 @@ Examples:
   
   my $spvm_array = $api->new_double_array($array);
 
-Converts the Perl array reference $array to a SPVM double array, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object.
+Converts the Perl array reference $array to an SPVM double array, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object.
 
 Each element is converted by the conversion of L</"double Type Argument">.
 
@@ -735,7 +735,7 @@ Exceptions:
 
 $array: If it is a reference, it must be an array reference. Otherwise an exception is thrown.
 
-$array: If it is a SPVM::BlessedObject::Array object, the type must be the double[] type. Otherwise an exception is thrown.
+$array: If it is an SPVM::BlessedObject::Array object, the type must be the double[] type. Otherwise an exception is thrown.
 
 Examples:
 
@@ -745,7 +745,7 @@ Examples:
 
   my $spvm_array = $api->new_double_array_len($length);
 
-Creates a SPVM double array with the length $length, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object.
+Creates an SPVM double array with the length $length, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object.
 
 Exceptions:
 
@@ -760,9 +760,9 @@ Examples:
 
   my $spvm_array = $api->new_double_array_from_bin($binary);
 
-Converts the binary date $binary to a SPVM double array, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object.
+Converts the binary date $binary to an SPVM double array, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object.
 
-$binary is copied to a SPVM double array by the C<memcpy> function in the C laugnage. The length of the array is calcurated from $binary.
+$binary is copied to an SPVM double array by the C<memcpy> function in the C laugnage. The length of the array is calcurated from $binary.
 
 Exceptions:
 
@@ -779,7 +779,7 @@ Examples:
   
   my $spvm_array = $api->new_string_array($array);
 
-Converts the Perl array reference $array to a SPVM string array, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object. Each element is converted by the L</"new_string"> method.
+Converts the Perl array reference $array to an SPVM string array, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object. Each element is converted by the L</"new_string"> method.
 
 If $array is undef, returns undef.
 
@@ -789,7 +789,7 @@ Exceptions:
 
 $array: If it is a reference, it must be an array reference. Otherwise an exception is thrown.
 
-$array: If it is a SPVM::BlessedObject::Array object, the type must be the string[] type. Otherwise an exception is thrown.
+$array: If it is an SPVM::BlessedObject::Array object, the type must be the string[] type. Otherwise an exception is thrown.
 
 Examples:
 
@@ -801,7 +801,7 @@ Examples:
 
   my $spvm_array = $api->new_string_array_len($length);
 
-Creates a SPVM string array with the length $length, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object.
+Creates an SPVM string array with the length $length, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object.
 
 Exceptions:
 
@@ -828,7 +828,7 @@ If the type name $type_name was parsed, but the class name could not be extracte
 
 $array: If it is a reference, it must be an array reference. Otherwise an exception is thrown.
 
-$array: If it is a SPVM::BlessedObject::Array object, the type must be assignable. Otherwise an exception is thrown.
+$array: If it is an SPVM::BlessedObject::Array object, the type must be assignable. Otherwise an exception is thrown.
 
 If the bacic type of the type $type_name is not found, an exception is thrown.
 
@@ -846,7 +846,7 @@ Examples:
 
   my $spvm_array = $api->new_object_array_len($type_name, $length);
 
-Creates a SPVM object array(1-dimensional) with the type name $type_name and the length $length, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object of $type_name type.
+Creates an SPVM object array(1-dimensional) with the type name $type_name and the length $length, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object of $type_name type.
 
 Exceptions:
 
@@ -879,7 +879,7 @@ The alias for the following code using the L</"new_object_array"> method.
 
   my $spvm_array = $api->new_any_object_array_len($length);
 
-Creates a SPVM object array with the length $length, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object of $type_name.
+Creates an SPVM object array with the length $length, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object of $type_name.
 
 Exceptions:
 
@@ -931,7 +931,7 @@ The dimension of the type $type_name must be 1. Otherwise an exception is thrown
 
 $array: If it is a reference, it must be an array reference. Otherwise an exception is thrown.
 
-$array: If it is a SPVM::BlessedObject::Array object, the type must be assignable. Otherwise an exception is thrown.
+$array: If it is an SPVM::BlessedObject::Array object, the type must be assignable. Otherwise an exception is thrown.
 
 Examples:
 
@@ -946,7 +946,7 @@ Examples:
 
   my $spvm_array = $api->new_mulnum_array_len($type_name, $length);
 
-Creates a SPVM object array with the type name $type_name and the length $length, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object of $type_name.
+Creates an SPVM object array with the type name $type_name and the length $length, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object of $type_name.
 
 Exceptions:
 
@@ -965,9 +965,9 @@ Examples:
 
   my $spvm_mulnum_array = $api->new_mulnum_array_from_bin($type_name, $binary);
 
-Converts the binary data $binary to a SPVM multi-numeric array type $type_name, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object.
+Converts the binary data $binary to an SPVM multi-numeric array type $type_name, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object.
 
-$binary is copied to a SPVM multi-numeric array by the C<memcpy> function in the C laugnage. The length of the array is calcurated from $binary.
+$binary is copied to an SPVM multi-numeric array by the C<memcpy> function in the C laugnage. The length of the array is calcurated from $binary.
 
 Exceptions:
 
@@ -1033,7 +1033,7 @@ If $array is a reference other than the array reference, an exception is thrown.
 
 $array: If it is a reference, it must be an array reference. Otherwise an exception is thrown.
 
-$array: If it is a SPVM::BlessedObject::Array object, the type must be assignable. Otherwise an exception is thrown.
+$array: If it is an SPVM::BlessedObject::Array object, the type must be assignable. Otherwise an exception is thrown.
 
 If the bacic type of the type $type_name is not found, an exception is thrown.
 
@@ -1051,7 +1051,7 @@ Examples:
 
   my $spvm_array = $api->new_muldim_array_len($type_name, $length);
 
-Creates a SPVM multi-dimensional array with the type name $type_name and the length $length, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object of $type_name.
+Creates an SPVM multi-dimensional array with the type name $type_name and the length $length, and returns the object that converts it to a L<SPVM::BlessedObject::Array> object of $type_name.
 
 Exceptions:
 
@@ -1131,7 +1131,7 @@ Converts the SPVM object $object to a dumped string using the L<dump|SPVM::Docum
 
 Exceptions:
 
-$object must be a SPVM::BlessedObject object. Otherwise an exception is thrown.
+$object must be an SPVM::BlessedObject object. Otherwise an exception is thrown.
 
 =head2 error
 
@@ -1155,11 +1155,11 @@ The method name $method_name allows a static method name such as C<Foo::bar>.
 
 The return value is converted by the rule of L</"Return Value Conversion">.
 
-If a L<SPVM::ExchangeAPI::Error> object is passed to the last of the arguments, and if an exception is thrown from a SPVM method, the error code is set to the C<code> field of the object.
+If a L<SPVM::ExchangeAPI::Error> object is passed to the last of the arguments, and if an exception is thrown from an SPVM method, the error code is set to the C<code> field of the object.
 
 Exceptions:
 
-If $invocant is a SPVM::BlessedObject, $invocant must be a SPVM::BlessedObject::Class object. Otherwise an exception is thrown.
+If $invocant is an SPVM::BlessedObject, $invocant must be an SPVM::BlessedObject::Class object. Otherwise an exception is thrown.
 
 The static method call must be valid. Otherwise an exception is thrown.
 
@@ -1198,7 +1198,7 @@ Instance method calls can be made easier using L<SPVM::BlessedObject::Class>.
 
 =head1 Argument Conversion
 
-Each argument passed to the L</"call_method"> method are converted to a SPVM value according to the SPVM type before it passed to a SPVM method.
+Each argument passed to the L</"call_method"> method are converted to an SPVM value according to the SPVM type before it passed to an SPVM method.
 
 =head2 byte Type Argument
 
@@ -1294,7 +1294,7 @@ No conversion is performed.
 
 Exceptions:
 
-The argument must be a SPVM::BlessedObject object or undef. Otherwise an exception is thrown.
+The argument must be an SPVM::BlessedObject object or undef. Otherwise an exception is thrown.
 
 =head2 Class Type Argument
 
@@ -1302,7 +1302,7 @@ No conversion is performed.
 
 Exceptions:
 
-The argument must be a SPVM::BlessedObject::Class object of a Z assignable type or undef. Otherwise an exception is thrown.
+The argument must be an SPVM::BlessedObject::Class object of a Z assignable type or undef. Otherwise an exception is thrown.
 
 =head2 Interaface Type Argument
 
@@ -1310,7 +1310,7 @@ No conversion is performed.
 
 Exceptions:
 
-The argument must be a SPVM::BlessedObject::Class object of a Z assignable type or undef. Otherwise an exception is thrown.
+The argument must be an SPVM::BlessedObject::Class object of a Z assignable type or undef. Otherwise an exception is thrown.
 
 =head2 Multi-Numeric Type Argument
 
@@ -1530,7 +1530,7 @@ Examples:
 
 =head3 Multi-Numeric byte Reference Type Argument
 
-A Perl reference is converted to a SPVM multi-numeric C<byte> reference type.
+A Perl reference is converted to an SPVM multi-numeric C<byte> reference type.
 
 Each field is converted to a value of the SPVM C<byte> type by the conversion of L</"byte Type Argument">.
 
@@ -1550,7 +1550,7 @@ Examples:
 
 =head3 Multi-Numeric short Reference Type Argument
 
-A Perl reference is converted to a SPVM multi-numeric C<short> reference type.
+A Perl reference is converted to an SPVM multi-numeric C<short> reference type.
 
 Each field is converted to a value of the SPVM C<short> type by the conversion of L</"short Type Argument">.
 
@@ -1570,7 +1570,7 @@ Examples:
 
 =head3 Multi-Numeric int Reference Type Argument
 
-A Perl reference is converted to a SPVM multi-numeric C<int> reference type.
+A Perl reference is converted to an SPVM multi-numeric C<int> reference type.
 
 Each field is converted to a value of the SPVM C<int> type by the conversion of L</"int Type Argument">.
 
@@ -1590,7 +1590,7 @@ Examples:
 
 =head3 Multi-Numeric long Reference Type Argument
 
-A Perl reference is converted to a SPVM multi-numeric C<long> reference type.
+A Perl reference is converted to an SPVM multi-numeric C<long> reference type.
 
 Each field is converted to a value of the SPVM C<long> type by the conversion of L</"long Type Argument">.
 
@@ -1610,7 +1610,7 @@ Examples:
 
 =head3 Multi-Numeric float Reference Type Argument
 
-A Perl reference is converted to a SPVM multi-numeric C<float> reference type.
+A Perl reference is converted to an SPVM multi-numeric C<float> reference type.
 
 Each field is converted to a value of the SPVM C<float> type by the conversion of L</"float Type Argument">.
 
@@ -1630,7 +1630,7 @@ Examples:
 
 =head3 Multi-Numeric double Reference Type Argument
 
-A Perl reference is converted to a SPVM multi-numeric C<double> reference type.
+A Perl reference is converted to an SPVM multi-numeric C<double> reference type.
 
 Each field is converted to a value of the SPVM C<double> type by the conversion of L</"double Type Argument">.
 
@@ -1788,7 +1788,7 @@ Exceptions thrown by the L</"new_muldim_array"> method are thrown.
 
 =head1 Return Value Conversion
 
-A SPVM return value is converted to a Perl value according to the SPVM type.
+An SPVM return value is converted to a Perl value according to the SPVM type.
 
 =head2 void Type Return Value
 

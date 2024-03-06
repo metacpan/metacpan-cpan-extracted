@@ -8,16 +8,12 @@ use Test::Expander -tempdir => {};
 use Test::Files::Constants qw( $DIRECTORY_OPTIONS $FMT_SUB_FAILED );
 
 my $diag;
-my $sub = sub { path( shift )->basename eq 'GOOD' };
+my $sub      = sub { path( shift )->basename eq 'GOOD' };
 my $mockThis = mock $CLASS => (
   override => [
-    _show_failure  => sub { pass( 'Failure reported' ); undef },
-    _show_result   => sub {
-      my $expected = $FMT_SUB_FAILED =~ s/%s/path( $TEMP_DIR )->child( 'BAD' )/er;
-      is( $_[ 2 ], $expected, 'Negative results reported' );
-      return;
-    },
-    _validate_args => sub { shift; ( $diag, path( shift ), shift, $DIRECTORY_OPTIONS ) },
+    _show_failure  => sub {},
+    _show_result   => sub { 1 },
+    _validate_args => sub { my $self = shift; $self->diag( $diag ); $sub },
   ]
 );
 
@@ -27,14 +23,8 @@ path( $TEMP_DIR )->child( 'GOOD' )->touch;
 
 plan( 2 );
 
-subtest 'valid arguments' => sub {
-  plan( 2 );
-  $diag = 'ERROR';
-  is( $METHOD_REF->( $TEMP_DIR, $sub ), undef, 'executed' );
-};
+$diag = [];
+ok(  $METHOD_REF->( $TEMP_DIR, $sub ), 'valid arguments' );
 
-subtest 'invalid arguments' => sub {
-  plan( 2 );
-  $diag = undef;
-  is( $METHOD_REF->( $TEMP_DIR, $sub ), undef, 'executed' );
-};
+$diag = [ 'ERROR' ];
+ok( !$METHOD_REF->( $TEMP_DIR, $sub ), 'invalid arguments' );

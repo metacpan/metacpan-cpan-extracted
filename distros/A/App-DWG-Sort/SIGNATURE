@@ -1,0 +1,58 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 bcef75fa998931e29fa950d7980443462e979fd59060236d4d2441cd5fb77d7c CONCEPT
+SHA256 4762111275245b138b11c982a3a9b24a163966eef666fe09b8bca9cce8659685 Changes
+SHA256 e9721661dbfb60dadebf3cd197cbc00239895aa73fb3431e19490cfad301cf99 LICENSE
+SHA256 7907bc1d8694a8b12aa84dad721608370d4fa056945a59be96481051a2b08fc0 MANIFEST
+SHA256 b0b5eda5aacb2201ece859d88dfdbb5a0bfccf2d77805d1f2a79cb60e1523432 META.yml
+SHA256 5b8af8f1cb1cea8f269521a4623f6439408be3c71897ac9d27bd314e3bd19439 Makefile.PL
+SHA256 896a6b0d1bee72244d84b1a33cb90a465e6029c0e89261673873cf623bf4fc56 README
+SHA256 64d31ff4c91d73e1e5534e0f1177e0b906715cfffcac50856b5938e92bd85c15 Sort.pm
+SHA256 89d2108be329295dbbdd1c70c969ea82bd1321634bf646a485b1a88508e0cb0e bin/dwg-sort
+SHA256 65804b36e5ed0552588150a7c5925b34f8c6bb9e13a5a627b24eefe55152bbb4 examples/sort_help.pl
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 63ec8405523ae67c33823dcf4b136a46f0711fb17a8b58b49ddd922ed6b69611 inc/Module/Install/Scripts.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 dc67fa87edf5b9025315695f0b51f496c83f8baa827ebd080bd87d632a8b8164 t/App-DWG-Sort/01-use.t
+SHA256 5c4320acc42a23a41e9aa5211614782187c4619625e2cbe3b39cbe5f50405e84 t/App-DWG-Sort/02-version.t
+SHA256 0866df29336fcddc6a2618581cc2621ad6fbb6c45d3ead7b8c77825c2682fac6 t/App-DWG-Sort/03-new.t
+SHA256 13d3a322e739405b9a95e0ad7a5ceb0613b1f81945dbd759fe0b3eeadefefd63 t/App-DWG-Sort/04-run.t
+SHA256 850584cba285d06e156dd5256909c9fc8b151ad699fc5aeaffbc562e65976b3f xt/App-DWG-Sort/01-pod_coverage.t
+SHA256 2cba302fb1d63cb0f03ead80aa33eaa19ff047d08cfa8fbd236a4a00294c9667 xt/App-DWG-Sort/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEEbhzVZugfHqSVNvE7YSp92FNcjtAFAmXoPw0ACgkQYSp92FNc
+jtCL4Qv/fS4/C6diPxwrGwG6AI8M1I3YgTVsv4/tuyILn5mx3XaEsD+5I4+Rnv6a
+7Kw2Uo3w4P+ZftZQ1MmO3bcgXrGophjRrQovwOLe7HcJ5bsl+Y8/SwmNHpVCidy4
+GfaTLB0tF8oMJuLR4z7rWCJAUxJXm7W3xoaoFOVn2CFsOqfATUcxEOlBGWKLAN/X
+s3HLPiRzRi5f+1TaIRKHXaAAv5ADEbhuY5MjGoxwziAv8QanoL0JZVLXiQ0N9aKe
+fOiqk5VaZJ3yF9ag2DhauUJMMGneGvTiseceHb0woYjELSgUIULtf3WpUWmMZ+f4
+DrkTfjf4q122u4ROQ/1mZBmNXBahtKAT8unj3EWXlfYgxM08bEyMY50UQoG/Cb9h
+nO3APnIqDdaCka+T0lsqVxiZe11c8Y670dQLmVyX+KDA6Bxm9gX/grsRILYfaKMd
+eW6AwzDAKuVQZGLL7Bo3t+LyDoe4S+cXvlFCr9b3VZxepA6xA+ypQZ5K6GpiGtQp
+ghVcppvj
+=2vAJ
+-----END PGP SIGNATURE-----

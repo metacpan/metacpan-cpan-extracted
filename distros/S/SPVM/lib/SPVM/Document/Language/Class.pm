@@ -30,7 +30,7 @@ Examples:
   
   }
 
-L<Class attributes|/"Class Attribute"> are written after C<:>.
+L<Class attributes|/"Class Attributes"> are written after C<:>.
 
   class CLASS_NAME : CLASS_ATTRIBUTE {
   
@@ -119,7 +119,7 @@ The version number is a floating point number created by the following way.
 
 A L<version string/"Version Declaration"> is converted to a floating point number by the C<strtod> C function.
 
-=head2 Class Attribute
+=head2 Class Attributes
 
 The list of class attributes.
 
@@ -128,7 +128,7 @@ The list of class attributes.
 <table>
   <tr>
     <th>
-      Class attributes
+      Class Attributes
    </th>
     <th>
       Descriptions
@@ -333,7 +333,7 @@ L<Examples:>
 
 =head2 Pointer Class
 
-The pointer class is the L<class|/"Class"> that has the L<class attribute|/"Class Attribute"> C<pointer>.
+The pointer class is the L<class|/"Class"> that has the L<class attribute|/"Class Attributes"> C<pointer>.
 
   # Pointer Class
   class Foo : pointer {
@@ -342,7 +342,7 @@ The pointer class is the L<class|/"Class"> that has the L<class attribute|/"Clas
 
 The type of a pointer class is the L<class type|/"Class Type">.
 
-A object of a pointer class has the pointer to a native address.
+An object of a pointer class has the pointer to a native address.
 
 =head2 Inheritance
 
@@ -416,7 +416,7 @@ The interface syntax is described.
 
 =head3 Interface Definition
 
-An interface is defined using a L<class definition|/"Class Definition"> with a L<class attribute/"Class Attribute"> C<interface_t>.
+An interface is defined using a L<class definition|/"Class Definition"> with a L<class attribute/"Class Attributes"> C<interface_t>.
 
   class Stringable: interface_t {
     required method to_string : string ();
@@ -481,7 +481,7 @@ The duck typing is supported.
   my $stringable = (Stringable)Point->new(1, 2);
   my $string = $stringable->to_string;
 
-The Point class have no interfaces, but A object of the Point class can be assigned to a Stringable interface
+The Point class have no interfaces, but An object of the Point class can be assigned to a Stringable interface
 because the to_string method in the Point class has the method compatibility of the to_string method in the Strigable interface.
 
 =head2 Class File Name
@@ -617,7 +617,7 @@ A Class variable must be defined directly under the L<class definition|/"Class D
 
 The type must be a L<numeric type|/"Numeric Type"> or an L<object type|/"Object Type">.
 
-L<Class variable attributes|/"Class Variable Attribute"> can be specified.
+L<Class variable attributes|/"Class Variable Attributes"> can be specified.
 
   our CLASS_VARIABLE_NAME : ATTRIBUTE TYPE;
   our CLASS_VARIABLE_NAME : ATTRIBUTE1 ATTRIBUTE2 ATTRIBUTE3 TYPE;
@@ -644,7 +644,7 @@ Examples:
     our $NUM_RW : rw int;
   }
 
-=head3 Class Variable Attribute
+=head3 Class Variable Attributes
 
 The list of class variable attributes.
 
@@ -812,7 +812,7 @@ The field is defined directly under the L<class block|/"Class Block">.
     has name : string;
   }
 
-L<Field attributes|/"Field Attribute"> can be specified.
+L<Field attributes|/"Field Attributes"> can be specified.
 
 Compilation Errors:
 
@@ -822,7 +822,7 @@ The field names must follows the rule of the L<field name|/"Field Name">. Otherw
 
 Field names cannot be duplicated. If so, a compilation error occurs.
 
-=head3 Field Attribute
+=head3 Field Attributes
 
 The list of field attributes.
 
@@ -831,7 +831,7 @@ The list of field attributes.
 <table>
   <tr>
     <th>
-      Attributes
+      Field Attributes
    </th>
     <th>
       Descriptions
@@ -1082,7 +1082,7 @@ Method attributes are attributes used in a L<method definition|/"Method Definiti
 <table>
   <tr>
     <th>
-      Attributes
+      Method Attributes
    </th>
     <th>
       Descriptions
@@ -1179,7 +1179,7 @@ About the way to write native methods, please see L<SPVM Native Class|SPVM::Docu
 
 =head3 Precompiled Method
 
-If the class has the C<precompile> L<class attribute|/"Class Attribute">, the methods of the class are precompiled.
+If the class has the C<precompile> L<class attribute|/"Class Attributes">, the methods of the class are precompiled.
 
 The source code of each precompiled method is translated to C source code and is compiled to the machine code such as C<MyMath.o>.
 

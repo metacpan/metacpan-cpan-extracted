@@ -313,9 +313,9 @@ allow_if_string_contains_single_quote = 1
 [Perl::Critic::Policy::ValuesAndExpressions::ProhibitLeadingZeros]
 add_themes = knib
 
-[Perl::Critic::Policy::ValuesAndExpressions::ProhibitLongChainsOfMethodCalls]
-add_themes       = knib
-max_chain_length = 3
+#[Perl::Critic::Policy::ValuesAndExpressions::ProhibitLongChainsOfMethodCalls]
+#add_themes       = knib
+#max_chain_length = 3
 
 [Perl::Critic::Policy::ValuesAndExpressions::ProhibitMagicNumbers]
 # Not yet configured completely.

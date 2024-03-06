@@ -5,8 +5,8 @@ use warnings
 
 use Test::Expander;
 
-my $mock_this = mock $CLASS => ( override => [ _compare_ok => sub {} ] );
+my $mock_this = mock $CLASS => ( override => [ _compare_ok => sub { shift } ] );
 
 plan( 1 );
 
-is( $METHOD_REF->( 'file', 'string', sub {} ), undef, 'comparison performed' );
+isa_ok( $METHOD_REF->( 'file', 'string', sub {} ), $CLASS );

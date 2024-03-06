@@ -14,7 +14,7 @@ sub __api {
   }
 }
 
-sub __get_type_name { my $ret; eval { $ret =  shift->_xs___get_type_name(@_) }; if ($@) { confess $@ } $ret; }
+sub __get_type_name { my $ret; eval { $ret =  shift->_xs___get_type_name(@_) }; if ($@) { confess($@) } $ret; }
 
 1;
 
@@ -24,7 +24,7 @@ SPVM::BlessedObject - SPVM object
 
 =head1 Description
 
-The object of the C<SPVM::BlessedObject> class holds a SPVM object.
+The object of the C<SPVM::BlessedObject> class holds an SPVM object.
 
 =head1 Instance Methods
 

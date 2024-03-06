@@ -5,19 +5,30 @@ use warnings
 
 use Test::Expander;
 
-my $diag;
-my $mock_this = mock $CLASS => (
-  override => [
-    _compare_dirs           => sub {},
-    _show_failure           => sub { $_[ 1 ] },
-    _validate_trailing_args => sub { ( $diag, {} ) },
-  ]
-);
-
 plan( 2 );
 
-$diag = undef;
-is( $METHOD_REF->( 'first_dir', 'second_dir' ), $diag, 'success' );
+subtest success => sub {
+  plan( 2 );
 
-$diag = 'ERROR';
-is( $METHOD_REF->( 'first_dir', 'second_dir' ), $diag, 'failure' );
+  my $mock_this = mock $CLASS => (
+    override => [
+      _compare_dirs           => sub { pass( 'compared' ) },
+      _validate_trailing_args => sub { shift },
+    ]
+  );
+
+  lives_ok { $METHOD_REF->( 'first_dir', 'second_dir' ) } 'executed';
+};
+
+subtest failure => sub {
+  plan( 2 );
+
+  my $mock_this = mock $CLASS => (
+    override => [
+      _show_failure           => sub { pass( 'error detected' ) },
+      _validate_trailing_args => sub { shift->diag( [ 'ERROR' ] ) },
+    ]
+  );
+
+  lives_ok { $METHOD_REF->( 'first_dir', 'second_dir' ) } 'executed';
+};

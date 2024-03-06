@@ -1,5 +1,9 @@
 Revision history for Perl extension Test::Files.
 
+0.25 2024-03-06
+    - Archive (container) comparison implemented.
+    - Constider specific of some operating systems in unit tests.
+
 0.24 2024-02-26
     - Some tests made less strict in case of Windows.
 

@@ -13,33 +13,40 @@ const my $SECOND_FILE => path( $TEMP_DIR )->child( 'second_file' );
 plan( 3 );
 
 my $expected;
+my $self = $CLASS->_init;
 
 subtest 'compare existence only' => sub {
   plan( 3 );
 
-  $expected = [ sprintf( $FMT_SECOND_FILE_ABSENT, $FIRST_FILE, $SECOND_FILE ) ];
-  is( $METHOD_REF->( 0, 1, { EXISTENCE_ONLY => 1 }, $FIRST_FILE, $SECOND_FILE ), $expected, 'first file missing' );
+  $self->options( { EXISTENCE_ONLY => 1 } );
 
   $expected = [ sprintf( $FMT_FIRST_FILE_ABSENT,  $FIRST_FILE, $SECOND_FILE ) ];
-  is( $METHOD_REF->( 1, 0, { EXISTENCE_ONLY => 1 }, $FIRST_FILE, $SECOND_FILE ), $expected, 'second file missing' );
+  is( $self->diag( [] )->$METHOD( 0, 1, $FIRST_FILE, $SECOND_FILE )->diag, $expected, 'second file missing' );
+
+  $expected = [ sprintf( $FMT_SECOND_FILE_ABSENT, $FIRST_FILE, $SECOND_FILE ) ];
+  is( $self->diag( [] )->$METHOD( 1, 0, $FIRST_FILE, $SECOND_FILE )->diag, $expected, 'first file missing' );
 
   $expected = [];
-  is( $METHOD_REF->( 1, 1, { EXISTENCE_ONLY => 1 }, $FIRST_FILE, $SECOND_FILE ), $expected, 'both files exist' );
+  is( $self->diag( [] )->$METHOD( 1, 1, $FIRST_FILE, $SECOND_FILE )->diag, $expected, 'both files exist' );
 };
 
 subtest 'compare size' => sub {
   plan( 2 );
 
+  $self->options( { SIZE_ONLY => 1 } );
+
   $expected = [ sprintf( $FMT_DIFFERENT_SIZE, $FIRST_FILE, $SECOND_FILE, 1, 0 ) ];
-  is( $METHOD_REF->( 1, 0, { SIZE_ONLY => 1 }, $FIRST_FILE, $SECOND_FILE ), $expected, 'different size' );
+  is( $self->diag( [] )->$METHOD( 1, 0, $FIRST_FILE, $SECOND_FILE )->diag, $expected, 'different size' );
 
   $expected = [];
-  is( $METHOD_REF->( 1, 1, { SIZE_ONLY => 1 }, $FIRST_FILE, $SECOND_FILE ), $expected, 'equal size' );
+  is( $self->diag( [] )->$METHOD( 1, 1, $FIRST_FILE, $SECOND_FILE )->diag, $expected, 'equal size' );
 };
 
 subtest 'compare content' => sub {
   plan( 2 );
 
-  ok(  scalar( @{ $METHOD_REF->( '1', '0', { STYLE => 'OldStyle'}, $FIRST_FILE, $SECOND_FILE ) } ), 'different content' );
-  ok( !scalar( @{ $METHOD_REF->( '1', '1', { CONTEXT => 2 },       $FIRST_FILE, $SECOND_FILE ) } ), 'identical content' );
+  $self->options( { CONTEXT => 2, STYLE => 'OldStyle'} );
+
+  isnt( $self->diag( [] )->$METHOD( '1', '0', $FIRST_FILE, $SECOND_FILE )->diag, [], 'different content' );
+  is  ( $self->diag( [] )->$METHOD( '1', '1', $FIRST_FILE, $SECOND_FILE )->diag, [], 'identical content' );
 };

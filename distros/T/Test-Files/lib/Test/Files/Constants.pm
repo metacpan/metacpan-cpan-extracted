@@ -1,6 +1,6 @@
 package Test::Files::Constants;
 
-our $VERSION = '0.24';                                      ## no critic (RequireUseStrict, RequireUseWarnings)
+our $VERSION = '0.25';                                      ## no critic (RequireUseStrict, RequireUseWarnings)
 
 use strict;
 use warnings
@@ -19,10 +19,9 @@ const our $DIRECTORY_OPTIONS       => {
   SIZE_ONLY      => 0,
   SYMMETRIC      => 0,
 };
-const our $CONTAINER_OPTIONS       => {
+const our $ARCHIVE_OPTIONS         => {
   %$DIRECTORY_OPTIONS,
-  FILE_LIST      => sub { [] },
-  GET_FILE       => sub {},
+  EXTRACT        => sub {},
   META_DATA      => sub {},
 };
 const our $FILE_OPTIONS            => {
@@ -35,6 +34,9 @@ const our $EXPECTED_CONTENT        => '<expected content>';
 
 const our $FMT_ABSENT              => "'%s' is absent, or is a directory, or is a special file";
 const our $FMT_ABSENT_WITH_ERROR   => "'%s' is absent, error: %s";
+const our $FMT_CANNOT_CREATE_DIR   => "Cannot create directory '%s': %s";
+const our $FMT_CANNOT_EXTRACT      => "Cannot extract from '%s' to directory '%s': %s";
+const our $FMT_CANNOT_GET_METADATA => "Cannot get metadata from '%s': %s";
 const our $FMT_DIFFERENT_SIZE      => "'%s' and '%s' have different sizes: %d and %d bytes, correspondingly";
 const our $FMT_FAILED_TO_SEE       => "Failed to see '%s'";
 const our $FMT_FILTER_ISNT_CODEREF => "Filter supplied to '%s' must be a code reference (or undef)";

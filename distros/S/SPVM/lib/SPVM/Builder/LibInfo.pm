@@ -75,15 +75,7 @@ sub new {
   my $config = $self->config;
   
   unless ($config) {
-    confess "The \"config\" field must be defined.";
-  }
-  
-  unless (defined $self->is_static) {
-    $self->is_static(0);
-  }
-  
-  unless (defined $self->is_abs) {
-    $self->is_abs(0);
+    confess("The \"config\" field must be defined.");
   }
   
   return $self;
@@ -193,27 +185,17 @@ Gets and sets the C<is_abs> field. If this field is a true value, the library is
 
   my $lib_info = SPVM::Builder::LibInfo->new(%fields);
 
-Creates a new L<SPVM::Builder::LibInfo> object given the fileds L</"Fields">.
+Creates a new L<SPVM::Builder::LibInfo> object given L<fields|/"Fields">.
 
-If a field is not defined, the field is set to the following default value.
+The C<config> field must be defined.
+
+Field Default Values:
 
 =over 2
 
-=item * L</"name">
+=item * All Fields
 
-undef
-
-=item * L</"file">
-
-undef
-
-=item * L</"is_static">
-
-0
-
-=item * L</"is_abs">
-
-0
+  undef
 
 =back
 

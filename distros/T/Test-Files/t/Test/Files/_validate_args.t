@@ -7,31 +7,60 @@ use Test::Expander -tempdir => {};
 
 use Test::Files::Constants qw( $FMT_INVALID_ARGUMENT $FMT_INVALID_DIR $FMT_UNDEF );
 
-const my $MISSING_FILE => 'MISSING_FILE';
-
 plan( 6 );
 
-my ( $expected, $valid_trailing_args );
-my $mockThis = mock $CLASS => (
-  override => [ _validate_trailing_args => sub { $valid_trailing_args ? () : 'ARG ERROR' } ]
-);
+subtest 'invalid options' => sub {
+  plan( 2 );
 
-$valid_trailing_args = undef;
-is( $METHOD_REF->( 'ARRAY', $TEMP_DIR, [] ), 'ARG ERROR', 'invalid options' );
+  my $expected = 'ARG ERROR';
+  my $mockThis = mock $CLASS => ( override => [ _validate_trailing_args => sub { shift->diag( [ $expected ] ) } ] );
+  my $self     = $CLASS->_init;
+  is( $self->$METHOD( 'ARRAY', $TEMP_DIR, [] ), undef,         'empty result' );
+  is( $self->diag,                              [ $expected ], 'error message' );
+};
 
-$valid_trailing_args = 1;
+subtest 'directory undefined' => sub {
+  plan( 2 );
 
-$expected = sprintf( $FMT_UNDEF, '\$dir', '.+' );
-like( $METHOD_REF->( 'ARRAY', undef, [] ), qr/$expected/, 'directory undefined' );
+  my $expected = sprintf( $FMT_UNDEF, '\$dir', '.+' );
+  my $self     = $CLASS->_init;
+  is  ( $self->$METHOD( 'ARRAY' ), undef,             'empty result' );
+  like( $self->diag,               [ qr/$expected/ ], 'error message' );
+};
 
-$expected = sprintf( $FMT_INVALID_DIR, path( $TEMP_DIR )->child( $MISSING_FILE ) );
-like( $METHOD_REF->( 'ARRAY', path( $TEMP_DIR )->child( $MISSING_FILE ), [] ), qr/$expected/, 'not a directory' );
+subtest 'not a directory' => sub {
+  plan( 2 );
 
-$expected = sprintf( $FMT_INVALID_ARGUMENT, '.+', 'array reference', '2nd' );
-like( $METHOD_REF->( 'ARRAY', $TEMP_DIR, {} ), qr/$expected/, 'file list has a wrong type' );
+  const my $MISSING_FILE => 'MISSING_FILE';
+  my $expected = sprintf( $FMT_INVALID_DIR, path( $TEMP_DIR )->child( $MISSING_FILE ) );
+  my $self     = $CLASS->_init;
+  is  ( $self->$METHOD( 'ARRAY', path( $TEMP_DIR )->child( $MISSING_FILE ), [] ), undef,             'empty result' );
+  like( $self->diag,                                                              [ qr/$expected/ ], 'error message' );
+};
 
-$expected = sprintf( $FMT_INVALID_ARGUMENT, '.+', 'code reference', '2nd' );
-like( $METHOD_REF->( 'CODE', $TEMP_DIR, {} ), qr/$expected/, 'code reference has a wrong type' );
+subtest 'file list has a wrong type' => sub {
+  plan( 2 );
 
-$expected = [ undef, path( $TEMP_DIR ), [], undef, undef ];
-is( [ $METHOD_REF->( 'ARRAY', $TEMP_DIR, [] ) ], $expected, 'arguments are valid' );
+  my $expected = sprintf( $FMT_INVALID_ARGUMENT, '.+', 'array reference', '2nd' );
+  my $self     = $CLASS->_init;
+  is  ( $self->$METHOD( 'ARRAY', $TEMP_DIR, {} ), undef,             'empty result' );
+  like( $self->diag,                              [ qr/$expected/ ], 'error message' );
+};
+
+subtest 'code reference has a wrong type' => sub {
+  plan( 2 );
+
+  my $expected = sprintf( $FMT_INVALID_ARGUMENT, '.+', 'code reference', '2nd' );
+  my $self     = $CLASS->_init;
+  is  ( $self->$METHOD( 'CODE', $TEMP_DIR, {} ), undef,             'empty result' );
+  like( $self->diag,                             [ qr/$expected/ ], 'error message' );
+};
+
+subtest 'arguments are valid' => sub {
+  plan( 2 );
+
+  my $expected = [ 'file' ];
+  my $self     = $CLASS->_init;
+  is( $self->$METHOD( 'ARRAY', $TEMP_DIR, $expected ), $expected, 'expected result' );
+  is( $self->diag,                                     [],        'no error message' );
+};

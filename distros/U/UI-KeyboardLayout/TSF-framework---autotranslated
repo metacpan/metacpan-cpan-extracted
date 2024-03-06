@@ -1,0 +1,1126 @@
+﻿https://blog.csdn.net/fishmai/article/details/60756753
+https://download.csdn.net/download/hacsonchen/9522525?spm=1001.2101.3001.6661.1&utm_medium=distribute.pc_relevant_t0.none-task-download-2%7Edefault%7ECTRLIST%7ERate-1-9522525-blog-60756753.235%5Ev43%5Epc_blog_bottom_relevance_base1&depth_1-utm_source=distribute.pc_relevant_t0.none-task-download-2%7Edefault%7ECTRLIST%7ERate-1-9522525-blog-60756753.235%5Ev43%5Epc_blog_bottom_relevance_base1&utm_relevant_index=1&ydreferer=aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2Zpc2htYWkvYXJ0aWNsZS9kZXRhaWxzLzYwNzU2NzUz
+
+Research and implementation of Pinyin input method based on text service framework
+Mai Xiaoyu
+Published on 2017-03-07 11:18:57
+7k views
+Collection 19
+Likes 9
+Category column: Input method
+Input method column contains this content
+6 articles 5 subscriptions
+Subscribe to the column
+Abstract: Most current input methods are developed using Input Method Manager-Input Method Editor (IMM-IME). Research on the new input method technology released by Microsoft - Text Services Framework (TSF) has been lagging behind. This article discusses The basic composition of TSF, main interfaces, specific implementation methods of input methods and subsequent improvements, and use this technology to implement a basic TSF input method for reference by researchers in related fields.
+Keywords: Pinyin input method; text service framework; dynamic link library; text service; input method installation
+CLC classification number: TP311 Document identification code: A Article number: 1009-3044 (2016) 11-0206-03
+Abstract: Most of the current input method are developed by the method of the input method manager-input method editor (IMM-IME), the research of the new IME technology—text service framework (TSF) that Microsoft released has been a lag. This paper discusses the basic composition of TSF, main interface and the concrete realization way of input method and subsequent improvements, and use this technology to achieve a basic TSF input, provides the reference for researchers in related fields.
+Key words: pinyin input method; TSF; DLL; text service; installation of input method
+1 Background
+Input method refers to the encoding scheme used to convert various key sequences into characters for input into computers or other devices (such as mobile phones and tablets). Therefore, the research on input methods is an important topic in information processing [1]. Windows provides two sets of input method frameworks: in Windows XP and before, it is IMM (Input Method Manager), which is the input method engine, based on pure function API; in Windows XP and later, it provides a new input method framework TSF (Text Service Framework) ), is based on COM (Component Object Model). Currently, most of the existing versions of input methods are developed using the Input Method Manager-Input Method Generator (IMM-IME) framework. However, Metro-style applications in Windows 8 systems do not support this framework. In these applications, For input, you need to use an input method developed by the Text Services Framework (TSF). This article will mainly introduce the basic composition of the TSF framework, the design of the input method and the installation points.
+2. The composition and basic working process of TSF
+2.1 Basic concepts
+1) What is TSF
+TSF provides a simple, extensible framework for advanced text and natural language input technology. It is a device-independent and language-independent system service provided starting from Windows XP. Although TSF does not have much different effects on keyboard input methods than traditional IME, applications that support TSF can receive text input (such as handwriting, voice input) from any text service that supports TSF, regardless of the source of the text. specific details.
+2) TSF architecture[2]
+TSF mainly consists of three parts: application, text service and TSF manager. Its structure is shown in Figure 1:
+Applications: Application tasks generally include display, direct editing, and text storage, and provide text access capabilities by implementing COM services.
+Text Services: Provide text to applications, also implemented in COM, with a built-in service process registered as TSF. Multiple text services are allowed to be registered at the same time, which can include text input and output, and can also be used as an association of data and attributes of a piece of text.
+TSF Manager: As an intermediate layer between text services and applications, TSF Manager supports an application to establish multiple connections with text services at the same time and share text content. Its functions are implemented by the operating system.
+2.2 Interaction with applications
+The advantage of TSF is that it is device-independent, language-independent, and extensible, while providing users with a consistent input experience. Any TSF-enabled application can receive text from any Text Service and can output text without knowing the details of the source of the text. At the same time, text services do not need to consider the differences between various applications.
+
+TSF is the intermediary between the application and the IME. TSF passes the input event to the IME and receives the input characters returned from the IME after the user selects the characters.
+
+This article introduces the overall architecture of Meow input method from the perspective of interface and system.
+
+Table of contents
+(1): Basic situation
+(2): Basic concepts and common interfaces
+(3): Overall structure
+(4): Editors and Candidates
+(5): Interface management and interface-less mode
+(6): Lexicon and candidate algorithm
+(7): Realization of skin
+(8): Other chores
+
+Interface composition
+A common input method consists of the following interface.
+// FIXME: Replace this picture that makes me cry.
+Different input methods will have different choices in details. Some input methods do not have an editing window, while some input methods do not have a status bar.
+Meow selected interface elements
+Editing window: Contains editing information and candidate data.
+Language bar: only contains input method icons.
+Status bar: Since the language bar function is controlled, a language bar is still needed to assist.
+About the language bar
+Personally, I think the language bar on the interface should be used with caution.
+First, because the language bar involves a width issue, many applications will actively modify the width of the language bar. There is also a width refresh bug in the language bar on XP.
+Second, the language bar is different in different operating systems.
+The third reason is because the taskbar already has a lot of things. . .
+
+System architecture
+Due to lack of experience, I can only roughly design the structure as follows, and the details will need to be adjusted in practical programming.
+// FIXME: This picture has been changed
+Generally speaking, the input method window and input candidate engine should be independent of TextService, which facilitates development and testing, and also facilitates the free expansion of skins and candidate engines.
+In order to avoid unnecessary complex services, Meow avoids creating threads, so the response time of each method needs to be strictly controlled, which is a challenge for candidate engines.
+
+TextService text service
+TextService is the basic entrance of the input method and maintains the status of the input method itself.
+Important interfaces include ITfTextInputProcessorEx, ITfThreadMgrEventSink, and ITfThreadFocusSink.
+
+ConfigurationManager Configuration Manager
+The configuration manager is a global manager that can be called directly by any module.
+
+WindowManager window manager
+Implement and manage input method windows and skins.
+
+CompositionManager Edit Manager
+CompositionManager processes keyboard events, cooperates with the status information provided by TextService, and its own state machine to handle the logical process of key input.
+Important interfaces include ITfKeyEventSink, ITfTextEditSink, ITfCompositionSink, and ITfEditSession.
+//FIXME: It remains to be seen whether ITfDisplayAttributeProvider, IEnumTfDisplayAttributeInfo, ITfDisplayAttributeInfo need to be processed.
+
+CandidateManager candidate manager
+CandidateManager has two tasks.
+One, of course, is to cooperate with the candidate engine, respond to the CompositionManager, and generate a CandidateList.
+On the other hand, CandidateManager is also responsible for pushing the status of CandidateList to other modules, including WindowManager, CompositionManager and generating UIElement.
+
+Explanation of logical points
+ConfigurationManager only manages the configuration and does not maintain the status of the current input method.
+The relationship between CompositionManager and CandidateManager is more like two steps in the process, namely: key event->CompositionManager->CandidateManager->UI.
+In UILess mode, CandidateManager is the provider of UIElement, mainly because CandidateList is obviously very close to ITfCandidateListUIElement.
+Both TextService and CandidateManager will operate on WindowManager. On some issues (such as whether to display or not), the former has a higher priority than the latter.
+The main task of WindowManager is skin-related work, and it is loosely coupled with the input method as a whole.
+The main tasks of Engine are candidate algorithm and vocabulary processing, and it is also loosely coupled with the input method as a whole.
+
+CandidateManager and CompositionManager
+Logically speaking, the generation of CandidateList should be inside Composition. But CandidateManager is independent of CompositionManager for the following reasons:
+1. Let CompositionManager simply maintain the Composition state with peace of mind. (This task is difficult enough)
+2. In the concept of TSF, Composition itself has nothing to do with UI and CandidateList. There is no concept of Composition Window in TSF.
+3. The existence of UILess mode requires ITfCandidateListUIElement and WindowManager to cooperate to a certain extent, and this "cooperation" needs to happen exactly when they interact with CandidateList, and the generation of CandidateList requires the use of CompositionManager's string and candidate engine. Therefore, using a module to connect UIElement, WindowManager, and CandidateList, and interacting with CompositionManager and candidate engines as a whole, the code will be simpler and easier to understand.
+
+Entrance
+The DLL entry is those DLL functions. The DLL entry needs to complete the registry registration and provide ClassFactory to the outside world. TextService can be obtained through ClassFactory.
+
+TextService
+Input method initialization and release
+12345
+When TextService is activated, ActivateEx and Activate will be called, and the work at this time is initialization.
+When TextService is released, Deactivate will be called, and the work at this time is cleanup work.
+There may be multiple TextServices, but a TextService will only be Activated once, so after Activate, you can use class members to store the status of the current input method instance.
+However, there is no one-to-one relationship between TextService and the input program. Depending on the operating system configuration, multiple programs may share a TextService.
+Input method current activity status management
+123456789
+ITfThreadFocusSink: In Windows, the definition of Focus is to start accepting input. ITfThreadFocusSink is used here to decide whether the input method status bar is displayed.
+ITfThreadMgrEventSink: The current working target of the input method can only be one ITfDocumentMgr, but this ITfDocumentMgr may be shared by multiple programs, or a program may have multiple ITfDocumentMgr, but only one must be Focus. If ITfThreadMgrEventSink::OnSetFocus occurs, all currently stored ITfContext and I should be cleaned and initialized as appropriate
+
+
+TfDocumentMgr related targets. OnPushContext, OnInitDocumentMgr, etc. are generally not captured, because usually the APP has completed these operations when the input method is not loaded, so the input method needs to actively GetFocus, get ITfDocumentMgr, and then GetTop to get ITfContext.
+Interface provided
+The QueryInterface of TextService provides interface query for the entire input method. At the same time, each Manager is also initialized and maintained in TextService. Generally, all Managers have a pointer to find the TextService where they are located.
+
+ConfigurationManager, WindowManager
+It is not fully implemented yet.
+
+CompositionManager
+CompositionManager attempts to separate editing-related logic from TextService to manage editing operations conveniently and safely.
+12345678910111213
+The Composition process is separated into two parts: KeyEvent and EditSession.
+KeyEvent: Handles keyboard events that occur on the ITfContext. Under normal circumstances, you generally only need to handle the KeyDown event.
+EditSession: It is used to modify the text on ITfContext (including the text being composited). Because APP and IME both have write permissions on ITfContext, TSF Manager uses EditSession to coordinate. Therefore, if you want to update the text, you must call EditSession once.
+Under normal circumstances, the creation and destruction of Composition is performed by IME in EditSession, but in unexpected circumstances, APP will actively terminate Composition (such as APP closing), and OnCompositionTerminated will be called. In addition, EditSession can be executed asynchronously, ITfTextEditSink::OnEndEdit() occurs every time the EditSession terminates.
+
+CandidateManager
+CompositionManager will try to intercept keystrokes and manage the current composite state. CandidateManager uses the composite result of CompositionManager to call the input engine to generate CandidateList and call the corresponding UI module (Window or UIElement).
+I can't provide more detailed information at the moment because I haven't finished writing it yet.
+
+3. Design and specific implementation of input method
+3.1 Implementation of main interface functions
+Unlike traditional IMEs that must implement ImeInquire, ImeConfigure, ImeProcessKey, ImeToAsciiEx and other interface functions [3], the text service framework contains a new set of interface functions, and the specific implementation methods are also different. Some of the important interfaces are as follows [4]:
+Text input processing (ITfTextInputProcessor): ITfTextInputProcessor is the first interface that needs to be implemented to create a text service. It inherits from the IUnknown interface and is called by the TSF manager to activate and deactivate the text service.
+Thread manager event sink (ITfThreadMgrEventSink): This interface allows text services to receive and respond to changes in event focus. In TSF, event notifications are received by COM objects called event receivers. Therefore, the client needs to implement an ITfThreadMgrEventSink object and install the event receiver to obtain event notifications sent by the thread manager. In TSF, applications and text services are defined as clients. Document manager (ITfDocumentMgr): The role of the document manager is to manage edited content, and developers can create it through the ITfDocumentMgr interface. Each document manager maintains a last-in-first-out buffer, usually called a content stack, which is used to store the list of edited content managed by the corresponding document manager.
+Language bar button item information (ITfLangBarItemButton): This interface also inherits from the IUnknown interface and implements some information about button items on the language bar, such as icons, text, menu items that pop up when clicked, etc.
+Edit session (ITfEditSession): The edit session is implemented by the text service and called by the TSF manager to read or modify the text and attribute context.
+Input combination (ITfComposition): The input combination interface is implemented by the TSF manager and also inherits from the IUnknown interface. What kind of text the application displays, and whether to display the text, needs to obtain the display attribute information of the input combination, and display its status to the user by determining whether the input combination exists.
+Edit content view object (ITfContextView): After the text service creates new content for the candidate list, the GetTextExt method of the ITfContextView interface can return the screen coordinates of the text bounding box.
+In addition to the above interfaces, TSF also has some important interfaces that need to be implemented such as thread manager (ITfThreadMgr), client identifier (ITfClientId), keyboard event receiver (ITfKeyEventSink), property setting (ITfProperty), etc., which will not be detailed here.
+3.2 Basic implementation steps of input method
+3.2.1 Create a blank dynamic link library project
+The input method program is actually a dynamic link library program [5], but this dynamic link library is special. The suffix of the file name is .ime instead of .dll.
+1) In the DLL_PROCESS_ATTACH event, use RegisterClass to register the user interface window class. Properties of the status window, encoding window, and candidate window can be designed according to personal preferences.
+2) In the DLL_PROCESS_DETACH event, unregister the window object registered above and release all system resources used by the object.
+3.2.2 Design of text service module
+Users can use the language bar or keyboard to interact with text services, so first create a text service and register it. For a text service to be used by an application, it needs to be registered as a standard COM embedded process service, that is, registered in the text service framework. TSF provides simple registration process support through two interfaces, ITfInputProcessorProfiles and ITfCategoryMgr.
+The thread manager (ITfThreadMgr) is a basic component of the TSF Manager and completes common tasks for contacting the application and the client, including tracking changes in input focus. At the same time, the thread manager is also responsible for sending event notifications to the client. The client implements the ITfThreadMgrEventSink object and uses the ITfSource::AdviseSink method to install the event receiver and obtain event notifications.
+The text service uses the document manager to obtain editing content. The ITfTextEditSink interface allows the text service to receive and respond to focus change events. For a text service or application, the implementation of this interface is optional.
+It should be noted that the IME must be compatible with the system taskbar [6]. The taskbar only displays its icons for compatible IMEs and not for incompatible ones. We need to store the IME icon in a DLL or EXE file, not in a separate .ico file.
+3.2.3 Complete button mapping
+In addition to language and handwriting recognition, keyboard recognition is still the most commonly used. Key mapping is an important part of input method design. As the name suggests, it is also the part we are most familiar with. Here, virtual keys are used to respond to general keys and function keys to complete the input process.
+First, you need to use the Windows macro MAKELANGID to create a language identifier, which contains a primary language identifier and a secondary language identifier. The return value is also a language identifier, and is registered through the RegisterProfile method of ITfInputProcessorProfileMgr. For Pinyin input method, use MAKELANGID (LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED).
+The processing of key events is affected by several factors: keyboard available status, keyboard on status, input status, idle status, Chinese and English status, etc. In TSF, the public buffer pool provides a data storage and message processing mechanism for data sharing. , to support data sharing between client programs. For the keyboard, the public buffer pool GUID_COMPARTMENT_KEYBOARD_DISABLED is for editing content and is predefined. If its value is non-zero, the keyboard is unavailable; and GUID_COMPARTMENT_KEYBOARD_OPENCLOSE is for the thread manager. If it is non-zero, Then the keyboard is on. We check whether the keyboard is available through the GetCompartment method of the ITfCompartmentMgr interface. The processing of buttons is shown in Figure 2:
+Next, implement the ITfKeyEventSink interface to handle keystroke events. This interface includes methods such as OnKeyDowm, OnKeyUp, and OnSetFocus to handle events such as key press, key pop-up, and a TSF text service receiving or losing keyboard focus respectively. At the same time, the ITfKeystrokeMgr interface is equally important, which allows the text service to interact with the keyboard manager.
+3.2.4 Processing of input combinations and candidate lists
+The text service creates an input composition by calling the ITfContextComposition::StartComposition method, receives event messages for the input composition by creating an ITfCompositionSink object, and uses the ITfContextComposition::EndComposition method to end the input composition.
+While creating the input combination, the text service needs to provide support for display attributes that distinguish the combined input text from regular text in the application, by defining the text foreground color, background color, underline style, color, thickness, etc. in the TF_DISPLAYATTRIBUTE structure. Implement the provision of display properties. First, you need to call the ITfCategoryMgr::RegisterCategory method to register the text service as a service provider, then implement the ITfDisplayAttributeProvider and IEumTfDisplayAttributeInfo interfaces and make them available, and finally implement an ITfDisplayAttributeInfo object for each display attribute provided by the text service. Next is the processing of the candidate list. After the user inputs characters, the input method needs to provide a suitable candidate list from which the user can select the result string. To create a candidate list, you must first implement the creation and registration of the candidate window, then complete the event processing part, such as page turning, selection, etc., and finally implement the destruction and hiding of the window. It needs to be implemented one by one through ITfTextLayoutSink, ITfIntegratableCandidtateListUIElement and other interfaces.
+3.2.5 Register the text service as a standard COM process service
+The text service is implemented as a COM. All in-process COM servers (In-Process COM Server) output four standard functions: DllRegisterServer, DllUnRegisterServer, DllGetClassObject and DllCanUnloadNow. We need to export these four interface functions in the module definition file (.def) so that the input method can be registered in the system.
+DllRegisterServer uses the Windows registry to register COM objects, while DllUnRegisterServer has the opposite role of DllRegisterServer. DllUnRegisterServer is responsible for removing all entries registered by DllRegisterServer in the Windows registry.
+DllGetClassObject is responsible for providing COM with a class factory, which is used to create a COM object. COM is responsible for calling DllCanUnloadNow to see if the COM server can be unloaded from memory.
+4. Key points for installing the input method
+About the input method ime, there are two installation methods:
+1) Use a third-party installer, such as InstallShield provided by Flexera Software, to create an IME installation experience. Use this method to import your own lexicon and the generated ime file, and create a Setup.exe file, which allows users to install
+​
+Install an IME written by yourself. For specific steps, please refer to the MSDN support documentation.
+
+2) Use the Regsvr32 command. The Regsvr32 command is used to register dynamic link library files. It is a command provided by the Windows system to register or uninstall controls to the system. It is run in command line mode. The specific steps are to copy the generated input method .ime file to the system System folder, and then run the Regsvr32 input method .ime under cmd. However, there are some problems with this method. The input method icon cannot be used, but it does not affect the test.
+
+    5 How to register, install and use
+
+This document is only useful for those who want to redefine registration information, otherwise just use the installation file provided by the input method.
+  
+1 Document Description:
+tsf-reg.exe is a 32-bit registration program, and yong.dll is a 32-bit built-in module
+tsf-reg64.exe is a 64-bit registration program, and yong.dll is a 64-bit built-in module
+  
+For 64-bit systems, both 32-bit and 64-bit modules need to be registered.
+  
+2 Parameter description
+-n your input method name (used before the -i parameter)
+-i perform installation
+-u performs uninstallation
+-c copies files to the system32 directory
+-d deletes the input method in the system32 directory
+-l specifies the language for installing the input method
+-ll list of input method languages allowed to be installed
+  
+3 known issues
+Using the -c parameter will cause a bug in Win8. The 32-bit tsf module cannot be loaded correctly when executing the 32-bit METRO program on a 64-bit system.
+
+
+
+Windows input method technology TSF theory excerpt and source code analysis excerpt
+Summary of your own clues
+
+CCompositionProcessorEngine is related to the code table and pinyin conversion results.
+_pTableDictionaryEngine code table related
+KeyHandler.cpp is the key that handles joining
+CCandidateWindow candidate window
+What became of the previous status bar? It seems to have something to do with the language bar
+InitializeSampleIMECompartment, initialize com component
+SetupConfiguration();
+TF_PRESERVEDKEY reserved key
+pKS = pKeystroke->Append();
+Adds one and returns the added pointer
+digital signature
+Requirements for Windows 8 IMEs
+
+A third-party IME must meet these requirements:
+
+     Must be digitally signed.
+     Must be Text Services Framework (TSF) aware, and proper IME flags must be set to run properly in Windows 8.
+     Must follow UX guidelines for Metro style apps and be compatible with Metro style apps.
+
+A third-party IME that doesn't meet these requirements is blocked from running in the Metro environment, but it can still run on the desktop.
+Also, Windows Defender removes malicious IMEs from the system. Because of this, it's important that you familiarize yourself with the IME coding requirements for Windows 8. For more info, see Guidelines and checklist for IME development.
+-------------------------------------------------- -------------
+Is it true that when a TextService.dll does not have a digital signature, the input method is not allowed to be called under metro? Also, would a personal digital certificate (untrusted) be useful to sign it?
+All your executable code needs to be signed.
+You cannot ensure that all users will manually add your certificate as a trusted user, so use a certificate issued by a trusted authority.
+Architecture understanding
+
+However, according to my understanding, TFS is divided into two parts, one is where text input is accepted, and the other part is where text output is accepted. It is generally believed that if you have to do this, you may need to forge an invisible input box, then force open an input method to enter text, and then set the sink to listen back.
+common elements
+interface or interface
+conclusion of issue
+
+Under normal circumstances, the key combination event registered using ITfKeystrokeMgr::PreserveKey(...) should get a response in ITfKeyEventSink::OnPreservedKey().
+But in some programs, although ITfKeystrokeMgr::PreserveKey(...) succeeds, ITfKeyEventSink::OnPreservedKey() fails to respond when the key combination is pressed.
+
+The programs that have been discovered include:
+1) After IE opens google.com.hk, the search box on the page cannot respond.
+2) Unable to respond in QQ chat window
+Attachment: Input method programs that can be used normally in all other programs of Windows 8.1, download page http://chinput.com/thread-1768-1-1.html, you can try to use SHIFT+SPACE in the above programs and other programs Switch half-width/full-width to find the problem.
+
+Microsoft Pinyin under win7, and Sogou or QQ input method under win8 no longer use the old IMM. I use
+https://social.technet.microsoft.com/Forums/office/en-CN/002efcfc-8d21-4674-b93b-53c8424d448e/vista-api-immgetdescription?forum=2087
+The code in this post can be used to obtain the currently activated TSF input method, and to force activation to other input methods, but it is only limited to the window created by the current program. Now I want to use my own background program to obtain and set any The TSF input method of the front window is always invalid (the function returns S_OK)
+I've tried using ITfThreadMgr's AssociateFocus(GetForegroundWindow(), pDocMgr, &pPrevDocMgr)
+There are also AttachThreadInput(GetWindowThreadProcessId(GetForegroundWindow(), NULL), GetCurrentThreadId(), TRUE); which are still useless and can be set using IMM related functions. . . Could you please tell me if this requirement of mine can be realized on TSF?
+Win8 support
+
+This is indeed the case, the input method cannot be used directly in the Win8style program. A declaration is required:
+To declare an IME as compatible with Metro style apps, set the dwCaps field withTF_IPP_CAPS_IMMERSIVESUPPORT.
+How to install
+
+Microsoft's website doesn't say how to install it programmatically, but it does say that it can be installed using installshield.
+example
+
+routine
+Link: http://pan.baidu.com/s/1kTxmnnp Password: mxjb
+Please help me debug the source code under Tibetan_input. The second one can be used as a reference. (Actually, both have many problems)
+Install
+CTF framework
+
+Under the CTF framework, an input method is a TIP (Text Input Processor), which must first be registered as a COM component. Register the TIP's CLSID and ProfileID through the ITfInputProcessorProfileMgr::RegisterProfile() interface. This is equivalent to the following way of writing the registry:
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\CTF\TIP\{CLSID}\LanguageProfile\[langid]\{guidProfile}
+Description=SZ:
+IconFile=SZ:
+IconIndex=DWORD:
+Enable=DWORD:[0|1]
+SubstituteLayout=SZ:
+CLSID stands for TIP and also refers to the GUID of the COM that accommodates the TIP. ProfileID refers to the ID of a specific input method. A COM can contain multiple input method ProfileIDs. For example, Microsoft Pinyin 2010 implements two input methods in one COM: new experience and simplicity to meet different user needs.
+Or use the old interface to register
+1) Register CLSID through ITfInputProcessorProfiles::Register()
+2) Add language profile through ITfInputProcessorProfiles::AddLanguageProfile()
+-You can add multiple profiles in different languages
+This is equivalent to:
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\CTF\TIP\{CLSID}\LanguageProfile\[langid]\{guidProfile}
+Description=SZ:
+IconFile=SZ:
+IconIndex=DWORD:
+3) Enable or disable a profile by default through ITfInputProcesorProfiles::EnableLanguageProfileByDefault().
+- This setting is system level, i.e. it applies to different users in different systems.
+- If this interface is not called, the default is enabled
+- This setting can be overridden in HKCU
+This is equivalent to:
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\CTF\TIP\{CLSID}\LanguageProfile\[langid]\{guidProfile}
+Enable=DWORD:[0|1]
+4) Set the profile name: call ITfInputProcessorProfilesEx::SetLanguageProfileDisplayName().
+- Optional step. Note setting names in different languages.
+This is equivalent to:
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\CTF\TIP\{CLSID}\LanguageProfile\[langid]\{guidProfile}
+Display Description=SZ:
+5) Set up an alternative keyboard layout (only use keyboard TIP)
+- ITfInputProcessorProfiles::SubstituteKeyboardLayout() sets a replaceable hkl for profile.
+This hkl will be used when the focus switches from a Cicero aware control to a non-Cicero aware control. This is equivalent to:
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\CTF\TIP\{CLSID}\LanguageProfile\[langid]\{guidProfile}
+SubstituteLayout=SZ:
+Optional – Hide profile in Control Panel Input Method dialog
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\CTF\TIP\{CLSID}\LanguageProfile\[langid]\{guidProfile}
+HiddenInSettingUI=DWORD:[0|1]
+If this key value does not exist, it defaults to 0, that is, this profile is displayed in the Control Panel Input Method dialog box.
+By the way, set the default input method under the current user:
+ITfInputProcessorProfile::SetDefaultLanguageProfile()
+This only affects newly created threads and has no effect on already running threads. Of course, after restarting, it will take effect in all threads. The secondary interface will only affect the current user and has no impact on other users in the system.
+this
+​
+
+Equivalent to: 
+HKEY_CURRENT_USER\SOFTWARE\Microsoft\CTF\Assembly\[langid]\{TIP’sCategory}
+Default=SZ:TIP’sCLSID
+KayboardLayout=DWORD:
+Profile=SZ:TIP’s guidProfile
+As you can see from the above, no matter which framework, input method information needs to be written to the registry HKEY_LOCAL_MACHINE path. In addition, different input methods may also register their own components into the operating system, so during installation:
+First, administrator permissions are required; all users must be members of the administrators group;
+Second, if some security software is installed in the system, it may block writing to the registry system path (such as HKEY_LOCAL_MACHINE), and the installation will not be successful at this time. Either turn off its functionality temporarily, select "Allow writing" when prompted, or uninstall it and then install it again.
+Important guidance
+
+After understanding the power of TSF, it is easy to have a question, how does TSF isolate applications and Text Service? Here is a brief introduction to the working principle of TSF.
+First of all, you need to know that the input method based on the TSF framework is actually a COM program. In other words, Microsoft provides us with a lot of virtual base classes, and then we need to implement a COM program.
+(1) First, make sure that what is passed between the application and the Text Service is a text stream. Since it is a text stream, there must be text (which can be understood as the carrier of the text stream), such as notepad. Word, various input boxes, can be understood as a text. The processing of TSF is to first create a Thread Manager by the application. The creation method is to create a component object through CoCreateInstance. Correspondingly, the interface provided by Microsoft is ITfThreadMgr.
+(2) After creating the Thread Manager, use Thread Manager to create a Document Manager (document manager) using ITfThreadMgr::CreateDocumentMgr. The application will create a Document Manager for each different Document
+(3) After creating Document Manager, use ITfDocumentMgr to create an edit context using ITfDocumentMgr::CreateContext.
+In fact, Thread Manager maintains a context stack for each Document Manager, and the newly created context is pushed into the stack.
+So, how does Text Service write text stream into context? For this problem, first Text Service needs to obtain a context.
+When Text Service obtains a context, it is easy to think that there may be many Document Managers at this time, and there may be more contexts. Which one should be obtained?
+(1) First get the Document Manager currently in focus, using the method ITfThreadMgr::GetFocus to get a Document Manager object
+(2) Get the top context in the context stack of Document Manager obtained previously by using ITfDocumentMgr::GetTop
+At this point, the application and Text Service are connected through a context created by Thread Manager.
+So, how does TSF perform Text Stores? For this problem, Microsoft also provides us with the corresponding interface.
+For example, we can implement a TTsfTextStore and inherit ITextStoreAcp. There are some functions in this interface that can be implemented in TTsfTextStore. Among these functions are implementations of passing text stream. Given a list of functions in ITextStoreAcp:
+/* ITextStoreACP Interfaces */
+HRESULT STDMETHODCALLTYPE AdviseSink(REFIID riid, IUnknown* punk, DWORD dwMask);
+HRESULT STDMETHODCALLTYPE UnadviseSink(IUnknown* punk);
+HRESULT STDMETHODCALLTYPE RequestLock(DWORD dwLockFlags, HRESULT* phrSession);
+HRESULT STDMETHODCALLTYPE GetStatus(TS_STATUS* pdcs);
+HRESULT STDMETHODCALLTYPE QueryInsert(LONG acpTestStart, LONG acpTestEnd, ULONG cch, LONG* pacpResultStart, LONG* pacpResultEnd);
+HRESULT STDMETHODCALLTYPE GetSelection(ULONG ulIndex, ULONG ulCount, TS_SELECTION_ACP* pSelection, ULONG* pcFetched);
+HRESULT STDMETHODCALLTYPE SetSelection(ULONG ulCount, const TS_SELECTION_ACP* pSelection);
+HRESULT STDMETHODCALLTYPE GetText(LONG acpStart, LONG acpEnd, WCHAR* pchPlain, ULONG cchPlainReq, ULONG* pcchPlainOut, TS_RUNINFO* prgRunInfo, ULONG ulRunInfoReq, ULONG* pulRunInfoOut, LONG* pacpNext);
+HRESULT STDMETHODCALLTYPE SetText(DWORD dwFlags, LONG acpStart, LONG acpEnd, const WCHAR* pchText, ULONG cch, TS_TEXTCHANGE* pChange);
+HRESULT STDMETHODCALLTYPE GetFormattedText(LONG acpStart, LONG acpEnd, IDataObject* *ppDataObject);
+HRESULT STDMETHODCALLTYPE GetEmbedded(LONG acpPos, REFGUID rguidService, REFIID riid, IUnknown* *ppunk);
+HRESULT STDMETHODCALLTYPE QueryInsertEmbedded(const GUID* pguidService, const FORMATETC* pFormatEtc, BOOL* pfInsertable);
+HRESULT STDMETHODCALLTYPE InsertEmbedded(DWORD dwFlags, LONG acpStart, LONG acpEnd, IDataObject* pDataObject, TS_TEXTCHANGE* pChange);
+HRESULT STDMETHODCALLTYPE RequestSupportedAttrs(DWORD dwFlags, ULONG cFilterAttrs, const TS_ATTRID* paFilterAttrs);
+HRESULT STDMETHODCALLTYPE RequestAttrsAtPosition(LONG acpPos, ULONG cFilterAttrs, const TS_ATTRID* paFilterAttrs, DWORD dwFlags);
+HRESULT STDMETHODCALLTYPE RequestAttrsTransitioningAtPosition(LONG acpPos, ULONG cFilterAttrs, const TS_ATTRID* paFilterAttrs, DWORD dwFlags);
+HRESULT STDMETHODCALLTYPE FindNextAttrTransition(LONG acpStart, LONG acpHalt, ULONG cFilterAttrs, const TS_ATTRID* paFilterAttrs, DWORD dwFlags, LONG* pacpNext, BOOL* pfFound, LONG* plFoundOffset);
+HRESULT STDMETHODCALLTYPE RetrieveRequestedAttrs(ULONG ulCount, TS_ATTRVAL* paAttrVals, ULONG* pcFetched);
+HRESULT STDMETHODCALLTYPE GetEndACP(LONG* papp);
+HRESULT STDMETHODCALLTYPE GetActiveView(TsViewCookie* pvcView);
+HRESULT STDMETHODCALLTYPE GetACPFromPoint(TsViewCookie vcView, const POINT* pt, DWORD dwFlags, LONG* papp);
+HRESULT STDMETHODCALLTYPE GetTextExt(TsViewCookie vcView, LONG acpStart, LONG acpEnd, RECT* prc, BOOL* pfClipped);
+HRESULT STDMETHODCALLTYPE GetScreenExt(TsViewCookie vcView, RECT* prc);
+HRESULT STDMETHODCALLTYPE GetWnd(TsViewCookie vcView, HWND* phwnd);
+HRESULT STDMETHODCALLTYPE InsertTextAtSelection(DWORD dwFlags, const WCHAR* pchText, ULONG cch, LONG* pacpStart, LONG* pacpEnd, TS_TEXTCHANGE* pChange);
+HRESULT STDMETHODCALLTYPE InsertEmbeddedAtSelection(DWORD dwFlags, IDataObject* pDataObject, LONG* pacpStart, LONG* pacpEnd, TS_TEXTCHANGE* pChange);
+Of course, usually, we don't need to implement all functions, we only need to implement some functions according to our own needs.
+Status Bar
+
+There is a question that has puzzled me for several days. I wonder if you can help me solve it. Take the Google input method as an example.
+
+After placing the input cursor in a text file and selecting the Google input method, a status bar will appear. If you move the cursor to another program and the Google input method is switched off, the status bar disappears.
+
+The problem now is that based on the input method I wrote in tsf, I use
+​
+
+What event receiver can sense that the current context has lost input focus?
+I now display the status bar in (), and then destroy it in ITfTextInputProcessor::Deactive(). The current phenomenon is that when the text selection input method is opened, the status bar appears, and the status bar cannot be destroyed until the text is closed. I've been looking for a long time but haven't found the right method. I hope you guys can give me some advice!
+
+UINT WMAPP_FOCUS = RegisterWindowMessage(L"TargetAppFocus");
+
+STDAPI CTextService::OnSetFocus(ITfDocumentMgr *pDocMgrFocus, ITfDocumentMgr *pDocMgrPrevFocus)
+{
+PostMessage(_hStatusWnd, WMAPP_FOCUS, NULL, 0);
+
+_InitTextEditSink(pDocMgrFocus);
+
+return S_OK;
+}
+
+
+LRESULT WINAPI StatusWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+//----Processing target window focus switching----//
+if(message==WMAPP_FOCUS)
+{
+if(GetFocus()==NULL)
+ShowWindow(hWnd, SW_HIDE);
+else
+ShowWindow(hWnd, SW_SHOWNOACTIVATE);
+return 0L;
+}
+Problem flip selection, and flip doc don't work.
+
+Input method registration:
+Compile and generate the tsfcase.dll file to the specified path, such as: x:\tsfcase.dll, and then use Regsvr32.exe x:\tsfcase.dll to register the input method (it needs to be written as a bat file under Vista, and then executed as an administrator). Then, open a text file and select the English input method, and then select the input method. Its name is Case Text Service. This input method will add an additional icon to the language bar. Click it to pop up the operation menu. Including show snoop wnd (display monitoring window), hello world (insert string hello world!), flip selcetion (convert the case of the selected string), flip doc (convert the case of the entire document), flip keystrokes (convert keyboard input uppercase and lowercase)
+
+debug:
+Similar to general dll debugging, add x:\windows\nodepad.exe to the debugging command
+Then start nodepad for debugging, select the input method, and enter the breakpoint.
+
+question:
+Now the problem is flip selection, and flip doc not working.
+After tracing to the function ToggleCase, I found that there is a problem with the following sentence:
+if (pRange->GetText(ec, dwFlags, achText, ARRAYSIZE(achText), &cch) != S_OK)
+cch is always 0, causing the loop to break out.
+The function is as follows:
+void ToggleCase(TfEditCookie ec, ITfRange *pRange, BOOL fIgnoreRangeEnd)
+{
+ITfRange *pRangeToggle;
+ULONG cch;
+ULONGi;
+DWORD dwFlags;
+WCHARachText[64];
+
+// backup the current range
+if (pRange->Clone(&pRangeToggle) != S_OK)
+return;
+
+dwFlags = TF_TF_MOVESTART | (fIgnoreRangeEnd ? TF_TF_IGNOREEND : 0);
+
+while(TRUE)
+{
+// grab the next block of chars
+if (pRange->GetText(ec, dwFlags, achText, ARRAYSIZE(achText), &cch) != S_OK)
+break;
+
+//out of text?
+if (cch == 0)
+{
+break;
+}
+
+// toggle the case
+for (i=0; i<cch; i++)
+{
+achText[i] = ToggleChar(achText[i]);
+}
+
+// shift pRangeToggle so it covers just the text we read
+if (pRangeToggle->ShiftEndToRange(ec, pRange, TF_ANCHOR_START) != S_OK)
+break;
+
+//replace the text
+pRangeToggle->SetText(ec, 0, achText, cch);
+
+// prepare for next iteration
+pRangeToggle->Collapse(ec, TF_ANCHOR_END);
+}
+
+pRangeToggle->Release();
+}
+
+This is because notepad's tsf support is implemented through CUAS. Therefore, TSF's text store interface is not fully supported for accessing text content.
+
+
+
+VwTextStore is the point of interaction between Fieldworks and Text Services. VwTxtSrc designates VwTextStore as a friend class.
+
+Events:
+
+Amongst other things, it receives messages from Text Services, listens for mouse events, manipulates the document and responds to internal Fieldworks events, such as document changes and lazy box changes.
+
+The messages from text services arrive through the interface methods provided by ITfContextOwnerCompositionSink and ITextStoreACP.
+
+Storage:
+
+What kind of changes can happen to the document that do not come from text services is not known (clipboard, formatting etc. possibly)
+
+The section of the document which is being edited is stored as a DocMgr. This interface looks pretty simple. It is not clear how much of the document is stored at one time (assumedly the amount which is seen on the screen, which would be dictated by the lazy box mechanism).
+
+Porting:
+
+This class will be replaced in Linux Fieldworks by VwTextInputManager.
+Contents [hide]
+
+     1 Public Methods
+         1.1 ITextStoreACP methods.
+         1.2 ITfContextOwnerCompositionSink methods
+         1.3 ITfMouseTrackerACP
+         1.4 Other Public Methods.
+
+Public Methods
+ITextStoreACP methods.
+
+     STDMETHOD AdviseSink (REFIID riid, IUnknown * punk, DWORD dwMask);
+     STDMETHOD UnadviseSink (IUnknown * punk);
+     STDMETHOD RequestLock (DWORD dwLockFlags, HRESULT * phrSession);
+     STDMETHOD GetStatus (TS_STATUS * pdcs);
+     STDMETHOD QueryInsert (LONG acpTestStart, LONG acpTestEnd, ULONG cch, LONG * pacpResultStart, LONG * pacpResultEnd);
+
+     STDMETHOD GetSelection (ULONG ulIndex, ULONG ulCount, TS_SELECTION_ACP * pSelection, ULONG * pcFetched);
+     STDMETHOD SetSelection (ULONG ulCount, const TS_SELECTION_ACP * pSelection);
+     STDMETHOD GetText (LONG acpStart, LONG acpEnd, WCHAR * pchPlain, ULONG cchPlainReq, ULONG * pcchPlainOut, TS_RUNINFO * prgRunInfo, ULONG ulRunInfoReq, ULONG * pulRunInfoOut, LONG * pacpNext);
+     STDMETHOD SetText (DWORD dwFlags, LONG acpStart, LONG acpEnd, const WCHAR * pchText, ULONG cch, TS_TEXTCHANGE * pChange);
+
+These look fairly GtkIM like.
+
+     STDMETHOD GetFormattedText (LONG acpStart, LONG acpEnd, IDataObject ** ppDataObject);
+
+Embedding not supported
+
+     STDMETHOD GetEmbedded (LONG acpPos, REFGUID rguidService, REFIID riid, IUnknown ** ppunk);
+     STDMETHOD QueryInsertEmbedded (const GUID * pguidService, const FORMATETC * pFormatEtc, BOOL * pfInsertable);
+     STDMETHOD InsertEmbedded (DWORD dwFlags, LONG acpStart, LONG acpEnd, IDataObject * pDataObject, TS_TEXTCHANGE * pChange);
+
+     STDMETHOD RequestSupportedAttrs (DWORD dwFlags, ULONG cFilterAttrs, const TS_ATTRID * paFilterAttrs);
+     STDMETHOD RequestAttrsAtPosition (LONG acpPos, ULONG cFilterAttrs, const TS_ATTRID * paFilterAttrs, DWORD dwFlags);
+     STDMETHOD Request
+​
+
+AttrsTransitioningAtPosition (LONG acpPos, ULONG cFilterAttrs, const TS_ATTRID * paFilterAttrs, DWORD dwFlags);
+    STDMETHOD FindNextAttrTransition (LONG acpStart, LONG acpHalt, ULONG cFilterAttrs, const TS_ATTRID * paFilterAttrs, DWORD dwFlags, LONG * pacpNext, BOOL * pfFound, LONG * plFoundOffset);
+    STDMETHOD RetrieveRequestedAttrs (ULONG ulCount, TS_ATTRVAL * paAttrVals, ULONG * pcFetched);
+    STDMETHOD GetEndACP (LONG * pacp);
+    STDMETHOD GetActiveView (TsViewCookie * pvcView);
+
+    STDMETHOD GetACPFromPoint (TsViewCookie vcView, const POINT * pt, DWORD dwFlags, LONG * pacp);
+
+    STDMETHOD GetTextExt (TsViewCookie vcView, LONG acpStart, LONG acpEnd, RECT * prc, BOOL * pfClipped);
+    STDMETHOD GetScreenExt (TsViewCookie vcView, RECT * prc);
+    STDMETHOD GetWnd (TsViewCookie vcView, HWND * phwnd);
+
+    STDMETHOD InsertTextAtSelection (DWORD dwFlags, const WCHAR * pchText, ULONG cch, LONG * pacpStart, LONG * pacpEnd, TS_TEXTCHANGE * pChange);
+
+Equivalent to IM commit callback and keyboard event handler?
+
+    STDMETHOD InsertEmbeddedAtSelection (DWORD dwFlags, IDataObject * pDataObject, LONG * pacpStart, LONG * pacpEnd, TS_TEXTCHANGE * pChange);
+
+ITfContextOwnerCompositionSink methods
+
+These methods appear to have a close correlation with the GtkIMContext signals.
+
+    STDMETHOD OnStartComposition ITfCompositionView *pComposition, BOOL *pfOk);
+        Eqivalent to preedit-start
+    STDMETHOD OnUpdateComposition ITfCompositionView *pComposition, ITfRange *pRangeNew);
+        Eqivalent to preedit-changed
+    STDMETHOD OnEndComposition ITfCompositionView *pComposition);
+        Eqivalent to preedit-end
+
+ITfMouseTrackerACP
+
+    STDMETHOD AdviseMouseSink (ITfRangeACP * range, ITfMouseSink* pSink, DWORD* pdwCookie);
+        Asks to receive mouse events affecting a particular range.
+        Probably causes MouseEvent() to be called
+        Does not handle multiple paragraphs
+    STDMETHOD UnadviseMouseSink (DWORD dwCookie);
+        Asks to stop receiving mouse events as asked for by AdviseMouseSink()
+
+Other Public Methods.
+
+    void OnDocChange ();
+        Mainly just talks to Windows
+        Also calls OnLayoutChange ()
+    void OnSelChange (int nHow);
+        Seems to just call methods of AdviseSink
+    void OnLayoutChange ();
+        Mainly calls AdviseSink methods
+        Also calls DoDisplayAttrs ()
+    void SetFocus ();
+        Sets the focus of the ThreadMgr
+    void Init ();
+        Sets up ThreadMgr and DocMgr
+    void Close ();
+        Just clears memory
+    void AddToKeepList (LazinessIncreaser *pli);
+        Calls one method on pli using what looks like FW classes
+    bool MouseEvent (int xd, int yd, RECT rcSrc1, RECT rcDst1, VwMouseEvent me);
+        Long method (>100 lines) which seems to be interested in finding where a click landed in a root box
+        Most execution paths just end the composition (Reset the input method in GTK speak)
+        Some windows, some FW
+
+
+Implementation.pdf
+Analysis of input method registration process based on TSF framework_tsf input method registration
+3-2
+The input method based on the TSF framework is essentially a COM program, which is registered through regsvr32.exe. The registration command is as follows. regsvr32.exe sogou.ime//Register input method regsvr32.exe /u sogou.ime//Cancel Register input method 1. Call the corresponding registration callback function...
+Use TSF to accurately switch input methods under Vista and Win7
+2-21
+namespaceTSF { [StructLayout( LayoutKind.Sequential )] internalstructTF_LANGUAGEPROFILE { internalGuid clsid; internalshortlangid; internalGuid catid; [MarshalAs( UnmanagedType.Bool )] ...
+Research and implementation of text classification based on machine learning
+04-27
+With the rapid development of Internet technology, there are more and more text data on the Internet. The traditional manual text classification method can no longer cope with the current amount of data, and automatic text classification technology has become a research hotspot. As the main branch of text mining technology, text classification technology can effectively solve the needs of automatic text classification under the development of big data. Feature selection and text classification algorithm are two key parts of text classification technology. This article mainly studies these two parts. In the feature selection part, this paper proposes a hybrid feature selection method (CHMI) based on chi-square statistics (CHI) and mutual information (MI). This method first aims at the shortcomings of the chi-square statistic method being sensitive to low-frequency words and introduces word frequency. Factors are improved, and then adjustment parameters are used to improve the category sensitivity of the mutual information method. Finally, the two improved methods are combined to obtain a hybrid feature selection method that has better processing effects on low-frequency words and categories. Experimental results show that compared with the traditional chi-square statistic method and mutual information method, this method can effectively improve the accuracy of text classification on support vector machines, naive Bayes and K nearest neighbor classifiers. In the text classification algorithm part, the classifier uses support vector machine. The core of support vector machine is the kernel function. This paper proposes a hybrid kernel function based on polynomial kernel function and Gaussian kernel function. This kernel function has the advantages of polynomial kernel function and Gaussian kernel function. It not only has the ability of polynomial kernel function to extract overall features, but also uses Gaussian kernel function to detect local features.
+2.1 Computer input method
+weixin_46048542's blog
+2910
+Input methods (1) Keyboard input Familiar with the keyboard layout (2) Non-keyboard input (automatic input) Handwriting input through real-time recognition of pen tip or fingertip Scanning input based on image pixels Voice input How to input Chinese in the computer? (1) Keyboard input Chinese requires familiarity with the keyboard layout and mastering certain input methods: Pinyin, Wubi, etc. (2) Handwriting input in Chinese requires less commonly used input devices: handwriting pad or pen that supports handwriting input, etc.: Write Chinese correctly; (3) Voice input (4 ) How many steps does the user input process such as scanning input have? Applications (Notepad, browsing... can receive input information (keyboard, voice...); notify the received information to the input method for analysis and processing: The input method can
+C# input method_c# tsf switch input method
+2-13
+if(ImmGetOpenStatus(HIme))//If the input method is open { intiMode=0; intiSentence=0; boolbSuccess=ImmGetConversionStatus(HIme,refiMode,refiSentence);//Retrieve input method information if(bSuccess)
+How the TSF input method framework works_tsf Get text
+1-11
+First of all, you need to know that the input method based on the TSF framework is actually a COM program. In other words, Microsoft provides us with a lot of virtual base classes, and then we need to implement a COM program. (1) First, make sure that what is passed between the application and Text Service is a text stream. Since it is text...
+Research on candidate column positioning of input method TSF framework
+yang1fei2's blog
+833
+Original link When developing an input method application, we need to have the candidate column track the position of the input cursor at all times for input. However, the inaccurate positioning of the candidate column has always troubled input method developers. The old Windows input method framework imm will be inaccurately positioned in some scenarios, such as chrome applications, and the new input method framework TSF will also be inaccurately positioned in some applications, such as Notepad++ and other applications. To solve the problem of inaccurate positioning, there are usually two options: 1. Obtain the position of the input cursor through the application and then perform candidate positioning. 2. Position the placeholder symbol on the screen in advance through the TSF framework. Both options have their own pros and cons. Here I will introduce the two. Solution 1. Position through the input cursor of the application and obtain the light
+Use of text service framework
+fishmai's column
+3571
+This section provides software developers with guidelines and standard implementations for creating text services and TSF-enabled applications. A set of sample source codes for compilable TSF applications and text services are provided in the winui subfolder of the samples folder of the Microsoft® Platform Software Development Kit (SDK). • Common components • Applications • Text services The following software components are used in or implemented by applications and text services that support TSF
+Implementation of Doubi input method (2): basic concepts and common interfaces
+fishmai's column
+4295
+Why is it called Meow? Because this is an input method for cats. . . Contents (1): Basic situation (2): Basic concepts and common interfaces (3): Overall architecture (4): Editing and candidates (5): Interface management and interfaceless mode (6): Lexicon and candidate algorithm (7) ): Skin implementation (8): Other chores TSF vs IMM32 The input method widely uses the IMM32 interface and has matured. Microsoft started to promote TSF in XP, and the Vista operating system has TSF enabled by default.
+Design and implementation of machine learning text emotion system based on python.docx
+08-17
+Design and implementation of machine learning text emotion system based on python
+Dynamic input method TSF startup process analysis
+Endless Encoding
+320
+dTyperJar also has two important member functions: setJvm() and startup(). In setJvm(), penv0 and mainclass0 are stored locally, penv0->GetJavaVM(&jvm); the environment pointer of the jvm started in CSmapleIME penv0, main class mainclass0, main class instance dTyper0, passed to its member->dTyperJar through _pCompositionProcessorEngine->setJvm(). At this point, dTyper has completed initialization and can perform typing functions.
+How to make the text editing box of full-screen games support IME and TSF input methods
+Libresoft Labs
+5465
+How to make the text editing box of full-screen games support IME and TSF input methods. This article mainly solves the problem that the text editing box of the game cannot display the word group window and candidate word window in the full-screen state. The article was first published: blog.csdn.net/goodboychina/leading to this problem The reason is that TSF is incompatible with IME, and starting from Win7, TSF (Advanced Text Service) is turned on by default and cannot be turned off. This situation is more serious under Win8. To solve this problem, we need to start with the compatibility issues caused by the introduction of the TSF framework. First understand the following
+Basic Server sets dynamic IP
+Popular recommendations
+qq_45769990’s blog
+10,000+
+1. First create a new basic server virtual host. 2. Enter the account password. You can not see the normal input when entering the password. 3. Enter ifconfig to view the current configuration network. 3. Enter vi /etc/sysconfig/network-scripts/ifcfg-eth0 to edit information. 3.1 Enter i to enter edit mode and change onboot to yes. Press the ESC key and enter: wq to save and exit. 3.2 Enter cat /etc/sysconfig/network-scripts/ifcfg-eth0 to view the information. 3.3 Confirm that it is correct and restart the gateway.
+Get TSF input method list
+harvardfeng's column
+2562
+TSF: Microsoft Windows Text Services Framework (TSF) is a system service included in the Windows XP and subsequent operating systems. TSF provides a simple and extensible framework for advanced text input communication and natural language technology. The above is quoted from Baidu Encyclopedia. To quote the Winapi.MsCTF unit, if you don't have it, search it in the higher version of XE, or search it on Baidu. procedure TForm1.btnSTFCli
+Hidden Markov model python implements simple pinyin input method
+861
+I saw an introduction to the hidden Markov model on the Internet, and I thought it couldn't be more magical. I also found a blog from a great person on the Internet about how to use the hidden Markov model to implement Chinese pinyin input. Unfortunately, the great person didn't give me a way to run it. For the code, I could only manually find the lexicon of stuttering word segmentation online. Based on this training, I derived a hidden Markov model and used the Viterbi algorithm to implement a simple pinyin input method. Githuh address: https://github.com/LiuRoy/Pinyin_Demo Introduction to the principle Hidden Markov model...
+UILess Mode Overview
+fishmai's column
+927
+How to create UILessMode Making UI-less Thread: The application can make a UI Less Thread by ITfThreadMgrEx::ActivateEx with ITF_AE_UIELEMENTENABLEDONLY. When ThreadMgr is activated with this fla
+Research and implementation of news text multi-label classification algorithm based on CNN
+06-28
+### Answer 1: The research and implementation of multi-label classification algorithm for news text based on CNN is a study of how to use convolutional neural network (CNN) to perform multi-label classification of news text. The algorithm can automatically classify news texts into multiple tags, thereby improving the accuracy and efficiency of classification. The implementation of this algorithm requires in-depth research on the principles and techniques of CNN, and training and testing combined with actual data sets. The research and implementation of this algorithm are of great significance for improving the accuracy and efficiency of news classification. ### Answer 2: In recent years, with the popularity of the Internet and social media, the number of news reports has continued to increase, and the topics involved have become more extensive and complex. Therefore, multi-label classification of news has become an important challenge. In traditional text classification methods, texts can often only be divided into single labels and cannot solve multi-label classification problems. The news text multi-label classification algorithm based on convolutional neural network (CNN) has become one of the more effective solutions at present. The implementation of the CNN-based news text multi-label classification algorithm is mainly divided into the following steps: 1. Data preprocessing: perform word segmentation, stop word filtering, stem extraction and other operations on the news text, and convert the text into a fixed-length vector form. 2. Build a CNN model: use the text vector as the input of the CNN, perform feature extraction through the convolution layer and the pooling layer, and then perform classification prediction through the fully connected layer, and finally output multiple different labels. 3. Model training: Use the standard backpropagation algorithm to train the model by minimizing the loss function. 4. Model evaluation: Use evaluation indicators (such as accuracy, macro-average F1, micro-average F1, etc.) to evaluate the trained model. In practical applications, the CNN-based news text multi-label classification algorithm can be widely used in news recommendation, public opinion analysis, text intelligent classification and other fields. At the same time, this algorithm also has some problems, such as the need to label a large amount of data and the model is prone to overfitting. Therefore, further in-depth research and improvement are needed in the future. In short, the CNN-based news text multi-label classification algorithm is one of the more effective solutions at present, which can help people manage and browse massive news data more accurately and efficiently. ### Answer 3: With the development of Internet technology, the amount of news information has grown exponentially. How to use new technologies to automatically process these massive news information has become an urgent problem to be solved. Among them, an important task is the multi-label classification of news texts. To this end, this article will introduce the research and implementation of multi-label classification algorithm for news text based on convolutional neural network (CNN). 1. Working principle and application of CNN Convolutional neural network is a deep learning model, which was first used in the field of image recognition. Its basic working principle is: perform a sliding window convolution operation on the input signal through the convolution kernel, thereby extracting prominent feature information, and sequentially process it through multiple layers of convolution layers, pooling layers and fully connected layers, and finally output Classification results. In recent years, CNN research in the field of text classification has also achieved many results. Its common applications include sentiment classification, spam identification, event detection, etc. In addition, CNN has also been used for multi-label classification tasks of news texts, becoming an effective solution. 2. Definition and challenges of news text multi-label classification tasks News text multi-label classification
+​
+
+The task refers to distinguishing multiple tags on a piece of news. Usually there are a large number of tags. Common tags include title, abstract, text, time, location and other information. The challenge lies in how to effectively extract and represent these labels to ensure high-quality classification results. 3. Multi-label classification algorithm for news text based on CNN. Specifically, the algorithm is mainly divided into the following steps: (1) Text preprocessing: segment the original text, filter stop words, remove non-Chinese characters and other operations. It is converted into a vector represented by numbers; (2) Convolution layer processing: Taking the preprocessed text data as input, performing a convolution operation and extracting feature information to obtain a multi-dimensional feature vector; (3) Pooling layer processing: By The convolutional layer output performs a pooling operation to compress the dimension of the feature vector to reduce the computational burden; (4) Fully connected layer processing: Perform a fully connected operation on the feature vectors extracted by the pooling layer to further extract new feature information and complete label discrimination. ; (5) Model training: Use a large amount of annotated data to train the model so that it can accurately classify labels; (6) Model evaluation: Use the test set to evaluate the performance of the trained model, including accuracy and recall. , F1 score and other indicators. The advantage of this algorithm is that it can make full use of local features in the text, effectively reduce the computational complexity of text classification, and can also perform well when the number of labels is large. 4. Conclusion The multi-label classification algorithm for news text based on CNN is an effective solution that can classify massive amounts of news information efficiently, accurately and automatically. It is one of the indispensable technologies in the field of news.
+Is "Related Recommendations" helpful to you?
+
+     Very unhelpful
+     Not helpful
+     generally
+     helpful
+     very helpful
+
+     about Us
+     Recruitment
+     Business Cooperation
+     seeking coverage
+     400-660-0108
+     kefu@csdn.net
+     online service
+     Working hours 8:30-22:00
+
+     Public Security Registration Number 11010502030143
+     Beijing ICP No. 19004658
+     Beijing Net Article [2020] No. 1039-165
+     Commercial website registration information
+     Beijing Internet Illegal and Bad Information Reporting Center
+     Parental supervision
+     Network 110 alarm service
+     China Internet Reporting Center
+     Chrome store download
+     Account management specifications
+     Copyright and Disclaimer
+     Copyright complaint
+     Publication license
+     business license
+     ©1999-2024Beijing Innovation Lezhi Network Technology Co., Ltd.
+
+Mai Xiaoyu
+12 years of coding experience
+Guangdong Opal Communications Co., Ltd.
+
+443
+     Original
+
+20,000+
+     Weekly ranking
+
+1.99 million+
+     Overall ranking
+
+2.49 million+
+     access
+
+     grade
+
+20,000+
+     integral
+
+687
+     fan
+
+413
+     Liked
+
+156
+     Comment
+
+1706
+     collect
+
+LinkedIn
+Keep creating
+1024 Medal
+Keep writing
+Creative expert
+Private letter
+focus on
+write an essay
+popular articles
+
+     A brief introduction to audio formats DTS, AC3 and AAC and HDTV 43572
+     WeChat applet architecture analysis and working principle analysis 37129
+     QQ Internet login prompt redirect uri is illegal (100010) perfect solution 37073
+     Detailed explanation of Referer 35819
+     Android interview questions [Senior Engineer Edition] 33779
+
+Classification column
+
+     qt
+     4 articles
+     life cube
+     1 article
+     android reverse engineering
+     6 articles
+     ios
+     131 articles
+     server
+     14 articles
+     voip
+     1 article
+     translater
+     7 articles
+     compiler debugger
+     8 articles
+     machine learning
+     5 articles
+     Big Data
+     5 articles
+     Audio and video
+     31 articles
+     android
+     109 articles
+     middleware
+     4 articles
+     product manager
+     1 article
+     Code generation automation
+     1 article
+     IOS reverse engineering
+     8 articles
+     software test
+     1 article
+     PC development
+     19 articles
+     C++ learning
+     7 articles
+     GUI framework
+     1 article
+     MFC
+     6 articles
+     Flex
+     7 articles
+     Four Pillars Forecasting
+     8 articles
+     emotional life
+     2 articles
+     vside
+     1 article
+     database
+     7 articles
+     Lessons learned
+     3 articles
+     debug
+     7 articles
+     web website building
+     2 articles
+     software engineering
+     2 articles
+     eclipse
+     3 articles
+     Software tool usage
+     1 article
+     php
+     1 article
+     project management
+     7 articles
+     Workflow
+     1 article
+     software career
+     3 articles
+     Efficient learning
+     2 articles
+     strategic management
+     1 article
+     Software debugging
+     4 articles
+     leadership
+     2 articles
+     Architect
+     5 articles
+     amr
+     2 articles
+     chrome
+     1 article
+     Architecture
+     10 articles
+     Architect exam
+     1 article
+     Performance Testing
+     3 articles
+     scm
+     3 articles
+     big data processing
+     1 article
+     Cryptographically secure
+     4 articles
+     Network setup
+     2 articles
+     reading notes
+     2 articles
+     javascript
+     2 articles
+     cell phone
+     3 articles
+     Development environment setup
+     2 articles
+     performance
+     6 articles
+     software
+     1 article
+     android debugging
+     12 articles
+     time management
+     2 articles
+     E-commerce
+     1 article
+     Life
+     1 article
+     securities
+     3 articles
+     financial management
+     7 articles
+     android test
+     1 article
+     dephi
+     1 article
+     deep learning
+     6 articles
+     text editor
+     3 articles
+     Game map editor
+     1 article
+     Image Processing
+     9 articles
+     font
+     2 articles
+     smart home
+     2 articles
+     live streaming
+     5 articles
+     easydarwin
+     5 articles
+     opengl
+     6 articles
+     http server
+     2 articles
+     wifidog
+     2 articles
+     Input
+     6 articles
+     C#
+     11 articles
+     vb
+     1 article
+     ffmpeg
+     4 articles
+     xcode
+     25 articles
+     java
+     11 articles
+     jvm
+     10 articles
+     objc
+     8 articles
+     svn
+     2 articles
+     mac
+     21 articles
+     mach-o
+     4 articles
+     lldb
+     4 articles
+     Push message
+     1 article
+     Tool efficiency
+     3 articles
+     llvm
+     2 articles
+     UI framework
+     4 articles
+     apple review
+     1 article
+     crash
+     3 articles
+     Script compilation
+     2 articles
+     appcode
+     dyld
+     gdb
+     1 article
+     DTrace
+     1 article
+     sqlite
+     3 articles
+     Network Optimization
+     6 articles
+     app
+     3 articles
+     start up
+     3 articles
+     swift
+     5 articles
+     Architecture-Network
+     3 articles
+     database
+     Camera
+     1 article
+     webrtc
+     5 articles
+     Memory management
+     5 articles
+     cpu
+     2 articles
+     Basic library
+     4 articles
+     go
+     1 article
+     cocos2d
+     1 article
+     animation library
+     1 article
+     network
+     2 articles
+     react native
+     4 articles
+     Open source library
+     6 articles
+     android studio
+     10 articles
+     linux
+     1 article
+     gradle
+     2 articles
+     buck
+     2 articles
+     android framework
+     6 articles
+     concurrent
+     1 article
+     sourcetree
+     1 article
+     Multithreading
+     1 article
+     sdk
+     1 article
+     jdk
+     1 article
+     push
+     1 article
+     anr
+     2 articles
+     survival rate
+     1 article
+     android source code analysis
+     Safety
+     1 article
+     atlas
+     1 article
+     spot
+     Backstage
+     9 articles
+     Operation and maintenance
+     3 articles
+     spark
+     1 article
+     elk
+     1 article
+     iphonex
+     1 article
+     redis
+     2 articles
+     tcpip
+     1 article
+     Distributed storage
+     2 articles
+     code review
+     1 article
+     Architecture-Domain Driven Development
+     1 article
+     Blockchain
+     tensorflow
+     1 article
+     caffe
+     1 article
+     clang
+     3 articles
+     reactnative
+     1 article
+     Front-end development
+     5 articles
+     keras
+     1 article
+     Gis
+     1 article
+     linux kernel
+     1 article
+
+latest comment
+
+     Code review summary
+
+     wjb6318: What is mvpd?
+     Construct and send Beacon frames to fake arbitrary WiFi hotspots
+
+     w-blueing: Hello, can this frame be connected?
+     apk cracking actual combat
+
+     qq_40785436: Master, can you help me crack an app? If the crack is successful, thank you for free.
+     Android cloud real machine principle and cloud real machine platform construction practice
+
+     Edward.W: It’s a pity that I didn’t see this article last year. I built a similar platform last year and there were no problems. However, when I displayed it, I found that most js libraries that play raw bytes only support the baseline type. Finally, h264-converter, a ts library, was used to play this high-type h264 naked stream.
+     Use Wifidog to realize WeChat wifi connection
+
+     SDCGD: Hello, what is the relationship between wifidog and portal? Thanks
+
+Would you recommend "Blog Details Page" to your friends?
+
+     Strongly not recommended
+     Not recommended
+     so so
+     recommend
+     highly recommended
+
+latest articles
+
+     How to create a data closed loop for autonomous driving
+     Federated learning open source framework solution selection
+     Detailed explanation of mindspore
+
+26 articles in 2022
+12 articles in 2021
+14 articles in 2020
+26 articles in 2019
+29 articles in 2018
+246 articles in 2017
+537 articles in 2016
+44 articles in 2015
+Table of contents
+
+     Windows input method technology TSF theory excerpt and source code analysis excerpt
+         Summary of your own clues
+         digital signature
+             Requirements for Windows 8 IMEs
+         Architecture understanding
+         common elements
+         interface or interface
+         conclusion of issue
+         Win8 support
+         How to install
+         example
+         Install
+         CTF framework
+         Important guidance
+         Status Bar
+         Problem flip selection, and flip doc don't work.
+         Contents
+         Public Methods
+             ITextStoreACP methods.
+             ITfContextOwnerCompositionSink methods
+             ITfMouseTrackerACP
+             Other Public Methods.
+​
+
+　　6 结束语 
+　　作为新一代输入法框架，TSF 是一个允许进行高级的、来源无关的文本输入的应用编程接口，它为高级文本和自然语言输入技术提供了一个简单和可扩展的框架。本文主要讨论了 TSF 的基本概念以及注意事项，并且使用 TSF 实现了一款简单的输入法软件。关于图标不能显示的问题还有待解决，另外，对于一个完整的输入法来说还有软键盘、鼠标输入、系统图标、菜单设置、输入法皮肤等方面需要一一实现[7]，同时，输入效率也是一个不容忽视的部分，有关输入转换算法还需要进一步的研究。 
+　　参考文献： 
+　　[1] 李培峰， 朱巧明. 析 Windows 95/98/NT 平台多文种 IME 的设计技术[J]. 计算机工程与科学， 2000， 22（4）： 67-70. 
+　　[2] 王世元. 基于文本服务框架的拼音输入法客户端设计与实现[D]. 哈尔滨： 哈尔滨工业大学， 2013. 
+　　[3] 胡宇晓， 马少平， 夏莹. 基于 IMM-IME 输入法接口的实现方法[J]. 计算机工程与应用， 2002（1）： 117-124. 
+　　[4] Microsoft Corporation Company. Text Services Framework[EB/OL]. http：//msdn.microsoft.com/zh-cn/library/windows/apps/ms629032.aspx. 
+　　[5] 刘政怡， 李炜， 吴建国. 基于IMM-IME的汉字键盘输入法编程技术研究[J]. 计算机技术与发展， 2006， 16（12）： 43-48. 
+　　[6] Microsoft Corporation Company. Requirements for IME development[EB/OL]. http：//msdn.microsoft.com/en-us/library/windows/apps/hh967425.aspx. 
+　　[7] 焦翠珍， 戴文华. 输入法程序设计技术初探[N]. 咸宁师专学报， 200， 21（3）： 73-77.
+麦晓宇
+关注
+
+    9
+    19
+    觉得还不错? 一键收藏
+    0
+
+专栏目录
+TSF 输入法开发例子 TSF example
+05-17
+BasicTextService.zip CandidateList.zip Composition.zip CompositionStringUnderline.zip IconInLanguageBar.zip Keyboard.zip PropertyMonitor.zip PropertyTextService.zip TextInsertion.zip TrackFocus.zip TrackTextChange.zip
+基于云模型的文本数字水印算法研究与实现
+04-17
+提出了基于云模型的文本水印算法。利用云模型的随机性和模糊性，设定云模型的参数作为密钥，通过正向云发生器产生水印信息，水印映射到坐标轴上形成一幅云图。采用小波域自适应量化的方法，根据嵌入位置的不同选取不同的量化系数，将水印嵌入到载体文本中。提取后既可以对云进行视觉上的判断，又能通过逆向云发生器得到云模型的参数，并且给出了定量判断的方法。实验结果表明：基于云模型的文本水印算法比传统水印具有更高的鲁棒性和不可感知性，可有效保护文本作品的版权。
+TSF输入法
+2-24
+从上面构架图可以看到,TSF提供一个位于应用和输入法实现的间接层(一个Text service/TIP可以是一个输入法,或语音识别,PunCha:记住,TIP就是一个输入法提供的一个服务,比如百度输入法提供“语音、手写、键盘”输入,那就是3个Tip,但是一...
+...编写 和 安装 输入法 教程(1)_tsf 输入法如何调试
+2-21
+编写输入法有几种方式,如外挂式,IME式,TSF式,今天我们主要介绍IME式( 输入法接口式(Input Method Editor-IME)) 1,输入法是什么东西? 编写输入法其实就是编写一个DLL ,一个导出一些操作系统约定函数的DLL,操作系统通过这些函数和我们...
+基于seq2seq实现的搜喵中文文本拼音输入法.zip
+最新发布
+08-24
+拼音输入的本质上就是一个序列到序列的模型：输入拼音序列，输出汉字序列。所以天然适合用在诸如机器翻译的seq2seq模型上。 模型初始输入是一个随机采样的拼音字母的character embedding，经过一个CBHG的模型，输出是五千个汉字对应的label。 详细介绍参考：https://blog.csdn.net/sheziqiong/article/details/132467183
+计算机研究 -基于知识图谱的文本自动生成技术的研究与实现.pdf
+06-29
+计算机研究 -基于知识图谱的文本自动生成技术的研究与
+​

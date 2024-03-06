@@ -1129,7 +1129,7 @@ got <0x30 00 0x65 00 0x31 00 0x32 00 0x33 00 0x34 0x20 0x20 0x20 0x20 0x20 0x20 
 		(If a binding and a longer one exist, finish shorter one with SPACE.)
 	New key ComposeKey in .kbdd.
 	Logic for wrapping autodead.
- basing on PrefixDocs.
+	Generate deadkey names basing on PrefixDocs.
 	Autogenerate PrefixDocs for flip_AltGr key.
 	AltGr-inverted deadkeys were not in the KEYNAME_DEAD section.
 	Suppress generation of deadkey names for Compose Compose Etc (overflow some Windows' buffer??? - installs but not activatable).
@@ -1708,7 +1708,7 @@ got <0x30 00 0x65 00 0x31 00 0x32 00 0x33 00 0x34 0x20 0x20 0x20 0x20 0x20 0x20 
 	New sections on “common confusion” about power of “legacy Windows keyboards”.
 	Clarify more sections in the docs.
 	Fix links to berkeley.
-	Update @double_scan_VK to the substitutions we were actually duing during patching.
+	Update @double_scan_VK to the substitutions we were actually during patching.
 	Output "\0" on Ctrl-2.
 	Replace by $self->order_faces_4_massage the last remaining sort keys %{$self->{faces}} (no difference).
 	Rename BaseKeys() to Base_VK_names(), add micro-docs.
@@ -1830,8 +1830,7 @@ got <0x30 00 0x65 00 0x31 00 0x32 00 0x33 00 0x34 0x20 0x20 0x20 0x20 0x20 0x20 
   a767    <ꝧ>     LATIN SMALL LETTER THORN WITH STROKE THROUGH DESCENDER [Latin; Latin Extended-D; 5.1]
 
 
-0.75:
-	Document treatment of KBDKANA (and +KBDSHIFT) to handle lAlt-keys (due to “KBDALT stripping”).
+0.75:	Document treatment of KBDKANA (and +KBDSHIFT) to handle lAlt-keys (due to “KBDALT stripping”).
 	Document the problem with OEM_8 on Firefox.
 	Update the docs on problems with Firefox to v.55 (sic!).
 
@@ -1856,3 +1855,71 @@ got <0x30 00 0x65 00 0x31 00 0x32 00 0x33 00 0x34 0x20 0x20 0x20 0x20 0x20 0x20 
 	examples/msklc_altgr_r2l.c
 	examples/msklc_altgr.c
 		Change the maximal length of ligature to 3 (to match the LIGATURE3 type from msklc_lig4.h).
+
+0.76	Extend bitmap’s bits usable in mods_keys_KBD by U, V, W (for 256..1024; untested).
+	New key @modkeys_vk (for a hash; remapping of scancode not implemented yet! — NOW IT IS).
+	Emit MODIFIERS section if mods_keys_KBD is non-empty.
+	Emit human-readable descriptions of modifier columns.
+	Almost done: document parts of the syntax of .kbdd file left “TBC” from version 0.13.  (A few TBC still remain.)
+	Start documenting yet newer syntax.  (Many more TBC appeared…)
+	Document the mutator rules “pseudo-faked-***”.
+	Comment code to handle prefix(NOTSAME(case)?)? in @output_layers.
+	Likewise for the mutator prefix(NOTSAME(case)?)?.
+	Implement the case-variant of the latter one.  (Untested.)
+	A bit more clear comment about <reveal-substkey>.
+	Change prefix AltGr to Altern for CharSubstitutions CharSubstitutionFaces CharSubstitutionLayers (old names deprecated).
+	Remove duplicates from the table of scancodes; remove VK_-codes (SHIFT..EXECUTE etc, NUMPADn, DECIMAL) crept in.
+	Produce “fake” scancodes 0xe0e* for NUMPADn/DECIMAL (which on non-exotic keyboards are not assigned scancodes, but are
+	  translated from Insert/End/etc. as needed by the kernel).
+		Can MSKLC treat this without breaking?  It handles NUMPADn (as good as with other codes - and it does not update E0 map!),
+		but allows DECIMAL only on sc=53.  It even REMOVES from the e0-map the ADDED e0nn codes (X5E removed by e05d	OEM_AX)!
+	Document this into GOTCHAs.
+	Remap DECIMAL to sc=53.
+	Document kbdutool not giving a way to assign a scancode.
+	Scancodes on VK settings were ignored.
+	Allow the VK settings to define only the scancode.
+	Massive simplifications in the suggested workflow of creating the DLLs.
+	Update LIMITATIONS and Copyright in the docs.
+
+	izKeys.kbdd:
+		Change “fake” prefixes (for extra layers) to be above 0fff (to free space; add 9000).
+		Change Compose and Compose³ accessors 06e8 → 06fe, 06f0 → 06ff.
+		Change AltGr-arrows accessors 06f4 → 06fa ... 06f7 → 06fd.
+		  ONLY 06fa..06ff remain used in the range 06e0..06ff (where we put non-automatic “strange” prefix keys).
+	  !!! Different massaging!!!  XXX  in 00b01 00b03
+		Remove <any-circled>+<reveal-substkey> which seems to have no effect.
+		Update COPYR_YEARS.
+		Redefine VK-codes of APPS and KANA.
+			(Now no patching is needed with conversion by klc2c.pl!)
+
+	izKeys-visual-maps-base.html
+		Start updating the described bindings.
+
+	examples/klc2c.pl
+		One of TODO issues got into a root TODO file.
+		MODIFIERS section is processed now.
+		Unhardwire massaging SHIFTSTATE (as for izKeys): now takes into account MODIFIERS (we ignore RMENU for massaging).
+		Code to emit the _extern.h file.
+		Make more readable comments in the emitted file, and include a license info.
+		Produce extra header and C files, and .DEF and .RC files.
+		Support lines in layout with only scancode and VK-code (to force a scancode).
+		Create the table of scancodes matching exactly what is on Type 4 of kbd.h.
+		Fill the value for VK_POWER (from Google search) which is used in the table above for scancode e05e.
+			(But do not they confuse it with the scancode???)
+			(Maybe it is better not to convert it to a scancode???)
+		Support redefinition of scancodes.
+		Ignore fake scancodes (in the range 0xE0E0..0xE0EF) for NUMPADn/DECIMAL.
+			(Untested when X/Y-scancodes need to be added.)
+		Special-case DECIMAL-on-53 too.
+		Autogenerate KBD_l with l in U V W as needed.
+		Option --comment-vkcodes=VK_first,VK_second would comment out emitting the specified VK-codes (with "VK_" omitted).
+		Support empty LAYOUT, DEADKEYS or LIGATURE, KEYNAME, KEYNAME_EXT.
+
+	Changes		One row in the description of v0.60 was garbled.
+
+	examples/build_here.cmd
+		Remove the parts relying on kbdutool.
+		Use  --comment-vkcodes=OEM_8 for the Latin version.
+		Update which files are included into src.zip.
+
+	logo-base.html	Fix 06f5 ⇝ 06fb etc. due to changes to .kbdd

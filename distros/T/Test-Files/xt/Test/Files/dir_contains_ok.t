@@ -3,22 +3,19 @@ use warnings
   FATAL    => qw( all ),
   NONFATAL => qw( deprecated exec internal malloc newline once portable redefine recursion uninitialized );
 
-use Test::Expander;
+use Test::Expander -tempdir => {};
 
-my $diag;
 my $mockThis = mock $CLASS => (
   override => [
-    _dir_contains_ok        => sub { [] },
-    _show_failure           => sub { $_[ 1 ] },
-    _show_result            => sub {},
-    _validate_trailing_args => sub { ( $diag, {} ) },
+    _show_failure => sub {},
+    _show_result  => sub { !@{ shift->diag } },
   ]
 );
 
-plan( 2 );                                                  ## no critic (ProhibitMagicNumbers)
+const my @FILE_LIST => ( qw( file0 file1 ) );
+path( $TEMP_DIR )->child( $_ )->touch foreach @FILE_LIST;
 
-$diag = undef;
-is( $METHOD_REF->( 'dir', [ 'file' ] ), $diag, 'comparison performed' );
+plan( 2 );
 
-$diag = 'ERROR';
-is( $METHOD_REF->( 'dir', [ 'file' ] ), $diag, 'invalid arguments, comparison rejected' );
+ok(  $METHOD_REF->( $TEMP_DIR, \@FILE_LIST ), 'comparison performed' );
+ok( !$METHOD_REF->( $TEMP_DIR, {} ),          'invalid arguments, comparison rejected' );

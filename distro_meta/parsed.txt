@@ -90891,3 +90891,12 @@ D/DE/DERF/Travel-Status-DE-DBWagenreihung-0.10.tar.gz
 W/WA/WATERKIP/WebService-Postex-0.006.tar.gz
 M/MA/MANWAR/WWW-Google-CustomSearch-0.40.tar.gz
 I/IN/INGY/YAMLScript-0.1.39.tar.gz
+P/PE/PERLANCAR/App-ComparerUtils-0.001.tar.gz
+S/SK/SKIM/App-DWG-Sort-0.01.tar.gz
+U/UT/UTASHIRO/App-Greple-9.11.tar.gz
+L/LE/LEEJO/CGI-4.63.tar.gz
+G/GE/GENE/Music-ModalFunction-0.0409.tar.gz
+K/KH/KHEDIN/Resource-Silo-0.1203.tar.gz
+K/KI/KIMOTO/SPVM-0.989083.tar.gz
+J/JS/JSF/Test-Files-0.25.tar.gz
+I/IL/ILYAZ/modules/UI-KeyboardLayout-0.76.zip

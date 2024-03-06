@@ -345,7 +345,7 @@ If an excetpion is thrown, the value referenced by C<error_id> is set to a non-z
 Examples:
 
   int32_t error_id = 0;
-  int8_t value = env->get_class_var_byte_by_name(env, stack, "TestCase::NativeAPI", "$BYTE_VALUE", &error_id, __func__, __FILE__, __LINE__);
+  int8_t value = env->get_class_var_byte_by_name(env, stack, "TestCase::NativeAPI", "$BYTE_VALUE", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
 
 =head2 get_class_var_short_by_name
@@ -367,7 +367,7 @@ If an excetpion is thrown, the value referenced by C<error_id> is set to a non-z
 Examples:
 
   int32_t error_id = 0;
-  int16_t value = env->get_class_var_short_by_name(env, stack, "TestCase::NativeAPI", "$SHORT_VALUE", &error_id, __func__, __FILE__, __LINE__);
+  int16_t value = env->get_class_var_short_by_name(env, stack, "TestCase::NativeAPI", "$SHORT_VALUE", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
 
 =head2 get_class_var_int_by_name
@@ -389,7 +389,7 @@ If an excetpion is thrown, the value referenced by C<error_id> is set to a non-z
 Examples:
 
   int32_t error_id = 0;
-  int8_t value = env->get_class_var_int_by_name(env, stack, "TestCase::NativeAPI", "$BYTE_VALUE", &error_id, __func__, __FILE__, __LINE__);
+  int8_t value = env->get_class_var_int_by_name(env, stack, "TestCase::NativeAPI", "$BYTE_VALUE", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
 
 =head2 get_class_var_long_by_name
@@ -411,7 +411,7 @@ If an excetpion is thrown, the value referenced by C<error_id> is set to a non-z
 Examples:
 
   int32_t error_id = 0;
-  int64_t value = env->get_class_var_long_by_name(env, stack, "TestCase::NativeAPI", "$LONG_VALUE", &error_id, __func__, __FILE__, __LINE__);
+  int64_t value = env->get_class_var_long_by_name(env, stack, "TestCase::NativeAPI", "$LONG_VALUE", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
 
 =head2 get_class_var_float_by_name
@@ -433,7 +433,7 @@ If an excetpion is thrown, the value referenced by C<error_id> is set to a non-z
 Examples:
 
   int32_t error_id = 0;
-  float value = env->get_class_var_float_by_name(env, stack, "TestCase::NativeAPI", "$FLOAT_VALUE", &error_id, __func__, __FILE__, __LINE__);
+  float value = env->get_class_var_float_by_name(env, stack, "TestCase::NativeAPI", "$FLOAT_VALUE", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
 
 =head2 get_class_var_double_by_name
@@ -455,7 +455,7 @@ If an excetpion is thrown, the value referenced by C<error_id> is set to a non-z
 Examples:
 
   int32_t error_id = 0;
-  double value = env->get_class_var_double_by_name(env, stack, "TestCase::NativeAPI", "$DOUBLE_VALUE", &error_id, __func__, __FILE__, __LINE__);
+  double value = env->get_class_var_double_by_name(env, stack, "TestCase::NativeAPI", "$DOUBLE_VALUE", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
 
 =head2 get_class_var_object_by_name
@@ -477,7 +477,7 @@ If an excetpion is thrown, the value referenced by C<error_id> is set to a non-z
 Examples:
   
   int32_t error_id = 0;
-  void* value = env->get_class_var_object_by_name(env, stack, "TestCase::NativeAPI", "$MINIMAL_VALUE", &error_id, __func__, __FILE__, __LINE__);
+  void* value = env->get_class_var_object_by_name(env, stack, "TestCase::NativeAPI", "$MINIMAL_VALUE", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
 
 =head2 get_class_var_string_by_name
@@ -511,7 +511,7 @@ If an excetpion is thrown, the value referenced by C<error_id> is set to a non-z
 Examples:
 
   int32_t error_id = 0;
-  env->set_class_var_byte_by_name(env, stack, "TestCase::NativeAPI", "$BYTE_VALUE", 15, &error_id, __func__, __FILE__, __LINE__);
+  env->set_class_var_byte_by_name(env, stack, "TestCase::NativeAPI", "$BYTE_VALUE", 15, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
 
 =head2 set_class_var_short_by_name
@@ -529,7 +529,7 @@ If an excetpion is thrown, the value referenced by C<error_id> is set to a non-z
 Examples:
 
   int32_t error_id = 0;
-  env->set_class_var_short_by_name(env, stack, "TestCase::NativeAPI", "$SHORT_VALUE", 15, &error_id, __func__, __FILE__, __LINE__);
+  env->set_class_var_short_by_name(env, stack, "TestCase::NativeAPI", "$SHORT_VALUE", 15, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
 
 =head2 set_class_var_int_by_name
@@ -547,7 +547,7 @@ If an excetpion is thrown, the value referenced by C<error_id> is set to a non-z
 Examples:
 
   int32_t error_id = 0;
-  env->set_class_var_int_by_name(env, stack, "TestCase::NativeAPI", "$INT_VALUE", 15, &error_id, __func__, __FILE__, __LINE__);
+  env->set_class_var_int_by_name(env, stack, "TestCase::NativeAPI", "$INT_VALUE", 15, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
 
 =head2 set_class_var_long_by_name
@@ -564,7 +564,7 @@ If an excetpion is thrown, the value referenced by C<error_id> is set to a non-z
 Examples:
 
   int32_t error_id = 0;
-  env->set_class_var_long_by_name(env, stack, "TestCase::NativeAPI", "$LONG_VALUE", 15, &error_id, __func__, __FILE__, __LINE__);
+  env->set_class_var_long_by_name(env, stack, "TestCase::NativeAPI", "$LONG_VALUE", 15, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
 
 =head2 set_class_var_float_by_name
@@ -582,7 +582,7 @@ If an excetpion is thrown, the value referenced by C<error_id> is set to a non-z
 Examples:
 
   int32_t error_id = 0;
-  env->set_class_var_float_by_name(env, stack, "TestCase::NativeAPI", "$FLOAT_VALUE", 15, &error_id, __func__, __FILE__, __LINE__);
+  env->set_class_var_float_by_name(env, stack, "TestCase::NativeAPI", "$FLOAT_VALUE", 15, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
 
 =head2 set_class_var_double_by_name
@@ -600,7 +600,7 @@ If an excetpion is thrown, the value referenced by C<error_id> is set to a non-z
 Examples:
 
   int32_t error_id = 0;
-  env->set_class_var_double_by_name(env, stack, "TestCase::NativeAPI", "$DOUBLE_VALUE", 15, &error_id, __func__, __FILE__, __LINE__);
+  env->set_class_var_double_by_name(env, stack, "TestCase::NativeAPI", "$DOUBLE_VALUE", 15, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
 
 =head2 set_class_var_object_by_name
@@ -617,7 +617,7 @@ If an excetpion is thrown, the value referenced by C<error_id> is set to a non-z
 Examples:
 
   int32_t error_id = 0;
-  env->set_class_var_object_by_name(env, stack, "TestCase::NativeAPI", "$MINIMAL_VALUE", minimal, &error_id, __func__, __FILE__, __LINE__);
+  env->set_class_var_object_by_name(env, stack, "TestCase::NativeAPI", "$MINIMAL_VALUE", minimal, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
 
 =head2 set_class_var_string_by_name
@@ -768,7 +768,7 @@ If an excetpion is thrown, the value referenced by C<error_id> is set to a non-z
 Examples:
 
   int32_t error_id = 0;
-  int8_t byte_value = env->get_field_byte_by_name(env, stack, object, "byte_value", &error_id, __func__, __FILE__, __LINE__);
+  int8_t byte_value = env->get_field_byte_by_name(env, stack, object, "byte_value", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
 
 =head2 get_field_short_by_name
@@ -788,7 +788,7 @@ If an excetpion is thrown, the value referenced by C<error_id> is set to a non-z
 Examples:
 
   int32_t error_id = 0;
-  int8_t short_value = env->get_field_short_by_name(env, stack, object, "short_value", &error_id, __func__, __FILE__, __LINE__);
+  int8_t short_value = env->get_field_short_by_name(env, stack, object, "short_value", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
 
 =head2 get_field_int_by_name
@@ -808,7 +808,7 @@ If an excetpion is thrown, the value referenced by C<error_id> is set to a non-z
 Examples:
 
   int32_t error_id = 0;
-  int8_t int_value = env->get_field_int_by_name(env, stack, object, "int_value", &error_id, __func__, __FILE__, __LINE__);
+  int8_t int_value = env->get_field_int_by_name(env, stack, object, "int_value", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
 
 =head2 get_field_long_by_name
@@ -828,7 +828,7 @@ If an excetpion is thrown, the value referenced by C<error_id> is set to a non-z
 Examples:
 
   int32_t error_id = 0;
-  int8_t long_value = env->get_field_long_by_name(env, stack, object, "long_value", &error_id, __func__, __FILE__, __LINE__);
+  int8_t long_value = env->get_field_long_by_name(env, stack, object, "long_value", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
 
 =head2 get_field_float_by_name
@@ -848,7 +848,7 @@ If an excetpion is thrown, the value referenced by C<error_id> is set to a non-z
 Examples:
 
   int32_t error_id = 0;
-  int8_t float_value = env->get_field_float_by_name(env, stack, object, "float_value", &error_id, __func__, __FILE__, __LINE__);
+  int8_t float_value = env->get_field_float_by_name(env, stack, object, "float_value", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
 
 =head2 get_field_double_by_name
@@ -868,7 +868,7 @@ If an excetpion is thrown, the value referenced by C<error_id> is set to a non-z
 Examples:
 
   int32_t error_id = 0;
-  int8_t double_value = env->get_field_double_by_name(env, stack, object, "double_value", &error_id, __func__, __FILE__, __LINE__);
+  int8_t double_value = env->get_field_double_by_name(env, stack, object, "double_value", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
 
 =head2 get_field_object_by_name
@@ -888,7 +888,7 @@ If an excetpion is thrown, the value referenced by C<error_id> is set to a non-z
 Examples:
 
   int32_t error_id = 0;
-  void* object_minimal = env->get_field_object_by_name(env, stack, object_simple, "object_value", &error_id, __func__, __FILE__, __LINE__);
+  void* object_minimal = env->get_field_object_by_name(env, stack, object_simple, "object_value", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
 
 =head2 get_field_string_by_name
@@ -920,7 +920,7 @@ If an excetpion is thrown, the value referenced by C<error_id> is set to a non-z
 Examples:
 
   int32_t error_id = 0;
-  env->set_field_byte_by_name(env, stack, object, "byte_value", 13, &error_id, __func__, __FILE__, __LINE__);
+  env->set_field_byte_by_name(env, stack, object, "byte_value", 13, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
 
 =head2 set_field_short_by_name
@@ -938,7 +938,7 @@ If an excetpion is thrown, the value referenced by C<error_id> is set to a non-z
 Examples:
 
   int32_t error_id = 0;
-  env->set_field_short_by_name(env, stack, object, "short_value", 13, &error_id, __func__, __FILE__, __LINE__);
+  env->set_field_short_by_name(env, stack, object, "short_value", 13, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
 
 =head2 set_field_int_by_name
@@ -956,7 +956,7 @@ If an excetpion is thrown, the value referenced by C<error_id> is set to a non-z
 Examples:
 
   int32_t error_id = 0;
-  env->set_field_int_by_name(env, stack, object, "int_value", 13, &error_id, __func__, __FILE__, __LINE__);
+  env->set_field_int_by_name(env, stack, object, "int_value", 13, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
 
 =head2 set_field_long_by_name
@@ -974,7 +974,7 @@ If an excetpion is thrown, the value referenced by C<error_id> is set to a non-z
 Examples:
 
   int32_t error_id = 0;
-  env->set_field_long_by_name(env, stack, object, "long_value", 13, &error_id, __func__, __FILE__, __LINE__);
+  env->set_field_long_by_name(env, stack, object, "long_value", 13, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
 
 =head2 set_field_float_by_name
@@ -992,7 +992,7 @@ If an excetpion is thrown, the value referenced by C<error_id> is set to a non-z
 Examples:
 
   int32_t error_id = 0;
-  env->set_field_float_by_name(env, stack, object, "float_value", 13, &error_id, __func__, __FILE__, __LINE__);
+  env->set_field_float_by_name(env, stack, object, "float_value", 13, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
 
 =head2 set_field_double_by_name
@@ -1010,7 +1010,7 @@ If an excetpion is thrown, the value referenced by C<error_id> is set to a non-z
 Examples:
 
   int32_t error_id = 0;
-  env->set_field_double_by_name(env, stack, object, "double_value", 13, &error_id, __func__, __FILE__, __LINE__);
+  env->set_field_double_by_name(env, stack, object, "double_value", 13, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
 
 =head2 set_field_object_by_name
@@ -1028,7 +1028,7 @@ If an excetpion is thrown, the value referenced by C<error_id> is set to a non-z
 Examples:
 
   int32_t error_id = 0;
-  env->set_field_object_by_name(env, stack, object_simple, "object_value", object_minimal, &error_id, __func__, __FILE__, __LINE__);
+  env->set_field_object_by_name(env, stack, object_simple, "object_value", object_minimal, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
 
 =head2 set_field_string_by_name
@@ -1105,7 +1105,7 @@ Calls the method I<method> given the L<width of the argument|SPVM::Document::Nat
 
 If the method throws an exception, returns a basic type ID of an error class, otherwise returns 0.
 
-The return value of the method is set to C<stack[0]>.
+C<stack[0]> is set to the return value of the method.
 
 This native API should not be used unless special purposes are intended. Normally, use the L</"call_method"> native API.
 
@@ -1133,15 +1133,17 @@ If an exception is thrown, C<error_id> is set to a non-zero value, otherwise it 
 
 Examples:
   
+  // Call a class method
   int32_t error_id = 0;
-  int32_t output;
+  int32_t total;
   {
-    int32_t args_width = 1;
+    int32_t args_width = 2;
     stack[0].ival = 5;
-    env->call_class_method_by_name(env, stack, "TestCase::NativeAPI", "my_value", args_width, &error_id, __func__, __FILE__, __LINE__);
+    stack[1].ival = 10;
+    env->call_class_method_by_name(env, stack, "MyClass", "sum", args_width, &error_id, __func__, FILE_NAME, __LINE__);
     if (error_id) { return error_id; }
     
-    output = stack[0].ival;
+    total = stack[0].ival;
   }
 
 =head2 call_instance_method_static_by_name
@@ -1171,7 +1173,7 @@ Examples:
   {
     int32_t args_width = 1;
     stack[0].oval = obj_point;
-    env->call_instance_method_static_by_name(env, stack, "Point", "x", args_width, &error_id, __func__, __FILE__, __LINE__);
+    env->call_instance_method_static_by_name(env, stack, "Point", "x", args_width, &error_id, __func__, FILE_NAME, __LINE__);
     if (error_id) { return error_id; }
     output = stack[0].ival;
   }
@@ -1238,7 +1240,7 @@ If an exception is thrown, C<error_id> is set to a non-zero value, otherwise it 
 Examples:
 
   int32_t error_id = 0;
-  void* minimal = env->new_object_by_name(env, stack, "TestCase::Minimal", &error_id, __func__, __FILE__, __LINE__);
+  void* obj_point = env->new_object_by_name(env, stack, "Point", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
 
 =head2 new_pointer_object_no_mortal
@@ -1268,7 +1270,7 @@ C<void* (*new_pointer_object_by_name)(L<SPVM_ENV* env|SPVM::Document::NativeClas
 Calls the L</"new_object_by_name"> native API and sets the pointer I<pointer> to a native data to the created object, and returns it.
 
   int32_t error_id = 0;
-  void* minimal = env->new_pointer_object_by_name(env, stack, "TestCase::Pointer", pointer, &error_id, __func__, __FILE__, __LINE__);
+  void* minimal = env->new_pointer_object_by_name(env, stack, "TestCase::Pointer", pointer, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
 
 =head2 get_pointer
@@ -1705,7 +1707,7 @@ Returns the pointer to the characters stored in the string C<string_object>.
 
 Examples:
 
-  const char* chars = env->get_chars(env, stack, string_object);
+  const char* chars = env->get_chars(env, stack, obj_string);
 
 =head2 get_bool_object_value
 
@@ -1857,7 +1859,7 @@ And sets the created string to the L<exception variable|SPVM::Document::Language
 
 Examples:
 
-  return env->die(env, stack, "The value must be %d.", 3, __func__, __FILE__, __LINE__);
+  return env->die(env, stack, "The value must be %d.", 3, __func__, FILE_NAME, __LINE__);
 
 =head2 get_exception
 
@@ -1873,7 +1875,7 @@ C<void (*set_exception)(L<SPVM_ENV* env|SPVM::Document::NativeClass/"Runtime Env
 
 Sets I<exception> to the L<exception variable|SPVM::Document::Language::ExceptionHandling/"Exception Variable">.
 
-I<exception> is a SPVM string.
+I<exception> is an SPVM string.
 
 =head2 new_stack_trace_no_mortal
 
@@ -1883,7 +1885,7 @@ Creates a new string adding a string line of a stack trace given the file I<file
 
 If its memory allocation failed, returns C<NULL>.
 
-I<exception> is a SPVM string. The return value is a SPVM string.
+I<exception> is an SPVM string. The return value is an SPVM string.
 
 This native API should not be used unless special purposes are intended. Normally, use the L</"new_stack_trace"> native API.
 

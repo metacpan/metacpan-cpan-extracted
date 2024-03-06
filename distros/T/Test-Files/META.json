@@ -37,6 +37,7 @@
             "Data::Compare" : "0",
             "Exporter" : "0",
             "Fcntl" : "0",
+            "File::chdir" : "0",
             "PadWalker" : "0",
             "Path::Tiny" : "0.144",
             "Test::Builder" : "0",
@@ -46,6 +47,7 @@
       },
       "test" : {
          "requires" : {
+            "Archive::Zip" : "0",
             "File::Copy::Recursive" : "0",
             "FindBin" : "0",
             "Test::Expander" : "0",
@@ -64,6 +66,6 @@
          "web" : "https://github.com/jsf116/Test-Files"
       }
    },
-   "version" : "0.24",
+   "version" : "0.25",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

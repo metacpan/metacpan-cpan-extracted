@@ -1,0 +1,80 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use App::DWG::Sort;
+
+our $VERSION = 0.01;
+
+# Run.
+exit App::DWG::Sort->new->run;
+
+# Print version.
+sub VERSION_MESSAGE {
+	print $VERSION."\n";
+	exit 0;
+}
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+dwg-sort - Tool to sort DWG files by version.
+
+=head1 SYNOPSIS
+
+ dwg-sort [-h] [--version] directory
+
+=head1 DESCRIPTION
+
+Tool is looking for all DWG files in directory and move them to directories
+named after DWG magic strings.
+
+=head1 ARGUMENTS
+
+=over 8
+
+=item * C<-h>
+
+Print help.
+
+=item * C<--version>
+
+Print version of script.
+
+=item * C<directory>
+
+Directory with DWG files.
+
+=back
+
+=head1 EXAMPLE
+
+ dwg-sort -h
+
+=head1 REPOSITORY
+
+L<https://github.com/michal-josef-spacek/App-DWG-Sort>
+
+=head1 AUTHOR
+
+Michal Josef Špaček L<mailto:skim@cpan.org>
+
+L<http://skim.cz>
+
+=head1 LICENSE AND COPYRIGHT
+
+© 2024 Michal Josef Špaček
+
+BSD 2-Clause License
+
+=head1 VERSION
+
+0.01
+
+=cut

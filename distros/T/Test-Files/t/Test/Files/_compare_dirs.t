@@ -5,47 +5,51 @@ use warnings
 
 use Test::Expander -tempdir => {};
 
-my ( $diag, $error, $expected, $file_list );
+use Test::Files::Constants qw( $FMT_UNDEF );
+
+my ( $error, $expected, $file_list );
 my $mock_this = mock $CLASS => (
   override => [
-    _compare_files          => sub { [] },
-    _dir_contains_ok        => sub { ( [], $file_list ) },
-    _get_two_files_info     => sub { $error },
-    _show_failure           => sub { pass( 'failure reported' ); return },
-    _show_result            => sub { is( !!shift, !!$expected, 'result reported' ); return },
-    _validate_trailing_args => sub { $diag },
+    _compare_files      => sub { [] },
+    _dir_contains_ok    => sub { $file_list },
+    _get_two_files_info => sub { shift->diag( $error ) },
+    _show_failure       => sub {
+      shift;
+      my $err = sprintf( $FMT_UNDEF, $expected, '.+' ); like( shift, qr/$err/, 'failure reported' );
+      return 0;
+    },
+    _show_result        => sub { is( !!@{ shift->diag }, !!@$error, 'result reported' ) },
   ]
 );
 
-plan( 5 );
+plan( 4 );
 
-subtest 'trailing arguments invalid' => sub {
-  plan( 2 );
-  $diag = 'ERROR';
-  is( $METHOD_REF->(), undef, 'comparison performed' );
-};
-
-$diag = undef;
 subtest 'first directory undefined' => sub {
   plan( 2 );
-  is( $METHOD_REF->(), undef, 'comparison performed' );
+
+  $expected = '\$expected_dir';
+  ok( !$CLASS->_init->$METHOD, 'comparison failed' );
 };
 
 subtest 'second directory undefined' => sub {
   plan( 2 );
-  is( $METHOD_REF->( 'FIRST_DIR' ), undef, 'comparison performed' );
+
+  $expected = '\$got_dir';
+  ok( !$CLASS->_init->expected( 'x' )->$METHOD, 'comparison failed' );
 };
 
 path( $TEMP_DIR )->child( 'SUBDIR' )->mkdir;
 path( $TEMP_DIR )->child( 'PLAIN_FILE' )->touch;
-( $error, $expected, $file_list ) = ( [], 1, [ 'file' ] );
+( $error, $expected, $file_list ) = ( [], undef, [ 'file' ] );
 subtest 'directories identical' => sub {
   plan( 2 );
-  is( $METHOD_REF->( 'FIRST_DIR', $TEMP_DIR ), undef, 'comparison performed' );
+
+  is( $CLASS->_init->got( 'FIRST_DIR' )->expected( $TEMP_DIR )->$METHOD, 1, 'comparison performed' );
 };
 
-( $error, $expected, $file_list ) = ( [ 'ERROR' ], 0, [ 'file' ] );
+( $error, $expected, $file_list ) = ( [ 'ERROR' ], undef, [ 'file' ] );
 subtest 'differences detected' => sub {
   plan( 2 );
-  is( $METHOD_REF->( 'FIRST_DIR', $TEMP_DIR ), undef, 'comparison performed' );
+
+  is( $CLASS->_init->got( 'FIRST_DIR' )->expected( $TEMP_DIR )->$METHOD, 1, 'comparison performed' );
 };

@@ -1,0 +1,40 @@
+#!/usr/bin/env perl
+
+# Show common cords and notes between two modes.
+
+use strict;
+use warnings;
+
+use List::Util qw(uniq);
+use Music::Chord::Note ();
+use Music::ModalFunction ();
+
+my $pitch1 = shift || 'c';
+my $scale1 = shift || 'ionian';
+my $pitch2 = shift || 'd';
+my $scale2 = shift || 'ionian';
+
+my $cn = Music::Chord::Note->new;
+
+my $m = Music::ModalFunction->new(
+    mode_note    => $pitch1,
+    mode         => $scale1,
+    key_note     => $pitch2,
+    key          => $scale2,
+    hash_results => 1,
+);
+my $results = $m->pivot_chord_keys;
+
+my @notes;
+
+print "Chords in common between $pitch1 $scale1 and $pitch2 $scale2:\n";
+for my $result (@$results) {
+    my $flavor = $result->{chord} eq 'maj' ? '' : $result->{chord} eq 'min' ? 'm' : $result->{chord};
+    my $chord = uc($result->{chord_note}) . $flavor;
+    my @pitches = $cn->chord($chord);
+    push @notes, @pitches;
+    print "\t$chord = [@pitches]\n";
+}
+
+@notes = uniq @notes;
+print "Notes: @notes\n";

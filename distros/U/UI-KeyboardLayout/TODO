@@ -1,33 +1,73 @@
 FF locks in Latin?!  Even with v73 compiled with klc2c — fixed by omitting OEM_8.
 
+	What if this is due to missing LIGATURE for OEM_8??? — but it has no ligatures!
+
+Link to “manual” installation instructions: https://github.com/lelegard/winkbdlayouts#declaring-a-keyboard-layout-on-windows
+
+Are we including newish header/C files into source.zip?
+
+TODO issues inside klc2c.pl
+
+Emit F000–F002  as LIGATURES (due to conflicts with WCH_DEAD etc).
+
+TBC entries in the docs not addressed from v0.13.
+					DONE — but new entries added
+
+Unknown atomic mutator rules (“compositions”): ⃒ ⃓ ⃦.  (These are the first 3 combining marks in MACRON's last part of diacretics.)
+
+     This is exposed, e.g., by
+
+  compounding [ [ [ <q>, (undef), (undef), <VisLr=US-Base> ], [ <Q>, (undef), (undef), <VisLr=US-Base> ] ], [ [ <ä>, (undef), (undef), <VisLr=USLatin-AltGr> ], [ <Ä>, (undef), (undef), <VisLr=USLatin-AltGr> ] ] ] at UI-KeyboardLayout/lib/UI/KeyboardLayout.pm line 12057.
+  compound  `⃒' of [q Q] -> [ (undef), (undef) ] at UI-KeyboardLayout/lib/UI/KeyboardLayout.pm line 12087.
+  compound+ `⃒' of [q Q] -> [ (undef), (undef) ] at UI-KeyboardLayout/lib/UI/KeyboardLayout.pm line 12091.
+
+     (See more context in ⓕTODO-missing-mutators, from ⓕ00m076-02db-no-substkeys.  Apparent order: ⃒ ⃓ <pseudo-manual-addvline> ⃦ .)
+
+       Are they added by “any-...” ???!!!
+       Currently the warning "composition <<<$m>>> unknown" is commented out.
+
+The semantic of <any-other-circle> unclear: as implemented, it would match <circle>, although the intent seems to be otherwise.
+
+Ideographs sneak in (including those used as IDs of extra layers sneaking into the output stats — via extra layers on SPACE).
+
+“Unreached” entries reported in “fake dead keys” for extra layers.
+
+Generate bold of ┄┅┈┉┆┇┊┋ via “adddot” even though bold guys are on extra layers???
+
+Add to the descriptor of visual layers “separation of layer names into rows” (via @-assignments???) to enable LayerName₁ etc.
+
+In the docs “When one CORE face is active, the letters in another CORE face ”… is not practical.  Describe our scheme instead
+(when “the ‘current’ CORE face” is moved in front of the list of CORE faces, and they are accessed by their ordinal (2nd, 3rd, 4th).
+
+It seems that Mutate2Self[] is reading chars accessible via SPACE-key only from the VK-section.  What if it is defined elsewhere???
+	Here “bound to space” is the list of characters assigned to C<VK_SPACE> (except those triggering “C<AltGr>-invertion” actions)???
+
+Did not document the trailing part of <any-greekize>.
+
+In izKeys-visual-maps-base.html, check all the AltGr- and Mnu-bindings (lCtrl- etc. too?).
+
 In Chrome (with AltGr; Menu-F2 works, but the rest of F1–F4 gives too many “actions”):
   🙂😌☺😊😃😄😆?😀😁😂🤣  😑😐😒🙁☹😦😟😞😬?😧😢 👌👍😎😍😘🤗😗?😚💏💑💋 🤨😏🙄😕😖😥😡👿🤦?🤢🤮
   🙂😌☺😊😃😄😆?😀?😂🤣  😑😐😒🙁☹😦😟😞😬?😧😢 👌👍😎😍😘🤗😗?😚?💑💋 🤨😏🙄😕😖😥😡👿🤦?🤢🤮  FF in RU
 
-Latin has -> ♫ on multicomp in Hebrew and Cyrillic prefixes???!!!  (Should be triggered only on AltGr-Invertor???)
+Latin has -> ♫ on multicomp in Hebrew and Cyrillic prefixes???!!!  (Should be triggered only on AltGr-Invertor of the base???)
+
+In RU, Dial-a-dash is on AltGr-inverted Green!  Without inversion, ♫ is inserted (vs. ♪ on other prefix keys).
+
+Move math-combining characters to ' " (and AltGr) (now: 2nd++ combining).
 
 Latin duplications (meaningful) bindings on AltGr-inverted prefix key.
 
 (Shift)-Menu-F12 is Compose (³).
 
-In RU, Dial-a-dash is on AltGr-inverted Green!  Without inversion, ♫ is inserted (vs. ♪ on other prefix keys).
-
 Maybe it is better to map synthetic Ctrl-Alt- bindings to AltGr- (as opposed to “Greek” lAlt-lCtrl-)???
 
 klc2c emits junk (instead of “empty”) if sections were missing.
 
-lAlt-Space in console not working anymore. lAlt-Char search not working in FCW; likewise for input in CMD.  But lAlt-\ works in FCW,
-and not in CMD.  keycodes.exe shows the same “translation” as English(US), but empty “Key”.  raw_… cannot see char on lAlt-a; neither
-by default, nor with “cooked” argument.
-						DONE and DOCUMENTED
-
-lCtrl-Menu-, produces “ — ¼”.  (Header file contains the type LIGATURE3, but the length in msklc_altgr(_r2l).c was 4.)
-						DONE
-
 Control-@ does not produce "\000". (But Control-2 does.)
 			But how a console application can see that it got 0 without using back-scan (sp?)???
 
-On RU AltGr-- д emits ¯д.  AltGr-- AltGr-F1 emits ¯🙂 = ¯🙂.	(Actually, AltGr- is not a dead key???)
+On RU AltGr-- д emits ¯д.  AltGr-- AltGr-F1 emits ¯🙂 = ¯🙂.	(Actually, AltGr-- is not a dead key???)
 
 Duplication of VK_-codes does not duplicate LIGATURES.
 
@@ -36,41 +76,20 @@ How to preserve determinism — but make this less error-prone?
     ByPairsPrefix cannot bind SPACE on extra-modifiers maps (even without SPACE in @skip_extra_layers_WIN).  (Needs FullFace()!)
 						DOCUMENTED; a workaround put into the kbdd.
 
+Need to make SPACE⸣s layout to be of “intermediate length” (in @skip_extra_layers_WIN it was too short, without is too long.)
 
 Document that if different keys have identical chars, to make an assignment to prefix key maps one may need to define a special
 layer with different values at these positions.
 
 Put ⋮ ⋯ ⋰ ⋱ to be more accessible???  Duplicate RET - / \ ; maybe would not be critical???  ⪇≦ ⪈≧
 
-		Was with v0.73; seems very wrong duplication — and SPACE is too short:
+As ABNT_C2 ???:
+    {VK_SEPARATOR , 0                ,','       ,','       ,','     ,','     }, //<NEC_OCDE OEM
+    {VK_OEM_NEC_EQUAL,    0          ,'='       ,'='       ,'='     ,'='     }, //<_PC98_ OEM
 
-33	OEM_COMMA	0	002c	003c	-1	-1	00b8@	2264	%%	%%	00ab	-1	0591	05a4	-1	-1	-1	-1	-1	%%	%%	%%	2aa1	-1	-1	%%	%%	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	// ,, <,  ,  , ¸, ≤,  — ,  — , «,  , ֑, ֤,  ,  ,  ,  ,  ,  — ,  
-34	OEM_PERIOD	0	002e	003e	-1	-1	00b0@	2265	00b7	%%	2026	-1	05c3	059a	-1	-1	-1	-1	-1	-1	%%	-1	2aa2	-1	-1	-1	%%	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	// ., >,  ,  , °, ≥, ·, 𝄡𝄡, …,  , ׃, ֚,  ,  ,  ,  ,  ,  , 𝄡𝄡,  , ⪢
-7E	ABNT_C2		0	002e	003e	-1	-1	00b0@	2265	00b7	%%	2026	-1	05c3	059a	-1	-1	-1	-1	-1	-1	%%	-1	2aa2	-1	-1	-1	%%	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	// ., >,  ,  , °, ≥, ·, 𝄡𝄡, …,  , ׃, ֚,  ,  ,  ,  ,  ,  , 𝄡𝄡,  , ⪢,
-53	DECIMAL		0	002e	-1	-1	-1	2502	-1	-1	-1	2503	-1	2578	-1	2574	-1	2579	-1	-1	2551	-1	2575	-1	257f	-1	%%	-1	257e	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	%%	-1	%%	-1	-1	-1	// .,  ,  ,  , │,  ,  ,  , ┃,  , ╸,  , ╴,  , ╹,  ,  , ║,  , ╵,  , ╿,  ,
-
-56	OEM_102		0	06f0@	00a0@	-1	-1	00b6	2767	-1	-1	044a	042a	05bf	05c7	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	// ۰,  ,  ,  , ¶, ❧,  ,  , ъ, Ъ, ֿ, ׇ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,
-7D	OEM_8		0	06f0@	00a0@	-1	-1	00b6	2767	-1	-1	044a	042a	05bf	05c7	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	// ۰,  ,  ,  , ¶, ❧,  ,  , ъ, Ъ, ֿ, ׇ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  
-73	ABNT_C1		0	06f0@	00a0@	-1	-1	00a3@	0301	// ۰,  ,  ,  , £, ́	// EXTENDED ARABIC-INDIC DIGIT ZERO, NO-BREAK SPACE,  ,  , POUND SIGN, COMBINING ACUTE ACCENT
-
-39	SPACE		0	0020	0138@	0020	-1	0192@	00a0@	//  , ĸ,  ,  , ƒ,  	// SPACE, LATIN SMALL LETTER KRA, SPACE,  , LATIN SMALL LETTER F WITH HOOK, NO-BREAK SPACE
-		From .C file (with lCtrl-lAlt- and Menu- bindings added — possibly with SHIFT: Compose and Compose³):
-  {VK_SPACE     ,0      ,' '      ,0x0138@ ,' '      ,WCH_NONE ,0x0192@   ,0x00a0@   ,0x06f0@   ,0x06e8@   ,0x06f0@   ,0x06e8@   },
-
-ABNT2 Brazil keyboard has OEM_102 (scancode 56) on the left (in PT with “\|”), and ABNT_C1 (scancode 73) on the right
-(in PT with “/?”).  (ABNT_C2 should have the “opposite separator” to PERIOD.)
-
-         https://www.win.tue.nl/~aeb/linux/kbd/scancodes-8.html
- JIS keyboard has OEM_8 (scancode 7D) to the left of BACKSPACE (unmarked, or with “¥|” — with “¥” often substituted by “\” in
- DOS???).  To the right of “/?” there is a key with “\_” OEM_102 (but with scancode 73, of ABNT_C1).
-
-  So to combine the ”full functionality” of both (with scancodes 56+73 and with scancodes 73+7D), one needs to duplicate 56 to 7D.
-
-    DOCUMENT THIS!
-    					DONE
-
-One should duplicate “the opposite of DECIMAL” to ABNT_C2.
-					DONE
+As Mnu- (KANA?):
+    {VK_GROUPSHIFT, "GROUPSHIFT" },
+    {VK_RGROUPSHIFT,"RGROUPSHIFT"},
 
 Mark=comment as “mirrored” extra entries in SHIFTSTATE.
 
@@ -78,31 +97,44 @@ Mark the minimal representation of “modification bitmap” in SHIFTSTATE and i
 
 Need to duplicate VK_OEM_AX to another “redefinable” scancode or VK_CODE???
 
-Document restrictions of SGCAPS and dead keys (can one circumvent some of them by combining with CAPLOK???).
-					DONE
-
-Inline links to L<"More (random) rambling on assignment of key combinations">
-					DONE??
-
 Make %double_scan_VK the default of a customizable mapping.
+
+======================== “New-style” leader keyboard layout driver (Text Services Framework ?)
+
+Loads “an old style driver” DLL, and performs as expected — with enhancements.
+(But it has no control to conversion of scancodes to VK-codes — however, it may ignore keypresses/releases, and [???] send
+extra keypresses/releases, marking them as sent-by-me.)
+		https://codeload.github.com/EasyIME/libIME/zip/d4e6cb41ea7d673a3b679ec9af282cea6e22cd6a
+		https://codeload.github.com/keymanapp/keyman/zip/refs/heads/master
+		https://blog.csdn.net/fishmai/article/details/60756753
+
+ • Without KBDSPECIAL, no stripping of SHIFT on KBDNUMPAD
+ • If a binding of a deadkey is WCH_LGTR or WCH_LGTR|0x1, then instead of emitting the specified ½word as a char or a prefix key,
+   look it up in LIGATURE as a pair of VK/columnNumber.  (Or on the next N longwords with the same DEADKEY/WCH pair???)  If odd,
+   the last ½word is the id of the prefix key to switch to.
+      (This way one can realize an arbitrary finite automaton on WCH⸣ars.)
+ • If the given WCH is not found, look for WCH_NONE.  If it is still not found, look for prefix=0 wch=WCH_NONE.  (This implements
+   “fallback bindings” on a prefix key.
+ • Load “another layout” from another DLL, and use its output as the override for the emitted VK per scancode/modificationNum pair.
+   Maybe load yet-another one, and use it “after a prefix key”.
+ 	(How to process keyrelease if several keys are pressed “in an unexpected order???)
+ • With CAPLOK_ENH flag, detect whether CAPLOK should be applied by either WCH_DEAD vs WCH_DEAD|0x4, or by looking in the next row.
+
+Allow latching keys.  The latching of the specified modification bitmap bits continues until the release of the key producing the
+next change in the finite automaton.  Additionally, an extra bitmap of “keep latching” is specified, and the latching persists until
+the last of these bits is “released” (by really-down modifiers, so ignoring the latching!).
+
+  How to allow the finite automaton to act on VK+modification numbers???  “Post-dead keys” (active only after a prefix???)
+
+  Keyrepeat: allow the prefix key remain active until the release of the key which triggered the binding.
 
 ========================
 
-The current code producing SGCAPS lines cannot work with CAPLOKALTGR.
-					DONE
+For Compose creation key, allow extra optional fields: name, and a “hashy array” name → prefix key.
 
 Since CAPLOKALTGR affects not only the AltGr-keys, one should allow a way to force a particular value.  Likewise for CAPLOK.
 
 Make Compose⁴ show ⎄,    AltGr_Invert⁶ show ⤨ instead of “ ” 2008 (as we show on Apple bindings)
-
-Document choice of modifier flags:
-	No autogeneration of Ctrl-letters if l/rCTRL has more bits set than expected.
-					DOCUMENTED
-
-  only ø and SHIFT are affected by CAPSLOK and SGCAPS logic (so it is disabled by KANALOK — see below);
-  only those with ALT and CTRL are affected by CAPSLOKALTGR logic
-  all are affected by KANALOK logic (which turns up KANA flag — but it is “documented” otherwise?!)
-					DOCUMENTED
 
 How to implement (=merge internal nodes)interaction of prefix keys and keys producing multi-codepoint strings:
 
@@ -115,11 +147,6 @@ How to implement (=merge internal nodes)interaction of prefix keys and keys prod
   Two vertices are compatible if the colors (codepoints) of outgoing edges do not intersect.  Out of immediate childs compatible
   with the vertex choose one with smallest valence (to try to minimize conflicts); out of those compatible with it too choose
   likewise etc.
-
-KANALOK seems to be used only when VK_KANA is down (locked by a physical keyboard); so, essentially, this allows VK_KANA to
-have effect on some keys (those with KANALOK), and no effect on tother keys (those without).  (Of course, this effect could be
-achieved also by duplicating entries in the columns with KBDKANA?!)
-			DOCUMENTED
 
 With our layout of modifiers bits, it seems that rCTRL (standalone) is affected by CAPSLOCK state.  How to check this?  This does
 not show in CMD or copy con nul???
@@ -187,7 +214,7 @@ This follows from what is described above:
 Visualization:
 
       |	  ∅   M    C    MC     A   AM   AC    AMC
-———————————————————————————————————————————————————
+  —————————————————————————————————————————————————
   ∅   |	  L   Gr   —    Scr    Lᴬ  Grᴬ  BbB   Frk
   C   |	  —       Lˢˢ          〃    〃    〃     〃
    A  |	  —             Scrᴮ   Lᴮ  Grᴮ  Mono  Frkᴮ
@@ -323,12 +350,6 @@ AltGr-^ Gray-* not entering ✖ (as expected, since Gray-* is the same as ×???)
 
 ⥲ missing (maybe more with similar names?!  It is on Alt-' ~.)
 
-Rotating AltGr-^ should give ˯.
-						TRYING NOW
-
-AltGr-/ & should give ⫛.
-						TRYING NOW
-
 CSS: Font family names containing whitespace should be quoted.  (Actually, only punctuation/numbers at start are important???)
 	https://developer.mozilla.org/en-US/docs/Web/CSS/font-family
 
@@ -338,9 +359,6 @@ In prefix mappings, need to move assignments to keypad earlier (e.g., × may be 
 
 Put ʈ on Ctrl-↑ AltGr.  Put upper-lower greek (etc?) to Ctrl-letter AltGr-↕ prefixes.
 Should be automated: a mutator should be marked as “Wide”, and ExtraFacesWide should be covered by this mutator too ⇝ Flat map.
-
-Put ₢ on AltGr-G (visually), move ৳ to AltGr-b, and insert BITCOIN.
-						TRYING NOW
 
 Operator-\ is both on Business and on Blue.  (One of them not highlighted blue???  Likewise for asterisk operator on Business…)
 
@@ -352,10 +370,6 @@ Do with ⊣⊢ what we did with <>.  (Many different forms, intelligently, leaki
 
 Optimize assignments on the (new) ≠.   ≇ ≭ on Business-8 (via ≐) ≢⧻⧧⧺ on Business-=+  ⫮ on Business-\ (why not on AltGr-/???).
 ≭ on Business-? too.  ⊀⊄⊁⊅ on Business-<>.  ≸∌ on Business-1; ≉ on Business-AltGr-~.
-
-Green/Ripe < and > are not used.  One may put ⟨⟩ ⟪⟫ there, which would free amplified-() for something better.
-	Green: ⟨⟩ ≪≫;  Blue: ⟪⟫ ⋘⋙;  Ripe ⪡⪢ ⫷⫸;  Amplify-()   ⟬⟭???  (Currently on AltGr-. []).
-						TRYING NOW	⟬⟭???
 
 Amplify-<>  now may be not ≪≫   ???
 
@@ -703,6 +717,96 @@ sense is complete but the meaning is not
 			→	221F	∟  right angle
 
 ======================== DONE AFTER THiS POINT
+
+Rotating AltGr-^ should give ˯.
+						DONE
+
+AltGr-/ & should give ⫛.
+						DONE
+
+Put ₢ on AltGr-G (visually), move ৳ to AltGr-b, and insert BITCOIN ₿.
+						DONE
+
+Green/Ripe < and > are not used.  One may put ⟨⟩ ⟪⟫ there, which would free amplified-() for something better.
+	Green: ⟨⟩ ≪≫;  Blue: ⟪⟫ ⋘⋙;  Ripe ⪡⪢ ⫷⫸;  Amplify-()   ⟬⟭???  (Currently on AltGr-. []).
+						DONE (but keep ∊∍ on Amplify-() — and ⋸⋶ on AltGr-()!)
+
+Check how things work in JS: https://stackoverflow.com/questions/10531977/key-code-for-common-characters-on-international-keyboards?rq=3
+					DONE
+
+kbdutool allows DECIMAL only on sc=53.
+					DONE and DOCUMENTED
+
+Produce MODIFIERS from kbdd files.
+						DONE
+
+Cannot Shortcut(FACE_RECIPE_NAME) use “smarter caching” — but is it ever reused with the same result???
+						NOTABUG
+
+The code for <reveal-substkey> is too baroque for the trivial thing it is doing (have the effect of an empty list of mogrifiers).
+					WRONG!  DOCUMENTED CORRECTLY
+
+lAlt-Space in console not working anymore. lAlt-Char search not working in FCW; likewise for input in CMD.  But lAlt-\ works in FCW,
+and not in CMD.  keycodes.exe shows the same “translation” as English(US), but empty “Key”.  raw_… cannot see char on lAlt-a; neither
+by default, nor with “cooked” argument.
+						DONE and DOCUMENTED
+
+lCtrl-Menu-, produces “ — ¼”.  (Header file contains the type LIGATURE3, but the length in msklc_altgr(_r2l).c was 4.)
+						DONE
+
+The current code producing SGCAPS lines cannot work with CAPLOKALTGR.
+					DONE
+
+Document choice of modifier flags:
+	No autogeneration of Ctrl-letters if l/rCTRL has more bits set than expected.
+					DOCUMENTED
+
+  only ø and SHIFT are affected by CAPSLOK and SGCAPS logic (so it is disabled by KANALOK — see below);
+  only those with ALT and CTRL are affected by CAPSLOKALTGR logic
+  all are affected by KANALOK logic (which turns up KANA flag — but it is “documented” otherwise?!)
+					DOCUMENTED
+
+KANALOK seems to be used only when VK_KANA is down (locked by a physical keyboard); so, essentially, this allows VK_KANA to
+have effect on some keys (those with KANALOK), and no effect on tother keys (those without).  (Of course, this effect could be
+achieved also by duplicating entries in the columns with KBDKANA?!)
+			DOCUMENTED
+
+Maybe just bind VK_CONTROL to the same bitmap as VK_LCONTROL ???
+		Was with v0.73; seems very wrong duplication — and SPACE is too short:
+
+33	OEM_COMMA	0	002c	003c	-1	-1	00b8@	2264	%%	%%	00ab	-1	0591	05a4	-1	-1	-1	-1	-1	%%	%%	%%	2aa1	-1	-1	%%	%%	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	// ,, <,  ,  , ¸, ≤,  — ,  — , «,  , ֑, ֤,  ,  ,  ,  ,  ,  — ,  
+34	OEM_PERIOD	0	002e	003e	-1	-1	00b0@	2265	00b7	%%	2026	-1	05c3	059a	-1	-1	-1	-1	-1	-1	%%	-1	2aa2	-1	-1	-1	%%	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	// ., >,  ,  , °, ≥, ·, 𝄡𝄡, …,  , ׃, ֚,  ,  ,  ,  ,  ,  , 𝄡𝄡,  , ⪢
+7E	ABNT_C2		0	002e	003e	-1	-1	00b0@	2265	00b7	%%	2026	-1	05c3	059a	-1	-1	-1	-1	-1	-1	%%	-1	2aa2	-1	-1	-1	%%	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	// ., >,  ,  , °, ≥, ·, 𝄡𝄡, …,  , ׃, ֚,  ,  ,  ,  ,  ,  , 𝄡𝄡,  , ⪢,
+53	DECIMAL		0	002e	-1	-1	-1	2502	-1	-1	-1	2503	-1	2578	-1	2574	-1	2579	-1	-1	2551	-1	2575	-1	257f	-1	%%	-1	257e	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	%%	-1	%%	-1	-1	-1	// .,  ,  ,  , │,  ,  ,  , ┃,  , ╸,  , ╴,  , ╹,  ,  , ║,  , ╵,  , ╿,  ,
+
+56	OEM_102		0	06f0@	00a0@	-1	-1	00b6	2767	-1	-1	044a	042a	05bf	05c7	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	// ۰,  ,  ,  , ¶, ❧,  ,  , ъ, Ъ, ֿ, ׇ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,
+7D	OEM_8		0	06f0@	00a0@	-1	-1	00b6	2767	-1	-1	044a	042a	05bf	05c7	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	// ۰,  ,  ,  , ¶, ❧,  ,  , ъ, Ъ, ֿ, ׇ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  
+73	ABNT_C1		0	06f0@	00a0@	-1	-1	00a3@	0301	// ۰,  ,  ,  , £, ́	// EXTENDED ARABIC-INDIC DIGIT ZERO, NO-BREAK SPACE,  ,  , POUND SIGN, COMBINING ACUTE ACCENT
+
+39	SPACE		0	0020	0138@	0020	-1	0192@	00a0@	//  , ĸ,  ,  , ƒ,  	// SPACE, LATIN SMALL LETTER KRA, SPACE,  , LATIN SMALL LETTER F WITH HOOK, NO-BREAK SPACE
+		From .C file (with lCtrl-lAlt- and Menu- bindings added — possibly with SHIFT: Compose and Compose³):
+  {VK_SPACE     ,0      ,' '      ,0x0138@ ,' '      ,WCH_NONE ,0x0192@   ,0x00a0@   ,0x06f0@   ,0x06e8@   ,0x06f0@   ,0x06e8@   },
+
+ABNT2 Brazil keyboard has OEM_102 (scancode 56) on the left (in PT with “\|”), and ABNT_C1 (scancode 73) on the right
+(in PT with “/?”).  (ABNT_C2 should have the “opposite separator” to PERIOD.)
+
+         https://www.win.tue.nl/~aeb/linux/kbd/scancodes-8.html
+ JIS keyboard has OEM_8 (scancode 7D) to the left of BACKSPACE (unmarked, or with “¥|” — with “¥” often substituted by “\” in
+ DOS???).  To the right of “/?” there is a key with “\_” OEM_102 (but with scancode 73, of ABNT_C1).
+
+  So to combine the ”full functionality” of both (with scancodes 56+73 and with scancodes 73+7D), one needs to duplicate 56 to 7D.
+
+    DOCUMENT THIS!
+    					DONE
+
+One should duplicate “the opposite of DECIMAL” to ABNT_C2.
+					DONE
+
+Document restrictions of SGCAPS and dead keys (can one circumvent some of them by combining with CAPLOK???).
+					DONE
+
+Inline links to L<"More (random) rambling on assignment of key combinations">
+					DONE??
 
 Accessibility report on “1” is garbled.
 						DONE

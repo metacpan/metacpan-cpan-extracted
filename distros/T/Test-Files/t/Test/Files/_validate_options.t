@@ -9,7 +9,7 @@ use Test::Files::Constants qw(
   $DIRECTORY_OPTIONS $FMT_FILTER_ISNT_CODEREF $FILE_OPTIONS $FMT_INVALID_NAME_PATTER $FMT_INVALID_OPTIONS $FILE_OPTIONS
 );
 
-my $expected;
+my ( $expected, $self );
 
 plan( 2 );
 
@@ -18,37 +18,58 @@ subtest failure => sub {
 
   const my $DEFAULT => $DIRECTORY_OPTIONS;
 
-  $expected = sprintf( $FMT_INVALID_OPTIONS, 'X' );
-  is  ( $METHOD_REF->( { X            => 0   }, $DEFAULT ),    $expected, 'invalid option' );
+  subtest 'invalid option' => sub {
+    plan( 2 );
 
-  $expected = sprintf( $FMT_FILTER_ISNT_CODEREF, '.+' ) =~ s/([()])/\\$1/gr;
-  like( $METHOD_REF->( { FILTER       => 0   }, $DEFAULT ), qr/$expected/, 'filter is not a code reference' );
+    isa_ok( $self = $CLASS->_init->options( { X => 0 } )->$METHOD( $DEFAULT ), [ $CLASS ],    'executed' );
 
-  $expected = sprintf( $FMT_INVALID_NAME_PATTER, '\[', '.+', '.+' );
-  like( $METHOD_REF->( { NAME_PATTERN => '[' }, $DEFAULT ), qr/$expected/, 'invalid name pattern' );
+    $expected = sprintf( $FMT_INVALID_OPTIONS, 'X' );
+    is( $self->diag,                                                           [ $expected ], 'detected' );
+  };
+
+  subtest 'filter is not a code reference' => sub {
+    plan( 2 );
+
+    isa_ok( $self = $CLASS->_init->options( { FILTER => 0 } )->$METHOD( $DEFAULT ), [ $CLASS ],        'executed' );
+
+    $expected = sprintf( $FMT_FILTER_ISNT_CODEREF, '.+' ) =~ s/([()])/\\$1/gr;
+    like( $self->diag,                                                              [ qr/$expected/ ], 'detected' );
+  };
+
+  subtest 'invalid name pattern' => sub {
+    plan( 2 );
+
+    isa_ok( $self = $CLASS->_init->options( { NAME_PATTERN => '[' } )->$METHOD( $DEFAULT ), [ $CLASS ],        'executed' );
+
+    $expected = sprintf( $FMT_INVALID_NAME_PATTER, '\[', '.+', '.+' );
+    like( $self->diag,                                                                      [ qr/$expected/ ], 'detected' );
+  };
 };
 
 subtest success => sub {
   plan( 2 );
 
   subtest 'both filter and name pattern supplied' => sub {
-    plan( 2 );
+    plan( 3 );
 
     const my $DEFAULT => $DIRECTORY_OPTIONS;
 
     my $filter = sub {};
-    my ( $diag, %args ) = $METHOD_REF->( { FILTER => $filter, NAME_PATTERN => '..' }, $DEFAULT );
-    is( $diag,  undef,                                                      'no errors' );
-    is( \%args, { ( %$DEFAULT, FILTER => $filter, NAME_PATTERN => '..' ) }, 'arguments determined' );
+    isa_ok(
+      $self = $CLASS->_init->options( { FILTER => $filter, NAME_PATTERN => '..' } )->$METHOD( $DEFAULT ),
+                        [ $CLASS ],                                             'executed'
+    );
+    is( $self->diag,    [],                                                     'no errors' );
+    is( $self->options, { %$DEFAULT, FILTER => $filter, NAME_PATTERN => '..' }, 'arguments determined' );
   };
 
   subtest 'both filter and name pattern omitted' => sub {
-    plan( 2 );
+    plan( 3 );
 
     const my $DEFAULT => $FILE_OPTIONS;
 
-    my ( $diag, %args ) = $METHOD_REF->( {}, $DEFAULT );
-    is( $diag,  undef,    'no errors' );
-    is( \%args, $DEFAULT, 'arguments determined' );
+    isa_ok( $self = $CLASS->_init->options( {} )->$METHOD( $DEFAULT ), [ $CLASS ], 'executed' );
+    is( $self->diag,                                                   [],         'no errors' );
+    is( $self->options,                                                $DEFAULT,   'arguments determined' );
   };
 };

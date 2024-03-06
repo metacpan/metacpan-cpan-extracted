@@ -4,16 +4,24 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.1202';
+our $VERSION = '0.1203';
 
 use Carp;
-use Exporter;
 use Scalar::Util qw( set_prototype );
 
 use Resource::Silo::Metadata;
 use Resource::Silo::Container;
 
-# Store definitions here
+# This is a dummy block to hint IDEs.
+# see 'import' below for _real_ resource & silo implementation
+use parent 'Exporter';
+our @EXPORT = qw( resource silo );
+#@returns Resource::Silo::Container
+sub silo     ();  ## no critic 'prototypes'
+sub resource (@); ## no critic 'prototypes'
+
+# We'll need a global metadata storage
+#     to allow extending container classes
 our %metadata;
 
 sub import {

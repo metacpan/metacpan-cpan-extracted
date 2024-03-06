@@ -155,7 +155,7 @@ sub new {
 
   my $class_name = $self->class_name;
   unless (defined $self->class_name) {
-    confess "A class name must be specified";
+    confess("A class name must be specified");
   }
   
   if (defined $self->output_dir) {
@@ -172,7 +172,7 @@ sub new {
   
   my $native = $self->native;
   if (defined $native && !($native eq 'c' || $native eq 'c++')) {
-    confess "Can't support native \"$native\"";
+    confess("Can't support native \"$native\"");
   }
   
   my $resource = $self->resource;
@@ -1117,11 +1117,11 @@ sub generate_dist {
   my $class_name = $self->class_name;
   
   unless (length $class_name) {
-    confess "The class name must be specified";
+    confess("The class name must be specified");
   }
   
   if ($class_name =~ /-/) {
-    confess "The class name cannnot contain \"-\"";
+    confess("The class name cannnot contain \"-\"");
   }
   
   my $native = $self->native;
@@ -1221,7 +1221,7 @@ SPVM::Dist - Generating SPVM Distrubution
 
 =head2 Description
 
-The SPVM::Dist class has methods to generate a SPVM Distrubution.
+The SPVM::Dist class has methods to generate an SPVM Distrubution.
 
 =head2 Usage
 

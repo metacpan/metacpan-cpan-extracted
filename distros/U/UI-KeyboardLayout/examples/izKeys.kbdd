@@ -5,7 +5,7 @@ COMPANYNAME=Ilya Zakharevich
 +LAYOUTNAME=RUS·ЯВЕРТЫ Lat=Ⓖ➡⇧␣=^ˡⒶˡ- Grk=Ⓡ➡Ⓐʳ␣=Ⓜ Hbr➡Ⓡ²=Ⓜ^ʳ- • k.ilyaz.org
 +LAYOUTNAME=Gr·ΘΩΕΡΤΨ↻[]\ Lat=Ⓖ➡⇧␣=^ˡⒶˡ Rus=Ⓡ➡Ⓐʳ␣=Ⓜ Hbr➡Ⓡ²=Ⓜ^ʳ •k.ilyaz.org
 +LAYOUTNAME=Hebr·QWERTY Lat=Ⓖ➡⇧␣=^ˡⒶˡ- Grk=Ⓡ➡Ⓐʳ␣=Ⓜ Rus➡Ⓡ²=Ⓜ^ʳ- •k.ilyaz.org
-COPYR_YEARS=2011-2017
+COPYR_YEARS=2011-2024
 @LOCALE_NAME=en-US,ru-RU,el-GR,he-IL
 @LOCALE_ID=0409,0419,0408,040d
 @DLLNAME=iz-la-4s,iz-ru-4s,iz-gr-p4,iz-hb-4s
@@ -67,7 +67,7 @@ prefix_repeat=3
 #
 	--//α	--//σ	--//δ	--//φ	--//γ	--//η	--//ϊ	--//κ	--//λ	--÷/--∶		∂∇/′″
 	--//ԙ	--//ꚃ	--//ӡ	--	--//ӿ	--//ҩ	--///ꙇ	--//ӄ	--//ԉ	--//ԟ/ҝ		--//ꚓ/ꚕ
-***	a/æ	s/ßẞ	d/ð	f/è	g/ý	h/ú	j/í	k/ó	l/ö	;:/¨06f0	'"/´˵/′″
+***	a/æ	s/ßẞ	d/ð	f/è	g/ý	h/ú	j/í	k/ó	l/ö	;:/¨06ff	'"/´˵/′″
 	а/ә/ꙗ/ӓ	с/ѕ/ҫ/ԍ	д/ђ/ӟ/ԁ	ф/ѳ/ғ/ӻ	г/ґ/ӷ/ҕ	х/һ/ҳ/ӽ	й/ї/ҋ/ӑ	к/қ/ҡ/ҟ	л/љ/ӆ/ԓ	--//ӹ/ӳ	--/ ́´/ ̀ ̀/ ́ ́
 ‭???	א ָ/ ַ ֲ סשׂ/ ׂ ֒ ד ֶ/ ְ ֧ פף/פּףּ	ג״/׳ ֞ הח/ ֢ ֜ ח ֻ/ ﬞ ֝ כך/ ֦ ֫ ל ֹ/ ׇ ֳ --/ ֛ ֔	--/׳״ ‬
 #"   ‼2009—2009   200a—200a
@@ -125,13 +125,13 @@ cp437_Start=		FromTo[Digits,cp437-Start](FlipShift(Face(Latin)))	ByPairs[_☼](F
 #
 ###+Add_AltGr=	 AssignTo[NUMPAD,16](Id(BoxDraw11))	AssignTo[FKEYS,12](Id(DashesEtc) FlipShift(FractionEmSpacesEtc))
 +Add_AltGr=	 AssignTo[NUMPAD,16](Id(BoxDraw11))	AssignTo[FKEYS,12](Id(Emoji-Enjoy²))
-+Add_AltGr=	 ByPairsPrefix[↑06f7 ↓06f6 →06f5 ←06f4](AssignTo[ARROWS,16](Id(Arrows)))
++Add_AltGr=	 ByPairsPrefix[↑06fd ↓06fc →06fb ←06fa](AssignTo[ARROWS,16](Id(Arrows)))
 #   FlipShift(FractionEmSpacesEtc)
 Add_Base=	 ByPairs[÷÷ ×× ‒‒ ∑∑](AssignTo[ARROWS,16](FlipShift(Arrows)))
 #
 Greek_w_Symbols_on_Digit_Row=	Id(Greek) Mutate[<subst-extra_greek>](Face(Latin))
 #
-US_Base_Compose=	ByPairsPrefix[ӏ.06f0 Ӏ.00a0](Id(Cyrillic-AltGr))	Id(US-Base)
+US_Base_Compose=	ByPairsPrefix[ӏ.06ff Ӏ.00a0](Id(Cyrillic-AltGr))	Id(US-Base)
 #
 #@layer_names=Base-Keypad,BoxDraw11,BoxDraw22,BoxDraw12,BoxDraw21,BoxDrawBB,BoxDraw1B,BoxDrawB1,BBoxDrawOnH,BBoxDrawOnV,BBoxDrawOnHV,BoxDrawOnBV,BoxDrawOnBH
 #@layer_names=Arrows,Arrows2,ArrowsBlack,ArrowsPlay,ArrowsWhite,Arrows3,HookArrows,ArrowsZigZag,ArrowsMapsTo,ArrowsToBar
@@ -226,8 +226,8 @@ SpecialKey_Images2=	ByPairs[000d↲ 000a⤶ 0008⎌ 001b⎗ 001d⎘ 007f⌧ 0003
 +Add_Ripe1=			Mutate[<pseudo-smallcaps>+dectrl|<any-smallcaps>+dectrl|<sub>+dectrl](FullFlipLayers(Latin))
 #
 +Add_Menu=			AssignTo[ARROWS,16](Id(Arrows²))	AssignTo[NUMPAD,16](Id(BoxDrawBB))
-+Add_Menu=			AssignTo[FKEYS,12](ByPairsPrefix[=06f0](SubExtraLetters))
-+Add_Menu=			AssignTo[FKEYS,12](ByPairsPrefix[=06e8](FlipShift(SubExtraLetters)))
++Add_Menu=			AssignTo[FKEYS,12](ByPairsPrefix[=06ff](SubExtraLetters))
++Add_Menu=			AssignTo[FKEYS,12](ByPairsPrefix[=06fe](FlipShift(SubExtraLetters)))
 #
 +Add_AltGr_Menu=		AssignTo[FKEYS,12](Id(Emoji-Enjoy-Objectified-or-Love²))
 #
@@ -312,85 +312,85 @@ Prefix_Base_AlternFace=		Layers(MenuArrows+Empty)
 +DeadKey_Map012e=		Face(Hebrew)	Face(SpecialKey_Images)	ByPairs[0020.2009 0138.200a]	Shortcut(ModArrows)
 #								Having AÅ KK contradicts Unicode recommendations	
 +DeadKey_Map019c=	PrefixDocs[MathBlue (“Blue keys” and common math flavors of letter)]
-+DeadKey_Map019c=	  ByPairs[0020␠ 0192␢ '⸣ `⸢ ´⸥ ˋ⸤ "〃 02f5⎖ :⫶ 06f0⦂ \∖ -− _―]	HTML_classes[C,special,∼∗⧵⋅−⫶⟨⟩≪≫≃,C,very-special,∖ℏ―⎖〃,C,need-learn,ℎℽ]
++DeadKey_Map019c=	  ByPairs[0020␠ 0192␢ '⸣ `⸢ ´⸥ ˋ⸤ "〃 02f5⎖ :⫶ 06ff⦂ \∖ -− _―]	HTML_classes[C,special,∼∗⧵⋅−⫶⟨⟩≪≫≃,C,very-special,∖ℏ―⎖〃,C,need-learn,ℎℽ]
 +DeadKey_Map019c=	  ByPairs[0020␢ \⧵ pℼ Pℿ qℎ c℃ f℉](FlipLayers(Latin))	ByPairs[0020␠ yℽ Yℾ](Face(Latin))	Face(MathBlue)
 +DeadKey_Map019c=	  Shortcut(ModArrows)	  ByPairsFlat[˱≶ ˲≷ ⋮⦿ …⨀]	ByPairsInvFlat[˱⋚ ˲⋛]
 # '
 # It is a terrible hack to make them into deadkeys; all we want is to have them in output_layers
-+DeadKey_Map06ff=	PrefixDocs[delivers Fraktur to an extra layer]		AssignTo[ARROWS,16](Id(ArrowsMapsTo²))
-+DeadKey_Map06ff=		Mutate32OK[<font=fraktur>](Face(Latin))		AssignTo[NUMPAD,16](Id(BoxDraw21))
++DeadKey_Map96ff=	PrefixDocs[delivers Fraktur to an extra layer]		AssignTo[ARROWS,16](Id(ArrowsMapsTo²))
++DeadKey_Map96ff=		Mutate32OK[<font=fraktur>](Face(Latin))		AssignTo[NUMPAD,16](Id(BoxDraw21))
 #
-+DeadKey_Map06fe=	PrefixDocs[delivers Double-Struck to an extra layer]
-+DeadKey_Map06fe=		Mutate32OK[<font=double-struck>|<any-whiten>](Face(Latin))	AssignTo[NUMPAD,16](Id(BoxDraw12))
-+DeadKey_Map06fe=		Face(LongStrings)	AssignTo[ARROWS,16](Id(ArrowsWhite²))	Face(CopticDigitsHundreds)
++DeadKey_Map96fe=	PrefixDocs[delivers Double-Struck to an extra layer]
++DeadKey_Map96fe=		Mutate32OK[<font=double-struck>|<any-whiten>](Face(Latin))	AssignTo[NUMPAD,16](Id(BoxDraw12))
++DeadKey_Map96fe=		Face(LongStrings)	AssignTo[ARROWS,16](Id(ArrowsWhite²))	Face(CopticDigitsHundreds)
 #
 #  /𐆋 ?𐆌 +𐆠: Greek ¼, sinusoid, tau-rho
-+DeadKey_Map06fd=	PrefixDocs[delivers Script to an extra layer]	AssignTo[NUMPAD,16](Id(BoxDraw22))	Face(CopticDigits)
-+DeadKey_Map06fd=		Mutate32OK[\\ℓ,<font=script>|<any-script>](Face(Latin))	ByPairsPrefix[:0297](Face(Latin))
-+DeadKey_Map06fd=		ByPairs[/𐆋 ?𐆌 -𐆠 +₊ =₌](Face(Latin))	Face(LongStrings)	AssignTo[ARROWS,16](Id(HookArrows²))
-+DeadKey_Map06fd=		Face(Greek__Prefix)	Face(Add_AltGr_Menu)
++DeadKey_Map96fd=	PrefixDocs[delivers Script to an extra layer]	AssignTo[NUMPAD,16](Id(BoxDraw22))	Face(CopticDigits)
++DeadKey_Map96fd=		Mutate32OK[\\ℓ,<font=script>|<any-script>](Face(Latin))	ByPairsPrefix[:0297](Face(Latin))
++DeadKey_Map96fd=		ByPairs[/𐆋 ?𐆌 -𐆠 +₊ =₌](Face(Latin))	Face(LongStrings)	AssignTo[ARROWS,16](Id(HookArrows²))
++DeadKey_Map96fd=		Face(Greek__Prefix)	Face(Add_AltGr_Menu)
 #
-+DeadKey_Map06f1=	PrefixDocs[delivers Bold Fraktur to an extra layer]		Mutate32OK[<font=bold-fraktur>](Face(Latin))
-+DeadKey_Map06f1=		AssignTo[ARROWS,16](Id(PartSquares²))	AssignTo[NUMPAD,16](Id(BBoxDrawOnV))
-+DeadKey_Map06ef=	PrefixDocs[delivers Bold Script to an extra layer]		Mutate32OK[<font=bold-script>](Face(Latin))
-+DeadKey_Map06ef=		ByPairsPrefix[/0297](Face(Latin))		Face(LongStrings)	
-+DeadKey_Map06ef=		AssignTo[ARROWS,16](Id(RoundDirections²))	AssignTo[NUMPAD,16](Id(BBoxDrawOnHV))
++DeadKey_Map96f1=	PrefixDocs[delivers Bold Fraktur to an extra layer]		Mutate32OK[<font=bold-fraktur>](Face(Latin))
++DeadKey_Map96f1=		AssignTo[ARROWS,16](Id(PartSquares²))	AssignTo[NUMPAD,16](Id(BBoxDrawOnV))
++DeadKey_Map96ef=	PrefixDocs[delivers Bold Script to an extra layer]		Mutate32OK[<font=bold-script>](Face(Latin))
++DeadKey_Map96ef=		ByPairsPrefix[/0297](Face(Latin))		Face(LongStrings)	
++DeadKey_Map96ef=		AssignTo[ARROWS,16](Id(RoundDirections²))	AssignTo[NUMPAD,16](Id(BBoxDrawOnHV))
 #
 #				These AssignTo() do not trigger any action in applications???
-+DeadKey_Map06ee=	PrefixDocs[delivers SansSerif Bold Italic to an extra layer]
-+DeadKey_Map06ee=	 	Mutate32OK[<font=sans-serif-bold-italic>](Face(Latin))
-+DeadKey_Map06ee=		AssignTo[ARROWS,16](Id(RectArr²))	AssignTo[NUMPAD,16](Id(BBoxDrawOnH))
++DeadKey_Map96ee=	PrefixDocs[delivers SansSerif Bold Italic to an extra layer]
++DeadKey_Map96ee=	 	Mutate32OK[<font=sans-serif-bold-italic>](Face(Latin))
++DeadKey_Map96ee=		AssignTo[ARROWS,16](Id(RectArr²))	AssignTo[NUMPAD,16](Id(BBoxDrawOnH))
 #							ByPairs[:0297](Face(Latin))
 #		These are non-essential, added for testing of applications only (B1, Frames??? eventually should be on rCtrl! ???)
-#+DeadKey_Map06fc=	PrefixDocs[delivers SansSerif BoldItalic Greek, Bold Digits to an extra layer]
-#+DeadKey_Map06fc=	  Mutate32OK[<font=sans-serif-bold-italic>](Id(Greek_w_Symbols_on_Digit_Row))
-#+DeadKey_Map06fc=	  AssignTo[NUMPAD,16](Id(BoxDraw1B))	AssignTo[ARROWS,16](Id(WhiteFrame) FlipShift(BlackFrame))
-+DeadKey_Map06fc=	PrefixDocs[delivers SansSerif Italic to an extra layer]	Mutate32OK[<font=sans-serif-italic>](Face(Latin))
-+DeadKey_Map06fc=		AssignTo[NUMPAD,16](Id(BoxDraw1B))	AssignTo[ARROWS,16](Id(ArrowsDtip²))
+#+DeadKey_Map96fc=	PrefixDocs[delivers SansSerif BoldItalic Greek, Bold Digits to an extra layer]
+#+DeadKey_Map96fc=	  Mutate32OK[<font=sans-serif-bold-italic>](Id(Greek_w_Symbols_on_Digit_Row))
+#+DeadKey_Map96fc=	  AssignTo[NUMPAD,16](Id(BoxDraw1B))	AssignTo[ARROWS,16](Id(WhiteFrame) FlipShift(BlackFrame))
++DeadKey_Map96fc=	PrefixDocs[delivers SansSerif Italic to an extra layer]	Mutate32OK[<font=sans-serif-italic>](Face(Latin))
++DeadKey_Map96fc=		AssignTo[NUMPAD,16](Id(BoxDraw1B))	AssignTo[ARROWS,16](Id(ArrowsDtip²))
 #
-+DeadKey_Map06fb=	PrefixDocs[delivers SansSerif Bold to an extra layer]	Mutate32OK[<font=sans-serif-bold>](Face(Latin))
-+DeadKey_Map06fb=		AssignTo[ARROWS,16](Id(ArrowsVStroke²))
-+DeadKey_Map06e9=	PrefixDocs[delivers SansSerif to an extra layer]	Mutate32OK[<font=sans-serif>](Face(Latin))
-+DeadKey_Map06e9=		AssignTo[ARROWS,16](Id(CrossedArrows²))
++DeadKey_Map96fb=	PrefixDocs[delivers SansSerif Bold to an extra layer]	Mutate32OK[<font=sans-serif-bold>](Face(Latin))
++DeadKey_Map96fb=		AssignTo[ARROWS,16](Id(ArrowsVStroke²))
++DeadKey_Map96e9=	PrefixDocs[delivers SansSerif to an extra layer]	Mutate32OK[<font=sans-serif>](Face(Latin))
++DeadKey_Map96e9=		AssignTo[ARROWS,16](Id(CrossedArrows²))
 #
-+DeadKey_Map06e7=	PrefixDocs[delivers Hebrew to an extra layer]  Layers(Hebrew-Base+Hebrew-AltGr)
-+DeadKey_Map06e7=		AssignTo[NUMPAD,16](Id(BoxDrawB1))	AssignTo[ARROWS,16](Id(ArrowsBlack²))
++DeadKey_Map96e7=	PrefixDocs[delivers Hebrew to an extra layer]  Layers(Hebrew-Base+Hebrew-AltGr)
++DeadKey_Map96e7=		AssignTo[NUMPAD,16](Id(BoxDrawB1))	AssignTo[ARROWS,16](Id(ArrowsBlack²))
 #					ARROWS is a dup of lAlt-Mnu (SS-Bold; not working in many apps)
-+DeadKey_Map06f9=	PrefixDocs[delivers Monospace to an extra layer]	Mutate32OK[<font=monospace>](Face(Latin))
-+DeadKey_Map06f9=		AssignTo[ARROWS,16](Id(ArrowsVStroke²))
-+DeadKey_Map06fa=	PrefixDocs[delivers BoldItalic to an extra layer]	Mutate32OK[<font=bold-italic>](Face(Latin))
-+DeadKey_Map06fa=		AssignTo[ARROWS,16](Id(PartCircles²))
-+DeadKey_Map06f8=	PrefixDocs[delivers Italic to an extra layer]		Mutate32OK[<font=italic>](Face(Latin))
-+DeadKey_Map06f8=		AssignTo[ARROWS,16](Id(Arrows4andCircles²))
-+DeadKey_Map06ea=	PrefixDocs[delivers Bold to an extra layer]	Mutate32OK[<font=bold>](Face(Latin))
-+DeadKey_Map06ea=		AssignTo[ARROWS,16](Id(ArrowsDashedCurved²))
++DeadKey_Map96f9=	PrefixDocs[delivers Monospace to an extra layer]	Mutate32OK[<font=monospace>](Face(Latin))
++DeadKey_Map96f9=		AssignTo[ARROWS,16](Id(ArrowsVStroke²))
++DeadKey_Map96fa=	PrefixDocs[delivers BoldItalic to an extra layer]	Mutate32OK[<font=bold-italic>](Face(Latin))
++DeadKey_Map96fa=		AssignTo[ARROWS,16](Id(PartCircles²))
++DeadKey_Map96f8=	PrefixDocs[delivers Italic to an extra layer]		Mutate32OK[<font=italic>](Face(Latin))
++DeadKey_Map96f8=		AssignTo[ARROWS,16](Id(Arrows4andCircles²))
++DeadKey_Map96ea=	PrefixDocs[delivers Bold to an extra layer]	Mutate32OK[<font=bold>](Face(Latin))
++DeadKey_Map96ea=		AssignTo[ARROWS,16](Id(ArrowsDashedCurved²))
 #
-DeadKey_Map06f7=	PrefixDocs[Superscript (and MODIFIER LETTERS), Phonetic]	Face(SupersPhonetic)  ByPairsFlat[…⋯]
+DeadKey_Map06fd=	PrefixDocs[Superscript (and MODIFIER LETTERS), Phonetic]	Face(SupersPhonetic)  ByPairsFlat[…⋯]
 #
-+DeadKey_Map06f6=	PrefixDocs[Subscript (and MODIFIER LETTERS LOW), Small Caps, Legs]  Face(SubsSmallCapsLegs)  ByPairsFlat[…⋮]
-+DeadKey_Map06f6=		ByPairs[≤⪿ ≥⫀ ¸⫁ °⫂]
++DeadKey_Map06fc=	PrefixDocs[Subscript (and MODIFIER LETTERS LOW), Small Caps, Legs]  Face(SubsSmallCapsLegs)  ByPairsFlat[…⋮]
++DeadKey_Map06fc=		ByPairs[≤⪿ ≥⫀ ¸⫁ °⫂]
 #
-+DeadKey_Map06f5=	PrefixDocs[Turnaround, inverted, reversed, turned, hooks (to the right)](Face(Latin))		
-+DeadKey_Map06f5=		Face(RotatedsHooks)	ByPairsFlat[…⋱ ⋮⋰ ˱≷]	ByPairsInvFlat[˱⪗]	ByPairs[>⩼ ¸⪃ °⪂]	
++DeadKey_Map06fb=	PrefixDocs[Turnaround, inverted, reversed, turned, hooks (to the right)](Face(Latin))		
++DeadKey_Map06fb=		Face(RotatedsHooks)	ByPairsFlat[…⋱ ⋮⋰ ˱≷]	ByPairsInvFlat[˱⪗]	ByPairs[>⩼ ¸⪃ °⪂]	
 #
-+DeadKey_Map06f4=	PrefixDocs[Hooks to the left (and palatal)](Face(Latin))		Face(LeftHooks)
-+DeadKey_Map06f4=		ByPairsFlat[…⋰ ˱≷]  ByPairs[<⩻ >≶ ≥⪘ ¸⪁ °⪄]
++DeadKey_Map06fa=	PrefixDocs[Hooks to the left (and palatal)](Face(Latin))		Face(LeftHooks)
++DeadKey_Map06fa=		ByPairsFlat[…⋰ ˱≷]  ByPairs[<⩻ >≶ ≥⪘ ¸⪁ °⪄]
 #
 #	lCtrl-lAlt-
-###### ???? Termporarily???? DeadKey_Map06f3=	ByPairsPrefix[:0297](Face(Latin))	Face(LGreekGreenMax)	Face(Add_Green1)	Shortcut(ModArrows)
+###### ???? Termporarily???? DeadKey_Map96f3=	ByPairsPrefix[:0297](Face(Latin))	Face(LGreekGreenMax)	Face(Add_Green1)	Shortcut(ModArrows)
 #		AssignTo[FKEYS,12](Id(Empty))	prefix=0138
-DeadKey_Map06f3=	ByPairsPrefix[:0297 0020.06f0 0138.06e8](FullFace(Latin))  prefix=0138	Face(Add_Green1)  Face(Add_Green1pref)
+DeadKey_Map96f3=	ByPairsPrefix[:0297 0020.06ff 0138.06fe](FullFace(Latin))  prefix=0138	Face(Add_Green1)  Face(Add_Green1pref)
 #	Mnu-
-+DeadKey_Map06f2=	ByPairsPrefix[;0297 :0483 0020.06f0 0138.06e8](FullFace(Latin))	ByPairs[<˱ >˲ !₽](Face(Latin))
-+DeadKey_Map06f2=		Face(Add_Menu)		prefix=0192
-###+DeadKey_Map06f2=	ByPairsPrefix[;0297 :0483 0020.06f0](Face(Latin))	ByPairsPrefix[0020.06e8](FlipShift(US-Base))
++DeadKey_Map96f2=	ByPairsPrefix[;0297 :0483 0020.06ff 0138.06fe](FullFace(Latin))	ByPairs[<˱ >˲ !₽](Face(Latin))
++DeadKey_Map96f2=		Face(Add_Menu)		prefix=0192
+###+DeadKey_Map96f2=	ByPairsPrefix[;0297 :0483 0020.06ff](Face(Latin))	ByPairsPrefix[0020.06fe](FlipShift(US-Base))
 #
-+DeadKey_Map06ed=	PrefixDocs[delivers BoldItalic Greek to an extra layer] AssignTo[ARROWS,16](Id(BlackTrian²))
-+DeadKey_Map06ed=		Mutate32OK[<font=bold-italic>](Id(Greek_w_Symbols_on_Digit_Row))
-+DeadKey_Map06ec=	PrefixDocs[delivers Bold Greek to an extra layer]	AssignTo[ARROWS,16](Id(WhiteFrame²))
-+DeadKey_Map06ec=		Mutate32OK[<font=bold>](Id(Greek_w_Symbols_on_Digit_Row))	AssignTo[NUMPAD,16](Id(BoxDrawOnBH))
-+DeadKey_Map06eb=	PrefixDocs[delivers Italic Greek to an extra layer]	AssignTo[ARROWS,16](Id(WhiteTriang²))
-+DeadKey_Map06eb=		Mutate32OK[<font=italic>](Id(Greek_w_Symbols_on_Digit_Row))	AssignTo[NUMPAD,16](Id(BoxDrawOnBV))
++DeadKey_Map96ed=	PrefixDocs[delivers BoldItalic Greek to an extra layer] AssignTo[ARROWS,16](Id(BlackTrian²))
++DeadKey_Map96ed=		Mutate32OK[<font=bold-italic>](Id(Greek_w_Symbols_on_Digit_Row))
++DeadKey_Map96ec=	PrefixDocs[delivers Bold Greek to an extra layer]	AssignTo[ARROWS,16](Id(WhiteFrame²))
++DeadKey_Map96ec=		Mutate32OK[<font=bold>](Id(Greek_w_Symbols_on_Digit_Row))	AssignTo[NUMPAD,16](Id(BoxDrawOnBH))
++DeadKey_Map96eb=	PrefixDocs[delivers Italic Greek to an extra layer]	AssignTo[ARROWS,16](Id(WhiteTriang²))
++DeadKey_Map96eb=		Mutate32OK[<font=italic>](Id(Greek_w_Symbols_on_Digit_Row))	AssignTo[NUMPAD,16](Id(BoxDrawOnBV))
 #
 geometry_via_layer=US-Base
 #
@@ -400,13 +400,13 @@ Auto_Diacritic_Start=0700
 Flip_AltGr_Key=00a0
 #
 # Layer-Shift-Caps-AppleVK, isDead;  vk=111: F12, vk=105: F13, vk=90: F20, vk=110: PC__Menu, vk=71: KeyPad_Clear, vk=80: F19
-/Apple_Override=1-0--vk=105,1,06f0/1-0--vk=111,1,06f0/0-0--vk=90,1,06f0
+/Apple_Override=1-0--vk=105,1,06ff/1-0--vk=111,1,06ff/0-0--vk=90,1,06ff
 # Negative isDead for literal names of states; hex4 is on F19, and Blue-u
 /Apple_Override=1-0--vk=80,,‾/0-0--vk=80,-1,hex4/+019c+u,-1,hex4/0-1--vk=80,-1,hex6/+019c+U,-1,hex6
-#/Apple_Override=1-0--vk=105,1,06f0/1-0--vk=111,1,06f0
+#/Apple_Override=1-0--vk=105,1,06ff/1-0--vk=111,1,06ff
 #
-#ComposeKey=06f0
-/ComposeKey=ComposeFiles,dotcompose,warn,06f0/EntityFiles,entity,warn,,06f0/rfc1345Files,rfc1345,warn,06e8,06f0
+#ComposeKey=06ff
+/ComposeKey=ComposeFiles,dotcompose,warn,06ff/EntityFiles,entity,warn,,06ff/rfc1345Files,rfc1345,warn,06fe,06ff
 @ComposeKey_Show=,&,ʳᶠᶜ
 #
 # Apparently, binding-column 15 (0-based) of aVkToWch18 is as if with WCH_NONE.  When there are 2 Ctrl-columns, this corresponds to
@@ -416,14 +416,16 @@ Flip_AltGr_Key=00a0
 # Actual keys:    ,Agr,CA,M,CrM,CMAgr,ACr,CrAgr,MAgr,AM,CM,CAM,AMCr
 #
 # modKeyID = a capital letter (possibly prepended with l/r); bits = (S) C A K L R Z T
+# deadkeys are fake (not emitted as prefix keys), so may go above 0fff
+@modkeys_vk=M,OEM_AX
 @mods_keys_KBD=lC,CL,lA,AK,rA,CALZ,M,CAT,rC,CAR
 @layers_mods_keys=,rA,lClA,M,MrC,rAMrC,lArC,rAM,rArC,lCMrC,lCM,lCrC,lArA,lArAM,lArAMrC,lAM,lClAMrC,lClArC,lClAM,lArArC,lAMrC
-@output_layers=0,1,prefixNOTSAME=06f3,prefixNOTSAME=06f2,prefixNOTSAME=06e7,prefixNOTSAME=06ff,prefixNOTSAME=06fc
-@output_layers=prefixNOTSAME=06fd,prefixNOTSAME=06fe
-@output_layers=prefixNOTSAME=06f1,prefixNOTSAME=06ef,prefixNOTSAME=06ee
-@output_layers=prefixNOTSAME=06f9,prefixNOTSAME=06f8,prefixNOTSAME=06fa,prefixNOTSAME=06fb
-@output_layers=prefixNOTSAME=06ed,prefixNOTSAME=06ec,prefixNOTSAME=06eb
-@output_layers=prefixNOTSAME=06ea,prefixNOTSAME=06e9
+@output_layers=0,1,prefixNOTSAME=96f3,prefixNOTSAME=96f2,prefixNOTSAME=96e7,prefixNOTSAME=96ff,prefixNOTSAME=96fc
+@output_layers=prefixNOTSAME=96fd,prefixNOTSAME=96fe
+@output_layers=prefixNOTSAME=96f1,prefixNOTSAME=96ef,prefixNOTSAME=96ee
+@output_layers=prefixNOTSAME=96f9,prefixNOTSAME=96f8,prefixNOTSAME=96fa,prefixNOTSAME=96fb
+@output_layers=prefixNOTSAME=96ed,prefixNOTSAME=96ec,prefixNOTSAME=96eb
+@output_layers=prefixNOTSAME=96ea,prefixNOTSAME=96e9
 #
 #@skip_extra_layers_WIN=SPACE,ABNT_C1
 @skip_extra_layers_WIN=ABNT_C1
@@ -441,7 +443,11 @@ Prefix_Base_Altern=Prefix_Base_AlternFace
 #					# Had 0297 on the "ripe key"; then 0138, now 0192
 @SPACE=,0020,0138@,0192@,00a0@
 # Temporary: when ¦ is Compose, change to this...
-@ABNT_C1=,06f0@,00a0@,00a3@,0301
+@ABNT_C1=,06ff@,00a0@,00a3@,0301
+# Override KANA=50->APPS and APPS=e05d->OEM_AX
+@APPS=70
+@OEM_AX=e05d
+#
 #@TAB=,0009,0009,0483@,0484@
 #
 # Dotted circle, black circle, white circle
@@ -463,17 +469,17 @@ ExportDeadKeys=	´  ˋ  ˆ  ˜  ° ¸  ˇ  ¯  0338  ¨ ˵
 #					# Now defined via ByPairsPrefix
 #@faceDeadKeys2= 0138\,	0138[,	0138], 0138`
 #							002c = ,
-@char2key_prefer_first=\,|,.,002c,£,06f0
+@char2key_prefer_first=\,|,.,002c,£,06ff
 @char2key_prefer_last=00a0
 #
 # Misnomer: not AltGr, but Alternative! (~∼, *∗, .⋅ ) perp=⟂' ¹⟂ is good only if ¹ is on 1! key…; 
-# |∣ does not hurt anything (and does not help much); 06f0 is compose (on AltGr-:)
-@AltGrCharSubstitutions=|∣,0338∕,06f0÷
+# |∣ does not hurt anything (and does not help much); 06ff is compose (on AltGr-:)
+@AlternCharSubstitutions=|∣,0338∕,06ff÷
 # ¡≀ - better on Greenkeys; #≠ - conflicts too much; ĳü - was good when ĳ was on k, not i; ó∘ - what for???
-@AltGrCharSubstitutionLayers=Blue,Blue-AltGr
+@AlternCharSubstitutionLayers=Blue,Blue-AltGr
 #
 #  This gives more collisions:
-#@AltGrCharSubstitutions=ĳü,^∧,&∩,*×,#≠,6∨,7∪,|∣,!⊥,1⊤,¡≀,¹⟂,2∫,@∮,ª∭,²‖,²∥,3⊳,#⊲,º△,³▽,4□,$◇,€⊢,¥⊣
+#@AlternCharSubstitutions=ĳü,^∧,&∩,*×,#≠,6∨,7∪,|∣,!⊥,1⊤,¡≀,¹⟂,2∫,@∮,ª∭,²‖,²∥,3⊳,#⊲,º△,³▽,4□,$◇,€⊢,¥⊣
 #
 @Import_Prefix_Keys=	0301:CyrillicPhonetic,0297,	0483:CyrillicPhonetic,0483
 #
@@ -574,7 +580,7 @@ DeadKey_Map=		Mutate	Mutate2Self	Shortcut(ModArrows)
 +Named_DIA_Recipe__ring_dot=	\\⋵ꞃ,\\⧔⧕[5],\Ẏọ,00b0|0323+<subst-Vietnamese>|||
 +Named_DIA_Recipe__ring_dot=		\⊛,!\⊆⊇,0307,0323|0328+<subst-Macron>|
 +Named_DIA_Recipe__ring_dot=		<any-round>,<any-ring-!above>,<any-dot>,<any-dots>,<any-dotless>,<any-other-circle>,
-+Named_DIA_Recipe__ring_dot=			<any-circled>,<any-circled>+<reveal-substkey>,<any-adddot>,
++Named_DIA_Recipe__ring_dot=			<any-circled>,<any-adddot>,
 +Named_DIA_Recipe__ring_dot=			<any-black>--<any-amplify>|<any-insular>,<any-equal>+<any-amplify>
 # ring above 00b0: combine with dotabove 0307 dotbelow 0323 
 # (only WÊ miss dot below, AUY miss dot above: Ȧ is Livonian and phonetic; U is not precomposed; Ẉ - WHERE???) ; <any-jot> does not add anything useful now...
@@ -670,7 +676,7 @@ ExportDeadKeys=	́	҃
 # would be prefered, and SWITCH AltGr-| would be resolved as "map | to Latin", and would produce |.
 #						002c = ,
 # Prefering both picks 2nd from the end (2nd of 3 for Ъ,ъ) - but picking the third makes layout nicer!
-@char2key_prefer_first=\,|,.,002c,£,0301,06f0
+@char2key_prefer_first=\,|,.,002c,£,0301,06ff
 @char2key_prefer_last=Ё,Ъ,ё,ъ,00a0
 #
 # (Ё would be mapped to Е if we do not specify it explicitly:)
@@ -738,7 +744,7 @@ ExportDeadKeys=	0342 0314 0313 03e2
 @Import_Prefix_Keys=	0301:CyrillicPhonetic,0297,	0483:CyrillicPhonetic,0483
 #
 # Prefering both picks 2nd from the end (2nd of 3 for Ъ,ъ) - but picking the third makes layout nicer!
-@char2key_prefer_first=\,|,.,002c,·,0342,£,06f0
+@char2key_prefer_first=\,|,.,002c,·,0342,£,06ff
 @char2key_prefer_last=00a0
 #
 # (Ё would be mapped to Е if we do not specify it explicitly:)
@@ -752,7 +758,7 @@ ExportDeadKeys=	0342 0314 0313 03e2
 ####  Does not work???
 #+PrefixChains=0297,0297,0483,0483
 #
-@extra_report_DeadChar=	012e, 06f7, 06f6, 06f4, 06f5
+@extra_report_DeadChar=	012e, 06fd, 06fc, 06fa, 06fb
 #				ĸ: ↹⇤ 0009⇥
 +DeadKey_Map0138=	PrefixDocs[Latin, Superscript digits/symbols, “Green Keys”]
 +DeadKey_Map0138=	Face(GLatinGreenMax)	Face(Add_Green1)  Face(Add_Green1pref)	X11symbol[dead_greek]
@@ -775,7 +781,7 @@ LinkFace=Latin
 MetaData_Index=3
 #
 # Prefering both picks 2nd from the end (2nd of 3 for Ъ,ъ) - but picking the third makes layout nicer!
-@char2key_prefer_first=\,|,.,002c,£,06f0
+@char2key_prefer_first=\,|,.,002c,£,06ff
 @char2key_prefer_last=00a0
 #
 @Import_Prefix_Keys=	0301:CyrillicPhonetic,0297,	0483:CyrillicPhonetic,0483

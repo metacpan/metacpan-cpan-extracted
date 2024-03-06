@@ -3,41 +3,26 @@ use warnings
   FATAL    => qw( all ),
   NONFATAL => qw( deprecated exec internal malloc newline once portable redefine recursion uninitialized );
 
-use Test::Expander -color => { exported => 'cyan', unexported => 'magenta' }, -tempdir => {};
+use Test::Expander -tempdir => {};
 
-my ( $args_valid, $expected, $file_diff, $files_info );
 my $mock_this = mock $CLASS => (
   override => [
-    _compare_files          => sub { $file_diff },
-    _get_two_files_info     => sub { $files_info },
-    _show_failure           => sub { is( [ @_[ 1 .. $#_ ] ], $expected, 'failure reported' ); return },
-    _show_result            => sub { is( [ @_[ 2 .. $#_ ] ], $expected, 'comparison result reported' ); return },
-    _validate_trailing_args => sub { $args_valid ? ( undef, $_[ 0 ]->[ 0 ], $_[ 0 ]->[ 1 ] ) : 'ARG ERROR' },
+    _show_failure => sub {},
+    _show_result  => sub { !@{ shift->diag } },
   ]
 );
 
-plan( 4 );                                                  ## no critic (ProhibitMagicNumbers)
+const my $EXPECTED_FILE => path( $TEMP_DIR )->child( 'expected_file' );
+const my $GOT_FILE      => path( $TEMP_DIR )->child( 'got_file' );
 
-subtest 'invalid optional arguments' => sub {
-  plan( 2 );                                                ## no critic (ProhibitMagicNumbers)
-  ( $args_valid, $expected, $file_diff, $files_info ) = ( 0, [ 'ARG ERROR' ], [], [] );
-  is( $METHOD_REF->( 'got_file', 'expected_file' ), undef, 'executed' );
-};
+plan( 4 );
 
-subtest 'file info cannot be gathered' => sub {
-  plan( 2 );                                                ## no critic (ProhibitMagicNumbers)
-  ( $args_valid, $expected, $file_diff, $files_info ) = ( 1, [ 'INFO ERROR' ], [], [ 'INFO ERROR' ] );
-  is( $METHOD_REF->( 'got_file', 'expected_file' ), undef, 'executed' );
-};
+ok( !$METHOD_REF->( $GOT_FILE, $EXPECTED_FILE, [] ),  'invalid optional arguments' );
 
-subtest 'expected file passed, differences detected' => sub {
-  plan( 2 );                                                ## no critic (ProhibitMagicNumbers)
-  ( $args_valid, $expected, $file_diff, $files_info ) = ( 1, [ 'DIFF ERROR' ], [ 'DIFF ERROR' ], [] );
-  is( $METHOD_REF->( 'got_file', 'expected_file' ), undef, 'executed' );
-};
+ok( !$METHOD_REF->( $GOT_FILE, $EXPECTED_FILE ),      'file info cannot be gathered' );
 
-subtest 'expected content passed, differences detected' => sub {
-  plan( 2 );                                                ## no critic (ProhibitMagicNumbers)
-  ( $args_valid, $expected, $file_diff, $files_info ) = ( 1, [ 'DIFF ERROR' ], [ 'DIFF ERROR' ], [] );
-  is( $METHOD_REF->( 'got_file', \'expected_content' ), undef, 'executed' );
-};
+$EXPECTED_FILE->spew( 'expected_content' );
+$GOT_FILE     ->spew( 'got_content' );
+ok( !$METHOD_REF->( $GOT_FILE, $EXPECTED_FILE ),      'expected file passed, differences detected' );
+
+ok( !$METHOD_REF->( $GOT_FILE, \'expected_content' ), 'expected content passed, differences detected' );

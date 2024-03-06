@@ -8,6 +8,7 @@ Makefile.PL
 README
 README.md
 dist.ini
+eg/common
 eg/mode-pivot
 lib/Music/ModalFunction.pm
 t/00-compile.t

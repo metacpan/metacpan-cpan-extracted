@@ -5,7 +5,7 @@ use warnings;
 
 use SPVM::Global;
 
-our $VERSION = "0.989082";
+our $VERSION = "0.989083";
 
 require XSLoader;
 XSLoader::load('SPVM', $VERSION);
@@ -50,7 +50,7 @@ Run a one liner with loading a class.
   # foo,bar,baz
   spvm -M Fn -e 'say Fn->join(",", ["foo", "bar", "baz"]);'
 
-=head2 Executing A SPVM Program
+=head2 Executing An SPVM Program
 
 Write a L<SPVM class|SPVM::Document::Language::Class> to print "Hello World!" using L<the say operator|SPVM::Document::Language::Operators/"say Operator">.
 
@@ -76,9 +76,9 @@ Run the executable file.
 
   ./hello
 
-=head2 Calling A SPVM Method from Perl
+=head2 Calling An SPVM Method from Perl
 
-Write a SPVM class.
+Write an SPVM class.
 
   # lib/SPVM/MyMath.spvm
   class MyMath {
@@ -93,7 +93,7 @@ Write a SPVM class.
     }
   }
 
-Write a Perl program calling a SPVM method using L<exchange APIs|SPVM::ExchangeAPI>.
+Write a Perl program calling an SPVM method using L<exchange APIs|SPVM::ExchangeAPI>.
 
   # sum.pl
   use FindBin;
@@ -172,11 +172,9 @@ L<All SPVM Documents|SPVM::Document>
 
 =back
 
-=item * L<Exchange APIs|SPVM::ExchangeAPI>
-
 =item * L<Native Classes|SPVM::Document::NativeClass>
 
-=item * L<Native Class Configurations|SPVM::Builder::Config>
+=item * L<Native Class Config|SPVM::Builder::Config>
 
 =item * L<Native APIs|SPVM::Document::NativeAPI>
 
@@ -213,6 +211,24 @@ L<All SPVM Documents|SPVM::Document>
 =item * L<Resources|SPVM::Document::Resource>
 
 =item * L<Environment Variables|SPVM::Document::EnvironmentVariables>
+
+=back
+
+=head1 Exchange APIs
+
+=over 2
+
+=item * L<Exchange APIs|SPVM::ExchangeAPI>
+
+=back
+
+=head1 Builder APIs
+
+=over 2
+
+=item * L<Builder APIs|SPVM::Builder::API>
+
+=item * L<Builder Utility APIs|SPVM::Builder::Util::API>
 
 =back
 

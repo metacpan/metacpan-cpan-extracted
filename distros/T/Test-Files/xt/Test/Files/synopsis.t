@@ -1,4 +1,4 @@
-# This example implements all test cases mentioned in SYNOPSIS.
+# This implements all test cases mentioned in SYNOPSIS.
 # To make it runnable, the following changes have been done:
 #   - Test::Expander used instead of Path::Tiny (this includes both Path::Tiny and Test2::V0).
 #   - $PATH referring to a temporary directory used instead of path( 'path' ).
@@ -12,6 +12,7 @@ use warnings
 use Test::Expander -tempdir => {};
 use Test::Files;
 
+use Archive::Zip          qw( :ERROR_CODES );
 use File::Copy::Recursive qw( dircopy );
 
 const my $PATH => path( $TEMP_DIR );
@@ -23,7 +24,7 @@ my $reference_dir  = $PATH->child( qw( reference dir with some stuff ) );
 my @file_list      = qw( expected file );
 my ( $content_check, $expected, $filter, $options );
 
-plan( 22 );
+plan( 24 );
 
 # Simply compares file contents to a string:
 $expected = "contents\nof file";
@@ -156,6 +157,41 @@ compare_dirs_filter_ok(
 # Verifies if all plain files in directory and its subdirectories contain the word 'good'
 # (take into consideration the -f test below excluding special files from comparison!):
 $got_dir->visit( sub { $_->spew( 'This is a good plain file!' ) unless $_->is_dir }, { recurse => 1 } );
-$content_check = sub { my ( $file ) = @_; ! -f $file or path( $file )->slurp =~ / \b good \b /x };
+$content_check = sub { my ( $file ) = @_; not -f $file or path( $file )->slurp =~ / \b good \b /x };
 $options       = { RECURSIVE => 1 };
 find_ok( $got_dir, $content_check, $options, "all files from '$got_dir' and subdirectories contain the word 'good'" );
+
+# Compares PKZIP archives considering both global and file comments.
+# Both archives contain the same members in different order:
+my @fileNos = ( 0, 1 );
+foreach my $archive ( $got_file, $reference_file ) {
+  my $zip = Archive::Zip->new();
+  $zip->zipfileComment( 'Global comment' );
+  $zip->addString( "This is file No. $_", "file_$_" )->fileComment( "Some comment to file No. $_" ) foreach @fileNos;
+  bail_out( "Cannot create '$archive.zip'" ) if $zip->writeToFileNamed( "$archive.zip" ) != AZ_OK;
+  @fileNos = reverse( @fileNos );
+}
+my $extract = sub {
+  my ( $file ) = @_;
+  my $zip = Archive::Zip->new();
+  die( "Cannot read '$file'" ) if $zip->read( $file ) != AZ_OK;
+  die( "Cannot extract from '$file'" ) if $zip->extractTree != AZ_OK;
+};
+my $meta_data = sub {
+  my ( $file ) = @_;
+  my $zip = Archive::Zip->new();
+  die( "Cannot read '$file'" ) if $zip->read( $file ) != AZ_OK;
+  my %meta_data = ( '' => $zip->zipfileComment );
+  $meta_data{ $_->fileName } = $_->fileComment foreach $zip->members;
+  return \%meta_data;
+};
+my $got_compressed_content       = path( "$got_file.zip"       )->slurp;
+my $reference_compressed_content = path( "$reference_file.zip" )->slurp;
+ok(
+  $got_compressed_content ne $reference_compressed_content,
+  "'$got_file.zip' and '$reference_file.zip' are physically different, but"
+);
+compare_archives_ok(
+  "$got_file.zip", "$reference_file.zip", { EXTRACT => $extract, META_DATA => $meta_data },
+  "'$got_file.zip' and '$reference_file.zip' are logically identical"
+);

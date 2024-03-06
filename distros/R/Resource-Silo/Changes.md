@@ -1,5 +1,8 @@
 # Revision history for Resource::Silo
 
+- 0.1203  Tue Mar 05 2024
+    - Add a dummy export(resource, silo) to hint IDEs
+
 - 0.1202  Wed Feb 28 2024
     - Documentation changes only
 

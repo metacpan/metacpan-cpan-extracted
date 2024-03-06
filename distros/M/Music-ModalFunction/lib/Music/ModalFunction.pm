@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Inspect musical modal functions
 
-our $VERSION = '0.0408';
+our $VERSION = '0.0409';
 
 use strictures 2;
 use AI::Prolog ();
@@ -271,7 +271,7 @@ Music::ModalFunction - Inspect musical modal functions
 
 =head1 VERSION
 
-version 0.0408
+version 0.0409
 
 =head1 SYNOPSIS
 

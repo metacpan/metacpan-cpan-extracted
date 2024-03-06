@@ -264,14 +264,14 @@ allow_if_string_contains_single_quote = 1
 [Perl::Critic::Policy::ValuesAndExpressions::ProhibitLeadingZeros]
 add_themes = critic
 
-[Perl::Critic::Policy::ValuesAndExpressions::ProhibitLongChainsOfMethodCalls]
-add_themes       = critic
-max_chain_length = 3
+#[Perl::Critic::Policy::ValuesAndExpressions::ProhibitLongChainsOfMethodCalls]
+#add_themes       = critic
+#max_chain_length = 3
 
-[Perl::Critic::Policy::ValuesAndExpressions::ProhibitMagicNumbers]
+#[Perl::Critic::Policy::ValuesAndExpressions::ProhibitMagicNumbers]
 # Not yet configured completely.
-add_themes     = critic
-allowed_values = -1 0 1
+#add_themes     = critic
+#allowed_values = -1 0 1
 
 [Perl::Critic::Policy::ValuesAndExpressions::ProhibitMixedBooleanOperators]
 add_themes = critic

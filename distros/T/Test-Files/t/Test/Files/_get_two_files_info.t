@@ -13,20 +13,28 @@ my $mock_this = mock $CLASS => ( override => [ _get_file_info => sub { @{ shift(
 
 plan( 2 );
 
-my $expected;
+subtest 'first file reading failed' => sub {
+  plan( 2 );
 
-@result   = ( [ $ERROR, undef ], [ undef, $CONTENT ] );
-$expected = [ [ $ERROR ], undef, $CONTENT  ];
-is(
-  [ $METHOD_REF->( 'first_file', 'second_file', undef, 'first_name', 'second_name' ) ],
-  $expected,
-  'first file reading failed'
-);
+  @result      = ( [ $ERROR, undef ], [ undef, $CONTENT ] );
+  my $expected = [ undef, $CONTENT  ];
+  my $self     = $CLASS->_init;
 
-@result   = ( [ undef, $CONTENT ], [ $ERROR, undef ] );
-$expected = [ [ $ERROR ], $CONTENT, undef  ];
-is(
-  [ $METHOD_REF->( 'first_file', 'second_file', undef, 'first_name', 'second_name' ) ],
-  $expected,
-  'second file reading failed'
-);
+  is( [ $self->$METHOD( 'first_file', 'second_file', 'first_name', 'second_name' ) ], $expected, 'result value' );
+
+  $expected = [ $ERROR ];
+  is( $self->diag,                                                                    $expected, 'error message' );
+};
+
+subtest 'second file reading failed' => sub {
+  plan( 2 );
+
+  @result      = ( [ undef, $CONTENT ], [ $ERROR, undef ] );
+  my $expected = [ $CONTENT, undef  ];
+  my $self     = $CLASS->_init;
+
+  is( [ $self->$METHOD( 'first_file', 'second_file', 'first_name', 'second_name' ) ], $expected, 'result value' );
+
+  $expected = [ $ERROR ];
+  is( $self->diag,                                                                    $expected, 'error message' );
+};

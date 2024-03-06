@@ -33,7 +33,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Music-ModalFunction
   repository: https://github.com/ology/Music-ModalFunction.git
-version: '0.0408'
+version: '0.0409'
 x_Dist_Zilla:
   perl:
     version: '5.032001'

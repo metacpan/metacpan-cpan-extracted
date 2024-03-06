@@ -13,10 +13,14 @@ If necessary, some parts of the contents can be excluded from the comparison.
 in regard to contents, or size, or existence.
 If necessary, some files as well as some parts of contents can be excluded from the comparison.
 - If all files in the directory being tested fulfill certain requirements.
+- If the archive (container) being tested is logically identical to the the reference archive (container).
+If necessary, some members of archives, as well as some parts of their contents, as well as some metadata
+can be excluded from the comparison.
 
 # SYNOPSIS
 
-All examples listed below can be found and executed using **xt/synopsis.t**.
+All examples listed below can be found and executed using **xt/synopsis.t**
+located on [GitHub](https://github.com/jsf116/Test-Files).
 ```perl
   use Path::Tiny qw( path );
   use Test::Files;
@@ -28,7 +32,7 @@ All examples listed below can be found and executed using **xt/synopsis.t**.
   my @file_list      = qw( expected file );
   my ( $content_check, $expected, $filter, $options );
 
-  plan( 22 );
+  plan( 24 );
 
   # Simply compares file contents to a string:
   $expected = "contents\nof file";
@@ -190,6 +194,33 @@ All examples listed below can be found and executed using **xt/synopsis.t**.
     $got_dir, $content_check, $options,
     "all files from '$got_dir' and subdirectories contain the word 'good'"
   );
+
+  # Compares PKZIP archives considering both global and file comments.
+  # Both archives contain the same members in different order:
+  my $extract = sub {
+    my ( $file ) = @_;
+    my $zip = Archive::Zip->new();
+    die( "Cannot read '$file'" ) if $zip->read( $file ) != AZ_OK;
+    die( "Cannot extract from '$file'" ) if $zip->extractTree != AZ_OK;
+  };
+  my $meta_data = sub {
+    my ( $file ) = @_;
+    my $zip = Archive::Zip->new();
+    die( "Cannot read '$file'" ) if $zip->read( $file ) != AZ_OK;
+    my %meta_data = ( '' => $zip->zipfileComment );
+    $meta_data{ $_->fileName } = $_->fileComment foreach $zip->members;
+    return \%meta_data;
+  };
+  my $got_compressed_content       = path( "$got_file.zip"       )->slurp;
+  my $reference_compressed_content = path( "$reference_file.zip" )->slurp;
+  ok(
+    $got_compressed_content ne $reference_compressed_content,
+    "'$got_file.zip' and '$reference_file.zip' are physically different, but"
+  );
+  compare_archives_ok(
+    "$got_file.zip", "$reference_file.zip", { EXTRACT => $extract, META_DATA => $meta_data },
+    "'$got_file.zip' and '$reference_file.zip' are logically identical"
+  );
 ```
 # DESCRIPTION
 
@@ -329,7 +360,7 @@ except of **FILENAME\_A** and **FILENAME\_B**.
 
 There is only one form of call namely
 ```perl
-compare_filter\_ok( $got_file, $reference_file, \&filter_func, $test_name )
+compare_filter_ok( $got_file, $reference_file, \&filter_func, $test_name )
 ```
 Works like **compare\_ok** with option **FILTER** i.e. compares the contents of two files,
 but sends each line through the filter **&filter\_func** so things that shouldn't count against success can be stripped.
@@ -492,6 +523,44 @@ Supported options:
     Boolean. If set to **true**, subdirectories of **$got\_dir** will be checked, too.
 
     Defaults to **false**.
+
+### compare\_archives\_ok
+
+The signature is
+```perl
+compare_archives_ok( $got_archive, $reference_archive, \%options, $test_name )
+```
+Verifies if the archives (containers) **$got\_archive** and **$reference\_archive** are logically identical.
+The term "logically identical" means that these files might be physically different e.g. because their members are
+stored in different order, or because some members are marked as deleted, but the metadata relevant for the current
+test case and the members are identical.
+
+Which metadata and which members must be compared can be controlled using **\\%options**.
+
+The comparison itself begins with the extraction and comparison of metadata;
+if they are not identical, no further comparison is provided and the test fails.
+If the metadata comparison succeeds, members of **$got\_archive** and **$reference\_archive** are extracted in
+temporary directories and compared in the same manner like **compare\_dirs\_ok** this does.
+
+Supported options:
+
+- All options supported by **compare\_dirs\_ok**.
+- **EXTRACT**
+
+    Code reference. Extracts members from the archive in the current directory.
+    The only expected parameter is the archive file name.
+    The current directory at the time point of extraction is a temporary directory that is removed after the test.
+
+    The return value is ignored.
+
+    Defaults to empty function **sub {}**.
+
+- **META\_DATA**
+
+    Code reference. Returns metadata e.g. comments from a PKZIP archive.
+    The only expected parameter is the archive file name.
+
+    Defaults to empty function **sub {}**.
 
 # SEE ALSO
 

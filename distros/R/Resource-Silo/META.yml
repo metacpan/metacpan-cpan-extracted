@@ -28,5 +28,5 @@ requires:
 resources:
   bugtracker: https://github.com/dallaylaen/resource-silo-p5/issues
   repository: https://github.com/dallaylaen/resource-silo-p5.git
-version: '0.1202'
+version: '0.1203'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
