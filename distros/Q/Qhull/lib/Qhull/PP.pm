@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use experimental 'signatures', 'lexical_subs', 'declared_refs';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 
 use Exporter::Shiny 'qhull';
@@ -101,22 +101,25 @@ my sub build_feed_qhull {
     croak( 'number of points must be > 1' )
       if $nelem < 2;
 
-    return eval_closure(
-        source => join( "\n",
-            q| use experimental 'signatures'; |,
-            q| sub ($fh) { |,
-            q| $fh->say( $ndims ); |,
-            q| $fh->say( $nelem ); |,
-            q| $fh->say( join( "\t", |,
-            join( ', ', @qsub ),
-            qq|) ) for (0..$nelem-1)|,
-            q|}|,
+    my $source = join( "\n",
+        q| use experimental 'signatures'; |,
+        q| sub ($fh) { |,
+        q| $fh->say( $ndims ); |,
+        q| $fh->say( $nelem ); |,
+        q| $fh->say( join( "\t", |,
+        join( ', ', @qsub ),
+        qq|) ) for (0..$nelem-1)|, q|}|, );
+
+    return (
+        eval_closure(
+            source      => $source,
+            environment => {
+                '@coord' => \@args,
+                '$ndims' => \$ndims,
+                '$nelem' => \$nelem,
+            },
         ),
-        environment => {
-            '@coord' => \@args,
-            '$ndims' => \$ndims,
-            '$nelem' => \$nelem,
-        },
+        $source,
     );
 }
 
@@ -158,6 +161,7 @@ my sub build_feed_qhull {
 
 
 
+## no critic( Subroutines::ProhibitExcessComplexity )
 sub qhull ( @coords ) {
 
     my %option = (
@@ -165,12 +169,14 @@ sub qhull ( @coords ) {
         passthrough => [],
         trace       => !!0,
         qh_opts     => undef,
+        save_input  => undef,
         is_hashref( $coords[-1] ) ? %{ pop @coords } : (),
     );
 
-    my $raw     = delete $option{raw};
-    my $trace   = delete $option{trace};
-    my $qh_opts = delete( $option{qh_opts} ) // [];
+    my $raw        = delete $option{raw};
+    my $trace      = delete $option{trace};
+    my $qh_opts    = delete( $option{qh_opts} ) // [];
+    my $save_input = delete $option{save_input};
 
     if ( is_arrayref( $qh_opts ) ) {
         $qh_opts = Qhull::Options->new_from_options( $qh_opts );
@@ -197,19 +203,40 @@ sub qhull ( @coords ) {
 
     # if there are errors in creating the feed routine, die before starting up
     # qhull
-    my $feed = @coords ? build_feed_qhull( @coords ) : undef;
+    my ( $feed, $feed_source ) = @coords ? build_feed_qhull( @coords ) : ();
 
     $log->is_debug
       && $log->debug( 'executing qhull: ' . Data::Dump::pp( $qh_opts->qhull_opts ) );
 
-    my $cmd = System::Command->new( qhull_exe, $qh_opts->qhull_opts->@* );
+    my @cmd = ( qhull_exe, $qh_opts->qhull_opts->@* );
+    my $cmd = System::Command->new( @cmd );
     if ( $feed ) {
+
+        # Log::Any says don't use newlines; ignore that advice here.
+        $log->trace( $feed_source );
+
+        if ( defined $save_input ) {
+            open my $fh, '>', $save_input
+              or croak( "unable to create $save_input" );
+            $feed->( $fh );
+            $fh->close or croak( "error closing $save_input" );
+        }
+
         $feed->( $cmd->stdin );
         $cmd->stdin->close;
     }
 
+    my $stderr = do {
+        local $/ = undef;
+        readline( $cmd->stderr );
+    };
+
+    croak( 'error running ' . join( q{ }, @cmd ) . ': ' . $stderr )
+      if length $stderr;
+
     my $output = defined( $qh_opts->output )
       ? do {
+        $cmd->close;
         require File::Slurper;
         File::Slurper::read_binary( $qh_opts->output );
       }
@@ -217,7 +244,6 @@ sub qhull ( @coords ) {
         local $/ = undef;
         readline( $cmd->stdout );
       };
-
 
     return $output if $raw;
 
@@ -253,7 +279,7 @@ Qhull::PP - Pure Perl interface to Qhull
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -266,7 +292,7 @@ version 0.01
 =head1 DESCRIPTION
 
 This is a pure-Perl interface to B<qhull>.  It passes input to the
-B<qhulL> executable and parses and returns the results.
+B<qhull> executable and parses and returns the results.
 
 =head1 SUBROUTINES
 
@@ -290,9 +316,7 @@ Don't parse the output; return it as a single string;
 
 =item *
 
-passthrough => I<array of Qhull options> or a L<Qhull::Options> object.
-
-It's expensive to parse the options, so for repeat calls, pass in a L<Qhull::Options> object.
+passthrough => I<array of Qhull options>
 
 =item *
 
@@ -302,7 +326,9 @@ Add line number info to parsed output.
 
 =item *
 
-qh_opts   => I<array of Qhull options>
+qh_opts   => I<array of Qhull options> or a L<Qhull::Options> object.
+
+It's expensive to parse the options, so for repeat calls, pass in a L<Qhull::Options> object.
 
 =back
 

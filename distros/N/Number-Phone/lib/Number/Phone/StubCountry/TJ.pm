@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185946;
+our $VERSION = 1.20240308154353;
 
 my $formatters = [
                 {
@@ -111,72 +111,77 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"9923134", "Rogun",
-"9923248", "Djilikul",
-"9923442", "Gafurov",
-"9923467", "Kanibadam",
-"9923556", "Rushan",
-"9923154", "Tadjikabad",
-"992331700", "Khovaling",
-"9923465", "Taboshar",
-"9923312", "Dangara",
-"9923452", "Zafarabad",
-"9923479", "Ayni",
-"9923249", "Kumsangir",
-"9923133", "Nurobod",
-"9923551", "Vanj",
-"9923153", "Varzob",
-"9923555", "Roshtkala",
-"9923451", "Chkalovsk",
-"9923311", "Vose",
-"9923455", "Jabarrasulov",
-"9923138", "Nurek",
-"9923315", "M\.\ Khamadoni",
-"9923552", "Darvaz",
-"9923445", "Matchinskiy",
-"9923243", "Abdurakhmana\ Jami",
-"9923139", "Hissar",
-"9923441", "Spitamen",
-"9923316", "Parkhar",
-"9923456", "Shakhristan",
-"9923322", "Kulyab",
-"9923462", "Isfara",
-"9923222", "Kurgan\-Tube",
-"9923130", "Tursun\-Zade",
-"9923132", "Jirgital",
-"9923251", "Kabodion",
-"9923246", "Vakhsh",
-"9923453", "Asht",
-"9923247", "Kolkhozabad",
-"9923422", "Khujand",
-"9923454", "Istravshan",
-"9923245", "Bokhtar",
-"9923475", "Pendjikent",
-"9923314", "Temurmalik",
-"9923443", "Kayrakum",
-"9923156", "Tavildara",
-"9923554", "Murgab",
-"9923141", "Yavan",
+$areanames{en} = {"9923556", "Rushan",
 "99237", "Dushanbe",
+"9923131", "Rasht",
+"9923452", "Zafarabad",
+"9923554", "Murgab",
 "9923240", "Shaartuz",
 "9923136", "Vakhdat",
-"9923522", "Khorog",
-"9923242", "Khuroson",
+"9923441", "Spitamen",
+"9923139", "Hissar",
+"9923134", "Rogun",
+"9923467", "Kanibadam",
+"9923475", "Pendjikent",
+"9923551", "Vanj",
+"9923453", "Asht",
+"9923247", "Kolkhozabad",
+"9923138", "Nurek",
+"9923451", "Chkalovsk",
+"9923132", "Jirgital",
+"9923553", "Ishkashim",
+"9923222", "Kurgan\-Tube",
+"9923465", "Taboshar",
+"9923443", "Kayrakum",
+"9923315", "M\.\ Khamadoni",
+"9923245", "Bokhtar",
+"9923454", "Istravshan",
+"9923552", "Darvaz",
+"9923133", "Nurobod",
+"992331700", "Khovaling",
+"9923456", "Shakhristan",
+"9923442", "Gafurov",
 "9923250", "Sarband",
 "9923155", "Shakhrinav",
-"9923464", "Ganchi",
-"9923553", "Ishkashim",
-"9923137", "Rudaki",
-"9923131", "Rasht",
 "9923252", "Panj",
+"9923316", "Parkhar",
+"9923249", "Kumsangir",
+"9923246", "Vakhsh",
+"9923137", "Rudaki",
+"9923464", "Ganchi",
+"9923314", "Temurmalik",
+"9923455", "Jabarrasulov",
+"9923156", "Tavildara",
+"9923311", "Vose",
+"9923522", "Khorog",
+"9923154", "Tadjikabad",
+"9923130", "Tursun\-Zade",
+"9923243", "Abdurakhmana\ Jami",
+"9923422", "Khujand",
+"9923445", "Matchinskiy",
+"9923251", "Kabodion",
+"9923555", "Roshtkala",
 "9923318", "Muminobod",
-"9923135", "Fayzabad",};
+"9923153", "Varzob",
+"9923312", "Dangara",
+"9923462", "Isfara",
+"9923248", "Djilikul",
+"9923479", "Ayni",
+"9923242", "Khuroson",
+"9923141", "Yavan",
+"9923135", "Fayzabad",
+"9923322", "Kulyab",};
+my $timezones = {
+               '' => [
+                       'Asia/Dushanbe'
+                     ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+992|\D)//g;
-      my $self = bless({ country_code => '992', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '992', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
         return $self->is_valid() ? $self : undef;
     }
 1;

@@ -1,9 +1,8 @@
 #!perl -T
 
 use strict;
-use lib './lib';
 
-use Test::Most tests => 12;
+use Test::Most tests => 11;
 
 my @modules = (
 	'Geo::Coder::Free',
@@ -11,7 +10,6 @@ my @modules = (
 	'Geo::Coder::Free::Local',
 	'Geo::Coder::Free::MaxMind',
 	'Geo::Coder::Free::OpenAddresses',
-	'Geo::Coder::Free::DB',
 	'Geo::Coder::Free::DB::MaxMind::admin1',
 	'Geo::Coder::Free::DB::MaxMind::admin',
 	'Geo::Coder::Free::DB::MaxMind::cities',

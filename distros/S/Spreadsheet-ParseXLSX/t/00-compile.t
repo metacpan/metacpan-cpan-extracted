@@ -6,10 +6,11 @@ use warnings;
 
 use Test::More;
 
-plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Spreadsheet/ParseXLSX.pm',
+    'Spreadsheet/ParseXLSX/Cell.pm',
     'Spreadsheet/ParseXLSX/Decryptor.pm',
     'Spreadsheet/ParseXLSX/Decryptor/Agile.pm',
     'Spreadsheet/ParseXLSX/Decryptor/Standard.pm'

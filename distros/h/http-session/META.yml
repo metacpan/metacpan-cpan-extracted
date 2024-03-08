@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,11 +28,11 @@ no_index:
 provides:
   HTTP::Session:
     file: lib/HTTP/Session.pm
-    version: '0.50'
+    version: '0.53'
   HTTP::Session::Expired:
-    file: lib/HTTP/Session.pm
+    file: lib/HTTP/Session/Expired.pm
   HTTP::Session::Finalized:
-    file: lib/HTTP/Session.pm
+    file: lib/HTTP/Session/Finalized.pm
   HTTP::Session::ID::MD5:
     file: lib/HTTP/Session/ID/MD5.pm
   HTTP::Session::ID::SHA1:
@@ -81,15 +81,15 @@ requires:
 resources:
   bugtracker: https://github.com/tokuhirom/http-session/issues
   homepage: https://github.com/tokuhirom/http-session
-  repository: git://github.com/tokuhirom/http-session.git
-version: '0.50'
+  repository: https://github.com/tokuhirom/http-session.git
+version: '0.53'
 x_contributors:
+  - 'Atsushi Kato <ktat.is@gmail.com>'
   - 'Atsushi Kato <ktat@cpan.org>'
   - 'MATSUU Takuto <matsuu@gmail.com>'
   - 'Neil Bowers <neil@bowers.com>'
   - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
   - 'kazuho <kazuho@d0d07461-0603-4401-acd4-de1884942a52>'
-  - 'ktat <ktat.is@gmail.com>'
   - 'tohae <tohaechan@gmail.com>'
   - 'tokuhirom <tokuhirom@d0d07461-0603-4401-acd4-de1884942a52>'
   - 'yappo <yappo@d0d07461-0603-4401-acd4-de1884942a52>'

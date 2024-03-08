@@ -9,9 +9,259 @@ Makefile.PL
 README
 dist.ini
 lib/Spreadsheet/ParseXLSX.pm
+lib/Spreadsheet/ParseXLSX/Cell.pm
 lib/Spreadsheet/ParseXLSX/Decryptor.pm
 lib/Spreadsheet/ParseXLSX/Decryptor/Agile.pm
 lib/Spreadsheet/ParseXLSX/Decryptor/Standard.pm
+'nytprof/(eval 10)[Errno-pm-172]-92-line.html'
+'nytprof/(eval 101)[XML-Twig-pm-5871]-218-line.html'
+'nytprof/(eval 102)[XML-Twig-pm-1750]-219-line.html'
+'nytprof/(eval 103)[XML-Twig-pm-7113]-220-line.html'
+'nytprof/(eval 106)[XML-Twig-pm-1750]-223-line.html'
+'nytprof/(eval 107)[XML-Twig-pm-1750]-224-line.html'
+'nytprof/(eval 108)[XML-Twig-pm-1750]-225-line.html'
+'nytprof/(eval 109)[XML-Twig-pm-1750]-226-line.html'
+'nytprof/(eval 11)[Errno-pm-17]-93-line.html'
+'nytprof/(eval 110)[XML-Twig-pm-1750]-227-line.html'
+'nytprof/(eval 111)[XML-Twig-pm-1750]-228-line.html'
+'nytprof/(eval 112)[XML-Twig-pm-1750]-229-line.html'
+'nytprof/(eval 114)[XML-Twig-pm-1750]-231-line.html'
+'nytprof/(eval 115)[XML-Twig-pm-1750]-232-line.html'
+'nytprof/(eval 12)[File-Copy-pm-19]-102-line.html'
+'nytprof/(eval 126)[XML-Twig-pm-5871]-243-line.html'
+'nytprof/(eval 127)[XML-Twig-pm-5871]-244-line.html'
+'nytprof/(eval 128)[XML-Twig-pm-5871]-245-line.html'
+'nytprof/(eval 129)[XML-Twig-pm-7113]-246-line.html'
+'nytprof/(eval 14)[XML-Twig-pm-159]-134-line.html'
+'nytprof/(eval 15)[XML-Twig-pm-167]-135-line.html'
+'nytprof/(eval 16)[XML-Twig-pm-5157]-137-line.html'
+'nytprof/(eval 17)[JSON-pm-274]-143-line.html'
+'nytprof/(eval 18)[JSON-pm-308]-144-line.html'
+'nytprof/(eval 2)[Carp-pm-21]-14-line.html'
+'nytprof/(eval 3)[Carp-pm-116]-15-line.html'
+'nytprof/(eval 31)[JSON-PP-pm-82]-248-line.html'
+'nytprof/(eval 39)[JSON-PP-pm-692]-147-line.html'
+'nytprof/(eval 4)[Carp-pm-171]-17-line.html'
+'nytprof/(eval 40)[JSON-PP-pm-692]-148-line.html'
+'nytprof/(eval 41)[JSON-PP-pm-692]-149-line.html'
+'nytprof/(eval 42)[JSON-PP-pm-692]-150-line.html'
+'nytprof/(eval 43)[JSON-PP-pm-692]-151-line.html'
+'nytprof/(eval 44)[JSON-PP-pm-692]-152-line.html'
+'nytprof/(eval 45)[JSON-PP-pm-692]-153-line.html'
+'nytprof/(eval 46)[JSON-PP-pm-692]-154-line.html'
+'nytprof/(eval 47)[JSON-PP-pm-692]-155-line.html'
+'nytprof/(eval 48)[JSON-PP-pm-692]-156-line.html'
+'nytprof/(eval 49)[JSON-PP-pm-692]-157-line.html'
+'nytprof/(eval 5)[Carp-pm-577]-18-line.html'
+'nytprof/(eval 50)[JSON-PP-pm-692]-158-line.html'
+'nytprof/(eval 51)[JSON-PP-pm-692]-159-line.html'
+'nytprof/(eval 52)[JSON-PP-pm-692]-160-line.html'
+'nytprof/(eval 53)[JSON-PP-pm-692]-161-line.html'
+'nytprof/(eval 54)[JSON-PP-pm-692]-162-line.html'
+'nytprof/(eval 55)[JSON-PP-pm-692]-163-line.html'
+'nytprof/(eval 56)[Test2-API-pm-72]-171-line.html'
+'nytprof/(eval 57)[XML-Twig-pm-1323]-172-line.html'
+'nytprof/(eval 58)[XML-Twig-pm-7113]-175-line.html'
+'nytprof/(eval 59)[XML-Twig-pm-5871]-176-line.html'
+'nytprof/(eval 6)[Time-HiRes-pm-55]-26-line.html'
+'nytprof/(eval 60)[XML-Twig-pm-7113]-177-line.html'
+'nytprof/(eval 61)[XML-Twig-pm-7113]-178-line.html'
+'nytprof/(eval 62)[XML-Twig-pm-7113]-179-line.html'
+'nytprof/(eval 63)[XML-Twig-pm-7113]-180-line.html'
+'nytprof/(eval 64)[XML-Twig-pm-7113]-181-line.html'
+'nytprof/(eval 65)[XML-Twig-pm-5871]-182-line.html'
+'nytprof/(eval 66)[XML-Twig-pm-7113]-183-line.html'
+'nytprof/(eval 67)[XML-Twig-pm-5871]-184-line.html'
+'nytprof/(eval 68)[XML-Twig-pm-7113]-185-line.html'
+'nytprof/(eval 69)[XML-Twig-pm-5871]-186-line.html'
+'nytprof/(eval 7)[Test2-API-Instance-pm-319]-71-line.html'
+'nytprof/(eval 70)[XML-Twig-pm-7113]-187-line.html'
+'nytprof/(eval 71)[XML-Twig-pm-5871]-188-line.html'
+'nytprof/(eval 72)[XML-Twig-pm-5871]-189-line.html'
+'nytprof/(eval 73)[XML-Twig-pm-5871]-190-line.html'
+'nytprof/(eval 74)[XML-Twig-pm-5871]-191-line.html'
+'nytprof/(eval 75)[XML-Twig-pm-5871]-192-line.html'
+'nytprof/(eval 76)[XML-Twig-pm-7113]-193-line.html'
+'nytprof/(eval 77)[XML-Twig-pm-5871]-194-line.html'
+'nytprof/(eval 78)[XML-Twig-pm-5871]-195-line.html'
+'nytprof/(eval 79)[XML-Twig-pm-5871]-196-line.html'
+'nytprof/(eval 8)[Compress-Raw-Zlib-pm-15]-84-line.html'
+'nytprof/(eval 80)[XML-Twig-pm-5871]-197-line.html'
+'nytprof/(eval 85)[XML-Twig-pm-7113]-202-line.html'
+'nytprof/(eval 86)[XML-Twig-pm-5871]-203-line.html'
+'nytprof/(eval 87)[XML-Twig-pm-7113]-204-line.html'
+'nytprof/(eval 9)[File-Path-pm-22]-90-line.html'
+'nytprof/(eval 90)[XML-Twig-pm-5871]-207-line.html'
+'nytprof/(eval 91)[XML-Twig-pm-5871]-208-line.html'
+'nytprof/(eval 94)[XML-Twig-pm-5871]-211-line.html'
+'nytprof/(eval 95)[XML-Twig-pm-5871]-212-line.html'
+'nytprof/(eval 96)[XML-Twig-pm-5871]-213-line.html'
+'nytprof/(eval 97)[XML-Twig-pm-7113]-214-line.html'
+nytprof/Agile-pm-169-line.html
+nytprof/Archive-Zip-Archive-pm-98-line.html
+nytprof/Archive-Zip-DirectoryMember-pm-113-line.html
+nytprof/Archive-Zip-FileMember-pm-112-line.html
+nytprof/Archive-Zip-Member-pm-109-line.html
+nytprof/Archive-Zip-NewFileMember-pm-115-line.html
+nytprof/Archive-Zip-StringMember-pm-116-line.html
+nytprof/Archive-Zip-ZipFileMember-pm-114-line.html
+nytprof/Archive-Zip-pm-73-line.html
+nytprof/Carp-Heavy-pm-96-line.html
+nytprof/Carp-pm-13-line.html
+nytprof/Cell-pm-170-line.html
+nytprof/Compress-Raw-Zlib-pm-81-line.html
+nytprof/Config-pm-20-line.html
+nytprof/Config_git-pl-23-line.html
+nytprof/Config_heavy-pl-22-line.html
+nytprof/Crypt-Cipher-pm-140-line.html
+nytprof/Crypt-Mode-CBC-pm-139-line.html
+nytprof/Crypt-Mode-ECB-pm-164-line.html
+nytprof/Crypt-RC4-pm-120-line.html
+nytprof/CryptX-pm-141-line.html
+nytprof/Cwd-pm-74-line.html
+nytprof/Decryptor-pm-138-line.html
+nytprof/Digest-Perl-MD5-pm-121-line.html
+nytprof/Digest-SHA-pm-165-line.html
+nytprof/Digest-base-pm-166-line.html
+nytprof/Encode-Alias-pm-104-line.html
+nytprof/Encode-Config-pm-108-line.html
+nytprof/Encode-Encoding-pm-107-line.html
+nytprof/Encode-MIME-Name-pm-105-line.html
+nytprof/Encode-pm-103-line.html
+nytprof/Errno-pm-91-line.html
+nytprof/Exporter-Heavy-pm-27-line.html
+nytprof/Exporter-pm-7-line.html
+nytprof/Fcntl-pm-11-line.html
+nytprof/File-Basename-pm-89-line.html
+nytprof/File-Copy-pm-100-line.html
+nytprof/File-Find-pm-99-line.html
+nytprof/File-Glob-pm-136-line.html
+nytprof/File-Path-pm-88-line.html
+nytprof/File-Spec-Unix-pm-86-line.html
+nytprof/File-Spec-pm-85-line.html
+nytprof/File-Temp-pm-87-line.html
+nytprof/FileHandle-pm-97-line.html
+nytprof/Graphics-ColorUtils-pm-117-line.html
+nytprof/IO-File-pm-75-line.html
+nytprof/IO-Handle-pm-79-line.html
+nytprof/IO-Seekable-pm-78-line.html
+nytprof/IO-pm-80-line.html
+nytprof/JSON-PP-Boolean-pm-146-line.html
+nytprof/JSON-PP-pm-145-line.html
+nytprof/JSON-pm-142-line.html
+nytprof/List-Util-pm-8-line.html
+nytprof/MIME-Base64-pm-167-line.html
+nytprof/OLE-Storage_Lite-pm-119-line.html
+nytprof/POSIX-pm-10-line.html
+nytprof/ParseXLSX-pm-72-line.html
+nytprof/PerlIO-pm-21-line.html
+nytprof/Scalar-Util-pm-6-line.html
+nytprof/SelectSaver-pm-77-line.html
+nytprof/Spreadsheet-ParseExcel-Cell-pm-126-line.html
+nytprof/Spreadsheet-ParseExcel-FmtDefault-pm-127-line.html
+nytprof/Spreadsheet-ParseExcel-Font-pm-124-line.html
+nytprof/Spreadsheet-ParseExcel-Format-pm-125-line.html
+nytprof/Spreadsheet-ParseExcel-Utility-pm-128-line.html
+nytprof/Spreadsheet-ParseExcel-Workbook-pm-122-line.html
+nytprof/Spreadsheet-ParseExcel-Worksheet-pm-123-line.html
+nytprof/Spreadsheet-ParseExcel-pm-118-line.html
+nytprof/Standard-pm-168-line.html
+nytprof/Storable-pm-106-line.html
+nytprof/Symbol-pm-76-line.html
+nytprof/Test-Builder-Formatter-pm-67-line.html
+nytprof/Test-Builder-Module-pm-4-line.html
+nytprof/Test-Builder-TodoDiag-pm-70-line.html
+nytprof/Test-Builder-pm-5-line.html
+nytprof/Test-More-pm-3-line.html
+nytprof/Test2-API-Context-pm-61-line.html
+nytprof/Test2-API-Instance-pm-28-line.html
+nytprof/Test2-API-Stack-pm-33-line.html
+nytprof/Test2-API-pm-24-line.html
+nytprof/Test2-Event-Bail-pm-56-line.html
+nytprof/Test2-Event-Diag-pm-53-line.html
+nytprof/Test2-Event-Exception-pm-57-line.html
+nytprof/Test2-Event-Fail-pm-63-line.html
+nytprof/Test2-Event-Note-pm-54-line.html
+nytprof/Test2-Event-Ok-pm-40-line.html
+nytprof/Test2-Event-Pass-pm-62-line.html
+nytprof/Test2-Event-Plan-pm-55-line.html
+nytprof/Test2-Event-Skip-pm-59-line.html
+nytprof/Test2-Event-Subtest-pm-60-line.html
+nytprof/Test2-Event-V2-pm-64-line.html
+nytprof/Test2-Event-Waiting-pm-58-line.html
+nytprof/Test2-Event-pm-41-line.html
+nytprof/Test2-EventFacet-About-pm-42-line.html
+nytprof/Test2-EventFacet-Amnesty-pm-43-line.html
+nytprof/Test2-EventFacet-Assert-pm-44-line.html
+nytprof/Test2-EventFacet-Control-pm-45-line.html
+nytprof/Test2-EventFacet-Error-pm-46-line.html
+nytprof/Test2-EventFacet-Hub-pm-52-line.html
+nytprof/Test2-EventFacet-Info-pm-47-line.html
+nytprof/Test2-EventFacet-Meta-pm-48-line.html
+nytprof/Test2-EventFacet-Parent-pm-50-line.html
+nytprof/Test2-EventFacet-Plan-pm-51-line.html
+nytprof/Test2-EventFacet-Trace-pm-29-line.html
+nytprof/Test2-EventFacet-pm-30-line.html
+nytprof/Test2-Formatter-TAP-pm-68-line.html
+nytprof/Test2-Formatter-pm-69-line.html
+nytprof/Test2-Hub-Interceptor-Terminator-pm-39-line.html
+nytprof/Test2-Hub-Interceptor-pm-38-line.html
+nytprof/Test2-Hub-Subtest-pm-37-line.html
+nytprof/Test2-Hub-pm-34-line.html
+nytprof/Test2-Util-ExternalMeta-pm-35-line.html
+nytprof/Test2-Util-Facets2Legacy-pm-65-line.html
+nytprof/Test2-Util-HashBase-pm-31-line.html
+nytprof/Test2-Util-Trace-pm-36-line.html
+nytprof/Test2-Util-pm-9-line.html
+nytprof/Tie-Hash-pm-12-line.html
+nytprof/Time-HiRes-pm-25-line.html
+nytprof/Time-Local-pm-110-line.html
+nytprof/UNIVERSAL-pm-130-line.html
+nytprof/URI-Escape-pm-174-line.html
+nytprof/URI-pm-173-line.html
+nytprof/XML-Parser-Expat-pm-133-line.html
+nytprof/XML-Parser-pm-132-line.html
+nytprof/XML-Twig-pm-129-line.html
+nytprof/XSLoader-pm-250-line.html
+nytprof/all_stacks_by_time.calls
+nytprof/all_stacks_by_time.svg
+nytprof/base-pm-66-line.html
+nytprof/bug-md-11-t-1-line.html
+nytprof/builtin-pm-101-line.html
+nytprof/bytes-pm-82-line.html
+nytprof/constant-pm-83-line.html
+nytprof/flamegraph_subattr.txt
+nytprof/index-subs-excl.html
+nytprof/index.html
+nytprof/integer-pm-111-line.html
+nytprof/js/asc.png
+nytprof/js/bg.png
+nytprof/js/desc.png
+nytprof/js/jit/Treemap.css
+nytprof/js/jit/gradient-cushion1.png
+nytprof/js/jit/gradient.png
+nytprof/js/jit/gradient20.png
+nytprof/js/jit/gradient30.png
+nytprof/js/jit/gradient40.png
+nytprof/js/jit/gradient50.png
+nytprof/js/jit/jit-yc.js
+nytprof/js/jit/jit.js
+nytprof/js/jquery-min.js
+nytprof/js/jquery.tablesorter.min.js
+nytprof/js/style-tablesorter.css
+nytprof/mro-pm-32-line.html
+nytprof/overload-pm-95-line.html
+nytprof/overloading-pm-16-line.html
+nytprof/packages-callgraph.dot
+nytprof/parent-pm-94-line.html
+nytprof/strict-pm-249-line.html
+nytprof/style.css
+nytprof/subs-callgraph.dot
+nytprof/subs-treemap-excl.html
+nytprof/utf8-pm-131-line.html
+nytprof/vars-pm-49-line.html
+nytprof/warnings-pm-2-line.html
+nytprof/warnings-register-pm-19-line.html
 t/00-compile.t
 t/ahihi.t
 t/author-critic.t
@@ -44,6 +294,7 @@ t/bug-7.t
 t/bug-72.t
 t/bug-8.t
 t/bug-md-10.t
+t/bug-md-11.t
 t/bug-md-7.t
 t/cell-to-row-col.t
 t/column-formats.t
@@ -76,6 +327,7 @@ t/data/bug-7.xlsx
 t/data/bug-72.xlsx
 t/data/bug-8.xlsx
 t/data/bug-md-10.xlsx
+t/data/bug-md-11.xlsx
 t/data/bug-md-7.xlsx
 t/data/column-formats.xlsx
 t/data/encryption-agile-123q.xlsx

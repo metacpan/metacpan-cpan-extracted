@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185946;
+our $VERSION = 1.20240308154352;
 
 my $formatters = [
                 {
@@ -182,59 +182,64 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"638851", "Bukidnon",
-"635221", "Albay",
-"634594", "Pampanga",
-"635446", "Camarines\ Sur",
+$areanames{en} = {"634593", "Pampanga",
 "6363", "Lanao\ del\ Norte\/Lanao\ del\ Sur",
-"634593", "Pampanga",
-"638842", "Misamis\ Oriental",
-"6333", "Iloilo",
-"6382", "Davao\ del\ Sur\/Davao",
-"6356", "Sorsogon\/Masbate",
-"6372", "La\ Union",
-"6385", "Agusan\ del\ Sur\/Agusan\ del\ Norte",
-"634422", "Bulacan",
-"6374", "Abra\/Benguet\/Kalinga\-Apayao\/Ifugao\/Mountain\ Province",
-"6375", "Pangasinan",
-"6384", "Davao\ del\ Norte",
-"634244", "Quezon",
-"638834", "Misamis\ Occidental",
-"638622", "Surigao\ del\ Sur",
-"634765", "Zambales",
-"6378", "Isabela\/Quirino\/Batanes\/Nueva\ Vizcaya\/Cagayan\ Valley",
-"6346", "Cavite",
-"6353", "Leyte",
-"636422", "North\ Cotabato",
-"633461", "Negros\ Occidental",
-"6336", "Antique\/Aklan\/Capiz",
-"6377", "Ilocos\ Sur\/Ilocos\ Norte",
-"634279", "Quezon",
-"6387", "Davao\ Oriental",
-"634396", "Batangas",
-"6355", "Western\ Samar",
 "634463", "Bulacan",
-"634761", "Zambales",
-"634235", "Quezon",
-"6383", "South\ Cotabato",
-"6332", "Cebu",
-"6362", "Zamboanga\ del\ Sur",
-"6335", "Negros\ Oriental",
-"634264", "Quezon",
+"6378", "Isabela\/Quirino\/Batanes\/Nueva\ Vizcaya\/Cagayan\ Valley",
 "634597", "Pampanga",
-"638853", "Bukidnon",
-"6365", "Zamboanga\ del\ Norte\/Zamboanga\ del\ Sur",
-"6338", "Bohol",
-"634251", "Quezon",
+"635446", "Camarines\ Sur",
+"634396", "Batangas",
+"6353", "Leyte",
+"638622", "Surigao\ del\ Sur",
+"6385", "Agusan\ del\ Sur\/Agusan\ del\ Norte",
+"634264", "Quezon",
+"6387", "Davao\ Oriental",
 "6348", "Palawan",
+"6384", "Davao\ del\ Norte",
+"6333", "Iloilo",
+"6383", "South\ Cotabato",
+"634761", "Zambales",
+"6355", "Western\ Samar",
+"6335", "Negros\ Oriental",
+"634251", "Quezon",
+"634279", "Quezon",
+"6365", "Zamboanga\ del\ Norte\/Zamboanga\ del\ Sur",
 "638822", "Misamis\ Oriental",
-"636423", "North\ Cotabato",};
+"634422", "Bulacan",
+"638834", "Misamis\ Occidental",
+"6372", "La\ Union",
+"6346", "Cavite",
+"635221", "Albay",
+"634765", "Zambales",
+"636422", "North\ Cotabato",
+"6332", "Cebu",
+"634244", "Quezon",
+"633461", "Negros\ Occidental",
+"638851", "Bukidnon",
+"6375", "Pangasinan",
+"6336", "Antique\/Aklan\/Capiz",
+"6374", "Abra\/Benguet\/Kalinga\-Apayao\/Ifugao\/Mountain\ Province",
+"6377", "Ilocos\ Sur\/Ilocos\ Norte",
+"6362", "Zamboanga\ del\ Sur",
+"6356", "Sorsogon\/Masbate",
+"638853", "Bukidnon",
+"636423", "North\ Cotabato",
+"634235", "Quezon",
+"6338", "Bohol",
+"634594", "Pampanga",
+"6382", "Davao\ del\ Sur\/Davao",
+"638842", "Misamis\ Oriental",};
+my $timezones = {
+               '' => [
+                       'Asia/Manila'
+                     ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+63|\D)//g;
-      my $self = bless({ country_code => '63', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '63', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
       $self = bless({ country_code => '63', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);

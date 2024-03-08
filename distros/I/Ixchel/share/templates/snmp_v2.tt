@@ -135,8 +135,8 @@ extend smart /usr/bin/env [% config.snmp.extend_env %] [% config.snmp.extend_bas
 extend privoxy /usr/bin/env [% config.snmp.extend_env %] [% config.snmp.extend_base_dir %]/privoxy -f [% config.snmp.extends.privoxy.log %]
 
 [% END %]
-[% IF config.chronyd.enable && config.snmp.extends.chronyd.enable %]e
-xtend chronyd /usr/bin/env [% config.snmp.extend_env %] [% config.snmp.extend_base_dir %]/chronyd
+[% IF config.chronyd.enable && config.snmp.extends.chronyd.enable %]
+extend chronyd /usr/bin/env [% config.snmp.extend_env %] [% config.snmp.extend_base_dir %]/chronyd
 
 [% END %]
 [% IF config.zfs.enable && config.snmp.extends.zfs.enable %]

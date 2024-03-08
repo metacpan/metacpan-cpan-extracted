@@ -53,3 +53,10 @@ Revision history for Image-DecodeQR-WeChat
 	I have fixed it with specifying explicitly the prototype using
 	PROTOTYPE: @ (without this, xsubp produces a '$$$$$$' prototype).
 	Added a test case to test this.
+
+0.10	2024-03-07/14:14
+	Added 'META_MERGE' key in Makefile.PL
+        Modified clean target in Makefile.PL to clean auto-generated .bs and .o files.
+        Added dependency 'Test2::Plugin::UTF8' for testing without 'Wide character in print ...' messages
+        Test t/20-decode_xs-without-use-utf8.t was judged pointless and was removed -- its job is done by t/10-decode_xs.t.
+        Documentation enchancments.

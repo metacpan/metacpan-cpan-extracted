@@ -527,9 +527,8 @@ limitation in the future.
 
 =head1 BUGS AND QUESTIONS
 
-If you find a bug in Locale::Codes, there are three ways to send it to me.
-In order of preference, they are:
-
+If you find a bug in Locale::Codes, please let me know.  The best ways to
+contact me are:
 
 =over 4
 
@@ -548,20 +547,12 @@ if at all possible.
 You are welcome to send it directly to me by email.  The email address
 to use is:  sbeck@cpan.org.
 
-Please note that because cpan.org addresses are published, they are used by
-a lot of spammers and phishers.  Please include the name of the perl module
-in the subject line of ALL messages sent to my cpan.org address or it will
-likely be missed.
-
-=item CPAN Bug Tracking
-
-You can submit it using the CPAN tracking tool.  This can be done at the
-following URL:
-
-L<http://rt.cpan.org/Public/Dist/Display.html?Name=Locale-Codes>
-
-There was discussion of halting this service a while back (though it continues
-to function), so only use this as a last resort.
+There is some discussion of discontinuing CPAN email, so please use
+this as a last resort.  The GitHub method is strongly preferred.
+Also, because cpan.org addresses are published, they are used by a lot
+of spammers and phishers.  Please include the name of the perl module
+in the subject line of ALL messages sent to my cpan.org address or it
+will likely be overlooked.
 
 =back
 
@@ -614,7 +605,7 @@ sent to him using any of the methods listed above.
    Copyright (c) 1997-2001 Canon Research Centre Europe (CRE).
    Copyright (c) 2001      Michael Hennecke (Locale::Currency)
    Copyright (c) 2001-2010 Neil Bowers
-   Copyright (c) 2010-2023 Sullivan Beck
+   Copyright (c) 2010-2024 Sullivan Beck
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

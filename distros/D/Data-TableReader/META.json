@@ -3,8 +3,8 @@
    "author" : [
       "Michael Conrad <mike@nrdvana.net>"
    ],
-   "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150001",
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -58,7 +58,8 @@
             "File::Spec::Functions" : "0",
             "Log::Any::Adapter" : "0",
             "Log::Any::Adapter::TAP" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "Types::Standard" : "0"
          }
       }
    },
@@ -74,11 +75,12 @@
          "web" : "https://github.com/nrdvana/perl-Data-TableReader"
       }
    },
-   "version" : "0.011",
+   "version" : "0.012",
    "x_contributors" : [
       "Christian Walde <walde.christian@gmail.com>"
    ],
-   "x_generated_by_perl" : "v5.20.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0115"
+   "x_generated_by_perl" : "v5.36.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.30",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

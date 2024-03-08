@@ -1,6 +1,6 @@
 package Test::Files::Constants;
 
-our $VERSION = '0.25';                                      ## no critic (RequireUseStrict, RequireUseWarnings)
+our $VERSION = '0.26';                                      ## no critic (RequireUseStrict, RequireUseWarnings)
 
 use strict;
 use warnings

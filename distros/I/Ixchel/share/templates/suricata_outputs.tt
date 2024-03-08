@@ -543,10 +543,10 @@ outputs:
         - bittorrent-dht
 [% IF vars.enable_pcap_log %]
   - pcap-log:
-    enabled: yes
-    filename: pcap/[% vars.instance_part2 %]pcap
-    limit: 32
-    conditional: alerts
+      enabled: yes
+      filename: pcap/[% vars.instance_part2 %]pcap
+      limit: 32
+      conditional: alerts
 [% END %]
 
 [% IF vars.logging.in_outputs %]

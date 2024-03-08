@@ -5,7 +5,7 @@ use warnings;
 use 5.020;
 use utf8;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use Carp qw(cluck confess);
 use JSON;
@@ -78,6 +78,7 @@ my %model_name = (
 	'632'      => [ 'Link II',             'BR 632' ],
 	'633'      => [ 'Link III',            'BR 633' ],
 	'640'      => [ 'LINT 27',             'BR 640' ],
+	'642'      => [ 'Desiro Classic',      'BR 642' ],
 	'643'      => [ 'TALENT',              'BR 643' ],
 	'648'      => [ 'LINT 41',             'BR 648' ],
 	'IC2.TWIN' => ['IC 2 Twindexx'],
@@ -431,6 +432,8 @@ sub wagongroup_description {
 		}
 		$ret .= " $power_desc{$powertype}";
 		$short //= $ret;
+		$short =~ s{elektrischer }{E-};
+		$short =~ s{[Ll]\Kokomotive}{ok};
 	}
 
 	if ( @model > 1 ) {
@@ -496,6 +499,7 @@ sub wagongroup_subtype {
 		'632'      => 0,
 		'633'      => 0,
 		'640'      => 0,
+		'642'      => 0,
 		'643'      => 0,
 		'648'      => 0,
 		'IC2.TWIN' => 0,
@@ -622,6 +626,9 @@ sub wagongroup_subtype {
 		elsif ( $wagon->model == 640 ) {
 			$ml{'640'}++;
 		}
+		elsif ( $wagon->model == 642 ) {
+			$ml{'642'}++;
+		}
 		elsif ( $wagon->model == 643 or $wagon->model == 943 ) {
 			$ml{'643'}++;
 		}
@@ -689,11 +696,12 @@ sub wagons {
 		} @{ $self->{wagons} };
 	}
 
-	for my $group (@wagon_groups) {
-		my $tt = $self->wagongroup_subtype( @{$group} );
+	for my $i ( 0 .. $#wagon_groups ) {
+		my $group = $wagon_groups[$i];
+		my $tt    = $self->wagongroup_subtype( @{$group} );
 		if ($tt) {
 			for my $wagon ( @{$group} ) {
-				$wagon->set_traintype($tt);
+				$wagon->set_traintype( $i, $tt );
 			}
 		}
 	}
@@ -762,7 +770,7 @@ Travel::Status::DE::DBWagenreihung - Interface to Deutsche Bahn Wagon Order API.
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 This is beta software. The API may change without notice.
 

@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2024 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Sizes 0.52;
+package Devel::MAT::Tool::Sizes 0.53;
 
 use v5.14;
 use warnings;
@@ -93,13 +93,13 @@ This tool adds the following SV methods.
 
 =head2 structure_set
 
-   @svs = $sv->structure_set
+   @svs = $sv->structure_set;
 
 Returns the total set of the SV's structure.
 
 =head2 structure_size
 
-   $size = $sv->structure_size
+   $size = $sv->structure_size;
 
 Returns the size, in bytes, of the structure that the SV contains.
 
@@ -141,13 +141,13 @@ sub Devel::MAT::SV::structure_size
 
 =head2 owned_set
 
-   @svs = $sv->owned_set
+   @svs = $sv->owned_set;
 
 Returns the set of every SV owned by the given one.
 
 =head2 owned_size
 
-   $size = $sv->owned_size
+   $size = $sv->owned_size;
 
 Returns the total size, in bytes, of the SVs owned by the given one.
 

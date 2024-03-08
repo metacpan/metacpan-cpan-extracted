@@ -29,8 +29,10 @@ if (-f $yaml) {
 my %hash;
 
 foreach my $type (@type) {
+   #print "# $type\n";
    my $obj = new Locale::Codes $type;
-   foreach my $codeset (keys %{ $Locale::Codes::Constants::ALL_CODESETS{$type}{'codesets'} }) {
+   foreach my $codeset (sort keys %{ $Locale::Codes::Constants::ALL_CODESETS{$type}{'codesets'} }) {
+      #print "#   $codeset\n";
       my @codes = $obj->all_codes($codeset);
       foreach my $code (@codes) {
          my $name = $obj->code2name($code,$codeset);

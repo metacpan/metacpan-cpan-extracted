@@ -12,8 +12,8 @@ my $bin_dir = path( Alien::Qhull->bin_dir );
 ok( $bin_dir->exists, 'bin_dir exists' )
   or bail_out $@;
 
-for my $bin (qw(  qconvex  qdelaunay  qhalf  qhull  qvoronoi  rbox )) {
-    ok( $bin_dir->child($bin)->exists, $bin );
+for my $bin ( qw(  qconvex  qdelaunay  qhalf  qhull  qvoronoi  rbox ) ) {
+    ok( $bin_dir->child( $bin )->exists, $bin );
 
 }
 

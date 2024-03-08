@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2013-2018 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Reachability 0.52;
+package Devel::MAT::Tool::Reachability 0.53;
 
 use v5.14;
 use warnings;
@@ -306,7 +306,7 @@ This tool adds the following SV methods.
 
 =head2 reachable
 
-   $r = $sv->reachable
+   $r = $sv->reachable;
 
 Returns true if the SV is reachable from a known root.
 

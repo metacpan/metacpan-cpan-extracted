@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185946;
+our $VERSION = 1.20240308154352;
 
 my $formatters = [
                 {
@@ -123,36 +123,41 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"5172", "Tumbes",
-"5152", "Tacna",
-"5162", "Huánuco",
-"5166", "Ayacucho",
-"5156", "Ica",
-"5141", "Amazonas",
-"5176", "Cajamarca",
-"5182", "Madre\ de\ Dios",
+$areanames{en} = {"5173", "Piura",
 "5183", "Apurímac",
-"5144", "La\ Libertad",
-"5173", "Piura",
-"5163", "Pasco",
-"5153", "Moquegua",
-"5161", "Ucayali",
-"5151", "Puno",
 "5142", "San\ Martín",
-"511", "Lima\/Callao",
-"5184", "Cusco",
-"5165", "Loreto",
-"5143", "Ancash",
-"5174", "Lambayeque",
 "5154", "Arequipa",
+"5176", "Cajamarca",
+"5143", "Ancash",
+"5165", "Loreto",
+"5141", "Amazonas",
+"5182", "Madre\ de\ Dios",
+"511", "Lima\/Callao",
+"5172", "Tumbes",
 "5164", "Junín",
-"5167", "Huancavelica",};
+"5167", "Huancavelica",
+"5161", "Ucayali",
+"5163", "Pasco",
+"5152", "Tacna",
+"5144", "La\ Libertad",
+"5166", "Ayacucho",
+"5151", "Puno",
+"5153", "Moquegua",
+"5156", "Ica",
+"5184", "Cusco",
+"5162", "Huánuco",
+"5174", "Lambayeque",};
+my $timezones = {
+               '' => [
+                       'America/Lima'
+                     ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+51|\D)//g;
-      my $self = bless({ country_code => '51', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '51', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
       $self = bless({ country_code => '51', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);

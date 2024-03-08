@@ -1,14 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2024 -- leonerd@leonerd.org.uk
 
 package Devel::MAT::Dumper::Helper;
 
+use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 =head1 NAME
 
@@ -109,7 +110,7 @@ my $DMD_helper_h = do {
 
 =head2 write_DMD_helper_h
 
-   Devel::MAT::Dumper::Helper->write_DMD_helper_h
+   Devel::MAT::Dumper::Helper->write_DMD_helper_h;
 
 Writes the L<DMD_helper.h> file to the current working directory. To cause the
 compiler to actually find this file, see L<extra_compiler_flags>.
@@ -128,7 +129,7 @@ sub write_DMD_helper_h
 
 =head2 extra_compiler_flags
 
-   @flags = Devel::MAT::Dumper::Helper->extra_compiler_flags
+   @flags = Devel::MAT::Dumper::Helper->extra_compiler_flags;
 
 Returns a list of extra flags that the build scripts should add to the
 compiler invocation. This enables the C compiler to find the F<DMD_helper.h>
@@ -150,7 +151,7 @@ sub extra_compiler_flags
 
 =head2 extend_module_build
 
-   Devel::MAT::Dumper::Helper->extend_module_build( $build )
+   Devel::MAT::Dumper::Helper->extend_module_build( $build );
 
 A convenient shortcut for performing all the tasks necessary to make a
 L<Module::Build>-based distribution use the helper.

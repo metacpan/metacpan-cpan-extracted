@@ -6,6 +6,7 @@ SYNOPSIS
 
      check_date($self, $key);
      check_date_dmy($self, $key);
+     check_date_ddmmyy($self, $key);
      check_date_order($self, $key1, $key2);
 
 DESCRIPTION
@@ -14,6 +15,8 @@ DESCRIPTION
 SUBROUTINES
   "check_date"
      check_date($self, $key);
+
+    *Since version 0.01. Described functionality since version 0.02.*
 
     Check parameter defined by $key which is date and that date isn't
     greater than actual year.
@@ -27,6 +30,8 @@ SUBROUTINES
   "check_date_dmy"
      check_date_dmy($self, $key);
 
+    *Since version 0.02. Described functionality since version 0.03.*
+
     Check parameter defined by $key which is date in right format.
 
     Possible dates. - D.M.YYYY - DD.MM.YYYY
@@ -37,8 +42,27 @@ SUBROUTINES
 
     Returns undef.
 
+  "check_date_ddmmyy"
+     check_date_ddmmyy($self, $key);
+
+    *Since version 0.03.*
+
+    Check parameter defined by $key which is date in ddmmyy format.
+
+    Possible dates. - DDMMYY
+
+    Function is working only for date years > 2000.
+
+    Date is checked via DateTime if it is real.
+
+    Put error if check isn't ok.
+
+    Returns undef.
+
   "check_date_order"
      check_date_order($self, $key1, $key2);
+
+    *Since version 0.01. Described functionality since version 0.02.*
 
     Check if date with $key1 is lesser than date with $key2.
 
@@ -54,6 +78,13 @@ ERRORS
 
      check_date_dmy():
              Parameter '%s' for date is in bad format.
+                     Value: %s
+             Parameter '%s' is bad date.
+                     Value: %s
+                     DateTime error: %s
+
+     check_date_ddmmyy():
+             Parameter '%s' for date is in bad date format.
                      Value: %s
              Parameter '%s' is bad date.
                      Value: %s
@@ -99,6 +130,43 @@ EXAMPLE2
      # Output like:
      # #Error [..Utils.pm:?] Parameter 'key' is in bad format.
 
+EXAMPLE3
+     use strict;
+     use warnings;
+
+     use Mo::utils::Date qw(check_date_ddmmyy);
+
+     my $self = {
+             'key' => '151120',
+     };
+     check_date_ddmmyy($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE4
+     use strict;
+     use warnings;
+
+     use Error::Pure;
+     use Mo::utils::Date qw(check_date_ddmmyy);
+
+     $Error::Pure::TYPE = 'Error';
+
+     my $self = {
+             'key' => 'foo',
+     };
+     check_date_ddmmyy($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [..Utils.pm:?] Parameter 'key' for date is in bad format.
+
 DEPENDENCIES
     DateTime, English, Exporter, Error::Pure, Readonly.
 
@@ -115,10 +183,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © Michal Josef Špaček 2022-2023
+    © Michal Josef Špaček 2022-2024
 
     BSD 2-Clause License
 
 VERSION
-    0.02
+    0.03
 

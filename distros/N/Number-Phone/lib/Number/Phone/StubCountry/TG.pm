@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185946;
+our $VERSION = 1.20240308154353;
 
 my $formatters = [
                 {
@@ -66,30 +66,35 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"22824", "Plateaux\ region",
-"22825", "Central\ region",
-"22822", "Lome",
-"22823", "Maritime\ region",
-"22827", "Savannah\ region",
-"22826", "Kara\ region",};
+$areanames{fr} = {"22826", "Région\ de\ la\ Kara",
+"22827", "Région\ des\ Savanes",
+"22825", "Région\ Centrale",
+"22823", "Région\ Maritime",
+"22824", "Région\ des\ Plateaux",
+"22822", "Lomé",};
 $areanames{es} = {"22822", "Lomé",
 "22824", "Región\ Plateaux",
 "22825", "Región\ Central",
 "22823", "Región\ Marítima",
 "22827", "Región\ de\ Savannah",
 "22826", "Región\ de\ Kara",};
-$areanames{fr} = {"22827", "Région\ des\ Savanes",
-"22826", "Région\ de\ la\ Kara",
-"22822", "Lomé",
-"22825", "Région\ Centrale",
-"22824", "Région\ des\ Plateaux",
-"22823", "Région\ Maritime",};
+$areanames{en} = {"22827", "Savannah\ region",
+"22826", "Kara\ region",
+"22822", "Lome",
+"22823", "Maritime\ region",
+"22825", "Central\ region",
+"22824", "Plateaux\ region",};
+my $timezones = {
+               '' => [
+                       'Africa/Lome'
+                     ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+228|\D)//g;
-      my $self = bless({ country_code => '228', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '228', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
         return $self->is_valid() ? $self : undef;
     }
 1;

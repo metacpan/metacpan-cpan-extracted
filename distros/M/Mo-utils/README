@@ -3,9 +3,9 @@ NAME
 
 SYNOPSIS
      use Mo::utils qw(check_angle check_array check_array_object check_array_required
-             check_bool check_code check_isa check_length check_number
-             check_number_of_items check_regexp check_required check_string_begin
-             check_strings);
+             check_bool check_code check_isa check_length check_length_fix check_number
+             check_number_of_items check_number_range check_regexp check_required
+             check_string check_string_begin check_strings);
 
      check_angle($self, $key);
      check_array($self, $key);
@@ -21,6 +21,7 @@ SYNOPSIS
      check_number_range($self, $key, $min, $max);
      check_regexp($self, $key, $regexp);
      check_required($self, $key);
+     check_string($self, $key, $string);
      check_string_begin($self, $key, $string_base);
      check_strings($self, $key, $strings_ar);
 
@@ -191,6 +192,17 @@ SUBROUTINES
 
     Returns undef.
 
+  "check_string"
+     check_string($self, $key, $string);
+
+    *Since version 0.24.*
+
+    Check string defined by $key to expected value.
+
+    Put error if check isn't ok.
+
+    Returns undef.
+
   "check_string_begin"
      check_string_begin($self, $key, $string_base);
 
@@ -285,6 +297,11 @@ ERRORS
 
      check_required():
              Parameter '%s' is required.
+
+     check_string():
+             Parameter '%s' must have expected value.
+                     Value: %s
+                     Expected value: %s
 
      check_string_begin():
              Parameter '%s' must have defined string base.
@@ -875,6 +892,43 @@ EXAMPLE29
      use strict;
      use warnings;
 
+     use Mo::utils qw(check_string);
+
+     my $self = {
+             'key' => 'foo',
+     };
+     check_string($self, 'key', 'foo');
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE30
+     use strict;
+     use warnings;
+
+     use Error::Pure;
+     use Mo::utils qw(check_string);
+
+     $Error::Pure::TYPE = 'Error';
+
+     my $self = {
+             'key' => 'bad',
+     };
+     check_string($self, 'key', 'foo');
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [...utils.pm:?] Parameter 'key' have expected value.
+
+EXAMPLE32
+     use strict;
+     use warnings;
+
      use Mo::utils qw(check_string_begin);
 
      my $self = {
@@ -888,7 +942,7 @@ EXAMPLE29
      # Output:
      # ok
 
-EXAMPLE30
+EXAMPLE33
      use strict;
      use warnings;
 
@@ -908,7 +962,7 @@ EXAMPLE30
      # Output like:
      # #Error [...utils.pm:?] Parameter 'key' must begin with defined string base.
 
-EXAMPLE31
+EXAMPLE34
      use strict;
      use warnings;
 
@@ -925,7 +979,7 @@ EXAMPLE31
      # Output:
      # ok
 
-EXAMPLE32
+EXAMPLE35
      use strict;
      use warnings;
 
@@ -974,5 +1028,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.23
+    0.24
 

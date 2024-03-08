@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2016-2018 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::InternalTools 0.52;
+package Devel::MAT::InternalTools 0.53;
 
 use v5.14;
 use warnings;
@@ -169,9 +169,28 @@ sub paginate
    $more->() or undef $more;
 }
 
+sub stop
+{
+   shift;
+   undef $more;
+}
+
 sub can_more
 {
    return defined $more;
+}
+
+package Devel::MAT::Tool::stop;
+
+use base qw( Devel::MAT::Tool );
+
+use constant CMD => "stop";
+use constant CMD_DESC => "Stops pagination";
+
+sub run
+{
+   shift;
+   Devel::MAT::Tool::more->stop;
 }
 
 package Devel::MAT::Tool::time;

@@ -3,11 +3,23 @@ package Geo::Coder::Free::DB::MaxMind::admin;
 use strict;
 use warnings;
 
+=head1 NAME
+
+Geo::Coder::Free::DB::MaxMind::admin
+
+=head1 VERSION
+
+Version 0.35
+
+=cut
+
+our $VERSION = '0.35';
+
 # admin1.db is from http://download.geonames.org/export/dump/admin1CodesASCII.txt
 
-use Geo::Coder::Free::DB;
+use Database::Abstraction;
 
-our @ISA = ('Geo::Coder::Free::DB');
+our @ISA = ('Database::Abstraction');
 
 sub _open {
 	my $self = shift;

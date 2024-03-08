@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# Copyright (c) 2010-2023 Sullivan Beck.  All rights reserved.
+# Copyright (c) 2010-2024 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -23,7 +23,7 @@ use Mojo::DOM;
 use lib "./internal";
 
 our $VERSION;
-$VERSION='3.77';
+$VERSION='3.78';
 
 # Some required executables
 my @exe     = qw( wget xls2csv );
@@ -95,7 +95,7 @@ our $country_iana_url   = "http://www.iana.org/domains/root/db/";
 our $country_un_url     = "https://unstats.un.org/unsd/methodology/m49/";
 
 #our $country_genc_url   = "https://nsgreg.nga.mil/genc/discovery";
-our $country_genc_url   = "https://nsgreg-api.nga.mil/registries/browse/results.jsp?registryType=genc&registerField=IE4&browseType=genc";
+our $country_genc_url   = "https://nsgreg.nga.mil/genc/registers.jsp?register=IE4";
 
 require "data.country.pl";
 
@@ -276,11 +276,13 @@ sub do_country {
 
    sub _init_country_genc {
       my $inst = qq
-(Please download the data manually for GENC country codes.
+(Please download the data manually for GENC country codes.  This can be done
+using the Chrome browser with the Table Capture (georgemike) extension enabled.
 
 Go to the following URL:
    $country_genc_url
 Click on:
+   'Browse'
    'Show 100 entries'
 
 Select any part of the table (it is not necessary to select the entire table).
@@ -292,10 +294,13 @@ the file.
 Select any part of the table (it is not necessary to select the entire
 table).  Then right click and launch the table caputure workshop.
 Click on the 'Copy table to clipboard' icon and paste it into the
-file.
+file.  Remove the headers (which contain '2-Char Code'), one per set of
+rows copied.
 
+*NOTE* This currently is required:
 If there are more entries than will fit on a single table, repeat this
-process but make sure you remove extra header lines.
+process but make sure you remove extra header lines (but do not remove the
+initial header line).
 );
 
       $in = _read_file('type'      => 'csv',
@@ -1681,7 +1686,7 @@ use warnings;
 use utf8;
 
 our(\$VERSION);
-\$VERSION='3.77';
+\$VERSION='3.78';
 
 \$Locale::Codes::Data{'$type'}{'id'} = '$ID';
 

@@ -1,3 +1,8 @@
+0.24 2024-03-07T10:15:30+01:00
+ - Add check_string().
+ - Add test for negative number in check_number_range().
+ - Fix SYNOPSIS section in doc.
+
 0.23 2024-03-04T11:52:32+01:00
  - Add check_number_range().
  - Move error test in tests of check_number() to the end.

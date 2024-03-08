@@ -4,9 +4,9 @@ NAME
 
 SYNOPSIS
 
-     use Devel::MAT::Dumper;
+       use Devel::MAT::Dumper;
     
-     Devel::MAT::Dumper::dump( "path/to/the/file.pmat" );
+       Devel::MAT::Dumper::dump( "path/to/the/file.pmat" );
 
 DESCRIPTION
 
@@ -128,13 +128,13 @@ FUNCTIONS
 
  dump
 
-       dump( $path )
+       dump( $path );
 
     Writes a heap dump to the named file
 
  dumpfh
 
-       dumpfh( $fh )
+       dumpfh( $fh );
 
     Writes a heap dump to the given filehandle (which must be a plain
     OS-level filehandle, though does not need to be a regular file, or

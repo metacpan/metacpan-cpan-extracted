@@ -2,7 +2,7 @@ package Plack::Middleware::Debug::Notepad;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 $VERSION = eval $VERSION;
 
 use Text::Markdown;

@@ -10,7 +10,7 @@ my $build = Module::Build->new(
       'Syntax::Keyword::Match' => 0,
 
       'Commandable::Invocation' => '0.04', # ->peek_remaining
-      'Devel::MAT::Dumper' => '0.35',
+      'Devel::MAT::Dumper' => '0.48', # format version 0.6
       'Feature::Compat::Try' => '0',
       'File::ShareDir' => 0,
       'File::Spec' => 0,
@@ -23,8 +23,7 @@ my $build = Module::Build->new(
       'Struct::Dumb' => '0.07',
    },
    test_requires => {
-      'Test::Identity' => 0,
-      'Test::More' => '0.88', # done_testing
+      'Test2::V0' => 0,
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires

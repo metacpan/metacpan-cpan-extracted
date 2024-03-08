@@ -37,7 +37,7 @@ use Scalar::Util qw/ looks_like_number /;
 @Expect::EXPORT = qw(expect exp_continue exp_continue_timeout);
 
 BEGIN {
-	$Expect::VERSION = '1.36';
+	$Expect::VERSION = '1.38';
 
 	# These are defaults which may be changed per object, or set as
 	# the user wishes.
@@ -478,7 +478,13 @@ sub expect {
 	}
 	croak "expect(): not enough arguments, should be expect(timeout, [patterns...])"
 		if @_ < 1;
-    my $timeout = looks_like_number($_[0]) ? shift : $self->timeout;
+	my $timeout;
+	if ( looks_like_number($_[0]) or not defined $_[0] ) {
+		$timeout = shift;
+		}
+	else {
+		$timeout = $self->timeout; 
+		}
 	my $timeout_hook = undef;
 
 	my @object_list;
@@ -511,6 +517,7 @@ sub expect {
                 push @pattern_list, [ $parm_nr, '-re', $parm, undef ];
             }
 			elsif ( ref($parm) eq 'ARRAY' ) {
+			# if ( ref($parm) eq 'ARRAY' ) {
 				my $err = _add_patterns_to_list(
 					\@pattern_list, \@timeout_list,
 					$parm_nr,       $parm

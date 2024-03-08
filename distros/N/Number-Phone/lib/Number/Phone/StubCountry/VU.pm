@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185946;
+our $VERSION = 1.20240308154353;
 
 my $formatters = [
                 {
@@ -78,25 +78,30 @@ my $validators = {
         '
               };
 my %areanames = ();
-$areanames{en} = {"67829", "Port\ Vila\,\ Shefa",
-"67838", "Penama\/Torba",
-"67828", "Port\ Vila\,\ Shefa",
+$areanames{en} = {"67823", "Port\ Vila\,\ Shefa",
 "67825", "Port\ Vila\,\ Shefa",
-"67837", "Luganville",
-"6784", "Malampa",
-"67823", "Port\ Vila\,\ Shefa",
-"67824", "Port\ Vila\,\ Shefa",
-"67826", "Port\ Vila\,\ Shefa",
 "67822", "Port\ Vila\,\ Shefa",
-"67888", "Tafea",
 "67836", "Sanma",
-"67827", "Port\ Vila\,\ Shefa",};
+"67829", "Port\ Vila\,\ Shefa",
+"67838", "Penama\/Torba",
+"67827", "Port\ Vila\,\ Shefa",
+"67837", "Luganville",
+"67824", "Port\ Vila\,\ Shefa",
+"67828", "Port\ Vila\,\ Shefa",
+"67888", "Tafea",
+"6784", "Malampa",
+"67826", "Port\ Vila\,\ Shefa",};
+my $timezones = {
+               '' => [
+                       'Pacific/Efate'
+                     ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+678|\D)//g;
-      my $self = bless({ country_code => '678', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '678', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
         return $self->is_valid() ? $self : undef;
     }
 1;

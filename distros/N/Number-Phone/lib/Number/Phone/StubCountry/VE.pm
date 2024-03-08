@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185946;
+our $VERSION = 1.20240308154353;
 
 my $formatters = [
                 {
@@ -71,74 +71,79 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"58256", "Portuguesa",
-"58246", "Aragua\/Guárico",
-"58269", "Falcón",
-"58286", "Anzoátegui\/Bolívar",
-"58235", "Anzoátegui\/Bolívar\/Guárico",
-"58277", "Táchira\/Mérida",
-"58251", "Lara\/Yaracuy",
-"58241", "Carabobo",
-"58275", "Táchira\/Mérida\/Zulia",
-"58281", "Anzoátegui",
-"58295", "Nueva\ Esparta",
-"58264", "Zulia",
-"58237", "Federal\ Dependencies",
-"58239", "Miranda",
-"58274", "Mérida",
-"58243", "Aragua\/Carabobo",
-"58294", "Sucre",
-"58265", "Zulia",
-"58282", "Anzoátegui",
-"58253", "Lara\/Yaracuy",
-"58242", "Carabobo",
-"58252", "Lara",
-"58283", "Anzoátegui",
-"58279", "Falcón",
-"58234", "Miranda",
-"58288", "Bolívar",
-"58267", "Zulia",
-"58248", "Amazonas",
-"58258", "Cojedes",
-"58293", "Sucre",
-"58273", "Barinas",
-"58244", "Aragua",
-"58254", "Yaracuy",
-"58272", "Trujillo",
-"58292", "Anzoátegui\/Monagas",
-"58238", "Guárico",
-"58284", "Bolívar",
-"58261", "Zulia",
-"58249", "Carabobo",
-"5821", "Caracas\/Miranda\/Vargas",
-"58259", "Falcón",
-"58278", "Apure\/Barinas",
-"58266", "Zulia",
-"58289", "Bolívar",
-"58287", "Delta\ Amacuro\/Monagas",
-"58268", "Falcón",
-"58296", "Amazonas",
-"58276", "Táchira",
-"58257", "Portuguesa",
-"58240", "Apure\/Barinas",
-"58247", "Apure\/Barinas\/Guárico",
-"58262", "Zulia",
-"58285", "Anzoátegui\/Bolívar",
-"58291", "Monagas",
-"58271", "Mérida\/Trujillo\/Zulia",
-"58263", "Zulia",
-"58245", "Carabobo",
-"58255", "Portuguesa",};
-$areanames{es} = {"58277", "Mérida\/Táchira",
-"58237", "Dependencias\ Federales",
+$areanames{es} = {"58237", "Dependencias\ Federales",
+"58277", "Mérida\/Táchira",
 "58275", "Mérida\/Táchira\/Zulia",
 "5821", "Distrito\ Capital\/Miranda\/Vargas",};
+$areanames{en} = {"58237", "Federal\ Dependencies",
+"58252", "Lara",
+"58293", "Sucre",
+"58283", "Anzoátegui",
+"58265", "Zulia",
+"58272", "Trujillo",
+"58242", "Carabobo",
+"58240", "Apure\/Barinas",
+"58276", "Táchira",
+"58259", "Falcón",
+"58246", "Aragua\/Guárico",
+"58284", "Bolívar",
+"58238", "Guárico",
+"58279", "Falcón",
+"58249", "Carabobo",
+"58256", "Portuguesa",
+"58294", "Sucre",
+"58251", "Lara\/Yaracuy",
+"58278", "Apure\/Barinas",
+"58248", "Amazonas",
+"58295", "Nueva\ Esparta",
+"58239", "Miranda",
+"58271", "Mérida\/Trujillo\/Zulia",
+"58241", "Carabobo",
+"58258", "Cojedes",
+"58285", "Anzoátegui\/Bolívar",
+"58263", "Zulia",
+"58257", "Portuguesa",
+"58264", "Zulia",
+"58277", "Táchira\/Mérida",
+"58247", "Apure\/Barinas\/Guárico",
+"58286", "Anzoátegui\/Bolívar",
+"58235", "Anzoátegui\/Bolívar\/Guárico",
+"58274", "Mérida",
+"58244", "Aragua",
+"58289", "Bolívar",
+"58267", "Zulia",
+"58296", "Amazonas",
+"58254", "Yaracuy",
+"58292", "Anzoátegui\/Monagas",
+"58268", "Falcón",
+"58253", "Lara\/Yaracuy",
+"58261", "Zulia",
+"58282", "Anzoátegui",
+"58243", "Aragua\/Carabobo",
+"58273", "Barinas",
+"58266", "Zulia",
+"58269", "Falcón",
+"58287", "Delta\ Amacuro\/Monagas",
+"58291", "Monagas",
+"58255", "Portuguesa",
+"58288", "Bolívar",
+"58281", "Anzoátegui",
+"58234", "Miranda",
+"5821", "Caracas\/Miranda\/Vargas",
+"58262", "Zulia",
+"58275", "Táchira\/Mérida\/Zulia",
+"58245", "Carabobo",};
+my $timezones = {
+               '' => [
+                       'America/Caracas'
+                     ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+58|\D)//g;
-      my $self = bless({ country_code => '58', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '58', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
       $self = bless({ country_code => '58', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);

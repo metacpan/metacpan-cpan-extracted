@@ -15,18 +15,18 @@ use Text::xSV::Slurp;
 
 Geo::Coder::Free::Local -
 Provides an interface to locations that you know yourself.
-I have found locations by using GPS apps on a smartphone and by
+For example, I have found locations by using GPS apps on a smartphone and by
 inspecting GeoTagged photographs using
 L<https://github.com/nigelhorne/NJH-Snippets/blob/master/bin/geotag>
-or by using the app GPSCF.
+or by using the app GPSCF which are included here.
 
 =head1 VERSION
 
-Version 0.34
+Version 0.35
 
 =cut
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 use constant	LIBPOSTAL_UNKNOWN => 0;
 use constant	LIBPOSTAL_INSTALLED => 1;
 use constant	LIBPOSTAL_NOT_INSTALLED => -1;
@@ -75,6 +75,9 @@ sub new {
 		return bless { %{$class}, %args }, ref($class);
 	}
 
+	# TODO: since 'hoh' doesn't allow a CODEREF as a key,
+	#	I could build an hoh manually from this aoh,
+	#	it would make searching much quicker
 	return bless {
 		data => xsv_slurp(
 			shape => 'aoh',
@@ -553,6 +556,7 @@ sub _search {
 				# 'longitude' => $row->{'longitude'},
 				'location' => $data->{'location'},
 				'confidence' => $confidence,
+				'database' => __PACKAGE__,
 				%{$row}
 			);
 		}
@@ -669,11 +673,14 @@ it under the same terms as Perl itself.
 
 =head1 BUGS
 
+The data are stored in the source,
+they should be read in from somewhere else to make it easier for non-authors to add data.
+
 =head1 SEE ALSO
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2020-2023 Nigel Horne.
+Copyright 2020-2024 Nigel Horne.
 
 The program code is released under the following licence: GPL2 for personal use on a single computer.
 All other users (including Commercial, Charity, Educational, Government)
@@ -708,6 +715,7 @@ __DATA__
 "NCBI",,"MEDLARS DR","BETHESDA","MONTGOMERY","MD","US",38.99516556,-77.09943963
 "",,"CENTER DR","BETHESDA","MONTGOMERY","MD","US",38.99698114,-77.10031119
 "",,"NORFOLK AVE","BETHESDA","MONTGOMERY","MD","US",38.98939358,-77.09819543
+"ROCK BOTTOM RESTAURANT & BREWERY",,"NORFOLK AVE","BETHESDA","MONTGOMERY","MD","US",38.9890861111111,-77.0975722222222
 "",3516,"SW MACVICAR AVE","TOPEKA","SHAWNEE","KS","US",39.005175,-95.706681
 "THE ATRIUM AT ROCK SPRING PARK",6555,"ROCKLEDGE DR","BETHESDA","MONTGOMERY","MD","US",39.028326,-77.136774
 "","","MOUTH OF MONOCACY RD","DICKERSON","MONTGOMERY","MD","US",39.2244603797302,-77.449615439877
@@ -716,11 +724,13 @@ __DATA__
 "UTICA DISTRICT PARK",,,"FREDERICK","FREDERICK","MD","US",39.5167883333333,-77.4015166666667
 "",3923,"SUGARLOAF CT","MONROVIA","FREDERICK","MD","US",39.342986,-77.239770
 "ALBERT EINSTEIN HIGH SCHOOL",11135,"NEWPORT MILL RD","KENSINGTON","MONTGOMERY","MD","US",39.03869019,-77.0682871
+"",10540,"METROPOLITAN AVE","KENSINGTON","MONTGOMERY","MD","US",39.028404,-77.073227
 "POST OFFICE",10325,"KENSINGTON PKWY","KENSINGTON","MONTGOMERY","MD","US",39.02554455,-77.07178215
 "NEWPORT MILL MIDDLE SCHOOL",11311,"NEWPORT MILL RD","KENSINGTON","MONTGOMERY","MD","US",39.0416107,-77.06884708
 "SAFEWAY",10541,"HOWARD AVE","KENSINGTON","MONTGOMERY","MD","US",39.02822438,-77.0755196
 "HAIR CUTTERY",3731,"CONNECTICUT AVE","KENSINGTON","MONTGOMERY","MD","US",39.03323865,-77.07368044
 "STROSNIDERS",10504,"CONNECTICUT AVE","KENSINGTON","MONTGOMERY","MD","US",39.02781493,-77.07740792
+"",8616,"SAVANNAH RIVER RD","LAUREL","ANNE ARUNDEL","MD","US",39.100869,-76.812162
 "DOWNS PARK",,"CHESAPEAKE BAY DRIVE","PASADENA","ANNE ARUNDEL","MD","US",39.110711,-76.434062
 "",1559,"GUERDON CT","PASADENA","ANNE ARUNDEL","MD","US",39.102637,-76.456384
 "ARCOLA HEALTH AND REHABILITATION CENTER",901,"ARCOLA AVE","SILVER SPRING","MONTGOMERY","MD","US",39.036439,-77.025502

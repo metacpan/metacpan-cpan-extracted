@@ -22,7 +22,7 @@ requires 'Class::Utils' => 0;
 requires 'Error::Pure' => 0;
 requires 'List::Util' => 1.33;
 requires 'Readonly' => 0;
-requires 'Tags::HTML' => 0;
+requires 'Tags::HTML' => 0.08;
 requires 'Tags::HTML::Messages' => 0.09;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Tags-HTML-ChangePassword/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Tags-HTML-ChangePassword';
@@ -38,7 +38,7 @@ test_requires 'Test::MockObject' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.04';
+version '0.05';
 
 # Run.
 WriteAll();

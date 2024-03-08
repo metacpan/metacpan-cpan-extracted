@@ -36,7 +36,7 @@ CONSTRUCTOR
 
  load
 
-       $pmat = Devel::MAT->load( $path, %args )
+       $pmat = Devel::MAT->load( $path, %args );
 
     Loads a heap dump file from the given path, and returns a new
     Devel::MAT instance wrapping it.
@@ -45,38 +45,38 @@ METHODS
 
  dumpfile
 
-       $df = $pmat->dumpfile
+       $df = $pmat->dumpfile;
 
     Returns the underlying Devel::MAT::Dumpfile instance backing this
     analysis object.
 
  available_tools
 
-       @tools = $pmat->available_tools
+       @tools = $pmat->available_tools;
 
     Lists the Devel::MAT::Tool classes that are installed and available.
 
  load_tool
 
-       $tool = $pmat->load_tool( $name )
+       $tool = $pmat->load_tool( $name );
 
     Loads the named Devel::MAT::Tool class.
 
  has_tool
 
-       $bool = $pmat->has_tool( $name )
+       $bool = $pmat->has_tool( $name );
 
     Returns true if the named tool is already loaded.
 
  run_command
 
-       $pmat->run_command( $inv )
+       $pmat->run_command( $inv );
 
     Runs a tool command given by the Commandable::Invocation instance.
 
  inref_graph
 
-       $node = $pmat->inref_graph( $sv, %opts )
+       $node = $pmat->inref_graph( $sv, %opts );
 
     Traces the tree of inrefs from $sv back towards the known roots,
     returning a Devel::MAT::Graph node object representing it, within a
@@ -116,7 +116,7 @@ METHODS
 
  find_symbol
 
-       $sv = $pmat->find_symbol( $name )
+       $sv = $pmat->find_symbol( $name );
 
     Attempts to walk the symbol table looking for a symbol of the given
     name, which must include the sigil.
@@ -128,14 +128,14 @@ METHODS
 
  find_glob
 
-       $gv = $pmat->find_glob( $name )
+       $gv = $pmat->find_glob( $name );
 
     Attempts to walk the symbol table looking for a symbol of the given
     name, returning the GLOB object if found.
 
  find_stash
 
-       $stash = $pmat->find_stash( $name )
+       $stash = $pmat->find_stash( $name );
 
     Attempts to walk the symbol table looking for a stash of the given
     name.

@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185945;
+our $VERSION = 1.20240308154352;
 
 my $formatters = [
                 {
@@ -82,29 +82,34 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"85079", "Hyesan",
-"85027", "Pyongyang",
-"8508", "Rason",
-"85049", "Kaesong",
-"85067", "Kanggye",
-"85041", "Sariwon",
-"8502381", "Pyongyang",
-"85045", "Haeju",
-"850195", "Pyongyang",
-"85073", "Chongjin",
-"85039", "Nampo",
-"85053", "Hamhung",
+$areanames{en} = {"85053", "Hamhung",
 "85031", "Pyongyang",
-"85028", "Pyongyang",
-"85021", "Pyongyang",
+"8508", "Rason",
 "85057", "Wonsan",
-"85061", "Sinuiju",};
+"85073", "Chongjin",
+"85045", "Haeju",
+"85049", "Kaesong",
+"85079", "Hyesan",
+"85061", "Sinuiju",
+"85027", "Pyongyang",
+"850195", "Pyongyang",
+"85028", "Pyongyang",
+"85039", "Nampo",
+"8502381", "Pyongyang",
+"85021", "Pyongyang",
+"85067", "Kanggye",
+"85041", "Sariwon",};
+my $timezones = {
+               '' => [
+                       'Asia/Seoul'
+                     ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+850|\D)//g;
-      my $self = bless({ country_code => '850', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '850', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
       $self = bless({ country_code => '850', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);

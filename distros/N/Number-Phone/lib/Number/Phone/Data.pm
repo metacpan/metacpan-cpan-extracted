@@ -1,10 +1,10 @@
 # automatically generated file, don't edit
 package Number::Phone::Data;
-*Number::Phone::libphonenumber_tag = sub { "v8.13.27" };
-*Number::Phone::UK::data_source = sub { "OFCOM at ".gmtime(1702230911)." UTC" };
-*Number::Phone::NANP::CA::data_source = sub { "CNAC at ".gmtime(1702155660)." UTC" };
-*Number::Phone::NANP::US::data_source = sub { "National Pooling Administrator at ".gmtime(1702192188)." UTC" };
-*Number::Phone::NANP::data_source = sub { "localcallingguide.com at ".gmtime(1702234776)." UTC" };
+*Number::Phone::libphonenumber_tag = sub { "v8.13.32" };
+*Number::Phone::UK::data_source = sub { "OFCOM at ".gmtime(1709912479)." UTC" };
+*Number::Phone::NANP::CA::data_source = sub { "CNAC at ".gmtime(1709845262)." UTC" };
+*Number::Phone::NANP::US::data_source = sub { "National Pooling Administrator at ".gmtime(1709881794)." UTC" };
+*Number::Phone::NANP::data_source = sub { "localcallingguide.com at ".gmtime(1709912621)." UTC" };
 1;
 
 =head1 NAME
@@ -13,14 +13,14 @@ Number::Phone::Data
 
 =head1 DATA SOURCES
 
-Canadian operator data derived from CNAC at Sat Dec 9 21:01:00 2023 UTC
+Canadian operator data derived from CNAC at Thu Mar 7 21:01:02 2024 UTC
 
-US operator data derived from National Pooling Administrator at Sun Dec 10 07:09:48 2023 UTC
+US operator data derived from National Pooling Administrator at Fri Mar 8 07:09:54 2024 UTC
 
-Other NANP operator data derived from localcallingguide.com at Sun Dec 10 18:59:36 2023 UTC
+Other NANP operator data derived from localcallingguide.com at Fri Mar 8 15:43:41 2024 UTC
 
-UK data derived from OFCOM at Sun Dec 10 17:55:11 2023 UTC
+UK data derived from OFCOM at Fri Mar 8 15:41:19 2024 UTC
 
-Most other data derived from libphonenumber v8.13.27
+Most other data derived from libphonenumber v8.13.32
 
 =cut

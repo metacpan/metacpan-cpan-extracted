@@ -3,8 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Identity;
+use Test2::V0;
 
 use Scalar::Util qw( weaken );
 
@@ -14,6 +13,10 @@ use Devel::MAT;
 my $ADDR = qr/0x[0-9a-f]+/;
 
 my $DUMPFILE = __FILE__ =~ s/\.t/\.pmat/r;
+
+my %HASH_WITH_KEY = (
+   a_shared_key => 123,
+);
 
 Devel::MAT::Dumper::dump( $DUMPFILE );
 END { unlink $DUMPFILE; }
@@ -31,13 +34,13 @@ BEGIN { our $PACKAGE_SCALAR = "some value" }
    is( $sv->symname, '$main::PACKAGE_SCALAR', 'PACKAGE_SCALAR SV has a name' );
    is( $sv->basetype, 'SV', 'SV base type' );
 
-   identical( $pmat->find_symbol( '$PACKAGE_SCALAR' ), $sv,
+   ref_is( $pmat->find_symbol( '$PACKAGE_SCALAR' ), $sv,
       '$pmat->find_symbol $PACKAGE_SCALAR' );
 
-   identical( $pmat->find_symbol( '$::PACKAGE_SCALAR' ), $sv,
+   ref_is( $pmat->find_symbol( '$::PACKAGE_SCALAR' ), $sv,
       '$pmat->find_symbol $::PACKAGE_SCALAR' );
 
-   identical( $pmat->find_symbol( '$main::PACKAGE_SCALAR' ), $sv,
+   ref_is( $pmat->find_symbol( '$main::PACKAGE_SCALAR' ), $sv,
       '$pmat->find_symbol $main::PACKAGE_SCALAR' );
 
    is( $sv->pv, "some value", 'PACKAGE_SCALAR SV has PV' );
@@ -51,7 +54,7 @@ BEGIN { our @PACKAGE_ARRAY = qw( A B C ) }
    is( $av->symname, '@main::PACKAGE_ARRAY', 'PACKAGE_ARRAY AV has a name' );
    is( $av->basetype, 'AV', 'AV base type' );
 
-   identical( $pmat->find_symbol( '@PACKAGE_ARRAY' ), $av,
+   ref_is( $pmat->find_symbol( '@PACKAGE_ARRAY' ), $av,
       '$pmat->find_symbol @PACKAGE_ARRAY' );
 
    is( $av->elem(1)->pv, "B", 'PACKAGE_ARRAY AV has elements' );
@@ -66,7 +69,7 @@ BEGIN { our %PACKAGE_HASH = ( one => 1, two => 2 ) }
    is( $hv->symname, '%main::PACKAGE_HASH', 'PACKAGE_HASH hv has a name' );
    is( $hv->basetype, 'HV', 'HV base type' );
 
-   identical( $pmat->find_symbol( '%PACKAGE_HASH' ), $hv,
+   ref_is( $pmat->find_symbol( '%PACKAGE_HASH' ), $hv,
       '$pmat->find_symbol %PACKAGE_HASH' );
 
    is( $hv->value("one")->uv, 1, 'PACKAGE_HASH HV has elements' );
@@ -86,7 +89,7 @@ sub PACKAGE_CODE { my $lexvar = "An unlikely scalar value"; }
 
    is( $cv->depth, 0, 'PACKAGE_CODE CV currently has depth 0' );
 
-   identical( $pmat->find_symbol( '&PACKAGE_CODE' ), $cv,
+   ref_is( $pmat->find_symbol( '&PACKAGE_CODE' ), $cv,
       '$pmat->find_symbol &PACKAGE_CODE' );
 
    is( $cv->padname( 1 )->name, '$lexvar', 'PACKAGE_CODE CV has padname(1)' );
@@ -104,7 +107,7 @@ sub PACKAGE_CODE { my $lexvar = "An unlikely scalar value"; }
 
    my $pad0 = $cv->pad(1);
    is( $pad0->type, "PAD", 'CV has pad(1)' );
-   is( $pad0->padcv, $cv, 'PAD at 1 has padcv' );
+   ref_is( $pad0->padcv, $cv, 'PAD at 1 has padcv' );
 
    is( $pad0->lexvar( '$lexvar' ), $cv->lexvar( '$lexvar', 1 ), 'CV has lexvar' );
 }
@@ -146,7 +149,7 @@ BEGIN { our $strongref = []; weaken( our $weakref = $strongref ) }
    my $rv_strong = $pmat->find_symbol( '$strongref' );
    my $rv_weak   = $pmat->find_symbol( '$weakref' );
 
-   identical( $rv_strong->rv, $rv_weak->rv, '$strongref and $weakref have same referrant' );
+   ref_is( $rv_strong->rv, $rv_weak->rv, '$strongref and $weakref have same referrant' );
 
    ok( !$rv_strong->is_weak, '$strongref is not weak' );
    ok(  $rv_weak->is_weak,   '$weakref is weak'       ); # and longcat is long
@@ -176,9 +179,9 @@ BEGIN { our @QUOTING = ( "1\\2", "don't", "do\0this", "at\x9fhome", "LONG"x100 )
 {
    my $av = $pmat->find_symbol( '@QUOTING' );
 
-   is_deeply( [ map { $_->qq_pv( 20 ) } $av->elems ],
-              [ "'1\\\\2'", "'don\\'t'", '"do\\x00this"', '"at\\x9fhome"', "'LONGLONGLONGLONGLONG'..." ],
-              '$sv->qq_pv quotes correctly' );
+   is( [ map { $_->qq_pv( 20 ) } $av->elems ],
+       [ "'1\\\\2'", "'don\\'t'", '"do\\x00this"', '"at\\x9fhome"', "'LONGLONGLONGLONGLONG'..." ],
+       '$sv->qq_pv quotes correctly' );
 }
 
 BEGIN {
@@ -213,6 +216,14 @@ BEGIN {
    is( $innerstash->stashname, "Inner", 'Inner stashname' );
 
    ok( $innerstash->value( "method" ), 'Inner stash has method' );
+}
+
+{
+   my $hv = $df->main_cv->maybe_lexvar( '%HASH_WITH_KEY' );
+   my $strtab = $df->strtab;
+
+   ok( my $hek_at = $hv->hek_at( "a_shared_key" ), '$hv has hek_at for a_shared_key' );
+   is( $strtab->hek_at( "a_shared_key" ), $hek_at, '$strtab has same address for a_shared_key' );
 }
 
 done_testing;

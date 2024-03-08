@@ -1,13 +1,13 @@
 package Locale::Country;
 # Copyright (C) 2001      Canon Research Centre Europe (CRE).
 # Copyright (C) 2002-2009 Neil Bowers
-# Copyright (c) 2010-2023 Sullivan Beck
+# Copyright (c) 2010-2024 Sullivan Beck
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'gen_mods' is run.
-#    Generated on: Fri Dec  1 15:38:03 EST 2023
+#    Generated on: Fri Mar  8 10:13:06 EST 2024
 
 use strict;
 use warnings;
@@ -15,7 +15,7 @@ require 5.006;
 use Exporter qw(import);
 
 our($VERSION,@EXPORT);
-$VERSION   = '3.77';
+$VERSION   = '3.78';
 
 ################################################################################
 use if $] >= 5.027007, 'deprecate';

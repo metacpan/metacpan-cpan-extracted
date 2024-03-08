@@ -27,6 +27,8 @@
             "CHI::Driver::RawMemory" : "0",
             "Config::Auto" : "0",
             "Cwd" : "0",
+            "Database::Abstraction" : "0",
+            "Devel::Size" : "0",
             "File::Basename" : "0",
             "File::Copy" : "0",
             "File::Open::NoCache::ReadOnly" : "0.02",
@@ -55,6 +57,7 @@
             "DBD::CSV" : "0",
             "DBD::SQLite" : "0",
             "DBI" : "0",
+            "DB_File" : "0",
             "Digest::MD5" : "0",
             "Encode" : "0",
             "File::Spec" : "0",
@@ -84,6 +87,7 @@
             "Test::Carp" : "0",
             "Test::Deep" : "0",
             "Test::Most" : "0",
+            "Test::Needs" : "0",
             "Test::NoWarnings" : "0",
             "Test::Number::Delta" : "0"
          }
@@ -102,6 +106,6 @@
          "web" : "https://github.com/nigelhorne/Geo-Coder-Free"
       }
    },
-   "version" : "0.34",
+   "version" : "0.35",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

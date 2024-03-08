@@ -216,32 +216,33 @@ my %WriteMakefileArgs = (
 	'FindBin' => '0',
 	'File::Temp' => '0',
 	'Cwd' => '0',
-	'Data::Roundtrip' => '0.11',
+	'Data::Roundtrip' => '0',
 	'IPC::Run' => '0',
 	'FFI::CheckLib' => '0',
 	#'Devel::CheckLib' => '0',
     },
     TEST_REQUIRES => {
         'Test::More' => '0',
+	'Test2::Plugin::UTF8' => '0',
 	'Encode' => '0',
 	'FindBin' => '0',
 	'File::Spec' => '0',
 	'File::Copy' => '0',
 	'Time::HiRes' => '0',
 	'File::ShareDir' => '0',
-	'Data::Roundtrip' => '0.11',
+	'Data::Roundtrip' => '0',
     },
     PREREQ_PM => {
 	'File::ShareDir' => '0',
 	'Time::HiRes' => '0',
-	'Data::Roundtrip' => '0.11',
+	'Data::Roundtrip' => '0',
 	'Getopt::Long' => '0',
     },
     EXE_FILES	=> [glob('script/*.pl')],
 
     META_MERGE => {
 		'meta-spec' => { version => 2 },
-		requires	=> { perl	=> '5.16.0' },
+		requires	=> { perl => '5.6.0' },
 		resources   => {
 			license	=> 'artistic_2',
 			homepage   => 'https://metacpan.org/module/Image::DecodeQR::WeChat',
@@ -266,7 +267,7 @@ my %WriteMakefileArgs = (
     XSOPT   => '-C++',
 
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean => { FILES => 'Image-DecodeQR-WeChat-* t/tmp/* xt/tmp/*' },
+    clean => { FILES => 'Image-DecodeQR-WeChat-* WeChat.bs WeChat.c *.o t/tmp/* xt/tmp/*' },
 );
 
 # Compatibility with old versions of ExtUtils::MakeMaker

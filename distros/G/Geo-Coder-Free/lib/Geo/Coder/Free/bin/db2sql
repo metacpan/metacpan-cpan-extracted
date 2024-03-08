@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
 # Needs App::csv2sqlite
+# TODO: turn admin1.db and admin2.db into sqlite databases
+#	with the asciiname field (that's the 3rd column) as the primary key
 
 set -e
 set -x

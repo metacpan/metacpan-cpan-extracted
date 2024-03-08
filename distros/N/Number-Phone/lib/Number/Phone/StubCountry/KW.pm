@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185945;
+our $VERSION = 1.20240308154352;
 
 my $formatters = [
                 {
@@ -103,16 +103,16 @@ my $validators = {
               1(?:
                 00|
                 11|
-                66
+                6[16]
               )|
-              222|
+              2[26]2|
               3[36]3|
-              444|
+              4[46]4|
               7(?:
                 0[013-9]|
                 [67]\\d
               )|
-              888|
+              8[68]8|
               9(?:
                 [069]\\d|
                 3[039]
@@ -120,8 +120,7 @@ my $validators = {
             )|
             9(?:
               (?:
-                0[09]|
-                [4679]\\d|
+                [04679]\\d|
                 8[057-9]
               )\\d|
               1(?:
@@ -149,12 +148,17 @@ my $validators = {
                 'toll_free' => '18\\d{5}',
                 'voip' => ''
               };
+my $timezones = {
+               '' => [
+                       'Asia/Kuwait'
+                     ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+965|\D)//g;
-      my $self = bless({ country_code => '965', number => $number, formatters => $formatters, validators => $validators, }, $class);
+      my $self = bless({ country_code => '965', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, }, $class);
         return $self->is_valid() ? $self : undef;
     }
 1;

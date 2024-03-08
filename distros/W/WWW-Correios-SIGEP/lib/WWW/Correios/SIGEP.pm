@@ -4,7 +4,7 @@ use warnings;
 use WWW::Correios::SIGEP::LogisticaReversa;
 use WWW::Correios::SIGEP::Common;
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 sub new {
     my ($class, $params) = @_;
@@ -227,6 +227,15 @@ sub gera_xml_plp {
           . ']]></email_remetente>'
         : '<email_remetente />'
       )
+    . (defined $params->{remetente}{celular}
+        ? '<celular_remetente><![CDATA['
+          . $params->{remetente}{celular}
+          . ']]></celular_remetente>'
+        : '<celular_remetente />'
+      )
+    . '<cpf_cnpj_remetente>' . ($params->{remetente}{cpf_cnpj} || die 'remetente.cpf_cnpj exigido')
+    . '</cpf_cnpj_remetente>'
+    . '<ciencia_conteudo_proibido>S</ciencia_conteudo_proibido>'
     . '</remetente><forma_pagamento />'
     ;
 
@@ -262,7 +271,7 @@ sub gera_xml_plp {
              . ($obj->{codigo_postagem} || die "objetos[].codigo_postagem exigido")
              . '</codigo_servico_postagem><cubagem>0,00</cubagem><peso>'
              . ($obj->{peso} || die "objetos[].peso em gramas exigido")
-             . '</peso><rt1/><rt2/><destinatario><nome_destinatario><![CDATA['
+             . '</peso><rt1/><rt2/><restricao_anac>S</restricao_anac><destinatario><nome_destinatario><![CDATA['
              . (substr($obj->{destinatario}{nome},0,50) || die "objetos[].destinatario.nome exigido")
              . ']]></nome_destinatario>'
              . (defined $obj->{destinatario}{telefone}
@@ -297,7 +306,11 @@ sub gera_xml_plp {
                 && $obj->{destinatario}{numero} =~ m{\A(?:s/n|\d+)\z}  # digit or "s/n"
                 ? $obj->{destinatario}{numero} : die "objetos[].destinatario.numero"
                )
-             . '</numero_end_destinatario></destinatario><nacional><bairro_destinatario><![CDATA['
+             . '</numero_end_destinatario>'
+             . '<cpf_cnpj_destinatario>'
+             . ($obj->{destinatario}{cpf_cnpj} || die 'objetos[].destinatario.cpf_cnpj')
+             . '</cpf_cnpj_destinatario>'
+             . '</destinatario><nacional><bairro_destinatario><![CDATA['
              . ($obj->{destinatario}{bairro} || die "objetos[].destinatario.bairro exigido")
              . ']]></bairro_destinatario><cidade_destinatario><![CDATA['
              . ($obj->{destinatario}{cidade} || die "objetos[].destinatario.cidade exigido")
@@ -370,6 +383,14 @@ __END__
 =head1 NAME
 
 WWW::Correios::SIGEP - API para o Gerenciador de Postagem dos Correios (SIGEP WEB)
+
+=head1 DEPRECATED / OBSOLETO
+
+Correios anunciaram que vão descontinuar o SIGEP WEB, e que clientes
+devem usar a nova API. Use L<Net::Correios> para isso.
+
+Correios have announced they'll discontinue SIGEP WEB, and clients
+should use the new API instead. Use L<Net::Correios> for that.
 
 =head1 SYNOPSIS
 
@@ -783,6 +804,7 @@ chamada acima é exatamente igual a:
             cep         => '111111222',
             cidade      => 'Minha Cidade',
             estado      => 'XX',
+            cpf_cnpj    => '111.111.111/1111-11',  # obrigatório desde 2022-01
         },
         objetos => [
             {
@@ -801,6 +823,7 @@ chamada acima é exatamente igual a:
                     cidade      => 'Cidade Feliz',
                     uf          => 'ZZ',
                     cep         => '2222233',
+                    cpf_cnpj    => '111.111.111-11', # obrigatório desde 2022-01
                 },
             },
         ],
@@ -911,7 +934,7 @@ Breno G. de Oliveira  C<< <garu@cpan.org> >>
 
 =head1 LICENÇA E COPYRIGHT
 
-Copyright (c) 2016-2021, Breno G. de Oliveira. Todos os direitos reservados.
+Copyright (c) 2016-2024, Breno G. de Oliveira. Todos os direitos reservados.
 
 Este módulo é software livre; você pode redistribuí-lo e/ou
 modificá-lo sob os mesmos termos que o Perl. Veja L<perlartistic>.

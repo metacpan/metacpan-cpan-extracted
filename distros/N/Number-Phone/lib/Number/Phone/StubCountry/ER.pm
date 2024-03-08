@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185945;
+our $VERSION = 1.20240308154351;
 
 my $formatters = [
                 {
@@ -68,12 +68,17 @@ my $validators = {
                 'toll_free' => '',
                 'voip' => ''
               };
+my $timezones = {
+               '' => [
+                       'Africa/Asmera'
+                     ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+291|\D)//g;
-      my $self = bless({ country_code => '291', number => $number, formatters => $formatters, validators => $validators, }, $class);
+      my $self = bless({ country_code => '291', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, }, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
       $self = bless({ country_code => '291', number => $number, formatters => $formatters, validators => $validators, }, $class);

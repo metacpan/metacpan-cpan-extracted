@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185945;
+our $VERSION = 1.20240308154352;
 
 my $formatters = [
                 {
@@ -107,17 +107,22 @@ my $validators = {
 my %areanames = ();
 $areanames{en} = {"96128", "Bekaa",
 "96125", "Chouf",
-"96127", "South\ Lebanon",
 "96124", "Metn",
+"96127", "South\ Lebanon",
+"96121", "Beirut",
 "96129", "Jbeil\ \&\ Keserwan",
-"96126", "North\ Lebanon",
-"96121", "Beirut",};
+"96126", "North\ Lebanon",};
+my $timezones = {
+               '' => [
+                       'Asia/Beirut'
+                     ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+961|\D)//g;
-      my $self = bless({ country_code => '961', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '961', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
       $self = bless({ country_code => '961', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);

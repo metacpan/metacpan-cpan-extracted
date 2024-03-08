@@ -22,11 +22,11 @@ Geo::Coder::Free - Provides a Geo-Coding functionality using free databases
 
 =head1 VERSION
 
-Version 0.34
+Version 0.35
 
 =cut
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 our $alternatives;
 our $abbreviations;
@@ -60,7 +60,8 @@ The cgi-bin directory contains a simple DIY Geo-Coding website.
 
     cgi-bin/page.fcgi page=query q=1600+Pennsylvania+Avenue+NW+Washington+DC+USA
 
-You can see a sample website at L<https://geocode.nigelhorne.com/>.
+The sample website is down at the moment while I look for a new host.
+When it's back up you will be able to use this to test it.
 
     curl 'https://geocode.nigelhorne.com/cgi-bin/page.fcgi?page=query&q=1600+Pennsylvania+Avenue+NW+Washington+DC+USA'
 
@@ -71,17 +72,15 @@ You can see a sample website at L<https://geocode.nigelhorne.com/>.
     $geo_coder = Geo::Coder::Free->new();
 
 Takes one optional parameter, openaddr, which is the base directory of
-the OpenAddresses data downloaded from L<http://results.openaddresses.io>.
-
-The database also will include data from Who's On First
-L<https://whosonfirst.org>.
+the OpenAddresses data from L<http://results.openaddresses.io>,
+and Who's On First data from L<https://whosonfirst.org>.
 
 Takes one optional parameter, directory,
 which tells the object where to find the MaxMind and GeoNames files admin1db,
 admin2.db and cities.[sql|csv.gz].
 If that parameter isn't given,
 the module will attempt to find the databases,
-but that can't be guaranteed.
+but that can't be guaranteed to work.
 
 =cut
 
@@ -391,35 +390,59 @@ sub _abbreviate($) {
 	return $type;
 }
 
-=head1 AUTHOR
-
-Nigel Horne, C<< <njh@bandsman.co.uk> >>
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
-
 =head1 GETTING STARTED
 
-Before you start,
-install L<App::csv2sqlite>;
-optionally set the environment variable OPENADDR_HOME to point to an empty directory and download the data from L<http://results.openaddresses.io> into that directory;
-optionally set the environment variable WHOSONFIRST_HOME to point to an empty directory and download the data using L<https://github.com/nigelhorne/NJH-Snippets/blob/master/bin/wof-sqlite-download>.
+Before running "make", but after running "perl Makefile.PL", run these instructions.
+
+Optionally set the environment variable OPENADDR_HOME to point to an empty directory and download the data from L<http://results.openaddresses.io> into that directory; and
+optionally set the environment variable WHOSONFIRST_HOME to point to an empty directory and download the data using L<https://github.com/nigelhorne/NJH-Snippets/blob/master/bin/wof-clone>.
+The script bin/download_databases (see below) will do those for you.
 You do not need to download the MaxMind data, that will be downloaded automatically.
 
 You will need to create the database used by Geo::Coder::Free.
+
+Install L<App::csv2sqlite> and L<https://github.com/nigelhorne/NJH-Snippets>.
+Run bin/create_sqlite - converts the Maxmind "cities" database from CSV to SQLite.
+
+To use with MariaDB,
+set MARIADB_SERVER="$hostname;$port" and
+MARIADB_USER="$user;$password" (TODO: username/password should be asked for)
+The code will use a database called geo_code_free which will be deleted
+if it exists.
+$user should only need to privileges to DROP, CREATE, SELECT, INSERT, CREATE and INDEX
+on that database. If you've set DEBUG mode in createdatabase.PL, or are playing
+with REPLACE instead of INSERT, you'll also need DELETE privileges - but non-developers
+don't need to have that.
+
+Optional steps to download and install large databases.
+This will take a long time and use a lot of disc space, be clear that this is what you want.
 In the bin directory there are some helper scripts to do this.
 You will need to tailor them to your set up, but that's not that hard as the
-scripts are trivial
-
-1. Download_databases - this will download the WhosOnFirst and Openaddr
-databases.
-The Makefile.PL file will download the MaxMind database.
-2. create_db - this creates the database used by G:C:F.
-It's called openaddr.sql,
-but that's historical before I added the WhosOnFirst database.
+scripts are trivial.
+1. mkdir $WHOSONFIRST_HOME, cd $WHOSONFIRST_HOME, run wof-clone from NJH-Snippets.
+This can take a long time because it contains lots of directories which filesystem drivers
+seem to take a long time to navigate (at least my EXT4 and ZFS systems do).
+2. Install L<https://github.com/dr5hn/countries-states-cities-database.git> into $DR5HN_HOME.
+This data contains cities only,
+so it's not used if OSM_HOME is set,
+since the latter is much more comprehensive.
+Also, only Australia, Canada and the US is imported, as the UK data is difficult to parse.
+3. Run bin/download_databases - this will download the WhosOnFirst, Openaddr,
+Open Street Map and dr5hn databases.
+Check the values of OSM_HOME, OPENADDR_HOME,
+DR5HN_HOME and WHOSONFIRST_HOME within that script,
+you may wish to change them.
+The Makefile.PL file will download the MaxMind database for you, as that is not optional.
+4. Run bin/create_db - this creates the database used by G:C:F using the data you've just downloaded
+The database is called openaddr.sql,
+even though it does include all of the above data.
+That's historical before I added the WhosOnFirst database.
 The names are a bit of a mess because of that.
-I should rename it, though it doesn't contain the Maxmind data.
-3. create_sqlite - converts the Maxmind database from CSV to SQLite.
+I should rename it to geo-coder-free.sql, even though it doesn't contain the Maxmind data.
+
+Now you're ready to run "make"
+(note that the download_databases script may have done that for you,
+but you'll want to check).
 
 See the comment at the start of createdatabase.PL for further reading.
 
@@ -444,7 +467,8 @@ to first install L<App::csv2sqlite>.
 If REDIS_SERVER is set, the data are also stored on a Redis Server.
 Running 'make' will download GeoNames and MaxMind, but OpenAddresses and WhosOnFirst need to be downloaded manually if you decide to use them - they are treated as optional by G:C:F.
 
-There is a sample website at L<https://geocode.nigelhorne.com/>.  The source code for that site is included in the G:C:F distribution.
+The sample website at L<https://geocode.nigelhorne.com/> is down at the moment while I look for a new host.
+The source code for that site is included in the G:C:F distribution.
 
 =head1 BUGS
 
@@ -457,6 +481,8 @@ The MaxMind data only contains cities.
 The OpenAddresses data doesn't cover the globe.
 
 Can't parse and handle "London, England".
+
+The various scripts in NJH-Snippets ought to be in this module.
 
 =head1 SEE ALSO
 
@@ -473,6 +499,13 @@ L<Geo::Coder::Free::OpenAddresses>.
 
 See L<Geo::Coder::Free::OpenAddresses> for instructions creating the SQLite database from
 L<http://results.openaddresses.io/>.
+
+=head1 AUTHOR
+
+Nigel Horne, C<< <njh@bandsman.co.uk> >>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =head1 SUPPORT
 
@@ -512,7 +545,7 @@ L<http://search.cpan.org/dist/Geo-Coder-Free/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2023 Nigel Horne.
+Copyright 2017-2024 Nigel Horne.
 
 The program code is released under the following licence: GPL for personal use on a single computer.
 All other users (including Commercial, Charity, Educational, Government)

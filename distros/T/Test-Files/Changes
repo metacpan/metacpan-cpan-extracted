@@ -1,5 +1,9 @@
 Revision history for Perl extension Test::Files.
 
+0.26 2024-03-08
+    - Fixed list of required modules.
+    - Constider specific of some operating systems in unit tests.
+
 0.25 2024-03-06
     - Archive (container) comparison implemented.
     - Constider specific of some operating systems in unit tests.

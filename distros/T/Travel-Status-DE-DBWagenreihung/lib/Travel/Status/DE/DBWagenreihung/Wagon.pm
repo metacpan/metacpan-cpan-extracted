@@ -8,48 +8,48 @@ use utf8;
 use parent 'Class::Accessor';
 use Carp qw(cluck);
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 Travel::Status::DE::DBWagenreihung::Wagon->mk_ro_accessors(
-	qw(attributes class_type has_ac has_accessibility has_bahn_comfort
-	  has_bike_storage has_bistro has_compartments has_family_area
-	  has_phone_area has_quiet_area is_dosto is_interregio is_locomotive
-	  is_powercar number model multipurpose section train_no train_subtype type
-	  uic_id)
+	qw(attributes class_type group_index has_ac has_accessibility
+	  has_bahn_comfort has_bike_storage has_bistro has_compartments
+	  has_family_area has_phone_area has_quiet_area is_dosto is_interregio
+	  is_locomotive is_powercar number model multipurpose section train_no
+	  train_subtype type uic_id)
 );
 
 our %type_attributes = (
 	'ICE 1' => [
-		undef, ['has_quiet_area'], undef, ['has_quiet_area'],    # 1 2 3 4
-		['has_family_area'], undef, ['has_bahn_comfort'],        # 5 6 7
-		undef, undef, undef, ['has_bahn_comfort'],               # 8 9 (10) 11
-		['has_quiet_area'], undef, undef                         # 12 (13) 14
+		undef, ['has_quiet_area'],  undef, ['has_quiet_area'],     # 1 2 3 4
+		['has_family_area'], undef, ['has_bahn_comfort'],          # 5 6 7
+		undef,               undef, undef, ['has_bahn_comfort'],   # 8 9 (10) 11
+		['has_quiet_area'],  undef, undef                          # 12 (13) 14
 	],
 	'ICE 2' => [
 		undef, ['has_quiet_area'], ['has_bahn_comfort'],
-		['has_family_area'],                                     # 1 2 3 4
+		['has_family_area'],                                       # 1 2 3 4
 		undef, ['has_bahn_comfort'],
-		[ 'has_quiet_area', 'has_phone_area' ]                   # 5 6 7
+		[ 'has_quiet_area', 'has_phone_area' ]                     # 5 6 7
 	],
 	'ICE 3' => [
-		['has_quiet_area'], undef, undef, undef,                 # 1 2 3 (4)
-		['has_family_area'], undef, ['has_bahn_comfort'],        # 5 6 7
+		['has_quiet_area'],  undef, undef, undef,                  # 1 2 3 (4)
+		['has_family_area'], undef, ['has_bahn_comfort'],          # 5 6 7
 		[ 'has_quiet_area', 'has_phone_area', 'has_bahn_comfort' ], undef  # 8 9
 	],
 	'ICE 3 Velaro' => [
-		['has_quiet_area'], undef, undef, ['has_family_area'],    # 1 2 3 4
-		['has_bahn_comfort'], ['has_bahn_comfort'], undef, undef, # 5 6 (7) 8
-		[ 'has_quiet_area', 'has_phone_area' ]                    # 9
+		['has_quiet_area'],   undef, undef, ['has_family_area'],    # 1 2 3 4
+		['has_bahn_comfort'], ['has_bahn_comfort'], undef, undef,    # 5 6 (7) 8
+		[ 'has_quiet_area', 'has_phone_area' ]                       # 9
 	],
 	'ICE 4' => [
 		['has_bike_storage'], undef, ['has_quiet_area'], undef,
-		undef,                                                    # 1 2 3 4 5
-		undef, ['has_bahn_comfort'], undef, ['has_family_area'],  # 6 7 (8) 9
+		undef,                                                       # 1 2 3 4 5
+		undef, ['has_bahn_comfort'], undef, ['has_family_area'],     # 6 7 (8) 9
 		undef, ['has_bahn_comfort'], undef, undef,
 		['has_quiet_area']    # 10 11 12 (13) 14
 	],
 	'ICE T 411' => [
 		['has_quiet_area'], ['has_quiet_area'], undef,
-		['has_family_area'],    # 1 2 3 4
+		['has_family_area'],                        # 1 2 3 4
 		undef, undef, ['has_bahn_comfort'],
 		[ 'has_quiet_area', 'has_bahn_comfort' ]    # (5) 6 7 8
 	],
@@ -196,8 +196,9 @@ sub parse_type {
 }
 
 sub set_traintype {
-	my ( $self, $tt ) = @_;
+	my ( $self, $group_index, $tt ) = @_;
 
+	$self->{group_index}   = $group_index;
 	$self->{train_subtype} = $tt;
 
 	if ( not $self->{number} or not exists( $type_attributes{$tt} ) ) {

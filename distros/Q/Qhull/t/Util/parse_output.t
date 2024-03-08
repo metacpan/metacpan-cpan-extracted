@@ -9,7 +9,7 @@ use Data::Dump;
 
 use JSON::PP;
 
-my $data = path( 't', 'data' );
+my $data = path( 't', 'data', 'Util', 'parse_output' );
 
 my @tests = (
 
@@ -29,6 +29,12 @@ my @tests = (
         label  => 'extrema',
         format => 'Fx',
         file   => 'extrema',
+    },
+
+    {
+        label  => 'sizes',
+        format => 'FS',
+        file   => 'sizes',
     },
 
 );

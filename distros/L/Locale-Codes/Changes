@@ -7,7 +7,10 @@ This document is automatically generated from the document:
 and that document should be considered the canonical source of change
 related information.
 
-3.77  expected 2023-12-01  sbeck
+3.78  2024-03-08  sbeck
+  -  NEW CODE(s)
+
+3.77  2023-12-01  sbeck
   -  NEW CODE(s)
   -  Changed RELEASE_TESTING variable
          Now use a release-specific testing variable rather than

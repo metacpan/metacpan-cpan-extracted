@@ -1,3 +1,11 @@
+2.06    2024-03-07
+
+    - Fix Mountain Standard Time (Mexico).
+
+    - Mark Samoa Standard Time and Central Asia Standard Time as known bad time zone for testing until Microsoft releases time zone updates.
+
+    - Change minimum version of DateTime::TimeZone for testing.
+
 2.05    2021-08-05
 
     - Add new time zones for Yukon Standard Time and South Sudan Standard Time.

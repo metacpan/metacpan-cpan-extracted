@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use List::Util qw( pairgrep );
 use Scalar::Util qw( weaken );

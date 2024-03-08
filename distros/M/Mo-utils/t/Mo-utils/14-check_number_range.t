@@ -4,7 +4,7 @@ use warnings;
 use English;
 use Error::Pure::Utils qw(clean);
 use Mo::utils qw(check_number_range);
-use Test::More 'tests' => 7;
+use Test::More 'tests' => 8;
 use Test::NoWarnings;
 
 # Test.
@@ -13,6 +13,13 @@ my $self = {
 };
 my $ret = check_number_range($self, 'key', 0, 10);
 is($ret, undef, 'Right number is present (positive number).');
+
+# Test.
+$self = {
+	'key' => -5,
+};
+$ret = check_number_range($self, 'key', -10, 0);
+is($ret, undef, 'Right number is present (negative number).');
 
 # Test.
 $self = {};

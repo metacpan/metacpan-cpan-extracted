@@ -10,7 +10,7 @@ use Storable 'dclone';
 use Scalar::Util 'blessed';
 use List::Util 'first';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Readonly::Tiny 'readonly', 'readwrite';
 use Qhull::Util::Options 'parse_options', -categories, -options;
@@ -340,7 +340,7 @@ Qhull::Options - A container for Qhull to minimize re-parsing
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

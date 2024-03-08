@@ -6,7 +6,7 @@ use v5.12;
 use strict;
 use warnings;
 
-our $VERSION = 'v8.0.2.1';
+our $VERSION = 'v8.0.2.2';
 
 use base qw( Alien::Base );
 
@@ -34,7 +34,7 @@ Alien::Qhull - Build and Install the Qhull library
 
 =head1 VERSION
 
-version v8.0.2.1
+version v8.0.2.2
 
 =head1 SYNOPSIS
 

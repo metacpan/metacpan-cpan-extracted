@@ -69,7 +69,7 @@ while (<>) {
   $writer->add_puzzle( %puzzle );
   $count++;
   print $del_line, sprintf "  %3d) %s\t%s\n", 
-    $count, $puzzle{clues}, $puzzle{bottomLine}
+    $count, $puzzle{clues}, $puzzle{bottomLine} || '--'
     unless $quiet;
 }
 

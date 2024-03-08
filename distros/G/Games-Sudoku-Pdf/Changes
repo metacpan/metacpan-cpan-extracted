@@ -1,6 +1,14 @@
 
 Changes for Games::Sudoku::Pdf
 
+v0.05 2024-03-08
+
+	Fix the fix: Testing the time format failed for UTC.
+
+v0.04 2024-03-07
+
+	Fix: Labour around faulty date validation in PDF::API2 2.042 to 2.044.
+
 v0.03 2024-02-26
 
 	Fix: Removed one forgotten global 'size' parameter to PDF::Table.

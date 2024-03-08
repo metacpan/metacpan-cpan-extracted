@@ -421,7 +421,7 @@ subtest eof_on_pty => sub {
 	# When we sleep 4 the above is still true, except that one of 12.2.1 machines returned 'timeout':
 	# http://www.cpantesters.org/cpan/report/6dba0d70-2d3d-11e4-8483-fe44e5e3eb0b
 	my $expected = 'timeout';
-	if ($Config{osname} =~ /^(freebsd|midnightbsd|dragonfly)$/) {
+	if ($Config{osname} =~ /^(freebsd|midnightbsd|dragonfly|aix)$/) {
 		$expected = 'eof';
 	}
 	if ($Config{osname} eq 'darwin' and $Config{osvers} lt '13') {

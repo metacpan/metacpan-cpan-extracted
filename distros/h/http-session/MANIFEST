@@ -6,6 +6,8 @@ README.md
 cpanfile
 examples/session.pl
 lib/HTTP/Session.pm
+lib/HTTP/Session/Expired.pm
+lib/HTTP/Session/Finalized.pm
 lib/HTTP/Session/ID/MD5.pm
 lib/HTTP/Session/ID/SHA1.pm
 lib/HTTP/Session/ID/Urandom.pm

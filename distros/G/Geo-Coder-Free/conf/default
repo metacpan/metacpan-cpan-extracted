@@ -2,7 +2,7 @@ SiteTitle: Free Geocoder
 Contents: Geocoder based on openaddresses and maxmind
 Host: geocode.nigelhorne.com
 # Where to find the templates
-rootdir: /var/www/geocode.nigelhorne.com/
+root_dir: /var/www/geocode.nigelhorne.com/
 disc_cache: driver=File, root_dir=/tmp/cache
 memory_cache: driver=File, root_dir=/tmp/cache
 OPENADDR_HOME: /usr/local/share/openaddr

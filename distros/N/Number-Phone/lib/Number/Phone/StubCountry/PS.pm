@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185946;
+our $VERSION = 1.20240308154353;
 
 my $formatters = [
                 {
@@ -69,27 +69,32 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"970223", "Jerusalem",
-"970424", "Jenin",
-"970222", "Jericho\/Hebron",
-"970824", "North\ Gaza",
-"970929", "Qalqilya\/Salfit",
-"970925", "Tubas",
-"970227", "Bethlehem",
-"970229", "Ramallah\/Al\-Bireh",
-"970826", "Gaza",
+$areanames{en} = {"970825", "Deir\ al\-Balah",
+"970821", "Rafah",
 "970828", "Gaza",
-"970820", "Khan\ Yunis",
-"970926", "Tulkarm",
+"970424", "Jenin",
+"970925", "Tubas",
+"970929", "Qalqilya\/Salfit",
 "970923", "Nablus",
-"970825", "Deir\ al\-Balah",
-"970821", "Rafah",};
+"970926", "Tulkarm",
+"970223", "Jerusalem",
+"970824", "North\ Gaza",
+"970820", "Khan\ Yunis",
+"970229", "Ramallah\/Al\-Bireh",
+"970222", "Jericho\/Hebron",
+"970227", "Bethlehem",
+"970826", "Gaza",};
+my $timezones = {
+               '' => [
+                       'Europe/Bucharest'
+                     ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+970|\D)//g;
-      my $self = bless({ country_code => '970', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '970', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
       $self = bless({ country_code => '970', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);

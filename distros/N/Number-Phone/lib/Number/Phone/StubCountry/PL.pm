@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185946;
+our $VERSION = 1.20240308154353;
 
 my $formatters = [
                 {
@@ -141,12 +141,9 @@ my $validators = {
         ',
                 'mobile' => '
           21(?:
-            1(?:
-              [145]\\d|
-              3[1-5]
-            )|
-            2\\d\\d
-          )\\d{4}|
+            1[013-5]|
+            2\\d
+          )\\d{5}|
           (?:
             45|
             5[0137]|
@@ -162,76 +159,81 @@ my $validators = {
                 'voip' => '39\\d{7}'
               };
 my %areanames = ();
-$areanames{pl} = {"4867", "Piła",
-"4871", "Wrocław",
-"4833", "Bielsko\-Biała",
-"4882", "Chełm",
-"4822", "Warszawa",
-"4885", "Białystok",
-"4859", "Słupsk",
-"4874", "Wałbrzych",
-"4824", "Płock",
-"4854", "Włocławek",
-"4887", "Suwałki",
-"4829", "Ostrołęka",
-"4842", "Łódź",
-"4883", "Biała\ Podlaska",
-"4886", "Łomża",};
-$areanames{en} = {"4868", "Zielona\ Góra",
-"4834", "Częstochowa",
-"4865", "Leszno",
-"4812", "Kraków",
-"4886", "Lomża",
-"4852", "Bydgoszcz",
-"4876", "Legnica",
-"4848", "Radom",
-"4844", "Piotrków\ Trybunalski",
-"4858", "Gdańsk",
-"4861", "Poznań",
-"4842", "Lódź",
-"4829", "Ostrolęka",
-"4889", "Olsztyn",
-"4887", "Suwalki",
-"4855", "Elbląg",
-"4854", "Wloclawek",
-"4877", "Opole",
-"4814", "Tarnów",
-"4862", "Kalisz",
-"4841", "Kielce",
-"4815", "Tarnobrzeg",
-"4832", "Katowice",
-"4883", "Biala\ Podlaska",
-"4823", "Ciechanów",
-"4818", "Nowy\ Sącz",
-"4813", "Krosno",
-"4846", "Skierniewice",
-"4884", "Zamość",
-"4824", "Plock",
-"4875", "Jelenia\ Góra",
-"4859", "Slupsk",
-"4874", "Walbrzych",
-"4885", "Bialystok",
-"4825", "Siedlce",
-"4895", "Gorzów\ Wielkopolski",
-"4817", "Rzeszów",
-"4894", "Koszalin",
-"4871", "Wroclaw",
-"4881", "Lublin",
-"4843", "Sieradz",
-"4816", "Przemyśl",
-"4867", "Pila",
-"4856", "Toruń",
-"4822", "Warsaw",
-"4882", "Chelm",
+$areanames{en} = {"4822", "Warsaw",
 "4891", "Szczecin",
-"4833", "Bielsko\-Biala",
-"4863", "Konin",};
+"4871", "Wroclaw",
+"4868", "Zielona\ Góra",
+"4886", "Lomża",
+"4841", "Kielce",
+"4843", "Sieradz",
+"4859", "Slupsk",
+"4818", "Nowy\ Sącz",
+"4882", "Chelm",
+"4858", "Gdańsk",
+"4832", "Katowice",
+"4889", "Olsztyn",
+"4812", "Kraków",
+"4844", "Piotrków\ Trybunalski",
+"4852", "Bydgoszcz",
+"4875", "Jelenia\ Góra",
+"4895", "Gorzów\ Wielkopolski",
+"4816", "Przemyśl",
+"4874", "Walbrzych",
+"4829", "Ostrolęka",
+"4877", "Opole",
+"4894", "Koszalin",
+"4862", "Kalisz",
+"4856", "Toruń",
+"4834", "Częstochowa",
+"4883", "Biala\ Podlaska",
+"4815", "Tarnobrzeg",
+"4881", "Lublin",
+"4855", "Elbląg",
+"4876", "Legnica",
+"4817", "Rzeszów",
+"4814", "Tarnów",
+"4842", "Lódź",
+"4854", "Wloclawek",
+"4865", "Leszno",
+"4867", "Pila",
+"4846", "Skierniewice",
+"4823", "Ciechanów",
+"4824", "Plock",
+"4863", "Konin",
+"4861", "Poznań",
+"4825", "Siedlce",
+"4885", "Bialystok",
+"4813", "Krosno",
+"4884", "Zamość",
+"4887", "Suwalki",
+"4848", "Radom",
+"4833", "Bielsko\-Biala",};
+$areanames{pl} = {"4829", "Ostrołęka",
+"4874", "Wałbrzych",
+"4886", "Łomża",
+"4871", "Wrocław",
+"4822", "Warszawa",
+"4882", "Chełm",
+"4859", "Słupsk",
+"4824", "Płock",
+"4887", "Suwałki",
+"4833", "Bielsko\-Biała",
+"4885", "Białystok",
+"4842", "Łódź",
+"4854", "Włocławek",
+"4883", "Biała\ Podlaska",
+"4867", "Piła",};
+my $timezones = {
+               '' => [
+                       'Europe/Warsaw'
+                     ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+48|\D)//g;
-      my $self = bless({ country_code => '48', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '48', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
         return $self->is_valid() ? $self : undef;
     }
 1;

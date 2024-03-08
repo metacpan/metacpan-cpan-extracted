@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Spreadsheet::ParseXLSX",
   "PREREQ_PM" => {
-    "Archive::Zip" => 0,
+    "Archive::Zip" => "1.34",
     "Crypt::Mode::CBC" => 0,
     "Crypt::Mode::ECB" => 0,
     "Digest::SHA" => 0,
@@ -28,6 +28,7 @@ my %WriteMakefileArgs = (
     "OLE::Storage_Lite" => 0,
     "Scalar::Util" => 0,
     "Spreadsheet::ParseExcel" => 0,
+    "Spreadsheet::ParseExcel::Cell" => 0,
     "XML::Twig" => 0
   },
   "TEST_REQUIRES" => {
@@ -38,7 +39,7 @@ my %WriteMakefileArgs = (
     "Spreadsheet::ParseExcel::Utility" => 0,
     "Test::More" => "0.88"
   },
-  "VERSION" => "0.31",
+  "VERSION" => "0.33",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,7 +47,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Archive::Zip" => 0,
+  "Archive::Zip" => "1.34",
   "Crypt::Mode::CBC" => 0,
   "Crypt::Mode::ECB" => 0,
   "Data::Dumper" => 0,
@@ -61,6 +62,7 @@ my %FallbackPrereqs = (
   "OLE::Storage_Lite" => 0,
   "Scalar::Util" => 0,
   "Spreadsheet::ParseExcel" => 0,
+  "Spreadsheet::ParseExcel::Cell" => 0,
   "Spreadsheet::ParseExcel::Utility" => 0,
   "Test::More" => "0.88",
   "XML::Twig" => 0

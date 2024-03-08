@@ -1,5 +1,5 @@
 package Net::Cisco::FMC::v1;
-$Net::Cisco::FMC::v1::VERSION = '0.009002';
+$Net::Cisco::FMC::v1::VERSION = '0.010000';
 # ABSTRACT: Cisco Firepower Management Center (FMC) API version 1 client library
 
 use 5.024;
@@ -358,6 +358,71 @@ sub delete_accessrule ($self, $accesspolicy_id, $id) {
         'accesspolicies',
         $accesspolicy_id,
         'accessrules',
+        $id
+    ));
+}
+
+
+sub create_accesspolicy_category ($self, $accesspolicy_id, $object_data, $query_params = {}) {
+    return $self->_create(join('/',
+            '/api/fmc_config/v1/domain',
+            $self->domain_uuid,
+            'policy',
+            'accesspolicies',
+            $accesspolicy_id,
+            'categories'
+        ), $object_data, $query_params);
+}
+
+
+sub list_accesspolicy_categories ($self, $accesspolicy_id, $query_params = {}) {
+    return $self->_list(join('/',
+        '/api/fmc_config/v1/domain',
+        $self->domain_uuid,
+        'policy',
+        'accesspolicies',
+        $accesspolicy_id,
+        'categories'
+    ), $query_params);
+}
+
+
+sub get_accesspolicy_category ($self, $accesspolicy_id, $id, $query_params = {}) {
+    return $self->_get(join('/',
+        '/api/fmc_config/v1/domain',
+        $self->domain_uuid,
+        'policy',
+        'accesspolicies',
+        $accesspolicy_id,
+        'categories',
+        $id
+    ), $query_params);
+}
+
+
+sub update_accesspolicy_category ($self, $accesspolicy_id, $object, $object_data, $query_params = {}) {
+    my $id = $object->{id};
+    return $self->_update(join('/',
+        '/api/fmc_config/v1/domain',
+        $self->domain_uuid,
+        'policy',
+        'accesspolicies',
+        $accesspolicy_id,
+        'categories',
+        $id
+    ), $object, $object_data, $query_params);
+}
+
+
+
+sub delete_accesspolicy_category ($self, $accesspolicy_id, $id) {
+    return $self->_delete(join('/',
+        '/api/fmc_config/v1/domain',
+        $self->domain_uuid,
+        'policy',
+        'accesspolicies',
+        $accesspolicy_id,
+        'categories',
         $id
     ));
 }
@@ -724,7 +789,7 @@ Net::Cisco::FMC::v1 - Cisco Firepower Management Center (FMC) API version 1 clie
 
 =head1 VERSION
 
-version 0.009002
+version 0.010000
 
 =head1 SYNOPSIS
 
@@ -804,6 +869,33 @@ hashref of query parameters and returns a hashref of the updated access rule.
 =head2 delete_accessrule
 
 Takes an access policy id and a rule object id.
+
+Returns true on success.
+
+=head2 create_accesspolicy_category
+
+Takes an access policy id, a hashref of the category which should be created and
+optional query parameters.
+
+=head2 list_accesspolicy_categories
+
+Takes an access policy id and query parameters and returns a hashref with a
+single key 'items' that has a list of categories similar to the FMC API.
+
+=head2 get_accesspolicy_category
+
+Takes an access policy id, category id and query parameters and returns the
+category.
+
+=head2 update_accesspolicy_category
+
+Takes an access policy id, category object, a hashref of the category and an
+optional hashref of query parameters and returns a hashref of the updated
+category.
+
+=head2 delete_accesspolicy_category
+
+Takes an access policy id and a category id.
 
 Returns true on success.
 
@@ -933,7 +1025,7 @@ Alexander Hartmaier <abraxxa@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 - 2023 by Alexander Hartmaier.
+This software is copyright (c) 2018 - 2024 by Alexander Hartmaier.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

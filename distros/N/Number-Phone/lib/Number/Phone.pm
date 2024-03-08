@@ -18,7 +18,7 @@ use Devel::Deprecations::Environmental
     OldPerl => { unsupported_from => '2023-01-08', older_than => '5.12.0' };
 
 # MUST be in format N.NNNN, see https://github.com/DrHyde/perl-modules-Number-Phone/issues/58
-our $VERSION = '4.0001';
+our $VERSION = '4.0002';
 
 my $NOSTUBS = 0;
 sub import {
@@ -141,6 +141,16 @@ sub format_for_country {
   $country_code =~ s/^\+//;
   return $self->format_using('National') if $country_code eq $self->country_code();
   return $self->format_using('NationallyPreferredIntl');
+}
+
+sub timezones {
+    my $self = shift;
+
+    if (my $stub = Number::Phone::Lib->new($self->format)) {
+        return $stub->timezones;
+    }
+
+    return undef;
 }
 
 1;
@@ -529,6 +539,23 @@ Return the subscriber part of the number.
 While the superclass implementation returns undef, this is nonsense in just
 about all cases, so you should always implement this.
 
+=item timezones
+
+This returns a list-ref of the timezones that could be assoicated with a
+geographic number or with the country for non geographic numbers. Returns
+undef in the case that possible timezones are unknown.
+
+Data is sourced from Google's libphonenumber project therefore implementation
+lies in the stub-countries which return timezones e.g. Europe/London, America/New_York.
+Non-stub implementations by default return their stub-country counterpart's
+result.
+
+Results are sorted alphabetically.
+
+This method should be considered experimental, and there may be some minor
+changes, especially for international "country" codes and non-geographic
+numbers.
+
 =item operator
 
 Return the name of the telco assigned this number, in an appropriate
@@ -830,7 +857,7 @@ L<git://github.com/DrHyde/perl-modules-Number-Phone.git>
 
 =head1 AUTHOR, COPYRIGHT and LICENCE
 
-Copyright 2004 - 2023 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
+Copyright 2004 - 2024 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
 
 This software is free-as-in-speech software, and may be used,
 distributed, and modified under the terms of either the GNU

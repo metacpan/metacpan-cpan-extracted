@@ -3,75 +3,68 @@
 use strict;
 use warnings;
 
-my $help;
-my $show_version;
-my @include_dirs;
-
 use SPVM::Builder::Util;
+use SPVM::Global;
 
-my $class_name;
-my $program_source;
-my @use_class_names;
+SPVM::Builder::Util::getopt
+  # spvmcc and spvm shared
+  'h|help'          => \my $help,
+  'v|version'       => \my $show_version,
+  'I|include-dir=s' => \my @include_dirs,
+  'B|build-dir=s'   => \my $build_dir,
+  
+  # spvm only
+  'e=s' => \my $program_source,
+  '-M=s' => \my @use_class_names,
+;
 
-BEGIN {
-  SPVM::Builder::Util::getopt
-    'h|help'          => \my $help,
-    'v|version'       => \my $show_version,
-    'I|include-dir=s' => \my @include_dirs,
-    'e=s' => \$program_source,
-    '-M=s' => \@use_class_names,
-  ;
+my @original_include_dirs = @include_dirs;
+push @include_dirs, map { "$_/SPVM" } @INC;
+unshift @INC, map { $_ =~ s/[\\\/]SPVM$//; $_; } @original_include_dirs;
+
+if ($help) {
+  print SPVM::Builder::Util::extract_usage;
+  exit 0;
+}
+elsif ($show_version) {
+  my $version_string = "spvm v$SPVM::VERSION";
+  print "$version_string\n";
+  exit 0;
+}
+
+if (defined $build_dir) {
+  $ENV{SPVM_BUILD_DIR} = $build_dir;
+}
+
+my $class_name = shift;
+
+if (!defined $class_name && !defined $program_source) {
+  die SPVM::Builder::Util::extract_usage;
+}
+
+for my $use_class_name (@use_class_names) {
+  SPVM::Global::build_class($use_class_name, __FILE__, __LINE__);
+}
+
+if (defined $class_name) {
+  SPVM::Global::build_class($class_name, __FILE__, __LINE__);
+}
+
+SPVM::Global::build_class('Native', __FILE__, __LINE__);
+
+if (defined $program_source) {
+  my $current_compiler = SPVM::Native->get_current_compiler;
   
-  my @original_include_dirs = @include_dirs;
-  push @include_dirs, map { "$_/SPVM" } @INC;
-  unshift @INC, map { $_ =~ s/[\\\/]SPVM$//; $_; } @original_include_dirs;
+  $current_compiler->set_start_file(__FILE__);
+  $current_compiler->set_start_line(__LINE__ + 1);
+  $current_compiler->eval_string($program_source);
+}
+else {
+  SPVM::Native->check_bootstrap_method($class_name);
   
-  if ($help) {
-    print SPVM::Builder::Util::extract_usage;
-    exit 0;
-  }
-  elsif ($show_version) {
-    my $version_string = "spvm v$SPVM::VERSION";
-    print "$version_string\n";
-    exit 0;
-  }
-  else {
-    unless (defined $program_source) {
-      $class_name = shift;
-      
-      unless (defined $class_name) {
-        die SPVM::Builder::Util::extract_usage;
-      }
-    }
-  }
+  my $spvm_class_name = "SPVM::$class_name";
   
-  for my $use_class_name (@use_class_names) {
-    eval "use SPVM '$use_class_name'";
-  }
-  
-  eval "use SPVM 'Native'";
-  if ($@) { confess $@ }
-  
-  eval "use SPVM 'Native::Compiler'";
-  if ($@) { confess $@ }
-  
-  if (defined $program_source) {
-    my $current_compiler = SPVM::Native->get_current_compiler;
-    
-    $current_compiler->set_start_file(__FILE__);
-    $current_compiler->set_start_line(__LINE__ + 1);
-    $current_compiler->eval_string($program_source);
-  }
-  else {
-    eval "use SPVM '$class_name'";
-    if ($@) { confess $@ }
-    
-    my $spvm_class_name = "SPVM::$class_name";
-    
-    SPVM::Native->check_bootstrap_method($class_name);
-    
-    $spvm_class_name->main;
-  }
+  $spvm_class_name->main;
 }
 
 =encoding utf8
@@ -94,6 +87,7 @@ The spvm command is a SPVM compiler and linker to generate an executable file.
     -h, --help                     Shows this message
     -v, --version                  Shows the version
     -I, --include-dir <directory>  Adds a include directory
+    -B, --build-dir <directory>    Build diretory
     -e <source>                    Executes a program source code using
                                    the eval_string method in the Compiler class
 

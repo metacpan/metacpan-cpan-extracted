@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185946;
+our $VERSION = 1.20240308154353;
 
 my $formatters = [
                 {
@@ -90,24 +90,29 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"96617", "Abha\/Najran\/Jezan",
-"96616", "Hail\/Qasim",
-"96611", "Riyadh\/Kharj",
-"96612", "Makkah\/Jeddah",
+$areanames{en} = {"96612", "Makkah\/Jeddah",
+"96613", "Dammam\/Khobar\/Dahran",
 "96614", "Madenah\/Arar\/Tabuk\/Yanbu",
-"96613", "Dammam\/Khobar\/Dahran",};
-$areanames{ar} = {"96616", "حائل\/القصيم",
-"96611", "الرياض\/الخرج",
-"96617", "أبها\/نجران\/جازان",
+"96617", "Abha\/Najran\/Jezan",
+"96611", "Riyadh\/Kharj",
+"96616", "Hail\/Qasim",};
+$areanames{ar} = {"96612", "مكة\/جدة",
 "96613", "الدمام\/الخبر\/الظهران",
-"96612", "مكة\/جدة",
-"96614", "المدينة\ المنورة\/عرعر\/تبوك\/ينبع\ البحر",};
+"96614", "المدينة\ المنورة\/عرعر\/تبوك\/ينبع\ البحر",
+"96617", "أبها\/نجران\/جازان",
+"96611", "الرياض\/الخرج",
+"96616", "حائل\/القصيم",};
+my $timezones = {
+               '' => [
+                       'Asia/Riyadh'
+                     ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+966|\D)//g;
-      my $self = bless({ country_code => '966', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '966', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
       $self = bless({ country_code => '966', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);

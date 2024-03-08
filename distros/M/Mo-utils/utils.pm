@@ -12,9 +12,9 @@ use Scalar::Util qw(blessed);
 Readonly::Array our @EXPORT_OK => qw(check_angle check_array check_array_object
 	check_array_required check_bool check_code check_isa check_length
 	check_length_fix check_number check_number_of_items check_number_range
-	check_regexp check_required check_string_begin check_strings);
+	check_regexp check_required check_string check_string_begin check_strings);
 
-our $VERSION = 0.23;
+our $VERSION = 0.24;
 
 sub check_angle {
 	my ($self, $key) = @_;
@@ -219,6 +219,21 @@ sub check_required {
 	return;
 }
 
+sub check_string {
+	my ($self, $key, $string) = @_;
+
+	_check_key($self, $key) && return;
+
+	if ($self->{$key} ne $string) {
+		err "Parameter '$key' must have expected value.",
+			'Value', $self->{$key},
+			'Expected value', $string,
+		;
+	}
+
+	return;
+}
+
 sub check_string_begin {
 	my ($self, $key, $string_base) = @_;
 
@@ -311,9 +326,9 @@ Mo::utils - Mo utilities.
 =head1 SYNOPSIS
 
  use Mo::utils qw(check_angle check_array check_array_object check_array_required
-         check_bool check_code check_isa check_length check_number
-         check_number_of_items check_regexp check_required check_string_begin
-         check_strings);
+         check_bool check_code check_isa check_length check_length_fix check_number
+         check_number_of_items check_number_range check_regexp check_required
+         check_string check_string_begin check_strings);
 
  check_angle($self, $key);
  check_array($self, $key);
@@ -329,6 +344,7 @@ Mo::utils - Mo utilities.
  check_number_range($self, $key, $min, $max);
  check_regexp($self, $key, $regexp);
  check_required($self, $key);
+ check_string($self, $key, $string);
  check_string_begin($self, $key, $string_base);
  check_strings($self, $key, $strings_ar);
 
@@ -511,6 +527,18 @@ Put error if check isn't ok.
 
 Returns undef.
 
+=head2 C<check_string>
+
+ check_string($self, $key, $string);
+
+I<Since version 0.24.>
+
+Check string defined by C<$key> to expected value.
+
+Put error if check isn't ok.
+
+Returns undef.
+
 =head2 C<check_string_begin>
 
  check_string_begin($self, $key, $string_base);
@@ -608,6 +636,11 @@ Returns undef.
 
  check_required():
          Parameter '%s' is required.
+
+ check_string():
+         Parameter '%s' must have expected value.
+                 Value: %s
+                 Expected value: %s
 
  check_string_begin():
          Parameter '%s' must have defined string base.
@@ -1280,6 +1313,49 @@ Returns undef.
 
 =head1 EXAMPLE29
 
+=for comment filename=check_string_ok.pl
+
+ use strict;
+ use warnings;
+
+ use Mo::utils qw(check_string);
+
+ my $self = {
+         'key' => 'foo',
+ };
+ check_string($self, 'key', 'foo');
+
+ # Print out.
+ print "ok\n";
+
+ # Output:
+ # ok
+
+=head1 EXAMPLE30
+
+=for comment filename=check_string_fail.pl
+
+ use strict;
+ use warnings;
+
+ use Error::Pure;
+ use Mo::utils qw(check_string);
+
+ $Error::Pure::TYPE = 'Error';
+
+ my $self = {
+         'key' => 'bad',
+ };
+ check_string($self, 'key', 'foo');
+
+ # Print out.
+ print "ok\n";
+
+ # Output like:
+ # #Error [...utils.pm:?] Parameter 'key' have expected value.
+
+=head1 EXAMPLE32
+
 =for comment filename=check_string_begin_ok.pl
 
  use strict;
@@ -1298,7 +1374,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE30
+=head1 EXAMPLE33
 
 =for comment filename=check_string_begin_fail.pl
 
@@ -1321,7 +1397,7 @@ Returns undef.
  # Output like:
  # #Error [...utils.pm:?] Parameter 'key' must begin with defined string base.
 
-=head1 EXAMPLE31
+=head1 EXAMPLE34
 
 =for comment filename=check_strings_ok.pl
 
@@ -1341,7 +1417,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE32
+=head1 EXAMPLE35
 
 =for comment filename=check_strings_fail.pl
 
@@ -1412,6 +1488,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.23
+0.24
 
 =cut

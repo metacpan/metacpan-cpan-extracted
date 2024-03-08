@@ -12,6 +12,10 @@
 #  define av_count(av)  (AvFILL(av) + 1)
 #endif
 
+#ifndef av_fetch_simple
+#  define av_fetch_simple  av_fetch
+#endif
+
 struct pmat_sv
 {
   SV  *df;
@@ -28,6 +32,7 @@ struct pmat_sv_glob
   struct pmat_sv _parent;
   long           stash_at;
   long           scalar_at, array_at, hash_at, code_at, egv_at, io_at, form_at;
+  long           name_hek;
   long           line;
   const char    *file;
   const char    *name;
@@ -71,6 +76,7 @@ struct pmat_sv_hash
   struct pmat_hval {
     const char    *key;
     size_t         klen;
+    long           hek;
     long           value;
   }             *values_at;
 };
@@ -82,6 +88,7 @@ struct pmat_sv_code
   long           flags;
   long           oproot;
   long           depth;
+  long           name_hek;
   long           stash_at, outside_at, padlist_at, constval_at;
   const char    *file;
   const char    *name;
@@ -281,7 +288,7 @@ OUTPUT:
 MODULE = Devel::MAT                PACKAGE = Devel::MAT::SV::GLOB
 
 void
-_set_glob_fields(self, stash_at, scalar_at, array_at, hash_at, code_at, egv_at, io_at, form_at, line, file, name)
+_set_glob_fields(self, stash_at, scalar_at, array_at, hash_at, code_at, egv_at, io_at, form_at, name_hek, line, file, name)
   HV   *self
   long  stash_at
   long  scalar_at
@@ -291,6 +298,7 @@ _set_glob_fields(self, stash_at, scalar_at, array_at, hash_at, code_at, egv_at, 
   long  egv_at
   long  io_at
   long  form_at
+  long  name_hek
   long  line
   SV   *file
   SV   *name
@@ -306,6 +314,7 @@ CODE:
     gv->egv_at    = egv_at;
     gv->io_at     = io_at;
     gv->form_at   = form_at;
+    gv->name_hek  = name_hek;
 
     if(SvPOK(file))
       gv->file = save_string(SvPV_nolen(file), 0);
@@ -345,7 +354,8 @@ ALIAS:
   egv_at    = 5
   io_at     = 6
   form_at   = 7
-  line      = 8
+  name_hek  = 8
+  line      = 9
 CODE:
   {
     struct pmat_sv_glob *gv = (struct pmat_sv_glob *)get_pmat_sv(self);
@@ -359,7 +369,8 @@ CODE:
         case 5: RETVAL = gv->egv_at;    break;
         case 6: RETVAL = gv->io_at;     break;
         case 7: RETVAL = gv->form_at;   break;
-        case 8: RETVAL = gv->line;      break;
+        case 8: RETVAL = gv->name_hek;  break;
+        case 9: RETVAL = gv->line;      break;
       }
   }
 OUTPUT:
@@ -716,9 +727,16 @@ CODE:
       I32 klen;
       const char *key = hv_iterkey(ent, &klen);
 
+      SV *val = hv_iterval(values_at, ent);
+      assert(SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVAV);
+      AV *valav = (AV *)SvRV(val);
+      SV *hek_at   = *av_fetch_simple(valav, 0, 0);
+      SV *value_at = *av_fetch_simple(valav, 1, 0);
+
       hv->values_at[i].key   = save_string(key, klen);
       hv->values_at[i].klen  = klen;
-      hv->values_at[i].value = SvUV(hv_iterval(values_at, ent));
+      hv->values_at[i].hek   = SvOK(hek_at) ? SvUV(hek_at) : 0;
+      hv->values_at[i].value = SvUV(value_at);
     }
 
     // TODO: sort the values so we can binsearch for them later
@@ -786,6 +804,9 @@ SV *
 value_at(self, key)
   HV    *self
   SV    *key
+ALIAS:
+  hek_at   = 0
+  value_at = 1
 CODE:
   {
     struct pmat_sv_hash *hv = (struct pmat_sv_hash *)get_pmat_sv(self);
@@ -801,7 +822,15 @@ CODE:
       if(memcmp(hv->values_at[i].key, SvPV_nolen(key), klen) != 0)
         continue;
 
-      RETVAL = newSVuv(hv->values_at[i].value);
+      switch(ix) {
+        case 0:
+          RETVAL = newSVuv(hv->values_at[i].hek);
+          break;
+
+        case 1:
+          RETVAL = newSVuv(hv->values_at[i].value);
+          break;
+      }
       break;
     }
   }
@@ -811,12 +840,13 @@ OUTPUT:
 MODULE = Devel::MAT                PACKAGE = Devel::MAT::SV::CODE
 
 void
-_set_code_fields(self, line, flags, oproot, depth, stash_at, outside_at, padlist_at, constval_at, file, name)
+_set_code_fields(self, line, flags, oproot, depth, name_hek, stash_at, outside_at, padlist_at, constval_at, file, name)
   HV   *self
   long  line
   long  flags
   long  oproot
   long  depth
+  long  name_hek
   long  stash_at
   long  outside_at
   long  padlist_at
@@ -831,6 +861,7 @@ CODE:
     cv->flags       = flags;
     cv->oproot      = oproot;
     cv->depth       = depth;
+    cv->name_hek    = name_hek;
     cv->stash_at    = stash_at;
     cv->outside_at  = outside_at;
     cv->padlist_at  = padlist_at;
@@ -902,12 +933,13 @@ ALIAS:
   line        = 0
   oproot      = 1
   depth       = 2
-  stash_at    = 3
-  outside_at  = 4
-  padlist_at  = 5
-  constval_at = 6
-  protosub_at = 7
-  padnames_at = 8
+  name_hek    = 3
+  stash_at    = 4
+  outside_at  = 5
+  padlist_at  = 6
+  constval_at = 7
+  protosub_at = 8
+  padnames_at = 9
 CODE:
   {
     struct pmat_sv_code *cv = (struct pmat_sv_code *)get_pmat_sv(self);
@@ -916,12 +948,13 @@ CODE:
         case 0: RETVAL = cv->line;        break;
         case 1: RETVAL = cv->oproot;      break;
         case 2: RETVAL = cv->depth;       break;
-        case 3: RETVAL = cv->stash_at;    break;
-        case 4: RETVAL = cv->outside_at;  break;
-        case 5: RETVAL = cv->padlist_at;  break;
-        case 6: RETVAL = cv->constval_at; break;
-        case 7: RETVAL = cv->protosub_at; break;
-        case 8: RETVAL = cv->padnames_at; break;
+        case 3: RETVAL = cv->name_hek;    break;
+        case 4: RETVAL = cv->stash_at;    break;
+        case 5: RETVAL = cv->outside_at;  break;
+        case 6: RETVAL = cv->padlist_at;  break;
+        case 7: RETVAL = cv->constval_at; break;
+        case 8: RETVAL = cv->protosub_at; break;
+        case 9: RETVAL = cv->padnames_at; break;
       }
   }
 OUTPUT:

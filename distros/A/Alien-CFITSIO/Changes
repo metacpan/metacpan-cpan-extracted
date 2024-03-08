@@ -1,5 +1,12 @@
 Revision history for Alien-CFITSIO
 
+v4.4.0.1  2024-03-06 12:54:54-05:00 America/New_York
+
+  [BUGFIX]
+
+    * alienfile wasn't Perl 5.10 compliant, which is the minimum
+      supported Perl version.
+
 v4.4.0.0  2024-03-04 12:43:10-05:00 America/New_York
 
   [ENHANCEMENT]

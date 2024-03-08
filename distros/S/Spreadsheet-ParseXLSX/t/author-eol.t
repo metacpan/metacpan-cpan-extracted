@@ -16,6 +16,7 @@ use Test::EOL;
 
 my @files = (
     'lib/Spreadsheet/ParseXLSX.pm',
+    'lib/Spreadsheet/ParseXLSX/Cell.pm',
     'lib/Spreadsheet/ParseXLSX/Decryptor.pm',
     'lib/Spreadsheet/ParseXLSX/Decryptor/Agile.pm',
     'lib/Spreadsheet/ParseXLSX/Decryptor/Standard.pm',
@@ -51,6 +52,7 @@ my @files = (
     't/bug-72.t',
     't/bug-8.t',
     't/bug-md-10.t',
+    't/bug-md-11.t',
     't/bug-md-7.t',
     't/cell-to-row-col.t',
     't/column-formats.t',

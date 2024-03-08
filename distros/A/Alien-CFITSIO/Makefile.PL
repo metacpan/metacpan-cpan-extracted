@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.006;
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
@@ -23,7 +23,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Alien-CFITSIO",
   "LICENSE" => "gpl",
-  "MIN_PERL_VERSION" => "5.006",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Alien::CFITSIO",
   "PREREQ_PM" => {
     "Alien::Base" => 0,
@@ -42,7 +42,7 @@ my %WriteMakefileArgs = (
     "Test::Alien" => "2.3901",
     "Test::More" => 0
   },
-  "VERSION" => "v4.4.0.0",
+  "VERSION" => "v4.4.0.1",
   "test" => {
     "TESTS" => "t/*.t"
   }

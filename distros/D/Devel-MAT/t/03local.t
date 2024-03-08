@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Devel::MAT::Dumper;
 $Devel::MAT::Dumper::VERSION >= 0.38 or

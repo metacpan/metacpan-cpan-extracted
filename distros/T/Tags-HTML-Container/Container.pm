@@ -6,7 +6,7 @@ use warnings;
 
 use Class::Utils qw(set_params split_params);
 use Error::Pure qw(err);
-use List::Util qw(none);
+use List::Util 1.33 qw(none);
 use Readonly;
 
 Readonly::Array our @HORIZ_ALIGN => qw(center left right);
@@ -19,7 +19,7 @@ Readonly::Hash our %VERT_CONV => (
 	'top' => 'flex-start',
 );
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 sub new {
 	my ($class, @params) = @_;
@@ -361,6 +361,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

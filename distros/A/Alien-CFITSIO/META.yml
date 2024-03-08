@@ -20,6 +20,7 @@ configure_requires:
   Alien::Build::Plugin::PkgConfig::Negotiate: '1.53'
   ExtUtils::MakeMaker: '6.52'
   Sort::Versions: '0'
+  perl: '5.010'
 dynamic_config: 1
 generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
 license: gpl
@@ -38,7 +39,7 @@ no_index:
 provides:
   Alien::CFITSIO:
     file: lib/Alien/CFITSIO.pm
-    version: v4.4.0.0
+    version: v4.4.0.1
 requires:
   Alien::Base: '0'
   base: '0'
@@ -48,7 +49,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Alien-CFITSIO
   repository: https://gitlab.com/djerius/alien-cfitsio.git
-version: v4.4.0.0
+version: v4.4.0.1
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:

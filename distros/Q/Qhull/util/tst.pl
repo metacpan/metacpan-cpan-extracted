@@ -4,7 +4,7 @@ use v5.10;
 use strict;
 use warnings;
 
-use Log::Any::Adapter 'Stderr', log_level => 'debug';
+use Log::Any::Adapter 'Stderr', log_level => 'trace';
 
 use Qhull 'qhull';
 use Path::Tiny;
@@ -24,8 +24,9 @@ my @results = qhull(
     \@y,
     {
         # raw => !!1,
-        trace   => !!1,
-        qh_opts => [
+        trace      => !!1,
+        save_input => 'qhull.in',
+        qh_opts    => [
             # TI => 'util/qhull.in',
             TO => 'qhull.out',
             # 'Fx',

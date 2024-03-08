@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185946;
+our $VERSION = 1.20240308154352;
 
 my $formatters = [
                 {
@@ -66,22 +66,48 @@ my $validators = {
                 'voip' => '499\\d{5}'
               };
 my %areanames = ();
-$areanames{en} = {"689405", "Îles\ du\ Vent\(IDV\)",
-"689404", "Îles\ du\ Vent\(IDV\)",
+$areanames{en} = {"689404", "Îles\ du\ Vent\(IDV\)",
+"689409", "Remote\ Archipelago",
+"6894088", "Polynesia",
+"689408", "Îles\ du\ Vent\(IDV\)",
+"689405", "Îles\ du\ Vent\(IDV\)",
 "689496", "Polynesia",
 "689498", "Polynesia",
 "689494", "Polynesia",
-"689409", "Remote\ Archipelago",
-"689408", "Îles\ du\ Vent\(IDV\)",
 "689406", "Îles\ Sous\-le\-vent\(ISLV\)",
-"689495", "Polynesia",
-"6894088", "Polynesia",};
+"689495", "Polynesia",};
+my $timezones = {
+               '' => [
+                       'Pacific/Gambier',
+                       'Pacific/Marquesas',
+                       'Pacific/Tahiti'
+                     ],
+               '4' => [
+                        'Pacific/Tahiti'
+                      ],
+               '80' => [
+                         'Pacific/Gambier',
+                         'Pacific/Marquesas',
+                         'Pacific/Tahiti'
+                       ],
+               '87' => [
+                         'Pacific/Gambier',
+                         'Pacific/Marquesas',
+                         'Pacific/Tahiti'
+                       ],
+               '88' => [
+                         'Pacific/Tahiti'
+                       ],
+               '89' => [
+                         'Pacific/Tahiti'
+                       ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+689|\D)//g;
-      my $self = bless({ country_code => '689', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '689', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
         return $self->is_valid() ? $self : undef;
     }
 1;

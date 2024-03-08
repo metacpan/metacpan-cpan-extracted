@@ -2,7 +2,7 @@ package Data::TableReader::Decoder;
 use Moo 2;
 
 # ABSTRACT: Base class for table decoders
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 
 has file_name   => ( is => 'ro', required => 1 );
@@ -15,7 +15,15 @@ sub _first_sufficient_module {
 	require Module::Runtime;
 	for my $mod (@$modules) {
 		my ($pkg, $ver)= ref $mod eq 'ARRAY'? @$mod : ( $mod, 0 );
-		return $pkg if eval { Module::Runtime::use_module($pkg, $ver) };
+		next unless eval { Module::Runtime::use_module($pkg, $ver) };
+		# Special case for Excel modules that use Archive::Zip and don't declare proper
+		# version requirements for it:
+		# https://github.com/MichaelDaum/spreadsheet-parsexlsx/pull/12
+		if ($pkg =~ /XLSX/ && !eval { Module::Runtime::use_module('Archive::Zip', 1.34) }) {
+			Carp::carp("Your version of Archive::Zip is not new enough to make use of $pkg");
+			next;
+		}
+		return $pkg
 	}
 	require Carp;
 	Carp::croak "No $name available (or of sufficient version); install one of: "
@@ -36,7 +44,7 @@ Data::TableReader::Decoder - Base class for table decoders
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 DESCRIPTION
 
@@ -74,7 +82,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Michael Conrad.
+This software is copyright (c) 2024 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

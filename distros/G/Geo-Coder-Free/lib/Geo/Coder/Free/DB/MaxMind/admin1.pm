@@ -3,7 +3,17 @@ package Geo::Coder::Free::DB::MaxMind::admin1;
 use strict;
 use warnings;
 
-# admin1.db is from http://download.geonames.org/export/dump/admin1CodesASCII.txt
+=head1 NAME
+
+Geo::Coder::Free::DB::MaxMind::admin1 - driver for http://download.geonames.org/export/dump/admin1CodesASCII.txt
+
+=head1 VERSION
+
+Version 0.35
+
+=cut
+
+our $VERSION = '0.35';
 
 # It contains admin areas such as counties, states and provinces
 # Note that GB has England, Scotland and Wales at this level, not the counties

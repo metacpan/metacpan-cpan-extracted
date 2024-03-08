@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185945;
+our $VERSION = 1.20240308154352;
 
 my $formatters = [
                 {
@@ -43,7 +43,7 @@ my $validators = {
                 'fixed_line' => '
           596(?:
             [03-7]\\d|
-            10|
+            1[05]|
             2[7-9]|
             8[0-39]|
             9[04-9]
@@ -52,7 +52,7 @@ my $validators = {
                 'geographic' => '
           596(?:
             [03-7]\\d|
-            10|
+            1[05]|
             2[7-9]|
             8[0-39]|
             9[04-9]
@@ -73,7 +73,7 @@ my $validators = {
                 'toll_free' => '80[0-5]\\d{6}',
                 'voip' => '
           9(?:
-            397[0-2]|
+            397[0-3]|
             477[0-5]|
             76(?:
               6\\d|
@@ -82,12 +82,17 @@ my $validators = {
           )\\d{4}
         '
               };
+my $timezones = {
+               '' => [
+                       'America/Martinique'
+                     ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+596|\D)//g;
-      my $self = bless({ country_code => '596', number => $number, formatters => $formatters, validators => $validators, }, $class);
+      my $self = bless({ country_code => '596', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, }, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
       $self = bless({ country_code => '596', number => $number, formatters => $formatters, validators => $validators, }, $class);

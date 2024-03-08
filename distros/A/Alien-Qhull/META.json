@@ -36,7 +36,6 @@
             "Alien::Build" : "2.3901",
             "Alien::Build::MM" : "0.32",
             "Alien::Build::Plugin::Build::CMake" : "0.99",
-            "Alien::Build::Plugin::PkgConfig::Negotiate" : "1.53",
             "ExtUtils::MakeMaker" : "6.52",
             "Sort::Versions" : "0",
             "perl" : "5.012"
@@ -89,7 +88,6 @@
             "Dist::Zilla::Plugin::Test::PodSpelling" : "0",
             "Dist::Zilla::Plugin::Test::ReportPrereqs" : "0",
             "Dist::Zilla::Plugin::Test::TrailingSpace" : "0",
-            "Dist::Zilla::Plugin::Test::UnusedVars" : "0",
             "Dist::Zilla::Plugin::Test::Version" : "0",
             "Dist::Zilla::PluginBundle::Basic" : "0",
             "Dist::Zilla::PluginBundle::Filter" : "0",
@@ -113,7 +111,6 @@
             "Test::Pod::Coverage" : "1.08",
             "Test::Spelling" : "0.12",
             "Test::TrailingSpace" : "0.0203",
-            "Test::Vars" : "0",
             "Test::Version" : "2.00"
          }
       },
@@ -147,11 +144,11 @@
    "provides" : {
       "Alien::Qhull" : {
          "file" : "lib/Alien/Qhull.pm",
-         "version" : "v8.0.2.1"
+         "version" : "v8.0.2.2"
       },
       "Alien::Qhull::Install::Files" : {
          "file" : "lib/Alien/Qhull/Install/Files.pm",
-         "version" : "v8.0.2.1"
+         "version" : "v8.0.2.2"
       }
    },
    "release_status" : "stable",
@@ -166,12 +163,11 @@
          "web" : "https://gitlab.com/djerius/alien-qhull"
       }
    },
-   "version" : "v8.0.2.1",
+   "version" : "v8.0.2.2",
    "x_alienfile" : {
       "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.32",
       "requires" : {
          "share" : {
-            "Alien::Build::Plugin::Gather::IsolateDynamic" : "0.48",
             "Alien::cmake3" : "0.02",
             "Archive::Tar" : "0",
             "Config" : "0",

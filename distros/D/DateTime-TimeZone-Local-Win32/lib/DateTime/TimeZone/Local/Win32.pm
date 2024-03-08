@@ -1,5 +1,5 @@
 package DateTime::TimeZone::Local::Win32;
-$DateTime::TimeZone::Local::Win32::VERSION = '2.05';
+$DateTime::TimeZone::Local::Win32::VERSION = '2.06';
 use 5.006;
 
 use strict;
@@ -136,7 +136,7 @@ sub EnvVars { return 'TZ' }
         'Morocco Standard Time'           => 'Africa/Casablanca',
         'Mountain'                        => 'America/Denver',
         'Mountain Standard Time'          => 'America/Denver',
-        'Mountain Standard Time (Mexico)' => 'America/Chihuahua',
+        'Mountain Standard Time (Mexico)' => 'America/Mazatlan',
         'Myanmar Standard Time'           => 'Asia/Rangoon',
         'N. Central Asia Standard Time'   => 'Asia/Novosibirsk',
         'Namibia Standard Time'           => 'Africa/Windhoek',
@@ -323,7 +323,7 @@ DateTime::TimeZone::Local::Win32 - Determine the local system's time zone on Win
 
 =head1 VERSION
 
-version 2.05
+version 2.06
 
 =head1 SYNOPSIS
 
@@ -401,7 +401,7 @@ Dave Rolsky <autarch@urth.org>
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (C) 2007-2014 Dave Rolsky <autarch@urth.org>
-Copyright (C) 2014-2021 by David Pinkowitz <dapink@cpan.org>
+Copyright (C) 2014-2024 by David Pinkowitz <dapink@cpan.org>
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1054,4 +1054,363 @@ class TestCase::TypeConversion {
     return 1;
   }
 
+  static method convert_string_to_byte : int () {
+    
+    {
+      my $string = (string)undef;
+      
+      my $num = (byte)$string;
+      
+      unless ($num == 0) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = (string)"";
+      
+      my $num = (byte)$string;
+      
+      unless ($num == 0) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = (string)Fn->BYTE_MAX;
+      
+      my $num = (byte)$string;
+      
+      unless ($num == Fn->BYTE_MAX) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = (string)(Fn->BYTE_MAX + 1);
+      
+      my $num = (byte)$string;
+      
+      unless ($num == Fn->BYTE_MAX) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = (string)(Fn->BYTE_MIN);
+      
+      my $num = (byte)$string;
+      
+      unless ($num == Fn->BYTE_MIN) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = (string)(Fn->BYTE_MIN - 1);
+      
+      my $num = (byte)$string;
+      
+      unless ($num == Fn->BYTE_MIN) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method convert_string_to_short : int () {
+    
+    {
+      my $string = (string)undef;
+      
+      my $num = (short)$string;
+      
+      unless ($num == 0) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = (string)"";
+      
+      my $num = (short)$string;
+      
+      unless ($num == 0) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = (string)Fn->SHORT_MAX;
+      
+      my $num = (short)$string;
+      
+      unless ($num == Fn->SHORT_MAX) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = (string)(Fn->SHORT_MAX + 1);
+      
+      my $num = (short)$string;
+      
+      unless ($num == Fn->SHORT_MAX) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = (string)(Fn->SHORT_MIN);
+      
+      my $num = (short)$string;
+      
+      unless ($num == Fn->SHORT_MIN) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = (string)(Fn->SHORT_MIN - 1);
+      
+      my $num = (short)$string;
+      
+      unless ($num == Fn->SHORT_MIN) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method convert_string_to_int : int () {
+    
+    {
+      my $string = (string)undef;
+      
+      my $num = (int)$string;
+      
+      unless ($num == 0) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = (string)"";
+      
+      my $num = (int)$string;
+      
+      unless ($num == 0) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = (string)"1A";
+      
+      my $num = (int)$string;
+      
+      unless ($num == 1) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = (string)Fn->INT_MAX;
+      
+      my $num = (int)$string;
+      
+      unless ($num == Fn->INT_MAX) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = (string)((long)Fn->INT_MAX + 1);
+      
+      my $num = (int)$string;
+      
+      unless ($num == Fn->INT_MAX) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = (string)(Fn->INT_MIN);
+      
+      my $num = (int)$string;
+      
+      unless ($num == Fn->INT_MIN) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = (string)((long)Fn->INT_MIN - 1);
+      
+      my $num = (int)$string;
+      
+      unless ($num == Fn->INT_MIN) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method convert_string_to_long : long () {
+    
+    {
+      my $string = (string)undef;
+      
+      my $num = (long)$string;
+      
+      unless ($num == 0) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = (string)"";
+      
+      my $num = (long)$string;
+      
+      unless ($num == 0) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = (string)Fn->LONG_MAX;
+      
+      my $num = (long)$string;
+      
+      unless ($num == Fn->LONG_MAX) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = (string)Fn->LONG_MIN;
+      
+      my $num = (long)$string;
+      
+      unless ($num == Fn->LONG_MIN) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method convert_string_to_float : float () {
+    
+    {
+      my $string = (string)undef;
+      
+      my $num = (float)$string;
+      
+      unless ($num == 0) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = (string)"";
+      
+      my $num = (float)$string;
+      
+      unless ($num == 0) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = (string)0.5;
+      
+      my $num = (float)$string;
+      
+      unless ($num == 0.5) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method convert_string_to_double : double () {
+    
+    {
+      my $string = (string)undef;
+      
+      my $num = (double)$string;
+      
+      unless ($num == 0) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = (string)"";
+      
+      my $num = (double)$string;
+      
+      unless ($num == 0) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = "2147483647.5";
+      
+      my $num = (double)$string;
+      
+      unless ($num == 2147483647.5) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method convert_string_to_byte_array : int () {
+    
+    {
+      my $string = (string)undef;
+      
+      my $byte_array = (byte[])$string;
+      
+      unless ($byte_array == undef) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = (string)"";
+      
+      my $byte_array = (byte[])$string;
+      
+      unless ($byte_array eq "") {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = (string)"abc";
+      
+      my $byte_array = (byte[])$string;
+      
+      if ($byte_array == $string) {
+        return 0;
+      }
+      
+      unless ($byte_array eq "abc") {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
 }

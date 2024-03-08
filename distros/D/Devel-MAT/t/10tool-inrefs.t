@@ -3,8 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Identity;
+use Test2::V0;
 
 use List::Util qw( pairgrep );
 
@@ -41,7 +40,7 @@ BEGIN { our @AofA = ( [] ); }
    is( ( grep { $_->name eq "element [0] via RV" } @av2_inrefs )[0]->sv, $av,
       '$av2 is referred to as element[0] via RV of $av' );
 
-   is_deeply( [ map { $_->sv } $av2->inrefs_indirect ], [ $av ],
+   is( [ map { $_->sv } $av2->inrefs_indirect ], [ $av ],
       '$av2->inrefs_indirect' );
 }
 

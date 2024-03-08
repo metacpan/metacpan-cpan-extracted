@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185942;
+our $VERSION = 1.20240308154348;
 
 my $formatters = [
                 {
@@ -53,7 +53,7 @@ my $validators = {
         ',
                 'mobile' => '
           (?:
-            4[0-6]|
+            4[0-7]|
             [56]\\d|
             9[013-9]
           )\\d{6}
@@ -65,53 +65,58 @@ my $validators = {
                 'voip' => '857[58]\\d{4}'
               };
 my %areanames = ();
-$areanames{fr} = {"2292029", "Départements\ Ouémé\/Plateau",
-"2292259", "Départements\ Mono\/Couffo\/Zou\/Collines",
-"2292249", "Départements\ Mono\/Couffo\/Zou\/Collines",
-"2292139", "Départements\ Littoral\/Atlantique",};
-$areanames{en} = {"2292255", "Savè",
-"2292025", "Pobè\/Kétou",
-"22924", "Tanguiéta",
-"2292251", "Bohicon",
-"2292021", "Ongala",
-"2292132", "Jéricho",
-"2292246", "Dogbo",
-"2292027", "Adjohoun",
-"2292363", "Kandi\/Gogounou\/Ségbana",
-"2292383", "Tanguiéta",
-"2292029", "Ouémé\/Plateau\ departments",
-"2292259", "Mono\/Kouffo\/Zou\/Collines\ departments",
-"2292130", "Cadjehoun",
-"2292134", "Ouidah",
-"2292241", "Lokossa",
-"2292026", "Sakété\/Igolo",
-"2292362", "Nikki\/Ndali",
-"2292382", "Natitingou",
-"2292133", "Akpakpa",
-"2292249", "Mono\/Kouffo\/Zou\/Collines\ departments",
-"2292380", "Djougou",
-"2292365", "Banikoara",
-"2292136", "Abomey\-Calaci",
-"2292361", "Parakou",
-"2292138", "Kouhounou",
-"2292367", "Malanville",
-"2292253", "Dassa\-Zoumé",
-"2292135", "Godomey",
-"2292252", "Covè",
-"2292131", "Ganhi",
-"2292022", "Kandiévé",
+$areanames{en} = {"2292024", "Sèmè",
 "2292137", "Allada",
-"2292254", "Savalou",
-"2292250", "Abomey",
-"2292024", "Sèmè",
+"2292131", "Ganhi",
+"2292246", "Dogbo",
+"2292026", "Sakété\/Igolo",
+"2292367", "Malanville",
+"2292249", "Mono\/Kouffo\/Zou\/Collines\ departments",
+"2292252", "Covè",
+"2292383", "Tanguiéta",
+"2292361", "Parakou",
+"2292029", "Ouémé\/Plateau\ departments",
+"2292130", "Cadjehoun",
+"2292021", "Ongala",
+"2292027", "Adjohoun",
+"2292241", "Lokossa",
+"2292255", "Savè",
+"2292134", "Ouidah",
 "2292139", "Littoral\/Atlantique\ departments",
-"2292243", "Come",};
+"2292382", "Natitingou",
+"2292253", "Dassa\-Zoumé",
+"2292136", "Abomey\-Calaci",
+"2292025", "Pobè\/Kétou",
+"2292380", "Djougou",
+"2292362", "Nikki\/Ndali",
+"2292251", "Bohicon",
+"2292132", "Jéricho",
+"2292138", "Kouhounou",
+"2292243", "Come",
+"2292250", "Abomey",
+"2292363", "Kandi\/Gogounou\/Ségbana",
+"2292254", "Savalou",
+"2292135", "Godomey",
+"22924", "Tanguiéta",
+"2292259", "Mono\/Kouffo\/Zou\/Collines\ departments",
+"2292022", "Kandiévé",
+"2292133", "Akpakpa",
+"2292365", "Banikoara",};
+$areanames{fr} = {"2292139", "Départements\ Littoral\/Atlantique",
+"2292249", "Départements\ Mono\/Couffo\/Zou\/Collines",
+"2292029", "Départements\ Ouémé\/Plateau",
+"2292259", "Départements\ Mono\/Couffo\/Zou\/Collines",};
+my $timezones = {
+               '' => [
+                       'Africa/Porto-Novo'
+                     ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+229|\D)//g;
-      my $self = bless({ country_code => '229', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '229', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
         return $self->is_valid() ? $self : undef;
     }
 1;

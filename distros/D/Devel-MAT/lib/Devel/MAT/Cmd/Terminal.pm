@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2018 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Cmd::Terminal 0.52;
+package Devel::MAT::Cmd::Terminal 0.53;
 
 use v5.14;
 use warnings;
@@ -53,6 +53,14 @@ sub Devel::MAT::Cmd::format_note
       bold    => 1,
       fgindex => $FG[$idx % 3],
    );
+}
+
+sub Devel::MAT::Cmd::_format_addr
+{
+   shift;
+   my ( $addr ) = @_;
+
+   return String::Tagged->new_tagged( sprintf( "%#x", $addr ), italic => 1 );
 }
 
 sub Devel::MAT::Cmd::_format_sv

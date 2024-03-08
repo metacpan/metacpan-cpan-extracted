@@ -16,7 +16,7 @@ use constant CFITSIO_VERSION => '4.4.0';
 # allow tweaks for testing.
 # DON'T USE THIS UNLESS YOU LIKE TO PUT YOUR HAND ON A HOT STOVE.
 
-use constant { map { uc($_) => $_ } 'exact_version', 'atleast_version' };
+use constant ( { map { uc($_) => $_ } 'exact_version', 'atleast_version' } );
 
 my %VersionMatchEnvs = (
     ALIEN_CFITSIO_EXACT_VERSION => EXACT_VERSION,

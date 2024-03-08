@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185942;
+our $VERSION = 1.20240308154348;
 
 my $formatters = [
                 {
@@ -116,98 +116,103 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"3210", "Wavre",
-"3211", "Hasselt",
-"323", "Antwerp",
-"322", "Brussels",
-"3253", "Aalst",
-"3219", "Waremme",
-"3252", "Dendermonde",
-"3286", "Durbuy",
-"3265", "Mons",
-"3284", "Marche\-en\-Famenne",
-"3285", "Huy",
-"3257", "Ypres",
-"3259", "Ostend",
-"3212", "Tongeren",
-"3264", "La\ Louvière",
-"3268", "Ath",
-"329", "Ghent",
-"3251", "Roeselare",
-"3213", "Diest",
-"3250", "Bruges",
-"3283", "Ciney",
-"3263", "Arlon",
-"3214", "Herentals",
-"3282", "Dinant",
-"3215", "Mechelen",
-"3256", "Kortrijk",
-"3255", "Ronse",
-"3216", "Leuven",
-"3287", "Verviers",
-"3243", "Liège",
-"3289", "Genk",
-"3267", "Nivelles",
-"3269", "Tournai",
-"3254", "Ninove",
-"3258", "Veurne",
-"3280", "Stavelot",
-"3261", "Libramont\-Chevigny",
-"3271", "Charleroi",
-"3281", "Namur",
-"3260", "Chimay",
-"3242", "Liège",};
-$areanames{fr} = {"3216", "Louvain",
-"3255", "Renaix",
-"3258", "Furnes",
-"3215", "Malines",
-"3256", "Courtrai",
+$areanames{de} = {"3250", "Brügge",
 "3259", "Ostende",
+"3243", "Lüttich",
+"3265", "Bergen",
+"323", "Antwerpen",
+"3242", "Lüttich",
+"3257", "Ypern",
+"3281", "Namür",
+"3215", "Mecheln",
+"3216", "Löwen",
+"322", "Brüssel",
+"329", "Gent",
+"3212", "Tongern",
+"3280", "Stablo",
+"3263", "Arel",};
+$areanames{nl} = {"3263", "Aarlen",
+"329", "Gent",
+"322", "Brussel",
+"3285", "Hoei",
+"3281", "Namen",
+"3269", "Doornik",
+"3268", "Aat",
+"3257", "Ieper",
+"3242", "Luik",
+"3219", "Borgworm",
+"3243", "Luik",
+"323", "Antwerpen",
+"3265", "Bergen",
+"3259", "Oostende",
+"3267", "Nijvel",
+"3250", "Brugge",
+"3210", "Waver",};
+$areanames{fr} = {"329", "Gand",
 "3212", "Tongres",
-"329", "Gand",
+"3252", "Termonde",
 "3251", "Roulers",
-"323", "Anvers",
 "3253", "Alost",
 "322", "Bruxelles",
-"3252", "Termonde",};
-$areanames{de} = {"3280", "Stablo",
-"3242", "Lüttich",
-"3281", "Namür",
-"3243", "Lüttich",
-"3216", "Löwen",
-"3215", "Mecheln",
-"3263", "Arel",
-"329", "Gent",
-"3250", "Brügge",
-"3265", "Bergen",
-"3212", "Tongern",
+"3216", "Louvain",
+"3256", "Courtrai",
+"3215", "Malines",
+"3255", "Renaix",
+"323", "Anvers",
 "3259", "Ostende",
-"3257", "Ypern",
-"322", "Brüssel",
-"323", "Antwerpen",};
-$areanames{nl} = {"3267", "Nijvel",
-"3269", "Doornik",
-"3243", "Luik",
-"3281", "Namen",
-"3242", "Luik",
-"3263", "Aarlen",
-"3285", "Hoei",
-"3257", "Ieper",
-"3259", "Oostende",
-"3265", "Bergen",
-"3250", "Brugge",
-"3268", "Aat",
-"329", "Gent",
-"323", "Antwerpen",
-"322", "Brussel",
-"3210", "Waver",
-"3219", "Borgworm",};
+"3258", "Furnes",};
+$areanames{en} = {"3216", "Leuven",
+"3284", "Marche\-en\-Famenne",
+"3287", "Verviers",
+"3256", "Kortrijk",
+"3253", "Aalst",
+"322", "Brussels",
+"3251", "Roeselare",
+"3211", "Hasselt",
+"3285", "Huy",
+"3213", "Diest",
+"3280", "Stavelot",
+"3212", "Tongeren",
+"329", "Ghent",
+"3252", "Dendermonde",
+"3263", "Arlon",
+"3289", "Genk",
+"3261", "Libramont\-Chevigny",
+"3267", "Nivelles",
+"3264", "La\ Louvière",
+"3250", "Bruges",
+"3282", "Dinant",
+"3258", "Veurne",
+"3210", "Wavre",
+"323", "Antwerp",
+"3265", "Mons",
+"3243", "Liège",
+"3219", "Waremme",
+"3259", "Ostend",
+"3268", "Ath",
+"3214", "Herentals",
+"3254", "Ninove",
+"3260", "Chimay",
+"3242", "Liège",
+"3257", "Ypres",
+"3286", "Durbuy",
+"3269", "Tournai",
+"3283", "Ciney",
+"3215", "Mechelen",
+"3281", "Namur",
+"3255", "Ronse",
+"3271", "Charleroi",};
+my $timezones = {
+               '' => [
+                       'Europe/Brussels'
+                     ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+32|\D)//g;
-      my $self = bless({ country_code => '32', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '32', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
       $self = bless({ country_code => '32', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);

@@ -1,5 +1,19 @@
 Revision history for Perl module HTTP::Session
 
+0.53 2024-03-07T05:47:13Z
+
+   - version up to fix PUUSE indexing problem.
+
+0.52 2024-03-07T04:47:45Z
+
+   - Separate HTTP::Session::Expired & HTTP::Session::Finalized
+     from HTTP::Session to fix PAUSE indexing problem(reported by eserte)
+
+0.51 2024-03-07T03:51:20Z
+
+   - Fix regexp in test for cookie expires date format
+     according to changes of CGI.pm v5.48 (ktat)
+
 0.50 2020-02-13T14:31:27Z
 
     - enable to set httponly and samesite cookie options.

@@ -21,7 +21,7 @@ recursive_author_tests('xt');
 requires 'Class::Utils' => 0;
 requires 'Error::Pure' => 0;
 requires 'Scalar::Util' => 0;
-requires 'Tags::HTML' => 0.04;
+requires 'Tags::HTML' => 0.06;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Tags-HTML-Element/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Tags-HTML-Element';
 resources 'repository' => 'git://github.com/michal-josef-spacek/Tags-HTML-Element';
@@ -40,7 +40,7 @@ test_requires 'Test::MockObject' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.08';
+version '0.09';
 
 # Run.
 WriteAll();

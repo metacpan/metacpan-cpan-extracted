@@ -19,7 +19,6 @@ configure_requires:
   Alien::Build: '2.3901'
   Alien::Build::MM: '0.32'
   Alien::Build::Plugin::Build::CMake: '0.99'
-  Alien::Build::Plugin::PkgConfig::Negotiate: '1.53'
   ExtUtils::MakeMaker: '6.52'
   Sort::Versions: '0'
   perl: '5.012'
@@ -41,10 +40,10 @@ no_index:
 provides:
   Alien::Qhull:
     file: lib/Alien/Qhull.pm
-    version: v8.0.2.1
+    version: v8.0.2.2
   Alien::Qhull::Install::Files:
     file: lib/Alien/Qhull/Install/Files.pm
-    version: v8.0.2.1
+    version: v8.0.2.2
 requires:
   Alien::Base: '0'
   base: '0'
@@ -54,12 +53,11 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Alien-Qhull
   repository: https://gitlab.com/djerius/alien-qhull.git
-version: v8.0.2.1
+version: v8.0.2.2
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:
     share:
-      Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'
       Alien::cmake3: '0.02'
       Archive::Tar: '0'
       Config: '0'

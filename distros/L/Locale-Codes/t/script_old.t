@@ -6,6 +6,7 @@ use Test::Inter;
 $::t = undef;
 $::t = new Test::Inter $0;
 require "do_tests.pl";
+do_tests();
 
 # Local Variables:
 # mode: cperl

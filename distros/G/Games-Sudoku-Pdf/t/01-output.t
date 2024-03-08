@@ -5,6 +5,7 @@ use warnings;
 use Test::More tests => 5;
 
 use Games::Sudoku::Pdf;
+#diag 'API2: ', $PDF::API2::VERSION, ', Table: ', $PDF::Table::VERSION;
 
 my %params = (
   author          => 'Test::More',
@@ -35,10 +36,10 @@ while (<DATA>) {
 my $page_count = $pdf_obj->can('page_count') ? $pdf_obj->page_count() : $pdf_obj->pages();
 is($page_count, 2, "page count"); 
 
-my ($head) = ($pdf_obj->can('to_string') ? $pdf_obj->to_string() : $pdf_obj->stringify() =~ /^(.+?)>> stream/s);
+my ($head) = (($pdf_obj->can('to_string') ? $pdf_obj->to_string() : $pdf_obj->stringify()) =~ /^(.+?)>> stream/s);
 
 like($head, qr/^%PDF-1\.4/, "magic number"); 
-like($head, qr/\/CreationDate \(D:[0-9]{14}[-+Z]/, "creation date"); 
+like($head, qr/\/CreationDate \(D:[0-9]{14}(Z|[-+]\d\d'\d\d'?)\)/, "creation date"); 
 like($head, qr/\/Author \($params{author}\)/, "meta author"); 
 
 __DATA__

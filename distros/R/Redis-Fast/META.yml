@@ -18,7 +18,7 @@ configure_requires:
   Module::Build: '0.4005'
   Module::Build::XSUtil: '0.02'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.21, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -38,7 +38,7 @@ no_index:
 provides:
   Redis::Fast:
     file: lib/Redis/Fast.pm
-    version: '0.36'
+    version: '0.37'
   Redis::Fast::Hash:
     file: lib/Redis/Fast/Hash.pm
   Redis::Fast::List:
@@ -48,12 +48,12 @@ provides:
 requires:
   Time::HiRes: '1.77'
   Try::Tiny: '0'
-  perl: '5.012000'
+  perl: '5.014000'
 resources:
   bugtracker: https://github.com/shogo82148/Redis-Fast/issues
   homepage: https://github.com/shogo82148/Redis-Fast
   repository: https://github.com/shogo82148/Redis-Fast.git
-version: '0.36'
+version: '0.37'
 x_contributors:
   - 'Aaron Crane <arc@aaroncrane.co.uk>'
   - 'Aaron Crane <arc@cpan.org>'
@@ -83,11 +83,13 @@ x_contributors:
   - 'Steffen Mueller <smueller@cpan.org>'
   - 'Syohei YOSHIDA <syohex@gmail.com>'
   - 'Thiago Berlitz Rondon <thiago.rondon@gmail.com>'
+  - 'Thomas Koeck <126570154+thomas-netcraft@users.noreply.github.com>'
   - 'U-LIFEBOOK\Administrator <Administrator@LIFEBOOK.(none)>'
   - 'Ulrich Habel <rhaen@cpan.org>'
   - 'Victor <victor@vsespb.ru>'
   - 'Vincent <vincent@weborama.com>'
   - 'Volker Kroll <vkroll@allein-zu-haus.de>'
+  - 'William Seddon <wsddn@users.noreply.github.com>'
   - 'Xavier Guimard <x.guimard@free.fr>'
   - 'Zugschlus <mh+github201409@zugschlus.de>'
   - 'bj5004 <bartosz.jakubski@hurra.com>'

@@ -30,11 +30,11 @@ die Data::Roundtrip::perl2dump(\%params)."\ncall to Image::DecodeQR::WeChat::dec
 print "\n$0 : results (payloads and their bounding boxes):\n".Data::Roundtrip::perl2dump($ret);
 
 sub	usage {
-	print "Usage : $0 <options>\noptions:\n"
+	print "Usage : $0 <options>\nwhere options are:\n"
 ."  --input F : the filename of the input image which supposedly contains QR codes to be detected.\n"
 ."  --modelsdir M : optionally use your own models contained in this directory instead of the ones this program was shipped with.\n"
 ."  --outbase O : basename for all output files (if any, depending on whether --dumpqrimagestofile is on).\n"
-."  --verbosity L : verbose level, 0:mute, 1:C code, 10:C+XS code.\n"
+."  --verbosity L : verbosity level, 0:mute, 1:C code, 10:C+XS code.\n"
 ."  --graphicaldisplayresult : display a graphical window with input image and QR codes outlined. Using --dumpqrimagestofile and specifying --outbase, images and payloads and bounding boxes will be saved to files, if you do not have graphical interface.\n"
 ."  --dumpqrimagestofile : it has effect only of --outbase was specified. Payloads, Bounding Boxes and images of each QR-code detected will be saved in separate files.\n"
 ."\n\nThe STDOUT output contains a payload and its matching bounding box (of 4 coordinates).\n"

@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185945;
+our $VERSION = 1.20240308154351;
 
 my $formatters = [
                 {
@@ -62,38 +62,75 @@ my $validators = {
                 'voip' => '3[89]\\d{4}'
               };
 my %areanames = ();
-$areanames{en} = {"29936", "Nuuk",
-"29985", "Sisimiut",
-"29991", "Qasigannguit",
-"29999", "Ittoqqortoormiit",
-"29934", "Nuuk",
-"299691", "Ivittuut",
-"29996", "Upernavik",
-"29931", "Nuuk",
-"29987", "Kangaatsiaq",
-"29994", "Ilulissat",
-"29968", "Paamiut",
-"29966", "Narsaq",
-"29937", "Nuuk",
-"29989", "Aasiaat",
-"29981", "Maniitsoq",
-"29998", "Tasiilaq",
-"29995", "Uummannaq",
+$areanames{en} = {"29964", "Qaqortoq",
 "29932", "Nuuk",
-"29964", "Qaqortoq",
+"29991", "Qasigannguit",
+"29998", "Tasiilaq",
+"29934", "Nuuk",
+"29981", "Maniitsoq",
+"29995", "Uummannaq",
 "29933", "Nuuk",
-"29961", "Nanortalik",
-"29984", "Kangerlussuaq",
 "29997", "Qaanaaq",
-"29986", "Sisimiut",
+"29966", "Narsaq",
+"29936", "Nuuk",
+"29985", "Sisimiut",
+"29987", "Kangaatsiaq",
+"29968", "Paamiut",
+"299691", "Ivittuut",
 "29992", "Qeqertasuaq",
-"29935", "Nuuk",};
+"29984", "Kangerlussuaq",
+"29931", "Nuuk",
+"29994", "Ilulissat",
+"29961", "Nanortalik",
+"29937", "Nuuk",
+"29999", "Ittoqqortoormiit",
+"29935", "Nuuk",
+"29986", "Sisimiut",
+"29996", "Upernavik",
+"29989", "Aasiaat",};
+my $timezones = {
+               '' => [
+                       'America/Godthab',
+                       'America/Scoresbysund',
+                       'America/Thule'
+                     ],
+               '1' => [
+                        'America/Godthab'
+                      ],
+               '2' => [
+                        'America/Godthab'
+                      ],
+               '3' => [
+                        'America/Godthab'
+                      ],
+               '4' => [
+                        'America/Godthab'
+                      ],
+               '5' => [
+                        'America/Godthab'
+                      ],
+               '6' => [
+                        'America/Godthab'
+                      ],
+               '8' => [
+                        'America/Godthab'
+                      ],
+               '9' => [
+                        'America/Godthab'
+                      ],
+               '97' => [
+                         'America/Thule'
+                       ],
+               '99' => [
+                         'America/Scoresbysund'
+                       ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+299|\D)//g;
-      my $self = bless({ country_code => '299', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '299', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
         return $self->is_valid() ? $self : undef;
     }
 1;

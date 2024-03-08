@@ -190,7 +190,7 @@ sub get_template_path {
 		return $self->{_filename};
 	}
 
-	my $dir = $self->{_config}->{rootdir} || $self->{_info}->rootdir();
+	my $dir = $self->{_config}->{root_dir} || $self->{_info}->root_dir();
 	if($self->{_logger}) {
 		$self->{_logger}->debug("Rootdir: $dir");
 		$self->{_logger}->debug(Data::Dumper->new([$self->{_config}])->Dump());

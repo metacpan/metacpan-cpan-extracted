@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Outrefs 0.52;
+package Devel::MAT::Tool::Outrefs 0.53;
 
 use v5.14;
 use warnings;
@@ -14,6 +14,11 @@ use List::UtilsBy qw( sort_by );
 =head1 NAME
 
 C<Devel::MAT::Tool::Outrefs> - show SVs referred to by a given SV
+
+=head1 DESCRIPTION
+
+This C<Devel::MAT> tool provides a command to list the other SVs that a given
+SV retains a reference to.
 
 =head1 COMANDS
 

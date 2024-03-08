@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185942;
+our $VERSION = 1.20240308154348;
 
 my $formatters = [
                 {
@@ -89,36 +89,41 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"2262541", "Léo\/Sapouy",
-"2262098", "Bobo\-Dioulasso",
-"2262096", "Orodara",
-"2262471", "Tenkodogo",
-"2262099", "Béréba\/Fo\/Houndé",
-"2262097", "Bobo\-Dioulasso",
-"2262454", "Yako",
+$areanames{en} = {"2262098", "Bobo\-Dioulasso",
+"2262540", "Pô\/Kombissiri\/Koubri",
+"2262456", "Djibo",
+"2262470", "Pouytenga\/Koupéla",
+"2262052", "Dédougou",
+"2262544", "Koudougou",
 "2262091", "Banfora",
+"2262097", "Bobo\-Dioulasso",
+"2262455", "Ouahigouya",
+"2262454", "Yako",
+"226253", "Ouagadougou",
 "2262479", "Kantchari",
 "2262477", "Fada\/Diabo",
-"2262090", "Gaoua",
-"226254", "Ouagadougou",
-"2262470", "Pouytenga\/Koupéla",
-"2262455", "Ouahigouya",
-"2262446", "Falagountou\/Dori",
 "2262053", "Boromo\/Djibasso\/Nouna",
-"226253", "Ouagadougou",
-"2262449", "Falagountou\/Dori",
-"2262052", "Dédougou",
-"2262456", "Djibo",
-"2262544", "Koudougou",
-"2262540", "Pô\/Kombissiri\/Koubri",
+"2262471", "Tenkodogo",
 "226204", "Kaya",
+"2262096", "Orodara",
+"2262449", "Falagountou\/Dori",
+"2262541", "Léo\/Sapouy",
+"2262099", "Béréba\/Fo\/Houndé",
+"2262446", "Falagountou\/Dori",
+"226254", "Ouagadougou",
+"2262090", "Gaoua",
 "2262445", "Kaya",};
+my $timezones = {
+               '' => [
+                       'Africa/Ouagadougou'
+                     ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+226|\D)//g;
-      my $self = bless({ country_code => '226', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '226', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
         return $self->is_valid() ? $self : undef;
     }
 1;

@@ -9,7 +9,7 @@ use experimental 'signatures', 'lexical_subs', 'declared_refs';
 use Ref::Util qw( is_arrayref is_hashref );
 use Log::Any '$log';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Qhull::Util::Options ':all';
 
@@ -28,15 +28,15 @@ my sub parse_output_vertices;
 my %Parser = (
     f => {
         func => \&parse_output_facets,
-        key  => 'f',
     },
     p => {
         func => \&parse_output_vertices,
-        key  => 'p',
     },
     Fx => {
         func => \&parse_extreme_points,
-        key  => 'e',
+    },
+    FS => {
+        func => \&parse_size,
     },
 );
 
@@ -314,6 +314,99 @@ sub parse_extreme_points( $option, $buf_ref, $line_no ) {
 
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sub parse_size( $option, $buf_ref, $line_no ) {
+    my \$buffer = $buf_ref;
+
+    ## no critic (RegularExpressions::ProhibitCaptureWithoutTest)
+
+    croak( "end of data in qhull output at line $line_no" )
+      if $buffer !~ /$qr_Record \n/gx;
+
+    my %results;
+
+    my $contents = $1;
+    my @ints     = $contents =~ /\G\h* ($Int) \h*/gxc;
+    @ints
+      or
+      croak( "out of sync in qhull output at line $line_no;" . " expected an integer, got: $contents",
+      );
+
+    $contents =~ /\G\h*$/gcx
+      or croak( "junk at end of line $line_no: " . substr( $contents, pos( $contents ) ) );
+
+    my $nints = shift @ints;
+    $nints == @ints
+      or croak( "expected $nints integers; got " . @ints );
+
+    ++$line_no;
+
+    croak( "end of data in qhull output at line $line_no" )
+      if $buffer !~ /$qr_Record \n/gx;
+
+    ## no critic (RegularExpressions::ProhibitUnusedCapture)
+    if ( ( $contents = $1 ) !~ /\h* ($Int) \h*/gx ) {
+        croak( "out of sync in qhull output at line $line_no;" . " expected an integer, got: $contents", );
+    }
+
+    my $nelem = $1;
+
+    my @reals = $contents =~ /\G\h* ($Num) \h*/cgmx;
+
+    $contents =~ /\G\h*$/gcx
+      or croak( "junk at end of line $line_no: " . substr( $contents, pos( $contents ) ) );
+
+    @reals
+      or croak(
+        sprintf(
+            'out of sync in qhull output at line %d; expected %d real numbers, got: %s',
+            $line_no, $nelem, substr( $contents, pos( $contents ) ) ) );
+    $nelem == @reals
+      or croak( sprintf( 'expected %d real numbers at line %d; got %d', $nelem, $line_no, 0+ @reals ) );
+
+    @results{ 'area', 'volume' } = @reals;
+
+    if ( $option->{trace} ) {
+        $results{line_no} = {
+            area   => $line_no,
+            volume => $line_no,
+        };
+    }
+
+    ++$line_no;
+    return $line_no, \%results;
+}
+
 1;
 
 #
@@ -338,7 +431,7 @@ Qhull::Util - Various bits and pieces
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -441,6 +534,34 @@ returned as well as the parsed data.
 B<@indices> is an array of indices, one per extreme point.  If
 the B<trace> option is specified, the elements in B<@indices> are array refs,
 with the first element the line number in the output the indices were parsed from.
+
+=head2 parse_size
+
+  ( $line_no, \%sizes ) = parse_size( \%option, \$buffer, $line_no );
+
+Parse C<FS> (size) formatted output.  B<pos($buffer)> must be the
+offset into B<$buffer> where the data start.  B<$line_no> is the line
+number corresponding to that offset.  The updated line number is
+returned as well as the parsed data.
+
+B<\%size> is a hash with the following entries:
+
+=over
+
+=item * area
+
+=item * volume
+
+=item *
+
+line_no - only present if the trace option is set;
+
+=back
+
+If the B<trace> option is specified, then there will be an additional
+entry B<line_no> which is a hash keyed off of the names of the other
+attributes, whose values are the line numbers in the input they
+appear on.
 
 =head1 SUPPORT
 

@@ -19,16 +19,22 @@ use Term::ANSIColor;
 use Time::HiRes qw(time);
 use File::Basename;
 
-use Data::Dumper; # Included in Perl
-eval {    # Data::Dumper::Simple is preferred.  Try to load it without dying.
+use Data::Dumper;    # Included in Perl
+eval {               # Data::Dumper::Simple is preferred.  Try to load it without dying.
     require Data::Dumper::Simple;
     Data::Dumper::Simple->import();
     1;
 };
 
-$Data::Dumper::Sortkeys = TRUE;
-$Data::Dumper::Purity   = TRUE;
-$Data::Dumper::Deparse  = TRUE;
+$Data::Dumper::Terse         = TRUE;
+$Data::Dumper::Indent        = TRUE;
+$Data::Dumper::Useqq         = TRUE;
+$Data::Dumper::Deparse       = TRUE;
+$Data::Dumper::Quotekeys     = TRUE;
+$Data::Dumper::Trailingcomma = TRUE;
+$Data::Dumper::Sortkeys      = TRUE;
+$Data::Dumper::Purity        = TRUE;
+$Data::Dumper::Deparse       = TRUE;
 
 use Config;
 use threads;
@@ -37,7 +43,7 @@ BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION = '2.13';
+    our $VERSION = '2.14';
 
     # Inherit from Exporter to export functions and variables
     our @ISA = qw(Exporter);
@@ -339,7 +345,7 @@ sub new {
         'Color'              => TRUE,                                                                # Default to colorized output
         'DateStamp'          => colored(['yellow'], '%date%'),
         'TimeStamp'          => colored(['yellow'], '%time%'),
-        'Epoch'              => colored(['cyan'],   '%epoch%'),
+        'Epoch'              => colored(['cyan'], '%epoch%'),
         'Padding'            => -20,                                                                 # Default padding is 20 spaces
         'Lines-Padding'      => -2,
         'Subroutine-Padding' => 0,
@@ -369,7 +375,7 @@ sub new {
             # This fixes a documentation error for past versions
             if ($upper eq 'LOGLEVEL') {
                 $self->{$upper} = 'ERR' if ($self->{$upper} =~ /^ERROR$/i);
-                $self->{$upper} = uc($self->{$upper});                        # Make loglevels case insensitive
+                $self->{$upper} = uc($self->{$upper});    # Make loglevels case insensitive
             }
             delete($self->{$Key});
         } elsif ($Key eq 'LOGLEVEL') {    # Make loglevels case insensitive
@@ -473,7 +479,7 @@ sub debug {
                 $package = $array[0];
                 my $subroutine = $array[3];
                 $subroutine =~ s/^$package\:\://;
-                $sname      =~ s/$subroutine//;
+                $sname =~ s/$subroutine//;
                 if ($sname eq '') {
                     $sname = ($subroutine ne '') ? $subroutine : $package;
                     $cline = $array[2];
@@ -490,7 +496,7 @@ sub debug {
             $count++;
         } ## end while (my @array = caller...)
         if ($package ne '') {
-            $sname  = $package . '::' . $sname;
+            $sname = $package . '::' . $sname;
             $nested = ' ' x $nest if ($nest);
         } else {
             my @array = caller(1);
@@ -503,15 +509,15 @@ sub debug {
             $sline = $cline;
             $short = $sname;
         } ## end else [ if ($package ne '') ]
-        $subroutine                   = ($sname ne '') ? $sname : 'main';
+        $subroutine = ($sname ne '') ? $sname : 'main';
         $self->{'PADDING'}            = 0 - length($subroutine) if (length($subroutine) > abs($self->{'PADDING'}));
         $self->{'LINES-PADDING'}      = 0 - length($cline)      if (length($cline) > abs($self->{'LINES-PADDING'}));
         $self->{'SUBROUTINE-PADDING'} = 0 - length($short)      if (length($short) > abs($self->{'SUBROUTINE-PADDING'}));
         $self->{'LINE-PADDING'}       = 0 - length($sline)      if (length($sline) > abs($self->{'LINE-PADDING'}));
-        $cline                        = sprintf('%' . $self->{'LINES-PADDING'} . 's', $cline);
-        $subroutine                   = colored(['bold cyan'], sprintf('%' . $self->{'PADDING'} . 's', $subroutine));
-        $sline                        = sprintf('%' . $self->{'LINE-PADDING'} . 's', $sline);
-        $short                        = colored(['bold cyan'], sprintf('%' . $self->{'SUBROUTINE-PADDING'} . 's', $short));
+        $cline = sprintf('%' . $self->{'LINES-PADDING'} . 's', $cline);
+        $subroutine = colored(['bold cyan'], sprintf('%' . $self->{'PADDING'} . 's', $subroutine));
+        $sline = sprintf('%' . $self->{'LINE-PADDING'} . 's', $sline);
+        $short = colored(['bold cyan'], sprintf('%' . $self->{'SUBROUTINE-PADDING'} . 's', $short));
     } ## end if ($self->{'PREFIX'} ...)
 
     # Figure out the benchmarks, but only if it is in the prefix
@@ -519,10 +525,10 @@ sub debug {
 
         # For multiline output, only output the bench data on the first line.  Use padded spaces for the rest.
         #        $thisBench  = sprintf('%7s', sprintf(' %.02f', time - $self->{$level . '_LASTSTAMP'}));
-        $thisBench  = sprintf('%7s', sprintf(' %.02f', time - $self->{'ANY_LASTSTAMP'}));
+        $thisBench = sprintf('%7s', sprintf(' %.02f', time - $self->{'ANY_LASTSTAMP'}));
         $thisBench2 = ' ' x length($thisBench);
     } ## end if ($self->{'PREFIX'} ...)
-    my $first = TRUE;                # Set the first line flag.
+    my $first = TRUE;    # Set the first line flag.
     foreach my $msg (@messages) {    # Loop through each line of output and format accordingly.
         if (ref($msg) ne '') {
             $msg = Dumper($msg);
@@ -542,7 +548,7 @@ sub debug {
     $self->{ $level . '_LASTSTAMP' } = time;
 } ## end sub debug
 
-sub _send_to_logger {    # This actually simplifies the previous method ... seriously
+sub _send_to_logger {      # This actually simplifies the previous method ... seriously
     my $self       = shift;
     my $level      = shift;
     my $padding    = shift;
@@ -559,12 +565,12 @@ sub _send_to_logger {    # This actually simplifies the previous method ... seri
     my $dt       = DateTime->now('time_zone' => $timezone);
     my $Date     = $dt->ymd();
     my $Time     = $dt->hms();
-    my $prefix   = $self->{ $level . '-PREFIX' } . '';                                # A copy not a pointer
+    my $prefix   = $self->{ $level . '-PREFIX' } . '';        # A copy not a pointer
     my $forked   = ($PARENT ne $$) ? 'C' : 'P';
     my $threaded = 'PT-';
     my $epoch    = time;
 
-    if (exists($Config{'useithreads'}) && $Config{'useithreads'}) {                   # Do eval so non-threaded perl's don't whine
+    if (exists($Config{'useithreads'}) && $Config{'useithreads'}) {    # Do eval so non-threaded perl's don't whine
         eval(
             q(
 				my $tid   = threads->tid();

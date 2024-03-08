@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2013-2024 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Dumpfile 0.52;
+package Devel::MAT::Dumpfile 0.53;
 
 use v5.14;
 use warnings;
@@ -31,11 +31,9 @@ C<Devel::MAT::Dumpfile> - load and analyse a heap dump file
 
 =head1 SYNOPSIS
 
- use Devel::MAT::Dumpfile;
+   use Devel::MAT::Dumpfile;
 
- my $df = Devel::MAT::Dumpfile->load( "path/to/the/file.pmat" );
-
- TODO
+   my $df = Devel::MAT::Dumpfile->load( "path/to/the/file.pmat" );
 
 =head1 DESCRIPTION
 
@@ -125,7 +123,7 @@ foreach (
 
 =head2 load
 
-   $df = Devel::MAT::Dumpfile->load( $path, %args )
+   $df = Devel::MAT::Dumpfile->load( $path, %args );
 
 Loads a heap dump file from the given path, and returns a new
 C<Devel::MAT::Dumpfile> instance representing it.
@@ -188,10 +186,8 @@ sub load
 
    $self->_read_u8 == 0 or die "Cannot read $path - format version major unrecognised";
 
-   # minor version 5 is the still-experimental support for feature-class
-   ( $self->{format_minor} = $self->_read_u8 ) <= 5 or
+   ( $self->{format_minor} = $self->_read_u8 ) <= 6 or
       die "Cannot read $path - format version minor unrecognised ($self->{format_minor})";
-   warnings::warnif experimental => "Support for PMAT file format v0.5 is experimental" if $self->{format_minor} == 5;
 
    if( $self->{format_minor} < 1 ) {
       warn "Loading an earlier format of dumpfile - SV MAGIC annotations may be incorrect\n";
@@ -495,6 +491,13 @@ sub _read_sv
          $sv->load( $structtype->fields );
       }
       else {
+         # Values 16=OBJECT and 17=CLASS should warn.
+         # Technically a padname with the field CODEx extension on it should
+         # also warn but in practice we shouldn't see one of those outside of
+         # a class that would have warned first anyway.
+         $type >= 16 and !$self->{warned_experimental_class}++ and
+            warnings::warnif experimental => "Support for class features in PMAT file is experimental";
+
          my ( $bytes, $nptrs, $nstrs ) = @{ $self->{sv_sizes}[$type] };
          $sv->load(
             $self->_read_bytesptrsstrs( $bytes, $nptrs, $nstrs )
@@ -586,6 +589,21 @@ sub _read_svx_88
    $sv->_debugdata( $serial, $line, $file );
 }
 
+sub _read_svx_89
+{
+   my $self = shift;
+   my ( $sv, $bytes, $ptrs, $strs ) = @_;
+
+   my ( $shared_hek ) = unpack "$self->{ptr_fmt}", $bytes;
+
+   if( $sv->type eq "SCALAR" ) {
+      $sv->_set_shared_hek_at( $shared_hek );
+   }
+   else {
+      warn sprintf "Ignoring SVxSHARED_HEK on non-SCALAR SV addr=%#x\n", $sv->addr;
+   }
+}
+
 sub _read_ctx
 {
    my $self = shift;
@@ -615,7 +633,7 @@ sub _read_ctx
 
 =head2 perlversion
 
-   $version = $df->perlversion
+   $version = $df->perlversion;
 
 Returns the version of perl that the heap dump file was created by, as a
 string in the form C<5.14.2>.
@@ -631,7 +649,7 @@ sub perlversion
 
 =head2 endian
 
-   $endian = $df->endian
+   $endian = $df->endian;
 
 Returns the endian direction of the perl that the heap dump was created by, as
 either C<big> or C<little>.
@@ -646,7 +664,7 @@ sub endian
 
 =head2 uint_len
 
-   $len = $df->uint_len
+   $len = $df->uint_len;
 
 Returns the length in bytes of a uint field of the perl that the heap dump was
 created by.
@@ -661,7 +679,7 @@ sub uint_len
 
 =head2 ptr_len
 
-   $len = $df->ptr_len
+   $len = $df->ptr_len;
 
 Returns the length in bytes of a pointer field of the perl that the heap dump
 was created by.
@@ -676,7 +694,7 @@ sub ptr_len
 
 =head2 nv_len
 
-   $len = $df->nv_len
+   $len = $df->nv_len;
 
 Returns the length in bytes of a double field of the perl that the heap dump
 was created by.
@@ -691,7 +709,7 @@ sub nv_len
 
 =head2 ithreads
 
-   $ithreads = $df->ithreads
+   $ithreads = $df->ithreads;
 
 Returns a boolean indicating whether ithread support was enabled in the perl
 that the heap dump was created by.
@@ -706,20 +724,20 @@ sub ithreads
 
 =head2 roots
 
-   %roots = $df->roots
+   %roots = $df->roots;
 
 Returns a key/value pair list giving the names and SVs at each of the roots.
 
 =head2 roots_strong
 
-   %roots = $df->roots_strong
+   %roots = $df->roots_strong;
 
 Returns a key/value pair list giving the names and SVs at each of the roots
 that count as strong references.
 
 =head2 roots_weak
 
-   %roots = $df->roots_weak
+   %roots = $df->roots_weak;
 
 Returns a key/value pair list giving the names and SVs at each of the roots
 that count as strong references.
@@ -755,7 +773,7 @@ sub roots_weak
 
 =head2 ROOTS
 
-   $sv = $df->ROOT
+   $sv = $df->ROOT;
 
 For each of the root names given below, a method exists with that name which
 returns the SV at that root:
@@ -794,7 +812,7 @@ returns the SV at that root:
 
 =head2 root_descriptions
 
-   %rootdescs = $df->root_descriptions
+   %rootdescs = $df->root_descriptions;
 
 Returns a key/value pair list giving the (method) name and description text of
 each of the possible roots.
@@ -812,7 +830,7 @@ sub root_descriptions
 
 =head2 root_at
 
-   $addr = $df->root_at( $name )
+   $addr = $df->root_at( $name );
 
 Returns the SV address of the given named root.
 
@@ -828,7 +846,7 @@ sub root_at
 
 =head2 root
 
-   $sv = $df->root( $name )
+   $sv = $df->root( $name );
 
 Returns the given root SV.
 
@@ -843,7 +861,7 @@ sub root
 
 =head2 heap
 
-   @svs = $df->heap
+   @svs = $df->heap;
 
 Returns all of the heap-allocated SVs, in no particular order
 
@@ -857,7 +875,7 @@ sub heap
 
 =head2 stack
 
-   @svs = $df->stack
+   @svs = $df->stack;
 
 Returns all the SVs on the stack
 
@@ -872,7 +890,7 @@ sub stack
 
 =head2 contexts
 
-   @ctxs = $df->contexts
+   @ctxs = $df->contexts;
 
 Returns a list of L<Devel::MAT::Context> objects representing the call context
 stack in the dumpfile.
@@ -887,7 +905,7 @@ sub contexts
 
 =head2 sv_at
 
-   $sv = $df->sv_at( $addr )
+   $sv = $df->sv_at( $addr );
 
 Returns the SV at the given address, or C<undef> if one does not exist.
 

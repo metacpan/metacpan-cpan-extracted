@@ -2,10 +2,12 @@
 
 use warnings;
 use strict;
-use Test::Most tests => 20;
+use Data::Dumper;
+use Test::Most tests => 21;
 use Test::Number::Delta;
 use Test::Carp;
 use Test::Deep;
+
 use lib 't/lib';
 use MyLogger;
 
@@ -19,19 +21,25 @@ SCANTEXT: {
 			diag('This will take some time and memory');
 
 			if($ENV{'TEST_VERBOSE'}) {
-				Geo::Coder::Free::DB::init(logger => MyLogger->new());
+				Database::Abstraction::init(logger => MyLogger->new());
 			}
 
 			my $geo_coder = new_ok('Geo::Coder::Free' => [ openaddr => $ENV{'OPENADDR_HOME'} ]);
 			my @locations = $geo_coder->geocode(scantext => 'I was born in Ramsgate, Kent, England');
-			ok(scalar(@locations) == 1);
+			diag(Data::Dumper->new([\@locations])->Dump()) if($ENV{'TEST_VERBOSE'});
+			cmp_ok(scalar(@locations), '==', 1, 'Finds one match');
 			my $location = $locations[0];
-			cmp_deeply($location,
-				methods('lat' => num(51.34, 1e-2), 'long' => num(1.41, 1e-2)));
+			ok(defined($location));
+			if($ENV{'WHOSONFIRST_HOME'}) {
+				cmp_deeply($location,
+					methods('lat' => num(51.34, 1e-2), 'long' => num(1.41, 1e-2)));
+			} else {
+				cmp_deeply($location,
+					methods('lat' => num(51.34, 1e-2), 'long' => num(1.31, 1e-2)));
+			}
 
 			ok(defined($location->{'confidence'}));
-
-			ok($location->{'location'} eq 'Ramsgate, Kent, England');
+			cmp_ok($location->{'location'}, 'eq', 'Ramsgate, Kent, England', 'Location is found in text');
 
 			@locations = $geo_coder->geocode(scantext => 'Hello World', region => 'GB');
 			ok(ref($locations[0]) eq '');
@@ -51,7 +59,9 @@ SCANTEXT: {
 				# if($location->{'country'} ne 'US') {
 					# next;
 				# }
-				next unless($location->{'location'} eq 'Newark, DE, USA');
+
+				diag(Data::Dumper->new([$location])->Dump()) if($ENV{'TEST_VERBOSE'});
+				next unless($location->{'location'} eq 'NEWARK, DE, USA');
 				$found++;
 				cmp_deeply($location,
 					methods('lat' => num(39.68, 1e-2), 'long' => num(-75.75, 1e-2)));
@@ -80,7 +90,7 @@ SCANTEXT: {
 					ok(defined($location->{'confidence'}));
 					ok($location->{'state'} eq 'IN');
 					cmp_deeply($location,
-						methods('lat' => num(39, 1), 'long' => num(-85, 1)));
+						methods('lat' => num(39, 1), 'long' => num(-86, 1)));
 				} elsif($city eq 'INDIANAPOLIS') {
 				# } elsif($location->{'location'} =~ /^Indianapolis,/i) {
 					$found{'INDIANAPOLIS'}++;
@@ -109,10 +119,10 @@ SCANTEXT: {
 			}
 		} elsif(!defined($ENV{'AUTHOR_TESTING'})) {
 			diag('Author tests not required for installation');
-			skip('Author tests not required for installation', 19);
+			skip('Author tests not required for installation', 20);
 		} else {
 			diag('Set OPENADDR_HOME to enable openaddresses.io testing');
-			skip('Set OPENADDR_HOME to enable openaddresses.io testing', 19);
+			skip('Set OPENADDR_HOME to enable openaddresses.io testing', 20);
 		}
 	}
 }

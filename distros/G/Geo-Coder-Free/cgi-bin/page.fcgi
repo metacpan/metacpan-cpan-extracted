@@ -6,11 +6,11 @@
 # Based on VWF - https://github.com/nigelhorne/vwf
 
 # Can be tested at the command line, e.g.:
-#	rootdir=$(pwd)/.. ./page.fcgi page=index
+#	root_dir=$(pwd)/.. ./page.fcgi page=index
 # To mimic a French mobile site:
-#	rootdir=$(pwd)/.. ./page.fcgi mobile=1 page=index lang=fr
+#	root_dir=$(pwd)/.. ./page.fcgi mobile=1 page=index lang=fr
 # To turn off linting of HTML on a search-engine landing page
-#	rootdir=$(pwd)/.. ./page.fcgi --search-engine page=index lint_content=0
+#	root_dir=$(pwd)/.. ./page.fcgi --search-engine page=index lint_content=0
 
 # TODO: use the memory_cache in the config file for the database searches
 
@@ -24,6 +24,7 @@ use Log::Log4perl qw(:levels);	# Put first to cleanup last
 use CGI::Carp qw(fatalsToBrowser);
 use CGI::Info;
 use CGI::Lingua;
+use Database::Abstraction;
 use File::Basename;
 # use CGI::Alert 'you@example.com';
 use FCGI;
@@ -75,10 +76,10 @@ use Geo::Coder::Free::Display::query;
 use Geo::Coder::Free::DB::openaddresses;
 
 my $config = Geo::Coder::Free::Config->new({ logger => $logger, info => $info });
-die "Set OPENADDR_HOME" if(!$config->OPENADDR_HOME());
+die 'Set OPENADDR_HOME' if(!$config->OPENADDR_HOME());
 
 my $database_dir = "$script_dir/../lib/Geo/Coder/Free/MaxMind/databases";
-Geo::Coder::Free::DB::init({ directory => $database_dir, logger => $logger });
+Database::Abstraction::init({ directory => $database_dir, logger => $logger });
 
 my $openaddresses = Geo::Coder::Free::DB::openaddresses->new(openaddr => $config->OPENADDR_HOME());
 if($@) {
@@ -136,6 +137,7 @@ while($handling_request = ($request->Accept() >= 0)) {
 		Log::Any::Adapter->set('Stdout', log_level => 'trace');
 		$logger = Log::Any->get_logger(category => $script_name);
 		Log::WarnDie->dispatcher($logger);
+		# print Data::Dumper->new([\$openaddresses])->Dump();
 		$openaddresses->set_logger($logger);
 		$info->set_logger($logger);
 		$Error::Debug = 1;
@@ -246,9 +248,9 @@ sub doit
 		logger => $logger,
 		lingua => $lingua
 	};
-	if(!$info->is_search_engine() && $config->rootdir() && ((!defined($info->param('action'))) || ($info->param('action') ne 'send'))) {
+	if(!$info->is_search_engine() && $config->root_dir() && ((!defined($info->param('action'))) || ($info->param('action') ne 'send'))) {
 		$args->{'save_to'} = {
-			directory => File::Spec->catfile($config->rootdir(), 'save_to'),
+			directory => File::Spec->catfile($config->root_dir(), 'save_to'),
 			ttl => 3600 * 24,
 			create_table => 1
 		};

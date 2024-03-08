@@ -1,16 +1,16 @@
 {
    "abstract" : "A Handy Debugging Module With Colorized Output and Formatting",
    "author" : [
-      "Richard Kelsch <rkelsch@cpan.org>"
+      "Richard Kelsch <rich@rk-internet.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Debug-Easy",
    "no_index" : {
@@ -28,7 +28,8 @@
       "configure" : {
          "requires" : {
             "Config" : "0",
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "Term::ANSIColor" : "0"
          }
       },
       "runtime" : {
@@ -43,6 +44,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "2.13",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "2.14",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

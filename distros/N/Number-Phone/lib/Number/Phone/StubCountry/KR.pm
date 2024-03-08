@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185945;
+our $VERSION = 1.20240308154352;
 
 my $formatters = [
                 {
@@ -160,7 +160,7 @@ my $validators = {
             6(?:
               [07]0|
               44|
-              6[168]|
+              6[0168]|
               88
             )|
             8(?:
@@ -185,46 +185,51 @@ my $validators = {
                 'voip' => '70\\d{8}'
               };
 my %areanames = ();
-$areanames{en} = {"8262", "Gwangju",
-"8252", "Ulsan",
-"8241", "Chungnam",
-"8232", "Incheon",
-"8233", "Gangwon",
-"8244", "Sejong\ City",
-"822", "Seoul",
-"8263", "Jeonbuk",
-"8253", "Daegu",
-"8261", "Jeonnam",
-"8251", "Busan",
-"8242", "Daejeon",
-"8231", "Gyeonggi",
+$areanames{en} = {"8261", "Jeonnam",
 "8255", "Gyeongnam",
-"8243", "Chungbuk",
+"8263", "Jeonbuk",
+"8232", "Incheon",
+"8252", "Ulsan",
+"8244", "Sejong\ City",
 "8254", "Gyeongbuk",
+"8242", "Daejeon",
+"8251", "Busan",
+"8243", "Chungbuk",
+"822", "Seoul",
+"8253", "Daegu",
+"8241", "Chungnam",
+"8231", "Gyeonggi",
+"8233", "Gangwon",
+"8262", "Gwangju",
 "8264", "Jeju",};
-$areanames{ko} = {"8244", "세종",
-"8233", "강원",
-"822", "서울",
-"8263", "전북",
-"8253", "대구",
-"8262", "광주",
-"8252", "울산",
-"8232", "인천",
-"8241", "충남",
-"8255", "경남",
-"8243", "충북",
+$areanames{ko} = {"8262", "광주",
 "8264", "제주",
-"8254", "경북",
-"8251", "부산",
-"8261", "전남",
 "8231", "경기",
-"8242", "대전",};
+"8233", "강원",
+"8251", "부산",
+"8243", "충북",
+"822", "서울",
+"8241", "충남",
+"8253", "대구",
+"8252", "울산",
+"8244", "세종",
+"8242", "대전",
+"8254", "경북",
+"8232", "인천",
+"8261", "전남",
+"8255", "경남",
+"8263", "전북",};
+my $timezones = {
+               '' => [
+                       'Asia/Seoul'
+                     ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+82|\D)//g;
-      my $self = bless({ country_code => '82', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '82', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0(8(?:[1-46-8]|5\d\d))?)//;
       $self = bless({ country_code => '82', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);

@@ -1,3 +1,10 @@
+Version 0.012 - 2024-03-07
+ - Field now has 'coerce' attribute which can be a coderef, or enable
+   Type::Tiny coercion.
+ - TableReader 'input' attribute can now be an arrayref, as a shorthand
+   for the 'Mock' decoder.
+ - Improved unit tests
+
 Version 0.011 - 2019-06-27
  - Allow per-field 'trim' value to be a regex or coderef
  - Change dist version-munger to Dist::Zilla::Plugin::OurPkgVersion

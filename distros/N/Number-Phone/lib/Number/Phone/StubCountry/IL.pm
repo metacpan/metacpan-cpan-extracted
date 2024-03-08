@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185945;
+our $VERSION = 1.20240308154351;
 
 my $formatters = [
                 {
@@ -153,22 +153,27 @@ my $validators = {
         '
               };
 my %areanames = ();
-$areanames{iw} = {"9729", "השרון",
-"9724", "חיפה\ והצפון",
-"9723", "תל\ אביב\-יפו\ והמרכז",
+$areanames{iw} = {"9722", "ירושלים",
 "9728", "השפלה\ והדרום",
-"9722", "ירושלים",};
-$areanames{en} = {"9722", "Jerusalem",
-"9728", "Hashfela\ and\ South\ Regions",
+"9724", "חיפה\ והצפון",
+"9729", "השרון",
+"9723", "תל\ אביב\-יפו\ והמרכז",};
+$areanames{en} = {"9723", "Tel\ Aviv",
 "9724", "Haifa\ and\ North\ Regions",
-"9723", "Tel\ Aviv",
-"9729", "Hasharon",};
+"9729", "Hasharon",
+"9722", "Jerusalem",
+"9728", "Hashfela\ and\ South\ Regions",};
+my $timezones = {
+               '' => [
+                       'Asia/Jerusalem'
+                     ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+972|\D)//g;
-      my $self = bless({ country_code => '972', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '972', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
       $self = bless({ country_code => '972', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);

@@ -3,7 +3,7 @@ package Games::Sudoku::Pdf;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 require 5.006;
 
@@ -765,21 +765,24 @@ sub _draw_jigsaw_lines {
 sub _format_time_w_zone_offset {
   my $epoch = shift() || time();
 
-  my $offset_sec = $epoch - timelocal(gmtime($epoch));
+  my $offset_sec = $epoch - timelocal( gmtime $epoch );
   my $sign = ($offset_sec =~ s/^-//) ? '-' : ($offset_sec > 0 ) ? '+' : 'Z';
-  my $offset_hrs = 0;
-  my $offset_min = 0;
-  
+
   my $offset = '';
   if  ($offset_sec > 0) {
-    $offset_hrs = int $offset_sec / 3600;
-    # API2 croaks on the trailing apostrophe before v. 2.044
-    # for backward compatibility the choice is to either drop the trailing apostrophe
-    # or, to stay conformant with all standards, old and new, by omitting offset minutes all together. 
-    #$offset_min = int( ($offset_sec % 3600) / 60);
-    #$offset = sprintf '%02d\'%02d\'', $offset_hrs, $offset_min;
-    $offset = sprintf '%02d\'', $offset_hrs;
-  }
+    my $offset_hrs = int $offset_sec / 3600;
+    my $offset_min = int( ($offset_sec % 3600) / 60);
+    $offset = sprintf '%02d\'%02d', $offset_hrs, $offset_min;
+    # Time offset ought to be: [-+Z] (hh') (mm')
+    # API2 until v2.041 gave a correct format example in the pod, but no validation took place.
+    # From v2.042 - 2.044 introduced a (faulty) date validation which _required_ a _leading_ 
+    # apostrophe with offset minutes but croaked on the trailing offset mm' apostrophe.
+    # Now both apostrophes are optional since v2.045.
+    if ($PDF::API2::VERSION < 2.042 || $PDF::API2::VERSION > 2.044) {
+      # (no validation || 'tolerant' validation) => pass correct format
+      $offset .= "'";
+    }
+  } # or else just return Z(ulu), to avoid any confusion
 
   my @lt = localtime($epoch);
   return sprintf('%d%02d%02d%02d%02d%02d%s%s', 

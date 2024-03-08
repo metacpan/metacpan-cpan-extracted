@@ -1,5 +1,13 @@
 Revision history for Spreadsheet-ParseXLSX
 
+0.33  2024-03-08
+
+      - performance fix computing merged cells
+
+0.32  2024-03-08
+
+      - Require minimum version of Archive::Zip
+
 0.31  2024-01-18
 
       - CVE-2024-23525: fixed in previous release

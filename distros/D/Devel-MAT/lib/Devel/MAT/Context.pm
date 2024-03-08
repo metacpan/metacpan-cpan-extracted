@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2024 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Context 0.52;
+package Devel::MAT::Context 0.53;
 
 use v5.14;
 use warnings;
@@ -74,7 +74,7 @@ sub load_v0_1
 
 =head2 gimme
 
-   $gimme = $ctx->gimme
+   $gimme = $ctx->gimme;
 
 Returns the gimme value of the call context.
 
@@ -93,11 +93,11 @@ sub gimme
 
 =head2 location
 
-   $file = $ctx->file
+   $file = $ctx->file;
 
-   $line = $ctx->line
+   $line = $ctx->line;
 
-   $location = $ctx->location
+   $location = $ctx->location;
 
 Returns the file, line or location as (C<FILE line LINE>).
 
@@ -112,7 +112,7 @@ sub location
    return "$self->{file} line $self->{line}";
 }
 
-package Devel::MAT::Context::SUB 0.52;
+package Devel::MAT::Context::SUB 0.53;
 use base qw( Devel::MAT::Context );
 __PACKAGE__->register_type( 1 );
 
@@ -151,26 +151,26 @@ sub _load_v0_1
 
 =head2 cv
 
-   $cv = $ctx->cv
+   $cv = $ctx->cv;
 
 Returns the CV which this call is to.
 
 =head2 args
 
-   $args = $ctx->args
+   $args = $ctx->args;
 
 Returns the arguments AV which represents the C<@_> argument array.
 
 =head2 olddepth
 
-   $olddepth = $ctx->olddepth
+   $olddepth = $ctx->olddepth;
 
 Returns the old depth of the context (that is, the depth the CV would be at
 after this context returns).
 
 =head2 depth
 
-   $depth = $ctx->depth
+   $depth = $ctx->depth;
 
 Returns the actual depth of the context. This is inferred at load time by
 considering the C<olddepth> of the next inner-nested call to the same CV, or
@@ -198,7 +198,7 @@ sub olddepth { return $_[0]->{olddepth} }
 sub _set_depth { $_[0]->{depth} = $_[1] }
 sub depth      { return $_[0]->{depth} }
 
-package Devel::MAT::Context::TRY 0.52;
+package Devel::MAT::Context::TRY 0.53;
 use base qw( Devel::MAT::Context );
 __PACKAGE__->register_type( 2 );
 
@@ -212,7 +212,7 @@ sub load {}
 
 sub _load_v0_1 {}
 
-package Devel::MAT::Context::EVAL 0.52;
+package Devel::MAT::Context::EVAL 0.53;
 use base qw( Devel::MAT::Context );
 __PACKAGE__->register_type( 3 );
 
@@ -240,7 +240,7 @@ sub _load_v0_1
 
 =head2 code
 
-   $sv = $ctx->code
+   $sv = $ctx->code;
 
 Returns the SV containing the text string being evaluated.
 

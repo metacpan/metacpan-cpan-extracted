@@ -3,11 +3,21 @@ package Geo::Coder::Free::DB::MaxMind::cities;
 use strict;
 use warnings;
 
-# cities.csv is from https://www.maxmind.com/en/free-world-cities-database
+=head1 NAME
 
-use Geo::Coder::Free::DB;
+Geo::Coder::Free::DB::MaxMind::cities - driver for https://www.maxmind.com/en/free-world-cities-database
 
-our @ISA = ('Geo::Coder::Free::DB');
+=head1 VERSION
+
+Version 0.35
+
+=cut
+
+our $VERSION = '0.35';
+
+use Database::Abstraction;
+
+our @ISA = ('Database::Abstraction');
 
 sub _open {
 	my $self = shift;

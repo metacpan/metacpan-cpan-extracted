@@ -1,19 +1,19 @@
 use strict;
 use warnings;
 
-our $VERSION = '0.9';
+our $VERSION = '1.0';
 
 use utf8; # allow for utf8 in code (we have strings in utf8, filenames)
 
 use Test::More;
-
+use Test2::Plugin::UTF8;
 use Image::DecodeQR::WeChat;
 use Encode;
 use File::Spec;
 use FindBin;
 
-binmode(STDOUT, ':encoding(utf8)');
-binmode(STDERR, ':encoding(utf8)');
+binmode(STDOUT, ':encoding(UTF-8)');
+binmode(STDERR, ':encoding(UTF-8)');
 
 # 0: nothing,
 # > 9: add also XS verbose

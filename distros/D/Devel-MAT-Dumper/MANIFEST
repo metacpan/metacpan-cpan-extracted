@@ -1,6 +1,6 @@
+.editorconfig
 Build.PL
 Changes
-doc/format-v0.5.txt
 doc/format.txt
 lib/Devel/MAT/Dumper.pm
 lib/Devel/MAT/Dumper.xs

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2014-2016 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Graph 0.52;
+package Devel::MAT::Graph 0.53;
 
 use v5.14;
 use warnings;
@@ -29,7 +29,7 @@ tasks.
 
 =head2 new
 
-   $graph = Devel::MAT::Graph->new( $dumpfile )
+   $graph = Devel::MAT::Graph->new( $dumpfile );
 
 Constructs a new C<Devel::MAT::Graph> instance backed by the given dumpfile
 (which is only actually used to make the C<< $node->sv >> method work).
@@ -57,7 +57,7 @@ sub new
 
 =head2 add_sv
 
-   $graph->add_sv( $sv )
+   $graph->add_sv( $sv );
 
 Makes the graph aware of the given L<Devel::MAT::SV>. This is not strictly
 necessary before calling C<add_ref> or C<add_root>, but ensures that C<has_sv>
@@ -78,7 +78,7 @@ sub add_sv
 
 =head2 add_ref
 
-   $graph->add_ref( $from_sv, $to_sv, $desc )
+   $graph->add_ref( $from_sv, $to_sv, $desc );
 
 Adds an edge to the graph, from and to the given SVs, with the given
 description.
@@ -101,7 +101,7 @@ sub add_ref
 
 =head2 add_root
 
-   $graph->add_root( $from_sv, $desc )
+   $graph->add_root( $from_sv, $desc );
 
 Adds a root edge to the graph, at the given SV with the given description.
 
@@ -123,7 +123,7 @@ sub add_root
 
 =head2 has_sv
 
-   $bool = $graph->has_sv( $sv )
+   $bool = $graph->has_sv( $sv );
 
 Returns true if the graph has edges or roots for the given SV, or it has at
 least been given to C<add_sv>.
@@ -144,7 +144,7 @@ sub has_sv
 
 =head2 get_sv_node
 
-   $node = $graph->get_sv_node( $sv )
+   $node = $graph->get_sv_node( $sv );
 
 Returns a C<Node> object for the given SV.
 
@@ -165,7 +165,7 @@ sub get_sv_node
 
 =head2 get_root_nodes
 
-   @desc_nodes = $graph->get_root_nodes
+   @desc_nodes = $graph->get_root_nodes;
 
 Returns an even-sized list of pairs, containing root descriptions and the
 nodes having those roots, in no particular order.
@@ -181,7 +181,7 @@ sub get_root_nodes
    } keys %{ $self->{roots_from} };
 }
 
-package Devel::MAT::Graph::Node 0.52;
+package Devel::MAT::Graph::Node 0.53;
 
 =head1 NODE OBJECTS
 
@@ -193,13 +193,13 @@ sub new { my $class = shift; bless { @_ }, $class }
 
 =head2 graph
 
-   $graph = $node->graph
+   $graph = $node->graph;
 
 Returns the containing C<Devel::MAT::Graph> instance.
 
 =head2 addr
 
-   $addr = $node->addr
+   $addr = $node->addr;
 
 Returns the address of the SV represented by this node.
 
@@ -210,7 +210,7 @@ sub addr  { $_[0]->{addr}  }
 
 =head2 sv
 
-   $sv = $node->sv
+   $sv = $node->sv;
 
 Returns the SV object itself, as taken from the dumpfile instance.
 
@@ -220,14 +220,14 @@ sub sv { $_[0]->graph->{df}->sv_at( $_[0]->addr ) }
 
 =head2 roots
 
-   @roots = $node->roots
+   @roots = $node->roots;
 
 Returns any root descriptions given (by calls to C<< $graph->add_root >> for
 the SV at this node.
 
    $graph->add_root( $sv, $desc );
 
-   ( $desc, ... ) = $graph->get_sv_node( $sv )->roots
+   ( $desc, ... ) = $graph->get_sv_node( $sv )->roots;
 
 =cut
 
@@ -239,19 +239,19 @@ sub roots
 
 =head2 edges_out
 
-   @edges = $node->edges_out
+   @edges = $node->edges_out;
 
 Returns an even-sized list of any edge descriptions and more C<Node> objects
 given as references (by calls to C<< $graph->add_ref >>) from the SV at this
 node.
 
-   $graph->add_ref( $from_sv, $to_sv, $desc )
+   $graph->add_ref( $from_sv, $to_sv, $desc );
 
-   ( $desc, $to_edge, ... ) = $graph->get_sv_node( $from_sv )->edges_out
+   ( $desc, $to_edge, ... ) = $graph->get_sv_node( $from_sv )->edges_out;
 
 =head2 edges_out (scalar)
 
-   $n_edges = $node->edges_out
+   $n_edges = $node->edges_out;
 
 In scalar context, returns the I<number of edges> that exist; i.e. half the
 size of the pairlist that would be returned in list context.
@@ -271,18 +271,18 @@ sub edges_out
 
 =head2 edges_in
 
-   @edges = $node->edges_in
+   @edges = $node->edges_in;
 
 Similar to C<edges_out>, but returns edges in the opposite direction; i.e.
 edges of references to this node.
 
-   $graph->add_ref( $from_sv, $to_sv, $desc )
+   $graph->add_ref( $from_sv, $to_sv, $desc );
 
-   ( $desc, $from_edge, ... ) = $graph->get_sv_node( $to_sv )->edges_in
+   ( $desc, $from_edge, ... ) = $graph->get_sv_node( $to_sv )->edges_in;
 
 =head2 edges_in (scalar)
 
-   $n_edges = $node->edges_out
+   $n_edges = $node->edges_out;
 
 In scalar context, returns the I<number of edges> that exist; i.e. half the
 size of the pairlist that would be returned in list context.

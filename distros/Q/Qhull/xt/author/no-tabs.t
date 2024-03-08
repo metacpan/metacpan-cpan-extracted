@@ -16,12 +16,17 @@ my @files = (
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/Util/parse_output.t',
-    't/data/extrema.json',
-    't/data/extrema.txt',
-    't/data/facets2D.json',
-    't/data/facets2D.txt',
-    't/data/vertex2D.json',
-    't/data/vertex2D.txt'
+    't/data/Util/parse_output/extrema.json',
+    't/data/Util/parse_output/extrema.txt',
+    't/data/Util/parse_output/facets2D.json',
+    't/data/Util/parse_output/facets2D.txt',
+    't/data/Util/parse_output/sizes.json',
+    't/data/Util/parse_output/sizes.txt',
+    't/data/Util/parse_output/vertex2D.json',
+    't/data/Util/parse_output/vertex2D.txt',
+    't/data/qhull/qhull.in',
+    't/data/qhull/qhull.out',
+    't/qhull.t'
 );
 
 notabs_ok($_) foreach @files;

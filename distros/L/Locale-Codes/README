@@ -472,8 +472,8 @@ KNOWN BUGS AND LIMITATIONS
         limitation in the future.
 
 BUGS AND QUESTIONS
-    If you find a bug in Locale::Codes, there are three ways to send it to
-    me. In order of preference, they are:
+    If you find a bug in Locale::Codes, please let me know. The best ways to
+    contact me are:
 
     GitHub
         You can submit it as an issue on GitHub. This can be done at the
@@ -488,19 +488,12 @@ BUGS AND QUESTIONS
         You are welcome to send it directly to me by email. The email
         address to use is: sbeck@cpan.org.
 
-        Please note that because cpan.org addresses are published, they are
-        used by a lot of spammers and phishers. Please include the name of
-        the perl module in the subject line of ALL messages sent to my
-        cpan.org address or it will likely be missed.
-
-    CPAN Bug Tracking
-        You can submit it using the CPAN tracking tool. This can be done at
-        the following URL:
-
-        <http://rt.cpan.org/Public/Dist/Display.html?Name=Locale-Codes>
-
-        There was discussion of halting this service a while back (though it
-        continues to function), so only use this as a last resort.
+        There is some discussion of discontinuing CPAN email, so please use
+        this as a last resort. The GitHub method is strongly preferred.
+        Also, because cpan.org addresses are published, they are used by a
+        lot of spammers and phishers. Please include the name of the perl
+        module in the subject line of ALL messages sent to my cpan.org
+        address or it will likely be overlooked.
 
     Please do not use other means to report bugs (such as forums for a
     specific OS or Linux distribution) as it is impossible for me to keep up
@@ -545,7 +538,7 @@ COPYRIGHT
        Copyright (c) 1997-2001 Canon Research Centre Europe (CRE).
        Copyright (c) 2001      Michael Hennecke (Locale::Currency)
        Copyright (c) 2001-2010 Neil Bowers
-       Copyright (c) 2010-2023 Sullivan Beck
+       Copyright (c) 2010-2024 Sullivan Beck
 
     This module is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.

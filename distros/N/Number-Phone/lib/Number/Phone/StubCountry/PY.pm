@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185946;
+our $VERSION = 1.20240308154353;
 
 my $formatters = [
                 {
@@ -214,85 +214,90 @@ my $validators = {
                 'voip' => '8700[0-4]\\d{4}'
               };
 my %areanames = ();
-$areanames{en} = {"595768", "Pirapo",
-"595784", "San\ Juan\ Neembucu",
-"59586", "Pilar",
-"59535", "Valle\ Mi",
-"595677", "San\ Alberto",
-"59528", "Capiata",
-"595741", "Coronel\ Bogado",
-"59546", "Salto\ Del\ Guaira",
-"59575", "Hoenau",
-"59581", "San\ Juan\ Bautista\ \/\ Misiones",
-"59564", "Cargil",
-"595785", "Paso\ De\ Patria",
-"595550", "Mauricio\ Jose\ Troche",
+$areanames{en} = {"595275", "Ypane",
 "59537", "Capitan\ Bado",
-"595783", "San\ Miguel\ \/\ Misiones",
-"595671", "Mayor\ Otano",
-"59541", "Itacurubi\ Del\ Rosario",
-"595275", "Ypane",
-"59521", "Fernando\ De\ La\ Mora\,\ Lambare\,\ Limpio\,\ Luque\,\ Mariano\ Roque\ Alonso\,\ San\ Antonio\,\ Valle\ Pucu\ and\ Villa\ Elisa",
-"59542", "San\ Pedro\ Del\ Ycua\ Mandyju",
-"595295", "Jose\ Augusto\ Saldivar",
-"595554", "Itape",
-"595763", "La\ Paz",
-"59583", "Villa\ Florida",
-"59543", "San\ Estanislao",
-"59539", "Yby\ Ja\'U",
-"595742", "San\ Pedro\ Del\ Parana",
-"59582", "San\ Ignacio\ \/\ Misiones",
-"595293", "Guarambare",
-"59548", "Curuguaty",
+"595767", "Bella\ Vista\ Sur",
 "595780", "Alberdi",
-"59526", "Villa\ Hayes",
+"59583", "Villa\ Florida",
+"59572", "Ayolas",
+"59542", "San\ Pedro\ Del\ Ycua\ Mandyju",
+"595763", "La\ Paz",
+"595675", "Juan\ Leon\ Mallorquin",
+"59531", "Concepcion",
+"59546", "Salto\ Del\ Guaira",
+"595782", "Santiago",
+"595631", "Hernandarias",
+"595678", "Santa\ Rosa\ Del\ Monday",
 "595294", "Itaugua",
+"595554", "Itape",
+"59525", "Villeta",
+"595632", "Colonia\ Yguazu",
+"595781", "Santa\ María\ \/\ Misiones",
+"59538", "Bella\ Vista\ Norte",
+"59539", "Yby\ Ja\'U",
+"595345", "Corpus\ Christi",
+"59524", "Ita",
+"59548", "Curuguaty",
+"595762", "Carmen\ Del\ Parana",
+"595295", "Jose\ Augusto\ Saldivar",
+"595674", "Juan\ E\.\ O\ Leary",
+"59536", "Pedro\ Juan\ Caballero",
+"595761", "Colonia\ Fram",
+"59585", "Santa\ Rosa\ \/\ Misiones",
+"59571", "Capitan\ Miranda",
+"59541", "Itacurubi\ Del\ Rosario",
 "595633", "Cedrales",
+"59564", "Cargil",
+"595787", "General\ \ Diaz",
+"59532", "Horqueta",
+"595783", "San\ Miguel\ \/\ Misiones",
+"59547", "Puente\ Kyha",
+"59544", "Villa\ Del\ Rosario",
+"59528", "Capiata",
+"595291", "Aregua",
+"59535", "Valle\ Mi",
+"595451", "Colonia\ Volendam",
+"59586", "Pilar",
+"595552", "Paso\ Yobay",
+"595292", "Nueva\ Italia",
+"595784", "San\ Juan\ Neembucu",
+"59521", "Fernando\ De\ La\ Mora\,\ Lambare\,\ Limpio\,\ Luque\,\ Mariano\ Roque\ Alonso\,\ San\ Antonio\,\ Valle\ Pucu\ and\ Villa\ Elisa",
+"595768", "Pirapo",
+"595673", "Santa\ Rita",
+"59582", "San\ Ignacio\ \/\ Misiones",
+"595743", "General\ Artigas",
+"59543", "San\ Estanislao",
+"59573", "San\ Cosme",
+"595550", "Mauricio\ Jose\ Troche",
+"595677", "San\ Alberto",
+"59561", "Presidente\ Franco",
 "595453", "Capiibary",
+"595271", "Benjamin\ \ Aceval",
+"59533", "Loreto",
+"595293", "Guarambare",
 "595553", "Tebicuary",
+"595740", "General\ \ Delgado",
+"595676", "Naranjal",
+"595671", "Mayor\ Otano",
+"59526", "Villa\ Hayes",
+"595742", "San\ Pedro\ Del\ Parana",
+"59575", "Hoenau",
 "595672", "Kressburgo",
 "595764", "Maria\ Auxiliadora",
-"59572", "Ayolas",
-"59538", "Bella\ Vista\ Norte",
-"595291", "Aregua",
-"59561", "Presidente\ Franco",
-"595740", "General\ \ Delgado",
-"59544", "Villa\ Del\ Rosario",
-"59573", "San\ Cosme",
-"595761", "Colonia\ Fram",
-"59525", "Villeta",
-"595676", "Naranjal",
-"595678", "Santa\ Rosa\ Del\ Monday",
-"595782", "Santiago",
-"59532", "Horqueta",
-"595631", "Hernandarias",
-"595451", "Colonia\ Volendam",
-"595767", "Bella\ Vista\ Sur",
-"59533", "Loreto",
-"595743", "General\ Artigas",
-"595292", "Nueva\ Italia",
-"59547", "Puente\ Kyha",
-"595787", "General\ \ Diaz",
-"59531", "Concepcion",
-"595762", "Carmen\ Del\ Parana",
-"595674", "Juan\ E\.\ O\ Leary",
-"595632", "Colonia\ Yguazu",
-"59524", "Ita",
-"595781", "Santa\ María\ \/\ Misiones",
-"595552", "Paso\ Yobay",
-"595673", "Santa\ Rita",
-"595675", "Juan\ Leon\ Mallorquin",
-"59536", "Pedro\ Juan\ Caballero",
-"59585", "Santa\ Rosa\ \/\ Misiones",
-"595271", "Benjamin\ \ Aceval",
-"59571", "Capitan\ Miranda",
-"595345", "Corpus\ Christi",};
+"59581", "San\ Juan\ Bautista\ \/\ Misiones",
+"595741", "Coronel\ Bogado",
+"595785", "Paso\ De\ Patria",};
+my $timezones = {
+               '' => [
+                       'America/Asuncion'
+                     ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+595|\D)//g;
-      my $self = bless({ country_code => '595', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '595', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
       $self = bless({ country_code => '595', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);

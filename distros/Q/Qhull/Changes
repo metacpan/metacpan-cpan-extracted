@@ -1,5 +1,20 @@
 Revision history for Qhull
 
+0.02      2024-03-07 22:13:57-05:00 America/New_York
+
+  [BUG FIX]
+
+     * ensure that the qhull executable is finished before reading its
+       output file
+
+  [ENHANCEMENT]
+
+     * Support for size (area and volume) output format (FS)
+
+  [TESTS]
+
+     * end-to-end call out to qhull executable
+
 0.01      2024-03-05 15:37:02-05:00 America/New_York
 
-* First release upon an unsuspecting world.
+    * First release upon an unsuspecting world.

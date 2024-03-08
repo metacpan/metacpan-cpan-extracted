@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185945;
+our $VERSION = 1.20240308154351;
 
 my $formatters = [
                 {
@@ -96,93 +96,98 @@ my $validators = {
                 'voip' => '21\\d{7}'
               };
 my %areanames = ();
-$areanames{en} = {"3674", "Szekszard",
-"3659", "Karcag",
-"3657", "Jaszbereny",
-"3685", "Marcali",
-"3625", "Dunaujvaros",
-"3684", "Siofok",
-"3624", "Szigetszentmiklós",
-"3675", "Paks",
-"3688", "Veszprem",
-"3628", "Godollo",
-"3678", "Kiskoros",
-"3646", "Miskolc",
-"3653", "Cegled",
-"3666", "Bekescsaba",
-"3694", "Szombathely",
-"3636", "Eger",
-"3695", "Sarvar",
-"3669", "Mohacs",
-"3692", "Zalaegerszeg",
-"3637", "Gyongyos",
-"3663", "Szentes",
-"3647", "Szerencs",
-"3633", "Esztergom",
-"3649", "Mezokovesd",
-"3656", "Szolnok",
-"3622", "Székesfehérvár",
-"3682", "Kaposvar",
-"3672", "Pecs",
-"3696", "Gyor",
-"3635", "Balassagyarmat",
-"3634", "Tatabanya",
-"3668", "Oroshaza",
-"3645", "Kisvarda",
-"3644", "Mátészalka",
-"3676", "Kecskemet",
-"3648", "Ozd",
+$areanames{hu} = {"3627", "Vác",
+"3625", "Dunaújváros",
+"3678", "Kiskőrös",
+"3649", "Mezőkövesd",
+"3653", "Cegléd",
+"3684", "Siófok",
+"3648", "Ózd",
+"3634", "Tatabánya",
+"3637", "Gyöngyös",
+"3642", "Nyíregyháza",
+"3657", "Jászberény",
+"3654", "Berettyóújfalu",
+"3696", "Győr",
+"3676", "Kecskemét",
+"3672", "Pécs",
+"3689", "Pápa",
+"3645", "Kisvárda",
+"3632", "Salgótarján",
+"3688", "Veszprém",
+"3666", "Békéscsaba",
+"3695", "Sárvár",
+"3628", "Gödöllő",
+"3674", "Szekszárd",
+"3673", "Szigetvár",
+"3669", "Mohács",
+"3668", "Orosháza",
+"3682", "Kaposvár",};
+$areanames{en} = {"3682", "Kaposvar",
 "3626", "Szentendre",
-"3652", "Debrecen",
-"3679", "Baja",
-"3654", "Berettyoujfalu",
-"3677", "Kiskunhalas",
-"3689", "Papa",
-"3629", "Monor",
-"3627", "Vac",
-"3687", "Tapolca",
-"3642", "Nyiregyhaza",
-"361", "Budapest",
+"3659", "Karcag",
+"3668", "Oroshaza",
+"3622", "Székesfehérvár",
+"3669", "Mohacs",
 "3693", "Nagykanizsa",
 "3673", "Szigetvar",
-"3683", "Keszthely",
-"3623", "Biatorbágy",
-"3699", "Sopron",
+"3662", "Szeged",
+"3694", "Szombathely",
+"3677", "Kiskunhalas",
+"3629", "Monor",
+"3674", "Szekszard",
+"3656", "Szolnok",
+"3636", "Eger",
+"3695", "Sarvar",
+"3628", "Godollo",
+"3675", "Paks",
+"3666", "Bekescsaba",
+"3644", "Mátészalka",
+"3688", "Veszprem",
+"3647", "Szerencs",
+"3652", "Debrecen",
 "3632", "Salgotarjan",
-"3662", "Szeged",};
-$areanames{hu} = {"3684", "Siófok",
-"3625", "Dunaújváros",
-"3657", "Jászberény",
-"3674", "Szekszárd",
-"3678", "Kiskőrös",
-"3628", "Gödöllő",
-"3688", "Veszprém",
-"3653", "Cegléd",
-"3695", "Sárvár",
-"3666", "Békéscsaba",
-"3637", "Gyöngyös",
-"3669", "Mohács",
-"3649", "Mezőkövesd",
-"3672", "Pécs",
-"3682", "Kaposvár",
-"3634", "Tatabánya",
-"3696", "Győr",
-"3668", "Orosháza",
-"3645", "Kisvárda",
-"3648", "Ózd",
-"3676", "Kecskemét",
-"3627", "Vác",
-"3689", "Pápa",
-"3654", "Berettyóújfalu",
-"3642", "Nyíregyháza",
-"3673", "Szigetvár",
-"3632", "Salgótarján",};
+"3645", "Kisvarda",
+"3689", "Papa",
+"361", "Budapest",
+"3672", "Pecs",
+"3692", "Zalaegerszeg",
+"3623", "Biatorbágy",
+"3646", "Miskolc",
+"3676", "Kecskemet",
+"3696", "Gyor",
+"3635", "Balassagyarmat",
+"3642", "Nyiregyhaza",
+"3654", "Berettyoujfalu",
+"3657", "Jaszbereny",
+"3683", "Keszthely",
+"3637", "Gyongyos",
+"3634", "Tatabanya",
+"3633", "Esztergom",
+"3648", "Ozd",
+"3687", "Tapolca",
+"3684", "Siofok",
+"3653", "Cegled",
+"3649", "Mezokovesd",
+"3685", "Marcali",
+"3678", "Kiskoros",
+"3625", "Dunaujvaros",
+"3699", "Sopron",
+"3624", "Szigetszentmiklós",
+"3679", "Baja",
+"3627", "Vac",
+"3663", "Szentes",};
+my $timezones = {
+               '' => [
+                       'Europe/Budapest'
+                     ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+36|\D)//g;
-      my $self = bless({ country_code => '36', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '36', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:06)//;
       $self = bless({ country_code => '36', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);

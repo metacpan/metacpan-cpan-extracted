@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/jacoby/expect.pm.png)](https://travis-ci.org/jacoby/expect.pm)
 
+![Build Status](https://github.com/jacoby/expect.pm/actions/workflows/perl_tests_ubuntu.yml/badge.svg)
 
 Expect.pm
 =========

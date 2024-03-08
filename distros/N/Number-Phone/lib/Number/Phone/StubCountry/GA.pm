@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185945;
+our $VERSION = 1.20240308154351;
 
 my $formatters = [
                 {
@@ -70,72 +70,77 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"2411186", "Mouila",
-"2411166", "Moanda",
-"2410154", "Omboué",
-"2411150", "Gamba",
-"24101420", "Ntoum",
-"2411193", "Booué",
-"2411165", "Koulamoutou",
-"2410192", "Mékambo",
-"2411140", "Kango",
-"24101424", "Cocobeach",
-"2410144", "Libreville",
-"2410190", "Makokou",
-"2411167", "Franceville",
-"2410169", "Léconi\/Akiéni\/Okondja",
-"2410158", "Lambaréné",
-"2411182", "Tchibanga",
-"2411147", "Libreville",
-"2411162", "Mounana",
-"2410164", "Lastoursville",
-"2411156", "Port\-Gentil",
-"2411160", "Ngouoni",
-"241017", "Libreville",
-"2411145", "Libreville",
-"2410148", "Libreville",
-"2410159", "Ndjolé",
-"2410196", "Bitam",
-"2411198", "Oyem",
-"2411155", "Port\-Gentil",
-"2411146", "Libreville",
-"2410183", "Mayumba",
-"2410150", "Gamba",
-"2410186", "Mouila",
-"2410166", "Moanda",
-"2411154", "Omboué",
-"24111420", "Ntoum",
-"2410193", "Booué",
-"2411144", "Libreville",
-"2410165", "Koulamoutou",
-"2411192", "Mékambo",
-"2410140", "Kango",
-"24111424", "Cocobeach",
-"2411190", "Makokou",
-"2411169", "Léconi\/Akiéni\/Okondja",
-"2410167", "Franceville",
-"2411158", "Lambaréné",
-"2410182", "Tchibanga",
+$areanames{en} = {"2411148", "Libreville",
+"2411186", "Mouila",
 "2410147", "Libreville",
-"2410162", "Mounana",
-"2410160", "Ngouoni",
-"241117", "Libreville",
-"2410145", "Libreville",
-"2411164", "Lastoursville",
-"2410156", "Port\-Gentil",
-"2411196", "Bitam",
-"2411148", "Libreville",
 "2411159", "Ndjolé",
-"2410146", "Libreville",
+"2410155", "Port\-Gentil",
+"2411156", "Port\-Gentil",
+"2410190", "Makokou",
+"2411193", "Booué",
+"2411154", "Omboué",
+"2411192", "Mékambo",
+"2411198", "Oyem",
+"2410169", "Léconi\/Akiéni\/Okondja",
+"2411165", "Koulamoutou",
+"2410140", "Kango",
+"2410166", "Moanda",
+"2410164", "Lastoursville",
+"2410150", "Gamba",
+"2411196", "Bitam",
+"2411167", "Franceville",
+"2410162", "Mounana",
 "2411183", "Mayumba",
+"24111424", "Cocobeach",
+"2410145", "Libreville",
+"2411182", "Tchibanga",
+"2411160", "Ngouoni",
+"2411146", "Libreville",
+"241017", "Libreville",
+"2411158", "Lambaréné",
+"2411144", "Libreville",
+"24101420", "Ntoum",
+"24101424", "Cocobeach",
+"2410196", "Bitam",
+"2411150", "Gamba",
+"2411162", "Mounana",
+"2410183", "Mayumba",
+"2410167", "Franceville",
+"2410144", "Libreville",
+"24111420", "Ntoum",
+"2410146", "Libreville",
+"2410182", "Tchibanga",
+"2410160", "Ngouoni",
+"2411145", "Libreville",
+"2410158", "Lambaréné",
+"241117", "Libreville",
+"2410154", "Omboué",
+"2410159", "Ndjolé",
+"2410186", "Mouila",
+"2411147", "Libreville",
+"2410148", "Libreville",
+"2411190", "Makokou",
+"2410193", "Booué",
+"2410156", "Port\-Gentil",
+"2411155", "Port\-Gentil",
+"2411164", "Lastoursville",
+"2411169", "Léconi\/Akiéni\/Okondja",
 "2410198", "Oyem",
-"2410155", "Port\-Gentil",};
+"2410192", "Mékambo",
+"2411166", "Moanda",
+"2411140", "Kango",
+"2410165", "Koulamoutou",};
+my $timezones = {
+               '' => [
+                       'Africa/Libreville'
+                     ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+241|\D)//g;
-      my $self = bless({ country_code => '241', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '241', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       my $prefix = qr/^(?:0(11\d{6}|60\d{6}|61\d{6}|6[256]\d{6}|7[467]\d{6}))/;
       my @matches = $number =~ /$prefix/;

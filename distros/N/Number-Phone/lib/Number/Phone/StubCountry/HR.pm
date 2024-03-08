@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185945;
+our $VERSION = 1.20240308154351;
 
 my $formatters = [
                 {
@@ -45,7 +45,10 @@ my $formatters = [
                 },
                 {
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '[67]',
+                  'leading_digits' => '
+            6|
+            7[245]
+          ',
                   'national_rule' => '0$1',
                   'pattern' => '(\\d{2})(\\d{3})(\\d{3,4})'
                 },
@@ -57,7 +60,7 @@ my $formatters = [
                 },
                 {
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '[2-5]',
+                  'leading_digits' => '[2-57]',
                   'national_rule' => '0$1',
                   'pattern' => '(\\d{2})(\\d{3})(\\d{3,4})'
                 },
@@ -99,6 +102,7 @@ my $validators = {
               5(?:
                 [01]\\d|
                 44|
+                55|
                 77|
                 9[5-7]
               )
@@ -119,32 +123,37 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"38523", "Zadar",
+$areanames{en} = {"38540", "Međimurje",
 "38532", "Vukovar\-Srijem",
-"38548", "Koprivnica\-Križevci",
-"38522", "Šibenik\-Knin",
-"38551", "Primorsko\-goranska",
-"38534", "Požega\-Slavonia",
 "38520", "Dubrovnik\-Neretva",
-"38549", "Krapina\-Zagorje",
-"38533", "Virovitica\-Podravina",
-"3851", "Zagreb",
-"38547", "Karlovac",
-"38540", "Međimurje",
-"38552", "Istra",
-"38542", "Varaždin",
-"38521", "Split\-Dalmatia",
-"38535", "Brod\-Posavina",
-"38553", "Lika\-Senj",
 "38531", "Osijek\-Baranja",
+"38553", "Lika\-Senj",
+"38547", "Karlovac",
+"38534", "Požega\-Slavonia",
+"38549", "Krapina\-Zagorje",
+"38523", "Zadar",
+"38543", "Bjelovar\-Bilogora",
+"3851", "Zagreb",
+"38551", "Primorsko\-goranska",
+"38533", "Virovitica\-Podravina",
+"38535", "Brod\-Posavina",
+"38548", "Koprivnica\-Križevci",
+"38552", "Istra",
 "38544", "Sisak\-Moslavina",
-"38543", "Bjelovar\-Bilogora",};
+"38521", "Split\-Dalmatia",
+"38542", "Varaždin",
+"38522", "Šibenik\-Knin",};
+my $timezones = {
+               '' => [
+                       'Europe/Zagreb'
+                     ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+385|\D)//g;
-      my $self = bless({ country_code => '385', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '385', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
       $self = bless({ country_code => '385', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);

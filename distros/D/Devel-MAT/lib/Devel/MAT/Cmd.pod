@@ -101,6 +101,11 @@ bareword identifier.
 If true, the value represents an array index. Wraps the result in square
 brackets C<[...]> and expects the value to be an integer.
 
+=item addr => BOOL
+
+If true, the value represents some (non-SV) address. Prepends a "0x" and
+formats the value as a hexadecimal string.
+
 =item pv => BOOL
 
 If true, the value represents a string from the user code. Wraps the result

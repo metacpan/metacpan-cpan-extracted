@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185945;
+our $VERSION = 1.20240308154352;
 
 my $formatters = [
                 {
@@ -93,41 +93,46 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"9438", "Panadura\,\ Kalutara",
-"9451", "Hatton\,\ Nuwara\ Eliya",
-"9425", "Anuradhapura",
-"9457", "Bandarawela\,\ Badulla",
-"9435", "Kegalle",
-"9434", "Kalutara",
-"9424", "Vavuniya",
-"9465", "Batticaloa",
-"9466", "Matale",
-"9426", "Trincomalee",
+$areanames{en} = {"9451", "Hatton\,\ Nuwara\ Eliya",
 "9436", "Avissawella\,\ Colombo",
-"9452", "Nuwara\ Eliya",
-"9445", "Ratnapura",
 "9411", "Colombo",
-"9421", "Jaffna",
 "9431", "Negombo\,\ Gampaha",
-"9454", "Nawalapitiya\,\ Kandy",
+"9433", "Gampaha",
+"9432", "Chilaw\,\ Puttalam",
+"9424", "Vavuniya",
+"9427", "Polonnaruwa",
+"9445", "Ratnapura",
+"9463", "Ampara",
+"9466", "Matale",
+"9425", "Anuradhapura",
+"9447", "Hambantota",
+"9452", "Nuwara\ Eliya",
+"9438", "Panadura\,\ Kalutara",
+"9426", "Trincomalee",
+"9441", "Matara",
+"9465", "Batticaloa",
 "9467", "Kalmunai\,\ Ampara",
+"9482", "Kandy",
+"9421", "Jaffna",
+"9423", "Mannar",
+"9434", "Kalutara",
 "9437", "Kurunegala",
 "9455", "Badulla",
-"9427", "Polonnaruwa",
-"9441", "Matara",
-"9432", "Chilaw\,\ Puttalam",
-"9482", "Kandy",
-"9463", "Ampara",
-"9433", "Gampaha",
-"9423", "Mannar",
 "9491", "Galle",
-"9447", "Hambantota",};
+"9435", "Kegalle",
+"9454", "Nawalapitiya\,\ Kandy",
+"9457", "Bandarawela\,\ Badulla",};
+my $timezones = {
+               '' => [
+                       'Asia/Colombo'
+                     ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+94|\D)//g;
-      my $self = bless({ country_code => '94', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '94', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
       $self = bless({ country_code => '94', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);

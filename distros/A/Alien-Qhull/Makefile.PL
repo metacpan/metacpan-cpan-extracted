@@ -18,7 +18,6 @@ my %WriteMakefileArgs = (
     "Alien::Build" => "2.3901",
     "Alien::Build::MM" => "0.32",
     "Alien::Build::Plugin::Build::CMake" => "0.99",
-    "Alien::Build::Plugin::PkgConfig::Negotiate" => "1.53",
     "ExtUtils::MakeMaker" => "6.52",
     "Sort::Versions" => 0
   },
@@ -44,7 +43,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "version" => 0
   },
-  "VERSION" => "v8.0.2.1",
+  "VERSION" => "v8.0.2.2",
   "test" => {
     "TESTS" => "t/*.t"
   }

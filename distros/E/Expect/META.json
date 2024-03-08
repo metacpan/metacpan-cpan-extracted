@@ -58,6 +58,6 @@
          "web" : "http://github.com/jacoby/expect.pm"
       }
    },
-   "version" : "1.36",
+   "version" : "1.38",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

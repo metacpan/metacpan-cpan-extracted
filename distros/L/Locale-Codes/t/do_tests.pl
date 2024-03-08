@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# Copyright (c) 2016-2023 Sullivan Beck. All rights reserved.
+# Copyright (c) 2016-2024 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -224,10 +224,12 @@ sub _test {
    }
 }
 
-init_tests();
-$::t->tests(func  => \&test,
-            tests => $::tests);
-$::t->done_testing();
+sub do_tests {
+   init_tests();
+   $::t->tests(func  => \&test,
+               tests => $::tests);
+   $::t->done_testing();
+}
 
 1;
 # Local Variables:

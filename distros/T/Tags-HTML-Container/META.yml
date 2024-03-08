@@ -30,13 +30,13 @@ no_index:
 requires:
   Class::Utils: 0
   Error::Pure: 0
-  List::Util: 0
+  List::Util: 1.33
   Readonly: 0
-  Tags::HTML: 0.02
+  Tags::HTML: 0.08
   perl: 5.8.0
 resources:
   bugtracker: https://github.com/michal-josef-spacek/Tags-HTML-Container/issues
   homepage: https://github.com/michal-josef-spacek/Tags-HTML-Container
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Tags-HTML-Container
-version: '0.04'
+version: '0.05'

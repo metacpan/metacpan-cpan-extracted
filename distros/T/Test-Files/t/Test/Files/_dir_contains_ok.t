@@ -7,7 +7,10 @@ use Test::Expander -tempdir => {};
 
 use Test::Files::Constants qw( $FMT_ABSENT $FMT_FAILED_TO_SEE $FMT_UNEXPECTED );
 
-const my $MISSING_FILE => 'MISSING_FILE';
+const my $MISSING_FILE   => 'MISSING_FILE';
+const my $SPECIAL_FILE   => 'special_file';
+const my $UNTESTABLE_OS  => $^O =~ /^(?:MacOS|MSWin32|darwin|solaris)$/ || !path( '/dev/null' )->exists;
+const my @EXISTING_FILES => qw( file0 file1 subdir/file2 subdir/file3 );
 
 plan( 4 );
 
@@ -21,16 +24,13 @@ subtest 'invalid arguments' => sub {
   is( $self->diag,                     $expected, 'error message' );
 };
 
-const my @EXISTING_FILES => qw( file0 file1 subdir/file2 subdir/file3 );
 foreach my $file ( map { [ split( m{/} ) ] } @EXISTING_FILES ) {
   path( $TEMP_DIR )->child( @$file[ 0 .. ( $#$file - 1 ) ] )->mkdir if $#$file;
   path( $TEMP_DIR )->child( @$file )->touch;
 }
 
-const my $SPECIAL_FILE => 'special_file';
 
 SKIP: {
-  const my $UNTESTABLE_OS => $^O eq 'MSWin32' || !path( '/dev/null' )->exists;
   skip "$^O does not support special device files" if $UNTESTABLE_OS;
   symlink( '/dev/null', path( $TEMP_DIR )->child( $SPECIAL_FILE ) );
 
@@ -76,7 +76,7 @@ $mockPathTiny->override(
 );
 
 subtest 'supefluous file in symmetric approach, name pattern omitted' => sub {
-  plan( 2 );
+  plan( $UNTESTABLE_OS ? 1 : 2 );
 
   my $expected = [
     sprintf( $FMT_ABSENT,     path( $TEMP_DIR )->child( $UNACCESSIBLE_FILE ) ),
@@ -87,11 +87,11 @@ subtest 'supefluous file in symmetric approach, name pattern omitted' => sub {
     $self->$METHOD( $TEMP_DIR, \@EXISTING_FILES, { EXISTENCE_ONLY => 1, RECURSIVE => 1, SYMMETRIC => 1 } ),
     [ map { my $e = path( $_ ); qr/\b$e$/ } @EXISTING_FILES ], 'list of existing files returned'
   );
-  is( $self->diag, $expected,                                  'error message' );
+  is( $self->diag, $expected,                                  'error message' ) unless $UNTESTABLE_OS;
 };
 
 subtest 'unaccessible file, name pattern omitted' => sub {
-  plan( 2 );
+  plan( $UNTESTABLE_OS ? 1 : 2 );
 
   path( $TEMP_DIR )->child( $_ )->touch foreach $UNACCESSIBLE_FILE, $UNEXPECTED_FILE;
   my $expected = [ sprintf( $FMT_ABSENT, path( $TEMP_DIR )->child( $UNACCESSIBLE_FILE ) ) ];
@@ -100,5 +100,5 @@ subtest 'unaccessible file, name pattern omitted' => sub {
     $self->$METHOD( $TEMP_DIR, \@EXISTING_FILES, { EXISTENCE_ONLY => 1, RECURSIVE => 1 } ),
     [ map { my $e = path( $_ ); qr/\b$e$/ } @EXISTING_FILES ], 'list of existing files returned'
   );
-  is( $self->diag, $expected,                                  'error message' );
+  is( $self->diag, $expected,                                  'error message' ) unless $UNTESTABLE_OS;
 };

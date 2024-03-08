@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Devel::MAT::Dumper;
 use Devel::MAT;
@@ -45,9 +45,9 @@ my ( $cinner, $ctry, $couter, $ceval, $canon ) = @ctxts;
    is( $cinner->cv->symname, '&main::inner', '$cinner CV name' );
    is( $cinner->depth, 1, '$cinner depth' );
    is( $cinner->olddepth, 0, '$cinner olddepth' );
-   is_deeply( [ map { $_->pv } $cinner->args->elems ],
-              [qw( C D )],
-              '$cinner args' );
+   is( [ map { $_->pv } $cinner->args->elems ],
+       [qw( C D )],
+       '$cinner args' );
 }
 
 {
@@ -61,9 +61,9 @@ my ( $cinner, $ctry, $couter, $ceval, $canon ) = @ctxts;
    like( $couter->file, qr/^\(eval \d+\)/, '$couter file' );
    is( $couter->line, 1, '$couter line' );
    is( $couter->cv->symname, '&main::outer', '$couter CV name' );
-   is_deeply( [ map { $_->pv } $couter->args->elems ],
-              [qw( A B )],
-              '$couter args' );
+   is( [ map { $_->pv } $couter->args->elems ],
+       [qw( A B )],
+       '$couter args' );
 }
 
 {

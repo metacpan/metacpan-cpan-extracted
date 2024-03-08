@@ -15,7 +15,7 @@ Header:
                     0x10 : ithreads
   U8      zero
   U8      FORMATVER_MAJOR 0
-  U8      FORMATVER_MINOR 4
+  U8      FORMATVER_MINOR 6
   U32     PERLVER   rev<<24 | ver<<16 | sub
 
   U8      NTYPES
@@ -132,8 +132,9 @@ An SV:
               OURSTASH
 
   type: GLOB
-    Header(I):
+    Header(I+P):
       UINT    LINE
+      PTR     NAME_HEK
     PTRs(8):
               STASH
               SCALAR
@@ -163,6 +164,7 @@ An SV:
               BACKREFS
     Body:
       {STR    KEY
+       PTR    HEK
        PTR    VALUE}*$n
 
   type: STASH
@@ -176,7 +178,7 @@ An SV:
               NAME
 
   type: CODE
-    Header(1+I+P):
+    Header(1+I+2P):
       UINT    LINE
       U8      FLAGS  0x01 : CLONE
                      0x02 : CLONED
@@ -186,6 +188,7 @@ An SV:
                      0x20 : LEXICAL
       PTR     OPROOT
       U32     DEPTH
+      PTR     NAME_HEK
     PTRs(5):
               STASH
               GLOB
@@ -231,6 +234,11 @@ An SV:
                    0x08 : TYPED
                    0x10 : OUR
 
+      type: PADNAME_FIELD
+        UINT PADIX
+        UINT FIELDIX
+        PTR  FIELDSTASH
+
   type: IO
     Header(2I):
       UINT    IFILENO
@@ -257,6 +265,19 @@ An SV:
   type: YES
 
   type: NO
+
+  type: OBJ
+    Header(1+I):
+      UINT    COUNT = $n
+    PTRs(0)
+    STRs(0)
+    Body:
+      {PTR    FIELD}*$n
+
+  type: CLASS
+    [extends fields of a stash]
+    PTRs(1)
+            ADJUST_BLOCKS
 
   type: STRUCT
     Header(0):
@@ -319,6 +340,10 @@ SV extensions:
       UINT  LINE
     STRs(1):
             FILE
+
+  type: PV_SHARED_HEK (0x89)
+    Header(P):
+      PTR   HEK
 
   type: META_STRUCT (0xF0)
     Header(2I):

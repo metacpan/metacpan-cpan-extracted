@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2017 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Roots 0.52;
+package Devel::MAT::Tool::Roots 0.53;
 
 use v5.14;
 use warnings;
@@ -50,7 +50,7 @@ sub run
          my $sv = $df->sv_at( $addr );
 
          $sv   ? [ "$description", Devel::MAT::Cmd->format_sv( $sv ) ] :
-         $addr ? [ "$description", sprintf( "PTR(0x%x)", $addr ) ] :
+         $addr ? [ "$description", Devel::MAT::Cmd->format_value( $addr, addr => 1 ) ] :
                  ()
       } pairs $df->root_descriptions ],
       sep => ": ",

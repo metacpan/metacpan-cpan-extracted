@@ -22,9 +22,10 @@ getopts('v', \%opts);
 Geo::Coder::Free::DB::init(logger => MyLogger->new()) if($opts{'v'});
 
 # print join(' ', @ARGV), "\n";
-if(my $rc = Geo::Coder::Free::Local->new()->geocode(join(' ', @ARGV))) {
-	print Data::Dumper->new([$rc])->Dump();
-} elsif($rc = Geo::Coder::Free->new()->geocode(join(' ', @ARGV))) {
+if(my $rc = Geo::Coder::Free::Local::geocode(join(' ', @ARGV))) {
+	print 'Local: ', Data::Dumper->new([$rc])->Dump();
+} elsif($rc = Geo::Coder::Free::geocode(join(' ', @ARGV))) {
+# if(my $rc = Geo::Coder::Free::geocode(join(' ', @ARGV))) {
 	print Data::Dumper->new([$rc])->Dump();
 } elsif($ENV{'OPENADDR_HOME'} && ($rc = Geo::Coder::Free::OpenAddresses->new(openaddr => $ENV{'OPENADDR_HOME'})->geocode(location => join(' ', @ARGV)))) {
 	print Data::Dumper->new([$rc])->Dump();

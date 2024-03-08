@@ -16,7 +16,6 @@ index.html
 lib/Geo/Coder/Free.pm
 lib/Geo/Coder/Free/bin/db2sql
 lib/Geo/Coder/Free/Config.pm
-lib/Geo/Coder/Free/DB.pm
 lib/Geo/Coder/Free/DB/MaxMind/admin.pm
 lib/Geo/Coder/Free/DB/MaxMind/admin1.pm
 lib/Geo/Coder/Free/DB/MaxMind/admin2.pm
@@ -44,6 +43,7 @@ t/cities.t
 t/comment-spelling.t
 t/coverage.t
 t/critic.t
+t/dr5hn.t
 t/eof.t
 t/eol.t
 t/fixme.t
@@ -59,6 +59,7 @@ t/no404s.t
 t/noopentickets.t
 t/noplan.t
 t/openaddr.t
+t/osm.t
 t/pod-cm.t
 t/pod-spelling.t
 t/pod-synopsis.t
@@ -71,6 +72,7 @@ t/strict.t
 t/unused.t
 t/used.t
 t/vars.t
+t/version.t
 t/whosonfirst.t
 templates/default/Geo/Coder/Free/Display/index.tmpl
 templates/default/Geo/Coder/Free/Display/query.txt

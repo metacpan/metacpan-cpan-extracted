@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185943;
+our $VERSION = 1.20240308154348;
 
 my $formatters = [
                 {
@@ -147,52 +147,57 @@ my $validators = {
         '
               };
 my %areanames = ();
-$areanames{en} = {"267654", "Kgalagadi",
-"26762", "Kasane",
-"267394", "Gaborone",
-"267534", "Lobatse",
-"26736", "Gaborone",
-"267371", "Gaborone",
-"26726", "Selebi\-Phikwe",
-"267319", "Gaborone",
-"267539", "Ramotswa",
-"267370", "Gaborone",
-"267659", "Gantsi",
-"26758", "Jwaneng",
-"26724", "Francistown",
-"267392", "Gaborone",
-"26768", "Maun",
-"267315", "Gaborone",
+$areanames{en} = {"26724", "Francistown",
+"267654", "Kgalagadi",
 "267312", "Gaborone",
-"267395", "Gaborone",
-"267393", "Gaborone",
+"267319", "Gaborone",
+"267370", "Gaborone",
+"26736", "Gaborone",
+"26758", "Jwaneng",
+"267539", "Ramotswa",
+"267659", "Gantsi",
+"267651", "Kgalagadi",
+"267316", "Gaborone",
 "26757", "Mochudi",
+"26726", "Selebi\-Phikwe",
+"267397", "Gaborone",
+"26762", "Kasane",
+"267393", "Gaborone",
+"267310", "Gaborone\ \(outer\)",
+"267534", "Lobatse",
+"267530", "Lobatse",
+"267395", "Gaborone",
+"267371", "Gaborone",
 "26747", "Mahalapye",
 "26729", "Letlhakane\/Orapa",
-"267533", "Lobatse",
-"267313", "Gaborone",
-"26749", "Palapye",
-"26759", "Molepolole",
-"267397", "Gaborone",
-"267317", "Gaborone",
-"267390", "Gaborone",
-"267651", "Kgalagadi",
-"267310", "Gaborone\ \(outer\)",
-"267530", "Lobatse",
-"26754", "Barolong\/Ngwaketse",
-"26746", "Serowe",
-"267391", "Gaborone",
-"267318", "Gaborone",
-"26738", "Gaborone",
 "26735", "Gaborone",
-"267316", "Gaborone",
-"267538", "Ramotswa",};
+"267317", "Gaborone",
+"267533", "Lobatse",
+"267394", "Gaborone",
+"26754", "Barolong\/Ngwaketse",
+"267318", "Gaborone",
+"267538", "Ramotswa",
+"267390", "Gaborone",
+"267313", "Gaborone",
+"267315", "Gaborone",
+"26768", "Maun",
+"26746", "Serowe",
+"26759", "Molepolole",
+"267392", "Gaborone",
+"26749", "Palapye",
+"26738", "Gaborone",
+"267391", "Gaborone",};
+my $timezones = {
+               '' => [
+                       'Africa/Gaborone'
+                     ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+267|\D)//g;
-      my $self = bless({ country_code => '267', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '267', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
         return $self->is_valid() ? $self : undef;
     }
 1;

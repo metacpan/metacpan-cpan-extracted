@@ -1,5 +1,7 @@
 Changes
 Date.pm
+examples/check_date_ddmmyy_fail.pl
+examples/check_date_ddmmyy_ok.pl
 examples/check_date_fail.pl
 examples/check_date_ok.pl
 inc/Module/Install.pm
@@ -23,6 +25,7 @@ t/Mo-utils-Date/01-use.t
 t/Mo-utils-Date/02-version.t
 t/Mo-utils-Date/03-check_date.t
 t/Mo-utils-Date/04-check_date_dmy.t
-t/Mo-utils-Date/05-check_date_order.t
+t/Mo-utils-Date/05-check_date_ddmmyy.t
+t/Mo-utils-Date/06-check_date_order.t
 xt/Mo-utils-Date/01-pod_coverage.t
 xt/Mo-utils-Date/02-pod.t

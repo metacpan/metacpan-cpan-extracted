@@ -17,7 +17,8 @@ xs_ok { xs => $xs, verbose => 1 }, with_subtest {
     my ( undef, $got ) = split( qr/ /, $stash->get_symbol( '&version' )->() );
     $got = version->declare( $got );
     # need to strip last component off of Alien::Qhull's version
-    my $expected = version->parse( version->declare( Alien::Qhull->VERSION )->numify =~ s/\d{3}$//r );
+    ( my $expected = version->parse( version->declare( Alien::Qhull->VERSION )->numify ) )
+      =~ s/\d{3}$//;
     ok( $got >= $expected, "$got >= $expected" )
       or note( "Got Version = $got" );
 };

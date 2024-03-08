@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185943;
+our $VERSION = 1.20240308154349;
 
 my $formatters = [
                 {
@@ -74,20 +74,52 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{fr} = {"2435", "Province\ Orientale\ \(Kisanga\/Mbandaka\)",
-"2436", "Nord\-Kivu\/Sud\-Kivu\/Maniema",};
-$areanames{en} = {"2435", "Oriental\ Province\ \(Kisanga\/Mbandaka\)",
-"2431", "Kinshasa",
-"2432", "Katanga",
+$areanames{en} = {"2432", "Katanga",
 "2436", "North\ Kivu\/South\ Kivu\/Maniema",
 "2434", "Kasai\-Oriental\/Kasai\-Occidental",
+"2435", "Oriental\ Province\ \(Kisanga\/Mbandaka\)",
+"2431", "Kinshasa",
 "2433", "Bas\-Congo\/Bandundu",};
+$areanames{fr} = {"2436", "Nord\-Kivu\/Sud\-Kivu\/Maniema",
+"2435", "Province\ Orientale\ \(Kisanga\/Mbandaka\)",};
+my $timezones = {
+               '' => [
+                       'Africa/Kinshasa',
+                       'Africa/Lubumbashi'
+                     ],
+               '1' => [
+                        'Africa/Kinshasa'
+                      ],
+               '2' => [
+                        'Africa/Lubumbashi'
+                      ],
+               '3' => [
+                        'Africa/Kinshasa'
+                      ],
+               '4' => [
+                        'Africa/Kinshasa'
+                      ],
+               '5' => [
+                        'Africa/Kinshasa'
+                      ],
+               '6' => [
+                        'Africa/Kinshasa'
+                      ],
+               '8' => [
+                        'Africa/Kinshasa',
+                        'Africa/Lubumbashi'
+                      ],
+               '9' => [
+                        'Africa/Kinshasa',
+                        'Africa/Lubumbashi'
+                      ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+243|\D)//g;
-      my $self = bless({ country_code => '243', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '243', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
       $self = bless({ country_code => '243', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);

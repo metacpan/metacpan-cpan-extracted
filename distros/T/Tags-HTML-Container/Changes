@@ -1,3 +1,10 @@
+0.05 2024-03-08T09:25:34+01:00
+ - Add tests for cleanup() with callback.
+ - Add tests for init() with callback.
+ - Add tests for prepare() with callback.
+ - Fix minimal dependency to List::Util.
+ - Fix minimal dependency to Tags::HTML.
+
 0.04 2024-01-06T14:07:28+01:00
  - Add test for CSS callback.
  - Add tests for cleanup(), init() and prepare() without callbacks.

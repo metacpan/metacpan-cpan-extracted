@@ -4,17 +4,18 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.31'; # VERSION
+our $VERSION = '0.33'; # VERSION
 
 # ABSTRACT: parse XLSX files
 
-use Archive::Zip;
+use Archive::Zip 1.34;
 use Graphics::ColorUtils 'rgb2hls', 'hls2rgb';
 use Scalar::Util 'openhandle';
 use Spreadsheet::ParseExcel;
 use XML::Twig;
 
 use Spreadsheet::ParseXLSX::Decryptor;
+use Spreadsheet::ParseXLSX::Cell;
 
 
 
@@ -382,10 +383,9 @@ sub _parse_sheet {
           }
 
           my $formula = $cell->first_child('s:f');
-          my $cell = Spreadsheet::ParseExcel::Cell->new(
+          my $cell = Spreadsheet::ParseXLSX::Cell->new(
             Val => $val,
             Type => $long_type,
-            Merged => undef, # fix up later
             Format => $format,
             FormatNo => $format_idx,
             (
@@ -409,11 +409,14 @@ sub _parse_sheet {
   $sheet_xml->parse($sheet_file);
 
   if ($sheet->{Cells}) {
+    # SMELL: we have to connect cells their sheet as well as their position
     for my $r (0 .. $#{$sheet->{Cells}}) {
       my $row = $sheet->{Cells}[$r] or next;
       for my $c (0 .. $#$row) {
         my $cell = $row->[$c] or next;
-        $cell->{Merged} = $self->_is_merged($sheet, $r, $c);
+        $cell->{Sheet} = $sheet;
+        $cell->{Row} = $r;
+        $cell->{Col} = $c;
       }
     }
   } else {
@@ -474,7 +477,7 @@ sub _parse_sheet_links {
         # Do I have a cell?
         unless ($cell) {
           # No - just create an empty value for now
-          $cell = $sheet->{Cells}[$row][$col] = Spreadsheet::ParseExcel::Cell->new();
+          $cell = $sheet->{Cells}[$row][$col] = Spreadsheet::ParseXLSX::Cell->new();
         }
 
         # Is this an external hyperlink I've parsed from the rels?
@@ -1161,7 +1164,7 @@ Spreadsheet::ParseXLSX - parse XLSX files
 
 =head1 VERSION
 
-version 0.31
+version 0.33
 
 =head1 SYNOPSIS
 
@@ -1318,7 +1321,7 @@ Jesse Luehrs <doy@tozt.net>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alexey Mazurin Daryl Anderman Dave Clarke Fitz Elliott FL Gareth Tunley Meredith Howard Michael Daum Nick Moore oharakouhei rdboisvert Ricardo Signes Robert Boisvert Steve Simms Stuart Watt theevilapplepie zhouzhen1
+=for stopwords Alexey Mazurin Daryl Anderman Dave Clarke Fitz Elliott FL Gareth Tunley M Conrad Meredith Howard Michael Daum Nick Moore oharakouhei rdboisvert Ricardo Signes Robert Boisvert Steve Simms Stuart Watt theevilapplepie zhouzhen1
 
 =over 4
 
@@ -1345,6 +1348,10 @@ FL <f20@reckon.co.uk>
 =item *
 
 Gareth Tunley <gjtunley@gmail.com>
+
+=item *
+
+M Conrad <mike@nrdvana.net>
 
 =item *
 

@@ -1,5 +1,9 @@
 Revision history for Ixchel
 
+0.9.4  2024-03-07/01:30
+		 - fix snmp_v2 template for chronyd
+		 - fix suricata outputs template for pcap logging again
+
 0.9.3  2024-02-22/11:30
 		 - remove a uneeded . for pcap logging in the suricata outputs template
 		 - fix template for suricata pcap logging

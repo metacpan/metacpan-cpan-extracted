@@ -27,5 +27,6 @@ t/Tags-HTML-ChangePassword/04-cleanup.t
 t/Tags-HTML-ChangePassword/05-init.t
 t/Tags-HTML-ChangePassword/06-prepare.t
 t/Tags-HTML-ChangePassword/07-process.t
+t/Tags-HTML-ChangePassword/08-process_css.t
 xt/Tags-HTML-ChangePassword/01-pod_coverage.t
 xt/Tags-HTML-ChangePassword/02-pod.t

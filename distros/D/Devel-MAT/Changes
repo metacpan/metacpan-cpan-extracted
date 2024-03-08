@@ -1,5 +1,18 @@
 Revision history for Devel-MAT
 
+0.53    2024-03-07
+        [CHANGES]
+         * Read PMAT file format 0.6 with its shared HEK pointer additions
+         * Added `strtab` command for analysing the PL_strtab shared strings
+           table
+         * Added count/skip/no-sort options and a filtering argument to
+           `values` command
+         * Added a `stop` command to cancel an ongoing pagination
+         * Only print "class it experimental" warnings when reading an actual
+           class or object instance from a PMAT file, rather than any version
+           0.5 (or later).
+         * Swap unit tests from `Test::More` to `Test2::V0`
+
 0.52    2024-01-13
         [CHANGES]
          * Ensure that `packages -V` can cope with version objects as well as

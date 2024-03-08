@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185944;
+our $VERSION = 1.20240308154350;
 
 my $formatters = [
                 {
@@ -79,12 +79,17 @@ my $validators = {
           )\\d{4}
         '
               };
+my $timezones = {
+               '' => [
+                       'America/Costa_Rica'
+                     ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+506|\D)//g;
-      my $self = bless({ country_code => '506', number => $number, formatters => $formatters, validators => $validators, }, $class);
+      my $self = bless({ country_code => '506', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, }, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:(19(?:0[0-2468]|1[09]|20|66|77|99)))//;
       $self = bless({ country_code => '506', number => $number, formatters => $formatters, validators => $validators, }, $class);

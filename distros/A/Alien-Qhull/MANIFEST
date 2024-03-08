@@ -13,6 +13,8 @@ dist.ini
 hgrc
 lib/Alien/Qhull.pm
 lib/Alien/Qhull/Install/Files.pm
+mutagen.yml
+mutagen.yml.lock
 perlcritic.rc
 perltidy.rc
 src/qhull-2020-src-8.0.2.tgz
@@ -37,4 +39,3 @@ xt/release/dist-manifest.t
 xt/release/fixme.t
 xt/release/meta-json.t
 xt/release/trailing-space.t
-xt/release/unused-vars.t

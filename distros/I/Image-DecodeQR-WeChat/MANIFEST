@@ -12,8 +12,8 @@ README.md
 script/image-decodeqr-wechat.pl
 t/00-load.t
 t/05-modelsdir.t
+t/06-decode_xs-prototype.t
 t/10-decode_xs.t
-t/20-decode_xs-without-use-utf8.t
 t/50-decode.t
 t/manifest.t
 t/pod-coverage.t

@@ -4,7 +4,7 @@ use v5.12;
 use strict;
 use warnings;
 
-our $VERSION = 'v8.0.2.1';
+our $VERSION = 'v8.0.2.2';
 
 require Alien::Qhull;
 
@@ -33,7 +33,7 @@ Alien::Qhull::Install::Files
 
 =head1 VERSION
 
-version v8.0.2.1
+version v8.0.2.2
 
 =for Pod::Coverage Inline
 

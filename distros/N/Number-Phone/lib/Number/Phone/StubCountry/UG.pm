@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185946;
+our $VERSION = 1.20240308154353;
 
 my $formatters = [
                 {
@@ -67,7 +67,7 @@ my $validators = {
             20(?:
               [017]\\d|
               2[5-9]|
-              32|
+              3[1-4]|
               5[0-4]|
               6[15-9]
             )|
@@ -89,7 +89,7 @@ my $validators = {
             20(?:
               [017]\\d|
               2[5-9]|
-              32|
+              3[1-4]|
               5[0-4]|
               6[15-9]
             )|
@@ -97,7 +97,10 @@ my $validators = {
           )\\d{5}
         ',
                 'mobile' => '
-          726[01]\\d{5}|
+          72(?:
+            [48]0|
+            6[01]
+          )\\d{5}|
           7(?:
             [015-8]\\d|
             20|
@@ -113,25 +116,30 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"256473", "Lira",
-"25646", "Mityana",
-"25643", "Jinja",
+$areanames{en} = {"256481", "Masaka",
+"256464", "Mubende",
+"25641", "Kampala",
+"256485", "Mbarara",
 "256465", "Masindi",
 "256476", "Arua",
-"256471", "Gulu",
-"25641", "Kampala",
-"256464", "Mubende",
-"256486", "Kabale\/Rukungiri\/Kisoro",
+"25643", "Jinja",
+"25645", "Mbale",
 "256483", "Fort\ Portal",
-"256481", "Masaka",
-"256485", "Mbarara",
-"25645", "Mbale",};
+"25646", "Mityana",
+"256486", "Kabale\/Rukungiri\/Kisoro",
+"256473", "Lira",
+"256471", "Gulu",};
+my $timezones = {
+               '' => [
+                       'Africa/Kampala'
+                     ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+256|\D)//g;
-      my $self = bless({ country_code => '256', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '256', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
       $self = bless({ country_code => '256', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);

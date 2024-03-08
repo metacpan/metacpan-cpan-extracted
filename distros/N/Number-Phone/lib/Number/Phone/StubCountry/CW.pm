@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185944;
+our $VERSION = 1.20240308154350;
 
 my $formatters = [
                 {
@@ -100,22 +100,43 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"59972", "Bonaire",
+$areanames{en} = {"5993180", "St\.\ Eustatius",
 "5994160", "Saba",
-"5993180", "St\.\ Eustatius",
 "59975", "Bonaire",
 "599417", "Saba",
-"5993183", "St\.\ Eustatius",
-"5994163", "Saba",
 "5993182", "St\.\ Eustatius",
+"59972", "Bonaire",
 "5994162", "Saba",
+"5994163", "Saba",
+"5993183", "St\.\ Eustatius",
 "59971", "Bonaire",};
+my $timezones = {
+               '' => [
+                       'America/Curacao',
+                       'America/Kralendijk'
+                     ],
+               '3' => [
+                        'America/Kralendijk'
+                      ],
+               '4' => [
+                        'America/Kralendijk'
+                      ],
+               '6' => [
+                        'America/Curacao'
+                      ],
+               '7' => [
+                        'America/Kralendijk'
+                      ],
+               '9' => [
+                        'America/Curacao'
+                      ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+599|\D)//g;
-      my $self = bless({ country_code => '599', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '599', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
         return $self->is_valid() ? $self : undef;
     }
 1;

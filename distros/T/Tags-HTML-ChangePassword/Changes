@@ -1,3 +1,8 @@
+0.05 2024-03-08T09:38:04+01:00
+ - Add tests for process_css().
+ - Fix minimal dependency for Tags::HTML to 0.08 (thanks Andreas J. König,
+   GH#1).
+
 0.04 2024-02-27T22:03:30+01:00
  - Add tests for prepare().
  - Add tests for process().

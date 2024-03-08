@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2024 -- leonerd@leonerd.org.uk
 
-package Devel::MAT 0.52;
+package Devel::MAT 0.53;
 
 use v5.14;
 use warnings;
@@ -68,7 +68,7 @@ be made more stable.
 
 =head2 load
 
-   $pmat = Devel::MAT->load( $path, %args )
+   $pmat = Devel::MAT->load( $path, %args );
 
 Loads a heap dump file from the given path, and returns a new C<Devel::MAT>
 instance wrapping it.
@@ -92,7 +92,7 @@ sub load
 
 =head2 dumpfile
 
-   $df = $pmat->dumpfile
+   $df = $pmat->dumpfile;
 
 Returns the underlying L<Devel::MAT::Dumpfile> instance backing this analysis
 object.
@@ -107,7 +107,7 @@ sub dumpfile
 
 =head2 available_tools
 
-   @tools = $pmat->available_tools
+   @tools = $pmat->available_tools;
 
 Lists the L<Devel::MAT::Tool> classes that are installed and available.
 
@@ -139,7 +139,7 @@ Lists the L<Devel::MAT::Tool> classes that are installed and available.
 
 =head2 load_tool
 
-   $tool = $pmat->load_tool( $name )
+   $tool = $pmat->load_tool( $name );
 
 Loads the named L<Devel::MAT::Tool> class.
 
@@ -174,7 +174,7 @@ sub load_tool_for_command
 
 =head2 has_tool
 
-   $bool = $pmat->has_tool( $name )
+   $bool = $pmat->has_tool( $name );
 
 Returns true if the named tool is already loaded.
 
@@ -190,7 +190,7 @@ sub has_tool
 
 =head2 run_command
 
-   $pmat->run_command( $inv )
+   $pmat->run_command( $inv );
 
 Runs a tool command given by the L<Commandable::Invocation> instance.
 
@@ -210,7 +210,7 @@ sub run_command
 
 =head2 inref_graph
 
-   $node = $pmat->inref_graph( $sv, %opts )
+   $node = $pmat->inref_graph( $sv, %opts );
 
 Traces the tree of inrefs from C<$sv> back towards the known roots, returning
 a L<Devel::MAT::Graph> node object representing it, within a graph of reverse
@@ -376,7 +376,7 @@ sub inref_graph
 
 =head2 find_symbol
 
-   $sv = $pmat->find_symbol( $name )
+   $sv = $pmat->find_symbol( $name );
 
 Attempts to walk the symbol table looking for a symbol of the given name,
 which must include the sigil.
@@ -419,14 +419,14 @@ sub find_symbol
 
 =head2 find_glob
 
-   $gv = $pmat->find_glob( $name )
+   $gv = $pmat->find_glob( $name );
 
 Attempts to walk the symbol table looking for a symbol of the given name,
 returning the C<GLOB> object if found.
 
 =head2 find_stash
 
-   $stash = $pmat->find_stash( $name )
+   $stash = $pmat->find_stash( $name );
 
 Attempts to walk the symbol table looking for a stash of the given name.
 
@@ -549,6 +549,13 @@ sub _format_sv
    return $ret;
 }
 
+sub _format_addr
+{
+   shift;
+   my ( $addr ) = @_;
+   return sprintf "%#x", $addr;
+}
+
 sub format_sv
 {
    shift;
@@ -560,7 +567,7 @@ sub format_sv
       $ret .= "=" . Devel::MAT::Cmd->format_symbol( $blessed->stashname, $blessed );
    }
 
-   $ret .= sprintf " at %#x", $sv->addr;
+   $ret .= " at " . Devel::MAT::Cmd->_format_addr( $sv->addr );
 
    if( my $rootname = $sv->rootname ) {
       $ret .= "=" . Devel::MAT::Cmd->format_note( $rootname, 1 );
@@ -596,6 +603,9 @@ sub format_value
    }
    elsif( $opts{index} ) {
       return "[" . Devel::MAT::Cmd->_format_value( $val+0 ) . "]";
+   }
+   elsif( $opts{addr} ) {
+      return Devel::MAT::Cmd->_format_addr( $val );
    }
    elsif( $opts{pv} ) {
       my $truncated;

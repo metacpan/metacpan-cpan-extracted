@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185945;
+our $VERSION = 1.20240308154351;
 
 my $formatters = [
                 {
@@ -73,19 +73,54 @@ my $validators = {
                 'voip' => '[2-7]890\\d{4}'
               };
 my %areanames = ();
-$areanames{en} = {"59326", "Carchi\/Imbabura\/Esmeraldas\/Sucumbíos\/Napo\/Orellana",
+$areanames{en} = {"59344", "Guayas",
+"59326", "Carchi\/Imbabura\/Esmeraldas\/Sucumbíos\/Napo\/Orellana",
+"59322", "Pichincha",
 "59345", "Manabí\/Los\ Ríos\/Galápagos",
-"59347", "Loja\/El\ Oro\/Zamora\ Chinchipe",
 "59323", "Cotopaxi\/Tungurahua\/Chimborazo\/Bolívar\/Pastaza",
-"59344", "Guayas",
 "59327", "Azuay\/Cañar\/Morona\ Santiago",
-"59322", "Pichincha",};
+"59347", "Loja\/El\ Oro\/Zamora\ Chinchipe",};
+my $timezones = {
+               '' => [
+                       'America/Guayaquil',
+                       'Pacific/Galapagos'
+                     ],
+               '1' => [
+                        'America/Guayaquil',
+                        'Pacific/Galapagos'
+                      ],
+               '2' => [
+                        'America/Guayaquil'
+                      ],
+               '3' => [
+                        'America/Guayaquil'
+                      ],
+               '4' => [
+                        'America/Guayaquil'
+                      ],
+               '5' => [
+                        'America/Guayaquil'
+                      ],
+               '52' => [
+                         'America/Guayaquil',
+                         'Pacific/Galapagos'
+                       ],
+               '6' => [
+                        'America/Guayaquil'
+                      ],
+               '7' => [
+                        'America/Guayaquil'
+                      ],
+               '9' => [
+                        'America/Guayaquil'
+                      ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+593|\D)//g;
-      my $self = bless({ country_code => '593', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '593', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
       $self = bless({ country_code => '593', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);

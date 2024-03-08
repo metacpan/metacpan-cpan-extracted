@@ -3,7 +3,7 @@ use warnings;
 
 use utf8; # allow for utf8 in code (we have strings in utf8, filenames)
 
-our $VERSION = '0.9';
+our $VERSION = '1.0';
 
 use Test::More;
 

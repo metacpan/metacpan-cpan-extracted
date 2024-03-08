@@ -11,6 +11,8 @@ build_requires:
   Config::Auto: '0'
   Cwd: '0'
   Data::Throttler: '0'
+  Database::Abstraction: '0'
+  Devel::Size: '0'
   File::Basename: '0'
   File::Copy: '0'
   File::Open::NoCache::ReadOnly: '0.02'
@@ -26,6 +28,7 @@ build_requires:
   Test::Carp: '0'
   Test::Deep: '0'
   Test::Most: '0'
+  Test::Needs: '0'
   Test::NoWarnings: '0'
   Test::Number::Delta: '0'
   Try::Tiny: '0'
@@ -49,6 +52,7 @@ requires:
   DBD::CSV: '0'
   DBD::SQLite: '0'
   DBI: '0'
+  DB_File: '0'
   Digest::MD5: '0'
   Encode: '0'
   File::Spec: '0'
@@ -72,5 +76,5 @@ resources:
   bugtracker: https://github.com/nigelhorne/Geo-Coder-Free/issues
   homepage: https://geocode.nigelhorne.com
   repository: git://github.com/nigelhorne/Geo-Coder-Free.git
-version: '0.34'
+version: '0.35'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

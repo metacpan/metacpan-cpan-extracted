@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185945;
+our $VERSION = 1.20240308154351;
 
 my $formatters = [
                 {
@@ -46,7 +46,7 @@ my $validators = {
                 'fixed_line' => '
           594(?:
             [02-49]\\d|
-            1[0-4]|
+            1[0-5]|
             5[6-9]|
             6[0-3]|
             80
@@ -55,7 +55,7 @@ my $validators = {
                 'geographic' => '
           594(?:
             [02-49]\\d|
-            1[0-4]|
+            1[0-5]|
             5[6-9]|
             6[0-3]|
             80
@@ -81,12 +81,17 @@ my $validators = {
           )\\d{4}
         '
               };
+my $timezones = {
+               '' => [
+                       'America/Cayenne'
+                     ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+594|\D)//g;
-      my $self = bless({ country_code => '594', number => $number, formatters => $formatters, validators => $validators, }, $class);
+      my $self = bless({ country_code => '594', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, }, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
       $self = bless({ country_code => '594', number => $number, formatters => $formatters, validators => $validators, }, $class);

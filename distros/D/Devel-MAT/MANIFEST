@@ -1,3 +1,4 @@
+.editorconfig
 bin/pmat
 bin/pmat-cat-svpv
 bin/pmat-counts
@@ -30,6 +31,7 @@ lib/Devel/MAT/Tool/Roots.pm
 lib/Devel/MAT/Tool/Show.pm
 lib/Devel/MAT/Tool/Sizes.pm
 lib/Devel/MAT/Tool/Stack.pm
+lib/Devel/MAT/Tool/Strtab.pm
 lib/Devel/MAT/Tool/Summary.pm
 lib/Devel/MAT/Tool/Symbols.pm
 lib/Devel/MAT/Tool/Tools.pm

@@ -32,7 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Archive::Zip" : "0",
+            "Archive::Zip" : "1.34",
             "Crypt::Mode::CBC" : "0",
             "Crypt::Mode::ECB" : "0",
             "Digest::SHA" : "0",
@@ -43,6 +43,7 @@
             "OLE::Storage_Lite" : "0",
             "Scalar::Util" : "0",
             "Spreadsheet::ParseExcel" : "0",
+            "Spreadsheet::ParseExcel::Cell" : "0",
             "XML::Twig" : "0",
             "perl" : "5.010"
          }
@@ -61,19 +62,23 @@
    "provides" : {
       "Spreadsheet::ParseXLSX" : {
          "file" : "lib/Spreadsheet/ParseXLSX.pm",
-         "version" : "0.31"
+         "version" : "0.33"
+      },
+      "Spreadsheet::ParseXLSX::Cell" : {
+         "file" : "lib/Spreadsheet/ParseXLSX/Cell.pm",
+         "version" : "0.33"
       },
       "Spreadsheet::ParseXLSX::Decryptor" : {
          "file" : "lib/Spreadsheet/ParseXLSX/Decryptor.pm",
-         "version" : "0.31"
+         "version" : "0.33"
       },
       "Spreadsheet::ParseXLSX::Decryptor::Agile" : {
          "file" : "lib/Spreadsheet/ParseXLSX/Decryptor/Agile.pm",
-         "version" : "0.31"
+         "version" : "0.33"
       },
       "Spreadsheet::ParseXLSX::Decryptor::Standard" : {
          "file" : "lib/Spreadsheet/ParseXLSX/Decryptor/Standard.pm",
-         "version" : "0.31"
+         "version" : "0.33"
       }
    },
    "release_status" : "stable",
@@ -86,7 +91,7 @@
          "web" : "https://github.com/MichaelDaum/spreadsheet-parsexlsx"
       }
    },
-   "version" : "0.31",
+   "version" : "0.33",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038002"
@@ -339,7 +344,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.31",
+                  "tag" : "0.33",
                   "tag_format" : "%v",
                   "tag_message" : ""
                },
@@ -382,7 +387,7 @@
                }
             },
             "name" : "Git::Contributors",
-            "version" : "0.036"
+            "version" : "0.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::OurPkgVersion",
@@ -612,6 +617,7 @@
       "Fitz Elliott <felliott@fiskur.org>",
       "FL <f20@reckon.co.uk>",
       "Gareth Tunley <gjtunley@gmail.com>",
+      "M Conrad <mike@nrdvana.net>",
       "Meredith Howard <mhoward@roomag.org>",
       "Michael Daum <daum@michaeldaumconsulting.com>",
       "Nick Moore <nick.moore@strategicdata.com.au>",

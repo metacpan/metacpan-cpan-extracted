@@ -18,11 +18,10 @@ our @EXPORT_OK = qw(
 	modelsdir
 ); # symbols to export on request (WHY?)
 
-our $VERSION = '0.9';
-
+our $VERSION = '1.0';
 
 BEGIN {
-    $VERSION = '0.9';
+    $VERSION = '1.0';
     if ($] > 5.006) {
         require XSLoader;
         XSLoader::load(__PACKAGE__, $VERSION);
@@ -50,9 +49,11 @@ sub decode {
 		push @params, undef;
 	} else { push @params, $m }
 
-	if( ! exists($params->{'verbosity'}) || ! defined($m=$params->{'verbosity'}) ){
-		push @params, 1;
-	} else { push @params, $m }
+	my $verbosity = exists($params->{'verbosity'}) && defined($params->{'verbosity'})
+		? $params->{'verbosity'}
+		: 0
+	;
+	push @params, $verbosity;
 
 	if( ! exists($params->{'graphicaldisplayresult'}) || ! defined($m=$params->{'graphicaldisplayresult'}) ){
 		push @params, 0;
@@ -69,7 +70,8 @@ sub decode {
 		push @params, 0;
 	} else { push @params, $m }
 
-	print "calling with these params: '".join("','", map { defined($_) ? $_ : '<undef>' } @params)."'.\n";
+	# this prints Wide character in print but I don't want to touch it ...
+	if( $verbosity > 0 ){ print "calling with these params: '".join("','", map { defined($_) ? $_ : '<undef>' } @params)."'.\n" }
 
 	return decode_xs(
 		$params[0],
@@ -91,21 +93,36 @@ Image::DecodeQR::WeChat - Decode QR code(s) from images using the OpenCV/WeChat 
 
 =head1 VERSION
 
-Version 0.9
+Version 1.0
 
 
 =head1 SYNOPSIS
 
 This module provides a Perl interface to the OpenCV/WeChat QR code
 decoder via XS code.
-OpenCV/WeChat library uses CNN to do this with pre-trained models.
+OpenCV/WeChat library uses CNN (Convolutional Neural Networks)
+to do this with pre-trained models.
 
-This module has been tested by myself with OpenCV v4.5.5 and Perl v5.32 on
+This module has been tested by myself with OpenCV v4.5.5, v4.8.1
+and Perl v5.32, v5.38 on
 Linux. But check the CPANtesters matrix on the left for all the tests done
-on this module.
+on this module (although tests may be sparse and rare because of the OpenCV
+dependency).
 
 The library is relatively successful even for rotated codes. It remains
-to be tested on the minimum size ofthe code images (60px in my case).
+to be tested on the minimum size of the code images (60px in my case).
+In producing test images with software like the L<GIMP|https://www.gimp.org/>,
+one should be aware of the distortions caused
+by transforms such as scale and rotation to the final QR code images,
+rotation in particular. Add certain enhancements
+to the final image to "look good" and
+the resultant image looks like QR code but it is not.
+Failure of the
+library on such artificially produced images would be somehow expected.
+Instead I would test with images which have been scanned with a QR code
+image attached to them in random angles. This is my use case afterall:
+scanned images with a glued-in QR code tag so that my systems would
+archive it straight from the scanner into the right database table.
 
 Here is some code to get you started:
 
@@ -231,11 +248,44 @@ interface other parts of the OpenCV library:
 
 =head1 COMMAND LINE SCRIPT
 
-  image-decodeqr-wechat.pl --input in.jpg
+  image-decodeqr-wechat.pl --input image-with-qr-code.jpg
 
   image-decodeqr-wechat.pl --help
 
-A CLI script is provided and will be installed by this module. Basic usage is as above.
+A CLI script is provided and will be installed by this module. Basic usage is as above. Here is its usage:
+
+  Usage : script/image-decodeqr-wechat.pl <options>
+
+  where options are:
+
+    --input F :
+      the filename of the input image
+      which supposedly contains QR codes to be detected.
+
+    --modelsdir M :
+      optionally use your own models contained
+      in this directory instead of the ones
+      this program was shipped with.
+
+    --outbase O :
+      basename for all output files
+      (if any, depending on whether --dumpqrimagestofile is on).
+
+    --verbosity L :
+      verbosity level, 0:mute, 1:C code, 10:C+XS code.
+
+    --graphicaldisplayresult :
+      display a graphical window with input image
+      and QR codes outlined. Using --dumpqrimagestofile
+      and specifying --outbase, images and payloads and
+      bounding boxes will be saved to files, if you do
+      not have graphical interface.
+
+    --dumpqrimagestofile :
+      it has effect only of --outbase was specified. Payloads,
+      Bounding Boxes and images of each QR-code detected will
+      be saved in separate files.
+
 
 =head1 PREREQUISITES
 
@@ -444,9 +494,11 @@ and in the XS file where the Perl headers are included.
 
 =head1 INSTALLING OpenCV
 
-In my case downloading OpenCV using Linux's package
-manager was not successful.It required to add another
-repository which wanted to install its own versions
+In my case installing OpenCV using Linux's package
+manager (dnf, fedora)
+was not successful with default repositories.
+It required to add another
+repository (rpmfusion) which wanted to install its own versions
 of packages I already had. So I prefered to install
 OpenCV from sources. This is the procedure I followed:
 
@@ -488,12 +540,19 @@ on a headless host. So, I just disabled it. That's easy to achieve
 during the above.
 
 =item * I have installed this on a CUDA-capable GPU (with CUDA 10.2 installed)
-host and on a headless remote host with no GPU or basic. CUDA is
-not required for building this module.
+host and on a headless remote host with no GPU or basic. In general,
+CUDA is not required for building this module. It is just an addition for
+making things run faster, possibly.
 
 =item * It is also possible to download a binary distribution of OpenCV.
 Just make sure that it supports all the things I mentioned above.
-And that it has all the required headers (in an include dir) - just saying.
+So, you should be looking for a developer binary package if such a thing exists.
+And that it has all the required headers (in an include dir).
+
+=item * If all else fails, then add C<rpmfusion> repository to
+your Linux's package manager and then add package OpenCV, developer version.
+Make sure there is the WeChat OpenCV library too. If there is not,
+C<perl Makefile.PL> will complain and fail.
 
 =back
 
@@ -513,9 +572,18 @@ link in the installation process of this module. C<Makefile.PL> contains
 code to do this with C<pkg-config> or C<cmake>. If these fail,
 it will look for ENVironment variables: C<OPENCV_LDFLAGS> and
 C<OPENCV_CFLAGS>, which should contain the C<CFLAGS> (for example:
-C<<-I/usr/include/opencv4/>>) and C<LDFLAGS> (for example:
-C<<-L/usr/lib64 -lopencv_world>>). Set these variables manually
+C<-I/usr/include/opencv4/>) and C<LDFLAGS> (for example:
+C<-L/usr/lib64 -lopencv_world>). Set these variables manually
 prior installation if the automatic methods mentioned above fail.
+
+One last thing to check is that if your OpenCV installation (developer version)
+was correct, there should be a C<pkg-config> file, perhaps in
+C</usr/lib64/pkgconfig/opencv4.pc> or C</usr/local/lib64/pkgconfig/opencv4.pc>.
+This file details all the C<CFLAGS> and C<LDFLAGS> and should be
+found by C<Makefile.PL> if it is in a standard location,
+or adjust the list of paths
+in environment variable C<PKG_CONFIG_PATH> which is where C<pkg-config> searches
+for these files.
 
 =head1 AUTHOR
 
@@ -571,6 +639,8 @@ which form the backbone of this module and do all the heavy lifting.
 module L<Image::DecodeQR> serves as the skeleton for this module.
 
 =item * Thank you! to all those who responded to this SO question L<https://stackoverflow.com/questions/71402095/perl-xs-create-and-return-array-of-strings-char-taken-from-calling-a-c-funct>
+
+=item * The Hackers of Free Software.
 
 =back
 

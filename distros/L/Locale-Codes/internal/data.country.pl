@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# Copyright (c) 2010-2023 Sullivan Beck.  All rights reserved.
+# Copyright (c) 2010-2024 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -264,6 +264,7 @@ $Data{'country'}{'genc'}{'orig'}{'name'} = {
    "SAINT HELENA, ASCENSION, AND TRISTAN DA CUNHA" => "Saint Helena, Ascension, and Tristan Da Cunha",
    "SOUTH GEORGIA AND SOUTH SANDWICH ISLANDS" => "South Georgia and South Sandwich Islands",
    "BONAIRE, SINT EUSTATIUS, AND SABA"       => "Bonaire, Sint Eustatius, and Saba",
+   "Åland Islands"                         => "Aland Islands",
 };
 
 $Data{'country'}{'genc'}{'ignore'} = {

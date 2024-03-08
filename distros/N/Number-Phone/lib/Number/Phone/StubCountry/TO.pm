@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185946;
+our $VERSION = 1.20240308154353;
 
 my $formatters = [
                 {
@@ -72,7 +72,10 @@ my $validators = {
         ',
                 'mobile' => '
           (?:
-            55[4-6]|
+            5(?:
+              4[0-5]|
+              5[4-6]
+            )|
             6(?:
               [09]\\d|
               3[02]|
@@ -93,38 +96,43 @@ my $validators = {
               };
 my %areanames = ();
 $areanames{en} = {"67641", "Masilamea",
-"67633", "Kolonga",
+"67669", "Ha\’apai",
+"67671", "Vava\’u",
+"67685", "Niuas",
 "67630", "Pea",
-"67637", "Vaini",
+"67636", "Nakolo",
+"67660", "Ha\’apai",
+"67633", "Kolonga",
+"6762", "Nuku\'alofa",
+"67629", "Pea",
+"67634", "Kolonga",
 "67675", "Vava\’u",
 "67632", "Muʻa",
-"6762", "Nuku\'alofa",
-"67670", "Vava\’u",
 "67672", "Vava\’u",
-"67669", "Ha\’apai",
-"67635", "Nakolo",
-"67638", "Vaini",
-"67685", "Niuas",
-"67660", "Ha\’apai",
-"67636", "Nakolo",
-"67671", "Vava\’u",
-"67634", "Kolonga",
-"67679", "Vava\’u",
-"67631", "Muʻa",
-"67676", "Vava\’u",
-"67643", "Matangiake",
-"67674", "Vava\’u",
-"67680", "Niuas",
-"67640", "Kolovai",
-"67629", "Pea",
 "67642", "Masilamea",
-"67650", "\‘Eua",};
+"67635", "Nakolo",
+"67680", "Niuas",
+"67637", "Vaini",
+"67674", "Vava\’u",
+"67650", "\‘Eua",
+"67638", "Vaini",
+"67679", "Vava\’u",
+"67643", "Matangiake",
+"67670", "Vava\’u",
+"67640", "Kolovai",
+"67676", "Vava\’u",
+"67631", "Muʻa",};
+my $timezones = {
+               '' => [
+                       'Pacific/Tongatapu'
+                     ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+676|\D)//g;
-      my $self = bless({ country_code => '676', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '676', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
         return $self->is_valid() ? $self : undef;
     }
 1;

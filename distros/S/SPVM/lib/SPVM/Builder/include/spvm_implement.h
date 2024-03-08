@@ -5,6 +5,7 @@
 #define SPVM_IMPLEMENT_H
 
 #include <inttypes.h>
+#include <stdlib.h>
 
 enum {
   SPVM_IMPLEMENT_C_STRING_CALL_STACK_ALLOCATION_FAILED,
@@ -1159,6 +1160,15 @@ static inline void SPVM_IMPLEMENT_ARRAY_LENGTH(SPVM_ENV* env, SPVM_VALUE* stack,
   }
 }
 
+static inline void SPVM_IMPLEMENT_STRING_LENGTH(SPVM_ENV* env, SPVM_VALUE* stack, int32_t* out, void* string, int32_t object_length_offset) {
+  if (string == NULL) {
+    *out = 0;
+  }
+  else {
+    *out = *(int32_t*)((intptr_t)string + object_length_offset);
+  }
+}
+
 static inline void SPVM_IMPLEMENT_GET_FIELD_BYTE(SPVM_ENV* env, SPVM_VALUE* stack, int8_t* out, void* object, int32_t field_offset, int32_t* error_id, int32_t object_data_offset) {
   
   if (__builtin_expect(object == NULL, 0)) {
@@ -2158,13 +2168,115 @@ static inline void SPVM_IMPLEMENT_TYPE_CONVERSION_DOUBLE_TO_STRING(SPVM_ENV* env
   env->assign_object(env, stack, out, string);
 }
 
+static inline void SPVM_IMPLEMENT_TYPE_CONVERSION_STRING_TO_BYTE(SPVM_ENV* env, SPVM_VALUE* stack, int8_t* out, void* src_string) {
+  
+  int64_t num = 0;
+  if (src_string) {
+    const char* string = env->get_chars(env, stack, src_string);
+    
+    char *end;
+    num = strtoll(string, &end, 10);
+    if (num > INT8_MAX) {
+      num = INT8_MAX;
+    }
+    else if (num < INT8_MIN) {
+      num = INT8_MIN;
+    }
+  }
+  
+  *out = (int8_t)num;
+}
+
+static inline void SPVM_IMPLEMENT_TYPE_CONVERSION_STRING_TO_SHORT(SPVM_ENV* env, SPVM_VALUE* stack, int16_t* out, void* src_string) {
+  
+  int64_t num = 0;
+  if (src_string) {
+    const char* string = env->get_chars(env, stack, src_string);
+    
+    char *end;
+    num = strtoll(string, &end, 10);
+    if (num > INT16_MAX) {
+      num = INT16_MAX;
+    }
+    else if (num < INT16_MIN) {
+      num = INT16_MIN;
+    }
+  }
+  
+  *out = (int16_t)num;
+}
+
+static inline void SPVM_IMPLEMENT_TYPE_CONVERSION_STRING_TO_INT(SPVM_ENV* env, SPVM_VALUE* stack, int32_t* out, void* src_string) {
+  
+  int64_t num = 0;
+  if (src_string) {
+    const char* string = env->get_chars(env, stack, src_string);
+    
+    char *end;
+    num = strtoll(string, &end, 10);
+    if (num > INT32_MAX) {
+      num = INT32_MAX;
+    }
+    else if (num < INT32_MIN) {
+      num = INT32_MIN;
+    }
+  }
+  
+  *out = (int32_t)num;
+}
+
+static inline void SPVM_IMPLEMENT_TYPE_CONVERSION_STRING_TO_LONG(SPVM_ENV* env, SPVM_VALUE* stack, int64_t* out, void* src_string) {
+  
+  int64_t num = 0;
+  if (src_string) {
+    const char* string = env->get_chars(env, stack, src_string);
+    
+    char *end;
+    num = strtoll(string, &end, 10);
+  }
+  
+  *out = (int64_t)num;
+}
+
+static inline void SPVM_IMPLEMENT_TYPE_CONVERSION_STRING_TO_FLOAT(SPVM_ENV* env, SPVM_VALUE* stack, float* out, void* src_string) {
+  
+  float num = 0;
+  if (src_string) {
+    const char* string = env->get_chars(env, stack, src_string);
+    
+    char *end;
+    num = strtof(string, &end);
+  }
+  
+  *out = (float)num;
+}
+
+static inline void SPVM_IMPLEMENT_TYPE_CONVERSION_STRING_TO_DOUBLE(SPVM_ENV* env, SPVM_VALUE* stack, double* out, void* src_string) {
+  
+  double num = 0;
+  if (src_string) {
+    const char* string = env->get_chars(env, stack, src_string);
+    
+    char *end;
+    num = strtod(string, &end);
+  }
+  
+  *out = (double)num;
+}
+
 static inline void SPVM_IMPLEMENT_TYPE_CONVERSION_STRING_TO_BYTE_ARRAY(SPVM_ENV* env, SPVM_VALUE* stack, void** out, void* src_string) {
-  int32_t src_string_length = env->length(env, stack, src_string);
-  const char* src_string_data = env->get_chars(env, stack, src_string);
-  void* byte_array = env->new_byte_array_no_mortal(env, stack, src_string_length);
-  int8_t* byte_array_data = env->get_elems_byte(env, stack, byte_array);
-  memcpy(byte_array_data, src_string_data, src_string_length);
-  env->assign_object(env, stack, out, byte_array);
+  
+  if (src_string) {
+    int32_t src_string_length = env->length(env, stack, src_string);
+    const char* src_string_data = env->get_chars(env, stack, src_string);
+    void* byte_array = env->new_byte_array_no_mortal(env, stack, src_string_length);
+    int8_t* byte_array_data = env->get_elems_byte(env, stack, byte_array);
+    memcpy(byte_array_data, src_string_data, src_string_length);
+    env->assign_object(env, stack, out, byte_array);
+  }
+  else {
+    env->assign_object(env, stack, out, NULL);
+  }
 }
 
 static inline void SPVM_IMPLEMENT_TYPE_CONVERSION_BYTE_ARRAY_TO_STRING(SPVM_ENV* env, SPVM_VALUE* stack, void** out, void* src_byte_array) {

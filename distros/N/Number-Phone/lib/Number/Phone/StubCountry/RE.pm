@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185946;
+our $VERSION = 1.20240308154353;
 
 my $formatters = [
                 {
@@ -90,12 +90,70 @@ my $validators = {
           )\\d{4}
         '
               };
+my $timezones = {
+               '' => [
+                       'Indian/Mayotte',
+                       'Indian/Reunion'
+                     ],
+               '262' => [
+                          'Indian/Reunion'
+                        ],
+               '263' => [
+                          'Indian/Reunion'
+                        ],
+               '269' => [
+                          'Indian/Mayotte'
+                        ],
+               '63' => [
+                         'Indian/Mayotte'
+                       ],
+               '69' => [
+                         'Indian/Reunion'
+                       ],
+               '80' => [
+                         'Indian/Mayotte',
+                         'Indian/Reunion'
+                       ],
+               '81' => [
+                         'Indian/Reunion'
+                       ],
+               '82' => [
+                         'Indian/Reunion'
+                       ],
+               '88' => [
+                         'Indian/Reunion'
+                       ],
+               '89' => [
+                         'Indian/Reunion'
+                       ],
+               '9398' => [
+                           'Indian/Mayotte'
+                         ],
+               '9399' => [
+                           'Indian/Reunion'
+                         ],
+               '9478' => [
+                           'Indian/Mayotte'
+                         ],
+               '9479' => [
+                           'Indian/Reunion'
+                         ],
+               '9762' => [
+                           'Indian/Reunion'
+                         ],
+               '9763' => [
+                           'Indian/Reunion'
+                         ],
+               '9769' => [
+                           'Indian/Mayotte'
+                         ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+262|\D)//g;
-      my $self = bless({ country_code => '262', number => $number, formatters => $formatters, validators => $validators, }, $class);
+      my $self = bless({ country_code => '262', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, }, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
       $self = bless({ country_code => '262', number => $number, formatters => $formatters, validators => $validators, }, $class);

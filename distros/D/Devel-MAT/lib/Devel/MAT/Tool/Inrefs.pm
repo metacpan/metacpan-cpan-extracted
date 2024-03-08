@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2024 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Inrefs 0.52;
+package Devel::MAT::Tool::Inrefs 0.53;
 
 use v5.14;
 use warnings;
@@ -84,7 +84,7 @@ This tool adds the following SV methods.
 
 =head2 inrefs
 
-   @refs = $sv->inrefs
+   @refs = $sv->inrefs;
 
 Returns a list of Reference objects for each of the SVs that refer to this
 one. This is formed by the inverse mapping along the SV graph from C<outrefs>.
@@ -99,15 +99,15 @@ one. This is formed by the inverse mapping along the SV graph from C<outrefs>.
 
 =head2 inrefs_inferred
 
-   @refs = $sv->inrefs_strong
+   @refs = $sv->inrefs_strong;
 
-   @refs = $sv->inrefs_weak
+   @refs = $sv->inrefs_weak;
 
-   @refs = $sv->inrefs_direct
+   @refs = $sv->inrefs_direct;
 
-   @refs = $sv->inrefs_indirect
+   @refs = $sv->inrefs_indirect;
 
-   @refs = $sv->inrefs_inferred
+   @refs = $sv->inrefs_inferred;
 
 Returns lists of Reference objects filtered by type, analogous to the various
 C<outrefs_*> methods.

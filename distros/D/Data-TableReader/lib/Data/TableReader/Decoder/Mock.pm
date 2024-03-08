@@ -2,18 +2,41 @@ package Data::TableReader::Decoder::Mock;
 use Moo 2;
 use Carp 'croak';
 use IO::Handle;
+require MRO::Compat if $] < '5.10';
 
 extends 'Data::TableReader::Decoder';
 
-# ABSTRACT: Mock decoder for test cases
-our $VERSION = '0.011'; # VERSION
+# ABSTRACT: Decoder that returns supplied data without decoding anything
+our $VERSION = '0.012'; # VERSION
 
 
-has data => ( is => 'rw' );
+sub BUILDARGS {
+	my $args= $_[0]->next::method(@_[1..$#_]);
+	# back-compat with earlier versions
+	$args->{datasets}= delete $args->{data} if defined $args->{data};
+	# allow simple way for user to specify a single table
+	$args->{datasets}= [ delete $args->{table} ] if defined $args->{table};
+	$args;
+}
+
+has datasets => ( is => 'rw', isa => \&_arrayref_3_deep );
+*data= *datasets;
+
+sub _arrayref_3_deep {
+	ref $_[0] eq 'ARRAY' or return 'Not an arrayref';
+	return undef unless @{$_[0]};
+	ref $_[0][0] eq 'ARRAY' or return 'Not an arrayref of tables';
+	return undef unless @{$_[0][0]};
+	ref $_[0][0][0] eq 'ARRAY' or return 'Not an arrayref of tables of rows';
+	return undef unless @{$_[0][0][0]};
+	ref $_[0][0][0][0] ne 'ARRAY'
+		or return 'Expected plain cell value at ->[$dataset][$table][$cell] depth of arrayrefs';
+	undef;
+}
 
 sub iterator {
 	my $self= shift;
-	my $data= $self->data;
+	my $data= $self->datasets;
 	my $table= $data->[0];
 	my $colmax= $table? scalar(@{$table->[0]})-1 : -1;
 	my $rowmax= $table? $#$table : -1;
@@ -93,17 +116,17 @@ __END__
 
 =head1 NAME
 
-Data::TableReader::Decoder::Mock - Mock decoder for test cases
+Data::TableReader::Decoder::Mock - Decoder that returns supplied data without decoding anything
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 
     decoder => {
       CLASS => 'Mock',
-      data => [
+      datasets => [
         [ # Data Set 0
            [ 1, 2, 3, 4, 5 ],
            ...
@@ -115,16 +138,29 @@ version 0.011
       ]
     }
 
+or
+
+    decoder => {
+      CLASS => 'Mock',
+      table => [
+         [ 1, 2, 3, 4, 5 ],
+         ...
+      ],
+    }
+
 This doesn't actually decode anything; it just returns verbatim rows of data from arrayrefs
-that you supply.
+that you supply.  You can provide one or multiple tables.  The 'table' constructor parameter
+is an alias for C<< datasets[0] >>.
 
 =head1 ATTRIBUTES
 
 See attributes from parent class: L<Data::TableReader::Decoder>.
 
-=head2 data
+=head2 datasets
 
-The verbatim data which will be returned by the iterator.
+The verbatim data which will be returned by the iterator.  This can be an array of tables, or
+one table itself.  A table must be composed of arrayrefs, and the cells of the table cannot
+themselves be arrayrefs.
 
 =head1 AUTHOR
 
@@ -132,7 +168,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Michael Conrad.
+This software is copyright (c) 2024 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

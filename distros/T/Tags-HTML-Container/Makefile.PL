@@ -20,9 +20,9 @@ readme_from 'Container.pm';
 recursive_author_tests('xt');
 requires 'Class::Utils' => 0;
 requires 'Error::Pure' => 0;
-requires 'List::Util' => 0;
+requires 'List::Util' => 1.33;
 requires 'Readonly' => 0;
-requires 'Tags::HTML' => 0.02;
+requires 'Tags::HTML' => 0.08;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Tags-HTML-Container/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Tags-HTML-Container';
 resources 'repository' => 'git://github.com/michal-josef-spacek/Tags-HTML-Container';
@@ -34,7 +34,7 @@ test_requires 'Tags::Output::Structure' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.04';
+version '0.05';
 
 # Run.
 WriteAll();

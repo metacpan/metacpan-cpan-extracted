@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185945;
+our $VERSION = 1.20240308154351;
 
 my $formatters = [
                 {
@@ -86,11 +86,14 @@ my $validators = {
           )|
           94(?:
             000[09]|
+            (?:
+              12\\d|
+              30[0-2]
+            )\\d|
             2(?:
               121|
               [2689]0\\d
             )|
-            30[0-2]\\d|
             4(?:
               111|
               40\\d
@@ -120,11 +123,14 @@ my $validators = {
           )|
           94(?:
             000[09]|
+            (?:
+              12\\d|
+              30[0-2]
+            )\\d|
             2(?:
               121|
               [2689]0\\d
             )|
-            30[0-2]\\d|
             4(?:
               111|
               40\\d
@@ -188,73 +194,78 @@ my $validators = {
               };
 my %areanames = ();
 $areanames{fa} = {"9841", "آذربایجان\ شرقی",
-"9856", "خراسان\ جنوبی",
-"9883", "استان\ کرمانشاه",
-"9823", "استان\ سمنان",
-"9881", "استان\ همدان",
-"9821", "استان\ تهران",
-"9831", "استان\ اصفهان",
-"9861", "خوزستان",
-"9858", "خراسان\ شمالی",
-"9871", "فارس",
-"9854", "سیستان\ و\ بلوچستان",
-"9877", "استان\ بوشهر",
-"9887", "کردستان",
-"9866", "لرستان",
-"9876", "هرمزگان",
 "9826", "البرز",
-"9886", "مرکزی",
-"9817", "گلستان",
-"9811", "مازندران",
-"9845", "استان\ اردبیل",
-"9844", "آذربایجان\ غربی",
-"9828", "استان\ قزوین",
 "9838", "چهارمحال\ و\ بختیاری",
+"9823", "استان\ سمنان",
+"9821", "استان\ تهران",
+"9858", "خراسان\ شمالی",
+"9883", "استان\ کرمانشاه",
+"9834", "استان\ کرمان",
+"9881", "استان\ همدان",
+"9871", "فارس",
+"9835", "استان\ یزد",
+"9817", "گلستان",
+"9876", "هرمزگان",
+"9854", "سیستان\ و\ بلوچستان",
+"9886", "مرکزی",
+"9828", "استان\ قزوین",
 "9851", "خراسان\ رضوی",
+"9811", "مازندران",
 "9813", "گیلان",
 "9874", "کهگیلویه\ و\ بویراحمد",
-"9825", "استان\ قم",
-"9835", "استان\ یزد",
-"9834", "استان\ کرمان",
+"9877", "استان\ بوشهر",
+"9887", "کردستان",
+"9884", "استان\ ایلام",
+"9831", "استان\ اصفهان",
+"9856", "خراسان\ جنوبی",
 "9824", "استان\ زنجان",
-"9884", "استان\ ایلام",};
-$areanames{en} = {"9884", "Ilam\ province",
-"9824", "Zanjan\ province",
-"9834", "Kerman\ province",
-"9874", "Kohgiluyeh\ and\ Boyer\-Ahmad",
-"9835", "Yazd\ province",
-"9825", "Qom\ province",
-"9813", "Gilan",
-"9851", "Razavi\ Khorasan",
-"9838", "Chahar\-mahal\ and\ Bakhtiari",
-"9828", "Qazvin\ province",
-"9844", "West\ Azarbaijan",
-"9845", "Ardabil\ province",
+"9861", "خوزستان",
+"9845", "استان\ اردبیل",
+"9825", "استان\ قم",
+"9866", "لرستان",
+"9844", "آذربایجان\ غربی",};
+$areanames{en} = {"9813", "Gilan",
 "9811", "Mazandaran",
-"9817", "Golestan",
-"9886", "Markazi",
-"9826", "Alborz",
-"9876", "Hormozgan",
-"9866", "Lorestan",
-"9887", "Kurdistan",
-"9854", "Sistan\ and\ Baluchestan",
-"9877", "Bushehr\ province",
-"9871", "Fars",
-"9858", "North\ Khorasan",
-"9861", "Khuzestan",
+"9851", "Razavi\ Khorasan",
+"9828", "Qazvin\ province",
+"9856", "South\ Khorasan",
 "9831", "Isfahan\ province",
-"9881", "Hamadan\ province",
-"9821", "Tehran\ province",
-"9883", "Kermanshah\ province",
-"9823", "Semnan\ province",
+"9887", "Kurdistan",
+"9884", "Ilam\ province",
+"9874", "Kohgiluyeh\ and\ Boyer\-Ahmad",
+"9877", "Bushehr\ province",
+"9861", "Khuzestan",
+"9845", "Ardabil\ province",
+"9824", "Zanjan\ province",
+"9844", "West\ Azarbaijan",
+"9866", "Lorestan",
+"9825", "Qom\ province",
+"9838", "Chahar\-mahal\ and\ Bakhtiari",
+"9826", "Alborz",
 "9841", "East\ Azarbaijan",
-"9856", "South\ Khorasan",};
+"9858", "North\ Khorasan",
+"9821", "Tehran\ province",
+"9823", "Semnan\ province",
+"9871", "Fars",
+"9881", "Hamadan\ province",
+"9834", "Kerman\ province",
+"9883", "Kermanshah\ province",
+"9886", "Markazi",
+"9854", "Sistan\ and\ Baluchestan",
+"9876", "Hormozgan",
+"9817", "Golestan",
+"9835", "Yazd\ province",};
+my $timezones = {
+               '' => [
+                       'Asia/Tehran'
+                     ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+98|\D)//g;
-      my $self = bless({ country_code => '98', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '98', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
       $self = bless({ country_code => '98', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);

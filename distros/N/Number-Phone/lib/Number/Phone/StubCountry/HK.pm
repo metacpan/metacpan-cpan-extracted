@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185945;
+our $VERSION = 1.20240308154351;
 
 my $formatters = [
                 {
@@ -106,7 +106,7 @@ my $validators = {
                 'mobile' => '
           (?:
             4(?:
-              44[5-9]|
+              44[0-25-9]|
               6(?:
                 1[0-7]|
                 4[0-57-9]|
@@ -122,19 +122,20 @@ my $validators = {
               66[0-3]
             )|
             70(?:
-              7[1-6]|
+              7[1-8]|
               8[0-4]
             )|
-            848[0-25-9]|
+            848[0-35-9]|
             9(?:
               29[013-9]|
+              39[01]|
               59[0-4]|
               899
             )
           )\\d{4}|
           (?:
             4(?:
-              4[0156]|
+              4[0-35-8]|
               6[02357-9]
             )|
             5(?:
@@ -148,8 +149,8 @@ my $validators = {
               [268][0-57-9]|
               7[0-79]
             )|
-            709|
-            84[09]|
+            70[129]|
+            84[0-29]|
             9(?:
               0[1-9]|
               1[02-9]|
@@ -233,12 +234,17 @@ my $validators = {
                 'toll_free' => '800\\d{6}',
                 'voip' => ''
               };
+my $timezones = {
+               '' => [
+                       'Asia/Hong_Kong'
+                     ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+852|\D)//g;
-      my $self = bless({ country_code => '852', number => $number, formatters => $formatters, validators => $validators, }, $class);
+      my $self = bless({ country_code => '852', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, }, $class);
         return $self->is_valid() ? $self : undef;
     }
 1;

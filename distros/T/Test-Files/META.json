@@ -32,6 +32,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Class::XSAccessor" : "0",
             "Const::Fast" : "0",
             "Cwd" : "0",
             "Data::Compare" : "0",
@@ -66,6 +67,6 @@
          "web" : "https://github.com/jsf116/Test-Files"
       }
    },
-   "version" : "0.25",
+   "version" : "0.26",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

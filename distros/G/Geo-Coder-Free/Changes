@@ -1,5 +1,18 @@
 Revision history for Geo-Coder-Free
 
+0.35	Wed Mar  6 20:48:43 EST 2024
+	Fix scantext.t when OSM is installed
+	Fix openaddr.t test for not/there
+	Rework the GETTING STARTED section of the POD
+	Trying different databases since the creation of a database in SQLite
+		eats a lot of RAM
+	Added mysql support in createdatabase - TODO add support to DB.pm
+	Added BUILDMODE to optionally only import from one large database
+	Fix usage message in DB.pm
+	Added more data cleanup to createdatabase.PL
+	Use Database::Abstraction
+	Rework key - for me saved about 1/3 of the database size
+
 0.34	Mon Nov  6 16:53:43 EST 2023
 	Latest DB.pm from NJH-Snippets
 	Latest Display.pm from VWF

@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185942;
+our $VERSION = 1.20240308154347;
 
 my $formatters = [
                 {
@@ -62,80 +62,85 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"9365", "Paktika",
-"9334", "Helmand",
-"9324", "Wardak",
-"9325", "Logar",
-"9357", "Faryab",
-"9364", "Paktia",
-"9351", "Kunduz",
-"9328", "Panjshar",
-"9350", "Balkh",
-"9344", "Nimruz",
-"9353", "Takhar",
-"9352", "Badkhshan",
-"9326", "Dorkondi",
-"9355", "Samangan",
-"9327", "Khost",
-"9343", "Farah",
-"9354", "Jowzjan",
-"9320", "Kabul",
-"9361", "Nurestan",
-"9358", "Baghlan",
-"9330", "Kandahar",
-"9321", "Parwan",
-"9360", "Nangarhar",
+$areanames{en} = {"9333", "Zabol",
+"9356", "Sar\-E\ Pol",
 "9331", "Ghazni",
-"9342", "Ghowr",
-"9333", "Zabol",
-"9323", "Bamian",
-"9363", "Laghman",
 "9362", "Kunarha",
 "9340", "Heart",
+"9320", "Kabul",
+"9353", "Takhar",
+"9351", "Kunduz",
+"9328", "Panjshar",
+"9344", "Nimruz",
+"9352", "Badkhshan",
+"9325", "Logar",
+"9363", "Laghman",
+"9361", "Nurestan",
+"9327", "Khost",
+"9324", "Wardak",
 "9332", "Uruzgan",
-"9322", "Kapisa",
+"9323", "Bamian",
+"9358", "Baghlan",
+"9321", "Parwan",
+"9364", "Paktia",
+"9350", "Balkh",
+"9330", "Kandahar",
 "9341", "Badghis",
-"9356", "Sar\-E\ Pol",};
-$areanames{fa} = {"9353", "تخار",
-"9344", "نیمروز",
-"9352", "بدخشان",
-"9326", "دایکندی",
-"9325", "لوگر",
-"9357", "فاریاب",
-"9364", "پکتیا",
-"9365", "پکتیکا",
+"9365", "Paktika",
+"9343", "Farah",
+"9326", "Dorkondi",
+"9360", "Nangarhar",
+"9357", "Faryab",
+"9354", "Jowzjan",
+"9342", "Ghowr",
+"9355", "Samangan",
+"9334", "Helmand",
+"9322", "Kapisa",};
+$areanames{fa} = {"9355", "سمنگان",
 "9334", "هلمند",
-"9324", "وردک",
-"9350", "بلخ",
-"9328", "پنجشیر",
-"9351", "قندوز",
-"9363", "لغمان",
-"9333", "زابل",
-"9323", "بامیان",
-"9332", "ارزگان",
 "9322", "کاپیسا",
-"9341", "بادغیس",
-"9356", "سر\ پل",
-"9362", "کنرها",
-"9340", "هرات",
-"9354", "جوزجان",
-"9355", "سمنگان",
-"9327", "خوست",
-"9343", "فراه",
 "9360", "ننگرهار",
-"9321", "پروان",
-"9331", "غزنی",
+"9357", "فاریاب",
 "9342", "غور",
-"9361", "نورستان",
+"9354", "جوزجان",
+"9330", "قندهار",
+"9341", "بادغیس",
+"9365", "پکتیکا",
+"9343", "فراه",
+"9326", "دایکندی",
+"9323", "بامیان",
 "9358", "بغلان",
+"9321", "پروان",
+"9364", "پکتیا",
+"9350", "بلخ",
+"9363", "لغمان",
+"9361", "نورستان",
+"9324", "وردک",
+"9327", "خوست",
+"9332", "ارزگان",
+"9352", "بدخشان",
+"9344", "نیمروز",
+"9325", "لوگر",
 "9320", "کابل",
-"9330", "قندهار",};
+"9353", "تخار",
+"9351", "قندوز",
+"9328", "پنجشیر",
+"9333", "زابل",
+"9356", "سر\ پل",
+"9331", "غزنی",
+"9340", "هرات",
+"9362", "کنرها",};
+my $timezones = {
+               '' => [
+                       'Asia/Kabul'
+                     ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+93|\D)//g;
-      my $self = bless({ country_code => '93', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '93', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
       $self = bless({ country_code => '93', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);

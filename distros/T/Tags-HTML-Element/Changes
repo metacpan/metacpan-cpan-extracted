@@ -1,3 +1,6 @@
+0.09 2024-03-08T09:43:54+01:00
+ - Fix minimal dependency to Tags::HTML.
+
 0.08 2024-02-13T08:12:30+01:00
  - Fix test dependencies.
 

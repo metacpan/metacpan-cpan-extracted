@@ -4,7 +4,7 @@
       "Andreas Hadjiprocopis <bliako@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -28,7 +28,7 @@
       "configure" : {
          "requires" : {
             "Cwd" : "0",
-            "Data::Roundtrip" : "0.11",
+            "Data::Roundtrip" : "0",
             "ExtUtils::MakeMaker" : "0",
             "FFI::CheckLib" : "0",
             "File::Copy" : "0",
@@ -41,7 +41,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Data::Roundtrip" : "0.11",
+            "Data::Roundtrip" : "0",
             "File::ShareDir" : "0",
             "Getopt::Long" : "0",
             "Time::HiRes" : "0",
@@ -50,12 +50,13 @@
       },
       "test" : {
          "requires" : {
-            "Data::Roundtrip" : "0.11",
+            "Data::Roundtrip" : "0",
             "Encode" : "0",
             "File::Copy" : "0",
             "File::ShareDir" : "0",
             "File::Spec" : "0",
             "FindBin" : "0",
+            "Test2::Plugin::UTF8" : "0",
             "Test::More" : "0",
             "Time::HiRes" : "0"
          }
@@ -70,6 +71,6 @@
          "web" : "https://github.com/hadjiprocopis/perl-image-decodeqr-wechat"
       }
    },
-   "version" : "0.9",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "1.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

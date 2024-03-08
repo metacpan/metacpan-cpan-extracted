@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185946;
+our $VERSION = 1.20240308154353;
 
 my $formatters = [
                 {
@@ -70,7 +70,7 @@ my $validators = {
               9\\d
             )|
             [35]92(?:
-              3[03]|
+              3[034]|
               9\\d
             )
           )\\d{3}|
@@ -85,7 +85,12 @@ my $validators = {
             )
           )\\d{5}
         ',
-                'pager' => '6222\\d{5}',
+                'pager' => '
+          6(?:
+            222\\d|
+            8988
+          )\\d{4}
+        ',
                 'personal_number' => '884[0-4689]\\d{5}',
                 'specialrate' => '(
           80(?:
@@ -118,65 +123,107 @@ my $validators = {
                 'voip' => '30\\d{7}'
               };
 my %areanames = ();
-$areanames{pt} = {"35121", "Lisboa",};
-$areanames{en} = {"351269", "Santiago\ do\ Cacém",
-"351281", "Tavira",
-"351244", "Leiria",
-"351295", "Angra\ do\ Heroísmo",
+$areanames{en} = {"351273", "Bragança",
+"351255", "Penafiel",
+"351239", "Coimbra",
+"351262", "Caldas\ da\ Rainha",
+"351291", "Funchal",
 "351258", "Viana\ do\ Castelo",
 "35121", "Lisbon",
-"351256", "S\.\ João\ da\ Madeira",
-"351243", "Santarém",
-"351278", "Mirandela",
-"351276", "Chaves",
-"351231", "Mealhada",
-"351245", "Portalegre",
-"351262", "Caldas\ da\ Rainha",
-"351282", "Portimão",
-"351255", "Penafiel",
-"351296", "Ponta\ Delgada",
-"351239", "Coimbra",
-"351274", "Proença\-a\-Nova",
-"351253", "Braga",
-"35122", "Porto",
-"351254", "Peso\ da\ Régua",
-"351275", "Covilhã",
-"351261", "Torres\ Vedras",
-"351232", "Viseu",
-"351289", "Faro",
-"351273", "Bragança",
-"351249", "Torres\ Novas",
-"351251", "Valença",
 "351292", "Horta",
-"351286", "Castro\ Verde",
+"351261", "Torres\ Vedras",
 "351277", "Idanha\-a\-Nova",
+"351244", "Leiria",
+"351266", "Évora",
+"351234", "Aveiro",
+"351296", "Ponta\ Delgada",
+"351249", "Torres\ Novas",
+"351283", "Odemira",
+"351235", "Arganil",
+"351286", "Castro\ Verde",
+"351259", "Vila\ Real",
+"351238", "Seia",
 "351271", "Guarda",
 "351263", "Vila\ Franca\ de\ Xira",
-"351236", "Pombal",
-"351238", "Seia",
-"351242", "Ponte\ de\ Sôr",
-"351265", "Setúbal",
-"351257", "Braga",
-"351252", "V\.\ N\.\ de\ Famalicão",
-"351285", "Moura",
-"351279", "Moncorvo",
-"351234", "Aveiro",
-"351283", "Odemira",
-"351291", "Funchal",
-"351233", "Figueira\ da\ Foz",
-"351266", "Évora",
-"351284", "Beja",
-"351268", "Estremoz",
+"35122", "Porto",
 "351272", "Castelo\ Branco",
-"351235", "Arganil",
-"351259", "Vila\ Real",
-"351241", "Abrantes",};
+"351282", "Portimão",
+"351254", "Peso\ da\ Régua",
+"351245", "Portalegre",
+"351281", "Tavira",
+"351276", "Chaves",
+"351231", "Mealhada",
+"351278", "Mirandela",
+"351275", "Covilhã",
+"351253", "Braga",
+"351257", "Braga",
+"351232", "Viseu",
+"351269", "Santiago\ do\ Cacém",
+"351242", "Ponte\ de\ Sôr",
+"351241", "Abrantes",
+"351285", "Moura",
+"351236", "Pombal",
+"351251", "Valença",
+"351279", "Moncorvo",
+"351233", "Figueira\ da\ Foz",
+"351295", "Angra\ do\ Heroísmo",
+"351268", "Estremoz",
+"351252", "V\.\ N\.\ de\ Famalicão",
+"351284", "Beja",
+"351265", "Setúbal",
+"351274", "Proença\-a\-Nova",
+"351256", "S\.\ João\ da\ Madeira",
+"351243", "Santarém",
+"351289", "Faro",};
+$areanames{pt} = {"35121", "Lisboa",};
+my $timezones = {
+               '' => [
+                       'Atlantic/Azores',
+                       'Europe/Lisbon'
+                     ],
+               '1' => [
+                        'Atlantic/Azores',
+                        'Europe/Lisbon'
+                      ],
+               '2' => [
+                        'Europe/Lisbon'
+                      ],
+               '292' => [
+                          'Atlantic/Azores'
+                        ],
+               '295' => [
+                          'Atlantic/Azores'
+                        ],
+               '296' => [
+                          'Atlantic/Azores'
+                        ],
+               '3' => [
+                        'Atlantic/Azores',
+                        'Europe/Lisbon'
+                      ],
+               '6' => [
+                        'Atlantic/Azores',
+                        'Europe/Lisbon'
+                      ],
+               '7' => [
+                        'Atlantic/Azores',
+                        'Europe/Lisbon'
+                      ],
+               '8' => [
+                        'Atlantic/Azores',
+                        'Europe/Lisbon'
+                      ],
+               '9' => [
+                        'Atlantic/Azores',
+                        'Europe/Lisbon'
+                      ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+351|\D)//g;
-      my $self = bless({ country_code => '351', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '351', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
         return $self->is_valid() ? $self : undef;
     }
 1;

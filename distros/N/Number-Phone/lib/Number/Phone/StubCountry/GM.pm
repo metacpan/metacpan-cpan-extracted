@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185945;
+our $VERSION = 1.20240308154351;
 
 my $formatters = [
                 {
@@ -96,58 +96,63 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"2204487", "Faraba",
-"2205547", "Jareng",
-"2205735", "Farafenni",
-"2205545", "Pakaliba",
-"2204485", "Kafuta",
-"2205541", "Kwenella",
-"2204481", "Brikama\/Kanilia",
+$areanames{en} = {"2204482", "Brikama\/Kanilia",
+"2204488", "Sibanor",
+"220566", "Baja\ Kunda\/Basse\/Fatoto\/Gambisara\/Garawol\/Misera\/Sambakunda\/Sudowol",
+"2205542", "Nyorojattaba",
+"220449", "Bakau",
+"2205723", "Njabakunda",
+"2204417", "Sanyang",
+"2205543", "Japeneh\/Soma",
+"2204483", "Brikama\/Kanilia",
+"2205666", "Numeyel",
+"2205678", "Brikama\-Ba",
+"2204410", "Brufut",
+"22044195", "Berending",
 "2205676", "Georgetown",
-"2204419", "Kartong",
+"2205541", "Kwenella",
+"2205674", "Bansang",
+"2204481", "Brikama\/Kanilia",
 "2205714", "Ndugukebbe",
+"2204489", "Bwiam",
+"2205738", "Ngensanjal",
 "2204486", "Gunjur",
 "2205546", "Kudang",
-"22042", "Banjul",
-"2205723", "Njabakunda",
-"220446", "Kotu\/Senegambia",
-"22043", "Bundung\/Serekunda",
 "220567", "Sotuma",
-"220574", "Kaur",
-"2205540", "Kaiaf",
-"2204480", "Bondali",
-"2204482", "Brikama\/Kanilia",
-"2204414", "Sanyang",
-"2205542", "Nyorojattaba",
-"220553", "Soma",
-"2205678", "Brikama\-Ba",
-"2204489", "Bwiam",
-"2205665", "Kuntaur",
-"2204417", "Sanyang",
-"22044195", "Berending",
+"22042", "Banjul",
+"2204484", "Brikama\/Kanilia",
+"2205544", "Bureng",
 "2205725", "Iliasa",
 "2204416", "Tujereng",
-"2204488", "Sibanor",
-"2205710", "Barra",
-"220449", "Bakau",
-"2205666", "Numeyel",
-"2205738", "Ngensanjal",
-"2205674", "Bansang",
-"2204483", "Brikama\/Kanilia",
-"2205543", "Japeneh\/Soma",
-"220566", "Baja\ Kunda\/Basse\/Fatoto\/Gambisara\/Garawol\/Misera\/Sambakunda\/Sudowol",
-"220447", "Yundum",
-"2205720", "Kerewan",
-"2205544", "Bureng",
-"2204484", "Brikama\/Kanilia",
+"2204419", "Kartong",
+"220553", "Soma",
+"2204414", "Sanyang",
+"220446", "Kotu\/Senegambia",
+"2204485", "Kafuta",
+"2205545", "Pakaliba",
 "2204412", "Tanji",
-"2204410", "Brufut",};
+"2205720", "Kerewan",
+"220574", "Kaur",
+"22043", "Bundung\/Serekunda",
+"2205735", "Farafenni",
+"2205710", "Barra",
+"220447", "Yundum",
+"2204487", "Faraba",
+"2205547", "Jareng",
+"2204480", "Bondali",
+"2205540", "Kaiaf",
+"2205665", "Kuntaur",};
+my $timezones = {
+               '' => [
+                       'Africa/Banjul'
+                     ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+220|\D)//g;
-      my $self = bless({ country_code => '220', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '220', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
         return $self->is_valid() ? $self : undef;
     }
 1;

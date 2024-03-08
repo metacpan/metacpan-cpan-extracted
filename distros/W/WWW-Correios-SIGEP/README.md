@@ -1,5 +1,14 @@
 ## WWW::Correios::SIGEP ##
 
+### OBSOLETO
+
+use Net::Correios em vez desse módulo, que interage com a nova API
+dos Correios. Os Correios anunciaram que vão descontinuar o SIGEP
+e desligar os servidores em algum momento no futuro, e quando isso
+isso acontecer *esse módulo vai parar de funcionar completamente*.
+
+---
+
 Os Correios disponibilizam gratuitamente para todos os clientes com contrato
 uma API para o sistema gerenciador de postagens SIGEP WEB, que permite a
 automatização de serviços como Pré-lista de Postagem (PLP), rastreamento
@@ -7,7 +16,7 @@ de objetos, disponibilidade de serviços, SEDEX, logística reversa, entre
 muitos outros.
 
 Este módulo permite uma integação fácil e rápida entre seu produto e a 
-[API do SIGEP WEB](http://www.corporativo.correios.com.br/encomendas/sigepweb/doc/Manual_de_Implementacao_do_Web_Service_SIGEPWEB_Logistica_Reversa.pdf).
+[API do SIGEP WEB](https://www2.correios.com.br/sistemas/encomendas/sigepweb/doc/Manual_de_Implementacao_do_Web_Service_SIGEP_WEB.pdf) e sua [Logística Reversa](http://www.corporativo.correios.com.br/encomendas/sigepweb/doc/Manual_de_Implementacao_do_Web_Service_SIGEPWEB_Logistica_Reversa.pdf).
 
 ```perl
 use WWW::Correios::SIGEP;
@@ -67,7 +76,7 @@ Breno G. de Oliveira
 
 ### LICENÇA E COPYRIGHT ###
 
-Copyright (c) 2016-2021, Breno G. de Oliveira. Todos os direitos reservados.
+Copyright (c) 2016-2024, Breno G. de Oliveira. Todos os direitos reservados.
 
 Este módulo é software livre; você pode redistribuí-lo e/ou
 modificá-lo sob os mesmos termos que o Perl. Veja L<perlartistic>.

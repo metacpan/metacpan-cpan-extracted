@@ -8,7 +8,7 @@ use Data::TableReader::Field;
 use Data::TableReader::Iterator;
 
 # ABSTRACT: Extract records from "dirty" tabular data sources
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 
 has input               => ( is => 'rw', required => 1 );
@@ -31,7 +31,10 @@ has log                 => ( is => 'rw', trigger => sub { shift->_clear_log } );
 sub _build__file_handle {
 	my $self= shift;
 	my $i= $self->input;
-	return undef if ref($i) && (ref($i) eq "Spreadsheet::ParseExcel::Worksheet");
+	return undef if ref($i) && (
+		ref($i) eq "Spreadsheet::ParseExcel::Worksheet"
+		or ref($i) eq 'ARRAY'
+	);
 	return $i if ref($i) && (ref($i) eq 'GLOB' or ref($i)->can('read'));
 	open(my $fh, '<', $i) or croak "open($i): $!";
 	binmode $fh;
@@ -150,6 +153,13 @@ sub detect_input_format {
 		if ref($input) && ref($input)->can('get_cell');
 	return ('XLSX', workbook => $input)
 		if ref($input) && ref($input)->can('worksheets');
+	if (ref($input) eq 'ARRAY') {
+		# if user supplied single table of data, wrap it in an array to make an array of tables.
+		$input= [ $input ]
+			if @$input && ref($input->[0]) eq 'ARRAY'
+			&& @{$input->[0]} && ref($input->[0][0]) ne 'ARRAY';
+		return ('Mock', datasets => $input);
+	}
 
 	# Load first block of file, unless supplied
 	my $fpos;
@@ -572,6 +582,7 @@ sub iterator {
 			$first_blank ||= $data_iter->position;
 			goto again;
 		} elsif ($first_blank) {
+			# At the end of a series of blank rows, run the callback to decide what to do
 			unless ($self->_handle_blank_row($first_blank, $data_iter->position)) {
 				$eof= 1;
 				return undef;
@@ -603,15 +614,26 @@ sub iterator {
 sub _make_validation_callback {
 	my ($self, $field, $index)= @_;
 	my $t= $field->type;
-	ref $t eq 'CODE'? sub {
-		my $e= $t->($_[0][$index]);
-		defined $e? ([ $field, $index, $e ]) : ()
+	my $c= $field->coerce;
+	$index =~ /^[0-9]+\Z/ or die "$index"; # sanity check for security, since using eval
+	# The validate can either be Type::Tiny or a coderef that inspects $_ and returns the error.
+	my $validate_fn= ref $t eq 'CODE'? '$t->'
+		: $t->can('validate')         ? '$t->validate'
+		: croak "Invalid type constraint $t on field ".$field->name;
+	# Coerce can either be Type::Tiny or a coderef that inspects $_[0] and returns the coerced value.
+	my $coerce_fn= ref $c eq 'CODE'? '$c->'
+		: $c && (!$t->can('has_coercions') || $t->has_coercions)? '$t->coerce'
+		: undef;
+	my $field_lvalue= '$_[0]['.$index.']';
+	my $code= 'sub { my $e= '.$validate_fn.'('.$field_lvalue.'); ';
+	if (defined $coerce_fn) {
+		$code .= 'if (defined $e) {'
+		      .  '  my $tmp= '.$coerce_fn.'('.$field_lvalue.');'
+		      .  '  ('.$field_lvalue.', $e)= ($tmp) unless defined '.$validate_fn.'($tmp);'
+		      .  '}';
 	}
-	: $t->can('validate')? sub {
-		my $e= $t->validate($_[0][$index]);
-		defined $e? ([ $field, $index, $e ]) : ()
-	}
-	: croak "Invalid type constraint $t on field ".$field->name;
+	$code .= 'defined $e? ([ $field, '.$index.', $e ]) : () }';
+	return eval($code) || die "error compiling validation callback: $@";
 }
 
 sub _handle_blank_row {
@@ -677,7 +699,7 @@ sub Data::TableReader::_RecIter::seek {
 }
 sub Data::TableReader::_RecIter::next_dataset {
 	shift->_fields->{reader}->_log
-		->('warn',"Searching for supsequent table headers is not supported yet");
+		->('warn',"Searching for subsequent table headers is not supported yet");
 	return 0;
 }
 
@@ -695,7 +717,7 @@ Data::TableReader - Extract records from "dirty" tabular data sources
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 
@@ -709,7 +731,7 @@ version 0.011
     )
     ->iterator->all;
 
-but there's plenty of options to choose from...
+but there are plenty of options to choose from...
 
   my $tr= Data::TableReader->new(
     # path or file handle
@@ -751,10 +773,12 @@ file.
 
 =head2 input
 
-This can be a file name or L<Path::Class> instance or file handle or a
-L<Spreadsheet::ParseExcel::Worksheet> object.  If a file handle, it must be
-seekable in order to auto-detect the file format, I<or> you may specify the
-decoder directly to avoid auto-detection.
+This can be a file name, L<Path::Class> instance, file handle, arrayref, or
+L<Spreadsheet::ParseExcel::Worksheet> object.  If you supply a file handle,
+it must be seekable in order to auto-detect the file format, I<or> you may
+specify the decoder directly to avoid auto-detection.  Arrayrefs are passed to
+the L<'Mock' decoder|Data::TableReader::Decoder::Mock> which just returns the
+data as-is.
 
 =head2 decoder
 
@@ -984,7 +1008,9 @@ returns all records in an arrayref.
 
 =head1 THANKS
 
-Portions of this software were funded by L<Ellis, Partners in Management Solutions|http://www.epmsonline.com/>.
+Portions of this software were funded by
+L<Ellis, Partners in Management Solutions|http://www.epmsonline.com/>
+and L<Candela Corporation|https://www.candelacorp.com/>.
 
 =head1 AUTHOR
 
@@ -998,7 +1024,7 @@ Christian Walde <walde.christian@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Michael Conrad.
+This software is copyright (c) 2024 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

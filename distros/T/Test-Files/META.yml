@@ -23,6 +23,7 @@ no_index:
     - t
     - inc
 requires:
+  Class::XSAccessor: '0'
   Const::Fast: '0'
   Cwd: '0'
   Data::Compare: '0'
@@ -37,5 +38,5 @@ requires:
 resources:
   bugtracker: https://github.com/jsf116/Test-Files/issues
   repository: git://github.com/jsf116/Test-Files.git
-version: '0.25'
+version: '0.26'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

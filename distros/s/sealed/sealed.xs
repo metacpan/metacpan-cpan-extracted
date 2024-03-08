@@ -26,11 +26,11 @@ void _padname_add(PADLIST *padlist, IV idx)
             PL_comppad_name      = PadlistNAMES(padlist);
             PL_comppad           = PadlistARRAY(padlist)[1];
             PL_curpad            = AvARRAY(PL_comppad);
-	    PL_comppad_name_fill = 0;
-	    PL_min_intro_pending = 0;
+            PL_comppad_name_fill = 0;
+            PL_min_intro_pending = 0;
 	    PL_cv_has_eval       = 0;
-            PL_padix             = PadnamelistMAX(PL_comppad_name);
             PL_pad_reset_pending = 0;
+            PL_padix             = PadnamelistMAX(PL_comppad_name);
             names                = PadnamelistARRAY((PADNAMELIST *)PadlistARRAY(padlist)[0]);
 
             names[idx]           = newPADNAMEpvn("&", 1);
@@ -43,4 +43,5 @@ void _padname_add(PADLIST *padlist, IV idx)
             PL_curpad            = old_curpad;
             PL_comppad           = old_comppad;
             PL_comppad_name      = old_comppad_name;
+	    PL_cv_has_eval       = old_cv_has_eval;
             PL_op                = old_op;

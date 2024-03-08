@@ -14,7 +14,7 @@
 #include <stdio.h>
 
 #define FORMAT_VERSION_MAJOR 0
-#define FORMAT_VERSION_MINOR 4 /* Actually 5 if HAVE_FEATURE_CLASS */
+#define FORMAT_VERSION_MINOR 6
 
 #ifndef SvOOK_offset
 #  define SvOOK_offset(sv, len) STMT_START { len = SvIVX(sv); } STMT_END
@@ -76,13 +76,13 @@ static SV *make_tmp_iv(IV iv)
 static uint8_t sv_sizes[] = {
   /* Header                   PTRs,  STRs */
   4 + PTRSIZE + UVSIZE,       1,     0,     /* common SV */
-  UVSIZE,                     8,     2,     /* GLOB */
+  UVSIZE + PTRSIZE,           8,     2,     /* GLOB */
   1 + 2*UVSIZE + PMAT_NVSIZE, 1,     1,     /* SCALAR */
   1,                          2,     0,     /* REF */
   1 + UVSIZE,                 0,     0,     /* ARRAY + has body */
   UVSIZE,                     1,     0,     /* HASH + has body */
   UVSIZE + 0,                 1 + 4, 0 + 1, /* STASH = extends HASH */
-  5 + UVSIZE + PTRSIZE,       5,     2,     /* CODE + has body */
+  5 + UVSIZE + 2*PTRSIZE,     5,     2,     /* CODE + has body */
   2*UVSIZE,                   3,     0,     /* IO */
   1 + 2*UVSIZE,               1,     0,     /* LVALUE */
   0,                          0,     0,     /* REGEXP */
@@ -91,10 +91,8 @@ static uint8_t sv_sizes[] = {
   0,                          0,     0,     /* UNDEF */
   0,                          0,     0,     /* YES */
   0,                          0,     0,     /* NO */
-#ifdef HAVE_FEATURE_CLASS
   UVSIZE,                     0,     0,     /* OBJECT */
   UVSIZE + 0,                 1+4+1, 0+1,   /* CLASS = extends STASH */
-#endif
 };
 
 static uint8_t svx_sizes[] = {
@@ -108,6 +106,7 @@ static uint8_t svx_sizes[] = {
   0,          1,     0,     /* saved CV */
   0,          1,     1,     /* SV->SV annotation */
   2*UVSIZE,   0,     1,     /* SV leak report */
+  PTRSIZE,    0,     0,     /* PV shared HEK */
 };
 
 static uint8_t ctx_sizes[] = {
@@ -150,6 +149,7 @@ enum PMAT_SVt {
   PMAT_SVxSAVED_CV,
   PMAT_SVxSVSVnote,
   PMAT_SVxDEBUGREPORT,
+  PMAT_SVxPV_SHARED_HEK,
 
   PMAT_SVtMETA_STRUCT = 0xF0,
 };
@@ -327,6 +327,7 @@ static void write_private_gv(FILE *fh, const GV *gv)
   if(isGV_with_GP(gv)) {
     // Header
     write_uint(fh, GvLINE(gv));
+    write_ptr(fh, GvNAME_HEK(gv));
 
     // PTRs
     write_svptr(fh, (SV*)GvSTASH(gv));
@@ -345,6 +346,7 @@ static void write_private_gv(FILE *fh, const GV *gv)
   else {
     // Header
     write_uint(fh, 0);
+    write_ptr(fh, NULL);
 
     // PTRs
     write_svptr(fh, (SV*)GvSTASH(gv));
@@ -410,6 +412,13 @@ static void write_private_sv(FILE *fh, const SV *sv)
   }
   else
     write_str(fh, NULL);
+
+  // Extensions
+  if(SvPOKp(sv) && SvIsCOW_shared_hash(sv)) {
+    write_u8(fh, PMAT_SVxPV_SHARED_HEK);
+    write_svptr(fh, sv);
+    write_ptr(fh, SvSHARED_HEK_FROM_PV(SvPVX_const(sv)));
+  }
 }
 
 static void write_private_rv(FILE *fh, const SV *rv)
@@ -487,9 +496,19 @@ static void write_hv_body_elems(FILE *fh, const HV *hv)
   for(bucket = 0; bucket <= HvMAX(hv); bucket++) {
     HE *he;
     for(he = HvARRAY(hv)[bucket]; he; he = he->hent_next) {
-      STRLEN len;
-      char *key = HePV(he, len);
-      write_strn(fh, key, len);
+      STRLEN keylen;
+      char *keypv = HePV(he, keylen);
+      write_strn(fh, keypv, keylen);
+
+      HEK *hek = HeKEY_hek(he);
+      bool hek_is_shared =
+#ifdef HVhek_NOTSHARED
+        !(HEK_FLAGS(hek) & HVhek_NOTSHARED);
+#else
+        true;
+#endif
+      write_ptr(fh, hek_is_shared ? hek : NULL);
+
       write_svptr(fh, is_strtab ? NULL : HeVAL(he));
     }
   }
@@ -608,6 +627,12 @@ static void write_private_cv(FILE *fh, const CV *cv)
     write_ptr(fh, NULL);
 
   write_u32(fh, CvDEPTH(cv));
+  // CvNAME_HEK doesn't take a const CV *, but we know it won't modify
+#ifdef CvNAME_HEK
+  write_ptr(fh, CvNAME_HEK((CV *)cv));
+#else
+  write_ptr(fh, NULL);
+#endif
 
   // PTRs
   write_svptr(fh, (SV*)CvSTASH(cv));
@@ -1180,11 +1205,7 @@ static void dumpfh(FILE *fh)
   write_u8(fh, flags);
   write_u8(fh, 0);
   write_u8(fh, FORMAT_VERSION_MAJOR);
-#ifdef HAVE_FEATURE_CLASS
-  write_u8(fh, 5);
-#else
   write_u8(fh, FORMAT_VERSION_MINOR);
-#endif
 
   write_u32(fh, PERL_REVISION<<24 | PERL_VERSION<<16 | PERL_SUBVERSION);
 

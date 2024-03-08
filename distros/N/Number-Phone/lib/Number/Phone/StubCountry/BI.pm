@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185942;
+our $VERSION = 1.20240308154348;
 
 my $formatters = [
                 {
@@ -59,22 +59,27 @@ my $validators = {
               };
 my %areanames = ();
 $areanames{en} = {"2572226", "West\ zone",
-"2572225", "Bujumbura",
-"2572222", "Bujumbura",
 "2572230", "North\ zone",
-"2572221", "Bujumbura",
 "2572223", "Bujumbura",
 "2572250", "South\ zone",
-"2572227", "Rural\ areas",
-"2572240", "Central\ east\ zone",
+"2572224", "Bujumbura",
+"2572225", "Bujumbura",
 "2572220", "Bujumbura",
-"2572224", "Bujumbura",};
+"2572222", "Bujumbura",
+"2572240", "Central\ east\ zone",
+"2572227", "Rural\ areas",
+"2572221", "Bujumbura",};
+my $timezones = {
+               '' => [
+                       'Africa/Bujumbura'
+                     ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+257|\D)//g;
-      my $self = bless({ country_code => '257', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '257', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
         return $self->is_valid() ? $self : undef;
     }
 1;

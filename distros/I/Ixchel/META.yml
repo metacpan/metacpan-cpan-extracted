@@ -41,5 +41,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/LilithSec/Ixchel
-version: v0.9.3
+version: v0.9.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

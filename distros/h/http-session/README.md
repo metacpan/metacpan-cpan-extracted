@@ -53,7 +53,7 @@ easy to integrate with [PSGI](https://metacpan.org/pod/PSGI) =)
 
     filtering response. this method runs html\_filter, redirect\_filter and header\_filter.
 
-    $res should be PSGI's response array, instance of [HTTP::Response](https://metacpan.org/pod/HTTP::Response), or [HTTP::Engine::Response](https://metacpan.org/pod/HTTP::Engine::Response).
+    $res should be PSGI's response array, instance of [HTTP::Response](https://metacpan.org/pod/HTTP%3A%3AResponse), or [HTTP::Engine::Response](https://metacpan.org/pod/HTTP%3A%3AEngine%3A%3AResponse).
 
 - $session->keys()
 
@@ -110,7 +110,7 @@ repo url is here [http://github.com/tokuhirom/http-session/tree/master](http://g
 
 # SEE ALSO
 
-[Catalyst::Plugin::Session](https://metacpan.org/pod/Catalyst::Plugin::Session), [Sledge::Session](https://metacpan.org/pod/Sledge::Session)
+[Catalyst::Plugin::Session](https://metacpan.org/pod/Catalyst%3A%3APlugin%3A%3ASession), [Sledge::Session](https://metacpan.org/pod/Sledge%3A%3ASession)
 
 # LICENSE
 

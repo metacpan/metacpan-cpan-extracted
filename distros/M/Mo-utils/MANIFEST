@@ -29,6 +29,8 @@ examples/check_required_fail.pl
 examples/check_required_ok.pl
 examples/check_string_begin_fail.pl
 examples/check_string_begin_ok.pl
+examples/check_string_fail.pl
+examples/check_string_ok.pl
 examples/check_strings_fail.pl
 examples/check_strings_ok.pl
 inc/Module/Install.pm
@@ -64,8 +66,9 @@ t/Mo-utils/13-check_number_of_items.t
 t/Mo-utils/14-check_number_range.t
 t/Mo-utils/15-check_regexp.t
 t/Mo-utils/16-check_required.t
-t/Mo-utils/17-check_string_begin.t
-t/Mo-utils/18-check_strings.t
+t/Mo-utils/17-check_string.t
+t/Mo-utils/18-check_string_begin.t
+t/Mo-utils/19-check_strings.t
 utils.pm
 xt/Mo-utils/01-pod_coverage.t
 xt/Mo-utils/02-pod.t

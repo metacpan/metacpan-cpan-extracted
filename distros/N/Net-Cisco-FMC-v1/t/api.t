@@ -1,5 +1,4 @@
 use Test2::V0;
-use Test2::Tools::Compare qw( array hash D );
 use Net::Cisco::FMC::v1;
 use JSON qw();
 
@@ -53,6 +52,41 @@ END {
     $fmc->logout
         if defined $fmc;
 }
+
+ok(my $category = $fmc->create_accesspolicy_category($policy->{id}, {
+    name => 'Test-Section',
+}), 'access policy category created');
+
+ok(my $categories = $fmc->list_accesspolicy_categories($policy->{id}),
+    'list accesspolicy categories successful');
+is($categories->{items},
+    array {
+        item hash {
+            field 'name' => 'Test-Section';
+            etc();
+        };
+        end();
+    },
+    'access policy has correct categories');
+
+is($fmc->get_accesspolicy_category($policy->{id}, $category->{id}),
+    hash {
+        field 'name' => 'Test-Section';
+        etc();
+    },
+    'get accesspolicy category successful');
+
+is($fmc->update_accesspolicy_category($policy->{id}, $category, { name => 'Test-Section updated'}),
+    hash {
+        field 'name' => 'Test-Section updated';
+        etc();
+    },
+    'update accesspolicy category successful');
+
+ok($fmc->delete_accesspolicy_category(
+    $policy->{id},
+    $category->{id}
+), 'delete accesspolicy category successful');
 
 ok(my $accessrules = $fmc->list_accessrules($policy->{id}),
     'list accessrules successful');

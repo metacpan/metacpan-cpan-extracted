@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185946;
+our $VERSION = 1.20240308154354;
 
 my $formatters = [
                 {
@@ -164,49 +164,54 @@ my $validators = {
         '
               };
 my %areanames = ();
-$areanames{en} = {"2753", "Eastern\ part\ of\ Northern\ Cape\/Far\ western\ part\ of\ North\ West\/Kimberley\/Kuruman",
-"2711", "Johannesburg",
-"2745", "Northern\ and\ eastern\ parts\ of\ Eastern\ Cape\/Queenstown",
+$areanames{en} = {"2712", "Brits\/Tshwane",
+"2747", "Butterworth\/Eastern\ part\ of\ Eastern\ Cape\/Mthatha",
 "2744", "Garden\ Route\/George\/Knysna\/Mossel\ Bay\/Oudtshoorn\/Plettenberg\ Bay",
-"2710", "Johannesburg",
+"2732", "Ballito\/KwaZulu\ Natal\ coast\/Stanger\/Tongaat\/Verulam",
+"2727", "Alexander\ Bay\/Calvinia\/Clanwilliam\/Namaqualand\/Port\ Nolloth\/Springbok\/Vredendal",
+"2745", "Northern\ and\ eastern\ parts\ of\ Eastern\ Cape\/Queenstown",
+"2740", "Alice\/Bhisho",
+"2716", "Vaal\ Triangle",
+"2731", "Durban",
+"2756", "Kroonstad\/Parys\/Northern\ Free\ State",
+"2733", "KwaZulu\ Natal\ Midlands\/Pietermaritzburg",
 "2748", "Cradock\/Northern\ part\ of\ Eastern\ Cape\/Steynsburg",
 "2736", "Drakensberg\/Ladysmith",
-"2717", "Ermelo\/Secunda\/Southern\ Mpumalanga",
-"2735", "Richards\ Bay\/St\.\ Lucia\/Ulundi\/Zululand",
-"2757", "Northern\ Free\ State\ Goldfields\/Welkom",
-"2712", "Brits\/Tshwane",
-"2734", "Newcastle\/Northern\ KwaZulu\ Natal\/Vryheid",
 "2728", "Caledon\/Hermanus\/Southern\ coast\ of\ Western\ Cape\/Swellendam",
-"2713", "Bronkhorstspruit\/Eastern\ Gauteng\/Middelburg\/Nelspruit\/Northern\ and\ Western\ Mpumalanga\/Witbank",
-"2746", "Bathurst\/Southern\ and\ eastern\ parts\ of\ Eastern\ Cape\/Grahamstown\/Kenton\-on\-Sea\/Port\ Alfred",
 "2751", "Aliwal\ North\/Bloemfontein\/Far\ eastern\ part\ of\ Eastern\ Cape\/Southern\ and\ Central\ Free\ State",
-"2718", "Klerksdorp\/Lichtenburg\/Potchefstroom",
+"2753", "Eastern\ part\ of\ Northern\ Cape\/Far\ western\ part\ of\ North\ West\/Kimberley\/Kuruman",
 "2749", "Graaff\-Reinet\/Western\ part\ of\ Eastern\ Cape",
-"2723", "Beaufort\ West\/Karoo\/Robertson\/Worcester",
-"2747", "Butterworth\/Eastern\ part\ of\ Eastern\ Cape\/Mthatha",
-"2733", "KwaZulu\ Natal\ Midlands\/Pietermaritzburg",
-"2722", "Boland\/Malmesbury\/Vredenburg\/Western\ coast\ of\ Western\ Cape",
-"2732", "Ballito\/KwaZulu\ Natal\ coast\/Stanger\/Tongaat\/Verulam",
-"2741", "Port\ Elizabeth\/Uitenhage",
-"2756", "Kroonstad\/Parys\/Northern\ Free\ State",
-"2715", "Northern\ and\ Eastern\ Limpopo\/Polokwane",
+"2713", "Bronkhorstspruit\/Eastern\ Gauteng\/Middelburg\/Nelspruit\/Northern\ and\ Western\ Mpumalanga\/Witbank",
+"2711", "Johannesburg",
+"2717", "Ermelo\/Secunda\/Southern\ Mpumalanga",
 "2714", "Modimolle\/Northern\ North\ West\ and\ Southwestern\ Limpopo\/Rustenburg",
-"2740", "Alice\/Bhisho",
-"2754", "Upington\/Gordonia",
-"2727", "Alexander\ Bay\/Calvinia\/Clanwilliam\/Namaqualand\/Port\ Nolloth\/Springbok\/Vredendal",
-"2743", "East\ London",
-"2716", "Vaal\ Triangle",
-"2739", "Eastern\ Pondoland\/Port\ Shepstone\/Southern\ coast\ of\ KwaZulu\ Natal",
-"2731", "Durban",
-"2721", "Cape\ Town\/Gordons\ Bay\/Somerset\ West\/Stellenbosch",
+"2735", "Richards\ Bay\/St\.\ Lucia\/Ulundi\/Zululand",
 "2742", "Jeffreys\ Bay\/Humansdorp\/Southern\ and\ central\ Eastern\ Cape",
-"2758", "Bethlehem\/Eastern\ Free\ State",};
+"2757", "Northern\ Free\ State\ Goldfields\/Welkom",
+"2754", "Upington\/Gordonia",
+"2715", "Northern\ and\ Eastern\ Limpopo\/Polokwane",
+"2722", "Boland\/Malmesbury\/Vredenburg\/Western\ coast\ of\ Western\ Cape",
+"2734", "Newcastle\/Northern\ KwaZulu\ Natal\/Vryheid",
+"2739", "Eastern\ Pondoland\/Port\ Shepstone\/Southern\ coast\ of\ KwaZulu\ Natal",
+"2718", "Klerksdorp\/Lichtenburg\/Potchefstroom",
+"2721", "Cape\ Town\/Gordons\ Bay\/Somerset\ West\/Stellenbosch",
+"2710", "Johannesburg",
+"2758", "Bethlehem\/Eastern\ Free\ State",
+"2723", "Beaufort\ West\/Karoo\/Robertson\/Worcester",
+"2746", "Bathurst\/Southern\ and\ eastern\ parts\ of\ Eastern\ Cape\/Grahamstown\/Kenton\-on\-Sea\/Port\ Alfred",
+"2743", "East\ London",
+"2741", "Port\ Elizabeth\/Uitenhage",};
+my $timezones = {
+               '' => [
+                       'Africa/Johannesburg'
+                     ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+27|\D)//g;
-      my $self = bless({ country_code => '27', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '27', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
       $self = bless({ country_code => '27', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);

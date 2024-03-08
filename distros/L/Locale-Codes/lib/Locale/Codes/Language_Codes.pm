@@ -3,7 +3,7 @@ Locale::Codes::Language_Codes;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'harvest_data' is run.
-#    Generated on: Fri Dec  1 15:37:07 EST 2023
+#    Generated on: Fri Mar  1 13:13:00 EST 2024
 
 use strict;
 require 5.006;
@@ -11,7 +11,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.77';
+$VERSION='3.78';
 
 $Locale::Codes::Data{'language'}{'id'} = '8028';
 

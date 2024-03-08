@@ -173,8 +173,8 @@ add_themes = critic
 # are in addition to new().
 forbid     = create destroy
 
-[Perl::Critic::Policy::RegularExpressions::ProhibitFixedStringMatches]
-add_themes = critic
+#[Perl::Critic::Policy::RegularExpressions::ProhibitFixedStringMatches]
+#add_themes = critic
 
 [Perl::Critic::Policy::RegularExpressions::ProhibitSingleCharAlternation]
 add_themes = critic

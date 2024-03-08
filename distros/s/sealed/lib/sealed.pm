@@ -19,7 +19,7 @@ our $VERSION;
 our $DEBUG;
 
 BEGIN {
-  our $VERSION = qv(5.1.6);
+  our $VERSION = qv(5.1.9);
   XSLoader::load("sealed", $VERSION);
 }
 
@@ -75,21 +75,27 @@ sub tweak ($\@\@\@$$\%) {
           or die __PACKAGE__ . ": invalid lookup: $class->$method_name - did you forget to 'use $class' first?";
         # replace $methop
         $old_pad                = B::cv_pad($cv_obj);
-        $gv                     = B::GVOP->new($gv_op->name, $gv_op->flags, ref($gv_op) eq "B::PADOP" ? 0 : $method);
+        $gv                     = B::GVOP->new($gv_op->name, $gv_op->flags, ref($gv_op) eq "B::PADOP" ? *tweak : $method);
         B::cv_pad($old_pad);
         $gv->next($methop->next);
         $gv->sibparent($methop->sibparent);
         $op->next($gv);
         $$processed_op{$$_}++ for $op, $gv, $methop;
+
         if (ref($gv) eq "B::PADOP") {
-          # the pad entry associated to $gv->padix is pure garbage,
+          # the pad entry associated to $gv->padix is (correctly flagged) garbage,
           # as well as completely missing a padname!
-          # so we answer the prayer by recycling $$pads[--$idx][$targ], which
+          # so we answer the prayer by resetting $$pads[--$idx][$gv->padix], which
           # has the correct semantics (for $method) under assignment.
           my $padix = $gv->padix;
           _padname_add($cv_obj->PADLIST, $padix);
-          $$pads[--$idx][$targ] = $method;
-          $gv->padix($targ);
+          my (undef, @p) = $cv_obj->PADLIST->ARRAY;
+          $pads = [ map $_->object_2svref, @p ];
+          $$pads[--$idx][$padix] = $method;
+          $$pads[$idx][$targ] .= ":compiled";
+        }
+        else {
+          $$pads[--$idx][$targ] .= ":sealed";
         }
         ++$tweaked;
       }
@@ -146,7 +152,7 @@ sub MODIFY_CODE_ATTRIBUTES {
     }
 
     if (defined $DEBUG and $DEBUG eq "deparse" and $tweaked) {
-      eval {warn "sub ", $cv_obj->GV->NAME // "__UNKNOWN__", " ", B::Deparse->new->coderef2text($rv), "\n"};
+      eval {warn "sub ", $cv_obj->GV->NAME // "__UNKNOWN__", " :sealed ", B::Deparse->new->coderef2text($rv), "\n"};
       warn "B::Deparse: coderef2text() aborted: $@" if $@;
     }
   }
@@ -205,6 +211,8 @@ from the mod_perl portion of the tune, only from the mpm_event worker process tu
 during httpd server (graceful) restart.
 
 =head1 CAVEATS
+
+KISS.
 
 Don't use typed lexicals under a :sealed sub for API method argument
 processing, if you are writing a reusable OO module (on CPAN, say). This

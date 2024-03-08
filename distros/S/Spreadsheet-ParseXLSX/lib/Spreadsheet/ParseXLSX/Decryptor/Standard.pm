@@ -3,7 +3,7 @@ package Spreadsheet::ParseXLSX::Decryptor::Standard;
 use strict;
 use warnings;
 
-our $VERSION = '0.31'; # VERSION
+our $VERSION = '0.33'; # VERSION
 
 # ABSTRACT: standard decryption
 
@@ -97,7 +97,7 @@ Spreadsheet::ParseXLSX::Decryptor::Standard - standard decryption
 
 =head1 VERSION
 
-version 0.31
+version 0.33
 
 =for Pod::Coverage   decrypt
   decryptFile

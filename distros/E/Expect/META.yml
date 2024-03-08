@@ -32,5 +32,5 @@ requires:
   perl: '5.006000'
 resources:
   repository: http://github.com/jacoby/expect.pm.git
-version: '1.36'
+version: '1.38'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

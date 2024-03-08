@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185945;
+our $VERSION = 1.20240308154352;
 
 my $formatters = [
                 {
@@ -66,32 +66,37 @@ my $validators = {
                 'voip' => '22\\d{7}'
               };
 my %areanames = ();
-$areanames{en} = {"2612053", "Toamasina",
-"2612057", "Maroantsetra\/Sainte\ Marie",
-"2612044", "Antsirabe",
-"2612092", "Taolañaro",
+$areanames{en} = {"2612056", "Moramanga",
 "2612067", "Antsohihy",
-"2612094", "Toliary",
-"26120729", "Mananjary",
-"2612069", "Maintirano",
-"2612095", "Morondava",
-"2612086", "Nosy\ Be",
-"26120722", "Manakara",
 "2612075", "Fianarantsoa",
-"2612082", "Antsiranana",
-"2612047", "Ambositra",
-"2612062", "Mahajanga",
+"2612053", "Toamasina",
+"2612086", "Nosy\ Be",
 "2612054", "Ambatondrazaka",
-"2612056", "Moramanga",
+"2612062", "Mahajanga",
+"2612047", "Ambositra",
+"2612073", "Farafangana",
+"2612094", "Toliary",
+"2612095", "Morondava",
+"26120729", "Mananjary",
 "2612088", "Sambava",
+"2612092", "Taolañaro",
+"2612082", "Antsiranana",
+"26120722", "Manakara",
+"2612057", "Maroantsetra\/Sainte\ Marie",
 "2612022", "Antananarivo",
-"2612073", "Farafangana",};
+"2612044", "Antsirabe",
+"2612069", "Maintirano",};
+my $timezones = {
+               '' => [
+                       'Indian/Antananarivo'
+                     ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+261|\D)//g;
-      my $self = bless({ country_code => '261', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '261', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       my $prefix = qr/^(?:([24-9]\d{6})$|0)/;
       my @matches = $number =~ /$prefix/;

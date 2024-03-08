@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use constant {
-    DT_TZ_MIN => 2.10,
+    DT_TZ_MIN => 2.16,
     SECONDS_PER_HOUR => 60 * 60,
     MINUTES_PER_HOUR => 60,
 };
@@ -15,7 +15,7 @@ eval {
     require DateTime::TimeZone::Local::Win32;
 };
 if ($@) {
-    plan skip_all => 
+    plan skip_all =>
         'These tests run only when DateTime and DateTime::TimeZone are present.';
 }
 use File::Basename qw( basename );
@@ -142,7 +142,7 @@ sub get_windows_timezone_offsets {
     my $feb_dt = shift;
     my $aug_dt = shift;
     my $windows_tz_info = shift;
-    
+
     # Daylight Savings Time not configured for this time zone
     if ( $windows_tz_info->{'standardMonth'} == 0 ) {
         return (
@@ -151,11 +151,11 @@ sub get_windows_timezone_offsets {
             $windows_tz_info->{'bias'} * -1
         );
     }
-    
+
     my @offsets;
 
     foreach my $date ( $dt, $feb_dt, $aug_dt ) {
-    
+
         # standard time
         my $standard_date = get_dt_by_week_and_day(
             $date->year(),
@@ -263,7 +263,7 @@ sub test_windows_zone {
     my $windows_tz_name = shift;
     my $iana_name      = shift;
     my $registry_writable = shift;
-    my %KnownBad = map { $_ => 1 } ( );
+    my %KnownBad = map { $_ => 1 } ( 'Samoa Standard Time', 'Central Asia Standard Time' );
 
 
     my $tz;
@@ -314,7 +314,7 @@ sub test_windows_zone {
             my $dt = DateTime->now(
                 time_zone => $tz->name(),
             );
-            
+
             # typical times always Winter or Summer time depending on hemisphere if daylight savings in use
             # and attempting to avoid Ramadan as Morocco suspends daylight savings during Ramadan
             my $feb_dt = DateTime->new(
@@ -370,7 +370,7 @@ sub test_windows_zone {
             $windows_offset /= MINUTES_PER_HOUR;
             $windows_feb_offset /= MINUTES_PER_HOUR;
             $windows_aug_offset /= MINUTES_PER_HOUR;
-            
+
             if ( $KnownBad{$windows_tz_name} ) {
             TODO: {
                     local $TODO

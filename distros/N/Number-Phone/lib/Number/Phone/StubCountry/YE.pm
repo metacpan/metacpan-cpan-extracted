@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185946;
+our $VERSION = 1.20240308154354;
 
 my $formatters = [
                 {
@@ -78,91 +78,96 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"967285", "Lahj",
+$areanames{en} = {"9677876", "Amran",
 "967650", "Dhamar",
-"9674841", "Taiz",
-"96744", "Ibb",
-"96754", "Hadhrmout",
-"96725", "Lahj",
-"9672840", "Aden",
-"9677877", "Amran",
-"96772", "Hajjah",
-"9676863", "Maareb",
-"9677871", "Hajjah",
-"967283", "Aden",
-"967656", "Al\ Baidha",
-"9677875", "Saadah",
-"9671", "Sanaa",
-"967284", "Dhalea",
-"9677876", "Amran",
-"9676864", "Dhamar",
-"967682", "Dhamar",
-"9676853", "Al\ Baidha",
-"967639", "Dhamar",
-"96776", "Amran",
-"967280", "Aden",
-"967655", "Al\ Baidha",
-"967433", "Ibb",
-"967484", "Ibb",
-"967653", "Al\ Baidha",
-"967286", "Abyan",
-"967566", "Soqatrah",
-"9676869", "Al\ Baidha",
-"9677870", "Hajjah",
-"967483", "Taiz",
-"9674842", "Taiz",
-"967654", "Al\ Baidha",
-"9677872", "Hajjah",
-"9674840", "Taiz",
-"9676868", "Al\ Baidha",
-"96745", "Ibb",
-"96755", "Hadhrmout",
 "96724", "Dhalea",
-"967485", "Ibb",
 "9677879", "Al\ Mahweet",
-"967651", "Dhamar",
-"967282", "Aden",
-"9673", "Hodaidah",
-"96722", "Aden",
-"9677878", "Saadah",
-"9676862", "Al\ Baidha",
-"967638", "Maareb",
-"967636", "Maareb",
-"96775", "Saadah",
-"96764", "Dhamar",
-"967657", "Al\ Baidha",
-"967630", "Maareb",
-"967785", "Saadah",
-"96723", "Aden",
-"9676860", "Al\ Baidha",
-"967281", "Aden",
-"96774", "Al\ Mahweet",
-"96743", "Taiz",
-"967652", "Al\ Baidha",
-"9676865", "Dhamar",
-"9677873", "Hajjah",
-"96753", "Hadhrmout",
-"9677845", "Al\ Mahweet",
-"9676861", "Dhamar",
-"967634", "Aljawf",
-"9676867", "Dhamar",
-"96742", "Taiz",
-"967683", "Maareb",
-"96752", "Shabwah",
-"9674843", "Taiz",
-"967633", "Maareb",
-"9676866", "Dhamar",
+"967656", "Al\ Baidha",
 "9677874", "Al\ Mahweet",
+"9676860", "Al\ Baidha",
+"967284", "Dhalea",
+"967651", "Dhamar",
+"9677845", "Al\ Mahweet",
+"96764", "Dhamar",
+"967633", "Maareb",
+"967652", "Al\ Baidha",
+"9677871", "Hajjah",
+"9676867", "Dhamar",
+"9676853", "Al\ Baidha",
 "967684", "Dhamar",
-"9676850", "Al\ Baidha",
+"96723", "Aden",
+"967566", "Soqatrah",
+"967483", "Taiz",
 "967786", "Amran",
-"96726", "Abyan",};
+"9677873", "Hajjah",
+"967630", "Maareb",
+"96752", "Shabwah",
+"9676865", "Dhamar",
+"967636", "Maareb",
+"96772", "Hajjah",
+"96742", "Taiz",
+"9674840", "Taiz",
+"9677878", "Saadah",
+"96776", "Amran",
+"9677872", "Hajjah",
+"967653", "Al\ Baidha",
+"967285", "Lahj",
+"967657", "Al\ Baidha",
+"96725", "Lahj",
+"9676866", "Dhamar",
+"967682", "Dhamar",
+"967286", "Abyan",
+"9676869", "Al\ Baidha",
+"967654", "Al\ Baidha",
+"9676864", "Dhamar",
+"96722", "Aden",
+"9674842", "Taiz",
+"967280", "Aden",
+"9677870", "Hajjah",
+"9672840", "Aden",
+"967282", "Aden",
+"96726", "Abyan",
+"96755", "Hadhrmout",
+"967638", "Maareb",
+"967785", "Saadah",
+"9677877", "Amran",
+"9676861", "Dhamar",
+"967485", "Ibb",
+"9674843", "Taiz",
+"967281", "Aden",
+"96775", "Saadah",
+"96745", "Ibb",
+"9671", "Sanaa",
+"9673", "Hodaidah",
+"967433", "Ibb",
+"96774", "Al\ Mahweet",
+"96744", "Ibb",
+"9676863", "Maareb",
+"967634", "Aljawf",
+"9674841", "Taiz",
+"9677875", "Saadah",
+"96754", "Hadhrmout",
+"967683", "Maareb",
+"967484", "Ibb",
+"9676862", "Al\ Baidha",
+"967655", "Al\ Baidha",
+"9676868", "Al\ Baidha",
+"967639", "Dhamar",
+"96753", "Hadhrmout",
+"9676850", "Al\ Baidha",
+"96743", "Taiz",
+"967283", "Aden",};
+my $timezones = {
+               '' => [
+                       'Asia/Aden'
+                     ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+967|\D)//g;
-      my $self = bless({ country_code => '967', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '967', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
       $self = bless({ country_code => '967', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);

@@ -1,0 +1,17 @@
+sync:
+  defaults:
+    flushOnCreate: true
+    ignore:
+      vcs: false
+  code:
+    alpha: "."
+    beta: "macabre:/home/dj/axaf/src/Alien-Qhull"
+    ignore:
+      paths:
+        - ".build"
+        - "local"
+        - "devel"
+        - ".tidyall.d"
+        - ".plx"
+        - "mutagen.yml.lock"
+        - "caldb"

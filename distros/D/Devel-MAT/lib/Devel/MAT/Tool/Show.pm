@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2024 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Show 0.52;
+package Devel::MAT::Tool::Show 0.53;
 
 use v5.14;
 use warnings;
@@ -110,8 +110,8 @@ sub run
          Devel::MAT::Cmd->format_sv( $magic->ptr )
       ) if $magic->ptr;
 
-      Devel::MAT::Cmd->printf( "\n     with virtual table at 0x%x",
-         $magic->vtbl
+      Devel::MAT::Cmd->printf( "\n     with virtual table at %s",
+         Devel::MAT::Cmd->format_value( $magic->vtbl, addr => 1 )
       ) if $magic->vtbl;
 
       Devel::MAT::Cmd->printf( "\n" );
@@ -150,7 +150,10 @@ sub show_GLOB
    my $self = shift;
    my ( $gv ) = @_;
 
-   Devel::MAT::Cmd->printf( "  name=%s\n", $gv->name ) if $gv->name;
+   if( $gv->name ) {
+      Devel::MAT::Cmd->printf( "  name=%s\n", $gv->name );
+      Devel::MAT::Cmd->printf( "  name_hek=%s\n", Devel::MAT::Cmd->format_value( $gv->name_hek_at, addr => 1 ) ) if $gv->name_hek_at;
+   }
 
    say_with_sv '  stash=', $gv->stash if $gv->stash;
 
@@ -185,6 +188,10 @@ sub show_SCALAR
          ),
       );
       Devel::MAT::Cmd->printf( "  PVLEN %d\n", $sv->pvlen );
+
+      Devel::MAT::Cmd->printf( "  SHARED_HEK=%s\n",
+         Devel::MAT::Cmd->format_value( $sv->shared_hek, addr => 1 ),
+      ) if $sv->shared_hek;
    }
 }
 
@@ -239,6 +246,9 @@ sub show_CODE
 {
    my $self = shift;
    my ( $cv, $opts ) = @_;
+
+   $cv->name_hek ? Devel::MAT::Cmd->printf( "  name_hek=%s\n", Devel::MAT::Cmd->format_value( $cv->name_hek, addr => 1 ) )
+                 : ();
 
    $cv->hekname  ? Devel::MAT::Cmd->printf( "  hekname=%s\n", $cv->hekname )
                  : Devel::MAT::Cmd->printf( "  no hekname\n" );
@@ -479,15 +489,9 @@ Takes the following named options:
 
 Show at most this number of elements (default 50).
 
-=back
+=item --start, -s COUNT
 
-Takes the following positional arguments:
-
-=over 4
-
-=item *
-
-Optional start index (default 0).
+Start at the given index.
 
 =back
 
@@ -498,18 +502,20 @@ use constant CMD_OPTS => (
               type => "i",
               alias => "c",
               default => 50 },
+   start => { help => "starting index",
+              type => "i",
+              alias => "s" },
 );
 
 use constant CMD_ARGS_SV => 1;
 use constant CMD_ARGS => (
-   { name => "startidx", help => "starting index" },
 );
 
 sub run
 {
    my $self = shift;
    my %opts = %{ +shift };
-   my ( $av, $startidx ) = @_;
+   my ( $av ) = @_;
 
    my $type = $av->type;
    if( $type eq "HASH" or $type eq "STASH" ) {
@@ -519,7 +525,7 @@ sub run
       die "Cannot 'elems' of a non-ARRAY\n";
    }
 
-   $startidx //= 0;
+   my $startidx = $opts{start} // 0;
    my $stopidx = min( $startidx + $opts{count}, $av->n_elems );
 
    my @rows;
@@ -561,6 +567,16 @@ Takes the following named options:
 
 Show at most this number of values (default 50).
 
+=item --skip, -s COUNT
+
+Skip over this number of keys initially before starting to print.
+
+=item --no-sort, -n
+
+Don't bother to sort keys before printing. Keys will be printed in no
+particular order (though the order will at least be stable between successive
+invocations of the command during the same session).
+
 =back
 
 Takes the following positional arguments:
@@ -569,8 +585,9 @@ Takes the following positional arguments:
 
 =item *
 
-Optional skip count (default 0). If present, will skip over this number of
-keys initially to show more of them.
+Optional filter pattern. If present, will only count and display keys matching
+the given regexp. Must be specified in the form C</PATTERN/> with optional
+trailing flags. The only permitted flags are C<adilmsux>.
 
 =back
 
@@ -581,18 +598,25 @@ use constant CMD_OPTS => (
               type => "i",
               alias => "c",
               default => 50 },
+   skip => { help => "count of keys to skip initially before printing",
+             type => "i",
+             alias => "s" },
+   no_sort => { help => "don't sort keys before printing",
+                alias => "n" },
+   hek => { help => "also show HEK pointers",
+            alias => "H" },
 );
 
 use constant CMD_ARGS_SV => 1;
 use constant CMD_ARGS => (
-   { name => "skipcount", help => "skip over this many keys initially" },
+   { name => "filter", help => "optional pattern to filter keys by" },
 );
 
 sub run
 {
    my $self = shift;
    my %opts = %{ +shift };
-   my ( $hv, $skipcount ) = @_;
+   my ( $hv, $filter ) = @_;
 
    my $type = $hv->type;
    if( $type eq "ARRAY" ) {
@@ -602,8 +626,18 @@ sub run
       die "Cannot 'elems' of a non-HASHlike\n";
    }
 
-   # TODO: control of sorting, start at, filtering
-   my @keys = sort $hv->keys;
+   my $skipcount = $opts{skip};
+   my $show_heks = $opts{hek};
+
+   my @keys = $hv->keys;
+   if( length $filter ) {
+      $filter =~ m/^\/(.*)\/([adilmsux]*)$/ or
+         die "Filter must be a /PATTERN.../ with optional flags";
+      my ( $pattern, $flags ) = ( $1, $2 );
+      my $re = qr/(?$flags:$pattern)/;
+      @keys = grep { $_ =~ $re } @keys;
+   }
+   @keys = sort @keys unless $opts{no_sort};
    splice @keys, 0, $skipcount if $skipcount;
 
    Devel::MAT::Tool::more->paginate( { pagesize => $opts{count} }, sub {
@@ -611,9 +645,12 @@ sub run
       my @rows;
       foreach my $key ( splice @keys, 0, $count ) {
          my $sv = $hv->value( $key );
+         my $hek = $show_heks ? $hv->hek_at( $key ) : 0;
+
          push @rows, [
             Devel::MAT::Cmd->format_value( $key, key => 1,
                stash => ( $type eq "STASH" ) ),
+            ( $hek ? "HEK at " . Devel::MAT::Cmd->format_value( $hek, addr => 1 ) : () ),
             $sv ? Devel::MAT::Cmd->format_sv_with_value( $sv ) : "NULL",
          ];
       }

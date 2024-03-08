@@ -2,12 +2,21 @@ package Geo::Coder::Free::DB::OpenAddr;
 
 use strict;
 use warnings;
+use Database::Abstraction;
 
-# The data are from http://results.openaddresses.io/
+=head1 NAME
 
-use Geo::Coder::Free::DB;
+Geo::Coder::Free::DB::Free::OpenAddr - driver for http://results.openaddresses.io/
 
-our @ISA = ('Geo::Coder::Free::DB');
+=head1 VERSION
+
+Version 0.35
+
+=cut
+
+our $VERSION = '0.35';
+
+our @ISA = ('Database::Abstraction');
 
 sub _open {
 	my $self = shift;

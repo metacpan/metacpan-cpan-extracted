@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185945;
+our $VERSION = 1.20240308154351;
 
 my $formatters = [
                 {
@@ -191,87 +191,92 @@ my $validators = {
                 'voip' => '70[67]\\d{6}'
               };
 my %areanames = ();
-$areanames{en} = {"995418", "Martvili",
-"995447", "Gali",
-"995424", "Shuaxevi",
-"995416", "Tsalendjikha",
-"995370", "Gori",
-"995479", "Chiatura",
-"995434", "Bagdati",
-"995491", "Terdjola",
-"995410", "Mestia",
-"995362", "Akhalkalaki",
-"995345", "Stefanstminda\/Kazbegi",
-"995350", "Telavi",
-"995497", "Tkibuli",
-"995433", "Kharagauli",
-"995369", "Kareli",
-"995472", "Tsageri",
-"995425", "Qeda",
-"995423", "Xulo",
-"995344", "Tskhinvali",
-"995358", "Bolnisi",
-"995356", "DedoplisTskaro",
-"995435", "Sachkhere",
-"995354", "Lagodekhi",
-"99532", "Tbilisi",
-"995346", "Dusheti",
-"995348", "Tianeti",
-"995413", "Senaki",
-"995415", "Zugdidi",
-"995361", "Ninotsminda",
-"995492", "Zestafoni",
-"995373", "Mtskheta",
-"995367", "Bordjomi",
-"995436", "Tskaltubo",
-"995374", "Tigvi",
-"995355", "Signagi",
-"995442", "Sukhumi",
-"995353", "Gurdjaani",
-"995426", "Kobuleti",
-"995414", "Xobi",
-"995371", "Kaspi",
-"995363", "Tsalka",
-"995496", "Ozurgeti",
-"995439", "Ambrolauri",
-"995365", "Akhaltsikhe",
-"995411", "Samtredia",
+$areanames{en} = {"995437", "Lentekhi",
 "995342", "Akhalgori",
-"995357", "Marneuli",
-"995422", "Batumi",
-"995446", "Tkvarcheli",
-"995448", "Gulripshi",
-"995349", "Akhmeta",
-"995417", "Chkhorotskhu",
-"995351", "Sagaredjo",
-"995432", "Vani",
+"995414", "Xobi",
+"995479", "Chiatura",
+"995341", "Rustavi",
 "995364", "Aspindza",
-"995473", "Oni",
-"995437", "Lentekhi",
-"995493", "Poti",
+"995433", "Kharagauli",
+"995495", "Khoni",
+"995353", "Gurdjaani",
+"995346", "Dusheti",
+"995443", "Gagra",
+"995425", "Qeda",
+"995447", "Gali",
+"995419", "Choxatauri",
+"995369", "Kareli",
+"995357", "Marneuli",
+"995350", "Telavi",
+"995432", "Vani",
+"995347", "Djava",
+"995374", "Tigvi",
+"995446", "Tkvarcheli",
+"995431", "Kutaisi",
+"995424", "Shuaxevi",
+"995356", "DedoplisTskaro",
+"995436", "Tskaltubo",
+"995351", "Sagaredjo",
+"995442", "Sukhumi",
+"995418", "Martvili",
+"995494", "lanchxuti",
+"995365", "Akhaltsikhe",
+"995415", "Zugdidi",
+"995352", "Kvareli",
 "995368", "Khashuri",
 "995366", "Adigeni",
-"995372", "Gardabani",
-"995444", "Gudauta",
-"995427", "Xelvachauri",
-"995359", "TetriTskaro",
-"995495", "Khoni",
-"995341", "Rustavi",
+"995497", "Tkibuli",
+"995416", "Tsalendjikha",
+"995472", "Tsageri",
+"995349", "Akhmeta",
+"995410", "Mestia",
+"995435", "Sachkhere",
+"995493", "Poti",
 "995360", "Dmanisi",
+"995358", "Bolnisi",
+"995362", "Akhalkalaki",
+"995427", "Xelvachauri",
+"995445", "Ochamchire",
+"995373", "Mtskheta",
+"995448", "Gulripshi",
+"995355", "Signagi",
 "995412", "Abasha",
-"995352", "Kvareli",
-"995347", "Djava",
-"995419", "Choxatauri",
-"995443", "Gagra",
-"995494", "lanchxuti",
-"995431", "Kutaisi",
-"995445", "Ochamchire",};
+"995361", "Ninotsminda",
+"995344", "Tskhinvali",
+"995423", "Xulo",
+"995411", "Samtredia",
+"995354", "Lagodekhi",
+"995426", "Kobuleti",
+"995492", "Zestafoni",
+"995370", "Gori",
+"995444", "Gudauta",
+"995348", "Tianeti",
+"995473", "Oni",
+"995439", "Ambrolauri",
+"995491", "Terdjola",
+"995345", "Stefanstminda\/Kazbegi",
+"995367", "Bordjomi",
+"995359", "TetriTskaro",
+"995371", "Kaspi",
+"995422", "Batumi",
+"995496", "Ozurgeti",
+"995417", "Chkhorotskhu",
+"995413", "Senaki",
+"99532", "Tbilisi",
+"995372", "Gardabani",
+"995434", "Bagdati",
+"995363", "Tsalka",};
+my $timezones = {
+               '' => [
+                       'Asia/Tbilisi'
+                     ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+995|\D)//g;
-      my $self = bless({ country_code => '995', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '995', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
       $self = bless({ country_code => '995', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);

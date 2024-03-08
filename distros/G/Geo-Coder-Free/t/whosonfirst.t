@@ -35,7 +35,7 @@ WHOSONFIRST: {
 				my $location = $geo_coder->geocode(location => 'Margate, Kent, England');
 				ok(defined($location));
 				cmp_deeply($location,
-					methods('lat' => num(51.38, 1e-2), 'long' => num(1.38, 1e-2)));
+					methods('lat' => num(51.38, 1e-2), 'long' => num(1.4, 1e-1)));
 
 				TODO: {
 					local $TODO = 'UK only supports towns and venues';
@@ -51,7 +51,7 @@ WHOSONFIRST: {
 				}
 
 				$location = $geo_coder->geocode('Silver Diner, 12276 Rockville Pike, Rockville, MD, USA');
-				ok(defined($location));
+				ok(defined($location), 'Silver Diner, 12276 Rockville Pike, Rockville, MD, USA');
 				cmp_deeply($location,
 					methods('lat' => num(39.06, 1e-2), 'long' => num(-77.12, 1e-2)));
 

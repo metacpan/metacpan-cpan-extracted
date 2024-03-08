@@ -1,9 +1,10 @@
 use strict;
 use warnings;
 
-our $VERSION = '0.9';
+our $VERSION = '1.0';
 
 use Test::More;
+use Test2::Plugin::UTF8;
 
 use Image::DecodeQR::WeChat;
 use File::Spec;

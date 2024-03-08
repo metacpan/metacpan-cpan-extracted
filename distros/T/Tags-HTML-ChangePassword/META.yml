@@ -35,7 +35,7 @@ requires:
   Error::Pure: 0
   List::Util: 1.33
   Readonly: 0
-  Tags::HTML: 0
+  Tags::HTML: 0.08
   Tags::HTML::Messages: 0.09
   perl: 5.8.0
 resources:
@@ -43,4 +43,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Tags-HTML-ChangePassword
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Tags-HTML-ChangePassword
-version: '0.04'
+version: '0.05'

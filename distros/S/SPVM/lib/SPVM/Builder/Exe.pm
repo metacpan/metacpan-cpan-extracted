@@ -135,6 +135,17 @@ sub mode {
   }
 }
 
+sub argv {
+  my $self = shift;
+  if (@_) {
+    $self->{argv} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{argv};
+  }
+}
+
 sub optimize {
   my $self = shift;
   if (@_) {
@@ -146,37 +157,36 @@ sub optimize {
   }
 }
 
-# Methods
+# Class Methods
 sub new {
   my $class = shift;
   
-  my $self = {@_};
+  my %options = @_;
+  
+  my $include_dirs = delete $options{include_dirs};
+  
+  my $build_dir = delete $options{build_dir};
+  
+  my $self = bless {
+    include_dirs => [],
+    argv => [],
+    %options
+  }, $class;
   
   # Target class name
   my $class_name = $self->{class_name};
   unless (defined $class_name) {
-    confess("A class name not specified");
+    confess("A class name must be defined.");
   }
   
   # Excutable file name
   my $output_file = $self->{output_file};
   unless (defined $output_file) {
-    $output_file = $class_name;
-    $output_file =~ s/::/__/g;
-    $self->{output_file} = $output_file;
+    confess("A output file must be defined.");
   }
-  
-  # Build directory
-  my $build_dir = delete $self->{build_dir};
   
   unless (defined $build_dir) {
     $build_dir = '.spvm_build';
-  }
-  
-  # Class paths
-  my $include_dirs = delete $self->{include_dirs};
-  unless (defined $include_dirs) {
-    $include_dirs = [];
   }
   
   # New SPVM::Builder object
@@ -188,14 +198,16 @@ sub new {
   # Config file
   my $allow_no_config_file = $self->{allow_no_config_file};
   
-  my $mode = $self->{mode};
+  my $config_mode = $self->{mode};
+  
+  my $config_argv = $self->{argv};
   
   # Config
   my $config_file = SPVM::Builder::Util::search_config_file($class_name);
   
   my $config;
   if (defined $config_file) {
-    $config = SPVM::Builder::Config::Exe->load_mode_config($config_file, $mode);
+    $config = SPVM::Builder::Config::Exe->load_mode_config($config_file, $config_mode, $config_argv);
   }
   else {
     if ($allow_no_config_file) {
@@ -228,9 +240,30 @@ sub new {
     $config->set_global_optimize($optimize);
   }
   
-  return bless $self, $class;
+  return $self;
 }
 
+sub parse_config_argv_option {
+  my ($class, $config_argv_option) = @_;
+  
+  my $name;
+  my $value;
+  if ($config_argv_option =~ /^(.+?)(?:=(.+)?)?$/) {
+    $name = $1;
+    $value = $2;
+    
+    unless (defined $value) {
+      $value = '';
+    }
+  }
+  else {
+    confess("[Unexpected Error]The regex for --config-argv-option does not match.");
+  }
+  
+  return ($name, $value);
+}
+
+# Instance Methods
 sub build_exe_file {
   my ($self) = @_;
   
@@ -254,19 +287,19 @@ sub build_exe_file {
   # Object files
   my $object_files = [];
   
-  # Compile SPVM core source files
-  my $spvm_core_object_files = $self->compile_spvm_core_source_files;
-  push @$object_files, @$spvm_core_object_files;
-  
-  my $classes_object_files = $self->compile_classes;
-  push @$object_files, @$classes_object_files;
-  
   # Create bootstrap C source
   $self->create_bootstrap_source;
   
   # Compile bootstrap C source
   my $bootstrap_object_file = $self->compile_bootstrap_source_file;
   push @$object_files, $bootstrap_object_file;
+  
+  # Compile SPVM core source files
+  my $spvm_core_object_files = $self->compile_spvm_core_source_files;
+  push @$object_files, @$spvm_core_object_files;
+  
+  my $classes_object_files = $self->compile_classes;
+  push @$object_files, @$classes_object_files;
   
   # Link and generate executable file
   my $config_linker = $self->config->clone;
@@ -879,9 +912,25 @@ sub create_bootstrap_source {
   
   $bootstrap_source .= $self->create_bootstrap_get_runtime_source;
   
-  if (defined $config_exe->file) {
-    $bootstrap_source .= "\n// " . $config_exe->file;
+  $bootstrap_source .= "\n";
+  
+  # For detecting chaging config mode
+  my $mode_string = $self->mode;
+  unless (defined $mode_string) {
+    $mode_string = '';
   }
+  $bootstrap_source .= "// mode : $mode_string\n";
+  
+  # For detecting chaging config arguments
+  my $argv = $self->argv;
+  $bootstrap_source .= "// argv : @$argv\n";
+  
+  # For detecting chaging optimize
+  my $optimize_string = $self->optimize;
+  unless (defined $optimize_string) {
+    $optimize_string = '';
+  }
+  $bootstrap_source .= "// optimize : $optimize_string\n";
   
   my $bootstrap_source_original;
   if (-f $bootstrap_source_file) {
@@ -892,6 +941,7 @@ sub create_bootstrap_source {
   
   if (defined $bootstrap_source_original && $bootstrap_source ne $bootstrap_source_original) {
     $force = 1;
+    $self->force($force);
   }
   
   my $need_generate = SPVM::Builder::Util::need_generate({

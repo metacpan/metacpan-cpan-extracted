@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2024 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::SV 0.52;
+package Devel::MAT::SV 0.53;
 
 use v5.14;
 use warnings;
@@ -83,7 +83,7 @@ sub new
 
 =head2 type
 
-   $type = $sv->type
+   $type = $sv->type;
 
 Returns the major type of the SV. This is the class name minus the
 C<Devel::MAT::SV::> prefix.
@@ -92,7 +92,7 @@ C<Devel::MAT::SV::> prefix.
 
 =head2 basetype
 
-   $type = $sv->basetype
+   $type = $sv->basetype;
 
 Returns the inner perl API type of the SV. This is one of
 
@@ -100,7 +100,7 @@ Returns the inner perl API type of the SV. This is one of
 
 =head2 desc
 
-   $desc = $sv->desc
+   $desc = $sv->desc;
 
 Returns a string describing the type of the SV and giving a short detail of
 its contents. The exact details depends on the SV type.
@@ -109,7 +109,7 @@ its contents. The exact details depends on the SV type.
 
 =head2 desc_addr
 
-   $desc = $sv->desc_addr
+   $desc = $sv->desc_addr;
 
 Returns a string describing the SV as with C<desc> and giving its address in
 hex. A useful way to uniquely identify the SV when printing.
@@ -124,7 +124,7 @@ sub desc_addr
 
 =head2 addr
 
-   $addr = $sv->addr
+   $addr = $sv->addr;
 
 Returns the address of the SV
 
@@ -134,13 +134,13 @@ Returns the address of the SV
 
 =head2 refcnt
 
-   $count = $sv->refcnt
+   $count = $sv->refcnt;;
 
 Returns the C<SvREFCNT> reference count of the SV
 
 =head2 refcount_adjusted
 
-   $count = $sv->refcount_adjusted
+   $count = $sv->refcount_adjusted;
 
 Returns the reference count of the SV, adjusted to take account of the fact
 that the C<SvREFCNT> value of the backrefs list of a hash or weakly-referenced
@@ -154,7 +154,7 @@ sub refcount_adjusted { shift->refcnt }
 
 =head2 blessed
 
-   $stash = $sv->blessed
+   $stash = $sv->blessed;
 
 If the SV represents a blessed object, returns the stash SV. Otherwise returns
 C<undef>.
@@ -169,7 +169,7 @@ sub blessed
 
 =head2 symname
 
-   $name = $sv->symname
+   $name = $sv->symname;
 
 Called on an SV which is a member of the symbol table, this method returns the
 perl representation of the full symbol name, including sigil. Otherwise,
@@ -192,7 +192,7 @@ sub symname {}
 
 =head2 size
 
-   $size = $sv->size
+   $size = $sv->size;
 
 Returns the (approximate) size in bytes of the SV
 
@@ -202,15 +202,15 @@ Returns the (approximate) size in bytes of the SV
 
 =head2 magic
 
-   @magics = $sv->magic
+   @magics = $sv->magic;
 
 Returns a list of magic applied to the SV; each giving the type and target SVs
 as struct fields:
 
-   $type = $magic->type
-   $sv = $magic->obj
-   $sv = $magic->ptr
-   $ptr = $magic->vtbl
+   $type = $magic->type;
+   $sv = $magic->obj;
+   $sv = $magic->ptr;
+   $ptr = $magic->vtbl;
 
 =cut
 
@@ -228,7 +228,7 @@ sub magic
 
 =head2 magic_svs
 
-   @svs = $sv->magic_svs
+   @svs = $sv->magic_svs;
 
 A more efficient way to retrieve just the SVs associated with the applied
 magic.
@@ -250,7 +250,7 @@ sub magic_svs
 
 =head2 backrefs
 
-   $av_or_rv = $sv->backrefs
+   $av_or_rv = $sv->backrefs;
 
 Returns backrefs SV, which may be an AV containing the back references, or
 if there is only one, the REF SV itself referring to this.
@@ -274,7 +274,7 @@ sub backrefs
 
 =head2 rootname
 
-   $rootname = $sv->rootname
+   $rootname = $sv->rootname;
 
 If the SV is a well-known root, this method returns its name. Otherwise
 returns C<undef>.
@@ -332,7 +332,7 @@ sub debug_file
 
 =head2 outrefs
 
-   @refs = $sv->outrefs
+   @refs = $sv->outrefs;
 
 Returns a list of Reference objects for each of the SVs that this one refers
 to, either directly by strong or weak reference, indirectly via RV, or
@@ -411,31 +411,31 @@ sub outrefs { $_[0]->_outrefs_matching( STRENGTH_ALL, $_[1] ) }
 
 =head2 outrefs_strong
 
-   @refs = $sv->outrefs_strong
+   @refs = $sv->outrefs_strong;
 
 Returns the subset of C<outrefs> that are direct strong references.
 
 =head2 outrefs_weak
 
-   @refs = $sv->outrefs_weak
+   @refs = $sv->outrefs_weak;
 
 Returns the subset of C<outrefs> that are direct weak references.
 
 =head2 outrefs_direct
 
-   @refs = $sv->outrefs_direct
+   @refs = $sv->outrefs_direct;
 
 Returns the subset of C<outrefs> that are direct strong or weak references.
 
 =head2 outrefs_indirect
 
-   @refs = $sv->outrefs_indirect
+   @refs = $sv->outrefs_indirect;
 
 Returns the subset of C<outrefs> that are indirect references via RVs.
 
 =head2 outrefs_inferred
 
-   @refs = $sv->outrefs_inferred
+   @refs = $sv->outrefs_inferred;
 
 Returns the subset of C<outrefs> that are not directly stored in the SV
 structure, but instead inferred by C<Devel::MAT> itself.
@@ -450,7 +450,7 @@ sub outrefs_inferred { $_[0]->_outrefs_matching( STRENGTH_INFERRED, $_[1] ) }
 
 =head2 outref_named
 
-   $ref = $sv->outref_named( $name )
+   $ref = $sv->outref_named( $name );
 
 I<Since version 0.49.>
 
@@ -460,7 +460,7 @@ Throws an exception if the SV has no such outref of that name.
 
 =head2 maybe_outref_named
 
-   $ref = $sv->maybe_outref_named( $name )
+   $ref = $sv->maybe_outref_named( $name );
 
 I<Since version 0.49.>
 
@@ -486,7 +486,7 @@ sub outref_named
 
 =head2 is_mortal
 
-   $mortal = $sv->is_mortal
+   $mortal = $sv->is_mortal;
 
 Returns true if this SV is referenced by the temps stack.
 
@@ -521,7 +521,7 @@ boolean true and false. They are
 
 =cut
 
-package Devel::MAT::SV::Immortal 0.52;
+package Devel::MAT::SV::Immortal 0.53;
 use base qw( Devel::MAT::SV );
 use constant immortal => 1;
 use constant basetype => "SV";
@@ -534,12 +534,12 @@ sub new {
 }
 sub _outrefs { () }
 
-package Devel::MAT::SV::UNDEF 0.52;
+package Devel::MAT::SV::UNDEF 0.53;
 use base qw( Devel::MAT::SV::Immortal );
 sub desc { "UNDEF" }
 sub type { "UNDEF" }
 
-package Devel::MAT::SV::YES 0.52;
+package Devel::MAT::SV::YES 0.53;
 use base qw( Devel::MAT::SV::Immortal );
 sub desc { "YES" }
 sub type { "SCALAR" }
@@ -552,7 +552,7 @@ sub pv { "1" }
 sub rv { undef }
 sub is_weak { '' }
 
-package Devel::MAT::SV::NO 0.52;
+package Devel::MAT::SV::NO 0.53;
 use base qw( Devel::MAT::SV::Immortal );
 sub desc { "NO" }
 sub type { "SCALAR" }
@@ -565,7 +565,7 @@ sub pv { "0" }
 sub rv { undef }
 sub is_weak { '' }
 
-package Devel::MAT::SV::Unknown 0.52;
+package Devel::MAT::SV::Unknown 0.53;
 use base qw( Devel::MAT::SV );
 __PACKAGE__->register_type( 0xff );
 
@@ -573,7 +573,7 @@ sub desc { "UNKNOWN" }
 
 sub _outrefs {}
 
-package Devel::MAT::SV::GLOB 0.52;
+package Devel::MAT::SV::GLOB 0.53;
 use base qw( Devel::MAT::SV );
 __PACKAGE__->register_type( 1 );
 use constant $CONSTANTS;
@@ -591,12 +591,12 @@ sub load
    my ( $header, $ptrs, $strs ) = @_;
    my $df = $self->df;
 
-   my ( $line ) =
-      unpack "$df->{uint_fmt}", $header;
+   my ( $line, $name_hek ) =
+      unpack "$df->{uint_fmt} $df->{ptr_fmt}", $header;
 
    $self->_set_glob_fields(
       @{$ptrs}[0..7],
-      $line, $strs->[1],
+      $name_hek // 0, $line, $strs->[1],
       $strs->[0],
    );
 }
@@ -614,18 +614,18 @@ sub _fixup
 
 =head2 location
 
-   $file = $gv->file
+   $file = $gv->file;
 
-   $line = $gv->line
+   $line = $gv->line;
 
-   $location = $gv->location
+   $location = $gv->location;
 
 Returns the filename, line number, or combined location (C<FILE line LINE>)
 that the GV first appears at.
 
 =head2 name
 
-   $name = $gv->name
+   $name = $gv->name;
 
 Returns the value of the C<GvNAME> field, for named globs.
 
@@ -643,7 +643,7 @@ sub location
 
 =head2 stash
 
-   $stash = $gv->stash
+   $stash = $gv->stash;
 
 Returns the stash to which the GV belongs.
 
@@ -665,19 +665,19 @@ sub stash  { my $self = shift; $self->df->sv_at( $self->stash_at  ) }
 
 =head2 form
 
-   $sv = $gv->scalar
+   $sv = $gv->scalar;
 
-   $av = $gv->array
+   $av = $gv->array;
 
-   $hv = $gv->hash
+   $hv = $gv->hash;
 
-   $cv = $gv->code
+   $cv = $gv->code;
 
-   $gv = $gv->egv
+   $gv = $gv->egv;
 
-   $io = $gv->io
+   $io = $gv->io;
 
-   $form = $gv->form
+   $form = $gv->form;
 
 Return the SV in the various glob slots.
 
@@ -759,7 +759,7 @@ sub _more_saved
    push @{ $self->{saved} }, [ $slot => $addr ];
 }
 
-package Devel::MAT::SV::SCALAR 0.52;
+package Devel::MAT::SV::SCALAR 0.53;
 use base qw( Devel::MAT::SV );
 __PACKAGE__->register_type( 2 );
 use constant $CONSTANTS;
@@ -799,31 +799,31 @@ sub load
 
 =head2 uv
 
-   $uv = $sv->uv
+   $uv = $sv->uv;
 
 Returns the integer numeric portion as an unsigned value, if valid, or C<undef>.
 
 =head2 iv
 
-   $iv = $sv->iv
+   $iv = $sv->iv;
 
 Returns the integer numeric portion as a signed value, if valid, or C<undef>.
 
 =head2 nv
 
-   $nv = $sv->nv
+   $nv = $sv->nv;
 
 Returns the floating numeric portion, if valid, or C<undef>.
 
 =head2 pv
 
-   $pv = $sv->pv
+   $pv = $sv->pv;
 
 Returns the string portion, if valid, or C<undef>.
 
 =head2 pvlen
 
-   $pvlen = $sv->pvlen
+   $pvlen = $sv->pvlen;
 
 Returns the length of the string portion, if valid, or C<undef>.
 
@@ -833,7 +833,7 @@ Returns the length of the string portion, if valid, or C<undef>.
 
 =head2 qq_pv
 
-   $str = $sv->qq_pv( $maxlen )
+   $str = $sv->qq_pv( $maxlen );
 
 Returns the PV string, if defined, suitably quoted. If C<$maxlen> is defined
 and the PV is longer than this, it is truncated and C<...> is appended after
@@ -867,7 +867,7 @@ sub qq_pv
 
 =head2 ourstash
 
-   $stash = $sv->ourstash
+   $stash = $sv->ourstash;
 
 Returns the stash of the SCALAR, if it is an 'C<our>' variable.
 
@@ -905,6 +905,10 @@ sub desc
    return "SCALAR(@flags)";
 }
 
+sub _set_shared_hek_at { my $self = shift; $self->{shared_hek_at} = $_[0]; }
+
+sub shared_hek { my $self = shift; return $self->{shared_hek_at}; }
+
 sub _outrefs
 {
    my $self = shift;
@@ -920,7 +924,7 @@ sub _outrefs
    return @outrefs;
 }
 
-package Devel::MAT::SV::REF 0.52;
+package Devel::MAT::SV::REF 0.53;
 use base qw( Devel::MAT::SV );
 __PACKAGE__->register_type( 3 );
 use constant $CONSTANTS;
@@ -952,7 +956,7 @@ sub load
 
 =head2 rv
 
-   $svrv = $sv->rv
+   $svrv = $sv->rv;
 
 Returns the SV referred to by the reference.
 
@@ -962,7 +966,7 @@ sub rv { my $self = shift; return $self->df->sv_at( $self->rv_at ) }
 
 =head2 is_weak
 
-   $weak = $sv->is_weak
+   $weak = $sv->is_weak;
 
 Returns true if the SV is a weakened RV reference.
 
@@ -972,7 +976,7 @@ Returns true if the SV is a weakened RV reference.
 
 =head2 ourstash
 
-   $stash = $sv->ourstash
+   $stash = $sv->ourstash;
 
 Returns the stash of the SCALAR, if it is an 'C<our>' variable.
 
@@ -1011,7 +1015,7 @@ sub _outrefs
    return @outrefs;
 }
 
-package Devel::MAT::SV::BOOL 0.52;
+package Devel::MAT::SV::BOOL 0.53;
 use base qw( Devel::MAT::SV::SCALAR );
 
 sub type { return "BOOL" }
@@ -1023,7 +1027,7 @@ sub desc
    return "BOOL(NO)";
 }
 
-package Devel::MAT::SV::ARRAY 0.52;
+package Devel::MAT::SV::ARRAY 0.53;
 use base qw( Devel::MAT::SV );
 __PACKAGE__->register_type( 4 );
 use constant $CONSTANTS;
@@ -1064,14 +1068,14 @@ sub _more_saved
 
 =head2 is_unreal
 
-   $unreal = $av->is_unreal
+   $unreal = $av->is_unreal;
 
 Returns true if the C<AvREAL()> flag is not set on the array - i.e. that its
 SV pointers do not contribute to the C<SvREFCNT> of the SVs it points at.
 
 =head2 is_backrefs
 
-   $backrefs = $av->is_backrefs
+   $backrefs = $av->is_backrefs;
 
 Returns true if the array contains the backrefs list of a hash or
 weakly-referenced object.
@@ -1089,7 +1093,7 @@ sub symname
 
 =head2 elems
 
-   @svs = $av->elems
+   @svs = $av->elems;
 
 Returns all of the element SVs in a list
 
@@ -1108,7 +1112,7 @@ sub elems
 
 =head2 elem
 
-   $sv = $av->elem( $index )
+   $sv = $av->elem( $index );
 
 Returns the SV at the given index
 
@@ -1179,7 +1183,7 @@ sub _outrefs
    return @outrefs;
 }
 
-package Devel::MAT::SV::PADLIST 0.52;
+package Devel::MAT::SV::PADLIST 0.53;
 # Synthetic type
 use base qw( Devel::MAT::SV::ARRAY );
 use constant type => "PADLIST";
@@ -1227,7 +1231,7 @@ sub _outrefs
    return @outrefs;
 }
 
-package Devel::MAT::SV::PADNAMES 0.52;
+package Devel::MAT::SV::PADNAMES 0.53;
 # Synthetic type
 use base qw( Devel::MAT::SV::ARRAY );
 use constant type => "PADNAMES";
@@ -1243,7 +1247,7 @@ sub padcv { my $self = shift; return $self->df->sv_at( $self->padcv_at ) }
 
 =head2 padname
 
-   $padname = $padnames->padname( $padix )
+   $padname = $padnames->padname( $padix );
 
 Returns the name of the lexical at the given index, or C<undef>
 
@@ -1260,7 +1264,7 @@ sub padname
 
 =head2 padix_from_padname
 
-   $padix = $padnames->padix_from_padname( $padname )
+   $padix = $padnames->padix_from_padname( $padname );
 
 Returns the index of the lexical with the given name, or C<undef>
 
@@ -1310,7 +1314,7 @@ sub _outrefs
    return @outrefs;
 }
 
-package Devel::MAT::SV::PAD 0.52;
+package Devel::MAT::SV::PAD 0.53;
 # Synthetic type
 use base qw( Devel::MAT::SV::ARRAY );
 use constant type => "PAD";
@@ -1330,7 +1334,7 @@ sub desc
 
 =head2 padcv
 
-   $cv = $pad->padcv
+   $cv = $pad->padcv;
 
 Returns the C<CODE> SV for which this is a pad.
 
@@ -1340,7 +1344,7 @@ sub padcv { my $self = shift; return $self->df->sv_at( $self->padcv_at ) }
 
 =head2 lexvars
 
-   ( $name, $sv, $name, $sv, ... ) = $pad->lexvars
+   ( $name, $sv, $name, $sv, ... ) = $pad->lexvars;
 
 Returns a name/value list of the lexical variables in the pad.
 
@@ -1360,7 +1364,7 @@ sub lexvars
 
 =head2 maybe_lexvar
 
-   $sv = $pad->maybe_lexvar( $padname )
+   $sv = $pad->maybe_lexvar( $padname );
 
 I<Since version 0.49.>
 
@@ -1427,7 +1431,7 @@ sub _outrefs
    return @outrefs;
 }
 
-package Devel::MAT::SV::HASH 0.52;
+package Devel::MAT::SV::HASH 0.53;
 use base qw( Devel::MAT::SV );
 __PACKAGE__->register_type( 5 );
 use constant $CONSTANTS;
@@ -1449,10 +1453,13 @@ sub load
    ( my $n ) =
       unpack "$df->{uint_fmt} a*", $header;
 
+   my $df_has_hek_ptr = $df->{format_minor} >= 6;
+
    my %values_at;
    foreach ( 1 .. $n ) {
       my $key = $df->_read_str;
-      $values_at{$key} = $df->_read_ptr;
+      my $hek_ptr = $df_has_hek_ptr ? $df->_read_ptr : undef;
+      $values_at{$key} = [ $hek_ptr, $df->_read_ptr ];
    }
 
    $self->_set_hash_fields(
@@ -1496,7 +1503,7 @@ sub backrefs
 
 =head2 keys
 
-   @keys = $hv->keys
+   @keys = $hv->keys;
 
 Returns the set of keys present in the hash, as plain perl strings, in no
 particular order.
@@ -1507,7 +1514,7 @@ particular order.
 
 =head2 value
 
-   $sv = $hv->value( $key )
+   $sv = $hv->value( $key );
 
 Returns the SV associated with the given key
 
@@ -1522,7 +1529,7 @@ sub value
 
 =head2 values
 
-   @svs = $hv->values
+   @svs = $hv->values;
 
 Returns all of the SVs stored as values, in no particular order (though, in an
 order corresponding to the order returned by C<keys>).
@@ -1608,7 +1615,7 @@ sub _outrefs
    return @outrefs;
 }
 
-package Devel::MAT::SV::STASH 0.52;
+package Devel::MAT::SV::STASH 0.53;
 use base qw( Devel::MAT::SV::HASH );
 __PACKAGE__->register_type( 6 );
 use constant $CONSTANTS;
@@ -1649,13 +1656,13 @@ sub load
 
 =head2 mro_isa
 
-   $hv = $stash->mro_linear_all
+   $hv = $stash->mro_linear_all;
 
-   $sv = $stash->mro_linearcurrent
+   $sv = $stash->mro_linearcurrent;
 
-   $sv = $stash->mro_nextmethod
+   $sv = $stash->mro_nextmethod;
 
-   $av = $stash->mro_isa
+   $av = $stash->mro_isa;
 
 Returns the fields from the MRO structure
 
@@ -1668,12 +1675,12 @@ sub mro_isa           { my $self = shift; return $self->df->sv_at( $self->{mro_i
 
 =head2 value_code
 
-   $cv = $stash->value_code( $key )
+   $cv = $stash->value_code( $key );
 
 Returns the CODE associated with the given symbol name, if it exists, or
 C<undef> if not. This is roughly equivalent to
 
-   $cv = $stash->value( $key )->code
+   $cv = $stash->value( $key )->code;
 
 Except that it is aware of the direct reference to CVs that perl 5.22 will
 optimise for. This method should be used in preference to the above construct.
@@ -1698,7 +1705,7 @@ sub value_code
 
 =head2 stashname
 
-   $name = $stash->stashname
+   $name = $stash->stashname;
 
 Returns the name of the stash
 
@@ -1747,7 +1754,7 @@ sub _outrefs
    return @outrefs;
 }
 
-package Devel::MAT::SV::CODE 0.52;
+package Devel::MAT::SV::CODE 0.53;
 use base qw( Devel::MAT::SV );
 __PACKAGE__->register_type( 7 );
 use constant $CONSTANTS;
@@ -1783,12 +1790,13 @@ sub load
    my ( $header, $ptrs, $strs ) = @_;
    my $df = $self->df;
 
-   my ( $line, $flags, $oproot, $depth ) =
-      unpack "$df->{uint_fmt} C $df->{ptr_fmt} $df->{u32_fmt}", $header;
+   my ( $line, $flags, $oproot, $depth, $name_hek ) =
+      unpack "$df->{uint_fmt} C $df->{ptr_fmt} $df->{u32_fmt} $df->{ptr_fmt}", $header;
 
    defined $depth or $depth = -1;
+   $name_hek //= 0;
 
-   $self->_set_code_fields( $line, $flags, $oproot, $depth,
+   $self->_set_code_fields( $line, $flags, $oproot, $depth, $name_hek,
       @{$ptrs}[0, 2..4], # STASH, OUTSIDE, PADLIST, CONSTVAL
       @{$strs}[0, 1],    # FILE, NAME
    );
@@ -1920,23 +1928,23 @@ sub _fixup
 
 =head2 depth
 
-   $stash = $cv->stash
+   $stash = $cv->stash;
 
-   $gv = $cv->glob
+   $gv = $cv->glob;
 
-   $filename = $cv->file
+   $filename = $cv->file;
 
-   $line = $cv->line
+   $line = $cv->line;
 
-   $scope_cv = $cv->scope
+   $scope_cv = $cv->scope;
 
-   $av = $cv->padlist
+   $av = $cv->padlist;
 
-   $sv = $cv->constval
+   $sv = $cv->constval;
 
-   $addr = $cv->oproot
+   $addr = $cv->oproot;
 
-   $depth = $cv->depth
+   $depth = $cv->depth;
 
 Returns the stash, glob, filename, line number, scope, padlist, constant value,
 oproot or depth of the code.
@@ -1953,7 +1961,7 @@ sub constval { my $self = shift; return $self->df->sv_at( $self->constval_at ) }
 
 =head2 location
 
-   $location = $cv->location
+   $location = $cv->location;
 
 Returns C<FILE line LINE> if the line is defined, or C<FILE> if not.
 
@@ -1980,17 +1988,17 @@ sub location
 
 =head2 is_lexical
 
-   $clone = $cv->is_clone
+   $clone = $cv->is_clone;
 
-   $cloned = $cv->is_cloned
+   $cloned = $cv->is_cloned;
 
-   $xsub = $cv->is_xsub
+   $xsub = $cv->is_xsub;
 
-   $weak = $cv->is_weakoutside
+   $weak = $cv->is_weakoutside;
 
-   $rc = $cv->is_cvgv_rc
+   $rc = $cv->is_cvgv_rc;
 
-   $lexical = $cv->is_lexical
+   $lexical = $cv->is_lexical;
 
 Returns the C<CvCLONE()>, C<CvCLONED()>, C<CvISXSUB()>, C<CvWEAKOUTSIDE()>,
 C<CvCVGV_RC()> and C<CvLEXICAL()> flags.
@@ -2001,7 +2009,7 @@ C<CvCVGV_RC()> and C<CvLEXICAL()> flags.
 
 =head2 protosub
 
-   $protosub = $cv->protosub
+   $protosub = $cv->protosub;
 
 Returns the protosub CV, if known, for a closure CV.
 
@@ -2011,7 +2019,7 @@ sub protosub { my $self = shift; return $self->df->sv_at( $self->protosub_at ); 
 
 =head2 constants
 
-   @svs = $cv->constants
+   @svs = $cv->constants;
 
 Returns a list of the SVs used as constants or method names in the code. On
 ithreads perl the constants are part of the padlist structure so this list is
@@ -2028,7 +2036,7 @@ sub constants
 
 =head2 globrefs
 
-   @svs = $cv->globrefs
+   @svs = $cv->globrefs;
 
 Returns a list of the SVs used as GLOB references in the code. On ithreads
 perl the constants are part of the padlist structure so this list is
@@ -2064,21 +2072,21 @@ sub symname
 
 =head2 padname
 
-   $padname = $cv->padname( $padix )
+   $padname = $cv->padname( $padix );
 
 Returns the name of the $padix'th lexical variable, or C<undef> if it doesn't
 have a name.
 
 The returned padname is a structure of the following fields:
 
- $name = $padname->name
+   $name = $padname->name;
 
- $bool = $padname->is_outer
- $bool = $padname->is_state
- $bool = $padname->is_lvalue
- $bool = $padname->is_typed
- $bool = $padname->is_our
- $bool = $padname->is_field
+   $bool = $padname->is_outer;
+   $bool = $padname->is_state;
+   $bool = $padname->is_lvalue;
+   $bool = $padname->is_typed;
+   $bool = $padname->is_our;
+   $bool = $padname->is_field;
 
 =cut
 
@@ -2092,7 +2100,7 @@ sub padname
 
 =head2 padix_from_padname
 
-   $padix = $cv->padix_from_padname( $padname )
+   $padix = $cv->padix_from_padname( $padname );
 
 Returns the index of the first lexical variable with the given pad name, or
 C<undef> if one does not exist.
@@ -2119,13 +2127,13 @@ sub padix_from_padname
 
 =head2 max_padix
 
-   $max_padix = $cv->max_padix
+   $max_padix = $cv->max_padix;
 
 Returns the maximum valid pad index.
 
 This is typically used to create a list of potential pad indexes, such as
 
-   0 .. $cv->max_padix
+   0 .. $cv->max_padix;
 
 Note that since pad slots may contain things other than lexical variables, not
 every pad slot between 0 and this index will necessarily contain a lexical
@@ -2141,7 +2149,7 @@ sub max_padix
 
 =head2 padnames_av
 
-   $padnames_av = $cv->padnames_av
+   $padnames_av = $cv->padnames_av;
 
 Returns the AV reference directly which stores the pad names.
 
@@ -2161,7 +2169,7 @@ sub padnames_av
 
 =head2 pads
 
-   @pads = $cv->pads
+   @pads = $cv->pads;
 
 Returns a list of the actual pad AVs.
 
@@ -2175,7 +2183,7 @@ sub pads
 
 =head2 pad
 
-   $pad = $cv->pad( $depth )
+   $pad = $cv->pad( $depth );
 
 Returns the PAD at the given depth (given by 1-based index).
 
@@ -2190,7 +2198,7 @@ sub pad
 
 =head2 maybe_lexvar
 
-   $sv = $cv->maybe_lexvar( $padname, $depth )
+   $sv = $cv->maybe_lexvar( $padname, $depth );
 
 I<Since version 0.49.>
 
@@ -2319,7 +2327,7 @@ sub _outrefs
    return @outrefs;
 }
 
-package Devel::MAT::SV::IO 0.52;
+package Devel::MAT::SV::IO 0.53;
 use base qw( Devel::MAT::SV );
 __PACKAGE__->register_type( 8 );
 use constant $CONSTANTS;
@@ -2351,9 +2359,9 @@ sub load
 
 =head2 ofileno
 
-   $ifileno = $io->ifileno
+   $ifileno = $io->ifileno;
 
-   $ofileno = $io->ofileno
+   $ofileno = $io->ofileno;
 
 Returns the input or output file numbers.
 
@@ -2393,7 +2401,7 @@ sub _outrefs
    return @outrefs;
 }
 
-package Devel::MAT::SV::LVALUE 0.52;
+package Devel::MAT::SV::LVALUE 0.53;
 use base qw( Devel::MAT::SV );
 __PACKAGE__->register_type( 9 );
 use constant $CONSTANTS;
@@ -2434,7 +2442,7 @@ sub _outrefs
    return @outrefs;
 }
 
-package Devel::MAT::SV::REGEXP 0.52;
+package Devel::MAT::SV::REGEXP 0.53;
 use base qw( Devel::MAT::SV );
 use constant basetype => "REGEXP";
 __PACKAGE__->register_type( 10 );
@@ -2445,7 +2453,7 @@ sub desc { "REGEXP()" }
 
 sub _outrefs { () }
 
-package Devel::MAT::SV::FORMAT 0.52;
+package Devel::MAT::SV::FORMAT 0.53;
 use base qw( Devel::MAT::SV );
 use constant basetype => "PVFM";
 __PACKAGE__->register_type( 11 );
@@ -2456,7 +2464,7 @@ sub desc { "FORMAT()" }
 
 sub _outrefs { () }
 
-package Devel::MAT::SV::INVLIST 0.52;
+package Devel::MAT::SV::INVLIST 0.53;
 use base qw( Devel::MAT::SV );
 use constant basetype => "INVLIST";
 __PACKAGE__->register_type( 12 );
@@ -2468,7 +2476,7 @@ sub desc { "INVLIST()" }
 sub _outrefs { () }
 
 # A hack to compress files
-package Devel::MAT::SV::_UNDEFSV 0.52;
+package Devel::MAT::SV::_UNDEFSV 0.53;
 use base qw( Devel::MAT::SV::SCALAR );
 __PACKAGE__->register_type( 13 );
 
@@ -2484,7 +2492,7 @@ sub load
    );
 }
 
-package Devel::MAT::SV::_YESSV 0.52;
+package Devel::MAT::SV::_YESSV 0.53;
 use base qw( Devel::MAT::SV::BOOL );
 __PACKAGE__->register_type( 14 );
 
@@ -2500,7 +2508,7 @@ sub load
    );
 }
 
-package Devel::MAT::SV::_NOSV 0.52;
+package Devel::MAT::SV::_NOSV 0.53;
 use base qw( Devel::MAT::SV::BOOL );
 __PACKAGE__->register_type( 15 );
 
@@ -2516,7 +2524,7 @@ sub load
    );
 }
 
-package Devel::MAT::SV::OBJECT 0.52;
+package Devel::MAT::SV::OBJECT 0.53;
 use base qw( Devel::MAT::SV );
 __PACKAGE__->register_type( 16 );
 use constant $CONSTANTS;
@@ -2544,7 +2552,7 @@ sub load
 
 =head2 fields
 
-   @svs = $obj->fields
+   @svs = $obj->fields;
 
 Returns all the values of all the fields in a list.
 
@@ -2566,7 +2574,7 @@ sub fields
 
 =head2 field
 
-   $sv = $obj->field( $name_or_fieldix )
+   $sv = $obj->field( $name_or_fieldix );
 
 Returns the value of the given field; which may be specified by name or
 index directly.
@@ -2623,7 +2631,7 @@ sub _outrefs
    return @outrefs;
 }
 
-package Devel::MAT::SV::CLASS 0.52;
+package Devel::MAT::SV::CLASS 0.53;
 use base qw( Devel::MAT::SV::STASH );
 __PACKAGE__->register_type( 17 );
 use constant $CONSTANTS;
@@ -2673,7 +2681,7 @@ sub adjust_blocks { my $self = shift; return $self->df->sv_at( $self->{adjust_bl
 
 =head2 fields
 
-   @fields = $class->fields
+   @fields = $class->fields;
 
 Returns a list of the field definitions of the class, in declaration order.
 Each is a structure whose form is given below.
@@ -2688,19 +2696,19 @@ sub fields
 
 =head2 field
 
-   $field = $class->field( $name_or_fieldix )
+   $field = $class->field( $name_or_fieldix );
 
 Returns the field definition of the given field; which may be specified by
 name or index directly. Throws an exception if none such exists.
 
 The returned field is a structure of the following fields:
 
-   $fieldix = $field->fieldix
-   $name    = $field->name
+   $fieldix = $field->fieldix;
+   $name    = $field->name;
 
 =head2 maybe_field
 
-   $field = $class->maybe_field( $name_or_fieldix )
+   $field = $class->maybe_field( $name_or_fieldix );
 
 I<Since version 0.49.>
 
@@ -2750,7 +2758,7 @@ sub _outrefs
 
 # A "SV" type that isn't really an SV, but has many of the same methods. These
 # aren't created by core perl, but are used by XS extensions
-package Devel::MAT::SV::C_STRUCT 0.52;
+package Devel::MAT::SV::C_STRUCT 0.53;
 use base qw( Devel::MAT::SV );
 __PACKAGE__->register_type( 0x7F );
 use constant $CONSTANTS;
@@ -2812,7 +2820,7 @@ sub load
 
 =head2 fields
 
-   @kvlist = $struct->fields
+   @kvlist = $struct->fields;
 
 Returns an even-sized name/value list of all the field values stored by the
 struct; each preceeded by its field type structure.
@@ -2841,7 +2849,7 @@ sub fields
 
 =head2 field_named
 
-   $val = $struct->field_named( $name )
+   $val = $struct->field_named( $name );
 
 Looks for a field whose name is exactly that given, and returns its value.
 
@@ -2849,7 +2857,7 @@ Throws an exception if the struct has no such field of that name.
 
 =head2 maybe_field_named
 
-   $val = $struct->maybe_field_named( $name )
+   $val = $struct->maybe_field_named( $name );
 
 I<Since version 0.49.>
 
@@ -2887,7 +2895,7 @@ sub field_named
 
 =head2 structtype
 
-   $structtype = $struct->structtype
+   $structtype = $struct->structtype;
 
 Returns a metadata structure describing the type of the struct itself.
 

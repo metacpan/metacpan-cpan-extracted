@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185945;
+our $VERSION = 1.20240308154351;
 
 my $formatters = [
                 {
@@ -156,89 +156,94 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"233303", "Tema",
-"2333431", "Nkawkaw",
-"2333822", "Bawku",
-"233317", "Western\ Region",
-"233348", "Eastern\ Region",
-"2333621", "Amedzofe",
-"2333723", "Damongo",
-"2333625", "Denu\/Aflao",
-"2333820", "Bolgatanga",
-"2333126", "Enchi",
-"2333524", "Wenchi",
+$areanames{en} = {"2333431", "Nkawkaw",
+"233328", "Ashanti\ Region",
+"2333720", "Tamale",
 "2333428", "Aburi",
-"2333320", "Swedru",
-"2333222", "Ashanti\ Mampong",
-"2333121", "Axim",
-"233367", "Volta\ Region",
-"2333523", "Dormaa\ Ahenkro",
-"233398", "Upper\ West\ Region",
-"2333724", "Yendi",
-"2333125", "Samreboi",
-"2333322", "Dunkwa",
-"2333220", "Kumasi",
-"2333626", "Keta\/Akatsi",
-"2333120", "Takoradi",
+"233347", "Eastern\ Region",
+"2333524", "Wenchi",
+"2333323", "Winneba",
+"2333625", "Denu\/Aflao",
+"2333526", "Atebubu",
 "2333423", "Mpraeso",
+"23334292", "Akim\ Oda",
+"233398", "Upper\ West\ Region",
+"2333521", "Bechem",
 "2333225", "Obuasi",
-"233378", "Northern\ Region",
+"2333120", "Takoradi",
+"2333820", "Bolgatanga",
+"233368", "Volta\ Region",
+"233337", "Central\ Region",
+"2333322", "Dunkwa",
 "233308", "Greater\ Accra\ Region",
+"2333725", "Bole",
+"233318", "Western\ Region",
+"2333035", "Ada",
+"2333523", "Dormaa\ Ahenkro",
+"233388", "Upper\ East\ Region",
+"2333421", "Nsawam",
+"2333620", "Ho",
+"2333125", "Samreboi",
+"2333220", "Kumasi",
+"2333321", "Cape\ Coast",
+"2333426", "Asamankese",
+"233378", "Northern\ Region",
+"233357", "Brong\-Ahafo\ Region",
+"2333424", "Donkorkrom",
+"2333522", "Berekum",
+"2333724", "Yendi",
+"2333121", "Axim",
+"2333520", "Sunyani",
+"2333623", "Kpandu",
+"233348", "Eastern\ Region",
+"2333726", "Salaga",
+"2333222", "Ashanti\ Mampong",
+"233327", "Ashanti\ Region",
+"2333821", "Navrongo",
+"2333124", "Asankragwa",
+"233367", "Volta\ Region",
+"233338", "Central\ Region",
+"233307", "Greater\ Accra\ Region",
+"2333622", "Hohoe",
+"2333721", "Walewale",
+"2333430", "Akosombo",
+"2333527", "Yeji",
+"233397", "Upper\ West\ Region",
+"2333126", "Enchi",
+"2333223", "Ejura",
+"233303", "Tema",
+"2333425", "Suhum",
+"2333320", "Swedru",
+"2333626", "Keta\/Akatsi",
+"2333822", "Bawku",
 "233387", "Upper\ East\ Region",
 "2333221", "Konongo",
-"2333122", "Elubo",
-"2333321", "Cape\ Coast",
-"2333035", "Ada",
-"233358", "Brong\-Ahafo\ Region",
-"2333620", "Ho",
-"23334292", "Akim\ Oda",
-"2333424", "Donkorkrom",
-"2333821", "Navrongo",
-"233327", "Ashanti\ Region",
-"2333622", "Hohoe",
-"2333430", "Akosombo",
-"233337", "Central\ Region",
-"2333427", "Akuapim\ Mampong",
-"2333323", "Winneba",
-"2333522", "Berekum",
-"2333223", "Ejura",
-"2333425", "Suhum",
-"233302", "Accra",
-"233397", "Upper\ West\ Region",
-"2333421", "Nsawam",
-"2333520", "Sunyani",
-"233368", "Volta\ Region",
-"2333722", "Buipe",
-"2333426", "Asamankese",
-"2333720", "Tamale",
-"233347", "Eastern\ Region",
-"233318", "Western\ Region",
-"2333224", "Bekwai",
-"2333526", "Atebubu",
-"2333124", "Asankragwa",
-"233328", "Ashanti\ Region",
-"2333721", "Walewale",
-"2333623", "Kpandu",
-"233357", "Brong\-Ahafo\ Region",
-"2333725", "Bole",
-"233338", "Central\ Region",
-"233388", "Upper\ East\ Region",
-"233307", "Greater\ Accra\ Region",
-"2333624", "Kete\-Krachi",
 "2333525", "Techiman",
-"233377", "Northern\ Region",
-"2333726", "Salaga",
-"2333521", "Bechem",
-"2333420", "Koforidua",
+"2333122", "Elubo",
+"2333624", "Kete\-Krachi",
+"233317", "Western\ Region",
+"2333427", "Akuapim\ Mampong",
+"2333723", "Damongo",
+"233358", "Brong\-Ahafo\ Region",
+"233302", "Accra",
+"2333224", "Bekwai",
 "233392", "Wa",
-"2333123", "Tarkwa",
-"2333527", "Yeji",};
+"2333722", "Buipe",
+"2333621", "Amedzofe",
+"233377", "Northern\ Region",
+"2333420", "Koforidua",
+"2333123", "Tarkwa",};
+my $timezones = {
+               '' => [
+                       'Africa/Accra'
+                     ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+233|\D)//g;
-      my $self = bless({ country_code => '233', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '233', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
       $self = bless({ country_code => '233', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);

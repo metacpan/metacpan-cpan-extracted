@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185945;
+our $VERSION = 1.20240308154351;
 
 my $formatters = [
                 {
@@ -54,53 +54,58 @@ my $validators = {
                 'voip' => '40\\d{5}'
               };
 my %areanames = ();
-$areanames{en} = {"24544370", "Buba",
-"24544321", "Bissau",
-"24544392", "Cacheu",
-"24544353", "Pirada",
-"24544332", "Bissora",
-"24544341", "Bafatá",
-"24544325", "Brá",
-"24544393", "S\.\ Domingos",
-"24544352", "Sonaco",
-"24544354", "Pitche",
-"24544397", "Bigene",
-"24544342", "Bambadinca",
-"24544351", "Gabu",
-"24544396", "Ingoré",
-"24544335", "Farim",
+$areanames{en} = {"24544335", "Farim",
 "24544322", "St\.\ Luzia",
+"24544321", "Bissau",
+"24544353", "Pirada",
+"24544393", "S\.\ Domingos",
 "24544391", "Canchungo",
-"24544334", "Mansaba",
+"24544392", "Cacheu",
+"24544396", "Ingoré",
 "24544320", "Bissau",
-"24544394", "Bula",
-"24544331", "Mansôa",};
+"24544354", "Pitche",
+"24544332", "Bissora",
+"24544331", "Mansôa",
+"24544325", "Brá",
+"24544397", "Bigene",
+"24544370", "Buba",
+"24544352", "Sonaco",
+"24544351", "Gabu",
+"24544342", "Bambadinca",
+"24544334", "Mansaba",
+"24544341", "Bafatá",
+"24544394", "Bula",};
 $areanames{pt} = {"245352", "Sonaco",
-"245393", "S\.\ Domingos",
-"245396", "Ingoré",
-"245351", "Gabú",
-"245334", "Mansaba",
+"245332", "Bigene\/Bissorã",
 "245392", "Cacheu",
+"245335", "Farim",
+"245393", "S\.\ Domingos",
+"245331", "Mansôa",
+"245351", "Gabú",
+"245320", "Bissau",
 "245353", "Pirada",
 "245391", "Canchungo",
 "245322", "Sta\.\ Luzia",
-"245320", "Bissau",
-"245354", "Pitche",
-"245370", "Buba",
-"245325", "Brá",
-"245321", "Bissau",
-"245342", "Bambadinca",
+"245341", "Bafatá",
+"245396", "Ingoré",
 "245394", "Bula",
-"245332", "Bigene\/Bissorã",
-"245331", "Mansôa",
-"245335", "Farim",
-"245341", "Bafatá",};
+"245321", "Bissau",
+"245370", "Buba",
+"245342", "Bambadinca",
+"245325", "Brá",
+"245334", "Mansaba",
+"245354", "Pitche",};
+my $timezones = {
+               '' => [
+                       'Atlantic/Reykjavik'
+                     ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+245|\D)//g;
-      my $self = bless({ country_code => '245', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '245', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
         return $self->is_valid() ? $self : undef;
     }
 1;

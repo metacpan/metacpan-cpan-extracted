@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185946;
+our $VERSION = 1.20240308154353;
 
 my $formatters = [
                 {
@@ -104,31 +104,36 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"5982", "Montevideo",
+$areanames{en} = {"598473", "Salto",
+"5984364", "Trinidad\/Flores",
+"5982", "Montevideo",
 "598435", "Florida",
-"598473", "Salto",
 "598462", "Rivera",
-"598445", "Treinta\ y\ Tres",
 "598433", "Canelones",
-"59842", "San\ Carlos",
-"598463", "Tacuarembo",
-"598472", "Paysandu",
-"598436", "Durazno",
-"598434", "San\ Jose\ de\ Mayo",
 "598453", "Mercedes\/Soriano",
-"598444", "Minas\/Lavalleja",
-"598456", "Fray\ Bentos\/Rio\ Negro",
-"598464", "Melo\/Cerro\ Largo",
-"598477", "Artigas",
 "598452", "Colonia\ del\ Scaramento",
+"598463", "Tacuarembo",
+"59842", "San\ Carlos",
+"598472", "Paysandu",
+"598477", "Artigas",
+"598444", "Minas\/Lavalleja",
 "598447", "Rocha",
-"5984364", "Trinidad\/Flores",};
+"598434", "San\ Jose\ de\ Mayo",
+"598436", "Durazno",
+"598456", "Fray\ Bentos\/Rio\ Negro",
+"598445", "Treinta\ y\ Tres",
+"598464", "Melo\/Cerro\ Largo",};
+my $timezones = {
+               '' => [
+                       'America/Montevideo'
+                     ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+598|\D)//g;
-      my $self = bless({ country_code => '598', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '598', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
       $self = bless({ country_code => '598', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);

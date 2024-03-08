@@ -95,13 +95,13 @@ sub test {
         {
             my $res = HTTP::Response->new(200, 'foo');
             $session->response_filter($res);
-            like $res->header('Set-Cookie'), qr!foo_sid=bar; path=/; expires=[A-Z][a-z]{2}, \d+-[A-Z][a-z]{2}-\d{4} \d\d:\d\d:\d\d GMT!;
+            like $res->header('Set-Cookie'), qr!foo_sid=bar; path=/; expires=[A-Z][a-z]{2}, \d+([- ])[A-Z][a-z]{2}\1\d{4} \d\d:\d\d:\d\d GMT!;
         }
 
         {
             my $res = HTTP::Response->new(200, 'foo');
             $session->header_filter($res);
-            like $res->header('Set-Cookie'), qr!foo_sid=bar; path=/; expires=[A-Z][a-z]{2}, \d+-[A-Z][a-z]{2}-\d{4} \d\d:\d\d:\d\d GMT!;
+            like $res->header('Set-Cookie'), qr!foo_sid=bar; path=/; expires=[A-Z][a-z]{2}, \d+([- ])[A-Z][a-z]{2}\1\d{4} \d\d:\d\d:\d\d GMT!;
         }
     }->();
 

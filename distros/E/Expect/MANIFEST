@@ -11,12 +11,15 @@ LICENSE
 Makefile.PL
 MANIFEST			This list of files
 README.md
+t/00-load.t
 t/01-test.t
 t/02-bc.t
 t/03-log.t
 t/04-multiline.t
 t/10-internal.t
 t/11-calc.t
+t/timeout.t
+t/utils/slow-interaction.pl
 tutorial/1.A.Intro
 tutorial/2.A.ftp
 tutorial/2.B.rlogin

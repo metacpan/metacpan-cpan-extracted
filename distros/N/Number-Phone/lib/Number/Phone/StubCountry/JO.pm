@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185945;
+our $VERSION = 1.20240308154351;
 
 my $formatters = [
                 {
@@ -240,47 +240,52 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"962530", "Zarqa",
-"962531", "Madaba",
-"962267", "Jarash",
-"962536", "Zarqa",
+$areanames{en} = {"962321", "Ma\’an",
+"962533", "Balqa",
 "962538", "Zarqa",
+"96265", "Amman",
+"962269", "Irbid",
+"962535", "Balqa",
+"962622", "Greater\ Amman",
+"9623260", "Tafileh",
+"962322", "Tafileh",
+"962262", "Mafraq",
+"962537", "Zarqa",
+"96227", "Irbid",
+"962320", "Aqaba",
+"962264", "Ajloun",
 "962324", "Aqaba",
 "962266", "Mafraq",
-"962268", "Ajloun",
 "962620", "Amman",
-"96227", "Irbid",
-"962323", "Karak",
-"962325", "Maan",
-"962537", "Zarqa",
-"962322", "Tafileh",
-"96264", "Amman",
-"962532", "Madaba",
-"962269", "Irbid",
-"9623260", "Tafileh",
-"962535", "Balqa",
-"96265", "Amman",
-"962647", "Greater\ Amman",
-"962327", "Karak",
-"9623262", "Southern\ Region",
-"962533", "Balqa",
-"962264", "Ajloun",
-"962534", "Balqa",
-"962625", "Amman",
-"962622", "Greater\ Amman",
-"962263", "Jarash",
-"962265", "Irbid",
-"962321", "Ma\’an",
-"962262", "Mafraq",
-"96263", "Amman",
 "962539", "Zarqa",
-"962320", "Aqaba",};
+"962325", "Maan",
+"96263", "Amman",
+"962265", "Irbid",
+"962268", "Ajloun",
+"962531", "Madaba",
+"962263", "Jarash",
+"962323", "Karak",
+"962327", "Karak",
+"962267", "Jarash",
+"962647", "Greater\ Amman",
+"962625", "Amman",
+"962532", "Madaba",
+"962534", "Balqa",
+"962530", "Zarqa",
+"96264", "Amman",
+"9623262", "Southern\ Region",
+"962536", "Zarqa",};
+my $timezones = {
+               '' => [
+                       'Asia/Amman'
+                     ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+962|\D)//g;
-      my $self = bless({ country_code => '962', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '962', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
       $self = bless({ country_code => '962', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);

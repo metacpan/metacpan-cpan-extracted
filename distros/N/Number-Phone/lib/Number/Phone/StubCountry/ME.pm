@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2023 David Cantrell, derived from data from libphonenumber
+# Copyright 2024 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20231210185945;
+our $VERSION = 1.20240308154352;
 
 my $formatters = [
                 {
@@ -94,22 +94,27 @@ my $validators = {
                 'voip' => '78[1-49]\\d{5}'
               };
 my %areanames = ();
-$areanames{en} = {"38230", "Bar\/Ulcinj",
+$areanames{en} = {"38231", "Herceg\ Novi",
 "38252", "Pljevlja\/Zabljak",
-"38240", "Niksic\/Pluzine\/Savnik",
-"38232", "Kotor\/Tivat",
-"38250", "Bijelo\ Polje\/Mojkovac",
-"38241", "Cetinje",
-"38231", "Herceg\ Novi",
-"38251", "Andrijevica\/Berane\/Blue\/Gusinje\/Petnitsa\/Rožaje",
 "3822", "Danilovgad\/Kolasin\/Podgorica",
-"38233", "Budva",};
+"38233", "Budva",
+"38240", "Niksic\/Pluzine\/Savnik",
+"38251", "Andrijevica\/Berane\/Blue\/Gusinje\/Petnitsa\/Rožaje",
+"38232", "Kotor\/Tivat",
+"38230", "Bar\/Ulcinj",
+"38241", "Cetinje",
+"38250", "Bijelo\ Polje\/Mojkovac",};
+my $timezones = {
+               '' => [
+                       'Europe/Podgorica'
+                     ]
+             };
 
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+382|\D)//g;
-      my $self = bless({ country_code => '382', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '382', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
       $number =~ s/^(?:0)//;
       $self = bless({ country_code => '382', number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);

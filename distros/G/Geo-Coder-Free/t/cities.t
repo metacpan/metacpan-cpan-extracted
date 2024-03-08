@@ -14,15 +14,17 @@ BEGIN {
 }
 
 CITIES: {
-	Geo::Coder::Free::DB::init(directory => 'lib/Geo/Coder/Free/MaxMind/databases');
-
-	my $cities = new_ok('Geo::Coder::Free::DB::MaxMind::cities' => [logger => new_ok('MyLogger'), no_entry => 1]);
+	my $cities = new_ok('Geo::Coder::Free::DB::MaxMind::cities' => [
+		directory => 'lib/Geo/Coder/Free/MaxMind/databases',
+		logger => new_ok('MyLogger'),
+		no_entry => 1
+	]);
 
 	# diag($cities->population(Country => 'gb', City => 'ramsgate'));
-	ok($cities->population(Country => 'gb', City => 'ramsgate') == 38624);
+	cmp_ok($cities->population(Country => 'gb', City => 'ramsgate'), '==', 38624, 'Reading the population of a town/city');
 
 	my $ramsgate = $cities->fetchrow_hashref({ Country => 'gb', City => 'ramsgate' });
-	if($ramsgate->{latitude}) {
+	if($ramsgate->{'latitude'}) {
 		delta_within($ramsgate->{latitude}, 51.33, 1e-2);
 		delta_within($ramsgate->{longitude}, 1.43, 1e-2);
 	} else {

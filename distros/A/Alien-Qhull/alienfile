@@ -13,33 +13,32 @@ use File::Which;
 use constant PACKAGE_VERSION =>  '8.0.2';
 #>>>
 
-our $VERSION = 'v8.0.2.1';
-
-my %req_version = (
-    defined $ENV{ALIEN_QHULL_EXACT_VERSION}
-    ? ( exact_version => $ENV{ALIEN_QHULL_EXACT_VERSION} )
-    : ( atleast_version => $ENV{ALIEN_QHULL_ATLEAST_VERSION} // PACKAGE_VERSION ) );
-
-die( "This distribution only supports QHULL versions @{[ PACKAGE_VERSION]} or greater\n" )
-  if versioncmp( PACKAGE_VERSION, ( values( %req_version ) )[0] ) == 1;
+our $VERSION = 'v8.0.2.2';
 
 use constant PACKAGE_NAME_R        => 'qhull_r';
 use constant PACKAGE_NAME_STATIC_R => 'qhullstatic_r';
 
-plugin 'Gather::IsolateDynamic';
-plugin PkgConfig => ( pkg_name => PACKAGE_NAME_R, %req_version );
+##########################################################################################
+# Some system installations (e.g. Debian 12) compile their static libraries in such a way
+# that linking the Perl .so XS module against it fails with something like:
 
-sys {
-    # find path to executables for system install, if found.
-    after 'gather' => sub {
-        my ( $build ) = @_;
-        if ( defined( my $exe = which( 'qhull' ) ) ) {
-            $build->runtime_prop->{system_bin_dir} = path( $exe )->parent->stringify;
-        }
-    };
+# relocation R_X86_64_PC32 against symbol `qh_version2' can not be
+# used when making a shared object; recompile with -fPIC'
 
-};
+# As far as I can tell, Alien::Build is passing -fPIC, but the system
+# library hasn't been compiled with it.  So, need to use dynamic
+# linking against the system library, but want to use static linking
+# for a share install.
 
+# However, qhull uses separate .pc files for dynamic and static
+# linking, and the PkgConfig plugin really wants to use a single file
+# for both.
+
+# I haven't figured out how to make that happen portably, so instead
+# force a static share install by using the PkgConfig plugin specifying the
+# static .pc file and ensuring that it always fails by requiring a non-existent version.
+
+plugin PkgConfig => ( pkg_name => PACKAGE_NAME_STATIC_R, exact_version => 0 );
 
 share {
     plugin 'Build::CMake';
@@ -52,21 +51,6 @@ share {
         version => qr/(\d+[.]\d+[.]\d+)[.]tgz*$/,
     );
 
-    meta->around_hook(
-        prefer => sub {
-            my ( $orig, $build, @args ) = @_;
-            my $ret  = $build->$orig( @args );
-            my $list = $ret->{list};
-            if ( exists $req_version{exact_version} ) {
-                $ret->{list} = [ grep { $_->{version} eq $req_version{exact_version} } @$list ];
-            }
-            else {
-                $ret->{list} = [ grep { versioncmp( $req_version{atleast_version}, $_->{version} ) < 1 } @$list ];
-            }
-            return $ret;
-        } );
-
-
     plugin Extract => 'tar.gz';
 
     build [ [
@@ -77,11 +61,5 @@ share {
         '%{make}',
         '%{make} install',
     ];
+
 };
-
-gather [
-    [ "pkg-config --modversion @{[ PACKAGE_NAME_STATIC_R ]}", \'%{.runtime.version}' ],
-    [ "pkg-config --cflags     @{[ PACKAGE_NAME_STATIC_R ]}", \'%{.runtime.cflags}' ],
-    [ "pkg-config --libs       @{[ PACKAGE_NAME_STATIC_R ]}", \'%{.runtime.libs}' ],
-];
-

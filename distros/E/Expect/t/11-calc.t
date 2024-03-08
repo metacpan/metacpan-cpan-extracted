@@ -37,7 +37,6 @@ my $space;
 	# The same strange behaviour is also encountered on the CPAN Testers.
 	like $e->after, qr/^($SPACE|$OUTPUT)$/, 'after';
 	$space = $e->after =~ /^$SPACE$/;
-	diag $space ? 'SPACE' : 'OUTPUT';
 	my $ACCUM = $space ? $SPACE : $OUTPUT;
 	like $e->clear_accum, qr/^$ACCUM$/, 'clear_accum';
 }

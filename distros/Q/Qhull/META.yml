@@ -12,6 +12,7 @@ build_requires:
   Path::Tiny: '0'
   Test2::V0: '0'
   Test::More: '0'
+  Test::TempDir::Tiny: '0'
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
@@ -32,19 +33,19 @@ no_index:
 provides:
   Qhull:
     file: lib/Qhull.pm
-    version: '0.01'
+    version: '0.02'
   Qhull::Options:
     file: lib/Qhull/Options.pm
-    version: '0.01'
+    version: '0.02'
   Qhull::PP:
     file: lib/Qhull/PP.pm
-    version: '0.01'
+    version: '0.02'
   Qhull::Util:
     file: lib/Qhull/Util.pm
-    version: '0.01'
+    version: '0.02'
   Qhull::Util::Options:
     file: lib/Qhull/Util/Options.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   Alien::Qhull: '0'
   CXC::Exporter::Util: '0.05'
@@ -73,7 +74,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Qhull
   repository: https://gitlab.com/djerius/p5-qhull.git
-version: '0.01'
+version: '0.02'
 x_generated_by_perl: v5.38.2
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: GPL-3.0-only

@@ -4,20 +4,35 @@ Image::DecodeQR::WeChat - Decode QR code(s) from images using the OpenCV/WeChat 
 
 # VERSION
 
-Version 0.8
+Version 1.0
 
 # SYNOPSIS
 
 This module provides a Perl interface to the OpenCV/WeChat QR code
 decoder via XS code.
-OpenCV/WeChat library uses CNN to do this with pre-trained models.
+OpenCV/WeChat library uses CNN (Convolutional Neural Networks)
+to do this with pre-trained models.
 
-This module has been tested by myself with OpenCV v4.5.5 and Perl v5.32 on
+This module has been tested by myself with OpenCV v4.5.5, v4.8.1
+and Perl v5.32, v5.38 on
 Linux. But check the CPANtesters matrix on the left for all the tests done
-on this module.
+on this module (although tests may be sparse and rare because of the OpenCV
+dependency).
 
 The library is relatively successful even for rotated codes. It remains
-to be tested on the minimum size ofthe code images (60px in my case).
+to be tested on the minimum size of the code images (60px in my case).
+In producing test images with software like the [GIMP](https://www.gimp.org/),
+one should be aware of the distortions caused
+by transforms such as scale and rotation to the final QR code images,
+rotation in particular. Add certain enhancements
+to the final image to "look good" and
+the resultant image looks like QR code but it is not.
+Failure of the
+library on such artificially produced images would be somehow expected.
+Instead I would test with images which have been scanned with a QR code
+image attached to them in random angles. This is my use case afterall:
+scanned images with a glued-in QR code tag so that my systems would
+archive it straight from the scanner into the right database table.
 
 Here is some code to get you started:
 
@@ -134,11 +149,43 @@ interface other parts of the OpenCV library:
 
 # COMMAND LINE SCRIPT
 
-    image-decodeqr-wechat.pl --input in.jpg
+    image-decodeqr-wechat.pl --input image-with-qr-code.jpg
 
     image-decodeqr-wechat.pl --help
 
-A CLI script is provided and will be installed by this module. Basic usage is as above.
+A CLI script is provided and will be installed by this module. Basic usage is as above. Here is its usage:
+
+    Usage : script/image-decodeqr-wechat.pl <options>
+
+    where options are:
+
+      --input F :
+        the filename of the input image
+        which supposedly contains QR codes to be detected.
+
+      --modelsdir M :
+        optionally use your own models contained
+        in this directory instead of the ones
+        this program was shipped with.
+
+      --outbase O :
+        basename for all output files
+        (if any, depending on whether --dumpqrimagestofile is on).
+
+      --verbosity L :
+        verbosity level, 0:mute, 1:C code, 10:C+XS code.
+
+      --graphicaldisplayresult :
+        display a graphical window with input image
+        and QR codes outlined. Using --dumpqrimagestofile
+        and specifying --outbase, images and payloads and
+        bounding boxes will be saved to files, if you do
+        not have graphical interface.
+
+      --dumpqrimagestofile :
+        it has effect only of --outbase was specified. Payloads,
+        Bounding Boxes and images of each QR-code detected will
+        be saved in separate files.
 
 # PREREQUISITES
 
@@ -316,9 +363,11 @@ and in the XS file where the Perl headers are included.
 
 # INSTALLING OpenCV
 
-In my case downloading OpenCV using Linux's package
-manager was not successful.It required to add another
-repository which wanted to install its own versions
+In my case installing OpenCV using Linux's package
+manager (dnf, fedora)
+was not successful with default repositories.
+It required to add another
+repository (rpmfusion) which wanted to install its own versions
 of packages I already had. So I prefered to install
 OpenCV from sources. This is the procedure I followed:
 
@@ -350,11 +399,17 @@ additional packages first, before finally compiling OpenCV.
 on a headless host. So, I just disabled it. That's easy to achieve
 during the above.
 - I have installed this on a CUDA-capable GPU (with CUDA 10.2 installed)
-host and on a headless remote host with no GPU or basic. CUDA is
-not required for building this module.
+host and on a headless remote host with no GPU or basic. In general,
+CUDA is not required for building this module. It is just an addition for
+making things run faster, possibly.
 - It is also possible to download a binary distribution of OpenCV.
 Just make sure that it supports all the things I mentioned above.
-And that it has all the required headers (in an include dir) - just saying.
+So, you should be looking for a developer binary package if such a thing exists.
+And that it has all the required headers (in an include dir).
+- If all else fails, then add `rpmfusion` repository to
+your Linux's package manager and then add package OpenCV, developer version.
+Make sure there is the WeChat OpenCV library too. If there is not,
+`perl Makefile.PL` will complain and fail.
 
 Your mileage may vary.
 
@@ -372,9 +427,18 @@ link in the installation process of this module. `Makefile.PL` contains
 code to do this with `pkg-config` or `cmake`. If these fail,
 it will look for ENVironment variables: `OPENCV_LDFLAGS` and
 `OPENCV_CFLAGS`, which should contain the `CFLAGS` (for example:
-`<-I/usr/include/opencv4/`>) and `LDFLAGS` (for example:
-`<-L/usr/lib64 -lopencv_world`>). Set these variables manually
+`-I/usr/include/opencv4/`) and `LDFLAGS` (for example:
+`-L/usr/lib64 -lopencv_world`). Set these variables manually
 prior installation if the automatic methods mentioned above fail.
+
+One last thing to check is that if your OpenCV installation (developer version)
+was correct, there should be a `pkg-config` file, perhaps in
+`/usr/lib64/pkgconfig/opencv4.pc` or `/usr/local/lib64/pkgconfig/opencv4.pc`.
+This file details all the `CFLAGS` and `LDFLAGS` and should be
+found by `Makefile.PL` if it is in a standard location,
+or adjust the list of paths
+in environment variable `PKG_CONFIG_PATH` which is where `pkg-config` searches
+for these files.
 
 # AUTHOR
 
@@ -418,6 +482,7 @@ which form the backbone of this module and do all the heavy lifting.
 (obsolete with modern - at the time of writing - OpenCV)
 module [Image::DecodeQR](https://metacpan.org/pod/Image%3A%3ADecodeQR) serves as the skeleton for this module.
 - Thank you! to all those who responded to this SO question [https://stackoverflow.com/questions/71402095/perl-xs-create-and-return-array-of-strings-char-taken-from-calling-a-c-funct](https://stackoverflow.com/questions/71402095/perl-xs-create-and-return-array-of-strings-char-taken-from-calling-a-c-funct)
+- The Hackers of Free Software.
 
 # LICENSE AND COPYRIGHT
 
