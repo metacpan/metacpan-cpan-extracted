@@ -1,5 +1,5 @@
 ---
-abstract: 'Provide the static, dynamic libraries and CLI of the parasail aligner'
+abstract: 'find, build and install the parasail library'
 author:
   - 'Christos Argyropoulos <chrisarg@gmail.com>'
 build_requires:
@@ -12,9 +12,14 @@ build_requires:
   Test::Alien::Diag: '0'
   Test::More: '0'
 configure_requires:
-  Alien::Build: '1.40'
+  Alien::Autotools: '0'
+  Alien::Build: '2.70'
   Alien::Build::MM: '0.32'
+  Carp: '0'
   ExtUtils::MakeMaker: '6.52'
+  File::Copy::Recursive: '0'
+  HTTP::Tiny: '0'
+  Path::Tiny: '0'
 dynamic_config: 1
 generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -33,21 +38,21 @@ no_index:
 provides:
   Alien::SeqAlignment::parasail:
     file: lib/Alien/SeqAlignment/parasail.pm
-    version: '0.03'
+    version: '0.04'
 requires:
-  Alien::Base: '0'
+  Alien::Base: '0.038'
   parent: '0'
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://github.com/chrisarg/Alien-SeqAlignment-parasail/issues
-  repository: git://github.com/chrisarg/Alien-SeqAlignment-parasail.git
-version: '0.03'
+  IRC: irc://irc.perl.org/#native
+  homepage: https://github.com/chrisarg/alien-seqalignment-parasail
+  repository: https://github.com/chrisarg/alien-seqalignment-parasail.git
+version: '0.04'
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:
     share:
-      Alien::Autotools: '0'
       Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'
       Config: '0'
       HTTP::Tiny: '0.044'

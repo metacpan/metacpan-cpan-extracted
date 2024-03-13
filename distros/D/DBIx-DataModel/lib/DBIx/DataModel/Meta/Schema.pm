@@ -13,6 +13,8 @@ use List::MoreUtils      qw/any firstval lastval uniq/;
 use Hash::Util           qw/lock_keys/;
 use Module::Load         qw/load/;
 use Carp::Clan           qw[^(DBIx::DataModel::|SQL::Abstract)];
+use Try::Tiny;
+use mro                  qw/c3/;
 use namespace::clean;
 
 #----------------------------------------------------------------------
@@ -25,8 +27,9 @@ my $spec = {
   isa                          => {type => SCALAR|ARRAYREF,
                                    default => 'DBIx::DataModel::Schema'},
 
-  sql_no_inner_after_left_join => {type => BOOLEAN, optional => 1},
-  join_with_USING              => {type => BOOLEAN, optional => 1},
+  sql_no_inner_after_left_join => {type => BOOLEAN,  optional => 1},
+  join_with_USING              => {type => BOOLEAN,  optional => 1},
+  resultAs_namespaces          => {type => ARRAYREF, optional => 1},
 
   # fields below are in common with tables (schema is a kind of "pseudo-root")
   auto_insert_columns          => {type => HASHREF, default => {}},
@@ -97,14 +100,18 @@ sub new {
   # attributes just for initialisation, don't keep them within $self
   my $isa = delete $self->{isa};
 
-  bless $self, $class;
+  bless $self, $class; # this is the metaschema instance
 
-  # create the Perl class
+  # now create the Perl class for schema instances
   define_class(
     name    => $self->{class},
     isa     => $isa,
     metadm  => $self,
    );
+
+  # namespaces for that class will be used for searching the 'ResultAs' classes
+  $self->{resultAs_namespaces} //= mro::get_linear_isa($self->{class});
+  $self->{resultAs_class_for}    = {};  # cache, initially empty
 
   return $self;
 }
@@ -296,6 +303,36 @@ sub define_join {
   $self->{join}{$subclass} = $meta_join;
 
   return $meta_join;
+}
+
+
+
+sub find_result_class {
+  my $self         = shift;
+  my $name         = ucfirst shift;
+
+  my $from_cache = $self->{resultAs_class_for}{$name};
+  return $from_cache if $from_cache;
+
+  # try to find subclass $name within namespace of schema or ancestors
+  foreach my $namespace (@{$self->{resultAs_namespaces}}) {
+    my $class = "${namespace}::ResultAs::${name}";
+
+    # see if that class is already loaded (by checking for a 'get_result' method)
+    my $is_loaded  = defined &{$class."::get_result"};
+
+    # otherwise, try to load the module
+    $is_loaded ||= try   {load $class; 1}
+                   catch {die $_ if $_ !~ /^Can't locate(?! object method)/};
+
+    # if class is found, feed the cache and exit loop
+    if ($is_loaded) {
+      $self->{resultAs_class_for}{$name} = $class;
+      return $class;
+    }
+  }
+
+  return; # false : class not found
 }
 
 
@@ -501,6 +538,11 @@ inserted or updated in every table.
 
 lists of tables, types, associations declared within that schema.
 
+=item *
+
+
+namespaces for searching for C<ResultAs> classes.
+
 =back
 
 and it contains methods for declaring those meta-objects.
@@ -534,14 +576,14 @@ L<reference documentation|DBIx::DataModel::Doc::Reference/"Schema() / define_sch
 
 =head2 Association
 
-  $schema->Association([$class1, $role1, $multiplicity1, @columns1],
-                       [$class2, $role2, $multiplicity2, @columns2]);
+  $meta_schema->Association([$class1, $role1, $multiplicity1, @columns1],
+                            [$class2, $role2, $multiplicity2, @columns2]);
 
 
 =head2 Composition
 
-  $schema->Composition([$class1, $role1, $multiplicity1, @columns1], 
-                       [$class2, $role2, $multiplicity2, @columns2]);
+  $meta_schema->Composition([$class1, $role1, $multiplicity1, @columns1], 
+                            [$class2, $role2, $multiplicity2, @columns2]);
 
 
 =head3 Type
@@ -550,6 +592,17 @@ L<reference documentation|DBIx::DataModel::Doc::Reference/"Schema() / define_sch
      $handler_name_1 => sub { ... },
      ...
    );
+
+
+
+=head1 OTHER PUBLIC METHODS
+
+=head2 find_result_class
+
+Called from the L<DBIx::DataModel::Statement> class for finding the class
+that implements how results from a C<select()> will be returned to the client.
+
+The search for the class walks through names
 
 
 

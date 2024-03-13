@@ -1,23 +1,30 @@
 use alienfile;
-use Path::Tiny;
-use IPC::System::Simple   qw(capturex);
-use File::Copy::Recursive qw(dircopy);
-use HTTP::Tiny;
-use Carp;
+use strict;
+use warnings;
+
+configure {
+    requires 'Alien::Autotools';
+    requires 'Carp';
+    requires 'File::Copy::Recursive';
+    requires 'HTTP::Tiny';
+    requires 'Path::Tiny';
+};
 
 my $parasail_executable = 'parasail_aligner';
-## not doing system install, so must deal with the package name
-
-
- plugin 'PkgConfig' =>
-  ( pkg_name => 'parasail-1', );
+## check that both the shared library and the executable exist
+plugin 'PkgConfig' => ( pkg_name => 'parasail-1', );
 
 plugin 'Probe::CommandLine' => (
-  command   => $parasail_executable,
-  secondary => 1, 
+    command   => $parasail_executable,
+    secondary => 1,
 );
 
 share {
+    use Carp;
+    use File::Copy::Recursive qw(dircopy);
+    use HTTP::Tiny;
+    use Path::Tiny;
+
     my $install_root;
     my $path_to_static_lib;
     my $repo_url;
@@ -38,7 +45,6 @@ share {
 
     start_url $repo_url;
 
-    requires 'Alien::Autotools';
     plugin 'Download';
     plugin 'Extract' => 'zip';
     plugin 'Build::Autoconf';
@@ -97,3 +103,5 @@ share {
         }
     };
 };
+
+1;

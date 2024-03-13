@@ -7,7 +7,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Provide the static, dynamic libraries and CLI (non-Windows) of the edlib aligner",
+  "ABSTRACT" => "find, build and install the edlib library",
   "AUTHOR" => "Christos Argyropoulos <chrisarg\@gmail.com>",
   "BUILD_REQUIRES" => {
     "Alien::Build" => "0.32",
@@ -15,16 +15,21 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => "6.52"
   },
   "CONFIGURE_REQUIRES" => {
-    "Alien::Build" => "1.40",
+    "Alien::Build" => "2.70",
     "Alien::Build::MM" => "0.32",
     "Alien::Build::Plugin::Build::CMake" => "0.99",
-    "ExtUtils::MakeMaker" => "6.52"
+    "Alien::Meson" => 0,
+    "Carp" => 0,
+    "ExtUtils::MakeMaker" => "6.52",
+    "File::Copy::Recursive" => 0,
+    "HTTP::Tiny" => 0,
+    "Path::Tiny" => 0
   },
   "DISTNAME" => "Alien-SeqAlignment-edlib",
   "LICENSE" => "perl",
   "NAME" => "Alien::SeqAlignment::edlib",
   "PREREQ_PM" => {
-    "Alien::Base" => 0,
+    "Alien::Base" => "0.038",
     "parent" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -37,7 +42,7 @@ my %WriteMakefileArgs = (
     "Test::Alien::Diag" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.05",
+  "VERSION" => "0.08",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,7 +50,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Alien::Base" => 0,
+  "Alien::Base" => "0.038",
   "Alien::Build" => "0.32",
   "Alien::Build::MM" => "0.32",
   "ExtUtils::MakeMaker" => "6.52",

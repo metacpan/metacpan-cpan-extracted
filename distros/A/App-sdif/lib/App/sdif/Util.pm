@@ -118,10 +118,12 @@ sub read_unified {
 		s/^(?![-+ ])/ /;
 	    }
 	}
-	# `git diff' produces message like this:
-	# "\ No newline at end of file"
 	/^([-+ ]{$mark_length}|\t)/p or do {
-	    unless (/^\\ /) {
+	    # `git diff' produces message like this:
+	    # "\ No newline at end of file"
+	    if (/^\\ /) {
+		[$stack[-1]->lists]->[-1][-1] =~ s/\n\z//;
+	    } else {
 		warn "Unexpected line: $_" unless $NO_WARNINGS;
 	    }
 	    next;

@@ -101,9 +101,12 @@ sub defaults {
             file_filter              => '',
         },
         create => {
-            autoincrement_col_name => 'Id',
-            data_type_guessing     => 1,
-            view_name_prefix       => '',
+            default_ai_column_name   => 'Id',
+            option_ai_column_enabled => 0,
+            data_type_guessing       => 1,
+            table_constraint_rows    => 0,
+            table_option_rows        => 0,
+            view_name_prefix         => '',
         },
         split => {
             record_sep    => '\n',

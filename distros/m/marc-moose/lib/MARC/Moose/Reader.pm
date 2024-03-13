@@ -1,6 +1,6 @@
 package MARC::Moose::Reader;
 # ABSTRACT: Base class for a reader returning MARC::Moose records
-$MARC::Moose::Reader::VERSION = '1.0.46';
+$MARC::Moose::Reader::VERSION = '1.0.48';
 use Moose::Role;
 use MARC::Moose::Lint::Checker;
 
@@ -29,7 +29,7 @@ MARC::Moose::Reader - Base class for a reader returning MARC::Moose records
 
 =head1 VERSION
 
-version 1.0.46
+version 1.0.48
 
 =head1 ATTRIBUTES
 
@@ -43,7 +43,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Frédéric Demians.
+This software is copyright (c) 2024 by Frédéric Demians.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

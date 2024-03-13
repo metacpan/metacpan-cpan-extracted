@@ -34,10 +34,10 @@ no_index:
 provides:
   LWP::Protocol::https:
     file: lib/LWP/Protocol/https.pm
-    version: '6.13'
+    version: '6.14'
   LWP::Protocol::https::Socket:
     file: lib/LWP/Protocol/https.pm
-    version: '6.13'
+    version: '6.14'
 requires:
   IO::Socket::SSL: '1.970'
   LWP::Protocol::http: '0'
@@ -52,7 +52,7 @@ resources:
   bugtracker: https://github.com/libwww-perl/LWP-Protocol-https/issues
   homepage: https://github.com/libwww-perl/LWP-Protocol-https
   repository: https://github.com/libwww-perl/LWP-Protocol-https.git
-version: '6.13'
+version: '6.14'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -230,7 +230,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v6.13
+          tag: v6.14
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -524,6 +524,7 @@ x_contributors:
   - 'Jon Jensen <jon@endpoint.com>'
   - 'Karen Etheridge <ether@cpan.org>'
   - 'Leo Lapworth <leo@cuckoo.org>'
+  - 'Marin Tsanov <btg.tsanov.marin@gmail.com>'
   - 'Mark Stosberg <mark@stosberg.com>'
   - 'Michael G. Schwern <schwern@pobox.com>'
   - 'Mike Schilli <github@perlmeister.com>'

@@ -11,6 +11,7 @@ do { my $x = {
                                         'Alien::Build' => '2.3901',
                                         'Alien::Build::MM' => '0.32',
                                         'Alien::Build::Plugin::PkgConfig::Negotiate' => '1.53',
+                                        'Alien::patch' => '0.15',
                                         'ExtUtils::MakeMaker' => '6.52',
                                         'Sort::Versions' => '0',
                                         'perl' => '5.010'

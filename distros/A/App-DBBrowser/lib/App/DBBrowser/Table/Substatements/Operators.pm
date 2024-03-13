@@ -161,6 +161,12 @@ sub read_and_add_value {
         if ( $sf->{i}{driver} eq 'SQLite' ) {
             $sql->{$stmt} =~ s/ (?<=\sREGEXP\() \? (?=,\Q$qt_col\E,[01]\)\z) /$value/x;
         }
+        elsif ( $sf->{i}{driver} eq 'Firebird' ) {
+            $sql->{$stmt} =~ s/ \? (?=\sESCAPE\s'\#'\z) /$value/x;
+        }
+        elsif ( $sf->{i}{driver} =~ /^(?:DB2|Oracle)\z/ ) {
+            $sql->{$stmt} =~ s/ \?  (?=,'[ci]'\)\z) /$value/x;
+        }
         else {
             $sql->{$stmt} =~ s/\?\z/$value/;
         }

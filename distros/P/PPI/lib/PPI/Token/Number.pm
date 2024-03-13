@@ -32,7 +32,7 @@ in the various types that Perl supports.
 use strict;
 use PPI::Token ();
 
-our $VERSION = '1.277';
+our $VERSION = '1.278';
 
 our @ISA = "PPI::Token";
 
@@ -93,6 +93,9 @@ sub __TOKENIZER__on_char {
 			return 1;
 		} elsif ( $char eq 'b' || $char eq 'B' ) {
 			$t->{class} = $t->{token}->set_class( 'Number::Binary' );
+			return 1;
+		} elsif ( $char eq 'o' || $char eq 'O' ) {
+			$t->{class} = $t->{token}->set_class( 'Number::Octal' );
 			return 1;
 		} elsif ( $char =~ /\d/ ) {
 			# You cannot have 8s and 9s on octals

@@ -29,7 +29,7 @@ represent base-8 numbers.
 use strict;
 use PPI::Token::Number ();
 
-our $VERSION = '1.277';
+our $VERSION = '1.278';
 
 our @ISA = "PPI::Token::Number";
 
@@ -55,6 +55,8 @@ sub literal {
 	my $self = shift;
 	return if $self->{_error};
 	my $str = $self->_literal;
+	# oct supports '0o' notation only since 5.34
+	$str =~ s (^0[oO]) (0);
 	my $neg = $str =~ s/^\-//;
 	my $val = oct $str;
 	return $neg ? -$val : $val;

@@ -664,14 +664,14 @@ sub get_prepared_aggr_func {
         $prepared_aggr = $aggr;
     }
     else {
-        require Clone;
-        my $tmp_sql = Clone::clone( $sql );
+        my $tmp_sql = $ax->clone_data( $sql );
         $aggr =~ s/\(X\)\z//;
         $prepared_aggr = $aggr . "(";
         if ( $clause eq 'aggregate' ) {
             push @{$tmp_sql->{aggr_cols}}, $prepared_aggr;
         }
         else {
+            # having, order_by
             $tmp_sql->{$clause . '_stmt'} = $sql->{$clause . '_stmt'} . " " . $prepared_aggr;
         }
         my $is_distinct;

@@ -5,7 +5,6 @@ use warnings;
 use strict;
 use 5.014;
 
-use Clone           qw( clone );
 use List::MoreUtils qw( any );
 
 use Term::Choose         qw();
@@ -154,7 +153,7 @@ sub join_tables {
                 last JOIN_TYPE;
             }
             $join_type =~ s/^-\s//;
-            push @bu, clone( $data );
+            push @bu, $ax->clone_data( $data );
             push @{$sql->{join_data}}, { join_type => $join_type };
             my $ok = $sf->__add_slave_with_join_condition( $sql, $data, $tables );
             if ( ! $ok ) {
@@ -254,7 +253,7 @@ sub __add_slave_with_join_condition {
             next SLAVE;
         }
         my $slave = $menu->[$idx];
-        my $bu_data = clone( $data );
+        my $bu_data = $ax->clone_data( $data );
         my $qt_slave;
         if ( $slave eq $derived_table ) {
             require App::DBBrowser::Subqueries;

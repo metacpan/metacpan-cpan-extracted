@@ -45,7 +45,24 @@
          }
       }
    },
+   "provides" : {
+      "Pass::OTP" : {
+         "file" : "lib/Pass/OTP.pm",
+         "version" : "1.702"
+      },
+      "Pass::OTP::URI" : {
+         "file" : "lib/Pass/OTP/URI.pm",
+         "version" : "1.702"
+      }
+   },
    "release_status" : "stable",
-   "version" : "1.7",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/baierjan/Pass-OTP-perl.git",
+         "web" : "https://github.com/baierjan/Pass-OTP-perl"
+      }
+   },
+   "version" : "1.702",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

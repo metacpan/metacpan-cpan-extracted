@@ -109,16 +109,19 @@ if( ! defined $ffmpeg_exe ){
 	}
 	$ffmpeg_exe = $exes[0];
 }
-if( defined $ffmpeg_exe ){
-	# hardcode the ffmpeg value into the package!
-	my ($infh,$outfh,$repl) = File::Replace::replace3('lib/Automate/Animate/FFmpeg.pm');
-	my $contents; { local $/ = undef; $contents = <$infh> }
-	$contents =~ s!\t\t# this will be modified during perl Makefile.PL\n\t\t'ffmpeg-executable'\s*=>\s*.*?\s*,?\s*#\s*specify fullpath if not in path\n\t\t# end this will be modified during perl Makefile.PL!\t\t# this will be modified during perl Makefile.PL\n\t\t'ffmpeg-executable' => '${ffmpeg_exe}', # specify fullpath if not in path\n\t\t# end this will be modified during perl Makefile.PL!;
-	print $outfh $contents;
-	$repl->finish;
-} else {
-	print STDERR "============================================\n$0 : Warning, FFmpeg executable was not found anywhere in the path. If you have it installed, then set environment variable AUTOMATE_ANIMATE_FFMPEG_PATH to the executables's fullpath and rerun the make procedure. Or install it. However, the installation procedure will continue to install the module albeit it will be unusable unless each time it is called the location to the executable is specified manually. A reinstallation when the executable can be found is advised.\n============================================\n";
+if( ! defined $ffmpeg_exe ){
+	print STDERR "============================================\n$0 : Warning, FFmpeg executable was not found anywhere in the path. If you have it installed, then set environment variable AUTOMATE_ANIMATE_FFMPEG_PATH to the executables's fullpath and rerun the make procedure. Or install it. \n============================================\n";
+	# we are bailing out, no ffmpeg executable was found
+	#exit(1);
 }
+
+# we have found FFmpeg executable:
+# hardcode the ffmpeg value into the package!
+my ($infh,$outfh,$repl) = File::Replace::replace3('lib/Automate/Animate/FFmpeg.pm');
+my $contents; { local $/ = undef; $contents = <$infh> }
+$contents =~ s!\t\t# this will be modified during perl Makefile.PL\n\t\t'ffmpeg-executable'\s*=>\s*.*?\s*,?\s*#\s*specify fullpath if not in path\n\t\t# end this will be modified during perl Makefile.PL!\t\t# this will be modified during perl Makefile.PL\n\t\t'ffmpeg-executable' => '${ffmpeg_exe}', # specify fullpath if not in path\n\t\t# end this will be modified during perl Makefile.PL!;
+print $outfh $contents;
+$repl->finish; # it closes the filehandles too
 
 # Compatibility with old versions of ExtUtils::MakeMaker
 unless (eval { ExtUtils::MakeMaker->VERSION('6.64'); 1 }) {

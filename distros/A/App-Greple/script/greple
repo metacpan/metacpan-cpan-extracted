@@ -13,6 +13,7 @@ use IO::Handle;
 use Pod::Usage;
 use Text::ParseWords qw(shellwords);
 use List::Util qw(min max first sum uniq shuffle notall pairs pairmap);
+use Hash::Util qw(lock_keys);
 use Cwd qw(getcwd abs_path);
 use Carp;
 
@@ -62,7 +63,7 @@ greple - extensible grep with lexical expression and region control
 =head1 VERSION
 
 
-Version 9.0902
+Version 9.1101
 
 
 =head1 SYNOPSIS
@@ -157,7 +158,6 @@ B<greple> [B<-M>I<module>] [ B<-options> ] pattern [ file... ]
     --man                display command or module manual page
     --show               display module file
     --path               show module file path
-    --persist            same as --error=retry
     --error=action       action after read error
     --warn=type          run time error control
     --alert [name=#]     set alert parameter (size/time)
@@ -173,13 +173,13 @@ my @optargs;
 my %optargs;
 
 sub newopt {
-    my @args = @_;
-    pairmap {
-	$a =~ s/\s+//g;
-	$a =~ s/^(?=\w+-)([-\w]+)/$1 =~ tr[-][_]r . "|$1"/e; # "a-b" -> "a_b|a-b"
-	$a =~ /^(\w+)/ and $optargs{$1} = $b if ref $b ne 'CODE';
-    } @args;
-    push @optargs, @args;
+    push @optargs, pairmap {
+	local $_ = $a;
+	s/\s+//g;
+	s/^(?=\w+-)([-\w]+)/$1 =~ tr[-][_]r . "|$1"/e; # "a-b" -> "a_b|a-b"
+	/^(\w+)/ and $optargs{$1} = $b if ref $b ne 'CODE';
+	$_ => $b;
+    } @_;
 }
 
 sub opt :lvalue {
@@ -241,7 +241,7 @@ newopt
     ' filename           |H     ' => \ my $opt_H ,
     ' no-filename        |h     ' => \ my $opt_h ,
     ' only-matching      |o  !  ' => \ my $opt_o ,
-    ' all                       ' => \ my $opt_all ,
+    ' all                    !  ' => \ my $opt_all ,
     ' max-count          |m  =s ' => \ my $opt_m ,
     ' after-context      |A  :2 ' => \(my $opt_A = 0) ,
     ' before-context     |B  :2 ' => \(my $opt_B = 0) ,
@@ -347,16 +347,11 @@ newopt
     ' alert                  =i ' => \    %opt_alert ,
     ' debug              |d  =s ' => \ my @opt_d ,
     ' persist                   ' => sub {
+	warn "Option --persist will be deprecated. Use --error=retry.\n";
 	opt('error') = 'retry';
     },
     'warn|w:1%' => sub {
 	map { $opt_warn{$_} = $_[2] }
-	map { $_ eq 'all' ? keys %opt_warn : $_ }
-	$_[1] =~ /\w+/g;
-    },
-    'conceal:1%' => sub {
-	warn "Option --conceal will be deprecated.  Use --warn.\n";
-	map { $opt_warn{$_} = $_[2] ? 0 : 1 }
 	map { $_ eq 'all' ? keys %opt_warn : $_ }
 	$_[1] =~ /\w+/g;
     },
@@ -856,7 +851,9 @@ if ($opt_C) {
     $opt_B ||= $opt_C;
 }
 my %stat = (
-    files => 0,
+    file_searched => 0,
+    file_tried => 0,
+    length => 0,
     match_effective => 0,
     match_positive => 0,
     match_negative => 0,
@@ -865,6 +862,7 @@ my %stat = (
     time_start => [],
     time_end => [],
     );
+lock_keys %stat;
 
 ##
 ## Setup functions
@@ -990,7 +988,8 @@ my $slurp = do {
     }
 };
 
-use Getopt::EX::Colormap qw(ansi_code);
+use Term::ANSIColor::Concise qw(ansi_code);
+
 use constant {
     EL  => ansi_code('{EL}'),    # Erase Line
     ED  => ansi_code('{ED}'),    # Erase Display
@@ -1002,7 +1001,6 @@ use constant {
 };
 
 my($progress_show, $progress_reset) = do {
-    use Getopt::EX::Colormap qw(ansi_code);
     my $n;
     my($s, $e) = ! $need_color ? ('', '') :
 	( ansi_code $colormap{PROGRESS}, ansi_code 'Z');
@@ -1088,6 +1086,7 @@ sub grep_files {
   FILE:
     while (defined($current_file = open_nextfile())) {
 	my $content = $slurp->();
+	$stat{file_tried}++;
 	if (not defined $content) {
 	    if ($opt_error eq 'fatal') {
 		die "ABORT on $current_file\n";
@@ -1117,7 +1116,8 @@ sub grep_files {
 	my $matched = grep_data(\$content);
 
 	$stat{match_effective} += $matched;
-	$stat{files}++;
+	$stat{file_searched}++;
+	$stat{length} += length $content;
     } continue {
 	close STDIN; # wait;	# wait for 4.019 or earlier?
 	# recover STDIN for opening '-' and some weird command which needs
@@ -1979,7 +1979,8 @@ you don't need extra newline.
 =item B<--all>
 
 Print entire file.  This option does not affect to seach behavior or
-block treatment.  Just print all contents.
+block treatment.  Just print all contents.  Can be negated by the
+B<--no-all> option
 
 =item B<-m> I<n>[,I<m>], B<--max-count>=I<n>[,I<m>]
 
@@ -2791,7 +2792,7 @@ therefore, file name is not given to those functions.
 Specify the function called after each search operation.  Funciton is
 called with C<App::Greple::Grep> object which cotains all information
 about the search.  This interface highly depends on the internal
-structure, so use with the utmost cation.
+structure, so use with the utmost caution.
 
 =item B<--callback>=I<function>(I<...>)
 
@@ -2941,15 +2942,9 @@ information can be display by giving appropriate flag to -d option.
 
 =end comment
 
-=item B<--conceal> I<type>=I<val>
-
-Use following C<--warn> option in reverse context.  This option
-remains for backward compatibility and will be deprecated in the near
-future.
-
 =item B<--persist>
 
-Same as C<--error=retry>.  It may be deprecated in the future.
+Use C<--error=retry>.  Will be deprecated in the future.
 
 =item B<--error>=I<action>
 
@@ -2985,7 +2980,7 @@ Ignore error and continue to read anyway.
 =back
 
 You may occasionally want to find text in binary data.  Next command
-will work like L<string(1)> command.
+will work like L<strings(1)> command.
 
     greple -o --re '(?a)\w{4,}' --error=retry --uc /bin/*
 
@@ -3312,7 +3307,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 1991-2023 Kazumasa Utashiro
+Copyright 1991-2024 Kazumasa Utashiro
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

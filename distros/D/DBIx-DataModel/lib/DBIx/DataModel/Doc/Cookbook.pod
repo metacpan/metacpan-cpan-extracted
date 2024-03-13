@@ -531,7 +531,7 @@ Encapsulate a C<descendant_of> common table expression as a new instance of L<SQ
   }
 
 Note: this is defined at the level of C<SQL::Abstract::More>, not C<DBIx::DataModel>,
-so the syntax for the join is C<<-from => [qw/-join parent_of {parent=name} descendant_of/]>>,
+so the syntax for the join is C<< -from => [qw/-join parent_of {parent=name} descendant_of/] >>,
 following the specification in L<SQL::Abstract::More/join>.
 
 

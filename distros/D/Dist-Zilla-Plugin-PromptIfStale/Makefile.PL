@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use 5.010;
+use 5.020000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Dist-Zilla-Plugin-PromptIfStale",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.010",
+  "MIN_PERL_VERSION" => "5.020000",
   "NAME" => "Dist::Zilla::Plugin::PromptIfStale",
   "PREREQ_PM" => {
     "CPAN::DistnameInfo" => 0,
@@ -43,8 +43,12 @@ my %WriteMakefileArgs = (
     "Term::ANSIColor" => "3.00",
     "Try::Tiny" => 0,
     "YAML::Tiny" => 0,
+    "experimental" => 0,
+    "if" => 0,
     "namespace::autoclean" => 0,
+    "stable" => "0.031",
     "strict" => 0,
+    "strictures" => 2,
     "version" => 0,
     "warnings" => 0
   },
@@ -53,7 +57,6 @@ my %WriteMakefileArgs = (
     "Class::Method::Modifiers" => 0,
     "Dist::Zilla::App::Tester" => 0,
     "Dist::Zilla::Chrome::Test" => 0,
-    "Dist::Zilla::Plugin::MakeMaker" => 0,
     "Dist::Zilla::Role::Plugin" => 0,
     "Dist::Zilla::Role::PluginBundle::Easy" => 0,
     "ExtUtils::MakeMaker" => 0,
@@ -64,10 +67,9 @@ my %WriteMakefileArgs = (
     "Test::Deep" => 0,
     "Test::Fatal" => 0,
     "Test::More" => "0.96",
-    "if" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.058",
+  "VERSION" => "0.059",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -87,7 +89,6 @@ my %FallbackPrereqs = (
   "Dist::Zilla::App" => 0,
   "Dist::Zilla::App::Tester" => 0,
   "Dist::Zilla::Chrome::Test" => 0,
-  "Dist::Zilla::Plugin::MakeMaker" => 0,
   "Dist::Zilla::Role::AfterBuild" => 0,
   "Dist::Zilla::Role::BeforeBuild" => 0,
   "Dist::Zilla::Role::BeforeRelease" => 0,
@@ -116,10 +117,13 @@ my %FallbackPrereqs = (
   "Test::More" => "0.96",
   "Try::Tiny" => 0,
   "YAML::Tiny" => 0,
+  "experimental" => 0,
   "if" => 0,
   "lib" => 0,
   "namespace::autoclean" => 0,
+  "stable" => "0.031",
   "strict" => 0,
+  "strictures" => 2,
   "version" => 0,
   "warnings" => 0
 );

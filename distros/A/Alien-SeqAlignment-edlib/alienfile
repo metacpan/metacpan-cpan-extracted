@@ -1,16 +1,25 @@
+use strict;
+use warnings;
 use alienfile;
-use Path::Tiny;
-use IPC::System::Simple   qw(capturex);
-use File::Copy::Recursive qw(dircopy);
-use HTTP::Tiny;
-use Carp;
+
+configure {
+    requires 'Alien::Meson';
+    requires 'Carp';
+    requires 'File::Copy::Recursive';
+    requires 'HTTP::Tiny';
+    requires 'Path::Tiny';
+};
 
 ## not doing system install, so must deal with the package name
 ## being not obvious
-plugin 'PkgConfig' =>
-  ( pkg_name => path( '.', 'lib', 'pkgconfig', 'edlib-1.pc' ), );
+plugin 'PkgConfig' => ( pkg_name => 'edlib-1', );
 
 share {
+    use Carp;
+    use File::Copy::Recursive qw(dircopy);
+    use HTTP::Tiny;
+    use Path::Tiny;
+
     my $install_root;
     my $path_to_static_lib;
     my $repo_url;
@@ -85,6 +94,7 @@ share {
 
         $build->runtime_prop->{command} = 'edlib-aligner'
           if $^O ne 'MSWin32';
+
     };
 
     test sub {
@@ -94,7 +104,7 @@ share {
         my $runTests_exec = $^O eq 'MSWin32' ? 'runTests.exe' : 'runTests';
         $runTests_exec = path( $binary_dest_directory, $runTests_exec );
         print("Can't find test executable") if not -e $runTests_exec;
-        my $test_output = capturex($runTests_exec)
+        my $test_output = `$runTests_exec`
           || die "failed to run edlib library tests";
         if (   $test_output =~ /FAIL/m
             || $test_output !~ /All specific tests passed/m )
@@ -105,21 +115,5 @@ share {
     };
 };
 
-## the pkgconfig invocation replaces this convoluted code which
-## was necessitated by the way the build of edlib was setup.
-##
-##    gather [
-##        [
-##            'pkg-config',                 '--modversion',
-##            './lib/pkgconfig/edlib-1.pc', \'%{.runtime.version}'
-##        ],
-##        [
-##            'pkg-config',                 '--cflags',
-##            './lib/pkgconfig/edlib-1.pc', \'%{.runtime.cflags}'
-##       ],
-##        [
-##            'pkg-config',                 '--libs',
-##            './lib/pkgconfig/edlib-1.pc', \'%{.runtime.libs}'
-##        ],
-##    ];
+
 

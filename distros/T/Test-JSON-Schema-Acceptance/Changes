@@ -1,5 +1,16 @@
 Revision history for Test-JSON-Schema-Acceptance
 
+1.022     2024-03-09 22:26:06Z
+        - handle out-of-range numeric test data by decoding to
+          Math::BigFloat/Math::BigInt objects
+        - remove use of JSON::MaybeXS, to avoid potential use of JSON::XS;
+          now we use Cpanel::JSON::XS or JSON::PP directly, using the same
+          environment variables as in Mojo::JSON for customization.
+        - explicit mention added to LICENSE prohibiting the alteration of the
+          test data packaged with this distribution
+        - updated test suite:
+          https://github.com/json-schema-org/JSON-Schema-Test-Suite/compare/cda4281c46226b980cbf9db4610f03d9f718e533...bf0360f4b7c51b8f968aabe7f3f49e12b120fc85
+
 1.021     2023-10-25 22:02:36Z
         - updated test suite:
           https://github.com/json-schema-org/JSON-Schema-Test-Suite/compare/ab3924a663d2f9e6de844f464d185a70d881b9ed...cda4281c46226b980cbf9db4610f03d9f718e533

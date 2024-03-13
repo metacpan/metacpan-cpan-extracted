@@ -13,7 +13,7 @@ our @EXPORT = qw(
 	string_between_ok
 	);
 
-our $VERSION = '1.245';
+our $VERSION = '1.246';
 
 use Scalar::Util;
 use Test::Builder;
@@ -102,9 +102,10 @@ Ok if the scalar is a dualvar.
 
 How do I test this?
 
-sub dualvar_ok ($;$)
-	{
-	my $ok   = Scalar::Util::dualvar( $_[0] );
+=cut
+
+sub dualvar_ok ($;$) {
+	my $ok   = Scalar::Util::isdual( $_[0] );
 	my $name = $_[1] || 'Scalar is a dualvar';
 
 	$Test->ok( $ok, $name );
@@ -112,8 +113,6 @@ sub dualvar_ok ($;$)
 	$Test->diag("Expected a dualvar, didn't get it\n")
 		unless $ok;
 	}
-
-=cut
 
 =item greater_than( SCALAR, BOUND )
 

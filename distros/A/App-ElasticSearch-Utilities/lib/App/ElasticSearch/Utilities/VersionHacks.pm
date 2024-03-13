@@ -5,7 +5,7 @@ use v5.16;
 use warnings;
 use version;
 
-our $VERSION = '8.7'; # VERSION
+our $VERSION = '8.8'; # VERSION
 
 use Const::Fast;
 use CLI::Helpers qw(:all);
@@ -183,7 +183,7 @@ App::ElasticSearch::Utilities::VersionHacks - Fix version issues to support all 
 
 =head1 VERSION
 
-version 8.7
+version 8.8
 
 =head1 AUTHOR
 
@@ -191,7 +191,7 @@ Brad Lhotsky <brad@divisionbyzero.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023 by Brad Lhotsky.
+This software is Copyright (c) 2024 by Brad Lhotsky.
 
 This is free software, licensed under:
 

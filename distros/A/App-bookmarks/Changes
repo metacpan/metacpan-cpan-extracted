@@ -1,5 +1,8 @@
 Revision history for App-bookmarks
 
+0.34    2024-03-09
+        - added netscape support
+
 0.33    2022-12-09
         - fixed utf8 in stdout and firefox
         - fixed bug in POD (wrong repo URL)

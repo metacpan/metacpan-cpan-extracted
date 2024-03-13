@@ -1,19 +1,37 @@
-# This -*-perl-*- program writes the Makefile for installing this distribution.
-#
-# See "perldoc perlmodinstall" or "perldoc ExtUtils::MakeMaker" for
-# info on how to control how the installation goes.
+package main;
 
-require 5.004;
+use 5.010;
+
 use strict;
-use ExtUtils::MakeMaker;
 
-WriteMakefile(
-    NAME            => 'HTML::Tagset',
-    AUTHOR          => 'Andy Lester <andy@petdance.com>',
-    VERSION_FROM    => 'Tagset.pm', # finds $VERSION
-    ABSTRACT_FROM   => 'Tagset.pm', # retrieve abstract from module
-    PMLIBDIRS       => [qw(lib/)],
+use ExtUtils::MakeMaker 6.46;
+
+my %parms = (
+    NAME             => 'HTML::Tagset',
+    AUTHOR           => 'Andy Lester <andy@petdance.com>',
+    ABSTRACT         => 'Data tables useful in parsing HTML',
+    VERSION_FROM     => 'lib/HTML/Tagset.pm',
+    LICENSE          => 'artistic_2',
+    MIN_PERL_VERSION => 5.010001,
+    CONFIGURE_REQUIRES => {
+        'ExtUtils::MakeMaker' => '6.46',
+    },
+    BUILD_REQUIRES => {
+        'ExtUtils::MakeMaker' => '6.46',
+    },
+    TEST_REQUIRES    => {
+        'Test::More' => '0.95',
+    },
+    META_MERGE       => {
+        resources => {
+            license     => 'https://opensource.org/licenses/artistic-license-2.0',
+            homepage    => 'https://github.com/petdance/html-tagset',
+            bugtracker  => 'https://github.com/petdance/html-tagset/issues',
+            repository  => 'https://github.com/petdance/html-tagset',
+        }
+    },
     dist            => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean           => { FILES => 'HTML-Tagset-*' },
-
 );
+
+WriteMakefile( %parms );

@@ -3,7 +3,7 @@ package Spreadsheet::ParseXLSX::Cell;
 use strict;
 use warnings;
 
-our $VERSION = '0.33'; # VERSION
+our $VERSION = '0.34'; # VERSION
 
 # ABSTRACT: wrapper class around L<Spreadsheet::ParseExcel::Cell>
 
@@ -12,21 +12,12 @@ use base 'Spreadsheet::ParseExcel::Cell';
 
 
 
-sub DESTROY {
-  my $self = shift;
-
-  #$self->SUPER::DESTROY();
-
-  undef $self->{Sheet}; # break circular dependencies
-}
-
-
 sub is_merged {
   my ($self, $sheet, $row, $col) = @_;
 
   return $self->{Merged} if defined $self->{Merged};
 
-  $sheet //= $self->{Sheet};
+  $sheet //= $Spreadsheet::ParseXLSX::Worksheet::_registry{$self->{Sheet}};
   $row //= $self->{Row};
   $col //= $self->{Col};
 
@@ -49,7 +40,7 @@ Spreadsheet::ParseXLSX::Cell - wrapper class around L<Spreadsheet::ParseExcel::C
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =head1 SYNOPSIS
 

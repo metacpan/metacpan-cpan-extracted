@@ -1,4 +1,18 @@
-/* $VERSION = 0.2 */
+/*
+our $VERSION = '2.1';
+*/
+
+/* Here we have C++ code which calls OpenCV functions related
+   to decoding QR codes, reading and writing images etc.
+   This code must live in its own file, totally independent of
+   XS code. In this way we keep the namespaces happy and avoid
+   clashes with Perl's macros and OpenCV functions/macros.
+   This is a good practice when interfacing Perl with external
+   C/C++ libraries: keep the interface outside of the XS by
+   creating intermediate functions.
+   In XS call the intermediate functions.
+*/
+
 #include <iostream>
 #include <fstream>
 #include <chrono>
@@ -23,10 +37,10 @@ using namespace std::chrono;
 
 void display(Mat &im, Mat &bbox);
 int save_image_with_framed_qrcodes_and_metadata(
-	string &outbase,
+	std::string &outbase,
 	Mat &im,
 	Mat bbox,
-	string text,
+	std::string text,
 	int verbosity
 );
 
@@ -74,15 +88,15 @@ int wechat_qr_decode(
 	// These model files must exist and can be found in opencv src dir under downloads/wechat_qrcode
 	// if one is not found then exception is thrown!
 	Ptr<wechat_qrcode::WeChatQRCode> detector;
-	string Modelsdir(modelsdir);
-	std::vector<string> models = {
+	std::string Modelsdir(modelsdir);
+	std::vector<std::string> models = {
 		Modelsdir+std::string("/detect.prototxt"),
 		Modelsdir+std::string("/detect.caffemodel"),
 		Modelsdir+std::string("/sr.prototxt"),
 		Modelsdir+std::string("/sr.caffemodel")
 	};
 	// check if all model files exist
-	for(string m : models){
+	for(std::string m : models){
 		if( verbosity > 0 ){ fprintf(stdout, "wechat_qr_decode() : checking model '%s' ... ", m.c_str()); }
 		if( access( m.c_str(), F_OK ) == -1 ){
 			if( verbosity > 0 ){ fprintf(stdout, "failed.\n"); }
@@ -95,9 +109,9 @@ int wechat_qr_decode(
 	try {
 		detector = makePtr<wechat_qrcode::WeChatQRCode>(models[0], models[1], models[2], models[3]);
 	} catch(Exception ex){
-		cerr << "Exception caught: " << ex.what() << endl;
-		cerr << "I have checked that the models exist and are accessible but do make sure:" << endl;
-		for(string m : models){ cerr << "  '" << m << "'." << endl; }
+		std::cerr << "Exception caught: " << ex.what() << std::endl;
+		std::cerr << "I have checked that the models exist and are accessible but do make sure:" << std::endl;
+		for(std::string m : models){ std::cerr << "  '" << m << "'." << std::endl; }
 		return 1;
 	}
 	if( verbosity > 0 ){ fprintf(stdout, "wechat_qr_decode() : created detector successfully.\n"); }
@@ -113,12 +127,12 @@ int wechat_qr_decode(
 	auto start = high_resolution_clock::now();
 	// Detect and decode.
 	if( verbosity > 0 ){ fprintf(stdout, "wechat_qr_decode() : starting detection ...\n"); }
-	vector<string> res = detector->detectAndDecode(img, points);
+	vector<std::string> res = detector->detectAndDecode(img, points);
 	// End time.
 	auto stop = high_resolution_clock::now();
 	// Time taken in milliseconds.
 	auto duration = duration_cast<milliseconds>(stop - start);
-	if( verbosity > 0 ){ cout << "wechat_qr_decode() : done in " << duration.count() << " mseconds. Found " << res.size() << " code(s)." << endl; }
+	if( verbosity > 0 ){ std::cout << "wechat_qr_decode() : done in " << duration.count() << " mseconds. Found " << res.size() << " code(s)." << std::endl; }
 
 	if( res.size() != points.size() ){ fprintf(stderr, "wechat_qr_decode() : error, number of results (payloads, %zu) is not the same as the number of bounding-boxes (%zu).\n", res.size(), points.size()); return 1; }
 	bool have_outfile = false;
@@ -127,8 +141,8 @@ int wechat_qr_decode(
 		int cdi;
 		fstream outfh;
 		if( outbasename != NULL ){
-			string outfilename(outbasename);
-			outfilename += ".txt";
+			std::string outfilename(outbasename);
+			outfilename += ".xml";
 			outfh.open(outfilename, ios::out);
 			if( ! outfh ){
 				fprintf(stderr, "wechat_qr_decode() : error opening output file '%s', I will use stdout : %s\n", outfilename, strerror(errno));
@@ -143,8 +157,11 @@ int wechat_qr_decode(
 			if( (*_bboxes=bboxes=(float **)malloc(res.size()*sizeof(float *))) == NULL ){ fprintf(stderr, "wechat_qr_decode() : error, failed to allocate %zu bytes for returned bboxes.\n", res.size()*sizeof(float *)); return 1; }
 			if( verbosity > 0 ){ fprintf(stdout, "wechat_qr_decode() : allocated %zu bbox(es) for returning back results ...\n", res.size()); }
 		}
+		if( have_outfile ){
+			outfh << "<qrcodes>\n";
+		}
 		for(i=0;i<res.size();i++){
-			string value = res[i];
+			std::string value = res[i];
 			if( verbosity > 0 ){ fprintf(stdout, "wechat_qr_decode() : detected code %d/%d : %s\n", i+1, res.size(), value.c_str()); }
 			if( *_payloads != NULL ){
 				// allocate for the payload plus terminating \0
@@ -155,29 +172,36 @@ int wechat_qr_decode(
 			}
 			if( *_bboxes != NULL ){
 				// allocate 8 floats for each bbox
-				if( (bboxes[i]=(float *)malloc(8*sizeof(float))) == NULL ){ fprintf(stderr, "wechat_qr_decode() : error, failed to allocate %zu bytes for bbox %d/%d: ", 8*sizeof(float), i+1, res.size()); cerr << points[i] << endl; return 1; }
-				if( verbosity > 0 ){ fprintf(stdout, "wechat_qr_decode() : allocated %zu bytes for %d/%d bbox (length: %zu): ", 8*sizeof(float), i+1, res.size()); cout << points[i] << endl; }
+				if( (bboxes[i]=(float *)malloc(8*sizeof(float))) == NULL ){ fprintf(stderr, "wechat_qr_decode() : error, failed to allocate %zu bytes for bbox %d/%d: ", 8*sizeof(float), i+1, res.size()); std::cerr << points[i] << std::endl; return 1; }
+				if( verbosity > 0 ){ fprintf(stdout, "wechat_qr_decode() : allocated %zu bytes for %d/%d bbox (length: %zu): ", 8*sizeof(float), i+1, res.size()); std::cout << points[i] << std::endl; }
 				for(j=0;j<8;j++) bboxes[i][j] = points[i].at<float>(j);
-				if( verbosity > 0 ){ fprintf(stdout, "wechat_qr_decode() : copied bbox %d/%d into results: ", i+1, res.size()); cout << points[i] << endl; }
+				if( verbosity > 0 ){ fprintf(stdout, "wechat_qr_decode() : copied bbox %d/%d into results: ", i+1, res.size()); std::cout << points[i] << std::endl; }
 			}
 			// print them payloads to file if we have one
 			if( have_outfile ){
-				outfh << value << endl;
+				outfh << "  <qrcode>\n    <payload>" << value << "</payload>\n    <boundingbox>";
+				for(j=0;j<8;j+=2){
+					outfh << "[" << bboxes[i][j] << ", " << bboxes[i][j+1] << "]";
+					if( j < 5 ){ outfh << ", "; }
+				};
+				outfh << "</boundingbox>\n  </qrcode>\n";
 			} else {
-				cout  << value << endl;
+				std::cout  << value << std::endl;
 			}
-			if( verbosity > 0 ){ cout << "wechat_qr_decode() : these are the bounding boxes for above payload:" << points[i] << endl; }
+			if( verbosity > 0 ){ std::cout << "wechat_qr_decode() : these are the bounding boxes for above payload:" << points[i] << std::endl; }
 		}
 
-		if( have_outfile ) outfh.close();
-
+		if( have_outfile ){
+			outfh << "</qrcodes>\n"; 
+			outfh.close();
+		}
 		if( payloads_sz != NULL ) *payloads_sz = (size_t )(res.size());
 
 		if( (dumpqrimagestofile > 0) && (outbasename!=NULL) ){
-			string ob(outbasename);
+			std::string ob(outbasename);
 			ob += ".";
 			for(i=0;i<res.size();i++){
-				string ob(outbasename);
+				std::string ob(outbasename);
 				ob.append(".").append(std::to_string(i));
 				cv::Mat newimg = img.clone();
 				if( save_image_with_framed_qrcodes_and_metadata(
@@ -199,9 +223,9 @@ int wechat_qr_decode(
 					for(j=0;j<points[i].size().height;j++){
 						matBbox.push_back(points[i].row(j));
 					}
-					cout << "Time taken : "  << duration.count() <<
-					    " milliseconds" << endl;
-					cout << matBbox << endl;
+					std::cout << "Time taken : "  << duration.count() <<
+					    " milliseconds" << std::endl;
+					std::cout << matBbox << std::endl;
 					// Display bounding box. 
 					display(img2, matBbox);
 				}
@@ -218,29 +242,48 @@ int wechat_qr_decode(
 }
 
 int save_image_with_framed_qrcodes_and_metadata(
-	string &outbase,
+	std::string &outbase,
 	Mat &im,
 	Mat bbox,
-	string text,
+	std::string text,
 	int verbosity
 ){
 	int n = bbox.rows;
 	for(int i=0;i<n;i++){
-	      line(im, Point2i(bbox.at<float>(i,0), bbox.at<float>(i,1)), 
-		     Point2i( bbox.at<float>((i+1) % n,0), 
-		 bbox.at<float>((i+1) % n,1)), Scalar(0,255,0), 3);
+		line(im, Point2i(
+				bbox.at<float>(i,0),
+				bbox.at<float>(i,1)
+			 ), 
+			 Point2i(
+				bbox.at<float>((i+1)%n,0), 
+				bbox.at<float>((i+1)%n,1)
+			),
+			Scalar(0,255,0),
+			3
+		);
 	}
-	string outfile(outbase);
-	outfile += ".png";
+	std::string bboxstr("<boundingbox>");
+	for(int i=0;i<n;i++){
+		bboxstr.append("[")
+			.append(std::to_string(bbox.at<float>(i,0)))
+			.append(", ")
+			.append(std::to_string(bbox.at<float>(i,1)))
+			.append("], ")
+		;
+	}
+	bboxstr = bboxstr.substr(0, bboxstr.size()-2);
+
+	std::string outfile(outbase);
+	outfile += ".jpg";
 	if( ! imwrite(outfile, im) ){ fprintf(stderr, "save_image_with_framed_qrcodes_and_metadata() : failed to save image to '%s'.\n", outbase.c_str()); return 1; }
 	if( verbosity > 0 ){ fprintf(stdout, "save_image_with_framed_qrcodes_and_metadata() : saved qr-code area to image '%s'.\n", outfile.c_str()); }
 
-	string outfile2(outbase);
-	outfile2 += ".txt";
+	std::string outfile2(outbase);
+	outfile2 += ".xml";
 	fstream outfh;
 	outfh.open(outfile2, ios::out);
 	if( ! outfh ){ fprintf(stderr, "save_image_with_framed_qrcodes_and_metadata() : error opening output file '%s', for writing detected qr-code metadata: %s\n", outfile2, strerror(errno)); return 1; }
-	outfh << "payload: " << text << endl << "boundingbox: " << bbox << endl;
+	outfh << "<qrcode>\n  <payload>" << text << "</payload>\n  <boundingbox>" << bboxstr << "</boundingbox>\n</qrcode>\n";
 	outfh.close();
 	if( verbosity > 0 ){ fprintf(stdout, "save_image_with_framed_qrcodes_and_metadata() : saved qr-code metadata as text to file '%s'.\n", outfile.c_str()); }
 	return 0;
@@ -256,7 +299,7 @@ void display(Mat &im, Mat &bbox){
 		 bbox.at<float>((i+1) % n,1)), Scalar(0,255,0), 3);
 	}
 	imshow("Image", im);
-	cout << "display() : press a key to continue ..." << endl;
+	std::cout << "display() : press a key to continue ..." << std::endl;
 	waitKey(0);
 #else
 	fprintf(stderr, "display() : opencv was not compiled with highgui, can not display images. No worries, just save them to file.\n");

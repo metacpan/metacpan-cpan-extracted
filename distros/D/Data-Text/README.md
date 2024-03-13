@@ -4,7 +4,7 @@ Data::Text - Class to handle text in an OO way
 
 # VERSION
 
-Version 0.12
+Version 0.13
 
 # SYNOPSIS
 
@@ -90,6 +90,19 @@ Replaces words.
     $dt->replace({ 'Hello' => 'Goodbye dear' });
     print $dt->as_string(), "\n";       # Outputs "Goodbye dear world"
 
+## appendconjunction
+
+Add a list as a conjunction.  See [Lingua::Conjunction](https://metacpan.org/pod/Lingua%3A%3AConjunction)
+Because of the way Data::Text works with quoting,
+this code works
+
+    my $d1 = Data::Text->new();
+    my $d2 = Data::Text->new('a');
+    my $d3 = Data::Text->new('b');
+
+    # Prints "a and b\n"
+    print $d1->appendconjunction($d2, $d3)->append("\n");
+
 # AUTHOR
 
 Nigel Horne, `<njh at bandsman.co.uk>`
@@ -120,16 +133,12 @@ You can also look for information at:
 
     [http://matrix.cpantesters.org/?dist=Data-Text](http://matrix.cpantesters.org/?dist=Data-Text)
 
-- CPAN Ratings
-
-    [http://cpanratings.perl.org/d/Data-Text](http://cpanratings.perl.org/d/Data-Text)
-
 - CPAN Testers Dependencies
 
     [http://deps.cpantesters.org/?module=Data::Text](http://deps.cpantesters.org/?module=Data::Text)
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2021-2022 Nigel Horne.
+Copyright 2021-2024 Nigel Horne.
 
 This program is released under the following licence: GPL2

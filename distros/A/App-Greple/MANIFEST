@@ -41,6 +41,7 @@ t/13_max.t
 t/14_no_color.t
 t/15_encoding.t
 t/16_callback.t
+t/17_style.t
 t/Checker.pm
 t/JA.txt
 t/SAMPLE.txt

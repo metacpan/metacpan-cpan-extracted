@@ -489,7 +489,7 @@ sub load_all {
 
     #note( "Loading $doc\n" );
     $docs->{$doc} = {
-      lines => read_lines( $doc, binmode => ':raw', array_ref => 1 ),
+      lines => read_lines( $doc, ':raw', array_ref => 1 ),
       dirty => 0,
     };
     $docs->{$doc}{type} = guess_type( $doc, $docs->{$doc} );

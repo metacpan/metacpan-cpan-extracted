@@ -5,11 +5,11 @@ package Qhull::Util;
 use v5.26;
 use strict;
 use warnings;
-use experimental 'signatures', 'lexical_subs', 'declared_refs';
+use experimental 'signatures', 'lexical_subs', 'declared_refs', 'refaliasing';
 use Ref::Util qw( is_arrayref is_hashref );
 use Log::Any '$log';
 
-our $VERSION = '0.02';
+our $VERSION = '0.05';
 
 use Qhull::Util::Options ':all';
 
@@ -431,7 +431,7 @@ Qhull::Util - Various bits and pieces
 
 =head1 VERSION
 
-version 0.02
+version 0.05
 
 =head1 SYNOPSIS
 

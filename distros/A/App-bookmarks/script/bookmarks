@@ -11,6 +11,7 @@
 # - Firefox (*.sqlite)
 # - Chrome and Edge (*Bookmarks)
 # - Internet Explorer (*Favorites)
+# - Netscape (*.html)
 # - Markdown (*.md)
 # - Gemini (*.gmi)
 # - Surfraw (same as plain text)
@@ -20,9 +21,9 @@
 #
 # - <title> is your bookmark's name, alias, or webpage title.
 # - <url> is your bookmark's address, URL or URI.
-# - <description> is empty for Chrome, Edge, Internet Explorer or Gemini. It 
-#   contains Safari 'Description', Firefox 'Tags' and what the Markdown spec
-#   calls the 'Title' (just the tooltip, actually).
+# - <description> is empty for Chrome, Edge, Internet Explorer, Netscape or
+#   Gemini. It contains Safari 'Description', Firefox 'Tags' and what the
+#   Markdown spec calls the 'Title' (just the tooltip, actually).
 # 
 # Markdown, Gemini and plain text files are processed line by line (as UTF-8) :
 #
@@ -40,6 +41,7 @@
 #
 # TODO :
 #
+# 2024.03.09 v0.34 jul : added support for netscape
 # 2022.12.22 v0.33 jul : fixed utf8 in stdout and firefox
 #                        fixed bug in POD (wrong repo URL)
 #                        doc arg "-" stdin as txt
@@ -81,7 +83,7 @@ use File::Copy qw(copy);
 use open qw(:std :encoding(UTF-8));
 use Encode qw(decode_utf8);
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 my $program  = basename($0);
 my $usage    = <<EOF;
 
@@ -317,7 +319,7 @@ sub _chrome {
     
         foreach my $i (@$arrayref)
         {
-            $print_bookmark->( $i->{'name'}, $i->{'url'});
+            $print_bookmark->($i->{'name'}, $i->{'url'});
         }
     }
 }
@@ -509,6 +511,38 @@ sub _md {
     }
 }
 
+sub _netscape {
+
+    eval {
+        require Netscape::Bookmarks;
+    };
+    if ($@)
+    {
+        die "to process Netscape files, you need to install module Netscape::Bookmarks\n";
+    }
+
+    my $file = shift // "";
+    warn "\$file: $file\n" if $debug;
+
+	# parse file
+	my $netscape = Netscape::Bookmarks->new($file);
+	die "unable to parse file : $file" if not $netscape->isa('Netscape::Bookmarks::Category');
+
+	my $callback = sub {
+		my ($object, $level) = @_;
+		if ($object->isa('Netscape::Bookmarks::Link'))
+		{
+            my $title       = $object->title;
+			my $url         = $object->href;
+            my $description = undef;
+			
+			$print_bookmark->($title, $url, $description);
+		}
+	};
+
+	$netscape->recurse($callback);
+}
+
 
 ############
 # RUN LOOP #
@@ -524,6 +558,7 @@ foreach my $file (@ARGV)
     elsif (-d $file and $name =~ /Favorites$/) { _iexplorer($file); }
     elsif (-f $file and $name =~ /\.md$/)      { _md($file);        }
     elsif (-f $file and $name =~ /\.gmi$/)     { _gemini($file);    }
+    elsif (-f $file and $name =~ /\.html$/)     { _netscape($file);  }
     elsif (-f $file )                          { _txt($file);       } 
     elsif ( $file eq '-' )                     { _txt($file);       }
     else  { die "unable to process file : $file"; }
@@ -566,6 +601,8 @@ sources are supported :
 
 =item - Internet Explorer (*Favorites)
 
+=item - Netscape (*.html)
+
 =item - Markdown (*.md)
 
 =item - Gemini (*.gmi)
@@ -584,9 +621,9 @@ Default export format : <title> <url> <description>
 
 =item - <url> is your bookmark's address, URL or URI.
 
-=item - <description> is empty for Chrome, Edge, Internet Explorer or Gemini. It 
-        contains Safari 'Description', Firefox 'Tags' and what the Markdown spec
-        calls the 'Title' (just the tooltip, actually).
+=item - <description> is empty for Chrome, Edge, Internet Explorer, Netscape
+        or Gemini. It contains Safari 'Description', Firefox 'Tags' and what
+        the Markdown spec calls the 'Title' (just the tooltip, actually).
 
 =back
 

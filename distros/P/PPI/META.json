@@ -4,7 +4,7 @@
       "Adam Kennedy <adamk@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -24,10 +24,14 @@
             "Dist::Zilla::PluginBundle::Git::VersionManager" : "0.007"
          },
          "requires" : {
+            "Devel::Confess" : "0",
             "Encode" : "0",
             "File::Spec" : "0",
+            "IO::All" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
+            "MetaCPAN::Client" : "0",
+            "Test2::V0" : "0",
             "Test::CPAN::Meta" : "0",
             "Test::ClassAPI" : "0",
             "Test::DependentModules" : "0",
@@ -38,6 +42,8 @@
             "Test::Pod::No404s" : "0",
             "Test::Portability::Files" : "0",
             "lib" : "0",
+            "perl" : "5.010",
+            "strictures" : "2",
             "warnings" : "0"
          }
       },
@@ -88,367 +94,367 @@
    "provides" : {
       "PPI" : {
          "file" : "lib/PPI.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Cache" : {
          "file" : "lib/PPI/Cache.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Document" : {
          "file" : "lib/PPI/Document.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Document::File" : {
          "file" : "lib/PPI/Document/File.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Document::Fragment" : {
          "file" : "lib/PPI/Document/Fragment.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Document::Normalized" : {
          "file" : "lib/PPI/Document/Normalized.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Dumper" : {
          "file" : "lib/PPI/Dumper.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Element" : {
          "file" : "lib/PPI/Element.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Exception" : {
          "file" : "lib/PPI/Exception.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Exception::ParserRejection" : {
          "file" : "lib/PPI/Exception/ParserRejection.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Find" : {
          "file" : "lib/PPI/Find.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Lexer" : {
          "file" : "lib/PPI/Lexer.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Node" : {
          "file" : "lib/PPI/Node.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Normal" : {
          "file" : "lib/PPI/Normal.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Normal::Standard" : {
          "file" : "lib/PPI/Normal/Standard.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Singletons" : {
          "file" : "lib/PPI/Singletons.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Statement" : {
          "file" : "lib/PPI/Statement.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Statement::Break" : {
          "file" : "lib/PPI/Statement/Break.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Statement::Compound" : {
          "file" : "lib/PPI/Statement/Compound.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Statement::Data" : {
          "file" : "lib/PPI/Statement/Data.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Statement::End" : {
          "file" : "lib/PPI/Statement/End.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Statement::Expression" : {
          "file" : "lib/PPI/Statement/Expression.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Statement::Given" : {
          "file" : "lib/PPI/Statement/Given.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Statement::Include" : {
          "file" : "lib/PPI/Statement/Include.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Statement::Include::Perl6" : {
          "file" : "lib/PPI/Statement/Include/Perl6.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Statement::Null" : {
          "file" : "lib/PPI/Statement/Null.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Statement::Package" : {
          "file" : "lib/PPI/Statement/Package.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Statement::Scheduled" : {
          "file" : "lib/PPI/Statement/Scheduled.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Statement::Sub" : {
          "file" : "lib/PPI/Statement/Sub.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Statement::Unknown" : {
          "file" : "lib/PPI/Statement/Unknown.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Statement::UnmatchedBrace" : {
          "file" : "lib/PPI/Statement/UnmatchedBrace.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Statement::Variable" : {
          "file" : "lib/PPI/Statement/Variable.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Statement::When" : {
          "file" : "lib/PPI/Statement/When.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Structure" : {
          "file" : "lib/PPI/Structure.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Structure::Block" : {
          "file" : "lib/PPI/Structure/Block.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Structure::Condition" : {
          "file" : "lib/PPI/Structure/Condition.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Structure::Constructor" : {
          "file" : "lib/PPI/Structure/Constructor.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Structure::For" : {
          "file" : "lib/PPI/Structure/For.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Structure::Given" : {
          "file" : "lib/PPI/Structure/Given.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Structure::List" : {
          "file" : "lib/PPI/Structure/List.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Structure::Subscript" : {
          "file" : "lib/PPI/Structure/Subscript.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Structure::Unknown" : {
          "file" : "lib/PPI/Structure/Unknown.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Structure::When" : {
          "file" : "lib/PPI/Structure/When.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Token" : {
          "file" : "lib/PPI/Token.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Token::ArrayIndex" : {
          "file" : "lib/PPI/Token/ArrayIndex.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Token::Attribute" : {
          "file" : "lib/PPI/Token/Attribute.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Token::BOM" : {
          "file" : "lib/PPI/Token/BOM.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Token::Cast" : {
          "file" : "lib/PPI/Token/Cast.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Token::Comment" : {
          "file" : "lib/PPI/Token/Comment.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Token::DashedWord" : {
          "file" : "lib/PPI/Token/DashedWord.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Token::Data" : {
          "file" : "lib/PPI/Token/Data.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Token::End" : {
          "file" : "lib/PPI/Token/End.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Token::HereDoc" : {
          "file" : "lib/PPI/Token/HereDoc.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Token::Label" : {
          "file" : "lib/PPI/Token/Label.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Token::Magic" : {
          "file" : "lib/PPI/Token/Magic.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Token::Number" : {
          "file" : "lib/PPI/Token/Number.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Token::Number::Binary" : {
          "file" : "lib/PPI/Token/Number/Binary.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Token::Number::Exp" : {
          "file" : "lib/PPI/Token/Number/Exp.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Token::Number::Float" : {
          "file" : "lib/PPI/Token/Number/Float.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Token::Number::Hex" : {
          "file" : "lib/PPI/Token/Number/Hex.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Token::Number::Octal" : {
          "file" : "lib/PPI/Token/Number/Octal.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Token::Number::Version" : {
          "file" : "lib/PPI/Token/Number/Version.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Token::Operator" : {
          "file" : "lib/PPI/Token/Operator.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Token::Pod" : {
          "file" : "lib/PPI/Token/Pod.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Token::Prototype" : {
          "file" : "lib/PPI/Token/Prototype.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Token::Quote" : {
          "file" : "lib/PPI/Token/Quote.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Token::Quote::Double" : {
          "file" : "lib/PPI/Token/Quote/Double.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Token::Quote::Interpolate" : {
          "file" : "lib/PPI/Token/Quote/Interpolate.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Token::Quote::Literal" : {
          "file" : "lib/PPI/Token/Quote/Literal.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Token::Quote::Single" : {
          "file" : "lib/PPI/Token/Quote/Single.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Token::QuoteLike" : {
          "file" : "lib/PPI/Token/QuoteLike.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Token::QuoteLike::Backtick" : {
          "file" : "lib/PPI/Token/QuoteLike/Backtick.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Token::QuoteLike::Command" : {
          "file" : "lib/PPI/Token/QuoteLike/Command.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Token::QuoteLike::Readline" : {
          "file" : "lib/PPI/Token/QuoteLike/Readline.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Token::QuoteLike::Regexp" : {
          "file" : "lib/PPI/Token/QuoteLike/Regexp.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Token::QuoteLike::Words" : {
          "file" : "lib/PPI/Token/QuoteLike/Words.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Token::Regexp" : {
          "file" : "lib/PPI/Token/Regexp.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Token::Regexp::Match" : {
          "file" : "lib/PPI/Token/Regexp/Match.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Token::Regexp::Substitute" : {
          "file" : "lib/PPI/Token/Regexp/Substitute.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Token::Regexp::Transliterate" : {
          "file" : "lib/PPI/Token/Regexp/Transliterate.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Token::Separator" : {
          "file" : "lib/PPI/Token/Separator.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Token::Structure" : {
          "file" : "lib/PPI/Token/Structure.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Token::Symbol" : {
          "file" : "lib/PPI/Token/Symbol.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Token::Unknown" : {
          "file" : "lib/PPI/Token/Unknown.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Token::Whitespace" : {
          "file" : "lib/PPI/Token/Whitespace.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Token::Word" : {
          "file" : "lib/PPI/Token/Word.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Tokenizer" : {
          "file" : "lib/PPI/Tokenizer.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Transform" : {
          "file" : "lib/PPI/Transform.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Transform::UpdateCopyright" : {
          "file" : "lib/PPI/Transform/UpdateCopyright.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::Util" : {
          "file" : "lib/PPI/Util.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       },
       "PPI::XSAccessor" : {
          "file" : "lib/PPI/XSAccessor.pm",
-         "version" : "1.277"
+         "version" : "1.278"
       }
    },
    "release_status" : "stable",
@@ -461,26 +467,26 @@
          "url" : "https://github.com/Perl-Critic/PPI"
       }
    },
-   "version" : "1.277",
+   "version" : "1.278",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.032001"
+         "version" : "5.034000"
       },
       "plugins" : [
          {
             "class" : "Dist::Zilla::Plugin::MetaResources",
             "name" : "MetaResources",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::Encoding",
             "name" : "Encoding",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::AutoPrereqs",
             "name" : "AutoPrereqs",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -491,7 +497,7 @@
                }
             },
             "name" : "Prereqs",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -502,7 +508,7 @@
                }
             },
             "name" : "TestRequires",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::DynamicPrereqs",
@@ -523,7 +529,6 @@
                      "README.pod"
                   ],
                   "exclude_match" : [],
-                  "follow_symlinks" : 0,
                   "include_dotfiles" : 0,
                   "prefix" : "",
                   "prune_directory" : [],
@@ -534,47 +539,47 @@
                }
             },
             "name" : "Git::GatherDir",
-            "version" : "2.048"
+            "version" : "2.049"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaYAML",
             "name" : "MetaYAML",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
             "name" : "MetaJSON",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::Readme",
             "name" : "Readme",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::Manifest",
             "name" : "Manifest",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::License",
             "name" : "License",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::MakeMaker",
             "config" : {
                "Dist::Zilla::Role::TestRunner" : {
-                  "default_jobs" : 1
+                  "default_jobs" : "8"
                }
             },
             "name" : "MakeMaker",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::CPANFile",
             "name" : "CPANFile",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Compile",
@@ -602,7 +607,7 @@
          {
             "class" : "Dist::Zilla::Plugin::MetaTests",
             "name" : "MetaTests",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::ChangesHasContent",
@@ -612,7 +617,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
             "name" : "PodSyntaxTests",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Pod::No404s",
@@ -658,7 +663,7 @@
                      {
                         "class" : "Dist::Zilla::Plugin::FinderCode",
                         "name" : "MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-                        "version" : "6.030"
+                        "version" : "6.031"
                      }
                   ],
                   "include_underscores" : 0
@@ -680,7 +685,7 @@
          {
             "class" : "Dist::Zilla::Plugin::MetaConfig",
             "name" : "MetaConfig",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::Keywords",
@@ -696,7 +701,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.39.0",
+                  "git_version" : "2.34.1",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -710,7 +715,7 @@
             "class" : "Dist::Zilla::Plugin::RunExtraTests",
             "config" : {
                "Dist::Zilla::Role::TestRunner" : {
-                  "default_jobs" : 1
+                  "default_jobs" : "8"
                }
             },
             "name" : "RunExtraTests",
@@ -731,18 +736,18 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.39.0",
+                  "git_version" : "2.34.1",
                   "repo_root" : "."
                }
             },
             "name" : "initial check",
-            "version" : "2.048"
+            "version" : "2.049"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.39.0",
+                  "git_version" : "2.34.1",
                   "repo_root" : "."
                }
             },
@@ -753,7 +758,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.39.0",
+                  "git_version" : "2.34.1",
                   "repo_root" : "."
                }
             },
@@ -763,12 +768,12 @@
          {
             "class" : "Dist::Zilla::Plugin::CheckPrereqsIndexed",
             "name" : "CheckPrereqsIndexed",
-            "version" : "0.020"
+            "version" : "0.022"
          },
          {
             "class" : "Dist::Zilla::Plugin::TestRelease",
             "name" : "TestRelease",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Check",
@@ -785,17 +790,17 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.39.0",
+                  "git_version" : "2.34.1",
                   "repo_root" : "."
                }
             },
             "name" : "after tests",
-            "version" : "2.048"
+            "version" : "2.049"
          },
          {
             "class" : "Dist::Zilla::Plugin::UploadToCPAN",
             "name" : "UploadToCPAN",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -806,7 +811,7 @@
                }
             },
             "name" : "@Git::VersionManager/pluginbundle version",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::RewriteVersion::Transitional",
@@ -861,7 +866,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.39.0",
+                  "git_version" : "2.34.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -869,7 +874,7 @@
                }
             },
             "name" : "@Git::VersionManager/release snapshot",
-            "version" : "2.048"
+            "version" : "2.049"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Tag",
@@ -878,12 +883,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v1.277",
+                  "tag" : "v1.278",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v%t"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.39.0",
+                  "git_version" : "2.34.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -891,7 +896,7 @@
                }
             },
             "name" : "@Git::VersionManager/Git::Tag",
-            "version" : "2.048"
+            "version" : "2.049"
          },
          {
             "class" : "Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional",
@@ -912,7 +917,7 @@
          {
             "class" : "Dist::Zilla::Plugin::NextRelease",
             "name" : "@Git::VersionManager/NextRelease",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Commit",
@@ -934,7 +939,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.39.0",
+                  "git_version" : "2.34.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -942,7 +947,7 @@
                }
             },
             "name" : "@Git::VersionManager/post-release commit",
-            "version" : "2.048"
+            "version" : "2.049"
          },
          {
             "class" : "Dist::Zilla::Plugin::ReadmeAnyFromPod",
@@ -964,72 +969,72 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.39.0",
+                  "git_version" : "2.34.1",
                   "repo_root" : "."
                }
             },
             "name" : "Git::Push",
-            "version" : "2.048"
+            "version" : "2.049"
          },
          {
             "class" : "Dist::Zilla::Plugin::ConfirmRelease",
             "name" : "ConfirmRelease",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":InstallModules",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":IncModules",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":TestFiles",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExtraTestFiles",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExecFiles",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":PerlExecFiles",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ShareFiles",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":MainModule",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":AllFiles",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":NoFiles",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : "MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-            "version" : "6.030"
+            "version" : "6.031"
          }
       ],
       "zilla" : {
@@ -1037,7 +1042,7 @@
          "config" : {
             "is_trial" : 0
          },
-         "version" : "6.030"
+         "version" : "6.031"
       }
    },
    "x_contributors" : [
@@ -1045,11 +1050,13 @@
       "Andy Lester <andy@petdance.com>",
       "Arnout Pierre <pierre.arnout@fraudbuster.mobi>",
       "bowtie <bowtie@cpan.org>",
+      "Branislav Zahradn\u00edk <happy.barney@gmail.com>",
       "brian d foy <brian.f.foy@gmail.com>",
       "Chas. J. Owens IV <chas.owens@gmail.com>",
       "Chris Capaci <chris.capaci@gmail.com>",
       "Chris Dolan <chris+github@chrisdolan.net>",
       "Christian Walde <walde.christian@gmail.com>",
+      "Christian Walde <walde@united-domains.de>",
       "Colin Newell <c.newell@cv-library.co.uk>",
       "Damyan Ivanov <dam@modsoftsys.com>",
       "Dan Book <grinnz@grinnz.com>",
@@ -1089,8 +1096,8 @@
       "Van de Bugger <van.de.bugger@gmail.com>",
       "Will Braswell <william.braswell@autoparallel.com>"
    ],
-   "x_generated_by_perl" : "v5.32.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

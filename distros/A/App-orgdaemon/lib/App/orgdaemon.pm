@@ -3,7 +3,7 @@
 #
 # Author: Slaven Rezic
 #
-# Copyright (C) 2016,2017,2021 Slaven Rezic. All rights reserved.
+# Copyright (C) 2016,2017,2021,2024 Slaven Rezic. All rights reserved.
 # This package is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -14,7 +14,7 @@
 package App::orgdaemon;
 
 use strict;
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 
 1;
 

@@ -54,9 +54,21 @@ Revision history for Image-DecodeQR-WeChat
 	PROTOTYPE: @ (without this, xsubp produces a '$$$$$$' prototype).
 	Added a test case to test this.
 
-0.10	2024-03-07/14:14
+1.0	2024-03-07/14:14
 	Added 'META_MERGE' key in Makefile.PL
         Modified clean target in Makefile.PL to clean auto-generated .bs and .o files.
         Added dependency 'Test2::Plugin::UTF8' for testing without 'Wide character in print ...' messages
         Test t/20-decode_xs-without-use-utf8.t was judged pointless and was removed -- its job is done by t/10-decode_xs.t.
         Documentation enchancments.
+
+2.0     2024-03-08/23:00
+        Major change: replaced sub names 'decode' with 'detect_and_decode_qr' : reason was that decode() clashes with Encode::decode().
+        Major change: replaced sub names 'decode_xs' with 'detect_and_decode_qr_xs'.
+        Major change: output files are now in XML and JPEG formats.
+        Added more tests.
+        Enhnaced the highgui detection procedure with 2 more methods.
+        Replaced CPAN Ratings link in POD with a link to PerlMonks' Module Review in order to settle issue https://rt.cpan.org/Public/Bug/Display.html?id=147894
+        Documentation enchancments.
+
+2.1     2024-03-12/11:50
+        Documentation fixes.

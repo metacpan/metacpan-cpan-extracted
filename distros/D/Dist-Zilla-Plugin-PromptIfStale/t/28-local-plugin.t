@@ -26,12 +26,6 @@ my @prompts;
     });
 }
 
-{
-    package inc::Foo;
-    use Moose;
-    extends 'Dist::Zilla::Plugin::MakeMaker';
-}
-
 my $tzil = Builder->from_config(
     { dist_root => 'does-not-exist' },
     {
@@ -39,13 +33,15 @@ my $tzil = Builder->from_config(
             path(qw(source dist.ini)) => simple_ini(
                 [ GatherDir => ],
                 [ 'PromptIfStale' => {
+                        check_authordeps => 1,
+                        check_all_prereqs => 1,
                         check_all_plugins => 1,
-                        skip => [ qw(Dist::Zilla::Plugin::GatherDir Dist::Zilla::Plugin::FinderCode Dist::Zilla::Plugin::PromptIfStale) ],
+                        skip => [ qw(Dist::Zilla::Plugin::GatherDir Dist::Zilla::Plugin::FinderCode Dist::Zilla::Plugin::PromptIfStale Software::License::Perl_5 ExtUtils::MakeMaker) ],
                     } ],
-                [ '=inc::Foo' ],
+                [ '=inc::Bar' ],
             ),
             path(qw(source lib Foo.pm)) => "package Foo;\n1;\n",
-            path(qw(source inc Foo.pm)) => "package inc::Foo;\nuse Moose;\nextends 'Dist::Zilla::Plugin::MakeMaker';\n1",
+            path(qw(source inc Bar.pm)) => "package inc::Bar;\nuse Moose;\nextends 'Dist::Zilla::Plugin::MakeMaker';\n1",
         },
         # copy the module to the source directory, because that's where $tzil->build chdirs
         also_copy => { 't/corpus' => 'source/t/lib' },

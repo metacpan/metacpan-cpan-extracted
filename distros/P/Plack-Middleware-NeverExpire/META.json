@@ -53,7 +53,7 @@
          "web" : "https://github.com/ap/Plack-Middleware-NeverExpire"
       }
    },
-   "version" : "1.101",
+   "version" : "1.201",
    "x_copyright" : {
       "holder" : "Aristotle Pagaltzis",
       "year" : 2015

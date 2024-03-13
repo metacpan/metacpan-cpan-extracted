@@ -52,9 +52,8 @@ my %args = (
         web  => "http://github.com/PerlAlien/Alien-pkgconf",
       },
       bugtracker => {
-        web  => 'https://github.com/PerlPkgConfig/perl-PkgConfig/issues',
+        web  => 'https://github.com/PerlAlien/Alien-pkgconf/issues',
       },
-      x_MailingList => "https://groups.google.com/forum/#!forum/perl5-alien",
       x_IRC => "irc://irc.perl.org/#native",
     },
     dynamic_config => 1,
@@ -101,7 +100,7 @@ eval {
   my $status_filename = File::Spec->catfile('_alien', '05stage.json');
   mkdir '_alien' unless -d '_alien';
   open my $fh, '>', $status_filename;
-  print $fh JSON::PP::encode_json({
+  print $fh JSON::PP->new->utf8->canonical->encode({
     cflags       => $cflags,
     libs         => $libs,
     install_type => 'system',

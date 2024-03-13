@@ -42,6 +42,7 @@ sub _groups {
         { name => 'group_database',     text => "- DB Settings"  },
         { name => 'group_extensions',   text => "- Extensions"   },
         { name => 'group_sql_settings', text => "- SQL Settings" },
+        { name => 'group_create',       text => "- Create Table" },
         { name => 'group_output',       text => "- Output"       },
         { name => 'group_import',       text => "- Import"       },
         { name => 'group_export',       text => "- Export"       },
@@ -80,9 +81,12 @@ sub _options {
             { name => 'operators',               text => "- Operators",        section => 'G'      },
             { name => '_alias',                  text => "- Alias",            section => 'alias'  },
             { name => '_sql_identifiers',        text => "- Identifiers",      section => 'G'      },
-            { name => '_view_name_prefix',       text => "- View prefix",      section => 'create' },
-            { name => '_autoincrement_col_name', text => "- Auto increment",   section => 'create' },
-            { name => '_data_type_guessing',     text => "- Guess data types", section => 'create' },
+            { name => '_view_name_prefix',       text => "- View prefix",      section => 'create' }, ##
+        ],
+        group_create => [
+            { name => '_enable_ct_opt',          text => "- Enable options",                     section => 'create' },
+            { name => '_add_ct_fields',          text => "- Add form fields",                    section => 'create' },
+            { name => '_default_ai_column_name', text => "- Default auto increment column name", section => 'create' },
         ],
         group_output => [
             { name => '_binary_filter',    text => "- Binary filter",       section => 'table' },
@@ -137,7 +141,10 @@ sub set_options {
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $groups;
     if ( $arg_group ) {
-        if ( $arg_group eq 'import' ) {
+        if ( $arg_group eq 'create' ) {
+            $groups = [ { name => 'group_create', text => '' } ];
+        }
+        elsif ( $arg_group eq 'import' ) {
             $groups = [ { name => 'group_import', text => '' } ];
         }
         elsif ( $arg_group eq 'export' ) {
@@ -363,19 +370,29 @@ sub set_options {
                 my $prompt = 'Set a view name prefix';
                 $sf->__group_readline( $section, $items, $prompt );
             }
-            elsif ( $opt eq '_autoincrement_col_name' ) {
+            ##### Create table ####
+            elsif ( $opt eq '_enable_ct_opt' ) {
+                my $prompt = 'Activate options';
+                my $sub_menu = [
+                    [ 'option_ai_column_enabled', "- Option 'Auto Increment'", [ $no, $yes ] ],
+                    [ 'data_type_guessing',       "- Data type guessing",      [ $no, $yes ] ],
+                ];
+                $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
+            }
+            elsif ( $opt eq '_add_ct_fields' ) {
+                my $prompt = 'Add fields';
+                my $sub_menu = [
+                    [ 'table_constraint_rows',    "- Table constraint fields", [ 0 .. 9    ] ],
+                    [ 'table_option_rows',        "- Table option fields",     [ 0 .. 9    ] ],
+                ];
+                $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
+            }
+            elsif ( $opt eq '_default_ai_column_name' ) {
                 my $items = [
-                    { name => 'autoincrement_col_name', prompt => "AI column name" },
+                    { name => 'default_ai_column_name', prompt => "Default primary key auto increment column name" },
                 ];
                 my $prompt = 'Set a default auto increment column name';
                 $sf->__group_readline( $section, $items, $prompt );
-            }
-            elsif ( $opt eq '_data_type_guessing' ) {
-                my $prompt = 'Data type guessing';
-                my $sub_menu = [
-                    [ 'data_type_guessing', "- Enable data type guessing", [ $no, $yes ] ]
-                ];
-                $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             ##### Output ####
             elsif ( $opt eq 'min_col_width' ) {

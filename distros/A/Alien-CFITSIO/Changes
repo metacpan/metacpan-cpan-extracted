@@ -1,5 +1,11 @@
 Revision history for Alien-CFITSIO
 
+v4.4.0.2  2024-03-11 10:09:00-04:00 America/New_York
+
+  [BUILD FIX]
+
+    * Alien::patch was not listed as a configure dependency
+
 v4.4.0.1  2024-03-06 12:54:54-05:00 America/New_York
 
   [BUGFIX]

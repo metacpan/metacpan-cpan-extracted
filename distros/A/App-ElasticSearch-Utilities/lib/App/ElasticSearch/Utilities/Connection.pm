@@ -5,7 +5,7 @@ package App::ElasticSearch::Utilities::Connection;
 use v5.16;
 use warnings;
 
-our $VERSION = '8.7'; # VERSION
+our $VERSION = '8.8'; # VERSION
 
 use App::ElasticSearch::Utilities::HTTPRequest;
 use CLI::Helpers qw(:output);
@@ -242,7 +242,7 @@ App::ElasticSearch::Utilities::Connection - Abstract the connection element
 
 =head1 VERSION
 
-version 8.7
+version 8.8
 
 =head1 SYNOPSIS
 
@@ -342,7 +342,7 @@ Brad Lhotsky <brad@divisionbyzero.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023 by Brad Lhotsky.
+This software is Copyright (c) 2024 by Brad Lhotsky.
 
 This is free software, licensed under:
 

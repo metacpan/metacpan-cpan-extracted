@@ -1,3 +1,11 @@
+Changes w/ 6.0.0:
+
+- Lexical::Types dependency for simple type assignment
+
+Changes w/ 5.1.14:
+
+- cpantesters.org Passes on all v5.28 or later
+
 Changes w/ 5.1.5:
 
 - Off-by-one error in tree walker after tweaked tree

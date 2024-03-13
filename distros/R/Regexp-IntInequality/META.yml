@@ -1,0 +1,35 @@
+---
+abstract: 'generate regular expressions to match integers                         greater than / less than / etc. a value'
+author:
+  - 'Hauke D <haukex@zero-g.net>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  JSON::PP: '2.94'
+  Test::More: '1.302096'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Regexp-IntInequality
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Regexp::IntInequality:
+    file: lib/Regexp/IntInequality.pm
+    version: '0.90'
+requires:
+  Carp: '0'
+  Exporter: '5.58'
+  perl: '5.008009'
+resources:
+  bugtracker: https://github.com/haukex/re-int-ineq/issues
+  homepage: https://github.com/haukex/re-int-ineq
+  repository: https://github.com/haukex/re-int-ineq.git
+version: '0.90'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

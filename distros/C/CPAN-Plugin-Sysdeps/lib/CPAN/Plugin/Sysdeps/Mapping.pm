@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.75';
+our $VERSION = '0.76';
 
 # shortcuts
 #  os and distros

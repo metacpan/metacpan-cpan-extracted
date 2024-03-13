@@ -1,4 +1,4 @@
-package EAI::Common 1.911;
+package EAI::Common 1.912;
 
 use strict; use feature 'unicode_strings'; use warnings; no warnings 'uninitialized';
 use Exporter qw(import); use EAI::DateUtil; use Data::Dumper qw(Dumper); use Getopt::Long qw(:config no_ignore_case); use Log::Log4perl qw(get_logger); use MIME::Lite (); use Scalar::Util qw(looks_like_number);
@@ -114,6 +114,7 @@ my %hashCheck = (
 	},
 	File => { # File fetching and parsing specific configs. File{filename} is also used for FTP
 		avoidRenameForRedo => 1, # when redoing, usually the cutoff (datetime/redo info) is removed following a pattern. set this flag to avoid this
+		append => 0, # for EAI::File::writeText: boolean to append (1) or overwrite (0 or undefined) to file given in filename
 		columns => {}, # for EAI::File::writeText: Hash of data fields, that are to be written (in order of keys)
 		columnskip => {}, # for EAI::File::writeText: boolean hash of column names that should be skipped when writing the file ({column1ToSkip => 1, column2ToSkip => 1, ...})
 		countPercent => 0, # percentage of progress in EAI::File::readText where indicator should be output (e.g. 10 for all 10% of progress). progress indicator is disabled if false.

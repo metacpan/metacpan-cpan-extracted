@@ -1,0 +1,5 @@
+#!/bin/sh
+
+if [ "$CIP_TAG" = "5.18" ] || [ "$CIP_TAG" = "5.16" ]; then
+  cip exec cpanm -n ExtUtils::MakeMaker
+fi

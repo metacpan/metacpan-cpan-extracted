@@ -335,6 +335,7 @@ open(DIFF, $DIFF) || die "$DIFF: $!\n";
 binmode DIFF, ":encoding(utf8)";
 
 my $stdout = App::sdif::Divert->new;
+sub println { print map { s/(?<!\n)\z/\n/r } @_ }
 
 while (<DIFF>) {
     my($left, $cmd, $right);
@@ -348,8 +349,8 @@ while (<DIFF>) {
 	    next;
 	};
 	compare(\$old, \$new) if $app->unit;
-	print color("OTEXT", $old);
-	print color("NTEXT", $new);
+	println color("OTEXT", $old);
+	println color("NTEXT", $new);
     }
     #
     # normal diff
@@ -392,9 +393,9 @@ while (<DIFF>) {
 	    }mge if $new;
 	}
 
-	print $old if $old and $app->show_old;
-	print $del if $del;
-	print $new if $new and $app->show_new;
+	println $old if $old and $app->show_old;
+	println $del if $del;
+	println $new if $new and $app->show_new;
     }
     #
     # diff -c
@@ -438,9 +439,9 @@ while (<DIFF>) {
 		}
 	    }
 	}
-	print @old if $app->show_old;
-	print $new;
-	print @new if $app->show_new;
+	println @old if $app->show_old;
+	println $new;
+	println @new if $app->show_new;
     }
     #
     # diff --combined (generic)
@@ -494,7 +495,7 @@ while (<DIFF>) {
 		$app->show_new or splice @result, 2, 1;
 		$app->show_old or splice @result, 1, 1;
 	    }
-	    print @result;
+	    println @result;
 	}
     }
     #
@@ -532,9 +533,9 @@ while (<DIFF>) {
 		my $mrg = join '', @mrg;
 		print color("MTEXT", $mrg) if $app->show_mrg;
 	    }
-	    print $c2 if $app->mark;
-	    print color("NTEXT", $new) if $app->show_new;
-	    print $c3 if $app->mark;
+	    println $c2 if $app->mark;
+	    println color("NTEXT", $new) if $app->show_new;
+	    println $c3 if $app->mark;
 	}
     }
     else {
@@ -912,7 +913,7 @@ cdif - word context diff
 
 =head1 VERSION
 
-Version 4.32
+Version 4.33
 
 =head1 SYNOPSIS
 

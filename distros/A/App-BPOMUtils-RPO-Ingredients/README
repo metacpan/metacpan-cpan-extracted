@@ -1,0 +1,129 @@
+NAME
+    App::BPOMUtils::RPO::Ingredients - Group ingredients suitable for food
+    label
+
+VERSION
+    This document describes version 0.006 of
+    App::BPOMUtils::RPO::Ingredients (from Perl distribution
+    App-BPOMUtils-RPO-Ingredients), released on 2024-02-26.
+
+SYNOPSIS
+DESCRIPTION
+    This distribution includes CLI utilities related to helping with
+    Processed Food Registration (RPO - Registrasi Pangan Olahan),
+    particularly with regards to ingredients.
+
+    *   bpom-rpo-ingredients-group-for-label
+
+FUNCTIONS
+  bpom_rpo_ingredients_group_for_label
+    Usage:
+
+     bpom_rpo_ingredients_group_for_label(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Group ingredients suitable for food label.
+
+    This utility accepts a CSV data from stdin. The CSV must be formatted
+    like this:
+
+     Ingredient,%weight,"Ingredient name for label (Indonesian)","Ingredient name for label (English)","QUID?","Note (Indonesian)","Note (English)","Ingredient group for label (Indonesian)","Ingredient group for label (English)"
+     Air,78.48,Air,Water,,
+     Gula,16.00,Gula,Sugar,,"mengandung pengawet sulfit","contains sulfite preservative",
+     "Nata de coco",5.00,"Nata de coco","Nata de coco",1,"mengandung pengawet sulfit","contains sulfit preservative",
+     "Asam sitrat",0.25,"Asam sitrat","Citric acid",,,,"Pengatur keasaman","Acidity regulator"
+     "Asam malat",0.10,"Asam malat","Malic acid",,,,"Pengatur keasaman","Acidity regulator"
+     "Grape flavor",0.10,Anggur,Grape,,,,"Perisa sintetik","Synthetic flavoring"
+     "Tea flavor",0.05,Teh,Tea,,,,"Perisa sintetik","Synthetic flavoring"
+     "Natrium benzoat",0.02,"Natrium benzoat","Sodium benzoate",,,,Pengawet,Preservative
+
+    It can then group the ingredients based on the ingredient group and
+    generate this (for Indonesian, "--lang ind"):
+
+     Ingredient,%weight
+     Air,78.48
+     Gula (mengandung pengawet sulfit),16.00
+     "Nata de coco 5% (mengandung pengawet sulfit)",5.00
+     "Pengatur keasaman (Asam sitrat, Asam malat)",0.35
+     "Perisa sintetik (Anggur, Teh)",0.15
+     "Pengawet Natrium benzoat",0.02
+
+    And for English, "--lang eng":
+
+     Ingredient,%weight
+     Water,78.48
+     Sugar (contains sulfite preservative),16.00
+     "Nata de coco 5% (contains sulfite preservative)",5.00
+     "Acidity regulator (Citric acid, Malic acid)",0.35
+     "Synthetic flavoring (Grape, Tea)",0.15
+     "Preservative Sodium benzoate",0.02
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   lang => *str* (default: "ind")
+
+        (No description)
+
+    *   quid_precision => *uint* (default: 4)
+
+        (No description)
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-BPOMUtils-RPO-Ingredients>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-BPOMUtils-RPO-Ingredients>.
+
+SEE ALSO
+    <https://registrasipangan.pom.go.id>
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-BPOMUtils-RPO-Ing
+    redients>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

@@ -26,7 +26,7 @@ sub validate_data ($self, $data, $schema) {
 }
 
 sub validate_json_string ($self, $data_string, $schema) {
-  state $decoder = JSON::MaybeXS->new(utf8 => 1, allow_nonref => 1);
+  state $decoder = (Mojo::JSON::JSON_XS ? 'Cpanel::JSON::XS' : 'JSON::PP')->new->utf8(1)->allow_nonref(1);
   return $self->validate_data($decoder->decode($data_string), $schema);
 }
 

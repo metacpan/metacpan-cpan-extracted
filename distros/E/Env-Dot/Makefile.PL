@@ -35,11 +35,16 @@ my %WriteMakefileArgs = (
     "Cwd" => 0,
     "File::Basename" => 0,
     "File::Spec" => 0,
-    "Test2::V0" => 0
+    "FindBin" => "1.51",
+    "Test2::Require" => 0,
+    "Test2::V0" => 0,
+    "Test::Script" => 0,
+    "base" => 0,
+    "lib" => 0
   },
-  "VERSION" => "0.008",
+  "VERSION" => "0.009",
   "test" => {
-    "TESTS" => "t/*.t t/env-dot-public/*.t"
+    "TESTS" => "t/*.t t/file-read-order/*.t"
   }
 );
 
@@ -52,10 +57,15 @@ my %FallbackPrereqs = (
   "Exporter" => 0,
   "File::Basename" => 0,
   "File::Spec" => 0,
+  "FindBin" => "1.51",
   "Getopt::Long" => 0,
   "Pod::Usage" => 0,
+  "Test2::Require" => 0,
   "Test2::V0" => 0,
+  "Test::Script" => 0,
+  "base" => 0,
   "constant" => 0,
+  "lib" => 0,
   "open" => 0,
   "strict" => 0,
   "warnings" => 0

@@ -27,38 +27,16 @@ my @prompts;
     });
 }
 
-{
-    use HTTP::Tiny;
-    package HTTP::Tiny;
-    no warnings 'redefine';
-    sub get {
-        my ($self, $url) = @_;
-        ::note 'in monkeypatched HTTP::Tiny::get for ' . $url;
-        my ($module) = reverse split('/', $url);
-        return +{
-            success => 1,
-            status => '200',
-            reason => 'OK',
-            protocol => 'HTTP/1.1',
-            url => $url,
-            headers => {
-                'content-type' => 'text/x-yaml',
-            },
-            content =>
-                $module eq 'strict' ? '---
+patch_module_response(
+  'strict' => '---
 distfile: R/RJ/RJBS/perl-5.20.0.tar.gz
 version: 200.0
-'
-                : $module eq 'Carp' ? '---
+',
+  'Carp' => '---
 distfile: Z/ZE/ZEFRAM/Carp-1.3301.tar.gz
 version: 200.0
-'
-                : die "should not be checking for $module"
-            ,
-        };
-        die 'should not be checking for ' . $module;
-    }
-}
+',
+);
 
 {
     my $tzil = Builder->from_config(

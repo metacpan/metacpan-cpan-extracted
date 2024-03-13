@@ -18,9 +18,8 @@ no_index:
     - t
     - inc
 requires:
-  Clone: '0'
   Cwd: '0'
-  DBD::SQLite: '1.68'
+  DBD::SQLite: '1.74'
   DBD::SQLite::Constants: '0'
   DBI: '0'
   Encode: '0'
@@ -38,6 +37,7 @@ requires:
   SQL::Type::Guess: '0'
   Scalar::Util: '0'
   Spreadsheet::Read: '0'
+  Storable: '0'
   String::Substitution: '0'
   String::Unescape: '0'
   Term::Choose: '1.763'
@@ -54,5 +54,5 @@ requires:
 resources:
   bugtracker: https://github.com/kuerbis/App-DBBrowser/issues
   repository: https://github.com/kuerbis/App-DBBrowser.git
-version: '2.405'
+version: '2.407'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

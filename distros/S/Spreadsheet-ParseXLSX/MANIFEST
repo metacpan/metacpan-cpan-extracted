@@ -13,6 +13,7 @@ lib/Spreadsheet/ParseXLSX/Cell.pm
 lib/Spreadsheet/ParseXLSX/Decryptor.pm
 lib/Spreadsheet/ParseXLSX/Decryptor/Agile.pm
 lib/Spreadsheet/ParseXLSX/Decryptor/Standard.pm
+lib/Spreadsheet/ParseXLSX/Worksheet.pm
 'nytprof/(eval 10)[Errno-pm-172]-92-line.html'
 'nytprof/(eval 101)[XML-Twig-pm-5871]-218-line.html'
 'nytprof/(eval 102)[XML-Twig-pm-1750]-219-line.html'
@@ -339,6 +340,7 @@ t/data/page-Setup.xlsx
 t/data/tab-color.xlsx
 t/data/target-abspath.xlsx
 t/encryption.t
+t/garbage-collect.t
 t/hidden-row-and-column.t
 t/hidden-sheet.t
 t/hyperlinks.t

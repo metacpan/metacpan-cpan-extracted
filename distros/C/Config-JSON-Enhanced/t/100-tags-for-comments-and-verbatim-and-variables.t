@@ -8,8 +8,9 @@ use Test::More;
 use Test2::Plugin::UTF8; # rids of the Wide Character in TAP message!
 use File::Temp qw/tempfile tempdir/;
 use File::Spec;
+use Data::Roundtrip qw/json2perl perl2dump no-unicode-escape-permanently/;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use Config::JSON::Enhanced;
 
@@ -91,6 +92,7 @@ for $atestparam (@testparams){
 	});
 	ok(defined $json, 'config2perl()'." : called and got defined result.") or BAIL_OUT;
 	is(ref($json), 'HASH', 'config2perl()'." : called and result is HASHref.");
+diag perl2dump($json);
 
 	ok(exists($json->{'a'}), 'config2perl()'." : called and result contains required key.");
 	ok(defined($json->{'a'}), 'config2perl()'." : called and result contains required key and it is defined.");

@@ -1,4 +1,4 @@
-package EAI::DateUtil 1.911;
+package EAI::DateUtil 1.912;
 
 use strict; use warnings; use feature 'unicode_strings'; use utf8;
 use Exporter qw(import); use Time::Local qw( timelocal_modern timegm_modern ); use Time::localtime; use POSIX qw(mktime);
@@ -115,16 +115,26 @@ sub get_curdate_dash_plus_X_years ($;$$) {
 	# date given as second argument: add X years (minus daysToSubtract) from that date
 	if ($year) {
 		my $dateval;
+		$day = 28 if $day eq "29" and !IsLeapYear($year+$y); # regard february in leap years
 		if ($daysToSubtract) {
 			$dateval = localtime(timegm_modern(0,0,12,$day,$mon-1,$year)-$daysToSubtract*24*60*60);
 		} else {
 			$dateval = localtime(timegm_modern(0,0,12,$day,$mon-1,$year));
 		}
-		return sprintf("%02d-%02d-%04d",$dateval->mday(), $dateval->mon()+1, $dateval->year()+ 1900 + $y);
+		return sprintf("%02d-%02d-%04d",$dateval->mday(), $dateval->mon()+1, $dateval->year()+1900+$y);
 	} else {
 		# add X years (minus daysToSubtract) from today
-		return sprintf("%02d-%02d-%04d",localtime->mday(), localtime->mon()+1, localtime->year()+ 1900 + $y);
+		my $offsetday = (localtime->mday() eq "29" and !IsLeapYear(localtime->year()+ 1900 + $y) ? 1 : 0); # regard february in leap years
+		return sprintf("%02d-%02d-%04d",localtime->mday()-$offsetday, localtime->mon()+1, localtime->year()+ 1900 + $y);
 	}
+}
+
+sub IsLeapYear ($) {
+	my $year = shift;
+	return 0 if $year % 4;
+	return 1 if $year % 100;
+	return 0 if $year % 400;
+	return 1;
 }
 
 sub get_curtime (;$$) {

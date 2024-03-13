@@ -71,13 +71,13 @@ foreach my $type (qw( dll static ))
 {
   my $filename = File::Spec->catfile($share_dir, 'status.json');
   open my $fh, '>', $filename;
-  print $fh encode_json(\%status);
+  print $fh JSON::PP->new->utf8->canonical->encode(\%status);
   close $fh;
 }
 
 {
   open my $fh, '>', $status_filename;
-  print $fh encode_json(\%status);
+  print $fh JSON::PP->new->utf8->canonical->encode(\%status);
   close $fh;
 }
 

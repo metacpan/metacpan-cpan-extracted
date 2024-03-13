@@ -32,9 +32,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Clone" : "0",
             "Cwd" : "0",
-            "DBD::SQLite" : "1.68",
+            "DBD::SQLite" : "1.74",
             "DBD::SQLite::Constants" : "0",
             "DBI" : "0",
             "Encode" : "0",
@@ -52,6 +51,7 @@
             "SQL::Type::Guess" : "0",
             "Scalar::Util" : "0",
             "Spreadsheet::Read" : "0",
+            "Storable" : "0",
             "String::Substitution" : "0",
             "String::Unescape" : "0",
             "Term::Choose" : "1.763",
@@ -79,6 +79,6 @@
          "web" : "https://github.com/kuerbis/App-DBBrowser"
       }
    },
-   "version" : "2.405",
+   "version" : "2.407",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

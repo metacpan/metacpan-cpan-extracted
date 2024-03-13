@@ -1,14 +1,9 @@
-# This code is adapted for Excel 2007 from:
-# Spreadsheet::XLSX::FmtDefault
-#  by Kawai, Takanori (Hippo2000) 2001.2.2
-# This Program is ALPHA version.
-#==============================================================================
 package Spreadsheet::XLSX::Fmt2007;
 use strict;
 use warnings;
 
 use Spreadsheet::XLSX::Utility2007 qw(ExcelFmt);
-our $VERSION = '0.17';    #
+our $VERSION = '0.18';    #
 
 my %hFmtDefault = (
     0x00 => '@',
@@ -52,7 +47,7 @@ my %hFmtDefault = (
 );
 
 #------------------------------------------------------------------------------
-# new (for Spreadsheet::XLSX::Utility2007)
+# new (for Spreadsheet::XLSX::Fmt2007)
 #------------------------------------------------------------------------------
 sub new {
     my ($sPkg, %hKey) = @_;
@@ -62,7 +57,7 @@ sub new {
 }
 
 #------------------------------------------------------------------------------
-# TextFmt (for Spreadsheet::XLSX::Utility2007)
+# TextFmt (for Spreadsheet::XLSX::Fmt2007)
 #------------------------------------------------------------------------------
 sub TextFmt {
     my ($oThis, $sTxt, $sCode) = @_;
@@ -71,7 +66,7 @@ sub TextFmt {
 }
 
 #------------------------------------------------------------------------------
-# FmtStringDef (for Spreadsheet::XLSX::Utility2007)
+# FmtStringDef (for Spreadsheet::XLSX::Fmt2007)
 #------------------------------------------------------------------------------
 sub FmtStringDef {
     my ($oThis, $iFmtIdx, $oBook, $rhFmt) = @_;
@@ -85,7 +80,7 @@ sub FmtStringDef {
 }
 
 #------------------------------------------------------------------------------
-# FmtString (for Spreadsheet::XLSX::Utility2007)
+# FmtString (for Spreadsheet::XLSX::Fmt2007)
 #------------------------------------------------------------------------------
 sub FmtString {
     my ($oThis, $oCell, $oBook) = @_;
@@ -122,7 +117,7 @@ sub FmtString {
 }
 
 #------------------------------------------------------------------------------
-# ValFmt (for Spreadsheet::XLSX::Utility2007)
+# ValFmt (for Spreadsheet::XLSX::Fmt2007)
 #------------------------------------------------------------------------------
 sub ValFmt {
     my ($oThis, $oCell, $oBook) = @_;
@@ -140,7 +135,7 @@ sub ValFmt {
 }
 
 #------------------------------------------------------------------------------
-# ChkType (for Spreadsheet::XLSX::Utility2007)
+# ChkType (for Spreadsheet::XLSX::Fmt2007)
 #------------------------------------------------------------------------------
 sub ChkType {
     my ($oPkg, $iNumeric, $iFmtIdx) = @_;
@@ -159,19 +154,39 @@ sub ChkType {
 
 __END__
 
+=head1 NAME
+
+Spreadsheet::XLSX::Fmt2007 - A class for Cell formats.
+
 =head1 SYNOPSIS
 
-		$cell = $myworkbook->worksheet->{Cells}[$row][$col]
-		my $type       = $cell->{Type}; # Date, Text, or Numeric
-		my $disp_value = $cell->Value;  # displayed (formatted) value set in XLSX by $myFmt2007->ValFmt($cell, $workbook)
-		my $fund_value = $cell->{Val};  # fundemental (underlying) value
-		my $formatter;
-		if ($myworkbook->excel07) {
-			$formatter=Spreadsheet::XLSX::Fmt2007->new();
-		} else {
-			$formatter=Spreadsheet::ParseExcel::FmtDefault->new();
-		}  
-		my $format_string = $formatter->FmtString($cell,$self->workbook); 
+See the documentation of L<Spreadsheet::XLSX>.
 
+    my $cell = $myworkbook->worksheet->{Cells}[$row][$col]
+    my $type       = $cell->{Type}; # Date, Text, or Numeric
+    my $disp_value = $cell->Value;  # displayed (formatted) value set in XLSX by $myFmt2007->ValFmt($cell, $workbook)
+    my $fund_value = $cell->{Val};  # fundemental (underlying) value
+    my $formatter;
+    if( $myworkbook->excel07 ) {
+        $formatter = Spreadsheet::XLSX::Fmt2007->new();
+    } else {
+        $formatter = Spreadsheet::ParseExcel::FmtDefault->new();
+    }  
+    my $format_string = $formatter->FmtString($cell, $self->workbook);
+
+=head1 DESCRIPTION
+
+This module is used in conjunction with L<Spreadsheet::XLSX>. See the documentation for L<Spreadsheet::XLSX>.
+
+This code is adapted for Excel 2007 from L<Spreadsheet::ParseExcel::FmtDefault> by Kawai, Takanori (Hippo2000) 2001-02-02.
+This Program is ALPHA version.
+
+=head1 AUTHOR
+
+See the documentation for L<Spreadsheet::XLSX>.
+
+=head1 COPYRIGHT
+
+See the documentation for L<Spreadsheet::XLSX>.
 
 =cut

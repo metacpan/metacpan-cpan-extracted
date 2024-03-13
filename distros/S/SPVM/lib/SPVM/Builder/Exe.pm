@@ -12,6 +12,7 @@ use SPVM::Builder::Util;
 use SPVM::Builder::Config::Exe;
 
 use SPVM 'Native::Compiler';
+use SPVM 'Native::Runtime::Info';
 
 # Fields
 sub builder {
@@ -110,6 +111,17 @@ sub runtime {
   }
   else {
     return $self->{runtime};
+  }
+}
+
+sub runtime_info {
+  my $self = shift;
+  if (@_) {
+    $self->{runtime_info} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{runtime_info};
   }
 }
 
@@ -240,6 +252,8 @@ sub new {
     $config->set_global_optimize($optimize);
   }
   
+  $self->compile;
+  
   return $self;
 }
 
@@ -267,15 +281,9 @@ sub parse_config_argv_option {
 sub build_exe_file {
   my ($self) = @_;
   
-  # Builder
   my $builder = $self->builder;
   
   my $class_name = $self->{class_name};
-  
-  # Build runtime
-  unless ($self->{finish_compile}) {
-    $self->compile;
-  }
   
   my $class = $self->runtime->get_basic_type_by_name($class_name);
   
@@ -313,108 +321,6 @@ sub build_exe_file {
   $cc_linker->link($class_name, $object_files, {config => $config_linker});
 }
 
-sub get_required_resources {
-  my ($self) = @_;
-  
-  my $config_exe = $self->config;
-  
-  unless ($self->{finish_compile}) {
-    $self->compile;
-  }
-  
-  my $required_resources = [];
-  
-  my $builder = $self->builder;
-  
-  my $build_dir = $self->builder->build_dir;
-  
-  my $builder_cc = SPVM::Builder::CC->new(
-    build_dir => $build_dir,
-    quiet => $self->quiet,
-    force => $self->force,
-  );
-  
-  my $runtime = $self->runtime;
-  
-  my $class_names = $runtime->_get_user_defined_basic_type_names->to_strings;
-  my $all_object_files = [];
-  for my $class_name (@$class_names) {
-    
-    my $class = $runtime->get_basic_type_by_name($class_name);
-    
-    my $native_method_names = $class->_get_native_method_names;
-    if (@$native_method_names) {
-      my $class_file = $class->_get_class_file;
-      
-      unless (defined $class_file) {
-        my $config_exe_file = SPVM::Builder::Util::search_config_file($class_name);
-        if ($config_exe_file) {
-          $class_file = $config_exe_file;
-          $class_file =~ s/\.config$/\.spvm/;
-        }
-        else {
-          confess("The class file \"$class_file\" is not found");
-        }
-      }
-      
-      my $config_file = SPVM::Builder::Util::search_config_file($class_name);
-      
-      unless ($class_name eq $self->class_name) {
-        
-        my $config_exe = SPVM::Builder::Config->load_config($config_file);
-        
-        my $resource_names = $config_exe->get_resource_names;
-        for my $resource_name (@$resource_names) {
-          my $resource = $config_exe->get_resource($resource_name);
-          
-          my $resource_info = {
-            class_name => $class_name,
-            resource => $resource
-          };
-          
-          push @$required_resources, $resource_info;
-        }
-      }
-    }
-  }
-  
-  return $required_resources;
-}
-
-sub get_required_resource_json_lines {
-  my ($self) = @_;
-  
-  my $required_resources = $self->get_required_resources;
-  
-  my @json_lines;
-  for my $required_resource (@$required_resources) {
-    my $class_name = $required_resource->{class_name};
-    my $resource = $required_resource->{resource};
-    my $resource_class_name = $resource->class_name;
-    my $resource_mode = $resource->mode;
-    my $resource_argv = $resource->argv || [];
-    
-    my $line = {
-      resource_loader_class_name => "$class_name",
-      class_name => $resource_class_name,
-    };
-    
-    if (defined $resource_mode) {
-      $line->{mode} = $resource_mode;
-    }
-    
-    if (@$resource_argv) {
-      $line->{argv} = $resource_argv;
-    }
-    
-    my $json_line = JSON::PP->new->utf8->canonical(1)->encode($line);
-    
-    push @json_lines, $json_line;
-  }
-  
-  return \@json_lines;
-}
-
 sub compile {
   my ($self) = @_;
 
@@ -440,13 +346,14 @@ sub compile {
   
   $self->runtime($runtime);
   
-  $self->{finish_compile} = 1;
+  my $runtime_info = SPVM::Native::Runtime::Info->new($runtime);
+  $self->runtime_info($runtime_info);
 }
 
 sub compile_classes {
   my ($self) = @_;
   
-  my $class_names = $self->runtime->_get_user_defined_basic_type_names->to_strings;
+  my $class_names = $self->runtime_info->get_class_names->to_strings;
   
   my $object_files = [];
   for my $class_name (@$class_names) {
@@ -523,7 +430,7 @@ sub create_bootstrap_header_source {
 
   my $class_name = $self->class_name;
 
-  my $class_names = $self->runtime->_get_user_defined_basic_type_names->to_strings;
+  my $class_names = $self->runtime_info->get_class_names->to_strings;
   
   my $source = '';
   
@@ -599,7 +506,7 @@ sub create_bootstrap_main_func_source {
 
   my $class_name = $self->class_name;
 
-  my $class_names = $self->runtime->_get_user_defined_basic_type_names->to_strings;
+  my $class_names = $self->runtime_info->get_class_names->to_strings;
 
   my $source = '';
 
@@ -725,7 +632,7 @@ static void* SPVM_BOOTSTRAP_get_runtime(SPVM_ENV* env, void* compiler) {
   
 EOS
   
-  my $class_names = $self->runtime->_get_user_defined_basic_type_names->to_strings;
+  my $class_names = $self->runtime_info->get_class_names->to_strings;
   
   my $compiler = $self->compiler;
   
@@ -803,7 +710,7 @@ sub create_bootstrap_set_precompile_method_addresses_func_source {
   # Builder
   my $builder = $self->builder;
 
-  my $class_names = $self->runtime->_get_user_defined_basic_type_names->to_strings;
+  my $class_names = $self->runtime_info->get_class_names->to_strings;
 
   my $source = '';
 
@@ -835,7 +742,7 @@ sub create_bootstrap_set_native_method_addresses_func_source {
   # Builder
   my $builder = $self->builder;
 
-  my $class_names = $self->runtime->_get_user_defined_basic_type_names->to_strings;
+  my $class_names = $self->runtime_info->get_class_names->to_strings;
 
   my $source = '';
 
@@ -869,7 +776,7 @@ sub create_bootstrap_source {
   
   my $class_name = $self->class_name;
   
-  my $class_names = $self->runtime->_get_user_defined_basic_type_names->to_strings;
+  my $class_names = $self->runtime_info->get_class_names->to_strings;
   
   my $class_files = [];
   for my $class_name (@$class_names) {
@@ -882,8 +789,8 @@ sub create_bootstrap_source {
   
   # Source file - Output
   my $build_src_dir = SPVM::Builder::Util::create_build_src_path($self->builder->build_dir);
-  my $target_perl_class_name = "SPVM::$class_name";
-  my $bootstrap_base = $target_perl_class_name;
+  my $perl_class_name = "SPVM::$class_name";
+  my $bootstrap_base = $perl_class_name;
   $bootstrap_base =~ s|::|/|g;
   my $bootstrap_source_file = "$build_src_dir/$bootstrap_base.boot.c";
   
@@ -963,10 +870,10 @@ sub compile_bootstrap_source_file {
   # Target class name
   my $class_name = $self->class_name;
   
-  my $target_perl_class_name = "SPVM::$class_name";
+  my $perl_class_name = "SPVM::$class_name";
   
   # Compile source files
-  my $class_name_rel_file = SPVM::Builder::Util::convert_class_name_to_rel_file($target_perl_class_name);
+  my $class_name_rel_file = SPVM::Builder::Util::convert_class_name_to_rel_file($class_name);
   my $object_file_name = SPVM::Builder::Util::create_build_object_path($self->builder->build_dir, "$class_name_rel_file.boot.o");
   my $source_file = SPVM::Builder::Util::create_build_src_path($self->builder->build_dir, "$class_name_rel_file.boot.c");
   
@@ -1096,7 +1003,7 @@ sub compile_native_class {
       $mode = $self->{mode};
     }
     
-    my $config = SPVM::Builder::Config->load_mode_config($config_file, $mode);
+    my $config = SPVM::Builder::Config->load_mode_config($config_file, $mode, []);
     
     # In an executable file, only resources used in the config of the class for generate an executable file are compiled.
     unless ($class_name eq $self->class_name) {

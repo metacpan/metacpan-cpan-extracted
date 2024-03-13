@@ -1,8 +1,13 @@
 Revision history for Perl module MARC::Moose
 
+1.0.48
+
+  - Marcedit format parser/reader
+
 1.0.46
 
   - Final point in title field Unimarc to MARC21 conversion
+
 1.0.45
 
   - Fix bug converting 600 field

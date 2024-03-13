@@ -8,10 +8,15 @@ do { my $x = {
                   },
        'configure' => {
                         'requires' => {
-                                        'Alien::Build' => '1.40',
+                                        'Alien::Build' => '2.70',
                                         'Alien::Build::MM' => '0.32',
                                         'Alien::Build::Plugin::Build::CMake' => '0.99',
-                                        'ExtUtils::MakeMaker' => '6.52'
+                                        'Alien::Meson' => '0',
+                                        'Carp' => '0',
+                                        'ExtUtils::MakeMaker' => '6.52',
+                                        'File::Copy::Recursive' => '0',
+                                        'HTTP::Tiny' => '0',
+                                        'Path::Tiny' => '0'
                                       }
                       },
        'develop' => {
@@ -29,7 +34,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'Alien::Base' => '0',
+                                      'Alien::Base' => '0.038',
                                       'parent' => '0',
                                       'strict' => '0',
                                       'warnings' => '0'

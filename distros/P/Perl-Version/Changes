@@ -1,5 +1,9 @@
 Revision history for Perl module Perl::Version
 
+1.017 2024-03-09T01:36:13Z
+	* fix encoding argment to read_line ("Odd number" warning), from
+	Andreas Hadjiprocopis (#11)
+
 1.016 2024-01-05T13:53:50Z
 	* new minimum version is v5.10, for version.pm
 	* git rid of File::Slurp::Tiny

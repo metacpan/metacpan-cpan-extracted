@@ -1,6 +1,7 @@
 package UI::KeyboardLayout;
 
-$VERSION = $VERSION = "0.76";
+our $VERSION;
+$VERSION = "0.77";
 
 binmode $DB::OUT, ':utf8' if $DB::OUT;		# (older) Perls had "Wide char in Print" in debugger otherwise
 binmode $DB::LINEINFO, ':utf8' if $DB::LINEINFO;		# (older) Perls had "Wide char in Print" in debugger otherwise
@@ -412,7 +413,7 @@ and one for C<AltGr> pressed) and a lot of associated metadata,
 
 The sections C<layer_recipes> and C<face_recipes> contain instructions how
 to build Layers and Faces out of simpler elements.  Similar recipes appear  
-as values of C<DeadKey_*> entries in a face.  Such a "recipe" is
+as values of C<DeadKey_Map*> entries in a face.  Such a "recipe" is
 executed with I<parameters>: a base face name, a layer number, and a prefix
 character (the latter is undefined when the recipe is a layer recipe or
 face recipe).  (The recipe is free to ignore the parameters; for example, most
@@ -481,7 +482,8 @@ C<ShiftFromTo[FROM,TO]> (adds a constant to the [numerical code of the] input ch
 so that C<FROM> becomes C<TO>), C<SelectRX[PERL_REGEXP]> (keeps input characters
 which match, converts everything else to C<undefined>), C<FromTo[LAYER_FROM,LAYER_TO]>
 (similar to C<ByPairs>, but pairs all characters in the layers based on their position),
-C<DefinedTo[CHAR]> (all defined characters are converted to C<CHAR>).
+C<DefinedTo[CHAR]> (all defined characters are converted to C<CHAR>; if C<CHAR> is C<undef>,
+this “undefines” these positions in whatever follows this part of the recipe).
 
 The mutator C<Imported[NAME]> is similar to C<ByPairs>, but takes the F<.klc>-style
 visual C<DEADKEYS/NAME> section as the description of the mutation.  C<NAME> may
@@ -489,8 +491,10 @@ be followed by a character as in C<NAME,CHAR>; if not, C<CHAR> is the prefix key
 the recipe's execution parameters.
 
 The simple mutator C<ByPairs> has flavors: one can append C<Prefix> or C<InvPrefix>
-to the name, and the resulting characters become prefix keys (the “C<AltGr>-inverted”
-prefix followed by C<CHAR> behaves as non-inverted prefix followed by C<AltGr-CHAR>).
+to the name, and the resulting bindings become prefix keys (with C<Inv>, the 
+prefix followed by C<CHAR> behaves as the non-C<Inv> prefix followed by C<AltGr-CHAR>).
+(I<The behaviour> of these prefix keys should be defined elsewhere; for example, by
+C<DeadKey_Map****>.)
 
 Some mutators pay attention not only to what the character is, but how it is 
 accessible on the given key: such are C<FlipShift>, C<FlipLayers>, 
@@ -778,7 +782,7 @@ For example, C<△> may be converted to C<▲=BLACK UP-POINTING TRIANGLE> by C<<
 
 C<< <pseudo-faked-***> >> rules are, first: the special case C<calculated-SYMBOL> converting C<MICRO SIGN> (C<µ>) to
 C<GREEK LETTER MU> (C<μ>).  In addition, C<greekize> converts a Latin letter into B<the Latin variant of the corresponding Greek
-letter (e.g., C<f> ⇝ C<LATIN SMALL LETTER PHI=ɸ>).  Finally, C<latinize> does the same, but “starting with a Greek letter”.
+letter> (e.g., C<f> ⇝ C<LATIN SMALL LETTER PHI=ɸ>).  Finally, C<latinize> does the same, but “starting with a Greek letter”.
 
 =item *
 
@@ -1093,7 +1097,8 @@ face: if a keypress is not defined by C<layers>, it would be taken from
 C<LinkFace>; additionally, it affects the C<Compose> key bindings: for example,
 if C<LinkFace> has C<g> where C<layers> has C<γ>, and there is a binding for 
 C<Compose g>, the same binding applies for C<Compose γ>.
-.........
+
+TBC .........
 
 =head2 Substitutions
 
@@ -1216,7 +1221,7 @@ generated C<.h> file; TBC ..................................)
 
 Finally, C<@output_layers> describes how to “fill” these layers.  Currently, the elements may be numbers (the ordinal of the layer
 of the current face), or have the form C<prefixNOTSAME=HEX> or C<prefixNOTSAMEcase=HEX> or C<prefix=HEX>.  Here C<HEX> (such as
-C<9f03) is the “id” of a diacritic defined elsewhere in the F<.kbdd> file.  (For example, by defining C<DeadKey_Map9f03>.)
+C<9f03>) is the “id” of a diacritic defined elsewhere in the F<.kbdd> file.  (For example, by defining C<DeadKey_Map9f03>.)
 
   @output_layers=0,1,prefixNOTSAME=9f03
 
@@ -1232,7 +1237,7 @@ the content of C<AltGr-key> is moved to the C<Shift-key>.
 
 The mneumonics (“terminator”) shown after C<AltGr_Invert>-prefix or C<Compose>-prefix keys are pressed are controlled by the
 settings C<AltGr_Invert_Show> and C<ComposeKey_Show>.  For other prefix keys this is controlled by C<Show[NNNN]> directive on the
-C<DeadKey_> descriptor.
+C<DeadKey_Map> descriptor.
 
 The name of the layout is controlled via C<LAYOUTNAME> with C<OSX_ADD_VERSION>, or by C<OSX_LAYOUTNAME>.
 
@@ -1243,7 +1248,9 @@ Extra Apple bindings may be inserted by (temporarily???) C<Apple_Override> (by C
 
 =head2 More settings describing the keyboard
 
-C<CapsLOCKoverride>:  Face recipe to use where the “naive rules” of behaviour of C<CapsLock> are not enough.
+C<CapsLOCKoverride>:  Face recipe to use where the “naive rules” of behaviour of C<CapsLock> are not enough.  It is enough if
+this recipe defines only the “tricky” positions: the positions in the map which should be affected by C<CapsLock> in the way that
+this module cannot deduce.
 
 C<AltGrInv_AltGr_as_Ctrl>: not used???!!!
 
@@ -1259,7 +1266,46 @@ C<WindowsEmitDeadkeyDescrREX> matches the DeadKey descriptions to not include in
 See L<Windows’ limits for size of the layout DLL|"If data in KEYNAME_DEAD takes too much space, keyboard is mis-installed, and “Language Bar” goes crazy">.
 (A nice value with a lot of Compose bindings is C<< ^(?!.*\bCompose\s+(Compose\b|(?!key)\S+)) >>.)
 
-C<@Prefix_Force_Altern> TBC ..................
+For “unusual” keys, one can use the C<VK> subsection of the face to describe
+its scancode.  The keys in this subsection are C<VK_>-names (with omitted C<VK_>), they all define arrays.
+the first entry in the array is the scancode.  (Or it may be a list of scancodes, separated by C<|>.  The last scancode is
+“the main one” — if there are bindings, this scancode is used on the line of the C<LAYOUT> section of the emitted F<.kbdd> file.
+(Although this distinction is going to be eventually lost in the generated C<.C> file!)
+If the first entry is empty, the C<VK_>-code is translated to a scancode using the hardwired
+tables.  The (optional) remaining entries are the bindings of this key (with the trailing C<@> denoting prefix keys), as in:
+
+  @SPACE=,0020,0138@,0192@,00a0@
+
+defining C<Space> as emitting C<space=0x20> and C<Shift-Space> as the deadkey C<0x0138> (the following values are for the
+corresponding C<AltGr> bindings).
+
+(This C<VK> subsection may be inherited from the [grand]parents of the given C<face/******> section.)
+
+For more settings, such as C<@Prefix_Force_Altern> — as well as the settings listed below: TBC ..................
+
+  Diacritics_Limits/ALL
+  [face_shortcuts]
+
+  ExtraScanCodesWin
+  Auto_Diacritic_Start
+  Flip_AltGr_Key
+  Diacritic_if_undef
+  DeadChar_DefaultTranslation
+  DeadChar_32bitTranslation		replacement char used (instead of "?") when a prefix map results in a multi-codepoint value
+					(such values cannot be emitted on Windows) or when it is in AltGr-invertor map, and results
+					in a prefix key which accesses this same prefix map (so this “gives a loop of length 1).
+  faceDeadKeys
+  ExportDeadKeys
+  extra_report_DeadChar
+  char2key_prefer_first
+  char2key_prefer_last
+  Import_Prefix_Keys			(Amended by DeadKey_Add*** recipes)
+  chainAltGr
+  PrefixChains
+  DeadKey_Map
+  TableSummaryAddHTML
+  faceDeadKeys2
+  LayoutTable_add_double_prefix_keys
 
 =head2 CAVEATS for German/French/BÉPO/Neo keyboards
 
@@ -1272,13 +1318,8 @@ currently hardwired.  Some pictures and tables are available on
 With this module, the scancode and the C<VK_>-code for a position in a layout
 are calculated via the C<BaseLayer> configuration variable; the first recognized 
 character at the given position of this layer is translated to
-the C<VK_>-code (using a hardwired table).  The mapping of C<VK_>-codes 
-to scancodes is currently hardwired.
-
-For “unusual” keys, one can use the C<VK> subsection of the face to describe
-its scancode (the first entry in the array) and the bindings.  If the scancode
-is empty, the name of the key is translated to a scancode using the hardwired
-tables.
+the C<VK_>-code (using a hardwired table).  The hardwired mapping of C<VK_>-codes 
+to scancodes can be modified via the C<VK> subsection.
 
 =head1 Keyboards: on ease of access (What makes an easy-to-use keyboard layout)
 
@@ -3384,11 +3425,15 @@ In short, these layouts have an extra table which may define the following enhan
   Manipulate a couple of bits of IME state.
   A few random hacks for key-deficient hardware layouts.
 
-(Via assigning ORed masks to radio-buttons, the radio-buttons and toggle-buttons above may affect the layout.
+(Via assigning ORed masks for modification bitmaps to radio-buttons, the radio-buttons and toggle-buttons above may affect the layout.
 Using this, it is easy to convert each toggling buttons to 2-state radiobuttons.
 The limitation is that the number of modification columns compatible with the
-extra table is at most 8 (B<but no>, it is 16 — see
-L<"Workarounds for WINDOWS GOTCHAS for application developers (problems in kernel)">!) — counting one for C<Ctrl>.)
+extra table is at most 8.)
+
+B<WARNING:> it turns out that the preceding paragraph is bogus.  In fact, I<these specific FE-hacks operate on very different
+assumptions than the rest of the Windows’ keyboard logic.  In particular, the tables-of-length-8 are driven I<not by ORed-bitmaps
+assigned to the modification keys>, but by “physical modifier C<Shift>, C<Ctrl>, C<Alt> modification buttons.  (In particular,
+even with C<KLLF_ALTGR>-flag, the key C<AltGr> is counted as C<Alt> and not C<Ctrl+Alt>.)
 
 Every C<VK> may be associated to two tables of functions, the “normal” one, and the “alternative” one.  For
 every modification column, each table
@@ -3471,7 +3516,8 @@ For C<KBDNLS_HOME_OR_CLEAR>, the registry is checked at statup.  For C<KBDNLS_HE
 
 The checked values are C<helpkey>, C<KanaHelpKey>, C<clrkey> in the hive C<RTL_REGISTRY_WINDOWS_NT\WOW\keyboard>.
 
-Which of two tables is chosen is controlled by the type (C<NULL>/C<NORMAL>/C<TOGGLE>) of the key's tables, and the (per key) history bit.  
+Which of two tables is chosen is controlled by the type (C<NULL>/C<NORMAL>/C<TOGGLE>) of the key's tables, and the (per key)
+history bit.  
 The initial state of the bit is in C<NLSFEProcCurrent> 
 (L<StuxNet hits here|http://www.eset.com/us/resources/white-papers/Stuxnet_Under_the_Microscope.pdf>!).
 The tables of type C<NULL> are ignored (the key descriptor passes all events 
@@ -3503,10 +3549,140 @@ OEM translations (NumPad→Cursor, except C<C-A-Del>; C<00> to double-press of C
 C<Shift-Cancels-CapsLock>), then those defined in the tables above.
 
 B<Remark:> As opposed to these translations, C<KLLF_LRM_RLM> and C<Alt-NUMPADn> is actually handled inside the 
-even loop, by ToUnicode().
+event loop, by ToUnicode().
 
 B<Remark:> L<http://www.toppa.com/2007/english-windows-xp-with-a-japanese-keyboard/> (and references inside!)
 explains fine points of using Japanese keyboards.  See also: L<http://www.coscom.co.jp/learnjapanese801/lesson08.html>.
+
+=head2 Example of changing C<VK_>-codes depending on modifiers
+
+The logic defined in the preceding section shows that with this:
+
+    {
+        VK_SPACE,                   // Base Vk
+        KBDNLS_TYPE_TOGGLE,         // NLSFEProcType
+        KBDNLS_INDEX_NORMAL,        // The initial memory bit  (.NLSFEProcCurrent)
+        0x08, /* 00001000 */        // NLSFEProcSwitch (is “active” in positions marked with ☑ below)
+        {                           // NLSFEProc
+            {KBDNLS_SEND_BASE_VK,0},        // Base    (These are “real” states of SHIFT etc, not “fancy”)
+            {KBDNLS_SEND_BASE_VK,0},        // Shift
+            {KBDNLS_SEND_BASE_VK,0},        // Control
+            {KBDNLS_SEND_PARAM_VK,VK_PA1},  // Shift+Control      ☑ (= “use the second table on release”)
+            {KBDNLS_SEND_BASE_VK,0},        // Alt                  (AltGr is counted as Alt and not Ctrl+Alt — even with KLLF_ALTGR)
+            {KBDNLS_SEND_BASE_VK,0},        // Shift+Alt
+            {KBDNLS_SEND_BASE_VK,0},        // Control+Alt
+            {KBDNLS_SEND_BASE_VK,0}         // Shift+Control+Alt
+        },
+        {                           // NLSFEProcAlt
+            {KBDNLS_SEND_PARAM_VK,VK_PA1},  // Base
+            {KBDNLS_SEND_PARAM_VK,VK_PA1},  // Shift
+            {KBDNLS_SEND_PARAM_VK,VK_PA1},  // Control
+            {KBDNLS_SEND_PARAM_VK,VK_PA1},  // Shift+Control      ☑
+            {KBDNLS_SEND_BASE_VK,0},        // Alt                   AltGr ⇒ Alt
+            {KBDNLS_SEND_BASE_VK,0},        // Shift+Alt
+            {KBDNLS_SEND_BASE_VK,0},        // Control+Alt
+            {KBDNLS_SEND_BASE_VK,0}         // Shift+Control+Alt
+        }
+    },
+
+as an element of the “C<VK>-to-function table”,
+C<Shift-Ctrl-Space> emits C<VK_PA1>; also, depending on the order of releasing the keys C<Space>, C<Shift> and
+C<Ctrl>, the modifiers at the moment of I<release of this combination> may be arbitrary subsets of C<Shift>+C<Ctrl>.  The bitmap of
+C<0x08> says to use the second table if and only if the key produces C<VK_PA1> — so I<all these arbitrary subsets> correspond to
+“releasing C<VK_PA1>”.
+
+B<Note:> observe that the last 4 entries of the second table may be triggered only if C<Alt> is “accidentally” pressed while
+C<Space> was down.  While not very probable, it is still possible. — So probably it is better to fill I<all the positions> in
+the second table the same.  (We do this in the example below.)
+
+B<Warning:> since we I<are forced> to use C<VK_PA1> in the first row of the second table, this approach cannot “work 100%” if there
+are more than 2 C<VK_>-codes assigned to a key (essentially, this is due to having only one bit of memory).  In FE keyboard layouts,
+“extra” C<VK_>-codes (third or more) appear only when these keys “are actually key-toggles” (like C<CapsLock>), so their keyrelease
+is “ignored anyway” — hence no confusion may arise.
+
+=head2 A full example of changing C<VK_>-codes depending on modifiers
+
+Put the “C<VK>-to-function table” C<VkToFuncTable> (similar to one discussed in the preceding section) near the start of the first
+C file compiled into the layout DLL:
+
+  static ALLOC_SECTION_LDATA VK_F VkToFuncTable[] = {
+    {
+        VK_CAPITAL,                   // Base Vk
+        KBDNLS_TYPE_TOGGLE,         // NLSFEProcType
+        KBDNLS_INDEX_NORMAL,        // (The initial value of) the memory bit  (.NLSFEProcCurrent)
+        0x10, /* 00010000 */        // NLSFEProcSwitch (is “active” in positions marked with [*] below)
+        {                           // NLSFEProc
+            {KBDNLS_SEND_BASE_VK,0},           // Base    (These are “real” states of SHIFT etc, not “fancy”)
+            {KBDNLS_SEND_BASE_VK,0},           // Shift
+            {KBDNLS_SEND_BASE_VK,0},           // Control
+            {KBDNLS_SEND_BASE_VK,0},           // Shift+Control
+            {KBDNLS_SEND_PARAM_VK,VK_OEM_AX},  // Alt                 [*] (= “use the second table on release”) AltGr ⇒ Alt
+            {KBDNLS_SEND_BASE_VK,0},           // Shift+Alt
+            {KBDNLS_SEND_BASE_VK,0},           // Control+Alt
+            {KBDNLS_SEND_BASE_VK,0}            // Shift+Control+Alt
+        },
+        {                // NLSFEProcAlt: if VK_OEM_AX-down was generated, generate VK_OEM_AX-up for all themod-combinations
+            {KBDNLS_SEND_PARAM_VK,VK_OEM_AX},  // Base
+            {KBDNLS_SEND_PARAM_VK,VK_OEM_AX},  // Shift
+            {KBDNLS_SEND_PARAM_VK,VK_OEM_AX},  // Control
+            {KBDNLS_SEND_PARAM_VK,VK_OEM_AX},  // Shift+Control
+            {KBDNLS_SEND_PARAM_VK,VK_OEM_AX},  // Alt                 [*] ( AltGr ⇒ Alt )
+            {KBDNLS_SEND_PARAM_VK,VK_OEM_AX},  // Shift+Alt
+            {KBDNLS_SEND_PARAM_VK,VK_OEM_AX},  // Control+Alt
+            {KBDNLS_SEND_PARAM_VK,VK_OEM_AX}   // Shift+Control+Alt
+        }
+    },
+  };
+
+  static ALLOC_SECTION_LDATA KBDNLSTABLES KbdNlsTables = {
+    0,                      // OEM ID (0 = Microsoft)
+    0,                      // Information
+    1,                      // Number of VK_F entry
+    VkToFuncTable,          // Pointer to VK_F array
+    0,                      // Number of MouseVk entry
+    NULL                    // Pointer to MouseVk array
+  };
+
+and “report it” in a certain C<extern> function exported with the ordinal C<2>.  Two more functions returning 0 seem to be
+necessary; they should be exported with ordinals C<3> and C<5> (see the F<.def> file below):
+
+  PKBDNLSTABLES KbdNlsLayerDescriptor(VOID) {  return &KbdNlsTables;  }
+
+  BOOL KbdLayerRealDllFile(HKL hkl, WCHAR *realDllName, PCLIENTKEYBOARDTYPE pClientKbdType, LPVOID reserve)
+    {  return FALSE;  }	// FALSE means: no reload needed (However, the presence of these enables KbdNlsLayerDescriptor()
+
+  BOOL KbdLayerRealDllFileNT4(WCHAR *RealDllName) { return FALSE;  }
+
+Finally, the C<EXPORTS> part of F<.def> file (which should already contain C<KbdLayerDescriptor @1>) should be appended with
+
+    KbdNlsLayerDescriptor @2
+    KbdLayerRealDllFileNT4 @3
+    ; for NT4 Hydra backward comptility -- @4 should be left empty.
+    KbdLayerRealDllFile @5
+    ; KbdLayerMultiDescriptor @6 fully undocumented
+
+This would make C<CapsLock> pressed when C<Alt>-modifier (and no other modifier) were down to behave as C<OEM_AX>.  Moreover, since
+the second table is “fully loaded”, there going to be no “stuck” C<OEM_AX> key — so, in particular, one can use C<OEM_AX> as I<a new
+modifier key>!
+
+For example, pressing C<Alt>, then C<CapsLock>, then releasing C<Alt> when keeping C<CapsLock> down allows combinging this fake-
+C<OEM_AX> key with other modifiers — then combine this accord with “real keypresses”.
+
+C<Warnong:> for less confusion, it is probably advisable to implement the C<VK_>-code-switch above I<whenever> C<Alt> is down — so
+that C<Alt> may be combined with other modifiers.  Then the start of the table entry above should be changed to:
+
+        KBDNLS_INDEX_NORMAL,        // (The initial value of) the memory bit  (.NLSFEProcCurrent)
+        0xF0, /* 11110000 */        // NLSFEProcSwitch (is “active” in positions marked with [*] below)
+        {                           // NLSFEProc
+            {KBDNLS_SEND_BASE_VK,0},           // Base    (These are “real” states of SHIFT etc, not “fancy”)
+            {KBDNLS_SEND_BASE_VK,0},           // Shift
+            {KBDNLS_SEND_BASE_VK,0},           // Control
+            {KBDNLS_SEND_BASE_VK,0},           // Shift+Control
+            {KBDNLS_SEND_PARAM_VK,VK_OEM_AX},  // Alt                 [*] (= “use the second table on release”) AltGr ⇒ Alt
+            {KBDNLS_SEND_PARAM_VK,VK_OEM_AX},  // Shift+Alt           [*] (= “use the second table on release”)
+            {KBDNLS_SEND_PARAM_VK,VK_OEM_AX},  // Control+Alt         [*] (= “use the second table on release”)
+            {KBDNLS_SEND_PARAM_VK,VK_OEM_AX}   // Shift+Control+Alt   [*] (= “use the second table on release”)
+        },
 
 =head2 A convenient assignment of C<KBD*> bitmaps to modifier keys
 
@@ -3574,9 +3750,14 @@ wider bitmaps is the size of the keyboard DLL: using 10 bits instead of 5 would
 only increase the size by 1K.
 
 Since it seems that L<the OS does not eat combinations of C<Win> and C<AltGr>|https://support.microsoft.com/en-us/windows/keyboard-shortcuts-in-windows-dcc61a57-8ff0-cffe-9796-cb9706c75eec>,
-one may actually use these combintations to produce character input.  (Although
+one may actually use these combinations to produce character input.  (Although
 without thorough experiments it is not clear whether this is advisable…  Better
-avoid C<Win> if feasible!)
+avoid C<Win> if feasible!  L<This undocumented C<Ctrl-Win-Alt-Shift-L> shortcut|https://www.pcworld.com/article/2070843/behold-the-dumbest-windows-shortcut-of-them-all.html>
+may also get in the way!  One can still hope that there is a way to affect this by a judicious use of the remapping of C<LWIN> and
+C<RWIN> keys as in L<"A full example of changing C<VK_>-codes depending on modifiers">.  Although interpretation of C<AltGr> “as
+of pure C<Alt>” — see the referenced section and its preceding section — gets in the way of “naive approaches”: with them the
+shortcuts including C<Win>+C<Alt> — “Game pad”, “Voice typing” and “App‘s actions” — must be entered “in exactly this order” — as
+opposed to C<Alt>+C<Win>…)
 
 If one assignes character input to combinations including C<Win+rAlt>, this
 adds 8 more C<Shift>-pairs to 21 discussed above.  For example, one could add
@@ -4811,6 +4992,12 @@ that C<%Keyboard_Layout_Creator%> is set so that
   %Keyboard_Layout_Creator%\bin\i386\kbdutool.exe
 
 exists — although now it uses only the C compiler from this distribution).
+
+=head2 The generated table of C<KEYNAME>s is wrong for C<F>-keys
+
+The numeric part is C<VK_>-codes, while it should be the scancodes.  Similarly, in the
+“extended” section appear mysterious keys C<< <00> >>, C<Help> (in positions C<X54>, C<X56>)
+which do not seem to be present anywhere.
 
 =head1 Workarounds for WINDOWS GOTCHAS for application developers (problems in kernel)
 
@@ -8398,7 +8585,7 @@ sub massage_full($) {
     for my $F (sort keys %{ $self->{faces} }) {	# Finally, collect the reachable no-prefix keys (include extra), make Compose
       next if 'HASH' ne ref $self->{faces}{$F} or $F =~ /\bVK$/;			# "parent" taking keys for a child
       next if $F =~ /#\@?#\@?(Inv)?#\@?/;		# Face-on-a-deadkey
-      my(%seenExtra, %seenExtraWithPrefix, %seenExtraPrefix);
+      my(%seenExtra, %seenExtraWithPrefix, %seenExtraPrefix);	# non-prefix, all, prefix-only
       my @extras = ( "@{ $self->{faces}{$F}{'[output_layers]'} || [''] }" =~ /\bprefix(?:\w*)=([0-9a-fA-F]{4,6}\b|.(?![^ ]))/g );
       my %is_extra = map { ($self->charhex2key($_), 1) } @extras;	# extra layers (on bizarre modifiers)
       for my $deadKEY ( sort keys %{ $self->{faces}{$F}{'[deadkeyFace]'}} ) {	# process Extra-basekeys
@@ -8406,8 +8593,10 @@ sub massage_full($) {
         next unless $is_extra{$deadKey};
 	# warn "$F ExtraPrefix=$deadKEY\n";
         my($FFF,$C) = $self->{faces}{$F}{'[deadkeyFace]'}{$deadKEY};
-        my $cov1 = $self->{faces}{$FFF}{'[coverage0]'}	# (non-prefix base keys) XXXX not layer0coverage0 - may slide down to layer0
+        my $cov0 = $self->{faces}{$FFF}{'[layer0coverage0]'}	# non-prefix base keys: can access all of these
           or warn("Deadkey `$deadKey' on face `$F' -> unmassaged face"), next;
+          	# XXXX this is heuristical only: we do not actually check sliding down and/or multi-codepoing!!! ???
+        my $cov1 = $self->{faces}{$FFF}{'[coverage0]'};	# non-prefix; may slide down; may access with AltGr-invertor if not multi-codepoint
         $seenExtraWithPrefix{$_}++, $seenExtra{$_}++          for map {ref() ? $_->[0] : $_} @$cov1;
         $seenExtraWithPrefix{$_}++, $seenExtraPrefix{$_}++    for keys %{$self->{faces}{$FFF}{'[coverage0_prefix]'}};
       }
@@ -8943,11 +9132,16 @@ sub massage_VK ($$) {
   $self->{faces}{$f}{'[scancodes]'} = \ my %scan;
   for my $K (reverse sort keys %$VK) {			# want SPACE to come before ABNT_* and OEM_102	;-)
     my ($v, @C) = $VK->{$K};
+    my $vv = $v->[0];
     die("Can't reset the scancode for the VK key `$K'") if @$v < 2 and not length $v->[0];
-    $scan{$K} = $v->[0],  $self->{faces}{$f}{'[scancodes_more]'}{$v->[0]} = $K, next unless @$v > 1;	# Do not modify %VK_off; only memorize the scancode
-    $v->[0] = $scan_codes{$K} or die("Can't find the scancode for the VK key `$K'")
-      unless length $v->[0];
-    $scan{$K} = $v->[0];
+    if ($v->[0] =~ /\|/ or @$v <= 1) {
+      $scan{$K} = $_,  $self->{faces}{$f}{'[scancodes_more]'}{$_} = $K for split /\|/, uc $v->[0];	# the last one is put into %scan
+      $vv = $scan{$K};
+    }
+    next unless @$v > 1;				# Do not modify %VK_off; only memorize the scancode
+    $vv = $scan_codes{$K} or die("Can't find the scancode for the VK key `$K'")
+      unless length $vv;
+    $scan{$K} = $vv;
 # warn 'Key: <', join('> <', @$v), '>';
     my $c = 0;
     $VK_off{$K} = @{ $extra[0] };		# Where in the layouts is the VK key
@@ -8963,8 +9157,9 @@ sub massage_VK ($$) {
       $c++;
     }
 # warn 'Key: <', join('> <', @C), '>';
-    @$v = ($v->[0], @C);			# update the entry in %$VK
+    @$v = ($v->[0], @C);			# update the entry in %$VK	(may be shared with other Faces!!!)
   }
+warn "eScanCodes($f): [", join(' ', sort keys %{$self->{faces}{$f}{'[scancodes_more]'}||{}}), ']';
   $self->{faces}{$f}{'[ini_layers]'} = [ @{ $self->{faces}{$f}{layers} } ];	# Deep copy
   if (@extra) {
     my($start_append, @Ln);
@@ -9179,8 +9374,9 @@ my %shift_control_extra = (2 => "\x00", 6 => "\x1e", OEM_MINUS => "\x1f");	# uns
     			      or $k eq 'DECIMAL' and '53'	# kbdutool only accepts DECIMAL on 53
 			      or $k =~ /^(?:NUMPAD(\d)|DECIMAL)$/ and (defined $1 ? "E0E$1" : 'E0EA'))
       or warn("Can't find the scancode for the key `$k'"), return;
+    $sc  = uc $sc;						# Probably already uc⸣ed (need for comparison)
     $sc =~ /^E0E/ and warn "Redirected numpad key $k to a fake scancode $sc";
-    $self->{faces}{$face}{'[emitted_scancodes]'}{$sc}++;
+    $self->{faces}{$face}{'[emitted_scancodes]'}{$sc} = $k;
     my ($cnt, @KK) = 0;
     my $skip = grep $k eq $_, @{$self->{faces}{$face}{'[skip_extra_layers_WIN]'}};
     my $flat = $self->flatten_unit($face, $N,
@@ -9354,7 +9550,12 @@ sub output_layout_win_only_scancodes ($$) {
   my ($self, $face) = (shift, shift);
   my $only_sc = $self->{faces}{$face}{'[scancodes_more]'} || {};
   my $emitted = $self->{faces}{$face}{'[emitted_scancodes]'} || {};	# Now all the unit00 are done, so this is filled
-  map "$_\t$only_sc->{$_}\n", grep !$emitted->{$_}, keys %$only_sc;
+warn 'eScanCodes: [', join(' ', sort keys %$only_sc), '] emitted=', join(' ', sort keys %$emitted), ']';
+  for my $sc (sort keys %$only_sc) {
+    next unless exists $emitted->{$sc};
+    warn "An extra scancode $sc for $only_sc->{$sc} conflicts with one for $emitted->{$_}" unless $only_sc->{$sc} eq $emitted->{$_}
+  }
+  map "$_\t$only_sc->{$_}\n", grep !exists $emitted->{$_}, sort keys %$only_sc;
 }
 
 sub output_layout_win ($$$$$$$) {	# $baseK contains the VK_-names
@@ -9441,14 +9642,14 @@ LOCALENAME	"LOCALE_NAME"
 
 LOCALEID	"SORT_ORDER_ID_LOCALE_ID"
 
-VERSION	1.0
+VERSION	1.0	// UI::KeyboardLayout version=UIKL_VERSION
 
 MODIFIERS
-SHIFTSTATE
+SHIFTSTATE	// With kbdutool the SHIFTSTATE should map to at least 2 columns, and map the Control key (= “have 2 present”)
 
 BITS_TEMPLATE
 ATTRIBS
-LAYOUT		;an extra '@' at the end is a dead key
+LAYOUT		// an extra '@' at the end is a dead key
 
 //SC	VK_		Cap	COL_HEADERS
 // in this row ⒸⒶ mean “right”:	COL_HUMAN
@@ -9457,7 +9658,16 @@ LAYOUT_KEYS
 DO_LIGA
 DEADKEYS
 
-KEYNAME
+// KEYNAME KEYNAME_EXT KEYNAME_DEAD - used to map a Scancode to Key Name via GetKeyNameText(); null-terminated.
+//
+// If the name is not found in the first two tables,
+// then it is deduced from the character/deadkey this key produces in the unshifted position (as MapVirtualKeyEx()).
+// In particular, the special-case in the latter function covers VK_A to VK_Z!
+//
+// As a corollary, the third table needs only to contain dead keys in the unshifted positions, and only
+// at positions not present in the first two tables.
+
+KEYNAME		// Mostly from type 4 keyboard, not producing a printable char, non-variable in types 1...6, Ctrl/etc are left versions
 
 01	Esc
 0e	Backspace
@@ -9480,50 +9690,74 @@ KEYNAME
 42	F8
 43	F9
 44	F10
-45	Pause
+45	Pause		// VK_NUMLOCK
 46	"Scroll Lock"
-47	"Num 7"
-48	"Num 8"
-49	"Num 9"
-4a	"Num -"
-4b	"Num 4"
-4c	"Num 5"
-4d	"Num 6"
-4e	"Num +"
-4f	"Num 1"
-50	"Num 2"
-51	"Num 3"
-52	"Num 0"
+47	"Num 7"		// VK_HOME (starts a block)
+48	"Num 8"		// ...
+49	"Num 9"		// ...
+4a	"Num -"		// ...
+4b	"Num 4"		// ...
+4c	"Num 5"		// ...
+4d	"Num 6"		// ...
+4e	"Num +"		// ...
+4f	"Num 1"		// ...
+50	"Num 2"		// ...
+51	"Num 3"		// ...
+52	"Num 0"		// VK_INSERT (ends a block)
 53	"Num Del"
-54	"Sys Req"
+54	"Sys Req"	// VK_SNAPSHOT ("Print Screen")
+56	"Oem 102"
 57	F11
 58	F12
-5C	AX
-70	KANA
-73	"ABNT C1"
-79	CONVERT
-7c	F13
-7d	F14
-7e	F15
-7f	F16
-80	F17
-81	F18
-82	F19
-83	F20
-84	F21
-85	F22
-86	F23
-87	F24
+59		Clear
+5a		Wctrl
+5b		Finish
+5c		Jump	// Was AX in older versions
+5d		EREOF
+5e		Backtab
+5f		Auto
+62		Zoom
+63		Help
+64			F13	// These F-keys were wrong in MSKLC (VK-codes, not scancodes)
+65			F14
+66			F15
+67			F16
+68			F17
+69			F18
+6a			F19
+6b			F20
+6c			F21
+6d			F22
+6e			F23
+6f		PA3
+70		KANA		// From Types 30 33
+71		Reset
+73		"ABNT C1"
+76			F24
+79		CONVERT		// From Types 7 8
+7b		PA1
+7c		"KB3270 Tab"
+7e		"ABNT C2"
+7f		PA2
 
-KEYNAME_EXT
+KEYNAME_EXT		// Type 4
 
+10		"Prev Track"
+19		"Next Track"
 1c	"Num Enter"
 1d	"Right Ctrl"
+20		"Volume Mute"
+21		"Launch App2"
+22		"Pause Play"
+24		"Stop"
+2e		"Volume Down"
+30		"Volume ߙp"
+32		"Browser Home"
 35	"Num /"
 37	"Prnt Scrn"
 38	"Right Alt"
 45	"Num Lock"
-46	Break
+46	Break		// VK_CANCEL
 47	Home
 48	Up
 49	"Page Up"
@@ -9531,14 +9765,25 @@ KEYNAME_EXT
 4d	Right
 4f	End
 50	Down
-51	"Page Down"
+51	"Page Down"	// Types 1 3 4
 52	Insert
 53	Delete
-54	<00>
-56	Help
+54	<00>		// ??? from MSKLC; not in kbd.h (on no Type) (does not seem to be used on any layout)
+56	Help		// ??? from MSKLC; not in kbd.h (on no Type) (does not seem to be used on any layout)
 5b	"Left Windows"
 5c	"Right Windows"
 5d	Application
+5e		Power
+5f		Sleep
+65		"Browser Search"
+66		"Browser Favorites"
+67		"Browser Refresh"
+68		"Browser Stop"
+69		"Browser Forward"
+6a		"Browser Back"
+6b		"Launch App1"
+6c		"Launch Mail"
+6c		"Launch Media Select"
 
 KEYNAMES_DEAD
 
@@ -9772,9 +10017,11 @@ sub output_deadkeys ($$$$$$;$) {	# Emits 1 or 2 maps; for the 2nd, uses $prefix_
     my (%joined_map, %loopOK);
     for my $hex (sort keys %$map) {	# Temprorarily???  Map joined keys to itself without resolving conficts (sort: consistent EXPL)
       $joined_map{$hex} = $map->{$hex}, next if $OUT_Apple or $hex =~ /^[a-f\d]{4}$/;
-      my(@comp,%seen,$seen) = split /\./, ($hex =~ /^[a-f\d]+$/
-		                           ? $self->keys2hex(to_UTF16LE_units(chr hex $hex))
-	        	                   : $hex);
+#      my(@comp,%seen,$seen) = split /\./, ($hex =~ /^[a-f\d]+$/
+#		                           ? $self->keys2hex(to_UTF16LE_units(chr hex $hex))
+#	        	                   : $hex);
+      my(@comp,%seen,$seen) = map {/^[a-f\d]{4}$/ ? $_ : split /\./, $self->keys2hex(to_UTF16LE_units(chr hex $hex))}
+      				split /\./, $hex;
       $seen{$_}++ and $seen++ for @comp;
       warn("Skipping a binding for $hex in deadkey=$d: conflicts"), next
         if $seen or grep exists $map->{$_} || exists $joined_map{$_} && not($joined_map{$_}[0] eq $d and $joined_map{$_}[2]==1), @comp;
@@ -9782,7 +10029,7 @@ sub output_deadkeys ($$$$$$;$) {	# Emits 1 or 2 maps; for the 2nd, uses $prefix_
         if ($c==$#comp) {
           my @b = @{$map->{$hex}||[]};
           $b[3] ||= '';
-          $b[3] .= " [from multicomponent source $hex]";
+          $b[3] .= " [from multi-codepoint source $hex]";
           $joined_map{$comp[$c]} = \@b;
         } else {
           $loopOK{$comp[$c]}++;
@@ -9790,7 +10037,7 @@ sub output_deadkeys ($$$$$$;$) {	# Emits 1 or 2 maps; for the 2nd, uses $prefix_
             $joined_map{$comp[$c]}[3] =~ s/(?<=source\b)/s/; #/
             $joined_map{$comp[$c]}[3] .= ", $hex";
           } else {
-            $joined_map{$comp[$c]} = [$d, undef, 1, "Component=" . ($c+1) . " of ". ($#comp+1) . " of multicomponent source $hex"];
+            $joined_map{$comp[$c]} = [$d, undef, 1, "Component=" . ($c+1) . " of ". ($#comp+1) . " of multi-codepoint source $hex"];
           }
         }
       }
@@ -9820,12 +10067,15 @@ sub output_deadkeys ($$$$$$;$) {	# Emits 1 or 2 maps; for the 2nd, uses $prefix_
 ###      $H->{'[32-bit]'}{chr hex $map_n}++, next if hex $n > 0xFFFF and $map_n;	# Cannot be put in a map...
       $H->{'[32-bit]'}{chr hex $map_n}++ if $n !~ /\./ and hex $n > 0xFFFF and $map_n;	# Cannot be put in a map...
       $n = $self->keys2hex(to_UTF16LE_units(chr hex $n)) if hex(my $n_high = $n) >= 0x10000;
-      if ($to and hex $to > 0xFFFF) {{		# Value cannot be put in a map...
+      if ($to and ($to =~ /\./ or hex $to > 0xFFFF)) {{		# Value cannot be put in a map...
 #        warn "32-bit: n=$n map{n}=$map_n to=$to";
+	my $trg = $to;
         $H->{'[32-bit]'}{chr hex $map_n}++;
         last unless defined ($to = $H->{'[DeadChar_32bitTranslation]'});
         $to =~ s/^\s+//;	$to =~ s/\s+$//;
         $to = $self->key2hex($to);
+        $EXPL .= ' ' if $EXPL ||= '';
+        $EXPL .= "Windows’ limitation: multi-codepoint value U+$trg cannot be emitted after a prefix key";
       }}
       if ($n =~ /[^a-f\d]/i or hex $n >= 0x10000) {
         next if $OUT_Apple;
@@ -10434,7 +10684,7 @@ print 'Extracted ', $self->array2string(\@out), " deadKey=$deadkey\n" if printSO
     }, $used_deadkey, 'all_layers';
   }
   if ($name =~ /^DefinedTo\[(.+)\]$/) {
-    my $to = $self->charhex2key($1);
+    my $to = ($1 eq 'undef' ? [] : $self->charhex2key($1));
     return sub ($) { my $c = shift; defined $c or return $c; $self->document_char($to, 'DefinedTo', $c) }, '';
   }
   if ($name =~ /^ByPairs(Inv)?(Prefix)?(Flat)?(Apple)?\[(.+)\]$/) {
@@ -10576,8 +10826,8 @@ sub make_translated_layers_stack ($$@) {		# Stacking
     }
     next if exists $self->{layers}{"@layers"};
     my (@L, @keys) = map $self->{layers}{$_}, @layers;
-    for my $lI (0..$#L) {
-      my $l = $L[$lI];
+    for my $lI (reverse 0..$#L) {
+      my($l, $to) = $L[$lI];
       # warn "... Layer$lN: `$layers[$lI]'..." if debug_stacking;
       for my $k (0..$#$l) {
         for my $kk (0..$#{$l->[$k]}) {
@@ -10585,7 +10835,10 @@ sub make_translated_layers_stack ($$@) {		# Stacking
             $cc = $cc->[0] if ref $cc;
 	    warn "...... On $k/$kk (${lI}th lN=$lN): I see `$cc': ", !defined $keys[$k][$kk], "\n" ;
 	  }
-          $keys[$k][$kk] = $l->[$k][$kk] if defined $l->[$k][$kk] and not defined $keys[$k][$kk];	# Shallow copy
+          if (defined($to = $l->[$k][$kk])) {
+            undef $to if $to and ref $to and not defined $to->[0];	# allow undef'ing
+            $keys[$k][$kk] = $to;
+          }
         }
         $keys[$k] ||= [];
       }
@@ -11460,6 +11713,7 @@ EOPREF
     $h{COL_HUMAN} = join "\t", map $hCols[$_],                                     0..$#cols;
     $h{BITS_TEMPLATE} = join "\n", map { "$cols[$_]\t// Column " . (4+$_) . " :\t" . $self->fmt_bitmap_mods($cols[$_], $_) } 0..$#cols;
   #  $h{BITS_TEMPLATE} =~ s(^(?=.*\bInvalid$))(#)m;					# XXX Actually, MSKLC is not ignoring the leading #
+    $h{UIKL_VERSION} = $VERSION;
   }
   $self->massage_template($template_win, \%h);
 }
@@ -13869,7 +14123,7 @@ sub filter_dotcompose ($;$) {
 
 sub put_val_deep ($$$$@) {
   my($self, $h, $term, $val, $k) = (shift, shift, shift, shift, shift);
-  die "No key(s) in put_val_deep()" unless @_;
+#  die "No key(s) in put_val_deep()" unless @_;		# It is OK to have an empty list
   while (@_) {
     my $oh = $h;
     $h->{$k} = {} unless defined $h->{$k};
@@ -13894,15 +14148,27 @@ sub put_val_deep ($$$$@) {
   }
 }
 
-sub compose_array_2_hash ($$$$) {
-  my($self, $a, $h, $opt) = (@_);
+sub compose_array_2_hash ($$$) {	# Assumes that below, @in is non-empty
+  my($self, $a, $opt) = (@_);
+  my($h, @root) = {};
   for my $l (@$a) {
     my($out, $term, @in) = @$l;
     my $Term = (ref $term ? $term->{term} : $term) ;
     my $pre = (($out eq "\x00" and ref $term and $term->{zeroOK}) ? '00' : '');		# protect against '0000' warning
-    $self->put_val_deep( $h, $term, $pre . $self->key2hex($out), map $self->key2hex($_), @in);
+    if (@in) {
+      $self->put_val_deep( $h, $term, $pre . $self->key2hex($out), map $self->key2hex($_), @in);
+    } elsif (not @root) {
+      @root = $pre . $self->key2hex($out);
+    } else {
+      die "Two empty bindings in compose_array_2_hash(): <<<@root>>> and <<<", $pre . $self->key2hex($out), '>>>';
+    }
     $self->put_val_deep( $opt, $term, $term, map $self->key2hex($_), @in) if ref $term;
   }
+  if (@root) {
+    die "an empty binding combined with others" if keys %$h;
+    return shift @root;
+  }
+  $h
 }
 
 sub compose_line_2_array ($$$$$@) {
@@ -13980,6 +14246,15 @@ sub merge_hash_to ($$$) {	# We do NOT do deep copy
 
 sub create_composeArray ($$$) {
   my ($self, $key, $method) = (shift, shift, shift);
+  if ($method eq 'literal') {
+    my $a = [];
+    for my $entry (split /\|\|\|/, $key) {
+      die "unexpected format of the argument to ComposeKey/literal: <<<$key>>>" unless $key =~ /^(.)=(.*)/;
+      my($out, @in) = ($1, split //, "$2");
+      $self->compose_line_2_array($a, $out, !'massage', $self->key2hex(' '), @in);
+    }
+    return [$a];
+  }
   my $names = $self->get__value($key) or return;
   my @A; # my $H;
   for my $fn (@$names) {
@@ -13998,8 +14273,14 @@ sub compose_Array_2_hash ($$$) {
   my ($self, $A, $OPT) = (shift, shift, shift);
   my $H = {};		# indexed by HEX
   for my $a (@$A) {
-    $self->compose_array_2_hash($a, my $h = {}, my $opt = {});
-    $self->merge_hash_to($h, $H);
+    my $h = $self->compose_array_2_hash($a, my $opt = {});
+    if (ref $h) {
+      $self->merge_hash_to($h, $H);
+    } elsif (not keys %$H) {
+      $H = $h;
+    } else {
+      die "Cannot merge a non-hash to a hash";
+    }
     $self->merge_hash_to($opt, $OPT);
 # warn "CP< ", join ', ', keys %$h;
   }
@@ -14048,6 +14329,7 @@ sub composehash_2_prefix ($$$$$$$$) {
 sub composehash_add_linked ($$$$) {
   my($self, $hexH, $charH, $prefCharH, $delay, %add, %ADD, %cnt) = (shift, shift, shift, shift, {});
 #warn "0: Mismatch E/Е: $hexH->{'0045'}///$hexH->{'0415'}" if $hexH->{'0045'} and $hexH->{'0415'} and $hexH->{'0045'} ne $hexH->{'0415'};
+  return unless ref $hexH;
   for my $h (sort keys %$hexH) {		# Make order predictable: when a char is present in more than 2 places, it matters
     next if $h =~ /^\[(G?Prefix(_Show)?|Mirror|Opt)\]$/;
     $self->composehash_add_linked($hexH->{$h}, $charH, $prefCharH) if ref $hexH->{$h};
@@ -14085,7 +14367,7 @@ sub composehash_add_linked ($$$$) {
 }
 
 sub create_composekey ($$$) {
-  my($self, $F, $prefix, @PREFIX) = (shift, shift, shift);
+  my($self, $F, $descrip, @DESCRIP) = (shift, shift, shift);
   my $linkedF = $self->{faces}{$F}{LinkFace};
   my $linked = $linkedF && $self->{faces}{$linkedF}{Face_link_map}{$F};
   $linked &&= {map {ref($_ || 0) ? $_->[0] : $_} %$linked};
@@ -14095,31 +14377,31 @@ sub create_composekey ($$$) {
 #     $F eq 'Latin' and 
 #     warn "   Compose: $F: ",  join ', ', sort keys %{$self->{faces}{$linkedF}{Face_link_map}{$F}}
 #	if $self->{faces}{$linkedF}{Face_link_map}{$F};
-  if ($prefix and ref $prefix) {
-    @PREFIX = map { my @a = split /,/; 
+  if ($descrip and ref $descrip) {
+    @DESCRIP = map { my @a = split /,/; 
     		    defined $a[$_] and length $a[$_] and $a[$_] = $self->key2hex($self->charhex2key($a[$_])) for 3,4; 
-    		    [@a]} @$prefix;
+    		    [@a]} @$descrip;
   } else {
-    $prefix = $self->key2hex($self->charhex2key($prefix));
-    @PREFIX = ( ['ComposeFiles', 'dotcompose', 'warn', $prefix, ''], 
-    		['EntityFiles',  'entity',     'warn', '', $prefix], 
-    		['rfc1345Files', 'rfc1345',    'warn', '', $prefix]);
+    $descrip = $self->key2hex($self->charhex2key($descrip));
+    @DESCRIP = ( ['ComposeFiles', 'dotcompose', 'warn', $descrip, ''], 
+    		['EntityFiles',  'entity',     'warn', '', $descrip], 
+    		['rfc1345Files', 'rfc1345',    'warn', '', $descrip]);
   }
   $self->load_KeySyms;
-  my $p0 = my $first_prefix = $PREFIX[0][3];			# use for first found map
+  my $p0 = my $first_prefix = $DESCRIP[0][3];			# use for first found map
   $self->{faces}{$F}{'[mainComposeKeyHex]'} = $p0;
   my @Hashes;
   my @Arrays = @{ $self->{'[ComposeArrays]'} || [] };
   unless (@Arrays) {	# Shared between faces
     my @Show;
-    for my $i (0..$#PREFIX) {	# FileList, type, OK_to_miss, prefix, prefix-in-last ... prefix-in-pre-last ...
-      my $pref = $PREFIX[$i];
+    for my $i (0..$#DESCRIP) {	# FileList, type, OK_to_miss, prefix, prefix-in-last ... prefix-in-pre-last ...
+      my $descr = $DESCRIP[$i];
       my $arr;
-      unless ($arr = $self->create_composeArray($pref->[0], $pref->[1]) and @$arr) {
-        warn "Compose list of type $pref->[1] could not be created from FileList variable $pref->[0]" if $pref->[2];
+      unless ($arr = $self->create_composeArray($descr->[0], $descr->[1]) and @$arr) {
+        warn "Compose list of type $descr->[1] could not be created from FileList variable $descr->[0]" if $descr->[2];
         next;
       }
-      push @Arrays, [$arr, $pref];
+      push @Arrays, [$arr, $descr];
       push @Show, $i;
     }
     $self->{'[ComposeArrays]'} = \@Arrays;
@@ -14128,11 +14410,11 @@ sub create_composekey ($$$) {
   my($v, $vv) = map $self->{faces}{$F}{$_}, qw( [coverage0oneUTF16hash] [coverageExtra] );
 #  warn "Filter hashes $F ", scalar keys %$v, ' ', scalar keys %$vv, ' ', scalar @{$self->{faces}{$F}{'[coverage0oneUTF16]'}};
   for my $A (@Arrays) {		# one per type
-    my($arr, $pref) = @$A;
+    my($arr, $descr) = @$A;
     my @NN;
     for my $a (@$arr) {		# $a one per input file
       my @N;
-      for my $l (@$a) {
+      for my $l (@$a) {		# One per line
         my($out, $term, @in) = @$l;
         next if grep {not ($v->{$_} or $vv->{$_} or $linked and $linked->{$_})} @in;
 # my $c;
@@ -14141,10 +14423,10 @@ sub create_composekey ($$$) {
       }
       push @NN, \@N;
     }
-#    warn "Compose face=$F: keys <@$arr> @$pref";
+#    warn "Compose face=$F: keys <@$arr> @$descr";
 #    warn "Compose face=$F: keys ", join ' ', map scalar @$_, @$arr;
     my $opt = {};
-    push @Hashes, [$self->compose_Array_2_hash(\@NN, $opt), $pref, $opt];
+    push @Hashes, [$self->compose_Array_2_hash(\@NN, $opt), $descr, $opt];
   }
   my @hashes;
   my $Comp_show = $self->{faces}{$F}{'[ComposeKey_Show]'};
@@ -14177,7 +14459,7 @@ sub create_composekey ($$$) {
   for my $i ( 0..$#hashes ) {
     my $h = $hashes[$i];
     my $I = $IDX->[$i];
-    next unless my $p = $h->{'[GPrefix]'};		# Not chained (chained are processed as subhashes by composehash_2_prefix()
+    next unless ref $h and my $p = $h->{'[GPrefix]'};		# Not chained (chained are processed as subhashes by composehash_2_prefix()
     my $post = ($c ? "[$c]" : '');
     my $comp_show = $h->{'[Prefix_Show]'};
     unless (defined $comp_show) {

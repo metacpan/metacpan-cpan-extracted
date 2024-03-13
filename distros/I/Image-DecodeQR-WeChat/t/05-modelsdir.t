@@ -1,19 +1,27 @@
+#!/usr/bin/env perl
+
 use strict;
 use warnings;
 
-our $VERSION = '1.0';
+our $VERSION = '2.1';
 
 use Test::More;
 use Test2::Plugin::UTF8;
 
-use Image::DecodeQR::WeChat;
 use File::Spec;
 use File::ShareDir qw/dist_dir/;
 use Time::HiRes;
 
+use Image::DecodeQR::WeChat qw/
+	modelsdir
+	opencv_has_highgui_xs
+	detect_and_decode_qr_xs
+	detect_and_decode_qr
+/;
+
 # modelsdir is installed during 'perl Makefile.PL/make install' stage
 # to a share-dir relative to INSTALL_BASE and will be read-only
-# if one does not supply modelsdir to decode_xs() or decode()
+# if one does not supply modelsdir to detect_and_decode_qr_xs() or detect_and_decode_qr()
 # this default will be used
 
 my ($t, $d);

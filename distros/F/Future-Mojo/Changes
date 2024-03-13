@@ -1,3 +1,6 @@
+1.003     2024-03-11 00:28:37 EDT
+  - Fix compatibility with Future implementations like Future::XS (haarg, #6)
+
 1.002     2021-06-16 02:18:44 EDT
   - Update IRC metadata to libera.chat
 

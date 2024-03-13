@@ -6,7 +6,6 @@ META.json
 META.yml
 Makefile.PL
 README
-README.md
 alienfile
 dist.ini
 lib/Alien/SeqAlignment/edlib.pm

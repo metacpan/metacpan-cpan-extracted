@@ -12,9 +12,11 @@ README.md
 script/image-decodeqr-wechat.pl
 t/00-load.t
 t/05-modelsdir.t
-t/06-decode_xs-prototype.t
-t/10-decode_xs.t
-t/50-decode.t
+t/06-decode-xs-prototype.t
+t/10-decode-xs.t
+t/20-usage-pod.t
+t/50-decode-pp.t
+t/60-decode-pp-with-dumpqrimagestofile-ON.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
@@ -33,7 +35,8 @@ typemap
 WeChat.xs
 wechat_qr_decode_lib.cpp
 wechat_qr_decode_lib.hpp
-xt/50-decode-with-graphicaldisplayresult.t
+xt/50-decode-pp-with-graphicaldisplayresult.t
+xt/60-decode-pp-with-graphicaldisplayresult-dumpqrimagestofile-ON.t
 xt/boilerplate.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

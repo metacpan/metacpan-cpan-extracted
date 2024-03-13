@@ -27,7 +27,7 @@ sub _clear_log_messages
 
 sub _log_messages
 {
-    [ map $_->{message}, @{ $chrome->logger->events } ];
+    [ map $_->{message}, $chrome->logger->events->@* ];
 }
 
 1;

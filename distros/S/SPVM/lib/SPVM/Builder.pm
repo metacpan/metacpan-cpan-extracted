@@ -42,6 +42,7 @@ sub new {
   my $class = shift;
   
   my $self = {
+    build_dir => $ENV{SPVM_BUILD_DIR},
     include_dirs => [map { "$_/SPVM" } @INC],
     @_
   };
@@ -156,7 +157,7 @@ sub build {
       confess("A config file \"$config_rel_file\" is not found in (@INC)");
     }
     
-    $config = SPVM::Builder::Config->load_config($config_file);
+    $config = SPVM::Builder::Config->load_config($config_file, []);
   }
   elsif ($category eq 'precompile') {
     $config = SPVM::Builder::Util::API::create_default_config();

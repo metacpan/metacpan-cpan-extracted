@@ -1,6 +1,6 @@
 package MARC::Moose::Reader::File::Isis;
 # ABSTRACT: A file reader for ISIS (DOS) encoded records
-$MARC::Moose::Reader::File::Isis::VERSION = '1.0.46';
+$MARC::Moose::Reader::File::Isis::VERSION = '1.0.48';
 use Moose;
 
 use Carp;
@@ -47,7 +47,7 @@ MARC::Moose::Reader::File::Isis - A file reader for ISIS (DOS) encoded records
 
 =head1 VERSION
 
-version 1.0.46
+version 1.0.48
 
 =head1 DESCRIPTION
 
@@ -87,7 +87,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Frédéric Demians.
+This software is copyright (c) 2024 by Frédéric Demians.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

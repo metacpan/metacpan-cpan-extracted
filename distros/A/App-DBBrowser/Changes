@@ -1,5 +1,14 @@
 Revision history for App-DBBrowser
 
+2.407  2024-03-11
+        - Bugfix: auto-increment primary key quoted twice.
+
+2.406  2024-03-11
+        - New 'create table' options: 'table constraints' and 'table options'.
+        - Update option 'auto increment column'.
+        - Use storable to make deep copies.
+        - DB2, Oracle, Firebird: regex operator bugfix.
+        - DBD::SQLite minimum version '1.74'.
 
 2.405  2024-02-12
         - Bugfixes in the 'search & replace' input filter.

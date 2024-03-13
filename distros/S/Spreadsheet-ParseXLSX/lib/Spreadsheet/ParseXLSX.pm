@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.33'; # VERSION
+our $VERSION = '0.34'; # VERSION
 
 # ABSTRACT: parse XLSX files
 
@@ -15,6 +15,7 @@ use Spreadsheet::ParseExcel;
 use XML::Twig;
 
 use Spreadsheet::ParseXLSX::Decryptor;
+use Spreadsheet::ParseXLSX::Worksheet;
 use Spreadsheet::ParseXLSX::Cell;
 
 
@@ -138,7 +139,7 @@ sub _parse_workbook {
   my @sheets = map {
     my $idx = $_->att('rels:id');
     if ($files->{sheets}{$idx}) {
-      my $sheet = Spreadsheet::ParseExcel::Worksheet->new(
+      my $sheet = Spreadsheet::ParseXLSX::Worksheet->new(
         Name => $_->att('name'),
         _Book => $workbook,
         _SheetNo => $idx,
@@ -173,6 +174,10 @@ sub _parse_workbook {
 sub _parse_sheet {
   my $self = shift;
   my ($sheet, $sheet_file) = @_;
+  # The XML::Twig instance does not clean up properly.  If we give it callbacks with
+  # strong references to $self or $sheet, we end up with a memory leak.
+  Scalar::Util::weaken($self);
+  Scalar::Util::weaken($sheet);
 
   $sheet->{MinRow} = 0;
   $sheet->{MinCol} = 0;
@@ -410,11 +415,12 @@ sub _parse_sheet {
 
   if ($sheet->{Cells}) {
     # SMELL: we have to connect cells their sheet as well as their position
+    my $sheet_addr= Scalar::Util::refaddr($sheet);
     for my $r (0 .. $#{$sheet->{Cells}}) {
       my $row = $sheet->{Cells}[$r] or next;
       for my $c (0 .. $#$row) {
         my $cell = $row->[$c] or next;
-        $cell->{Sheet} = $sheet;
+        $cell->{Sheet} = $sheet_addr;
         $cell->{Row} = $r;
         $cell->{Col} = $c;
       }
@@ -1164,7 +1170,7 @@ Spreadsheet::ParseXLSX - parse XLSX files
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =head1 SYNOPSIS
 
@@ -1321,7 +1327,7 @@ Jesse Luehrs <doy@tozt.net>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alexey Mazurin Daryl Anderman Dave Clarke Fitz Elliott FL Gareth Tunley M Conrad Meredith Howard Michael Daum Nick Moore oharakouhei rdboisvert Ricardo Signes Robert Boisvert Steve Simms Stuart Watt theevilapplepie zhouzhen1
+=for stopwords Alexey Mazurin Daryl Anderman Dave Clarke Fitz Elliott FL Gareth Tunley Meredith Howard Michael Conrad Daum Nick Moore oharakouhei rdboisvert Ricardo Signes Robert Boisvert Steve Simms Stuart Watt theevilapplepie zhouzhen1
 
 =over 4
 
@@ -1351,11 +1357,11 @@ Gareth Tunley <gjtunley@gmail.com>
 
 =item *
 
-M Conrad <mike@nrdvana.net>
+Meredith Howard <mhoward@roomag.org>
 
 =item *
 
-Meredith Howard <mhoward@roomag.org>
+Michael Conrad <mike@nrdvana.net>
 
 =item *
 

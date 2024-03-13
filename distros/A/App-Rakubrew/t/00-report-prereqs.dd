@@ -1,7 +1,7 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '0'
+                                        'ExtUtils::MakeMaker' => '7.1101'
                                       }
                       },
        'develop' => {
@@ -15,14 +15,13 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'Encode::Locale' => '1.05',
-                                      'File::Copy::Recursive' => '0.45',
-                                      'File::HomeDir' => '0.97',
-                                      'File::Which' => '1.23',
-                                      'HTTP::Tinyish' => '0.15',
-                                      'JSON' => '4.02',
-                                      'Path::Tiny' => '0',
-                                      'Try::Tiny' => '0.30',
+                                      'Encode::Locale' => '== 1.05',
+                                      'File::Copy::Recursive' => '== 0.45',
+                                      'File::HomeDir' => '== 1.006',
+                                      'File::Which' => '== 1.27',
+                                      'HTTP::Tinyish' => '== 0.19',
+                                      'JSON' => '== 4.10',
+                                      'Try::Tiny' => '== 0.31',
                                       'perl' => '5.010001'
                                     }
                     },
@@ -33,8 +32,8 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
-                                   'IPC::Run' => '20200505.0',
-                                   'Test::Compile' => 'v2.3.1',
+                                   'IPC::Run' => '== 20231003.0',
+                                   'Test::Compile' => '== v3.3.1',
                                    'Test::More' => '0'
                                  }
                  }

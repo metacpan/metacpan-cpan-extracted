@@ -5,7 +5,8 @@ use Test2::V0;
 
 use Qhull::Util 'parse_output';
 use Path::Tiny;
-use Data::Dump;
+use Data::Rmap 'rmap_to', ':types', 'cut';
+use Scalar::Util 'looks_like_number';
 
 use JSON::PP;
 
@@ -45,6 +46,16 @@ for my $test ( @tests ) {
 
         my $input    = $data->child( $test->{file} . '.txt' )->slurp;
         my $expected = decode_json( $data->child( $test->{file} . '.json' )->slurp );
+
+        # perform a numerical compare
+        rmap_to {
+            if ( looks_like_number( $_ ) ) {
+                $_ = float( $_ );
+                cut;
+            }
+            return;
+        }
+        VALUE, $expected;
 
         my @got;
 

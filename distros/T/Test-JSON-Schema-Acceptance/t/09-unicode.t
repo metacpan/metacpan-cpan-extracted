@@ -72,8 +72,11 @@ $accepter->acceptance(
     is(index($data, "\"Les hivers de mon enfance \x{c3}\x{a9}taient"), 0,
       'data contains utf8-encoded data (latin-1 character is encoded as two bytes in utf8')
       &&
-    is(JSON::MaybeXS->new(utf8 => 1, allow_nonref => 1)->decode($data), $schema->{const},
-      'data can be decoded and compares correctly');
+    is(
+      (Mojo::JSON::JSON_XS ? 'Cpanel::JSON::XS' : 'JSON::PP')->new->utf8(1)->allow_nonref(1)->decode($data),
+      $schema->{const},
+      'data can be decoded and compares correctly',
+    );
   },
 );
 

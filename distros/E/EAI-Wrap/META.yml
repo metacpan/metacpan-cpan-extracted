@@ -25,22 +25,22 @@ no_index:
 provides:
   EAI::Common:
     file: lib/EAI/Common.pm
-    version: '1.911'
+    version: '1.912'
   EAI::DB:
     file: lib/EAI/DB.pm
-    version: '1.911'
+    version: '1.912'
   EAI::DateUtil:
     file: lib/EAI/DateUtil.pm
-    version: '1.911'
+    version: '1.912'
   EAI::FTP:
     file: lib/EAI/FTP.pm
-    version: '1.911'
+    version: '1.912'
   EAI::File:
     file: lib/EAI/File.pm
-    version: '1.911'
+    version: '1.912'
   EAI::Wrap:
     file: lib/EAI/Wrap.pm
-    version: '1.911'
+    version: '1.912'
 recommends:
   Text::CSV_XS: '0'
   Win32::Console::ANSI: '0'
@@ -67,5 +67,5 @@ requires:
 resources:
   bugtracker: https://github.com/rkapl123/EAI-Wrap/issues
   repository: https://github.com/rkapl123/EAI-Wrap.git
-version: '1.911'
+version: '1.912'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

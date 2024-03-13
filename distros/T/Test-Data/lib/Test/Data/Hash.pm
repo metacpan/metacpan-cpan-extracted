@@ -9,7 +9,7 @@ our @EXPORT = qw(exists_ok not_exists_ok
 	hash_value_defined_ok hash_value_undef_ok
 	hash_value_true_ok hash_value_false_ok);
 
-our $VERSION = '1.245';
+our $VERSION = '1.246';
 
 use Test::Builder;
 my $Test = Test::Builder->new();

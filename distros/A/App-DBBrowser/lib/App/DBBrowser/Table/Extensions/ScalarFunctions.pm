@@ -70,8 +70,7 @@ sub __choose_columns {
         elsif ( $menu->[$idx[0]] eq $sf->{i}{menu_addition} ) {
             # recursion
             my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
-            require Clone;
-            my $bu_nested_func = Clone::clone( $r_data );
+            my $bu_nested_func = $ax->clone_data( $r_data );
             # reset nested_func and add an array-ref so the child function knows that the parent is a multi-col function.
             # Children of a  multi-col function start with an empty nested_func. Only whenn they return to
             # the parent multi-col function their results are integrated in the parent nested_func.
@@ -230,10 +229,10 @@ sub col_function {
     my $second       = 'SECOND';
     my $day_of_week  = 'DAYOFWEEK';
     my $day_of_year  = 'DAYOFYEAR';
-
-    $functions{date} = [ sort( $dateadd, $epoch_to_d, $epoch_to_dt, $extract, $now, $year, $quarter, $month, $week, $day, $hour, $minute, $second, $day_of_week, $day_of_year ) ];
+    my $unix_ts      = 'UNIX_TIMESTAMP';
+    $functions{date} = [ sort( $dateadd, $epoch_to_d, $epoch_to_dt, $extract, $now, $year, $quarter, $month, $week, $day, $hour, $minute, $second, $day_of_week, $day_of_year ) ]; # , $unix_ts # ###
     if ( $sf->{i}{driver} eq 'Informix' ) {
-        $functions{date} = [ grep { ! /^(?:$week|$day_of_year)\z/ } @{$functions{date}} ];
+        $functions{date} = [ grep { ! /^(?:$week|$day_of_year|$unix_ts)\z/ } @{$functions{date}} ];
     }
 
     my $cast         = 'CAST';
@@ -244,7 +243,7 @@ sub col_function {
     my @one_col_func = (
         $trim, $ltrim, $rtrim, $upper, $lower, $octet_length, $char_length, $reverse,
         $abs, $ceil, $exp, $floor, $log, $sign, $sqrt,
-        $year, $quarter, $month, $week, $day, $hour, $minute, $second, $day_of_week, $day_of_year,
+        $year, $quarter, $month, $week, $day, $hour, $minute, $second, $day_of_week, $day_of_year, $unix_ts
     );
     my @one_col_one_arg_func = (
         $left, $position, $right,

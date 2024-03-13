@@ -1,6 +1,6 @@
 package MARC::Moose::Formater::Iso2709;
 # ABSTRACT: MARC::Moose record formater into ISO 2709 format
-$MARC::Moose::Formater::Iso2709::VERSION = '1.0.46';
+$MARC::Moose::Formater::Iso2709::VERSION = '1.0.48';
 use Moose;
 use utf8;
 use Modern::Perl;
@@ -62,7 +62,7 @@ MARC::Moose::Formater::Iso2709 - MARC::Moose record formater into ISO 2709 forma
 
 =head1 VERSION
 
-version 1.0.46
+version 1.0.48
 
 =head1 AUTHOR
 
@@ -70,7 +70,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Frédéric Demians.
+This software is copyright (c) 2024 by Frédéric Demians.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

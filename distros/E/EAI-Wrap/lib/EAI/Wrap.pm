@@ -1,4 +1,4 @@
-package EAI::Wrap 1.911;
+package EAI::Wrap 1.912;
 
 use strict; use feature 'unicode_strings'; use warnings;
 use Exporter qw(import); use Data::Dumper qw(Dumper); use File::Copy qw(copy move); use Cwd qw(chdir); use Archive::Extract ();
@@ -15,7 +15,7 @@ BEGIN {
 };
 use EAI::Common; use EAI::DateUtil; use EAI::DB; use EAI::File; use EAI::FTP;
 
-our @EXPORT = qw(%common %config %execute @loads @optload %opt removeFilesinFolderOlderX openDBConn openFTPConn redoFiles getLocalFiles getFilesFromFTP getFiles checkFiles extractArchives getAdditionalDBData readFileData dumpDataIntoDB markProcessed writeFileFromDB putFileInLocalDir markForHistoryDelete uploadFileToFTP uploadFileCMD uploadFile processingEnd processingPause processingContinues standardLoop moveFilesToHistory deleteFiles
+our @EXPORT = qw(%common %config %execute @loads @optload %opt removeFilesinFolderOlderX openDBConn openFTPConn redoFiles getLocalFiles getFilesFromFTP getFiles checkFiles extractArchives getAdditionalDBData readFileData dumpDataIntoDB markProcessed writeFileFromDB writeFileFromMemory putFileInLocalDir markForHistoryDelete uploadFileToFTP uploadFileCMD uploadFile processingEnd processingPause processingContinues standardLoop moveFilesToHistory deleteFiles
 monthsToInt intToMonths addLocaleMonths get_curdate get_curdatetime get_curdate_dot formatDate formatDateFromYYYYMMDD get_curdate_dash get_curdate_gen get_curdate_dash_plus_X_years get_curtime get_curtime_HHMM get_lastdateYYYYMMDD get_lastdateDDMMYYYY is_first_day_of_month is_last_day_of_month get_last_day_of_month weekday is_weekend is_holiday is_easter addCalendar first_week first_weekYYYYMMDD last_week last_weekYYYYMMDD convertDate convertDateFromMMM convertDateToMMM convertToDDMMYYYY addDays addDaysHol addMonths subtractDays subtractDaysHol convertcomma convertToThousendDecimal get_dateseries parseFromDDMMYYYY parseFromYYYYMMDD convertEpochToYYYYMMDD make_time formatTime get_curtime_epochs localtime timelocal_modern
 newDBH beginWork commit rollback readFromDB readFromDBHash doInDB storeInDB deleteFromDB updateInDB getConn setConn
 readText readExcel readXML writeText writeExcel
@@ -59,11 +59,11 @@ sub INIT {
 sub readConfigs (;$) {
 	my $envraw = ($_[0] ? $_[0]."/" : "");
 	EAI::Common::readConfigFile("$EAI_WRAP_CONFIG_PATH/${envraw}site.config") if -e "$EAI_WRAP_CONFIG_PATH/${envraw}site.config";
-	EAI::Common::readConfigFile($_) for sort glob("$EAI_WRAP_CONFIG_PATH/additional/*.config");
-	EAI::Common::readConfigFile($_) for sort glob("$EAI_WRAP_SENS_CONFIG_PATH/*.config");
+	EAI::Common::readConfigFile($_) for sort glob qq{"$EAI_WRAP_CONFIG_PATH/additional/*.config"};
+	EAI::Common::readConfigFile($_) for sort glob qq{"$EAI_WRAP_SENS_CONFIG_PATH/*.config"};
 	if ($envraw) {
-		EAI::Common::readConfigFile($_) for sort glob("$EAI_WRAP_CONFIG_PATH/${envraw}additional/*.config");
-		EAI::Common::readConfigFile($_) for sort glob("$EAI_WRAP_SENS_CONFIG_PATH/${envraw}*.config");
+		EAI::Common::readConfigFile($_) for sort glob qq{"$EAI_WRAP_CONFIG_PATH/${envraw}additional/*.config"};
+		EAI::Common::readConfigFile($_) for sort glob qq{"$EAI_WRAP_SENS_CONFIG_PATH/${envraw}*.config"};
 	}
 }
 
@@ -199,7 +199,7 @@ sub redoFiles ($) {
 	if (chdir($redoDir)) {
 		my $globPattern = $barename."*".($ext ? ".$ext" : ""); # extend glob with .$ext only if defined
 		$logger->debug("checking against glob pattern ".$globPattern);
-		for my $redofile (glob($globPattern)) {
+		for my $redofile (glob qq{"$globPattern"}) { #qq{}, um Ergebnis des interpolierten $globPattern in hochkomma einzuschliessen, weil glob leerzeichen als trennzeichen interpretiert und dann pfade/files mit leerzeichen geglobbed werden.
 			$logger->debug("found candidate file $redofile in $redoDir");
 			my $redoTimestampPatternPart = $common{task}{redoTimestampPatternPart};
 			if (!$redoTimestampPatternPart) {
@@ -245,7 +245,7 @@ sub getLocalFiles ($) {
 			my @multipleFiles;
 			if ($File->{filename} =~ /\*/) { # if there is a glob character then copy multiple files !
 				if (chdir($localFilesystemPath)) {
-					@multipleFiles = glob($File->{filename});
+					@multipleFiles = glob qq{"$File->{filename}"};
 					chdir($execute{homedir});
 				} else {
 					$logger->error("couldn't change into folder ".$localFilesystemPath." !");
@@ -458,7 +458,7 @@ sub readFileData ($) {
 	my $readSuccess;
 	@{$process->{data}} = (); # reset data in case of error retries having erroneous data
 	if ($File->{format_xlformat}) {
-		$readSuccess = EAI::File::readExcel($File, \@{$process->{data}}, $process->{filenames}, $redoDir);
+		$readSuccess = EAI::File::readExcel($File, \@{$process->{data}}, $process->{filenames}, $redoDir, $process->{countPercent});
 	} elsif ($File->{format_XML}) {
 		$readSuccess = EAI::File::readXML($File, \@{$process->{data}}, $process->{filenames}, $redoDir);
 	} else {
@@ -615,7 +615,7 @@ sub writeFileFromDB ($) {
 	my $logger = get_logger();
 	my ($DB,$File,$process) = EAI::Common::extractConfigs("creating/writing file from DB",$arg,"DB","File","process");
 	return 1 if $process->{successfullyDone} and $process->{successfullyDone} =~ /writeFileFromDB/ and $execute{retryBecauseOfError};
-	my @columnnames;
+
 	# get data from database, including column names (passed by ref)
 	@{$DB->{columnnames}} = (); # reset columnnames to pass data back as reference
 	@{$process->{data}} = (); # reset data to pass data back as reference
@@ -631,13 +631,35 @@ sub writeFileFromDB ($) {
 	if ($DB->{postReadProcessing}) {
 		evalCustomCode($DB->{postReadProcessing},"postReadProcessing");
 	}
-	EAI::File::writeText($File,\@{$process->{data}}) or do {
-		$logger->error("error creating/writing file");
-		$process->{hadErrors} = 1;
-		return 0;
-	};
-	$process->{successfullyDone}.="writeFileFromDB";
-	return 1;
+	my $writeSuccess;
+	if ($File->{format_xlformat}) {
+		$writeSuccess = EAI::File::writeExcel($File,\@{$process->{data}},$process->{countPercent});
+	} else {
+		$writeSuccess = EAI::File::writeText($File,\@{$process->{data}},$process->{countPercent});
+	}
+	$process->{successfullyDone}.="writeFileFromDB" if $writeSuccess;
+	$process->{hadErrors} = 1 unless $writeSuccess;
+	return $writeSuccess;
+}
+
+# create Data-files from Memory
+sub writeFileFromMemory ($$) {
+	my $arg = shift;
+	my $data = shift;
+	my $logger = get_logger();
+	my ($File,$process) = EAI::Common::extractConfigs("creating/writing file from Memory",$arg,"File","process");
+	return 1 if $process->{successfullyDone} and $process->{successfullyDone} =~ /writeFileFromMem/ and $execute{retryBecauseOfError};
+	$logger->warn("no columns given for file ".$File->{filename}) if !$File->{columns};
+	$logger->warn("no data available for writing") if !$data or ($data and @{$data} == 0);
+	my $writeSuccess;
+	if ($File->{format_xlformat}) {
+		$writeSuccess = EAI::File::writeExcel($File,$data,$process->{countPercent});
+	} else {
+		$writeSuccess = EAI::File::writeText($File,$data,$process->{countPercent});
+	}
+	$process->{successfullyDone}.="writeFileFromMem" if $writeSuccess;
+	$process->{hadErrors} = 1 unless $writeSuccess;
+	return $writeSuccess;
 }
 
 # put files into local folder if required
@@ -1165,11 +1187,11 @@ A special merge is done for configurations defined in hash C<lookups>, which may
 
 =item %execute
 
-hash of parameters for current task execution which is not set by the user but can be used to set other parameters and control the flow. Most important here are C<$execute{env}>, giving the current used environment (Prod, Test, Dev, whatever), C<$execute{envraw}> (Production is empty here), the several file lists (files being procesed, files for deletion/moving, etc.), flags for ending/interrupting processing and directory locations as home and history
+hash of parameters for current task execution, which is not set by the user but can be read to set other parameters and control the flow. Most important here are C<$execute{env}>, giving the current used environment (Prod, Test, Dev, whatever), C<$execute{envraw}> (same as C<$execute{env}>, with Production being empty here), the several file lists (files being procesed, files for deletion/moving, etc.), flags for ending/interrupting processing and directory locations as the home dir and history folders for processed files.
 
-Detailed information about the several parameters used can be found in section L<execute|/execute> of the configuration parameter reference, there are parameters for files (L<filesProcessed|/filesProcessed>, L<filesToDelete|/filesToDelete>, L<filesToMoveinHistory|/filesToMoveinHistory>, L<filesToMoveinHistoryUpload|/filesToMoveinHistoryUpload>, L<retrievedFiles|/retrievedFiles>) and L<uploadFilesToDelete|/uploadFilesToDelete>, directories (L<homedir|/homedir>, L<historyFolder|/historyFolder>, L<historyFolderUpload|/historyFolderUpload> and L<redoDir|/redoDir>), process controlling parameters (L<failcount|/failcount>, L<firstRunSuccess|/firstRunSuccess>, L<retryBecauseOfError|/retryBecauseOfError>, L<retrySeconds|/retrySeconds> and L<processEnd|/processEnd>).
+Detailed information about these parameters can be found in section L<execute|/execute> of the configuration parameter reference, there are parameters for files (L<filesProcessed|/filesProcessed>, L<filesToDelete|/filesToDelete>, L<filesToMoveinHistory|/filesToMoveinHistory>, L<filesToMoveinHistoryUpload|/filesToMoveinHistoryUpload>, L<retrievedFiles|/retrievedFiles>) and L<uploadFilesToDelete|/uploadFilesToDelete>, directories (L<homedir|/homedir>, L<historyFolder|/historyFolder>, L<historyFolderUpload|/historyFolderUpload> and L<redoDir|/redoDir>), process controlling parameters (L<failcount|/failcount>, L<firstRunSuccess|/firstRunSuccess>, L<retryBecauseOfError|/retryBecauseOfError>, L<retrySeconds|/retrySeconds> and L<processEnd|/processEnd>).
 
-Retrying with checking C<$execute{processEnd}> (set during C<processingEnd()>, combining this call and check can be done in loop header at start with C<processingContinues()>) can happen because of two reasons: First, due to C<task =E<gt> {plannedUntil =E<gt> "HHMM"}> being set to a time until the task has to be retried, however this is done at most until midnight. Second, because an error occurred, in such a case C<$process-E<gt>{hadErrors}> is set for each load that failed. C<$process{successfullyDone}> is also important in this context as it prevents the repeated run of following API procedures if the loads didn't have an error during their execution:
+Retrying after C<$execute{processEnd}> is false (this parameter is set during C<processingEnd()>, combining this call and check can be done in loop header at start with C<processingContinues()>) can happen because of two reasons: First, due to C<task =E<gt> {plannedUntil =E<gt> "HHMM"}> being set to a time until the task has to be retried, however this is done at most until midnight. Second, because an error occurred, in such a case C<$process-E<gt>{hadErrors}> is set for each load that failed. C<$process{successfullyDone}> is also important in this context as it prevents the repeated run of following API procedures if the loads didn't have an error during their execution:
 
 L<openDBConn|/openDBConn>, L<openFTPConn|/openFTPConn>, L<getLocalFiles|/getLocalFiles>, L<getFilesFromFTP|/getFilesFromFTP>, L<getFiles|/getFiles>, L<extractArchives|/extractArchives>, L<getAdditionalDBData|/getAdditionalDBData>, L<readFileData|/readFileData>, L<dumpDataIntoDB|/dumpDataIntoDB>, L<writeFileFromDB|/writeFileFromDB>, L<putFileInLocalDir|/putFileInLocalDir>, L<uploadFileToFTP|/uploadFileToFTP>, L<uploadFileCMD|/uploadFileCMD>, and L<uploadFile|/uploadFile>.
 
@@ -1179,7 +1201,7 @@ After the first successful run of the task, C<$execute{firstRunSuccess}> is set 
 
 =item initialization
 
-The INIT procedure is executed at the task script initialization (when EAI::Wrap is used in the task script) and loads the site configuration, starts logging and reads commandline options. This means that everything passed to the script via command line may be used in the definitions, especially the C<task{interactive.*}> parameters, here the name and the type of the parameter are not checked by the consistency checks (all other parameters not allowed or having the wrong type would throw an error). The task scripts configuration itself is then read with setupEAIWrap(), which is usually called immediately after the datastructures for configurations have been finished.
+The INIT procedure is executed at the task script initialization (when EAI::Wrap is "use"d in the task script) and loads the site configuration, starts logging and reads commandline options. This means that everything passed to the script via command line may be used in the definitions, especially the C<task{interactive.*}> parameters, here the name and the type of the parameter are not checked by the consistency checks (other parameters that are not allowed or have the wrong type throw an error). The task script's configuration itself is then read with setupEAIWrap(), which is usually called immediately after the datastructures for configurations have been finished.
 
 =back
 
@@ -1277,7 +1299,13 @@ mark files as being processed depending on whether there were errors, also decid
 
 argument $arg (ref to current load or common)
 
-create Data-files from Database. Arguments are fetched from common or loads[i], using DB and File parameters.
+create data-files (excel or text) from Database. Arguments are fetched from common or loads[i], using DB and File parameters.
+
+=item writeFileFromMemory ($$)
+
+arguments $arg (ref to current load or common) and $data (ref to array of hash values coming from readFromDB or readText/readExcel/readXML)
+
+create data-files (excel or text) from memory stored array of hash values. The created (in case of text files also appended) file information is taken from $arg, the data from $data.
 
 =item putFileInLocalDir ($)
 
@@ -1311,21 +1339,34 @@ combines above two procedures in a general procedure to upload files via FTP or 
 
 =item standardLoop (;$)
 
-executes the given configuration in a standard extract/transform/load loop (shown simplified below), depending on whether loads are given an additional loop is done for all loads within the @loads list. 
+executes the given configuration in a standard extract/transform/load loop (as shown below), depending on whether loads are given an additional loop is done for all loads within the @loads list. 
 If the definition only contains the common hash then there is no loop. The additional optional parameter $getAddtlDBData activates getAdditionalDBData before reading in file data.
 No other processing is possible (creating files from data, uploading, etc.)
 
   while (processingContinues()) {
-    openDBConn(\%common,1); # only done if DB{DSN} is given to avoid errors.
-    openFTPConn(\%common,1); # only done if FTP{remoteHost} is given to avoid errors.
-    for my $load (@loads) {
-      if (getFilesFromFTP($load)) {
-        getAdditionalDBData($load) if $getAddtlDBData;
-        readFileData($load);
-        dumpDataIntoDB($load);
-        markProcessed($load);
-      }
-    }
+  	if ($common{DB}{DSN}) {
+  		openDBConn(\%common,1) or $logger->error("failed opening DB connection");
+  	}
+  	if ($common{FTP}{remoteHost}) {
+  		openFTPConn(\%common,1) or $logger->error("failed opening FTP connection");
+  	}
+  	if (@loads) {
+  		for my $load (@loads) {
+  			if (getFiles($load)) {
+  				getAdditionalDBData($load) if $getAddtlDBData;
+  				readFileData($load);
+  				dumpDataIntoDB($load);
+  				markProcessed($load);
+  			}
+  		}
+  	} else {
+  		if (getFiles(\%common)) {
+  			getAdditionalDBData(\%common) if $getAddtlDBData;
+  			readFileData(\%common);
+  			dumpDataIntoDB(\%common);
+  			markProcessed(\%common);
+  		}
+  	}
   }
 
 =item processingEnd
@@ -1706,6 +1747,10 @@ File fetching and parsing specific configs. File{filename} is also used for FTP
 =item avoidRenameForRedo
 
 when redoing, usually the cutoff (datetime/redo info) is removed following a pattern. set this flag to avoid this
+
+=item append
+
+for EAI::File::writeText: boolean to append (1) or overwrite (0 or undefined) to file given in filename
 
 =item columns
 

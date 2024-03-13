@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.21, Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Milla version v1.0.22, Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,9 +32,10 @@ resources:
   bugtracker: https://github.com/miyagawa/HTTP-Tinyish/issues
   homepage: https://github.com/miyagawa/HTTP-Tinyish
   repository: https://github.com/miyagawa/HTTP-Tinyish.git
-version: '0.18'
+version: '0.19'
 x_contributors:
   - 'Nicolas R <cpan@atoomic.org>'
+  - 'Patrick Böker <patrick.boeker@posteo.de>'
   - 'Shoichi Kaji <skaji@cpan.org>'
   - 'Stig Palmquist <stig@stig.io>'
   - 'Takahiro SHIMIZU <anatofuz@gmail.com>'

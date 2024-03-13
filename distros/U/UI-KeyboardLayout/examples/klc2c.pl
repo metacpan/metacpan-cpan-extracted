@@ -40,7 +40,9 @@ use strict;
 #    Here _X and _Y duplicate ROYA and LOYA, and _T duplicating GRPSELTAP.
 # Option --comment-vkcodes=VK_first,VK_second would comment out emitting the specified VK-codes (with "VK_" omitted).
 
-my $v = 0.76;
+my $v = 0.77;
+my $v1000 = int($v*1000);
+my $vvv = 3;				# The first part of the version (MSKLC has 3.40)
 
 my %comment_vkcodes;
 shift, %comment_vkcodes = map {($_,1)} split /\s*,\s*/, $1 if @ARGV and $ARGV[0] =~ /^--comment-vkcodes=(.*)/;
@@ -92,6 +94,14 @@ my $fn = shift or die;
 ########### Parse the file roughly
 
 my $IN = get_file $fn;
+
+### Hack
+my $VVV = $vvv = $1 if $IN =~ m(^\s*VERSION\s+\S+\s*//\s*UI::KeyboardLayout\s+version=(\S+))m ;
+my $built = '';
+if ($VVV) {
+  $built = " (built by UI::KeyboardLayout version $vvv)";
+}
+
 my $in = clean_extra $IN;
 my %IN;
 
@@ -131,9 +141,12 @@ warn join "\n", "Unrecognized lines in file '$fn':", $rest if length $rest;
 my(%REPL, @null_sec);
 ($REPL{mod_name}, $IN{mod_descr}) = ($IN{KBD} =~ /^(\S+)\s+"(.*)"/);
 my $name = $REPL{mod_name};
+$REPL{built} = $built;
+$REPL{vUIKL} = $VVV ? int(1000*$vvv) : $vvv;
 
 ############################ Massage short fields
 $REPL{myversion} = "$0 v$v";
+$REPL{myversion1000} = $v1000;
 $REPL{mydate} = localtime;
 ($REPL{copyright} = $IN{COPYRIGHT}) =~  s/^"|"\s*(;.*)?$//g;
 
@@ -558,8 +571,8 @@ EOS
 
 if ($REPL{KEYNAME}) {
   $REPL{KEYNAME} = <<EOS;
-static ALLOC_SECTION_LDATA VSC_LPWSTR aKeyNames[] = {
-$REPL{KEYNAME}    NULL
+ALLOC_SECTION_LDATA VSC_LPWSTR aKeyNames[] = {
+$REPL{KEYNAME}    0, NULL
 };
 EOS
 } else {
@@ -590,7 +603,7 @@ my $init_auxVK = $REPL{init_auxVK} = <<'EOD';
     T28, T29, T2A, T2B, T2C, T2D, T2E, T2F,
     T30, T31, T32, T33, T34, T35,
 
-    T36 | KBDEXT,                   // RSHIFT; KBDEXT is passed to the apps as bit 24 in lParam of WM_KEYDOWN   https://learn.microsoft.com/en-us/windows/win32/inputdev/wm-keydown
+    T36 | KBDEXT,                   // RSHIFT; KBDEXT is legacy?? What is passed to the apps as bit 24 in lParam of WM_KEYDOWN is 0xe0 of the scancode  https://learn.microsoft.com/en-us/windows/win32/inputdev/wm-keydown
        // KBDMULTIVK: on some physical keyboards the kernel will convert this value to different VK-codes with suitable modifiers
        // This translation is based on VK-codes, so if T37 is redefined, then KBDMULTIVK may have no effect
        //   This type of keyboard is determined (at runtime) by .Type==3 in tagKBD_TYPE_INFO (supplied by the keyboard driver)
@@ -874,7 +887,7 @@ __DATA__
 *
 * History:
 *
-* @@@myversion@@@ - created this file on @@@mydate@@@
+* @@@myversion@@@ - created this file@@@built@@@ on @@@mydate@@@
 *
 \***************************************************************************/
 
@@ -1022,10 +1035,14 @@ ALLOC_SECTION_LDATA VK_TO_WCHAR_TABLE aVkToWcharTable[] = {
 };
 
 /***************************************************************************\
-* aKeyNames[], aKeyNamesExt[]  - Virtual Scancode to Key Name tables (null-terminated)
+* aKeyNames[], aKeyNamesExt[], aKeyNamesDead[]  - used to map a Scancode to Key Name via GetKeyNameText(); null-terminated.
 *
-* Only the names of Extended, NumPad, Dead and Non-Printable keys are here.
-* (Keys producing printable characters are named by that character)
+* If the name is not found in the first two tables,
+* then it is deduced from the character/deadkey this key produces in the unshifted position (as MapVirtualKeyEx()).
+* In particular, the special-case in the latter function covers VK_A to VK_Z!
+*
+* As a corollary, the third table needs only to contain dead keys in the unshifted positions, and only
+* at positions not present in the first two tables.
 \***************************************************************************/
 
 @@@KEYNAME@@@
@@ -1050,9 +1067,9 @@ __DATA__
 #include "winver.h"
 #include "winnt.h"
 
-1 VERSIONINFO
- FILEVERSION       @@@version1@@@,@@@version2@@@,3,40
- PRODUCTVERSION    @@@version1@@@,@@@version2@@@,3,40
+1 VERSIONINFO		// https://learn.microsoft.com/en-us/windows/win32/menurc/versioninfo-resource
+ FILEVERSION       @@@version1@@@,@@@version2@@@,@@@vUIKL@@@,@@@myversion1000@@@
+ PRODUCTVERSION    @@@version1@@@,@@@version2@@@,@@@vUIKL@@@,@@@myversion1000@@@
  FILEFLAGSMASK 0x3fL
  FILEFLAGS 0x0L
 FILEOS 0x40004L
@@ -1065,13 +1082,13 @@ BEGIN
        BEGIN
            VALUE "CompanyName",     "@@@q_company@@@\0"
            VALUE "FileDescription", "@@@q_mod_descr@@@\0"
-           VALUE "FileVersion",     "@@@version1@@@, @@@version2@@@, 3, 40\0"
-           VALUE "InternalName",    "@@@mod_name@@@ (3.40)\0"
+           VALUE "FileVersion",     "@@@version1@@@, @@@version2@@@, @@@vUIKL@@@, @@@myversion1000@@@\0"
+           VALUE "InternalName",    "@@@mod_name@@@ (@@@version1@@@.@@@version2@@@)\0"
            VALUE "ProductName","Created by @@@myversion@@@\0"
            VALUE "Release Information","Created by @@@myversion@@@\0"
            VALUE "LegalCopyright",  "@@@q_copyright@@@\0"
            VALUE "OriginalFilename","@@@mod_name@@@\0"
-           VALUE "ProductVersion",  "@@@version1@@@, @@@version2@@@, 3, 40\0"
+           VALUE "ProductVersion",  "@@@version1@@@, @@@version2@@@, @@@vUIKL@@@, @@@myversion1000@@@\0"
        END
    END
    BLOCK "VarFileInfo"
@@ -1116,7 +1133,7 @@ __DATA__
 *
 * History:
 *
-* @@@myversion@@@ - created this file on @@@mydate@@@
+* @@@myversion@@@ - created this file@@@built@@@ on @@@mydate@@@
 *
 \***************************************************************************/
 

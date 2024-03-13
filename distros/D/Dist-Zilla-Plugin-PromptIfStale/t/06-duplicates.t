@@ -71,7 +71,7 @@ my %expected_prompts = (
 );
 
 my @expected_prompts = (
-    (map "Issues found:\n".join("\n", @{$expected_prompts{$_}}, 'Continue anyway?'),
+    (map "Issues found:\n".join("\n", $expected_prompts{$_}->@*, 'Continue anyway?'),
         qw(before_build after_build)),
     'FooZ is not installed. Continue anyway?',
 );
@@ -99,7 +99,7 @@ is(
     undef,
     'build succeeded when checking for a module that is not stale',
 );
-$_->before_release('Foo.tar.gz') for eval { Dist::Zilla->VERSION('7.000') } ? $tzil->plugins_with(-BeforeRelease) : @{ $tzil->plugins_with(-BeforeRelease) };
+$_->before_release('Foo.tar.gz') for eval { Dist::Zilla->VERSION('7.000') } ? $tzil->plugins_with(-BeforeRelease) : $tzil->plugins_with(-BeforeRelease)->@*;
 
 cmp_deeply(
     \@prompts,

@@ -22,5 +22,5 @@ requires:
   Tk: '0'
 resources:
   repository: https://github.com/eserte/org-daemon.git
-version: '1.12'
+version: '1.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

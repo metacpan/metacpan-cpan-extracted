@@ -1,0 +1,74 @@
+use alienfile;
+use strict;
+use warnings;
+
+configure sub {
+
+## find out of pipx is actually installed
+    my $is_pipx_installed;
+    my $cmd = `pipx --version`;
+    $is_pipx_installed = $cmd =~ /[0..9]+/;
+
+## if pipx is not installed, install it using OS appropriate package managers
+    unless ($is_pipx_installed) {
+        my $os         = $^O;
+        my %os_mapping = (
+            'darwin' => {
+                install => 'brew install pipx',
+                setpath => 'pipx ensurepath',
+                upgrade => 'brew update && brew upgrade pipx',
+            },
+            'linux' => {
+                install => 'sudo apt install pipx',
+                setpath => 'pipx ensurepath',
+                upgrade => '',
+            },
+            'MSWin32' => {
+                install => 'scoop install pipx',
+                setpath => 'pipx ensurepath',
+                upgrade => 'scoop update pipx',
+            },
+        );
+        unless ( exists $os_mapping{$os} ) {
+            my @valid_oses = keys %os_mapping;
+            die "Unsupported os : $os, must be one of @valid_oses";
+        }
+
+        ## adjust the linux install steps based on version
+        if ( $os eq 'linux' ) {
+            my @os_details = `cat /etc/os-release`;
+            chomp @os_details;
+            my %os_details = map { split /=/, $_ } @os_details;
+            $os_details{VERSION_ID} =~ s/\"//g;
+            if ( $os_details{VERSION_ID} <= 22.04 ) {
+                $os_mapping{linux} = {
+                    install => 'python3 -m pip install --user pipx',
+                    setpath => 'python3 -m pipx ensurepath',
+                    upgrade => 'python3 -m pip install --user --upgrade pipx',
+                };
+            }
+        }
+
+        system $os_mapping{$os}->{install};
+        system $os_mapping{$os}->{setpath};
+        system $os_mapping{$os}->{upgrade};
+    }
+};
+## dummy probe to force a system install
+probe sub {
+    'system';
+};
+
+sys sub {
+    ##find out if cutadapt is actually installed
+    my $cmd = `pipx environment`;
+    $cmd = `cutadapt --help`;
+    my $is_cutadapt_installed = $cmd =~ /\Acutadapt\s+version\s+[0-9.]+/;
+
+    ## if cutadapt is not installed, install it via pipx
+    unless ($is_cutadapt_installed) {
+        system 'pipx install cutadapt';
+    }
+};
+
+1;

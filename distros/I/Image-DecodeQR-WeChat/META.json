@@ -29,6 +29,7 @@
          "requires" : {
             "Cwd" : "0",
             "Data::Roundtrip" : "0",
+            "Devel::CheckLib" : "0",
             "ExtUtils::MakeMaker" : "0",
             "FFI::CheckLib" : "0",
             "File::Copy" : "0",
@@ -45,7 +46,7 @@
             "File::ShareDir" : "0",
             "Getopt::Long" : "0",
             "Time::HiRes" : "0",
-            "perl" : "5.006"
+            "perl" : "5.016"
          }
       },
       "test" : {
@@ -55,6 +56,7 @@
             "File::Copy" : "0",
             "File::ShareDir" : "0",
             "File::Spec" : "0",
+            "File::Temp" : "0",
             "FindBin" : "0",
             "Test2::Plugin::UTF8" : "0",
             "Test::More" : "0",
@@ -71,6 +73,6 @@
          "web" : "https://github.com/hadjiprocopis/perl-image-decodeqr-wechat"
       }
    },
-   "version" : "1.0",
+   "version" : "2.1",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

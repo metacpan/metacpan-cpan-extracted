@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 
-our $VERSION = '0.2';
+our $VERSION = '2.1';
 
-use Image::DecodeQR::WeChat;
+use Image::DecodeQR::WeChat qw/:all/;
 use Getopt::Long;
 use Data::Roundtrip qw/perl2dump/;
 
@@ -21,8 +21,8 @@ if( ! Getopt::Long::GetOptions(
 	'help|h' => sub { usage($0); exit(0) } 
 ) ){ print STDERR usage($0) . "\n$0 : something wrong with command line parameters.\n"; exit(1); }
 
-my $ret = Image::DecodeQR::WeChat::decode(\%params);
-die Data::Roundtrip::perl2dump(\%params)."\ncall to Image::DecodeQR::WeChat::decode() has failed for above parameters."
+my $ret = Image::DecodeQR::WeChat::detect_and_decode_qr(\%params);
+die Data::Roundtrip::perl2dump(\%params)."\ncall to Image::DecodeQR::WeChat::detect_and_decode_qr() has failed for above parameters."
 	unless $ret and scalar @{$ret->[0]};
 
 #my ($payloads, $bboxes) = @$ret;
@@ -38,5 +38,5 @@ sub	usage {
 ."  --graphicaldisplayresult : display a graphical window with input image and QR codes outlined. Using --dumpqrimagestofile and specifying --outbase, images and payloads and bounding boxes will be saved to files, if you do not have graphical interface.\n"
 ."  --dumpqrimagestofile : it has effect only of --outbase was specified. Payloads, Bounding Boxes and images of each QR-code detected will be saved in separate files.\n"
 ."\n\nThe STDOUT output contains a payload and its matching bounding box (of 4 coordinates).\n"
-."\n\nAndreas Hadjiprocopis 2022\n\n"
+."\n\nAndreas Hadjiprocopis (bliako\@cpan.org) 2022\n\n"
 }

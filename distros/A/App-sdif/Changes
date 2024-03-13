@@ -1,5 +1,9 @@
 Revision history for Perl application 'sdif-tools'.
 
+4.33 2024-03-13T00:58:40Z
+
+    - make cdif to visualize the absence of the newline
+
 4.32 2024-02-22T02:03:26Z
 
     - add UTEXT color for cdif

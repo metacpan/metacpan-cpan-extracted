@@ -11,7 +11,7 @@ build_requires:
   Test2::Plugin::UTF8: '0'
   Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
@@ -24,11 +24,11 @@ no_index:
     - t
     - inc
 requires:
-  Data::Roundtrip: '0'
+  Data::Roundtrip: '0.16'
   perl: '5.006'
 resources:
   bugtracker: https://github.com/hadjiprocopis/Config-JSON-Enhanced/issues
   homepage: https://metacpan.org/module/Config::JSON::Enhanced
   repository: https://github.com/hadjiprocopis/Config-JSON-Enhanced
-version: '0.09'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

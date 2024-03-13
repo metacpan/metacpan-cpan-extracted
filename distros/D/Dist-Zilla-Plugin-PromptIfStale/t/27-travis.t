@@ -80,7 +80,7 @@ subtest "run_under_travis = $_" => sub {
     {
         cmp_deeply(\@prompts, [ ], 'we were not prompted');
 
-        my @log_messages = grep /^\[PromptIfStale\]/, @{$tzil->log_messages};
+        my @log_messages = grep /^\[PromptIfStale\]/, $tzil->log_messages->@*;
 
         cmp_deeply(
             \@log_messages,

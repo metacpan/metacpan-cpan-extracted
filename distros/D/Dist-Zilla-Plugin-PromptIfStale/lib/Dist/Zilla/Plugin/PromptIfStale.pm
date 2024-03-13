@@ -1,17 +1,24 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::PromptIfStale; # git description: v0.057-4-gc62d384
+package Dist::Zilla::Plugin::PromptIfStale; # git description: v0.058-5-g4255790
 # vim: set ts=8 sts=2 sw=2 tw=115 et :
 # ABSTRACT: Check at build/release time if modules are out of date
 # KEYWORDS: prerequisites upstream dependencies modules metadata update stale
 
-our $VERSION = '0.058';
+our $VERSION = '0.059';
 
 use Moose;
 with 'Dist::Zilla::Role::BeforeBuild',
     'Dist::Zilla::Role::AfterBuild',
     'Dist::Zilla::Role::BeforeRelease';
 
+use strictures 2;
+use stable 0.031 'postderef';
+use experimental 'signatures';
+use if "$]" >= 5.022, experimental => 're_strict';
+no if "$]" >= 5.031009, feature => 'indirect';
+no if "$]" >= 5.033001, feature => 'multidimensional';
+no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use Moose::Util::TypeConstraints 'enum';
 use List::Util 1.45 qw(none any uniq);
 use version;
@@ -81,9 +88,7 @@ has run_under_travis => (
     default => 0,
 );
 
-around dump_config => sub
-{
-    my ($orig, $self) = @_;
+around dump_config => sub ($orig, $self) {
     my $config = $self->$orig;
 
     $config->{+__PACKAGE__} = {
@@ -97,10 +102,7 @@ around dump_config => sub
     return $config;
 };
 
-sub before_build
-{
-    my $self = shift;
-
+sub before_build ($self) {
     if (not $ENV{PROMPTIFSTALE_REALLY_RUN_TESTS}
         and $ENV{CONTINUOUS_INTEGRATION} and not $self->run_under_travis)
     {
@@ -126,10 +128,7 @@ sub before_build
     }
 }
 
-sub after_build
-{
-    my $self = shift;
-
+sub after_build ($self, @) {
     return if not $ENV{PROMPTIFSTALE_REALLY_RUN_TESTS}
         and $ENV{CONTINUOUS_INTEGRATION} and not $self->run_under_travis;
 
@@ -142,9 +141,7 @@ sub after_build
     }
 }
 
-sub before_release
-{
-    my $self = shift;
+sub before_release ($self, @) {
     if ($self->phase eq 'release')
     {
         my @extra_modules = $self->_modules_extra;
@@ -175,10 +172,7 @@ sub __clear_already_checked { %already_checked = () } # for testing
 # module name to absolute filename where the file can be found
 my %module_to_filename;
 
-sub stale_modules
-{
-    my ($self, @modules) = @_;
-
+sub stale_modules ($self, @modules) {
     require Module::CoreList;
     Module::CoreList->VERSION('5.20151213');
 
@@ -199,7 +193,11 @@ sub stale_modules
             next;
         }
 
-        my $path = Module::Metadata->find_module_by_name($module);
+        my $path = do {
+            local @INC = @INC; push @INC, "$root";
+            Module::Metadata->find_module_by_name($module);
+        };
+
         if (not $path)
         {
             $already_checked{$module}++;
@@ -262,10 +260,7 @@ sub stale_modules
     return [ sort @stale_modules ], [ sort @errors ];
 }
 
-sub _check_modules
-{
-    my ($self, @modules) = @_;
-
+sub _check_modules ($self, @modules) {
     my ($stale_modules, $errors) = $self->stale_modules(@modules);
 
     return if not @$errors;
@@ -304,16 +299,15 @@ has _authordeps => (
     traits => ['Array'],
     handles => { _authordeps => 'elements' },
     lazy => 1,
-    default => sub {
-        my $self = shift;
+    default => sub ($self) {
         require Dist::Zilla::Util::AuthorDeps;
         Dist::Zilla::Util::AuthorDeps->VERSION(5.021);
         my @skip = $self->skip;
         [
             grep { my $module = $_; none { $module eq $_ } @skip }
             uniq(
-                map +(%$_)[0],
-                    @{ Dist::Zilla::Util::AuthorDeps::extract_author_deps($self->zilla->root) }
+                map +($_->%*)[0],
+                    Dist::Zilla::Util::AuthorDeps::extract_author_deps($self->zilla->root)->@*
             )
         ];
     },
@@ -324,8 +318,7 @@ has _modules_plugin => (
     traits => ['Array'],
     handles => { _modules_plugin => 'elements' },
     lazy => 1,
-    default => sub {
-        my $self = shift;
+    default => sub ($self) {
         my @skip = $self->skip;
         [
             # we look on disk since it is too early to check $zilla->files
@@ -334,7 +327,7 @@ has _modules_plugin => (
             grep { my $module = $_; none { $module eq $_ } @skip }
             uniq
             map find_meta($_)->name,
-            eval { Dist::Zilla->VERSION('7.000') } ? $self->zilla->plugins : @{ $self->zilla->plugins }
+            eval { Dist::Zilla->VERSION('7.000') } ? $self->zilla->plugins : $self->zilla->plugins->@*
         ];
     },
 );
@@ -344,33 +337,27 @@ has _modules_prereq => (
     traits => ['Array'],
     handles => { _modules_prereq => 'elements' },
     lazy => 1,
-    default => sub {
-        my $self = shift;
+    default => sub ($self) {
         my $prereqs = $self->zilla->prereqs->as_string_hash;
         my @skip = $self->skip;
         [
             grep { my $module = $_; none { $module eq $_ } @skip }
-            map keys %$_,
+            map keys $_->%*,
             grep defined,
-            map @{$_}{qw(requires recommends suggests)},
+            map $_->@{qw(requires recommends suggests)},
             grep defined,
-            values %$prereqs
+            values $prereqs->%*
         ];
     },
 );
 
-sub _modules_extra
-{
-    my $self = shift;
+sub _modules_extra ($self) {
     my @skip = $self->skip;
     grep { my $module = $_; none { $module eq $_ } @skip } $self->_raw_modules;
 }
 
 # this ought to be in Module::CoreList -- TODO :)
-sub _is_duallifed
-{
-    my ($self, $module) = @_;
-
+sub _is_duallifed ($self, $module) {
     return if not Module::CoreList::is_core($module);
 
     # Module::CoreList doesn't tell us this information at all right now - for
@@ -388,7 +375,7 @@ sub _is_duallifed
     my $data = $res->{content};
 
     require HTTP::Headers;
-    if (my $charset = HTTP::Headers->new(%{ $res->{headers} })->content_type_charset)
+    if (my $charset = HTTP::Headers->new($res->{headers}->%*)->content_type_charset)
     {
         $data = Encode::decode($charset, $data, Encode::FB_CROAK);
     }
@@ -402,10 +389,7 @@ sub _is_duallifed
 }
 
 my $packages;
-sub _indexed_version
-{
-    my ($self, $module, $combined) = @_;
-
+sub _indexed_version ($self, $module, $combined) {
     # we download 02packages if we have several modules to query at once, or
     # if we were given a different URL to use -- otherwise, we perform an API
     # hit for just this one module's data
@@ -415,10 +399,7 @@ sub _indexed_version
 }
 
 # I bet this is available somewhere as a module?
-sub _indexed_version_via_query
-{
-    my ($self, $module) = @_;
-
+sub _indexed_version_via_query ($self, $module) {
     die 'should not be here - get 02packages instead' if $self->_has_index_base_url;
     die 'no module?' if not $module;
 
@@ -430,7 +411,7 @@ sub _indexed_version_via_query
     my $data = $res->{content};
 
     require HTTP::Headers;
-    if (my $charset = HTTP::Headers->new(%{ $res->{headers} })->content_type_charset)
+    if (my $charset = HTTP::Headers->new($res->{headers}->%*)->content_type_charset)
     {
         $data = Encode::decode($charset, $data, Encode::FB_CROAK);
     }
@@ -446,9 +427,7 @@ sub _indexed_version_via_query
 # TODO: it would be AWESOME to provide this to multiple plugins via a role
 # even better would be to save the file somewhere semi-permanent and
 # keep it refreshed with a Last-Modified header - or share cpanm's copy?
-sub _get_packages
-{
-    my $self = shift;
+sub _get_packages ($self) {
     return $packages if $packages;
 
     my $tempdir = Path::Tiny->tempdir(CLEANUP => 1);
@@ -468,15 +447,11 @@ sub _get_packages
     $packages = Parse::CPAN::Packages::Fast->new($path->stringify);
 }
 
-sub _has_index_base_url {
-    my $self = shift;
+sub _has_index_base_url ($self) {
     return $self->index_base_url || $ENV{CPAN_INDEX_BASE_URL};
 }
 
-sub _indexed_version_via_02packages
-{
-    my ($self, $module) = @_;
-
+sub _indexed_version_via_02packages ($self, $module) {
     die 'no module?' if not $module;
     my $packages = $self->_get_packages;
     return undef if not $packages;
@@ -499,7 +474,7 @@ Dist::Zilla::Plugin::PromptIfStale - Check at build/release time if modules are 
 
 =head1 VERSION
 
-version 0.058
+version 0.059
 
 =head1 SYNOPSIS
 

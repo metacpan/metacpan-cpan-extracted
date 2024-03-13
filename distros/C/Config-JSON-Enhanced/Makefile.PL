@@ -1,7 +1,7 @@
 use 5.006;
 use strict;
 use warnings;
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker 6.64;
 
 sub MY::libscan {
     my( $mm, $file ) = @_;
@@ -17,8 +17,13 @@ my %WriteMakefileArgs = (
     ABSTRACT_FROM    => 'lib/Config/JSON/Enhanced.pm',
     LICENSE          => 'artistic_2',
     MIN_PERL_VERSION => '5.006',
+    EXE_FILES        => [
+        'script/configjson2perl.pl',
+        'script/configjson2json.pl',
+        'script/configjson2yaml.pl',
+    ],
     CONFIGURE_REQUIRES => {
-        'ExtUtils::MakeMaker' => '0',
+        'ExtUtils::MakeMaker' => '6.64',
     },
     TEST_REQUIRES => {
         'Test::More' => '0',
@@ -29,7 +34,7 @@ my %WriteMakefileArgs = (
 	'Cwd' => '0',
     },
     PREREQ_PM => {
-	'Data::Roundtrip' => '0',
+	'Data::Roundtrip' => '0.16',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Config-JSON-Enhanced-*' },

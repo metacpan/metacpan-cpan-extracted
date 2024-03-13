@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use experimental 'signatures', 'lexical_subs', 'declared_refs';
 
-our $VERSION = '0.02';
+our $VERSION = '0.05';
 
 
 use Exporter::Shiny 'qhull';
@@ -279,7 +279,7 @@ Qhull::PP - Pure Perl interface to Qhull
 
 =head1 VERSION
 
-version 0.02
+version 0.05
 
 =head1 SYNOPSIS
 

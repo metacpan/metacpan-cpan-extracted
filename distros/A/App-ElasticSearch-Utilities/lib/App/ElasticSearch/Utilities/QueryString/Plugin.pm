@@ -4,12 +4,12 @@ package App::ElasticSearch::Utilities::QueryString::Plugin;
 use v5.16;
 use warnings;
 
-our $VERSION = '8.7'; # VERSION
+our $VERSION = '8.8'; # VERSION
 
 use Hash::Merge::Simple qw(clone_merge);
 use Moo::Role;
 use Ref::Util qw(is_arrayref is_hashref);
-use Types::Standard qw( Str Int );
+use Types::Standard qw( HashRef Str Int );
 
 
 # Attributes
@@ -29,6 +29,13 @@ has priority => (
     isa => Int,
 );
 sub _build_priority { 50; }
+
+
+has fields_meta => (
+    is => 'rw',
+    isa => HashRef,
+    default => sub { {} },
+);
 
 
 requires qw(handle_token);
@@ -87,7 +94,7 @@ App::ElasticSearch::Utilities::QueryString::Plugin - Moo::Role for implementing 
 
 =head1 VERSION
 
-version 8.7
+version 8.8
 
 =head1 ATTRIBUTES
 
@@ -99,6 +106,10 @@ Name of the plugin, used in debug reporting.
 
 Priority is an integer which determmines the order tokens are parsed in
 low->high order.
+
+=head2 fields_meta
+
+A hash reference with the field data from L<App::ElasticSearch::Utilities::es_index_fields>.
 
 =head1 INTERFACE
 
@@ -147,7 +158,7 @@ Brad Lhotsky <brad@divisionbyzero.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023 by Brad Lhotsky.
+This software is Copyright (c) 2024 by Brad Lhotsky.
 
 This is free software, licensed under:
 

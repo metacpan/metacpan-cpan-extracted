@@ -1,8 +1,13 @@
 Release history for Plack-Middleware-NeverExpire
 
+1.201 Sat 09 Mar 2024
+	- Correct generation of Sunday timestamps
+	- Global caching of middleware timestamps
+	- Two new functions exposed as documented API
+
 1.101 Mon 29 Jan 2024
 	- No dependency on Time::Piece (whose day and month name lists are mutable global state)
-	- Strict RFC 7231 compliance
+	- (Attempted) strict RFC 9110 compliance [found to be buggy after the release]
 	- Caching of the formatted timestamp while valid
 
 1.007 Sun 04 Sep 2022

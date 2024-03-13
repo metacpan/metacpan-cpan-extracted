@@ -29,5 +29,5 @@ resources:
   bugtracker: https://github.com/briandfoy/perl-version/issues
   homepage: https://github.com/briandfoy/perl-version
   repository: https://github.com/briandfoy/perl-version
-version: '1.016'
+version: '1.017'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

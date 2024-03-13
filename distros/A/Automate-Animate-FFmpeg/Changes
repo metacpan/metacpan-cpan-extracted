@@ -29,3 +29,6 @@ Revision history for Automate-Animate
 
 0.08    04-01-2023 02:00
         Fixed a pod error.
+
+0.09    12-03-2024 17:00
+        Trying to fix double encoding of unicoded filenames in M$ the attempted fix is at line 286 of lib/Automate/Animate/FFmpeg.pm

@@ -244,6 +244,7 @@ Rolf
 Roman
 Romanov
 Roszatycki
+Russell
 Sarathy
 Schilli
 Schinder
@@ -252,6 +253,7 @@ Sean
 Sebastian
 Sergey
 Shamatrin
+Shingleton
 Shirazi
 Shoichi
 Simple
@@ -417,6 +419,7 @@ patrik
 peterm
 phrstbrn
 piotr
+reshingleton
 rg
 ribasushi
 roman

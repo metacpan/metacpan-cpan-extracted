@@ -9,7 +9,7 @@ use Role::Tiny::With;
 
 use parent 'Future';
 
-our $VERSION = '1.002';
+our $VERSION = '1.003';
 
 with 'Future::Role::Promisify';
 
@@ -17,7 +17,8 @@ sub new {
 	my $proto = shift;
 	my $self = $proto->SUPER::new;
 	
-	$self->{loop} = ref $proto ? $proto->{loop} : (shift() // Mojo::IOLoop->singleton);
+	my $loop = ref $proto ? $proto->loop : (shift() // Mojo::IOLoop->singleton);
+	$self->set_udata(loop => $loop);
 	
 	return $self;
 }
@@ -55,13 +56,13 @@ sub _set_timer {
 	return $self;
 }
 
-sub loop { shift->{loop} }
+sub loop { shift->udata('loop') }
 
 sub await {
 	my $self = shift;
 	croak 'Awaiting a future while the event loop is running would recurse'
-		if $self->{loop}->is_running;
-	$self->{loop}->one_tick until $self->is_ready;
+		if $self->loop->is_running;
+	$self->loop->one_tick until $self->is_ready;
 }
 
 sub done_next_tick {

@@ -9,10 +9,14 @@ do { my $x = {
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
+                                      'Devel::Confess' => '0',
                                       'Encode' => '0',
                                       'File::Spec' => '0',
+                                      'IO::All' => '0',
                                       'IO::Handle' => '0',
                                       'IPC::Open3' => '0',
+                                      'MetaCPAN::Client' => '0',
+                                      'Test2::V0' => '0',
                                       'Test::CPAN::Meta' => '0',
                                       'Test::ClassAPI' => '0',
                                       'Test::DependentModules' => '0',
@@ -23,6 +27,8 @@ do { my $x = {
                                       'Test::Pod::No404s' => '0',
                                       'Test::Portability::Files' => '0',
                                       'lib' => '0',
+                                      'perl' => '5.010',
+                                      'strictures' => '2',
                                       'warnings' => '0'
                                     }
                     },

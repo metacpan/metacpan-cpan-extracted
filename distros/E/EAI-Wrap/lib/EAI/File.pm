@@ -1,4 +1,4 @@
-package EAI::File 1.911;
+package EAI::File 1.912;
 
 use strict; use feature 'unicode_strings'; use warnings; no warnings 'uninitialized';
 use Exporter qw(import);use Text::CSV();use Data::XLSX::Parser();use Spreadsheet::ParseExcel();use Spreadsheet::WriteExcel();use Excel::Writer::XLSX();use Data::Dumper qw(Dumper);use XML::LibXML();use XML::LibXML::Debugging();
@@ -222,6 +222,7 @@ sub cell_handler {
 	}
 }
 
+my $countPercentExcel;
 # event handler for readExcel (xlsx format)
 sub row_handlerXLSX {
 	my $rowDetails = $_[1];
@@ -247,12 +248,14 @@ sub row_handlerXLSX {
 				$maxRow = $row if $maxRow < $row;
 			}
 		}
+		print "EAI::File::readExcel read $row rows\r" if $countPercentExcel and ($row % 50 == 0);
 	}
 }
 
 # read Excel file (format depends on setting)
-sub readExcel ($$$;$) {
-	my ($File,$data,$filenames,$redoSubDir) = @_;
+sub readExcel ($$$;$$) {
+	my ($File,$data,$filenames,$redoSubDir,$countPercent) = @_;
+	$countPercentExcel = $countPercent if $countPercent;
 	my $logger = get_logger();
 	$stopOnEmptyValueColumn = $File->{format_stopOnEmptyValueColumn};
 	$stoppedOnEmptyValue = 0; # reset
@@ -379,6 +382,7 @@ sub readExcel ($$$;$) {
 		$logger->debug("(data) start row: $startRow, (data) end row: $maxRow");
 LINE:
 		# $maxRow is being set when reading in the sheet
+		my $lines = $maxRow - $startRow;
 		for my $lineno ($startRow .. $maxRow) {
 			@previousline = @line;
 			@line = undef;
@@ -395,6 +399,7 @@ LINE:
 				}
 			}
 			readRow($data,\@line,\@header,\@targetheader,undef,$lineProcessing,$fieldProcessing,$thousandsep,$decimalsep,$lineno);
+			print "EAI::File::readExcel parsed $lineno of $lines\r" if $countPercent and ($lineno % (int($lines * ($countPercent / 100)) == 0 ? 1 : int($lines * ($countPercent / 100))) == 0);
 		}
 		close FILE;
 		if (scalar(@{$data}) == 0 and !$File->{emptyOK}) {
@@ -547,10 +552,11 @@ sub readRow ($$$$$$$$$$) {
 
 our $value;
 # write text file
-sub writeText ($$) {
-	my ($File,$data) = @_;
+sub writeText ($$;$) {
+	my ($File,$data,$countPercent) = @_;
 	my $logger = get_logger();
 	my $filename = $File->{filename};
+	my $writemode = ($File->{append} ? ">>" : ">");
 	if (ref($data) ne 'ARRAY') {
 		$logger->error("passed data in \$data is not a ref to array (you have to initialize it as an array):".Dumper($data));
 		return 0;
@@ -603,9 +609,9 @@ sub writeText ($$) {
 		$col++;
 	}
 	# open file for writing
-	$logger->debug("writing to ".$filename);
-	open (FHOUT, ">".$File->{format_encoding},$filename) or do {
-		$logger->error("file creation error with $filename: $!");
+	$logger->info("writing to $filename ($writemode)");
+	open (FHOUT, $writemode.$File->{format_encoding},$filename) or do {
+		$logger->error("couldn't open $filename for writing (writemode $writemode): $!");
 		return 0;
 	};
 	# write header
@@ -622,7 +628,8 @@ sub writeText ($$) {
 	}
 	# write data
 	$logger->trace("passed data:\n".Dumper($data)) if $logger->is_trace;
-	for (my $i=0; $i<scalar(@{$data}); $i++) {
+	my $lines = scalar(@{$data});
+	for (my $i=0; $i<$lines; $i++) {
 		# data row
 		my $row = $data->[$i];
 		my $lineRow;
@@ -677,14 +684,15 @@ sub writeText ($$) {
 			print FHOUT $lineRow."\n";
 			$logger->trace("row: ".$lineRow) if $logger->is_trace;
 		}
+		print "EAI::File::writeText written $i of $lines\r" if $countPercent and ($i % (int($lines * ($countPercent / 100)) == 0 ? 1 : int($lines * ($countPercent / 100))) == 0);
 	}
 	close FHOUT;
 	return 1;
 }
 
 # write Excel file
-sub writeExcel ($$) {
-	my ($File,$data) = @_;
+sub writeExcel ($$;$) {
+	my ($File,$data,$countPercent) = @_;
 	my $logger = get_logger();
 	
 	if (ref($data) ne 'ARRAY') {
@@ -734,7 +742,8 @@ sub writeExcel ($$) {
 	}
 	# write data
 	$logger->trace("passed data:\n".Dumper($data)) if $logger->is_trace;
-	for (my $i=0; $i<scalar(@{$data}); $i++) {
+	my $lines = scalar(@{$data});
+	for (my $i=0; $i<$lines; $i++) {
 		# data row
 		my $row = $data->[$i];
 		my @lineRow;
@@ -754,6 +763,7 @@ sub writeExcel ($$) {
 		for my $col (0 .. @lineRow) {
 			$worksheet->write($i+1,$col,$lineRow[$col]);
 		}
+		print "EAI::File::writeExcel written $i of $lines\r" if $countPercent and ($i % (int($lines * ($countPercent / 100)) == 0 ? 1 : int($lines * ($countPercent / 100))) == 0);
 		$logger->trace("row: @lineRow") if $logger->is_trace();
 	}
 	$workbook->close();
@@ -794,7 +804,7 @@ reads the defined text file with specified parameters into array of hashes (DB r
 
 returns 0 on error, 1 if OK
 
-=item readExcel ($$$;$)
+=item readExcel ($$$;$$)
 
 reads the defined excel file with specified parameters into array of hashes (DB ready structure)
 
@@ -802,6 +812,7 @@ reads the defined excel file with specified parameters into array of hashes (DB 
  $data      .. hash ref for returned data (hashkey "data" -> above mentioned array of hashes)
  $filenames .. array of file names, if explicit (given in case of mget and unpacked zip archives).
  $redoSubDir .. (optional) redo subdirectory, where file can be taken alternatively to homedir.
+ $countPercent .. (optional) percentage of progress where indicator should be output (e.g. 10 for all 10% of progress). set to 0 to disable progress indicator
 
 returns 0 on error, 1 if OK
 
@@ -818,21 +829,23 @@ returns 0 on error, 1 if OK
 
 For all read<*> functions custom "hooks" can be defined with L<fieldCode|/fieldCode> and L<lineCode|/lineCode> to modify and enhance the standard mapping defined in format_header. To access the final line data the hash %EAI::File::line can be used (specific fields with $EAI::File::line{<target header column>}). if a field is being replaced using a different name from targetheader, the data with the original header name is placed in %EAI::File::templine. You can also access data from the previous line with %EAI::File::previousline and the previous temp line with %EAI::File::previoustempline.
 
-=item writeText ($$)
+=item writeText ($$;$)
 
 writes a text file using specified parameters from array of hashes (DB structure) 
 
  $File      .. hash ref for File specific configuration
  $data      .. hash ref for returned data (hashkey "data" -> above mentioned array of hashes)
+ $countPercent .. (optional) percentage of progress where indicator should be output (e.g. 10 for all 10% of progress). set to 0 to disable progress indicator
 
 returns 0 on error, 1 if OK
 
-=item writeExcel ($$)
+=item writeExcel ($$;$)
 
 writes an excel file using specified parameters from array of hashes (DB structure) 
 
  $File      .. hash ref for File specific configuration
  $data      .. hash ref for returned data (hashkey "data" -> above mentioned array of hashes)
+ $countPercent .. (optional) percentage of progress where indicator should be output (e.g. 10 for all 10% of progress). set to 0 to disable progress indicator
 
 returns 0 on error, 1 if OK
 

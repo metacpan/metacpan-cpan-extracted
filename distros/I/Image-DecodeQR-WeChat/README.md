@@ -4,44 +4,79 @@ Image::DecodeQR::WeChat - Decode QR code(s) from images using the OpenCV/WeChat 
 
 # VERSION
 
-Version 1.0
+Version 2.1
 
 # SYNOPSIS
 
-This module provides a Perl interface to the OpenCV/WeChat QR code
+This module detects and
+decodes QR code(s) in an input image.
+
+It provides a Perl interface to the C++ OpenCV/WeChat QR code
 decoder via XS code.
 OpenCV/WeChat library uses CNN (Convolutional Neural Networks)
-to do this with pre-trained models.
+to do this with pre-trained models. It works quite well.
 
-This module has been tested by myself with OpenCV v4.5.5, v4.8.1
+This module has been tested with OpenCV v4.5.5, v4.8.1, v4.9
 and Perl v5.32, v5.38 on
 Linux. But check the CPANtesters matrix on the left for all the tests done
 on this module (although tests may be sparse and rare because of the OpenCV
 dependency).
 
-The library is relatively successful even for rotated codes. It remains
-to be tested on the minimum size of the code images (60px in my case).
-In producing test images with software like the [GIMP](https://www.gimp.org/),
-one should be aware of the distortions caused
-by transforms such as scale and rotation to the final QR code images,
-rotation in particular. Add certain enhancements
-to the final image to "look good" and
-the resultant image looks like QR code but it is not.
-Failure of the
-library on such artificially produced images would be somehow expected.
-Instead I would test with images which have been scanned with a QR code
-image attached to them in random angles. This is my use case afterall:
-scanned images with a glued-in QR code tag so that my systems would
-archive it straight from the scanner into the right database table.
+The OpenCV/WeChat library is relatively successful even for non-orthogonally
+rotated codes. It remains
+to be tested fully on the minimum size of the code images. 60px was the minimum
+size with my tests. See section ["TESTING THE QR CODE DETECTION ALGORITHM"](#testing-the-qr-code-detection-algorithm) for more details.
 
 Here is some code to get you started:
 
-    # this ensures that both input params can contain utf8 strings
-    # but also results (somehow but beyond me)
     use Image::DecodeQR::WeChat;
 
-    # this will be fixed, right now params are hardoded in XS code
-    my $ret = Image::DecodeQR::WeChat::decode_xs(
+    # decode QR image with convenient "named" params
+    my $ret = Image::DecodeQR::WeChat::detect_and_decode_qr({
+        # these are required
+        'input' => 'input.jpg',
+        # optional with defaults:
+        # specify a different models dir
+        #'modelsdir' => '...',
+        # dump results to file(s) whose name
+        # is prepended by param 'outbase'
+        #'outbase' => 'outs',
+        # set this to 1 to also dump images of
+        # QR codes detected as well text files with
+        # payload and bounding box coordinates
+        #'dumpqrimagestofile' => 0,
+        # use OpenCV's GUI image viewer to display
+        # this needs a non-headless OS and OpenCV highgui
+        #'graphicaldisplayresult'' => 0,
+        #'verbosity' => 0,
+    });
+    die "failed" unless $ret;
+
+    # we got back an array-of-2-arrays
+    # * one contains the QR-code-text (called payload)
+    # * one contains bounding boxes, one for each payload
+    # we have as many payloads and bounding boxes as
+    # are the QR-codes detected (some may have been skipped)
+
+    # the number of QR code images found in the input
+    # NOTE: the returned array will contain
+    # just 2 empty arrays if no QR code was detected
+    # so this is the right way:
+    my $num_qr_codes_detected = scalar @$payloads;
+    
+    my ($payloads, $boundingboxes) = @$ret;
+    for (0..$#$payloads){
+      print "Payload got: '".$payloads->[$_]
+        ."' bbox: @{$boundingboxes->[$_]}"
+        .".\n";
+    }
+
+    # Alternatively, a less convenient method to
+    # decode a QR code is via the XS sub.
+    # It requires that all parameters be specified
+    # unlike detect_and_decode_qr() which uses
+    # "named" parameters  with defaults.
+    my $ret = Image::DecodeQR::WeChat::detect_and_decode_qr_xs(
         # the input image containing one or more QR-codes
         'an-input-image.png',
 
@@ -53,9 +88,9 @@ Here is some code to get you started:
         # Alternatively, you specify here your own model files:
         Image::DecodeQR::WeChat::modelsdir(),
 
-        # outbase for all output files, optional
+        # outbase for all output files, optional = set to undef,
         # if more than one QR-codes were detected then an index will
-        # be appended to the filename. And there will be png image files
+        # be appended to the filename. And there will be JPEG image files
         # containing the portion of the image which was detected
         # and there will be txt files with QR-code text (payload)
         # and its bounding box. And there will be an overall
@@ -75,66 +110,48 @@ Here is some code to get you started:
         1,
     );
     die "failed" unless $ret;
-    # we got back an array-of-2-arrays
-    # * one contains the QR-code-text (called payload)
-    # * one contains bounding boxes, one for each payload
-    # we have as many payloads and bounding boxes as
-    # are the QR-codes detected (some may have been skipped)
-    
+
+    # again, the same data structure returned:
     my ($payloads, $boundingboxes) = @$ret;
+    my $num_qr_codes_detected = scalar @$payloads;
     for (0..$#$payloads){
       print "Payload got: '".$payloads->[$_]
         ."' bbox: @{$boundingboxes->[$_]}"
         .".\n";
     }
 
-    # The above decode_xs() expects all parameters to be present
-    # while decode() below takes a hash of params and fills the
-    # missing params with defaults. Then it calls decode_xs()
-    # So, it is still calling XS code but via a Perl sub
-    # The important bit is that the modelsdir is filled in automatically
-    # rather than the user looking for it
-    my $ret = Image::DecodeQR::WeChat::decode({
-        # these are required
-        'input' => 'input.jpg',
-        'outbase' => 'outs',
-        # these are optional and have defaults
-        #'modelsdir' => '...', # use it only if you have your own models
-        #'verbosity' => 0,
-        #'graphicaldisplayresult'' => 0,
-        #'dumpqrimagestofile' => 0,
-    });
-    die "failed" unless $ret;
-    my ($payloads, $boundingboxes) = @$ret;
-    for (0..$#$payloads){
-      print "Payload got: '".$payloads->[$_]
-        ."' bbox: @{$boundingboxes->[$_]}"
-        .".\n";
-    }
-
-    # pre-trained models location (installed with this module)
+    # Where is it looking for default
+    # pre-trained models location ?
+    # (they are installed with this module)
     print "my models are in here: ".Image::DecodeQR::WeChat::modelsdir()."\n"
 
     # returns 1 or 0 when OpenCV was compiled with highgui or not
     # and supports GUI display like imshow() which displays an image in a window
     my $has_highgui_support = opencv_has_highgui_xs();
 
-This code calls functions and methods from OpenCV/WeChat library (written in C++)
-for decoding one or more QR codes found embedded in images.
+This code interfaces functions and methods from OpenCV/WeChat library (written in C++)
+for decoding **one or more QR code images**
+found embedded in images.
 It's just that: a very thin wrapper of a C++ library written in XS. It only interfaces
-the OpenCV/WeChat library for QR code decoding.
+the OpenCV/WeChat library for QR code decoding and accommodates its returned
+data into a Perl array (ref).
 
-It can detect multiple QR codes embeded in a single image. And has been
-successfully tested with as small sizes as 60 x 60 px.
+It can detect multiple QR codes embeded in a single image. It has been
+successfully tested with images as small as 60 x 60 pixels.
 
-The payload(s) (the QR-code's text) are returned back as an ARRAYref.
+The payload (i.e. the QR-code's text) and the coordinates of the
+bounding box around each QR code image detected are returned
+back as Perl array of tuples (i.e. `[[QR code text, bounding box]...`).
 
 Optionally, it can output the portion of the input image corresponding
-to each QR-code, its bounding box and the payload in separate files,
+to each QR-code (that is a sub-image, part of the input image),
+its bounding box and the payload in separate files,
 useful for debugging and identification when multiple QR codes exist
 in a single input image.
 
-Following this code as an example, it will be trivial to
+# FUTURE WORK
+
+Following the XS code in this module as a guide, it will be trivial to
 interface other parts of the OpenCV library:
 
     Ιδού πεδίον δόξης λαμπρόν
@@ -142,10 +159,179 @@ interface other parts of the OpenCV library:
 
 # EXPORT
 
-- `decode()`
-- `decode_xs()`
+- `detect_and_decode_qr()`
+- `detect_and_decode_qr_xs()`
 - `modelsdir()`
 - `opencv_has_highgui_xs()`
+
+# SUBROUTINES/METHODS
+
+## `detect_and_decode_qr(\%params)`
+
+It tries to detect all
+the QR codes in the input image
+(specified by its **filepath**) with one or more
+QR codes embedded in it.
+
+It wraps the XS function [detect\_and\_decode\_qr\_xs(\\@params)](https://metacpan.org/pod/detect_and_decode_qr_xs%28%5C%40params%29)
+and replaces missing optional parameters with defaults.
+
+These are the `\%params` it accepts:
+
+- **input** : the _filepath_ of the input image possibly embedded with QR code(s).
+The format of the input image can be anything OpenCV supports, see
+[OpenCV's imread()](https://docs.opencv.org/4.9.0/d4/da8/group__imgcodecs.html).
+- **modelsdir** : **optional** parameter to specify an alternative
+models location, other than the one installed during the module's installation.
+The current models dir is found using [modelsdir()](https://metacpan.org/pod/modelsdir%28%29). See ["MODELS"](#models)
+for more information on what this directory should contain. If this
+parameter is omitted the default value is determined by what
+[modelsdir()](https://metacpan.org/pod/modelsdir%28%29) returns.
+- **dumpqrimagestofile** : **optional** flag (0 or 1) to specify whether to
+write results into output files (as well as returning them back as an ARRAYref).
+If this parameter is omitted the default value is zero, meaning NO don't dump files.
+
+    These are what the set of output files comprises of:
+
+    - An image of the detected QR code. This is part of the input image
+    detailing only the detected QR code. It is saved as a JPEG image file.
+    - XML output with 1) the detected QR code payload (the text it contains), followed by
+    2) the coordinates of the bounding box of the detected QR code. These coordinates
+    are for the input image. Here is an example:
+
+            <qrcodes>
+              <qrcode>
+                <payload>Just another Perl hacker</payload>
+                <boundingbox>[9, 1], [409, 1], [409, 401], [9, 401]</boundingbox>
+              </qrcode>
+            </qrcodes>
+
+    There will be as many pairs of files as the detected QR codes in the input image.
+    The filenames will be formed with the `outbase` parameter (which is mandadory if
+    this parameter is set to 1) followed by a zero-based index number denoting
+    the sequence of the detected QR code (even if there is only one detected QR code, the
+    output files will still contain an index number, in this case it will be `0`),
+    followed by the extentsion `.jpg` for the image file and `.xml` for the
+    text file. For example `$outbase.1.xml` and `$outbase.1.jpg`, where
+    `$outbase` is the specified in the input parameters (see below).
+
+    Additionally, an overall output file whose name is the same as above except
+    that it has no index number, will be created to contain the payloads of ALL
+    QR codes detected. Each on its own line.
+
+- **outbase** : **optional** parameter which must be specified if **dumpqrimagestofile**
+is set to 1. If left `undef` then no results are written to files. If specified
+but **dumpqrimagestofile** is set to 0, then it saves all results into a single
+file `$outbase.xml`. If specified and **dumpqrimagestofile** is set to 1 then
+in addition to the overall XML file, for each QR code detected there will
+be an output image as a copy of the input with the detected QR code outlined
+and an output XML file with metadata (the payload and bounding box coordinates).
+
+    WARNING: if you set **dumpqrimagestofile** to 1 then as many output images
+    as the detected QR codes will be created and all will be a copy of the input
+    image, that can be a lot of large images ...
+
+    **outbase** will be prepended to the name of each of the output result
+    files. **outbase** may contain directory components but make sure they do
+    exist because they will not be created.
+
+- **graphicaldisplayresult** : **optional** flag which
+applies only
+in the case where the underlying OpenCV installation contains
+the `highgui` GUI component which allows for displaying
+images. If that component exists (which can be determined by
+calling  [opencv\_has\_highgui\_xs()](https://metacpan.org/pod/opencv_has_highgui_xs%28%29)) then setting this parameter
+to 1 will also display image results (the detected QR codes)
+into a GUI window as the detection process is happening.
+The user must close this window in order for detection process
+to continue until the script exits. The default value is zero, meaning NO do not
+display any output images.
+- **verbosity** : set this to a positive integer in order
+for the program to print debugging messages to standard output.
+Verbosity increases as this
+value increases. With zero, the default value, being completely mute.
+
+### Returned data by `detect_and_decode_qr()`
+
+On success, it returns results back as an
+ARRAYref of 2-item-arrays (tuples) containing:
+
+- The text of the decoded QR code detected.
+- The coordinates of the bounding box around
+the QR code image detetced.
+
+It returns an array of two  zero-length arrays if no
+QR codes were detected.
+
+It returns `undef` on failure.
+
+Noting all the above, here is a way of calling it,
+checking its success and iterating over all
+the QR codes data returned:
+
+    my $ret = detect_and_decode_qr(\%params);
+    die "failed to detect_and_decode_qr()" unless defined $ret;
+    my ($payloads, $bounding_boxes) = @$ret;
+    # the number of detected QR codes (can be zero!):
+    my $num_qr_codes_detected = scalar @$payloads;
+    for ( 0 .. ($num_qr_codes_detected-1) ){
+      print "payload: ".$payloads->[$_]."\n";
+      print "bbox: ".$bounding_boxes->[$_]."\n";
+    }
+
+## `detect_and_decode_qr_xs(infile, modelsdir, outbase, verbosity, graphicaldisplayresult, dumpqrimagestofile)`
+
+It tries to detect all
+the QR codes in the input image
+(specified by its **filepath**) with one or more
+QR codes embedded in it.
+
+This is an XS function (which can be called safely by a Perl script)
+wrapped by [detect\_and\_decode\_qr(\\%params)](https://metacpan.org/pod/detect_and_decode_qr%28%5C%25params%29) which is more convenient as
+it replaces missing parameters with defaults, unlike this
+function which expects all the parameters to be specified.
+
+These are the `@params` it accepts, in this order:
+
+- **input** : the filepath to the input image possibly containing QR codes.
+The format of the input image can be anything OpenCV supports, see
+[OpenCV's imread()](https://docs.opencv.org/4.5.5/d4/da8/group__imgcodecs.html).
+- **modelsdir** : the path to the directory conntaining the pre-trained
+CNN models which are used for the QR code detection. This parameter must be
+specified. The default models dir is given by calling [modelsdir()](https://metacpan.org/pod/modelsdir%28%29). You can
+pass the return of [modelsdir()](https://metacpan.org/pod/modelsdir%28%29) as this parameter if you do not
+have your own models.
+- **outbase** : the string prepended to all the output files.
+It must be specified (i.e. not left `undef`) only when **dumpqrimagestofile**
+is set to 1.
+- **verbosity** : set it to a positive integer to get debugging output
+to standard output. Set it to zero for mute operation.
+- **graphicaldisplayresult** : set it to 1 to display image results into
+an image viewer provided by OpenCV (`highgui` and `imgview()`).
+Set it to 0 for not displaying anything. If set to 1, OpenCV must contain
+the `highgui` library component which is optional. OpenCV installations
+to headless servers most likely will not contain this component. Although
+it is possible to install it.
+- **dumpqrimagestofile** : set it to 1 in order to dump results (text and images) to output
+files whose names are prepended by **outbase**. Set it to 0 for not saving any results to files.
+Results will still be returned back by this function as an array.
+
+It returns exactly the same results as [detect\_and\_decode\_qr()](https://metacpan.org/pod/detect_and_decode_qr%28%29), see ["Returned data by `detect_and_decode_qr()`"](#returned-data-by-detect_and_decode_qr)
+for details.
+
+## `modelsdir()`
+
+It returns the path to the default location of the directory
+containing the pre-trained CNN models.
+
+## `opencv_has_highgui_xs()`
+
+It returns 0 or 1 depending whether OpenCV's `highgui` library
+component was detected during this module's installation.
+If the result is 1 then the component is installed in your system
+and the **graphicaldisplayresult** parameter to both [detect\_and\_decode\_qr(\\%params)](https://metacpan.org/pod/detect_and_decode_qr%28%5C%25params%29)
+and [detect\_and\_decode\_qr\_xs(@params)](https://metacpan.org/pod/detect_and_decode_qr_xs%28%40params%29) can be set to 1. See [CAVEATS](https://metacpan.org/pod/CAVEATS) for the
+efficacy of this subroutine.
 
 # COMMAND LINE SCRIPT
 
@@ -203,164 +389,6 @@ output images can be displayed in their own window. But this is
 superfluous, because the basic operation of this module allows for
 saving output files to disk.
 
-# SUBROUTINES/METHODS
-
-### ` decode_xs(infile, modelsdir, outbase, verbosity, graphicaldisplayresult, dumpqrimagestofile) `
-
-It takes in the filename of an input image which may contain
-one or more QR codes and returns back an ARRAYref of
-strings containing all the payloads of the codes which
-have successfully been decoded (some QR codes may
-fail to be decoded because of resolution or quality etc.)
-
-It returns undef on failure.
-
-It returns an empty ARRAYref (i.e. a ref to an empty array)
-if no QR codes were found or decoded successfully.
-
-These are the parameters it requires. They must all be present, with
-optional parameters allowed to be `undef`:
-
-- `infile` : the input image with zero or more QR codes.
-All the image formats of OpenCV's [imread()](https://docs.opencv.org/4.5.5/d4/da8/group__imgcodecs.html)
-are supported.
-- `modelsdir` : the location of the directory holding all model files (CNN trained models)
-required for QR code detection. These models are already included with this Perl module and will be
-installed in a shared dir during installation. Their total size is about 1MB.
-They have been kindly contributed by WeChat along with their library for QR Code detection.
-They can be found [https://github.com/WeChatCV/opencv\_3rdparty|here](https://github.com/WeChatCV/opencv_3rdparty|here). The installed
-models location is returned by [modelsdir()](https://metacpan.org/pod/modelsdir%28%29). If you do not want to experiment with
-your own models then just plug the output of [modelsdir()](https://metacpan.org/pod/modelsdir%28%29) to this parameter, else
-specify your own.
-- `outbase` : optionally specify output files basename which will contain
-detected QR-codes' payloads, bounding boxes and QR-code images extracted from
-the input image (one set of files for each QR-code detected).
-If `dumpqrimagestofile` is set to 1 all the aforementioned files will
-be created. If it is set to 0 then only the payloads will be saved in a single
-file (all in one file). If `outbase` is left `undef` then nothing is written to
-a file. As usual all detected codes' data is returned back via the returned
-value of [decode\_xs()](https://metacpan.org/pod/decode_xs%28%29).
-- ` verbosity ` levels: 0 is mute, 1 is only for C code, 10 is for C+XS code.
-- ` graphicaldisplayresult` : if set to 1, it will display a window with the input image
-and the detected QR-code(s) outlined. This
-is subject to whether current OpenCV installation was compiled to support
-` imshow() ` (with C < highgui > enabled).
-- `dumpqrimagestofile` : if set to 0, and `outbase` is specified, then all payloads
-are written to a single file using the basename specified. If set to 1 a lot more information
-is written to separate files, one for each detected code. This is mainly for debugging purposes
-because the returned value contains the payloads and their corresponding QR-codes' bounding
-boxes. See `outbase` above.
-
-### ` decode(\%params) `
-
-This is a Perl wrapper to the `decode_xs()` and allows a user to specify
-only a minimal set of parameters with the rest to be filled in by defaults.
-
-Like [decode\_xs()](https://metacpan.org/pod/decode_xs%28%29), it returns undef on failure. Or an arrayref of
-two arrays. The `payloads` array and the `bounding-boxes` array.
-Each has a number of items equal to the QR codes detected.
-
-An ARRAYref of two empty arrays will be returned
-if no QR codes were found or decoded successfully.
-
-The ` params ` hashref:
-
-- `input` : the name of the input image file which can contain one or more QR codes.
-- `outbase` : optional, if specified payloads (QR-code text) will be dumped to a text file.
-If further, `dumpqrimagestofile` is set to 1 then image files with the detected QR-codes will
-be dumped one for each QR-code as well as text files with payloads and bounding boxes wrt the
-input image.
-- `modelsdir` : optional, use it only if you want to use your own model files (for their
-format have a look at [https://docs.opencv.org/4.x/d5/d04/classcv\_1\_1wechat\_\_qrcode\_1\_1WeChatQRCode.html](https://docs.opencv.org/4.x/d5/d04/classcv_1_1wechat__qrcode_1_1WeChatQRCode.html), they are CNN training files).
-This Perl module has included the model files kindly submitted by WeChat as a contribution to OpenCV
-and will be installed in your system with all other files. Use `modelsdir()` to see the location
-of installed model files. Their total size is about 1MB.
-- `verbosity` : default is 0 which is muted. 1 is for verbose C code and 10 is for verbose C and XS code.
-- `dumpqrimagestofile` : default is 0, set to 1 to have lots of image and text files dumped (relative to `outbase`)
-for each QR code detected.
-- `graphicaldisplayresult` : default is 0, set to 1 to have a window popping up with the input image
-and the QR-code detected highlighted, once for each code detected. This
-is subject to whether current OpenCV installation was compiled to support
-` imshow() ` (with C < highgui > enabled).
-
-### ` modelsdir() `
-
-It returns the path where the models included in this Perl module
-have been installed.
-This is useful when you want to use `decode_xs()` and need to specify
-the `modelsdir`.
-Just pass the output of this to `decode_xs()` as its `modelsdir` parameter.
-However, you can not set the location of your own modelsdir using ` modelsdir() `.
-
-### ` opencv_has_highgui_xs() `
-
-It returns 1 or 0 depending on whether current OpenCV installation has
-support for graphical display of images (the `imshow()` function). This
-affects the option `graphicaldisplayresult` to [decode()](https://metacpan.org/pod/decode%28%29) and [decode\_xs()](https://metacpan.org/pod/decode_xs%28%29)
-which will be ignored if there is no highgui support.
-
-Caveat: checking for whether current OpenCV installation has highgui
-support is currently very lame, it merely tries to find the include file `opencv2/highgui.hpp`
-in the Include dirs. I have tried several methods (see \`\`\`Makefile.PL\`\`\`), for
-example [DynaLoader](https://metacpan.org/pod/DynaLoader) or [FFI::CheckLib](https://metacpan.org/pod/FFI%3A%3ACheckLib) can search for symbols in any library
-(e.g. searching for `imshow()` in `libopencv_highgui` or  `libopencv_world`).
-This would have been the most straight-forward way but alas, these are C++ libraries
-and function names are mangled to weird function names like:
-
-    ZN2cv3viz6imshowERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKNS_11_InputArrayERKNS_5Size_IiEE()
-
-There's an imshow() in there but without a regex symbol-name search
-the symbol can not be detected.
-
-Another take is with [Devel::CheckLib](https://metacpan.org/pod/Devel%3A%3ACheckLib) which supports compiling code
-snippets when searching for a particular library. This fails because they
-... allow only a C compiler but we need a C++ compiler.
-
-Finally, using [Inline::CPP](https://metacpan.org/pod/Inline%3A%3ACPP) to compile our own snippet is totally in vain
-because of its useless form of running as `use Inline CPP =` ... >. I could
-not find any way of telling it to use specific CFLAGS and LDFLAGS with this
-useless `use Inline CPP` form.
-
-# IMPLEMENTATION DETAILS
-
-This code demonstrates how to call OpenCV (modern OpenCV v4) C++ methods using the
-technique suggested by `Botje @ #perl` in order to avoid all the
-function, macro, data structures name clashes between Perl and OpenCV
-(for example `seed()`, `do_open()`, `do_close()` and
-most notably `struct cv` and `namespace cv` in Perl and OpenCV respectively).
-
-The trick suggested is to put all the OpenCV-calling code in a separate C++ file
-and provide high-level functions to be called by XS. So that the XS code does
-not see any OpenCV header files.
-
-`Makefile.PL` will happily compile any `.c and/or .cpp` files found in the dir it resides
-by placing `OBJECT => '$(O_FILES)'` in `%WriteMakefileArgs`. And will
-have no problems with specifying also these:
-
-    CC      => 'g++',
-    LD      => 'g++',
-    XSOPT   => '-C++',
-
-With one caveat, `g++` **compiler will mangle the names of the functions**
-when placing them in the object files. And that will cause [XSLoader](https://metacpan.org/pod/XSLoader) to report
-missing and undefined symbols.
-
-The cure to this is to wrap any function you want to remain unmangled
-within
-
-    #ifdef __cplusplus
-    extern "C" {
-    #endif
-
-and
-
-    #ifdef __cplusplus
-    } //extern "C" {
-    #endif
-
-This only need happen in the header file: ` wechat_qr_decode_lib.hpp `
-and in the XS file where the Perl headers are included.
-
 # INSTALLING OpenCV
 
 In my case installing OpenCV using Linux's package
@@ -381,7 +409,8 @@ to setting the billion `cmake` variables. Use it
 if you are on a machine which offers a GUI like this: `cmake-gui ..`
 If you are on a headless or remote host possibly over telnet or ssh
 then do not despair because `ccmake` is the CLI, curses-based
-equivalent to `cmake-gui`,  use it like: `ccmake ..` (from within the build dir).
+equivalent to `cmake-gui`,  use it like: `ccmake ../`
+(from within the build dir).
 - Once on either of the cmake GUIs, first do a
 `configure`, then check the
 list of all variables (you can search on both, for searching
@@ -398,14 +427,15 @@ additional packages first, before finally compiling OpenCV.
 - I had a problem with compiling OpenCV with a GUI (the `highgui`)
 on a headless host. So, I just disabled it. That's easy to achieve
 during the above.
-- I have installed this on a CUDA-capable GPU (with CUDA 10.2 installed)
-host and on a headless remote host with no GPU or basic. In general,
+- I have successfully installed this module
+on a system with CUDA-capable GPU (with CUDA 10.2 installed)
+host and, also, on a headless remote host with no GPU or basic. In general,
 CUDA is not required for building this module. It is just an addition for
-making things run faster, possibly.
-- It is also possible to download a binary distribution of OpenCV.
+making things run faster, possibly. OpenCV is responsible for
+detecting and utilising GPU processing via CUDA.
+- It is also possible to download a binary distribution of OpenCV
+with developer files (e.g. header files and perhaps a pkg-config or cmake configuration file).
 Just make sure that it supports all the things I mentioned above.
-So, you should be looking for a developer binary package if such a thing exists.
-And that it has all the required headers (in an include dir).
 - If all else fails, then add `rpmfusion` repository to
 your Linux's package manager and then add package OpenCV, developer version.
 Make sure there is the WeChat OpenCV library too. If there is not,
@@ -420,7 +450,7 @@ such as Linux as your first action.
 # INSTALLING THIS MODULE
 
 This module depends on the existence of the OpenCV library with all
-the extensions and contributed modules mentioned in section `PREREQUISITES`.
+the extensions and contributed modules mentioned in section ["PREREQUISITES"](#prerequisites).
 
 Detecting where this library is located in your system is the weakest
 link in the installation process of this module. `Makefile.PL` contains
@@ -439,6 +469,138 @@ found by `Makefile.PL` if it is in a standard location,
 or adjust the list of paths
 in environment variable `PKG_CONFIG_PATH` which is where `pkg-config` searches
 for these files.
+
+# TESTING THE QR CODE DETECTION ALGORITHM
+
+You will want to produce QR codes in order to assess how well
+the algorithm (basically the CNN pre-trained models supplied by OpenCV/WeChat)
+detects codes and find out the minimum size, quality, rotation angles etc.
+for optimal detection.
+
+In producing test images from an original QR code,
+with software like the [GIMP](https://www.gimp.org/),
+one should be aware of the distortions caused
+by transforms such as scale and rotation to the final QR code images,
+rotation in particular. Add certain enhancements
+to the final image to "look good" and
+the resultant image looks like QR code but it is not.
+Failure of the
+library on such artificially produced images would be somehow expected.
+
+Instead I would suggest testing with images **which have been scanned with a QR code
+image attached to them in random angles and zoom factors**. Using a photocopier
+or a scanner.
+
+My use case was to process
+scanned images with a glued-in QR code tag which is detected
+and archive the document from the scanner to the appropriate files.
+
+# UNIT TESTING
+
+There are two sets of tests which can be performed before installation of this module.
+The first test is done by default and can be run with:
+
+    perl Makefile.PL
+    make all
+    make test
+
+The second set of tests is what is called _author tests_ and 
+is optionally run with:
+
+    perl Makefile.PL
+    make all
+    prove -bl xt
+
+In both sets setting the environment variable `TEMP_DIRS_KEEP` to 1
+will keep all temporary files created so that inspection
+of output files is possible. By default all temporary files
+created during testing are erased on test's exit.
+
+# MODELS
+
+The OpenCV/WeChat QR code detector algorithm
+uses CNN (Convolutional Neural Networks) which are required
+to be trained first with data containing example QR code images.
+The detector kindly provided by OpenCV/WeChat
+already contains trained models (see ["LICENSE AND COPYRIGHT"](#license-and-copyright) for license)
+which are
+also contained in and distributed with this module.
+These pre-trained models are installed as part of this module, along
+with everything else. You do not need to download them manually.
+
+The pre-trained models can be found
+[here](https://github.com/WeChatCV/opencv_3rdparty) where it also
+shows their MD5 signatures. Their total size is about 1 MB.
+
+The models directory must contain four files: `detect.caffemodel`,
+`detect.prototxt`, `sr.caffemodel` and `sr.prototxt`.
+
+Use [modelsdir()](https://metacpan.org/pod/modelsdir%28%29) to get the location
+of the installed models.
+
+# IMPLEMENTATION DETAILS
+
+This code demonstrates how to call OpenCV (modern OpenCV v4) C++ methods using the
+technique suggested by `Botje @ #perl` in order to avoid all the
+function, macro, data structures name clashes between Perl and OpenCV
+(for example `seed()`, `do_open()`, `do_close()` and
+most notably `struct cv` and `namespace cv` in Perl and OpenCV respectively).
+
+The trick suggested is to put all the OpenCV-calling code in a separate C++ file
+and provide high-level functions to be called by XS. So that the XS code does
+not see any OpenCV header files.
+
+`Makefile.PL` will happily compile any `.c` and/or `.cpp`
+files found in the dir it resides
+by placing `OBJECT => '$(O_FILES)'` in `%WriteMakefileArgs`.
+And will have no problems with specifying also these:
+
+    CC      => 'g++',
+    LD      => 'g++',
+    XSOPT   => '-C++',
+
+With one caveat, `g++` **compiler will mangle the names of the functions**
+when placing them in the object files. And that will cause [XSLoader](https://metacpan.org/pod/XSLoader) to report
+missing and undefined symbols.
+
+The cure to this is to wrap any function you want to remain unmangled
+between these two blocks:
+
+    #ifdef __cplusplus
+    extern "C" {
+    #endif
+
+and
+
+    #ifdef __cplusplus
+    } //extern "C" {
+    #endif
+
+This only need happen in the header file: ` wechat_qr_decode_lib.hpp `
+and in the XS file where the Perl headers are included.
+
+# CAVEATS
+
+Checking for whether local OpenCV installation has highgui
+support is currently very lame.
+It tries to detect it with three methods (see `find_if_opencv_highgui_is_supported()` in
+`Makefile.PL` for the implementation)
+
+- Use [FFI::CheckLib::find\_lib](https://metacpan.org/pod/FFI%3A%3ACheckLib%3A%3Afind_lib) to check if library `opencv_highgui` exists.
+- Search Include dirs for file `opencv2/highgui.hpp`. This is the most OS-agnostic method.
+- Use [Devel::CheckLib::check\_lib](https://metacpan.org/pod/Devel%3A%3ACheckLib%3A%3Acheck_lib) to check if a sample C program can link to the `opencv_highgui` library. This requires a C compiler.
+
+Note that [DynaLoader](https://metacpan.org/pod/DynaLoader) (or [FFI::CheckLib](https://metacpan.org/pod/FFI%3A%3ACheckLib) which uses it)
+can search for symbols in any library
+(e.g. highgui library should contain function `imshow()` in `libopencv_highgui` or  `libopencv_world`).
+This would have been the most straight-forward way but alas, these are C++ libraries
+and the contained function names are mangled to weird function names like:
+
+    ZN2cv3viz6imshowERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKNS_11_InputArrayERKNS_5Size_IiEE()
+
+There's an `imshow` string in there but without a regex symbol-name search
+the symbol can not be detected. Currently, [DynaLoader](https://metacpan.org/pod/DynaLoader) (which is called by [FFI::CheckLib](https://metacpan.org/pod/FFI%3A%3ACheckLib))
+does not provide a regular expression symbol name matching, only exact.
 
 # AUTHOR
 
@@ -462,9 +624,9 @@ You can also look for information at:
 
     [https://rt.cpan.org/NoAuth/Bugs.html?Dist=Image-DecodeQR-WeChat](https://rt.cpan.org/NoAuth/Bugs.html?Dist=Image-DecodeQR-WeChat)
 
-- CPAN Ratings
+- Review this module at PerlMonks
 
-    [https://cpanratings.perl.org/d/Image-DecodeQR-WeChat](https://cpanratings.perl.org/d/Image-DecodeQR-WeChat)
+    [https://www.perlmonks.org/?node\_id=21144](https://www.perlmonks.org/?node_id=21144)
 
 - Search CPAN
 
@@ -491,6 +653,14 @@ This software is Copyright (c) 2022 by Andreas Hadjiprocopis.
 This is free software, licensed under:
 
     The Artistic License 2.0 (GPL Compatible)
+
+The OpenCV/WeChat CNN trained models redistributed with
+this module are licensed under
+
+    The Apache License Version 2.0
+
+See the full licence
+[here](https://github.com/WeChatCV/opencv_3rdparty/commit/3487ef7cde71d93c6a01bb0b84aa0f22c6128f6b).
 
 # HUGS
 

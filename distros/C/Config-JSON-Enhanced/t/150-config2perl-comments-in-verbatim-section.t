@@ -10,7 +10,7 @@ use FindBin;
 use Cwd 'abs_path';
 use Data::Roundtrip qw/perl2dump no-unicode-escape-permanently/;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use Config::JSON::Enhanced;
 

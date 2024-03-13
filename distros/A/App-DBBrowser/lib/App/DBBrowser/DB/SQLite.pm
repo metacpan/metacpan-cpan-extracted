@@ -9,7 +9,7 @@ use Encode                qw( encode decode );
 use File::Find            qw( find );
 use File::Spec::Functions qw( catfile );
 
-use DBD::SQLite 1.68;    # dbd_sqlite_string_mode intruced with 1.67_05
+use DBD::SQLite 1.74;    # sqlite 3.42.0
 use DBD::SQLite::Constants ':dbd_sqlite_string_mode';
 use DBI            qw();
 use Encode::Locale qw();

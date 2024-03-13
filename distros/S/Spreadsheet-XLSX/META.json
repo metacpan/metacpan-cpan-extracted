@@ -1,5 +1,5 @@
 {
-   "abstract" : "Perl extension for reading MS Excel 2007 files;",
+   "abstract" : "Perl extension for reading MS Excel 2007 files.",
    "author" : [
       "Dmitry Ovsyanko <do@eludia.ru>",
       "Mike Blackwell <mike.blackwell@rrd.com"
@@ -51,6 +51,6 @@
          "url" : "https://github.com/asb-capfan/Spreadsheet-XLSX"
       }
    },
-   "version" : "0.17",
+   "version" : "0.18",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

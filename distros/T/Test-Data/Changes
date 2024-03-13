@@ -1,5 +1,8 @@
 Revision history for Perl module Test::Data
 
+1.246 2024-03-09T01:42:16Z
+	* fix dualvar_ok so it actaully exports (#12) from jwrightecs
+
 1.245 2024-01-29T18:56:07Z
 	* refresh distro, update email address
 

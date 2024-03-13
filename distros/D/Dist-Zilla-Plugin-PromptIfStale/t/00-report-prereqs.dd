@@ -4,12 +4,12 @@ do { my $x = {
                                         'CPAN::Meta::Requirements' => '2.120620',
                                         'ExtUtils::MakeMaker' => '0',
                                         'Module::Metadata' => '0',
-                                        'perl' => '5.010'
+                                        'perl' => 'v5.20.0'
                                       }
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.162',
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.163',
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
@@ -66,9 +66,13 @@ do { my $x = {
                                       'Term::ANSIColor' => '3.00',
                                       'Try::Tiny' => '0',
                                       'YAML::Tiny' => '0',
+                                      'experimental' => '0',
+                                      'if' => '0',
                                       'namespace::autoclean' => '0',
-                                      'perl' => '5.010',
+                                      'perl' => 'v5.20.0',
+                                      'stable' => '0.031',
                                       'strict' => '0',
+                                      'strictures' => '2',
                                       'version' => '0',
                                       'warnings' => '0'
                                     }
@@ -82,7 +86,6 @@ do { my $x = {
                                    'Class::Method::Modifiers' => '0',
                                    'Dist::Zilla::App::Tester' => '0',
                                    'Dist::Zilla::Chrome::Test' => '0',
-                                   'Dist::Zilla::Plugin::MakeMaker' => '0',
                                    'Dist::Zilla::Role::Plugin' => '0',
                                    'Dist::Zilla::Role::PluginBundle::Easy' => '0',
                                    'ExtUtils::MakeMaker' => '0',
@@ -93,9 +96,8 @@ do { my $x = {
                                    'Test::Deep' => '0',
                                    'Test::Fatal' => '0',
                                    'Test::More' => '0.96',
-                                   'if' => '0',
                                    'lib' => '0',
-                                   'perl' => '5.010'
+                                   'perl' => 'v5.20.0'
                                  }
                  },
        'x_Dist_Zilla' => {

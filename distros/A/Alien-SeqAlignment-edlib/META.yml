@@ -1,5 +1,5 @@
 ---
-abstract: 'Provide the static, dynamic libraries and CLI (non-Windows) of the edlib aligner'
+abstract: 'find, build and install the edlib library'
 author:
   - 'Christos Argyropoulos <chrisarg@gmail.com>'
 build_requires:
@@ -12,10 +12,15 @@ build_requires:
   Test::Alien::Diag: '0'
   Test::More: '0'
 configure_requires:
-  Alien::Build: '1.40'
+  Alien::Build: '2.70'
   Alien::Build::MM: '0.32'
   Alien::Build::Plugin::Build::CMake: '0.99'
+  Alien::Meson: '0'
+  Carp: '0'
   ExtUtils::MakeMaker: '6.52'
+  File::Copy::Recursive: '0'
+  HTTP::Tiny: '0'
+  Path::Tiny: '0'
 dynamic_config: 1
 generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -34,13 +39,17 @@ no_index:
 provides:
   Alien::SeqAlignment::edlib:
     file: lib/Alien/SeqAlignment/edlib.pm
-    version: '0.05'
+    version: '0.08'
 requires:
-  Alien::Base: '0'
+  Alien::Base: '0.038'
   parent: '0'
   strict: '0'
   warnings: '0'
-version: '0.05'
+resources:
+  IRC: irc://irc.perl.org/#native
+  homepage: https://github.com/chrisarg/alien-seqalignment-edlib
+  repository: https://github.com/chrisarg/alien-seqalignment-edlib.git
+version: '0.08'
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:

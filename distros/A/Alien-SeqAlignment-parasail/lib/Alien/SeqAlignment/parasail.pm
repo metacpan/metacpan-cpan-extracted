@@ -1,58 +1,25 @@
-package Alien::SeqAlignment::parasail;
-use parent qw( Alien::Base );
 use strict;
 use warnings;
+package Alien::SeqAlignment::parasail;
+$Alien::SeqAlignment::parasail::VERSION = '0.04';
 
-
-
-
-sub exe {
-  my($class) = @_;
-  $class->runtime_prop->{command} ;
-}
-
-
-sub alien_helper {
-  my($class) = @_;
-  return {
-    parasail_aligner => sub {
-      # return the CLI command for the parasail aligner
-      Alien::SeqAligment::parasail->exe;
-    }
-  },
-}
-
-
-
-1;
-
-__END__
-
-=pod
-
-=encoding UTF-8
+use parent qw( Alien::Base );
 
 =head1 NAME
 
-Alien::SeqAlignment::parasail
-
-=head1 VERSION
-
-version 0.03
+Alien::SeqAlignment::parasail - find, build and install the parasail library
 
 =head1 SYNOPSIS
 
 To execute the alignment using the commande line tool:
 
  use Alien::parasail;
- use Env qw( @PATH );
-
- unshift @PATH, Alien::SeqAlignment::parasail->bin_dir;
  system Alien::SeqAlignment::parasail->exe, (list of options);
+
 
 =head1 DESCRIPTION
 
-This distribution provides parsail so that it can be used by other
+This distribution provides parasail so that it can be used by other
 Perl distributions that are on CPAN.  The source code will be downloaded
 from the parasail github repo, and if that fails it will use the location of a
 fork but the author of this module. Contrary to other Alien modules, this one
@@ -63,9 +30,7 @@ library, and is guaranteed to use the latest version of parasail.
 The build provides the static and shared libraries, but also the CLI aligner 
 (parasail_aligner). 
 
-=head1 NAME
-
-Alien::SeqAlignment::parasail - find, build and install the parasail library
+=cut
 
 =head1 METHODS
 
@@ -75,13 +40,12 @@ Alien::SeqAlignment::parasail - find, build and install the parasail library
 
 Returns the command name for running the CLI version of the parasail aligner.
 
-=head1 HELPERS
+=cut
 
-%{parasail_aligner}
-
-=head2 parasail_aligner
-
-Returns the CLI command for the parasail aligner
+sub exe {
+  my($class) = @_;
+  $class->runtime_prop->{command} ;
+}
 
 =head1 SEE ALSO
 
@@ -109,7 +73,7 @@ variants exist because parasail is intended to be high-performing;
 calculating additional statistics or the traceback will perform slower 
 than simply calculating the alignment score. 
 Select the appropriate implementation for your needs.
-=back
+
 
 =item L<Alien>
 
@@ -136,15 +100,7 @@ This software is copyright (c) 2023 by Christos Argyropoulos.
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
-=head1 AUTHOR
-
-Christos Argyropoulos <chrisarg@gmail.com>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2023 by Christos Argyropoulos.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
 =cut
+
+1;
+

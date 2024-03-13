@@ -148,5 +148,5 @@ chdir(_catdir(File::Spec->updir, File::Spec->updir, File::Spec->updir));
 
 my $fh;
 open($fh, '>', $status_filename) || die "unable to write $status_filename $!";
-print $fh encode_json({ destdir => $ENV{DESTDIR}, prefix => \@prefix, skip => 0 });
+print $fh JSON::PP->new->utf8->canonical->encode({ destdir => $ENV{DESTDIR}, prefix => \@prefix, skip => 0 });
 close $fh;

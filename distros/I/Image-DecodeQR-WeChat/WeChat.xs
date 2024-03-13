@@ -5,6 +5,11 @@
 /* don't forget that we are using a C++ compiler and so these
   need to be protected else ... function-name mangling ooouuouuuuoouu :
 */
+
+/*
+our $VERSION = '2.1';
+*/
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -29,13 +34,13 @@ int _SV_contains_undef(SV *ansv){ SvGETMAGIC(ansv); return(!SvOK(ansv)); }
    without it, and with PROTOTYPES: ENABLE above it, the default
    prototype set by xsubpp is $$$$$$ (6 scalars).
    Which has problems when calling
-   decode_xs(@x) where @x is an array of 6 scalars.
+   detect_and_decode_qr_xs(@x) where @x is an array of 6 scalars.
    With explicitly setting
 	PROTOTYPE: @
    it allow function to be called from Perl with
    both an array and 6 scalars.
    And catches the case where array has not exactly 6 items.
-   See test case t/06-decode_xs-prototype.t
+   See test case t/06-decode-xs-prototype.t
    #perl advice (Botje, LeoNerd): 
      - Don't set PROTOTYPE
      - you should probably just abandon the use of prototypes.
@@ -49,7 +54,7 @@ MODULE = Image::DecodeQR::WeChat		PACKAGE = Image::DecodeQR::WeChat
 PROTOTYPES: ENABLE
 
 SV *
-decode_xs(infilename_SV, modelsdir_SV, outbase_SV, verbosity, graphicaldisplayresult, dumpqrimagestofile)
+detect_and_decode_qr_xs(infilename_SV, modelsdir_SV, outbase_SV, verbosity, graphicaldisplayresult, dumpqrimagestofile)
 	SV *infilename_SV;
 	SV *modelsdir_SV;
 	SV *outbase_SV;
@@ -81,8 +86,8 @@ decode_xs(infilename_SV, modelsdir_SV, outbase_SV, verbosity, graphicaldisplayre
     INIT:
 	AV *retarr_AV;
 	// TODO: try using croak
-	if( _SV_contains_undef(infilename_SV) ){ fprintf(stderr, "decode_xs() : error, input filename can not be undefined.\n"); XSRETURN_UNDEF; }
-	if( _SV_contains_undef(modelsdir_SV) ){ fprintf(stderr, "decode_xs() : error, modelsdir can not be undefined.\n"); XSRETURN_UNDEF; }
+	if( _SV_contains_undef(infilename_SV) ){ fprintf(stderr, "detect_and_decode_qr_xs() : error, input filename can not be undefined.\n"); XSRETURN_UNDEF; }
+	if( _SV_contains_undef(modelsdir_SV) ){ fprintf(stderr, "detect_and_decode_qr_xs() : error, modelsdir can not be undefined.\n"); XSRETURN_UNDEF; }
 
 	// prepare an array for return
 	retarr_AV = (AV *)sv_2mortal((SV *)newAV());
@@ -105,14 +110,14 @@ decode_xs(infilename_SV, modelsdir_SV, outbase_SV, verbosity, graphicaldisplayre
 	}
 
 	if( verbosity > 9 ){
-		fprintf(stdout, "decode_xs() : got these input parameters:"
+		fprintf(stdout, "detect_and_decode_qr_xs() : got these input parameters:"
 "\n  infilename(length %zu)='%s'"
 "\n  modelsdir(length: %zu)='%s'"
 "\n  outbase(length: %zu)='%s'"
 "\n  verbosity=%d"
 "\n  graphicaldisplayresult=%d"
 "\n  dumpqrimagestofile=%d"
-"\ndecode_xs() : end of input parameters.\n",
+"\ndetect_and_decode_qr_xs() : end of input parameters.\n",
 			infilename_len, infilename,
 			modelsdir_len, modelsdir,
 			outbase_len, outbase==NULL ? "undef":outbase,
@@ -131,7 +136,7 @@ decode_xs(infilename_SV, modelsdir_SV, outbase_SV, verbosity, graphicaldisplayre
 		&payloads_sz
 	);
 	if( ret != 0 ){
-		fprintf(stderr, "decode_xs() : call to wechat_qr_decode_with_C_linkage() has failed.\n");
+		fprintf(stderr, "detect_and_decode_qr_xs() : call to wechat_qr_decode_with_C_linkage() has failed.\n");
 		// return undef on error
 		//RETVAL = (AV *)(&PL_sv_undef);
 		XSRETURN_UNDEF; // or croak?
@@ -147,13 +152,13 @@ decode_xs(infilename_SV, modelsdir_SV, outbase_SV, verbosity, graphicaldisplayre
 	av_push(retarr_AV, newRV( (SV *)bboxes_AV ));
 
 	if( payloads_sz == 0 ){
-		fprintf(stderr, "decode_xs() : no QR-codes detected.\n");
+		fprintf(stderr, "detect_and_decode_qr_xs() : no QR-codes detected.\n");
 		goto END;
 	}
 
 	for(I=0;I<payloads_sz;I++){
 		apayload_sz = strlen(payloads[I]);
-		if( verbosity > 9 ){ fprintf(stdout, "decode_xs() : payload %d/%d received (length: %zu): %s\n", I+1, payloads_sz, apayload_sz, payloads[I]); }
+		if( verbosity > 9 ){ fprintf(stdout, "detect_and_decode_qr_xs() : payload %d/%d received (length: %zu): %s\n", I+1, payloads_sz, apayload_sz, payloads[I]); }
 
 		// this will create an SV with C-char-* to a utf8-perl-string
 		// Thanks Håkon Hægland, ikegami, Timothy Legge:
@@ -179,7 +184,7 @@ decode_xs(infilename_SV, modelsdir_SV, outbase_SV, verbosity, graphicaldisplayre
 
 	if( verbosity > 9 ){
 		// print the results if verbose
-		fprintf(stdout, "decode_xs() : returning these %zu payload(s):\n", payloads_sz);
+		fprintf(stdout, "detect_and_decode_qr_xs() : returning these %zu payload(s):\n", payloads_sz);
 		for(I=0;I<payloads_sz;I++){
 			apayloadPP = av_fetch(payloads_AV, I, 0);
 			dummy = SvPVutf8(*apayloadPP, dummy_len);
@@ -193,7 +198,7 @@ decode_xs(infilename_SV, modelsdir_SV, outbase_SV, verbosity, graphicaldisplayre
 			fprintf(stdout, "]\n");
 			*/
 		}
-		fprintf(stdout, "decode_xs() : end of payload(s) to return.\n");
+		fprintf(stdout, "detect_and_decode_qr_xs() : end of payload(s) to return.\n");
 	}
 	// this is lame but it's there because I don't know how to tell it to just
 	// return back in the middle of the codez above!, so just goto...

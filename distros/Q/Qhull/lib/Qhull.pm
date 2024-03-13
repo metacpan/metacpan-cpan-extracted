@@ -1,12 +1,12 @@
 package Qhull;
 
-# ABSTRACT: a really awesome library
+# ABSTRACT: Interface to the Qhull convex hull, Delauny triangulation, Voronoi diagram software suite
 
 use v5.26;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.05';
 
 sub import {
     my ( undef, @args ) = @_;
@@ -31,15 +31,15 @@ __END__
 
 =pod
 
-=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory qhull
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory qhull Delauny Voronoi
 
 =head1 NAME
 
-Qhull - a really awesome library
+Qhull - Interface to the Qhull convex hull, Delauny triangulation, Voronoi diagram software suite
 
 =head1 VERSION
 
-version 0.02
+version 0.05
 
 =head1 SYNOPSIS
 

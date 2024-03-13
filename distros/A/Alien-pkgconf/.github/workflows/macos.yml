@@ -1,0 +1,72 @@
+name: macos
+
+on:
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - '*'
+  pull_request:
+
+env:
+  PERL5LIB: /Users/runner/perl5/lib/perl5
+  PERL_LOCAL_LIB_ROOT: /Users/runner/perl5
+  PERL_MB_OPT: --install_base /Users/runner/perl5
+  PERL_MM_OPT: INSTALL_BASE=/Users/runner/perl5
+
+jobs:
+  perl:
+
+    runs-on: macOS-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        alien:
+          - install_type: share
+#          - install_type: system
+#            packages: 
+
+    env:
+      ALIEN_INSTALL_TYPE: ${{ matrix.alien.install_type }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Perl
+        run: |
+          brew install perl ${{ matrix.alien.packages }} libffi libarchive
+          curl https://cpanmin.us | perl - App::cpanminus -n
+          echo "/Users/runner/perl5/bin" >> $GITHUB_PATH
+
+      - name: perl -V
+        run: perl -V
+
+      - name: Prepare for cache
+        run: |
+          perl -V > perlversion.txt
+          ls -l perlversion.txt
+
+      - name: Cache CPAN modules
+        uses: actions/cache@v1
+        with:
+          path: ~/perl5
+          key: ${{ runner.os }}-build-${{ matrix.alien.install_type }}-${{ hashFiles('perlversion.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ matrix.alien.install_type }}-${{ hashFiles('perlversion.txt') }}
+
+      - name: Install Dependencies
+        run: |
+          perl Makefile.PL
+          cpanm --installdeps .
+
+      - name: Build
+        run: make
+
+      - name: Test
+        run: make test TEST_VERBOSE=1
+
+      - name: CPAN log
+        if: ${{ failure() }}
+        run: |
+          cat ~/.cpanm/latest-build/build.log

@@ -1,5 +1,21 @@
 Revision history for Perl application 'greple'.
 
+9.1101 2024-03-10T06:13:21Z
+
+    - include total length in stat information
+
+9.11 2024-03-06T08:39:18Z
+
+    - deprecate --conceal option
+    - skip some test on perl v5.14 because :lvalue sub does not work somehow
+
+9.10 2023-12-22T02:08:08Z
+
+    - remove --git-color-blame from -Mcolors
+    - use Getopt::EX@2.1.6 to deal with the latest Getopt::Long
+    - "-Mline" allows line numbers to be specified immediately after
+    - make --all option can be cancelled
+
 9.0902 2023-11-20T10:23:55Z
 
     - fix bug of --must pattern used with --need option

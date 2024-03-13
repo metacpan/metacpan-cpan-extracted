@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use utf8; # filenames can be in utf8
 
@@ -279,11 +279,21 @@ sub	input_pattern {
 	if( $verbos > 1 ){ print "${whoami} (via $parent), line ".__LINE__." : searching under dir '$indir' with pattern '".$pattern."' ...\n" }
 
 	if( ! defined $self->input_images([
-		# this little piglet does not support unicode or rather readdir needs some patching
-		map { Encode::decode_utf8($_) } File::Find::Rule
-			->file()
-			->name($pattern)
-			->in(Encode::encode_utf8($indir))
+		# this little piglet does not support unicode
+		# or, rather, readdir() needs some patching
+		# additionally, it fails in M$ as the unicoded
+		# filenames get doubly encoded, let's see if this will fix it:
+		($^O eq 'MSWin32')
+			?
+			    File::Find::Rule
+				->file()
+				->name($pattern)
+				->in(Encode::encode_utf8($indir))
+			: map { Encode::decode_utf8($_) }
+			    File::Find::Rule
+				->file()
+				->name($pattern)
+				->in(Encode::encode_utf8($indir))
 	]) ){ print STDERR "${whoami} (via $parent), line ".__LINE__." : error, call to input_images() has failed.\n"; return 0 }
 
 	return 1 # success
@@ -368,7 +378,7 @@ Automate::Animate::FFmpeg - Create animation from a sequence of images using FFm
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 
 =head1 SYNOPSIS

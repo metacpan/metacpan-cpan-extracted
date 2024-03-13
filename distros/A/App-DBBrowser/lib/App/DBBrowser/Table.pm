@@ -143,8 +143,7 @@ sub __on_table {
             if ( ! eval {
                 require App::DBBrowser::Table::InsertUpdateDelete;
                 my $write = App::DBBrowser::Table::InsertUpdateDelete->new( $sf->{i}, $sf->{o}, $sf->{d} );
-                require Clone;
-                my $backup_sql = Clone::clone( $sql );
+                my $backup_sql = $ax->clone_data( $sql );
                 $write->table_write_access( $sql );
                 $sql = $backup_sql;
                 1 }

@@ -130,7 +130,7 @@ $next_for_validation ||= $m->caller(1)->path;
 <div id="formtools-form-body" class="container p-4 formtools-base-style">
 <form
     method="POST"
-    action="<% $next_for_validation %>"
+    action="<% RT->Config->Get('WebPath') . $next_for_validation %>"
     enctype="multipart/form-data"
     <% defined $form_id ? ' id="'.$form_id.'"' : '' |n %>
     <% defined $form_name ? ' name="'.$form_name.'"' : '' |n %>

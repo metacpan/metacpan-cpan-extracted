@@ -79,6 +79,7 @@ t/20_util.t
 t/50_cli.t
 t/testset/bot/adidxbot.yaml
 t/testset/bot/adstxt_com.yaml
+t/testset/bot/amazonbot.yaml
 t/testset/bot/applebot.yaml
 t/testset/bot/baiduspider.yaml
 t/testset/bot/barkrowler.yaml

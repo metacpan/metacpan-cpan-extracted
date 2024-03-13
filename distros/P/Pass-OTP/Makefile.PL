@@ -20,6 +20,27 @@ WriteMakefile(
         'Digest::SHA' => '0',
         'Math::BigInt' => '1.999806',
     },
-    dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        resources => {
+            repository => {
+                type => 'git',
+                url => 'git://github.com/baierjan/Pass-OTP-perl.git',
+                web => 'https://github.com/baierjan/Pass-OTP-perl',
+            },
+        },
+        provides => {
+            'Pass::OTP' => {
+                file => 'lib/Pass/OTP.pm', version => '1.702',
+            },
+            'Pass::OTP::URI' => {
+                file => 'lib/Pass/OTP/URI.pm', version => '1.702',
+            },
+        }
+    },
+    dist  => {
+        COMPRESS => 'gzip -9f', SUFFIX => 'gz',
+        TARFLAGS => '--format=ustar -c -v -f',
+    },
     clean => { FILES => 'Pass-OTP-*' },
 );

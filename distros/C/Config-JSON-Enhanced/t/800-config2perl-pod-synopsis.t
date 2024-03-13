@@ -10,7 +10,7 @@ use FindBin;
 
 use Data::Roundtrip qw/perl2dump no-unicode-escape-permanently/;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use Config::JSON::Enhanced;
 
@@ -36,7 +36,7 @@ for (qw/a b c/){
 	ok(exists($json->{$_}), 'config2perl()'." : called and result contains required key ($_).");
 }
 is(ref($json->{'b'}), 'ARRAY', 'config2perl()'." : called and result contains 'b' which is an ARRAY.");
-diag perl2dump($json, {indent=>0});
+#diag perl2dump($json, {indent=>0});
 
 ########################
 ##### another example
@@ -51,7 +51,7 @@ $con = <<'EOJ';
       Comments like /* this */ or # this comment
       will be removed.
       White space from beginning and end will be chomped.
- 
+
       <%end-verbatim-section%>
       ,
       "b" : 123
@@ -67,7 +67,7 @@ is(ref($json), 'HASH', 'config2perl()'." : called and result is HASHref.");
 for (qw/a b/){
 	ok(exists($json->{$_}), 'config2perl()'." : called and result contains required key ($_).");
 }
-diag perl2dump($json,{indent=>0});
+#diag perl2dump($json,{indent=>0});
 
 ########################
 ##### another example
@@ -100,7 +100,7 @@ $varname = 'configfile'; unlike($json->{$varname}, qr/<%\s*${varname}\s*%>/, 'co
 $varname = 'username'; unlike($json->{$varname}, qr/<%\s*${varname}\s*%>/, 'config2perl()'." : template substitution (for '$varname') was correct.");
 
 is($json->{'d'}->[2], 42, 'config2perl()'." : called and result contains 42!!!");
-diag perl2dump($json,{indent=>0});
+#diag perl2dump($json,{indent=>0});
 
 
 done_testing();

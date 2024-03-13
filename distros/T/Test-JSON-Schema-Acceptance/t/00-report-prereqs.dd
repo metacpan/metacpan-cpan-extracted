@@ -8,7 +8,7 @@ do { my $x = {
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.162',
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.163',
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
@@ -40,8 +40,8 @@ do { my $x = {
                       'requires' => {
                                       'Feature::Compat::Try' => '0',
                                       'File::ShareDir' => '0',
-                                      'JSON::MaybeXS' => '1.004001',
                                       'List::Util' => '1.33',
+                                      'Mojo::JSON' => '0',
                                       'Moo' => '0',
                                       'MooX::TypeTiny' => '0.002002',
                                       'Path::Tiny' => '0.069',
@@ -75,6 +75,7 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
+                                   'JSON::MaybeXS' => '1.002004',
                                    'JSON::PP' => '0',
                                    'Scalar::Util' => '0',
                                    'Test2::Suite' => '0.000131',

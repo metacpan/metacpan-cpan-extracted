@@ -21,7 +21,7 @@ __DATA__
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
-#include <parasail.h>
+#include "parasail.h"
  
 int
 version(const char *class)

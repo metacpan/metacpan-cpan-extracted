@@ -1,9 +1,9 @@
 ---
-abstract: 'a really awesome library'
+abstract: 'Interface to the Qhull convex hull, Delauny triangulation, Voronoi diagram software suite'
 author:
   - 'Diab Jerius <djerius@cpan.org>'
 build_requires:
-  Data::Dump: '0'
+  Data::Rmap: '0'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   IO::Handle: '0'
@@ -33,21 +33,21 @@ no_index:
 provides:
   Qhull:
     file: lib/Qhull.pm
-    version: '0.02'
+    version: '0.05'
   Qhull::Options:
     file: lib/Qhull/Options.pm
-    version: '0.02'
+    version: '0.05'
   Qhull::PP:
     file: lib/Qhull/PP.pm
-    version: '0.02'
+    version: '0.05'
   Qhull::Util:
     file: lib/Qhull/Util.pm
-    version: '0.02'
+    version: '0.05'
   Qhull::Util::Options:
     file: lib/Qhull/Util/Options.pm
-    version: '0.02'
+    version: '0.05'
 requires:
-  Alien::Qhull: '0'
+  Alien::Qhull: v8.0.2.2
   CXC::Exporter::Util: '0.05'
   Carp: '0'
   Eval::Closure: '0'
@@ -74,7 +74,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Qhull
   repository: https://gitlab.com/djerius/p5-qhull.git
-version: '0.02'
+version: '0.05'
 x_generated_by_perl: v5.38.2
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: GPL-3.0-only

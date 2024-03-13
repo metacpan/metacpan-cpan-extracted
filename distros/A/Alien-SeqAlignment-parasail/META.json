@@ -1,5 +1,5 @@
 {
-   "abstract" : "Provide the static, dynamic libraries and CLI of the parasail aligner",
+   "abstract" : "find, build and install the parasail library",
    "author" : [
       "Christos Argyropoulos <chrisarg@gmail.com>"
    ],
@@ -33,9 +33,14 @@
       },
       "configure" : {
          "requires" : {
-            "Alien::Build" : "1.40",
+            "Alien::Autotools" : "0",
+            "Alien::Build" : "2.70",
             "Alien::Build::MM" : "0.32",
-            "ExtUtils::MakeMaker" : "6.52"
+            "Carp" : "0",
+            "ExtUtils::MakeMaker" : "6.52",
+            "File::Copy::Recursive" : "0",
+            "HTTP::Tiny" : "0",
+            "Path::Tiny" : "0"
          }
       },
       "develop" : {
@@ -53,7 +58,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Alien::Base" : "0",
+            "Alien::Base" : "0.038",
             "parent" : "0",
             "strict" : "0",
             "warnings" : "0"
@@ -76,26 +81,24 @@
    "provides" : {
       "Alien::SeqAlignment::parasail" : {
          "file" : "lib/Alien/SeqAlignment/parasail.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/chrisarg/Alien-SeqAlignment-parasail/issues"
-      },
+      "homepage" : "https://github.com/chrisarg/alien-seqalignment-parasail",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/chrisarg/Alien-SeqAlignment-parasail.git",
-         "web" : "https://github.com/chrisarg/Alien-SeqAlignment-parasail"
-      }
+         "url" : "https://github.com/chrisarg/alien-seqalignment-parasail.git",
+         "web" : "https://github.com/chrisarg/alien-seqalignment-parasail"
+      },
+      "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_alienfile" : {
       "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.32",
       "requires" : {
          "share" : {
-            "Alien::Autotools" : "0",
             "Alien::Build::Plugin::Gather::IsolateDynamic" : "0.48",
             "Config" : "0",
             "HTTP::Tiny" : "0.044",

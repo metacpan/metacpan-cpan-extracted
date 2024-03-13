@@ -1,4 +1,4 @@
-package EAI::DB 1.911;
+package EAI::DB 1.912;
 
 use strict; use feature 'unicode_strings'; use warnings;
 use Exporter qw(import); use DBI qw(:sql_types); use DBD::ODBC (); use Data::Dumper qw(Dumper); use Log::Log4perl qw(get_logger);
@@ -16,13 +16,13 @@ sub newDBH ($$) {
 		$DSN = $newDSN;
 		$logger->debug("DSN: $DSN");
 		$dbh->disconnect() if defined($dbh);
+		# AutoCommit=>0 is not done here, as beginWork calls $dbh->begin_work, which does this.
 		$dbh = DBI->connect("dbi:ODBC:$DSN",undef,undef,{PrintError=>0,RaiseError=>0}) or do {
 			$logger->error("DB connection error:".$DBI::errstr.",DSN:".$DSN);
 			undef $dbh;
 			return 0;
 		};
-		$DB->{longreadlen} = 1024 if !$DB->{longreadlen};
-		$dbh->{LongReadLen} = $DB->{longreadlen};
+		$dbh->{LongReadLen} = ($DB->{longreadlen} ? $DB->{longreadlen} : 1024);
 		$logger->info("new DB connection established");
 	} else {
 		$logger->info("DB connection already open, using $DSN");

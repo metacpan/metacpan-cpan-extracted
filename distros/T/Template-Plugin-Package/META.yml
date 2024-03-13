@@ -1,0 +1,28 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '6.46'
+  Test::More: '0.95'
+configure_requires:
+  ExtUtils::MakeMaker: '6.46'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Template-Plugin-Package
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/petdance/template-plugin-package/issues
+  homepage: https://github.com/petdance/template-plugin-package
+  license: https://opensource.org/licenses/artistic-license-2.0.php
+version: '1.00'

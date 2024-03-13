@@ -21,7 +21,7 @@ my %strcnt ; # 数える対象の文字列(各行から最後の改行文字列�
 my %cntX1X2 ; # $cntX1X2 {$_}{$tail} で度数を表す。「X」で切断を意味する。
 my %l1str ; # $l1str{ str } で最初の出現行番号を保持
 my %l2str ; # $l2str{ str } で最後の出現行番号を保持
-my $in1 = do { $_ = <> ; chomp ; $_ } if $o{q/=/} ; # -=の指定がある場合の、入力1行目
+my $in1 = do { $_ = <> ; chomp ; $_ } if $o{'='} ; # -=の指定がある場合の、入力1行目
 my $isep = $o{i} // "\t" ; # //= do { $o{','} //= "\t" ; eval qq[qq[$o{','}]] } ; # 入力の区切り文字 
 my $osep = "\t" ; # 出力用セパレータ
 my $readLines ; # 読み取った行数
@@ -120,9 +120,10 @@ sub output ( ) {
   push @cNames , $o{j}? '累積和':'AccSum'  if $o{a} ;
   push @cNames , $o{j}? '比率(%)':'Ratio%' if $o{'%'} ; 
   push @cNames , $o{j}? '頻度*':'Freq*' unless $o{1} ;
-  push @cNames , "$o{q}$in1$o{q}" // $o{j}?'各行文字列':'$LinStr' ; #
+  push @cNames , defined $in1 ? "$o{q}$in1$o{q}" : $o{j} ? '各行文字列' : 'LineContent' ; #
   push @cNames , "RIGHT_FIELDS.." if defined $hTake ;
   say UNDERLINE join $osep , @cNames if ($o{0}//'') ne '0' ; 
+  say $in1 if ($o{0}//'') eq '0' && $o{1} ; #  freq -=100 に対応。
 
   * lineRange = sub { $l1str{$_} //= 0 ; $l2str{$_} //= 0 ; $l1str{$_}==$l2str{$_} ? "$l1str{$_}:" : "$l1str{$_}~$l2str{$_}:" } ; 
 

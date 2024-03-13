@@ -52,3 +52,10 @@ Revision history for Config-EnhancedJSON
 0.09    06-10-2023 / 18:00
         Added one more test (t/300-tags-clashing.t)
         for testing if comment tags are the same as the other tags.
+
+0.10    12-03-2023 / 19:15
+        Scripts for command-line functionality are provided:
+        configjson2json.pl  configjson2perl.pl	configjson2.yaml.pl
+        Dependency 'Data::Roundtrip' must now have minimum version of 0.16
+        because prior to that json2perl() was die'ing on failure as opposed
+        to returning undef which is what we expected in the tests.

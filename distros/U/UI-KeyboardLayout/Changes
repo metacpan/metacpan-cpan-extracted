@@ -1923,3 +1923,56 @@ got <0x30 00 0x65 00 0x31 00 0x32 00 0x33 00 0x34 0x20 0x20 0x20 0x20 0x20 0x20 
 		Update which files are included into src.zip.
 
 	logo-base.html	Fix 06f5 ⇝ 06fb etc. due to changes to .kbdd
+
+0.77
+	Better comments (in the output .klc) about the purpose of KEYNAMES etc.
+	Better comments (in the output .klc) about the restrictions on (the minimal possible) SHIFTSTATE.
+	Correct 2 POD errors.
+	Clarify a bit the description of radio-buttons in FE keyboards.
+	Document how to generate different VK-codes depending on modifiers.
+	Change (the only) ;-comment in the generated .kbdd file to //.
+	Warn about conflict of assigned via VK scancodes.
+	Allow multiple assigned-to-VK scancodes (separate by |); the main one (if binds) is the last one.
+	Document the VK-subsection.
+	   Bogus “unreached”:
+		 —  𐋠 𐋳 𐋴 𐋵 𐋶 𐋷 𐋸 𐋹 𐋺 𐋻
+	On Windows, allow more than one ≥0x10000 codepoint in the source of a prefix key map, and explain the limitation for the
+		target.
+	Attept to: allow undefing keys via DefinedTo[undef].
+	Writes its version (as a comment) into the resulting file.
+	Update the builtin — and only so far — tables of key names.
+		(fixing the errors of MSKLC).
+	Document these errors.
+	We erronerously updated the list of scancodes in a setting in VK-section.
+		Try not-updating the rest as well.
+	New undocumented method 'literal' in ComposeKey.  (Undocumented, splits by |||.)
+
+	examples/klc2c.pl
+		The comment about KBDEXT in the generated table of scancodes seems to be wrong (by inspecting RSHIFT).
+		Better comments about the purpose of aKeyNames etc.
+		Uses its version and the version of the module as the 4th and the 3rd numbers in the version id.
+
+	examples/klc-layout2human.pl
+		New file (converts the LAYOUT section to a human-readable — and still parsable — form).
+		(Can also be used for checking for hanging ligatures.)
+		Replace end by … if too long; put in ⟬⟭ and replace whitespace by ␣, double-slash by ⁄⁄ if the context may confuse
+			the parser.
+ 		  (Still wrong for ‌ ‍ ͏ ‎ ‏  = 034f 200c–200f Combining Grapheme Joiner (CGJ), ZERO WIDTH (NON-)JOINER, L2R/R2L-marks)
+
+	izKeys.kbdd:
+		In comments, KANA was wrongly identified as scancode=50 (should be 70).
+		Remap scancodes 61, 72, 74 to VK-codes SNAPSHOT, OEM_AX (=“our-Menu”=“our-APPS”) and APP.  (To allow remapping.)
+		Change assignment of Emaji from Id() to Layers() — but only for AltGr-Menu, since "Add_AltGr" is A LAYER.
+			Does not change the output layout — but changes “Unreachable” warnings (wrongly!)…	UNDO???
+			Warnings are correct only if the binding is put into Layer 1 ???  (It would be lowered automatically by the
+			logic of the assigner-to-an-extra-layer prefixNOTSAME=****.)
+		Same for Green1pref.
+		Assignment of Dashes/Spaces crept in to Add_Menu.  (Now Menu-F12 are not Compose.)
+		Undef the F-key bindings in lAlt-lCtrl.
+		Move coptic hundreds to F-keys in Menu-rCtrl (Hebrew).
+		Add objectified emoji to Double-Struck F-keys.
+		Deliver 4th personality (as opposed to Hebrew) on Menu-rCtrl.
+		Undo addition of length=5 emojis
+			(XXXX Were trying to bisect a defect in RU: no/bad access to AltGr-Mnu; but it was unrelated.  Still undone!)
+		chainAltGr: insert Hebrew, make the same everywhere, terminate by ⤨.
+		Terminate the Compose chain by ⎄.

@@ -329,5 +329,5 @@ unshift @{ $status{pkg_config_dir} }, $my_pkg_config_dir;
 
 mkdir '_alien' unless -d '_alien';
 open my $fh, '>', $status_filename;
-print $fh encode_json(\%status);
+print $fh JSON::PP->new->utf8->canonical->encode(\%status);
 close $fh;

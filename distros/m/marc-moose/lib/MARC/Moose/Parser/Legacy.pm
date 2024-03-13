@@ -1,6 +1,6 @@
 package MARC::Moose::Parser::Legacy;
 # ABSTRACT: Parser for MARC::Record legacy records
-$MARC::Moose::Parser::Legacy::VERSION = '1.0.46';
+$MARC::Moose::Parser::Legacy::VERSION = '1.0.48';
 use Moose;
 
 extends 'MARC::Moose::Parser';
@@ -48,7 +48,7 @@ MARC::Moose::Parser::Legacy - Parser for MARC::Record legacy records
 
 =head1 VERSION
 
-version 1.0.46
+version 1.0.48
 
 =head1 SYNOPSYS
 
@@ -70,7 +70,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Frédéric Demians.
+This software is copyright (c) 2024 by Frédéric Demians.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

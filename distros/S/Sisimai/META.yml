@@ -26,7 +26,7 @@ no_index:
 provides:
   Sisimai:
     file: lib/Sisimai.pm
-    version: v5.0.1
+    version: v5.0.2
   Sisimai::ARF:
     file: lib/Sisimai/ARF.pm
   Sisimai::Address:
@@ -300,7 +300,7 @@ resources:
   bugtracker: https://github.com/sisimai/p5-sisimai/issues
   homepage: https://libsisimai.org/
   repository: git://github.com/sisimai/p5-sisimai.git
-version: v5.0.1
+version: v5.0.2
 x_contributors:
   - '0xcdcdcdcd <0xcdcdcdcd@gmail.com>'
   - 'Adrian Yee <adrian@gt.net>'

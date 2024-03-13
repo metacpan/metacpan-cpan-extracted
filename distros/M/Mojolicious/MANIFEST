@@ -131,11 +131,11 @@ lib/Mojolicious/Renderer.pm
 lib/Mojolicious/resources/public/favicon.ico
 lib/Mojolicious/resources/public/mojo/bootstrap/bootstrap.css
 lib/Mojolicious/resources/public/mojo/bootstrap/bootstrap.js
+lib/Mojolicious/resources/public/mojo/bootstrap/bootstrap.min.css.map
 lib/Mojolicious/resources/public/mojo/failraptor.png
 lib/Mojolicious/resources/public/mojo/highlight.js/highlight-mojo-dark.css
 lib/Mojolicious/resources/public/mojo/highlight.js/highlight.min.js
 lib/Mojolicious/resources/public/mojo/highlight.js/mojolicious.min.js
-lib/Mojolicious/resources/public/mojo/jquery/jquery.js
 lib/Mojolicious/resources/public/mojo/logo-white-2x.png
 lib/Mojolicious/resources/public/mojo/logo-white.png
 lib/Mojolicious/resources/public/mojo/logo.png
@@ -144,6 +144,7 @@ lib/Mojolicious/resources/public/mojo/noraptor.png
 lib/Mojolicious/resources/public/mojo/notfound.png
 lib/Mojolicious/resources/public/mojo/pinstripe-dark.png
 lib/Mojolicious/resources/public/mojo/pinstripe-light.png
+lib/Mojolicious/resources/public/mojo/popper/popper.js
 lib/Mojolicious/resources/templates/mojo/debug.html.ep
 lib/Mojolicious/resources/templates/mojo/exception.html.ep
 lib/Mojolicious/resources/templates/mojo/not_found.html.ep

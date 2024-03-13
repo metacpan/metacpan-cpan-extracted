@@ -128,7 +128,7 @@ sub create_table {
                 if ( $orig_row_count - 1 == @{$sql->{insert_args}} ) {
                     unshift @{$sql->{insert_args}}, $bu_first_row;
                 }
-                $sql->{create_table_col_names} = [];
+                $sql->{ct_column_definitions} = [];
                 $sql->{insert_col_names}  = [];
                 my $header_row = $sf->__get_column_names( $sql );
                 if ( ! $header_row ) {
@@ -145,23 +145,26 @@ sub create_table {
                 $count_table_name_loop = 0;
 
                 AUTO_INCREMENT: while( 1 ) {
-                    $sql->{create_table_col_names} = [ @$header_row ];  # not quoted
+                    $sql->{ct_column_definitions} = [ @$header_row ];  # not quoted
                     $sql->{insert_col_names}  = [ @$header_row ];  # not quoted
-                    my $continue = $sf->__autoincrement_column( $sql);
-                    if ( ! $continue ) {
-                        next GET_COLUMN_NAMES;
+                    $sf->{auto_increment} = 0;
+                    if ( $sf->{o}{create}{option_ai_column_enabled} && $sf->__primary_key_autoincrement_constraint() ) {
+                        my $return = $sf->__autoincrement_column( $sql);
+                        if ( ! defined $return ) {
+                            next GET_COLUMN_NAMES;
+                        }
                     }
-                    my @bu_orig_create_table_col_names = @{$sql->{create_table_col_names}};
+                    my @bu_orig_ct_column_definitions = @{$sql->{ct_column_definitions}};
                     my $column_names = []; # column_names memory
 
                     EDIT_COLUMN_NAMES: while( 1 ) {
                         $column_names = $sf->__edit_column_names( $sql, $column_names );
                         if ( ! $column_names ) {
-                            $sql->{create_table_col_names} = [ @bu_orig_create_table_col_names ];
-                            next AUTO_INCREMENT if $sf->{col_auto};
+                            $sql->{ct_column_definitions} = [ @bu_orig_ct_column_definitions ];
+                            next AUTO_INCREMENT if $sf->{auto_increment};
                             next GET_COLUMN_NAMES;
                         }
-                        if ( any { ! length } @{$sql->{create_table_col_names}} ) {
+                        if ( any { ! length } @{$sql->{ct_column_definitions}} ) {
                             # Choose
                             $tc->choose(
                                 [ 'Column with no name!' ],
@@ -169,7 +172,7 @@ sub create_table {
                             );
                             next EDIT_COLUMN_NAMES;
                         }
-                        my @duplicates = duplicates map { lc } @{$sql->{create_table_col_names}};
+                        my @duplicates = duplicates map { lc } @{$sql->{ct_column_definitions}};
                         if ( @duplicates ) {
                             # Choose
                             $tc->choose(
@@ -178,19 +181,19 @@ sub create_table {
                             );
                             next EDIT_COLUMN_NAMES;
                         }
-                        my @bu_edited_create_table_col_names = @{$sql->{create_table_col_names}};
+                        my @bu_edited_ct_column_definitions = @{$sql->{ct_column_definitions}};
                         my $data_types = {}; # data_types memory
 
                         EDIT_COLUMN_TYPES: while( 1 ) {
-                            $data_types = $sf->__edit_column_types( $sql, $data_types ); # `create_table_col_names` quoted in `__edit_column_types`
+                            $data_types = $sf->__edit_column_types( $sql, $data_types ); # `ct_column_definitions` quoted in `__edit_column_types`
                             if ( ! $data_types ) {
-                                $sql->{create_table_col_names} = [ @bu_orig_create_table_col_names ];
+                                $sql->{ct_column_definitions} = [ @bu_orig_ct_column_definitions ];
                                 next EDIT_COLUMN_NAMES;
                             }
                             # CREATE_TABLE
                             my $ok_create_table = $sf->__create( $sql, 'table' );
                             if ( ! defined $ok_create_table ) {
-                                $sql->{create_table_col_names} = [ @bu_edited_create_table_col_names ];
+                                $sql->{ct_column_definitions} = [ @bu_edited_ct_column_definitions ];
                                 $sql->{insert_col_names}  = [];
                                 next EDIT_COLUMN_TYPES;
                             }
@@ -279,27 +282,38 @@ sub __get_column_names {
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my ( $first_row, $user_input ) = ( '- YES', '- NO' );
-    my @pre = ( undef );
+    my $hidden = 'Use the first Data Row as the Table Header:';
+    my @pre = ( $hidden, undef );
     my $menu = [ @pre, $first_row, $user_input ];
-    my $header_row;
-    my $info = $ax->get_sql_info( $sql );
-    # Choose
-    my $chosen = $tc->choose(
-        $menu,
-        { %{$sf->{i}{lyt_v}}, info => $info, prompt => 'Use the first Data Row as the Table Header:', undef => '  <=',
-          keep => scalar( @$menu ) }
-    );
-    $ax->print_sql_info( $info );
-    if ( ! defined $chosen ) {
-        return;
+
+    while ( 1 ) {
+        my $info = $ax->get_sql_info( $sql );
+        # Choose
+        my $idx = $tc->choose(
+            $menu,
+            { %{$sf->{i}{lyt_v}}, info => $info, prompt => '', index => 1, default => 1, undef => '  <=',
+            keep => scalar( @$menu ) }
+        );
+        $ax->print_sql_info( $info );
+        if ( ! defined $idx || ! defined $menu->[$idx] ) {
+            return;
+        }
+        my $header_row;
+        if ( $menu->[$idx] eq $hidden ) {
+            require App::DBBrowser::Opt::Set;
+            my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
+            $opt_set->set_options( 'create' );
+            next;
+        }
+        elsif ( $menu->[$idx] eq $first_row ) {
+            $header_row = shift @{$sql->{insert_args}};
+            $header_row = [ map { defined ? "$_" : '' } @$header_row ];
+        }
+        else {
+            $header_row = [ ( '' ) x @{$sql->{insert_args}[0]} ];
+        }
+        return $header_row;
     }
-    elsif ( $chosen eq $first_row ) {
-        $header_row = shift @{$sql->{insert_args}};
-    }
-    else {
-        $header_row = [ ( '' ) x @{$sql->{insert_args}[0]} ];
-    }
-    return $header_row;
 }
 
 
@@ -307,31 +321,26 @@ sub __autoincrement_column {
     my ( $sf, $sql ) = @_;
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    $sf->{col_auto} = '';
-    $sf->{constraint_auto} = $sf->__primary_key_autoincrement_constraint();
-    if ( $sf->{constraint_auto} ) {
-        $sf->{col_auto} = $sf->{o}{create}{autoincrement_col_name};
+    my ( $no, $yes ) = ( '- NO ', '- YES' );
+    my $menu = [ undef, $yes, $no  ];
+    my $info = $ax->get_sql_info( $sql );
+    # Choose
+    my $chosen = $tc->choose(
+        $menu,
+        { %{$sf->{i}{lyt_v}}, info => $info, prompt => 'Add an AUTO INCREMENT column:', undef => '  <=',
+            keep => scalar( @$menu )  }
+    );
+    $ax->print_sql_info( $info );
+    if ( ! defined $chosen ) {
+        return;
     }
-    if ( $sf->{col_auto} ) {
-        my ( $no, $yes ) = ( '- NO ', '- YES' );
-        my $menu = [ undef, $yes, $no  ];
-        my $info = $ax->get_sql_info( $sql );
-        # Choose
-        my $chosen = $tc->choose(
-            $menu,
-            { %{$sf->{i}{lyt_v}}, info => $info, prompt => 'Add an AUTO INCREMENT column:', undef => '  <=',
-              keep => scalar( @$menu )  }
-        );
-        $ax->print_sql_info( $info );
-        if ( ! defined $chosen ) {
-            return;
-        }
-        elsif ( $chosen eq $no ) {
-            $sf->{col_auto} = '';
-        }
-        else {
-            unshift @{$sql->{create_table_col_names}}, $sf->{col_auto};
-        }
+    elsif ( $chosen eq $no ) {
+        $sf->{auto_increment} = 0;
+    }
+    else {
+        my $auto_increment_column_name = $sf->{o}{create}{default_ai_column_name} // 'Id'; ##
+        unshift @{$sql->{ct_column_definitions}}, $auto_increment_column_name;
+        $sf->{auto_increment} = 1;
     }
     return 1;
 }
@@ -387,10 +396,10 @@ sub __edit_column_names {
     my $col_number = 0;
     my $fields;
     if ( @$column_names ) {
-        $fields = [ map { [ ++$col_number, defined $_ ? "$_" : '' ] } @$column_names ];
+        $fields = [ map { [ ++$col_number, $_ ] } @$column_names ];
     }
     else {
-        $fields = [ map { [ ++$col_number, defined $_ ? "$_" : '' ] } @{$sql->{create_table_col_names}} ];
+        $fields = [ map { [ ++$col_number, $_ ] } @{$sql->{ct_column_definitions}} ];
     }
     my $info = $ax->get_sql_info( $sql );
     # Fill_form
@@ -402,10 +411,9 @@ sub __edit_column_names {
     if ( ! defined $form ) {
         return;
     }
-    $column_names = $sql->{create_table_col_names} = [ map { $_->[1] } @$form ]; # not quoted
-    if ( length $sf->{col_auto} ) {
-        $sf->{col_auto} = $sql->{create_table_col_names}[0];
-    }
+    $column_names = $sql->{ct_column_definitions} = [ map { $_->[1] } @$form ]; # not quoted
+    $sql->{ct_table_constraints} = [];
+    $sql->{ct_table_options} = [];
     return $column_names;
 }
 
@@ -414,10 +422,10 @@ sub __edit_column_types {
     my ( $sf, $sql, $data_types ) = @_;
     my $tf = Term::Form->new( $sf->{i}{tf_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $unquoted_table_cols = [ @{$sql->{create_table_col_names}} ];
-    $sql->{create_table_col_names} = $ax->quote_cols( $sql->{create_table_col_names} ); # now quoted
-    $sql->{insert_col_names} = [ @{$sql->{create_table_col_names}} ];
-    if ( length $sf->{col_auto} ) {
+    my $unquoted_table_cols = [ @{$sql->{ct_column_definitions}} ];
+    $sql->{ct_column_definitions} = $ax->quote_cols( $sql->{ct_column_definitions} ); # now quoted
+    $sql->{insert_col_names} = [ @{$sql->{ct_column_definitions}} ];
+    if ( $sf->{auto_increment} ) {
         shift @{$sql->{insert_col_names}};
     }
     my $fields;
@@ -444,8 +452,8 @@ sub __edit_column_types {
         $fields = [ map { [ $_, '' ] } @{$sql->{insert_col_names}} ];
     }
     my $read_only = []; ##
-    if ( length $sf->{col_auto} ) {
-        unshift @$fields, [ $ax->quote_column( $sf->{col_auto} ), $sf->{constraint_auto} ];
+    if ( $sf->{auto_increment} ) {
+        unshift @$fields, [ $sql->{ct_column_definitions}[0], $sf->__primary_key_autoincrement_constraint() ];
         $read_only = [ 0 ];
     }
     if ( $sf->{i}{driver} =~ /^(?:Pg|Firebird|Informix|Oracle)\z/ ) {
@@ -457,22 +465,48 @@ sub __edit_column_types {
             }
         }
     }
+    my $constraint_rows = $sf->{o}{create}{table_constraint_rows};
+    my $tbl_option_rows = $sf->{o}{create}{table_option_rows};
+    my $skip = ' ';
+    if ( $constraint_rows ) {
+        push @$fields, [ $skip ];
+        for my $i ( 0 .. $constraint_rows - 1 ) {
+            push @$fields, [ 'Constraint', $sql->{ct_table_constraints}[$i] // '' ];
+        }
+    }
+    if ( $tbl_option_rows ) {
+        push @$fields, [ $skip ];
+        for my $i ( 0 .. $tbl_option_rows - 1 ) {
+            push @$fields, [ 'Tbl Option', $sql->{ct_table_options}[$i] // '' ];
+        }
+    }
     my $info = $ax->get_sql_info( $sql );
     # Fill_form
-    my $col_name_and_type = $tf->fill_form(
+    my $filled_form = $tf->fill_form(
         $fields,
-        { info => $info, prompt => 'Column data types:', read_only => $read_only,
+        { info => $info, prompt => 'Column data types:', read_only => $read_only, skip_items => qr/^\Q$skip\E\z/,
           confirm => $sf->{i}{confirm}, back => $sf->{i}{back} . '   ' }
     );
     $ax->print_sql_info( $info );
-    if ( ! $col_name_and_type ) {
+    if ( ! $filled_form ) {
         return;
     }
-    else {
-        no warnings 'uninitialized'; ##
-        $sql->{create_table_col_names} = [ map { join ' ', @$_ }  @$col_name_and_type ];
+    if ( $tbl_option_rows ) {
+        $sql->{ct_table_options} = [
+            grep { length } map { $_->[1] } splice @$filled_form, -$tbl_option_rows, $tbl_option_rows
+        ];
+        pop @$filled_form;
     }
-    $data_types = { map { $_->[0] => $_->[1] } @$col_name_and_type };
+    if ( $constraint_rows ) {
+        $sql->{ct_table_constraints} = [
+            grep { length } map { $_->[1] } splice @$filled_form, -$constraint_rows, $constraint_rows
+        ];
+        pop @$filled_form;
+    }
+    $sql->{ct_column_definitions} = [
+        map { length $_->[1] ? join ' ', @$_ : $_->[0] }  @$filled_form
+    ];
+    $data_types = { map { $_->[0] => $_->[1] } @$filled_form };
     return $data_types;
 }
 
@@ -505,7 +539,7 @@ sub __create {
         return 0;
     }
     my $stmt = $ax->get_stmt( $sql, 'Create_' . $type, 'prepare' );
-    # don't reset `$sql->{create_table_col_names}` and `$sf->{d}{stmt_types}`:
+    # don't reset `$sql->{ct_column_definitions}` and `$sf->{d}{stmt_types}`:
     #    to get a consistent print_sql_info output in CommitSQL
     #    to avoid another confirmation prompt in CommitSQL
     if ( ! eval { $sf->{d}{dbh}->do( $stmt ); 1 } ) {
@@ -523,7 +557,7 @@ sub __insert_data {
     if ( ! defined $columns ) {
         return;
     }
-    if ( length $sf->{col_auto} ) {
+    if ( $sf->{auto_increment} ) {
         shift @$columns;
     }
     $sql->{insert_col_names} = $ax->quote_cols( $columns ); # now quoted

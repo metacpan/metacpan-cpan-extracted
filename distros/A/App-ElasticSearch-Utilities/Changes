@@ -1,9 +1,41 @@
 ==================================================
-Changes from 2021-08-18 00:00:00 +0000 to present.
+Changes from 2022-03-14 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 8.7 at 2023-08-18 17:05:23 +0000
+version 8.8 at 2024-03-13 03:33:40 +0000
+----------------------------------------
+
+  Change: 4ac157a60a392cbccf14ecc24582c521089a7162
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2024-03-12 20:33:30 +0000
+
+    Prepping 8.8 Release 
+
+  Change: de34aa8ce3a0a0398c39a4a388686c7cf3ded224
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2024-03-12 20:08:02 +0000
+
+    Add ::QueryString::Text to replace ::AutoEscape
+
+    * Replace `::QueryString::AutoEscape` with `::QueryString::Text` *
+    Deprecate `::QueryString::AutoEscape` to prevent it from loading * Move
+    `=field:value` for `term` queries to `::QueryString::Text` * Add
+    `*field:value` for `wildcard` queries * Add `~field:value` for `fuzzy`
+    queries * Add `/field:value` for `regexp` queries * Add `+field:value` for
+    `match_phrase` queries * Automatically promote queries against `text`
+    fields to `match` queries
+
+    unless otherwise specified * Add tests for the behavior 
+
+  Change: 90abda3a445f97e935d6a6ffe6aca37add9b9c87
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2024-03-12 20:08:02 +0000
+
+    Allow --jq/--json with --tail 
+
+----------------------------------------
+version 8.7 at 2023-08-18 17:04:19 +0000
 ----------------------------------------
 
   Change: 498b1b1896ab84bb1248f3c915783cf90a574dd2
@@ -254,77 +286,6 @@ version 8.3 at 2022-03-23 00:15:12 +0000
     This is related to the earlier bug I discovered in handling array
     references with ES 7.x and later. 
 
-----------------------------------------
-version 8.2 at 2021-09-24 21:30:36 +0000
-----------------------------------------
-
-  Change: 569436f7847833b3b3b20d15d14f753ab07c61aa
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2021-09-24 14:30:36 +0000
-
-    Prepping the 8.2 Release 
-
-  Change: ff914b2e69d3bf4c1862ad4970e119ab9a150e12
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2021-09-16 15:57:37 +0000
-
-    ES 7.x fixes + bonus
-
-    * Fix `::Query->add_bool()` for stricter parser in ES 7.x * Add
-    `value_count` as a valid aggregation for sorting 
-
-  Change: 963498bd7d45ba7480a8ef2ba82306bd98f9175c
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2021-08-31 20:25:48 +0000
-
-    Add --with-missing to es-search.pl
-
-    If specified, all terms aggregations will calculate the missing element as
-    'MISSING'. 
-
-----------------------------------------
-version 8.1 at 2021-09-01 00:43:28 +0000
-----------------------------------------
-
-  Change: dc6735a8f9fcb22c3bad773b759c47d4519dc2c1
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2021-08-31 17:43:28 +0000
-
-    Setting up the 8.1 release 
-
-  Change: cc2d07e3e2515d02d983dd8dd35fe3a061047a66
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2021-08-31 17:41:12 +0000
-
-    Add test for query and minimum_should_match for consistency 
-
-  Change: 5257a66d11394ea8ec140c9e5de0c3e7a8a1d50c
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2021-08-31 17:24:45 +0000
-
-    Fix tabs which errantly made it into the file 
-
-  Change: 94b47afe216d3361d821ef6585888fed4a6c958b
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2021-08-31 17:20:53 +0000
-
-    Fix minimum should match handling in the ::Query 
-
-  Change: 365a0a129d40b505bcb8ef3d72809f6e4c75ccfe
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2021-08-31 17:18:31 +0000
-
-    Update Aggregations documentation
-
-    * Adds documentation to `::Aggregations` * Adds more docs to
-    `es-aggregate.pl` 
-
-  Change: ce7787fe56b295dc83476f58f9082ade7f0e3661
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2021-08-16 21:02:18 +0000
-
-    Starting point for aggregation documentation 
-
 =================================================
-Plus 89 releases after 2021-08-18 00:00:00 +0000.
+Plus 91 releases after 2022-03-14 00:00:00 +0000.
 =================================================

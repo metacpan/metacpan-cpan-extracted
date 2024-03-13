@@ -2,7 +2,7 @@
 use warnings;
 use strict;
 use 5.014;
-our $VERSION = '2.405';
+our $VERSION = '2.407';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -46,7 +46,7 @@ C<db-browser> - Browse SQL databases and their tables interactively.
 
 =head1 VERSION
 
-Version 2.405
+Version 2.407
 
 =head1 SYNOPSIS
 
@@ -363,9 +363,11 @@ for the table name
 
 if the first data row should be used as a header
 
+Selecting the prompt line of this menu allows you to set the 'create table' options.
+
 =item
 
-if an auto increment column should be added (if the option L</Auto Increment> is enabled)
+if an auto increment column should be added (if the option is enabled in L</Create-Table>)
 
 =item
 
@@ -970,15 +972,48 @@ C<Informix>: set the C<DELIMIDENT> environment variable to allow quoted identifi
 
 Enter a string that should be automatically placed in front of all view names.
 
-=head3 Auto Increment
+=head2 Create-Table
 
-Setting I<Auto Increment> to a value other than an empty string enables the option to set an auto-increment column when
-creating a table. The value set here is then used as the default name for the auto-increment column.
+=head3 Enable Options
 
-=head3 Column Data Types
+=over
 
-If this option is enabled and a table is created, C<SQL::Type::Guess> is used to detect the data types. These data types
-are then used as default values when the user is asked for the data types.
+=item
+
+Auto Increment
+
+Enabling I<Auto Increment> makes the 'auto-increment primary key' option available when creating a table.
+
+=item
+
+Data Type Guessing
+
+When this option is enabled and a table is created, C<SQL::Type::Guess> is used to guess the data types. These data types
+are then used as defaults when the user is prompted for data types.
+
+=back
+
+=head3 Add Form Fields
+
+=over
+
+=item
+
+Table Constraint Fields
+
+Specify the number of fields available for entering table constraints (0-9).
+
+=item
+
+Table Option Fields
+
+Specify the number of fields available for entering table options (0-9).
+
+=back
+
+=head3 Auto Increment Column Name
+
+Set the default value for the auto-increment primary key column name.
 
 =head2 Output
 

@@ -19,6 +19,18 @@ This module requires these other modules and libraries:
   Archive::Zip
   Spreadsheet::ParseExcel
 
+BUILD AND RELEASE INSTRUCTIONS
+
+Note: Meta files (META.json and META.yml) have to be generated using ExtUtils::MakeMaker to satisfy the MANIFEST file. 
+
+Use the commands:
+
+   perl Makefile.PL
+   make distdir
+   make disttest
+   make dist
+   
+
 COPYRIGHT AND LICENCE
 
 Copyright (C) 2008 by Dmitry Ovsyanko

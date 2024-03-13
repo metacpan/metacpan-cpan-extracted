@@ -10,7 +10,7 @@ use File::Temp 'tempfile';
 use FindBin;
 use Cwd 'abs_path';
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use Config::JSON::Enhanced;
 

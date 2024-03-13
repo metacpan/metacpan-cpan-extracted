@@ -3,6 +3,7 @@ package Data::Text;
 use warnings;
 use strict;
 use Carp;
+use Lingua::Conjunction;
 use String::Clean;
 use String::Util;
 
@@ -12,11 +13,11 @@ Data::Text - Class to handle text in an OO way
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use overload (
         '==' => \&equal,
@@ -315,6 +316,30 @@ sub replace {
 	return $self;
 }
 
+=head2	appendconjunction
+
+Add a list as a conjunction.  See L<Lingua::Conjunction>
+Because of the way Data::Text works with quoting,
+this code works
+
+    my $d1 = Data::Text->new();
+    my $d2 = Data::Text->new('a');
+    my $d3 = Data::Text->new('b');
+
+    # Prints "a and b\n"
+    print $d1->appendconjunction($d2, $d3)->append("\n");
+
+=cut
+
+sub appendconjunction
+{
+	my $self = shift;
+
+	$self->append(Lingua::Conjunction::conjunction(@_));
+
+	return $self;
+}
+
 =head1 AUTHOR
 
 Nigel Horne, C<< <njh at bandsman.co.uk> >>
@@ -347,10 +372,6 @@ L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-Text>
 
 L<http://matrix.cpantesters.org/?dist=Data-Text>
 
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Data-Text>
-
 =item * CPAN Testers Dependencies
 
 L<http://deps.cpantesters.org/?module=Data::Text>
@@ -359,7 +380,7 @@ L<http://deps.cpantesters.org/?module=Data::Text>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2021-2022 Nigel Horne.
+Copyright 2021-2024 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

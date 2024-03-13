@@ -6,7 +6,7 @@ use warnings;
 
 use base 'Spreadsheet::ParseExcel::Workbook';
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use Archive::Zip;
 use Spreadsheet::ParseExcel;
@@ -148,8 +148,8 @@ sub _load_workbook {
                 if ($type eq "Date") {
                     if ($v < 1) {    #then this is Excel time field
                         $cell->{Type} = "Text";
+                        $cell->{Val}  = $cell->{_Value};
                     }
-                    $cell->{Val}  = $cell->{_Value};
                 }
                 $sheet->{Cells}[$row][$col] = $cell;
             }
@@ -288,7 +288,7 @@ __END__
 
 =head1 NAME
 
-Spreadsheet::XLSX - Perl extension for reading MS Excel 2007 files;
+Spreadsheet::XLSX - Perl extension for reading MS Excel 2007 files.
 
 =head1 SYNOPSIS
 
@@ -339,7 +339,7 @@ including Workbook, Worksheet, and Cell.
 
 =item L<Spreadsheet::ParseXLSX>
 
-This module has some serious issues with the way it uses regexs for parsing the XML.
+This module (Spradsheet::XLSX) has some serious issues with the way it uses regexs for parsing the XML.
 I would strongly encourage switching to L<Spreadsheet::ParseXLSX> which takes a more reliable approach.
 
 =item L<Text::CSV_XS>, L<Text::CSV_PP>

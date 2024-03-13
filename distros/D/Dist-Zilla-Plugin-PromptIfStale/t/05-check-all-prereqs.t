@@ -77,7 +77,7 @@ my %expected_prompts = (
 );
 
 my @expected_prompts = map
-    "Issues found:\n".join("\n", @{$expected_prompts{$_}}, 'Continue anyway?'),
+    "Issues found:\n".join("\n", $expected_prompts{$_}->@*, 'Continue anyway?'),
     qw(before_build after_build);
 
 $tzil->chrome->set_response_for($_, 'y') foreach @expected_prompts;

@@ -9,7 +9,7 @@ use File::Temp qw/tempfile/;
 use Test2::Plugin::UTF8; # rids of the Wide Character in TAP message!
 use Data::Roundtrip qw/perl2dump no-unicode-escape-permanently/;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use Config::JSON::Enhanced;
 

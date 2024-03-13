@@ -62,6 +62,14 @@ sub function_with_col {
     elsif ( $func =~ /^(?:YEAR|QUARTER|MONTH|WEEK|DAY|HOUR|MINUTE|SECOND|DAYOFWEEK|DAYOFYEAR)\z/ ) {
         return $sf->function_with_col_and_arg( 'EXTRACT', $col, $func );
     }
+    elsif ( $func =~ /^UNIX_TIMESTAMP\z/i ) {
+        return "UNIXEPOCH($col,'utc','subsec')"                                         if $driver eq 'SQLite'; # sqlite 3.42.0
+        return "EXTRACT(EPOCH FROM ${col}::timestamp with time zone)"                   if $driver eq 'Pg';
+        return "UNIX_TIMESTAMP($col)"                                                   if $driver =~ /^(?:mysql|MariaDB)\z/;
+        return "DATEDIFF(MILLISECOND,TIMESTAMP '1970-01-01 00:00:00',$col) * 0.001"     if $driver eq 'Firebird';
+        return "TRUNC(($col - date '1970-01-01') * 86400)"                              if $driver eq 'Oracle';
+        return "EXTRACT(EPOCH FROM $col)";                                              # Pg DB2
+    }
     else {
         return "$func($col)";
     }

@@ -23,6 +23,7 @@ DESCRIPTION
 - Firefox (_*.sqlite_)
 - Chrome and Edge (_*Bookmarks_)
 - Internet Explorer (_*Favorites_)
+- Netscape (_*.html_)
 - Markdown (_*.md_)
 - Gemini (_*.gmi_)
 - Surfraw (same as plain text)
@@ -32,8 +33,8 @@ Default export format : `<title> <url> <description>`
 
 - `<title>` is your bookmark's name, alias, or webpage title.
 - `<url>` is your bookmark's address, URL or URI.
-- `<description>` is empty for Chrome, Edge, Internet Explorer or Gemini. It 
-  contains Safari 'Description', Firefox 'Tags' and what the Markdown spec
+- `<description>` is empty for Chrome, Edge, Internet Explorer, Netscape or Gemini.
+  It contains Safari 'Description', Firefox 'Tags' and what the Markdown spec
   calls the 'Title' (just the tooltip, actually).
 
 Markdown, Gemini and plain text files are processed line by line (as UTF-8) :
@@ -121,6 +122,7 @@ All are optional.
 - Firefox : DBI, DBD::SQLite
 - Chrome : File::Slurper, JSON
 - Internet Explorer : Config::Any, Config::Tiny, Win32
+- Netscape : Netscape::Bookmarks
 - Plain text : URI::Find
 - Markdown : none
 

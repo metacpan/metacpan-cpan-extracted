@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-package Test::JSON::Schema::Acceptance; # git description: v1.020-3-g5e1831a
+package Test::JSON::Schema::Acceptance; # git description: v1.021-9-g938717d
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Acceptance testing for JSON-Schema based validators
 
-our $VERSION = '1.021';
+our $VERSION = '1.022';
 
 use 5.020;
 use Moo;
@@ -17,7 +17,7 @@ no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use Test2::API ();
 use Test2::Todo;
 use Test2::Tools::Compare ();
-use JSON::MaybeXS 1.004001;
+use Mojo::JSON ();  # for JSON_XS, MOJO_NO_JSON_XS environment variables
 use File::ShareDir 'dist_dir';
 use Feature::Compat::Try;
 use MooX::TypeTiny 0.002002;
@@ -378,6 +378,8 @@ sub _mutation_check ($self, $data) {
   return @error_paths;
 }
 
+use constant _JSON_BACKEND => Mojo::JSON::JSON_XS ? 'Cpanel::JSON::XS' : 'JSON::PP';
+
 # used for internal serialization/deserialization; does not prettify the string.
 has _json_serializer => (
   is => 'ro',
@@ -387,7 +389,8 @@ has _json_serializer => (
     json_deserialize => 'decode',
   },
   lazy => 1,
-  default => sub { JSON::MaybeXS->new(allow_nonref => 1, utf8 => 1, allow_blessed => 1, canonical => 1) },
+  default => sub { _JSON_BACKEND->new->allow_nonref(1)->utf8(1)->allow_blessed(1)->allow_bignum(1)->canonical(1) },
+
 );
 
 # used for displaying diagnostics only
@@ -399,7 +402,7 @@ has _json_prettyprinter => (
     json_prettyprint => 'encode',
   },
   default => sub {
-    my $encoder = JSON::MaybeXS->new(allow_nonref => 1, utf8 => 1, allow_blessed => 1, canonical => 1, convert_blessed => 1, pretty => 1)->space_before(0);
+    my $encoder = _JSON_BACKEND->new->allow_nonref(1)->utf8(0)->allow_blessed(1)->allow_bignum(1)->canonical(1)->convert_blessed(1)->pretty(1)->space_before(0);
     $encoder->indent_length(2) if $encoder->can('indent_length');
     $encoder;
   },
@@ -528,7 +531,7 @@ Test::JSON::Schema::Acceptance - Acceptance testing for JSON-Schema based valida
 
 =head1 VERSION
 
-version 1.021
+version 1.022
 
 =head1 SYNOPSIS
 
@@ -557,7 +560,7 @@ In the JSON::Schema::Modern module, a test could look like the following:
   done_testing();
 
 This would determine if JSON::Schema::Modern's C<validate> method returns the right result for all
-of the cases in the JSON Schema Test Suite, except for those listed in C<$skip_tests>.
+of the cases in the JSON Schema Test Suite, except for those listed in C<skip_tests>.
 
 =head1 DESCRIPTION
 
@@ -659,7 +662,7 @@ L<https://github.com/json-schema-org/JSON-Schema-Test-Suite/blob/main/README.md>
 
 A directory of additional resources which should be made available to the implementation under the
 base URI C<http://localhost:1234>. This is automatically provided if you did not override
-C</test_dir>; otherwise, you need to supply it yourself, if any tests require it (for example by
+L</test_dir>; otherwise, you need to supply it yourself, if any tests require it (for example by
 containing C<< {"$ref": "http://localhost:1234/foo.json/#a/b/c"} >>). If you supply an
 L</add_resource> value to L</acceptance> (see below), this will be done for you.
 
@@ -675,8 +678,8 @@ Optional. When true, tests in subdirectories (most notably F<optional/> are also
 =head2 skip_dir
 
 Optional. Pass a string or arrayref consisting of relative path name(s) to indicate directories
-(within the test directory as specified above with C<specification> or C<test_dir>) which will be
-skipped. Note that this is only useful currently with C<include_optional => 1>, as otherwise all
+(within the test directory as specified above with L</specification> or L</test_dir>) which will be
+skipped. Note that this is only useful currently with C<< include_optional => 1 >>, as otherwise all
 subdirectories would be skipped anyway.
 
 =head2 results
@@ -714,7 +717,7 @@ the same table that is printed at the end of the test run.
 =for stopwords metaschema
 
 Optional. A boolean that, when true, will test every schema against its
-specification metaschema. (When set, C<specification> must also be set.)
+specification metaschema. (When set, L</specification> must also be set.)
 
 This normally should not be set as the official test suite has already been
 sanity-tested, but you may want to set this in development environments if you
@@ -730,7 +733,7 @@ Defaults to false.
 
 Accepts a hash of options as its arguments.
 
-(Backwards-compatibility mode: accepts a subroutine which is used as C<validate_json_string>,
+(Backwards-compatibility mode: accepts a subroutine which is used as L</validate_json_string>,
 and a hashref of arguments.)
 
 Available options are:
@@ -743,7 +746,7 @@ structure to be validated. This is the main entry point to your JSON Schema libr
 The subroutine should return truthy or falsey depending on if the schema was valid for the input or
 not (an object with a boolean overload is acceptable).
 
-Either C<validate_data> or C<validate_json_string> is required.
+Either L</validate_data> or L</validate_json_string> is required.
 
 =head3 validate_json_string
 
@@ -754,7 +757,7 @@ library only accepts JSON strings.
 The subroutine should return truthy or falsey depending on if the schema was valid for the input or
 not (an object with a boolean overload is acceptable).
 
-Exactly one of C<validate_data> or C<validate_json_string> is required.
+Exactly one of L</validate_data> or L</validate_json_string> is required.
 
 =head3 add_resource
 
@@ -816,6 +819,14 @@ the same hashref structure as L</tests> above, which are ORed together.
     # .. etc
   ]
 
+=head2 json_prettyprint
+
+JSON-encodes a data structure in a format suitable for human view, used for printing test diagnostics.
+
+=head2 json_encoder
+
+Provides access to the object that provides the L</json_prettyprint> method.
+
 =head1 ACKNOWLEDGEMENTS
 
 =for stopwords Perrett Signes
@@ -866,6 +877,13 @@ This is free software, licensed under:
 This distribution includes data from the L<https://json-schema.org> test suite, which carries its own
 licence (see F<share/LICENSE>).
 
-=for Pod::Coverage BUILDARGS BUILD json_encoder json_decoder
+Permission is explicitly B<NOT> granted to repackage or redistribute this distribution with any
+files altered or added (such as with a different set of test data) than what was originally
+published to the Perl Programming Authors Upload Server (PAUSE), as dependencies of this
+distribution have specific expectations as to the contents of this test data depending on version.
+If it is desired to use a different dataset at runtime, please refer to the L</test_dir>
+configuration option.
+
+=for Pod::Coverage BUILDARGS BUILD json_decoder
 
 =cut

@@ -10,7 +10,7 @@ use Test2::Plugin::UTF8; # rids of the Wide Character in TAP message!
 use File::Temp qw/tempfile tempdir/;
 use File::Spec;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use Config::JSON::Enhanced;
 

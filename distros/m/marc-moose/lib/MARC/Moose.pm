@@ -1,6 +1,6 @@
 package MARC::Moose;
 # ABSTRACT: Moose based MARC records set of tools
-$MARC::Moose::VERSION = '1.0.46';
+$MARC::Moose::VERSION = '1.0.48';
 use Moose;
 
 use Carp;
@@ -22,7 +22,7 @@ MARC::Moose - Moose based MARC records set of tools
 
 =head1 VERSION
 
-version 1.0.46
+version 1.0.48
 
 =head1 DESCRIPTION
 
@@ -154,7 +154,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Frédéric Demians.
+This software is copyright (c) 2024 by Frédéric Demians.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

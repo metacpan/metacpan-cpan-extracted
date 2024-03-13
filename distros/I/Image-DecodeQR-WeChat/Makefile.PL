@@ -15,7 +15,7 @@ use IPC::Run;
 # it does not depend on FFI!
 use FFI::CheckLib;
 # but we also need this to compile a piece of C code (not really)
-#use Devel::CheckLib;
+use Devel::CheckLib;
 
 my $VERBOSE = exists($ENV{VERBOSE}) && defined($ENV{VERBOSE}) ? $ENV{VERBOSE} : 1;
 
@@ -165,16 +165,30 @@ EOCM
 	return  undef # failed
 }
 
+# find whether opencv highgui library exists
+# this is an optional OpenCV component and may or may not be installed.
+# we can't use FFI::CheckLib which uses DynaLoader to interrogate libs for symbols
+# because these are likely symbols whose names are C++-mangled
+# e.g. we have _ZN2cv3viz6imshowERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKNS_11_InputArrayERKNS_5Size_IiEE
+# instead of imshow.
+# so, what we need to do is use Devel::CheckLib this time to compile some code
+# Alas, this also does not work because it does not allow for a C++ compiler
 sub find_if_opencv_highgui_is_supported {
 	my ($cflags, $ldflags) = @_;
 
-	# we can't use FFI::CheckLib which uses DynaLoader to interrogate libs for symbols
-	# because these are likely symbols whose names are C++-mangled
-	# e.g. we have _ZN2cv3viz6imshowERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKNS_11_InputArrayERKNS_5Size_IiEE
-	# instead of imshow.
-	# so, what we need to do is use Devel::CheckLib this time to compile some code
-	# Alas, this also does not work because it does not allow for a C++ compiler
+	my $num_votes = 0;
 
+	my $method1 = 0;
+	for my $wanted ('opencv_highgui'){
+		my ($lib) = FFI::CheckLib::find_lib(
+			lib => $wanted,
+		);
+		# example output: /usr/local/lib64/libopencv_world.so.4.5.5
+		$method1 = defined($lib);
+	}
+	$num_votes += $method1;
+
+	my $method2 = 0;
 	my @incs;
 	push @incs, $1 while $cflags =~ /\-I\s*['](.+?)[']/g;
 	push @incs, $1 while $cflags =~ /\-I\s*["](.+?)["]/g;
@@ -182,9 +196,25 @@ sub find_if_opencv_highgui_is_supported {
 	for my $aninc (@incs){
 		my $f = File::Spec->catdir($aninc, 'opencv2', 'highgui.hpp');
 		if( $VERBOSE > 0 ){ print STDOUT "find_if_opencv_highgui_is_supported() : checking if file '$f' exists in '$aninc' ...\n" }
-		if( -f $f ){ return 1 }
+		if( -f $f ){ $method2 = 1 ; last }
 	}
-	return 0 # no highgui
+	$num_votes += $method2;
+
+	my $method3 = 0;
+	for my $wanted ('opencv_highgui'){
+		$method3 = Devel::CheckLib::check_lib(
+			lib => $wanted,
+		);
+	}
+	$num_votes += $method3;
+
+
+	if( $num_votes == 3 ){ return 1 }
+	elsif( $num_votes == 2 ){
+		print STDERR "WARNING: finding OpenCV's highgui library has yielded contradictory results:\nMethod 1 : does library exist? ".($method1==1?"YES":"NO")."\nMethod 2 : does OpenCV's highgui include file exist? ".($method2==1?"YES":"NO")."\nMethod 3 : is linking to this library successful? ".($method3==1?"YES":"NO")."\nI assume the answer is YES but we need a more robust method to detect this. You may want to raise this as an issue detailing your current OS and OpenCV installation.\n";
+		return 1
+	}
+	return 0 # not found (or just 1 method was successful)
 }
 
 my $ret = find_opencv_settings();
@@ -207,7 +237,7 @@ my %WriteMakefileArgs = (
     VERSION_FROM     => 'lib/Image/DecodeQR/WeChat.pm',
     ABSTRACT_FROM    => 'lib/Image/DecodeQR/WeChat.pm',
     LICENSE          => 'artistic_2',
-    MIN_PERL_VERSION => '5.006',
+    MIN_PERL_VERSION => '5.016',
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
 	'File::ShareDir::Install' => '0',
@@ -219,7 +249,7 @@ my %WriteMakefileArgs = (
 	'Data::Roundtrip' => '0',
 	'IPC::Run' => '0',
 	'FFI::CheckLib' => '0',
-	#'Devel::CheckLib' => '0',
+	'Devel::CheckLib' => '0',
     },
     TEST_REQUIRES => {
         'Test::More' => '0',
@@ -227,6 +257,7 @@ my %WriteMakefileArgs = (
 	'Encode' => '0',
 	'FindBin' => '0',
 	'File::Spec' => '0',
+	'File::Temp' => '0',
 	'File::Copy' => '0',
 	'Time::HiRes' => '0',
 	'File::ShareDir' => '0',
@@ -267,7 +298,7 @@ my %WriteMakefileArgs = (
     XSOPT   => '-C++',
 
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean => { FILES => 'Image-DecodeQR-WeChat-* WeChat.bs WeChat.c *.o t/tmp/* xt/tmp/*' },
+    clean => { FILES => 'Image-DecodeQR-WeChat-* WeChat.bs WeChat.c WeChat.xs *.o' },
 );
 
 # Compatibility with old versions of ExtUtils::MakeMaker

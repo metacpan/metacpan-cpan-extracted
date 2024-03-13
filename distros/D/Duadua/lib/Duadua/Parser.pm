@@ -50,14 +50,14 @@ sub _detect_general_bot {
 
     my %h = %{$BLANK_UA};
 
-    if ( index($d->ua, 'http://') > -1 || index($d->ua, 'https://') > -1 ) {
+    if ( index($d->ua, 'https://') > -1 || index($d->ua, 'http://') > -1 ) {
         $h{is_bot} = 1;
-        if ( index($d->ua, 'Mozilla/') != 0 && $d->ua =~ m!^([^/;]+)/(v?[\d.]+)! ) {
+        if ( index($d->ua, 'Mozilla/') == -1 && $d->ua =~ m!^([^/;]+)/(v?[\d.]+)! ) {
             my ($name, $version) = ($1, $2);
             $h{name}    = $name;
             $h{version} = $version;
         }
-        elsif ( $d->ua =~ m![\s\(]([^/\s:;]+(?:bot|crawl|crawler|spider|fetcher))/(v?[\d.]+)!i ) {
+        elsif ( $d->ua =~ m![\s\(]([^(/\s:;]+(?:bot|crawl|crawler|spider|fetcher))/(v?[\d.]+)!i ) {
             my ($name, $version) = ($1, $2);
             $h{name}    = $1;
             $h{version} = $version;

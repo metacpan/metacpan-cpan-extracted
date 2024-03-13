@@ -3,7 +3,7 @@ package Spreadsheet::ParseXLSX::Decryptor::Agile;
 use strict;
 use warnings;
 
-our $VERSION = '0.33'; # VERSION
+our $VERSION = '0.34'; # VERSION
 
 # ABSTRACT: decryptor for files of version 4.4
 
@@ -119,7 +119,7 @@ Spreadsheet::ParseXLSX::Decryptor::Agile - decryptor for files of version 4.4
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =for Pod::Coverage   decrypt
   decryptFile

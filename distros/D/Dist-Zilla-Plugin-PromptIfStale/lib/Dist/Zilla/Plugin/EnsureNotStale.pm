@@ -4,10 +4,18 @@ package Dist::Zilla::Plugin::EnsureNotStale;
 # vim: set ts=8 sts=2 sw=2 tw=115 et :
 # ABSTRACT: Abort at build/release time if modules are out of date
 
-our $VERSION = '0.058';
+our $VERSION = '0.059';
 
 use Moose;
 extends 'Dist::Zilla::Plugin::PromptIfStale';
+
+use strictures 2;
+use stable 0.031 'postderef';
+use experimental 'signatures';
+use if "$]" >= 5.022, experimental => 're_strict';
+no if "$]" >= 5.031009, feature => 'indirect';
+no if "$]" >= 5.033001, feature => 'multidimensional';
+no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use namespace::autoclean;
 
 has '+fatal' => (
@@ -29,7 +37,7 @@ Dist::Zilla::Plugin::EnsureNotStale - Abort at build/release time if modules are
 
 =head1 VERSION
 
-version 0.058
+version 0.059
 
 =head1 SYNOPSIS
 

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client::Request;
 # ABSTRACT: Object used for making requests to MetaCPAN
-$MetaCPAN::Client::Request::VERSION = '2.031000';
+$MetaCPAN::Client::Request::VERSION = '2.031001';
 use Moo;
 use Carp;
 use JSON::MaybeXS qw<decode_json encode_json>;
@@ -125,8 +125,10 @@ sub _decode_result {
     defined $success
         or croak 'Missing success in return value';
 
-    $success
-        or croak "Failed to fetch '$url': " . $result->{'reason'};
+    if (!$success) {
+        my $reason_field = $result->{status} == 599 ? 'content' : 'reason';
+        croak "Failed to fetch '$url': " . $result->{$reason_field};
+    }
 
     my $content = $result->{'content'}
         or croak 'Missing content in return value';
@@ -282,7 +284,7 @@ MetaCPAN::Client::Request - Object used for making requests to MetaCPAN
 
 =head1 VERSION
 
-version 2.031000
+version 2.031001
 
 =head1 ATTRIBUTES
 

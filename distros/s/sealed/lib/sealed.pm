@@ -5,7 +5,7 @@
 # Author: Joe Schaefer <joe@sunstarsys.com>
 
 package sealed;
-use v5.22;
+use v5.28;
 
 use strict;
 use warnings;
@@ -19,24 +19,25 @@ our $VERSION;
 our $DEBUG;
 
 BEGIN {
-  our $VERSION = qv(5.1.9);
+  our $VERSION = qv(6.0.0);
   XSLoader::load("sealed", $VERSION);
+  sub UNIVERSAL::TYPEDSCALAR {shift}
 }
 
-my %valid_attrs                 = (sealed => 1);
-my $p_obj                       = B::svref_2object(sub {&tweak});
+my %valid_attrs                  = (sealed => 1);
+my $p_obj                        = B::svref_2object(sub {&tweak});
 
 # B::PADOP (w/ ithreads) or B::SVOP
-my $gv_op                       = $p_obj->START->next->next;
+my $gv_op                        = $p_obj->START->next->next;
 
 sub tweak ($\@\@\@$$\%) {
   my ($op, $lexical_varnames, $pads, $op_stack, $cv_obj, $pad_names, $processed_op) = @_;
-  my $tweaked                   = 0;
+  my $tweaked                    = 0;
 
   if (${$op->next} and $op->next->name eq "padsv") {
-    $op                         = $op->next;
-    my $type                    = $$lexical_varnames[$op->targ]->TYPE;
-    my $class                   = $type->isa("B::HV") ? $type->NAME : undef;
+    $op                          = $op->next;
+    my $type                     = $$lexical_varnames[$op->targ]->TYPE;
+    my $class                    = $type->isa("B::HV") ? $type->NAME : undef;
 
     while (${$op->next} and $op->next->name ne "entersub") {
 
@@ -44,38 +45,38 @@ sub tweak ($\@\@\@$$\%) {
         return $op->next, $tweaked if $$processed_op{+${$op->next}}++;
 	# we need to process this arg stack recursively
 	splice @_, 0, 1, $op->next;
-        ($op, my $t)            = &tweak;
-        $tweaked               += $t;
-        $op                     = $_[0]->next unless $$op and ${$op->next};
+        ($op, my $t)             = &tweak;
+        $tweaked                += $t;
+        $op                      = $_[0]->next unless $$op and ${$op->next};
       }
 
       elsif ($op->next->name eq "method_named" and defined $class) {
-        my $methop              = $op->next;
+        my $methop               = $op->next;
 
         my ($method_name, $idx, $targ, $gv, $old_pad);
 
         if (ref($gv_op) eq "B::PADOP") {
-          $targ                 = $methop->targ;
+          $targ                  = $methop->targ;
 
           # A little prayer (the PL_curpad we need ain't available now).
           # Not sure if this works better pre-ithread cloning, or post-ithread cloning.
           # I've only used it post-ithread cloning, so YMMV.
           # $targ collisions are fun; ordering is a WAG with the @op_stack walker down below.
 
-          $method_name          = $$pads[$idx++][$targ] until defined $method_name and not
+          $method_name           = $$pads[$idx++][$targ] until defined $method_name and not
             (ref $method_name and warn __PACKAGE__ . ": target collision: targ=$targ");
         }
         else {
-          $method_name          = ${$methop->meth_sv->object_2svref};
+          $method_name           = ${$methop->meth_sv->object_2svref};
         }
 
         warn __PACKAGE__, ": compiling $class->$method_name lookup.\n"
           if $DEBUG;
-        my $method              = $class->can($method_name)
+        my $method               = $class->can($method_name)
           or die __PACKAGE__ . ": invalid lookup: $class->$method_name - did you forget to 'use $class' first?";
         # replace $methop
-        $old_pad                = B::cv_pad($cv_obj);
-        $gv                     = B::GVOP->new($gv_op->name, $gv_op->flags, ref($gv_op) eq "B::PADOP" ? *tweak : $method);
+        $old_pad                 = B::cv_pad($cv_obj);
+        $gv                      = B::GVOP->new($gv_op->name, $gv_op->flags, ref($gv_op) eq "B::PADOP" ? *tweak : $method);
         B::cv_pad($old_pad);
         $gv->next($methop->next);
         $gv->sibparent($methop->sibparent);
@@ -89,21 +90,22 @@ sub tweak ($\@\@\@$$\%) {
           # has the correct semantics (for $method) under assignment.
           my $padix = $gv->padix;
           _padname_add($cv_obj->PADLIST, $padix);
-          my (undef, @p) = $cv_obj->PADLIST->ARRAY;
+          my (undef, @p)         = $cv_obj->PADLIST->ARRAY;
           $pads = [ map $_->object_2svref, @p ];
           $$pads[--$idx][$padix] = $method;
-          $$pads[$idx][$targ] .= ":compiled";
+          $$pads[$idx][$targ]   .= ":compiled";
         }
         else {
-          $$pads[--$idx][$targ] .= ":sealed";
+          ${$methop->meth_sv->object_2svref} .= ":compiled";
         }
+
         ++$tweaked;
       }
     }
 
     continue {
       last unless $$op and ${$op->next};
-      $op                       = $op->next;
+      $op                        = $op->next;
     }
   }
 
@@ -112,16 +114,16 @@ sub tweak ($\@\@\@$$\%) {
 }
 
 sub MODIFY_CODE_ATTRIBUTES {
-  my ($class, $rv, @attrs)      = @_;
+  my ($class, $rv, @attrs)       = @_;
   local $@;
 
   if ((not defined $DEBUG or $DEBUG ne "disabled") and grep $valid_attrs{+lc}, @attrs) {
 
-    my $cv_obj                  = B::svref_2object($rv);
-    my @op_stack                = $cv_obj->START;
-    my ($pad_names, @p)         = $cv_obj->PADLIST->ARRAY;
-    my @pads                    = map $_->object_2svref, @p;
-    my @lexical_varnames        = $pad_names->ARRAY;
+    my $cv_obj                   = B::svref_2object($rv);
+    my @op_stack                 = $cv_obj->START;
+    my ($pad_names, @p)          = $cv_obj->PADLIST->ARRAY;
+    my @pads                     = map $_->object_2svref, @p;
+    my @lexical_varnames         = $pad_names->ARRAY;
     my %processed_op;
     my $tweaked;
 
@@ -132,7 +134,7 @@ sub MODIFY_CODE_ATTRIBUTES {
       $op->dump if defined $DEBUG and $DEBUG eq 'dump';
 
       if ($op->name eq "pushmark") {
-	$tweaked               += eval {tweak $op, @lexical_varnames, @pads, @op_stack, $cv_obj, $pad_names, %processed_op};
+	$tweaked                += eval {tweak $op, @lexical_varnames, @pads, @op_stack, $cv_obj, $pad_names, %processed_op};
         warn __PACKAGE__ . ": tweak() aborted: $@" if $@;
       }
 
@@ -160,7 +162,15 @@ sub MODIFY_CODE_ATTRIBUTES {
 }
 
 sub import {
-  $DEBUG                        = $_[1];
+  $DEBUG                         = $_[1];
+  my ($invoker) = caller;
+  local $@;
+  eval <<EOT;
+  package $invoker;
+  require Lexical::Types;
+  Lexical::Types->import()
+EOT
+  die $@ if $@;
 }
 
 1;
@@ -230,7 +240,7 @@ drown out any performance gains this module would otherwise provide.
 
 =head1 SEE ALSO
 
-L<https://blogs.sunstarsys.com/joe/perl7-sealed-lexicals>
+L<https://www.iconoclasts.blog/joe/perl7-sealed-lexicals>
 
 =head1 LICENSE
 

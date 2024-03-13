@@ -4,7 +4,7 @@ Config::JSON::Enhanced - JSON-based config with C/Shell-style comments, verbatim
 
 # VERSION
 
-Version 0.09
+Version 0.10
 
 # SYNOPSIS
 

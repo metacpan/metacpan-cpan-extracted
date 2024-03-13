@@ -1,10 +1,87 @@
 FF locks in Latin?!  Even with v73 compiled with klc2c — fixed by omitting OEM_8.
 
+Extra bindings on SPACE get in the way!
+
+If a component of a ComposeKey is “not connected”, merge it with the preceding one.
+
+We need a way to give “ultra-new” keys to have names given in the C file.
+
+AltGr-Fkeys “try” to be idempotent on the companion-personality faces.  (Need to “fill them” to avoid.)
+
+Can we combine DeadKey_Add and DeadKey_Inv?  Currently we need to do a silly 0138⤨ to terminate the AltGr-invertor chain.
+The implementation is near Adddeadkey**** (and Invdeadkey****?).
+
+DeadKey_Inv does not affect what is imported into other layers.  Is it actually included into coverage???
+
+Update these name lists in klc2c.pl (due to our extension of the tables).  We already added
+     5C      AX  70      KANA  73      "ABNT C1"  79      CONVERT
+     					DONE
+
+The update ≈74 ⇝ pre-77 disables AltGr-Mnu (etc) on the RU base.  The redefine of E05D to AX disappeared in ooo-ru???
+					DONE
+
+Check very long sequences in LIGATURES.    (Currently disabled, length=5 was truncated to 4???)
+
+In Hebrew, Menu-rCtrl is still Hebrew???
+					DONE
+
+On Cyr: F-keys on Green ⇝ ♫, on AltGr-inverted Green ⇝ Dashes/Spaces
+					DONE
+
+On Cyrillic or Hbr bases, F-keys are missing from columns 8,9 (Shift-)Menu.
+					DONE
+
+On Latin base, AltGr-inversion of Green still accesses Dahses/Spaces (on Latin only?)
+					DONE
+
+After the preceding fix (to Green1pref) now columns 6,7 of Cyr,Gr bases became Emoji, and AltGr- (and only) bindings to Dashes/Spaces disappear.
+					DONE
+
+Remove lCtrl-lAlt bindings for the F-keys.
+					DONE
+
+Our code to find coverage of extra layers is heuristical only: we do not actually check sliding down and/or multi-codepoing.
+At least, one should move the logic of sliding down BEFORE finding coverage.  (And why do we emit “extra-key map” for them???
+
+  Actually, is inversion actually accessing the layer 1 of extra face ???  !!!  I’m confused…
+
+(Un)reached reports for extra faces are complete bogus.
+
+Merge NOTSAME branches: currently they (essentially) have semantics NOTSAMEkey and NOTSAMEface (with different default for extra
+layers and for face declarations).
+
+Do a preliminary scan of layers/extra_layers/LinkFace//diacretics/layer_recipes/face_recipes(/etc???) to find the graph of
+dependencies, and order/warn appropriately (paying attention to “Full”-prefix!).  Inspect the reports for izKeys to decide what
+to do for dependency loops.
+
+Change the scheme for extra layers to (like) faceNOTSAME(extraF_Greek), layerNOTSAME(Greek_1).  Or maybe: (FaceName) is a shortcut
+for NOTSAMEface(FaceName) — otherwise it is a name/recipe of the face/layer (obviously, with no commas/slashes in the text).
+
+As iz-76-NLS shows, one can remap lCtrl and rAlt dynamically so that lCtrl+rAlt is distinguishable from rAlt even with KLLF_ALTGR
+no matter what is the order of pressing lCtrl and rAlt.  However, the order affects what an application can see — and with
+lCtrl-rAlt, it DOES NOT see that both lCtrl and rAlt are down (what it can see is LCONTROL+OEM_PA2)!  Moreover, with appropriate
+presses and releases of keys, the combination lCtrl-rAlt may have 4 different values of the associated bitmap (but one of them
+is not distinguishable from rAlt).
+
+  rAlt+rCtrl-rAlt			gives the 2nd-lCtrl
+		 +rCtrl+rAlt-rCtrl	adds  the 2nd-rAlt
+
+    CONCLUSION: some application may be defective with the order of pressing lCtrl-rAlt.
+
+      This build also shows how to make Alt⸣ed-Win an alias for Menu, and convert Alt⸣ed CapsLock into an extra modifier key.
+      Together with Tab (what about Alt-Tab???), this may lead to use of extra 3 modifiers (one to encode lCtrl-rAlt, and 2 more
+      for ´CapsLock and ´Tab).
+
+Imported Greek satellites should allow Greek chars to be entered after the prefix key (and not only the “base” characters).
+
+lAⒶS not bound — but produce something on ~!@#$%^&*()_+
+
 	What if this is due to missing LIGATURE for OEM_8??? — but it has no ligatures!
 
 Link to “manual” installation instructions: https://github.com/lelegard/winkbdlayouts#declaring-a-keyboard-layout-on-windows
 
 Are we including newish header/C files into source.zip?
+					DONE (untested)
 
 TODO issues inside klc2c.pl
 
@@ -34,6 +111,15 @@ Ideographs sneak in (including those used as IDs of extra layers sneaking into t
 
 Generate bold of ┄┅┈┉┆┇┊┋ via “adddot” even though bold guys are on extra layers???
 
+Make BackSpace after a dead key “cancel the dead key.
+
+In our recomendation to use DEADKEY=0 to produce the effect of “no characters in the expansion of a dead-key-combination”:
+			IRRELEVANT: for a minute, I was under impression that this “may have been used ‘after another dead-key’”.
+
+Non-destructive ToUnicode() is now documented!
+
+Is a 0-length ligature cancelling a dead key if used after it???
+
 Add to the descriptor of visual layers “separation of layer names into rows” (via @-assignments???) to enable LayerName₁ etc.
 
 In the docs “When one CORE face is active, the letters in another CORE face ”… is not practical.  Describe our scheme instead
@@ -59,6 +145,7 @@ Move math-combining characters to ' " (and AltGr) (now: 2nd++ combining).
 Latin duplications (meaningful) bindings on AltGr-inverted prefix key.
 
 (Shift)-Menu-F12 is Compose (³).
+						REPLACED now
 
 Maybe it is better to map synthetic Ctrl-Alt- bindings to AltGr- (as opposed to “Greek” lAlt-lCtrl-)???
 
@@ -99,7 +186,12 @@ Need to duplicate VK_OEM_AX to another “redefinable” scancode or VK_CODE???
 
 Make %double_scan_VK the default of a customizable mapping.
 
+One can severely restrict the number of entries in KEYNAME_DEAD (only what is generated by unshifted position is important).
+
 ======================== “New-style” leader keyboard layout driver (Text Services Framework ?)
+
+  This assumes that TSF “driver“ has acsess to scancode → VK-code translation.  However, it seems that it can operate only on
+  the level of WM-text-related-messages — so most of this section may be bogus!
 
 Loads “an old style driver” DLL, and performs as expected — with enhancements.
 (But it has no control to conversion of scancodes to VK-codes — however, it may ignore keypresses/releases, and [???] send
@@ -127,6 +219,15 @@ the last of these bits is “released” (by really-down modifiers, so ignoring 
   How to allow the finite automaton to act on VK+modification numbers???  “Post-dead keys” (active only after a prefix???)
 
   Keyrepeat: allow the prefix key remain active until the release of the key which triggered the binding.
+
+======================== When lCtrl is combinable with rAlt
+
+With lCtrl+rAlt meaning “Tensor”, Menu=Greek, lAlt=±Bold (as usual) and ???
+
+With lCtrl meaning “Math-font”, AltGr=Italic, Menu=Greek, lAlt=±Bold (as usual) and rCtrl=SansSerif get an orthogonal access.
+With lAlt+AltGr meaning “Tensor”, get an easy access.  What remains is (Bold)Script ???
+
+  lAlt+rCtrl unused???  lCtrl+Menu??? 2 other empty slots in Greek-Math-Fonts???
 
 ========================
 

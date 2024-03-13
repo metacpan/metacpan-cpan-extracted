@@ -1,6 +1,8 @@
 Revision history for Alien-SeqAlignment-parasail
 
-0.03      2024-03-02 22:39:19-07:00 America/Denver
+0.04      2024-03-09 21:07:08-07:00 America/Denver
+- reconfigured alienfile for clarity
+0.03      2024-03-02 22:41:20-07:00 America/Denver
 - Fixed erroneous probe via PkgConfig
 0.02      2024-03-02 21:28:05-07:00 America/Denver
 - Checks for prior (system) installation before reinstalling everything

@@ -75,7 +75,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'Alien::Qhull' => '0',
+                                      'Alien::Qhull' => 'v8.0.2.2',
                                       'CXC::Exporter::Util' => '0.05',
                                       'Carp' => '0',
                                       'Eval::Closure' => '0',
@@ -106,7 +106,7 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
-                                   'Data::Dump' => '0',
+                                   'Data::Rmap' => '0',
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
                                    'IO::Handle' => '0',

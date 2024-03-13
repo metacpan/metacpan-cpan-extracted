@@ -1,6 +1,6 @@
 package MARC::Moose::Field::Std;
 # ABSTRACT: Standard Marc Field (tag >= 010)
-$MARC::Moose::Field::Std::VERSION = '1.0.46';
+$MARC::Moose::Field::Std::VERSION = '1.0.48';
 use Moose;
 
 extends 'MARC::Moose::Field';
@@ -61,7 +61,7 @@ MARC::Moose::Field::Std - Standard Marc Field (tag >= 010)
 
 =head1 VERSION
 
-version 1.0.46
+version 1.0.48
 
 =head1 ATTRIBUTES
 
@@ -102,7 +102,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Frédéric Demians.
+This software is copyright (c) 2024 by Frédéric Demians.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

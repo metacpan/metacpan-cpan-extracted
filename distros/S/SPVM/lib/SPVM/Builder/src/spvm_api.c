@@ -3788,54 +3788,66 @@ int32_t SPVM_API_call_method_common(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_RUNTI
           }
         }
         
-        // Call native subrotuine
+        // Call native method
         int32_t (*native_address)(SPVM_ENV*, SPVM_VALUE*) = method->native_address;
-        assert(native_address != NULL);
-        error_id = (*native_address)(env, stack);
-        
-        // Increment ref count of return value
-        if (!error_id) {
-          if (method_return_type_is_object) {
-            SPVM_OBJECT* return_object = *(void**)&stack[0];
-            if (return_object != NULL) {
-              SPVM_API_inc_ref_count(env, stack, return_object);
-            }
-          }
+        if (!native_address) {
+          error_id = SPVM_API_die(env, stack, "The execution address of the \"%s\" native method in the \"%s\" class must not be NULL. Loading the dynamic link library maybe failed.", method->name, method->current_basic_type->name, __func__, FILE_NAME, __LINE__);
         }
         
-        // Leave scope
-        SPVM_API_leave_scope(env, stack, original_mortal_stack_top);
-        
-        // Decrement ref count of return value
         if (!error_id) {
-          if (method_return_type_is_object) {
-            SPVM_OBJECT* return_object = *(void**)&stack[0];
-            if (return_object != NULL) {
-              SPVM_API_dec_ref_count(env, stack, return_object);
+          error_id = (*native_address)(env, stack);
+          
+          // Increment ref count of return value
+          if (!error_id) {
+            if (method_return_type_is_object) {
+              SPVM_OBJECT* return_object = *(void**)&stack[0];
+              if (return_object != NULL) {
+                SPVM_API_inc_ref_count(env, stack, return_object);
+              }
             }
           }
-        }
-        
-        // Set default exception message
-        if (error_id && SPVM_API_get_exception(env, stack) == NULL) {
-          void* exception = SPVM_API_new_string_nolen_no_mortal(env, stack, "Error");
-          SPVM_API_set_exception(env, stack, exception);
+          
+          // Leave scope
+          SPVM_API_leave_scope(env, stack, original_mortal_stack_top);
+          
+          // Decrement ref count of return value
+          if (!error_id) {
+            if (method_return_type_is_object) {
+              SPVM_OBJECT* return_object = *(void**)&stack[0];
+              if (return_object != NULL) {
+                SPVM_API_dec_ref_count(env, stack, return_object);
+              }
+            }
+          }
+          
+          // Set default exception message
+          if (error_id && SPVM_API_get_exception(env, stack) == NULL) {
+            void* exception = SPVM_API_new_string_nolen_no_mortal(env, stack, "Error");
+            SPVM_API_set_exception(env, stack, exception);
+          }
         }
       }
-      else {
-        // Call precompiled method
+      else if (method->is_precompile) {
+        // TODO: this is added temporary for bugs of SPVM::Builder::Exe.
+        method->is_precompile_fallback = 1;
+        
         void* method_precompile_address = method->precompile_address;
         if (method_precompile_address) {
           int32_t (*precompile_address)(SPVM_ENV*, SPVM_VALUE*) = method_precompile_address;
           error_id = (*precompile_address)(env, stack);
         }
-        // Call sub virtual machine
-        else {
+        else if (method->is_precompile_fallback) {
           error_id = SPVM_API_call_method_vm(env, stack, method, args_width);
         }
+        else {
+          error_id = SPVM_API_die(env, stack, "The execution address of the \"%s\" precompilation method in the \"%s\" class must not be NULL. Loading the dynamic link library maybe failed.", method->name, method->current_basic_type->name, __func__, FILE_NAME, __LINE__);
+        }
+      }
+      else {
+        error_id = SPVM_API_call_method_vm(env, stack, method, args_width);
       }
       
-      if (mortal && method_return_type_is_object) {
+      if (!error_id && mortal && method_return_type_is_object) {
         SPVM_API_push_mortal(env, stack, stack[0].oval);
       }
     }

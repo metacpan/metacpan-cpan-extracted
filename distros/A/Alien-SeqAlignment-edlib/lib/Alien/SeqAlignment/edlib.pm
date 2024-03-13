@@ -1,55 +1,25 @@
-package Alien::SeqAlignment::edlib;
-use parent qw( Alien::Base );
 use strict;
 use warnings;
+package Alien::SeqAlignment::edlib;
+$Alien::SeqAlignment::edlib::VERSION = '0.08';
 
+use parent qw( Alien::Base );
 
-
-
-sub exe {
-  my($class) = @_;
-  $class->runtime_prop->{command} if  $^O ne 'MSWin32';
-}
-
-
-sub alien_helper {
-  my($class) = @_;
-  return {
-    edlib_aligner => sub {
-      # return the CLI command for the edlib aligner
-      Alien::SeqAligment::edlib->exe;
-    }
-  },
-}
-
-
-
-
-1;
-
-__END__
-
-=pod
-
-=encoding UTF-8
 
 =head1 NAME
 
-Alien::SeqAlignment::edlib
-
-=head1 VERSION
-
-version 0.05
+Alien::SeqAlignment::edlib - find, build and install the edlib library
 
 =head1 SYNOPSIS
 
-To execute the alignment using the commande line tool:
+To execute the alignment using the command line tool:
 
- use Alien::Edlib;
+ use Alien::SeqAlignment::edlib;
  use Env qw( @PATH );
 
  unshift @PATH, Alien::SeqAlignment::edlib->bin_dir;
  system Alien::SeqAlignment::edlib->exe, (list of options), <queries.fasta>, <target.fasta>;
+
 
 =head1 DESCRIPTION
 
@@ -64,9 +34,7 @@ library, and is guaranteed to use the latest version of edlib.
 The build provides the static and shared libraries, but also the CLI aligner 
 (edlib-aligner, not currently available in Windows). 
 
-=head1 NAME
-
-Alien::SeqAlignment::edlib - find, build and install the edlib library
+=cut
 
 =head1 METHODS
 
@@ -76,21 +44,56 @@ Alien::SeqAlignment::edlib - find, build and install the edlib library
 
 Returns the command name for running the CLI version of the edlib aligner
 Since the command line tool is not built under Windows by the edlib project
-make files, this method will return undef under Windows.
+make files, this method will return undef under Windows. 
 
-=head1 HELPERS
+=cut
 
-%{edlib_aligner}
+sub exe {
+    my ($class) = @_;
+    $^O ne 'MSWin32' ? $class->runtime_prop->{command} : undef;
+}
 
-=head2 edlib_aligner
+=head1 USAGE
 
-Returns the CLI command for the edlib aligner
+=head2 Command line tool
+ use v5.38;
+ use Alien::SeqAlignment::edlib;
+ use Env qw( @PATH );
+
+ unshift @PATH, Alien::SeqAlignment::edlib->bin_dir;
+ my $string1 =      "ACGACG";
+ my $string2 = "CCCCCACGTCG";
+
+ # save sequences
+ open my $fh, '>', 'seq1.fasta';
+ say $fh ">Seq1\n$string1";
+ close $fh;
+ open my $fh, '>', 'seq2.fasta';
+ say $fh ">Seq2\n$string2";
+ close $fh;
+
+ system Alien::SeqAlignment::edlib->exe, '-m', 'HW','-n','0', '-k','-1','-p','-f' ,'NICE','seq1.fasta', 'seq2.fasta';
+
+Output
+
+	Using HW alignment mode.
+	Reading queries...
+	Read 1 queries, 6 residues total.
+	Reading target fasta file...
+	Read target, 11 residues.
+
+	Comparing queries to target...
+
+	Query #0 (6 residues): score = 1
+	T: ACGTCG (5 - 10)
+	   ||| ||
+	Q: ACGACG (0 - 5)
 
 =head1 SEE ALSO
 
 =over 4
 
-=item L<edlib|https://github.com/Martinsos/edlib>
+=item * L<edlib|https://github.com/Martinsos/edlib>
 
 Edlib is a lightweight and superfast C/C++ library for sequence 
 alignment using the edit (Levenshtein) distance between two or more
@@ -102,29 +105,19 @@ primary use is to compute edit distances and alignments over small
 (255 characters or fewer) alphabets as they occur in bioinformatic
 applications.
 
-=back
 
-=over 4
-
-=item L<Text::Levenshtein::Edlib|https://metacpan.org/pod/Text::Levenshtein::Edlib>
+=item * L<Text::Levenshtein::Edlib|https://metacpan.org/pod/Text::Levenshtein::Edlib>
 
 An XS library that also wraps around the edlib library and returns
 edit distances, as well as alignment paths.
 
-=back
-
-=over 4
-
-=item L<Text::Levenshtein::XS|https://metacpan.org/pod/Text::Levenshtein::XS>
+=item * L<Text::Levenshtein::XS|https://metacpan.org/pod/Text::Levenshtein::XS>
 
 An XS library that computes edit distances but not alignment paths. See also 
 its github repository at: L<https://github.com/ugexe/Text--Levenshtein--XS/>)
 
-=back
 
-=over 4
-
-=item L<Text::LevenshteinXS|https://metacpan.org/pod/Text::LevenshteinXS>
+=item * L<Text::LevenshteinXS|https://metacpan.org/pod/Text::LevenshteinXS>
 
 Yet another XS implementation of Levenshtein distance over strings 
 (no alignment path).
@@ -133,15 +126,16 @@ Yet another XS implementation of Levenshtein distance over strings
 
 =over 4
 
-=item L<Alien>
+=item * L<Alien>
 
 Documentation on the Alien concept itself.
 
-=item L<Alien::Base>
+=item * L<Alien::Base|https://metacpan.org/pod/Alien::Base>
 
-The base class for this Alien.
+The base class for this Alien. The methods in that class allow you to use
+the static and the dynamic edlib library in your code. 
 
-=item L<Alien::Build::Manual::AlienUser>
+=item * L<Alien::Build::Manual::AlienUser|https://metacpan.org/dist/Alien-Build/view/lib/Alien/Build/Manual/AlienUser.pod>
 
 Detailed manual for users of Alien classes.
 
@@ -158,15 +152,7 @@ This software is copyright (c) 2023 by Christos Argyropoulos.
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
-=head1 AUTHOR
-
-Christos Argyropoulos <chrisarg@gmail.com>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2023 by Christos Argyropoulos.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
 =cut
+
+1;
+

@@ -19,6 +19,7 @@ no_index:
     - inc
 requires:
   B::Generate: '0'
-  perl: '5.022000'
-version: v5.1.9
+  Lexical::Types: '0'
+  perl: '5.028000'
+version: v6.0.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

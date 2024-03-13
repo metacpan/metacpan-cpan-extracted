@@ -2,7 +2,7 @@ runtime:
   requires:
     perl: '5.010001'
     Carp: 0
-    Future: '0.36'
+    Future: '0.49'
     Mojolicious: '7.54'
     parent: 0
     Role::Tiny: '2.000002'

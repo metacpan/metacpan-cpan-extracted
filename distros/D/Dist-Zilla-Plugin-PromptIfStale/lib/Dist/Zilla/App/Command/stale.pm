@@ -4,14 +4,20 @@ package Dist::Zilla::App::Command::stale;
 # vim: set ts=8 sts=2 sw=2 tw=115 et :
 # ABSTRACT: print your distribution's prerequisites and plugins that are out of date
 
-our $VERSION = '0.058';
+our $VERSION = '0.059';
 
+use strictures 2;
+use stable 0.031 'postderef';
+use experimental 'signatures';
+use if "$]" >= 5.022, experimental => 're_strict';
+no if "$]" >= 5.031009, feature => 'indirect';
+no if "$]" >= 5.033001, feature => 'multidimensional';
+no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use Dist::Zilla::App -command;
 
 sub abstract { "print your distribution's stale prerequisites and plugins" }
 
-sub opt_spec
-{
+sub opt_spec {
     [ 'root=s' => 'the root of the distribution; defaults to .' ],
     [ 'all'   , 'check all plugins and prerequisites, regardless of plugin configuration' ]
     # TODO?
@@ -19,14 +25,11 @@ sub opt_spec
     # [ 'prereqs', 'check all prerequisites' ],
 }
 
-sub stale_modules
-{
-    my ($self, $zilla, $all) = @_;
-
+sub stale_modules ($self, $zilla, $all = undef) {
     my $dzil7 = eval { Dist::Zilla::App->VERSION('7.000') };
 
     my @plugins = grep $_->isa('Dist::Zilla::Plugin::PromptIfStale'),
-        $dzil7 ? $zilla->plugins : @{ $zilla->plugins };
+        $dzil7 ? $zilla->plugins : $zilla->plugins->@*;
 
     if (not @plugins)
     {
@@ -42,12 +45,12 @@ sub stale_modules
     if ($all or do { require List::Util; List::Util->VERSION('1.33'); List::Util::any(sub { $_->check_all_prereqs }, @plugins) })
     {
         $_->before_build for grep !$_->isa('Dist::Zilla::Plugin::PromptIfStale'),
-            $dzil7 ? $zilla->plugins_with(-BeforeBuild) : @{ $zilla->plugins_with(-BeforeBuild) };
-        $_->gather_files for $dzil7 ? $zilla->plugins_with(-FileGatherer) : @{ $zilla->plugins_with(-FileGatherer) };
-        $_->set_file_encodings for $dzil7 ? $zilla->plugins_with(-EncodingProvider) : @{ $zilla->plugins_with(-EncodingProvider) };
-        $_->prune_files  for $dzil7 ? $zilla->plugins_with(-FilePruner) : @{ $zilla->plugins_with(-FilePruner) };
-        $_->munge_files  for $dzil7 ? $zilla->plugins_with(-FileMunger) : @{ $zilla->plugins_with(-FileMunger) };
-        $_->register_prereqs for $dzil7 ? $zilla->plugins_with(-PrereqSource) : @{ $zilla->plugins_with(-PrereqSource) };
+            $dzil7 ? $zilla->plugins_with(-BeforeBuild) : $zilla->plugins_with(-BeforeBuild)->@*;
+        $_->gather_files for $dzil7 ? $zilla->plugins_with(-FileGatherer) : $zilla->plugins_with(-FileGatherer)->@*;
+        $_->set_file_encodings for $dzil7 ? $zilla->plugins_with(-EncodingProvider) : $zilla->plugins_with(-EncodingProvider)->@*;
+        $_->prune_files  for $dzil7 ? $zilla->plugins_with(-FilePruner) : $zilla->plugins_with(-FilePruner)->@*;
+        $_->munge_files  for $dzil7 ? $zilla->plugins_with(-FileMunger) : $zilla->plugins_with(-FileMunger)->@*;
+        $_->register_prereqs for $dzil7 ? $zilla->plugins_with(-PrereqSource) : $zilla->plugins_with(-PrereqSource)->@*;
 
         push @modules, map
             $all || $_->check_all_prereqs ? $_->_modules_prereq : (),
@@ -69,10 +72,7 @@ sub stale_modules
     return @$stale_modules;
 }
 
-sub execute
-{
-    my ($self, $opt) = @_; # $arg
-
+sub execute ($self, $opt, @) {
     $self->app->chrome->logger->mute unless $self->app->global_options->verbose;
 
     require Try::Tiny;
@@ -144,18 +144,15 @@ sub execute
 }
 
 # as in Dist::Zilla::App::Command::alldeps
-sub _missing_authordeps
-{
-    my ($self, $root) = @_;
-
+sub _missing_authordeps ($self, $root) {
     require Dist::Zilla::Util::AuthorDeps;
     Dist::Zilla::Util::AuthorDeps->VERSION(5.021);
-    my @authordeps = map +(%$_)[0],
-        @{ Dist::Zilla::Util::AuthorDeps::extract_author_deps(
+    my @authordeps = map +($_->%*)[0],
+        Dist::Zilla::Util::AuthorDeps::extract_author_deps(
             $root,          # repository root
             1,              # --missing
           )
-        };
+        ->@*;
 }
 
 1;
@@ -172,7 +169,7 @@ Dist::Zilla::App::Command::stale - print your distribution's prerequisites and p
 
 =head1 VERSION
 
-version 0.058
+version 0.059
 
 =head1 SYNOPSIS
 

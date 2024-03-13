@@ -1,5 +1,9 @@
 #!perl
 
+#################################################################
+#### NOTE: this test is expected to FAIL, all is well ###########
+#################################################################
+
 use 5.010;
 use strict;
 use warnings;
@@ -9,7 +13,7 @@ use Test2::Plugin::UTF8; # rids of the Wide Character in TAP message!
 use FindBin;
 use Cwd qw/abs_path/;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use Config::JSON::Enhanced;
 
@@ -29,6 +33,7 @@ my $con = <<'EOJ';
   }
 EOJ
 
+# this must return undef, it is expected to fail!
 my $json = config2perl({
 	'string' => $con,
 	'commentstyle' => 'C,CPP',
@@ -37,6 +42,6 @@ my $json = config2perl({
 		'expected-res123' => 42
 	},
 });
-ok(!defined $json, 'config2perl()'." : called and got failed result AS EXPECTED.");
+ok( ! defined $json, 'config2perl()'." : called and got failed result AS EXPECTED.");
 
 done_testing();

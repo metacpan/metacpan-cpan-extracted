@@ -3,7 +3,7 @@ use strict;
 
 package RT::Extension::FormTools;
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 RT->AddStyleSheets('rt-extension-formtools.css');
 RT->AddJavaScript('rt-extension-formtools.js');
@@ -449,7 +449,7 @@ or via the web at
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2014-2023 by Best Practical Solutions
+This software is Copyright (c) 2014-2024 by Best Practical Solutions
 
 This is free software, licensed under:
 

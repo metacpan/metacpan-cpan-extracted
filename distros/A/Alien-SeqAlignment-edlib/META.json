@@ -1,5 +1,5 @@
 {
-   "abstract" : "Provide the static, dynamic libraries and CLI (non-Windows) of the edlib aligner",
+   "abstract" : "find, build and install the edlib library",
    "author" : [
       "Christos Argyropoulos <chrisarg@gmail.com>"
    ],
@@ -33,10 +33,15 @@
       },
       "configure" : {
          "requires" : {
-            "Alien::Build" : "1.40",
+            "Alien::Build" : "2.70",
             "Alien::Build::MM" : "0.32",
             "Alien::Build::Plugin::Build::CMake" : "0.99",
-            "ExtUtils::MakeMaker" : "6.52"
+            "Alien::Meson" : "0",
+            "Carp" : "0",
+            "ExtUtils::MakeMaker" : "6.52",
+            "File::Copy::Recursive" : "0",
+            "HTTP::Tiny" : "0",
+            "Path::Tiny" : "0"
          }
       },
       "develop" : {
@@ -54,7 +59,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Alien::Base" : "0",
+            "Alien::Base" : "0.038",
             "parent" : "0",
             "strict" : "0",
             "warnings" : "0"
@@ -77,11 +82,20 @@
    "provides" : {
       "Alien::SeqAlignment::edlib" : {
          "file" : "lib/Alien/SeqAlignment/edlib.pm",
-         "version" : "0.05"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
-   "version" : "0.05",
+   "resources" : {
+      "homepage" : "https://github.com/chrisarg/alien-seqalignment-edlib",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/chrisarg/alien-seqalignment-edlib.git",
+         "web" : "https://github.com/chrisarg/alien-seqalignment-edlib"
+      },
+      "x_IRC" : "irc://irc.perl.org/#native"
+   },
+   "version" : "0.08",
    "x_alienfile" : {
       "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.32",
       "requires" : {

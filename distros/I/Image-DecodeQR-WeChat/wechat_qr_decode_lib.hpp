@@ -1,7 +1,9 @@
 #ifndef _WECHAT_QR_DECODE_LIB_H
 #define _WECHAT_QR_DECODE_LIB_H
 
-/* $VERSION = 0.2 */
+/*
+our $VERSION = '2.1';
+*/
 
 int wechat_qr_decode(
 	char *infilename,

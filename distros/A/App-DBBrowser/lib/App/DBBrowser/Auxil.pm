@@ -63,7 +63,7 @@ sub get_stmt {
     my $indent2 = 2;
     my $qt_table = $sql->{table};
     my @tmp;
-    if ( defined $sql->{ctes} && @{$sql->{ctes}} ) {
+    if ( @{$sql->{ctes}//[]} ) { ##
         push @tmp, "WITH";
         for my $cte ( @{$sql->{ctes}} ) {
             push @tmp, $sf->__stmt_fold( $used_for, sprintf( '%s AS (%s),', $cte->{name}, $cte->{query} ), $indent1 );
@@ -86,7 +86,10 @@ sub get_stmt {
         @tmp = ( $sf->__stmt_fold( $used_for, "DROP VIEW $qt_table", $indent0 ) );
     }
     elsif ( $stmt_type eq 'Create_table' ) {
-        my $stmt = sprintf "CREATE TABLE $qt_table (%s)", join ', ', map { $_ // '' } @{$sql->{create_table_col_names}};
+        my $stmt = sprintf "CREATE TABLE $qt_table (%s)", join ', ', @{$sql->{ct_column_definitions}}, @{$sql->{ct_table_constraints}};
+        if ( @{$sql->{ct_table_options}} ) {
+            $stmt .= ' ' . join ', ', @{$sql->{ct_table_options}};
+        }
         @tmp = ( $sf->__stmt_fold( $used_for, $stmt, $indent0 ) );
     }
     elsif ( $stmt_type eq 'Create_view' ) {
@@ -176,7 +179,7 @@ sub get_stmt {
         push @tmp, $sf->__stmt_fold( $used_for, ")", $indent0 );
     }
     my $print_stmt = join( "\n", @tmp );
-    $print_stmt .= "\n" if $used_for eq 'print'; # ###
+    $print_stmt .= "\n" if $used_for eq 'print'; ##
     return $print_stmt;
 }
 
@@ -189,11 +192,24 @@ sub info_format_insert_args {
         $term_w += WIDTH_CURSOR;
     }
     my $row_count = @{$sql->{insert_args}};
-    my $col_count = @{$sql->{insert_args}[0]//[]};
     if ( $row_count == 0 ) {
         return [];
     }
-    my $avail_h = $term_h - ( 12  + ( $col_count < 10 ? 10 : $col_count ) );
+    my $col_count = 0; ##
+    if ( $sf->{d}{stmt_types}[0] && $sf->{d}{stmt_types}[0] eq 'Create_table' ) {
+        $col_count = @{$sql->{insert_args}[0]//[]};
+        #$col_count = @{$sql->{ct_column_definitions//[]}};
+        $col_count += 1 + $sf->{o}{create}{table_constraint_rows} if $sf->{o}{create}{table_constraint_rows};
+        $col_count += 1 + $sf->{o}{create}{table_option_rows}     if $sf->{o}{create}{table_option_rows};
+        $col_count += 12;
+        if ( $col_count < 22 ) {
+            $col_count = 22;
+        }
+    }
+    else {
+        $col_count = 22;
+    }
+    my $avail_h = $term_h - $col_count;
     if ( $avail_h < $term_h / 3.5 ) {
         $avail_h = int $term_h / 3.5;
     }
@@ -422,6 +438,13 @@ sub unquote_identifier {
 }
 
 
+sub clone_data {
+    my ( $sf, $data ) = @_;
+    require Storable;
+    return Storable::dclone( $data );
+}
+
+
 sub reset_sql {
     my ( $sf, $sql ) = @_;
     my $backup = {};
@@ -430,8 +453,10 @@ sub reset_sql {
     }
     delete @{$sql}{ keys %$sql }; # not "$sql = {}" so $sql is still pointing to the outer $sql
     my @string = qw( distinct_stmt set_stmt where_stmt group_by_stmt having_stmt order_by_stmt limit_stmt offset_stmt );
-    my @array  = qw( cols group_by_cols aggr_cols selected_cols insert_col_names create_table_col_names
-                     set_args insert_args ctes );
+    my @array  = qw( cols group_by_cols aggr_cols selected_cols set_args
+                     ctes
+                     ct_column_definitions ct_table_constraints ct_table_options
+                     insert_col_names insert_args );
     my @hash   = qw( alias );
     @{$sql}{@string} = ( '' ) x  @string;
     @{$sql}{@array}  = map{ [] } @array;

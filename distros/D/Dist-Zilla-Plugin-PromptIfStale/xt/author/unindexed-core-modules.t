@@ -25,7 +25,7 @@ my $tzil = Builder->from_config(
         },
     },
 );
-my $plugin = first { $_->isa('Dist::Zilla::Plugin::PromptIfStale') } @{ $tzil->plugins };
+my $plugin = first { $_->isa('Dist::Zilla::Plugin::PromptIfStale') } $tzil->plugins->@*;
 
 diag 'looking up some core modules in the index...';
 

@@ -13,15 +13,14 @@ use Test::Script;
 use File::Temp;
 use File::Spec;
 use FindBin;
-use Cwd::utf8 qw{abs_path};
+use Cwd;
 use Encode;
 use File::Basename;
-use Unicode::Normalize;
 use Data::Roundtrip qw/perl2dump no-unicode-escape-permanently/;
 
 use Automate::Animate::FFmpeg;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 my $curdir = $FindBin::Bin;
 
@@ -44,20 +43,8 @@ my $FAILURE_REGEX = qr/(?:\: error,)|(?:Usage)/;
 
 my $FRAME_DURATION = 3;
 my $VERBOSITY = 10;
-# make sure we have also accended chars in the filename
-my $outfile = File::Spec->catfile($tmpdir, "γαγαγάγ.mp4");
-
-# Now here is a problem: Some of these files/dirs
-# with accented unicode characters in their name
-# are presented differently on OSX than in Linux 
-# and who knows what mess windows will be - still untested.
-# So, a filename I typed here with say the greek iota-accented
-# can fail to be found on the filesystem because the OS wrote
-# it / or presents it with greek iota-not-accented followed by accent char
-# a total whole mess!
-# see https://perlmonks.org/?node_id=11156629
-
-my @IMGS = map { Unicode::Normalize::NFD($_) } (
+my $outfile = File::Spec->catfile($tmpdir, "γαγαγαγ.mp4");
+my @IMGS = (
 	File::Spec->catfile($curdir, 't-data', 'images', 'blue.png'),
 	File::Spec->catfile($curdir, 't-data', 'images', 'green.png'),
 	File::Spec->catfile($curdir, 't-data', 'images', 'red.png'),
@@ -65,12 +52,7 @@ my @IMGS = map { Unicode::Normalize::NFD($_) } (
 	File::Spec->catfile($curdir, 't-data', 'images', 'Περισσότερα', 'πράσινο.png'),
 	File::Spec->catfile($curdir, 't-data', 'images', 'Περισσότερα', 'Κόκκινο.png'),
 );
-for (@IMGS){
-	ok(-e $_, "test image '$_' exists on disk") or BAIL_OUT;
-	ok(-f $_, "test image '$_' exists on disk and it is a file") or BAIL_OUT;
-}
-
-my $input_images_file = File::Spec->catfile($tmpdir, "filelistκαίunicode.txt");
+my $input_images_file = File::Spec->catfile($tmpdir, "filelist.txt");
 my $FH;
 ok(open($FH, '>:encoding(UTF-8)', $input_images_file), "opened file '$input_images_file' for writing the file list.") or BAIL_OUT;
 print $FH join("\n", @IMGS)."\n"; close $FH;
@@ -125,7 +107,7 @@ for my $atest (@TESTS){
 	my $atestname = 'test-'.$ascriptname.' no.'.${idx};
 	script_compiles($ascriptname) or print "script ($ascriptname) does not compile.\n"; $num_tests++;
 	script_runs($cmdline, $atestname) or print "command failed: @$cmdline\n"; $num_tests++;
-	# did it find exactly 6 images?
+	# did it find exactly 4 images?
 	script_stdout_like('done, success. Output animation of 6 input images', $ascriptname);
 	ok(-f $outfile, "script run and output file '$outfile' exists.");
 	unlink($outfile);
@@ -141,8 +123,8 @@ for my $atest (@TESTS){
 	unlink($outfile); # just in case
 }
 
-diag "temp dir: '$tmpdir' ...";
-$File::Temp::KEEP_ALL = 0; File::Temp::cleanup();
-
 # END
 done_testing();
+
+diag "temp dir: '$tmpdir' ...";
+#$File::Temp::KEEP_ALL = 0; File::Temp::cleanup();

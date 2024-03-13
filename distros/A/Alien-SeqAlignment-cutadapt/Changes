@@ -1,0 +1,8 @@
+Revision history for Alien-SeqAlignment-cutadapt
+
+0.03      2024-03-10 13:30:58-06:00 America/Denver
+- expanded, reformatted and fixed typos in the POD documentation
+0.02      2024-03-09 19:53:04-07:00 America/Denver
+- moved pipx installation into the distribution
+0.01      2024-03-08 21:43:48-07:00 America/Denver
+- First and hopefully last install

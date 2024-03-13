@@ -13,6 +13,9 @@ my $datadir = path( 't', 'data', 'qhull' );
 my $input    = $datadir->child( 'qhull.in' )->absolute;
 my $expected = $datadir->child( 'qhull.out' )->absolute;
 
+my @expected = map { float $_ } $expected->lines( { chomp => 1 } );
+
+
 subtest 'input:file, output:file' => sub {
 
     my $dir    = tempdir( 'files' );
@@ -20,13 +23,12 @@ subtest 'input:file, output:file' => sub {
 
     my ( $index ) = qhull( { qh_opts => [ TI => $input, TO => $output, 'Fx' ] } );
 
-    my @expected = $expected->lines( { chomp => 1 } );
-    my @got      = $output->lines( { chomp => 1 } );
+    my @got = $output->lines( { chomp => 1 } );
 
-    is( \@expected, \@got, 'output files match' );
+    is( \@got, \@expected, 'output files match' );
 
     # first line is # of nodes
-    shift @expected;
+    unshift @{$index}, 0+ @$index;
     is( $index, \@expected, 'returned values match' );
 };
 
@@ -46,19 +48,16 @@ subtest 'input:fh output:file' => sub {
 
     my ( $index ) = qhull( \@x, \@y, { qh_opts => [ TO => $output, 'Fx' ] } );
 
-    my @expected = $expected->lines( { chomp => 1 } );
-    my @got      = $output->lines( { chomp => 1 } );
+    my @got = $output->lines( { chomp => 1 } );
 
-    is( \@expected, \@got, 'output files match' );
+    is( \@got, \@expected, 'output files match' );
 
     # first line is # of nodes
-    shift @expected;
+    unshift @{$index}, 0+ @$index;
     is( $index, \@expected, 'returned values match' );
 };
 
 subtest 'input:fh output:fh' => sub {
-
-    my $dir = tempdir( 'files' );
 
     my ( @x, @y );
     for my $line ( $input->lines( { chomp => 1 } ) ) {
@@ -71,9 +70,8 @@ subtest 'input:fh output:fh' => sub {
 
     my ( $index ) = qhull( \@x, \@y );
 
-    my @expected = $expected->lines( { chomp => 1 } );
     # first line is # of nodes
-    shift @expected;
+    unshift @{$index}, 0+ @$index;
     is( $index, \@expected, 'returned values match' );
 };
 

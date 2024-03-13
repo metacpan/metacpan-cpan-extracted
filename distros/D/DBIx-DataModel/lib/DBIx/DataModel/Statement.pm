@@ -11,7 +11,6 @@ use POSIX            qw/LONG_MAX/;
 use Clone            qw/clone/;
 use Carp::Clan       qw[^(DBIx::DataModel::|SQL::Abstract)];
 use Try::Tiny        qw/try catch/;
-use Module::Load     qw/load/;
 use mro              qw/c3/;
 
 use DBIx::DataModel;
@@ -416,19 +415,14 @@ sub execute {
 
 
 
-
-
-my %cache_result_class;
-
 sub select {
   my $self = shift;
 
   $self->refine(@_) if @_;
 
+  # parse -result_as arg
   my $arg_result_as = $self->arg(-result_as) || 'rows';
-
- SWITCH:
-  my ($result_as, @subclass_args)
+  my ($result_as, @resultclass_args)
     = does($arg_result_as, 'ARRAY') ? @$arg_result_as : ($arg_result_as);
 
   # historically,some kinds of results accepted various aliases
@@ -436,13 +430,11 @@ sub select {
   $result_as =~ s/^arrayref$/rows/;
   $result_as =~ s/^fast-statement$/fast_statement/;
 
-  for ($result_as) {
-    my $subclass = $cache_result_class{$_}
-               ||= $self->_find_result_class($_)
-      or croak "didn't find any ResultAs subclass to implement -result_as => '$_'";
-    my $result_maker = $subclass->new(@subclass_args);
-    return $result_maker->get_result($self);
-  }
+  # produce result through a ResultAs instance
+  my $result_class = $self->schema->metadm->find_result_class($result_as)
+    or croak "didn't find any ResultAs subclass to implement -result_as => '$result_as'";
+  my $result_maker = $result_class->new(@resultclass_args);
+  return $result_maker->get_result($self);
 }
 
 
@@ -792,30 +784,6 @@ sub _compute_from_DB_handlers {
 
   return $self;
 }
-
-sub _find_result_class {
-  my $self         = shift;
-  my $name         = ucfirst shift;
-  my $schema       = $self->schema;
-  my $schema_class = ref $schema || $schema;
-
-  # try to find subclass $name within namespace of schema or ancestors
-  foreach my $namespace (@{$schema->resultAs_classes}) {
-    my $class = "${namespace}::ResultAs::${name}";
-
-    # see if that class is already loaded (by checking for a 'get_result' method)
-    my $is_loaded  = defined &{$class."::get_result"};
-
-    # otherwise, try to load the module
-    $is_loaded ||= try   {load $class; 1}
-                   catch {die $_ if $_ !~ /^Can't locate(?! object method)/};
-
-    return $class if $is_loaded; # true : class is found, exit loop
-  }
-
-  return; # false : class not found
-}
-
 
 
 1; # End of DBIx::DataModel::Statement

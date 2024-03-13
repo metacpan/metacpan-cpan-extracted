@@ -8,6 +8,19 @@ use List::Util qw/shuffle/;
 
 use Duadua;
 
+=pod
+
+    # Set up dependencies
+    $ cpm install --with-recommends --with-test --with-develop --with-configure --show-build-log-on-failure
+
+    # Run 100_testset.t
+    perl -Ilocal/lib/perl5/ -Ilib t/100_testset.t
+
+    # Run specific bot test
+    perl -Ilocal/lib/perl5/ -Ilib t/100_testset.t amazonbot
+
+=cut
+
 MAIN: {
     test_yaml(@{$_}) for shuffle get_yaml_list(@ARGV);
 }

@@ -137,7 +137,7 @@ es-index-fields.pl - Show information on the fields storage usage
 
 =head1 VERSION
 
-version 8.7
+version 8.8
 
 =head1 SYNOPSIS
 
@@ -199,7 +199,7 @@ Brad Lhotsky <brad@divisionbyzero.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023 by Brad Lhotsky.
+This software is Copyright (c) 2024 by Brad Lhotsky.
 
 This is free software, licensed under:
 

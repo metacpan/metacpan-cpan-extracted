@@ -22,7 +22,7 @@ __DATA__
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
-#include <edlib.h>
+#include "edlib.h"
  
 int
 version(const char *class)

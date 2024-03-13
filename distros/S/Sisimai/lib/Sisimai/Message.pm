@@ -14,8 +14,7 @@ use Sisimai::Lhost;
 state $Fields1894 = Sisimai::RFC1894->FIELDINDEX;
 state $Fields5322 = Sisimai::RFC5322->FIELDINDEX;
 state $Fields5965 = Sisimai::RFC5965->FIELDINDEX;
-state @FieldIndex = ($Fields1894->@*, $Fields5322->@*, $Fields5965->@*);
-state $FieldTable = { map { lc $_ => $_ } @FieldIndex };
+state $FieldTable = { map { lc $_ => $_ } ($Fields1894->@*, $Fields5322->@*, $Fields5965->@*) };
 state $ReplacesAs = { 'Content-Type' => [['message/xdelivery-status', 'message/delivery-status']] };
 state $Boundaries = ['Content-Type: message/rfc822', 'Content-Type: text/rfc822-headers'];
 
@@ -196,17 +195,26 @@ sub makemap {
     # https://gist.github.com/xtetsuji/b080e1f5551d17242f6415aba8a00239
     my $firstpairs = { $$argv0 =~ /^([\w-]+):[ ]*(.*?)\n(?![\s\t])/gms };
     my $headermaps = { 'subject' => '' };
-    my $recvheader = [];
+       $headermaps->{ lc $_ } = $firstpairs->{ $_ } for keys %$firstpairs;
+    my $receivedby = [];
 
-    $headermaps->{ lc $_ } = $firstpairs->{ $_ } for keys %$firstpairs;
     for my $e ( values %$headermaps ) { s/\n\s+/ /, y/\t / /s for $e }
 
     if( index($$argv0, "\nReceived:") > 0 || index($$argv0, "Received:") == 0 ) {
         # Capture values of each Received: header
-        $recvheader = [$$argv0 =~ /^Received:[ ]*(.*?)\n(?![\s\t])/gms];
-        for my $e ( @$recvheader ) { s/\n\s+/ /, y/\n\t / /s for $e }
+        my $re = [$$argv0 =~ /^Received:[ ]*(.*?)\n(?![\s\t])/gms];
+        for my $e ( @$re ) {
+            # 1. Exclude the Received header including "(qmail ** invoked from network)".
+            # 2. Convert all consecutive spaces and line breaks into a single space character.
+            next if index($e, ' invoked by uid')       > 0;
+            next if index($e, ' invoked from network') > 0;
+
+            $e =~ s/\n\s+/ /;
+            $e =~ y/\n\t / /s;
+            push @$receivedby, $e;
+        }
     }
-    $headermaps->{'received'} = $recvheader;
+    $headermaps->{'received'} = $receivedby;
 
     return $headermaps unless $argv1;
     return $headermaps unless length $headermaps->{'subject'};
@@ -592,7 +600,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2023 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2024 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

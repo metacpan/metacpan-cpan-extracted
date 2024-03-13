@@ -55,6 +55,8 @@
 1.909  Fri Feb 17 00:00:00 2024
 	- added port parameter to FTP config, reset $EAI::Common::alreadySent on repeat processing, added workaround for utf8 problems with Win32::Console::ANSI, refactored readConfigs and doExecuteOnInit on INIT
 1.910  Sun Feb 25 02:00:00 2024
-	-  removed hardcoded default for format_sep in EAI::File, added progress indicators for EAI::File::readText and EAI::DB::storeInDB when additional parameter process{countPercent} is set to nonzero. added standardLoop to EAI::Wrap for short implementation of standard loops. fixed error in EAI::DB::storeInDB when dontKeepContent was set and primKeys were not set (not needed in this case). removed bogus warning in setupLogging when checking for logprefixForLastLogfile. Fixed setting of lastLogFile in checkLogExist.pl and switching between environment.
+	- removed hardcoded default for format_sep in EAI::File, added progress indicators for EAI::File::readText and EAI::DB::storeInDB when additional parameter process{countPercent} is set to nonzero. added standardLoop to EAI::Wrap for short implementation of standard loops. fixed error in EAI::DB::storeInDB when dontKeepContent was set and primKeys were not set (not needed in this case). removed bogus warning in setupLogging when checking for logprefixForLastLogfile. Fixed setting of lastLogFile in checkLogExist.pl and switching between environment.
 1.911  Sun Feb 25 14:00:00 2024
-	-  enhanced and fixed documentation, small code fix, added test.
+	- enhanced and fixed documentation, small code fix, added test.
+1.912  Mon Mar 11 00:00:00 2024
+	- added EAI::Wrap::writeFileFromMemory for direct writing of files after reading; fixed globbing issues with spaces in paths/files; added progress indicator to EAI::File::readExcel, EAI::File::writeText and EAI::File::writeExcel ; fixed leapyear problem when adding years in EAI::DateUtil::get_curdate_dash_plus_X_years; added File->{append} parameter to append to files for EAI::File::writeText.

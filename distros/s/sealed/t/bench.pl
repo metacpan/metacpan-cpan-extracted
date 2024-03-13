@@ -21,12 +21,17 @@ BEGIN {
   sub _foo :Sealed { my Foo $x = shift; $n++ ? $x->bar : $x->main::reentrant }
 }
 sub func   {Foo::foo($x)}
-BEGIN{@::ISA=('Foo')}
 
-my main $y = $x;
+BEGIN {our @ISA=qw/Foo/}
+use sealed 'deparse'; # invokes Lexical::Types->import into this namespace
+
+# assigned to 'main' by UNIVERSAL::TYPESCALAR
+my main $y;
+
 sub sealed :Sealed {
     $y->foo();
 }
+
 sub also_sealed :Sealed {
     my main $a = shift;
     if ($a) {

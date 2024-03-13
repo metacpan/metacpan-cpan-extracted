@@ -85,7 +85,7 @@ for my $check_prereqs ( 0, 1 ) {
         );
 
         my @expected_prompts = map
-            "Issues found:\n" . join("\n", @{$expected_prompts{$_}}, 'Continue anyway?'),
+            "Issues found:\n" . join("\n", $expected_prompts{$_}->@*, 'Continue anyway?'),
             qw(before_release);
 
         $tzil->chrome->logger->set_debug(1);

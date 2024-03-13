@@ -7,11 +7,10 @@ use Data::Dumper;
 use SQL::Abstract::Test import => [qw/is_same_sql_bind/];
 use Storable qw/dclone/;
 
-use constant N_DBI_MOCK_TESTS => 108;
+use constant N_DBI_MOCK_TESTS => 111;
 use constant N_BASIC_TESTS    =>  15;
 
 use Test::More tests => (N_BASIC_TESTS + N_DBI_MOCK_TESTS);
-
 
 # die_ok : succeeds if the supplied coderef dies with an exception
 sub die_ok(&) { 
@@ -177,7 +176,18 @@ SKIP: {
 	  'FROM T_Employee ' .
 	  "ORDER BY d_birth", [], 'order_by select');
 
+  # test the debug() method
+  my $log = MiniLogger->new;
+  HR->debug($log);
+  $lst = HR::Employee->select;
+  is_deeply($log->msgs, ['PREPARE SELECT * FROM T_Employee / '], "debug mode activated");
+  $log->clear;
+  HR->debug(undef);
+  $lst = HR::Employee->select;
+  is_deeply($log->msgs, [], "debug mode deactivated");
 
+
+  # column aliases
   $dbh->{mock_clear_history} = 1;
   $dbh->{mock_add_resultset} = [ [qw/ln  db/],
                                  [qw/foo 2001-01-01/], 
@@ -189,14 +199,13 @@ SKIP: {
   is($lst->[0]{db}, "01.01.2001", "fromDB handler on column alias");
 
 
+  # distinct
   $lst = HR::Employee->select(-distinct => "lastname, firstname");
-
   sqlLike('SELECT DISTINCT lastname, firstname '.
 	  'FROM T_Employee' , [], 'distinct 1');
 
 
   $lst = HR::Employee->select(-distinct => [qw/lastname firstname/]);
-
   sqlLike('SELECT DISTINCT lastname, firstname '.
 	  'FROM T_Employee' , [], 'distinct 2');
 
@@ -207,7 +216,6 @@ SKIP: {
 			  -having  => [n_emp => {">=" => 2}],
 			  -orderBy => 'n_emp DESC'
 			 );
-
 
   sqlLike('SELECT lastname, COUNT(firstname) AS n_emp '.
 	  'FROM T_Employee '.
@@ -689,9 +697,19 @@ die_ok {$emp->emp_id};
 	  'WHERE (emp_id = ? AND gender = ? AND gender != ?)', [999, 'F', 'M'],
 	  'statement prepare/execute');
 
+  # idem, other syntax
+  $statement = HR->table('Employee')->join(qw/activities department/);
+  $statement->prepare(-columns => [qw/firstname lastname/],
+                      -where   => {gender => 'F'});
+  my @rows = $statement->execute($emp)->all;
+  sqlLike('SELECT firstname, lastname ' .
+	  'FROM T_Activity ' .
+	  'INNER JOIN T_Department ' .
+	  'ON T_Activity.dpt_id=T_Department.dpt_id ' .
+	  'WHERE (emp_id = ? AND gender = ?)', [999, 'F'],
+	  'statement prepare/execute 2nd syntax');
 
   # many-to-many association
-
   HR->Association([qw/Employee   employees   * activities employee/],
 			[qw/Department departments * activities department/]);
 
@@ -889,6 +907,13 @@ die_ok {$emp->emp_id};
           'COMMIT',     [], "nested transaction on dbh2");
 } # END OF SKIP BLOCK
 
+
+package MiniLogger;
+
+sub new    { bless [], shift}
+sub debug  { my ($self, $msg) = @_; push @$self, $msg;}
+sub clear  { my ($self) = @_; @$self = ()}
+sub msgs   { my ($self) = @_; return $self}
 
 
 __END__

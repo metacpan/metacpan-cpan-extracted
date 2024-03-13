@@ -29,6 +29,7 @@ my %WriteMakefileArgs = (
     "Scalar::Util" => 0,
     "Spreadsheet::ParseExcel" => 0,
     "Spreadsheet::ParseExcel::Cell" => 0,
+    "Spreadsheet::ParseExcel::Worksheet" => 0,
     "XML::Twig" => 0
   },
   "TEST_REQUIRES" => {
@@ -39,7 +40,7 @@ my %WriteMakefileArgs = (
     "Spreadsheet::ParseExcel::Utility" => 0,
     "Test::More" => "0.88"
   },
-  "VERSION" => "0.33",
+  "VERSION" => "0.34",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -64,6 +65,7 @@ my %FallbackPrereqs = (
   "Spreadsheet::ParseExcel" => 0,
   "Spreadsheet::ParseExcel::Cell" => 0,
   "Spreadsheet::ParseExcel::Utility" => 0,
+  "Spreadsheet::ParseExcel::Worksheet" => 0,
   "Test::More" => "0.88",
   "XML::Twig" => 0
 );

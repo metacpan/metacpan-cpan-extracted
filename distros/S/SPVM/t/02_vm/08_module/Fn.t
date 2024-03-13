@@ -174,6 +174,19 @@ my $seed = time();
     ok(SPVM::TestCase::Module::Fn->get_basic_type_id);
     
     ok(SPVM::TestCase::Module::Fn->memset_char);
+    
+    ok(SPVM::TestCase::Module::Fn->or);
+    
+    ok(SPVM::TestCase::Module::Fn->if);
+    
+    ok(SPVM::TestCase::Module::Fn->grep);
+    
+    ok(SPVM::TestCase::Module::Fn->map);
+    
+    ok(SPVM::TestCase::Module::Fn->map_expand);
+    
+    ok(SPVM::TestCase::Module::Fn->get_compile_type_name);
+    
   }
   
   # Extra

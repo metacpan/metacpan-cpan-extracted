@@ -1,5 +1,10 @@
 Revision history for Perl extension DBIx::DataModel.
 
+v3.10 11.03.2024
+  - bug fix : schema attribute setters must accept undef (for erasing the attribute)
+  - added tests for the debug() method
+  - internal refactoring : find_result_class() is now done in the metaschema, not in Statement class
+
 v3.09 27.01.2024
   - installing $dbh->{HandleError} so that error messages are reported from the caller's perspective
   - new feature: select(..., -result_as => [subquery => 'aliased_column'])

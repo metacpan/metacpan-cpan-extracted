@@ -1,5 +1,8 @@
 Change history for libwww-perl
 
+6.77      2024-03-11 00:56:14Z
+    - Documentation updates for GH#448 (GH#457) (Russell Shingleton)
+
 6.76      2024-01-25 18:31:25Z
     - Simplify code slightly for Perl v5.8+ (GH#455) (James Raspass)
     - Move HTTP::CookieJar::LWP to test requires (GH#453) (Olaf Alders)

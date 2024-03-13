@@ -1,5 +1,8 @@
 Revision history for Alien-pkgconf
 
+0.20 2024-03-11 06:17:00 -0600
+  - JSON output is sorted to make build reproducable (ppisar++ gh#19)
+
 0.19 2022-10-24 11:36:33 -0600
   - Improve detection logic: Amazon Linux should now be recognized as
     RedHat like (gh#15, gh#16)

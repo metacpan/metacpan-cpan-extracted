@@ -36,6 +36,7 @@
             "Alien::Build" : "2.3901",
             "Alien::Build::MM" : "0.32",
             "Alien::Build::Plugin::PkgConfig::Negotiate" : "1.53",
+            "Alien::patch" : "0.15",
             "ExtUtils::MakeMaker" : "6.52",
             "Sort::Versions" : "0",
             "perl" : "5.010"
@@ -142,7 +143,7 @@
    "provides" : {
       "Alien::CFITSIO" : {
          "file" : "lib/Alien/CFITSIO.pm",
-         "version" : "v4.4.0.1"
+         "version" : "v4.4.0.2"
       }
    },
    "release_status" : "stable",
@@ -157,7 +158,7 @@
          "web" : "https://gitlab.com/djerius/alien-cfitsio"
       }
    },
-   "version" : "v4.4.0.1",
+   "version" : "v4.4.0.2",
    "x_alienfile" : {
       "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.32",
       "requires" : {

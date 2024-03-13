@@ -15,7 +15,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '7.1101'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,64 +32,64 @@ no_index:
 provides:
   MetaCPAN::Client:
     file: lib/MetaCPAN/Client.pm
-    version: '2.031000'
+    version: '2.031001'
   MetaCPAN::Client::Author:
     file: lib/MetaCPAN/Client/Author.pm
-    version: '2.031000'
+    version: '2.031001'
   MetaCPAN::Client::Cover:
     file: lib/MetaCPAN/Client/Cover.pm
-    version: '2.031000'
+    version: '2.031001'
   MetaCPAN::Client::Distribution:
     file: lib/MetaCPAN/Client/Distribution.pm
-    version: '2.031000'
+    version: '2.031001'
   MetaCPAN::Client::DownloadURL:
     file: lib/MetaCPAN/Client/DownloadURL.pm
-    version: '2.031000'
+    version: '2.031001'
   MetaCPAN::Client::Favorite:
     file: lib/MetaCPAN/Client/Favorite.pm
-    version: '2.031000'
+    version: '2.031001'
   MetaCPAN::Client::File:
     file: lib/MetaCPAN/Client/File.pm
-    version: '2.031000'
+    version: '2.031001'
   MetaCPAN::Client::Mirror:
     file: lib/MetaCPAN/Client/Mirror.pm
-    version: '2.031000'
+    version: '2.031001'
   MetaCPAN::Client::Module:
     file: lib/MetaCPAN/Client/Module.pm
-    version: '2.031000'
+    version: '2.031001'
   MetaCPAN::Client::Package:
     file: lib/MetaCPAN/Client/Package.pm
-    version: '2.031000'
+    version: '2.031001'
   MetaCPAN::Client::Permission:
     file: lib/MetaCPAN/Client/Permission.pm
-    version: '2.031000'
+    version: '2.031001'
   MetaCPAN::Client::Pod:
     file: lib/MetaCPAN/Client/Pod.pm
-    version: '2.031000'
+    version: '2.031001'
   MetaCPAN::Client::Rating:
     file: lib/MetaCPAN/Client/Rating.pm
-    version: '2.031000'
+    version: '2.031001'
   MetaCPAN::Client::Release:
     file: lib/MetaCPAN/Client/Release.pm
-    version: '2.031000'
+    version: '2.031001'
   MetaCPAN::Client::Request:
     file: lib/MetaCPAN/Client/Request.pm
-    version: '2.031000'
+    version: '2.031001'
   MetaCPAN::Client::ResultSet:
     file: lib/MetaCPAN/Client/ResultSet.pm
-    version: '2.031000'
+    version: '2.031001'
   MetaCPAN::Client::Role::Entity:
     file: lib/MetaCPAN/Client/Role/Entity.pm
-    version: '2.031000'
+    version: '2.031001'
   MetaCPAN::Client::Role::HasUA:
     file: lib/MetaCPAN/Client/Role/HasUA.pm
-    version: '2.031000'
+    version: '2.031001'
   MetaCPAN::Client::Scroll:
     file: lib/MetaCPAN/Client/Scroll.pm
-    version: '2.031000'
+    version: '2.031001'
   MetaCPAN::Client::Types:
     file: lib/MetaCPAN/Client/Types.pm
-    version: '2.031000'
+    version: '2.031001'
 requires:
   Carp: '0'
   HTTP::Tiny: '0.056'
@@ -111,7 +111,7 @@ resources:
   WebIRC: https://chat.mibbit.com/#metacpan@irc.perl.org
   bugtracker: https://github.com/metacpan/metacpan-client/issues
   repository: https://github.com/metacpan/metacpan-client.git
-version: '2.031000'
+version: '2.031001'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -119,15 +119,15 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Starter/MetaYAML'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Starter/MetaJSON'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::License
       name: '@Starter/License'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:
@@ -138,7 +138,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Starter/PodSyntaxTests'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::Test::ReportPrereqs
       name: '@Starter/Test::ReportPrereqs'
@@ -167,19 +167,19 @@ x_Dist_Zilla:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@Starter/MakeMaker'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Starter/Manifest'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Starter/PruneCruft'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Starter/ManifestSkip'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::RunExtraTests
       config:
@@ -190,23 +190,23 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@Starter/TestRelease'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Starter/ConfirmRelease'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Starter/UploadToCPAN'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Starter/MetaConfig'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::MetaNoIndex
       name: '@Starter/MetaNoIndex'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Package
       config:
@@ -215,7 +215,7 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: '@Starter/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-              version: '6.030'
+              version: '6.031'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
           $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
@@ -230,22 +230,21 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Starter/ShareDir'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Starter/ExecDir'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::PodCoverageTests
       name: PodCoverageTests
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
       config:
         Dist::Zilla::Plugin::GatherDir:
           exclude_filename: []
           exclude_match: []
-          follow_symlinks: 0
           include_dotfiles: 0
           prefix: ''
           prune_directory: []
@@ -253,7 +252,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: Git::GatherDir
-      version: '2.048'
+      version: '2.049'
     -
       class: Dist::Zilla::Plugin::Prereqs::FromCPANfile
       name: Prereqs::FromCPANfile
@@ -350,11 +349,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PkgVersion
       name: PkgVersion
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: MetaResources
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -362,7 +361,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v2.031000
+          tag: v2.031001
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -371,7 +370,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: Git::Tag
-      version: '2.048'
+      version: '2.049'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -383,56 +382,56 @@ x_Dist_Zilla:
           git_version: 2.34.1
           repo_root: .
       name: Git::Push
-      version: '2.048'
+      version: '2.049'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.030'
+      version: '6.031'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: '@Starter/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-      version: '6.030'
+      version: '6.031'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.030'
+    version: '6.031'
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

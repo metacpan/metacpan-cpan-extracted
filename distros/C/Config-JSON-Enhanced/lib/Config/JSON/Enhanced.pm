@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use strict;
 use warnings;
@@ -66,7 +66,7 @@ sub	config2perl {
 
 	my ($tvop, $tvcl);
 	if( exists($params->{'tags'}) && defined($params->{'tags'}) ){
-		if( ref($params->{'tags'}) ne 'ARRAY' ){ warn __PACKAGE__.'::configfile2perl()'." (line ".__LINE__.") : error, input parameter 'tags' must be an ARRAYref of exactly 2 items and not a ".ref($params->{'tags'})."."; return undef }
+		if( ref($params->{'tags'}) ne 'ARRAY' ){ warn __PACKAGE__.'::configfile2perl()'." (line ".__LINE__.") : error, input parameter 'tags' must be an ARRAYref of exactly 2 items and not a '".ref($params->{'tags'})."'."; return undef }
 		if( scalar(@{ $params->{'tags'} }) != 2 ){ warn __PACKAGE__.'::configfile2perl()'." (line ".__LINE__.") : error, input parameter 'tags' must be an ARRAYref of exactly 2 items and not ".scalar(@{ $params->{'tags'} })."."; return undef }
 		($tvop, $tvcl) = @{ $params->{'tags'} };
 	} else { $tvop = '<%'; $tvcl = '%>' }
@@ -109,16 +109,12 @@ sub	config2perl {
 		if( ($ak =~ /(?:\Q${tvop}\E)|(?:\Q${tvcl}\E)/) ){ warn __PACKAGE__.'::config2perl()'." (line ".__LINE__.") : error, variable names can not contain the specified opening ($tvop) and/or closing ($tvcl) variable name tags."; return undef }
 		$contents =~ s!\Q${tvop}\E\s*${ak}\s*\Q${tvcl}\E!${av}!g;
 	}
-	# this is a warning:
+	# this is JUST a warning:
 	# we can not be sure if this <% xyz %> is part of the content or a forgotten templated variable
-	# NOTE: During test t/090-config2perl-failed-verbatim.t some CPAN testers
-	# report a failure. The fact is that this test deliberately tests a failed case
-	# and the line below should cause the sub to exit and print a long winded, multiline error message.
-	# So, some testers (3/15) report a failure.
-	# see https://www.cpantesters.org/cpan/report/fbbe94b6-62e8-11ee-9f69-c1f66d8775ea
-	# So, I am replacing the comment with a short comment.
-	#if( $contents =~ /\Q${tvop}\E\s*!(:?(:?begin-verbatim-section)|(:?end-verbatim-section))\s*\Q${tvcl}\E/ ){ print STDERR "--begin content:\n".$contents."\n--end content.\n".__PACKAGE__.'::config2perl()'." (line ".__LINE__.") : warning, there may still be remains of templated variables in the specified content (tags used: '${tvop}' and '${tvcl} -- ignore the enclosing single quotes), see above what remained after all template variables substitutions were done." }
-	if( $contents =~ /\Q${tvop}\E\s*!(:?(:?begin-verbatim-section)|(:?end-verbatim-section))\s*\Q${tvcl}\E/ ){ print STDERR __PACKAGE__.'::config2perl()'." (line ".__LINE__.") : warning, there may still be remains of templated variables in the specified content (tags used: '${tvop}' and '${tvcl}' -- ignore the enclosing single quotes), see above what remained after all template variables substitutions were done." }
+	if( $contents =~ /\Q${tvop}\E\s*!(:?(:?begin-verbatim-section)|(:?end-verbatim-section))\s*\Q${tvcl}\E/ ){ print STDERR "--begin content:\n".$contents."\n--end content.\n".__PACKAGE__.'::config2perl()'." (line ".__LINE__.") : warning, there may still be remains of templated variables in the specified content (tags used: '${tvop}' and '${tvcl} -- ignore the enclosing single quotes), see above what remained after all template variables substitutions were done." }
+	# this does not print contents in its warning message
+	# in case Test::More gets confused:
+	#if( $contents =~ /\Q${tvop}\E\s*!(:?(:?begin-verbatim-section)|(:?end-verbatim-section))\s*\Q${tvcl}\E/ ){ print STDERR __PACKAGE__.'::config2perl()'." (line ".__LINE__.") : warning, there may still be remains of templated variables in the specified content (tags used: '${tvop}' and '${tvcl}' -- ignore the enclosing single quotes), see above what remained after all template variables substitutions were done." }
 
 	# secondly, remove the VERBATIM multiline sections and transform them.
 	# Comments inside the verbatim section will NOT BE touched.
@@ -158,7 +154,7 @@ sub	config2perl {
 		}
 	}
 
-	# thirdly, remove comments: 'shell' and/or 'C' and/or 'CPP'
+	# fourthly, remove comments: 'shell' and/or 'C' and/or 'CPP'
 	# and/or multiple instances of 'custom()()'
 	my $tc = $commentstyle;
 	if( $tc =~ s/\bC\b//i ){
@@ -191,9 +187,12 @@ sub	config2perl {
 	}
 	if( $tc =~ /[a-z]/i ){ warn __PACKAGE__.'::config2perl()'." (line ".__LINE__.") : error, comments style '${commentstyle}' was not understood, this is what was left after parsing it: '${tc}'."; return undef }
 
-	# this is a warning:
-	# we can not be sure if this <% xyz %> is part of the content or a forgotten templated variable
-	if( $contents =~ /\Q${tvop}\E.+?-verbatim-section\s*\Q${tvcl}\E/ ){ warn "--begin content:\n".$contents."\n--end content.\n".__PACKAGE__.'::config2perl()'." (line ".__LINE__.") : warning, there may still be remains of templated variables in the specified content, see above what remained after all verbatime sections were removed." }
+	# this is JUST a warning:
+	# because we can not be sure if this <% xyz %>
+	# is part of the content or a forgotten templated variable
+	# However, the json2perl below will return undef on any errors
+	# turn it into an error?
+	if( $contents =~ /\Q${tvop}\E.+?(?:begin|end)-verbatim-section\s*\Q${tvcl}\E/ ){ warn "--begin content:\n".$contents."\n--end content.\n".__PACKAGE__.'::config2perl()'." (line ".__LINE__.") : warning, there may still be remains of templated variables in the specified content, see above what remained after all verbatime sections were removed." }
 
 	if( $remove_comments_in_strings == 0 ){
 		$idx = 0;
@@ -224,7 +223,7 @@ Config::JSON::Enhanced - JSON-based config with C/Shell-style comments, verbatim
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =head1 SYNOPSIS
 

@@ -21,19 +21,22 @@ name: Spreadsheet-ParseXLSX
 provides:
   Spreadsheet::ParseXLSX:
     file: lib/Spreadsheet/ParseXLSX.pm
-    version: '0.33'
+    version: '0.34'
   Spreadsheet::ParseXLSX::Cell:
     file: lib/Spreadsheet/ParseXLSX/Cell.pm
-    version: '0.33'
+    version: '0.34'
   Spreadsheet::ParseXLSX::Decryptor:
     file: lib/Spreadsheet/ParseXLSX/Decryptor.pm
-    version: '0.33'
+    version: '0.34'
   Spreadsheet::ParseXLSX::Decryptor::Agile:
     file: lib/Spreadsheet/ParseXLSX/Decryptor/Agile.pm
-    version: '0.33'
+    version: '0.34'
   Spreadsheet::ParseXLSX::Decryptor::Standard:
     file: lib/Spreadsheet/ParseXLSX/Decryptor/Standard.pm
-    version: '0.33'
+    version: '0.34'
+  Spreadsheet::ParseXLSX::Worksheet:
+    file: lib/Spreadsheet/ParseXLSX/Worksheet.pm
+    version: '0.34'
 requires:
   Archive::Zip: '1.34'
   Crypt::Mode::CBC: '0'
@@ -47,12 +50,13 @@ requires:
   Scalar::Util: '0'
   Spreadsheet::ParseExcel: '0'
   Spreadsheet::ParseExcel::Cell: '0'
+  Spreadsheet::ParseExcel::Worksheet: '0'
   XML::Twig: '0'
   perl: '5.010'
 resources:
   bugtracker: https://github.com/MichaelDaum/spreadsheet-parsexlsx/issues
   repository: https://github.com/MichaelDaum/spreadsheet-parsexlsx
-version: '0.33'
+version: '0.34'
 x_Dist_Zilla:
   perl:
     version: '5.038002'
@@ -249,7 +253,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.33'
+          tag: '0.34'
           tag_format: '%v'
           tag_message: ''
         Dist::Zilla::Role::Git::Repo:
@@ -459,8 +463,8 @@ x_contributors:
   - 'Fitz Elliott <felliott@fiskur.org>'
   - 'FL <f20@reckon.co.uk>'
   - 'Gareth Tunley <gjtunley@gmail.com>'
-  - 'M Conrad <mike@nrdvana.net>'
   - 'Meredith Howard <mhoward@roomag.org>'
+  - 'Michael Conrad <mike@nrdvana.net>'
   - 'Michael Daum <daum@michaeldaumconsulting.com>'
   - 'Nick Moore <nick.moore@strategicdata.com.au>'
   - 'oharakouhei <gofue0723@gmail.com>'

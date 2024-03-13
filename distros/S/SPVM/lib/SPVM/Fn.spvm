@@ -12,6 +12,9 @@ class Fn {
   use Callback;
   use Format;
   use Error::Unicode::InvalidUTF8;
+  use Callback::Grep;
+  use Callback::Map;
+  use Callback::MapExpand;
   
   static method BYTE_MAX : int () { return 127; }
   static method BYTE_MIN : int () { return -128; }
@@ -1264,5 +1267,107 @@ class Fn {
       $string->[$offset + $i] = (byte)$char;
     }
   }
+  
+  static method or : object ($left : object, $right : object) {
+    
+    if ($left) {
+      return $left;
+    }
+    else {
+      return $right;
+    }
+  }
+  
+  
+  static method if : object ($condition : int, $left : object, $right : object) {
+    
+    if ($condition) {
+      return $left;
+    }
+    else {
+      return $right;
+    }
+  }
+  
+  precompile static method grep : object[] ($array : object[], $callback : Callback::Grep) {
+    
+    unless ($array) {
+      die "The array \$array must be defined.";
+    }
+    
+    unless ($callback) {
+      die "The callback \$callback must be defined.";
+    }
+    
+    my $proto_array = Array->new_proto($array, 0);
+    
+    my $list = List->new($proto_array);
+    
+    for my $element (@$array) {
+      my $ok = $callback->($element);
+      
+      if ($ok) {
+        $list->push($element);
+      }
+    }
+    
+    my $new_array = $list->to_array;
+    
+    return $new_array;
+  }
+  
+  precompile static method map : object[] ($array : object[], $callback : Callback::Map) {
+    
+    unless ($array) {
+      die "The array \$array must be defined.";
+    }
+    
+    unless ($callback) {
+      die "The callback \$callback must be defined.";
+    }
+    
+    my $proto_array = Array->new_proto($array, 0);
+    
+    my $list = List->new($proto_array);
+    
+    for my $element (@$array) {
+      my $new_element = $callback->($element);
+      
+      $list->push($new_element);
+    }
+    
+    my $new_array = $list->to_array;
+    
+    return $new_array;
+  }
+  
+  precompile static method map_expand : object[] ($array : object[], $callback : Callback::MapExpand) {
+    
+    unless ($array) {
+      die "The array \$array must be defined.";
+    }
+    
+    unless ($callback) {
+      die "The callback \$callback must be defined.";
+    }
+    
+    my $proto_array = Array->new_proto($array, 0);
+    
+    my $list = List->new($proto_array);
+    
+    for my $element (@$array) {
+      my $new_elements = $callback->($element);
+      
+      for my $new_element (@$new_elements) {
+        $list->push($new_element);
+      }
+    }
+    
+    my $new_array = $list->to_array;
+    
+    return $new_array;
+  }
+  
+  native static method get_compile_type_name : string ($basic_type_name : string, $type_dimension : int, $type_flag : int);
   
 }
