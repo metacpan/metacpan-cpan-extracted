@@ -1,6 +1,6 @@
 package Mail::BIMI::Role::Data;
 # ABSTRACT: Class to retrieve data files
-our $VERSION = '3.20240205'; # VERSION
+our $VERSION = '3.20240313'; # VERSION
 use 5.20.0;
 use Moose::Role;
 use Mail::BIMI::Prelude;
@@ -38,7 +38,7 @@ Mail::BIMI::Role::Data - Class to retrieve data files
 
 =head1 VERSION
 
-version 3.20240205
+version 3.20240313
 
 =head1 DESCRIPTION
 

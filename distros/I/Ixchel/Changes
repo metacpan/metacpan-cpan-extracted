@@ -1,5 +1,8 @@
 Revision history for Ixchel
 
+0.10.0 2024-03-13/16:00
+		 - enable auto_sensor_name for suricata_diff if needed
+
 0.9.4  2024-03-07/01:30
 		 - fix snmp_v2 template for chronyd
 		 - fix suricata outputs template for pcap logging again

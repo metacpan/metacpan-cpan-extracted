@@ -4,7 +4,7 @@
       "Gisle Aas <gaas@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -76,7 +76,6 @@
             "Config" : "0",
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
-            "FileHandle" : "0",
             "IO::File" : "0",
             "SelectSaver" : "0",
             "Test::More" : "0",
@@ -89,32 +88,32 @@
    "provides" : {
       "HTML::Entities" : {
          "file" : "lib/HTML/Entities.pm",
-         "version" : "3.81"
+         "version" : "3.82"
       },
       "HTML::Filter" : {
          "file" : "lib/HTML/Filter.pm",
-         "version" : "3.81",
+         "version" : "3.82",
          "x_deprecated" : 1
       },
       "HTML::HeadParser" : {
          "file" : "lib/HTML/HeadParser.pm",
-         "version" : "3.81"
+         "version" : "3.82"
       },
       "HTML::LinkExtor" : {
          "file" : "lib/HTML/LinkExtor.pm",
-         "version" : "3.81"
+         "version" : "3.82"
       },
       "HTML::Parser" : {
          "file" : "lib/HTML/Parser.pm",
-         "version" : "3.81"
+         "version" : "3.82"
       },
       "HTML::PullParser" : {
          "file" : "lib/HTML/PullParser.pm",
-         "version" : "3.81"
+         "version" : "3.82"
       },
       "HTML::TokeParser" : {
          "file" : "lib/HTML/TokeParser.pm",
-         "version" : "3.81"
+         "version" : "3.82"
       }
    },
    "release_status" : "stable",
@@ -129,7 +128,7 @@
          "web" : "https://github.com/libwww-perl/HTML-Parser"
       }
    },
-   "version" : "3.81",
+   "version" : "3.82",
    "x_contributors" : [
       "Antonio Radici <antonio@dyne.org>",
       "Barbie <barbie@missbarbell.co.uk>",
@@ -138,6 +137,7 @@
       "Chip Salzenberg <chip@pobox.com>",
       "Damyan Ivanov <dmn@debian.org>",
       "David Steinbrunner <dsteinbrunner@pobox.com>",
+      "dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
       "Fran\u00e7ois Perrad <francois.perrad@gadz.org>",
       "Gisle Aas <gisle@aas.no>",
       "Graham Knop <haarg@haarg.org>",
@@ -153,11 +153,12 @@
       "Salvatore Bonaccorso <salvatore.bonaccorso@gmail.com>",
       "Todd Rinaldo <toddr@cpan.org>",
       "Ville Skytt\u00e4 <ville.skytta@iki.fi>",
+      "yoshikazusawa <883514+yoshikazusawa@users.noreply.github.com>",
       "Yves Orton <demerphq@gmail.com>",
       "Zefram <zefram@fysh.org>"
    ],
-   "x_generated_by_perl" : "v5.36.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

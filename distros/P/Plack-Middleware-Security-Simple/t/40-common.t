@@ -34,6 +34,7 @@ my $handler = builder {
             require_content,
             protocol_in_path_or_referer,
             script_extensions,
+            script_injection,
             system_dirs,
             unexpected_content,
             webdav_methods,
@@ -367,6 +368,13 @@ test_psgi
 
     subtest 'blocked exchange' => sub {
         my $req = GET '/ecp/Current/exporttool/microsoft.exchange.ediscovery.exporttool.application';
+        my $res = $cb->($req);
+        ok is_error( $res->code ), join( " ", $req->method, $req->uri );
+        is $res->code, HTTP_BAD_REQUEST, "HTTP_BAD_REQUEST";
+    };
+
+    subtest 'blocked script injection' => sub {
+        my $req = GET "/image/data:application/x-javascript;%20charset=utf-8;base64,Zm5vcmpkCg==";
         my $res = $cb->($req);
         ok is_error( $res->code ), join( " ", $req->method, $req->uri );
         is $res->code, HTTP_BAD_REQUEST, "HTTP_BAD_REQUEST";

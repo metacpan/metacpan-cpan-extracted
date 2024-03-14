@@ -4,8 +4,8 @@ NAME
 SYNOPSIS
      use Mo::utils qw(check_angle check_array check_array_object check_array_required
              check_bool check_code check_isa check_length check_length_fix check_number
-             check_number_of_items check_number_range check_regexp check_required
-             check_string check_string_begin check_strings);
+             check_number_min check_number_of_items check_number_range check_regexp
+             check_required check_string check_string_begin check_strings);
 
      check_angle($self, $key);
      check_array($self, $key);
@@ -17,6 +17,7 @@ SYNOPSIS
      check_length($self, $key, $max_length);
      check_length_fix($self, $key, $length);
      check_number($self, $key);
+     check_number_min($self, $key, $min);
      check_number_of_items($self, $list_method, $item_method, $object_name, $item_name);
      check_number_range($self, $key, $min, $max);
      check_regexp($self, $key, $regexp);
@@ -140,6 +141,17 @@ SUBROUTINES
 
     Check parameter defined by $key which is number (positive or negative)
     or no.
+
+    Put error if check isn't ok.
+
+    Returns undef.
+
+  "check_number_min"
+     check_number_min($self, $key, $min);
+
+    *Since version 0.25.*
+
+    Check parameter defined by $key which is number greater than $min value.
 
     Put error if check isn't ok.
 
@@ -278,6 +290,10 @@ ERRORS
 
      check_number():
              Parameter '%s' must be a number.
+                     Value: %s
+
+     check_number_min():
+             Parameter '%s' must be greater than %s.
                      Value: %s
 
      check_number_of_items():
@@ -698,6 +714,42 @@ EXAMPLE21
      use strict;
      use warnings;
 
+     use Mo::utils qw(check_number_min);
+
+     my $self = {
+             'key' => 10,
+     };
+     check_number_min($self, 'key', 5);
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE22
+     use strict;
+     use warnings;
+
+     $Error::Pure::TYPE = 'Error';
+
+     use Mo::utils qw(check_number_min);
+
+     my $self = {
+             'key' => 10,
+     };
+     check_number_min($self, 'key', 11);
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [...utils.pm:?] Parameter 'key' must be greater than 11.
+
+EXAMPLE23
+     use strict;
+     use warnings;
+
      use Test::MockObject;
 
      $Error::Pure::TYPE = 'Error';
@@ -736,7 +788,7 @@ EXAMPLE21
      # Output like:
      # ok
 
-EXAMPLE22
+EXAMPLE24
      use strict;
      use warnings;
 
@@ -778,7 +830,7 @@ EXAMPLE22
      # Output like:
      # #Error [...utils.pm:?] Test for Item 'value1' has multiple values.
 
-EXAMPLE23
+EXAMPLE25
      use strict;
      use warnings;
 
@@ -795,7 +847,7 @@ EXAMPLE23
      # Output:
      # ok
 
-EXAMPLE24
+EXAMPLE26
      use strict;
      use warnings;
 
@@ -814,7 +866,7 @@ EXAMPLE24
      # Output like:
      # #Error [...utils.pm:?] Parameter 'key' must be a number between 10 and 12.
 
-EXAMPLE25
+EXAMPLE27
      use strict;
      use warnings;
 
@@ -831,7 +883,7 @@ EXAMPLE25
      # Output:
      # ok
 
-EXAMPLE26
+EXAMPLE28
      use strict;
      use warnings;
 
@@ -851,7 +903,7 @@ EXAMPLE26
      # Output like:
      # #Error [...utils.pm:?] Parameter 'key' does not match the specified regular expression.
 
-EXAMPLE27
+EXAMPLE29
      use strict;
      use warnings;
 
@@ -868,7 +920,7 @@ EXAMPLE27
      # Output:
      # ok
 
-EXAMPLE28
+EXAMPLE30
      use strict;
      use warnings;
 
@@ -888,7 +940,7 @@ EXAMPLE28
      # Output like:
      # #Error [...utils.pm:?] Parameter 'key' is required.
 
-EXAMPLE29
+EXAMPLE31
      use strict;
      use warnings;
 
@@ -905,7 +957,7 @@ EXAMPLE29
      # Output:
      # ok
 
-EXAMPLE30
+EXAMPLE32
      use strict;
      use warnings;
 
@@ -925,7 +977,7 @@ EXAMPLE30
      # Output like:
      # #Error [...utils.pm:?] Parameter 'key' have expected value.
 
-EXAMPLE32
+EXAMPLE33
      use strict;
      use warnings;
 
@@ -942,7 +994,7 @@ EXAMPLE32
      # Output:
      # ok
 
-EXAMPLE33
+EXAMPLE34
      use strict;
      use warnings;
 
@@ -962,7 +1014,7 @@ EXAMPLE33
      # Output like:
      # #Error [...utils.pm:?] Parameter 'key' must begin with defined string base.
 
-EXAMPLE34
+EXAMPLE35
      use strict;
      use warnings;
 
@@ -979,7 +1031,7 @@ EXAMPLE34
      # Output:
      # ok
 
-EXAMPLE35
+EXAMPLE36
      use strict;
      use warnings;
 
@@ -1028,5 +1080,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.24
+    0.25
 

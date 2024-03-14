@@ -20,6 +20,7 @@ readme_from 'HashType.pm';
 recursive_author_tests('xt');
 requires 'Class::Utils' => 0;
 requires 'Data::HashType' => 0;
+requires 'Mo::utils' => 0.25;
 requires 'Readonly' => 0;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Data-Random-HashType/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Data-Random-HashType';
@@ -29,7 +30,7 @@ test_requires 'Error::Pure::Utils' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.01';
+version '0.02';
 
 # Run.
 WriteAll();

@@ -100,7 +100,7 @@ undef($p);
 
 is($atext, "Perl\240Institute");
 
-# test parsing of embeded document
+# test parsing of embedded document
 $p = HTML::TokeParser->new(\<<HTML);
 <title>Title</title>
 <H1>

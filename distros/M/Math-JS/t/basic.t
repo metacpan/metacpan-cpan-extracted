@@ -5,7 +5,7 @@ use Test::More;
 
 my ($new, $dummy);
 
-cmp_ok($Math::JS::VERSION, 'eq', '0.04', "version number is as expected");
+cmp_ok($Math::JS::VERSION, 'eq', '0.05', "version number is as expected");
 
 eval {$new = Math::JS->new(undef);};
 like ($@, qr/^Bad argument \(or no argument\)/, 'undef is invalid arg');

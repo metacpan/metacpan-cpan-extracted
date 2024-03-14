@@ -40,8 +40,8 @@ use strict;
 #    Here _X and _Y duplicate ROYA and LOYA, and _T duplicating GRPSELTAP.
 # Option --comment-vkcodes=VK_first,VK_second would comment out emitting the specified VK-codes (with "VK_" omitted).
 
-my $v = 0.77;
-my $v1000 = int($v*1000);
+my $v = 0.78;
+my $v1000 = int($v*1000+0.5);
 my $vvv = 3;				# The first part of the version (MSKLC has 3.40)
 
 my %comment_vkcodes;
@@ -223,7 +223,7 @@ sub parse_mods($) {
 parse_mods $mods;
 parse_mods $IN{MODIFIERS} if exists $IN{MODIFIERS};
 $REPL{modifiers} = join '', map "    { VK_$_ ,\t$mods{$_} },\n", 	# sort in almost-expected order
-  grep(/^[SCM]/, reverse sort keys %mods), grep /^[^SCM]/, sort keys %mods;
+  grep(/^[SCM]/, reverse sort keys %mods), grep /^[^SCM]/, sort keys %mods;	# We may add a comment later!
 
 # Due to: applications may synthesize non-chiral keypresses (such as VK_SHIFT) and KBDALT stripping
 my %massage_shiftstate; # = ( $BM{S} => [$BM{S}], $BM{C} => [$BM{C}|$BM{L}, $BM{C}|$BM{A}|$BM{R}], $BM{A} => [$BM{A}|$BM{K}]);  # , $BM{C}|$BM{A}|$BM{L}|$BM{Z}
@@ -652,6 +652,9 @@ $REPL{init_auxVK_c} = 1 + $CC;
 my @AA = grep $_ ne 'NOALTGR', split /\s+/, $IN{ATTRIBUTES};
 push @AA, 'ALTGR'  if $IN{ATTRIBUTES} !~ /\b(NO)?ALTGR\b/ and $maxbitmap > 3;
 $REPL{use_KLLFlags} = 'KLLF_' . join(' | KLLF_', @AA) || 0;
+
+$REPL{modifiers} =~ s((\{\s*VK_RMENU\s*,.*))($1\t// Due to KLL_ALTGR, is combined with bits for CONTROL and LCONTROL.)
+  if grep $_ eq 'ALTGR', @AA;
 
 #################################### Do actual emit with substitutions
 my $rxrepl = join '|', keys %REPL;

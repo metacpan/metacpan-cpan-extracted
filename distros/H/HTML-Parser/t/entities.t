@@ -73,7 +73,7 @@ is($x, $ent);
     };
     #>>>
 
-    ok(!$error, "decode_entitites() when processing a key as input");
+    ok(!$error, "decode_entities() when processing a key as input");
     is($got, (values %hash)[0], "decode_entities() decodes a key properly");
 }
 

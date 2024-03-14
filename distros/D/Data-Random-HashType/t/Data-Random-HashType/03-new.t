@@ -4,7 +4,7 @@ use warnings;
 use Data::Random::HashType;
 use English;
 use Error::Pure::Utils qw(clean);
-use Test::More 'tests' => 5;
+use Test::More 'tests' => 7;
 use Test::NoWarnings;
 
 # Test.
@@ -14,11 +14,31 @@ isa_ok($obj, 'Data::Random::HashType');
 # Test.
 eval {
 	Data::Random::HashType->new(
+		'mode_id' => 'bad',
+	);
+};
+is($EVAL_ERROR, "Parameter 'mode_id' must be a bool (0/1).\n",
+	"Parameter 'mode_id' must be a bool (0/1).");
+clean();
+
+# Test.
+eval {
+	Data::Random::HashType->new(
 		'num_generated' => undef,
 	);
 };
 is($EVAL_ERROR, "Parameter 'num_generated' is required.\n",
 	"Parameter 'num_generated' is required.");
+clean();
+
+# Test.
+eval {
+	Data::Random::HashType->new(
+		'num_generated' => -4,
+	);
+};
+is($EVAL_ERROR, "Parameter 'num_generated' must be greater than 1.\n",
+	"Parameter 'num_generated' must be greater than 1 (-4).");
 clean();
 
 # Test.

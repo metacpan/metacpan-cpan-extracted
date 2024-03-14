@@ -6,19 +6,26 @@ use warnings;
 use Class::Utils qw(set_params);
 use Data::HashType;
 use Error::Pure qw(err);
+use Mo::utils 0.25 qw(check_bool check_number_min);
 use Readonly;
 
 Readonly::Array our @OBSOLETE_HASH_TYPES => qw(MD4 MD5 SHA1);
 Readonly::Array our @DEFAULT_HASH_TYPES => qw(SHA-256 SHA-384 SHA-512);
 Readonly::Array our @ALL_HASH_TYPES => (@OBSOLETE_HASH_TYPES, @DEFAULT_HASH_TYPES);
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 sub new {
 	my ($class, @params) = @_;
 
 	# Create object.
 	my $self = bless {}, $class;
+
+	# Id.
+	$self->{'id'} = 1;
+	$self->{'cb_id'} = sub {
+		return $self->{'id'}++;
+	};
 
 	# Add id or not.
 	$self->{'mode_id'} = 0;
@@ -32,8 +39,8 @@ sub new {
 	# Process parameters.
 	set_params($self, @params);
 
-	# TODO Check mode_id.
-	# TODO Check num_generated.
+	check_bool($self, 'mode_id');
+	check_number_min($self, 'num_generated', 1);
 	if (! defined $self->{'num_generated'}) {
 		err "Parameter 'num_generated' is required.";
 	}
@@ -58,7 +65,9 @@ sub random {
 			my $rand = int(rand(scalar @list - 1));
 			my $hash_type = splice @list, $rand, 1;
 			push @ret, Data::HashType->new(
-				$self->{'mode_id'} ? ('id' => $id) : (),
+				$self->{'mode_id'} ? (
+					'id' => $self->{'cb_id'}->($self),
+				) : (),
 				'active' => 1,
 				'name' => $hash_type,
 			);
@@ -67,7 +76,9 @@ sub random {
 		my $i = 1;
 		foreach my $hash_type (@{$self->{'possible_hash_types'}}) {
 			push @ret, Data::HashType->new(
-				$self->{'mode_id'} ? ('id' => $i) : (),
+				$self->{'mode_id'} ? (
+					'id' => $self->{'cb_id'}->($self),
+				) : (),
 				'active' => 1,
 				'name' => $hash_type,
 			);
@@ -107,6 +118,18 @@ Constructor.
 
 =over 8
 
+=item * C<cb_id>
+
+Callback to adding of id.
+
+Default value is subroutine which returns C<$self->{'id'}++>.
+
+=item * C<id>
+
+Minimal id for adding. Only if C<mode_id> is set to 1.
+
+Default value is 1.
+
 =item * C<mode_id>
 
 Boolean value if we are generating id in hash type object.
@@ -140,6 +163,11 @@ Returns instance of L<Data::HashType>.
 =head1 ERRORS
 
  new():
+         From Mo::utils:
+                 Parameter 'mode_id' must be a bool (0/1).
+                         Value: %s
+                 Parameter 'num_generated' must be greater than %s.
+                         Value: %s
          Parameter 'num_generated' is required.
          Parameter 'possible_hash_types' must be a reference to array.
          Parameter 'possible_hash_types' must contain at least one hash type name.
@@ -199,6 +227,7 @@ Returns instance of L<Data::HashType>.
 L<Class::Utils>,
 L<Data::HashType>,
 L<Error::Pure>,
+L<Mo::utils>,
 L<Readonly>.
 
 =head1 REPOSITORY
@@ -213,12 +242,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2023 Michal Josef Špaček
+© 2023-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

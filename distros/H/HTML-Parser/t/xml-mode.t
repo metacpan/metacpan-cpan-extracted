@@ -42,7 +42,7 @@ my $xml = <<'EOT';
 <?xml version="1.0"?>
 <?IS10744:arch name="html"?><!-- comment -->
 <DOC>
-<title html="h1">My first architectual document</title>
+<title html="h1">My first architectural document</title>
 <author html="address">Geir Ove Gronmo, grove@infotek.no</author>
 <para>This is the first paragraph in this document</para>
 <para html="p">This is the second paragraph</para>
@@ -57,7 +57,7 @@ is($text, <<'EOT');
 PI[xml version="1.0"]
 PI[IS10744:arch name="html"]
 S[DOC]
-S[title html=h1]My first architectual documentE[title]
+S[title html=h1]My first architectural documentE[title]
 S[author html=address]Geir Ove Gronmo, grove@infotek.noE[author]
 S[para]This is the first paragraph in this documentE[para]
 S[para html=p]This is the second paragraphE[para]
@@ -74,7 +74,7 @@ is($text, <<'EOT');
 PI[xml version="1.0"?]
 PI[IS10744:arch name="html"?]
 S[doc]
-S[title html=h1]My first architectual documentE[title]
+S[title html=h1]My first architectural documentE[title]
 S[author html=address]Geir Ove Gronmo, grove@infotek.noE[author]
 S[para]This is the first paragraph in this documentE[para]
 S[para html=p]This is the second paragraphE[para]

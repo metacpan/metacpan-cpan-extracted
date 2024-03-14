@@ -1,0 +1,13 @@
+
+This module provides a Unix-like command `samelines'. 
+
+同じ文字列の行の発生の様子を調べる。全行を入力から読み取り、「全く同じ内容の行が
+m重に発生したということがn回発生した」様子を全てのmに対して集計して、mxn の
+表示の仕方で(xは小文字のエックスであり、その前後に数値を配置する)、コンマ区切りで
+表示する。入力がN行であり、全ての行の内容が異なる場合には1xNと出力される。
+
+=head1 DESCRIPTION
+
+ Copyright (c) 2024 Toshiyuki SHIMONO. All rights reserved.
+ This program is free software; you can redistribute it and/or
+ modify it under the same terms as Perl itself.

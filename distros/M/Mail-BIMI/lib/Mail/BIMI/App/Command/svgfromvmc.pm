@@ -1,6 +1,6 @@
 package Mail::BIMI::App::Command::svgfromvmc;
 # ABSTRACT: Extract the SVG from a VMC
-our $VERSION = '3.20240205'; # VERSION
+our $VERSION = '3.20240313'; # VERSION
 use 5.20.0;
 BEGIN { $ENV{MAIL_BIMI_CACHE_DEFAULT_BACKEND} = 'Null' };
 use Mail::BIMI::Prelude;
@@ -99,7 +99,7 @@ Mail::BIMI::App::Command::svgfromvmc - Extract the SVG from a VMC
 
 =head1 VERSION
 
-version 3.20240205
+version 3.20240313
 
 =head1 DESCRIPTION
 

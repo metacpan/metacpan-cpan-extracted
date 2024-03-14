@@ -27,13 +27,14 @@ our @EXPORT = qw(
    protocol_in_path_or_referer
    require_content
    script_extensions
+   script_injection
    system_dirs
    unexpected_content
    webdav_methods
    wordpress
 );
 
-our $VERSION = 'v0.11.1';
+our $VERSION = 'v0.12.0';
 
 
 
@@ -172,6 +173,15 @@ sub script_extensions {
 }
 
 
+sub script_injection {
+    my $re = qr{data:(?:application|text)/(?:x-)?(?:javascript|wasm);};
+    return (
+        PATH_INFO    => $re,
+        QUERY_STRING => $re,
+    );
+}
+
+
 sub system_dirs {
     my $re = qr{/(?:s?adm|bin|etc|usr|var|srv|opt|__MACOSX|META-INF)/};
     return (
@@ -216,7 +226,7 @@ Plack::Middleware::Security::Common - A simple security filter for Plack with co
 
 =head1 VERSION
 
-version v0.11.1
+version v0.12.0
 
 =head1 SYNOPSIS
 
@@ -382,6 +392,10 @@ This blocks requests that refer to actual scripts or source code file
 extension, such as C<.php> or C<.asp>.  It will also block requests
 that refer to these scripts in the query string.
 
+=head2 script_injection
+
+This block requests that inject scripts using data-URLs.
+
 =head2 system_dirs
 
 This blocks requests that refer to system or metadata directories in
@@ -428,7 +442,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014,2018-2023 by Robert Rothenberg.
+This software is Copyright (c) 2014,2018-2024 by Robert Rothenberg.
 
 This is free software, licensed under:
 

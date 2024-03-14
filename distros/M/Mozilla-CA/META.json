@@ -48,6 +48,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#lwp"
    },
-   "version" : "20231213",
+   "version" : "20240313",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

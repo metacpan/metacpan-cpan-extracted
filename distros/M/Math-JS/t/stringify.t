@@ -5,7 +5,7 @@ use Test::More;
 
 my $ryu = Math::JS::USE_RYU;
 if($ryu) {
-  warn "\nFYI: Stringifying the values of Math::JS objects uses the Ryu algorithm\n";
+  warn "\nFYI: Stringifying the values of Math::JS objects uses Math::Ryu version $Math::Ryu::VERSION\n";
 }
 else {
   warn "\nFYI: Stringifying the values of Math::JS objects uses sprintf(\"%.17g\", val)\n";
@@ -59,14 +59,35 @@ cmp_ok("$js", 'eq', '9007199254740991', "9007199254740991.0 displays as expected
 $js = Math::JS->new(4294967297);
 cmp_ok("$js", 'eq', '4294967297', "4294967297 displays as expected");
 
-$js = Math::JS->new(1e19);
-cmp_ok("$js", 'eq', '1' . '0' x 19, "1e+19 displays as expected");
+# The next 2 tests might not pass if sprintf() is being used.
+# They pass with sprintf() on some systems, but not others.
+# Since the documentation acknowledges that sprintf() might
+# produce differing results, we can skip the following two
+# tests unless Math::Ryu is being used for the formatting.
 
-$js = Math::JS->new(9e20);
-cmp_ok("$js", 'eq', '9' . '0' x 20, "9e+20 displays as expected");
+if($ryu) {
+  $js = Math::JS->new(1e19);
+  cmp_ok("$js", 'eq', '1' . '0' x 19, "1e+19 displays as expected");
+
+  $js = Math::JS->new(9e20);
+  cmp_ok("$js", 'eq', '9' . '0' x 20, "9e+20 displays as expected");
+}
+
+# Having possibly skipped the last 2 tests, we can at least check
+# that $js == the expected value:
+my $expected = $ryu ? '9' . '0' x 20 : '4294967297';
+cmp_ok("$js", '==', $expected, "strings are evaluated as expected");
+$js = Math::JS->new(1e19);
+cmp_ok("$js", '==', '1' . '0' x 19, "1e+19 is evaluated as expected");
 
 $js = Math::JS->new(1e21);
-cmp_ok("$js", 'eq', '1e+21', "1e+21 displays as expected");
+if($ryu) {
+  cmp_ok("$js", 'eq', '1e+21', "1e+21 displays as expected");
+}
+else {
+  # With "%.17g" formatting, the exponent can be either "+21" or "+021".
+  like("$js", qr/^1e\+0?21$/, "1e21 displays as expected");
+}
 
 
 done_testing();

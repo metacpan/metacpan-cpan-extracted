@@ -19,7 +19,8 @@ cd ..
 rm CURRENT-prev
 mv CURRENT CURRENT-prev
 ln -s v0.???? CURRENT
-========================= Build
+
+========================= Build (after the second step one may need to patch, if a diff_* file is in src.zip)
 
 #set PERL5OPT=&& D:\Programs\cygwin\bin\perl.exe  -wC31 -I UI-KeyboardLayout/lib UI-KeyboardLayout/examples/build-iz.pl UI-KeyboardLayout/examples/izKeys.kbdd
 cd iz-71

@@ -1,6 +1,38 @@
-FF locks in Latin?!  Even with v73 compiled with klc2c — fixed by omitting OEM_8.
 
-Extra bindings on SPACE get in the way!
+FF locks in Latin?!  Even with v73 compiled with klc2c — fixed by omitting OEM_8.  (Even pre-0.77)
+Same for Cyrillic in 0.77 (same fix).
+
+  After removing OEM_8:
+
+Immediately after switching to Cyr-base (any way), FF emits U+0d9a ක on 'a'-key 's'-key.  For greek 76-NLS, it is non-math Aleph;
+with AltGr-Mnu-Num5 gives U+012e U+29ed = Į⧭.  Similar for Chrome but Cyr gives U+72e=ܮ (but not a console CMD or FCW).
+	With RU 77a not present in FF/Chrome.
+		Try removing Mnu (no help)
+
+Switching to Greek from Latin via mouse: 'a' is fine, but the following 's' gives Hebrew ס.
+
+(NON)CONVERT should be shortened together with SPACE
+
+  We removed this part from the docs.  Can it be improved and restored?
+
+This exception is due to the only case in which a key-up event may change the stored state of the keyboard finite automaton: key-up of
+C<Alt> L<may terminate the input-by-number|"Keyboard input on Windows, Part II: The semantic of ToUnicode()">.  (B<NONONO:> key-ups
+for the intermediate [hex-] digits are I<also> important…  So one should be extra careful; see
+L<Part IV|"Can an application on Windows accept keyboard events?  Part IV: application-specific modifiers"> above. ???)
+So on older windows the keydown event of C<Alt> should be special-cased.  (Since all
+we want to find out is whether this event delivers a character, the answer is clear anyway!)
+
+
+
+============================================ Pre-v0.77 or generic
+
+The “consumption” of the bitmap of lCtrl into rAlt leads to complications in the new “bullet-proof method”.  Avoid!
+					DONE
+
+Customize stripping common-with-lC bits from rA: allow forcing a particular flag.
+
+Extra bindings on SPACE get in the user’s way!
+					PATCHED in the distribution
 
 If a component of a ComposeKey is “not connected”, merge it with the preceding one.
 
@@ -79,6 +111,7 @@ lAⒶS not bound — but produce something on ~!@#$%^&*()_+
 	What if this is due to missing LIGATURE for OEM_8??? — but it has no ligatures!
 
 Link to “manual” installation instructions: https://github.com/lelegard/winkbdlayouts#declaring-a-keyboard-layout-on-windows
+			ONLY in Install on ilyaz.org
 
 Are we including newish header/C files into source.zip?
 					DONE (untested)

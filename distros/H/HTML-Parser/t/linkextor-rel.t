@@ -2,16 +2,16 @@ use strict;
 use warnings;
 
 use HTML::LinkExtor ();
-use Test::More tests => 4;
+use Test::More tests => 3;
 
 my $HTML = <<HTML;
 <head>
 <base href="http://www.sn.no/">
 </head>
-<body background="http://www.sn.no/sn.gif">
+<body>
 
 This is <A HREF="link.html">link</a> and an <img SRC="img.jpg"
-lowsrc="img.gif" alt="Image">.
+alt="Image">.
 HTML
 
 
@@ -26,7 +26,6 @@ my $p = HTML::LinkExtor->new(sub {
 $p->parse($HTML); $p->eof;
 
 ok($links =~ m|^base href http://www\.sn\.no/$|m);
-ok($links =~ m|^body background http://www\.sn\.no/sn\.gif$|m);
 ok($links =~ m|^a href link\.html$|m);
 
 # Used to be problems when using the links method on a document with

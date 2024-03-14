@@ -1,5 +1,13 @@
 Revision history for Mozilla-CA
 
+20240313
+  - Update from Mozilla repository to 2024-03-13
+  - Added certificates:
+    - Telekom Security TLS ECC Root 2020
+      sha256: 578af4ded0853f4e5998db4aeaf9cbea8d945f60b620a38d1a3c13b2bc7ba8e1
+    - Telekom Security TLS RSA Root 2023
+      sha256: efc65cadbb59adb6efe84da22311b35624b71b3b1ea0da8b6655174ec8978646
+
 20231213
   - Update from Mozilla repository to 2023-12-13
   - Added certificates:

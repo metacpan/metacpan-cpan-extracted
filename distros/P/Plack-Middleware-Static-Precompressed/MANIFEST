@@ -1,0 +1,20 @@
+Changes
+Makefile.PL
+inc/WriteMakefile.pl
+inc/boilerplate.pl
+lib/Plack/App/File/Precompressed.pm
+lib/Plack/Middleware/Static/Precompressed.pm
+t/00-load.t
+t/basic.t
+t/cache.t
+t/fallthrough.t
+t/lib/MockPSGIBodyFH.pm
+t/lib/test.gzipjs
+t/lib/test.js
+t/lib/test.txt
+t/vfs.t
+MANIFEST
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+LICENSE
+README

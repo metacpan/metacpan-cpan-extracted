@@ -1,3 +1,6 @@
+0.25 2024-03-14T02:21:19+01:00
+ - Add check_number_min().
+
 0.24 2024-03-07T10:15:30+01:00
  - Add check_string().
  - Add test for negative number in check_number_range().

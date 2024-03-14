@@ -14,11 +14,11 @@ Ixchel::Actions::suricata_diff - Finds the differences between the Ixchel config
 
 =head1 VERSION
 
-Version 0.2.0
+Version 0.3.0
 
 =cut
 
-our $VERSION = '0.2.0';
+our $VERSION = '0.3.0';
 
 =head1 CLI SYNOPSIS
 
@@ -34,6 +34,9 @@ ixchel -a suricata_diff [B<-i> <instance>]
 
 =head1 DESCRIPTION
 
+If .suricata.auto_sensor_name=0 and .suricata.config.sensor-name and
+.suricata.instances.$instance.sensor-name are undef, then it will set
+.suricata.auto_sensor_name=1 for the instance being processed.
 
 =head1 FLAGS
 
@@ -128,42 +131,56 @@ sub process_config {
 		return;
 	}
 
-	copy( $old_config_base, $temp_dir . '/old.yaml' );
-	if ( -f $old_config_include ) {
-		copy( $old_config_include, $temp_dir . '/old-include.yaml' );
+	my $orig_asn = $self->{config}{suricata}{auto_sensor_name}{enable};
+	if (   !defined( $self->{config}{suricata}{config}{'sensor-name'} )
+		&& !defined( $self->{config}{suricata}{ubstabces}{ $opts{instance} }{'sensor-name'} ) )
+	{
+		$self->{config}{suricata}{auto_sensor_name}{enable} = 1;
 	}
-	if ( -f $old_config_outputs ) {
-		copy( $old_config_outputs, $temp_dir . '/old-outputs.yaml' );
+
+	eval {
+		copy( $old_config_base, $temp_dir . '/old.yaml' );
+		if ( -f $old_config_include ) {
+			copy( $old_config_include, $temp_dir . '/old-include.yaml' );
+		}
+		if ( -f $old_config_outputs ) {
+			copy( $old_config_outputs, $temp_dir . '/old-outputs.yaml' );
+		}
+
+		my $yq = YAML::yq::Helper->new( file => $temp_dir . '/old.yaml' );
+		if ( -f $temp_dir . '/old-include.yaml' ) {
+			$yq->merge_yaml( yaml => $temp_dir . '/old-include.yaml' );
+		}
+		if ( -f $temp_dir . '/old-outputs.yaml' ) {
+			$yq->merge_yaml( yaml => $temp_dir . '/old-outputs.yaml' );
+		}
+		$yq->delete( var => '.outputs' );
+		$yq->delete( var => '.include' );
+
+		my $results = $self->{ixchel}
+			->action( action => 'suricata_base', opts => { np => 1, w => 1, i => $opts{instance}, d => $new_dir } );
+		$results = $self->{ixchel}
+			->action( action => 'suricata_include', opts => { np => 1, w => 1, i => $opts{instance}, d => $new_dir } );
+		$results = $self->{ixchel}
+			->action( action => 'suricata_outputs', opts => { np => 1, w => 1, i => $opts{instance}, d => $new_dir } );
+
+		my $new_yq = YAML::yq::Helper->new( file => $new_config_base );
+		$new_yq->merge_yaml( yaml => $new_config_include );
+		$new_yq->merge_yaml( yaml => $new_config_outputs );
+		$new_yq->delete( var => '.outputs' );
+		$new_yq->delete( var => '.include' );
+
+		move( $new_config_base, $temp_dir . '/new.yaml' );
+
+		my $diff = $yq->yaml_diff( yaml => $temp_dir . '/new.yaml' );
+
+		$self->status_add( status => $instance_part . " diff... \n" . $diff );
+	};
+	if ($@) {
+		die($@);
 	}
 
-	my $yq = YAML::yq::Helper->new( file => $temp_dir . '/old.yaml' );
-	if ( -f $temp_dir . '/old-include.yaml' ) {
-		$yq->merge_yaml( yaml => $temp_dir . '/old-include.yaml' );
-	}
-	if ( -f $temp_dir . '/old-outputs.yaml' ) {
-		$yq->merge_yaml( yaml => $temp_dir . '/old-outputs.yaml' );
-	}
-	$yq->delete( var => '.outputs' );
-	$yq->delete( var => '.include' );
-
-	my $results = $self->{ixchel}
-		->action( action => 'suricata_base', opts => { np => 1, w => 1, i => $opts{instance}, d => $new_dir } );
-	$results = $self->{ixchel}
-		->action( action => 'suricata_include', opts => { np => 1, w => 1, i => $opts{instance}, d => $new_dir } );
-	$results = $self->{ixchel}
-		->action( action => 'suricata_outputs', opts => { np => 1, w => 1, i => $opts{instance}, d => $new_dir } );
-
-	my $new_yq = YAML::yq::Helper->new( file => $new_config_base );
-	$new_yq->merge_yaml( yaml => $new_config_include );
-	$new_yq->merge_yaml( yaml => $new_config_outputs );
-	$new_yq->delete( var => '.outputs' );
-	$new_yq->delete( var => '.include' );
-
-	move( $new_config_base, $temp_dir . '/new.yaml' );
-
-	my $diff = $yq->yaml_diff( yaml => $temp_dir . '/new.yaml' );
-
-	$self->status_add( status => $instance_part . " diff... \n" . $diff );
+	$self->{config}{suricata}{auto_sensor_name}{enable} = $orig_asn;
 
 	return;
 } ## end sub process_config

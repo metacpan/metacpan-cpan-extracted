@@ -2,8 +2,8 @@ use strict;
 use warnings;
 use utf8;
 
-use FileHandle   ();
 use HTML::Parser ();
+use IO::File     ();
 use Test::More tests => 7;
 
 my $HTML = <<'HTML';
@@ -125,7 +125,7 @@ for my $chunksize (64 * 1024, 64, 13, 3, 1, "file", "filehandle") {
         close($fh);
 
         if ($chunksize eq "filehandle") {
-            my $fh = FileHandle->new($file) || die "Can't open $file: $!";
+            my $fh = IO::File->new($file) || die "Can't open $file: $!";
             $file = $fh;
         }
 

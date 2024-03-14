@@ -1,2 +1,7 @@
+0.02 2024-03-14T03:00:05+01:00
+ - Add 'id' and 'cb_id' parameters.
+ - Add constructor checks.
+ - Update copyright years.
+
 0.01 2023-09-02T12:55:19+02:00
  - First version.

@@ -1945,6 +1945,7 @@ got <0x30 00 0x65 00 0x31 00 0x32 00 0x33 00 0x34 0x20 0x20 0x20 0x20 0x20 0x20 
 	Document these errors.
 	We erronerously updated the list of scancodes in a setting in VK-section.
 		Try not-updating the rest as well.
+	Massage ComposeKey engine to allow binding 0-length sequences.
 	New undocumented method 'literal' in ComposeKey.  (Undocumented, splits by |||.)
 
 	examples/klc2c.pl
@@ -1962,7 +1963,7 @@ got <0x30 00 0x65 00 0x31 00 0x32 00 0x33 00 0x34 0x20 0x20 0x20 0x20 0x20 0x20 
 	izKeys.kbdd:
 		In comments, KANA was wrongly identified as scancode=50 (should be 70).
 		Remap scancodes 61, 72, 74 to VK-codes SNAPSHOT, OEM_AX (=“our-Menu”=“our-APPS”) and APP.  (To allow remapping.)
-		Change assignment of Emaji from Id() to Layers() — but only for AltGr-Menu, since "Add_AltGr" is A LAYER.
+		Change assignment of Emoji from Id() to Layers() — but only for AltGr-Menu, since "Add_AltGr" is A LAYER.
 			Does not change the output layout — but changes “Unreachable” warnings (wrongly!)…	UNDO???
 			Warnings are correct only if the binding is put into Layer 1 ???  (It would be lowered automatically by the
 			logic of the assigner-to-an-extra-layer prefixNOTSAME=****.)
@@ -1976,3 +1977,30 @@ got <0x30 00 0x65 00 0x31 00 0x32 00 0x33 00 0x34 0x20 0x20 0x20 0x20 0x20 0x20 
 			(XXXX Were trying to bisect a defect in RU: no/bad access to AltGr-Mnu; but it was unrelated.  Still undone!)
 		chainAltGr: insert Hebrew, make the same everywhere, terminate by ⤨.
 		Terminate the Compose chain by ⎄.
+
+0.78
+	Document the valid way to distinguish character-input events from bind-to-actions events on Windows.
+			(Untested.  Warnings are put to compare “the old way” and “the new way”.)
+	A lot of cleanup and cross-linking in the docs.
+	The first pass of cleaning up the TODO section.
+	The “wrong-keynames” head2 slipped down: became under a wrong head1.
+	Correction/inversion of the recommendation to consume the bitmap of lCtrl into rAlt.
+	Would not put NOALTGR into ATTRIBUTES.
+	Strip common-with-lCtrl bits from rAlt in MODIFIERS.
+	Correct 1 POD syntax error.
+		   Need to emphasize in the documentation that key releases of HEX-digit keys are important for input-by-numbers!
+	Clarify ALTNUMPAD_BIT and OEM codepage.
+
+	examples/HOWTO-install-deinstall-and-tables.txt		New file (from ilyaz.org)
+
+	examples/klc-layout2human.pl
+		Change funny spaces not to ␣, but to ⍽.
+
+	izKeys-visual-maps-base.html
+		Add a stub for Vietnamese input.
+
+	examples/klc2c.pl
+		Add comment to the MODIFIER section about the effect of KLLF_ALTGR.
+
+	examples/dumper-msg.c
+		New file.  Do-only-trivial-reports initial implementation of untangling keyboard input.

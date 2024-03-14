@@ -1,0 +1,41 @@
+Plack::Middleware::Static::Precompressed
+
+This middleware does HTTP content negotiation based on content encoding,
+given a set of files that never change. It is meant primarily as a
+complement to middlewares such as Deflater which compress each response
+on the fly – as is necessary for generated responses, but wasteful when
+it repeats the same work for the same unchanged files over and over
+again. This middleware lets you compress each static asset file just
+once, e.g. as part of your build process, then at runtime just picks the
+smallest one that the client can use.
+
+If a URL is not matched, it is passed to the wrapped PSGI application.
+But you can also use this middleware as a standalone PSGI application, in
+which case it will return a 404 response for URLs it does not have. If
+you would like to use it like this but dislike instantiating a
+middleware, you can use the included dummy
+Plack::App::File::Precompressed wrapper.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2024 by Aristotle Pagaltzis.
+
+This is free software; you can redistribute it and/or modify it under the
+same terms as the Perl 5 programming language system itself.

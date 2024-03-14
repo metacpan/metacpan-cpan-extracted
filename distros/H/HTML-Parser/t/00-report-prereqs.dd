@@ -51,7 +51,6 @@ do { my $x = {
                                    'Config' => '0',
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
-                                   'FileHandle' => '0',
                                    'IO::File' => '0',
                                    'SelectSaver' => '0',
                                    'Test::More' => '0',

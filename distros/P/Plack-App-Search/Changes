@@ -1,3 +1,10 @@
+0.03 2024-03-14T18:57:42+01:00
+ - Add 'search_placeholder' parameter.
+ - Add image_height() accessor.
+ - Improve doc.
+ - Regen README file.
+ - Update copyright years.
+
 0.02 2023-06-09T12:39:24+02:00
  - Add another test for post method.
  - Add example to doc with button.

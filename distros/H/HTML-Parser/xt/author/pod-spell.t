@@ -10,6 +10,8 @@ set_spell_cmd('aspell list');
 add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
+49699333
+883514
 Aas
 Alders
 Antonio
@@ -83,6 +85,7 @@ capoeirab
 castaway
 chip
 demerphq
+dependabot
 dmn
 dsteinbrunner
 francois
@@ -105,5 +108,6 @@ textified
 toddr
 undecoded
 ville
+yoshikazusawa
 zefram
 Špaček

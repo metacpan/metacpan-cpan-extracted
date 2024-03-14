@@ -1,5 +1,8 @@
 Changes file for Math::JS
 
+0.05
+ - Fix bugs in t/stringify.t
+
 0.04
  - The overloading of '""' (stringification of values held by Math::JS
    objects) now automaticaly utilizes Math::Ryu if version 0.06 or later

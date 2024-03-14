@@ -131,3 +131,10 @@ Revision history for Data-Roundtrip
         Clarified the documentation that internally YAML::PP is used and
         that it has no problem with handling yaml strings which contain
         escaped quotes.
+
+0.27    2024-03-14 11:00
+        Chnaged the shortcut command-line interface
+        for the provided scripts so that
+        -r is equivalent to --terse and -d is equivalent to --indent.
+        Replaced 'warn()' with 'print STDERR'.
+        In eval()'ing code which dies (e.g. my $res = eval { YAML::PP::Dump($pv) }; ) I have used this 'if( $@ || ! defined($res) )' which now became if( ! defined($res) )'.

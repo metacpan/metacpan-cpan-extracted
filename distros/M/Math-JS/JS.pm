@@ -47,7 +47,7 @@ use constant MAX_NUM   =>  9007199254740991;
 use constant USE_RYU => $::bool; # set in BEGIN{} block
 use constant IVSIZE    => $Config{ivsize};
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 require Exporter;
 *import = \&Exporter::import;

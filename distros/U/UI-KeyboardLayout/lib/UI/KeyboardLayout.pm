@@ -1,7 +1,7 @@
 package UI::KeyboardLayout;
 
 our $VERSION;
-$VERSION = "0.77";
+$VERSION = "0.78";
 
 binmode $DB::OUT, ':utf8' if $DB::OUT;		# (older) Perls had "Wide char in Print" in debugger otherwise
 binmode $DB::LINEINFO, ':utf8' if $DB::LINEINFO;		# (older) Perls had "Wide char in Print" in debugger otherwise
@@ -1200,7 +1200,7 @@ L<the C<KBD>-bits in the Windows’ key-modifers-bitmap|"Keyboard input on Windo
 raised by every modifier.  This array is converted to a hash, the keys can be one of C<S C A>
 (for C<Shift>, C<Ctrl>, C<Alt>) possibly prepended by C<l> or C<r> (for “left” and “right”
 flavors), as well as the keys defined in C<modkeys_vk> hash.  The values are combinations
-of C<S C A K X Y Z T U V W> (for bits from 0x1 to 0x400); the bits C<X Y> have aliases
+of C<S C A K X Y Z T U V W> (for bits from 0x001 to 0x400); the bits C<X Y> have aliases
 C<R L> (for C<Roya> and C<Loya>).
 
 For example,
@@ -2836,10 +2836,10 @@ are generated.
 
 =item 5
 
-If needed, asyncroneous key state for the current key's non-left-non-right flavor is updated.
+If needed, asynchronous key state for the current key's non-left-non-right flavor is updated.
 (The rest is dropped if the key is consumed by a C<WH_KEYBOARD_LL> hook.)
 
-Asyncroneous key state for the current key is updated.  Numpad-by-number flags are updated.
+Asynchronous key state for the current key is updated.  Numpad-by-number flags are updated.
 (The rest is dropped if the key is a hotkey.)
 
 The message C<WM_(SYS)KEYDOWN/UP> is posted to the application.  If C<VK_MENU> [usually
@@ -2869,7 +2869,10 @@ the last one are marked by C<FAKE_KEYSTROKE> flag in C<lParam>.  If the initial 
 was C<WM_SYSKEYDOWN>, the C<SYS> flavor is posted; if ToUnicode() returns a
 deadkey, the C<DEAD> flavor is posted.
 
-(The bit C<ALTNUMPAD_BIT> is set/used only for the console handler.)
+(The bit C<ALTNUMPAD_BIT> is set/used only for the console handler — otherwise the character is already translated to Unicode. — It
+indicates that the character which was input-by-number
+should be interpreted “as in” OEM codepage — as opposed to ANSI-codepage/Unicode.  This happens when non-hex input was started by
+non-C<0> digit.)
 
 =back
 
@@ -2882,8 +2885,9 @@ the semantic is not.  Here we fix this.
 
 =item 1
 
-If the bit 0x01 in C<wFlags> is not set, the key event is checked for contributing to
-character-by-number input via numeric KeyPad (and numpad-by-number flags are updated).
+If the bit C<0x01> in C<wFlags> is not set, the key event is checked for contributing to
+character-by-number input via numeric KeyPad (and numpad-by-number flags are updated — unless
+the bit C<0x04> in C<wFlags> is set).
 If so, the character is
 delivered only when C<Alt> is released.  (This the only case when KEYUP
 delivers a character.)  Unless the bit 0x02 in C<wFlags> is set, the KEYUP
@@ -2941,7 +2945,10 @@ tables.  The automaton changes the state according to the input; it may also emi
 emits the ID I<and> the input, and resets to 0 state.
 
 (On KEYUP event, the changes to the state of the finite-automaton are ignored.  This is only
-relevant if C<wFlags> has bit 0x02 set.)
+relevant if C<wFlags> has bit C<0x02> set.)
+
+B<MS documents new behaviour after version ………:> (untested) if C<wFlags> has bit C<0x04> set, the initial state of the finite
+automaton is restored.
 
 =item 9
 
@@ -2997,14 +3004,15 @@ of bytes).  In multibyte codepages, numbers 0x80..0xFF
 are considered in C<cp1252> codepage (unless the translate-to codepage is Japanese, and the number’s codepoint is Katakana).
 
 B<NOTE:> If the starter key is C<KeyPad0> or C<KeyPadDOT>, the number is a codepoint in the default codepage of the keyboard layout;
-if it is another digit, it is in the OEM codepage.
+if it is another digit, it is in the OEM codepage (usually one with pseudo-graphic symbols; user-settable).  (For example, typing
+with C<Alt> keys C<1 1> may give C<U+2642=♂> on C<Alt>-release, while typing keys C<0 1 1> gives a control character C<U+000B>.)
 Enabling hex modes (C<KeyPadPLUS> or C<KeyPadDOT>) requires extra tinkering; see L<"Hex input of unicode is not enabled">.
 
 B<NOTE:> since keyboard layout normally map C<Alt> to the mask C<KBDALT>, and do not define
 a modification column for the ORed mask C<=KBDALT>, and C<KBDALT> is B<NOT> stripped for
 key events in input-by-number, these key events usually do not generate spurious C<WM_CHAR>s.
 
-B<NOTE:> if the bit 0x01 of C<wFlags> is intended to be set, then there is a way to query
+B<NOTE:> if the bit C<0x01> of C<wFlags> is intended to be set, then there is a way to query
 the kernel “what would happen if a particular key with a particular combination of modifiers
 were pressed now”.  (Recall that a “usual” ToUnicode() call is “destructive”: it modifies the
 I<state> of the keyboard stored in the kernel.  The information about whether one is in the
@@ -3015,7 +3023,7 @@ exists.
 
 Using C<wFlags=0x01|0x02>, and setting the high bit of C<wScanCode> gives the same result as
 ToUnicode() with C<wFlags=0x01> and no high bit in C<wScanCode>.  Moreover, this preserves the state of
-the deadkey-finite-automaton.  This way, one gets a “I<nondestrictive>” flavor of ToUnicode().
+the deadkey-finite-automaton.  This way, one gets a “I<non-destructive>” flavor of ToUnicode().
 
 =head2 Keyboard input on Windows, Part III: Customary “special” keybindings of typical keyboards
 
@@ -3046,13 +3054,295 @@ the following bindings with C<Ctrl-Shift> modifiers:
   ^	 ——→ 0x1e
   _	 ——→ 0x1f
 
+=head2 Can an application on Windows accept keyboard events?
+
+This may seem a silly question until one have seen zillions of various attempts tried by different
+applications to implement the support of this functionality.  All of these attempts I
+have seen are extremely buggy.
+
+B<Why?>  The key problem is that any code supporting a customizable key bindings (in particular,
+the Windows’ basic framework of APIs for applications!) needs to distinguish which case it is:
+
+=over 4
+
+=item
+
+either I<user intends> the given key chord to “be intercepted” to trigger “a certain action”
+(as in: “save this file”), or
+
+=item
+
+I<the intent> is to insert a character.
+
+=back
+
+Unfortunately, the way the kernel treats keyboard actions is not helpful in the task of
+distinguishing these two intents.  (See 
+L<"Keyboard input on Windows, Part I: what is the kernel doing?">.)
+
+Given the vast pletora of different approaches the keyboard layouts use to make character
+input convenient, an application would not be able to find out “on itself” whether a key
+press (say, C<Alt-Win-s> delivering the character C<∑>) was intended to “trigger a certain
+bindable action”.  So the only viable strategy should be:
+
+=over 4
+
+=item
+
+Find out whether a keypress B<“really”> delivers a character.
+
+=item
+
+If so, insert the character (the “intended-for-insert” case).
+
+=item
+
+If not, try to match this keypress with the list of bindable actions.
+
+=back
+
+Unfortunately, L<until recently|https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-tounicodeex>, the documented
+Windows APIs did not include the way to inspect the “really”-part above.  So different applications tried various hacks — failing
+in all but the most trivial cases.
+
+B<The difficulty:> L<C<KBDALT> stripping|"Keyboard input on Windows, Part II: The semantic of ToUnicode()"> does not allow one to
+see whether the C<Alt>-modifier was used to “modify” the character
+delivered by the keyboard layout, or it was used to “trigger an C<Alt>-action.  With C<Win>-modifier there is no stripping, but
+a similar problem still remains (since by default this modifier have no C<KBD>-bits attached).  To add insult to injury, some
+C<Ctrl>-chords also deliver characters — but these are not intended for character input!
+
+B<The core difficulty:> to implement the scheme above, we need to C<check first> which character is delivered by a keypress.
+However, the APIs to do this¹⁾ I<reset the stored state> of the keyboard layout (“the current prefix=dead key”).  So after doing
+this, we I<can find> “whether a character is delivered” — but this stops our further attempts to investigate “the ‘really delivered’
+ bit” discussed above.
+
+  ¹⁾  ToUnicodeEx() or TranslateMessage(). — The latter is just a shallow wrapper
+                       for sending a character message described by ToUnicodeEx().
+
+=head2 The “easy parts of the logic”
+
+This goes like this:
+
+If C<ToUnicodeEx()> delivers a prefix=dead key, this is not an accelerator.  So the correct behaviour is “do
+nothing” (“the destructive version” alread modified the internal state of the keyboard layout appropriately!  If it was
+non-destructuve, “redo it destructively”).
+
+So. assume we know that C<ToUnicodeEx()> delivers a character.
+
+=over
+
+=item
+
+If there is no C<Win>, C<Alt>, C<Ctrl> modifiers pressed, then I<it is definitely> “intended-for-insert”.
+
+=item
+
+Same if this happens after “a prefix key”.  (To know this, raise a flag after getting a C<WM_(SYS)DEADCHAR>, and lower after
+getting a C<WM_(SYS)CHAR> or
+L<a C<WM_(SYS)DEADCHAR> with C<string="\0">|"It is not documented how to make a with-prefix-key(s) combination produce 0-length string"> — or equivalents of these from C<ToUnicodeEx()>.)
+
+=item
+
+If C<Ctrl> is down, this character may still be “fake” — when the intent is not “insert this”.  However, these cases are easy to
+detect: just mark all the C<WM_(SYS)CHAR> carrying characters in the range C<0x00..0x1f>, C<0x7f> as “non-insert”, and
+do the same with C<0x20> delivered when one of C<Ctrl> keys is down.
+
+=item
+
+However, given how the kernel treats C<Win>- and C<Alt>-modifiers (ignores C<Win> and possibly-strips C<KBDALT>), when the
+user combines a keypress with C<Win>¹⁾ (and — in basic cases — with C<Alt>), the delivered character remains the same.  But such
+chords are definitely I<not intended-for-insert>!
+
+  ¹⁾ This assumes that keyboard layout is ignoring Win-modifier — as most of layouts do.
+
+This B<forces one to inspect whether removing C<Alt> and/or C<Win> from the chord leaves the delivered character the same>.  If
+so — this is not intended for insert!  The following sections discuss two approaches: a hack, and a 100%-robust one.
+
+=back
+
+=head2 The ultra-simple approach
+
+What we describe here is still a hack. — However it avoids using “only-recently-documented” non-destructive APIs of Windows, and
+works in overwhelming majority of tricky cases (meaning: the cases where most of other approaches tried in Windows’ applications
+fail).  It was implemented in Emacs in mid-10s, and only one bug (quickly worked around) was reported.
+
+B<The problem:> how to find out whether removing C<Win>- and C<Alt>-modifiers would deliver the same character as returned by the
+earlier call to C<ToUnicodeEx()>?  For example, on one layout C<Win>-modifer “is not bound”, but C<]>-key delivers C<щ> (a quite
+common situation), on the other layout it delivers C<]>, but C<Win> “is bound”, and C<Win-]> delivers C<щ>.  If we can see that
+a chord-with-C<Win> delivers C<щ>, then in the first case we should better call the action associated with C<Win-щ>, while in the
+second case we should insert C<щ>.
+
+Here we assume that the call to C<ToUnicodeEx()> was destructive, so calling C<ToUnicodeEx()> again “is too late”.
+The hack is to call L<C<VkKeyScanW()>|https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-vkkeyscanw> on the
+delivered character.  (In particular, the delivered I<string> should contain only one codepoint; so this would not work for
+characters above C<U+FFFF>, and multi-char strings — but in the latter case it is hard to imagine how this makes sense with an
+“extra” C<Alt>-modifier.)
+
+This call returns “(one of) the way(s) to reach this character from the given keyboard layout” — which is a combination of the
+C<VK_>-code, and of the “needed modifier bitmap”.  (Here it may be advisable to look in
+L<"A convenient assignment of C<KBD*> bitmaps to modifier keys">.)  So now one can proceed like this:
+
+=over 4
+
+=item
+
+Since there may be several ways to type this character, we may get “a mismatching combination”.  If the mismatch is in the
+C<VK_>-key — tough luck: but see the corresponding comment in C<get_wm_chars()> in
+L<https://github.com/emacs-mirror/emacs/blob/master/src/w32fns.c#L3833>; it seems that in this case, it is a good heuristic to
+ assume that this key chord is intended-for-insert iff the delivered character is non-ASCII!)
+
+=item
+
+So now we assume that what C<VkKeyScanW() reported matches the C<VK_>-code of the pressed key.  Then we can compare the reported
+C<KBD*> bitmap with the modifier keys which are down.  
+
+=back
+
+Discuss first the common cases.  Usually C<Win> does not generate C<KBD*> bits, and if it generates them, they should be
+C<KBDKANA> or above.  C<CONCLUSION:> if the bitmask is below C<KBDKANA>, and C<Win> is down, then this character may be entered
+without pressing C<Win>, so this-chord-with-C<Win> is not intended for insert.
+
+More generally, if the returned bitmap is C<KBDSHIFT|KBDALT|KBDCTRL=7> or below, then on any keyboard layout with even microscopic
+sanity, this means that the bitmasks on the pressed keys “match their names”, and we can find exactly which combination of keys
+I<is needed> to emit this character — and this is exactly what we need.  So if more modifiers than strictly necessary are pressed
+down, we can “strip away the ‘needed’ modifiers”, and trigger the action associated with our character and the remaining modifiers.
+
+(If both C<left> and C<right> versions of a certain modifier are down, one should better follow what Windows’ “accelerator
+framework” does: with both C<lCtrl> and C<rAlt> are down, it would prefer striping C<lCtrl> and C<rAlt>.)
+
+Furthermore even if bitmap is 8 or more, if only one C<Ctrl> is down, and the bitmap has C<KBDCTRL> set, then the 
+C<Ctrl>-modifier should be ignored; likewise for C<Alt>-logic. — And if after this, there is no non-ignored C<Alt>-, C<Ctrl>- or
+C<Win>-modifiers which are pressed, this chord is “intended-for-insert”; otherwise, the non-ignored modifiers “lead to a
+boundable event”.  (Indeed, if the bitmap does not have C<KBDALT> set, and C<Alt> is pressed, then this character may be entered
+without pressing C<Alt>, so this-chord-with-C<Alt> is not intended for insert, and “has C<Alt> added”.)
+
+(The latter logic is due to the common case of the bitmap associated to C<Ctrl> including the bit C<KBDCTRL>, and the bitmap
+associated to C<Alt> including the bit C<KBDALT>.)
+
+The only unhandled cases are when the bitmap is above C<KBDSHIFT|KBDALT|KBDCTRL=7>, and either C<Win> is down, or there is a
+non-ignored C<Alt> or C<Ctrl>.  This case needs “tricky heuristics” — but it seems that the logic used above for “the case of
+mismatched C<VK_>-codes” is still applicable: if the delivered char is ASCII, consider this as a bindable event, otherwise
+it is “intended for insert”.
+
+B<Remark:> See the link above for how Emacs does it and how it is commented.  (However, keep in mind that this codes wants to be
+as compatible as possible with “the ideosyncratic ways of old versions of Emacs”.)
+
+B<Caveat:> the API in question allows accessing the lower 8 bit of the modifiers-bitmap.  Since this bitmap seems to be 16-bit,
+this approach may give some bogus results (but in very tricky cases only!) for the keyboard layouts which use these extra bits.
+
+=head2 The bullet-proof method
+
+B<Warning:> this is untested.  It is recommended that
+L<"Can an application on Windows accept keyboard events?  Part I: insert only"> (and the followup parts) be consulted too before
+implementing this.  This should also be better enhanced by
+L<C<lAlt-lCtrl>-recognition|"Can an application on Windows accept keyboard events?  Part IV: application-specific modifiers">.
+
+Nowadays, when the
+L<non-destructive ways of querying keyboard|https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-tounicodeex>
+are finally documented, one can do this easily.  Recall that we need to find out whether a character delivered by a chord may
+be entered with fewer modifier keys pressed — and I<we know which modifier keys we are interested in>!  So
+
+=over 4
+
+=item
+
+Call C<ToUnicodeEx()> non-destructively; store the resulting string (we may assume it is not empty — otherwise it it trivially 
+not-intended-for-insert — unless this happens after a prefix=dead key).
+
+=item
+
+Running through the list of “known modifier keys”, if this key is pressed, reissue the C<ToUnicodeEx()> calls with the (temporarily)
+modified array where this key is not pressed.  If the result is the same as before — this modifier key is “excessive”!  Memorize
+this key, unset it permanently in the array, and rerun this stage.
+
+=item
+
+Sooner or later we reach this stage.  We memorized a (maximal!) set of “excessive” modifiers.  Restore them in the “is␣pressed”
+array, and make a final call to C<ToUnicodeEx()> — this time destructively.  (Of course, it returns the result we already
+know — but the keyboard layout needs this to handle sequences of keypresses “as intended”.
+
+=back
+
+The rest is very simple: if the delivered character is a control character, or C<" ">-and-C<Ctrl>-is-down, it should be
+ignored, — or maybe interpreted by adding C<Ctrl> to “excessive modifiers” after un-C<Ctrl>ing this character.  Finally, if there is
+no “excessive” modifiers, this chord is “intended-for-insert”.  If there are “excessive” modifiers, then the
+delivered character should be “augmented by these excessive modifiers” and translated to a bindable event.
+
+B<Caveat:> I<there is one case> when the logic above fails>: we try to check whether removing modifiers could produce the same
+result — but this assumes that I<the user can remove these modifiers!>  While with C<KLLF_ALTGR>, the kernel “mocks” pressing the
+left C<Ctrl> keys when C<AltGr> is pressed — and I<the user can do nothing to control this>.  If the bitmaps produced by C<lCtrl>
+and C<rAlt> are I<independent>, everything is fine.  Unfortunately,
+L<our advice to developers is|"Windows combines modifier bitmaps for C<lCtrl>, C<Alt> and C<rAlt> on C<AltGr>">
+to make the bitmap on C<rAlt> I<consume the bitmap for C<lCtrl>> (to avoid developers’ confusion).  Then this algorithm would
+B<“wrongly”> find
+out that “removing C<lCtrl> does not change the result” — so this case should be special-cased: avoid removing C<lCtrl> if C<rAlt>
+is down and
+L<it is not known that the flag C<KLLF_ALTGR> is absent|"Many applications need to know the state of hidden flag C<KLLF_ALTGR>">.
+
+B<Note:> for the last stage, it is advisable to “pass the obtained string/prefix-char to ourselves” via C<CHAR> and C<DEADCHAR>
+messages — as C<TranslateMessage()> does.  This would allow external applications to interact with our application “in the usual
+way”: by sending suitable messages.
+
+B<Reminder:> the
+L<non-destructive ways ToUnicode()|https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-tounicodeex> can be
+coded in two ways: first, on newer Windows, put C<wFlags=0x04>.  On older Windows, put C<wFlags=0x01|0x02>, raise the high bit
+of C<lParam> “from key-down to key-up”, and process
+L<“input-by-number”|"Keyboard input on Windows, Part II: The semantic of ToUnicode()"> in your application.  (Theoretically, one
+could use C<wFlags=0x02> — but I expect that processing key-up events for [hex]digits during input-by-number — they
+change the state — may be tricky.  Should not one follow the I<very quirky> [see the preceding reference] logic of the kernel
+I<precisely>?)
+
+=head2 Possible enhancements and caveats
+
+The method above is so powerful that one may want to use it to enhance the user’s experience yet more.  For 
+example, suppose a Greek keyboard layout sends Latin characters after a prefix-key C<Shift-Space> (so C<Shift-Space σ> sends C<s>).
+How can a user trigger the C<Alt-S> binding of the application?  “The obvious way” is to try C<Alt-Shift-Space σ>.  This
+may obviously fail in two cases: the keyboard layout may “do something” on C<Alt-Shift-Space>; or: the application may
+have C<Alt-Shift-Space> bound to some action.
+
+However, observe what happens when none of these cases is applicable.  With the scheme above the keyboard-input handler of the
+application I<already knows> that C<Alt-Shift-Space> is “C<Alt> combined with the prefix key C<Shift-Space>”.  In principle, I<if
+it can get the “feedback from the event-binding engine” that C<Alt-Shift-Space> is unbound>, it I<might> start processing this
+as an “C<Alt>-modified sequence of keypresses”.  (For this, it would memorize that “C<Alt>-modifier should be applied to the
+eventual result”, and proceed until an “insert event” or a bindable-event is detected — possibly stripping the “êxcessive”
+C<Alt>-modifiers.  Then the engine would apply “another excessive modifier” C<Alt> to the resulting “insert event”. — And what to
+do with bindable events — it is a judgement call…)  C<Warning:> one may choose to also apply this approach for C<Ctrl>
+modifier — mutatis mutandis.
+
+C<Warning:> (This concerns a completely fictional situation.)  We did not discuss what to do if a text input event corresponds to
+“a multi-character sequence I<with “excess” modifiers>. — And this is a judgement call!  For example, to bind C<Alt-Space> Emacs’
+APIs use a “symbolic name” C<space>, so from the point of view of these APIs this event is a combination of a modifier C<Alt> and
+this “symbol” C<space>.  How to present to it the input event which has an “excessive modifier” C<Alt> and the “delivered string”
+being C<"space">?!  One made-up solution is to present it using a “symbol name” C<S_space> — this should not cause any confusion
+with C<VK_>-codes.  Another is to deliver C<Alt-s Alt-p Alt-a …>.  (Or just make this user-configurable!)
+
+C<Note:> One major shortcoming of different schemes of binding events is that they assume that “the language of” the keyboard
+matches the language of the UI of the application/session.  Suppose that the application “works in English context”, but I switched
+to Greek keyboard layout to enter a Greek fragment.  Suppose I want to trigger an event assigned to C<Alt-s> key chord.  The user
+would definitely prefer this to be triggered by pressing C<Alt> and hitting the key marked as C<s>!  However, what the application
+can see is the event C<Alt-σ> — although it may also deduce that it comes from C<VK_>-code C<S>, so it may be I<also> interpreted
+as C<Alt-s>. — And the application cannot I<guess my intent> — did I want to trigger the binding assigned to C<Alt-σ> or to
+C<Alt-s>?!
+
+(It seems that to make the best of a bad situation, the input engine may need to pass to the binding engine I<a list of possible
+interpretations> of a key chord (as opposed to “just one”) — delegating the resolution to the binding engine.  If the latter can
+see that only one of these is defined — then it is clear what to do!)
+
+One way to put a workaround for this (on the level of the keyboard layout) is
+discussed in the note in L<"A convenient assignment of C<KBD*> bitmaps to modifier keys">.
+
 =head2 Can an application on Windows accept keyboard events?  Part I: insert only
+
+B<Warning:> Nowadays this may be obsolete.  I recommend inspecting L<"Can an application on Windows accept keyboard events?"> (and
+the following sections) first.
 
 The logic described above makes the kernel deliver more or less “correct” C<WM_(SYS)CHAR> messages
 to the application.  The only bindings which may be defined in the keyboard layout, but will not be
 seen as C<WM_(SYS)CHAR> are those in modification columns which involve C<KBDALT>, and do not
-involve any bits except C<KBDSHIFT> and C<KBDKANA>.  (Due to the stripping of C<KBDALT> described
-above, these modification columns are never accessed — I<well, they are, but only for input-by-number>.)
+involve any bits except C<KBDSHIFT> and C<KBDKANA>.  (Due to
+L<the stripping of C<KBDALT>|"Keyboard input on Windows, Part II: The semantic of ToUnicode()"> described
+above, these modification columns are never accessed — I<well, they are, but
+L<only for input-by-number|"Keyboard input on Windows, Part II: The semantic of ToUnicode()">>.)
 
 Try to design an application with an entry field; the application should insert B<ALL> the
 characters ”delivered for insertion” by the keyboard layout and the kernel.  The application
@@ -3095,7 +3385,7 @@ Moreover, if “supporing only the naive mapping” were a feasible
 restriction, there would be no reason for the kernel to go through the extra step of “the ORed mask”.
 Actually, to have a keyboard which is simultaneously backward compatible, easy for users, and
 covering a sufficiently wide range of possible characters, one B<must> use more or
-less convoluted implementations (as in L<A convenient assignment of C<KBD*> bitmaps to modifier keys>).
+less convoluted implementations (as in L<"A convenient assignment of C<KBD*> bitmaps to modifier keys">).
 
 B<CONCLUSION:> the fact that the kernel and the applications speak different
 incompatible languages makes even the primitive task discussed here impossible
@@ -3109,6 +3399,9 @@ keys as a bindable accelerator keys.  We address this question in the L<Part IV|
 
 =head2 Can an application on Windows accept keyboard events?  Part II: special key events
 
+B<Warning:> Nowadays this may be obsolete.  I recommend inspecting L<"Can an application on Windows accept keyboard events?"> (and
+the following sections) first.
+
 In the preceding section, we considered the most primitive application accepting
 the user inserting of characters, and nothing more.  “Real applications” must
 support also keyboard actions different from “insertion”; so those KEYDOWN events
@@ -3120,7 +3413,7 @@ characters ”delivered for insertion” by the keyboard layout and the kernel.
 For all the keyboard events I<not related to insertion of characters>, the application
 should write to the log file which of C<Ctrl/Alt/Shift> modifiers were down,
 and the virtual keycode of the KEYDOWN event.  Again, at first, we ignore
-the C<KBDALT> stripping.
+L<the C<KBDALT> stripping|"Keyboard input on Windows, Part II: The semantic of ToUnicode()">.
 
 At first, the problem looks simple: with the standard message pump, when C<WM_(SYS)KEYDOWN>
 message is processed, the corresponding C<WM_(SYS)(DEAD)CHAR> messages are already
@@ -3129,7 +3422,8 @@ and not “special”, they correspond to “insertion”, so nothing should be 
 Otherwise, one reports this C<WM_(SYS)KEYDOWN> to the log.
 
 Unfortunately, this solution is wrong.  Inspect again what the kernel is delivering
-during the input-by-number via numeric keyboard: the KEYDOWN for decimal/hex digits
+during L<the input-by-number via numeric keyboard|"Keyboard input on Windows, Part II: The semantic of ToUnicode()">:
+the KEYDOWN for decimal/hex digits
 B<is> a part of the “insertion”, but it does not generate any C<WM_(SYS)(DEAD)CHAR>.
 Essentially, the application may see C<Alt-F> pressed during the processing of
 C<Alt-NumPadPlus+F+1+2>, but even if C<Alt-F> is supposed to format the paragraph,
@@ -3147,7 +3441,8 @@ B<POSSIBLE IMPLEMENTATION>: myTranslateMessage() should:
 
 =item *
 
-when non handling input-by-number, call ToUnicode(), but use C<wFlag=1>, so that ToUnicode() does not handle input-by-number.
+when non handling L<input-by-number|"Keyboard input on Windows, Part II: The semantic of ToUnicode()">,
+call ToUnicode(), but use C<wFlag=0x01|0x02>, so that ToUnicode() does not handle input-by-number.
 
 =item *
 
@@ -3227,6 +3522,9 @@ In addition to 8-bitness, Emacs also suffers from check-for-specials-first syndr
 
 =head2 Can an application on Windows accept keyboard events?  Part III: better detection of C<KBDALT> stripping
 
+B<Warning:> Nowadays this may be obsolete.  I recommend inspecting L<"Can an application on Windows accept keyboard events?"> (and
+the following sections) first.
+
 We explained above that L<it is not possible to make a bullet-proof algorithm
 handling the case when C<KBDALT> might have been stripped by the kernel|"Can an application on Windows accept keyboard events?  Part I: insert only">.  The
 very naive heuristic algorithm described there will recognize the simplest
@@ -3273,6 +3571,9 @@ I saw provide close-to-abysmal support of keyboard input on Windows.)
 
 =head2 Can an application on Windows accept keyboard events?  Part IV: application-specific modifiers
 
+B<Warning:> Nowadays this may be obsolete.  I recommend inspecting L<"Can an application on Windows accept keyboard events?"> (and
+the following sections) first.
+
 Some application handle certain keys as “extra modifiers for the purpose of
 application-specific accelerator keypresses”.  For example, Emacs may treat
 the C<ApplicationMenu> in this way (as a C<Super> modifier for its bindable-keys
@@ -3318,7 +3619,7 @@ call of ToUnicode() corresponding to the currently pressed down modifiers.)
 
 Fortunately, with the framework described in the
 L<Part III|"Can an application on Windows accept keyboard events?  Part III: better detection of C<KBDALT> stripping">,
-the call of ToUnicode() is performed with C<wFlags> being 0x01.  As explained near the end of the section
+the call of ToUnicode() is performed with C<wFlags> being C<0x01|0x02>.  As explained near the end of the section
 L<"Keyboard input on Windows, Part II: The semantic of ToUnicode()">, this call has a “non-destructive”
 flavor!  Hence, for applications with such “enhanced” modifier keys, the logic of the
 L<Part III|"Can an application on Windows accept keyboard events?  Part III: better detection of C<KBDALT> stripping">
@@ -3336,9 +3637,10 @@ Make a non-destructive call of ToUnicode().  Store the result.  If no insertable
 If both left C<Ctrl> and left C<Alt> are down (AND right C<Ctrl> AND right C<Alt> are up!) 
 replace left C<Alt> by the right C<Alt>, and
 make another non-destructive call of ToUnicode().  If the result is identical to the first one,
-mark C<leftCtrl+leftAlt> as “special modifiers present for accelerators”.
+mark C<leftCtrl+leftAlt> as “special modifiers present for accelerators”.  (This assumes that
+L<the keyboard has C<KLLF_ALTGR> bit set|"Many applications need to know the state of hidden flag C<KLLF_ALTGR>">.)
 
-Remove left C<Ctrl> and left C<Alt> from the collection of keys which are down (argument to ToUnicde()),
+Remove left C<Ctrl> and left C<Alt> from the collection of keys which are down (argument to ToUnicode()),
 and continue with the previous step.
 (This may be generalized to other combinations of left/right C<Alt>/C<Ctrl>.)
 
@@ -3379,7 +3681,8 @@ the application would
 
 =item *
 
-Handle C<Alt>-NUMPAD input-by-number in an intuitive mostly compatible with Windows way 
+Handle L<C<Alt>-NUMPAD input-by-number|"Keyboard input on Windows, Part II: The semantic of ToUnicode()"> in an intuitive mostly
+compatible with Windows way 
 (but not bug-for-bug compatible with the Windows' way);
 
 =item *
@@ -3431,7 +3734,7 @@ The limitation is that the number of modification columns compatible with the
 extra table is at most 8.)
 
 B<WARNING:> it turns out that the preceding paragraph is bogus.  In fact, I<these specific FE-hacks operate on very different
-assumptions than the rest of the Windows’ keyboard logic.  In particular, the tables-of-length-8 are driven I<not by ORed-bitmaps
+assumptions> than the rest of the Windows’ keyboard logic.  In particular, the tables-of-length-8 are driven I<not by ORed-bitmaps
 assigned to the modification keys>, but by “physical modifier C<Shift>, C<Ctrl>, C<Alt> modification buttons.  (In particular,
 even with C<KLLF_ALTGR>-flag, the key C<AltGr> is counted as C<Alt> and not C<Ctrl+Alt>.)
 
@@ -3610,13 +3913,13 @@ C file compiled into the layout DLL:
         VK_CAPITAL,                   // Base Vk
         KBDNLS_TYPE_TOGGLE,         // NLSFEProcType
         KBDNLS_INDEX_NORMAL,        // (The initial value of) the memory bit  (.NLSFEProcCurrent)
-        0x10, /* 00010000 */        // NLSFEProcSwitch (is “active” in positions marked with [*] below)
+        0x10, /* 00010000 */        // NLSFEProcSwitch (is “active” in positions marked with ☑ below)
         {                           // NLSFEProc
             {KBDNLS_SEND_BASE_VK,0},           // Base    (These are “real” states of SHIFT etc, not “fancy”)
             {KBDNLS_SEND_BASE_VK,0},           // Shift
             {KBDNLS_SEND_BASE_VK,0},           // Control
             {KBDNLS_SEND_BASE_VK,0},           // Shift+Control
-            {KBDNLS_SEND_PARAM_VK,VK_OEM_AX},  // Alt                 [*] (= “use the second table on release”) AltGr ⇒ Alt
+            {KBDNLS_SEND_PARAM_VK,VK_OEM_AX},  // Alt                 ☑ (= “use the second table on release”) AltGr ⇒ Alt
             {KBDNLS_SEND_BASE_VK,0},           // Shift+Alt
             {KBDNLS_SEND_BASE_VK,0},           // Control+Alt
             {KBDNLS_SEND_BASE_VK,0}            // Shift+Control+Alt
@@ -3626,7 +3929,7 @@ C file compiled into the layout DLL:
             {KBDNLS_SEND_PARAM_VK,VK_OEM_AX},  // Shift
             {KBDNLS_SEND_PARAM_VK,VK_OEM_AX},  // Control
             {KBDNLS_SEND_PARAM_VK,VK_OEM_AX},  // Shift+Control
-            {KBDNLS_SEND_PARAM_VK,VK_OEM_AX},  // Alt                 [*] ( AltGr ⇒ Alt )
+            {KBDNLS_SEND_PARAM_VK,VK_OEM_AX},  // Alt                 ☑ ( AltGr ⇒ Alt )
             {KBDNLS_SEND_PARAM_VK,VK_OEM_AX},  // Shift+Alt
             {KBDNLS_SEND_PARAM_VK,VK_OEM_AX},  // Control+Alt
             {KBDNLS_SEND_PARAM_VK,VK_OEM_AX}   // Shift+Control+Alt
@@ -3672,17 +3975,85 @@ C<Warnong:> for less confusion, it is probably advisable to implement the C<VK_>
 that C<Alt> may be combined with other modifiers.  Then the start of the table entry above should be changed to:
 
         KBDNLS_INDEX_NORMAL,        // (The initial value of) the memory bit  (.NLSFEProcCurrent)
-        0xF0, /* 11110000 */        // NLSFEProcSwitch (is “active” in positions marked with [*] below)
+        0xF0, /* 11110000 */        // NLSFEProcSwitch (is “active” in positions marked with ☑ below)
         {                           // NLSFEProc
             {KBDNLS_SEND_BASE_VK,0},           // Base    (These are “real” states of SHIFT etc, not “fancy”)
             {KBDNLS_SEND_BASE_VK,0},           // Shift
             {KBDNLS_SEND_BASE_VK,0},           // Control
             {KBDNLS_SEND_BASE_VK,0},           // Shift+Control
-            {KBDNLS_SEND_PARAM_VK,VK_OEM_AX},  // Alt                 [*] (= “use the second table on release”) AltGr ⇒ Alt
-            {KBDNLS_SEND_PARAM_VK,VK_OEM_AX},  // Shift+Alt           [*] (= “use the second table on release”)
-            {KBDNLS_SEND_PARAM_VK,VK_OEM_AX},  // Control+Alt         [*] (= “use the second table on release”)
-            {KBDNLS_SEND_PARAM_VK,VK_OEM_AX}   // Shift+Control+Alt   [*] (= “use the second table on release”)
+            {KBDNLS_SEND_PARAM_VK,VK_OEM_AX},  // Alt                 ☑ (= “use the second table on release”) AltGr ⇒ Alt
+            {KBDNLS_SEND_PARAM_VK,VK_OEM_AX},  // Shift+Alt           ☑ (= “use the second table on release”)
+            {KBDNLS_SEND_PARAM_VK,VK_OEM_AX},  // Control+Alt         ☑ (= “use the second table on release”)
+            {KBDNLS_SEND_PARAM_VK,VK_OEM_AX}   // Shift+Control+Alt   ☑ (= “use the second table on release”)
         },
+
+=head2 Another redefinition to avoid problems with the C<KLLF_ALTGR> flag
+
+As mentioned in L<"Windows combines modifier bitmaps for C<lCtrl>, C<Alt> and C<rAlt> on C<AltGr>">, while the C<KLLF_ALTGR> flag
+(in the keyboard definition) is useful for support of legacy applications, it does not allow the keyboard behave differently
+with C<rAlt> and with C<lCtrl-rAlt> modifiers.
+
+However, with these definitions C<lCtrl> and C<rAlt> produce two different C<VK_codes> depending on whether C<Ctrl> and/or
+C<Alt> were pressed I<before> the corresponding keypresses:
+
+    {
+        VK_LCONTROL,                // Base Vk
+        KBDNLS_TYPE_TOGGLE,         // NLSFEProcType
+        KBDNLS_INDEX_NORMAL,        // (The initial value of) the memory bit  (.NLSFEProcCurrent)
+        0xC0, /* 11000000 */        // NLSFEProcSwitch (is “active” in positions marked with ☑ below)
+        {                           // NLSFEProc
+            {KBDNLS_SEND_BASE_VK,0},           // Base    (These are “real” states of SHIFT etc, not “fancy”)
+            {KBDNLS_SEND_BASE_VK,0},           // Shift
+            {KBDNLS_SEND_BASE_VK,0},           // Control
+            {KBDNLS_SEND_BASE_VK,0},           // Shift+Control
+            {KBDNLS_SEND_BASE_VK,0},           // Alt                 (AltGr is counted as Alt and not Ctrl+Alt - even with KLLF_ALTGR)
+            {KBDNLS_SEND_BASE_VK,0},           // Shift+Alt       
+            {KBDNLS_SEND_PARAM_VK,VK_OEM_PA3}, // Control+Alt         ☑ (= “use the second table on release”)
+            {KBDNLS_SEND_PARAM_VK,VK_OEM_PA3}  // Shift+Control+Alt   ☑ (= “use the second table on release”)
+        },
+        {                // NLSFEProcAlt: if VK_OEM_PA3-down was generated, generate VK_OEM_PA3-up for all themod-combinations
+            {KBDNLS_SEND_PARAM_VK,VK_OEM_PA3},  // Base
+            {KBDNLS_SEND_PARAM_VK,VK_OEM_PA3},  // Shift
+            {KBDNLS_SEND_PARAM_VK,VK_OEM_PA3},  // Control
+            {KBDNLS_SEND_PARAM_VK,VK_OEM_PA3},  // Shift+Control
+            {KBDNLS_SEND_PARAM_VK,VK_OEM_PA3},  // Alt                     (AltGr is counted as Alt and not Ctrl+Alt - even with KLLF_ALTGR)
+            {KBDNLS_SEND_PARAM_VK,VK_OEM_PA3},  // Shift+Alt
+            {KBDNLS_SEND_PARAM_VK,VK_OEM_PA3},  // Control+Alt         ☑
+            {KBDNLS_SEND_PARAM_VK,VK_OEM_PA3}   // Shift+Control+Alt   ☑
+        }
+    },
+    {
+        VK_RMENU,                // Base Vk
+        KBDNLS_TYPE_TOGGLE,         // NLSFEProcType
+        KBDNLS_INDEX_NORMAL,        // (The initial value of) the memory bit  (.NLSFEProcCurrent)
+        0xCC, /* 11001100 */        // NLSFEProcSwitch (is “active” in positions marked with ☑ below)
+        {                           // NLSFEProc
+            {KBDNLS_SEND_BASE_VK,0},            // Base    (These are “real” states of SHIFT etc, not “fancy”)
+            {KBDNLS_SEND_BASE_VK,0},            // Shift
+            {KBDNLS_SEND_PARAM_VK,VK_OEM_PA2},  // Control             ☑ (= “use the second table on release”)
+            {KBDNLS_SEND_PARAM_VK,VK_OEM_PA2},  // Shift+Control       ☑ (= “use the second table on release”)
+            {KBDNLS_SEND_BASE_VK,0},            // Alt                     (AltGr is counted as Alt and not Ctrl+Alt - even with KLLF_ALTGR)
+            {KBDNLS_SEND_BASE_VK,0},            // Shift+Alt
+            {KBDNLS_SEND_PARAM_VK,VK_OEM_PA2},  // Control+Alt         ☑ (= “use the second table on release”)
+            {KBDNLS_SEND_PARAM_VK,VK_OEM_PA2}   // Shift+Control+Alt   ☑ (= “use the second table on release”)
+        },
+        {                // NLSFEProcAlt: if VK_OEM_PA3-down was generated, generate VK_OEM_PA3-up for all themod-combinations
+            {KBDNLS_SEND_PARAM_VK,VK_OEM_PA2},  // Base
+            {KBDNLS_SEND_PARAM_VK,VK_OEM_PA2},  // Shift
+            {KBDNLS_SEND_PARAM_VK,VK_OEM_PA2},  // Control             ☑ (= “use the second table on release”)
+            {KBDNLS_SEND_PARAM_VK,VK_OEM_PA2},  // Shift+Control       ☑ (= “use the second table on release”)
+            {KBDNLS_SEND_PARAM_VK,VK_OEM_PA2},  // Alt
+            {KBDNLS_SEND_PARAM_VK,VK_OEM_PA2},  // Shift+Alt
+            {KBDNLS_SEND_PARAM_VK,VK_OEM_PA2},  // Control+Alt         ☑
+            {KBDNLS_SEND_PARAM_VK,VK_OEM_PA2}   // Shift+Control+Alt   ☑
+        }
+    }
+
+This way one can distinguish user pressing both C<lCtrl> and C<rAlt> even with C<KLLF_ALTGR> (the result depends on the order in
+which these two modifiers were pressed — though in practice this is not important).  By assigning C<PA2> and C<PA3> suitable
+bitmasks, one can define how the keyboard behaves when both these modifiers are down.  (However, this requires consuming 1 extra
+bit in the modifiers-bitmap.  If it is indeed 16-bit as it seems, this should be OK even with the assignment from the next
+section.)
 
 =head2 A convenient assignment of C<KBD*> bitmaps to modifier keys
 
@@ -3730,9 +4101,20 @@ still happens with the assignment above.  It results in the bitmap C<KBDKANA> (p
  with C<KBDSHIFT>).  For normal functionality of the C<left_Alt>-keys, one should redirect
 these bitmaps to modification columns by I<stripping C<KBDKANA>> from these two bitmaps.
 
-C<NOTE:> since C<KBDALT> stripping leaves a non-base bitmap, one can map to a column I<specific
+B<NOTE:> since C<KBDALT> stripping leaves a non-base bitmap, one can map to a column I<specific
 to C<Alt>-bindings>.  In particular, even if a keyboard is non-Latin, one can still make C<Alt->keys
-activate English-language menu entries, or trigger Latin-bases accelerator in an application.
+activate English-language menu entries, or trigger Latin-bases accelerator in an application.  (Compare
+with what is discussed in L<"Possible enhancements and caveats">.)
+
+B<Remark:> the assignment to the left C<Alt> is more or less “fixed” (compare with
+L<Windows ignores C<lAlt> if its modifier bitmaps is not standard>).  Likewise, 
+the assignment to the C<rAlt=AltGr> is explained in
+L<"Windows combines modifier bitmaps for C<lCtrl>, C<Alt> and C<rAlt> on C<AltGr>">.
+
+C<Caveat:> the latter assignment leads to possible complications (see B<Caveat> in L<"The bullet-proof method">).  So the
+assignment above should only be “used when designing ‘what different modification columns should do’”. — However, in the actual
+C<MODIFIERS> section of the keyboard layout one should better remove the bits of C<lCtrl> from the bits in C<rAlt> (preferably
+leaving a comment about “the effective” bits! — this is what this module is doing).
 
 This is continued in L<More (random) rambling on assignment of key combinations>.
 
@@ -3916,7 +4298,7 @@ B<NOTE:> Some applications may do a "reverse lookup" using
 L<C<VkKeyScanW()>|https://msdn.microsoft.com/en-us/library/windows/desktop/ms646329%28v=vs.85%29.aspx> 
 (this is B<the only> API which exposes the modifier masks).  Most of these calls would not
 know anything about "higher bits", only S/C/A would be covered.  In particular,
-it makes sense to add "fake" entries mapping combinations of bits 0x1/0x2/0x4 to the
+it makes sense to add "fake" entries mapping combinations of bits 0x01/0x02/0x04 to the
 "corresponding" modification columns.
 
 For example, C<rAlt> above would produce modififier mask C<CTRL|ALT|LOYA|X1>; 
@@ -4917,6 +5299,12 @@ or use the C</verbose> option on the linker to get more detailed output:
 
 (Another conjectural reason: a conflict between an extern declaration and a static definition of a symbol.)
 
+=head2 The generated table of C<KEYNAME>s is wrong for C<F>-keys
+
+The numeric part is C<VK_>-codes, while it should be the scancodes.  Similarly, in the
+“extended” section appear mysterious keys C<< <00> >>, C<Help> (in positions C<X54>, C<X56>)
+which do not seem to be present anywhere.
+
 =head1 WORKAROUND summary of the productive “alternative” workflow with F<.klc>
 
 =head2 Summary of the productive workflow with F<.klc>:
@@ -4992,12 +5380,6 @@ that C<%Keyboard_Layout_Creator%> is set so that
   %Keyboard_Layout_Creator%\bin\i386\kbdutool.exe
 
 exists — although now it uses only the C compiler from this distribution).
-
-=head2 The generated table of C<KEYNAME>s is wrong for C<F>-keys
-
-The numeric part is C<VK_>-codes, while it should be the scancodes.  Similarly, in the
-“extended” section appear mysterious keys C<< <00> >>, C<Help> (in positions C<X54>, C<X56>)
-which do not seem to be present anywhere.
 
 =head1 Workarounds for WINDOWS GOTCHAS for application developers (problems in kernel)
 
@@ -5099,7 +5481,7 @@ Set a global flag disabling processing of C<WM_(SYS)COMMAND> in the application;
 =item *
 
 Call TranslateAccelerator() with an improbable virtual key (C<VK_OEM_AX> or
-some such) and appropriate ad hoc translation table;
+some such — or, better, the “unassigned C<VK_>-code C<0xe8>) and a suitable ad hoc translation table;
 
 =item *
 
@@ -5224,14 +5606,24 @@ combinations.  The mapping from modifiers to columns should not be necessarily 1
 
 =head2 Windows combines modifier bitmaps for C<lCtrl>, C<Alt> and C<rAlt> on C<AltGr>
 
-(When a keyboard is marked with the C<KLLF_ALTGR> flag — so C<AltGr> is special in the keyboard, and mocks pressing of 2 keys:
+(When — for compatibility with legacy applications — a keyboard layout is marked with the C<KLLF_ALTGR> flag — so C<AltGr> is
+special in the keyboard, and mocks pressing of 2 keys:
 C<lCtrl> then C<rAlt> — with the same timestamp) the modifier bitmap bound to this
-key is actually bit-or of bitmaps above.  Essentially, this prohibits assigning
+key is actually bit-OR of bitmaps above.  Essentially, this prohibits assigning
 interesting flag combinations to C<lCtrl>.
 
-The (very limited) workaround is to ensure that the flags one puts on C<AltGr> contain
-all the flags assigned to the above VK codes.  (This does not change anything, but
-at least makes the assignments less confusing for human inspection.)
+The (very limited — and nowadays dangerous — see B<Caveat> in L<"The bullet-proof method">) workaround is to ensure that the
+bits in the modification bitmap one puts on C<AltGr> contain
+all the bits assigned to the above VK codes.  (With applications using “ad hoc algorithms”, this would not change anything;
+and since this makes the assignments less confusing for human inspection, B<historically> we recommended to use it.
+Unfortunately, using such “joined bitmap” in the C<MODIFIERS> section leads to problems — so while one can use this hack when
+designing the mapping of chords-of-modifier-keys to modification columns, I<in the actual C<MODIFIERS> section> these “forced” bits
+should not be included on the C<VK_RMENU> line. — And this is what this module does now.)
+
+A workaround for the user’s experience is possible (although only partially tested): see
+L<Another redefinition to avoid problems with the C<KLLF_ALTGR> flag>.
+
+(Compare with L<"A convenient assignment of KBD* bitmaps to modifier keys">. — But see B<Caveat> in this section!)
 
 =head2 Windows ignores C<lAlt> if its modifier bitmaps is not standard
 
@@ -5246,12 +5638,14 @@ is going to be stripped for handling of C<lAlt-key>, the modification column for
 C<KBDKANA> should duplicate the modification column for no-C<KBD>-flags.  Same with
 C<KBDSHIFT> added.)
 
+(Compare with L<"A convenient assignment of KBD* bitmaps to modifier keys">.)
+
 =head2 When C<AltGr> produces C<ROYA>, problems in Notepad
 
 Going to the Save As dialogue in Notepad loses "speciality of AltGr" (it highlights Menu);
 one need to switch layouts via LAlt+LShift to restore.
 
-I do not know any workaround.
+I do not know any workaround (except combining C<AltGr> with at most C<KANA>).
 
 =head2 Console applications cannot detect when a keypress may be interpreted as a “command”
 
@@ -5335,7 +5729,8 @@ not handle C<Alt> the same way as the console does.)
 =head2 In console, which combinations of keypresses may deliver characters?
 
 In addition to the problem outlined in the preceding section, a console application should
-better support input of character-by-numeric-code, and of copy-and-pasted strings.  Actually,
+better support L<input of character-by-numeric-code|"Keyboard input on Windows, Part II: The semantic of ToUnicode()">, and of
+copy-and-pasted strings.  Actually,
 the second situation, although undocumented, is well-engineered, so let us document these two
 here.  (These two should better be documented together, since pasting may fake input by
 repeated character-by-numeric-code.)
@@ -5387,7 +5782,8 @@ of C<lAlt>).
 
 =item *
 
-In general, entering characters-by-numeric-code (entering the decimal — or “KP+” then hex — while
+In general, L<entering characters-by-numeric-code|"Keyboard input on Windows, Part II: The semantic of ToUnicode()"> (entering the
+decimal — or “KP+” then hex — while
 C<Alt> is down) produces the resulting character when C<Alt> is released.  Processing this may create
 a significant problem for applications which interpret C<Alt-keypad> as “commands” (e.g., if
 they interpret C<Alt-Left> as “word-left”).
@@ -6610,28 +7006,31 @@ The distributed examples may have their own copyrights.
 
 =head1 TODO
 
-UniPolyK-MultiSymple
+The content of this section is most probably completely obsolete.  The newer list is in the
+L<dedicated TODO file|https://metacpan.org/dist/UI-KeyboardLayout/source/TODO>.  We mark obvious GOTCHAS which are NOTFIX by OK.
 
-Multiple linked faces (accessible as described in ChangeLog); designated 
-Primary- and Secondary- switch keys (as Shift-Space and AltGr-Space now).
+“UniPolyK-MultiSymple”
 
-C<Soft hyphen> as a deadkey may be not a good idea: following it by a special key
+“designated Primary- and Secondary- switch keys” (as Shift-Space and AltGr-Space now).
+
+OK: C<Soft hyphen> as a deadkey may be not a good idea: following it by a special key
 (such as C<Shift-Tab>, or C<Control-Enter>) may insert the deadkey character???
 Hence the character should be highly visible... (Now the key is invisible,
-so this is irrelevant...)
+so this is irrelevant for characters from the main layer...)
 
 Currently linked layers must have exactly the same number of keys in VK-tables.
 
 VK tables for TAB, BACK were BS.  Same (remains) for the rest of unusual keys...  (See TAB-was.)
-But UTOOL cannot handle them anyway...
+But UTOOL cannot handle them anyway...  (We do not generate them now…)
 
 Define an extra element in VK keys: linkable.  Should be sorted first in the kbd map,
 and there should be the same number in linked lists.  Non-linkable keys should not
 be linked together by deadkey access...
 
-Interaction of FromToFlipShift with SelectRX not intuitive.  This works: Diacritic[<sub>](SelectRX[[0-9]](FlipShift(Face(Latin))))
+OK: Interaction of FromToFlipShift with SelectRX not intuitive.  This works: Diacritic[<sub>](SelectRX[[0-9]](FlipShift(Face(Latin))))
 
-FlipShift is not reliable without an explicit argument (when used with multiple-personalities???)
+OK: FlipShift is not reliable without an explicit argument (when used with multiple-personalities???  Since accesses a possibly scant
+non-Full face???)
 
 DefinedTo cannot be put on Cyrillic 3a9 (yo to superscript disappears - due to duplication???).
 
@@ -6642,8 +7041,6 @@ via_parent() is broken - cannot replace for Diacritic_if_undef.
 
 Currently, we map ephigraphic letters to capital letters - is it intuitive???
 
-dotted circle ◌ 25CC
-
 DeadKey_Map200A=	FlipLayers
 #DeadKey_Map200A_0=	Id(Russian-AltGr)
 #DeadKey_Map200A_1=	Id(Russian)
@@ -6653,23 +7050,13 @@ Why ¨ on THIN SPACE inserts OGONEK after making ¨ multifaceted???
 
 When splitting a name on OVER/BELOW/ABOVE, we need both sides as modifiers???
 
-Ỳ currently unreachable (appears only in Latin-8 Celtic, is not on Wikipedia)
-
-Somebody is putting an extra element at the end of arrays for layers???  - Probably SPACE...
-
-Need to treat upside-down as a pseudo-decomposition.
+OK: Ỳ currently unreachable via AltGr (appears only in Latin-8 Celtic, is not on Wikipedia)
 
 We decompose reversed-smallcaps in one step - probably better add yet another two-steps variant...
 
-When creating a <pseudo-stuff> treat SYMBOL/SIGN/FINAL FORM/ISOLATED FORM/INITIAL FORM/MEDIAL FORM;
-note that SIGN may be stripped: LESS-THAN SIGN becomes LESS-THAN WITH DOT
-
 We do not do canonical-merging of diacritics; so one needs to specify VARIA in addition to GRAVE ACCENT.
 
-We use a smartish algorithm to assign multiple diacritics to the same deadkey.  A REALLY smart algorithm
-would use information about when a particular precombined form was introduced in Unicode...
-
-Inspector tool for NamesList.txt:
+OK: Inspector tool for NamesList.txt:
 
  grep " WITH .* " ! | grep -E -v "(ACUTE|GRAVE|ABOVE|BELOW|TILDE|DIAERESIS|DOT|HOOK|LEG|MACRON|BREVE|CARON|STROKE|TAIL|TONOS|BAR|DOTS|ACCENT|HALF RING|VARIA|OXIA|PERISPOMENI|YPOGEGRAMMENI|PROSGEGRAMMENI|OVERLAY|(TIP|BARB|CORNER) ([A-Z]+WARDS|UP|DOWN|RIGHT|LEFT))$" | grep -E -v "((ISOLATED|MEDIAL|FINAL|INITIAL) FORM|SIGN|SYMBOL)$" |less
  grep " WITH "    ! | grep -E -v "(ACUTE|GRAVE|ABOVE|BELOW|TILDE|DIAERESIS|CIRCUMFLEX|CEDILLA|OGONEK|DOT|HOOK|LEG|MACRON|BREVE|CARON|STROKE|TAIL|TONOS|BAR|CURL|BELT|HORN|DOTS|LOOP|ACCENT|RING|TICK|HALF RING|COMMA|FLOURISH|TITLO|UPTURN|DESCENDER|VRACHY|QUILL|BASE|ARC|CHECK|STRIKETHROUGH|NOTCH|CIRCLE|VARIA|OXIA|PSILI|DASIA|DIALYTIKA|PERISPOMENI|YPOGEGRAMMENI|PROSGEGRAMMENI|OVERLAY|(TIP|BARB|CORNER) ([A-Z]+WARDS|UP|DOWN|RIGHT|LEFT))$" | grep -E -v "((ISOLATED|MEDIAL|FINAL|INITIAL) FORM|SIGN|SYMBOL)$" |less
@@ -6685,10 +7072,13 @@ WarnConflicts[exceptions] and NoConflicts translation map parsing rules.
 
 Need a way to map to a different face, not a different layer.
 
-Vietnamese: to put second accent over ă, ơ (o/horn), put them over ae/oe; - including 
+Vietnamese: to put second accent over ă, ơ (o/horn), put them “over the C<AltGr> forms æ/œ”; - including 
 another ˘ which would "cancel the implied one", so will get o-horn itself.  - Except
-for acute accent which should replaced by ¨, and hook must be replaced by ˆ.  (Over ae/oe
-there is only macron and diaeresis over ae.)
+for acute accent which should replaced by ¨, and hook must be replaced by ˆ.  (Over æ/œ
+there is only macron ǣ and acute ǽ over æ — although there are turned-œ with bar and stroke ꭁ and ꭂ.)
+
+(Vietnamese input in described in L<F<Changes>|https://metacpan.org/dist/UI-KeyboardLayout/source/Changes#L635>; see the part for
+C<v0.09>.)
 
 Or: for the purpose of taking a second accent, AltGr-A behaves as Ă (or Â?), AltGr-O 
 behaves as Ô (or O-horn Ơ?).  Then Å and O/ behave as the other one...  And ˚ puts the
@@ -6755,7 +7145,7 @@ Diacritics_0218_0b56_0c34=	May create such a thing...
 To avoid infinite cycles, face-switch keys to non-private faces should be
 marked in each face... 
 
-"Acute makes sharper" is applicable to () too to get <>-parens...
+"Acute makes sharper" is applicable to () too to get <>-parens...  But now they are on Green — maybe can replace???
 
 Another ways of combining: "OR EQUAL TO", "OR EQUIVALENT TO", "APL FUNCTIONAL
 SYMBOL QUAD", "APL FUNCTIONAL SYMBOL *** UNDERBAR", "APL FUNCTIONAL SYMBOL *** DIAERESIS".
@@ -6769,44 +7159,7 @@ When a diacritic on a base letter expands to several variants, use them all
 
 Problem: acute on acute makes double acute modifier...
 
-Penalized letter are temporarily completely ignored; need to attach them in the end... 
- - but not 02dd which should be completely ignore...
 
-Report characters available on diacritic chains, but not accessible via such chains.
-Likewise for characters not accessible at all.  Mark certain chains as "Hacks" so that
-they are not counted in these lists.
-
-Long s and "preceded by" are not handled since the table has its own (useless) compatibility decompositions.
-
- ╒╤╕
- ╞╪╡
- ╘╧╛
- ╓╥╖
- ╟╫╢
- ╙╨╜
- ╔╦╗
- ╠╬╣
- ╚╩╝
- ┌┬┐
- ├┼┤
- └┴┘
- ┎┰┒
- ┠╂┨
- ┖┸┚
- ┍┯┑
- ┝┿┥
- ┕┷┙
- ┏┳┓
- ┣╋┫
- ┗┻┛
-    On top of a light-lines grid (3×2, 2×3, 2×2; H, V, V+H):
- ┲┱
- ╊╉
- ┺┹
- ┢╈┪
- ┡╇┩
- ╆╅
- ╄╇
  ╼†━†╾†╺†╸†╶†─†╴†╌†┄†┈† †╍†┅†┉†
  ╼━╾╺╸╶─╴╌┄┈ ╍┅┉
  ╻
@@ -6820,33 +7173,13 @@ Long s and "preceded by" are not handled since the table has its own (useless) c
  ╿
  ╎┆┊╏┇┋
 
- ╲ ╱
-  ╳
- ╭╮
- ╰╯
- ◤▲◥
- ◀■▶
- ◣▼◢
- ◜△◝
- ◁□▷
- ◟▽◞
- ◕◓◔
- ◐○◑
-  ◒ 
- ▗▄▖
- ▐█▌
- ▝▀▘
- ▛▀▜
- ▌ ▐
- ▙▄▟
-
- ░▒▓
 
 
 =head2 Implementation details: C<FullFace(FNAME)>
 
 Since the C<FullFace(FNAME)> accessor may have different effects at different moment of
-a face C<FNAME> synthesis, here is the order in which C<FullFace(FNAME)> changes:
+a face C<FNAME> synthesis, here is the order in which C<FullFace(FNAME)> changes (we also
+mention how to access the results from these steps from Perl code):
 
   ini_layers:   essentially, contains what is given in the key “layers” of the face recipe
 	Later, a version of these layers with exportable keys marked is created as ini_layers_prefix.
@@ -6857,7 +7190,7 @@ a face C<FNAME> synthesis, here is the order in which C<FullFace(FNAME)> changes
 The next modification is done not by modifying the list of names of layers
 associated to the face, but by editing the corresponding layers in place.
 (The unmodified version of layer, one containing the exportable keys, is
-accessible via C<ini_copy>.)  On this step one adds the missing characters via
+accessible via C<ini_copy>.)  On this step one adds the missing characters
 from the face specified in the C<LinkFace> key.
 
 =cut
@@ -7570,7 +7903,7 @@ sub massage_faces ($) {
     # defined $self->{faces}{$f}{"[$_]"} and not ref $self->{faces}{$f}{"[$_]"}
     #  or
     $self->{faces}{$f}{"[$_]"} = $self->get_deep_via_parents($self, $idx, 'faces', (split m(/), $f), $_)
-        for qw(LRM_RLM ALTGR SHIFTLOCK);
+        for qw(LRM_RLM ALTGR SHIFTLOCK NOALTGR);
 
     my %R = qw(ComposeKey_Show ⎄    AltGr_Invert_Show ⤨);		# On Apple only
     defined $self->{faces}{$f}{"[$_]"} or $self->{faces}{$f}{"[$_]"} = $R{$_} for keys %R;
@@ -11597,8 +11930,8 @@ sub fill_win_template ($$$;$$) {
   my $F = $self->get_deep($self, @$k);		# Presumably a face hash, as in $k = [qw(faces US)]
   $F->{'[dead-used]'} = [map {}, @{$F->{layers}}];		# Which of deadkeys are reachable on the keyboard
   my $cnt = $F->{'[non_VK]'};
-  if (grep $F->{"[$_]"}, qw(LRM_RLM ALTGR SHIFTLOCK)) {
-    $h{ATTRIBS} = (join "\n   ", "\nATTRIBUTES", grep $F->{"[$_]"}, qw(LRM_RLM ALTGR SHIFTLOCK)) . "\n" ;
+  if (grep $F->{"[$_]"}, qw(LRM_RLM ALTGR SHIFTLOCK NOALTGR)) {
+    $h{ATTRIBS} = (join "\n   ", "\nATTRIBUTES", grep $F->{"[$_]"}, qw(LRM_RLM ALTGR SHIFTLOCK NOALTGR)) . "\n" ;
   } else {
     $h{ATTRIBS} = '';				# default
   }
@@ -11666,13 +11999,21 @@ EOPREF
     my %mods =   map {(substr($_,0, 1), $modsF{$_})} keys %modsF;
     my(%mfFULL, $mks) = map {(substr($_,0, 1), length > 1 ? $_ : "_$_")}  keys %modsF;
     if (@{ $mks = $F->{'[mods_keys_KBD]'} }) {
-      my(%mks) = @$mks;
+      my($cmmnt, %mks) = ('', @$mks);
+      if ($mks{lC} and $mks{rA} and not $F->{"[NOALTGR]"}) {	# Strip common-with-lC bits from rA
+        my %seen = map {($_, 1)} split //, $mks{lC};
+        my $out = join '', grep !$seen{$_}, split //, $mks{rA};
+        $cmmnt = "\t// With KLLF_ALTGR, this is combined with LCONTROL and CONTROL; stripped $mks{rA} -> $out" if $out ne $mks{rA};
+        $mks{rA} = $out;
+      }
       $h{MODIFIERS} = "MODIFIERS\n";
       my %vk = (qw(S SHIFT C CONTROL A MENU), @{$F->{'[modkeys_vk]'} || []});
       (my $vkRX = join '', keys %vk) =~ /\W/ and die 'Non-letter in @modkeys_vk = (' . join(" ", sort keys %vk) . ')'; # XXX Needed???
       for my $K (sort keys %mks) {	# ??? Need to take into account @modkeys_vk  XXX
-        my($preK, $KK) = ($K =~ /^([lr]?)([$vkRX])$/) or die "Unexpected key <<<$K>>> of mods_keys_KBD";	# [ACKLR-Z]
-        $h{MODIFIERS} .= "    \U$preK\E$vk{$KK}\tKBD" . join(' | KBD', map "$mfFULL{$_}", split //, $mks{$K}) . "\n" ;
+        my($preK, $KK, $c) = ($K =~ /^([lr]?)([$vkRX])$/) or die "Unexpected key <<<$K>>> of mods_keys_KBD";	# [ACKLR-Z]
+        $c = $cmmnt if $K eq 'rA';
+        $c ||= '';
+        $h{MODIFIERS} .= "    \U$preK\E$vk{$KK}\tKBD" . join(' | KBD', map "$mfFULL{$_}", split //, $mks{$K}) . ($c || '') . "\n";
       }
       $h{MODIFIERS} .= "\n" ;
     }

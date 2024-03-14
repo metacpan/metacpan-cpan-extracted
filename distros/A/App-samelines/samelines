@@ -1,0 +1,127 @@
+#!/usr/bin/perl 
+use 5.014 ; use warnings ; 
+use Time::HiRes qw [ gettimeofday tv_interval ] ;
+my ${ dt_start } = [ gettimeofday ] ; 
+#use Encode qw[ decode_utf8 encode_utf8 ] ; 
+use Getopt::Std ; getopts '2:c:i:' , \my %o  ; 
+use Term::ANSIColor qw[ color :constants ] ; $Term::ANSIColor::AUTORESET = 1 ;
+use FindBin qw[ $Script ] ; 
+use autodie qw [ open ] ;
+
+* d3 = exists $o{','} && $o{','} eq 0 ? sub{$_[0]} : sub { $_[0] =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/gr } ;
+my $time0 = time ; 
+my $help = 0  ; # オンラインヘルプの文面の表示をしたか否か。
+$o{i} //= "\t" ;
+my $readLines = 0 ; # 読み取った行数
+my $sec = $o{'@'} // 15 ; # 何秒おきにアラームを発生させるか
+
+$SIG{INT} = sub { exit } ;
+$SIG{ALRM} = sub { 
+  my $n = $.  =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/gr ; # 3桁ごとに区切る。
+  say STDERR GREEN "$n lines read ($Script). " , scalar localtime ; 
+  alarm $sec 
+} ; 
+alarm $sec ;
+
+
+#my %f0 ; # (層分割するときに)出現した文字列を保管。
+my %f1 ; # 各行の内容の文字列から単純に参照される頻度表になる。(層分割の時は、一段階だけ多次元化する)
+my @f2 ; # 変数の %f1 の頻度の数についての頻度を集計したものになる。(層分割の時は、一段階だけ多次元化する)
+
+
+if ( ! defined $o{c} ) { 
+  while ( <> ) {
+    $readLines ++ ;
+    chomp ; 
+    $f1 { $_ } ++ ;
+  }
+  $f2 [ $f1{$_} ] ++ for keys %f1 ;  # **1 
+  say STDERR BOLD FAINT ITALIC "--" unless ($o{2}//'') eq 0 ; 
+  say join ',' , map { $_ . 'x' . $f2[$_] } grep { defined $f2[$_] } 1 .. $#f2 ; 
+} 
+else 
+{ 
+  my $pos = $o{c} > 0 ? $o{c} - 1 : $o{c} ; # -c N において N<0 の場合は後ろから何番目のように考える。
+  while ( <> ) { 
+    $readLines ++ ;
+    chomp ; 
+    my @F = split $o{i} , $_ , -1 ; 
+    my $label = splice @F , $pos , 1  ;
+    $_ = join $o{i} , @F ;
+    $f1 { $label } { $_ } ++ ; 
+    #$f0 { $label } = 1 ;
+  }
+  for my $label ( keys %f1 ) { ## ← 上記の **1 とは意味の異なるので、トリッキーである。注意。
+    for my $rest ( keys %{ $f1 { $label } } ) { 
+      $f2 [ $f1{$label}{$rest} ] { $label } ++ ;
+    }
+  }
+  say STDERR BOLD FAINT ITALIC "--" unless ($o{2}//'') eq 0 ; 
+  
+  for my $label ( sort keys %f1 ) { 
+    print "$label", "\t" ; # <-- タブに固定する。$o{i}は使わない。
+    say join ',' , map { $_ . 'x' . $f2[$_]{$label} } grep { defined $f2[$_]{$label} } 1 .. $#f2 ; 
+  }
+
+
+}
+
+
+
+exit ;
+
+END{
+  exit if $help ;
+  my $procsec = sprintf "%.5f", tv_interval ${ dt_start } ; #time - $time0 ; # このプログラムの処理にかかった秒数。比較する2個の時刻は秒単位なので、±1秒未満の誤差は発生する。
+  $readLines //= $. ; # Ctrl+Cの連打で必要となる処理。
+  return if ($o{2}//'') eq 0 ; 
+  my $linenumeral = $readLines > 1 ? 'lines' : 'line' ; 
+  print STDERR BOLD FAINT ITALIC & d3 ( $readLines ) . " $linenumeral read. " ; 
+  my $s = tv_interval $dt_start , [ gettimeofday ] ; 
+  say STDERR BOLD FAINT ITALIC " -- $Script ; " . $procsec . " sec. in process" ;
+  #say STDERR BOLD FAINT ITALIC " --  " , "Proc. time: " , sprintf( "%.5f", $s ) , " sec." ;
+  #* d3 = exists $o{','} && $o{','} eq 0 ? sub{$_[0]} : sub { $_[0] =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/gr } ;
+  #print STDERR BOLD ITALIC DARK CYAN & d3 ( $totalSum ) . " lines are counted. " ; 
+  #print STDERR BOLD ITALIC DARK CYAN & d3 ( $shownLines ) . " lines output. " ; 
+
+}
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+  use FindBin qw[ $Script ] ; 
+  $help = 1 ;
+  $ARGV[1] //= '' ;
+  open my $FH , '<' , $0 ;
+  while(<$FH>){
+    s/\$0/$Script/g ;
+    print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+  }
+  close $FH ;
+  exit 0 ;
+}
+
+=encoding utf8
+
+=head1
+
+コマンド
+
+  $0 inputfile 
+  $0 < inuptfile 
+  cat inputfile | $0 
+
+オプションに関して
+
+  -2 0 : 入力行数や処理時間などの2次情報を、標準エラー出力に出力しない。
+  -c N : N は数である。指定されると、タブ文字区切りの左からN列目ごとに「層分け」する。
+
+  --help : このオンラインヘルプの文面を表示する。
+
+その他: 
+  * x と , を使った表記の出力の仕方もある。層分割したときに、表のようにしたいかも。-p でプレゼン用に変えたい。
+  * 区切り文字を指定できるようにする。
+  * -= を使うことで、-c 変数名のよう使い方が出来るようにする。
+
+
+=cut

@@ -4,7 +4,7 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 # import params is just one 'no-unicode-escape-permanently'
 # if set, then unicode escaping will not happen at
@@ -19,9 +19,12 @@ use Unicode::Escape qw/escape unescape/;
 # YAML v1.30 fails for {"\"aaa'bbb" => "aaa","bbb" => 1,}
 # while YAML::PP and YAML::XS both succeed
 # YAML::PP is less restrictive so using this
+# YAML v1.31 now behaves correctly, run 'make deficiencies' to see that
+# but since YAML author urges not use this module, we will
+# be using YAML::PP
 #use YAML;
 use YAML::PP qw/Load Dump/;
-# this also works with tricky cases but needs compilation
+# this also works with the tricky cases but it needs compilation
 # on M$ systems and that can be tricky :(
 #use YAML::XS;
 
@@ -138,23 +141,26 @@ sub	perl2json {
 	if( $escape_unicode ){
 		if( $pretty_printing ){
 			$json_string = eval { JSON->new->utf8(1)->pretty->encode($pv) };
-			if( $@ || ! defined($json_string) ){ warn "error, call to ".'JSON->new->utf8(1)->pretty->encode()'." has failed".(defined($@)?" with this exception:\n".$@:"")."."; return undef }
-		} else { $json_string = JSON->new->utf8(1)->encode($pv) }
+			if( ! defined($json_string) ){ print STDERR "error, call to ".'JSON->new->utf8(1)->pretty->encode()'." has failed".((defined($@)&&($@!~/^\s*$/))?" with this exception:\n".$@:".")."\n"; return undef }
+		} else {
+			$json_string = eval { JSON->new->utf8(1)->encode($pv) };
+			if( ! defined($json_string) ){ print STDERR "error, call to ".'JSON->new->utf8(1)->encode()'." has failed".((defined($@)&&($@!~/^\s*$/))?" with this exception:\n".$@:".")."\n"; return undef }
+		}
 		if ( _has_utf8($json_string) ){
 			$json_string = Unicode::Escape::escape($json_string, 'utf8');
-			if( ! defined($json_string) ){ warn "error, call to ".'Unicode::Escape::escape()'." has failed."; return undef }
+			if( ! defined($json_string) ){ print STDERR "error, call to ".'Unicode::Escape::escape()'." has failed.\n"; return undef }
 		}
 	} else {
 		if( $pretty_printing ){
 			$json_string = eval { JSON->new->utf8(0)->pretty->encode($pv) };
-			if( $@ || ! defined($json_string) ){ warn "error, call to ".'JSON->new->utf8(0)->pretty->encode()'." has failed".(defined($@)?" with this exception:\n".$@:"")."."; return undef }
+			if( ! defined($json_string) ){ print STDERR "error, call to ".'JSON->new->utf8(0)->pretty->encode()'." has failed".((defined($@)&&($@!~/^\s*$/))?" with this exception:\n".$@:".")."\n"; return undef }
 		} else {
 # cpan testers report:
 # https://www.cpantesters.org/cpan/report/1fba88ee-6bfa-1014-8b5d-8080f52666f1
 # cannot encode reference to scalar at C:\strawberry163\cpan\build\Data-Roundtrip-0.11-0\blib\lib/Data/Roundtrip.pm line 138.
 # following was line 138:
 			$json_string = eval { JSON->new->utf8(0)->encode($pv) };
-			if( $@ || ! defined($json_string) ){ warn "error, call to ".'JSON->new->utf8(0)->encode()'." has failed".(defined($@)?" with this exception:\n".$@:"")."."; return undef }
+			if( ! defined($json_string) ){ print STDERR "error, call to ".'JSON->new->utf8(0)->encode()'." has failed".((defined($@)&&($@!~/^\s*$/))?" with this exception:\n".$@:".")."\n"; return undef }
 		}
 	}
 	# succeeded here
@@ -166,7 +172,7 @@ sub	perl2yaml {
 	my $pretty_printing = exists($params->{'pretty'}) && defined($params->{'pretty'})
 		? $params->{'pretty'} : 0
 	;
-	warn "perl2yaml() : pretty-printing is not supported for YAML output" and $pretty_printing=0
+	print STDERR "perl2yaml() : pretty-printing is not supported for YAML output\n" and $pretty_printing=0
 		if $pretty_printing;
 
 	my $escape_unicode = exists($params->{'escape-unicode'}) && defined($params->{'escape-unicode'})
@@ -177,15 +183,15 @@ sub	perl2yaml {
 		#if( $pretty_printing ){
 			# it's here just for historic purposes, this is not supported and a warning is issued
 			#$yaml_string = eval { YAML::PP::Dump($pv) };
-			#if( $@ ){ warn "error, call to ".'YAML::PP::Dump()'." has failed with this exception:\n".$@; return undef }
+			#if( ! defined $yaml_string ){ print STDERR "error, call to ".'YAML::PP::Dump()'." has failed with this exception:\n".$@."\n"; return undef }
 			# this does not work :( no pretty printing for yaml
 			#$yaml_string = Data::Format::Pretty::YAML::format_pretty($pv);
 		#} else {
 			# intercepting a die by wrapping in an eval
 			$yaml_string = eval { YAML::PP::Dump($pv) };
-			if( $@ || ! defined($yaml_string) ){ warn "error, call to ".'YAML::PP::Dump()'." has failed".(defined($@)?" with this exception:\n".$@:"")."."; return undef }
+			if( ! defined($yaml_string) ){ print STDERR "error, call to ".'YAML::PP::Dump()'." has failed".((defined($@)&&($@!~/^\s*$/))?" with this exception:\n".$@:".")."\n"; return undef }
 		#}
-		if( ! $yaml_string ){ warn "perl2yaml() : error, no yaml produced from perl variable"; return undef }
+		if( ! $yaml_string ){ print STDERR "perl2yaml() : error, no yaml produced from perl variable.\n"; return undef }
 		if( _has_utf8($yaml_string) ){
 			utf8::encode($yaml_string);
 			$yaml_string = Unicode::Escape::escape($yaml_string, 'utf8');
@@ -196,9 +202,9 @@ sub	perl2yaml {
 			#$yaml_string = Data::Format::Pretty::YAML::format_pretty($pv);
 		#} else {
 			$yaml_string = eval { YAML::PP::Dump($pv) };
-			if( $@ || ! defined($yaml_string) ){ warn "error, call to ".'YAML::PP::Dump()'." has failed".(defined($@)?" with this exception:\n".$@:"")."."; return undef }
+			if( ! defined($yaml_string) ){ print STDERR "error, call to ".'YAML::PP::Dump()'." has failed".((defined($@)&&($@!~/^\s*$/))?" with this exception:\n".$@:".")."\n"; return undef }
 		#}
-		if( ! $yaml_string ){ warn "perl2yaml() : error, no yaml produced from perl variable"; return undef }
+		if( ! $yaml_string ){ print STDERR "perl2yaml() : error, no yaml produced from perl variable.\n"; return undef }
 	}
 	return $yaml_string
 }
@@ -218,16 +224,16 @@ sub	yaml2perl {
 	#    t/14-yaml-tainted-input.t
 	($yaml_string) = keys %{{$yaml_string,0}};
 	my $pv = eval { YAML::PP::Load($yaml_string) };
-	if( $@ || ! defined($pv) ){ warn "yaml2perl() : error, call to YAML::PP::Load() has failed".(defined($@)?" with this exception:\n".$@:"")."."; return undef }
+	if( ! defined($pv) ){ print STDERR "yaml2perl() : error, call to YAML::PP::Load() has failed".((defined($@)&&($@!~/^\s*$/))?" with this exception:\n".$@:".")."\n"; return undef }
 	return $pv
 }
 sub	yamlfile2perl {
 	my $yaml_file = $_[0];
 	#my $params = defined($_[1]) ? $_[1] : {};
 	my $contents = read_from_file($yaml_file);
-	if( ! defined $contents ){ warn "yamlfile2perl() : error, failed to read from file '${yaml_file}'."; return undef }
+	if( ! defined $contents ){ print STDERR "yamlfile2perl() : error, failed to read from file '${yaml_file}'.\n"; return undef }
 	my $pv = yaml2perl($contents);
-	if( ! defined $pv ){ warn "yamlfile2perl() : error, call to yaml2perl() has failed after reading yaml string from file '${yaml_file}'."; return undef }
+	if( ! defined $pv ){ print STDERR "yamlfile2perl() : error, call to yaml2perl() has failed after reading yaml string from file '${yaml_file}'.\n"; return undef }
 	return $pv;
 }
 sub	json2perl {
@@ -237,11 +243,11 @@ sub	json2perl {
 	if( _has_utf8($json_string) ){
 		# intercepting a die by wrapping in an eval
 		$pv = eval { JSON::decode_json(Encode::encode_utf8($json_string)) };
-		if( $@ || ! defined($pv) ){ warn "json2perl() :  error, call to json2perl() has failed".(defined($@)?" with this exception: $@":""); return undef }
+		if( ! defined($pv) ){ print STDERR "json2perl() :  error, call to json2perl() has failed".((defined($@)&&($@!~/^\s*$/))?" with this exception: $@:":".")."\n"; return undef }
 	} else {
 		# intercepting a die by wrapping in an eval
 		$pv = eval { JSON::decode_json($json_string) };
-		if( $@ || ! defined($pv) ){ warn "json2perl() :  error, call to json2perl() has failed".(defined($@)?" with this exception: $@":""); return undef }
+		if( ! defined($pv) ){ print STDERR "json2perl() :  error, call to json2perl() has failed".((defined($@)&&($@!~/^\s*$/))?" with this exception: $@:":".")."\n"; return undef }
 	}
 	return $pv;
 }
@@ -249,9 +255,9 @@ sub	jsonfile2perl {
 	my $json_file = $_[0];
 	#my $params = defined($_[1]) ? $_[1] : {};
 	my $contents = read_from_file($json_file);
-	if( ! defined $contents ){ warn "jsonfile2perl() : error, failed to read from file '${json_file}'."; return undef }
+	if( ! defined $contents ){ print STDERR "jsonfile2perl() : error, failed to read from file '${json_file}'.\n"; return undef }
 	my $pv = json2perl($contents);
-	if( ! defined $pv ){ warn "jsonfile2perl() : error, call to json2perl() has failed after reading json string from file '${json_file}'."; return undef }
+	if( ! defined $pv ){ print STDERR "jsonfile2perl() : error, call to json2perl() has failed after reading json string from file '${json_file}'.\n"; return undef }
 	return $pv;
 }
 sub	json2json {
@@ -259,9 +265,9 @@ sub	json2json {
 	my $params = defined($_[1]) ? $_[1] : {};
 
 	my $pv = json2perl($json_string, $params);
-	if( ! defined $pv ){ warn "json2perl() :  error, call to json2perl() has failed"; return undef }
+	if( ! defined $pv ){ print STDERR "json2perl() :  error, call to json2perl() has failed.\n"; return undef }
 	$json_string = perl2json($pv, $params);
-	if( ! defined $json_string ){ warn "json2perl() :  error, call to perl2json() has failed"; return undef }
+	if( ! defined $json_string ){ print STDERR "json2perl() :  error, call to perl2json() has failed.\n"; return undef }
 
 	return $json_string;
 }
@@ -270,9 +276,9 @@ sub	yaml2yaml {
 	my $params = defined($_[1]) ? $_[1] : {};
 
 	my $pv = yaml2perl($yaml_string, $params);
-	if( ! defined $pv ){ warn "yaml2perl() :  error, call to yaml2perl() has failed"; return undef }
+	if( ! defined $pv ){ print STDERR "yaml2perl() :  error, call to yaml2perl() has failed.\n"; return undef }
 	$yaml_string = perl2yaml($pv, $params);
-	if( ! defined $yaml_string ){ warn "yaml2perl() :  error, call to perl2yaml() has failed"; return undef }
+	if( ! defined $yaml_string ){ print STDERR "yaml2perl() :  error, call to perl2yaml() has failed.\n"; return undef }
 
 	return $yaml_string;
 }
@@ -281,9 +287,9 @@ sub	dump2dump {
 	my $params = defined($_[1]) ? $_[1] : {};
 
 	my $pv = dump2perl($dump_string, $params);
-	if( ! defined $pv ){ warn "dump2perl() :  error, call to dump2perl() has failed"; return undef }
+	if( ! defined $pv ){ print STDERR "dump2perl() :  error, call to dump2perl() has failed.\n"; return undef }
 	$dump_string = perl2dump($pv, $params);
-	if( ! defined $dump_string ){ warn "dump2perl() :  error, call to perl2dump() has failed"; return undef }
+	if( ! defined $dump_string ){ print STDERR "dump2perl() :  error, call to perl2dump() has failed.\n"; return undef }
 
 	return $dump_string;
 }
@@ -294,9 +300,9 @@ sub	yaml2json {
 	# is it escaped already?
 	$yaml_string =~ s/\\u([0-9a-fA-F]{4})/eval "\"\\x{$1}\""/ge;
 	my $pv = yaml2perl($yaml_string, $params);
-	if( ! $pv ){ warn "yaml2json() : error, call to yaml2perl() has failed"; return undef }
+	if( ! $pv ){ print STDERR "yaml2json() : error, call to yaml2perl() has failed.\n"; return undef }
 	my $json = perl2json($pv, $params);
-	if( ! $json ){ warn "yaml2json() : error, call to perl2json() has failed"; return undef }
+	if( ! $json ){ print STDERR "yaml2json() : error, call to perl2json() has failed.\n"; return undef }
 	return $json
 }
 sub	yaml2dump {
@@ -304,9 +310,9 @@ sub	yaml2dump {
 	my $params = defined($_[1]) ? $_[1] : {};
 
 	my $pv = yaml2perl($yaml_string, $params);
-	if( ! $pv ){ warn "yaml2json() : error, call to yaml2perl() has failed"; return undef }
+	if( ! $pv ){ print STDERR "yaml2json() : error, call to yaml2perl() has failed.\n"; return undef }
 	my $dump = perl2dump($pv, $params);
-	if( ! $dump ){ warn "yaml2dump() : error, call to perl2dump() has failed"; return undef }
+	if( ! $dump ){ print STDERR "yaml2dump() : error, call to perl2dump() has failed.\n"; return undef }
 	return $dump
 }
 sub	json2dump {
@@ -314,9 +320,9 @@ sub	json2dump {
 	my $params = defined($_[1]) ? $_[1] : {};
 
 	my $pv = json2perl($json_string, $params);
-	if( ! $pv ){ warn "json2json() : error, call to json2perl() has failed"; return undef }
+	if( ! $pv ){ print STDERR "json2json() : error, call to json2perl() has failed.\n"; return undef }
 	my $dump = perl2dump($pv, $params);
-	if( ! $dump ){ warn "json2dump() : error, call to perl2dump() has failed"; return undef }
+	if( ! $dump ){ print STDERR "json2dump() : error, call to perl2dump() has failed.\n"; return undef }
 	return $dump
 }
 sub	dump2json {
@@ -324,9 +330,9 @@ sub	dump2json {
 	my $params = defined($_[1]) ? $_[1] : {};
 
 	my $pv = dump2perl($dump_string, $params);
-	if( ! $pv ){ warn "dump2json() : error, call to dump2perl() has failed"; return undef }
+	if( ! $pv ){ print STDERR "dump2json() : error, call to dump2perl() has failed.\n"; return undef }
 	my $json_string = perl2json($pv, $params);
-	if( ! $json_string ){ warn "dump2json() : error, call to perl2json() has failed"; return undef }
+	if( ! $json_string ){ print STDERR "dump2json() : error, call to perl2json() has failed.\n"; return undef }
 	return $json_string
 }
 sub	dump2yaml {
@@ -334,9 +340,9 @@ sub	dump2yaml {
 	my $params = defined($_[1]) ? $_[1] : {};
 
 	my $pv = dump2perl($dump_string, $params);
-	if( ! $pv ){ warn "yaml2yaml() : error, call to yaml2perl() has failed"; return undef }
+	if( ! $pv ){ print STDERR "yaml2yaml() : error, call to yaml2perl() has failed.\n"; return undef }
 	my $yaml_string = perl2yaml($pv, $params);
-	if( ! $yaml_string ){ warn "dump2yaml() : error, call to perl2yaml() has failed"; return undef }
+	if( ! $yaml_string ){ print STDERR "dump2yaml() : error, call to perl2yaml() has failed.\n"; return undef }
 	return $yaml_string
 }
 sub	json2yaml {
@@ -344,9 +350,9 @@ sub	json2yaml {
 	my $params = defined($_[1]) ? $_[1] : {};
 
 	my $pv = json2perl($json_string, $params);
-	if( ! defined $pv ){ warn "json2yaml() :  error, call to json2perl() has failed"; return undef }
+	if( ! defined $pv ){ print STDERR "json2yaml() :  error, call to json2perl() has failed.\n"; return undef }
 	my $yaml_string = perl2yaml($pv, $params);
-	if( ! defined $yaml_string ){ warn "json2yaml() :  error, call to perl2yaml() has failed"; return undef }
+	if( ! defined $yaml_string ){ print STDERR "json2yaml() :  error, call to perl2yaml() has failed.\n"; return undef }
 	return $yaml_string
 }
 sub	dump2perl {
@@ -358,11 +364,11 @@ sub	dump2perl {
 	#my $params = defined($_[1]) ? $_[1] : {};
 
 	$dump_string =~ s/^\$VAR1\s*=\s*//g;
-	warn "dump2perl() : WARNING, eval()'ing input string, are you sure you did check its content ?\n";
-	warn "dump2perl() : WARNING, this sub will be removed in future releases.\n";
+	print STDERR "dump2perl() : WARNING, eval()'ing input string, are you sure you did check its content ?\n";
+	print STDERR "dump2perl() : WARNING, this sub will be removed in future releases.\n";
 	# WARNING: eval() of unknown input:
 	my $pv = eval($dump_string);
-	if( $@ || ! defined($pv) ){ warn "input string:${pv}\nend input string.\ndump2perl() : error, eval() of input string (alledgedly a perl variable, see above) has failed".(defined($@)?" with this exception:\n".$@:"")."."; return undef }
+	if( ! defined($pv) ){ print STDERR "input string:${dump_string}\nend input string.\ndump2perl() : error, eval() of input string (alledgedly a perl variable, see above) has failed".((defined($@)&&($@!~/^\s*$/))?" with this exception:\n".$@:".")."\n"; return undef }
 	return $pv
 }
 # this bypasses Data::Dumper's obsession with escaping
@@ -540,7 +546,7 @@ sub	read_from_file {
 	my $infile = $_[0];
 	my $FH;
 	if( ! open $FH, '<:encoding(UTF-8)', $infile ){
-		warn "failed to open file '$infile' for reading, $!";
+		print STDERR "failed to open file '$infile' for reading, $!";
 		return undef;
 	}
 	my $contents = read_from_filehandle($FH);
@@ -553,10 +559,10 @@ sub	write_to_file {
 	my $contents = $_[1];
 	my $FH;
 	if( ! open $FH, '>:encoding(UTF-8)', $outfile ){
-		warn "failed to open file '$outfile' for writing, $!";
+		print STDERR "failed to open file '$outfile' for writing, $!";
 		return 0
 	}
-	if( ! write_to_filehandle($FH, $contents) ){ warn "error, call to ".'write_to_filehandle()'." has failed"; close $FH; return 0 }
+	if( ! write_to_filehandle($FH, $contents) ){ print STDERR "error, call to ".'write_to_filehandle()'." has failed"; close $FH; return 0 }
 	close $FH;
 	return 1;
 }
@@ -642,7 +648,7 @@ Data::Roundtrip - convert between Perl data structures, YAML and JSON with unico
 
 =head1 VERSION
 
-Version 0.26
+Version 0.27
 
 =head1 SYNOPSIS
 

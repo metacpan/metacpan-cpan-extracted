@@ -17,7 +17,6 @@ on 'configure' => sub {
 on 'test' => sub {
     requires 'strict';
     requires 'Config';
-    requires 'FileHandle';
     requires 'File::Spec';
     requires 'IO::File';
     requires 'SelectSaver';

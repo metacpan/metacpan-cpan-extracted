@@ -1,6 +1,6 @@
 package Mail::BIMI::Indicator;
 # ABSTRACT: Class to model a BIMI indicator
-our $VERSION = '3.20240205'; # VERSION
+our $VERSION = '3.20240313'; # VERSION
 use 5.20.0;
 use Moose;
 use Moose::Util::TypeConstraints;
@@ -181,17 +181,35 @@ sub _build_header($self) {
 }
 
 
+sub header_crlf($self) {
+  my $base64 = encode_base64( $self->data_uncompressed );
+  $base64 =~ s/\n//g;
+  my @parts = unpack("(A70)*", $base64);
+  return "BIMI-Indicator: " . join("\r\n    ", @parts)
+}
+
+
 sub finish($self) {
   $self->_write_cache;
 }
 
 
 sub app_validate($self) {
+  my $size_raw = 0;
+  $size_raw = length($self->data) if $self->data;
+  my $size_uncompressed = 0;
+  $size_uncompressed = length($self->data_uncompressed) if $self->data_uncompressed;
+  my $size_header = 0;
+  $size_header = length($self->header_crlf) if $self->header_crlf;
+
   say 'Indicator'.($self->source ? ' (From '.$self->source.')' : '' ).' Returned: '.($self->is_valid ? GREEN."\x{2713}" : BRIGHT_RED."\x{26A0}").RESET;
   say YELLOW.'  GZipped        '.WHITE.': '.CYAN.($self->data_uncompressed eq $self->data?'No':'Yes').RESET;
   say YELLOW.'  BIMI-Indicator '.WHITE.': '.CYAN.$self->header.RESET if $self->is_valid;
   say YELLOW.'  Profile Used   '.WHITE.': '.CYAN.$self->validator_profile.RESET;
   say YELLOW.'  Is Valid       '.WHITE.': '.($self->is_valid?GREEN.'Yes':BRIGHT_RED.'No').RESET;
+  say YELLOW.'  Size (raw)     '.WHITE.': '.$size_raw.' bytes'.RESET if $size_raw;
+  say YELLOW.'  Size (unzip)   '.WHITE.': '.$size_uncompressed.' bytes'.RESET if $size_uncompressed;
+  say YELLOW.'  Size (header)  '.WHITE.': '.$size_header.' bytes'.RESET if $size_header;
   if ( ! $self->is_valid ) {
     say "Errors:";
     foreach my $error ( $self->errors->@* ) {
@@ -218,7 +236,7 @@ Mail::BIMI::Indicator - Class to model a BIMI indicator
 
 =head1 VERSION
 
-version 3.20240205
+version 3.20240313
 
 =head1 DESCRIPTION
 
@@ -345,6 +363,13 @@ Synonym for data; returns the data in a maybe compressed format
 =head2 I<data_uncompressed_normalized()>
 
 Returns the uncompressed data with normalized line endings
+
+=head2 I<header_crlf()>
+
+Returns the proposed BIMI-Indicator in its entirity with crlf line endings
+even when the Indicator has not validated.
+This is used to find the size of the header in validator code and MUST NOT
+be used to add the header to emails.
 
 =head2 I<finish()>
 

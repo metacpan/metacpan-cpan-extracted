@@ -1,0 +1,37 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use File::Spec::Functions qw(updir catfile abs2rel canonpath);
+use File::Basename qw(dirname);
+use Cwd qw(abs_path);
+
+my $dir = dirname(__FILE__);
+my $root = abs2rel(abs_path(catfile($dir, updir)));
+
+my $prev_version;
+
+my $infile = canonpath("$root/Changes");
+open my $in, '<', $infile
+    or die "can't read $infile: $!";
+
+while (my $line = <$in>) {
+    if ($line =~ /^v?([\d.]+)\b/) {
+        $prev_version = $1;
+        last;
+    }
+}
+close $in;
+
+if (!defined $prev_version) {
+    die "Can't find previous version in $infile.\n";
+}
+
+print "v$prev_version\n";
+
+if (defined $ENV{GITHUB_OUTPUT}) {
+    open my $fh, '>>', $ENV{GITHUB_OUTPUT}
+        or die "can't append to $ENV{GITHUB_OUTPUT}: $!";
+    print { $fh } "tag-name=v$prev_version\n";
+    close $fh;
+}

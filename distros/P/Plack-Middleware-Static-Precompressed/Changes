@@ -1,0 +1,7 @@
+Release history for Plack-Middleware-Static-Precompressed
+
+1.002 Thu 14 Mar 2024
+	- New redundant `use strict`, for CPANTS pacification
+
+1.001 Thu 14 Mar 2024
+	- Initial release.

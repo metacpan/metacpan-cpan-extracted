@@ -7,6 +7,7 @@ maint/get-tarball-name
 maint/make-tarball
 maint/mk-ca-bundle.pl
 maint/prepare-release
+maint/prev-release
 maint/update-cacert-file
 maint/update-mk-ca-bundle
 Makefile.PL

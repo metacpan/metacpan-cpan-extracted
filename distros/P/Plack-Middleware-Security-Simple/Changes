@@ -1,5 +1,12 @@
 Revision history for Plack-Middleware-Security-Simple:
 
+v0.12.0   2024-03-13 17:03:24+00:00 Europe/London
+  [Exhancements]
+  - Added the script_injection rule.
+
+  [Documentation]
+  - Bumped copyright year.
+
 v0.11.1   2023-10-28 08:43:52+01:00 Europe/London
   [Tests]
   - Migrated to Test2.

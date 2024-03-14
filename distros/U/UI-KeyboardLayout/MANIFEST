@@ -79,6 +79,8 @@ examples/build-test.pl
 examples/logo-base.html
 examples/izKeys-front-base.html
 examples/HOWTO-release-version
+examples/HOWTO-install-deinstall-and-tables.txt
 examples/klc-layout2human.pl
+examples/dumper-msg.c
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

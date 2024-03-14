@@ -31,14 +31,13 @@ my %WriteMakefileArgs = (
     "Config" => 0,
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
-    "FileHandle" => 0,
     "IO::File" => 0,
     "SelectSaver" => 0,
     "Test::More" => 0,
     "URI" => 0,
     "strict" => 0
   },
-  "VERSION" => "3.81",
+  "VERSION" => "3.82",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -56,7 +55,6 @@ my %FallbackPrereqs = (
   "Exporter" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
-  "FileHandle" => 0,
   "HTML::Tagset" => 0,
   "HTTP::Headers" => 0,
   "IO::File" => 0,

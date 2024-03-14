@@ -111,7 +111,8 @@ for my $l (split /\n/, $IN) {
     $o =~ s/^(.{6})..+/$1\x{2026}/;		# ellipsis
     if ($o =~ /^(-1|[\da-f]{4}\@?)$/i or $o =~ m(//|\s) or $o =~ s/^(?=\p{NonspacingMark})/\x{25cc}/) {	# Can confuse the parser or reader
       $o =~ s/^(.{4})..+/$1\x{2026}/;		# ellipsis
-      $o =~ s/\s/\x{2423}/g;
+      $o =~ s/ /\x{2423}/g;
+      $o =~ s/\s/\x{237d}/g;
       $o =~ s(//)(\x{2044}\x{2044})g;
       $o = "\x{27ec}$o\x{27ed}"
     }

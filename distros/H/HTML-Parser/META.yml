@@ -6,7 +6,6 @@ build_requires:
   Config: '0'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
-  FileHandle: '0'
   IO::File: '0'
   SelectSaver: '0'
   Test::More: '0'
@@ -17,7 +16,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.52'
   perl: '5.008'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,26 +33,26 @@ no_index:
 provides:
   HTML::Entities:
     file: lib/HTML/Entities.pm
-    version: '3.81'
+    version: '3.82'
   HTML::Filter:
     file: lib/HTML/Filter.pm
-    version: '3.81'
+    version: '3.82'
     x_deprecated: 1
   HTML::HeadParser:
     file: lib/HTML/HeadParser.pm
-    version: '3.81'
+    version: '3.82'
   HTML::LinkExtor:
     file: lib/HTML/LinkExtor.pm
-    version: '3.81'
+    version: '3.82'
   HTML::Parser:
     file: lib/HTML/Parser.pm
-    version: '3.81'
+    version: '3.82'
   HTML::PullParser:
     file: lib/HTML/PullParser.pm
-    version: '3.81'
+    version: '3.82'
   HTML::TokeParser:
     file: lib/HTML/TokeParser.pm
-    version: '3.81'
+    version: '3.82'
 requires:
   Carp: '0'
   Exporter: '0'
@@ -69,7 +68,7 @@ resources:
   bugtracker: https://github.com/libwww-perl/HTML-Parser/issues
   homepage: https://github.com/libwww-perl/HTML-Parser
   repository: https://github.com/libwww-perl/HTML-Parser.git
-version: '3.81'
+version: '3.82'
 x_contributors:
   - 'Antonio Radici <antonio@dyne.org>'
   - 'Barbie <barbie@missbarbell.co.uk>'
@@ -78,6 +77,7 @@ x_contributors:
   - 'Chip Salzenberg <chip@pobox.com>'
   - 'Damyan Ivanov <dmn@debian.org>'
   - 'David Steinbrunner <dsteinbrunner@pobox.com>'
+  - 'dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>'
   - 'François Perrad <francois.perrad@gadz.org>'
   - 'Gisle Aas <gisle@aas.no>'
   - 'Graham Knop <haarg@haarg.org>'
@@ -93,8 +93,9 @@ x_contributors:
   - 'Salvatore Bonaccorso <salvatore.bonaccorso@gmail.com>'
   - 'Todd Rinaldo <toddr@cpan.org>'
   - 'Ville Skyttä <ville.skytta@iki.fi>'
+  - 'yoshikazusawa <883514+yoshikazusawa@users.noreply.github.com>'
   - 'Yves Orton <demerphq@gmail.com>'
   - 'Zefram <zefram@fysh.org>'
-x_generated_by_perl: v5.36.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_generated_by_perl: v5.34.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

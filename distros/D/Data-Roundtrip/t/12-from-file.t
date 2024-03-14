@@ -9,6 +9,15 @@
 # the input string to YAML::PP or use Perl >= v5.14
 # I am untainting 1 case.
 
+# Another issue is that Data::Random::Structure returning 
+# floats we get something like this with Test::More's is_deeply()
+#   Failed test 'jsonfile2perl() : result agrees with what we saved before.'
+#   at t/12-from-file.t line 120.
+#     Structures begin differing at:
+#          $got->[0] = '0.764232574944025'
+#     $expected->[0] = '0.764232574944026'
+# there is nothing we can do
+
 use 5.008;
 use strict;
 use warnings;
@@ -20,7 +29,7 @@ my $DIAG_verbose = 0;
 use Data::Dump qw/pp/;
 use utf8;
 
-our $VERSION='0.26';
+our $VERSION='0.27';
 
 use File::Temp;
 use File::Spec;
@@ -69,19 +78,21 @@ my $randomiser_utf8 = Data::Random::Structure::UTF8->new(
 ok(defined $randomiser, 'Data::Random::Structure->new()'." called.") or BAIL_OUT;
 if( $DIAG_verbose > 0 ){ diag "calling utf8 randomiser OK"; }
 
-my ($outfile, $FH, $perl_data_structure, $json_string, $yaml_string, $perl_data_structure_from_file);
+my ($outfile, $FH, $perl_data_structure, $json_string, $yaml_string,
+    $perl_data_structure_from_file, $perl_data_structure_name);
 
 for my $trial (1..2){
 	if( $DIAG_verbose > 0 ){ diag "in trials loop, trial is $trial ..."; }
   # NOTE: randomiser_utf8->generate() will output to STDERR
   #       I don't know how to generate string-UTF8
   #       it is harmless and it shows that all works ok
-  for $perl_data_structure (
-	$randomiser->generate(),
-	$randomiser_utf8->generate()
+  for my $ad (
+	['randomiser', $randomiser->generate()],
+	['randomiser_utf8', $randomiser_utf8->generate()]
   ){
-	if( $DIAG_verbose > 0 ){ diag "in perl_data_structure loop, trial is $trial ..."; }
-	ok(defined $perl_data_structure, "random perl data structure created.");
+	($perl_data_structure_name, $perl_data_structure) = @$ad;
+	if( $DIAG_verbose > 0 ){ diag "in perl_data_structure loop, trial is $trial, randomiser is '$perl_data_structure_name' ..."; }
+	ok(defined $perl_data_structure, "random perl data structure created ('$perl_data_structure_name'/$trial).");
 
 	if( $DIAG_verbose > 0 ){ diag "about to call fix_recursively ..."; }
 	my $recursion_depth = 0;
@@ -94,17 +105,17 @@ for my $trial (1..2){
 	if( $DIAG_verbose > 0 ){ diag "calling Data::Roundtrip::perl2json ..."; }
 	$json_string = Data::Roundtrip::perl2json($perl_data_structure);
 	if( $DIAG_verbose > 0 ){ diag "calling Data::Roundtrip::perl2json OK"; }
-	ok(defined($json_string), "json string created from perl data structure.");
+	ok(defined($json_string), "json string created from perl data structure ('$perl_data_structure_name'/$trial).");
 
 	if( $DIAG_verbose > 0 ){ diag "calling Data::Roundtrip::perl2yaml ..."; }
 	$yaml_string = Data::Roundtrip::perl2yaml($perl_data_structure);
 	if( $DIAG_verbose > 0 ){ diag "calling Data::Roundtrip::perl2yaml OK"; }
-	ok(defined($yaml_string), "yaml string created from perl data structure.");
+	ok(defined($yaml_string), "yaml string created from perl data structure ('$perl_data_structure_name'/$trial).");
 
 	# write JSON to file
 	$outfile = File::Spec->catdir($tmpdir, 'out.json');
 	if( $DIAG_verbose > 0 ){ diag "opening out to file $outfile ..."; }
-	ok(open($FH, '>:utf8', $outfile), "open tmp file '${outfile}' for writing JSON string.") or BAIL_OUT;
+	ok(open($FH, '>:utf8', $outfile), "open tmp file '${outfile}' for writing JSON string ('$perl_data_structure_name'/$trial).") or BAIL_OUT;
 	if( $DIAG_verbose > 0 ){ diag "writing out to file $outfile ..."; }
 	print $FH $json_string;
 	if( $DIAG_verbose > 0 ){ diag "writing out to file $outfile OK"; }
@@ -115,15 +126,15 @@ for my $trial (1..2){
 	if( $DIAG_verbose > 0 ){ diag "reading jsin from file $outfile ..."; }
 	$perl_data_structure_from_file = Data::Roundtrip::jsonfile2perl($outfile);
 	if( $DIAG_verbose > 0 ){ diag "reading jsin from file $outfile OK"; }
-	ok(defined($perl_data_structure_from_file), "jsonfile2perl() : called and got defined result.");
+	ok(defined($perl_data_structure_from_file), "jsonfile2perl() : called and got defined result ('$perl_data_structure_name'/$trial).");
 	if( $DIAG_verbose > 0 ){ diag "calling is_deeply ..."; }
-	is_deeply($perl_data_structure, $perl_data_structure_from_file, "jsonfile2perl() : result agrees with what we saved before.");
+	is_deeply($perl_data_structure, $perl_data_structure_from_file, "jsonfile2perl() : result agrees with what we saved before ('$perl_data_structure_name'/$trial).");
 	if( $DIAG_verbose > 0 ){ diag "calling is_deeply OK"; }
 
 	# write YAML data to file
 	$outfile = File::Spec->catdir($tmpdir, 'out.yaml');
 	if( $DIAG_verbose > 0 ){ diag "opening2 out to file $outfile ..."; }
-	ok(open($FH, '>:utf8', $outfile), "open tmp file '${outfile}' for writing yaml string.") or BAIL_OUT;
+	ok(open($FH, '>:utf8', $outfile), "open tmp file '${outfile}' for writing yaml string ('$perl_data_structure_name'/$trial).") or BAIL_OUT;
 	if( $DIAG_verbose > 0 ){ diag "opening2 out to file $outfile OK"; }
 	print $FH $yaml_string;
 	if( $DIAG_verbose > 0 ){ diag "printed out to file $outfile OK"; }
@@ -134,9 +145,9 @@ for my $trial (1..2){
 	if( $DIAG_verbose > 0 ){ diag "calling Data::Roundtrip::yamlfile2perl ..."; }
 	$perl_data_structure_from_file = Data::Roundtrip::yamlfile2perl($outfile);
 	if( $DIAG_verbose > 0 ){ diag "calling Data::Roundtrip::yamlfile2perl OK"; }
-	ok(defined($perl_data_structure_from_file), "yamlfile2perl() : called and got defined result.") or BAIL_OUT("--begin YAML:\n${yaml_string}\n--end YAML string.\nfailed for above YAML string");
+	ok(defined($perl_data_structure_from_file), "yamlfile2perl() : called and got defined result ('$perl_data_structure_name'/$trial).") or BAIL_OUT("--begin YAML:\n${yaml_string}\n--end YAML string.\nfailed for above YAML string");
 	if( $DIAG_verbose > 0 ){ diag "calling is_deeply2 ..."; }
-	is_deeply($perl_data_structure, $perl_data_structure_from_file, "yamlfile2perl() : result agrees with what we saved before.") or BAIL_OUT("--begin perl_data_structure:".perl2dump($perl_data_structure_from_file)."--end perl_data_structure_from_file\n\n--begin perl_data_structure_from_file:\n".perl2dump($perl_data_structure_from_file)."--end perl_data_structure_from_file.");
+	is_deeply($perl_data_structure, $perl_data_structure_from_file, "yamlfile2perl() : result agrees with what we saved before ('$perl_data_structure_name'/$trial).") or BAIL_OUT("--begin perl_data_structure:".perl2dump($perl_data_structure_from_file)."--end perl_data_structure_from_file\n\n--begin perl_data_structure_from_file:\n".perl2dump($perl_data_structure_from_file)."--end perl_data_structure_from_file.");
 	if( $DIAG_verbose > 0 ){ diag "calling is_deeply2 OK"; }
 
 	if( $verbose == 0 ){
