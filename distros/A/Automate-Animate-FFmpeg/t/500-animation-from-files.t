@@ -17,7 +17,7 @@ use File::Basename;
 
 use Automate::Animate::FFmpeg;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 my $curdir = Cwd::abs_path($FindBin::Bin);
 

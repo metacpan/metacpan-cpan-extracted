@@ -1,5 +1,5 @@
 /* runcap - run program and capture its output
-   Copyright (C) 2017-2020 Sergey Poznyakoff
+   Copyright (C) 2017-2024 Sergey Poznyakoff
 
    Runcap is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -260,6 +260,8 @@ timeval_diff(struct timeval const *a, struct timeval const *b)
 	return res;
 }
 
+extern char **environ;
+
 static int
 runcap_start(struct runcap *rc)
 {
@@ -306,6 +308,8 @@ runcap_start(struct runcap *rc)
 			i--;
 		}
 
+		if (rc->rc_env)
+			environ = rc->rc_env;
 		execvp(rc->rc_program ? rc->rc_program : rc->rc_argv[0],
 		       rc->rc_argv);
 		_exit(127);
@@ -479,7 +483,8 @@ runcap_init(struct runcap *rc, int flags)
 		rc->rc_program = NULL;
 	if (!(flags & RCF_TIMEOUT))
 		rc->rc_timeout = 0;
-
+	if (!(flags & RCF_ENV))
+		rc->rc_env = NULL;
 	if (flags & RCF_STDIN) {
 		if (rc->rc_cap[RUNCAP_STDIN].sc_size > 0
 		    && rc->rc_cap[RUNCAP_STDIN].sc_fd != -1) {

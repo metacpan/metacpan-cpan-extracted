@@ -107,15 +107,14 @@ XS_unpack_ARGV(SV *sv)
 }
 
 static void
-free_argv(struct capture *cp)
+free_argv(char **argv)
 {
-	if (cp->rc.rc_argv) {
+	if (argv) {
 		size_t i;
-		for (i = 0; cp->rc.rc_argv[i]; i++) {
-			free(cp->rc.rc_argv[i]);
+		for (i = 0; argv[i]; i++) {
+			free(argv[i]);
 		}
-		free(cp->rc.rc_argv);
-		cp->rc.rc_argv = NULL;
+		free(argv);
 	}
 }
 
@@ -176,7 +175,7 @@ capture_close_output(struct capture *cp, int strno)
 }
 
 struct capture *
-capture_new(SV *program, ARGV argv, unsigned timeout, SV *cb[2], SV *input)
+capture_new(SV *program, ARGV argv, ARGV env, unsigned timeout, SV *cb[2], SV *input)
 {
 	struct capture *cp;
 	I32 i, n;
@@ -194,6 +193,11 @@ capture_new(SV *program, ARGV argv, unsigned timeout, SV *cb[2], SV *input)
 		SvREFCNT_inc(program);
 		cp->rc.rc_program = SvPV_nolen(program);
 		cp->flags |= RCF_PROGRAM;
+	}
+
+	if (env) {
+		cp->rc.rc_env = env;
+		cp->flags |= RCF_ENV;
 	}
 	
 	if (timeout) {
@@ -226,7 +230,10 @@ capture_DESTROY(struct capture *cp)
 	capture_close_output(cp, RUNCAP_STDOUT);
 	capture_close_output(cp, RUNCAP_STDERR);
 
-	free_argv(cp);
+	free_argv(cp->rc.rc_env);
+	cp->rc.rc_env = NULL;
+	free_argv(cp->rc.rc_argv);
+	cp->rc.rc_argv = NULL;
 	runcap_free(&cp->rc);
 	
 	free(cp);
@@ -274,8 +281,19 @@ capture_set_input(struct capture *cp, SV *inp)
 void
 capture_set_argv_ref(struct capture *cp, ARGV argv)
 {
-	free_argv(cp);
+	free_argv(cp->rc.rc_argv);
 	cp->rc.rc_argv = argv;
+}
+
+void
+capture_set_env_ref(struct capture *cp, ARGV env)
+{
+	free_argv(cp->rc.rc_env);
+	cp->rc.rc_env = env;
+	if (cp->rc.rc_env == NULL)
+		cp->flags &= ~RCF_ENV;
+	else
+		cp->flags |= RCF_ENV;
 }
 
 char *

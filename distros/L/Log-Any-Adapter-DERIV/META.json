@@ -63,6 +63,7 @@
             "Log::Any::Proxy" : "0",
             "Path::Tiny" : "0.118",
             "PerlIO" : "0",
+            "Syntax::Keyword::Try" : "0.28",
             "Term::ANSIColor" : "5.01",
             "Time::Moment" : "0.44",
             "curry" : "1.001000",
@@ -100,7 +101,7 @@
    "provides" : {
       "Log::Any::Adapter::DERIV" : {
          "file" : "lib/Log/Any/Adapter/DERIV.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
@@ -115,14 +116,14 @@
          "web" : "https://github.com/binary-com/perl-Log-Any-Adapter-DERIV"
       }
    },
-   "version" : "0.006",
+   "version" : "0.007",
    "x_authority" : "cpan:DERIV",
    "x_contributors" : [
-      "aisha-deriv <aisha@deriv.com>",
+      "aisha-deriv <aisha@regentmarkets.com>",
       "chylli-binary <52912308+chylli-binary@users.noreply.github.com>",
-      "chylli-deriv <chylli@binary.com>",
-      "Tom Molesworth <tom@deriv.com>",
       "aisha-deriv <116639606+aisha-deriv@users.noreply.github.com>",
+      "chylli-deriv <chylli@deriv.com>",
+      "Tom Molesworth <tom@deriv.com>",
       "Kalaiselvan <kalaiselvan@deriv.com>",
       "sasikala-binary <76985137+sasikala-binary@users.noreply.github.com>"
    ],

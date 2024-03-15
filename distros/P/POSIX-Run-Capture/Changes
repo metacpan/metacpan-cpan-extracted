@@ -1,5 +1,14 @@
 Revision history for Perl extension POSIX::Run::Capture.
 
+1.05  Fri Mar 15 13:47:40 2024
+	- New constructor argument 'env' allows you to supply environment
+	to the command to be run.
+	- Fix packaging
+	
+1.04  Fri Mar 15 13:31:50 2024
+	- New constructor argument 'env' allows you to supply environment
+	to the command to be run.
+
 1.03  Tue Feb 23 12:21:17 2021
 	- Fix packaging
 	

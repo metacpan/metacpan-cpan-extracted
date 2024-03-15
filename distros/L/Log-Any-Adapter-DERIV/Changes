@@ -1,5 +1,8 @@
 
 Revision history for Log-Any-Adapter-DERIV
+0.007     2024-03-15 07:29:29+00:00 UTC
+    - sensitive information masking in log messages 
+
 0.006     2023-10-26 19:53:35+08:00 Asia/Shanghai
     - Context addition to logger adapter
 

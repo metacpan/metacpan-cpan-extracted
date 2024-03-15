@@ -1941,7 +1941,7 @@ If the object I<object> is not C<NULL> and its type is a multi-numeric array typ
 
 C<int32_t (*isa)(L<SPVM_ENV* env|SPVM::Document::NativeClass/"Runtime Environment">, L<SPVM_VALUE* stack|SPVM::Document::NativeClass/"Runtime Stack">, void* object, void* basic_type, int32_t type_dimension);>
 
-If the object I<object> satisfies the L<runtime type assignability|SPVM::Document::Language::Types/"Runtime Type Assignability"> to the type given by the basic type C<basic_type> and the type dimension C<type_dimension>, returns 1, otherwise returns 0.
+If the object I<object> satisfies the L<runtime assignment requirement|SPVM::Document::Language::Types/"Runtime Assignment Requirement"> to the type given by the basic type C<basic_type> and the type dimension C<type_dimension>, returns 1, otherwise returns 0.
 
 =head2 isa_by_name
 
@@ -1949,7 +1949,7 @@ C<int32_t (*isa_by_name)(L<SPVM_ENV* env|SPVM::Document::NativeClass/"Runtime En
 
 If the basic type given by the basic type name I<basic_type_name> is not found, returns 0.
 
-If the object I<object> satisfies the L<runtime type assignability|SPVM::Document::Language::Types/"Runtime Type Assignability"> to the type given by the basic type name C<basic_type_name> and the type dimension C<type_dimension>, returns 1, otherwise returns 0.
+If the object I<object> satisfies the L<runtime assignment requirement|SPVM::Document::Language::Types/"Runtime Assignment Requirement"> to the type given by the basic type name C<basic_type_name> and the type dimension C<type_dimension>, returns 1, otherwise returns 0.
 
 =head2 is_type
 
@@ -1971,7 +1971,7 @@ If the object I<object> is not C<NULL> and its type of the object I<object> is e
 
 C<int32_t (*elem_isa)(L<SPVM_ENV* env|SPVM::Document::NativeClass/"Runtime Environment">, L<SPVM_VALUE* stack|SPVM::Document::NativeClass/"Runtime Stack">, void* array, void* element);>
 
-If the element I<element> satisfies the L<runtime type assignability|SPVM::Document::Language::Types/"Runtime Type Assignability"> to the element type of the array I<array>, returns 1, otherwise returns 0.
+If the element I<element> satisfies the L<runtime assignment requirement|SPVM::Document::Language::Types/"Runtime Assignment Requirement"> to the element type of the array I<array>, returns 1, otherwise returns 0.
 
 =head2 get_elem_size
 
@@ -2260,6 +2260,26 @@ If it is invalid, an exception is thrown.
 
 If an exception is thrown, returns a non-zero value, otherwise returns 0.
 
+=head2 new_array_proto_element_no_mortal
+
+C<void* (*new_array_proto_element_no_mortal)(SPVM_ENV* env, SPVM_VALUE* stack, void* element, int32_t length);>
+
+Creates a new array given the prototype element I<element> and the length I<length>, and returns it.
+
+If I<element> is C<NULL>, returns C<NULL>.
+
+If the type of I<element> must be an object type.
+
+If I<length> is lower than 0, returns C<NULL>.
+
+This native API should not be used unless special purposes are intended. Normally, use the L</"new_array_proto_element"> native API.
+
+=head2 new_array_proto_element
+
+C<void* (*new_array_proto_element)(SPVM_ENV* env, SPVM_VALUE* stack, void* element, int32_t length);>
+
+Calls the L</"new_array_proto_element_no_mortal"> native API and push its return value to the L<mortal stack|SPVM::Document::NativeClass/"Mortal Stack">, and returns it.
+
 =head1 Native API IDs
 
 Native APIs have its IDs.
@@ -2477,6 +2497,8 @@ Native APIs have its IDs.
   210 spvm_stdout,
   211 spvm_stderr,
   212 check_bootstrap_method
+  213 new_array_proto_element_no_mortal
+  214 new_array_proto_element
 
 =head1 Constant Values
 

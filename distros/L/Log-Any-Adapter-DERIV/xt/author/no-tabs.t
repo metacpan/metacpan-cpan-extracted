@@ -16,6 +16,7 @@ my @files = (
     't/00-report-prereqs.t',
     't/01-log_context.t',
     't/02-collapse_future_stack.t',
+    't/03-log_mask_sensitive.t',
     't/05-filter_stack.t',
     't/10-misc.t',
     't/deriv.t',

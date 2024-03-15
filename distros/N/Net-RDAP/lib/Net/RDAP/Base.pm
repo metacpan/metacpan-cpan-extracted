@@ -54,6 +54,18 @@ modules extend it.
 
 =head1 METHODS
 
+=head2 Language
+
+    $lang = $object->lang;
+
+Returns the language identifier for this object, or C<undef>.
+
+=cut
+
+sub lang { $_[0]->{'lang'} }
+
+=pod
+
 =head2 Links
 
     @links = $object->links;

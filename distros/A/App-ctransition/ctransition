@@ -1,0 +1,134 @@
+#!/usr/bin/perl 
+use 5.014 ; use warnings ; 
+use Time::HiRes qw [ gettimeofday tv_interval ] ;
+my ${ dt_start } = [ gettimeofday ] ; 
+use Getopt::Std ; getopts '=@:0:2:l:q:' , \my %o  ; 
+use Term::ANSIColor qw[ color :constants ] ; $Term::ANSIColor::AUTORESET = 1 ;
+use FindBin qw[ $Script ] ; 
+use Encode qw[ decode_utf8 encode_utf8 ] ; 
+
+* d3 = exists $o{','} && $o{','} eq 0 ? sub{$_[0]} : sub { $_[0] =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/gr } ;
+my $time0 = time ; 
+my $help = 0  ; # オンラインヘルプの文面の表示をしたか否か。
+my $head ;
+$o{i} //= "\t" ;
+my $readLines = 0 ; # 読み取った行数
+my $optL0 = ($o{l}//'') eq 0 ? 1 : 0 ;
+$o{'@'} //= 15 ; # 何秒おきにアラームを発生させるか
+$o{0} //= '-' ; # 出力表において、頻度が 0 の場合に、どんな値を出力するかを表す。
+$o{q} //= "'" ; # 出力する文字を前後で囲む文字。
+
+binmode STDOUT, ":utf8" ;
+
+$SIG{INT} = sub { exit } ;
+$SIG{ALRM} = sub { 
+  my $n = $.  =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/gr ; # 3桁ごとに区切る。
+  say STDERR GREEN "$n lines read ($Script). " , scalar localtime ; 
+  alarm $o{'@'} 
+} ; 
+alarm $o{'@'} ;
+
+
+my %nn ; # $nn{ $prev } { $post } で頻度である。
+my %n2 ; # $post を格納する(ひとまずの定義)。他の意味づけや他の用途は考えられるであろう。
+
+do { $_ = <> ; chomp ; $head = $_ } if $o{'='} ; 
+my $z = '' ; # 直前の文字として格納。
+#my $ec = "\x{24ba}" ; # 最後を表す文字 End Char
+my $ec = "end" ; # 最後を表す文字 End Char
+
+while( <> ) { 
+  $readLines ++ ;
+  do { chomp ; $z = '' } if ! $optL0 ; # 行を意識する場合。
+  $_ = decode_utf8 $_ ; 
+  my @chars = split // , $_ , 0 ; 
+  #say CYAN join "," , @chars , "x" ; 
+  for ( @chars ) {
+    $_ = '\n' if $_ eq "\n" ;
+    $nn {$z} {$_} ++ ; 
+    #$nn {$z} {"\n"} ++ ; 
+    $n2 {$_} ++ ; 
+    $z = $_ ;
+  } 
+  do { $nn {$z} {$ec} ++ ; $n2 {$ec} ++ } if ! $optL0 ; # 行を意識する場合
+  do { $nn {'\n'} {$ec} ++ ; $n2 {'\n'} ++ } if $optL0 ; # 行を意識しない場合
+}
+do { $nn {$z} {$ec} ++ ; $n2 {$ec} ++ } if $optL0 ; # 行を意識しない場合
+
+#say "\x{24ba}" ;
+
+my @keg1 = sort keys %nn ; 
+my @keg2 = sort keys %n2 ; 
+say UNDERLINE join "\t" , 'char' , map { & conv($_) } @keg2 ; 
+for my $k ( @keg1 ) { 
+  say join "\t" , & conv($k) , map { $nn { $k } { $_ } // $o{0} } @keg2 ; 
+}
+say join "\t" , "total" , map { $n2 { $_ } // $o{0} } @keg2 ; 
+exit ;
+
+sub conv ( $ ) { 
+  #$_[0] //= '' ; # !! 
+  #return "\x{24c8}" if $_[0] eq '' ; 
+  return "start" if $_[0] eq '' ; 
+  return $_[0] = '"\t"' if $_[0] eq "\t" ; 
+  return $_[0] = '"\n"' if $_[0] eq "\n" ;   
+  return "$o{q}$_[0]$o{q}" ; 
+}
+
+END{
+  exit if $help ;
+  my $procsec = sprintf "%.5f", tv_interval ${ dt_start } ; #time - $time0 ; # このプログラムの処理にかかった秒数。比較する2個の時刻は秒単位なので、±1秒未満の誤差は発生する。
+  $readLines //= $. ; # Ctrl+Cの連打で必要となる処理。
+  return if ($o{2}//'') eq 0 ; 
+  my $linenumeral = $readLines > 1 ? 'lines' : 'line' ; 
+  print STDERR BOLD FAINT ITALIC & d3 ( $readLines ) . " $linenumeral read. " ; 
+  my $s = tv_interval $dt_start , [ gettimeofday ] ; 
+  say STDERR BOLD FAINT ITALIC " -- $Script ; " . $procsec . " sec. in process" ;
+  say STDERR BOLD FAINT ITALIC $head if defined $head ;
+}
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+  use FindBin qw[ $Script ] ; 
+  $help = 1 ;
+  $ARGV[1] //= '' ;
+  open my $FH , '<' , $0 ;
+  while(<$FH>){
+    s/\$0/$Script/g ;
+    print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+  }
+  close $FH ;
+  exit 0 ;
+}
+
+=encoding utf8
+
+=head1
+
+コマンドの例 :
+
+  $0 inputfile 
+  $0 < inuptfile 
+  cat inputfile | $0 
+
+ 入力の全ての文字に対して、次の文字は何であるかの回数の集計を、行列状に表示する。
+
+オプションに関して :
+
+  -=    : 最初の行を読み飛ばす。
+  -0 STR : 出現回数が0の時に表示する文字。未指定なら '-' となる。
+  -2 0  : 最後に標準エラー出力に出力される二次情報を、出力しない。
+  -@ N  : N秒ごとに、何行読んだか等の情報を標準エラー出力に出力する。未指定だと15。
+  # -l 0  : 行単位(改行文字で区切られている)で処理する(各行の先頭文字を改行文字の直後と見なさない)。
+  -q STR : 各出現文字をどんなクォーテーションの文字で加工かを指定する。未指定ならシングルクォーテーション(')。
+  --help : このオンラインヘルプの文面を表示する。
+
+その他 : 
+  * 行単位の処理になってしまってないか? それで良いのか? 
+  * 改行文字を ハッシュ変数の引数に使えないようにも見える。
+  * 出力する行列を転置させるオプションがあっても良いかも。 
+  * 最も最初の文字は、改行文字の直後ではない。行単位で処理するオプションが必要。
+
+
+=cut

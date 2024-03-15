@@ -7,6 +7,7 @@ LICENSE
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
+out
 ppport.h
 README
 runcap/aclocal.m4
@@ -31,6 +32,7 @@ runcap/shared.am
 runcap/static.am
 runcap/static.in
 runcap/t/atlocal.in
+runcap/t/env.at
 runcap/t/genout.c
 runcap/t/INPUT
 runcap/t/linemon00.at
@@ -63,6 +65,7 @@ t/07two.t
 t/08input.t
 t/09linemon.t
 t/10file.t
+t/11env.t
 t/TestCapture.pm
 typemap
 META.yml                                 Module YAML meta-data (added by MakeMaker)

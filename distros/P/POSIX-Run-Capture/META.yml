@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,10 +22,11 @@ no_index:
 provides:
   POSIX::Run::Capture:
     file: lib/POSIX/Run/Capture.pm
-    version: '1.03'
+    version: '1.05'
 requires:
   perl: '5.006'
 resources:
   bugtracker: https://puszcza.gnu.org.ua/bugs/?group=posixruncapture
   repository: git://git.gnu.org.ua/posixruncapture.git
-version: '1.03'
+version: '1.05'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

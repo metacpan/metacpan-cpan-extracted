@@ -1,5 +1,5 @@
 # Automake settings to build runcap as a static convenience library (default).
-# See Make.am for details.
+# See Make.am for details, including licensing.
 include Make.am
 noinst_LIBRARIES=libruncap.a
 libruncap_a_SOURCES = $(RUNCAP_SRC)

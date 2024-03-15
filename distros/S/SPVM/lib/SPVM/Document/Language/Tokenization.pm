@@ -1,10 +1,10 @@
 =head1 Name
 
-SPVM::Document::Language::Tokenization - Lexical Tokenization in SPVM Language
+SPVM::Document::Language::Tokenization - Lexical Tokenization in The SPVM Language
 
 =head1 Description
 
-This document describes lexical tokenization in SPVM language.
+This document describes lexical tokenization in the SPVM language.
 
 =head1 Tokenization
 
@@ -1414,6 +1414,24 @@ The length of a here document name must be greater than or equal to 0. Otherwise
 A here document name cannot start with a number. If so, a compilation error occurs.
 
 A here document name cannot contain C<__>. If so, a compilation error occurs.
+
+=head1 See Also
+
+=over 2
+
+=item * L<SPVM::Document::Language::SyntaxParsing>
+
+=item * L<SPVM::Document::Language::Statements>
+
+=item * L<SPVM::Document::Language::Operators>
+
+=item * L<SPVM::Document::Language::Class>
+
+=item * L<SPVM::Document::Language>
+
+=item * L<SPVM::Document>
+
+=back
 
 =head1 Copyright & License
 

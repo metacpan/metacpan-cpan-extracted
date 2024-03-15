@@ -183,15 +183,30 @@ sub domain {
     my ($package, $domain) = @_;
     croak(sprintf('Argument to %s->domain() must be a Net::DNS::Domain', $package)) unless ('Net::DNS::Domain' eq ref($domain));
 
+    my $is_tld = (1 == scalar($domain->label));
+
     my $registry = $package->load_registry(DNS_URL);
     return undef if (!$registry);
 
     my %matches;
     SERVICE: foreach my $service ($registry->services) {
         VALUE: foreach my $value ($service->registries) {
-            if ($domain->name =~ /\.$value$/i) {
+
+            if ($is_tld && '' eq $value) {
+                #
+                # the RDAP server for the root zone is identified by an empty
+                # string (see RFC 9224 § 4):
+                #
                 $matches{$value} = $package->get_best_url($service->urls);
+
                 last VALUE;
+
+            } else {
+                if ($domain->name =~ /\.$value$/i) {
+                    $matches{$value} = $package->get_best_url($service->urls);
+
+                    last VALUE;
+                }
             }
         }
     }

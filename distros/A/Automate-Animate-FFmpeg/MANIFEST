@@ -1,5 +1,4 @@
 Changes
-j2cPqwNkTbZQ.txt
 lib/Automate/Animate/FFmpeg.pm
 Makefile.PL
 MANIFEST			This list of files
@@ -22,6 +21,5 @@ t/t-data/images/red.png
 t/t-data/images/Περισσότερα/Κόκκινο.png
 t/t-data/images/Περισσότερα/πράσινο.png
 t/t-data/images/κίτρινο.png
-ZD2uQB52n46f.txt
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -28,7 +28,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 #our @EXPORT = qw();
 
-our $VERSION = '1.03';
+our $VERSION = '1.05';
 
 require XSLoader;
 XSLoader::load('POSIX::Run::Capture', $VERSION);
@@ -55,6 +55,11 @@ sub set_argv {
     $self->set_argv_ref([@_]);
 }
 
+sub set_env {
+    my $self = shift;
+    $self->set_env_ref([@_]);
+}
+
 1;
 __END__
 =head1 NAME
@@ -67,6 +72,7 @@ POSIX::Run::Capture - run command and capture its output
 
   $obj = new POSIX::Run::Capture(argv => [ $command, @args ],
  			         program => $prog,
+                                 env => [ @environment ],
 			         stdin => $fh_or_string,
 			         stdout => $ref_or_string,
 			         stderr => $ref_or_string,
@@ -82,12 +88,15 @@ POSIX::Run::Capture - run command and capture its output
   $aref = $obj->get_lines($chan);
   $obj->rewind($chan)
 
+  $obj->set_argv(@argv);  
   $obj->set_program($prog);
+  $obj->set_env(@argv);  
   $obj->set_timeout($n);
   $obj->set_input($fh_or_string);
 
   $aref = $obj->argv;
   $str = $obj->program
+  $aref = $obj->env;
   $num = $obj->timeout;
     
 =head1 DESCRIPTION
@@ -108,6 +117,7 @@ Creates a new capture object. There are three possible invocation modes.
 
   new POSIX::Run::Capture(argv => [ $command, @args ],
  			  program => $prog,
+                          env => [ @environment ],
 			  stdin => $fh_or_string,
 			  stdout => $ref_or_string,
 			  stderr => $ref_or_string,
@@ -126,6 +136,11 @@ B<program> argument, B<$argv[0]> will be run.
 
 Sets the pathname of binary file to run.	
 
+=item B<env>
+
+Defines execution environment.  By default, environment variables are
+inherited from the calling process.    
+    
 =item B<stdin> or B<input>
 
 Supplies standard input for the command. The argument can be a string or
@@ -181,7 +196,7 @@ A simplified way of creating the object, equivalent to
 Crates an empty capture object.
 
 Whatever constructor is used, the necessary parameters can be set
-or changed later, using B<set_argv>, B<set_program>, B<set_input>,
+or changed later, using B<set_argv>, B<set_program>, B<set_env>, B<set_input>,
 and B<set_timeout>.
 
 Monitors and redirections can be defined only when creating the object.
@@ -189,11 +204,19 @@ Monitors and redirections can be defined only when creating the object.
 =head2 Modifying the object.
 
 The following methods modify the object:    
+
+=head3 $obj->set_argv(@argv)
+
+Set arguments array.    
     
 =head3 $obj->set_program($prog)
 
 Sets the pathname of the command to run.
 
+=head3 $obj->set_env(@env)
+
+Set environment variables.    
+    
 =head3 $obj->set_timeout($n)
 
 Sets runtime timeout, in seconds.
@@ -216,6 +239,10 @@ Returns a reference to the B<argv> array associated with the object.
 
 Returns the pathname of the executable program.
 
+=head3 $obj->env
+
+Returns a reference to the array of environment variables.    
+    
 =head3 $obj->timeout
 
 Returns the runtime timeout or B<0> if no timeout is set.
@@ -295,7 +322,7 @@ Sergey Poznyakoff, E<lt>gray@gnu.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017-2020 by Sergey Poznyakoff
+Copyright (C) 2017-2024 by Sergey Poznyakoff
 
 This library is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the

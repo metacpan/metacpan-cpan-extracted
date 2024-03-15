@@ -1,0 +1,11 @@
+
+This module provides a Unix-like command `colcount'. 
+
+入力の各行について、カラムの数を数えたり、条件を満たすカラムの数を数えたりする。
+特別値や欠測項目を多数持つ行を見つけたりすることに役立つであろう。
+
+=head1 DESCRIPTION
+
+ Copyright (c) 2024 Toshiyuki SHIMONO. All rights reserved.
+ This program is free software; you can redistribute it and/or
+ modify it under the same terms as Perl itself.

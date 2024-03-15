@@ -289,6 +289,18 @@ Set the log context hash
 
 undef the log context hash
 
+=head2 mask_sensitive
+
+Mask sensitive data in the message and logs error in case of failure
+
+=over 4
+
+=item * C<$message> string - The message to be masked
+
+=back
+
+Returns string - The masked message
+
 =head1 INHERITED METHODS
 
 =over 4

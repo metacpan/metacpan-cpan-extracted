@@ -8,6 +8,7 @@ capture_new(package, ...)
 	char *package;
   PREINIT:
         ARGV argv = NULL;
+        ARGV env = NULL;
         unsigned timeout = 0;
         SV *cb[2] = { &PL_sv_undef, &PL_sv_undef };
         SV *prog = &PL_sv_undef;
@@ -37,6 +38,12 @@ capture_new(package, ...)
 					argv = XS_unpack_ARGV(val);
 				} else
 					croak("argv must be an array ref");
+			} else if (strcmp(kw, "env") == 0) {
+				if (SvROK(val)
+				    && SvTYPE(SvRV(val)) == SVt_PVAV) {
+					env = XS_unpack_ARGV(val);
+				} else
+					croak("env must be an array ref");
 			} else if (strcmp(kw, "stdout") == 0
 				   || strcmp(kw, "stderr") == 0) {
 				cb[kw[3] == 'o' ? 0 : 1] = val;
@@ -57,7 +64,7 @@ capture_new(package, ...)
 				croak("unknown keyword argument %s", kw);
 		}
 	}
-        RETVAL = capture_new(prog, argv, timeout, cb, input);
+        RETVAL = capture_new(prog, argv, env, timeout, cb, input);
   OUTPUT:
         RETVAL
 
@@ -77,6 +84,11 @@ void
 capture_set_argv_ref(cp, argv)
 	POSIX::Run::Capture cp;
 	ARGV argv;
+
+void
+capture_set_env_ref(cp, env)
+	POSIX::Run::Capture cp;
+	ARGV env;
 
 void
 capture_set_program(cp, prog)
@@ -115,6 +127,14 @@ capture_argv(cp)
 	POSIX::Run::Capture cp;
   CODE:
 	RETVAL = cp->rc.rc_argv;
+  OUTPUT:
+        RETVAL
+
+ARGV
+capture_env(cp)
+	POSIX::Run::Capture cp;
+  CODE:
+	RETVAL = cp->rc.rc_env;
   OUTPUT:
         RETVAL
 

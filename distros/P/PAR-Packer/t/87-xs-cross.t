@@ -11,6 +11,28 @@ require "./t/utils.pl";
 
 plan skip_all => "Tests only relevant on Windows" unless $^O eq 'MSWin32';
 
+# Building XS modules XS{Quux,Bar} fails with the  most current release
+# of ExtUtils::Depends (0.8001): it doesn't build (and install) the "import lib"
+# corresponding to the XS DLL, e.g. XSQuux.a to XSQuux.xs.dll. 
+# Without XSQuux.a installed, XSBar.xs.dll fails to link with 
+# "undefined reference to `triple'".
+#
+# This happens at least for perl on Windows built with the mingw-w64 
+# toolchain, e.g. Strawberry Perl. Note that the "strawberry" distribution
+# installed by shogo82148/actions-setup-perl on GitHub actions
+# comes with ExtUtils::Depends 0.8000 pre-installed for this very reason.
+#
+# Bug reports:
+# https://rt.cpan.org/Public/Bug/Display.html?id=147200
+# https://rt.cpan.org/Public/Bug/Display.html?id=45224#txn-2466235
+#
+# NOTE: This bug also prevents people building GNOME bindings 
+# (for e.g. Pango, Cairo, Gtk2, Gtk3) with ExtUtils::Depends 0.8001.
+use version;
+require ExtUtils::Depends;
+plan skip_all => "Test XS modules fail to build with ExtUtils::Depends $ExtUtils::Depends::VERSION"
+    unless version->parse($ExtUtils::Depends::VERSION) < v0.800.100;
+
 # This test creates two XS modules that demonstrate the problem
 # with the perl bindings for Gnome libraries: one glue DLL, XSBar.xs.dll,
 # calls a function implemented in another glue DLL, XSQuux.xs.dll
@@ -89,7 +111,6 @@ my $make;
 
 # create temporary directory to install modules into
 my $base = $ENV{PAR_TMPDIR} = tempdir(TMPDIR => 1, CLEANUP => 1);
-my @libs = (catdir($base, qw(lib perl5), $Config{archname}), catdir($base, qw(lib perl5)));
 
 # prepend the new installations to the perl search path for all sub processes
 # The reason is that configuring XSBar requires an installed XSQuux:
@@ -97,12 +118,16 @@ my @libs = (catdir($base, qw(lib perl5), $Config{archname}), catdir($base, qw(li
 #   (this will add dependencies of XSQuux, though there are none this time)
 # - auto/XSQuux/XSQuux.a (added to LIBS by ExtUtils::Depends::find_extra_libs())
 #   (this causes XSBar.xs.dll to link to XSQuux.xs.dll)
-$ENV{PERL5LIB} = join($Config{path_sep}, @libs, $ENV{PERL5LIB});
+{
+    my $perl5lib = catdir($base, qw(lib perl5));
+    $perl5lib .= "$Config{path_sep}$ENV{PERL5LIB}" if $ENV{PERL5LIB};
+    $ENV{PERL5LIB} = $perl5lib;
+}
 
 my $cwd = getcwd();
 my ($exe, $out, $err);
 
-foreach my $mod (qw(XSQuux XSBar))
+foreach my $mod (qw(XSQuux XSBar))      # must build XSQuux **before** XSBar
 {
     diag("build and install $mod");
     chdir(catdir($cwd, qw(t data), $mod)) or die "can't chdir to $mod source: $!";

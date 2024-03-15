@@ -38,8 +38,9 @@ sub roles { $_[0]->{'roles'} ? @{$_[0]->{'roles'}} : () }
 
     $vcard = $entity->vcard;
 
-Returns a L<vCard> object for the entity. Support for all the miriad options in vCard files is ongoing, at the moment,
-only the `fn`, `org`, `email`, `tel` and `adr` node types are supported.
+Returns a L<vCard> object for the entity. Support for all the miriad options in
+vCard files is limited: only the C<fn>, C<org>, C<email>, C<tel> and C<adr> node
+types are supported.
 
 =cut
 
@@ -48,27 +49,38 @@ sub vcard {
 
     return undef unless ($self->{'vcardArray'});
 
-    my $card = vCard->new;
-
-    my @nodes = @{$self->{'vcardArray'}->[1]};
-
     my @emails;
     my @phones;
     my @addresses;
 
-    foreach my $nref (@nodes) {
+    my $card = vCard->new;
+
+    foreach my $nref (@{$self->{'vcardArray'}->[1]}) {
         my ($type, $params, $vtype, $value) = @{$nref};
 
-        #
-        # vCard is a very loosely defined format, so supporting anything
-        # beyond the most basic properties will require a lot of work.
-        # This is the bare minimum for now.
-        #
-        if      ('fn'       eq $type)    { $card->full_name($value)                                                 }
-        elsif   ('org'      eq $type)    { $card->organization($value)                                              }
-        elsif   ('email'    eq $type)    { push(@emails, $value)                                                    }
-        elsif   ('tel'      eq $type)    { push(@phones, { 'type' => $params->{'type'}, 'number' => $value } )      }
-        elsif   ('adr'      eq $type)    { push(@addresses, { 'type' => $params->{'type'}, 'address' => $value } )  }
+        if ('fn' eq $type) {
+            $card->full_name($value);
+
+        } elsif ('org' eq $type) {
+            $card->organization($value);
+
+        } elsif ('email' eq $type) {
+            push(@emails, $value);
+
+        } elsif ('tel' eq $type) {
+            push(@phones, {
+                'type'      => [$params->{'type'}],
+                'number'    => $value
+            });
+
+        } elsif ('adr' eq $type) {
+            $value->[6] = $value->[6] || $params->{'cc'},
+
+            push(@addresses, {
+                'type'      => [$params->{'type'}],
+                'address'   => $value
+            });
+        }
     }
 
     $card->email_addresses([ map { { 'address' => $_ } } @emails ]);

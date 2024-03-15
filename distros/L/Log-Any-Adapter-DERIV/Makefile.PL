@@ -31,6 +31,7 @@ my %WriteMakefileArgs = (
     "Log::Any::Proxy" => 0,
     "Path::Tiny" => "0.118",
     "PerlIO" => 0,
+    "Syntax::Keyword::Try" => "0.28",
     "Term::ANSIColor" => "5.01",
     "Time::Moment" => "0.44",
     "curry" => "1.001000",
@@ -57,7 +58,7 @@ my %WriteMakefileArgs = (
     "Test::MockTime::HiRes" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.006",
+  "VERSION" => "0.007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -82,6 +83,7 @@ my %FallbackPrereqs = (
   "Log::Any::Test" => 0,
   "Path::Tiny" => "0.118",
   "PerlIO" => 0,
+  "Syntax::Keyword::Try" => "0.28",
   "Sys::Hostname" => 0,
   "Term::ANSIColor" => "5.01",
   "Test::CheckDeps" => "0.010",

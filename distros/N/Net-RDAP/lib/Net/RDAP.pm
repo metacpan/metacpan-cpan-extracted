@@ -21,7 +21,7 @@ use vars qw($VERSION);
 use constant DEFAULT_CACHE_TTL => 3600;
 use strict;
 
-$VERSION = '0.20';
+$VERSION = 0.21;
 
 =pod
 

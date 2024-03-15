@@ -70,6 +70,6 @@
          "web" : "https://github.com/hadjiprocopis/Automate-Animate-FFmpeg"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

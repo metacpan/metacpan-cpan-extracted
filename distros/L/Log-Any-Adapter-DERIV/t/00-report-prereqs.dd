@@ -39,6 +39,7 @@ do { my $x = {
                                       'Log::Any::Proxy' => '0',
                                       'Path::Tiny' => '0.118',
                                       'PerlIO' => '0',
+                                      'Syntax::Keyword::Try' => '0.28',
                                       'Term::ANSIColor' => '5.01',
                                       'Time::Moment' => '0.44',
                                       'curry' => '1.001000',

@@ -1,5 +1,5 @@
 /* runcap - run program and capture its output
-   Copyright (C) 2017-2020 Sergey Poznyakoff
+   Copyright (C) 2017-2024 Sergey Poznyakoff
 
    Runcap is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -25,6 +25,7 @@
 #include <sys/wait.h>
 #include <errno.h>
 #include <inttypes.h>
+#include <assert.h>
 #include "runcap.h"
 
 static char *progname;
@@ -49,6 +50,10 @@ usage(int code)
 	fprintf(fp, "tests the runcap library\n");
 	fprintf(fp, "OPTIONS are:\n\n");
 	fprintf(fp, "  -S all|stderr|stdout   selects capture for the next -m, -N, or -s option\n");
+	fprintf(fp, "  -e VAR=NAME            set environment variable\n");
+	fprintf(fp, "  -e -VAR                unset environment variable\n");
+	fprintf(fp, "  -e -                   clear environment (except for PATH,\n");
+	fprintf(fp, "                         HOME, and LOGNAME)\n");
 	fprintf(fp, "  -f FILE                reads stdin from FILE\n");
 	fprintf(fp, "  -i                     inline read (use before -f)\n");
 	fprintf(fp, "  -N                     disable capturing\n");
@@ -234,11 +239,9 @@ readreq_do(struct runcap *rc, struct readreq *req)
 	if (req->full) {
 		char *buf = malloc(req->count);
 		ssize_t n;
-		
-		if (!buf) {
-			perror("malloc");
-			abort();
-		}
+
+		assert(buf != NULL);
+
 		n = runcap_read(rc, req->what, buf, req->count);
 		if (n < 0) {
 			perror("runcap_read");
@@ -279,6 +282,123 @@ open_outfile(char *file, int stream, struct runcap *rc, int *flags)
 	*flags |= RCF_SC_TO_FLAG(RCF_SC_STORFD, stream);
 }
 
+static int
+getenvind(char **env, char const *name)
+{
+        size_t i;
+        for (i = 0; env[i]; i++) {
+                char const *p;
+                char *q;
+
+                for (p = name, q = env[i]; *p == *q; p++, q++)
+                        ;
+                if (*p == 0 && *q == '=') {
+                        return i;
+                }
+        }
+        return -1;
+}
+
+char **
+envdup(char **env)
+{
+	int i;
+	char **new_env;
+
+	for (i = 0; env[i]; i++)
+		;
+
+	new_env = calloc(i+1, sizeof(env[0]));
+	assert(new_env != NULL);
+
+	for (i = 0; env[i]; i++) {
+		new_env[i] = strdup(env[i]);
+		assert(new_env[i] != NULL);
+	}
+	new_env[i] = NULL;
+
+	return new_env;
+}
+
+char **envupdate(char **, char *);
+
+char **
+envclear(char **env)
+{
+	int i, j;
+	static char *keep[] = {
+		"PATH",
+		"HOME",
+		"LOGNAME",
+		NULL
+	};
+	char **new_env = calloc(1, sizeof(new_env[0]));
+	assert(new_env != NULL);
+	for (i = 0; keep[i]; i++) {
+		j = getenvind(env, keep[i]);
+		if (j != -1)
+			new_env = envupdate(new_env, env[j]);
+	}
+	for (i = 0; env[i]; i++)
+		free(env[i]);
+	free(env);
+	return new_env;
+}
+
+char **
+envappend(char **env, char *arg)
+{
+	int i;
+
+	for (i = 0; env[i]; i++)
+		;
+	env = realloc(env, (i+2) * sizeof(env[0]));
+	assert(env != NULL);
+	env[i] = strdup(arg);
+	assert(env[i] != NULL);
+	env[i+1] = NULL;
+	return env;
+}
+
+char **
+envdelete(char **env, char *arg)
+{
+	int i = getenvind(env, arg);
+	if (i != -1) {
+		int n;
+		for (n = 0; env[n]; n++)
+			;
+		free(env[i]);
+		memmove(env + i, env + i + 1, (n - i) * sizeof(env[0]));
+	}
+	return env;
+}
+
+extern char **environ;
+
+char **
+envupdate(char **env, char *arg)
+{
+	if (env == NULL)
+		env = envdup(environ);
+	if (*arg == '-') {
+		if (arg[1] == 0)
+			env = envclear(env);
+		else
+			env = envdelete(env, arg+1);
+	} else {
+		int i = getenvind(env, arg);
+		if (i == -1)
+			env = envappend(env, arg);
+		else {
+			free(env[i]);
+			env[i] = strdup(arg);
+			assert(env[i] != NULL);
+		}
+	}
+	return env;
+}
+
 int
 main(int argc, char **argv)
 {
@@ -306,8 +426,13 @@ main(int argc, char **argv)
 		progname++;
 	else
 		progname = argv[0];
-	while ((c = getopt(argc, argv, "?f:iNn:mo:p:r:S:s:t:")) != EOF) {
+	memset(&rc, 0, sizeof(rc));
+	while ((c = getopt(argc, argv, "?e:f:iNn:mo:p:r:S:s:t:")) != EOF) {
 		switch (c) {
+		case 'e':
+			rc.rc_env = envupdate(rc.rc_env, optarg);
+			rcf |= RCF_ENV;
+			break;
 		case 'f':
 			fd = open(optarg, O_RDONLY);
 			if (fd == -1) {
@@ -325,10 +450,7 @@ main(int argc, char **argv)
 				}
 				size = st.st_size;
 				buffer = malloc(size + 1);
-				if (!buffer) {
-					error("not enough memory");
-					exit(1);
-				}
+				assert(buffer != NULL);
 				
 				rc.rc_cap[RUNCAP_STDIN].sc_size = size;
 				rc.rc_cap[RUNCAP_STDIN].sc_base = buffer;

@@ -260,7 +260,7 @@ This macro defines the following *make* variables:
 
 * Copyright
 
-Copyright (C) 2017-2020 Sergey Poznyakoff
+Copyright (C) 2017-2024 Sergey Poznyakoff
 
 Permission is granted to anyone to make or distribute verbatim copies
 of this document as received, in any medium, provided that the

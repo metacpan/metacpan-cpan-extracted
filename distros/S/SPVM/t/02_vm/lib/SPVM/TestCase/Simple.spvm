@@ -124,4 +124,12 @@ class TestCase::Simple : public {
     
     return $self;
   }
+  
+  method arg_object : object ($object : object) {
+    return $object;
+  }
+  
+  method arg_object_option : object () {
+    return undef;
+  }
 }

@@ -4,13 +4,13 @@
       "Sergey Poznyakoff <gray@gnu.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "POSIX-Run-Capture",
    "no_index" : {
@@ -45,7 +45,7 @@
    "provides" : {
       "POSIX::Run::Capture" : {
          "file" : "lib/POSIX/Run/Capture.pm",
-         "version" : "1.03"
+         "version" : "1.05"
       }
    },
    "release_status" : "stable",
@@ -60,5 +60,6 @@
          "web" : "http://git.gnu.org.ua/cgit/posixruncapture.git/"
       }
    },
-   "version" : "1.03"
+   "version" : "1.05",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

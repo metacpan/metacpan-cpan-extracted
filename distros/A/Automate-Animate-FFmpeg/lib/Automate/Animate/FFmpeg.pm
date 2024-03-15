@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use utf8; # filenames can be in utf8
 
@@ -288,7 +288,7 @@ sub	input_pattern {
 			    File::Find::Rule
 				->file()
 				->name($pattern)
-				->in(Encode::encode_utf8($indir))
+				->in($indir)
 			: map { Encode::decode_utf8($_) }
 			    File::Find::Rule
 				->file()
@@ -378,7 +378,7 @@ Automate::Animate::FFmpeg - Create animation from a sequence of images using FFm
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 
 =head1 SYNOPSIS

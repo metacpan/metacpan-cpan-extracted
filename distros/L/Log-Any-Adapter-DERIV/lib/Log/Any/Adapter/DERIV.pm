@@ -5,10 +5,11 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:DERIV';    # AUTHORITY
-our $VERSION   = '0.006';
+our $VERSION   = '0.007';
 
 use feature qw(state);
 use parent  qw(Log::Any::Adapter::Coderef);
+use Syntax::Keyword::Try;
 
 use utf8;
 
@@ -142,6 +143,7 @@ our %SEVERITY_COLOUR = (
     fatal    => [qw(red bold)],
     critical => [qw(red bold)],
 );
+
 my $adapter_context;
 my @methods     = reverse logging_methods();
 my %num_to_name = map { $_ => $methods[$_] } 0 .. $#methods;
@@ -332,8 +334,9 @@ Add format and add color code using C<format_line> and writes the log entry
 
 sub log_entry {
     my ($self, $data) = @_;
-    $data = $self->_process_data($data);
-    $data = $self->_process_context($data);
+    $data            = $self->_process_data($data);
+    $data            = $self->_process_context($data);
+    $data->{message} = mask_sensitive($data->{message});
     my $json_data;
     my %text_data = ();
     my $get_json  = sub { $json_data //= encode_json_text($data) . "\n"; return $json_data; };
@@ -635,6 +638,50 @@ undef the log context hash
 sub clear_context {
     my ($self) = @_;
     $adapter_context = undef;
+}
+
+=head2 mask_sensitive
+
+Mask sensitive data in the message and logs error in case of failure
+
+=over 4
+
+=item * C<$message> string - The message to be masked
+
+=back
+
+Returns string - The masked message
+
+=cut
+
+sub mask_sensitive {
+    my ($message) = @_;
+
+    # Define a lookup list for all sensitive data regex patterns to be logged
+
+    my @sensitive_patterns = (
+        qr/\b[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}\b/i,             #Email
+        qr/\b(?:token|key|oauth[ _-]?token)\s*[:=]\s*([^\s]+)/i,    #Token or API key , = : value
+        qr/(?:a1|r1|ct1)-[a-z0-9]{29}/i,                            #OAuth, Refresh, and CTrader token patterns
+        qr/[a-z0-9]{15}/i,                                          #API Token pattern
+    );
+
+    try {
+        foreach my $pattern (@sensitive_patterns) {
+            $message =~ s/$pattern/'*' x length($&)/ge;
+        }
+    } catch ($e) {
+        # Disable the custom warning handler temporarily to avoid potential recursion issues.
+        local $SIG{__WARN__} = undef;
+
+        # Extract the error message from the exception.
+        chomp(my $error_msg = $e);
+
+        # Log the error for further investigation and troubleshooting.
+        $log->warn("Error in mask_sensitive: $error_msg");
+    };
+
+    return $message;
 }
 
 1;

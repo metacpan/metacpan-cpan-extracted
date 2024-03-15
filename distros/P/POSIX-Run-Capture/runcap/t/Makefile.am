@@ -1,5 +1,5 @@
 # This file is part of runcap testsuite.
-# Copyright (C) 2017-2020 Sergey Poznyakoff
+# Copyright (C) 2017-2024 Sergey Poznyakoff
 #
 # Runcap is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the
@@ -55,7 +55,8 @@ TESTSUITE_AT = \
   nocap.at\
   redirect.at\
   seek00.at\
-  seek01.at
+  seek01.at\
+  env.at
 # Add more files here
 
 TESTSUITE = $(srcdir)/testsuite

@@ -1,5 +1,5 @@
 /* runcap - run program and capture its output
-   Copyright (C) 2017-2020 Sergey Poznyakoff
+   Copyright (C) 2017-2024 Sergey Poznyakoff
 
    Runcap is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -47,6 +47,7 @@ struct runcap
 {
 	char *rc_program; /* [IN] (Path)name of the program to run */ 
 	char **rc_argv;   /* [IN] Argument vector */
+	char **rc_env;    /* [IN] Environment variables */
 	unsigned rc_timeout; /* [IN] Execution timeout */
 	struct stream_capture rc_cap[RUNCAP_NBUF];
 	/* rc_cap[RUNCAP_STDIN] - [IN], rest - [OUT] */
@@ -58,6 +59,7 @@ struct runcap
 #define RCF_PROGRAM 0x0001 /* rc_program is set */
 #define RCF_TIMEOUT 0x0002 /* rc_timeout is set */
 #define RCF_STDIN   0x0004 /* rc_cap[RUNCAP_STDIN] is set */
+#define RCF_ENV     0x0008 /* rc_env is set */
 
 #define RCF_SC_SIZE        0x1 /* sc_size is set */
 #define RCF_SC_LINEMON     0x2 /* sc_linemon is set*/

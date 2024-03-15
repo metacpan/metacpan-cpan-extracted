@@ -1,5 +1,8 @@
 Revision history for perl module Net::RDAP
 
+0.21 - 2024-03-15
+  - add special case for the root zone entry (see RFC 9224 § 4)
+
 0.20 - 2023-12-31
   - use Storable::dclone instead of Clone::clone
 

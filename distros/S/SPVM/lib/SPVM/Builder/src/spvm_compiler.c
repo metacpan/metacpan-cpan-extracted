@@ -234,7 +234,7 @@ int32_t SPVM_COMPILER_compile_common(SPVM_COMPILER* compiler, const char* basic_
       }
       else {
         int32_t build_opcode_list_start_memory_blocks_count_tmp = compiler->current_each_compile_allocator->memory_blocks_count_tmp;
-        SPVM_OPCODE_BUILDER_build_opcode_list(compiler);
+        SPVM_OPCODE_BUILDER_build_opcodes(compiler);
         assert(compiler->current_each_compile_allocator->memory_blocks_count_tmp == build_opcode_list_start_memory_blocks_count_tmp);
         assert(SPVM_COMPILER_get_error_messages_length(compiler) == 0);
       }
@@ -897,7 +897,7 @@ SPVM_RUNTIME* SPVM_COMPILER_build_runtime(SPVM_COMPILER* compiler) {
             runtime_arg->basic_type = SPVM_API_RUNTIME_get_basic_type_by_id(runtime, arg_var_decl->type->basic_type->id);
             runtime_arg->type_dimension = arg_var_decl->type->dimension;
             runtime_arg->type_flag = arg_var_decl->type->flag;
-            runtime_arg->stack_index = arg_var_decl->arg_stack_index;
+            runtime_arg->stack_index = arg_var_decl->stack_index;
           }
         }
         

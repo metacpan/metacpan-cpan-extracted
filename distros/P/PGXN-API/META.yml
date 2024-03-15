@@ -21,16 +21,16 @@ name: PGXN-API
 provides:
   PGXN::API:
     file: lib/PGXN/API.pm
-    version: v0.20.1
+    version: v0.20.2
   PGXN::API::Indexer:
     file: lib/PGXN/API/Indexer.pm
-    version: v0.20.1
+    version: v0.20.2
   PGXN::API::Router:
     file: lib/PGXN/API/Router.pm
-    version: v0.20.1
+    version: v0.20.2
   PGXN::API::Sync:
     file: lib/PGXN/API/Sync.pm
-    version: v0.20.1
+    version: v0.20.2
 requires:
   Archive::Zip: '1.30'
   CommonMark: '0.290000'
@@ -63,5 +63,5 @@ requires:
   perl: '5.014'
 resources:
   homepage: http://api.pgxn.org/
-version: v0.20.1
+version: v0.20.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

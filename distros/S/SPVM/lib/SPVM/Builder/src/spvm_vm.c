@@ -395,13 +395,13 @@ int32_t SPVM_VM_call_method(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_RUNTIME_METHO
         SPVM_IMPLEMENT_MOVE_OBJECT(env, stack, &object_vars[opcode->operand0], object_vars[opcode->operand1]);
         break;
       }
-      case SPVM_OPCODE_C_ID_MOVE_OBJECT_WITH_TYPE_CHECKING: {
-        int32_t cast_basic_type_id = opcode->operand2;
-        int32_t cast_type_dimension = opcode->operand3;
+      case SPVM_OPCODE_C_ID_MOVE_OBJECT_WITH_TYPE_CHECK: {
+        int32_t dist_basic_type_id = opcode->operand2;
+        int32_t dist_type_dimension = opcode->operand3;
         
-        void* cast_basic_type = env->api->runtime->get_basic_type_by_id(env->runtime, cast_basic_type_id);
+        void* dist_basic_type = env->api->runtime->get_basic_type_by_id(env->runtime, dist_basic_type_id);
         
-        SPVM_IMPLEMENT_MOVE_OBJECT_WITH_TYPE_CHECKING(env, stack, &object_vars[opcode->operand0], object_vars[opcode->operand1], cast_basic_type, cast_type_dimension, &error_id);
+        SPVM_IMPLEMENT_MOVE_OBJECT_WITH_TYPE_CHECK(env, stack, &object_vars[opcode->operand0], object_vars[opcode->operand1], dist_basic_type, dist_type_dimension, &error_id);
         break;
       }
       case SPVM_OPCODE_C_ID_MOVE_OBJECT_CHECK_READ_ONLY: {
@@ -2270,6 +2270,15 @@ int32_t SPVM_VM_call_method(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_RUNTIME_METHO
       }
       case SPVM_OPCODE_C_ID_SET_STACK_OBJECT: {
         SPVM_IMPLEMENT_SET_STACK_OBJECT(stack, opcode->operand3, object_vars[opcode->operand0]);
+        break;
+      }
+      case SPVM_OPCODE_C_ID_SET_STACK_OBJECT_WITH_TYPE_CHECK: {
+        int32_t dist_basic_type_id = opcode->operand1;
+        int32_t dist_type_dimension = opcode->operand2;
+        
+        void* dist_basic_type = env->api->runtime->get_basic_type_by_id(env->runtime, dist_basic_type_id);
+        
+        SPVM_IMPLEMENT_SET_STACK_OBJECT_WITH_TYPE_CHECK(env, stack, opcode->operand3, object_vars[opcode->operand1], dist_basic_type, dist_type_dimension, &error_id);
         break;
       }
       case SPVM_OPCODE_C_ID_SET_STACK_REF: {

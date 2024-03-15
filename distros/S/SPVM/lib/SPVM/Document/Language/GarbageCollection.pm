@@ -1,10 +1,10 @@
 =head1 Name
 
-SPVM::Document::Language::GarbageCollection - Garbage Collection in SPVM Language
+SPVM::Document::Language::GarbageCollection - Garbage Collection in The SPVM Language
 
 =head1 Description
 
-This document describes garbage collection in SPVM language.
+This document describes garbage collection in the SPVM language.
 
 =head1 Garbage Collection
 
@@ -105,6 +105,18 @@ The L<unweaken operator|SPVM::Document::Language::Operators/"unweaken Operator">
 If a weak reference is convertd to a reference, the reference count of the referenced object is incremented by 1.
 
 And the weaken flag of the field trun off, and the back reference from the field is removed from the referenced object.
+
+=head1 See Also
+
+=over 2
+
+=item * L<SPVM::Document::Language::Operators>
+
+=item * L<SPVM::Document::Language>
+
+=item * L<SPVM::Document>
+
+=back
 
 =head1 Copyright & License
 

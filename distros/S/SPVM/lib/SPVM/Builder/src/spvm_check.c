@@ -66,22 +66,22 @@ void SPVM_CHECK_check_basic_types(SPVM_COMPILER* compiler) {
     return;
   }
   
-  SPVM_CHECK_check_basic_types_class_var(compiler);
+  SPVM_CHECK_check_class_vars(compiler);
   if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
     return;
   }
   
-  SPVM_CHECK_check_basic_types_field(compiler);
+  SPVM_CHECK_check_fields(compiler);
   if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
     return;
   }
   
-  SPVM_CHECK_check_basic_types_method(compiler);
+  SPVM_CHECK_check_methods(compiler);
   if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
     return;
   }
   
-  SPVM_CHECK_check_basic_types_ast(compiler);
+  SPVM_CHECK_check_asts(compiler);
   if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
     return;
   }
@@ -207,7 +207,7 @@ void SPVM_CHECK_check_basic_types_relation(SPVM_COMPILER* compiler) {
   }
 }
 
-void SPVM_CHECK_check_basic_types_class_var(SPVM_COMPILER* compiler) {
+void SPVM_CHECK_check_class_vars(SPVM_COMPILER* compiler) {
   
   for (int32_t basic_type_id = compiler->basic_types_base_id; basic_type_id < compiler->basic_types->length; basic_type_id++) {
     int32_t compile_error = 0;
@@ -229,7 +229,7 @@ void SPVM_CHECK_check_basic_types_class_var(SPVM_COMPILER* compiler) {
   }
 }
 
-void SPVM_CHECK_check_basic_types_field(SPVM_COMPILER* compiler) {
+void SPVM_CHECK_check_fields(SPVM_COMPILER* compiler) {
   for (int32_t basic_type_id = compiler->basic_types_base_id; basic_type_id < compiler->basic_types->length; basic_type_id++) {
     int32_t compile_error = 0;
     SPVM_BASIC_TYPE* basic_type = SPVM_LIST_get(compiler->basic_types, basic_type_id);
@@ -404,7 +404,7 @@ void SPVM_CHECK_check_basic_types_field(SPVM_COMPILER* compiler) {
   }
 }
 
-void SPVM_CHECK_check_basic_types_method(SPVM_COMPILER* compiler) {
+void SPVM_CHECK_check_methods(SPVM_COMPILER* compiler) {
 
   for (int32_t basic_type_id = compiler->basic_types_base_id; basic_type_id < compiler->basic_types->length; basic_type_id++) {
     int32_t compile_error = 0;
@@ -450,8 +450,9 @@ void SPVM_CHECK_check_basic_types_method(SPVM_COMPILER* compiler) {
     }
     
     // Check methods
-    for (int32_t i = 0; i < basic_type->methods->length; i++) {
-      SPVM_METHOD* method = SPVM_LIST_get(basic_type->methods, i);
+    SPVM_LIST* methods = basic_type->methods;
+    for (int32_t i = 0; i < methods->length; i++) {
+      SPVM_METHOD* method = SPVM_LIST_get(methods, i);
       
       // Argument limit check
       int32_t args_width = 0;
@@ -465,19 +466,19 @@ void SPVM_CHECK_check_basic_types_method(SPVM_COMPILER* compiler) {
         int32_t is_arg_type_is_mulnum_type = SPVM_TYPE_is_mulnum_type(compiler, arg_type->basic_type->id, arg_type->dimension, arg_type->flag);
         
         // Optional argument
-        SPVM_OP* op_optional_arg_default = arg_var_decl->op_optional_arg_default;
-        if (op_optional_arg_default) {
+        SPVM_OP* op_arg_default = arg_var_decl->op_arg_default;
+        if (op_arg_default) {
           found_optional_arg = 1;
           if (SPVM_TYPE_is_numeric_type(compiler, arg_type->basic_type->id, arg_type->dimension, arg_type->flag)) {
-            if (op_optional_arg_default->id != SPVM_OP_C_ID_CONSTANT) {
+            if (op_arg_default->id != SPVM_OP_C_ID_CONSTANT) {
               SPVM_COMPILER_error(compiler, "The default value of the optional argument \"%s\" must be a constant value.\n  at %s line %d", arg_var_decl->var->name, method->op_method->file, method->op_method->line);
               return;
             }
             else {
-              SPVM_TYPE* constant_type = SPVM_CHECK_get_type(compiler, op_optional_arg_default);
+              SPVM_TYPE* constant_type = SPVM_CHECK_get_type(compiler, op_arg_default);
               int32_t need_implicite_conversion = 0;
-              int32_t allow_narrowing_conversion = SPVM_CHECK_check_allow_narrowing_conversion(compiler, arg_type, op_optional_arg_default);
-              int32_t assignability = SPVM_TYPE_can_assign(
+              int32_t allow_narrowing_conversion = SPVM_CHECK_check_allow_narrowing_conversion(compiler, arg_type, op_arg_default);
+              int32_t assignability = SPVM_TYPE_satisfy_assignment_requirement(
                 compiler,
                 arg_type->basic_type->id, arg_type->dimension, arg_type->flag,
                 constant_type->basic_type->id, constant_type->dimension, constant_type->flag,
@@ -491,7 +492,7 @@ void SPVM_CHECK_check_basic_types_method(SPVM_COMPILER* compiler) {
             }
           }
           else if (SPVM_TYPE_is_object_type(compiler, arg_type->basic_type->id, arg_type->dimension, arg_type->flag)) {
-            if (op_optional_arg_default->id != SPVM_OP_C_ID_UNDEF) {
+            if (op_arg_default->id != SPVM_OP_C_ID_UNDEF) {
               SPVM_COMPILER_error(compiler, "The default value of the optional argument \"%s\" must be undef.\n  at %s line %d", arg_var_decl->var->name, method->op_method->file, method->op_method->line);
               return;
             }
@@ -508,7 +509,7 @@ void SPVM_CHECK_check_basic_types_method(SPVM_COMPILER* compiler) {
           }
         }
         
-        arg_var_decl->arg_stack_index = args_width;
+        arg_var_decl->stack_index = args_width;
         
         if (is_arg_type_is_mulnum_type) {
           args_width += arg_type->basic_type->unmerged_fields->length;
@@ -538,18 +539,16 @@ void SPVM_CHECK_check_basic_types_method(SPVM_COMPILER* compiler) {
         SPVM_BASIC_TYPE* anon_method_defined_basic_type = SPVM_HASH_get(compiler->basic_type_symtable, method->outer_basic_type_name, strlen(method->outer_basic_type_name));
         basic_type->is_precompile = anon_method_defined_basic_type->is_precompile;
       }
-    }
-    
-    SPVM_LIST* methods = basic_type->methods;
-    
-    // Sort methods by name
-    qsort(methods->values, methods->length, sizeof(SPVM_METHOD*), &SPVM_CHECK_method_name_compare_cb);
-    
-    // Create method IDs
-    for (int32_t i = 0; i < basic_type->methods->length; i++) {
-      SPVM_METHOD* method = SPVM_LIST_get(basic_type->methods, i);
       
-      // Set method precompile flag if basic type have precompile attribute
+      // Add variable declarations if the block does not exist
+      if (!method->op_block) {
+        for (int32_t arg_index = 0; arg_index < method->args_length; arg_index++) {
+          SPVM_VAR_DECL* arg_var_decl = SPVM_LIST_get(method->var_decls, arg_index);
+          SPVM_LIST_push(method->var_decls, arg_var_decl);
+        }
+      }
+      
+      // Set is_precompile field of methods
       if (basic_type->is_precompile) {
         int32_t can_precompile;
         if (method->is_init) {
@@ -558,7 +557,6 @@ void SPVM_CHECK_check_basic_types_method(SPVM_COMPILER* compiler) {
         else if (method->is_enum) {
           can_precompile = 0;
         }
-        // native method, methods of interface type
         else if (!method->op_block) {
           can_precompile = 0;
         }
@@ -571,13 +569,7 @@ void SPVM_CHECK_check_basic_types_method(SPVM_COMPILER* compiler) {
         }
       }
       
-      method->index = i;
-    }
-    
-    for (int32_t method_index = 0; method_index < basic_type->methods->length; method_index++) {
-      SPVM_METHOD* method = SPVM_LIST_get(basic_type->methods, method_index);
-      
-      // Check super class method compatibility
+      // Check method overide requirements
       if (!method->is_class_method) {
         SPVM_BASIC_TYPE* parent_basic_type = basic_type->parent;
         while (1) {
@@ -588,59 +580,51 @@ void SPVM_CHECK_check_basic_types_method(SPVM_COMPILER* compiler) {
           SPVM_METHOD* parent_method = SPVM_HASH_get(parent_basic_type->method_symtable, method->name, strlen(method->name));
           
           if (parent_method) {
-            int32_t method_compatibility = SPVM_BASIC_TYPE_check_method_compatibility(compiler, basic_type, method, parent_basic_type, parent_method, "class");
+            int32_t can_override = SPVM_METHOD_satisfy_interface_method_requirement(compiler, parent_basic_type, parent_method, basic_type, method, "class");
             
-            if (method_compatibility == 0) {
+            if (can_override == 0) {
               return;
             }
           }
           parent_basic_type = parent_basic_type->parent;
         }
       }
-      
       assert(method->current_basic_type->file);
       
-      // Add variable declarations if the block does not exist
-      if (!method->op_block) {
-        for (int32_t arg_index = 0; arg_index < method->args_length; arg_index++) {
-          SPVM_VAR_DECL* arg_var_decl = SPVM_LIST_get(method->var_decls, arg_index);
-          SPVM_LIST_push(method->var_decls, arg_var_decl);
-        }
-      }
-    }
-    
-    // Check interface method compatibility
-    for (int32_t interface_basic_type_index = 0; interface_basic_type_index < basic_type->interface_basic_types->length; interface_basic_type_index++) {
-      
-      SPVM_BASIC_TYPE* interface_basic_type = SPVM_LIST_get(basic_type->interface_basic_types, interface_basic_type_index);
-      for (int32_t interface_method_index = 0; interface_method_index < interface_basic_type->methods->length; interface_method_index++) {
-        SPVM_METHOD* interface_method = SPVM_LIST_get(interface_basic_type->methods, interface_method_index);
+      // Check interface method overide requirement
+      for (int32_t interface_basic_type_index = 0; interface_basic_type_index < basic_type->interface_basic_types->length; interface_basic_type_index++) {
         
-        // Check super class method compatibility
-        SPVM_BASIC_TYPE* parent_basic_type = basic_type;
-        while (1) {
-          if (!parent_basic_type) {
-            break;
-          }
+        SPVM_BASIC_TYPE* interface_basic_type = SPVM_LIST_get(basic_type->interface_basic_types, interface_basic_type_index);
+        for (int32_t interface_method_index = 0; interface_method_index < interface_basic_type->methods->length; interface_method_index++) {
+          SPVM_METHOD* interface_method = SPVM_LIST_get(interface_basic_type->methods, interface_method_index);
           
-          SPVM_METHOD* parent_method = SPVM_HASH_get(parent_basic_type->method_symtable, interface_method->name, strlen(interface_method->name));
-          
-          if (parent_method) {
-            int32_t method_compatibility = SPVM_BASIC_TYPE_check_method_compatibility(compiler, parent_basic_type, parent_method, interface_basic_type, interface_method, "interface");
+          if (strcmp(method->name, interface_method->name) == 0) {
+            int32_t can_override = SPVM_METHOD_satisfy_interface_method_requirement(compiler, interface_basic_type, interface_method, basic_type, method, "interface");
             
-            if (method_compatibility == 0) {
+            if (can_override == 0) {
               return;
             }
           }
-          parent_basic_type = parent_basic_type->parent;
         }
       }
+      
     }
+    
+    // Sort methods by name
+    qsort(methods->values, methods->length, sizeof(SPVM_METHOD*), &SPVM_CHECK_method_name_compare_cb);
+    
+    // Create method IDs
+    for (int32_t i = 0; i < methods->length; i++) {
+      SPVM_METHOD* method = SPVM_LIST_get(methods, i);
+      
+      method->index = i;
+    }
+    
   }
 }
 
   
-void SPVM_CHECK_check_basic_types_ast(SPVM_COMPILER* compiler) {
+void SPVM_CHECK_check_asts(SPVM_COMPILER* compiler) {
   for (int32_t basic_type_id = compiler->basic_types_base_id; basic_type_id < compiler->basic_types->length; basic_type_id++) {
     SPVM_BASIC_TYPE* basic_type = SPVM_LIST_get(compiler->basic_types, basic_type_id);
     
@@ -682,13 +666,13 @@ void SPVM_CHECK_check_basic_types_ast(SPVM_COMPILER* compiler) {
       SPVM_METHOD* method = SPVM_LIST_get(basic_type->methods, method_index);
       // AST traversals
       if (method->op_block) {
-        SPVM_CHECK_check_ast_check_op_types(compiler, basic_type, method);
+        SPVM_CHECK_check_ast_op_types(compiler, basic_type, method);
         if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
           return;
         }
         
         // AST traversal - Check syntax and generate some operations
-        SPVM_CHECK_check_ast_check_syntax(compiler, basic_type, method);
+        SPVM_CHECK_check_ast_syntax(compiler, basic_type, method);
         if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
           return;
         }
@@ -698,11 +682,11 @@ void SPVM_CHECK_check_basic_types_ast(SPVM_COMPILER* compiler) {
         assert(SPVM_COMPILER_get_error_messages_length(compiler) == 0);
         
         // AST traversal - Check if a block needs "leave scope" operation
-        SPVM_CHECK_check_ast_check_if_block_need_leave_scope(compiler, basic_type, method);
+        SPVM_CHECK_check_ast_if_block_need_leave_scope(compiler, basic_type, method);
         assert(SPVM_COMPILER_get_error_messages_length(compiler) == 0);
         
         // AST traversal - Check call stack ids of variable declarations
-        SPVM_CHECK_check_ast_check_runtime_var_indexs(compiler, basic_type, method);
+        SPVM_CHECK_check_ast_var_index_by_types(compiler, basic_type, method);
         assert(SPVM_COMPILER_get_error_messages_length(compiler) == 0);
       }
     }
@@ -1001,7 +985,7 @@ void SPVM_CHECK_check_call_method(SPVM_COMPILER* compiler, SPVM_OP* op_call_meth
     char* last_colon_pos = strrchr(method_name, ':');
     if (last_colon_pos) {
       const char* abs_method_name = method_name;
-      call_method->is_class_method_instance_method_call = 1;
+      call_method->is_instance_method_static = 1;
       method_name = last_colon_pos + 1;
       int32_t basic_type_name_length = (last_colon_pos - 1) - abs_method_name;
       
@@ -1063,7 +1047,7 @@ void SPVM_CHECK_check_call_method(SPVM_COMPILER* compiler, SPVM_OP* op_call_meth
   }
 }
 
-void SPVM_CHECK_check_ast_check_op_types(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE* basic_type, SPVM_METHOD* method) {
+void SPVM_CHECK_check_ast_op_types(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE* basic_type, SPVM_METHOD* method) {
   
   // Run OPs
   SPVM_OP* op_root = method->op_block;
@@ -1158,7 +1142,7 @@ void SPVM_CHECK_check_ast_check_op_types(SPVM_COMPILER* compiler, SPVM_BASIC_TYP
   }
 }
 
-void SPVM_CHECK_check_ast_check_syntax(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE* basic_type, SPVM_METHOD* method) {
+void SPVM_CHECK_check_ast_syntax(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE* basic_type, SPVM_METHOD* method) {
   
   if (!method->op_block) {
     return;
@@ -1984,7 +1968,7 @@ void SPVM_CHECK_check_ast_check_syntax(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE*
               int32_t need_implicite_conversion = 0;
               int32_t allow_narrowing_conversion = 0;
               
-              int32_t assignability = SPVM_TYPE_can_assign(
+              int32_t assignability = SPVM_TYPE_satisfy_assignment_requirement(
                 compiler,
                 right_type->basic_type->id, right_type->dimension, right_type->flag,
                 left_operand_type->basic_type->id, left_operand_type->dimension, left_operand_type->flag,
@@ -3135,7 +3119,7 @@ void SPVM_CHECK_check_ast_check_syntax(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE*
             SPVM_TYPE* cast_type = SPVM_CHECK_get_type(compiler, op_cast);
             assert(cast_type);
             
-            int32_t castability = SPVM_TYPE_can_cast(
+            int32_t castability = SPVM_TYPE_satisfy_cast_requirement(
               compiler,
               cast_type->basic_type->id, cast_type->dimension, cast_type->flag,
               src_type->basic_type->id, src_type->dimension, src_type->flag
@@ -3383,7 +3367,7 @@ void SPVM_CHECK_check_ast_assign_unassigned_op_to_var(SPVM_COMPILER* compiler, S
   }
 }
 
-void SPVM_CHECK_check_ast_check_if_block_need_leave_scope(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE* basic_type, SPVM_METHOD* method) {
+void SPVM_CHECK_check_ast_if_block_need_leave_scope(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE* basic_type, SPVM_METHOD* method) {
   
   // Block stack
   SPVM_LIST* op_block_stack = SPVM_LIST_new(compiler->current_each_compile_allocator, 0, SPVM_ALLOCATOR_C_ALLOC_TYPE_TMP);
@@ -3483,7 +3467,7 @@ void SPVM_CHECK_check_ast_check_if_block_need_leave_scope(SPVM_COMPILER* compile
   SPVM_LIST_free(op_block_stack);
 }
 
-void SPVM_CHECK_check_ast_check_runtime_var_indexs(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE* basic_type, SPVM_METHOD* method) {
+void SPVM_CHECK_check_ast_var_index_by_types(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE* basic_type, SPVM_METHOD* method) {
   
   SPVM_LIST* tmp_var_decl_stack = SPVM_LIST_new(compiler->current_each_compile_allocator, 0, SPVM_ALLOCATOR_C_ALLOC_TYPE_TMP);
 
@@ -3538,12 +3522,12 @@ void SPVM_CHECK_check_ast_check_runtime_var_indexs(SPVM_COMPILER* compiler, SPVM
               SPVM_TYPE* type = SPVM_CHECK_get_type(compiler, var_decl->op_var_decl);
               
               // Check mem id
-              int32_t runtime_var_index;
+              int32_t index_by_type;
               if (SPVM_TYPE_is_object_type(compiler, type->basic_type->id, type->dimension, type->flag)) {
-                runtime_var_index = SPVM_CHECK_get_runtime_var_index(compiler, runtime_vars_object, var_decl);
+                index_by_type = SPVM_CHECK_get_var_index_by_type(compiler, runtime_vars_object, var_decl);
               }
               else if (SPVM_TYPE_is_ref_type(compiler, type->basic_type->id, type->dimension, type->flag)) {
-                runtime_var_index = SPVM_CHECK_get_runtime_var_index(compiler, runtime_vars_ref, var_decl);
+                index_by_type = SPVM_CHECK_get_var_index_by_type(compiler, runtime_vars_ref, var_decl);
               }
               else if (SPVM_TYPE_is_mulnum_type(compiler, type->basic_type->id, type->dimension, type->flag)) {
                 SPVM_FIELD* first_field = SPVM_LIST_get(type->basic_type->fields, 0);
@@ -3553,27 +3537,27 @@ void SPVM_CHECK_check_ast_check_runtime_var_indexs(SPVM_COMPILER* compiler, SPVM
                 
                 switch (field_type->basic_type->id) {
                   case SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE: {
-                    runtime_var_index = SPVM_CHECK_get_runtime_var_index(compiler, runtime_vars_byte, var_decl);
+                    index_by_type = SPVM_CHECK_get_var_index_by_type(compiler, runtime_vars_byte, var_decl);
                     break;
                   }
                   case SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT: {
-                    runtime_var_index = SPVM_CHECK_get_runtime_var_index(compiler, runtime_vars_short, var_decl);
+                    index_by_type = SPVM_CHECK_get_var_index_by_type(compiler, runtime_vars_short, var_decl);
                     break;
                   }
                   case SPVM_NATIVE_C_BASIC_TYPE_ID_INT: {
-                    runtime_var_index = SPVM_CHECK_get_runtime_var_index(compiler, runtime_vars_int, var_decl);
+                    index_by_type = SPVM_CHECK_get_var_index_by_type(compiler, runtime_vars_int, var_decl);
                     break;
                   }
                   case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG: {
-                    runtime_var_index = SPVM_CHECK_get_runtime_var_index(compiler, runtime_vars_long, var_decl);
+                    index_by_type = SPVM_CHECK_get_var_index_by_type(compiler, runtime_vars_long, var_decl);
                     break;
                   }
                   case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT: {
-                    runtime_var_index = SPVM_CHECK_get_runtime_var_index(compiler, runtime_vars_float, var_decl);
+                    index_by_type = SPVM_CHECK_get_var_index_by_type(compiler, runtime_vars_float, var_decl);
                     break;
                   }
                   case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE: {
-                    runtime_var_index = SPVM_CHECK_get_runtime_var_index(compiler, runtime_vars_double, var_decl);
+                    index_by_type = SPVM_CHECK_get_var_index_by_type(compiler, runtime_vars_double, var_decl);
                     break;
                   }
                   default:
@@ -3584,30 +3568,30 @@ void SPVM_CHECK_check_ast_check_runtime_var_indexs(SPVM_COMPILER* compiler, SPVM
                 SPVM_TYPE* numeric_type = SPVM_CHECK_get_type(compiler, var_decl->op_var_decl);
                 switch(numeric_type->basic_type->id) {
                   case SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE: {
-                    runtime_var_index = SPVM_CHECK_get_runtime_var_index(compiler, runtime_vars_byte, var_decl);
+                    index_by_type = SPVM_CHECK_get_var_index_by_type(compiler, runtime_vars_byte, var_decl);
                     break;
                   }
                   case SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT: {
-                    runtime_var_index = SPVM_CHECK_get_runtime_var_index(compiler, runtime_vars_short, var_decl);
+                    index_by_type = SPVM_CHECK_get_var_index_by_type(compiler, runtime_vars_short, var_decl);
                     break;
                   }
                   case SPVM_NATIVE_C_BASIC_TYPE_ID_INT: {
-                    runtime_var_index = SPVM_CHECK_get_runtime_var_index(compiler, runtime_vars_int, var_decl);
+                    index_by_type = SPVM_CHECK_get_var_index_by_type(compiler, runtime_vars_int, var_decl);
                     if (strcmp(var_decl->var->name, "$.condition_flag") == 0) {
-                      assert(runtime_var_index == 0);
+                      assert(index_by_type == 0);
                     }
                     break;
                   }
                   case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG: {
-                    runtime_var_index = SPVM_CHECK_get_runtime_var_index(compiler, runtime_vars_long, var_decl);
+                    index_by_type = SPVM_CHECK_get_var_index_by_type(compiler, runtime_vars_long, var_decl);
                     break;
                   }
                   case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT: {
-                    runtime_var_index = SPVM_CHECK_get_runtime_var_index(compiler, runtime_vars_float, var_decl);
+                    index_by_type = SPVM_CHECK_get_var_index_by_type(compiler, runtime_vars_float, var_decl);
                     break;
                   }
                   case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE: {
-                    runtime_var_index = SPVM_CHECK_get_runtime_var_index(compiler, runtime_vars_double, var_decl);
+                    index_by_type = SPVM_CHECK_get_var_index_by_type(compiler, runtime_vars_double, var_decl);
                     break;
                   }
                   default:
@@ -3615,12 +3599,12 @@ void SPVM_CHECK_check_ast_check_runtime_var_indexs(SPVM_COMPILER* compiler, SPVM
                 }
               }
               else if (SPVM_TYPE_is_void_type(compiler, type->basic_type->id, type->dimension, type->flag)) {
-                runtime_var_index = -1;
+                index_by_type = -1;
               }
               else {
                 assert(0);
               }
-              var_decl->runtime_var_index = runtime_var_index;
+              var_decl->index_by_type = index_by_type;
               
             }
             break;
@@ -3977,7 +3961,7 @@ SPVM_OP* SPVM_CHECK_check_assign(SPVM_COMPILER* compiler, SPVM_TYPE* dist_type, 
   int32_t need_implicite_conversion = 0;
   int32_t allow_narrowing_conversion = SPVM_CHECK_check_allow_narrowing_conversion(compiler, dist_type, op_src);
   
-  int32_t assignability = SPVM_TYPE_can_assign(
+  int32_t assignability = SPVM_TYPE_satisfy_assignment_requirement(
     compiler,
     dist_type_basic_type_id, dist_type_dimension, dist_type_flag,
     src_type_basic_type_id, src_type_dimension, src_type_flag,
@@ -4003,9 +3987,9 @@ SPVM_OP* SPVM_CHECK_check_assign(SPVM_COMPILER* compiler, SPVM_TYPE* dist_type, 
   return op_src;
 }
 
-int32_t SPVM_CHECK_get_runtime_var_index(SPVM_COMPILER* compiler, SPVM_LIST* runtime_vars, SPVM_VAR_DECL* var_decl) {
+int32_t SPVM_CHECK_get_var_index_by_type(SPVM_COMPILER* compiler, SPVM_LIST* runtime_vars, SPVM_VAR_DECL* var_decl) {
   
-  int32_t found_runtime_var_index = -1;
+  int32_t found_index_by_type = -1;
   
   SPVM_TYPE* var_decl_type = var_decl->type;
 
@@ -4013,11 +3997,11 @@ int32_t SPVM_CHECK_get_runtime_var_index(SPVM_COMPILER* compiler, SPVM_LIST* run
   
   // Search free memory
   int32_t found = 0;
-  for (int32_t runtime_var_index = 0; runtime_var_index < runtime_vars->length; runtime_var_index++) {
-    if (runtime_var_index + var_width <= runtime_vars->length) {
+  for (int32_t index_by_type = 0; index_by_type < runtime_vars->length; index_by_type++) {
+    if (index_by_type + var_width <= runtime_vars->length) {
       int32_t is_used = 0;
       for (int32_t i = 0; i < var_width; i++) {
-        int32_t var_decl_id = (intptr_t)SPVM_LIST_get(runtime_vars, runtime_var_index + i);
+        int32_t var_decl_id = (intptr_t)SPVM_LIST_get(runtime_vars, index_by_type + i);
         if (var_decl_id >= 0) {
           is_used = 1;
           break;
@@ -4025,9 +4009,9 @@ int32_t SPVM_CHECK_get_runtime_var_index(SPVM_COMPILER* compiler, SPVM_LIST* run
       }
       if (!is_used) {
         found = 1;
-        found_runtime_var_index = runtime_var_index;
+        found_index_by_type = index_by_type;
         for (int32_t i = 0; i < var_width; i++) {
-          runtime_vars->values[runtime_var_index + i] = (void*)(intptr_t)var_decl->index;
+          runtime_vars->values[index_by_type + i] = (void*)(intptr_t)var_decl->index;
         }
         break;
       }
@@ -4040,13 +4024,13 @@ int32_t SPVM_CHECK_get_runtime_var_index(SPVM_COMPILER* compiler, SPVM_LIST* run
   
   // Add stack
   if (!found) {
-    found_runtime_var_index = runtime_vars->length;
+    found_index_by_type = runtime_vars->length;
     for (int32_t i = 0; i < var_width; i++) {
       SPVM_LIST_push(runtime_vars, (void*)(intptr_t)var_decl->index);
     }
   }
   
-  return found_runtime_var_index;
+  return found_index_by_type;
 }
 
 SPVM_OP* SPVM_CHECK_new_op_var_tmp(SPVM_COMPILER* compiler, SPVM_TYPE* type, SPVM_METHOD* method, const char* file, int32_t line) {

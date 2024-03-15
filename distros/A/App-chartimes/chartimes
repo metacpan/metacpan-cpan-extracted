@@ -1,0 +1,167 @@
+#!/usr/bin/perl 
+use 5.014 ; use warnings ; 
+use Time::HiRes qw [ gettimeofday tv_interval ] ;
+my ${ dt_start } = [ gettimeofday ] ; 
+use Encode qw[ decode_utf8 encode_utf8 ] ; 
+use Getopt::Std ; getopts '=@:0:2:q:v:y:R' , \my %o  ; 
+use Term::ANSIColor qw[ color :constants ] ; $Term::ANSIColor::AUTORESET = 1 ;
+use FindBin qw[ $Script ] ; 
+use autodie qw [ open ] ;
+use List::Util qw[ max ] ; 
+use Scalar::Util qw [ dualvar ]  ; 
+
+* d3 = exists $o{','} && $o{','} eq 0 ? sub{$_[0]} : sub { $_[0] =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/gr } ;
+my $time0 = time ; 
+my $help = 0  ; # オンラインヘルプの文面の表示をしたか否か。
+my $readLines = 0 ; # 読み取った行数
+my $diffChars = 0 ; # 出力の行数
+my $sec = $o{'@'} // 15 ; # 何秒おきにアラームを発生させるか
+
+$o{0} //= '-' ; # 行列状の出力で 値が 0 の場合に出力する文字
+$o{q} //= "'" ; # 文字を囲む文字
+$o{y} //= 1   ; # この数より少ない頻度しかどの行でも出力しなかった場合は、出力しない。
+my $optV0 = ($o{v}//'') eq '0' ? 1 : 0 ;
+
+$SIG{INT} = sub { exit } ;
+$SIG{ALRM} = sub { 
+  my $n = $.  =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/gr ; # 3桁ごとに区切る。
+  say STDERR GREEN "$n lines read ($Script). " , scalar localtime ; 
+  alarm $sec 
+} ; 
+alarm $sec ;
+
+binmode STDOUT, ":utf8" ;
+my %f2 ; # $f2{ $char } [ $times ] は、各文字 charを丁度times個持つ文字が、何行に出現したかを格納。
+my %fs ; # $f2{$c}[$t] の 数$t で現れた値を記録。
+my %fm1 ; # $fm1{$c} で $c の出現の最大値を記録。dualvar である。すなわち、その時の最大値の時の、行文字列も格納。
+my %fm2 ; # %fm1 とよく似ているが、最後の例を取り出す。
+my $head = <> if $o{'='} ;
+chomp $head if defined $head ;
+$SIG{INT} = sub { & output ; exit } ;
+
+# 集計
+while ( <> ) {
+  $readLines ++ ;
+  chomp ; 
+  $_ = decode_utf8 $_ ;
+  my @F = split // , $_ , 0 ; # 文字単位でばらばらにする。0 でなくて-1にすると、配列の最後が空文字列になる。
+  #say join "+" , @F ; 
+  my %f1 ; #  $frq1{ $char } でその行にその文字が何回出現したかを格納。
+  if ( ! $o{R} ) { $f1 { $_ } ++ for @F } # 単純に集計
+  else { 
+    my %t ; # $t{$c}は $cが連続で最長何文字続いたかを格納するようにする。
+    my $z = '' ; # 直前の文字
+    my $d = 1 ; # 長さ
+    push @F , '' ; # 軽いトリック
+    for ( @F ) { 
+      if ( $_ eq $z ) {
+        $d ++ ; #print $d ; 
+      } else 
+      {
+        $t {$z} = $d ; #print $d if $d > 1 ; 
+        $d = 1 ; # リセット
+        $f1 { $z } = $t{ $z } if ( $f1 { $z } // 0 ) < $t { $z } ;
+      }
+      $z = $_ ;
+    }
+    delete $f1{''} ; 
+    #for ( keys %t )
+  }
+  $f2 { $_ } [ $f1{$_} ] ++ for keys %f1 ;
+  $fs { $_ } = 1 for values %f1 ; 
+
+  for my $c ( keys %f1 ) { 
+    $fm1 { $c } = dualvar $f1 { $c } + 0 , $_ if ($fm1{$c}//0) <  $f1 { $c } ; 
+    $fm2 { $c } = dualvar $f1 { $c } + 0 , $_ if ($fm2{$c}//0) <= $f1 { $c } && $fm1{$c} ne $_ ;
+  }
+}
+
+& output () ;
+exit ; 
+
+# 出力
+
+sub output () { 
+  #say STDERR $o{y} ; exit ;
+  my @fsE = sort { $a <=> $b } keys %fs ; # E は Entire の頭文字のつもり。数値の集合となる。
+  my @chars = grep { scalar @{$f2{$_}} > $o{y} } sort keys %f2 ; 
+  $diffChars = @chars  ; 
+  say UNDERLINE join "\t" , 'char', @fsE ; 
+  for my $c ( @chars ) { 
+    print "$o{q}$c$o{q}\t" ; 
+    my @out ; 
+    push @out , map { $f2{$c}[$_] || $o{0} } @fsE ;
+    push @out , map {"$o{q}$_$o{q}"} grep { defined $_ } $fm1{$c}, $fm2{$c} unless $optV0 ; 
+    do { splice @out , -1 , 1 ; push @out , FAINT "--"} if $out[-1] eq $out[-2] && @fsE +2 == @out; # 同じなら除去。  # トリッキー
+    say join "\t" , @out ; 
+  }
+}
+
+END {
+  exit if $help ;
+  my $procsec = sprintf "%.5f", tv_interval ${ dt_start } ; #time - $time0 ; # このプログラムの処理にかかった秒数。比較する2個の時刻は秒単位なので、±1秒未満の誤差は発生する。
+  $readLines //= $. ; # Ctrl+Cの連打で必要となる処理。
+  return if ($o{2}//'') eq 0 ; 
+  my $linenumeral = $readLines > 1 ? 'lines' : 'line' ; 
+  print STDERR BOLD FAINT ITALIC & d3 ( $readLines ) . " $linenumeral read" ; 
+  print STDERR BOLD FAINT ITALIC $o{'='} ? " after $o{q}$head$o{q}. " : ". " ; 
+  my $charnumeral = $diffChars > 1 ? 'characters' : 'character' ; 
+  print STDERR BOLD FAINT ITALIC & d3 ( $diffChars ) . " different $charnumeral in input are shown. " ; 
+  my $s = tv_interval $dt_start , [ gettimeofday ] ; 
+  say STDERR BOLD FAINT ITALIC " -- $Script ; " . $procsec . " sec. in process" ;
+}
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+  use FindBin qw[ $Script ] ; 
+  $help = 1 ;
+  $ARGV[1] //= '' ;
+  open my $FH , '<' , $0 ;
+  while(<$FH>){
+    s/\$0/$Script/g ;
+    print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+  }
+  close $FH ;
+  exit 0 ;
+}
+
+=encoding utf8
+
+=head1
+
+コマンド
+
+  $0 inputfile 
+  $0 < inuptfile 
+  cat inputfile | $0 
+
+ 各文字yが丁度x個持つ文字が、何個の行に出現したかを行列状に表示するコマンドである。
+
+ 下記の用途に使える。他にも幅広い用途に使えるであろう。
+  - 小数点が2回出現したとか、括弧の対応がついていない可能性が検出容易。
+  - 特別値や特殊文字も見つけやすくなる。
+
+オプションに関して: 
+
+  -0 STR : 頻度が0であることをSTRで表示。未指定なら"-" となる。-0 0 のような使い方が想定される。
+  -2 0 : 入力行数や処理時間などの2次情報を、標準エラー出力に出力しない。
+  -q STR : 出現した各文字を、STR で囲って表示する。未指定ならシングルクォーテーション(')。'1'のようになる。
+  -v 0 : 具体例の抑制。(出力される具体例は、その文字を最も多く持つ入力行で、最初のものと、それとは異なる最後のものである。)
+  #-y N : 横軸の値が N 以上の場合の、文字のみ出力する。
+  -@ N  : N秒おきに、入力の読み取り状況を標準エラー出力に出力する。
+
+  -R   : 異なる各文字が、それぞれの行で、最長で何文字連続したかを、数えるようにする。
+
+  --help : このオンラインヘルプの文面を表示する。
+
+その他: 
+  * 具体例の表示の説明は、もう少し正確で的確で簡潔な説明が必要。(内部のプログラムを見る必要あり。)
+  * -: によって、具体例のところに行番号が付加されるようにしたい。 123:"someline" のように。
+  * 出力の表示順序について、times (頻度; 横軸の数) が多い順に表示するオプションが欲しい。
+  * 他の表示順序のオプションも考えたい。各文字の出現頻度順など。-~で逆転させるなど。
+  * 具体例において、その文字列が何回出現したかを暗い文字で括弧内で表示させたい。
+  * 文字コードも出したいが、他のコマンドで今は代替できるので、もしかしたら後で実装する。
+  * 1文字単位なので、このコマンドは動作が少し遅く感じられるかも。
+
+=cut

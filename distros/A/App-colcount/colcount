@@ -1,0 +1,96 @@
+#!/usr/bin/perl 
+use 5.014 ; use warnings ; 
+use Time::HiRes qw [ gettimeofday tv_interval ] ;
+my ${ dt_start } = [ gettimeofday ] ; 
+use Getopt::Std ; getopts '=@:2:c:e:A' , \my %o  ; 
+use Term::ANSIColor qw[ color :constants ] ; $Term::ANSIColor::AUTORESET = 1 ;
+use FindBin qw[ $Script ] ; 
+
+* d3 = exists $o{','} && $o{','} eq 0 ? sub{$_[0]} : sub { $_[0] =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/gr } ;
+my $time0 = time ; 
+my $help = 0  ; # オンラインヘルプの文面の表示をしたか否か。
+$o{i} //= "\t" ;
+my $readLines = 0 ; # 読み取った行数
+$o{'@'} //= 15 ; # 何秒おきにアラームを発生させるか
+
+$SIG{INT} = sub { exit } ;
+$SIG{ALRM} = sub { 
+  my $n = $.  =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/gr ; # 3桁ごとに区切る。
+  say STDERR GREEN "$n lines read ($Script). " , scalar localtime ; 
+  alarm $o{'@'} 
+} ; 
+alarm $o{'@'} ;
+
+do { $_ = <> ; chomp ; say $_ } if defined $o{c} && $o{'='} ; 
+
+
+while( <> ) { 
+  $readLines ++ ;
+  chomp ; 
+  my @F = split /$o{i}/ , $_ , -1 ; 
+  @F = grep { m/$o{e}/ } @F if defined $o{e} ; 
+  if ( ! defined $o{c} ) { 
+    say $o{A} ? "$_$o{i}" . scalar @F : scalar @F ;
+  }
+  else {
+    say $_ if scalar @F == $o{c} ;
+  }
+}
+
+exit ;
+
+END{
+  exit if $help ;
+  my $procsec = sprintf "%.5f", tv_interval ${ dt_start } ; #time - $time0 ; # このプログラムの処理にかかった秒数。比較する2個の時刻は秒単位なので、±1秒未満の誤差は発生する。
+  $readLines //= $. ; # Ctrl+Cの連打で必要となる処理。
+  return if ($o{2}//'') eq 0 ; 
+  my $linenumeral = $readLines > 1 ? 'lines' : 'line' ; 
+  print STDERR BOLD FAINT ITALIC & d3 ( $readLines ) . " $linenumeral read. " ; 
+  my $s = tv_interval $dt_start , [ gettimeofday ] ; 
+  say STDERR BOLD FAINT ITALIC " -- $Script ; " . $procsec . " sec. in process" ;
+}
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+  use FindBin qw[ $Script ] ; 
+  $help = 1 ;
+  $ARGV[1] //= '' ;
+  open my $FH , '<' , $0 ;
+  while(<$FH>){
+    s/\$0/$Script/g ;
+    print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+  }
+  close $FH ;
+  exit 0 ;
+}
+
+=encoding utf8
+
+=head1
+
+コマンドの例 :
+
+  $0 inputfile 
+  $0 < inuptfile 
+  cat inputfile | $0 
+
+ 入力の各行の列数を出力する。「-e 正規表現」を指定すると、各行で条件に合う列の数を出力する。
+
+オプションに関して :
+
+  -e STR : 正規表現で、マッチする列数を指定するようにする。^(\-|)$ により、各セルの値が"-"または空文字列であるものを数えるように指定できる。
+  -c N   : 各行において、-e で指定した正規表現にマッチする列について、-c で指定された数 N に一致する場合に、その入力行を出力する。
+  -=     : -c が指定されているときに、-= が指定されたら、入力行の1行目は無条件に最初に出力する(変数名の並びであるなど重要なことがあるため)。
+
+  -i STR : 入力の区切り文字の指定。未指定なら、タブ文字を指定したものと見なされる。
+  -A     : 入力の各行において 出力すべき「列数」を、元の入力のすぐ後ろに追加する。区切り文字は-i で指定したものになる。(-cとは両立しない)
+  -2 0   : 最後に標準エラー出力に出力される二次情報を、出力しない。
+  -@  N  : N秒ごとに、何行読んだか等の情報を標準エラー出力に出力する。未指定だと15。
+  --help : このオンラインヘルプの文面を表示する。
+
+その他 : 
+  *  -c の指定において、1個の数だけでは無くて、複数の数や数範囲を指定できるようにしたい。
+  *  -A の指定により、変数名の並びの行に対して、出力をファイルに保存した場合、1行目の最後の列を手書きで書き換える必要が発生してしまう。
+
+=cut

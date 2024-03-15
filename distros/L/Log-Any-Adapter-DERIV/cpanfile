@@ -8,6 +8,7 @@ requires 'Term::ANSIColor', '>= 5.01';
 requires 'Time::Moment', '>= 0.44';
 requires 'File::HomeDir', 0;
 requires 'Future', '>= 0.49';
+requires "Syntax::Keyword::Try", ">= 0.28";
 
 on 'test' => sub {
     requires 'Test::More', '>= 0.98';

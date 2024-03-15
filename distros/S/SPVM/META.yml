@@ -25,5 +25,5 @@ requires:
 resources:
   bugtracker: https://github.com/yuki-kimoto/SPVM/issues
   repository: https://github.com/yuki-kimoto/SPVM.git
-version: '0.989086'
+version: '0.989087'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

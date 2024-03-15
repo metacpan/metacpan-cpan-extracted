@@ -1,5 +1,5 @@
 .\" This file is part of runcap -*- nroff -*-
-.\" Copyright (C) 2017-2020 Sergey Poznyakoff
+.\" Copyright (C) 2017-2024 Sergey Poznyakoff
 .\"
 .\" Runcap is free software; you can redistribute it and/or modify
 .\" it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 .\"
 .\" You should have received a copy of the GNU General Public License
 .\" along with runcap.  If not, see <http://www.gnu.org/licenses/>.
-.TH RUNCAP 2 "January 30, 2020" "RUNCAP" "User Commands"
+.TH RUNCAP 2 "March 14, 2024" "RUNCAP" "User Commands"
 .SH NAME
 runcap \- run external process and capture its stdout and stderr
 .SH SYNOPSIS
@@ -67,13 +67,14 @@ The \fBstruct runcap\fR is defined as follows:
 .nf
 struct runcap
 {
-    char *rc_program;    /* [\fIIN\fR] (Path)name of the program to run */ 
-    char **rc_argv;      /* [\fIIN\fR] Argument vector */
-    unsigned rc_timeout; /* [\fIIN\fR] Execution timeout */
+    char *rc_program;    /* [\fIIN\fR] (Path)name of the program to run. */ 
+    char **rc_argv;      /* [\fIIN\fR] Argument vector. */
+    char **rc_env;       /* [\fIIN\fR] Environment variables. */
+    unsigned rc_timeout; /* [\fIIN\fR] Execution timeout. */
     struct stream_capture rc_cap[3]; 
-    pid_t rc_pid;        /* [\fIOUT\fR] PID of the process */
-    int rc_status;       /* [\fIOUT\fR] Termination status */
-    int rc_errno;        /* [\fIOUT\fR] System error code */
+    pid_t rc_pid;        /* [\fIOUT\fR] PID of the process. */
+    int rc_status;       /* [\fIOUT\fR] Termination status. */
+    int rc_errno;        /* [\fIOUT\fR] System error code. */
 };
 .fi
 .in
@@ -96,6 +97,14 @@ Time to wait for the program termination, in seconds.  If initialized,
 the \fBRCF_TIMEOUT\fR bit must be set in \fIflags\fR.  If not set,
 .B runcap
 will wait indefinitely.
+.TP
+.B rc_env
+A
+.BR NULL -terminated
+array of environment variables.  Each element (except the last
+.BR NULL )
+has the form "\fIname\fR=\fIvalue\fR".  If initialized, the
+\fBRCF_ENV\fR bit must be set in \fIflags\fR.
 .PP
 The three streams associated with the running command are described by
 the
@@ -476,7 +485,7 @@ archive(void)
 .SH AUTHORS
 Sergey Poznyakoff
 .SH COPYRIGHT
-Copyright \(co 2017--2020 Sergey Poznyakoff
+Copyright \(co 2017--2024 Sergey Poznyakoff
 .br
 .na
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
