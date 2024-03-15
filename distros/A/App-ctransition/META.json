@@ -42,6 +42,6 @@
          "web" : "https://github.com/tulamili/App-ctransition"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

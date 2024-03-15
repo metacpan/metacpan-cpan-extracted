@@ -5,13 +5,23 @@ package PDL::Algorithm::Center::Failure;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use custom::failures::x::alias -suffix => '_failure', qw[
   parameter
   iteration::limit_reached
   iteration::empty
 ];
+
+#
+# This file is part of PDL-Algorithm-Center
+#
+# This software is Copyright (c) 2017 by Smithsonian Astrophysical Observatory.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
+#
 
 1;
 
@@ -27,7 +37,11 @@ PDL::Algorithm::Center::Failure - Exception classes for PDL::Algorithm::Center
 
 =head1 VERSION
 
-version 0.12
+version 0.14
+
+=for Pod::Coverage iteration_empty_failure
+iteration_limit_reached_failure
+parameter_failure
 
 =head1 SUPPORT
 

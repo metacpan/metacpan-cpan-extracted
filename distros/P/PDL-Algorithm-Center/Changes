@@ -1,5 +1,18 @@
 Revision history for PDL-Algorithm-Center
 
+0.14      2023-11-25 20:39:04-05:00 America/New_York
+
+  [BUG FIX]
+
+    * backcompat fix: don't use postfix dereference
+
+0.13      2023-11-21 15:03:34-05:00 America/New_York
+
+  [ENHANCEMENT]
+
+    * results objects now have a TO_JSON method to aid in
+      serialization
+
 0.12      2021-10-22 01:12:21-04:00 America/New_York
 
   [BUG FIX]

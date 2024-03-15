@@ -42,6 +42,6 @@
          "web" : "https://github.com/tulamili/App-freq"
       }
    },
-   "version" : "0.125",
+   "version" : "0.126",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

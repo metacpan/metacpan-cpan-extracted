@@ -4,7 +4,7 @@
       "Diab Jerius <djerius@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.020, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -97,6 +97,8 @@
       },
       "runtime" : {
          "requires" : {
+            "Data::Clone" : "0",
+            "Data::Visitor::Tiny" : "0",
             "Hash::Wrap" : "0.10",
             "PDL" : "0",
             "PDL::Image2D" : "0",
@@ -140,15 +142,15 @@
    "provides" : {
       "PDL::Algorithm::Center" : {
          "file" : "lib/PDL/Algorithm/Center.pm",
-         "version" : "0.12"
+         "version" : "0.14"
       },
       "PDL::Algorithm::Center::Failure" : {
          "file" : "lib/PDL/Algorithm/Center/Failure.pm",
-         "version" : "0.12"
+         "version" : "0.14"
       },
       "PDL::Algorithm::Center::Types" : {
          "file" : "lib/PDL/Algorithm/Center/Types.pm",
-         "version" : "0.12"
+         "version" : "0.14"
       }
    },
    "release_status" : "stable",
@@ -163,9 +165,9 @@
          "web" : "https://gitlab.com/djerius/pdl-algorithm-center"
       }
    },
-   "version" : "0.12",
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
+   "version" : "0.14",
+   "x_generated_by_perl" : "v5.36.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "GPL-3.0-only"
 }
 

@@ -10,7 +10,7 @@ my $d0   = PDL->new( 1 );
 my $d1   = PDL->new( [1] );
 my $d1E  = PDL->new( [] );
 my $d2   = PDL->new( [1], [1] );
-my $d2E  = PDL->new( [], [] );
+my $d2E  = PDL->new( [],  [] );
 
 my $d1_1 = PDL->new( [1] );
 my $d2_1 = PDL->new( [ [1] ] );
@@ -30,7 +30,8 @@ sub coerce_lives {
     my $got;
 
     my $ok
-      = $ctx->ok( lives { $got = $c->assert_coerce( $input ) }, "$label: coerce" )->pass
+      = $ctx->ok( lives { $got = $c->assert_coerce( $input ) },
+        "$label: coerce" )->pass
       ? $ctx->ok( _cmp_pdl( $got, $exp ), "$label: value" )->pass
           ? 1
           : do { note $got; 0 }
@@ -80,8 +81,8 @@ subtest 'Piddle0D_ne' => sub {
         coerce_lives( $t, $d0, $d0, '0D' );
 
         coerce_dies( $t, 'foo', 'scalar' );
-        coerce_dies( $t, [3], '[number]' );
-        coerce_dies( $t, {}, 'hash' );
+        coerce_dies( $t, [3],   '[number]' );
+        coerce_dies( $t, {},    'hash' );
 
     };
 
@@ -110,7 +111,7 @@ subtest 'Piddle1D_ne' => sub {
 
         coerce_dies( $t, $d2,   '2D' );
         coerce_dies( $t, 'foo', 'scalar' );
-        coerce_dies( $t, {}, 'hash' );
+        coerce_dies( $t, {},    'hash' );
 
     };
 
@@ -132,15 +133,15 @@ subtest 'Piddle2D_ne' => sub {
 
     subtest "coerce" => sub {
 
-        coerce_lives( $t, 1,   $d2_1, 'number' );
-        coerce_lives( $t, $d0, $d2_1, '0D' );
+        coerce_lives( $t, 1,       $d2_1, 'number' );
+        coerce_lives( $t, $d0,     $d2_1, '0D' );
         coerce_lives( $t, [1],     $d2_1, '[number]' );
         coerce_lives( $t, [ [1] ], $d2_1, '[ [number] ]' );
-        coerce_lives( $t, $d1, $d2_1, '1D' );
-        coerce_lives( $t, $d2, $d2,   '2D' );
+        coerce_lives( $t, $d1,     $d2_1, '1D' );
+        coerce_lives( $t, $d2,     $d2,   '2D' );
 
         coerce_dies( $t, 'foo', 'scalar' );
-        coerce_dies( $t, {}, 'hash' );
+        coerce_dies( $t, {},    'hash' );
     };
 };
 
@@ -152,23 +153,23 @@ subtest 'Piddle_min1D_ne' => sub {
 
         ok( !$t->check( $null ), 'null' );
         ok( !$t->check( $d0 ),   '0D' );
-        ok(  $t->check( $d1 ),   '1D' );
+        ok( $t->check( $d1 ),    '1D' );
         ok( !$t->check( $d1E ),  '1DE' );
-        ok(  $t->check( $d2 ),    '2D' );
+        ok( $t->check( $d2 ),    '2D' );
         ok( !$t->check( $d2E ),  '2DE' );
     };
 
     subtest "coerce" => sub {
 
-        coerce_lives( $t, 1,   $d1_1, 'number' );
-        coerce_lives( $t, $d0, $d1_1, '0D' );
+        coerce_lives( $t, 1,       $d1_1, 'number' );
+        coerce_lives( $t, $d0,     $d1_1, '0D' );
         coerce_lives( $t, [1],     $d1_1, '[number]' );
         coerce_lives( $t, [ [1] ], $d1_1, '[ [number] ]' );
-        coerce_lives( $t, $d1, $d1_1, '1D' );
-        coerce_lives( $t, $d2, $d2,   '2D' );
+        coerce_lives( $t, $d1,     $d1_1, '1D' );
+        coerce_lives( $t, $d2,     $d2,   '2D' );
 
         coerce_dies( $t, 'foo', 'scalar' );
-        coerce_dies( $t, {}, 'hash' );
+        coerce_dies( $t, {},    'hash' );
     };
 };
 
@@ -184,7 +185,7 @@ subtest 'Piddle1DFromPiddle0D' => sub {
 
     coerce_dies( $c, $d2,   '2D' );
     coerce_dies( $c, 'foo', 'scalar' );
-    coerce_dies( $c, {}, 'hash' );
+    coerce_dies( $c, {},    'hash' );
 
 };
 
@@ -199,7 +200,7 @@ subtest 'Piddle2DFromPiddle1D' => sub {
     coerce_lives( $c, $d2, $d2,   '2D' );
 
     coerce_dies( $c, 'foo', 'scalar' );
-    coerce_dies( $c, {}, 'hash' );
+    coerce_dies( $c, {},    'hash' );
 
 };
 
@@ -251,7 +252,7 @@ subtest 'Coords' => sub {
         );
 
         coerce_dies( $t, 'foo', 'scalar' );
-        coerce_dies( $t, {}, 'hash' );
+        coerce_dies( $t, {},    'hash' );
 
     };
 };
@@ -264,9 +265,9 @@ subtest 'Center' => sub {
     subtest "check" => sub {
         ok( !$t->check( $null ), 'null' );
         ok( !$t->check( $d0 ),   '0D' );
-        ok( $t->check( $d1 ),   '1D' );
+        ok( $t->check( $d1 ),    '1D' );
         ok( !$t->check( $d1E ),  '1DE' );
-        ok( !$t->check( $d2 ),    '2D' );
+        ok( !$t->check( $d2 ),   '2D' );
         ok( !$t->check( $d2E ),  '2DE' );
     };
 
@@ -280,9 +281,9 @@ subtest 'Center' => sub {
 
         coerce_lives( $t, [ 1, 2 ], PDL->new( 1, 2 ), '[number, number]' );
 
-        coerce_dies( $t, $d2, '2D' );
+        coerce_dies( $t, $d2,   '2D' );
         coerce_dies( $t, 'foo', 'scalar' );
-        coerce_dies( $t, {}, 'hash' );
+        coerce_dies( $t, {},    'hash' );
 
     };
 };

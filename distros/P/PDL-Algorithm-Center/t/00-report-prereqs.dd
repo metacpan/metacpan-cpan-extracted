@@ -72,6 +72,8 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
+                                      'Data::Clone' => '0',
+                                      'Data::Visitor::Tiny' => '0',
                                       'Hash::Wrap' => '0.10',
                                       'PDL' => '0',
                                       'PDL::Image2D' => '0',

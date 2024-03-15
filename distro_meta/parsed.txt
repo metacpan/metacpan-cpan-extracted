@@ -91032,3 +91032,8 @@ D/DW/DWHEELER/PGXN-API-v0.20.2.tar.gz
 S/SG/SGRAY/POSIX-Run-Capture-1.05.tar.gz
 K/KI/KIMOTO/SPVM-0.989087.tar.gz
 F/FK/FKENTO/Text-ASCII-Convert-0.25.tar.gz
+T/TU/TULAMILI/App-chartimes-0.031.tar.gz
+T/TU/TULAMILI/App-ctransition-0.002.tar.gz
+T/TU/TULAMILI/App-freq-0.126.tar.gz
+T/TU/TULAMILI/App-samelines-0.033.tar.gz
+D/DJ/DJERIUS/PDL-Algorithm-Center-0.14.tar.gz

@@ -28,38 +28,35 @@ $SIG{ALRM} = sub {
 } ; 
 alarm $o{'@'} ;
 
-
 my %nn ; # $nn{ $prev } { $post } で頻度である。
 my %n2 ; # $post を格納する(ひとまずの定義)。他の意味づけや他の用途は考えられるであろう。
 
 do { $_ = <> ; chomp ; $head = $_ } if $o{'='} ; 
-my $z = '' ; # 直前の文字として格納。
-#my $ec = "\x{24ba}" ; # 最後を表す文字 End Char
-my $ec = "end" ; # 最後を表す文字 End Char
+my $z = 'start' ; # 直前の文字として格納。
+my $end = 'end' ; # 最後を表す文字 End Char
 
 while( <> ) { 
   $readLines ++ ;
-  do { chomp ; $z = '' } if ! $optL0 ; # 行を意識する場合。
+  do { chomp ; $z = 'start' } if ! $optL0 ; # 行を意識する場合。
   $_ = decode_utf8 $_ ; 
   my @chars = split // , $_ , 0 ; 
   #say CYAN join "," , @chars , "x" ; 
   for ( @chars ) {
-    $_ = '\n' if $_ eq "\n" ;
+    $_ = '$/' if $_ eq $/  ;
     $nn {$z} {$_} ++ ; 
-    #$nn {$z} {"\n"} ++ ; 
     $n2 {$_} ++ ; 
     $z = $_ ;
   } 
-  do { $nn {$z} {$ec} ++ ; $n2 {$ec} ++ } if ! $optL0 ; # 行を意識する場合
-  do { $nn {'\n'} {$ec} ++ ; $n2 {'\n'} ++ } if $optL0 ; # 行を意識しない場合
+  do { $nn {$z} {$end} ++ ; $n2 {$end} ++ } if ! $optL0 ; # 行を意識する場合
+  #do { $nn {'\n'} {$end} ++ ; $n2 {'\n'} ++ } if $optL0 ; # 行を意識しない場合
 }
-do { $nn {$z} {$ec} ++ ; $n2 {$ec} ++ } if $optL0 ; # 行を意識しない場合
+do { $nn {$z} {$end} ++ ; $n2 {$end} ++ } if $optL0 ; # 行を意識しない場合
 
 #say "\x{24ba}" ;
 
-my @keg1 = sort keys %nn ; 
-my @keg2 = sort keys %n2 ; 
-say UNDERLINE join "\t" , 'char' , map { & conv($_) } @keg2 ; 
+my @keg1 = sort { &conv($a) cmp &conv($b) } keys %nn ; 
+my @keg2 = sort { &conv($a) cmp &conv($b) } keys %n2 ; 
+say UNDERLINE join "\t" , 'p/n' , map { & conv($_) } @keg2 ; 
 for my $k ( @keg1 ) { 
   say join "\t" , & conv($k) , map { $nn { $k } { $_ } // $o{0} } @keg2 ; 
 }
@@ -69,9 +66,10 @@ exit ;
 sub conv ( $ ) { 
   #$_[0] //= '' ; # !! 
   #return "\x{24c8}" if $_[0] eq '' ; 
-  return "start" if $_[0] eq '' ; 
+  ##return "start" if $_[0] eq '' ; 
   return $_[0] = '"\t"' if $_[0] eq "\t" ; 
   return $_[0] = '"\n"' if $_[0] eq "\n" ;   
+  return $_[0] if length $_[0] > 1 ;
   return "$o{q}$_[0]$o{q}" ; 
 }
 
@@ -120,15 +118,12 @@ sub HELP_MESSAGE {
   -0 STR : 出現回数が0の時に表示する文字。未指定なら '-' となる。
   -2 0  : 最後に標準エラー出力に出力される二次情報を、出力しない。
   -@ N  : N秒ごとに、何行読んだか等の情報を標準エラー出力に出力する。未指定だと15。
-  # -l 0  : 行単位(改行文字で区切られている)で処理する(各行の先頭文字を改行文字の直後と見なさない)。
+  -l 0  : 行単位(改行文字で区切られている)で処理する(各行の先頭文字を改行文字の直後と見なさない)。
   -q STR : 各出現文字をどんなクォーテーションの文字で加工かを指定する。未指定ならシングルクォーテーション(')。
   --help : このオンラインヘルプの文面を表示する。
 
 その他 : 
-  * 行単位の処理になってしまってないか? それで良いのか? 
-  * 改行文字を ハッシュ変数の引数に使えないようにも見える。
+  * p/n と最初に出力されるのは、prev/next を意味する。「左の列がprevで、右の行がnext」を意味する。
   * 出力する行列を転置させるオプションがあっても良いかも。 
-  * 最も最初の文字は、改行文字の直後ではない。行単位で処理するオプションが必要。
-
 
 =cut

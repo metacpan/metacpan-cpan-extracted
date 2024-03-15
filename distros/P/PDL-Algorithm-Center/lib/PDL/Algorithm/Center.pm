@@ -9,13 +9,13 @@ require 5.010000;
 
 use feature 'state';
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Carp;
 
 use Try::Tiny;
 use Safe::Isa;
-use Ref::Util qw< is_arrayref is_ref is_coderef  >;
+use Ref::Util  qw< is_arrayref is_ref is_coderef is_hashref >;
 
 use Hash::Wrap ( { -as => '_wrap_hash' } );
 
@@ -115,7 +115,6 @@ sub _sigma_clip_calc_wmask {
     return;
 }
 
-
 sub _sigma_clip_is_converged {
 
     my ( $init_clip, $dtol, $coords, $mask, $weight, $last, $current ) = @_;
@@ -143,7 +142,6 @@ sub _sigma_clip_is_converged {
 
     return;
 }
-
 
 sub _sigma_clip_log_iteration {
 
@@ -174,11 +172,10 @@ sub _sigma_clip_log_iteration {
 
     printf(
         join( ' ', @fmt ) . "\n",
-        $iter->iter, $iter->nelem, $iter->total_weight, $iter->clip // 'undef',
+        $iter->iter,  $iter->nelem, $iter->total_weight, $iter->clip // 'undef',
         $iter->sigma, $iter->center->list
     );
 }
-
 
 ## no critic (ProhibitAccessOfPrivateData)
 
@@ -456,10 +453,51 @@ sub _sigma_clip_log_iteration {
 
 
 
+
+
+
+
+
+
+
+
+sub _to_json {
+    my $obj = shift;
+
+    require Data::Visitor::Tiny;
+    require Data::Clone;
+    require Scalar::Util;
+
+    # remove outer blessed hash and clone everything except for the
+    # objects.
+    my $hash = Data::Clone::clone( { %{$obj} } );
+
+    # now replace the included objects
+    Data::Visitor::Tiny::visit(
+        $hash,
+        sub {
+            return unless Scalar::Util::blessed( my $object = ${ $_[1] } );
+            if ( defined( my $TO_JSON = $object->can( 'TO_JSON' ) ) ) {
+                ${ $_[1] } = $object->$TO_JSON;
+            }
+            elsif ( $object->isa( 'PDL' ) ) {
+                ${ $_[1] }
+                  = $object->dims == 0 ? $object->unpdl->[0] : $object->unpdl;
+            }
+
+            else {
+                die( "unexpected object: ", Scalar::Util::blessed( $object ) );
+            }
+        },
+        $hash
+    );
+    return $hash;
+}
+
 use Hash::Wrap ( {
-        -as     => '_new_iteration',
-        -class  => 'PDL::Algorithm::Center::Iteration',
-        -clone  => sub {
+        -as    => '_new_iteration',
+        -class => 'PDL::Algorithm::Center::Iteration',
+        -clone => sub {
             my $hash = shift;
 
             return {
@@ -470,20 +508,21 @@ use Hash::Wrap ( {
                 } keys %$hash
             };
         },
+        -methods => { TO_JSON => \&_to_json },
     },
     {
-        -as     => '_return_iterate_results',
-        -class  => 'PDL::Algorithm::Center::Iterate::Results',
+        -as      => '_return_iterate_results',
+        -class   => 'PDL::Algorithm::Center::Iterate::Results',
+        -methods => { TO_JSON => \&_to_json },
     } );
-
 
 sub sigma_clip {
 
     state $check = compile_named(
-        center => Optional [ ArrayRef [ Num | Undef ] | Center | CodeRef ],
-        clip   => Optional [PositiveNum],
-        coords => Optional [Coords],
-        dtol   => PositiveNum,
+        center      => Optional [ ArrayRef [ Num | Undef ] | Center | CodeRef ],
+        clip        => Optional [PositiveNum],
+        coords      => Optional [Coords],
+        dtol        => PositiveNum,
         iterlim     => Optional [PositiveInt],
         log         => Optional [ Bool | CodeRef ],
         mask        => Optional [ Undef | Piddle_min1D_ne ],
@@ -554,9 +593,7 @@ sub sigma_clip {
         parameter_failure->throw( "must specify one of <coords> or <weight>" );
     }
 
-
     my ( $ndims ) = $opt->coords->dims;
-
 
     if ( defined $opt->{center} && is_arrayref( $opt->center ) ) {
 
@@ -586,7 +623,6 @@ sub sigma_clip {
         $opt->{center} //= \&_weighted_mean_center;
     }
 
-
     my $nsigma = delete $opt->{nsigma};
     $opt->{calc_wmask} //= sub {
         _sigma_clip_calc_wmask( $nsigma, @_ );
@@ -610,10 +646,8 @@ sub sigma_clip {
 
     delete @{$opt}{ grep { !defined $opt->{$_} } keys %$opt };
 
-
     iterate( %$opt );
 }
-
 
 
 
@@ -1190,7 +1224,6 @@ sub iterate {
         $total_weight = $opt->weight->dsum;
     }
 
-
     my $mask   = $opt->mask->copy;
     my $weight = $opt->weight->copy;
 
@@ -1201,8 +1234,6 @@ sub iterate {
     parameter_failure->throw(
         "<center> must be a 1D piddle with $ndims elements" )
       unless is_Piddle1D( $opt->center ) && $opt->center->nelem == $ndims;
-
-
 
     #############################################################################
 
@@ -1224,7 +1255,6 @@ sub iterate {
 
     $mask   .= $opt->mask;
     $weight .= $opt->weight;
-
 
     my $iteration = 0;
     my $converged;
@@ -1317,7 +1347,7 @@ PDL::Algorithm::Center - Various methods of finding the center of a sample
 
 =head1 VERSION
 
-version 0.12
+version 0.14
 
 =head1 DESCRIPTION
 
@@ -1523,14 +1553,14 @@ It defaults to a piddle of all C<1>'s.
 =head3 Sigma Clip Results
 
 B<sigma_clip> returns an object which includes all of the attributes
-from the final iteration object (See L</Sigma Clip Iterations> ), with
+from the final iteration object (See L</Sigma Clip Iteration Object> ), with
 the following additional attributes/methods:
 
 =over
 
 =item C<iterations> => I<arrayref>
 
-An array of results objects for each iteration.
+An array of instances of L</Sigma Clip Iteration Object> for each iteration.
 
 =item C<success> => I<boolean>
 
@@ -1552,9 +1582,13 @@ inclusion mask.
 If the C<$save_weight> option is true, this will be the final
 weights.
 
+=item C<TO_JSON>
+
+Returns a structure suitable for serialization.
+
 =back
 
-=head4 Sigma Clip Iterations
+=head4 Sigma Clip Iteration Object
 
 The results for each iteration are stored in an object with the
 following attributes/methods:
@@ -1594,6 +1628,10 @@ if the C<clip> option was not specified.
 
 I<Optional>. The distance between the previous and current centers. This is defined
 only if the C<dtol> option was passed.
+
+=item C<TO_JSON>
+
+Returns a structure suitable for serialization.
 
 =back
 

@@ -6,7 +6,7 @@ use Test2::Tools::Compare qw[ object call ];
 use PDL::Algorithm::Center qw[ sigma_clip ];
 
 use PDL::Lite;
-use PDL::Core qw( pdl zeroes );
+use PDL::Core  qw( pdl zeroes );
 use PDL::Ufunc qw( dsum dsumover );
 use PDL::IO::FITS;
 use Scalar::Util qw( blessed );
@@ -32,22 +32,20 @@ sub logit {
 sub my_float {
     my $expected = shift;
 
-    return validator (
+    return validator(
         sub {
             my $got = $_;
             my $ref;
-            $got = $got->at if  defined( $ref =  blessed $got ) && $ref eq 'PDL';;
-            !! float( $expected )->run( convert => sub { $_[0] } );
-        }
-       );
+            $got = $got->at if defined( $ref = blessed $got ) && $ref eq 'PDL';
+            !!float( $expected )->run( convert => sub { $_[0] } );
+        } );
 }
 
 sub to_scalar {
     my $what = shift;
-    my $ref = blessed $what;
+    my $ref  = blessed $what;
     return ( defined( $ref ) && $ref eq 'PDL' ) ? $what->sclr : $what;
 }
-
 
 ########################################
 # interface
@@ -101,7 +99,6 @@ subtest "coords" => sub {
     ok( lives { sigma_clip( %req, coords => pdl( 1 ) ) }, "pdl(1)", )
       or note( $@ );
 
-
 };
 
 subtest "center" => sub {
@@ -112,7 +109,7 @@ subtest "center" => sub {
                 %req,
                 coords => pdl( 1 ),
                 center => 'foo'
-              )
+            )
         },
         [ eclass( 'parameter' ) ],
         'center not a 1D piddle'
@@ -124,7 +121,7 @@ subtest "center" => sub {
                 %req,
                 coords => pdl( [1], [2] ),
                 center => pdl( 1.5 ),
-              )
+            )
         },
         'center a 1D piddle'
     ) or note $@;
@@ -134,12 +131,11 @@ subtest "center" => sub {
             sigma_clip(
                 %req,
                 coords => pdl( [1], [2] ),
-                center => [ 1.5 ],
-              )
+                center => [1.5],
+            )
         },
         'center a arrayref'
     ) or note $@;
-
 
 };
 
@@ -162,8 +158,6 @@ subtest "weight" => sub {
 
 };
 
-
-
 foreach my $field ( 'weight', 'mask' ) {
 
     subtest "coords + $field" => sub {
@@ -174,7 +168,7 @@ foreach my $field ( 'weight', 'mask' ) {
                     %req,
                     coords => [ pdl( 1, 2, 3 ), pdl( 3, 4, 5 ) ],
                     $field => pdl( 1 ),
-                  )
+                )
             },
             [ eclass( 'parameter' ) ],
             'incorrect dimensions'
@@ -186,7 +180,7 @@ foreach my $field ( 'weight', 'mask' ) {
                     %req,
                     coords => [ pdl( 1, 2, 3 ), pdl( 3, 4, 5 ) ],
                     $field => pdl( 1, 2, 3 ),
-                  )
+                )
             },
             'matched dimensions'
         ) or note $@;
@@ -205,7 +199,6 @@ subtest "!( coords || weight)" => sub {
 
 };
 
-
 subtest 'log' => sub {
 
     isa_ok(
@@ -214,14 +207,13 @@ subtest 'log' => sub {
                 %req,
                 coords => pdl( 1 ),
                 log    => 'string',
-              )
+            )
         },
         [ eclass( 'parameter' ) ],
         'log = string'
     );
 
 };
-
 
 for my $field ( qw( clip nsigma dtol ) ) {
 
@@ -261,9 +253,6 @@ for my $field ( qw( clip nsigma dtol ) ) {
     };
 }
 
-
-
-
 ########################################
 # operations
 
@@ -288,7 +277,8 @@ sub _generate_sample {
             # so tests are reproducible
             my $rng = PDL::GSL::RNG->new( 'taus' );
             $rng->set_seed( 1 );
-            $coords_cache = $rng->ran_bivariate_gaussian( 10, 8, 0.5, $attr{nelem} );
+            $coords_cache
+              = $rng->ran_bivariate_gaussian( 10, 8, 0.5, $attr{nelem} );
             $coords_cache->wfits( $data );
             $coords_cache;
         }
@@ -327,7 +317,8 @@ subtest 'coords, no clip, no initial center' => sub {
         dtol    => 0.00001,
         iterlim => 100,
         nsigma  => 1.5,
-        # log => sub { require DDP; $_[0]->center( $_[0]->center->unpdl ); \&DDP::p( $_[0] ) },
+
+# log => sub { require DDP; $_[0]->center( $_[0]->center->unpdl ); \&DDP::p( $_[0] ) },
     );
 
     ok( $results->success, "successful centering" ) or note $results->error;
@@ -339,16 +330,16 @@ subtest 'coords, no clip, no initial center' => sub {
     is(
         $iter0,
         object {
-            call nelem => $sample->nelem;
+            call nelem        => $sample->nelem;
             call total_weight => $sample->nelem;
-            call center => array {
+            call center       => array {
                 item float( $sample->average_center->[0] );
                 item float( $sample->average_center->[1] );
                 end;
             };
             call sigma => D();
-            call dist => U();
-            call clip => U();
+            call dist  => U();
+            call clip  => U();
         },
         "iteration 0",
     );
@@ -388,7 +379,8 @@ subtest 'coords, no clip, initial center = [X,Y]' => sub {
         dtol    => 0.00001,
         iterlim => 100,
         nsigma  => 1.5,
-        # log => sub { require DDP; $_[0]->center( $_[0]->center->unpdl ); \&DDP::p( $_[0] ) },
+
+# log => sub { require DDP; $_[0]->center( $_[0]->center->unpdl ); \&DDP::p( $_[0] ) },
     );
 
     ok( $results->success, "successful centering" ) or note $results->error;
@@ -400,16 +392,16 @@ subtest 'coords, no clip, initial center = [X,Y]' => sub {
     is(
         $iter0,
         object {
-            call nelem => $sample->nelem;
+            call nelem        => $sample->nelem;
             call total_weight => $sample->nelem;
-            call center => array {
-                item float( $sample->initial_center->at(0) );
-                item float( $sample->initial_center->at(1) );
+            call center       => array {
+                item float( $sample->initial_center->at( 0 ) );
+                item float( $sample->initial_center->at( 1 ) );
                 end;
             };
             call sigma => D();
-            call dist => U();
-            call clip => U();
+            call dist  => U();
+            call clip  => U();
         },
         "iteration 0",
     );
@@ -443,12 +435,13 @@ subtest 'coords, no clip, initial center = [ X, undef]' => sub {
     my $sample = _generate_sample();
 
     my $results = sigma_clip(
-        center => [ $sample->initial_center->at(0), undef ],
+        center  => [ $sample->initial_center->at( 0 ), undef ],
         coords  => $sample->coords,
         dtol    => 0.00001,
         iterlim => 100,
         nsigma  => 1.5,
-        # log => sub { require DDP; $_[0]->center( $_[0]->center->unpdl ); \&DDP::p( $_[0] ) },
+
+# log => sub { require DDP; $_[0]->center( $_[0]->center->unpdl ); \&DDP::p( $_[0] ) },
     );
 
     ok( $results->success, "successful centering" ) or note $results->error;
@@ -460,16 +453,16 @@ subtest 'coords, no clip, initial center = [ X, undef]' => sub {
     is(
         $iter0,
         object {
-            call nelem => $sample->nelem;
+            call nelem        => $sample->nelem;
             call total_weight => $sample->nelem;
-            call center => array {
-                item float( $sample->initial_center->at(0) );
+            call center       => array {
+                item float( $sample->initial_center->at( 0 ) );
                 item float( $sample->average_center->[1] );
                 end;
             };
             call sigma => D();
-            call dist => U();
-            call clip => U();
+            call dist  => U();
+            call clip  => U();
         },
         "iteration 0",
     );
@@ -503,12 +496,13 @@ subtest 'coords, no clip, initial center => [undef,Y]' => sub {
     my $sample = _generate_sample();
 
     my $results = sigma_clip(
-        center => [ undef, $sample->initial_center->at(1) ],
+        center  => [ undef, $sample->initial_center->at( 1 ) ],
         coords  => $sample->coords,
         dtol    => 0.00001,
         iterlim => 100,
         nsigma  => 1.5,
-        # log => sub { require DDP; $_[0]->center( $_[0]->center->unpdl ); \&DDP::p( $_[0] ) },
+
+# log => sub { require DDP; $_[0]->center( $_[0]->center->unpdl ); \&DDP::p( $_[0] ) },
     );
 
     ok( $results->success, "successful centering" ) or note $results->error;
@@ -520,16 +514,16 @@ subtest 'coords, no clip, initial center => [undef,Y]' => sub {
     is(
         $iter0,
         object {
-            call nelem => $sample->nelem;
+            call nelem        => $sample->nelem;
             call total_weight => $sample->nelem;
-            call center => array {
+            call center       => array {
                 item float( $sample->average_center->[0] );
-                item float( $sample->initial_center->at(1) );
+                item float( $sample->initial_center->at( 1 ) );
                 end;
             };
             call sigma => D();
-            call dist => U();
-            call clip => U();
+            call dist  => U();
+            call clip  => U();
         },
         "iteration 0",
     );
@@ -563,12 +557,13 @@ subtest 'coords, no clip, initial center => [undef, undef]' => sub {
     my $sample = _generate_sample();
 
     my $results = sigma_clip(
-        center => [ undef, undef ],
+        center  => [ undef, undef ],
         coords  => $sample->coords,
         dtol    => 0.00001,
         iterlim => 100,
         nsigma  => 1.5,
-        # log => sub { require DDP; $_[0]->center( $_[0]->center->unpdl ); \&DDP::p( $_[0] ) },
+
+# log => sub { require DDP; $_[0]->center( $_[0]->center->unpdl ); \&DDP::p( $_[0] ) },
     );
 
     ok( $results->success, "successful centering" ) or note $results->error;
@@ -580,16 +575,16 @@ subtest 'coords, no clip, initial center => [undef, undef]' => sub {
     is(
         $iter0,
         object {
-            call nelem => $sample->nelem;
+            call nelem        => $sample->nelem;
             call total_weight => $sample->nelem;
-            call center => array {
+            call center       => array {
                 item float( $sample->average_center->[0] );
                 item float( $sample->average_center->[1] );
                 end;
             };
             call sigma => D();
-            call dist => U();
-            call clip => U();
+            call dist  => U();
+            call clip  => U();
         },
         "iteration 0",
     );
@@ -630,7 +625,8 @@ subtest 'coords + clip results' => sub {
         dtol    => 0.00001,
         iterlim => 100,
         nsigma  => 1.5,
-        # log => sub { require DDP; $_[0]->center( $_[0]->center->unpdl ); \&DDP::p( $_[0] ) },
+
+# log => sub { require DDP; $_[0]->center( $_[0]->center->unpdl ); \&DDP::p( $_[0] ) },
     );
 
     ok( $results->success, "successful centering" ) or note $results->error;
@@ -639,11 +635,11 @@ subtest 'coords + clip results' => sub {
     is(
         $results->iterations->[0],
         object {
-            call sigma => my_float( $sample->sigma );
-            call nelem => $sample->ninside;
+            call sigma        => my_float( $sample->sigma );
+            call nelem        => $sample->ninside;
             call total_weight => $sample->ninside;
-            call dist => U();
-            call clip => 10;
+            call dist         => U();
+            call clip         => 10;
         },
         "iteration 0",
     );
@@ -671,7 +667,6 @@ subtest 'coords + clip results' => sub {
     );
     #>>> notidy
 
-
 };
 
 # let's try masking!
@@ -686,23 +681,24 @@ subtest 'coords + mask results' => sub {
         iterlim => 100,
         dtol    => 0.00001,
         nsigma  => 1.5,
-        # log => sub { require DDP; $_[0]->center( $_[0]->center->unpdl ); \&DDP::p( $_[0] ) },
+
+# log => sub { require DDP; $_[0]->center( $_[0]->center->unpdl ); \&DDP::p( $_[0] ) },
     );
 
     ok( $results->success, "successful centering" ) or note $results->error;
 
     # make sure iteration 0 agrees with the above calculations
     is(
-       $results->{iterations}[0],
-       object {
-           call sigma  => my_float( $sample->sigma );
-           call nelem => $sample->ninside;
-           call total_weight => $sample->ninside;
-           call dist => U();
-           call clip => U();
-       },
-       "iteration 0",
-      );
+        $results->{iterations}[0],
+        object {
+            call sigma        => my_float( $sample->sigma );
+            call nelem        => $sample->ninside;
+            call total_weight => $sample->ninside;
+            call dist         => U();
+            call clip         => U();
+        },
+        "iteration 0",
+    );
 
     # Test2::V0 can't handle objects which overload &&.
     $results->center( $results->center->unpdl );
@@ -736,7 +732,13 @@ subtest 'coords + clip + weight results' => sub {
     my $inside_weight     = $weight->where( $sample->mask );
     my $inside_weight_sum = to_scalar( $inside_weight->dsum );
 
-    $sample->sigma( sqrt( dsum( $inside_weight * dsumover( ( $sample->inside - $sample->initial_center )**2 ) ) / $inside_weight_sum ) );
+    $sample->sigma(
+        sqrt(
+            dsum(
+                $inside_weight
+                  * dsumover( ( $sample->inside - $sample->initial_center )**2 )
+            ) / $inside_weight_sum
+        ) );
 
     my $results = sigma_clip(
         coords  => $sample->coords,
@@ -750,17 +752,16 @@ subtest 'coords + clip + weight results' => sub {
 
     # make sure iteration 0 agrees with the above calculations
     is(
-       $results->{iterations}[0],
-       object {
-           call sigma  => my_float( $sample->sigma );
-           call nelem => $sample->ninside;
-           call total_weight => $inside_weight_sum;
-           call dist => U();
-           call clip => 10;
-       },
-       "iteration 0",
-      );
-
+        $results->{iterations}[0],
+        object {
+            call sigma        => my_float( $sample->sigma );
+            call nelem        => $sample->ninside;
+            call total_weight => $inside_weight_sum;
+            call dist         => U();
+            call clip         => 10;
+        },
+        "iteration 0",
+    );
 
     # Test2::V0 can't handle objects which overload &&.
     $results->center( $results->center->unpdl );
@@ -782,9 +783,108 @@ subtest 'coords + clip + weight results' => sub {
     );
     #>>> notidy
 
-
 };
 
+subtest serialize => sub {
+
+    my $result;
+    ok(
+        lives {
+            $result = sigma_clip(
+                %req,
+                coords => pdl( [1], [2] ),
+                center => pdl( 1.5 ),
+            );
+        },
+        'center a 1D piddle'
+    ) or note $@;
+
+    is(
+        $result,
+        object {
+            call center     => object { call sclr => 1.5 };
+            call clip       => 0.75;
+            call dist       => 0;
+            call error      => U();
+            call iter       => 1;
+            call iterations => array {
+                item object {
+                    call center       => object { call sclr => 1.5 };
+                    call clip         => U();
+                    call dist         => U();
+                    call iter         => 0;
+                    call nelem        => 2;
+                    call sigma        => 0.5;
+                    call total_weight => 2;
+                };
+                item object {
+                    call center       => object { call sclr => 1.5 };
+                    call clip         => 0.75;
+                    call dist         => 0;
+                    call iter         => 1;
+                    call nelem        => 2;
+                    call sigma        => 0.5;
+                    call total_weight => 2;
+                };
+                end;
+            };
+            call nelem        => 2;
+            call sigma        => 0.5;
+            call success      => 1;
+            call total_weight => 2;
+        },
+        'default result is an object with objects in it',
+    );
+
+    isnt( $result->TO_JSON, object {},
+        q{jsonified top level object isn't an object} );
+    isnt(
+        $result->TO_JSON->{iterations},
+        bag { item object {}; item object {}; },
+        q{jsonified lower level objects aren't objects},
+    );
+
+    is(
+        $result->TO_JSON,
+        hash {
+            field center     => [1.5];
+            field clip       => 0.75;
+            field dist       => 0;
+            field error      => U();
+            field iter       => 1;
+            field iterations => array {
+                item hash {
+                    field center       => [1.5];
+                    field clip         => U();
+                    field dist         => U();
+                    field iter         => 0;
+                    field nelem        => 2;
+                    field sigma        => 0.5;
+                    field total_weight => 2;
+                    end;
+                };
+                item hash {
+                    field center       => [1.5];
+                    field clip         => 0.75;
+                    field dist         => 0;
+                    field iter         => 1;
+                    field nelem        => 2;
+                    field sigma        => 0.5;
+                    field total_weight => 2;
+                    end;
+                };
+                end;
+            };
+            field nelem        => 2;
+            field sigma        => 0.5;
+            field success      => 1;
+            field total_weight => 2;
+            end;
+        },
+        'JSONified result has the correct contents'
+    );
+
+};
 
 done_testing;
 

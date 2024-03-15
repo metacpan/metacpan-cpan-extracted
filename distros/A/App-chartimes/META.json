@@ -42,6 +42,6 @@
          "web" : "https://github.com/tulamili/App-chartimes"
       }
    },
-   "version" : "0.030",
+   "version" : "0.031",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

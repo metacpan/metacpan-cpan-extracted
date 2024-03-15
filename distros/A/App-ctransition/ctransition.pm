@@ -1,6 +1,6 @@
 package App::ctransition ;  
-our $VERSION = '0.001' ; 
-our $DATE = '2024-03-15T20:13+09:00' ; 
+our $VERSION = '0.002' ; 
+our $DATE = '2024-03-15T23:48+09:00' ; 
 
 =encoding utf8
 

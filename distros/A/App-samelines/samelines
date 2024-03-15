@@ -2,7 +2,7 @@
 use 5.014 ; use warnings ; 
 use Time::HiRes qw [ gettimeofday tv_interval ] ;
 my ${ dt_start } = [ gettimeofday ] ; 
-use Getopt::Std ; getopts '=12:c:i:s:' , \my %o  ; 
+use Getopt::Std ; getopts '@:=12:c:i:s:' , \my %o  ; 
 use Term::ANSIColor qw[ color :constants ] ; $Term::ANSIColor::AUTORESET = 1 ;
 use FindBin qw[ $Script ] ; 
 use autodie qw [ open ] ;

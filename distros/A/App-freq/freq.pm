@@ -1,14 +1,14 @@
 package App::freq ;  
-our $VERSION = '0.125' ; 
-our $DATE = '2024-03-15T15:14+09:00' ; 
+our $VERSION = '0.126' ; 
+our $DATE = '2024-03-16T00:06+09:00' ; 
 
 =encoding utf8
 
 =head1 NAME
 
-App::freq 
-- `freq' command counts how many different content of each line appears, with various options.
-- 入力を読み取り、各行の文字列が、同じ内容で何回現れたか頻度を数えて、集計表にする。
+App::freq - `freq' command counts how many different content of each line appears, with various options.
+
+入力を読み取り、各行の文字列が、同じ内容で何回現れたか頻度を数えて、集計表にする。
 
 =head1 SYNOPSIS
 
