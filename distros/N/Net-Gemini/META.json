@@ -50,11 +50,11 @@
    "provides" : {
       "Net::Gemini" : {
          "file" : "lib/Net/Gemini.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Net::Gemini::Server" : {
          "file" : "lib/Net/Gemini/Server.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "URI::gemini" : {
          "file" : "lib/Net/Gemini.pm"
@@ -69,6 +69,6 @@
          "url" : "https://thrig.me/src/Net-Gemini.git"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

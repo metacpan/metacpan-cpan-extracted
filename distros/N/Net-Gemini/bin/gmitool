@@ -8,12 +8,14 @@ use File::Path            qw(make_path);
 use File::Slurper         qw(read_text write_text);
 use File::Spec::Functions qw(catdir catfile splitpath);
 use Getopt::Long          qw(GetOptionsFromArray);
-use Net::Gemini 0.08;
+use IO::Socket            qw[PF_INET PF_INET6];
+use Net::Gemini 0.10;
 use Parse::MIME 'parse_mime_type';
 use URI ();
 
 Getopt::Long::Configure('bundling');
 
+my $Address_Family;    # v4 or v6 or (defaults to) any
 my $Allow_Verified;    # allow verified certificates
 my $Be_Quiet;
 my $Force_Update;      # clobber known_hosts?
@@ -41,16 +43,18 @@ sub get {
     my ($args) = @_;
     GetOptionsFromArray(
         $args,
-        'A'       => \$Allow_Verified,
+        4         => sub { $Address_Family = PF_INET },
+        6         => sub { $Address_Family = PF_INET6 },
+        A         => \$Allow_Verified,
         'C=s'     => \my $client_cert,
         'E=s'     => \my $output_encoding,
         'H=s'     => \my $sni_host,
         'K=s'     => \my $client_key,
-        'S'       => \$Show_Status,
+        S         => \$Show_Status,
         'V=s'     => \my $verify,
-        'f'       => \$Force_Update,
+        f         => \$Force_Update,
         'links|l' => \my $Only_Links,
-        'q'       => \$Be_Quiet,
+        q         => \$Be_Quiet,
         't=i',    => \my $timeout
     ) or exit 64;
 
@@ -80,6 +84,7 @@ sub get {
     if ( defined $sni_host ) {
         $param{ssl}->{SSL_hostname} = $sni_host;
     }
+    $param{family} = $Address_Family if defined $Address_Family;
     $param{ssl}->{Timeout} = $timeout || 30;
 
     if ( defined $verify ) {
@@ -306,7 +311,7 @@ gmitool - a Net::Gemini command line tool
 
 =head1 SYNOPSIS
 
-  gmitool get [-A] [-E encoding-layer] [-C cert-file -K key-file] \
+  gmitool get [-46] [-A] [-E encoding-layer] [-C cert-file -K key-file] \
               [-H sni-host] [-S] [-V peer|none] \
               [-f] [-l] [-q] [-t seconds] \
               gemini://example.org
@@ -323,6 +328,14 @@ Gets a gemini page and prints it to standard out, if all goes well
 (garbage in, garbage out). Options:
 
 =over 4
+
+=item C<-4>
+
+Use only IPv4. The default is to use any protocol.
+
+=item C<-6>
+
+Use only IPv6.
 
 =item C<-A>
 

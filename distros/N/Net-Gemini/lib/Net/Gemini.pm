@@ -37,7 +37,7 @@ package URI::gemini {
 }
 
 package Net::Gemini;
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 use strict;
 use warnings;
 use Digest::SHA 'sha256_hex';
@@ -78,7 +78,7 @@ sub uri { $_[0]{_uri} }
 # what gg(1) of gmid does
 sub _verify_ssl { 1 }
 
-# minimal method to get a resource (see also ->request)
+# minimal method to get a resource (see also gemini_request)
 sub get {
     my ( $class, $source, %param ) = @_;
     my %obj;
@@ -106,6 +106,7 @@ sub get {
     # gemini://alexschroeder.ch/page/2020-07-20%20Does%20a%20Gemini%20certificate%20need%20a%20Common%20Name%20matching%20the%20domain%3F
     eval {
         $obj{_socket} = IO::Socket::IP->new(
+            ( exists $param{family} ? ( Domain => $param{family} ) : () ),
             PeerAddr => $obj{_host},
             PeerPort => $obj{_port},
             Proto    => 'tcp'

@@ -1,5 +1,8 @@
 Revision history for Net-Gemini
 
+0.10    2024-03-18
+        gmitool "get" supports -4 and -6 flags to select a protocol.
+
 0.09    2023-11-30
         gmitool "link" now supports -r to only show relative links,
         and only applies -b (base) if that is supplied. Add tests for

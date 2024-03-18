@@ -1,10 +1,10 @@
 {
    "abstract" : "Globally/Universally Unique Identifiers (GUIDs/UUIDs)",
    "author" : [
-      "Ricardo Signes <rjbs[at]cpan.org>"
+      "Graham TerMarsch <gtermars[at]cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "bsd"
    ],
@@ -39,12 +39,12 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/rjbs/Data-UUID/issues"
+         "web" : "https://github.com/bleargh45/Data-UUID/issues"
       },
       "repository" : {
-         "url" : "https://github.com/rjbs/Data-UUID"
+         "url" : "https://github.com/bleargh45/Data-UUID"
       }
    },
-   "version" : "1.226",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "1.227",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }
