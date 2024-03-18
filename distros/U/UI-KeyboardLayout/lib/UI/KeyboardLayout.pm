@@ -1,7 +1,7 @@
 package UI::KeyboardLayout;
 
 our $VERSION;
-$VERSION = "0.78";
+$VERSION = "0.79";
 
 binmode $DB::OUT, ':utf8' if $DB::OUT;		# (older) Perls had "Wide char in Print" in debugger otherwise
 binmode $DB::LINEINFO, ':utf8' if $DB::LINEINFO;		# (older) Perls had "Wide char in Print" in debugger otherwise
@@ -795,7 +795,7 @@ defines the rule C<< <subst-Zuang_tones> >> which, in particular, converts C<#> 
 
 =item *
 
-Manual prearranged rules C<< <pseudo-manual-***> >> are like <subst-***>, but use the tables supplied in this Perl module.
+Manual prearranged rules C<< <pseudo-manual-***> >> are like C<< <subst-***> >>, but use the tables builtin into this Perl module.
 Currently the following rules are defined:
 
   phonetized phonetize2 phonetize3 phonetize0	# different “priorities” of translation
@@ -1170,14 +1170,18 @@ value C<KEY> is equivalent to the array with elements
   rfc1345Files,rfc1345,warn,,KEY
 
 Five comma-separated fields are: the variable controlling the filelist, 
-the type of files in the filelist (only the 3 listed types are supported now),
-whether to warn when a particular flavor 
+the type of files in the filelist (in addition to 3 listed types only the
+type C<literal> — see below — is supported now), whether to warn when a particular flavor 
 of composition table could not be loaded, the global access prefix, the prefix 
-for access from the previous element (chained access).
+for access from the previous element (chained access), pre-previous etc.
 
 If C<ComposeFiles> (etc.) has more than 1 file, bindings from earlier files
 take precedence over bindings from the later ones.  If the same sequence is
 bound several times inside a file, a later binding takes precedence.
+
+For the type C<literal>, the first element of these 5 gives the bindings separated
+by C<|||>; if an empty binding is present (as in C<⎄=>), it should be the only one.
+Each binding is the output, followed by C<=>, followed by the accessor keys.
 
 =head2 Names of prefix keys
 
@@ -3046,6 +3050,7 @@ Additionally, the typical keyboards also define the following bindings:
   Tab		 ——→ ^I
   Enter		 ——→ ^M
   Ctrl-Enter	 ——→ ^J
+  Ctrl-2	 ——→ 0x00
 
 In addition to this, the standard US keyboard (and keyboards built by this Perl module) define
 the following bindings with C<Ctrl-Shift> modifiers:
@@ -3193,7 +3198,7 @@ L<https://github.com/emacs-mirror/emacs/blob/master/src/w32fns.c#L3833>; it seem
 
 =item
 
-So now we assume that what C<VkKeyScanW() reported matches the C<VK_>-code of the pressed key.  Then we can compare the reported
+So now we assume that what C<VkKeyScanW()> reported matches the C<VK_>-code of the pressed key.  Then we can compare the reported
 C<KBD*> bitmap with the modifier keys which are down.  
 
 =back
@@ -3268,18 +3273,28 @@ ignored, — or maybe interpreted by adding C<Ctrl> to “excessive modifier
 no “excessive” modifiers, this chord is “intended-for-insert”.  If there are “excessive” modifiers, then the
 delivered character should be “augmented by these excessive modifiers” and translated to a bindable event.
 
-B<Caveat:> I<there is one case> when the logic above fails>: we try to check whether removing modifiers could produce the same
+B<Special cases:> In addition to treating input-by-number on older Windows, I<there are a few special cases> in which the logic
+above gives suboptimal results.  First, as explained in
+L<"Windows combines modifier bitmaps for C<lCtrl>, C<Alt> and C<rAlt> on C<AltGr>">, for best user’s experience, with the flag
+C<KLLF_ALTGR> the bitmap associated to C<rAlt> should contain all the bits of C<lCtrl>.  WIth the recipe above,
+we try to check whether removing modifiers could produce the same
 result — but this assumes that I<the user can remove these modifiers!>  While with C<KLLF_ALTGR>, the kernel “mocks” pressing the
 left C<Ctrl> keys when C<AltGr> is pressed — and I<the user can do nothing to control this>.  If the bitmaps produced by C<lCtrl>
-and C<rAlt> are I<independent>, everything is fine.  Unfortunately,
-L<our advice to developers is|"Windows combines modifier bitmaps for C<lCtrl>, C<Alt> and C<rAlt> on C<AltGr>">
-to make the bitmap on C<rAlt> I<consume the bitmap for C<lCtrl>> (to avoid developers’ confusion).  Then this algorithm would
-B<“wrongly”> find
-out that “removing C<lCtrl> does not change the result” — so this case should be special-cased: avoid removing C<lCtrl> if C<rAlt>
-is down and
+and C<rAlt> are I<independent>, the recipe above works fine: it would correctly detect that from the pair of modifiers
+“faked” by pressing C<AltGr>, neither can be removed.  Unfortunately, with the “overlap” recommended above, this algorithm would
+B<“wrongly”> find out that “removing C<lCtrl> does not change the result”! — So this case should be special-cased: avoid removing
+C<lCtrl> if C<rAlt> is down and
 L<it is not known that the flag C<KLLF_ALTGR> is absent|"Many applications need to know the state of hidden flag C<KLLF_ALTGR>">.
 
-B<Note:> for the last stage, it is advisable to “pass the obtained string/prefix-char to ourselves” via C<CHAR> and C<DEADCHAR>
+The other special case concerns the
+L<C<lAlt-lCtrl>-recognition|"Can an application on Windows accept keyboard events?  Part IV: application-specific modifiers">. — We
+already mentioned it above.  Finally, for “dense keybindings”, in which two chords C<lAlt-lCtrl> and C<AltGr> of modifiers
+behave differently, the application should better
+L<use the timing data on keypresses|https://metacpan.org/dist/UI-KeyboardLayout/source/examples/dumper-msg.c> to detect when the
+combinations of C<lCtrl> and C<rAlt> were not “faked”, but actually keyed in by the user.
+
+B<Note:> for the last stage of the recipe, it is advisable to “pass the obtained string/prefix-char to ourselves” via C<CHAR> and
+C<DEADCHAR>
 messages — as C<TranslateMessage()> does.  This would allow external applications to interact with our application “in the usual
 way”: by sending suitable messages.
 
@@ -3289,7 +3304,7 @@ coded in two ways: first, on newer Windows, put C<wFlags=0x04>.  On older Window
 of C<lParam> “from key-down to key-up”, and process
 L<“input-by-number”|"Keyboard input on Windows, Part II: The semantic of ToUnicode()"> in your application.  (Theoretically, one
 could use C<wFlags=0x02> — but I expect that processing key-up events for [hex]digits during input-by-number — they
-change the state — may be tricky.  Should not one follow the I<very quirky> [see the preceding reference] logic of the kernel
+change the state — may be tricky.  And why should one follow the I<very quirky> [see the preceding reference] logic of the kernel
 I<precisely>?)
 
 =head2 Possible enhancements and caveats
@@ -3839,7 +3854,7 @@ on KEYUP is often different than the state on KEYDOWN: people can release modifi
   press-Shift, press-Enter, release-Enter, release-Shift	--->	Shift-Enter pressed and released
 
 If pressing C<Shift-Enter> acts as if it were the C<F38> key (and only so with C<Shift>!), to ensure consistency, one would need 
-to make releasing C<Shift-Enter> B<and> also releasing C<Enter> to act as if it were the C<F38> key.  So one can make pressing
+to make releasing C<Shift-Enter> B<and also> releasing C<Enter> to act as if it were the C<F38> key.  So one can make pressing
 C<Shift-Enter> special (via the first table), sets the history bit on C<Shift-Enter>, and make I<the second table> map C<Enter> 
 and C<Shift-Enter> to be special too (send C<F38>) I<if the history bit is set>.
 
@@ -3900,8 +3915,10 @@ the second table the same.  (We do this in the example below.)
 
 B<Warning:> since we I<are forced> to use C<VK_PA1> in the first row of the second table, this approach cannot “work 100%” if there
 are more than 2 C<VK_>-codes assigned to a key (essentially, this is due to having only one bit of memory).  In FE keyboard layouts,
-“extra” C<VK_>-codes (third or more) appear only when these keys “are actually key-toggles” (like C<CapsLock>), so their keyrelease
-is “ignored anyway” — hence no confusion may arise.
+“extra” C<VK_>-codes (third or more) appear only when these keys “are actually key-toggles” (for the user they look like
+C<CapsLock>, but without the kernel special-casing them by looking into the “toggle state”), so their keyrelease
+is “ignored anyway” — hence no confusion may arise.  (“Physical keydown” events are alternately translated to “logical keyup” and
+“logical keydown” events.)
 
 =head2 A full example of changing C<VK_>-codes depending on modifiers
 
@@ -4823,7 +4840,7 @@ I found out one scenario how this might happen, and how to fix this particular
 situation.  (Unfortunately, it did not fix what I see, when C<AltGr-s> [but not
 C<AltGr-S>] is stolen.)  Installing a shortcut, one can associate a hotkey to
 the shortcut.  Unfortunately, the UI allows (and encourages!) hotkeys of the
-form <Control-Alt-letter> (which are equivalent to C<AltGr-letter>) - instead
+form C<Control-Alt-letter> (which are equivalent to C<AltGr-letter>) - instead
 of safe combinations like C<Control-Alt-F4> or
 C<Alt-Shift-letter> (which — by convention — are ignored by keyboard drivers, and do not generate
 characters).  If/when an application linked to by this shortcut is
@@ -5402,7 +5419,7 @@ restriction: what to do if only one of C<ALT> and C<CTRL> bits is set?!
 However, the latter situation I<may be completely avoided>): see L<"A convenient assignment of C<KBD*> bitmaps to modifier keys">.
 
 B<NOTE:> all keys are affected by C<KANALOK> logic (which mocks turning up C<KANA> bit if C<VK_KANA> key is “logically down” — it
-may be processed as “radiobutton” if it has C<KBDKANA> bit assigned).  This allows Ц<VK_KANA> to
+may be processed as “radiobutton” if it has C<KBDKANA> bit assigned).  This allows C<VK_KANA> to
 have effect on some keys (those with KANALOK), and no effect on tother keys (those without).  (Of course, this effect could be
 achieved also by duplicating entries in the columns with C<KBDKANA>!)
 
@@ -5606,22 +5623,34 @@ combinations.  The mapping from modifiers to columns should not be necessarily 1
 
 =head2 Windows combines modifier bitmaps for C<lCtrl>, C<Alt> and C<rAlt> on C<AltGr>
 
-(When — for compatibility with legacy applications — a keyboard layout is marked with the C<KLLF_ALTGR> flag — so C<AltGr> is
-special in the keyboard, and mocks pressing of 2 keys:
-C<lCtrl> then C<rAlt> — with the same timestamp) the modifier bitmap bound to this
-key is actually bit-OR of bitmaps above.  Essentially, this prohibits assigning
-interesting flag combinations to C<lCtrl>.
+Usually — for compatibility with legacy applications — a keyboard layout is marked with the C<KLLF_ALTGR> flag; then C<AltGr> is
+special in this keyboard layout, and pressing it mocks pressing of 2 keys:
+C<lCtrl>, then C<rAlt> — with the same timestamp (likewise for releasing).  (However, this does not happen if one of C<Ctrl> keys is
+already down; but — otherwise — happens for “keyrepeat events” too.)  This means that the modifier bitmap bound to this
+key I<is effectively> a bit-OR of bitmaps for C<lCtrl> and C<rAlt> (as usual, one should also combine the “unhanded” variants
+C<VK_CONTROL> and C<VK_MENU>).  Essentially, this prohibits assigning “interesting bitmaps” to C<lCtrl>.
+
+To add insult to injury, I<due to the exceptions described above> this does not I<happen always>.  For example, pressing
+C<any-Ctrl>, then C<rAlt>, I<then releasing> C<Ctrl> “makes the pressed C<rAlt> ‘expose its I<real bitmap>’.  (However, this happens
+for very short time only, since “keyrepeat” events for C<rAlt> re-emulate pressing C<lCtrl>.  But this momentous situation is
+degraded yet more if some other modifiers — say C<Shift> — is pressed after C<rAlt>; then it is C<Shift> which is going to be
+“keyrepeated”, hence pressing C<Ctrl-rAlt-Shift> (in this order) then releasing C<Ctrl> will “expose the ‘native’ bitmap of C<rAlt>
+for a long time.
+
+Since this changes how C<rAlt> combines with keys, it may be very confusing situation for users.
 
 The (very limited — and nowadays dangerous — see B<Caveat> in L<"The bullet-proof method">) workaround is to ensure that the
 bits in the modification bitmap one puts on C<AltGr> contain
-all the bits assigned to the above VK codes.  (With applications using “ad hoc algorithms”, this would not change anything;
-and since this makes the assignments less confusing for human inspection, B<historically> we recommended to use it.
-Unfortunately, using such “joined bitmap” in the C<MODIFIERS> section leads to problems — so while one can use this hack when
-designing the mapping of chords-of-modifier-keys to modification columns, I<in the actual C<MODIFIERS> section> these “forced” bits
-should not be included on the C<VK_RMENU> line. — And this is what this module does now.)
+all the bits assigned to the above VK codes.  This completely avoids the complication above.
 
-A workaround for the user’s experience is possible (although only partially tested): see
-L<Another redefinition to avoid problems with the C<KLLF_ALTGR> flag>.
+(With applications using “ad hoc algorithms”, this would not change anything;
+and since this makes the assignments less confusing for human inspection, B<historically> we recommended to use it.
+Unfortunately, using such “joined bitmap” in the C<MODIFIERS> section leads to problems: the “bullet-proof” algorithm should 
+take into account this situation.  Given an improvement in user’s experience vs. a minor complication in the algorithm, one
+should probably prefer the later.)
+
+B<Enhancement:> a workaround for the impossibility to combine C<lCtrl> with C<rAlt> is possible (although only partially tested):
+see L<Another redefinition to avoid problems with the C<KLLF_ALTGR> flag>.
 
 (Compare with L<"A convenient assignment of KBD* bitmaps to modifier keys">. — But see B<Caveat> in this section!)
 
@@ -12001,10 +12030,14 @@ EOPREF
     if (@{ $mks = $F->{'[mods_keys_KBD]'} }) {
       my($cmmnt, %mks) = ('', @$mks);
       if ($mks{lC} and $mks{rA} and not $F->{"[NOALTGR]"}) {	# Strip common-with-lC bits from rA
+       if (1) {		# See the section:   Windows combines modifier bitmaps for C<lCtrl>, C<Alt> and C<rAlt> on C<AltGr>
+        $cmmnt = "\t// With KLLF_ALTGR, this is combined not only with MENU, but also with LCONTROL and CONTROL"; # if $out ne $mks{rA};
+       } else {
         my %seen = map {($_, 1)} split //, $mks{lC};
         my $out = join '', grep !$seen{$_}, split //, $mks{rA};
         $cmmnt = "\t// With KLLF_ALTGR, this is combined with LCONTROL and CONTROL; stripped $mks{rA} -> $out" if $out ne $mks{rA};
         $mks{rA} = $out;
+       }
       }
       $h{MODIFIERS} = "MODIFIERS\n";
       my %vk = (qw(S SHIFT C CONTROL A MENU), @{$F->{'[modkeys_vk]'} || []});

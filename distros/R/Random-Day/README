@@ -10,6 +10,7 @@ SYNOPSIS
      my $dt = $obj->random_day($day);
      my $dt = $obj->random_day_month($day, $month);
      my $dt = $obj->random_day_month_year($day, $month, $year);
+     my $dt = $obj->random_day_year($day, $year);
      my $dt = $obj->random_month($month);
      my $dt = $obj->random_month_year($month, $year);
      my $dt = $obj->random_year($year);
@@ -50,6 +51,8 @@ METHODS
 
             Default value is undef.
 
+    Returns instance of object.
+
   "get"
      my $dt = $obj->get;
 
@@ -75,6 +78,13 @@ METHODS
      my $dt = $obj->random_day_month($day, $month);
 
     Get random date defined by day and month.
+
+    Returns DateTime object for date.
+
+  "random_day_year"
+     my $dt = $obj->random_day_year($day, $year);
+
+    Get random date defined by day and year.
 
     Returns DateTime object for date.
 
@@ -113,26 +123,65 @@ ERRORS
 
      random_day():
              Day cannot be a zero.
-             Day isn't number.
+             Day isn't positive number.
 
      random_day_month():
              Cannot create DateTime object.
              Day cannot be a zero.
-             Day isn't number.
+             Day isn't positive number.
 
      random_day_month_year():
+             Begin of expected month is lesser than minimal date.
+                     Expected year: %s
+                     Expected month: %s
+                     Expected day: %s
+                     Minimal year: %s
+                     Minimal month: %s
+                     Minimal day: %s
              Cannot create DateTime object.
                      Error: %s
              Day cannot be a zero.
-             Day isn't number.
+             Day isn't positive number.
+             End of expected month is greater than maximal date.
+                     Expected year: %s
+                     Expected month: %s
+                     Expected day: %s
+                     Maximal year: %s
+                     Maximal month: %s
+                     Maximal day: %s
+
+     random_day_year():
+             Day cannot be a zero.
+             Day is greater than maximal possible date.
+             Day is greater than possible day.
+                     Day: %s
+             Day is lesser than minimal possible date.
+             Day isn't positive number.
+             Day not fit between start and end dates.
+             Year is lesser than minimal year.
+                     Expected year: %s
+                     Minimal year: %s
+             Year is greater than maximal year.
+                     Expected year: %s
+                     Maximal year: %s
 
      random_month():
              Cannot create DateTime object.
                      Error: %s
 
      random_month_year():
+             Begin of expected month is lesser than minimal date.
+                     Expected year: %s
+                     Expected month: %s
+                     Minimal year: %s
+                     Minimal month: %s
              Cannot create DateTime object.
                      Error: %s
+             End of expected month is greater than maximal date.
+                     Expected year: %s
+                     Expected month: %s
+                     Maximal year: %s
+                     Maximal month: %s
 
      random_year():
              Year is greater than maximal year.
@@ -183,10 +232,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2013-2023 Michal Josef Špaček
+    © 2013-2024 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.13
+    0.14
 

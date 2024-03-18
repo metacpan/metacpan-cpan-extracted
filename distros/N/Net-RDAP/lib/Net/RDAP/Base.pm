@@ -45,11 +45,11 @@ sub objects {
 
 =head1 NAME
 
-L<Net::RDAP::Base> - base module for some L<Net::RDAP>:: modules.
+Net::RDAP::Base - base module for some L<Net::RDAP>:: modules.
 
 =head1 DESCRIPTION
 
-You don't use L<Net::RDAP::Base> directly, instead, various other
+You don't use C<Net::RDAP::Base> directly, instead, various other
 modules extend it.
 
 =head1 METHODS
@@ -91,9 +91,25 @@ sub self { (grep { 'self' eq $_->rel } $_[0]->links)[0] }
 
 =pod
 
+=head1 C<TO_JSON()>
+
+C<Net::RDAP::Base> provides a C<TO_JSON()> so that any RDAP object can be
+serialized back into JSON if your JSON serializer (L<JSON>, L<JSON::XS>, etc)
+is configured with the C<convert_blessed> option.
+
+=cut
+
+sub TO_JSON {
+    my $self = shift;
+    my %hash = %{$self};
+    return \%hash;
+}
+
+=pod
+
 =head1 COPYRIGHT
 
-Copyright CentralNic Ltd. All rights reserved.
+Copyright 2018-2023 CentralNic Ltd, 2024 Gavin Brown. All rights reserved.
 
 =head1 LICENSE
 

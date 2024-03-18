@@ -1,0 +1,17 @@
+\documentclass[letterpaper,twoside,12pt]{article}
+\begin{document}
+\title{ there are 3 articles here! }
+\maketitle
+\section*{title1}
+by author1\\
+---------------\\
+content1
+\section*{title2}
+by author2\\
+---------------\\
+content2
+\section*{title3}
+by author3\\
+---------------\\
+content3
+\end{document}

@@ -34,7 +34,9 @@ binmode STDOUT, ":utf8" ;
 my %f2 ; # $f2{ $char } [ $times ] は、各文字 charを丁度times個持つ文字が、何行に出現したかを格納。
 my %fs ; # $f2{$c}[$t] の 数$t で現れた値を記録。
 my %fm1 ; # $fm1{$c} で $c の出現の最大値を記録。dualvar である。すなわち、その時の最大値の時の、行文字列も格納。
-my %fm2 ; # %fm1 とよく似ているが、最後の例を取り出す。
+my %fm2 ; # %fm1 とよく似ているが、最後の例を取り出す。 dualvar であることは同じ。
+my ( %fm1c , %fm2c ) ; # その対応する文字列の出現回数を格納する。
+
 my $head = <> if $o{'='} ;
 chomp $head if defined $head ;
 $SIG{INT} = sub { & output ; exit } ;
@@ -46,7 +48,7 @@ while ( <> ) {
   $_ = decode_utf8 $_ ;
   my @F = split // , $_ , 0 ; # 文字単位でばらばらにする。0 でなくて-1にすると、配列の最後が空文字列になる。
   #say join "+" , @F ; 
-  my %f1 ; #  $frq1{ $char } でその行にその文字が何回出現したかを格納。
+  my %f1 ; #  $f1{ $char } でその行にその文字が何回出現したかを格納。
   if ( ! $o{R} ) { $f1 { $_ } ++ for @F } # 単純に集計
   else { 
     my %t ; # $t{$c}は $cが連続で最長何文字続いたかを格納するようにする。
@@ -71,8 +73,10 @@ while ( <> ) {
   $fs { $_ } = 1 for values %f1 ; 
 
   for my $c ( keys %f1 ) { 
-    $fm1 { $c } = dualvar $f1 { $c } + 0 , $_ if ($fm1{$c}//0) <  $f1 { $c } ; 
-    $fm2 { $c } = dualvar $f1 { $c } + 0 , $_ if ($fm2{$c}//0) <= $f1 { $c } && $fm1{$c} ne $_ ;
+    do{ $fm1c{$c} = 0 ; $fm1{$c} = dualvar $f1{$c},$_ } if ($fm1{$c}//0) <  $f1 { $c } ; 
+    $fm1c { $c } ++ if $_ eq $fm1{$c} ; # dualvar の文字列の方の比較になっている
+    do{ $fm2c{$c} = 0 if defined $fm2{$c} && $fm2{$c} ne $_ ; $fm2{$c} = dualvar $f1{$c},$_ } if ($fm2{$c}//0) <= $f1 { $c } && $fm1{$c} ne $_ ;
+    $fm2c { $c } ++ if defined $fm2{$c} && $_ eq $fm2{$c} ; # dualvar の文字列の方の比較になっている    
   }
 }
 
@@ -86,12 +90,15 @@ sub output () {
   my @fsE = sort { $a <=> $b } keys %fs ; # E は Entire の頭文字のつもり。数値の集合となる。
   my @chars = grep { scalar @{$f2{$_}} > $o{y} } sort keys %f2 ; 
   $diffChars = @chars  ; 
-  say UNDERLINE join "\t" , 'char', @fsE ; 
+  say UNDERLINE join "\t" , 'char', @fsE , $optV0 ? () : 'examples' . FAINT '(count)' ; 
   for my $c ( @chars ) { 
     print "$o{q}$c$o{q}\t" ; 
     my @out ; 
     push @out , map { $f2{$c}[$_] || $o{0} } @fsE ;
-    push @out , map {"$o{q}$_$o{q}"} grep { defined $_ } $fm1{$c}, $fm2{$c} unless $optV0 ; 
+    my $fm1c = "$o{q}$fm1{$c}$o{q}" . FAINT "($fm1c{$c})" if defined $fm1{$c} ; # 
+    my $fm2c = "$o{q}$fm2{$c}$o{q}" . FAINT "(>= $fm2c{$c})" if defined $fm2{$c} ; # 直前の行とよく似ている。保守時にトラブりがち。
+    #push @out , map {"$o{q}$_$o{q}"} grep { defined $_ } $fm1{$c}, $fm2{$c} unless $optV0 ; 
+    push @out , grep { defined $_ } $fm1c, $fm2c unless $optV0 ; 
     do { splice @out , -1 , 1 ; push @out , FAINT "--"} if $out[-1] eq $out[-2] && @fsE +2 == @out; # 同じなら除去。  # トリッキー
     say join "\t" , @out ; 
   }

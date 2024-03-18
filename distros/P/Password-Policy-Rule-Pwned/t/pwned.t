@@ -30,15 +30,20 @@ eval { require 5.008; 1; } and push @pw, qw/ ££££££ безопасност
 if ($ENV{NO_NETWORK_TESTING}) {
 	plan skip_all => 'NO_NETWORK_TESTING is set'
 } else {
-	plan tests => 2 * scalar @pw
+	plan tests => 4 * scalar @pw
 }
 
 my $pp = Password::Policy->new (config => 't/stock.yaml');
 for my $pass (@pw) {
 	my $encpw = encode ('UTF-8', $pass);
+	throws_ok { $pp->process({ password => $pass }) }
+		'Password::Policy::Exception::Pwned',
+		"$encpw decoded is pwned as expected";
+	like $@, qr/The specified password has been pwned/,
+		'Error string is as expected';
 	throws_ok { $pp->process({ password => $encpw }) }
 		'Password::Policy::Exception::Pwned',
-		"$encpw is pwned as expected";
+		"$encpw encoded is pwned as expected";
 	like $@, qr/The specified password has been pwned/,
 		'Error string is as expected';
 }

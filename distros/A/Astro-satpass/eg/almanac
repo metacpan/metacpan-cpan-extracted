@@ -11,13 +11,12 @@ use warnings;
 use Astro::Coord::ECI;
 use Astro::Coord::ECI::Sun;
 use Astro::Coord::ECI::Moon;
-use Astro::Coord::ECI::Utils qw{deg2rad};
+use Astro::Coord::ECI::Utils qw{ deg2rad local_strftime };
 use Getopt::Long 2.33;
 use Pod::Usage;
-use POSIX qw{strftime};
 use Time::Local;
 
-our $VERSION = '0.130';
+our $VERSION = '0.131';
 
 Getopt::Long::Configure( 'pass_through' );	# Numbers may be negative.
 
@@ -85,7 +84,7 @@ foreach my $luminary ( qw{ sun moon } ) {
 #	order of increasing time.
 
 foreach (sort {$a->[0] <=> $b->[0]} @almanac) {
-    print strftime ($opt{format}, localtime $_->[0]), '  ',
+    print local_strftime( $opt{format}, $_->[0]), '  ',
 	ucfirst ($_->[3]), "\n";
 }
 
@@ -99,42 +98,47 @@ almanac - Generate almanac data for a given location
 
  almanac       # The White House by default
  almanac 52.07 4.29 4   # The Hague
- almanac -help
- almanac -version
+ almanac --help
+ almanac --version
 
 =head1 OPTIONS
 
-=head2 -date=date_string
+=head2 --date
+
+ --date=date_string
 
 This option specifies the date as a string that can be parsed by
 L<Date::Manip|Date::Manip>. If L<Date::Manip|Date::Manip> can not be
-loaded an error occurs. If this option is specified, C<-tomorrow> is
-ignored.
+loaded an error occurs. If this option is specified,
+L<--tomorrow|/--tomorrow> is ignored.
 
-=head2 -format=strftime_format
+=head2 --format
+
+ --format=strftime_format
 
 This option specifies the C<strftime> format used to display dates and
 times. The default is C<'%d-%b-%Y %H:%M:%S'>.
 
-=head2 -help
+=head2 --help
 
 This option displays the documentation for this script. The script then
 exits.
 
-=head2 -moon
+=head2 --moon
 
-Display data for the Moon. Defaults to C<-nomoon> if C<-sun> is
-asserted.
+Display data for the Moon. Defaults to C<--no-moon> if L<--sun|/--sun>
+is asserted.
 
-=head2 -sun
+=head2 --sun
 
-Display data for the Sun. Defaults to C<-nosun> if C<-moon> is asserted.
+Display data for the Sun. Defaults to C<--no-sun> if L<=-moon|/--moon>
+is asserted.
 
-=head2 -tomorrow
+=head2 --tomorrow
 
 Display data for tomorrow, rather than today.
 
-=head2 -version
+=head2 --version
 
 This option displays the version of this script. The script then exits.
 
@@ -152,10 +156,10 @@ By default, data for both the Sun and Moon are displayed. If you
 explicitly assert either C<-sun> or C<-moon>, only the selected luminary
 will be displayed.
 
-You can look a day ahead by specifying C<-tomorrow>.
+You can look a day ahead by specifying L<--tomorrow|/--tomorrow>.
 
-The format of the time output can be specified using the C<-format>
-option.
+The format of the time output can be specified using the
+L<--format|/--format> option.
 
 =head1 AUTHOR
 
@@ -163,7 +167,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012-2023 by Thomas R. Wyant, III
+Copyright (C) 2012-2024 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

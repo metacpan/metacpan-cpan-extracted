@@ -1,0 +1,69 @@
+: ######################################################
+: # we are receiving 2 hashes: 'data' and 'private'
+: # data will contain authors etc.
+: # private will contain filepath of template file etc.
+: ######################################################
+\documentclass[letterpaper]{article}
+
+\usepackage[header]{aimatters}
+
+\usepackage{graphicx}
+
+% Complete the title and author information below
+\title{<: $data.title :>}
+\author{
+: for $data.authors -> $author {
+  \AIMauthor{<: $author.name :>}{<: $author.organisation :>}{<: $author.email :>}
+: }
+}
+
+
+% Add a bio for each author.  (These will appear at the end of the document.)
+% Note:  Due to quirks in the way LaTeX wraps text around figures, only use \textbf or \textem for emphasis in the bios; no other formatting commands!  (Specifically, don't use \bf, \em, etc.)
+: for $data.authors -> $author {
+\AIMbio{<: $author.picture :>}{<: $author.bio :>}
+: }
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\newpage
+
+\begin{center}
+ \includegraphics[width=\linewidth]{shakey.jpg}
+\end{center}
+
+: for $data.sections -> $section {
+\section{<: $section.title :>}
+:   if( defined($section.label) ){
+\label{<: $section.label :>}
+:   }
+
+:   for $section.paragraphs -> $paragraph {
+
+\par
+<: $paragraph :>
+
+:  }
+
+:   for $section.subsections -> $subsection {
+\subsection(<: $subsection.title :>)
+:     if( defined($subsection.label) ){
+\label{<: $subsection.label :>}
+:     }
+
+:     for $subsection.paragraphs -> $paragraph {
+
+\par
+<: $paragraph :>
+
+:     }
+
+:   }
+\newpage % after each section
+: }
+
+\end{document}

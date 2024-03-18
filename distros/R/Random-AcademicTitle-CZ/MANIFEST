@@ -20,5 +20,6 @@ README
 SIGNATURE
 t/Random-AcademicTitle-CZ/01-use.t
 t/Random-AcademicTitle-CZ/02-version.t
+t/Random-AcademicTitle-CZ/03-new.t
 xt/Random-AcademicTitle-CZ/01-pod_coverage.t
 xt/Random-AcademicTitle-CZ/02-pod.t

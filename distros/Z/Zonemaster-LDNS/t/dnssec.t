@@ -59,9 +59,30 @@ my $nsec = Zonemaster::LDNS::RR->new('xx.se.			7200	IN	NSEC	xx0r.se. NS RRSIG NS
 isa_ok($nsec, 'Zonemaster::LDNS::RR::NSEC');
 ok($nsec->covers('xx-example.se'), 'Covers xx-example.se');
 
+ok(!$nsec->covers('.'), 'Does not cover the root domain');
+
 my $nsec3 = Zonemaster::LDNS::RR->new('NR2E513KM693MBTNVHH56ENF54F886T0.com. 86400 IN NSEC3 1 1 0 - NR2FUHQVR56LH70L6F971J3L6N1RH2TU NS DS RRSIG');
 isa_ok($nsec3, 'Zonemaster::LDNS::RR::NSEC3');
 ok($nsec3->covers('xx-example.com'), 'Covers xx-example.com');
+
+is($nsec3->covers('.'), undef, 'Does not cover the root domain');
+
+subtest 'malformed NSEC3 do not cover anything' => sub {
+    # Malformed resource record lacking a next hashed owner name field in its
+    # RDATA. The only way to synthesize such a datum is to use the RFC 3597
+    # syntax.
+    my $example = Zonemaster::LDNS::RR->new(
+        q{example. 0 IN NSEC3 \# 15 01 00 0001 01 AB 00 0006 400000000002}
+    );
+    is( $example->covers("example"), undef );
+
+    # NSEC3 resource record whose owner name is the root name. This should
+    # normally not happen.
+    $example = Zonemaster::LDNS::RR->new(
+        q{.        0 IN NSEC3 1 0 1 ab 01234567 A RRSIG}
+    );
+    is( $example->covers("example"), undef );
+};
 
 SKIP: {
     skip 'no network', 3 unless $ENV{TEST_WITH_NETWORK};

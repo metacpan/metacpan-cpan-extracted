@@ -1,0 +1,17 @@
+%% begin a section
+\section{<: $section.title :>}
+: if( defined($section.label) ){
+\label{<: $section.label :>}
+: }
+
+: for $section.paragraphs -> $paragraph {
+:   include "paragraph.tex.tx" { paragraph => $paragraph }
+: }
+
+: for $section.subsections -> $subsection {
+:   include "subsection.tex.tx" { subsection => $subsection }
+: }
+: # add a newpage after each section
+\newpage
+%% end section
+

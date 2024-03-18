@@ -59,6 +59,7 @@ Compile-time dependencies (only when installing from source):
  * `automake` (if [Internal ldns] is enabled)
 
 Test-time dependencies:
+ * `MIME::Base32`
  * `Test::Fatal`
 
 There is a small part in the code that may not be compatible with non-Unix

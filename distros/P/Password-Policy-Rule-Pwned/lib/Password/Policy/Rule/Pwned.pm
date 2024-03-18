@@ -26,8 +26,10 @@ use Password::Policy::Exception::Pwned;
 use Password::Policy::Exception::PwnedError;
 use LWP::UserAgent;
 use Digest::SHA 'sha1_hex';
+use String::Multibyte;
+use Encode 'encode';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 my $ua = __PACKAGE__ . '/' . $VERSION;
 my $timeout = 5;
 our $base_url = 'https://api.pwnedpasswords.com/range/';
@@ -35,7 +37,9 @@ our $base_url = 'https://api.pwnedpasswords.com/range/';
 sub check {
 	my $self     = shift;
 	my $password = $self->prepare (shift);
-	my $hash     = uc sha1_hex ($password);
+	my $strmb    = String::Multibyte->new ('UTF8');
+	my $hash     = uc sha1_hex ($strmb->islegal($password) ? $password :
+	                    encode ('UTF-8', $password));
 	my $range    = substr ($hash, 0, 5, '');
 	my $url      = $base_url . $range;
 	my $res      = LWP::UserAgent->new (agent => $ua, timeout => $timeout)->get ($url);
@@ -137,8 +141,9 @@ key phrases, although this will be less robust.
 
 This method is not expected to be called directly but rather via
 C<Password::Policy-E<gt>process>. It takes one argument which is the
-password to be checked. If the password is a utf-8 string it must be
-encoded first.
+password to be checked. The password must be either an encoded utf-8
+bytestring or an unencoded string (which will be encoded internally
+prior to hashing).
 
 The method will throw a L<Password::Policy::Exception::Pwned> exception
 if the password is pwned. If the API server is unavailable it will warn
@@ -170,7 +175,7 @@ This module is written and maintained by Pete Houston of Openstrike
 
 =head1 COPYRIGHT
 
-Copyright 2018 by Pete Houston. All Rights Reserved.
+Copyright 2018, 2024 by Pete Houston. All Rights Reserved.
 
 Permission to use, copy, and  distribute  is  hereby granted,
 providing that the above copyright notice and this permission

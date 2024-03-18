@@ -1,0 +1,58 @@
+0.009   2024-02-25  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename module/dist Sah-Schema{s,Bundle}-Binary following rename
+          of Sah-Schema{s,Bundle} (for visual clarity and consistency with
+          naming of other bundles).
+
+
+0.008   2022-10-20  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Mention related Type::Tiny type libraries & constraints.
+
+
+0.007   2022-09-25  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [ux] Tweak Abstracts (give example).
+
+
+0.006   2022-07-24  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] [schema hexbuf] Allow & remove whitespaces.
+
+
+0.005   2020-03-08  Released-By: PERLANCAR; Urgency: medium
+
+        - No functional changes.
+
+	- [build] Rebuild with updated Pod::Weaver plugin [-Sah::Schemas] to
+          correctly show examples.
+
+
+0.004   2020-03-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Update examples, use 'value' instead of 'data'.
+
+
+0.003   2020-03-02  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes
+
+        - [build] Render examples in Synopsis, using
+          Pod::Weaver::Plugin::Sah::Schemas 0.060+.
+
+
+0.002   2020-03-02  Released-By: PERLANCAR; Urgency: medium
+
+	- Tweak regex: allow empty string & disallow odd number of
+	  hexdigits.
+
+        - Add examples (tests).
+
+
+0.001   2018-01-01  Released-By: PERLANCAR
+
+        - First release.

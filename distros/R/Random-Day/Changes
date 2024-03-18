@@ -1,3 +1,12 @@
+0.14 2024-03-16T14:13:15+01:00
+ - Add missing random_day_year() method.
+ - Add tests to coverage of Random::Day::get().
+ - Fix error message in doc.
+ - Improve constructor doc.
+ - Regen README file.
+ - Update Module::Install to 1.21 version.
+ - Update copyright years.
+
 0.13 2023-01-26T19:13:52+01:00
  - Add check for year in interval of 'dt_from' and 'dt_to' in
    random_year().

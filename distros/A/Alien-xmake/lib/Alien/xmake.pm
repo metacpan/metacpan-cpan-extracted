@@ -1,4 +1,4 @@
-package Alien::xmake 0.01 {
+package Alien::xmake 0.05 {
     use strict;
     use warnings;
     use File::Which qw[which];
@@ -90,11 +90,11 @@ Alien::xmake - Locate, Download, or Build and Install xmake
 =head1 DESCRIPTION
 
 xmake is a lightweight, cross-platform build utility based on Lua. It uses a
-Lua script to maintain project builds, but is driven by a dependency free core
+Lua script to maintain project builds, but is driven by a dependency-free core
 program written in C. Compared with Makefiles or CMake, the configuration
-syntax is much concise and intuitive. As such, it's friendly to novices while
-still maintaining the flexibly required in a build system. With xmake, you can
-focus on your project instead of the build.
+syntax is (in the opinion of the author) much more concise and intuitive. As
+such, it's friendly to novices while still maintaining the flexibly required in
+a build system. With xmake, you can focus on your project instead of the build.
 
 xmake can be used to directly build source code (like with Make or Ninja), or
 it can generate project source files like CMake or Meson. It also has a
@@ -166,11 +166,108 @@ See C<xmake create --help> for a full list.
 =head1 Prerequisites
 
 Windows simply downloads an installer but elsewhere, you gotta have git, make,
-and a C compiler installed to build and install xmake.
+and a C compiler installed to build and install xmake. If you'd like
+Alien::xmake to use a pre-built or system install of xmake, install it yourself
+first with one of the following:
+
+=over
+
+=item Built from source
+
+    $ curl -fsSL https://xmake.io/shget.text | bash
+
+...or on Windows with Powershell...
+
+    > Invoke-Expression (Invoke-Webrequest 'https://xmake.io/psget.text' -UseBasicParsing).Content
+
+...or if you want to do it all by hand, try...
+
+    $ git clone --recursive https://github.com/xmake-io/xmake.git
+    # xmake maintains dependencies via git submodule so --recursive is required
+    $ cd ./xmake
+    # On macOS, you may need to run: export SDKROOT=$(xcrun --sdk macosx --show-sdk-path)
+    $ ./configure
+    $ make
+    $ ./scripts/get.sh __local__ __install_only__
+    $ source ~/.xmake/profile
+
+...or building from source on Windows...
+
+    > git clone --recursive https://github.com/xmake-io/xmake.git
+    > cd ./xmake/core
+    > xmake
+
+=item Windows
+
+The easiest way might be to use the installer but you still have options.
+
+=over
+
+=item Installer
+
+Download a 32- or 64-bit installer from
+https://github.com/xmake-io/xmake/releases and run it.
+
+=item Via scoop
+
+    $ scoop install xmake
+
+See https://scoop.sh/
+
+=item Via the Windows Package Manager
+
+    $ winget install xmake
+
+See https://learn.microsoft.com/en-us/windows/package-manager/
+
+=item Msys/Mingw
+
+    $ pacman -Sy mingw-w64-x86_64-xmake # 64-bit
+
+    $ pacman -Sy mingw-w64-i686-xmake   # 32-bit
+
+=back
+
+=item MacOS with Homebrew
+
+    $ brew install xmake
+
+See https://brew.sh/
+
+=item Arch
+
+    # sudo pacman -Sy xmake
+
+=item Debian
+
+    # sudo add-apt-repository ppa:xmake-io/xmake
+    # sudo apt update
+    # sudo apt install xmake
+
+=item Fedora/RHEL/OpenSUSE/CentOS
+
+    # sudo dnf copr enable waruqi/xmake
+    # sudo dnf install xmake
+
+=item Gentoo
+
+    # sudo emerge -a --autounmask dev-util/xmake
+
+You'll need to add GURU to your system repository first.
+
+=item FreeBSD
+
+Build from source using gmake instead of make.
+
+=item Android (Termux)
+
+    $ pkg install xmake
+
+=back
 
 =head1 See Also
 
-https://xmake.io/
+L<https://xmake.io/>
 
 =head1 LICENSE
 
@@ -184,6 +281,6 @@ conditions may apply to data transmitted through this module.
 
 Sanko Robinson E<lt>sanko@cpan.orgE<gt>
 
-=for stopwords xmake macOS wxWidgets CMake gotta
+=for stopwords xmake macOS wxWidgets CMake gotta FreeBSD MacOS
 
 =cut

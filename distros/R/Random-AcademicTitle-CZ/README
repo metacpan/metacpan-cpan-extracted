@@ -45,6 +45,9 @@ ERRORS
      new():
              From Class::Utils::set_params():
                      Unknown parameter '%s'.
+             From Mo::utils::check_bool():
+                     Parameter 'old' must be a bool (0/1).
+                             Value: %s
 
 EXAMPLE
      use strict;
@@ -68,7 +71,7 @@ EXAMPLE
      # Title after: Th.D.
 
 DEPENDENCIES
-    Class::Utils, Readonly.
+    Class::Utils, Mo::utils, Readonly.
 
 SEE ALSO
     Mock::Person::CZ
@@ -88,5 +91,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.02
+    0.03
 

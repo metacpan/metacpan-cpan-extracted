@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Class::Utils qw(set_params);
+use Mo::utils 0.06 qw(check_bool);
 use Readonly;
 
 Readonly::Array our @TITLES_AFTER => (
@@ -50,7 +51,7 @@ Readonly::Array our @TITLES_BEFORE_OLD => (
 	'ThMgr.',
 );
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Constructor.
 sub new {
@@ -64,6 +65,8 @@ sub new {
 
 	# Process parameters.
 	set_params($self, @params);
+
+	check_bool($self, 'old');
 
 	return $self;
 }
@@ -160,6 +163,9 @@ Returns string.
  new():
          From Class::Utils::set_params():
                  Unknown parameter '%s'.
+         From Mo::utils::check_bool():
+                 Parameter 'old' must be a bool (0/1).
+                         Value: %s
 
 =head1 EXAMPLE
 
@@ -188,6 +194,7 @@ Returns string.
 =head1 DEPENDENCIES
 
 L<Class::Utils>,
+L<Mo::utils>,
 L<Readonly>.
 
 =head1 SEE ALSO
@@ -218,6 +225,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

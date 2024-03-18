@@ -1,0 +1,11 @@
+\documentclass[letterpaper,twoside,12pt]{article}
+\begin{document}
+\title{ <: $data.title :> }
+\maketitle
+: for $data.articles -> $article {
+\section*{<: $article.title :>}
+by <: $article.author :>\\
+---------------\\
+<: $article.content :>
+: }
+\end{document}

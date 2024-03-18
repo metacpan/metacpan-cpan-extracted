@@ -8,7 +8,7 @@ use lib qw{ inc };
 use Astro::Coord::ECI;
 use Astro::Coord::ECI::Utils qw{ :greg_time deg2rad PERL2000 PI rad2deg };
 use My::Module::Test qw{ :tolerance velocity_sanity };
-use POSIX qw{strftime floor};
+use POSIX qw{ floor };
 use Test::More 0.88;
 use Time::Local;
 
@@ -16,23 +16,7 @@ use constant CLASS	=> 'Astro::Coord::ECI';
 use constant EQUATORIALRADIUS => 6378.14;	# Meeus page 82.
 use constant TIMFMT => '%d-%b-%Y %H:%M:%S';
 
-Astro::Coord::ECI->set (debug => 0);
-
-{
-    local $@ = undef;
-    my $eci;
-    eval {
-	$eci = Astro::Coord::ECI->new();
-	pass 'Can instantiate a default object';
-	1;
-    } or BAIL_OUT 'Can not instantiate a default object';
-
-    eval {
-	$eci->get( 'sun' );
-	pass q<Can get the default 'sun' attribute>;
-	1;
-    } or BAIL_OUT q<Can not get the default 'sun' attribute>;
-}
+Astro::Coord::ECI->set( debug => 0 );
 
 # universal time
 # Tests: universal()

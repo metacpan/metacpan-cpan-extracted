@@ -7,6 +7,7 @@ build_requires:
   Devel::PPPort: 3.19
   ExtUtils::MakeMaker: 6.59
   JSON::PP: 0
+  MIME::Base32: 0
   Test::Fatal: 0
   Test::More: 1.302015
 configure_requires:
@@ -35,4 +36,4 @@ resources:
   bugtracker: https://github.com/zonemaster/zonemaster-ldns/issues
   license: http://opensource.org/licenses/bsd-license.php
   repository: https://github.com/zonemaster/zonemaster-ldns
-version: 3.2.0
+version: 4.0.0

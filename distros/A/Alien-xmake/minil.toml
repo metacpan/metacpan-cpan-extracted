@@ -1,5 +1,5 @@
 name = "Alien-xmake"
-badges = ["github-actions/linux.yml", "github-actions/windows.yml", "github-actions/macos.yml", "metacpan"]
+badges = ["github-actions/linux.yml", "github-actions/windows.yml", "github-actions/macos.yml", "github-actions/bsd.yml","metacpan"]
 module_maker="ModuleBuild"
 static_install = "auto"
 authority = "cpan:SANKO"

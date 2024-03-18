@@ -6,4 +6,4 @@ use Test::More 'tests' => 2;
 use Test::NoWarnings;
 
 # Test.
-is($Random::Day::InTheFuture::VERSION, 0.13, 'Version.');
+is($Random::Day::InTheFuture::VERSION, 0.14, 'Version.');

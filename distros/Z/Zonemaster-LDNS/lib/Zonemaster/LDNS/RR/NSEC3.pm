@@ -37,11 +37,11 @@ Returns the iteration count.
 
 =item salt()
 
-Returns the cryptographic salt, in binary form.
+Returns the contents of the salt field as a binary string, if non-empty; otherwise, returns an empty string. If there was a problem accessing the salt field, returns undef.
 
 =item next_owner()
 
-Returns the next owner field.
+Returns the next hashed owner name field, in binary form. To convert the return value to the human-readable presentation format, use L<MIME::Base32/encode_base32hex>.
 
 =item typelist()
 

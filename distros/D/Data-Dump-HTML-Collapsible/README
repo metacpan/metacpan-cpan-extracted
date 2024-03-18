@@ -3,9 +3,9 @@ NAME
     document with collapsible sections
 
 VERSION
-    This document describes version 0.001 of Data::Dump::HTML::Collapsible
+    This document describes version 0.002 of Data::Dump::HTML::Collapsible
     (from Perl distribution Data-Dump-HTML-Collapsible), released on
-    2024-03-08.
+    2024-03-12.
 
 SYNOPSIS
      use Data::Dump::HTML::Collapsible; # exports dd(), can export dump()
@@ -77,9 +77,15 @@ SOURCE
     <https://github.com/perlancar/perl-Data-Dump-HTML-Collapsible>.
 
 SEE ALSO
-    Data::Dumper::HTML
+    Other data structure dumpers to (collapsible) tree:
+    Data::HTML::TreeDumper (doesn't handle recursion), Data::TreeDumper
+    (Data::TreeDumper::Renderer::DHTML, Data::TreeDumper::Renderer::GTK),
+    Data::Dumper::GUI.
 
-    Other data structure dumpers like Data::Dumper, Data::Dump,
+    Other data structure dumpers that outputs to HTML: Data::HTMLDumper,
+    Data::Dumper::HTML, Data::Format::Pretty::HTML.
+
+    Other data structure dumpers: Data::Dumper, Data::Dump,
     Data::Dump::Color, Data::Dmp, Data::Printer.
 
 AUTHOR

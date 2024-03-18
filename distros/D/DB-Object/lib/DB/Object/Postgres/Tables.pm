@@ -259,7 +259,11 @@ sub enable_trigger
     return( $sth );
 }
 
-sub exists { return( shift->table_exists( shift( @_ ) ) ); }
+sub exists
+{
+    my $self = shift( @_ );
+    return( $self->table_exists( @_ ? shift( @_ ) : $self->name ) );
+}
 
 # NOTE: sub fields is inherited from DB::Object::Tables
 # sub fields
@@ -641,6 +645,8 @@ EOT
     return( $self->_clone( $struct ) );
 }
 
+sub table_info { return( shift->database_object->table_info( @_ ) ); }
+
 sub unlock
 {
     my $self = shift( @_ );
@@ -1015,6 +1021,10 @@ A column name to its sql definition
 A column name to column data type hash reference
 
 =back
+
+=head2 table_info
+
+This is an alias for L<DB::Object::Postgres/table_info>
 
 =head2 unlock
 

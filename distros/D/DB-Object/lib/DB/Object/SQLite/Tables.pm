@@ -335,6 +335,8 @@ sub structure
     return( $self->_clone( $struct ) );
 }
 
+sub table_info { return( shift->database_object->tables_info( @_ ) ); }
+
 sub unlock { return( shift->error( "Locking and unlocking of tables is unsupportde in SQLite." ) ); }
 
 # NOTE: sub _simple_exist is inherited from DB::Object
@@ -416,7 +418,7 @@ Table lock is unsupported in SQLite and this will return an error.
 
 A convenient wrapper to L<DB::Object::Postgres::Query/on_conflict>
 
-This feature is available in SQLite since version 3.35.0 released on 2021-03-12. If your version of SQLIte is anterior, this will return an error.
+This feature is available in SQLite since version 3.35.0 released on 2021-03-12. If your version of SQLite is anterior, this will return an error.
 
 =head2 rename
 
@@ -470,6 +472,10 @@ A column name to its sql definition
 A column name to column data type hash reference
 
 =back
+
+=head2 table_info
+
+This is an alias for L<DB::Object::SQLite/table_info>
 
 =head2 unlock
 

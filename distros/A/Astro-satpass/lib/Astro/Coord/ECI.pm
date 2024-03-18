@@ -92,12 +92,12 @@ package Astro::Coord::ECI;
 use strict;
 use warnings;
 
-our $VERSION = '0.130';
+our $VERSION = '0.131';
 
 use Astro::Coord::ECI::Utils qw{ @CARP_NOT :mainstream };
 use Carp;
 use Clone ();
-use POSIX qw{floor strftime};
+use POSIX qw{ floor };
 
 use constant NO_CASCADING_STATIONS =>
     q{Cascading 'station' attributes are not supported};
@@ -896,8 +896,6 @@ sub equation_of_time {
 
     if ( looks_like_number( $self ) ) {
 	( $self, $time ) = ( __PACKAGE__, $self );
-	__subroutine_deprecation();
-##	Carp::cluck( 'Subroutine call to equation_of_time() is deprecated' );
     }
     defined $time
 	or $time = $self->dynamical();
@@ -2397,8 +2395,6 @@ sub obliquity {
 
     if ( looks_like_number( $self ) ) {
 	( $self, $time ) = ( __PACKAGE__, $self );
-	__subroutine_deprecation();
-##	Carp::cluck( 'Subroutine call to obliquity() is deprecated' );
     }
     defined $time
 	or $time = $self->dynamical();
@@ -4172,7 +4168,7 @@ Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2023 by Thomas R. Wyant, III
+Copyright (C) 2005-2024 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

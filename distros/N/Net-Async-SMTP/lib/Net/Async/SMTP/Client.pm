@@ -1,16 +1,15 @@
 package Net::Async::SMTP::Client;
-$Net::Async::SMTP::Client::VERSION = '0.002';
+
 use strict;
 use warnings;
 use parent qw(IO::Async::Notifier);
 
+our $VERSION = '0.004'; ## VERSION
+## AUTHORITY
+
 =head1 NAME
 
 Net::Async::SMTP::Client - sending email with IO::Async
-
-=head1 VERSION
-
-version 0.002
 
 =head1 SYNOPSIS
 
@@ -91,23 +90,23 @@ See also: L</connected>
 =cut
 
 sub connection {
-	my $self = shift;
-	(defined($self->host)
-	? Future->wrap($self->host)
-	: $self->mx_lookup($self->domain))->then(sub {
-		my @hosts = @_;
-		try_repeat_until_success {
-			my $host = shift;
-			$self->debug_printf("Trying connection to [%s]", $host);
-			$self->loop->connect(
-				socktype => 'stream',
-				host     => $host,
-				service  => $self->port || 'smtp',
-			)->on_fail(sub {
-				$self->debug_printf("Failed connection to [%s], have %d left to try", $host, scalar @hosts);
-			})
-		} foreach => \@hosts;
-	});
+    my $self = shift;
+    (defined($self->host)
+    ? Future->wrap($self->host)
+    : $self->mx_lookup($self->domain))->then(sub {
+        my @hosts = @_;
+        try_repeat_until_success {
+            my $host = shift;
+            $self->debug_printf("Trying connection to [%s]", $host);
+            $self->loop->connect(
+                socktype => 'stream',
+                host     => $host,
+                service  => $self->port || 'smtp',
+            )->on_fail(sub {
+                $self->debug_printf("Failed connection to [%s], have %d left to try", $host, scalar @hosts);
+            })
+        } foreach => \@hosts;
+    });
 }
 
 =head2 mx_lookup
@@ -119,38 +118,38 @@ Returns a L<Future> which will resolve to the list of records found.
 =cut
 
 sub mx_lookup {
-	my $self = shift;
-	my $domain = shift;
-	my $resolver = $self->loop->resolver;
+    my $self = shift;
+    my $domain = shift;
+    my $resolver = $self->loop->resolver;
 
- 	# Wrap the resolver query as a Future
- 	my $f = $self->loop->new_future;
-	$resolver->res_query(
-		dname => $domain,
-		type  => "MX",
-		on_resolved => sub {
-			$f->done(@_);
-			undef $f;
-		},
-		on_error => sub {
-			$f->fail(@_);
-			undef $f;
-		},
-	);
+    # Wrap the resolver query as a Future
+    my $f = $self->loop->new_future;
+    $resolver->res_query(
+        dname => $domain,
+        type  => "MX",
+        on_resolved => sub {
+            $f->done(@_);
+            undef $f;
+        },
+        on_error => sub {
+            $f->fail(@_);
+            undef $f;
+        },
+    );
 
-	# ... and return just the list of hosts we want to contact as our result
-	$f->transform(
-		done => sub {
-			my $pkt = shift;
-			my @host;
-			foreach my $mx ( $pkt->answer ) {
-				next unless $mx->type eq "MX";
-				push @host, [ $mx->preference, $mx->exchange ];
-			}
-			# sort things - possibly already handled by the resolver
-			map $_->[1], sort { $_->[0] <=> $_->[1] } @host;
-		}
-	);
+    # ... and return just the list of hosts we want to contact as our result
+    $f->transform(
+        done => sub {
+            my $pkt = shift;
+            my @host;
+            foreach my $mx ( $pkt->answer ) {
+                next unless $mx->type eq "MX";
+                push @host, [ $mx->preference, $mx->exchange ];
+            }
+            # sort things - possibly already handled by the resolver
+            map $_->[1], sort { $_->[0] <=> $_->[1] } @host;
+        }
+    );
 }
 
 =head2 configure
@@ -160,14 +159,14 @@ Overrides L<IO::Async::Notifier> C<configure> to apply SMTP-specific config.
 =cut
 
 sub configure {
-	my $self = shift;
-	my %args = @_;
-	for(grep exists $args{$_}, qw(host user pass auth domain)) {
-		$self->{$_} = delete $args{$_};
-	}
-	# SSL support
-	$self->{$_} = delete $args{$_} for grep /^SSL_/, keys %args;
-	$self->SUPER::configure(%args);
+    my $self = shift;
+    my %args = @_;
+    for(grep exists $args{$_}, qw(host user pass auth domain)) {
+        $self->{$_} = delete $args{$_};
+    }
+    # SSL support
+    $self->{$_} = delete $args{$_} for grep /^SSL_/, keys %args;
+    $self->SUPER::configure(%args);
 }
 
 =head2 connected
@@ -180,27 +179,27 @@ success.
 =cut
 
 sub connected {
-	my $self = shift;
-	$self->{connected} ||= $self->connection->then(sub {
-		my $sock = shift;
-		my $stream = Net::Async::SMTP::Connection->new(
-			handle => $sock,
-			$self->auth
-			? (auth => $self->auth)
-			: (),
-		);
-		$self->add_child($stream);
-		$stream->send_greeting->then(sub {
-			return Future->wrap($stream) unless $stream->has_feature('STARTTLS');
+    my $self = shift;
+    $self->{connected} ||= $self->connection->then(sub {
+        my $sock = shift;
+        my $stream = Net::Async::SMTP::Connection->new(
+            handle => $sock,
+            $self->auth
+            ? (auth => $self->auth)
+            : (),
+        );
+        $self->add_child($stream);
+        $stream->send_greeting->then(sub {
+            return Future->wrap($stream) unless $stream->has_feature('STARTTLS');
 
-			# Currently need to have this loaded to find ->sslwrite
-			require IO::Async::SSLStream;
+            # Currently need to have this loaded to find ->sslwrite
+            require IO::Async::SSLStream;
 
-			$stream->starttls(
-				$self->ssl_parameters
-			)
-		});
-	});
+            $stream->starttls(
+                $self->ssl_parameters
+            )
+        });
+    });
 }
 
 =head2 ssl_parameters
@@ -211,8 +210,8 @@ or L</configure>.
 =cut
 
 sub ssl_parameters {
-	my $self = shift;
-	map { $_, $self->{$_} } grep /^SSL_/, keys %$self;
+    my $self = shift;
+    map { $_, $self->{$_} } grep /^SSL_/, keys %$self;
 }
 
 =head2 login
@@ -224,12 +223,12 @@ Returns a L<Future> which will resolve with this instance when the login complet
 =cut
 
 sub login {
-	my $self = shift;
-	my %args = @_;
-	$self->connected->then(sub {
-		my $connection = shift;
-		$connection->login(%args);
-	});
+    my $self = shift;
+    my %args = @_;
+    $self->connected->then(sub {
+        my $connection = shift;
+        $connection->login(%args);
+    });
 }
 
 =head2 send
@@ -245,13 +244,32 @@ Returns a L<Future>.
 =cut
 
 sub send {
-	my $self = shift;
-	my %args = @_;
+    my $self = shift;
+    my %args = @_;
 
-	$self->connected->then(sub {
-		my $connection = shift;
-		$connection->send(%args);
-	})
+    $self->connected->then(sub {
+        my $connection = shift;
+        $connection->send(%args);
+    })
+}
+
+=head2 quit
+
+Quit the SMTP connection, unsetting the connection.
+
+Returns a L<Future>.
+
+=cut
+
+sub quit {
+    my $self = shift;
+
+    $self->connected->then(sub {
+        my $connection = shift;
+        my $rv = $connection->quit;
+        undef $self->{connected};
+        return $rv;
+    })
 }
 
 =head1 METHODS - Accessors
@@ -297,8 +315,9 @@ __END__
 
 =head1 AUTHOR
 
-Tom Molesworth <cpan@entitymodel.com>
+Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2012-2014. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2012-2024. Licensed under the same terms as Perl itself.
+

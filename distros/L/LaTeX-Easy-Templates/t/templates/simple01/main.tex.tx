@@ -1,0 +1,8 @@
+\documentclass[letterpaper,twoside,12pt]{article}
+\begin{document}
+\title{ <: $data.title :> }
+\author{ <: $data.author.name :> <: $data.author.surname :> }
+\date{ <: $data.date :> }
+\maketitle
+<: $data.content :>
+\end{document}

@@ -5,8 +5,9 @@ author:
   - 'Sanko Robinson <sanko@cpan.org>'
 build_requires:
   File::Temp: '0'
-  Test::More: '0.98'
+  Test2::V0: '0'
 configure_requires:
+  Archive::Tar: '0'
   CPAN::Meta: '0'
   File::Basename: '0'
   File::Spec::Functions: '0'
@@ -15,7 +16,7 @@ configure_requires:
   HTTP::Tiny: '0'
   Module::Build: '0.4005'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.22, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,7 +35,7 @@ no_index:
 provides:
   Alien::xmake:
     file: lib/Alien/xmake.pm
-    version: '0.01'
+    version: '0.05'
 requires:
   File::ShareDir: '0'
   File::Which: '0'
@@ -44,7 +45,7 @@ resources:
   bugtracker: https://github.com/sanko/Alien-xmake/issues
   homepage: https://github.com/sanko/Alien-xmake
   repository: https://github.com/sanko/Alien-xmake.git
-version: '0.01'
+version: '0.05'
 x_authority: cpan:SANKO
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 0

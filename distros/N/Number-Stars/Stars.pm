@@ -6,7 +6,7 @@ use warnings;
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 # Constructor.
 sub new {
@@ -103,6 +103,8 @@ Returns reference to hash.
 
 =head1 EXAMPLE1
 
+=for comment filename=percent_to_stars.pl
+
  use strict;
  use warnings;
 
@@ -146,6 +148,8 @@ Returns reference to hash.
  # }
 
 =head1 EXAMPLE2
+
+=for comment filename=percent_to_stars_console.pl
 
  use strict;
  use warnings;
@@ -194,6 +198,8 @@ Returns reference to hash.
 
 =head1 EXAMPLE3
 
+=for comment filename=percent_to_stars_console_variable.pl
+
  use strict;
  use warnings;
 
@@ -205,12 +211,13 @@ Returns reference to hash.
  Readonly::Scalar our $HALF_STAR => decode_utf8('⭒');
  Readonly::Scalar our $NOTHING_STAR => decode_utf8('☆');
 
- if (@ARGV < 2) {
-        print STDERR "Usage: $0 number_of_stars percent\n";
+ if (@ARGV < 1) {
+        print STDERR "Usage: $0 number_of_stars percent [number_of_stars]\n";
+        print STDERR "\tDefault value of number_of_stars is 10.\n";
         exit 1;
  }
- my $number_of_stars = $ARGV[0];
- my $percent = $ARGV[1];
+ my $percent = $ARGV[0];
+ my $number_of_stars = $ARGV[1] || 10;
 
  # Object.
  my $obj = Number::Stars->new(
@@ -236,13 +243,18 @@ Returns reference to hash.
  print 'Output: '.encode_utf8($output)."\n";
 
  # Output for run without arguments:
- # Usage: __SCRIPT__ number_of_stars percent
+ # Usage: __SCRIPT__ percent [number_of_stars]
+ #         Default value of number_of_stars is 10.
 
- # Output for values 10, 55:
+ # Output for values 55, 10:
  # Percent: 55
  # Output: ★★★★★⭒☆☆☆☆
 
- # Output for values 3, 55:
+ # Output for values 55:
+ # Percent: 55
+ # Output: ★★★★★⭒☆☆☆☆
+
+ # Output for values 55, 3:
  # Percent: 55
  # Output: ★⭒☆
 
@@ -273,12 +285,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2020
+© Michal Josef Špaček 2020-2024
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

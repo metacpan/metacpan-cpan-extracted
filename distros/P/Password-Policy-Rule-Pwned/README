@@ -1,7 +1,6 @@
+Password::Policy::Rule::Pwned 0.03
 
-Password::Policy::Rule::Pwned version 0.02
-
-Released: 10th September 2018
+Released: 15th March 2024
 
 
 INSTALLATION
@@ -32,12 +31,11 @@ allow the checking of potential passwords against the list of known
 pwned passwords at https://api.pwnedpasswords.com/range/
 
 
-NEW SINCE LAST VERSION
-----------------------
+NEW SINCE LAST PRODUCTION VERSION
+---------------------------------
 
- - Improve POD: typos, links, synopsis, etc.
- - Improve basic example with PwnedError check
- - Expand tests to check both exception object and message
+ - Tests require newer version of Password::Policy
+ - Allow decoded UTF-8 strings as arguments to check ()
 
 See the Changes file for a complete history.
 
@@ -58,6 +56,6 @@ to read it. Alternatively, you can view the man page with
 COPYRIGHT
 ---------
 
-This software is copyright (c) 2018 by Pete Houston. It is released
+This software is copyright (c) 2018, 2024 by Pete Houston. It is released
 under the Artistic Licence (version 2) and the GNU General Public Licence
 (version 2).

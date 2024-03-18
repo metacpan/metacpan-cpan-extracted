@@ -45,7 +45,7 @@ private_name_regex	= _(?!_)\w+
 
 [Perl::Critic::Policy::Subroutines::RequireArgUnpacking]
 
-allow_delegation_to	= _expand_args_default_station __default_station
+allow_delegation_to	= _expand_args_default_station __default_station _pre_strftime
 short_subroutine_statements	= 3
 
 [Perl::Critic::Policy::Subroutines::RequireFinalReturn]

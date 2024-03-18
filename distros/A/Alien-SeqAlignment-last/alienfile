@@ -1,0 +1,191 @@
+use strict;
+use warnings;
+use alienfile;
+use Carp;
+use Capture::Tiny qw(capture);
+use File::Copy;
+use File::Copy::Recursive qw(dircopy);
+use HTTP::Tiny;
+use Path::Tiny;
+
+configure {
+    requires 'Carp';
+    requires 'Capture::Tiny';
+    requires 'File::Copy';
+    requires 'File::Copy::Recursive';
+    requires 'HTTP::Tiny';
+    requires 'Path::Tiny';
+};
+
+die "This Alien does not work on Windows" if $^O eq 'MSWin32';
+
+probe sub {
+  
+    my ($build) = @_;
+    ## see if GNU parallel is installed
+    my ( $cmd, $stder ) = capture { system( 'parallel', '--version' ) };
+    my $is_gnu_parallel_installed = $cmd =~ /\AGNU\s+parallel\s+[0-9]+/m;
+    carp "GNU parallel is not installed\n"
+      . "Please install it from https://www.gnu.org/software/parallel/ "
+      . "and re-attempt installation of this Alien.\n"
+      unless $is_gnu_parallel_installed;
+
+    ## check if all the components of the last suite are installed
+    ( $cmd, $stder ) = capture { system( 'lastal', '--version' ) };
+    my $is_last_installed = $cmd =~ /\Alastal\s+[0-9]+/m;
+    ( $cmd, $stder ) = capture { system( 'last-split', '--version' ) };
+    $is_last_installed &&= $cmd =~ /\Alast-split\s+[0-9]+/m;
+    ( $cmd, $stder ) = capture { system( 'last-pair-probs', '--version' ) };
+    $is_last_installed &&= $cmd =~ /\Alast-pair-probs\s+[0-9]+/m;
+    ( $cmd, $stder ) = capture { system( 'maf-convert', '--help' ) };
+    $is_last_installed &&= $cmd =~ /\AUsage:/m;
+    ( $cmd, $stder ) = capture { system( 'lastdb', '--version' ) };
+    $is_last_installed &&= $cmd =~ /lastdb\s+[0-9]+/m;
+    ( $cmd, $stder ) = capture { system( 'last-train', '--help' ) };
+    $is_last_installed &&= $cmd =~ /\AUsage:/m;
+    print $is_last_installed
+      ? "The last suite is already installed in your system\n"
+      : "The last suite is not installed, so will install from source\n";
+
+    ## check if all the components of the last-split-pe suite are installed
+    ( $cmd, $stder ) = capture { system( 'lastal', '--help' ) };
+    my $is_last_split_pe_installed = $cmd =~ /\AUsage:/m;
+    print $is_last_split_pe_installed
+      ? "The last-split-pe suite is already installed in your system\n"
+      : "The last-split-pe suite is not installed, so will install from source\n";
+
+    ## set the suite download flags & determine whether to do sys Alien install
+    $build->install_prop->{my_to_install_last} = !$is_last_installed;
+    $build->install_prop->{my_to_install_last_split_pe} =
+      !$is_last_split_pe_installed;
+    (        $build->install_prop->{my_to_install_last}
+          || $build->install_prop->{my_to_install_last_split_pe} )
+      ? 'share'
+      : 'system';
+
+};
+
+share {
+    download sub {
+        my ($build) = @_;
+        my $repo_url;
+        my $repo_response;
+
+        my $download_dir =
+          [ path( $build->install_prop->{root} )->children ]->[0]
+          ;    ## create an anonymous reference to get the download directory
+
+   
+        ## download last if we have to download it
+        if ( $build->install_prop->{my_to_install_last} ) {
+            $repo_url =
+              'https://gitlab.com/mcfrith/last/-/archive/main/last-main.zip';
+            $repo_response = HTTP::Tiny->new->get($repo_url);
+            unless ( $repo_response->{success} )
+            {    ## failed original download, try my fork
+                $repo_url =
+'https://gitlab.com/chrisarg1/last/-/archive/main/last-main.zip';
+                $repo_response = HTTP::Tiny->new->get($repo_url);
+                croak "Failed to download last from either location"
+                  unless $repo_response->{success};
+            }
+            path( $download_dir, 'last-main.zip' )
+              ->spew_raw( $repo_response->{content} );
+        }
+
+        ##download last_split_pe if we have to download it
+        if ( $build->install_prop->{my_to_install_last_split_pe} ) {
+            $repo_url =
+'https://bitbucket.org/splitpairedend/last-split-pe/get/3f0ce13a347f.zip';
+            $repo_response = HTTP::Tiny->new->get($repo_url);
+            unless ( $repo_response->{success} )
+            {    ## failed original download, try my fork
+                $repo_url =
+'https://bitbucket.org/chrisarg/last-split-pe/get/3f0ce13a347f.zip';
+                $repo_response = HTTP::Tiny->new->get($repo_url);
+                croak "Failed to download last_split_pe from either location"
+                  unless $repo_response->{success};
+            }
+            path( $download_dir, 'last-split_pe.zip' )
+              ->spew_raw( $repo_response->{content} );
+        }
+    };
+
+    extract sub {
+        my ($build) = @_;
+        my ( $extract_dir, $download_dir ) =
+          sort( path( $build->install_prop->{root} )->children )
+          ; ## build directory added automatically by Alien::Build after download to root
+          path( $build->install_prop->{root} )->children;
+        copy path( $download_dir, 'last-main.zip' ), $extract_dir
+          || croak "Failed to move last-main.zip to extract directory";
+        copy path( $download_dir, 'last-split_pe.zip' ), $extract_dir
+          || croak "Failed to move last-split_pe.zip to extract directory";
+        ## extract the downloaded last files
+        if ( $build->install_prop->{my_to_install_last} ) {
+            system 'unzip', path( $extract_dir, 'last-main.zip' ), '-d',
+              $extract_dir
+              || croak "Failed to extract last from downloaded file";
+        }
+
+        ## extract the downloaded last_split_pe files
+        if ( $build->install_prop->{my_to_install_last_split_pe} ) {
+            system 'unzip', path( $extract_dir, 'last-split_pe.zip' ), '-d',
+              $extract_dir
+              || croak "Failed to extract last_split_pe from downloaded file";
+        }
+
+    };
+
+    build sub {
+        my ($build) = @_;
+        my ( $source_directory, $download_dir ) =
+          sort( path( $build->install_prop->{root} )->children );
+        if ( $build->install_prop->{my_to_install_last} ) {
+            chdir path( $source_directory, 'last-main' );
+            system 'make';
+        }
+        if ( $build->install_prop->{my_to_install_last_split_pe} ) {
+            chdir path( $source_directory,
+                'splitpairedend-last-split-pe-3f0ce13a347f/src' );
+            system 'make';
+        }
+
+    };
+    after 'build' => sub {
+        my ($build) = @_;
+        my $install_root;
+        if ( $build->meta_prop->{destdir} ) {
+            my $destdir = $ENV{DESTDIR};
+            $install_root =
+              Path::Tiny->new( $ENV{DESTDIR}, $build->install_prop->{prefix} );
+        }
+        else {
+            $install_root = Path::Tiny->new( $build->install_prop->{stage} );
+        }
+        my ( $source_directory, $download_dir ) =
+          sort( path( $build->install_prop->{root} )->children );
+        $source_directory = path($source_directory);
+        my $binary_dest_directory = path( $install_root, 'bin' );
+        $binary_dest_directory->mkdir;
+        path( $source_directory,
+            'splitpairedend-last-split-pe-3f0ce13a347f/src/last-split-pe' )
+          ->move( path( $binary_dest_directory, 'last-split-pe' ) );
+        dircopy path( $source_directory, 'last-main/bin' ),
+          $binary_dest_directory;
+    };
+};
+
+    gather sub {
+    my ($build) = @_;
+    $build->runtime_prop->{command}->{exe}                = 'lastal';
+    $build->runtime_prop->{command}->{dbbuild}            = 'lastadb';
+    $build->runtime_prop->{command}->{maf_convert}        = 'maf-convert';
+    $build->runtime_prop->{command}->{train}              = 'last-train';
+    $build->runtime_prop->{command}->{split_or_splice}    = 'last-split';
+    $build->runtime_prop->{command}->{split_or_splice_pe} = 'last-split-pe';
+    $build->runtime_prop->{command}->{pe_probs}           = 'last-pair-probs';
+    $build->runtime_prop->{command}->{parallel}           = 'parallel';
+};
+
+1;

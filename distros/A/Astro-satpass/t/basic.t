@@ -3,7 +3,6 @@ package main;
 use strict;
 use warnings;
 
-use POSIX qw{strftime floor};
 use Test::More 0.88;	# Because of done_testing()
 use Time::Local;
 
@@ -31,6 +30,8 @@ if ( HAS_UNICODE_SUPPORT ) {
 
 =cut
 
+note "Perl $]";
+
 require_ok 'Astro::Coord::ECI::Utils'
     or BAIL_OUT 'Can not continue without Astro::Coord::ECI::Utils';
 
@@ -39,6 +40,15 @@ require_ok 'Astro::Coord::ECI'
 
 instantiate( 'Astro::Coord::ECI' )
     or BAIL_OUT 'Can not instantiate Astro::Coord::ECI';
+
+{
+    local $@ = undef;
+
+    ok eval {
+	get_object()->get( 'sun' );
+    }, q/Can get the default 'sun' attribute/
+	or BAIL_OUT q/Can not get the default 'sun' attribute'/;
+}
 
 require_ok 'Astro::Coord::ECI::Moon'
     or BAIL_OUT 'Can not continue without Astro::Coord::ECI::Moon';
@@ -322,6 +332,26 @@ u_cmp_eql( find_first_true => [
     0, 1, sub{ sin( $_[0] ) >= sin( .5 ) }, .0001 ], .5, '%.4f',
     'find_first_true looking for sin( $x ) >= sin( .5 )' );
 
+*_pre_strftime = \&Astro::Coord::ECI::Utils::_pre_strftime;
+
+is_deeply [ _pre_strftime( '%F %T', 2.5 ) ], [ '%Y-%m-%d %H:%M:%S', 2 ],
+    q('%F %T', 2.5);
+
+is_deeply [ _pre_strftime( '%H:%M:%.2S', 2.5 ) ], [ '%H:%M:%S.50', 2 ],
+    q('%H:%M:%.2S', 2.5);
+
+is_deeply [ _pre_strftime( '%H:%M:%S', 2.5, 2 ) ], [ '%H:%M:%S.50', 2 ],
+    q('%H:%M:%S', 2.5, 2);
+
+is_deeply [ _pre_strftime( '%F %.2T', 2.5 ) ], [ '%Y-%m-%d %H:%M:%S.50', 2 ],
+    q('%F %.2T', 2.5);
+
+*gm_strftime = \&Astro::Coord::ECI::Utils::gm_strftime;
+
+is gm_strftime( '%F %T', timegm( 0, 30, 2, 10, 2, 124 ) ),
+    '2024-03-10 02:30:00',
+    q('%F %T' in middle of America/New_York time change);
+
 u_cmp_eql( format_space_track_json_time => timegm( 0, 0, 0, 1, 3, 114 ),
     '2014-04-01 00:00:00', '%s', 'Format Space Track JSON time' );
 
@@ -359,13 +389,21 @@ EOD
 
 done_testing;
 
-sub instantiate {
-    my ( $class ) = @_;
-    my $pass = eval {
-	$class->new();
-    };
-    @_ = ( $pass, "Instantiate $class" );
-    goto &ok;
+{
+    my $obj;
+
+    sub instantiate {
+	my ( $class ) = @_;
+	$obj = eval {
+	    $class->new();
+	};
+	@_ = ( $obj, "Instantiate $class" );
+	goto &ok;
+    }
+
+    sub get_object {
+	return $obj;
+    }
 }
 
 sub deg_to_rad {

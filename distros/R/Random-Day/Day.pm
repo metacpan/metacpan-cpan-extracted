@@ -10,7 +10,7 @@ use DateTime::Event::Recurrence;
 use English;
 use Error::Pure qw(err);
 
-our $VERSION = 0.13;
+our $VERSION = 0.14;
 
 # Constructor.
 sub new {
@@ -127,6 +127,66 @@ sub random_day_month {
 	my $dt = $yearly_day_month->next($self->random);
 	if (! defined $dt) {
 		err 'Cannot create DateTime object.';
+	}
+
+	return $dt;
+}
+
+# Random DateTime object for day defined by day and year.
+sub random_day_year {
+	my ($self, $day, $year) = @_;
+
+	$self->_check_day($day);
+	if ($day > 31) {
+		err 'Day is greater than possible day.',
+			'Day', $day,
+		;
+	}
+	if ($self->{'dt_from'}->year > $year) {
+		err 'Year is lesser than minimal year.',
+			'Expected year', $year,
+			'Minimal year', $self->{'dt_from'}->year,
+		;
+	}
+	if ($self->{'dt_to'}->year < $year) {
+		err 'Year is greater than maximal year.',
+			'Expected year', $year,
+			'Maximal year', $self->{'dt_to'}->year,
+		;
+	}
+	my ($from_month, $to_month) = (1, 12);
+	if ($self->{'dt_from'}->year == $year) {
+		$from_month = $self->{'dt_from'}->month;
+		if ($self->{'dt_from'}->day > $day) {
+			$from_month++;
+		}
+		if ($from_month > 12) {
+			err 'Day is lesser than minimal possible date.';
+		}
+	}
+	if ($self->{'dt_to'}->year == $year) {
+		$to_month = $self->{'dt_to'}->month;
+		if ($self->{'dt_to'}->day < $day) {
+			$to_month--;
+		}
+		if ($to_month < 1) {
+			err 'Day is greater than maximal possible date.';
+		}
+	}
+	if ($to_month < $from_month) {
+		err 'Day not fit between start and end dates.';
+	}
+	my @possible_months = ($from_month .. $to_month);
+	my $dt;
+	while (! $dt) {
+		my $random_month = $possible_months[int(rand(scalar @possible_months))];
+		$dt = eval {
+			DateTime->new(
+				'day' => $day,
+				'month' => $random_month,
+				'year' => $year,
+			);
+		};
 	}
 
 	return $dt;
@@ -305,6 +365,7 @@ Random::Day - Class for random day generation.
  my $dt = $obj->random_day($day);
  my $dt = $obj->random_day_month($day, $month);
  my $dt = $obj->random_day_month_year($day, $month, $year);
+ my $dt = $obj->random_day_year($day, $year);
  my $dt = $obj->random_month($month);
  my $dt = $obj->random_month_year($month, $year);
  my $dt = $obj->random_year($year);
@@ -351,6 +412,8 @@ Default value is undef.
 
 =back
 
+Returns instance of object.
+
 =head2 C<get>
 
  my $dt = $obj->get;
@@ -380,6 +443,14 @@ Returns DateTime object for date.
  my $dt = $obj->random_day_month($day, $month);
 
 Get random date defined by day and month.
+
+Returns DateTime object for date.
+
+=head2 C<random_day_year>
+
+ my $dt = $obj->random_day_year($day, $year);
+
+Get random date defined by day and year.
 
 Returns DateTime object for date.
 
@@ -423,12 +494,12 @@ Returns DateTime object for date.
 
  random_day():
          Day cannot be a zero.
-         Day isn't number.
+         Day isn't positive number.
 
  random_day_month():
          Cannot create DateTime object.
          Day cannot be a zero.
-         Day isn't number.
+         Day isn't positive number.
 
  random_day_month_year():
          Begin of expected month is lesser than minimal date.
@@ -441,7 +512,7 @@ Returns DateTime object for date.
          Cannot create DateTime object.
                  Error: %s
          Day cannot be a zero.
-         Day isn't number.
+         Day isn't positive number.
          End of expected month is greater than maximal date.
                  Expected year: %s
                  Expected month: %s
@@ -449,6 +520,21 @@ Returns DateTime object for date.
                  Maximal year: %s
                  Maximal month: %s
                  Maximal day: %s
+
+ random_day_year():
+         Day cannot be a zero.
+         Day is greater than maximal possible date.
+         Day is greater than possible day.
+                 Day: %s
+         Day is lesser than minimal possible date.
+         Day isn't positive number.
+         Day not fit between start and end dates.
+         Year is lesser than minimal year.
+                 Expected year: %s
+                 Minimal year: %s
+         Year is greater than maximal year.
+                 Expected year: %s
+                 Maximal year: %s
 
  random_month():
          Cannot create DateTime object.
@@ -536,12 +622,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2013-2023 Michal Josef Špaček
+© 2013-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.13
+0.14
 
 =cut

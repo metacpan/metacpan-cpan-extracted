@@ -2,7 +2,7 @@
 use 5.014 ; use warnings ; 
 use Time::HiRes qw [ gettimeofday tv_interval ] ;
 my ${ dt_start } = [ gettimeofday ] ; 
-use Getopt::Std ; getopts '=@:0:2:l:q:' , \my %o  ; 
+use Getopt::Std ; getopts '~=@:0:2:l:q:' , \my %o  ; 
 use Term::ANSIColor qw[ color :constants ] ; $Term::ANSIColor::AUTORESET = 1 ;
 use FindBin qw[ $Script ] ; 
 use Encode qw[ decode_utf8 encode_utf8 ] ; 
@@ -40,23 +40,19 @@ while( <> ) {
   do { chomp ; $z = 'start' } if ! $optL0 ; # 行を意識する場合。
   $_ = decode_utf8 $_ ; 
   my @chars = split // , $_ , 0 ; 
-  #say CYAN join "," , @chars , "x" ; 
   for ( @chars ) {
     $_ = '$/' if $_ eq $/  ;
-    $nn {$z} {$_} ++ ; 
-    $n2 {$_} ++ ; 
+    $o{'~'} ? ++ $nn {$_} {$z} && ++ $n2 {$z} : ++ $nn {$z} {$_} && ++ $n2 {$_} ; # トリッキーかも。
     $z = $_ ;
   } 
-  do { $nn {$z} {$end} ++ ; $n2 {$end} ++ } if ! $optL0 ; # 行を意識する場合
-  #do { $nn {'\n'} {$end} ++ ; $n2 {'\n'} ++ } if $optL0 ; # 行を意識しない場合
+  do { $o{'~'} ? ++$nn{$end}{$z} && ++$n2{$z} : ++$nn{$z}{$end} && ++$n2{$end} } if ! $optL0 ; # 行を意識する場合
 }
-do { $nn {$z} {$end} ++ ; $n2 {$end} ++ } if $optL0 ; # 行を意識しない場合
-
-#say "\x{24ba}" ;
+do { $o{'~'} ? ++$nn{$end}{$z} && ++$n2{$z}: ++$nn{$z}{$end} && ++$n2{$end} } if $optL0 ; # 行を意識しない場合
 
 my @keg1 = sort { &conv($a) cmp &conv($b) } keys %nn ; 
 my @keg2 = sort { &conv($a) cmp &conv($b) } keys %n2 ; 
-say UNDERLINE join "\t" , 'p/n' , map { & conv($_) } @keg2 ; 
+use utf8 ;
+say UNDERLINE join "\t" , ($o{'~'} ? '↓prev' : 'prev→') , map { & conv($_) } @keg2 ; 
 for my $k ( @keg1 ) { 
   say join "\t" , & conv($k) , map { $nn { $k } { $_ } // $o{0} } @keg2 ; 
 }
@@ -64,9 +60,6 @@ say join "\t" , "total" , map { $n2 { $_ } // $o{0} } @keg2 ;
 exit ;
 
 sub conv ( $ ) { 
-  #$_[0] //= '' ; # !! 
-  #return "\x{24c8}" if $_[0] eq '' ; 
-  ##return "start" if $_[0] eq '' ; 
   return $_[0] = '"\t"' if $_[0] eq "\t" ; 
   return $_[0] = '"\n"' if $_[0] eq "\n" ;   
   return $_[0] if length $_[0] > 1 ;
@@ -120,10 +113,12 @@ sub HELP_MESSAGE {
   -@ N  : N秒ごとに、何行読んだか等の情報を標準エラー出力に出力する。未指定だと15。
   -l 0  : 行単位(改行文字で区切られている)で処理する(各行の先頭文字を改行文字の直後と見なさない)。
   -q STR : 各出現文字をどんなクォーテーションの文字で加工かを指定する。未指定ならシングルクォーテーション(')。
+  -~     : 出力する行列を転置する。元々、縦軸と横軸に並ぶ文字は、直前と直後の文字であるが、それを反転させる。
   --help : このオンラインヘルプの文面を表示する。
 
 その他 : 
   * p/n と最初に出力されるのは、prev/next を意味する。「左の列がprevで、右の行がnext」を意味する。
   * 出力する行列を転置させるオプションがあっても良いかも。 
+  * 出力する縦軸と予後軸の文字の順序を制御したい。まずは、いわゆる特殊文字をどうするか考えたい。
 
 =cut

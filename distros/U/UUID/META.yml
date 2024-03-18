@@ -3,27 +3,36 @@ abstract: 'Universally Unique Identifier library for Perl'
 author:
   - 'Rick Myers <jrm@cpan.org>'
 build_requires:
+  Benchmark: '0'
   CPAN::Meta: '0'
   Config: '0'
-  Devel::CheckLib: '0'
+  Devel::CheckLib: '1.14'
   DynaLoader: '0'
   Exporter: '0'
-  ExtUtils::MakeMaker: '6.64'
+  ExtUtils::MakeMaker: '7.06'
   ExtUtils::Manifest: '0'
-  Test::More: '0'
-  Text::Patch: '0'
+  File::Spec: '0'
+  File::Temp: '0.10'
+  List::Util: '1.29'
+  Test::More: '0.88'
+  Thread::Semaphore: '0'
+  Time::HiRes: '0'
+  Try::Tiny: '0'
   lib: '0'
   strict: '0'
+  threads: '0'
+  threads::shared: '0'
   vars: '0'
+  version: '0.77'
   warnings: '0'
 configure_requires:
   Config: '0'
-  Devel::CheckLib: '0'
-  ExtUtils::MakeMaker: '6.64'
+  Devel::CheckLib: '1.14'
+  ExtUtils::MakeMaker: '7.06'
   strict: '0'
   warnings: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.06, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -36,13 +45,15 @@ no_index:
 provides:
   UUID:
     file: UUID.pm
-    version: '0.32'
+    version: '0.33'
 requires:
   DynaLoader: '0'
   Exporter: '0'
-  perl: '5.005'
+  Time::HiRes: '0'
+  perl: '5.005063'
   strict: '0'
   vars: '0'
   warnings: '0'
-version: '0.32'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '0.33'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+

@@ -4,13 +4,13 @@
       "Pete Houston (cpan@openstrike.co.uk)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Password-Policy-Rule-Pwned",
    "no_index" : {
@@ -35,8 +35,9 @@
             "Digest::SHA" : "0",
             "LWP" : "6.02",
             "LWP::Protocol::https" : "6.02",
-            "Password::Policy" : "0.04",
-            "perl" : "5.006000"
+            "Password::Policy" : "0.06",
+            "String::Multibyte" : "0",
+            "perl" : "5.008000"
          }
       },
       "test" : {
@@ -50,15 +51,15 @@
    "provides" : {
       "Password::Policy::Exception::Pwned" : {
          "file" : "lib/Password/Policy/Exception/Pwned.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Password::Policy::Exception::PwnedError" : {
          "file" : "lib/Password/Policy/Exception/PwnedError.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Password::Policy::Rule::Pwned" : {
          "file" : "lib/Password/Policy/Rule/Pwned.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -72,5 +73,6 @@
          "web" : "https://gitlab.com/openstrike/password-pwned"
       }
    },
-   "version" : "0.02"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

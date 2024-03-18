@@ -1,0 +1,50 @@
+: ######################################################
+: # we are receiving 2 hashes: 'data' and 'private'
+: # data will contain authors etc.
+: # private will contain filepath of template file etc.
+: ######################################################
+\documentclass[letterpaper,twoside,12pt]{article}
+
+% let's go (love you LaTeXXXX)
+
+: # WARNING WARNING WARNING use mark_raw as this idiot escapes everything (why?)
+
+\begin{document}
+
+\tableofcontents
+
+\newpage
+
+my title is \textbf{ <: $data.title :> }
+
+: for $data.sections -> $section {
+\section{<: $section.title :>}
+:   if( defined($section.label) ){
+\label{<: $section.label :>}
+:   }
+:   for $section.paragraphs -> $paragraph {
+
+\par
+<: $paragraph :>
+
+:  }
+
+:   for $section.subsections -> $subsection {
+\subsection{<: $subsection.title :>}
+:     if( defined($subsection.label) ){
+\label{<: $subsection.label :>}
+:     }
+
+:     for $subsection.paragraphs -> $paragraph {
+
+\par
+<: $paragraph :>
+
+:    }
+
+:  }
+
+\newpage % after each section
+: }
+
+\end{document}

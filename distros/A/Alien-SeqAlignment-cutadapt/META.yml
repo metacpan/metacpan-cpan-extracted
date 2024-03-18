@@ -30,13 +30,13 @@ no_index:
 provides:
   Alien::SeqAlignment::cutadapt:
     file: lib/Alien/SeqAlignment/cutadapt.pm
-    version: '0.03'
+    version: '0.04'
 requires:
   Alien::Base: '0.038'
   parent: '0'
   strict: '0'
   warnings: '0'
-version: '0.03'
+version: '0.04'
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:

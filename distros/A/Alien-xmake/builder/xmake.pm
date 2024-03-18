@@ -9,17 +9,18 @@ package builder::xmake {
     use File::Temp            qw[tempdir tempfile];
     use File::Spec::Functions qw[rel2abs];
     use File::Which           qw[which];
+    use Archive::Tar          qw[];
 
     #~ use File::ShareDir qw[];
     #
-    #~ use Data::Dump;
-    #
-    my $version = 'v2.8.3';    # Target install version
-    my $branch  = 'master';
+    my $version = '2.8.8';    # Target install version
 
+    # If false, a complete archive is downloaded (quickly) via http
     #~ my $installer_sh = 'https://xmake.io/shget.text';
     my $installer_exe
-        = "https://github.com/xmake-io/xmake/releases/download/${version}/xmake-${version}.win64.exe";
+        = "https://github.com/xmake-io/xmake/releases/download/v${version}/xmake-v${version}.win64.exe";
+    my $installer_tar
+        = "https://github.com/xmake-io/xmake/releases/download/v${version}/xmake-v${version}.tar.gz";
     my $share = rel2abs 'share';
     #
     sub http {
@@ -43,18 +44,18 @@ package builder::xmake {
     #~ warn File::Spec->rel2abs(
     #~ File::Basename::dirname(__FILE__), 'share'
     #~ );
-    sub download_exe {
-        my ($s)      = @_;
-        my $local    = File::Spec->rel2abs( File::Spec->catfile( $s->cwd, 'xmake_installer.exe' ) );
-        my $response = $s->http->mirror( $installer_exe, $local );
+    sub download {
+        my ( $s, $url, $path ) = @_;
+        my $local    = File::Spec->rel2abs( File::Spec->catfile( $s->cwd, $path ) );
+        my $response = $s->http->mirror( $url, $local );
         if ( $response->{success} ) {
             $s->log_debug( 'Install executable mirrored at ' . $local );
             $s->make_executable($local);    # get it ready to run
             return $local;
         }
         $s->log_debug( 'Status: [' . $response->{status} . '] ' . $response->{content} );
-        $s->log_warn( 'Failed to download installer from ' . $response->{url} );
-        exit 1;
+        $s->log_warn( 'Failed to download ' . $response->{url} );
+        return ();
     }
 
     #~ sub download_shget {
@@ -105,16 +106,17 @@ package builder::xmake {
         }
         elsif ( $os eq 'Windows' ) {
             $s->config_data( xmake_type => 'share' );
-            my $installer = $s->download_exe();
+            my $installer = $s->download( $installer_exe, 'xmake_installer.exe' );
             my $dest      = File::Spec->rel2abs(
                 File::Spec->catdir( $s->base_dir, @{ $s->share_dir->{dist} } ) );
             $s->log_info(qq[Running installer [$installer]...\n]);
-            warn $s->do_system( $installer, '/NOADMIN', '/S', '/D=' . $dest );
-            $s->log_info(qq[Installer complete\n]);
+            $s->do_system( $installer, '/NOADMIN', '/S', '/D=' . $dest );
+            $s->log_info(qq[Installed to $dest\n]);
             push @PATH, $dest;
             my $xmake = $s->locate_xmake();
             $s->config_data( xmake_type => 'share' );
             $s->gather_info($xmake);
+            $s->config_data( xmake_install => $dest );
 
 # D:\a\_temp\1aa1c77c-ff7b-41bc-8899-98e4cd421618.exe /NOADMIN /S /D=C:\Users\RUNNER~1\AppData\Local\Temp\xmake-15e5f277191e8a088998d0f797dd1f44b5491e17
 #~ $s->warn_info('Windows is on the todo list');
@@ -127,11 +129,12 @@ package builder::xmake {
                 $s->config_data( xmake_type => 'system' );
             }
             else {
-                build_from_source();
+                $s->build_from_source();
                 $xmake = $s->locate_xmake();
                 #
                 $s->config_data( xmake_type => 'share' );
             }
+            $s->config_data( xmake_install => $xmake );
             $s->gather_info($xmake);
             return File::Spec->rel2abs($xmake);
         }
@@ -181,42 +184,33 @@ package builder::xmake {
     }
 
     sub build_from_source {
+        my $s = shift;
 
         # get make
         my $make;
         {
             for (qw[make gmake]) {
-                if ( system( $_, '--version' ) == 0 ) {
+                if ( `$_ --version` =~ /GNU Make/ ) {
                     $make = $_;
                     last;
                 }
             }
-            $make // warn 'Please install make/gmake';
+            $make // warn 'Please install gmake';
         }
         my $compiler;
         {
             my ( $fh, $filename ) = tempfile();
             syswrite $fh, "#include <stdio.h>\nint main(){return 0;}";
-            die 'Please install git' if system 'git', '--version';
             for (qw[gcc cc clang]) {
                 if ( !system $_, qw'-x c', $filename,
                     qw'-o /dev/null -I/usr/include -I/usr/local/include' ) {
                     $compiler = $_;
                 }
             }
-            $compiler // warn 'Please install a C compiler';
+
+            #~ $compiler // warn 'Please install a C compiler';
         }
-        my $git;
-        {
-            for (qw[git]) {
-                if ( system( $_, '--version' ) == 0 ) {
-                    $git = $_;
-                    last;
-                }
-            }
-            $git // warn 'Please install git';
-        }
-        if ( !defined $make || !defined $git || !defined $compiler ) {
+        if ( !defined $make || !defined $compiler ) {
             my $sudo      = sudo();
             my $installer = package_installer();
             my %options   = (
@@ -243,7 +237,11 @@ package builder::xmake {
                 #brew   => 'brew --version',                                       # MacOS
                 #dnf    => 'dnf --help',    # Fedora, RHEL, OpenSUSE, CentOS
             );
-            system $options{$installer} if defined $options{$installer};
+            warn 'You should probably try running ' . $options{$installer}
+                if defined $options{$installer};
+            my $prebuilt = install_prebuilt();
+            warn 'You could also install a prebuilt version of xmake with ' . $prebuilt
+                if defined $prebuilt;
         }
 
         sub get_host_speed {
@@ -266,31 +264,49 @@ package builder::xmake {
                 return 'github.com';
             }
         }
-        my $mirror = get_fast_host();
-        CORE::say "Using $mirror mirror...";
-        my ( $gitrepo, $gitrepo_raw );
-        if ( $mirror eq 'github.com' ) {
-            $gitrepo = 'https://github.com/xmake-io/xmake.git';
-
-            #$gitrepo_raw='https://github.com/xmake-io/xmake/raw/master';
-            $gitrepo_raw = 'https://fastly.jsdelivr.net/gh/xmake-io/xmake@master';
-        }
-        else {
-            $gitrepo     = "https://gitee.com/tboox/xmake.git";
-            $gitrepo_raw = "https://gitee.com/tboox/xmake/raw/master";
-        }
-        #
+        my $cwd        = rel2abs('.');
         my $projectdir = tempdir( CLEANUP => 1 );
-        #
-        `git clone --depth=1 -b "$branch" "$gitrepo" --recurse-submodules $projectdir`
-            unless -f $projectdir;
-        my $cwd = rel2abs('.');
+        my $workdir;
+        my $archive = $s->download( $installer_tar, 'xmake.tar.gz' );
+        if ( !$archive ) {
+            warn 'Failed to download source snapshot... Looking for git...';
+            my $git;
+            for (qw[git]) {
+                if ( system( $_, '--version' ) == 0 ) {
+                    $git = $_;
+                    last;
+                }
+            }
+            if ( !$git ) { warn 'Cannot locate git. Giving up'; exit 1; }
+            my $mirror = get_fast_host();
+            CORE::say "Using $mirror mirror...";
+            my ( $gitrepo, $gitrepo_raw );
+            if ( $mirror eq 'github.com' ) {
+                $gitrepo = 'https://github.com/xmake-io/xmake.git';
+
+                #$gitrepo_raw='https://github.com/xmake-io/xmake/raw/master';
+                $gitrepo_raw = 'https://fastly.jsdelivr.net/gh/xmake-io/xmake@master';
+            }
+            else {
+                $gitrepo     = "https://gitee.com/tboox/xmake.git";
+                $gitrepo_raw = "https://gitee.com/tboox/xmake/raw/master";
+            }
+            #
+            `git clone --depth=1 -b "v$version" "$gitrepo" --recurse-submodules $projectdir`
+                unless -f $projectdir;
+            chdir $projectdir;
+            $workdir = $projectdir;
+        }
+        my $tar = Archive::Tar->new;
+        $tar->read($archive);
         chdir $projectdir;
-        `./configure` unless -f "$projectdir/makefile";
+        $tar->extract();
+        $workdir = $projectdir . '/xmake-' . $version;
+        chdir $workdir;
+        system './configure' unless -f 'makefile';
+        system $make, '--jobs=5';
+        system $make, 'install', qq[PREFIX=$share];
         chdir $cwd;    # I really should go to dist base dir
-        warn 'Building with ' . $make;
-        `$make -C $projectdir`;
-        `$make -C $projectdir install PREFIX=$share`;
         return $share;
     }
 

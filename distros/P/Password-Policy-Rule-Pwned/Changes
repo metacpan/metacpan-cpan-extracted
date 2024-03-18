@@ -1,3 +1,19 @@
+0.03 2024-03-15
+
+ - No changes from 0.02_02
+
+0.02_03 2024-03-04
+
+ - No changes from 0.02_02: bump to force reindex only
+
+0.02_02 2024-02-18
+
+ - Tests require newer version of Password::Policy
+
+0.02_01 2024-02-16
+
+ - Allow decoded UTF-8 strings as arguments to check ()
+
 0.02 2018-09-10
 
  - Improve POD: typos, links, synopsis, etc.

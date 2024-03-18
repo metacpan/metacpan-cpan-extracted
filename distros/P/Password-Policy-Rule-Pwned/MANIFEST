@@ -13,6 +13,9 @@ t/pwned.t
 t/stock.yaml
 t/unpwned.t
 xt/release/kwalitee.t
+xt/release/manifest.t
+xt/release/perlver.t
 xt/release/vars.t
+xt/release/version.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

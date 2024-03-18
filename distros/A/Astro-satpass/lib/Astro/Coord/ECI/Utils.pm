@@ -8,6 +8,18 @@ Astro::Coord::ECI::Utils - Utility routines for astronomical calculations
  my $now = time ();
  print "The current Julian day is ", julianday ($now);
 
+=head2 DEPRECATION NOTICE
+
+As of version 0.131, subroutines C<date2epoch()> and C<epoch2datetime()>
+are deprecated. These are not used internally. Under Perl 5.12 and
+later, C<Time::Local::timegm_posix()> and core C<gmtime()> are
+recommended over these subroutines. For earlier Perls, you can try
+L<Time::y2038|Time::y2038>.
+
+Six months after the release of version 0.131, these subroutines will
+warn on first use. Six months after that, they will warn on every use.
+After a further six months, use of them will be fatal.
+
 =head1 DESCRIPTION
 
 This module was written to provide a home for all the constants and
@@ -20,7 +32,7 @@ become complicated, this module is also responsible for figuring out how
 that is done, and exporting whatever is needful to export. See C<:time>
 below for the gory details.
 
-This package exports nothing by default. But all the constants,
+This module exports nothing by default. But all the constants,
 variables, and subroutines documented below are exportable, and the
 following export tags may be used:
 
@@ -123,7 +135,7 @@ package Astro::Coord::ECI::Utils;
 use strict;
 use warnings;
 
-our $VERSION = '0.130';
+our $VERSION = '0.131';
 our @ISA = qw{Exporter};
 
 use Carp;
@@ -279,11 +291,11 @@ my @all_external = ( qw{
 	decode_space_track_json_time deg2rad distsq dynamical_delta
 	embodies epoch2datetime find_first_true
 	fold_case __format_epoch_time_usec
-	format_space_track_json_time intensity_to_magnitude
+	format_space_track_json_time gm_strftime intensity_to_magnitude
 	jcent2000 jd2date jd2datetime jday2000 julianday
-	keplers_equation load_module looks_like_number max min mod2pi
-	omega
-	position_angle
+	keplers_equation load_module local_strftime
+	looks_like_number max min mod2pi
+	omega position_angle
 	rad2deg rad2dms rad2hms tan theta0 thetag vector_cross_product
 	vector_dot_product vector_magnitude vector_unitize __classisa
 	__default_station __instance __subroutine_deprecation
@@ -304,7 +316,8 @@ our %EXPORT_TAGS = (
     mainstream => [ grep { ! $deprecated_export{$_} } @all_external ],
     params => [ qw{ __classisa __instance } ],
     ref	=> [ grep { m/ [[:upper:]]+ _REF \z /smx } @all_external ],
-    time => [ qw{ time_gm time_local }, @greg_time_routines ],
+    time => [ qw{ gm_strftime local_strftime time_gm time_local },
+	@greg_time_routines ],
     vector => [ grep { m/ \A vector_ /smx } @all_external ],
 );
 
@@ -463,6 +476,10 @@ use constant JD_OF_EPOCH => date2jd (gmtime (0));
 
 =item $epoch = date2epoch ($sec, $min, $hr, $day, $mon, $yr)
 
+This subroutine is B<deprecated> as of version 0.131. It will be put
+through my usual deprecation cycle (warn on first use after six months,
+and so on) and removed.
+
 This is a convenience routine that converts the given date to seconds
 since the epoch, going through date2jd() to do so. The arguments are the
 same as those of date2jd().
@@ -480,6 +497,7 @@ Perl, L<Time::y2038|Time::y2038> C<timegm()> may do what you want.
 
 sub date2epoch {
     my @args = @_;
+    __subroutine_deprecation();
     unshift @args, 0 while @args < 6;
     my ($sec, $min, $hr, $day, $mon, $yr) = @args;
     return (date2jd ($day, $mon, $yr) - JD_OF_EPOCH) * SECSPERDAY +
@@ -615,6 +633,10 @@ sub embodies {
 
 =item ($sec, $min, $hr, $day, $mon, $yr, $wday, $yday, 0) = epoch2datetime ($epoch)
 
+This subroutine is B<deprecated> as of version 0.131. It will be put
+through my usual deprecation cycle (warn on first use after six months,
+and so on) and removed.
+
 This convenience subroutine converts the given time in seconds from the
 system epoch to the corresponding date and time. It is implemented in
 terms of jd2date (), with the year and month returned from that
@@ -645,6 +667,7 @@ page 65.
 
 sub epoch2datetime {
     my ($time) = @_;
+    __subroutine_deprecation();
     my $day = floor ($time / SECSPERDAY);
     my $sec = $time - $day * SECSPERDAY;
     ($day, my $mon, my $yr, undef, my $leap) = jd2date (
@@ -659,8 +682,11 @@ sub epoch2datetime {
 	10) / 12) + $day - 31;
     wantarray and return ($sec, $min, $hr, $day, $mon, $yr, $wday, $yd,
 	0);
-    return strftime ($DATETIMEFORMAT, $sec, $min, $hr, $day, $mon, $yr,
-	$wday, $yd, 0);
+    # FIXME this seems to be needed under Perl 5.39.8, but not under
+    # earlier Perls.
+    local $ENV{TZ} = 'UTC';
+    return POSIX::strftime( $DATETIMEFORMAT, $sec, $min, $hr, $day,
+	$mon, $yr, $wday, $yd );
 }
 
 =item $time = find_first_true ($start, $end, \&test, $limit);
@@ -755,32 +781,34 @@ with seconds expressed to the nearest microsecond.
 
 =cut
 
-{
-    # The test of this (which uses format '%F %T') failed under Windows,
-    # at least undef Strawberry, returning the empty string. Expanding
-    # %F fixed this, so I decided to expand all the 'equivalent to'
-    # format strings I could find.
-    my %equiv = (
-	'D'	=> 'm/%d/%y',
-	'F'	=> 'Y-%m-%d',
-	'r'	=> 'I:%M:%S %p',
-	'R'	=> 'H:%M',
-	'T'	=> 'H:%M:%S',
-	'V'	=> 'e-%b-%Y',
-    );
+sub __format_epoch_time_usec {
+    my ( $epoch, $date_format ) = @_;
+    return gm_strftime( $date_format, $epoch, 6 );
+}
 
-    sub __format_epoch_time_usec {
-	my ( $epoch, $date_format ) = @_;
-	my ( $microseconds, $seconds ) = modf( $epoch );
-	my @parts = gmtime $seconds;
-	my $string_us = sprintf '%.6f', $parts[0] + $microseconds;
-	$string_us =~ s/ [^.]* //smx;
-	$date_format =~ s{ ( %+ ) ( [DFrRTV] ) }
-	    { length( $1 ) % 2 ?  "$1$equiv{$2}" : "$1$2" }smxge;
-	$date_format =~ s{ ( %+ ) S }
-	    { length( $1 ) % 2 ?  "${1}S$string_us" : "$1$2" }smxge;
-	return strftime( $date_format, @parts );
-    }
+=item print gm_strftime( $format, $epoch, $places )
+
+This subroutine takes as input a strftime-compatible format and an
+epoch, and returns the GMT, formatted per the format.
+
+Optional argument C<$places> is the default number of decimal places for
+seconds. If defined, it must be either C<''> or an unsigned integer.
+
+You can also specify an optional C<'.d'> (where the 'd' is one or more
+decimal digits) before any format specification that generates seconds.
+Examples include C<'%.3S'> or C<'%.6T'>. Such a specification overrides
+the C<$places> argument, if any.
+
+=cut
+
+sub gm_strftime {
+    my ( $format, $epoch ) = _pre_strftime( @_ );
+    my @gmt = gmtime $epoch;
+    pop @gmt;
+    # FIXME this seems to be needed under Perl 5.39.8, but not under
+    # earlier Perls.
+    local $ENV{TZ} = 'UTC';
+    return POSIX::strftime( $format, @gmt );
 }
 
 =item $epoch = greg_time_gm( $sec, $min, $hr, $day, $mon, $yr );
@@ -1008,6 +1036,26 @@ to load the same module simply give the cached results.
     }
 }	# End local symbol block.
 
+=item print local_strftime( $format, $epoch, $places )
+
+This subroutine takes as input a strftime-compatible format and an
+epoch, and returns the local time, formatted per the format.
+
+Optional argument C<$places> is the default number of decimal places for
+seconds. If defined, it must be either C<''> or an unsigned integer.
+
+You can also specify an optional C<'.d'> (where the 'd' is one or more
+decimal digits) before any format specification that generates seconds.
+Examples include C<'%.3S'> or C<'%.6T'>. Such a specification overrides
+the C<$places> argument, if any.
+
+=cut
+
+sub local_strftime {
+    my ( $format, $epoch ) = _pre_strftime( @_ );
+    return POSIX::strftime( $format, localtime $epoch );
+}
+
 =item $boolean = looks_like_number ($string);
 
 This subroutine returns true if the input looks like a number. It uses
@@ -1118,7 +1166,9 @@ Edition, page 116, but his algorithm is for the position angle of the
 first body with respect to the second (i.e. the roles of the two bodies
 are reversed). The order of arguments for this subroutine is consistent
 with The IDL Astronomy User's Library at
-L<https://idlastro.gsfc.nasa.gov/>, function C<posang()>.
+L<https://github.com/wlandsman/IDLAstro>, function C<posang()>. The NASA
+page for this, L<https://asd.gsfc.nasa.gov/archive/idlastro/>, is
+obsolete and no longer updated, but also more descriptive.
 
 This is exposed because in principal you could calculate the position
 angle in any spherical coordinate system, you would just need to get the
@@ -1513,6 +1563,51 @@ sub __instance {
 
 }
 
+sub _pre_strftime {
+    my ( $format, $epoch, $places ) = @_;
+    my $seconds = POSIX::floor( $epoch );
+    my $frac = $epoch - $seconds;
+    $format =~ s( ( %+ ) ( [.] [0-9]* )? ( [DFrRSTV] ) )
+    ( _pre_strftime_mung_fmt( $1, $2, $3, $frac, $places ) )smxge;
+    return ( $format, $seconds );
+};
+
+{
+    # The test of __format_epoch_time_usec() (which uses format '%F %T')
+    # failed under Windows, at least undef Strawberry, returning the
+    # empty string. Expanding %F fixed this, so I decided to expand all
+    # the 'equivalent to' format strings I could find.
+
+    my %mung = (
+	'D'	=> 'm/%%d/%%y',
+	'F'	=> 'Y-%%m-%%d',
+	'r'	=> 'I:%%M:%%S%s %%p',
+	'R'	=> 'H:%%M',
+	'S'	=> 'S%s',
+	'T'	=> 'H:%%M:%%S%s',
+	'V'	=> 'e-%%b-%%Y',
+    );
+
+    sub _pre_strftime_mung_fmt {
+	my ( $percent, $places, $fmt, $frac, $dflt_places ) = @_;
+	length( $percent ) % 2
+	    and $mung{$fmt}
+	    or return "$percent$places$fmt";
+	my $f = '';
+	defined $places
+	    or $places = $dflt_places;
+	if ( defined $places ) {
+	    index( $places, '.' ) == 0
+		or substr $places, 0, 0, '.';
+	    $places eq '.'
+		and $places = '';
+	    $f = sprintf "%${places}f", $frac;
+	    $f =~ s/ \A 0+ //smx;
+	}
+	return $percent . __sprintf( $mung{$fmt}, $f );
+    }
+}
+
 sub __sprintf {
     my ( $tplt, @args ) = @_;
     defined $tplt
@@ -1523,6 +1618,14 @@ sub __sprintf {
 
 {
     my %deprecate = (
+	epoch2datetime	=> {
+	    level	=> 0,
+	    method	=> 'core subroutine gmtime',
+	},
+	date2epoch	=> {
+	    level	=> 0,
+	    method	=> 'subroutine Time::Local::timegm_posix',
+	},
     );
 
     sub __subroutine_deprecation {
@@ -1531,7 +1634,7 @@ sub __sprintf {
 	$info->{level}
 	    or return;
 	my $msg = "Subroutine $sub() deprecated in favor of @{[
-	    $info->{method} || $sub ]}() method";
+	    $info->{method} || $sub ]}()";
 	$info->{level} >= 3
 	    and croak $msg;
 	carp $msg;
@@ -1589,7 +1692,7 @@ Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2023 by Thomas R. Wyant, III
+Copyright (C) 2005-2024 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

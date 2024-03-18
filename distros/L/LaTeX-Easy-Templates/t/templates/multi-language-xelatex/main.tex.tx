@@ -1,0 +1,111 @@
+: ######################################################
+: # we are receiving 2 hashes: 'data' and 'private'
+: # data will contain authors etc.
+: # private will contain filepath of template file etc.
+: ######################################################
+\documentclass[letterpaper,twoside,12pt]{article}
+\usepackage[greek]{babel}
+\usepackage[Greek,Latin]{ucharclasses}
+%\usepackage[export]{adjustbox}
+\usepackage{wrapfig}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{anysize}
+\usepackage{fontspec}
+\usepackage{lineno}
+
+%\usepackage{etoolbox}
+%\makeatletter
+%\patchcmd{\Ginclude@eps}{"#1"}{#1}{}{}
+%\makeatother
+
+\usepackage{polyglossia}
+\setdefaultlanguage{greek}
+\setotherlanguages{english}
+% this kills the stack why?
+%\setTransitionsForGreek{\selectlanguage{greek}}{\selectlanguage{english}}
+
+\setlength\columnsep{30pt} %space between columns
+\renewcommand{\familydefault}{\sfdefault}
+
+% MARGINS
+\marginsize{30pt}{30pt}{10pt}{20pt}
+
+% FONTS
+\usepackage{fontspec}
+\setmainfont[Kerning=On,Mapping=tex-text]{GFS Artemisia} 
+%\setmainfont{GFS Philostratos}
+%\setsansfont{GFS Didot}
+\setsansfont{GFS Bodoni}
+\newfontfamily\greekfont[Script=Greek]{GFS Neohellenic}
+\newfontfamily\greekfontsf[Script=Greek]{GFS Bodoni}
+
+%\newfontface\mytitle{GFS Artemisia}[Contextuals={WordInitial,WordFinal}]
+\newfontface\mytitle{GFS Artemisia} 
+%
+
+% our own macros
+
+\newcommand{\mycaption}[1]{%
+	\usefont{T1}{augie}{m}{n} 	
+	\small #1 \vspace{4pt}
+	\par \normalsize \normalfont
+}
+		
+% insert a figure(1:filename, 2:width (0-1 percent of textwidth),
+% 3:angle-rotate (0 is no rotate), 4:caption
+\newcommand{\insfig}[4]{%
+	\begin{center}
+	\begin{minipage}[h]{1.0\linewidth}
+%		\begin{wrapfigure}{l}{1.0\linewidth}
+			\includegraphics[width=#2\linewidth,angle=#3]{#1}
+%			\\
+			\mycaption{#4}
+%		\end{wrapfigure}
+	\end{minipage}
+	\end{center}
+}
+
+% let's go (love you LaTeXXXX)
+
+: # WARNING WARNING WARNING use mark_raw as this idiot escapes everything (why?)
+
+\begin{document}
+
+\tableofcontents
+
+\newpage
+
+my title is \textbf{ <: $data.title :> }
+
+: for $data.sections -> $section {
+\section{<: $section.title :>}
+:   if( defined($section.label) ){
+\label{<: $section.label :>}
+:   }
+:   for $section.paragraphs -> $paragraph {
+
+\par
+<: $paragraph :>
+
+:  }
+
+:   for $section.subsections -> $subsection {
+\subsection{<: $subsection.title :>}
+:     if( defined($subsection.label) ){
+\label{<: $subsection.label :>}
+:     }
+
+:     for $subsection.paragraphs -> $paragraph {
+
+\par
+<: $paragraph :>
+
+:    }
+
+:  }
+
+\newpage % after each section
+: }
+
+\end{document}

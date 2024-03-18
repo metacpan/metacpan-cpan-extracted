@@ -10,9 +10,7 @@ use warnings;
 use Astro::Coord::ECI;
 use Astro::Coord::ECI::TLE;
 use Astro::Coord::ECI::TLE::Set;
-use Astro::Coord::ECI::Utils qw{ deg2rad rad2deg :greg_time };
-
-use POSIX qw{strftime};
+use Astro::Coord::ECI::Utils qw{ deg2rad gm_strftime rad2deg :greg_time };
 
 my $station = Astro::Coord::ECI->new(
     name => 'Parliament House, Canberra ACT, Australia',
@@ -45,7 +43,7 @@ foreach my $body (@tle) {
 	};
 	my ($azim, $elev, $range) = $body->azel();
 	$elev >= 0 or next;
-	printf $dtafmt, strftime($timfmt, gmtime $time), rad2deg($azim),
+	printf $dtafmt, gm_strftime($timfmt, $time), rad2deg($azim),
 	    rad2deg($elev), $range;
     }
 }

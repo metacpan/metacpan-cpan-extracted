@@ -2,6 +2,12 @@ Revision history for Pod-AsciiDoctor
 
 NOT USED - Please use github http://github.com/benignbala/pod-asciidoctor
 
+0.102002    2024-03-15
+
+    - Fix italic markup:
+        - https://github.com/shlomif/Pod-AsciiDoctor/pull/3
+        - Thanks to @perlpunk
+
 0.102001    2023-12-06
 
     - bin/pod2asciidoctor : fix "-o -"

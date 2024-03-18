@@ -1,0 +1,151 @@
+NAME
+    Data::Dump::HTML::PopUp - Dump Perl data structures as HTML document
+    with nested pop ups
+
+VERSION
+    This document describes version 0.001 of Data::Dump::HTML::PopUp (from
+    Perl distribution Data-Dump-HTML-PopUp), released on 2024-03-17.
+
+SYNOPSIS
+     use Data::Dump::HTML::PopUp; # exports dd(), can export dump()
+     dd [1, 2, 3];
+
+DESCRIPTION
+    This module is a Data::Dump variant that dumps Perl data structure to
+    HTML document where you can expand and collapse nodes to drill down and
+    roll up your data. The nodes will expand in (nested) pop up modal
+    dialogs. It currently uses jQuery [1] and Modally [2] JavaScript
+    libraries.
+
+    There are other collapsible HTML dumper modules on CPAN (see "SEE
+    ALSO").
+
+VARIABLES
+  $Data::Dump::HTML::PopUp::OPT_PERL_VERSION
+    String, default: 5.010.
+
+    Set target Perl version. If you set this to, say 5.010, then the dumped
+    code will keep compatibility with Perl 5.10.0. This is used in the
+    following ways:
+
+    *   passed to Regexp::Stringify
+
+    *   when dumping code references
+
+        For example, in perls earlier than 5.016, feature.pm does not
+        understand:
+
+         no feature ':all';
+
+        so we replace it with:
+
+         no feature;
+
+  $Data::Dump::HTML::PopUp::OPT_REMOVE_PRAGMAS
+    Bool, default: 0.
+
+    If set to 1, then pragmas at the start of coderef dump will be removed.
+    Coderef dump is produced by B::Deparse and is of the form like:
+
+     sub { use feature 'current_sub', 'evalbytes', 'fc', 'say', 'state', 'switch', 'unicode_strings', 'unicode_eval'; $a <=> $b }
+
+    If you want to dump short coderefs, the pragmas might be distracting.
+    You can turn turn on this option which will make the above dump become:
+
+     sub { $a <=> $b }
+
+    Note that without the pragmas, the dump might be incorrect.
+
+  $Data::Dump::HTML::PopUp::::OPT_DEPARSE
+    Bool, default: 1.
+
+    Can be set to 0 to skip deparsing code. Coderefs will be dumped as
+    "sub{"DUMMY"}" instead, like in Data::Dump.
+
+  $Data::Dump::HTML::PopUp::::OPT_STRINGIFY_NUMBERS
+    Bool, default: 0.
+
+    If set to true, will dump numbers as quoted string, e.g. 123 as "123"
+    instead of 123. This might be helpful if you want to compute the hash of
+    or get a canonical representation of data structure.
+
+  $Data::Dump::HTML::PopUp::::OPT_LIBRARY_LINK_MODE
+    Str, default: "local". Valid values: "none", "embed", "local", "cdn".
+
+    Specify how the JavaScript libraries should be linked in the generated
+    HTML page. The JavaScript libraries are linked at the preamble which is
+    generated before the actual dump:
+
+     <link rel="stylesheet" href="jquery.modally.css">
+     <script src="jquery.min.js"></script>
+     <script src="jquery.modally.js"></script>
+
+    If the setting is set to "none", then no preamble will be produced at
+    all. If the setting is set to "embed", then instead of being linked, the
+    source code of the JavaScript libraries will be directly embedded. If
+    the setting is set to "local", then the links will be to the local
+    filesystem to the library files included in the distribution's shared
+    directory. If the setting is set to "cdn", then the links will be to the
+    CDN URLs.
+
+FUNCTIONS
+  dd
+  dump
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Data-Dump-HTML-PopUp>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Data-Dump-HTML-PopUp>.
+
+SEE ALSO
+    [1] jQuery JavaScript library, <http://www.jquery.com>
+
+    [2] Modally plugin for jQuery,
+    <https://www.jqueryscript.net/lightbox/nested-modal-modally.html>
+
+    Other data structure dumpers to (collapsible) tree:
+    Data::Dump::HTML::Collapsible, Data::HTML::TreeDumper (also uses
+    "<details>" and "<summary>" HTML elements, doesn't handle recursion),
+    Data::TreeDumper (Data::TreeDumper::Renderer::DHTML,
+    Data::TreeDumper::Renderer::GTK), Data::Dumper::GUI.
+
+    Other data structure dumpers that outputs to HTML: Data::HTMLDumper,
+    Data::Dumper::HTML, Data::Format::Pretty::HTML.
+
+    Other data structure dumpers, among others: Data::Dumper, Data::Dump,
+    Data::Dump::Color, Data::Dmp, Data::Printer.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Dump-HTML-PopUp>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

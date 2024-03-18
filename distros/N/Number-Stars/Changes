@@ -1,2 +1,8 @@
+0.02 2024-03-16T00:58:37+01:00
+ - Rename example file names to better names.
+ - Rewrite second example in doc to better version.
+ - Update Module::Install to 1.21 version.
+ - Update copyright years.
+
 0.01 2020-08-04T14:28:28+02:00
  - First version.

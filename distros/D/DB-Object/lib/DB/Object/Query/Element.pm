@@ -61,7 +61,7 @@ sub fo
     {
         $fo = $f;
     }
-    else
+    elsif( defined( $f ) && CORE::length( $f // '' ) )
     {
         $fo = $self->query_object->table_object->fields( $f );
     }

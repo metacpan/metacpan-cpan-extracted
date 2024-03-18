@@ -1727,6 +1727,46 @@ rr_rdf(obj,n)
     OUTPUT:
         RETVAL
 
+bool
+rr_check_rd_count(obj)
+    Zonemaster::LDNS::RR obj;
+    CODE:
+        ldns_rr_type rr_type = ldns_rr_get_type(obj);
+        ldns_rr_descriptor *desc = ldns_rr_descript(rr_type);
+        size_t rd_min = ldns_rr_descriptor_minimum(desc);
+        size_t rd_max = ldns_rr_descriptor_maximum(desc);
+        size_t rd_count = ldns_rr_rd_count(obj);
+
+        // Workaround for when the last field is variable length with length
+        // zero, and ldns represents this by omitting the last field from
+        // the field list.
+        if (rd_min > 0 && rd_min == rd_max)
+        {
+            switch (ldns_rr_descriptor_field_type(desc,rd_min-1))
+            {
+            // This list is taken from ldns_wire2rdf()
+            case LDNS_RDF_TYPE_APL:
+            case LDNS_RDF_TYPE_B64:
+            case LDNS_RDF_TYPE_HEX:
+            case LDNS_RDF_TYPE_NSEC:
+            case LDNS_RDF_TYPE_UNKNOWN:
+            case LDNS_RDF_TYPE_SERVICE:
+            case LDNS_RDF_TYPE_LOC:
+            case LDNS_RDF_TYPE_WKS:
+            case LDNS_RDF_TYPE_NSAP:
+            case LDNS_RDF_TYPE_ATMA:
+            case LDNS_RDF_TYPE_IPSECKEY:
+            case LDNS_RDF_TYPE_LONG_STR:
+            case LDNS_RDF_TYPE_AMTRELAY:
+            case LDNS_RDF_TYPE_NONE:
+                rd_min -= 1;
+            }
+        }
+
+        RETVAL = rd_min <= rd_count && rd_count <= rd_max;
+    OUTPUT:
+        RETVAL
+
 void
 rr_DESTROY(obj)
     Zonemaster::LDNS::RR obj;
@@ -2275,20 +2315,36 @@ rr_nsec3_iterations(obj)
 SV *
 rr_nsec3_salt(obj)
     Zonemaster::LDNS::RR::NSEC3 obj;
-    PPCODE:
-        if(ldns_nsec3_salt_length(obj) > 0)
-        {
-            ldns_rdf *buf = ldns_nsec3_salt(obj);
-            ST(0) = sv_2mortal(newSVpvn((char *)ldns_rdf_data(buf), ldns_rdf_size(buf)));
-            ldns_rdf_deep_free(buf);
+    CODE:
+    {
+        uint8_t *salt = ldns_nsec3_salt_data(obj);
+        if (salt) {
+            RETVAL = newSVpvn((char *)salt, ldns_nsec3_salt_length(obj));
+            LDNS_FREE(salt);
         }
+    }
+    OUTPUT:
+        RETVAL
 
 SV *
 rr_nsec3_next_owner(obj)
     Zonemaster::LDNS::RR::NSEC3 obj;
+    INIT:
+        ldns_rdf *buf = NULL;
+        size_t size;
     CODE:
-        ldns_rdf *buf = ldns_nsec3_next_owner(obj);
-        RETVAL = newSVpvn((char *)ldns_rdf_data(buf), ldns_rdf_size(buf));
+        buf = ldns_nsec3_next_owner(obj);
+        if (!buf) {
+            XSRETURN_UNDEF;
+        }
+        size = ldns_rdf_size(buf);
+        if (size < 1) {
+            XSRETURN_UNDEF;
+        }
+
+        /* ldns_rdf_data(buf) points to the hashed next owner name preceded by a
+         * length byte, which we don't want. */
+        RETVAL = newSVpvn((char *)(ldns_rdf_data(buf) + 1), size - 1);
     OUTPUT:
         RETVAL
 
@@ -2337,6 +2393,16 @@ bool
 rr_nsec3_covers(obj,name)
     Zonemaster::LDNS::RR::NSEC3 obj;
     const char *name;
+    INIT:
+        /* Sanity test on owner name */
+        if (ldns_dname_label_count(ldns_rr_owner(obj)) == 0)
+            XSRETURN_UNDEF;
+
+        /* Sanity test on hashed next owner field */
+        ldns_rdf *next_owner = ldns_nsec3_next_owner(obj);
+        if (!next_owner || ldns_rdf_size(next_owner) <= 1)
+            XSRETURN_UNDEF;
+
     CODE:
     {
         ldns_rr *clone;
@@ -2344,15 +2410,28 @@ rr_nsec3_covers(obj,name)
         ldns_rdf *hashed;
         ldns_rdf *chopped;
 
-        clone = ldns_rr_clone(obj);
         dname = ldns_rdf_new_frm_str(LDNS_RDF_TYPE_DNAME, name);
+        if (!dname)
+            XSRETURN_UNDEF;
+
         ldns_dname2canonical(dname);
+
+        chopped = ldns_dname_left_chop(dname);
+        if (!chopped) {
+            ldns_rdf_deep_free(dname);
+            XSRETURN_UNDEF;
+        }
+
+        clone = ldns_rr_clone(obj);
         ldns_rr2canonical(clone);
         hashed = ldns_nsec3_hash_name_frm_nsec3(clone, dname);
-        chopped = ldns_dname_left_chop(dname);
+
         ldns_rdf_deep_free(dname);
+
         ldns_dname_cat(hashed,chopped);
+
         RETVAL = ldns_nsec_covers_name(clone,hashed);
+
         ldns_rdf_deep_free(hashed);
         ldns_rdf_deep_free(chopped);
         ldns_rr_free(clone);
@@ -2390,12 +2469,17 @@ rr_nsec3param_iterations(obj)
 SV *
 rr_nsec3param_salt(obj)
     Zonemaster::LDNS::RR::NSEC3PARAM obj;
-    PPCODE:
-        ldns_rdf *rdf = ldns_rr_rdf(obj,3);
-        if(ldns_rdf_size(rdf) > 0)
+    CODE:
+    {
+        ldns_rdf *rdf = ldns_rr_rdf(obj, 3);
+        size_t size = ldns_rdf_size(rdf);
+        if (size > 0)
         {
-            mPUSHs(newSVpvn((char *)ldns_rdf_data(rdf), ldns_rdf_size(rdf)));
+            RETVAL = newSVpvn((char *)(ldns_rdf_data(rdf) + 1), size - 1);
         }
+    }
+    OUTPUT:
+        RETVAL
 
 MODULE = Zonemaster::LDNS        PACKAGE = Zonemaster::LDNS::RR::PTR              PREFIX=rr_ptr_
 

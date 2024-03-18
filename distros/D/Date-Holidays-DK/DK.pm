@@ -4,26 +4,40 @@ use base qw(Exporter);
 
 use Date::Simple;
 use Date::Easter;
+use utf8;
 
 use vars qw($VERSION @EXPORT);
-$VERSION = '0.03';
+$VERSION = '0.04';
 @EXPORT = qw(is_dk_holiday dk_holidays);
 
 # Fixed-date holidays
-my $FIX = {'0101' => "Nyt�rsdag",
+my $FIX = {'0101' => "Nytårsdag",
 	   '0605' => "Grundlovsdag",
 	   '1224' => "Juleaftensdag",
 	   '1225' => "Juledag",
 	   '1226' => "2. Juledag",
 	  };
 
+my $VAR;
+
 # Holidays relative to Easter
-my $VAR = {-7 => "Palmes�ndag",
-	   -3 => "Sk�rtorsdag",
+my $VAR_PRE2024 = {-7 => "Palmesøndag",
+	   -3 => "Skærtorsdag",
 	   -2 => "Langfredag",
-	    0 => "P�skedag",
-	    1 => "2. P�skedag",
+	    0 => "Påskedag",
+	    1 => "2. Påskedag",
 	   26 => "Store Bededag",
+	   39 => "Kristi Himmelfartsdag",
+	   49 => "Pinsedag",
+	   50 => "2. Pinsedag",
+	  };
+
+# "Store Bededag" no longer a holiday after 2023
+my $VAR_POST2023 = {-7 => "Palmesøndag",
+	   -3 => "Skærtorsdag",
+	   -2 => "Langfredag",
+	    0 => "Påskedag",
+	    1 => "2. Påskedag",
 	   39 => "Kristi Himmelfartsdag",
 	   49 => "Pinsedag",
 	   50 => "2. Pinsedag",
@@ -32,10 +46,18 @@ my $VAR = {-7 => "Palmes�ndag",
 sub is_dk_holiday {
   my ($year, $month, $day) = @_;
 
-  $FIX->{sprintf "%02d%02d", $month, $day} ||
+  if ($year >= 2024) {
+    $VAR = $VAR_POST2023;
+  } else {
+    $VAR = $VAR_PRE2024;
+  }
+
+  my $holiday = $FIX->{sprintf "%02d%02d", $month, $day} ||
   $VAR->{Date::Simple->new($year, $month, $day) -
 	 Date::Simple->new($year, easter($year))} ||
   undef;
+
+  return $holiday;
 }
 
 sub dk_holidays {

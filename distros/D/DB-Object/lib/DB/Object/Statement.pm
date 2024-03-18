@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Statement.pm
-## Version v0.5.0
+## Version v0.6.0
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2023/11/22
+## Modified 2024/03/16
 ## All rights reserved
 ## 
 ## 
@@ -26,7 +26,7 @@ BEGIN
     use Class::Struct qw( struct );
     use Want;
     our $DEBUG = 0;
-    our $VERSION = 'v0.5.0';
+    our $VERSION = 'v0.6.0';
     use Devel::Confess;
 };
 
@@ -399,6 +399,20 @@ sub execute
             {
                 $binded[$i] = $json;
             }
+        }
+        # If the value provided is a DateTime object without a formatter, we transform the given value into a ISO8601 datetime string
+        elsif( defined( $el ) &&
+            !$bind_mismatch &&
+            ( $elem = $el->elements->[$i] ) &&
+            defined( $elem ) &&
+            $self->_is_a( $elem->fo => 'DB::Object::Fields::Field' ) &&
+            ( $elem->fo->type =~ /^(date|timestamp)/i || $elem->fo->datatype->alias->grep( qr/^(date|timestamp)/i )->length ) &&
+            defined( $binded[$i] ) &&
+            $self->_is_a( $binded[$i] => 'DateTime' ) &&
+            # There is no formatter
+            !$binded[$i]->formatter )
+        {
+            $binded[$i] = $binded[$i]->iso8601;
         }
         
         # The value is an array object, but not a simple array, so we need to convert it
@@ -1221,7 +1235,7 @@ DB::Object::Statement - Statement Object
 
 =head1 VERSION
 
-v0.5.0
+v0.6.0
 
 =head1 DESCRIPTION
 

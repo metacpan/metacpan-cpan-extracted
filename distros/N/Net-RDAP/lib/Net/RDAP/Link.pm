@@ -143,7 +143,7 @@ sub type { $_[0]->{'type'} ? MIME::Type->new('type' => $_[0]->{'type'}) : undef 
 
 =head1 COPYRIGHT
 
-Copyright CentralNic Ltd. All rights reserved.
+Copyright 2018-2023 CentralNic Ltd, 2024 Gavin Brown. All rights reserved.
 
 =head1 LICENSE
 

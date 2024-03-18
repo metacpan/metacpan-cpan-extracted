@@ -20,7 +20,7 @@ use File::Basename;
 use FileHandle;
 use Getopt::Long;
 use Pod::Usage;
-use POSIX qw{floor strftime};
+use POSIX qw{ floor };
 use Text::Abbrev;
 use Text::ParseWords;
 
@@ -43,7 +43,7 @@ $clipboard_unavailable = $IO::Clipboard::clipboard_unavailable;
 #	Initialization
 #
 
-our $VERSION = '0.130';
+our $VERSION = '0.131';
 
 use constant LINFMT => <<eod;
 %s %s %8.4f %9.4f %7.1f %-4s %s
@@ -308,7 +308,7 @@ satpass $VERSION - Satellite pass predictor
 based on Astro::Coord::ECI @{[Astro::Coord::ECI->VERSION]}
 Perl $Config{version} on $Config{osname}
 
-Copyright 2005-2023 by Thomas R. Wyant, III.
+Copyright 2005-2024 by Thomas R. Wyant, III.
 
 Enter 'help' for help. See the help for terms of use.
 
@@ -652,10 +652,10 @@ foreach (sort {$a->[0] <=> $b->[0]} @almanac) {
 	}
     } else {
 	$descr = ('End ', 'Begin ')[$detail] . $id if $event eq 'twilight';
-	my $day = strftime $parm{date_format}, _mytime($time);
+	my $day = _my_strftime( $parm{date_format}, $time );
 	print "$day\n" if $day ne $last;
 	$last = $day;
-	print strftime ($parm{time_format}, _mytime($time)), ' ',
+	print _my_strftime( $parm{time_format}, $time ), ' ',
 	    ucfirst $descr, "\n";
 	}
     }
@@ -889,10 +889,7 @@ foreach my $tle (_select_observing_list ($pass_start)) {
 Error - Can not calculate satellite flares without loading at least one
         flaring body.
 eod
-my $timlen = max (
-    length (strftime ($parm{time_format}, 59, 59, 23, 31, 11, 2000)),
-    length (strftime ($parm{time_format}, 59, 59, 11, 31, 11, 2000)),
-    );
+my $timlen = _time_len();
 
 if ($cmdopt{debug}) {
     foreach my $tle (@active) {
@@ -939,10 +936,10 @@ foreach my $fd (sort {$a->{time} <=> $b->{time}} @flares) {
     my $tle = $fd->{body}->universal ($time);
 
     my $displaytime = floor($time + .5);
-    my $day = strftime ($parm{date_format}, _mytime($displaytime));
+    my $day = _my_strftime( $parm{date_format}, $displaytime );
     print "$day\n" if $day ne $last_day && !$cmdopt{dump};
     $last_day = $day;
-    $time = strftime ($parm{time_format}, _mytime($displaytime));
+    $time = _my_strftime( $parm{time_format}, $displaytime );
     my $name = ucfirst lc ($tle->get ('name') || $tle->get ('id'));
     if ($cmdopt{dump}) {
 	if ($cmdopt{flatten}) {
@@ -1369,7 +1366,7 @@ if (@bodies) {
     foreach my $tle (_select_observing_list ()) {
 	my $id = $tle->get ('id');
 	my $name = $tle->get ('name');
-	my $epoch = strftime $dtfmt, _mytime($tle->get ('epoch'));
+	my $epoch = _my_strftime( $dtfmt, $tle->get ('epoch') );
 	$name = $name ? " - $name" : '';
 	my $secs = floor ($tle->period + .5);
 	my $mins = floor ($secs / 60);
@@ -1533,22 +1530,19 @@ sub magnitude_table {
 Error - End time must be after start time.
 eod
     my $sta = _get_station ();
-    @bodies or die <<eod;
+    @bodies or die <<'EOD';
 Error - Can not calculate satellite pass without loading at least one
         body.
-eod
+EOD
     my $pass_step = shift || 60;
-    my $timlen = max (
-	length (strftime ($parm{time_format}, 59, 59, 23, 31, 11, 2000)),
-	length (strftime ($parm{time_format}, 59, 59, 11, 31, 11, 2000)),
-	);
-    my $header = <<eod;
+    my $timlen = _time_len();
+    my $header = <<"EOD";
 
 %s%s
 
 time@{[' ' x ($timlen - 4)]} @{[$lcfmt->()]} latitude longitude altitude
 
-eod
+EOD
 
 #	Decide which model to use.
 
@@ -1633,8 +1627,7 @@ eod
 	    foreach my $event (@{$pass->{events}}) {
 		my $time = $event->{time};
 		my $displaytime = floor($time + .5);
-		my $date = strftime ($parm{date_format},
-		    _mytime($displaytime));
+		my $date = _my_strftime( $parm{date_format}, $displaytime );
 		if ($date ne $last_date) {
 		    print "$date\n" unless $cmdopt{dump};
 		    $last_date = $date;
@@ -1652,8 +1645,7 @@ eod
 		    }
 		} else {
 		    my @data = (
-			strftime( $parm{time_format}, _mytime(
-				$displaytime ) ),
+			_my_strftime( $parm{time_format}, $displaytime ),
 			$lcfmt->( $tle ),
 			rad2deg ($lat), rad2deg ($long), $alt,
 			$event_name[$event->{illumination}]->($event),
@@ -1672,9 +1664,8 @@ eod
 			my $body = $event->{appulse}{body}
 			    ->universal ($time);
 			my ($lat, $long) = $body->geodetic;
-			printf BGFMT, strftime (
-				$parm{time_format}, _mytime (
-				    $displaytime)),
+			printf BGFMT, _my_strftime(
+			    $parm{time_format}, $displaytime ),
 			    $lcfmt->( $body ),
 			    rad2deg ($lat), rad2deg ($long),
 			    $body->get ('name') || $body->get ('id') || '';
@@ -1711,8 +1702,9 @@ foreach my $body (@sky) {
     $phase = rad2deg ($phase);
     my $name;
     foreach (@table) {$_->[0] > $phase or next; $name = $_->[1]; last}
-    printf "%s @{[$body->get ('name')]} phase %.0f deg, %s, %.0f%% illum.\n",
-	strftime ($dtfmt, _mytime($time)), $phase, $name, $illum * 100;
+    printf "%s %s phase %.0f deg, %s, %.0f%% illum.\n",
+	_my_strftime( $dtfmt, $time ), $body->get( 'name' ),
+	$phase, $name, $illum * 100;
     }
 }
 }	# end of BEGIN block
@@ -1749,12 +1741,12 @@ if ( $cmdopt{magnitude} ) {
     printf <<"EOD", _format_location (),
 %s            name @{[$lcfmt->()]} %-*s illum mag
 EOD
-	length (strftime $dtfmt, _mytime(time)), 'epoch of data';
+	length( _my_strftime( $dtfmt, time ) ), 'epoch of data';
 } else {
     printf <<"EOD", _format_location (),
 %s            name @{[$lcfmt->()]} %-*s illum
 EOD
-	length (strftime $dtfmt, _mytime(time)), 'epoch of data';
+	length( _my_strftime( $dtfmt, time ) ), 'epoch of data';
 }
 
 #	Tell aggregate() how to work.
@@ -1764,7 +1756,7 @@ local $Astro::Coord::ECI::TLE::Set::Singleton = $parm{singleton};
 my $when = time ();
 my $indent;
 while ($time <= $endtm) {
-    print strftime ($dtfmt, _mytime($time)), "\n";
+    print _my_strftime( $dtfmt, $time ), "\n";
     foreach my $body (_select_observing_list ($time), @sky) {
 	$body->set(
 	    debug	=> $cmdopt{debug},
@@ -1789,11 +1781,11 @@ while ($time <= $endtm) {
 		my $mag = $body->magnitude( $sta );
 		$mag = defined $mag ? sprintf( '%4.1f', $mag ) : '';
 		$line = sprintf '%16s %s %s %5s %4s', $name, $lcfmt->( $body ),
-		    strftime ($dtfmt, _mytime($body->get ('epoch'))),
+		    _my_strftime( $dtfmt, $body->get( 'epoch' ) ),
 		    $lighting[$illum] || '', $mag;
 	    } else {
 		$line = sprintf '%16s %s %s %5s', $name, $lcfmt->( $body ),
-		    strftime ($dtfmt, _mytime($body->get ('epoch'))),
+		    _my_strftime( $dtfmt, $body->get( 'epoch' ) ),
 		    $lighting[$illum] || '';
 	    }
 	    $line =~ s/ \s+ \z //smx;
@@ -1881,7 +1873,7 @@ sub quarters {
 	    }
 	} else {
 	    my ($time, $quarter) = @$_;
-	    print strftime ($dtfmt, _mytime($time)), " $quarter\n";
+	    print _my_strftime( $dtfmt, $time ), " $quarter\n";
 	}
     }
 
@@ -2433,16 +2425,14 @@ sub times {
     my $time = _parse_time (shift || '+0');
     my $dtfmt = "$parm{date_format} $parm{time_format}";
     my $sta = _get_station ()->universal ($time);
-    print strftime ($dtfmt, gmtime ($time)), " universal =\n";
-    print '    ', strftime ($dtfmt, gmtime ($sta->dynamical ())),
+    print gm_strftime( $dtfmt, $time ), " universal =\n";
+    print '    ', gm_strftime( $dtfmt, $sta->dynamical() ),
 	" dynamical\n";
-    print '    ', strftime ($dtfmt, localtime ($time)),
+    print '    ', local_strftime( $dtfmt, $time ),
 	" local standard time\n";
-    print '    ', strftime ($dtfmt, gmtime (
-	    floor ($sta->local_mean_time () + .5))),
+    print '    ', gm_strftime( $dtfmt, floor( $sta->local_mean_time() + .5 ) ),
 	" local mean time\n";
-    print '    ', strftime ($dtfmt, gmtime (
-	    floor ($sta->local_time () + .5))),
+    print '    ', gm_strftime( $dtfmt, floor( $sta->local_time() + .5 ) ),
 	" local time\n";
 }
 
@@ -2473,7 +2463,7 @@ BEGIN {
 
 # Keplerian elements for $name
 # Generated by satpass $VERSION
-# Epoch: @{[strftime $dtfmt, gmtime $tle->get('epoch')]} UT
+# Epoch: @{[ gm_strftime( $dtfmt, $tle->get( 'epoch' ) ) ]} UT
 
 Modify "$name" "Sol/Earth" {
     EllipticalOrbit {
@@ -2942,7 +2932,7 @@ sub _get_suffix {
 sub _get_time {
     my ($name) = @_;
     if ($parm{$name}) {
-	return strftime '%d-%b-%Y %H:%M:%S UT', gmtime $parm{$name};
+	return gm_strftime '%d-%b-%Y %H:%M:%S UT', $parm{$name};
     } else {
 	return 0;
     }
@@ -3042,13 +3032,16 @@ BEGIN {	# Begin local symbol block
 
 }	# end local symbol block.
 
-#	@times = _mytime($time);
-
-#	Returns seconds, minutes, hours, and so on. It is localtime if
-#	the gmt parameter is false, or GMT if it is true.
-
-sub _mytime {
-    return $parm{gmt} ? gmtime($_[0]) : localtime($_[0]);
+#	print _my_strftime( $format, $epoch )
+#
+#	Returns a string representing the $epoch formatted with the
+#	given strftime() format. The string is GMT if the gmt parameter
+#	is true, or local time if it is false.
+sub _my_strftime {
+    my ( $format, $epoch ) = @_;
+    return $parm{gmt} ?
+	gm_strftime( $format, $epoch ) :
+	local_strftime( $format, $epoch );
 }
 
 #	$angle = _parse_angle ($string)
@@ -3629,6 +3622,22 @@ sub _time () {
 	*_time_trim = sub {$_[0]};
     }
     goto &_time;
+}
+
+{
+    my @times;
+
+    BEGIN {
+	@times = map { greg_time_gm( @{ $_ } ) }
+	[ 59, 59, 23, 31, 11, 2000 ],
+	[ 59, 59, 11, 31, 11, 2000 ],
+	;
+    }
+
+    sub _time_len {
+	return max( map { length( gm_strftime( $parm{time_format}, $_ )
+		) } @times );
+    }
 }
 
 ########################################################################
@@ -5937,7 +5946,7 @@ Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2023 by Thomas R. Wyant, III
+Copyright (C) 2005-2024 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

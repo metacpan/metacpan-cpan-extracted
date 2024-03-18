@@ -1,5 +1,5 @@
 package Pod::AsciiDoctor;
-$Pod::AsciiDoctor::VERSION = '0.102001';
+$Pod::AsciiDoctor::VERSION = '0.102002';
 use 5.014;
 use strict;
 use warnings FATAL => 'all';
@@ -119,7 +119,7 @@ sub interior_sequence
     ## Expand an interior sequence; sample actions might be:
     return "*$seq_argument*" if ( $seq_command eq 'B' );
     return "`$seq_argument`" if ( $seq_command eq 'C' );
-    return "_${seq_argument}_'"
+    return "_${seq_argument}_"
         if ( $seq_command eq 'I' || $seq_command eq 'F' );
     if ( $seq_command eq 'L' )
     {
@@ -223,7 +223,7 @@ Pod::AsciiDoctor - Convert from POD to AsciiDoc
 
 =head1 VERSION
 
-version 0.102001
+version 0.102002
 
 =head1 SYNOPSIS
 

@@ -2,30 +2,41 @@ NAME
     UUID - Universally Unique Identifier library for Perl
 
 SYNOPSIS
-        use UUID 'uuid';
+        use UUID qw(uuid);    # see EXPORTS
 
-        $string = uuid();   # generate stringified UUID
+        my $str = uuid();     # generate version 4 UUID string
 
-        UUID::generate($uuid);               # new binary UUID; prefer random
-        UUID::generate_random($uuid);        # new binary UUID; use random
-        UUID::generate_time($uuid);          # new binary UUID; use time
+        $str = uuid();                    # new stringified UUID; prefer v4
+        $str = uuid1();                   # new stringified UUID; always v1
+        $str = uuid4();                   # new stringified UUID; always v4
+        $str = uuid6();                   # new stringified UUID; always v6
+        $str = uuid7();                   # new stringified UUID; always v7
 
-        UUID::unparse($uuid, $string);       # stringify $uuid; system casing
-        UUID::unparse_lower($uuid, $string); # force lowercase stringify
-        UUID::unparse_upper($uuid, $string); # force uppercase stringify
+        UUID::generate($bin);             # new binary UUID; prefer v4
+        UUID::generate_v1($bin);          # new binary UUID; always v1
+        UUID::generate_v4($bin);          # new binary UUID; always v4
+        UUID::generate_v6($bin);          # new binary UUID; always v6
+        UUID::generate_v7($bin);          # new binary UUID; always v7
 
-        $rc = UUID::parse($string, $uuid);   # map string to UUID; -1 on error
+        UUID::generate_time($bin);        # alias for generate_v1()
+        UUID::generate_random($bin);      # alias for generate_v4()
 
-        UUID::copy($dst, $src);              # copy binary UUID from $src to $dst
-        UUID::compare($uuid1, $uuid2);       # compare binary UUIDs
+        UUID::unparse($bin, $str);        # stringify $bin; prefer lowercase
+        UUID::unparse_lower($bin, $str);  # force lowercase stringify
+        UUID::unparse_upper($bin, $str);  # force uppercase stringify
 
-        UUID::clear( $uuid );                # set binary UUID to NULL
-        UUID::is_null( $uuid );              # compare binary UUID to NULL
+        UUID::parse($str, $bin);          # map string to binary UUID
 
-        UUID::type( $uuid );                 # return UUID type
-        UUID::variant( $uuid );              # return UUID variant
+        UUID::compare($bin1, $bin2);      # compare binary UUIDs
+        UUID::copy($dst, $src);           # copy binary UUID from $src to $dst
 
-        UUID::time( $uuid );                 # return internal UUID time
+        UUID::clear($bin);                # set binary UUID to NULL
+        UUID::is_null($bin);              # compare binary UUID to NULL
+
+        UUID::time($bin);                 # return UUID time
+        UUID::type($bin);                 # return UUID type
+        UUID::variant($bin);              # return UUID variant
+        UUID::version($bin);              # return UUID version
 
 DESCRIPTION
     The UUID library is used to generate unique identifiers for objects that
@@ -36,19 +47,23 @@ DESCRIPTION
     The generated UUIDs can be reasonably expected to be unique within a
     system, and unique across all systems, and are compatible with those
     created by the Open Software Foundation (OSF) Distributed Computing
-    Environment (DCE) utility uuidgen.
+    Environment (DCE).
 
-    All generated UUIDs are either type 1 from UUID::generate_time(), or
-    type 4 from UUID::generate_random(). And all are variant 1, meaning
-    compliant with the OSF DCE standard as described in RFC4122.
+    All generated UUIDs are either version 1, 4, 6, or version 7. And all
+    are variant 1, meaning compliant with the OSF DCE standard as described
+    in RFC4122.
+
+    Versions 6, 7, and 8 are not standardized. They are presented here as
+    proposed in RFC4122bis, version 14, and may change in the future.
+    RFC4122bis is noted to replace RFC4122, if approved.
 
 FUNCTIONS
-    Most of the UUID functions expose the underlying libuuid C interface
-    rather directly. That is, many return their values in their parameters
-    and nothing else.
+    Most of the UUID functions expose the historically underlying libuuid
+    C interface rather directly. That is, many return their values in their
+    parameters and nothing else.
 
-    Not very Perlish, is it? It's been like that for a long time though, so
-    not very likely to change any time soon.
+    Not very Perlish, but it's been like that for a long time so not likely
+    to change any time soon.
 
     All take or return UUIDs in either binary or string format. The string
     format resembles the following:
@@ -62,12 +77,7 @@ FUNCTIONS
     The binary form is simply a packed 16 byte binary value.
 
   clear( $uuid )
-    Sets $uuid equal to the value of the NULL UUID.
-
-  copy( $dst, $src )
-    Copies the binary $src UUID to $dst.
-
-    If $src isn't a UUID, $dst is set to the NULL UUID.
+    Sets binary $uuid equal to the value of the NULL UUID.
 
   compare( $uuid1, $uuid2 )
     Compares two binary UUIDs.
@@ -75,40 +85,63 @@ FUNCTIONS
     Returns an integer less than, equal to, or greater than zero if $uuid1
     is less than, equal to, or greater than $uuid2.
 
-    However, if either operand is not a UUID, falls back to a simple string
+    If one is defined and the other not, the defined value is deemed the
+    larger.
+
+    If either operand is not a binary UUID, falls back to a simple string
     comparison returning similar values.
 
+  copy( $dst, $src )
+    Copies the binary $src UUID to $dst.
+
+    If $src isn't a UUID, $dst is set to the NULL UUID.
+
   generate( $uuid )
-    Generates a new binary UUID based on high quality randomness from
-    /dev/urandom, if available.
+    Alias for generate_v4().
 
-    Alternately, the current time, the local ethernet MAC address (if
-    available), and random data generated using a pseudo-random generator
-    are used.
-
-    The previous content of $uuid, if any, is lost.
+    Prior to version 0.33, this function provided either a binary version 4
+    UUID or fell back to version 1 in some cases. This is no longer the
+    case. The fallback feature was removed with the addition of an onboard
+    crypto-strength number generator.
 
   generate_random( $uuid )
-    Generates a new binary UUID but forces the use of the all-random
-    algorithm, even if a high-quality random number generator (i.e.,
-    /dev/urandom) is not available, in which case a pseudo-random
-    generator is used.
-
-    Note that the use of a pseudo-random generator may compromise the
-    uniqueness of UUIDs generated in this fashion.
+    Alias for generate_v4().
 
   generate_time( $uuid )
-    Generates a new binary UUID but forces the use of the alternative
-    algorithm which uses the current time and the local ethernet MAC address
-    (if available).
+    Alias for generate_v1().
 
-    This algorithm used to be the default one used to generate UUIDs, but
-    because of the use of the ethernet MAC address, it can leak information
-    about when and where the UUID was generated.
+  generate_v1( $uuid )
+    Generates a new version 1 binary UUID using the current time and the
+    local ethernet MAC address, if available.
 
-    This can cause privacy problems in some applications, so the generate()
-    function only uses this algorithm if a high-quality source of randomness
-    is not available.
+    If the MAC address is not available at startup, or a randomized address
+    is requested (see :mac in EXPORTS), a random address is used. The
+    multicast bit of this address is set to avoid conflict with addresses
+    returned from network cards.
+
+  generate_v4( $uuid )
+    Generates a new version 4 binary UUID using mostly random data. There
+    are 6 bits used for the UUID format, leaving 122 bits for randomness.
+
+  generate_v6( $uuid )
+    Generates a new version 6 binary UUID using the current time and the
+    local ethernet MAC address, if available.
+
+    If the MAC address is not available at startup, or a randomized address
+    is requested (see :mac in EXPORTS), a random address is used. The
+    multicast bit of this address is set to avoid conflict with addresses
+    returned from network cards.
+
+    Version 6 is the same as version 1, with reversed time fields to make it
+    more database friendly.
+
+  generate_v7( $uuid )
+    Generates a new version 7 binary UUID using the current time and random
+    data. There are 6 bits used for the UUID format and 48 bits for
+    timestamp, leaving 74 bits for randomness.
+
+    Version 7 is the same as version 6, in that it uses reversed timestamp
+    fields, but also uses a Unix epoch time base instead of Gregorian.
 
   is_null( $uuid )
     Compares the value of $uuid to the NULL UUID.
@@ -126,38 +159,44 @@ FUNCTIONS
     Returns the time element of a binary UUID in seconds since the epoch,
     the same as Perl's time function.
 
-    Keep in mind this only works for type 1 UUIDs. Values returned from
-    other types range from non-standardized to totally random.
+    Keep in mind this only works for version 1, 6, and version 7 UUIDs.
+    Values returned from other versions are always 0.
 
   type( $uuid )
-    Returns the type of binary $uuid.
-
-    This module only generates type 1 (time) and type 4 (random) UUIDs, but
-    others may be found in the wild.
-
-    Known types: 1 a.k.a. Version 1 - date/time and MAC address 2 a.k.a.
-    Version 2 - date/time and MAC address, security version 3 a.k.a. Version
-    3 - namespace based, MD5 hash 4 a.k.a. Version 4 - random 5 a.k.a.
-    Version 5 - namespace based, SHA-1 hash
+    Alias for version().
 
   unparse( $uuid, $string )
+    Alias for unparse_lower().
+
+    Prior to version 0.32, casing of the return value was system-dependent.
+    Later versions are lowercase, per RFC4122.
+
+  unparse_lower( $uuid, $string )
     Converts the binary UUID in $uuid to string format and returns in
     $string. The previous content of $string, if any, is lost.
 
-    The case of the hex digits returned may be upper or lower case, and is
-    dependent on the local system default.
-
-  unparse_lower( $uuid, $string )
-    Same as unparse() but $string is forced to lower case.
-
   unparse_upper( $uuid, $string )
-    Same as unparse() but $string is forced to upper case.
+    Same as unparse_lower() but $string is forced to upper case.
 
   uuid()
-    Creates a new string format UUID and returns it in a more Perlish way.
+    Alias for uuid4().
 
-    Functionally the equivalent of calling generate() and then unparse(),
-    but throwing away the intermediate binary UUID.
+  uuid0()
+    Returns a new string format NULL UUID.
+
+  uuid1()
+    Returns a new string format version 1 UUID. Functionally the equivalent
+    of calling generate_v1() then unparse(), but throwing away the
+    intermediate binary UUID.
+
+  uuid4()
+    Same as uuid1() but version 4.
+
+  uuid6()
+    Same as uuid1() but version 6.
+
+  uuid7()
+    Same as uuid1() but version 7.
 
   variant( $uuid )
     Returns the variant of binary $uuid.
@@ -172,20 +211,101 @@ FUNCTIONS
         2  Microsoft
         3  Other
 
-UUID LIBRARY
-    Prior to version 0.32, UUID required libuuid or similar be installed
-    first. This is no longer the case. UUID now builds against a private
-    copy of the e2fsprogs UUID code.
+  version( $uuid> )
+    Returns the version of binary $uuid.
+
+    This module only generates version 1, 4, 6, and version 7 UUIDs, but
+    others may be found in the wild.
+
+    Known versions: v1 date/time and node address v2 date/time and node
+    address, security version v3 namespace based, MD5 hash v4 random v5
+    namespace based, SHA-1 hash v6 reverse date/time and node address v7
+    reverse unix date/time and random v8 custom
+
+MAINTAINING STATE
+    Internal state is optionally maintained for timestamped UUIDs (versions
+    1, 6, and 7) via a file designated by the :persist export tag. See
+    EXPORTS for details.
+
+    The file records various internal states at the time the last UUID is
+    generated, preventing future instances from overlapping the prior UUID
+    sequence. This allows the sequence to absolutely survive reboots and,
+    more importantly, backwards resetting of system time.
+
+    If :persist is not used, time resets will still be detected while the
+    module is loaded and handled by incrementing the UUID clock_seq field.
+    The clock_seq field is randomly initialized in this case anyway, so the
+    chance of overlap is low but still exists since clock_seq is only 14
+    bits wide. Using a random MAC will help (see :mac in EXPORTS), adding an
+    additional 48 bits of randomness.
+
+    NOTE: Using :persist incurs a serious performance penalty, in excess of
+    95% on tested platforms. You can run "make compare" in the distribution
+    directory to see how this might affect your application, but unless you
+    need many thousands of UUIDs/sec it's probably a non-issue.
+
+RANDOM NUMBERS
+    Prior to version 0.33, UUID obtained randomness from the system's
+    /dev/random device, or similar interface. On some platforms it called
+    getrandom() and on others it read directly from /dev/urandom. And of
+    course, Win32 did something completely different depending on the
+    environment.
+
+    Starting in 0.33, UUID generates random numbers itself using the
+    ChaCha20 algorithm which is considered crypto-strength in most circles.
+    This is the same algo used as the basis for many modern kernel RNGs,
+    albeit without the same entropy gathering ability.
+
+    To compensate, UUID mixes the output from ChaCha with output from
+    another RNG, Xoshiro. The idea is that by mixing the two, the true
+    output from either is effectively hidden, making discovery of either's
+    key much more unlikely than it already is. And without the keys, you
+    can't predict the future.
+
+    Well, that's the theory anyway.
 
 EXPORTS
     None by default. All functions may be imported in the usual manner,
-    either individually or all at once using the ":all" tag.
+    either individually or all at once using the :all tag.
 
-TODO
-    Need more tests and sanity checks.
+    Beware that importing :all clobbers Perl's time(), not to mention a
+    few other commonly used subs, like copy() from File::Copy.
+
+  :mac=mode
+    The MAC address used for MAC-inclusive UUIDS (versions 1 and 6) is
+    forced to always be random in one of two modes:
+
+        random The MAC address is generated once at startup and used
+        through the lifetime of the process. This is the default if a real
+        MAC cannot be found.
+
+        unique A new MAC address is generated for each new UUID. It is not
+        guaranteed to be unique beyond the probability of randomness.
+
+  :persist=path/to/state.txt
+    Path to timestamp state maintenance file. (See MAINTAINING STATE.) The
+    path may be either relative or absolute.
+
+    If the file does not exist, it will be created provided the path exists
+    and the user has permission.
+
+    If the file cannot be opened, cannot be created, or is a symlink, UUID
+    will ignore it. No state will be maintained.
+
+    WARNING: Do not :persist in a public directory. See CVE-2013-4184. UUID
+    attempts to avoid this, but nothing is foolproof. Only YOU can prevent
+    symlink attacks!
+
+THREAD SAFETY
+    This module is believed to be thread safe.
+
+UUID LIBRARY
+    Releases prior to UUID-0.32 required libuuid or similar be installed
+    first. This is no longer the case. Version 0.33 bundled the e2fsprogs
+    UUID code, and version 0.34 removed it altogether.
 
 COPYRIGHT AND LICENSE
-    This software is Copyright (c) 2014-2023 by Rick Myers.
+    This software is Copyright (c) 2014-2024 by Rick Myers.
 
     This is free software, licensed under:
 
@@ -220,6 +340,10 @@ CONTRIBUTORS
     twata
 
 SEE ALSO
-    uuid(3), uuid_clear(3), uuid_compare(3), uuid_copy(3), uuid_generate(3),
-    uuid_is_null(3), uuid_parse(3), uuid_unparse(3), perl(1).
+    RFC4122 - <https://www.rfc-editor.org/rfc/rfc4122>
+
+    RFC4122bis -
+    <https://www.ietf.org/archive/id/draft-ietf-uuidrev-rfc4122bis-14.html>
+
+    perl(1).
 

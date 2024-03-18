@@ -19,14 +19,17 @@ perl_version 5.006002;
 readme_from 'CZ.pm';
 recursive_author_tests('xt');
 requires 'Class::Utils' => 0.03;
+requires 'Mo::utils' => 0.06;
 requires 'Readonly' => 0;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Random-AcademicTitle-CZ/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Random-AcademicTitle-CZ';
 resources 'repository' => 'git://github.com/michal-josef-spacek/Random-AcademicTitle-CZ';
+test_requires 'English' => 0;
+test_requires 'Error::Pure::Utils' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.02';
+version '0.03';
 
 # Run.
 WriteAll();

@@ -7,7 +7,7 @@ use Carp;
 use Control::CLI qw( :all );
 
 my $Package = __PACKAGE__;
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 our @ISA = qw(Control::CLI);
 our %EXPORT_TAGS = (
 		use	=> [qw(useTelnet useSsh useSerial useIPv6)],
@@ -191,7 +191,7 @@ my %Attribute = (
 );
 
 my @InitPromptOrder = ("$Prm{pers}_cli", "$Prm{pers}_nncli", $Prm{xos}, $Prm{ipanema}, 'generic');
-my $GenericPromptRegex = '[\?\$%#>](?:\e\[00?m)?\s?$';
+my $GenericPromptRegex = '[\?\$%#>=](?:\e\[00?m)?\s?$';
 my %InitPrompt = ( # Initial prompt pattern expected at login
 	# Capturing brackets: $1 = switchName, $2 = login_cpu_slot, $3 = configContext;
 	$Prm{bstk}		=>	'\x0d?([^\n\x0d\x0a]{1,50}?)()(?:\((.+?)\))?(?:<.+>)?[>#]$',
@@ -3953,7 +3953,7 @@ sub cmdConfig { # If nncli send command in Config mode and restore mode on exit;
 					$disableCmd = 'disable';
 					$self->print($disableCmd);
 				}
-				$self->debugMsg(8,"\cmdConfig() Sending command:>", \$disableCmd, "<\n");
+				$self->debugMsg(8,"\ncmdConfig() Sending command:>", \$disableCmd, "<\n");
 			}
 		}
 		if ($cmdConfig->{stage} < 7) { # 7th stage
@@ -4075,8 +4075,12 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 		return $ok unless $ok;
 		$discDevice->{stage}++; # Move to next stage on next cycle
 		# .. and we lock it down to the minimum length required
-		$self->last_prompt =~ /(.*)($GenericPromptRegex)/;
-		$self->prompt(join('', ".{", length($1), ",}\Q$2\E\$"));
+		if ($self->last_prompt =~ /(.*)($GenericPromptRegex)/) { # Ideally this will always match...
+			$self->prompt(join('', ".{", length($1), ",}\Q$2\E\$"));
+		}
+		else { # ...but if it does not, we would error setting the new prompt, so better to carry on..
+			$self->debugMsg(4,"discoverDevice() continuing with already set prompt pattern\n");
+		}
 	}
 
 	# Prefer commands unique to platform, and with small output (not more paged)

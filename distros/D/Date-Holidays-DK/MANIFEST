@@ -2,6 +2,7 @@ Build.PL
 Changes
 DK.pm
 MANIFEST			This list of files
+META.json
 META.yml
 Makefile.PL
 README

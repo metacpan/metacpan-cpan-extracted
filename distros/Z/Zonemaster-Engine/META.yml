@@ -36,6 +36,7 @@ requires:
   List::MoreUtils: 0
   Locale::TextDomain: 1.2
   Log::Any: 0
+  Mail::SPF: 0
   Module::Find: 0.1
   Moose: 2.0401
   MooseX::Singleton: 0.3
@@ -44,10 +45,10 @@ requires:
   Readonly: 0
   Text::CSV: 0
   YAML::XS: 0
-  Zonemaster::LDNS: 3.002
+  Zonemaster::LDNS: 4
   perl: 5.14.2
 resources:
   bugtracker: https://github.com/zonemaster/zonemaster-engine/issues
   license: http://opensource.org/licenses/bsd-license.php
   repository: https://github.com/zonemaster/zonemaster-engine
-version: '4.007003'
+version: '5.000000'

@@ -11,9 +11,9 @@ use HTML::Entities qw(encode_entities);
 use Scalar::Util qw(looks_like_number blessed reftype refaddr);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-03-08'; # DATE
+our $DATE = '2024-03-12'; # DATE
 our $DIST = 'Data-Dump-HTML-Collapsible'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our @EXPORT = qw(dd);
 our @EXPORT_OK = qw(dump);
@@ -228,7 +228,7 @@ Data::Dump::HTML::Collapsible - Dump Perl data structures as HTML document with 
 
 =head1 VERSION
 
-This document describes version 0.001 of Data::Dump::HTML::Collapsible (from Perl distribution Data-Dump-HTML-Collapsible), released on 2024-03-08.
+This document describes version 0.002 of Data::Dump::HTML::Collapsible (from Perl distribution Data-Dump-HTML-Collapsible), released on 2024-03-12.
 
 =head1 SYNOPSIS
 
@@ -313,9 +313,15 @@ Source repository is at L<https://github.com/perlancar/perl-Data-Dump-HTML-Colla
 
 =head1 SEE ALSO
 
-L<Data::Dumper::HTML>
+Other data structure dumpers to (collapsible) tree: L<Data::HTML::TreeDumper>
+(doesn't handle recursion), L<Data::TreeDumper>
+(L<Data::TreeDumper::Renderer::DHTML>, L<Data::TreeDumper::Renderer::GTK>),
+L<Data::Dumper::GUI>.
 
-Other data structure dumpers like L<Data::Dumper>, L<Data::Dump>,
+Other data structure dumpers that outputs to HTML: L<Data::HTMLDumper>,
+L<Data::Dumper::HTML>, L<Data::Format::Pretty::HTML>.
+
+Other data structure dumpers: L<Data::Dumper>, L<Data::Dump>,
 L<Data::Dump::Color>, L<Data::Dmp>, L<Data::Printer>.
 
 =head1 AUTHOR

@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object.pm
-## Version v1.1.2
+## Version v1.1.3
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2024/01/05
+## Modified 2024/02/15
 ## All rights reserved
 ## 
 ## 
@@ -35,7 +35,7 @@ BEGIN
     use POSIX ();
     use Want;
     our $PLACEHOLDER_REGEXP = qr/\b\?\b/;
-    our $VERSION = 'v1.1.2';
+    our $VERSION = 'v1.1.3';
     use Devel::Confess;
 };
 
@@ -645,11 +645,12 @@ sub do($;$@)
     my $query     = shift( @_ );
     my $opt_ref   = shift( @_ ) || undef();
     my $param_ref = shift( @_ ) || [];
-    my $dbh = $self->{dbh} || return( $self->error( "Could not find database handler." ) );
+    my $dbh = $self->can( 'database_object' ) ? $self->database_object : $self;
+    $dbh or return( $self->error( "Could not find database handler." ) );
     my $sth = $dbh->prepare( $query, $opt_ref ) || 
-    return( $self->error( "Error while preparing do query:\n$query", $dbh->errstr() ) );
+        return( $self->error( "Error while preparing do query:\n$query", $dbh->errstr() ) );
     $sth->execute( @$param_ref ) || 
-    return( $self->error( "Error while executing do query:\n$query", $sth->errstr() ) );
+        return( $self->error( "Error while executing do query:\n$query", $sth->errstr() ) );
     # my $rows = $sth->rows();
     # return( ( $rows == 0 ) ? "0E0" : $rows );
     return( $sth );
@@ -1161,20 +1162,25 @@ sub table_exists
     my $table = shift( @_ ) || 
     return( $self->error( "You must provide a table name to access the table methods." ) );
     my $cache_tables = $self->cache_tables;
-    my $tables_in_cache = $cache_tables->get({
-        host => $self->host,
-        driver => $self->driver,
-        port => $self->port,
-        database => $self->database,
-    });
+    my $tables_in_cache = [];
+    if( defined( $cache_tables ) )
+    {
+        $tables_in_cache = $cache_tables->get({
+            host => $self->host,
+            driver => $self->driver,
+            port => $self->port,
+            database => $self->database,
+        });
+    }
     foreach my $ref ( @$tables_in_cache )
     {
         return( 1 ) if( $ref->{name} eq $table );
     }
     # We did not find it, so let's try by checking directly the database
-    my $def = $self->table_info( $table ) || return;
-    return( 0 ) if( !scalar( @$def ) );
-    return( 1 );
+    my $def = $self->table_info( $table );
+    return( $self->pass_error ) if( !defined( $def ) );
+    return(0) if( !scalar( keys( %$def ) ) );
+    return(1);
 }
 
 sub table_info 
@@ -1469,17 +1475,11 @@ sub _cache_this
         }
         if( scalar( keys( %$prepare_options ) ) )
         {
-            $sth = $self->prepare( $query, $prepare_options ) || do
-            {
-                return;
-            };
+            $sth = $self->prepare( $query, $prepare_options ) || return( $self->pass_error );
         }
         else
         {
-            $sth = $self->prepare( $query ) || do
-            {
-                return;
-            };
+            $sth = $self->prepare( $query ) || return( $self->pass_error );
         }
         # $sth = $self->prepare( $self->{ 'query' } ) ||
         # return( $self->error( "Error while preparing the query on table '$self->{ 'table' }':\n$self->{ 'query' }\n", $self->errstr() ) );
@@ -2724,7 +2724,7 @@ Because the L<fields objects|DB::Object::Fields::Field> are overloaded, instead 
 
 =head1 VERSION
 
-    v1.1.2
+    v1.1.3
 
 =head1 DESCRIPTION
 
@@ -3633,6 +3633,8 @@ Provided with a table name and this returns true if the table exist or false oth
 =head2 table_info
 
 This is a method that must be implemented by the driver package.
+
+It returns an array reference of hash reference containing information about each table column.
 
 =head2 table_push
 

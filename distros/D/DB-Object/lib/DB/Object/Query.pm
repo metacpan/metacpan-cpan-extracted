@@ -1477,16 +1477,16 @@ sub _group_order
     {
         $self->messagec( 6, "Received arguments -> {green}", join( "{/}, {green}", map( overload::StrVal( $_ ), @_ ) ), "{/}" );
         my $fields_ref = $tbl_o->fields;
+        my $fields     = join( '|', keys( %$fields_ref ) );
+        my $prefix     = $tbl_o->prefix;
+        my $db         = $tbl_o->database;
+        my $tables     = CORE::join( '|', @{$tbl_o->database_object->tables} );
+        my $multi_db   = $tbl_o->prefix_database;
         my $data   = ( @_ == 1 && ( !$self->_is_object( $_[0] ) || $self->_is_array( $_[0] ) ) && !exists( $fields_ref->{ "$_[0]" } ) )
             ? shift( @_ )
             : [ @_ ];
         if( $self->_is_array( $data ) )
         {
-            my $prefix     = $tbl_o->prefix;
-            my $fields     = join( '|', keys( %$fields_ref ) );
-            my $db         = $tbl_o->database();
-            my $tables     = CORE::join( '|', @{$tbl_o->database_object->tables} );
-            my $multi_db   = $tbl_o->prefix_database;
             $clause = $self->new_clause(
                 type    => $type,
                 debug   => $self->debug,
@@ -1495,7 +1495,7 @@ sub _group_order
             foreach my $field ( @$data )
             {
                 # Some garbage reached us
-                next if( !CORE::length( $field ) );
+                next if( !CORE::length( $field // '' ) );
                 
                 # Special treatment if we are being provided multiple clause to merge with ours
                 if( $self->_is_a( $field => 'DB::Object::Query::Clause' ) )
@@ -1598,14 +1598,63 @@ sub _group_order
                 value => $data,
                 type => $type,
             });
-            # my $ref = [];
-            if( $bind )
+            my $elem;
+            if( ref( $data ) eq 'SCALAR' )
+            {
+                $elem = $self->new_element(
+                    field => $data,
+                    type => '',
+                    value => $$data,
+                );
+                $clause->push( $elem );
+            }
+            elsif( $data =~ /^($placeholder_re)$/ )
+            {
+                $elem = $self->new_element(
+                    field => $data,
+                    placeholder => $1,
+                    type => '',
+                    value => $data,
+                );
+                $clause->push( $elem );
+            }
+            elsif( $data =~ /\b(?:$fields)\b/ ||
+                   $data =~ /\w\([^\)]*\)/ ||
+                   !$bind )
+            {
+                $data =~ s{
+                    (?<![\.\"])\b($fields)\b(\s*)?(?!\.)
+                }
+                {
+                    my( $ok, $spc ) = ( $1, $2 );
+                    "${prefix}.${ok}${spc}";
+                }gex if( $prefix );
+                $data =~ s/(?<!\.)($tables)(?:\.)/$db\.$1\./g if( $multi_db );
+                $elem = $self->new_element(
+                    field => $data,
+                    type => '',
+                    value => $data,
+                );
+                $clause->push( $elem );
+            }
+            elsif( $bind )
             {
                 # $self->_value2bind( \$data, $ref );
                 my $elems = $self->_value2bind( \$data );
                 # $clause->bind->values( $ref );
                 # $clause->bind->types( ( '' ) x scalar( @$ref ) );
                 $clause->push( $elems->elements->list ) if( $elems->elements->length );
+            }
+            else
+            {
+                $elem = $self->new_element(
+                    field => $data,
+                    # Not necessary; this is already the default value
+                    # generic => '?',
+                    type => '',
+                    value => $data,
+                );
+                $clause->push( $elem );
             }
         }
         $self->{ $prop } = $clause if( $clause->elements->length );

@@ -1,0 +1,508 @@
+%
+% Filename: aimatters.sty
+% Adapted from aaai.sty by Eric Eaton in 2015
+%
+% WARNING: IF YOU ARE USING THIS STYLE SHEET FOR PUBLICATION IN AI MATTERS, YOU
+% MAY NOT MODIFY IT FOR ANY REASON. MODIFICATIONS (IN YOUR SOURCE 
+% OR IN THIS STYLE SHEET) WILL NOT BE INCLUDED IN THE FINAL COMPILATION OF YOUR 
+% ARTICLE FOR THE NEWSLETTER.
+%
+%
+% USAGE (For Authors)
+% The style file provides a number of commands to assist in formatting your submission:
+% 
+% \AIMauthor -- format the author line; to be use inside of \author{}
+% Usage: \AIMauthor{NAME}{AFFILIATION}{EMAIL}
+%     E.g.: \AIMauthor{Shakey the Robot}{Stanford Research Institute}{shakey@sri.com}
+%
+% \AIMbio -- create the biography for a single author, which will be included automatically at the end of the article
+% Usage: \AIMbio{IMAGE_FILENAME}{BIOGRAPHY_TEXT}
+%     E.g.: \AIMbio{shakey.jpg}{Shakey the robot was ....}
+%
+% \AIMfirstText -- inserts text in single-column mode immediately after the title/author header and before the two-columns start
+%                         This could be useful, for example, to start off your paper with a figure that spans two columns.  Note that this command must be called
+%                         before \maketitle
+% Usage: \AIMfirstText{TEXT_TO_PLACE_AT_VERY_START_OF_DOCUMENT_BODY}
+%     E.g.: \AIMfirstText{\includegraphics[width=\textwidth}{image.jpg}}    % start off paper with an image that is the full page width
+%
+% Do not use any other commands that are defined in this style file in preparing your submission, since they are subject to change without notice.
+%
+%
+%
+%
+% USAGE (For Editors)
+% The style file takes in several optional arguments to configure the DOI and category marker for the article.  Authors should NOT use these options.
+% Options (Text):
+%    DOI - The doi for the article
+%    category - The category marker for the article. Values: {AIMbook, AIMdissertation, AIMevent, AIMhumor, AIMimpact, AIMnews, AIMopinion, AIMpaper, AIMvideo}
+%    year - The year of the issue
+%    month - The month of the issue (only needed with the 'toc' or 'header' options)
+%    volume - The volume of the issue (only needed with the 'toc' or 'header' options)
+%    number - The number of the issue (only needed with the 'toc' or 'header' options)
+%    pagenum - The starting page number of the article (optional, 'header' only)
+% Options (Boolean - no arguments):
+%    toc - this boolean option disables the copyright and author output to create the table-of-contents
+%    header - this boolean option specifies that the issue header should be printed
+%    noBios - this boolean option disables the output of biographies
+%    noDOI - this boolean option disables the output of the DOI
+%    noCopyright - this boolean option disables the output of the copyright statement
+% Example:  
+%    When an article is ready for publication, change the \usepackage{aimatters} line in the authors' source file to 
+%    \usepackage[DOI=123.45/6789,category=AIMnews,year=2015]{aimatters}
+%    in order to build the article PDF with the specified DOI and category with copyright in 2015.
+%    To output full header information, the line should be changed to:
+%    \usepackage[DOI=123.45/6789,category=AIMnews,year=2015,
+%                          header,month=January,volume=1,number=1,pagenum=10]{aimatters}
+%    in order to build the article PDF with the specified DOI and category with copyright in 2015, with a 
+%    header for the January issue Volume 1, issue 1 starting at page 10
+% Example 2:
+%    In order to create a one page notice without authors:
+%    \usepackage[category=AIMnews,noDOI,noCopyright,noBios]{aimatters}
+%
+% \AIMlastText -- inserts text after the author biographies.  Note:  authors should not use this command, it is only to allow editors to insert, for example, 
+%                         a sidebar column or advertisement after your paper.  The biographies are required to be the last element of your paper.
+% Usage: \AIMlastText{TEXT_TO_PLACE_AT_VERY_END_OF_DOCUMENT_BODY}
+%     E.g.: \AIMlastText{\includegraphics[width=\columnwidth}{advertisement.jpg}}    % place ad after the paper
+%
+
+
+\typeout{Style for SIGAI AI Matters Articles for LaTeX 2e -- version 2015-08-20}
+
+% NOTICE: DO NOT MODIFY THIS FILE WITHOUT CHANGING ITS NAME. This style
+% file is called aimatters.sty. Modifications to this file are permitted,
+% provided that your modified version does not include the acronym "aimatters"
+% in its name, that credit to the authors and supporting agencies is
+% retained, and that further modification or reuse is not restricted. This
+% file was based upon the aaai.sty file originally prepared by Peter F. Patel-Schneider, liberally
+% using the ideas of other style hackers, including Barbara Beeton. It was
+% modified in April 1999 by J. Scott Penberthy and George Ferguson. It was
+% modified in 2007 by AAAI. It was modified in February 2009  
+% and in November 2009 by Hans W. Guesgen and Giuseppe De Giacomo. It
+% was further modified in March 2010 by AAAI.  It was adapted for use with
+% the AI Matters newsletter by Eric Eaton in 2015.
+% The original preparation of this file was supported by 
+% Schlumberger Palo Alto Research, AT\&T Bell Laboratories, AAAI, and 
+% Morgan Kaufmann Publishers.
+% 
+% WARNING: This style is NOT guaranteed to work. It is provided in the
+% hope that it might make the preparation of papers easier, but this style
+% file is provided "as is" without warranty of any kind, either express or
+% implied, including but not limited to the implied warranties of
+% merchantability, fitness for a particular purpose, or noninfringement.
+% You use this style file at your own risk. Standard disclaimers apply.
+% 
+% Do not use this file unless you are an experienced LaTeX user. 
+% AI Matters will not accept your paper if it is formatted
+% using obsolete type 3 Computer Modern bitmapped fonts. Please ensure
+% that your version of dvips maps to type 1 fonts. Place this document in
+% a file called aimatters.sty in the TeX search path. (Placing it in the same
+% directory as the paper should also work.)
+%
+% You must also format your paper for US letter-sized paper.
+% 
+% There are undoubtably bugs in this style. If you would like to submit
+% bug fixes, improvements, etc. please let us know by emailing the current AI Matters editors.
+% 
+% USE OF PDFTeX IS NOW REQUIRED
+
+
+
+% declare options to package:
+% DOI - the DOI for the article
+\usepackage{kvoptions}
+\SetupKeyvalOptions{
+  family=AIM,
+  prefix=AIM@
+}
+\DeclareStringOption [XX.XXXX/XXXXXXX.XXXXXXX]{DOI}[XX.XXXX/XXXXXXX.XXXXXXX]
+\DeclareStringOption [AIMunknown]{category}[AIMunknown]
+\DeclareStringOption [20XX]{year}[20XX]
+\DeclareStringOption [XXXXX]{month}[XXXXX]
+\DeclareStringOption [X]{volume}[X]
+\DeclareStringOption [X]{number}[X]
+\DeclareStringOption [1]{pagenum}[1]
+
+\DeclareBoolOption{toc}
+\DeclareBoolOption{header}
+\DeclareBoolOption{noDOI}
+\DeclareBoolOption{noBios}
+\DeclareBoolOption{noCopyright}
+
+% process the options
+\ProcessKeyvalOptions*
+
+
+\usepackage[usenames, dvipsnames]{color}
+\definecolor{aimattersblue}{RGB}{39, 104, 140}
+\definecolor{AIMbook}{RGB}{98,180,68}
+\definecolor{AIMdissertation}{RGB}{252,75,66}
+\definecolor{AIMevent}{RGB}{253,123,57}
+\definecolor{AIMhumor}{RGB}{255,215,225}
+\definecolor{AIMimpact}{RGB}{252,253,149}
+\definecolor{AIMnews}{RGB}{170,170,170}
+\definecolor{AIMopinion}{RGB}{114,162,252}
+\definecolor{AIMpaper}{RGB}{244,128,252}
+\definecolor{AIMvideo}{RGB}{151,228,252}
+\definecolor{AIMtitlebackground}{RGB}{94,171,213}
+
+
+\usepackage{fancyhdr}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+\chead{}
+\lfoot{}
+\cfoot{}
+\ifAIM@header  % only have the header and footer if specified
+   \setcounter{page}{\AIM@pagenum}
+   \lhead{\color{aimattersblue} \large \fontfamily{ptm}\selectfont AI MATTERS, VOLUME \AIM@volume, ISSUE \AIM@number}
+   \rhead{\color{aimattersblue} \large \fontfamily{ptm}\selectfont \MakeUppercase{\AIM@month\ \AIM@year}}
+   \rfoot{\thepage}
+\else
+\ifAIM@toc  % need the header and footer for the TOC
+   \lhead{\color{aimattersblue} \large \fontfamily{ptm}\selectfont AI MATTERS, VOLUME \AIM@volume, ISSUE \AIM@number}
+   \rhead{\color{aimattersblue} \large \fontfamily{ptm}\selectfont \MakeUppercase{\AIM@month\ \AIM@year}}
+   \rfoot{\thepage}
+\else  % blank header and footer for no header option; the TOC would need to add these headers to each paper automatically when it is compiled
+   \lhead{}
+   \rhead{}
+   \rfoot{}
+\fi
+\fi
+
+% Define the AI Matters category markers
+\newcommand{\AIMbook}{\fcolorbox{AIMbook}{AIMbook}{\makebox(14,14){\LARGE B}}}
+\newcommand{\AIMdissertation}{\fcolorbox{AIMdissertation}{AIMdissertation}{\makebox(14,14){\LARGE D}}}
+\newcommand{\AIMevent}{\fcolorbox{AIMevent}{AIMevent}{\makebox(14,14){\LARGE E}}}
+\newcommand{\AIMhumor}{\fcolorbox{AIMhumor}{AIMhumor}{\makebox(14,14){\LARGE H}}}
+\newcommand{\AIMimpact}{\fcolorbox{AIMimpact}{AIMimpact}{\makebox(14,14){\LARGE I}}}
+\newcommand{\AIMnews}{\fcolorbox{AIMnews}{AIMnews}{\makebox(14,14){\LARGE N}}}
+\newcommand{\AIMopinion}{\fcolorbox{AIMopinion}{AIMopinion}{\makebox(14,14){\LARGE O}}}
+\newcommand{\AIMpaper}{\fcolorbox{AIMpaper}{AIMpaper}{\makebox(14,14){\LARGE P}}}
+\newcommand{\AIMvideo}{\fcolorbox{AIMvideo}{AIMvideo}{\makebox(14,14){\LARGE V}}}
+\newcommand{\AIMunknown}{\fcolorbox{black}{black}{\makebox(14,14){\LARGE U}}}
+
+
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\hypersetup{
+  colorlinks=true,
+  allcolors=blue,
+  linkbordercolor=blue,
+  pdfborderstyle={/S/U/W 1}% border style will be underline of width 1pt
+}
+
+% AI Matters author line
+% Usage: \AIMauthor{NAME}{AFFILIATION}{EMAIL}
+%     E.g.: \AIMauthor{Shakey the Robot}{Stanford Research Institute}{shakey@sri.com}
+\newcommand{\AIMauthor}[3]{{\bf #1} (#2; \href{#3}{#3}) \vskip 3pt plus 0.5 pt minus 0.5pt}
+
+
+% AI Matters author biographies
+% Usage: \AIMbio{IMAGE_FILENAME}{BIOGRAPHY_TEXT}
+%     E.g.: \AIMbio{shakey.jpg}{Shakey the robot was ....}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+%\makeatletter
+\newcommand*{\AIMbiographies}{}
+\newcommand{\AIMbio}[2]{%
+  \g@addto@macro\AIMbiographies{
+  \begingroup  % make changes local to this group
+  \setlength{\columnsep}{6pt}
+  \setlength{\intextsep}{6pt}
+  \begin{minipage}{\columnwidth}
+  \begin{wrapfigure}{l}{1.25in}
+  \begin{center}
+    \includegraphics[width=1.25in]{#1}
+  \end{center}
+  \end{wrapfigure}#2
+  \end{minipage}
+  \vskip 2pt plus 0.5pt minus 0.5pt
+  \endgroup}
+}
+%\makeatother
+
+\AtEndDocument{
+\ifAIM@toc
+\else
+\ifAIM@noBios
+\else
+\vskip 6pt plus 1pt minus 2pt
+{\color{aimattersblue}\rule{\columnwidth}{3.5pt}}
+\vskip 2pt plus 0.5pt minus 0.5pt
+\ifx\AIMbiographies\empty
+  YOU ARE MISSING AUTHOR BIOGRAPHIES.  You must include a biography and accompanying photo for each author.  To include these, use the {\em \textbackslash AIMbio} command (one per author), as described in the AI Matters formatting instructions.  The photographs will be printed as 1.25in wide (scaled proportionally).
+\else 
+\AIMbiographies
+\fi
+{\color{aimattersblue}\rule{\columnwidth}{3.5pt}}
+\fi
+\fi
+\ifx\AIM@lasttext\empty \else \AIM@lasttext \fi
+}
+
+\newcommand*{\AIM@firsttext}{}
+\newcommand{\AIMfirstText}[1]{
+  \g@addto@macro\AIM@firsttext{#1}}
+  
+\newcommand*{\AIM@lasttext}{}
+\newcommand{\AIMlastText}[1]{
+  \g@addto@macro\AIM@lasttext{#1}}
+
+
+
+
+% AI Matters DOI line
+% Usage: \AIMdoiprocessor{DOI_URL}
+%     E.g.: \AIMdoi{12.3456/789.0}
+\newcommand{\AIMdoiprocessor}[1]{DOI: \href{http://dx.doi.org/#1}{#1}}
+
+\newcommand{\AIMrule}{{\color{aimattersblue}\rule{\textwidth}{3.5pt}}}
+\newcommand{\AIMcolumnrule}{{\color{aimattersblue}\rule{\columnwidth}{3.5pt}}}
+
+\newcommand{\AIMtocheader}{
+\begin{minipage}{\textwidth}
+\AIMrule\\[5pt]
+\includegraphics[height=1.15in]{sigai.jpg}\hfill
+\fcolorbox{aimattersblue}{AIMtitlebackground}{\parbox[b][1.15in][c]{5.15in}{\centering \fontsize{77pt}{77pt}\selectfont \textcolor{white}{AI Matters}}}\\[3pt]
+\AIMrule
+\end{minipage}
+\vskip 0.3in plus 0.05in minus 0.05in
+}
+
+
+% PHYSICAL PAGE LAYOUT
+\setlength\topmargin{-0.4in} \setlength\oddsidemargin{0in}
+\setlength\headheight{0.25in}  \setlength\headsep{0.15in}
+\setlength\textheight{9.0in} \setlength\textwidth{6.5in}
+\setlength\columnsep{0.375in} \newlength\titlebox \setlength\titlebox{2.25in}
+%\setlength\footheight{0pt}  \setlength\footskip{0pt}
+\flushbottom \twocolumn \sloppy
+
+% We're never going to need a table of contents, so just flush it to
+% save space --- suggested by drstrip@sandia-2
+\def\addcontentsline#1#2#3{}
+
+% gf: PRINT COPYRIGHT NOTICE
+\def\copyright@year{\AIM@year}
+\def\copyright@text{Copyright \copyright\space \copyright@year\ by the author(s).}
+\def\copyright@on{T}
+\def\nocopyright{\gdef\copyright@on{}}
+\def\copyrighttext#1{\gdef\copyright@on{T}\gdef\copyright@text{#1}}
+\def\copyrightyear#1{\gdef\copyright@on{T}\gdef\copyright@year{#1}}
+% gf: End changes for copyright notice (used in \maketitle, below)
+
+% Title stuff, taken from deproc.
+\def\maketitle{\par
+\begingroup % to make the footnote style local to the title
+\def\thefootnote{\fnsymbol{footnote}}
+% gf: Don't see why we'd want the footnotemark to be 0pt wide
+%\def\@makefnmark{\hbox to 0pt{$^{\@thefnmark}$\hss}}
+\twocolumn[\ifAIM@toc \AIMtocheader \else \@maketitle \fi] \@thanks  % TOC HEADER FOR TOC, or MAKETITLE FOR A PAPER
+\endgroup
+% gf: Insert copyright slug unless turned off
+\if T\copyright@on\insert\footins{\noindent\footnotesize\copyright@text}\fi
+% gf: And now back to your regular programming
+\setcounter{footnote}{0}
+\let\maketitle\relax \let\@maketitle\relax
+\gdef\@thanks{}\gdef\@author{}\gdef\@title{}\let\thanks\relax}
+% AI Matters title box
+\def\@maketitle{\vbox {\hsize\textwidth %to \titlebox
+%%\linewidth\hsize \vskip 0.625in minus 0.125in \centering
+\linewidth\hsize %\vskip 0.625in minus 0.125in 
+\AIMrule 
+\vskip 2pt
+\begin{minipage}[t]{0.3in}
+\strut\\[-14pt]
+\csname\AIM@category\endcsname  % EXECUTE THE SPECIFIED AIM@category AS A COMMAND 
+\end{minipage}
+\begin{minipage}[t]{0.95\textwidth}
+\strut %\vspace{0pt}
+{\Large\bf\color{aimattersblue} \@title \par} \vskip 6pt plus 0.5 pt minus 0.5pt
+{\@author \ifAIM@noDOI \else \AIMdoiprocessor{\AIM@DOI} \fi}
+\end{minipage}
+\vskip 0.3in plus 0.05in minus 0.05in
+\ifx\AIM@firsttext\empty \else \AIM@firsttext \fi
+}}
+%{\def\and{\unskip\enspace{\rm and}\enspace}%
+%\def\And{\end{tabular}\hss \egroup \hskip 1in plus 2fil 
+% \hbox to 0pt\bgroup\hss \begin{tabular}[t]{c}\large\bf}%
+%\def\AND{\end{tabular}\hss\egroup \hfil\hfil\egroup
+%\vskip 0.25in plus 1fil minus 0.125in
+%% hg: Changed Large to normalsize on next line
+% \hbox to \linewidth\bgroup\normalsize \hfil\hfil
+%\hbox to 0pt\bgroup\hss \begin{tabular}[t]{c}\Large\bf}
+%\hbox to \linewidth\bgroup\normalsize \hfil\hfil
+%\hbox to 0pt\bgroup\hss \begin{tabular}[t]{c}\Large\bf\@author 
+%\end{tabular}\hss\egroup
+%\hfil\hfil\egroup}
+%\vskip 0.3in plus 2fil minus 0.1in
+%}}
+
+\renewenvironment{abstract}{\centerline{\bf
+Abstract}\vspace{0.5ex}\begin{quote}\small}{\par\end{quote}\vskip 1ex}
+% jsp added:
+\def\pubnote#1{\thispagestyle{myheadings}
+\pagestyle{myheadings}
+\markboth{#1}{#1}
+\setlength\headheight{10pt}  \setlength\headsep{10pt}
+}
+
+% SECTIONS with less space
+\def\section{\@startsection {section}{1}{\z@}{-2.0ex plus
+-0.5ex minus -.2ex}{2pt plus 0.5pt minus 0.5pt}{\large\bf\raggedright}}
+\def\subsection{\@startsection{subsection}{2}{\z@}{-2.0ex plus
+-0.5ex minus -.2ex}{2pt plus 0.5pt minus 0.5pt}{\normalsize\bf\raggedright}}
+\def\subsubsection{\@startsection{subparagraph}{3}{\z@}{-6pt plus
+%%% DIEGO changed: 29/11/2009
+%% 2pt minus 1pt}{-1em}{\normalsize\bf}}
+-2pt minus -1pt}{-1em}{\normalsize\bf}}
+%%% END changed
+\setcounter{secnumdepth}{0}
+% add period to section (but not subsection) numbers, reduce space after
+%\renewcommand{\thesection}
+%   {\arabic{section}.\hskip-0.6em}
+%\renewcommand{\thesubsection}
+%   {\arabic{section}.\arabic{subsection}\hskip-0.6em}
+% FOOTNOTES
+\footnotesep 6.65pt %
+\skip\footins 9pt plus 4pt minus 2pt
+\def\footnoterule{\kern-3pt \hrule width 5pc \kern 2.6pt }
+\setcounter{footnote}{0}
+% LISTS AND PARAGRAPHS
+\parindent 0pt
+\parskip 6pt plus 0.5pt minus 0.5pt
+\topsep 4pt plus 1pt minus 2pt
+\partopsep 1pt plus 0.5pt minus 0.5pt
+\itemsep 2pt plus 1pt minus 0.5pt
+\parsep 2pt plus 1pt minus 0.5pt
+\leftmargin 10pt \leftmargini\leftmargin \leftmarginii 10pt
+\leftmarginiii 5pt \leftmarginiv 5pt \leftmarginv 5pt \leftmarginvi 5pt
+\labelwidth\leftmargini\advance\labelwidth-\labelsep \labelsep 5pt
+\def\@listi{\leftmargin\leftmargini}
+\def\@listii{\leftmargin\leftmarginii
+\labelwidth\leftmarginii\advance\labelwidth-\labelsep
+\topsep 2pt plus 1pt minus 0.5pt
+\parsep 1pt plus 0.5pt minus 0.5pt
+\itemsep \parsep}
+\def\@listiii{\leftmargin\leftmarginiii
+\labelwidth\leftmarginiii\advance\labelwidth-\labelsep
+\topsep 1pt plus 0.5pt minus 0.5pt 
+\parsep \z@ \partopsep 0.5pt plus 0pt minus 0.5pt
+\itemsep \topsep}
+\def\@listiv{\leftmargin\leftmarginiv
+\labelwidth\leftmarginiv\advance\labelwidth-\labelsep}
+\def\@listv{\leftmargin\leftmarginv
+\labelwidth\leftmarginv\advance\labelwidth-\labelsep}
+\def\@listvi{\leftmargin\leftmarginvi
+\labelwidth\leftmarginvi\advance\labelwidth-\labelsep}
+\abovedisplayskip 7pt plus2pt minus5pt%
+\belowdisplayskip \abovedisplayskip
+\abovedisplayshortskip 0pt plus3pt% 
+\belowdisplayshortskip 4pt plus3pt minus3pt%
+
+% Set Font Sizes
+% Less leading in most fonts (due to the narrow columns)
+% The choices were between 1-pt and 1.5-pt leading
+\def\normalsize{\@setfontsize\normalsize\@xipt{12}}   % 11 point on 12
+\def\small{\@setfontsize\small\@xpt{11}}    % 10 point on 11
+\def\footnotesize{\@setfontsize\footnotesize\@xpt{11}}  % 10 point on 11
+\def\scriptsize{\@setfontsize\scriptsize\@ixpt{10}}  % 9 point on 10
+\def\tiny{\@setfontsize\tiny\@viipt{10}}  % 7 point on 8
+\def\large{\@setfontsize\large\@xiipt{14}}    % 12 point on 14
+\def\Large{\@setfontsize\Large\@xivpt{16}}    % 14 point on 16
+\def\LARGE{\@setfontsize\LARGE\@xviipt{20}}    % 17 point on 20
+\def\huge{\@setfontsize\huge\@xxpt{23}}    % 20 point on 23
+\def\Huge{\@setfontsize\Huge\@xxvpt{25}}    % 23 point on 25
+
+%%%% named style for aaai, included here for ease of use
+% This section implements citations for the ``named'' bibliography style,
+% modified for AAAI use.
+% This file can be modified and used in other conferences as long
+% as credit to the authors and supporting agencies is retained, this notice
+% is not changed, and further modification or reuse is not restricted.
+% The ``named'' bibliography style creates citations with labels like
+% \citeauthoryear{author-info}{year}
+% these labels are processed by the following commands:
+% \cite{keylist}
+%  which produces citations with both author and year,
+%  enclosed in square brackets
+% \shortcite{keylist}
+%  which produces citations with year only,
+%  enclosed in square brackets
+% \citeauthor{key}
+%  which produces the author information only
+% \citeyear{key}
+%  which produces the year information only
+\def\leftcite{(}\def\rightcite{)}
+\def\cite{\def\citeauthoryear##1##2{\def\@thisauthor{##1}%
+\ifx \@lastauthor \@thisauthor \relax \else##1 \fi ##2}\@icite}
+\def\shortcite{\def\citeauthoryear##1##2{##2}\@icite}
+\def\citeauthor{\def\citeauthoryear##1##2{##1}\@nbcite}
+\def\citeyear{\def\citeauthoryear##1##2{##2}\@nbcite}
+% internal macro for citations with () and with breaks between citations
+% used in \cite and \shortcite
+\def\@icite{\leavevmode\def\@citeseppen{-1000}%
+\def\@cite##1##2{\leftcite\nobreak\hskip 0in{##1\if@tempswa , ##2\fi}\rightcite}%
+\@ifnextchar [{\@tempswatrue\@citex}{\@tempswafalse\@citex[]}}
+% internal macro for citations without [] and with no breaks
+% used in \citeauthor and \citeyear
+\def\@nbcite{\leavevmode\def\@citeseppen{1000}%
+\def\@cite##1##2{{##1\if@tempswa , ##2\fi}}%
+\@ifnextchar [{\@tempswatrue\@citex}{\@tempswafalse\@citex[]}}
+% don't box citations, separate with ; and a space
+% also, make the penalty between citations a parameter, 
+% it may be a good place to break
+\def\@citex[#1]#2{%
+\def\@lastauthor{}\def\@citea{}%
+\@cite{\@for\@citeb:=#2\do
+{\@citea\def\@citea{;\penalty\@citeseppen\ }%
+\if@filesw\immediate\write\@auxout{\string\citation{\@citeb}}\fi
+\@ifundefined{b@\@citeb}{\def\@thisauthor{}{\bf ?}\@warning
+{Citation `\@citeb' on page \thepage \space undefined}}%
+{\csname b@\@citeb\endcsname}\let\@lastauthor\@thisauthor}}{#1}}
+%Ignore the key when generating the Reference section.
+\def\@lbibitem[#1]#2{\item\if@filesw 
+{ \def\protect##1{\string ##1\space}\immediate
+\write\@auxout{\string\bibcite{#2}{#1}}}\fi\ignorespaces}
+\def\thebibliography#1{\section*{References\@mkboth
+{REFERENCES}{REFERENCES}}\list
+{}{\labelwidth 0in\leftmargin\labelwidth
+%%% DIEGO removed
+%%\advance\leftmargin\labelsep
+%%% END removed
+%%% DIEGO changed
+\itemsep .01in % original
+%%\itemsep -.0125in % reduced space between bib entries
+%%% END changed
+}
+\def\newblock{\hskip .11em plus .33em minus .07em}
+\sloppy\clubpenalty4000\widowpenalty4000
+\sfcode`\.=1000\relax}
+\let\endthebibliography=\endlist
+
+\usepackage{times}
+\usepackage{helvet}
+\usepackage{courier}
+\renewcommand\familydefault{\sfdefault}
+
+\setlength{\pdfpagewidth}{8.5in} 
+\setlength{\pdfpageheight}{11in}
+\pagestyle{fancy}
+
+% set caption size for figures to be small
+\usepackage[font=small]{caption}
+
+% Disable copyright line for the table of contents
+\ifAIM@toc
+ \nocopyright
+\fi
+
+% Disable copyright line if the noCopyright option was invoked 
+\ifAIM@noCopyright
+ \nocopyright
+\fi
+
+
+
+

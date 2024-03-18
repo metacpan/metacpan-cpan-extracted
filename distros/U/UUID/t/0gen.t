@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use MyNote;
 use CPAN::Meta ();
 use ExtUtils::Manifest qw(maniread manicheck filecheck);
 use lib 'blib/lib';
@@ -95,60 +96,27 @@ ok manifest_extras(), 'files not in manifest';
 
 sub manifest_extras {
     my @extras =
-        grep { ! m{EUMM.h$}                     }
-        grep { ! m{UUID.bs$}                    }
-        grep { ! m{UUID.c$}                     }
-        grep { ! m{UUID.o$}                     }
-        grep { ! m{clear.o$}                    }
-        grep { ! m{compare.o$}                  }
-        grep { ! m{config.h$}                   }
-        grep { ! m{copy.o$}                     }
-        grep { ! m{dirpaths.h$}                 }
-        grep { ! m{gen_uuid.o$}                 }
-        grep { ! m{isnull.o$}                   }
-        grep { ! m{pack.o$}                     }
-        grep { ! m{parse.o$}                    }
-        grep { ! m{ulib\/uuid\/gen_uuid.c$}     }
-        grep { ! m{unpack.o$}                   }
-        grep { ! m{unparse.o$}                  }
-        grep { ! m{uuid_time.o$}                }
-        grep { ! m{uuid.h$}                     }
-        grep { ! m{uuid_types.h$}               }
-        grep { ! m{\.exists$}                   }
-        grep { ! m{ulib/.patch$}                }
-        grep { ! m{ulib/uuid/clear.c$}          }
-        grep { ! m{ulib/uuid/compare.c$}        }
-        grep { ! m{ulib/uuid/copy.c$}           }
-        grep { ! m{ulib/uuid/gen_uuid_nt.c$}    }
-        grep { ! m{ulib/uuid/isnull.c$}         }
-        grep { ! m{ulib/uuid/pack.c$}           }
-        grep { ! m{ulib/uuid/parse.c$}          }
-        grep { ! m{ulib/uuid/tst_uuid.c$}       }
-        grep { ! m{ulib/uuid/unpack.c$}         }
-        grep { ! m{ulib/uuid/unparse.c$}        }
-        grep { ! m{ulib/uuid/uuid.h.new$}       }
-        grep { ! m{ulib/uuid/uuid_time.c$}      }
-        grep { ! m{ulib/uuid/uuidd.h$}          }
-        grep { ! m{ulib/uuid/uuidP.h$}          }
-        grep { ! m{usrcP/.patch$}               }
-        grep { ! m{usrcP/config.h.in$}          }
-        grep { ! m{usrcP/dirpaths.h.in$}        }
-        grep { ! m{usrcP/uuid/clear.c$}         }
-        grep { ! m{usrcP/uuid/compare.c$}       }
-        grep { ! m{usrcP/uuid/copy.c$}          }
-        grep { ! m{usrcP/uuid/gen_uuid.c$}      }
-        grep { ! m{usrcP/uuid/gen_uuid_nt.c$}   }
-        grep { ! m{usrcP/uuid/isnull.c$}        }
-        grep { ! m{usrcP/uuid/pack.c$}          }
-        grep { ! m{usrcP/uuid/parse.c$}         }
-        grep { ! m{usrcP/uuid/tst_uuid.c$}      }
-        grep { ! m{usrcP/uuid/unpack.c$}        }
-        grep { ! m{usrcP/uuid/unparse.c$}       }
-        grep { ! m{usrcP/uuid/uuid.h.in$}       }
-        grep { ! m{usrcP/uuid/uuid_time.c$}     }
-        grep { ! m{usrcP/uuid/uuid_types.h.in$} }
-        grep { ! m{usrcP/uuid/uuidd.h$}         }
-        grep { ! m{usrcP/uuid/uuidP.h$}         }
+        grep { ! m{UUID.bs}         }
+        grep { ! m{UUID.c}          }
+        grep { ! m{UUID.o}          }
+        grep { ! m{ulib/EUMM.h}     }
+        grep { ! m{ulib/chacha.o}   }
+        grep { ! m{ulib/clear.o}    }
+        grep { ! m{ulib/clock.o}    }
+        grep { ! m{ulib/compare.o}  }
+        grep { ! m{ulib/copy.o}     }
+        grep { ! m{ulib/gen.o}      }
+        grep { ! m{ulib/gettime.o}  }
+        grep { ! m{ulib/isnull.o}   }
+        grep { ! m{ulib/node.o}     }
+        grep { ! m{ulib/pack.o}     }
+        grep { ! m{ulib/parse.o}    }
+        grep { ! m{ulib/splitmix.o} }
+        grep { ! m{ulib/unpack.o}   }
+        grep { ! m{ulib/unparse.o}  }
+        grep { ! m{ulib/util.o}     }
+        grep { ! m{ulib/xoshiro.o}  }
+        grep { ! m{uu_to_blib}      }
         filecheck()
     ;
     my $cnt = 0;

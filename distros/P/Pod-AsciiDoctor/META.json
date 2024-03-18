@@ -63,7 +63,7 @@
    "provides" : {
       "Pod::AsciiDoctor" : {
          "file" : "lib/Pod/AsciiDoctor.pm",
-         "version" : "0.102001"
+         "version" : "0.102002"
       }
    },
    "release_status" : "stable",
@@ -78,7 +78,7 @@
          "web" : "https://github.com/shlomif/Pod-AsciiDoctor"
       }
    },
-   "version" : "0.102001",
+   "version" : "0.102002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038002"

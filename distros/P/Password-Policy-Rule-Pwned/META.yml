@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,20 +23,22 @@ no_index:
 provides:
   Password::Policy::Exception::Pwned:
     file: lib/Password/Policy/Exception/Pwned.pm
-    version: '0.02'
+    version: '0.03'
   Password::Policy::Exception::PwnedError:
     file: lib/Password/Policy/Exception/PwnedError.pm
-    version: '0.02'
+    version: '0.03'
   Password::Policy::Rule::Pwned:
     file: lib/Password/Policy/Rule/Pwned.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   Digest::SHA: '0'
   LWP: '6.02'
   LWP::Protocol::https: '6.02'
-  Password::Policy: '0.04'
-  perl: '5.006000'
+  Password::Policy: '0.06'
+  String::Multibyte: '0'
+  perl: '5.008000'
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Password-Policy-Rule-Pwned
   repository: git://gitlab.com/openstrike/password-pwned.git
-version: '0.02'
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

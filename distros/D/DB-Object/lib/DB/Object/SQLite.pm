@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/SQLite.pm
-## Version v1.0.0
+## Version v1.1.0
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2023/11/17
+## Modified 2024/03/16
 ## All rights reserved
 ## 
 ## 
@@ -76,7 +76,7 @@ BEGIN
         },
     };
     our $PLACEHOLDER_REGEXP = qr/\?(?<index>\d+)/;
-    our $VERSION = 'v1.0.0';
+    our $VERSION = 'v1.1.0';
     use Devel::Confess;
 };
 
@@ -663,8 +663,7 @@ sub table_info
     my $self = shift( @_ );
     my $table = shift( @_ ) || 
     return( $self->error( "You must provide a table name to access the table methods." ) );
-    my $opts = {};
-    $opts = shift( @_ ) if( $self->_is_hash( $_[0] => 'strict' ) );
+    my $opts = $self->_get_args_as_hash( @_ );
     my $sql = <<'EOT';
 SELECT 
      name
@@ -677,7 +676,8 @@ EOT
     $sth->execute( $table ) || return( $self->error( "An error occured while executing query to check if table \"$table\" exists in database \"", $self->database, "\: ", $sth->errstr ) );
     my $all = $sth->fetchall_arrayref( {} );
     $sth->finish;
-    return( $all );
+    return( {} ) if( !scalar( @$all ) );
+    return( $all->[0] );
 }
 
 sub tables
@@ -1414,7 +1414,7 @@ DB::Object::SQLite - DB Object SQLite Driver
     
 =head1 VERSION
 
-    v1.0.0
+    v1.1.0
 
 =head1 DESCRIPTION
 
@@ -1863,7 +1863,25 @@ If the option I<type> is specified, this will return the equivalent property fro
 
 =head2 table_info
 
-This is the SQLite specific implementation to get the given table information.
+Provided with a table name and this will retrieve the table information as an hash reference.
+
+Otherwise, if nothing can be found, it returns an empty hash reference.
+
+It takes no optional parameters.
+
+Information retrieved are:
+
+=over 4
+
+=item * C<name>
+
+The table name
+
+=item * C<type>
+
+The object type, which may be one of: C<table>, C<view>, C<materialized view>, C<special>, C<foreign table>
+
+=back
 
 =head2 tables
 

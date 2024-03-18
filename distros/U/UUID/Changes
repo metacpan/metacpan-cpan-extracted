@@ -1,9 +1,29 @@
 Revision history for Perl extension UUID.
 
 ToDo:
-  - Remove old tests.
-  - Rebuilds under nmake 2 or 3 times.
-  - Port e2fs code to perl api.
+  - Version 3 and 5 UUIDs.
+
+0.33 Sat Mar 16 07:34:19 EDT 2024
+  - Removed most bundled e2fsprogs UUID code.
+  - Added :mac=random/unique to hide real MAC.
+  - Fixed finding mac address on native Win32 builds.
+  - Added version 6 and 7 UUIDs.
+  - Switched to ChaCha20 as RNG salted with Xoshiro256++.
+  - Added uuid1(), uuid4() to return strings directly.
+  - Added generate_v1() and generate_v4() for binaries.
+  - Fixed duplicate Win32 random UUIDs when > 1K/sec.
+  - Fixed Win32 v1 throttling when > 10K/sec.
+  - Fixed duplicate v1 UUIDs everywhere when > 10M/sec.
+  - Exposed persistent state function.
+  - Added :persist to make state path configurable.
+  - Fixed possible symlink attack on persistent file.
+  - Added generate_v0() and uuid0() to generate null UUIDs.
+  - Added benchmarks in tests.
+    > make test TEST_VERBOSE=1 TEST_FILES=t/9benchmark/*.t
+  - Added benchmark comparing version speeds, calling styles,
+    and persitence.
+    > make compare
+  - Now believed to be thread safe.
 
 0.32 Tue Dec 12 23:23:51 EST 2023
   - Expose uuid_type().

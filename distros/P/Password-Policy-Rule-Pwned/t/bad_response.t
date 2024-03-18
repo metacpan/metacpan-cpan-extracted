@@ -49,6 +49,7 @@ my $pp = Password::Policy->new (config => 't/stock.yaml');
 my $pass = 'password';
 my $encpw = encode ('UTF-8', $pass);
 for my $try (@urls) {
+	$SIG{__WARN__} = sub {};
 	$Password::Policy::Rule::Pwned::base_url = $try->{url};
 	throws_ok { $pp->process({ password => $encpw }) }
 		'Password::Policy::Exception::PwnedError',

@@ -4,8 +4,13 @@ NAME
 SYNOPSIS
     Command line tool:
 
-    system 'cutadapt' (list of arguments and options); system "cutadapt
-    (list of argumentns and options)"; # less safe
+     system 'cutadapt' (list of arguments and options);
+     system "cutadapt  (list of argumentns and options)"; # less safe
+
+    or you can even do this to maintain compatibility with the Alien tool
+    API
+
+     system Alien::SeqAlignment::cutadapt->exe (list of arguments and options)
 
 DESCRIPTION
     This distribution provides the python tool cutadapt so that it can be
@@ -15,11 +20,22 @@ DESCRIPTION
     package installer pipx to download and install cutadapt in an isolated
     environment for each user. Note that after installation one ends up with
     a tool that can be used from the shell (i.e. no need for Perl), hence
-    uninstalling the Perl module will not uninstall cutadapt or pipx.
+    uninstalling the Perl module will not uninstall cutadapt or pipx. If you
+    would like to uninstall cutadapt, then you should use pipx to uninstall
+    it as in:
+
+     pipx uninstall cutadapt.
 
     Note that the installation method of pipx varies by operating system.
     MacOS and Windows users should have working installations of homebrew
     and scoop respectively to use this Perl Alien module.
+
+METHODS
+  exe
+     Alien::SeqAlignment::cutadapt->exe
+
+    Returns the command name for running the CLI version of the cutadapt
+    CLI.
 
 SEE ALSO
     *   cutadapt <https://cutadapt.readthedocs.io/en/stable/index.html>

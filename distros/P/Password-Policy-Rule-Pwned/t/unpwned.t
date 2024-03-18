@@ -32,12 +32,14 @@ eval { require 5.008; 1; } and push @pw, 'Οὐχὶ ταὐτὰ';
 if ($ENV{NO_NETWORK_TESTING}) {
 	plan skip_all => 'NO_NETWORK_TESTING is set'
 } else {
-	plan tests => scalar @pw
+	plan tests => 2 * scalar @pw
 }
 
 my $pp = Password::Policy->new (config => 't/stock.yaml');
 for my $pass (@pw) {
 	my $encpw = encode ('UTF-8', $pass);
 	lives_and { is $pp->process({ password => $encpw }), $encpw }
-		"$encpw is not pwned"
+		"$encpw is not pwned when encoded";
+	lives_and { is $pp->process({ password => $pass }), $pass }
+		"$encpw is not pwned when decoded";
 }

@@ -1,15 +1,29 @@
 ---
-name: Date-Holidays-DK
-version: 0.03
-author: ~
-abstract: Determine Danish public holidays
+abstract: 'Determine Danish public holidays'
+author:
+  - 'Lars Thegler <lars@thegler.dk>. Originally inspired by'
+build_requires: {}
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
-requires:
-  Date::Easter: 0
-  Date::Simple: 0
-  Test::More: 0
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Date-Holidays-DK
 provides:
   Date::Holidays::DK:
     file: DK.pm
-    version: 0.03
-generated_by: Module::Build version 0.2611
+    version: '0.04'
+requires:
+  Date::Easter: '0'
+  Date::Simple: '0'
+  Test::More: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Date-Holidays-DK
+  homepage: https://metacpan.org/pod/Date::Holidays::DK
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/tagg/Date-Holidays-DK
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

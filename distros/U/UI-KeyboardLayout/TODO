@@ -1,3 +1,4 @@
+On FF in Latin, AltGr-' = inserts ∂≕ (with ∂ from Shift-Space ').  Did it work like this in 73???
 
 FF locks in Latin?!  Even with v73 compiled with klc2c — fixed by omitting OEM_8.  (Even pre-0.77)
 Same for Cyrillic in 0.77 (same fix).
@@ -22,12 +23,42 @@ L<Part IV|"Can an application on Windows accept keyboard events?  Part IV: appli
 So on older windows the keydown event of C<Alt> should be special-cased.  (Since all
 we want to find out is whether this event delivers a character, the answer is clear anyway!)
 
+---
 
+Redo back the advice on including bitmaps of lCtrl into rAlt???  Recheck the finite automaton???  Remove autostripper???  Observe:
+   Hitting 'a' before keyrepeat on rAlt triggers (with KLLF_ALTGR) gives bare rAlt (and an accelerator???):
+
+WM_KEYDOWN:         0x0012  0x61380001 Sc=e038 Rsrvd=0 CtrlAlt=C/A wasDn=1 goUp=0 [ⒸⒶCA] 1/-1 118,12
+WM_SYSKEYUP:        0x0011  0xE11D0001 Sc=e01d Rsrvd=0 CtrlAlt=-/A wasDn=1 goUp=1 [ⒶA] 1/-1 118,11
+WM_SYSKEYDOWN:      0x0041  0x201E0001   Sc=1e Rsrvd=0 CtrlAlt=-/A wasDn=0 goUp=0 [ⒶA =A] 1/-1 118,41
+WM_SYSCHAR:     <æ> 0x00E6  0x201E0001   Sc=1e Rsrvd=0 CtrlAlt=-/A wasDn=0 goUp=0 [ⒶA =A] 1/-1 118,e6
+     Unexpected accelator!!
+WM_SYSKEYUP:        0x0011  0xA01D0001   Sc=1d Rsrvd=0 CtrlAlt=-/A wasDn=0 goUp=1 [ⒶA =A] 1/-1 119,11
+WM_KEYUP:           0x0012  0xC1380001 Sc=e038 Rsrvd=0 CtrlAlt=?/- wasDn=1 goUp=1 [=A] 1/-1 119,12
+WM_KEYUP:           0x0041  0xC01E0001   Sc=1e Rsrvd=0 CtrlAlt=?/- wasDn=1 goUp=1 1/-1 119,41
+
+---
+
+Error handling if could not create/subclass etc???
+Why reset is not happening???   It seems that after recieving -1 from Check_K… it should never be
+called again — but it is???
+
+  Switch up→first should depend on rMenu_down ???
+  Unclear: If rMenu_down withough rCtrl_down (but it might have been down before!); keyrepeat of rMenu?
+
+  Triggering check_KLLFA on lCtrl down is not thought out.
+
+Add combination with Ctrl on AltGr — but this defeats the “bullet-proof” method!
 
 ============================================ Pre-v0.77 or generic
 
 The “consumption” of the bitmap of lCtrl into rAlt leads to complications in the new “bullet-proof method”.  Avoid!
 					DONE
+
+In two windows with Latin layouts (here Compose Compose m a p produces ↦) do (1st row, then the 2nd row):
+  W1: Compose Compose m   switch-to-ru    д AltGr-' ф		gives дғ
+  W2: a p							gives ↦
+This cannot be combined: if one does it in one window (switching back to LA) then the result is "ap"!
 
 Customize stripping common-with-lC bits from rA: allow forcing a particular flag.
 

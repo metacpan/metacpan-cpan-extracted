@@ -1,0 +1,189 @@
+: ######################################################
+: # we are receiving 2 hashes: 'data' and 'private'
+: # data will contain authors etc.
+: # private will contain filepath of template file etc.
+: ######################################################
+% based on https://www.overleaf.com/latex/templates/un-periodico/hhwxyzvcrpgk
+% modified by bliako
+
+\documentclass[letterpaper,twoside,12pt]{article}
+\usepackage[greek]{babel}
+\usepackage[Greek,Latin]{ucharclasses}
+%\usepackage[export]{adjustbox}
+\usepackage{wrapfig}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{anysize}
+\usepackage{fontspec}
+\usepackage{lineno}
+
+%\usepackage{etoolbox}
+%\makeatletter
+%\patchcmd{\Ginclude@eps}{"#1"}{#1}{}{}
+%\makeatother
+
+\usepackage{polyglossia}
+\setdefaultlanguage{greek}
+\setotherlanguages{english}
+% this kills the stack why?
+%\setTransitionsForGreek{\selectlanguage{greek}}{\selectlanguage{english}}
+
+\setlength\columnsep{30pt} %space between columns
+\renewcommand{\familydefault}{\sfdefault}
+
+% MÁRGINS
+\marginsize{30pt}{30pt}{10pt}{20pt}
+
+% FONTS
+\usepackage{fontspec}
+\setmainfont[Kerning=On,Mapping=tex-text]{GFS Artemisia} 
+%\setmainfont{GFS Philostratos}
+%\setsansfont{GFS Didot}
+\setsansfont{GFS Bodoni}
+\newfontfamily\greekfont[Script=Greek]{GFS Neohellenic}
+\newfontfamily\greekfontsf[Script=Greek]{GFS Bodoni}
+
+%\newfontface\mytitle{GFS Artemisia}[Contextuals={WordInitial,WordFinal}]
+\newfontface\mytitle{GFS Artemisia} 
+%
+
+% our own macros
+
+\newcommand{\mycaption}[1]{%
+	\usefont{T1}{augie}{m}{n} 	
+	\small #1 \vspace{4pt}
+	\par \normalsize \normalfont
+}
+		
+% insert a figure(1:filename, 2:width (0-1 percent of textwidth),
+% 3:angle-rotate (0 is no rotate), 4:caption
+\newcommand{\insfig}[4]{%
+	\begin{center}
+	\begin{minipage}[h]{1.0\linewidth}
+%		\begin{wrapfigure}{l}{1.0\linewidth}
+			\includegraphics[width=#2\linewidth,angle=#3]{#1}
+%			\\
+			\mycaption{#4}
+%		\end{wrapfigure}
+	\end{minipage}
+	\end{center}
+}
+
+% let's go (love you LaTeXXXX)
+
+: # WARNING WARNING WARNING use mark_raw as this idiot escapes everything (why?)
+
+\begin{document}
+
+\pagenumbering{gobble}
+
+%%% HEADER
+\begin{minipage}[h]{1.0\linewidth}
+\begin{center}
+%%% TITLE
+\mytitle {\Huge <: $data.title | mark_raw :>}\\
+%%% TITLE
+\rule[0mm]{200mm}{0.2mm}
+\vspace{-8mm}
+\begin{multicols}{3}
+%%% SUBTITLE - LEFT
+\begin{flushleft}
+<: $data.subtitleleft | mark_raw :>
+\end{flushleft}
+%%% SUBTITLE - CENTRE
+\begin{center}
+<: $data.subtitlemiddle | mark_raw :>
+\end{center}
+%%% SUBTITLE - RIGHT
+\begin{flushright}
+<: $data.subtitleright | mark_raw :>
+\end{flushright}
+\end{multicols}
+%%% END TITLE AND SUBTITLES
+\vspace{-2mm}
+\rule[10mm]{200mm}{0.5mm}
+\end{center}
+\end{minipage}
+%%% END TITLE
+
+\tableofcontents
+
+\newpage
+
+\pagenumbering{arabic}
+
+: for $data.articles -> $article {
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% BEGIN ARTICLE (<: $article.title | mark_raw :>)
+% url : <: $article.url | mark_raw :>
+% local file : <: $article.filename | mark_raw :>
+% basedir : <: $article.basedir | mark_raw :>
+% fetched on : <: $article.date | mark_raw :>
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection*{}
+\addcontentsline{toc}{section}{\protect\numberline{}<: $article.title | mark_raw :>}%
+%\vspace{-14mm}
+
+\begin{minipage}[h]{1.0\linewidth}
+
+%%% ARTICLE TITLE
+\begin{center}
+\begin{huge}
+\textbf{<: $article.title | mark_raw :>}
+\end{huge}
+\vspace{2mm}\\
+%%% ARTICLE SUBTITLE
+\textit{<: $article.subtitle | mark_raw :>}
+\end{center}
+
+\end{minipage}
+
+\begin{multicols}{2}
+\linenumbers
+\modulolinenumbers[10]
+
+:   for $article.items -> $item {
+
+:     if( $item.type == 'picture' ){
+
+: # this is a picture
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% BEGIN PICTURE (<: $item.caption | mark_raw :>)
+% url : <: $item.url | mark_raw :>
+% local file : <: $item.filename | mark_raw :>
+% basedir : <: $item.basedir | mark_raw :>
+% fetched on : <: $item.date | mark_raw :>
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\insfig {<: $item.filename | mark_raw :>}
+	{<: $item.widthpercent :>}
+	{<: $item.angle :>}
+	{<: $item.caption | mark_raw :>}
+:     } elsif( $item.type == 'text' ){
+
+: # this is text
+\par
+: $item.content | mark_raw
+
+:     } else {
+
+\par
+UNKNOWN item <: $item.type :>
+
+:     } # if type
+
+:   } # for each item of the article
+
+% colophon for the article
+\begin{flushright}
+\textit{<: $article.colophon | mark_raw :>}
+\end{flushright}
+
+\end{multicols} 
+
+\rule[10mm]{200mm}{0.5mm}
+
+: } # end for artitles loop
+
+\end{document}

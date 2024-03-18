@@ -60,6 +60,7 @@ use Zonemaster::LDNS::RR::RKEY;
 use Zonemaster::LDNS::RR::RP;
 use Zonemaster::LDNS::RR::RRSIG;
 use Zonemaster::LDNS::RR::RT;
+use Zonemaster::LDNS::RR::SIG;
 use Zonemaster::LDNS::RR::SINK;
 use Zonemaster::LDNS::RR::SOA;
 use Zonemaster::LDNS::RR::SPF;

@@ -1,0 +1,3 @@
+%% begin an author bio
+\AIMbio{<: $author.picture :>}{<: $author.bio :>}
+%% end author bio

@@ -1,8 +1,10 @@
-use Test::More;
-use Test::Fatal;
-
 use strict;
 use warnings;
+use Test::More;
+
+use MIME::Base64;
+use Test::Differences;
+use Test::Fatal;
 
 use_ok('Zonemaster::LDNS');
 
@@ -57,6 +59,36 @@ subtest "croak when stringifying packet with malformed CAA" => sub {
         $packet->string;
     };
     like( exception { $will_croak->() }, qr/^Failed to convert packet to string/ );
+};
+
+subtest "Answer section" => sub {
+    # Parse a packet with a single incomplete MX record
+    my $data = decode_base64( "EjSFgAABAAIAAAAAB2V4YW1wbGUCc2UAAA8AAcAMAA8AAQABUYAAAgAKwAwAAQABAAFRgAAEwAACAQ==");
+    my $p = Zonemaster::LDNS::Packet->new_from_wireformat( $data );
+
+    my $rr_count = scalar $p->answer;
+
+    is $rr_count, 1, "keep complete RRs but ignore incomplete ones";
+};
+
+subtest "Authority section" => sub {
+    # Parse a packet with a single incomplete MX record
+    my $data = decode_base64( "EjSFgAABAAAAAgAAB2V4YW1wbGUCc2UAAA8AAcAMAA8AAQABUYAAAgAKwAwAAQABAAFRgAAEwAACAQ==" );
+    my $p = Zonemaster::LDNS::Packet->new_from_wireformat( $data );
+
+    my $rr_count = scalar $p->authority;
+
+    is $rr_count, 1, "keep complete RRs but ignore incomplete ones";
+};
+
+subtest "Additional section" => sub {
+    # Parse a packet with a single incomplete MX record
+    my $data = decode_base64( "EjSFgAABAAAAAAACB2V4YW1wbGUCc2UAAA8AAcAMAA8AAQABUYAAAgAKwAwAAQABAAFRgAAEwAACAQ==" );
+    my $p = Zonemaster::LDNS::Packet->new_from_wireformat( $data );
+
+    my $rr_count = scalar $p->additional;
+
+    is $rr_count, 1, "keep complete RRs but ignore incomplete ones";
 };
 
 done_testing();

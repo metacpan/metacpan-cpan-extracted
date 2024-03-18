@@ -1,0 +1,122 @@
+\documentclass[letterpaper]{article}
+
+\usepackage[header]{aimatters}
+
+\usepackage{graphicx}
+
+% Complete the title and author information below
+\title{a test title}
+\author{
+  \AIMauthor{bozo}{nuthaus uk}{bozo at circus.eu}
+  \AIMauthor{Ali}{Democratic Elections Corp}{bongo at elysee}
+}
+
+
+% Add a bio for each author.  (These will appear at the end of the document.)
+% Note:  Due to quirks in the way LaTeX wraps text around figures, only use \textbf or \textem for emphasis in the bios; no other formatting commands!  (Specifically, don't use \bf, \em, etc.)
+\AIMbio{sigai.png}{after extensive work in the circus, Bozo has moved up.}
+\AIMbio{shakey.jpg}{inherited the democratic votes from his dadio and has been elected ever since.}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\newpage
+
+\begin{center}
+ \includegraphics[width=\linewidth]{shakey.jpg}
+\end{center}
+
+\section{a section title 1}
+\label{label:sec1}
+
+
+\par
+section 1 paragraph 1
+
+
+\par
+section 1 paragraph 2
+
+
+\subsection(a section 1 subsection title 1)
+\label{label:sec1:subsec1}
+
+
+\par
+section 1, subsection 1 paragraph 1
+
+
+\par
+section 1, subsection 1 paragraph 2
+
+
+\subsection(a section 1 subsection title 2)
+\label{label:sec1:subsec2}
+
+
+\par
+section 1, subsection 2 paragraph 1
+
+
+\par
+section 1, subsection 2 paragraph 2
+
+
+\subsection(a section 1, subsection title 3)
+\label{label:sec1:subsec3}
+
+
+\par
+section 1, subsection 3 paragraph 1
+
+
+\par
+section 1, subsection 3 paragraph 2
+
+
+\newpage % after each section
+\section{}
+
+
+\subsection(a section 2 subsection title 1)
+\label{label:sec2:subsec1}
+
+
+\par
+section 2, subsection 1 paragraph 1
+
+
+\par
+section 2, subsection 1 paragraph 2
+
+
+\subsection(a section 2 subsection title 2)
+\label{label:sec2:subsec2}
+
+
+\par
+section 2, subsection 2 paragraph 1
+
+
+\par
+section 2, subsection 2 paragraph 2
+
+
+\subsection(a section 2, subsection title 3)
+\label{label:sec2:subsec3}
+
+
+\par
+section 2, subsection 3 paragraph 1
+
+
+\par
+section 2, subsection 3 paragraph 2
+
+
+\newpage % after each section
+
+\end{document}

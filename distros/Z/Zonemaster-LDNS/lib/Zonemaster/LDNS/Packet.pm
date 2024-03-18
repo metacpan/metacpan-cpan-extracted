@@ -32,7 +32,9 @@ sub answer {
     my @records = $self->answer_unfiltered;
 
     for ( my $i = $#records ; $i >= 0 ; --$i ) {
-        if ( $records[$i]->type() eq 'DNSKEY' && $records[$i]->keysize() == -1 ) {
+        if ( !$records[$i]->check_rd_count()
+            || ( $records[$i]->type() eq 'DNSKEY' && $records[$i]->keysize() == -1 ) )
+        {
             splice @records, $i, 1;
         }
     }
@@ -45,6 +47,12 @@ sub authority {
 
     my @records = $self->authority_unfiltered;
 
+    for ( my $i = $#records ; $i >= 0 ; --$i ) {
+        if ( !$records[$i]->check_rd_count() ) {
+            splice @records, $i, 1;
+        }
+    }
+
     return @records;
 }
 
@@ -52,6 +60,12 @@ sub additional {
     my ( $self ) = @_;
 
     my @records = $self->additional_unfiltered;
+
+    for ( my $i = $#records ; $i >= 0 ; --$i ) {
+        if ( !$records[$i]->check_rd_count() ) {
+            splice @records, $i, 1;
+        }
+    }
 
     return @records;
 }

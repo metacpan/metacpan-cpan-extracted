@@ -29,6 +29,11 @@ use Pod::AsciiDoctor ();
         qr/reference \[Asciidoctor User Manual\]/,
         "hyperlink markup",
     );
+    like(
+        $adoc->adoc(),
+        qr/be able to do all this _with_ escape sequences/,
+        "Italic markup",
+    );
 
 }
 

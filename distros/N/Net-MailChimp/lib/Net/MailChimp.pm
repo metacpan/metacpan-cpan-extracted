@@ -9,7 +9,7 @@ package Net::MailChimp {
     use version;
     use v5.36;
 
-    our $VERSION = qv("v0.1.0");
+    our $VERSION = qv("v0.2.0");
 
     has endpoint_uri => ( is => 'ro', default => sub {
         'https://' . $_[0]->dc . '.api.mailchimp.com/' . $_[0]->api_version . '/'
@@ -47,10 +47,12 @@ package Net::MailChimp {
             },
             $datatransport => $reqargs
         )->result;
-        confess $res->message .': ' . $res->body
-            if !$res->is_success && ($res->code < 400 || $res->code >= 500);
 
-        return { httpstatus => $res->code } if $res->code > 299; # These should be managed by caller
+        # We have the caller handle errors, as some like 400-not_found can happen
+        if ( !$res->is_success ) {
+            return { httpstatus => $res->code, message => $res->body };
+        }
+
         return $res->json;
     }
 
@@ -90,7 +92,8 @@ Net::MailChimp - Perl library with MINIMAL interface to use MailChimp API.
     my $mailhash = $mc->md5address('test@test.com');
 
     my $res = $mch->request('lists/00000/members/'.$mailhash, 'GET');
-    say 'Email-not-found' if $res->{httpstatus} == 404;
+    # The module will never die, as most MailChimp errors require processing by the caller
+    say $res->{message} if $res->{httpstatus};
     say $res->{status}; # subscribed, pending, unsubscribed, cleaned
 
     $mch->request('lists/00000/members/',  'POST', {
@@ -99,10 +102,10 @@ Net::MailChimp - Perl library with MINIMAL interface to use MailChimp API.
             status      => 'pending',
             merge_fields => {
                 FNAME       => 'Test1',
-                LNAME       => 'Test2'
             }
         }
     });
+
 
 =head1 DESCRIPTION
 

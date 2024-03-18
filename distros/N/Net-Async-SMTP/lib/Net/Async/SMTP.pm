@@ -3,15 +3,11 @@ package Net::Async::SMTP;
 use strict;
 use warnings;
 
-our $VERSION = '0.002';
+our $VERSION = '0.004';
 
 =head1 NAME
 
 Net::Async::SMTP - email sending with IO::Async
-
-=head1 VERSION
-
-version 0.002
 
 =head1 SYNOPSIS
 
@@ -71,8 +67,9 @@ __END__
 
 =head1 AUTHOR
 
-Tom Molesworth <cpan@entitymodel.com>
+Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2010-2014. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2010-2024. Licensed under the same terms as Perl itself.
+

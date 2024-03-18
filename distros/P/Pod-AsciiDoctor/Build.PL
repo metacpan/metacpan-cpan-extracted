@@ -18,7 +18,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "Pod-AsciiDoctor",
-  "dist_version" => "0.102001",
+  "dist_version" => "0.102002",
   "license" => "apache",
   "module_name" => "Pod::AsciiDoctor",
   "recursive_test_files" => 1,

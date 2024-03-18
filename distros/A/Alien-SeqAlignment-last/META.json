@@ -1,0 +1,104 @@
+{
+   "abstract" : "find, build and install the last tools",
+   "author" : [
+      "Christos Argyropoulos <chrisarg@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-SeqAlignment-last",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Build" : "0.32",
+            "Alien::Build::MM" : "0.32",
+            "ExtUtils::MakeMaker" : "6.52"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Build" : "2.70",
+            "Alien::Build::MM" : "0.32",
+            "Capture::Tiny" : "0",
+            "Carp" : "0",
+            "ExtUtils::MakeMaker" : "6.52",
+            "File::Copy" : "0",
+            "File::Copy::Recursive" : "0",
+            "HTTP::Tiny" : "0",
+            "Path::Tiny" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "perl" : "5.006"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "0.038",
+            "parent" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.52",
+            "File::Spec" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::SeqAlignment::last" : {
+         "file" : "lib/Alien/SeqAlignment/last.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/chrisarg/alien-seqalignment-last",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/chrisarg/alien-seqalignment-last.git",
+         "web" : "https://github.com/chrisarg/alien-seqalignment-last"
+      },
+      "x_IRC" : "irc://irc.perl.org/#native"
+   },
+   "version" : "0.01",
+   "x_alienfile" : {
+      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.32",
+      "requires" : {
+         "share" : {},
+         "system" : {}
+      }
+   },
+   "x_generated_by_perl" : "v5.38.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

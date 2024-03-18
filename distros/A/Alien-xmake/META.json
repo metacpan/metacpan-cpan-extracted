@@ -5,7 +5,7 @@
       "Sanko Robinson <sanko@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.22",
+   "generated_by" : "Minilla/v3.1.23",
    "license" : [
       "artistic_2"
    ],
@@ -29,6 +29,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
+            "Archive::Tar" : "0",
             "CPAN::Meta" : "0",
             "File::Basename" : "0",
             "File::Spec::Functions" : "0",
@@ -68,14 +69,14 @@
       "test" : {
          "requires" : {
             "File::Temp" : "0",
-            "Test::More" : "0.98"
+            "Test2::V0" : "0"
          }
       }
    },
    "provides" : {
       "Alien::xmake" : {
          "file" : "lib/Alien/xmake.pm",
-         "version" : "0.01"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -90,7 +91,7 @@
          "web" : "https://github.com/sanko/Alien-xmake"
       }
    },
-   "version" : "0.01",
+   "version" : "0.05",
    "x_authority" : "cpan:SANKO",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 0

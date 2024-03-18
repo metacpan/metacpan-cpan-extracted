@@ -21,7 +21,7 @@ use vars qw($VERSION);
 use constant DEFAULT_CACHE_TTL => 3600;
 use strict;
 
-$VERSION = 0.21;
+$VERSION = 0.22;
 
 =pod
 
@@ -280,6 +280,8 @@ sub query {
 }
 
 =pod
+
+=head2 Determining object existence
 
     $exists = $rdap->exists($object);
 
@@ -551,10 +553,17 @@ sub request {
 
 =head2 Performing Searches
 
-RDAP supports a limited search capability, but you need to know in
-advance which RDAP server you want to send the search query to. The
-L<Net::RDAP::Service> class allows you to prepare and submit search
-queries to specific RDAP servers.
+    my $svc = Net::RDAP::Service->new('https://www.example.com/rdap');
+
+    # $result is a Net::RDAP::SearchResult
+    my $result = $svc->domains('name' => 'ex*mple.com');
+
+RDAP supports a limited search capability, but you need to know in advance which
+RDAP server you want to send the search query to.
+
+The L<Net::RDAP::Service> class allows you to prepare and submit search queries
+to specific RDAP servers. For more information, please see the documentation for
+that module.
 
 =head2 RDAP User Agent
 
@@ -579,8 +588,8 @@ sub ua {
     $self->{'ua'} = Net::RDAP::UA->new if (!defined($self->{'ua'}));
 
     #
-    # inject our UA object into NET::RDAP::Registry and NET::RDAP::Values so everything
-    # uses the same user agent
+    # inject our UA object into NET::RDAP::Registry and NET::RDAP::Values so
+    # everything uses the same user agent
     #
     $NET::RDAP::Registry::UA = $NET::RDAP::Registry::Values = $self->{'ua'};
 
@@ -715,7 +724,7 @@ Protocol (RDAP) Object Tagging
 
 =head1 COPYRIGHT
 
-Copyright CentralNic Ltd. All rights reserved.
+Copyright 2018-2023 CentralNic Ltd, 2024 Gavin Brown. All rights reserved.
 
 =head1 LICENSE
 

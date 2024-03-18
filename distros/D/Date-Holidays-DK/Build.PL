@@ -9,4 +9,11 @@ Module::Build->new(
               },
   license => 'perl',
   create_makefile_pl => 'traditional',
+  meta_merge => {
+    resources => {
+            homepage   => 'https://metacpan.org/pod/Date::Holidays::DK',
+            bugtracker => 'http://rt.cpan.org/NoAuth/Bugs.html?Dist=Date-Holidays-DK',
+            repository => 'https://github.com/tagg/Date-Holidays-DK',
+    }
+  },
 )->create_build_script;

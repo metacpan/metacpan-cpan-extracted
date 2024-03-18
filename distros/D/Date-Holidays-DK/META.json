@@ -1,0 +1,51 @@
+{
+   "abstract" : "Determine Danish public holidays",
+   "author" : [
+      "Lars Thegler <lars@thegler.dk>. Originally inspired by"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4234",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Date-Holidays-DK",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Date::Easter" : "0",
+            "Date::Simple" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Date::Holidays::DK" : {
+         "file" : "DK.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Date-Holidays-DK"
+      },
+      "homepage" : "https://metacpan.org/pod/Date::Holidays::DK",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/tagg/Date-Holidays-DK"
+      }
+   },
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

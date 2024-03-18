@@ -1,7 +1,7 @@
 use alienfile;
 use strict;
 use warnings;
-
+use Data::Dump qw(dump);
 configure sub {
 
 ## find out of pipx is actually installed
@@ -60,6 +60,7 @@ probe sub {
 };
 
 sys sub {
+
     ##find out if cutadapt is actually installed
     my $cmd = `pipx environment`;
     $cmd = `cutadapt --help`;
@@ -69,6 +70,11 @@ sys sub {
     unless ($is_cutadapt_installed) {
         system 'pipx install cutadapt';
     }
+
 };
 
+gather sub {
+    my ($build) = @_;
+    $build->runtime_prop->{command}= 'cutadapt';
+};
 1;

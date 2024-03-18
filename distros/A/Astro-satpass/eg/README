@@ -36,9 +36,10 @@ convert_tle
 
 iss
     This Perl script uses Astro::SpaceTrack (not included) to download
-    orbital data from http://spaceflight.nasa.gov/realdata/elements/ and
-    predict visibility for the next week from the given location, which
-    is hard-coded as 80 Wellington Street Ottawa Ontario Canada.
+    orbital data for the International Space Station and the Chinese
+    Space Station, and predict visibility for the next week from the
+    given location, which is hard-coded as 80 Wellington Street Ottawa
+    Ontario Canada.
 
 maidenhead
     This Perl script converts posiitons between latitude/longitude and

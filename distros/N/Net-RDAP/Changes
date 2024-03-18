@@ -1,4 +1,7 @@
-Revision history for perl module Net::RDAP
+Revision history for perl module Net::RDAP:
+
+0.22 - 2024-03-18
+  - add TO_JSON() method to Net::RDAP::Base so all RDAP objects can be reserialized back into JSON (see https://github.com/gbxyz/perl-net-rdap/issues/3).
 
 0.21 - 2024-03-15
   - add special case for the root zone entry (see RFC 9224 § 4)

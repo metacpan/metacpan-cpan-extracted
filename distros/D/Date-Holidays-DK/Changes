@@ -1,5 +1,9 @@
 Revision history for Perl extension Date::Holidays::DK.
 
+0.04  17-mar-2024
+  - "Store Bededag" no longer a holiday after 2023 (jonasbn)
+  - Use utf8
+
 0.03  28-oct-2005
   - Fixed typo
   - Don't require Test::Pod module

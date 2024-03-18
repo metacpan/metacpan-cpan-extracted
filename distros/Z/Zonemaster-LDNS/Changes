@@ -1,5 +1,19 @@
 Release history for Zonemaster component Zonemaster-LDNS
 
+4.0.0 2024-03-18 (public release version)
+
+ [Breaking change]
+ - Fix crashing induced by Zonemaster::LDNS::RR::NSEC3::salt()
+   method (#177)
+ - Fix other methods in Zonemaster::LDNS::RR::NSEC3 and
+   ::NSEC3PARAM (#178)
+
+ [Fixes]
+ - Ignore incomplete RRs (#136)
+ - Validate inputs to Zonemaster::LDNS::RR::NSEC3::covers()
+   (#176)
+
+
 3.2.0 2023-06-21 (public fix version)
  [Feature]
  - Expand DNAME support (#170)

@@ -124,6 +124,7 @@ configure_requires 'Module::Install::XSUtil';
 test_requires 'JSON::PP';
 test_requires 'Test::Fatal';
 test_requires 'Test::More' => 1.302015;
+test_requires 'MIME::Base32';
 
 use_ppport 3.19;
 cc_include_paths 'include';

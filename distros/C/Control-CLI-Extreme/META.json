@@ -35,7 +35,7 @@
    "provides" : {
       "Control::CLI::Extreme" : {
          "file" : "lib/Control/CLI/Extreme.pm",
-         "version" : "1.11"
+         "version" : "1.12"
       }
    },
    "release_status" : "stable",
@@ -50,6 +50,6 @@
          "url" : "https://github.com/lgastevens/Control-CLI-Extreme"
       }
    },
-   "version" : "1.11",
+   "version" : "1.12",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

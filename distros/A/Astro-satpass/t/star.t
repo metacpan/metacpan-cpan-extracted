@@ -9,7 +9,6 @@ use Astro::Coord::ECI;
 use Astro::Coord::ECI::Star;
 use Astro::Coord::ECI::Utils qw{ :greg_time deg2rad PI };
 use My::Module::Test qw{ tolerance };
-use POSIX qw{strftime floor};
 use Test::More 0.88;
 
 use constant LIGHTYEAR2KILOMETER => 9.4607e12;

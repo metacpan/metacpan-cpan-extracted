@@ -229,22 +229,24 @@ package Astro::Coord::ECI::TLE;
 use strict;
 use warnings;
 
-our $VERSION = '0.130';
+our $VERSION = '0.131';
 
 use base qw{ Astro::Coord::ECI Exporter };
 
 use Astro::Coord::ECI::Utils qw{ :params :ref :greg_time deg2rad distsq
     dynamical_delta embodies find_first_true fold_case
     __format_epoch_time_usec
-    format_space_track_json_time load_module looks_like_number max min
-    mod2pi PI PIOVER2 rad2deg SECSPERDAY TWOPI thetag __default_station
+    format_space_track_json_time gm_strftime load_module local_strftime
+    looks_like_number max min
+    mod2pi PI PIOVER2 rad2deg SECSPERDAY TWOPI thetag
+    __default_station
     @CARP_NOT
     };
 
 use Carp qw{carp croak confess};
 use Data::Dumper;
 use IO::File;
-use POSIX qw{ ceil floor fmod modf strftime };
+use POSIX qw{ ceil floor fmod modf };
 use Scalar::Util ();
 
 BEGIN {
@@ -1843,15 +1845,15 @@ eod
 		[ $sat_set, PASS_EVENT_SET ],
 	    ;
 
-	    warn <<eod if $debug;	## no critic (RequireCarping)
+	    warn <<"EOD" if $debug;	## no critic (RequireCarping)
 
-Debug - Computed @{[strftime '%d-%b-%Y %H:%M:%S', localtime $time[0][0]
+Debug - Computed @{[ local_strftime '%d-%b-%Y %H:%M:%S', $time[0][0]
 		    ]} $time[0][1]
-                 @{[strftime '%d-%b-%Y %H:%M:%S', localtime $time[1][0]
+                 @{[ local_strftime '%d-%b-%Y %H:%M:%S', $time[1][0]
 		    ]} $time[1][1]
-                 @{[strftime '%d-%b-%Y %H:%M:%S', localtime $time[2][0]
+                 @{[ local_strftime '%d-%b-%Y %H:%M:%S', $time[2][0]
 		    ]} $time[2][1]
-eod
+EOD
 
 	    # Because we relaxed the detection criteria to be sure we
 	    # caught all passes, we may have a pass that ended before
@@ -2079,8 +2081,8 @@ eod
 		};
 
 		warn <<"EOD" if $debug;	## no critic (RequireCarping)
-	    $time[$#time][1] @{[strftime '%d-%b-%Y %H:%M:%S',
-		localtime $time[$#time][0]]}
+	    $time[$#time][1] @{[ local_strftime '%d-%b-%Y %H:%M:%S',
+		$time[$#time][0]]}
 EOD
 	    }
 
@@ -6786,7 +6788,7 @@ sub sgp4r {
 		    $self->get($thing))) {
 		local $@ = undef;
 		my $diag = eval {
-		    strftime( "$thing = $tfmt", gmtime $value ) };
+		    gm_strftime( "$thing = $tfmt", $value ) };
 		defined $diag or $diag = "$thing = $value";
 		push @data, $diag;
 	    } else {
@@ -7243,7 +7245,7 @@ NORAD ID: @{[$self->get ('id')]}
 EOD
     if (defined (my $effective = $self->get('effective'))) {
 	$result .= <<EOD;
-    Effective date: @{[strftime $dtfmt, gmtime $effective]} GMT
+    Effective date: @{[ gm_strftime $dtfmt, $effective]} GMT
 EOD
     }
     $result .= <<EOD;
@@ -7910,11 +7912,14 @@ sub _looks_like_real {
 
 sub __make_tle_epoch {
     my ( $self ) = @_;
-    my $epoch = $self->get('epoch');
-    my $epoch_dayfrac = sprintf '%.8f', ($epoch / SECSPERDAY);
-    $epoch_dayfrac =~ s/.*?\././;
-    my $epoch_daynum = strftime '%y%j', gmtime ($epoch);
-    return $epoch_daynum . $epoch_dayfrac;
+    my $raw_epoch = $self->get( 'epoch' );
+    my $cooked_epoch = floor( $raw_epoch );
+    my ( $sec, $min, $hr, undef, undef, $year, undef, $yday ) =
+	gmtime $cooked_epoch;
+    my $epoch_dayfrac = ( ( $hr * 60 + $min ) * 60 + $sec + $raw_epoch -
+	$cooked_epoch ) / SECSPERDAY;
+    return sprintf '%02d%03d.%08d', $year % 100, $yday + 1,
+	$epoch_dayfrac * 100_000_000 + 0.5;
 }
 
 #	$output = _make_tle_checksum($fmt ...);
@@ -8173,12 +8178,12 @@ sub _next_elevation_screen {
 #
 #   $ tools/heavens-above-mag --celestrak
 #
-# Last-Modified: Tue, 26 Sep 2023 01:23:57 GMT
+# Last-Modified: Wed, 14 Feb 2024 17:56:43 GMT
 
 # The following constants are unsupported, and may be modified or
 # revoked at any time. They exist to support
 # xt/author/magnitude_status.t
-use constant _CELESTRAK_VISUAL => 'Tue, 26 Sep 2023 01:23:57 GMT';
+use constant _CELESTRAK_VISUAL => 'Wed, 14 Feb 2024 17:56:43 GMT';
 use constant _MCCANTS_VSNAMES  => undef;
 use constant _MCCANTS_QUICKSAT => undef;
 
@@ -8201,7 +8206,7 @@ use constant _MCCANTS_QUICKSAT => undef;
   '08459' =>   5.2, # SL-8 R/B
   '10114' =>   4.7, # SL-3 R/B
   '10967' =>   3.2, # SEASAT 1
-  '11251' =>   4.7, # METEOR 1-29
+# '11251' => undef, # METEOR 1-29 has no recorded magnitude
   '11267' =>   4.7, # SL-14 R/B
   '11574' =>   4.2, # SL-8 R/B
   '11672' =>   4.2, # SL-14 R/B
@@ -8251,7 +8256,6 @@ use constant _MCCANTS_QUICKSAT => undef;
   '19650' =>   2.7, # SL-16 R/B
   '20261' =>   5.2, # INTERCOSMOS 24
   '20262' =>   5.7, # SL-14 R/B
-  '20303' =>   4.2, # DELTA 2 R/B(1)
   '20323' =>   4.7, # DELTA 1 R/B
   '20443' =>   4.2, # ARIANE 40 R/B
   '20453' =>   4.7, # DELTA 2 R/B(1)
@@ -8286,7 +8290,7 @@ use constant _MCCANTS_QUICKSAT => undef;
   '23088' =>   2.7, # SL-16 R/B
   '23343' =>   2.7, # SL-16 R/B
   '23405' =>   2.7, # SL-16 R/B
-  '23560' =>   3.7, # ERS 2
+# '23560' => undef, # ERS 2 has no recorded magnitude
   '23561' =>   3.7, # ARIANE 40+ R/B
   '23705' =>   2.7, # SL-16 R/B
   '24298' =>   2.7, # SL-16 R/B
@@ -8812,7 +8816,7 @@ Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2023 by Thomas R. Wyant, III
+Copyright (C) 2005-2024 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

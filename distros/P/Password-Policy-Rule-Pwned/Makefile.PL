@@ -3,7 +3,7 @@ use strict;
 use warnings;
 require 5.6.0;
 
-my $release = '0.02';
+my $release = '0.03';
 my %MF = (
 	NAME            => 'Password::Policy::Rule::Pwned',
 	ABSTRACT        => 'Compare text to known pwned passwords list',
@@ -36,12 +36,13 @@ my %MF = (
 			},
 		},
 	},
-	MIN_PERL_VERSION => '5.6.0',
+	MIN_PERL_VERSION => '5.8.0',
 	PREREQ_PM        => {
-		'Password::Policy'     => '0.04',
+		'Password::Policy'     => '0.06',
 		'LWP'                  => '6.02',
 		'LWP::Protocol::https' => '6.02',
 		'Digest::SHA'          => '0',
+		'String::Multibyte'    => '0',
 	},
 	TEST_REQUIRES    => {
 		'Test::More'	  => '0.84',
@@ -54,6 +55,19 @@ my %MF = (
 		SUFFIX   => 'gz'
 	}
 );
+
+# Extra tests
+if ($ENV{RELEASE_TESTING}   ||
+	$ENV{AUTHOR_TESTING}) {
+	$MF{test} = { TESTS => 't/*.t xt/*/*.t' };
+	my $req = $MF{META_MERGE}{prereqs}{test}{requires};
+	$req->{'Test::Vars'}             = '0.12';
+	$req->{'Test::Kwalitee'}         = '1.28';
+	$req->{'Test::DistManifest'}     = '1.014';
+	$req->{'Test::Version'}          = '2.09';
+	$req->{'Test::NewVersion'}       = '0.003';
+	$req->{'Test::MinimumVersion'}   = '0.101082';
+}
 
 if ($ExtUtils::MakeMaker::VERSION lt 6.64) {
 	if ($ExtUtils::MakeMaker::VERSION ge 6.55) {

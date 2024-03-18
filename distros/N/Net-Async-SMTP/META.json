@@ -1,40 +1,48 @@
 {
    "abstract" : "SMTP support for IO::Async",
    "author" : [
-      "Tom Molesworth <tom@entitymodel.com>"
+      "Tom Molesworth <TEAM@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.014, CPAN::Meta::Converter version 2.140640",
+   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Net-Async-SMTP",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "share",
+         "shares",
+         "t",
+         "xt"
+      ]
+   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "perl" : "5.010001"
-         }
-      },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.48"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "develop" : {
          "requires" : {
-            "CPAN::Meta" : "2.120920",
-            "Encode" : "0",
-            "HTTP::Tiny" : "0",
-            "JSON" : "0",
-            "List::Util" : "0",
-            "Module::Metadata" : "0",
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::PluginBundle::Author::TEAM" : "0",
+            "Software::License::Perl_5" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::EOL" : "0",
+            "Test::MinimumVersion" : "0",
+            "Test::Mojibake" : "0",
             "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
             "Test::Pod" : "1.41",
-            "version" : "0"
+            "Test::Portability::Files" : "0",
+            "Test::Version" : "1"
          }
       },
       "runtime" : {
@@ -53,7 +61,11 @@
          }
       },
       "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
          "requires" : {
+            "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
@@ -63,14 +75,40 @@
          }
       }
    },
+   "provides" : {
+      "Net::Async::SMTP" : {
+         "file" : "lib/Net/Async/SMTP.pm",
+         "version" : "0.004"
+      },
+      "Net::Async::SMTP::Client" : {
+         "file" : "lib/Net/Async/SMTP/Client.pm",
+         "version" : "0.004"
+      },
+      "Net::Async::SMTP::Connection" : {
+         "file" : "lib/Net/Async/SMTP/Connection.pm",
+         "version" : "0.004"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-net-async-smtp at rt.cpan.org",
-         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Net-Async-SMTP"
+         "web" : "https://github.com/team-at-cpan/Net-Async-SMTP/issues"
       },
-      "homepage" : "http://search.cpan.org/dist/Net-Async-SMTP/"
+      "homepage" : "https://github.com/team-at-cpan/Net-Async-SMTP",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/team-at-cpan/Net-Async-SMTP.git",
+         "web" : "https://github.com/team-at-cpan/Net-Async-SMTP"
+      }
    },
-   "version" : "0.002"
+   "version" : "0.004",
+   "x_authority" : "cpan:TEAM",
+   "x_contributors" : [
+      "Tom Molesworth <tom@perlsite.co.uk>",
+      "Thomas Klausner <domm@plix.at>"
+   ],
+   "x_generated_by_perl" : "v5.38.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

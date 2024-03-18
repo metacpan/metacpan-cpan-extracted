@@ -1,0 +1,79 @@
+{
+   "abstract" : "Easily format content into PDF/PS/DVI with LaTeX templates.",
+   "author" : [
+      "Andreas Hadjiprocopis <bliako@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "LaTeX-Easy-Templates",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cwd" : "0",
+            "Data::Roundtrip" : "0.18",
+            "File::Basename" : "0",
+            "File::Copy::Recursive" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Filesys::DiskUsage" : "0",
+            "LaTeX::Driver" : "v1.0.0",
+            "Mojo::Log" : "0",
+            "Storable" : "0",
+            "Text::Xslate" : "v3.5.6",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Roundtrip" : "0.18",
+            "File::Basename" : "0",
+            "File::Compare" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "FindBin" : "0",
+            "Mojo::Log" : "0",
+            "Test::More" : "0",
+            "Test::More::UTF8" : "0",
+            "Text::Xslate" : "v3.5.6"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hadjiprocopis/LaTeX-Easy-Templates/issues"
+      },
+      "homepage" : "https://metacpan.org/module/LaTeX::Easy::Templates",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/hadjiprocopis/LaTeX-Easy-Templates",
+         "web" : "https://github.com/hadjiprocopis/LaTeX-Easy-Templates"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

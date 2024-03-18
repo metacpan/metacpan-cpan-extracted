@@ -2004,3 +2004,15 @@ got <0x30 00 0x65 00 0x31 00 0x32 00 0x33 00 0x34 0x20 0x20 0x20 0x20 0x20 0x20 
 
 	examples/dumper-msg.c
 		New file.  Do-only-trivial-reports initial implementation of untangling keyboard input.
+
+0.79
+	Clarify a bit in variable-VK-by-modifiers section of the docs.
+	Revert the advice to avoid including the bitmap for lCtrl into one for rAlt.  Clarify via an example.
+	Revert: remove the stripping of lC-flags from rA in MODIFIERS (but keep the useful part of the comment).
+	A few minor POD errors.
+	Document "literal" in the ComposeKey.
+	Ctrl-2 was not mentioned in the docs.
+		[Untested; released for update in the docs.]
+
+	examples/dumper-msg.c
+		Now almost works.  (Only the detection of lCtrl when rAlt is down is processed in a brain-damaged way.)

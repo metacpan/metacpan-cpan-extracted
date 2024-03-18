@@ -1,0 +1,104 @@
+\documentclass[letterpaper,twoside,12pt]{article}
+
+% let's go (love you LaTeXXXX)
+
+
+\begin{document}
+
+\tableofcontents
+
+\newpage
+
+my title is \textbf{ a test title }
+
+\section{a section title 1}
+\label{label:sec1}
+
+\par
+section 1 paragraph 1
+
+
+\par
+section 1 paragraph 2
+
+
+\subsection{a section 1 subsection title 1}
+\label{label:sec1:subsec1}
+
+
+\par
+section 1, subsection 1 paragraph 1
+
+
+\par
+section 1, subsection 1 paragraph 2
+
+
+\subsection{a section 1 subsection title 2}
+\label{label:sec1:subsec2}
+
+
+\par
+section 1, subsection 2 paragraph 1
+
+
+\par
+section 1, subsection 2 paragraph 2
+
+
+\subsection{a section 1, subsection title 3}
+\label{label:sec1:subsec3}
+
+
+\par
+section 1, subsection 3 paragraph 1
+
+
+\par
+section 1, subsection 3 paragraph 2
+
+
+
+\newpage % after each section
+\section{}
+
+\subsection{a section 2 subsection title 1}
+\label{label:sec2:subsec1}
+
+
+\par
+section 2, subsection 1 paragraph 1
+
+
+\par
+section 2, subsection 1 paragraph 2
+
+
+\subsection{a section 2 subsection title 2}
+\label{label:sec2:subsec2}
+
+
+\par
+section 2, subsection 2 paragraph 1
+
+
+\par
+section 2, subsection 2 paragraph 2
+
+
+\subsection{a section 2, subsection title 3}
+\label{label:sec2:subsec3}
+
+
+\par
+section 2, subsection 3 paragraph 1
+
+
+\par
+section 2, subsection 3 paragraph 2
+
+
+
+\newpage % after each section
+
+\end{document}

@@ -1,0 +1,7 @@
+Revision history for Intellexer::API
+0.91 Sun Mar 17 17:00:00 2024
+     - updated POD
+0.9  Wed Feb 28 11:05:09 2024
+     - adding dist.ini 
+     - created ./lib, ./t
+     - stubbed out initial test, t/01-basic.t

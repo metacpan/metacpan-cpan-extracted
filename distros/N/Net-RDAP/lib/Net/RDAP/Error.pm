@@ -42,7 +42,7 @@ sub description { $_[0]->{'description'} ? @{$_[0]->{'description'}} : () }
 
 =head1 COPYRIGHT
 
-Copyright CentralNic Ltd. All rights reserved.
+Copyright 2018-2023 CentralNic Ltd, 2024 Gavin Brown. All rights reserved.
 
 =head1 LICENSE
 

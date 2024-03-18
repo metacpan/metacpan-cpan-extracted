@@ -19,7 +19,7 @@ name: Data-Dump-HTML-Collapsible
 provides:
   Data::Dump::HTML::Collapsible:
     file: lib/Data/Dump/HTML/Collapsible.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   B::Deparse: '0'
   Exporter: '5.57'
@@ -33,7 +33,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Dump-HTML-Collapsible
   homepage: https://metacpan.org/release/Data-Dump-HTML-Collapsible
   repository: git://github.com/perlancar/perl-Data-Dump-HTML-Collapsible.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.038002'

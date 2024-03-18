@@ -1,0 +1,8 @@
+: # This now should include many hello
+Many hellos:
+
+: for $data.names -> $aname {
+:   include "subdir/hello-in-subdir.txt.tx" { name => $aname }
+: }
+
+this is the end.

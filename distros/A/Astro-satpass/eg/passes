@@ -8,14 +8,13 @@ use 5.006002;
 use Astro::Coord::ECI;
 use Astro::Coord::ECI::TLE qw{ :constants };
 use Astro::Coord::ECI::TLE::Set;
-use Astro::Coord::ECI::Utils qw{ deg2rad rad2deg };
+use Astro::Coord::ECI::Utils qw{ deg2rad gm_strftime local_strftime rad2deg };
 use Astro::SpaceTrack 0.052;
 use Getopt::Long 2.32;
 use Pod::Usage;
-use POSIX qw{ strftime };
 use Time::Local;
 
-our $VERSION = '0.130';
+our $VERSION = '0.131';
 
 # Map -want-events values to TLE event codes.
 my %wanted_event_map = (
@@ -34,16 +33,16 @@ my %delta_number_up = (
 
 # Option values, with defaults.
 my %opt = (
-    'body-template'	=> '%N%t',
-    'dump-headers'	=> 0,
-    'event-template'	=> '%V %L %T',
+    body_template	=> '%N%t',
+    dump_headers	=> 0,
+    event_template	=> '%V %L %T',
     finish		=> '+7',
     geometric		=> 0,
     height		=> 0,
     horizon		=> 0,
     join		=> '%n%t',
     start		=> 'today',
-    'time-format'	=> '%d-%b-%Y %H:%M:%S',
+    time_format		=> '%d-%b-%Y %H:%M:%S',
     twilight		=> 6,
     'want-events'	=> 'rmltb',
 );
@@ -52,11 +51,13 @@ my %opt = (
 my @lgl_opt = (
     'help|?' => sub { pod2usage( { verbose => 2 } ) },
     qw{
-	body-template=s dump-headers event-template=s finish=s
+	body_template|body-template=s dump_headers|dump-headers
+	event_template|event-template=s finish=s
 	geometric! gmt!  height=f horizon=f
 	identity|spacetrack_identity|spacetrack-identity!
 	join=s latitude=f
-	longitude=f password=s split start=s time-format=s twilight=f
+	longitude=f password=s split start=s
+	time_format|time-format=s twilight=f
 	username=s want-events=s visible!
     }
 );
@@ -128,7 +129,7 @@ my $st = Astro::SpaceTrack->new(
 	    password => $opt{password},
 	)
     ),
-    dump_headers => ( $opt{'dump-headers'} ? 15 : 0 ),
+    dump_headers => ( $opt{dump_headers} ? 15 : 0 ),
     with_name => 1,
 );
 
@@ -199,8 +200,8 @@ my $join = template( $opt{join} );
 foreach my $data ( sort { $a->{time} <=> $b->{time} } @events_found ) {
     defined $data->{event}
 	and $up += ( $delta_number_up{ $data->{event} } || 0 );
-    print template( $opt{'body-template'}, $data ), join( $join,
-	map { template( $opt{'event-template'}, $_ ) }
+    print template( $opt{body_template}, $data ), join( $join,
+	map { template( $opt{event_template}, $_ ) }
 	$opt{split} ? $data : grep { $want_event{$_->{event}} } @{
 	    $data->{events} }
     ), "\n";
@@ -212,8 +213,8 @@ foreach my $data ( sort { $a->{time} <=> $b->{time} } @events_found ) {
 # Format the time appropriately.
 sub format_time {
     my ( $time ) = @_;
-    return strftime( $opt{'time-format'},
-	( $opt{gmt} ? gmtime $time : localtime $time ) );
+    return $opt{gmt} ? gm_strftime( $opt{time_format}, $time ) :
+	local_strftime( $opt{time_format}, $time );
 }
 
 # load_file( $file_name );
@@ -406,9 +407,9 @@ C<-finish> options.
 
 Output is controlled by a templating system. In general the output line
 consists of satellite-specific data followed by event-specific data. The
-satellite-specific data are specified by the C<-body-template> option.
-The event-specific data are specified by the C<-event-template> option.
-Time formats (for C<strftime(3)>) are set using the C<-time-format>
+satellite-specific data are specified by the C<--body-template> option.
+The event-specific data are specified by the C<--event-template> option.
+Time formats (for C<strftime(3)>) are set using the C<--time-format>
 option.  The string used to separate multiple events on the same line is
 specified by the C<-join> option.
 
@@ -434,19 +435,19 @@ sets separately, use C<-split>.
 
 =over
 
-=item -body-template template_string
+=item --body-template template_string
 
 This option specifies the template used to insert information about the
 satellite into the output. The templating system is described under the
-C<-event-template> option, below.
+C<--event-template> option, below.
 
 The %a (azimuth) and %e (elevation) specifications do nothing useful in
-a C<-body-template>.
+a C<--body-template>.
 
 The default is '%N%t' (i.e. the name of the satellite, followed by a
 horizontal tab).
 
-=item -event-template output_template
+=item --event-template output_template
 
 This option specifies the template used to insert information about an
 individual pass event into the output.
@@ -478,7 +479,7 @@ word 'undefined' does not mean that you get a literal C<undef> under
 those circumstances. It means that the behavior (whatever it is) may not
 be what you expect or want, and that it may change without notice.
 
-All times are formatted according to the value of the C<-time-format>
+All times are formatted according to the value of the C<--time-format>
 option.
 
 The default template is '%V %L %T' (that is, the name of the event,
@@ -596,7 +597,7 @@ a separate line of output.
 
 The default is C<-nosplit>.
 
-=item -time-format strftime_format
+=item --time-format strftime_format
 
 This option sets the strftime(3) format used to format the time in the
 output.
@@ -714,7 +715,7 @@ Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010-2023 by Thomas R. Wyant, III
+Copyright (C) 2010-2024 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

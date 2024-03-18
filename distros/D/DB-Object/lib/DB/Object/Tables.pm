@@ -309,7 +309,8 @@ sub fields
     if( @_ )
     {
         my $field = shift( @_ );
-        my $obj = $fields->{ $field } || return( $self->error( "No field object found for \"${field}\"." ) );
+        return( $self->error( "No field name was provided." ) ) if( !CORE::length( $field // '' ) );
+        my $obj = $fields->{ $field } || return( $self->error( "No field object found for \"", ( $field // 'undef' ), "\"." ) );
         return( $obj->clone );
     }
     # return( +{ map{ $_ => $fields->{ $_ }->clone } keys( %$fields ) } );

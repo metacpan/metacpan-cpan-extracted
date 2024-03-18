@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Postgres.pm
-## Version v1.0.0
+## Version v1.1.0
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2023/11/17
+## Modified 2024/03/16
 ## All rights reserved
 ## 
 ## 
@@ -464,7 +464,7 @@ BEGIN
         },
     };
     our $PLACEHOLDER_REGEXP = qr/(?:\?|\$(?<index>\d+))/;
-    our $VERSION = 'v1.0.0';
+    our $VERSION = 'v1.1.0';
     use Devel::Confess;
 };
 
@@ -1900,7 +1900,7 @@ DB::Object::Postgres - SQL API
     
 =head1 VERSION
 
-    v1.0.0
+    v1.1.0
 
 =head1 DESCRIPTION
 
@@ -2489,7 +2489,7 @@ A database schema.
 
 Provided with a table name and some optional parameters and this will retrieve the table information.
 
-It returns an array reference of tables information found if no schema was provided or if I<anywhere> is true.
+It returns an array reference of tables information found if no schema was provided or if C<anywhere> is true.
 
 If a schema was provided, and the table found it returns an hash reference for that table.
 
@@ -2506,6 +2506,24 @@ If true, it will search anywhere.
 =item * C<schema>
 
 A database schema.
+
+=back
+
+Information retrieved are:
+
+=over 4
+
+=item * C<name>
+
+The table name
+
+=item * C<schema>
+
+Database schema, if any.
+
+=item * C<type>
+
+The object type, which may be one of: C<table>, C<view>, C<materialized view>, C<special>, C<foreign table>
 
 =back
 
@@ -2547,6 +2565,10 @@ Calls L<DBD::Pg/trace_msg> and pass it whatever arguments were provided.
 =head2 unlock
 
 Unlock does not work with PostgreSQL
+
+=head2 table_info
+
+It returns an array reference of hash reference containing information about each table column.
 
 =head2 variables
 

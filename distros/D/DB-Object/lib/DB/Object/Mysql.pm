@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Mysql.pm
-## Version v1.0.0
+## Version v1.1.0
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2023/11/17
+## Modified 2024/03/16
 ## All rights reserved
 ## 
 ## 
@@ -262,7 +262,7 @@ BEGIN
     };
     # DBI->trace(5);
     our $PLACEHOLDER_REGEXP = qr/\b\?\b/;
-    our $VERSION = 'v1.0.0';
+    our $VERSION = 'v1.1.0';
     use Devel::Confess;
 };
 
@@ -635,30 +635,33 @@ sub table_info
     my $opts = $self->_get_args_as_hash( @_ );
     my $db = $opts->{database} || $self->database;
     # my $sth = $self->{dbh}->table_info( undef(), undef(), $table );
-    my $sql = "SELECT * FROM information_schema.tables WHERE table_name=?";
+    my $sql = <<EOT;
+SELECT
+     table_schema AS "schema"
+    ,table_name AS "name"
+    ,table_type AS "type"
+FROM information_schema.tables WHERE table_name=?
+EOT
     my $dbh = $self->{dbh} || return( $self->error( "Could not find database handler." ) );
     my $sth = $dbh->prepare_cached( $sql ) || return( $self->error( "An error occured while preparing query to check if table \"$table\" exists in our database: ", $dbh->errstr ) );
-    $sth->execute( $table ) || return( $self->error( "An error occured while executing query to check if table \"$table\" exists in our database: ", $sth->errstr ) );
+    $sth->execute( $table, ( $db ? $db : () ) ) || return( $self->error( "An error occured while executing query to check if table \"$table\" exists in our database: ", $sth->errstr ) );
     my $all = $sth->fetchall_arrayref( {} );
     $sth->finish;
     return( [] ) if( !scalar( @$all ) );
+    foreach my $ref ( @$all )
+    {
+        # example: BASE TABLE
+        if( $ref->{type} =~ /^(?:(?:\S+)[[:blank:]]+)?(.*?)$/ )
+        {
+            $ref->{type} = $2;
+        }
+    }
     return( $all ) if( $opts->{anywhere} );
     foreach my $ref ( @$all )
     {
-        if( $ref->{table_schema} eq $db )
+        if( $ref->{schema} eq $db )
         {
-            my $hash =
-            {
-            schema        => $ref->{table_schema},
-            name        => $ref->{table_name},
-            type        => $ref->{table_type},
-            };
-            # example: BASE TABLE
-            if( $ref->{table_type} =~ /^(?:(?:\S+)[[:blank:]]+)?(.*?)$/ )
-            {
-                $hash->{type} = $2;
-            }
-            return( $hash );
+            return( $ref );
         }
     }
     return( [] );
@@ -931,7 +934,7 @@ DB::Object::Mysql - Mysql Database Object
     
 =head1 VERSION
 
-    v1.0.0
+    v1.1.0
 
 =head1 DESCRIPTION
 
@@ -1566,11 +1569,53 @@ Returns undef or empty list in scalar or list context respectively if no table f
 
 Otherwise, it returns the list of table in list context or a reference of it in scalar context.
 
+=head2 table_info
+
+Provided with a table name and this returns all the matching table information from the MySQL system.
+
+It returns an array reference of tables information found if no schema was provided or if C<anywhere> is true.
+
+If a schema was provided, and the table found it returns an hash reference for that table.
+
+Otherwise, if nothing can be found, it returns an empty array reference.
+
+It takes the following options:
+
+=over 4
+
+=item * C<anywhere>
+
+If true, this will have this method an array reference of hash reference for each match.
+
+=item * C<database>
+
+An optional database name to restrict the search.
+
+=back
+
+Information retrieved are:
+
+=over 4
+
+=item * C<name>
+
+The table name
+
+=item * C<schema>
+
+Database schema, if any.
+
+=item * C<type>
+
+The object type, which may be one of: C<table>, C<view>, C<materialized view>, C<special>, C<foreign table>
+
+=back
+
 =head2 tables_info
 
 Provided with a database name and this returns all the tables information.
 
-Information retrieved from the PostgreSQL system tables for every table found in the given database are:
+Information retrieved from the MySQL system tables for every table found in the given database are:
 
 =over 4
 

@@ -1,5 +1,8 @@
 Revision history for Alien-SeqAlignment-cutadapt
 
+0.04      2024-03-16 19:23:46-06:00 America/Denver
+- provided a method to run cutadapt to ensure compatibiity with 
+the Alien tool API
 0.03      2024-03-10 13:30:58-06:00 America/Denver
 - expanded, reformatted and fixed typos in the POD documentation
 0.02      2024-03-09 19:53:04-07:00 America/Denver

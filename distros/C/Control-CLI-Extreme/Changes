@@ -124,3 +124,7 @@ Revision history for Control-CLI-Extreme
 	  adapted module to work with modified prompt.
 	* Updated ISW error patterns
 	* Removed useless debug level line in module constructor
+
+1.12	2024-03-17
+	* New Universal Hardware series 4120 and 4220 restricted CLI prompt ending in "=" was not being caught
+	  by the generic prompt and would fail extended discovery

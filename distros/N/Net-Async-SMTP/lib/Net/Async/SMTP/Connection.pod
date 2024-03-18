@@ -1,3 +1,5 @@
+=encoding utf8
+
 =for comment POD_DERIVED_INDEX_GENERATED
 The following documentation is automatically generated.  Please do not edit
 this file, but rather the original, inline with Net::Async::SMTP::Connection
@@ -12,13 +14,20 @@ sure you change the first line.
 
 Net::Async::SMTP::Connection - stream subclass for dealing with SMTP connections
 
-=head1 VERSION
-
-version 0.002
-
 =head1 DESCRIPTION
 
 Used internally by L<Net::Async::SMTP>. No user-serviceable parts inside.
+
+Timeouts:
+
+RFC821 4.5.3.2 - An SMTP client MUST provide a timeout mechanism
+
+greeting_timeout => 300,
+mail_timeout => 300,
+rcpt_timeout => 300,
+data_timeout => 120,
+data_block_timeout => 180,
+data_finish_timeout => 600,
 
 =head1 INHERITED METHODS
 
@@ -34,14 +43,15 @@ L<bind|IO::Async::Handle/bind>, L<close_read|IO::Async::Handle/close_read>, L<cl
 
 =item L<IO::Async::Notifier>
 
-L<add_child|IO::Async::Notifier/add_child>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<new|IO::Async::Notifier/new>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
+L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<adopted_futures|IO::Async::Notifier/adopted_futures>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure_unknown|IO::Async::Notifier/configure_unknown>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<new|IO::Async::Notifier/new>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
 
 =back
 
 =head1 AUTHOR
 
-Tom Molesworth <cpan@entitymodel.com>
+Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2012-2014. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2012-2024. Licensed under the same terms as Perl itself.
+

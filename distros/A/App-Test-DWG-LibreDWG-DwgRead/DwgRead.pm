@@ -16,7 +16,7 @@ use Readonly;
 
 Readonly::Scalar our $DR => 'dwgread';
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -84,6 +84,13 @@ sub run {
 		# dwgread.
 		my $dwgread = "$DR $v $dwg_file_out";
 		$self->_exec($dwgread, $file_num.'-dwgread', $dwg_file_in);
+
+		# tmp directory cleanup immediately.
+		if (! defined $self->{'_opts'}->{'d'}) {
+			my $tmp_glob_file = catfile($tmp_dir, $file_num);
+			my @glob_files = glob $tmp_glob_file.'*';
+			unlink @glob_files;
+		}
 
 		$file_num++;
 	}
@@ -255,6 +262,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

@@ -555,6 +555,8 @@ EOT
     return( $self->_clone( $struct ) );
 }
 
+sub table_info { return( shift->database_object->table_info( @_ ) ); }
+
 sub unlock
 {
     my $self = shift( @_ );
@@ -840,6 +842,10 @@ A column name to its sql definition
 A column name to column data type hash reference
 
 =back
+
+=head2 table_info
+
+This is an alias for L<DB::Object::Mysql/table_info>
 
 =head2 unlock
 

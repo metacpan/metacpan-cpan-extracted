@@ -20,7 +20,7 @@ name: Pod-AsciiDoctor
 provides:
   Pod::AsciiDoctor:
     file: lib/Pod/AsciiDoctor.pm
-    version: '0.102001'
+    version: '0.102002'
 requires:
   Carp: '0'
   Getopt::Long: '0'
@@ -35,7 +35,7 @@ resources:
   bugtracker: https://github.com/shlomif/Pod-AsciiDoctor/issues
   homepage: http://metacpan.org/release/Pod-AsciiDoctor
   repository: git://github.com/shlomif/Pod-AsciiDoctor.git
-version: '0.102001'
+version: '0.102002'
 x_Dist_Zilla:
   perl:
     version: '5.038002'

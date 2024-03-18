@@ -1,0 +1,3 @@
+%% begin an author
+\AIMauthor{<: $author.name :>}{<: $author.organisation :>}{<: $author.email :>}
+%% end an author

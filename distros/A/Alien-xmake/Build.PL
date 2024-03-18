@@ -40,7 +40,7 @@ my %args = (
 
     test_requires => {
         'File::Temp' => '0',
-        'Test::More' => '0.98',
+        'Test2::V0' => '0',
     },
 
     name            => 'Alien-xmake',

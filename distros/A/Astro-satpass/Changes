@@ -1,3 +1,20 @@
+0.131		2024-03-16	T. R. Wyant
+    Deprecate Astro::Coord::ECI::Utils subroutines  date2epoch() and
+    epoch2datetime().
+
+    Deal with POSIX::strftime() behavior change in Perl 5.38.9, which
+    made formatting GMT times problematic.
+
+    Refurbish some of the eg/* scripts which have not kept track with
+    API changes of various sorts.
+
+    Correct bug in ::TLE->__make_tle_epoch(). The fractional part was
+    wrong for negative epochs.
+
+    Updates to canned magnitude table.
+
+    Move all tests that BAIL_OUT() into t/basic.t.
+
 0.130		2023-10-07	T. R. Wyant
     Update magnitude table to track Kelso visual.txt.
 

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Alien::SeqAlignment::cutadapt;
-$Alien::SeqAlignment::cutadapt::VERSION = '0.03';
+$Alien::SeqAlignment::cutadapt::VERSION = '0.04';
 
 use parent qw( Alien::Base );
 
@@ -13,8 +13,12 @@ Alien::SeqAlignment::cutadapt - Find or install cutadapt
 
 Command line tool:
 
-system 'cutadapt' (list of arguments and options);
-system "cutadapt  (list of argumentns and options)"; # less safe
+ system 'cutadapt' (list of arguments and options);
+ system "cutadapt  (list of argumentns and options)"; # less safe
+ 
+or you can even do this to maintain compatibility with the Alien tool API
+
+ system Alien::SeqAlignment::cutadapt->exe (list of arguments and options)
 
 =head1 DESCRIPTION
 
@@ -25,10 +29,29 @@ will use that.  If it cannot be found, it will use the Python package installer
 pipx to download and install cutadapt in an isolated environment for each
 user. Note that after installation one ends up with a tool that can be used
 from the shell (i.e. no need for Perl), hence uninstalling the Perl module will
-not uninstall cutadapt or pipx. 
+not uninstall cutadapt or pipx. If you would like to uninstall cutadapt, then
+you should use pipx to uninstall it as in: 
+
+ pipx uninstall cutadapt.
 
 Note that the installation method of pipx varies by operating system. 
-MacOS and Windows users should have working installations of homebrew and scoop respectively to use this Perl Alien module.
+MacOS and Windows users should have working installations of homebrew and scoop 
+respectively to use this Perl Alien module.
+
+=head1 METHODS
+
+=head2 exe
+
+ Alien::SeqAlignment::cutadapt->exe
+
+Returns the command name for running the CLI version of the cutadapt CLI. 
+
+=cut
+
+sub exe {
+    my ($class) = @_;
+    $class->runtime_prop->{command};
+}
 
 =head1 SEE ALSO
 

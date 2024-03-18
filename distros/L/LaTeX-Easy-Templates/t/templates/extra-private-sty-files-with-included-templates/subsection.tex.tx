@@ -1,0 +1,9 @@
+%% begin a subsection
+\subsection(<: $subsection.title :>)
+: if( defined($subsection.label) ){
+\label{<: $subsection.label :>}
+: } # end for each subsection
+: for $subsection.paragraphs -> $paragraph {
+:   include "paragraph.tex.tx" { paragraph => $paragraph }
+: } # end for each paragraph
+%% end subsection
