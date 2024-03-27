@@ -38,11 +38,11 @@ my %WriteMakefileArgs = (
     "FindBin" => "1.51",
     "Test2::Require" => 0,
     "Test2::V0" => 0,
-    "Test::Script" => 0,
+    "Test::Script" => "1.26",
     "base" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.009",
+  "VERSION" => "0.010",
   "test" => {
     "TESTS" => "t/*.t t/file-read-order/*.t"
   }
@@ -62,7 +62,7 @@ my %FallbackPrereqs = (
   "Pod::Usage" => 0,
   "Test2::Require" => 0,
   "Test2::V0" => 0,
-  "Test::Script" => 0,
+  "Test::Script" => "1.26",
   "base" => 0,
   "constant" => 0,
   "lib" => 0,

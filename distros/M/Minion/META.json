@@ -58,6 +58,6 @@
          "web" : "https://web.libera.chat/#mojo"
       }
    },
-   "version" : "10.28",
+   "version" : "10.29",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

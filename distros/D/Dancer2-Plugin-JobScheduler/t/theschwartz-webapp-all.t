@@ -57,8 +57,6 @@ BEGIN {
         has config => (
             is      => 'ro',
             default => sub {
-
-                # return build_managed_handle_config(%test_dbs);
                 return {
                     default   => q{theschwartz_db1},
                     databases => {

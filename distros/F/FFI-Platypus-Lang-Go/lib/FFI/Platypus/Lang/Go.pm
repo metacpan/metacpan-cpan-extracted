@@ -6,7 +6,7 @@ use 5.008001;
 use File::ShareDir::Dist 0.07 qw( dist_config );
 
 # ABSTRACT: Documentation and tools for using Platypus with Go
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 
 my $config;
@@ -77,7 +77,7 @@ FFI::Platypus::Lang::Go - Documentation and tools for using Platypus with Go
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -307,7 +307,11 @@ L<FFI::Build> class for handling Go modules.
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Graham TerMarsch (GTERMARS)
 
 =head1 COPYRIGHT AND LICENSE
 

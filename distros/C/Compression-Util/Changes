@@ -1,0 +1,31 @@
+Revision history for Compression-Util
+
+0.03    2024-03-22
+
+        [ADDITIONS]
+
+        - Added the lzhd_compress() and lzhd_decompress() functions.
+        - Added the obh_encode() and obh_decode() functions.
+
+        [CHANGES]
+
+        - Simplified deflate_encode() to no longer require the size of the uncompressed data.
+
+0.02    2024-03-21
+
+        [ADDITIONS]
+
+        - Added the run_length() function.
+        - Added the binary_vrl_encode() and binary_vrl_decode() functions.
+        - Added the elias_gamma_encode() and elias_gamma_decode() functions.
+        - Added the adaptive_ac_encode() and adaptive_ac_decode() functions.
+        - Added the create_adaptive_ac_entry() and decode_adaptive_ac_entry() functions.
+
+        [CHANGES]
+
+        - Renamed mtf_encode_alphabet() to encode_alphabet().
+        - Renamed mtf_decode_alphabet() to decode_alphabet().
+
+0.01    2024-03-21
+
+        - Initial release.

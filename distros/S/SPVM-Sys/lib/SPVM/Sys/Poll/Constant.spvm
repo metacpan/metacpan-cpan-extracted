@@ -2,6 +2,8 @@
 # MIT License
 
 class Sys::Poll::Constant {
+  
+  # Class Methods
   native static method POLLERR : int ();
 
   native static method POLLHUP : int ();

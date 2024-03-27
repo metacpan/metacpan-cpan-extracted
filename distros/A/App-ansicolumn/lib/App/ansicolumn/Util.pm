@@ -33,10 +33,13 @@ sub lb_flag {
     $lb_flag{shift->linebreak};
 }
 
-sub margin_width {
+sub runin_margin {
     my $obj = shift;
-    return 0 if not $lb_flag{$obj->linebreak} & LINEBREAK_RUNIN;
-    $obj->runin;
+    if ($lb_flag{$obj->linebreak} & LINEBREAK_RUNIN) {
+	$obj->runin;
+    } else {
+	0;
+    }
 }
 
 sub term_size {
@@ -153,7 +156,7 @@ sub do_pagebreak {
     my $height = $obj->effective_height || die;
     my @up;
     use List::Util qw(first);
-    while (defined(my $i = first { $dp->[$_] =~ /\f/ } 0 .. $#{$dp})) {
+    while (defined(my $i = first { $dp->[$_] =~ /\f/ } keys @$dp)) {
 	push @up, splice @$dp, 0, $i;
 	$dp->[0] =~ s/^([^\f]*)\f// or die;
 	push @up, $1, if $1 ne '';

@@ -1,0 +1,4 @@
+:# preamble.tex.tx
+\title{ <: $data.title :> }
+\author{ <: $data.author.name :> <: $data.author.surname :> }
+\date{ <: $data.date :> }

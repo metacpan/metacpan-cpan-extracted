@@ -70,11 +70,20 @@
    "provides" : {
       "Alien::SeqAlignment::cutadapt" : {
          "file" : "lib/Alien/SeqAlignment/cutadapt.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
-   "version" : "0.04",
+   "resources" : {
+      "homepage" : "https://github.com/chrisarg/alien-seqalignment-cutadapt",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/chrisarg/alien-seqalignment-cutadapt.git",
+         "web" : "https://github.com/chrisarg/alien-seqalignment-cutadapt"
+      },
+      "x_IRC" : "irc://irc.perl.org/#native"
+   },
+   "version" : "0.05",
    "x_alienfile" : {
       "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.32",
       "requires" : {

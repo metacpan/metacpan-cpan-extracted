@@ -12,7 +12,7 @@ use FFI::Platypus::Memory qw( malloc memcpy free );
 use Class::Method::Modifiers ();
 
 # ABSTRACT: A String as far as Go knows it.
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 
 record_layout(qw(
@@ -55,7 +55,7 @@ FFI::Go::String - A String as far as Go knows it.
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -97,7 +97,11 @@ Creates a new Perl string as a copy of the original Go string.
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Graham TerMarsch (GTERMARS)
 
 =head1 COPYRIGHT AND LICENSE
 

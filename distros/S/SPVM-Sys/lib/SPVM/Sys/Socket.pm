@@ -4,372 +4,370 @@ package SPVM::Sys::Socket;
 
 =head1 Name
 
-SPVM::Sys::Socket - Socket System Call
+SPVM::Sys::Socket - System Calls for Sockets
+
+=head1 Description
+
+The Sys::Socket class in L<SPVM> has methods to call system calls for sockets.
 
 =head1 Usage
   
   use Sys::Socket;
-  use Sys::Socket::Constant as Sock;
-  my $socket = Sys::Socket->socket(Sock->AF_INET, Sock->SOCK_STREAM, 0);
-
-=head1 Description
-
-C<Sys::Socket> is the class for system calls of socket.
+  use Sys::Socket::Constant as SOCKET;
+  
+  my $socket_fd = Sys::Socket->socket(SOCKET->AF_INET, SOCKET->SOCK_STREAM, 0);
 
 =head1 Class Methods
 
 =head2 htonl
 
-  static method htonl : int ($hostlong : int);
+C<static method htonl : int ($hostlong : int);>
 
-The htonl() function converts the unsigned integer hostlong from host byte order to network byte order.
-
-See the detail of the L<htonl|https://linux.die.net/man/3/htonl> function in the case of Linux.
+Calls the L<htonl|https://linux.die.net/man/3/htonl> function and returns its return value.
 
 =head2 htons
 
-  static method htons : short ($hostshort : short);
+C<static method htons : short ($hostshort : short);>
 
-The htons() function converts the unsigned short integer hostshort from host byte order to network byte order.
-
-See the detail of the L<htons|https://linux.die.net/man/3/htons> function in the case of Linux.
+Calls the L<htons|https://linux.die.net/man/3/htons> function and returns its return value.
 
 =head2 ntohl
 
-  static method ntohl : int ($netlong : int);
+C<static method ntohl : int ($netlong : int);>
 
-The ntohl() function converts the unsigned integer netlong from network byte order to host byte order.
-
-See the detail of the L<ntohl|https://linux.die.net/man/3/ntohl> function in the case of Linux.
+Calls the L<ntohl|https://linux.die.net/man/3/ntohl> function and returns its return value.
 
 =head2 ntohs
 
-  static method ntohs : short ($netshort : short);
+C<static method ntohs : short ($netshort : short);>
 
-The ntohs() function converts the unsigned short integer netshort from network byte order to host byte order.
-
-See the detail of the L<ntohs|https://linux.die.net/man/3/ntohs> function in the case of Linux.
+Calls the L<ntohs|https://linux.die.net/man/3/ntohs> function and returns its return value.
 
 =head2 inet_aton
 
-  static method inet_aton : int ($cp : string, $inp : Sys::Socket::In_addr);
+C<static method inet_aton : int ($cp : string, $inp : L<Sys::Socket::In_addr|SPVM::Sys::Socket::In_addr>);>
 
-inet_aton() converts the Internet host address cp from the IPv4 numbers-and-dots notation into binary form (in network byte order) and stores it in the structure that inp points to. inet_aton() returns nonzero if the address is valid, zero if not. The address supplied in cp can have one of the following forms:
+Calls the L<inet_aton|https://linux.die.net/man/3/inet_aton> function and returns its return value.
 
-See the detail of the L<inet_aton|https://linux.die.net/man/3/inet_aton> function in the case of Linux.
+Excetpions:
 
-The input address(inp) is a L<Sys::Socket::In_addr|SPVM::Sys::Socket::In_addr> object.
+$cp must be defined. Otherwise an excetpion is thrown.
 
-The input address(cp) must be defined. Otherwise an exception will be thrown.
+$inp must be defined. Otherwise an excetpion is thrown.
 
-The output address(inp) must be defined. Otherwise an exception will be thrown.
+If the got address is not a valid network, an excetpion is thrownn with C<eval_error_id> set to the basic type ID of the L<Sys::Socket::Error::InetInvalidNetworkAddress> class.
+
+If the inet_aton function failed, an excetpion is thrownn with C<eval_error_id> set to the basic type ID of the L<Error::System|SPVM::Error::System> class.
 
 =head2 inet_ntoa
 
-  static method inet_ntoa : string ($in : Sys::Socket::In_addr);
+C<static method inet_ntoa : string ($in : L<Sys::Socket::In_addr|SPVM::Sys::Socket::In_addr>);>
 
-The inet_ntoa() function converts the Internet host address in, given in network byte order, to a string in IPv4 dotted-decimal notation. The string is returned in a statically allocated buffer, which subsequent calls will overwrite.
+Calls the L<inet_ntoa|https://linux.die.net/man/3/inet_ntoa> function and returns its return value.
 
-See the detail of the L<inet_ntoa|https://linux.die.net/man/3/inet_ntoa> function in the case of Linux.
+Excetpions:
 
-The input address(in) is a L<Sys::Socket::In_addr|SPVM::Sys::Socket::In_addr> object.
+$in address must be defined. Otherwise an excetpion is thrown.
 
-The input address must be defined. Otherwise an exception will be thrown.
+If the inet_ntoa function failed, an excetpion is thrownn with C<eval_error_id> set to the basic type ID of the L<Sys::Socket::Error::InetInvalidNetworkAddress> class.
 
 =head2 inet_pton
 
-  static method inet_pton : int ($af : int, $src : string, $dst : object of Sys::Socket::In_addr|Sys::Socket::In6_addr);
+C<static method inet_pton : int ($af : int, $src : string, $dst : L<Sys::Socket::In_addr_base|SPVM::Sys::Socket::In_addr_base>);>
 
-This function converts the character string src into a network address structure in the af address family, then copies the network address structure to dst. The af argument must be either AF_INET or AF_INET6.
+Calls the L<inet_pton|https://linux.die.net/man/3/inet_pton> function and returns its return value.
 
-See the detail of the L<inet_pton|https://linux.die.net/man/3/inet_pton> function in the case of Linux.
+See L<Sys::Socket::Constant|SPVM::Sys::Socket::Constant> about constant values given to $af.
 
-The output address(dst) is assumed to be L<Sys::Socket::In_addr|SPVM::Sys::Socket::In_addr> or L<Sys::Socket::In6_addr|SPVM::Sys::Socket::In6_addr> corresponding to the address family(af).
+Exceptions:
 
-The input address(src) must be defined. Otherwise an exception will be thrown.
+$af must be AF_INET or AF_INET6. Otherwise an excetpion is thrown.
 
-The output address(dst) must be defined. Otherwise an exception will be thrown.
+$dst must be defined. Otherwise an excetpion is thrown.
+
+If $af must be AF_INET, $dst must be the Sys::Socket::In_addr class. Otherwise an excetpion is thrown.
+
+If $af must be AF_INET6, $dst must be the Sys::Socket::In6_addr class. Otherwise an excetpion is thrown.
+
+If the type of $dst is invalid, otherwise an excetpion is thrown.
+
+If the got address is not a valid network, an excetpion is thrownn with C<eval_error_id> set to the basic type ID of the L<Sys::Socket::Error::InetInvalidNetworkAddress> class.
+
+If the inet_pton function failed, an excetpion is thrownn with C<eval_error_id> set to the basic type ID of the L<Error::System|SPVM::Error::System> class.
 
 =head2 inet_ntop
 
-  static method inet_ntop : mutable string ($af : int, $src : object of Sys::Socket::In_addr|Sys::Socket::In6_addr, $dst : mutable string, $size : int);
+C<static method inet_ntop : mutable string ($af : int, $src : L<Sys::Socket::In_addr_base|SPVM::Sys::Socket::In_addr_base>, $dst : mutable string, $size : int);>
 
-This function converts the network address structure src in the af address family into a character string. The resulting string is copied to the buffer pointed to by dst, which must be a non-NULL pointer. The caller specifies the number of bytes available in this buffer in the argument size.
+Calls the L<inet_ntop|https://linux.die.net/man/3/inet_ntop> function and returns its return value.
 
-See the detail of the L<inet_ntop|https://linux.die.net/man/3/inet_ntop> function in the case of Linux.
+See L<Sys::Socket::Constant|SPVM::Sys::Socket::Constant> about constant values given to $af.
 
-The input address(src) is assumed to be L<Sys::Socket::In_addr|SPVM::Sys::Socket::In_addr> or L<Sys::Socket::In6_addr|SPVM::Sys::Socket::In6_addr> corresponding to the address family(af).
+Excetpions:
 
-The input address(src) must be defined. Otherwise an exception will be thrown.
+$af must be AF_INET or AF_INET6. Otherwise an excetpion is thrown.
 
-The output address(dst) must be defined. Otherwise an exception will be thrown.
+$src must be defined. Otherwise an excetpion is thrown.
+
+$dst must be defined. Otherwise an excetpion is thrown.
+
+If the inet_ntop function failed, an excetpion is thrownn with C<eval_error_id> set to the basic type ID of the L<Error::System|SPVM::Error::System> class.
 
 =head2 socket
 
-  static method socket : int ($domain : int, $type : int, $protocol : int);
+C<static method socket : int ($domain : int, $type : int, $protocol : int);>
 
-socket() creates an endpoint for communication and returns a descriptor.
-The domain argument specifies a communication domain; this selects the protocol family which will be used for communication. These families are defined in <sys/socket.h>. The currently understood formats include:
+Calls the L<socket|https://linux.die.net/man/2/socket> function and returns its return value.
 
-See the detail of the L<socket|https://linux.die.net/man/2/socket> function in the case of Linux.
+See L<Sys::Socket::Constant|SPVM::Sys::Socket::Constant> about constant values given to $domain, $type, and $protocal.
 
-If the system call failed, an exception will be thrown with the error code set to the class id of the L<Error::System> class.
+Excetpions:
 
-=head2 connect_raw
-
-  static method connect_raw : int ($sockfd : int, $addr : Sys::Socket::Sockaddr, $addrlen : int);
+If the socket function failed, an excetpion is thrownn with C<eval_error_id> set to the basic type ID of the L<Error::System|SPVM::Error::System> class.
 
 =head2 connect
 
-  static method connect : int ($sockfd : int, $addr : Sys::Socket::Sockaddr, $addrlen : int);
+C<static method connect : int ($sockfd : int, $addr : L<Sys::Socket::Sockaddr|SPVM::Sys::Socket::Sockaddr>, $addrlen : int);>
 
-The connect() system call connects the socket referred to by the file descriptor sockfd to the address specified by addr. The addrlen argument specifies the size of addr. The format of the address in addr is determined by the address space of the socket sockfd; see socket(2) for further details.
+Calls the L<connect|https://linux.die.net/man/2/connect> function and returns its return value.
 
-See the detail of the L<connect|https://linux.die.net/man/2/connect> function in the case of Linux.
+Excetpions:
 
-The address(C<$addr>) is a L<Sys::Socket::Sockaddr|SPVM::Sys::Socket::Sockaddr> object.
+$addr must be defined. Otherwise an excetpion is thrown.
 
-If the system call failed, an exception will be thrown with the error code set to the class id of the L<Error::System> class.
+If the connect function failed, an excetpion is thrownn with C<eval_error_id> set to the basic type ID of the L<Error::System|SPVM::Error::System> class.
 
 =head2 bind
 
-  static method bind : int ($sockfd : int, $addr : Sys::Socket::Sockaddr, $addrlen : int);
+C<static method bind : int ($sockfd : int, $addr : L<Sys::Socket::Sockaddr|SPVM::Sys::Socket::Sockaddr>, $addrlen : int);>
 
-When a socket is created with socket(2), it exists in a name space (address family) but has no address assigned to it. bind() assigns the address specified by addr to the socket referred to by the file descriptor sockfd. addrlen specifies the size, in bytes, of the address structure pointed to by addr. Traditionally, this operation is called "assigning a name to a socket".
+Calls the L<bind|https://linux.die.net/man/2/bind> function and returns its return value.
 
-See the detail of the L<bind|https://linux.die.net/man/2/bind> function in the case of Linux.
+Excetpions:
 
-The address(C<$addr>) is a L<Sys::Socket::Sockaddr|SPVM::Sys::Socket::Sockaddr> object.
+$addr must be defined. Otherwise an excetpion is thrown.
 
-The address must be defined. Otherwise an exception will be thrown.
-
-If the system call failed, an exception will be thrown with the error code set to the class id of the L<Error::System> class.
+If the bind function failed, an excetpion is thrownn with C<eval_error_id> set to the basic type ID of the L<Error::System|SPVM::Error::System> class.
 
 =head2 accept
 
-  static method accept : int ($sockfd : int, $addr : Sys::Socket::Sockaddr, $addrlen_ref : int*);
+C<static method accept : int ($sockfd : int, $addr : L<Sys::Socket::Sockaddr|SPVM::Sys::Socket::Sockaddr>, $addrlen_ref : int*);>
 
-The accept() system call is used with connection-based socket types (SOCK_STREAM, SOCK_SEQPACKET). It extracts the first connection request on the queue of pending connections for the listening socket, sockfd, creates a new connected socket, and returns a new file descriptor referring to that socket. The newly created socket is not in the listening state. The original socket sockfd is unaffected by this call.
+Calls the L<accept|https://linux.die.net/man/2/accept> function and returns its return value.
 
-See the detail of the L<accept|https://linux.die.net/man/2/accept> function in the case of Linux.
+$addr must be defined. Otherwise an excetpion is thrown.
 
-The address(C<$addr>) is a L<Sys::Socket::Sockaddr|SPVM::Sys::Socket::Sockaddr> object.
-
-The address must be defined. Otherwise an exception will be thrown.
-
-If the system call failed, an exception will be thrown with the error code set to the class id of the L<Error::System> class.
+If the accept function failed, an excetpion is thrownn with C<eval_error_id> set to the basic type ID of the L<Error::System|SPVM::Error::System> class.
 
 =head2 listen
 
-  static method listen : int ($sockfd : int, $backlog : int);
+C<static method listen : int ($sockfd : int, $backlog : int);>
 
-listen() marks the socket referred to by sockfd as a passive socket, that is, as a socket that will be used to accept incoming connection requests using accept(2).
+Calls the L<listen|https://linux.die.net/man/2/listen> function and returns its return value.
 
-See the detail of the L<listen|https://linux.die.net/man/2/listen> function in the case of Linux.
+Excetpions:
 
-If the system call failed, an exception will be thrown with the error code set to the class id of the L<Error::System> class.
+If the listen function failed, an excetpion is thrownn with C<eval_error_id> set to the basic type ID of the L<Error::System|SPVM::Error::System> class.
 
 =head2 shutdown
 
-  static method shutdown : int ($sockfd : int, $how : int);
+C<static method shutdown : int ($sockfd : int, $how : int);>
 
-The shutdown() call causes all or part of a full-duplex connection on the socket associated with sockfd to be shut down. If how is SHUT_RD, further receptions will be disallowed. If how is SHUT_WR, further transmissions will be disallowed. If how is SHUT_RDWR, further receptions and transmissions will be disallowed.
+Calls the L<shutdown|https://linux.die.net/man/2/shutdown> function and returns its return value.
 
-See the detail of the L<shutdown|https://linux.die.net/man/2/shutdown> function in the case of Linux.
+See L<Sys::Socket::Constant|SPVM::Sys::Socket::Constant> about constant values given to $how.
 
-If the system call failed, an exception will be thrown with the error code set to the class id of the L<Error::System> class.
+Excetpions:
 
-=head2 recv
+If the shutdown function failed, an excetpion is thrownn with C<eval_error_id> set to the basic type ID of the L<Error::System|SPVM::Error::System> class.
 
-  static method recv : int ($sockfd : int, $buf : mutable string, $len : int, $flags : int, $buf_offset : int = 0);
+=head2 closesocket
 
-The recv() call is normally used only on a connected socket (see connect(2)) and is identical to recvfrom() with a NULL src_addr argument.
+C<static method closesocket : int ($fd : int);>
 
-See the detail of the L<recv|https://linux.die.net/man/2/recv> function in the case of Linux.
+Calls the L<closesocket|https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-closesocket> function and returns its return value.
 
-The buffer(C<$buf> must be defined. Otherwise an exception will be thrown.
+Excetpions:
 
-If the system call failed, an exception will be thrown with the error code set to the class id of the L<Error::System> class.
-
-=head2 send
-
-  static method send : int ($sockfd : int, $buf : string, $len : int, $flags : int, $buf_offset : int = 0);
-
-The send() call may be used only when the socket is in a connected state (so that the intended recipient is known). The only difference between send() and write(2) is the presence of flags. With a zero flags argument, send() is equivalent to write(2). Also, the following call
-
-The buffer(C<$buf> must be defined. Otherwise an exception will be thrown.
-
-See the detail of the L<send|https://linux.die.net/man/2/send> function in the case of Linux.
-
-=head2 getpeername
-
-  static method getpeername : int ($sockfd : int, $addr : Sys::Socket::Sockaddr, $addrlen_ref : int*);
-
-getpeername() returns the address of the peer connected to the socket sockfd, in the buffer pointed to by addr. The addrlen argument should be initialized to indicate the amount of space pointed to by addr. On return it contains the actual size of the name returned (in bytes). The name is truncated if the buffer provided is too small.
-
-See the detail of the L<getpeername|https://linux.die.net/man/2/getpeername> function in the case of Linux.
-
-The address(C<$addr>) is a L<Sys::Socket::Sockaddr|SPVM::Sys::Socket::Sockaddr> object.
-
-The address must be defined. Otherwise an exception will be thrown.
-
-If the system call failed, an exception will be thrown with the error code set to the class id of the L<Error::System> class.
-
-=head2 getsockname
-
-  static method getsockname : int ($sockfd : int, $addr : Sys::Socket::Sockaddr, $addrlen_ref : int*);
-
-getsockname() returns the current address to which the socket sockfd is bound, in the buffer pointed to by addr. The addrlen argument should be initialized to indicate the amount of space (in bytes) pointed to by addr. On return it contains the actual size of the socket address.
-
-See the detail of the L<getsockname|https://linux.die.net/man/2/getsockname> function in the case of Linux.
-
-The address(C<$addr>) is a L<Sys::Socket::Sockaddr|SPVM::Sys::Socket::Sockaddr> object.
-
-The address must be defined. Otherwise an exception will be thrown.
-
-If the system call failed, an exception will be thrown with the error code set to the class id of the L<Error::System> class.
-
-=head2 socketpair
-
-  static method socketpair : int ($domain : int, $type : int, $protocol : int, $sv : int[]);
-
-The socketpair() call creates an unnamed pair of connected sockets in the specified domain, of the specified type, and using the optionally specified protocol. For further details of these arguments, see socket(2).
-
-See the detail of the L<socketpair|https://linux.die.net/man/2/socketpair> function in the case of Linux.
-
-The output of the socket pair(sv) must be defined. Otherwise an exception will be thrown.
-
-The length of the output of the socket pair(sv) must be greater than or equal to 2. Otherwise an exception will be thrown.
-
-If the system call failed, an exception will be thrown with the error code set to the class id of the L<Error::System> class.
-
-=head2 setsockopt
-
-  static method setsockopt : int ($sockfd : int, $level : int, $optname : int, $optval : string, $optlen : int);
-
-getsockopt() and setsockopt() manipulate options for the socket referred to by the file descriptor sockfd. Options may exist at multiple protocol levels; they are always present at the uppermost socket level.
-
-See the detail of the L<setsockopt|https://linux.die.net/man/2/setsockopt> function in the case of Linux.
-
-The option value must be defined. Otherwise an exception will be thrown.
-
-The option length must be greater than or equal to 0. Otherwise an exception will be thrown.
-
-The length of the option value must be less than or equal to the option length. Otherwise an exception will be thrown.
-
-If the system call failed, an exception will be thrown with the error code set to the class id of the L<Error::System> class.
-
-=head2 setsockopt_int
-
-  static method setsockopt_int : int ($sockfd : int, $level : int, $optname : int, $optval : int);
-
-The same as L</"setsockopt">, but the option value can be specifed by the C<int> type.
-
-=head2 getsockopt
-
-  static method getsockopt : int ($sockfd : int, $level : int, $optname : int, $optval : mutable string, $optlen_ref : int*);
-
-getsockopt() and setsockopt() manipulate options for the socket referred to by the file descriptor sockfd. Options may exist at multiple protocol levels; they are always present at the uppermost socket level.
-
-See the detail of the L<getsockopt|https://linux.die.net/man/2/getsockopt> function in the case of Linux.
-
-The option value must be defined. Otherwise an exception will be thrown.
-
-The option length must be greater than or equal to 0. Otherwise an exception will be thrown.
-
-The length of the option value must be less than or equal to the option length. Otherwise an exception will be thrown.
-
-If the system call failed, an exception will be thrown with the error code set to the class id of the L<Error::System> class.
-
-=head2 getsockopt_int
-
-  static method getsockopt_int : int ($sockfd : int, $level : int, $optname : int, $optval_ref : int*);
-
-The same as L</"getsockopt">, but the option value can be specifed by the C<int> type.
-
-=head2 getaddrinfo_raw
-
-  static method getaddrinfo_raw : int ($node : string, $service : string,
-                $hints : Sys::Socket::Addrinfo,
-                $res : Sys::Socket::Addrinfo[]);
-
-Same as the L</"getaddrinfo"> method, but doesn't throw exceptions related to system errors.
-
-=head2 getaddrinfo
-
-  static method getaddrinfo : int ($node : string, $service : string,
-                $hints : Sys::Socket::Addrinfo,
-                $res : Sys::Socket::Addrinfo[]);
-
-Given node and service, which identify an Internet host and a service, getaddrinfo() returns one or more addrinfo structures, each of which contains an Internet address that can be specified in a call to bind(2) or connect(2). The getaddrinfo() function combines the functionality provided by the gethostbyname(3) and getservbyname(3) functions into a single interface, but unlike the latter functions, getaddrinfo() is reentrant and allows programs to eliminate IPv4-versus-IPv6 dependencies.
-
-See the detail of the L<getaddrinfo|https://linux.die.net/man/3/getaddrinfo> function in the case of Linux.
-
-The hints is a L<Sys::Socket::Addrinfo|SPVM::Sys::Socket::Addrinfo> object.
-
-The response(res) is an array of the L<Sys::Socket::Addrinfo|SPVM::Sys::Socket::Addrinfo>.
-
-The response must be defined. Otherwise an exception will be thrown.
-
-The length of the array of the response must be greater than or equal to 1. Otherwise an exception will be thrown.
-
-If a system error occur, an exception will be thrown with the error code set to the class id of the L<Error::System> class.
-
-=head2 getnameinfo_raw
-
-  static method getnameinfo_raw : int ($sa : Sys::Socket::Sockaddr, $salen : int,
-                $host : mutable string, $hostlen : int,
-                $serv : mutable string, $servlen : int, $flags : int);
-
-Same as the L</"getnameinfo"> method, but doesn't throw exceptions related to system errors.
-
-=head2 getnameinfo
-
-  static method getnameinfo : int ($sa : Sys::Socket::Sockaddr, $salen : int,
-                $host : mutable string, $hostlen : int,
-                $serv : mutable string, $servlen : int, $flags : int);
-
-The getnameinfo() function is the inverse of getaddrinfo(3): it converts a socket address to a corresponding host and service, in a protocol-independent manner. It combines the functionality of gethostbyaddr(3) and getservbyport(3), but unlike those functions, getnameinfo() is reentrant and allows programs to eliminate IPv4-versus-IPv6 dependencies.
-
-See the detail of the L<getnameinfo|https://linux.die.net/man/3/getaddrinfo> function in the case of Linux.
-
-The socket address(sa) is a L<Sys::Socket::Addrinfo|SPVM::Sys::Socket::Addrinfo> object.
-
-If a system error occur, an exception will be thrown with the error code set to the class id of the L<Error::System> class.
-
-=head2 gai_strerror
-
-  static method gai_strerror : string($errcode : int);
-
-The gai_strerror() function translates these error codes to a human readable string, suitable for error reporting.
-
-See the detail of the L<getnameinfo|https://linux.die.net/man/3/gai_strerror> function in the case of Linux.
+If the closesocket function failed, an excetpion is thrownn with C<eval_error_id> set to the basic type ID of the L<Error::System|SPVM::Error::System> class.
 
 =head2 close
 
-  static method close : int ($fd : int);
+C<static method close : int ($fd : int);>
 
-The same as L<close in Sys::IO|SPVM::Sys::IO/"close">, but portable in socket.
+Calls the L</"closesocket"> method in Windows.
 
-=head2 socket_errno
+Calls the L<close|Sys::IO/"close"> method in the the Sys::IO class in other OSs.
 
-  static method socket_errno : int ();
+=head2 recv
 
-Portalbe C<errno> related to the errors of the socket.
+C<static method recv : int ($sockfd : int, $buf : mutable string, $len : int, $flags : int, $buf_offset : int = 0);>
 
-=head2 socket_strerror
+Calls the L<recv|https://linux.die.net/man/2/recv> function and returns its return value.
 
-  static method socket_strerror : string ($errno : int, $length : int);
+Excetpions:
 
-Portalbe C<strerror> related to the errors of the socket.
+$buf must be defined. Otherwise an excetpion is thrown.
 
-=head2 sockatmark
+$len must be less than the length of $buf - $buf_offset. Otherwise an excetpion is thrown.
 
-  static method sockatmark : int ($sockfd : int);
+If the recv function failed, an excetpion is thrownn with C<eval_error_id> set to the basic type ID of the L<Error::System|SPVM::Error::System> class.
+
+=head2 send
+
+C<static method send : int ($sockfd : int, $buf : string, $len : int, $flags : int, $buf_offset : int = 0);>
+
+Calls the L<send|https://linux.die.net/man/2/send> function and returns its return value.
+
+Excetpions:
+
+$buf must be defined. Otherwise an excetpion is thrown.
+
+$len must be less than the length of $buf - $buf_offset. Otherwise an excetpion is thrown.
+
+If the send function failed, an excetpion is thrownn with C<eval_error_id> set to the basic type ID of the L<Error::System|SPVM::Error::System> class.
 
 =head2 sendto
 
-  static method sendto : int ($sockfd : int, $buf : string, $len : int, $flags : int, $addr : Sys::Socket::Sockaddr, $addrlen : int);
+C<static method sendto : int ($sockfd : int, $buf : string, $len : int, $flags : int, $addr : L<Sys::Socket::Sockaddr|SPVM::Sys::Socket::Sockaddr>, $addrlen : int, $buf_offset : int = 0);>
+
+Calls the L<sendto|https://linux.die.net/man/2/sendto> function and returns its return value.
+
+Excetpions:
+
+$buf must be defined. Otherwise an excetpion is thrown.
+
+$addr must be defined. Otherwise an excetpion is thrown.
+
+$len must be less than the length of $buf - $buf_offset. Otherwise an excetpion is thrown.
+
+If the send function failed, an excetpion is thrownn with C<eval_error_id> set to the basic type ID of the L<Error::System|SPVM::Error::System> class.
+
+=head2 getpeername
+
+C<static method getpeername : int ($sockfd : int, $addr : L<Sys::Socket::Sockaddr|SPVM::Sys::Socket::Sockaddr>, $addrlen_ref : int*);>
+
+Calls the L<getpeername|https://linux.die.net/man/2/getpeername> function and returns its return value.
+
+Exceptions:
+
+$addr must be defined. Otherwise an exception is thrown.
+
+If the getpeername function failed, an exception is thrown with C<eval_error_id> set to the basic type ID of the L<Error::System|SPVM::Error::System> class.
+
+Excetpions:
+
+=head2 getsockname
+
+C<static method getsockname : int ($sockfd : int, $addr : L<Sys::Socket::Sockaddr|SPVM::Sys::Socket::Sockaddr>, $addrlen_ref : int*);>
+
+Calls the L<getsockname|https://linux.die.net/man/2/getsockname> function and returns its return value.
+
+Excetpions:
+
+$addr must be defined. Otherwise an exception is thrown.
+
+If the getsockname function failed, an exception is thrown with C<eval_error_id> set to the basic type ID of the L<Error::System|SPVM::Error::System> class.
+
+Excetpions:
+
+=head2 getsockopt
+
+C<static method getsockopt : int ($sockfd : int, $level : int, $optname : int, $optval : mutable string, $optlen_ref : int*);>
+
+Calls the L<getsockopt|https://linux.die.net/man/2/getsockopt> function and returns its return value.
+
+See L<Sys::Socket::Constant|SPVM::Sys::Socket::Constant> about constant values given to $level and $optname.
+
+Exceptions:
+
+$optval must be defined. Otherwise an exception is thrown.
+
+The referred value of $optlen_ref must be greater than or equal to 0. Otherwise an exception is thrown.
+
+The referred value of $optlen_ref must be less than or equal to the length of $optval. Otherwise an exception is thrown.
+
+If the getsockopt function failed, an exception is thrown with C<eval_error_id> set to the basic type ID of the L<Error::System|SPVM::Error::System> class.
+
+=head2 setsockopt
+
+C<static method setsockopt : int ($sockfd : int, $level : int, $optname : int, $optval : string, $optlen : int);>
+
+Calls the L<setsockopt|https://linux.die.net/man/2/setsockopt> function and returns its return value.
+
+See L<Sys::Socket::Constant|SPVM::Sys::Socket::Constant> about constant values given to $level and $optname.
+
+Exceptions:
+
+$optval must be defined. Otherwise an exception is thrown.
+
+$optlen must be greater than or equal to 0. Otherwise an exception is thrown.
+
+$optlen must be less than or equal to the length of $optval. Otherwise an exception is thrown.
+
+If the setsockopt function failed, an exception is thrown with C<eval_error_id> set to the basic type ID of the L<Error::System|SPVM::Error::System> class.
+
+=head2 socketpair
+
+C<static method socketpair : int ($domain : int, $type : int, $protocol : int, $sv : int[]);>
+
+Calls the L<socketpair|https://linux.die.net/man/2/socketpair> function and returns its return value.
+
+See L<Sys::Socket::Constant|SPVM::Sys::Socket::Constant> about constant values given to $domain, $type, and $protocol.
+
+Exceptions:
+
+$sv must be defined. Otherwise an exception is thrown.
+
+The length of $sv must be greater than or equal to 2. Otherwise an exception is thrown.
+
+If the socketpair function failed, an exception is thrown with C<eval_error_id> set to the basic type ID of the L<Error::System|SPVM::Error::System> class.
+
+=head2 getaddrinfo
+
+C<static method getaddrinfo : int ($node : string, $service : string, $hints : L<Sys::Socket::Addrinfo|SPVM::Sys::Socket::Addrinfo>, $res_ref : L<Sys::Socket::AddrinfoLinkedList|SPVM::Sys::Socket::AddrinfoLinkedList>[]);>
+
+Calls the L<getaddrinfo|https://linux.die.net/man/3/getaddrinfo> function and returns its return value.
+
+Exceptions:
+
+$res_array must be defined. Otherwise an exception is thrown.
+
+The length of $res_array must be equal to 1.
+
+If the getnameinfo function failed, an exception is thrown with C<eval_error_id> set to the basic type ID of the L<Error::System|SPVM::Error::System> class.
+
+=head2 getnameinfo
+
+C<static method getnameinfo : int ($sa : L<Sys::Socket::Sockaddr|SPVM::Sys::Socket::Sockaddr>, $salen : int, $host : mutable string, $hostlen : int, $serv : mutable string, $servlen : int, $flags : int);>
+
+Calls the L<getnameinfo|https://linux.die.net/man/3/getaddrinfo> function and returns its return value.
+
+Excetpions:
+
+$sa must be defined. Otherwise an exception is thrown.
+
+If the getnameinfo function failed, an exception is thrown with C<eval_error_id> set to the basic type ID of the L<Error::System|SPVM::Error::System> class.
+
+=head2 gai_strerror
+
+C<static method gai_strerror : string($errcode : int);>
+
+Calls the L<gai_strerror|https://linux.die.net/man/3/gai_strerror> function and returns its return value.
+
+Excepsions:
+
+If the gai_strerror function failed, an exception is thrown with C<eval_error_id> set to the basic type ID of the L<Error::System|SPVM::Error::System> class.
+
+=head2 sockatmark
+
+C<static method sockatmark : int ($sockfd : int);>
+
+Calls the L<sockatmark|https://linux.die.net/man/3/sockatmark> function and returns its return value.
+
+Excepsions:
+
+If the sockatmark function failed, an exception is thrown with C<eval_error_id> set to the basic type ID of the L<Error::System|SPVM::Error::System> class.
 
 =head1 Copyright & License
 

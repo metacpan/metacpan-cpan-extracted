@@ -36,7 +36,7 @@ no_index:
 provides:
   Alien::SeqAlignment::last:
     file: lib/Alien/SeqAlignment/last.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   Alien::Base: '0.038'
   parent: '0'
@@ -46,7 +46,7 @@ resources:
   IRC: irc://irc.perl.org/#native
   homepage: https://github.com/chrisarg/alien-seqalignment-last
   repository: https://github.com/chrisarg/alien-seqalignment-last.git
-version: '0.01'
+version: '0.02'
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:

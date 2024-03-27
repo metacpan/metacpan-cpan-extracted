@@ -11,7 +11,6 @@ Name | Type | Description | Notes
 **AnnotationsPermission** | **boolean** |  |
 **AssembleDocumentPermission** | **boolean** |  |
 **ExtractContentPermission** | **boolean** |  |
-**ExtractContentPermissionObsolete** | **boolean** |  |
 **FillFormsPermission** | **boolean** |  |
 **FullQualityPrintPermission** | **boolean** |  |
 **ModifyDocumentPermission** | **boolean** |  |

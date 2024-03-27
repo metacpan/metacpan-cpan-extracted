@@ -12,35 +12,45 @@ class Sys::IO::Stat : pointer {
   # Class methods
   native static method new : Sys::IO::Stat ();
   
-  native static method stat_raw : int ($path : string, $stat : Sys::IO::Stat);
-  
   native static method stat : int ($path : string, $stat : Sys::IO::Stat);
-  
-  native static method lstat_raw : int ($path : string, $stat : Sys::IO::Stat);
   
   native static method lstat : int ($path : string, $stat : Sys::IO::Stat);
   
-  native static method fstat_raw : int ($fd : int, $stat : Sys::IO::Stat);
-  
   native static method fstat : int ($fd : int, $stat : Sys::IO::Stat);
   
-  # Instance methods
+  # Instance Methods
   native method DESTROY : void ();
+  
   native method st_dev : long ();
+  
   native method st_ino : long ();
+  
   native method st_mode : int ();
+  
   native method st_nlink : long ();
+  
   native method st_uid : int ();
+  
   native method st_gid : int ();
+  
   native method st_rdev : long ();
+  
   native method st_size : long ();
+  
   native method st_blksize : long ();
+  
   native method st_blocks : long ();
+  
   native method st_mtime : long ();
+  
   native method st_atime : long ();
+  
   native method st_ctime : long ();
+  
   native method st_mtim_tv_nsec : long ();
+  
   native method st_atim_tv_nsec : long ();
+  
   native method st_ctim_tv_nsec : long ();
   
   method A : double () {
@@ -243,7 +253,91 @@ class Sys::IO::Stat : pointer {
     return $ok;
   }
   
-  method cando : int ($mode : int, $effective : int) {
+  method r : int () {
+    
+    my $effective = 1;
+    my $ok = $self->cando(IO->S_IRUSR, $effective);
+    
+    return $ok;
+  }
+  
+  method w : int () {
+    
+    my $effective = 1;
+    my $ok = $self->cando(IO->S_IWUSR, $effective);
+    
+    return $ok;
+  }
+  
+  method x : int () {
+    
+    my $effective = 1;
+    my $ok = $self->cando(IO->S_IXUSR, $effective);
+    
+    return $ok;
+  }
+  
+  method R : int () {
+    
+    my $effective = 0;
+    my $ok = $self->cando(IO->S_IRUSR, $effective);
+    
+    return $ok;
+  }
+  
+  method W : int () {
+    
+    my $effective = 0;
+    my $ok = $self->cando(IO->S_IWUSR, $effective);
+    
+    return $ok;
+  }
+  
+  method X : int () {
+    
+    my $effective = 0;
+    my $ok = $self->cando(IO->S_IXUSR, $effective);
+    
+    return $ok;
+  }
+  
+  private static method _ingroup : int ($gid : int, $effective : int) {
+    
+    my $egid = Sys::User->getegid;
+    
+    my $supp_length = Sys::User->getgroups(0, undef);
+    
+    my $supp = new int[$supp_length];
+    
+    Sys::User->getgroups($supp_length, $supp);
+    
+    my $rgid = Sys::User->getgid;
+    
+    my $ingroup = 0;
+    my $cmp_gid = 0;
+    if ($effective) {
+      $cmp_gid = $egid;
+    }
+    else {
+      $cmp_gid = $rgid;
+    }
+    
+    if ($gid == $cmp_gid) {
+      $ingroup = 1;
+    }
+    else {
+      for my $sup (@$supp) {
+        if ($gid == $sup) {
+          $ingroup = 1;
+          last;
+        }
+      }
+    }
+    
+    return $ingroup;
+  }
+  
+  private method cando : int ($mode : int, $effective : int) {
     my $stmode = $self->st_mode;
     
     my $cando = 0;
@@ -292,83 +386,6 @@ class Sys::IO::Stat : pointer {
     return $cando;
   }
   
-  private static method _ingroup : int ($gid : int, $effective : int) {
-
-    my $egid = Sys::User->getegid;
-    my $supp = Sys::User->getgroups;
-    my $rgid = Sys::User->getgid;
-    
-    my $ingroup = 0;
-    my $cmp_gid = 0;
-    if ($effective) {
-      $cmp_gid = $egid;
-    }
-    else {
-      $cmp_gid = $rgid;
-    }
-    
-    if ($gid == $cmp_gid) {
-      $ingroup = 1;
-    }
-    else {
-      for my $sup (@$supp) {
-        if ($gid == $sup) {
-          $ingroup = 1;
-          last;
-        }
-      }
-    }
-    
-    return $ingroup;
-  }
-  
-  method r : int () {
-    
-    my $effective = 1;
-    my $ok = $self->cando(IO->S_IRUSR, $effective);
-    
-    return $ok;
-  }
-  
-  method w : int () {
-    
-    my $effective = 1;
-    my $ok = $self->cando(IO->S_IWUSR, $effective);
-    
-    return $ok;
-  }
-  
-  method x : int () {
-    
-    my $effective = 1;
-    my $ok = $self->cando(IO->S_IXUSR, $effective);
-    
-    return $ok;
-  }
-  
-  method R : int () {
-    
-    my $effective = 0;
-    my $ok = $self->cando(IO->S_IRUSR, $effective);
-    
-    return $ok;
-  }
-  
-  method W : int () {
-    
-    my $effective = 0;
-    my $ok = $self->cando(IO->S_IWUSR, $effective);
-    
-    return $ok;
-  }
-  
-  method X : int () {
-    
-    my $effective = 0;
-    my $ok = $self->cando(IO->S_IXUSR, $effective);
-    
-    return $ok;
-  }
 }
 
 =pod

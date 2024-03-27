@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Alien::SeqAlignment::edlib;
-$Alien::SeqAlignment::edlib::VERSION = '0.08';
+$Alien::SeqAlignment::edlib::VERSION = '0.09';
 
 use parent qw( Alien::Base );
 
@@ -9,6 +9,10 @@ use parent qw( Alien::Base );
 =head1 NAME
 
 Alien::SeqAlignment::edlib - find, build and install the edlib library
+
+=head1 VERSION
+
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -18,7 +22,7 @@ To execute the alignment using the command line tool:
  use Env qw( @PATH );
 
  unshift @PATH, Alien::SeqAlignment::edlib->bin_dir;
- system Alien::SeqAlignment::edlib->exe, (list of options), <queries.fasta>, <target.fasta>;
+ system Alien::SeqAlignment::edlib->edlib_aligner, (list of options), <queries.fasta>, <target.fasta>;
 
 
 =head1 DESCRIPTION
@@ -38,9 +42,9 @@ The build provides the static and shared libraries, but also the CLI aligner
 
 =head1 METHODS
 
-=head2 exe
+=head2 edlib_aligner
 
- Alien::SeqAlignment::edlib->exe
+ Alien::SeqAlignment::edlib->edlib_aligner
 
 Returns the command name for running the CLI version of the edlib aligner
 Since the command line tool is not built under Windows by the edlib project
@@ -48,7 +52,7 @@ make files, this method will return undef under Windows.
 
 =cut
 
-sub exe {
+sub edlib_aligner {
     my ($class) = @_;
     $^O ne 'MSWin32' ? $class->runtime_prop->{command} : undef;
 }
@@ -56,6 +60,7 @@ sub exe {
 =head1 USAGE
 
 =head2 Command line tool
+
  use v5.38;
  use Alien::SeqAlignment::edlib;
  use Env qw( @PATH );
@@ -72,7 +77,7 @@ sub exe {
  say $fh ">Seq2\n$string2";
  close $fh;
 
- system Alien::SeqAlignment::edlib->exe, '-m', 'HW','-n','0', '-k','-1','-p','-f' ,'NICE','seq1.fasta', 'seq2.fasta';
+ system Alien::SeqAlignment::edlib->edlib_aligner, '-m', 'HW','-n','0', '-k','-1','-p','-f' ,'NICE','seq1.fasta', 'seq2.fasta';
 
 Output
 
@@ -139,6 +144,11 @@ the static and the dynamic edlib library in your code.
 
 Detailed manual for users of Alien classes.
 
+=item * L<Bio::SeqAlignment|https://metacpan.org/pod/Bio::SeqAlignment>
+
+A collection of tools and libraries for aligning biological sequences 
+from within Perl. 
+
 =back
 
 =head1 AUTHOR
@@ -155,4 +165,3 @@ the same terms as the Perl 5 programming language system itself.
 =cut
 
 1;
-

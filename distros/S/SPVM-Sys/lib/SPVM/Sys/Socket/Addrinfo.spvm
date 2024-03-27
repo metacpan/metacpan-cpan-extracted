@@ -13,22 +13,22 @@ class Sys::Socket::Addrinfo {
   native method DESTROY : void ();
   
   native method ai_flags : int ();
-
+  
   native method set_ai_flags : void ($ai_flags : int);
-
+  
   native method ai_family : int ();
-
+  
   native method set_ai_family : void ($ai_family : int);
-
+  
   native method ai_socktype : int ();
-
+  
   native method set_ai_socktype : void ($ai_socktype : int);
-
+  
   native method ai_protocol : int ();
-
+  
   native method set_ai_protocol : void ($ai_protocol : int);
-
-  native method copy_ai_addr : Sys::Socket::Sockaddr ();
-
-  native method copy_ai_canonname : string ();
+  
+  native method ai_addr : Sys::Socket::Sockaddr ();
+  
+  native method ai_canonname : string ();
 }

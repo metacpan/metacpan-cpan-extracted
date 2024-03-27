@@ -2,7 +2,7 @@ package Object::HashBase;
 use strict;
 use warnings;
 
-our $VERSION = '0.010';
+our $VERSION = '0.013';
 our $HB_VERSION = $VERSION;
 # The next line is for inlining
 # <-- START -->
@@ -14,6 +14,17 @@ require Carp;
 }
 
 BEGIN {
+    {
+        # Make sure none of these get messed up.
+        local ($SIG{__DIE__}, $@, $?, $!, $^E);
+        if (eval { require Class::XSAccessor; Class::XSAccessor->VERSION(1.19); 1 }) {
+            *CLASS_XS_ACCESSOR = sub() { 1 }
+        }
+        else {
+            *CLASS_XS_ACCESSOR = sub() { 0 }
+        }
+    }
+
     # these are not strictly equivalent, but for out use we don't care
     # about order
     *_isa = ($] >= 5.010 && require mro) ? \&mro::get_linear_isa : sub {
@@ -33,11 +44,20 @@ my %SPEC = (
     '>' => {reader => 0, writer => 1, dep_writer => 0, read_only => 0, strip => 1},
     '<' => {reader => 1, writer => 0, dep_writer => 0, read_only => 0, strip => 1},
     '+' => {reader => 0, writer => 0, dep_writer => 0, read_only => 0, strip => 1},
+    '~' => {reader => 1, writer => 1, dep_writer => 0, read_only => 0, strip => 1, no_xs => 1},
 );
+
+sub spec { \%SPEC }
 
 sub import {
     my $class = shift;
     my $into  = caller;
+    $class->do_import($into, @_);
+}
+
+sub do_import {
+    my $class = shift;
+    my $into  = shift;
 
     # Make sure we list the OLDEST version used to create this class.
     my $ver = $Object::HashBase::HB_VERSION || $Object::HashBase::VERSION;
@@ -48,34 +68,82 @@ sub import {
     my $attr_subs = $Object::HashBase::ATTR_SUBS{$into} ||= {};
 
     my %subs = (
-        ($into->can('new') ? () : (new => \&_new)),
+        ($into->can('new') ? () : (new => $class->can('_new'))),
         (map %{$Object::HashBase::ATTR_SUBS{$_} || {}}, @{$isa}[1 .. $#$isa]),
-        (
-            map {
-                my $p = substr($_, 0, 1);
-                my $x = $_;
-
-                my $spec = $SPEC{$p} || {reader => 1, writer => 1};
-
-                substr($x, 0, 1) = '' if $spec->{strip};
-                push @$attr_list => $x;
-                my ($sub, $attr) = (uc $x, $x);
-
-                $attr_subs->{$sub} = sub() { $attr };
-                my %out = ($sub => $attr_subs->{$sub});
-
-                $out{$attr}       = sub { $_[0]->{$attr} }                                                  if $spec->{reader};
-                $out{"set_$attr"} = sub { $_[0]->{$attr} = $_[1] }                                          if $spec->{writer};
-                $out{"set_$attr"} = sub { Carp::croak("'$attr' is read-only") }                             if $spec->{read_only};
-                $out{"set_$attr"} = sub { Carp::carp("set_$attr() is deprecated"); $_[0]->{$attr} = $_[1] } if $spec->{dep_writer};
-
-                %out;
-            } @_
-        ),
+        ($class->args_to_subs($attr_list, $attr_subs, \@_, $into)),
     );
 
     no strict 'refs';
-    *{"$into\::$_"} = $subs{$_} for keys %subs;
+    while (my ($k, $v) = each %subs) {
+        if (ref($v) eq 'CODE') {
+            *{"$into\::$k"} = $v;
+        }
+        else {
+            my ($sub, @args) = @$v;
+            $sub->(@args);
+        }
+    }
+}
+
+sub args_to_subs {
+    my $class = shift;
+    my ($attr_list, $attr_subs, $args, $into) = @_;
+
+    my $use_gen = $class->can('gen_accessor') ;
+
+    my %out;
+
+    while (@$args) {
+        my $x = shift @$args;
+        my $p = substr($x, 0, 1);
+
+        my $spec = $class->spec->{$p} || {reader => 1, writer => 1};
+        substr($x, 0, 1) = '' if $spec->{strip};
+
+        push @$attr_list => $x;
+        my ($sub, $attr) = (uc $x, $x);
+
+        $attr_subs->{$sub} = sub() { $attr };
+        $out{$sub} = $attr_subs->{$sub};
+
+        my $copy = "$attr";
+        if ($spec->{reader}) {
+            if ($use_gen) {
+                $out{$attr} = $class->gen_accessor(reader => $copy, $spec, $args);
+            }
+            elsif (CLASS_XS_ACCESSOR && !$spec->{no_xs}) {
+                $out{$attr} = [\&Class::XSAccessor::newxs_getter, "$into\::$attr", $copy];
+            }
+            else {
+                $out{$attr} = sub { $_[0]->{$attr} };
+            }
+        }
+
+        if ($spec->{writer}) {
+            if ($use_gen) {
+                $out{"set_$attr"} = $class->gen_accessor(writer => $copy, $spec, $args);
+            }
+            elsif(CLASS_XS_ACCESSOR && !$spec->{no_xs}) {
+                $out{"set_$attr"} = [\&Class::XSAccessor::newxs_setter, "$into\::set_$attr", $copy, 0];
+            }
+            else {
+                $out{"set_$attr"} = sub { $_[0]->{$attr} = $_[1] };
+            }
+        }
+        elsif($spec->{read_only}) {
+            $out{"set_$attr"} = $use_gen ? $class->gen_accessor(read_only => $copy, $spec, $args) : sub { Carp::croak("'$attr' is read-only") };
+        }
+        elsif($spec->{dep_writer}) {
+            $out{"set_$attr"} = $use_gen ? $class->gen_accessor(dep_writer => $copy, $spec, $args) : sub { Carp::carp("set_$attr() is deprecated"); $_[0]->{$attr} = $_[1] };
+        }
+
+        if ($spec->{custom}) {
+            my %add = $class->gen_accessor(custom => $copy, $spec, $args);
+            $out{$_} = $add{$_} for keys %add;
+        }
+    }
+
+    return %out;
 }
 
 sub attr_list {
@@ -175,6 +243,7 @@ A class:
     }
 
     sub print {
+        my $self = shift;
         print join ", " => map { $self->{$_} } FOO, BAR, BAZ, BAT, BAN, BOO;
     }
 
@@ -241,6 +310,29 @@ Generated accessors will be getters, C<set_ACCESSOR> setters will also be
 generated for you. You also get constants for each accessor (all caps) which
 return the key into the hash for that accessor. Single inheritance is also
 supported.
+
+=head1 XS ACCESSORS
+
+If L<Class::XSAccessor> is installed, it will be used to generate XS getters
+and setters.
+
+=head2 CAVEATS
+
+The only caveat noticed so far is that if you take a reference to an objects
+attribute element: C<< my $ref = \($obj->{foo}) >> then use
+C<< $obj->set_foo(1) >>, setting C<< $$ref = 2 >> will not longer work, and
+getting the value via C<< $val = $$ref >> will also not work. This is not a
+problem when L<Class::XSAccessor> is not used.
+
+In practice it will nbe VERY rare for this to be a problem, but it was noticed
+because it broke a performance optimization in L<Test2::API>.
+
+You can request an accessor NOT be xs with the '~' prefix:
+
+    use Object::HashBase '~foo';
+
+The sample above generates C<foo()> and C<set_foo()> and they are NOT
+implemented in XS.
 
 =head1 INCLUDING IN YOUR DIST
 
@@ -404,6 +496,13 @@ Only gives you a write (C<set_foo>), no C<foo> method is defined at all.
     use Object::HashBase qw/+foo/;
 
 This does not create any methods for you, it just adds the C<FOO> constant.
+
+=head2 NO XS
+
+    use Object::HashBase qw/~foo/;
+
+This enforces that the getter and setter generated for C<foo> will NOT use
+L<Class::XSAccessor> even if it is installed.
 
 =head1 SUBCLASSING
 

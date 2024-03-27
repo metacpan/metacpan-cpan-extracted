@@ -1,4 +1,0 @@
-# Copyright (c) 2023 Yuki Kimoto
-# MIT License
-
-class Sys::Signal::Handler::Default extends Sys::Signal::Handler;

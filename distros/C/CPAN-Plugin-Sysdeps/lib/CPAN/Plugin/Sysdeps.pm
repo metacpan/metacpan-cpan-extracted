@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps;
 use strict;
 use warnings;
 
-our $VERSION = '0.76';
+our $VERSION = '0.77';
 
 use List::Util 'first';
 
@@ -489,7 +489,6 @@ sub _find_missing_rpm_packages {
     return () if !@packages;
 
     my @missing_packages;
-
     {
 	my %packages = map{($_,1)} @packages;
 
@@ -501,14 +500,35 @@ sub _find_missing_rpm_packages {
 	    if (m{^package (\S+) is not installed}) {
 		my $package = $1;
 		if (!exists $packages{$package}) {
-		    die "Unexpected: package $package listed as non-installed, but not queries in '@cmd'?!";
+		    die "Unexpected: package $package listed as non-installed, but not queried in '@cmd'?!";
 		}
 		push @missing_packages, $package;
 	    }
 	}
     }
+    return () if !@missing_packages;
 
-    @missing_packages;
+    # maybe the packages are just provided by another package?
+    my @definitively_missing_packages;
+    {
+	my %packages = map{($_,1)} @missing_packages;
+
+	local $ENV{LC_ALL} = 'C';
+	my @cmd = ('rpm', '-q', '--whatprovides', @missing_packages);
+	open my $fh, '-|', @cmd
+	    or die "Error running '@cmd': $!";
+	while(<$fh>) {
+	    if (m{^no package provides (\S+)}) {
+		my $package = $1;
+		if (!exists $packages{$package}) {
+		    die "Unexpected: package $package listed as non-installed, but not queried in '@cmd'?!";
+		}
+		push @definitively_missing_packages, $package;
+	    }
+	}
+    }
+
+    @definitively_missing_packages;
 }
 
 sub _find_missing_freebsd_pkg_packages {

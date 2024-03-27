@@ -233,6 +233,10 @@ Then you can use them without module option.  In this case, option
     % date --ru
     воскресенье, 22 октября 2017 г. 18:00:00 (JST)
 
+Module `i18n` is implemented as [Getopt::EX::i18n](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3Ai18n) and included in
+this distribution.  So it can be used as above without additional
+installation.
+
 # STANDARD MODULES
 
 Standard modules are installed at `App::optex`, and they can be
@@ -265,6 +269,17 @@ addressed with and without `App::optex` prefix.
 
     Module to implement command input/output filters.
     See [App::optex::util::filter](https://metacpan.org/pod/App%3A%3Aoptex%3A%3Autil%3A%3Afilter) for detail.
+
+# Getopt::EX MODULES
+
+In addition to its own modules, **optex** can also use `Getopt::EX`
+modules.  The standard `Getopt::EX` modules installed are these.
+
+- -M**i18n** ([Getopt::EX::i18n](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3Ai18n))
+
+    You can display a Greek calendar by doing the following:
+
+        optex -Mi18n cal --gr
 
 # OPTIONS
 

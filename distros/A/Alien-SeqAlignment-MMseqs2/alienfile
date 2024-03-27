@@ -1,0 +1,63 @@
+use strict;
+use warnings;
+use alienfile;
+
+use Capture::Tiny qw(capture);
+use File::Copy;
+use Path::Tiny;
+
+my %application_programs = ( mmseqs => 'mmseqs', );
+probe sub {
+    ## see if the suite is installed
+    my ( $cmd, $stder ) = capture { system( 'mmseqs', ) };
+    my $is_suite_installed_installed = $$stder =~ /MMseqs2/m;
+    print $is_suite_installed_installed
+      ? "The MMseqs2 suite is already installed in your system\n"
+      : "The MMseqs2 suite is not installed, so will install from source\n";
+    $is_suite_installed_installed ? 'system' : 'share';
+};
+
+share {
+    plugin 'Download::GitHub' => (
+        github_user => 'soedinglab',
+        github_repo => 'MMseqs2',
+    );
+    plugin Extract => 'tar.gz';
+    plugin 'Build::CMake';
+    build [
+        'mkdir build',
+        'cd build',
+        [
+            '%{cmake}', @{ meta->prop->{plugin_build_cmake}->{args} },
+            '%{.install.extract}'
+        ],
+        '%{make}',
+        '%{make} install',
+    ];
+
+    after 'build' => sub {
+        my ($build) = @_;
+        my $install_root = Path::Tiny->new( $build->install_prop->{stage} );
+
+        my $source_directory = path( $build->install_prop->{extract}, 'bin' );
+        my $binary_dest_directory = path( $install_root, 'bin' );
+<<'oxo'
+        $binary_dest_directory->mkdir;
+        foreach my $key ( keys %application_programs ) {
+            path( $source_directory, $application_programs{$key} )
+              ->move(
+                path( $binary_dest_directory, $application_programs{$key} ) );
+        }
+oxo
+    };
+};
+
+gather sub {
+    my ($build) = @_;
+    while ( my ( $key, $value ) = each %application_programs ) {
+        $build->runtime_prop->{command}->{$key} = $value;
+    }
+
+};
+
+1;

@@ -10,7 +10,7 @@ bff-pxf-simulator \[-options\]
        -f|format                      Format [>bff|pxf]
        -n|number                      Number of individuals
        -o|output                      Output file [individuals.json]
-       -external-ontologies           YAML file with ontologies for diseases, phenotypicFeatures and treatments
+       -external-ontologies           YAML file with ontologies for diseases, exposures, phenotypicFeatures, procedures and treatments
        -random-seed                   Initializes pseudorandom number sequences for reproducible results (int)
 
        -diseases                      Number of [1]

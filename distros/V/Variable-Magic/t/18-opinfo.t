@@ -39,13 +39,15 @@ our @o;
 
 my @tests = (
  [ 'len', '@c',      'my @c',    'my $x = @c',     [ 'padav',   'B::OP'     ] ],
- [ 'get', '$c[0]',   'my @c',    'my $x = $c[0]',  [ $aelem,    'B::OP'     ] ],
- [ 'get', '$o[0]',   'local @o', 'my $x = $o[0]',  [ $aelemf,   $aelemf_op  ] ],
+ [ 'get', '$c[0]',   'my @c',    'my $x = $c[0]; 1',
+                                                   [ $aelem,    'B::OP'     ] ],
+ [ 'get', '$o[0]',   'local @o', 'my $x = $o[0]; 1',
+                                                   [ $aelemf,   $aelemf_op  ] ],
  [ 'get', '$x->{a}', 'my $x',    'my $y = $x->{a}{b}',
                                                    [ $deref,    $deref_op   ] ],
  [ 'get', '$c',    'my $c = 1',  '++$c',           [ 'preinc',  'B::UNOP'   ] ],
  [ 'get', '$c',    'my $c = 1',  '$c ** 2',        [ 'pow',     'B::BINOP'  ] ],
- [ 'get', '$c',    'my $c = 1',  'my $x = $c',     [ $assign_op, $assign_op_cl ] ],
+ [ 'get', '$c',    'my $c = 1',  'my $x = $c; 1',  [ $assign_op, $assign_op_cl ] ],
  [ 'get', '$c',    'my $c = 1',  '1 if $c',        [ 'and',     'B::LOGOP'  ] ],
  [ 'get', '$c',    'my $c = []', 'ref $c',         [ 'ref',     'B::UNOP'   ] ],
  [ 'get', '$c',    'my $c = $0', '-f $c',          [ 'ftfile',  'B::UNOP'   ] ],

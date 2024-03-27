@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Alien::SeqAlignment::parasail;
-$Alien::SeqAlignment::parasail::VERSION = '0.04';
+$Alien::SeqAlignment::parasail::VERSION = '0.05';
 
 use parent qw( Alien::Base );
 
@@ -9,12 +9,16 @@ use parent qw( Alien::Base );
 
 Alien::SeqAlignment::parasail - find, build and install the parasail library
 
+=head1 VERSION
+
+version 0.05
+
 =head1 SYNOPSIS
 
-To execute the alignment using the commande line tool:
+To execute the alignment using the command line tool:
 
  use Alien::parasail;
- system Alien::SeqAlignment::parasail->exe, (list of options);
+ system Alien::SeqAlignment::parasail->parasail_aligner, (list of options);
 
 
 =head1 DESCRIPTION
@@ -34,15 +38,15 @@ The build provides the static and shared libraries, but also the CLI aligner
 
 =head1 METHODS
 
-=head2 exe
+=head2 parasail_aligner
 
- Alien::SeqAlignment::parasail->exe
+ Alien::SeqAlignment::parasail->parasail_aligner
 
 Returns the command name for running the CLI version of the parasail aligner.
 
 =cut
 
-sub exe {
+sub parasail_aligner {
   my($class) = @_;
   $class->runtime_prop->{command} ;
 }
@@ -51,7 +55,7 @@ sub exe {
 
 =over 4
 
-=item L<parasail|https://github.com/jeffdaily/parasail>
+=item * L<parasail|https://github.com/jeffdaily/parasail>
 
 parasail is a SIMD C (C99) library containing implementations of the 
 Smith-Waterman (local), Needleman-Wunsch (global), and various 
@@ -72,20 +76,23 @@ store a traceback for later retrieval as a SAM CIGAR string. The three
 variants exist because parasail is intended to be high-performing; 
 calculating additional statistics or the traceback will perform slower 
 than simply calculating the alignment score. 
-Select the appropriate implementation for your needs.
 
-
-=item L<Alien>
+=item * L<Alien>
 
 Documentation on the Alien concept itself.
 
-=item L<Alien::Base>
+=item * L<Alien::Base>
 
 The base class for this Alien.
 
-=item L<Alien::Build::Manual::AlienUser>
+=item  * L<Alien::Build::Manual::AlienUser>
 
 Detailed manual for users of Alien classes.
+
+=item * L<Bio::SeqAlignment|https://metacpan.org/pod/Bio::SeqAlignment>
+
+A collection of tools and libraries for aligning biological sequences 
+from within Perl. 
 
 =back
 
@@ -103,4 +110,3 @@ the same terms as the Perl 5 programming language system itself.
 =cut
 
 1;
-

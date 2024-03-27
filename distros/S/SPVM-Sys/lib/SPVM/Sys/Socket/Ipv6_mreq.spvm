@@ -3,16 +3,18 @@
 
 class Sys::Socket::Ipv6_mreq {
   use Sys::Socket::In6_addr;
-
+  
+  # Class Methods
   native static method new : Sys::Socket::Ipv6_mreq ();
-
+  
+  # Instance Methods
   native method DESTROY : void ();
-
+  
   native method ipv6mr_multiaddr : Sys::Socket::In6_addr ();
-
+  
   native method set_ipv6mr_multiaddr : void ($interface : Sys::Socket::In6_addr);
-
+  
   native method ipv6mr_interface : int ();
-
+  
   native method set_ipv6mr_interface : void ($interface : int);
 }

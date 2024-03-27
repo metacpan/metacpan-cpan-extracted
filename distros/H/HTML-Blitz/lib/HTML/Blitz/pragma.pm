@@ -15,7 +15,7 @@ use Function::Parameters 2;
 
 use Carp ();
 
-our $VERSION = '0.09';
+our $VERSION = '0.0901';
 
 method import($class: @items) {
     for my $item (@items) {

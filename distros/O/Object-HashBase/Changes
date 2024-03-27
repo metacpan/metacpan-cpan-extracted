@@ -1,3 +1,16 @@
+0.013     2024-03-21 17:41:14-07:00 America/Los_Angeles
+
+    - Documentation Fixes
+
+0.012     2024-03-21 13:55:43-07:00 America/Los_Angeles
+
+    - Do not taint $@, $!, $? or $^E when checking for Class::XSAccessor.
+    - Ignore __DIE__ handlers when checking for Class::XSAccessor.
+
+0.011     2024-03-21 13:38:57-07:00 America/Los_Angeles
+
+    - Add support for Class::XSAccessor when it is installed
+
 0.010     2023-10-22 21:52:16-07:00 America/Los_Angeles
 
     - Merge doc fixes #3

@@ -189,6 +189,12 @@ void SPVM_API_set_pointer(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object,
 
 // Get Bool object
 int32_t SPVM_API_get_bool_object_value(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* bool_object);
+int32_t SPVM_API_get_byte_object_value(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* byte_object);
+int32_t SPVM_API_get_short_object_value(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* short_object);
+int32_t SPVM_API_get_int_object_value(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* int_object);
+int64_t SPVM_API_get_long_object_value(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* long_object);
+float SPVM_API_get_float_object_value(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* float_object);
+double SPVM_API_get_double_object_value(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* double_object);
 
 // String manipulation
 SPVM_OBJECT* SPVM_API_concat_no_mortal(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* string1, SPVM_OBJECT* string2);
@@ -318,7 +324,7 @@ void* SPVM_API_strerror_string_nolen(SPVM_ENV* env, SPVM_VALUE* stack, int32_t e
 
 int32_t SPVM_API_call_method_vm(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_RUNTIME_METHOD* method, int32_t args_width);
 
-int32_t SPVM_API_check_stack_env(SPVM_ENV* env, SPVM_VALUE* stack);
+int32_t SPVM_API_is_binary_compatible_stack(SPVM_ENV* env, SPVM_VALUE* stack);
 
 // Assign
 
@@ -353,5 +359,7 @@ int32_t SPVM_API_check_bootstrap_method(SPVM_ENV* env, SPVM_VALUE* stack, const 
 SPVM_OBJECT* SPVM_API_new_array_proto_element_no_mortal(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* element, int32_t length);
 
 SPVM_OBJECT* SPVM_API_new_array_proto_element(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* element, int32_t length);
+
+int32_t SPVM_API_is_binary_compatible_object(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object);
 
 #endif

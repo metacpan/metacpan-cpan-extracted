@@ -24,6 +24,7 @@ WriteMakefile(
     AUTHOR              => 'Ymirlink <tl@tripletail.jp>',
     VERSION_FROM        => 'SMIME.pl',
     ABSTRACT            => 'S/MIME message signing, verification, encryption and decryption',
+    LICENSE             => 'perl_5',
     PL_FILES            => {},
     CONFIGURE_REQUIRES  => {
         'ExtUtils::CChecker'  => 0,

@@ -5,3 +5,11 @@ Revision history for LaTeX-Easy-Templates
 
 0.02    2024-03-15/23:50
         Completed the distribution with png and jpg files required for testing.
+
+0.03    2024-03-21/23:01
+        Fixed LaTeX program paths detection where e.g. xelatex was not tested to actually exist on disk and being an executable with right permissions.
+
+0.04    2024-03-27/10:00
+        Moved test file "t/400-format.t" into xt/ to be run only by 'author tests' because it was failing in many tester machines which lack LaTeX font and style files. In order for this test to succeed, all these missing LaTeX fonts and style files must be installed and that's not an option. Author tests can be run with "make authortest".
+        Added two more unit tests "t/350-inmemory-template-usage-calling-other-templates.t" and "t/360-ondisk-template-usage-calling-other-templates.t".
+	Enhanced documentation.

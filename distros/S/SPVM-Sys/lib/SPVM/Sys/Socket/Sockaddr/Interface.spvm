@@ -1,9 +1,0 @@
-# Copyright (c) 2023 Yuki Kimoto
-# MIT License
-
-class Sys::Socket::Sockaddr::Interface : interface_t {
-  required method has_interfaces : int ();
-  
-  method sa_family : int ();
-  method sizeof : int ();
-}

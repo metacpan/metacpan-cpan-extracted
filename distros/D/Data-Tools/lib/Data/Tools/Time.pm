@@ -42,6 +42,8 @@ our @EXPORT = qw(
 
                 julian_date_goto_first_dom
                 julian_date_goto_last_dom
+                julian_date_goto_first_doy
+                julian_date_goto_last_doy
                 julian_date_get_dow
                 julian_date_get_day
                 julian_date_get_month
@@ -366,6 +368,24 @@ sub julian_date_goto_last_dom
 
   my ( $y, $m, $d ) = julian_date_to_ymd( $wd );
   return julian_date_from_ymd( $y, $m, Days_in_Month( $y, $m ) );
+}
+
+# return julian date, moved to the first day of its year
+sub julian_date_goto_first_doy
+{
+  my $wd = shift; # original/work date
+
+  my ( $y, $m, $d ) = julian_date_to_ymd( $wd );
+  return julian_date_from_ymd( $y, 1, 1 );
+}
+
+# return julian date, moved to the last day of its year
+sub julian_date_goto_last_doy
+{
+  my $wd = shift; # original/work date
+
+  my ( $y, $m, $d ) = julian_date_to_ymd( $wd );
+  return julian_date_from_ymd( $y, 12, 31 );
 }
 
 # return day of the month, 1 .. 31

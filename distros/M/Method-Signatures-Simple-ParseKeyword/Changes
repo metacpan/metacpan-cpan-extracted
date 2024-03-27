@@ -1,5 +1,8 @@
 Revision history for Method-Signatures-Simple-ParseKeyword
 
+1.14    2024-03-24  Rhesa Rozendaal <rhesa@cpan.org>
+        Run number tests under C locale
+
 1.13    2023-08-19  Rhesa Rozendaal <rhesa@cpan.org>
         More descriptive syntax errors
         shift $self off of @_

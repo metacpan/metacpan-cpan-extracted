@@ -27,7 +27,7 @@ share {
 
     ## use one of two locations to source edlib
     $repo_url =
-      'https://github.com/Martinsos/edlib/archive/refs/heads/master.zip';
+      'https://github.com/Martinsos/edlib/archive/refs/heads/master2.zip';
     $repo_response = HTTP::Tiny->new->head($repo_url);
     unless ( $repo_response->{success} )
     {    ## failed original download, try my fork

@@ -3,16 +3,18 @@
 
 class Sys::Socket::Ip_mreq : pointer {
   use Sys::Socket::In_addr;
-
+  
+  # Class Methods
   native static method new : Sys::Socket::Ip_mreq ();
-
+  
+  # Instance Methods
   native method DESTROY : void ();
-
+  
   native method imr_multiaddr : Sys::Socket::In_addr ();
-
+  
   native method set_imr_multiaddr : void ($address : Sys::Socket::In_addr);
-
+  
   native method imr_interface : Sys::Socket::In_addr ();
-
+  
   native method set_imr_interface : void ($interface : Sys::Socket::In_addr);
 }

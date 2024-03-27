@@ -1,6 +1,13 @@
 Revision history for Perl distribution Pheno-Ranker
 
-0.04 2023-11-26T00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
+0.05 2023-XX-XXT00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
+
+ - Implemented sprintf in jaccard function for FreeBSD CPAN test compliance
+ - Added utils/bff_pxf_plot to create PNG with stats
+ - Updated Dockerfile
+ - Ensured termination with an error if primary_key is unset for any object
+
+0.04 2023-12-26T00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
 
  - Added List::MoreUtils to cpanfile and Makefile.PL
  - Added error when --include-terms does not exist in cohort(s)
@@ -9,7 +16,6 @@ Revision history for Perl distribution Pheno-Ranker
  - Spiced up die/warn messages with bold-colored text
  - Added utils/barcode to deal with QR codes (+Dockerfile and t)
  - csv2pheno-ranker now accepts .tsv (sep \t)
- - Turned on legend on share/r/mds_color.R
  - Fixed stringification of weights (read from YAML) on JSON export
  - Added flag --similarity-metric-cohort
  - Added terms <procedures, exposures> to bff-pxf-simulator

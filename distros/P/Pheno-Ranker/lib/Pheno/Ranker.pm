@@ -26,17 +26,16 @@ $SIG{__DIE__}  = sub { die BOLD RED "Error: ", @_ };
 
 # Global variables:
 $Data::Dumper::Sortkeys = 1;
-our $VERSION   = '0.04';
+our $VERSION   = '0.05';
 our $share_dir = dist_dir('Pheno-Ranker');
 
 # Set developoent mode
 use constant DEVEL_MODE => 0;
 
 # Misc variables
-my (
-    $config_sort_by, $config_similarity_metric_cohort, $config_max_out, $config_max_number_var,
-    $config_seed,    @config_allowed_terms
-);
+my ( $config_sort_by, $config_similarity_metric_cohort,
+    $config_max_out, $config_max_number_var,
+    $config_seed,    @config_allowed_terms );
 my $default_config_file = catfile( $share_dir, 'conf', 'config.yaml' );
 
 ############################################
@@ -69,8 +68,9 @@ has 'config_file' => (
 # Sets basic configuration parameters from the provided config.
 sub _set_basic_config {
     my ( $self, $config ) = @_;
-    $config_sort_by        = $config->{sort_by}        // 'hamming';
-    $config_similarity_metric_cohort        = $config->{similarity_metric_cohort}        // 'hamming';
+    $config_sort_by                  = $config->{sort_by} // 'hamming';
+    $config_similarity_metric_cohort = $config->{similarity_metric_cohort}
+      // 'hamming';
     $config_max_out        = $config->{max_out}        // 50;
     $config_max_number_var = $config->{max_number_var} // 10_000;
     $config_seed =
@@ -103,7 +103,9 @@ sub _set_additional_config {
       // '';                                                                  # setter
     $self->{array_terms} = $config->{array_terms} // ['foo'];                 # setter (TBV)
     $self->{array_regex} = $config->{array_regex} // '^(\w+):(\d+)';          # setter (TBV)
-    $self->{format}      = $config->{format};                                 #setter
+    $self->{array_terms_regex_str} =
+      '^(' . join( '|', map { "\Q$_\E" } @{ $self->{array_terms} } ) . '):';   # setter (TBV)
+    $self->{format} = $config->{format};                                       #setter
 
     # Validate $config->{id_correspondence} for "real" array_terms
     if ( $self->{array_terms}[0] ne 'foo' ) {
@@ -481,7 +483,6 @@ sub run {
         }
     }
 
-
     # Dump to JSON if <--export>
     # NB: Must work for -r and -t
     serialize_hashes(
@@ -546,7 +547,7 @@ L<https://github.com/CNAG-Biomedical-Informatics/pheno-ranker#readme>
 
 The author requests that any published work that utilizes C<Pheno-Ranker> includes a cite to the the following reference:
 
-Rueda, M. et al. "Advancing Semantic Similarity Analysis of Phenotypic Data Stored in GA4GH Standards and Beyond. (2023) I<Submitted>.
+Rueda, M. et al. "Advancing Semantic Similarity Analysis of Phenotypic Data Stored in GA4GH Standards and Beyond. (2024) I<Submitted>.
 
 =head1 AUTHOR
 
@@ -558,7 +559,7 @@ There is only method named c<run>. See above the syntax.
 
 For more information check the documentation:
 
-L<https://cnag-biomedical-informatics.github.io/pheno-ranker
+L<https://cnag-biomedical-informatics.github.io/pheno-ranker>
 
 =head1 COPYRIGHT
 

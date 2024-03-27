@@ -8,7 +8,7 @@ use AsposeCellsCloud::Request::PostMetadata;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**file** | **string** | document properties |
+**file** | **string** | File to upload |
 **cells_documents** | **ARRAY[CellsDocumentProperty]** | document properties |
 **password** | **string** | The password needed to open an Excel file. |
 **check_excel_restriction** | **boolean** | Whether check restriction of excel file when user modify cells related objects. |

@@ -1,5 +1,9 @@
 Revision history for Perl application 'sdif-tools'.
 
+4.3301 2024-03-27T06:50:25Z
+
+    - fix bug of cdif producing extra empty lines
+
 4.33 2024-03-13T00:58:40Z
 
     - make cdif to visualize the absence of the newline

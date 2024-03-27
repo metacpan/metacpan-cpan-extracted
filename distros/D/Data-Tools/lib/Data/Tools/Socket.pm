@@ -128,10 +128,10 @@ sub socket_read_message
   if( $res_data_len != $data_len )
     {
     # invalid data len received
-    return undef;
+    return wantarray ? ( undef, $res_data_len ) : undef;
     }
   
-  return $read_data;
+  return wantarray ? ( $read_data, $res_data_len ) : $res_data_len;
 }
 
 sub socket_write_message

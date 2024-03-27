@@ -3,6 +3,7 @@ abstract: 'Data objects for hash type.'
 author:
   - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
+  DateTime: 0
   English: 0
   Error::Pure: 0
   ExtUtils::MakeMaker: 6.59
@@ -26,6 +27,8 @@ no_index:
     - t
     - xt
 requires:
+  DateTime: 0
+  Error::Pure: 0
   Mo: 0
   Mo::utils: 0.09
   perl: 5.8.0
@@ -34,4 +37,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Data-HashType
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Data-HashType
-version: '0.03'
+version: '0.05'

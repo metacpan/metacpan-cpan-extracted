@@ -16,6 +16,8 @@ class Native::Runtime : pointer {
   # Fields
   has compiler : Native::Compiler;
   
+  has env : Native::Env;
+  
   # Instance Methods
   native method get_basic_types_length : int ();
   
@@ -27,33 +29,86 @@ class Native::Runtime : pointer {
   
   native method build_precompile_method_source : string ($method : Native::Method);
   
-  # Private Instance Methods - Only used in core.
+  native method get_compiler : Native::Compiler ();
   
-  method _get_class_names : string[] () {
+  method get_method_by_name : Native::Method ($class_name : string, $method_name : string) {
+    
+    my $basic_type = $self->get_basic_type_by_name($class_name);
+    
+    my $method = $basic_type->get_method_by_name($method_name);
+    
+    return $method;
+  }
+  
+  method get_field_by_name : Native::Field ($class_name : string, $field_name : string) {
+    
+    my $basic_type = $self->get_basic_type_by_name($class_name);
+    
+    my $field = $basic_type->get_field_by_name($field_name);
+    
+    return $field;
+  }
+  
+  method get_class_var_by_name : Native::ClassVar ($class_name : string, $class_var_name : string) {
+    
+    my $basic_type = $self->get_basic_type_by_name($class_name);
+    
+    my $class_var = $basic_type->get_class_var_by_name($class_var_name);
+    
+    return $class_var;
+  }
+  
+  method get_basic_types : Native::BasicType[] ($options : object[] = undef) {
+    
+    my $options_h = Hash->new($options);
     
     my $basic_types_length = $self->get_basic_types_length;
     
-    my $user_defined_basic_type_names_tmp = new string [$basic_types_length];
+    my $basic_types_list = List->new(new Native::BasicType[0]);
     
-    my $user_defined_basic_type_names_length = 0;
+    my $match = 1;
     
-    for (my $basic_type_id = 0; $basic_type_id < $basic_types_length; $basic_type_id++) {
-      my $basic_type = $self->get_basic_type_by_id($basic_type_id);
-      my $basic_type_name = $basic_type->get_name;
-      if (($basic_type_name->[0] >= 'A' && $basic_type_name->[0] <= 'Z') && !Fn->contains($basic_type_name, "::anon::")) {
-        $user_defined_basic_type_names_tmp->[$user_defined_basic_type_names_length] = $basic_type_name;
-        $user_defined_basic_type_names_length++;
+    for (my $id = 0; $id < $basic_types_length; $id++) {
+      my $basic_type = $self->get_basic_type_by_id($id);
+      
+      if ($options_h->exists("category")) {
+        my $categories = (int[])$options_h->get("category");
+        
+        my $category_match = 0;
+        for my $category (@$categories) {
+          if ($basic_type->get_category == $category) {
+            $category_match = 1;
+            last;
+          }
+        }
+        
+        unless ($category_match) {
+          next;
+        }
       }
+      
+      if ($options_h->exists("is_anon")) {
+        my $is_anon = $options_h->get_int("is_anon");
+        
+        my $basic_type_name = $basic_type->get_name;
+        my $basic_type_is_anon = $basic_type->is_anon;
+        
+        my $is_anon_match = !!$basic_type->is_anon == !!$is_anon;
+        
+        unless ($is_anon_match) {
+          next;
+        }
+      }
+      
+      $basic_types_list->push($basic_type);
     }
     
-    my $user_defined_basic_type_names = new string [$user_defined_basic_type_names_length];
+    my $basic_types = (Native::BasicType[])$basic_types_list->to_array;
     
-    for (my $i = 0; $i < $user_defined_basic_type_names_length; $i++) {
-      $user_defined_basic_type_names->[$i] = $user_defined_basic_type_names_tmp->[$i];
-    }
-    
-    return $user_defined_basic_type_names;
+    return $basic_types;
   }
   
-  native method get_compiler : Native::Compiler ();
+  method get_env : Native::Env () {
+    return $self->{env};
+  }
 }

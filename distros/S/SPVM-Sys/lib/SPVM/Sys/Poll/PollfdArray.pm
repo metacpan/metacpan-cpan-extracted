@@ -4,7 +4,11 @@ package SPVM::Sys::Poll::PollfdArray;
 
 =head1 Name
 
-SPVM::Sys::Poll::PollfdArray - Array of C<struct pollfd> in C<C language>
+SPVM::Sys::Poll::PollfdArray - Array of C<struct pollfd> in the C language
+
+=head1 Description
+
+The Sys::Poll::PollfdArray class in L<SPVM> represents the array of C<struct pollfd> in the C language.
 
 =head1 Usage
 
@@ -12,17 +16,15 @@ SPVM::Sys::Poll::PollfdArray - Array of C<struct pollfd> in C<C language>
   
   my $pollfds = Sys::Poll::PollfdArray->new(1024);
 
-=head1 Description
+=head1 Details
 
-C<Sys::Poll::PollfdArray> is the class for the array of C<struct pollfd> in C<C language>.
-
-This is a L<pointer class|SPVM::Document::Language/"Pointer Class">.
+This class is a pointer class. The pointer the instance has is set to an C<struct pollfd> array.
 
 =head1 Fields
 
 =head2 length
 
-  has length : ro int;
+C<has length : ro int;>
 
 The length of the array.
 
@@ -30,91 +32,99 @@ The length of the array.
 
 =head2 new
 
-  static method new : Sys::Poll::PollfdArray ($length : int);
+C<static method new : L<Sys::Poll::PollfdArray|SPVM::Sys::Poll::PollfdArray> ($length : int);>
 
-Create a new C<Sys::Poll::PollfdArray> object with the length.
+Creates a new L<Sys::Poll::PollfdArray|SPVM::Sys::Poll::PollfdArray> object given the length $lenth.
 
 =head1 Instance Methods
 
 =head2 DESTROY
 
-  method DESTROY : void ();
+C<method DESTROY : void ();>
 
 The destructor.
 
 =head2 length
 
-  method length : int ();
+C<method length : int ();>
 
-Get the lenght of the array.
+Gets the lenght of the array.
 
 =head2 fd
 
-  method fd : int ($index : int);
+C<method fd : int ($index : int);>
 
-Get C<fd> of the position specifed by the index.
+Returns C<fd> of the element at index $index.
 
-The index must be greater than or equal to 0. Otherwise an exception will be thrown.
+Excetpions:
 
-The index must be less than the length of the file descripters. Otherwise an exception will be thrown.
+$index must be greater than or equal to 0. Otherwise an exception is thrown.
+
+$index must be less than the length of the file descripters. Otherwise an exception is thrown.
 
 =head2 set_fd
 
-  method set_fd : void ($index : int, $fd : int);
+C<method set_fd : void ($index : int, $fd : int);>
 
-Set C<fd> of the position specifed by the index.
+Sets C<fd> of the element at index $index.
 
-The index must be greater than or equal to 0. Otherwise an exception will be thrown.
+Excetpions:
 
-The index must be less than the length of the file descripters. Otherwise an exception will be thrown.
+$index must be greater than or equal to 0. Otherwise an exception is thrown.
+
+$index must be less than the length of the file descripters. Otherwise an exception is thrown.
 
 =head2 events
 
-  method events : int ($index : int);
+C<method events : int ($index : int);>
 
-Get C<events> of the position specifed by the index.
+Returns C<events> of the element at index $index.
 
-The index must be greater than or equal to 0. Otherwise an exception will be thrown.
+Excetpions:
 
-The index must be less than the length of the file descripters. Otherwise an exception will be thrown.
+$index must be greater than or equal to 0. Otherwise an exception is thrown.
 
-See L<Sys::Poll::PollfdArray|SPVM::Sys::Poll::PollfdArray> about the constant values of events.
+$index must be less than the length of the file descripters. Otherwise an exception is thrown.
 
 =head2 set_events
 
-  method set_events : void ($index : int, $events : int);
+C<method set_events : void ($index : int, $events : int);>
 
-Set C<events> of the position specifed by the index.
+Sets C<events> of the element at index $index.
 
-The index must be greater than or equal to 0. Otherwise an exception will be thrown.
+Excetpions:
 
-The index must be less than the length of the file descripters. Otherwise an exception will be thrown.
+$index must be greater than or equal to 0. Otherwise an exception is thrown.
 
-See L<Sys::Poll::PollfdArray|SPVM::Sys::Poll::PollfdArray> about the constant values of events.
+$index must be less than the length of the file descripters. Otherwise an exception is thrown.
+
+See L<Sys::Poll::Constant|SPVM::Sys::Poll::Constant> about constant values given to $revents.
 
 =head2 events
 
-  method revents : int ($index : int);
+C<method revents : int ($index : int);>
 
-Get C<revents> of the position specifed by the index.
+Returns C<revents> of the element at index $index.
 
-The index must be greater than or equal to 0. Otherwise an exception will be thrown.
+Excetpions:
 
-The index must be less than the length of the file descripters. Otherwise an exception will be thrown.
+$index must be greater than or equal to 0. Otherwise an exception is thrown.
 
-See L<Sys::Poll::PollfdArray|SPVM::Sys::Poll::PollfdArray> about the constant values of events.
+$index must be less than the length of the file descripters. Otherwise an exception is thrown.
 
 =head2 set_revents
 
-  method set_revents : void ($index : int, $revents : int);
+C<method set_revents : void ($index : int, $revents : int);>
 
-Set C<revents> of the position specifed by the index.
+Sets C<revents> of the element at index $index.
 
-The index must be greater than or equal to 0. Otherwise an exception will be thrown.
+Excetpions:
 
-The index must be less than the length of the file descripters. Otherwise an exception will be thrown.
+$index must be greater than or equal to 0. Otherwise an exception is thrown.
 
-See L<Sys::Poll::PollfdArray|SPVM::Sys::Poll::PollfdArray> about the constant values of events.
+$index must be less than the length of the file descripters. Otherwise an exception is thrown.
+
+See L<Sys::Poll::Constant|SPVM::Sys::Poll::Constant> about constant values given to $revents.
 
 =head1 Copyright & License
 

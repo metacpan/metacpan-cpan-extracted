@@ -229,9 +229,11 @@ sub visible {
     if (defined(my $all = delete $opt{all})) {
 	$flag{$_} = $all for keys %flag;
     }
-    my($tabstyle, $s_char, $c_char) = ('bar', '', '');
-    if (exists $opt{tabstyle} and $tabstyle = delete $opt{tabstyle}) {
-	Text::ANSI::Tabs->configure(tabstyle => $tabstyle);
+    my($s_char, $c_char) = ('', '');
+    for my $name (qw(tabstyle tabstop)) {
+	if (exists $opt{$name} and my $value = delete $opt{$name}) {
+	    Text::ANSI::Tabs->configure($name => $value);
+	}
     }
     %flag = (%flag, %opt);
     for my $name (keys %flag) {
@@ -239,9 +241,7 @@ sub visible {
 	elsif ($flag{$name})        { $s_char .= $char{$name} }
     }
     while (<>) {
-	if ($tabstyle) {
-	    $_ = ansi_expand($_);
-	}
+	$_ = ansi_expand($_);
 	s{(?=(${keep_after}?))([$s_char]|(?#bug?)(?!))}{$symbol{$2}$1}g
 	    if $s_char ne '';
 	s{(?=(${keep_after}?))([$c_char]|(?#bug?)(?!))}{
@@ -266,7 +266,7 @@ visible representation.
 
 =item I<name>
 
-Name is C<tabstyle>, C<all>, or one of these:
+Name is C<tabstop>, C<tabstyle>, C<all>, or one of these:
 
     000 nul  001 soh  002 stx  003 etx  004 eot  005 enq  006 ack  007 bel
     010 bs   011 ht   012 nl   013 vt   014 np   015 cr   016 so   017 si
@@ -280,7 +280,8 @@ Default is equivalent to:
 
     visible(tabstyle=bar,all=s,esc=0,nl=0)
 
-As for C<tabstyle>, use anything defined in L<Text::ANSI::Fold>.
+Tab width can be set by C<tabstop>.  As for C<tabstyle>, use anything
+defined in L<Text::ANSI::Fold>.
 
 =item I<flag>
 

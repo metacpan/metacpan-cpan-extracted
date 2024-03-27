@@ -1,3 +1,6 @@
+1.010 2024-03-24
+- fix PGPLOT to read devices correctly
+
 1.009 2023-01-28
 - Prima driver now working again - thanks @dk
 

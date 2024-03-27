@@ -1,0 +1,15 @@
+Changes
+lib/Business/Tax/US/Form_1040/Worksheets.pm
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/001-pp_ssbw.t
+t/002-pp_qdcgtw.t
+t/2022/001-social.t
+t/2022/002-qualified.t
+t/2023/001-social.t
+t/2023/002-qualified.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

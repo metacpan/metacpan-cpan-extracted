@@ -4,7 +4,19 @@ package Sys::Socket::Error::InetInvalidNetworkAddress;
 
 =head1 Name
 
-Sys::Socket::Error::InetInvalidNetworkAddress - The address is not a valid network address.
+Sys::Socket::Error::InetInvalidNetworkAddress - Invalid Network address Socket Error
+
+=head1 Description
+
+The Sys::Socket::Error class in L<SPVM> represents a socket error "The got address is not a valid network address".
+
+=head1 Usage
+
+  use Sys::Socket::Error::InetInvalidNetworkAddress;
+
+=head1 Inheritance
+
+L<Error|SPVM::Error>
 
 =head1 Copyright & License
 

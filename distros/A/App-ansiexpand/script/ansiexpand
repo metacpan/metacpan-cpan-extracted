@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-our $VERSION = "1.04";
+our $VERSION = "1.05";
 
 BEGIN {
     if ($0 =~ /unexpand$/) {
@@ -28,16 +28,17 @@ ansiexpand [ option ] file ...
 
 ansiunexpand [ option ] file ...
 
-    -u  --unexpand               convert spaces to tabs
-    -t# --tabstop=#              tab stop width
-        --tabhead=char           tab head character
-        --tabspace=char          tab space character
-        --tabstyle=style         tab style
-        --ambiguous=wide|narrow  width of Unicode ambiguous character
+    -u --unexpand               convert spaces to tabs
+    -x --minimum=[#]            minimum space count to be converted
+    -t --tabstop=#              tab stop width
+       --tabhead=char           tab head character
+       --tabspace=char          tab space character
+       --tabstyle=style         tab style
+       --ambiguous=wide|narrow  width of Unicode ambiguous character
 
 =head1 VERSION
 
-Version 1.04
+Version 1.05
 
 =head1 DESCRIPTION
 
@@ -54,9 +55,23 @@ implementation detail.
 
 =over 7
 
-=item B<--unexpand>, B<-u>
+=item B<-u>, B<--unexpand>
 
 Behave as unexpand command.
+
+=item B<-a>
+
+This option exists only for compatibility with the C<unexpand>
+command.  It can be used but has no effect on the behavior of the
+command.
+
+=item B<-x>[#], B<--minimum>=[#]
+
+By default, two or more consecutive whitespace characters are
+converted by the B<-u> option or C<ansiunexpand> command.  This option
+sets the minimum number of whitespace characters to be converted.  If
+no value is given, a value of 1 is assumed, and all possible
+whitespace is converted to tabs.
 
 =item B<--tabstop>=#, B<-t>#
 
@@ -91,12 +106,10 @@ Set the width of Unicode ambiguous characters.  Default is C<narrow>.
 
 =head1 INCOMPATIBILITY
 
-There is no C<-a> option for C<ansiunexpand> and it always convert all
-spaces not only leading ones.  Use normal L<unexpand(1)> to convert
-just leading spaces.
-
-C<ansiexpand -u> or C<ansiunexpand> convert all spaces whenever possible
-including single space even if it does not reduce total data length.
+C<ansiunexpand>, with or without the C<-a> option, always converts all
+possible spaces, not just leading ones.  Because there is no point in
+using the C<ansiunexpand> command to convert only leading spaces, so
+please use the normal L<unexpand(1)> in that case.
 
 =head1 FILES
 
@@ -131,7 +144,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2021-2023 Kazumasa Utashiro
+Copyright ©︎ 2021-2024 Kazumasa Utashiro
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::ColorFilter;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**FilterByFillColor** | **boolean** | Flag indicating whether filter by the cell's fill color.  |
+**FilterByFillColor** | **boolean** | Whether filter by the cell's fill color.             |
 **Pattern** | **string** |  |
 **Color** | **CellsColor** |  |
 **ForegroundColorColor** | **CellsColor** |  |

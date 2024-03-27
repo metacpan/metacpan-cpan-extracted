@@ -25,14 +25,20 @@ sub oops(@) {
 
 $SIG{__WARN__} = sub { confess("warning trapped: @_") };
 
+BEGIN{ diag "before use Data::Compare etc."; } # try to find mystery Windows crash
 use Data::Compare qw(Compare);
+use Data::Dumper::Interp qw/:all/;
+BEGIN{ diag "after  use Data::Compare etc."; } # try to find mystery Windows crash
 
-# This test mysteriously dies (exit 5) with no visible message
+# This test mysteriously dies (exit 255) with no visible message
 # on certain Windows machines.  Try to explicitly 'fail' instead of
 # actually dieing.
 $SIG{__DIE__} = sub {
   if ($^S or !defined($^S)) {
-    die(@_); # in eval or at compile time
+    die(@_); # in eval or at compile time. Propagate it.
+    #NO
+    #my ($fn, $lno) = (caller(0))[1,2]; $fn //= "Undef"; $lno //= "Undef";
+    #fail("die caught in eval or at compile time  ${fn}:$lno", Carp::longmess(@_));
   } else {
     warn "!! die trapped : @_";
     my $via_carp;
@@ -46,7 +52,7 @@ $SIG{__DIE__} = sub {
     if ($via_carp) {
       fail("croak/confess caught", @_);
     } else {
-      my ($fn, $lno) = (caller(0))[1,2];
+      my ($fn, $lno) = (caller(0))[1,2]; $fn //= "Undef"; $lno //= "Undef";
       fail("die caught at ${fn}:$lno", Carp::longmess(@_));
     }
     bail_out("__DIE__ trap");
@@ -57,8 +63,6 @@ confess("Non-zero CHILD_ERROR ($?)") if $? != 0;
 
 # This script was written before the author knew anything about standard
 # Perl test-harness tools.  So it is a big monolithic thing.
-
-use Data::Dumper::Interp qw/:all/;
 
 sub visFoldwidth() {
   "Data::Dumper::Interp::Foldwidth=".u($Data::Dumper::Interp::Foldwidth)
@@ -146,12 +150,16 @@ sub mychecklit(&$$) {
   }
 }#checklit()
 
+diag "About to start tests...\n"; # try to find mystery Windows crash
+
 # Basic test of OO interfaces
 { my $code="Data::Dumper::Interp->new->vis('foo')  ;"; mycheck $code, '"foo"',     eval $code }
 { my $code="Data::Dumper::Interp->new->avis('foo') ;"; mycheck $code, '("foo")',   eval $code }
 { my $code="Data::Dumper::Interp->new->hvis(k=>'v');"; mycheck $code, '(k => "v")',eval $code }
 { my $code="Data::Dumper::Interp->new->dvis('foo') ;"; mycheck $code, 'foo',       eval $code }
 { my $code="Data::Dumper::Interp->new->ivis('foo') ;"; mycheck $code, 'foo',       eval $code }
+
+diag "Now at line ".__LINE__."\n"; # try to find mystery Windows crash
 
 foreach (
           ['Foldwidth',0,1,80,9999],
@@ -188,6 +196,8 @@ foreach (
     }
   }
 }
+
+diag "Now at line ".__LINE__."\n"; # try to find mystery Windows crash
 
 # Changing these are not allowed:
 foreach my $confname (qw/Indent Terse Sparseseen/) {
@@ -263,8 +273,11 @@ our $ABC_hr = \%ABC_h;
 our $ABC_obj = $main::global_obj;
 our $ABC_regexp = $main::global_regexp;
 
+main::diag("Now at line ".__LINE__."\n"); # try to find mystery Windows crash
+
 package main::Mybase;
 sub new { bless \do{ my $t = 1000+$_[1] }, $_[0] }
+BEGIN{ main::diag("In main::Mybase, use overload... at line ".__LINE__."\n"); } # try to find mystery Windows crash
 use overload
   '""' => sub{ my $self=shift; "Mybase-ish-".$$self }, # "Mybase-ish-1xxxx"
   # Implement '&' so Data::Dumper::Interp::_show_as_number
@@ -275,6 +288,8 @@ package main::Myderived;
 our @ISA = ("main::Mybase");
 
 package main;
+
+diag "Now at line ".__LINE__."\n"; # try to find mystery Windows crash
 
 $_ = "GroupA.GroupB";
 /(.*)\W(.*)/sp or confess "nomatch"; # set $1 and $2
@@ -297,6 +312,8 @@ $_ = "GroupA.GroupB";
 foreach my $os ($^O, 'linux', 'MSWin32') {
   local $^O = "$os"; # re-stringify to avoid undef when setting local $^O = $^O;
 
+diag "\$os=$os  Now at line ".__LINE__."\n"; # try to find mystery Windows crash
+
   if ($^O eq "MSWin32") {
     { my $code = q(qshlist("a b","c",'$d')); mycheck $code." (OS=$^O)", q("a b" c "$d"),  eval $code; }
     { my $code = q( qsh("a b\\\\")        ); mycheck $code." (OS=$^O)", q("a b\\\\"),     eval $code; }
@@ -308,6 +325,8 @@ foreach my $os ($^O, 'linux', 'MSWin32') {
     { my $code = q( qsh(q<a b">)          ); mycheck $code." (OS=$^O)", q('a b"'),        eval $code; }
   }
 }
+
+diag "Now at line ".__LINE__."\n"; # try to find mystery Windows crash
 
 # Basic checks
 { my $code = 'vis($_)'; mycheck $code, "\"${_}\"", eval $code; }
@@ -363,6 +382,8 @@ foreach my $os ($^O, 'linux', 'MSWin32') {
 { my $code = 'my $vv=123; \' a $vv b\' =~ / (.*)/ && dvis($1) && ($1 eq "a \$vv b") && dvis($1)';
   mycheck $code, 'a vv=123 b', eval $code; }
 
+diag "Now at line ".__LINE__."\n"; # try to find mystery Windows crash
+
 # Check Deparse support
 { my $data = $test_sub;
   { my $code = 'vis($data)'; mycheck $code, 'sub { "DUMMY" }', eval $code; }
@@ -391,6 +412,7 @@ my $bigfstr = '9988776655443322112233445566778899.8877';
 my $bigistr = '9988776655443322112233445566778899887766';
 my $ratstr  = '1/9';
 
+diag "Now at line ".__LINE__."\n"; # try to find mystery Windows crash
 {
   use bignum;  # BigInt and BigFloat together
 

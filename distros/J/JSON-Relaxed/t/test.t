@@ -21,7 +21,7 @@ BEGIN {
 # require './module-lib.pm';
 
 # prepare for tests
-use Test::Most;
+use Test::More;
 $ENV{'IDOCSDEV'} and die_on_fail();
 plan tests => 261;
 

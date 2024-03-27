@@ -28,17 +28,12 @@ my @usage_tests = (
     },
     {
         args => [qw(something else --that foo)],
-        cmp  => { },
         output => "You called me with that=foo",
         name => "Called something else with --that foo",
     },
     {
       args => [qw(something other --that foo)],
-      cmp  => {
-        '-exitval' => 1,
-        '-message' => 'something other command does not exist!',
-        '-verbose' => 1
-      },
+      warns => ["Unknown option: that\n"],
       name => "Incorrect subaction",
     },
 
@@ -88,7 +83,7 @@ foreach (@usage_tests) {
 
     _init_test($_->{args});
 
-    cmp_deeply(\%opts, $_->{cmp}, "... $_->{name}");
+    cmp_deeply(\%opts, $_->{cmp} // {}, "... $_->{name}");
 
     if (@warns || @{$_->{warns}}) {
       cmp_deeply(\@warns, $_->{warns}, "... warns about invalid options for commands");

@@ -1,4 +1,4 @@
-HTTP::Request::Diff - create diffs between HTTP request
+HTTP::Request::Diff - create diffs between HTTP requests
 
 
 
@@ -20,12 +20,32 @@ Should you wish to install this module manually, the procedure is
   make install
 
 
+REPOSITORY
+
+The public repository of this module is
+L<https://github.com/Corion/HTTP-Request-Diff>.
+
+SUPPORT
+
+The public support forum of this module is L<https://perlmonks.org/>.
 
 
 
+BUG TRACKER
+
+Please report bugs in this module via the Github bug queue at
+L<https://github.com/Corion/HTTP-Request-Diff/issues>
 
 
 
+AUTHOR
 
+Max Maischein C<corion@cpan.org>
 
+LICENSE
 
+This module is released under the Artistic License 2.0.
+
+COPYRIGHT (c)
+
+Copyright 2023- by Max Maischein C<corion@cpan.org>.

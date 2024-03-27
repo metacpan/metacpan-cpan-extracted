@@ -1,6 +1,7 @@
 use 5.006;
 use strict;
 use warnings;
+use Config;
 use ExtUtils::MakeMaker;
 use PDL::Core::Dev;
 use Devel::CheckLib qw(assert_lib);
@@ -47,7 +48,6 @@ my %WriteMakefileArgs = (
             },
         },
     },
-
 );
 
 # Compatibility with old versions of ExtUtils::MakeMaker
@@ -67,6 +67,9 @@ delete $WriteMakefileArgs{MIN_PERL_VERSION}
     unless eval { ExtUtils::MakeMaker->VERSION('6.48'); 1 };
 delete $WriteMakefileArgs{LICENSE}
     unless eval { ExtUtils::MakeMaker->VERSION('6.31'); 1 };
+
+$WriteMakefileArgs{CCFLAGS} = "$Config::Config{ccflags} -std=c99"
+    if $Config::Config{ccname} eq "gcc";
 
 WriteMakefile(%WriteMakefileArgs);
 

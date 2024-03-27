@@ -40,7 +40,7 @@ if ($meta) {
 # http://www.cpantesters.org/cpan/report/b26888fa-55bd-11ed-9ef0-b2246e8775ea
 
 my %configure_and_runtime_requires = (
-  'SPVM' => '0.989017',
+  'SPVM' => '0.989060',
   'SPVM::Resource::SocketUtil' => '1.001',
 );
 WriteMakefile(
@@ -72,6 +72,8 @@ WriteMakefile(
     %configure_and_runtime_requires,
     'SPVM::Errno' => '0.06',
   },
+  TEST_REQUIRES => {
+  }
 );
 
 sub MY::postamble {
@@ -80,13 +82,13 @@ sub MY::postamble {
   
   unless ($no_build_spvm_modules) {
     require SPVM::Builder::Util::API;
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_precompile('Sys');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::IO');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::IO::Windows');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::IO::Constant');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::IO::FileStream');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::IO::DirStream');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::IO::Dirent');
-    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::IO::Utimbuf');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::IO::Flock');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Process');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Process::Constant');
@@ -94,9 +96,11 @@ sub MY::postamble {
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::User::Passwd');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::User::Group');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Socket');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Socket::Errno');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Socket::Constant');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Socket::Addrinfo');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Socket::AddrinfoLinkedList');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Socket::Sockaddr');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Socket::Sockaddr::In');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Socket::Sockaddr::In6');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Socket::Sockaddr::Un');
@@ -114,6 +118,7 @@ sub MY::postamble {
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Time::Itimerval');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Time::Tm');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Time::Tms');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Time::Utimbuf');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Select');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Select::Fd_set');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Poll');
@@ -121,6 +126,7 @@ sub MY::postamble {
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Ioctl');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Ioctl::Constant');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Signal');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Signal::Handler');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Signal::Constant');
   }
   

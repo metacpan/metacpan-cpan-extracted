@@ -1,2 +1,1 @@
-# All files are binary files. CRLF is always CRLF. LF is always LF.
-* -text
+*.spvm text eol=lf

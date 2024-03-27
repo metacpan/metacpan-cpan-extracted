@@ -1,13 +1,68 @@
+NAME
 
+    HTML::Template::Plugin::Dot::Helpers - Add useful objects to your
+    templates
 
-This archive contains the distribution HTML-Template-Plugin-Dot-Helpers,
-version 0.06:
+SYNOPSIS
 
-  Add useful objects to your templates
+      use HTML::Template::Plugin::Dot::Helpers;
 
-This software is copyright (c) 2013 by Rhesa Rozendaal.
+    Then in your template, you can do:
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+      <tmpl_var Number.format_currency(orderitem.price)>
+      
 
+DESCRIPTION
+
+    This helper class adds some useful objects to your Dot-enabled
+    templates (see HTML::Template::Plugin::Dot).
+
+ Added objects
+
+    Number
+
+      An extended Number::Format object. See Number::Format for
+      documentation. Note that only the object oriented methods are
+      supported here.
+
+      I've added several generic numerical methods. Most (well, all in this
+      release) are boolean methods, useful in <tmpl_if>s. They are:
+
+      equals - test whether two numbers are equal (==)
+
+      le, lt, ge, gt - test how two numbers compare
+
+	(implemented with <=, <, >=, > respectively)
+
+      The following is not yet implemented.
+
+    String
+
+      Adds generic string testing functions similar to the above:
+
+      equals - test whether two strings are equal (eq)
+
+      le, lt, ge, gt - test how two strings compare lexically
+
+AUTHOR
+
+    Rhesa Rozendaal, <rhesa@cpan.org>
+
+BUGS
+
+    Please report any bugs or feature requests to
+    bug-html-template-plugin-dot-helpers@rt.cpan.org, or through the web
+    interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=HTML-Template-Plugin-Dot-Helpers.
+    I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+ACKNOWLEDGEMENTS
+
+COPYRIGHT & LICENSE
+
+    Copyright 2005 Rhesa Rozendaal, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
 

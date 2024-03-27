@@ -1,8 +1,8 @@
-# SPDX-License-Identifier: CC0-1.0
+# SPDX-License-Identifier: 0BSD OR MIT-0
 
 package DNS::nsdiff;
 
-our $VERSION = "1.82";
+our $VERSION = "1.85";
 
 =head1 NAME
 
@@ -35,12 +35,11 @@ The B<nsvi> script makes it easy to edit a dynamic zone.
 
 =head1 VERSION
 
-  This is DNS::nsdiff-1.82 <https://dotat.at/prog/nsdiff/>
+  This is DNS::nsdiff-1.85 <https://dotat.at/prog/nsdiff/>
 
   Written by Tony Finch <fanf2@cam.ac.uk> <dot@dotat.at>
   at Cambridge University Information Services.
   You may do anything with this. It has no warranty.
-  <https://creativecommons.org/publicdomain/zero/1.0/>
 
 =head1 SEE ALSO
 

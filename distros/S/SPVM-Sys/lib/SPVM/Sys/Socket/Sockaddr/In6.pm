@@ -4,7 +4,7 @@ package SPVM::Sys::Socket::Sockaddr::In6;
 
 =head1 Name
 
-SPVM::Sys::Socket::Sockaddr::In6 - struct sockaddr_in6 in C language
+SPVM::Sys::Socket::Sockaddr::In6 - struct sockaddr_in6 in the C language
 
 =head1 Usage
 
@@ -12,107 +12,113 @@ SPVM::Sys::Socket::Sockaddr::In6 - struct sockaddr_in6 in C language
 
 =head1 Description
 
-C<Sys::Socket::Sockaddr::In6> is the class for the C<struct sockaddr_in6> in C<C language>.
+The Sys::Socket::Sockaddr::In6 class in L<SPVM> represents L<struct sockaddr_in6|https://linux.die.net/man/7/ipv6> in the C language.
 
-This is a L<pointer class|SPVM::Document::Language/"Pointer Class">.
+=head1 Details
+
+This class is a pointer class. The pointer the instance has is set to a L<struct sockaddr_in6|https://linux.die.net/man/7/ipv6> object.
 
 =head1 Inheritance
 
-This class inherits L<Sys::Socket::Sockaddr|SPVM::Sys::Socket::Sockaddr>.
+L<Sys::Socket::Sockaddr|SPVM::Sys::Socket::Sockaddr>
 
 =head1 Class Methods
 
 =head2 new
 
-  static method new : Sys::Socket::Sockaddr::In6 ();
+C<static method new : L<Sys::Socket::Sockaddr::In6|SPVM::Sys::Socket::Sockaddr::In6> ();>
 
-Create a new C<Sys::Socket::Sockaddr::In6> object.
+Create a new L<Sys::Socket::Sockaddr::In6|SPVM::Sys::Socket::Sockaddr::In6> object.
 
 =head1 Instance Methods
 
 =head2 DESTROY
 
-  method DESTROY : void ()
+C<method DESTROY : void ()>
 
 The destructor.
 
 =head2 sa_family
 
-  method sa_family : int ()
+C<method sa_family : int ()>
 
-Gets C<sa_family>. This is the overriden method of the L<sa_family|SPVM::Sys::Socket::Sockaddr/"sa_family"> method in the Sys::Socket::Sockaddr class.
+Returns C<sa_family>.
 
 =head2 sin6_family
 
-  method sin6_family : int ();
+C<method sin6_family : int ();>
 
-Gets C<sin6_family>.
+Returns C<sin6_family>.
 
 =head2 set_sin6_family
 
-  method set_sin6_family : void ($family : int)
+C<method set_sin6_family : void ($family : int)>
 
 Sets C<sin6_family>.
 
 =head2 sin6_flowinfo
 
-  method sin6_flowinfo : int ()
+C<method sin6_flowinfo : int ()>
 
-Gets C<sin6_flowinfo>.
+Returns C<sin6_flowinfo>.
 
 =head2 set_sin6_flowinfo
 
-  method set_sin6_flowinfo : void ($flowinfo : int)
+C<method set_sin6_flowinfo : void ($flowinfo : int)>
 
 Sets C<sin6_flowinfo>.
 
 =head2 sin6_scope_id
 
-  method sin6_scope_id : int ();
+C<method sin6_scope_id : int ();>
 
-Gets C<sin6_scope_id>.
+Returns C<sin6_scope_id>.
 
 =head2 set_sin6_scope_id
 
-  method set_sin6_scope_id : void ($scope_id : int)
+C<method set_sin6_scope_id : void ($scope_id : int)>
 
 Sets C<sin6_scope_id>.
 
-=head2 copy_sin6_addr
+=head2 sin6_addr
 
-  method copy_sin6_addr : Sys::Socket::In6_addr ();
+C<method sin6_addr : L<Sys::Socket::In6_addr|SPVM::Sys::Socket::In6_addr> ();>
 
-Copies C<sin6_addr>. This is a L<Sys::Socket::In6_addr|SPVM::Sys::Socket::In6_addr> object.
+Copies C<sin6_addr> and returns it.
 
 =head2 set_sin6_addr
 
-  method set_sin6_addr : void ($address : Sys::Socket::In6_addr);
+C<method set_sin6_addr : void ($address : L<Sys::Socket::In6_addr|SPVM::Sys::Socket::In6_addr>);>
 
-Sets C<sin6_addr>. This is a L<Sys::Socket::In6_addr|SPVM::Sys::Socket::In6_addr> object.
+Sets C<sin6_addr>.
+
+Exceptions:
+
+The address must be defined. Otherwise an exception is thrown.
 
 =head2 sin6_port
 
-  method sin6_port : int ();
+C<method sin6_port : int ();>
 
-Gets C<sin6_port>.
+Returns C<sin6_port>.
 
 =head2 set_sin6_port
 
-  method set_sin6_port : void ($port : int);
+C<method set_sin6_port : void ($port : int);>
 
 Sets C<sin6_port>.
 
-=head2 sizeof
+=head2 size
 
-  method sizeof : int ()
+C<method size : int ()>
 
-The size of C<struct sockaddr_in6>.
+Returns the size of C<struct sockaddr_in6>.
 
 =head2 clone
 
-  method clone : Sys::Socket::Sockaddr::In6 ();
+C<method clone : L<Sys::Socket::Sockaddr::In6|SPVM::Sys::Socket::Sockaddr::In6> ();>
 
-Clones this object.
+Clones this instance and returns it.
 
 =head1 Copyright & License
 

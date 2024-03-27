@@ -6,4 +6,4 @@ use Test::More 'tests' => 2;
 use Test::NoWarnings;
 
 # Test.
-is($Mo::utils::Language::VERSION, 0.04, 'Version.');
+is($Mo::utils::Language::VERSION, 0.05, 'Version.');

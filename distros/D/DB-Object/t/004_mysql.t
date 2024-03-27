@@ -20,11 +20,17 @@ SKIP:
 	{
 		require DBD::mysql;
 	};
-	skip( "DBD::mysql is not installed", 22 ) if( $@ );
-	use_ok( 'DB::Object::Mysql' );
-    use_ok( "DB::Object::Mysql::Query" );
-    use_ok( "DB::Object::Mysql::Statement" );
-    use_ok( "DB::Object::Mysql::Tables" );
+	if( $@ )
+	{
+        skip( "DBD::mysql is not installed", 22 );
+	}
+	else
+	{
+        use_ok( 'DB::Object::Mysql' );
+        use_ok( "DB::Object::Mysql::Query" );
+        use_ok( "DB::Object::Mysql::Statement" );
+        use_ok( "DB::Object::Mysql::Tables" );
+    }
 	
 	## Connection parameters are taken from environment variables (DB_NAME, DB_LOGIN, DB_PASSWD, DB_DRIVER, DB_SCHEMA), or from file (DB_CON_FILE) or from uri (DB_CON_URI)
 	## DB_CON_URI=http://localhost:5432?database=mysql&login=jack&

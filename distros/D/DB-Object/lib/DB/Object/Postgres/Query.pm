@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Postgres/Query.pm
-## Version v0.2.1
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v0.3.0
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2024/01/05
+## Modified 2024/03/22
 ## All rights reserved
 ## 
 ## 
@@ -21,7 +21,7 @@ BEGIN
     use vars qw( $VERSION $DEBUG );
     use Devel::Confess;
     use Want;
-    our $VERSION = 'v0.2.1';
+    our $VERSION = 'v0.3.0';
 };
 
 use strict;
@@ -67,7 +67,11 @@ sub binded_types_as_param
     {
         my $elem = shift( @_ );
         my $type;
-        if( $elem && defined( $type = $elem->type ) )
+        if( $elem && $elem->as_is )
+        {
+            return;
+        }
+        elsif( $elem && defined( $type = $elem->type ) )
         {
             $params->push( { pg_type => $type } );
         }
@@ -750,7 +754,7 @@ DB::Object::Postgres::Query - Query Object for PostgreSQL
 
 =head1 VERSION
 
-    v0.2.1
+    v0.3.0
 
 =head1 DESCRIPTION
 

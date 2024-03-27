@@ -2,12 +2,12 @@ package Data::TableReader::Decoder::Mock;
 use Moo 2;
 use Carp 'croak';
 use IO::Handle;
-require MRO::Compat if $] < '5.10';
+require MRO::Compat if $] < '5.010';
 
 extends 'Data::TableReader::Decoder';
 
 # ABSTRACT: Decoder that returns supplied data without decoding anything
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 
 sub BUILDARGS {
@@ -120,7 +120,7 @@ Data::TableReader::Decoder::Mock - Decoder that returns supplied data without de
 
 =head1 VERSION
 
-version 0.012
+version 0.014
 
 =head1 SYNOPSIS
 

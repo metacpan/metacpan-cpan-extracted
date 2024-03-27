@@ -14,7 +14,9 @@ my $build = Module::Build->new(
       'File::Basename' => 0,
       'Getopt::Long' => 0,
       'List::UtilsBy' => 0,
+      'POSIX::strptime' => 0,
       'Text::CSV' => 0,
+      'Time::timegm' => 0,
    },
    test_requires => {
       'Test2::V0' => 0,

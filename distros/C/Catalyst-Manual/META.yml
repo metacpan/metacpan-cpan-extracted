@@ -25,7 +25,7 @@ resources:
   MailingList: http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Manual
   repository: https://github.com/perl-catalyst/Catalyst-Manual.git
-version: '5.9012'
+version: '5.9013'
 x_contributors:
   - 'Kennedy Clark <hkclark@gmail.com>'
   - 'Tomas Doran <bobtfish@bobtfish.net>'
@@ -42,7 +42,7 @@ x_contributors:
   - 'Frederik Schwarzer <schwarzerf@gmail.com>'
   - 'Jonathan Yu <jawnsy@cpan.org>'
   - 'Breno G. de Oliveira <garu@cpan.org>'
-  - "Lars DÉªá´�á´�á´�á´�á´¡ è¿ªæ��æ�¯ <daxim@cpan.org>"
+  - 'Lars Dɪᴇᴄᴋᴏᴡ 迪拉斯 <daxim@cpan.org>'
   - 'Matt S Trout <mst@shadowcat.co.uk>'
   - 'Florian Ragwitz <rafl@debian.org>'
   - 'Jess Robinson <cpan@desert-island.me.uk>'
@@ -57,7 +57,7 @@ x_contributors:
   - 'antgel <no@se.com>'
   - 'Alexander Hartmaier <abraxxa@cpan.org>'
   - 'Andreas Marienborg <omega@palle.net>'
-  - 'Dagfinn Ilmari MannsÃ¥ker <ilmari@ilmari.org>'
+  - 'Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>'
   - 'Gerda Shank <gerda.shank@gmail.com>'
   - 'Ian Wells <ijw@cack.org.uk>'
   - 'Jay Hannah <jay@jays.net>'
@@ -74,9 +74,9 @@ x_contributors:
   - 'David Steinbrunner <dsteinbrunner@pobox.com>'
   - 'Dominic Humphries <djh@thermeon.eu>'
   - 'Edwin de Graaf <egraaf@egraaf.org>'
-  - 'Eisenberger TamÃ¡s <tamas@eisenberger.hu>'
+  - 'Eisenberger Tamás <tamas@eisenberger.hu>'
   - 'Eric A. Zarko <ezarko@cpan.org>'
-  - 'IÃ±igo Tejedor Arrondo <poisonbit@gmail.com>'
+  - 'Iñigo Tejedor Arrondo <poisonbit@gmail.com>'
   - 'Jonathan "Duke" Leto <jonathan@leto.net>'
   - 'Jonathan Otsuka <djgoku@gmail.com>'
   - 'Kartik Thakore <thakore.kartik@gmail.com>'

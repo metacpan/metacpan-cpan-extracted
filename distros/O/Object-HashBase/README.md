@@ -25,6 +25,7 @@ A class:
     }
 
     sub print {
+        my $self = shift;
         print join ", " => map { $self->{$_} } FOO, BAR, BAZ, BAT, BAN, BOO;
     }
 
@@ -91,6 +92,29 @@ Generated accessors will be getters, `set_ACCESSOR` setters will also be
 generated for you. You also get constants for each accessor (all caps) which
 return the key into the hash for that accessor. Single inheritance is also
 supported.
+
+# XS ACCESSORS
+
+If [Class::XSAccessor](https://metacpan.org/pod/Class%3A%3AXSAccessor) is installed, it will be used to generate XS getters
+and setters.
+
+## CAVEATS
+
+The only caveat noticed so far is that if you take a reference to an objects
+attribute element: `my $ref = \($obj->{foo})` then use
+`$obj->set_foo(1)`, setting `$$ref = 2` will not longer work, and
+getting the value via `$val = $$ref` will also not work. This is not a
+problem when [Class::XSAccessor](https://metacpan.org/pod/Class%3A%3AXSAccessor) is not used.
+
+In practice it will nbe VERY rare for this to be a problem, but it was noticed
+because it broke a performance optimization in [Test2::API](https://metacpan.org/pod/Test2%3A%3AAPI).
+
+You can request an accessor NOT be xs with the '~' prefix:
+
+    use Object::HashBase '~foo';
+
+The sample above generates `foo()` and `set_foo()` and they are NOT
+implemented in XS.
 
 # INCLUDING IN YOUR DIST
 
@@ -232,6 +256,13 @@ Only gives you a write (`set_foo`), no `foo` method is defined at all.
     use Object::HashBase qw/+foo/;
 
 This does not create any methods for you, it just adds the `FOO` constant.
+
+## NO XS
+
+    use Object::HashBase qw/~foo/;
+
+This enforces that the getter and setter generated for `foo` will NOT use
+[Class::XSAccessor](https://metacpan.org/pod/Class%3A%3AXSAccessor) even if it is installed.
 
 # SUBCLASSING
 

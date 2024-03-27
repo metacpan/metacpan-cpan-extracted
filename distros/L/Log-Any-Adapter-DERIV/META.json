@@ -101,7 +101,7 @@
    "provides" : {
       "Log::Any::Adapter::DERIV" : {
          "file" : "lib/Log/Any/Adapter/DERIV.pm",
-         "version" : "0.007"
+         "version" : "0.008"
       }
    },
    "release_status" : "stable",
@@ -116,7 +116,7 @@
          "web" : "https://github.com/binary-com/perl-Log-Any-Adapter-DERIV"
       }
    },
-   "version" : "0.007",
+   "version" : "0.008",
    "x_authority" : "cpan:DERIV",
    "x_contributors" : [
       "aisha-deriv <aisha@regentmarkets.com>",

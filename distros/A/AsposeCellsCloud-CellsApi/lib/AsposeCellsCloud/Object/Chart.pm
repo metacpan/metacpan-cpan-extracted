@@ -248,7 +248,7 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'Name',
-     	description => 'Gets and sets the name of the chart.',
+     	description => '',
      	format => '',
      	read_only => '',
      		},

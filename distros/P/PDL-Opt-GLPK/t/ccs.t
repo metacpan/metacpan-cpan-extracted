@@ -1,6 +1,5 @@
 #!perl -T
 
-use v5.26;
 use Test2::V0 '!float';
 use Test2::Require::Module 'PDL::CCS';
 

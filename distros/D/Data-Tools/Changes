@@ -1,5 +1,11 @@
 Revision history for Perl extension Data::Tools
 
+1.43 2024-03-23
+
+   - added Data::Tools::Process module for process management
+   - added daemonize() function in Data::Tools::Process
+   - moved cmd_fork_exec() from Data::Tools to Data::Tools::Process
+
 1.42 2023-08-15
 
    - version and git repo cleanup

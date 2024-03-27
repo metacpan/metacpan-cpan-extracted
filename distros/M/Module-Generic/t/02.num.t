@@ -226,7 +226,7 @@ is( $n2->decimal, $dec_sep, "Decimal separator -> '" . ( defined( $dec_sep ) ? $
 # is( $n2->thousand->scalar, $tho_sep, 'Thousand separator' );
 # diag( "\$tho_sep is defined? ", defined( $tho_sep ) ? 'yes' : 'no' );
 # diag( "\$n2->thousand is defined? ", defined( $n2->thousand ) ? 'yes' : 'no' );
-is( $n2->thousand, ( $tho_sep // '' ), "Thousand separator -> '" . ( defined( $tho_sep ) ? $tho_sep : 'undef' ) . "'" );
+is( ( $n2->thousand // '' ), ( $tho_sep // '' ), "Thousand separator -> '" . ( defined( $tho_sep ) ? $tho_sep : 'undef' ) . "'" );
 is( $n2->precision, 2, "Precision -> '2'" );
 is( $n2->currency, '€', "Currency symbol -> '€'" );
 isa_ok( $n2->currency, 'Module::Generic::Scalar', 'Returns property as string object' );

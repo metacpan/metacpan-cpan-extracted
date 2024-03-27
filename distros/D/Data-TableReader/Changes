@@ -1,3 +1,9 @@
+Version 0.014 - 2024-03-25
+ - Fix compatibility with newest Spreadsheet::ParseXLSX
+
+Version 0.013 - 2024-03-22
+ - Fix bug in unit tests causing failure when MRO::Compat not installed
+
 Version 0.012 - 2024-03-07
  - Field now has 'coerce' attribute which can be a coderef, or enable
    Type::Tiny coercion.

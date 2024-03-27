@@ -12,8 +12,8 @@ enum {
   SPVM_IMPLEMENT_C_STRING_VALUE_ASSIGN_NON_ASSIGNABLE_TYPE,
   SPVM_IMPLEMENT_C_STRING_ASSIGN_READ_ONLY_STRING_TO_MUTABLE_TYPE,
   SPVM_IMPLEMENT_C_STRING_DIVIDE_ZERO,
-  SPVM_IMPLEMENT_C_STRING_CONCAT_LEFT_UNDEFINED,
-  SPVM_IMPLEMENT_C_STRING_CONCAT_RIGHT_UNDEFINED,
+  SPVM_IMPLEMENT_C_STRING_STRING_CONCAT_LEFT_UNDEFINED,
+  SPVM_IMPLEMENT_C_STRING_STRING_CONCAT_RIGHT_UNDEFINED,
   SPVM_IMPLEMENT_C_STRING_NEW_OBJECT_FAILED,
   SPVM_IMPLEMENT_C_STRING_NEW_ARRAY_FAILED,
   SPVM_IMPLEMENT_C_STRING_ARRRAY_LENGTH_SMALL,
@@ -70,13 +70,13 @@ static const char* SPVM_IMPLEMENT_STRING_LITERALS[] = {
 };
 
 enum {
-  SPVM_IMPLEMENT_C_COMPARISON_OP_STRING_EQ,
-  SPVM_IMPLEMENT_C_COMPARISON_OP_STRING_NE,
-  SPVM_IMPLEMENT_C_COMPARISON_OP_STRING_GT,
-  SPVM_IMPLEMENT_C_COMPARISON_OP_STRING_GE,
-  SPVM_IMPLEMENT_C_COMPARISON_OP_STRING_LT,
-  SPVM_IMPLEMENT_C_COMPARISON_OP_STRING_LE,
-  SPVM_IMPLEMENT_C_COMPARISON_OP_STRING_CMP,
+  SPVM_IMPLEMENT_C_STRING_COMPARISON_EQ,
+  SPVM_IMPLEMENT_C_STRING_COMPARISON_NE,
+  SPVM_IMPLEMENT_C_STRING_COMPARISON_GT,
+  SPVM_IMPLEMENT_C_STRING_COMPARISON_GE,
+  SPVM_IMPLEMENT_C_STRING_COMPARISON_LT,
+  SPVM_IMPLEMENT_C_STRING_COMPARISON_LE,
+  SPVM_IMPLEMENT_C_STRING_COMPARISON_CMP,
 };
 
 static inline void* SPVM_IMPLEMENT_GET_BASIC_TYPE_BY_NAME(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, char* message, int32_t* error_id) {
@@ -391,16 +391,16 @@ static inline void SPVM_IMPLEMENT_MOVE_OBJECT_CHECK_READ_ONLY(SPVM_ENV* env, SPV
 #define SPVM_IMPLEMENT_NEGATE_FLOAT(out, in) (out = -in)
 #define SPVM_IMPLEMENT_NEGATE_DOUBLE(out, in) (out = -in)
 
-static inline void SPVM_IMPLEMENT_CONCAT(SPVM_ENV* env, SPVM_VALUE* stack, void** out, void* in1, void* in2, int32_t* error_id) {
+static inline void SPVM_IMPLEMENT_STRING_CONCAT(SPVM_ENV* env, SPVM_VALUE* stack, void** out, void* in1, void* in2, int32_t* error_id) {
   void* string1 = in1;
   void* string2 = in2;
   if (string1 == NULL) {
-    void* exception = env->new_string_nolen_no_mortal(env, stack, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_CONCAT_LEFT_UNDEFINED]);
+    void* exception = env->new_string_nolen_no_mortal(env, stack, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_STRING_CONCAT_LEFT_UNDEFINED]);
     env->set_exception(env, stack, exception);
     *error_id = SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_CLASS;
   }
   else if (string2 == NULL) {
-    void* exception = env->new_string_nolen_no_mortal(env, stack, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_CONCAT_RIGHT_UNDEFINED]);
+    void* exception = env->new_string_nolen_no_mortal(env, stack, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_STRING_CONCAT_RIGHT_UNDEFINED]);
     env->set_exception(env, stack, exception);
     *error_id = SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_CLASS;
   }
@@ -418,80 +418,80 @@ static inline void SPVM_IMPLEMENT_CONCAT(SPVM_ENV* env, SPVM_VALUE* stack, void*
 #define SPVM_IMPLEMENT_BOOL_CONVERSION_REF(out, in) (out = !!in)
 #define SPVM_IMPLEMENT_BOOL_CONVERSION_BOOL_OBJECT(env, stack, out, in) (out = !!env->get_bool_object_value(env, stack, in))
 
-#define SPVM_IMPLEMENT_EQ_INT(out, in1, in2) (out = (in1 == in2))
-#define SPVM_IMPLEMENT_EQ_LONG(out, in1, in2) (out = (in1 == in2))
-#define SPVM_IMPLEMENT_EQ_FLOAT(out, in1, in2) (out = (in1 == in2))
-#define SPVM_IMPLEMENT_EQ_DOUBLE(out, in1, in2) (out = (in1 == in2))
-#define SPVM_IMPLEMENT_EQ_OBJECT(out, in1, in2) (out = (in1 == in2))
-#define SPVM_IMPLEMENT_EQ_REF(out, in1, in2) (out = (in1 == in2))
+#define SPVM_IMPLEMENT_NUMERIC_COMPARISON_EQ_INT(out, in1, in2) (out = (in1 == in2))
+#define SPVM_IMPLEMENT_NUMERIC_COMPARISON_EQ_LONG(out, in1, in2) (out = (in1 == in2))
+#define SPVM_IMPLEMENT_NUMERIC_COMPARISON_EQ_FLOAT(out, in1, in2) (out = (in1 == in2))
+#define SPVM_IMPLEMENT_NUMERIC_COMPARISON_EQ_DOUBLE(out, in1, in2) (out = (in1 == in2))
+#define SPVM_IMPLEMENT_NUMERIC_COMPARISON_EQ_OBJECT(out, in1, in2) (out = (in1 == in2))
+#define SPVM_IMPLEMENT_NUMERIC_COMPARISON_EQ_REF(out, in1, in2) (out = (in1 == in2))
 
-#define SPVM_IMPLEMENT_NE_INT(out, in1, in2) (out = (in1 != in2))
-#define SPVM_IMPLEMENT_NE_LONG(out, in1, in2) (out = (in1 != in2))
-#define SPVM_IMPLEMENT_NE_FLOAT(out, in1, in2) (out = (in1 != in2))
-#define SPVM_IMPLEMENT_NE_DOUBLE(out, in1, in2) (out = (in1 != in2))
-#define SPVM_IMPLEMENT_NE_OBJECT(out, in1, in2) (out = (in1 != in2))
-#define SPVM_IMPLEMENT_NE_REF(out, in1, in2) (out = (in1 != in2))
+#define SPVM_IMPLEMENT_NUMERIC_COMPARISON_NE_INT(out, in1, in2) (out = (in1 != in2))
+#define SPVM_IMPLEMENT_NUMERIC_COMPARISON_NE_LONG(out, in1, in2) (out = (in1 != in2))
+#define SPVM_IMPLEMENT_NUMERIC_COMPARISON_NE_FLOAT(out, in1, in2) (out = (in1 != in2))
+#define SPVM_IMPLEMENT_NUMERIC_COMPARISON_NE_DOUBLE(out, in1, in2) (out = (in1 != in2))
+#define SPVM_IMPLEMENT_NUMERIC_COMPARISON_NE_OBJECT(out, in1, in2) (out = (in1 != in2))
+#define SPVM_IMPLEMENT_NUMERIC_COMPARISON_NE_REF(out, in1, in2) (out = (in1 != in2))
 
-#define SPVM_IMPLEMENT_GT_INT(out, in1, in2) (out = (in1 > in2))
-#define SPVM_IMPLEMENT_GT_LONG(out, in1, in2) (out = (in1 > in2))
-#define SPVM_IMPLEMENT_GT_FLOAT(out, in1, in2) (out = (in1 > in2))
-#define SPVM_IMPLEMENT_GT_DOUBLE(out, in1, in2) (out = (in1 > in2))
+#define SPVM_IMPLEMENT_NUMERIC_COMPARISON_GT_INT(out, in1, in2) (out = (in1 > in2))
+#define SPVM_IMPLEMENT_NUMERIC_COMPARISON_GT_LONG(out, in1, in2) (out = (in1 > in2))
+#define SPVM_IMPLEMENT_NUMERIC_COMPARISON_GT_FLOAT(out, in1, in2) (out = (in1 > in2))
+#define SPVM_IMPLEMENT_NUMERIC_COMPARISON_GT_DOUBLE(out, in1, in2) (out = (in1 > in2))
 
-#define SPVM_IMPLEMENT_GE_INT(out, in1, in2) (out = (in1 >= in2))
-#define SPVM_IMPLEMENT_GE_LONG(out, in1, in2) (out = (in1 >= in2))
-#define SPVM_IMPLEMENT_GE_FLOAT(out, in1, in2) (out = (in1 >= in2))
-#define SPVM_IMPLEMENT_GE_DOUBLE(out, in1, in2) (out = (in1 >= in2))
+#define SPVM_IMPLEMENT_NUMERIC_COMPARISON_GE_INT(out, in1, in2) (out = (in1 >= in2))
+#define SPVM_IMPLEMENT_NUMERIC_COMPARISON_GE_LONG(out, in1, in2) (out = (in1 >= in2))
+#define SPVM_IMPLEMENT_NUMERIC_COMPARISON_GE_FLOAT(out, in1, in2) (out = (in1 >= in2))
+#define SPVM_IMPLEMENT_NUMERIC_COMPARISON_GE_DOUBLE(out, in1, in2) (out = (in1 >= in2))
 
-#define SPVM_IMPLEMENT_LT_INT(out, in1, in2) (out = (in1 < in2))
-#define SPVM_IMPLEMENT_LT_LONG(out, in1, in2) (out = (in1 < in2))
-#define SPVM_IMPLEMENT_LT_FLOAT(out, in1, in2) (out = (in1 < in2))
-#define SPVM_IMPLEMENT_LT_DOUBLE(out, in1, in2) (out = (in1 < in2))
+#define SPVM_IMPLEMENT_NUMERIC_COMPARISON_LT_INT(out, in1, in2) (out = (in1 < in2))
+#define SPVM_IMPLEMENT_NUMERIC_COMPARISON_LT_LONG(out, in1, in2) (out = (in1 < in2))
+#define SPVM_IMPLEMENT_NUMERIC_COMPARISON_LT_FLOAT(out, in1, in2) (out = (in1 < in2))
+#define SPVM_IMPLEMENT_NUMERIC_COMPARISON_LT_DOUBLE(out, in1, in2) (out = (in1 < in2))
 
-#define SPVM_IMPLEMENT_LE_INT(out, in1, in2) (out = (in1 <= in2))
-#define SPVM_IMPLEMENT_LE_LONG(out, in1, in2) (out = (in1 <= in2))
-#define SPVM_IMPLEMENT_LE_FLOAT(out, in1, in2) (out = (in1 <= in2))
-#define SPVM_IMPLEMENT_LE_DOUBLE(out, in1, in2) (out = (in1 <= in2))
+#define SPVM_IMPLEMENT_NUMERIC_COMPARISON_LE_INT(out, in1, in2) (out = (in1 <= in2))
+#define SPVM_IMPLEMENT_NUMERIC_COMPARISON_LE_LONG(out, in1, in2) (out = (in1 <= in2))
+#define SPVM_IMPLEMENT_NUMERIC_COMPARISON_LE_FLOAT(out, in1, in2) (out = (in1 <= in2))
+#define SPVM_IMPLEMENT_NUMERIC_COMPARISON_LE_DOUBLE(out, in1, in2) (out = (in1 <= in2))
 
-#define SPVM_IMPLEMENT_CMP_INT(out, in1, in2) (out = in1 > in2 ? 1 : in1 < in2 ? -1 : 0)
-#define SPVM_IMPLEMENT_CMP_LONG(out, in1, in2) (out = in1 > in2 ? 1 : in1 < in2 ? -1 : 0)
-#define SPVM_IMPLEMENT_CMP_FLOAT(out, in1, in2) (out = in1 > in2 ? 1 : in1 < in2 ? -1 : 0)
-#define SPVM_IMPLEMENT_CMP_DOUBLE(out, in1, in2) (out = in1 > in2 ? 1 : in1 < in2 ? -1 : 0)
+#define SPVM_IMPLEMENT_NUMERIC_COMPARISON_CMP_INT(out, in1, in2) (out = in1 > in2 ? 1 : in1 < in2 ? -1 : 0)
+#define SPVM_IMPLEMENT_NUMERIC_COMPARISON_CMP_LONG(out, in1, in2) (out = in1 > in2 ? 1 : in1 < in2 ? -1 : 0)
+#define SPVM_IMPLEMENT_NUMERIC_COMPARISON_CMP_FLOAT(out, in1, in2) (out = in1 > in2 ? 1 : in1 < in2 ? -1 : 0)
+#define SPVM_IMPLEMENT_NUMERIC_COMPARISON_CMP_DOUBLE(out, in1, in2) (out = in1 > in2 ? 1 : in1 < in2 ? -1 : 0)
 
 #define SPVM_IMPLEMENT_IS_UNDEF(out, in) (out = in == NULL)
 #define SPVM_IMPLEMENT_IS_NOT_UNDEF(out, in) (out = in != NULL)
 
-static inline void SPVM_IMPLEMENT_STRING_COMPARISON_OP(SPVM_ENV* env, SPVM_VALUE* stack, int32_t comparison_op_id, int32_t* out, void* in1, void* in2, int32_t object_length_offset) {
+static inline void SPVM_IMPLEMENT_STRING_COMPARISON(SPVM_ENV* env, SPVM_VALUE* stack, int32_t comparison_op_id, int32_t* out, void* in1, void* in2, int32_t object_length_offset) {
   void* object1 = in1;
   void* object2 = in2;
   
   int32_t flag = 0;
   if (object1 == NULL && object2 == NULL) {
    switch (comparison_op_id) {
-      case SPVM_IMPLEMENT_C_COMPARISON_OP_STRING_EQ: {
+      case SPVM_IMPLEMENT_C_STRING_COMPARISON_EQ: {
         flag = 1;
         break;
       }
-      case SPVM_IMPLEMENT_C_COMPARISON_OP_STRING_NE: {
+      case SPVM_IMPLEMENT_C_STRING_COMPARISON_NE: {
         flag = 0;
         break;
       }
-      case SPVM_IMPLEMENT_C_COMPARISON_OP_STRING_GT: {
+      case SPVM_IMPLEMENT_C_STRING_COMPARISON_GT: {
         flag = 0;
         break;
       }
-      case SPVM_IMPLEMENT_C_COMPARISON_OP_STRING_GE: {
+      case SPVM_IMPLEMENT_C_STRING_COMPARISON_GE: {
         flag = 1;
         break;
       }
-      case SPVM_IMPLEMENT_C_COMPARISON_OP_STRING_LT: {
+      case SPVM_IMPLEMENT_C_STRING_COMPARISON_LT: {
         flag = 0;
         break;
       }
-      case SPVM_IMPLEMENT_C_COMPARISON_OP_STRING_LE: {
+      case SPVM_IMPLEMENT_C_STRING_COMPARISON_LE: {
         flag = 1;
         break;
       }
-      case SPVM_IMPLEMENT_C_COMPARISON_OP_STRING_CMP: {
+      case SPVM_IMPLEMENT_C_STRING_COMPARISON_CMP: {
         flag = 0;
         break;
       }
@@ -499,31 +499,31 @@ static inline void SPVM_IMPLEMENT_STRING_COMPARISON_OP(SPVM_ENV* env, SPVM_VALUE
   }
   else if (object1 != NULL && object2 == NULL) {
     switch (comparison_op_id) {
-      case SPVM_IMPLEMENT_C_COMPARISON_OP_STRING_EQ: {
+      case SPVM_IMPLEMENT_C_STRING_COMPARISON_EQ: {
         flag = 0;
         break;
       }
-      case SPVM_IMPLEMENT_C_COMPARISON_OP_STRING_NE: {
+      case SPVM_IMPLEMENT_C_STRING_COMPARISON_NE: {
         flag = 1;
         break;
       }
-      case SPVM_IMPLEMENT_C_COMPARISON_OP_STRING_GT: {
+      case SPVM_IMPLEMENT_C_STRING_COMPARISON_GT: {
         flag = 1;
         break;
       }
-      case SPVM_IMPLEMENT_C_COMPARISON_OP_STRING_GE: {
+      case SPVM_IMPLEMENT_C_STRING_COMPARISON_GE: {
         flag = 1;
         break;
       }
-      case SPVM_IMPLEMENT_C_COMPARISON_OP_STRING_LT: {
+      case SPVM_IMPLEMENT_C_STRING_COMPARISON_LT: {
         flag = 0;
         break;
       }
-      case SPVM_IMPLEMENT_C_COMPARISON_OP_STRING_LE: {
+      case SPVM_IMPLEMENT_C_STRING_COMPARISON_LE: {
         flag = 0;
         break;
       }
-      case SPVM_IMPLEMENT_C_COMPARISON_OP_STRING_CMP: {
+      case SPVM_IMPLEMENT_C_STRING_COMPARISON_CMP: {
         flag = 1;
         break;
       }
@@ -531,31 +531,31 @@ static inline void SPVM_IMPLEMENT_STRING_COMPARISON_OP(SPVM_ENV* env, SPVM_VALUE
   }
   else if (object1 == NULL && object2 != NULL) {
     switch (comparison_op_id) {
-      case SPVM_IMPLEMENT_C_COMPARISON_OP_STRING_EQ: {
+      case SPVM_IMPLEMENT_C_STRING_COMPARISON_EQ: {
         flag = 0;
         break;
       }
-      case SPVM_IMPLEMENT_C_COMPARISON_OP_STRING_NE: {
+      case SPVM_IMPLEMENT_C_STRING_COMPARISON_NE: {
         flag = 1;
         break;
       }
-      case SPVM_IMPLEMENT_C_COMPARISON_OP_STRING_GT: {
+      case SPVM_IMPLEMENT_C_STRING_COMPARISON_GT: {
         flag = 0;
         break;
       }
-      case SPVM_IMPLEMENT_C_COMPARISON_OP_STRING_GE: {
+      case SPVM_IMPLEMENT_C_STRING_COMPARISON_GE: {
         flag = 0;
         break;
       }
-      case SPVM_IMPLEMENT_C_COMPARISON_OP_STRING_LT: {
+      case SPVM_IMPLEMENT_C_STRING_COMPARISON_LT: {
         flag = 1;
         break;
       }
-      case SPVM_IMPLEMENT_C_COMPARISON_OP_STRING_LE: {
+      case SPVM_IMPLEMENT_C_STRING_COMPARISON_LE: {
         flag = 1;
         break;
       }
-      case SPVM_IMPLEMENT_C_COMPARISON_OP_STRING_CMP: {
+      case SPVM_IMPLEMENT_C_STRING_COMPARISON_CMP: {
         flag = -1;
         break;
       }
@@ -580,31 +580,31 @@ static inline void SPVM_IMPLEMENT_STRING_COMPARISON_OP(SPVM_ENV* env, SPVM_VALUE
     }
     
     switch (comparison_op_id) {
-      case SPVM_IMPLEMENT_C_COMPARISON_OP_STRING_EQ: {
+      case SPVM_IMPLEMENT_C_STRING_COMPARISON_EQ: {
         flag = (cmp == 0);
         break;
       }
-      case SPVM_IMPLEMENT_C_COMPARISON_OP_STRING_NE: {
+      case SPVM_IMPLEMENT_C_STRING_COMPARISON_NE: {
         flag = (cmp != 0);
         break;
       }
-      case SPVM_IMPLEMENT_C_COMPARISON_OP_STRING_GT: {
+      case SPVM_IMPLEMENT_C_STRING_COMPARISON_GT: {
         flag = (cmp == 1);
         break;
       }
-      case SPVM_IMPLEMENT_C_COMPARISON_OP_STRING_GE: {
+      case SPVM_IMPLEMENT_C_STRING_COMPARISON_GE: {
         flag = (cmp >= 0);
         break;
       }
-      case SPVM_IMPLEMENT_C_COMPARISON_OP_STRING_LT: {
+      case SPVM_IMPLEMENT_C_STRING_COMPARISON_LT: {
         flag = (cmp == -1);
         break;
       }
-      case SPVM_IMPLEMENT_C_COMPARISON_OP_STRING_LE: {
+      case SPVM_IMPLEMENT_C_STRING_COMPARISON_LE: {
         flag = (cmp <= 0);
         break;
       }
-      case SPVM_IMPLEMENT_C_COMPARISON_OP_STRING_CMP: {
+      case SPVM_IMPLEMENT_C_STRING_COMPARISON_CMP: {
         flag = cmp;
         break;
       }
@@ -614,13 +614,13 @@ static inline void SPVM_IMPLEMENT_STRING_COMPARISON_OP(SPVM_ENV* env, SPVM_VALUE
   *out = flag;
 }
 
-#define SPVM_IMPLEMENT_STRING_EQ(env, stack, out, in1, in2) (SPVM_IMPLEMENT_STRING_COMPARISON_OP(env, stack, SPVM_IMPLEMENT_C_COMPARISON_OP_STRING_EQ, out, in1, in2, object_length_offset))
-#define SPVM_IMPLEMENT_STRING_NE(env, stack, out, in1, in2) (SPVM_IMPLEMENT_STRING_COMPARISON_OP(env, stack, SPVM_IMPLEMENT_C_COMPARISON_OP_STRING_NE, out, in1, in2, object_length_offset))
-#define SPVM_IMPLEMENT_STRING_GT(env, stack, out, in1, in2) (SPVM_IMPLEMENT_STRING_COMPARISON_OP(env, stack, SPVM_IMPLEMENT_C_COMPARISON_OP_STRING_GT, out, in1, in2, object_length_offset))
-#define SPVM_IMPLEMENT_STRING_GE(env, stack, out, in1, in2) (SPVM_IMPLEMENT_STRING_COMPARISON_OP(env, stack, SPVM_IMPLEMENT_C_COMPARISON_OP_STRING_GE, out, in1, in2, object_length_offset))
-#define SPVM_IMPLEMENT_STRING_LT(env, stack, out, in1, in2) (SPVM_IMPLEMENT_STRING_COMPARISON_OP(env, stack, SPVM_IMPLEMENT_C_COMPARISON_OP_STRING_LT, out, in1, in2, object_length_offset))
-#define SPVM_IMPLEMENT_STRING_LE(env, stack, out, in1, in2) (SPVM_IMPLEMENT_STRING_COMPARISON_OP(env, stack, SPVM_IMPLEMENT_C_COMPARISON_OP_STRING_LE, out, in1, in2, object_length_offset))
-#define SPVM_IMPLEMENT_STRING_CMP(env, stack, out, in1, in2) (SPVM_IMPLEMENT_STRING_COMPARISON_OP(env, stack, SPVM_IMPLEMENT_C_COMPARISON_OP_STRING_CMP, out, in1, in2, object_length_offset))
+#define SPVM_IMPLEMENT_STRING_COMPARISON_EQ(env, stack, out, in1, in2) (SPVM_IMPLEMENT_STRING_COMPARISON(env, stack, SPVM_IMPLEMENT_C_STRING_COMPARISON_EQ, out, in1, in2, object_length_offset))
+#define SPVM_IMPLEMENT_STRING_COMPARISON_NE(env, stack, out, in1, in2) (SPVM_IMPLEMENT_STRING_COMPARISON(env, stack, SPVM_IMPLEMENT_C_STRING_COMPARISON_NE, out, in1, in2, object_length_offset))
+#define SPVM_IMPLEMENT_STRING_COMPARISON_GT(env, stack, out, in1, in2) (SPVM_IMPLEMENT_STRING_COMPARISON(env, stack, SPVM_IMPLEMENT_C_STRING_COMPARISON_GT, out, in1, in2, object_length_offset))
+#define SPVM_IMPLEMENT_STRING_COMPARISON_GE(env, stack, out, in1, in2) (SPVM_IMPLEMENT_STRING_COMPARISON(env, stack, SPVM_IMPLEMENT_C_STRING_COMPARISON_GE, out, in1, in2, object_length_offset))
+#define SPVM_IMPLEMENT_STRING_COMPARISON_LT(env, stack, out, in1, in2) (SPVM_IMPLEMENT_STRING_COMPARISON(env, stack, SPVM_IMPLEMENT_C_STRING_COMPARISON_LT, out, in1, in2, object_length_offset))
+#define SPVM_IMPLEMENT_STRING_COMPARISON_LE(env, stack, out, in1, in2) (SPVM_IMPLEMENT_STRING_COMPARISON(env, stack, SPVM_IMPLEMENT_C_STRING_COMPARISON_LE, out, in1, in2, object_length_offset))
+#define SPVM_IMPLEMENT_STRING_COMPARISON_CMP(env, stack, out, in1, in2) (SPVM_IMPLEMENT_STRING_COMPARISON(env, stack, SPVM_IMPLEMENT_C_STRING_COMPARISON_CMP, out, in1, in2, object_length_offset))
 
 static inline void SPVM_IMPLEMENT_NEW_OBJECT(SPVM_ENV* env, SPVM_VALUE* stack, void** out, void* basic_type, int32_t* error_id) {
   void* object = env->new_object_no_mortal(env, stack, basic_type);
@@ -1338,7 +1338,7 @@ static inline void SPVM_IMPLEMENT_SET_FIELD_OBJECT(SPVM_ENV* env, SPVM_VALUE* st
     *error_id = SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_CLASS;
   }
   else {
-    void* ref = (void**)((intptr_t)object + object_data_offset + field_offset);
+    void** ref = (void**)((intptr_t)object + object_data_offset + field_offset);
     env->assign_object(env, stack, ref, in);
   }
 }
@@ -1351,7 +1351,7 @@ static inline void SPVM_IMPLEMENT_SET_FIELD_UNDEF(SPVM_ENV* env, SPVM_VALUE* sta
     *error_id = SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_CLASS;
   }
   else {
-    void* ref = (void**)((intptr_t)object + object_data_offset + field_offset);
+    void** ref = (void**)((intptr_t)object + object_data_offset + field_offset);
     env->assign_object(env, stack, ref, NULL);
   }
 }
@@ -1454,11 +1454,7 @@ static inline void SPVM_IMPLEMENT_SAY(SPVM_ENV* env, SPVM_VALUE* stack, void* st
   env->say(env, stack, string);
 }
 
-static inline void SPVM_IMPLEMENT_WARN(SPVM_ENV* env, SPVM_VALUE* stack, void* string, const char* file, int32_t line) {
-  env->warn(env, stack, string, NULL, NULL, file, line);
-}
-
-static inline void SPVM_IMPLEMENT_WARN_V2(SPVM_ENV* env, SPVM_VALUE* stack, void* string, const char* basic_type_name, const char* method_name, const char* file, int32_t line) {
+static inline void SPVM_IMPLEMENT_WARN(SPVM_ENV* env, SPVM_VALUE* stack, void* string, const char* basic_type_name, const char* method_name, const char* file, int32_t line) {
   env->warn(env, stack, string, basic_type_name, method_name, file, line);
 }
 
@@ -2457,19 +2453,6 @@ static inline void SPVM_IMPLEMENT_TYPE_CONVERSION_DOUBLE_OBJECT_TO_DOUBLE(SPVM_E
 #define SPVM_IMPLEMENT_SET_STACK_OBJECT(stack, stack_index, in) (*(void**)&stack[stack_index] = in)
 #define SPVM_IMPLEMENT_SET_STACK_REF(stack, stack_index, in) (*(void**)&stack[stack_index] = in)
 #define SPVM_IMPLEMENT_SET_STACK_UNDEF(stack, stack_index) (*(void**)&stack[stack_index] = NULL)
-
-static inline void SPVM_IMPLEMENT_SET_STACK_OBJECT_WITH_TYPE_CHECK(SPVM_ENV* env, SPVM_VALUE* stack, int32_t stack_index, void* in, void* dist_basic_type, int32_t dist_type_dimension, int32_t* error_id) {
-  void* object = in;
-  int32_t isa = env->isa(env, stack, object, dist_basic_type, dist_type_dimension);
-  if (isa) {
-    *(void**)&stack[stack_index] = object;
-  }
-  else {
-    void* exception = env->new_string_nolen_no_mortal(env, stack, SPVM_IMPLEMENT_STRING_LITERALS[SPVM_IMPLEMENT_C_STRING_VALUE_ASSIGN_NON_ASSIGNABLE_TYPE]);
-    env->set_exception(env, stack, exception);
-    *error_id = SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_CLASS;
-  }
-}
 
 static inline void SPVM_IMPLEMENT_SET_STACK_MULNUM_BYTE(SPVM_ENV* env, SPVM_VALUE* stack, int32_t stack_base, int32_t args_width, int8_t* in) {
   for (int32_t stack_index = 0; stack_index < args_width; stack_index++) {

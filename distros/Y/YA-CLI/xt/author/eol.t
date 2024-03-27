@@ -10,6 +10,7 @@ my @files = (
     'lib/YA/CLI.pm',
     'lib/YA/CLI/ActionRole.pm',
     'lib/YA/CLI/ErrorHandler.pm',
+    'lib/YA/CLI/PodRole.pm',
     'lib/YA/CLI/Usage.pm',
     't/00-compile.t',
     't/01-basic.t',

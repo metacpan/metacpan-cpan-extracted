@@ -5,7 +5,7 @@ use warnings;
 use Exporter;
 use DynaLoader;
 
-our $VERSION="2.28";
+our $VERSION="2.29";
 
 our @ISA = qw(Exporter DynaLoader);
 our @EXPORT = qw( pgarro pgask pgaxis pgband pgbbuf pgbeg pgbegin pgbin pgbox
@@ -19,7 +19,9 @@ pgqid pgqinf pgqitf pgqls pgqlw pgqndt pgqpos pgqtbg pgqtxt pgqvp pgqvsz pgqwin
 pgrect pgrnd pgrnge pgsah pgsave pgunsa pgscf pgsch pgsci pgscir pgsclp pgscr
 pgscrl pgscrn pgsfs pgshls pgshs pgsitf pgslct pgsls pgslw pgstbg pgsubp pgsvp
 pgvport pgswin pgwindow pgtbox pgtick pgtext pgupdt pgvect pgvsiz pgvsize
-pgvstd pgvstand pgwedg pgwnad );
+pgvstd pgvstand pgwedg pgwnad
+pggapline pgcolorpnts
+);
 
 if($^O =~ /mswin32/i) {
   local $DynaLoader::dl_dlext = 'xs.dll';
@@ -53,7 +55,7 @@ PGPLOT - allow subroutines in the PGPLOT graphics library to be called from Perl
 
 =head1 DESCRIPTION
 
-This module provides an inteface to the PGPLOT graphics library. To
+This module provides an interface to the PGPLOT graphics library. To
 obtain the library and its manual, see L</OBTAINING PGPLOT>.
 
 For every PGPLOT function the module provides an equivalent Perl

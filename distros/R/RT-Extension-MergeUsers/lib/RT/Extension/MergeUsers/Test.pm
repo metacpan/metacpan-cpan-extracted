@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 ### after: use lib qw(@RT_LIB_PATH@);
-use lib qw(/Users/sunnavy/bps/git/rt/local/lib /Users/sunnavy/bps/git/rt/lib);
+use lib qw(/opt/rt5/local/lib /opt/rt5/lib);
 
 package RT::Extension::MergeUsers::Test;
 

@@ -44,4 +44,3 @@ xt/release/cpan-changes.t
 xt/release/dist-manifest.t
 xt/release/fixme.t
 xt/release/meta-json.t
-xt/release/unused-vars.t

@@ -68,10 +68,10 @@ sub socket_protocol_read_message
   my $socket  = shift;
   my $timeout = shift;
   
-  my $data = socket_read_message( $socket, $timeout );
+  my ( $data, $data_read_len ) = socket_read_message( $socket, $timeout );
   if( ! defined $data )
     {
-    return wantarray ? ( undef, undef, 'E_SOCKET' ) : undef;
+    return wantarray ? ( undef, undef, $data_read_len == 0 ? 'E_EOF' : 'E_SOCKET' ) : undef;
     }
 
   my $ptype = substr( $data, 0, 1 );

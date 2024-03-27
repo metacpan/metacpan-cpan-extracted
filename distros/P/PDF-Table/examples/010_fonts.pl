@@ -3,20 +3,47 @@ use strict;
 use warnings;
 use Carp 'verbose'; local $SIG{__DIE__} = sub { Carp::confess(@_) }; use Data::Dumper;
 use PDF::Table;
+# NOTE: this example isn't really valid; 
+#   originally an attempt to use UTF-8 with corefonts!
 # -------------
 # -A or -B on command line to select preferred library (if available)
 # then look for PDFpref file and read A or B forms
 my ($PDFpref, $rcA, $rcB); # which is available?
-my $prefFile = "./PDFpref";
+my $prefFile = "examples/PDFpref";
 my $prefDefault = "B"; # PDF::Builder default if no prefFile, or both installed
+
+# command line selection of preferred library? A..., -A..., B..., or -B...
 if (@ARGV) {
     # A or -A argument: set PDFpref to A else B
     if ($ARGV[0] =~ m/^-?([AB])/i) {
 	$PDFpref = uc($1);
+	$prefix = 1;
     } else {
 	print STDERR "Unknown command line flag $ARGV[0] ignored.\n";
     }
 }
+# environment variable selection of preferred library?
+# A..., B..., PDF:[:]A..., or PDF:[:]B...
+if (!defined $PDFpref) {
+    if (defined $ENV{'PDF_prefLib'}) {
+        $PDFpref = $ENV{'PDF_prefLib'};
+        if      ($PDFpref =~ m/^A/i) {
+	    # something starting with A, assume want PDF::API2
+	    $PDFpref = 'A';
+        } elsif ($PDFpref =~ m/^B/i) {
+	    # something starting with B, assume want PDF::Builder
+	    $PDFpref = 'B';
+        } elsif ($PDFpref =~ m/^PDF:{1,2}A/i) {
+	    # something starting with PDF:A or PDF::A, assume want PDF::API2
+	    $PDFpref = 'A';
+        } elsif ($PDFpref =~ m/^PDF:{1,2}B/i) {
+	    # something starting with PDF:B or PDF::B, assume want PDF::Builder
+	    $PDFpref = 'B';
+        }
+    }
+}
+# PDF preference file selecting preferred library?
+# A..., B..., PDF:[:]A..., or PDF:[:]B...
 if (!defined $PDFpref) {
     if (-f $prefFile && -r $prefFile) {
         open my $FH, '<', $prefFile or die "error opening $prefFile: $!\n";
@@ -33,17 +60,19 @@ if (!defined $PDFpref) {
         } elsif ($PDFpref =~ m/^PDF:{1,2}B/i) {
 	    # something starting with PDF:B or PDF::B, assume want PDF::Builder
 	    $PDFpref = 'B';
-        } else {
-	    print STDERR "Don't see A... or B..., default to $prefDefault\n";
-	    $PDFpref = $prefDefault;
         }
         close $FH;
-    } else {
-        # no preference expressed, default to PDF::Builder
-        print STDERR "No preference file found, so default to $prefDefault\n";
-        $PDFpref = $prefDefault;
     }
 }
+# still no preferred library indicated? use the default
+if (!defined $PDFpref) {
+        # no preference expressed, default to PDF::Builder
+        print STDERR "No library preference given, so default to ".
+	  (($prefDefault eq 'A')? 'PDF::API2': 'PDF::Builder')." as preferred.\n";
+        $PDFpref = $prefDefault;
+}
+
+# try to use the preferred library, if available
 foreach (1 .. 2) {
     if ($PDFpref eq 'A') { # A(PI2) preferred
         $rcA = eval {
@@ -69,8 +98,8 @@ if (!$rcA && !$rcB) {
 }
 # -------------
 
-our $VERSION = '1.005'; # VERSION
-our $LAST_UPDATE = '1.002'; # manually update whenever code is changed
+our $VERSION = '1.006'; # VERSION
+our $LAST_UPDATE = '1.006'; # manually update whenever code is changed
 
 my $outfile = $0;
 $outfile =~ s/\.pl$/.pdf/;

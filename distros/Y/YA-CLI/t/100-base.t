@@ -150,7 +150,12 @@ foreach (@usage_tests) {
     cmp_deeply(\%opts, $_->{cmp}, "... $_->{name}");
 
     if (@warns || @{$_->{warns}}) {
-      cmp_deeply(\@warns, $_->{warns}, "... warns about invalid options for commands");
+      my $ok = cmp_deeply(\@warns, $_->{warns},
+        "... warns about invalid options for commands");
+      if (!$ok) {
+          diag explain \@warns;
+          diag explain $_->{warns};
+      }
     }
 
     next unless exists $_->{output};

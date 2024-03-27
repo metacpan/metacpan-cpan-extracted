@@ -10,13 +10,13 @@ static const char* FILE_NAME = "Sys/Time/Timezone.c";
 
 int32_t SPVM__Sys__Time__Timezone__new(SPVM_ENV* env, SPVM_VALUE* stack) {
 
-  int32_t e;
+  int32_t error_id = 0;
   
-  struct timezone* st_tz = env->new_memory_stack(env, stack, sizeof(struct timezone));
+  struct timezone* st_tz = env->new_memory_block(env, stack, sizeof(struct timezone));
   
-  void* obj_tz = env->new_pointer_object_by_name(env, stack, "Sys::Time::Timezone", st_tz, &e, __func__, FILE_NAME, __LINE__);
-  if (e) { return e; }
-
+  void* obj_tz = env->new_pointer_object_by_name(env, stack, "Sys::Time::Timezone", st_tz, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
   stack[0].oval = obj_tz;
   
   return 0;
@@ -30,7 +30,7 @@ int32_t SPVM__Sys__Time__Timezone__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   assert(st_tz);
   
-  env->free_memory_stack(env, stack, st_tz);
+  env->free_memory_block(env, stack, st_tz);
   
   return 0;
 }

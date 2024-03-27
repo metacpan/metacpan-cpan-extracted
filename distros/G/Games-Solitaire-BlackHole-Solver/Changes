@@ -1,5 +1,10 @@
 Revision history for Games-Solitaire-BlackHole-Solver
 
+0.10.0  2024-03-23
+    - ASCIIfied the UTF-8 arrows in the output.
+        - The use of utf8 pragmas/open-modes may have incurred a speed
+        overhead, and the user-experience is not *too* degraded.
+
 0.8.0   2024-01-18
         - Add the --display-boards flag.
         - Add the --num-foundations flag.

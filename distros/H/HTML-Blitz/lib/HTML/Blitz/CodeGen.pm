@@ -26,7 +26,7 @@ use constant {
     MAX_NESTED_CONCAT => 100,
 };
 
-our $VERSION = '0.09';
+our $VERSION = '0.0901';
 
 method new($class: :$_scope = 0, :$name = undef) {
     bless {
@@ -621,7 +621,7 @@ method assemble(:$data_format, :$data_format_mapping) {
     )
     . "    my \$r = '';\n"
     . "\n"
-    . $gen_code =~ s/^/    /mgr
+    . $gen_code =~ s/^(?=.)/    /mgr
     . "    \$r\n"
     . "}\n"
 }

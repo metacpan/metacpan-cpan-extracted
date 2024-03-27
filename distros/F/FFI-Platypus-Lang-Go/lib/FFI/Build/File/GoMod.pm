@@ -12,7 +12,7 @@ use FFI::Build::File::Library;
 use File::chdir;
 
 # ABSTRACT: Class to track C source file in FFI::Build
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 
 sub accept_suffix
@@ -109,7 +109,7 @@ FFI::Build::File::GoMod - Class to track C source file in FFI::Build
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -126,7 +126,11 @@ with the L<FFI::Platypus::Lang::Go> distribution.
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Graham TerMarsch (GTERMARS)
 
 =head1 COPYRIGHT AND LICENSE
 

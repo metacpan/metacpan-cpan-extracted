@@ -8,8 +8,8 @@ class TestCase::Sys::Ioctl {
   use Sys::Ioctl;
   use Sys::Ioctl::Constant as IOCTL;
   use Sys::OS;
-  
-  use TestUtil::SocketAutoClose;
+  use Sys;
+  use Fn;
   
   static method ioctl : int () {
     # Socket
@@ -18,13 +18,14 @@ class TestCase::Sys::Ioctl {
     unless ($socket> 0) {
       return 0;
     }
-
-    # Close socket at the end of this scope
-    my $socket_auto_close = TestUtil::SocketAutoClose->new($socket);
+    
+    Fn->defer([$socket : int] method :void () {
+      Sys::Socket->close($socket);
+    });
     
     my $value_ref = [1];
     my $status_ioctl = 0;
-    eval { $status_ioctl = Sys::Ioctl->ioctl($socket, IOCTL->FIONBIO, $value_ref); };
+    eval { $status_ioctl = Sys->ioctl($socket, IOCTL->FIONBIO, $value_ref); };
     
     if (Sys::OS->is_windows) {
       unless ($status_ioctl == 0) {

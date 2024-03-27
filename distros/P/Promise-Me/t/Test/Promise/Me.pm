@@ -81,7 +81,7 @@ sub runtest
     subtest 'concurrency' => sub
     {
         my $tmpdir = sys_tmpdir();
-        my $tmpfile = $tmpdir->child( 'module_generic_promise_test.txt' );
+        my $tmpfile = $tmpdir->child( "module_generic_promise_test-$$.txt" );
         my $f = $tmpfile;
         $f->empty;
         $f->close;
@@ -91,13 +91,19 @@ sub runtest
         $truc = 'Jean';
         %bidule = ( name => 'John', location => 'Paris' );
         @chouette = qw( Pierre Paul Jacques );
+        my $lockfile = tempfile( extension => 'txt', open => 1 );
+        # diag( "Lock file created at $lockfile and it exists? ", ( $lockfile->exists ? 'yes' : 'no' ) );
         share( $truc, %bidule, @chouette );
         my $p1 = Promise::Me->new(sub
         {
             print( STDERR "Concurrent promise 1 ($$), sleeping.\n" ) if( $DEBUG );
             diag( "Is \$result tied ? ", tied( $result ) ? 'Yes' : 'No', ". Value is -> '$result'" ) if( $DEBUG );
             # sleep(3);
-            sleep_tight(3);
+            # sleep_tight(3);
+            while( $lockfile->exists )
+            {
+                sleep_tight(0.5);
+            }
             $result .= "concurrency 1\n";
             my $file = $tmpfile->clone;
             diag( "Writing 'concurrency 1' to file $tmpfile and my pid is '$$' vs parent '$pid'" ) if( $DEBUG );
@@ -134,6 +140,7 @@ sub runtest
             {
                 warn( "Error appending to file $file: ", $file->error, "\n" );
             };
+            $lockfile->remove;
             return( $file );
         },
         {
@@ -167,6 +174,7 @@ sub runtest
         diag( "[$medium] -> [$serialiser]: ", $lines->length, " lines found in $tmpfile -> ", $lines->join( '' )->scalar ) if( $DEBUG );
         is( $lines->join( '' )->scalar, "concurrency 2\nconcurrency 1\n", 'concurrency check' );
         $f->empty;
+        $f->remove;
     };
 }
 

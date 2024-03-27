@@ -1,5 +1,5 @@
 package YA::CLI::ActionRole;
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 use Moo::Role;
 use namespace::autoclean;
 
@@ -8,6 +8,8 @@ use namespace::autoclean;
 use YA::CLI::Usage;
 use Getopt::Long;
 use List::Util qw(none any);
+
+with 'YA::CLI::PodRole';
 
 requires qw(
     action
@@ -23,10 +25,6 @@ has _cli_args => (
 );
 
 sub cli_options {
-    return;
-}
-
-sub usage_pod {
     return;
 }
 
@@ -63,44 +61,16 @@ sub has_action {
 
     return if none { $action eq $_ } $self->action;
 
-    if ($self->can('subaction')) {
-        return 0 unless defined $subaction;
-        return any { $subaction eq $_ } $self->subaction;
-    }
-    return defined $subaction ? 0 : 1;
+    return $self->has_subaction($subaction);
 }
 
-sub as_help {
+sub has_subaction {
     my $self = shift;
-    my $rc = shift;
-    my $message = shift;
+    my $subaction = shift;
 
-    return YA::CLI::Usage->new(
-      rc => ($rc // 0),
-      $message ? (message => $message) : (),
-      $self->_get_podfile_for_usage,
-    );
-}
-
-sub as_manpage {
-    my $self = shift;
-
-    return YA::CLI::Usage->new(
-        rc      => 0,
-        verbose => 2,
-        $self->_get_podfile_for_usage,
-    );
-}
-
-
-sub _get_podfile_for_usage {
-    my $self = shift;
-
-    my $podfile;
-    my $pod = $self->usage_pod;
-    return unless $pod;
-    return (pod_file => $pod) unless $pod == 1;
-    return (pod_file => ref $self || $self);
+    return -1 unless $self->can('subaction');
+    return 0 unless defined $subaction;
+    return any { $subaction eq $_ } $self->subaction;
 }
 
 1;
@@ -117,7 +87,7 @@ YA::CLI::ActionRole - Action handler role
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

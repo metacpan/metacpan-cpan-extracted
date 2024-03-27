@@ -4,19 +4,24 @@ use strict;
 use warnings;
 
 use Data::HashType;
+use DateTime;
 
 my $obj = Data::HashType->new(
-        'active' => 1,
         'id' => 10,
         'name' => 'SHA-256',
+        'valid_from' => DateTime->new(
+                'year' => 2024,
+                'month' => 1,
+                'day' => 1,
+        ),
 );
 
 # Print out.
 print 'Name: '.$obj->name."\n";
-print 'Active: '.$obj->active."\n";
 print 'Id: '.$obj->id."\n";
+print 'Valid from: '.$obj->valid_from->ymd."\n";
 
 # Output:
 # Name: SHA-256
-# Active: 1
 # Id: 10
+# Valid from: 2024-01-01

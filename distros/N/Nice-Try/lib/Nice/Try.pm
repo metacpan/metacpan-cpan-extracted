@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## A real Try Catch Block Implementation Using Perl Filter - ~/lib/Nice/Try.pm
-## Version v1.3.5
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v1.3.10
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/05/17
-## Modified 2023/09/29
+## Modified 2024/03/26
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -28,7 +28,7 @@ BEGIN
     use Scalar::Util ();
     use List::Util ();
     use Want ();
-    our $VERSION = 'v1.3.5';
+    our $VERSION = 'v1.3.10';
     our $ERROR;
     our( $CATCH, $DIED, $EXCEPTION, $FINALLY, $HAS_CATCH, @RETVAL, $SENTINEL, $TRY, $WANTARRAY );
 }
@@ -2040,7 +2040,7 @@ And you also have granular power in the catch block to filter which exception to
 
 =head1 VERSION
 
-    v1.3.5
+    v1.3.10
 
 =head1 DESCRIPTION
 
@@ -2904,7 +2904,7 @@ You can also pass an optional hash or hash reference of options to L</implement>
 
 =head1 CREDITS
 
-Credits to Stephen R. Scaffidi for his implementation of L<Try::Harder> from which I borrowed some code.
+Credits to Stephen R. Scaffidi for his implementation of L<Try::Harder> from which I initially borrowed some code.
 
 =head1 AUTHOR
 
@@ -2918,7 +2918,7 @@ L<JavaScript implementation of nice-try|https://javascript.info/try-catch>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2020-2021 DEGUEST Pte. Ltd.
+Copyright (c) 2020-2023 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated files under the same terms as Perl itself.
 

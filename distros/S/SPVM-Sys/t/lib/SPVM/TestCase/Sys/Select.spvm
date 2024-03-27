@@ -1,4 +1,5 @@
 class TestCase::Sys::Select {
+  use Sys;
   use Sys::Select;
   use Sys::Select::Fd_set;
   use Sys::Select::Constant as SELECT;
@@ -9,29 +10,30 @@ class TestCase::Sys::Select {
   use Sys::Socket::Sockaddr::In;
   use Sys::Process;
   
-  use TestUtil::SocketAutoClose;
+  use Fn;
   
   static method select : int ($port : int) {
     {
       # Socket
       my $no0_socket = Sys::Socket->socket(SOCKET->AF_INET, SOCKET->SOCK_STREAM, 0);
 
-      unless ($no0_socket> 0) {
+      unless ($no0_socket > 0) {
         return 0;
       }
       
-      # Close socket at the end of this scope
-      my $no0_socket_auto_close = TestUtil::SocketAutoClose->new($no0_socket);
+      Fn->defer([$no0_socket : int] method :void () {
+        Sys::Socket->close($no0_socket);
+      });
       
       # IPv4 address
       my $no0_address = Sys::Socket::Sockaddr::In->new;
       $no0_address->set_sin_family((byte)SOCKET->AF_INET);
       $no0_address->set_sin_port(Sys::Socket->htons((short)$port));
-      my $no0_sin_addr = $no0_address->copy_sin_addr;
+      my $no0_sin_addr = $no0_address->sin_addr;
       Sys::Socket->inet_pton(SOCKET->AF_INET, "127.0.0.1", $no0_sin_addr);
       $no0_address->set_sin_addr($no0_sin_addr);
       
-      my $no0_status_connect = Sys::Socket->connect($no0_socket, $no0_address, $no0_address->sizeof);
+      my $no0_status_connect = Sys::Socket->connect($no0_socket, $no0_address, $no0_address->size);
       
       unless ($no0_status_connect == 0) {
         Sys::Socket->close($no0_socket);
@@ -45,18 +47,19 @@ class TestCase::Sys::Select {
         return 0;
       }
       
-      # Close socket at the end of this scope
-      my $no1_socket_auto_close = TestUtil::SocketAutoClose->new($no1_socket);
+      Fn->defer([$no1_socket : int] method :void () {
+        Sys::Socket->close($no1_socket);
+      });
       
       # IPv4 address
       my $no1_address = Sys::Socket::Sockaddr::In->new;
       $no1_address->set_sin_family((byte)SOCKET->AF_INET);
       $no1_address->set_sin_port(Sys::Socket->htons((short)$port));
-      my $no1_sin_addr = $no1_address->copy_sin_addr;
+      my $no1_sin_addr = $no1_address->sin_addr;
       Sys::Socket->inet_pton(SOCKET->AF_INET, "127.0.0.1", $no1_sin_addr);
       $no1_address->set_sin_addr($no1_sin_addr);
       
-      my $no1_status_connect = Sys::Socket->connect($no1_socket, $no1_address, $no1_address->sizeof);
+      my $no1_status_connect = Sys::Socket->connect($no1_socket, $no1_address, $no1_address->size);
       
       unless ($no1_status_connect == 0) {
         Sys::Socket->close($no1_socket);
@@ -77,10 +80,9 @@ class TestCase::Sys::Select {
           $socket_max = $no1_socket;
         }
         
-        my $timeout = Sys::Time::Timeval->new;
-        $timeout->set_tv_sec(10);
+        my $timeout = 10;
         
-        my $ready_count_out = Sys::Select->select($socket_max + 1, undef, $writefds, undef, $timeout);
+        my $ready_count_out = Sys->select(undef, $writefds, undef, $timeout);
         
         unless ($ready_count_out == 2) {
           return 0;
@@ -163,10 +165,9 @@ class TestCase::Sys::Select {
           $socket_max = $no1_socket;
         }
         
-        my $timeout = Sys::Time::Timeval->new;
-        $timeout->set_tv_sec(10);
+        my $timeout = 10;
         
-        my $ready_count_out = Sys::Select->select($socket_max + 1, $readfds, undef, undef, $timeout);
+        my $ready_count_out = Sys->select($readfds, undef, undef, $timeout);
         
         unless ($ready_count_out == 2) {
           return 0;
@@ -323,17 +324,16 @@ class TestCase::Sys::Select {
       Sys::Select->FD_SET(0, $set);
       Sys::Select->FD_SET(1, $set);
       Sys::Select->FD_SET(2, $set);
-
-      my $set_copy = Sys::Select::Fd_set->new;
-      $set_copy->set($set);
       
-      unless (Sys::Select->FD_ISSET(0, $set_copy)) {
+      my $set_clone = $set->clone;
+      
+      unless (Sys::Select->FD_ISSET(0, $set_clone)) {
         return 0;
       }
-      unless (Sys::Select->FD_ISSET(1, $set_copy)) {
+      unless (Sys::Select->FD_ISSET(1, $set_clone)) {
         return 0;
       }
-      unless (Sys::Select->FD_ISSET(2, $set_copy)) {
+      unless (Sys::Select->FD_ISSET(2, $set_clone)) {
         return 0;
       }
     }

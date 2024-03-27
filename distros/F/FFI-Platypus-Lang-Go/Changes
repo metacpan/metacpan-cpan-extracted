@@ -1,5 +1,9 @@
 Revision history for FFI-Platypus-Lang-Go
 
+0.03      2024-03-22 15:46:00 -0600
+  - Updated prereqs to reflect that FFI::Platypus is required at configure
+    time (gh#20, Graham TerMarsch++)
+
 0.02      2022-10-30 21:29:00 -0600
   - Documentation improvements (gh#16)
 

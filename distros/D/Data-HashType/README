@@ -5,20 +5,25 @@ SYNOPSIS
      use Data::HashType;
 
      my $obj = Data::HashType->new(%params);
-     my $active = $obj->active;
      my $id = $obj->id;
      my $name = $obj->name;
+     my $valid_from = $obj->valid_from;
+     my $valid_to = $obj->valid_to;
+
+DESCRIPTION
+    The intention of this module is to store information about the usage of
+    digests. Digests are active only within a certain time range, and we
+    need a mechanism to transition to others.
+
+    A real-world example is a database table that follows the same format as
+    this data object, with multiple records being valid at different times,
+    while other database tables have relations to this table.
 
 METHODS
   "new"
      my $obj = Data::HashType->new(%params);
 
     Constructor.
-
-    *       "active"
-
-            Flag for activity of hash type. Possible value is 0/1. Default
-            value is 1 (active).
 
     *       "id"
 
@@ -30,14 +35,17 @@ METHODS
             Hash type name. Maximal length of value is 50 characters. It's
             required.
 
+    *       "valid_from"
+
+            Date and time of start of use. Must be a DateTime object. It's
+            required.
+
+    *       "valid_to"
+
+            Date and time of end of use. An undefined value means it is in
+            use. Must be a DateTime object. It's optional.
+
     Returns instance of object.
-
-  "active"
-     my $active = $obj->active;
-
-    Get active flag.
-
-    Returns 0/1.
 
   "id"
      my $id = $obj->id;
@@ -53,41 +61,68 @@ METHODS
 
     Returns string.
 
+  "valid_from"
+     my $valid_from = $obj->valid_from;
+
+    Get date and time of start of use.
+
+    Returns DateTime object.
+
+  "valid_to"
+     my $valid_to = $obj->valid_to;
+
+    Get date and time of end of use.
+
+    Returns DateTime object or undef.
+
 ERRORS
      new():
              From Mo::utils:
-                     Parameter 'active' must be a bool (0/1).
-                             Value: %s
                      Parameter 'id' must be a number.
                              Value: %s
                      Parameter 'name' has length greater than '50'.
                              Value: %s
                      Parameter 'name' is required.
+                     Parameter 'valid_from' is required.
+                     Parameter 'valid_from' must be a 'DateTime' object.
+                             Value: %s
+                             Reference: %s
+                     Parameter 'valid_to' must be a 'DateTime' object.
+                             Value: %s
+                             Reference: %s
+                     Parameter 'valid_to' must be older than 'valid_from' parameter.
+                             Value: %s
+                             Valid from: %s
 
 EXAMPLE
      use strict;
      use warnings;
 
      use Data::HashType;
+     use DateTime;
 
      my $obj = Data::HashType->new(
-             'active' => 1,
              'id' => 10,
              'name' => 'SHA-256',
+             'valid_from' => DateTime->new(
+                     'year' => 2024,
+                     'month' => 1,
+                     'day' => 1,
+             ),
      );
 
      # Print out.
      print 'Name: '.$obj->name."\n";
-     print 'Active: '.$obj->active."\n";
      print 'Id: '.$obj->id."\n";
+     print 'Valid from: '.$obj->valid_from->ymd."\n";
 
      # Output:
      # Name: SHA-256
-     # Active: 1
      # Id: 10
+     # Valid from: 2024-01-01
 
 DEPENDENCIES
-    Mo, Mo::utils.
+    DateTime, Error::Pure, Mo, Mo::utils.
 
 REPOSITORY
     <https://github.com/michal-josef-spacek/Data-HashType>
@@ -103,5 +138,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.03
+    0.05
 

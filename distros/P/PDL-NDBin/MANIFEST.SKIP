@@ -9,3 +9,4 @@
 ^_private
 ^cover_db$
 ^nytprof
+\/pp-.*\.[co]

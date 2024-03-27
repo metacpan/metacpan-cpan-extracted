@@ -1,18 +1,17 @@
 class TestCase::Sys::IO {
   use Sys::IO;
   use Sys::IO::Constant as IO;
-  use Sys::FileTest;
   use Fn;
   use Sys::IO::Stat;
   use Sys;
-  use Sys::IO::Utimbuf;
   use Sys::Time;
-
+  use Sys::IO::Flock;
+  
   static method open : int ($test_dir : string, $tmp_dir : string) {
     
     {
       my $file = "$test_dir/ftest/file_empty.txt";
-      my $fd = Sys::IO->open($file, IO->O_RDONLY, IO->O_TRUNC);
+      my $fd = Sys::IO->open($file, IO->O_RDONLY, 0644);
       
       unless ($fd >= 0) {
         return 0;
@@ -22,7 +21,7 @@ class TestCase::Sys::IO {
     
     {
       my $file = "$test_dir/ftest/not_found.txt";
-      eval { Sys::IO->open($file, IO->O_RDWR, IO->O_TRUNC); };
+      eval { Sys::IO->open($file, IO->O_RDWR, 0644); };
       
       unless ($@) {
         return 0;
@@ -44,6 +43,14 @@ class TestCase::Sys::IO {
       unless ($fd >= 0) {
         return 0;
       }
+      Sys::IO->close($fd);
+    }
+    
+    {
+      my $file = "$test_dir/ftest/file_empty.txt";
+      my $fd = -1;
+      Sys->sysopen(\$fd, $file, IO->O_RDONLY, 0644);
+      
       Sys::IO->close($fd);
     }
     
@@ -88,6 +95,47 @@ class TestCase::Sys::IO {
       }
 
       $read_length = Sys::IO->read($fd, $buffer, $count);
+      
+      unless ($read_length == 0) {
+        return 0;
+      }
+      Sys::IO->close($fd);
+    }
+    
+    {
+      my $file = "$test_dir/ftest/file_bytes8.txt";
+      my $fd = Sys::IO->open($file, IO->O_RDONLY);
+      
+      unless ($fd >= 0) {
+        return 0;
+      }
+
+      my $buffer = (mutable string)new_string_len 4;
+      my $count = 4;
+      
+      my $read_length = 0;
+      
+      $read_length = Sys->sysread($fd, $buffer, $count);
+      
+      unless ($buffer eq "abcd") {
+        return 0;
+      }
+      
+      unless ($read_length == 4) {
+        return 0;
+      }
+
+      $read_length = Sys->sysread($fd, $buffer, $count);
+      
+      unless ($buffer eq "efgh") {
+        return 0;
+      }
+      
+      unless ($read_length == 4) {
+        return 0;
+      }
+
+      $read_length = Sys->sysread($fd, $buffer, $count);
       
       unless ($read_length == 0) {
         return 0;
@@ -163,6 +211,28 @@ class TestCase::Sys::IO {
       Sys::IO->close($fd);
     }
     
+    {
+      my $file = "$test_dir/foo.txt";
+      my $fd = Sys::IO->open($file, IO->O_WRONLY | IO->O_CREAT, 0666);
+      
+      unless ($fd >= 0) {
+        return 0;
+      }
+
+      my $write_length = 0;
+      $write_length = Sys->syswrite($fd, "abcd", 4);
+      unless ($write_length == 4) {
+        return 0;
+      }
+      
+      $write_length = Sys->syswrite($fd, "efgh");
+      unless ($write_length == 4) {
+        return 0;
+      }
+      
+      Sys::IO->close($fd);
+    }
+    
     return 1;
   }
 
@@ -207,6 +277,37 @@ class TestCase::Sys::IO {
       IO->SEEK_END;
     }
     
+    {
+      my $file = "$test_dir/ftest/file_bytes8.txt";
+      my $fd = Sys::IO->open($file, IO->O_RDONLY);
+      
+      unless ($fd >= 0) {
+        return 0;
+      }
+
+      my $buffer = (mutable string)new_string_len 4;
+      my $count = 4;
+      
+      my $read_length = 0;
+      
+      my $cur_offset = Sys->sysseek($fd, 4, IO->SEEK_SET);
+      
+      unless ($cur_offset == 4) {
+        return 0;
+      }
+      
+      $read_length = Sys::IO->read($fd, $buffer, $count);
+      
+      unless ($buffer eq "efgh") {
+        return 0;
+      }
+      
+      unless ($read_length == 4) {
+        return 0;
+      }
+
+      Sys::IO->close($fd);
+    }
     return 1;
   }
 
@@ -231,18 +332,35 @@ class TestCase::Sys::IO {
   }
   
   static method fileno : int ($test_dir : string) {
-
-    my $file = "$test_dir/foo.txt";
-    my $stream = Sys::IO->fopen($file, "w");
     
-    unless (Sys::FileTest->f($file)) {
-      return 0;
+    {
+      my $file = "$test_dir/foo.txt";
+      my $stream = Sys::IO->fopen($file, "w");
+      
+      unless (Sys->f($file)) {
+        return 0;
+      }
+      
+      my $fd = Sys::IO->fileno($stream);
+      
+      unless ($fd >= 0) {
+        return 0;
+      }
     }
     
-    my $fd = Sys::IO->fileno($stream);
-    
-    unless ($fd >= 0) {
-      return 0;
+    {
+      my $file = "$test_dir/foo.txt";
+      my $stream = Sys::IO->fopen($file, "w");
+      
+      unless (Sys->f($file)) {
+        return 0;
+      }
+      
+      my $fd = Sys->fileno($stream);
+      
+      unless ($fd >= 0) {
+        return 0;
+      }
     }
     
     return 1;
@@ -276,6 +394,16 @@ class TestCase::Sys::IO {
       }
     }
     
+    {
+      my $file = "$test_dir/ftest/file_empty.txt";
+      my $stream_ref = [(Sys::IO::FileStream)undef];
+      Sys->open($stream_ref, "<", $file);
+      
+      unless ($stream_ref->[0]) {
+        return 0;
+      }
+    }
+    
     $@ = undef;
     
     return 1;
@@ -285,12 +413,12 @@ class TestCase::Sys::IO {
     
     {
       my $file = "$test_dir/ftest/file_empty.txt";
-      my $fd = Sys::IO->open($file, IO->O_RDWR, IO->O_TRUNC);
+      my $fd = Sys::IO->open($file, IO->O_RDWR, 0666);
       
       unless ($fd >= 0) {
         return 0;
       }
-
+      
       my $stream = Sys::IO->fdopen($fd, "rb");
       
       unless ($stream) {
@@ -304,8 +432,20 @@ class TestCase::Sys::IO {
       unless ($@) {
         return 0;
       }
+    }
+    
+    {
+      my $file = "$test_dir/ftest/file_empty.txt";
+      my $fd = Sys::IO->open($file, IO->O_RDWR, 0666);
       
-      unless (eval_error_id == basic_type_id Error::System) {
+      unless ($fd >= 0) {
+        return 0;
+      }
+      
+      my $stream_ref = [(Sys::IO::FileStream)undef];
+      Sys->fdopen($stream_ref, "<", $fd);
+      
+      unless ($stream_ref->[0]) {
         return 0;
       }
     }
@@ -398,6 +538,45 @@ class TestCase::Sys::IO {
       }
     }
     
+    {
+      my $file = "$test_dir/ftest/file_bytes8.txt";
+      my $stream = Sys::IO->fopen($file, "rb");
+      
+      unless ($stream) {
+        return 0;
+      }
+      
+      my $buffer = (mutable string)new_string_len 4;
+      my $size = 1;
+      my $length = 4;
+      
+      my $read_length = 0;
+      
+      $read_length = Sys->read($stream, $buffer, $length, 0);
+      
+      unless ($buffer eq "abcd") {
+        return 0;
+      }
+     
+      unless ($read_length == 4) {
+        return 0;
+      }
+      
+      $read_length = Sys->read($stream, $buffer, $length);
+      
+      unless ($buffer eq "efgh") {
+        return 0;
+      }
+      
+      unless ($read_length == 4) {
+        return 0;
+      }
+      
+      $read_length = Sys->read($stream, $buffer, $length);
+      unless ($read_length == 0) {
+        return 0;
+      }
+    }
     
     return 1;
   }
@@ -444,6 +623,52 @@ class TestCase::Sys::IO {
       }
       
       my $feof = Sys::IO->feof($stream);
+      
+      unless ($feof) {
+        return 0;
+      }
+    }
+    
+    {
+      my $file = "$test_dir/ftest/file_bytes8.txt";
+      my $stream = Sys::IO->fopen($file, "rb");
+      
+      unless ($stream) {
+        return 0;
+      }
+      
+      my $buffer = (mutable string)new_string_len 4;
+      my $size = 1;
+      my $length = 4;
+      
+      my $read_length = 0;
+      
+      $read_length = Sys::IO->fread($buffer, $size, $length, $stream);
+      
+      unless ($buffer eq "abcd") {
+        return 0;
+      }
+     
+      unless ($read_length == 4) {
+        return 0;
+      }
+      
+      $read_length = Sys::IO->fread($buffer, $size, $length, $stream);
+      
+      unless ($buffer eq "efgh") {
+        return 0;
+      }
+      
+      unless ($read_length == 4) {
+        return 0;
+      }
+      
+      $read_length = Sys::IO->fread($buffer, $size, $length, $stream);
+      unless ($read_length == 0) {
+        return 0;
+      }
+      
+      my $feof = Sys->eof($stream);
       
       unless ($feof) {
         return 0;
@@ -601,6 +826,54 @@ class TestCase::Sys::IO {
       }
     }
     
+    {
+      my $file = "$test_dir/ftest/file_bytes8.txt";
+      my $stream = Sys::IO->fopen($file, "rb");
+      
+      unless ($stream) {
+        return 0;
+      }
+      
+      my $char = 0;
+      
+      $char = Sys->getc($stream);
+      unless ($char == 'a') {
+        return 0;
+      }
+      $char = Sys->getc( $stream);
+      unless ($char == 'b') {
+        return 0;
+      }
+      $char = Sys->getc( $stream);
+      unless ($char == 'c') {
+        return 0;
+      }
+      $char = Sys->getc( $stream);
+      unless ($char == 'd') {
+        return 0;
+      }
+      $char = Sys->getc( $stream);
+      unless ($char == 'e') {
+        return 0;
+      }
+      $char = Sys->getc( $stream);
+      unless ($char == 'f') {
+        return 0;
+      }
+      $char = Sys->getc( $stream);
+      unless ($char == 'g') {
+        return 0;
+      }
+      $char = Sys->getc( $stream);
+      unless ($char == 'h') {
+        return 0;
+      }
+      $char = Sys->getc( $stream);
+      unless ($char == IO->EOF) {
+        return 0;
+      }
+    }
+    
     return 1;
   }
 
@@ -618,36 +891,21 @@ class TestCase::Sys::IO {
       my $buffer_zero = copy $buffer;
       my $size = length $buffer;
       
-      my $success = (string)undef;
-      
-      $success = Sys::IO->fgets($buffer, $size, $stream);
-      
-      unless ($success) {
-        return 0;
-      }
+      Sys::IO->fgets($buffer, $size, $stream);
       
       unless ($buffer eq "a\n\0\0") {
         return 0;
       }
       
-
       Fn->memcpy($buffer, 0, $buffer_zero, 0, $size);
-      $success = Sys::IO->fgets($buffer, $size, $stream);
-      
-      unless ($success) {
-        return 0;
-      }
+      Sys::IO->fgets($buffer, $size, $stream);
       
       unless ($buffer eq "xxx\0") {
         return 0;
       }
-
-      Fn->memcpy($buffer, 0, $buffer_zero, 0, $size);
-      $success = Sys::IO->fgets($buffer, $size, $stream);
       
-      unless ($success) {
-        return 0;
-      }
+      Fn->memcpy($buffer, 0, $buffer_zero, 0, $size);
+      Sys::IO->fgets($buffer, $size, $stream);
       
       unless ($buffer->[0] == '\n') {
         return 0;
@@ -657,38 +915,26 @@ class TestCase::Sys::IO {
       }
       
       Fn->memcpy($buffer, 0, $buffer_zero, 0, $size);
-      $success = Sys::IO->fgets($buffer, $size, $stream);
-      
-      unless ($success) {
-        return 0;
-      }
+      Sys::IO->fgets($buffer, $size, $stream);
       
       unless ($buffer eq "bc\n\0") {
         return 0;
       }
-
-      Fn->memcpy($buffer, 0, $buffer_zero, 0, $size);
-      $success = Sys::IO->fgets($buffer, $size, $stream);
       
-      unless ($success) {
-        return 0;
-      }
+      Fn->memcpy($buffer, 0, $buffer_zero, 0, $size);
+      Sys::IO->fgets($buffer, $size, $stream);
       
       unless ($buffer eq "d\0\0\0") {
         return 0;
       }
-
-      Fn->memcpy($buffer, 0, $buffer_zero, 0, $size);
-      $success = Sys::IO->fgets($buffer, $size, $stream);
       
-      if ($success) {
-        return 0;
-      }
+      Fn->memcpy($buffer, 0, $buffer_zero, 0, $size);
+      Sys::IO->fgets($buffer, $size, $stream);
     }
     
     return 1;
   }
-
+  
   static method fwrite : int ($test_dir : string) {
     
     {
@@ -699,7 +945,7 @@ class TestCase::Sys::IO {
         unless ($stream) {
           return 0;
         }
-
+        
         my $write_length = 0;
         my $size = 1;
         my $length = 4;
@@ -724,7 +970,7 @@ class TestCase::Sys::IO {
         unless ($stream) {
           return 0;
         }
-
+        
         my $buffer = (mutable string)new_string_len 4;
         my $size = 1;
         my $length = 4;
@@ -750,12 +996,84 @@ class TestCase::Sys::IO {
         unless ($read_length == 4) {
           return 0;
         }
-
+        
         $read_length = Sys::IO->fread($buffer, $size, $length, $stream);
         
         unless ($read_length == 0) {
           return 0;
         }
+        
+        Sys::IO->fclose($stream);
+      }
+      
+      {
+        my $file = "$test_dir/foo.txt";
+        my $stream = Sys::IO->fopen($file, "wb");
+        
+        unless ($stream) {
+          return 0;
+        }
+        
+        my $size = 1;
+        my $length = 4;
+        
+        Sys->print($stream, "abcd");
+        
+        Sys->print($stream, "efgh");
+        
+        Sys::IO->fclose($stream);
+      }
+      
+      {
+        my $file = "$test_dir/foo.txt";
+        my $stream = Sys::IO->fopen($file, "wb");
+        
+        unless ($stream) {
+          return 0;
+        }
+        
+        my $size = 1;
+        my $length = 4;
+        
+        Sys->say($stream, "abcd");
+        
+        Sys->say($stream, "efgh");
+        
+        Sys::IO->fclose($stream);
+      }
+      
+      {
+        my $file = "$test_dir/foo.txt";
+        my $stream = Sys::IO->fopen($file, "wb");
+        
+        unless ($stream) {
+          return 0;
+        }
+        
+        my $size = 1;
+        my $length = 4;
+        
+        Sys->say($stream, "abcd");
+        
+        Sys->say($stream, "efgh");
+        
+        Sys::IO->fclose($stream);
+      }
+      
+      {
+        my $file = "$test_dir/foo.txt";
+        my $stream = Sys::IO->fopen($file, "wb");
+        
+        unless ($stream) {
+          return 0;
+        }
+        
+        my $size = 1;
+        my $length = 4;
+        
+        Sys->printf($stream, "abc%s", ["d"]);
+        
+        Sys->printf($stream, "efg%s", ["h"]);
         
         Sys::IO->fclose($stream);
       }
@@ -871,6 +1189,32 @@ class TestCase::Sys::IO {
       }
     }
     
+    {
+      my $file = "$test_dir/ftest/file_bytes8.txt";
+      my $stream = Sys::IO->fopen($file, "rb");
+      
+      unless ($stream) {
+        return 0;
+      }
+      
+      my $buffer = (mutable string)new_string_len 4;
+      my $size = 1;
+      my $length = 4;
+      
+      my $read_length = 0;
+      
+      Sys->seek($stream, 4, IO->SEEK_SET);
+      
+      $read_length = Sys::IO->fread($buffer, $size, $length, $stream);
+      
+      unless ($buffer eq "efgh") {
+        return 0;
+      }
+      
+      unless ($read_length == 4) {
+        return 0;
+      }
+    }
     return 1;
   }
 
@@ -903,6 +1247,32 @@ class TestCase::Sys::IO {
       }
     }
     
+    {
+      my $file = "$test_dir/ftest/file_bytes8.txt";
+      my $stream = Sys::IO->fopen($file, "rb");
+      
+      unless ($stream) {
+        return 0;
+      }
+      
+      my $buffer = (mutable string)new_string_len 4;
+      my $size = 1;
+      my $length = 4;
+      
+      my $read_length = 0;
+      
+      my $streameek_status = Sys::IO->fseek($stream, 4, IO->SEEK_SET);
+      
+      unless ($streameek_status == 0) {
+        return 0;
+      }
+      
+      my $offset = Sys->tell($stream);
+      
+      unless ($offset == 4) {
+        return 0;
+      }
+    }
     return 1;
   }
 
@@ -988,6 +1358,25 @@ class TestCase::Sys::IO {
       IO->LOCK_UN;
     }
     
+    {
+      my $file = "$test_dir/ftest/file_empty.txt";
+      my $fd = Sys::IO->open($file, IO->O_RDONLY, IO->O_TRUNC);
+      
+      my $status_lock = Sys::IO->flock($fd, IO->LOCK_SH);
+      
+      unless ($status_lock == 0) {
+        return 0;
+      }
+
+      Sys->flock($fd, IO->LOCK_UN);
+      
+      my $close_status = Sys::IO->close($fd);
+      
+      unless ($close_status == 0) {
+        return 0;
+      }
+    }
+    
     return 1;
   }
 
@@ -1001,7 +1390,7 @@ class TestCase::Sys::IO {
       return 0;
     }
     
-    unless (Sys::FileTest->d($dir)) {
+    unless (Sys->d($dir)) {
       return 0;
     }
     
@@ -1048,7 +1437,7 @@ class TestCase::Sys::IO {
     
     Sys::IO->mkdir($dir, 0755);
     
-    unless (Sys::FileTest->d($dir)) {
+    unless (Sys->d($dir)) {
       return 0;
     }
     
@@ -1058,7 +1447,7 @@ class TestCase::Sys::IO {
       return 0;
     }
     
-    if (Sys::FileTest->e($dir)) {
+    if (Sys->e($dir)) {
       return 0;
     }
     
@@ -1073,11 +1462,14 @@ class TestCase::Sys::IO {
   }
 
   static method unlink : int ($test_dir : string) {
-
-    my $file = "$test_dir/foo.txt";
-    Sys::IO->fopen($file, "w");
     
-    unless (Sys::FileTest->f($file)) {
+    my $file = "$test_dir/foo.txt";
+    
+    {
+      Sys::IO->fopen($file, "w");
+    }
+    
+    unless (Sys->f($file)) {
       return 0;
     }
     
@@ -1087,7 +1479,7 @@ class TestCase::Sys::IO {
       return 0;
     }
     
-    if (Sys::FileTest->e($file)) {
+    if (Sys->e($file)) {
       return 0;
     }
     
@@ -1104,9 +1496,12 @@ class TestCase::Sys::IO {
   static method rename : int ($test_dir : string) {
 
     my $file = "$test_dir/foo.txt";
-    Sys::IO->fopen($file, "w");
     
-    unless (Sys::FileTest->e($file)) {
+    {
+      Sys::IO->fopen($file, "w");
+    }
+    
+    unless (Sys->e($file)) {
       return 0;
     }
     
@@ -1117,11 +1512,11 @@ class TestCase::Sys::IO {
       return 0;
     }
     
-    if (Sys::FileTest->e($file)) {
+    if (Sys->e($file)) {
       return 0;
     }
 
-    unless (Sys::FileTest->e($new_file)) {
+    unless (Sys->e($new_file)) {
       return 0;
     }
     
@@ -1219,7 +1614,7 @@ class TestCase::Sys::IO {
   private static method replace_chars : void ($string : mutable string, $from : byte, $to : byte) {
     
     unless ($string) {
-      die "The string must be defined";
+      die "\$string must be defined.";
     }
     
     my $string_length = length $string;
@@ -1308,7 +1703,7 @@ class TestCase::Sys::IO {
     my $file = "$test_dir/foo.txt";
     my $stream = Sys::IO->fopen($file, "w");
     
-    unless (Sys::FileTest->f($file)) {
+    unless (Sys->f($file)) {
       return 0;
     }
     
@@ -1331,28 +1726,49 @@ class TestCase::Sys::IO {
   }
 
   static method chown : int ($test_dir : string) {
-    my $file = "$test_dir/foo.txt";
-    my $stream = Sys::IO->fopen($file, "w");
-    
-    unless (Sys::FileTest->f($file)) {
-      return 0;
-    }
-    
-    Sys::IO->fclose($stream);
-    
-    my $status = Sys::IO->chown($file, -1, -1);
-    
-    unless ($status == 0) {
-      return 0;
-    }
-    
     {
-      eval { Sys::IO->chown("$file/not_found.txt", -1, -1); };
-      unless (Fn->contains($@, "not_found.txt")) {
+      my $file = "$test_dir/foo.txt";
+      my $stream = Sys::IO->fopen($file, "w");
+      
+      unless (Sys->f($file)) {
         return 0;
+      }
+      
+      Sys::IO->fclose($stream);
+      
+      my $status = Sys::IO->chown($file, -1, -1);
+      
+      unless ($status == 0) {
+        return 0;
+      }
+      
+      {
+        eval { Sys::IO->chown("$file/not_found.txt", -1, -1); };
+        unless (Fn->contains($@, "not_found.txt")) {
+          return 0;
+        }
       }
     }
     
+    {
+      my $file = "$test_dir/foo.txt";
+      my $stream = Sys::IO->fopen($file, "w");
+      
+      unless (Sys->f($file)) {
+        return 0;
+      }
+      
+      Sys::IO->fclose($stream);
+      
+      Sys->chown(-1, -1, $file);
+      
+      {
+        eval { Sys->chown(-1, -1, "$file/not_found.txt"); };
+        unless (Fn->contains($@, "not_found.txt")) {
+          return 0;
+        }
+      }
+    }
     return 1;
   }
 
@@ -1376,7 +1792,7 @@ class TestCase::Sys::IO {
         return 0;
       }
       
-      my $exists_symlink_file = Sys::FileTest->l($file_symlink);
+      my $exists_symlink_file = Sys->l($file_symlink);
       unless ($exists_symlink_file) {
         return 0;
       }
@@ -1415,7 +1831,7 @@ class TestCase::Sys::IO {
         return 0;
       }
       
-      my $exists_symlink_file = Sys::FileTest->l($file_symlink);
+      my $exists_symlink_file = Sys->l($file_symlink);
       unless ($exists_symlink_file) {
         return 0;
       }
@@ -1456,28 +1872,28 @@ class TestCase::Sys::IO {
       my $stream = Sys::IO->fopen($file, "rb");
 
       {
-        my $line = Sys::IO->readline($stream);
+        my $line = Sys->readline($stream);
         unless ($line eq "abcd\n") {
           return 0;
         }
       }
 
       {
-        my $line = Sys::IO->readline($stream);
+        my $line = Sys->readline($stream);
         unless ($line eq "fghi\n") {
           return 0;
         }
       }
 
       {
-        my $line = Sys::IO->readline($stream);
+        my $line = Sys->readline($stream);
         unless ($line eq "klm\n") {
           return 0;
         }
       }
 
       {
-        my $line = Sys::IO->readline($stream);
+        my $line = Sys->readline($stream);
         unless ($line == undef) {
           return 0;
         }
@@ -1491,7 +1907,7 @@ class TestCase::Sys::IO {
       my $stream = Sys::IO->fopen($file, "rb");
 
       my $lstrings = StringList->new((string[])undef);
-      while (my $line = Sys::IO->readline($stream)) {
+      while (my $line = Sys->readline($stream)) {
         $lstrings->push($line);
       }
 
@@ -1502,7 +1918,6 @@ class TestCase::Sys::IO {
         return 0;
       }
       
-      return 1;
     }
 
     # EOF
@@ -1512,40 +1927,40 @@ class TestCase::Sys::IO {
       my $stream = Sys::IO->fopen($file, "rb");
 
       {
-        my $line = Sys::IO->readline($stream);
+        my $line = Sys->readline($stream);
         unless ($line eq "abcd\n") {
           return 0;
         }
       }
 
       {
-        my $line = Sys::IO->readline($stream);
+        my $line = Sys->readline($stream);
         unless ($line eq "fghi\n") {
           return 0;
         }
       }
       
       {
-        my $line = Sys::IO->readline($stream);
+        my $line = Sys->readline($stream);
         unless ($line eq "\n") {
           return 0;
         }
       }
 
       {
-        my $line = Sys::IO->readline($stream);
+        my $line = Sys->readline($stream);
         unless ($line eq "klm") {
           return 0;
         }
       }
 
       {
-        my $line = Sys::IO->readline($stream);
+        my $line = Sys->readline($stream);
         unless ($line == undef) {
           return 0;
         }
       }
-      return 1;
+      
     }
 
     # Long lines
@@ -1555,33 +1970,33 @@ class TestCase::Sys::IO {
       my $stream = Sys::IO->fopen($file, "rb");
 
       {
-        my $line = Sys::IO->readline($stream);
+        my $line = Sys->readline($stream);
         unless ($line eq "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n") {
           return 0;
         }
       }
 
       {
-        my $line = Sys::IO->readline($stream);
+        my $line = Sys->readline($stream);
         unless ($line eq "fghi\n") {
           return 0;
         }
       }
 
       {
-        my $line = Sys::IO->readline($stream);
+        my $line = Sys->readline($stream);
         unless ($line eq "klm\n") {
           return 0;
         }
       }
 
       {
-        my $line = Sys::IO->readline($stream);
+        my $line = Sys->readline($stream);
         unless ($line == undef) {
           return 0;
         }
       }
-      return 1;
+      
     }
 
     # With chomp
@@ -1590,13 +2005,49 @@ class TestCase::Sys::IO {
       my $stream = Sys::IO->fopen($file, "rb");
 
       {
-        my $line = Sys::IO->readline($stream);
+        my $line = Sys->readline($stream);
         Fn->chomp($line);
         unless ($line eq "abcd") {
           return 0;
         }
       }
     }
+    
+    {
+      my $file = "$test_file_dir/ftest/readline_basic.txt";
+      
+      my $stream = Sys::IO->fopen($file, "rb");
+
+      {
+        my $line = Sys->readline($stream);
+        unless ($line eq "abcd\n") {
+          return 0;
+        }
+      }
+
+      {
+        my $line = Sys->readline($stream);
+        unless ($line eq "fghi\n") {
+          return 0;
+        }
+      }
+
+      {
+        my $line = Sys->readline($stream);
+        unless ($line eq "klm\n") {
+          return 0;
+        }
+      }
+
+      {
+        my $line = Sys->readline($stream);
+        unless ($line == undef) {
+          return 0;
+        }
+      }
+    }
+    
+    return 1;
   }
 
   static method truncate : int ($test_dir : string) {
@@ -1615,15 +2066,15 @@ class TestCase::Sys::IO {
       }
     }
     
-    warn "[Test Output]" . Sys::FileTest->s($file);
-    unless (Sys::FileTest->s($file) > 0) {
+    warn "[Test Output]" . Sys->s($file);
+    unless (Sys->s($file) > 0) {
       return 0;
     }
     
     Sys::IO->truncate($file, 0);
     
-    warn "[Test Output]" . Sys::FileTest->s($file);
-    unless (Sys::FileTest->s($file) == 0) {
+    warn "[Test Output]" . Sys->s($file);
+    unless (Sys->s($file) == 0) {
       return 0;
     }
     
@@ -1638,35 +2089,68 @@ class TestCase::Sys::IO {
 
   static method ftruncate : int ($test_dir : string) {
     
-    my $file = "$test_dir/foo.txt";
     {
-      my $stream = Sys::IO->fopen($file, "wb");
+      my $file = "$test_dir/foo.txt";
+      {
+        my $stream = Sys::IO->fopen($file, "wb");
+        
+        my $write_length = 0;
+        my $size = 1;
+        my $length = 4;
+        
+        $write_length = Sys::IO->fwrite("abcd", $size, $length, $stream);
+        unless ($write_length == 4) {
+          return 0;
+        }
+      }
       
-      my $write_length = 0;
-      my $size = 1;
-      my $length = 4;
+      warn "[Test Output]" . Sys->s($file);
+      unless (Sys->s($file) > 0) {
+        return 0;
+      }
+        
+      {
+        my $stream = Sys::IO->fopen($file, "wb");
+        my $status = Sys::IO->ftruncate(Sys::IO->fileno($stream), 0);
+        unless ($status == 0) {
+          return 0;
+        }
+      }
       
-      $write_length = Sys::IO->fwrite("abcd", $size, $length, $stream);
-      unless ($write_length == 4) {
+      warn "[Test Output]" . Sys->s($file);
+      unless (Sys->s($file) == 0) {
         return 0;
       }
     }
     
-    warn "[Test Output]" . Sys::FileTest->s($file);
-    unless (Sys::FileTest->s($file) > 0) {
-      return 0;
-    }
-      
     {
-      my $stream = Sys::IO->fopen($file, "wb");
-      Sys::IO->ftruncate(Sys::IO->fileno($stream), 0);
+      my $file = "$test_dir/foo.txt";
+      {
+        my $stream = Sys::IO->fopen($file, "wb");
+        
+        my $write_length = 0;
+        my $size = 1;
+        my $length = 4;
+        
+        $write_length = Sys::IO->fwrite("abcd", $size, $length, $stream);
+        unless ($write_length == 4) {
+          return 0;
+        }
+      }
+      
+      unless (Sys->s($file) > 0) {
+        return 0;
+      }
+        
+      {
+        my $stream = Sys::IO->fopen($file, "wb");
+        Sys->truncate(Sys::IO->fileno($stream), 0);
+      }
+      
+      unless (Sys->s($file) == 0) {
+        return 0;
+      }
     }
-
-    warn "[Test Output]" . Sys::FileTest->s($file);
-    unless (Sys::FileTest->s($file) == 0) {
-      return 0;
-    }
-    
     return 1;
   }
 
@@ -1858,68 +2342,318 @@ class TestCase::Sys::IO {
     
     return 1;
   }
-
-  static method utime : int ($test_dir : string) {
-    
-    my $file = "$test_dir/ftest/file_empty.txt";
-    
-    my $utimbuf = Sys::IO::Utimbuf->new;
-    
-    my $time = Sys::Time->time;
-    
-    my $actime = $utimbuf->set_actime($time);
-    my $modtime = $utimbuf->set_modtime($time);
-    
-    my $status = Sys::IO->utime($file, $utimbuf);
-    
-    unless ($status == 0) {
-      return 0;
-    }
-    
-    return 1;
-  }
-
+  
   static method opendir : int ($test_dir : string) {
     
-    my $file = "$test_dir/ftest";
+    {
+      my $file = "$test_dir/ftest";
+      
+      my $stream = Sys::IO->opendir($test_dir);
+      
+      unless ($stream) {
+        return 0;
+      }
+    }
     
-    my $stream = Sys::IO->opendir($test_dir);
-    
-    unless ($stream) {
-      return 0;
+    {
+      my $file = "$test_dir/ftest";
+      
+      my $dh_ref = [(Sys::IO::DirStream)undef];
+      
+      Sys->opendir($dh_ref, $test_dir);
+      
+      unless ($dh_ref->[0]) {
+        return 0;
+      }
+      
+      Sys->closedir($dh_ref->[0]);
     }
     
     return 1;
   }
-
+  
   static method readdir : int ($test_dir : string) {
     
-    my $dir = "$test_dir/ftest";
-    
-    my $stream = Sys::IO->opendir($dir);
-    
-    unless ($stream) {
-      return 0;
-    }
-    
-    my $check_file_count = 0;
-    while (my $dirent = Sys::IO->readdir($stream)) {
-      my $d_ino = $dirent->d_ino;
-      my $d_reclen = $dirent->d_reclen;
-      my $d_name = $dirent->d_name;
+    {
+      my $dir = "$test_dir/ftest";
       
-      if ($d_name eq "foo.txt") {
-        $check_file_count++;
+      my $stream = Sys::IO->opendir($dir);
+      
+      Fn->defer([$stream : Sys::IO::DirStream] method : void () {
+        Sys::IO->closedir($stream);
+      });
+      
+      unless ($stream) {
+        return 0;
       }
-      elsif ($d_name eq "bar.txt") {
-        $check_file_count++;
+      
+      Sys::IO->rewinddir($stream);
+      Sys->rewinddir($stream);
+      
+      {
+        my $current_offset = Sys::IO->telldir($stream);
+        unless ($current_offset == 0) {
+          return 0;
+        }
+      }
+      
+      {
+        my $current_offset = Sys->telldir($stream);
+        unless ($current_offset == 0) {
+          return 0;
+        }
+      }
+      
+      my $check_file_count = 0;
+      while (my $dirent = Sys::IO->readdir($stream)) {
+        my $d_name = $dirent->d_name;
+        
+        if ($d_name eq "foo.txt") {
+          $check_file_count++;
+        }
+        elsif ($d_name eq "bar.txt") {
+          $check_file_count++;
+        }
+      }
+      
+      unless ($check_file_count == 2) {
+        return 0;
       }
     }
     
-    unless ($check_file_count == 2) {
-      return 0;
+    {
+      my $dir = "$test_dir/ftest";
+      
+      my $stream = Sys::IO->opendir($dir);
+      
+      Fn->defer([$stream : Sys::IO::DirStream] method : void () {
+        Sys::IO->closedir($stream);
+      });
+      
+      my $dirent = Sys::IO->readdir($stream);
+      
+      my $d_ino = $dirent->d_ino;
+      
+      warn "[Test Output]Sys::IO::Dirent:d_ino:$d_ino";
+      
+      if (Sys::OS->defined("__linux__")) {
+        unless ($d_ino > 0) {
+          return 0;
+        }
+      }
+      
+      # d_reclen
+      my $d_reclen_not_supported = Sys::OS->defined("__CYGWIN__");
+      if ($d_reclen_not_supported) {
+        eval { $dirent->d_reclen; }
+        unless ($@ && eval_error_id is_error Error::NotSupported) {
+          return 0;
+        }
+      }
+      else {
+        my $d_reclen = $dirent->d_reclen;
+        warn "[Test Output]Sys::IO::Dirent:d_reclen:$d_reclen";
+        if (Sys::OS->defined("__linux__")) {
+          unless ($d_reclen > 0) {
+            return 0;
+          }
+        }
+      }
+      
+      # d_type
+      my $d_type_not_supported = Sys::OS->defined("_WIN32");
+      if ($d_type_not_supported) {
+        eval { $dirent->d_type; }
+        unless ($@ && eval_error_id is_error Error::NotSupported) {
+          return 0;
+        }
+      }
+      else {
+        my $d_type = $dirent->d_type;
+        warn "[Test Output]Sys::IO::Dirent:d_type:$d_type";
+        unless ($d_type > 0) {
+          return 0;
+        }
+      }
+      
+      # d_off
+      my $d_off_not_supported = Sys::OS->defined("_WIN32") || Sys::OS->defined("__CYGWIN__") || Sys::OS->defined("__APPLE__");
+      if ($d_off_not_supported) {
+        eval { $dirent->d_off; }
+        unless ($@ && eval_error_id is_error Error::NotSupported) {
+          return 0;
+        }
+      }
+      else {
+        my $d_off = $dirent->d_off;
+        warn "[Test Output]Sys::IO::Dirent:d_off:$d_off";
+        unless ($d_off > 0) {
+          return 0;
+        }
+      }
     }
     
     return 1;
   }
+  
+  static method fcntl : int ($test_dir : string) {
+    
+    if (Sys::OS->is_windows) {
+      warn "Skip tests of fcntl in Windows";
+    }
+    else {
+      my $dir = "$test_dir/ftest";
+      
+      {
+        my $file = "$test_dir/ftest/file_empty.txt";
+        my $fd = Sys::IO->open($file, IO->O_RDWR);
+        
+        unless ($fd >= 0) {
+          return 0;
+        }
+        
+        {
+          my $ret = Sys::IO->fcntl($fd, IO->F_GETFL);
+          
+          unless ($ret >= 0) {
+            return 0;
+          }
+          
+          Sys::IO->fcntl($fd, IO->F_SETFL, $ret);
+          
+          my $ret2 = Sys::IO->fcntl($fd, IO->F_GETFL);
+          
+          unless ($ret == $ret2) {
+            return 0;
+          }
+        }
+        
+        {
+          my $current_flags = Sys::IO->fcntl($fd, IO->F_GETFL);
+          my $ret = Sys::IO->fcntl($fd, IO->F_SETFL, $current_flags | IO->O_APPEND);
+          
+          unless ($ret == 0) {
+            return 0;
+          }
+        }
+        
+        {
+          my $ret = Sys->fcntl($fd, IO->F_GETFL);
+          
+          unless ($ret >= 0) {
+            return 0;
+          }
+          
+          my $ret2 = Sys->fcntl($fd, IO->F_GETFL);
+          
+          unless ($ret == $ret2) {
+            return 0;
+          }
+        }
+        
+        {
+          my $ret = Sys->fcntl($fd, IO->F_SETFL, IO->O_APPEND);
+          
+          unless ($ret == 0) {
+            return 0;
+          }
+        }
+        
+        {
+          my $flock = Sys::IO::Flock->new;
+          $flock->set_l_type(IO->F_WRLCK);
+          $flock->set_l_whence(IO->SEEK_SET);
+          my $ret = Sys::IO->fcntl($fd, IO->F_SETLK, $flock);
+          
+          unless ($ret == 0) {
+            return 0;
+          }
+        }
+        
+        Sys::IO->close($fd);
+      }
+      
+    }
+    
+    return 1;
+  }
+  
+  static method stdin : int () {
+    {
+      my $stdin = Sys::IO->stdin;
+      
+      unless (Sys->fileno($stdin) == IO->STDIN_FILENO) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method stdout : int () {
+    {
+      my $stdout = Sys::IO->stdout;
+      
+      unless (Sys->fileno($stdout) == IO->STDOUT_FILENO) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method stderr : int () {
+    {
+      my $stderr = Sys::IO->stderr;
+      
+      unless (Sys->fileno($stderr) == IO->STDERR_FILENO) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method spvm_stdin : int () {
+  
+    {
+      my $spvm_stdin = Sys::IO->spvm_stdin;
+      
+      unless (Sys->fileno($spvm_stdin) > 2) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method spvm_stdout : int () {
+    
+    {
+      my $spvm_stdout = Sys::IO->spvm_stdout;
+      
+      my $spvm_stdin = Sys::IO->spvm_stdin;
+      
+      unless (Sys->fileno($spvm_stdout) > Sys->fileno($spvm_stdin)) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method spvm_stderr : int () {
+    {
+      my $spvm_stderr = Sys::IO->spvm_stderr;
+      
+      my $spvm_stdout = Sys::IO->spvm_stdout;
+      
+      unless (Sys->fileno($spvm_stderr) > Sys->fileno($spvm_stdout)) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
 }

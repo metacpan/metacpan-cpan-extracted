@@ -24,7 +24,7 @@ sub mkreader {
    my ( $data ) = @_;
    my @data = @$data; # copy
    return sub {
-      return shift @data;
+      return @data ? [ @{ shift @data } ] : undef; # copy
    };
 }
 
@@ -44,13 +44,13 @@ sub finder { $finder }
 
 sub run_cmd
 {
-   my ( $cmd, $opts, $data_in ) = @_;
+   my ( $cmd, $opts, @data_in ) = @_;
 
    my $toolpkg = $cmd->package;
 
    $toolpkg->run(
       $cmd->parse_invocation( Commandable::Invocation->new( $opts ) ),
-      mkreader( $data_in ),
+      ( map { mkreader( $_ ) } @data_in ),
       mkoutput( \my @out ),
    );
 

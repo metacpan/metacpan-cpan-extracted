@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::State::LaxParser;
-$Games::Solitaire::Verify::State::LaxParser::VERSION = '0.2500';
+$Games::Solitaire::Verify::State::LaxParser::VERSION = '0.2600';
 use warnings;
 use strict;
 
@@ -80,7 +80,7 @@ states (or positions) of the entire board.
 
 =head1 VERSION
 
-version 0.2500
+version 0.2600
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

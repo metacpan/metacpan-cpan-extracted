@@ -16,16 +16,21 @@ name: App-csvtool
 provides:
   App::csvtool:
     file: lib/App/csvtool.pm
-    version: '0.01'
+    version: '0.02'
+  App::csvtool::Timetools:
+    file: lib/App/csvtool/Timetools.pm
+    version: '0.02'
 requires:
   Commandable::Finder::Packages: '0.11'
   Commandable::Invocation: '0.03'
   File::Basename: '0'
   Getopt::Long: '0'
   List::UtilsBy: '0'
+  POSIX::strptime: '0'
   Text::CSV: '0'
+  Time::timegm: '0'
   perl: '5.026'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,31 @@
+Revision history for Perl module Business::Tax::US::Form_1040::Worksheets
+
+0.01 Fri Mar 24 05:25:07 2023
+    - original version; created by ExtUtils::ModuleMaker 0.63
+    - pushed to CPAN approx. Wed Feb 21 11:00 2024, but due to CPAN
+      malfunctioning was not indexed and hence did not appear on metacpan or
+      cpantesters
+
+0.02 Fri Feb 23 08:57:32 AM EST 2024
+    - Introduce pp_qdcgtw() for pretty-printing the qd-worksheet
+    - Like 0.01, this version will probably not make it to CPAN, so I'm
+      tagging it and pushing to GH
+
+0.03 Fri Feb 23 03:49:44 PM EST 2024
+    - Introduce social_security_worksheet_data().
+    - Like preceding versions, this version will probably not make it to CPAN,
+      so I'm tagging it and pushing to GH
+
+0.04 Fri Feb 23 08:20:22 PM EST 2024
+    - Introduce pp_ssbw() for pretty-printing the ssb-worksheet.
+    - Like preceding versions, this version will probably not make it to CPAN,
+      so I'm tagging it and pushing to GH
+
+0.05 Fri Feb 23 09:49:50 PM EST 2024
+    - In 0.04, pp_ssbw() wasn't doing any pretty-printing.  Corrected.
+    - Like preceding versions, this version will probably not make it to CPAN,
+      so I'm tagging it and pushing to GH
+
+0.06 Wed Mar 20 05:12:32 PM EDT 2024
+    - Comment out all instances of Data::Dump, as they were only used
+      during development

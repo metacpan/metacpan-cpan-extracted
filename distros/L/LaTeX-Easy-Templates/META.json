@@ -39,6 +39,7 @@
             "File::Path" : "0",
             "File::Spec" : "0",
             "File::Temp" : "0",
+            "File::Which" : "0",
             "Filesys::DiskUsage" : "0",
             "LaTeX::Driver" : "v1.0.0",
             "Mojo::Log" : "0",
@@ -74,6 +75,6 @@
          "web" : "https://github.com/hadjiprocopis/LaTeX-Easy-Templates"
       }
    },
-   "version" : "0.02",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

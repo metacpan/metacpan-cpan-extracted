@@ -10,9 +10,6 @@ use SPVM::Builder;
 use SPVM::Builder::CC;
 use SPVM::Builder::Util;
 
-use SPVM 'Native::Compiler';
-use SPVM 'Native::Runtime::Info';
-
 # Fields
 sub builder {
   my $self = shift;
@@ -75,7 +72,7 @@ sub new {
   
   $self->{builder} = $builder;
   
-  my $compiler = SPVM::Native::Compiler->new;
+  my $compiler = SPVM::Builder::Native::Compiler->new;
   $compiler->add_include_dir($_) for @{$builder->include_dirs};
   $self->{compiler} = $compiler;
   
@@ -117,9 +114,14 @@ sub get_class_names {
   
   my $runtime = $self->runtime;
   
-  my $runtime_info = SPVM::Native::Runtime::Info->new($runtime);
+  my $category = [
+    6, # SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_CLASS,
+    7, # SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_INTERFACE,
+  ];
   
-  my $class_names = $runtime_info->get_class_names->to_strings;
+  my $basic_types = $runtime->get_basic_types({category => $category, is_anon => 0});
+  
+  my $class_names = [map { $_->get_name } @$basic_types];
   
   return $class_names;
 }
@@ -209,13 +211,13 @@ The SPVM::Builder::Config::Info class has methods to manipulate config informati
 
 =head1 Usage
 
-  my $builder_info = SPVM::Builder::Config::Info->new(class_name => "Foo");
+  my $config_info = SPVM::Builder::Config::Info->new(class_name => "Foo");
 
 =head1 Class Methods
 
 =head2 new
 
-  my $builder_info = SPVM::Builder::Config::Info->new(%options);
+  my $config_info = SPVM::Builder::Config::Info->new(%options);
 
 Creates a L<SPVM::Builder::Config::Info> object given the class name $class_name and returns it.
 
@@ -241,15 +243,13 @@ The "class_name" option must be defined, otherwise an exception is thrown.
 
 =head2 get_class_names
 
-  my $class_names = $builder_info->get_class_names;
+  my $class_names = $config_info->get_class_names;
 
-Returns the all class names loaded by the runtime.
-
-This method is the same as the L<get_class_names|Native::Runtime::Info/"get_class_names"> method in the C<Native::Runtime::Info>, but the return value is converted to an array reference of strings.
+Returns the all class and interface names except for anon classes loaded by the runtime.
 
 =head2 has_config_file
 
-  my $has_config_file = $builder_info->has_config_file($class_name);
+  my $has_config_file = $config_info->has_config_file($class_name);
   
 If the class given by the class name has a config file, returns 1, otherwise returns 0.
 
@@ -259,7 +259,7 @@ The class name $class_name must be defined, otherwise an exception is thrown.
 
 =head2 is_resource_loader
 
-  my $is_resource_loader = $builder_info->is_resource_loader($class_name);
+  my $is_resource_loader = $config_info->is_resource_loader($class_name);
   
 If the class given by the class name $class_name is a class that load resources, returns 1, otherwise returns 0.
 
@@ -269,7 +269,7 @@ The class name $class_name must be defined, otherwise an exception is thrown.
 
 =head2 get_config_file
 
-  my $config_file = $builder_info->get_config_file($class_name);
+  my $config_file = $config_info->get_config_file($class_name);
 
 Returns the file path of the config for the class given by the class name $class_name.
 
@@ -281,7 +281,7 @@ The config file for the class "%s" is not found, otherwise an exception is throw
 
 =head2 get_config_content
 
-  my $config_content = $builder_info->get_config_content($class_name);
+  my $config_content = $config_info->get_config_content($class_name);
 
 Returns the content of the config for the class given by the class name $class_name.
 
@@ -291,7 +291,7 @@ Exceptions thrown by the L</"get_config_file"> method could be thrown.
 
 =head2 get_config
 
-  my $config = $builder_info->get_config($class_name);
+  my $config = $config_info->get_config($class_name);
 
 Returns the L<config|SPVM::Builder::Config> for the class given by the class name $class_name.
 

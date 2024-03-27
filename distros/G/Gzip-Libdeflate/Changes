@@ -1,5 +1,9 @@
 Revision history for Perl module Gzip::Libdeflate
 
+0.07 2024-03-25
+
+- Update libdeflate to 1.20
+
 0.06 2023-09-18
 
 - Update libdeflate to 1.19

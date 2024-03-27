@@ -46,13 +46,13 @@ no_index:
 provides:
   Dist::Zilla::App::Command::stale:
     file: lib/Dist/Zilla/App/Command/stale.pm
-    version: '0.059'
+    version: '0.060'
   Dist::Zilla::Plugin::EnsureNotStale:
     file: lib/Dist/Zilla/Plugin/EnsureNotStale.pm
-    version: '0.059'
+    version: '0.060'
   Dist::Zilla::Plugin::PromptIfStale:
     file: lib/Dist/Zilla/Plugin/PromptIfStale.pm
-    version: '0.059'
+    version: '0.060'
 requires:
   CPAN::DistnameInfo: '0'
   Config::MVP::Section: '2.200004'
@@ -91,10 +91,10 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-PromptIfStale
   homepage: https://github.com/karenetheridge/Dist-Zilla-Plugin-PromptIfStale
   repository: https://github.com/karenetheridge/Dist-Zilla-Plugin-PromptIfStale.git
-version: '0.059'
+version: '0.060'
 x_Dist_Zilla:
   perl:
-    version: '5.039008'
+    version: '5.039009'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -116,7 +116,7 @@ x_Dist_Zilla:
           run_under_travis: 0
           skip: []
       name: '@Author::ETHER/stale modules, build'
-      version: '0.058'
+      version: '0.059'
     -
       class: Dist::Zilla::Plugin::FileFinder::ByName
       name: '@Author::ETHER/Examples'
@@ -565,7 +565,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20240223'
+          Module::CoreList: '5.20240320'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.010'
     -
@@ -579,7 +579,7 @@ x_Dist_Zilla:
           run_under_travis: 0
           skip: []
       name: '@Author::ETHER/stale modules, release'
-      version: '0.058'
+      version: '0.059'
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -729,7 +729,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.059
+          tag: v0.060
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -963,7 +963,7 @@ x_contributors:
   - 'David Golden <dagolden@cpan.org>'
   - 'Dave Rolsky <autarch@urth.org>'
   - 'Olivier Mengué <dolmen@cpan.org>'
-x_generated_by_perl: v5.39.8
+x_generated_by_perl: v5.39.9
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 0

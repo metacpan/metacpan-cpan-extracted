@@ -1,5 +1,5 @@
 
-package Microsoft::Teams::WebHook 1.01;
+package Microsoft::Teams::WebHook 1.02;
 
 use v5.26;
 use warnings;

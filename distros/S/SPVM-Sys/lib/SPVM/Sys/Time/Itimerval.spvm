@@ -4,13 +4,17 @@
 class Sys::Time::Itimerval : pointer {
   use Sys::Time::Timeval;
   
+  # Class Methods
   native static method new : Sys::Time::Itimerval ();
-
+  
+  # Instance Methods
   native method DESTROY : void ();
   
-  native method copy_it_interval : Sys::Time::Timeval ();
-  native method copy_it_value : Sys::Time::Timeval ();
-
+  native method it_interval : Sys::Time::Timeval ();
+  
+  native method it_value : Sys::Time::Timeval ();
+  
   native method set_it_interval : void ($it_interval : Sys::Time::Timeval);
+  
   native method set_it_value : void ($it_value : Sys::Time::Timeval);
 }

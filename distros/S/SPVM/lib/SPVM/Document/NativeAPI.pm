@@ -2115,11 +2115,11 @@ C<const char* (*strerror_nolen)(L<SPVM_ENV* env|SPVM::Document::NativeClass/"Run
 
 Calls the L</"strerror"> function given 0 to I<length>, and returns its return value.
 
-=head2 reserved194
+=head2 is_binary_compatible_object
 
-C<void* reserved194;>
+C<int32_t (*is_binary_compatible_object)(L<SPVM_ENV* env|SPVM::Document::NativeClass/"Runtime Environment">, L<SPVM_VALUE* stack|SPVM::Document::NativeClass/"Runtime Stack">, void* object);>
 
-Reserved for the future use.
+If the object I<object> is binary compatible with the runtime environment I<runtime> and the runtime stack I<stack>, returns 1, otherwise returns 0.
 
 =head2 reserved195
 
@@ -2169,11 +2169,11 @@ If the field given by I<field_name> is not found, an exception is thrown.
 
 If an excetpion is thrown, the value referenced by C<error_id> is set to a non-zero value, otherwise set to 0.
 
-=head2 check_stack_env
+=head2 is_binary_compatible_stack
 
-C<int32_t (*check_stack_env)(L<SPVM_ENV* env|SPVM::Document::NativeClass/"Runtime Environment">, L<SPVM_VALUE* stack|SPVM::Document::NativeClass/"Runtime Stack">);>
+C<int32_t (*is_binary_compatible_stack)(L<SPVM_ENV* env|SPVM::Document::NativeClass/"Runtime Environment">, L<SPVM_VALUE* stack|SPVM::Document::NativeClass/"Runtime Stack">);>
 
-If the L<runtime environment|SPVM::Document::NativeClass/"Runtime Environment"> referenced by the stack I<stack> is equal to the runtime environment I<env>, returns 1, otherwise returns 0.
+If the runtime stack I<stack> is binary compatible with the runtime environment I<runtime>, returns 1, otherwise returns 0.
 
 =head2 assign_object
 
@@ -2279,6 +2279,54 @@ This native API should not be used unless special purposes are intended. Normall
 C<void* (*new_array_proto_element)(SPVM_ENV* env, SPVM_VALUE* stack, void* element, int32_t length);>
 
 Calls the L</"new_array_proto_element_no_mortal"> native API and push its return value to the L<mortal stack|SPVM::Document::NativeClass/"Mortal Stack">, and returns it.
+
+=head2 get_byte_object_value
+
+C<int32_t (*get_byte_object_value)(SPVM_ENV* env, SPVM_VALUE* stack, void* byte_object);>
+
+Returns the value of the C<value> field of the L<Byte|SPVM::Byte> object I<byte_object>.
+
+I<byte_object> must be a L<Byte|SPVM::Byte> object.
+
+=head2 get_short_object_value
+
+C<int32_t (*get_short_object_value)(SPVM_ENV* env, SPVM_VALUE* stack, void* short_object);>
+
+Returns the value of the C<value> field of the L<Short|SPVM::Short> object I<short_object>.
+
+I<short_object> must be a L<Short|SPVM::Short> object.
+
+=head2 get_int_object_value
+
+C<int32_t (*get_int_object_value)(SPVM_ENV* env, SPVM_VALUE* stack, void* int_object);>
+
+Returns the value of the C<value> field of the L<Int|SPVM::Int> object I<int_object>.
+
+I<int_object> must be an L<Int|SPVM::Int> object.
+
+=head2 get_long_object_value
+
+C<int64_t (*get_long_object_value)(SPVM_ENV* env, SPVM_VALUE* stack, void* long_object);>
+
+Returns the value of the C<value> field of the L<Long|SPVM::Long> object I<long_object>.
+
+I<long_object> must be a L<Long|SPVM::Long> object.
+
+=head2 get_float_object_value
+
+C<float (*get_float_object_value)(SPVM_ENV* env, SPVM_VALUE* stack, void* float_object);>
+
+Returns the value of the C<value> field of the L<Float|SPVM::Float> object I<float_object>.
+
+I<float_object> must be a L<Float|SPVM::Float> object.
+
+=head2 get_double_object_value
+
+C<double (*get_double_object_value)(SPVM_ENV* env, SPVM_VALUE* stack, void* double_object);>
+
+Returns the value of the C<value> field of the L<Double|SPVM::Double> object I<double_object>.
+
+I<double_object> must be a L<Double|SPVM::Double> object.
 
 =head1 Native API IDs
 
@@ -2478,14 +2526,14 @@ Native APIs have its IDs.
   191 strerror_string_nolen,
   192 strerror,
   193 strerror_nolen,
-  194 reserved194,
-  195 reserved195,
+  194 is_binary_compatible_object,
+  195 is_binary_compatible_stack,
   196 new_stack,
   197 free_stack,
   198 get_field_object_defined_and_has_pointer_by_name,
   199 get_field_object_ref,
   200 get_field_object_ref_by_name,
-  201 check_stack_env,
+  201 check_bootstrap_method
   202 assign_object,
   203 new_string_array_no_mortal,
   204 new_memory_block,
@@ -2496,9 +2544,14 @@ Native APIs have its IDs.
   209 spvm_stdin,
   210 spvm_stdout,
   211 spvm_stderr,
-  212 check_bootstrap_method
-  213 new_array_proto_element_no_mortal
-  214 new_array_proto_element
+  212 new_array_proto_element_no_mortal
+  213 new_array_proto_element
+  214 get_byte_object_value
+  215 get_short_object_value
+  216 get_int_object_value
+  217 get_long_object_value
+  218 get_float_object_value
+  219 get_double_object_value
 
 =head1 Constant Values
 

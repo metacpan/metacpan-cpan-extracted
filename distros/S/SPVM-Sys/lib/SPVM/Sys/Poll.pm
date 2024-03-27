@@ -18,7 +18,7 @@ C<Sys::Poll> is the class for the poll function.
 
 =head2 poll
 
-  static method poll : int ($fds : Sys::Poll::PollfdArray, $nfds : int, $timeout : int);
+C<static method poll : int ($fds : L<Sys::Poll::PollfdArray|SPVM::Sys::Poll::PollfdArray>, $nfds : int, $timeout : int);>
 
 poll() performs a similar task to select(2): it waits for one of a set of file descriptors to become ready to perform I/O.
 

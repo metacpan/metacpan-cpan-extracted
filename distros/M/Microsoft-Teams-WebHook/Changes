@@ -1,5 +1,8 @@
 Revision history for perl distribution Microsoft::Teams::WebHook
 
+1.02      2024-03-25T8:43:33-05:00
+  - fix test duration check failing in start/end
+
 1.01      2024-02-23T09:42:40-04:00
   - add package version declaration
 

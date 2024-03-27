@@ -1,5 +1,9 @@
 Revision history for RTx-Calendar
 
+1.10 2024-03-25
+ - Add Spanish translation (thanks Eduardo Dominguez!)
+ - Add Catalan translation (thanks Eduardo Dominguez!)
+
 1.09 2023-12-18
  - Add French translation (thanks elacour!)
  - Restrict image width for better display on metacpan

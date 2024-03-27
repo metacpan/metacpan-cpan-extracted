@@ -1,3 +1,14 @@
+0.05 2024-03-22T17:25:32+01:00
+ - API CHANGE: Parameter 'active' is removed.
+ - API CHANGE: Parameter 'valid_from' is required.
+ - Fix dependencies.
+
+0.04 2024-03-19T13:12:38+01:00
+ - API CHANGE: Add 'valid_from' and 'valid_to' parameters. 'active'
+   parameter will be removed in future. And 'valid_from' will be required
+   in future.
+ - Add DESCRIPTION section to doc.
+
 0.03 2024-03-01T00:35:00+01:00
  - Fix typo in doc.
  - Improve ERRORS section in doc.

@@ -1,10 +1,10 @@
 {
-   "abstract" : "BrowseEntry like widgetwithout button",
+   "abstract" : "BrowseEntry like widget without button",
    "author" : [
       "Hans Jeuken <hanje at cpan dot org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -32,9 +32,9 @@
       },
       "runtime" : {
          "requires" : {
-            "Test::Tk" : "0.03",
+            "Test::Tk" : "3.02",
             "Tk" : "804.033",
-            "Tk::PopList" : "0.05"
+            "Tk::PopList" : "0.06"
          }
       }
    },
@@ -46,6 +46,6 @@
          "web" : "https://github.com/haje61/Tk-ListEntry"
       }
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

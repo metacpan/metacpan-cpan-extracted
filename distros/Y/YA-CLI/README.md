@@ -48,7 +48,8 @@ Override the default search path, defaults to your Your::App namespace.
 
 Defaults to `main` for your default handler. If this handler cannot be found
 ultimatly falls back to [YA::CLI::ErrorHandler](https://metacpan.org/pod/YA%3A%3ACLI%3A%3AErrorHandler) which deals with just `--help`
-and `--man` commands.
+and `--man` commands. You can set this value to undef, which in turn will
+display the usage of your script.
 
 ## cli\_options
 
@@ -59,4 +60,5 @@ default help and man.
 
 - [YA::CLI::ActionRole](https://metacpan.org/pod/YA%3A%3ACLI%3A%3AActionRole)
 - [YA::CLI::ErrorHandler](https://metacpan.org/pod/YA%3A%3ACLI%3A%3AErrorHandler)
+- [YA::CLI::PodRole](https://metacpan.org/pod/YA%3A%3ACLI%3A%3APodRole)
 - [YA::CLI::Usage](https://metacpan.org/pod/YA%3A%3ACLI%3A%3AUsage)

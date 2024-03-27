@@ -5,9 +5,9 @@ class TestCase::NativeAPI {
   use TestCase::Pointer;
   use TestCase::PointerChild;
   use TestCase::PointerEmpty;
-  use TestCase::AnonMethod::AnonMethod;
-  use TestCase::AnonMethod::ImplementAnonMethod1;
-  use TestCase::AnonMethod::ImplementAnonMethod2;
+  use TestCase::Operator::AnonMethod::AnonMethod;
+  use TestCase::Operator::AnonMethod::ImplementAnonMethod1;
+  use TestCase::Operator::AnonMethod::ImplementAnonMethod2;
   use Fn;
   use Array;
   use Error;
@@ -1358,6 +1358,18 @@ class TestCase::NativeAPI {
     return 1;
   }
   native static method get_bool_object_value_native : int ($bool_object : Bool);
+  
+  native static method get_byte_object_value : int ();
+  
+  native static method get_short_object_value : int ();
+  
+  native static method get_int_object_value : int ();
+  
+  native static method get_long_object_value : int ();
+  
+  native static method get_float_object_value : int ();
+  
+  native static method get_double_object_value : int ();
   
   native static method new_string_no_mortal : int ();
   

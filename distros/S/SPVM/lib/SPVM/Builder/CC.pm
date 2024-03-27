@@ -15,6 +15,7 @@ use SPVM::Builder::Util;
 use SPVM::Builder::CompileInfo;
 use SPVM::Builder::ObjectFileInfo;
 use SPVM::Builder::LinkInfo;
+use SPVM::Builder::Native::BasicType;
 
 # Fields
 sub build_dir {
@@ -137,8 +138,11 @@ sub build_precompile_class_source_file {
   
   my $runtime = $options->{runtime};
   
-  my $class_file = &_runtime_get_class_file($runtime, $class_name);
-  my $precompile_source = &_runtime_build_precompile_class_source($runtime, $class_name);
+  my $basic_type = $runtime->get_basic_type_by_name($class_name);
+  
+  my $class_file = $basic_type->get_class_file;
+  
+  my $precompile_source = $basic_type->build_precompile_class_source($basic_type);
   
   # Force
   my $force = $self->detect_force;
@@ -290,7 +294,8 @@ sub compile_class {
   my $native_class_ext = $config->ext;
   
   if ($category eq 'precompile') {
-    my $precompile_method_names = &_runtime_get_method_names($runtime, $class_name, $category);
+    my $basic_type = $runtime->get_basic_type_by_name($class_name);
+    my $precompile_method_names = $basic_type->get_method_names_by_category($category);
     
     unless (@$precompile_method_names) {
       return [];
@@ -321,7 +326,9 @@ sub compile_class {
     }
   }
   else {
-    $class_file = &_runtime_get_class_file($runtime, $class_name);
+    my $basic_type = $runtime->get_basic_type_by_name($class_name);
+    
+    $class_file = $basic_type->get_class_file;
   }
   
   my $cc_input_dir;
@@ -585,72 +592,6 @@ sub get_resource_object_dir_from_class_name {
   return $resource_object_dir;
 }
 
-sub _runtime_build_precompile_class_source {
-  my ($runtime, $class_name, $category) = @_;
-  
-  my $precompile_source;
-  if ($runtime->isa('SPVM::Builder::Runtime')) {
-    $precompile_source = $runtime->build_precompile_class_source($class_name);
-  }
-  elsif ($runtime->isa('SPVM::BlessedObject::Class')) {
-    my $basic_type = $runtime->get_basic_type_by_name($class_name);
-    
-    $precompile_source = $runtime->build_precompile_class_source($basic_type)->to_string;
-  }
-  else {
-    confess("[Unexpected Error]Invalid object type.");
-  }
-  
-  return $precompile_source;
-}
-
-sub _runtime_get_class_file {
-  my ($runtime, $class_name, $category) = @_;
-  
-  my $class_file;
-  if ($runtime->isa('SPVM::Builder::Runtime')) {
-    $class_file = $runtime->get_class_file($class_name, $category);
-  }
-  elsif ($runtime->isa('SPVM::BlessedObject::Class')) {
-    my $basic_type = $runtime->get_basic_type_by_name($class_name);
-    
-    my $spvm_class_dir = $basic_type->get_class_dir;
-    
-    my $spvm_class_rel_file = $basic_type->get_class_rel_file;
-    
-    $class_file = "$spvm_class_dir/$spvm_class_rel_file";
-  }
-  else {
-    confess("[Unexpected Error]Invalid object type.");
-  }
-  
-  return $class_file;
-}
-
-sub _runtime_get_method_names {
-  my ($runtime, $class_name, $category) = @_;
-  
-  my $method_names;
-  if ($runtime->isa('SPVM::Builder::Runtime')) {
-    $method_names = $runtime->get_method_names($class_name, $category);
-  }
-  elsif ($runtime->isa('SPVM::BlessedObject::Class')) {
-    my $basic_type = $runtime->get_basic_type_by_name($class_name);
-    
-    if ($category eq 'native') {
-      $method_names = $basic_type->_get_native_method_names;
-    }
-    elsif ($category eq 'precompile') {
-      $method_names = $basic_type->_get_precompile_method_names;
-    }
-  }
-  else {
-    confess("[Unexpected Error]Invalid object type.");
-  }
-  
-  return $method_names;
-}
-
 sub link {
   my ($self, $class_name, $object_files, $options) = @_;
   
@@ -745,7 +686,8 @@ sub link {
     
     # Create a dynamic library
     if ($output_type eq 'dynamic_lib') {
-      my $method_names = &_runtime_get_method_names($runtime, $class_name, $category);
+      my $basic_type = $runtime->get_basic_type_by_name($class_name);
+      my $method_names = $basic_type->get_method_names_by_category($category);
       
       my $dl_func_list = SPVM::Builder::Util::create_dl_func_list($class_name, $method_names, {category => $category});
       

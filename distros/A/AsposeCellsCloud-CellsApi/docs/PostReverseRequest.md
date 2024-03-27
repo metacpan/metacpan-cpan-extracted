@@ -8,7 +8,7 @@ use AsposeCellsCloud::Request::PostReverse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**file** | **string** | rows/cols/both |
+**file** | **string** | File to upload |
 **rotate_type** | **string** | rows/cols/both |
 **out_format** | **string** | The output data file format.(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers) |
 **password** | **string** | The password needed to open an Excel file. |

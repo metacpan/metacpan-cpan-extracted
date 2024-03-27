@@ -4,91 +4,97 @@ package SPVM::Sys::Socket::Sockaddr::In;
 
 =head1 Name
 
-SPVM::Sys::Socket::Sockaddr::In - struct sockaddr_in in C language
+SPVM::Sys::Socket::Sockaddr::In - struct sockaddr_in in the C language
+
+=head1 Description
+
+The Sys::Socket::Sockaddr::In class in L<SPVM> represents L<struct sockaddr_in|https://linux.die.net/man/7/ip> in the C language.
 
 =head1 Usage
 
   use Sys::Socket::Sockaddr::In;
 
-=head1 Description
+=head1 Details
 
-C<Sys::Socket::Sockaddr::In> is the class for the C<struct sockaddr_in> in C<C language>.
-
-This is a L<pointer class|SPVM::Document::Language/"Pointer Class">.
+This class is a pointer class. The pointer the instance has is set to a L<struct sockaddr_in|https://linux.die.net/man/7/ip> object.
 
 =head1 Inheritance
 
-This class inherits L<Sys::Socket::Sockaddr|SPVM::Sys::Socket::Sockaddr>.
+L<Sys::Socket::Sockaddr|SPVM::Sys::Socket::Sockaddr>
 
 =head1 Class Methods
 
 =head2 new
 
-  static method new : Sys::Socket::Sockaddr::In ();
+C<static method new : L<Sys::Socket::Sockaddr::In|SPVM::Sys::Socket::Sockaddr::In> ();>
 
-Create a new C<Sys::Socket::Sockaddr::In> object.
+Create a new L<Sys::Socket::Sockaddr::In|SPVM::Sys::Socket::Sockaddr::In> object.
 
 =head1 Instance Methods
 
 =head2 DESTROY
 
-  method DESTROY : void ();
+C<method DESTROY : void ();>
 
 The destructor.
 
 =head2 sa_family
 
-  method sa_family : int ()
+C<method sa_family : int ()>
 
-Gets C<sa_family>. This is the overriden method of the L<sa_family|SPVM::Sys::Socket::Sockaddr/"sa_family"> method in the Sys::Socket::Sockaddr class.
+Returns C<sa_family>.
 
 =head2 sin_family
 
-  method sin_family : int ();
+C<method sin_family : int ();>
   
-Gets C<sin_family>.
+Returns C<sin_family>.
 
 =head2 set_sin_family
 
-  method set_sin_family : void ($family : int);
+C<method set_sin_family : void ($family : int);>
 
 Sets C<sin_family>.
 
-=head2 copy_sin_addr
+=head2 sin_addr
 
-  method copy_sin_addr : Sys::Socket::In_addr ();
+C<method sin_addr : L<Sys::Socket::In_addr|SPVM::Sys::Socket::In_addr> ();>
 
-Copies C<sin_addr>. This is a L<Sys::Socket::In_addr|SPVM::Sys::Socket::In_addr> object.
+Copies C<sin_addr> and returns it.
 
 =head2 set_sin_addr
 
-  method set_sin_addr : void ($address : Sys::Socket::In_addr);
+C<method set_sin_addr : void ($address : L<Sys::Socket::In_addr|SPVM::Sys::Socket::In_addr>);>
 
-Sets C<sin_addr>. This is a L<Sys::Socket::In_addr|SPVM::Sys::Socket::In_addr> object.
+Sets C<sin_addr>.
+
+Exceptions:
+
+The address must be defined. Otherwise an exception is thrown.
 
 =head2 sin_port
 
-  method sin_port : int ();
+C<method sin_port : int ();>
 
-Gets C<sin_port>.
+Returns C<sin_port>.
 
 =head2 set_sin_port
 
-  method set_sin_port : void ($port : int);
+C<method set_sin_port : void ($port : int);>
 
 Sets C<sin_port>.
 
-=head2 sizeof
+=head2 size
 
-  method sizeof : int ()
+C<method size : int ()>
 
-The size of C<struct sockaddr_in>.
+Returns the size of C<struct sockaddr_in>.
 
 =head2 clone
 
-  method clone : Sys::Socket::Sockaddr::In () {
+C<method clone : L<Sys::Socket::Sockaddr::In|SPVM::Sys::Socket::Sockaddr::In> ()>
 
-Clones this object.
+Clones this instance and returns it.
 
 =head1 Copyright & License
 

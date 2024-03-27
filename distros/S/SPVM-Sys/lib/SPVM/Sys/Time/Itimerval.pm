@@ -4,69 +4,57 @@ package SPVM::Sys::Time::Itimerval;
 
 =head1 Name
 
-SPVM::Sys::Time::Itimerval - struct timeval in C language
+SPVM::Sys::Time::Itimerval - struct itimerval in the C language
 
 =head1 Usage
-  
+
   use Sys::Time::Itimerval;
   
   my $tv = Sys::Time::Itimerval->new;
   
-  my $it_interval = $tv->copy_it_interval;
+  my $it_interval = $tv->it_interval;
   $tv->set_it_interval(12);
   
-  my $it_value = $tv->copy_it_value;
+  my $it_value = $tv->it_value;
   $tv->set_it_value(34);
 
 =head1 Description
 
-C<Sys::Time::Itimerval> represents C<struct timeval> in C<C language>.
-
-See L<gettimeofday(2) - Linux man page|https://linux.die.net/man/2/gettimeofday> about C<struct timeval> in Linux.
+The Sys::Time::Itimerval class represents L<struct itimerval|https://linux.die.net/man/2/setitimer> in the C language.
 
 =head1 Class Methods
 
 =head2 new
 
-  static method new : Sys::Time::Itimerval ()
+C<static method new : L<Sys::Time::Itimerval|SPVM::Sys::Time::Itimerval> ();>
 
-Creates a new C<Sys::Time::Itimerval> object.
-
-  my $tv = Sys::Time::Itimerval->new;
+Creates a new L<Sys::Time::Itimerval|SPVM::Sys::Time::Itimerval> object.
 
 =head1 Instance Methods
 
-=head2 copy_it_interval
+=head2 it_interval
 
-  method copy_it_interval : Sys::Time::Timeval ()
+C<method it_interval : L<Sys::Time::Timeval|SPVM::Sys::Time::Timeval> ();>
 
-Copies C<it_interval>.
-
-  my $it_interval = $tv->copy_it_interval;
+Copies C<it_interval> and creates a L<Sys::Time::Timeval|SPVM::Sys::Time::Timeval> object whose pointer is set to the copied value address, and returns it.
 
 =head2 set_it_interval
 
-  method set_it_interval : void ($it_interval : Sys::Time::Timeval)
+C<method set_it_interval : void ($it_interval : L<Sys::Time::Timeval|SPVM::Sys::Time::Timeval>);>
 
 Sets C<it_interval>.
 
-  $tv->set_it_interval(12);
-
-=head2 copy_it_value
+=head2 it_value
   
-  method copy_it_value : Sys::Time::Timeval ()
+C<method it_value : L<Sys::Time::Timeval|SPVM::Sys::Time::Timeval> ();>
 
-Copies C<it_value>.
-
-  my $it_value = $tv->copy_it_value;
+Copies C<it_value> and creates a L<Sys::Time::Timeval|SPVM::Sys::Time::Timeval> object whose pointer is set to the copied value address, and returns it.
 
 =head2 set_it_value
 
-  method set_it_value : void ($it_value : Sys::Time::Timeval)
+C<method set_it_value : void ($it_value : L<Sys::Time::Timeval|SPVM::Sys::Time::Timeval>);>
 
 Sets C<it_value>.
-
-  $tv->set_it_value(34);
 
 =head1 Copyright & License
 

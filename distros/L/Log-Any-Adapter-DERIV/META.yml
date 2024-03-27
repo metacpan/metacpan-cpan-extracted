@@ -38,7 +38,7 @@ no_index:
 provides:
   Log::Any::Adapter::DERIV:
     file: lib/Log/Any/Adapter/DERIV.pm
-    version: '0.007'
+    version: '0.008'
 requires:
   Clone: '0'
   Fcntl: '0'
@@ -64,7 +64,7 @@ resources:
   bugtracker: https://github.com/binary-com/perl-Log-Any-Adapter-DERIV/issues
   homepage: https://github.com/binary-com/perl-Log-Any-Adapter-DERIV
   repository: https://github.com/binary-com/perl-Log-Any-Adapter-DERIV.git
-version: '0.007'
+version: '0.008'
 x_authority: cpan:DERIV
 x_contributors:
   - 'aisha-deriv <aisha@regentmarkets.com>'

@@ -5,7 +5,7 @@ use warnings;
 name 'Config-ROFL';
 author q{Nicolas Mendoza <mendoza@pvv.ntnu.no>};
 license 'perl';
-version '1.08';
+version '1.09';
 
 configure_requires 'Module::Install';
 
@@ -16,6 +16,7 @@ requires 'Carp';
 requires 'Config::General';
 requires 'Cpanel::JSON::XS' => '4.04';
 requires 'Config::ZOMG';
+requires 'Config::Any' => 0.33;
 requires 'Data::Rmap';
 requires 'File::Share';
 requires 'File::Spec';

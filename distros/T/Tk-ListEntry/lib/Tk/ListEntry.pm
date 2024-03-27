@@ -2,14 +2,14 @@ package Tk::ListEntry;
 
 =head1 NAME
 
-Tk::ListEntry - BrowseEntry like widgetwithout button
+Tk::ListEntry - BrowseEntry like widget without button
 
 =cut
 
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.01';
+$VERSION = '0.02';
 
 use Tk;
 require Tk::PopList;
@@ -29,9 +29,13 @@ not have a button. Clicking the entry will pop the list.
 
 You can use all config options and methods of the Entry widget.
 
-=head1 B<CONFIG VARIABLES>
+=head1 CONFIG VARIABLES
 
 =over 4
+
+=item Switch: B<-command>
+
+Callback to be executed when you press the B<Return> button or select an item in the list.
 
 =item Switch: B<-motionselect>
 
@@ -47,6 +51,16 @@ See L<Tk::PopList>.
 
 =back
 
+=head1 ADVERTISED SUBWIDGETS
+
+=over 4
+
+=item B<Entry> The Entry widget.
+
+=item B<List> The PopList widget.
+
+=back
+
 =cut
 
 sub Populate {
@@ -58,21 +72,20 @@ sub Populate {
 	my $entry = $self->Entry->pack(-expand => 1, -fill => 'both');
 	my $list = $self->PopList(
 		-confine => 1,
-		-selectcall => sub { 
-			$entry->delete(0, 'end');
-			$entry->insert('end', shift)
-		},
+		-selectcall => ['EntrySelect', $self],
 		-widget => $entry,
 	);
 	$self->Advertise(Entry => $entry);
 	$self->Advertise(List => $list);
-	$entry->bind('<FocusOut>', [$self, 'EntryFocusOut', Ev('d')]);
 	$entry->bind('<Button-1>', [$list, 'popFlip']);
 	$entry->bind('<Down>', [$list, 'popUp']);
+	$entry->bind('<FocusOut>', [$self, 'EntryFocusOut', Ev('d')]);
+	$entry->bind('<Return>', [$self, 'EntrySelect', Ev('d')]);
 
 
 	$self->ConfigSpecs(
 		-background => ['SELF', 'DESCENDANTS'],
+		-command => ['CALLBACK', undef, undef, sub {}],
 		-motionselect => [$list],
 		-popdirection => [$list],
 		-values => [$list],
@@ -103,6 +116,15 @@ sub EntryFocusOut {
 	}
 }
 
+sub EntrySelect {
+	my ($self, $select) = @_;
+	my $entry = $self->Subwidget('Entry');
+	if (defined $select) {
+		$entry->delete(0, 'end');
+		$entry->insert('end', $select);
+	}
+	$self->Callback('-command', $entry->get);
+}
 
 =item B<validate>
 
@@ -146,3 +168,5 @@ Unknown. If you find any, please contact the author.
 =cut
 
 1;
+
+

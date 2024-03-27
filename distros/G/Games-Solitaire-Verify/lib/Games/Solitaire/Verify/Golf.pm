@@ -1,10 +1,9 @@
 package Games::Solitaire::Verify::Golf;
-$Games::Solitaire::Verify::Golf::VERSION = '0.2500';
+$Games::Solitaire::Verify::Golf::VERSION = '0.2600';
 use strict;
 use warnings;
 use 5.014;
 use autodie;
-use utf8;
 
 
 use Carp       ();
@@ -83,11 +82,14 @@ sub _init
         if ( my ($card_s) = $foundation_str =~
             m#\AFoundations:((?: $CARD_RE){$num_foundations})\z# )
         {
-            $card_s =~ s/\A //ms or die;
+            $card_s =~ s/\A //ms
+                or Carp::confess("_set_found_line: no leading space");
             my @c = split( / /, $card_s );
             if ( @c != $num_foundations )
             {
-                die;
+                Carp::confess( "num_foundations is "
+                        . scalar(@c)
+                        . " rather than $num_foundations" );
             }
             for my $i ( keys @c )
             {
@@ -107,7 +109,7 @@ sub _init
     {
         if ( $foundation_str !~ s#\ATalon: ((?:$CARD_RE ){15}$CARD_RE)#$1# )
         {
-            die "improper talon line <$foundation_str>!";
+            Carp::confess("improper talon line <$foundation_str>!");
         }
         $self->_talon(
             [
@@ -163,36 +165,79 @@ sub _set_found
     return;
 }
 
+package Games::Solitaire::Verify::Golf::_LinesIter;
+$Games::Solitaire::Verify::Golf::_LinesIter::VERSION = '0.2600';
+sub new
+{
+    my $class = shift;
+
+    my $self = bless {}, $class;
+
+    $self->_init(@_);
+
+    return $self;
+}
+
+sub _init
+{
+    my ( $self, $args ) = @_;
+
+    $self->{_get}      = $args->{_get};
+    $self->{_line_num} = 0;
+
+    return;
+}
+
+sub _get_line
+{
+    my ( $self, ) = @_;
+
+    my $ret = $self->{_get}->();
+    return ( $ret, ++$self->{_line_num} );
+}
+
+sub _assert_empty_line
+{
+    my ( $self, ) = @_;
+
+    my ( $s, $line_idx ) = $self->_get_line;
+
+    if ( $s ne '' )
+    {
+        Carp::confess("Line '$line_idx' is not empty, but '$s'");
+    }
+
+    return;
+}
+
+sub _compare_line
+{
+    my ( $self, $wanted_line, $title, ) = @_;
+
+    my ( $line, $line_idx ) = $self->_get_line;
+    if ( $line ne $wanted_line )
+    {
+        Carp::confess(
+            "$title string is '$line' vs. '$wanted_line' at line no. $line_idx"
+        );
+    }
+
+    return;
+}
+
+package Games::Solitaire::Verify::Golf;
+
 sub process_solution
 {
     my ( $self, $next_line_iter ) = @_;
-    my $columns         = $self->_columns;
-    my $NUM_COLUMNS     = @$columns;
-    my $line_num        = 0;
+    my $columns     = $self->_columns;
+    my $NUM_COLUMNS = @$columns;
+    my $it          = Games::Solitaire::Verify::Golf::_LinesIter->new(
+        { _get => $next_line_iter, } );
     my $remaining_cards = sum( map { $_->len } @$columns );
 
-    my $get_line = sub {
-        my $ret = $next_line_iter->();
-        return ( $ret, ++$line_num );
-    };
+    $it->_compare_line( "Solved!", "First line" );
 
-    my $assert_empty_line = sub {
-        my ( $s, $line_idx ) = $get_line->();
-
-        if ( $s ne '' )
-        {
-            Carp::confess("Line '$line_idx' is not empty, but '$s'");
-        }
-
-        return;
-    };
-
-    my ( $l, $first_l ) = $get_line->();
-
-    if ( $l ne "Solved!" )
-    {
-        die "First line is '$l' instead of 'Solved!'";
-    }
     my $IS_BINARY_STAR     = $self->_is_binary_star;
     my $IS_GOLF            = $self->_is_golf;
     my $CHECK_EMPTY        = ( $IS_GOLF or $self->_variant eq "black_hole" );
@@ -211,45 +256,40 @@ MOVES:
         )
         )
     {
-        my ( $move_line, $move_line_idx ) = $get_line->();
+        my ( $move_line, $move_line_idx ) = $it->_get_line;
 
         my $card;
         my $col_idx;
-        my $foundation_idx;
+        my $foundation_idx = 0;
         my $moved_card_str;
         if (    $IS_GOLF
             and $move_line =~ m/\ADeal talon\z/ )
         {
             if ( !@{ $self->_talon } )
             {
-                die "Talon is empty on line no. $move_line_idx";
+                Carp::confess("Talon is empty on line no. $move_line_idx");
             }
-            $card           = shift @{ $self->_talon };
-            $foundation_idx = 0;
+            $card = shift @{ $self->_talon };
         }
         else
         {
             if (
-                $IS_DETAILED_MOVE
-                ? ( ( $moved_card_str, $col_idx, $foundation_idx ) =
-                        $move_line =~
+                not(
+                    $IS_DETAILED_MOVE
+                    ? ( ( $moved_card_str, $col_idx, $foundation_idx ) =
+                            $move_line =~
 m/\AMove ($CARD_RE) from stack ([0-9]+) to foundations ([0-9]+)\z/
-                )
-                : ( ($col_idx) =
-                        $move_line =~
+                    )
+                    : ( ($col_idx) =
+                            $move_line =~
 m/\AMove a card from stack ([0-9]+) to the foundations\z/
+                    )
                 )
                 )
             {
-                if ( not $IS_DETAILED_MOVE )
-                {
-                    $foundation_idx = 0;
-                }
-            }
-            else
-            {
-                die
-"Incorrect format for move line no. $move_line_idx - '$move_line'";
+                Carp::confess(
+"Incorrect format for move line no. $move_line_idx - '$move_line'"
+                );
             }
         }
 
@@ -257,35 +297,39 @@ m/\AMove a card from stack ([0-9]+) to the foundations\z/
         {
             if ( ( $col_idx < 0 ) or ( $col_idx >= $NUM_COLUMNS ) )
             {
-                die "Invalid column index '$col_idx' at $move_line_idx";
+                Carp::confess(
+                    "Invalid column index '$col_idx' at line no. $move_line_idx"
+                );
             }
         }
 
-        $assert_empty_line->();
+        $it->_assert_empty_line();
         my ( $info_line, $info_line_idx );
         if ( not $IS_DETAILED_MOVE )
         {
-            ( $info_line, $info_line_idx ) = $get_line->();
+            ( $info_line, $info_line_idx ) = $it->_get_line;
             if ( $info_line !~ m/\AInfo: Card moved is ($CARD_RE)\z/ )
             {
-                die
-"Invalid format for info line no. $info_line_idx - '$info_line'";
+                Carp::confess(
+"Invalid format for info line no. $info_line_idx - '$info_line'"
+                );
             }
 
             $moved_card_str = $1;
 
-            $assert_empty_line->();
-            $assert_empty_line->();
+            $it->_assert_empty_line();
+            $it->_assert_empty_line();
 
-            my ( $sep_line, $sep_line_idx ) = $get_line->();
+            my ( $sep_line, $sep_line_idx ) = $it->_get_line;
 
             if ( $sep_line !~ m/\A=+\z/ )
             {
-                die
-"Invalid format for separator line no. $sep_line_idx - '$sep_line'";
+                Carp::confess(
+"Invalid format for separator line no. $sep_line_idx - '$sep_line'"
+                );
             }
 
-            $assert_empty_line->();
+            $it->_assert_empty_line();
         }
 
         if ( defined $card )
@@ -293,8 +337,9 @@ m/\AMove a card from stack ([0-9]+) to the foundations\z/
             my $top_card_moved_str = $card->to_string();
             if ( $top_card_moved_str ne $moved_card_str )
             {
-                die
-"Card moved should be '$top_card_moved_str', but the info says it is '$moved_card_str' at line $info_line_idx";
+                Carp::confess(
+"Card moved should be '$top_card_moved_str', but the info says it is '$moved_card_str' at line $info_line_idx"
+                );
             }
         }
         else
@@ -305,8 +350,9 @@ m/\AMove a card from stack ([0-9]+) to the foundations\z/
 
             if ( $top_card_moved_str ne $moved_card_str )
             {
-                die
-"Card moved should be '$top_card_moved_str', but the info says it is '$moved_card_str' at line $info_line_idx";
+                Carp::confess(
+"Card moved should be '$top_card_moved_str', but the info says it is '$moved_card_str' at line $info_line_idx"
+                );
             }
 
             my $found_card = $self->_foundation->cell($foundation_idx);
@@ -332,13 +378,12 @@ m/\AMove a card from stack ([0-9]+) to the foundations\z/
                     )
                     )
                 {
-                    die
+                    Carp::confess(
 "Cannot put $top_card_moved_str in the foundations that contain "
-                        . $found_card->to_string();
+                            . $found_card->to_string() );
                 }
                 if ($IS_DISPLAYED_BOARD)
                 {
-                    my ( $line, $line_idx ) = $get_line->();
                     my $wanted_line = $self->_foundation->to_string();
                     $wanted_line =~ s#\AFreecells:#Foundations:#
                         or Carp::confess("Unimpl!");
@@ -346,15 +391,11 @@ m/\AMove a card from stack ([0-9]+) to the foundations\z/
                     my $fstr = $found_card->to_string();
                     my $tstr = $top_card->to_string();
                     $wanted_line =~
-s#\AFoundations:(?: $CARD_RE){$foundation_idx} \K(\Q$fstr\E)#my$c=$1;"[ $c → $tstr ]"#e
+s#\AFoundations:(?: $CARD_RE){$foundation_idx} \K(\Q$fstr\E)#my$c=$1;"[ $c -> $tstr ]"#e
                         or Carp::confess(
 "Failed substitute! foundation_idx=$foundation_idx wanted_line=$wanted_line fstr='$fstr'"
                         );
-                    if ( $line ne $wanted_line )
-                    {
-                        Carp::confess(
-                            "Foundations str is '$line' vs. '$wanted_line'");
-                    }
+                    $it->_compare_line( $wanted_line, "Foundations" );
                     for my $i ( keys @$columns )
                     {
                         my $col         = $columns->[$i];
@@ -362,19 +403,14 @@ s#\AFoundations:(?: $CARD_RE){$foundation_idx} \K(\Q$fstr\E)#my$c=$1;"[ $c → $
                         if ( $i == $col_idx )
                         {
                             $wanted_line =~
-                                s# \K(\Q$tstr\E)\z#my$c=$1;"[ $c → ]"#e
+                                s# \K(\Q$tstr\E)\z#my$c=$1;"[ $c -> ]"#e
                                 or Carp::confess(
 "Failed column substitute! foundation_idx=$foundation_idx wanted_line=$wanted_line tstr='$tstr'"
                                 );
                         }
-                        my ( $line, $line_idx ) = $get_line->();
-                        if ( $line ne $wanted_line )
-                        {
-                            Carp::confess(
-                                "Column $i str is '$line' vs. '$wanted_line'");
-                        }
+                        $it->_compare_line( $wanted_line, "Column $i" );
                     }
-                    $assert_empty_line->();
+                    $it->_assert_empty_line();
                 }
             }
             $card = $col->pop;
@@ -382,7 +418,7 @@ s#\AFoundations:(?: $CARD_RE){$foundation_idx} \K(\Q$fstr\E)#my$c=$1;"[ $c → $
         }
         if ( not defined $foundation_idx )
         {
-            die "\$foundation_idx not set";
+            Carp::confess("\$foundation_idx not set");
         }
         $self->_set_found( $foundation_idx, $card, );
         if ($CHECK_EMPTY)
@@ -411,7 +447,7 @@ of black-hole-solve (or a similar solver)
 
 =head1 VERSION
 
-version 0.2500
+version 0.2600
 
 =head1 SYNOPSIS
 
@@ -430,7 +466,7 @@ version 0.2500
 
 =head1 METHODS
 
-=head2 Games::Solitaire::Verify::Golf->new({board_string=>$str, variant =>"golf"|"all_in_a_row"|"black_hole"})
+=head2 Games::Solitaire::Verify::Golf->new({board_string=>$str, variant =>"golf"|"all_in_a_row"|"binary_star"|"black_hole"})
 
 Construct a new validator / verifier for the variant and the initial board string.
 

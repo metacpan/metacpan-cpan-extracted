@@ -33,7 +33,7 @@ If called with a prefix argument (C-u), prompt for the target language."
                                 xlate-default-target-lang xlate-default-target-lang))
            nil)))
   (let* ((l (or target-lang xlate-default-target-lang))
-         (lang (or (cdr (assoc lang xlate-lang-aliases)) l)))
+         (lang (or (cdr (assoc l xlate-lang-aliases)) l)))
     (shell-command-on-region
      begin end
      (format "xlate -a -s -o cm -w72 -p '(?s).+' -t %s -" lang)

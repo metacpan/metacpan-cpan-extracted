@@ -1,0 +1,15 @@
+\documentclass[letterpaper,twoside,12pt]{article}
+\begin{document}
+
+\title{ a test title }
+\author{ myname surname }
+\date{ 2024/12/12 }
+
+  \section{Content for section 1}
+blah blah
+  \section{Content for section 2}
+blah blah
+  \section{Content for section 3}
+blah blah
+
+\end{document}

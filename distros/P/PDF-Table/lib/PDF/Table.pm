@@ -9,7 +9,7 @@ package PDF::Table;
 
 # portions (c) copyright 2004 Stone Environmental Inc.
 # (c) copyright 2006 Daemmon Hughes
-# (c) copyright 2020 - 2023 by Phil M. Perry
+# (c) copyright 2020 - 2024 by Phil M. Perry
  
 use Carp;
 use List::Util qw[min max];  # core
@@ -18,8 +18,8 @@ use PDF::Table::ColumnWidth;
 use PDF::Table::Settings;
 # can't move text_block() b/c many globals referenced
 
-our $VERSION = '1.005'; # fixed, read by Makefile.PL
-our $LAST_UPDATE = '1.005'; # manually update whenever code is changed
+our $VERSION = '1.006'; # fixed, read by Makefile.PL
+our $LAST_UPDATE = '1.006'; # manually update whenever code is changed
 # don't forget to update VERSION down in POD area
 
 my $compat_mode = 0; # 0 = new behaviors, 1 = compatible with old
@@ -335,7 +335,7 @@ sub table {
         $header_props = $arg{'header_props'};
 
         # Check other parameters and put defaults if needed
-        $header_props->{'repeat'   } ||= $repeat_default;
+        $header_props->{'repeat'   } //= $repeat_default;
 
         $do_headers = 1;  # do headers, no repeat
         $do_headers = 2 if $header_props->{'repeat'};  # do headers w/ repeat

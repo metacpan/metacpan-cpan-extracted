@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.014;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use utf8;
 use DateTime;
@@ -22,7 +22,8 @@ my ( $json_output, $raw_json_output );
 my $show_full_route;
 my ( $list_services, $service );
 my ( @excluded_mots, @exclusive_mots );
-my $verbosity = 0;
+my $max_change = undef;
+my $verbosity  = 0;
 
 my @output;
 my %min_verbosity = (
@@ -45,6 +46,7 @@ my $output_reset = -t STDOUT ? "\033[0m" : q{};
 
 GetOptions(
 	'a|arrive=s'      => sub { $arrival = 1; $time = $_[1] },
+	'c|max-change=s'  => \$max_change,
 	'd|date=s'        => \$date,
 	'h|help'          => sub { show_help(0) },
 	'f|full-route'    => \$show_full_route,
@@ -75,19 +77,22 @@ if ($list_services) {
 
 parse_mot_options();
 
-my ( $from_stop, $to_stop ) = @ARGV;
+my ( $from_stop, @via_stops ) = @ARGV;
+my $to_stop = pop @via_stops;
 
-if ( not $from_stop and $to_stop ) {
+if ( not( $from_stop and $to_stop ) ) {
 	show_help(1);
 }
 
 my %opt = (
+	service        => $service,
+	from_stop      => $from_stop,
+	via_stops      => \@via_stops,
+	to_stop        => $to_stop,
 	excluded_mots  => \@excluded_mots,
 	exclusive_mots => \@exclusive_mots,
-	from_stop      => $from_stop,
-	to_stop        => $to_stop,
+	max_change     => $max_change,
 	developer_mode => $developer_mode,
-	service        => $service,
 	arrival        => $arrival,
 	language       => $language,
 );
@@ -447,11 +452,11 @@ hafas - Interface to HAFAS (e.g. Deutsche Bahn) itinerary services
 =head1 SYNOPSIS
 
 B<hafas> [B<-d> I<date>] [B<-t> I<time>] [B<-m> I<motlist>]
-[B<-s> I<service>] [B<-l> I<language>] [B<-v>] I<from> I<to>
+[B<-s> I<service>] [B<-l> I<language>] [B<-v>] I<from> [I<via> ...] I<to>
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 DESCRIPTION
 
@@ -467,6 +472,10 @@ between two stops and prints the results.
 
 Request connections that arrive at the destination before I<hh>:I<mm>.
 Overrides B<--time> / B<--depart>.
+
+=item B<-c>, B<--max-change> I<count>
+
+Request connections with no more than I<count> changeovers.
 
 =item B<-d>, B<--date> I<dd>.I<mm>.[I<yyyy>]
 

@@ -4,18 +4,26 @@ use warnings;
 use Carp 'confess';
 
 use SPVM::Builder;
+use SPVM::Builder::Native::Env;
 use SPVM::ExchangeAPI;
 
+my $COMPILER;
 my $API;
 
 END {
   
   if ($API) {
-    # Remove circular reference
-    my $env = delete $API->{env};
-    my $stack = delete $API->{stack};
+    {
+      # Remove circular reference
+      my $env = delete $API->{env};
+      my $stack = delete $API->{stack};
+      
+      $env->destroy_class_vars($stack);
+    }
     
-    $env->destroy_class_vars($stack);
+    $API = undef;
+    
+    $COMPILER = undef;
   }
 }
 
@@ -36,39 +44,30 @@ sub build_class {
   my $build_success;
   if (defined $class_name) {
     
-    my $env = $API->env;
+    my $api = $API;
+    my $compiler = $COMPILER;
     
-    my $compiler = $env->runtime->get_compiler;
-    
-    my $start_runtime = $compiler->get_runtime;
-    my $start_basic_types_length = $start_runtime->get_basic_types_length;
-    
-    $compiler->set_start_file($file);
-    $compiler->set_start_line($line);
-    eval { $compiler->compile($class_name) };
-    if ($@) {
-      my $error_messages = $compiler->get_error_messages;
-      for my $error_message (@$error_messages) {
-        printf STDERR "[CompileError]$error_message\n";
-      }
-      $compiler = undef;
-      exit(255);
-    }
+    my $env = $api->env;
     
     my $runtime = $compiler->get_runtime;
+    my $start_basic_types_length = $runtime->get_basic_types_length;
+    
+    $compiler->compile_with_exit($class_name, __FILE__, __LINE__);
     
     my $basic_types_length = $runtime->get_basic_types_length;
     
     for (my $basic_type_id = $start_basic_types_length; $basic_type_id < $basic_types_length; $basic_type_id++) {
       my $basic_type = $runtime->get_basic_type_by_id($basic_type_id);
-      &load_dynamic_lib($runtime, $basic_type->get_name->to_string);
+      my $class_name = $basic_type->get_name;
+      
+      &load_dynamic_lib($runtime, $class_name);
     }
     
-    &bind_to_perl($class_name);
-    
-    my $stack = $API->stack;
+    my $stack = $api->stack;
     
     $env->call_init_methods($stack);
+    
+    &bind_to_perl($class_name);
   }
 }
 
@@ -77,64 +76,35 @@ sub init_api {
     my $build_dir = SPVM::Builder::Util::get_normalized_env('SPVM_BUILD_DIR');
     my $builder = SPVM::Builder->new(build_dir => $build_dir);
     
-    my $builder_compiler = SPVM::Builder::Compiler->new(
-      include_dirs => $builder->include_dirs
-    );
+    my $compiler = SPVM::Builder::Native::Compiler->new;
     
-    my @native_compiler_class_name_names = qw(
-      Native::Compiler
-      Native::Method
-      Native::Runtime
-      Native::BasicType
-      Native::Stack
-      Native::Env
-    );
-    
-    for my $native_compiler_class_name_name (@native_compiler_class_name_names) {
-      $builder_compiler->compile_with_exit($native_compiler_class_name_name, __FILE__, __LINE__);
-      my $builder_runtime = $builder_compiler->get_runtime;
-      
-      # Load dinamic libnaray - native only
-      {
-        my $class_name = $native_compiler_class_name_name;
-        my $category = 'native';
-        my $method_names = $builder_runtime->get_method_names($class_name, $category);
-        
-        if (@$method_names) {
-          # Build classes - Compile C source codes and link them generating a dynamic link library
-          my $class_file = $builder_runtime->get_class_file($class_name);
-          my $dynamic_lib_file = SPVM::Builder::Util::get_dynamic_lib_file_dist($class_file, $category);
-          
-          if (-f $dynamic_lib_file) {
-            my $method_addresses = SPVM::Builder::Util::get_method_addresses($dynamic_lib_file, $class_name, $method_names, $category);
-            
-            for my $method_name (sort keys %$method_addresses) {
-              my $cfunc_address = $method_addresses->{$method_name};
-              $builder_runtime->set_native_method_address($class_name, $method_name, $cfunc_address);
-            }
-          }
-        }
-      }
-    }
-    
-    my $builder_env = SPVM::Builder::Env->new($builder_compiler);
-    
-    my $builder_stack = $builder_env->new_stack;
-    
-    my $builder_api = SPVM::ExchangeAPI->new(env => $builder_env, stack => $builder_stack);
-    
-    my $compiler = $builder_api->class("Native::Compiler")->new;
     for my $include_dir (@{$builder->include_dirs}) {
       $compiler->add_include_dir($include_dir);
     }
     
-    $compiler->compile(undef);
+    my $runtime = $compiler->get_runtime;
     
-    my $env = $builder_api->class("Native::Env")->new($compiler);
+    my $start_basic_types_length = $runtime->get_basic_types_length;
+    
+    $compiler->compile_with_exit(undef, __FILE__, __LINE__);
+    
+    my $basic_types_length = $runtime->get_basic_types_length;
+    
+    for (my $basic_type_id = $start_basic_types_length; $basic_type_id < $basic_types_length; $basic_type_id++) {
+      my $basic_type = $runtime->get_basic_type_by_id($basic_type_id);
+      my $class_name = $basic_type->get_name;
+      
+      &load_dynamic_lib($runtime, $class_name);
+    }
+    
+    my $env = $runtime->get_env;
     
     my $stack = $env->new_stack;
     
-    $API = SPVM::ExchangeAPI->new(env => $env, stack => $stack);
+    my $api = SPVM::ExchangeAPI->new(env => $env, stack => $stack);
+    
+    $COMPILER = $compiler;
+    $API = $api;
     
     $env->set_command_info_program_name($stack, $0);
     
@@ -147,71 +117,41 @@ sub init_api {
 sub load_dynamic_lib {
   my ($runtime, $class_name) = @_;
   
-  my $basic_type = $runtime->get_basic_type_by_name($class_name);
-  
   for my $category ('precompile', 'native') {
+    my $basic_type = $runtime->get_basic_type_by_name($class_name);
     
-    my $get_method_names_options = $runtime->__api->new_options({
-      $category => $runtime->__api->class('Int')->new(1)
-    });
+    my $method_names = $basic_type->get_method_names_by_category($category);
     
-    my $category_method_names;
-    
-    if ($category eq 'native') {
-      $category_method_names = $basic_type->_get_native_method_names;
-    }
-    elsif ($category eq 'precompile') {
-      $category_method_names = $basic_type->_get_precompile_method_names;
-    }
-    
-    if (@$category_method_names) {
-      # Build modules - Compile C source codes and link them to SPVM precompile method
-      # Shared library which is already installed in distribution directory
+    if (@$method_names) {
+      # Build classes - Compile C source codes and link them generating a dynamic link library
+      my $class_file = $basic_type->get_class_file;
+      my $dynamic_lib_file = SPVM::Builder::Util::get_dynamic_lib_file_dist($class_file, $category);
       
-      my $spvm_class_dir = $basic_type->get_class_dir;
-      if ($spvm_class_dir) {
+      # Try to build the shared library at runtime if shared library is not found
+      unless (-f $dynamic_lib_file) {
+        my $build_dir = SPVM::Builder::Util::get_normalized_env('SPVM_BUILD_DIR');
+        my $builder = SPVM::Builder->new(build_dir => $build_dir);
+        $dynamic_lib_file = $builder->build_jit(
+          $class_name,
+          {
+            runtime => $runtime,
+            class_file => $class_file,
+            category => $category,
+          }
+        );
+      }
+      
+      if (-f $dynamic_lib_file) {
+        my $method_addresses = SPVM::Builder::Util::get_method_addresses($dynamic_lib_file, $class_name, $method_names, $category);
         
-        my $spvm_class_rel_file = $basic_type->get_class_rel_file;
-        
-        my $class_file = "$spvm_class_dir/$spvm_class_rel_file";
-        my $dynamic_lib_file = SPVM::Builder::Util::get_dynamic_lib_file_dist($class_file, $category);
-        
-        # Try to build the shared library at runtime if shared library is not found
-        unless (-f $dynamic_lib_file) {
-          my $build_dir = SPVM::Builder::Util::get_normalized_env('SPVM_BUILD_DIR');
-          my $builder = SPVM::Builder->new(build_dir => $build_dir);
-          $dynamic_lib_file = $builder->build_jit(
-            $class_name,
-            {
-              runtime => $runtime,
-              class_file => $class_file,
-              category => $category,
-            }
-          );
-        }
-        
-        if (-f $dynamic_lib_file) {
-          my $method_addresses = SPVM::Builder::Util::get_method_addresses(
-            $dynamic_lib_file,
-            $class_name,
-            $category_method_names,
-            $category
-          );
-          
-          for my $method_name (sort keys %$method_addresses) {
-            my $method = $basic_type->get_method_by_name($method_name);
-            
-            my $cfunc_address = $method_addresses->{$method_name};
-            if ($category eq 'native') {
-              $method->set_native_address(
-                $runtime->__api->new_address_object($cfunc_address)
-              );
-            }
-            elsif ($category eq 'precompile') {
-              $method->set_precompile_address(
-                $runtime->__api->new_address_object($cfunc_address)
-              );
-            }
+        for my $method_name (sort keys %$method_addresses) {
+          my $cfunc_address = $method_addresses->{$method_name};
+          my $method = $basic_type->get_method_by_name($method_name);
+          if ($category eq 'precompile') {
+            $method->set_precompile_address($cfunc_address);
+          }
+          elsif ($category eq 'native') {
+            $method->set_native_address($cfunc_address);
           }
         }
       }
@@ -225,9 +165,7 @@ sub bind_to_perl {
   
   my $env = $API->env;
   
-  my $compiler = $env->runtime->get_compiler;
-  
-  my $runtime = $compiler->get_runtime;
+  my $runtime = $env->runtime;
   
   my $basic_type = $runtime->get_basic_type_by_name($class_name);
   
@@ -241,7 +179,7 @@ sub bind_to_perl {
     # The inheritance
     my @isa;
     if (defined $parent_basic_type) {
-      my $parent_basic_type_name = $parent_basic_type->get_name->to_string;
+      my $parent_basic_type_name = $parent_basic_type->get_name;
       push @isa, "$perl_class_name_base$parent_basic_type_name";
     }
     push @isa, 'SPVM::BlessedObject::Class';
@@ -255,10 +193,11 @@ sub bind_to_perl {
     }
     
     my $methods_length = $basic_type->get_methods_length;
+    
     for (my $method_index = 0; $method_index < $methods_length; $method_index++) {
       my $method = $basic_type->get_method_by_index($method_index);
       
-      my $method_name = $method->get_name->to_string;
+      my $method_name = $method->get_name;
       
       # Destrutor is skip
       if ($method_name eq 'DESTROY') {

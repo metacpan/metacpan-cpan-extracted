@@ -8,7 +8,7 @@ use AsposeCellsCloud::Request::PostClearObjects;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**file** | **string** | chart/comment/picture/shape/listobject/hyperlink/oleobject/pivottable/validation/Background |
+**file** | **string** | File to upload |
 **objecttype** | **string** | chart/comment/picture/shape/listobject/hyperlink/oleobject/pivottable/validation/Background |
 **sheetname** | **string** | The worksheet name, specify the scope of the deletion. |
 **out_format** | **string** | The output data file format.(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers) |

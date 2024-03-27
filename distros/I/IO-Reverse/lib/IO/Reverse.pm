@@ -1,11 +1,14 @@
 
 package IO::Reverse;
 
+use v5.14;
+
 use warnings;
 use strict;
-use IO::File;
-use Fcntl;
-use Data::Dumper;
+# the following only used for development
+#use Data::Dumper;
+#use lib './lib';  # local Verbose.pm
+#use Verbose;
 
 =head1 NAME
 
@@ -13,11 +16,11 @@ IO::Reverse - read a file in reverse
 
 =head1 VERSION
 
-Version 0.01
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
@@ -36,7 +39,9 @@ Now a small test script
  use IO::Reverse;
 
  my $f = IO::Reverse->new( 
-	 FILENAME => './t.txt'
+    {
+       FILENAME => './t.txt'
+    }
  );
 
  while ( my $line = $f->next ) {
@@ -119,44 +124,150 @@ use Exporter qw(import);
 our @ISA=qw(Exporter);
 
 sub new {
-	my ($class, %args) = @_;
-	my $fh = IO::File->new;
+	my ($class, $args) = @_;
 
-	$fh->open($args{FILENAME})  || die "Reverse: could not open file: $args{FILENAME} - $!\n";
-	$args{FH}=$fh;
-	$args{F_SIZE} = -s $args{FILENAME};
-	$args{F_OFFSET} = -2; # offset continually decrements to allow reverse seek
+	open(my $fh,'<', $args->{FILENAME})  || die "Reverse: could not open file: $args->{FILENAME} - $!\n";
+	$args->{FH}=$fh;
+	$args->{F_SIZE} = -s $args->{FILENAME};
+	# offset starts at penultimate character in file
 
-	# set to EOF minus offset 
-	# offset to avoid the end of line/file characters
-	$fh->seek($fh->getpos, SEEK_END);
-	$args{F_POS} =  $fh->getpos;
+	# uncomment if Verbose.pm needed again
+	#$args->{verbose} = Verbose->new(
+		#{
+			#VERBOSITY=>$args->{VERBOSITY},
+			#LABELS=>1,
+			#TIMESTAMP=>0,
+			##HANDLE=>*STDERR
+			#HANDLE=>*STDOUT
+		#} 
+	#);
 
-	my $self = bless \%args, $class;
+	$args->{DEBUG} ||= 0;
+	$args->{CHUNKSIZE} ||= 2**20;
+
+	# extra initial offset to avoid reading EOF	
+	$args->{F_OFFSET} = ($args->{CHUNKSIZE}+1) * -1; # offset continually decrements to allow reverse seek
+
+	if ( $args->{CHUNKSIZE} >= abs($args->{F_SIZE}) ) {
+		$args->{CHUNKSIZE} = $args->{F_SIZE} ; 
+		$args->{F_OFFSET} = ($args->{F_SIZE} * -1) +1 ;
+		$args->{F_OFFSET} = $args->{CHUNKSIZE} * -1;
+	}
+
+	$args->{BOF} ||= 0; # true/false - have we reached beginning of file - control used in loadBuffer()
+
+	seek $args->{FH}, $args->{F_OFFSET} , 2;
+
+	# do not use getpos - described as 'opaque' in the docs
+	# only useful for passing to setpos
+	#$args->{F_POS} =  $args->{FH}->getpos;
+	$args->{F_POS} =  tell($args->{FH});
+	$args->{DEBUG} ||= 0;
+
+	my $self = bless $args, $class;
+
+	$self->showReadParameters;
+
 	return $self;
+}
+
+
+# closure to preserve buffer across calls
+{
+
+my ($accumulator,@bufLines) = ('',());
+my ($firstChar) = ('');
+my %readHash = ();
+
+sub showReadParameters {
+	my ($self) = @_;
+	# uncomment if Verbose.pm needed again
+	#$self->{verbose}->print(3,"      fsize: $self->{F_SIZE}",[]);	
+	#$self->{verbose}->print(3,"  chunkSize: $self->{CHUNKSIZE}",[]);	
+	#$self->{verbose}->print(3,"     offset: $self->{F_OFFSET}",[]);	
+}
+
+sub setReadParameters {
+	my ($self) = @_;
+
+	if ( abs($self->{F_OFFSET}) + $self->{CHUNKSIZE} > $self->{F_SIZE} ) {
+		$self->{CHUNKSIZE} = $self->{F_SIZE} - abs($self->{F_OFFSET}) ;#-1;
+		$self->{F_OFFSET} = ($self->{F_SIZE} * -1) ; #+1;
+	} else {
+		$self->{F_OFFSET} += ($self->{CHUNKSIZE} * -1);
+	}
+
+	return;
+
+}
+
+
+sub dataRead {
+	my ($self) = @_;
+	my $buffer='';
+	my $iter=0;
+
+	while(1) {
+
+		my $rsz = 0;
+		if ($self->{CHUNKSIZE} > 0) {
+			seek $self->{FH}, $self->{F_OFFSET} , 2;
+			$rsz = read($self->{FH}, $buffer, $self->{CHUNKSIZE} );	
+		}
+
+		if ($rsz < 1) {
+			@bufLines	= split(/\n/, $accumulator);
+			$self->{BOF} = 1;
+			return 1;
+		}
+		
+		$accumulator = $buffer . $accumulator;
+		
+		$self->setReadParameters();
+
+		last if $buffer =~ /\n/;
+
+	}
+
+	@bufLines = split(/\n/, $accumulator);
+
+	$accumulator = shift  @bufLines; # possibly partial line
+	if (@bufLines) {
+		@bufLines = reverse @bufLines; # needs to be in reverse order if more than 1 element
+	}
+
+	return 1;
+}
+
+sub loadBuffer {
+	my ($self) = @_;
+
+	my $r = $self->dataRead();
+
+	return $r;
+
 }
 
 sub next {
 	my ($self) = @_;
 
-	my $line='';
-	if ( abs($self->{F_OFFSET}) > $self->{F_SIZE}) { return undef; }
-
-	if (abs($self->{F_OFFSET}) < $self->{F_SIZE} ) {
-		while (abs($self->{F_OFFSET}) <= $self->{F_SIZE}) {
-			$self->{FH}->seek($self->{F_OFFSET}, 2);  # seek backward
-			$self->{F_OFFSET} -= 1;
-			my $char = $self->{FH}->getc;
-			last if $char eq "\n";
-			$line = $char . $line; 
-			# just for fun, the line will be reversed
-			#$line .= $char ;
-		}
+	return undef if $self->{BOF};
+	
+	if (! @bufLines ) {
+		$self->loadBuffer() ;
+	} 
+	
+	if (@bufLines) {
+		my $f = shift @bufLines;
+		return $f . "\n";
+	} else {
+		push @bufLines, $accumulator if $accumulator;
 	}
 
-  return "$line\n";
-
 }
+
+} # end of closure
+
 
 1;
 

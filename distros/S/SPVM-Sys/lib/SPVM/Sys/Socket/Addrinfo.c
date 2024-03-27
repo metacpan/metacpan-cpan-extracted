@@ -4,20 +4,31 @@
 #include "spvm_native.h"
 #include "spvm_socket_util.h"
 
+#if defined(_WIN32)
+
+#define UNIX_PATH_MAX 108
+
+typedef struct sockaddr_un {
+  ADDRESS_FAMILY sun_family;
+  char sun_path[UNIX_PATH_MAX];
+};
+
+#else
+  #include <sys/un.h>
+#endif
+
 #include <assert.h>
 
 static const char* FILE_NAME = "Sys/Socket/Addrinfo.c";
 
 int32_t SPVM__Sys__Socket__Addrinfo__new(SPVM_ENV* env, SPVM_VALUE* stack) {
-  (void)env;
-  (void)stack;
   
-  int32_t e = 0;
+  int32_t error_id = 0;
   
-  struct addrinfo* addrinfo = env->new_memory_stack(env, stack, sizeof(struct addrinfo));
-
-  void* obj_addrinfo = env->new_pointer_object_by_name(env, stack, "Sys::Socket::Addrinfo", addrinfo, &e, __func__, FILE_NAME, __LINE__);
-  if (e) { return e; }
+  struct addrinfo* addrinfo = env->new_memory_block(env, stack, sizeof(struct addrinfo));
+  
+  void* obj_addrinfo = env->new_pointer_object_by_name(env, stack, "Sys::Socket::Addrinfo", addrinfo, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
   
   stack[0].oval = obj_addrinfo;
   
@@ -32,8 +43,8 @@ int32_t SPVM__Sys__Socket__Addrinfo__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   assert(st_addrinfo);
   
-  env->free_memory_stack(env, stack, st_addrinfo);
-
+  env->free_memory_block(env, stack, st_addrinfo);
+  
   env->set_pointer(env, stack, obj_addrinfo, NULL);
   
   return 0;
@@ -149,7 +160,7 @@ int32_t SPVM__Sys__Socket__Addrinfo__set_ai_addrlen(SPVM_ENV* env, SPVM_VALUE* s
   return 0;
 }
 
-int32_t SPVM__Sys__Socket__Addrinfo__copy_ai_addr(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__Sys__Socket__Addrinfo__ai_addr(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error = 0;
   
@@ -167,18 +178,24 @@ int32_t SPVM__Sys__Socket__Addrinfo__copy_ai_addr(SPVM_ENV* env, SPVM_VALUE* sta
       
       case AF_INET: {
         sockaddr_class_name = "Sys::Socket::Sockaddr::In";
-        tmp_ai_addr = env->new_memory_stack(env, stack, sizeof(struct sockaddr_in));
+        tmp_ai_addr = env->new_memory_block(env, stack, sizeof(struct sockaddr_in));
         memcpy(tmp_ai_addr, ai_addr, sizeof(struct sockaddr_in));
         break;
       }
       case AF_INET6: {
         sockaddr_class_name = "Sys::Socket::Sockaddr::In6";
-        tmp_ai_addr = env->new_memory_stack(env, stack, sizeof(struct sockaddr_in6));
+        tmp_ai_addr = env->new_memory_block(env, stack, sizeof(struct sockaddr_in6));
         memcpy(tmp_ai_addr, ai_addr, sizeof(struct sockaddr_in6));
         break;
       }
+      case AF_UNIX: {
+        sockaddr_class_name = "Sys::Socket::Sockaddr::Un";
+        tmp_ai_addr = env->new_memory_block(env, stack, sizeof(struct sockaddr_un));
+        memcpy(tmp_ai_addr, ai_addr, sizeof(struct sockaddr_un));
+        break;
+      }
       default : {
-        assert(0);
+        return env->die(env, stack, "ai_addr->sa_family is an unknown address family.", __func__, FILE_NAME, __LINE__);
       }
     }
     
@@ -200,7 +217,7 @@ int32_t SPVM__Sys__Socket__Addrinfo__copy_ai_addr(SPVM_ENV* env, SPVM_VALUE* sta
   return 0;
 }
 
-int32_t SPVM__Sys__Socket__Addrinfo__copy_ai_canonname(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__Sys__Socket__Addrinfo__ai_canonname(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_self = stack[0].oval;
   

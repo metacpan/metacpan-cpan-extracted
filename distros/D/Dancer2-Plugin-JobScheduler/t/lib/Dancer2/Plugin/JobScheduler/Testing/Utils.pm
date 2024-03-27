@@ -11,7 +11,6 @@ use Exporter 'import';
 our @EXPORT_OK = qw(
   init_db
   build_test_dbs
-  build_managed_handle_config
   db_2_managed_handle_config
   db_2_dancer2_plugin_database_config
 );
@@ -20,7 +19,6 @@ our %EXPORT_TAGS = (
         qw(
           init_db
           build_test_dbs
-          build_managed_handle_config
           db_2_managed_handle_config
           db_2_dancer2_plugin_database_config
         )
@@ -50,8 +48,6 @@ sub init_db {
 sub build_test_dbs {
     my (@drivers) = @_;
     diag 'Create temp databases';
-
-    # my @test_dbs;
     my %test_dbs;
     foreach my $driver (@drivers) {
         my $test_db = Test::Database::Temp->new(
@@ -62,36 +58,9 @@ sub build_test_dbs {
             },
         );
         diag 'Test database (' . $test_db->driver . ') ' . $test_db->name . " created.\n";
-
-        # push @test_dbs, $test_db;
-        # my @dbs;
-        # @dbs = @{ $test_dbs{$driver} } if( exists $test_dbs{$driver} );
-        # push @dbs, $test_db;
-        # $test_dbs{$driver} = \@dbs;
-        # my $name = $test_db->name
         $test_dbs{$driver}->{ $test_db->name } = $test_db;
     }
     return %test_dbs;
-}
-
-sub build_managed_handle_config {
-    my (%test_dbs) = @_;
-    foreach my $driver ( keys %test_dbs ) {
-    }
-    my %cfg = (
-
-        # default => $test_dbs[0]->name,
-    );
-
-    # foreach my $name (@test_dbs) {
-    #     my $db =
-    #     my $name = $db->name();
-    #     my @info = $db->connection_info();
-    #     my %c;
-    #     @c{'dsn','username','password','attr'} = @info;
-    #     $cfg{'databases'}->{$name} = \%c;
-    # }
-    return \%cfg;
 }
 
 sub db_2_managed_handle_config {
@@ -107,8 +76,8 @@ sub db_2_dancer2_plugin_database_config {
     my ($db) = @_;
     my %c;
     if ( $db->driver eq 'SQLite' ) {
-        @c{'driver'}   = 'SQLite';
-        @c{'database'} = $db->info->{'filepath'};
+        $c{'driver'}   = 'SQLite';
+        $c{'database'} = $db->info->{'filepath'};
     }
     else {
         croak 'Unknown driver';

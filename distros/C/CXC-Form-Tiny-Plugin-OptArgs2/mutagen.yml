@@ -13,3 +13,4 @@ sync:
         - "devel"
         - ".tidyall.d"
         - ".plx"
+        - "mutagen.yml.lock"

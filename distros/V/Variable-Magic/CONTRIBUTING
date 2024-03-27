@@ -1,0 +1,39 @@
+Contributing guildelines for the Variable-Magic distribution
+
+Patch submissions guidelines :
+- Patches VERY MUCH SHOULD be generated with "git format-patch".
+    If that's really not possible, make sure your patches apply cleanly in the
+    distribution directory.
+- Single patches MUST be submitted to the bugtracker.
+    Open a ticket and add your patch as an attachment.
+- Series of patches CAN be submitted as a public feature branch.
+    You can clone the directory wherever you want and point me to your remote
+    branch as long as I don't need to log in.
+
+C/XS-related guidelines :
+- C code MUST be kept ANSI-compliant.
+    Older perl versions may have been built with a C compiler that does not
+    support C99 features (plus they are mostly useless except for restrict).
+    In particular, this means no C99 comments, no mixed declaration and code,
+    and no C++ void* casts.
+- XS code MUST be buildable with any perl matching the META requirements.
+    If needed, wrap your code around with the XSH_HAS_PERL(x, y, z) macro.
+
+Tests-related guidelines :
+- Patches MUST be tested before being sent.
+    Make sure the distribution builds and tests correctly.
+- Patches that add version-specific code MUST be tested with at least
+  one perl release matching each version interval.
+    That is, if you add new code specific to perl 5.34 and above, then you
+    have to test it with a pre-5.34 perl (e.g. 5.32) and a post-5.34 perl
+    (e.g. 5.34).
+- C/XS patches MUST be tested with a threaded perl regardless of how much you
+  dislike perl threads.
+    Testing with a threaded perl makes sure your code can build in many more
+    situations. Memory issues are also more easily spotted.
+- Bugfixes SHOULD come with a regression test.
+    Add it to an existing .t file or create your own.
+
+What you don't need to do :
+- DON'T update the Changes file.
+- DON'T run author tests.

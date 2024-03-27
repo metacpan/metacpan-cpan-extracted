@@ -29,12 +29,18 @@ SKIP:
 	{
 		require DBD::Pg;
 	};
-	skip( "DBD::Pg is not installed", 25 ) if( $@ );
-	use_ok( 'DB::Object::Postgres' );
-    use_ok( "DB::Object::Postgres::Query" );
-    use_ok( "DB::Object::Postgres::Statement" );
-    use_ok( "DB::Object::Postgres::Lo" );
-    use_ok( "DB::Object::Postgres::Tables" );
+	if( $@ )
+	{
+        skip( "DBD::Pg is not installed", 25 );
+	}
+	else
+	{
+        use_ok( 'DB::Object::Postgres' );
+        use_ok( "DB::Object::Postgres::Query" );
+        use_ok( "DB::Object::Postgres::Statement" );
+        use_ok( "DB::Object::Postgres::Lo" );
+        use_ok( "DB::Object::Postgres::Tables" );
+    }
 	
 	# Connection parameters are taken from environment variables (DB_NAME, DB_LOGIN, DB_PASSWD, DB_DRIVER, DB_SCHEMA), or from file (DB_CON_FILE) or from uri (DB_CON_URI)
 	# DB_CON_URI=http://localhost:5432?database=postgres&login=jack&

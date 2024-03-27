@@ -1,5 +1,5 @@
 package App::ansiexpand;
-our $VERSION = "1.04";
+our $VERSION = "1.05";
 
 use 5.014;
 use warnings;
@@ -8,6 +8,7 @@ use open IO => 'utf8', ':std';
 use Encode;
 use Pod::Usage;
 use Data::Dumper;
+use List::Util qw(max);
 use Text::ANSI::Tabs qw(ansi_expand ansi_unexpand);
 
 our $DEFAULT_UNEXPAND;
@@ -17,6 +18,8 @@ use Getopt::EX::Hashed 1.05; {
     Getopt::EX::Hashed->configure(DEFAULT => [ is => 'ro' ]);
 
     has unexpand  => ' u  !   ' , default => $DEFAULT_UNEXPAND;
+    has all       => ' a      ' , default => 1;
+    has minimum   => ' x  :1  ' ;
     has ambiguous => '    =s  ' , any => [ qw(wide narrow) ];
     has tabstop   => ' t  =i  ' , min => 1;
     has tabhead   => '    =s  ' ;
@@ -27,6 +30,10 @@ use Getopt::EX::Hashed 1.05; {
 
     has '+tabstop' => sub {
 	$_->{$_[0]} = $Text::ANSI::Tabs::tabstop = $_[1];
+    };
+
+    has '+minimum' => sub {
+	Text::ANSI::Tabs->configure("$_[0]" => $_[1]);
     };
 
     has [ qw(+tabhead +tabspace +tabstyle) ] => sub {
@@ -85,11 +92,11 @@ sub run {
 
 sub list_tabstyle {
     my %style = %Text::ANSI::Fold::TABSTYLE;
-    use List::Util 'max';
     my $max = max map length, keys %style;
     for my $name (sort keys %style) {
 	my($head, $space) = @{$style{$name}};
-	printf "%*s %s%s\n", $max, $name, $head, $space x 7;
+	my $tab = $head . $space x 7;
+	printf "%*s %s\n", $max, $name, $tab x 3;
     }
 }
 
@@ -104,7 +111,7 @@ ansiexpand, ansiunexpand - ANSI sequence aware tab expand/unexpand command
 
 =head1 VERSION
 
-Version 1.04
+Version 1.05
 
 =head1 DESCRIPTION
 

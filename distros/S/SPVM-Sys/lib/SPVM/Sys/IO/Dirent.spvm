@@ -3,14 +3,12 @@
 
 class Sys::IO::Dirent : pointer {
   native method d_ino : int ();
-  native method d_reclen : int ();
+  
   native method d_name : string ();
-
-=pod Mac doesn't have d_off. Windows doesn't have d_type, d_off
-
+  
+  native method d_reclen : int ();
+  
   native method d_off : long ();
+  
   native method d_type : int ();
-
-=cut
-
 }

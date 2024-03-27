@@ -18,6 +18,9 @@ COMMANDS
 
     A comma-separated list of field indexes (defaults to 1).
 
+    A field index of u will result in an undefined (i.e. empty) field being
+    emitted. This can be used to create spaces and pad out the data.
+
  grep
 
        $ csvtool grep PATTERN INPUT...
@@ -43,6 +46,33 @@ COMMANDS
 
     Number of lines to output. If negative, will output all but the final
     few rows of the given number.
+
+ join
+
+       $ csvtool join -fFIELD FILE1 FILE2
+
+    Reads two files and outputs rows joined by a common key.
+
+    The second file is read entirely into memory and indexed by its key
+    field. Then the first file is read a row at a time, and each row has
+    the corresponding data from the second file appended to it when output.
+
+    This is more flexible than the join(1) UNIX tool that inspires it,
+    because FILE2 does not need to be sorted in key order in the same way
+    as FILE1. Additionally, rows of FILE2 may be emitted zero, one, or more
+    times as required by matches from FILE1.
+
+  --field1, -1
+
+    The field index in FILE1 to use as the lookup key.
+
+  --field2, -2
+
+    The field index in FILE2 to use as the storage key.
+
+  --field, -f
+
+    Use the same field index for both files.
 
  sort
 

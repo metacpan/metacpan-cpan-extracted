@@ -1,0 +1,33 @@
+class TestCase::InlineExpansion {
+  
+  # Inline expansion
+  static method constant_method_return_double : double () {
+    return 0.25;
+  }
+  
+  # Array store undef
+  static method constant_method : int () {
+    unless (TestCase::InlineExpansion->constant_method_return_double() == 0.25) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  # Inline expansion
+  static method new : TestCase::InlineExpansion () {
+    return new TestCase::InlineExpansion;
+  }
+  
+  # Array store undef
+  static method new_inline : int () {
+    my $self = TestCase::InlineExpansion->new;
+    
+    unless ($self isa TestCase::InlineExpansion) {
+      return 0;
+    }
+    
+    return 1;
+  }
+
+}

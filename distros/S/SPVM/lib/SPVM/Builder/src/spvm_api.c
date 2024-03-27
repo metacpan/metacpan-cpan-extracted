@@ -294,14 +294,14 @@ SPVM_ENV* SPVM_API_new_env(void) {
     SPVM_API_strerror_string_nolen,
     SPVM_API_strerror,
     SPVM_API_strerror_nolen,
-    NULL, // reserved194,
-    NULL, // reserved195,
+    SPVM_API_is_binary_compatible_object,
+    SPVM_API_is_binary_compatible_stack,
     SPVM_API_new_stack,
     SPVM_API_free_stack,
     SPVM_API_get_field_object_defined_and_has_pointer_by_name,
     SPVM_API_get_field_object_ref,
     SPVM_API_get_field_object_ref_by_name,
-    SPVM_API_check_stack_env,
+    SPVM_API_check_bootstrap_method,
     SPVM_API_assign_object,
     SPVM_API_new_string_array_no_mortal,
     SPVM_API_new_memory_block,
@@ -312,9 +312,14 @@ SPVM_ENV* SPVM_API_new_env(void) {
     SPVM_API_spvm_stdin,
     SPVM_API_spvm_stdout,
     SPVM_API_spvm_stderr,
-    SPVM_API_check_bootstrap_method,
     SPVM_API_new_array_proto_element_no_mortal,
     SPVM_API_new_array_proto_element,
+    SPVM_API_get_byte_object_value,
+    SPVM_API_get_short_object_value,
+    SPVM_API_get_int_object_value,
+    SPVM_API_get_long_object_value,
+    SPVM_API_get_float_object_value,
+    SPVM_API_get_double_object_value,
   };
   SPVM_ENV* env = calloc(1, sizeof(env_init));
   if (env == NULL) {
@@ -437,8 +442,8 @@ void SPVM_API_destroy_class_vars(SPVM_ENV* env, SPVM_VALUE* stack){
       
       int32_t class_var_type_is_object = SPVM_API_TYPE_is_object_type(runtime, class_var_basic_type, class_var_type_dimension, class_var_type_flag);
       if (class_var_type_is_object) {
-        SPVM_OBJECT** object_ref = (SPVM_OBJECT**)&class_var->data;
-        SPVM_API_assign_object(env, stack, object_ref, NULL);
+        SPVM_OBJECT** ref = (SPVM_OBJECT**)&class_var->data;
+        SPVM_API_assign_object(env, stack, ref, NULL);
       }
     }
   }
@@ -741,9 +746,9 @@ SPVM_OBJECT** SPVM_API_get_class_var_object_ref(SPVM_ENV* env, SPVM_VALUE* stack
   
   assert(class_var);
   
-  SPVM_OBJECT** object_ref = (SPVM_OBJECT**)&class_var->data.oval;
+  SPVM_OBJECT** ref = (SPVM_OBJECT**)&class_var->data.oval;
   
-  return object_ref;
+  return ref;
 }
 
 SPVM_OBJECT* SPVM_API_get_class_var_string(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_RUNTIME_CLASS_VAR* class_var) {
@@ -797,8 +802,8 @@ void SPVM_API_set_class_var_object(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_RUNTIM
   
   assert(class_var);
   
-  void* object_ref = &class_var->data.oval;
-  SPVM_API_assign_object(env, stack, object_ref, value);
+  SPVM_OBJECT** ref = (SPVM_OBJECT**)&class_var->data.oval;
+  SPVM_API_assign_object(env, stack, ref, value);
 }
 
 void SPVM_API_set_class_var_string(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_RUNTIME_CLASS_VAR* class_var, SPVM_OBJECT* value) {
@@ -1129,9 +1134,9 @@ SPVM_OBJECT* SPVM_API_get_field_object(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OB
 
 SPVM_OBJECT** SPVM_API_get_field_object_ref(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, SPVM_RUNTIME_FIELD* field) {
   
-  SPVM_OBJECT** object_ref = (SPVM_OBJECT**)((intptr_t)object + SPVM_API_RUNTIME_get_object_data_offset(env->runtime) + field->offset);
+  SPVM_OBJECT** ref = (SPVM_OBJECT**)((intptr_t)object + SPVM_API_RUNTIME_get_object_data_offset(env->runtime) + field->offset);
   
-  return object_ref;
+  return ref;
 }
 
 SPVM_OBJECT* SPVM_API_get_field_string(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, SPVM_RUNTIME_FIELD* field) {
@@ -1173,9 +1178,9 @@ void SPVM_API_set_field_double(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* ob
 
 void SPVM_API_set_field_object(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, SPVM_RUNTIME_FIELD* field, SPVM_OBJECT* value) {
   
-  void* object_ref = (void**)((intptr_t)object + SPVM_API_RUNTIME_get_object_data_offset(env->runtime) + field->offset);
+  SPVM_OBJECT** ref = (SPVM_OBJECT**)((intptr_t)object + SPVM_API_RUNTIME_get_object_data_offset(env->runtime) + field->offset);
   
-  SPVM_API_assign_object(env, stack, object_ref, value);
+  SPVM_API_assign_object(env, stack, ref, value);
 }
 
 void SPVM_API_set_field_string(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, SPVM_RUNTIME_FIELD* field, SPVM_OBJECT* value) {
@@ -1365,9 +1370,9 @@ SPVM_OBJECT** SPVM_API_get_field_object_ref_by_name(SPVM_ENV* env, SPVM_VALUE* s
     return NULL;
   };
   
-  SPVM_OBJECT** object_ref = SPVM_API_get_field_object_ref(env, stack, object, field);
+  SPVM_OBJECT** ref = SPVM_API_get_field_object_ref(env, stack, object, field);
   
-  return object_ref;
+  return ref;
 }
 
 SPVM_OBJECT* SPVM_API_get_field_object_defined_and_has_pointer_by_name(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* field_name, int32_t* error_id, const char* func_name, const char* file_name, int32_t line) {
@@ -2171,30 +2176,31 @@ void SPVM_API_warn(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* string, const 
   
   FILE* spvm_stderr = SPVM_API_RUNTIME_get_spvm_stderr(env->runtime);
   
-  int32_t empty_or_undef = 0;
   if (string) {
-    const char* bytes =SPVM_API_get_chars(env, stack, string);
-    int32_t string_length = SPVM_API_length(env, stack, string);
-    
-    if (string_length > 0) {
-      size_t ret = fwrite(bytes, 1, string_length, spvm_stderr);
+    if (env->is_type_by_name(env, stack, string, "string", 0)) {
+      const char* chars =SPVM_API_get_chars(env, stack, string);
+      
+      int32_t string_length = SPVM_API_length(env, stack, string);
+      
+      if (string_length > 0) {
+        size_t ret = fwrite(chars, 1, string_length, spvm_stderr);
+      }
       
       // Add line and file information if last character is not '\n'
-      int32_t add_line_file;
-      if (bytes[string_length - 1] != '\n') {
+      if (string_length == 0 || chars[string_length - 1] != '\n') {
         fprintf(spvm_stderr, "\n  %s->%s at %s line %d\n", basic_type_name, method_name, file, line);
       }
     }
     else {
-      empty_or_undef = 1;
+      void* obj_type_name = env->get_type_name(env, stack, string);
+      const char* type_name = env->get_chars(env, stack, obj_type_name);
+      
+      fprintf(spvm_stderr, "%s", type_name);
+      fprintf(spvm_stderr, "(0x%" PRIxPTR ")\n  %s->%s at %s line %d\n", (uintptr_t)string, basic_type_name, method_name, file, line);
     }
   }
   else {
-    empty_or_undef = 1;
-  }
-  
-  if (empty_or_undef) {
-    fprintf(spvm_stderr, "Warning\n  %s->%s at %s line %d\n", basic_type_name, method_name, file, line);
+    fprintf(spvm_stderr, "undef\n  %s->%s at %s line %d\n", basic_type_name, method_name, file, line);
   }
 }
 
@@ -2812,13 +2818,6 @@ SPVM_OBJECT* SPVM_API_new_string_no_mortal(SPVM_ENV* env, SPVM_VALUE* stack, con
   return object;
 }
 
-int32_t SPVM_API_get_bool_object_value(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* bool_object) {
-  
-  int32_t value = *(int32_t*)((intptr_t)bool_object + SPVM_API_RUNTIME_get_object_data_offset(env->runtime));
-  
-  return value;
-}
-
 SPVM_OBJECT* SPVM_API_new_string(SPVM_ENV* env, SPVM_VALUE* stack, const char* bytes, int32_t length) {
   
   
@@ -3152,9 +3151,9 @@ SPVM_OBJECT* SPVM_API_get_elem_object(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJ
 
 void SPVM_API_set_elem_object(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* array, int32_t index, SPVM_OBJECT* object) {
   
-  void* object_ref = &((void**)((intptr_t)array + SPVM_API_RUNTIME_get_object_data_offset(env->runtime)))[index];
+  SPVM_OBJECT** ref = &((SPVM_OBJECT**)((intptr_t)array + SPVM_API_RUNTIME_get_object_data_offset(env->runtime)))[index];
   
-  SPVM_API_assign_object(env, stack, object_ref, object);
+  SPVM_API_assign_object(env, stack, ref, object);
 }
 
 SPVM_OBJECT* SPVM_API_get_elem_string(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* array, int32_t index) {
@@ -3667,14 +3666,14 @@ SPVM_OBJECT* SPVM_API_new_object_common(SPVM_ENV* env, SPVM_VALUE* stack, size_t
   return object;
 }
 
-int32_t SPVM_API_check_stack_env(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM_API_is_binary_compatible_stack(SPVM_ENV* env, SPVM_VALUE* stack) {
   
-  int32_t is_valid = 0;
+  int32_t is_binary_compatible_stack = 0;
   if (stack[SPVM_API_C_STACK_INDEX_ENV].oval == env) {
-    is_valid = 1;
+    is_binary_compatible_stack = 1;
   }
   
-  return is_valid;
+  return is_binary_compatible_stack;
 }
 
 int32_t SPVM_API_call_method_common(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_RUNTIME_METHOD* method, int32_t args_width, int32_t mortal) {
@@ -3829,7 +3828,7 @@ int32_t SPVM_API_call_method_common(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_RUNTI
             // Increment ref count of return value
             if (!error_id) {
               if (method_return_type_is_object) {
-                SPVM_OBJECT* return_object = *(void**)&stack[0];
+                SPVM_OBJECT* return_object = *(SPVM_OBJECT**)&stack[0];
                 if (return_object != NULL) {
                   SPVM_API_inc_ref_count(env, stack, return_object);
                 }
@@ -3842,7 +3841,7 @@ int32_t SPVM_API_call_method_common(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_RUNTI
             // Decrement ref count of return value
             if (!error_id) {
               if (method_return_type_is_object) {
-                SPVM_OBJECT* return_object = *(void**)&stack[0];
+                SPVM_OBJECT* return_object = *(SPVM_OBJECT**)&stack[0];
                 if (return_object != NULL) {
                   SPVM_API_dec_ref_count(env, stack, return_object);
                 }
@@ -3857,9 +3856,6 @@ int32_t SPVM_API_call_method_common(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_RUNTI
           }
         }
         else if (method->is_precompile) {
-          // TODO: this is added temporary for bugs of SPVM::Builder::Exe.
-          method->is_precompile_fallback = 1;
-          
           void* method_precompile_address = method->precompile_address;
           if (method_precompile_address) {
             int32_t (*precompile_address)(SPVM_ENV*, SPVM_VALUE*) = method_precompile_address;
@@ -3926,9 +3922,9 @@ void SPVM_API_leave_scope(SPVM_ENV* env, SPVM_VALUE* stack, int32_t original_mor
   int32_t mortal_stack_index;
   for (mortal_stack_index = original_mortal_stack_top; mortal_stack_index < *current_mortal_stack_top_ptr; mortal_stack_index++) {
     
-    SPVM_OBJECT** object_ref = &(*current_mortal_stack_ptr)[mortal_stack_index];
+    SPVM_OBJECT** ref = &(*current_mortal_stack_ptr)[mortal_stack_index];
     
-    SPVM_API_assign_object(env, stack, object_ref, NULL);
+    SPVM_API_assign_object(env, stack, ref, NULL);
     
   }
   
@@ -3939,9 +3935,9 @@ void SPVM_API_leave_scope_local(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT** 
   
   for (int32_t mortal_stack_index = original_mortal_stack_top; mortal_stack_index < *mortal_stack_top_ptr; mortal_stack_index++) {
     int32_t var_index = mortal_stack[mortal_stack_index];
-    SPVM_OBJECT** object_ref = (SPVM_OBJECT**)&object_vars[var_index];
-    if (*object_ref != NULL) {
-      SPVM_API_assign_object(env, stack, object_ref, NULL);
+    SPVM_OBJECT** ref = (SPVM_OBJECT**)&object_vars[var_index];
+    if (*ref != NULL) {
+      SPVM_API_assign_object(env, stack, ref, NULL);
     }
   }
   *mortal_stack_top_ptr = original_mortal_stack_top;
@@ -4389,3 +4385,84 @@ SPVM_OBJECT* SPVM_API_new_array_proto_element(SPVM_ENV* env, SPVM_VALUE* stack, 
   
   return new_array;
 }
+
+int32_t SPVM_API_is_binary_compatible_object(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object) {
+  
+  int32_t is_binary_compatible_object = 0;
+  
+  int32_t is_binary_compatible_stack = SPVM_API_is_binary_compatible_stack(env, stack);
+  
+  if (is_binary_compatible_stack) {
+    int32_t basic_type_id = object->basic_type->id;
+    
+    int32_t is_shareable_type = 0;
+    switch (basic_type_id) {
+      case SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE:
+      case SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT:
+      case SPVM_NATIVE_C_BASIC_TYPE_ID_INT:
+      case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG:
+      case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT:
+      case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE:
+      case SPVM_NATIVE_C_BASIC_TYPE_ID_STRING:
+      {
+        is_shareable_type = 1;
+      }
+    }
+    
+    if (is_shareable_type || object->basic_type->current_runtime == env->runtime) {
+      is_binary_compatible_object = 1;
+    }
+  }
+  
+  return is_binary_compatible_object;
+}
+
+int32_t SPVM_API_get_bool_object_value(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* bool_object) {
+  
+  int32_t value = *(int8_t*)((intptr_t)bool_object + SPVM_API_RUNTIME_get_object_data_offset(env->runtime));
+  
+  return value;
+}
+
+int32_t SPVM_API_get_byte_object_value(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* byte_object) {
+  
+  int32_t value = *(int8_t*)((intptr_t)byte_object + SPVM_API_RUNTIME_get_object_data_offset(env->runtime));
+  
+  return value;
+}
+
+int32_t SPVM_API_get_short_object_value(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* short_object) {
+  
+  int32_t value = *(int16_t*)((intptr_t)short_object + SPVM_API_RUNTIME_get_object_data_offset(env->runtime));
+  
+  return value;
+}
+
+int32_t SPVM_API_get_int_object_value(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* int_object) {
+  
+  int32_t value = *(int32_t*)((intptr_t)int_object + SPVM_API_RUNTIME_get_object_data_offset(env->runtime));
+  
+  return value;
+}
+
+int64_t SPVM_API_get_long_object_value(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* long_object) {
+  
+  int64_t value = *(int64_t*)((intptr_t)long_object + SPVM_API_RUNTIME_get_object_data_offset(env->runtime));
+  
+  return value;
+}
+
+float SPVM_API_get_float_object_value(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* float_object) {
+  
+  float value = *(float*)((intptr_t)float_object + SPVM_API_RUNTIME_get_object_data_offset(env->runtime));
+  
+  return value;
+}
+
+double SPVM_API_get_double_object_value(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* double_object) {
+  
+  double value = *(double*)((intptr_t)double_object + SPVM_API_RUNTIME_get_object_data_offset(env->runtime));
+  
+  return value;
+}
+

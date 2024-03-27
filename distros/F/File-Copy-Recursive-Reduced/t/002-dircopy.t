@@ -246,19 +246,22 @@ SKIP: {
         unless $ENV{PERL_AUTHOR_TESTING};
 
     my $rv = eval { require File::Copy::Recursive; };
-    die unless $rv;
-    no warnings ('redefine');
-    local *dircopy = \&File::Copy::Recursive::dircopy;
-    use warnings;
-
-    note("COMPARISON: Basic tests of File::Copy::Recursive::dircopy()");
-    basic_dircopy_tests(@dirnames);
     SKIP: {
-        skip "System does not support symlinks",  6
-            unless $File::Copy::Recursive::Reduced::CopyLink;
+        skip "Must install File::Copy::Recursive for certain tests", 26
+            unless $rv;
+        no warnings ('redefine');
+        local *dircopy = \&File::Copy::Recursive::dircopy;
+        use warnings;
 
-        note("Copy directory which holds symlinks");
-        mixed_block();
+        note("COMPARISON: Basic tests of File::Copy::Recursive::dircopy()");
+        basic_dircopy_tests(@dirnames);
+        SKIP: {
+            skip "System does not support symlinks",  6
+                unless $File::Copy::Recursive::Reduced::CopyLink;
+
+            note("Copy directory which holds symlinks");
+            mixed_block();
+        }
     }
 }
 

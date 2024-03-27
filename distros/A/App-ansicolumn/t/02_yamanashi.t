@@ -29,7 +29,7 @@ my $sh = $0 =~ s/\.t/.sh/r;
 my @command = read_lines $sh or die;
 
 if ($opt{show}) {
-    for (0 .. $#command) {
+    for (keys @command) {
 	printf "%4d: %s\n", $_, $command[$_];
     }
     exit;

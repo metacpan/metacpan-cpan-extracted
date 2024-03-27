@@ -9,9 +9,9 @@ use List::Util 1.33 qw(none);
 use Locale::Language;
 use Readonly;
 
-Readonly::Array our @EXPORT_OK => qw(check_language);
+Readonly::Array our @EXPORT_OK => qw(check_language check_language_639_1 check_language_639_2);
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 sub check_language {
 	my ($self, $key) = @_;
@@ -27,6 +27,26 @@ sub check_language {
 	return;
 }
 
+sub check_language_639_1 {
+	my ($self, $key) = @_;
+
+	my $error = "Parameter '%s' doesn't contain valid ISO 639-1 code.";
+
+	_check_language($self, $key, 'alpha-2', $error);
+
+	return;
+}
+
+sub check_language_639_2 {
+	my ($self, $key) = @_;
+
+	my $error = "Parameter '%s' doesn't contain valid ISO 639-2 code.";
+
+	_check_language($self, $key, 'alpha-3', $error);
+
+	return;
+}
+
 sub _check_key {
 	my ($self, $key) = @_;
 
@@ -35,6 +55,22 @@ sub _check_key {
 	}
 
 	return 0;
+}
+
+sub _check_language {
+	my ($self, $key, $codeset, $error) = @_;
+
+	_check_key($self, $key) && return;
+
+	if (none { $_ eq $self->{$key} } all_language_codes($codeset)) {
+		my $err = sprintf($error, $key);
+		err $err,
+			'Codeset', $codeset,
+			'Value', $self->{$key},
+		;
+	}
+
+	return;
 }
 
 1;
@@ -54,6 +90,8 @@ Mo::utils::Language - Mo language utilities.
  use Mo::utils::Language qw(check_language);
 
  check_language($self, $key);
+ check_language_639_1($self, $key);
+ check_language_639_2($self, $key);
 
 =head1 DESCRIPTION
 
@@ -70,10 +108,38 @@ Value could be undefined.
 
 Returns undef.
 
+=head2 C<check_language_639_1>
+
+ check_language_639_1($self, $key);
+
+Check parameter defined by C<$key> if it's ISO 639-1 language code and if language code exists.
+Value could be undefined.
+
+Returns undef.
+
+=head2 C<check_language_639_2>
+
+ check_language_639_2($self, $key);
+
+Check parameter defined by C<$key> if it's ISO 639-2 language code and if language code exists.
+Value could be undefined.
+
+Returns undef.
+
 =head1 ERRORS
 
  check_language():
          Parameter '%s' doesn't contain valid ISO 639-1 code.
+                 Value: %s
+
+ check_language_639_1():
+         Parameter '%s' doesn't contain valid ISO 639-1 code.
+                 Codeset: %s
+                 Value: %s
+
+ check_language_639_2():
+         Parameter '%s' doesn't contain valid ISO 639-2 code.
+                 Codeset: %s
                  Value: %s
 
 =head1 EXAMPLE1
@@ -117,7 +183,93 @@ Returns undef.
  print "ok\n";
 
  # Output like:
- # #Error [...utils.pm:?] Language code 'xx' isn't ISO 639-1 code.
+ # #Error [...utils.pm:?] Parameter 'key' doesn't contain valid ISO 639-1 code.
+
+=head1 EXAMPLE3
+
+=for comment filename=check_language_639_1_ok.pl
+
+ use strict;
+ use warnings;
+
+ use Mo::utils::Language qw(check_language_639_1);
+
+ my $self = {
+         'key' => 'en',
+ };
+ check_language_639_1($self, 'en');
+
+ # Print out.
+ print "ok\n";
+
+ # Output:
+ # ok
+
+=head1 EXAMPLE4
+
+=for comment filename=check_language_639_1_fail.pl
+
+ use strict;
+ use warnings;
+
+ use Error::Pure;
+ use Mo::utils::Language qw(check_language_639_1);
+
+ $Error::Pure::TYPE = 'Error';
+
+ my $self = {
+         'key' => 'xx',
+ };
+ check_language_639_1($self, 'key');
+
+ # Print out.
+ print "ok\n";
+
+ # Output like:
+ # #Error [...utils.pm:?] Parameter 'key' doesn't contain valid ISO 639-1 code.
+
+=head1 EXAMPLE5
+
+=for comment filename=check_language_639_2_ok.pl
+
+ use strict;
+ use warnings;
+
+ use Mo::utils::Language qw(check_language_639_2);
+
+ my $self = {
+         'key' => 'eng',
+ };
+ check_language_639_2($self, 'eng');
+
+ # Print out.
+ print "ok\n";
+
+ # Output:
+ # ok
+
+=head1 EXAMPLE6
+
+=for comment filename=check_language_639_2_fail.pl
+
+ use strict;
+ use warnings;
+
+ use Error::Pure;
+ use Mo::utils::Language qw(check_language_639_2);
+
+ $Error::Pure::TYPE = 'Error';
+
+ my $self = {
+         'key' => 'xxx',
+ };
+ check_language_639_2($self, 'key');
+
+ # Print out.
+ print "ok\n";
+
+ # Output like:
+ # #Error [...utils.pm:?] Parameter 'key' doesn't contain valid ISO 639-2 code.
 
 =head1 DEPENDENCIES
 
@@ -163,6 +315,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

@@ -6,7 +6,7 @@ package Catalyst::Manual;
 use strict;
 use warnings;
 
-our $VERSION = '5.9012';
+our $VERSION = '5.9013';
 
 1;
 __END__

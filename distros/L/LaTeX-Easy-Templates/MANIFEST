@@ -7,6 +7,7 @@ README.md
 t/000-load.t
 t/010-Xslate.t
 t/030-instantiate.t
+t/040-program-executables.t
 t/050-_init-formating-data.t
 t/100-create_latex_source_from_template-simple.t
 t/120-create_latex_source_from_template-pod-part1.t
@@ -15,8 +16,10 @@ t/130-create_latex_source_from_template-tterse.t
 t/150-create_latex_source_from_template-simple-with-zero-max-filesize.t
 t/200-create_latex_source_from_template-complex.t
 t/250-format-check-latex-driver-parameters-accepted.t
-t/300-simple-inmemory-template-usage.t
-t/400-format.t
+t/300-inmemory-template-usage-simple.t
+t/350-inmemory-template-usage-calling-other-templates.t
+t/360-ondisk-template-usage-calling-other-templates.t
+t/400-format-simple.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
@@ -44,6 +47,10 @@ t/templates/periodico/periodico-2column.tex.tx
 t/templates/periodico/url.txt
 t/templates/simple01/main.tex.expected_output
 t/templates/simple01/main.tex.tx
+t/templates/simple02-included-templates/content.tex.tx
+t/templates/simple02-included-templates/main.tex.expected_output
+t/templates/simple02-included-templates/main.tex.tx
+t/templates/simple02-included-templates/preamble.tex.tx
 t/templates/simple05/main.tex.expected_output
 t/templates/simple05/main.tex.tx
 t/templates/simple20/main.tex.expected_output

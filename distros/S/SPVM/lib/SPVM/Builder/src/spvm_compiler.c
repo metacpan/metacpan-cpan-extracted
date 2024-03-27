@@ -81,7 +81,11 @@ SPVM_COMPILER* SPVM_COMPILER_new() {
   compiler->op_use_stack = SPVM_LIST_new_list_permanent(compiler->global_allocator, 0);
   compiler->op_types = SPVM_LIST_new_list_permanent(compiler->global_allocator, 0);
   
-  compiler->runtime = SPVM_RUNTIME_new();
+  SPVM_RUNTIME* runtime = SPVM_RUNTIME_new();
+  
+  compiler->runtime = runtime;
+  
+  runtime->compiler = compiler;
   
   int32_t compiler_mutex_compile_size = SPVM_MUTEX_size();
   void* compiler_mutex_compile = SPVM_ALLOCATOR_alloc_memory_block_permanent(compiler->global_allocator, compiler_mutex_compile_size);
@@ -499,7 +503,7 @@ void SPVM_COMPILER_set_default_loaded_class_files(SPVM_COMPILER* compiler) {
   {
     const char* class_name = "Bool";
     const char* rel_file = "Bool.spvm";
-    const char* content = "class Bool {\n  INIT {\n    $TRUE = new Bool;\n    $TRUE->{value} = 1;\n    $FALSE = new Bool;\n    $FALSE->{value} = 0;\n  }\n  \n  our $TRUE : ro Bool;\n  our $FALSE : ro Bool;\n  has value : ro int;\n}";
+    const char* content = "class Bool {\n  INIT {\n    $TRUE = new Bool;\n    $TRUE->{value} = 1;\n    $FALSE = new Bool;\n    $FALSE->{value} = 0;\n  }\n  \n  our $TRUE : ro Bool;\n  our $FALSE : ro Bool;\n  has value : ro byte;\n}";
     SPVM_COMPILER_set_class_file_with_members(compiler, class_name, rel_file, content);
   }
   
@@ -898,6 +902,7 @@ SPVM_RUNTIME* SPVM_COMPILER_build_runtime(SPVM_COMPILER* compiler) {
             runtime_arg->type_dimension = arg_var_decl->type->dimension;
             runtime_arg->type_flag = arg_var_decl->type->flag;
             runtime_arg->stack_index = arg_var_decl->stack_index;
+            runtime_arg->current_method = runtime_method;
           }
         }
         
@@ -962,6 +967,8 @@ SPVM_RUNTIME* SPVM_COMPILER_build_runtime(SPVM_COMPILER* compiler) {
     if (basic_type->destructor_method) {
       runtime_basic_type->destructor_method = &runtime_basic_type->methods[basic_type->destructor_method->index];
     }
+    
+    runtime_basic_type->current_runtime = runtime;
   }
   
   compiler->runtime = runtime;

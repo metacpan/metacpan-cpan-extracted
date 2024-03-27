@@ -26,13 +26,13 @@ no_index:
 provides:
   Method::Signatures::Simple::ParseKeyword:
     file: lib/Method/Signatures/Simple/ParseKeyword.pm
-    version: '1.13'
+    version: '1.14'
 requires:
   Parse::Keyword: '0.09'
   Sub::Name: '0.26'
 resources:
   repository: http://github.com/rhesa/method-signatures-simple-parsekeyword
-version: '1.13'
+version: '1.14'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

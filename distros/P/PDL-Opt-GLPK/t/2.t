@@ -1,7 +1,5 @@
 #!perl -T
 
-use v5.24;
-use warnings;
 use Test2::V0 '!float';
 use PDL;
 use PDL::Opt::GLPK;

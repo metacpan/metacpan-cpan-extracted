@@ -11,14 +11,15 @@ $z = Foo->can("foo");
 sub method {$x->foo}
 sub class  {Foo->foo}
 sub anon   {$z->($x)}
+sub bar    { 1 }
+sub reentrant;
 BEGIN {
   package Foo;
   use base 'sealed';
   use sealed 'deparse';
   sub foo { shift }
-  sub bar  { 1 }
   my $n;
-  sub _foo :Sealed { my Foo $x = shift; $n++ ? $x->bar : $x->main::reentrant }
+  sub _foo :Sealed { my main $x = shift; $n++ ? $x->bar : $x->reentrant }
 }
 sub func   {Foo::foo($x)}
 
@@ -50,7 +51,7 @@ sub also_sealed :Sealed {
 
 sub reentrant :Sealed { my main $b = shift; local our @Q=1; my $c = $b->_foo }
 
-ok($y->main::reentrant()==1);
+ok($y->reentrant()==1);
 
 my %tests = (
     func => \&func,

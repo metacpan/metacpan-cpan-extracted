@@ -63,7 +63,7 @@
       },
       "AsposeCellsCloud::CellsApi" : {
          "file" : "lib/AsposeCellsCloud/CellsApi.pm",
-         "version" : "24.2.1"
+         "version" : "24.3"
       },    
       "AsposeCellsCloud::Configuration" : {
          "file" : "lib/AsposeCellsCloud/Configuration.pm"
@@ -188,6 +188,18 @@
       "AsposeCellsCloud::Object::DataBarBorder" : {
          "file" : "lib/AsposeCellsCloud/Object/DataBarBorder.pm"
       },
+      "AsposeCellsCloud::Object::DataCleansing" : {
+         "file" : "lib/AsposeCellsCloud/Object/DataCleansing.pm"
+      },
+      "AsposeCellsCloud::Object::DataColumnFillValue" : {
+         "file" : "lib/AsposeCellsCloud/Object/DataColumnFillValue.pm"
+      },
+      "AsposeCellsCloud::Object::DataFill" : {
+         "file" : "lib/AsposeCellsCloud/Object/DataFill.pm"
+      },
+      "AsposeCellsCloud::Object::DataFillValue" : {
+         "file" : "lib/AsposeCellsCloud/Object/DataFillValue.pm"
+      },
       "AsposeCellsCloud::Object::DataSorter" : {
          "file" : "lib/AsposeCellsCloud/Object/DataSorter.pm"
       },
@@ -196,6 +208,9 @@
       },
       "AsposeCellsCloud::Object::DateTimeGroupItem" : {
          "file" : "lib/AsposeCellsCloud/Object/DateTimeGroupItem.pm"
+      },
+      "AsposeCellsCloud::Object::DeduplicationRegion" : {
+         "file" : "lib/AsposeCellsCloud/Object/DeduplicationRegion.pm"
       },
       "AsposeCellsCloud::Object::DynamicFilter" : {
          "file" : "lib/AsposeCellsCloud/Object/DynamicFilter.pm"
@@ -899,6 +914,18 @@
       "AsposeCellsCloud::Object::CreatePivotTableRequest" : {
          "file" : "lib/AsposeCellsCloud/Object/CreatePivotTableRequest.pm"
       },
+      "AsposeCellsCloud::Object::DataCleansingRequest" : {
+         "file" : "lib/AsposeCellsCloud/Object/DataCleansingRequest.pm"
+      },
+      "AsposeCellsCloud::Object::DataDeduplicationRequest" : {
+         "file" : "lib/AsposeCellsCloud/Object/DataDeduplicationRequest.pm"
+      },
+      "AsposeCellsCloud::Object::DataFillRequest" : {
+         "file" : "lib/AsposeCellsCloud/Object/DataFillRequest.pm"
+      },
+      "AsposeCellsCloud::Object::DeleteIncompleteRowsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Object/DeleteIncompleteRowsRequest.pm"
+      },
       "AsposeCellsCloud::Object::ImportJsonRequest" : {
          "file" : "lib/AsposeCellsCloud/Object/ImportJsonRequest.pm"
       },
@@ -1595,6 +1622,27 @@
       "AsposeCellsCloud::Request::PostImportDataRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/PostImportDataRequest.pm"
       },
+      "AsposeCellsCloud::Request::PostWorkbookDataCleansingRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorkbookDataCleansingRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostDataCleansingRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostDataCleansingRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorkbookDataDeduplicationRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorkbookDataDeduplicationRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostDataDeduplicationRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostDataDeduplicationRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorkbookDataFillRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorkbookDataFillRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostDataFillRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostDataFillRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostDeleteIncompleteRowsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostDeleteIncompleteRowsRequest.pm"
+      },
       "AsposeCellsCloud::Request::GetWorksheetHyperlinksRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/GetWorksheetHyperlinksRequest.pm"
       },
@@ -2239,6 +2287,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "24.2.1",
+   "version" : "24.3",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

@@ -5,8 +5,9 @@ float *	T_FLOATP
 Logical	T_IV
 int2D *	T_INT2DP
 float2D *	T_FLOAT2DP
+float_packed	T_FLOATS
 
-INPUT 
+INPUT
 
 T_INTP
         $var = ($type)pack1D($arg,'i')
@@ -16,3 +17,5 @@ T_INT2DP
         $var = ($type)pack2D($arg,'i')
 T_FLOAT2DP
         $var = ($type)pack2D($arg,'f')
+T_FLOATS
+        $var = (float_packed)(SvPV(SvRV($arg), PL_na))

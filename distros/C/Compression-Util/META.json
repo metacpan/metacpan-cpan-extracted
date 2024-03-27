@@ -1,0 +1,58 @@
+{
+   "abstract" : "Implementation of various techniques used in data compression.",
+   "author" : [
+      "Daniel Șuteu <trizen@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4234",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Compression-Util",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "List::Util" : "1.45",
+            "POSIX" : "0",
+            "Test::More" : "0",
+            "perl" : "v5.36.0"
+         }
+      }
+   },
+   "provides" : {
+      "Compression::Util" : {
+         "file" : "lib/Compression/Util.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/trizen/Compression-Util/issues"
+      },
+      "homepage" : "https://github.com/trizen/Compression-Util",
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ],
+      "repository" : {
+         "url" : "https://github.com/trizen/Compression-Util"
+      }
+   },
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

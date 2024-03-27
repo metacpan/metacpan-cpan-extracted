@@ -6,6 +6,7 @@ class Sys::Select {
   use Sys::Time::Timeval;
   use Sys::Select::Fd_set;
   
+  # Class Methods
   native static method FD_ZERO : void ($set : Sys::Select::Fd_set);
   
   native static method FD_SET : void ($fd : int, $set : Sys::Select::Fd_set);
@@ -13,6 +14,6 @@ class Sys::Select {
   native static method FD_CLR : void ($fd : int, $set : Sys::Select::Fd_set);
   
   native static method FD_ISSET : int ($fd : int, $set : Sys::Select::Fd_set);
-
+  
   native static method select : int ($nfds : int, $readfds : Sys::Select::Fd_set, $writefds : Sys::Select::Fd_set, $exceptfds : Sys::Select::Fd_set, $timeout : Sys::Time::Timeval);
 }

@@ -26,11 +26,23 @@ METHODS
 
             Default value is 'Plack::App::Search; Version: __VERSION__'
 
+    *       "image_height"
+
+            Image height.
+
+            Default value is undef, this mean real height of image.
+
     *       "image_link"
 
             URL to image above form. Image is centered.
 
             Default value is undef.
+
+    *       "image_radius"
+
+            CSS radius of image.
+
+            Default value is 0.
 
     *       "search_method"
 
@@ -269,5 +281,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

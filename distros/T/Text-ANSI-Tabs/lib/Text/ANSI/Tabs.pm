@@ -1,5 +1,5 @@
 package Text::ANSI::Tabs;
-our $VERSION = "1.03";
+our $VERSION = "1.0501";
 
 =encoding utf-8
 
@@ -20,7 +20,7 @@ Text::ANSI::Tabs - Tab expand and unexpand with ANSI sequence
 
 =head1 VERSION
 
-Version 1.03
+Version 1.0501
 
 =cut
 
@@ -51,11 +51,27 @@ my  $end_re = qr{ $reset_re | $erase_re }x;
 my $fold = Text::ANSI::Fold->new;
 
 our $tabstop = 8;
+our $min_space = 2;
 our $REMOVE_REDUNDANT = 1;
 
 sub configure {
     my $class = shift;
-    $fold->configure(@_);
+    @_ % 2 and die "invalid parameter.\n";
+    my @fold_opt;
+    while (my($k, $v) = splice(@_, 0, 2)) {
+	if ($k eq 'tabstop') {
+	    $tabstop = $v;
+	}
+	elsif ($k eq 'minimum') {
+	    $v =~ /^\d+$/ and $v > 0
+		or die "$v: invalid value for minimum space.\n";
+	    $min_space = $v;
+	} else {
+	    push @fold_opt, $k => $v;
+	}
+    }
+    $fold->configure(@fold_opt) if @fold_opt;
+    return $fold;
 }
 
 sub expand {
@@ -90,7 +106,7 @@ sub _unexpand {
 	my $width = $tabstop + $margin;
 	my($a, $b, $w) = $fold->fold($_, width => $width);
 	if ($w == $width) {
-	    $a =~ s/([ ]+)(?= $end_re* $)/\t/x;
+	    $a =~ s/([ ]{$min_space,})(?= $end_re* $)/\t/x;
 	}
 	$margin = $width - $w;
 	$ret .= $a;
@@ -153,9 +169,14 @@ some redundant color designation code.
 
 =item B<configure>
 
-Confiugre C<Text::ANSI::Fold> object.  Related parameters are those:
+Confiugre and return the underlying C<Text::ANSI::Fold> object.
+Related parameters are those:
 
 =over 4
+
+=item B<tabstop> => I<num>
+
+Set the value of variable C<$Text::ANSI::Tabs::tabstop> to I<num>.
 
 =item B<tabhead> => I<char>
 
@@ -172,6 +193,13 @@ two values for tabhead and tabspace.
 
 If two style names are combined, like C<symbol,space>, use
 C<symbols>'s tabhead and C<space>'s tabspace.
+
+=item B<minimum> => I<num>
+
+By default, B<unexpand> converts two or more consecutive whitespace
+characters into tab characters.  This parameter specifies the minimum
+number of whitespace characters to be converted to tabs.  Specifying
+it to 1 will convert all possible whitespace characters.
 
 =back
 
@@ -201,7 +229,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2021-2023 Kazumasa Utashiro.
+Copyright 2021-2024 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

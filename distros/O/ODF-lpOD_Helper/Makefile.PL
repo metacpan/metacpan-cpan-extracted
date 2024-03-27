@@ -40,6 +40,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Archive::Zip" => 0,
     "Capture::Tiny" => 0,
+    "Carp::Always" => 0,
     "Cwd" => 0,
     "Data::Dumper" => 0,
     "Data::Dumper::Interp" => "6.006",
@@ -66,7 +67,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "multidimensional" => 0
   },
-  "VERSION" => "6.009",
+  "VERSION" => "6.010",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -77,6 +78,7 @@ my %FallbackPrereqs = (
   "Archive::Zip" => 0,
   "Capture::Tiny" => 0,
   "Carp" => 0,
+  "Carp::Always" => 0,
   "Cwd" => 0,
   "Data::Dumper" => 0,
   "Data::Dumper::Interp" => "6.006",

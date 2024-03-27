@@ -2,6 +2,12 @@ Revision history for YA-CLI
 
 TODO: Port to Object::Pad / Corrina
 
+0.006     2024-03-23 00:01:38Z
+
+    * Allow actions which have both subcommands and not, eg
+        YA::CLI::My::Action supports actions without sub commands
+        YA::CLI::My::Action::Subcommand supports subcommands
+
 0.005     2024-02-23 18:58:45Z
 
     * Fix usage() bug where incorrect POD is shown

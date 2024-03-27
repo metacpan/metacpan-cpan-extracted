@@ -26,93 +26,70 @@ The Native::MethodCall class of L<SPVM> has methods to call methods.
 
 =head1 Class Methods
 
+=head2 new_class_method_with_env_stack
+
+C<static method new_class_method_with_env_stack : L<Native::MethodCall|SPVM::Native::MethodCall> ($env : L<Native::Env|SPVM::Native::Env>, $stack : L<Native::Stack|SPVM::Native::Stack>, $basic_type_name : string, $method_name : string);>
+Creates a class method call given the runtime environment $env, the runtime stck $stack, the basic type name $basic_type_name and the method name $method_name and returns it.
+
+If $env is not given, $env is set to the current runtime environment.
+
+If $stack is not given, $stack is set to the current runtime environment.
+
+=head2 new_instance_method_static_with_env_stack
+
+C<static method new_instance_method_static_with_env_stack : L<Native::MethodCall|SPVM::Native::MethodCall> ($env : L<Native::Env|SPVM::Native::Env>, $stack : L<Native::Stack|SPVM::Native::Stack>, $basic_type_name : string, $method_name : string);>
+
+Creates a instance method call given the runtime environment $env, the runtime stck $stack,  the basic type name $basic_type_name and the method name $method_name, and returns it.
+
+If $env is not given, $env is set to the current runtime environment.
+
+If $stack is not given, $stack is set to the current runtime environment.
+
+=head2 new_instance_method_with_env_stack
+
+C<static method new_instance_method_with_env_stack : L<Native::MethodCall|SPVM::Native::MethodCall> ($env : L<Native::Env|SPVM::Native::Env>, $stack : L<Native::Stack|SPVM::Native::Stack>, $instance : object, $method_name : string);>
+
+Creates a instance method call given the runtime environment $env, the runtime stck $stack,  the instance $instance and the method name $method_name, and returns it.
+
+If $env is not given, $env is set to the current runtime environment.
+
+If $stack is not given, $stack is set to the current runtime environment.
+
 =head2 new_class_method
 
 C<static method new_class_method : L<Native::MethodCall|SPVM::Native::MethodCall> ($basic_type_name : string, $method_name : string);>
 
-Create a class method call given the basic type name $basic_type_name and the method name $method_name and returns it.
+Calls the L</"new_class_method_with_env_stack"> method given $env to undef and $stack to undef, and returns its return value.
+
+Creates a class method call given the basic type name $basic_type_name and the method name $method_name and returns it.
 
 =head2 new_instance_method_static
 
 C<static method new_instance_method_static : L<Native::MethodCall|SPVM::Native::MethodCall> ($basic_type_name : string, $method_name : string);>
 
-Create a instance method call given the basic type name $basic_type_name and the method name $method_name, and returns it.
+Calls the L</"new_instance_method_static_with_env_stack"> method given $env to undef and $stack to undef, and returns its return value.
 
 =head2 new_instance_method
 
 C<static method new_instance_method : L<Native::MethodCall|SPVM::Native::MethodCall> ($instance : object, $method_name : string);>
 
-Create a instance method call given the instance $instance and the method name $method_name, and returns it.
-
-=head2 call_callback
-
-C<static method call_callback : void ($callback : L<Callback|SPVM::Callback>, $error_id : int*, $stack = undef : L<Native::Stack|SPVM::Native::Stack>);>
-
-Calls a callback with a stack. If $stack is not defined, the current stack is used.
-
-The stack is a L<Native::Stack|SPVM::Native::Stack> object.
-
-The callback is a L<Callback|SPVM::Callback> object.
-
-If the callback throw exception, the error id is set to $error_id. Otherwise 0 is set to $error_id.
-
-=head2 call_class_method_for_env
-
-C<static method call_class_method_for_env : void ($basic_type_name : string, $method_name : string, $error_id : int*, $stack : L<Native::Stack|SPVM::Native::Stack> = undef, $env : L<Native::Env|SPVM::Native::Env> = undef);>
-  
-Calls a class method with an environment and a stack without arguments. If the environment is not given, the current environment is used.
-
-The stack is a L<Native::Stack|SPVM::Native::Stack> object.
-
-The environment is a L<Native::Env|SPVM::Native::Env> object.
-
-If $stack is not defined, the current stackt is used.
-
-If $environment is not defined, the current environment is used.
-
-=head2 get_exception
-
-C<static method get_exception : string ($stack : L<Native::Stack|SPVM::Native::Stack> = undef, $env : L<Native::Env|SPVM::Native::Env> = undef);>
-
-Copies an excetpion on a stack, and returns it.
-
-The stack is a L<Native::Stack|SPVM::Native::Stack> object.
-
-The environment is a L<Native::Env|SPVM::Native::Env> object.
-
-If $stack is not defined, the current stackt is used.
-
-If $environment is not defined, the current environment is used.
-
-=head2 set_exception
-
-C<static method set_exception : void ($exception : string, $stack : L<Native::Stack|SPVM::Native::Stack> = undef, $env : L<Native::Env|SPVM::Native::Env> = undef);>
-
-Copies an excetpion on a stack using an enviroment, and sets it to the stack.
-
-The stack is a L<Native::Stack|SPVM::Native::Stack> object.
-
-The environment is a L<Native::Env|SPVM::Native::Env> object.
-
-If $stack is not defined, the current stackt is used.
-
-If $environment is not defined, the current environment is used.
+Calls the L</"new_instance_method_with_env_stack"> method given $env to undef and $stack to undef, and returns its return value.
 
 =head2 call_class_method
 
-C<static method call_class_method : void ($basic_type_name : string, $method_name : string, $args : object[] = undef);>
+C<static method call_class_method : void ($basic_type_name : string, $method_name : string, $args : object[] = undef, $error_id_ref : int[] = undef);>
 
 Calls a class method given the basic type name $basic_type_name, the method name $method_name, and the arguments $args.
 
 =head2 call_instance_method_static
 
-C<static method call_instance_method_static : object ($basic_type_name : string, $method_name : string, $args : object[] = undef);>
+C<static method call_instance_method_static : object ($basic_type_name : string, $method_name : string, $args : object[] = undef, $error_id_ref : int[] = undef);>
 
 Calls a instance method given the basic type name $basic_type_name, the method name $method_name, and the arguments $args.
 
 =head2 call_instance_method
 
-C<static method call_instance_method : object ($method_name : string, $args : object[] = undef);>
+C<static method call_instance_method : object ($method_name : string, $args : object[] = undef, $error_id_ref : int[] = undef);>
 
 Calls a instance method given the method name $method_name, and the arguments $args. The first argument in $args must be an instance.
 
@@ -120,9 +97,21 @@ Calls a instance method given the method name $method_name, and the arguments $a
 
 =head2 call
 
-C<method call : object ($args : object[] = undef);>
+C<method call : object ($args : object[] = undef, $error_id_ref : int[] = undef);>
 
 Calls a method with arguments and returns the return value.
+
+=head2 get_exception
+
+C<method get_exception : string ();>
+
+Gets the excetpion on the runtime enviroment and runtime stack owned by this instance.
+
+=head2 set_exception
+
+C<method set_exception : void ($exception : string);>
+
+Sets the excetpion on the runtime enviroment and runtime stack owned by this instance to the string $exception.
 
 =head2 Arguments
 

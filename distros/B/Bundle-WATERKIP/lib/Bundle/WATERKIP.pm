@@ -1,6 +1,6 @@
 use utf8;
 package Bundle::WATERKIP;
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 # ABSTRACT: A mono repo for perl scripts and modules which WATERKIP likes
 
@@ -18,7 +18,7 @@ Bundle::WATERKIP - A mono repo for perl scripts and modules which WATERKIP likes
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

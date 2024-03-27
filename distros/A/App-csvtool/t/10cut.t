@@ -38,4 +38,11 @@ is(
    ],
    'cut -f2,3' );
 
+is(
+   run_cmd( $cmd, "-f2,u,3", \@DATA ),
+   [
+      [ 2,undef,3 ], [ 5,undef,6 ],
+   ],
+   'cut -f2,u,3' );
+
 done_testing;

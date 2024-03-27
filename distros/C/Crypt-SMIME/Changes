@@ -1,5 +1,9 @@
 Revision history for Crypt::SMIME
 
+0.30    Mon Mar 25 11:13:13 JST 2024
+        - Added missing licence info to META files:
+          https://rt.cpan.org/Public/Bug/Display.html?id=152521
+
 0.29    Mon Mar  4 18:10:38 JST 2024
         - Fixed a bug which could cause a double-free on X.509
           structures in a certain scenario:

@@ -36,11 +36,11 @@ for my $test ( @flag_tests ) {
 
     my @flags = $test->{flags}->@*;
     my $label = join( q{, }, @flags );
-    my %pars  = mkSexagesimal( @flags )->%*;
-
-    my $qr = qr/$pars{qr}/;
 
     subtest $label => sub {
+
+        my %pars = mkSexagesimal( @flags )->%*;
+        my $qr   = qr/$pars{qr}/;
 
         if ( my @inputs = $test->{pass}->@* ) {
             subtest 'pass' => sub {

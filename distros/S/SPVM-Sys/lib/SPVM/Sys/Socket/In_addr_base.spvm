@@ -1,0 +1,6 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class Sys::Socket::In_addr_base {
+  
+}

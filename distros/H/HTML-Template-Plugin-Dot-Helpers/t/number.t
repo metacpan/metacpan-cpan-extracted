@@ -4,6 +4,9 @@ use strict;
 use warnings;
 use Test::More;
 
+use POSIX;
+setlocale(&LC_ALL, 'C');
+
 plan tests => 4 +
               5;
 

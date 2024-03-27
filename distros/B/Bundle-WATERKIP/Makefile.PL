@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
     "bin/get-azure-token.pl",
     "bin/jwt-decrypt.pl",
     "bin/opnpost",
+    "bin/parse-phone-number",
     "bin/rm_pm",
     "bin/today-is"
   ],
@@ -70,6 +71,7 @@ my %WriteMakefileArgs = (
     "Moose" => 0,
     "Net::SMTP" => 0,
     "Net::SMTP::SSL" => 0,
+    "Number::Phone" => 0,
     "Object::Pad" => "0.66",
     "POSIX" => 0,
     "Pod::Usage" => 0,
@@ -83,7 +85,7 @@ my %WriteMakefileArgs = (
     "WebService::KvKAPI" => "0.106",
     "XML::Compile::Schema" => 0,
     "XML::LibXML" => 0,
-    "YA::CLI" => "0.004",
+    "YA::CLI" => "0.006",
     "YA::CLI::ActionRole" => 0,
     "namespace::autoclean" => 0
   },
@@ -93,7 +95,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => "0.96"
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -147,6 +149,7 @@ my %FallbackPrereqs = (
   "Moose" => 0,
   "Net::SMTP" => 0,
   "Net::SMTP::SSL" => 0,
+  "Number::Phone" => 0,
   "Object::Pad" => "0.66",
   "POSIX" => 0,
   "Pod::Usage" => 0,
@@ -161,7 +164,7 @@ my %FallbackPrereqs = (
   "WebService::KvKAPI" => "0.106",
   "XML::Compile::Schema" => 0,
   "XML::LibXML" => 0,
-  "YA::CLI" => "0.004",
+  "YA::CLI" => "0.006",
   "YA::CLI::ActionRole" => 0,
   "namespace::autoclean" => 0
 );

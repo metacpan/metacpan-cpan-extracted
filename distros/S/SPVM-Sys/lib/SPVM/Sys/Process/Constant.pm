@@ -4,67 +4,65 @@ package SPVM::Sys::Process::Constant;
 
 =head1 Name
 
-SPVM::Sys::Process::Constant - Constant Values for Process
+SPVM::Sys::Process::Constant - Constant Values for Process Manipulation
+
+=head1 Description
+
+The Sys::Process::Constant class in L<SPVM> has methods to get constant values for process manipulation.
 
 =head1 Usage
 
-  use Sys::Process::Constant as Proc;
-  
-  my $value = Proc->EXIT_FAILURE;
-  
-=head1 Description
-
-C<Sys::Process::Constant> provides the methods for the constant values for the process manipulation.
+  use Sys::Process::Constant;
 
 =head1 Class Methods
 
 =head2 EXIT_FAILURE
 
-  static method EXIT_FAILURE : int ();
+C<static method EXIT_FAILURE : int ();>
 
-Get the constant value of C<EXIT_FAILURE>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+Gets the value of C<EXIT_FAILURE>. If the value is not defined in the system, an exception is thrown with C<eval_error_id> set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
 
 =head2 EXIT_SUCCESS
 
-  static method EXIT_SUCCESS : int ();
+C<static method EXIT_SUCCESS : int ();>
 
-Get the constant value of C<EXIT_SUCCESS>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+Gets the value of C<EXIT_SUCCESS>. If the value is not defined in the system, an exception is thrown with C<eval_error_id> set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
 
 =head2 WNOHANG
 
-  static method WNOHANG : int ();
+C<static method WNOHANG : int ();>
 
-Get the constant value of C<WNOHANG>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+Gets the value of C<WNOHANG>. If the value is not defined in the system, an exception is thrown with C<eval_error_id> set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
 
 =head2 WUNTRACED
 
-  static method WUNTRACED : int ();
+C<static method WUNTRACED : int ();>
 
-Get the constant value of C<WUNTRACED>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+Gets the value of C<WUNTRACED>. If the value is not defined in the system, an exception is thrown with C<eval_error_id> set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
 
 =head2 WCONTINUED
 
-  static method WCONTINUED : int ();
+C<static method WCONTINUED : int ();>
 
-Get the constant value of C<WCONTINUED>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+Gets the value of C<WCONTINUED>. If the value is not defined in the system, an exception is thrown with C<eval_error_id> set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
 
 =head2 PRIO_PROCESS
 
-  static method PRIO_PROCESS : int ();
+C<static method PRIO_PROCESS : int ();>
 
-Get the constant value of C<PRIO_PROCESS>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+Gets the value of C<PRIO_PROCESS>. If the value is not defined in the system, an exception is thrown with C<eval_error_id> set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
 
 =head2 PRIO_PGRP
 
-  static method PRIO_PGRP : int ();
+C<static method PRIO_PGRP : int ();>
 
-Get the constant value of C<PRIO_PGRP>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+Gets the value of C<PRIO_PGRP>. If the value is not defined in the system, an exception is thrown with C<eval_error_id> set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
 
 =head2 PRIO_USER
 
-  static method PRIO_USER : int ();
+C<static method PRIO_USER : int ();>
 
-Get the constant value of C<PRIO_USER>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+Gets the value of C<PRIO_USER>. If the value is not defined in the system, an exception is thrown with C<eval_error_id> set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
 
 =head1 Copyright & License
 

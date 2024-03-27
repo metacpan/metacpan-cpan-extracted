@@ -10,7 +10,7 @@ App::Greple::xlate - модуль поддержки перевода для gre
 
 # VERSION
 
-Version 0.31
+Version 0.3101
 
 # DESCRIPTION
 
@@ -39,6 +39,16 @@ Version 0.31
 </div>
 
 Если вы хотите перевести весь текст, используйте опцию **--match-all**. Это сокращение для указания шаблона `(?s).+`, который соответствует всему тексту.
+
+Формат данных маркера конфликта можно просмотреть в стиле рядом друг с другом с помощью команды `sdif` с опцией `-V`. Поскольку сравнивать по строкам не имеет смысла, рекомендуется использовать опцию `--no-cdif`. Если вам не нужно раскрашивать текст, укажите `--no-color` или `--cm 'TEXT*='`.
+
+    sdif -V --cm '*TEXT=' --no-cdif data_shishin.deepl-EN-US.cm
+
+<div>
+    <p>
+    <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/sdif-cm-view.png">
+    </p>
+</div>
 
 # OPTIONS
 

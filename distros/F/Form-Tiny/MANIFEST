@@ -84,6 +84,7 @@ t/990-examples/020-metaobject.t
 t/990-examples/030-regular-form.t
 t/999-bugfixes/001-3-plugins-array.t
 t/999-bugfixes/002-8-empty-form.t
+t/999-bugfixes/003-14-nested-form-errors.t
 t/author-01-object-pad.t
 t/author-02-bless.t
 t/author-03-autoclean.t

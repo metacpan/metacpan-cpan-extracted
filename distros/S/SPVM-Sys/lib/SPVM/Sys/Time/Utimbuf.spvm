@@ -1,0 +1,19 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class Sys::Time::Utimbuf : pointer {
+  
+  # Class methods
+  native static method new : Sys::Time::Utimbuf ();
+  
+  # Instance methods
+  native method DESTROY : void ();
+  
+  native method actime : long ();
+  
+  native method set_actime : long ($actime : long);
+  
+  native method modtime : long ();
+  
+  native method set_modtime : long ($modtime : long);
+}

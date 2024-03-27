@@ -1,0 +1,51 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Dillan Hildebrand"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "ImgurAPI-Client",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dumper" : "2.154",
+            "HTTP::Request::Common" : "6.07",
+            "JSON" : "2.90",
+            "LWP::UserAgent" : "6.05",
+            "Mozilla::CA" : "20240313",
+            "Scalar::Util" : "1.42",
+            "Test::Exception" : "0.43",
+            "Test::More" : "1.302162",
+            "XML::LibXML" : "2.0110"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {},
+   "version" : "v1.1.3",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

@@ -665,6 +665,9 @@ C<--ru> is replaced by C<-Mi18n --ru> automatically.
     % date --ru
     воскресенье, 22 октября 2017 г. 18:00:00 (JST)
 
+Module C<i18n> is implemented as L<Getopt::EX::i18n> and included in
+this distribution.  So it can be used as above without additional
+installation.
 
 =head1 STANDARD MODULES
 
@@ -703,6 +706,20 @@ See L<App::optex::util::filter> for detail.
 
 =back
 
+=head1 Getopt::EX MODULES
+
+In addition to its own modules, B<optex> can also use C<Getopt::EX>
+modules.  The standard C<Getopt::EX> modules installed are these.
+
+=over 4
+
+=item -MB<i18n> (L<Getopt::EX::i18n>)
+
+You can display a Greek calendar by doing the following:
+
+    optex -Mi18n cal --gr
+
+=back
 
 =head1 OPTIONS
 

@@ -1,6 +1,9 @@
 NAME
     Alien::SeqAlignment::cutadapt - Find or install cutadapt
 
+VERSION
+    version 0.05
+
 SYNOPSIS
     Command line tool:
 
@@ -10,7 +13,7 @@ SYNOPSIS
     or you can even do this to maintain compatibility with the Alien tool
     API
 
-     system Alien::SeqAlignment::cutadapt->exe (list of arguments and options)
+     system Alien::SeqAlignment::cutadapt->cutadapt (list of arguments and options)
 
 DESCRIPTION
     This distribution provides the python tool cutadapt so that it can be
@@ -31,8 +34,8 @@ DESCRIPTION
     and scoop respectively to use this Perl Alien module.
 
 METHODS
-  exe
-     Alien::SeqAlignment::cutadapt->exe
+  cutadapt
+     Alien::SeqAlignment::cutadapt->cutadapt
 
     Returns the command name for running the CLI version of the cutadapt
     CLI.
@@ -103,6 +106,11 @@ SEE ALSO
     *   Alien::Build::Manual::AlienUser
 
         Detailed manual for users of Alien classes.
+
+    *   Bio::SeqAlignment <https://metacpan.org/pod/Bio::SeqAlignment>
+
+        A collection of tools and libraries for aligning biological
+        sequences from within Perl.
 
 AUTHOR
     Christos Argyropoulos <chrisarg@gmail.com>

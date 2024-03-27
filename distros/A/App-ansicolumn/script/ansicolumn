@@ -20,23 +20,24 @@ ansicolumn [options] [file ...]
 
     -w#, -c#             output width
     -s#                  separator string
-    -t                   table style output
     -l#                  maximum number of table columns
     -x                   exchange rows and columns
     -o#                  output separator
-    -R#                  right adjust table columns
 
     -P[#], --page=#      page mode, with optional page length
     -U[#], --up=#        show in N-up format (-WC# --linestyle=wrap)
     --2up .. --9up       same as -U2 .. -U9
-    -D, --document       document mode
-    -V, --parallel       parallel view mode
+    -D,  --document      document mode
+    -V,  --parallel      parallel view mode
+    -H,  --filename      print filename header in parallel view mode
+    -X#, --cell=#        set text width for files in parallel view mode
     -C#, --pane=#        number of panes
     -S#, --pane-width=#  pane width
-    -W, --widen          widen to terminal width
-    -p, --paragraph      paragraph mode
+    -W,  --widen         widen to terminal width
+    -p,  --paragraph     paragraph mode
+    -r,  --regex-sep     treat separator string as regex
 
-    -B, --border[=#]     print border with optional style
+    -B,  --border[=#]    print border with optional style
     -F, --fillup[=#]     fill-up unit (pane|page|none)
 
     --height=#           page height
@@ -47,7 +48,7 @@ ansicolumn [options] [file ...]
     --linebreak=#        line-break mode (none|all|runin|runout)
     --runin=#            run-in width
     --runout=#           run-out width
-    --run=#              set both run-in and run-out width
+    --runlen=#           set both run-in and run-out width
     --[no-]pagebreak     allow page break
     --border-style=#     border style
     --[no-]ignore-space  ignore space in table output
@@ -60,16 +61,46 @@ ansicolumn [options] [file ...]
     --ambiguous=#        ambiguous character width (narrow|wide)
     --pages              split file by formfeed
 
+Table style options:
+
+    -t, --table          table style output
+    -A, --table-align    align table output to column unit
+    -T, --table-tabs     align items by tabs
+    -R#, --table-right=# right adjust table columns
+
+Default alias options:
+
+    --board-color FG BG  board style pages with FG and BG colors
+    --white-board        black on white board
+    --black-board        white on black board
+    --green-board        white on green board
+    --slate-board        white on dark slategray board
+
 =head1 VERSION
 
-Version 1.2801
+Version 1.4101
 
 =head1 DESCRIPTION
 
 B<ansicolumn> is a L<column(1)> command clone which can handle ANSI
-terminal sequences.  It supports traditional options and some of Linux
-extended, and many other original options.  Empty lines are B<not>
-ignored, though.
+terminal sequences, backspaces, and Asian wide characters.  It
+supports traditional options and some of Linux extended, and many
+other original options.
+
+=begin html
+
+<p><img width="750" src="https://raw.githubusercontent.com/tecolicom/App-ansicolumn/master/images/ac-grep.png">
+
+=end html
+
+In addition to normal operation, table style output (C<-t>) is
+supported as well.
+
+=begin html
+
+<p><img width="750" src="https://raw.githubusercontent.com/tecolicom/App-ansicolumn/master/images/ac-table.png">
+
+=end html
 
 In contrast to the original L<column(1)> command which handles mainly
 short item list, and Linux variant which has been expanded to have
@@ -78,9 +109,25 @@ text file in multi-column view.  Combined with pagenation and
 document-friendly folding mechanism, it can be used as a document
 viewing preprocessor for pager program.
 
+=begin html
+
+<p><img width="750" src="https://raw.githubusercontent.com/tecolicom/App-ansicolumn/master/images/ac-man.png">
+
+=end html
+
+In order to accurately display the contents of the file, blank lines
+that were ignored by the original L<column(1)> command are not
+ignored.
+
 When multiple files are given as arguments, it gets in the parallel
 view mode, and show all files in parallel.  It's convenient to see
 multiple files side-by-side.
+
+=begin html
+
+<p><img width="750" src="https://raw.githubusercontent.com/tecolicom/App-ansicolumn/master/images/ac-cell.png">
+
+=end html
 
 =head2 COMPATIBLE OPTIONS
 
@@ -95,12 +142,13 @@ default, from the standard input.
 Output is formatted for a display columns wide.  See L</CALCULATION>
 section.
 
-Accept B<-c> for compatibility, but B<-w> is more popular.
+Accept C<-c> for compatibility, but C<-w> is more popular.
 
 =item B<-s>#, B<--separator>=#
 
-Specify a set of characters to be used to delimit columns for the
--t option.
+Specify a set of characters to be used to delimit columns for the -t
+option.  When used with C<--regex-sep> or C<-r> option, it is used as
+regex rather than character set.
 
 =item B<-t>, B<--table>
 
@@ -108,6 +156,8 @@ Determine the number of columns the input contains and create a
 table.  Columns are delimited with whitespace, by default, or
 with the characters supplied using the -s option.  Useful for
 pretty-printing displays.
+
+Unlike original L<column(1)> command, empty field is not ignored.
 
 =item B<-l>#, B<--table-columns-limit>=#
 
@@ -121,13 +171,17 @@ Fill columns before filling rows.
 
 =item B<-o>#, B<--output-separator>=#
 
-When used B<--table> or B<-t> option, each column are joined by two
+When used C<--table> or C<-t> option, each column are joined by two
 space characters (' ') by default.  This option will change it.
 
 =item B<-R>#, B<--table-right>=#
 
-Right align text in these columns.
-Support only numbers.
+Right align text in these columns.  Multiple columns are separated by
+commas.  Support only numbers.
+
+Parameters are parsed by the L<Getopt::EX::Numbers> module, so you can
+specify a range of numbers, as in C<-R2:5> which is equivalent to
+C<-R2,3,4,5>. Option C<-R:> makes all fields right-aligned.
 
 =back
 
@@ -145,12 +199,12 @@ Page mode.  Set these options.
     --fillup
 
 If optional number is given, it is used as a page height unless option
-B<--height> exists.  Otherwise page height is set to terminal height
+C<--height> exists.  Otherwise page height is set to terminal height
 minus one.
 
 =item B<-U>#, B<--up>=#, B<--2up> .. B<--9up>
 
-Show in N-up format.  Almost same as B<-P> but does not set page
+Show in N-up format.  Almost same as C<-P> but does not set page
 height.  This is convenient when you want multi-column output without
 page control.
 
@@ -173,7 +227,7 @@ L<App::optex::textconv>.
 =item B<-V>, B<-->[B<no->]B<parallel>
 
 Parallel view mode.  Implicitly enabled when multiple files are
-specified.  Use B<--no-parallel> to disable.
+specified.  Use C<--no-parallel> to disable.
 
 Set these options, and cancel all pagenation behavior.
 
@@ -182,19 +236,81 @@ Set these options, and cancel all pagenation behavior.
     --border
 
 By default, all files are displayed in parallel.  In other words,
-number of pane is set as a number of files.  You can use B<-C> option
+number of pane is set as a number of files.  You can use C<-C> option
 to specify number of files displayed simultaneously.
 
-You can use this option mixed with B<-D> option to see document files.
+You can use this option mixed with C<-D> option to see document files.
 
-If you want to show multiple parts in single data stream in parallel,
-use B<--pages> option.  It split the data by formfeed character and
-treat each part as a individual file.
+If you want to display multiple parts in a single stream in parallel,
+use the C<--pages> option. It will split the data by form feed
+characters and treat each part as a separate file.
+
+=item B<-H>, B<--filename>
+
+=item B<--filename-format>=I<format> (DEFAULT: C<: %s>)
+
+Print filename header before contents.  Currently, this option is
+effective only in C<--parallel> mode.  Filename is truncated in each
+pane width.
+
+This option is convenient to look over many small files at once.
+
+   ansicolumn -VHC1 *.txt | less
+
+Filename is printed in a format given by C<--filename-format> option.
+Default is C<: %s> so that making easy to move to next file by C<^:>
+pattern search.
+
+=item B<-X>#, B<--cell>=#
+
+Sets the display width of each file.  This option is only valid with
+parallel view mode.  For example, if you are displaying three files
+and want the first file to be displayed in 80 columns and the
+remaining files in 40 columns, specify like this:
+
+    --cell 80,40,40
+
+This is the same as
+
+    --cell 80,40
+
+since the last value specified is repeated.
+
+You can also specify values relative to the default width.  For
+example, to display the first column 20 columns more and the remaining
+columns 10 columns less, use
+
+    --cell +20,-10
+
+To return to the default display width for the fourth and subsequent
+files, use
+
+    --cell +20,-10,-10,+0
+
+If C<=> is specified as the value, it is set to the width of the
+longest line in the file.
+
+    -X=
+
+Then all specified files will be displayed with the width of the
+longest line they contain. C<=> may be followed by a maximum value.
+
+    -X=80
+
+will set the cell width to length of the longest line if it is less
+than 80, or 80 if it is greater than 80.  C<< < >> may be used instead
+of C<=>.
+
+    -X'<80'
+
+The correspondence between file and display width remains the same 
+even when the number of columns to be displayed simultaneously is 
+specified with the C<-C> option.
 
 =item B<-C>#, B<--pane>=#
 
 Output is formatted in the specified number of panes.  Setting number
-of panes implies B<--widen> option enabled.  See L</CALCULATION>
+of panes implies C<--widen> option enabled.  See L</CALCULATION>
 section.
 
 =item B<-S>#, B<--pane-width>=#, B<--pw>=#
@@ -205,34 +321,41 @@ L</CALCULATION> section.
 =item B<-W>, B<--widen>
 
 Use full width of the terminal.  Each pane is expanded to fill
-terminal width, unless B<--pane-width> is specified.
+terminal width, unless C<--pane-width> is specified.
 
 =item B<-p>, B<--paragraph>
 
 Insert empty line between every successive non-empty lines.
 
-=item B<-B>, B<--border>[=I<style>]
+=item B<-B>, B<--border>[=I<style>] (DEFAULT: C<box>)
 
-Print border.  Enabled by B<--page> option automatically.  If the
+Print border.  Enabled by C<--page> option automatically.  If the
 optional I<style> is given, it is used as a border style and precedes
-to B<--border-style> option.  Use B<--border=none> to disable it.
+to C<--border-style> option.  Use C<--border=none> to disable it.
 
-Border style is specified by B<--border-style> option.
+Border style is specified by C<--border-style> option.
 
 =item B<-F>, B<--fillup>[=C<pane>|C<page>|C<none>]
 
 Fill up final pane or page by empty lines.  Parameter is optional and
-considered as 'pane' by default.  Set by B<--page> option
-automatically.  Use B<--fillup=none> if you want to explicitly disable
+considered as 'pane' by default.  Set by C<--page> option
+automatically.  Use C<--fillup=none> if you want to explicitly disable
 it.
 
-Option B<-F> is a shortcut for B<--fillup=pane>.
+Option C<-F> is a shortcut for C<--fillup=pane>.
+
+=item B<--fillup-str>=I<string>
+
+Set string used for filling up space.  Default is empty.
+
+Use C<--fillup-str='~'> to fill up the area after EOF by C<~>
+character like L<vi(1)> or L<more(1)>.
 
 =item B<--height>=#
 
 Set page height and page mode on.  See L</CALCULATION> section.
 
-=item B<--column-unit>=#, B<--cu>=#
+=item B<--column-unit>=#, B<--cu>=# (DEFAULT: 8)
 
 Each column is placed at the unit of 8 by default.  This option
 changes the number of the unit.
@@ -243,28 +366,42 @@ Each column has at least single character margin on the right side so
 that they are not placed back-to-back.  This option specifies the
 margin width.
 
+=item B<-A>, B<--table-align>
+
+Align each field in the table output to column-unit.  If this option
+is specified, B<--output-separator> option is ignored.
+Implicitly enable the B<--table> option.
+
+=item B<-T>, B<--table-tabs>
+
+If this option is specified with B<--table-align>, tabs are used for
+spaces between items.  The width of tabs uses the value of
+B<--column-unit>.  Implicitly enable the B<--table> and
+B<--table-align> option.  Option B<--table-right> does not take
+effect.
+
 =item B<--linestyle>=C<none>|C<truncate>|C<wrap>|C<wordwrap>, B<--ls>=C<...>
 
 Set the style of treatment for longer lines.
 Default is C<none>.
 
-Option B<--linestyle=wordrap> sets B<--linestyle=wrap> and
-B<--boundary=word> at once.
+Option C<--linestyle=wordrap> sets C<--linestyle=wrap> and
+C<--boundary=word> at once.
 
 =item B<--boundary>=C<none>|C<word>|C<space>
 
 Set text wrap boundary.  If set as C<word> or C<space>, text is not
 wrapped in the middle of alphanumeric word or non-space sequence.
-Option B<--document> set this as C<word>.  See L<Text::ANSI::Fold> for
+Option C<--document> set this as C<word>.  See L<Text::ANSI::Fold> for
 detail.
 
 =item B<--linebreak>=C<none>|C<all>|C<runin>|C<runout>, B<--lb>=...
 
 Set the linebreak mode.
 
-=item B<--runin>=#, B<--runout>=#, B<--run>=#
+=item B<--runin>=#, B<--runout>=#, B<--runlen>=#
 
-Set the number of runin/runout column.  B<--run> set both.
+Set the number of runin/runout column.  C<--runlen> set both.
 Default is both 2.
 
 As for Japanese text, only one character can be moved with default
@@ -279,6 +416,13 @@ like this:
 Move to next pane when form feed character found.
 Default true.
 
+=item B<-r>, B<--regex-sep>
+
+Treat separator option as a regex pattern.  Next example specifies a
+space character just before C<(> as a separator.
+
+    gem list | ansicolumn -trs ' (?=\()'
+
 =item B<--border-style>=I<style>, B<--bs>=...
 
 Set the border style.  Current default style is C<box>, which enclose
@@ -290,16 +434,21 @@ none,
 space,
 vbar, heavy-vbar, fat-vbar,
 line, heavy-line,
+hline, heavy-hline,
+bottom-line, heavy-bottom-line,
 stick, heavy-stick,
 ascii-frame,
 ascii-box,
 c-box,
 box, heavy-box, fat-box, very-fat-box,
-dash-box, heavy-dash-box,
+dash-box, heavy-dash-box, fat-dash-box,
 round-box,
+inner-box, outer-box,
 frame, heavy-frame, fat-frame, very-fat-frame,
-dash-frame, heavy-dash-frame,
+dash-frame, heavy-dash-frame, fat-dash-frame,
 page-frame, heavy-page-frame,
+zebra-frame,
+checker-box, checker-frame,
 shadow, shin-shadow,
 shadow-box, shin-shadow-box, heavy-shadow-box,
 comb, heavy-comb,
@@ -330,21 +479,21 @@ lines in your C<$HOME/.ansicolumnrc> file, for example.
 
 =item B<-->[B<no->]B<ignore-space>, B<-->[B<no->]B<is>
 
-When used B<-t> option, leading spaces are ignored by default.  Use
-B<--no-ignore-space> option to disable it.
+When used C<-t> option, leading spaces are ignored by default.  Use
+C<--no-ignore-space> option to disable it.
 
 =item B<-->[B<no->]B<white-space>
 
 Allow white spaces at the top of each pane, or clean them up.  Default
-true.  Negated by B<--document> option.
+true.  Negated by C<--document> option.
 
 =item B<-->[B<no->]B<isolation>
 
 Allow the first line of a paragraph (continuous non-space lines) is
 placed at the bottom of a pane.  Default true.  If false, move it to
-the top of next pane.  Negated by B<--document> option.
+the top of next pane.  Negated by C<--document> option.
 
-=item B<--tabstop>=#
+=item B<--tabstop>=# (DEFAULT: 8)
 
 Set tab width.
 
@@ -356,12 +505,21 @@ Set head and following space characters.  Both are space by default.
 If the option value is longer than single characger, it is evaluated
 as unicode name.
 
-=item B<--tabstyle>=#
+=item B<--tabstyle>, B<--ts>
 
-Set the style how tab is expanded.  Select from C<dot>, C<symbol> or
-C<shade>.  Styles are defined in L<Text::ANSI::Fold> library.
+=item B<--tabstyle>=I<style>, B<--ts>=...
 
-=item B<--ambiguous>=C<wide>|C<narrow>
+=item B<--tabstyle>=I<head-style>,I<space-style> B<--ts>=...
+
+Set the style how tab is expanded.  Select C<symbol> or C<shade> for
+example.  If two style names are combined, like
+C<squat-arrow,middle-dot>, use C<squat-arrow> for tabhead and
+C<middle-dot> for tabspace.
+
+Show available style list if called without parameter.  Styles are
+defined in L<Text::ANSI::Fold> library.
+
+=item B<--ambiguous>=C<wide>|C<narrow> (DEFAULT: C<narrow>)
 
 Specifies how to treat Unicode ambiguous width characters.  Take a
 value of 'narrow' or 'wide.  Default is 'narrow'.
@@ -369,7 +527,7 @@ value of 'narrow' or 'wide.  Default is 'narrow'.
 =item B<--pages>
 
 Split file content by formfeed character, and treat each part as a
-individual file.  Use with B<--parallel> option.
+individual file.  Use with C<--parallel> option.
 
 =begin comment
 
@@ -385,13 +543,43 @@ Set padding chracter.
 
 =back
 
+=head1 DEFAULT ALISES
+
+The following options are defined in F<App::ansicolumn::default.pm>.
+
+=over 7
+
+=item B<--board-color> I<fg-color> I<bg-color>
+
+This option is defined as follows:
+
+   option --board-color \
+          --bs=inner-box \
+          --cm=BORDER=$<2>,TEXT=$<shift>/$<shift>
+
+The resulting text is displayed in an I<fg-color> font on an
+I<bg-color> panel.
+
+=item B<--white-board>
+
+=item B<--black-board>
+
+=item B<--green-board>
+
+=item B<--slate-board>
+
+Use the C<--board-color> option to display text on the white, black,
+green or darkslate panels.
+
+=back
+
 =head1 CALCULATION
 
-As for B<--height>, B<--width>, B<--pane> and B<--pane-width> options,
-besides giving numeric digits, you can calculate the number using
-terminal size.  If the expression contains non-digit character, it is
-evaluated as an RPN (Reverse Polish Notation) with the terminal size
-pushed on the stack.  Initial value for B<--height> options is
+As for C<--height>, C<--width>, C<--pane>, C<--up> and C<--pane-width>
+options, besides giving numeric digits, you can calculate the number
+using terminal size.  If the expression contains non-digit character,
+it is evaluated as an RPN (Reverse Polish Notation) with the terminal
+size pushed on the stack.  Initial value for C<--height> options is
 terminal height, and terminal width for others.
 
     OPTION              VALUE
@@ -421,12 +609,12 @@ This command is implemented with L<Getopt::EX> module.  So
 
     ~/.ansicolumnrc
 
-file is read at start up time.  If you want use B<--no-white-space>
+file is read at start up time.  If you want use C<--no-white-space>
 always, put this line in your F<~/.ansicolumnrc>.
 
     option default --no-white-space
 
-Also command can be extended by original modules with B<-M>
+Also command can be extended by original modules with C<-M>
 option. See `perldoc Getopt::EX` for detail.
 
 =head1 INSTALL
@@ -445,6 +633,8 @@ L<https://github.com/tecolicom/App-ansicolumn/tree/master/images>
 
 =head1 SEE ALSO
 
+L<https://github.com/tecolicom/ANSI-Tools>
+
 L<column(1)>,
 L<https://man7.org/linux/man-pages/man1/column.1.html>
 
@@ -452,25 +642,33 @@ L<App::ansicolumn>,
 L<https://github.com/tecolicom/App-ansicolumn>
 
 L<Text::ANSI::Printf>,
-L<https://github.com/kaz-utashiro/Text-ANSI-Printf>
+L<https://github.com/tecolicom/Text-ANSI-Printf>
 
-=head2 Articles
+=head2 Articles (in Japanese)
 
 =over 2
 
 =item *
 
-https://qiita.com/kaz-utashiro/items/345cd9abcd8e1f0d81a2
+L<https://qiita.com/kaz-utashiro/items/345cd9abcd8e1f0d81a2>
 
 =item *
 
-https://qiita.com/kaz-utashiro/items/1cdd71d44eb11f3fb36e
+L<https://qiita.com/kaz-utashiro/items/1cdd71d44eb11f3fb36e>
 
 =item *
 
-https://qiita.com/kaz-utashiro/items/32e1c2d4c42a80c42422
+L<https://qiita.com/kaz-utashiro/items/32e1c2d4c42a80c42422>
+
+=item *
+
+L<https://qiita.com/kaz-utashiro/items/a347628da09638e633ed>
 
 =back
+
+=head1 RELATED WORKS
+
+L<https://github.com/LukeSavefrogs/column_ansi>
 
 =head1 AUTHOR
 
@@ -478,7 +676,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-©︎ 2020-2022 Kazumasa Utashiro.
+Copyright © 2020-2024 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

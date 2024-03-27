@@ -32,6 +32,7 @@ lib/Mojolicious/Plugin/Minion/resources/public/minion/d3/d3.js
 lib/Mojolicious/Plugin/Minion/resources/public/minion/epoch/epoch.css
 lib/Mojolicious/Plugin/Minion/resources/public/minion/epoch/epoch.js
 lib/Mojolicious/Plugin/Minion/resources/public/minion/fontawesome/fontawesome.css
+lib/Mojolicious/Plugin/Minion/resources/public/minion/jquery/jquery.js
 lib/Mojolicious/Plugin/Minion/resources/public/minion/logo-black-2x.png
 lib/Mojolicious/Plugin/Minion/resources/public/minion/logo-black.png
 lib/Mojolicious/Plugin/Minion/resources/public/minion/moment/moment.js

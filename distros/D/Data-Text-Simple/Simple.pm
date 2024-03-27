@@ -5,9 +5,9 @@ use warnings;
 
 use Mo qw(build is);
 use Mo::utils 0.09 qw(check_number check_required);
-use Mo::utils::Language qw(check_language);
+use Mo::utils::Language 0.05 qw(check_language_639_1);
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 has id => (
 	is => 'ro',
@@ -28,7 +28,7 @@ sub BUILD {
 	check_number($self, 'id');
 
 	# Check lang.
-	check_language($self, 'lang');
+	check_language_639_1($self, 'lang');
 
 	# Check text.
 	check_required($self, 'text');
@@ -125,6 +125,7 @@ Returns string.
                  Parameter 'text' is required.
          From Mo::utils::Language:
                  Parameter 'lang' doesn't contain valid ISO 639-1 code.
+                         Codeset: %s
                          Value: %s
 
 =head1 EXAMPLE
@@ -176,6 +177,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

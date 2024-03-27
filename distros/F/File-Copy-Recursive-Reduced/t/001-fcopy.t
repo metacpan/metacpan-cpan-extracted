@@ -241,19 +241,22 @@ SKIP: {
         unless $ENV{PERL_AUTHOR_TESTING};
 
     my $rv = eval { require File::Copy::Recursive; };
-    die unless $rv;
-    no warnings ('redefine');
-    local *fcopy = \&File::Copy::Recursive::fcopy;
-    use warnings;
+    SKIP: {
+        skip "Must install File::Copy::Recursive for certain tests", 29
+            unless $rv;
+        no warnings ('redefine');
+        local *fcopy = \&File::Copy::Recursive::fcopy;
+        use warnings;
 
-    note("COMPARISON: Basic tests of File::Copy::Recursive::fcopy()");
+        note("COMPARISON: Basic tests of File::Copy::Recursive::fcopy()");
 
-    basic_tests();
+        basic_tests();
 
-    my $tdir = tempdir(CLEANUP => 1);
-    my $adir = "$tdir/albemarle";
-    my $bdir = "$tdir/beverly";
-    more_basic_tests($tdir, $adir, $bdir);
+        my $tdir = tempdir(CLEANUP => 1);
+        my $adir = "$tdir/albemarle";
+        my $bdir = "$tdir/beverly";
+        more_basic_tests($tdir, $adir, $bdir);
+    }
 }
 
 {

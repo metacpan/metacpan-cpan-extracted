@@ -10,6 +10,7 @@ my @files = (
     'bin/get-azure-token.pl',
     'bin/jwt-decrypt.pl',
     'bin/opnpost',
+    'bin/parse-phone-number',
     'bin/rm_pm',
     'bin/today-is',
     'lib/Bundle/WATERKIP.pm',

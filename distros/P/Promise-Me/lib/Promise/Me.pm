@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Promise - ~/lib/Promise/Me.pm
-## Version v0.4.8
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.4.10
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/28
-## Modified 2023/10/11
+## Modified 2024/03/22
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -125,7 +125,7 @@ BEGIN
     our $OBJECTS_REPO = [];
     our $EXCEPTION_CLASS = 'Module::Generic::Exception';
     our $SERIALISER = 'storable';
-    our $VERSION = 'v0.4.8';
+    our $VERSION = 'v0.4.10';
 };
 
 use strict;
@@ -1691,12 +1691,18 @@ END
         if( (
                 $o->shared_space_destroy && 
                 defined( $shm = $o->shared_mem ) &&
-                ( $shm->isa( 'Module::Generic::SharedMem' ) ||
-                  $shm->isa( 'Module::Generic::SharedMemXS' )
+                (
+                    $shm->isa( 'Module::Generic::SharedMem' ) ||
+                    $shm->isa( 'Module::Generic::SharedMemXS' )
                 )
             ) ||
-            $shm->isa( 'Module::Generic::File::Cache' ) ||
-            $shm->isa( 'Module::Generic::File::Mmap' ) )
+            (
+                defined( $shm = $o->shared_mem ) &&
+                (
+                    $shm->isa( 'Module::Generic::File::Cache' ) ||
+                    $shm->isa( 'Module::Generic::File::Mmap' ) )
+                )
+            )
         {
             $shm->remove;
         }
@@ -2493,7 +2499,7 @@ Promise::Me - Fork Based Promise with Asynchronous Execution, Async, Await and S
 
 =head1 VERSION
 
-    v0.4.8
+    v0.4.10
 
 =head1 DESCRIPTION
 

@@ -8,7 +8,7 @@ use AsposeCellsCloud::Request::PostConvertWorkbookToPDF;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**file** | **string** | The password needed to open an Excel file. |
+**file** | **string** | File to upload |
 **password** | **string** | The password needed to open an Excel file. |
 **check_excel_restriction** | **boolean** | Whether check restriction of excel file when user modify cells related objects. |
 **region** | **string** | The regional settings for workbook. |  

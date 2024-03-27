@@ -6,7 +6,7 @@ use IO::Handle;
 extends 'Data::TableReader::Decoder';
 
 # ABSTRACT: Base class for implementing spreadsheet decoders
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 
 has workbook => ( is => 'lazy' );
@@ -146,7 +146,7 @@ Data::TableReader::Decoder::Spreadsheet - Base class for implementing spreadshee
 
 =head1 VERSION
 
-version 0.012
+version 0.014
 
 =head1 DESCRIPTION
 

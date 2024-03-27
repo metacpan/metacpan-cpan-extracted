@@ -1,8 +1,5 @@
 package HTML::Template::Plugin::Dot::Helpers::Number;
-{
-  $HTML::Template::Plugin::Dot::Helpers::Number::VERSION = '0.06';
-}
-
+$HTML::Template::Plugin::Dot::Helpers::Number::VERSION = '0.07';
 use strict;
 use warnings;
 use base qw/Number::Format/;
@@ -46,10 +43,6 @@ __END__
 
 HTML::Template::Plugin::Dot::Helpers::Number - Number formatting and comparison functions
 
-=head1 VERSION
-
-version 0.06
-
 =head1 METHODS
 
 See L<Number::Format> for formatting functions
@@ -69,3 +62,4 @@ See L<Number::Format> for formatting functions
 L<HTML::Template::Plugin::Dot::Helpers> for detailed help, license, and contact information.
 
 =cut
+

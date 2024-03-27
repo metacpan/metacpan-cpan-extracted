@@ -66,6 +66,7 @@ ERRORS
                      Parameter 'text' is required.
              From Mo::utils::Language:
                      Parameter 'lang' doesn't contain valid ISO 639-1 code.
+                             Codeset: %s
                              Value: %s
 
 EXAMPLE
@@ -107,5 +108,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.01
+    0.02
 

@@ -11,16 +11,22 @@ use IO::Reverse;
 
 my $fileName='';
 my $help=0;
+my $debug=0;
+my $verbosity=0;
 
 GetOptions(
-	"filename=s" => \$fileName,
+	"f|filename=s" => \$fileName,
+	"v|verbosity=i" => \$verbosity,
 	"h|help!" => \$help
 ) or usage(1);
 
 usage(1) if $help;
 
 my $f = IO::Reverse->new( 
-	FILENAME => $fileName
+	{ 
+		FILENAME => $fileName ,
+		#VERBOSITY => $verbosity,
+	}
 );
 
 while ( my $line = $f->next ) {
@@ -41,9 +47,10 @@ usage: $basename - read a file from the end to beginning
 
    $basename --file <filename> 
 
---file	  name of file to read
+       --f|file       name of file to read
+       --v|verbosity  verbosity level for debugging (not currently in use)
 
---help|-h  help
+       --h|help       help
 
 examples here:
 

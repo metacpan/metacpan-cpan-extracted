@@ -21,22 +21,22 @@ name: Spreadsheet-ParseXLSX
 provides:
   Spreadsheet::ParseXLSX:
     file: lib/Spreadsheet/ParseXLSX.pm
-    version: '0.34'
+    version: '0.35'
   Spreadsheet::ParseXLSX::Cell:
     file: lib/Spreadsheet/ParseXLSX/Cell.pm
-    version: '0.34'
+    version: '0.35'
   Spreadsheet::ParseXLSX::Decryptor:
     file: lib/Spreadsheet/ParseXLSX/Decryptor.pm
-    version: '0.34'
+    version: '0.35'
   Spreadsheet::ParseXLSX::Decryptor::Agile:
     file: lib/Spreadsheet/ParseXLSX/Decryptor/Agile.pm
-    version: '0.34'
+    version: '0.35'
   Spreadsheet::ParseXLSX::Decryptor::Standard:
     file: lib/Spreadsheet/ParseXLSX/Decryptor/Standard.pm
-    version: '0.34'
+    version: '0.35'
   Spreadsheet::ParseXLSX::Worksheet:
     file: lib/Spreadsheet/ParseXLSX/Worksheet.pm
-    version: '0.34'
+    version: '0.35'
 requires:
   Archive::Zip: '1.34'
   Crypt::Mode::CBC: '0'
@@ -56,7 +56,7 @@ requires:
 resources:
   bugtracker: https://github.com/MichaelDaum/spreadsheet-parsexlsx/issues
   repository: https://github.com/MichaelDaum/spreadsheet-parsexlsx
-version: '0.34'
+version: '0.35'
 x_Dist_Zilla:
   perl:
     version: '5.038002'
@@ -253,7 +253,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.34'
+          tag: '0.35'
           tag_format: '%v'
           tag_message: ''
         Dist::Zilla::Role::Git::Repo:

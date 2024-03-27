@@ -1,5 +1,5 @@
 package Form::Tiny::Plugin::Strict;
-$Form::Tiny::Plugin::Strict::VERSION = '2.23';
+$Form::Tiny::Plugin::Strict::VERSION = '2.24';
 use v5.10;
 use strict;
 use warnings;

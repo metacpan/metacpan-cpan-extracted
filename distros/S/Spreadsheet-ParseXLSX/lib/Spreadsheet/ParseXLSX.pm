@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.34'; # VERSION
+our $VERSION = '0.35'; # VERSION
 
 # ABSTRACT: parse XLSX files
 
@@ -1170,7 +1170,7 @@ Spreadsheet::ParseXLSX - parse XLSX files
 
 =head1 VERSION
 
-version 0.34
+version 0.35
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,8 @@
+0.002   2024-03-17  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+        - [incompatible change] Rename 'event' to 'hook'.
+
+
+0.001   2024-02-12  Released-By: PERLANCAR
+
+        - First release.

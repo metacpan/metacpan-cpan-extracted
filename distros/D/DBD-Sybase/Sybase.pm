@@ -24,7 +24,7 @@
 
   $hostname  = Sys::Hostname::hostname();
   $init_done = 0;
-  $VERSION   = '1.23';
+  $VERSION   = '1.24';
   
   require_version DBI 1.30;
 
@@ -872,7 +872,8 @@ features, ?-style placeholders and CHAINED non-AutoCommit mode, in particular.
 =item encryptPassword
 
 Specify the use of the client password encryption supported by CT-Lib.
-Specify a value of 1 to use encrypted passwords.
+Specify a value of 1 to use encrypted passwords. Set to a value > 1 to also
+enable asymetric password encryption.
 
     $dbh=DBI->connect("dbi:Sybase:encryptPassword=1", $user, $password);
 

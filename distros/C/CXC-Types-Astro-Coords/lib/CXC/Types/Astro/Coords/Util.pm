@@ -7,13 +7,14 @@ use warnings;
 
 use experimental 'signatures', 'postderef', 'declared_refs';
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use POSIX ();
 use Regexp::Common;
-use List::Util 'zip';
+use List::Util 'zip', 'sum0';
 use Exporter::Shiny qw( mkSexagesimal from_Degrees);
-
+use String::Interpolate::RE strinterp =>
+  { opts => { useENV => !!0, format => !!0, recurse => !!0 } };
 
 my sub croak {
     require Carp;
@@ -150,7 +151,26 @@ my sub croak {
 
 
 
-## no critic (Subroutines::ProhibitExcessComplexity)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 sub mkSexagesimal ( @wanted ) {
 
     state %comp = do {
@@ -167,7 +187,7 @@ sub mkSexagesimal ( @wanted ) {
         %base;
     };
 
-    state %check = do {
+    state %bounds_check = do {
         my %base = (
             -ra  => q{( (0 <= $1 && $1 < 24) && (0 <= $2 && $2 < 60) && (0 <= $3 && $3 < 60) )},
             -dec =>
@@ -183,7 +203,7 @@ sub mkSexagesimal ( @wanted ) {
         %base;
     };
 
-    state %ArrayReftoDegrees = do {
+    state %ArrayRef_toDegrees = do {
         my %base = (
             -ra     => q{ ( 15 * $_->[0] + $_->[1] / 4 + $_->[2] / 240 ) },
             -dec    => q{ POSIX::copysign( abs($_->[0]) + $_->[1]/60 + $_->[2]/3600, $_->[0] ) },
@@ -198,49 +218,75 @@ sub mkSexagesimal ( @wanted ) {
         %base;
     };
 
-    state %Match_toArrayRef = do {
+    state %StrMatch_toArrayRef = do {
         my %base = (
             -any => <<~'EOS',
-            do { ($2//'d') eq 'h'
-                  ? do {
-                         my @array = ( $1, $3, $4 );
-                         my $degrees = ( 15 * $array[0] +  $array[1] / 4 + $array[2] / 240 );
-                         my @comp = ( int($degrees) );
-                         $degrees -= $comp[0];
-                         $degrees *= 60;
-                         $comp[1] = int($degrees);
-                         $comp[2] = 60 * ($degrees - $comp[1]);
-                         \@comp;
-                    }
-                  : [ 0+$1, 0+$3, 0+$4 ]
-              }
-           EOS
+           ($2//'d') eq 'h'
+                 ? do {
+                        my @array = ( $1, $3, $4 );
+                        my $degrees = ( 15 * $array[0] +  $array[1] / 4 + $array[2] / 240 );
+                        my @comp = ( int($degrees) );
+                        $degrees -= $comp[0];
+                        $degrees *= 60;
+                        $comp[1] = int($degrees);
+                        $comp[2] = 60 * ($degrees - $comp[1]);
+                        \@comp;
+                   }
+                 : [ 0+$1, 0+$3, 0+$4 ]
+          EOS
         );
         $base{$_} = q<[ 0+$1, 0+$2, 0+$3 ]> for qw( -ra -dec -deg -negdeg -lat -long -neglong );
         %base;
     };
 
-    #<<< no tidy
-    state %unit
-      = ( map { $_ =>
-                   $_ eq '-ra' ? '[h]'
-                : ($_ eq '-any' ? '([hd])'
-                :                '[d]'
-              ) } keys %comp );
-    #>>> ydit on
+   #<<< no tidy
+   state %unit
+     = ( map { $_ =>
+                  $_ eq '-ra' ? '[h]'
+               : ($_ eq '-any' ? '([hd])'  # capture unit, as need
+                                           # this info to convert to
+                                           # degrees
+               :                '[d]'
+             ) } keys %comp );
+   #>>> ydit on
 
-    # ws after each term
-    state @term_ws = (
-        [ q{},   q{},   q{} ],    # no ws
-        [ '\h+', '\h+', q{} ],    # required ws
-        [ '\h*', '\h*', q{} ],    # optional ws
+    # flag states.  sum them
+    state %mask = (
+        -units    => 0x200,
+        -optunits => 0x100,
+        -sep      => 0x020,
+        -optsep   => 0x010,
+        -ws       => 0x002,
+        -optws    => 0x001,
     );
 
-    # sep after each term
-    state @term_sep = (
-        [ q{},   q{},   q{} ],    # no sep
-        [ q{:},  q{:},  q{} ],    # required sep
-        [ q{:?}, q{:?}, q{} ],    # optional sep
+    state %between_template = (
+        map {    ## no critic (BuiltinFunctions::ProhibitComplexMappings)
+            my @templates = $_->[1]->@*;
+
+            # the first element in the input array is for the first &
+            # second components. need to repeat it. if there's only
+            # one element in the array, the element is the same for
+            # all three components.
+            ## no critic (ValuesAndExpressions::ProhibitCommaSeparatedStatements)
+            unshift( @templates, $templates[0] ) while @templates < 3;
+
+            ( sum0 @mask{ $_->[0]->@* } ), \@templates;
+        } (
+            [ [ -units ]                     => ['${units}'] ],
+            [ [ -units, -ws ]                => [ '${units}${ws}', '${units}' ] ],
+            [ [ -units, -optws ]             => [ '${units}${ows}', '${units}' ] ],
+            [ [ -sep ]                       => [ '${sep}', q{} ] ],
+            [ [ -sep, -ws ]                  => [ '${sep}${ws}', q{} ] ],
+            [ [ -optws, -sep ]               => [ '${sep}${ows}', q{} ] ],
+            [ [ -ws, ]                       => [ '${ws}', q{} ] ],
+            [ [ -optsep, -ws ]               => [ '${sep}?${ws}', q{} ] ],
+            [ [ -optsep, -optws ]            => [ '(?:${sep}|${ws})${ows}', q{} ] ],
+            [ [ -optunits, -ws ]             => [ '${units}?${ws}', q{}, ] ],
+            [ [ -optunits, -optws ]          => [ '(?:${units}|${ws})${ows}', q{} ] ],
+            [ [ -optsep, -optunits, -ws ]    => [ '(?:${units}|${sep})${ws}', '${units}?' ] ],
+            [ [ -optsep, -optunits, -optws ] => [ '(?:${units}|${sep}|${ws})${ows}', '${units}?' ] ],
+        ),
     );
 
     state %utils;
@@ -248,36 +294,15 @@ sub mkSexagesimal ( @wanted ) {
     my $utils = $utils{ join $;, sort @wanted } //= do {
 
         my %wanted;
-        @wanted{@wanted} = ( 1 ) x @wanted;
+        @wanted{@wanted} = @wanted;
 
-        my $required_ws = !!delete( $wanted{-ws} )    ? 1 : 0;
-        my $optional_ws = !!delete( $wanted{-optws} ) ? 2 : 0;
-        my $want_ws     = $required_ws + $optional_ws;
+        ( my @parse_flags = grep defined, delete @wanted{ keys %mask } )
+          or croak( 'no parse flags specified' );
 
-        my $required_unit = !!delete( $wanted{-units} )    ? 1 : 0;
-        my $optional_unit = !!delete( $wanted{-optunits} ) ? 2 : 0;
-        # my $want_unit     = $required_unit + $optional_unit;
-
-        my $required_sep = !!delete $wanted{-sep}    ? 1 : 0;
-        my $optional_sep = !!delete $wanted{-optsep} ? 2 : 0;
-        my $want_sep     = $required_sep + $optional_sep;
+        defined( my $between_template = $between_template{ sum0 @mask{@parse_flags} } )
+          or croak( 'illegal combination of flags: ', join( ', ', @parse_flags ) );
 
         my $want_trim = !!delete $wanted{-trim};
-
-        croak( 'illegal combination: -ws and (-sep or -optsep)' )
-          if $want_sep && $required_ws;
-
-        croak( 'illegal combination of -sep and -units' )
-          if $required_sep && $required_unit;
-
-        croak( 'illegal combination of -sep and -optunits' )
-          if $required_sep && $optional_unit;
-
-        croak( 'illegal combination of -sep and -optws' )
-          if $required_sep && $optional_ws;
-
-        croak( 'illegal combination of -optsep and -units' )
-          if $optional_sep && $required_unit;
 
         my ( $coord, @extra ) = grep defined delete $wanted{$_}, keys %comp;
         croak( 'too many coordinate systems specified: ' . join q{, }, $coord, @extra )
@@ -287,14 +312,8 @@ sub mkSexagesimal ( @wanted ) {
 
         $coord //= '-any';
 
-        my @comp = ( $comp{$coord}, '[0-5]?[0-9]', $RE{num}{decimal} );
-
-        my @units
-          = ( map { $required_unit ? $_ : $optional_unit ? qq{$_?} : q{} } $unit{$coord}, '[m]', '[s]' );
-
-        my @ws = $term_ws[$want_ws]->@*;
-
-        my @sep = $term_sep[$want_sep]->@*;
+        my @comp  = ( $comp{$coord}, '[0-5]?[0-9]', $RE{num}{decimal} );
+        my @units = ( $unit{$coord}, '[m]',         '[s]' );
 
         ## no critic(BuiltinFunctions::ProhibitComplexMappings)
         my $qr = q{^} . join(
@@ -302,37 +321,38 @@ sub mkSexagesimal ( @wanted ) {
             ( $want_trim ? '\h*' : () ),
             (
                 map {
-                    my ( $comp, $unit, $sep, $ws ) = $_->@*;
-                    my @between = ( ( length $unit ? $unit : () ), ( length $sep ? $sep : () ) );
+                    my ( $template, $comp, $units ) = $_->@*;
                     join q{}, q{(}, $comp, q{)},
-                      (
-                          @between == 1 ? $between[0]
-                        : @between == 2 ? q{(?:} . join( q{|}, @between ) . q{)}
-                        :                 ()
-                      ),
-                      $ws;
-                } zip( \@comp, \@units, \@sep, \@ws ),
+                      strinterp(
+                        $template,
+                        {
+                            units => $units,
+                            sep   => q{:},
+                            ws    => '\h+',
+                            ows   => '\h*',
+                        } );
+                } zip( $between_template, \@comp, \@units ),
             ),
             ( $want_trim ? '\h*' : () ),
         ) . q{$};
 
-        my $check = $check{$coord};
-        {
-            qr             => $qr,
-            constraint     => qq{\$_ =~ /$qr/ && $check },
-            Str_toArrayRef => qq{ do { \$_ =~ /$qr/ ? do { $Match_toArrayRef{$coord} } : \$_ } },
-            Str_toDegrees  => <<~"EOS",
-                                   do { \$_ =~ /$qr/
-                                         ? do {
-                                                use experimental 'declared_refs';
-                                                local \$_ = $Match_toArrayRef{$coord};
-                                                $ArrayReftoDegrees{$coord};
-                                              }
-                                         : \$_
-                                   }
-                                  EOS
-            ArrayRef_toDegrees => $ArrayReftoDegrees{$coord},
-        };
+        my %_utils = (
+            qr                  => $qr,
+            constraint          => sprintf( q{ ($_ =~ /%s/) && (%s) }, $qr, $bounds_check{$coord} ),
+            StrMatch_toArrayRef => $StrMatch_toArrayRef{$coord},
+            ArrayRef_toDegrees  => $ArrayRef_toDegrees{$coord},
+        );
+        $_utils{Str_toArrayRef}
+          = sprintf( q{ ( (%s) ? (%s) : $_ ) }, $_utils{constraint}, $StrMatch_toArrayRef{$coord} );
+
+        $_utils{Str_toDegrees} = sprintf(
+            q{ ( (%s) ? do { local $_ = %s; %s; } : $_ ) },
+            $_utils{constraint},
+            $_utils{StrMatch_toArrayRef},
+            $_utils{ArrayRef_toDegrees},
+        );
+
+        \%_utils;
     };
     return $utils;
 }
@@ -409,7 +429,7 @@ CXC::Types::Astro::Coords::Util - Coordinate Type utilities
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SUBROUTINES
 
@@ -494,13 +514,25 @@ leading and trailing white space is ignored.
 
 =back
 
-The following combination of options are flagged as illegal:
+The following combination of parse flags are legal:
 
- -ws     -sep
- -ws     -optsep
- -sep    -unit
- -sep    -optunit
- -unit   -optsep
+ -sep
+ -sep, -ws
+ -sep, -optws
+
+ -optsep, -optunits, -optws
+ -optsep, -optunits, -ws
+ -optsep, -optws
+ -optsep, -ws
+
+ -units
+ -units, -optws
+ -units, -ws
+
+ -optunits, -optws
+ -optunits, -ws
+
+ -ws
 
 Do not specify more than one coordinate system.
 
@@ -529,6 +561,14 @@ A string containing code suitable to be passed as the B<constraint> parameter to
 B<Str_toArrayRef>
 
 A string containing code suitable to be passed to the L<Type::Util> B<coerce> command, e.g.
+
+=item *
+
+B<StrMatch_toArrayRef>
+
+A string containing code, which when executed directly after a
+successful match against L<qr> returns an arrayref with the three
+coordinate components (degrees, minutes, seconds).
 
 =item *
 

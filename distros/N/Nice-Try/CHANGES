@@ -1,5 +1,20 @@
 Revision history for Perl module Nice::Try.
 
+v1.3.10 2024-03-26T09:32:14+0900
+    - Unit testing adjustments for sub prototype and signatures
+
+v1.3.9 2024-03-25T07:56:30+0900
+    - Adapting the unit tests to account for perl bug on mixing prototype and signature between version 5.22 and 5.26.3
+
+v1.3.8 2024-03-25T02:25:12+0900
+    - More unit test tuning for signatures
+
+v1.3.7 2024-03-23T11:06:48+0900
+    - Corrected unit test for signatures
+
+v1.3.6 2024-03-22T15:05:39+0900
+    - Corrected Makefile to require experimental module for testing.
+
 v1.3.5 2023-09-29T12:28:19+0900
     - Improved code by giving up early if no 'try' block is detected in the code.
     - Fixed bug #6 arising when token __SUB__ is used within a try-catch block (Credits to Clay Fouts for finding this)

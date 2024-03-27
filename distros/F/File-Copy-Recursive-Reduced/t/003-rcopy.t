@@ -247,19 +247,22 @@ SKIP: {
         unless $ENV{PERL_AUTHOR_TESTING};
 
     my $rv = eval { require File::Copy::Recursive; };
-    die unless $rv;
-    no warnings ('redefine');
-    local *rcopy = \&File::Copy::Recursive::rcopy;
-    use warnings;
+    SKIP: {
+        skip "Must install File::Copy::Recursive for certain tests", 29
+            unless $rv;
+        no warnings ('redefine');
+        local *rcopy = \&File::Copy::Recursive::rcopy;
+        use warnings;
 
-    note("COMPARISON: Basic tests of File::Copy::Recursive::rcopy()");
+        note("COMPARISON: Basic tests of File::Copy::Recursive::rcopy()");
 
-    basic_rcopy_file_tests();
+        basic_rcopy_file_tests();
 
-    my $tdir = tempdir(CLEANUP => 1);
-    my $adir = "$tdir/albemarle";
-    my $bdir = "$tdir/beverly";
-    more_basic_rcopy_file_tests($tdir, $adir, $bdir);
+        my $tdir = tempdir(CLEANUP => 1);
+        my $adir = "$tdir/albemarle";
+        my $bdir = "$tdir/beverly";
+        more_basic_rcopy_file_tests($tdir, $adir, $bdir);
+    }
 }
 
 {
@@ -644,19 +647,22 @@ SKIP: {
         unless $ENV{PERL_AUTHOR_TESTING};
 
     my $rv = eval { require File::Copy::Recursive; };
-    die unless $rv;
-    no warnings ('redefine');
-    local *rcopy = \&File::Copy::Recursive::rcopy;
-    use warnings;
-
-    note("COMPARISON: Basic tests of File::Copy::Recursive::rcopy()");
-    basic_rcopy_dir_tests(@dirnames);
     SKIP: {
-        skip "System does not support symlinks",  6
-            unless $File::Copy::Recursive::Reduced::CopyLink;
+        skip "Must install File::Copy::Recursive for certain tests", 26
+            unless $rv;
+        no warnings ('redefine');
+        local *rcopy = \&File::Copy::Recursive::rcopy;
+        use warnings;
 
-        note("Copy directory which holds symlinks");
-        rcopy_mixed_block();
+        note("COMPARISON: Basic tests of File::Copy::Recursive::rcopy()");
+        basic_rcopy_dir_tests(@dirnames);
+        SKIP: {
+            skip "System does not support symlinks",  6
+                unless $File::Copy::Recursive::Reduced::CopyLink;
+
+            note("Copy directory which holds symlinks");
+            rcopy_mixed_block();
+        }
     }
 }
 

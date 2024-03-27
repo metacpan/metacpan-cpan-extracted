@@ -2,6 +2,7 @@
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
+#include "ppport.h"
 
 static int call_free_lifo(pTHX_ SV* var, MAGIC* magic) {
 	dSP;
@@ -11,7 +12,7 @@ static int call_free_lifo(pTHX_ SV* var, MAGIC* magic) {
 	}
 	PUSHSTACKi(PERLSI_MAGIC);
 	PUSHMARK(SP);
-	call_sv(magic->mg_obj, G_VOID | G_DISCARD);
+	call_sv(magic->mg_obj, G_VOID | G_DISCARD | G_EVAL | G_KEEPERR);
 	POPSTACK;
 	return 0;
 }
@@ -30,7 +31,7 @@ static int call_free_fifo(pTHX_ SV* var, MAGIC* magic) {
 		SV** current = av_fetch(list, counter, 0);
 		if (current && *current) {
 			PUSHMARK(SP);
-			call_sv(*current, G_VOID | G_DISCARD);
+			call_sv(*current, G_VOID | G_DISCARD | G_EVAL | G_KEEPERR);
 		}
 	}
 	POPSTACK;

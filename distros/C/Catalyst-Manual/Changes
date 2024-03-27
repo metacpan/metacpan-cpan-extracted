@@ -1,5 +1,8 @@
 Revision history for Catalyst-Manual
 
+5.9013 - 2024-03-22
+    - fix mojibake in metadata
+
 5.9012 - 2024-02-03
     - fixed some broken links (Graham Knop, Daniel Böhmer)
 

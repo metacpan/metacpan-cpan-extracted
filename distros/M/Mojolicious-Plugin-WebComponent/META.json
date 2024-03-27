@@ -50,7 +50,7 @@
    "provides" : {
       "Mojolicious::Plugin::WebComponent" : {
          "file" : "lib/Mojolicious/Plugin/WebComponent.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -65,7 +65,7 @@
          "web" : "https://github.com/rshingleton/Mojolicious-Plugin-WebComponent"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_contributors" : [
       "shingler <shingler@oclc.org>"
    ],

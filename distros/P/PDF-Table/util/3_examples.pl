@@ -8,8 +8,8 @@
 use strict;
 use warnings;
 
-our $VERSION = '1.005'; # VERSION
-our $LAST_UPDATE = '1.004'; # manually update whenever code is changed
+our $VERSION = '1.006'; # VERSION
+our $LAST_UPDATE = '1.006'; # manually update whenever code is changed
 
 # dependent on optional packages:
 
@@ -32,6 +32,9 @@ my (@example_list, @example_results);
 
   push @example_list, "header_repeat_with_cell_props.pl";
   push @example_results, "demonstrate column headings with many properties.\n";
+
+  push @example_list, "no_repeat.pl";
+  push @example_results, "like header_repeat, but without repeating header.\n";
 
   push @example_list, "row_height.pl";
   push @example_results, "show table with various row heights specified.\n";

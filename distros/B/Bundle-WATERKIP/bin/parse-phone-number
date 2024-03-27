@@ -1,0 +1,150 @@
+#!perl
+use warnings;
+use strict;
+
+# ABSTRACT: Parse and validate phone numbers
+# PODNAME: parse-phone-number
+
+use Number::Phone;
+use Pod::Usage;
+use Getopt::Long;
+
+my ($help, $man, $cc, $v);
+
+GetOptions(
+  help   => \$help,
+  man    => \$man,
+  'cc=s' => \$cc,
+  v      => \$v,
+) or die("Error in command line arguments\n");
+
+$cc //= 'NL';
+
+pod2usage(-exitval => 1, -message => _print_number_phone_version()) if $help;
+pod2usage(-exitval => 0, -verbose => 2) if $man;
+
+sub phonenumber_to_object {
+    my $number = shift;
+
+    $number =~ s/\-+//g;
+    $number =~ s/\s+//g;
+    $number =~ s/\(([0-9]+)\)/$1/g;
+
+    # Default to a wrong prefix because ppl think 00 is the same as a +
+    if (substr($number, 0,2) eq '00') {
+        return Number::Phone->new("+" . substr($number, 2));
+    }
+
+    return Number::Phone->new($cc, $number) if $number =~ /^[0-9]/;
+    return Number::Phone->new($number);
+}
+
+my @order = qw(
+    geographic
+    fixed_line
+    mobile
+    pager
+    ipphone
+    isdn
+    tollfree
+    specialrate
+    adult
+    personal
+    corporate
+    government
+    network_service
+    drama
+);
+
+sub _print_number_phone_version {
+    if ($v) {
+        "\nAll phonenumers are parsed and validated by " .
+        "Number::Phone version $Number::Phone::VERSION\n",
+    }
+}
+
+unless (@ARGV) {
+    $v = 1;
+    pod2usage(-message => _print_number_phone_version(),
+        -exit => 1,
+    );
+}
+
+my $number;
+foreach (@ARGV) {
+    $number = phonenumber_to_object($_);
+
+    if (!defined $number) {
+        warn "$_ is not a phone number", $/;
+        next;
+    }
+
+    if (!$number->is_valid) {
+        warn "$_ is not a valid number", $/;
+        next;
+    }
+
+    for my $k (@order) {
+        my $m = "is_$k";
+        my $ok = $number->$m;
+        print "$_ is a $k", $/;
+    }
+}
+
+print _print_number_phone_version() if $v;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+parse-phone-number - Parse and validate phone numbers
+
+=head1 VERSION
+
+version 0.002
+
+=head1 SYNOPSIS
+
+    parse-phone-number 003123456789
+
+=head1 DESCRIPTION
+
+Parse and validate phonenumbers. Be aware that some numbers are so called M2M
+numbers and are not supported by this module.
+
+=head1 OPTIONS
+
+=head2 help
+
+The help
+
+=head2 man
+
+The man page
+
+=head2 cc
+
+Set the default country code for numbers without international prefixes.
+Defaults to NL.
+
+=head2 v
+
+Tell people which Number::Phone module is used
+
+=head1 AUTHOR
+
+Wesley Schwengle <waterkip@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2024 by Wesley Schwengle.
+
+This is free software, licensed under:
+
+  The (three-clause) BSD License
+
+=cut

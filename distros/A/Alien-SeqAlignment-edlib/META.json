@@ -82,7 +82,7 @@
    "provides" : {
       "Alien::SeqAlignment::edlib" : {
          "file" : "lib/Alien/SeqAlignment/edlib.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -95,7 +95,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_alienfile" : {
       "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.32",
       "requires" : {

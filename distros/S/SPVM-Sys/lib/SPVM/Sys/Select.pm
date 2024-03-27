@@ -6,69 +6,85 @@ package SPVM::Sys::Select;
 
 SPVM::Sys::Select - Select System Call
 
+=head1 Description
+
+The Sys::Select class has methods to call the select system call.
+
 =head1 Usage
   
   use Sys::Select;
 
-=head1 Description
+=head2 Details
 
-C<Sys::Select> provides the select function and its utility functions.
+In Windows, FD_SETSIZE is set to 1024.
 
 =head1 Class Methods
 
 =head2 FD_ZERO
 
-  static method FD_ZERO : void ($set : Sys::Select::Fd_set);
+C<static method FD_ZERO : void ($set : L<Sys::Select::Fd_set|SPVM::Sys::Select::Fd_set>);>
 
-FD_ZERO() clears a set.
+Calls the L<FD_ZERO|https://linux.die.net/man/2/select> function.
 
-See the L<select(2) - Linux man page|https://linux.die.net/man/2/select> in Linux.
+Exceptions:
 
-The C<$set> is a L<Sys::Select::Fd_set|SPVM::Sys::Select::Fd_set> object.
+$set must be defined. Otherwise an exception is thrown.
 
 =head2 FD_SET
 
-  static method FD_SET : void ($fd : int, $set : Sys::Select::Fd_set);
+C<static method FD_SET : void ($fd : int, $set : L<Sys::Select::Fd_set|SPVM::Sys::Select::Fd_set>);>
 
-See the L<select(2) - Linux man page|https://linux.die.net/man/2/select> in Linux.
+Calls the L<FD_SET|https://linux.die.net/man/2/select> function.
 
-The C<$set> is a L<Sys::Select::Fd_set|SPVM::Sys::Select::Fd_set> object.
+Exceptions:
+
+$fd must be greater than or equal to 0. Otherwise an exception is thrown.
+
+$fd must be less than FD_SETSIZE. Otherwise an exception is thrown.
+
+$set must be defined. Otherwise an exception is thrown.
 
 =head2 FD_CLR
 
-  static method FD_CLR : void ($fd : int, $set : Sys::Select::Fd_set);
+C<static method FD_CLR : void ($fd : int, $set : L<Sys::Select::Fd_set|SPVM::Sys::Select::Fd_set>);>
 
-FD_SET() respectively adds a given file descriptor from a set.
+Calls the L<FD_CLR|https://linux.die.net/man/2/select> function.
 
-See the L<select(2) - Linux man page|https://linux.die.net/man/2/select> in Linux.
+Exceptions:
 
-The C<$set> is a L<Sys::Select::Fd_set|SPVM::Sys::Select::Fd_set> object.
+$fd must be greater than or equal to 0. Otherwise an exception is thrown.
+
+$fd must be less than FD_SETSIZE. Otherwise an exception is thrown.
+
+$set must be defined. Otherwise an exception is thrown.
 
 =head2 FD_ISSET
 
-  static method FD_ISSET : int ($fd : int, $set : Sys::Select::Fd_set);
+C<static method FD_ISSET : int ($fd : int, $set : L<Sys::Select::Fd_set|SPVM::Sys::Select::Fd_set>);>
 
-FD_ISSET() tests to see if a file descriptor is part of the set.
+Calls the L<FD_ISSET|https://linux.die.net/man/2/select> function and returns its return value.
 
-See the L<select(2) - Linux man page|https://linux.die.net/man/2/select> in Linux.
+Exceptions:
 
-The C<$set> is a L<Sys::Select::Fd_set|SPVM::Sys::Select::Fd_set> object.
+$fd must be greater than or equal to 0. Otherwise an exception is thrown.
+
+$fd must be less than FD_SETSIZE. Otherwise an exception is thrown.
+
+$set must be defined. Otherwise an exception is thrown.
 
 =head2 select
 
-    static method select : int ($nfds : int, $readfds : Sys::Select::Fd_set, $writefds : Sys::Select::Fd_set, $exceptfds : Sys::Select::Fd_set, $timeout : Sys::Time::Timeval);
+C<static method select : int ($nfds : int, $readfds : L<Sys::Select::Fd_set|SPVM::Sys::Select::Fd_set>, $writefds : L<Sys::Select::Fd_set|SPVM::Sys::Select::Fd_set>, $exceptfds : L<Sys::Select::Fd_set|SPVM::Sys::Select::Fd_set>, $timeout : L<Sys::Time::Timeval|SPVM::Sys::Time::Timeval>);>
 
-select() allows a program to monitor multiple file descriptors, waiting until one or more of the file descriptors become "ready" for some class of I/O operation (e.g., input possible). A file descriptor is considered ready if it is possible to perform the corresponding I/O operation (e.g., read(2)) without blocking.
+Calls the L<select|https://linux.die.net/man/2/select> function and returns its return value.
 
-See the L<select(2) - Linux man page|https://linux.die.net/man/2/select> in Linux.
+Exceptions:
 
-The C<$readfds> is a L<Sys::Select::Fd_set|SPVM::Sys::Select::Fd_set> object.
+$fd must be greater than or equal to 0. Otherwise an exception is thrown.
 
-The C<$writefds> is a L<Sys::Select::Fd_set|SPVM::Sys::Select::Fd_set> object.
+$fd must be less than FD_SETSIZE. Otherwise an exception is thrown.
 
-The C<$exceptfds> is a L<Sys::Select::Fd_set|SPVM::Sys::Select::Fd_set> object.
-
-The C<$timeout> is a L<Sys::Time::Timeval|SPVM::Sys::Time::Timeval> object.
+If the select function failed, an exception is thrown with C<eval_error_id> set to the basic type ID of the L<Error::System|SPVM::Error::System> class.
 
 =head1 Copyright & License
 

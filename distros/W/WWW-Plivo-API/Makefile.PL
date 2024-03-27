@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
     PREREQ_PM => {
         'WWW::Plivo::API' => '0',
         'LWP::UserAgent' => '0',
+        'List::Util' => '1.29',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'WWW-Plivo-*' },

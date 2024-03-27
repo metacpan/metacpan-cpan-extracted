@@ -20,7 +20,7 @@ subtest 'Script runs --version' => sub {
 
     my $stdout;
     script_runs( [ 'script/envdot', '--version', ], { stdout => \$stdout, }, 'Verify output' );
-    like( ( split qr/\n/msx, $stdout )[0], qr/^ script\/envdot (\s version \s .* |) $/msx,         'Correct stdout' );
+    like( ( split qr/\n/msx, $stdout )[0], qr/^ script [\/\\] envdot (\s version \s .* |) $/msx,   'Correct stdout' );
     like( ( split qr/\n/msx, $stdout )[1], qr/^ [(] Getopt::Long::GetOptions [[:space:]]{1,} /msx, 'Correct stdout' );
 
     done_testing;

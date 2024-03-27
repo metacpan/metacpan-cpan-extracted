@@ -2,6 +2,7 @@
 // MIT License
 
 #include "spvm_native.h"
+#include "spvm_socket_util.h"
 
 #if defined(_WIN32)
   #include <winsock2.h>
@@ -12,58 +13,14 @@
 
 #include <errno.h>
 
-const char* FILE_NAME = "Sys/Ioctl.c";
-
-// static functions are copied from Sys/Socket.c
-static int32_t socket_errno (void) {
-#if defined(_WIN32)
-  return WSAGetLastError();
-#else
-  return errno;
-#endif
-}
-
-#if defined(_WIN32)
-static void* socket_strerror_string_win (SPVM_ENV* env, SPVM_VALUE* stack, int32_t error_number, int32_t length) {
-  char* error_message = NULL;
-  FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, 
-                 NULL, error_number,
-                 MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
-                 (LPSTR)&error_message, length, NULL);
-  
-  void* obj_error_message = env->new_string(env, stack, error_message, strlen(error_message));
-  
-  LocalFree(error_message);
-  
-  return obj_error_message;
-}
-#endif
-
-static void* socket_strerror_string (SPVM_ENV* env, SPVM_VALUE* stack, int32_t error_number, int32_t length) {
-  void*
-#if defined(_WIN32)
-  obj_strerror_value = socket_strerror_string_win(env, stack, error_number, length);
-#else
-  obj_strerror_value = env->strerror_string(env, stack, error_number, length);
-#endif
-  return obj_strerror_value;
-}
-
-
-static const char* socket_strerror(SPVM_ENV* env, SPVM_VALUE* stack, int32_t error_number, int32_t length) {
-  void* obj_socket_strerror = socket_strerror_string(env, stack, error_number, length);
-  
-  const char* ret_socket_strerror = NULL;
-  if (obj_socket_strerror) {
-    ret_socket_strerror = env->get_chars(env, stack, obj_socket_strerror);
-  }
-  
-  return ret_socket_strerror;
-}
+static const char* FILE_NAME = "Sys/Ioctl.c";
 
 int32_t SPVM__Sys__Ioctl__ioctl(SPVM_ENV* env, SPVM_VALUE* stack) {
-
-  int32_t e = 0;
+#if defined(_WIN32)
+  env->die(env, stack, "The ioctl method in the Sys::IO class is not supported in this system(defined(_WIN32)).", __func__, FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
+#else
+  int32_t error_id = 0;
   
   int32_t fd = stack[0].ival;
   
@@ -113,16 +70,52 @@ int32_t SPVM__Sys__Ioctl__ioctl(SPVM_ENV* env, SPVM_VALUE* stack) {
       ret = ioctl(fd, request, request_arg_ref);
     }
     else {
-      return env->die(env, stack, "The $request_arg_ref must be an byte[]/short[]/int[]/long[]/float[]/double[] type object or the object that is a pointer class", __func__, FILE_NAME, __LINE__);
+      return env->die(env, stack, "$request_arg_ref must be an byte[]/short[]/int[]/long[]/float[]/double[] type object or the object that is a pointer class.", __func__, FILE_NAME, __LINE__);
     }
   }
   
   if (ret == -1) {
-    env->die(env, stack, "[System Error]ioctl failed: %s", socket_strerror(env, stack, socket_errno(), 0), __func__, FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]ioctl failed: %s", env->strerror(env, stack, errno, 0), __func__, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_SYSTEM_CLASS;
   }
   
   stack[0].ival = ret;
   
   return 0;
+#endif
+}
+
+int32_t SPVM__Sys__Ioctl__ioctlsocket(SPVM_ENV* env, SPVM_VALUE* stack) {
+#if !defined(_WIN32)
+  env->die(env, stack, "The ioctlsocket method in the Sys::IO class is not supported in this system(!defined(_WIN32)).", __func__, FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
+#else
+
+  int32_t error_id = 0;
+  
+  int32_t fd = stack[0].ival;
+  
+  int32_t request = stack[1].ival;
+  
+  int32_t ret;
+  
+  void* obj_request_arg_ref = stack[2].oval;
+  
+  if (!obj_request_arg_ref) {
+    ret = ioctlsocket(fd, request, NULL);
+  }
+  else {
+    int32_t* request_arg_ref = env->get_elems_int(env, stack, obj_request_arg_ref);
+    ret = ioctlsocket(fd, request, (u_long*)request_arg_ref);
+  }
+  
+  if (ret == -1) {
+    env->die(env, stack, "[System Error]ioctlsocket failed: %s", spvm_socket_strerror(env, stack, spvm_socket_errno(), 0), __func__, FILE_NAME, __LINE__);
+    return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_SYSTEM_CLASS;
+  }
+  
+  stack[0].ival = ret;
+  
+  return 0;
+#endif
 }

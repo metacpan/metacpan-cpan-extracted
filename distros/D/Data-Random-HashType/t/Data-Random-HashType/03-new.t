@@ -4,7 +4,8 @@ use warnings;
 use Data::Random::HashType;
 use English;
 use Error::Pure::Utils qw(clean);
-use Test::More 'tests' => 7;
+use Test::MockObject;
+use Test::More 'tests' => 9;
 use Test::NoWarnings;
 
 # Test.
@@ -59,4 +60,25 @@ eval {
 };
 is($EVAL_ERROR, "Parameter 'possible_hash_types' must contain at least one hash type name.\n",
 	"Parameter 'possible_hash_types' must contain at least one hash type name.");
+clean();
+
+# Test.
+eval {
+	Data::Random::HashType->new(
+		'dt_start' => undef,
+	);
+};
+is($EVAL_ERROR, "Parameter 'dt_start' is required.\n",
+	"Parameter 'dt_start' is required.");
+clean();
+
+# Test.
+my $mock = Test::MockObject->new;
+eval {
+	Data::Random::HashType->new(
+		'dt_start' => $mock,
+	);
+};
+is($EVAL_ERROR, "Parameter 'dt_start' must be a 'DateTime' object.\n",
+	"Parameter 'dt_start' must be a 'DateTime' object.");
 clean();

@@ -4,93 +4,95 @@ package SPVM::Sys::Socket::Addrinfo;
 
 =head1 Name
 
-SPVM::Sys::Socket::Addrinfo - struct addrinfo in C language
+SPVM::Sys::Socket::Addrinfo - struct addrinfo in the C language
+
+=head1 Description
+
+The Sys::Socket::Addrinfo class in L<SPVM> represents L<struct addrinfo|https://linux.die.net/man/3/getaddrinfo> in the C language.
 
 =head1 Usage
 
   use Sys::Socket::Addrinfo;
 
-=head1 Description
+=head1 Details
 
-C<Sys::Socket::Addrinfo> is the class for the C<struct addrinfo> in C<C language>.
-
-This is a L<pointer class|SPVM::Document::Language/"Pointer Class">.
+This class is a pointer class. The pointer the instance has is set to a L<struct addrinfo|https://linux.die.net/man/3/getaddrinfo> object.
 
 =head1 Class Methods
 
 =head2 new
 
-  method new : Sys::Socket::Addrinfo ();
+C<method new : L<Sys::Socket::Addrinfo|SPVM::Sys::Socket::Addrinfo> ();>
 
-Create a new Sys::Socket::Addrinfo object.
+Create a new L<Sys::Socket::Addrinfo|SPVM::Sys::Socket::Addrinfo> object.
 
 =head1 Instance Methods
 
 =head2 DESTROY
 
-  method DESTROY : void ();
+C<method DESTROY : void ();>
 
 The destructor.
 
 =head2 ai_flags
 
-  method ai_flags : int ();
+C<method ai_flags : int ();>
 
-Gets C<ai_flags>.
+Returns C<ai_flags>.
 
 =head2 set_ai_flags
 
-  method set_ai_flags : void ($ai_flags : int);
+C<method set_ai_flags : void ($ai_flags : int);>
 
 Sets C<ai_flags>.
 
 =head2 ai_family
 
-  method ai_family : int ();
+C<method ai_family : int ();>
 
-Gets C<ai_family>.
+Returns C<ai_family>.
 
 =head2 set_ai_family
 
-  method set_ai_family : void ($ai_family : int);
+C<method set_ai_family : void ($ai_family : int);>
 
 Sets C<ai_family>.
 
 =head2 ai_socktype
 
-  method ai_socktype : int ();
+C<method ai_socktype : int ();>
 
-Gets C<ai_socktype>.
+Returns C<ai_socktype>.
 
 =head2 set_ai_socktype
 
-  method set_ai_socktype : void ($ai_socktype : int);
+C<method set_ai_socktype : void ($ai_socktype : int);>
 
 Sets C<ai_socktype>.
 
 =head2 ai_protocol
 
-  method ai_protocol : int ();
+C<method ai_protocol : int ();>
 
-Gets C<ai_protocol>.
+Returns C<ai_protocol>.
 
 =head2 set_ai_protocol
 
-  method set_ai_protocol : void ($ai_protocol : int);
+C<method set_ai_protocol : void ($ai_protocol : int);>
 
 Sets C<ai_protocol>.
 
-=head2 copy_ai_addr
+=head2 ai_addr
 
-  method copy_ai_addr : Sys::Socket::Sockaddr ();
+C<method ai_addr : L<Sys::Socket::Sockaddr|SPVM::Sys::Socket::Sockaddr> ();>
 
-Copies C<ai_addr>.
+Copies C<ai_addr> and returns it.
 
-=head2 copy_ai_canonname
+=head2 ai_canonname
 
-  method copy_ai_canonname : string ();
+C<method ai_canonname : string ();>
 
-Copies C<ai_canonname>.
+Copies C<ai_canonname> and returns it.
 
 =head1 Copyright & License
 

@@ -81,7 +81,7 @@
    "provides" : {
       "Alien::SeqAlignment::parasail" : {
          "file" : "lib/Alien/SeqAlignment/parasail.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -94,7 +94,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_alienfile" : {
       "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.32",
       "requires" : {

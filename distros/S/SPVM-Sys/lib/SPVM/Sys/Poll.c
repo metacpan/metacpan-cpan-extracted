@@ -15,7 +15,7 @@
 
 #include <errno.h>
 
-const char* FILE_NAME = "Sys/Poll.c";
+static const char* FILE_NAME = "Sys/Poll.c";
 
 // static functions are copied from Sys/Socket.c
 static int32_t socket_errno (void) {

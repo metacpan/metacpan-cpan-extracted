@@ -15,7 +15,10 @@ package My::Form {
 
     use Form::Tiny plugins => ['+CXC::Form::Tiny::Plugin::OptArgs2'];
 
+    use JSON::PP;
+
     use Types::Standard       qw( Any ArrayRef Bool Enum HashRef Str );
+    use Types::TypeTiny       qw( BoolLike );
     use Types::Path::Tiny     qw( Path File Dir);
     use Types::Common::String qw( NonEmptyStr );
 
@@ -92,6 +95,12 @@ package My::Form {
         name    => 'db',
         comment => 'output to database instead of a file',
     );
+
+    form_field 'bool_like' => (
+        type    => BoolLike,
+        default => sub { JSON::PP::true },
+    );
+    option( comment => 'Boolean object' );
 
     form_field 'any_thing_goes' => ( type => Any, );
     option( comment => 'the world is your oyster', );
@@ -213,12 +222,13 @@ ok( $form->valid, 'form validated input' )
     is(
         $form->fields,
         hash {
-            field arg1   => $options{arg1};
-            field arg2   => $options{arg2};
-            field file   => $options{file};
-            field dir    => $options{dir};
-            field url    => $options{url};
-            field output => hash {
+            field arg1      => $options{arg1};
+            field arg2      => $options{arg2};
+            field bool_like => T();
+            field file      => $options{file};
+            field dir       => $options{dir};
+            field url       => $options{url};
+            field output    => hash {
                 field file     => $options{output};
                 field encoding => $options{encoding};
                 end;

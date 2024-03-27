@@ -2,6 +2,14 @@
 
 JSON::Relaxed -- An extension of JSON that allows for better human-readability.
 
+=head1 TAKEOVER
+
+New maintainer,
+
+The minimal perl requirement is raised to 5.26 for future features. If
+this fails the takeover will be cancelled and new features will be
+implemented in a different module.
+
 =head1 SYNOPSIS
 
  my ($rjson, $hash, $parser);
@@ -30,6 +38,7 @@ JSON::Relaxed -- An extension of JSON that allows for better human-readability.
  # object-oriented parsing
  $parser = JSON::Relaxed::Parser->new();
  $hash = $parser->parse($rjson);
+
 
 =head1 INSTALLATION
 
@@ -178,7 +187,7 @@ returned, the extra code after that first hash is ignored, and no error is set:
 =head2 Error codes
 
 When JSON::Relaxed encounters a parsing error it returns C<undef> and sets two
-global variables:
+global variables: 
 
 =over 4
 
@@ -229,6 +238,7 @@ C<space-only-input> in that it is triggered when the input contains only
 comments, like this:
 
  $parser->parse('/* whatever */')
+
 
 =item * C<unclosed-inline-comment>
 
@@ -317,6 +327,7 @@ This error is triggered when a quote isn't closed. For example:
  $parse->parse('"whatever') }
 
 =back
+
 
 =head1 INTERNALS
 
@@ -533,9 +544,9 @@ C<parse_chars()> should not produce any fatal errors.
 =item tokenize()
 
 C<tokenize()> organizes the characters from
-C<< L<parse_chars()|/"parse_chars()"> >> into tokens. Those tokens can then be
+C<L<parse_chars()|/"parse_chars()">> into tokens. Those tokens can then be
 organized into a data structure with
-C<< L<structure()|/"structure()"> >>.
+C<L<structure()|/"structure()">>.
 
 Each token represents an item that is recognized by JSON. Those items include
 structural characters such as C<{> or C<}>, or strings such as
@@ -564,7 +575,7 @@ C<tokenize()> should not produce any fatal errors.
 
 =item structure()
 
-C<$parser->structure()> organizes the tokens from C<< L<tokenize()|/"tokenize()"> >>
+C<$parser->structure()> organizes the tokens from C<L<tokenize()|/"tokenize()">>
 into a data structure.  C<$parser->structure()> returns a single string, single
 array reference, a single hash reference, or (if there are errors) undef.
 
@@ -634,7 +645,7 @@ objects by I<Moe> would not.
     Moe
  ]
 
-C<Quoted> objects are created by C<< $parser-E<gt>tokenize() >> when it works
+C<Quoted> objects are created by C<$parser-E<gt>tokenize()> when it works
 through the array of characters in the document.
 
 =over 4
@@ -652,6 +663,7 @@ escape characters then the escapes are processed and the unescaped characters
 are in C<raw>. So, for example, C<\n> would become an actual newline.
 
 C<quote>: the delimiting quote, i.e. either a single quote or a double quote.
+
 
 =item * C<as_perl()>
 
@@ -672,7 +684,7 @@ would not.
     Moe
  ]
 
-C<Unquoted> objects are created by C<< $parser-E<gt>tokenize() >> when it works
+C<Unquoted> objects are created by C<$parser-E<gt>tokenize()> when it works
 through the array of characters in the document.
 
 An C<Unquoted> object has one property, C<raw>, which is the string. Escaped
@@ -697,7 +709,7 @@ return 1 (for true), 0 (for false) or undef (for null), B<unless> the
 C<always_string> option is sent, in which case the string itself is returned.
 If the string does not represent a boolean value then it is returned as-is.
 
-C<< $parser-E<gt>structure() >> sends the C<always_string> when the token is a key
+C<$parser-E<gt>structure()> sends the C<always_string> when the token is a key
 in a hash. The following example should clarify how C<always_string> is used:
 
  {
@@ -786,4 +798,5 @@ Fixed bug: Test::Most was not added to the prerequisite list. No changes
 to the functionality of the module itself.
 
 =back
+
 

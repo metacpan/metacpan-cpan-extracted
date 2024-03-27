@@ -1,5 +1,15 @@
 Revision history for Perl extension Net::Waiter
 
+1.12  2024-03-23
+    1. added default SIGHUP handler
+        
+        fired in parent processes:
+            on_sig_hup()
+        
+        fired in child processes:    
+            on_child_sig_hup()
+    
+
 1.11  2023.12.08
 
     1. fixed shared mem, semaphores, signalling issues

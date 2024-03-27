@@ -1,5 +1,5 @@
 package Method::Signatures::Simple::ParseKeyword;
-$Method::Signatures::Simple::ParseKeyword::VERSION = '1.13';
+$Method::Signatures::Simple::ParseKeyword::VERSION = '1.14';
 use warnings;
 use strict;
 

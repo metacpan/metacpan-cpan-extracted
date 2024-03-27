@@ -1,0 +1,210 @@
+class TestCase::Module::Native::Runtime {
+  use Native;
+  use Fn;
+  use Array;
+  use Callback;
+  use Point;
+  use Native::Constant as NATIVE;
+  
+  static method get_method_by_name : int () {
+    
+    {
+      my $current_rntime = Native->get_current_runtime;
+      
+      my $method = $current_rntime->get_method_by_name("Fn", "join");
+      
+      unless ($method is_type Native::Method) {
+        return 0;
+      }
+      
+      {
+        unless ($method->get_name eq "join") {
+          return 0;
+        }
+      }
+      
+    }
+    
+    return 1;
+  }
+  
+  static method get_field_by_name : int () {
+    
+    {
+      my $current_rntime = Native->get_current_runtime;
+      
+      my $field = $current_rntime->get_field_by_name("Point", "x");
+      
+      unless ($field is_type Native::Field) {
+        return 0;
+      }
+      
+      {
+        unless ($field->get_name eq "x") {
+          return 0;
+        }
+      }
+      
+    }
+    
+    return 1;
+  }
+  
+  static method get_class_var_by_name : int () {
+    
+    {
+      my $current_rntime = Native->get_current_runtime;
+      
+      my $class_var = $current_rntime->get_class_var_by_name("Bool", "\$TRUE");
+      
+      unless ($class_var is_type Native::ClassVar) {
+        return 0;
+      }
+      
+      {
+        unless ($class_var->get_name eq "\$TRUE") {
+          return 0;
+        }
+      }
+      
+    }
+    
+    return 1;
+  }
+  
+  static method get_basic_types : int () {
+    
+    {
+      my $current_rntime = Native->get_current_runtime;
+      
+      my $basic_types = $current_rntime->get_basic_types;
+      
+      {
+        my $callback = method : int ($element : object) {
+          if ($element->(Native::BasicType)->get_name eq "int") { return 1; }
+        };
+        
+        unless (@{Fn->grep($basic_types, $callback)}) {
+          return 0;
+        }
+      }
+      
+      {
+        my $callback = method : int ($element : object) {
+          if ($element->(Native::BasicType)->get_name eq "Fn") { return 1; }
+        };
+        
+        unless (@{Fn->grep($basic_types, $callback)}) {
+          return 0;
+        }
+      }
+      
+      {
+        my $callback = method : int ($element : object) {
+          if ($element->(Native::BasicType)->get_name eq "Array") { return 1; }
+        };
+        
+        unless (@{Fn->grep($basic_types, $callback)}) {
+          return 1;
+        }
+      }
+    }
+    
+    # category option
+    {
+      my $current_rntime = Native->get_current_runtime;
+      
+      my $basic_types = $current_rntime->get_basic_types({category => [NATIVE->SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_CLASS, NATIVE->SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_INTERFACE]});
+      
+      {
+        my $callback = method : int ($element : object) {
+          if ($element->(Native::BasicType)->get_name eq "int") { return 1; }
+        };
+        
+        if (@{Fn->grep($basic_types, $callback)}) {
+          return 0;
+        }
+      }
+      
+      {
+        my $callback = method : int ($element : object) {
+          if ($element->(Native::BasicType)->get_name eq "Fn") { return 1; }
+        };
+        
+        unless (@{Fn->grep($basic_types, $callback)}) {
+          return 0;
+        }
+      }
+      
+      {
+        my $callback = method : int ($element : object) {
+          if ($element->(Native::BasicType)->get_name eq "Callback") { return 1; }
+        };
+        
+        unless (@{Fn->grep($basic_types, $callback)}) {
+          return 1;
+        }
+      }
+    }
+    
+    # is_anon option
+    {
+      # 1
+      {
+        my $current_rntime = Native->get_current_runtime;
+        
+        my $basic_types = $current_rntime->get_basic_types({is_anon => 1});
+        
+        {
+          my $callback = method : int ($element : object) {
+            if ($element->(Native::BasicType)->get_name eq "int") { return 1; }
+          };
+          
+          if (@{Fn->grep($basic_types, $callback)}) {
+            return 0;
+          }
+        }
+        
+        {
+          my $callback = method : int ($element : object) {
+            if ($element->(Native::BasicType)->get_name eq "::anon::") { return 1; }
+          };
+          
+          unless (@{Fn->grep($basic_types, $callback)}) {
+            return 1;
+          }
+        }
+      }
+      
+      # 0
+      {
+        my $current_rntime = Native->get_current_runtime;
+        
+        my $basic_types = $current_rntime->get_basic_types({is_anon => 0});
+        
+        {
+          my $callback = method : int ($element : object) {
+            if ($element->(Native::BasicType)->get_name eq "int") { return 1; }
+          };
+          
+          unless (@{Fn->grep($basic_types, $callback)}) {
+            return 0;
+          }
+        }
+        
+        {
+          my $callback = method : int ($element : object) {
+            if ($element->(Native::BasicType)->get_name eq "::anon::") { return 1; }
+          };
+          
+          if (@{Fn->grep($basic_types, $callback)}) {
+            return 1;
+          }
+        }
+      }
+      
+    }
+    return 1;
+  }
+  
+}

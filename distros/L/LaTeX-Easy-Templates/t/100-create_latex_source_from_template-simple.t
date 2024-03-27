@@ -11,7 +11,7 @@ use lib 'blib/lib';
 
 #use utf8;
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 use Test::More;
 use Test::More::UTF8;
@@ -39,7 +39,7 @@ ok(-d $tmpdir, "tmpdir exists $tmpdir") or BAIL_OUT;
 
 my $template_dir = File::Spec->catdir($curdir, 'templates', 'simple05');
 my $template_filename = File::Spec->catfile($template_dir, 'main.tex.tx');
-my $expected_latex_file_contents = $template_filename; $expected_latex_file_contents =~ s/\.tx$/.expected_output/;
+my $expected_latex_output_filename = $template_filename; $expected_latex_output_filename =~ s/\.tx$/.expected_output/;
 my ($template_string, $FH);
 ok(open($FH, '<', $template_filename), "template filename '$template_filename' opened for reading.") or BAIL_OUT("not it failed with $!");
 { local $/ = undef; $template_string = <$FH> } close $FH;
@@ -143,8 +143,8 @@ for my $aprocessorname (sort keys %{$latterparams->{'processors'}}){
 		# compare its content with returned
 		my $latexsrcf = $untemplate_ret->{'latex'}->{'filepath'};
 		ok(-f $latexsrcf, 'untemplate()'." : called for processor '$aprocessorname', compare1 file ($latexsrcf) exists.") or BAIL_OUT;
-		ok(-f $expected_latex_file_contents, 'untemplate()'." : called for processor '$aprocessorname', compare2 file ($expected_latex_file_contents) exists.") or BAIL_OUT;
-		is(File::Compare::compare($latexsrcf, $expected_latex_file_contents), 0, 'untemplate()'." : called for processor '$aprocessorname', and latex output file ($latexsrcf) is exactly the same as the expected output ($expected_latex_file_contents).") or BAIL_OUT;
+		ok(-f $expected_latex_output_filename, 'untemplate()'." : called for processor '$aprocessorname', compare2 file ($expected_latex_output_filename) exists.") or BAIL_OUT;
+		is(File::Compare::compare($latexsrcf, $expected_latex_output_filename), 0, 'untemplate()'." : called for processor '$aprocessorname', and latex output file ($latexsrcf) is exactly the same as the expected output ($expected_latex_output_filename).") or BAIL_OUT;
 	}
 
 	# format

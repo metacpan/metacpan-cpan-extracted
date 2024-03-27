@@ -6,12 +6,17 @@ use warnings;
 use Data::HashType;
 use Data::Login;
 use Data::Login::Role;
+use DateTime;
 
 my $obj = Data::Login->new(
         'hash_type' => Data::HashType->new(
-                'active' => 1,
                 'id' => 1,
                 'name' => 'SHA-512',
+                'valid_from' => DateTime->new(
+                        'day' => 1,
+                        'month' => 1,
+                        'year' => 2024,
+                ),
         ),
         'id' => 2,
         'login_name' => 'michal.josef.spacek',
@@ -33,6 +38,11 @@ my $obj = Data::Login->new(
                         'role' => 'Bad',
                 ),
         ],
+        'valid_from' => DateTime->new(
+                'day' => 1,
+                'month' => 1,
+                'year' => 2024,
+        ),
 );
 
 # Print out.
@@ -43,6 +53,7 @@ print 'Password hash: '.$obj->password_hash."\n";
 print "Active roles:\n";
 print join "\n", map { $_->active ? ' - '.$_->role : () } @{$obj->roles};
 print "\n";
+print 'Valid from: '.$obj->valid_from->ymd."\n";
 
 # Output:
 # Hash type: SHA-512
@@ -52,3 +63,4 @@ print "\n";
 # Active roles:
 #  - Admin
 #  - User
+# Valid from: 2024-01-01

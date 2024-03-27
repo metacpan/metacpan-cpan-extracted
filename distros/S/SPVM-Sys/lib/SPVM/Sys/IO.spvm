@@ -2,12 +2,12 @@
 # MIT License
 
 class Sys::IO {
-
+  allow Sys;
+  
   use Sys::IO::FileStream;
   use Sys::IO::Stat;
   use Sys::IO::DirStream;
   use Sys::IO::Dirent;
-  use Sys::IO::Utimbuf;
   use Sys::IO::Flock;
   use Sys::IO::Constant as IO;
   use Sys::IO::Windows;
@@ -16,29 +16,31 @@ class Sys::IO {
   our $STDOUT : Sys::IO::FileStream;
   our $STDERR : Sys::IO::FileStream;
   
+  our $SPVM_STDIN : Sys::IO::FileStream;
+  our $SPVM_STDOUT : Sys::IO::FileStream;
+  our $SPVM_STDERR : Sys::IO::FileStream;
+  
   INIT {
     $STDIN = &INIT_STDIN();
     $STDOUT = &INIT_STDOUT();
     $STDERR = &INIT_STDERR();
+    
+    $SPVM_STDIN = &INIT_SPVM_STDIN();
+    $SPVM_STDOUT = &INIT_SPVM_STDOUT();
+    $SPVM_STDERR = &INIT_SPVM_STDERR();
   }
   
-  native private static method INIT_STDIN : Sys::IO::FileStream ();
-  native private static method INIT_STDOUT : Sys::IO::FileStream ();
-  native private static method INIT_STDERR : Sys::IO::FileStream ();
-  
   static method stdin : Sys::IO::FileStream () { return $STDIN; }
+  
   static method stdout : Sys::IO::FileStream () { return $STDOUT; }
+  
   static method stderr : Sys::IO::FileStream () { return $STDERR; }
   
-  native static method open : int ($path : string, $flags : int, $mode : int = 0);
+  static method spvm_stdin : Sys::IO::FileStream () { return $SPVM_STDIN; }
   
-  native static method read : int ($fd : int, $buf : mutable string, $count : int, $buf_offset : int = 0);
+  static method spvm_stdout : Sys::IO::FileStream () { return $SPVM_STDOUT; }
   
-  native static method write : int ($fd : int, $buf : string, $count : int, $buf_offset : int = 0);
-
-  native static method lseek : long ($fd : int, $offset : long, $whence : int);
-  
-  native static method close : int ($fd : int);
+  static method spvm_stderr : Sys::IO::FileStream () { return $SPVM_STDERR; }
   
   native static method fopen : Sys::IO::FileStream ($path : string, $mode : string);
   
@@ -56,20 +58,84 @@ class Sys::IO {
   
   native static method getc : int ($stream : Sys::IO::FileStream);
   
+  native static method ungetc : int ($c : int, $stream : Sys::IO::FileStream);
+  
   native static method fgets : mutable string ($s : mutable string, $size : int, $stream : Sys::IO::FileStream, $s_offset : int = 0);
   
   native static method fwrite : int ($ptr : string, $size : int, $nmemb : int, $stream : Sys::IO::FileStream, $ptr_offset : int = 0);
+  
+  native static method fclose : int ($stream : Sys::IO::FileStream);
   
   native static method fseek : int ($stream : Sys::IO::FileStream, $offset : long, $whence : int);
   
   native static method ftell : long ($stream : Sys::IO::FileStream);
   
-  native static method fclose : int ($stream : Sys::IO::FileStream);
-  
   native static method fflush : int ($stream : Sys::IO::FileStream);
   
+  native static method freopen : Sys::IO::FileStream ($path : string, $mode : string, $stream : Sys::IO::FileStream);
+  
+  native static method setvbuf : int ($stream : Sys::IO::FileStream, $buf : mutable string, $mode : int, $size : int);
+  
+  static method setbuf : void ($stream : Sys::IO::FileStream, $buf : mutable string) {
+    my $mode : int;
+    if ($buf) {
+      $mode = IO->_IOFBF;
+    }
+    else {
+      $mode = IO->_IONBF;
+    }
+    
+    &setvbuf($stream, $buf, $mode, IO->BUFSIZ);
+  }
+  
+  static method setbuffer : void ($stream : Sys::IO::FileStream, $buf : mutable string, $size : int) {
+    my $mode : int;
+    if ($buf) {
+      $mode = IO->_IOFBF;
+    }
+    else {
+      $mode = IO->_IONBF;
+    }
+    
+    &setvbuf($stream, $buf, $mode, $size);
+  }
+  
+  static method setlinebuf : void ($stream : Sys::IO::FileStream) {
+    my $mode = IO->_IOLBF;
+    &setvbuf($stream, undef, $mode, IO->BUFSIZ);
+  }
+  
+  native static method open : int ($path : string, $flags : int, $mode : int = 0);
+  
+  native static method read : int ($fd : int, $buf : mutable string, $count : int, $buf_offset : int = 0);
+  
+  native static method write : int ($fd : int, $buf : string, $count : int = -1, $buf_offset : int = 0);
+  
+  native static method lseek : long ($fd : int, $offset : long, $whence : int);
+  
+  native static method close : int ($fd : int);
+  
+  native static method fsync : int ($fd : int);
+  
+  native static method fcntl : int ($fd : int, $command : int, $command_arg : object of Int|Sys::IO::Flock|object = undef);
+  
+  native static method ftruncate : int ($fd : int, $length : long);
+  
   native static method flock : int ($fd : int, $operation : int);
-
+  
+  native static method access : int ($pathname : string, $mode : int);
+  
+  native static method faccessat : int ($dirfd : int, $pathname : string, $mode : int, $flags : int);
+  
+  static method eaccess : int ($pathname : string, $mode : int) {
+    
+    my $status = &faccessat(IO->AT_FDCWD, $pathname, $mode, IO->AT_EACCESS);
+    
+    return $status;
+  }
+  
+  native static method truncate : int ($path : string, $length : long);
+  
   native static method mkdir : int ($path : string, $mode : int);
   
   native static method umask : int ($mode : int);
@@ -94,21 +160,9 @@ class Sys::IO {
   
   native static method chown : int ($path : string, $owner : int, $group : int);
   
-  native static method truncate : int ($path : string, $length : long);
-  
   native static method symlink : int ($oldpath : string, $newpath : string);
   
   native static method readlink : int ($path : string, $buf : mutable string, $bufsiz : int);
-  
-  static method get_readlink_buffer_size : int ($path : string) {
-    my $stat = Sys::IO::Stat->new;
-
-    Sys::IO::Stat->lstat($path, $stat);
-
-    my $readlink_buffer_size = (int)$stat->st_size;
-
-    return $readlink_buffer_size;
-  }
   
   native static method opendir : Sys::IO::DirStream ($dir : string);
   
@@ -122,82 +176,24 @@ class Sys::IO {
   
   native static method seekdir : void ($dirp : Sys::IO::DirStream, $offset : long);
   
-  native static method utime : int ($filename : string, $times : Sys::IO::Utimbuf);
+  native static method popen : Sys::IO::FileStream ($command : string, $type : string);
   
-  native static method access_raw : int ($pathname : string, $mode : int);
+  native static method _popen : Sys::IO::FileStream ($command : string, $mode : string);
   
-  native static method access : int ($pathname : string, $mode : int);
+  native static method pclose : int ($stream : Sys::IO::FileStream);
   
-  native static method faccessat_raw : int ($dirfd : int, $pathname : string, $mode : int, $flags : int);
+  native static method _pclose : int ($stream : Sys::IO::FileStream);
   
-  native static method faccessat : int ($dirfd : int, $pathname : string, $mode : int, $flags : int);
+  native private static method INIT_STDIN : Sys::IO::FileStream ();
   
-  static method eaccess_raw : int ($pathname : string, $mode : int) {
-    my $status = &faccessat_raw(IO->AT_FDCWD, $pathname, $mode, IO->AT_EACCESS);
-    return $status;
-  }
+  native private static method INIT_STDOUT : Sys::IO::FileStream ();
   
-  static method eaccess : int ($pathname : string, $mode : int) {
-    my $status = &faccessat(IO->AT_FDCWD, $pathname, $mode, IO->AT_EACCESS);
-    return $status;
-  }
+  native private static method INIT_STDERR : Sys::IO::FileStream ();
   
-  native static method fcntl : int ($fd : int, $command : int, $command_arg : object of Int|Sys::IO::Flock|object = undef);
-
-  native static method readline : mutable string ($stream : Sys::IO::FileStream);
+  native private static method INIT_SPVM_STDIN : Sys::IO::FileStream ();
   
-  native static method ftruncate : int ($fd : int, $length : long);
+  native private static method INIT_SPVM_STDOUT : Sys::IO::FileStream ();
   
-  native static method ungetc : int ($c : int, $stream : Sys::IO::FileStream);
+  native private static method INIT_SPVM_STDERR : Sys::IO::FileStream ();
   
-  native static method fsync : int ($fd : int);
-  
-  native static method freopen : Sys::IO::FileStream ($path : string, $mode : string, $stream : Sys::IO::FileStream);
-
-  native static method setvbuf : int ($stream : Sys::IO::FileStream, $buf : mutable string, $mode : int, $size : int);
-
-  static method setbuf : void ($stream : Sys::IO::FileStream, $buf : mutable string) {
-    my $mode : int;
-    if ($buf) {
-      $mode = IO->_IOFBF;
-    }
-    else {
-      $mode = IO->_IONBF;
-    }
-    
-    &setvbuf($stream, $buf, $mode, IO->BUFSIZ);
-  }
-
-  static method setbuffer : void ($stream : Sys::IO::FileStream, $buf : mutable string, $size : int) {
-    my $mode : int;
-    if ($buf) {
-      $mode = IO->_IOFBF;
-    }
-    else {
-      $mode = IO->_IONBF;
-    }
-    
-    &setvbuf($stream, $buf, $mode, $size);
-  }
-
-  static method setlinebuf : void ($stream : Sys::IO::FileStream) {
-    my $mode = IO->_IOLBF;
-    &setvbuf($stream, undef, $mode, IO->BUFSIZ);
-  }
-  
-  # Temporary
-  static method readlinkp : string ($file : string) {
-    if (Sys::OS->is_windows) {
-      my $buffer_size = Sys::IO::Windows->get_readlink_buffer_size($file);
-      my $buffer = (mutable string)new_string_len $buffer_size;
-      Sys::IO::Windows->readlink($file, $buffer, $buffer_size);
-      return $buffer;
-    }
-    else {
-      my $buffer_size = Sys::IO->get_readlink_buffer_size($file);
-      my $buffer = (mutable string)new_string_len $buffer_size;
-      Sys::IO->readlink($file, $buffer, $buffer_size);
-      return $buffer;
-    }
-  }
 }

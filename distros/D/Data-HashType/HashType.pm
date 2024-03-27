@@ -3,14 +3,12 @@ package Data::HashType;
 use strict;
 use warnings;
 
+use DateTime;
+use Error::Pure qw(err);
 use Mo qw(build is);
-use Mo::utils 0.09 qw(check_bool check_length check_number check_required);
+use Mo::utils 0.09 qw(check_isa check_length check_number check_required);
 
-our $VERSION = 0.03;
-
-has active => (
-	is => 'ro',
-);
+our $VERSION = 0.05;
 
 has id => (
 	is => 'ro',
@@ -20,14 +18,16 @@ has name => (
 	is => 'ro',
 );
 
+has valid_from => (
+	is => 'ro',
+);
+
+has valid_to => (
+	is => 'ro',
+);
+
 sub BUILD {
 	my $self = shift;
-
-	# Check active.
-	if (! defined $self->{'active'}) {
-		$self->{'active'} = 1;
-	}
-	check_bool($self, 'active');
 
 	# Check id.
 	check_number($self, 'id');
@@ -35,6 +35,21 @@ sub BUILD {
 	# Check hash name.
 	check_required($self, 'name');
 	check_length($self, 'name', 50);
+
+	# Check valid_from.
+	check_required($self, 'valid_from');
+	check_isa($self, 'valid_from', 'DateTime');
+
+	# Check valid_to.
+	check_isa($self, 'valid_to', 'DateTime');
+	if (defined $self->{'valid_to'}
+		&& DateTime->compare($self->{'valid_from'}, $self->{'valid_to'}) != -1) {
+
+		err "Parameter 'valid_to' must be older than 'valid_from' parameter.",
+			'Value', $self->{'valid_to'},
+			'Valid from', $self->{'valid_from'},
+		;
+	}
 
 	return;
 }
@@ -56,9 +71,20 @@ Data::HashType - Data object for hash type.
  use Data::HashType;
 
  my $obj = Data::HashType->new(%params);
- my $active = $obj->active;
  my $id = $obj->id;
  my $name = $obj->name;
+ my $valid_from = $obj->valid_from;
+ my $valid_to = $obj->valid_to;
+
+=head1 DESCRIPTION
+
+The intention of this module is to store information about the usage of digests.
+Digests are active only within a certain time range, and we need a mechanism to
+transition to others.
+
+A real-world example is a database table that follows the same format as this data object,
+with multiple records being valid at different times, while other database tables
+have relations to this table.
 
 =head1 METHODS
 
@@ -69,12 +95,6 @@ Data::HashType - Data object for hash type.
 Constructor.
 
 =over 8
-
-=item * C<active>
-
-Flag for activity of hash type.
-Possible value is 0/1.
-Default value is 1 (active).
 
 =item * C<id>
 
@@ -89,17 +109,21 @@ Hash type name.
 Maximal length of value is 50 characters.
 It's required.
 
+=item * C<valid_from>
+
+Date and time of start of use.
+Must be a L<DateTime> object.
+It's required.
+
+=item * C<valid_to>
+
+Date and time of end of use. An undefined value means it is in use.
+Must be a L<DateTime> object.
+It's optional.
+
 =back
 
 Returns instance of object.
-
-=head2 C<active>
-
- my $active = $obj->active;
-
-Get active flag.
-
-Returns 0/1.
 
 =head2 C<id>
 
@@ -117,17 +141,41 @@ Get hash type name.
 
 Returns string.
 
+=head2 C<valid_from>
+
+ my $valid_from = $obj->valid_from;
+
+Get date and time of start of use.
+
+Returns L<DateTime> object.
+
+=head2 C<valid_to>
+
+ my $valid_to = $obj->valid_to;
+
+Get date and time of end of use.
+
+Returns L<DateTime> object or undef.
+
 =head1 ERRORS
 
  new():
          From Mo::utils:
-                 Parameter 'active' must be a bool (0/1).
-                         Value: %s
                  Parameter 'id' must be a number.
                          Value: %s
                  Parameter 'name' has length greater than '50'.
                          Value: %s
                  Parameter 'name' is required.
+                 Parameter 'valid_from' is required.
+                 Parameter 'valid_from' must be a 'DateTime' object.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'valid_to' must be a 'DateTime' object.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'valid_to' must be older than 'valid_from' parameter.
+                         Value: %s
+                         Valid from: %s
 
 =head1 EXAMPLE
 
@@ -137,25 +185,32 @@ Returns string.
  use warnings;
 
  use Data::HashType;
+ use DateTime;
 
  my $obj = Data::HashType->new(
-         'active' => 1,
          'id' => 10,
          'name' => 'SHA-256',
+         'valid_from' => DateTime->new(
+                 'year' => 2024,
+                 'month' => 1,
+                 'day' => 1,
+         ),
  );
 
  # Print out.
  print 'Name: '.$obj->name."\n";
- print 'Active: '.$obj->active."\n";
  print 'Id: '.$obj->id."\n";
+ print 'Valid from: '.$obj->valid_from->ymd."\n";
 
  # Output:
  # Name: SHA-256
- # Active: 1
  # Id: 10
+ # Valid from: 2024-01-01
 
 =head1 DEPENDENCIES
 
+L<DateTime>,
+L<Error::Pure>,
 L<Mo>,
 L<Mo::utils>.
 
@@ -177,6 +232,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.05
 
 =cut

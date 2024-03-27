@@ -4,55 +4,59 @@ package SPVM::Sys::Socket::Ipv6_mreq;
 
 =head1 Name
 
-SPVM::Sys::Socket::Ipv6_mreq - struct ipv6_mreq in C language
+SPVM::Sys::Socket::Ipv6_mreq - struct ipv6_mreq in the C language
+
+=head1 Description
+
+The Sys::Socket::Ipv6_mreq class in L<SPVM> represents L<struct ipv6_mreq|https://linux.die.net/man/7/ipv6> in the C language.
 
 =head1 Usage
 
   use Sys::Socket::Ipv6_mreq;
 
-=head1 Description
+=head1 Details
 
-C<Sys::Socket::Ipv6_mreq> is the class for the C<struct ipv6_mreq> in C<C language>.
-
-This is a L<pointer class|SPVM::Document::Language/"Pointer Class">.
+This class is a pointer class. The pointer the instance has is set to a L<struct ipv6_mreq|https://linux.die.net/man/7/ipv6> object.
 
 =head1 Class Methods
 
 =head2 new
 
-  static method new : Sys::Socket::Ipv6_mreq ();
+C<static method new : L<Sys::Socket::Ipv6_mreq|SPVM::Sys::Socket::Ipv6_mreq> ();>
 
-Create a new C<Sys::Socket::Ipv6_mreq> object.
+Create a new L<Sys::Socket::Ipv6_mreq|SPVM::Sys::Socket::Ipv6_mreq> object.
 
 =head1 Instance Methods
 
 =head2 
 
-  method DESTROY : void ();
+C<method DESTROY : void ();>
+
+The destructor.
 
 =head2 ipv6mr_multiaddr
 
-  method ipv6mr_multiaddr : Sys::Socket::In6_addr ();
+C<method ipv6mr_multiaddr : L<Sys::Socket::In6_addr|SPVM::Sys::Socket::In6_addr> ();>
 
-Get C<ipv6mr_multiaddr>. This is a L<Sys::Socket::In6_addr|SPVM::Sys::Socket::In6_addr> object.
+Copies C<ipv6mr_multiaddr> and returns it.
 
 =head2 set_ipv6mr_multiaddr
 
-  method set_ipv6mr_multiaddr : void ($interface : Sys::Socket::In6_addr);
+C<method set_ipv6mr_multiaddr : void ($interface : L<Sys::Socket::In6_addr|SPVM::Sys::Socket::In6_addr>);>
 
-Set C<ipv6mr_multiaddr>. This is a L<Sys::Socket::In6_addr|SPVM::Sys::Socket::In6_addr> object.
+Sets C<ipv6mr_multiaddr>.
 
 =head2 ipv6mr_interface
 
-  method ipv6mr_interface : int ();
+C<method ipv6mr_interface : int ();>
 
-Get C<ipv6mr_interface>.
+Returns C<ipv6mr_interface>.
 
 =head2 set_ipv6mr_interface
 
-  method set_ipv6mr_interface : void ($interface : int);
+C<method set_ipv6mr_interface : void ($interface : int);>
 
-Set C<ipv6mr_interface>.
+Sets C<ipv6mr_interface>.
 
 =head1 Copyright & License
 

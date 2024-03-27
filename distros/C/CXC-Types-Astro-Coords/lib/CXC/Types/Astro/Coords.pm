@@ -9,7 +9,7 @@ use warnings;
 
 use experimental 'signatures', 'postderef', 'declared_refs';
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use CXC::Types::Astro::Coords::Util 'mkSexagesimal';
 
@@ -68,6 +68,18 @@ my sub croak {
 BEGIN {
     my @parameters = qw[ -any -optws -optsep -optunits -trim ];
     my %default    = mkSexagesimal( @parameters )->%*;
+
+    sub methods ( %attr ) {
+        return {
+            ## no critic (BuiltinFunctions::ProhibitComplexMappings)
+            map {
+                my $value = $attr{$_};
+                $_ => sub { $value },
+              }
+              keys %attr,
+        };
+    }
+
     __PACKAGE__->meta->add_type(
         name                 => 'Sexagesimal',
         constraint_generator => sub ( @args ) {
@@ -79,19 +91,11 @@ BEGIN {
                 constraint   => $parameterized{constraint},
                 parameters   => [@args],
                 parent => Any,   # required to avoid an oops; see https://github.com/tobyink/p5-type-tiny/issues/151
-                my_methods => {
-                    Str_toArrayRef     => sub { $parameterized{Str_toArrayRef} },
-                    Str_toDegrees      => sub { $parameterized{Str_toDegrees} },
-                    ArrayRef_toDegrees => sub { $parameterized{ArrayRef_toDegrees} },
-                },
+                my_methods => methods( %parameterized ),
             );
         },
         constraint => $default{constraint},
-        my_methods => {
-            Str_toArrayRef     => sub { $default{Str_toArrayRef} },
-            Str_toDegrees      => sub { $default{Str_toDegrees} },
-            ArrayRef_toDegrees => sub { $default{ArrayRef_toDegrees} },
-        },
+        my_methods => methods( %default ),
     );
 }
 
@@ -122,8 +126,6 @@ declare SexagesimalDegrees, as Num;
 coerce SexagesimalArray,   from NonEmptyStr,      Sexagesimal->my_Str_toArrayRef;
 coerce SexagesimalDegrees, from NonEmptyStr,      Sexagesimal->my_Str_toDegrees;
 coerce SexagesimalDegrees, from SexagesimalArray, Sexagesimal->my_ArrayRef_toDegrees;
-
-
 
 
 
@@ -461,7 +463,7 @@ CXC::Types::Astro::Coords - type definitions for Coordinates
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -481,7 +483,7 @@ conventions used in Astronomy.
   $type = Sexagesimal; #  same as Sexagesimal[ qw( -any -optws -optsep -optunits -trim )]
 
 Return a type tuned to recognize specific forms of sexagesimal
-coordinate notation.  See the L<CXC::Types::Astro::Coords:Util>
+coordinate notation.  See the L<CXC::Types::Astro::Coords::Util>
 B<mkSexagesimal> subroutine for more information on the available
 flags.
 

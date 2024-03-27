@@ -8,12 +8,13 @@ build_requires:
 configure_requires:
   Capture::Tiny: '0'
   ExtUtils::MakeMaker: '0'
+  FFI::Platypus: '0'
   File::ShareDir::Dist::Install: '0'
   File::chdir: '0'
   Path::Tiny: '0'
   perl: '5.008001'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -36,11 +37,15 @@ requires:
   perl: '5.008001'
 resources:
   IRC: irc://irc.perl.org/#native
+  Twitter: https://fosstodon.org/@PerlFFI
   bugtracker: https://github.com/PerlFFI/FFI-Platypus-Lang-Go/issues
   homepage: https://metacpan.org/pod/FFI::Platypus::Lang::Go
   repository: git://github.com/PerlFFI/FFI-Platypus-Lang-Go.git
-version: '0.02'
-x_generated_by_perl: v5.37.5
-x_serialization_backend: 'YAML::Tiny version 1.73'
+version: '0.03'
+x_contributors:
+  - 'Graham Ollis <plicease@cpan.org>'
+  - 'Graham TerMarsch (GTERMARS)'
+x_generated_by_perl: v5.38.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_use_unsafe_inc: 0

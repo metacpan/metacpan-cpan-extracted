@@ -54,7 +54,7 @@ subtest 'Longitude' => sub {
     test_type(
         LongitudeSexagesimal,
         [ '0d0m0s',     '359d 2m  8.22s', '359:2:8.22' ],
-        [ '360d 0m 0s', '359d 60m 0s',    '359d 00m 60s', '359:2:-8.22' ],
+        [ '360d 0m 0s', '359d 60m 0s',    '359d 00m 60s', '359:2:-8.22', '22.3s', '33m 22.3s', ],
     );
 
     subtest 'Coerce' => sub {
@@ -111,7 +111,7 @@ subtest 'RightAscension' => sub {
             '23h 2m  8.22s',
             '23:2:8.22' ],
 
-        [ '24h0m0s', '24h60m0s', '24h00m60s', '24:2:-8.22' ],
+        [ '24h0m0s', '24h60m0s', '24h00m60s', '24:2:-8.22', '180d20m30s' ],
     );
 
     subtest 'Coerce' => sub {
@@ -140,7 +140,7 @@ subtest 'Declination' => sub {
             '-90:0:0',       '90:0:0',         '89:59:59.9', '-89:59:59.9',
             '89d 59m 59.9s', '-89d 59m 59.9s', '89 59 59.9', '-89 59 59.9',
         ],
-        [ -91, 91 ],
+        [ -91, 91, '180d20m30s', '10h20m30s' ],
     );
 
     subtest 'Coerce' => sub {

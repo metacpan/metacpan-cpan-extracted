@@ -76,7 +76,7 @@
    "provides" : {
       "Alien::SeqAlignment::last" : {
          "file" : "lib/Alien/SeqAlignment/last.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -89,7 +89,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_alienfile" : {
       "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.32",
       "requires" : {

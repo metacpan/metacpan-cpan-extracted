@@ -8,7 +8,7 @@ use AsposeCellsCloud::Request::PostReplace;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**file** | **string** | Find content |
+**file** | **string** | File to upload |
 **text** | **string** | Find content |
 **newtext** | **string** | Replace content |
 **password** | **string** | The password needed to open an Excel file. |

@@ -2498,14 +2498,26 @@ sub open
             }
             else
             {
-                $opts->{binmode} = 'encoding(utf-8)' if( lc( $opts->{binmode} ) eq 'utf-8' );
                 $opts->{binmode} =~ s/^\://g;
+                my $layer;
+                if( $opts->{binmode} =~ /^(?:bytes|crlf|mmap|perlio|pop|raw|scalar|stdio|unix|utf8)\b/ )
+                {
+                    $layer = $opts->{binmode};
+                }
+                elsif( index( $opts->{binmode}, '(' ) != -1 )
+                {
+                    $layer = $opts->{binmode};
+                }
+                else
+                {
+                    $layer = "encoding($opts->{binmode})";
+                }
                 # try-catch
                 local $@;
                 my $rv;
                 eval
                 {
-                    $rv = $io->binmode( ":$opts->{binmode}" );
+                    $rv = $io->binmode( ":$layer" );
                 };
                 if( $@ )
                 {

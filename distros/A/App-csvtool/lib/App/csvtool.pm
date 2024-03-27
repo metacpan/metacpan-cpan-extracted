@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2024 -- leonerd@leonerd.org.uk
 
-package App::csvtool 0.01;
+package App::csvtool 0.02;
 
 use v5.26;
 use warnings;
@@ -35,6 +35,9 @@ Extracts the given field column(s).
 
 A comma-separated list of field indexes (defaults to 1).
 
+A field index of C<u> will result in an undefined (i.e. empty) field being
+emitted. This can be used to create spaces and pad out the data.
+
 =cut
 
    use constant COMMAND_DESC => "Extract the given field(s) to output";
@@ -54,10 +57,10 @@ A comma-separated list of field indexes (defaults to 1).
       my @FIELDS = split m/,/, $opts->{fields};
 
       # 1-indexed
-      $_-- for @FIELDS;
+      $_ eq "u" || $_-- for @FIELDS;
 
       while( my $row = $reader->() ) {
-         $output->( [ @{$row}[@FIELDS] ] );
+         $output->( [ map { $_ eq "u" ? undef : $row->[$_] } @FIELDS ] );
       }
    }
 }
@@ -164,6 +167,73 @@ of the given number.
             $output->( shift @ROWS );
             push @ROWS, $row;
          }
+      }
+   }
+}
+
+package App::csvtool::join
+{
+
+=head2 join
+
+   $ csvtool join -fFIELD FILE1 FILE2
+
+Reads two files and outputs rows joined by a common key.
+
+The second file is read entirely into memory and indexed by its key field.
+Then the first file is read a row at a time, and each row has the
+corresponding data from the second file appended to it when output.
+
+This is more flexible than the F<join(1)> UNIX tool that inspires it, because
+C<FILE2> does not need to be sorted in key order in the same way as C<FILE1>.
+Additionally, rows of C<FILE2> may be emitted zero, one, or more times as
+required by matches from C<FILE1>.
+
+=head3 --field1, -1
+
+The field index in FILE1 to use as the lookup key.
+
+=head3 --field2, -2
+
+The field index in FILE2 to use as the storage key.
+
+=head3 --field, -f
+
+Use the same field index for both files.
+
+=cut
+
+   use constant COMMAND_DESC => "Join two files by a common key";
+
+   use constant COMMAND_OPTS => (
+      { name => "field|f=", description => "Field of both files to join by" },
+      { name => "field1|1=", description => "Field of FILE1 to join by" },
+      { name => "field2|2=", description => "Field of FILE2 to join by" },
+   );
+
+   use constant WANT_READER => 2;
+   use constant WANT_OUTPUT => 1;
+
+   sub run
+   {
+      shift;
+      my ( $opts, $reader1, $reader2, $output ) = @_;
+
+      my $FIELD1 = $opts->{field1} // $opts->{field}; $FIELD1--;
+      my $FIELD2 = $opts->{field2} // $opts->{field}; $FIELD2--;
+
+      # Load the joindata from second reader
+      my %rows_by_key;
+      while( my $row = $reader2->() ) {
+         my $key = splice @$row, $FIELD2, 1, ();
+         warn "FILE2 contains duplicate key '$key'\n"
+            if exists $rows_by_key{$key};
+         $rows_by_key{$key} = $row;
+      }
+
+      while( my $row = $reader1->() ) {
+         my $key = $row->[$FIELD1];
+         $output->( [ @$row, @{ $rows_by_key{$key} // [] } ] );
       }
    }
 }

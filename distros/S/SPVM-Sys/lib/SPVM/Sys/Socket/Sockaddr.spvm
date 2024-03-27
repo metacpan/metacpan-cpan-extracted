@@ -2,27 +2,48 @@
 # MIT License
 
 class Sys::Socket::Sockaddr : pointer {
-  interface Sys::Socket::Sockaddr::Interface;
+  use Sys::Socket::Constant as SOCKET;
+  use Sys::Socket::Sockaddr::In;
+  use Sys::Socket::Sockaddr::In6;
+  use Sys::Socket::Sockaddr::Un;
+  
+  # Interfaces
   interface Cloneable;
   
-  method has_interfaces : int () { return 1; }
+  # Class methods
+  native static method new : Sys::Socket::Sockaddr ();
   
-  method sa_family : int () {
-    my $sa_family = $self->(Sys::Socket::Sockaddr::Interface)->sa_family;
+  static method new_with_family : Sys::Socket::Sockaddr ($family : int) {
     
-    return $sa_family;
+    my $addr = (Sys::Socket::Sockaddr)undef;
+    
+    if ($family == SOCKET->AF_INET) {
+      $addr = Sys::Socket::Sockaddr::In->new;
+    }
+    elsif ($family == SOCKET->AF_INET6) {
+      $addr = Sys::Socket::Sockaddr::In6->new;
+    }
+    elsif ($family == SOCKET->AF_UNIX) {
+      $addr = Sys::Socket::Sockaddr::Un->new;
+    }
+    else {
+      die "The address family $family is not available.";
+    }
+    
+    return $addr;
   }
   
-  method sizeof : int () {
-    my $size = $self->(Sys::Socket::Sockaddr::Interface)->sizeof;
-    
-    return $size;
-  }
+  # Instance methods
+  native method DESTROY : void ();
   
-  method clone : Sys::Socket::Sockaddr () {
-    
-    my $clone = (Sys::Socket::Sockaddr)$self->(Cloneable)->clone;
-    
-    return $clone;
-  }
+  native method sa_family : int ();
+  
+  native method set_sa_family : void ($family : int);
+  
+  method size : int () { die "Not implemented."; }
+  
+  method clone : Sys::Socket::Sockaddr () { die "Not implemented."; }
+  
+  native method upgrade : Sys::Socket::Sockaddr ();
+  
 }

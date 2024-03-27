@@ -4717,6 +4717,269 @@ sub post_import_data{
 }
 
 #
+# PostWorkbookDataCleansingRequest
+#
+# Data cleaning of spreadsheet files is a data management process used to identify, correct, and remove errors, incompleteness, duplicates, or inaccuracies in tables and ranges.
+# 
+# @name  string (required)  The file name.  
+# @dataCleansing  DataCleansing (required)  data cleansing content.  
+# @folder  string   The folder where the file is situated.  
+# @storageName  string   The storage name where the file is situated.  
+# @password  string   The file password.   
+# @region  string   The regional settings for workbook.  
+# @checkExcelRestriction  boolean      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorkbookDataCleansingRequest',
+            description => 'PostWorkbookDataCleansing Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_workbook_data_cleansing' } = { 
+    	summary => 'Data cleaning of spreadsheet files is a data management process used to identify, correct, and remove errors, incompleteness, duplicates, or inaccuracies in tables and ranges.',
+        params => $params,
+        returns => 'FileInfo',
+    };
+}
+#
+# @return FileInfo
+#
+sub post_workbook_data_cleansing{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FileInfo', $response);
+    return $_response_object;
+}
+
+#
+# PostDataCleansingRequest
+#
+# Data cleansing of spreadsheet files is a data management process used to identify, correct, and remove errors, incompleteness, duplicates, or inaccuracies in tables and ranges.
+# 
+# @dataCleansingRequest  DataCleansingRequest (required)     
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostDataCleansingRequest',
+            description => 'PostDataCleansing Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_data_cleansing' } = { 
+    	summary => 'Data cleansing of spreadsheet files is a data management process used to identify, correct, and remove errors, incompleteness, duplicates, or inaccuracies in tables and ranges.',
+        params => $params,
+        returns => 'FileInfo',
+    };
+}
+#
+# @return FileInfo
+#
+sub post_data_cleansing{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FileInfo', $response);
+    return $_response_object;
+}
+
+#
+# PostWorkbookDataDeduplicationRequest
+#
+# Data deduplication of spreadsheet files is mainly used to eliminate duplicate data in tables and ranges.
+# 
+# @name  string (required)    
+# @deduplicationRegion  DeduplicationRegion (required)    
+# @folder  string     
+# @storageName  string     
+# @password  string     
+# @region  string     
+# @checkExcelRestriction  boolean      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorkbookDataDeduplicationRequest',
+            description => 'PostWorkbookDataDeduplication Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_workbook_data_deduplication' } = { 
+    	summary => 'Data deduplication of spreadsheet files is mainly used to eliminate duplicate data in tables and ranges.',
+        params => $params,
+        returns => 'FileInfo',
+    };
+}
+#
+# @return FileInfo
+#
+sub post_workbook_data_deduplication{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FileInfo', $response);
+    return $_response_object;
+}
+
+#
+# PostDataDeduplicationRequest
+#
+# Data deduplication of spreadsheet files is mainly used to eliminate duplicate data in tables and ranges.
+# 
+# @dataDeduplicationRequest  DataDeduplicationRequest (required)     
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostDataDeduplicationRequest',
+            description => 'PostDataDeduplication Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_data_deduplication' } = { 
+    	summary => 'Data deduplication of spreadsheet files is mainly used to eliminate duplicate data in tables and ranges.',
+        params => $params,
+        returns => 'FileInfo',
+    };
+}
+#
+# @return FileInfo
+#
+sub post_data_deduplication{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FileInfo', $response);
+    return $_response_object;
+}
+
+#
+# PostWorkbookDataFillRequest
+#
+# Data filling for spreadsheet files is primarily used to fill empty data in tables and ranges.
+# 
+# @name  string (required)    
+# @dataFill  DataFill (required)    
+# @folder  string     
+# @storageName  string     
+# @password  string     
+# @region  string     
+# @checkExcelRestriction  boolean      
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostWorkbookDataFillRequest',
+            description => 'PostWorkbookDataFill Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_workbook_data_fill' } = { 
+    	summary => 'Data filling for spreadsheet files is primarily used to fill empty data in tables and ranges.',
+        params => $params,
+        returns => 'FileInfo',
+    };
+}
+#
+# @return FileInfo
+#
+sub post_workbook_data_fill{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FileInfo', $response);
+    return $_response_object;
+}
+
+#
+# PostDataFillRequest
+#
+# Data filling for spreadsheet files is primarily used to fill empty data in tables and ranges.
+# 
+# @dataFillRequest  DataFillRequest (required)     
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostDataFillRequest',
+            description => 'PostDataFill Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_data_fill' } = { 
+    	summary => 'Data filling for spreadsheet files is primarily used to fill empty data in tables and ranges.',
+        params => $params,
+        returns => 'FileInfo',
+    };
+}
+#
+# @return FileInfo
+#
+sub post_data_fill{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FileInfo', $response);
+    return $_response_object;
+}
+
+#
+# PostDeleteIncompleteRowsRequest
+#
+# Deleting incomplete rows of spreadsheet files is mainly used to eliminate incomplete rows in tables and ranges.
+# 
+# @deleteIncompleteRowsRequest  DeleteIncompleteRowsRequest (required)     
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostDeleteIncompleteRowsRequest',
+            description => 'PostDeleteIncompleteRows Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_delete_incomplete_rows' } = { 
+    	summary => 'Deleting incomplete rows of spreadsheet files is mainly used to eliminate incomplete rows in tables and ranges.',
+        params => $params,
+        returns => 'FileInfo',
+    };
+}
+#
+# @return FileInfo
+#
+sub post_delete_incomplete_rows{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FileInfo', $response);
+    return $_response_object;
+}
+
+#
 # GetWorksheetHyperlinksRequest
 #
 # Retrieve descriptions of hyperlinks in the worksheet.

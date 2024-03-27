@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -23,6 +23,7 @@
          "requires" : {
             "Capture::Tiny" : "0",
             "ExtUtils::MakeMaker" : "0",
+            "FFI::Platypus" : "0",
             "File::ShareDir::Dist::Install" : "0",
             "File::chdir" : "0",
             "Path::Tiny" : "0",
@@ -32,6 +33,7 @@
       "develop" : {
          "recommends" : {
             "Dist::Zilla::Plugin::Author::Plicease::Core" : "0",
+            "Dist::Zilla::Plugin::Author::Plicease::Thanks" : "0",
             "Dist::Zilla::Plugin::Author::Plicease::Upload" : "0",
             "Dist::Zilla::Plugin::InsertExample" : "0",
             "Dist::Zilla::Plugin::MetaNoIndex" : "0",
@@ -148,11 +150,16 @@
          "url" : "git://github.com/PerlFFI/FFI-Platypus-Lang-Go.git",
          "web" : "https://github.com/PerlFFI/FFI-Platypus-Lang-Go"
       },
-      "x_IRC" : "irc://irc.perl.org/#native"
+      "x_IRC" : "irc://irc.perl.org/#native",
+      "x_twitter" : "https://fosstodon.org/@PerlFFI"
    },
-   "version" : "0.02",
-   "x_generated_by_perl" : "v5.37.5",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
+   "version" : "0.03",
+   "x_contributors" : [
+      "Graham Ollis <plicease@cpan.org>",
+      "Graham TerMarsch (GTERMARS)"
+   ],
+   "x_generated_by_perl" : "v5.38.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0
 }

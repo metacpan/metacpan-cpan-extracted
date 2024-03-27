@@ -1,0 +1,73 @@
+use strict;
+use warnings;
+use alienfile;
+
+use Capture::Tiny qw(capture);
+use File::Copy;
+use Path::Tiny;
+
+my %bowtie2_programs = (
+    bowtie2           => 'bowtie2',
+    bowtie2_build     => 'bowtie2-build',
+    bowtie2_inspect   => 'bowtie2-inspect',
+    bowtie2_inspect_l => 'bowtie2-inspect-l',
+    bowtie2_inspect_s => 'bowtie2-inspect-s',
+    bowtie2_align_l   => 'bowtie2-align-l',
+    bowtie2_align_s   => 'bowtie2-align-s',
+    bowtie2_build_l   => 'bowtie2-build-l',
+    bowtie2_build_s   => 'bowtie2-build-s',
+);
+probe sub {
+    ## see if the bowtie2 suite is installed
+    my ( $cmd, $stder ) = capture { system( 'bowtie2', '--help' ) };
+    my $is_bowtie2_installed_installed = $cmd =~ /bowtie/m;
+    print $is_bowtie2_installed_installed
+      ? "The bowtie2 suite is already installed in your system\n"
+      : "The bowtie2 suite is not installed, so will install from source\n";
+    $is_bowtie2_installed_installed ? 'system' : 'share';
+};
+
+share {
+    plugin 'Download::GitHub' => (
+        github_user => 'BenLangmead',
+        github_repo => 'bowtie2',
+        version     => 'v2.5.3',
+    );
+    plugin Extract => 'tar.gz';
+    build [
+        '%{make}',
+ #       '%{make} test',
+    ];
+
+    after 'build' => sub {
+        my ($build) = @_;
+        my $install_root;
+        if ( $build->meta_prop->{destdir} ) {
+            my $destdir = $ENV{DESTDIR};
+            $install_root =
+              Path::Tiny->new( $ENV{DESTDIR}, $build->install_prop->{prefix} );
+        }
+        else {
+            $install_root = Path::Tiny->new( $build->install_prop->{stage} );
+        }
+        my $source_directory = path($build->install_prop->{extract});
+        system "ls -l $source_directory";
+
+        my $binary_dest_directory = path( $install_root, 'bin' );
+        $binary_dest_directory->mkdir;
+        foreach my $key ( keys %bowtie2_programs ) {
+            path( $source_directory, $bowtie2_programs{$key} )->move(
+                path( $binary_dest_directory, $bowtie2_programs{$key} ));
+        }
+
+    };
+};
+
+gather sub {
+    my ($build) = @_;
+    while ( my ( $key, $value ) = each %bowtie2_programs ) {
+        $build->runtime_prop->{command}->{$key} = $value;
+    }
+};
+
+1;

@@ -1,6 +1,6 @@
 package PDL::NDBin;
 # ABSTRACT: Multidimensional binning & histogramming
-$PDL::NDBin::VERSION = '0.026';
+$PDL::NDBin::VERSION = '0.027';
 use strict;
 use warnings;
 use Exporter;
@@ -605,7 +605,7 @@ PDL::NDBin - Multidimensional binning & histogramming
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 
@@ -2238,7 +2238,7 @@ Edward Baudrez <ebaudrez@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Edward Baudrez.
+This software is copyright (c) 2024 by Edward Baudrez.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

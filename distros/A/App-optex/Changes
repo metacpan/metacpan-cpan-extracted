@@ -1,5 +1,9 @@
 Revision history for `optex' command.
 
+v0.99.1 2024-03-22T09:31:18Z
+
+    - Make tabstop configurable in -Mutil::filter module.
+
 v0.99 2024-03-05T01:17:51Z
 
     - Introduce --filter command in -Mutil::argv module.

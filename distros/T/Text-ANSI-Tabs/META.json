@@ -4,7 +4,7 @@
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.20",
+   "generated_by" : "Minilla/v3.1.23",
    "license" : [
       "perl_5"
    ],
@@ -43,7 +43,7 @@
       "runtime" : {
          "requires" : {
             "List::Util" : "1.45",
-            "Text::ANSI::Fold" : "2.19",
+            "Text::ANSI::Fold" : "2.2104",
             "perl" : "v5.14.0"
          }
       },
@@ -57,7 +57,7 @@
    "provides" : {
       "Text::ANSI::Tabs" : {
          "file" : "lib/Text/ANSI/Tabs.pm",
-         "version" : "1.03"
+         "version" : "1.0501"
       }
    },
    "release_status" : "stable",
@@ -72,7 +72,7 @@
          "web" : "https://github.com/tecolicom/Text-ANSI-Tabs"
       }
    },
-   "version" : "1.03",
+   "version" : "1.0501",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

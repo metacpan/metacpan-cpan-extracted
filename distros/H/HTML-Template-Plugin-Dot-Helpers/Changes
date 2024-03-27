@@ -1,5 +1,11 @@
 Revision history for HTML-Template-Plugin-Dot-Helpers
 
+0.07    2024-03-24  Rhesa Rozendaal <rhesa@cpan.org>
+        bump version
+
+0.06    2024-03-24  Rhesa Rozendaal <rhesa@cpan.org>
+        Run number tests under C locale
+
 0.05    2013-01-18  Rhesa Rozendaal <rhesa@cpan.org>
         Fix RT64434
 

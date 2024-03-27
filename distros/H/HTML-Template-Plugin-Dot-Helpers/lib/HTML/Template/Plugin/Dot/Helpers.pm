@@ -1,8 +1,5 @@
 package HTML::Template::Plugin::Dot::Helpers;
-{
-  $HTML::Template::Plugin::Dot::Helpers::VERSION = '0.06';
-}
-
+$HTML::Template::Plugin::Dot::Helpers::VERSION = '0.07';
 use warnings;
 use strict;
 
@@ -21,10 +18,6 @@ __END__
 =head1 NAME
 
 HTML::Template::Plugin::Dot::Helpers - Add useful objects to your templates
-
-=head1 VERSION
-
-version 0.06
 
 =head1 SYNOPSIS
 
@@ -99,3 +92,4 @@ This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
 =cut
+

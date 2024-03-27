@@ -1,3 +1,6 @@
+## 2.2.1
+* Fix auto-refreshing issue. Introduce new parameter for set_access_token_session(). See example script.
+
 ## 2.2.0
 * Add support of Client Credentials Grant
 

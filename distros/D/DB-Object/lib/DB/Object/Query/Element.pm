@@ -1,11 +1,12 @@
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Query/Element.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/07/08
-## Modified 2023/07/08
+## Modified 2024/03/22
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -18,7 +19,7 @@ BEGIN
     use parent qw( Module::Generic );
     use vars qw( $VERSION );
     use Want;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
 
 use strict;
@@ -27,6 +28,7 @@ use warnings;
 sub init
 {
     my $self = shift( @_ );
+    $self->{as_is}          = undef;
     $self->{field}          = undef;
     $self->{format}         = undef;
     $self->{index}          = undef;
@@ -40,6 +42,8 @@ sub init
     $self->SUPER::init( @_ ) || return( $self->pass_error );
     return( $self );
 }
+
+sub as_is { return( shift->_set_get_boolean( 'as_is', @_ ) ); }
 
 sub elements { return( shift->_set_get_object_without_init( 'elements', 'DB::Object::Query::Elements', @_ ) ); }
 
@@ -166,7 +170,7 @@ DB::Object::Query::Element - Database Object Interface
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 
@@ -183,6 +187,21 @@ Takes an hash or hash reference of key-value pairs matching any of the methods b
 Returns a newly instantiated object upon success, or sets an L<error|Module::Generic/error> and return C<undef> or an empty list, depending on the caller's context.
 
 =head1 METHODS
+
+=head2 as_is
+
+Sets or gets the boolean value. If true, then the format specified will be used as-is during execution. This is aimed for value representing SQL functions or other values passed through that the user wants no optimisation.
+
+For example:
+
+    my $tbl = $dbh->some_table || die( "No table found" );
+    $tbl->where( user_id => '?' );
+    my $sth = $tbl->update( updated => \'NOW()' ) || die( $tbl->error );
+    my $rv = $sth->exec( $user_id ) || die( $sth->error );
+
+In the example above, when C<NOW()> was specified as a scalar reference, it indicates we want the value to be used I<as-is>. This would translate to something like:
+
+    UPDATE some_table SET updated = NOW() WHERE user_id = 'b9c01f91-8094-462c-9f49-a0340dc9fcec'
 
 =head2 elements
 

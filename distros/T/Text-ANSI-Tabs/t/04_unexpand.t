@@ -24,6 +24,7 @@ my $pattern = <<"END";
 0       01      01
         0       01
 0123            01
+0123456         01
 01234567        01
                 01
 END
@@ -92,6 +93,8 @@ for (
      [ '一       x' => "一\t x", 'middle+' ],
      [ '一二三  x' =>
        "一二三\tx",'middle' ],
+     [ '一二三_ x' =>
+       "一二三_ x",'middle' ],
      [ '一二三  一二三  x' =>
        "一二三\t一二三\tx",'middle x 2' ],
      [ '一二三四        x' =>
@@ -100,6 +103,44 @@ for (
        "x一二三四\tx", 'wide char on the boundary' ],
      [ 'x一二三四一二三四       x' =>
        "x一二三四一二三四\tx", 'double wide boundary' ],
+    ) {
+
+    my($s, $a, $msg) = @$_;
+
+    if (1) {
+	my $u = ansi_unexpand($s);
+	is($u, $a, $msg)
+	    or warn Dumper $u, $s;
+    }
+
+    if (1) {
+	my $rs = r($a);
+	my $ru = ansi_unexpand(r($s));
+	is($ru, $rs, "$msg (color non-space)")
+	    or warn Dumper $ru, $rs;
+    };
+
+    if (1) {
+	my $opt = { pattern => q/\s+/ };
+	my $rs = r($opt, $a);
+	my $ru = ansi_unexpand(r($opt, $s));
+	is($ru, $rs, "$msg (color space)")
+	    or warn Dumper $ru, $rs;
+    }
+
+    if (1) {
+	my $opt = { pattern => q/.+/ };
+	my $rs = r($opt, $a);
+	my $ru = ansi_unexpand(r($opt, $s));
+	is($ru, $rs, "$msg (color all)")
+	    or warn Dumper $ru, $rs;
+    }
+}
+
+Text::ANSI::Tabs->configure(minimum => 1);
+for (
+     [ '一二三_ x' =>
+       "一二三_\tx",'convert single' ],
     ) {
 
     my($s, $a, $msg) = @$_;

@@ -5,7 +5,7 @@
       "Diab Jerius <djerius@cfa.harvard.edu>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -69,7 +69,6 @@
             "Dist::Zilla::Plugin::Test::PodSpelling" : "0",
             "Dist::Zilla::Plugin::Test::ReportPrereqs" : "0",
             "Dist::Zilla::Plugin::Test::TrailingSpace" : "0",
-            "Dist::Zilla::Plugin::Test::UnusedVars" : "0",
             "Dist::Zilla::Plugin::Test::Version" : "0",
             "Dist::Zilla::PluginBundle::Basic" : "0",
             "Dist::Zilla::PluginBundle::Filter" : "0",
@@ -91,7 +90,6 @@
             "Test::Pod::Coverage" : "1.08",
             "Test::Spelling" : "0.12",
             "Test::TrailingSpace" : "0.0203",
-            "Test::Vars" : "0.015",
             "Test::Version" : "1"
          }
       },
@@ -100,6 +98,7 @@
             "List::Util" : "1.56",
             "POSIX" : "0",
             "Regexp::Common" : "0",
+            "String::Interpolate::RE" : "0",
             "Type::Library" : "0",
             "Type::Tiny" : "2.0",
             "Type::Utils" : "0",
@@ -127,11 +126,11 @@
    "provides" : {
       "CXC::Types::Astro::Coords" : {
          "file" : "lib/CXC/Types/Astro/Coords.pm",
-         "version" : "0.11"
+         "version" : "0.12"
       },
       "CXC::Types::Astro::Coords::Util" : {
          "file" : "lib/CXC/Types/Astro/Coords/Util.pm",
-         "version" : "0.11"
+         "version" : "0.12"
       }
    },
    "release_status" : "stable",
@@ -146,9 +145,9 @@
          "web" : "https://gitlab.com/djerius/cxc-types-astro-coords"
       }
    },
-   "version" : "0.11",
-   "x_generated_by_perl" : "v5.36.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
+   "version" : "0.12",
+   "x_generated_by_perl" : "v5.38.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "GPL-3.0-only"
 }
 

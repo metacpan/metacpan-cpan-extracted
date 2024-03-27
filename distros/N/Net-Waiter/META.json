@@ -39,6 +39,6 @@
          "web" : "https://github.com/cade-vs/perl-net-waiter"
       }
    },
-   "version" : "1.11",
+   "version" : "1.12",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

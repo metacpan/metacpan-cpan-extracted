@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Query.pm
-## Version v0.6.0
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v0.7.0
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2024/01/03
+## Modified 2024/03/22
 ## All rights reserved
 ## 
 ## 
@@ -25,7 +25,7 @@ BEGIN
     use Devel::Confess;
     use Want;
     our $DEBUG = 0;
-    our $VERSION = 'v0.6.0';
+    our $VERSION = 'v0.7.0';
 };
 
 use strict;
@@ -120,7 +120,11 @@ sub binded_types_as_param
     {
         my $elem = shift( @_ );
         my $type;
-        if( $elem && defined( $type = $elem->type ) )
+        if( $elem && $elem->as_is )
+        {
+            return;
+        }
+        elsif( $elem && defined( $type = $elem->type ) )
         {
             $params->push( $type );
         }
@@ -529,6 +533,7 @@ sub format_update
         elsif( ref( $value ) eq 'SCALAR' )
         {
             $elem->format( "$field=$$value" );
+            $elem->as_is(1);
         }
         # Maybe $bind is not enabled, but the user may have manually provided a placeholder, i.e. '?'
         elsif( !$bind )
@@ -2496,7 +2501,7 @@ DB::Object::Query - Query Object
 
 =head1 VERSION
 
-    v0.6.0
+    v0.7.0
 
 =head1 DESCRIPTION
 

@@ -1,0 +1,61 @@
+{
+   "abstract" : "access GCC compiler builtin functions via XS",
+   "author" : [
+      "Andreas Hadjiprocopis <bliako ta cpan.org / andreashad2 ta gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "GCC-Builtins",
+   "no_index" : {
+      "directory" : [
+         "sbin"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.12"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DynaLoader" : "0",
+            "Exporter" : "0",
+            "ExtUtils::MakeMaker" : "7.12",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Benchmark" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hadjiprocopis/perl-gcc-builtins/issues"
+      },
+      "homepage" : "https://metacpan.org/module/GCC::Builtins",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/hadjiprocopis/perl-gcc-builtins",
+         "web" : "https://github.com/hadjiprocopis/perl-gcc-builtins"
+      }
+   },
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

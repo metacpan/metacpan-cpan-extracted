@@ -1,0 +1,17 @@
+Revision history for GCC-Builtins
+
+0.01    2024/03/19 - 15:00
+        First version, released on an unsuspecting world.
+
+0.02    2024/03/19 - 22:00
+        Added a few more builtins.
+        Fixed pod.
+
+0.03    2024/03/20 - 02:00
+        Added more builtins.
+        Added one test file for each builtin function supported.
+        Created benchmarks comparing clz() XS vs PP.
+        Enhanced documentation.
+
+0.04    2024/03/20 - 22:00
+        There are now 36 GCC Builtins functions exported and readily available to Perl.

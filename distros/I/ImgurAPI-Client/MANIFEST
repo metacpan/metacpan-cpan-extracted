@@ -1,0 +1,16 @@
+CHANGES.md
+lib/ImgurAPI/Client.pm
+LICENSE.txt
+Makefile.PL
+MANIFEST
+MYMETA.json
+MYMETA.yml
+README.md
+t/imgurapi.t
+examples/account.pl
+examples/album.pl
+examples/authorize.pl
+examples/comment.ply
+examples/gallery.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

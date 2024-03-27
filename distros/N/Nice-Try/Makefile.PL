@@ -2,9 +2,6 @@ use ExtUtils::MakeMaker;
 use strict;
 use warnings;
 
-# Call 'perldoc ExtUtils::MakeMaker' for details of how to influence
-# the contents of the Makefile that is written.
-
 my %WriteMakefileArgs = (
     NAME                => 'Nice::Try',
     AUTHOR              => 'Jacques Deguest (jack@deguest.jp)',
@@ -18,7 +15,7 @@ my %WriteMakefileArgs = (
     	'Exporter'		=> '5.73',
     	'Filter::Util::Call' => '1.59',
     	'List::Util'    => '1.33',
-    	'PPI'           => '1.277',
+    	'PPI'           => '1.278',
         'PPI::XS'       => '0.910',
     	'Scalar::Util'	=> '1.50',
     	'Want'          => '0.29',
@@ -27,6 +24,7 @@ my %WriteMakefileArgs = (
     {
         'Test::More'    => '1.302162',
         'Test::Pod'     => '1.52',
+        'experimental'  => '0.020',
     },
     LICENSE				=> 'perl_5',
     MIN_PERL_VERSION	=> 'v5.16.0',

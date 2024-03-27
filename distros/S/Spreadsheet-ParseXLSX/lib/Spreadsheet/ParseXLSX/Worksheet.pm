@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Scalar::Util ();
 
-our $VERSION = '0.34'; # VERSION
+our $VERSION = '0.35'; # VERSION
 
 # ABSTRACT: wrapper class around L<Spreadsheet::ParseExcel::Worksheet>
 
@@ -19,7 +19,7 @@ our %_registry;
 
 
 sub new {
-  my $self = shift->next::method(@_);
+  my $self = shift->SUPER::new(@_);
 
   Scalar::Util::weaken($_registry{Scalar::Util::refaddr($self)} = $self);
 
@@ -45,7 +45,7 @@ Spreadsheet::ParseXLSX::Worksheet - wrapper class around L<Spreadsheet::ParseExc
 
 =head1 VERSION
 
-version 0.34
+version 0.35
 
 =head1 DESCRIPTION
 

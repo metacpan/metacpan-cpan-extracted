@@ -4,294 +4,327 @@ package SPVM::Sys::IO::Stat;
 
 =head1 Name
 
-SPVM::Sys::IO::Stat - The stat Functions and The struct stat in C language
-
-=head1 Usage
-  
-  use Sys::IO::Stat;
-  
-  my $file = "foo.txt";
-  my $stat = Sys::IO::Stat->new($file);
-  
-  my $st_mode = $stat->st_mode;
-  my $st_size = $stat->st_size;
-  
-  # More native
-  my $stat = Sys::IO::Stat->new;
-  Sys::IO::Stat->stat($file, $stat);
-  Sys::IO::Stat->lstat($file, $stat);
+SPVM::Sys::IO::Stat - struct stat in the C language
 
 =head1 Description
 
-C<Sys::IO::Stat> is the class for the C<struct stat> in C<C language>.
+The Sys::IO::Stat class in L<SPVM> represents C<struct stat> in the C language, and has utility methods for the structure.
 
-This is a L<pointer class|SPVM::Document::Language/"Pointer Class">.
+=head1 Usage
+
+  use Sys::IO::Stat;
+  
+  my $file = "foo.txt";
+  my $stat = Sys::IO::Stat->new;
+  
+  Sys::IO::Stat->stat($file, $stat);
+  
+  Sys::IO::Stat->lstat($file, $stat);
+  
+  my $st_mode = $stat->st_mode;
+  my $st_size = $stat->st_size;
+
+=head1 Details
+
+This class is a pointer class. The pointer the instance has is set to a C<struct stat> object.
 
 =head1 Class Methods
 
 =head2 new
 
-  static method new : Sys::IO::Stat ($path : string = undef, $options : object[] = undef);
+C<static method new : L<Sys::IO::Stat|SPVM::Sys::IO::Stat> ();>
 
-Creates a new C<Sys::IO::Stat> object.
-
-If $path is specified, L</"stat"> is called.
-
-=head2 stat_raw
-
-  static method stat_raw : int ($path : string, $stat : Sys::IO::Stat);
-
-The same as L</"stat">, but even if the return value is C<-1>, an exception will not be thrown.
+Creates a new L<Sys::IO::Stat|SPVM::Sys::IO::Stat> object.
 
 =head2 stat
 
-  static method stat : int ($path : string, $stat : Sys::IO::Stat);
+C<static method stat : int ($path : string, $stat : L<Sys::IO::Stat|SPVM::Sys::IO::Stat>);>
 
-These functions return information about a file. No permissions are required on the file itself, but-in the case of stat() and lstat() - execute (search) permission is required on all of the directories in path that lead to the file.
+Calls the L<stat|https://linux.die.net/man/2/stat> function and returns its return value.
 
-stat() stats the file pointed to by path and fills in buf.
+Exceptions:
 
-See the L<stat|https://linux.die.net/man/2/stat> function in Linux.
+$path must be defined. Otherwise an exception is thrown.
 
-The stat is L<Sys::IO::Stat|SPVM::Sys::IO::Stat> object.
+$stat must be defined. Otherwise an exception is thrown.
 
-=head2 lstat_raw
-
-  static method lstat_raw : int ($path : string, $stat : Sys::IO::Stat);
-
-The same as L</"lstat">, but even if the return value is C<-1>, an exception will not be thrown.
+If the stat function failed, an exception is thrown with C<eval_error_id> set to the basic type ID of the L<Error::System|SPVM::Error::System> class.
 
 =head2 lstat
 
-  static method lstat : int ($path : string, $stat : Sys::IO::Stat);
+C<static method lstat : int ($path : string, $stat : L<Sys::IO::Stat|SPVM::Sys::IO::Stat>);>
 
-These functions return information about a file. No permissions are required on the file itself, but-in the case of stat() and lstat() - execute (search) permission is required on all of the directories in path that lead to the file.
+Calls the L<lstat|https://linux.die.net/man/2/lstat> function and returns its return value.
 
-lstat() is identical to stat(), except that if path is a symbolic link, then the link itself is stat-ed, not the file that it refers to.
+Exceptions:
 
-See the L<lstat|https://linux.die.net/man/2/lstat> function in Linux.
+$path must be defined. Otherwise an exception is thrown.
 
-The stat is L<Sys::IO::Stat|SPVM::Sys::IO::Stat> object.
+$stat must be defined. Otherwise an exception is thrown.
 
-=head2 fstat_raw
-
-  static method fstat_raw : int ($fd : int, $stat : Sys::IO::Stat);
-
-The same as L</"fstat">, but even if the return value is C<-1>, an exception will not be thrown.
+If the lstat function failed, an exception is thrown with C<eval_error_id> set to the basic type ID of the L<Error::System|SPVM::Error::System> class.
 
 =head2 fstat
 
-  static method fstat : int ($fd : int, $stat : Sys::IO::Stat);
+C<static method fstat : int ($fd : int, $stat : L<Sys::IO::Stat|SPVM::Sys::IO::Stat>);>
 
-fstat() is identical to stat(), except that the file to be stat-ed is specified by the file descriptor fd.
+Calls the L<fstat|https://linux.die.net/man/2/fstat> function and returns its return value.
 
-See L<fstat(2) - Linux man page|https://linux.die.net/man/2/fsync> in Linux.
+Exceptions:
 
 The C<$stat> is a L<Sys::IO::Stat|SPVM::Sys::IO::Stat> object.
+
+$stat must be defined. Otherwise an exception is thrown.
+
+If the stat function failed, an exception is thrown with C<eval_error_id> set to the basic type ID of the L<Error::System|SPVM::Error::System> class.
 
 =head1 Instance Methods
 
 =head2 DESTROY
 
-  method DESTROY : void ();
+C<method DESTROY : void ();>
 
 The destructor.
 
 =head2 st_dev
 
-  method st_dev : int ();
+C<method st_dev : int ();>
 
-Gets C<st_dev>.
+Returns C<st_dev>.
 
 =head2 st_ino
 
-  method st_ino : int ();
+C<method st_ino : int ();>
 
-Gets C<st_ino>.
+Returns C<st_ino>.
 
 =head2 st_mode
 
-  method st_mode : int ();
+C<method st_mode : int ();>
 
-Gets C<st_mode>.
+Returns C<st_mode>.
 
 =head2 st_nlink
 
-  method st_nlink : int ();
+C<method st_nlink : int ();>
 
-Gets C<st_nlink>.
+Returns C<st_nlink>.
 
 =head2 st_uid
 
-  method st_uid : int ();
+C<method st_uid : int ();>
 
-Gets C<st_uid>.
+Returns C<st_uid>.
 
 =head2 st_gid
 
-  method st_gid : int ();
+C<method st_gid : int ();>
 
-Gets C<st_gid>.
+Returns C<st_gid>.
 
 =head2 st_rdev
 
-  method st_rdev : int ();
+C<method st_rdev : int ();>
 
-Gets C<st_rdev>.
+Returns C<st_rdev>.
 
 =head2 st_size
 
-  method st_size : long ();
+C<method st_size : long ();>
 
-Gets C<st_size>.
+Returns C<st_size>.
 
 =head2 st_blksize
 
-  method st_blksize : long ();
+C<method st_blksize : long ();>
 
-Gets C<st_blksize>.
+Returns C<st_blksize>.
 
 =head2 st_blocks
 
-  method st_blocks : long ();
+C<method st_blocks : long ();>
 
-Gets C<st_blocks>.
+Returns C<st_blocks>.
 
 =head2 st_mtime
 
-  method st_mtime : long ();
+C<method st_mtime : long ();>
 
-Gets C<st_mtime>.
+Returns C<st_mtime>.
 
 =head2 st_atime
 
-  method st_atime : long ();
+C<method st_atime : long ();>
 
-Gets C<st_atime>.
+Returns C<st_atime>.
 
 =head2 st_ctime
 
-  method st_ctime : long ();
+C<method st_ctime : long ();>
 
-Gets C<st_ctime>.
+Returns C<st_ctime>.
 
 =head2 st_mtim_tv_nsec
 
-  method st_mtim_tv_nsec : long ();
+C<method st_mtim_tv_nsec : long ();>
 
-Gets C<st_mtim.tv_nsec>.
+Returns C<st_mtim.tv_nsec>.
 
 =head2 st_atim_tv_nsec
 
-  method st_atim_tv_nsec : long ();
+C<method st_atim_tv_nsec : long ();>
 
-Gets C<st_atim.tv_nsec>.
+Returns C<st_atim.tv_nsec>.
 
 =head2 st_ctim_tv_nsec
 
-  method st_ctim_tv_nsec : long ();
+C<method st_ctim_tv_nsec : long ();>
 
-Gets C<st_ctim.tv_nsec>.
+Returns C<st_ctim.tv_nsec>.
 
 =head2 A
 
-  method A : double ();
+C<method A : double ();>
+
+The implementation of the L<A|SPVM::Sys/"A"> method in the Sys class.
 
 =head2 C
 
-  method C : double ();
+C<method C : double ();>
+
+The implementation of the L<C|SPVM::Sys/"C"> method in the Sys class.
 
 =head2 M
 
-  method M : double ();
+C<method M : double ();>
+
+The implementation of the L<M|SPVM::Sys/"M"> method in the Sys class.
 
 =head2 O
 
-  method O : int ();
+C<method O : int ();>
+
+The implementation of the L<O|SPVM::Sys/"O"> method in the Sys class.
 
 =head2 S
 
-  method S : int ();
+C<method S : int ();>
+
+The implementation of the L<S|SPVM::Sys/"S"> method in the Sys class.
 
 =head2 b
 
-  method b : int ();
+C<method b : int ();>
+
+The implementation of the L<b|SPVM::Sys/"b"> method in the Sys class.
 
 =head2 c
 
-  method c : int ();
+C<method c : int ();>
+
+The implementation of the L<c|SPVM::Sys/"c"> method in the Sys class.
 
 =head2 d
 
-  method d : int ();
+C<method d : int ();>
+
+The implementation of the L<d|SPVM::Sys/"d"> method in the Sys class.
 
 =head2 e
 
-  method e : int ();
+C<method e : int ();>
+
+The implementation of the L<e|SPVM::Sys/"e"> method in the Sys class.
 
 =head2 f
 
-  method f : int ();
+C<method f : int ();>
+
+The implementation of the L<f|SPVM::Sys/"f"> method in the Sys class.
 
 =head2 g
 
-  method g : int ();
+C<method g : int ();>
+
+The implementation of the L<g|SPVM::Sys/"g"> method in the Sys class.
 
 =head2 k
 
-  method k : int ();
+C<method k : int ();>
+
+The implementation of the L<k|SPVM::Sys/"k"> method in the Sys class.
 
 =head2 l
 
-  method l : int ();
+C<method l : int ();>
+
+The implementation of the L<l|SPVM::Sys/"l"> method in the Sys class.
 
 =head2 o
 
-  method o : int ();
+C<method o : int ();>
+
+The implementation of the L<o|SPVM::Sys/"o"> method in the Sys class.
 
 =head2 p
 
-  method p : int ();
+C<method p : int ();>
+
+The implementation of the L<p|SPVM::Sys/"p"> method in the Sys class.
 
 =head2 s
 
-  method s : long ();
+C<method s : long ();>
+
+The implementation of the L<s|SPVM::Sys/"s"> method in the Sys class.
 
 =head2 u
 
-  method u : int ();
+C<method u : int ();>
+
+The implementation of the L<u|SPVM::Sys/"u"> method in the Sys class.
 
 =head2 z
 
-  method z : int ();
+C<method z : int ();>
 
-=head2 cando
-
-  method cando : int ($mode : int, $effective : int);
+The implementation of the L<z|SPVM::Sys/"z"> method in the Sys class.
 
 =head2 r
 
-  method r : int ();
+C<method r : int ();>
+
+The implementation of the L<r|SPVM::Sys/"r"> method in the Sys class.
 
 =head2 w
 
-  method w : int ();
+C<method w : int ();>
+
+The implementation of the L<w |SPVM::Sys/"w "> method in the Sys class.
 
 =head2 x
 
-  method x : int ();
+C<method x : int ();>
+
+The implementation of the L<x|SPVM::Sys/"x"> method in the Sys class.
 
 =head2 R
 
-  method R : int ();
+C<method R : int ();>
+
+The implementation of the L<R|SPVM::Sys/"R"> method in the Sys class.
 
 =head2 W
 
-  method W : int ();
+C<method W : int ();>
+
+The implementation of the L<W|SPVM::Sys/"W"> method in the Sys class.
 
 =head2 X
 
-  method X : int ();
+C<method X : int ();>
+
+The implementation of the L<X|SPVM::Sys/"X"> method in the Sys class.
 
 =head1 Copyright & License
 

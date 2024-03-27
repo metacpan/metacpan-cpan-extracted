@@ -98,7 +98,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
     // "aaa $foo bar" is interupted "aaa $foo" . " bar"
     if (compiler->ch_ptr == compiler->next_string_literal_ch_ptr) {
       compiler->next_string_literal_ch_ptr = NULL;
-      var_expansion_state = SPVM_TOKE_C_VAR_EXPANSION_STATE_SECOND_CONCAT;
+      var_expansion_state = SPVM_TOKE_C_VAR_EXPANSION_STATE_SECOND_STRING_CONCAT;
     }
     
     // Current character
@@ -111,7 +111,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           ch = (uint8_t)*compiler->ch_ptr;
           break;
         }
-        case  SPVM_TOKE_C_VAR_EXPANSION_STATE_FIRST_CONCAT: {
+        case  SPVM_TOKE_C_VAR_EXPANSION_STATE_FIRST_STRING_CONCAT: {
           ch = '.';
           break;
         }
@@ -119,7 +119,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           ch = (uint8_t)*compiler->ch_ptr;
           break;
         }
-        case  SPVM_TOKE_C_VAR_EXPANSION_STATE_SECOND_CONCAT: {
+        case  SPVM_TOKE_C_VAR_EXPANSION_STATE_SECOND_STRING_CONCAT: {
           ch = '.';
           break;
         }
@@ -167,15 +167,15 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
       // Cancat
       case '.': {
         // Variable expansion "." before the variable
-        if (var_expansion_state == SPVM_TOKE_C_VAR_EXPANSION_STATE_FIRST_CONCAT) {
+        if (var_expansion_state == SPVM_TOKE_C_VAR_EXPANSION_STATE_FIRST_STRING_CONCAT) {
           compiler->var_expansion_state = SPVM_TOKE_C_VAR_EXPANSION_STATE_VAR;
-          yylvalp->opval = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_CONCAT);
+          yylvalp->opval = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_STRING_CONCAT);
           return '.';
         }
         // Variable expansion second "." after the variable
-        else if (var_expansion_state == SPVM_TOKE_C_VAR_EXPANSION_STATE_SECOND_CONCAT) {
+        else if (var_expansion_state == SPVM_TOKE_C_VAR_EXPANSION_STATE_SECOND_STRING_CONCAT) {
           compiler->var_expansion_state = SPVM_TOKE_C_VAR_EXPANSION_STATE_BEGIN_NEXT_STRING_LITERAL;
-          yylvalp->opval = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_CONCAT);
+          yylvalp->opval = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_STRING_CONCAT);
           return '.';
         }
         else {
@@ -183,14 +183,14 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           if (*compiler->ch_ptr == '=') {
             compiler->ch_ptr++;
             SPVM_OP* op_special_assign = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_SPECIAL_ASSIGN);
-            op_special_assign->flag = SPVM_OP_C_FLAG_SPECIAL_ASSIGN_CONCAT;
+            op_special_assign->flag = SPVM_OP_C_FLAG_SPECIAL_ASSIGN_STRING_CONCAT;
             
             yylvalp->opval = op_special_assign;
             
             return SPECIAL_ASSIGN;
           }
           else {
-            yylvalp->opval = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_CONCAT);
+            yylvalp->opval = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_STRING_CONCAT);
             return '.';
           }
         }
@@ -561,7 +561,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           // ==
           if (*compiler->ch_ptr == '=') {
             compiler->ch_ptr++;
-            SPVM_OP* op = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_NUMERIC_EQ);
+            SPVM_OP* op = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_NUMERIC_COMPARISON_EQ);
             yylvalp->opval = op;
             return NUMEQ;
           }
@@ -720,13 +720,13 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           // <=>
           if (*compiler->ch_ptr == '>') {
             compiler->ch_ptr++;
-            SPVM_OP* op = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_NUMERIC_CMP);
+            SPVM_OP* op = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_NUMERIC_COMPARISON_CMP);
             yylvalp->opval = op;
             return NUMERIC_CMP;
           }
           // <=
           else {
-            SPVM_OP* op = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_NUMERIC_LE);
+            SPVM_OP* op = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_NUMERIC_COMPARISON_LE);
             yylvalp->opval = op;
             return NUMLE;
           }
@@ -734,7 +734,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
         // <
         else {
           compiler->ch_ptr++;
-          SPVM_OP* op = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_NUMERIC_LT);
+          SPVM_OP* op = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_NUMERIC_COMPARISON_LT);
           yylvalp->opval = op;
           return NUMLT;
         }
@@ -786,14 +786,14 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
         // >=
         else if (*compiler->ch_ptr == '=') {
           compiler->ch_ptr++;
-          SPVM_OP* op = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_NUMERIC_GE);
+          SPVM_OP* op = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_NUMERIC_COMPARISON_GE);
           yylvalp->opval = op;
           return NUMGE;
         }
         // >
         else {
           compiler->ch_ptr++;
-          SPVM_OP* op = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_NUMERIC_GT);
+          SPVM_OP* op = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_NUMERIC_COMPARISON_GT);
           yylvalp->opval = op;
           return NUMGT;
         }
@@ -804,7 +804,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
         
         if (*compiler->ch_ptr == '=') {
           compiler->ch_ptr++;
-          SPVM_OP* op = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_NUMERIC_NE);
+          SPVM_OP* op = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_NUMERIC_COMPARISON_NE);
           yylvalp->opval = op;
           return NUMNE;
         }
@@ -936,7 +936,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
               }
               else {
                 string_literal_finished = 1;
-                next_var_expansion_state = SPVM_TOKE_C_VAR_EXPANSION_STATE_FIRST_CONCAT;
+                next_var_expansion_state = SPVM_TOKE_C_VAR_EXPANSION_STATE_FIRST_STRING_CONCAT;
                 
                 // Proceed through a variable expansion and find the position of the next string literal
                 char* next_string_literal_ch_ptr = compiler->ch_ptr + 1;
@@ -1318,7 +1318,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
         yylvalp->opval = op_constant;
         
         // Next is start from $
-        if (next_var_expansion_state == SPVM_TOKE_C_VAR_EXPANSION_STATE_FIRST_CONCAT) {
+        if (next_var_expansion_state == SPVM_TOKE_C_VAR_EXPANSION_STATE_FIRST_STRING_CONCAT) {
           compiler->var_expansion_state = next_var_expansion_state;
           compiler->ch_ptr--;
         }
@@ -1327,17 +1327,17 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
       }
       case '\\': {
         compiler->ch_ptr++;
-        SPVM_OP* op = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_CREATE_REF);
+        SPVM_OP* op = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_REFERENCE);
         yylvalp->opval = op;
-        return CREATE_REF;
+        return REFERENCE;
       }
       case '$': {
         // A derefernece operator
         if (*(compiler->ch_ptr + 1) == '$') {
           compiler->ch_ptr++;
-          SPVM_OP* op = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_DEREF);
+          SPVM_OP* op = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_DEREFERENCE);
           yylvalp->opval = op;
-          return DEREF;
+          return DEREFERENCE;
         }
         // A exception variable
         else if (*(compiler->ch_ptr + 1) == '@') {
@@ -2021,7 +2021,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   keyword_token = CASE;
                 }
                 else if (strcmp(symbol_name, "cmp") == 0) {
-                  yylvalp->opval = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_STRING_CMP);
+                  yylvalp->opval = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_STRING_COMPARISON_CMP);
                   keyword_token = STRING_CMP;
                 }
                 else if (strcmp(symbol_name, "class") == 0) {
@@ -2079,7 +2079,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   keyword_token = ENUM;
                 }
                 else if (strcmp(symbol_name, "eq") == 0) {
-                  yylvalp->opval = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_STRING_EQ);
+                  yylvalp->opval = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_STRING_COMPARISON_EQ);
                   keyword_token = STREQ;
                 }
                 else if (strcmp(symbol_name, "eval") == 0) {
@@ -2113,11 +2113,11 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
               }
               case 'g' : {
                 if (strcmp(symbol_name, "gt") == 0) {
-                  yylvalp->opval = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_STRING_GT);
+                  yylvalp->opval = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_STRING_COMPARISON_GT);
                   keyword_token = STRGT;
                 }
                 else if (strcmp(symbol_name, "ge") == 0) {
-                  yylvalp->opval = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_STRING_GE);
+                  yylvalp->opval = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_STRING_COMPARISON_GE);
                   keyword_token = STRGE;
                 }
                 break;
@@ -2188,13 +2188,13 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   keyword_token = STRING_LENGTH;
                 }
                 else if (strcmp(symbol_name, "lt") == 0) {
-                  SPVM_OP* op = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_STRING_LT);
+                  SPVM_OP* op = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_STRING_COMPARISON_LT);
                   yylvalp->opval = op;
                   
                   keyword_token = STRLT;
                 }
                 else if (strcmp(symbol_name, "le") == 0) {
-                  SPVM_OP* op = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_STRING_LE);
+                  SPVM_OP* op = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_STRING_COMPARISON_LE);
                   yylvalp->opval = op;
                   
                   keyword_token = STRLE;
@@ -2250,7 +2250,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   keyword_token = ATTRIBUTE;
                 }
                 else if (strcmp(symbol_name, "ne") == 0) {
-                  yylvalp->opval = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_STRING_NE);
+                  yylvalp->opval = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_STRING_COMPARISON_NE);
                   keyword_token = STRNE;
                 }
                 else if (strcmp(symbol_name, "next") == 0) {

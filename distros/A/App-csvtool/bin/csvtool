@@ -55,9 +55,17 @@ $toolpkg or
 @ARGV = ();
 push @ARGV, $cinv->pull_token while defined $cinv->peek_token;
 
-if( $toolpkg->can( "WANT_READER" ) and $toolpkg->WANT_READER ) {
-   my $csv = new_csv();
-   push @args, sub { $csv->getline( \*ARGV ) };
+if( $toolpkg->can( "WANT_READER" ) and my $count = $toolpkg->WANT_READER ) {
+   # TODO: If count is some special token like "*", merge all the files into a
+   # single reader
+   foreach ( 1 .. $count ) {
+      my $path = shift @ARGV;
+      my $fh;
+      $path eq "-" ? $fh = \*STDIN
+                   : open( $fh, "<", $path ) || die "Cannot read $path - $!";
+      my $csv = new_csv();
+      push @args, sub { $csv->getline( $fh ) };
+   }
 }
 
 if( $toolpkg->can( "WANT_OUTPUT" ) and $toolpkg->WANT_OUTPUT ) {
@@ -128,6 +136,28 @@ Output only the first few rows.
 
 Number of lines to output. If negative, will output all but the final few rows
 of the given number.
+
+=head2 join
+
+   $ csvtool join -fFIELD FILE1 FILE2
+
+Reads two files and outputs rows joined by a common key.
+
+The second file is read entirely into memory and indexed by its key field.
+Then the first file is read a row at a time, and each row has the
+corresponding data from the second file appended to it when output.
+
+=head3 --field1, -1
+
+The field index in FILE1 to use as the lookup key.
+
+=head3 --field2, -2
+
+The field index in FILE2 to use as the storage key.
+
+=head3 --field, -f
+
+Use the same field index for both files.
 
 =head2 sort
 

@@ -1,5 +1,5 @@
 package YA::CLI;
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 use Moo;
 
 # ABSTRACT: Yet another CLI framework
@@ -9,6 +9,7 @@ use Getopt::Long;
 use List::Util qw(first);
 use Module::Pluggable::Object;
 
+with 'YA::CLI::PodRole';
 
 sub BUILD_ARGS {
     croak "Please use run()";
@@ -40,7 +41,9 @@ sub _init {
     if ($action && @$args && $args->[0] !~ /^--/) {
         $subaction = shift @$args;
     }
+
     $action //= $class->default_handler;
+    return $class->as_help() if !defined $action;
 
     my $handler = $class->_get_action_handler($action, $subaction);
 
@@ -53,6 +56,10 @@ sub _init {
         else {
             return $handler->as_help(1, "$action $subaction command does not exist!");
         }
+    }
+
+    if ($handler && defined $subaction && !$handler->can('subaction')) {
+        unshift(@$args, $subaction);
     }
 
     return $handler->as_manpage()  if $cli_args{man};
@@ -104,7 +111,12 @@ sub _get_action_handler {
     );
 
     @PLUGINS = $finder->plugins if !@PLUGINS;
-    return first { $_->has_action($action, $subaction) } @PLUGINS;
+    my @found =  grep { $_->has_action($action, $subaction) } @PLUGINS;
+    return unless @found;
+
+    return $found[0] if @found == 1;
+    return first { $_->has_subaction($subaction) == 1 } @found;
+
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -121,7 +133,7 @@ YA::CLI - Yet another CLI framework
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -175,7 +187,8 @@ Override the default search path, defaults to your Your::App namespace.
 
 Defaults to C<main> for your default handler. If this handler cannot be found
 ultimatly falls back to L<YA::CLI::ErrorHandler> which deals with just C<--help>
-and C<--man> commands.
+and C<--man> commands. You can set this value to undef, which in turn will
+display the usage of your script.
 
 =head2 cli_options
 
@@ -189,6 +202,8 @@ default help and man.
 =item * L<YA::CLI::ActionRole>
 
 =item * L<YA::CLI::ErrorHandler>
+
+=item * L<YA::CLI::PodRole>
 
 =item * L<YA::CLI::Usage>
 

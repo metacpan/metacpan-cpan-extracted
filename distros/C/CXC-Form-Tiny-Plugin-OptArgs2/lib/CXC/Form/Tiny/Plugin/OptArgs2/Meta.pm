@@ -6,7 +6,7 @@ use v5.20;
 
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use Clone        ();
 use Scalar::Util qw( blessed );
@@ -218,7 +218,8 @@ sub _inherit_optargs ( $self, $package ) {
             || _match_inherit_optargs( $self->inherit_optargs_match, $package ) ) );
 }
 
-# this has too many arguments
+## no critic( ValuesAndExpressions::ProhibitImplicitNewlines )
+## no critic( Subroutines::ProhibitManyArgs )
 sub _create_options (
     $self, $rename,
     $path      = [],
@@ -251,7 +252,6 @@ sub _create_options (
 
                 if ( defined( my $name = ( $addons->{optargs} // {} )->{name} ) ) {
 
-                    ## no critic (ControlStructures::ProhibitDeepNests)
                     if ( my @fixup = $opt_path->@* ) {
                         my @comp = split( /[.]/, $def->name );
                         splice( @fixup, @fixup - @comp, @comp, $name );
@@ -379,6 +379,9 @@ sub _resolve_type ( $field, $type_set ) {
 
     return $type_set->{Str}
       if index( '|Any|Path|File|Dir|', q{|} . $type->name . q{|} ) != -1;
+
+    return $type_set->{Bool}
+      if $type->name eq 'BoolLike';
 
     while ( defined $type ) {
         return $type_set->{ $type->name } if exists $type_set->{ $type->name };
@@ -533,7 +536,7 @@ CXC::Form::Tiny::Plugin::OptArgs2::Meta - Form metaclass role for OptArgs2
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 DESCRIPTION
 

@@ -1,7 +1,19 @@
 Revision history for PDL-Opt-GLPK
 
-0.03	2024-02-25 20:34 CET
-		Refactoring and cleanup
+0.07    2024-03-26 13:58 CET
+        remove needless depencencies on perl versions
+
+0.06    2024-03-25 18:46 CET
+        use FILENAME_MAX instead of PATH_MAX
+
+0.05    2024-03-24 12:33 CET
+        enforce C99 standard
+ 
+0.04    2024-03-23 13:44 CET
+        Minor tweaks
+
+0.03    2024-02-25 20:34 CET
+        Refactoring and cleanup
 
 0.02    2024-02-22 10:30 CET
         - fixed filename length for output files
@@ -9,4 +21,3 @@ Revision history for PDL-Opt-GLPK
 
 0.01    2024-02-21 21:23 CET
         First version, released on an unsuspecting world.
-

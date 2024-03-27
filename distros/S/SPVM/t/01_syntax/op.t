@@ -30,14 +30,14 @@ use Test::More;
 {
   {
     my $source = 'class MyClass { static method main : void () { {"foo" => 1, "bar"}; } }';
-    compile_not_ok($source, qr/\QThe lenght of the elements in {} of the array initialization must be an even number/);
+    compile_not_ok($source, qr/\QThe length of the elements in {} of the array initialization must be an even number/);
   }
   
   {
     my $source = [
       'class MyClass { static method main : int () { {"foo"}; }',
     ];
-    compile_not_ok($source, q|The lenght of the elements in {} of the array initialization must be an even number.|);
+    compile_not_ok($source, q|The length of the elements in {} of the array initialization must be an even number.|);
   }
 }
 
@@ -156,11 +156,6 @@ use Test::More;
   {
     my $source = 'class MyClass : interface_t { required method foo : void (); required method bar : void (); }';
     compile_ok($source);
-  }
-  
-  {
-    my $source = 'class MyClass : interface_t { static method foo : void () { new MyClass; } }';
-    compile_not_ok($source, q|The operand of the new operator cannnot be an interface type.|);
   }
   
 }

@@ -1,5 +1,5 @@
 package Form::Tiny::FieldDefinition;
-$Form::Tiny::FieldDefinition::VERSION = '2.23';
+$Form::Tiny::FieldDefinition::VERSION = '2.24';
 use v5.10;
 use strict;
 use warnings;
@@ -219,9 +219,8 @@ sub validate
 					$class = 'Form::Tiny::Error::NestedFormError';
 
 					my $path = $self->get_name_path;
-					$path = $path->clone->append_path(
-						$self->type->_ft_find_field($exception->field)->get_name_path
-					) if defined $exception->field;
+					$path = $path->clone->append_path(Form::Tiny::Path->from_name($exception->field))
+						if defined $exception->field;
 
 					$exception->set_field($path->join);
 				}

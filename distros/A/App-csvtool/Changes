@@ -1,0 +1,14 @@
+Revision history for App-csvtool
+
+0.02    2024-03-19
+        [CHANGES]
+         * Added a selection of timestamp-related commands: tsort, strftime,
+           strptime
+         * Added `join` command
+         * Accept field index 'u' to cut subcommand to generate extra empty
+           fields
+
+0.01    2023-12-11
+        First version, released on an unsuspecting world.
+
+

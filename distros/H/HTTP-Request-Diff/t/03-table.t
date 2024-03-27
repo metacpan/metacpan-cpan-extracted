@@ -27,7 +27,7 @@ for my $block (@tests) {
     my $reference = $block->{reference};
     my ($name_v)  = $reference =~ m!^(.*?)$!;
     my $actual    = $block->{actual};
-    my $result    = $block->{diff} . "\n";
+    my $result    = $block->{diff};
     my $name      = $block->{name} // $name_v;
 
     my $todo;
@@ -56,6 +56,7 @@ GET /foo HTTP/1.1
 --- diff
 +----------+-----------+--------+
 | Type     | Reference | Actual |
++----------+-----------+--------+
 | uri.path | /         | /foo   |
 +----------+-----------+--------+
 ===
@@ -71,11 +72,14 @@ GET / HTTP/1.1
 --- diff
 +-------------------------+-----------+-----------+
 | Type                    | Reference | Actual    |
++-------------------------+-----------+-----------+
 | headers.Accept-Language | fi        | <missing> |
 +-------------------------+-----------+-----------+
 ===
 --- name
 UTF-8 stuff
+--- todo
+Unicode::GCString is needed for this test to pass
 --- reference
 GET / HTTP/1.1
 Content-Charset: UTF-8
@@ -89,5 +93,6 @@ Umloud
 --- diff
 +-----------------+-----------+--------+
 | Type            | Reference | Actual |
++-----------------+-----------+--------+
 | request.content | Ümloud    | Umloud |
 +-----------------+-----------+--------+

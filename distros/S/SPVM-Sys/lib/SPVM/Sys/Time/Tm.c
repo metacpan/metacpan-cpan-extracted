@@ -8,14 +8,14 @@
 static const char* FILE_NAME = "Sys/Time/Tm.c";
 
 int32_t SPVM__Sys__Time__Tm__new(SPVM_ENV* env, SPVM_VALUE* stack) {
-
-  int32_t e;
   
-  struct tm* st_tm = env->new_memory_stack(env, stack, sizeof(struct tm));
+  int32_t error_id = 0;
   
-  void* obj_tm = env->new_pointer_object_by_name(env, stack, "Sys::Time::Tm", st_tm, &e, __func__, FILE_NAME, __LINE__);
-  if (e) { return e; }
-
+  struct tm* st_tm = env->new_memory_block(env, stack, sizeof(struct tm));
+  
+  void* obj_tm = env->new_pointer_object_by_name(env, stack, "Sys::Time::Tm", st_tm, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
   stack[0].oval = obj_tm;
   
   return 0;
@@ -24,10 +24,9 @@ int32_t SPVM__Sys__Time__Tm__new(SPVM_ENV* env, SPVM_VALUE* stack) {
 int32_t SPVM__Sys__Time__Tm__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_tm = stack[0].oval;
-  if (obj_tm != NULL) {
-    struct tm* st_tm = env->get_pointer(env, stack, obj_tm);
-    env->free_memory_stack(env, stack, st_tm);
-  }
+  
+  struct tm* st_tm = env->get_pointer(env, stack, obj_tm);
+  env->free_memory_block(env, stack, st_tm);
   
   return 0;
 }

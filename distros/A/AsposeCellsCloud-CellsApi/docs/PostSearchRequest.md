@@ -8,7 +8,7 @@ use AsposeCellsCloud::Request::PostSearch;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**file** | **string** | Find content |
+**file** | **string** | File to upload |
 **text** | **string** | Find content |
 **password** | **string** | The password needed to open an Excel file. |
 **sheetname** | **string** | The worksheet name. Locate the specified text content in the worksheet. |

@@ -1,4 +1,8 @@
 Changes
+examples/check_language_639_1_fail.pl
+examples/check_language_639_1_ok.pl
+examples/check_language_639_2_fail.pl
+examples/check_language_639_2_ok.pl
 examples/check_language_fail.pl
 examples/check_language_ok.pl
 inc/Module/Install.pm
@@ -22,5 +26,7 @@ SIGNATURE
 t/Mo-utils-Language/01-use.t
 t/Mo-utils-Language/02-version.t
 t/Mo-utils-Language/03-check_language.t
+t/Mo-utils-Language/04-check_language_639_1.t
+t/Mo-utils-Language/05-check_language_639_2.t
 xt/Mo-utils-Language/01-pod_coverage.t
 xt/Mo-utils-Language/02-pod.t

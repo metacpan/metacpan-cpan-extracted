@@ -4,149 +4,122 @@ package SPVM::Sys::Signal;
 
 =head1 Name
 
-SPVM::Sys::Signal - Signal System Call
+SPVM::Sys::Signal - Signals
+
+=head1 Description
+
+The Sys::Signal class in L<SPVM> has methods to manipulate signals.
 
 =head1 Usage
   
   use Sys::Signal;
   use Sys::Signal::Constant as SIGNAL;
   
-  Sys::Signal->raise(SIGNAL->SIGTERM);
-
   Sys::Signal->kill($process_id, SIGNAL->SIGINT);
-
+  
   Sys::Signal->signal(SIGNAL->SIGTERM, Sys::Signal->SIG_IGN);
-
-=head1 Description
-
-C<Sys::Signal> provides the methods to call the system call for the signal.
-
-=head1 Class Variables
-
-=head2 $SIG_DFL
-
-  our $SIG_DFL : ro Sys::Signal::Handler::Default;
-
-Gets a singlton L<Sys::Signal::Handler::Default|SPVM::Sys::Signal::Handler::Default> object that represents C<SIG_DFL> in C<C Language>.
-
-=head2 $SIG_IGN
-
-  our $SIG_IGN : ro Sys::Signal::Handler::Ignore;
-
-Gets a singlton L<Sys::Signal::Handler::Ignore|SPVM::Sys::Signal::Handler::Ignore> object that represents C<SIG_IGN> in C<C Language>.
-
-=head2 $SIG_MONITOR
-
-  our $SIG_MONITOR : ro Sys::Signal::Handler::Monitor;
-
-Gets a singlton L<Sys::Signal::Handler::Monitor|Sys::Signal::Handler::Monitor> object to monitor signals.
 
 =head1 Class Methods
 
 =head2 raise
 
-  static method raise : int ($sig : int)
+C<static method raise : int ($sig : int)>
 
-The raise() function sends a signal to the calling process or thread.
+Calls the L<raise|https://linux.die.net/man/3/raise> function and returns its return value.
 
-See L<raise(3) - Linux man page|https://linux.die.net/man/3/raise> in Linux.
+See L<Sys::Signal::Constant|SPVM::Sys::Signal::Constant> about constant values given to $sig.
 
-Constant values specified in C<$sig> is defined in L<Sys::Signal::Constant|SPVM::Sys::Signal::Constant>.
+Exceptions:
+
+If the raise function failed, an exception is thrown with C<eval_error_id> set to the basic type ID of the L<Error::System|SPVM::Error::System> class.
 
 =head2 kill
 
-  static method kill : int ($pid : int, $sig : int)
+C<static method kill : int ($pid : int, $sig : int)>
 
-The kill() system call can be used to send any signal to any process group or process.
+Calls the L<kill|https://linux.die.net/man/2/kill> function and returns its return value.
 
-See the L<kill(2) - Linux man page|https://linux.die.net/man/2/kill> in Linux.
+See L<Sys::Signal::Constant|SPVM::Sys::Signal::Constant> about constant values given to $sig.
 
-See L<Sys::Signal::Constant|SPVM::Sys::Signal::Constant> about the signal numbers specified by C<$sig> 
+Exceptions:
 
-Constant values specified in C<$sig> is defined in L<Sys::Signal::Constant|SPVM::Sys::Signal::Constant>.
+If the kill function failed, an exception is thrown with C<eval_error_id> set to the basic type ID of the L<Error::System|SPVM::Error::System> class.
+
+In Windows the following excetpion is thrown. kill is not supported in this system(defined(_WIN32)).
 
 =head2 alarm
 
-  static method alarm : int ($seconds : int)
+C<static method alarm : int ($seconds : int)>
 
-alarm() arranges for a SIGALRM signal to be delivered to the calling process in seconds seconds.
+Calls the L<alarm|https://linux.die.net/man/2/alarm> function and returns its return value.
 
-See L<alarm(2) - Linux man page|https://linux.die.net/man/2/alarm> in Linux.
+Exceptions:
 
-B<Examples:>
+If the alarm function failed, an exception is thrown with C<eval_error_id> set to the basic type ID of the L<Error::System|SPVM::Error::System> class.
 
-  Sys::Signal->reset_monitored_signal(SIGNAL->SIGALRM);
-  
-  Sys::Signal->signal(SIGNAL->SIGALRM, Sys::Signal->SIG_MONITOR);
-  
-  Sys::Signal->alarm(1);
-  
-  while (1) {
-    if (Sys::Signal->check_monitored_signal(SIGNAL->SIGALRM)) {
-      # Do something
-    }
-  }
+In Windows the following excetpion is thrown. alarm is not supported in this system(defined(_WIN32)).
 
 =head2 ualarm
 
-  static method ualarm : int ($usecs : int, $interval : int)
+C<static method ualarm : int ($usecs : int, $interval : int)>
 
-The ualarm() function causes the signal SIGALRM to be sent to the invoking process after (not less than) usecs microseconds. The delay may be lengthened slightly by any system activity or by the time spent processing the call or by the granularity of system timers.
+Calls the L<ualarm|https://linux.die.net/man/3/ualarm> function and returns its return value.
 
-See L<ualarm(3) - Linux man page|https://linux.die.net/man/3/ualarm> in Linux.
+Exceptions:
+
+In Windows the following excetpion is thrown. ualarm is not supported in this system(defined(_WIN32)).
 
 =head2 signal
 
-  static method signal : Sys::Signal::Handler ($signum : int, $handler : Sys::Signal::Handler);
+C<static method signal : L<Sys::Signal::Handler|SPVM::Sys::Signal::Handler> ($signum : int, $handler : L<Sys::Signal::Handler|SPVM::Sys::Signal::Handler>);>
 
-signal() sets the disposition of the signal signum to handler.
+Calls L<signal|https://linux.die.net/man/2/signal> function and creates a signal handler object with its pointer set to the function's return value, and returns it.
 
-See L<signal(2) - Linux man page|https://linux.die.net/man/2/signal> in Linux.
+$handler can be L</"SIG_DFL"> and L</"SIG_IGN">.
 
-Constant values specified in C<$signum> is defined in L<Sys::Signal::Constant|SPVM::Sys::Signal::Constant>.
+See L<Sys::Signal::Constant|SPVM::Sys::Signal::Constant> about constant values given to $sig.
 
-The C<$handler> is a L<Sys::Signal::Handler|SPVM::Sys::Signal::Handler> object.
+Exceptions:
 
-The well known L<Sys::Signal::Handler|SPVM::Sys::Signal::Handler> classes are L<Sys::Signal::Handler::Default|SPVM::Sys::Signal::Handler::Default>, L<Sys::Signal::Handler::Ignore|SPVM::Sys::Signal::Handler::Ignore>, L<Sys::Signal::Handler::Monitor|SPVM::Sys::Signal::Handler::Monitor>, and L<Sys::Signal::Handler::Unknown|SPVM::Sys::Signal::Handler::Unknown>.
+$handler must be defined. Otherwise an exception is thrown.
 
-B<Examples:>
+If the signal function failed, an exception is thrown with C<eval_error_id> set to the basic type ID of the L<Error::System|SPVM::Error::System> class.
 
-  # SIG_DFL
-  Sys::Signal->signal(SIGNAL->SIGINT, Sys::Signal->SIG_DFL);
-  
-  # SIG_IGN
-  Sys::Signal->signal(SIGNAL->SIGINT, Sys::Signal->SIG_IGN);
-  
-  # Monitor signal
-  Sys::Signal->reset_monitored_signal(SIGNAL->SIGTERM);
+=head2 SIG_DFL
 
-  my $old_handler = Sys::Signal->signal(SIGNAL->SIGTERM, Sys::Signal->SIG_MONITOR);
-  
-  Sys::Signal->raise(SIGNAL->SIGTERM);
-  
-  while (1) {
-    if (Sys::Signal->check_monitored_signal(SIGNAL->SIGTERM)) {
-      # Do something
-    }
-  }
+C<static method SIG_DFL : L<Sys::Signal::Handler|SPVM::Sys::Signal::Handler> ();>
 
-=head2 reset_monitored_signal
+Creates a new signal handler that represents C<SIG_DFL>.
 
-  static method reset_monitored_signal : void ($signum : int);
+=head2 SIG_IGN
 
-Set a monitored signal by monitored L<Sys::Signal::Handler::Monitor|Sys::Signal::Handler::Monitor> to C<0>.
+C<static method SIG_IGN : L<Sys::Signal::Handler|SPVM::Sys::Signal::Handler> ();>
 
-Constant values specified in C<$signum> is defined in L<Sys::Signal::Constant|SPVM::Sys::Signal::Constant>.
+Creates a new signal handler that represents C<SIG_IGN>.
 
-=head2 check_monitored_signal
+=head2 SIG_GO
 
-  static method check_monitored_signal : int ($signum : int);
+C<static method SIG_GO : L<Sys::Signal::Handler|SPVM::Sys::Signal::Handler> ();>
 
-Gets a monitored signal by monitored L<Sys::Signal::Handler::Monitor|Sys::Signal::Handler::Monitor>.
+Creates a new signal handler that represents the signal handler for L<Go::OS::Signal|SPVM::Go::OS::Signal>.
 
-If a signal is received, the monitored signal was set to C<1> by the L<Sys::Signal::Handler::Monitor|Sys::Signal::Handler::Monitor> specified in the L</"signal"> method.
+Do not use this signal handler because this signal handler is prepared to implement the  L<Go::OS::Signal|SPVM::Go::OS::Signal> class.
 
-Constant values specified in C<$signum> is defined in L<Sys::Signal::Constant|SPVM::Sys::Signal::Constant>.
+=head2 SET_SIG_GO_WRITE_FD
+
+C<static method SET_SIG_GO_WRITE_FD : void ($fd : int);>
+
+Set a write file descriptor for L<Go::OS::Signal|SPVM::Go::OS::Signal>.
+
+Do not use this method because this method is prepared to implement the L<Go::OS::Signal|SPVM::Go::OS::Signal> class.
+
+=head1 See Also
+
+=over 2
+
+L<Go::OS::Signal|SPVM::Go::OS::Signal>
+
+=back
 
 =head1 Copyright & License
 

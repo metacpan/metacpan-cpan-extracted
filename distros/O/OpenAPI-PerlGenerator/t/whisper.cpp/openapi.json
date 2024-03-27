@@ -1,0 +1,111 @@
+{
+    "openapi":"3.1.0",
+    "info" : {
+            "title":"Whisper.cpp API"
+            ,"version":"0.1.0"
+    },
+    "servers": [
+        { "url": "http://localhost:8080/" }
+    ],
+    "paths":{
+        "/inference":{
+            "post":{
+                "tags":["inference"],
+                "summary": "Perform inference on a WAV file",
+                "operationId": "inference",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {"$ref":"#/components/schemas/TranscribeFile"}
+                        }
+                    }
+                },
+                "responses":{
+                    "200": {
+                        "description":"Successful response",
+                        "content":{
+                            "application/json": {
+                                "schema": {"$ref":"#/components/schemas/Transcription"}
+                            }
+                        }
+                    },
+                    "default": {
+                        "description":"Error response",
+                        "content":{
+                            "application/json": {
+                                "schema": {"$ref":"#/components/schemas/Error"}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/load":{
+            "post":{
+                "tags":["load"],
+                "summary": "Load a model",
+                "operationId": "load",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": { "$ref" : "#/components/schemas/LoadModel" }
+                        }
+                    }
+                },
+                "responses":{
+                    "200": {
+                        "description":"Successful response",
+                        "content":{
+                            "application/text": {
+                                "schema": {"$ref":"#/components/schemas/SuccessfulLoad"}
+                            }
+                        }
+                    },
+                    "default": {
+                        "description":"Error response",
+                        "content":{
+                            "application/json": {
+                                "schema": {"$ref":"#/components/schemas/Error"}
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components":{
+        "schemas":{
+            "TranscribeFile": {
+                "type": "object",
+                "properties": {
+                    "name": { "type": "string", "in":"form"},
+                    "temperature": {"type": "number", "description": "Temperature"},
+                    "temperature_inc": {"type": "number"},
+                    "response_format": {"type": "string", "default":"json"}
+                },
+                "required": ["name"]
+            },
+            "Transcription":{
+                "properties":{"text":{"type":"string","title":"Text"},"filename":{"type":"string","title":"Filename"}},"type":"object","required":["text","filename"],"title":"Transcription"
+            },
+            "LoadModel": {
+                "type": "object",
+                "properties": {
+                    "model"          : { "description":"Model file", "type":"string"},
+                    "temperature"    : { "description":"Temperature","type":"number"},
+                    "temperature_inc": { "type":"number"},
+                    "response_format": { "description":"Format of the response", "default":"json","type":"string"}
+                },
+                "required": ["model"]
+            },
+            "SuccessfulLoad":{
+                "properties":{"msg":{"type":"string"}},"type":"object"
+            },
+            "Error":{
+                "properties":{"error":{"type":"string"}},"type":"object"
+            }
+        }
+    }
+}

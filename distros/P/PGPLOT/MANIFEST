@@ -1,6 +1,8 @@
 arrays.c
 arrays.h
 CHANGES
+examples/pgplot.pl
+examples/std_pgplot.pl
 HELP
 HINTS.irix
 HINTS.osf
@@ -11,6 +13,14 @@ LICENSE
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
+PDL/Demo.pm
+PDL/Makefile.PL
+PDL/PGPLOT.pm
+PDL/PGPLOTOptions.pm
+PDL/t/pgplot.t
+PDL/Window/Demo.pm
+PDL/Window/Makefile.PL
+PDL/Window/Window.pm
 pgcompatbility.p
 pgfun.c
 PGPLOT.pm

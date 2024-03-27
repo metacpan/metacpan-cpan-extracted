@@ -1,4 +1,6 @@
 package JSON::Relaxed;
+
+use v5.26;
 use strict;
 
 # debug tools
@@ -6,7 +8,7 @@ use strict;
 # use Debug::ShowStuff::ShowVar;
 
 # version
-our $VERSION = '0.05';
+our $VERSION = '0.052';
 
 # global error messages
 our $err_id;
@@ -20,6 +22,17 @@ our $err_msg;
 =head1 NAME
 
 JSON::Relaxed -- An extension of JSON that allows for better human-readability.
+
+=head1 TAKEOVER
+
+New maintainer.
+
+The minimal perl requirement is raised to 5.26 for future features. If
+this fails the takeover will be cancelled and new features will be
+implemented in a different module.
+
+For a look at the future, see:
+L<https://github.com/sciurius/perl-JSON-Relaxed>.
 
 =head1 SYNOPSIS
 

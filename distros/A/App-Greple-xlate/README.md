@@ -11,7 +11,7 @@ App::Greple::xlate - translation support module for greple
 
 # VERSION
 
-Version 0.31
+Version 0.3101
 
 # DESCRIPTION
 
@@ -55,6 +55,20 @@ can be specified by **--xlate-format** option.
 If you want to translate entire text, use **--match-all** option.  This
 is a short-cut to specify the pattern `(?s).+` which matches entire
 text.
+
+Conflict marker format data can be viewed in side-by-side style by
+`sdif` command with `-V` option.  Since it makes no sense to compare
+on a per-string basis, the `--no-cdif` option is recommended.  If you
+do not need to color the text, specify `--no-color` or `--cm
+'TEXT*='`.
+
+    sdif -V --cm '*TEXT=' --no-cdif data_shishin.deepl-EN-US.cm
+
+<div>
+    <p>
+    <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/sdif-cm-view.png">
+    </p>
+</div>
 
 # OPTIONS
 

@@ -1,6 +1,10 @@
 Revision history for Perl module Module::Generic
 
+v0.35.2 2024-03-22T14:13:24+0900
+    - Minor corrections to unit tests
+
 v0.35.1 2024-02-24T21:02:55+0900
+    - Correction of minor bug in Module::Generic::Exception induced by distribution post-processing automation.
 
 v0.35.0 2024-02-24T11:13:54+0900
     - Improved support method _set_get_scalar implementing set/get callbacks

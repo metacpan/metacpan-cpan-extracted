@@ -1,5 +1,9 @@
 Revision history for Perl extension CPAN::Plugin::Sysdeps.
 
+0.77  2024-03-22
+	- support for rpm --whatprovides
+	- new test script rpm.t
+
 0.76  2024-03-10
 	- test fix for t/detect_linux_distribution.t failures @ opensuse
 	- CI updates (opensuse tests)

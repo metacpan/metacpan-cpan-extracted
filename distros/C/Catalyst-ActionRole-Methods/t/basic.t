@@ -47,6 +47,8 @@ use Test::More 0.88;
 
 use Catalyst::Test 'MyApp';
 use HTTP::Request::Common;
+# polyfill for HTTP::Request::Common < 6.21
+BEGIN { defined &OPTIONS or *OPTIONS = sub { ( my $req = &POST )->method( 'OPTIONS' ); $req } }
 
 {
   ok my $res = request(GET '/22');

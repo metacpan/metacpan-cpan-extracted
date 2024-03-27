@@ -1,0 +1,87 @@
+use strict;
+use warnings;
+use alienfile;
+use Carp;
+use Capture::Tiny qw(capture);
+use File::Copy;
+use File::Copy::Recursive qw(dircopy);
+use HTTP::Tiny;
+use Path::Tiny;
+
+my %application_programs = (
+    alimask       => 'alimask',
+    hmmalign      => 'hmmalign',
+    hmmbuild      => 'hmmbuild',
+    hmmconvert    => 'hmmconvert',
+    hmmemit       => 'hmmemit',
+    hmmfetch      => 'hmmfetch',
+    hmmlogo       => 'hmmlogo',
+    hmmpgmd       => 'hmmpgmd',
+    hmmpgmd_shard => 'hmmpgmd_shard',
+    hmmpress      => 'hmmpress',
+    hmmsearch     => 'hmmsearch',
+    hmmsim        => 'hmmsim',
+    hmmstat       => 'hmmstat',
+    jackhmmer     => 'jackhmmer',
+    makehmmerdb   => 'makehmmerdb',
+    nhmmer        => 'nhmmer',
+    nhmmscan      => 'nhmmscan',
+    phmmer        => 'phmmer',
+## Easel minimaps
+    esl_afetch     => 'esl-afetch',
+    esl_alimanip   => 'esl-alimanip',
+    esl_alimap     => 'esl-alimap',
+    asl_alimask    => 'esl-alimask',
+    esl_alimerge   => 'esl-alimerge',
+    esl_alipid     => 'esl-alipid',
+    esl_alirev     => 'esl-alirev',
+    esl_alistat    => 'esl-alistat',
+    esl_compalign  => 'esl-compalign',
+    esl_compstruct => 'esl-compstruct',
+    esl_construct  => 'esl-construct',
+    esl_histplot   => 'esl-histplot',
+    esl_mask       => 'esl-mask',
+    esl_mixdchlet  => 'esl-mixdchlet',
+    esl_reformat   => 'esl-reformat',
+    esl_selectn    => 'esl-selectn',
+    esl_seqrange   => 'esl-seqrange',
+    esl_seqstat    => 'esl-seqstat',
+    esl_sfetch     => 'esl-sfetch',
+    esl_shuffle    => 'esl-shuffle',
+    esl_ssdraw     => 'esl-ssdraw',
+    esl_translate  => 'esl-translate',
+    esl_weight     => 'esl-weight',
+);
+
+probe sub {
+    ## see if the nhmmer suite is installed
+    my ( $cmd, $stder ) = capture { system( 'nhmmer', '-h' ) };
+    my $is_nhmmer_installed_installed = $cmd =~ /HMMER\s+[0-9.]+/m;
+    print $is_nhmmer_installed_installed
+      ? "The HMMER suite is already installed in your system\n"
+      : "The HMMER suite is not installed, so will install from source\n";
+    $is_nhmmer_installed_installed ? 'system' : 'share';
+};
+
+share {
+    start_url 'http://eddylab.org/software/hmmer/hmmer.tar.gz';
+    plugin 'Download';
+    plugin Extract => 'tar.gz';
+    plugin 'Build::Autoconf';
+    plugin 'Gather::IsolateDynamic';
+    build [
+        '%{configure} --prefix=%{.install.prefix}',
+        '%{make}',
+        '%{make} check',
+        '%{make} install',
+        'cd easel',
+        'make install',
+    ];
+};
+
+gather sub {
+    my ($build) = @_;
+    while ( my ( $key, $value ) = each %application_programs ) {
+        $build->runtime_prop->{command}->{$key} = $value;
+    }
+};

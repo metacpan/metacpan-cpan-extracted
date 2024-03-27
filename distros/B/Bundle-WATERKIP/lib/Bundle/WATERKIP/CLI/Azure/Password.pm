@@ -1,5 +1,5 @@
 package Bundle::WATERKIP::CLI::Azure::Password;
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 use Moo;
 use namespace::autoclean;
 with 'YA::CLI::ActionRole';
@@ -95,7 +95,7 @@ Bundle::WATERKIP::CLI::Azure::Password - Get Password JWT
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

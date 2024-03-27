@@ -1,3 +1,0 @@
-class TestUtil::Scope::Guard::Handler : interface_t {
-  required method : void ();
-}

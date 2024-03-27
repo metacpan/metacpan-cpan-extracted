@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::App::CmdLine;
-$Games::Solitaire::Verify::App::CmdLine::VERSION = '0.2500';
+$Games::Solitaire::Verify::App::CmdLine::VERSION = '0.2600';
 use strict;
 use warnings;
 
@@ -189,7 +189,7 @@ command line app for verifying the solutions of Solitaire games.
 
 =head1 VERSION
 
-version 0.2500
+version 0.2600
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,17 @@
+0.003   2024-02-25  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename module/dist Sah-Schema{s,Bundle}-Bool following rename of
+          Sah-Schema{s,Bundle} (for visual clarity and consistency with
+          naming of other bundles).
+
+
+0.002   2022-09-25  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [ux] Tweak Abstracts (give example).
+
+
+0.001   2017-11-01  Released-By: PERLANCAR
+
+        - First release.

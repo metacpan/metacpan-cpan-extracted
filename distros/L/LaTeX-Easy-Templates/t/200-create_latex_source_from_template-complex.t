@@ -11,7 +11,7 @@ use lib 'blib/lib';
 
 #use utf8;
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 use Test::More;
 use Test::More::UTF8;

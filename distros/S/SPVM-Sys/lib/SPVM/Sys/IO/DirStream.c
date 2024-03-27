@@ -8,17 +8,16 @@
 #include <errno.h>
 #include <dirent.h>
 
-const char* FILE_NAME = "Sys/IO/DirStream.c";
+static const char* FILE_NAME = "Sys/IO/DirStream.c";
 
 int32_t SPVM__Sys__IO__DirStream__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
   
-  int32_t e = 0;
+  int32_t error_id = 0;
   
-  // File handle
   void* obj_self = stack[0].oval;
   
-  int32_t closed = env->get_field_byte_by_name(env, stack, obj_self, "closed", &e, __func__, FILE_NAME, __LINE__);
-  if (e) { return e; }
+  int32_t closed = env->get_field_byte_by_name(env, stack, obj_self, "closed", &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
   
   DIR* dir_stream = (DIR*)env->get_pointer(env, stack, obj_self);
   

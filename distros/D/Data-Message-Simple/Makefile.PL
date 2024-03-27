@@ -20,7 +20,7 @@ readme_from 'Simple.pm';
 recursive_author_tests('xt');
 requires 'Mo' => 0;
 requires 'Mo::utils' => 0.15;
-requires 'Mo::utils::Language' => 0.04;
+requires 'Mo::utils::Language' => 0.05;
 requires 'Readonly' => 0;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Data-Message-Simple/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Data-Message-Simple';
@@ -28,7 +28,7 @@ resources 'repository' => 'git://github.com/michal-josef-spacek/Data-Message-Sim
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.03';
+version '0.04';
 
 # Run.
 WriteAll();

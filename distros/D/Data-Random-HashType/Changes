@@ -1,3 +1,14 @@
+0.05 2024-03-22T19:10:24+01:00
+ - Parameter 'num_generated' rewrite to use check_required().
+ - Update to Data::HashType@0.05 without 'active' parameter.
+
+0.04 2024-03-22T16:08:10+01:00
+ - Add tests for valid_from.
+ - Regen documentation and example.
+
+0.03 2024-03-19T13:59:34+01:00
+ - Add support for Data::HashType@0.04.
+
 0.02 2024-03-14T03:00:05+01:00
  - Add 'id' and 'cb_id' parameters.
  - Add constructor checks.

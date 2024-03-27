@@ -1,0 +1,11 @@
+\documentclass[letterpaper,twoside,12pt]{article}
+\begin{document}
+
+: include "preamble.tex.tx" {data => $data};
+
+: for [1, 2, 3] -> $i {
+  \section{Content for section <: $i :>}
+  : include "content.tex.tx" {data => $data};
+: }
+
+\end{document}

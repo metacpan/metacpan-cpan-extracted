@@ -1,0 +1,8 @@
+0.002   2023-11-09  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename module/dist: Dist::Zilla::Role::Get{Shared,Dist}FileURL.
+
+
+0.001   2020-06-18  Released-By: PERLANCAR
+
+        - First release.

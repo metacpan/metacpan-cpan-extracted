@@ -1,7 +1,7 @@
 site_name: 'Pheno-Ranker Documentation'
 site_description: 'Pheno-Ranker Documentation'
 site_author: 'Manuel Rueda, PhD'
-copyright: '&copy; Copyright 2023, Manuel Rueda, CNAG'
+copyright: '&copy; Copyright 2023-2024, Manuel Rueda, CNAG'
 repo_name: 'Pheno-Ranker'
 repo_url: https://github.com/mrueda/pheno-ranker
 edit_uri: edit/main/docs/
@@ -79,21 +79,23 @@ nav:
       - Cohort mode: cohort.md 
       - Patient mode: patient.md
   - Utilities:
-      - BFF/PXF simulator: simulator.md 
+      - BFF/PXF plot: bff-pxf-plot.md 
+      - BFF/PXF simulator: bff-pxf-simulator.md
       - CSV import: csv-import.md
-      - QR generator: qr-generator.md
+      - QR code generator: qr-code-generator.md
   - Technical details:
       - Implementation: implementation.md
-#      - Algorithm: algorithm.md
-#      - Federated version: federated-version.md
+      - Algorithm: algorithm.md
   - Help:
-      - Tutorial: tutorial.md
+      - 'Tutorial: JSON format': tutorial-json-format.md
       - Google colab: https://colab.research.google.com/drive/1n3Etu4fnwuDWNveSMb1SzuN50O2a05Rg#scrollTo=8tbJ0f5-hJAB
       - Usage: usage.md
       - FAQs: faq.md
   - Addendum: 
       - openEHR: open-ehr.md
+      - OMOP-CDM: omop-cdm.md 
       - VCF: vcf.md
+      - Federated version proposal: federated-version-proposal.md
   - About:
       - About: about.md
       - Citation: citation.md

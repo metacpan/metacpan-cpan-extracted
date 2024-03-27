@@ -93,6 +93,7 @@
 
 
 
+
 const char* const* SPVM_OP_C_ID_NAMES(void) {
 
   static const char* const id_names[] = {
@@ -107,6 +108,7 @@ const char* const* SPVM_OP_C_ID_NAMES(void) {
     "EXTENDS",
     "CLASS_BLOCK",
     "END_OF_FILE",
+    "VERSION_DECL",
     "IF",
     "UNLESS",
     "ELSIF",
@@ -124,7 +126,7 @@ const char* const* SPVM_OP_C_ID_NAMES(void) {
     "LOOP_INCREMENT",
     "LAST",
     "NEXT",
-    "MY",
+    "VAR_DECL",
     "FIELD",
     "METHOD",
     "ENUM",
@@ -152,25 +154,31 @@ const char* const* SPVM_OP_C_ID_NAMES(void) {
     "IF_REQUIRE",
     "INIT",
     "INTERFACE",
+    "ALLOW",
+    "DIE",
     "RETURN",
     "CONSTANT",
+    "MINUS",
+    "PLUS",
     "INC",
     "DEC",
     "PRE_INC",
     "POST_INC",
     "PRE_DEC",
     "POST_DEC",
-    "MINUS",
-    "PLUS",
     "ADD",
     "SUBTRACT",
     "MULTIPLY",
     "DIVIDE",
+    "DIVIDE_UNSIGNED_INT",
+    "DIVIDE_UNSIGNED_LONG",
     "BIT_AND",
     "BIT_OR",
     "BIT_XOR",
     "BIT_NOT",
     "MODULO",
+    "MODULO_UNSIGNED_INT",
+    "MODULO_UNSIGNED_LONG",
     "LEFT_SHIFT",
     "RIGHT_ARITHMETIC_SHIFT",
     "RIGHT_LOGICAL_SHIFT",
@@ -179,78 +187,68 @@ const char* const* SPVM_OP_C_ID_NAMES(void) {
     "LOGICAL_NOT",
     "ARRAY_ACCESS",
     "ASSIGN",
-    "CALL_METHOD",
     "FIELD_ACCESS",
     "VAR",
-    "TYPE_CAST",
     "UNDEF",
     "ARRAY_LENGTH",
-    "DIE",
+    "SCALAR",
     "EXCEPTION_VAR",
+    "SPECIAL_ASSIGN",
+    "STRING_LENGTH",
+    "STRING_CONCAT",
+    "CLASS_VAR",
+    "CLASS_VAR_ACCESS",
+    "NUMERIC_COMPARISON_EQ",
+    "NUMERIC_COMPARISON_NE",
+    "NUMERIC_COMPARISON_LT",
+    "NUMERIC_COMPARISON_LE",
+    "NUMERIC_COMPARISON_GT",
+    "NUMERIC_COMPARISON_GE",
+    "NUMERIC_COMPARISON_CMP",
+    "STRING_COMPARISON_EQ",
+    "STRING_COMPARISON_NE",
+    "STRING_COMPARISON_GT",
+    "STRING_COMPARISON_GE",
+    "STRING_COMPARISON_LT",
+    "STRING_COMPARISON_LE",
+    "STRING_COMPARISON_CMP",
+    "ARRAY_FIELD_ACCESS",
     "NEW",
+    "ARRAY_INIT",
+    "WARN",
+    "PRINT",
+    "SAY",
+    "DUMP",
+    "TRUE",
+    "FALSE",
+    "NEW_STRING_LEN",
+    "IS_READ_ONLY",
+    "MAKE_READ_ONLY",
+    "COPY",
+    "TYPE_CAST",
+    "BOOL",
+    "ISA",
+    "ISA_ERROR",
+    "IS_TYPE",
+    "IS_ERROR",
+    "IS_COMPILE_TYPE",
+    "CAN",
+    "BASIC_TYPE_ID",
+    "TYPE_NAME",
+    "COMPILE_TYPE_NAME",
+    "CURRENT_CLASS_NAME",
+    "ARGS_WIDTH",
+    "CALL_METHOD",
     "WEAKEN",
     "WEAKEN_FIELD",
     "UNWEAKEN",
     "UNWEAKEN_FIELD",
     "ISWEAK",
     "ISWEAK_FIELD",
-    "SPECIAL_ASSIGN",
-    "CONCAT",
-    "CLASS_VAR",
-    "CLASS_VAR_ACCESS",
-    "ARRAY_INIT",
-    "BOOL",
-    "CHECK_CONVERT",
-    "NUMERIC_EQ",
-    "NUMERIC_NE",
-    "NUMERIC_LT",
-    "NUMERIC_LE",
-    "NUMERIC_GT",
-    "NUMERIC_GE",
-    "NUMERIC_CMP",
-    "STRING_EQ",
-    "STRING_NE",
-    "STRING_GT",
-    "STRING_GE",
-    "STRING_LT",
-    "STRING_LE",
-    "STRING_CMP",
-    "ISA",
-    "ISA_ERROR",
-    "IS_TYPE",
-    "IS_ERROR",
-    "IS_COMPILE_TYPE",
-    "SEQUENCE",
-    "SCALAR",
-    "ARRAY_FIELD_ACCESS",
     "REFERENCE",
-    "DEREF",
-    "STRING_LENGTH",
-    "CURRENT_CLASS_NAME",
-    "ALLOW",
-    "WARN",
-    "PRINT",
-    "SAY",
-    "TYPE_NAME",
-    "COMPILE_TYPE_NAME",
-    "DUMP",
-    "TRUE",
-    "FALSE",
-    "DIVIDE_UNSIGNED_INT",
-    "DIVIDE_UNSIGNED_LONG",
-    "MODULO_UNSIGNED_INT",
-    "MODULO_UNSIGNED_LONG",
-    "NEW_STRING_LEN",
-    "IS_READ_ONLY",
-    "MAKE_READ_ONLY",
-    "COPY",
-    "CAN",
-    "BASIC_TYPE_ID",
-    "DIE_ERROR_ID",
-    "SET_DIE_ERROR_ID",
+    "DEREFERENCE",
     "EVAL_ERROR_ID",
-    "ARGS_WIDTH",
-    "VERSION",
+    "SEQUENCE",
   };
   
   return id_names;
@@ -1572,10 +1570,7 @@ SPVM_OP* SPVM_OP_build_method_definition(SPVM_COMPILER* compiler, SPVM_OP* op_me
 
     // Add condition_flag variable to first of block
     {
-      char* name = "$.condition_flag";
-      SPVM_OP* op_name = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_NAME, op_list_statement->file, op_list_statement->last->line + 1);
-      op_name->uv.name = name;
-      SPVM_OP* op_var = SPVM_OP_build_var(compiler, op_name);
+      SPVM_OP* op_var = SPVM_OP_new_op_var_condition_flag(compiler, op_list_statement->file, op_list_statement->last->line + 1);
       SPVM_OP* op_var_decl = SPVM_OP_new_op_var_decl(compiler, op_list_statement->file, op_list_statement->last->line + 1);
       SPVM_OP* op_type = SPVM_OP_new_op_int_type(compiler, op_list_statement->file, op_list_statement->line);
       op_var = SPVM_OP_build_var_decl(compiler, op_var_decl, op_var, op_type, NULL);
@@ -1776,18 +1771,18 @@ SPVM_OP* SPVM_OP_build_case_statement(SPVM_COMPILER* compiler, SPVM_OP* op_case_
   if (op_block) {
     SPVM_OP* op_statements = op_block->first;
     if (op_statements) {
-      SPVM_OP* op_last_statement = op_statements->last;
+      SPVM_OP* op_right_operand_statement = op_statements->last;
       
       // Add "break" statement if it doesn't exist
       {
         // No statement
-        if (!op_last_statement) {
+        if (!op_right_operand_statement) {
           SPVM_OP* op_break = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_BREAK, op_statements->file, op_statements->line);
           SPVM_OP_insert_child(compiler, op_statements, op_statements->last, op_break);
         }
         // The last statement is not "break" statement
-        else if (op_last_statement->id != SPVM_OP_C_ID_BREAK) {
-          SPVM_OP* op_break = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_BREAK, op_last_statement->file, op_last_statement->line + 1);
+        else if (op_right_operand_statement->id != SPVM_OP_C_ID_BREAK) {
+          SPVM_OP* op_break = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_BREAK, op_right_operand_statement->file, op_right_operand_statement->line + 1);
           SPVM_OP_insert_child(compiler, op_statements, op_statements->last, op_break);
         }
       }
@@ -1812,7 +1807,7 @@ SPVM_OP* SPVM_OP_build_default_statement(SPVM_COMPILER* compiler, SPVM_OP* op_de
 }
 
 SPVM_OP* SPVM_OP_build_condition(SPVM_COMPILER* compiler, SPVM_OP* op_condition_operand, int32_t is_not) {
-  // Condition
+  
   int32_t id;
   if (is_not) {
     id = SPVM_OP_C_ID_CONDITION_NOT;
@@ -1822,14 +1817,8 @@ SPVM_OP* SPVM_OP_build_condition(SPVM_COMPILER* compiler, SPVM_OP* op_condition_
   }
   SPVM_OP* op_condition = SPVM_OP_new_op(compiler, id, op_condition_operand->file, op_condition_operand->line);
   
-  if (SPVM_OP_is_comparison_op(compiler, op_condition_operand)) {
-    assert(op_condition_operand->moresib == 0);
-    SPVM_OP_insert_child(compiler, op_condition, op_condition->last, op_condition_operand);
-  }
-  else {
-    SPVM_OP* op_assign_bool = SPVM_OP_new_op_assign_bool(compiler, op_condition_operand, op_condition_operand->file, op_condition_operand->line);
-    SPVM_OP_insert_child(compiler, op_condition, op_condition->last, op_assign_bool);
-  }
+  SPVM_OP* op_bool = SPVM_OP_new_op_bool(compiler, op_condition_operand, op_condition_operand->file, op_condition_operand->line);
+  SPVM_OP_insert_child(compiler, op_condition, op_condition->last, op_bool);
   
   return op_condition;
 }
@@ -1925,8 +1914,8 @@ SPVM_OP* SPVM_OP_build_foreach_statement(SPVM_COMPILER* compiler, SPVM_OP* op_fo
   // $.i < $array_length
   SPVM_OP* op_var_init_for_condition = SPVM_OP_clone_op_var(compiler, op_var_init_orig);
   SPVM_OP* op_var_array_length_for_condition = SPVM_OP_clone_op_var(compiler, op_var_array_length_orig);
-  SPVM_OP* op_numlt = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_NUMERIC_LT, op_for->file, op_for->line);
-  SPVM_OP* op_numlt_comparison = SPVM_OP_build_comparison_op(compiler, op_numlt, op_var_init_for_condition, op_var_array_length_for_condition);
+  SPVM_OP* op_numlt = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_NUMERIC_COMPARISON_LT, op_for->file, op_for->line);
+  SPVM_OP* op_numlt_comparison = SPVM_OP_build_binary_op(compiler, op_numlt, op_var_init_for_condition, op_var_array_length_for_condition);
   
   // $.array->[$.i]
   SPVM_OP* op_var_init_for_array_access = SPVM_OP_clone_op_var(compiler, op_var_init_orig);
@@ -2015,21 +2004,19 @@ SPVM_OP* SPVM_OP_build_if_require_statement(SPVM_COMPILER* compiler, SPVM_OP* op
 
 SPVM_OP* SPVM_OP_build_if_statement(SPVM_COMPILER* compiler, SPVM_OP* op_if, SPVM_OP* op_if_operand, SPVM_OP* op_block_true, SPVM_OP* op_block_false, int32_t no_scope) {
   
-  // ELSIF is same as IF
-  int32_t not_condition = 0;
-  
   if (op_if->id == SPVM_OP_C_ID_UNLESS) {
+    SPVM_OP* op_logical_not = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_LOGICAL_NOT, op_if_operand->file, op_if_operand->line);
+    op_if_operand = SPVM_OP_build_logical_not(compiler, op_logical_not, op_if_operand);
     op_if->id = SPVM_OP_C_ID_IF;
-    not_condition = 1;
   }
   else if (op_if->id == SPVM_OP_C_ID_ELSIF) {
     op_if->id = SPVM_OP_C_ID_IF;
   }
   
   // Condition
-  SPVM_OP* op_condition = SPVM_OP_build_condition(compiler, op_if_operand, not_condition);
+  SPVM_OP* op_condition = SPVM_OP_build_condition(compiler, op_if_operand, 0);
   op_condition->flag |= SPVM_OP_C_FLAG_CONDITION_IF;
-
+  
   // Create true block if needed
   if (op_block_true->id != SPVM_OP_C_ID_BLOCK) {
     SPVM_OP* op_not_block = op_block_true;
@@ -2163,7 +2150,7 @@ SPVM_OP* SPVM_OP_build_array_init(SPVM_COMPILER* compiler, SPVM_OP* op_array_ini
   }
   
   if (is_key_value_pairs && length % 2 != 0) {
-    SPVM_COMPILER_error(compiler, "The lenght of the elements in {} of the array initialization must be an even number.\n  at %s line %d", op_list_elements->file, op_list_elements->line);
+    SPVM_COMPILER_error(compiler, "The length of the elements in {} of the array initialization must be an even number.\n  at %s line %d", op_list_elements->file, op_list_elements->line);
     return op_array_init;
   }
   
@@ -2178,8 +2165,8 @@ SPVM_OP* SPVM_OP_build_array_init(SPVM_COMPILER* compiler, SPVM_OP* op_array_ini
   else if (length > 0) {
     {
       SPVM_OP* op_pushmark = op_list_elements->first;
-      SPVM_OP* op_first_element = SPVM_OP_sibling(compiler, op_pushmark);
-      if (op_first_element->id == SPVM_OP_C_ID_UNDEF) {
+      SPVM_OP* op_element_element = SPVM_OP_sibling(compiler, op_pushmark);
+      if (op_element_element->id == SPVM_OP_C_ID_UNDEF) {
         SPVM_COMPILER_error(compiler, "The first element in the array initialization must be defined.\n  at %s line %d", op_array_init->file, op_array_init->line);
         return op_array_init;
       }
@@ -2187,18 +2174,18 @@ SPVM_OP* SPVM_OP_build_array_init(SPVM_COMPILER* compiler, SPVM_OP* op_array_ini
     
     if (is_key_value_pairs) {
       SPVM_OP* op_pushmark = op_list_elements->first;
-      SPVM_OP* op_first_element = SPVM_OP_sibling(compiler, op_pushmark);
+      SPVM_OP* op_element_element = SPVM_OP_sibling(compiler, op_pushmark);
       if (is_key_value_pairs) {
         SPVM_OP* op_type_cast = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE_CAST, op_array_init->file, op_array_init->line);
         SPVM_OP* op_type_for_cast = SPVM_OP_new_op_any_object_type(compiler, op_array_init->file, op_array_init->line);
-        SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_first_element);
-        SPVM_OP_build_type_cast(compiler, op_type_cast, op_type_for_cast, op_first_element, NULL);
+        SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_element_element);
+        SPVM_OP_build_type_cast(compiler, op_type_cast, op_type_for_cast, op_element_element, NULL);
         SPVM_OP_replace_op(compiler, op_stab, op_type_cast);
       }
     }
     
     SPVM_OP* op_pushmark = op_list_elements->first;
-    SPVM_OP* op_first_element = SPVM_OP_sibling(compiler, op_pushmark);
+    SPVM_OP* op_element_element = SPVM_OP_sibling(compiler, op_pushmark);
     
     SPVM_OP* op_sequence = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_SEQUENCE, op_array_init->file, op_array_init->line);
     
@@ -2208,8 +2195,8 @@ SPVM_OP* SPVM_OP_build_array_init(SPVM_COMPILER* compiler, SPVM_OP* op_array_ini
     SPVM_OP* op_var_decl_first_element = SPVM_OP_new_op_var_decl_arg(compiler, op_array_init->file, op_array_init->line);
     op_var_first_element = SPVM_OP_build_var_decl(compiler, op_var_decl_first_element, op_var_first_element, NULL, NULL);
     SPVM_OP* op_assign_first_element = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_array_init->file, op_array_init->line);
-    SPVM_OP_cut_op(compiler, op_first_element);
-    SPVM_OP_build_assign(compiler, op_assign_first_element, op_var_first_element, op_first_element);
+    SPVM_OP_cut_op(compiler, op_element_element);
+    SPVM_OP_build_assign(compiler, op_assign_first_element, op_var_first_element, op_element_element);
     SPVM_OP_insert_child(compiler, op_sequence, op_sequence->last, op_assign_first_element);
     
     // my $array = new $first_element;
@@ -2306,24 +2293,7 @@ SPVM_OP* SPVM_OP_build_can(SPVM_COMPILER* compiler, SPVM_OP* op_can, SPVM_OP* op
   SPVM_OP_insert_child(compiler, op_can, op_can->last, op_var);
   SPVM_OP_insert_child(compiler, op_can, op_can->last, op_name);
   
-  SPVM_OP* op_name_var_condition = SPVM_OP_new_op_name(compiler, "$.condition_flag", op_var->file, op_var->line);
-  SPVM_OP* op_var_condition = SPVM_OP_new_op_var(compiler, op_name_var_condition);
-  SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_var->file, op_var->line);
-  SPVM_OP_build_assign(compiler, op_assign, op_var_condition, op_can);
-  
-  return op_assign;
-}
-
-SPVM_OP* SPVM_OP_build_is_read_only(SPVM_COMPILER* compiler, SPVM_OP* op_is_read_only, SPVM_OP* op_operand) {
-  
-  SPVM_OP_insert_child(compiler, op_is_read_only, op_is_read_only->last, op_operand);
-  
-  SPVM_OP* op_name_var_condition = SPVM_OP_new_op_name(compiler, "$.condition_flag", op_operand->file, op_operand->line);
-  SPVM_OP* op_var_condition = SPVM_OP_new_op_var(compiler, op_name_var_condition);
-  SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_operand->file, op_operand->line);
-  SPVM_OP_build_assign(compiler, op_assign, op_var_condition, op_is_read_only);
-  
-  return op_assign;
+  return op_can;
 }
 
 SPVM_OP* SPVM_OP_build_weaken_field(SPVM_COMPILER* compiler, SPVM_OP* op_weaken, SPVM_OP* op_field_access) {
@@ -2351,13 +2321,8 @@ SPVM_OP* SPVM_OP_build_isweak_field(SPVM_COMPILER* compiler, SPVM_OP* op_isweak,
   SPVM_OP* op_isweak_field = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ISWEAK_FIELD, op_isweak->file, op_isweak->line);
   SPVM_OP_insert_child(compiler, op_isweak_field, op_isweak_field->last, op_field_access);
   op_field_access->flag |= SPVM_OP_C_FLAG_FIELD_ACCESS_ISWEAK;
-
-  SPVM_OP* op_name_var = SPVM_OP_new_op_name(compiler, "$.condition_flag", op_field_access->file, op_field_access->line);
-  SPVM_OP* op_var = SPVM_OP_new_op_var(compiler, op_name_var);
-  SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_field_access->file, op_field_access->line);
-  SPVM_OP_build_assign(compiler, op_assign, op_var, op_field_access);
   
-  return op_assign;
+  return op_field_access;
 }
 
 SPVM_OP* SPVM_OP_build_type_cast(SPVM_COMPILER* compiler, SPVM_OP* op_type_cast, SPVM_OP* op_type, SPVM_OP* op_operand, SPVM_OP* op_attributes) {
@@ -2451,15 +2416,14 @@ SPVM_OP* SPVM_OP_build_call_method(SPVM_COMPILER* compiler, SPVM_OP* op_call_met
   return op_call_method;
 }
 
-SPVM_OP* SPVM_OP_build_unary_op(SPVM_COMPILER* compiler, SPVM_OP* op_unary, SPVM_OP* op_first) {
+SPVM_OP* SPVM_OP_build_unary_op(SPVM_COMPILER* compiler, SPVM_OP* op_unary, SPVM_OP* op_operand) {
   
-  // Build op
-  SPVM_OP_insert_child(compiler, op_unary, op_unary->last, op_first);
+  SPVM_OP_insert_child(compiler, op_unary, op_unary->last, op_operand);
   
   return op_unary;
 }
 
-SPVM_OP* SPVM_OP_build_unary_op_var(SPVM_COMPILER* compiler, SPVM_OP* op_unary, SPVM_OP* op_first) {
+SPVM_OP* SPVM_OP_build_unary_op_var(SPVM_COMPILER* compiler, SPVM_OP* op_unary, SPVM_OP* op_operand) {
   
   const char* op_name = SPVM_OP_get_op_name(compiler, op_unary->id);
   char op_name_lc[16] = {0};
@@ -2470,74 +2434,30 @@ SPVM_OP* SPVM_OP_build_unary_op_var(SPVM_COMPILER* compiler, SPVM_OP* op_unary, 
     }
   }
   
-  if (op_first->id != SPVM_OP_C_ID_VAR) {
-    SPVM_COMPILER_error(compiler, "The operand of the %s operator must be a variable.\n  at %s line %d", op_name_lc, op_first->file, op_first->line);
+  if (op_operand->id != SPVM_OP_C_ID_VAR) {
+    SPVM_COMPILER_error(compiler, "The operand of the %s operator must be a variable.\n  at %s line %d", op_name_lc, op_operand->file, op_operand->line);
   }
   
   // Build op
-  SPVM_OP_insert_child(compiler, op_unary, op_unary->last, op_first);
+  SPVM_OP_insert_child(compiler, op_unary, op_unary->last, op_operand);
   
   return op_unary;
 }
 
-SPVM_OP* SPVM_OP_build_comparison_op(SPVM_COMPILER* compiler, SPVM_OP* op_comparison, SPVM_OP* op_first, SPVM_OP* op_last) {
-
-  SPVM_OP_insert_child(compiler, op_comparison, op_comparison->last, op_first);
-  SPVM_OP_insert_child(compiler, op_comparison, op_comparison->last, op_last);
+SPVM_OP* SPVM_OP_build_binary_op(SPVM_COMPILER* compiler, SPVM_OP* op_bin, SPVM_OP* op_left_operand, SPVM_OP* op_right_operand) {
   
-  SPVM_OP* op_name_var = SPVM_OP_new_op_name(compiler, "$.condition_flag", op_comparison->file, op_comparison->line);
-  SPVM_OP* op_var = SPVM_OP_new_op_var(compiler, op_name_var);
-  SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_comparison->file, op_comparison->line);
-  SPVM_OP_build_assign(compiler, op_assign, op_var, op_comparison);
-  
-  return op_assign;
-}
-
-SPVM_OP* SPVM_OP_build_binary_is(SPVM_COMPILER* compiler, SPVM_OP* op_is, SPVM_OP* op_first, SPVM_OP* op_last) {
-  
-  SPVM_OP_insert_child(compiler, op_is, op_is->last, op_first);
-  SPVM_OP_insert_child(compiler, op_is, op_is->last, op_last);
-  
-  SPVM_OP* op_name_var = SPVM_OP_new_op_name(compiler, "$.condition_flag", op_is->file, op_is->line);
-  SPVM_OP* op_var = SPVM_OP_new_op_var(compiler, op_name_var);
-  SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_is->file, op_is->line);
-  SPVM_OP_build_assign(compiler, op_assign, op_var, op_is);
-  
-  return op_assign;
-}
-
-SPVM_OP* SPVM_OP_build_isa(SPVM_COMPILER* compiler, SPVM_OP* op_isa, SPVM_OP* op_operand, SPVM_OP* op_type) {
-  
-  return SPVM_OP_build_binary_is(compiler, op_isa, op_operand, op_type);
-}
-
-SPVM_OP* SPVM_OP_build_isa_error(SPVM_COMPILER* compiler, SPVM_OP* op_isa_error, SPVM_OP* op_operand, SPVM_OP* op_type) {
-  
-  return SPVM_OP_build_binary_is(compiler, op_isa_error, op_operand, op_type);
-}
-
-SPVM_OP* SPVM_OP_build_is_type(SPVM_COMPILER* compiler, SPVM_OP* op_is_type, SPVM_OP* op_operand, SPVM_OP* op_type) {
-  
-  return SPVM_OP_build_binary_is(compiler, op_is_type, op_operand, op_type);
-}
-
-SPVM_OP* SPVM_OP_build_is_error(SPVM_COMPILER* compiler, SPVM_OP* op_is_error, SPVM_OP* op_operand, SPVM_OP* op_type) {
-  
-  return SPVM_OP_build_binary_is(compiler, op_is_error, op_operand, op_type);
-}
-
-SPVM_OP* SPVM_OP_build_is_compile_type(SPVM_COMPILER* compiler, SPVM_OP* op_is_compile_type, SPVM_OP* op_operand, SPVM_OP* op_compile_type) {
-  
-  return SPVM_OP_build_binary_is(compiler, op_is_compile_type, op_operand, op_compile_type);
-}
-
-SPVM_OP* SPVM_OP_build_binary_op(SPVM_COMPILER* compiler, SPVM_OP* op_bin, SPVM_OP* op_first, SPVM_OP* op_last) {
-  
-  // Build op
-  SPVM_OP_insert_child(compiler, op_bin, op_bin->last, op_first);
-  SPVM_OP_insert_child(compiler, op_bin, op_bin->last, op_last);
+  SPVM_OP_insert_child(compiler, op_bin, op_bin->last, op_left_operand);
+  SPVM_OP_insert_child(compiler, op_bin, op_bin->last, op_right_operand);
   
   return op_bin;
+}
+
+SPVM_OP* SPVM_OP_build_type_check(SPVM_COMPILER* compiler, SPVM_OP* op_is, SPVM_OP* op_operand, SPVM_OP* op_type) {
+  
+  SPVM_OP_insert_child(compiler, op_is, op_is->last, op_operand);
+  SPVM_OP_insert_child(compiler, op_is, op_is->last, op_type);
+  
+  return op_is;
 }
 
 SPVM_OP* SPVM_OP_build_special_assign(SPVM_COMPILER* compiler, SPVM_OP* op_special_assign, SPVM_OP* op_dist, SPVM_OP* op_src) {
@@ -2676,8 +2596,8 @@ SPVM_OP* SPVM_OP_build_special_assign(SPVM_COMPILER* compiler, SPVM_OP* op_speci
           culc_op_id = SPVM_OP_C_ID_BIT_AND;
           break;
         }
-        case SPVM_OP_C_FLAG_SPECIAL_ASSIGN_CONCAT: {
-          culc_op_id = SPVM_OP_C_ID_CONCAT;
+        case SPVM_OP_C_FLAG_SPECIAL_ASSIGN_STRING_CONCAT: {
+          culc_op_id = SPVM_OP_C_ID_STRING_CONCAT;
           break;
         }
         default: {
@@ -2704,7 +2624,7 @@ SPVM_OP* SPVM_OP_build_special_assign(SPVM_COMPILER* compiler, SPVM_OP* op_speci
     SPVM_OP* op_dist_clone = op_var_clone;
     SPVM_OP_build_assign(compiler, op_assign_update, op_dist_clone, op_culc);
   }
-  else if (op_dist->id == SPVM_OP_C_ID_DEREF) {
+  else if (op_dist->id == SPVM_OP_C_ID_DEREFERENCE) {
     SPVM_OP_build_assign(compiler, op_assign_save_old, op_var_old, op_dist);
     SPVM_OP* op_deref = op_dist;
     SPVM_OP* op_var_deref = op_deref->first;
@@ -2837,168 +2757,233 @@ SPVM_OP* SPVM_OP_build_special_assign(SPVM_COMPILER* compiler, SPVM_OP* op_speci
   return op_sequence;
 }
 
-SPVM_OP* SPVM_OP_build_inc(SPVM_COMPILER* compiler, SPVM_OP* op_inc, SPVM_OP* op_first) {
+SPVM_OP* SPVM_OP_build_inc(SPVM_COMPILER* compiler, SPVM_OP* op_inc, SPVM_OP* op_operand) {
   
-  SPVM_OP_insert_child(compiler, op_inc, op_inc->last, op_first);
+  SPVM_OP_insert_child(compiler, op_inc, op_inc->last, op_operand);
   
-  SPVM_OP* op_constant = SPVM_OP_new_op_constant_int(compiler, 1, op_first->file, op_first->line);
-  op_inc = SPVM_OP_build_special_assign(compiler, op_inc, op_first, op_constant);
+  SPVM_OP* op_constant = SPVM_OP_new_op_constant_int(compiler, 1, op_operand->file, op_operand->line);
+  op_inc = SPVM_OP_build_special_assign(compiler, op_inc, op_operand, op_constant);
   
   return op_inc;
 }
 
-SPVM_OP* SPVM_OP_build_dec(SPVM_COMPILER* compiler, SPVM_OP* op_dec, SPVM_OP* op_first) {
+SPVM_OP* SPVM_OP_build_dec(SPVM_COMPILER* compiler, SPVM_OP* op_dec, SPVM_OP* op_operand) {
   
-  SPVM_OP_insert_child(compiler, op_dec, op_dec->last, op_first);
+  SPVM_OP_insert_child(compiler, op_dec, op_dec->last, op_operand);
   
-  SPVM_OP* op_constant = SPVM_OP_new_op_constant_int(compiler, 1, op_first->file, op_first->line);
-  op_dec = SPVM_OP_build_special_assign(compiler, op_dec, op_first, op_constant);
+  SPVM_OP* op_constant = SPVM_OP_new_op_constant_int(compiler, 1, op_operand->file, op_operand->line);
+  op_dec = SPVM_OP_build_special_assign(compiler, op_dec, op_operand, op_constant);
   
   return op_dec;
 }
 
-SPVM_OP* SPVM_OP_build_logical_and(SPVM_COMPILER* compiler, SPVM_OP* op_logical_and, SPVM_OP* op_first, SPVM_OP* op_last) {
+SPVM_OP* SPVM_OP_build_logical_and(SPVM_COMPILER* compiler, SPVM_OP* op_logical_and, SPVM_OP* op_left_operand, SPVM_OP* op_right_operand) {
   
-  // Convert && to if statement
-  /* before
+  /*
+    [Before]
     AND
-      first
-      last
+      left_operand
+      right_operand
   */
   
-  /* after 
-    IF              if1
-      CONDITION
-        first
-      IF            if2
+  /*
+    [After]
+    SEQUENCE                    op_sequence
+      VAR                       op_var
+        VAR_DECL                op_var_decl
+      IF                        op_if_left
         CONDITION
-          last
-        TYPE_CONVERTION_BOOL
-          condition_flag  true
-        TYPE_CONVERTION_BOOL
-          0               false1
-      TYPE_CONVERTION_BOOL
-        0                 false2
+          left_operand
+        IF                      op_if_right
+          CONDITION
+            right_operand
+          ASSIGN                op_assign_true_right
+            VAR_CONDITION_FLAG  op_var_condition_flag_true_right
+            VAR                 op_var_true_right
+          ASSIGN                op_assign_false_right
+            VAR_CONDITION_FLAG  op_var_condition_flag_false_right
+            VAR                 op_var_false_right
+        ASSIGN                  op_assign_true_left
+          VAR_CONDITION_FLAG    op_var_condition_flag_false_left
+          VAR                   op_var_true_left
+      VAR                       op_var_ret
   */
   
-  SPVM_OP* op_if1 = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_IF, op_logical_and->file, op_logical_and->line);
+  SPVM_OP* op_sequence = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_SEQUENCE, op_logical_and->file, op_logical_and->line);
   
-  // Constant true
-  SPVM_OP* op_name_var_true = SPVM_OP_new_op_name(compiler, "$.condition_flag", op_logical_and->file, op_logical_and->line);
-  SPVM_OP* op_var_true = SPVM_OP_new_op_var(compiler, op_name_var_true);
-  SPVM_OP* op_assign_bool_true = SPVM_OP_new_op_assign_bool(compiler, op_var_true, op_if1->file, op_if1->line);
-  
-  // Constant false 1
-  SPVM_OP* op_constant_false1 = SPVM_OP_new_op_constant_int(compiler, 0, op_if1->file, op_if1->line);
-  SPVM_OP* op_assign_bool_false1 = SPVM_OP_new_op_assign_bool(compiler, op_constant_false1, op_if1->file, op_if1->line);
-  
-  // Constant false 2
-  SPVM_OP* op_constant_false2 = SPVM_OP_new_op_constant_int(compiler, 0, op_if1->file, op_if1->line);
-  SPVM_OP* op_assign_bool_false2 = SPVM_OP_new_op_assign_bool(compiler, op_constant_false2, op_if1->file, op_if1->line);
-  
-  // if2
-  SPVM_OP* op_if2 = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_IF, op_if1->file, op_if1->line);
-  
-  // Build if tree
-  int32_t no_scope = 1;
-  SPVM_OP_build_if_statement(compiler, op_if2, op_last, op_assign_bool_true, op_assign_bool_false1, no_scope);
-  SPVM_OP_build_if_statement(compiler, op_if1, op_first, op_if2, op_assign_bool_false2, no_scope);
-
-  SPVM_OP* op_name_var = SPVM_OP_new_op_name(compiler, "$.condition_flag", op_logical_and->file, op_logical_and->line);
+  SPVM_OP* op_name_var = SPVM_OP_new_op_name_tmp_var(compiler, op_logical_and->file, op_logical_and->line);
   SPVM_OP* op_var = SPVM_OP_new_op_var(compiler, op_name_var);
-  SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_logical_and->file, op_logical_and->line);
-  SPVM_OP_build_assign(compiler, op_assign, op_var, op_if1);
+  SPVM_OP* op_type_var = SPVM_OP_new_op_int_type(compiler, op_logical_and->file, op_logical_and->line);
+  SPVM_OP* op_var_decl = SPVM_OP_new_op_var_decl(compiler, op_logical_and->file, op_logical_and->line);
+  SPVM_OP_build_var_decl(compiler, op_var_decl, op_var, op_type_var, NULL);
   
-  return op_assign;
+  SPVM_OP_insert_child(compiler, op_sequence, op_sequence->last, op_var);
+  
+  SPVM_OP* op_var_true_rigth = SPVM_OP_clone_op_var(compiler, op_var);
+  SPVM_OP* op_var_condition_flag_true_right = SPVM_OP_new_op_var_condition_flag(compiler, op_logical_and->file, op_logical_and->line);
+  SPVM_OP* op_assign_true_rigth = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_logical_and->file, op_logical_and->line);
+  SPVM_OP_build_assign(compiler, op_assign_true_rigth, op_var_true_rigth, op_var_condition_flag_true_right);
+  
+  SPVM_OP* op_var_false_right = SPVM_OP_clone_op_var(compiler, op_var);
+  SPVM_OP* op_var_condition_flag_false_right = SPVM_OP_new_op_var_condition_flag(compiler, op_logical_and->file, op_logical_and->line);
+  SPVM_OP* op_assign_false_right = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_logical_and->file, op_logical_and->line);
+  SPVM_OP_build_assign(compiler, op_assign_false_right, op_var_false_right, op_var_condition_flag_false_right);
+  
+  SPVM_OP* op_var_false_left = SPVM_OP_clone_op_var(compiler, op_var);
+  SPVM_OP* op_var_condition_flag_false_left = SPVM_OP_new_op_var_condition_flag(compiler, op_logical_and->file, op_logical_and->line);
+  SPVM_OP* op_assign_false_left = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_logical_and->file, op_logical_and->line);
+  SPVM_OP_build_assign(compiler, op_assign_false_left, op_var_false_left, op_var_condition_flag_false_left);
+  
+  SPVM_OP* op_if_left = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_IF, op_logical_and->file, op_logical_and->line);
+  
+  SPVM_OP* op_if_right = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_IF, op_if_left->file, op_if_left->line);
+  
+  int32_t no_scope = 1;
+  SPVM_OP_build_if_statement(compiler, op_if_right, op_right_operand, op_assign_true_rigth, op_assign_false_right, no_scope);
+  
+  SPVM_OP_build_if_statement(compiler, op_if_left, op_left_operand, op_if_right, op_assign_false_left, no_scope);
+  
+  SPVM_OP_insert_child(compiler, op_sequence, op_sequence->last, op_if_left);
+  
+  SPVM_OP* op_var_ret = SPVM_OP_clone_op_var(compiler, op_var);
+  
+  SPVM_OP_insert_child(compiler, op_sequence, op_sequence->last, op_var_ret);
+  
+  return op_sequence;
 }
 
-SPVM_OP* SPVM_OP_build_logical_or(SPVM_COMPILER* compiler, SPVM_OP* op_logical_or, SPVM_OP* op_first, SPVM_OP* op_last) {
+SPVM_OP* SPVM_OP_build_logical_or(SPVM_COMPILER* compiler, SPVM_OP* op_logical_or, SPVM_OP* op_left_operand, SPVM_OP* op_right_operand) {
   
-  // Convert || to if statement
-  // before
-  //  OR
-  //    first
-  //    last
+  /*
+    [Before]
+    LOGICAL_OR
+      left_operand
+      right_operand
+  */
   
-  // after 
-  //  IF      if1
-  //    first
-  //    TYPE_CONVERTION_BOOL
-  //      condition_flag     true1
-  //    IF    if2
-  //      last
-  //      TYPE_CONVERTION_BOOL
-  //        condition_flag   true2
-  //      TYPE_CONVERTION_BOOL
-  //        0                false
+  /*
+    [After]
+    SEQUENCE                    op_sequence
+      VAR                       op_var
+        VAR_DECL                op_var_decl
+      IF                        op_if_left
+        CONDITION
+          left_operand
+        ASSIGN                  op_assign_true_left
+          VAR_CONDITION_FLAG    op_var_condition_flag_true_left
+          VAR                   op_var_true_left
+        IF                      op_if_right
+          CONDITION
+            right_operand
+          ASSIGN                op_assign_true_right
+            VAR_CONDITION_FLAG  op_var_condition_flag_true_right
+            VAR                 op_var_true_right
+          ASSIGN                op_assign_false_right
+            VAR_CONDITION_FLAG  op_var_condition_flag_false_right
+            VAR                 op_var_false_right
+      VAR                       op_var_ret
+  */
   
-  SPVM_OP* op_if1 = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_IF, op_logical_or->file, op_logical_or->line);
+  SPVM_OP* op_sequence = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_SEQUENCE, op_logical_or->file, op_logical_or->line);
   
-  // Constant true 1
-  SPVM_OP* op_name_var_true1 = SPVM_OP_new_op_name(compiler, "$.condition_flag", op_logical_or->file, op_logical_or->line);
-  SPVM_OP* op_var_true1 = SPVM_OP_new_op_var(compiler, op_name_var_true1);
-  SPVM_OP* op_bool_true1 = SPVM_OP_new_op_assign_bool(compiler, op_var_true1, op_if1->file, op_if1->line);
-  
-  // Constant true 2
-  SPVM_OP* op_name_var_true2 = SPVM_OP_new_op_name(compiler, "$.condition_flag", op_logical_or->file, op_logical_or->line);
-  SPVM_OP* op_var_true2 = SPVM_OP_new_op_var(compiler, op_name_var_true2);
-  SPVM_OP* op_bool_true2 = SPVM_OP_new_op_assign_bool(compiler, op_var_true2, op_if1->file, op_if1->line);
-  
-  // Constant false
-  SPVM_OP* op_constant_false = SPVM_OP_new_op_constant_int(compiler, 0, op_if1->file, op_if1->line);
-  SPVM_OP* op_bool_false = SPVM_OP_new_op_assign_bool(compiler, op_constant_false, op_if1->file, op_if1->line);
-  
-  // if2
-  SPVM_OP* op_if2 = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_IF, op_if1->file, op_if1->line);
-  
-  // Build if tree
-  int32_t no_scope = 1;
-  SPVM_OP_build_if_statement(compiler, op_if2, op_last, op_bool_true2, op_bool_false, no_scope);
-  SPVM_OP_build_if_statement(compiler, op_if1, op_first, op_bool_true1, op_if2, no_scope);
-  
-  SPVM_OP* op_name_var = SPVM_OP_new_op_name(compiler, "$.condition_flag", op_logical_or->file, op_logical_or->line);
+  SPVM_OP* op_name_var = SPVM_OP_new_op_name_tmp_var(compiler, op_logical_or->file, op_logical_or->line);
   SPVM_OP* op_var = SPVM_OP_new_op_var(compiler, op_name_var);
-  SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_logical_or->file, op_logical_or->line);
-  SPVM_OP_build_assign(compiler, op_assign, op_var, op_if1);
+  SPVM_OP* op_type_var = SPVM_OP_new_op_int_type(compiler, op_logical_or->file, op_logical_or->line);
+  SPVM_OP* op_var_decl = SPVM_OP_new_op_var_decl(compiler, op_logical_or->file, op_logical_or->line);
+  SPVM_OP_build_var_decl(compiler, op_var_decl, op_var, op_type_var, NULL);
   
-  return op_assign;
+  SPVM_OP_insert_child(compiler, op_sequence, op_sequence->last, op_var);
+  
+  SPVM_OP* op_var_true_left = SPVM_OP_clone_op_var(compiler, op_var);
+  SPVM_OP* op_var_condition_flag_true_left = SPVM_OP_new_op_var_condition_flag(compiler, op_logical_or->file, op_logical_or->line);
+  SPVM_OP* op_assign_true_left = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_logical_or->file, op_logical_or->line);
+  SPVM_OP_build_assign(compiler, op_assign_true_left, op_var_true_left, op_var_condition_flag_true_left);
+  
+  SPVM_OP* op_var_true_rigth = SPVM_OP_clone_op_var(compiler, op_var);
+  SPVM_OP* op_var_condition_flag_true_right = SPVM_OP_new_op_var_condition_flag(compiler, op_logical_or->file, op_logical_or->line);
+  SPVM_OP* op_assign_true_rigth = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_logical_or->file, op_logical_or->line);
+  SPVM_OP_build_assign(compiler, op_assign_true_rigth, op_var_true_rigth, op_var_condition_flag_true_right);
+  
+  SPVM_OP* op_var_false_right = SPVM_OP_clone_op_var(compiler, op_var);
+  SPVM_OP* op_var_condition_flag_false_right = SPVM_OP_new_op_var_condition_flag(compiler, op_logical_or->file, op_logical_or->line);
+  SPVM_OP* op_assign_false_right = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_logical_or->file, op_logical_or->line);
+  SPVM_OP_build_assign(compiler, op_assign_false_right, op_var_false_right, op_var_condition_flag_false_right);
+  
+  SPVM_OP* op_if_left = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_IF, op_logical_or->file, op_logical_or->line);
+  
+  SPVM_OP* op_if_right = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_IF, op_if_left->file, op_if_left->line);
+  
+  int32_t no_scope = 1;
+  SPVM_OP_build_if_statement(compiler, op_if_right, op_right_operand, op_assign_true_rigth, op_assign_false_right, no_scope);
+  
+  SPVM_OP_build_if_statement(compiler, op_if_left, op_left_operand, op_assign_true_left, op_if_right, no_scope);
+  
+  SPVM_OP_insert_child(compiler, op_sequence, op_sequence->last, op_if_left);
+  
+  SPVM_OP* op_var_ret = SPVM_OP_clone_op_var(compiler, op_var);
+  
+  SPVM_OP_insert_child(compiler, op_sequence, op_sequence->last, op_var_ret);
+  
+  return op_sequence;
 }
 
-SPVM_OP* SPVM_OP_build_logical_not(SPVM_COMPILER* compiler, SPVM_OP* op_not, SPVM_OP* op_first) {
+SPVM_OP* SPVM_OP_build_logical_not(SPVM_COMPILER* compiler, SPVM_OP* op_logical_not, SPVM_OP* op_operand) {
   
-  // Convert ! to if statement
-  // before
-  //  LOGICAL_NOT
-  //    first
+  /*
+    [Before]
+    LOGICAL_NOT
+      first
+  */
   
-  // after 
-  //  IF
-  //    first
-  //    TYPE_CONVERTION_BOOL
-  //      0
-  //    TYPE_CONVERTION_BOOL
-  //      1
+  /*
+    [After]
+    SEQUENCE          op_sequence
+      VAR             op_var
+        VAR_DECL      op_var_decl
+      IF              op_if
+        CONDITION
+          first
+        ASSIGN        op_assign_false
+          CONSTANT 0  op_constant_false
+          VAR         op_var_false
+        ASSIGN        op_assign_true
+          CONSTANT 1  op_constant_true
+          VAR         op_var_true
+      VAR             op_var_ret
+  */
   
-  SPVM_OP* op_if = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_IF, op_not->file, op_not->line);
+  SPVM_OP* op_sequence = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_SEQUENCE, op_logical_not->file, op_logical_not->line);
   
-  // Constant false
-  SPVM_OP* op_constant_false = SPVM_OP_new_op_constant_int(compiler, 0, op_if->file, op_if->line);
-  SPVM_OP* op_assign_bool_false = SPVM_OP_new_op_assign_bool(compiler, op_constant_false, op_if->file, op_if->line);
-
-  // Constant true
-  SPVM_OP* op_constant_true = SPVM_OP_new_op_constant_int(compiler, 1, op_if->file, op_if->line);
-  SPVM_OP* op_assign_bool_true = SPVM_OP_new_op_assign_bool(compiler, op_constant_true, op_if->file, op_if->line);
-  
-  // Build if tree
-  int32_t no_scope = 1;
-  SPVM_OP_build_if_statement(compiler, op_if, op_first, op_assign_bool_false, op_assign_bool_true, no_scope);
-
-  SPVM_OP* op_name_var = SPVM_OP_new_op_name(compiler, "$.condition_flag", op_not->file, op_not->line);
+  SPVM_OP* op_name_var = SPVM_OP_new_op_name_tmp_var(compiler, op_logical_not->file, op_logical_not->line);
   SPVM_OP* op_var = SPVM_OP_new_op_var(compiler, op_name_var);
-  SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_not->file, op_not->line);
-  SPVM_OP_build_assign(compiler, op_assign, op_var, op_if);
+  SPVM_OP* op_type_var = SPVM_OP_new_op_int_type(compiler, op_logical_not->file, op_logical_not->line);
+  SPVM_OP* op_var_decl = SPVM_OP_new_op_var_decl(compiler, op_logical_not->file, op_logical_not->line);
+  SPVM_OP_build_var_decl(compiler, op_var_decl, op_var, op_type_var, NULL);
   
-  return op_assign;
+  SPVM_OP_insert_child(compiler, op_sequence, op_sequence->last, op_var);
+  
+  SPVM_OP* op_if = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_IF, op_logical_not->file, op_logical_not->line);
+  
+  SPVM_OP* op_var_false = SPVM_OP_clone_op_var(compiler, op_var);
+  SPVM_OP* op_constant_false = SPVM_OP_new_op_constant_int(compiler, 0, op_logical_not->file, op_logical_not->line);
+  SPVM_OP* op_assign_false = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_logical_not->file, op_logical_not->line);
+  SPVM_OP_build_assign(compiler, op_assign_false, op_var_false, op_constant_false);
+  
+  SPVM_OP* op_var_true = SPVM_OP_clone_op_var(compiler, op_var);
+  SPVM_OP* op_constant_true = SPVM_OP_new_op_constant_int(compiler, 1, op_logical_not->file, op_logical_not->line);
+  SPVM_OP* op_assign_true = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_logical_not->file, op_logical_not->line);
+  SPVM_OP_build_assign(compiler, op_assign_true, op_var_true, op_constant_true);
+  
+  int32_t no_scope = 1;
+  SPVM_OP_build_if_statement(compiler, op_if, op_operand, op_assign_false, op_assign_true, no_scope);
+  
+  SPVM_OP_insert_child(compiler, op_sequence, op_sequence->last, op_if);
+  
+  SPVM_OP* op_var_ret = SPVM_OP_clone_op_var(compiler, op_var);
+  
+  SPVM_OP_insert_child(compiler, op_sequence, op_sequence->last, op_var_ret);
+  
+  return op_sequence;
 }
 
 SPVM_OP* SPVM_OP_build_assign(SPVM_COMPILER* compiler, SPVM_OP* op_assign, SPVM_OP* op_dist, SPVM_OP* op_src) {
@@ -3060,7 +3045,6 @@ SPVM_OP* SPVM_OP_build_die(SPVM_COMPILER* compiler, SPVM_OP* op_die, SPVM_OP* op
 SPVM_OP* SPVM_OP_build_warn(SPVM_COMPILER* compiler, SPVM_OP* op_warn, SPVM_OP* op_operand) {
   
   if (!op_operand || op_operand->id == SPVM_OP_C_ID_UNDEF) {
-    // Default warn message
     op_operand = SPVM_OP_new_op_constant_string(compiler, "Warning", strlen("Warning"), op_warn->file, op_warn->line);
   }
   
@@ -3157,16 +3141,12 @@ SPVM_OP* SPVM_OP_build_array_type(SPVM_COMPILER* compiler, SPVM_OP* op_type_elem
   return op_type;
 }
 
-SPVM_OP* SPVM_OP_new_op_assign_bool(SPVM_COMPILER* compiler, SPVM_OP* op_operand, const char* file, int32_t line) {
+SPVM_OP* SPVM_OP_new_op_bool(SPVM_COMPILER* compiler, SPVM_OP* op_operand, const char* file, int32_t line) {
+  
   SPVM_OP* op_bool = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_BOOL, file, line);
   SPVM_OP_insert_child(compiler, op_bool, op_bool->last, op_operand);
-
-  SPVM_OP* op_name_var = SPVM_OP_new_op_name(compiler, "$.condition_flag", file, line);
-  SPVM_OP* op_var = SPVM_OP_new_op_var(compiler, op_name_var);
-  SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, file, line);
-  SPVM_OP_build_assign(compiler, op_assign, op_var, op_bool);
   
-  return op_assign;
+  return op_bool;
 }
 
 SPVM_OP* SPVM_OP_new_op_var_decl(SPVM_COMPILER* compiler, const char* file, int32_t line) {
@@ -3244,6 +3224,15 @@ SPVM_OP* SPVM_OP_new_op_var(SPVM_COMPILER* compiler, SPVM_OP* op_name) {
   var->op_name = op_name;
   var->name = op_name->uv.name;
   op_var->uv.var = var;
+  
+  return op_var;
+}
+
+SPVM_OP* SPVM_OP_new_op_var_condition_flag(SPVM_COMPILER* compiler, const char* file, int32_t line) {
+  
+  SPVM_OP* op_name_var = SPVM_OP_new_op_name(compiler, "$.condition_flag", file, line);
+  
+  SPVM_OP* op_var = SPVM_OP_new_op_var(compiler, op_name_var);
   
   return op_var;
 }
@@ -3329,7 +3318,7 @@ SPVM_OP* SPVM_OP_clone_op_array_field_access(SPVM_COMPILER* compiler, SPVM_OP* o
 
 SPVM_OP* SPVM_OP_clone_op_deref(SPVM_COMPILER* compiler, SPVM_OP* op_deref, SPVM_OP* op_var) {
   
-  SPVM_OP* op_deref_clone = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_DEREF, op_deref->file, op_deref->line);
+  SPVM_OP* op_deref_clone = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_DEREFERENCE, op_deref->file, op_deref->line);
   
   SPVM_OP* op_var_clone = SPVM_OP_clone_op_var(compiler, op_var);
   
@@ -3452,12 +3441,6 @@ SPVM_OP* SPVM_OP_new_op_short_type(SPVM_COMPILER* compiler, const char* file, in
 
 SPVM_OP* SPVM_OP_new_op_int_type(SPVM_COMPILER* compiler, const char* file, int32_t line) {
   SPVM_TYPE* type = SPVM_TYPE_new_int_type(compiler);
-  SPVM_OP* op_type = SPVM_OP_new_op_type(compiler, type->unresolved_basic_type_name, type->basic_type, type->dimension, type->flag, file, line);  
-  return op_type;
-}
-
-SPVM_OP* SPVM_OP_new_op_bool_object_type(SPVM_COMPILER* compiler, const char* file, int32_t line) {
-  SPVM_TYPE* type = SPVM_TYPE_new_bool_object_type(compiler);
   SPVM_OP* op_type = SPVM_OP_new_op_type(compiler, type->unresolved_basic_type_name, type->basic_type, type->dimension, type->flag, file, line);  
   return op_type;
 }
@@ -3684,39 +3667,10 @@ int32_t SPVM_OP_is_mutable(SPVM_COMPILER* compiler, SPVM_OP* op) {
     case SPVM_OP_C_ID_CLASS_VAR_ACCESS:
     case SPVM_OP_C_ID_ARRAY_ACCESS:
     case SPVM_OP_C_ID_FIELD_ACCESS:
-    case SPVM_OP_C_ID_DEREF:
+    case SPVM_OP_C_ID_DEREFERENCE:
     case SPVM_OP_C_ID_EXCEPTION_VAR:
     case SPVM_OP_C_ID_ARRAY_FIELD_ACCESS:
       return 1;
-  }
-  
-  return 0;
-}
-
-int32_t SPVM_OP_is_comparison_op(SPVM_COMPILER* compiler, SPVM_OP* op) {
-  
-  switch (op->id) {
-    case SPVM_OP_C_ID_NUMERIC_EQ:
-    case SPVM_OP_C_ID_NUMERIC_NE:
-    case SPVM_OP_C_ID_NUMERIC_GT:
-    case SPVM_OP_C_ID_NUMERIC_GE:
-    case SPVM_OP_C_ID_NUMERIC_LT:
-    case SPVM_OP_C_ID_NUMERIC_LE:
-    case SPVM_OP_C_ID_NUMERIC_CMP:
-    case SPVM_OP_C_ID_STRING_EQ:
-    case SPVM_OP_C_ID_STRING_NE:
-    case SPVM_OP_C_ID_STRING_GT:
-    case SPVM_OP_C_ID_STRING_GE:
-    case SPVM_OP_C_ID_STRING_LT:
-    case SPVM_OP_C_ID_STRING_LE:
-    case SPVM_OP_C_ID_STRING_CMP:
-    case SPVM_OP_C_ID_ISA:
-    case SPVM_OP_C_ID_ISA_ERROR:
-    case SPVM_OP_C_ID_IS_TYPE:
-    case SPVM_OP_C_ID_IS_ERROR:
-    {
-      return 1;
-    }
   }
   
   return 0;

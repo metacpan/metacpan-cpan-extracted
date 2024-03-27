@@ -5,7 +5,7 @@ WriteMakefile(
 	VERSION_FROM => 'lib/Tk/PopList.pm',
 	PREREQ_PM => {
 		'Tk' => 0,
-		'Test::Tk' => '2.02',
+		'Test::Tk' => '3.02',
 	},
 	ABSTRACT_FROM => 'lib/Tk/PopList.pm',
 	AUTHOR => 'Hans Jeuken <hanje at cpan dot org>',
@@ -22,4 +22,5 @@ WriteMakefile(
 		}}) : ()
 	),
 );
+
 

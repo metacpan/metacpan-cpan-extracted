@@ -3,6 +3,9 @@
 
 class Sys::Socket::AddrinfoLinkedList {
   use Sys::Socket::Addrinfo;
+  
+  # Instance Methods
   native method DESTROY : void ();
+  
   native method to_array : Sys::Socket::Addrinfo[] ();
 }

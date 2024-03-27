@@ -7,7 +7,7 @@ use FFI::Go::String;
 use Ref::Util qw( is_blessed_ref );
 
 # ABSTRACT: Go String type for Platypus
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 
 sub ffi_custom_type_api_1
@@ -36,7 +36,7 @@ FFI::Platypus::Type::GoString - Go String type for Platypus
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -65,7 +65,11 @@ outside of Go are not currently supported.
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Graham TerMarsch (GTERMARS)
 
 =head1 COPYRIGHT AND LICENSE
 

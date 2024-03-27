@@ -1,11 +1,13 @@
 use strict;
 use warnings;
 
+use CSS::Struct::Output::Structure;
 use English;
 use Error::Pure::Utils qw(clean err_msg);
 use Tags::HTML::Container;
-use Tags::Output::Raw;
-use Test::More 'tests' => 9;
+use Tags::Output::Structure;
+use Test::MockObject;
+use Test::More 'tests' => 11;
 use Test::NoWarnings;
 
 # Test.
@@ -14,9 +16,36 @@ isa_ok($obj, 'Tags::HTML::Container');
 
 # Test.
 $obj = Tags::HTML::Container->new(
-	'tags' => Tags::Output::Raw->new,
+	'css' => CSS::Struct::Output::Structure->new,
+	'tags' => Tags::Output::Structure->new,
 );
 isa_ok($obj, 'Tags::HTML::Container');
+
+# Test.
+eval {
+	Tags::HTML::Container->new(
+		'css' => 'foo',
+	);
+};
+is(
+	$EVAL_ERROR,
+	"Parameter 'css' must be a 'CSS::Struct::Output::*' class.\n",
+	"Parameter 'css' must be a 'CSS::Struct::Output::*' class (foo).",
+);
+clean();
+
+# Test.
+eval {
+	Tags::HTML::Container->new(
+		'css' => Test::MockObject->new,
+	);
+};
+is(
+	$EVAL_ERROR,
+	"Parameter 'css' must be a 'CSS::Struct::Output::*' class.\n",
+	"Parameter 'css' must be a 'CSS::Struct::Output::*' class (bad instance).",
+);
+clean();
 
 # Test.
 eval {
@@ -34,7 +63,7 @@ clean();
 # Test.
 eval {
 	Tags::HTML::Container->new(
-		'tags' => Tags::HTML::Container->new,
+		'tags' => Test::MockObject->new,
 	);
 };
 is(

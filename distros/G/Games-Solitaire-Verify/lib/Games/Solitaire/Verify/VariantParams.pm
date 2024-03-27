@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::VariantParams;
-$Games::Solitaire::Verify::VariantParams::VERSION = '0.2500';
+$Games::Solitaire::Verify::VariantParams::VERSION = '0.2600';
 use warnings;
 use strict;
 
@@ -173,7 +173,7 @@ the parameters of the variant.
 
 =head1 VERSION
 
-version 0.2500
+version 0.2600
 
 =head1 SYNOPSIS
 

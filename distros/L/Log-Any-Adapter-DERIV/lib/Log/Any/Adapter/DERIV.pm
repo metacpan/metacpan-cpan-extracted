@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:DERIV';    # AUTHORITY
-our $VERSION   = '0.007';
+our $VERSION   = '0.008';
 
 use feature qw(state);
 use parent  qw(Log::Any::Adapter::Coderef);
@@ -663,7 +663,7 @@ sub mask_sensitive {
         qr/\b[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}\b/i,             #Email
         qr/\b(?:token|key|oauth[ _-]?token)\s*[:=]\s*([^\s]+)/i,    #Token or API key , = : value
         qr/(?:a1|r1|ct1)-[a-z0-9]{29}/i,                            #OAuth, Refresh, and CTrader token patterns
-        qr/[a-z0-9]{15}/i,                                          #API Token pattern
+        qr/\b[a-z0-9]{15}\b/i,                                      #API Token
     );
 
     try {

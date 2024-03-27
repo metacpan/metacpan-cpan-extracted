@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object.pm
-## Version v1.1.3
+## Version v1.2.1
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2024/02/15
+## Modified 2024/03/22
 ## All rights reserved
 ## 
 ## 
@@ -35,7 +35,7 @@ BEGIN
     use POSIX ();
     use Want;
     our $PLACEHOLDER_REGEXP = qr/\b\?\b/;
-    our $VERSION = 'v1.1.3';
+    our $VERSION = 'v1.2.1';
     use Devel::Confess;
 };
 
@@ -1179,7 +1179,7 @@ sub table_exists
     # We did not find it, so let's try by checking directly the database
     my $def = $self->table_info( $table );
     return( $self->pass_error ) if( !defined( $def ) );
-    return(0) if( !scalar( keys( %$def ) ) );
+    return(0) if( $self->_is_empty( $def ) );
     return(1);
 }
 
@@ -1921,7 +1921,7 @@ sub _operator_object_create
     my $class = shift( @_ ) || return( $self->error( "No operator class was provided." ) );
     my $q = $self->_reset_query;
     my $args = ( scalar( @_ ) == 1 && ref( $_[0] ) eq 'ARRAY' ) ? [ @{$_[0]} ] : [ @_ ];
-    $self->messagec( 5, "Creating an operator object for class {green}${class}{/} and values '{green}", join( "{/}', '{green}", map( overload::StrVal( $_ ), @$args ) ), "{/}'" );
+    $self->messagec( 5, "Creating an operator object for class {green}${class}{/} and values '{green}" . join( "{/}', '{green}", map( overload::StrVal( $_ ), @$args ) ) . "{/}'" );
     return( $class->new(
         debug => $self->debug,
         query_object => $q,
@@ -2724,7 +2724,7 @@ Because the L<fields objects|DB::Object::Fields::Field> are overloaded, instead 
 
 =head1 VERSION
 
-    v1.1.3
+    v1.2.1
 
 =head1 DESCRIPTION
 

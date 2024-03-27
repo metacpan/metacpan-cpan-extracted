@@ -3,7 +3,7 @@ package Spreadsheet::ParseXLSX::Decryptor;
 use strict;
 use warnings;
 
-our $VERSION = '0.34'; # VERSION
+our $VERSION = '0.35'; # VERSION
 
 # ABSTRACT: helper class to open password protected files
 
@@ -226,7 +226,7 @@ Spreadsheet::ParseXLSX::Decryptor - helper class to open password protected file
 
 =head1 VERSION
 
-version 0.34
+version 0.35
 
 =for Pod::Coverage   new
   open

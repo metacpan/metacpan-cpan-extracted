@@ -55,7 +55,7 @@ use RT::Shredder;
 
 package RT::Extension::MergeUsers;
 
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 =head1 NAME
 
@@ -194,6 +194,9 @@ sub CanonicalizeEmailAddress {
     if ($RT::CanonicalizeEmailAddressMatch && $RT::CanonicalizeEmailAddressReplace ) {
         $address =~ s/$RT::CanonicalizeEmailAddressMatch/$RT::CanonicalizeEmailAddressReplace/gi;
     }
+
+    # Empty emails should not be used to find users
+    return $address unless defined $address && length $address;
 
     # get the user whose email address this is
     my $canonical_user = RT::User->new( $RT::SystemUser );
@@ -663,8 +666,8 @@ sub TweakRoleLimitArgs {
             : $args{FIELD} eq 'EmailAddress' ? 'LoadByEmail'
             :                                  'Load';
         $o->$method( $args{VALUE} );
-        $args{FIELD} = 'id';
         if ( $o->id ) {
+            $args{FIELD} = 'id';
             if ( my $merged_users = $o->FirstAttribute('MergedUsers') ) {
                 $args{VALUE} = [ $o->id, @{ $merged_users->Content } ];
                 $args{OPERATOR} = $is_negative ? 'NOT IN' : 'IN';
@@ -721,7 +724,7 @@ sub TweakRoleLimitArgs {
     *Limit = sub {
         my $self = shift;
         my %args = @_;
-        if (   $args{FIELD} eq 'Owner'
+        if (   ( $args{FIELD} // '' ) eq 'Owner'
             && ( $args{OPERATOR} || '=' ) =~ /^!?=$/
             && $args{VALUE} =~ /^(\d+)$/ )
         {

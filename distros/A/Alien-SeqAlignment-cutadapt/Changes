@@ -1,5 +1,7 @@
 Revision history for Alien-SeqAlignment-cutadapt
 
+0.05      2024-03-23 22:07:34-06:00 America/Denver
+- Updated POD to link to the Bio::SeqAlignment distribution
 0.04      2024-03-16 19:23:46-06:00 America/Denver
 - provided a method to run cutadapt to ensure compatibiity with 
 the Alien tool API

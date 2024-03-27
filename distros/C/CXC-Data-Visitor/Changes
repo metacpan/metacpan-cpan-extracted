@@ -1,0 +1,26 @@
+Revision history for CXC-Data-Visitor
+
+0.03      2024-03-25 16:10:08-04:00 America/New_York
+
+  [API CHANGE]
+
+     * The callback routine now returns enums rather than a Boolean.
+
+  [ENHANCEMENTS]
+
+     * containers may be revisited after being changed
+
+
+0.02      2024-03-24 14:27:10-04:00 America/New_York
+
+  [ENHANCEMENTS]
+
+     * possible to restrict elements visited to container, leaf, or both.
+
+     * constants for cycle behavior are now available; using strings is now
+       deprecated and no longer documented.
+
+
+0.01      2024-03-23 13:04:03-04:00 America/New_York
+
+* First release upon an unsuspecting world.

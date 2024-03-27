@@ -8,6 +8,7 @@ examples/chess.pl
 examples/border_rules.pl
 examples/header.pl
 examples/header_repeat_with_cell_props.pl
+examples/no_repeat.pl
 examples/PDFpref
 examples/row_height.pl
 examples/sample1.pl

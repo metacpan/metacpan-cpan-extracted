@@ -5,6 +5,7 @@ class TestCase::Sys::Time {
   use Sys::Time::Timespec;
   use Sys::Time::Constant as TIME;
   use Sys::Time::Itimerval;
+  use Sys::Time::Utimbuf;
   
   static method new_tm : int () {
     my $tm = Sys::Time::Tm->new;
@@ -21,19 +22,75 @@ class TestCase::Sys::Time {
     
     return $time;
   }
-
-  static method localtime : Sys::Time::Tm ($time : long) {
-    my $time_info = Sys::Time->localtime($time);
+  
+  static method localtime : int () {
+    {
+      my $tm = Sys->localtime(0);
+      
+      unless ($tm->tm_year + 1900 == 1970) {
+        return 0;
+      }
+    }
+    
+    {
+      my $tm = Sys->localtime;
+      
+      unless ($tm->tm_year + 1900 > 1970) {
+        return 0;
+      }
+    }
+    
+    unless (Sys::OS->is_windows) {
+      my $tm = Sys->localtime(-(86_400 * 2), 1);
+      
+      unless ($tm->tm_year + 1900 == 1969) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method localtime_value : Sys::Time::Tm ($time : long) {
+    my $time_info = Sys::Time->localtime(\$time);
     
     return $time_info;
   }
-
-  static method gmtime : Sys::Time::Tm ($time : long) {
-    my $time_info = Sys::Time->gmtime($time);
+  
+  static method gmtime : int () {
+    {
+      my $tm = Sys->gmtime(0);
+      
+      unless ($tm->tm_year + 1900 == 1970) {
+        return 0;
+      }
+    }
+    
+    {
+      my $tm = Sys->gmtime;
+      
+      unless ($tm->tm_year + 1900 > 1970) {
+        return 0;
+      }
+    }
+    
+    unless (Sys::OS->is_windows) {
+      my $tm = Sys->gmtime(-(86_400 * 2), 1);
+      
+      unless ($tm->tm_year + 1900 == 1969) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method gmtime_value : Sys::Time::Tm ($time : long) {
+    my $time_info = Sys::Time->gmtime(\$time);
     
     return $time_info;
   }
-
+  
   static method gettimeofday : int () {
     
     my $tv = Sys::Time::Timeval->new;
@@ -65,7 +122,7 @@ class TestCase::Sys::Time {
     
     return 1;
   }
-
+  
   static method clock_gettime : int () {
     
     my $tp = Sys::Time::Timespec->new;
@@ -82,7 +139,7 @@ class TestCase::Sys::Time {
     
     return 1;
   }
-
+  
   static method clock_getres : int () {
     
     my $tp = Sys::Time::Timespec->new;
@@ -103,12 +160,11 @@ class TestCase::Sys::Time {
 
   static method setitimer : int () {
     
-    my $new_tv = Sys::Time::Timeval->new;
-    $new_tv->set_tv_sec(1);
+    my $new_tv = Sys::Time::Timeval->new(1, 1);
     
     my $new_value = Sys::Time::Itimerval->new;
     $new_value->set_it_interval($new_tv);
-
+    
     my $old_value = Sys::Time::Itimerval->new;
     
     my $status = Sys::Time->setitimer(TIME->ITIMER_REAL, $new_value, $old_value);
@@ -208,9 +264,7 @@ class TestCase::Sys::Time {
     
     my $start = Sys::Time->time;
     
-    my $ts = Sys::Time::Timespec->new;
-    $ts->set_tv_sec(1);
-    $ts->set_tv_nsec(100_000_000);
+    my $ts = Sys::Time::Timespec->new(1, 100_000_000);
     
     my $status = Sys::Time->nanosleep($ts, undef);
     
@@ -224,4 +278,54 @@ class TestCase::Sys::Time {
     
     return 1;
   }
+  
+  static method utime : int ($test_dir : string) {
+    
+    my $file = "$test_dir/ftest/utime.txt";
+    
+    my $utimbuf = Sys::Time::Utimbuf->new;
+    
+    my $time = Sys::Time->time;
+    
+    my $actime = $utimbuf->set_actime($time);
+    my $modtime = $utimbuf->set_modtime($time);
+    
+    my $status = Sys::Time->utime($file, $utimbuf);
+    
+    unless ($status == 0) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method utimes : int ($test_dir : string) {
+    
+    if (Sys::OS->is_windows) {
+      eval { Sys::Time->utimes(undef, undef); }
+      unless ($@ && eval_error_id is_error Error::NotSupported) {
+        return 0;
+      }
+    }
+    else {
+      my $file = "$test_dir/ftest/utime.txt";
+      
+      my $times0 = Sys::Time::Timeval->new;
+      Sys::Time->gettimeofday($times0, undef);
+      
+      my $times1 = Sys::Time::Timeval->new;
+      Sys::Time->gettimeofday($times1, undef);
+      
+      my $times = [$times0, $times1];
+      
+      my $status = Sys::Time->utimes($file, $times);
+      
+      unless ($status == 0) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
 }

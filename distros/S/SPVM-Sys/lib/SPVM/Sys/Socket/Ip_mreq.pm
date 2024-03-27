@@ -4,57 +4,61 @@ package SPVM::Sys::Socket::Ip_mreq;
 
 =head1 Name
 
-SPVM::Sys::Socket::Ip_mreq - struct ip_mreq in C language
+SPVM::Sys::Socket::Ip_mreq - struct ip_mreq in the C language
+
+=head1 Description
+
+The Sys::Socket::In_addr class in L<SPVM> represents L<struct ip_mreq|https://linux.die.net/man/7/ip> in the C language.
 
 =head1 Usage
 
   use Sys::Socket::Ip_mreq;
 
-=head1 Description
+=head1 Details
 
-C<Sys::Socket::In_addr> is the class for the C<struct ip_mreq> in C<C language>.
+This class is a pointer class. The pointer the instance has is set to a L<struct ip_mreq|https://linux.die.net/man/7/ip> object.
 
-This is a L<pointer class|SPVM::Document::Language/"Pointer Class">.
+C<struct ip_mreq> is the old format of C<struct ip_mreqn>.
 
 =head1 Class Methods
 
 =head2 new
 
-  static method new : Sys::Socket::Ip_mreq ();
+C<static method new : L<Sys::Socket::Ip_mreq|SPVM::Sys::Socket::Ip_mreq> ();>
 
-Create a new C<Sys::Socket::Ip_mreq> object.
+Create a new L<Sys::Socket::Ip_mreq|SPVM::Sys::Socket::Ip_mreq> object.
 
 =head1 Instance Methods
 
 =head2 DESTROY
 
-  method DESTROY : void ();
+C<method DESTROY : void ();>
 
 The destructor.
 
 =head2 imr_multiaddr
 
-  method imr_multiaddr : Sys::Socket::In_addr ();
+C<method imr_multiaddr : L<Sys::Socket::In_addr|SPVM::Sys::Socket::In_addr> ();>
 
-Get C<imr_multiaddr>. This is a L<Sys::Socket::In_addr|SPVM::Sys::Socket::In_addr> object.
+Copies C<imr_multiaddr> and returns it.
 
 =head2 set_imr_multiaddr
 
-  method set_imr_multiaddr : void ($address : Sys::Socket::In_addr);
+C<method set_imr_multiaddr : void ($address : L<Sys::Socket::In_addr|SPVM::Sys::Socket::In_addr>);>
 
-Set C<imr_multiaddr>. This is a L<Sys::Socket::In_addr|SPVM::Sys::Socket::In_addr> object.
+Sets C<imr_multiaddr>.
 
 =head2 imr_interface
 
-  method imr_interface : Sys::Socket::In_addr ();
+C<method imr_interface : L<Sys::Socket::In_addr|SPVM::Sys::Socket::In_addr> ();>
 
-Get C<imr_interface>. This is a L<Sys::Socket::In_addr|SPVM::Sys::Socket::In_addr> object.
+Copies C<imr_interface> and returns it.
 
 =head2 set_imr_interface
 
-  method set_imr_interface : void ($interface : Sys::Socket::In_addr);
+C<method set_imr_interface : void ($interface : L<Sys::Socket::In_addr|SPVM::Sys::Socket::In_addr>);>
 
-Set C<imr_interface>. This is a L<Sys::Socket::In_addr|SPVM::Sys::Socket::In_addr> object.
+Sets C<imr_interface>.
 
 =head1 Copyright & License
 

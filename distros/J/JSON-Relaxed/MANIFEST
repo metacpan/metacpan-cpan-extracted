@@ -8,3 +8,4 @@ Makefile.PL
 t/test.t
 lib/JSON/Relaxed.pm
 lib/JSON/Relaxed.pod
+META.json                                Module JSON meta-data (added by MakeMaker)

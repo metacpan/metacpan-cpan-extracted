@@ -6,7 +6,7 @@ use Carp;
 use Scalar::Util 'refaddr';
 
 # ABSTRACT: Base class for iterators (blessed coderefs)
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 
 our %_iterator_fields;
@@ -56,7 +56,7 @@ Data::TableReader::Iterator - Base class for iterators (blessed coderefs)
 
 =head1 VERSION
 
-version 0.012
+version 0.014
 
 =head1 SYNOPSIS
 

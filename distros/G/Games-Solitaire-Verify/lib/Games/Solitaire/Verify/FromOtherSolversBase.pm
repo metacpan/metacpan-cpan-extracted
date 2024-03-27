@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::FromOtherSolversBase;
-$Games::Solitaire::Verify::FromOtherSolversBase::VERSION = '0.2500';
+$Games::Solitaire::Verify::FromOtherSolversBase::VERSION = '0.2600';
 use strict;
 use warnings;
 use autodie;
@@ -266,7 +266,7 @@ class for converters.
 
 =head1 VERSION
 
-version 0.2500
+version 0.2600
 
 =head1 SYNOPSIS
 

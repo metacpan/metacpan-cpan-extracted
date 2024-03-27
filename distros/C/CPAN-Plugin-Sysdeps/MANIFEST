@@ -16,6 +16,7 @@ t/lib/TestUtil.pm
 t/mapping/code.pl
 t/mapping/fail_likelinuxdistro.pl
 t/mapping/sample.pl
+t/rpm.t
 t/sample.t
 t/traverse.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

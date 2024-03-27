@@ -6,7 +6,7 @@ use warnings;
 use Carp;
 use List::Util qw[min max];  # core
 
-our $VERSION = '1.005'; # VERSION
+our $VERSION = '1.006'; # VERSION
 our $LAST_UPDATE = '1.003'; # manually update whenever code is changed
 
 ###################################################################

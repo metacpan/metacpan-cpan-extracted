@@ -16,7 +16,7 @@ use Sys::SigAction qw( set_sig_handler );
 use IPC::Shareable;
 use Time::HiRes qw( sleep );
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 ##############################################################################
             
@@ -86,6 +86,7 @@ sub run
   $SIG{ 'INT'   } = sub { $self->break_main_loop(); };
   $SIG{ 'TERM'  } = sub { $self->break_main_loop(); };
   $SIG{ 'CHLD'  } = sub { $self->__sig_child();     };
+  $SIG{ 'HUP '  } = sub { $self->__sig_hup();       };
   $SIG{ 'USR1'  } = sub { $self->__sig_usr1();      };
   $SIG{ 'USR2'  } = sub { $self->__sig_usr2();      };
   $SIG{ 'RTMIN' } = sub { $self->__sig_kid_idle()   };
@@ -263,6 +264,7 @@ sub __run_forking
   $SIG{ 'INT'   } = sub { $self->break_main_loop(); };
   $SIG{ 'TERM'  } = sub { $self->break_main_loop(); };
   $SIG{ 'CHLD'  } = 'DEFAULT';
+  $SIG{ 'HUP '  } = sub { $self->__child_sig_hup();   };
   $SIG{ 'USR1'  } = sub { $self->__child_sig_usr1();  };
   $SIG{ 'USR2'  } = sub { $self->__child_sig_usr2();  };
   $SIG{ 'RTMIN' } = 'DEFAULT';
@@ -342,6 +344,7 @@ sub __run_prefork
         # reinstall signal handlers in the kid
         $SIG{ 'INT'   } = 'DEFAULT';
         $SIG{ 'CHLD'  } = 'DEFAULT';
+        $SIG{ 'HUP '  } = sub { $self->__child_sig_hup();   };
         $SIG{ 'USR1'  } = sub { $self->__child_sig_usr1();  };
         $SIG{ 'USR2'  } = sub { $self->__child_sig_usr2();  };
         $SIG{ 'RTMIN' } = 'DEFAULT';
@@ -423,6 +426,7 @@ sub __sha_lock_ro
     my $rc = tied( %{ $self->{ 'SHA' } } )->lock( IPC::Shareable::LOCK_SH );
     return $rc if $rc;
     }
+  return undef;  
 }
 
 sub __sha_lock_rw
@@ -435,6 +439,7 @@ sub __sha_lock_rw
     my $rc = tied( %{ $self->{ 'SHA' } } )->lock( IPC::Shareable::LOCK_EX );
     return $rc if $rc;
     }
+  return undef;  
 }
 
 sub __sha_unlock
@@ -447,6 +452,7 @@ sub __sha_unlock
     my $rc = tied( %{ $self->{ 'SHA' } } )->lock( IPC::Shareable::LOCK_UN );
     return $rc if $rc;
     }
+  return undef;  
 }
 
 ##############################################################################
@@ -572,6 +578,14 @@ sub __sig_child
   $SIG{ 'CHLD' } = sub { $self->__sig_child(); };
 }
 
+sub __sig_hup
+{
+  my $self = shift;
+
+  $self->on_sig_hup();
+  $SIG{ 'HUP ' } = sub { $self->__sig_hup();   };
+}
+
 sub __sig_usr1
 {
   my $self = shift;
@@ -588,6 +602,14 @@ sub __sig_usr2
   $self->on_sig_usr2();
   $self->propagate_signal( 'USR2' ) if $self->{ 'PROP_SIGUSR' };
   $SIG{ 'USR2' } = sub { $self->__sig_usr2();  };
+}
+
+sub __child_sig_hup
+{
+  my $self = shift;
+
+  $self->on_child_sig_hup();
+  $SIG{ 'HUP' } = sub { $self->__child_sig_hup();  };
 }
 
 sub __child_sig_usr1
@@ -683,6 +705,10 @@ sub on_sig_child
 {
 }
 
+sub on_sig_hup
+{
+}
+
 sub on_sig_usr1
 {
 }
@@ -696,6 +722,10 @@ sub on_sig_kid_idle
 }
 
 sub on_sig_kid_busy
+{
+}
+
+sub on_child_sig_hup
 {
 }
 

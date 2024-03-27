@@ -9,7 +9,7 @@ Tk::PopList - Popping a selection list relative to a widget
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.06';
+$VERSION = '0.07';
 
 use base qw(Tk::Derived Tk::Poplevel);
 
@@ -104,7 +104,7 @@ sub Populate {
 		-scrollbars => 'oe',
 		-listvariable => $self->{LIST},
 		-xscrollcommand => sub {},
-	)->pack(-fill => 'both');
+	)->pack(-expand => 1, -fill => 'both');
 	$self->Advertise('Listbox', $listbox);
 	$listbox->bind('<ButtonRelease-1>', [$self, 'Select']);
 	$listbox->bind('<Down>', [$self, 'NavDown']);
@@ -118,8 +118,9 @@ sub Populate {
 	$self->ConfigSpecs(
 		-background => ['SELF', 'DESCENDATNS'],
 		-filter => ['PASSIVE', undef, undef, 0],
+		-maxheight => ['PASSIVE', undef, undef, 10],
 		-selectcall => ['CALLBACK', undef, undef, sub {}],
-		'-values' => ['METHOD', undef, undef, []],
+		-values => ['METHOD', undef, undef, []],
 		DEFAULT => [ $listbox ],
 	);
 }
@@ -128,10 +129,14 @@ sub calculateHeight {
 	my $self = shift;
 	my $list = $self->{LIST};
 	my $lb = $self->Subwidget('Listbox');
-	my $lheight = 10;
+	my $lheight = $self->cget('-maxheight');
 	if (@$list < $lheight) { $lheight = @$list }
-	$lb->configure(-height => $lheight);
-	my $height = $lb->reqheight;
+	my $font = $lb->cget('-font');
+
+	my $fontheight = $lb->fontActual($font, '-size');
+	$fontheight = $fontheight * -1 if $fontheight < 0;
+
+	my $height = $lheight * $fontheight * 2;
 	$height = $height + $self->{FE}->reqheight if defined $self->{FE};
 	return $height
 }
@@ -249,6 +254,7 @@ sub popUp {
 		$self->{FE} = $e;
 	}
 
+#	$self->calculateHeight;
 	$self->SUPER::popUp;
 
 	my $lb = $self->Subwidget('Listbox');
@@ -316,4 +322,6 @@ Unknown. If you find any, please contact the author.
 
 1;
 __END__
+
+
 

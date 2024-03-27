@@ -4,95 +4,111 @@ use Mojo::Base 'Mojolicious::Plugin', -signatures;
 use Carp;
 use Data::Dumper;
 
-our $VERSION = "0.06";
+our $VERSION = "0.07";
 
-sub register($self, $app, $conf) {
+has route => sub {
+    my $self = shift;
+    my $root = $self->config->{path} ? $self->config->{path} : '/component';
+    $self->app->routes->any([ qw(HEAD GET) ] => "$root/:req/*component")->name('webcomponent')->to(cb => \&_serve);
+};
+has 'app';
+has 'config';
 
-    my $assetDir = $app->static->asset_dir;
-    my $javascriptPath = "/$assetDir/js/components";
-    my $templatePath = "components";
-    my $path = "/component/:req/*component";
+sub register($self, $app, $config) {
+    $self->config($config);
+    $self->app($app);
 
-    if (defined($conf)) {
-        # remove trailing slashes
-        $conf->{javascript_path} = $1 if (defined($conf->{javascript_path}) && $conf->{javascript_path} =~ /(.*)\/$/);
-        $conf->{template_path} = $1 if (defined($conf->{template_path}) && $conf->{template_path} =~ /(.*)\/$/);
-        $conf->{path} = $1 if (defined($conf->{path}) && $conf->{path} =~ /(.*)\/$/);
-        $javascriptPath = $conf->{javascript_path} if $conf->{javascript_path};
-        $templatePath = $conf->{template_path} if $conf->{template_path};
-        $path = "$conf->{path}/:req/*component" if $conf->{path};
+    my $helper = 'component';
+
+    if ($app->renderer->helpers->{$helper}) {
+        return $app->log->debug("WebComponent: Helper $helper() is already registered.");
     }
 
-    $app->helper(component => sub {_component($self, $path, @_)});
-    $app->routes->get($path)->to(cb => sub {
-        my $c = shift;
-        my $component = $c->param('component');
-        my $params = $self->_getAllParams($c)->to_hash;
+    $app->defaults('webcomponent.helper' => $helper);
 
-        my $templateFile;
-        my $skipTemplate;
-        if (exists($params->{template})) {
-            my $template = $params->{template};
-            if ($template =~ m/(false|f|no|0)/i || !defined($template)) {
-                $skipTemplate = 1;
-            }
-            else {
-                $templateFile = $template;
-            }
+    $app->helper($helper => sub {@_ == 1 ? $self : $self->_component(@_)});
+}
+
+sub _serve {
+    my $c = shift;
+    my $helper = $c->stash('webcomponent.helper');
+    my $self = $c->$helper;
+    my $app = $self->app;
+
+    my $component = $c->param('component');
+    my $params = $self->_getAllParams($c)->to_hash;
+
+    my $assetDir = $app->static->asset_dir;
+    my $javascriptPath = $self->config->{javascript_path} ? $self->config->{javascript_path} : "components";
+    my $templatePath = $self->config->{template_path} ? $self->config->{template_path} : "components";
+
+    my $templateFile;
+    my $skipTemplate;
+    if (exists($params->{template})) {
+        my $template = $params->{template};
+        if ($template =~ m/(false|f|no|0)/i || !defined($template)) {
+            $skipTemplate = 1;
+        }
+        else {
+            $templateFile = $template;
+        }
+    }
+
+    my $tmpl;
+    if (!defined($skipTemplate)) {
+        my $tmplHtml;
+        # if the template file is not set,
+        $templateFile //= $component =~ s/\.js//gr;
+        my $template = "$templatePath/$templateFile";
+        if ($app->renderer->{templates}->{"$template.html"}) {
+            $tmplHtml = $c->render_to_string($template, params => $params);
         }
 
-        my $tmpl;
-        if (!defined($skipTemplate)) {
-            my $tmplHtml;
-            # if the template file is not set,
-            $templateFile //= $component =~ s/\.js//gr;
-            my $template = "$templatePath/$templateFile";
-            if ($app->renderer->{templates}->{"$template.html"}) {
-                $tmplHtml = $c->render_to_string($template, params => $params);
-            }
+        # If the template file was not found, show it
+        $tmplHtml //= "<div>404 -  $template template not found</div>";
 
-            # If the template file was not found, show it
-            $tmplHtml //= "<div>404 -  $template template not found</div>";
-
-            $tmpl = qq{
+        $tmpl = qq{
                     let tmpl = document.createElement('template');
                     tmpl.innerHTML = `$tmplHtml`
             };
-        }
+    }
 
-        # my $publicPath = $app->static->{paths}->[0];
-        my $js = "$javascriptPath/$component";
-        my $asset = $app->static->file($js);
+    # my $publicPath = $app->static->{paths}->[0];
+    my $js = "/$assetDir/js/$javascriptPath/$component";
+    my $asset = $app->static->file($js);
 
-        my $content;
-        my $fh = $asset->handle;
-        my $tmplInit = 0;
-        while (<$fh>) {
-            if ($tmpl && !$tmplInit) {
-                if ($_ =~ m/let tmpl;/) {
-                    $content .= $tmpl;
-                    $tmplInit = 1;
-                    next;
-                }
-                if ($_ =~ m/shadowRoot.appendChild\(tmpl.content.cloneNode\(true\)\)/) {
-                    $content .= $tmpl;
-                    $tmplInit = 1;
-                }
+    my $content;
+    my $fh = $asset->handle;
+    my $tmplInit = 0;
+    while (<$fh>) {
+        if ($tmpl && !$tmplInit) {
+            if ($_ =~ m/let tmpl;/) {
+                $content .= $tmpl;
+                $tmplInit = 1;
+                next;
             }
-
-            $content .= $_;
+            if ($_ =~ m/shadowRoot.appendChild\(tmpl.content.cloneNode\(true\)\)/) {
+                $content .= $tmpl;
+                $tmplInit = 1;
+            }
         }
 
-        $c->render(text => $content);
-    });
+        $content .= $_;
+    }
+
+    $c->render(text => $content);
 }
 
 sub _component {
     my $self = shift;
-    my $path = shift;
     my $c = shift;
     my $name = shift;
     my $opts = shift;
+    my $route = $self->route;
+
+    my $base = $c->req->url->base->path->{path};
+    my $path = $base ? $base . $route->pattern->unparsed
+        : $route->pattern->unparsed;
 
     if (exists($opts->{template})) {
         my $template = defined($opts->{template}) ? $opts->{template} : 'false';

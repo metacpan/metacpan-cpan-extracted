@@ -1,0 +1,54 @@
+use strict;
+use warnings;
+use alienfile;
+
+use Capture::Tiny qw(capture);
+use File::Copy;
+use Path::Tiny;
+
+my %minimap2_programs = (
+    minimap2           => 'minimap2',
+);
+probe sub {
+    ## see if the minimap2 suite is installed
+    my ( $cmd, $stder ) = capture { system( 'minimap2', ) };
+    my $is_minimap2_installed_installed = $$stder =~ /minimap2/m;
+    print $is_minimap2_installed_installed
+      ? "The minimap2 suite is already installed in your system\n"
+      : "The minimap2 suite is not installed, so will install from source\n";
+    $is_minimap2_installed_installed ? 'system' : 'share';
+};
+
+share {
+    plugin 'Download::GitHub' => (
+        github_user => 'lh3',
+        github_repo => 'minimap2',
+    );
+    plugin Extract => 'tar.gz';
+    build [
+        '%{make}',
+    ];
+
+    after 'build' => sub {
+        my ($build) = @_;
+        my $install_root = Path::Tiny->new( $build->install_prop->{stage} );
+
+        my $source_directory = path($build->install_prop->{extract});
+        my $binary_dest_directory = path( $install_root, 'bin' );
+        $binary_dest_directory->mkdir;
+        foreach my $key ( keys %minimap2_programs ) {
+            path( $source_directory, $minimap2_programs{$key} )->move(
+                path( $binary_dest_directory, $minimap2_programs{$key} ));
+        }
+
+    };
+};
+
+gather sub {
+    my ($build) = @_;
+    while ( my ( $key, $value ) = each %minimap2_programs ) {
+        $build->runtime_prop->{command}->{$key} = $value;
+    }
+};
+
+1;

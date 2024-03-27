@@ -22,7 +22,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.19/lib/adler32.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.20/lib/adler32.c */
 
 
 /* #include "lib_common.h" */
@@ -73,8 +73,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	19
-#define LIBDEFLATE_VERSION_STRING	"1.19"
+#define LIBDEFLATE_VERSION_MINOR	20
+#define LIBDEFLATE_VERSION_STRING	"1.20"
 
 
 #ifndef LIBDEFLATEAPI
@@ -292,6 +292,7 @@ struct libdeflate_options {
 #undef ARCH_X86_32
 #undef ARCH_ARM64
 #undef ARCH_ARM32
+#undef ARCH_RISCV
 #ifdef _MSC_VER
 #  if defined(_M_X64)
 #    define ARCH_X86_64
@@ -311,6 +312,8 @@ struct libdeflate_options {
 #    define ARCH_ARM64
 #  elif defined(__arm__)
 #    define ARCH_ARM32
+#  elif defined(__riscv)
+#    define ARCH_RISCV
 #  endif
 #endif
 
@@ -355,6 +358,9 @@ typedef size_t machine_word_t;
 #  define GCC_PREREQ(major, minor)		\
 	(__GNUC__ > (major) ||			\
 	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#  if !GCC_PREREQ(4, 9)
+#    error "gcc versions older than 4.9 are no longer supported"
+#  endif
 #else
 #  define GCC_PREREQ(major, minor)	0
 #endif
@@ -367,14 +373,27 @@ typedef size_t machine_word_t;
 	(__clang_major__ > (major) ||			\
 	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
 #  endif
+#  if !CLANG_PREREQ(3, 9, 8000000)
+#    error "clang versions older than 3.9 are no longer supported"
+#  endif
 #else
 #  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+#ifdef _MSC_VER
+#  define MSVC_PREREQ(version)	(_MSC_VER >= (version))
+#  if !MSVC_PREREQ(1900)
+#    error "MSVC versions older than Visual Studio 2015 are no longer supported"
+#  endif
+#else
+#  define MSVC_PREREQ(version)	0
 #endif
 
 
 #ifndef __has_attribute
 #  define __has_attribute(attribute)	0
 #endif
+
+
 #ifndef __has_builtin
 #  define __has_builtin(builtin)	0
 #endif
@@ -398,6 +417,13 @@ typedef size_t machine_word_t;
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
+#endif
+
+
+#if defined(__GNUC__) || __has_attribute(noreturn)
+#  define NORETURN		__attribute__((noreturn))
+#else
+#  define NORETURN
 #endif
 
 
@@ -466,12 +492,10 @@ typedef size_t machine_word_t;
 #endif
 
 
-#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#if defined(__GNUC__) || __has_attribute(target)
 #  define _target_attribute(attrs)	__attribute__((target(attrs)))
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
 #else
 #  define _target_attribute(attrs)
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
 #endif
 
 
@@ -511,7 +535,7 @@ static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
 
 static forceinline u16 bswap16(u16 v)
 {
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap16)
 	return __builtin_bswap16(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ushort(v);
@@ -523,7 +547,7 @@ static forceinline u16 bswap16(u16 v)
 
 static forceinline u32 bswap32(u32 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap32)
 	return __builtin_bswap32(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ulong(v);
@@ -538,7 +562,7 @@ static forceinline u32 bswap32(u32 v)
 
 static forceinline u64 bswap64(u64 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap64)
 	return __builtin_bswap64(v);
 #elif defined(_MSC_VER)
 	return _byteswap_uint64(v);
@@ -569,6 +593,7 @@ static forceinline u64 bswap64(u64 v)
 #if (defined(__GNUC__) || defined(__clang__)) && \
 	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	 defined(__riscv_misaligned_fast) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
 #elif defined(_MSC_VER)
@@ -906,12 +931,17 @@ int memcmp(const void *s1, const void *s2, size_t n);
 
 #undef LIBDEFLATE_ENABLE_ASSERTIONS
 #else
-#include <string.h>
+#  include <string.h>
+   
+#  ifdef __clang_analyzer__
+#    define LIBDEFLATE_ENABLE_ASSERTIONS
+#  endif
 #endif
 
 
 #ifdef LIBDEFLATE_ENABLE_ASSERTIONS
-void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+NORETURN void
+libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #define ASSERT(expr) { if (unlikely(!(expr))) \
 	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
 #else
@@ -931,34 +961,48 @@ void libdeflate_assertion_failed(const char *expr, const char *file, int line);
 
 #define MAX_CHUNK_LEN	5552
 
+
+#define ADLER32_CHUNK(s1, s2, p, n)					\
+do {									\
+	if (n >= 4) {							\
+		u32 s1_sum = 0;						\
+		u32 byte_0_sum = 0;					\
+		u32 byte_1_sum = 0;					\
+		u32 byte_2_sum = 0;					\
+		u32 byte_3_sum = 0;					\
+									\
+		do {							\
+			s1_sum += s1;					\
+			s1 += p[0] + p[1] + p[2] + p[3];		\
+			byte_0_sum += p[0];				\
+			byte_1_sum += p[1];				\
+			byte_2_sum += p[2];				\
+			byte_3_sum += p[3];				\
+			p += 4;						\
+			n -= 4;						\
+		} while (n >= 4);					\
+		s2 += (4 * (s1_sum + byte_0_sum)) + (3 * byte_1_sum) +	\
+		      (2 * byte_2_sum) + byte_3_sum;			\
+	}								\
+	for (; n; n--, p++) {						\
+		s1 += *p;						\
+		s2 += s1;						\
+	}								\
+	s1 %= DIVISOR;							\
+	s2 %= DIVISOR;							\
+} while (0)
+
 static u32 MAYBE_UNUSED
 adler32_generic(u32 adler, const u8 *p, size_t len)
 {
 	u32 s1 = adler & 0xFFFF;
 	u32 s2 = adler >> 16;
-	const u8 * const end = p + len;
 
-	while (p != end) {
-		size_t chunk_len = MIN(end - p, MAX_CHUNK_LEN);
-		const u8 *chunk_end = p + chunk_len;
-		size_t num_unrolled_iterations = chunk_len / 4;
+	while (len) {
+		size_t n = MIN(len, MAX_CHUNK_LEN & ~3);
 
-		while (num_unrolled_iterations--) {
-			s1 += *p++;
-			s2 += s1;
-			s1 += *p++;
-			s2 += s1;
-			s1 += *p++;
-			s2 += s1;
-			s1 += *p++;
-			s2 += s1;
-		}
-		while (p != chunk_end) {
-			s1 += *p++;
-			s2 += s1;
-		}
-		s1 %= DIVISOR;
-		s2 %= DIVISOR;
+		len -= n;
+		ADLER32_CHUNK(s1, s2, p, n);
 	}
 
 	return (s2 << 16) | s1;
@@ -1029,8 +1073,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	19
-#define LIBDEFLATE_VERSION_STRING	"1.19"
+#define LIBDEFLATE_VERSION_MINOR	20
+#define LIBDEFLATE_VERSION_STRING	"1.20"
 
 
 #ifndef LIBDEFLATEAPI
@@ -1248,6 +1292,7 @@ struct libdeflate_options {
 #undef ARCH_X86_32
 #undef ARCH_ARM64
 #undef ARCH_ARM32
+#undef ARCH_RISCV
 #ifdef _MSC_VER
 #  if defined(_M_X64)
 #    define ARCH_X86_64
@@ -1267,6 +1312,8 @@ struct libdeflate_options {
 #    define ARCH_ARM64
 #  elif defined(__arm__)
 #    define ARCH_ARM32
+#  elif defined(__riscv)
+#    define ARCH_RISCV
 #  endif
 #endif
 
@@ -1311,6 +1358,9 @@ typedef size_t machine_word_t;
 #  define GCC_PREREQ(major, minor)		\
 	(__GNUC__ > (major) ||			\
 	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#  if !GCC_PREREQ(4, 9)
+#    error "gcc versions older than 4.9 are no longer supported"
+#  endif
 #else
 #  define GCC_PREREQ(major, minor)	0
 #endif
@@ -1323,14 +1373,27 @@ typedef size_t machine_word_t;
 	(__clang_major__ > (major) ||			\
 	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
 #  endif
+#  if !CLANG_PREREQ(3, 9, 8000000)
+#    error "clang versions older than 3.9 are no longer supported"
+#  endif
 #else
 #  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+#ifdef _MSC_VER
+#  define MSVC_PREREQ(version)	(_MSC_VER >= (version))
+#  if !MSVC_PREREQ(1900)
+#    error "MSVC versions older than Visual Studio 2015 are no longer supported"
+#  endif
+#else
+#  define MSVC_PREREQ(version)	0
 #endif
 
 
 #ifndef __has_attribute
 #  define __has_attribute(attribute)	0
 #endif
+
+
 #ifndef __has_builtin
 #  define __has_builtin(builtin)	0
 #endif
@@ -1354,6 +1417,13 @@ typedef size_t machine_word_t;
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
+#endif
+
+
+#if defined(__GNUC__) || __has_attribute(noreturn)
+#  define NORETURN		__attribute__((noreturn))
+#else
+#  define NORETURN
 #endif
 
 
@@ -1422,12 +1492,10 @@ typedef size_t machine_word_t;
 #endif
 
 
-#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#if defined(__GNUC__) || __has_attribute(target)
 #  define _target_attribute(attrs)	__attribute__((target(attrs)))
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
 #else
 #  define _target_attribute(attrs)
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
 #endif
 
 
@@ -1467,7 +1535,7 @@ static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
 
 static forceinline u16 bswap16(u16 v)
 {
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap16)
 	return __builtin_bswap16(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ushort(v);
@@ -1479,7 +1547,7 @@ static forceinline u16 bswap16(u16 v)
 
 static forceinline u32 bswap32(u32 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap32)
 	return __builtin_bswap32(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ulong(v);
@@ -1494,7 +1562,7 @@ static forceinline u32 bswap32(u32 v)
 
 static forceinline u64 bswap64(u64 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap64)
 	return __builtin_bswap64(v);
 #elif defined(_MSC_VER)
 	return _byteswap_uint64(v);
@@ -1525,6 +1593,7 @@ static forceinline u64 bswap64(u64 v)
 #if (defined(__GNUC__) || defined(__clang__)) && \
 	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	 defined(__riscv_misaligned_fast) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
 #elif defined(_MSC_VER)
@@ -1862,12 +1931,17 @@ int memcmp(const void *s1, const void *s2, size_t n);
 
 #undef LIBDEFLATE_ENABLE_ASSERTIONS
 #else
-#include <string.h>
+#  include <string.h>
+   
+#  ifdef __clang_analyzer__
+#    define LIBDEFLATE_ENABLE_ASSERTIONS
+#  endif
 #endif
 
 
 #ifdef LIBDEFLATE_ENABLE_ASSERTIONS
-void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+NORETURN void
+libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #define ASSERT(expr) { if (unlikely(!(expr))) \
 	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
 #else
@@ -1881,33 +1955,23 @@ void libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #endif 
 
 
-#define HAVE_DYNAMIC_ARM_CPU_FEATURES	0
-
 #if defined(ARCH_ARM32) || defined(ARCH_ARM64)
 
+#define ARM_CPU_FEATURE_NEON		(1 << 0)
+#define ARM_CPU_FEATURE_PMULL		(1 << 1)
+
+#define ARM_CPU_FEATURE_PREFER_PMULL	(1 << 2)
+#define ARM_CPU_FEATURE_CRC32		(1 << 3)
+#define ARM_CPU_FEATURE_SHA3		(1 << 4)
+#define ARM_CPU_FEATURE_DOTPROD		(1 << 5)
+
 #if !defined(FREESTANDING) && \
-    (COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE || defined(_MSC_VER)) && \
+    (defined(__GNUC__) || defined(__clang__) || defined(_MSC_VER)) && \
     (defined(__linux__) || \
      (defined(__APPLE__) && defined(ARCH_ARM64)) || \
      (defined(_WIN32) && defined(ARCH_ARM64)))
-#  undef HAVE_DYNAMIC_ARM_CPU_FEATURES
-#  define HAVE_DYNAMIC_ARM_CPU_FEATURES	1
-#endif
 
-#define ARM_CPU_FEATURE_NEON		0x00000001
-#define ARM_CPU_FEATURE_PMULL		0x00000002
-#define ARM_CPU_FEATURE_CRC32		0x00000004
-#define ARM_CPU_FEATURE_SHA3		0x00000008
-#define ARM_CPU_FEATURE_DOTPROD		0x00000010
-
-#define HAVE_NEON(features)	(HAVE_NEON_NATIVE    || ((features) & ARM_CPU_FEATURE_NEON))
-#define HAVE_PMULL(features)	(HAVE_PMULL_NATIVE   || ((features) & ARM_CPU_FEATURE_PMULL))
-#define HAVE_CRC32(features)	(HAVE_CRC32_NATIVE   || ((features) & ARM_CPU_FEATURE_CRC32))
-#define HAVE_SHA3(features)	(HAVE_SHA3_NATIVE    || ((features) & ARM_CPU_FEATURE_SHA3))
-#define HAVE_DOTPROD(features)	(HAVE_DOTPROD_NATIVE || ((features) & ARM_CPU_FEATURE_DOTPROD))
-
-#if HAVE_DYNAMIC_ARM_CPU_FEATURES
-#define ARM_CPU_FEATURES_KNOWN		0x80000000
+#  define ARM_CPU_FEATURES_KNOWN	(1U << 31)
 extern volatile u32 libdeflate_arm_cpu_features;
 
 void libdeflate_init_arm_cpu_features(void);
@@ -1918,38 +1982,37 @@ static inline u32 get_arm_cpu_features(void)
 		libdeflate_init_arm_cpu_features();
 	return libdeflate_arm_cpu_features;
 }
-#else 
+#else
 static inline u32 get_arm_cpu_features(void) { return 0; }
-#endif 
+#endif
 
 
-#if defined(__ARM_NEON) || defined(ARCH_ARM64)
+#if defined(__ARM_NEON) || (defined(_MSC_VER) && defined(ARCH_ARM64))
+#  define HAVE_NEON(features)	1
 #  define HAVE_NEON_NATIVE	1
 #else
+#  define HAVE_NEON(features)	((features) & ARM_CPU_FEATURE_NEON)
 #  define HAVE_NEON_NATIVE	0
 #endif
 
-#if HAVE_NEON_NATIVE || \
-	(HAVE_DYNAMIC_ARM_CPU_FEATURES && GCC_PREREQ(6, 1) && defined(__ARM_FP))
+#if (defined(__GNUC__) || defined(__clang__) || defined(_MSC_VER)) && \
+	(HAVE_NEON_NATIVE || (GCC_PREREQ(6, 1) && defined(__ARM_FP)))
 #  define HAVE_NEON_INTRIN	1
+#  include <arm_neon.h>
 #else
 #  define HAVE_NEON_INTRIN	0
 #endif
 
 
 #ifdef __ARM_FEATURE_CRYPTO
-#  define HAVE_PMULL_NATIVE	1
+#  define HAVE_PMULL(features)	1
 #else
-#  define HAVE_PMULL_NATIVE	0
+#  define HAVE_PMULL(features)	((features) & ARM_CPU_FEATURE_PMULL)
 #endif
-#if HAVE_PMULL_NATIVE || \
-	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
-	 HAVE_NEON_INTRIN  && \
-	 (GCC_PREREQ(6, 1) || CLANG_PREREQ(3, 5, 6010000) || \
-	  defined(_MSC_VER)) && \
-	   \
-	 !(defined(ARCH_ARM32) && defined(__clang__)))
-#  define HAVE_PMULL_INTRIN	CPU_IS_LITTLE_ENDIAN() 
+#if defined(ARCH_ARM64) && HAVE_NEON_INTRIN && \
+	(GCC_PREREQ(6, 1) || defined(__clang__) || defined(_MSC_VER)) && \
+	CPU_IS_LITTLE_ENDIAN() 
+#  define HAVE_PMULL_INTRIN	1
    
 #  ifdef _MSC_VER
 #    define compat_vmull_p64(a, b)  vmull_p64(vcreate_p64(a), vcreate_p64(b))
@@ -1960,105 +2023,98 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #  define HAVE_PMULL_INTRIN	0
 #endif
 
-#if HAVE_PMULL_NATIVE && defined(ARCH_ARM64) && \
-		GCC_PREREQ(6, 1) && !GCC_PREREQ(13, 1)
-#  define USE_PMULL_TARGET_EVEN_IF_NATIVE	1
-#else
-#  define USE_PMULL_TARGET_EVEN_IF_NATIVE	0
-#endif
-
 
 #ifdef __ARM_FEATURE_CRC32
-#  define HAVE_CRC32_NATIVE	1
+#  define HAVE_CRC32(features)	1
 #else
-#  define HAVE_CRC32_NATIVE	0
+#  define HAVE_CRC32(features)	((features) & ARM_CPU_FEATURE_CRC32)
 #endif
-#undef HAVE_CRC32_INTRIN
-#if HAVE_CRC32_NATIVE
+#if defined(ARCH_ARM64) && \
+	(defined(__GNUC__) || defined(__clang__) || defined(_MSC_VER))
 #  define HAVE_CRC32_INTRIN	1
-#elif HAVE_DYNAMIC_ARM_CPU_FEATURES
-#  if GCC_PREREQ(1, 0)
-    
-#    if (GCC_PREREQ(11, 3) || \
-	 (GCC_PREREQ(10, 4) && !GCC_PREREQ(11, 0)) || \
-	 (GCC_PREREQ(9, 5) && !GCC_PREREQ(10, 0))) && \
-	!defined(__ARM_ARCH_6KZ__) && \
-	!defined(__ARM_ARCH_7EM__)
-#      define HAVE_CRC32_INTRIN	1
-#    endif
-#  elif CLANG_PREREQ(3, 4, 6000000)
-#    define HAVE_CRC32_INTRIN	1
-#  elif defined(_MSC_VER)
-#    define HAVE_CRC32_INTRIN	1
+#  if defined(__GNUC__) || defined(__clang__)
+#    include <arm_acle.h>
 #  endif
-#endif
-#ifndef HAVE_CRC32_INTRIN
+   
+#  if defined(__clang__) && !CLANG_PREREQ(16, 0, 16000000) && \
+	!defined(__ARM_FEATURE_CRC32)
+#    undef __crc32b
+#    define __crc32b(a, b)					\
+	({ uint32_t res;					\
+	   __asm__("crc32b %w0, %w1, %w2"			\
+		   : "=r" (res) : "r" (a), "r" (b));		\
+	   res; })
+#    undef __crc32h
+#    define __crc32h(a, b)					\
+	({ uint32_t res;					\
+	   __asm__("crc32h %w0, %w1, %w2"			\
+		   : "=r" (res) : "r" (a), "r" (b));		\
+	   res; })
+#    undef __crc32w
+#    define __crc32w(a, b)					\
+	({ uint32_t res;					\
+	   __asm__("crc32w %w0, %w1, %w2"			\
+		   : "=r" (res) : "r" (a), "r" (b));		\
+	   res; })
+#    undef __crc32d
+#    define __crc32d(a, b)					\
+	({ uint32_t res;					\
+	   __asm__("crc32x %w0, %w1, %2"			\
+		   : "=r" (res) : "r" (a), "r" (b));		\
+	   res; })
+#    pragma clang diagnostic ignored "-Wgnu-statement-expression"
+#  endif
+#else
 #  define HAVE_CRC32_INTRIN	0
 #endif
 
 
-#if defined(ARCH_ARM64) && !defined(_MSC_VER)
-#  ifdef __ARM_FEATURE_SHA3
-#    define HAVE_SHA3_NATIVE	1
-#  else
-#    define HAVE_SHA3_NATIVE	0
-#  endif
-#  define HAVE_SHA3_TARGET	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
-				 (GCC_PREREQ(8, 1)  || \
-				  CLANG_PREREQ(7, 0, 10010463) ))
-#  define HAVE_SHA3_INTRIN	(HAVE_NEON_INTRIN && \
-				 (HAVE_SHA3_NATIVE || HAVE_SHA3_TARGET) && \
-				 (GCC_PREREQ(9, 1)  || \
-				  CLANG_PREREQ(13, 0, 13160000)))
+#ifdef __ARM_FEATURE_SHA3
+#  define HAVE_SHA3(features)	1
 #else
-#  define HAVE_SHA3_NATIVE	0
-#  define HAVE_SHA3_TARGET	0
+#  define HAVE_SHA3(features)	((features) & ARM_CPU_FEATURE_SHA3)
+#endif
+#if defined(ARCH_ARM64) && HAVE_NEON_INTRIN && \
+	(GCC_PREREQ(9, 1)  || \
+	 CLANG_PREREQ(7, 0, 10010463) )
+#  define HAVE_SHA3_INTRIN	1
+   
+#  if defined(__clang__) && !CLANG_PREREQ(16, 0, 16000000) && \
+	!defined(__ARM_FEATURE_SHA3)
+#    undef veor3q_u8
+#    define veor3q_u8(a, b, c)					\
+	({ uint8x16_t res;					\
+	   __asm__("eor3 %0.16b, %1.16b, %2.16b, %3.16b"	\
+		   : "=w" (res) : "w" (a), "w" (b), "w" (c));	\
+	   res; })
+#    pragma clang diagnostic ignored "-Wgnu-statement-expression"
+#  endif
+#else
 #  define HAVE_SHA3_INTRIN	0
 #endif
 
 
-#ifdef ARCH_ARM64
-#  ifdef __ARM_FEATURE_DOTPROD
-#    define HAVE_DOTPROD_NATIVE	1
-#  else
-#    define HAVE_DOTPROD_NATIVE	0
-#  endif
-#  if HAVE_DOTPROD_NATIVE || \
-	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
-	 (GCC_PREREQ(8, 1) || CLANG_PREREQ(7, 0, 10010000) || \
-	  defined(_MSC_VER)))
-#    define HAVE_DOTPROD_INTRIN	1
-#  else
-#    define HAVE_DOTPROD_INTRIN	0
+#ifdef __ARM_FEATURE_DOTPROD
+#  define HAVE_DOTPROD(features)	1
+#else
+#  define HAVE_DOTPROD(features)	((features) & ARM_CPU_FEATURE_DOTPROD)
+#endif
+#if defined(ARCH_ARM64) && HAVE_NEON_INTRIN && \
+	(GCC_PREREQ(8, 1) || CLANG_PREREQ(7, 0, 10010000) || defined(_MSC_VER))
+#  define HAVE_DOTPROD_INTRIN	1
+   
+#  if defined(__clang__) && !CLANG_PREREQ(16, 0, 16000000) && \
+	!defined(__ARM_FEATURE_DOTPROD)
+#    undef vdotq_u32
+#    define vdotq_u32(a, b, c)					\
+	({ uint32x4_t res = (a);				\
+	   __asm__("udot %0.4s, %1.16b, %2.16b"			\
+		   : "+w" (res) : "w" (b), "w" (c));		\
+	   res; })
+#    pragma clang diagnostic ignored "-Wgnu-statement-expression"
 #  endif
 #else
-#  define HAVE_DOTPROD_NATIVE	0
 #  define HAVE_DOTPROD_INTRIN	0
-#endif
-
-
-#if HAVE_CRC32_INTRIN && !HAVE_CRC32_NATIVE && \
-	(defined(__clang__) || defined(ARCH_ARM32))
-#  define __ARM_FEATURE_CRC32	1
-#endif
-#if HAVE_SHA3_INTRIN && !HAVE_SHA3_NATIVE && defined(__clang__)
-#  define __ARM_FEATURE_SHA3	1
-#endif
-#if HAVE_DOTPROD_INTRIN && !HAVE_DOTPROD_NATIVE && defined(__clang__)
-#  define __ARM_FEATURE_DOTPROD	1
-#endif
-#if HAVE_CRC32_INTRIN && !HAVE_CRC32_NATIVE && \
-	(defined(__clang__) || defined(ARCH_ARM32))
-#  include <arm_acle.h>
-#  undef __ARM_FEATURE_CRC32
-#endif
-#if HAVE_SHA3_INTRIN && !HAVE_SHA3_NATIVE && defined(__clang__)
-#  include <arm_neon.h>
-#  undef __ARM_FEATURE_SHA3
-#endif
-#if HAVE_DOTPROD_INTRIN && !HAVE_DOTPROD_NATIVE && defined(__clang__)
-#  include <arm_neon.h>
-#  undef __ARM_FEATURE_DOTPROD
 #endif
 
 #endif 
@@ -2068,26 +2124,19 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 
 
 #if HAVE_NEON_INTRIN && CPU_IS_LITTLE_ENDIAN()
-#  define adler32_neon		adler32_neon
-#  define FUNCNAME		adler32_neon
-#  define FUNCNAME_CHUNK	adler32_neon_chunk
-#  define IMPL_ALIGNMENT	16
-#  define IMPL_SEGMENT_LEN	64
-
-#  define IMPL_MAX_CHUNK_LEN	(64 * (0xFFFF / 0xFF))
+#  define adler32_arm_neon	adler32_arm_neon
 #  if HAVE_NEON_NATIVE
+     
 #    define ATTRIBUTES
+#  elif defined(ARCH_ARM32)
+#    define ATTRIBUTES	_target_attribute("fpu=neon")
+#  elif defined(__clang__)
+#    define ATTRIBUTES	_target_attribute("simd")
 #  else
-#    ifdef ARCH_ARM32
-#      define ATTRIBUTES	_target_attribute("fpu=neon")
-#    else
-#      define ATTRIBUTES	_target_attribute("+simd")
-#    endif
+#    define ATTRIBUTES	_target_attribute("+simd")
 #  endif
-#  include <arm_neon.h>
-static forceinline ATTRIBUTES void
-adler32_neon_chunk(const uint8x16_t *p, const uint8x16_t * const end,
-		   u32 *s1, u32 *s2)
+static ATTRIBUTES MAYBE_UNUSED u32
+adler32_arm_neon(u32 adler, const u8 *p, size_t len)
 {
 	static const u16 _aligned_attribute(16) mults[64] = {
 		64, 63, 62, 61, 60, 59, 58, 57, 56, 55, 54, 53, 52, 51, 50, 49,
@@ -2103,171 +2152,144 @@ adler32_neon_chunk(const uint8x16_t *p, const uint8x16_t * const end,
 	const uint16x8_t mults_f = vld1q_u16(&mults[40]);
 	const uint16x8_t mults_g = vld1q_u16(&mults[48]);
 	const uint16x8_t mults_h = vld1q_u16(&mults[56]);
-
-	uint32x4_t v_s1 = vdupq_n_u32(0);
-	uint32x4_t v_s2 = vdupq_n_u32(0);
-	
-	uint16x8_t v_byte_sums_a = vdupq_n_u16(0);
-	uint16x8_t v_byte_sums_b = vdupq_n_u16(0);
-	uint16x8_t v_byte_sums_c = vdupq_n_u16(0);
-	uint16x8_t v_byte_sums_d = vdupq_n_u16(0);
-	uint16x8_t v_byte_sums_e = vdupq_n_u16(0);
-	uint16x8_t v_byte_sums_f = vdupq_n_u16(0);
-	uint16x8_t v_byte_sums_g = vdupq_n_u16(0);
-	uint16x8_t v_byte_sums_h = vdupq_n_u16(0);
-
-	do {
-		
-		const uint8x16_t bytes1 = *p++;
-		const uint8x16_t bytes2 = *p++;
-		const uint8x16_t bytes3 = *p++;
-		const uint8x16_t bytes4 = *p++;
-		uint16x8_t tmp;
-
-		
-		v_s2 = vaddq_u32(v_s2, v_s1);
-
-		
-		tmp = vpaddlq_u8(bytes1);
-		v_byte_sums_a = vaddw_u8(v_byte_sums_a, vget_low_u8(bytes1));
-		v_byte_sums_b = vaddw_u8(v_byte_sums_b, vget_high_u8(bytes1));
-		tmp = vpadalq_u8(tmp, bytes2);
-		v_byte_sums_c = vaddw_u8(v_byte_sums_c, vget_low_u8(bytes2));
-		v_byte_sums_d = vaddw_u8(v_byte_sums_d, vget_high_u8(bytes2));
-		tmp = vpadalq_u8(tmp, bytes3);
-		v_byte_sums_e = vaddw_u8(v_byte_sums_e, vget_low_u8(bytes3));
-		v_byte_sums_f = vaddw_u8(v_byte_sums_f, vget_high_u8(bytes3));
-		tmp = vpadalq_u8(tmp, bytes4);
-		v_byte_sums_g = vaddw_u8(v_byte_sums_g, vget_low_u8(bytes4));
-		v_byte_sums_h = vaddw_u8(v_byte_sums_h, vget_high_u8(bytes4));
-		v_s1 = vpadalq_u16(v_s1, tmp);
-
-	} while (p != end);
-
-	
-#ifdef ARCH_ARM32
-#  define umlal2(a, b, c)  vmlal_u16((a), vget_high_u16(b), vget_high_u16(c))
-#else
-#  define umlal2	   vmlal_high_u16
-#endif
-	v_s2 = vqshlq_n_u32(v_s2, 6);
-	v_s2 = vmlal_u16(v_s2, vget_low_u16(v_byte_sums_a), vget_low_u16(mults_a));
-	v_s2 = umlal2(v_s2, v_byte_sums_a, mults_a);
-	v_s2 = vmlal_u16(v_s2, vget_low_u16(v_byte_sums_b), vget_low_u16(mults_b));
-	v_s2 = umlal2(v_s2, v_byte_sums_b, mults_b);
-	v_s2 = vmlal_u16(v_s2, vget_low_u16(v_byte_sums_c), vget_low_u16(mults_c));
-	v_s2 = umlal2(v_s2, v_byte_sums_c, mults_c);
-	v_s2 = vmlal_u16(v_s2, vget_low_u16(v_byte_sums_d), vget_low_u16(mults_d));
-	v_s2 = umlal2(v_s2, v_byte_sums_d, mults_d);
-	v_s2 = vmlal_u16(v_s2, vget_low_u16(v_byte_sums_e), vget_low_u16(mults_e));
-	v_s2 = umlal2(v_s2, v_byte_sums_e, mults_e);
-	v_s2 = vmlal_u16(v_s2, vget_low_u16(v_byte_sums_f), vget_low_u16(mults_f));
-	v_s2 = umlal2(v_s2, v_byte_sums_f, mults_f);
-	v_s2 = vmlal_u16(v_s2, vget_low_u16(v_byte_sums_g), vget_low_u16(mults_g));
-	v_s2 = umlal2(v_s2, v_byte_sums_g, mults_g);
-	v_s2 = vmlal_u16(v_s2, vget_low_u16(v_byte_sums_h), vget_low_u16(mults_h));
-	v_s2 = umlal2(v_s2, v_byte_sums_h, mults_h);
-#undef umlal2
-
-	
-#ifdef ARCH_ARM32
-	*s1 += vgetq_lane_u32(v_s1, 0) + vgetq_lane_u32(v_s1, 1) +
-	       vgetq_lane_u32(v_s1, 2) + vgetq_lane_u32(v_s1, 3);
-	*s2 += vgetq_lane_u32(v_s2, 0) + vgetq_lane_u32(v_s2, 1) +
-	       vgetq_lane_u32(v_s2, 2) + vgetq_lane_u32(v_s2, 3);
-#else
-	*s1 += vaddvq_u32(v_s1);
-	*s2 += vaddvq_u32(v_s2);
-#endif
-}
-/* #include "adler32_vec_template.h" */
-
-
-
-
-static u32 ATTRIBUTES MAYBE_UNUSED
-FUNCNAME(u32 adler, const u8 *p, size_t len)
-{
-	const size_t max_chunk_len =
-		MIN(MAX_CHUNK_LEN, IMPL_MAX_CHUNK_LEN) -
-		(MIN(MAX_CHUNK_LEN, IMPL_MAX_CHUNK_LEN) % IMPL_SEGMENT_LEN);
 	u32 s1 = adler & 0xFFFF;
 	u32 s2 = adler >> 16;
-	const u8 * const end = p + len;
-	const u8 *vend;
 
 	
-	if (p != end && (uintptr_t)p % IMPL_ALIGNMENT) {
+	if (unlikely(len > 32768 && ((uintptr_t)p & 15))) {
 		do {
 			s1 += *p++;
 			s2 += s1;
-		} while (p != end && (uintptr_t)p % IMPL_ALIGNMENT);
+			len--;
+		} while ((uintptr_t)p & 15);
 		s1 %= DIVISOR;
 		s2 %= DIVISOR;
 	}
 
-	
-	STATIC_ASSERT(IMPL_SEGMENT_LEN % IMPL_ALIGNMENT == 0);
-	vend = end - ((size_t)(end - p) % IMPL_SEGMENT_LEN);
-	while (p != vend) {
-		size_t chunk_len = MIN((size_t)(vend - p), max_chunk_len);
+	while (len) {
+		
+		size_t n = MIN(len, MAX_CHUNK_LEN & ~63);
 
-		s2 += s1 * chunk_len;
+		len -= n;
 
-		FUNCNAME_CHUNK((const void *)p, (const void *)(p + chunk_len),
-			       &s1, &s2);
+		if (n >= 64) {
+			uint32x4_t v_s1 = vdupq_n_u32(0);
+			uint32x4_t v_s2 = vdupq_n_u32(0);
+			
+			uint16x8_t v_byte_sums_a = vdupq_n_u16(0);
+			uint16x8_t v_byte_sums_b = vdupq_n_u16(0);
+			uint16x8_t v_byte_sums_c = vdupq_n_u16(0);
+			uint16x8_t v_byte_sums_d = vdupq_n_u16(0);
+			uint16x8_t v_byte_sums_e = vdupq_n_u16(0);
+			uint16x8_t v_byte_sums_f = vdupq_n_u16(0);
+			uint16x8_t v_byte_sums_g = vdupq_n_u16(0);
+			uint16x8_t v_byte_sums_h = vdupq_n_u16(0);
 
-		p += chunk_len;
-		s1 %= DIVISOR;
-		s2 %= DIVISOR;
+			s2 += s1 * (n & ~63);
+
+			do {
+				
+				const uint8x16_t data_a = vld1q_u8(p + 0);
+				const uint8x16_t data_b = vld1q_u8(p + 16);
+				const uint8x16_t data_c = vld1q_u8(p + 32);
+				const uint8x16_t data_d = vld1q_u8(p + 48);
+				uint16x8_t tmp;
+
+				
+				v_s2 = vaddq_u32(v_s2, v_s1);
+
+				
+				tmp = vpaddlq_u8(data_a);
+				v_byte_sums_a = vaddw_u8(v_byte_sums_a,
+							 vget_low_u8(data_a));
+				v_byte_sums_b = vaddw_u8(v_byte_sums_b,
+							 vget_high_u8(data_a));
+				tmp = vpadalq_u8(tmp, data_b);
+				v_byte_sums_c = vaddw_u8(v_byte_sums_c,
+							 vget_low_u8(data_b));
+				v_byte_sums_d = vaddw_u8(v_byte_sums_d,
+							 vget_high_u8(data_b));
+				tmp = vpadalq_u8(tmp, data_c);
+				v_byte_sums_e = vaddw_u8(v_byte_sums_e,
+							 vget_low_u8(data_c));
+				v_byte_sums_f = vaddw_u8(v_byte_sums_f,
+							 vget_high_u8(data_c));
+				tmp = vpadalq_u8(tmp, data_d);
+				v_byte_sums_g = vaddw_u8(v_byte_sums_g,
+							 vget_low_u8(data_d));
+				v_byte_sums_h = vaddw_u8(v_byte_sums_h,
+							 vget_high_u8(data_d));
+				v_s1 = vpadalq_u16(v_s1, tmp);
+
+				p += 64;
+				n -= 64;
+			} while (n >= 64);
+
+			
+		#ifdef ARCH_ARM32
+		#  define umlal2(a, b, c)  vmlal_u16((a), vget_high_u16(b), vget_high_u16(c))
+		#else
+		#  define umlal2	   vmlal_high_u16
+		#endif
+			v_s2 = vqshlq_n_u32(v_s2, 6);
+			v_s2 = vmlal_u16(v_s2, vget_low_u16(v_byte_sums_a),
+					 vget_low_u16(mults_a));
+			v_s2 = umlal2(v_s2, v_byte_sums_a, mults_a);
+			v_s2 = vmlal_u16(v_s2, vget_low_u16(v_byte_sums_b),
+					 vget_low_u16(mults_b));
+			v_s2 = umlal2(v_s2, v_byte_sums_b, mults_b);
+			v_s2 = vmlal_u16(v_s2, vget_low_u16(v_byte_sums_c),
+					 vget_low_u16(mults_c));
+			v_s2 = umlal2(v_s2, v_byte_sums_c, mults_c);
+			v_s2 = vmlal_u16(v_s2, vget_low_u16(v_byte_sums_d),
+					 vget_low_u16(mults_d));
+			v_s2 = umlal2(v_s2, v_byte_sums_d, mults_d);
+			v_s2 = vmlal_u16(v_s2, vget_low_u16(v_byte_sums_e),
+					 vget_low_u16(mults_e));
+			v_s2 = umlal2(v_s2, v_byte_sums_e, mults_e);
+			v_s2 = vmlal_u16(v_s2, vget_low_u16(v_byte_sums_f),
+					 vget_low_u16(mults_f));
+			v_s2 = umlal2(v_s2, v_byte_sums_f, mults_f);
+			v_s2 = vmlal_u16(v_s2, vget_low_u16(v_byte_sums_g),
+					 vget_low_u16(mults_g));
+			v_s2 = umlal2(v_s2, v_byte_sums_g, mults_g);
+			v_s2 = vmlal_u16(v_s2, vget_low_u16(v_byte_sums_h),
+					 vget_low_u16(mults_h));
+			v_s2 = umlal2(v_s2, v_byte_sums_h, mults_h);
+		#undef umlal2
+
+			
+		#ifdef ARCH_ARM32
+			s1 += vgetq_lane_u32(v_s1, 0) + vgetq_lane_u32(v_s1, 1) +
+			      vgetq_lane_u32(v_s1, 2) + vgetq_lane_u32(v_s1, 3);
+			s2 += vgetq_lane_u32(v_s2, 0) + vgetq_lane_u32(v_s2, 1) +
+			      vgetq_lane_u32(v_s2, 2) + vgetq_lane_u32(v_s2, 3);
+		#else
+			s1 += vaddvq_u32(v_s1);
+			s2 += vaddvq_u32(v_s2);
+		#endif
+		}
+		
+		ADLER32_CHUNK(s1, s2, p, n);
 	}
-
-	
-	if (p != end) {
-		do {
-			s1 += *p++;
-			s2 += s1;
-		} while (p != end);
-		s1 %= DIVISOR;
-		s2 %= DIVISOR;
-	}
-
 	return (s2 << 16) | s1;
 }
-
-#undef FUNCNAME
-#undef FUNCNAME_CHUNK
 #undef ATTRIBUTES
-#undef IMPL_ALIGNMENT
-#undef IMPL_SEGMENT_LEN
-#undef IMPL_MAX_CHUNK_LEN
-
 #endif 
 
 
 #if HAVE_DOTPROD_INTRIN && CPU_IS_LITTLE_ENDIAN()
-#  define adler32_neon_dotprod	adler32_neon_dotprod
-#  define FUNCNAME		adler32_neon_dotprod
-#  define FUNCNAME_CHUNK	adler32_neon_dotprod_chunk
-#  define IMPL_ALIGNMENT	16
-#  define IMPL_SEGMENT_LEN	64
-#  define IMPL_MAX_CHUNK_LEN	MAX_CHUNK_LEN
-#  if HAVE_DOTPROD_NATIVE
-#    define ATTRIBUTES
+#  define adler32_arm_neon_dotprod	adler32_arm_neon_dotprod
+#  ifdef __clang__
+#    define ATTRIBUTES	_target_attribute("dotprod")
+   
+#  elif defined(__ARM_FEATURE_JCVT)
+#    define ATTRIBUTES	_target_attribute("+dotprod")
 #  else
-#    ifdef __clang__
-#      define ATTRIBUTES  _target_attribute("dotprod")
-     
-#    elif defined(__ARM_FEATURE_JCVT)
-#      define ATTRIBUTES  _target_attribute("+dotprod")
-#    else
-#      define ATTRIBUTES  _target_attribute("arch=armv8.2-a+dotprod")
-#    endif
+#    define ATTRIBUTES	_target_attribute("arch=armv8.2-a+dotprod")
 #  endif
-#  include <arm_neon.h>
-static forceinline ATTRIBUTES void
-adler32_neon_dotprod_chunk(const uint8x16_t *p, const uint8x16_t * const end,
-			   u32 *s1, u32 *s2)
+static ATTRIBUTES u32
+adler32_arm_neon_dotprod(u32 adler, const u8 *p, size_t len)
 {
 	static const u8 _aligned_attribute(16) mults[64] = {
 		64, 63, 62, 61, 60, 59, 58, 57, 56, 55, 54, 53, 52, 51, 50, 49,
@@ -2280,133 +2302,107 @@ adler32_neon_dotprod_chunk(const uint8x16_t *p, const uint8x16_t * const end,
 	const uint8x16_t mults_c = vld1q_u8(&mults[32]);
 	const uint8x16_t mults_d = vld1q_u8(&mults[48]);
 	const uint8x16_t ones = vdupq_n_u8(1);
-	uint32x4_t v_s1_a = vdupq_n_u32(0);
-	uint32x4_t v_s1_b = vdupq_n_u32(0);
-	uint32x4_t v_s1_c = vdupq_n_u32(0);
-	uint32x4_t v_s1_d = vdupq_n_u32(0);
-	uint32x4_t v_s2_a = vdupq_n_u32(0);
-	uint32x4_t v_s2_b = vdupq_n_u32(0);
-	uint32x4_t v_s2_c = vdupq_n_u32(0);
-	uint32x4_t v_s2_d = vdupq_n_u32(0);
-	uint32x4_t v_s1_sums_a = vdupq_n_u32(0);
-	uint32x4_t v_s1_sums_b = vdupq_n_u32(0);
-	uint32x4_t v_s1_sums_c = vdupq_n_u32(0);
-	uint32x4_t v_s1_sums_d = vdupq_n_u32(0);
-	uint32x4_t v_s1;
-	uint32x4_t v_s2;
-	uint32x4_t v_s1_sums;
-
-	do {
-		uint8x16_t bytes_a = *p++;
-		uint8x16_t bytes_b = *p++;
-		uint8x16_t bytes_c = *p++;
-		uint8x16_t bytes_d = *p++;
-
-		v_s1_sums_a = vaddq_u32(v_s1_sums_a, v_s1_a);
-		v_s1_a = vdotq_u32(v_s1_a, bytes_a, ones);
-		v_s2_a = vdotq_u32(v_s2_a, bytes_a, mults_a);
-
-		v_s1_sums_b = vaddq_u32(v_s1_sums_b, v_s1_b);
-		v_s1_b = vdotq_u32(v_s1_b, bytes_b, ones);
-		v_s2_b = vdotq_u32(v_s2_b, bytes_b, mults_b);
-
-		v_s1_sums_c = vaddq_u32(v_s1_sums_c, v_s1_c);
-		v_s1_c = vdotq_u32(v_s1_c, bytes_c, ones);
-		v_s2_c = vdotq_u32(v_s2_c, bytes_c, mults_c);
-
-		v_s1_sums_d = vaddq_u32(v_s1_sums_d, v_s1_d);
-		v_s1_d = vdotq_u32(v_s1_d, bytes_d, ones);
-		v_s2_d = vdotq_u32(v_s2_d, bytes_d, mults_d);
-	} while (p != end);
-
-	v_s1 = vaddq_u32(vaddq_u32(v_s1_a, v_s1_b), vaddq_u32(v_s1_c, v_s1_d));
-	v_s2 = vaddq_u32(vaddq_u32(v_s2_a, v_s2_b), vaddq_u32(v_s2_c, v_s2_d));
-	v_s1_sums = vaddq_u32(vaddq_u32(v_s1_sums_a, v_s1_sums_b),
-			      vaddq_u32(v_s1_sums_c, v_s1_sums_d));
-	v_s2 = vaddq_u32(v_s2, vqshlq_n_u32(v_s1_sums, 6));
-
-	*s1 += vaddvq_u32(v_s1);
-	*s2 += vaddvq_u32(v_s2);
-}
-/* #include "arm-../adler32_vec_template.h" */
-
-
-
-
-static u32 ATTRIBUTES MAYBE_UNUSED
-FUNCNAME(u32 adler, const u8 *p, size_t len)
-{
-	const size_t max_chunk_len =
-		MIN(MAX_CHUNK_LEN, IMPL_MAX_CHUNK_LEN) -
-		(MIN(MAX_CHUNK_LEN, IMPL_MAX_CHUNK_LEN) % IMPL_SEGMENT_LEN);
 	u32 s1 = adler & 0xFFFF;
 	u32 s2 = adler >> 16;
-	const u8 * const end = p + len;
-	const u8 *vend;
 
 	
-	if (p != end && (uintptr_t)p % IMPL_ALIGNMENT) {
+	if (unlikely(len > 32768 && ((uintptr_t)p & 15))) {
 		do {
 			s1 += *p++;
 			s2 += s1;
-		} while (p != end && (uintptr_t)p % IMPL_ALIGNMENT);
+			len--;
+		} while ((uintptr_t)p & 15);
 		s1 %= DIVISOR;
 		s2 %= DIVISOR;
 	}
 
-	
-	STATIC_ASSERT(IMPL_SEGMENT_LEN % IMPL_ALIGNMENT == 0);
-	vend = end - ((size_t)(end - p) % IMPL_SEGMENT_LEN);
-	while (p != vend) {
-		size_t chunk_len = MIN((size_t)(vend - p), max_chunk_len);
+	while (len) {
+		
+		size_t n = MIN(len, MAX_CHUNK_LEN & ~63);
 
-		s2 += s1 * chunk_len;
+		len -= n;
 
-		FUNCNAME_CHUNK((const void *)p, (const void *)(p + chunk_len),
-			       &s1, &s2);
+		if (n >= 64) {
+			uint32x4_t v_s1_a = vdupq_n_u32(0);
+			uint32x4_t v_s1_b = vdupq_n_u32(0);
+			uint32x4_t v_s1_c = vdupq_n_u32(0);
+			uint32x4_t v_s1_d = vdupq_n_u32(0);
+			uint32x4_t v_s2_a = vdupq_n_u32(0);
+			uint32x4_t v_s2_b = vdupq_n_u32(0);
+			uint32x4_t v_s2_c = vdupq_n_u32(0);
+			uint32x4_t v_s2_d = vdupq_n_u32(0);
+			uint32x4_t v_s1_sums_a = vdupq_n_u32(0);
+			uint32x4_t v_s1_sums_b = vdupq_n_u32(0);
+			uint32x4_t v_s1_sums_c = vdupq_n_u32(0);
+			uint32x4_t v_s1_sums_d = vdupq_n_u32(0);
+			uint32x4_t v_s1;
+			uint32x4_t v_s2;
+			uint32x4_t v_s1_sums;
 
-		p += chunk_len;
-		s1 %= DIVISOR;
-		s2 %= DIVISOR;
+			s2 += s1 * (n & ~63);
+
+			do {
+				uint8x16_t data_a = vld1q_u8(p + 0);
+				uint8x16_t data_b = vld1q_u8(p + 16);
+				uint8x16_t data_c = vld1q_u8(p + 32);
+				uint8x16_t data_d = vld1q_u8(p + 48);
+
+				v_s1_sums_a = vaddq_u32(v_s1_sums_a, v_s1_a);
+				v_s1_a = vdotq_u32(v_s1_a, data_a, ones);
+				v_s2_a = vdotq_u32(v_s2_a, data_a, mults_a);
+
+				v_s1_sums_b = vaddq_u32(v_s1_sums_b, v_s1_b);
+				v_s1_b = vdotq_u32(v_s1_b, data_b, ones);
+				v_s2_b = vdotq_u32(v_s2_b, data_b, mults_b);
+
+				v_s1_sums_c = vaddq_u32(v_s1_sums_c, v_s1_c);
+				v_s1_c = vdotq_u32(v_s1_c, data_c, ones);
+				v_s2_c = vdotq_u32(v_s2_c, data_c, mults_c);
+
+				v_s1_sums_d = vaddq_u32(v_s1_sums_d, v_s1_d);
+				v_s1_d = vdotq_u32(v_s1_d, data_d, ones);
+				v_s2_d = vdotq_u32(v_s2_d, data_d, mults_d);
+
+				p += 64;
+				n -= 64;
+			} while (n >= 64);
+
+			v_s1 = vaddq_u32(vaddq_u32(v_s1_a, v_s1_b),
+					 vaddq_u32(v_s1_c, v_s1_d));
+			v_s2 = vaddq_u32(vaddq_u32(v_s2_a, v_s2_b),
+					 vaddq_u32(v_s2_c, v_s2_d));
+			v_s1_sums = vaddq_u32(vaddq_u32(v_s1_sums_a,
+							v_s1_sums_b),
+					      vaddq_u32(v_s1_sums_c,
+							v_s1_sums_d));
+			v_s2 = vaddq_u32(v_s2, vqshlq_n_u32(v_s1_sums, 6));
+
+			s1 += vaddvq_u32(v_s1);
+			s2 += vaddvq_u32(v_s2);
+		}
+		
+		ADLER32_CHUNK(s1, s2, p, n);
 	}
-
-	
-	if (p != end) {
-		do {
-			s1 += *p++;
-			s2 += s1;
-		} while (p != end);
-		s1 %= DIVISOR;
-		s2 %= DIVISOR;
-	}
-
 	return (s2 << 16) | s1;
 }
-
-#undef FUNCNAME
-#undef FUNCNAME_CHUNK
 #undef ATTRIBUTES
-#undef IMPL_ALIGNMENT
-#undef IMPL_SEGMENT_LEN
-#undef IMPL_MAX_CHUNK_LEN
-
 #endif 
 
-#if defined(adler32_neon_dotprod) && HAVE_DOTPROD_NATIVE
-#define DEFAULT_IMPL	adler32_neon_dotprod
+#if defined(adler32_arm_neon_dotprod) && defined(__ARM_FEATURE_DOTPROD)
+#define DEFAULT_IMPL	adler32_arm_neon_dotprod
 #else
 static inline adler32_func_t
 arch_select_adler32_func(void)
 {
 	const u32 features MAYBE_UNUSED = get_arm_cpu_features();
 
-#ifdef adler32_neon_dotprod
+#ifdef adler32_arm_neon_dotprod
 	if (HAVE_NEON(features) && HAVE_DOTPROD(features))
-		return adler32_neon_dotprod;
+		return adler32_arm_neon_dotprod;
 #endif
-#ifdef adler32_neon
+#ifdef adler32_arm_neon
 	if (HAVE_NEON(features))
-		return adler32_neon;
+		return adler32_arm_neon;
 #endif
 	return NULL;
 }
@@ -2476,8 +2472,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	19
-#define LIBDEFLATE_VERSION_STRING	"1.19"
+#define LIBDEFLATE_VERSION_MINOR	20
+#define LIBDEFLATE_VERSION_STRING	"1.20"
 
 
 #ifndef LIBDEFLATEAPI
@@ -2695,6 +2691,7 @@ struct libdeflate_options {
 #undef ARCH_X86_32
 #undef ARCH_ARM64
 #undef ARCH_ARM32
+#undef ARCH_RISCV
 #ifdef _MSC_VER
 #  if defined(_M_X64)
 #    define ARCH_X86_64
@@ -2714,6 +2711,8 @@ struct libdeflate_options {
 #    define ARCH_ARM64
 #  elif defined(__arm__)
 #    define ARCH_ARM32
+#  elif defined(__riscv)
+#    define ARCH_RISCV
 #  endif
 #endif
 
@@ -2758,6 +2757,9 @@ typedef size_t machine_word_t;
 #  define GCC_PREREQ(major, minor)		\
 	(__GNUC__ > (major) ||			\
 	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#  if !GCC_PREREQ(4, 9)
+#    error "gcc versions older than 4.9 are no longer supported"
+#  endif
 #else
 #  define GCC_PREREQ(major, minor)	0
 #endif
@@ -2770,14 +2772,27 @@ typedef size_t machine_word_t;
 	(__clang_major__ > (major) ||			\
 	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
 #  endif
+#  if !CLANG_PREREQ(3, 9, 8000000)
+#    error "clang versions older than 3.9 are no longer supported"
+#  endif
 #else
 #  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+#ifdef _MSC_VER
+#  define MSVC_PREREQ(version)	(_MSC_VER >= (version))
+#  if !MSVC_PREREQ(1900)
+#    error "MSVC versions older than Visual Studio 2015 are no longer supported"
+#  endif
+#else
+#  define MSVC_PREREQ(version)	0
 #endif
 
 
 #ifndef __has_attribute
 #  define __has_attribute(attribute)	0
 #endif
+
+
 #ifndef __has_builtin
 #  define __has_builtin(builtin)	0
 #endif
@@ -2801,6 +2816,13 @@ typedef size_t machine_word_t;
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
+#endif
+
+
+#if defined(__GNUC__) || __has_attribute(noreturn)
+#  define NORETURN		__attribute__((noreturn))
+#else
+#  define NORETURN
 #endif
 
 
@@ -2869,12 +2891,10 @@ typedef size_t machine_word_t;
 #endif
 
 
-#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#if defined(__GNUC__) || __has_attribute(target)
 #  define _target_attribute(attrs)	__attribute__((target(attrs)))
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
 #else
 #  define _target_attribute(attrs)
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
 #endif
 
 
@@ -2914,7 +2934,7 @@ static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
 
 static forceinline u16 bswap16(u16 v)
 {
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap16)
 	return __builtin_bswap16(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ushort(v);
@@ -2926,7 +2946,7 @@ static forceinline u16 bswap16(u16 v)
 
 static forceinline u32 bswap32(u32 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap32)
 	return __builtin_bswap32(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ulong(v);
@@ -2941,7 +2961,7 @@ static forceinline u32 bswap32(u32 v)
 
 static forceinline u64 bswap64(u64 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap64)
 	return __builtin_bswap64(v);
 #elif defined(_MSC_VER)
 	return _byteswap_uint64(v);
@@ -2972,6 +2992,7 @@ static forceinline u64 bswap64(u64 v)
 #if (defined(__GNUC__) || defined(__clang__)) && \
 	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	 defined(__riscv_misaligned_fast) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
 #elif defined(_MSC_VER)
@@ -3309,12 +3330,17 @@ int memcmp(const void *s1, const void *s2, size_t n);
 
 #undef LIBDEFLATE_ENABLE_ASSERTIONS
 #else
-#include <string.h>
+#  include <string.h>
+   
+#  ifdef __clang_analyzer__
+#    define LIBDEFLATE_ENABLE_ASSERTIONS
+#  endif
 #endif
 
 
 #ifdef LIBDEFLATE_ENABLE_ASSERTIONS
-void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+NORETURN void
+libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #define ASSERT(expr) { if (unlikely(!(expr))) \
 	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
 #else
@@ -3328,29 +3354,24 @@ void libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #endif 
 
 
-#define HAVE_DYNAMIC_X86_CPU_FEATURES	0
-
 #if defined(ARCH_X86_32) || defined(ARCH_X86_64)
 
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE || defined(_MSC_VER)
-#  undef HAVE_DYNAMIC_X86_CPU_FEATURES
-#  define HAVE_DYNAMIC_X86_CPU_FEATURES	1
-#endif
+#define X86_CPU_FEATURE_SSE2		(1 << 0)
+#define X86_CPU_FEATURE_PCLMULQDQ	(1 << 1)
+#define X86_CPU_FEATURE_AVX		(1 << 2)
+#define X86_CPU_FEATURE_AVX2		(1 << 3)
+#define X86_CPU_FEATURE_BMI2		(1 << 4)
 
-#define X86_CPU_FEATURE_SSE2		0x00000001
-#define X86_CPU_FEATURE_PCLMUL		0x00000002
-#define X86_CPU_FEATURE_AVX		0x00000004
-#define X86_CPU_FEATURE_AVX2		0x00000008
-#define X86_CPU_FEATURE_BMI2		0x00000010
+#define X86_CPU_FEATURE_ZMM		(1 << 5)
+#define X86_CPU_FEATURE_AVX512BW	(1 << 6)
+#define X86_CPU_FEATURE_AVX512VL	(1 << 7)
+#define X86_CPU_FEATURE_VPCLMULQDQ	(1 << 8)
+#define X86_CPU_FEATURE_AVX512VNNI	(1 << 9)
+#define X86_CPU_FEATURE_AVXVNNI		(1 << 10)
 
-#define HAVE_SSE2(features)	(HAVE_SSE2_NATIVE     || ((features) & X86_CPU_FEATURE_SSE2))
-#define HAVE_PCLMUL(features)	(HAVE_PCLMUL_NATIVE   || ((features) & X86_CPU_FEATURE_PCLMUL))
-#define HAVE_AVX(features)	(HAVE_AVX_NATIVE      || ((features) & X86_CPU_FEATURE_AVX))
-#define HAVE_AVX2(features)	(HAVE_AVX2_NATIVE     || ((features) & X86_CPU_FEATURE_AVX2))
-#define HAVE_BMI2(features)	(HAVE_BMI2_NATIVE     || ((features) & X86_CPU_FEATURE_BMI2))
+#if defined(__GNUC__) || defined(__clang__) || defined(_MSC_VER)
 
-#if HAVE_DYNAMIC_X86_CPU_FEATURES
-#define X86_CPU_FEATURES_KNOWN		0x80000000
+#  define X86_CPU_FEATURES_KNOWN	(1U << 31)
 extern volatile u32 libdeflate_x86_cpu_features;
 
 void libdeflate_init_x86_cpu_features(void);
@@ -3361,89 +3382,101 @@ static inline u32 get_x86_cpu_features(void)
 		libdeflate_init_x86_cpu_features();
 	return libdeflate_x86_cpu_features;
 }
-#else 
-static inline u32 get_x86_cpu_features(void) { return 0; }
-#endif 
 
-
-#if HAVE_DYNAMIC_X86_CPU_FEATURES && \
-	(GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000) || defined(_MSC_VER))
-#  define HAVE_TARGET_INTRINSICS	1
+#  include <immintrin.h>
+#  if defined(_MSC_VER) && defined(__clang__)
+#    include <tmmintrin.h>
+#    include <smmintrin.h>
+#    include <wmmintrin.h>
+#    include <avxintrin.h>
+#    include <avx2intrin.h>
+#    include <avx512fintrin.h>
+#    include <avx512bwintrin.h>
+#    include <avx512vlintrin.h>
+#    if __has_include(<avx512vlbwintrin.h>)
+#      include <avx512vlbwintrin.h>
+#    endif
+#    if __has_include(<vpclmulqdqintrin.h>)
+#      include <vpclmulqdqintrin.h>
+#    endif
+#    if __has_include(<avx512vnniintrin.h>)
+#      include <avx512vnniintrin.h>
+#    endif
+#    if __has_include(<avx512vlvnniintrin.h>)
+#      include <avx512vlvnniintrin.h>
+#    endif
+#    if __has_include(<avxvnniintrin.h>)
+#      include <avxvnniintrin.h>
+#    endif
+#  endif
 #else
-#  define HAVE_TARGET_INTRINSICS	0
+static inline u32 get_x86_cpu_features(void) { return 0; }
 #endif
-
 
 #if defined(__SSE2__) || \
 	(defined(_MSC_VER) && \
 	 (defined(ARCH_X86_64) || (defined(_M_IX86_FP) && _M_IX86_FP >= 2)))
-#  define HAVE_SSE2_NATIVE	1
+#  define HAVE_SSE2(features)		1
+#  define HAVE_SSE2_NATIVE		1
 #else
-#  define HAVE_SSE2_NATIVE	0
+#  define HAVE_SSE2(features)		((features) & X86_CPU_FEATURE_SSE2)
+#  define HAVE_SSE2_NATIVE		0
 #endif
-#define HAVE_SSE2_INTRIN	(HAVE_SSE2_NATIVE || HAVE_TARGET_INTRINSICS)
-
 
 #if defined(__PCLMUL__) || (defined(_MSC_VER) && defined(__AVX2__))
-#  define HAVE_PCLMUL_NATIVE	1
+#  define HAVE_PCLMULQDQ(features)	1
 #else
-#  define HAVE_PCLMUL_NATIVE	0
+#  define HAVE_PCLMULQDQ(features)	((features) & X86_CPU_FEATURE_PCLMULQDQ)
 #endif
-#if HAVE_PCLMUL_NATIVE || (HAVE_TARGET_INTRINSICS && \
-			   (GCC_PREREQ(4, 4) || CLANG_PREREQ(3, 2, 0) || \
-			    defined(_MSC_VER)))
-#  define HAVE_PCLMUL_INTRIN	1
-#else
-#  define HAVE_PCLMUL_INTRIN	0
-#endif
-
 
 #ifdef __AVX__
-#  define HAVE_AVX_NATIVE	1
+#  define HAVE_AVX(features)		1
 #else
-#  define HAVE_AVX_NATIVE	0
+#  define HAVE_AVX(features)		((features) & X86_CPU_FEATURE_AVX)
 #endif
-#if HAVE_AVX_NATIVE || (HAVE_TARGET_INTRINSICS && \
-			(GCC_PREREQ(4, 6) || CLANG_PREREQ(3, 0, 0) || \
-			 defined(_MSC_VER)))
-#  define HAVE_AVX_INTRIN	1
-#else
-#  define HAVE_AVX_INTRIN	0
-#endif
-
 
 #ifdef __AVX2__
-#  define HAVE_AVX2_NATIVE	1
+#  define HAVE_AVX2(features)		1
 #else
-#  define HAVE_AVX2_NATIVE	0
+#  define HAVE_AVX2(features)		((features) & X86_CPU_FEATURE_AVX2)
 #endif
-#if HAVE_AVX2_NATIVE || (HAVE_TARGET_INTRINSICS && \
-			 (GCC_PREREQ(4, 7) || CLANG_PREREQ(3, 1, 0) || \
-			  defined(_MSC_VER)))
-#  define HAVE_AVX2_INTRIN	1
-#else
-#  define HAVE_AVX2_INTRIN	0
-#endif
-
 
 #if defined(__BMI2__) || (defined(_MSC_VER) && defined(__AVX2__))
-#  define HAVE_BMI2_NATIVE	1
+#  define HAVE_BMI2(features)		1
+#  define HAVE_BMI2_NATIVE		1
 #else
-#  define HAVE_BMI2_NATIVE	0
-#endif
-#if HAVE_BMI2_NATIVE || (HAVE_TARGET_INTRINSICS && \
-			 (GCC_PREREQ(4, 7) || CLANG_PREREQ(3, 1, 0) || \
-			  defined(_MSC_VER)))
-#  define HAVE_BMI2_INTRIN	1
-#else
-#  define HAVE_BMI2_INTRIN	0
+#  define HAVE_BMI2(features)		((features) & X86_CPU_FEATURE_BMI2)
+#  define HAVE_BMI2_NATIVE		0
 #endif
 
-#if defined(_MSC_VER) && _MSC_VER < 1930 
-#  undef HAVE_BMI2_NATIVE
-#  undef HAVE_BMI2_INTRIN
-#  define HAVE_BMI2_NATIVE	0
-#  define HAVE_BMI2_INTRIN	0
+#ifdef __AVX512BW__
+#  define HAVE_AVX512BW(features)	1
+#else
+#  define HAVE_AVX512BW(features)	((features) & X86_CPU_FEATURE_AVX512BW)
+#endif
+
+#ifdef __AVX512VL__
+#  define HAVE_AVX512VL(features)	1
+#else
+#  define HAVE_AVX512VL(features)	((features) & X86_CPU_FEATURE_AVX512VL)
+#endif
+
+#ifdef __VPCLMULQDQ__
+#  define HAVE_VPCLMULQDQ(features)	1
+#else
+#  define HAVE_VPCLMULQDQ(features)	((features) & X86_CPU_FEATURE_VPCLMULQDQ)
+#endif
+
+#ifdef __AVX512VNNI__
+#  define HAVE_AVX512VNNI(features)	1
+#else
+#  define HAVE_AVX512VNNI(features)	((features) & X86_CPU_FEATURE_AVX512VNNI)
+#endif
+
+#ifdef __AVXVNNI__
+#  define HAVE_AVXVNNI(features)	1
+#else
+#  define HAVE_AVXVNNI(features)	((features) & X86_CPU_FEATURE_AVXVNNI)
 #endif
 
 #endif 
@@ -3452,336 +3485,2045 @@ static inline u32 get_x86_cpu_features(void) { return 0; }
 
 
 
-
-#define ADLER32_FINISH_VEC_CHUNK_128(s1, s2, v_s1, v_s2)		    \
-{									    \
-	__m128i  s1_last = (v_s1), s2_last = (v_s2);	    \
-									    \
-							    \
-	s2_last = _mm_add_epi32(s2_last, _mm_shuffle_epi32(s2_last, 0x31)); \
-	s1_last = _mm_add_epi32(s1_last, _mm_shuffle_epi32(s1_last, 0x02)); \
-	s2_last = _mm_add_epi32(s2_last, _mm_shuffle_epi32(s2_last, 0x02)); \
-									    \
-	*(s1) += (u32)_mm_cvtsi128_si32(s1_last);			    \
-	*(s2) += (u32)_mm_cvtsi128_si32(s2_last);			    \
-}
-
-#define ADLER32_FINISH_VEC_CHUNK_256(s1, s2, v_s1, v_s2)		    \
-{									    \
-	__m128i  s1_128bit, s2_128bit;			    \
-									    \
-							    \
-	s1_128bit = _mm_add_epi32(_mm256_extracti128_si256((v_s1), 0),	    \
-				  _mm256_extracti128_si256((v_s1), 1));	    \
-	s2_128bit = _mm_add_epi32(_mm256_extracti128_si256((v_s2), 0),	    \
-				  _mm256_extracti128_si256((v_s2), 1));	    \
-									    \
-	ADLER32_FINISH_VEC_CHUNK_128((s1), (s2), s1_128bit, s2_128bit);	    \
-}
+#if defined(__GNUC__) || defined(__clang__) || defined(_MSC_VER)
+#  define adler32_x86_sse2	adler32_x86_sse2
+#  define SUFFIX			   _sse2
+#  define ATTRIBUTES		_target_attribute("sse2")
+#  define VL			16
+#  define USE_VNNI		0
+#  define USE_AVX512		0
+/* #include "x86-adler32_template.h" */
 
 
-#if GCC_PREREQ(1, 0)
-#  define GCC_UPDATE_VARS(a, b, c, d, e, f) \
-	__asm__("" : "+x" (a), "+x" (b), "+x" (c), "+x" (d), "+x" (e), "+x" (f))
-#else
-#  define GCC_UPDATE_VARS(a, b, c, d, e, f) \
-	(void)a, (void)b, (void)c, (void)d, (void)e, (void)f
-#endif
 
 
-#if HAVE_SSE2_INTRIN
-#  define adler32_sse2		adler32_sse2
-#  define FUNCNAME		adler32_sse2
-#  define FUNCNAME_CHUNK	adler32_sse2_chunk
-#  define IMPL_ALIGNMENT	16
-#  define IMPL_SEGMENT_LEN	32
-
-#  define IMPL_MAX_CHUNK_LEN	(32 * (0x7FFF / 0xFF))
-#  if HAVE_SSE2_NATIVE
-#    define ATTRIBUTES
+#if VL == 16
+#  define vec_t			__m128i
+#  define mask_t		u16
+#  define LOG2_VL		4
+#  define VADD8(a, b)		_mm_add_epi8((a), (b))
+#  define VADD16(a, b)		_mm_add_epi16((a), (b))
+#  define VADD32(a, b)		_mm_add_epi32((a), (b))
+#  if USE_AVX512
+#    define VDPBUSD(a, b, c)	_mm_dpbusd_epi32((a), (b), (c))
 #  else
-#    define ATTRIBUTES		_target_attribute("sse2")
+#    define VDPBUSD(a, b, c)	_mm_dpbusd_avx_epi32((a), (b), (c))
 #  endif
-#  include <emmintrin.h>
+#  define VLOAD(p)		_mm_load_si128((const void *)(p))
+#  define VLOADU(p)		_mm_loadu_si128((const void *)(p))
+#  define VMADD16(a, b)		_mm_madd_epi16((a), (b))
+#  define VMASKZ_LOADU(mask, p) _mm_maskz_loadu_epi8((mask), (p))
+#  define VMULLO32(a, b)	_mm_mullo_epi32((a), (b))
+#  define VSAD8(a, b)		_mm_sad_epu8((a), (b))
+#  define VSET1_8(a)		_mm_set1_epi8(a)
+#  define VSET1_32(a)		_mm_set1_epi32(a)
+#  define VSETZERO()		_mm_setzero_si128()
+#  define VSLL32(a, b)		_mm_slli_epi32((a), (b))
+#  define VUNPACKLO8(a, b)	_mm_unpacklo_epi8((a), (b))
+#  define VUNPACKHI8(a, b)	_mm_unpackhi_epi8((a), (b))
+#elif VL == 32
+#  define vec_t			__m256i
+#  define mask_t		u32
+#  define LOG2_VL		5
+#  define VADD8(a, b)		_mm256_add_epi8((a), (b))
+#  define VADD16(a, b)		_mm256_add_epi16((a), (b))
+#  define VADD32(a, b)		_mm256_add_epi32((a), (b))
+#  if USE_AVX512
+#    define VDPBUSD(a, b, c)	_mm256_dpbusd_epi32((a), (b), (c))
+#  else
+#    define VDPBUSD(a, b, c)	_mm256_dpbusd_avx_epi32((a), (b), (c))
+#  endif
+#  define VLOAD(p)		_mm256_load_si256((const void *)(p))
+#  define VLOADU(p)		_mm256_loadu_si256((const void *)(p))
+#  define VMADD16(a, b)		_mm256_madd_epi16((a), (b))
+#  define VMASKZ_LOADU(mask, p) _mm256_maskz_loadu_epi8((mask), (p))
+#  define VMULLO32(a, b)	_mm256_mullo_epi32((a), (b))
+#  define VSAD8(a, b)		_mm256_sad_epu8((a), (b))
+#  define VSET1_8(a)		_mm256_set1_epi8(a)
+#  define VSET1_32(a)		_mm256_set1_epi32(a)
+#  define VSETZERO()		_mm256_setzero_si256()
+#  define VSLL32(a, b)		_mm256_slli_epi32((a), (b))
+#  define VUNPACKLO8(a, b)	_mm256_unpacklo_epi8((a), (b))
+#  define VUNPACKHI8(a, b)	_mm256_unpackhi_epi8((a), (b))
+#elif VL == 64
+#  define vec_t			__m512i
+#  define mask_t		u64
+#  define LOG2_VL		6
+#  define VADD8(a, b)		_mm512_add_epi8((a), (b))
+#  define VADD16(a, b)		_mm512_add_epi16((a), (b))
+#  define VADD32(a, b)		_mm512_add_epi32((a), (b))
+#  define VDPBUSD(a, b, c)	_mm512_dpbusd_epi32((a), (b), (c))
+#  define VLOAD(p)		_mm512_load_si512((const void *)(p))
+#  define VLOADU(p)		_mm512_loadu_si512((const void *)(p))
+#  define VMADD16(a, b)		_mm512_madd_epi16((a), (b))
+#  define VMASKZ_LOADU(mask, p) _mm512_maskz_loadu_epi8((mask), (p))
+#  define VMULLO32(a, b)	_mm512_mullo_epi32((a), (b))
+#  define VSAD8(a, b)		_mm512_sad_epu8((a), (b))
+#  define VSET1_8(a)		_mm512_set1_epi8(a)
+#  define VSET1_32(a)		_mm512_set1_epi32(a)
+#  define VSETZERO()		_mm512_setzero_si512()
+#  define VSLL32(a, b)		_mm512_slli_epi32((a), (b))
+#  define VUNPACKLO8(a, b)	_mm512_unpacklo_epi8((a), (b))
+#  define VUNPACKHI8(a, b)	_mm512_unpackhi_epi8((a), (b))
+#else
+#  error "unsupported vector length"
+#endif
+
+#define VADD32_3X(a, b, c)	VADD32(VADD32((a), (b)), (c))
+#define VADD32_4X(a, b, c, d)	VADD32(VADD32((a), (b)), VADD32((c), (d)))
+#define VADD32_5X(a, b, c, d, e) VADD32((a), VADD32_4X((b), (c), (d), (e)))
+#define VADD32_7X(a, b, c, d, e, f, g)	\
+	VADD32(VADD32_3X((a), (b), (c)), VADD32_4X((d), (e), (f), (g)))
+
+
+#undef reduce_to_32bits
 static forceinline ATTRIBUTES void
-adler32_sse2_chunk(const __m128i *p, const __m128i *const end, u32 *s1, u32 *s2)
+ADD_SUFFIX(reduce_to_32bits)(vec_t v_s1, vec_t v_s2, u32 *s1_p, u32 *s2_p)
 {
-	const __m128i zeroes = _mm_setzero_si128();
-	const __m128i  mults_a =
-		_mm_setr_epi16(32, 31, 30, 29, 28, 27, 26, 25);
-	const __m128i  mults_b =
-		_mm_setr_epi16(24, 23, 22, 21, 20, 19, 18, 17);
-	const __m128i  mults_c =
-		_mm_setr_epi16(16, 15, 14, 13, 12, 11, 10, 9);
-	const __m128i  mults_d =
-		_mm_setr_epi16(8,  7,  6,  5,  4,  3,  2,  1);
-
-	
-	__m128i  v_s1 = zeroes;
-
-	
-	__m128i  v_s2 = zeroes;
-
-	
-	__m128i  v_byte_sums_a = zeroes;
-	__m128i  v_byte_sums_b = zeroes;
-	__m128i  v_byte_sums_c = zeroes;
-	__m128i  v_byte_sums_d = zeroes;
-
-	do {
+	__m128i v_s1_128, v_s2_128;
+#if VL == 16
+	{
+		v_s1_128 = v_s1;
+		v_s2_128 = v_s2;
+	}
+#else
+	{
+		__m256i v_s1_256, v_s2_256;
+	#if VL == 32
+		v_s1_256 = v_s1;
+		v_s2_256 = v_s2;
+	#else
 		
-		const __m128i bytes1 = *p++;
-		const __m128i bytes2 = *p++;
-
+		v_s1_256 = _mm256_add_epi32(_mm512_extracti64x4_epi64(v_s1, 0),
+					    _mm512_extracti64x4_epi64(v_s1, 1));
+		v_s2_256 = _mm256_add_epi32(_mm512_extracti64x4_epi64(v_s2, 0),
+					    _mm512_extracti64x4_epi64(v_s2, 1));
+	#endif
 		
-		v_s2 = _mm_add_epi32(v_s2, v_s1);
-
-		
-		v_s1 = _mm_add_epi32(v_s1, _mm_sad_epu8(bytes1, zeroes));
-		v_s1 = _mm_add_epi32(v_s1, _mm_sad_epu8(bytes2, zeroes));
-
-		
-		v_byte_sums_a = _mm_add_epi16(
-			v_byte_sums_a, _mm_unpacklo_epi8(bytes1, zeroes));
-		v_byte_sums_b = _mm_add_epi16(
-			v_byte_sums_b, _mm_unpackhi_epi8(bytes1, zeroes));
-		v_byte_sums_c = _mm_add_epi16(
-			v_byte_sums_c, _mm_unpacklo_epi8(bytes2, zeroes));
-		v_byte_sums_d = _mm_add_epi16(
-			v_byte_sums_d, _mm_unpackhi_epi8(bytes2, zeroes));
-
-		GCC_UPDATE_VARS(v_s1, v_s2, v_byte_sums_a, v_byte_sums_b,
-				v_byte_sums_c, v_byte_sums_d);
-	} while (p != end);
+		v_s1_128 = _mm_add_epi32(_mm256_extracti128_si256(v_s1_256, 0),
+					 _mm256_extracti128_si256(v_s1_256, 1));
+		v_s2_128 = _mm_add_epi32(_mm256_extracti128_si256(v_s2_256, 0),
+					 _mm256_extracti128_si256(v_s2_256, 1));
+	}
+#endif
 
 	
-	v_s2 = _mm_slli_epi32(v_s2, 5);
-	v_s2 = _mm_add_epi32(v_s2, _mm_madd_epi16(v_byte_sums_a, mults_a));
-	v_s2 = _mm_add_epi32(v_s2, _mm_madd_epi16(v_byte_sums_b, mults_b));
-	v_s2 = _mm_add_epi32(v_s2, _mm_madd_epi16(v_byte_sums_c, mults_c));
-	v_s2 = _mm_add_epi32(v_s2, _mm_madd_epi16(v_byte_sums_d, mults_d));
+#if USE_VNNI
+	v_s1_128 = _mm_add_epi32(v_s1_128, _mm_shuffle_epi32(v_s1_128, 0x31));
+#endif
+	v_s2_128 = _mm_add_epi32(v_s2_128, _mm_shuffle_epi32(v_s2_128, 0x31));
+	v_s1_128 = _mm_add_epi32(v_s1_128, _mm_shuffle_epi32(v_s1_128, 0x02));
+	v_s2_128 = _mm_add_epi32(v_s2_128, _mm_shuffle_epi32(v_s2_128, 0x02));
 
-	
-	ADLER32_FINISH_VEC_CHUNK_128(s1, s2, v_s1, v_s2);
+	*s1_p += (u32)_mm_cvtsi128_si32(v_s1_128);
+	*s2_p += (u32)_mm_cvtsi128_si32(v_s2_128);
 }
-/* #include "adler32_vec_template.h" */
+#define reduce_to_32bits	ADD_SUFFIX(reduce_to_32bits)
 
-
-
-
-static u32 ATTRIBUTES MAYBE_UNUSED
-FUNCNAME(u32 adler, const u8 *p, size_t len)
+static ATTRIBUTES u32
+ADD_SUFFIX(adler32_x86)(u32 adler, const u8 *p, size_t len)
 {
-	const size_t max_chunk_len =
-		MIN(MAX_CHUNK_LEN, IMPL_MAX_CHUNK_LEN) -
-		(MIN(MAX_CHUNK_LEN, IMPL_MAX_CHUNK_LEN) % IMPL_SEGMENT_LEN);
+#if USE_VNNI
+	
+	static const u8 _aligned_attribute(VL) raw_mults[VL] = {
+	#if VL == 64
+		64, 63, 62, 61, 60, 59, 58, 57, 56, 55, 54, 53, 52, 51, 50, 49,
+		48, 47, 46, 45, 44, 43, 42, 41, 40, 39, 38, 37, 36, 35, 34, 33,
+	#endif
+	#if VL >= 32
+		32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17,
+	#endif
+		16, 15, 14, 13, 12, 11, 10,  9,  8,  7,  6,  5,  4,  3,  2,  1,
+	};
+	const vec_t ones = VSET1_8(1);
+#else
+	
+	static const u16 _aligned_attribute(VL) raw_mults[4][VL / 2] = {
+	#if VL == 16
+		{ 32, 31, 30, 29, 28, 27, 26, 25 },
+		{ 24, 23, 22, 21, 20, 19, 18, 17 },
+		{ 16, 15, 14, 13, 12, 11, 10, 9  },
+		{ 8,  7,  6,  5,  4,  3,  2,  1  },
+	#elif VL == 32
+		{ 64, 63, 62, 61, 60, 59, 58, 57, 48, 47, 46, 45, 44, 43, 42, 41 },
+		{ 56, 55, 54, 53, 52, 51, 50, 49, 40, 39, 38, 37, 36, 35, 34, 33 },
+		{ 32, 31, 30, 29, 28, 27, 26, 25, 16, 15, 14, 13, 12, 11, 10,  9 },
+		{ 24, 23, 22, 21, 20, 19, 18, 17,  8,  7,  6,  5,  4,  3,  2,  1 },
+	#else
+	#  error "unsupported parameters"
+	#endif
+	};
+	const vec_t mults_a = VLOAD(raw_mults[0]);
+	const vec_t mults_b = VLOAD(raw_mults[1]);
+	const vec_t mults_c = VLOAD(raw_mults[2]);
+	const vec_t mults_d = VLOAD(raw_mults[3]);
+#endif
+	const vec_t zeroes = VSETZERO();
 	u32 s1 = adler & 0xFFFF;
 	u32 s2 = adler >> 16;
-	const u8 * const end = p + len;
-	const u8 *vend;
 
 	
-	if (p != end && (uintptr_t)p % IMPL_ALIGNMENT) {
+	if (unlikely(len > 65536 && ((uintptr_t)p & (VL-1)))) {
 		do {
 			s1 += *p++;
 			s2 += s1;
-		} while (p != end && (uintptr_t)p % IMPL_ALIGNMENT);
+			len--;
+		} while ((uintptr_t)p & (VL-1));
 		s1 %= DIVISOR;
 		s2 %= DIVISOR;
 	}
 
+#if USE_VNNI
 	
-	STATIC_ASSERT(IMPL_SEGMENT_LEN % IMPL_ALIGNMENT == 0);
-	vend = end - ((size_t)(end - p) % IMPL_SEGMENT_LEN);
-	while (p != vend) {
-		size_t chunk_len = MIN((size_t)(vend - p), max_chunk_len);
+	while (len) {
+		
+		size_t n = MIN(len, MAX_CHUNK_LEN & ~(4*VL - 1));
+		vec_t mults = VLOAD(raw_mults);
+		vec_t v_s1 = zeroes;
+		vec_t v_s2 = zeroes;
 
-		s2 += s1 * chunk_len;
+		s2 += s1 * n;
+		len -= n;
 
-		FUNCNAME_CHUNK((const void *)p, (const void *)(p + chunk_len),
-			       &s1, &s2);
+		if (n >= 4*VL) {
+			vec_t v_s1_b = zeroes;
+			vec_t v_s1_c = zeroes;
+			vec_t v_s1_d = zeroes;
+			vec_t v_s2_b = zeroes;
+			vec_t v_s2_c = zeroes;
+			vec_t v_s2_d = zeroes;
+			vec_t v_s1_sums   = zeroes;
+			vec_t v_s1_sums_b = zeroes;
+			vec_t v_s1_sums_c = zeroes;
+			vec_t v_s1_sums_d = zeroes;
+			vec_t tmp0, tmp1;
 
-		p += chunk_len;
+			do {
+				vec_t data_a = VLOADU(p + 0*VL);
+				vec_t data_b = VLOADU(p + 1*VL);
+				vec_t data_c = VLOADU(p + 2*VL);
+				vec_t data_d = VLOADU(p + 3*VL);
+
+				
+			#if GCC_PREREQ(1, 0)
+				__asm__("" : "+v" (data_a), "+v" (data_b),
+					     "+v" (data_c), "+v" (data_d));
+			#endif
+
+				v_s2   = VDPBUSD(v_s2,   data_a, mults);
+				v_s2_b = VDPBUSD(v_s2_b, data_b, mults);
+				v_s2_c = VDPBUSD(v_s2_c, data_c, mults);
+				v_s2_d = VDPBUSD(v_s2_d, data_d, mults);
+
+				v_s1_sums   = VADD32(v_s1_sums,   v_s1);
+				v_s1_sums_b = VADD32(v_s1_sums_b, v_s1_b);
+				v_s1_sums_c = VADD32(v_s1_sums_c, v_s1_c);
+				v_s1_sums_d = VADD32(v_s1_sums_d, v_s1_d);
+
+				v_s1   = VDPBUSD(v_s1,   data_a, ones);
+				v_s1_b = VDPBUSD(v_s1_b, data_b, ones);
+				v_s1_c = VDPBUSD(v_s1_c, data_c, ones);
+				v_s1_d = VDPBUSD(v_s1_d, data_d, ones);
+
+				
+			#if GCC_PREREQ(1, 0) && !defined(ARCH_X86_32)
+				__asm__("" : "+v" (v_s2), "+v" (v_s2_b),
+					     "+v" (v_s2_c), "+v" (v_s2_d),
+					     "+v" (v_s1_sums),
+					     "+v" (v_s1_sums_b),
+					     "+v" (v_s1_sums_c),
+					     "+v" (v_s1_sums_d),
+					     "+v" (v_s1), "+v" (v_s1_b),
+					     "+v" (v_s1_c), "+v" (v_s1_d));
+			#endif
+				p += 4*VL;
+				n -= 4*VL;
+			} while (n >= 4*VL);
+
+			
+			tmp0 = VADD32(v_s1, v_s1_b);
+			tmp1 = VADD32(v_s1, v_s1_c);
+			v_s1_sums = VADD32_4X(v_s1_sums, v_s1_sums_b,
+					      v_s1_sums_c, v_s1_sums_d);
+			v_s1 = VADD32_3X(tmp0, v_s1_c, v_s1_d);
+			v_s2 = VADD32_7X(VSLL32(v_s1_sums, LOG2_VL + 2),
+					 VSLL32(tmp0, LOG2_VL + 1),
+					 VSLL32(tmp1, LOG2_VL),
+					 v_s2, v_s2_b, v_s2_c, v_s2_d);
+		}
+
+		
+		if (n >= 2*VL) {
+			const vec_t data_a = VLOADU(p + 0*VL);
+			const vec_t data_b = VLOADU(p + 1*VL);
+
+			v_s2 = VADD32(v_s2, VSLL32(v_s1, LOG2_VL + 1));
+			v_s1 = VDPBUSD(v_s1, data_a, ones);
+			v_s1 = VDPBUSD(v_s1, data_b, ones);
+			v_s2 = VDPBUSD(v_s2, data_a, VSET1_8(VL));
+			v_s2 = VDPBUSD(v_s2, data_a, mults);
+			v_s2 = VDPBUSD(v_s2, data_b, mults);
+			p += 2*VL;
+			n -= 2*VL;
+		}
+		if (n) {
+			
+			vec_t data;
+
+			v_s2 = VADD32(v_s2, VMULLO32(v_s1, VSET1_32(n)));
+
+			mults = VADD8(mults, VSET1_8((int)n - VL));
+			if (n > VL) {
+				data = VLOADU(p);
+				v_s1 = VDPBUSD(v_s1, data, ones);
+				v_s2 = VDPBUSD(v_s2, data, mults);
+				p += VL;
+				n -= VL;
+				mults = VADD8(mults, VSET1_8(-VL));
+			}
+			
+		#if USE_AVX512
+			data = VMASKZ_LOADU((mask_t)-1 >> (VL - n), p);
+		#else
+			data = zeroes;
+			memcpy(&data, p, n);
+		#endif
+			v_s1 = VDPBUSD(v_s1, data, ones);
+			v_s2 = VDPBUSD(v_s2, data, mults);
+			p += n;
+		}
+
+		reduce_to_32bits(v_s1, v_s2, &s1, &s2);
 		s1 %= DIVISOR;
 		s2 %= DIVISOR;
 	}
-
+#else 
 	
-	if (p != end) {
-		do {
-			s1 += *p++;
-			s2 += s1;
-		} while (p != end);
-		s1 %= DIVISOR;
-		s2 %= DIVISOR;
-	}
+	while (len) {
+		
+		size_t n = MIN(len, MIN(2 * VL * (INT16_MAX / UINT8_MAX),
+					MAX_CHUNK_LEN) & ~(2*VL - 1));
+		len -= n;
 
+		if (n >= 2*VL) {
+			vec_t v_s1 = zeroes;
+			vec_t v_s1_sums = zeroes;
+			vec_t v_byte_sums_a = zeroes;
+			vec_t v_byte_sums_b = zeroes;
+			vec_t v_byte_sums_c = zeroes;
+			vec_t v_byte_sums_d = zeroes;
+			vec_t v_s2;
+
+			s2 += s1 * (n & ~(2*VL - 1));
+
+			do {
+				vec_t data_a = VLOADU(p + 0*VL);
+				vec_t data_b = VLOADU(p + 1*VL);
+
+				v_s1_sums = VADD32(v_s1_sums, v_s1);
+				v_byte_sums_a = VADD16(v_byte_sums_a,
+						       VUNPACKLO8(data_a, zeroes));
+				v_byte_sums_b = VADD16(v_byte_sums_b,
+						       VUNPACKHI8(data_a, zeroes));
+				v_byte_sums_c = VADD16(v_byte_sums_c,
+						       VUNPACKLO8(data_b, zeroes));
+				v_byte_sums_d = VADD16(v_byte_sums_d,
+						       VUNPACKHI8(data_b, zeroes));
+				v_s1 = VADD32(v_s1,
+					      VADD32(VSAD8(data_a, zeroes),
+						     VSAD8(data_b, zeroes)));
+				
+			#if GCC_PREREQ(1, 0)
+				__asm__("" : "+x" (v_s1), "+x" (v_s1_sums),
+					     "+x" (v_byte_sums_a),
+					     "+x" (v_byte_sums_b),
+					     "+x" (v_byte_sums_c),
+					     "+x" (v_byte_sums_d));
+			#endif
+				p += 2*VL;
+				n -= 2*VL;
+			} while (n >= 2*VL);
+
+			
+			v_s2 = VADD32_5X(VSLL32(v_s1_sums, LOG2_VL + 1),
+					 VMADD16(v_byte_sums_a, mults_a),
+					 VMADD16(v_byte_sums_b, mults_b),
+					 VMADD16(v_byte_sums_c, mults_c),
+					 VMADD16(v_byte_sums_d, mults_d));
+			reduce_to_32bits(v_s1, v_s2, &s1, &s2);
+		}
+		
+		ADLER32_CHUNK(s1, s2, p, n);
+	}
+#endif 
 	return (s2 << 16) | s1;
 }
 
-#undef FUNCNAME
-#undef FUNCNAME_CHUNK
+#undef vec_t
+#undef mask_t
+#undef LOG2_VL
+#undef VADD8
+#undef VADD16
+#undef VADD32
+#undef VDPBUSD
+#undef VLOAD
+#undef VLOADU
+#undef VMADD16
+#undef VMASKZ_LOADU
+#undef VMULLO32
+#undef VSAD8
+#undef VSET1_8
+#undef VSET1_32
+#undef VSETZERO
+#undef VSLL32
+#undef VUNPACKLO8
+#undef VUNPACKHI8
+
+#undef SUFFIX
 #undef ATTRIBUTES
-#undef IMPL_ALIGNMENT
-#undef IMPL_SEGMENT_LEN
-#undef IMPL_MAX_CHUNK_LEN
-
-#endif 
+#undef VL
+#undef USE_VNNI
+#undef USE_AVX512
 
 
-#if HAVE_AVX2_INTRIN
-#  define adler32_avx2		adler32_avx2
-#  define FUNCNAME		adler32_avx2
-#  define FUNCNAME_CHUNK	adler32_avx2_chunk
-#  define IMPL_ALIGNMENT	32
-#  define IMPL_SEGMENT_LEN	64
-#  define IMPL_MAX_CHUNK_LEN	(64 * (0x7FFF / 0xFF))
-#  if HAVE_AVX2_NATIVE
-#    define ATTRIBUTES
+#  define adler32_x86_avx2	adler32_x86_avx2
+#  define SUFFIX			   _avx2
+#  define ATTRIBUTES		_target_attribute("avx2")
+#  define VL			32
+#  define USE_VNNI		0
+#  define USE_AVX512		0
+/* #include "x86-adler32_template.h" */
+
+
+
+
+#if VL == 16
+#  define vec_t			__m128i
+#  define mask_t		u16
+#  define LOG2_VL		4
+#  define VADD8(a, b)		_mm_add_epi8((a), (b))
+#  define VADD16(a, b)		_mm_add_epi16((a), (b))
+#  define VADD32(a, b)		_mm_add_epi32((a), (b))
+#  if USE_AVX512
+#    define VDPBUSD(a, b, c)	_mm_dpbusd_epi32((a), (b), (c))
 #  else
-#    define ATTRIBUTES		_target_attribute("avx2")
+#    define VDPBUSD(a, b, c)	_mm_dpbusd_avx_epi32((a), (b), (c))
 #  endif
-#  include <immintrin.h>
-  
-#  if defined(__clang__) && defined(_MSC_VER)
-#    include <avxintrin.h>
-#    include <avx2intrin.h>
+#  define VLOAD(p)		_mm_load_si128((const void *)(p))
+#  define VLOADU(p)		_mm_loadu_si128((const void *)(p))
+#  define VMADD16(a, b)		_mm_madd_epi16((a), (b))
+#  define VMASKZ_LOADU(mask, p) _mm_maskz_loadu_epi8((mask), (p))
+#  define VMULLO32(a, b)	_mm_mullo_epi32((a), (b))
+#  define VSAD8(a, b)		_mm_sad_epu8((a), (b))
+#  define VSET1_8(a)		_mm_set1_epi8(a)
+#  define VSET1_32(a)		_mm_set1_epi32(a)
+#  define VSETZERO()		_mm_setzero_si128()
+#  define VSLL32(a, b)		_mm_slli_epi32((a), (b))
+#  define VUNPACKLO8(a, b)	_mm_unpacklo_epi8((a), (b))
+#  define VUNPACKHI8(a, b)	_mm_unpackhi_epi8((a), (b))
+#elif VL == 32
+#  define vec_t			__m256i
+#  define mask_t		u32
+#  define LOG2_VL		5
+#  define VADD8(a, b)		_mm256_add_epi8((a), (b))
+#  define VADD16(a, b)		_mm256_add_epi16((a), (b))
+#  define VADD32(a, b)		_mm256_add_epi32((a), (b))
+#  if USE_AVX512
+#    define VDPBUSD(a, b, c)	_mm256_dpbusd_epi32((a), (b), (c))
+#  else
+#    define VDPBUSD(a, b, c)	_mm256_dpbusd_avx_epi32((a), (b), (c))
 #  endif
+#  define VLOAD(p)		_mm256_load_si256((const void *)(p))
+#  define VLOADU(p)		_mm256_loadu_si256((const void *)(p))
+#  define VMADD16(a, b)		_mm256_madd_epi16((a), (b))
+#  define VMASKZ_LOADU(mask, p) _mm256_maskz_loadu_epi8((mask), (p))
+#  define VMULLO32(a, b)	_mm256_mullo_epi32((a), (b))
+#  define VSAD8(a, b)		_mm256_sad_epu8((a), (b))
+#  define VSET1_8(a)		_mm256_set1_epi8(a)
+#  define VSET1_32(a)		_mm256_set1_epi32(a)
+#  define VSETZERO()		_mm256_setzero_si256()
+#  define VSLL32(a, b)		_mm256_slli_epi32((a), (b))
+#  define VUNPACKLO8(a, b)	_mm256_unpacklo_epi8((a), (b))
+#  define VUNPACKHI8(a, b)	_mm256_unpackhi_epi8((a), (b))
+#elif VL == 64
+#  define vec_t			__m512i
+#  define mask_t		u64
+#  define LOG2_VL		6
+#  define VADD8(a, b)		_mm512_add_epi8((a), (b))
+#  define VADD16(a, b)		_mm512_add_epi16((a), (b))
+#  define VADD32(a, b)		_mm512_add_epi32((a), (b))
+#  define VDPBUSD(a, b, c)	_mm512_dpbusd_epi32((a), (b), (c))
+#  define VLOAD(p)		_mm512_load_si512((const void *)(p))
+#  define VLOADU(p)		_mm512_loadu_si512((const void *)(p))
+#  define VMADD16(a, b)		_mm512_madd_epi16((a), (b))
+#  define VMASKZ_LOADU(mask, p) _mm512_maskz_loadu_epi8((mask), (p))
+#  define VMULLO32(a, b)	_mm512_mullo_epi32((a), (b))
+#  define VSAD8(a, b)		_mm512_sad_epu8((a), (b))
+#  define VSET1_8(a)		_mm512_set1_epi8(a)
+#  define VSET1_32(a)		_mm512_set1_epi32(a)
+#  define VSETZERO()		_mm512_setzero_si512()
+#  define VSLL32(a, b)		_mm512_slli_epi32((a), (b))
+#  define VUNPACKLO8(a, b)	_mm512_unpacklo_epi8((a), (b))
+#  define VUNPACKHI8(a, b)	_mm512_unpackhi_epi8((a), (b))
+#else
+#  error "unsupported vector length"
+#endif
+
+#define VADD32_3X(a, b, c)	VADD32(VADD32((a), (b)), (c))
+#define VADD32_4X(a, b, c, d)	VADD32(VADD32((a), (b)), VADD32((c), (d)))
+#define VADD32_5X(a, b, c, d, e) VADD32((a), VADD32_4X((b), (c), (d), (e)))
+#define VADD32_7X(a, b, c, d, e, f, g)	\
+	VADD32(VADD32_3X((a), (b), (c)), VADD32_4X((d), (e), (f), (g)))
+
+
+#undef reduce_to_32bits
 static forceinline ATTRIBUTES void
-adler32_avx2_chunk(const __m256i *p, const __m256i *const end, u32 *s1, u32 *s2)
+ADD_SUFFIX(reduce_to_32bits)(vec_t v_s1, vec_t v_s2, u32 *s1_p, u32 *s2_p)
 {
-	const __m256i zeroes = _mm256_setzero_si256();
+	__m128i v_s1_128, v_s2_128;
+#if VL == 16
+	{
+		v_s1_128 = v_s1;
+		v_s2_128 = v_s2;
+	}
+#else
+	{
+		__m256i v_s1_256, v_s2_256;
+	#if VL == 32
+		v_s1_256 = v_s1;
+		v_s2_256 = v_s2;
+	#else
+		
+		v_s1_256 = _mm256_add_epi32(_mm512_extracti64x4_epi64(v_s1, 0),
+					    _mm512_extracti64x4_epi64(v_s1, 1));
+		v_s2_256 = _mm256_add_epi32(_mm512_extracti64x4_epi64(v_s2, 0),
+					    _mm512_extracti64x4_epi64(v_s2, 1));
+	#endif
+		
+		v_s1_128 = _mm_add_epi32(_mm256_extracti128_si256(v_s1_256, 0),
+					 _mm256_extracti128_si256(v_s1_256, 1));
+		v_s2_128 = _mm_add_epi32(_mm256_extracti128_si256(v_s2_256, 0),
+					 _mm256_extracti128_si256(v_s2_256, 1));
+	}
+#endif
+
 	
-	const __m256i  mults_a =
-		_mm256_setr_epi16(64, 63, 62, 61, 60, 59, 58, 57,
-				  48, 47, 46, 45, 44, 43, 42, 41);
-	const __m256i  mults_b =
-		_mm256_setr_epi16(56, 55, 54, 53, 52, 51, 50, 49,
-				  40, 39, 38, 37, 36, 35, 34, 33);
-	const __m256i  mults_c =
-		_mm256_setr_epi16(32, 31, 30, 29, 28, 27, 26, 25,
-				  16, 15, 14, 13, 12, 11, 10,  9);
-	const __m256i  mults_d =
-		_mm256_setr_epi16(24, 23, 22, 21, 20, 19, 18, 17,
-				  8,  7,  6,  5,  4,  3,  2,  1);
-	__m256i  v_s1 = zeroes;
-	__m256i  v_s2 = zeroes;
-	__m256i  v_byte_sums_a = zeroes;
-	__m256i  v_byte_sums_b = zeroes;
-	__m256i  v_byte_sums_c = zeroes;
-	__m256i  v_byte_sums_d = zeroes;
+#if USE_VNNI
+	v_s1_128 = _mm_add_epi32(v_s1_128, _mm_shuffle_epi32(v_s1_128, 0x31));
+#endif
+	v_s2_128 = _mm_add_epi32(v_s2_128, _mm_shuffle_epi32(v_s2_128, 0x31));
+	v_s1_128 = _mm_add_epi32(v_s1_128, _mm_shuffle_epi32(v_s1_128, 0x02));
+	v_s2_128 = _mm_add_epi32(v_s2_128, _mm_shuffle_epi32(v_s2_128, 0x02));
 
-	do {
-		const __m256i bytes1 = *p++;
-		const __m256i bytes2 = *p++;
-
-		v_s2 = _mm256_add_epi32(v_s2, v_s1);
-		v_s1 = _mm256_add_epi32(v_s1, _mm256_sad_epu8(bytes1, zeroes));
-		v_s1 = _mm256_add_epi32(v_s1, _mm256_sad_epu8(bytes2, zeroes));
-		v_byte_sums_a = _mm256_add_epi16(
-			v_byte_sums_a, _mm256_unpacklo_epi8(bytes1, zeroes));
-		v_byte_sums_b = _mm256_add_epi16(
-			v_byte_sums_b, _mm256_unpackhi_epi8(bytes1, zeroes));
-		v_byte_sums_c = _mm256_add_epi16(
-			v_byte_sums_c, _mm256_unpacklo_epi8(bytes2, zeroes));
-		v_byte_sums_d = _mm256_add_epi16(
-			v_byte_sums_d, _mm256_unpackhi_epi8(bytes2, zeroes));
-
-		GCC_UPDATE_VARS(v_s1, v_s2, v_byte_sums_a, v_byte_sums_b,
-				v_byte_sums_c, v_byte_sums_d);
-	} while (p != end);
-
-	v_s2 = _mm256_slli_epi32(v_s2, 6);
-	v_s2 = _mm256_add_epi32(v_s2, _mm256_madd_epi16(v_byte_sums_a, mults_a));
-	v_s2 = _mm256_add_epi32(v_s2, _mm256_madd_epi16(v_byte_sums_b, mults_b));
-	v_s2 = _mm256_add_epi32(v_s2, _mm256_madd_epi16(v_byte_sums_c, mults_c));
-	v_s2 = _mm256_add_epi32(v_s2, _mm256_madd_epi16(v_byte_sums_d, mults_d));
-	ADLER32_FINISH_VEC_CHUNK_256(s1, s2, v_s1, v_s2);
+	*s1_p += (u32)_mm_cvtsi128_si32(v_s1_128);
+	*s2_p += (u32)_mm_cvtsi128_si32(v_s2_128);
 }
-/* #include "x86-../adler32_vec_template.h" */
+#define reduce_to_32bits	ADD_SUFFIX(reduce_to_32bits)
 
-
-
-
-static u32 ATTRIBUTES MAYBE_UNUSED
-FUNCNAME(u32 adler, const u8 *p, size_t len)
+static ATTRIBUTES u32
+ADD_SUFFIX(adler32_x86)(u32 adler, const u8 *p, size_t len)
 {
-	const size_t max_chunk_len =
-		MIN(MAX_CHUNK_LEN, IMPL_MAX_CHUNK_LEN) -
-		(MIN(MAX_CHUNK_LEN, IMPL_MAX_CHUNK_LEN) % IMPL_SEGMENT_LEN);
+#if USE_VNNI
+	
+	static const u8 _aligned_attribute(VL) raw_mults[VL] = {
+	#if VL == 64
+		64, 63, 62, 61, 60, 59, 58, 57, 56, 55, 54, 53, 52, 51, 50, 49,
+		48, 47, 46, 45, 44, 43, 42, 41, 40, 39, 38, 37, 36, 35, 34, 33,
+	#endif
+	#if VL >= 32
+		32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17,
+	#endif
+		16, 15, 14, 13, 12, 11, 10,  9,  8,  7,  6,  5,  4,  3,  2,  1,
+	};
+	const vec_t ones = VSET1_8(1);
+#else
+	
+	static const u16 _aligned_attribute(VL) raw_mults[4][VL / 2] = {
+	#if VL == 16
+		{ 32, 31, 30, 29, 28, 27, 26, 25 },
+		{ 24, 23, 22, 21, 20, 19, 18, 17 },
+		{ 16, 15, 14, 13, 12, 11, 10, 9  },
+		{ 8,  7,  6,  5,  4,  3,  2,  1  },
+	#elif VL == 32
+		{ 64, 63, 62, 61, 60, 59, 58, 57, 48, 47, 46, 45, 44, 43, 42, 41 },
+		{ 56, 55, 54, 53, 52, 51, 50, 49, 40, 39, 38, 37, 36, 35, 34, 33 },
+		{ 32, 31, 30, 29, 28, 27, 26, 25, 16, 15, 14, 13, 12, 11, 10,  9 },
+		{ 24, 23, 22, 21, 20, 19, 18, 17,  8,  7,  6,  5,  4,  3,  2,  1 },
+	#else
+	#  error "unsupported parameters"
+	#endif
+	};
+	const vec_t mults_a = VLOAD(raw_mults[0]);
+	const vec_t mults_b = VLOAD(raw_mults[1]);
+	const vec_t mults_c = VLOAD(raw_mults[2]);
+	const vec_t mults_d = VLOAD(raw_mults[3]);
+#endif
+	const vec_t zeroes = VSETZERO();
 	u32 s1 = adler & 0xFFFF;
 	u32 s2 = adler >> 16;
-	const u8 * const end = p + len;
-	const u8 *vend;
 
 	
-	if (p != end && (uintptr_t)p % IMPL_ALIGNMENT) {
+	if (unlikely(len > 65536 && ((uintptr_t)p & (VL-1)))) {
 		do {
 			s1 += *p++;
 			s2 += s1;
-		} while (p != end && (uintptr_t)p % IMPL_ALIGNMENT);
+			len--;
+		} while ((uintptr_t)p & (VL-1));
 		s1 %= DIVISOR;
 		s2 %= DIVISOR;
 	}
 
+#if USE_VNNI
 	
-	STATIC_ASSERT(IMPL_SEGMENT_LEN % IMPL_ALIGNMENT == 0);
-	vend = end - ((size_t)(end - p) % IMPL_SEGMENT_LEN);
-	while (p != vend) {
-		size_t chunk_len = MIN((size_t)(vend - p), max_chunk_len);
+	while (len) {
+		
+		size_t n = MIN(len, MAX_CHUNK_LEN & ~(4*VL - 1));
+		vec_t mults = VLOAD(raw_mults);
+		vec_t v_s1 = zeroes;
+		vec_t v_s2 = zeroes;
 
-		s2 += s1 * chunk_len;
+		s2 += s1 * n;
+		len -= n;
 
-		FUNCNAME_CHUNK((const void *)p, (const void *)(p + chunk_len),
-			       &s1, &s2);
+		if (n >= 4*VL) {
+			vec_t v_s1_b = zeroes;
+			vec_t v_s1_c = zeroes;
+			vec_t v_s1_d = zeroes;
+			vec_t v_s2_b = zeroes;
+			vec_t v_s2_c = zeroes;
+			vec_t v_s2_d = zeroes;
+			vec_t v_s1_sums   = zeroes;
+			vec_t v_s1_sums_b = zeroes;
+			vec_t v_s1_sums_c = zeroes;
+			vec_t v_s1_sums_d = zeroes;
+			vec_t tmp0, tmp1;
 
-		p += chunk_len;
+			do {
+				vec_t data_a = VLOADU(p + 0*VL);
+				vec_t data_b = VLOADU(p + 1*VL);
+				vec_t data_c = VLOADU(p + 2*VL);
+				vec_t data_d = VLOADU(p + 3*VL);
+
+				
+			#if GCC_PREREQ(1, 0)
+				__asm__("" : "+v" (data_a), "+v" (data_b),
+					     "+v" (data_c), "+v" (data_d));
+			#endif
+
+				v_s2   = VDPBUSD(v_s2,   data_a, mults);
+				v_s2_b = VDPBUSD(v_s2_b, data_b, mults);
+				v_s2_c = VDPBUSD(v_s2_c, data_c, mults);
+				v_s2_d = VDPBUSD(v_s2_d, data_d, mults);
+
+				v_s1_sums   = VADD32(v_s1_sums,   v_s1);
+				v_s1_sums_b = VADD32(v_s1_sums_b, v_s1_b);
+				v_s1_sums_c = VADD32(v_s1_sums_c, v_s1_c);
+				v_s1_sums_d = VADD32(v_s1_sums_d, v_s1_d);
+
+				v_s1   = VDPBUSD(v_s1,   data_a, ones);
+				v_s1_b = VDPBUSD(v_s1_b, data_b, ones);
+				v_s1_c = VDPBUSD(v_s1_c, data_c, ones);
+				v_s1_d = VDPBUSD(v_s1_d, data_d, ones);
+
+				
+			#if GCC_PREREQ(1, 0) && !defined(ARCH_X86_32)
+				__asm__("" : "+v" (v_s2), "+v" (v_s2_b),
+					     "+v" (v_s2_c), "+v" (v_s2_d),
+					     "+v" (v_s1_sums),
+					     "+v" (v_s1_sums_b),
+					     "+v" (v_s1_sums_c),
+					     "+v" (v_s1_sums_d),
+					     "+v" (v_s1), "+v" (v_s1_b),
+					     "+v" (v_s1_c), "+v" (v_s1_d));
+			#endif
+				p += 4*VL;
+				n -= 4*VL;
+			} while (n >= 4*VL);
+
+			
+			tmp0 = VADD32(v_s1, v_s1_b);
+			tmp1 = VADD32(v_s1, v_s1_c);
+			v_s1_sums = VADD32_4X(v_s1_sums, v_s1_sums_b,
+					      v_s1_sums_c, v_s1_sums_d);
+			v_s1 = VADD32_3X(tmp0, v_s1_c, v_s1_d);
+			v_s2 = VADD32_7X(VSLL32(v_s1_sums, LOG2_VL + 2),
+					 VSLL32(tmp0, LOG2_VL + 1),
+					 VSLL32(tmp1, LOG2_VL),
+					 v_s2, v_s2_b, v_s2_c, v_s2_d);
+		}
+
+		
+		if (n >= 2*VL) {
+			const vec_t data_a = VLOADU(p + 0*VL);
+			const vec_t data_b = VLOADU(p + 1*VL);
+
+			v_s2 = VADD32(v_s2, VSLL32(v_s1, LOG2_VL + 1));
+			v_s1 = VDPBUSD(v_s1, data_a, ones);
+			v_s1 = VDPBUSD(v_s1, data_b, ones);
+			v_s2 = VDPBUSD(v_s2, data_a, VSET1_8(VL));
+			v_s2 = VDPBUSD(v_s2, data_a, mults);
+			v_s2 = VDPBUSD(v_s2, data_b, mults);
+			p += 2*VL;
+			n -= 2*VL;
+		}
+		if (n) {
+			
+			vec_t data;
+
+			v_s2 = VADD32(v_s2, VMULLO32(v_s1, VSET1_32(n)));
+
+			mults = VADD8(mults, VSET1_8((int)n - VL));
+			if (n > VL) {
+				data = VLOADU(p);
+				v_s1 = VDPBUSD(v_s1, data, ones);
+				v_s2 = VDPBUSD(v_s2, data, mults);
+				p += VL;
+				n -= VL;
+				mults = VADD8(mults, VSET1_8(-VL));
+			}
+			
+		#if USE_AVX512
+			data = VMASKZ_LOADU((mask_t)-1 >> (VL - n), p);
+		#else
+			data = zeroes;
+			memcpy(&data, p, n);
+		#endif
+			v_s1 = VDPBUSD(v_s1, data, ones);
+			v_s2 = VDPBUSD(v_s2, data, mults);
+			p += n;
+		}
+
+		reduce_to_32bits(v_s1, v_s2, &s1, &s2);
 		s1 %= DIVISOR;
 		s2 %= DIVISOR;
 	}
-
+#else 
 	
-	if (p != end) {
-		do {
-			s1 += *p++;
-			s2 += s1;
-		} while (p != end);
-		s1 %= DIVISOR;
-		s2 %= DIVISOR;
-	}
+	while (len) {
+		
+		size_t n = MIN(len, MIN(2 * VL * (INT16_MAX / UINT8_MAX),
+					MAX_CHUNK_LEN) & ~(2*VL - 1));
+		len -= n;
 
+		if (n >= 2*VL) {
+			vec_t v_s1 = zeroes;
+			vec_t v_s1_sums = zeroes;
+			vec_t v_byte_sums_a = zeroes;
+			vec_t v_byte_sums_b = zeroes;
+			vec_t v_byte_sums_c = zeroes;
+			vec_t v_byte_sums_d = zeroes;
+			vec_t v_s2;
+
+			s2 += s1 * (n & ~(2*VL - 1));
+
+			do {
+				vec_t data_a = VLOADU(p + 0*VL);
+				vec_t data_b = VLOADU(p + 1*VL);
+
+				v_s1_sums = VADD32(v_s1_sums, v_s1);
+				v_byte_sums_a = VADD16(v_byte_sums_a,
+						       VUNPACKLO8(data_a, zeroes));
+				v_byte_sums_b = VADD16(v_byte_sums_b,
+						       VUNPACKHI8(data_a, zeroes));
+				v_byte_sums_c = VADD16(v_byte_sums_c,
+						       VUNPACKLO8(data_b, zeroes));
+				v_byte_sums_d = VADD16(v_byte_sums_d,
+						       VUNPACKHI8(data_b, zeroes));
+				v_s1 = VADD32(v_s1,
+					      VADD32(VSAD8(data_a, zeroes),
+						     VSAD8(data_b, zeroes)));
+				
+			#if GCC_PREREQ(1, 0)
+				__asm__("" : "+x" (v_s1), "+x" (v_s1_sums),
+					     "+x" (v_byte_sums_a),
+					     "+x" (v_byte_sums_b),
+					     "+x" (v_byte_sums_c),
+					     "+x" (v_byte_sums_d));
+			#endif
+				p += 2*VL;
+				n -= 2*VL;
+			} while (n >= 2*VL);
+
+			
+			v_s2 = VADD32_5X(VSLL32(v_s1_sums, LOG2_VL + 1),
+					 VMADD16(v_byte_sums_a, mults_a),
+					 VMADD16(v_byte_sums_b, mults_b),
+					 VMADD16(v_byte_sums_c, mults_c),
+					 VMADD16(v_byte_sums_d, mults_d));
+			reduce_to_32bits(v_s1, v_s2, &s1, &s2);
+		}
+		
+		ADLER32_CHUNK(s1, s2, p, n);
+	}
+#endif 
 	return (s2 << 16) | s1;
 }
 
-#undef FUNCNAME
-#undef FUNCNAME_CHUNK
+#undef vec_t
+#undef mask_t
+#undef LOG2_VL
+#undef VADD8
+#undef VADD16
+#undef VADD32
+#undef VDPBUSD
+#undef VLOAD
+#undef VLOADU
+#undef VMADD16
+#undef VMASKZ_LOADU
+#undef VMULLO32
+#undef VSAD8
+#undef VSET1_8
+#undef VSET1_32
+#undef VSETZERO
+#undef VSLL32
+#undef VUNPACKLO8
+#undef VUNPACKHI8
+
+#undef SUFFIX
 #undef ATTRIBUTES
-#undef IMPL_ALIGNMENT
-#undef IMPL_SEGMENT_LEN
-#undef IMPL_MAX_CHUNK_LEN
+#undef VL
+#undef USE_VNNI
+#undef USE_AVX512
 
-#endif 
+#endif
 
-#if defined(adler32_avx2) && HAVE_AVX2_NATIVE
-#define DEFAULT_IMPL	adler32_avx2
+
+#if GCC_PREREQ(11, 1) || CLANG_PREREQ(12, 0, 13000000) || MSVC_PREREQ(1930)
+#  define adler32_x86_avx2_vnni	adler32_x86_avx2_vnni
+#  define SUFFIX			   _avx2_vnni
+#  define ATTRIBUTES		_target_attribute("avx2,avxvnni")
+#  define VL			32
+#  define USE_VNNI		1
+#  define USE_AVX512		0
+/* #include "x86-adler32_template.h" */
+
+
+
+
+#if VL == 16
+#  define vec_t			__m128i
+#  define mask_t		u16
+#  define LOG2_VL		4
+#  define VADD8(a, b)		_mm_add_epi8((a), (b))
+#  define VADD16(a, b)		_mm_add_epi16((a), (b))
+#  define VADD32(a, b)		_mm_add_epi32((a), (b))
+#  if USE_AVX512
+#    define VDPBUSD(a, b, c)	_mm_dpbusd_epi32((a), (b), (c))
+#  else
+#    define VDPBUSD(a, b, c)	_mm_dpbusd_avx_epi32((a), (b), (c))
+#  endif
+#  define VLOAD(p)		_mm_load_si128((const void *)(p))
+#  define VLOADU(p)		_mm_loadu_si128((const void *)(p))
+#  define VMADD16(a, b)		_mm_madd_epi16((a), (b))
+#  define VMASKZ_LOADU(mask, p) _mm_maskz_loadu_epi8((mask), (p))
+#  define VMULLO32(a, b)	_mm_mullo_epi32((a), (b))
+#  define VSAD8(a, b)		_mm_sad_epu8((a), (b))
+#  define VSET1_8(a)		_mm_set1_epi8(a)
+#  define VSET1_32(a)		_mm_set1_epi32(a)
+#  define VSETZERO()		_mm_setzero_si128()
+#  define VSLL32(a, b)		_mm_slli_epi32((a), (b))
+#  define VUNPACKLO8(a, b)	_mm_unpacklo_epi8((a), (b))
+#  define VUNPACKHI8(a, b)	_mm_unpackhi_epi8((a), (b))
+#elif VL == 32
+#  define vec_t			__m256i
+#  define mask_t		u32
+#  define LOG2_VL		5
+#  define VADD8(a, b)		_mm256_add_epi8((a), (b))
+#  define VADD16(a, b)		_mm256_add_epi16((a), (b))
+#  define VADD32(a, b)		_mm256_add_epi32((a), (b))
+#  if USE_AVX512
+#    define VDPBUSD(a, b, c)	_mm256_dpbusd_epi32((a), (b), (c))
+#  else
+#    define VDPBUSD(a, b, c)	_mm256_dpbusd_avx_epi32((a), (b), (c))
+#  endif
+#  define VLOAD(p)		_mm256_load_si256((const void *)(p))
+#  define VLOADU(p)		_mm256_loadu_si256((const void *)(p))
+#  define VMADD16(a, b)		_mm256_madd_epi16((a), (b))
+#  define VMASKZ_LOADU(mask, p) _mm256_maskz_loadu_epi8((mask), (p))
+#  define VMULLO32(a, b)	_mm256_mullo_epi32((a), (b))
+#  define VSAD8(a, b)		_mm256_sad_epu8((a), (b))
+#  define VSET1_8(a)		_mm256_set1_epi8(a)
+#  define VSET1_32(a)		_mm256_set1_epi32(a)
+#  define VSETZERO()		_mm256_setzero_si256()
+#  define VSLL32(a, b)		_mm256_slli_epi32((a), (b))
+#  define VUNPACKLO8(a, b)	_mm256_unpacklo_epi8((a), (b))
+#  define VUNPACKHI8(a, b)	_mm256_unpackhi_epi8((a), (b))
+#elif VL == 64
+#  define vec_t			__m512i
+#  define mask_t		u64
+#  define LOG2_VL		6
+#  define VADD8(a, b)		_mm512_add_epi8((a), (b))
+#  define VADD16(a, b)		_mm512_add_epi16((a), (b))
+#  define VADD32(a, b)		_mm512_add_epi32((a), (b))
+#  define VDPBUSD(a, b, c)	_mm512_dpbusd_epi32((a), (b), (c))
+#  define VLOAD(p)		_mm512_load_si512((const void *)(p))
+#  define VLOADU(p)		_mm512_loadu_si512((const void *)(p))
+#  define VMADD16(a, b)		_mm512_madd_epi16((a), (b))
+#  define VMASKZ_LOADU(mask, p) _mm512_maskz_loadu_epi8((mask), (p))
+#  define VMULLO32(a, b)	_mm512_mullo_epi32((a), (b))
+#  define VSAD8(a, b)		_mm512_sad_epu8((a), (b))
+#  define VSET1_8(a)		_mm512_set1_epi8(a)
+#  define VSET1_32(a)		_mm512_set1_epi32(a)
+#  define VSETZERO()		_mm512_setzero_si512()
+#  define VSLL32(a, b)		_mm512_slli_epi32((a), (b))
+#  define VUNPACKLO8(a, b)	_mm512_unpacklo_epi8((a), (b))
+#  define VUNPACKHI8(a, b)	_mm512_unpackhi_epi8((a), (b))
 #else
+#  error "unsupported vector length"
+#endif
+
+#define VADD32_3X(a, b, c)	VADD32(VADD32((a), (b)), (c))
+#define VADD32_4X(a, b, c, d)	VADD32(VADD32((a), (b)), VADD32((c), (d)))
+#define VADD32_5X(a, b, c, d, e) VADD32((a), VADD32_4X((b), (c), (d), (e)))
+#define VADD32_7X(a, b, c, d, e, f, g)	\
+	VADD32(VADD32_3X((a), (b), (c)), VADD32_4X((d), (e), (f), (g)))
+
+
+#undef reduce_to_32bits
+static forceinline ATTRIBUTES void
+ADD_SUFFIX(reduce_to_32bits)(vec_t v_s1, vec_t v_s2, u32 *s1_p, u32 *s2_p)
+{
+	__m128i v_s1_128, v_s2_128;
+#if VL == 16
+	{
+		v_s1_128 = v_s1;
+		v_s2_128 = v_s2;
+	}
+#else
+	{
+		__m256i v_s1_256, v_s2_256;
+	#if VL == 32
+		v_s1_256 = v_s1;
+		v_s2_256 = v_s2;
+	#else
+		
+		v_s1_256 = _mm256_add_epi32(_mm512_extracti64x4_epi64(v_s1, 0),
+					    _mm512_extracti64x4_epi64(v_s1, 1));
+		v_s2_256 = _mm256_add_epi32(_mm512_extracti64x4_epi64(v_s2, 0),
+					    _mm512_extracti64x4_epi64(v_s2, 1));
+	#endif
+		
+		v_s1_128 = _mm_add_epi32(_mm256_extracti128_si256(v_s1_256, 0),
+					 _mm256_extracti128_si256(v_s1_256, 1));
+		v_s2_128 = _mm_add_epi32(_mm256_extracti128_si256(v_s2_256, 0),
+					 _mm256_extracti128_si256(v_s2_256, 1));
+	}
+#endif
+
+	
+#if USE_VNNI
+	v_s1_128 = _mm_add_epi32(v_s1_128, _mm_shuffle_epi32(v_s1_128, 0x31));
+#endif
+	v_s2_128 = _mm_add_epi32(v_s2_128, _mm_shuffle_epi32(v_s2_128, 0x31));
+	v_s1_128 = _mm_add_epi32(v_s1_128, _mm_shuffle_epi32(v_s1_128, 0x02));
+	v_s2_128 = _mm_add_epi32(v_s2_128, _mm_shuffle_epi32(v_s2_128, 0x02));
+
+	*s1_p += (u32)_mm_cvtsi128_si32(v_s1_128);
+	*s2_p += (u32)_mm_cvtsi128_si32(v_s2_128);
+}
+#define reduce_to_32bits	ADD_SUFFIX(reduce_to_32bits)
+
+static ATTRIBUTES u32
+ADD_SUFFIX(adler32_x86)(u32 adler, const u8 *p, size_t len)
+{
+#if USE_VNNI
+	
+	static const u8 _aligned_attribute(VL) raw_mults[VL] = {
+	#if VL == 64
+		64, 63, 62, 61, 60, 59, 58, 57, 56, 55, 54, 53, 52, 51, 50, 49,
+		48, 47, 46, 45, 44, 43, 42, 41, 40, 39, 38, 37, 36, 35, 34, 33,
+	#endif
+	#if VL >= 32
+		32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17,
+	#endif
+		16, 15, 14, 13, 12, 11, 10,  9,  8,  7,  6,  5,  4,  3,  2,  1,
+	};
+	const vec_t ones = VSET1_8(1);
+#else
+	
+	static const u16 _aligned_attribute(VL) raw_mults[4][VL / 2] = {
+	#if VL == 16
+		{ 32, 31, 30, 29, 28, 27, 26, 25 },
+		{ 24, 23, 22, 21, 20, 19, 18, 17 },
+		{ 16, 15, 14, 13, 12, 11, 10, 9  },
+		{ 8,  7,  6,  5,  4,  3,  2,  1  },
+	#elif VL == 32
+		{ 64, 63, 62, 61, 60, 59, 58, 57, 48, 47, 46, 45, 44, 43, 42, 41 },
+		{ 56, 55, 54, 53, 52, 51, 50, 49, 40, 39, 38, 37, 36, 35, 34, 33 },
+		{ 32, 31, 30, 29, 28, 27, 26, 25, 16, 15, 14, 13, 12, 11, 10,  9 },
+		{ 24, 23, 22, 21, 20, 19, 18, 17,  8,  7,  6,  5,  4,  3,  2,  1 },
+	#else
+	#  error "unsupported parameters"
+	#endif
+	};
+	const vec_t mults_a = VLOAD(raw_mults[0]);
+	const vec_t mults_b = VLOAD(raw_mults[1]);
+	const vec_t mults_c = VLOAD(raw_mults[2]);
+	const vec_t mults_d = VLOAD(raw_mults[3]);
+#endif
+	const vec_t zeroes = VSETZERO();
+	u32 s1 = adler & 0xFFFF;
+	u32 s2 = adler >> 16;
+
+	
+	if (unlikely(len > 65536 && ((uintptr_t)p & (VL-1)))) {
+		do {
+			s1 += *p++;
+			s2 += s1;
+			len--;
+		} while ((uintptr_t)p & (VL-1));
+		s1 %= DIVISOR;
+		s2 %= DIVISOR;
+	}
+
+#if USE_VNNI
+	
+	while (len) {
+		
+		size_t n = MIN(len, MAX_CHUNK_LEN & ~(4*VL - 1));
+		vec_t mults = VLOAD(raw_mults);
+		vec_t v_s1 = zeroes;
+		vec_t v_s2 = zeroes;
+
+		s2 += s1 * n;
+		len -= n;
+
+		if (n >= 4*VL) {
+			vec_t v_s1_b = zeroes;
+			vec_t v_s1_c = zeroes;
+			vec_t v_s1_d = zeroes;
+			vec_t v_s2_b = zeroes;
+			vec_t v_s2_c = zeroes;
+			vec_t v_s2_d = zeroes;
+			vec_t v_s1_sums   = zeroes;
+			vec_t v_s1_sums_b = zeroes;
+			vec_t v_s1_sums_c = zeroes;
+			vec_t v_s1_sums_d = zeroes;
+			vec_t tmp0, tmp1;
+
+			do {
+				vec_t data_a = VLOADU(p + 0*VL);
+				vec_t data_b = VLOADU(p + 1*VL);
+				vec_t data_c = VLOADU(p + 2*VL);
+				vec_t data_d = VLOADU(p + 3*VL);
+
+				
+			#if GCC_PREREQ(1, 0)
+				__asm__("" : "+v" (data_a), "+v" (data_b),
+					     "+v" (data_c), "+v" (data_d));
+			#endif
+
+				v_s2   = VDPBUSD(v_s2,   data_a, mults);
+				v_s2_b = VDPBUSD(v_s2_b, data_b, mults);
+				v_s2_c = VDPBUSD(v_s2_c, data_c, mults);
+				v_s2_d = VDPBUSD(v_s2_d, data_d, mults);
+
+				v_s1_sums   = VADD32(v_s1_sums,   v_s1);
+				v_s1_sums_b = VADD32(v_s1_sums_b, v_s1_b);
+				v_s1_sums_c = VADD32(v_s1_sums_c, v_s1_c);
+				v_s1_sums_d = VADD32(v_s1_sums_d, v_s1_d);
+
+				v_s1   = VDPBUSD(v_s1,   data_a, ones);
+				v_s1_b = VDPBUSD(v_s1_b, data_b, ones);
+				v_s1_c = VDPBUSD(v_s1_c, data_c, ones);
+				v_s1_d = VDPBUSD(v_s1_d, data_d, ones);
+
+				
+			#if GCC_PREREQ(1, 0) && !defined(ARCH_X86_32)
+				__asm__("" : "+v" (v_s2), "+v" (v_s2_b),
+					     "+v" (v_s2_c), "+v" (v_s2_d),
+					     "+v" (v_s1_sums),
+					     "+v" (v_s1_sums_b),
+					     "+v" (v_s1_sums_c),
+					     "+v" (v_s1_sums_d),
+					     "+v" (v_s1), "+v" (v_s1_b),
+					     "+v" (v_s1_c), "+v" (v_s1_d));
+			#endif
+				p += 4*VL;
+				n -= 4*VL;
+			} while (n >= 4*VL);
+
+			
+			tmp0 = VADD32(v_s1, v_s1_b);
+			tmp1 = VADD32(v_s1, v_s1_c);
+			v_s1_sums = VADD32_4X(v_s1_sums, v_s1_sums_b,
+					      v_s1_sums_c, v_s1_sums_d);
+			v_s1 = VADD32_3X(tmp0, v_s1_c, v_s1_d);
+			v_s2 = VADD32_7X(VSLL32(v_s1_sums, LOG2_VL + 2),
+					 VSLL32(tmp0, LOG2_VL + 1),
+					 VSLL32(tmp1, LOG2_VL),
+					 v_s2, v_s2_b, v_s2_c, v_s2_d);
+		}
+
+		
+		if (n >= 2*VL) {
+			const vec_t data_a = VLOADU(p + 0*VL);
+			const vec_t data_b = VLOADU(p + 1*VL);
+
+			v_s2 = VADD32(v_s2, VSLL32(v_s1, LOG2_VL + 1));
+			v_s1 = VDPBUSD(v_s1, data_a, ones);
+			v_s1 = VDPBUSD(v_s1, data_b, ones);
+			v_s2 = VDPBUSD(v_s2, data_a, VSET1_8(VL));
+			v_s2 = VDPBUSD(v_s2, data_a, mults);
+			v_s2 = VDPBUSD(v_s2, data_b, mults);
+			p += 2*VL;
+			n -= 2*VL;
+		}
+		if (n) {
+			
+			vec_t data;
+
+			v_s2 = VADD32(v_s2, VMULLO32(v_s1, VSET1_32(n)));
+
+			mults = VADD8(mults, VSET1_8((int)n - VL));
+			if (n > VL) {
+				data = VLOADU(p);
+				v_s1 = VDPBUSD(v_s1, data, ones);
+				v_s2 = VDPBUSD(v_s2, data, mults);
+				p += VL;
+				n -= VL;
+				mults = VADD8(mults, VSET1_8(-VL));
+			}
+			
+		#if USE_AVX512
+			data = VMASKZ_LOADU((mask_t)-1 >> (VL - n), p);
+		#else
+			data = zeroes;
+			memcpy(&data, p, n);
+		#endif
+			v_s1 = VDPBUSD(v_s1, data, ones);
+			v_s2 = VDPBUSD(v_s2, data, mults);
+			p += n;
+		}
+
+		reduce_to_32bits(v_s1, v_s2, &s1, &s2);
+		s1 %= DIVISOR;
+		s2 %= DIVISOR;
+	}
+#else 
+	
+	while (len) {
+		
+		size_t n = MIN(len, MIN(2 * VL * (INT16_MAX / UINT8_MAX),
+					MAX_CHUNK_LEN) & ~(2*VL - 1));
+		len -= n;
+
+		if (n >= 2*VL) {
+			vec_t v_s1 = zeroes;
+			vec_t v_s1_sums = zeroes;
+			vec_t v_byte_sums_a = zeroes;
+			vec_t v_byte_sums_b = zeroes;
+			vec_t v_byte_sums_c = zeroes;
+			vec_t v_byte_sums_d = zeroes;
+			vec_t v_s2;
+
+			s2 += s1 * (n & ~(2*VL - 1));
+
+			do {
+				vec_t data_a = VLOADU(p + 0*VL);
+				vec_t data_b = VLOADU(p + 1*VL);
+
+				v_s1_sums = VADD32(v_s1_sums, v_s1);
+				v_byte_sums_a = VADD16(v_byte_sums_a,
+						       VUNPACKLO8(data_a, zeroes));
+				v_byte_sums_b = VADD16(v_byte_sums_b,
+						       VUNPACKHI8(data_a, zeroes));
+				v_byte_sums_c = VADD16(v_byte_sums_c,
+						       VUNPACKLO8(data_b, zeroes));
+				v_byte_sums_d = VADD16(v_byte_sums_d,
+						       VUNPACKHI8(data_b, zeroes));
+				v_s1 = VADD32(v_s1,
+					      VADD32(VSAD8(data_a, zeroes),
+						     VSAD8(data_b, zeroes)));
+				
+			#if GCC_PREREQ(1, 0)
+				__asm__("" : "+x" (v_s1), "+x" (v_s1_sums),
+					     "+x" (v_byte_sums_a),
+					     "+x" (v_byte_sums_b),
+					     "+x" (v_byte_sums_c),
+					     "+x" (v_byte_sums_d));
+			#endif
+				p += 2*VL;
+				n -= 2*VL;
+			} while (n >= 2*VL);
+
+			
+			v_s2 = VADD32_5X(VSLL32(v_s1_sums, LOG2_VL + 1),
+					 VMADD16(v_byte_sums_a, mults_a),
+					 VMADD16(v_byte_sums_b, mults_b),
+					 VMADD16(v_byte_sums_c, mults_c),
+					 VMADD16(v_byte_sums_d, mults_d));
+			reduce_to_32bits(v_s1, v_s2, &s1, &s2);
+		}
+		
+		ADLER32_CHUNK(s1, s2, p, n);
+	}
+#endif 
+	return (s2 << 16) | s1;
+}
+
+#undef vec_t
+#undef mask_t
+#undef LOG2_VL
+#undef VADD8
+#undef VADD16
+#undef VADD32
+#undef VDPBUSD
+#undef VLOAD
+#undef VLOADU
+#undef VMADD16
+#undef VMASKZ_LOADU
+#undef VMULLO32
+#undef VSAD8
+#undef VSET1_8
+#undef VSET1_32
+#undef VSETZERO
+#undef VSLL32
+#undef VUNPACKLO8
+#undef VUNPACKHI8
+
+#undef SUFFIX
+#undef ATTRIBUTES
+#undef VL
+#undef USE_VNNI
+#undef USE_AVX512
+
+#endif
+
+#if GCC_PREREQ(8, 1) || CLANG_PREREQ(6, 0, 10000000) || MSVC_PREREQ(1920)
+
+#  define adler32_x86_avx512_vl256_vnni	adler32_x86_avx512_vl256_vnni
+#  define SUFFIX				   _avx512_vl256_vnni
+#  define ATTRIBUTES		_target_attribute("avx512bw,avx512vl,avx512vnni")
+#  define VL			32
+#  define USE_VNNI		1
+#  define USE_AVX512		1
+/* #include "x86-adler32_template.h" */
+
+
+
+
+#if VL == 16
+#  define vec_t			__m128i
+#  define mask_t		u16
+#  define LOG2_VL		4
+#  define VADD8(a, b)		_mm_add_epi8((a), (b))
+#  define VADD16(a, b)		_mm_add_epi16((a), (b))
+#  define VADD32(a, b)		_mm_add_epi32((a), (b))
+#  if USE_AVX512
+#    define VDPBUSD(a, b, c)	_mm_dpbusd_epi32((a), (b), (c))
+#  else
+#    define VDPBUSD(a, b, c)	_mm_dpbusd_avx_epi32((a), (b), (c))
+#  endif
+#  define VLOAD(p)		_mm_load_si128((const void *)(p))
+#  define VLOADU(p)		_mm_loadu_si128((const void *)(p))
+#  define VMADD16(a, b)		_mm_madd_epi16((a), (b))
+#  define VMASKZ_LOADU(mask, p) _mm_maskz_loadu_epi8((mask), (p))
+#  define VMULLO32(a, b)	_mm_mullo_epi32((a), (b))
+#  define VSAD8(a, b)		_mm_sad_epu8((a), (b))
+#  define VSET1_8(a)		_mm_set1_epi8(a)
+#  define VSET1_32(a)		_mm_set1_epi32(a)
+#  define VSETZERO()		_mm_setzero_si128()
+#  define VSLL32(a, b)		_mm_slli_epi32((a), (b))
+#  define VUNPACKLO8(a, b)	_mm_unpacklo_epi8((a), (b))
+#  define VUNPACKHI8(a, b)	_mm_unpackhi_epi8((a), (b))
+#elif VL == 32
+#  define vec_t			__m256i
+#  define mask_t		u32
+#  define LOG2_VL		5
+#  define VADD8(a, b)		_mm256_add_epi8((a), (b))
+#  define VADD16(a, b)		_mm256_add_epi16((a), (b))
+#  define VADD32(a, b)		_mm256_add_epi32((a), (b))
+#  if USE_AVX512
+#    define VDPBUSD(a, b, c)	_mm256_dpbusd_epi32((a), (b), (c))
+#  else
+#    define VDPBUSD(a, b, c)	_mm256_dpbusd_avx_epi32((a), (b), (c))
+#  endif
+#  define VLOAD(p)		_mm256_load_si256((const void *)(p))
+#  define VLOADU(p)		_mm256_loadu_si256((const void *)(p))
+#  define VMADD16(a, b)		_mm256_madd_epi16((a), (b))
+#  define VMASKZ_LOADU(mask, p) _mm256_maskz_loadu_epi8((mask), (p))
+#  define VMULLO32(a, b)	_mm256_mullo_epi32((a), (b))
+#  define VSAD8(a, b)		_mm256_sad_epu8((a), (b))
+#  define VSET1_8(a)		_mm256_set1_epi8(a)
+#  define VSET1_32(a)		_mm256_set1_epi32(a)
+#  define VSETZERO()		_mm256_setzero_si256()
+#  define VSLL32(a, b)		_mm256_slli_epi32((a), (b))
+#  define VUNPACKLO8(a, b)	_mm256_unpacklo_epi8((a), (b))
+#  define VUNPACKHI8(a, b)	_mm256_unpackhi_epi8((a), (b))
+#elif VL == 64
+#  define vec_t			__m512i
+#  define mask_t		u64
+#  define LOG2_VL		6
+#  define VADD8(a, b)		_mm512_add_epi8((a), (b))
+#  define VADD16(a, b)		_mm512_add_epi16((a), (b))
+#  define VADD32(a, b)		_mm512_add_epi32((a), (b))
+#  define VDPBUSD(a, b, c)	_mm512_dpbusd_epi32((a), (b), (c))
+#  define VLOAD(p)		_mm512_load_si512((const void *)(p))
+#  define VLOADU(p)		_mm512_loadu_si512((const void *)(p))
+#  define VMADD16(a, b)		_mm512_madd_epi16((a), (b))
+#  define VMASKZ_LOADU(mask, p) _mm512_maskz_loadu_epi8((mask), (p))
+#  define VMULLO32(a, b)	_mm512_mullo_epi32((a), (b))
+#  define VSAD8(a, b)		_mm512_sad_epu8((a), (b))
+#  define VSET1_8(a)		_mm512_set1_epi8(a)
+#  define VSET1_32(a)		_mm512_set1_epi32(a)
+#  define VSETZERO()		_mm512_setzero_si512()
+#  define VSLL32(a, b)		_mm512_slli_epi32((a), (b))
+#  define VUNPACKLO8(a, b)	_mm512_unpacklo_epi8((a), (b))
+#  define VUNPACKHI8(a, b)	_mm512_unpackhi_epi8((a), (b))
+#else
+#  error "unsupported vector length"
+#endif
+
+#define VADD32_3X(a, b, c)	VADD32(VADD32((a), (b)), (c))
+#define VADD32_4X(a, b, c, d)	VADD32(VADD32((a), (b)), VADD32((c), (d)))
+#define VADD32_5X(a, b, c, d, e) VADD32((a), VADD32_4X((b), (c), (d), (e)))
+#define VADD32_7X(a, b, c, d, e, f, g)	\
+	VADD32(VADD32_3X((a), (b), (c)), VADD32_4X((d), (e), (f), (g)))
+
+
+#undef reduce_to_32bits
+static forceinline ATTRIBUTES void
+ADD_SUFFIX(reduce_to_32bits)(vec_t v_s1, vec_t v_s2, u32 *s1_p, u32 *s2_p)
+{
+	__m128i v_s1_128, v_s2_128;
+#if VL == 16
+	{
+		v_s1_128 = v_s1;
+		v_s2_128 = v_s2;
+	}
+#else
+	{
+		__m256i v_s1_256, v_s2_256;
+	#if VL == 32
+		v_s1_256 = v_s1;
+		v_s2_256 = v_s2;
+	#else
+		
+		v_s1_256 = _mm256_add_epi32(_mm512_extracti64x4_epi64(v_s1, 0),
+					    _mm512_extracti64x4_epi64(v_s1, 1));
+		v_s2_256 = _mm256_add_epi32(_mm512_extracti64x4_epi64(v_s2, 0),
+					    _mm512_extracti64x4_epi64(v_s2, 1));
+	#endif
+		
+		v_s1_128 = _mm_add_epi32(_mm256_extracti128_si256(v_s1_256, 0),
+					 _mm256_extracti128_si256(v_s1_256, 1));
+		v_s2_128 = _mm_add_epi32(_mm256_extracti128_si256(v_s2_256, 0),
+					 _mm256_extracti128_si256(v_s2_256, 1));
+	}
+#endif
+
+	
+#if USE_VNNI
+	v_s1_128 = _mm_add_epi32(v_s1_128, _mm_shuffle_epi32(v_s1_128, 0x31));
+#endif
+	v_s2_128 = _mm_add_epi32(v_s2_128, _mm_shuffle_epi32(v_s2_128, 0x31));
+	v_s1_128 = _mm_add_epi32(v_s1_128, _mm_shuffle_epi32(v_s1_128, 0x02));
+	v_s2_128 = _mm_add_epi32(v_s2_128, _mm_shuffle_epi32(v_s2_128, 0x02));
+
+	*s1_p += (u32)_mm_cvtsi128_si32(v_s1_128);
+	*s2_p += (u32)_mm_cvtsi128_si32(v_s2_128);
+}
+#define reduce_to_32bits	ADD_SUFFIX(reduce_to_32bits)
+
+static ATTRIBUTES u32
+ADD_SUFFIX(adler32_x86)(u32 adler, const u8 *p, size_t len)
+{
+#if USE_VNNI
+	
+	static const u8 _aligned_attribute(VL) raw_mults[VL] = {
+	#if VL == 64
+		64, 63, 62, 61, 60, 59, 58, 57, 56, 55, 54, 53, 52, 51, 50, 49,
+		48, 47, 46, 45, 44, 43, 42, 41, 40, 39, 38, 37, 36, 35, 34, 33,
+	#endif
+	#if VL >= 32
+		32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17,
+	#endif
+		16, 15, 14, 13, 12, 11, 10,  9,  8,  7,  6,  5,  4,  3,  2,  1,
+	};
+	const vec_t ones = VSET1_8(1);
+#else
+	
+	static const u16 _aligned_attribute(VL) raw_mults[4][VL / 2] = {
+	#if VL == 16
+		{ 32, 31, 30, 29, 28, 27, 26, 25 },
+		{ 24, 23, 22, 21, 20, 19, 18, 17 },
+		{ 16, 15, 14, 13, 12, 11, 10, 9  },
+		{ 8,  7,  6,  5,  4,  3,  2,  1  },
+	#elif VL == 32
+		{ 64, 63, 62, 61, 60, 59, 58, 57, 48, 47, 46, 45, 44, 43, 42, 41 },
+		{ 56, 55, 54, 53, 52, 51, 50, 49, 40, 39, 38, 37, 36, 35, 34, 33 },
+		{ 32, 31, 30, 29, 28, 27, 26, 25, 16, 15, 14, 13, 12, 11, 10,  9 },
+		{ 24, 23, 22, 21, 20, 19, 18, 17,  8,  7,  6,  5,  4,  3,  2,  1 },
+	#else
+	#  error "unsupported parameters"
+	#endif
+	};
+	const vec_t mults_a = VLOAD(raw_mults[0]);
+	const vec_t mults_b = VLOAD(raw_mults[1]);
+	const vec_t mults_c = VLOAD(raw_mults[2]);
+	const vec_t mults_d = VLOAD(raw_mults[3]);
+#endif
+	const vec_t zeroes = VSETZERO();
+	u32 s1 = adler & 0xFFFF;
+	u32 s2 = adler >> 16;
+
+	
+	if (unlikely(len > 65536 && ((uintptr_t)p & (VL-1)))) {
+		do {
+			s1 += *p++;
+			s2 += s1;
+			len--;
+		} while ((uintptr_t)p & (VL-1));
+		s1 %= DIVISOR;
+		s2 %= DIVISOR;
+	}
+
+#if USE_VNNI
+	
+	while (len) {
+		
+		size_t n = MIN(len, MAX_CHUNK_LEN & ~(4*VL - 1));
+		vec_t mults = VLOAD(raw_mults);
+		vec_t v_s1 = zeroes;
+		vec_t v_s2 = zeroes;
+
+		s2 += s1 * n;
+		len -= n;
+
+		if (n >= 4*VL) {
+			vec_t v_s1_b = zeroes;
+			vec_t v_s1_c = zeroes;
+			vec_t v_s1_d = zeroes;
+			vec_t v_s2_b = zeroes;
+			vec_t v_s2_c = zeroes;
+			vec_t v_s2_d = zeroes;
+			vec_t v_s1_sums   = zeroes;
+			vec_t v_s1_sums_b = zeroes;
+			vec_t v_s1_sums_c = zeroes;
+			vec_t v_s1_sums_d = zeroes;
+			vec_t tmp0, tmp1;
+
+			do {
+				vec_t data_a = VLOADU(p + 0*VL);
+				vec_t data_b = VLOADU(p + 1*VL);
+				vec_t data_c = VLOADU(p + 2*VL);
+				vec_t data_d = VLOADU(p + 3*VL);
+
+				
+			#if GCC_PREREQ(1, 0)
+				__asm__("" : "+v" (data_a), "+v" (data_b),
+					     "+v" (data_c), "+v" (data_d));
+			#endif
+
+				v_s2   = VDPBUSD(v_s2,   data_a, mults);
+				v_s2_b = VDPBUSD(v_s2_b, data_b, mults);
+				v_s2_c = VDPBUSD(v_s2_c, data_c, mults);
+				v_s2_d = VDPBUSD(v_s2_d, data_d, mults);
+
+				v_s1_sums   = VADD32(v_s1_sums,   v_s1);
+				v_s1_sums_b = VADD32(v_s1_sums_b, v_s1_b);
+				v_s1_sums_c = VADD32(v_s1_sums_c, v_s1_c);
+				v_s1_sums_d = VADD32(v_s1_sums_d, v_s1_d);
+
+				v_s1   = VDPBUSD(v_s1,   data_a, ones);
+				v_s1_b = VDPBUSD(v_s1_b, data_b, ones);
+				v_s1_c = VDPBUSD(v_s1_c, data_c, ones);
+				v_s1_d = VDPBUSD(v_s1_d, data_d, ones);
+
+				
+			#if GCC_PREREQ(1, 0) && !defined(ARCH_X86_32)
+				__asm__("" : "+v" (v_s2), "+v" (v_s2_b),
+					     "+v" (v_s2_c), "+v" (v_s2_d),
+					     "+v" (v_s1_sums),
+					     "+v" (v_s1_sums_b),
+					     "+v" (v_s1_sums_c),
+					     "+v" (v_s1_sums_d),
+					     "+v" (v_s1), "+v" (v_s1_b),
+					     "+v" (v_s1_c), "+v" (v_s1_d));
+			#endif
+				p += 4*VL;
+				n -= 4*VL;
+			} while (n >= 4*VL);
+
+			
+			tmp0 = VADD32(v_s1, v_s1_b);
+			tmp1 = VADD32(v_s1, v_s1_c);
+			v_s1_sums = VADD32_4X(v_s1_sums, v_s1_sums_b,
+					      v_s1_sums_c, v_s1_sums_d);
+			v_s1 = VADD32_3X(tmp0, v_s1_c, v_s1_d);
+			v_s2 = VADD32_7X(VSLL32(v_s1_sums, LOG2_VL + 2),
+					 VSLL32(tmp0, LOG2_VL + 1),
+					 VSLL32(tmp1, LOG2_VL),
+					 v_s2, v_s2_b, v_s2_c, v_s2_d);
+		}
+
+		
+		if (n >= 2*VL) {
+			const vec_t data_a = VLOADU(p + 0*VL);
+			const vec_t data_b = VLOADU(p + 1*VL);
+
+			v_s2 = VADD32(v_s2, VSLL32(v_s1, LOG2_VL + 1));
+			v_s1 = VDPBUSD(v_s1, data_a, ones);
+			v_s1 = VDPBUSD(v_s1, data_b, ones);
+			v_s2 = VDPBUSD(v_s2, data_a, VSET1_8(VL));
+			v_s2 = VDPBUSD(v_s2, data_a, mults);
+			v_s2 = VDPBUSD(v_s2, data_b, mults);
+			p += 2*VL;
+			n -= 2*VL;
+		}
+		if (n) {
+			
+			vec_t data;
+
+			v_s2 = VADD32(v_s2, VMULLO32(v_s1, VSET1_32(n)));
+
+			mults = VADD8(mults, VSET1_8((int)n - VL));
+			if (n > VL) {
+				data = VLOADU(p);
+				v_s1 = VDPBUSD(v_s1, data, ones);
+				v_s2 = VDPBUSD(v_s2, data, mults);
+				p += VL;
+				n -= VL;
+				mults = VADD8(mults, VSET1_8(-VL));
+			}
+			
+		#if USE_AVX512
+			data = VMASKZ_LOADU((mask_t)-1 >> (VL - n), p);
+		#else
+			data = zeroes;
+			memcpy(&data, p, n);
+		#endif
+			v_s1 = VDPBUSD(v_s1, data, ones);
+			v_s2 = VDPBUSD(v_s2, data, mults);
+			p += n;
+		}
+
+		reduce_to_32bits(v_s1, v_s2, &s1, &s2);
+		s1 %= DIVISOR;
+		s2 %= DIVISOR;
+	}
+#else 
+	
+	while (len) {
+		
+		size_t n = MIN(len, MIN(2 * VL * (INT16_MAX / UINT8_MAX),
+					MAX_CHUNK_LEN) & ~(2*VL - 1));
+		len -= n;
+
+		if (n >= 2*VL) {
+			vec_t v_s1 = zeroes;
+			vec_t v_s1_sums = zeroes;
+			vec_t v_byte_sums_a = zeroes;
+			vec_t v_byte_sums_b = zeroes;
+			vec_t v_byte_sums_c = zeroes;
+			vec_t v_byte_sums_d = zeroes;
+			vec_t v_s2;
+
+			s2 += s1 * (n & ~(2*VL - 1));
+
+			do {
+				vec_t data_a = VLOADU(p + 0*VL);
+				vec_t data_b = VLOADU(p + 1*VL);
+
+				v_s1_sums = VADD32(v_s1_sums, v_s1);
+				v_byte_sums_a = VADD16(v_byte_sums_a,
+						       VUNPACKLO8(data_a, zeroes));
+				v_byte_sums_b = VADD16(v_byte_sums_b,
+						       VUNPACKHI8(data_a, zeroes));
+				v_byte_sums_c = VADD16(v_byte_sums_c,
+						       VUNPACKLO8(data_b, zeroes));
+				v_byte_sums_d = VADD16(v_byte_sums_d,
+						       VUNPACKHI8(data_b, zeroes));
+				v_s1 = VADD32(v_s1,
+					      VADD32(VSAD8(data_a, zeroes),
+						     VSAD8(data_b, zeroes)));
+				
+			#if GCC_PREREQ(1, 0)
+				__asm__("" : "+x" (v_s1), "+x" (v_s1_sums),
+					     "+x" (v_byte_sums_a),
+					     "+x" (v_byte_sums_b),
+					     "+x" (v_byte_sums_c),
+					     "+x" (v_byte_sums_d));
+			#endif
+				p += 2*VL;
+				n -= 2*VL;
+			} while (n >= 2*VL);
+
+			
+			v_s2 = VADD32_5X(VSLL32(v_s1_sums, LOG2_VL + 1),
+					 VMADD16(v_byte_sums_a, mults_a),
+					 VMADD16(v_byte_sums_b, mults_b),
+					 VMADD16(v_byte_sums_c, mults_c),
+					 VMADD16(v_byte_sums_d, mults_d));
+			reduce_to_32bits(v_s1, v_s2, &s1, &s2);
+		}
+		
+		ADLER32_CHUNK(s1, s2, p, n);
+	}
+#endif 
+	return (s2 << 16) | s1;
+}
+
+#undef vec_t
+#undef mask_t
+#undef LOG2_VL
+#undef VADD8
+#undef VADD16
+#undef VADD32
+#undef VDPBUSD
+#undef VLOAD
+#undef VLOADU
+#undef VMADD16
+#undef VMASKZ_LOADU
+#undef VMULLO32
+#undef VSAD8
+#undef VSET1_8
+#undef VSET1_32
+#undef VSETZERO
+#undef VSLL32
+#undef VUNPACKLO8
+#undef VUNPACKHI8
+
+#undef SUFFIX
+#undef ATTRIBUTES
+#undef VL
+#undef USE_VNNI
+#undef USE_AVX512
+
+
+
+#  define adler32_x86_avx512_vl512_vnni	adler32_x86_avx512_vl512_vnni
+#  define SUFFIX				   _avx512_vl512_vnni
+#  define ATTRIBUTES		_target_attribute("avx512bw,avx512vnni")
+#  define VL			64
+#  define USE_VNNI		1
+#  define USE_AVX512		1
+/* #include "x86-adler32_template.h" */
+
+
+
+
+#if VL == 16
+#  define vec_t			__m128i
+#  define mask_t		u16
+#  define LOG2_VL		4
+#  define VADD8(a, b)		_mm_add_epi8((a), (b))
+#  define VADD16(a, b)		_mm_add_epi16((a), (b))
+#  define VADD32(a, b)		_mm_add_epi32((a), (b))
+#  if USE_AVX512
+#    define VDPBUSD(a, b, c)	_mm_dpbusd_epi32((a), (b), (c))
+#  else
+#    define VDPBUSD(a, b, c)	_mm_dpbusd_avx_epi32((a), (b), (c))
+#  endif
+#  define VLOAD(p)		_mm_load_si128((const void *)(p))
+#  define VLOADU(p)		_mm_loadu_si128((const void *)(p))
+#  define VMADD16(a, b)		_mm_madd_epi16((a), (b))
+#  define VMASKZ_LOADU(mask, p) _mm_maskz_loadu_epi8((mask), (p))
+#  define VMULLO32(a, b)	_mm_mullo_epi32((a), (b))
+#  define VSAD8(a, b)		_mm_sad_epu8((a), (b))
+#  define VSET1_8(a)		_mm_set1_epi8(a)
+#  define VSET1_32(a)		_mm_set1_epi32(a)
+#  define VSETZERO()		_mm_setzero_si128()
+#  define VSLL32(a, b)		_mm_slli_epi32((a), (b))
+#  define VUNPACKLO8(a, b)	_mm_unpacklo_epi8((a), (b))
+#  define VUNPACKHI8(a, b)	_mm_unpackhi_epi8((a), (b))
+#elif VL == 32
+#  define vec_t			__m256i
+#  define mask_t		u32
+#  define LOG2_VL		5
+#  define VADD8(a, b)		_mm256_add_epi8((a), (b))
+#  define VADD16(a, b)		_mm256_add_epi16((a), (b))
+#  define VADD32(a, b)		_mm256_add_epi32((a), (b))
+#  if USE_AVX512
+#    define VDPBUSD(a, b, c)	_mm256_dpbusd_epi32((a), (b), (c))
+#  else
+#    define VDPBUSD(a, b, c)	_mm256_dpbusd_avx_epi32((a), (b), (c))
+#  endif
+#  define VLOAD(p)		_mm256_load_si256((const void *)(p))
+#  define VLOADU(p)		_mm256_loadu_si256((const void *)(p))
+#  define VMADD16(a, b)		_mm256_madd_epi16((a), (b))
+#  define VMASKZ_LOADU(mask, p) _mm256_maskz_loadu_epi8((mask), (p))
+#  define VMULLO32(a, b)	_mm256_mullo_epi32((a), (b))
+#  define VSAD8(a, b)		_mm256_sad_epu8((a), (b))
+#  define VSET1_8(a)		_mm256_set1_epi8(a)
+#  define VSET1_32(a)		_mm256_set1_epi32(a)
+#  define VSETZERO()		_mm256_setzero_si256()
+#  define VSLL32(a, b)		_mm256_slli_epi32((a), (b))
+#  define VUNPACKLO8(a, b)	_mm256_unpacklo_epi8((a), (b))
+#  define VUNPACKHI8(a, b)	_mm256_unpackhi_epi8((a), (b))
+#elif VL == 64
+#  define vec_t			__m512i
+#  define mask_t		u64
+#  define LOG2_VL		6
+#  define VADD8(a, b)		_mm512_add_epi8((a), (b))
+#  define VADD16(a, b)		_mm512_add_epi16((a), (b))
+#  define VADD32(a, b)		_mm512_add_epi32((a), (b))
+#  define VDPBUSD(a, b, c)	_mm512_dpbusd_epi32((a), (b), (c))
+#  define VLOAD(p)		_mm512_load_si512((const void *)(p))
+#  define VLOADU(p)		_mm512_loadu_si512((const void *)(p))
+#  define VMADD16(a, b)		_mm512_madd_epi16((a), (b))
+#  define VMASKZ_LOADU(mask, p) _mm512_maskz_loadu_epi8((mask), (p))
+#  define VMULLO32(a, b)	_mm512_mullo_epi32((a), (b))
+#  define VSAD8(a, b)		_mm512_sad_epu8((a), (b))
+#  define VSET1_8(a)		_mm512_set1_epi8(a)
+#  define VSET1_32(a)		_mm512_set1_epi32(a)
+#  define VSETZERO()		_mm512_setzero_si512()
+#  define VSLL32(a, b)		_mm512_slli_epi32((a), (b))
+#  define VUNPACKLO8(a, b)	_mm512_unpacklo_epi8((a), (b))
+#  define VUNPACKHI8(a, b)	_mm512_unpackhi_epi8((a), (b))
+#else
+#  error "unsupported vector length"
+#endif
+
+#define VADD32_3X(a, b, c)	VADD32(VADD32((a), (b)), (c))
+#define VADD32_4X(a, b, c, d)	VADD32(VADD32((a), (b)), VADD32((c), (d)))
+#define VADD32_5X(a, b, c, d, e) VADD32((a), VADD32_4X((b), (c), (d), (e)))
+#define VADD32_7X(a, b, c, d, e, f, g)	\
+	VADD32(VADD32_3X((a), (b), (c)), VADD32_4X((d), (e), (f), (g)))
+
+
+#undef reduce_to_32bits
+static forceinline ATTRIBUTES void
+ADD_SUFFIX(reduce_to_32bits)(vec_t v_s1, vec_t v_s2, u32 *s1_p, u32 *s2_p)
+{
+	__m128i v_s1_128, v_s2_128;
+#if VL == 16
+	{
+		v_s1_128 = v_s1;
+		v_s2_128 = v_s2;
+	}
+#else
+	{
+		__m256i v_s1_256, v_s2_256;
+	#if VL == 32
+		v_s1_256 = v_s1;
+		v_s2_256 = v_s2;
+	#else
+		
+		v_s1_256 = _mm256_add_epi32(_mm512_extracti64x4_epi64(v_s1, 0),
+					    _mm512_extracti64x4_epi64(v_s1, 1));
+		v_s2_256 = _mm256_add_epi32(_mm512_extracti64x4_epi64(v_s2, 0),
+					    _mm512_extracti64x4_epi64(v_s2, 1));
+	#endif
+		
+		v_s1_128 = _mm_add_epi32(_mm256_extracti128_si256(v_s1_256, 0),
+					 _mm256_extracti128_si256(v_s1_256, 1));
+		v_s2_128 = _mm_add_epi32(_mm256_extracti128_si256(v_s2_256, 0),
+					 _mm256_extracti128_si256(v_s2_256, 1));
+	}
+#endif
+
+	
+#if USE_VNNI
+	v_s1_128 = _mm_add_epi32(v_s1_128, _mm_shuffle_epi32(v_s1_128, 0x31));
+#endif
+	v_s2_128 = _mm_add_epi32(v_s2_128, _mm_shuffle_epi32(v_s2_128, 0x31));
+	v_s1_128 = _mm_add_epi32(v_s1_128, _mm_shuffle_epi32(v_s1_128, 0x02));
+	v_s2_128 = _mm_add_epi32(v_s2_128, _mm_shuffle_epi32(v_s2_128, 0x02));
+
+	*s1_p += (u32)_mm_cvtsi128_si32(v_s1_128);
+	*s2_p += (u32)_mm_cvtsi128_si32(v_s2_128);
+}
+#define reduce_to_32bits	ADD_SUFFIX(reduce_to_32bits)
+
+static ATTRIBUTES u32
+ADD_SUFFIX(adler32_x86)(u32 adler, const u8 *p, size_t len)
+{
+#if USE_VNNI
+	
+	static const u8 _aligned_attribute(VL) raw_mults[VL] = {
+	#if VL == 64
+		64, 63, 62, 61, 60, 59, 58, 57, 56, 55, 54, 53, 52, 51, 50, 49,
+		48, 47, 46, 45, 44, 43, 42, 41, 40, 39, 38, 37, 36, 35, 34, 33,
+	#endif
+	#if VL >= 32
+		32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17,
+	#endif
+		16, 15, 14, 13, 12, 11, 10,  9,  8,  7,  6,  5,  4,  3,  2,  1,
+	};
+	const vec_t ones = VSET1_8(1);
+#else
+	
+	static const u16 _aligned_attribute(VL) raw_mults[4][VL / 2] = {
+	#if VL == 16
+		{ 32, 31, 30, 29, 28, 27, 26, 25 },
+		{ 24, 23, 22, 21, 20, 19, 18, 17 },
+		{ 16, 15, 14, 13, 12, 11, 10, 9  },
+		{ 8,  7,  6,  5,  4,  3,  2,  1  },
+	#elif VL == 32
+		{ 64, 63, 62, 61, 60, 59, 58, 57, 48, 47, 46, 45, 44, 43, 42, 41 },
+		{ 56, 55, 54, 53, 52, 51, 50, 49, 40, 39, 38, 37, 36, 35, 34, 33 },
+		{ 32, 31, 30, 29, 28, 27, 26, 25, 16, 15, 14, 13, 12, 11, 10,  9 },
+		{ 24, 23, 22, 21, 20, 19, 18, 17,  8,  7,  6,  5,  4,  3,  2,  1 },
+	#else
+	#  error "unsupported parameters"
+	#endif
+	};
+	const vec_t mults_a = VLOAD(raw_mults[0]);
+	const vec_t mults_b = VLOAD(raw_mults[1]);
+	const vec_t mults_c = VLOAD(raw_mults[2]);
+	const vec_t mults_d = VLOAD(raw_mults[3]);
+#endif
+	const vec_t zeroes = VSETZERO();
+	u32 s1 = adler & 0xFFFF;
+	u32 s2 = adler >> 16;
+
+	
+	if (unlikely(len > 65536 && ((uintptr_t)p & (VL-1)))) {
+		do {
+			s1 += *p++;
+			s2 += s1;
+			len--;
+		} while ((uintptr_t)p & (VL-1));
+		s1 %= DIVISOR;
+		s2 %= DIVISOR;
+	}
+
+#if USE_VNNI
+	
+	while (len) {
+		
+		size_t n = MIN(len, MAX_CHUNK_LEN & ~(4*VL - 1));
+		vec_t mults = VLOAD(raw_mults);
+		vec_t v_s1 = zeroes;
+		vec_t v_s2 = zeroes;
+
+		s2 += s1 * n;
+		len -= n;
+
+		if (n >= 4*VL) {
+			vec_t v_s1_b = zeroes;
+			vec_t v_s1_c = zeroes;
+			vec_t v_s1_d = zeroes;
+			vec_t v_s2_b = zeroes;
+			vec_t v_s2_c = zeroes;
+			vec_t v_s2_d = zeroes;
+			vec_t v_s1_sums   = zeroes;
+			vec_t v_s1_sums_b = zeroes;
+			vec_t v_s1_sums_c = zeroes;
+			vec_t v_s1_sums_d = zeroes;
+			vec_t tmp0, tmp1;
+
+			do {
+				vec_t data_a = VLOADU(p + 0*VL);
+				vec_t data_b = VLOADU(p + 1*VL);
+				vec_t data_c = VLOADU(p + 2*VL);
+				vec_t data_d = VLOADU(p + 3*VL);
+
+				
+			#if GCC_PREREQ(1, 0)
+				__asm__("" : "+v" (data_a), "+v" (data_b),
+					     "+v" (data_c), "+v" (data_d));
+			#endif
+
+				v_s2   = VDPBUSD(v_s2,   data_a, mults);
+				v_s2_b = VDPBUSD(v_s2_b, data_b, mults);
+				v_s2_c = VDPBUSD(v_s2_c, data_c, mults);
+				v_s2_d = VDPBUSD(v_s2_d, data_d, mults);
+
+				v_s1_sums   = VADD32(v_s1_sums,   v_s1);
+				v_s1_sums_b = VADD32(v_s1_sums_b, v_s1_b);
+				v_s1_sums_c = VADD32(v_s1_sums_c, v_s1_c);
+				v_s1_sums_d = VADD32(v_s1_sums_d, v_s1_d);
+
+				v_s1   = VDPBUSD(v_s1,   data_a, ones);
+				v_s1_b = VDPBUSD(v_s1_b, data_b, ones);
+				v_s1_c = VDPBUSD(v_s1_c, data_c, ones);
+				v_s1_d = VDPBUSD(v_s1_d, data_d, ones);
+
+				
+			#if GCC_PREREQ(1, 0) && !defined(ARCH_X86_32)
+				__asm__("" : "+v" (v_s2), "+v" (v_s2_b),
+					     "+v" (v_s2_c), "+v" (v_s2_d),
+					     "+v" (v_s1_sums),
+					     "+v" (v_s1_sums_b),
+					     "+v" (v_s1_sums_c),
+					     "+v" (v_s1_sums_d),
+					     "+v" (v_s1), "+v" (v_s1_b),
+					     "+v" (v_s1_c), "+v" (v_s1_d));
+			#endif
+				p += 4*VL;
+				n -= 4*VL;
+			} while (n >= 4*VL);
+
+			
+			tmp0 = VADD32(v_s1, v_s1_b);
+			tmp1 = VADD32(v_s1, v_s1_c);
+			v_s1_sums = VADD32_4X(v_s1_sums, v_s1_sums_b,
+					      v_s1_sums_c, v_s1_sums_d);
+			v_s1 = VADD32_3X(tmp0, v_s1_c, v_s1_d);
+			v_s2 = VADD32_7X(VSLL32(v_s1_sums, LOG2_VL + 2),
+					 VSLL32(tmp0, LOG2_VL + 1),
+					 VSLL32(tmp1, LOG2_VL),
+					 v_s2, v_s2_b, v_s2_c, v_s2_d);
+		}
+
+		
+		if (n >= 2*VL) {
+			const vec_t data_a = VLOADU(p + 0*VL);
+			const vec_t data_b = VLOADU(p + 1*VL);
+
+			v_s2 = VADD32(v_s2, VSLL32(v_s1, LOG2_VL + 1));
+			v_s1 = VDPBUSD(v_s1, data_a, ones);
+			v_s1 = VDPBUSD(v_s1, data_b, ones);
+			v_s2 = VDPBUSD(v_s2, data_a, VSET1_8(VL));
+			v_s2 = VDPBUSD(v_s2, data_a, mults);
+			v_s2 = VDPBUSD(v_s2, data_b, mults);
+			p += 2*VL;
+			n -= 2*VL;
+		}
+		if (n) {
+			
+			vec_t data;
+
+			v_s2 = VADD32(v_s2, VMULLO32(v_s1, VSET1_32(n)));
+
+			mults = VADD8(mults, VSET1_8((int)n - VL));
+			if (n > VL) {
+				data = VLOADU(p);
+				v_s1 = VDPBUSD(v_s1, data, ones);
+				v_s2 = VDPBUSD(v_s2, data, mults);
+				p += VL;
+				n -= VL;
+				mults = VADD8(mults, VSET1_8(-VL));
+			}
+			
+		#if USE_AVX512
+			data = VMASKZ_LOADU((mask_t)-1 >> (VL - n), p);
+		#else
+			data = zeroes;
+			memcpy(&data, p, n);
+		#endif
+			v_s1 = VDPBUSD(v_s1, data, ones);
+			v_s2 = VDPBUSD(v_s2, data, mults);
+			p += n;
+		}
+
+		reduce_to_32bits(v_s1, v_s2, &s1, &s2);
+		s1 %= DIVISOR;
+		s2 %= DIVISOR;
+	}
+#else 
+	
+	while (len) {
+		
+		size_t n = MIN(len, MIN(2 * VL * (INT16_MAX / UINT8_MAX),
+					MAX_CHUNK_LEN) & ~(2*VL - 1));
+		len -= n;
+
+		if (n >= 2*VL) {
+			vec_t v_s1 = zeroes;
+			vec_t v_s1_sums = zeroes;
+			vec_t v_byte_sums_a = zeroes;
+			vec_t v_byte_sums_b = zeroes;
+			vec_t v_byte_sums_c = zeroes;
+			vec_t v_byte_sums_d = zeroes;
+			vec_t v_s2;
+
+			s2 += s1 * (n & ~(2*VL - 1));
+
+			do {
+				vec_t data_a = VLOADU(p + 0*VL);
+				vec_t data_b = VLOADU(p + 1*VL);
+
+				v_s1_sums = VADD32(v_s1_sums, v_s1);
+				v_byte_sums_a = VADD16(v_byte_sums_a,
+						       VUNPACKLO8(data_a, zeroes));
+				v_byte_sums_b = VADD16(v_byte_sums_b,
+						       VUNPACKHI8(data_a, zeroes));
+				v_byte_sums_c = VADD16(v_byte_sums_c,
+						       VUNPACKLO8(data_b, zeroes));
+				v_byte_sums_d = VADD16(v_byte_sums_d,
+						       VUNPACKHI8(data_b, zeroes));
+				v_s1 = VADD32(v_s1,
+					      VADD32(VSAD8(data_a, zeroes),
+						     VSAD8(data_b, zeroes)));
+				
+			#if GCC_PREREQ(1, 0)
+				__asm__("" : "+x" (v_s1), "+x" (v_s1_sums),
+					     "+x" (v_byte_sums_a),
+					     "+x" (v_byte_sums_b),
+					     "+x" (v_byte_sums_c),
+					     "+x" (v_byte_sums_d));
+			#endif
+				p += 2*VL;
+				n -= 2*VL;
+			} while (n >= 2*VL);
+
+			
+			v_s2 = VADD32_5X(VSLL32(v_s1_sums, LOG2_VL + 1),
+					 VMADD16(v_byte_sums_a, mults_a),
+					 VMADD16(v_byte_sums_b, mults_b),
+					 VMADD16(v_byte_sums_c, mults_c),
+					 VMADD16(v_byte_sums_d, mults_d));
+			reduce_to_32bits(v_s1, v_s2, &s1, &s2);
+		}
+		
+		ADLER32_CHUNK(s1, s2, p, n);
+	}
+#endif 
+	return (s2 << 16) | s1;
+}
+
+#undef vec_t
+#undef mask_t
+#undef LOG2_VL
+#undef VADD8
+#undef VADD16
+#undef VADD32
+#undef VDPBUSD
+#undef VLOAD
+#undef VLOADU
+#undef VMADD16
+#undef VMASKZ_LOADU
+#undef VMULLO32
+#undef VSAD8
+#undef VSET1_8
+#undef VSET1_32
+#undef VSETZERO
+#undef VSLL32
+#undef VUNPACKLO8
+#undef VUNPACKHI8
+
+#undef SUFFIX
+#undef ATTRIBUTES
+#undef VL
+#undef USE_VNNI
+#undef USE_AVX512
+
+#endif
+
 static inline adler32_func_t
 arch_select_adler32_func(void)
 {
 	const u32 features MAYBE_UNUSED = get_x86_cpu_features();
 
-#ifdef adler32_avx2
-	if (HAVE_AVX2(features))
-		return adler32_avx2;
+#ifdef adler32_x86_avx512_vl512_vnni
+	if ((features & X86_CPU_FEATURE_ZMM) &&
+	    HAVE_AVX512BW(features) && HAVE_AVX512VNNI(features))
+		return adler32_x86_avx512_vl512_vnni;
 #endif
-#ifdef adler32_sse2
+#ifdef adler32_x86_avx512_vl256_vnni
+	if (HAVE_AVX512BW(features) && HAVE_AVX512VL(features) &&
+	    HAVE_AVX512VNNI(features))
+		return adler32_x86_avx512_vl256_vnni;
+#endif
+#ifdef adler32_x86_avx2_vnni
+	if (HAVE_AVX2(features) && HAVE_AVXVNNI(features))
+		return adler32_x86_avx2_vnni;
+#endif
+#ifdef adler32_x86_avx2
+	if (HAVE_AVX2(features))
+		return adler32_x86_avx2;
+#endif
+#ifdef adler32_x86_sse2
 	if (HAVE_SSE2(features))
-		return adler32_sse2;
+		return adler32_x86_sse2;
 #endif
 	return NULL;
 }
 #define arch_select_adler32_func	arch_select_adler32_func
-#endif
 
 #endif 
 
@@ -3819,7 +5561,7 @@ libdeflate_adler32(u32 adler, const void *buffer, size_t len)
 		return 1;
 	return adler32_impl(adler, buffer, len);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.19/lib/crc32.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.20/lib/crc32.c */
 
 
 
@@ -3872,8 +5614,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	19
-#define LIBDEFLATE_VERSION_STRING	"1.19"
+#define LIBDEFLATE_VERSION_MINOR	20
+#define LIBDEFLATE_VERSION_STRING	"1.20"
 
 
 #ifndef LIBDEFLATEAPI
@@ -4091,6 +5833,7 @@ struct libdeflate_options {
 #undef ARCH_X86_32
 #undef ARCH_ARM64
 #undef ARCH_ARM32
+#undef ARCH_RISCV
 #ifdef _MSC_VER
 #  if defined(_M_X64)
 #    define ARCH_X86_64
@@ -4110,6 +5853,8 @@ struct libdeflate_options {
 #    define ARCH_ARM64
 #  elif defined(__arm__)
 #    define ARCH_ARM32
+#  elif defined(__riscv)
+#    define ARCH_RISCV
 #  endif
 #endif
 
@@ -4154,6 +5899,9 @@ typedef size_t machine_word_t;
 #  define GCC_PREREQ(major, minor)		\
 	(__GNUC__ > (major) ||			\
 	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#  if !GCC_PREREQ(4, 9)
+#    error "gcc versions older than 4.9 are no longer supported"
+#  endif
 #else
 #  define GCC_PREREQ(major, minor)	0
 #endif
@@ -4166,14 +5914,27 @@ typedef size_t machine_word_t;
 	(__clang_major__ > (major) ||			\
 	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
 #  endif
+#  if !CLANG_PREREQ(3, 9, 8000000)
+#    error "clang versions older than 3.9 are no longer supported"
+#  endif
 #else
 #  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+#ifdef _MSC_VER
+#  define MSVC_PREREQ(version)	(_MSC_VER >= (version))
+#  if !MSVC_PREREQ(1900)
+#    error "MSVC versions older than Visual Studio 2015 are no longer supported"
+#  endif
+#else
+#  define MSVC_PREREQ(version)	0
 #endif
 
 
 #ifndef __has_attribute
 #  define __has_attribute(attribute)	0
 #endif
+
+
 #ifndef __has_builtin
 #  define __has_builtin(builtin)	0
 #endif
@@ -4197,6 +5958,13 @@ typedef size_t machine_word_t;
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
+#endif
+
+
+#if defined(__GNUC__) || __has_attribute(noreturn)
+#  define NORETURN		__attribute__((noreturn))
+#else
+#  define NORETURN
 #endif
 
 
@@ -4265,12 +6033,10 @@ typedef size_t machine_word_t;
 #endif
 
 
-#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#if defined(__GNUC__) || __has_attribute(target)
 #  define _target_attribute(attrs)	__attribute__((target(attrs)))
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
 #else
 #  define _target_attribute(attrs)
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
 #endif
 
 
@@ -4310,7 +6076,7 @@ static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
 
 static forceinline u16 bswap16(u16 v)
 {
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap16)
 	return __builtin_bswap16(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ushort(v);
@@ -4322,7 +6088,7 @@ static forceinline u16 bswap16(u16 v)
 
 static forceinline u32 bswap32(u32 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap32)
 	return __builtin_bswap32(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ulong(v);
@@ -4337,7 +6103,7 @@ static forceinline u32 bswap32(u32 v)
 
 static forceinline u64 bswap64(u64 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap64)
 	return __builtin_bswap64(v);
 #elif defined(_MSC_VER)
 	return _byteswap_uint64(v);
@@ -4368,6 +6134,7 @@ static forceinline u64 bswap64(u64 v)
 #if (defined(__GNUC__) || defined(__clang__)) && \
 	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	 defined(__riscv_misaligned_fast) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
 #elif defined(_MSC_VER)
@@ -4705,12 +6472,17 @@ int memcmp(const void *s1, const void *s2, size_t n);
 
 #undef LIBDEFLATE_ENABLE_ASSERTIONS
 #else
-#include <string.h>
+#  include <string.h>
+   
+#  ifdef __clang_analyzer__
+#    define LIBDEFLATE_ENABLE_ASSERTIONS
+#  endif
 #endif
 
 
 #ifdef LIBDEFLATE_ENABLE_ASSERTIONS
-void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+NORETURN void
+libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #define ASSERT(expr) { if (unlikely(!(expr))) \
 	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
 #else
@@ -4726,55 +6498,103 @@ void libdeflate_assertion_failed(const char *expr, const char *file, int line);
 /* #include "crc32_multipliers.h" */
 
 
-#define CRC32_1VECS_MULT_1 0xae689191 
-#define CRC32_1VECS_MULT_2 0xccaa009e 
-#define CRC32_1VECS_MULTS { CRC32_1VECS_MULT_1, CRC32_1VECS_MULT_2 }
+#define CRC32_X159_MODG 0xae689191 
+#define CRC32_X95_MODG 0xccaa009e 
 
-#define CRC32_2VECS_MULT_1 0xf1da05aa 
-#define CRC32_2VECS_MULT_2 0x81256527 
-#define CRC32_2VECS_MULTS { CRC32_2VECS_MULT_1, CRC32_2VECS_MULT_2 }
+#define CRC32_X287_MODG 0xf1da05aa 
+#define CRC32_X223_MODG 0x81256527 
 
-#define CRC32_3VECS_MULT_1 0x3db1ecdc 
-#define CRC32_3VECS_MULT_2 0xaf449247 
-#define CRC32_3VECS_MULTS { CRC32_3VECS_MULT_1, CRC32_3VECS_MULT_2 }
+#define CRC32_X415_MODG 0x3db1ecdc 
+#define CRC32_X351_MODG 0xaf449247 
 
-#define CRC32_4VECS_MULT_1 0x8f352d95 
-#define CRC32_4VECS_MULT_2 0x1d9513d7 
-#define CRC32_4VECS_MULTS { CRC32_4VECS_MULT_1, CRC32_4VECS_MULT_2 }
+#define CRC32_X543_MODG 0x8f352d95 
+#define CRC32_X479_MODG 0x1d9513d7 
 
-#define CRC32_5VECS_MULT_1 0x1c279815 
-#define CRC32_5VECS_MULT_2 0xae0b5394 
-#define CRC32_5VECS_MULTS { CRC32_5VECS_MULT_1, CRC32_5VECS_MULT_2 }
+#define CRC32_X671_MODG 0x1c279815 
+#define CRC32_X607_MODG 0xae0b5394 
 
-#define CRC32_6VECS_MULT_1 0xdf068dc2 
-#define CRC32_6VECS_MULT_2 0x57c54819 
-#define CRC32_6VECS_MULTS { CRC32_6VECS_MULT_1, CRC32_6VECS_MULT_2 }
+#define CRC32_X799_MODG 0xdf068dc2 
+#define CRC32_X735_MODG 0x57c54819 
 
-#define CRC32_7VECS_MULT_1 0x31f8303f 
-#define CRC32_7VECS_MULT_2 0x0cbec0ed 
-#define CRC32_7VECS_MULTS { CRC32_7VECS_MULT_1, CRC32_7VECS_MULT_2 }
+#define CRC32_X927_MODG 0x31f8303f 
+#define CRC32_X863_MODG 0x0cbec0ed 
 
-#define CRC32_8VECS_MULT_1 0x33fff533 
-#define CRC32_8VECS_MULT_2 0x910eeec1 
-#define CRC32_8VECS_MULTS { CRC32_8VECS_MULT_1, CRC32_8VECS_MULT_2 }
+#define CRC32_X1055_MODG 0x33fff533 
+#define CRC32_X991_MODG 0x910eeec1 
 
-#define CRC32_9VECS_MULT_1 0x26b70c3d 
-#define CRC32_9VECS_MULT_2 0x3f41287a 
-#define CRC32_9VECS_MULTS { CRC32_9VECS_MULT_1, CRC32_9VECS_MULT_2 }
+#define CRC32_X1183_MODG 0x26b70c3d 
+#define CRC32_X1119_MODG 0x3f41287a 
 
-#define CRC32_10VECS_MULT_1 0xe3543be0 
-#define CRC32_10VECS_MULT_2 0x9026d5b1 
-#define CRC32_10VECS_MULTS { CRC32_10VECS_MULT_1, CRC32_10VECS_MULT_2 }
+#define CRC32_X1311_MODG 0xe3543be0 
+#define CRC32_X1247_MODG 0x9026d5b1 
 
-#define CRC32_11VECS_MULT_1 0x5a1bb05d 
-#define CRC32_11VECS_MULT_2 0xd1df2327 
-#define CRC32_11VECS_MULTS { CRC32_11VECS_MULT_1, CRC32_11VECS_MULT_2 }
+#define CRC32_X1439_MODG 0x5a1bb05d 
+#define CRC32_X1375_MODG 0xd1df2327 
 
-#define CRC32_12VECS_MULT_1 0x596c8d81 
-#define CRC32_12VECS_MULT_2 0xf5e48c85 
-#define CRC32_12VECS_MULTS { CRC32_12VECS_MULT_1, CRC32_12VECS_MULT_2 }
+#define CRC32_X1567_MODG 0x596c8d81 
+#define CRC32_X1503_MODG 0xf5e48c85 
 
-#define CRC32_FINAL_MULT 0xb8bc6765 
+#define CRC32_X1695_MODG 0x682bdd4f 
+#define CRC32_X1631_MODG 0x3c656ced 
+
+#define CRC32_X1823_MODG 0x4a28bd43 
+#define CRC32_X1759_MODG 0xfe807bbd 
+
+#define CRC32_X1951_MODG 0x0077f00d 
+#define CRC32_X1887_MODG 0x1f0c2cdd 
+
+#define CRC32_X2079_MODG 0xce3371cb 
+#define CRC32_X2015_MODG 0xe95c1271 
+
+#define CRC32_X2207_MODG 0xa749e894 
+#define CRC32_X2143_MODG 0xb918a347 
+
+#define CRC32_X2335_MODG 0x2c538639 
+#define CRC32_X2271_MODG 0x71d54a59 
+
+#define CRC32_X2463_MODG 0x32b0733c 
+#define CRC32_X2399_MODG 0xff6f2fc2 
+
+#define CRC32_X2591_MODG 0x0e9bd5cc 
+#define CRC32_X2527_MODG 0xcec97417 
+
+#define CRC32_X2719_MODG 0x76278617 
+#define CRC32_X2655_MODG 0x1c63267b 
+
+#define CRC32_X2847_MODG 0xc51b93e3 
+#define CRC32_X2783_MODG 0xf183c71b 
+
+#define CRC32_X2975_MODG 0x7eaed122 
+#define CRC32_X2911_MODG 0x9b9bdbd0 
+
+#define CRC32_X3103_MODG 0x2ce423f1 
+#define CRC32_X3039_MODG 0xd31343ea 
+
+#define CRC32_X3231_MODG 0x8b8d8645 
+#define CRC32_X3167_MODG 0x4470ac44 
+
+#define CRC32_X3359_MODG 0x4b700aa8 
+#define CRC32_X3295_MODG 0xeea395c4 
+
+#define CRC32_X3487_MODG 0xeff5e99d 
+#define CRC32_X3423_MODG 0xf9d9c7ee 
+
+#define CRC32_X3615_MODG 0xad0d2bb2 
+#define CRC32_X3551_MODG 0xcd669a40 
+
+#define CRC32_X3743_MODG 0x9fb66bd3 
+#define CRC32_X3679_MODG 0x6d40f445 
+
+#define CRC32_X3871_MODG 0xc2dcc467 
+#define CRC32_X3807_MODG 0x9ee62949 
+
+#define CRC32_X3999_MODG 0x398e2ff2 
+#define CRC32_X3935_MODG 0x145575d5 
+
+#define CRC32_X4127_MODG 0x1072db28 
+#define CRC32_X4063_MODG 0x0c30f51d 
+
+#define CRC32_X63_MODG 0xb8bc6765 
 #define CRC32_BARRETT_CONSTANT_1 0x00000001f7011641ULL 
 #define CRC32_BARRETT_CONSTANT_2 0x00000001db710641ULL 
 #define CRC32_BARRETT_CONSTANTS { CRC32_BARRETT_CONSTANT_1, CRC32_BARRETT_CONSTANT_2 }
@@ -5743,8 +7563,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	19
-#define LIBDEFLATE_VERSION_STRING	"1.19"
+#define LIBDEFLATE_VERSION_MINOR	20
+#define LIBDEFLATE_VERSION_STRING	"1.20"
 
 
 #ifndef LIBDEFLATEAPI
@@ -5962,6 +7782,7 @@ struct libdeflate_options {
 #undef ARCH_X86_32
 #undef ARCH_ARM64
 #undef ARCH_ARM32
+#undef ARCH_RISCV
 #ifdef _MSC_VER
 #  if defined(_M_X64)
 #    define ARCH_X86_64
@@ -5981,6 +7802,8 @@ struct libdeflate_options {
 #    define ARCH_ARM64
 #  elif defined(__arm__)
 #    define ARCH_ARM32
+#  elif defined(__riscv)
+#    define ARCH_RISCV
 #  endif
 #endif
 
@@ -6025,6 +7848,9 @@ typedef size_t machine_word_t;
 #  define GCC_PREREQ(major, minor)		\
 	(__GNUC__ > (major) ||			\
 	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#  if !GCC_PREREQ(4, 9)
+#    error "gcc versions older than 4.9 are no longer supported"
+#  endif
 #else
 #  define GCC_PREREQ(major, minor)	0
 #endif
@@ -6037,14 +7863,27 @@ typedef size_t machine_word_t;
 	(__clang_major__ > (major) ||			\
 	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
 #  endif
+#  if !CLANG_PREREQ(3, 9, 8000000)
+#    error "clang versions older than 3.9 are no longer supported"
+#  endif
 #else
 #  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+#ifdef _MSC_VER
+#  define MSVC_PREREQ(version)	(_MSC_VER >= (version))
+#  if !MSVC_PREREQ(1900)
+#    error "MSVC versions older than Visual Studio 2015 are no longer supported"
+#  endif
+#else
+#  define MSVC_PREREQ(version)	0
 #endif
 
 
 #ifndef __has_attribute
 #  define __has_attribute(attribute)	0
 #endif
+
+
 #ifndef __has_builtin
 #  define __has_builtin(builtin)	0
 #endif
@@ -6068,6 +7907,13 @@ typedef size_t machine_word_t;
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
+#endif
+
+
+#if defined(__GNUC__) || __has_attribute(noreturn)
+#  define NORETURN		__attribute__((noreturn))
+#else
+#  define NORETURN
 #endif
 
 
@@ -6136,12 +7982,10 @@ typedef size_t machine_word_t;
 #endif
 
 
-#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#if defined(__GNUC__) || __has_attribute(target)
 #  define _target_attribute(attrs)	__attribute__((target(attrs)))
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
 #else
 #  define _target_attribute(attrs)
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
 #endif
 
 
@@ -6181,7 +8025,7 @@ static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
 
 static forceinline u16 bswap16(u16 v)
 {
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap16)
 	return __builtin_bswap16(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ushort(v);
@@ -6193,7 +8037,7 @@ static forceinline u16 bswap16(u16 v)
 
 static forceinline u32 bswap32(u32 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap32)
 	return __builtin_bswap32(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ulong(v);
@@ -6208,7 +8052,7 @@ static forceinline u32 bswap32(u32 v)
 
 static forceinline u64 bswap64(u64 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap64)
 	return __builtin_bswap64(v);
 #elif defined(_MSC_VER)
 	return _byteswap_uint64(v);
@@ -6239,6 +8083,7 @@ static forceinline u64 bswap64(u64 v)
 #if (defined(__GNUC__) || defined(__clang__)) && \
 	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	 defined(__riscv_misaligned_fast) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
 #elif defined(_MSC_VER)
@@ -6576,12 +8421,17 @@ int memcmp(const void *s1, const void *s2, size_t n);
 
 #undef LIBDEFLATE_ENABLE_ASSERTIONS
 #else
-#include <string.h>
+#  include <string.h>
+   
+#  ifdef __clang_analyzer__
+#    define LIBDEFLATE_ENABLE_ASSERTIONS
+#  endif
 #endif
 
 
 #ifdef LIBDEFLATE_ENABLE_ASSERTIONS
-void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+NORETURN void
+libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #define ASSERT(expr) { if (unlikely(!(expr))) \
 	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
 #else
@@ -6595,33 +8445,23 @@ void libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #endif 
 
 
-#define HAVE_DYNAMIC_ARM_CPU_FEATURES	0
-
 #if defined(ARCH_ARM32) || defined(ARCH_ARM64)
 
+#define ARM_CPU_FEATURE_NEON		(1 << 0)
+#define ARM_CPU_FEATURE_PMULL		(1 << 1)
+
+#define ARM_CPU_FEATURE_PREFER_PMULL	(1 << 2)
+#define ARM_CPU_FEATURE_CRC32		(1 << 3)
+#define ARM_CPU_FEATURE_SHA3		(1 << 4)
+#define ARM_CPU_FEATURE_DOTPROD		(1 << 5)
+
 #if !defined(FREESTANDING) && \
-    (COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE || defined(_MSC_VER)) && \
+    (defined(__GNUC__) || defined(__clang__) || defined(_MSC_VER)) && \
     (defined(__linux__) || \
      (defined(__APPLE__) && defined(ARCH_ARM64)) || \
      (defined(_WIN32) && defined(ARCH_ARM64)))
-#  undef HAVE_DYNAMIC_ARM_CPU_FEATURES
-#  define HAVE_DYNAMIC_ARM_CPU_FEATURES	1
-#endif
 
-#define ARM_CPU_FEATURE_NEON		0x00000001
-#define ARM_CPU_FEATURE_PMULL		0x00000002
-#define ARM_CPU_FEATURE_CRC32		0x00000004
-#define ARM_CPU_FEATURE_SHA3		0x00000008
-#define ARM_CPU_FEATURE_DOTPROD		0x00000010
-
-#define HAVE_NEON(features)	(HAVE_NEON_NATIVE    || ((features) & ARM_CPU_FEATURE_NEON))
-#define HAVE_PMULL(features)	(HAVE_PMULL_NATIVE   || ((features) & ARM_CPU_FEATURE_PMULL))
-#define HAVE_CRC32(features)	(HAVE_CRC32_NATIVE   || ((features) & ARM_CPU_FEATURE_CRC32))
-#define HAVE_SHA3(features)	(HAVE_SHA3_NATIVE    || ((features) & ARM_CPU_FEATURE_SHA3))
-#define HAVE_DOTPROD(features)	(HAVE_DOTPROD_NATIVE || ((features) & ARM_CPU_FEATURE_DOTPROD))
-
-#if HAVE_DYNAMIC_ARM_CPU_FEATURES
-#define ARM_CPU_FEATURES_KNOWN		0x80000000
+#  define ARM_CPU_FEATURES_KNOWN	(1U << 31)
 extern volatile u32 libdeflate_arm_cpu_features;
 
 void libdeflate_init_arm_cpu_features(void);
@@ -6632,38 +8472,37 @@ static inline u32 get_arm_cpu_features(void)
 		libdeflate_init_arm_cpu_features();
 	return libdeflate_arm_cpu_features;
 }
-#else 
+#else
 static inline u32 get_arm_cpu_features(void) { return 0; }
-#endif 
+#endif
 
 
-#if defined(__ARM_NEON) || defined(ARCH_ARM64)
+#if defined(__ARM_NEON) || (defined(_MSC_VER) && defined(ARCH_ARM64))
+#  define HAVE_NEON(features)	1
 #  define HAVE_NEON_NATIVE	1
 #else
+#  define HAVE_NEON(features)	((features) & ARM_CPU_FEATURE_NEON)
 #  define HAVE_NEON_NATIVE	0
 #endif
 
-#if HAVE_NEON_NATIVE || \
-	(HAVE_DYNAMIC_ARM_CPU_FEATURES && GCC_PREREQ(6, 1) && defined(__ARM_FP))
+#if (defined(__GNUC__) || defined(__clang__) || defined(_MSC_VER)) && \
+	(HAVE_NEON_NATIVE || (GCC_PREREQ(6, 1) && defined(__ARM_FP)))
 #  define HAVE_NEON_INTRIN	1
+#  include <arm_neon.h>
 #else
 #  define HAVE_NEON_INTRIN	0
 #endif
 
 
 #ifdef __ARM_FEATURE_CRYPTO
-#  define HAVE_PMULL_NATIVE	1
+#  define HAVE_PMULL(features)	1
 #else
-#  define HAVE_PMULL_NATIVE	0
+#  define HAVE_PMULL(features)	((features) & ARM_CPU_FEATURE_PMULL)
 #endif
-#if HAVE_PMULL_NATIVE || \
-	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
-	 HAVE_NEON_INTRIN  && \
-	 (GCC_PREREQ(6, 1) || CLANG_PREREQ(3, 5, 6010000) || \
-	  defined(_MSC_VER)) && \
-	   \
-	 !(defined(ARCH_ARM32) && defined(__clang__)))
-#  define HAVE_PMULL_INTRIN	CPU_IS_LITTLE_ENDIAN() 
+#if defined(ARCH_ARM64) && HAVE_NEON_INTRIN && \
+	(GCC_PREREQ(6, 1) || defined(__clang__) || defined(_MSC_VER)) && \
+	CPU_IS_LITTLE_ENDIAN() 
+#  define HAVE_PMULL_INTRIN	1
    
 #  ifdef _MSC_VER
 #    define compat_vmull_p64(a, b)  vmull_p64(vcreate_p64(a), vcreate_p64(b))
@@ -6674,105 +8513,98 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #  define HAVE_PMULL_INTRIN	0
 #endif
 
-#if HAVE_PMULL_NATIVE && defined(ARCH_ARM64) && \
-		GCC_PREREQ(6, 1) && !GCC_PREREQ(13, 1)
-#  define USE_PMULL_TARGET_EVEN_IF_NATIVE	1
-#else
-#  define USE_PMULL_TARGET_EVEN_IF_NATIVE	0
-#endif
-
 
 #ifdef __ARM_FEATURE_CRC32
-#  define HAVE_CRC32_NATIVE	1
+#  define HAVE_CRC32(features)	1
 #else
-#  define HAVE_CRC32_NATIVE	0
+#  define HAVE_CRC32(features)	((features) & ARM_CPU_FEATURE_CRC32)
 #endif
-#undef HAVE_CRC32_INTRIN
-#if HAVE_CRC32_NATIVE
+#if defined(ARCH_ARM64) && \
+	(defined(__GNUC__) || defined(__clang__) || defined(_MSC_VER))
 #  define HAVE_CRC32_INTRIN	1
-#elif HAVE_DYNAMIC_ARM_CPU_FEATURES
-#  if GCC_PREREQ(1, 0)
-    
-#    if (GCC_PREREQ(11, 3) || \
-	 (GCC_PREREQ(10, 4) && !GCC_PREREQ(11, 0)) || \
-	 (GCC_PREREQ(9, 5) && !GCC_PREREQ(10, 0))) && \
-	!defined(__ARM_ARCH_6KZ__) && \
-	!defined(__ARM_ARCH_7EM__)
-#      define HAVE_CRC32_INTRIN	1
-#    endif
-#  elif CLANG_PREREQ(3, 4, 6000000)
-#    define HAVE_CRC32_INTRIN	1
-#  elif defined(_MSC_VER)
-#    define HAVE_CRC32_INTRIN	1
+#  if defined(__GNUC__) || defined(__clang__)
+#    include <arm_acle.h>
 #  endif
-#endif
-#ifndef HAVE_CRC32_INTRIN
+   
+#  if defined(__clang__) && !CLANG_PREREQ(16, 0, 16000000) && \
+	!defined(__ARM_FEATURE_CRC32)
+#    undef __crc32b
+#    define __crc32b(a, b)					\
+	({ uint32_t res;					\
+	   __asm__("crc32b %w0, %w1, %w2"			\
+		   : "=r" (res) : "r" (a), "r" (b));		\
+	   res; })
+#    undef __crc32h
+#    define __crc32h(a, b)					\
+	({ uint32_t res;					\
+	   __asm__("crc32h %w0, %w1, %w2"			\
+		   : "=r" (res) : "r" (a), "r" (b));		\
+	   res; })
+#    undef __crc32w
+#    define __crc32w(a, b)					\
+	({ uint32_t res;					\
+	   __asm__("crc32w %w0, %w1, %w2"			\
+		   : "=r" (res) : "r" (a), "r" (b));		\
+	   res; })
+#    undef __crc32d
+#    define __crc32d(a, b)					\
+	({ uint32_t res;					\
+	   __asm__("crc32x %w0, %w1, %2"			\
+		   : "=r" (res) : "r" (a), "r" (b));		\
+	   res; })
+#    pragma clang diagnostic ignored "-Wgnu-statement-expression"
+#  endif
+#else
 #  define HAVE_CRC32_INTRIN	0
 #endif
 
 
-#if defined(ARCH_ARM64) && !defined(_MSC_VER)
-#  ifdef __ARM_FEATURE_SHA3
-#    define HAVE_SHA3_NATIVE	1
-#  else
-#    define HAVE_SHA3_NATIVE	0
-#  endif
-#  define HAVE_SHA3_TARGET	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
-				 (GCC_PREREQ(8, 1)  || \
-				  CLANG_PREREQ(7, 0, 10010463) ))
-#  define HAVE_SHA3_INTRIN	(HAVE_NEON_INTRIN && \
-				 (HAVE_SHA3_NATIVE || HAVE_SHA3_TARGET) && \
-				 (GCC_PREREQ(9, 1)  || \
-				  CLANG_PREREQ(13, 0, 13160000)))
+#ifdef __ARM_FEATURE_SHA3
+#  define HAVE_SHA3(features)	1
 #else
-#  define HAVE_SHA3_NATIVE	0
-#  define HAVE_SHA3_TARGET	0
+#  define HAVE_SHA3(features)	((features) & ARM_CPU_FEATURE_SHA3)
+#endif
+#if defined(ARCH_ARM64) && HAVE_NEON_INTRIN && \
+	(GCC_PREREQ(9, 1)  || \
+	 CLANG_PREREQ(7, 0, 10010463) )
+#  define HAVE_SHA3_INTRIN	1
+   
+#  if defined(__clang__) && !CLANG_PREREQ(16, 0, 16000000) && \
+	!defined(__ARM_FEATURE_SHA3)
+#    undef veor3q_u8
+#    define veor3q_u8(a, b, c)					\
+	({ uint8x16_t res;					\
+	   __asm__("eor3 %0.16b, %1.16b, %2.16b, %3.16b"	\
+		   : "=w" (res) : "w" (a), "w" (b), "w" (c));	\
+	   res; })
+#    pragma clang diagnostic ignored "-Wgnu-statement-expression"
+#  endif
+#else
 #  define HAVE_SHA3_INTRIN	0
 #endif
 
 
-#ifdef ARCH_ARM64
-#  ifdef __ARM_FEATURE_DOTPROD
-#    define HAVE_DOTPROD_NATIVE	1
-#  else
-#    define HAVE_DOTPROD_NATIVE	0
-#  endif
-#  if HAVE_DOTPROD_NATIVE || \
-	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
-	 (GCC_PREREQ(8, 1) || CLANG_PREREQ(7, 0, 10010000) || \
-	  defined(_MSC_VER)))
-#    define HAVE_DOTPROD_INTRIN	1
-#  else
-#    define HAVE_DOTPROD_INTRIN	0
+#ifdef __ARM_FEATURE_DOTPROD
+#  define HAVE_DOTPROD(features)	1
+#else
+#  define HAVE_DOTPROD(features)	((features) & ARM_CPU_FEATURE_DOTPROD)
+#endif
+#if defined(ARCH_ARM64) && HAVE_NEON_INTRIN && \
+	(GCC_PREREQ(8, 1) || CLANG_PREREQ(7, 0, 10010000) || defined(_MSC_VER))
+#  define HAVE_DOTPROD_INTRIN	1
+   
+#  if defined(__clang__) && !CLANG_PREREQ(16, 0, 16000000) && \
+	!defined(__ARM_FEATURE_DOTPROD)
+#    undef vdotq_u32
+#    define vdotq_u32(a, b, c)					\
+	({ uint32x4_t res = (a);				\
+	   __asm__("udot %0.4s, %1.16b, %2.16b"			\
+		   : "+w" (res) : "w" (b), "w" (c));		\
+	   res; })
+#    pragma clang diagnostic ignored "-Wgnu-statement-expression"
 #  endif
 #else
-#  define HAVE_DOTPROD_NATIVE	0
 #  define HAVE_DOTPROD_INTRIN	0
-#endif
-
-
-#if HAVE_CRC32_INTRIN && !HAVE_CRC32_NATIVE && \
-	(defined(__clang__) || defined(ARCH_ARM32))
-#  define __ARM_FEATURE_CRC32	1
-#endif
-#if HAVE_SHA3_INTRIN && !HAVE_SHA3_NATIVE && defined(__clang__)
-#  define __ARM_FEATURE_SHA3	1
-#endif
-#if HAVE_DOTPROD_INTRIN && !HAVE_DOTPROD_NATIVE && defined(__clang__)
-#  define __ARM_FEATURE_DOTPROD	1
-#endif
-#if HAVE_CRC32_INTRIN && !HAVE_CRC32_NATIVE && \
-	(defined(__clang__) || defined(ARCH_ARM32))
-#  include <arm_acle.h>
-#  undef __ARM_FEATURE_CRC32
-#endif
-#if HAVE_SHA3_INTRIN && !HAVE_SHA3_NATIVE && defined(__clang__)
-#  include <arm_neon.h>
-#  undef __ARM_FEATURE_SHA3
-#endif
-#if HAVE_DOTPROD_INTRIN && !HAVE_DOTPROD_NATIVE && defined(__clang__)
-#  include <arm_neon.h>
-#  undef __ARM_FEATURE_DOTPROD
 #endif
 
 #endif 
@@ -6782,30 +8614,11 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 
 
 #if HAVE_CRC32_INTRIN
-#  if HAVE_CRC32_NATIVE
-#    define ATTRIBUTES
+#  ifdef __clang__
+#    define ATTRIBUTES	_target_attribute("crc")
 #  else
-#    ifdef ARCH_ARM32
-#      ifdef __clang__
-#        define ATTRIBUTES	_target_attribute("armv8-a,crc")
-#      elif defined(__ARM_PCS_VFP)
-	 
-#        define ATTRIBUTES	_target_attribute("arch=armv8-a+crc+simd")
-#      else
-#        define ATTRIBUTES	_target_attribute("arch=armv8-a+crc")
-#      endif
-#    else
-#      ifdef __clang__
-#        define ATTRIBUTES	_target_attribute("crc")
-#      else
-#        define ATTRIBUTES	_target_attribute("+crc")
-#      endif
-#    endif
+#    define ATTRIBUTES	_target_attribute("+crc")
 #  endif
-
-#ifndef _MSC_VER
-#  include <arm_acle.h>
-#endif
 
 
 static forceinline ATTRIBUTES u32
@@ -6828,7 +8641,7 @@ combine_crcs_slow(u32 crc0, u32 crc1, u32 crc2, u32 crc3)
 }
 
 #define crc32_arm_crc	crc32_arm_crc
-static u32 ATTRIBUTES MAYBE_UNUSED
+static ATTRIBUTES u32
 crc32_arm_crc(u32 crc, const u8 *p, size_t len)
 {
 	if (len >= 64) {
@@ -6934,24 +8747,11 @@ crc32_arm_crc(u32 crc, const u8 *p, size_t len)
 
 
 #if HAVE_CRC32_INTRIN && HAVE_PMULL_INTRIN
-#  if HAVE_CRC32_NATIVE && HAVE_PMULL_NATIVE && !USE_PMULL_TARGET_EVEN_IF_NATIVE
-#    define ATTRIBUTES
+#  ifdef __clang__
+#    define ATTRIBUTES	_target_attribute("crc,aes")
 #  else
-#    ifdef ARCH_ARM32
-#      define ATTRIBUTES	_target_attribute("arch=armv8-a+crc,fpu=crypto-neon-fp-armv8")
-#    else
-#      ifdef __clang__
-#        define ATTRIBUTES	_target_attribute("crc,aes")
-#      else
-#        define ATTRIBUTES	_target_attribute("+crc,+crypto")
-#      endif
-#    endif
+#    define ATTRIBUTES	_target_attribute("+crc,+crypto")
 #  endif
-
-#ifndef _MSC_VER
-#  include <arm_acle.h>
-#endif
-#include <arm_neon.h>
 
 
 static forceinline ATTRIBUTES u64
@@ -6975,7 +8775,7 @@ combine_crcs_fast(u32 crc0, u32 crc1, u32 crc2, u32 crc3, size_t i)
 }
 
 #define crc32_arm_crc_pmullcombine	crc32_arm_crc_pmullcombine
-static u32 ATTRIBUTES MAYBE_UNUSED
+static ATTRIBUTES u32
 crc32_arm_crc_pmullcombine(u32 crc, const u8 *p, size_t len)
 {
 	const size_t align = -(uintptr_t)p & 7;
@@ -7123,28 +8923,18 @@ crc32_arm_crc_pmullcombine(u32 crc, const u8 *p, size_t len)
 #if HAVE_PMULL_INTRIN
 #  define crc32_arm_pmullx4	crc32_arm_pmullx4
 #  define SUFFIX			 _pmullx4
-#  if HAVE_PMULL_NATIVE && !USE_PMULL_TARGET_EVEN_IF_NATIVE
-#    define ATTRIBUTES
+#  ifdef __clang__
+     
+#    define ATTRIBUTES	_target_attribute("aes")
 #  else
-#    ifdef ARCH_ARM32
-#      define ATTRIBUTES    _target_attribute("fpu=crypto-neon-fp-armv8")
-#    else
-#      ifdef __clang__
-	 
-#        define ATTRIBUTES  _target_attribute("aes")
-#      else
-	 
-#        define ATTRIBUTES  _target_attribute("+crypto")
-#      endif
-#    endif
+     
+#    define ATTRIBUTES	_target_attribute("+crypto")
 #  endif
 #  define ENABLE_EOR3		0
 /* #include "arm-crc32_pmull_helpers.h" */
 
 
 
-
-#include <arm_neon.h>
 
 
 #undef u32_to_bytevec
@@ -7180,7 +8970,7 @@ ADD_SUFFIX(clmul_low)(uint8x16_t a, poly64x2_t b)
 static forceinline ATTRIBUTES uint8x16_t
 ADD_SUFFIX(clmul_high)(uint8x16_t a, poly64x2_t b)
 {
-#if defined(__clang__) && defined(ARCH_ARM64)
+#ifdef __clang__
 	
 	uint8x16_t res;
 
@@ -7197,18 +8987,10 @@ static forceinline ATTRIBUTES uint8x16_t
 ADD_SUFFIX(eor3)(uint8x16_t a, uint8x16_t b, uint8x16_t c)
 {
 #if ENABLE_EOR3
-#if HAVE_SHA3_INTRIN
 	return veor3q_u8(a, b, c);
 #else
-	uint8x16_t res;
-
-	__asm__("eor3 %0.16b, %1.16b, %2.16b, %3.16b"
-		: "=w" (res) : "w" (a), "w" (b), "w" (c));
-	return res;
-#endif
-#else 
 	return veorq_u8(veorq_u8(a, b), c);
-#endif 
+#endif
 }
 #define eor3	ADD_SUFFIX(eor3)
 
@@ -7222,24 +9004,6 @@ ADD_SUFFIX(fold_vec)(uint8x16_t src, uint8x16_t dst, poly64x2_t multipliers)
 	return eor3(a, b, dst);
 }
 #define fold_vec	ADD_SUFFIX(fold_vec)
-
-#undef vtbl
-static forceinline ATTRIBUTES uint8x16_t
-ADD_SUFFIX(vtbl)(uint8x16_t table, uint8x16_t indices)
-{
-#ifdef ARCH_ARM64
-	return vqtbl1q_u8(table, indices);
-#else
-	uint8x8x2_t tab2;
-
-	tab2.val[0] = vget_low_u8(table);
-	tab2.val[1] = vget_high_u8(table);
-
-	return vcombine_u8(vtbl2_u8(tab2, vget_low_u8(indices)),
-			   vtbl2_u8(tab2, vget_high_u8(indices)));
-#endif
-}
-#define vtbl	ADD_SUFFIX(vtbl)
 
 
 #undef fold_partial_vec
@@ -7261,7 +9025,7 @@ ADD_SUFFIX(fold_partial_vec)(uint8x16_t v, const u8 *p, size_t len,
 	uint8x16_t x0, x1, bsl_mask;
 
 	
-	x0 = vtbl(v, lshift);
+	x0 = vqtbl1q_u8(v, lshift);
 
 	
 	bsl_mask = vreinterpretq_u8_s8(
@@ -7269,23 +9033,23 @@ ADD_SUFFIX(fold_partial_vec)(uint8x16_t v, const u8 *p, size_t len,
 
 	
 	x1 = vbslq_u8(bsl_mask ,
-		      vld1q_u8(p + len - 16), vtbl(v, rshift));
+		      vld1q_u8(p + len - 16), vqtbl1q_u8(v, rshift));
 
 	return fold_vec(x0, x1, multipliers_1);
 }
 #define fold_partial_vec	ADD_SUFFIX(fold_partial_vec)
 
 
-static u32 ATTRIBUTES MAYBE_UNUSED
+static ATTRIBUTES u32
 crc32_arm_pmullx4(u32 crc, const u8 *p, size_t len)
 {
 	static const u64 _aligned_attribute(16) mults[3][2] = {
-		CRC32_1VECS_MULTS,
-		CRC32_4VECS_MULTS,
-		CRC32_2VECS_MULTS,
+		{ CRC32_X159_MODG, CRC32_X95_MODG },  
+		{ CRC32_X543_MODG, CRC32_X479_MODG }, 
+		{ CRC32_X287_MODG, CRC32_X223_MODG }, 
 	};
 	static const u64 _aligned_attribute(16) final_mults[3][2] = {
-		{ CRC32_FINAL_MULT, 0 },
+		{ CRC32_X63_MODG, 0 },
 		{ CRC32_BARRETT_CONSTANT_1, 0 },
 		{ CRC32_BARRETT_CONSTANT_2, 0 },
 	};
@@ -7368,73 +9132,47 @@ crc32_arm_pmullx4(u32 crc, const u8 *p, size_t len)
 #endif 
 
 
-#if defined(ARCH_ARM64) && HAVE_PMULL_INTRIN && HAVE_CRC32_INTRIN
+#if HAVE_PMULL_INTRIN && HAVE_CRC32_INTRIN
 #  define crc32_arm_pmullx12_crc	crc32_arm_pmullx12_crc
 #  define SUFFIX				 _pmullx12_crc
-#  if HAVE_PMULL_NATIVE && HAVE_CRC32_NATIVE && !USE_PMULL_TARGET_EVEN_IF_NATIVE
-#    define ATTRIBUTES
+#  ifdef __clang__
+#    define ATTRIBUTES	_target_attribute("aes,crc")
 #  else
-#    ifdef __clang__
-#      define ATTRIBUTES  _target_attribute("aes,crc")
-#    else
-#      define ATTRIBUTES  _target_attribute("+crypto,+crc")
-#    endif
+#    define ATTRIBUTES	_target_attribute("+crypto,+crc")
 #  endif
 #  define ENABLE_EOR3	0
 #include "arm-crc32_pmull_wide.h"
 #endif
 
 
-#if defined(ARCH_ARM64) && HAVE_PMULL_INTRIN && HAVE_CRC32_INTRIN && \
-	(HAVE_SHA3_TARGET || HAVE_SHA3_NATIVE)
+#if HAVE_PMULL_INTRIN && HAVE_CRC32_INTRIN && HAVE_SHA3_INTRIN
 #  define crc32_arm_pmullx12_crc_eor3	crc32_arm_pmullx12_crc_eor3
 #  define SUFFIX				 _pmullx12_crc_eor3
-#  if HAVE_PMULL_NATIVE && HAVE_CRC32_NATIVE && HAVE_SHA3_NATIVE && \
-	!USE_PMULL_TARGET_EVEN_IF_NATIVE
-#    define ATTRIBUTES
+#  ifdef __clang__
+#    define ATTRIBUTES	_target_attribute("aes,crc,sha3")
+   
+#  elif defined(__ARM_FEATURE_JCVT)
+#    define ATTRIBUTES	_target_attribute("+crypto,+crc,+sha3")
 #  else
-#    ifdef __clang__
-#      define ATTRIBUTES  _target_attribute("aes,crc,sha3")
-     
-#    elif defined(__ARM_FEATURE_JCVT)
-#      define ATTRIBUTES  _target_attribute("+crypto,+crc,+sha3")
-#    else
-#      define ATTRIBUTES  _target_attribute("arch=armv8.2-a+crypto+crc+sha3")
-#    endif
+#    define ATTRIBUTES	_target_attribute("arch=armv8.2-a+crypto+crc+sha3")
 #  endif
 #  define ENABLE_EOR3	1
 #include "arm-crc32_pmull_wide.h"
 #endif
 
-
-#define PREFER_PMULL_TO_CRC	0
-#ifdef __APPLE__
-#  include <TargetConditionals.h>
-#  if TARGET_OS_OSX
-#    undef PREFER_PMULL_TO_CRC
-#    define PREFER_PMULL_TO_CRC	1
-#  endif
-#endif
-
-
-#if PREFER_PMULL_TO_CRC && defined(crc32_arm_pmullx12_crc_eor3) && \
-	HAVE_PMULL_NATIVE && HAVE_CRC32_NATIVE && HAVE_SHA3_NATIVE
-#  define DEFAULT_IMPL	crc32_arm_pmullx12_crc_eor3
-#elif !PREFER_PMULL_TO_CRC && defined(crc32_arm_crc_pmullcombine) && \
-	HAVE_CRC32_NATIVE && HAVE_PMULL_NATIVE
-#  define DEFAULT_IMPL	crc32_arm_crc_pmullcombine
-#else
 static inline crc32_func_t
 arch_select_crc32_func(void)
 {
 	const u32 features MAYBE_UNUSED = get_arm_cpu_features();
 
-#if PREFER_PMULL_TO_CRC && defined(crc32_arm_pmullx12_crc_eor3)
-	if (HAVE_PMULL(features) && HAVE_CRC32(features) && HAVE_SHA3(features))
+#ifdef crc32_arm_pmullx12_crc_eor3
+	if ((features & ARM_CPU_FEATURE_PREFER_PMULL) &&
+	    HAVE_PMULL(features) && HAVE_CRC32(features) && HAVE_SHA3(features))
 		return crc32_arm_pmullx12_crc_eor3;
 #endif
-#if PREFER_PMULL_TO_CRC && defined(crc32_arm_pmullx12_crc)
-	if (HAVE_PMULL(features) && HAVE_CRC32(features))
+#ifdef crc32_arm_pmullx12_crc
+	if ((features & ARM_CPU_FEATURE_PREFER_PMULL) &&
+	    HAVE_PMULL(features) && HAVE_CRC32(features))
 		return crc32_arm_pmullx12_crc;
 #endif
 #ifdef crc32_arm_crc_pmullcombine
@@ -7452,7 +9190,6 @@ arch_select_crc32_func(void)
 	return NULL;
 }
 #define arch_select_crc32_func	arch_select_crc32_func
-#endif
 
 #endif 
 
@@ -7517,8 +9254,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	19
-#define LIBDEFLATE_VERSION_STRING	"1.19"
+#define LIBDEFLATE_VERSION_MINOR	20
+#define LIBDEFLATE_VERSION_STRING	"1.20"
 
 
 #ifndef LIBDEFLATEAPI
@@ -7736,6 +9473,7 @@ struct libdeflate_options {
 #undef ARCH_X86_32
 #undef ARCH_ARM64
 #undef ARCH_ARM32
+#undef ARCH_RISCV
 #ifdef _MSC_VER
 #  if defined(_M_X64)
 #    define ARCH_X86_64
@@ -7755,6 +9493,8 @@ struct libdeflate_options {
 #    define ARCH_ARM64
 #  elif defined(__arm__)
 #    define ARCH_ARM32
+#  elif defined(__riscv)
+#    define ARCH_RISCV
 #  endif
 #endif
 
@@ -7799,6 +9539,9 @@ typedef size_t machine_word_t;
 #  define GCC_PREREQ(major, minor)		\
 	(__GNUC__ > (major) ||			\
 	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#  if !GCC_PREREQ(4, 9)
+#    error "gcc versions older than 4.9 are no longer supported"
+#  endif
 #else
 #  define GCC_PREREQ(major, minor)	0
 #endif
@@ -7811,14 +9554,27 @@ typedef size_t machine_word_t;
 	(__clang_major__ > (major) ||			\
 	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
 #  endif
+#  if !CLANG_PREREQ(3, 9, 8000000)
+#    error "clang versions older than 3.9 are no longer supported"
+#  endif
 #else
 #  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+#ifdef _MSC_VER
+#  define MSVC_PREREQ(version)	(_MSC_VER >= (version))
+#  if !MSVC_PREREQ(1900)
+#    error "MSVC versions older than Visual Studio 2015 are no longer supported"
+#  endif
+#else
+#  define MSVC_PREREQ(version)	0
 #endif
 
 
 #ifndef __has_attribute
 #  define __has_attribute(attribute)	0
 #endif
+
+
 #ifndef __has_builtin
 #  define __has_builtin(builtin)	0
 #endif
@@ -7842,6 +9598,13 @@ typedef size_t machine_word_t;
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
+#endif
+
+
+#if defined(__GNUC__) || __has_attribute(noreturn)
+#  define NORETURN		__attribute__((noreturn))
+#else
+#  define NORETURN
 #endif
 
 
@@ -7910,12 +9673,10 @@ typedef size_t machine_word_t;
 #endif
 
 
-#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#if defined(__GNUC__) || __has_attribute(target)
 #  define _target_attribute(attrs)	__attribute__((target(attrs)))
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
 #else
 #  define _target_attribute(attrs)
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
 #endif
 
 
@@ -7955,7 +9716,7 @@ static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
 
 static forceinline u16 bswap16(u16 v)
 {
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap16)
 	return __builtin_bswap16(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ushort(v);
@@ -7967,7 +9728,7 @@ static forceinline u16 bswap16(u16 v)
 
 static forceinline u32 bswap32(u32 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap32)
 	return __builtin_bswap32(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ulong(v);
@@ -7982,7 +9743,7 @@ static forceinline u32 bswap32(u32 v)
 
 static forceinline u64 bswap64(u64 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap64)
 	return __builtin_bswap64(v);
 #elif defined(_MSC_VER)
 	return _byteswap_uint64(v);
@@ -8013,6 +9774,7 @@ static forceinline u64 bswap64(u64 v)
 #if (defined(__GNUC__) || defined(__clang__)) && \
 	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	 defined(__riscv_misaligned_fast) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
 #elif defined(_MSC_VER)
@@ -8350,12 +10112,17 @@ int memcmp(const void *s1, const void *s2, size_t n);
 
 #undef LIBDEFLATE_ENABLE_ASSERTIONS
 #else
-#include <string.h>
+#  include <string.h>
+   
+#  ifdef __clang_analyzer__
+#    define LIBDEFLATE_ENABLE_ASSERTIONS
+#  endif
 #endif
 
 
 #ifdef LIBDEFLATE_ENABLE_ASSERTIONS
-void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+NORETURN void
+libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #define ASSERT(expr) { if (unlikely(!(expr))) \
 	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
 #else
@@ -8369,29 +10136,24 @@ void libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #endif 
 
 
-#define HAVE_DYNAMIC_X86_CPU_FEATURES	0
-
 #if defined(ARCH_X86_32) || defined(ARCH_X86_64)
 
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE || defined(_MSC_VER)
-#  undef HAVE_DYNAMIC_X86_CPU_FEATURES
-#  define HAVE_DYNAMIC_X86_CPU_FEATURES	1
-#endif
+#define X86_CPU_FEATURE_SSE2		(1 << 0)
+#define X86_CPU_FEATURE_PCLMULQDQ	(1 << 1)
+#define X86_CPU_FEATURE_AVX		(1 << 2)
+#define X86_CPU_FEATURE_AVX2		(1 << 3)
+#define X86_CPU_FEATURE_BMI2		(1 << 4)
 
-#define X86_CPU_FEATURE_SSE2		0x00000001
-#define X86_CPU_FEATURE_PCLMUL		0x00000002
-#define X86_CPU_FEATURE_AVX		0x00000004
-#define X86_CPU_FEATURE_AVX2		0x00000008
-#define X86_CPU_FEATURE_BMI2		0x00000010
+#define X86_CPU_FEATURE_ZMM		(1 << 5)
+#define X86_CPU_FEATURE_AVX512BW	(1 << 6)
+#define X86_CPU_FEATURE_AVX512VL	(1 << 7)
+#define X86_CPU_FEATURE_VPCLMULQDQ	(1 << 8)
+#define X86_CPU_FEATURE_AVX512VNNI	(1 << 9)
+#define X86_CPU_FEATURE_AVXVNNI		(1 << 10)
 
-#define HAVE_SSE2(features)	(HAVE_SSE2_NATIVE     || ((features) & X86_CPU_FEATURE_SSE2))
-#define HAVE_PCLMUL(features)	(HAVE_PCLMUL_NATIVE   || ((features) & X86_CPU_FEATURE_PCLMUL))
-#define HAVE_AVX(features)	(HAVE_AVX_NATIVE      || ((features) & X86_CPU_FEATURE_AVX))
-#define HAVE_AVX2(features)	(HAVE_AVX2_NATIVE     || ((features) & X86_CPU_FEATURE_AVX2))
-#define HAVE_BMI2(features)	(HAVE_BMI2_NATIVE     || ((features) & X86_CPU_FEATURE_BMI2))
+#if defined(__GNUC__) || defined(__clang__) || defined(_MSC_VER)
 
-#if HAVE_DYNAMIC_X86_CPU_FEATURES
-#define X86_CPU_FEATURES_KNOWN		0x80000000
+#  define X86_CPU_FEATURES_KNOWN	(1U << 31)
 extern volatile u32 libdeflate_x86_cpu_features;
 
 void libdeflate_init_x86_cpu_features(void);
@@ -8402,89 +10164,101 @@ static inline u32 get_x86_cpu_features(void)
 		libdeflate_init_x86_cpu_features();
 	return libdeflate_x86_cpu_features;
 }
-#else 
-static inline u32 get_x86_cpu_features(void) { return 0; }
-#endif 
 
-
-#if HAVE_DYNAMIC_X86_CPU_FEATURES && \
-	(GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000) || defined(_MSC_VER))
-#  define HAVE_TARGET_INTRINSICS	1
+#  include <immintrin.h>
+#  if defined(_MSC_VER) && defined(__clang__)
+#    include <tmmintrin.h>
+#    include <smmintrin.h>
+#    include <wmmintrin.h>
+#    include <avxintrin.h>
+#    include <avx2intrin.h>
+#    include <avx512fintrin.h>
+#    include <avx512bwintrin.h>
+#    include <avx512vlintrin.h>
+#    if __has_include(<avx512vlbwintrin.h>)
+#      include <avx512vlbwintrin.h>
+#    endif
+#    if __has_include(<vpclmulqdqintrin.h>)
+#      include <vpclmulqdqintrin.h>
+#    endif
+#    if __has_include(<avx512vnniintrin.h>)
+#      include <avx512vnniintrin.h>
+#    endif
+#    if __has_include(<avx512vlvnniintrin.h>)
+#      include <avx512vlvnniintrin.h>
+#    endif
+#    if __has_include(<avxvnniintrin.h>)
+#      include <avxvnniintrin.h>
+#    endif
+#  endif
 #else
-#  define HAVE_TARGET_INTRINSICS	0
+static inline u32 get_x86_cpu_features(void) { return 0; }
 #endif
-
 
 #if defined(__SSE2__) || \
 	(defined(_MSC_VER) && \
 	 (defined(ARCH_X86_64) || (defined(_M_IX86_FP) && _M_IX86_FP >= 2)))
-#  define HAVE_SSE2_NATIVE	1
+#  define HAVE_SSE2(features)		1
+#  define HAVE_SSE2_NATIVE		1
 #else
-#  define HAVE_SSE2_NATIVE	0
+#  define HAVE_SSE2(features)		((features) & X86_CPU_FEATURE_SSE2)
+#  define HAVE_SSE2_NATIVE		0
 #endif
-#define HAVE_SSE2_INTRIN	(HAVE_SSE2_NATIVE || HAVE_TARGET_INTRINSICS)
-
 
 #if defined(__PCLMUL__) || (defined(_MSC_VER) && defined(__AVX2__))
-#  define HAVE_PCLMUL_NATIVE	1
+#  define HAVE_PCLMULQDQ(features)	1
 #else
-#  define HAVE_PCLMUL_NATIVE	0
+#  define HAVE_PCLMULQDQ(features)	((features) & X86_CPU_FEATURE_PCLMULQDQ)
 #endif
-#if HAVE_PCLMUL_NATIVE || (HAVE_TARGET_INTRINSICS && \
-			   (GCC_PREREQ(4, 4) || CLANG_PREREQ(3, 2, 0) || \
-			    defined(_MSC_VER)))
-#  define HAVE_PCLMUL_INTRIN	1
-#else
-#  define HAVE_PCLMUL_INTRIN	0
-#endif
-
 
 #ifdef __AVX__
-#  define HAVE_AVX_NATIVE	1
+#  define HAVE_AVX(features)		1
 #else
-#  define HAVE_AVX_NATIVE	0
+#  define HAVE_AVX(features)		((features) & X86_CPU_FEATURE_AVX)
 #endif
-#if HAVE_AVX_NATIVE || (HAVE_TARGET_INTRINSICS && \
-			(GCC_PREREQ(4, 6) || CLANG_PREREQ(3, 0, 0) || \
-			 defined(_MSC_VER)))
-#  define HAVE_AVX_INTRIN	1
-#else
-#  define HAVE_AVX_INTRIN	0
-#endif
-
 
 #ifdef __AVX2__
-#  define HAVE_AVX2_NATIVE	1
+#  define HAVE_AVX2(features)		1
 #else
-#  define HAVE_AVX2_NATIVE	0
+#  define HAVE_AVX2(features)		((features) & X86_CPU_FEATURE_AVX2)
 #endif
-#if HAVE_AVX2_NATIVE || (HAVE_TARGET_INTRINSICS && \
-			 (GCC_PREREQ(4, 7) || CLANG_PREREQ(3, 1, 0) || \
-			  defined(_MSC_VER)))
-#  define HAVE_AVX2_INTRIN	1
-#else
-#  define HAVE_AVX2_INTRIN	0
-#endif
-
 
 #if defined(__BMI2__) || (defined(_MSC_VER) && defined(__AVX2__))
-#  define HAVE_BMI2_NATIVE	1
+#  define HAVE_BMI2(features)		1
+#  define HAVE_BMI2_NATIVE		1
 #else
-#  define HAVE_BMI2_NATIVE	0
-#endif
-#if HAVE_BMI2_NATIVE || (HAVE_TARGET_INTRINSICS && \
-			 (GCC_PREREQ(4, 7) || CLANG_PREREQ(3, 1, 0) || \
-			  defined(_MSC_VER)))
-#  define HAVE_BMI2_INTRIN	1
-#else
-#  define HAVE_BMI2_INTRIN	0
+#  define HAVE_BMI2(features)		((features) & X86_CPU_FEATURE_BMI2)
+#  define HAVE_BMI2_NATIVE		0
 #endif
 
-#if defined(_MSC_VER) && _MSC_VER < 1930 
-#  undef HAVE_BMI2_NATIVE
-#  undef HAVE_BMI2_INTRIN
-#  define HAVE_BMI2_NATIVE	0
-#  define HAVE_BMI2_INTRIN	0
+#ifdef __AVX512BW__
+#  define HAVE_AVX512BW(features)	1
+#else
+#  define HAVE_AVX512BW(features)	((features) & X86_CPU_FEATURE_AVX512BW)
+#endif
+
+#ifdef __AVX512VL__
+#  define HAVE_AVX512VL(features)	1
+#else
+#  define HAVE_AVX512VL(features)	((features) & X86_CPU_FEATURE_AVX512VL)
+#endif
+
+#ifdef __VPCLMULQDQ__
+#  define HAVE_VPCLMULQDQ(features)	1
+#else
+#  define HAVE_VPCLMULQDQ(features)	((features) & X86_CPU_FEATURE_VPCLMULQDQ)
+#endif
+
+#ifdef __AVX512VNNI__
+#  define HAVE_AVX512VNNI(features)	1
+#else
+#  define HAVE_AVX512VNNI(features)	((features) & X86_CPU_FEATURE_AVX512VNNI)
+#endif
+
+#ifdef __AVXVNNI__
+#  define HAVE_AVXVNNI(features)	1
+#else
+#  define HAVE_AVXVNNI(features)	((features) & X86_CPU_FEATURE_AVXVNNI)
 #endif
 
 #endif 
@@ -8493,520 +10267,1813 @@ static inline u32 get_x86_cpu_features(void) { return 0; }
 
 
 
-#if HAVE_PCLMUL_INTRIN
-#  define crc32_x86_pclmul	crc32_x86_pclmul
-#  define SUFFIX			 _pclmul
-#  if HAVE_PCLMUL_NATIVE
-#    define ATTRIBUTES
-#  else
-#    define ATTRIBUTES		_target_attribute("pclmul")
-#  endif
-#  define FOLD_PARTIAL_VECS	0
+static const u8 MAYBE_UNUSED shift_tab[48] = {
+	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+	0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+};
+
+#if defined(__GNUC__) || defined(__clang__) || defined(_MSC_VER)
+
+#  define crc32_x86_pclmulqdq	crc32_x86_pclmulqdq
+#  define SUFFIX			 _pclmulqdq
+#  define ATTRIBUTES		_target_attribute("pclmul")
+#  define VL			16
+#  define USE_SSE4_1		0
+#  define USE_AVX512		0
 /* #include "x86-crc32_pclmul_template.h" */
 
 
 
 
-#include <immintrin.h>
-
-#if defined(__clang__) && defined(_MSC_VER)
-#  include <tmmintrin.h>
-#  include <smmintrin.h>
-#  include <wmmintrin.h>
+#if VL == 16
+#  define vec_t			__m128i
+#  define fold_vec		fold_vec128
+#  define VLOADU(p)		_mm_loadu_si128((const void *)(p))
+#  define VXOR(a, b)		_mm_xor_si128((a), (b))
+#  define M128I_TO_VEC(a)	a
+#  define MULTS_8V		_mm_set_epi64x(CRC32_X991_MODG, CRC32_X1055_MODG)
+#  define MULTS_4V		_mm_set_epi64x(CRC32_X479_MODG, CRC32_X543_MODG)
+#  define MULTS_2V		_mm_set_epi64x(CRC32_X223_MODG, CRC32_X287_MODG)
+#  define MULTS_1V		_mm_set_epi64x(CRC32_X95_MODG, CRC32_X159_MODG)
+#elif VL == 32
+#  define vec_t			__m256i
+#  define fold_vec		fold_vec256
+#  define VLOADU(p)		_mm256_loadu_si256((const void *)(p))
+#  define VXOR(a, b)		_mm256_xor_si256((a), (b))
+#  define M128I_TO_VEC(a)	_mm256_castsi128_si256(a)
+#  define MULTS(a, b)		_mm256_set_epi64x(a, b, a, b)
+#  define MULTS_8V		MULTS(CRC32_X2015_MODG, CRC32_X2079_MODG)
+#  define MULTS_4V		MULTS(CRC32_X991_MODG, CRC32_X1055_MODG)
+#  define MULTS_2V		MULTS(CRC32_X479_MODG, CRC32_X543_MODG)
+#  define MULTS_1V		MULTS(CRC32_X223_MODG, CRC32_X287_MODG)
+#elif VL == 64
+#  define vec_t			__m512i
+#  define fold_vec		fold_vec512
+#  define VLOADU(p)		_mm512_loadu_si512((const void *)(p))
+#  define VXOR(a, b)		_mm512_xor_si512((a), (b))
+#  define M128I_TO_VEC(a)	_mm512_castsi128_si512(a)
+#  define MULTS(a, b)		_mm512_set_epi64(a, b, a, b, a, b, a, b)
+#  define MULTS_8V		MULTS(CRC32_X4063_MODG, CRC32_X4127_MODG)
+#  define MULTS_4V		MULTS(CRC32_X2015_MODG, CRC32_X2079_MODG)
+#  define MULTS_2V		MULTS(CRC32_X991_MODG, CRC32_X1055_MODG)
+#  define MULTS_1V		MULTS(CRC32_X479_MODG, CRC32_X543_MODG)
+#else
+#  error "unsupported vector length"
 #endif
 
-#undef fold_vec
+#undef fold_vec128
 static forceinline ATTRIBUTES __m128i
-ADD_SUFFIX(fold_vec)(__m128i src, __m128i dst, __m128i  multipliers)
+ADD_SUFFIX(fold_vec128)(__m128i src, __m128i dst, __m128i  mults)
 {
-	
-	dst = _mm_xor_si128(dst, _mm_clmulepi64_si128(src, multipliers, 0x00));
-	dst = _mm_xor_si128(dst, _mm_clmulepi64_si128(src, multipliers, 0x11));
+	dst = _mm_xor_si128(dst, _mm_clmulepi64_si128(src, mults, 0x00));
+	dst = _mm_xor_si128(dst, _mm_clmulepi64_si128(src, mults, 0x11));
 	return dst;
 }
-#define fold_vec	ADD_SUFFIX(fold_vec)
+#define fold_vec128	ADD_SUFFIX(fold_vec128)
 
-#if FOLD_PARTIAL_VECS
+#if VL >= 32
+#undef fold_vec256
+static forceinline ATTRIBUTES __m256i
+ADD_SUFFIX(fold_vec256)(__m256i src, __m256i dst, __m256i  mults)
+{
+#if USE_AVX512
+	
+	return _mm256_ternarylogic_epi32(
+			_mm256_clmulepi64_epi128(src, mults, 0x00),
+			_mm256_clmulepi64_epi128(src, mults, 0x11),
+			dst,
+			0x96);
+#else
+	return _mm256_xor_si256(
+			_mm256_xor_si256(dst,
+					 _mm256_clmulepi64_epi128(src, mults, 0x00)),
+			_mm256_clmulepi64_epi128(src, mults, 0x11));
+#endif
+}
+#define fold_vec256	ADD_SUFFIX(fold_vec256)
+#endif 
 
-#undef fold_partial_vec
-static forceinline ATTRIBUTES __m128i
-ADD_SUFFIX(fold_partial_vec)(__m128i v, const u8 *p, size_t len,
-			     __m128i  multipliers_1)
+#if VL >= 64
+#undef fold_vec512
+static forceinline ATTRIBUTES __m512i
+ADD_SUFFIX(fold_vec512)(__m512i src, __m512i dst, __m512i  mults)
 {
 	
-	static const u8 shift_tab[48] = {
-		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-		0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-		0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
-		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-	};
+	return _mm512_ternarylogic_epi32(
+			_mm512_clmulepi64_epi128(src, mults, 0x00),
+			_mm512_clmulepi64_epi128(src, mults, 0x11),
+			dst,
+			0x96);
+}
+#define fold_vec512	ADD_SUFFIX(fold_vec512)
+#endif 
+
+#if USE_SSE4_1
+
+#undef fold_lessthan16bytes
+static forceinline ATTRIBUTES __m128i
+ADD_SUFFIX(fold_lessthan16bytes)(__m128i x, const u8 *p, size_t len,
+				 __m128i  mults_128b)
+{
 	__m128i lshift = _mm_loadu_si128((const void *)&shift_tab[len]);
 	__m128i rshift = _mm_loadu_si128((const void *)&shift_tab[len + 16]);
 	__m128i x0, x1;
 
 	
-	x0 = _mm_shuffle_epi8(v, lshift);
+	x0 = _mm_shuffle_epi8(x, lshift);
 
 	
-	x1 = _mm_blendv_epi8(_mm_shuffle_epi8(v, rshift),
+	x1 = _mm_blendv_epi8(_mm_shuffle_epi8(x, rshift),
 			     _mm_loadu_si128((const void *)(p + len - 16)),
 			     
 			     rshift);
 
-	return fold_vec(x0, x1, multipliers_1);
+	return fold_vec128(x0, x1, mults_128b);
 }
-#define fold_partial_vec	ADD_SUFFIX(fold_partial_vec)
+#define fold_lessthan16bytes	ADD_SUFFIX(fold_lessthan16bytes)
 #endif 
 
-static u32 ATTRIBUTES MAYBE_UNUSED
+static ATTRIBUTES u32
 ADD_SUFFIX(crc32_x86)(u32 crc, const u8 *p, size_t len)
 {
-	const __m128i  multipliers_8 =
-		_mm_set_epi64x(CRC32_8VECS_MULT_2, CRC32_8VECS_MULT_1);
-	const __m128i  multipliers_4 =
-		_mm_set_epi64x(CRC32_4VECS_MULT_2, CRC32_4VECS_MULT_1);
-	const __m128i  multipliers_2 =
-		_mm_set_epi64x(CRC32_2VECS_MULT_2, CRC32_2VECS_MULT_1);
-	const __m128i  multipliers_1 =
-		_mm_set_epi64x(CRC32_1VECS_MULT_2, CRC32_1VECS_MULT_1);
-	const __m128i  final_multiplier =
-		_mm_set_epi64x(0, CRC32_FINAL_MULT);
-	const __m128i mask32 = _mm_set_epi32(0, 0, 0, 0xFFFFFFFF);
-	const __m128i  barrett_reduction_constants =
-		_mm_set_epi64x(CRC32_BARRETT_CONSTANT_2,
-			       CRC32_BARRETT_CONSTANT_1);
-	__m128i v0, v1, v2, v3, v4, v5, v6, v7;
-
 	
-	if (len < 1024) {
-		if (len < 16)
-			return crc32_slice1(crc, p, len);
+	const vec_t mults_8v = MULTS_8V;
+	const vec_t mults_4v = MULTS_4V;
+	const vec_t mults_2v = MULTS_2V;
+	const vec_t mults_1v = MULTS_1V;
+	const __m128i mults_128b = _mm_set_epi64x(CRC32_X95_MODG, CRC32_X159_MODG);
+	const __m128i final_mult = _mm_set_epi64x(0, CRC32_X63_MODG);
+	const __m128i mask32 = _mm_set_epi32(0, 0, 0, 0xFFFFFFFF);
+	const __m128i barrett_reduction_constants =
+		_mm_set_epi64x(CRC32_BARRETT_CONSTANT_2, CRC32_BARRETT_CONSTANT_1);
+	vec_t v0, v1, v2, v3, v4, v5, v6, v7;
+	__m128i x0 = _mm_cvtsi32_si128(crc);
+	__m128i x1;
 
-		v0 = _mm_xor_si128(_mm_loadu_si128((const void *)p),
-				   _mm_cvtsi32_si128(crc));
-		p += 16;
-
-		if (len >= 64) {
-			v1 = _mm_loadu_si128((const void *)(p + 0));
-			v2 = _mm_loadu_si128((const void *)(p + 16));
-			v3 = _mm_loadu_si128((const void *)(p + 32));
-			p += 48;
-			while (len >= 64 + 64) {
-				v0 = fold_vec(v0, _mm_loadu_si128((const void *)(p + 0)),
-					      multipliers_4);
-				v1 = fold_vec(v1, _mm_loadu_si128((const void *)(p + 16)),
-					      multipliers_4);
-				v2 = fold_vec(v2, _mm_loadu_si128((const void *)(p + 32)),
-					      multipliers_4);
-				v3 = fold_vec(v3, _mm_loadu_si128((const void *)(p + 48)),
-					      multipliers_4);
-				p += 64;
-				len -= 64;
+	if (len < 8*VL) {
+		if (len < VL) {
+			STATIC_ASSERT(VL == 16 || VL == 32 || VL == 64);
+			if (len < 16) {
+			#if USE_AVX512
+				if (len < 4)
+					return crc32_slice1(crc, p, len);
+				
+				x0 = _mm_xor_si128(
+					x0, _mm_maskz_loadu_epi8((1 << len) - 1, p));
+				x0 = _mm_shuffle_epi8(
+					x0, _mm_loadu_si128((const void *)&shift_tab[len]));
+				goto reduce_x0;
+			#else
+				return crc32_slice1(crc, p, len);
+			#endif
 			}
-			v0 = fold_vec(v0, v2, multipliers_2);
-			v1 = fold_vec(v1, v3, multipliers_2);
-			if (len & 32) {
-				v0 = fold_vec(v0, _mm_loadu_si128((const void *)(p + 0)),
-					      multipliers_2);
-				v1 = fold_vec(v1, _mm_loadu_si128((const void *)(p + 16)),
-					      multipliers_2);
-				p += 32;
-			}
-			v0 = fold_vec(v0, v1, multipliers_1);
-			if (len & 16) {
-				v0 = fold_vec(v0, _mm_loadu_si128((const void *)p),
-					      multipliers_1);
-				p += 16;
-			}
-		} else {
+			
+			x0 = _mm_xor_si128(_mm_loadu_si128((const void *)p), x0);
 			if (len >= 32) {
-				v0 = fold_vec(v0, _mm_loadu_si128((const void *)p),
-					      multipliers_1);
-				p += 16;
-				if (len >= 48) {
-					v0 = fold_vec(v0, _mm_loadu_si128((const void *)p),
-						      multipliers_1);
-					p += 16;
-				}
+				x0 = fold_vec128(x0, _mm_loadu_si128((const void *)(p + 16)),
+						 mults_128b);
+				if (len >= 48)
+					x0 = fold_vec128(x0, _mm_loadu_si128((const void *)(p + 32)),
+							 mults_128b);
 			}
+			p += len & ~15;
+			goto less_than_16_remaining;
 		}
+		v0 = VXOR(VLOADU(p), M128I_TO_VEC(x0));
+		if (len < 2*VL) {
+			p += VL;
+			goto less_than_vl_remaining;
+		}
+		v1 = VLOADU(p + 1*VL);
+		if (len < 4*VL) {
+			p += 2*VL;
+			goto less_than_2vl_remaining;
+		}
+		v2 = VLOADU(p + 2*VL);
+		v3 = VLOADU(p + 3*VL);
+		p += 4*VL;
 	} else {
-		const size_t align = -(uintptr_t)p & 15;
-		const __m128i *vp;
+		
+		if (len > 65536 && ((uintptr_t)p & (VL-1))) {
+			size_t align = -(uintptr_t)p & (VL-1);
 
-	#if FOLD_PARTIAL_VECS
-		v0 = _mm_xor_si128(_mm_loadu_si128((const void *)p),
-				   _mm_cvtsi32_si128(crc));
-		p += 16;
-		
-		if (align) {
-			v0 = fold_partial_vec(v0, p, align, multipliers_1);
-			p += align;
 			len -= align;
-		}
-		vp = (const __m128i *)p;
-	#else
-		
-		if (align) {
+		#if USE_SSE4_1
+			x0 = _mm_xor_si128(_mm_loadu_si128((const void *)p), x0);
+			p += 16;
+			if (align & 15) {
+				x0 = fold_lessthan16bytes(x0, p, align & 15,
+							  mults_128b);
+				p += align & 15;
+				align &= ~15;
+			}
+			while (align) {
+				x0 = fold_vec128(x0, *(const __m128i *)p,
+						 mults_128b);
+				p += 16;
+				align -= 16;
+			}
+			v0 = M128I_TO_VEC(x0);
+		#  if VL == 32
+			v0 = _mm256_inserti128_si256(v0, *(const __m128i *)p, 1);
+		#  elif VL == 64
+			v0 = _mm512_inserti32x4(v0, *(const __m128i *)p, 1);
+			v0 = _mm512_inserti64x4(v0, *(const __m256i *)(p + 16), 1);
+		#  endif
+			p -= 16;
+		#else
 			crc = crc32_slice1(crc, p, align);
 			p += align;
-			len -= align;
+			v0 = VXOR(VLOADU(p), M128I_TO_VEC(_mm_cvtsi32_si128(crc)));
+		#endif
+		} else {
+			v0 = VXOR(VLOADU(p), M128I_TO_VEC(x0));
 		}
-		vp = (const __m128i *)p;
-		v0 = _mm_xor_si128(*vp++, _mm_cvtsi32_si128(crc));
-	#endif
-		v1 = *vp++;
-		v2 = *vp++;
-		v3 = *vp++;
-		v4 = *vp++;
-		v5 = *vp++;
-		v6 = *vp++;
-		v7 = *vp++;
-		do {
-			v0 = fold_vec(v0, *vp++, multipliers_8);
-			v1 = fold_vec(v1, *vp++, multipliers_8);
-			v2 = fold_vec(v2, *vp++, multipliers_8);
-			v3 = fold_vec(v3, *vp++, multipliers_8);
-			v4 = fold_vec(v4, *vp++, multipliers_8);
-			v5 = fold_vec(v5, *vp++, multipliers_8);
-			v6 = fold_vec(v6, *vp++, multipliers_8);
-			v7 = fold_vec(v7, *vp++, multipliers_8);
-			len -= 128;
-		} while (len >= 128 + 128);
+		v1 = VLOADU(p + 1*VL);
+		v2 = VLOADU(p + 2*VL);
+		v3 = VLOADU(p + 3*VL);
+		v4 = VLOADU(p + 4*VL);
+		v5 = VLOADU(p + 5*VL);
+		v6 = VLOADU(p + 6*VL);
+		v7 = VLOADU(p + 7*VL);
+		p += 8*VL;
 
-		v0 = fold_vec(v0, v4, multipliers_4);
-		v1 = fold_vec(v1, v5, multipliers_4);
-		v2 = fold_vec(v2, v6, multipliers_4);
-		v3 = fold_vec(v3, v7, multipliers_4);
-		if (len & 64) {
-			v0 = fold_vec(v0, *vp++, multipliers_4);
-			v1 = fold_vec(v1, *vp++, multipliers_4);
-			v2 = fold_vec(v2, *vp++, multipliers_4);
-			v3 = fold_vec(v3, *vp++, multipliers_4);
+		
+		while (len >= 16*VL) {
+			v0 = fold_vec(v0, VLOADU(p + 0*VL), mults_8v);
+			v1 = fold_vec(v1, VLOADU(p + 1*VL), mults_8v);
+			v2 = fold_vec(v2, VLOADU(p + 2*VL), mults_8v);
+			v3 = fold_vec(v3, VLOADU(p + 3*VL), mults_8v);
+			v4 = fold_vec(v4, VLOADU(p + 4*VL), mults_8v);
+			v5 = fold_vec(v5, VLOADU(p + 5*VL), mults_8v);
+			v6 = fold_vec(v6, VLOADU(p + 6*VL), mults_8v);
+			v7 = fold_vec(v7, VLOADU(p + 7*VL), mults_8v);
+			p += 8*VL;
+			len -= 8*VL;
 		}
 
-		v0 = fold_vec(v0, v2, multipliers_2);
-		v1 = fold_vec(v1, v3, multipliers_2);
-		if (len & 32) {
-			v0 = fold_vec(v0, *vp++, multipliers_2);
-			v1 = fold_vec(v1, *vp++, multipliers_2);
+		
+		v0 = fold_vec(v0, v4, mults_4v);
+		v1 = fold_vec(v1, v5, mults_4v);
+		v2 = fold_vec(v2, v6, mults_4v);
+		v3 = fold_vec(v3, v7, mults_4v);
+		if (len & (4*VL)) {
+			v0 = fold_vec(v0, VLOADU(p + 0*VL), mults_4v);
+			v1 = fold_vec(v1, VLOADU(p + 1*VL), mults_4v);
+			v2 = fold_vec(v2, VLOADU(p + 2*VL), mults_4v);
+			v3 = fold_vec(v3, VLOADU(p + 3*VL), mults_4v);
+			p += 4*VL;
 		}
-
-		v0 = fold_vec(v0, v1, multipliers_1);
-		if (len & 16)
-			v0 = fold_vec(v0, *vp++, multipliers_1);
-
-		p = (const u8 *)vp;
 	}
+	
+	v0 = fold_vec(v0, v2, mults_2v);
+	v1 = fold_vec(v1, v3, mults_2v);
+	if (len & (2*VL)) {
+		v0 = fold_vec(v0, VLOADU(p + 0*VL), mults_2v);
+		v1 = fold_vec(v1, VLOADU(p + 1*VL), mults_2v);
+		p += 2*VL;
+	}
+less_than_2vl_remaining:
+	
+	v0 = fold_vec(v0, v1, mults_1v);
+	if (len & VL) {
+		v0 = fold_vec(v0, VLOADU(p), mults_1v);
+		p += VL;
+	}
+less_than_vl_remaining:
+	
+#if VL == 16
+	x0 = v0;
+#else
+	{
+	#if VL == 32
+		__m256i y0 = v0;
+	#else
+		const __m256i mults_256b =
+			_mm256_set_epi64x(CRC32_X223_MODG, CRC32_X287_MODG,
+					  CRC32_X223_MODG, CRC32_X287_MODG);
+		__m256i y0 = fold_vec256(_mm512_extracti64x4_epi64(v0, 0),
+					 _mm512_extracti64x4_epi64(v0, 1),
+					 mults_256b);
+		if (len & 32) {
+			y0 = fold_vec256(y0, _mm256_loadu_si256((const void *)p),
+					 mults_256b);
+			p += 32;
+		}
+	#endif
+		x0 = fold_vec128(_mm256_extracti128_si256(y0, 0),
+				 _mm256_extracti128_si256(y0, 1), mults_128b);
+	}
+	if (len & 16) {
+		x0 = fold_vec128(x0, _mm_loadu_si128((const void *)p),
+				 mults_128b);
+		p += 16;
+	}
+#endif
+less_than_16_remaining:
 	len &= 15;
 
 	
-#if FOLD_PARTIAL_VECS
+#if USE_SSE4_1
 	if (len)
-		v0 = fold_partial_vec(v0, p, len, multipliers_1);
+		x0 = fold_lessthan16bytes(x0, p, len, mults_128b);
+#endif
+#if USE_AVX512
+reduce_x0:
 #endif
 
 	
-	v0 = _mm_xor_si128(_mm_srli_si128(v0, 8),
-			   _mm_clmulepi64_si128(v0, multipliers_1, 0x10));
+	x0 = _mm_xor_si128(_mm_srli_si128(x0, 8),
+			   _mm_clmulepi64_si128(x0, mults_128b, 0x10));
 
 	
-	v0 = _mm_xor_si128(_mm_srli_si128(v0, 4),
-			   _mm_clmulepi64_si128(_mm_and_si128(v0, mask32),
-						final_multiplier, 0x00));
+	x0 = _mm_xor_si128(_mm_srli_si128(x0, 4),
+			   _mm_clmulepi64_si128(_mm_and_si128(x0, mask32),
+						final_mult, 0x00));
 
 	
-	v1 = _mm_clmulepi64_si128(_mm_and_si128(v0, mask32),
+	x1 = _mm_clmulepi64_si128(_mm_and_si128(x0, mask32),
 				  barrett_reduction_constants, 0x00);
-	v1 = _mm_clmulepi64_si128(_mm_and_si128(v1, mask32),
+	x1 = _mm_clmulepi64_si128(_mm_and_si128(x1, mask32),
 				  barrett_reduction_constants, 0x10);
-	v0 = _mm_xor_si128(v0, v1);
-#if FOLD_PARTIAL_VECS
-	crc = _mm_extract_epi32(v0, 1);
+	x0 = _mm_xor_si128(x0, x1);
+#if USE_SSE4_1
+	crc = _mm_extract_epi32(x0, 1);
 #else
-	crc = _mm_cvtsi128_si32(_mm_shuffle_epi32(v0, 0x01));
+	crc = _mm_cvtsi128_si32(_mm_shuffle_epi32(x0, 0x01));
 	
 	crc = crc32_slice1(crc, p, len);
 #endif
 	return crc;
 }
 
+#undef vec_t
+#undef fold_vec
+#undef VLOADU
+#undef VXOR
+#undef M128I_TO_VEC
+#undef MULTS
+#undef MULTS_8V
+#undef MULTS_4V
+#undef MULTS_2V
+#undef MULTS_1V
+
 #undef SUFFIX
 #undef ATTRIBUTES
-#undef FOLD_PARTIAL_VECS
+#undef VL
+#undef USE_SSE4_1
+#undef USE_AVX512
 
-#endif
 
 
-#if HAVE_PCLMUL_INTRIN && HAVE_AVX_INTRIN
-#  define crc32_x86_pclmul_avx	crc32_x86_pclmul_avx
-#  define SUFFIX			 _pclmul_avx
-#  if HAVE_PCLMUL_NATIVE && HAVE_AVX_NATIVE
-#    define ATTRIBUTES
-#  else
-#    define ATTRIBUTES		_target_attribute("pclmul,avx")
-#  endif
-#  define FOLD_PARTIAL_VECS	1
+#  define crc32_x86_pclmulqdq_avx	crc32_x86_pclmulqdq_avx
+#  define SUFFIX				 _pclmulqdq_avx
+#  define ATTRIBUTES		_target_attribute("pclmul,avx")
+#  define VL			16
+#  define USE_SSE4_1		1
+#  define USE_AVX512		0
 /* #include "x86-crc32_pclmul_template.h" */
 
 
 
 
-#include <immintrin.h>
-
-#if defined(__clang__) && defined(_MSC_VER)
-#  include <tmmintrin.h>
-#  include <smmintrin.h>
-#  include <wmmintrin.h>
+#if VL == 16
+#  define vec_t			__m128i
+#  define fold_vec		fold_vec128
+#  define VLOADU(p)		_mm_loadu_si128((const void *)(p))
+#  define VXOR(a, b)		_mm_xor_si128((a), (b))
+#  define M128I_TO_VEC(a)	a
+#  define MULTS_8V		_mm_set_epi64x(CRC32_X991_MODG, CRC32_X1055_MODG)
+#  define MULTS_4V		_mm_set_epi64x(CRC32_X479_MODG, CRC32_X543_MODG)
+#  define MULTS_2V		_mm_set_epi64x(CRC32_X223_MODG, CRC32_X287_MODG)
+#  define MULTS_1V		_mm_set_epi64x(CRC32_X95_MODG, CRC32_X159_MODG)
+#elif VL == 32
+#  define vec_t			__m256i
+#  define fold_vec		fold_vec256
+#  define VLOADU(p)		_mm256_loadu_si256((const void *)(p))
+#  define VXOR(a, b)		_mm256_xor_si256((a), (b))
+#  define M128I_TO_VEC(a)	_mm256_castsi128_si256(a)
+#  define MULTS(a, b)		_mm256_set_epi64x(a, b, a, b)
+#  define MULTS_8V		MULTS(CRC32_X2015_MODG, CRC32_X2079_MODG)
+#  define MULTS_4V		MULTS(CRC32_X991_MODG, CRC32_X1055_MODG)
+#  define MULTS_2V		MULTS(CRC32_X479_MODG, CRC32_X543_MODG)
+#  define MULTS_1V		MULTS(CRC32_X223_MODG, CRC32_X287_MODG)
+#elif VL == 64
+#  define vec_t			__m512i
+#  define fold_vec		fold_vec512
+#  define VLOADU(p)		_mm512_loadu_si512((const void *)(p))
+#  define VXOR(a, b)		_mm512_xor_si512((a), (b))
+#  define M128I_TO_VEC(a)	_mm512_castsi128_si512(a)
+#  define MULTS(a, b)		_mm512_set_epi64(a, b, a, b, a, b, a, b)
+#  define MULTS_8V		MULTS(CRC32_X4063_MODG, CRC32_X4127_MODG)
+#  define MULTS_4V		MULTS(CRC32_X2015_MODG, CRC32_X2079_MODG)
+#  define MULTS_2V		MULTS(CRC32_X991_MODG, CRC32_X1055_MODG)
+#  define MULTS_1V		MULTS(CRC32_X479_MODG, CRC32_X543_MODG)
+#else
+#  error "unsupported vector length"
 #endif
 
-#undef fold_vec
+#undef fold_vec128
 static forceinline ATTRIBUTES __m128i
-ADD_SUFFIX(fold_vec)(__m128i src, __m128i dst, __m128i  multipliers)
+ADD_SUFFIX(fold_vec128)(__m128i src, __m128i dst, __m128i  mults)
 {
-	
-	dst = _mm_xor_si128(dst, _mm_clmulepi64_si128(src, multipliers, 0x00));
-	dst = _mm_xor_si128(dst, _mm_clmulepi64_si128(src, multipliers, 0x11));
+	dst = _mm_xor_si128(dst, _mm_clmulepi64_si128(src, mults, 0x00));
+	dst = _mm_xor_si128(dst, _mm_clmulepi64_si128(src, mults, 0x11));
 	return dst;
 }
-#define fold_vec	ADD_SUFFIX(fold_vec)
+#define fold_vec128	ADD_SUFFIX(fold_vec128)
 
-#if FOLD_PARTIAL_VECS
+#if VL >= 32
+#undef fold_vec256
+static forceinline ATTRIBUTES __m256i
+ADD_SUFFIX(fold_vec256)(__m256i src, __m256i dst, __m256i  mults)
+{
+#if USE_AVX512
+	
+	return _mm256_ternarylogic_epi32(
+			_mm256_clmulepi64_epi128(src, mults, 0x00),
+			_mm256_clmulepi64_epi128(src, mults, 0x11),
+			dst,
+			0x96);
+#else
+	return _mm256_xor_si256(
+			_mm256_xor_si256(dst,
+					 _mm256_clmulepi64_epi128(src, mults, 0x00)),
+			_mm256_clmulepi64_epi128(src, mults, 0x11));
+#endif
+}
+#define fold_vec256	ADD_SUFFIX(fold_vec256)
+#endif 
 
-#undef fold_partial_vec
-static forceinline ATTRIBUTES __m128i
-ADD_SUFFIX(fold_partial_vec)(__m128i v, const u8 *p, size_t len,
-			     __m128i  multipliers_1)
+#if VL >= 64
+#undef fold_vec512
+static forceinline ATTRIBUTES __m512i
+ADD_SUFFIX(fold_vec512)(__m512i src, __m512i dst, __m512i  mults)
 {
 	
-	static const u8 shift_tab[48] = {
-		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-		0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-		0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
-		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-	};
+	return _mm512_ternarylogic_epi32(
+			_mm512_clmulepi64_epi128(src, mults, 0x00),
+			_mm512_clmulepi64_epi128(src, mults, 0x11),
+			dst,
+			0x96);
+}
+#define fold_vec512	ADD_SUFFIX(fold_vec512)
+#endif 
+
+#if USE_SSE4_1
+
+#undef fold_lessthan16bytes
+static forceinline ATTRIBUTES __m128i
+ADD_SUFFIX(fold_lessthan16bytes)(__m128i x, const u8 *p, size_t len,
+				 __m128i  mults_128b)
+{
 	__m128i lshift = _mm_loadu_si128((const void *)&shift_tab[len]);
 	__m128i rshift = _mm_loadu_si128((const void *)&shift_tab[len + 16]);
 	__m128i x0, x1;
 
 	
-	x0 = _mm_shuffle_epi8(v, lshift);
+	x0 = _mm_shuffle_epi8(x, lshift);
 
 	
-	x1 = _mm_blendv_epi8(_mm_shuffle_epi8(v, rshift),
+	x1 = _mm_blendv_epi8(_mm_shuffle_epi8(x, rshift),
 			     _mm_loadu_si128((const void *)(p + len - 16)),
 			     
 			     rshift);
 
-	return fold_vec(x0, x1, multipliers_1);
+	return fold_vec128(x0, x1, mults_128b);
 }
-#define fold_partial_vec	ADD_SUFFIX(fold_partial_vec)
+#define fold_lessthan16bytes	ADD_SUFFIX(fold_lessthan16bytes)
 #endif 
 
-static u32 ATTRIBUTES MAYBE_UNUSED
+static ATTRIBUTES u32
 ADD_SUFFIX(crc32_x86)(u32 crc, const u8 *p, size_t len)
 {
-	const __m128i  multipliers_8 =
-		_mm_set_epi64x(CRC32_8VECS_MULT_2, CRC32_8VECS_MULT_1);
-	const __m128i  multipliers_4 =
-		_mm_set_epi64x(CRC32_4VECS_MULT_2, CRC32_4VECS_MULT_1);
-	const __m128i  multipliers_2 =
-		_mm_set_epi64x(CRC32_2VECS_MULT_2, CRC32_2VECS_MULT_1);
-	const __m128i  multipliers_1 =
-		_mm_set_epi64x(CRC32_1VECS_MULT_2, CRC32_1VECS_MULT_1);
-	const __m128i  final_multiplier =
-		_mm_set_epi64x(0, CRC32_FINAL_MULT);
-	const __m128i mask32 = _mm_set_epi32(0, 0, 0, 0xFFFFFFFF);
-	const __m128i  barrett_reduction_constants =
-		_mm_set_epi64x(CRC32_BARRETT_CONSTANT_2,
-			       CRC32_BARRETT_CONSTANT_1);
-	__m128i v0, v1, v2, v3, v4, v5, v6, v7;
-
 	
-	if (len < 1024) {
-		if (len < 16)
-			return crc32_slice1(crc, p, len);
+	const vec_t mults_8v = MULTS_8V;
+	const vec_t mults_4v = MULTS_4V;
+	const vec_t mults_2v = MULTS_2V;
+	const vec_t mults_1v = MULTS_1V;
+	const __m128i mults_128b = _mm_set_epi64x(CRC32_X95_MODG, CRC32_X159_MODG);
+	const __m128i final_mult = _mm_set_epi64x(0, CRC32_X63_MODG);
+	const __m128i mask32 = _mm_set_epi32(0, 0, 0, 0xFFFFFFFF);
+	const __m128i barrett_reduction_constants =
+		_mm_set_epi64x(CRC32_BARRETT_CONSTANT_2, CRC32_BARRETT_CONSTANT_1);
+	vec_t v0, v1, v2, v3, v4, v5, v6, v7;
+	__m128i x0 = _mm_cvtsi32_si128(crc);
+	__m128i x1;
 
-		v0 = _mm_xor_si128(_mm_loadu_si128((const void *)p),
-				   _mm_cvtsi32_si128(crc));
-		p += 16;
-
-		if (len >= 64) {
-			v1 = _mm_loadu_si128((const void *)(p + 0));
-			v2 = _mm_loadu_si128((const void *)(p + 16));
-			v3 = _mm_loadu_si128((const void *)(p + 32));
-			p += 48;
-			while (len >= 64 + 64) {
-				v0 = fold_vec(v0, _mm_loadu_si128((const void *)(p + 0)),
-					      multipliers_4);
-				v1 = fold_vec(v1, _mm_loadu_si128((const void *)(p + 16)),
-					      multipliers_4);
-				v2 = fold_vec(v2, _mm_loadu_si128((const void *)(p + 32)),
-					      multipliers_4);
-				v3 = fold_vec(v3, _mm_loadu_si128((const void *)(p + 48)),
-					      multipliers_4);
-				p += 64;
-				len -= 64;
+	if (len < 8*VL) {
+		if (len < VL) {
+			STATIC_ASSERT(VL == 16 || VL == 32 || VL == 64);
+			if (len < 16) {
+			#if USE_AVX512
+				if (len < 4)
+					return crc32_slice1(crc, p, len);
+				
+				x0 = _mm_xor_si128(
+					x0, _mm_maskz_loadu_epi8((1 << len) - 1, p));
+				x0 = _mm_shuffle_epi8(
+					x0, _mm_loadu_si128((const void *)&shift_tab[len]));
+				goto reduce_x0;
+			#else
+				return crc32_slice1(crc, p, len);
+			#endif
 			}
-			v0 = fold_vec(v0, v2, multipliers_2);
-			v1 = fold_vec(v1, v3, multipliers_2);
-			if (len & 32) {
-				v0 = fold_vec(v0, _mm_loadu_si128((const void *)(p + 0)),
-					      multipliers_2);
-				v1 = fold_vec(v1, _mm_loadu_si128((const void *)(p + 16)),
-					      multipliers_2);
-				p += 32;
-			}
-			v0 = fold_vec(v0, v1, multipliers_1);
-			if (len & 16) {
-				v0 = fold_vec(v0, _mm_loadu_si128((const void *)p),
-					      multipliers_1);
-				p += 16;
-			}
-		} else {
+			
+			x0 = _mm_xor_si128(_mm_loadu_si128((const void *)p), x0);
 			if (len >= 32) {
-				v0 = fold_vec(v0, _mm_loadu_si128((const void *)p),
-					      multipliers_1);
-				p += 16;
-				if (len >= 48) {
-					v0 = fold_vec(v0, _mm_loadu_si128((const void *)p),
-						      multipliers_1);
-					p += 16;
-				}
+				x0 = fold_vec128(x0, _mm_loadu_si128((const void *)(p + 16)),
+						 mults_128b);
+				if (len >= 48)
+					x0 = fold_vec128(x0, _mm_loadu_si128((const void *)(p + 32)),
+							 mults_128b);
 			}
+			p += len & ~15;
+			goto less_than_16_remaining;
 		}
+		v0 = VXOR(VLOADU(p), M128I_TO_VEC(x0));
+		if (len < 2*VL) {
+			p += VL;
+			goto less_than_vl_remaining;
+		}
+		v1 = VLOADU(p + 1*VL);
+		if (len < 4*VL) {
+			p += 2*VL;
+			goto less_than_2vl_remaining;
+		}
+		v2 = VLOADU(p + 2*VL);
+		v3 = VLOADU(p + 3*VL);
+		p += 4*VL;
 	} else {
-		const size_t align = -(uintptr_t)p & 15;
-		const __m128i *vp;
+		
+		if (len > 65536 && ((uintptr_t)p & (VL-1))) {
+			size_t align = -(uintptr_t)p & (VL-1);
 
-	#if FOLD_PARTIAL_VECS
-		v0 = _mm_xor_si128(_mm_loadu_si128((const void *)p),
-				   _mm_cvtsi32_si128(crc));
-		p += 16;
-		
-		if (align) {
-			v0 = fold_partial_vec(v0, p, align, multipliers_1);
-			p += align;
 			len -= align;
-		}
-		vp = (const __m128i *)p;
-	#else
-		
-		if (align) {
+		#if USE_SSE4_1
+			x0 = _mm_xor_si128(_mm_loadu_si128((const void *)p), x0);
+			p += 16;
+			if (align & 15) {
+				x0 = fold_lessthan16bytes(x0, p, align & 15,
+							  mults_128b);
+				p += align & 15;
+				align &= ~15;
+			}
+			while (align) {
+				x0 = fold_vec128(x0, *(const __m128i *)p,
+						 mults_128b);
+				p += 16;
+				align -= 16;
+			}
+			v0 = M128I_TO_VEC(x0);
+		#  if VL == 32
+			v0 = _mm256_inserti128_si256(v0, *(const __m128i *)p, 1);
+		#  elif VL == 64
+			v0 = _mm512_inserti32x4(v0, *(const __m128i *)p, 1);
+			v0 = _mm512_inserti64x4(v0, *(const __m256i *)(p + 16), 1);
+		#  endif
+			p -= 16;
+		#else
 			crc = crc32_slice1(crc, p, align);
 			p += align;
-			len -= align;
+			v0 = VXOR(VLOADU(p), M128I_TO_VEC(_mm_cvtsi32_si128(crc)));
+		#endif
+		} else {
+			v0 = VXOR(VLOADU(p), M128I_TO_VEC(x0));
 		}
-		vp = (const __m128i *)p;
-		v0 = _mm_xor_si128(*vp++, _mm_cvtsi32_si128(crc));
-	#endif
-		v1 = *vp++;
-		v2 = *vp++;
-		v3 = *vp++;
-		v4 = *vp++;
-		v5 = *vp++;
-		v6 = *vp++;
-		v7 = *vp++;
-		do {
-			v0 = fold_vec(v0, *vp++, multipliers_8);
-			v1 = fold_vec(v1, *vp++, multipliers_8);
-			v2 = fold_vec(v2, *vp++, multipliers_8);
-			v3 = fold_vec(v3, *vp++, multipliers_8);
-			v4 = fold_vec(v4, *vp++, multipliers_8);
-			v5 = fold_vec(v5, *vp++, multipliers_8);
-			v6 = fold_vec(v6, *vp++, multipliers_8);
-			v7 = fold_vec(v7, *vp++, multipliers_8);
-			len -= 128;
-		} while (len >= 128 + 128);
+		v1 = VLOADU(p + 1*VL);
+		v2 = VLOADU(p + 2*VL);
+		v3 = VLOADU(p + 3*VL);
+		v4 = VLOADU(p + 4*VL);
+		v5 = VLOADU(p + 5*VL);
+		v6 = VLOADU(p + 6*VL);
+		v7 = VLOADU(p + 7*VL);
+		p += 8*VL;
 
-		v0 = fold_vec(v0, v4, multipliers_4);
-		v1 = fold_vec(v1, v5, multipliers_4);
-		v2 = fold_vec(v2, v6, multipliers_4);
-		v3 = fold_vec(v3, v7, multipliers_4);
-		if (len & 64) {
-			v0 = fold_vec(v0, *vp++, multipliers_4);
-			v1 = fold_vec(v1, *vp++, multipliers_4);
-			v2 = fold_vec(v2, *vp++, multipliers_4);
-			v3 = fold_vec(v3, *vp++, multipliers_4);
+		
+		while (len >= 16*VL) {
+			v0 = fold_vec(v0, VLOADU(p + 0*VL), mults_8v);
+			v1 = fold_vec(v1, VLOADU(p + 1*VL), mults_8v);
+			v2 = fold_vec(v2, VLOADU(p + 2*VL), mults_8v);
+			v3 = fold_vec(v3, VLOADU(p + 3*VL), mults_8v);
+			v4 = fold_vec(v4, VLOADU(p + 4*VL), mults_8v);
+			v5 = fold_vec(v5, VLOADU(p + 5*VL), mults_8v);
+			v6 = fold_vec(v6, VLOADU(p + 6*VL), mults_8v);
+			v7 = fold_vec(v7, VLOADU(p + 7*VL), mults_8v);
+			p += 8*VL;
+			len -= 8*VL;
 		}
 
-		v0 = fold_vec(v0, v2, multipliers_2);
-		v1 = fold_vec(v1, v3, multipliers_2);
-		if (len & 32) {
-			v0 = fold_vec(v0, *vp++, multipliers_2);
-			v1 = fold_vec(v1, *vp++, multipliers_2);
+		
+		v0 = fold_vec(v0, v4, mults_4v);
+		v1 = fold_vec(v1, v5, mults_4v);
+		v2 = fold_vec(v2, v6, mults_4v);
+		v3 = fold_vec(v3, v7, mults_4v);
+		if (len & (4*VL)) {
+			v0 = fold_vec(v0, VLOADU(p + 0*VL), mults_4v);
+			v1 = fold_vec(v1, VLOADU(p + 1*VL), mults_4v);
+			v2 = fold_vec(v2, VLOADU(p + 2*VL), mults_4v);
+			v3 = fold_vec(v3, VLOADU(p + 3*VL), mults_4v);
+			p += 4*VL;
 		}
-
-		v0 = fold_vec(v0, v1, multipliers_1);
-		if (len & 16)
-			v0 = fold_vec(v0, *vp++, multipliers_1);
-
-		p = (const u8 *)vp;
 	}
+	
+	v0 = fold_vec(v0, v2, mults_2v);
+	v1 = fold_vec(v1, v3, mults_2v);
+	if (len & (2*VL)) {
+		v0 = fold_vec(v0, VLOADU(p + 0*VL), mults_2v);
+		v1 = fold_vec(v1, VLOADU(p + 1*VL), mults_2v);
+		p += 2*VL;
+	}
+less_than_2vl_remaining:
+	
+	v0 = fold_vec(v0, v1, mults_1v);
+	if (len & VL) {
+		v0 = fold_vec(v0, VLOADU(p), mults_1v);
+		p += VL;
+	}
+less_than_vl_remaining:
+	
+#if VL == 16
+	x0 = v0;
+#else
+	{
+	#if VL == 32
+		__m256i y0 = v0;
+	#else
+		const __m256i mults_256b =
+			_mm256_set_epi64x(CRC32_X223_MODG, CRC32_X287_MODG,
+					  CRC32_X223_MODG, CRC32_X287_MODG);
+		__m256i y0 = fold_vec256(_mm512_extracti64x4_epi64(v0, 0),
+					 _mm512_extracti64x4_epi64(v0, 1),
+					 mults_256b);
+		if (len & 32) {
+			y0 = fold_vec256(y0, _mm256_loadu_si256((const void *)p),
+					 mults_256b);
+			p += 32;
+		}
+	#endif
+		x0 = fold_vec128(_mm256_extracti128_si256(y0, 0),
+				 _mm256_extracti128_si256(y0, 1), mults_128b);
+	}
+	if (len & 16) {
+		x0 = fold_vec128(x0, _mm_loadu_si128((const void *)p),
+				 mults_128b);
+		p += 16;
+	}
+#endif
+less_than_16_remaining:
 	len &= 15;
 
 	
-#if FOLD_PARTIAL_VECS
+#if USE_SSE4_1
 	if (len)
-		v0 = fold_partial_vec(v0, p, len, multipliers_1);
+		x0 = fold_lessthan16bytes(x0, p, len, mults_128b);
+#endif
+#if USE_AVX512
+reduce_x0:
 #endif
 
 	
-	v0 = _mm_xor_si128(_mm_srli_si128(v0, 8),
-			   _mm_clmulepi64_si128(v0, multipliers_1, 0x10));
+	x0 = _mm_xor_si128(_mm_srli_si128(x0, 8),
+			   _mm_clmulepi64_si128(x0, mults_128b, 0x10));
 
 	
-	v0 = _mm_xor_si128(_mm_srli_si128(v0, 4),
-			   _mm_clmulepi64_si128(_mm_and_si128(v0, mask32),
-						final_multiplier, 0x00));
+	x0 = _mm_xor_si128(_mm_srli_si128(x0, 4),
+			   _mm_clmulepi64_si128(_mm_and_si128(x0, mask32),
+						final_mult, 0x00));
 
 	
-	v1 = _mm_clmulepi64_si128(_mm_and_si128(v0, mask32),
+	x1 = _mm_clmulepi64_si128(_mm_and_si128(x0, mask32),
 				  barrett_reduction_constants, 0x00);
-	v1 = _mm_clmulepi64_si128(_mm_and_si128(v1, mask32),
+	x1 = _mm_clmulepi64_si128(_mm_and_si128(x1, mask32),
 				  barrett_reduction_constants, 0x10);
-	v0 = _mm_xor_si128(v0, v1);
-#if FOLD_PARTIAL_VECS
-	crc = _mm_extract_epi32(v0, 1);
+	x0 = _mm_xor_si128(x0, x1);
+#if USE_SSE4_1
+	crc = _mm_extract_epi32(x0, 1);
 #else
-	crc = _mm_cvtsi128_si32(_mm_shuffle_epi32(v0, 0x01));
+	crc = _mm_cvtsi128_si32(_mm_shuffle_epi32(x0, 0x01));
 	
 	crc = crc32_slice1(crc, p, len);
 #endif
 	return crc;
 }
 
+#undef vec_t
+#undef fold_vec
+#undef VLOADU
+#undef VXOR
+#undef M128I_TO_VEC
+#undef MULTS
+#undef MULTS_8V
+#undef MULTS_4V
+#undef MULTS_2V
+#undef MULTS_1V
+
 #undef SUFFIX
 #undef ATTRIBUTES
-#undef FOLD_PARTIAL_VECS
+#undef VL
+#undef USE_SSE4_1
+#undef USE_AVX512
 
 #endif
 
 
-#if defined(crc32_x86_pclmul_avx) && HAVE_PCLMUL_NATIVE && HAVE_AVX_NATIVE
-#define DEFAULT_IMPL	crc32_x86_pclmul_avx
+#if GCC_PREREQ(8, 1) || CLANG_PREREQ(6, 0, 10000000)
+#  define crc32_x86_vpclmulqdq_avx2	crc32_x86_vpclmulqdq_avx2
+#  define SUFFIX				 _vpclmulqdq_avx2
+#  define ATTRIBUTES		_target_attribute("vpclmulqdq,pclmul,avx2")
+#  define VL			32
+#  define USE_SSE4_1		1
+#  define USE_AVX512		0
+/* #include "x86-crc32_pclmul_template.h" */
+
+
+
+
+#if VL == 16
+#  define vec_t			__m128i
+#  define fold_vec		fold_vec128
+#  define VLOADU(p)		_mm_loadu_si128((const void *)(p))
+#  define VXOR(a, b)		_mm_xor_si128((a), (b))
+#  define M128I_TO_VEC(a)	a
+#  define MULTS_8V		_mm_set_epi64x(CRC32_X991_MODG, CRC32_X1055_MODG)
+#  define MULTS_4V		_mm_set_epi64x(CRC32_X479_MODG, CRC32_X543_MODG)
+#  define MULTS_2V		_mm_set_epi64x(CRC32_X223_MODG, CRC32_X287_MODG)
+#  define MULTS_1V		_mm_set_epi64x(CRC32_X95_MODG, CRC32_X159_MODG)
+#elif VL == 32
+#  define vec_t			__m256i
+#  define fold_vec		fold_vec256
+#  define VLOADU(p)		_mm256_loadu_si256((const void *)(p))
+#  define VXOR(a, b)		_mm256_xor_si256((a), (b))
+#  define M128I_TO_VEC(a)	_mm256_castsi128_si256(a)
+#  define MULTS(a, b)		_mm256_set_epi64x(a, b, a, b)
+#  define MULTS_8V		MULTS(CRC32_X2015_MODG, CRC32_X2079_MODG)
+#  define MULTS_4V		MULTS(CRC32_X991_MODG, CRC32_X1055_MODG)
+#  define MULTS_2V		MULTS(CRC32_X479_MODG, CRC32_X543_MODG)
+#  define MULTS_1V		MULTS(CRC32_X223_MODG, CRC32_X287_MODG)
+#elif VL == 64
+#  define vec_t			__m512i
+#  define fold_vec		fold_vec512
+#  define VLOADU(p)		_mm512_loadu_si512((const void *)(p))
+#  define VXOR(a, b)		_mm512_xor_si512((a), (b))
+#  define M128I_TO_VEC(a)	_mm512_castsi128_si512(a)
+#  define MULTS(a, b)		_mm512_set_epi64(a, b, a, b, a, b, a, b)
+#  define MULTS_8V		MULTS(CRC32_X4063_MODG, CRC32_X4127_MODG)
+#  define MULTS_4V		MULTS(CRC32_X2015_MODG, CRC32_X2079_MODG)
+#  define MULTS_2V		MULTS(CRC32_X991_MODG, CRC32_X1055_MODG)
+#  define MULTS_1V		MULTS(CRC32_X479_MODG, CRC32_X543_MODG)
 #else
+#  error "unsupported vector length"
+#endif
+
+#undef fold_vec128
+static forceinline ATTRIBUTES __m128i
+ADD_SUFFIX(fold_vec128)(__m128i src, __m128i dst, __m128i  mults)
+{
+	dst = _mm_xor_si128(dst, _mm_clmulepi64_si128(src, mults, 0x00));
+	dst = _mm_xor_si128(dst, _mm_clmulepi64_si128(src, mults, 0x11));
+	return dst;
+}
+#define fold_vec128	ADD_SUFFIX(fold_vec128)
+
+#if VL >= 32
+#undef fold_vec256
+static forceinline ATTRIBUTES __m256i
+ADD_SUFFIX(fold_vec256)(__m256i src, __m256i dst, __m256i  mults)
+{
+#if USE_AVX512
+	
+	return _mm256_ternarylogic_epi32(
+			_mm256_clmulepi64_epi128(src, mults, 0x00),
+			_mm256_clmulepi64_epi128(src, mults, 0x11),
+			dst,
+			0x96);
+#else
+	return _mm256_xor_si256(
+			_mm256_xor_si256(dst,
+					 _mm256_clmulepi64_epi128(src, mults, 0x00)),
+			_mm256_clmulepi64_epi128(src, mults, 0x11));
+#endif
+}
+#define fold_vec256	ADD_SUFFIX(fold_vec256)
+#endif 
+
+#if VL >= 64
+#undef fold_vec512
+static forceinline ATTRIBUTES __m512i
+ADD_SUFFIX(fold_vec512)(__m512i src, __m512i dst, __m512i  mults)
+{
+	
+	return _mm512_ternarylogic_epi32(
+			_mm512_clmulepi64_epi128(src, mults, 0x00),
+			_mm512_clmulepi64_epi128(src, mults, 0x11),
+			dst,
+			0x96);
+}
+#define fold_vec512	ADD_SUFFIX(fold_vec512)
+#endif 
+
+#if USE_SSE4_1
+
+#undef fold_lessthan16bytes
+static forceinline ATTRIBUTES __m128i
+ADD_SUFFIX(fold_lessthan16bytes)(__m128i x, const u8 *p, size_t len,
+				 __m128i  mults_128b)
+{
+	__m128i lshift = _mm_loadu_si128((const void *)&shift_tab[len]);
+	__m128i rshift = _mm_loadu_si128((const void *)&shift_tab[len + 16]);
+	__m128i x0, x1;
+
+	
+	x0 = _mm_shuffle_epi8(x, lshift);
+
+	
+	x1 = _mm_blendv_epi8(_mm_shuffle_epi8(x, rshift),
+			     _mm_loadu_si128((const void *)(p + len - 16)),
+			     
+			     rshift);
+
+	return fold_vec128(x0, x1, mults_128b);
+}
+#define fold_lessthan16bytes	ADD_SUFFIX(fold_lessthan16bytes)
+#endif 
+
+static ATTRIBUTES u32
+ADD_SUFFIX(crc32_x86)(u32 crc, const u8 *p, size_t len)
+{
+	
+	const vec_t mults_8v = MULTS_8V;
+	const vec_t mults_4v = MULTS_4V;
+	const vec_t mults_2v = MULTS_2V;
+	const vec_t mults_1v = MULTS_1V;
+	const __m128i mults_128b = _mm_set_epi64x(CRC32_X95_MODG, CRC32_X159_MODG);
+	const __m128i final_mult = _mm_set_epi64x(0, CRC32_X63_MODG);
+	const __m128i mask32 = _mm_set_epi32(0, 0, 0, 0xFFFFFFFF);
+	const __m128i barrett_reduction_constants =
+		_mm_set_epi64x(CRC32_BARRETT_CONSTANT_2, CRC32_BARRETT_CONSTANT_1);
+	vec_t v0, v1, v2, v3, v4, v5, v6, v7;
+	__m128i x0 = _mm_cvtsi32_si128(crc);
+	__m128i x1;
+
+	if (len < 8*VL) {
+		if (len < VL) {
+			STATIC_ASSERT(VL == 16 || VL == 32 || VL == 64);
+			if (len < 16) {
+			#if USE_AVX512
+				if (len < 4)
+					return crc32_slice1(crc, p, len);
+				
+				x0 = _mm_xor_si128(
+					x0, _mm_maskz_loadu_epi8((1 << len) - 1, p));
+				x0 = _mm_shuffle_epi8(
+					x0, _mm_loadu_si128((const void *)&shift_tab[len]));
+				goto reduce_x0;
+			#else
+				return crc32_slice1(crc, p, len);
+			#endif
+			}
+			
+			x0 = _mm_xor_si128(_mm_loadu_si128((const void *)p), x0);
+			if (len >= 32) {
+				x0 = fold_vec128(x0, _mm_loadu_si128((const void *)(p + 16)),
+						 mults_128b);
+				if (len >= 48)
+					x0 = fold_vec128(x0, _mm_loadu_si128((const void *)(p + 32)),
+							 mults_128b);
+			}
+			p += len & ~15;
+			goto less_than_16_remaining;
+		}
+		v0 = VXOR(VLOADU(p), M128I_TO_VEC(x0));
+		if (len < 2*VL) {
+			p += VL;
+			goto less_than_vl_remaining;
+		}
+		v1 = VLOADU(p + 1*VL);
+		if (len < 4*VL) {
+			p += 2*VL;
+			goto less_than_2vl_remaining;
+		}
+		v2 = VLOADU(p + 2*VL);
+		v3 = VLOADU(p + 3*VL);
+		p += 4*VL;
+	} else {
+		
+		if (len > 65536 && ((uintptr_t)p & (VL-1))) {
+			size_t align = -(uintptr_t)p & (VL-1);
+
+			len -= align;
+		#if USE_SSE4_1
+			x0 = _mm_xor_si128(_mm_loadu_si128((const void *)p), x0);
+			p += 16;
+			if (align & 15) {
+				x0 = fold_lessthan16bytes(x0, p, align & 15,
+							  mults_128b);
+				p += align & 15;
+				align &= ~15;
+			}
+			while (align) {
+				x0 = fold_vec128(x0, *(const __m128i *)p,
+						 mults_128b);
+				p += 16;
+				align -= 16;
+			}
+			v0 = M128I_TO_VEC(x0);
+		#  if VL == 32
+			v0 = _mm256_inserti128_si256(v0, *(const __m128i *)p, 1);
+		#  elif VL == 64
+			v0 = _mm512_inserti32x4(v0, *(const __m128i *)p, 1);
+			v0 = _mm512_inserti64x4(v0, *(const __m256i *)(p + 16), 1);
+		#  endif
+			p -= 16;
+		#else
+			crc = crc32_slice1(crc, p, align);
+			p += align;
+			v0 = VXOR(VLOADU(p), M128I_TO_VEC(_mm_cvtsi32_si128(crc)));
+		#endif
+		} else {
+			v0 = VXOR(VLOADU(p), M128I_TO_VEC(x0));
+		}
+		v1 = VLOADU(p + 1*VL);
+		v2 = VLOADU(p + 2*VL);
+		v3 = VLOADU(p + 3*VL);
+		v4 = VLOADU(p + 4*VL);
+		v5 = VLOADU(p + 5*VL);
+		v6 = VLOADU(p + 6*VL);
+		v7 = VLOADU(p + 7*VL);
+		p += 8*VL;
+
+		
+		while (len >= 16*VL) {
+			v0 = fold_vec(v0, VLOADU(p + 0*VL), mults_8v);
+			v1 = fold_vec(v1, VLOADU(p + 1*VL), mults_8v);
+			v2 = fold_vec(v2, VLOADU(p + 2*VL), mults_8v);
+			v3 = fold_vec(v3, VLOADU(p + 3*VL), mults_8v);
+			v4 = fold_vec(v4, VLOADU(p + 4*VL), mults_8v);
+			v5 = fold_vec(v5, VLOADU(p + 5*VL), mults_8v);
+			v6 = fold_vec(v6, VLOADU(p + 6*VL), mults_8v);
+			v7 = fold_vec(v7, VLOADU(p + 7*VL), mults_8v);
+			p += 8*VL;
+			len -= 8*VL;
+		}
+
+		
+		v0 = fold_vec(v0, v4, mults_4v);
+		v1 = fold_vec(v1, v5, mults_4v);
+		v2 = fold_vec(v2, v6, mults_4v);
+		v3 = fold_vec(v3, v7, mults_4v);
+		if (len & (4*VL)) {
+			v0 = fold_vec(v0, VLOADU(p + 0*VL), mults_4v);
+			v1 = fold_vec(v1, VLOADU(p + 1*VL), mults_4v);
+			v2 = fold_vec(v2, VLOADU(p + 2*VL), mults_4v);
+			v3 = fold_vec(v3, VLOADU(p + 3*VL), mults_4v);
+			p += 4*VL;
+		}
+	}
+	
+	v0 = fold_vec(v0, v2, mults_2v);
+	v1 = fold_vec(v1, v3, mults_2v);
+	if (len & (2*VL)) {
+		v0 = fold_vec(v0, VLOADU(p + 0*VL), mults_2v);
+		v1 = fold_vec(v1, VLOADU(p + 1*VL), mults_2v);
+		p += 2*VL;
+	}
+less_than_2vl_remaining:
+	
+	v0 = fold_vec(v0, v1, mults_1v);
+	if (len & VL) {
+		v0 = fold_vec(v0, VLOADU(p), mults_1v);
+		p += VL;
+	}
+less_than_vl_remaining:
+	
+#if VL == 16
+	x0 = v0;
+#else
+	{
+	#if VL == 32
+		__m256i y0 = v0;
+	#else
+		const __m256i mults_256b =
+			_mm256_set_epi64x(CRC32_X223_MODG, CRC32_X287_MODG,
+					  CRC32_X223_MODG, CRC32_X287_MODG);
+		__m256i y0 = fold_vec256(_mm512_extracti64x4_epi64(v0, 0),
+					 _mm512_extracti64x4_epi64(v0, 1),
+					 mults_256b);
+		if (len & 32) {
+			y0 = fold_vec256(y0, _mm256_loadu_si256((const void *)p),
+					 mults_256b);
+			p += 32;
+		}
+	#endif
+		x0 = fold_vec128(_mm256_extracti128_si256(y0, 0),
+				 _mm256_extracti128_si256(y0, 1), mults_128b);
+	}
+	if (len & 16) {
+		x0 = fold_vec128(x0, _mm_loadu_si128((const void *)p),
+				 mults_128b);
+		p += 16;
+	}
+#endif
+less_than_16_remaining:
+	len &= 15;
+
+	
+#if USE_SSE4_1
+	if (len)
+		x0 = fold_lessthan16bytes(x0, p, len, mults_128b);
+#endif
+#if USE_AVX512
+reduce_x0:
+#endif
+
+	
+	x0 = _mm_xor_si128(_mm_srli_si128(x0, 8),
+			   _mm_clmulepi64_si128(x0, mults_128b, 0x10));
+
+	
+	x0 = _mm_xor_si128(_mm_srli_si128(x0, 4),
+			   _mm_clmulepi64_si128(_mm_and_si128(x0, mask32),
+						final_mult, 0x00));
+
+	
+	x1 = _mm_clmulepi64_si128(_mm_and_si128(x0, mask32),
+				  barrett_reduction_constants, 0x00);
+	x1 = _mm_clmulepi64_si128(_mm_and_si128(x1, mask32),
+				  barrett_reduction_constants, 0x10);
+	x0 = _mm_xor_si128(x0, x1);
+#if USE_SSE4_1
+	crc = _mm_extract_epi32(x0, 1);
+#else
+	crc = _mm_cvtsi128_si32(_mm_shuffle_epi32(x0, 0x01));
+	
+	crc = crc32_slice1(crc, p, len);
+#endif
+	return crc;
+}
+
+#undef vec_t
+#undef fold_vec
+#undef VLOADU
+#undef VXOR
+#undef M128I_TO_VEC
+#undef MULTS
+#undef MULTS_8V
+#undef MULTS_4V
+#undef MULTS_2V
+#undef MULTS_1V
+
+#undef SUFFIX
+#undef ATTRIBUTES
+#undef VL
+#undef USE_SSE4_1
+#undef USE_AVX512
+
+#endif
+
+#if GCC_PREREQ(8, 1) || CLANG_PREREQ(6, 0, 10000000) || MSVC_PREREQ(1920)
+
+#  define crc32_x86_vpclmulqdq_avx512_vl256  crc32_x86_vpclmulqdq_avx512_vl256
+#  define SUFFIX				      _vpclmulqdq_avx512_vl256
+#  define ATTRIBUTES		_target_attribute("vpclmulqdq,pclmul,avx512bw,avx512vl")
+#  define VL			32
+#  define USE_SSE4_1		1
+#  define USE_AVX512		1
+/* #include "x86-crc32_pclmul_template.h" */
+
+
+
+
+#if VL == 16
+#  define vec_t			__m128i
+#  define fold_vec		fold_vec128
+#  define VLOADU(p)		_mm_loadu_si128((const void *)(p))
+#  define VXOR(a, b)		_mm_xor_si128((a), (b))
+#  define M128I_TO_VEC(a)	a
+#  define MULTS_8V		_mm_set_epi64x(CRC32_X991_MODG, CRC32_X1055_MODG)
+#  define MULTS_4V		_mm_set_epi64x(CRC32_X479_MODG, CRC32_X543_MODG)
+#  define MULTS_2V		_mm_set_epi64x(CRC32_X223_MODG, CRC32_X287_MODG)
+#  define MULTS_1V		_mm_set_epi64x(CRC32_X95_MODG, CRC32_X159_MODG)
+#elif VL == 32
+#  define vec_t			__m256i
+#  define fold_vec		fold_vec256
+#  define VLOADU(p)		_mm256_loadu_si256((const void *)(p))
+#  define VXOR(a, b)		_mm256_xor_si256((a), (b))
+#  define M128I_TO_VEC(a)	_mm256_castsi128_si256(a)
+#  define MULTS(a, b)		_mm256_set_epi64x(a, b, a, b)
+#  define MULTS_8V		MULTS(CRC32_X2015_MODG, CRC32_X2079_MODG)
+#  define MULTS_4V		MULTS(CRC32_X991_MODG, CRC32_X1055_MODG)
+#  define MULTS_2V		MULTS(CRC32_X479_MODG, CRC32_X543_MODG)
+#  define MULTS_1V		MULTS(CRC32_X223_MODG, CRC32_X287_MODG)
+#elif VL == 64
+#  define vec_t			__m512i
+#  define fold_vec		fold_vec512
+#  define VLOADU(p)		_mm512_loadu_si512((const void *)(p))
+#  define VXOR(a, b)		_mm512_xor_si512((a), (b))
+#  define M128I_TO_VEC(a)	_mm512_castsi128_si512(a)
+#  define MULTS(a, b)		_mm512_set_epi64(a, b, a, b, a, b, a, b)
+#  define MULTS_8V		MULTS(CRC32_X4063_MODG, CRC32_X4127_MODG)
+#  define MULTS_4V		MULTS(CRC32_X2015_MODG, CRC32_X2079_MODG)
+#  define MULTS_2V		MULTS(CRC32_X991_MODG, CRC32_X1055_MODG)
+#  define MULTS_1V		MULTS(CRC32_X479_MODG, CRC32_X543_MODG)
+#else
+#  error "unsupported vector length"
+#endif
+
+#undef fold_vec128
+static forceinline ATTRIBUTES __m128i
+ADD_SUFFIX(fold_vec128)(__m128i src, __m128i dst, __m128i  mults)
+{
+	dst = _mm_xor_si128(dst, _mm_clmulepi64_si128(src, mults, 0x00));
+	dst = _mm_xor_si128(dst, _mm_clmulepi64_si128(src, mults, 0x11));
+	return dst;
+}
+#define fold_vec128	ADD_SUFFIX(fold_vec128)
+
+#if VL >= 32
+#undef fold_vec256
+static forceinline ATTRIBUTES __m256i
+ADD_SUFFIX(fold_vec256)(__m256i src, __m256i dst, __m256i  mults)
+{
+#if USE_AVX512
+	
+	return _mm256_ternarylogic_epi32(
+			_mm256_clmulepi64_epi128(src, mults, 0x00),
+			_mm256_clmulepi64_epi128(src, mults, 0x11),
+			dst,
+			0x96);
+#else
+	return _mm256_xor_si256(
+			_mm256_xor_si256(dst,
+					 _mm256_clmulepi64_epi128(src, mults, 0x00)),
+			_mm256_clmulepi64_epi128(src, mults, 0x11));
+#endif
+}
+#define fold_vec256	ADD_SUFFIX(fold_vec256)
+#endif 
+
+#if VL >= 64
+#undef fold_vec512
+static forceinline ATTRIBUTES __m512i
+ADD_SUFFIX(fold_vec512)(__m512i src, __m512i dst, __m512i  mults)
+{
+	
+	return _mm512_ternarylogic_epi32(
+			_mm512_clmulepi64_epi128(src, mults, 0x00),
+			_mm512_clmulepi64_epi128(src, mults, 0x11),
+			dst,
+			0x96);
+}
+#define fold_vec512	ADD_SUFFIX(fold_vec512)
+#endif 
+
+#if USE_SSE4_1
+
+#undef fold_lessthan16bytes
+static forceinline ATTRIBUTES __m128i
+ADD_SUFFIX(fold_lessthan16bytes)(__m128i x, const u8 *p, size_t len,
+				 __m128i  mults_128b)
+{
+	__m128i lshift = _mm_loadu_si128((const void *)&shift_tab[len]);
+	__m128i rshift = _mm_loadu_si128((const void *)&shift_tab[len + 16]);
+	__m128i x0, x1;
+
+	
+	x0 = _mm_shuffle_epi8(x, lshift);
+
+	
+	x1 = _mm_blendv_epi8(_mm_shuffle_epi8(x, rshift),
+			     _mm_loadu_si128((const void *)(p + len - 16)),
+			     
+			     rshift);
+
+	return fold_vec128(x0, x1, mults_128b);
+}
+#define fold_lessthan16bytes	ADD_SUFFIX(fold_lessthan16bytes)
+#endif 
+
+static ATTRIBUTES u32
+ADD_SUFFIX(crc32_x86)(u32 crc, const u8 *p, size_t len)
+{
+	
+	const vec_t mults_8v = MULTS_8V;
+	const vec_t mults_4v = MULTS_4V;
+	const vec_t mults_2v = MULTS_2V;
+	const vec_t mults_1v = MULTS_1V;
+	const __m128i mults_128b = _mm_set_epi64x(CRC32_X95_MODG, CRC32_X159_MODG);
+	const __m128i final_mult = _mm_set_epi64x(0, CRC32_X63_MODG);
+	const __m128i mask32 = _mm_set_epi32(0, 0, 0, 0xFFFFFFFF);
+	const __m128i barrett_reduction_constants =
+		_mm_set_epi64x(CRC32_BARRETT_CONSTANT_2, CRC32_BARRETT_CONSTANT_1);
+	vec_t v0, v1, v2, v3, v4, v5, v6, v7;
+	__m128i x0 = _mm_cvtsi32_si128(crc);
+	__m128i x1;
+
+	if (len < 8*VL) {
+		if (len < VL) {
+			STATIC_ASSERT(VL == 16 || VL == 32 || VL == 64);
+			if (len < 16) {
+			#if USE_AVX512
+				if (len < 4)
+					return crc32_slice1(crc, p, len);
+				
+				x0 = _mm_xor_si128(
+					x0, _mm_maskz_loadu_epi8((1 << len) - 1, p));
+				x0 = _mm_shuffle_epi8(
+					x0, _mm_loadu_si128((const void *)&shift_tab[len]));
+				goto reduce_x0;
+			#else
+				return crc32_slice1(crc, p, len);
+			#endif
+			}
+			
+			x0 = _mm_xor_si128(_mm_loadu_si128((const void *)p), x0);
+			if (len >= 32) {
+				x0 = fold_vec128(x0, _mm_loadu_si128((const void *)(p + 16)),
+						 mults_128b);
+				if (len >= 48)
+					x0 = fold_vec128(x0, _mm_loadu_si128((const void *)(p + 32)),
+							 mults_128b);
+			}
+			p += len & ~15;
+			goto less_than_16_remaining;
+		}
+		v0 = VXOR(VLOADU(p), M128I_TO_VEC(x0));
+		if (len < 2*VL) {
+			p += VL;
+			goto less_than_vl_remaining;
+		}
+		v1 = VLOADU(p + 1*VL);
+		if (len < 4*VL) {
+			p += 2*VL;
+			goto less_than_2vl_remaining;
+		}
+		v2 = VLOADU(p + 2*VL);
+		v3 = VLOADU(p + 3*VL);
+		p += 4*VL;
+	} else {
+		
+		if (len > 65536 && ((uintptr_t)p & (VL-1))) {
+			size_t align = -(uintptr_t)p & (VL-1);
+
+			len -= align;
+		#if USE_SSE4_1
+			x0 = _mm_xor_si128(_mm_loadu_si128((const void *)p), x0);
+			p += 16;
+			if (align & 15) {
+				x0 = fold_lessthan16bytes(x0, p, align & 15,
+							  mults_128b);
+				p += align & 15;
+				align &= ~15;
+			}
+			while (align) {
+				x0 = fold_vec128(x0, *(const __m128i *)p,
+						 mults_128b);
+				p += 16;
+				align -= 16;
+			}
+			v0 = M128I_TO_VEC(x0);
+		#  if VL == 32
+			v0 = _mm256_inserti128_si256(v0, *(const __m128i *)p, 1);
+		#  elif VL == 64
+			v0 = _mm512_inserti32x4(v0, *(const __m128i *)p, 1);
+			v0 = _mm512_inserti64x4(v0, *(const __m256i *)(p + 16), 1);
+		#  endif
+			p -= 16;
+		#else
+			crc = crc32_slice1(crc, p, align);
+			p += align;
+			v0 = VXOR(VLOADU(p), M128I_TO_VEC(_mm_cvtsi32_si128(crc)));
+		#endif
+		} else {
+			v0 = VXOR(VLOADU(p), M128I_TO_VEC(x0));
+		}
+		v1 = VLOADU(p + 1*VL);
+		v2 = VLOADU(p + 2*VL);
+		v3 = VLOADU(p + 3*VL);
+		v4 = VLOADU(p + 4*VL);
+		v5 = VLOADU(p + 5*VL);
+		v6 = VLOADU(p + 6*VL);
+		v7 = VLOADU(p + 7*VL);
+		p += 8*VL;
+
+		
+		while (len >= 16*VL) {
+			v0 = fold_vec(v0, VLOADU(p + 0*VL), mults_8v);
+			v1 = fold_vec(v1, VLOADU(p + 1*VL), mults_8v);
+			v2 = fold_vec(v2, VLOADU(p + 2*VL), mults_8v);
+			v3 = fold_vec(v3, VLOADU(p + 3*VL), mults_8v);
+			v4 = fold_vec(v4, VLOADU(p + 4*VL), mults_8v);
+			v5 = fold_vec(v5, VLOADU(p + 5*VL), mults_8v);
+			v6 = fold_vec(v6, VLOADU(p + 6*VL), mults_8v);
+			v7 = fold_vec(v7, VLOADU(p + 7*VL), mults_8v);
+			p += 8*VL;
+			len -= 8*VL;
+		}
+
+		
+		v0 = fold_vec(v0, v4, mults_4v);
+		v1 = fold_vec(v1, v5, mults_4v);
+		v2 = fold_vec(v2, v6, mults_4v);
+		v3 = fold_vec(v3, v7, mults_4v);
+		if (len & (4*VL)) {
+			v0 = fold_vec(v0, VLOADU(p + 0*VL), mults_4v);
+			v1 = fold_vec(v1, VLOADU(p + 1*VL), mults_4v);
+			v2 = fold_vec(v2, VLOADU(p + 2*VL), mults_4v);
+			v3 = fold_vec(v3, VLOADU(p + 3*VL), mults_4v);
+			p += 4*VL;
+		}
+	}
+	
+	v0 = fold_vec(v0, v2, mults_2v);
+	v1 = fold_vec(v1, v3, mults_2v);
+	if (len & (2*VL)) {
+		v0 = fold_vec(v0, VLOADU(p + 0*VL), mults_2v);
+		v1 = fold_vec(v1, VLOADU(p + 1*VL), mults_2v);
+		p += 2*VL;
+	}
+less_than_2vl_remaining:
+	
+	v0 = fold_vec(v0, v1, mults_1v);
+	if (len & VL) {
+		v0 = fold_vec(v0, VLOADU(p), mults_1v);
+		p += VL;
+	}
+less_than_vl_remaining:
+	
+#if VL == 16
+	x0 = v0;
+#else
+	{
+	#if VL == 32
+		__m256i y0 = v0;
+	#else
+		const __m256i mults_256b =
+			_mm256_set_epi64x(CRC32_X223_MODG, CRC32_X287_MODG,
+					  CRC32_X223_MODG, CRC32_X287_MODG);
+		__m256i y0 = fold_vec256(_mm512_extracti64x4_epi64(v0, 0),
+					 _mm512_extracti64x4_epi64(v0, 1),
+					 mults_256b);
+		if (len & 32) {
+			y0 = fold_vec256(y0, _mm256_loadu_si256((const void *)p),
+					 mults_256b);
+			p += 32;
+		}
+	#endif
+		x0 = fold_vec128(_mm256_extracti128_si256(y0, 0),
+				 _mm256_extracti128_si256(y0, 1), mults_128b);
+	}
+	if (len & 16) {
+		x0 = fold_vec128(x0, _mm_loadu_si128((const void *)p),
+				 mults_128b);
+		p += 16;
+	}
+#endif
+less_than_16_remaining:
+	len &= 15;
+
+	
+#if USE_SSE4_1
+	if (len)
+		x0 = fold_lessthan16bytes(x0, p, len, mults_128b);
+#endif
+#if USE_AVX512
+reduce_x0:
+#endif
+
+	
+	x0 = _mm_xor_si128(_mm_srli_si128(x0, 8),
+			   _mm_clmulepi64_si128(x0, mults_128b, 0x10));
+
+	
+	x0 = _mm_xor_si128(_mm_srli_si128(x0, 4),
+			   _mm_clmulepi64_si128(_mm_and_si128(x0, mask32),
+						final_mult, 0x00));
+
+	
+	x1 = _mm_clmulepi64_si128(_mm_and_si128(x0, mask32),
+				  barrett_reduction_constants, 0x00);
+	x1 = _mm_clmulepi64_si128(_mm_and_si128(x1, mask32),
+				  barrett_reduction_constants, 0x10);
+	x0 = _mm_xor_si128(x0, x1);
+#if USE_SSE4_1
+	crc = _mm_extract_epi32(x0, 1);
+#else
+	crc = _mm_cvtsi128_si32(_mm_shuffle_epi32(x0, 0x01));
+	
+	crc = crc32_slice1(crc, p, len);
+#endif
+	return crc;
+}
+
+#undef vec_t
+#undef fold_vec
+#undef VLOADU
+#undef VXOR
+#undef M128I_TO_VEC
+#undef MULTS
+#undef MULTS_8V
+#undef MULTS_4V
+#undef MULTS_2V
+#undef MULTS_1V
+
+#undef SUFFIX
+#undef ATTRIBUTES
+#undef VL
+#undef USE_SSE4_1
+#undef USE_AVX512
+
+
+
+#  define crc32_x86_vpclmulqdq_avx512_vl512  crc32_x86_vpclmulqdq_avx512_vl512
+#  define SUFFIX				      _vpclmulqdq_avx512_vl512
+#  define ATTRIBUTES		_target_attribute("vpclmulqdq,pclmul,avx512bw,avx512vl")
+#  define VL			64
+#  define USE_SSE4_1		1
+#  define USE_AVX512		1
+/* #include "x86-crc32_pclmul_template.h" */
+
+
+
+
+#if VL == 16
+#  define vec_t			__m128i
+#  define fold_vec		fold_vec128
+#  define VLOADU(p)		_mm_loadu_si128((const void *)(p))
+#  define VXOR(a, b)		_mm_xor_si128((a), (b))
+#  define M128I_TO_VEC(a)	a
+#  define MULTS_8V		_mm_set_epi64x(CRC32_X991_MODG, CRC32_X1055_MODG)
+#  define MULTS_4V		_mm_set_epi64x(CRC32_X479_MODG, CRC32_X543_MODG)
+#  define MULTS_2V		_mm_set_epi64x(CRC32_X223_MODG, CRC32_X287_MODG)
+#  define MULTS_1V		_mm_set_epi64x(CRC32_X95_MODG, CRC32_X159_MODG)
+#elif VL == 32
+#  define vec_t			__m256i
+#  define fold_vec		fold_vec256
+#  define VLOADU(p)		_mm256_loadu_si256((const void *)(p))
+#  define VXOR(a, b)		_mm256_xor_si256((a), (b))
+#  define M128I_TO_VEC(a)	_mm256_castsi128_si256(a)
+#  define MULTS(a, b)		_mm256_set_epi64x(a, b, a, b)
+#  define MULTS_8V		MULTS(CRC32_X2015_MODG, CRC32_X2079_MODG)
+#  define MULTS_4V		MULTS(CRC32_X991_MODG, CRC32_X1055_MODG)
+#  define MULTS_2V		MULTS(CRC32_X479_MODG, CRC32_X543_MODG)
+#  define MULTS_1V		MULTS(CRC32_X223_MODG, CRC32_X287_MODG)
+#elif VL == 64
+#  define vec_t			__m512i
+#  define fold_vec		fold_vec512
+#  define VLOADU(p)		_mm512_loadu_si512((const void *)(p))
+#  define VXOR(a, b)		_mm512_xor_si512((a), (b))
+#  define M128I_TO_VEC(a)	_mm512_castsi128_si512(a)
+#  define MULTS(a, b)		_mm512_set_epi64(a, b, a, b, a, b, a, b)
+#  define MULTS_8V		MULTS(CRC32_X4063_MODG, CRC32_X4127_MODG)
+#  define MULTS_4V		MULTS(CRC32_X2015_MODG, CRC32_X2079_MODG)
+#  define MULTS_2V		MULTS(CRC32_X991_MODG, CRC32_X1055_MODG)
+#  define MULTS_1V		MULTS(CRC32_X479_MODG, CRC32_X543_MODG)
+#else
+#  error "unsupported vector length"
+#endif
+
+#undef fold_vec128
+static forceinline ATTRIBUTES __m128i
+ADD_SUFFIX(fold_vec128)(__m128i src, __m128i dst, __m128i  mults)
+{
+	dst = _mm_xor_si128(dst, _mm_clmulepi64_si128(src, mults, 0x00));
+	dst = _mm_xor_si128(dst, _mm_clmulepi64_si128(src, mults, 0x11));
+	return dst;
+}
+#define fold_vec128	ADD_SUFFIX(fold_vec128)
+
+#if VL >= 32
+#undef fold_vec256
+static forceinline ATTRIBUTES __m256i
+ADD_SUFFIX(fold_vec256)(__m256i src, __m256i dst, __m256i  mults)
+{
+#if USE_AVX512
+	
+	return _mm256_ternarylogic_epi32(
+			_mm256_clmulepi64_epi128(src, mults, 0x00),
+			_mm256_clmulepi64_epi128(src, mults, 0x11),
+			dst,
+			0x96);
+#else
+	return _mm256_xor_si256(
+			_mm256_xor_si256(dst,
+					 _mm256_clmulepi64_epi128(src, mults, 0x00)),
+			_mm256_clmulepi64_epi128(src, mults, 0x11));
+#endif
+}
+#define fold_vec256	ADD_SUFFIX(fold_vec256)
+#endif 
+
+#if VL >= 64
+#undef fold_vec512
+static forceinline ATTRIBUTES __m512i
+ADD_SUFFIX(fold_vec512)(__m512i src, __m512i dst, __m512i  mults)
+{
+	
+	return _mm512_ternarylogic_epi32(
+			_mm512_clmulepi64_epi128(src, mults, 0x00),
+			_mm512_clmulepi64_epi128(src, mults, 0x11),
+			dst,
+			0x96);
+}
+#define fold_vec512	ADD_SUFFIX(fold_vec512)
+#endif 
+
+#if USE_SSE4_1
+
+#undef fold_lessthan16bytes
+static forceinline ATTRIBUTES __m128i
+ADD_SUFFIX(fold_lessthan16bytes)(__m128i x, const u8 *p, size_t len,
+				 __m128i  mults_128b)
+{
+	__m128i lshift = _mm_loadu_si128((const void *)&shift_tab[len]);
+	__m128i rshift = _mm_loadu_si128((const void *)&shift_tab[len + 16]);
+	__m128i x0, x1;
+
+	
+	x0 = _mm_shuffle_epi8(x, lshift);
+
+	
+	x1 = _mm_blendv_epi8(_mm_shuffle_epi8(x, rshift),
+			     _mm_loadu_si128((const void *)(p + len - 16)),
+			     
+			     rshift);
+
+	return fold_vec128(x0, x1, mults_128b);
+}
+#define fold_lessthan16bytes	ADD_SUFFIX(fold_lessthan16bytes)
+#endif 
+
+static ATTRIBUTES u32
+ADD_SUFFIX(crc32_x86)(u32 crc, const u8 *p, size_t len)
+{
+	
+	const vec_t mults_8v = MULTS_8V;
+	const vec_t mults_4v = MULTS_4V;
+	const vec_t mults_2v = MULTS_2V;
+	const vec_t mults_1v = MULTS_1V;
+	const __m128i mults_128b = _mm_set_epi64x(CRC32_X95_MODG, CRC32_X159_MODG);
+	const __m128i final_mult = _mm_set_epi64x(0, CRC32_X63_MODG);
+	const __m128i mask32 = _mm_set_epi32(0, 0, 0, 0xFFFFFFFF);
+	const __m128i barrett_reduction_constants =
+		_mm_set_epi64x(CRC32_BARRETT_CONSTANT_2, CRC32_BARRETT_CONSTANT_1);
+	vec_t v0, v1, v2, v3, v4, v5, v6, v7;
+	__m128i x0 = _mm_cvtsi32_si128(crc);
+	__m128i x1;
+
+	if (len < 8*VL) {
+		if (len < VL) {
+			STATIC_ASSERT(VL == 16 || VL == 32 || VL == 64);
+			if (len < 16) {
+			#if USE_AVX512
+				if (len < 4)
+					return crc32_slice1(crc, p, len);
+				
+				x0 = _mm_xor_si128(
+					x0, _mm_maskz_loadu_epi8((1 << len) - 1, p));
+				x0 = _mm_shuffle_epi8(
+					x0, _mm_loadu_si128((const void *)&shift_tab[len]));
+				goto reduce_x0;
+			#else
+				return crc32_slice1(crc, p, len);
+			#endif
+			}
+			
+			x0 = _mm_xor_si128(_mm_loadu_si128((const void *)p), x0);
+			if (len >= 32) {
+				x0 = fold_vec128(x0, _mm_loadu_si128((const void *)(p + 16)),
+						 mults_128b);
+				if (len >= 48)
+					x0 = fold_vec128(x0, _mm_loadu_si128((const void *)(p + 32)),
+							 mults_128b);
+			}
+			p += len & ~15;
+			goto less_than_16_remaining;
+		}
+		v0 = VXOR(VLOADU(p), M128I_TO_VEC(x0));
+		if (len < 2*VL) {
+			p += VL;
+			goto less_than_vl_remaining;
+		}
+		v1 = VLOADU(p + 1*VL);
+		if (len < 4*VL) {
+			p += 2*VL;
+			goto less_than_2vl_remaining;
+		}
+		v2 = VLOADU(p + 2*VL);
+		v3 = VLOADU(p + 3*VL);
+		p += 4*VL;
+	} else {
+		
+		if (len > 65536 && ((uintptr_t)p & (VL-1))) {
+			size_t align = -(uintptr_t)p & (VL-1);
+
+			len -= align;
+		#if USE_SSE4_1
+			x0 = _mm_xor_si128(_mm_loadu_si128((const void *)p), x0);
+			p += 16;
+			if (align & 15) {
+				x0 = fold_lessthan16bytes(x0, p, align & 15,
+							  mults_128b);
+				p += align & 15;
+				align &= ~15;
+			}
+			while (align) {
+				x0 = fold_vec128(x0, *(const __m128i *)p,
+						 mults_128b);
+				p += 16;
+				align -= 16;
+			}
+			v0 = M128I_TO_VEC(x0);
+		#  if VL == 32
+			v0 = _mm256_inserti128_si256(v0, *(const __m128i *)p, 1);
+		#  elif VL == 64
+			v0 = _mm512_inserti32x4(v0, *(const __m128i *)p, 1);
+			v0 = _mm512_inserti64x4(v0, *(const __m256i *)(p + 16), 1);
+		#  endif
+			p -= 16;
+		#else
+			crc = crc32_slice1(crc, p, align);
+			p += align;
+			v0 = VXOR(VLOADU(p), M128I_TO_VEC(_mm_cvtsi32_si128(crc)));
+		#endif
+		} else {
+			v0 = VXOR(VLOADU(p), M128I_TO_VEC(x0));
+		}
+		v1 = VLOADU(p + 1*VL);
+		v2 = VLOADU(p + 2*VL);
+		v3 = VLOADU(p + 3*VL);
+		v4 = VLOADU(p + 4*VL);
+		v5 = VLOADU(p + 5*VL);
+		v6 = VLOADU(p + 6*VL);
+		v7 = VLOADU(p + 7*VL);
+		p += 8*VL;
+
+		
+		while (len >= 16*VL) {
+			v0 = fold_vec(v0, VLOADU(p + 0*VL), mults_8v);
+			v1 = fold_vec(v1, VLOADU(p + 1*VL), mults_8v);
+			v2 = fold_vec(v2, VLOADU(p + 2*VL), mults_8v);
+			v3 = fold_vec(v3, VLOADU(p + 3*VL), mults_8v);
+			v4 = fold_vec(v4, VLOADU(p + 4*VL), mults_8v);
+			v5 = fold_vec(v5, VLOADU(p + 5*VL), mults_8v);
+			v6 = fold_vec(v6, VLOADU(p + 6*VL), mults_8v);
+			v7 = fold_vec(v7, VLOADU(p + 7*VL), mults_8v);
+			p += 8*VL;
+			len -= 8*VL;
+		}
+
+		
+		v0 = fold_vec(v0, v4, mults_4v);
+		v1 = fold_vec(v1, v5, mults_4v);
+		v2 = fold_vec(v2, v6, mults_4v);
+		v3 = fold_vec(v3, v7, mults_4v);
+		if (len & (4*VL)) {
+			v0 = fold_vec(v0, VLOADU(p + 0*VL), mults_4v);
+			v1 = fold_vec(v1, VLOADU(p + 1*VL), mults_4v);
+			v2 = fold_vec(v2, VLOADU(p + 2*VL), mults_4v);
+			v3 = fold_vec(v3, VLOADU(p + 3*VL), mults_4v);
+			p += 4*VL;
+		}
+	}
+	
+	v0 = fold_vec(v0, v2, mults_2v);
+	v1 = fold_vec(v1, v3, mults_2v);
+	if (len & (2*VL)) {
+		v0 = fold_vec(v0, VLOADU(p + 0*VL), mults_2v);
+		v1 = fold_vec(v1, VLOADU(p + 1*VL), mults_2v);
+		p += 2*VL;
+	}
+less_than_2vl_remaining:
+	
+	v0 = fold_vec(v0, v1, mults_1v);
+	if (len & VL) {
+		v0 = fold_vec(v0, VLOADU(p), mults_1v);
+		p += VL;
+	}
+less_than_vl_remaining:
+	
+#if VL == 16
+	x0 = v0;
+#else
+	{
+	#if VL == 32
+		__m256i y0 = v0;
+	#else
+		const __m256i mults_256b =
+			_mm256_set_epi64x(CRC32_X223_MODG, CRC32_X287_MODG,
+					  CRC32_X223_MODG, CRC32_X287_MODG);
+		__m256i y0 = fold_vec256(_mm512_extracti64x4_epi64(v0, 0),
+					 _mm512_extracti64x4_epi64(v0, 1),
+					 mults_256b);
+		if (len & 32) {
+			y0 = fold_vec256(y0, _mm256_loadu_si256((const void *)p),
+					 mults_256b);
+			p += 32;
+		}
+	#endif
+		x0 = fold_vec128(_mm256_extracti128_si256(y0, 0),
+				 _mm256_extracti128_si256(y0, 1), mults_128b);
+	}
+	if (len & 16) {
+		x0 = fold_vec128(x0, _mm_loadu_si128((const void *)p),
+				 mults_128b);
+		p += 16;
+	}
+#endif
+less_than_16_remaining:
+	len &= 15;
+
+	
+#if USE_SSE4_1
+	if (len)
+		x0 = fold_lessthan16bytes(x0, p, len, mults_128b);
+#endif
+#if USE_AVX512
+reduce_x0:
+#endif
+
+	
+	x0 = _mm_xor_si128(_mm_srli_si128(x0, 8),
+			   _mm_clmulepi64_si128(x0, mults_128b, 0x10));
+
+	
+	x0 = _mm_xor_si128(_mm_srli_si128(x0, 4),
+			   _mm_clmulepi64_si128(_mm_and_si128(x0, mask32),
+						final_mult, 0x00));
+
+	
+	x1 = _mm_clmulepi64_si128(_mm_and_si128(x0, mask32),
+				  barrett_reduction_constants, 0x00);
+	x1 = _mm_clmulepi64_si128(_mm_and_si128(x1, mask32),
+				  barrett_reduction_constants, 0x10);
+	x0 = _mm_xor_si128(x0, x1);
+#if USE_SSE4_1
+	crc = _mm_extract_epi32(x0, 1);
+#else
+	crc = _mm_cvtsi128_si32(_mm_shuffle_epi32(x0, 0x01));
+	
+	crc = crc32_slice1(crc, p, len);
+#endif
+	return crc;
+}
+
+#undef vec_t
+#undef fold_vec
+#undef VLOADU
+#undef VXOR
+#undef M128I_TO_VEC
+#undef MULTS
+#undef MULTS_8V
+#undef MULTS_4V
+#undef MULTS_2V
+#undef MULTS_1V
+
+#undef SUFFIX
+#undef ATTRIBUTES
+#undef VL
+#undef USE_SSE4_1
+#undef USE_AVX512
+
+#endif
+
 static inline crc32_func_t
 arch_select_crc32_func(void)
 {
 	const u32 features MAYBE_UNUSED = get_x86_cpu_features();
 
-#ifdef crc32_x86_pclmul_avx
-	if (HAVE_PCLMUL(features) && HAVE_AVX(features))
-		return crc32_x86_pclmul_avx;
+#ifdef crc32_x86_vpclmulqdq_avx512_vl512
+	if ((features & X86_CPU_FEATURE_ZMM) &&
+	    HAVE_VPCLMULQDQ(features) && HAVE_PCLMULQDQ(features) &&
+	    HAVE_AVX512BW(features) && HAVE_AVX512VL(features))
+		return crc32_x86_vpclmulqdq_avx512_vl512;
 #endif
-#ifdef crc32_x86_pclmul
-	if (HAVE_PCLMUL(features))
-		return crc32_x86_pclmul;
+#ifdef crc32_x86_vpclmulqdq_avx512_vl256
+	if (HAVE_VPCLMULQDQ(features) && HAVE_PCLMULQDQ(features) &&
+	    HAVE_AVX512BW(features) && HAVE_AVX512VL(features))
+		return crc32_x86_vpclmulqdq_avx512_vl256;
+#endif
+#ifdef crc32_x86_vpclmulqdq_avx2
+	if (HAVE_VPCLMULQDQ(features) && HAVE_PCLMULQDQ(features) &&
+	    HAVE_AVX2(features))
+		return crc32_x86_vpclmulqdq_avx2;
+#endif
+#ifdef crc32_x86_pclmulqdq_avx
+	if (HAVE_PCLMULQDQ(features) && HAVE_AVX(features))
+		return crc32_x86_pclmulqdq_avx;
+#endif
+#ifdef crc32_x86_pclmulqdq
+	if (HAVE_PCLMULQDQ(features))
+		return crc32_x86_pclmulqdq;
 #endif
 	return NULL;
 }
 #define arch_select_crc32_func	arch_select_crc32_func
-#endif
 
 #endif 
 
@@ -9044,7 +12111,7 @@ libdeflate_crc32(u32 crc, const void *p, size_t len)
 		return 0;
 	return ~crc32_impl(~crc, p, len);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.19/lib/deflate_compress.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.20/lib/deflate_compress.c */
 
 
 /* #include "deflate_compress.h" */
@@ -9099,8 +12166,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	19
-#define LIBDEFLATE_VERSION_STRING	"1.19"
+#define LIBDEFLATE_VERSION_MINOR	20
+#define LIBDEFLATE_VERSION_STRING	"1.20"
 
 
 #ifndef LIBDEFLATEAPI
@@ -9318,6 +12385,7 @@ struct libdeflate_options {
 #undef ARCH_X86_32
 #undef ARCH_ARM64
 #undef ARCH_ARM32
+#undef ARCH_RISCV
 #ifdef _MSC_VER
 #  if defined(_M_X64)
 #    define ARCH_X86_64
@@ -9337,6 +12405,8 @@ struct libdeflate_options {
 #    define ARCH_ARM64
 #  elif defined(__arm__)
 #    define ARCH_ARM32
+#  elif defined(__riscv)
+#    define ARCH_RISCV
 #  endif
 #endif
 
@@ -9381,6 +12451,9 @@ typedef size_t machine_word_t;
 #  define GCC_PREREQ(major, minor)		\
 	(__GNUC__ > (major) ||			\
 	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#  if !GCC_PREREQ(4, 9)
+#    error "gcc versions older than 4.9 are no longer supported"
+#  endif
 #else
 #  define GCC_PREREQ(major, minor)	0
 #endif
@@ -9393,14 +12466,27 @@ typedef size_t machine_word_t;
 	(__clang_major__ > (major) ||			\
 	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
 #  endif
+#  if !CLANG_PREREQ(3, 9, 8000000)
+#    error "clang versions older than 3.9 are no longer supported"
+#  endif
 #else
 #  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+#ifdef _MSC_VER
+#  define MSVC_PREREQ(version)	(_MSC_VER >= (version))
+#  if !MSVC_PREREQ(1900)
+#    error "MSVC versions older than Visual Studio 2015 are no longer supported"
+#  endif
+#else
+#  define MSVC_PREREQ(version)	0
 #endif
 
 
 #ifndef __has_attribute
 #  define __has_attribute(attribute)	0
 #endif
+
+
 #ifndef __has_builtin
 #  define __has_builtin(builtin)	0
 #endif
@@ -9424,6 +12510,13 @@ typedef size_t machine_word_t;
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
+#endif
+
+
+#if defined(__GNUC__) || __has_attribute(noreturn)
+#  define NORETURN		__attribute__((noreturn))
+#else
+#  define NORETURN
 #endif
 
 
@@ -9492,12 +12585,10 @@ typedef size_t machine_word_t;
 #endif
 
 
-#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#if defined(__GNUC__) || __has_attribute(target)
 #  define _target_attribute(attrs)	__attribute__((target(attrs)))
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
 #else
 #  define _target_attribute(attrs)
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
 #endif
 
 
@@ -9537,7 +12628,7 @@ static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
 
 static forceinline u16 bswap16(u16 v)
 {
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap16)
 	return __builtin_bswap16(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ushort(v);
@@ -9549,7 +12640,7 @@ static forceinline u16 bswap16(u16 v)
 
 static forceinline u32 bswap32(u32 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap32)
 	return __builtin_bswap32(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ulong(v);
@@ -9564,7 +12655,7 @@ static forceinline u32 bswap32(u32 v)
 
 static forceinline u64 bswap64(u64 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap64)
 	return __builtin_bswap64(v);
 #elif defined(_MSC_VER)
 	return _byteswap_uint64(v);
@@ -9595,6 +12686,7 @@ static forceinline u64 bswap64(u64 v)
 #if (defined(__GNUC__) || defined(__clang__)) && \
 	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	 defined(__riscv_misaligned_fast) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
 #elif defined(_MSC_VER)
@@ -9932,12 +13024,17 @@ int memcmp(const void *s1, const void *s2, size_t n);
 
 #undef LIBDEFLATE_ENABLE_ASSERTIONS
 #else
-#include <string.h>
+#  include <string.h>
+   
+#  ifdef __clang_analyzer__
+#    define LIBDEFLATE_ENABLE_ASSERTIONS
+#  endif
 #endif
 
 
 #ifdef LIBDEFLATE_ENABLE_ASSERTIONS
-void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+NORETURN void
+libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #define ASSERT(expr) { if (unlikely(!(expr))) \
 	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
 #else
@@ -10119,8 +13216,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	19
-#define LIBDEFLATE_VERSION_STRING	"1.19"
+#define LIBDEFLATE_VERSION_MINOR	20
+#define LIBDEFLATE_VERSION_STRING	"1.20"
 
 
 #ifndef LIBDEFLATEAPI
@@ -10338,6 +13435,7 @@ struct libdeflate_options {
 #undef ARCH_X86_32
 #undef ARCH_ARM64
 #undef ARCH_ARM32
+#undef ARCH_RISCV
 #ifdef _MSC_VER
 #  if defined(_M_X64)
 #    define ARCH_X86_64
@@ -10357,6 +13455,8 @@ struct libdeflate_options {
 #    define ARCH_ARM64
 #  elif defined(__arm__)
 #    define ARCH_ARM32
+#  elif defined(__riscv)
+#    define ARCH_RISCV
 #  endif
 #endif
 
@@ -10401,6 +13501,9 @@ typedef size_t machine_word_t;
 #  define GCC_PREREQ(major, minor)		\
 	(__GNUC__ > (major) ||			\
 	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#  if !GCC_PREREQ(4, 9)
+#    error "gcc versions older than 4.9 are no longer supported"
+#  endif
 #else
 #  define GCC_PREREQ(major, minor)	0
 #endif
@@ -10413,14 +13516,27 @@ typedef size_t machine_word_t;
 	(__clang_major__ > (major) ||			\
 	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
 #  endif
+#  if !CLANG_PREREQ(3, 9, 8000000)
+#    error "clang versions older than 3.9 are no longer supported"
+#  endif
 #else
 #  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+#ifdef _MSC_VER
+#  define MSVC_PREREQ(version)	(_MSC_VER >= (version))
+#  if !MSVC_PREREQ(1900)
+#    error "MSVC versions older than Visual Studio 2015 are no longer supported"
+#  endif
+#else
+#  define MSVC_PREREQ(version)	0
 #endif
 
 
 #ifndef __has_attribute
 #  define __has_attribute(attribute)	0
 #endif
+
+
 #ifndef __has_builtin
 #  define __has_builtin(builtin)	0
 #endif
@@ -10444,6 +13560,13 @@ typedef size_t machine_word_t;
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
+#endif
+
+
+#if defined(__GNUC__) || __has_attribute(noreturn)
+#  define NORETURN		__attribute__((noreturn))
+#else
+#  define NORETURN
 #endif
 
 
@@ -10512,12 +13635,10 @@ typedef size_t machine_word_t;
 #endif
 
 
-#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#if defined(__GNUC__) || __has_attribute(target)
 #  define _target_attribute(attrs)	__attribute__((target(attrs)))
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
 #else
 #  define _target_attribute(attrs)
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
 #endif
 
 
@@ -10557,7 +13678,7 @@ static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
 
 static forceinline u16 bswap16(u16 v)
 {
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap16)
 	return __builtin_bswap16(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ushort(v);
@@ -10569,7 +13690,7 @@ static forceinline u16 bswap16(u16 v)
 
 static forceinline u32 bswap32(u32 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap32)
 	return __builtin_bswap32(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ulong(v);
@@ -10584,7 +13705,7 @@ static forceinline u32 bswap32(u32 v)
 
 static forceinline u64 bswap64(u64 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap64)
 	return __builtin_bswap64(v);
 #elif defined(_MSC_VER)
 	return _byteswap_uint64(v);
@@ -10615,6 +13736,7 @@ static forceinline u64 bswap64(u64 v)
 #if (defined(__GNUC__) || defined(__clang__)) && \
 	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	 defined(__riscv_misaligned_fast) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
 #elif defined(_MSC_VER)
@@ -10952,12 +14074,17 @@ int memcmp(const void *s1, const void *s2, size_t n);
 
 #undef LIBDEFLATE_ENABLE_ASSERTIONS
 #else
-#include <string.h>
+#  include <string.h>
+   
+#  ifdef __clang_analyzer__
+#    define LIBDEFLATE_ENABLE_ASSERTIONS
+#  endif
 #endif
 
 
 #ifdef LIBDEFLATE_ENABLE_ASSERTIONS
-void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+NORETURN void
+libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #define ASSERT(expr) { if (unlikely(!(expr))) \
 	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
 #else
@@ -11007,7 +14134,9 @@ typedef s16 mf_pos_t;
 
 
 #define MATCHFINDER_MEM_ALIGNMENT	32
-#define MATCHFINDER_SIZE_ALIGNMENT	128
+
+
+#define MATCHFINDER_SIZE_ALIGNMENT	1024
 
 #undef matchfinder_init
 #undef matchfinder_rebase
@@ -11074,8 +14203,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	19
-#define LIBDEFLATE_VERSION_STRING	"1.19"
+#define LIBDEFLATE_VERSION_MINOR	20
+#define LIBDEFLATE_VERSION_STRING	"1.20"
 
 
 #ifndef LIBDEFLATEAPI
@@ -11293,6 +14422,7 @@ struct libdeflate_options {
 #undef ARCH_X86_32
 #undef ARCH_ARM64
 #undef ARCH_ARM32
+#undef ARCH_RISCV
 #ifdef _MSC_VER
 #  if defined(_M_X64)
 #    define ARCH_X86_64
@@ -11312,6 +14442,8 @@ struct libdeflate_options {
 #    define ARCH_ARM64
 #  elif defined(__arm__)
 #    define ARCH_ARM32
+#  elif defined(__riscv)
+#    define ARCH_RISCV
 #  endif
 #endif
 
@@ -11356,6 +14488,9 @@ typedef size_t machine_word_t;
 #  define GCC_PREREQ(major, minor)		\
 	(__GNUC__ > (major) ||			\
 	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#  if !GCC_PREREQ(4, 9)
+#    error "gcc versions older than 4.9 are no longer supported"
+#  endif
 #else
 #  define GCC_PREREQ(major, minor)	0
 #endif
@@ -11368,14 +14503,27 @@ typedef size_t machine_word_t;
 	(__clang_major__ > (major) ||			\
 	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
 #  endif
+#  if !CLANG_PREREQ(3, 9, 8000000)
+#    error "clang versions older than 3.9 are no longer supported"
+#  endif
 #else
 #  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+#ifdef _MSC_VER
+#  define MSVC_PREREQ(version)	(_MSC_VER >= (version))
+#  if !MSVC_PREREQ(1900)
+#    error "MSVC versions older than Visual Studio 2015 are no longer supported"
+#  endif
+#else
+#  define MSVC_PREREQ(version)	0
 #endif
 
 
 #ifndef __has_attribute
 #  define __has_attribute(attribute)	0
 #endif
+
+
 #ifndef __has_builtin
 #  define __has_builtin(builtin)	0
 #endif
@@ -11399,6 +14547,13 @@ typedef size_t machine_word_t;
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
+#endif
+
+
+#if defined(__GNUC__) || __has_attribute(noreturn)
+#  define NORETURN		__attribute__((noreturn))
+#else
+#  define NORETURN
 #endif
 
 
@@ -11467,12 +14622,10 @@ typedef size_t machine_word_t;
 #endif
 
 
-#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#if defined(__GNUC__) || __has_attribute(target)
 #  define _target_attribute(attrs)	__attribute__((target(attrs)))
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
 #else
 #  define _target_attribute(attrs)
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
 #endif
 
 
@@ -11512,7 +14665,7 @@ static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
 
 static forceinline u16 bswap16(u16 v)
 {
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap16)
 	return __builtin_bswap16(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ushort(v);
@@ -11524,7 +14677,7 @@ static forceinline u16 bswap16(u16 v)
 
 static forceinline u32 bswap32(u32 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap32)
 	return __builtin_bswap32(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ulong(v);
@@ -11539,7 +14692,7 @@ static forceinline u32 bswap32(u32 v)
 
 static forceinline u64 bswap64(u64 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap64)
 	return __builtin_bswap64(v);
 #elif defined(_MSC_VER)
 	return _byteswap_uint64(v);
@@ -11570,6 +14723,7 @@ static forceinline u64 bswap64(u64 v)
 #if (defined(__GNUC__) || defined(__clang__)) && \
 	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	 defined(__riscv_misaligned_fast) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
 #elif defined(_MSC_VER)
@@ -11907,12 +15061,17 @@ int memcmp(const void *s1, const void *s2, size_t n);
 
 #undef LIBDEFLATE_ENABLE_ASSERTIONS
 #else
-#include <string.h>
+#  include <string.h>
+   
+#  ifdef __clang_analyzer__
+#    define LIBDEFLATE_ENABLE_ASSERTIONS
+#  endif
 #endif
 
 
 #ifdef LIBDEFLATE_ENABLE_ASSERTIONS
-void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+NORETURN void
+libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #define ASSERT(expr) { if (unlikely(!(expr))) \
 	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
 #else
@@ -11926,33 +15085,23 @@ void libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #endif 
 
 
-#define HAVE_DYNAMIC_ARM_CPU_FEATURES	0
-
 #if defined(ARCH_ARM32) || defined(ARCH_ARM64)
 
+#define ARM_CPU_FEATURE_NEON		(1 << 0)
+#define ARM_CPU_FEATURE_PMULL		(1 << 1)
+
+#define ARM_CPU_FEATURE_PREFER_PMULL	(1 << 2)
+#define ARM_CPU_FEATURE_CRC32		(1 << 3)
+#define ARM_CPU_FEATURE_SHA3		(1 << 4)
+#define ARM_CPU_FEATURE_DOTPROD		(1 << 5)
+
 #if !defined(FREESTANDING) && \
-    (COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE || defined(_MSC_VER)) && \
+    (defined(__GNUC__) || defined(__clang__) || defined(_MSC_VER)) && \
     (defined(__linux__) || \
      (defined(__APPLE__) && defined(ARCH_ARM64)) || \
      (defined(_WIN32) && defined(ARCH_ARM64)))
-#  undef HAVE_DYNAMIC_ARM_CPU_FEATURES
-#  define HAVE_DYNAMIC_ARM_CPU_FEATURES	1
-#endif
 
-#define ARM_CPU_FEATURE_NEON		0x00000001
-#define ARM_CPU_FEATURE_PMULL		0x00000002
-#define ARM_CPU_FEATURE_CRC32		0x00000004
-#define ARM_CPU_FEATURE_SHA3		0x00000008
-#define ARM_CPU_FEATURE_DOTPROD		0x00000010
-
-#define HAVE_NEON(features)	(HAVE_NEON_NATIVE    || ((features) & ARM_CPU_FEATURE_NEON))
-#define HAVE_PMULL(features)	(HAVE_PMULL_NATIVE   || ((features) & ARM_CPU_FEATURE_PMULL))
-#define HAVE_CRC32(features)	(HAVE_CRC32_NATIVE   || ((features) & ARM_CPU_FEATURE_CRC32))
-#define HAVE_SHA3(features)	(HAVE_SHA3_NATIVE    || ((features) & ARM_CPU_FEATURE_SHA3))
-#define HAVE_DOTPROD(features)	(HAVE_DOTPROD_NATIVE || ((features) & ARM_CPU_FEATURE_DOTPROD))
-
-#if HAVE_DYNAMIC_ARM_CPU_FEATURES
-#define ARM_CPU_FEATURES_KNOWN		0x80000000
+#  define ARM_CPU_FEATURES_KNOWN	(1U << 31)
 extern volatile u32 libdeflate_arm_cpu_features;
 
 void libdeflate_init_arm_cpu_features(void);
@@ -11963,38 +15112,37 @@ static inline u32 get_arm_cpu_features(void)
 		libdeflate_init_arm_cpu_features();
 	return libdeflate_arm_cpu_features;
 }
-#else 
+#else
 static inline u32 get_arm_cpu_features(void) { return 0; }
-#endif 
+#endif
 
 
-#if defined(__ARM_NEON) || defined(ARCH_ARM64)
+#if defined(__ARM_NEON) || (defined(_MSC_VER) && defined(ARCH_ARM64))
+#  define HAVE_NEON(features)	1
 #  define HAVE_NEON_NATIVE	1
 #else
+#  define HAVE_NEON(features)	((features) & ARM_CPU_FEATURE_NEON)
 #  define HAVE_NEON_NATIVE	0
 #endif
 
-#if HAVE_NEON_NATIVE || \
-	(HAVE_DYNAMIC_ARM_CPU_FEATURES && GCC_PREREQ(6, 1) && defined(__ARM_FP))
+#if (defined(__GNUC__) || defined(__clang__) || defined(_MSC_VER)) && \
+	(HAVE_NEON_NATIVE || (GCC_PREREQ(6, 1) && defined(__ARM_FP)))
 #  define HAVE_NEON_INTRIN	1
+#  include <arm_neon.h>
 #else
 #  define HAVE_NEON_INTRIN	0
 #endif
 
 
 #ifdef __ARM_FEATURE_CRYPTO
-#  define HAVE_PMULL_NATIVE	1
+#  define HAVE_PMULL(features)	1
 #else
-#  define HAVE_PMULL_NATIVE	0
+#  define HAVE_PMULL(features)	((features) & ARM_CPU_FEATURE_PMULL)
 #endif
-#if HAVE_PMULL_NATIVE || \
-	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
-	 HAVE_NEON_INTRIN  && \
-	 (GCC_PREREQ(6, 1) || CLANG_PREREQ(3, 5, 6010000) || \
-	  defined(_MSC_VER)) && \
-	   \
-	 !(defined(ARCH_ARM32) && defined(__clang__)))
-#  define HAVE_PMULL_INTRIN	CPU_IS_LITTLE_ENDIAN() 
+#if defined(ARCH_ARM64) && HAVE_NEON_INTRIN && \
+	(GCC_PREREQ(6, 1) || defined(__clang__) || defined(_MSC_VER)) && \
+	CPU_IS_LITTLE_ENDIAN() 
+#  define HAVE_PMULL_INTRIN	1
    
 #  ifdef _MSC_VER
 #    define compat_vmull_p64(a, b)  vmull_p64(vcreate_p64(a), vcreate_p64(b))
@@ -12005,105 +15153,98 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #  define HAVE_PMULL_INTRIN	0
 #endif
 
-#if HAVE_PMULL_NATIVE && defined(ARCH_ARM64) && \
-		GCC_PREREQ(6, 1) && !GCC_PREREQ(13, 1)
-#  define USE_PMULL_TARGET_EVEN_IF_NATIVE	1
-#else
-#  define USE_PMULL_TARGET_EVEN_IF_NATIVE	0
-#endif
-
 
 #ifdef __ARM_FEATURE_CRC32
-#  define HAVE_CRC32_NATIVE	1
+#  define HAVE_CRC32(features)	1
 #else
-#  define HAVE_CRC32_NATIVE	0
+#  define HAVE_CRC32(features)	((features) & ARM_CPU_FEATURE_CRC32)
 #endif
-#undef HAVE_CRC32_INTRIN
-#if HAVE_CRC32_NATIVE
+#if defined(ARCH_ARM64) && \
+	(defined(__GNUC__) || defined(__clang__) || defined(_MSC_VER))
 #  define HAVE_CRC32_INTRIN	1
-#elif HAVE_DYNAMIC_ARM_CPU_FEATURES
-#  if GCC_PREREQ(1, 0)
-    
-#    if (GCC_PREREQ(11, 3) || \
-	 (GCC_PREREQ(10, 4) && !GCC_PREREQ(11, 0)) || \
-	 (GCC_PREREQ(9, 5) && !GCC_PREREQ(10, 0))) && \
-	!defined(__ARM_ARCH_6KZ__) && \
-	!defined(__ARM_ARCH_7EM__)
-#      define HAVE_CRC32_INTRIN	1
-#    endif
-#  elif CLANG_PREREQ(3, 4, 6000000)
-#    define HAVE_CRC32_INTRIN	1
-#  elif defined(_MSC_VER)
-#    define HAVE_CRC32_INTRIN	1
+#  if defined(__GNUC__) || defined(__clang__)
+#    include <arm_acle.h>
 #  endif
-#endif
-#ifndef HAVE_CRC32_INTRIN
+   
+#  if defined(__clang__) && !CLANG_PREREQ(16, 0, 16000000) && \
+	!defined(__ARM_FEATURE_CRC32)
+#    undef __crc32b
+#    define __crc32b(a, b)					\
+	({ uint32_t res;					\
+	   __asm__("crc32b %w0, %w1, %w2"			\
+		   : "=r" (res) : "r" (a), "r" (b));		\
+	   res; })
+#    undef __crc32h
+#    define __crc32h(a, b)					\
+	({ uint32_t res;					\
+	   __asm__("crc32h %w0, %w1, %w2"			\
+		   : "=r" (res) : "r" (a), "r" (b));		\
+	   res; })
+#    undef __crc32w
+#    define __crc32w(a, b)					\
+	({ uint32_t res;					\
+	   __asm__("crc32w %w0, %w1, %w2"			\
+		   : "=r" (res) : "r" (a), "r" (b));		\
+	   res; })
+#    undef __crc32d
+#    define __crc32d(a, b)					\
+	({ uint32_t res;					\
+	   __asm__("crc32x %w0, %w1, %2"			\
+		   : "=r" (res) : "r" (a), "r" (b));		\
+	   res; })
+#    pragma clang diagnostic ignored "-Wgnu-statement-expression"
+#  endif
+#else
 #  define HAVE_CRC32_INTRIN	0
 #endif
 
 
-#if defined(ARCH_ARM64) && !defined(_MSC_VER)
-#  ifdef __ARM_FEATURE_SHA3
-#    define HAVE_SHA3_NATIVE	1
-#  else
-#    define HAVE_SHA3_NATIVE	0
-#  endif
-#  define HAVE_SHA3_TARGET	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
-				 (GCC_PREREQ(8, 1)  || \
-				  CLANG_PREREQ(7, 0, 10010463) ))
-#  define HAVE_SHA3_INTRIN	(HAVE_NEON_INTRIN && \
-				 (HAVE_SHA3_NATIVE || HAVE_SHA3_TARGET) && \
-				 (GCC_PREREQ(9, 1)  || \
-				  CLANG_PREREQ(13, 0, 13160000)))
+#ifdef __ARM_FEATURE_SHA3
+#  define HAVE_SHA3(features)	1
 #else
-#  define HAVE_SHA3_NATIVE	0
-#  define HAVE_SHA3_TARGET	0
+#  define HAVE_SHA3(features)	((features) & ARM_CPU_FEATURE_SHA3)
+#endif
+#if defined(ARCH_ARM64) && HAVE_NEON_INTRIN && \
+	(GCC_PREREQ(9, 1)  || \
+	 CLANG_PREREQ(7, 0, 10010463) )
+#  define HAVE_SHA3_INTRIN	1
+   
+#  if defined(__clang__) && !CLANG_PREREQ(16, 0, 16000000) && \
+	!defined(__ARM_FEATURE_SHA3)
+#    undef veor3q_u8
+#    define veor3q_u8(a, b, c)					\
+	({ uint8x16_t res;					\
+	   __asm__("eor3 %0.16b, %1.16b, %2.16b, %3.16b"	\
+		   : "=w" (res) : "w" (a), "w" (b), "w" (c));	\
+	   res; })
+#    pragma clang diagnostic ignored "-Wgnu-statement-expression"
+#  endif
+#else
 #  define HAVE_SHA3_INTRIN	0
 #endif
 
 
-#ifdef ARCH_ARM64
-#  ifdef __ARM_FEATURE_DOTPROD
-#    define HAVE_DOTPROD_NATIVE	1
-#  else
-#    define HAVE_DOTPROD_NATIVE	0
-#  endif
-#  if HAVE_DOTPROD_NATIVE || \
-	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
-	 (GCC_PREREQ(8, 1) || CLANG_PREREQ(7, 0, 10010000) || \
-	  defined(_MSC_VER)))
-#    define HAVE_DOTPROD_INTRIN	1
-#  else
-#    define HAVE_DOTPROD_INTRIN	0
+#ifdef __ARM_FEATURE_DOTPROD
+#  define HAVE_DOTPROD(features)	1
+#else
+#  define HAVE_DOTPROD(features)	((features) & ARM_CPU_FEATURE_DOTPROD)
+#endif
+#if defined(ARCH_ARM64) && HAVE_NEON_INTRIN && \
+	(GCC_PREREQ(8, 1) || CLANG_PREREQ(7, 0, 10010000) || defined(_MSC_VER))
+#  define HAVE_DOTPROD_INTRIN	1
+   
+#  if defined(__clang__) && !CLANG_PREREQ(16, 0, 16000000) && \
+	!defined(__ARM_FEATURE_DOTPROD)
+#    undef vdotq_u32
+#    define vdotq_u32(a, b, c)					\
+	({ uint32x4_t res = (a);				\
+	   __asm__("udot %0.4s, %1.16b, %2.16b"			\
+		   : "+w" (res) : "w" (b), "w" (c));		\
+	   res; })
+#    pragma clang diagnostic ignored "-Wgnu-statement-expression"
 #  endif
 #else
-#  define HAVE_DOTPROD_NATIVE	0
 #  define HAVE_DOTPROD_INTRIN	0
-#endif
-
-
-#if HAVE_CRC32_INTRIN && !HAVE_CRC32_NATIVE && \
-	(defined(__clang__) || defined(ARCH_ARM32))
-#  define __ARM_FEATURE_CRC32	1
-#endif
-#if HAVE_SHA3_INTRIN && !HAVE_SHA3_NATIVE && defined(__clang__)
-#  define __ARM_FEATURE_SHA3	1
-#endif
-#if HAVE_DOTPROD_INTRIN && !HAVE_DOTPROD_NATIVE && defined(__clang__)
-#  define __ARM_FEATURE_DOTPROD	1
-#endif
-#if HAVE_CRC32_INTRIN && !HAVE_CRC32_NATIVE && \
-	(defined(__clang__) || defined(ARCH_ARM32))
-#  include <arm_acle.h>
-#  undef __ARM_FEATURE_CRC32
-#endif
-#if HAVE_SHA3_INTRIN && !HAVE_SHA3_NATIVE && defined(__clang__)
-#  include <arm_neon.h>
-#  undef __ARM_FEATURE_SHA3
-#endif
-#if HAVE_DOTPROD_INTRIN && !HAVE_DOTPROD_NATIVE && defined(__clang__)
-#  include <arm_neon.h>
-#  undef __ARM_FEATURE_DOTPROD
 #endif
 
 #endif 
@@ -12112,7 +15253,6 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 
 
 #if HAVE_NEON_NATIVE
-#  include <arm_neon.h>
 static forceinline void
 matchfinder_init_neon(mf_pos_t *data, size_t size)
 {
@@ -12159,6 +15299,8 @@ matchfinder_rebase_neon(mf_pos_t *data, size_t size)
 
 #endif 
 
+#  elif defined(ARCH_RISCV)
+#    include "riscv/matchfinder_impl.h"
 #  elif defined(ARCH_X86_32) || defined(ARCH_X86_64)
 /* #    include "x86/matchfinder_impl.h" */
 
@@ -12220,8 +15362,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	19
-#define LIBDEFLATE_VERSION_STRING	"1.19"
+#define LIBDEFLATE_VERSION_MINOR	20
+#define LIBDEFLATE_VERSION_STRING	"1.20"
 
 
 #ifndef LIBDEFLATEAPI
@@ -12439,6 +15581,7 @@ struct libdeflate_options {
 #undef ARCH_X86_32
 #undef ARCH_ARM64
 #undef ARCH_ARM32
+#undef ARCH_RISCV
 #ifdef _MSC_VER
 #  if defined(_M_X64)
 #    define ARCH_X86_64
@@ -12458,6 +15601,8 @@ struct libdeflate_options {
 #    define ARCH_ARM64
 #  elif defined(__arm__)
 #    define ARCH_ARM32
+#  elif defined(__riscv)
+#    define ARCH_RISCV
 #  endif
 #endif
 
@@ -12502,6 +15647,9 @@ typedef size_t machine_word_t;
 #  define GCC_PREREQ(major, minor)		\
 	(__GNUC__ > (major) ||			\
 	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#  if !GCC_PREREQ(4, 9)
+#    error "gcc versions older than 4.9 are no longer supported"
+#  endif
 #else
 #  define GCC_PREREQ(major, minor)	0
 #endif
@@ -12514,14 +15662,27 @@ typedef size_t machine_word_t;
 	(__clang_major__ > (major) ||			\
 	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
 #  endif
+#  if !CLANG_PREREQ(3, 9, 8000000)
+#    error "clang versions older than 3.9 are no longer supported"
+#  endif
 #else
 #  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+#ifdef _MSC_VER
+#  define MSVC_PREREQ(version)	(_MSC_VER >= (version))
+#  if !MSVC_PREREQ(1900)
+#    error "MSVC versions older than Visual Studio 2015 are no longer supported"
+#  endif
+#else
+#  define MSVC_PREREQ(version)	0
 #endif
 
 
 #ifndef __has_attribute
 #  define __has_attribute(attribute)	0
 #endif
+
+
 #ifndef __has_builtin
 #  define __has_builtin(builtin)	0
 #endif
@@ -12545,6 +15706,13 @@ typedef size_t machine_word_t;
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
+#endif
+
+
+#if defined(__GNUC__) || __has_attribute(noreturn)
+#  define NORETURN		__attribute__((noreturn))
+#else
+#  define NORETURN
 #endif
 
 
@@ -12613,12 +15781,10 @@ typedef size_t machine_word_t;
 #endif
 
 
-#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#if defined(__GNUC__) || __has_attribute(target)
 #  define _target_attribute(attrs)	__attribute__((target(attrs)))
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
 #else
 #  define _target_attribute(attrs)
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
 #endif
 
 
@@ -12658,7 +15824,7 @@ static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
 
 static forceinline u16 bswap16(u16 v)
 {
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap16)
 	return __builtin_bswap16(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ushort(v);
@@ -12670,7 +15836,7 @@ static forceinline u16 bswap16(u16 v)
 
 static forceinline u32 bswap32(u32 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap32)
 	return __builtin_bswap32(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ulong(v);
@@ -12685,7 +15851,7 @@ static forceinline u32 bswap32(u32 v)
 
 static forceinline u64 bswap64(u64 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap64)
 	return __builtin_bswap64(v);
 #elif defined(_MSC_VER)
 	return _byteswap_uint64(v);
@@ -12716,6 +15882,7 @@ static forceinline u64 bswap64(u64 v)
 #if (defined(__GNUC__) || defined(__clang__)) && \
 	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	 defined(__riscv_misaligned_fast) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
 #elif defined(_MSC_VER)
@@ -13053,12 +16220,17 @@ int memcmp(const void *s1, const void *s2, size_t n);
 
 #undef LIBDEFLATE_ENABLE_ASSERTIONS
 #else
-#include <string.h>
+#  include <string.h>
+   
+#  ifdef __clang_analyzer__
+#    define LIBDEFLATE_ENABLE_ASSERTIONS
+#  endif
 #endif
 
 
 #ifdef LIBDEFLATE_ENABLE_ASSERTIONS
-void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+NORETURN void
+libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #define ASSERT(expr) { if (unlikely(!(expr))) \
 	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
 #else
@@ -13072,29 +16244,24 @@ void libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #endif 
 
 
-#define HAVE_DYNAMIC_X86_CPU_FEATURES	0
-
 #if defined(ARCH_X86_32) || defined(ARCH_X86_64)
 
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE || defined(_MSC_VER)
-#  undef HAVE_DYNAMIC_X86_CPU_FEATURES
-#  define HAVE_DYNAMIC_X86_CPU_FEATURES	1
-#endif
+#define X86_CPU_FEATURE_SSE2		(1 << 0)
+#define X86_CPU_FEATURE_PCLMULQDQ	(1 << 1)
+#define X86_CPU_FEATURE_AVX		(1 << 2)
+#define X86_CPU_FEATURE_AVX2		(1 << 3)
+#define X86_CPU_FEATURE_BMI2		(1 << 4)
 
-#define X86_CPU_FEATURE_SSE2		0x00000001
-#define X86_CPU_FEATURE_PCLMUL		0x00000002
-#define X86_CPU_FEATURE_AVX		0x00000004
-#define X86_CPU_FEATURE_AVX2		0x00000008
-#define X86_CPU_FEATURE_BMI2		0x00000010
+#define X86_CPU_FEATURE_ZMM		(1 << 5)
+#define X86_CPU_FEATURE_AVX512BW	(1 << 6)
+#define X86_CPU_FEATURE_AVX512VL	(1 << 7)
+#define X86_CPU_FEATURE_VPCLMULQDQ	(1 << 8)
+#define X86_CPU_FEATURE_AVX512VNNI	(1 << 9)
+#define X86_CPU_FEATURE_AVXVNNI		(1 << 10)
 
-#define HAVE_SSE2(features)	(HAVE_SSE2_NATIVE     || ((features) & X86_CPU_FEATURE_SSE2))
-#define HAVE_PCLMUL(features)	(HAVE_PCLMUL_NATIVE   || ((features) & X86_CPU_FEATURE_PCLMUL))
-#define HAVE_AVX(features)	(HAVE_AVX_NATIVE      || ((features) & X86_CPU_FEATURE_AVX))
-#define HAVE_AVX2(features)	(HAVE_AVX2_NATIVE     || ((features) & X86_CPU_FEATURE_AVX2))
-#define HAVE_BMI2(features)	(HAVE_BMI2_NATIVE     || ((features) & X86_CPU_FEATURE_BMI2))
+#if defined(__GNUC__) || defined(__clang__) || defined(_MSC_VER)
 
-#if HAVE_DYNAMIC_X86_CPU_FEATURES
-#define X86_CPU_FEATURES_KNOWN		0x80000000
+#  define X86_CPU_FEATURES_KNOWN	(1U << 31)
 extern volatile u32 libdeflate_x86_cpu_features;
 
 void libdeflate_init_x86_cpu_features(void);
@@ -13105,98 +16272,109 @@ static inline u32 get_x86_cpu_features(void)
 		libdeflate_init_x86_cpu_features();
 	return libdeflate_x86_cpu_features;
 }
-#else 
-static inline u32 get_x86_cpu_features(void) { return 0; }
-#endif 
 
-
-#if HAVE_DYNAMIC_X86_CPU_FEATURES && \
-	(GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000) || defined(_MSC_VER))
-#  define HAVE_TARGET_INTRINSICS	1
+#  include <immintrin.h>
+#  if defined(_MSC_VER) && defined(__clang__)
+#    include <tmmintrin.h>
+#    include <smmintrin.h>
+#    include <wmmintrin.h>
+#    include <avxintrin.h>
+#    include <avx2intrin.h>
+#    include <avx512fintrin.h>
+#    include <avx512bwintrin.h>
+#    include <avx512vlintrin.h>
+#    if __has_include(<avx512vlbwintrin.h>)
+#      include <avx512vlbwintrin.h>
+#    endif
+#    if __has_include(<vpclmulqdqintrin.h>)
+#      include <vpclmulqdqintrin.h>
+#    endif
+#    if __has_include(<avx512vnniintrin.h>)
+#      include <avx512vnniintrin.h>
+#    endif
+#    if __has_include(<avx512vlvnniintrin.h>)
+#      include <avx512vlvnniintrin.h>
+#    endif
+#    if __has_include(<avxvnniintrin.h>)
+#      include <avxvnniintrin.h>
+#    endif
+#  endif
 #else
-#  define HAVE_TARGET_INTRINSICS	0
+static inline u32 get_x86_cpu_features(void) { return 0; }
 #endif
-
 
 #if defined(__SSE2__) || \
 	(defined(_MSC_VER) && \
 	 (defined(ARCH_X86_64) || (defined(_M_IX86_FP) && _M_IX86_FP >= 2)))
-#  define HAVE_SSE2_NATIVE	1
+#  define HAVE_SSE2(features)		1
+#  define HAVE_SSE2_NATIVE		1
 #else
-#  define HAVE_SSE2_NATIVE	0
+#  define HAVE_SSE2(features)		((features) & X86_CPU_FEATURE_SSE2)
+#  define HAVE_SSE2_NATIVE		0
 #endif
-#define HAVE_SSE2_INTRIN	(HAVE_SSE2_NATIVE || HAVE_TARGET_INTRINSICS)
-
 
 #if defined(__PCLMUL__) || (defined(_MSC_VER) && defined(__AVX2__))
-#  define HAVE_PCLMUL_NATIVE	1
+#  define HAVE_PCLMULQDQ(features)	1
 #else
-#  define HAVE_PCLMUL_NATIVE	0
+#  define HAVE_PCLMULQDQ(features)	((features) & X86_CPU_FEATURE_PCLMULQDQ)
 #endif
-#if HAVE_PCLMUL_NATIVE || (HAVE_TARGET_INTRINSICS && \
-			   (GCC_PREREQ(4, 4) || CLANG_PREREQ(3, 2, 0) || \
-			    defined(_MSC_VER)))
-#  define HAVE_PCLMUL_INTRIN	1
-#else
-#  define HAVE_PCLMUL_INTRIN	0
-#endif
-
 
 #ifdef __AVX__
-#  define HAVE_AVX_NATIVE	1
+#  define HAVE_AVX(features)		1
 #else
-#  define HAVE_AVX_NATIVE	0
+#  define HAVE_AVX(features)		((features) & X86_CPU_FEATURE_AVX)
 #endif
-#if HAVE_AVX_NATIVE || (HAVE_TARGET_INTRINSICS && \
-			(GCC_PREREQ(4, 6) || CLANG_PREREQ(3, 0, 0) || \
-			 defined(_MSC_VER)))
-#  define HAVE_AVX_INTRIN	1
+
+#ifdef __AVX2__
+#  define HAVE_AVX2(features)		1
 #else
-#  define HAVE_AVX_INTRIN	0
+#  define HAVE_AVX2(features)		((features) & X86_CPU_FEATURE_AVX2)
 #endif
+
+#if defined(__BMI2__) || (defined(_MSC_VER) && defined(__AVX2__))
+#  define HAVE_BMI2(features)		1
+#  define HAVE_BMI2_NATIVE		1
+#else
+#  define HAVE_BMI2(features)		((features) & X86_CPU_FEATURE_BMI2)
+#  define HAVE_BMI2_NATIVE		0
+#endif
+
+#ifdef __AVX512BW__
+#  define HAVE_AVX512BW(features)	1
+#else
+#  define HAVE_AVX512BW(features)	((features) & X86_CPU_FEATURE_AVX512BW)
+#endif
+
+#ifdef __AVX512VL__
+#  define HAVE_AVX512VL(features)	1
+#else
+#  define HAVE_AVX512VL(features)	((features) & X86_CPU_FEATURE_AVX512VL)
+#endif
+
+#ifdef __VPCLMULQDQ__
+#  define HAVE_VPCLMULQDQ(features)	1
+#else
+#  define HAVE_VPCLMULQDQ(features)	((features) & X86_CPU_FEATURE_VPCLMULQDQ)
+#endif
+
+#ifdef __AVX512VNNI__
+#  define HAVE_AVX512VNNI(features)	1
+#else
+#  define HAVE_AVX512VNNI(features)	((features) & X86_CPU_FEATURE_AVX512VNNI)
+#endif
+
+#ifdef __AVXVNNI__
+#  define HAVE_AVXVNNI(features)	1
+#else
+#  define HAVE_AVXVNNI(features)	((features) & X86_CPU_FEATURE_AVXVNNI)
+#endif
+
+#endif 
+
+#endif 
 
 
 #ifdef __AVX2__
-#  define HAVE_AVX2_NATIVE	1
-#else
-#  define HAVE_AVX2_NATIVE	0
-#endif
-#if HAVE_AVX2_NATIVE || (HAVE_TARGET_INTRINSICS && \
-			 (GCC_PREREQ(4, 7) || CLANG_PREREQ(3, 1, 0) || \
-			  defined(_MSC_VER)))
-#  define HAVE_AVX2_INTRIN	1
-#else
-#  define HAVE_AVX2_INTRIN	0
-#endif
-
-
-#if defined(__BMI2__) || (defined(_MSC_VER) && defined(__AVX2__))
-#  define HAVE_BMI2_NATIVE	1
-#else
-#  define HAVE_BMI2_NATIVE	0
-#endif
-#if HAVE_BMI2_NATIVE || (HAVE_TARGET_INTRINSICS && \
-			 (GCC_PREREQ(4, 7) || CLANG_PREREQ(3, 1, 0) || \
-			  defined(_MSC_VER)))
-#  define HAVE_BMI2_INTRIN	1
-#else
-#  define HAVE_BMI2_INTRIN	0
-#endif
-
-#if defined(_MSC_VER) && _MSC_VER < 1930 
-#  undef HAVE_BMI2_NATIVE
-#  undef HAVE_BMI2_INTRIN
-#  define HAVE_BMI2_NATIVE	0
-#  define HAVE_BMI2_INTRIN	0
-#endif
-
-#endif 
-
-#endif 
-
-
-#if HAVE_AVX2_NATIVE
-#  include <immintrin.h>
 static forceinline void
 matchfinder_init_avx2(mf_pos_t *data, size_t size)
 {
@@ -13241,7 +16419,6 @@ matchfinder_rebase_avx2(mf_pos_t *data, size_t size)
 #define matchfinder_rebase matchfinder_rebase_avx2
 
 #elif HAVE_SSE2_NATIVE
-#  include <emmintrin.h>
 static forceinline void
 matchfinder_init_sse2(mf_pos_t *data, size_t size)
 {
@@ -13680,8 +16857,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	19
-#define LIBDEFLATE_VERSION_STRING	"1.19"
+#define LIBDEFLATE_VERSION_MINOR	20
+#define LIBDEFLATE_VERSION_STRING	"1.20"
 
 
 #ifndef LIBDEFLATEAPI
@@ -13899,6 +17076,7 @@ struct libdeflate_options {
 #undef ARCH_X86_32
 #undef ARCH_ARM64
 #undef ARCH_ARM32
+#undef ARCH_RISCV
 #ifdef _MSC_VER
 #  if defined(_M_X64)
 #    define ARCH_X86_64
@@ -13918,6 +17096,8 @@ struct libdeflate_options {
 #    define ARCH_ARM64
 #  elif defined(__arm__)
 #    define ARCH_ARM32
+#  elif defined(__riscv)
+#    define ARCH_RISCV
 #  endif
 #endif
 
@@ -13962,6 +17142,9 @@ typedef size_t machine_word_t;
 #  define GCC_PREREQ(major, minor)		\
 	(__GNUC__ > (major) ||			\
 	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#  if !GCC_PREREQ(4, 9)
+#    error "gcc versions older than 4.9 are no longer supported"
+#  endif
 #else
 #  define GCC_PREREQ(major, minor)	0
 #endif
@@ -13974,14 +17157,27 @@ typedef size_t machine_word_t;
 	(__clang_major__ > (major) ||			\
 	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
 #  endif
+#  if !CLANG_PREREQ(3, 9, 8000000)
+#    error "clang versions older than 3.9 are no longer supported"
+#  endif
 #else
 #  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+#ifdef _MSC_VER
+#  define MSVC_PREREQ(version)	(_MSC_VER >= (version))
+#  if !MSVC_PREREQ(1900)
+#    error "MSVC versions older than Visual Studio 2015 are no longer supported"
+#  endif
+#else
+#  define MSVC_PREREQ(version)	0
 #endif
 
 
 #ifndef __has_attribute
 #  define __has_attribute(attribute)	0
 #endif
+
+
 #ifndef __has_builtin
 #  define __has_builtin(builtin)	0
 #endif
@@ -14005,6 +17201,13 @@ typedef size_t machine_word_t;
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
+#endif
+
+
+#if defined(__GNUC__) || __has_attribute(noreturn)
+#  define NORETURN		__attribute__((noreturn))
+#else
+#  define NORETURN
 #endif
 
 
@@ -14073,12 +17276,10 @@ typedef size_t machine_word_t;
 #endif
 
 
-#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#if defined(__GNUC__) || __has_attribute(target)
 #  define _target_attribute(attrs)	__attribute__((target(attrs)))
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
 #else
 #  define _target_attribute(attrs)
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
 #endif
 
 
@@ -14118,7 +17319,7 @@ static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
 
 static forceinline u16 bswap16(u16 v)
 {
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap16)
 	return __builtin_bswap16(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ushort(v);
@@ -14130,7 +17331,7 @@ static forceinline u16 bswap16(u16 v)
 
 static forceinline u32 bswap32(u32 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap32)
 	return __builtin_bswap32(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ulong(v);
@@ -14145,7 +17346,7 @@ static forceinline u32 bswap32(u32 v)
 
 static forceinline u64 bswap64(u64 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap64)
 	return __builtin_bswap64(v);
 #elif defined(_MSC_VER)
 	return _byteswap_uint64(v);
@@ -14176,6 +17377,7 @@ static forceinline u64 bswap64(u64 v)
 #if (defined(__GNUC__) || defined(__clang__)) && \
 	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	 defined(__riscv_misaligned_fast) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
 #elif defined(_MSC_VER)
@@ -14513,12 +17715,17 @@ int memcmp(const void *s1, const void *s2, size_t n);
 
 #undef LIBDEFLATE_ENABLE_ASSERTIONS
 #else
-#include <string.h>
+#  include <string.h>
+   
+#  ifdef __clang_analyzer__
+#    define LIBDEFLATE_ENABLE_ASSERTIONS
+#  endif
 #endif
 
 
 #ifdef LIBDEFLATE_ENABLE_ASSERTIONS
-void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+NORETURN void
+libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #define ASSERT(expr) { if (unlikely(!(expr))) \
 	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
 #else
@@ -14568,7 +17775,9 @@ typedef s16 mf_pos_t;
 
 
 #define MATCHFINDER_MEM_ALIGNMENT	32
-#define MATCHFINDER_SIZE_ALIGNMENT	128
+
+
+#define MATCHFINDER_SIZE_ALIGNMENT	1024
 
 #undef matchfinder_init
 #undef matchfinder_rebase
@@ -14635,8 +17844,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	19
-#define LIBDEFLATE_VERSION_STRING	"1.19"
+#define LIBDEFLATE_VERSION_MINOR	20
+#define LIBDEFLATE_VERSION_STRING	"1.20"
 
 
 #ifndef LIBDEFLATEAPI
@@ -14854,6 +18063,7 @@ struct libdeflate_options {
 #undef ARCH_X86_32
 #undef ARCH_ARM64
 #undef ARCH_ARM32
+#undef ARCH_RISCV
 #ifdef _MSC_VER
 #  if defined(_M_X64)
 #    define ARCH_X86_64
@@ -14873,6 +18083,8 @@ struct libdeflate_options {
 #    define ARCH_ARM64
 #  elif defined(__arm__)
 #    define ARCH_ARM32
+#  elif defined(__riscv)
+#    define ARCH_RISCV
 #  endif
 #endif
 
@@ -14917,6 +18129,9 @@ typedef size_t machine_word_t;
 #  define GCC_PREREQ(major, minor)		\
 	(__GNUC__ > (major) ||			\
 	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#  if !GCC_PREREQ(4, 9)
+#    error "gcc versions older than 4.9 are no longer supported"
+#  endif
 #else
 #  define GCC_PREREQ(major, minor)	0
 #endif
@@ -14929,14 +18144,27 @@ typedef size_t machine_word_t;
 	(__clang_major__ > (major) ||			\
 	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
 #  endif
+#  if !CLANG_PREREQ(3, 9, 8000000)
+#    error "clang versions older than 3.9 are no longer supported"
+#  endif
 #else
 #  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+#ifdef _MSC_VER
+#  define MSVC_PREREQ(version)	(_MSC_VER >= (version))
+#  if !MSVC_PREREQ(1900)
+#    error "MSVC versions older than Visual Studio 2015 are no longer supported"
+#  endif
+#else
+#  define MSVC_PREREQ(version)	0
 #endif
 
 
 #ifndef __has_attribute
 #  define __has_attribute(attribute)	0
 #endif
+
+
 #ifndef __has_builtin
 #  define __has_builtin(builtin)	0
 #endif
@@ -14960,6 +18188,13 @@ typedef size_t machine_word_t;
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
+#endif
+
+
+#if defined(__GNUC__) || __has_attribute(noreturn)
+#  define NORETURN		__attribute__((noreturn))
+#else
+#  define NORETURN
 #endif
 
 
@@ -15028,12 +18263,10 @@ typedef size_t machine_word_t;
 #endif
 
 
-#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#if defined(__GNUC__) || __has_attribute(target)
 #  define _target_attribute(attrs)	__attribute__((target(attrs)))
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
 #else
 #  define _target_attribute(attrs)
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
 #endif
 
 
@@ -15073,7 +18306,7 @@ static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
 
 static forceinline u16 bswap16(u16 v)
 {
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap16)
 	return __builtin_bswap16(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ushort(v);
@@ -15085,7 +18318,7 @@ static forceinline u16 bswap16(u16 v)
 
 static forceinline u32 bswap32(u32 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap32)
 	return __builtin_bswap32(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ulong(v);
@@ -15100,7 +18333,7 @@ static forceinline u32 bswap32(u32 v)
 
 static forceinline u64 bswap64(u64 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap64)
 	return __builtin_bswap64(v);
 #elif defined(_MSC_VER)
 	return _byteswap_uint64(v);
@@ -15131,6 +18364,7 @@ static forceinline u64 bswap64(u64 v)
 #if (defined(__GNUC__) || defined(__clang__)) && \
 	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	 defined(__riscv_misaligned_fast) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
 #elif defined(_MSC_VER)
@@ -15468,12 +18702,17 @@ int memcmp(const void *s1, const void *s2, size_t n);
 
 #undef LIBDEFLATE_ENABLE_ASSERTIONS
 #else
-#include <string.h>
+#  include <string.h>
+   
+#  ifdef __clang_analyzer__
+#    define LIBDEFLATE_ENABLE_ASSERTIONS
+#  endif
 #endif
 
 
 #ifdef LIBDEFLATE_ENABLE_ASSERTIONS
-void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+NORETURN void
+libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #define ASSERT(expr) { if (unlikely(!(expr))) \
 	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
 #else
@@ -15487,33 +18726,23 @@ void libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #endif 
 
 
-#define HAVE_DYNAMIC_ARM_CPU_FEATURES	0
-
 #if defined(ARCH_ARM32) || defined(ARCH_ARM64)
 
+#define ARM_CPU_FEATURE_NEON		(1 << 0)
+#define ARM_CPU_FEATURE_PMULL		(1 << 1)
+
+#define ARM_CPU_FEATURE_PREFER_PMULL	(1 << 2)
+#define ARM_CPU_FEATURE_CRC32		(1 << 3)
+#define ARM_CPU_FEATURE_SHA3		(1 << 4)
+#define ARM_CPU_FEATURE_DOTPROD		(1 << 5)
+
 #if !defined(FREESTANDING) && \
-    (COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE || defined(_MSC_VER)) && \
+    (defined(__GNUC__) || defined(__clang__) || defined(_MSC_VER)) && \
     (defined(__linux__) || \
      (defined(__APPLE__) && defined(ARCH_ARM64)) || \
      (defined(_WIN32) && defined(ARCH_ARM64)))
-#  undef HAVE_DYNAMIC_ARM_CPU_FEATURES
-#  define HAVE_DYNAMIC_ARM_CPU_FEATURES	1
-#endif
 
-#define ARM_CPU_FEATURE_NEON		0x00000001
-#define ARM_CPU_FEATURE_PMULL		0x00000002
-#define ARM_CPU_FEATURE_CRC32		0x00000004
-#define ARM_CPU_FEATURE_SHA3		0x00000008
-#define ARM_CPU_FEATURE_DOTPROD		0x00000010
-
-#define HAVE_NEON(features)	(HAVE_NEON_NATIVE    || ((features) & ARM_CPU_FEATURE_NEON))
-#define HAVE_PMULL(features)	(HAVE_PMULL_NATIVE   || ((features) & ARM_CPU_FEATURE_PMULL))
-#define HAVE_CRC32(features)	(HAVE_CRC32_NATIVE   || ((features) & ARM_CPU_FEATURE_CRC32))
-#define HAVE_SHA3(features)	(HAVE_SHA3_NATIVE    || ((features) & ARM_CPU_FEATURE_SHA3))
-#define HAVE_DOTPROD(features)	(HAVE_DOTPROD_NATIVE || ((features) & ARM_CPU_FEATURE_DOTPROD))
-
-#if HAVE_DYNAMIC_ARM_CPU_FEATURES
-#define ARM_CPU_FEATURES_KNOWN		0x80000000
+#  define ARM_CPU_FEATURES_KNOWN	(1U << 31)
 extern volatile u32 libdeflate_arm_cpu_features;
 
 void libdeflate_init_arm_cpu_features(void);
@@ -15524,38 +18753,37 @@ static inline u32 get_arm_cpu_features(void)
 		libdeflate_init_arm_cpu_features();
 	return libdeflate_arm_cpu_features;
 }
-#else 
+#else
 static inline u32 get_arm_cpu_features(void) { return 0; }
-#endif 
+#endif
 
 
-#if defined(__ARM_NEON) || defined(ARCH_ARM64)
+#if defined(__ARM_NEON) || (defined(_MSC_VER) && defined(ARCH_ARM64))
+#  define HAVE_NEON(features)	1
 #  define HAVE_NEON_NATIVE	1
 #else
+#  define HAVE_NEON(features)	((features) & ARM_CPU_FEATURE_NEON)
 #  define HAVE_NEON_NATIVE	0
 #endif
 
-#if HAVE_NEON_NATIVE || \
-	(HAVE_DYNAMIC_ARM_CPU_FEATURES && GCC_PREREQ(6, 1) && defined(__ARM_FP))
+#if (defined(__GNUC__) || defined(__clang__) || defined(_MSC_VER)) && \
+	(HAVE_NEON_NATIVE || (GCC_PREREQ(6, 1) && defined(__ARM_FP)))
 #  define HAVE_NEON_INTRIN	1
+#  include <arm_neon.h>
 #else
 #  define HAVE_NEON_INTRIN	0
 #endif
 
 
 #ifdef __ARM_FEATURE_CRYPTO
-#  define HAVE_PMULL_NATIVE	1
+#  define HAVE_PMULL(features)	1
 #else
-#  define HAVE_PMULL_NATIVE	0
+#  define HAVE_PMULL(features)	((features) & ARM_CPU_FEATURE_PMULL)
 #endif
-#if HAVE_PMULL_NATIVE || \
-	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
-	 HAVE_NEON_INTRIN  && \
-	 (GCC_PREREQ(6, 1) || CLANG_PREREQ(3, 5, 6010000) || \
-	  defined(_MSC_VER)) && \
-	   \
-	 !(defined(ARCH_ARM32) && defined(__clang__)))
-#  define HAVE_PMULL_INTRIN	CPU_IS_LITTLE_ENDIAN() 
+#if defined(ARCH_ARM64) && HAVE_NEON_INTRIN && \
+	(GCC_PREREQ(6, 1) || defined(__clang__) || defined(_MSC_VER)) && \
+	CPU_IS_LITTLE_ENDIAN() 
+#  define HAVE_PMULL_INTRIN	1
    
 #  ifdef _MSC_VER
 #    define compat_vmull_p64(a, b)  vmull_p64(vcreate_p64(a), vcreate_p64(b))
@@ -15566,105 +18794,98 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #  define HAVE_PMULL_INTRIN	0
 #endif
 
-#if HAVE_PMULL_NATIVE && defined(ARCH_ARM64) && \
-		GCC_PREREQ(6, 1) && !GCC_PREREQ(13, 1)
-#  define USE_PMULL_TARGET_EVEN_IF_NATIVE	1
-#else
-#  define USE_PMULL_TARGET_EVEN_IF_NATIVE	0
-#endif
-
 
 #ifdef __ARM_FEATURE_CRC32
-#  define HAVE_CRC32_NATIVE	1
+#  define HAVE_CRC32(features)	1
 #else
-#  define HAVE_CRC32_NATIVE	0
+#  define HAVE_CRC32(features)	((features) & ARM_CPU_FEATURE_CRC32)
 #endif
-#undef HAVE_CRC32_INTRIN
-#if HAVE_CRC32_NATIVE
+#if defined(ARCH_ARM64) && \
+	(defined(__GNUC__) || defined(__clang__) || defined(_MSC_VER))
 #  define HAVE_CRC32_INTRIN	1
-#elif HAVE_DYNAMIC_ARM_CPU_FEATURES
-#  if GCC_PREREQ(1, 0)
-    
-#    if (GCC_PREREQ(11, 3) || \
-	 (GCC_PREREQ(10, 4) && !GCC_PREREQ(11, 0)) || \
-	 (GCC_PREREQ(9, 5) && !GCC_PREREQ(10, 0))) && \
-	!defined(__ARM_ARCH_6KZ__) && \
-	!defined(__ARM_ARCH_7EM__)
-#      define HAVE_CRC32_INTRIN	1
-#    endif
-#  elif CLANG_PREREQ(3, 4, 6000000)
-#    define HAVE_CRC32_INTRIN	1
-#  elif defined(_MSC_VER)
-#    define HAVE_CRC32_INTRIN	1
+#  if defined(__GNUC__) || defined(__clang__)
+#    include <arm_acle.h>
 #  endif
-#endif
-#ifndef HAVE_CRC32_INTRIN
+   
+#  if defined(__clang__) && !CLANG_PREREQ(16, 0, 16000000) && \
+	!defined(__ARM_FEATURE_CRC32)
+#    undef __crc32b
+#    define __crc32b(a, b)					\
+	({ uint32_t res;					\
+	   __asm__("crc32b %w0, %w1, %w2"			\
+		   : "=r" (res) : "r" (a), "r" (b));		\
+	   res; })
+#    undef __crc32h
+#    define __crc32h(a, b)					\
+	({ uint32_t res;					\
+	   __asm__("crc32h %w0, %w1, %w2"			\
+		   : "=r" (res) : "r" (a), "r" (b));		\
+	   res; })
+#    undef __crc32w
+#    define __crc32w(a, b)					\
+	({ uint32_t res;					\
+	   __asm__("crc32w %w0, %w1, %w2"			\
+		   : "=r" (res) : "r" (a), "r" (b));		\
+	   res; })
+#    undef __crc32d
+#    define __crc32d(a, b)					\
+	({ uint32_t res;					\
+	   __asm__("crc32x %w0, %w1, %2"			\
+		   : "=r" (res) : "r" (a), "r" (b));		\
+	   res; })
+#    pragma clang diagnostic ignored "-Wgnu-statement-expression"
+#  endif
+#else
 #  define HAVE_CRC32_INTRIN	0
 #endif
 
 
-#if defined(ARCH_ARM64) && !defined(_MSC_VER)
-#  ifdef __ARM_FEATURE_SHA3
-#    define HAVE_SHA3_NATIVE	1
-#  else
-#    define HAVE_SHA3_NATIVE	0
-#  endif
-#  define HAVE_SHA3_TARGET	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
-				 (GCC_PREREQ(8, 1)  || \
-				  CLANG_PREREQ(7, 0, 10010463) ))
-#  define HAVE_SHA3_INTRIN	(HAVE_NEON_INTRIN && \
-				 (HAVE_SHA3_NATIVE || HAVE_SHA3_TARGET) && \
-				 (GCC_PREREQ(9, 1)  || \
-				  CLANG_PREREQ(13, 0, 13160000)))
+#ifdef __ARM_FEATURE_SHA3
+#  define HAVE_SHA3(features)	1
 #else
-#  define HAVE_SHA3_NATIVE	0
-#  define HAVE_SHA3_TARGET	0
+#  define HAVE_SHA3(features)	((features) & ARM_CPU_FEATURE_SHA3)
+#endif
+#if defined(ARCH_ARM64) && HAVE_NEON_INTRIN && \
+	(GCC_PREREQ(9, 1)  || \
+	 CLANG_PREREQ(7, 0, 10010463) )
+#  define HAVE_SHA3_INTRIN	1
+   
+#  if defined(__clang__) && !CLANG_PREREQ(16, 0, 16000000) && \
+	!defined(__ARM_FEATURE_SHA3)
+#    undef veor3q_u8
+#    define veor3q_u8(a, b, c)					\
+	({ uint8x16_t res;					\
+	   __asm__("eor3 %0.16b, %1.16b, %2.16b, %3.16b"	\
+		   : "=w" (res) : "w" (a), "w" (b), "w" (c));	\
+	   res; })
+#    pragma clang diagnostic ignored "-Wgnu-statement-expression"
+#  endif
+#else
 #  define HAVE_SHA3_INTRIN	0
 #endif
 
 
-#ifdef ARCH_ARM64
-#  ifdef __ARM_FEATURE_DOTPROD
-#    define HAVE_DOTPROD_NATIVE	1
-#  else
-#    define HAVE_DOTPROD_NATIVE	0
-#  endif
-#  if HAVE_DOTPROD_NATIVE || \
-	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
-	 (GCC_PREREQ(8, 1) || CLANG_PREREQ(7, 0, 10010000) || \
-	  defined(_MSC_VER)))
-#    define HAVE_DOTPROD_INTRIN	1
-#  else
-#    define HAVE_DOTPROD_INTRIN	0
+#ifdef __ARM_FEATURE_DOTPROD
+#  define HAVE_DOTPROD(features)	1
+#else
+#  define HAVE_DOTPROD(features)	((features) & ARM_CPU_FEATURE_DOTPROD)
+#endif
+#if defined(ARCH_ARM64) && HAVE_NEON_INTRIN && \
+	(GCC_PREREQ(8, 1) || CLANG_PREREQ(7, 0, 10010000) || defined(_MSC_VER))
+#  define HAVE_DOTPROD_INTRIN	1
+   
+#  if defined(__clang__) && !CLANG_PREREQ(16, 0, 16000000) && \
+	!defined(__ARM_FEATURE_DOTPROD)
+#    undef vdotq_u32
+#    define vdotq_u32(a, b, c)					\
+	({ uint32x4_t res = (a);				\
+	   __asm__("udot %0.4s, %1.16b, %2.16b"			\
+		   : "+w" (res) : "w" (b), "w" (c));		\
+	   res; })
+#    pragma clang diagnostic ignored "-Wgnu-statement-expression"
 #  endif
 #else
-#  define HAVE_DOTPROD_NATIVE	0
 #  define HAVE_DOTPROD_INTRIN	0
-#endif
-
-
-#if HAVE_CRC32_INTRIN && !HAVE_CRC32_NATIVE && \
-	(defined(__clang__) || defined(ARCH_ARM32))
-#  define __ARM_FEATURE_CRC32	1
-#endif
-#if HAVE_SHA3_INTRIN && !HAVE_SHA3_NATIVE && defined(__clang__)
-#  define __ARM_FEATURE_SHA3	1
-#endif
-#if HAVE_DOTPROD_INTRIN && !HAVE_DOTPROD_NATIVE && defined(__clang__)
-#  define __ARM_FEATURE_DOTPROD	1
-#endif
-#if HAVE_CRC32_INTRIN && !HAVE_CRC32_NATIVE && \
-	(defined(__clang__) || defined(ARCH_ARM32))
-#  include <arm_acle.h>
-#  undef __ARM_FEATURE_CRC32
-#endif
-#if HAVE_SHA3_INTRIN && !HAVE_SHA3_NATIVE && defined(__clang__)
-#  include <arm_neon.h>
-#  undef __ARM_FEATURE_SHA3
-#endif
-#if HAVE_DOTPROD_INTRIN && !HAVE_DOTPROD_NATIVE && defined(__clang__)
-#  include <arm_neon.h>
-#  undef __ARM_FEATURE_DOTPROD
 #endif
 
 #endif 
@@ -15673,7 +18894,6 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 
 
 #if HAVE_NEON_NATIVE
-#  include <arm_neon.h>
 static forceinline void
 matchfinder_init_neon(mf_pos_t *data, size_t size)
 {
@@ -15720,6 +18940,8 @@ matchfinder_rebase_neon(mf_pos_t *data, size_t size)
 
 #endif 
 
+#  elif defined(ARCH_RISCV)
+#    include "riscv/matchfinder_impl.h"
 #  elif defined(ARCH_X86_32) || defined(ARCH_X86_64)
 /* #    include "x86/matchfinder_impl.h" */
 
@@ -15781,8 +19003,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	19
-#define LIBDEFLATE_VERSION_STRING	"1.19"
+#define LIBDEFLATE_VERSION_MINOR	20
+#define LIBDEFLATE_VERSION_STRING	"1.20"
 
 
 #ifndef LIBDEFLATEAPI
@@ -16000,6 +19222,7 @@ struct libdeflate_options {
 #undef ARCH_X86_32
 #undef ARCH_ARM64
 #undef ARCH_ARM32
+#undef ARCH_RISCV
 #ifdef _MSC_VER
 #  if defined(_M_X64)
 #    define ARCH_X86_64
@@ -16019,6 +19242,8 @@ struct libdeflate_options {
 #    define ARCH_ARM64
 #  elif defined(__arm__)
 #    define ARCH_ARM32
+#  elif defined(__riscv)
+#    define ARCH_RISCV
 #  endif
 #endif
 
@@ -16063,6 +19288,9 @@ typedef size_t machine_word_t;
 #  define GCC_PREREQ(major, minor)		\
 	(__GNUC__ > (major) ||			\
 	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#  if !GCC_PREREQ(4, 9)
+#    error "gcc versions older than 4.9 are no longer supported"
+#  endif
 #else
 #  define GCC_PREREQ(major, minor)	0
 #endif
@@ -16075,14 +19303,27 @@ typedef size_t machine_word_t;
 	(__clang_major__ > (major) ||			\
 	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
 #  endif
+#  if !CLANG_PREREQ(3, 9, 8000000)
+#    error "clang versions older than 3.9 are no longer supported"
+#  endif
 #else
 #  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+#ifdef _MSC_VER
+#  define MSVC_PREREQ(version)	(_MSC_VER >= (version))
+#  if !MSVC_PREREQ(1900)
+#    error "MSVC versions older than Visual Studio 2015 are no longer supported"
+#  endif
+#else
+#  define MSVC_PREREQ(version)	0
 #endif
 
 
 #ifndef __has_attribute
 #  define __has_attribute(attribute)	0
 #endif
+
+
 #ifndef __has_builtin
 #  define __has_builtin(builtin)	0
 #endif
@@ -16106,6 +19347,13 @@ typedef size_t machine_word_t;
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
+#endif
+
+
+#if defined(__GNUC__) || __has_attribute(noreturn)
+#  define NORETURN		__attribute__((noreturn))
+#else
+#  define NORETURN
 #endif
 
 
@@ -16174,12 +19422,10 @@ typedef size_t machine_word_t;
 #endif
 
 
-#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#if defined(__GNUC__) || __has_attribute(target)
 #  define _target_attribute(attrs)	__attribute__((target(attrs)))
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
 #else
 #  define _target_attribute(attrs)
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
 #endif
 
 
@@ -16219,7 +19465,7 @@ static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
 
 static forceinline u16 bswap16(u16 v)
 {
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap16)
 	return __builtin_bswap16(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ushort(v);
@@ -16231,7 +19477,7 @@ static forceinline u16 bswap16(u16 v)
 
 static forceinline u32 bswap32(u32 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap32)
 	return __builtin_bswap32(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ulong(v);
@@ -16246,7 +19492,7 @@ static forceinline u32 bswap32(u32 v)
 
 static forceinline u64 bswap64(u64 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap64)
 	return __builtin_bswap64(v);
 #elif defined(_MSC_VER)
 	return _byteswap_uint64(v);
@@ -16277,6 +19523,7 @@ static forceinline u64 bswap64(u64 v)
 #if (defined(__GNUC__) || defined(__clang__)) && \
 	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	 defined(__riscv_misaligned_fast) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
 #elif defined(_MSC_VER)
@@ -16614,12 +19861,17 @@ int memcmp(const void *s1, const void *s2, size_t n);
 
 #undef LIBDEFLATE_ENABLE_ASSERTIONS
 #else
-#include <string.h>
+#  include <string.h>
+   
+#  ifdef __clang_analyzer__
+#    define LIBDEFLATE_ENABLE_ASSERTIONS
+#  endif
 #endif
 
 
 #ifdef LIBDEFLATE_ENABLE_ASSERTIONS
-void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+NORETURN void
+libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #define ASSERT(expr) { if (unlikely(!(expr))) \
 	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
 #else
@@ -16633,29 +19885,24 @@ void libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #endif 
 
 
-#define HAVE_DYNAMIC_X86_CPU_FEATURES	0
-
 #if defined(ARCH_X86_32) || defined(ARCH_X86_64)
 
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE || defined(_MSC_VER)
-#  undef HAVE_DYNAMIC_X86_CPU_FEATURES
-#  define HAVE_DYNAMIC_X86_CPU_FEATURES	1
-#endif
+#define X86_CPU_FEATURE_SSE2		(1 << 0)
+#define X86_CPU_FEATURE_PCLMULQDQ	(1 << 1)
+#define X86_CPU_FEATURE_AVX		(1 << 2)
+#define X86_CPU_FEATURE_AVX2		(1 << 3)
+#define X86_CPU_FEATURE_BMI2		(1 << 4)
 
-#define X86_CPU_FEATURE_SSE2		0x00000001
-#define X86_CPU_FEATURE_PCLMUL		0x00000002
-#define X86_CPU_FEATURE_AVX		0x00000004
-#define X86_CPU_FEATURE_AVX2		0x00000008
-#define X86_CPU_FEATURE_BMI2		0x00000010
+#define X86_CPU_FEATURE_ZMM		(1 << 5)
+#define X86_CPU_FEATURE_AVX512BW	(1 << 6)
+#define X86_CPU_FEATURE_AVX512VL	(1 << 7)
+#define X86_CPU_FEATURE_VPCLMULQDQ	(1 << 8)
+#define X86_CPU_FEATURE_AVX512VNNI	(1 << 9)
+#define X86_CPU_FEATURE_AVXVNNI		(1 << 10)
 
-#define HAVE_SSE2(features)	(HAVE_SSE2_NATIVE     || ((features) & X86_CPU_FEATURE_SSE2))
-#define HAVE_PCLMUL(features)	(HAVE_PCLMUL_NATIVE   || ((features) & X86_CPU_FEATURE_PCLMUL))
-#define HAVE_AVX(features)	(HAVE_AVX_NATIVE      || ((features) & X86_CPU_FEATURE_AVX))
-#define HAVE_AVX2(features)	(HAVE_AVX2_NATIVE     || ((features) & X86_CPU_FEATURE_AVX2))
-#define HAVE_BMI2(features)	(HAVE_BMI2_NATIVE     || ((features) & X86_CPU_FEATURE_BMI2))
+#if defined(__GNUC__) || defined(__clang__) || defined(_MSC_VER)
 
-#if HAVE_DYNAMIC_X86_CPU_FEATURES
-#define X86_CPU_FEATURES_KNOWN		0x80000000
+#  define X86_CPU_FEATURES_KNOWN	(1U << 31)
 extern volatile u32 libdeflate_x86_cpu_features;
 
 void libdeflate_init_x86_cpu_features(void);
@@ -16666,98 +19913,109 @@ static inline u32 get_x86_cpu_features(void)
 		libdeflate_init_x86_cpu_features();
 	return libdeflate_x86_cpu_features;
 }
-#else 
-static inline u32 get_x86_cpu_features(void) { return 0; }
-#endif 
 
-
-#if HAVE_DYNAMIC_X86_CPU_FEATURES && \
-	(GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000) || defined(_MSC_VER))
-#  define HAVE_TARGET_INTRINSICS	1
+#  include <immintrin.h>
+#  if defined(_MSC_VER) && defined(__clang__)
+#    include <tmmintrin.h>
+#    include <smmintrin.h>
+#    include <wmmintrin.h>
+#    include <avxintrin.h>
+#    include <avx2intrin.h>
+#    include <avx512fintrin.h>
+#    include <avx512bwintrin.h>
+#    include <avx512vlintrin.h>
+#    if __has_include(<avx512vlbwintrin.h>)
+#      include <avx512vlbwintrin.h>
+#    endif
+#    if __has_include(<vpclmulqdqintrin.h>)
+#      include <vpclmulqdqintrin.h>
+#    endif
+#    if __has_include(<avx512vnniintrin.h>)
+#      include <avx512vnniintrin.h>
+#    endif
+#    if __has_include(<avx512vlvnniintrin.h>)
+#      include <avx512vlvnniintrin.h>
+#    endif
+#    if __has_include(<avxvnniintrin.h>)
+#      include <avxvnniintrin.h>
+#    endif
+#  endif
 #else
-#  define HAVE_TARGET_INTRINSICS	0
+static inline u32 get_x86_cpu_features(void) { return 0; }
 #endif
-
 
 #if defined(__SSE2__) || \
 	(defined(_MSC_VER) && \
 	 (defined(ARCH_X86_64) || (defined(_M_IX86_FP) && _M_IX86_FP >= 2)))
-#  define HAVE_SSE2_NATIVE	1
+#  define HAVE_SSE2(features)		1
+#  define HAVE_SSE2_NATIVE		1
 #else
-#  define HAVE_SSE2_NATIVE	0
+#  define HAVE_SSE2(features)		((features) & X86_CPU_FEATURE_SSE2)
+#  define HAVE_SSE2_NATIVE		0
 #endif
-#define HAVE_SSE2_INTRIN	(HAVE_SSE2_NATIVE || HAVE_TARGET_INTRINSICS)
-
 
 #if defined(__PCLMUL__) || (defined(_MSC_VER) && defined(__AVX2__))
-#  define HAVE_PCLMUL_NATIVE	1
+#  define HAVE_PCLMULQDQ(features)	1
 #else
-#  define HAVE_PCLMUL_NATIVE	0
+#  define HAVE_PCLMULQDQ(features)	((features) & X86_CPU_FEATURE_PCLMULQDQ)
 #endif
-#if HAVE_PCLMUL_NATIVE || (HAVE_TARGET_INTRINSICS && \
-			   (GCC_PREREQ(4, 4) || CLANG_PREREQ(3, 2, 0) || \
-			    defined(_MSC_VER)))
-#  define HAVE_PCLMUL_INTRIN	1
-#else
-#  define HAVE_PCLMUL_INTRIN	0
-#endif
-
 
 #ifdef __AVX__
-#  define HAVE_AVX_NATIVE	1
+#  define HAVE_AVX(features)		1
 #else
-#  define HAVE_AVX_NATIVE	0
+#  define HAVE_AVX(features)		((features) & X86_CPU_FEATURE_AVX)
 #endif
-#if HAVE_AVX_NATIVE || (HAVE_TARGET_INTRINSICS && \
-			(GCC_PREREQ(4, 6) || CLANG_PREREQ(3, 0, 0) || \
-			 defined(_MSC_VER)))
-#  define HAVE_AVX_INTRIN	1
+
+#ifdef __AVX2__
+#  define HAVE_AVX2(features)		1
 #else
-#  define HAVE_AVX_INTRIN	0
+#  define HAVE_AVX2(features)		((features) & X86_CPU_FEATURE_AVX2)
 #endif
+
+#if defined(__BMI2__) || (defined(_MSC_VER) && defined(__AVX2__))
+#  define HAVE_BMI2(features)		1
+#  define HAVE_BMI2_NATIVE		1
+#else
+#  define HAVE_BMI2(features)		((features) & X86_CPU_FEATURE_BMI2)
+#  define HAVE_BMI2_NATIVE		0
+#endif
+
+#ifdef __AVX512BW__
+#  define HAVE_AVX512BW(features)	1
+#else
+#  define HAVE_AVX512BW(features)	((features) & X86_CPU_FEATURE_AVX512BW)
+#endif
+
+#ifdef __AVX512VL__
+#  define HAVE_AVX512VL(features)	1
+#else
+#  define HAVE_AVX512VL(features)	((features) & X86_CPU_FEATURE_AVX512VL)
+#endif
+
+#ifdef __VPCLMULQDQ__
+#  define HAVE_VPCLMULQDQ(features)	1
+#else
+#  define HAVE_VPCLMULQDQ(features)	((features) & X86_CPU_FEATURE_VPCLMULQDQ)
+#endif
+
+#ifdef __AVX512VNNI__
+#  define HAVE_AVX512VNNI(features)	1
+#else
+#  define HAVE_AVX512VNNI(features)	((features) & X86_CPU_FEATURE_AVX512VNNI)
+#endif
+
+#ifdef __AVXVNNI__
+#  define HAVE_AVXVNNI(features)	1
+#else
+#  define HAVE_AVXVNNI(features)	((features) & X86_CPU_FEATURE_AVXVNNI)
+#endif
+
+#endif 
+
+#endif 
 
 
 #ifdef __AVX2__
-#  define HAVE_AVX2_NATIVE	1
-#else
-#  define HAVE_AVX2_NATIVE	0
-#endif
-#if HAVE_AVX2_NATIVE || (HAVE_TARGET_INTRINSICS && \
-			 (GCC_PREREQ(4, 7) || CLANG_PREREQ(3, 1, 0) || \
-			  defined(_MSC_VER)))
-#  define HAVE_AVX2_INTRIN	1
-#else
-#  define HAVE_AVX2_INTRIN	0
-#endif
-
-
-#if defined(__BMI2__) || (defined(_MSC_VER) && defined(__AVX2__))
-#  define HAVE_BMI2_NATIVE	1
-#else
-#  define HAVE_BMI2_NATIVE	0
-#endif
-#if HAVE_BMI2_NATIVE || (HAVE_TARGET_INTRINSICS && \
-			 (GCC_PREREQ(4, 7) || CLANG_PREREQ(3, 1, 0) || \
-			  defined(_MSC_VER)))
-#  define HAVE_BMI2_INTRIN	1
-#else
-#  define HAVE_BMI2_INTRIN	0
-#endif
-
-#if defined(_MSC_VER) && _MSC_VER < 1930 
-#  undef HAVE_BMI2_NATIVE
-#  undef HAVE_BMI2_INTRIN
-#  define HAVE_BMI2_NATIVE	0
-#  define HAVE_BMI2_INTRIN	0
-#endif
-
-#endif 
-
-#endif 
-
-
-#if HAVE_AVX2_NATIVE
-#  include <immintrin.h>
 static forceinline void
 matchfinder_init_avx2(mf_pos_t *data, size_t size)
 {
@@ -16802,7 +20060,6 @@ matchfinder_rebase_avx2(mf_pos_t *data, size_t size)
 #define matchfinder_rebase matchfinder_rebase_avx2
 
 #elif HAVE_SSE2_NATIVE
-#  include <emmintrin.h>
 static forceinline void
 matchfinder_init_sse2(mf_pos_t *data, size_t size)
 {
@@ -17190,8 +20447,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	19
-#define LIBDEFLATE_VERSION_STRING	"1.19"
+#define LIBDEFLATE_VERSION_MINOR	20
+#define LIBDEFLATE_VERSION_STRING	"1.20"
 
 
 #ifndef LIBDEFLATEAPI
@@ -17409,6 +20666,7 @@ struct libdeflate_options {
 #undef ARCH_X86_32
 #undef ARCH_ARM64
 #undef ARCH_ARM32
+#undef ARCH_RISCV
 #ifdef _MSC_VER
 #  if defined(_M_X64)
 #    define ARCH_X86_64
@@ -17428,6 +20686,8 @@ struct libdeflate_options {
 #    define ARCH_ARM64
 #  elif defined(__arm__)
 #    define ARCH_ARM32
+#  elif defined(__riscv)
+#    define ARCH_RISCV
 #  endif
 #endif
 
@@ -17472,6 +20732,9 @@ typedef size_t machine_word_t;
 #  define GCC_PREREQ(major, minor)		\
 	(__GNUC__ > (major) ||			\
 	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#  if !GCC_PREREQ(4, 9)
+#    error "gcc versions older than 4.9 are no longer supported"
+#  endif
 #else
 #  define GCC_PREREQ(major, minor)	0
 #endif
@@ -17484,14 +20747,27 @@ typedef size_t machine_word_t;
 	(__clang_major__ > (major) ||			\
 	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
 #  endif
+#  if !CLANG_PREREQ(3, 9, 8000000)
+#    error "clang versions older than 3.9 are no longer supported"
+#  endif
 #else
 #  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+#ifdef _MSC_VER
+#  define MSVC_PREREQ(version)	(_MSC_VER >= (version))
+#  if !MSVC_PREREQ(1900)
+#    error "MSVC versions older than Visual Studio 2015 are no longer supported"
+#  endif
+#else
+#  define MSVC_PREREQ(version)	0
 #endif
 
 
 #ifndef __has_attribute
 #  define __has_attribute(attribute)	0
 #endif
+
+
 #ifndef __has_builtin
 #  define __has_builtin(builtin)	0
 #endif
@@ -17515,6 +20791,13 @@ typedef size_t machine_word_t;
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
+#endif
+
+
+#if defined(__GNUC__) || __has_attribute(noreturn)
+#  define NORETURN		__attribute__((noreturn))
+#else
+#  define NORETURN
 #endif
 
 
@@ -17583,12 +20866,10 @@ typedef size_t machine_word_t;
 #endif
 
 
-#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#if defined(__GNUC__) || __has_attribute(target)
 #  define _target_attribute(attrs)	__attribute__((target(attrs)))
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
 #else
 #  define _target_attribute(attrs)
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
 #endif
 
 
@@ -17628,7 +20909,7 @@ static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
 
 static forceinline u16 bswap16(u16 v)
 {
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap16)
 	return __builtin_bswap16(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ushort(v);
@@ -17640,7 +20921,7 @@ static forceinline u16 bswap16(u16 v)
 
 static forceinline u32 bswap32(u32 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap32)
 	return __builtin_bswap32(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ulong(v);
@@ -17655,7 +20936,7 @@ static forceinline u32 bswap32(u32 v)
 
 static forceinline u64 bswap64(u64 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap64)
 	return __builtin_bswap64(v);
 #elif defined(_MSC_VER)
 	return _byteswap_uint64(v);
@@ -17686,6 +20967,7 @@ static forceinline u64 bswap64(u64 v)
 #if (defined(__GNUC__) || defined(__clang__)) && \
 	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	 defined(__riscv_misaligned_fast) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
 #elif defined(_MSC_VER)
@@ -18023,12 +21305,17 @@ int memcmp(const void *s1, const void *s2, size_t n);
 
 #undef LIBDEFLATE_ENABLE_ASSERTIONS
 #else
-#include <string.h>
+#  include <string.h>
+   
+#  ifdef __clang_analyzer__
+#    define LIBDEFLATE_ENABLE_ASSERTIONS
+#  endif
 #endif
 
 
 #ifdef LIBDEFLATE_ENABLE_ASSERTIONS
-void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+NORETURN void
+libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #define ASSERT(expr) { if (unlikely(!(expr))) \
 	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
 #else
@@ -18078,7 +21365,9 @@ typedef s16 mf_pos_t;
 
 
 #define MATCHFINDER_MEM_ALIGNMENT	32
-#define MATCHFINDER_SIZE_ALIGNMENT	128
+
+
+#define MATCHFINDER_SIZE_ALIGNMENT	1024
 
 #undef matchfinder_init
 #undef matchfinder_rebase
@@ -18145,8 +21434,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	19
-#define LIBDEFLATE_VERSION_STRING	"1.19"
+#define LIBDEFLATE_VERSION_MINOR	20
+#define LIBDEFLATE_VERSION_STRING	"1.20"
 
 
 #ifndef LIBDEFLATEAPI
@@ -18364,6 +21653,7 @@ struct libdeflate_options {
 #undef ARCH_X86_32
 #undef ARCH_ARM64
 #undef ARCH_ARM32
+#undef ARCH_RISCV
 #ifdef _MSC_VER
 #  if defined(_M_X64)
 #    define ARCH_X86_64
@@ -18383,6 +21673,8 @@ struct libdeflate_options {
 #    define ARCH_ARM64
 #  elif defined(__arm__)
 #    define ARCH_ARM32
+#  elif defined(__riscv)
+#    define ARCH_RISCV
 #  endif
 #endif
 
@@ -18427,6 +21719,9 @@ typedef size_t machine_word_t;
 #  define GCC_PREREQ(major, minor)		\
 	(__GNUC__ > (major) ||			\
 	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#  if !GCC_PREREQ(4, 9)
+#    error "gcc versions older than 4.9 are no longer supported"
+#  endif
 #else
 #  define GCC_PREREQ(major, minor)	0
 #endif
@@ -18439,14 +21734,27 @@ typedef size_t machine_word_t;
 	(__clang_major__ > (major) ||			\
 	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
 #  endif
+#  if !CLANG_PREREQ(3, 9, 8000000)
+#    error "clang versions older than 3.9 are no longer supported"
+#  endif
 #else
 #  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+#ifdef _MSC_VER
+#  define MSVC_PREREQ(version)	(_MSC_VER >= (version))
+#  if !MSVC_PREREQ(1900)
+#    error "MSVC versions older than Visual Studio 2015 are no longer supported"
+#  endif
+#else
+#  define MSVC_PREREQ(version)	0
 #endif
 
 
 #ifndef __has_attribute
 #  define __has_attribute(attribute)	0
 #endif
+
+
 #ifndef __has_builtin
 #  define __has_builtin(builtin)	0
 #endif
@@ -18470,6 +21778,13 @@ typedef size_t machine_word_t;
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
+#endif
+
+
+#if defined(__GNUC__) || __has_attribute(noreturn)
+#  define NORETURN		__attribute__((noreturn))
+#else
+#  define NORETURN
 #endif
 
 
@@ -18538,12 +21853,10 @@ typedef size_t machine_word_t;
 #endif
 
 
-#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#if defined(__GNUC__) || __has_attribute(target)
 #  define _target_attribute(attrs)	__attribute__((target(attrs)))
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
 #else
 #  define _target_attribute(attrs)
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
 #endif
 
 
@@ -18583,7 +21896,7 @@ static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
 
 static forceinline u16 bswap16(u16 v)
 {
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap16)
 	return __builtin_bswap16(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ushort(v);
@@ -18595,7 +21908,7 @@ static forceinline u16 bswap16(u16 v)
 
 static forceinline u32 bswap32(u32 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap32)
 	return __builtin_bswap32(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ulong(v);
@@ -18610,7 +21923,7 @@ static forceinline u32 bswap32(u32 v)
 
 static forceinline u64 bswap64(u64 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap64)
 	return __builtin_bswap64(v);
 #elif defined(_MSC_VER)
 	return _byteswap_uint64(v);
@@ -18641,6 +21954,7 @@ static forceinline u64 bswap64(u64 v)
 #if (defined(__GNUC__) || defined(__clang__)) && \
 	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	 defined(__riscv_misaligned_fast) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
 #elif defined(_MSC_VER)
@@ -18978,12 +22292,17 @@ int memcmp(const void *s1, const void *s2, size_t n);
 
 #undef LIBDEFLATE_ENABLE_ASSERTIONS
 #else
-#include <string.h>
+#  include <string.h>
+   
+#  ifdef __clang_analyzer__
+#    define LIBDEFLATE_ENABLE_ASSERTIONS
+#  endif
 #endif
 
 
 #ifdef LIBDEFLATE_ENABLE_ASSERTIONS
-void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+NORETURN void
+libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #define ASSERT(expr) { if (unlikely(!(expr))) \
 	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
 #else
@@ -18997,33 +22316,23 @@ void libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #endif 
 
 
-#define HAVE_DYNAMIC_ARM_CPU_FEATURES	0
-
 #if defined(ARCH_ARM32) || defined(ARCH_ARM64)
 
+#define ARM_CPU_FEATURE_NEON		(1 << 0)
+#define ARM_CPU_FEATURE_PMULL		(1 << 1)
+
+#define ARM_CPU_FEATURE_PREFER_PMULL	(1 << 2)
+#define ARM_CPU_FEATURE_CRC32		(1 << 3)
+#define ARM_CPU_FEATURE_SHA3		(1 << 4)
+#define ARM_CPU_FEATURE_DOTPROD		(1 << 5)
+
 #if !defined(FREESTANDING) && \
-    (COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE || defined(_MSC_VER)) && \
+    (defined(__GNUC__) || defined(__clang__) || defined(_MSC_VER)) && \
     (defined(__linux__) || \
      (defined(__APPLE__) && defined(ARCH_ARM64)) || \
      (defined(_WIN32) && defined(ARCH_ARM64)))
-#  undef HAVE_DYNAMIC_ARM_CPU_FEATURES
-#  define HAVE_DYNAMIC_ARM_CPU_FEATURES	1
-#endif
 
-#define ARM_CPU_FEATURE_NEON		0x00000001
-#define ARM_CPU_FEATURE_PMULL		0x00000002
-#define ARM_CPU_FEATURE_CRC32		0x00000004
-#define ARM_CPU_FEATURE_SHA3		0x00000008
-#define ARM_CPU_FEATURE_DOTPROD		0x00000010
-
-#define HAVE_NEON(features)	(HAVE_NEON_NATIVE    || ((features) & ARM_CPU_FEATURE_NEON))
-#define HAVE_PMULL(features)	(HAVE_PMULL_NATIVE   || ((features) & ARM_CPU_FEATURE_PMULL))
-#define HAVE_CRC32(features)	(HAVE_CRC32_NATIVE   || ((features) & ARM_CPU_FEATURE_CRC32))
-#define HAVE_SHA3(features)	(HAVE_SHA3_NATIVE    || ((features) & ARM_CPU_FEATURE_SHA3))
-#define HAVE_DOTPROD(features)	(HAVE_DOTPROD_NATIVE || ((features) & ARM_CPU_FEATURE_DOTPROD))
-
-#if HAVE_DYNAMIC_ARM_CPU_FEATURES
-#define ARM_CPU_FEATURES_KNOWN		0x80000000
+#  define ARM_CPU_FEATURES_KNOWN	(1U << 31)
 extern volatile u32 libdeflate_arm_cpu_features;
 
 void libdeflate_init_arm_cpu_features(void);
@@ -19034,38 +22343,37 @@ static inline u32 get_arm_cpu_features(void)
 		libdeflate_init_arm_cpu_features();
 	return libdeflate_arm_cpu_features;
 }
-#else 
+#else
 static inline u32 get_arm_cpu_features(void) { return 0; }
-#endif 
+#endif
 
 
-#if defined(__ARM_NEON) || defined(ARCH_ARM64)
+#if defined(__ARM_NEON) || (defined(_MSC_VER) && defined(ARCH_ARM64))
+#  define HAVE_NEON(features)	1
 #  define HAVE_NEON_NATIVE	1
 #else
+#  define HAVE_NEON(features)	((features) & ARM_CPU_FEATURE_NEON)
 #  define HAVE_NEON_NATIVE	0
 #endif
 
-#if HAVE_NEON_NATIVE || \
-	(HAVE_DYNAMIC_ARM_CPU_FEATURES && GCC_PREREQ(6, 1) && defined(__ARM_FP))
+#if (defined(__GNUC__) || defined(__clang__) || defined(_MSC_VER)) && \
+	(HAVE_NEON_NATIVE || (GCC_PREREQ(6, 1) && defined(__ARM_FP)))
 #  define HAVE_NEON_INTRIN	1
+#  include <arm_neon.h>
 #else
 #  define HAVE_NEON_INTRIN	0
 #endif
 
 
 #ifdef __ARM_FEATURE_CRYPTO
-#  define HAVE_PMULL_NATIVE	1
+#  define HAVE_PMULL(features)	1
 #else
-#  define HAVE_PMULL_NATIVE	0
+#  define HAVE_PMULL(features)	((features) & ARM_CPU_FEATURE_PMULL)
 #endif
-#if HAVE_PMULL_NATIVE || \
-	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
-	 HAVE_NEON_INTRIN  && \
-	 (GCC_PREREQ(6, 1) || CLANG_PREREQ(3, 5, 6010000) || \
-	  defined(_MSC_VER)) && \
-	   \
-	 !(defined(ARCH_ARM32) && defined(__clang__)))
-#  define HAVE_PMULL_INTRIN	CPU_IS_LITTLE_ENDIAN() 
+#if defined(ARCH_ARM64) && HAVE_NEON_INTRIN && \
+	(GCC_PREREQ(6, 1) || defined(__clang__) || defined(_MSC_VER)) && \
+	CPU_IS_LITTLE_ENDIAN() 
+#  define HAVE_PMULL_INTRIN	1
    
 #  ifdef _MSC_VER
 #    define compat_vmull_p64(a, b)  vmull_p64(vcreate_p64(a), vcreate_p64(b))
@@ -19076,105 +22384,98 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #  define HAVE_PMULL_INTRIN	0
 #endif
 
-#if HAVE_PMULL_NATIVE && defined(ARCH_ARM64) && \
-		GCC_PREREQ(6, 1) && !GCC_PREREQ(13, 1)
-#  define USE_PMULL_TARGET_EVEN_IF_NATIVE	1
-#else
-#  define USE_PMULL_TARGET_EVEN_IF_NATIVE	0
-#endif
-
 
 #ifdef __ARM_FEATURE_CRC32
-#  define HAVE_CRC32_NATIVE	1
+#  define HAVE_CRC32(features)	1
 #else
-#  define HAVE_CRC32_NATIVE	0
+#  define HAVE_CRC32(features)	((features) & ARM_CPU_FEATURE_CRC32)
 #endif
-#undef HAVE_CRC32_INTRIN
-#if HAVE_CRC32_NATIVE
+#if defined(ARCH_ARM64) && \
+	(defined(__GNUC__) || defined(__clang__) || defined(_MSC_VER))
 #  define HAVE_CRC32_INTRIN	1
-#elif HAVE_DYNAMIC_ARM_CPU_FEATURES
-#  if GCC_PREREQ(1, 0)
-    
-#    if (GCC_PREREQ(11, 3) || \
-	 (GCC_PREREQ(10, 4) && !GCC_PREREQ(11, 0)) || \
-	 (GCC_PREREQ(9, 5) && !GCC_PREREQ(10, 0))) && \
-	!defined(__ARM_ARCH_6KZ__) && \
-	!defined(__ARM_ARCH_7EM__)
-#      define HAVE_CRC32_INTRIN	1
-#    endif
-#  elif CLANG_PREREQ(3, 4, 6000000)
-#    define HAVE_CRC32_INTRIN	1
-#  elif defined(_MSC_VER)
-#    define HAVE_CRC32_INTRIN	1
+#  if defined(__GNUC__) || defined(__clang__)
+#    include <arm_acle.h>
 #  endif
-#endif
-#ifndef HAVE_CRC32_INTRIN
+   
+#  if defined(__clang__) && !CLANG_PREREQ(16, 0, 16000000) && \
+	!defined(__ARM_FEATURE_CRC32)
+#    undef __crc32b
+#    define __crc32b(a, b)					\
+	({ uint32_t res;					\
+	   __asm__("crc32b %w0, %w1, %w2"			\
+		   : "=r" (res) : "r" (a), "r" (b));		\
+	   res; })
+#    undef __crc32h
+#    define __crc32h(a, b)					\
+	({ uint32_t res;					\
+	   __asm__("crc32h %w0, %w1, %w2"			\
+		   : "=r" (res) : "r" (a), "r" (b));		\
+	   res; })
+#    undef __crc32w
+#    define __crc32w(a, b)					\
+	({ uint32_t res;					\
+	   __asm__("crc32w %w0, %w1, %w2"			\
+		   : "=r" (res) : "r" (a), "r" (b));		\
+	   res; })
+#    undef __crc32d
+#    define __crc32d(a, b)					\
+	({ uint32_t res;					\
+	   __asm__("crc32x %w0, %w1, %2"			\
+		   : "=r" (res) : "r" (a), "r" (b));		\
+	   res; })
+#    pragma clang diagnostic ignored "-Wgnu-statement-expression"
+#  endif
+#else
 #  define HAVE_CRC32_INTRIN	0
 #endif
 
 
-#if defined(ARCH_ARM64) && !defined(_MSC_VER)
-#  ifdef __ARM_FEATURE_SHA3
-#    define HAVE_SHA3_NATIVE	1
-#  else
-#    define HAVE_SHA3_NATIVE	0
-#  endif
-#  define HAVE_SHA3_TARGET	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
-				 (GCC_PREREQ(8, 1)  || \
-				  CLANG_PREREQ(7, 0, 10010463) ))
-#  define HAVE_SHA3_INTRIN	(HAVE_NEON_INTRIN && \
-				 (HAVE_SHA3_NATIVE || HAVE_SHA3_TARGET) && \
-				 (GCC_PREREQ(9, 1)  || \
-				  CLANG_PREREQ(13, 0, 13160000)))
+#ifdef __ARM_FEATURE_SHA3
+#  define HAVE_SHA3(features)	1
 #else
-#  define HAVE_SHA3_NATIVE	0
-#  define HAVE_SHA3_TARGET	0
+#  define HAVE_SHA3(features)	((features) & ARM_CPU_FEATURE_SHA3)
+#endif
+#if defined(ARCH_ARM64) && HAVE_NEON_INTRIN && \
+	(GCC_PREREQ(9, 1)  || \
+	 CLANG_PREREQ(7, 0, 10010463) )
+#  define HAVE_SHA3_INTRIN	1
+   
+#  if defined(__clang__) && !CLANG_PREREQ(16, 0, 16000000) && \
+	!defined(__ARM_FEATURE_SHA3)
+#    undef veor3q_u8
+#    define veor3q_u8(a, b, c)					\
+	({ uint8x16_t res;					\
+	   __asm__("eor3 %0.16b, %1.16b, %2.16b, %3.16b"	\
+		   : "=w" (res) : "w" (a), "w" (b), "w" (c));	\
+	   res; })
+#    pragma clang diagnostic ignored "-Wgnu-statement-expression"
+#  endif
+#else
 #  define HAVE_SHA3_INTRIN	0
 #endif
 
 
-#ifdef ARCH_ARM64
-#  ifdef __ARM_FEATURE_DOTPROD
-#    define HAVE_DOTPROD_NATIVE	1
-#  else
-#    define HAVE_DOTPROD_NATIVE	0
-#  endif
-#  if HAVE_DOTPROD_NATIVE || \
-	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
-	 (GCC_PREREQ(8, 1) || CLANG_PREREQ(7, 0, 10010000) || \
-	  defined(_MSC_VER)))
-#    define HAVE_DOTPROD_INTRIN	1
-#  else
-#    define HAVE_DOTPROD_INTRIN	0
+#ifdef __ARM_FEATURE_DOTPROD
+#  define HAVE_DOTPROD(features)	1
+#else
+#  define HAVE_DOTPROD(features)	((features) & ARM_CPU_FEATURE_DOTPROD)
+#endif
+#if defined(ARCH_ARM64) && HAVE_NEON_INTRIN && \
+	(GCC_PREREQ(8, 1) || CLANG_PREREQ(7, 0, 10010000) || defined(_MSC_VER))
+#  define HAVE_DOTPROD_INTRIN	1
+   
+#  if defined(__clang__) && !CLANG_PREREQ(16, 0, 16000000) && \
+	!defined(__ARM_FEATURE_DOTPROD)
+#    undef vdotq_u32
+#    define vdotq_u32(a, b, c)					\
+	({ uint32x4_t res = (a);				\
+	   __asm__("udot %0.4s, %1.16b, %2.16b"			\
+		   : "+w" (res) : "w" (b), "w" (c));		\
+	   res; })
+#    pragma clang diagnostic ignored "-Wgnu-statement-expression"
 #  endif
 #else
-#  define HAVE_DOTPROD_NATIVE	0
 #  define HAVE_DOTPROD_INTRIN	0
-#endif
-
-
-#if HAVE_CRC32_INTRIN && !HAVE_CRC32_NATIVE && \
-	(defined(__clang__) || defined(ARCH_ARM32))
-#  define __ARM_FEATURE_CRC32	1
-#endif
-#if HAVE_SHA3_INTRIN && !HAVE_SHA3_NATIVE && defined(__clang__)
-#  define __ARM_FEATURE_SHA3	1
-#endif
-#if HAVE_DOTPROD_INTRIN && !HAVE_DOTPROD_NATIVE && defined(__clang__)
-#  define __ARM_FEATURE_DOTPROD	1
-#endif
-#if HAVE_CRC32_INTRIN && !HAVE_CRC32_NATIVE && \
-	(defined(__clang__) || defined(ARCH_ARM32))
-#  include <arm_acle.h>
-#  undef __ARM_FEATURE_CRC32
-#endif
-#if HAVE_SHA3_INTRIN && !HAVE_SHA3_NATIVE && defined(__clang__)
-#  include <arm_neon.h>
-#  undef __ARM_FEATURE_SHA3
-#endif
-#if HAVE_DOTPROD_INTRIN && !HAVE_DOTPROD_NATIVE && defined(__clang__)
-#  include <arm_neon.h>
-#  undef __ARM_FEATURE_DOTPROD
 #endif
 
 #endif 
@@ -19183,7 +22484,6 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 
 
 #if HAVE_NEON_NATIVE
-#  include <arm_neon.h>
 static forceinline void
 matchfinder_init_neon(mf_pos_t *data, size_t size)
 {
@@ -19230,6 +22530,8 @@ matchfinder_rebase_neon(mf_pos_t *data, size_t size)
 
 #endif 
 
+#  elif defined(ARCH_RISCV)
+#    include "riscv/matchfinder_impl.h"
 #  elif defined(ARCH_X86_32) || defined(ARCH_X86_64)
 /* #    include "x86/matchfinder_impl.h" */
 
@@ -19291,8 +22593,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	19
-#define LIBDEFLATE_VERSION_STRING	"1.19"
+#define LIBDEFLATE_VERSION_MINOR	20
+#define LIBDEFLATE_VERSION_STRING	"1.20"
 
 
 #ifndef LIBDEFLATEAPI
@@ -19510,6 +22812,7 @@ struct libdeflate_options {
 #undef ARCH_X86_32
 #undef ARCH_ARM64
 #undef ARCH_ARM32
+#undef ARCH_RISCV
 #ifdef _MSC_VER
 #  if defined(_M_X64)
 #    define ARCH_X86_64
@@ -19529,6 +22832,8 @@ struct libdeflate_options {
 #    define ARCH_ARM64
 #  elif defined(__arm__)
 #    define ARCH_ARM32
+#  elif defined(__riscv)
+#    define ARCH_RISCV
 #  endif
 #endif
 
@@ -19573,6 +22878,9 @@ typedef size_t machine_word_t;
 #  define GCC_PREREQ(major, minor)		\
 	(__GNUC__ > (major) ||			\
 	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#  if !GCC_PREREQ(4, 9)
+#    error "gcc versions older than 4.9 are no longer supported"
+#  endif
 #else
 #  define GCC_PREREQ(major, minor)	0
 #endif
@@ -19585,14 +22893,27 @@ typedef size_t machine_word_t;
 	(__clang_major__ > (major) ||			\
 	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
 #  endif
+#  if !CLANG_PREREQ(3, 9, 8000000)
+#    error "clang versions older than 3.9 are no longer supported"
+#  endif
 #else
 #  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+#ifdef _MSC_VER
+#  define MSVC_PREREQ(version)	(_MSC_VER >= (version))
+#  if !MSVC_PREREQ(1900)
+#    error "MSVC versions older than Visual Studio 2015 are no longer supported"
+#  endif
+#else
+#  define MSVC_PREREQ(version)	0
 #endif
 
 
 #ifndef __has_attribute
 #  define __has_attribute(attribute)	0
 #endif
+
+
 #ifndef __has_builtin
 #  define __has_builtin(builtin)	0
 #endif
@@ -19616,6 +22937,13 @@ typedef size_t machine_word_t;
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
+#endif
+
+
+#if defined(__GNUC__) || __has_attribute(noreturn)
+#  define NORETURN		__attribute__((noreturn))
+#else
+#  define NORETURN
 #endif
 
 
@@ -19684,12 +23012,10 @@ typedef size_t machine_word_t;
 #endif
 
 
-#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#if defined(__GNUC__) || __has_attribute(target)
 #  define _target_attribute(attrs)	__attribute__((target(attrs)))
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
 #else
 #  define _target_attribute(attrs)
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
 #endif
 
 
@@ -19729,7 +23055,7 @@ static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
 
 static forceinline u16 bswap16(u16 v)
 {
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap16)
 	return __builtin_bswap16(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ushort(v);
@@ -19741,7 +23067,7 @@ static forceinline u16 bswap16(u16 v)
 
 static forceinline u32 bswap32(u32 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap32)
 	return __builtin_bswap32(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ulong(v);
@@ -19756,7 +23082,7 @@ static forceinline u32 bswap32(u32 v)
 
 static forceinline u64 bswap64(u64 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap64)
 	return __builtin_bswap64(v);
 #elif defined(_MSC_VER)
 	return _byteswap_uint64(v);
@@ -19787,6 +23113,7 @@ static forceinline u64 bswap64(u64 v)
 #if (defined(__GNUC__) || defined(__clang__)) && \
 	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	 defined(__riscv_misaligned_fast) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
 #elif defined(_MSC_VER)
@@ -20124,12 +23451,17 @@ int memcmp(const void *s1, const void *s2, size_t n);
 
 #undef LIBDEFLATE_ENABLE_ASSERTIONS
 #else
-#include <string.h>
+#  include <string.h>
+   
+#  ifdef __clang_analyzer__
+#    define LIBDEFLATE_ENABLE_ASSERTIONS
+#  endif
 #endif
 
 
 #ifdef LIBDEFLATE_ENABLE_ASSERTIONS
-void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+NORETURN void
+libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #define ASSERT(expr) { if (unlikely(!(expr))) \
 	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
 #else
@@ -20143,29 +23475,24 @@ void libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #endif 
 
 
-#define HAVE_DYNAMIC_X86_CPU_FEATURES	0
-
 #if defined(ARCH_X86_32) || defined(ARCH_X86_64)
 
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE || defined(_MSC_VER)
-#  undef HAVE_DYNAMIC_X86_CPU_FEATURES
-#  define HAVE_DYNAMIC_X86_CPU_FEATURES	1
-#endif
+#define X86_CPU_FEATURE_SSE2		(1 << 0)
+#define X86_CPU_FEATURE_PCLMULQDQ	(1 << 1)
+#define X86_CPU_FEATURE_AVX		(1 << 2)
+#define X86_CPU_FEATURE_AVX2		(1 << 3)
+#define X86_CPU_FEATURE_BMI2		(1 << 4)
 
-#define X86_CPU_FEATURE_SSE2		0x00000001
-#define X86_CPU_FEATURE_PCLMUL		0x00000002
-#define X86_CPU_FEATURE_AVX		0x00000004
-#define X86_CPU_FEATURE_AVX2		0x00000008
-#define X86_CPU_FEATURE_BMI2		0x00000010
+#define X86_CPU_FEATURE_ZMM		(1 << 5)
+#define X86_CPU_FEATURE_AVX512BW	(1 << 6)
+#define X86_CPU_FEATURE_AVX512VL	(1 << 7)
+#define X86_CPU_FEATURE_VPCLMULQDQ	(1 << 8)
+#define X86_CPU_FEATURE_AVX512VNNI	(1 << 9)
+#define X86_CPU_FEATURE_AVXVNNI		(1 << 10)
 
-#define HAVE_SSE2(features)	(HAVE_SSE2_NATIVE     || ((features) & X86_CPU_FEATURE_SSE2))
-#define HAVE_PCLMUL(features)	(HAVE_PCLMUL_NATIVE   || ((features) & X86_CPU_FEATURE_PCLMUL))
-#define HAVE_AVX(features)	(HAVE_AVX_NATIVE      || ((features) & X86_CPU_FEATURE_AVX))
-#define HAVE_AVX2(features)	(HAVE_AVX2_NATIVE     || ((features) & X86_CPU_FEATURE_AVX2))
-#define HAVE_BMI2(features)	(HAVE_BMI2_NATIVE     || ((features) & X86_CPU_FEATURE_BMI2))
+#if defined(__GNUC__) || defined(__clang__) || defined(_MSC_VER)
 
-#if HAVE_DYNAMIC_X86_CPU_FEATURES
-#define X86_CPU_FEATURES_KNOWN		0x80000000
+#  define X86_CPU_FEATURES_KNOWN	(1U << 31)
 extern volatile u32 libdeflate_x86_cpu_features;
 
 void libdeflate_init_x86_cpu_features(void);
@@ -20176,98 +23503,109 @@ static inline u32 get_x86_cpu_features(void)
 		libdeflate_init_x86_cpu_features();
 	return libdeflate_x86_cpu_features;
 }
-#else 
-static inline u32 get_x86_cpu_features(void) { return 0; }
-#endif 
 
-
-#if HAVE_DYNAMIC_X86_CPU_FEATURES && \
-	(GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000) || defined(_MSC_VER))
-#  define HAVE_TARGET_INTRINSICS	1
+#  include <immintrin.h>
+#  if defined(_MSC_VER) && defined(__clang__)
+#    include <tmmintrin.h>
+#    include <smmintrin.h>
+#    include <wmmintrin.h>
+#    include <avxintrin.h>
+#    include <avx2intrin.h>
+#    include <avx512fintrin.h>
+#    include <avx512bwintrin.h>
+#    include <avx512vlintrin.h>
+#    if __has_include(<avx512vlbwintrin.h>)
+#      include <avx512vlbwintrin.h>
+#    endif
+#    if __has_include(<vpclmulqdqintrin.h>)
+#      include <vpclmulqdqintrin.h>
+#    endif
+#    if __has_include(<avx512vnniintrin.h>)
+#      include <avx512vnniintrin.h>
+#    endif
+#    if __has_include(<avx512vlvnniintrin.h>)
+#      include <avx512vlvnniintrin.h>
+#    endif
+#    if __has_include(<avxvnniintrin.h>)
+#      include <avxvnniintrin.h>
+#    endif
+#  endif
 #else
-#  define HAVE_TARGET_INTRINSICS	0
+static inline u32 get_x86_cpu_features(void) { return 0; }
 #endif
-
 
 #if defined(__SSE2__) || \
 	(defined(_MSC_VER) && \
 	 (defined(ARCH_X86_64) || (defined(_M_IX86_FP) && _M_IX86_FP >= 2)))
-#  define HAVE_SSE2_NATIVE	1
+#  define HAVE_SSE2(features)		1
+#  define HAVE_SSE2_NATIVE		1
 #else
-#  define HAVE_SSE2_NATIVE	0
+#  define HAVE_SSE2(features)		((features) & X86_CPU_FEATURE_SSE2)
+#  define HAVE_SSE2_NATIVE		0
 #endif
-#define HAVE_SSE2_INTRIN	(HAVE_SSE2_NATIVE || HAVE_TARGET_INTRINSICS)
-
 
 #if defined(__PCLMUL__) || (defined(_MSC_VER) && defined(__AVX2__))
-#  define HAVE_PCLMUL_NATIVE	1
+#  define HAVE_PCLMULQDQ(features)	1
 #else
-#  define HAVE_PCLMUL_NATIVE	0
+#  define HAVE_PCLMULQDQ(features)	((features) & X86_CPU_FEATURE_PCLMULQDQ)
 #endif
-#if HAVE_PCLMUL_NATIVE || (HAVE_TARGET_INTRINSICS && \
-			   (GCC_PREREQ(4, 4) || CLANG_PREREQ(3, 2, 0) || \
-			    defined(_MSC_VER)))
-#  define HAVE_PCLMUL_INTRIN	1
-#else
-#  define HAVE_PCLMUL_INTRIN	0
-#endif
-
 
 #ifdef __AVX__
-#  define HAVE_AVX_NATIVE	1
+#  define HAVE_AVX(features)		1
 #else
-#  define HAVE_AVX_NATIVE	0
+#  define HAVE_AVX(features)		((features) & X86_CPU_FEATURE_AVX)
 #endif
-#if HAVE_AVX_NATIVE || (HAVE_TARGET_INTRINSICS && \
-			(GCC_PREREQ(4, 6) || CLANG_PREREQ(3, 0, 0) || \
-			 defined(_MSC_VER)))
-#  define HAVE_AVX_INTRIN	1
+
+#ifdef __AVX2__
+#  define HAVE_AVX2(features)		1
 #else
-#  define HAVE_AVX_INTRIN	0
+#  define HAVE_AVX2(features)		((features) & X86_CPU_FEATURE_AVX2)
 #endif
+
+#if defined(__BMI2__) || (defined(_MSC_VER) && defined(__AVX2__))
+#  define HAVE_BMI2(features)		1
+#  define HAVE_BMI2_NATIVE		1
+#else
+#  define HAVE_BMI2(features)		((features) & X86_CPU_FEATURE_BMI2)
+#  define HAVE_BMI2_NATIVE		0
+#endif
+
+#ifdef __AVX512BW__
+#  define HAVE_AVX512BW(features)	1
+#else
+#  define HAVE_AVX512BW(features)	((features) & X86_CPU_FEATURE_AVX512BW)
+#endif
+
+#ifdef __AVX512VL__
+#  define HAVE_AVX512VL(features)	1
+#else
+#  define HAVE_AVX512VL(features)	((features) & X86_CPU_FEATURE_AVX512VL)
+#endif
+
+#ifdef __VPCLMULQDQ__
+#  define HAVE_VPCLMULQDQ(features)	1
+#else
+#  define HAVE_VPCLMULQDQ(features)	((features) & X86_CPU_FEATURE_VPCLMULQDQ)
+#endif
+
+#ifdef __AVX512VNNI__
+#  define HAVE_AVX512VNNI(features)	1
+#else
+#  define HAVE_AVX512VNNI(features)	((features) & X86_CPU_FEATURE_AVX512VNNI)
+#endif
+
+#ifdef __AVXVNNI__
+#  define HAVE_AVXVNNI(features)	1
+#else
+#  define HAVE_AVXVNNI(features)	((features) & X86_CPU_FEATURE_AVXVNNI)
+#endif
+
+#endif 
+
+#endif 
 
 
 #ifdef __AVX2__
-#  define HAVE_AVX2_NATIVE	1
-#else
-#  define HAVE_AVX2_NATIVE	0
-#endif
-#if HAVE_AVX2_NATIVE || (HAVE_TARGET_INTRINSICS && \
-			 (GCC_PREREQ(4, 7) || CLANG_PREREQ(3, 1, 0) || \
-			  defined(_MSC_VER)))
-#  define HAVE_AVX2_INTRIN	1
-#else
-#  define HAVE_AVX2_INTRIN	0
-#endif
-
-
-#if defined(__BMI2__) || (defined(_MSC_VER) && defined(__AVX2__))
-#  define HAVE_BMI2_NATIVE	1
-#else
-#  define HAVE_BMI2_NATIVE	0
-#endif
-#if HAVE_BMI2_NATIVE || (HAVE_TARGET_INTRINSICS && \
-			 (GCC_PREREQ(4, 7) || CLANG_PREREQ(3, 1, 0) || \
-			  defined(_MSC_VER)))
-#  define HAVE_BMI2_INTRIN	1
-#else
-#  define HAVE_BMI2_INTRIN	0
-#endif
-
-#if defined(_MSC_VER) && _MSC_VER < 1930 
-#  undef HAVE_BMI2_NATIVE
-#  undef HAVE_BMI2_INTRIN
-#  define HAVE_BMI2_NATIVE	0
-#  define HAVE_BMI2_INTRIN	0
-#endif
-
-#endif 
-
-#endif 
-
-
-#if HAVE_AVX2_NATIVE
-#  include <immintrin.h>
 static forceinline void
 matchfinder_init_avx2(mf_pos_t *data, size_t size)
 {
@@ -20312,7 +23650,6 @@ matchfinder_rebase_avx2(mf_pos_t *data, size_t size)
 #define matchfinder_rebase matchfinder_rebase_avx2
 
 #elif HAVE_SSE2_NATIVE
-#  include <emmintrin.h>
 static forceinline void
 matchfinder_init_sse2(mf_pos_t *data, size_t size)
 {
@@ -21457,6 +24794,8 @@ deflate_get_offset_slot(u32 offset)
 {
 	
 	unsigned n = (256 - offset) >> 29;
+
+	ASSERT(offset >= 1 && offset <= 32768);
 
 	return deflate_offset_slot[(offset - 1) >> n] + (n << 1);
 }
@@ -23643,7 +26982,7 @@ libdeflate_deflate_compress_bound(struct libdeflate_compressor *c,
 	
 	return (5 * max_blocks) + in_nbytes;
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.19/lib/deflate_decompress.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.20/lib/deflate_decompress.c */
 
 
 /* #include "lib_common.h" */
@@ -23694,8 +27033,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	19
-#define LIBDEFLATE_VERSION_STRING	"1.19"
+#define LIBDEFLATE_VERSION_MINOR	20
+#define LIBDEFLATE_VERSION_STRING	"1.20"
 
 
 #ifndef LIBDEFLATEAPI
@@ -23913,6 +27252,7 @@ struct libdeflate_options {
 #undef ARCH_X86_32
 #undef ARCH_ARM64
 #undef ARCH_ARM32
+#undef ARCH_RISCV
 #ifdef _MSC_VER
 #  if defined(_M_X64)
 #    define ARCH_X86_64
@@ -23932,6 +27272,8 @@ struct libdeflate_options {
 #    define ARCH_ARM64
 #  elif defined(__arm__)
 #    define ARCH_ARM32
+#  elif defined(__riscv)
+#    define ARCH_RISCV
 #  endif
 #endif
 
@@ -23976,6 +27318,9 @@ typedef size_t machine_word_t;
 #  define GCC_PREREQ(major, minor)		\
 	(__GNUC__ > (major) ||			\
 	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#  if !GCC_PREREQ(4, 9)
+#    error "gcc versions older than 4.9 are no longer supported"
+#  endif
 #else
 #  define GCC_PREREQ(major, minor)	0
 #endif
@@ -23988,14 +27333,27 @@ typedef size_t machine_word_t;
 	(__clang_major__ > (major) ||			\
 	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
 #  endif
+#  if !CLANG_PREREQ(3, 9, 8000000)
+#    error "clang versions older than 3.9 are no longer supported"
+#  endif
 #else
 #  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+#ifdef _MSC_VER
+#  define MSVC_PREREQ(version)	(_MSC_VER >= (version))
+#  if !MSVC_PREREQ(1900)
+#    error "MSVC versions older than Visual Studio 2015 are no longer supported"
+#  endif
+#else
+#  define MSVC_PREREQ(version)	0
 #endif
 
 
 #ifndef __has_attribute
 #  define __has_attribute(attribute)	0
 #endif
+
+
 #ifndef __has_builtin
 #  define __has_builtin(builtin)	0
 #endif
@@ -24019,6 +27377,13 @@ typedef size_t machine_word_t;
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
+#endif
+
+
+#if defined(__GNUC__) || __has_attribute(noreturn)
+#  define NORETURN		__attribute__((noreturn))
+#else
+#  define NORETURN
 #endif
 
 
@@ -24087,12 +27452,10 @@ typedef size_t machine_word_t;
 #endif
 
 
-#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#if defined(__GNUC__) || __has_attribute(target)
 #  define _target_attribute(attrs)	__attribute__((target(attrs)))
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
 #else
 #  define _target_attribute(attrs)
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
 #endif
 
 
@@ -24132,7 +27495,7 @@ static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
 
 static forceinline u16 bswap16(u16 v)
 {
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap16)
 	return __builtin_bswap16(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ushort(v);
@@ -24144,7 +27507,7 @@ static forceinline u16 bswap16(u16 v)
 
 static forceinline u32 bswap32(u32 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap32)
 	return __builtin_bswap32(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ulong(v);
@@ -24159,7 +27522,7 @@ static forceinline u32 bswap32(u32 v)
 
 static forceinline u64 bswap64(u64 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap64)
 	return __builtin_bswap64(v);
 #elif defined(_MSC_VER)
 	return _byteswap_uint64(v);
@@ -24190,6 +27553,7 @@ static forceinline u64 bswap64(u64 v)
 #if (defined(__GNUC__) || defined(__clang__)) && \
 	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	 defined(__riscv_misaligned_fast) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
 #elif defined(_MSC_VER)
@@ -24527,12 +27891,17 @@ int memcmp(const void *s1, const void *s2, size_t n);
 
 #undef LIBDEFLATE_ENABLE_ASSERTIONS
 #else
-#include <string.h>
+#  include <string.h>
+   
+#  ifdef __clang_analyzer__
+#    define LIBDEFLATE_ENABLE_ASSERTIONS
+#  endif
 #endif
 
 
 #ifdef LIBDEFLATE_ENABLE_ASSERTIONS
-void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+NORETURN void
+libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #define ASSERT(expr) { if (unlikely(!(expr))) \
 	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
 #else
@@ -25157,7 +28526,7 @@ typedef enum libdeflate_result (*decompress_func_t)
 #  define EXTRACT_VARBITS8(word, count)	((word) & BITMASK((u8)(count)))
 #endif
 
-static enum libdeflate_result ATTRIBUTES MAYBE_UNUSED
+static ATTRIBUTES MAYBE_UNUSED enum libdeflate_result
 FUNCNAME(struct libdeflate_decompressor * restrict d,
 	 const void * restrict in, size_t in_nbytes,
 	 void * restrict out, size_t out_nbytes_avail,
@@ -25806,8 +29175,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	19
-#define LIBDEFLATE_VERSION_STRING	"1.19"
+#define LIBDEFLATE_VERSION_MINOR	20
+#define LIBDEFLATE_VERSION_STRING	"1.20"
 
 
 #ifndef LIBDEFLATEAPI
@@ -26025,6 +29394,7 @@ struct libdeflate_options {
 #undef ARCH_X86_32
 #undef ARCH_ARM64
 #undef ARCH_ARM32
+#undef ARCH_RISCV
 #ifdef _MSC_VER
 #  if defined(_M_X64)
 #    define ARCH_X86_64
@@ -26044,6 +29414,8 @@ struct libdeflate_options {
 #    define ARCH_ARM64
 #  elif defined(__arm__)
 #    define ARCH_ARM32
+#  elif defined(__riscv)
+#    define ARCH_RISCV
 #  endif
 #endif
 
@@ -26088,6 +29460,9 @@ typedef size_t machine_word_t;
 #  define GCC_PREREQ(major, minor)		\
 	(__GNUC__ > (major) ||			\
 	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#  if !GCC_PREREQ(4, 9)
+#    error "gcc versions older than 4.9 are no longer supported"
+#  endif
 #else
 #  define GCC_PREREQ(major, minor)	0
 #endif
@@ -26100,14 +29475,27 @@ typedef size_t machine_word_t;
 	(__clang_major__ > (major) ||			\
 	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
 #  endif
+#  if !CLANG_PREREQ(3, 9, 8000000)
+#    error "clang versions older than 3.9 are no longer supported"
+#  endif
 #else
 #  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+#ifdef _MSC_VER
+#  define MSVC_PREREQ(version)	(_MSC_VER >= (version))
+#  if !MSVC_PREREQ(1900)
+#    error "MSVC versions older than Visual Studio 2015 are no longer supported"
+#  endif
+#else
+#  define MSVC_PREREQ(version)	0
 #endif
 
 
 #ifndef __has_attribute
 #  define __has_attribute(attribute)	0
 #endif
+
+
 #ifndef __has_builtin
 #  define __has_builtin(builtin)	0
 #endif
@@ -26131,6 +29519,13 @@ typedef size_t machine_word_t;
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
+#endif
+
+
+#if defined(__GNUC__) || __has_attribute(noreturn)
+#  define NORETURN		__attribute__((noreturn))
+#else
+#  define NORETURN
 #endif
 
 
@@ -26199,12 +29594,10 @@ typedef size_t machine_word_t;
 #endif
 
 
-#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#if defined(__GNUC__) || __has_attribute(target)
 #  define _target_attribute(attrs)	__attribute__((target(attrs)))
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
 #else
 #  define _target_attribute(attrs)
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
 #endif
 
 
@@ -26244,7 +29637,7 @@ static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
 
 static forceinline u16 bswap16(u16 v)
 {
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap16)
 	return __builtin_bswap16(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ushort(v);
@@ -26256,7 +29649,7 @@ static forceinline u16 bswap16(u16 v)
 
 static forceinline u32 bswap32(u32 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap32)
 	return __builtin_bswap32(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ulong(v);
@@ -26271,7 +29664,7 @@ static forceinline u32 bswap32(u32 v)
 
 static forceinline u64 bswap64(u64 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap64)
 	return __builtin_bswap64(v);
 #elif defined(_MSC_VER)
 	return _byteswap_uint64(v);
@@ -26302,6 +29695,7 @@ static forceinline u64 bswap64(u64 v)
 #if (defined(__GNUC__) || defined(__clang__)) && \
 	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	 defined(__riscv_misaligned_fast) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
 #elif defined(_MSC_VER)
@@ -26639,12 +30033,17 @@ int memcmp(const void *s1, const void *s2, size_t n);
 
 #undef LIBDEFLATE_ENABLE_ASSERTIONS
 #else
-#include <string.h>
+#  include <string.h>
+   
+#  ifdef __clang_analyzer__
+#    define LIBDEFLATE_ENABLE_ASSERTIONS
+#  endif
 #endif
 
 
 #ifdef LIBDEFLATE_ENABLE_ASSERTIONS
-void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+NORETURN void
+libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #define ASSERT(expr) { if (unlikely(!(expr))) \
 	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
 #else
@@ -26658,29 +30057,24 @@ void libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #endif 
 
 
-#define HAVE_DYNAMIC_X86_CPU_FEATURES	0
-
 #if defined(ARCH_X86_32) || defined(ARCH_X86_64)
 
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE || defined(_MSC_VER)
-#  undef HAVE_DYNAMIC_X86_CPU_FEATURES
-#  define HAVE_DYNAMIC_X86_CPU_FEATURES	1
-#endif
+#define X86_CPU_FEATURE_SSE2		(1 << 0)
+#define X86_CPU_FEATURE_PCLMULQDQ	(1 << 1)
+#define X86_CPU_FEATURE_AVX		(1 << 2)
+#define X86_CPU_FEATURE_AVX2		(1 << 3)
+#define X86_CPU_FEATURE_BMI2		(1 << 4)
 
-#define X86_CPU_FEATURE_SSE2		0x00000001
-#define X86_CPU_FEATURE_PCLMUL		0x00000002
-#define X86_CPU_FEATURE_AVX		0x00000004
-#define X86_CPU_FEATURE_AVX2		0x00000008
-#define X86_CPU_FEATURE_BMI2		0x00000010
+#define X86_CPU_FEATURE_ZMM		(1 << 5)
+#define X86_CPU_FEATURE_AVX512BW	(1 << 6)
+#define X86_CPU_FEATURE_AVX512VL	(1 << 7)
+#define X86_CPU_FEATURE_VPCLMULQDQ	(1 << 8)
+#define X86_CPU_FEATURE_AVX512VNNI	(1 << 9)
+#define X86_CPU_FEATURE_AVXVNNI		(1 << 10)
 
-#define HAVE_SSE2(features)	(HAVE_SSE2_NATIVE     || ((features) & X86_CPU_FEATURE_SSE2))
-#define HAVE_PCLMUL(features)	(HAVE_PCLMUL_NATIVE   || ((features) & X86_CPU_FEATURE_PCLMUL))
-#define HAVE_AVX(features)	(HAVE_AVX_NATIVE      || ((features) & X86_CPU_FEATURE_AVX))
-#define HAVE_AVX2(features)	(HAVE_AVX2_NATIVE     || ((features) & X86_CPU_FEATURE_AVX2))
-#define HAVE_BMI2(features)	(HAVE_BMI2_NATIVE     || ((features) & X86_CPU_FEATURE_BMI2))
+#if defined(__GNUC__) || defined(__clang__) || defined(_MSC_VER)
 
-#if HAVE_DYNAMIC_X86_CPU_FEATURES
-#define X86_CPU_FEATURES_KNOWN		0x80000000
+#  define X86_CPU_FEATURES_KNOWN	(1U << 31)
 extern volatile u32 libdeflate_x86_cpu_features;
 
 void libdeflate_init_x86_cpu_features(void);
@@ -26691,89 +30085,101 @@ static inline u32 get_x86_cpu_features(void)
 		libdeflate_init_x86_cpu_features();
 	return libdeflate_x86_cpu_features;
 }
-#else 
-static inline u32 get_x86_cpu_features(void) { return 0; }
-#endif 
 
-
-#if HAVE_DYNAMIC_X86_CPU_FEATURES && \
-	(GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000) || defined(_MSC_VER))
-#  define HAVE_TARGET_INTRINSICS	1
+#  include <immintrin.h>
+#  if defined(_MSC_VER) && defined(__clang__)
+#    include <tmmintrin.h>
+#    include <smmintrin.h>
+#    include <wmmintrin.h>
+#    include <avxintrin.h>
+#    include <avx2intrin.h>
+#    include <avx512fintrin.h>
+#    include <avx512bwintrin.h>
+#    include <avx512vlintrin.h>
+#    if __has_include(<avx512vlbwintrin.h>)
+#      include <avx512vlbwintrin.h>
+#    endif
+#    if __has_include(<vpclmulqdqintrin.h>)
+#      include <vpclmulqdqintrin.h>
+#    endif
+#    if __has_include(<avx512vnniintrin.h>)
+#      include <avx512vnniintrin.h>
+#    endif
+#    if __has_include(<avx512vlvnniintrin.h>)
+#      include <avx512vlvnniintrin.h>
+#    endif
+#    if __has_include(<avxvnniintrin.h>)
+#      include <avxvnniintrin.h>
+#    endif
+#  endif
 #else
-#  define HAVE_TARGET_INTRINSICS	0
+static inline u32 get_x86_cpu_features(void) { return 0; }
 #endif
-
 
 #if defined(__SSE2__) || \
 	(defined(_MSC_VER) && \
 	 (defined(ARCH_X86_64) || (defined(_M_IX86_FP) && _M_IX86_FP >= 2)))
-#  define HAVE_SSE2_NATIVE	1
+#  define HAVE_SSE2(features)		1
+#  define HAVE_SSE2_NATIVE		1
 #else
-#  define HAVE_SSE2_NATIVE	0
+#  define HAVE_SSE2(features)		((features) & X86_CPU_FEATURE_SSE2)
+#  define HAVE_SSE2_NATIVE		0
 #endif
-#define HAVE_SSE2_INTRIN	(HAVE_SSE2_NATIVE || HAVE_TARGET_INTRINSICS)
-
 
 #if defined(__PCLMUL__) || (defined(_MSC_VER) && defined(__AVX2__))
-#  define HAVE_PCLMUL_NATIVE	1
+#  define HAVE_PCLMULQDQ(features)	1
 #else
-#  define HAVE_PCLMUL_NATIVE	0
+#  define HAVE_PCLMULQDQ(features)	((features) & X86_CPU_FEATURE_PCLMULQDQ)
 #endif
-#if HAVE_PCLMUL_NATIVE || (HAVE_TARGET_INTRINSICS && \
-			   (GCC_PREREQ(4, 4) || CLANG_PREREQ(3, 2, 0) || \
-			    defined(_MSC_VER)))
-#  define HAVE_PCLMUL_INTRIN	1
-#else
-#  define HAVE_PCLMUL_INTRIN	0
-#endif
-
 
 #ifdef __AVX__
-#  define HAVE_AVX_NATIVE	1
+#  define HAVE_AVX(features)		1
 #else
-#  define HAVE_AVX_NATIVE	0
+#  define HAVE_AVX(features)		((features) & X86_CPU_FEATURE_AVX)
 #endif
-#if HAVE_AVX_NATIVE || (HAVE_TARGET_INTRINSICS && \
-			(GCC_PREREQ(4, 6) || CLANG_PREREQ(3, 0, 0) || \
-			 defined(_MSC_VER)))
-#  define HAVE_AVX_INTRIN	1
-#else
-#  define HAVE_AVX_INTRIN	0
-#endif
-
 
 #ifdef __AVX2__
-#  define HAVE_AVX2_NATIVE	1
+#  define HAVE_AVX2(features)		1
 #else
-#  define HAVE_AVX2_NATIVE	0
+#  define HAVE_AVX2(features)		((features) & X86_CPU_FEATURE_AVX2)
 #endif
-#if HAVE_AVX2_NATIVE || (HAVE_TARGET_INTRINSICS && \
-			 (GCC_PREREQ(4, 7) || CLANG_PREREQ(3, 1, 0) || \
-			  defined(_MSC_VER)))
-#  define HAVE_AVX2_INTRIN	1
-#else
-#  define HAVE_AVX2_INTRIN	0
-#endif
-
 
 #if defined(__BMI2__) || (defined(_MSC_VER) && defined(__AVX2__))
-#  define HAVE_BMI2_NATIVE	1
+#  define HAVE_BMI2(features)		1
+#  define HAVE_BMI2_NATIVE		1
 #else
-#  define HAVE_BMI2_NATIVE	0
-#endif
-#if HAVE_BMI2_NATIVE || (HAVE_TARGET_INTRINSICS && \
-			 (GCC_PREREQ(4, 7) || CLANG_PREREQ(3, 1, 0) || \
-			  defined(_MSC_VER)))
-#  define HAVE_BMI2_INTRIN	1
-#else
-#  define HAVE_BMI2_INTRIN	0
+#  define HAVE_BMI2(features)		((features) & X86_CPU_FEATURE_BMI2)
+#  define HAVE_BMI2_NATIVE		0
 #endif
 
-#if defined(_MSC_VER) && _MSC_VER < 1930 
-#  undef HAVE_BMI2_NATIVE
-#  undef HAVE_BMI2_INTRIN
-#  define HAVE_BMI2_NATIVE	0
-#  define HAVE_BMI2_INTRIN	0
+#ifdef __AVX512BW__
+#  define HAVE_AVX512BW(features)	1
+#else
+#  define HAVE_AVX512BW(features)	((features) & X86_CPU_FEATURE_AVX512BW)
+#endif
+
+#ifdef __AVX512VL__
+#  define HAVE_AVX512VL(features)	1
+#else
+#  define HAVE_AVX512VL(features)	((features) & X86_CPU_FEATURE_AVX512VL)
+#endif
+
+#ifdef __VPCLMULQDQ__
+#  define HAVE_VPCLMULQDQ(features)	1
+#else
+#  define HAVE_VPCLMULQDQ(features)	((features) & X86_CPU_FEATURE_VPCLMULQDQ)
+#endif
+
+#ifdef __AVX512VNNI__
+#  define HAVE_AVX512VNNI(features)	1
+#else
+#  define HAVE_AVX512VNNI(features)	((features) & X86_CPU_FEATURE_AVX512VNNI)
+#endif
+
+#ifdef __AVXVNNI__
+#  define HAVE_AVXVNNI(features)	1
+#else
+#  define HAVE_AVXVNNI(features)	((features) & X86_CPU_FEATURE_AVXVNNI)
 #endif
 
 #endif 
@@ -26782,15 +30188,12 @@ static inline u32 get_x86_cpu_features(void) { return 0; }
 
 
 
-#if HAVE_BMI2_INTRIN
+#if defined(__GNUC__) || defined(__clang__) || MSVC_PREREQ(1930)
 #  define deflate_decompress_bmi2	deflate_decompress_bmi2
 #  define FUNCNAME			deflate_decompress_bmi2
-#  if !HAVE_BMI2_NATIVE
-#    define ATTRIBUTES			_target_attribute("bmi2")
-#  endif
+#  define ATTRIBUTES			_target_attribute("bmi2")
    
 #  ifndef __clang__
-#    include <immintrin.h>
 #    ifdef ARCH_X86_64
 #      define EXTRACT_VARBITS(word, count)  _bzhi_u64((word), (count))
 #      define EXTRACT_VARBITS8(word, count) _bzhi_u64((word), (count))
@@ -26814,7 +30217,7 @@ static inline u32 get_x86_cpu_features(void) { return 0; }
 #  define EXTRACT_VARBITS8(word, count)	((word) & BITMASK((u8)(count)))
 #endif
 
-static enum libdeflate_result ATTRIBUTES MAYBE_UNUSED
+static ATTRIBUTES MAYBE_UNUSED enum libdeflate_result
 FUNCNAME(struct libdeflate_decompressor * restrict d,
 	 const void * restrict in, size_t in_nbytes,
 	 void * restrict out, size_t out_nbytes_avail,
@@ -27400,7 +30803,7 @@ block_done:
 #undef EXTRACT_VARBITS
 #undef EXTRACT_VARBITS8
 
-#endif 
+#endif
 
 #if defined(deflate_decompress_bmi2) && HAVE_BMI2_NATIVE
 #define DEFAULT_IMPL	deflate_decompress_bmi2
@@ -27513,7 +30916,7 @@ libdeflate_free_decompressor(struct libdeflate_decompressor *d)
 	if (d)
 		d->free_func(d);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.19/lib/gzip_compress.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.20/lib/gzip_compress.c */
 
 
 /* #include "deflate_compress.h" */
@@ -27568,8 +30971,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	19
-#define LIBDEFLATE_VERSION_STRING	"1.19"
+#define LIBDEFLATE_VERSION_MINOR	20
+#define LIBDEFLATE_VERSION_STRING	"1.20"
 
 
 #ifndef LIBDEFLATEAPI
@@ -27787,6 +31190,7 @@ struct libdeflate_options {
 #undef ARCH_X86_32
 #undef ARCH_ARM64
 #undef ARCH_ARM32
+#undef ARCH_RISCV
 #ifdef _MSC_VER
 #  if defined(_M_X64)
 #    define ARCH_X86_64
@@ -27806,6 +31210,8 @@ struct libdeflate_options {
 #    define ARCH_ARM64
 #  elif defined(__arm__)
 #    define ARCH_ARM32
+#  elif defined(__riscv)
+#    define ARCH_RISCV
 #  endif
 #endif
 
@@ -27850,6 +31256,9 @@ typedef size_t machine_word_t;
 #  define GCC_PREREQ(major, minor)		\
 	(__GNUC__ > (major) ||			\
 	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#  if !GCC_PREREQ(4, 9)
+#    error "gcc versions older than 4.9 are no longer supported"
+#  endif
 #else
 #  define GCC_PREREQ(major, minor)	0
 #endif
@@ -27862,14 +31271,27 @@ typedef size_t machine_word_t;
 	(__clang_major__ > (major) ||			\
 	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
 #  endif
+#  if !CLANG_PREREQ(3, 9, 8000000)
+#    error "clang versions older than 3.9 are no longer supported"
+#  endif
 #else
 #  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+#ifdef _MSC_VER
+#  define MSVC_PREREQ(version)	(_MSC_VER >= (version))
+#  if !MSVC_PREREQ(1900)
+#    error "MSVC versions older than Visual Studio 2015 are no longer supported"
+#  endif
+#else
+#  define MSVC_PREREQ(version)	0
 #endif
 
 
 #ifndef __has_attribute
 #  define __has_attribute(attribute)	0
 #endif
+
+
 #ifndef __has_builtin
 #  define __has_builtin(builtin)	0
 #endif
@@ -27893,6 +31315,13 @@ typedef size_t machine_word_t;
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
+#endif
+
+
+#if defined(__GNUC__) || __has_attribute(noreturn)
+#  define NORETURN		__attribute__((noreturn))
+#else
+#  define NORETURN
 #endif
 
 
@@ -27961,12 +31390,10 @@ typedef size_t machine_word_t;
 #endif
 
 
-#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#if defined(__GNUC__) || __has_attribute(target)
 #  define _target_attribute(attrs)	__attribute__((target(attrs)))
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
 #else
 #  define _target_attribute(attrs)
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
 #endif
 
 
@@ -28006,7 +31433,7 @@ static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
 
 static forceinline u16 bswap16(u16 v)
 {
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap16)
 	return __builtin_bswap16(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ushort(v);
@@ -28018,7 +31445,7 @@ static forceinline u16 bswap16(u16 v)
 
 static forceinline u32 bswap32(u32 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap32)
 	return __builtin_bswap32(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ulong(v);
@@ -28033,7 +31460,7 @@ static forceinline u32 bswap32(u32 v)
 
 static forceinline u64 bswap64(u64 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap64)
 	return __builtin_bswap64(v);
 #elif defined(_MSC_VER)
 	return _byteswap_uint64(v);
@@ -28064,6 +31491,7 @@ static forceinline u64 bswap64(u64 v)
 #if (defined(__GNUC__) || defined(__clang__)) && \
 	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	 defined(__riscv_misaligned_fast) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
 #elif defined(_MSC_VER)
@@ -28401,12 +31829,17 @@ int memcmp(const void *s1, const void *s2, size_t n);
 
 #undef LIBDEFLATE_ENABLE_ASSERTIONS
 #else
-#include <string.h>
+#  include <string.h>
+   
+#  ifdef __clang_analyzer__
+#    define LIBDEFLATE_ENABLE_ASSERTIONS
+#  endif
 #endif
 
 
 #ifdef LIBDEFLATE_ENABLE_ASSERTIONS
-void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+NORETURN void
+libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #define ASSERT(expr) { if (unlikely(!(expr))) \
 	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
 #else
@@ -28534,7 +31967,7 @@ libdeflate_gzip_compress_bound(struct libdeflate_compressor *c,
 	return GZIP_MIN_OVERHEAD +
 	       libdeflate_deflate_compress_bound(c, in_nbytes);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.19/lib/gzip_decompress.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.20/lib/gzip_decompress.c */
 
 
 /* #include "lib_common.h" */
@@ -28585,8 +32018,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	19
-#define LIBDEFLATE_VERSION_STRING	"1.19"
+#define LIBDEFLATE_VERSION_MINOR	20
+#define LIBDEFLATE_VERSION_STRING	"1.20"
 
 
 #ifndef LIBDEFLATEAPI
@@ -28804,6 +32237,7 @@ struct libdeflate_options {
 #undef ARCH_X86_32
 #undef ARCH_ARM64
 #undef ARCH_ARM32
+#undef ARCH_RISCV
 #ifdef _MSC_VER
 #  if defined(_M_X64)
 #    define ARCH_X86_64
@@ -28823,6 +32257,8 @@ struct libdeflate_options {
 #    define ARCH_ARM64
 #  elif defined(__arm__)
 #    define ARCH_ARM32
+#  elif defined(__riscv)
+#    define ARCH_RISCV
 #  endif
 #endif
 
@@ -28867,6 +32303,9 @@ typedef size_t machine_word_t;
 #  define GCC_PREREQ(major, minor)		\
 	(__GNUC__ > (major) ||			\
 	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#  if !GCC_PREREQ(4, 9)
+#    error "gcc versions older than 4.9 are no longer supported"
+#  endif
 #else
 #  define GCC_PREREQ(major, minor)	0
 #endif
@@ -28879,14 +32318,27 @@ typedef size_t machine_word_t;
 	(__clang_major__ > (major) ||			\
 	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
 #  endif
+#  if !CLANG_PREREQ(3, 9, 8000000)
+#    error "clang versions older than 3.9 are no longer supported"
+#  endif
 #else
 #  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+#ifdef _MSC_VER
+#  define MSVC_PREREQ(version)	(_MSC_VER >= (version))
+#  if !MSVC_PREREQ(1900)
+#    error "MSVC versions older than Visual Studio 2015 are no longer supported"
+#  endif
+#else
+#  define MSVC_PREREQ(version)	0
 #endif
 
 
 #ifndef __has_attribute
 #  define __has_attribute(attribute)	0
 #endif
+
+
 #ifndef __has_builtin
 #  define __has_builtin(builtin)	0
 #endif
@@ -28910,6 +32362,13 @@ typedef size_t machine_word_t;
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
+#endif
+
+
+#if defined(__GNUC__) || __has_attribute(noreturn)
+#  define NORETURN		__attribute__((noreturn))
+#else
+#  define NORETURN
 #endif
 
 
@@ -28978,12 +32437,10 @@ typedef size_t machine_word_t;
 #endif
 
 
-#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#if defined(__GNUC__) || __has_attribute(target)
 #  define _target_attribute(attrs)	__attribute__((target(attrs)))
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
 #else
 #  define _target_attribute(attrs)
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
 #endif
 
 
@@ -29023,7 +32480,7 @@ static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
 
 static forceinline u16 bswap16(u16 v)
 {
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap16)
 	return __builtin_bswap16(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ushort(v);
@@ -29035,7 +32492,7 @@ static forceinline u16 bswap16(u16 v)
 
 static forceinline u32 bswap32(u32 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap32)
 	return __builtin_bswap32(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ulong(v);
@@ -29050,7 +32507,7 @@ static forceinline u32 bswap32(u32 v)
 
 static forceinline u64 bswap64(u64 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap64)
 	return __builtin_bswap64(v);
 #elif defined(_MSC_VER)
 	return _byteswap_uint64(v);
@@ -29081,6 +32538,7 @@ static forceinline u64 bswap64(u64 v)
 #if (defined(__GNUC__) || defined(__clang__)) && \
 	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	 defined(__riscv_misaligned_fast) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
 #elif defined(_MSC_VER)
@@ -29418,12 +32876,17 @@ int memcmp(const void *s1, const void *s2, size_t n);
 
 #undef LIBDEFLATE_ENABLE_ASSERTIONS
 #else
-#include <string.h>
+#  include <string.h>
+   
+#  ifdef __clang_analyzer__
+#    define LIBDEFLATE_ENABLE_ASSERTIONS
+#  endif
 #endif
 
 
 #ifdef LIBDEFLATE_ENABLE_ASSERTIONS
-void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+NORETURN void
+libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #define ASSERT(expr) { if (unlikely(!(expr))) \
 	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
 #else
@@ -29596,7 +33059,7 @@ libdeflate_gzip_decompress(struct libdeflate_decompressor *d,
 					     out, out_nbytes_avail,
 					     NULL, actual_out_nbytes_ret);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.19/lib/utils.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.20/lib/utils.c */
 
 
 /* #include "lib_common.h" */
@@ -29647,8 +33110,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	19
-#define LIBDEFLATE_VERSION_STRING	"1.19"
+#define LIBDEFLATE_VERSION_MINOR	20
+#define LIBDEFLATE_VERSION_STRING	"1.20"
 
 
 #ifndef LIBDEFLATEAPI
@@ -29866,6 +33329,7 @@ struct libdeflate_options {
 #undef ARCH_X86_32
 #undef ARCH_ARM64
 #undef ARCH_ARM32
+#undef ARCH_RISCV
 #ifdef _MSC_VER
 #  if defined(_M_X64)
 #    define ARCH_X86_64
@@ -29885,6 +33349,8 @@ struct libdeflate_options {
 #    define ARCH_ARM64
 #  elif defined(__arm__)
 #    define ARCH_ARM32
+#  elif defined(__riscv)
+#    define ARCH_RISCV
 #  endif
 #endif
 
@@ -29929,6 +33395,9 @@ typedef size_t machine_word_t;
 #  define GCC_PREREQ(major, minor)		\
 	(__GNUC__ > (major) ||			\
 	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#  if !GCC_PREREQ(4, 9)
+#    error "gcc versions older than 4.9 are no longer supported"
+#  endif
 #else
 #  define GCC_PREREQ(major, minor)	0
 #endif
@@ -29941,14 +33410,27 @@ typedef size_t machine_word_t;
 	(__clang_major__ > (major) ||			\
 	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
 #  endif
+#  if !CLANG_PREREQ(3, 9, 8000000)
+#    error "clang versions older than 3.9 are no longer supported"
+#  endif
 #else
 #  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+#ifdef _MSC_VER
+#  define MSVC_PREREQ(version)	(_MSC_VER >= (version))
+#  if !MSVC_PREREQ(1900)
+#    error "MSVC versions older than Visual Studio 2015 are no longer supported"
+#  endif
+#else
+#  define MSVC_PREREQ(version)	0
 #endif
 
 
 #ifndef __has_attribute
 #  define __has_attribute(attribute)	0
 #endif
+
+
 #ifndef __has_builtin
 #  define __has_builtin(builtin)	0
 #endif
@@ -29972,6 +33454,13 @@ typedef size_t machine_word_t;
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
+#endif
+
+
+#if defined(__GNUC__) || __has_attribute(noreturn)
+#  define NORETURN		__attribute__((noreturn))
+#else
+#  define NORETURN
 #endif
 
 
@@ -30040,12 +33529,10 @@ typedef size_t machine_word_t;
 #endif
 
 
-#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#if defined(__GNUC__) || __has_attribute(target)
 #  define _target_attribute(attrs)	__attribute__((target(attrs)))
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
 #else
 #  define _target_attribute(attrs)
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
 #endif
 
 
@@ -30085,7 +33572,7 @@ static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
 
 static forceinline u16 bswap16(u16 v)
 {
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap16)
 	return __builtin_bswap16(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ushort(v);
@@ -30097,7 +33584,7 @@ static forceinline u16 bswap16(u16 v)
 
 static forceinline u32 bswap32(u32 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap32)
 	return __builtin_bswap32(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ulong(v);
@@ -30112,7 +33599,7 @@ static forceinline u32 bswap32(u32 v)
 
 static forceinline u64 bswap64(u64 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap64)
 	return __builtin_bswap64(v);
 #elif defined(_MSC_VER)
 	return _byteswap_uint64(v);
@@ -30143,6 +33630,7 @@ static forceinline u64 bswap64(u64 v)
 #if (defined(__GNUC__) || defined(__clang__)) && \
 	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	 defined(__riscv_misaligned_fast) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
 #elif defined(_MSC_VER)
@@ -30480,12 +33968,17 @@ int memcmp(const void *s1, const void *s2, size_t n);
 
 #undef LIBDEFLATE_ENABLE_ASSERTIONS
 #else
-#include <string.h>
+#  include <string.h>
+   
+#  ifdef __clang_analyzer__
+#    define LIBDEFLATE_ENABLE_ASSERTIONS
+#  endif
 #endif
 
 
 #ifdef LIBDEFLATE_ENABLE_ASSERTIONS
-void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+NORETURN void
+libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #define ASSERT(expr) { if (unlikely(!(expr))) \
 	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
 #else
@@ -30600,14 +34093,14 @@ memcmp(const void *s1, const void *s2, size_t n)
 #ifdef LIBDEFLATE_ENABLE_ASSERTIONS
 #include <stdio.h>
 #include <stdlib.h>
-void
+NORETURN void
 libdeflate_assertion_failed(const char *expr, const char *file, int line)
 {
 	fprintf(stderr, "Assertion failed: %s at %s:%d\n", expr, file, line);
 	abort();
 }
 #endif 
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.19/lib/zlib_compress.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.20/lib/zlib_compress.c */
 
 
 /* #include "deflate_compress.h" */
@@ -30662,8 +34155,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	19
-#define LIBDEFLATE_VERSION_STRING	"1.19"
+#define LIBDEFLATE_VERSION_MINOR	20
+#define LIBDEFLATE_VERSION_STRING	"1.20"
 
 
 #ifndef LIBDEFLATEAPI
@@ -30881,6 +34374,7 @@ struct libdeflate_options {
 #undef ARCH_X86_32
 #undef ARCH_ARM64
 #undef ARCH_ARM32
+#undef ARCH_RISCV
 #ifdef _MSC_VER
 #  if defined(_M_X64)
 #    define ARCH_X86_64
@@ -30900,6 +34394,8 @@ struct libdeflate_options {
 #    define ARCH_ARM64
 #  elif defined(__arm__)
 #    define ARCH_ARM32
+#  elif defined(__riscv)
+#    define ARCH_RISCV
 #  endif
 #endif
 
@@ -30944,6 +34440,9 @@ typedef size_t machine_word_t;
 #  define GCC_PREREQ(major, minor)		\
 	(__GNUC__ > (major) ||			\
 	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#  if !GCC_PREREQ(4, 9)
+#    error "gcc versions older than 4.9 are no longer supported"
+#  endif
 #else
 #  define GCC_PREREQ(major, minor)	0
 #endif
@@ -30956,14 +34455,27 @@ typedef size_t machine_word_t;
 	(__clang_major__ > (major) ||			\
 	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
 #  endif
+#  if !CLANG_PREREQ(3, 9, 8000000)
+#    error "clang versions older than 3.9 are no longer supported"
+#  endif
 #else
 #  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+#ifdef _MSC_VER
+#  define MSVC_PREREQ(version)	(_MSC_VER >= (version))
+#  if !MSVC_PREREQ(1900)
+#    error "MSVC versions older than Visual Studio 2015 are no longer supported"
+#  endif
+#else
+#  define MSVC_PREREQ(version)	0
 #endif
 
 
 #ifndef __has_attribute
 #  define __has_attribute(attribute)	0
 #endif
+
+
 #ifndef __has_builtin
 #  define __has_builtin(builtin)	0
 #endif
@@ -30987,6 +34499,13 @@ typedef size_t machine_word_t;
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
+#endif
+
+
+#if defined(__GNUC__) || __has_attribute(noreturn)
+#  define NORETURN		__attribute__((noreturn))
+#else
+#  define NORETURN
 #endif
 
 
@@ -31055,12 +34574,10 @@ typedef size_t machine_word_t;
 #endif
 
 
-#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#if defined(__GNUC__) || __has_attribute(target)
 #  define _target_attribute(attrs)	__attribute__((target(attrs)))
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
 #else
 #  define _target_attribute(attrs)
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
 #endif
 
 
@@ -31100,7 +34617,7 @@ static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
 
 static forceinline u16 bswap16(u16 v)
 {
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap16)
 	return __builtin_bswap16(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ushort(v);
@@ -31112,7 +34629,7 @@ static forceinline u16 bswap16(u16 v)
 
 static forceinline u32 bswap32(u32 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap32)
 	return __builtin_bswap32(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ulong(v);
@@ -31127,7 +34644,7 @@ static forceinline u32 bswap32(u32 v)
 
 static forceinline u64 bswap64(u64 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap64)
 	return __builtin_bswap64(v);
 #elif defined(_MSC_VER)
 	return _byteswap_uint64(v);
@@ -31158,6 +34675,7 @@ static forceinline u64 bswap64(u64 v)
 #if (defined(__GNUC__) || defined(__clang__)) && \
 	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	 defined(__riscv_misaligned_fast) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
 #elif defined(_MSC_VER)
@@ -31495,12 +35013,17 @@ int memcmp(const void *s1, const void *s2, size_t n);
 
 #undef LIBDEFLATE_ENABLE_ASSERTIONS
 #else
-#include <string.h>
+#  include <string.h>
+   
+#  ifdef __clang_analyzer__
+#    define LIBDEFLATE_ENABLE_ASSERTIONS
+#  endif
 #endif
 
 
 #ifdef LIBDEFLATE_ENABLE_ASSERTIONS
-void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+NORETURN void
+libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #define ASSERT(expr) { if (unlikely(!(expr))) \
 	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
 #else
@@ -31596,7 +35119,7 @@ libdeflate_zlib_compress_bound(struct libdeflate_compressor *c,
 	return ZLIB_MIN_OVERHEAD +
 	       libdeflate_deflate_compress_bound(c, in_nbytes);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.19/lib/zlib_decompress.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.20/lib/zlib_decompress.c */
 
 
 /* #include "lib_common.h" */
@@ -31647,8 +35170,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	19
-#define LIBDEFLATE_VERSION_STRING	"1.19"
+#define LIBDEFLATE_VERSION_MINOR	20
+#define LIBDEFLATE_VERSION_STRING	"1.20"
 
 
 #ifndef LIBDEFLATEAPI
@@ -31866,6 +35389,7 @@ struct libdeflate_options {
 #undef ARCH_X86_32
 #undef ARCH_ARM64
 #undef ARCH_ARM32
+#undef ARCH_RISCV
 #ifdef _MSC_VER
 #  if defined(_M_X64)
 #    define ARCH_X86_64
@@ -31885,6 +35409,8 @@ struct libdeflate_options {
 #    define ARCH_ARM64
 #  elif defined(__arm__)
 #    define ARCH_ARM32
+#  elif defined(__riscv)
+#    define ARCH_RISCV
 #  endif
 #endif
 
@@ -31929,6 +35455,9 @@ typedef size_t machine_word_t;
 #  define GCC_PREREQ(major, minor)		\
 	(__GNUC__ > (major) ||			\
 	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#  if !GCC_PREREQ(4, 9)
+#    error "gcc versions older than 4.9 are no longer supported"
+#  endif
 #else
 #  define GCC_PREREQ(major, minor)	0
 #endif
@@ -31941,14 +35470,27 @@ typedef size_t machine_word_t;
 	(__clang_major__ > (major) ||			\
 	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
 #  endif
+#  if !CLANG_PREREQ(3, 9, 8000000)
+#    error "clang versions older than 3.9 are no longer supported"
+#  endif
 #else
 #  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+#ifdef _MSC_VER
+#  define MSVC_PREREQ(version)	(_MSC_VER >= (version))
+#  if !MSVC_PREREQ(1900)
+#    error "MSVC versions older than Visual Studio 2015 are no longer supported"
+#  endif
+#else
+#  define MSVC_PREREQ(version)	0
 #endif
 
 
 #ifndef __has_attribute
 #  define __has_attribute(attribute)	0
 #endif
+
+
 #ifndef __has_builtin
 #  define __has_builtin(builtin)	0
 #endif
@@ -31972,6 +35514,13 @@ typedef size_t machine_word_t;
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
+#endif
+
+
+#if defined(__GNUC__) || __has_attribute(noreturn)
+#  define NORETURN		__attribute__((noreturn))
+#else
+#  define NORETURN
 #endif
 
 
@@ -32040,12 +35589,10 @@ typedef size_t machine_word_t;
 #endif
 
 
-#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#if defined(__GNUC__) || __has_attribute(target)
 #  define _target_attribute(attrs)	__attribute__((target(attrs)))
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
 #else
 #  define _target_attribute(attrs)
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
 #endif
 
 
@@ -32085,7 +35632,7 @@ static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
 
 static forceinline u16 bswap16(u16 v)
 {
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap16)
 	return __builtin_bswap16(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ushort(v);
@@ -32097,7 +35644,7 @@ static forceinline u16 bswap16(u16 v)
 
 static forceinline u32 bswap32(u32 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap32)
 	return __builtin_bswap32(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ulong(v);
@@ -32112,7 +35659,7 @@ static forceinline u32 bswap32(u32 v)
 
 static forceinline u64 bswap64(u64 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap64)
 	return __builtin_bswap64(v);
 #elif defined(_MSC_VER)
 	return _byteswap_uint64(v);
@@ -32143,6 +35690,7 @@ static forceinline u64 bswap64(u64 v)
 #if (defined(__GNUC__) || defined(__clang__)) && \
 	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	 defined(__riscv_misaligned_fast) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
 #elif defined(_MSC_VER)
@@ -32480,12 +36028,17 @@ int memcmp(const void *s1, const void *s2, size_t n);
 
 #undef LIBDEFLATE_ENABLE_ASSERTIONS
 #else
-#include <string.h>
+#  include <string.h>
+   
+#  ifdef __clang_analyzer__
+#    define LIBDEFLATE_ENABLE_ASSERTIONS
+#  endif
 #endif
 
 
 #ifdef LIBDEFLATE_ENABLE_ASSERTIONS
-void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+NORETURN void
+libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #define ASSERT(expr) { if (unlikely(!(expr))) \
 	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
 #else
@@ -32594,7 +36147,7 @@ libdeflate_zlib_decompress(struct libdeflate_decompressor *d,
 					     out, out_nbytes_avail,
 					     NULL, actual_out_nbytes_ret);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.19/lib/arm/cpu_features.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.20/lib/arm/cpu_features.c */
 
 
 
@@ -32671,8 +36224,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	19
-#define LIBDEFLATE_VERSION_STRING	"1.19"
+#define LIBDEFLATE_VERSION_MINOR	20
+#define LIBDEFLATE_VERSION_STRING	"1.20"
 
 
 #ifndef LIBDEFLATEAPI
@@ -32890,6 +36443,7 @@ struct libdeflate_options {
 #undef ARCH_X86_32
 #undef ARCH_ARM64
 #undef ARCH_ARM32
+#undef ARCH_RISCV
 #ifdef _MSC_VER
 #  if defined(_M_X64)
 #    define ARCH_X86_64
@@ -32909,6 +36463,8 @@ struct libdeflate_options {
 #    define ARCH_ARM64
 #  elif defined(__arm__)
 #    define ARCH_ARM32
+#  elif defined(__riscv)
+#    define ARCH_RISCV
 #  endif
 #endif
 
@@ -32953,6 +36509,9 @@ typedef size_t machine_word_t;
 #  define GCC_PREREQ(major, minor)		\
 	(__GNUC__ > (major) ||			\
 	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#  if !GCC_PREREQ(4, 9)
+#    error "gcc versions older than 4.9 are no longer supported"
+#  endif
 #else
 #  define GCC_PREREQ(major, minor)	0
 #endif
@@ -32965,14 +36524,27 @@ typedef size_t machine_word_t;
 	(__clang_major__ > (major) ||			\
 	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
 #  endif
+#  if !CLANG_PREREQ(3, 9, 8000000)
+#    error "clang versions older than 3.9 are no longer supported"
+#  endif
 #else
 #  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+#ifdef _MSC_VER
+#  define MSVC_PREREQ(version)	(_MSC_VER >= (version))
+#  if !MSVC_PREREQ(1900)
+#    error "MSVC versions older than Visual Studio 2015 are no longer supported"
+#  endif
+#else
+#  define MSVC_PREREQ(version)	0
 #endif
 
 
 #ifndef __has_attribute
 #  define __has_attribute(attribute)	0
 #endif
+
+
 #ifndef __has_builtin
 #  define __has_builtin(builtin)	0
 #endif
@@ -32996,6 +36568,13 @@ typedef size_t machine_word_t;
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
+#endif
+
+
+#if defined(__GNUC__) || __has_attribute(noreturn)
+#  define NORETURN		__attribute__((noreturn))
+#else
+#  define NORETURN
 #endif
 
 
@@ -33064,12 +36643,10 @@ typedef size_t machine_word_t;
 #endif
 
 
-#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#if defined(__GNUC__) || __has_attribute(target)
 #  define _target_attribute(attrs)	__attribute__((target(attrs)))
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
 #else
 #  define _target_attribute(attrs)
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
 #endif
 
 
@@ -33109,7 +36686,7 @@ static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
 
 static forceinline u16 bswap16(u16 v)
 {
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap16)
 	return __builtin_bswap16(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ushort(v);
@@ -33121,7 +36698,7 @@ static forceinline u16 bswap16(u16 v)
 
 static forceinline u32 bswap32(u32 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap32)
 	return __builtin_bswap32(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ulong(v);
@@ -33136,7 +36713,7 @@ static forceinline u32 bswap32(u32 v)
 
 static forceinline u64 bswap64(u64 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap64)
 	return __builtin_bswap64(v);
 #elif defined(_MSC_VER)
 	return _byteswap_uint64(v);
@@ -33167,6 +36744,7 @@ static forceinline u64 bswap64(u64 v)
 #if (defined(__GNUC__) || defined(__clang__)) && \
 	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	 defined(__riscv_misaligned_fast) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
 #elif defined(_MSC_VER)
@@ -33504,12 +37082,17 @@ int memcmp(const void *s1, const void *s2, size_t n);
 
 #undef LIBDEFLATE_ENABLE_ASSERTIONS
 #else
-#include <string.h>
+#  include <string.h>
+   
+#  ifdef __clang_analyzer__
+#    define LIBDEFLATE_ENABLE_ASSERTIONS
+#  endif
 #endif
 
 
 #ifdef LIBDEFLATE_ENABLE_ASSERTIONS
-void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+NORETURN void
+libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #define ASSERT(expr) { if (unlikely(!(expr))) \
 	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
 #else
@@ -33627,8 +37210,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	19
-#define LIBDEFLATE_VERSION_STRING	"1.19"
+#define LIBDEFLATE_VERSION_MINOR	20
+#define LIBDEFLATE_VERSION_STRING	"1.20"
 
 
 #ifndef LIBDEFLATEAPI
@@ -33846,6 +37429,7 @@ struct libdeflate_options {
 #undef ARCH_X86_32
 #undef ARCH_ARM64
 #undef ARCH_ARM32
+#undef ARCH_RISCV
 #ifdef _MSC_VER
 #  if defined(_M_X64)
 #    define ARCH_X86_64
@@ -33865,6 +37449,8 @@ struct libdeflate_options {
 #    define ARCH_ARM64
 #  elif defined(__arm__)
 #    define ARCH_ARM32
+#  elif defined(__riscv)
+#    define ARCH_RISCV
 #  endif
 #endif
 
@@ -33909,6 +37495,9 @@ typedef size_t machine_word_t;
 #  define GCC_PREREQ(major, minor)		\
 	(__GNUC__ > (major) ||			\
 	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#  if !GCC_PREREQ(4, 9)
+#    error "gcc versions older than 4.9 are no longer supported"
+#  endif
 #else
 #  define GCC_PREREQ(major, minor)	0
 #endif
@@ -33921,14 +37510,27 @@ typedef size_t machine_word_t;
 	(__clang_major__ > (major) ||			\
 	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
 #  endif
+#  if !CLANG_PREREQ(3, 9, 8000000)
+#    error "clang versions older than 3.9 are no longer supported"
+#  endif
 #else
 #  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+#ifdef _MSC_VER
+#  define MSVC_PREREQ(version)	(_MSC_VER >= (version))
+#  if !MSVC_PREREQ(1900)
+#    error "MSVC versions older than Visual Studio 2015 are no longer supported"
+#  endif
+#else
+#  define MSVC_PREREQ(version)	0
 #endif
 
 
 #ifndef __has_attribute
 #  define __has_attribute(attribute)	0
 #endif
+
+
 #ifndef __has_builtin
 #  define __has_builtin(builtin)	0
 #endif
@@ -33952,6 +37554,13 @@ typedef size_t machine_word_t;
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
+#endif
+
+
+#if defined(__GNUC__) || __has_attribute(noreturn)
+#  define NORETURN		__attribute__((noreturn))
+#else
+#  define NORETURN
 #endif
 
 
@@ -34020,12 +37629,10 @@ typedef size_t machine_word_t;
 #endif
 
 
-#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#if defined(__GNUC__) || __has_attribute(target)
 #  define _target_attribute(attrs)	__attribute__((target(attrs)))
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
 #else
 #  define _target_attribute(attrs)
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
 #endif
 
 
@@ -34065,7 +37672,7 @@ static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
 
 static forceinline u16 bswap16(u16 v)
 {
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap16)
 	return __builtin_bswap16(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ushort(v);
@@ -34077,7 +37684,7 @@ static forceinline u16 bswap16(u16 v)
 
 static forceinline u32 bswap32(u32 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap32)
 	return __builtin_bswap32(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ulong(v);
@@ -34092,7 +37699,7 @@ static forceinline u32 bswap32(u32 v)
 
 static forceinline u64 bswap64(u64 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap64)
 	return __builtin_bswap64(v);
 #elif defined(_MSC_VER)
 	return _byteswap_uint64(v);
@@ -34123,6 +37730,7 @@ static forceinline u64 bswap64(u64 v)
 #if (defined(__GNUC__) || defined(__clang__)) && \
 	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	 defined(__riscv_misaligned_fast) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
 #elif defined(_MSC_VER)
@@ -34460,12 +38068,17 @@ int memcmp(const void *s1, const void *s2, size_t n);
 
 #undef LIBDEFLATE_ENABLE_ASSERTIONS
 #else
-#include <string.h>
+#  include <string.h>
+   
+#  ifdef __clang_analyzer__
+#    define LIBDEFLATE_ENABLE_ASSERTIONS
+#  endif
 #endif
 
 
 #ifdef LIBDEFLATE_ENABLE_ASSERTIONS
-void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+NORETURN void
+libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #define ASSERT(expr) { if (unlikely(!(expr))) \
 	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
 #else
@@ -34479,33 +38092,23 @@ void libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #endif 
 
 
-#define HAVE_DYNAMIC_ARM_CPU_FEATURES	0
-
 #if defined(ARCH_ARM32) || defined(ARCH_ARM64)
 
+#define ARM_CPU_FEATURE_NEON		(1 << 0)
+#define ARM_CPU_FEATURE_PMULL		(1 << 1)
+
+#define ARM_CPU_FEATURE_PREFER_PMULL	(1 << 2)
+#define ARM_CPU_FEATURE_CRC32		(1 << 3)
+#define ARM_CPU_FEATURE_SHA3		(1 << 4)
+#define ARM_CPU_FEATURE_DOTPROD		(1 << 5)
+
 #if !defined(FREESTANDING) && \
-    (COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE || defined(_MSC_VER)) && \
+    (defined(__GNUC__) || defined(__clang__) || defined(_MSC_VER)) && \
     (defined(__linux__) || \
      (defined(__APPLE__) && defined(ARCH_ARM64)) || \
      (defined(_WIN32) && defined(ARCH_ARM64)))
-#  undef HAVE_DYNAMIC_ARM_CPU_FEATURES
-#  define HAVE_DYNAMIC_ARM_CPU_FEATURES	1
-#endif
 
-#define ARM_CPU_FEATURE_NEON		0x00000001
-#define ARM_CPU_FEATURE_PMULL		0x00000002
-#define ARM_CPU_FEATURE_CRC32		0x00000004
-#define ARM_CPU_FEATURE_SHA3		0x00000008
-#define ARM_CPU_FEATURE_DOTPROD		0x00000010
-
-#define HAVE_NEON(features)	(HAVE_NEON_NATIVE    || ((features) & ARM_CPU_FEATURE_NEON))
-#define HAVE_PMULL(features)	(HAVE_PMULL_NATIVE   || ((features) & ARM_CPU_FEATURE_PMULL))
-#define HAVE_CRC32(features)	(HAVE_CRC32_NATIVE   || ((features) & ARM_CPU_FEATURE_CRC32))
-#define HAVE_SHA3(features)	(HAVE_SHA3_NATIVE    || ((features) & ARM_CPU_FEATURE_SHA3))
-#define HAVE_DOTPROD(features)	(HAVE_DOTPROD_NATIVE || ((features) & ARM_CPU_FEATURE_DOTPROD))
-
-#if HAVE_DYNAMIC_ARM_CPU_FEATURES
-#define ARM_CPU_FEATURES_KNOWN		0x80000000
+#  define ARM_CPU_FEATURES_KNOWN	(1U << 31)
 extern volatile u32 libdeflate_arm_cpu_features;
 
 void libdeflate_init_arm_cpu_features(void);
@@ -34516,38 +38119,37 @@ static inline u32 get_arm_cpu_features(void)
 		libdeflate_init_arm_cpu_features();
 	return libdeflate_arm_cpu_features;
 }
-#else 
+#else
 static inline u32 get_arm_cpu_features(void) { return 0; }
-#endif 
+#endif
 
 
-#if defined(__ARM_NEON) || defined(ARCH_ARM64)
+#if defined(__ARM_NEON) || (defined(_MSC_VER) && defined(ARCH_ARM64))
+#  define HAVE_NEON(features)	1
 #  define HAVE_NEON_NATIVE	1
 #else
+#  define HAVE_NEON(features)	((features) & ARM_CPU_FEATURE_NEON)
 #  define HAVE_NEON_NATIVE	0
 #endif
 
-#if HAVE_NEON_NATIVE || \
-	(HAVE_DYNAMIC_ARM_CPU_FEATURES && GCC_PREREQ(6, 1) && defined(__ARM_FP))
+#if (defined(__GNUC__) || defined(__clang__) || defined(_MSC_VER)) && \
+	(HAVE_NEON_NATIVE || (GCC_PREREQ(6, 1) && defined(__ARM_FP)))
 #  define HAVE_NEON_INTRIN	1
+#  include <arm_neon.h>
 #else
 #  define HAVE_NEON_INTRIN	0
 #endif
 
 
 #ifdef __ARM_FEATURE_CRYPTO
-#  define HAVE_PMULL_NATIVE	1
+#  define HAVE_PMULL(features)	1
 #else
-#  define HAVE_PMULL_NATIVE	0
+#  define HAVE_PMULL(features)	((features) & ARM_CPU_FEATURE_PMULL)
 #endif
-#if HAVE_PMULL_NATIVE || \
-	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
-	 HAVE_NEON_INTRIN  && \
-	 (GCC_PREREQ(6, 1) || CLANG_PREREQ(3, 5, 6010000) || \
-	  defined(_MSC_VER)) && \
-	   \
-	 !(defined(ARCH_ARM32) && defined(__clang__)))
-#  define HAVE_PMULL_INTRIN	CPU_IS_LITTLE_ENDIAN() 
+#if defined(ARCH_ARM64) && HAVE_NEON_INTRIN && \
+	(GCC_PREREQ(6, 1) || defined(__clang__) || defined(_MSC_VER)) && \
+	CPU_IS_LITTLE_ENDIAN() 
+#  define HAVE_PMULL_INTRIN	1
    
 #  ifdef _MSC_VER
 #    define compat_vmull_p64(a, b)  vmull_p64(vcreate_p64(a), vcreate_p64(b))
@@ -34558,113 +38160,107 @@ static inline u32 get_arm_cpu_features(void) { return 0; }
 #  define HAVE_PMULL_INTRIN	0
 #endif
 
-#if HAVE_PMULL_NATIVE && defined(ARCH_ARM64) && \
-		GCC_PREREQ(6, 1) && !GCC_PREREQ(13, 1)
-#  define USE_PMULL_TARGET_EVEN_IF_NATIVE	1
-#else
-#  define USE_PMULL_TARGET_EVEN_IF_NATIVE	0
-#endif
-
 
 #ifdef __ARM_FEATURE_CRC32
-#  define HAVE_CRC32_NATIVE	1
+#  define HAVE_CRC32(features)	1
 #else
-#  define HAVE_CRC32_NATIVE	0
+#  define HAVE_CRC32(features)	((features) & ARM_CPU_FEATURE_CRC32)
 #endif
-#undef HAVE_CRC32_INTRIN
-#if HAVE_CRC32_NATIVE
+#if defined(ARCH_ARM64) && \
+	(defined(__GNUC__) || defined(__clang__) || defined(_MSC_VER))
 #  define HAVE_CRC32_INTRIN	1
-#elif HAVE_DYNAMIC_ARM_CPU_FEATURES
-#  if GCC_PREREQ(1, 0)
-    
-#    if (GCC_PREREQ(11, 3) || \
-	 (GCC_PREREQ(10, 4) && !GCC_PREREQ(11, 0)) || \
-	 (GCC_PREREQ(9, 5) && !GCC_PREREQ(10, 0))) && \
-	!defined(__ARM_ARCH_6KZ__) && \
-	!defined(__ARM_ARCH_7EM__)
-#      define HAVE_CRC32_INTRIN	1
-#    endif
-#  elif CLANG_PREREQ(3, 4, 6000000)
-#    define HAVE_CRC32_INTRIN	1
-#  elif defined(_MSC_VER)
-#    define HAVE_CRC32_INTRIN	1
+#  if defined(__GNUC__) || defined(__clang__)
+#    include <arm_acle.h>
 #  endif
-#endif
-#ifndef HAVE_CRC32_INTRIN
+   
+#  if defined(__clang__) && !CLANG_PREREQ(16, 0, 16000000) && \
+	!defined(__ARM_FEATURE_CRC32)
+#    undef __crc32b
+#    define __crc32b(a, b)					\
+	({ uint32_t res;					\
+	   __asm__("crc32b %w0, %w1, %w2"			\
+		   : "=r" (res) : "r" (a), "r" (b));		\
+	   res; })
+#    undef __crc32h
+#    define __crc32h(a, b)					\
+	({ uint32_t res;					\
+	   __asm__("crc32h %w0, %w1, %w2"			\
+		   : "=r" (res) : "r" (a), "r" (b));		\
+	   res; })
+#    undef __crc32w
+#    define __crc32w(a, b)					\
+	({ uint32_t res;					\
+	   __asm__("crc32w %w0, %w1, %w2"			\
+		   : "=r" (res) : "r" (a), "r" (b));		\
+	   res; })
+#    undef __crc32d
+#    define __crc32d(a, b)					\
+	({ uint32_t res;					\
+	   __asm__("crc32x %w0, %w1, %2"			\
+		   : "=r" (res) : "r" (a), "r" (b));		\
+	   res; })
+#    pragma clang diagnostic ignored "-Wgnu-statement-expression"
+#  endif
+#else
 #  define HAVE_CRC32_INTRIN	0
 #endif
 
 
-#if defined(ARCH_ARM64) && !defined(_MSC_VER)
-#  ifdef __ARM_FEATURE_SHA3
-#    define HAVE_SHA3_NATIVE	1
-#  else
-#    define HAVE_SHA3_NATIVE	0
-#  endif
-#  define HAVE_SHA3_TARGET	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
-				 (GCC_PREREQ(8, 1)  || \
-				  CLANG_PREREQ(7, 0, 10010463) ))
-#  define HAVE_SHA3_INTRIN	(HAVE_NEON_INTRIN && \
-				 (HAVE_SHA3_NATIVE || HAVE_SHA3_TARGET) && \
-				 (GCC_PREREQ(9, 1)  || \
-				  CLANG_PREREQ(13, 0, 13160000)))
+#ifdef __ARM_FEATURE_SHA3
+#  define HAVE_SHA3(features)	1
 #else
-#  define HAVE_SHA3_NATIVE	0
-#  define HAVE_SHA3_TARGET	0
+#  define HAVE_SHA3(features)	((features) & ARM_CPU_FEATURE_SHA3)
+#endif
+#if defined(ARCH_ARM64) && HAVE_NEON_INTRIN && \
+	(GCC_PREREQ(9, 1)  || \
+	 CLANG_PREREQ(7, 0, 10010463) )
+#  define HAVE_SHA3_INTRIN	1
+   
+#  if defined(__clang__) && !CLANG_PREREQ(16, 0, 16000000) && \
+	!defined(__ARM_FEATURE_SHA3)
+#    undef veor3q_u8
+#    define veor3q_u8(a, b, c)					\
+	({ uint8x16_t res;					\
+	   __asm__("eor3 %0.16b, %1.16b, %2.16b, %3.16b"	\
+		   : "=w" (res) : "w" (a), "w" (b), "w" (c));	\
+	   res; })
+#    pragma clang diagnostic ignored "-Wgnu-statement-expression"
+#  endif
+#else
 #  define HAVE_SHA3_INTRIN	0
 #endif
 
 
-#ifdef ARCH_ARM64
-#  ifdef __ARM_FEATURE_DOTPROD
-#    define HAVE_DOTPROD_NATIVE	1
-#  else
-#    define HAVE_DOTPROD_NATIVE	0
-#  endif
-#  if HAVE_DOTPROD_NATIVE || \
-	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
-	 (GCC_PREREQ(8, 1) || CLANG_PREREQ(7, 0, 10010000) || \
-	  defined(_MSC_VER)))
-#    define HAVE_DOTPROD_INTRIN	1
-#  else
-#    define HAVE_DOTPROD_INTRIN	0
+#ifdef __ARM_FEATURE_DOTPROD
+#  define HAVE_DOTPROD(features)	1
+#else
+#  define HAVE_DOTPROD(features)	((features) & ARM_CPU_FEATURE_DOTPROD)
+#endif
+#if defined(ARCH_ARM64) && HAVE_NEON_INTRIN && \
+	(GCC_PREREQ(8, 1) || CLANG_PREREQ(7, 0, 10010000) || defined(_MSC_VER))
+#  define HAVE_DOTPROD_INTRIN	1
+   
+#  if defined(__clang__) && !CLANG_PREREQ(16, 0, 16000000) && \
+	!defined(__ARM_FEATURE_DOTPROD)
+#    undef vdotq_u32
+#    define vdotq_u32(a, b, c)					\
+	({ uint32x4_t res = (a);				\
+	   __asm__("udot %0.4s, %1.16b, %2.16b"			\
+		   : "+w" (res) : "w" (b), "w" (c));		\
+	   res; })
+#    pragma clang diagnostic ignored "-Wgnu-statement-expression"
 #  endif
 #else
-#  define HAVE_DOTPROD_NATIVE	0
 #  define HAVE_DOTPROD_INTRIN	0
 #endif
 
-
-#if HAVE_CRC32_INTRIN && !HAVE_CRC32_NATIVE && \
-	(defined(__clang__) || defined(ARCH_ARM32))
-#  define __ARM_FEATURE_CRC32	1
-#endif
-#if HAVE_SHA3_INTRIN && !HAVE_SHA3_NATIVE && defined(__clang__)
-#  define __ARM_FEATURE_SHA3	1
-#endif
-#if HAVE_DOTPROD_INTRIN && !HAVE_DOTPROD_NATIVE && defined(__clang__)
-#  define __ARM_FEATURE_DOTPROD	1
-#endif
-#if HAVE_CRC32_INTRIN && !HAVE_CRC32_NATIVE && \
-	(defined(__clang__) || defined(ARCH_ARM32))
-#  include <arm_acle.h>
-#  undef __ARM_FEATURE_CRC32
-#endif
-#if HAVE_SHA3_INTRIN && !HAVE_SHA3_NATIVE && defined(__clang__)
-#  include <arm_neon.h>
-#  undef __ARM_FEATURE_SHA3
-#endif
-#if HAVE_DOTPROD_INTRIN && !HAVE_DOTPROD_NATIVE && defined(__clang__)
-#  include <arm_neon.h>
-#  undef __ARM_FEATURE_DOTPROD
-#endif
-
 #endif 
 
 #endif 
 
 
-#if HAVE_DYNAMIC_ARM_CPU_FEATURES
+#ifdef ARM_CPU_FEATURES_KNOWN
+
 
 #ifdef __linux__
 
@@ -34731,10 +38327,6 @@ static u32 query_arm_cpu_features(void)
 	STATIC_ASSERT(sizeof(long) == 4);
 	if (hwcap & (1 << 12))	
 		features |= ARM_CPU_FEATURE_NEON;
-	if (hwcap2 & (1 << 1))	
-		features |= ARM_CPU_FEATURE_PMULL;
-	if (hwcap2 & (1 << 4))	
-		features |= ARM_CPU_FEATURE_CRC32;
 #else
 	STATIC_ASSERT(sizeof(long) == 8);
 	if (hwcap & (1 << 1))	
@@ -34756,6 +38348,7 @@ static u32 query_arm_cpu_features(void)
 
 #include <sys/types.h>
 #include <sys/sysctl.h>
+#include <TargetConditionals.h>
 
 static const struct {
 	const char *name;
@@ -34810,6 +38403,7 @@ static u32 query_arm_cpu_features(void)
 static const struct cpu_feature arm_cpu_feature_table[] = {
 	{ARM_CPU_FEATURE_NEON,		"neon"},
 	{ARM_CPU_FEATURE_PMULL,		"pmull"},
+	{ARM_CPU_FEATURE_PREFER_PMULL,  "prefer_pmull"},
 	{ARM_CPU_FEATURE_CRC32,		"crc32"},
 	{ARM_CPU_FEATURE_SHA3,		"sha3"},
 	{ARM_CPU_FEATURE_DOTPROD,	"dotprod"},
@@ -34821,6 +38415,11 @@ void libdeflate_init_arm_cpu_features(void)
 {
 	u32 features = query_arm_cpu_features();
 
+	
+#if (defined(__APPLE__) && TARGET_OS_OSX) || defined(TEST_SUPPORT__DO_NOT_USE)
+	features |= ARM_CPU_FEATURE_PREFER_PMULL;
+#endif
+
 	disable_cpu_features_for_testing(&features, arm_cpu_feature_table,
 					 ARRAY_LEN(arm_cpu_feature_table));
 
@@ -34828,7 +38427,7 @@ void libdeflate_init_arm_cpu_features(void)
 }
 
 #endif 
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.19/lib/x86/cpu_features.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.20/lib/x86/cpu_features.c */
 
 
 /* #include "cpu_features_common.h" - no include guard */ 
@@ -34886,8 +38485,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	19
-#define LIBDEFLATE_VERSION_STRING	"1.19"
+#define LIBDEFLATE_VERSION_MINOR	20
+#define LIBDEFLATE_VERSION_STRING	"1.20"
 
 
 #ifndef LIBDEFLATEAPI
@@ -35105,6 +38704,7 @@ struct libdeflate_options {
 #undef ARCH_X86_32
 #undef ARCH_ARM64
 #undef ARCH_ARM32
+#undef ARCH_RISCV
 #ifdef _MSC_VER
 #  if defined(_M_X64)
 #    define ARCH_X86_64
@@ -35124,6 +38724,8 @@ struct libdeflate_options {
 #    define ARCH_ARM64
 #  elif defined(__arm__)
 #    define ARCH_ARM32
+#  elif defined(__riscv)
+#    define ARCH_RISCV
 #  endif
 #endif
 
@@ -35168,6 +38770,9 @@ typedef size_t machine_word_t;
 #  define GCC_PREREQ(major, minor)		\
 	(__GNUC__ > (major) ||			\
 	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#  if !GCC_PREREQ(4, 9)
+#    error "gcc versions older than 4.9 are no longer supported"
+#  endif
 #else
 #  define GCC_PREREQ(major, minor)	0
 #endif
@@ -35180,14 +38785,27 @@ typedef size_t machine_word_t;
 	(__clang_major__ > (major) ||			\
 	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
 #  endif
+#  if !CLANG_PREREQ(3, 9, 8000000)
+#    error "clang versions older than 3.9 are no longer supported"
+#  endif
 #else
 #  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+#ifdef _MSC_VER
+#  define MSVC_PREREQ(version)	(_MSC_VER >= (version))
+#  if !MSVC_PREREQ(1900)
+#    error "MSVC versions older than Visual Studio 2015 are no longer supported"
+#  endif
+#else
+#  define MSVC_PREREQ(version)	0
 #endif
 
 
 #ifndef __has_attribute
 #  define __has_attribute(attribute)	0
 #endif
+
+
 #ifndef __has_builtin
 #  define __has_builtin(builtin)	0
 #endif
@@ -35211,6 +38829,13 @@ typedef size_t machine_word_t;
 #  define MAYBE_UNUSED		__attribute__((unused))
 #else
 #  define MAYBE_UNUSED
+#endif
+
+
+#if defined(__GNUC__) || __has_attribute(noreturn)
+#  define NORETURN		__attribute__((noreturn))
+#else
+#  define NORETURN
 #endif
 
 
@@ -35279,12 +38904,10 @@ typedef size_t machine_word_t;
 #endif
 
 
-#if GCC_PREREQ(4, 4) || __has_attribute(target)
+#if defined(__GNUC__) || __has_attribute(target)
 #  define _target_attribute(attrs)	__attribute__((target(attrs)))
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	1
 #else
 #  define _target_attribute(attrs)
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	0
 #endif
 
 
@@ -35324,7 +38947,7 @@ static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
 
 static forceinline u16 bswap16(u16 v)
 {
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap16)
 	return __builtin_bswap16(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ushort(v);
@@ -35336,7 +38959,7 @@ static forceinline u16 bswap16(u16 v)
 
 static forceinline u32 bswap32(u32 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap32)
 	return __builtin_bswap32(v);
 #elif defined(_MSC_VER)
 	return _byteswap_ulong(v);
@@ -35351,7 +38974,7 @@ static forceinline u32 bswap32(u32 v)
 
 static forceinline u64 bswap64(u64 v)
 {
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+#if defined(__GNUC__) || __has_builtin(__builtin_bswap64)
 	return __builtin_bswap64(v);
 #elif defined(_MSC_VER)
 	return _byteswap_uint64(v);
@@ -35382,6 +39005,7 @@ static forceinline u64 bswap64(u64 v)
 #if (defined(__GNUC__) || defined(__clang__)) && \
 	(defined(ARCH_X86_64) || defined(ARCH_X86_32) || \
 	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	 defined(__riscv_misaligned_fast) || \
 	  defined(__wasm__))
 #  define UNALIGNED_ACCESS_IS_FAST	1
 #elif defined(_MSC_VER)
@@ -35719,12 +39343,17 @@ int memcmp(const void *s1, const void *s2, size_t n);
 
 #undef LIBDEFLATE_ENABLE_ASSERTIONS
 #else
-#include <string.h>
+#  include <string.h>
+   
+#  ifdef __clang_analyzer__
+#    define LIBDEFLATE_ENABLE_ASSERTIONS
+#  endif
 #endif
 
 
 #ifdef LIBDEFLATE_ENABLE_ASSERTIONS
-void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+NORETURN void
+libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #define ASSERT(expr) { if (unlikely(!(expr))) \
 	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
 #else
@@ -35738,29 +39367,24 @@ void libdeflate_assertion_failed(const char *expr, const char *file, int line);
 #endif 
 
 
-#define HAVE_DYNAMIC_X86_CPU_FEATURES	0
-
 #if defined(ARCH_X86_32) || defined(ARCH_X86_64)
 
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE || defined(_MSC_VER)
-#  undef HAVE_DYNAMIC_X86_CPU_FEATURES
-#  define HAVE_DYNAMIC_X86_CPU_FEATURES	1
-#endif
+#define X86_CPU_FEATURE_SSE2		(1 << 0)
+#define X86_CPU_FEATURE_PCLMULQDQ	(1 << 1)
+#define X86_CPU_FEATURE_AVX		(1 << 2)
+#define X86_CPU_FEATURE_AVX2		(1 << 3)
+#define X86_CPU_FEATURE_BMI2		(1 << 4)
 
-#define X86_CPU_FEATURE_SSE2		0x00000001
-#define X86_CPU_FEATURE_PCLMUL		0x00000002
-#define X86_CPU_FEATURE_AVX		0x00000004
-#define X86_CPU_FEATURE_AVX2		0x00000008
-#define X86_CPU_FEATURE_BMI2		0x00000010
+#define X86_CPU_FEATURE_ZMM		(1 << 5)
+#define X86_CPU_FEATURE_AVX512BW	(1 << 6)
+#define X86_CPU_FEATURE_AVX512VL	(1 << 7)
+#define X86_CPU_FEATURE_VPCLMULQDQ	(1 << 8)
+#define X86_CPU_FEATURE_AVX512VNNI	(1 << 9)
+#define X86_CPU_FEATURE_AVXVNNI		(1 << 10)
 
-#define HAVE_SSE2(features)	(HAVE_SSE2_NATIVE     || ((features) & X86_CPU_FEATURE_SSE2))
-#define HAVE_PCLMUL(features)	(HAVE_PCLMUL_NATIVE   || ((features) & X86_CPU_FEATURE_PCLMUL))
-#define HAVE_AVX(features)	(HAVE_AVX_NATIVE      || ((features) & X86_CPU_FEATURE_AVX))
-#define HAVE_AVX2(features)	(HAVE_AVX2_NATIVE     || ((features) & X86_CPU_FEATURE_AVX2))
-#define HAVE_BMI2(features)	(HAVE_BMI2_NATIVE     || ((features) & X86_CPU_FEATURE_BMI2))
+#if defined(__GNUC__) || defined(__clang__) || defined(_MSC_VER)
 
-#if HAVE_DYNAMIC_X86_CPU_FEATURES
-#define X86_CPU_FEATURES_KNOWN		0x80000000
+#  define X86_CPU_FEATURES_KNOWN	(1U << 31)
 extern volatile u32 libdeflate_x86_cpu_features;
 
 void libdeflate_init_x86_cpu_features(void);
@@ -35771,89 +39395,101 @@ static inline u32 get_x86_cpu_features(void)
 		libdeflate_init_x86_cpu_features();
 	return libdeflate_x86_cpu_features;
 }
-#else 
-static inline u32 get_x86_cpu_features(void) { return 0; }
-#endif 
 
-
-#if HAVE_DYNAMIC_X86_CPU_FEATURES && \
-	(GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000) || defined(_MSC_VER))
-#  define HAVE_TARGET_INTRINSICS	1
+#  include <immintrin.h>
+#  if defined(_MSC_VER) && defined(__clang__)
+#    include <tmmintrin.h>
+#    include <smmintrin.h>
+#    include <wmmintrin.h>
+#    include <avxintrin.h>
+#    include <avx2intrin.h>
+#    include <avx512fintrin.h>
+#    include <avx512bwintrin.h>
+#    include <avx512vlintrin.h>
+#    if __has_include(<avx512vlbwintrin.h>)
+#      include <avx512vlbwintrin.h>
+#    endif
+#    if __has_include(<vpclmulqdqintrin.h>)
+#      include <vpclmulqdqintrin.h>
+#    endif
+#    if __has_include(<avx512vnniintrin.h>)
+#      include <avx512vnniintrin.h>
+#    endif
+#    if __has_include(<avx512vlvnniintrin.h>)
+#      include <avx512vlvnniintrin.h>
+#    endif
+#    if __has_include(<avxvnniintrin.h>)
+#      include <avxvnniintrin.h>
+#    endif
+#  endif
 #else
-#  define HAVE_TARGET_INTRINSICS	0
+static inline u32 get_x86_cpu_features(void) { return 0; }
 #endif
-
 
 #if defined(__SSE2__) || \
 	(defined(_MSC_VER) && \
 	 (defined(ARCH_X86_64) || (defined(_M_IX86_FP) && _M_IX86_FP >= 2)))
-#  define HAVE_SSE2_NATIVE	1
+#  define HAVE_SSE2(features)		1
+#  define HAVE_SSE2_NATIVE		1
 #else
-#  define HAVE_SSE2_NATIVE	0
+#  define HAVE_SSE2(features)		((features) & X86_CPU_FEATURE_SSE2)
+#  define HAVE_SSE2_NATIVE		0
 #endif
-#define HAVE_SSE2_INTRIN	(HAVE_SSE2_NATIVE || HAVE_TARGET_INTRINSICS)
-
 
 #if defined(__PCLMUL__) || (defined(_MSC_VER) && defined(__AVX2__))
-#  define HAVE_PCLMUL_NATIVE	1
+#  define HAVE_PCLMULQDQ(features)	1
 #else
-#  define HAVE_PCLMUL_NATIVE	0
+#  define HAVE_PCLMULQDQ(features)	((features) & X86_CPU_FEATURE_PCLMULQDQ)
 #endif
-#if HAVE_PCLMUL_NATIVE || (HAVE_TARGET_INTRINSICS && \
-			   (GCC_PREREQ(4, 4) || CLANG_PREREQ(3, 2, 0) || \
-			    defined(_MSC_VER)))
-#  define HAVE_PCLMUL_INTRIN	1
-#else
-#  define HAVE_PCLMUL_INTRIN	0
-#endif
-
 
 #ifdef __AVX__
-#  define HAVE_AVX_NATIVE	1
+#  define HAVE_AVX(features)		1
 #else
-#  define HAVE_AVX_NATIVE	0
+#  define HAVE_AVX(features)		((features) & X86_CPU_FEATURE_AVX)
 #endif
-#if HAVE_AVX_NATIVE || (HAVE_TARGET_INTRINSICS && \
-			(GCC_PREREQ(4, 6) || CLANG_PREREQ(3, 0, 0) || \
-			 defined(_MSC_VER)))
-#  define HAVE_AVX_INTRIN	1
-#else
-#  define HAVE_AVX_INTRIN	0
-#endif
-
 
 #ifdef __AVX2__
-#  define HAVE_AVX2_NATIVE	1
+#  define HAVE_AVX2(features)		1
 #else
-#  define HAVE_AVX2_NATIVE	0
+#  define HAVE_AVX2(features)		((features) & X86_CPU_FEATURE_AVX2)
 #endif
-#if HAVE_AVX2_NATIVE || (HAVE_TARGET_INTRINSICS && \
-			 (GCC_PREREQ(4, 7) || CLANG_PREREQ(3, 1, 0) || \
-			  defined(_MSC_VER)))
-#  define HAVE_AVX2_INTRIN	1
-#else
-#  define HAVE_AVX2_INTRIN	0
-#endif
-
 
 #if defined(__BMI2__) || (defined(_MSC_VER) && defined(__AVX2__))
-#  define HAVE_BMI2_NATIVE	1
+#  define HAVE_BMI2(features)		1
+#  define HAVE_BMI2_NATIVE		1
 #else
-#  define HAVE_BMI2_NATIVE	0
-#endif
-#if HAVE_BMI2_NATIVE || (HAVE_TARGET_INTRINSICS && \
-			 (GCC_PREREQ(4, 7) || CLANG_PREREQ(3, 1, 0) || \
-			  defined(_MSC_VER)))
-#  define HAVE_BMI2_INTRIN	1
-#else
-#  define HAVE_BMI2_INTRIN	0
+#  define HAVE_BMI2(features)		((features) & X86_CPU_FEATURE_BMI2)
+#  define HAVE_BMI2_NATIVE		0
 #endif
 
-#if defined(_MSC_VER) && _MSC_VER < 1930 
-#  undef HAVE_BMI2_NATIVE
-#  undef HAVE_BMI2_INTRIN
-#  define HAVE_BMI2_NATIVE	0
-#  define HAVE_BMI2_INTRIN	0
+#ifdef __AVX512BW__
+#  define HAVE_AVX512BW(features)	1
+#else
+#  define HAVE_AVX512BW(features)	((features) & X86_CPU_FEATURE_AVX512BW)
+#endif
+
+#ifdef __AVX512VL__
+#  define HAVE_AVX512VL(features)	1
+#else
+#  define HAVE_AVX512VL(features)	((features) & X86_CPU_FEATURE_AVX512VL)
+#endif
+
+#ifdef __VPCLMULQDQ__
+#  define HAVE_VPCLMULQDQ(features)	1
+#else
+#  define HAVE_VPCLMULQDQ(features)	((features) & X86_CPU_FEATURE_VPCLMULQDQ)
+#endif
+
+#ifdef __AVX512VNNI__
+#  define HAVE_AVX512VNNI(features)	1
+#else
+#  define HAVE_AVX512VNNI(features)	((features) & X86_CPU_FEATURE_AVX512VNNI)
+#endif
+
+#ifdef __AVXVNNI__
+#  define HAVE_AVXVNNI(features)	1
+#else
+#  define HAVE_AVXVNNI(features)	((features) & X86_CPU_FEATURE_AVXVNNI)
 #endif
 
 #endif 
@@ -35861,14 +39497,8 @@ static inline u32 get_x86_cpu_features(void) { return 0; }
 #endif 
 
 
-#if HAVE_DYNAMIC_X86_CPU_FEATURES
+#ifdef X86_CPU_FEATURES_KNOWN
 
-
-#if defined(ARCH_X86_32) && defined(__PIC__)
-#  define EBX_CONSTRAINT "=&r"
-#else
-#  define EBX_CONSTRAINT "=b"
-#endif
 
 
 static inline void
@@ -35883,10 +39513,7 @@ cpuid(u32 leaf, u32 subleaf, u32 *a, u32 *b, u32 *c, u32 *d)
 	*c = result[2];
 	*d = result[3];
 #else
-	__asm__ volatile(".ifnc %%ebx, %1; mov  %%ebx, %1; .endif\n"
-			 "cpuid                                  \n"
-			 ".ifnc %%ebx, %1; xchg %%ebx, %1; .endif\n"
-			 : "=a" (*a), EBX_CONSTRAINT (*b), "=c" (*c), "=d" (*d)
+	__asm__ volatile("cpuid" : "=a" (*a), "=b" (*b), "=c" (*c), "=d" (*d)
 			 : "a" (leaf), "c" (subleaf));
 #endif
 }
@@ -35910,32 +39537,71 @@ read_xcr(u32 index)
 
 static const struct cpu_feature x86_cpu_feature_table[] = {
 	{X86_CPU_FEATURE_SSE2,		"sse2"},
-	{X86_CPU_FEATURE_PCLMUL,	"pclmul"},
+	{X86_CPU_FEATURE_PCLMULQDQ,	"pclmulqdq"},
 	{X86_CPU_FEATURE_AVX,		"avx"},
 	{X86_CPU_FEATURE_AVX2,		"avx2"},
 	{X86_CPU_FEATURE_BMI2,		"bmi2"},
+	{X86_CPU_FEATURE_ZMM,		"zmm"},
+	{X86_CPU_FEATURE_AVX512BW,	"avx512bw"},
+	{X86_CPU_FEATURE_AVX512VL,	"avx512vl"},
+	{X86_CPU_FEATURE_VPCLMULQDQ,	"vpclmulqdq"},
+	{X86_CPU_FEATURE_AVX512VNNI,	"avx512_vnni"},
+	{X86_CPU_FEATURE_AVXVNNI,	"avx_vnni"},
 };
 
 volatile u32 libdeflate_x86_cpu_features = 0;
 
 
+static inline bool
+allow_512bit_vectors(const u32 manufacturer[3], u32 family, u32 model)
+{
+#ifdef TEST_SUPPORT__DO_NOT_USE
+	return true;
+#endif
+	if (memcmp(manufacturer, "GenuineIntel", 12) != 0)
+		return true;
+	if (family != 6)
+		return true;
+	switch (model) {
+	case 85: 
+	case 106: 
+	case 108: 
+	case 126: 
+	case 140: 
+	case 141: 
+		return false;
+	}
+	return true;
+}
+
+
 void libdeflate_init_x86_cpu_features(void)
 {
-	u32 max_leaf, a, b, c, d;
+	u32 max_leaf;
+	u32 manufacturer[3];
+	u32 family, model;
+	u32 a, b, c, d;
 	u64 xcr0 = 0;
 	u32 features = 0;
 
 	
-	cpuid(0, 0, &max_leaf, &b, &c, &d);
+	cpuid(0, 0, &max_leaf, &manufacturer[0], &manufacturer[2],
+	      &manufacturer[1]);
 	if (max_leaf < 1)
 		goto out;
 
 	
 	cpuid(1, 0, &a, &b, &c, &d);
+	family = (a >> 8) & 0xf;
+	model = (a >> 4) & 0xf;
+	if (family == 6 || family == 0xf)
+		model += (a >> 12) & 0xf0;
+	if (family == 0xf)
+		family += (a >> 20) & 0xff;
 	if (d & (1 << 26))
 		features |= X86_CPU_FEATURE_SSE2;
 	if (c & (1 << 1))
-		features |= X86_CPU_FEATURE_PCLMUL;
+		features |= X86_CPU_FEATURE_PCLMULQDQ;
 	if (c & (1 << 27))
 		xcr0 = read_xcr(0);
 	if ((c & (1 << 28)) && ((xcr0 & 0x6) == 0x6))
@@ -35950,6 +39616,22 @@ void libdeflate_init_x86_cpu_features(void)
 		features |= X86_CPU_FEATURE_AVX2;
 	if (b & (1 << 8))
 		features |= X86_CPU_FEATURE_BMI2;
+	if (((xcr0 & 0xe6) == 0xe6) &&
+	    allow_512bit_vectors(manufacturer, family, model))
+		features |= X86_CPU_FEATURE_ZMM;
+	if ((b & (1 << 30)) && ((xcr0 & 0xe6) == 0xe6))
+		features |= X86_CPU_FEATURE_AVX512BW;
+	if ((b & (1U << 31)) && ((xcr0 & 0xe6) == 0xe6))
+		features |= X86_CPU_FEATURE_AVX512VL;
+	if ((c & (1 << 10)) && ((xcr0 & 0x6) == 0x6))
+		features |= X86_CPU_FEATURE_VPCLMULQDQ;
+	if ((c & (1 << 11)) && ((xcr0 & 0xe6) == 0xe6))
+		features |= X86_CPU_FEATURE_AVX512VNNI;
+
+	
+	cpuid(7, 1, &a, &b, &c, &d);
+	if ((a & (1 << 4)) && ((xcr0 & 0x6) == 0x6))
+		features |= X86_CPU_FEATURE_AVXVNNI;
 
 out:
 	disable_cpu_features_for_testing(&features, x86_cpu_feature_table,

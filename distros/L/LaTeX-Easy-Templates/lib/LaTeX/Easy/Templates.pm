@@ -10,7 +10,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 use Exporter qw(import);
 our @EXPORT = qw(
@@ -27,6 +27,7 @@ use File::Basename;
 use File::Path 'make_path';
 use File::Copy::Recursive qw/fmove rcopy/;
 use Filesys::DiskUsage qw/du/;
+use File::Which;
 use Cwd 'abs_path';
 
 use Data::Roundtrip qw/perl2dump no-unicode-escape-permanently/;
@@ -979,9 +980,31 @@ sub log {
 # checks if LaTeX::Driver has found the specifed executable.
 # The executable can be something like: latex, pdflatex, xelatex etc.
 # as well as dvips etc.
-# returns the path to the executable if found
+# returns the FULL path to the executable if found
 # or undef if not found or errors (e.g. failed to instantiate LaTeX::Driver)
 sub latex_driver_executable {
+	my $program_name = $_[0];
+	my $pa;
+	if( defined $program_name ){
+		$pa = LaTeX::Driver->program_path($program_name);
+		return undef unless $pa;
+		# this returns undef if not found or not executable (even if via a link)
+		return File::Which::which($pa)
+	}
+	# just iterate over all program names and check them
+	my (%ret, $pk);
+	for $pk (keys %LaTeX::Driver::program_path){
+		if( defined($pa=latex_driver_executable($pk)) ){
+			$ret{$pk} = $pa
+		}
+	}
+	return \%ret;
+}
+
+# to be removed
+sub latex_driver_executable_old {
+	# NOTE you can check program names without LaTeX::Driver object
+	# like this: LaTeX::Driver->program_name('xelatex')
 	my ($program_name) = @_;
 	my $parent = ( caller(1) )[3] || "N/A";
 	my $whoami = ( caller(0) )[3];
@@ -990,7 +1013,13 @@ sub latex_driver_executable {
 	if( ! defined($drivobj) ){ print STDERR "${whoami} (via $parent), line ".__LINE__." : error, failed to instantiate LaTeX::Driver: $@"; return undef }
 	close $fh; unlink $tmpfil;
 	if( defined $program_name ){
-		if( exists($drivobj->{_program_path}->{$program_name}) && defined($drivobj->{_program_path}->{$program_name}) ){
+		if( exists($drivobj->{_program_path}->{$program_name})
+		 && defined($drivobj->{_program_path}->{$program_name})
+		# LaTeX::Driver seems to return 'xelatex' (note: no path)
+		# even if xelatex is not on the system,
+		# so add this check too:
+		 && (-x $drivobj->{_program_path}->{$program_name})
+		){
 			return $drivobj->{_program_path}->{$program_name}
 		}
 		return undef # not found
@@ -1094,7 +1123,7 @@ LaTeX::Easy::Templates - Easily format content into PDF/PS/DVI with LaTeX templa
 
 =head1 VERSION
 
-Version 0.02
+Version 0.04
 
 =head1 SYNOPSIS
 
@@ -1108,9 +1137,10 @@ printer feed.
 
 Its use requires
 that LaTeX is already installed in your system.
-Don't be alarmed! LaTeX is simple to install in any OS.
-Download the installer from here: L<https://www.tug.org/texlive/>
-or, if you have Linux, add it via your package manager.
+Don't be alarmed! LaTeX is simple to install in any OS,
+see section L</INSTALLING LaTeX> for how. In Linux
+it is provided by the system package manager.
+
 Using LaTeX will not only empower you like
 Guttenberg's press did and does, but it
 will also satisfy even the highest aesthetic
@@ -1218,6 +1248,8 @@ from open source, publicly available, superbly styled "I<themes>".
     my $latte = LaTeX::Easy::Templates->new({
       debug => {verbosity=>2, cleanup=>1},
       'processors' => {
+        # if it includes other in-memory templates
+        # then just include them here with their name
         'mytemplate' => {
           'template' => {
             'content' => $latex_template_string,
@@ -1238,8 +1270,16 @@ from open source, publicly available, superbly styled "I<themes>".
     });
     die unless $ret;
 
-In this way you can nicely and easily typesed your data
+In this way you can nicely and easily typeset your data
 into a PDF.
+
+=head1 EXPORT
+
+=over 2
+
+=item * L</latex_driver_executable($program_name)>
+
+=back
 
 =head1 METHODS
 
@@ -1305,7 +1345,7 @@ set during runtime with
 
 =back
 
-=item * B<output> : specifies the file path to the output typesed document:
+=item * B<output> : specifies the file path to the output typeset document:
 
 =over 2
 
@@ -1346,7 +1386,7 @@ Note that B<only the following> parameters will be passed on:
 =over 2
 
 =item * B<format> : specify the output format (e.g. B<pdf>, B<ps>, etc.)
-of the rendered document and, optionally, the LaTeX "flavour" to be used,
+of the rendered document and, optionally, the LaTeX "I<flavour>" or "I<processor>" to be used,
 e.g. C<xelatex>, C<pdflatex>, C<latex>, etc. The default value is C<pdf(pdflatex)>.
 
 =item * B<paths> : specifies a mapping of program names to full pathname as a hash reference.
@@ -1636,7 +1676,7 @@ These are some common templater paramaters:
 
 =over 2
 
-=item * B<syntax> : specify the template syntax to be either C<Kolon> or C<TTerse>. Default is C<Kolon>.
+=item * B<syntax> : specify the template syntax to be either L<Kolon|Text::Xslate::Syntax::Kolon> or C<TTerse|Text::Xslate::Syntax::TTerse>. Default is C<Kolon>.
 
 =item * B<suffix> : specify the template files suffix. Default is C<.tx> (do not forget the dot).
 
@@ -1657,15 +1697,24 @@ This is an exported sub (and not a method)
 
 It enquires L<LaTeX::Driver> for what is the fullpath to the
 program named C<$program_name>. The program can be C<latex>, C<dvips>,
-C<makeindex>, C<pdflatex> etc. If the program is not found it returns C<undef>.
+C<makeindex>, C<pdflatex> etc.
+If the program is not found or if it is not an executable
+(for the current user), it returns C<undef>.
+If it is found and it is executable (for the current user),
+its fullpath is returned.
 
-The parameter is optional, if it is omitted a hash(ref) with all known
-paths is returned.
+The parameter C<$program_name> is optional,
+if it is omitted, it returns a hash(ref) with all known
+programs (the keys)
+and their full paths (the values).
 
-Note that L<LaTeX::Driver>'s paths are detected during its installation.
-Paths can be set during running L</format()> by passing it
-B<latex-E<gt>latex-driver-parameters-E<gt>paths> (a hashref mapping program names
-to their paths).
+Note that L<LaTeX::Driver>'s paths are detected during its installation
+(according to its documentation).
+
+Program full paths can be set during running L</format()> by passing it
+the parameter
+B<latex-E<gt>latex-driver-parameters-E<gt>paths>
+(a hashref mapping program names to their paths).
 
 =head2 C<processors()>
 
@@ -1675,45 +1724,6 @@ set up during construction.
 =head2 C<loaded_info()>
 
 It returns the hash(ref) of extra information relating to the "processors".
-
-=head1 STARTING WITH LaTeX
-
-Currently, the best place to get started with LaTeX is at
-the site L<https://www.overleaf.com/> (which I am not affiliated in any way).
-There is no subscription involved or any registration required.
-
-Click on L<Templates|https://www.overleaf.com/latex/templates> and search for anything
-you are interested to typeset your data with. For example, if you are scraping a news
-website you may be interested in the
-L<Committee Times|https://www.overleaf.com/latex/templates/newspaper-slash-news-letter-template/wjxxhkxdjxhw> template.
-First check its license and if you agree with that, click on B<View Source>, copy the contents and paste
-them into your new LaTeX file, let's call that C<main.tex> located in a new directory C<templates/committee-times>.
-
-Firstly, run latex on it to with C<latex main.tex> to see if there are any required files
-you need to install. For example it requires package C<newspaper>. These packages are
-located at the L<Comprehensive TeX Archive Network (CTAN) | https://ctan.org>. Search the package,
-download it, locate and change to your LaTeX installation directory (for example C</usr/share/texlive/texmf-dist>),
-change to C<tex>. Decide which flavour of LaTeX this package is for, e.g. C<latex> or C<xelatex>,
-change to that directory and unzip the downloaded file there. This is the hard way.
-The easy way is via your package manager. For example on Fedora with C<dnf>
-there is this package C<texlive-newspaper.noarch>. Easy. Running latex will tell you
-if it requires more packages to be installed.
-
-Now study that LaTeX source file and identify what template variables
-and control structures to use in order to turn it into a template.
-Rename the file to C<main.tex.tx> and you are ready.
-
-Naturally, there will be a lot of head banging and hair pulling before you
-manage to produce anything decent.
-
-=head1 LaTeX TEMPLATES
-
-Creating a LaTeX template is very easy. You need to start with
-a LaTeX document and identify those sections which can be
-replaced by the template variables. You can also identify
-repeated sections and replace them with loops.
-It is exactly the same procedure as with creating HTML templates
-or email messages templates.
 
 =head1 TEMPLATE PROCESSING
 
@@ -1753,7 +1763,273 @@ So if your template data is this:
 Then your template will access C<name>'s value via C< <: $data.name :> >.
 
 L<Text::Xslate> supports loops and conditional statements etc. etc. Read
-L<Text::Xslate::Syntax::Kolon> and/or L<Text::Xslate::Syntax::TTerse>.
+the documentation for L<Text::Xslate>'s syntax:
+L<Text::Xslate::Syntax::Kolon> or L<Text::Xslate::Syntax::TTerse>.
+
+=head1 TEMPLATES INCLUDING TEMPLATES
+
+Templates which include other templates are supported.
+Both with in-memory template strings or with on-disk template files.
+
+=head2 In-memory templates
+
+The C<processor> parameter to L<LaTeX::Easy::Templates>'s L<constructor|/new()>
+should contain both the main template and all other
+included templates keyed on their include name. For example, the
+main template is:
+
+    \documentclass[letterpaper,twoside,12pt]{article}
+    \begin{document}
+    : include "preamble.tex.tx" {data => $data};
+    : for [1, 2, 3] -> $i {
+      \section{Content for section <: $i :>}
+      : include "content.tex.tx" {data => $data};
+   : }
+   \end{document}
+
+It calls two other templates:
+
+    :# preamble.tex.tx
+    \title{ <: $data.title :> }
+    \author{ <: $data.author.name :> <: $data.author.surname :> }
+    \date{ <: $data.date :> }
+
+and
+
+    :# content.tex.tx
+    <: $data.content :>
+
+In order to load all above templates, construct the L<LaTeX::Easy::Templates>
+object like this:
+
+     my $latter = LaTeX::Easy::Template->new({
+      'processors' => {
+        # the main entry
+        'main.tex.tx' => {
+           'template' => {
+        	'content' => '... main.tex.tx contents ...'
+           },
+           'output' => {
+        	'filename' => 'out.pdf'
+           }
+        },
+        # it includes these other templates:
+        'preamble.tex.tx' => { # one ...
+           'template' => {
+        	'content' => '... preamble.tex.tx contents ...'
+           }
+        },
+        'content.tex.tx' => { # ... and two
+           'template' => {
+        	'content' => '... content.tex.tx contents ...'
+           },
+        }
+      } # end 'processors'
+
+With the above, all in-memory templates required are loaded in memory.
+All you need now is to specify "C<main.tex.tx>" as the
+C<processor> name when
+calling L</untemplate()> or L</format()>. You do not need
+to mention the included template names at all. Like this:
+
+    my $ret = $latter->format({
+      'template-data' => $template_data,
+      'output' => {
+        'filepath' => ...,
+      },
+      # just specify the main entry template
+      'processor' => 'main.tex.tx',
+});
+
+
+The above functionality is demonstrated and tested in
+file C<t/350-inmemory-template-usage-calling-other-templates.t>
+
+=head2 On-disk, file templates
+
+If both the main template and all templates it includes are in the
+same directory then you only need to specify
+the C<main.tex.tx> template. And all dependencies will
+be taken care of. Like this:
+
+     my $latter = LaTeX::Easy::Template->new({
+      'processors' => {
+        # the main entry
+        'main.tex.tx' => {
+           'template' => {
+             'filepath' => '/x/y/z/main.tex.tx'
+             # works also with specifying
+             #   'filename' & 'basedir'  
+           },
+           'output' => {
+        	'filename' => 'out.pdf'
+           }
+        },
+        # the dependent templates are not needed
+        # to be included if in same dir
+        # include them ONLY if in different dir
+      } # end 'processors'
+
+
+With the above, the "C<main.tex.tx>" template,
+which is the main entry point, is loaded.
+As long as its dependencies, i.e. the templates
+it includes, are in the same directory
+or are specified with their full path,
+then there is nothing else you need to include.
+The dependencies will be found and included as needed.
+
+All you need now is to specify "C<main.tex.tx>" as the
+C<processor> name when
+calling L</untemplate()> or L</format()>. You do not need
+to mention the included template names at all. Like this:
+
+    my $ret = $latter->format({
+      'template-data' => $template_data,
+      'output' => {
+        'filepath' => '/x/y/z/out.pdf',
+      },
+      # just specify the main entry template
+      # dependencies will be included as needed:
+      'processor' => 'main.tex.tx',
+});
+
+
+The above functionality is demonstrated and tested in
+file C<t/360-ondisk-template-usage-calling-other-templates.t>>
+
+
+=head1 STARTING WITH LaTeX
+
+Currently, the best place to get started with LaTeX is at
+the site L<https://www.overleaf.com/> (which I am not affiliated in any way).
+There is no subscription involved or any registration required.
+
+Click on L<Templates|https://www.overleaf.com/latex/templates> and search for anything
+you are interested to typeset your data with. For example, if you are scraping a news
+website you may be interested in the
+L<Committee Times|https://www.overleaf.com/latex/templates/newspaper-slash-news-letter-template/wjxxhkxdjxhw> template.
+First check its license and if you agree with that, click on B<View Source>, copy the contents and paste
+them into your new LaTeX file, let's call that C<main.tex> located in a new directory C<templates/committee-times>.
+
+Firstly, run latex on it  with this command C<latex main.tex>.
+It will fail if it can not find, in your LaTeX installation,
+the packages it requires.
+For example it requires package C<newspaper>.
+If it complains that certain packages are not found,
+please read section L</INSTALLING LaTeX PACKAGES>.
+
+Now study that LaTeX source file and identify what template variables
+and control structures to use in order to turn it into a template.
+Rename the file to C<main.tex.tx> and you are ready.
+
+Naturally, there will be a lot of head banging and hair pulling before you
+manage to produce anything decent.
+
+=head1 LaTeX TEMPLATES
+
+Creating a LaTeX template is very easy. You need to start with
+a LaTeX document and identify those sections which can be
+replaced by the template variables. You can also identify
+repeated sections and replace them with loops.
+It is exactly the same procedure as with creating HTML templates
+or email messages templates.
+
+At this moment, the template processor is L<Text::Xslate>.
+Therefore the syntax for declaring template variables, loops,
+conditionals, etc. must comply with L<Text::Xslate>. See
+section L</TEMPLATE PROCESSING> for where to start
+with L<Text::Xslate>.
+
+A LaTeX template can live in memory as a Perl string
+or on disk, as a file in its own directory or not.
+
+If your template dependes on other templates you
+can include all as files in the same directory.
+
+If your template depends on your own
+LaTeX style files, packages etc., then
+include those in the same directory with
+the LaTeX templates. Additionally, when specifying the location
+of the template, specify C<basedir> and C<filename>
+(instead of a single C<filepath>). This will
+ensure that all file dependencies contained within
+C<basedir> will be copied to the temporary processing
+directories. See L</new()> for how this works.
+
+=head1 INSTALLING LaTeX
+
+Today, as far as I know,
+there are two main TeX/LaTeX distributions:
+L<MikTeX|https://miktex.org/>
+and
+L<TexLive|https://www.tug.org/texlive/>
+
+Both provide the same LaTeX. They
+just package different things with it.
+And both provide package managers in order
+to make installing extra packages easy.
+
+I believe L<MikTeX|https://miktex.org/>
+was, at some time, aimed for M$ systems and
+L<TexLive|https://www.tug.org/texlive/>
+for the saner operating systems.
+
+My Linux package manager installs
+L<TexLive|https://www.tug.org/texlive/>
+and I am absolutely happy with it.
+
+=head1 INSTALLING LaTeX PACKAGES
+
+In Linux, it is preferred to install
+LaTeX packages
+via the system package manager.
+
+With modern TeX distributions installing
+LaTeX packages is quite simple. Both
+L<MikTeX|https://miktex.org/>
+and
+L<TexLive|https://www.tug.org/texlive/>
+provide package installers.
+
+See L<this guide|https://en.wikibooks.org/wiki/LaTeX/Installing_Extra_Packages#Automatic_installation>
+for more information.
+
+=head2 Manual installation
+
+This is the hard way.
+
+All available LaTeX packages are
+located at the L<Comprehensive TeX Archive Network (CTAN) site | https://ctan.org>. Search the package,
+download it, locate and change to your LaTeX installation directory (for example C</usr/share/texlive/texmf-dist>),
+change to C<tex>. Decide which flavour of LaTeX (processor)
+this package is for, e.g. C<latex>, C<pdflatex> or C<xelatex>,
+change to that directory and unzip the downloaded file there.
+
+=head1 TESTING
+
+Some tests may fail because some required LaTeX fonts
+and/or style files are missing from your LaTeX installation.
+As of version 0.04 the test files which use complex
+LaTeX formatting and may require extra LaTeX packages
+have been designated as I<author tests> and have
+been moved to the C<xt/> directory. They are not
+part of the usual unit tests suite run with C<make test>.
+They can be run using C<make authortest>. If there are failures,
+try installing the missing LaTeX fonts and style files
+(see section L</INSTALLING LaTeX PACKAGES>).
+Or freshen up your LaTeX installation. In any event,
+these tests are not important and their possible
+failure should not cause any convern.
+
+In order to run all tests download the
+tarball of this module, extract it,
+enter the directory and do:
+
+    perl Makefile.PL
+    make all
+    make test
+    make authortest
 
 
 =head1 AUTHOR

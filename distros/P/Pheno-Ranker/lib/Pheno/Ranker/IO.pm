@@ -85,8 +85,8 @@ sub read_json {
 
     my $file = shift;
 
-    # NB: hp.json is non-UTF8
-    # malformed UTF-8 character in JSON string, at character offset 680 (before "\x{fffd}r"\n      },...")
+# NB: hp.json is non-UTF8
+# malformed UTF-8 character in JSON string, at character offset 680 (before "\x{fffd}r"\n      },...")
     my $str =
       $file =~ /hp\.json/ ? path($file)->slurp : path($file)->slurp_utf8;
     return decode_json($str);    # Decode to Perl data structure
@@ -257,38 +257,72 @@ sub append_and_rename_primary_key {
     return ref $ref_data->[0] eq ref {} ? [ $ref_data->[0] ] : $ref_data->[0]
       if @$ref_data == 1;
 
-    # NB: for is a bit faster than map
-    my $count = 1;
+    # Count for prefixes
+    my $prefix_count = 1;
 
     # We have to load into a new array data
+    # NB: for is a bit faster than map
     my $data;
     for my $item (@$ref_data) {
 
+        # Get prefix
         my $prefix =
-            $append_prefixes->[ $count - 1 ]
-          ? $append_prefixes->[ $count - 1 ] . '_'
-          : 'C' . $count . '_';
+            $append_prefixes->[ $prefix_count - 1 ]
+          ? $append_prefixes->[ $prefix_count - 1 ] . '_'
+          : 'C' . $prefix_count . '_';
 
         # ARRAY
+        my $item_count = 1;
         if ( ref $item eq ref [] ) {
             for my $individual (@$item) {
-                $individual->{$primary_key} =
-                  $prefix . $individual->{$primary_key};
+                my $id = $individual->{$primary_key};
+                check_null_primary_key(
+                    {
+                        count       => $item_count,
+                        primary_key => $primary_key,
+                        id          => $id,
+                        prefix      => $prefix
+                    }
+                );
+                $individual->{$primary_key} = $prefix . $id;
                 push @$data, $individual;
+                $item_count++;
             }
         }
 
         # Object
         else {
-            $item->{$primary_key} = $prefix . $item->{$primary_key};
+
+            # Check if primary_key is defined
+            my $id = $item->{$primary_key};
+            check_null_primary_key(
+                {
+                    count       => $item_count,
+                    primary_key => $primary_key,
+                    id          => $id,
+                    prefix      => $prefix
+                }
+            );
+            $item->{$primary_key} = $prefix . $id;
             push @$data, $item;
+            $item_count++;
         }
-
-        # Add $count
-        $count++;
+        $prefix_count++;
     }
-
     return $data;
+}
+
+sub check_null_primary_key {
+
+    my $arg         = shift;
+    my $id          = $arg->{id};
+    my $count       = $arg->{count};
+    my $primary_key = $arg->{primary_key};
+    my $prefix      = $arg->{prefix};
+    die
+"Sorry but the JSON document ${prefix}[$count] does not have the primary_key <$primary_key> defined\n"
+      unless defined $id;
+    return 1;
 }
 
 1;

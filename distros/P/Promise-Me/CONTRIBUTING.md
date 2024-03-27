@@ -43,7 +43,7 @@ Issues are currently reported using CPAN [bug tracker](https://gitlab.com/jackde
 
 ## More information
 
-Please refer to the [README](https://metacpan.org/source/JDEGUEST/Promise-Me-v0.4.7/README.md)
+Please refer to the [README](https://metacpan.org/source/JDEGUEST/Promise-Me-v0.4.9/README.md)
 
 ## Author
 

@@ -8,7 +8,7 @@ use AsposeCellsCloud::Request::PostRotate;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**file** | **string** | 270/90/row/col/row2col |
+**file** | **string** | File to upload |
 **rotate_type** | **string** | 270/90/row/col/row2col |
 **out_format** | **string** | The output data file format.(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers) |
 **password** | **string** | The password needed to open an Excel file. |

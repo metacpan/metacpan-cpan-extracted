@@ -10,6 +10,7 @@ README
 dist.ini
 lib/Variable/OnDestruct.pm
 lib/Variable/OnDestruct.xs
+lib/Variable/ppport.h
 t/10-basics.t
 xt/author/pod-coverage.t
 xt/author/pod-syntax.t

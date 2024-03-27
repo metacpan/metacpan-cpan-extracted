@@ -3,32 +3,46 @@
 
 class Sys::User {
   use Sys::User::Passwd;
+  
   use Sys::User::Group;
   
   native static method getuid : int ();
+  
   native static method geteuid : int ();
+  
   native static method getgid : int ();
+  
   native static method getegid : int ();
   
   native static method setuid : int ($uid : int);
+  
   native static method seteuid : int ($euid : int);
+  
   native static method setgid : int ($gid : int);
+  
   native static method setegid : int ($egid : int);
   
   native static method setpwent : void ();
+  
   native static method endpwent : void ();
+  
   native static method getpwent : Sys::User::Passwd ();
   
   native static method setgrent : void ();
+  
   native static method endgrent : void ();
+  
   native static method getgrent : Sys::User::Group ();
   
-  native static method getgroups : int[] ();
+  native static method getgroups : int ($size : int, $list : int[]);
+  
   native static method setgroups : int ($groups : int[]);
-
+  
   native static method getpwuid : Sys::User::Passwd ($id : int);
+  
   native static method getpwnam : Sys::User::Passwd ($name : string);
-
+  
   native static method getgrgid : Sys::User::Group ($id : int);
+  
   native static method getgrnam : Sys::User::Group ($name : string);
 }

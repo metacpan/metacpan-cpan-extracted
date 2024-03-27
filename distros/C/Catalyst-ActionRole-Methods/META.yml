@@ -27,7 +27,7 @@ resources:
   bugtracker: https://github.com/jjn1056/Catalyst-ActionRole-Methods/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/jjn1056/Catalyst-ActionRole-Methods.git
-version: '0.103'
+version: '0.104'
 x_copyright:
   holder: 'Aristotle Pagaltzis'
   year: 2024

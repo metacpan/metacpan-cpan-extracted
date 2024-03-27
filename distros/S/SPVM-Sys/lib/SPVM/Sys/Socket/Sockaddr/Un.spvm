@@ -8,27 +8,27 @@ class Sys::Socket::Sockaddr::Un extends Sys::Socket::Sockaddr : pointer {
   
   # Instance methods
   native method DESTROY : void ();
-
+  
   method sa_family : int () {
     my $sun_family = $self->sun_family;
     return $sun_family;
   }
   
   native method sun_family : int ();
-
+  
   native method set_sun_family : void ($family : int);
-
-  native method copy_sun_path : string ();
-
+  
+  native method sun_path : string ();
+  
   native method set_sun_path : void ($path : string);
   
-  native method sizeof : int ();
+  native method size : int ();
   
   method clone : Sys::Socket::Sockaddr::Un () {
     my $clone = Sys::Socket::Sockaddr::Un->new;
-
+    
     $clone->set_sun_family($self->sun_family);
-    $clone->set_sun_path($self->copy_sun_path);
+    $clone->set_sun_path($self->sun_path);
     
     return $clone;
   }

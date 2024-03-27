@@ -27,8 +27,8 @@ package
 package Data::Dumper::Interp;
 
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 997.999; }
-our $VERSION = '7.005'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-02-29'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '7.006'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2024-03-22'; # DATE from Dist::Zilla::Plugin::OurDate
 
 use Moose;
 
@@ -547,57 +547,56 @@ sub _generate_sub($;$) {
   my $listform = '';
   my $signature = $basename =~ /^[ah]/ ? '@' : '_'; # avis(@) ivis(_) vis(_)
   my $code = "sub $methname($signature)";
-  if ($proto_only) {
-    $code .= ";";
+  if ($basename eq "vis") {
+    my $listform = delete($mod{l}) ? 'l' : '';
+    $code .= " { &__getself_s->_Listform('${listform}')";
+  }
+  elsif ($basename eq "avis") {
+    my $listform = delete($mod{l}) ? 'l' : 'a';
+    $code .= " { &__getself_a->_Listform('${listform}')";
+  }
+  elsif ($basename eq "hvis") {
+    my $listform = delete($mod{l}) ? 'l' : 'h';
+    $code .= " { &__getself_h->_Listform('${listform}')";
+  }
+  elsif ($basename eq "ivis") {
+    $code .= " { \@_ = ( &__getself" ;
+  }
+  elsif ($basename eq "dvis") {
+    $code .= " { \@_ = ( &__getself->_EnabUseqqFeature(_utfoutput() ? ':spacedots:condense' : ':condense')" ;
+    #$code .= " { \@_ = ( &__getself->_EnabUseqqFeature(':spacedots')" ;
+  }
+  else { oops }
+
+  my $useqq = "";
+  $useqq .= ":unicode:controlpics" if delete $mod{c};
+  $useqq .= ":condense"            if delete $mod{C};
+  $code .= '->Debug(2)'            if delete $mod{D};
+  $useqq .= ":hex"                 if delete $mod{h};
+  $code .= '->Objects(0)'          if delete $mod{o};
+  $useqq .= ":octets"              if delete $mod{O};
+  $code .= '->Refaddr(1)'          if delete $mod{r};
+  $useqq .= ":underscores"         if delete $mod{u};
+
+  $code .= "->Useqq(\$Useqq.'${useqq}')" if $useqq ne "";
+
+  $code .= "->_EnabUseqqFeature(_utfoutput() ? ':spacedots:condense' : ':condense')" if delete($mod{d}) or $basename eq "dvis";
+
+  $code .= "->Useqq(0)"     if delete $mod{q};
+
+  $code .= "->Maxdepth($N)" if defined($N);
+
+  if ($basename =~ /^([id])vis/) {
+    $code .= ", shift, '$1' ); goto &_Interpolate }";
   } else {
-    if ($basename eq "vis") {
-      my $listform = delete($mod{l}) ? 'l' : '';
-      $code .= " { &__getself_s->_Listform('${listform}')";
-    }
-    elsif ($basename eq "avis") {
-      my $listform = delete($mod{l}) ? 'l' : 'a';
-      $code .= " { &__getself_a->_Listform('${listform}')";
-    }
-    elsif ($basename eq "hvis") {
-      my $listform = delete($mod{l}) ? 'l' : 'h';
-      $code .= " { &__getself_h->_Listform('${listform}')";
-    }
-    elsif ($basename eq "ivis") {
-      $code .= " { \@_ = ( &__getself" ;
-    }
-    elsif ($basename eq "dvis") {
-      $code .= " { \@_ = ( &__getself->_EnabUseqqFeature(_utfoutput() ? ':spacedots:condense' : ':condense')" ;
-      #$code .= " { \@_ = ( &__getself->_EnabUseqqFeature(':spacedots')" ;
-    }
-    else { oops }
-
-    my $useqq = "";
-    $useqq .= ":unicode:controlpics" if delete $mod{c};
-    $useqq .= ":condense"            if delete $mod{C};
-    $code .= '->Debug(2)'            if delete $mod{D};
-    $useqq .= ":hex"                 if delete $mod{h};
-    $code .= '->Objects(0)'          if delete $mod{o};
-    $useqq .= ":octets"              if delete $mod{O};
-    $code .= '->Refaddr(1)'          if delete $mod{r};
-    $useqq .= ":underscores"         if delete $mod{u};
-
-    $code .= "->Useqq(\$Useqq.'${useqq}')" if $useqq ne "";
-
-    $code .= "->_EnabUseqqFeature(_utfoutput() ? ':spacedots:condense' : ':condense')" if delete($mod{d}) or $basename eq "dvis";
-
-    $code .= "->Useqq(0)"     if delete $mod{q};
-
-    $code .= "->Maxdepth($N)" if defined($N);
-
-    if ($basename =~ /^([id])vis/) {
-      $code .= ", shift, '$1' ); goto &_Interpolate }";
-    } else {
-      $code .= "->_Do }";
-    }
-
-    for (keys %mod) { error "Unknown or inappropriate modifier '$_'" }
+    $code .= "->_Do }";
   }
 
+  for (keys %mod) { error "Unknown or inappropriate modifier '$_'" }
+
+  if ($proto_only) {
+    $code =~ s/ *\{.*/;/ or oops;
+  }
   # To see the generated code
   #   use Data::Dumper::Interp qw/:debug :DEFAULT/; # or :all
   if ($Debug) {

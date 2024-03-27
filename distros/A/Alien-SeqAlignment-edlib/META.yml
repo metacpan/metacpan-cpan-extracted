@@ -39,7 +39,7 @@ no_index:
 provides:
   Alien::SeqAlignment::edlib:
     file: lib/Alien/SeqAlignment/edlib.pm
-    version: '0.08'
+    version: '0.09'
 requires:
   Alien::Base: '0.038'
   parent: '0'
@@ -49,7 +49,7 @@ resources:
   IRC: irc://irc.perl.org/#native
   homepage: https://github.com/chrisarg/alien-seqalignment-edlib
   repository: https://github.com/chrisarg/alien-seqalignment-edlib.git
-version: '0.08'
+version: '0.09'
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:

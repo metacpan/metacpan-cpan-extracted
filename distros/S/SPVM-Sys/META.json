@@ -1,5 +1,5 @@
 {
-   "abstract" : "System Calls for File IO, User, Process, Signal, Socket",
+   "abstract" : "System Calls for File IO, Sockets, Time, Process, Signals, Users",
    "author" : [
       "USER_NAME<USER_MAIL>"
    ],
@@ -27,16 +27,19 @@
       },
       "configure" : {
          "requires" : {
-            "SPVM" : "0.989017",
+            "SPVM" : "0.989060",
             "SPVM::Resource::SocketUtil" : "1.001"
          }
       },
       "runtime" : {
          "requires" : {
-            "SPVM" : "0.989017",
+            "SPVM" : "0.989060",
             "SPVM::Errno" : "0.06",
             "SPVM::Resource::SocketUtil" : "1.001"
          }
+      },
+      "test" : {
+         "requires" : {}
       }
    },
    "release_status" : "stable",
@@ -50,6 +53,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM-Sys"
       }
    },
-   "version" : "0.481008",
+   "version" : "0.514001",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

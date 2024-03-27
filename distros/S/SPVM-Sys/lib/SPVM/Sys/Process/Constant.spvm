@@ -2,19 +2,21 @@
 # MIT License
 
 class Sys::Process::Constant {
+  
+  # Class Methods
   native static method EXIT_FAILURE : int ();
-
+  
   native static method EXIT_SUCCESS : int ();
-
+  
   native static method WNOHANG : int ();
-
+  
   native static method WUNTRACED : int ();
-
+  
   native static method WCONTINUED : int ();
-
+  
   native static method PRIO_PROCESS : int ();
-
+  
   native static method PRIO_PGRP : int ();
-
+  
   native static method PRIO_USER : int ();
 }

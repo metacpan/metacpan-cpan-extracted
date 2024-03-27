@@ -7,7 +7,7 @@ class TestCase::Sys::Poll {
   use Sys::Socket::Sockaddr::In;
   use Sys::Process;
   
-  use TestUtil::SocketAutoClose;
+  use Fn;
   
   static method poll : int ($port : int) {
     {
@@ -18,18 +18,19 @@ class TestCase::Sys::Poll {
         return 0;
       }
       
-      # Close socket at the end of this scope
-      my $no0_socket_auto_close = TestUtil::SocketAutoClose->new($no0_socket);
+      Fn->defer([$no0_socket : int] method :void () {
+        Sys::Socket->close($no0_socket);
+      });
       
       # IPv4 address
       my $no0_address = Sys::Socket::Sockaddr::In->new;
       $no0_address->set_sin_family((byte)SOCKET->AF_INET);
       $no0_address->set_sin_port(Sys::Socket->htons((short)$port));
-      my $no0_sin_addr = $no0_address->copy_sin_addr;
+      my $no0_sin_addr = $no0_address->sin_addr;
       Sys::Socket->inet_pton(SOCKET->AF_INET, "127.0.0.1", $no0_sin_addr);
       $no0_address->set_sin_addr($no0_sin_addr);
       
-      my $no0_status_connect = Sys::Socket->connect($no0_socket, $no0_address, $no0_address->sizeof);
+      my $no0_status_connect = Sys::Socket->connect($no0_socket, $no0_address, $no0_address->size);
       
       unless ($no0_status_connect == 0) {
         Sys::Socket->close($no0_socket);
@@ -43,18 +44,19 @@ class TestCase::Sys::Poll {
         return 0;
       }
       
-      # Close socket at the end of this scope
-      my $no1_socket_auto_close = TestUtil::SocketAutoClose->new($no1_socket);
+      Fn->defer([$no1_socket : int] method :void () {
+        Sys::Socket->close($no1_socket);
+      });
       
       # IPv4 address
       my $no1_address = Sys::Socket::Sockaddr::In->new;
       $no1_address->set_sin_family((byte)SOCKET->AF_INET);
       $no1_address->set_sin_port(Sys::Socket->htons((short)$port));
-      my $no1_sin_addr = $no1_address->copy_sin_addr;
+      my $no1_sin_addr = $no1_address->sin_addr;
       Sys::Socket->inet_pton(SOCKET->AF_INET, "127.0.0.1", $no1_sin_addr);
       $no1_address->set_sin_addr($no1_sin_addr);
       
-      my $no1_status_connect = Sys::Socket->connect($no1_socket, $no1_address, $no1_address->sizeof);
+      my $no1_status_connect = Sys::Socket->connect($no1_socket, $no1_address, $no1_address->size);
       
       unless ($no1_status_connect == 0) {
         Sys::Socket->close($no1_socket);
@@ -237,6 +239,10 @@ class TestCase::Sys::Poll {
         unless ($no1_recv_length == 0) {
           return 0;
         }
+      }
+      
+      {
+        my $fds = Sys::Poll::PollfdArray->new(0);
       }
     }
     

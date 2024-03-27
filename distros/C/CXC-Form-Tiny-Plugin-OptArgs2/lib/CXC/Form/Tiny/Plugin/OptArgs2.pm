@@ -7,7 +7,7 @@ use v5.20;
 use warnings;
 use experimental 'signatures', 'postderef';
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use parent 'Form::Tiny::Plugin';
 
@@ -60,7 +60,7 @@ CXC::Form::Tiny::Plugin::OptArgs2 - A Plugin to interface Form::Tiny with OptArg
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -503,6 +503,13 @@ The C<isa> option can be omitted in the list of option and argument
 attributes if the L<OptArgs2> type can be deduced from the
 L<Form::Tiny> type.  The types which require explicit specification
 are the L<OptArgs2> C<Flag>, C<Counter>, and C<SubCmd> types.
+
+Here are the existing mappings from L<Type::Tiny> to L<OptArgs2> types:
+
+ ArrayRef Flag Bool Counter HashRef Int Num Str
+                   => eponymous OptArgs2 type
+ BoolLike          => Bool
+ Any Path File Dir => Str
 
 =head4 C<required>
 

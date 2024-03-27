@@ -9,7 +9,7 @@ not good to spend a lot of time working on something that no one is interested
 in!
 
 You can contribute to the discussion by posting bug reports, feature requests, 
-observations, etc. to the [GitHub issues area](https://github.com/ PhilterPaper/PDF-Table/issues?q=is%3Aissue+sort%3Aupdated-desc "issues")
+observations, etc. to the [GitHub issues area](https://github.com/PhilterPaper/PDF-Table/issues?q=is%3Aissue+sort%3Aupdated-desc "issues")
 (please tag new threads accordingly, using ["Labels"], if possible).
 
 For code changes, a GitHub pull request, a formal patch file (e.g., "diff"), or 
@@ -24,8 +24,9 @@ effort if we decline the offer.
 ## Do NOT...
 
 Do NOT under ANY circumstances open a PR (Pull Request) to **report a _bug_.**
-It is a waste of both _your_ and _our_ time and effort. Open a regular ticket
-(issue), and attach a Perl (.pl) program illustrating the problem, if possible. 
+It is a waste of both _your_ and _our_ time and effort. Instead, simply open a 
+regular ticket (_issue_) in GitHub, and attach a Perl (.pl) program that 
+illustrates the problem, if possible. 
 If you believe that you have a program patch (i.e., a permanent change to the 
 code), and offer to share it as a PR, we may give the go-ahead. Unsolicited PRs 
 may be closed without further action.
@@ -44,4 +45,4 @@ like PDF::API2::Ladder), under either our ownership or yours.
 
 Good luck, and best wishes using and helping with PDF::Table!
 
-December, 2022
+May, 2023

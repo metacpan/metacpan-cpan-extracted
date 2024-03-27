@@ -238,7 +238,7 @@ sub execute
     
     if( defined( $el ) )
     {
-        $self->messagec( 5, "{green}", $el->elements->length, "{/} elements set." );
+        $self->messagec( 5, "{green}", $el->elements->length, "{/} elements set and {green}", scalar( @binded_types ), "{/} types set so far with \$q->binded_types_as_param." );
     }
     
     # Get the values to bind
@@ -676,8 +676,11 @@ sub fetchrow_hashref
     {
         $self->execute() || return( $self->pass_error );
     }
-    return( $sth->fetchrow_hashref ) if( !$dbo->auto_decode_json && !$dbo->auto_convert_datetime_to_object );
     my $ref = $sth->fetchrow_hashref;
+    if( !$dbo->auto_decode_json && !$dbo->auto_convert_datetime_to_object )
+    {
+        return( $ref );
+    }
     # Convert json to hash for the relevant fields
     # return( $self->_convert_json2hash( $ref ) );
     $ref = $self->_convert_json2hash({ statement => $sth, data => $ref }) if( $dbo->auto_decode_json );

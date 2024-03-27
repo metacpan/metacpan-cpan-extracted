@@ -13,7 +13,7 @@ use HTML::Blitz::TokenType qw(
     TT_DOCTYPE
 );
 
-our $VERSION = '0.09';
+our $VERSION = '0.0901';
 
 method _fail(
     $msg,

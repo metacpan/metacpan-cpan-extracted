@@ -1,0 +1,486 @@
+class TestCase::Sys::Time::Util {
+  use Sys::Time::Util;
+  
+  static method nanoseconds_to_timespec : int () {
+    
+    my $nanoseconds = 1_000_000_200;
+    my $ts = Sys::Time::Util->nanoseconds_to_timespec($nanoseconds);
+    
+    unless ($ts->tv_sec == 1) {
+      return 0;
+    }
+    
+    unless ($ts->tv_nsec == 200) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method timespec_to_nanoseconds : int () {
+    
+    my $nanoseconds = 1_000_000_200;
+    
+    my $ts = Sys::Time::Util->nanoseconds_to_timespec($nanoseconds);
+    
+    my $nanoseconds_again = Sys::Time::Util->timespec_to_nanoseconds($ts);
+    
+    unless ($nanoseconds_again == 1_000_000_200) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method microseconds_to_timeval : int () {
+    
+    my $microseconds = 1_000_200;
+    my $tv = Sys::Time::Util->microseconds_to_timeval($microseconds);
+    
+    unless ($tv->tv_sec == 1) {
+      return 0;
+    }
+    
+    unless ($tv->tv_usec == 200) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method timeval_to_microseconds : int () {
+    
+    my $microseconds = 1_000_200;
+    
+    my $tv = Sys::Time::Util->microseconds_to_timeval($microseconds);
+    
+    my $microseconds_again = Sys::Time::Util->timeval_to_microseconds($tv);
+    
+    unless ($microseconds_again == 1_000_200) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method float_seconds_to_timespec : int () {
+    
+    my $float_seconds = 1.5;
+    my $ts = Sys::Time::Util->float_seconds_to_timespec($float_seconds);
+    
+    unless ($ts->tv_sec == 1) {
+      return 0;
+    }
+    
+    unless ($ts->tv_nsec == 500_000_000) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method timespec_to_float_seconds : int () {
+    
+    my $float_seconds = 1.5;
+    my $ts = Sys::Time::Util->float_seconds_to_timespec($float_seconds);
+    
+    my $float_seconds_again = Sys::Time::Util->timespec_to_float_seconds($ts);
+    
+    unless ($float_seconds_again == 1.5) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method float_seconds_to_timeval : int () {
+    
+    my $float_seconds = 1.5;
+    my $tv = Sys::Time::Util->float_seconds_to_timeval($float_seconds);
+    
+    unless ($tv->tv_sec == 1) {
+      return 0;
+    }
+    
+    unless ($tv->tv_usec == 500_000) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method timeval_to_float_seconds : int () {
+    
+    my $float_seconds = 1.5;
+    my $tv = Sys::Time::Util->float_seconds_to_timeval($float_seconds);
+    
+    my $float_seconds_again = Sys::Time::Util->timeval_to_float_seconds($tv);
+    
+    unless ($float_seconds_again == 1.5) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method float_seconds_to_nanoseconds : int () {
+    
+    my $float_seconds = 1.5;
+    
+    my $nanoseconds = Sys::Time::Util->float_seconds_to_nanoseconds($float_seconds);
+    
+    unless ($nanoseconds == 1_500_000_000) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method nanoseconds_to_float_seconds : int () {
+    
+    my $float_seconds = 1.5;
+    
+    my $nanoseconds = Sys::Time::Util->float_seconds_to_nanoseconds($float_seconds);
+    
+    my $float_seconds_again = Sys::Time::Util->nanoseconds_to_float_seconds($nanoseconds);
+    
+    unless ($float_seconds_again == 1.5) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  static method float_seconds_to_microseconds : int () {
+    
+    my $float_seconds = 1.5;
+    
+    my $microseconds = Sys::Time::Util->float_seconds_to_microseconds($float_seconds);
+    
+    unless ($microseconds == 1_500_000) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method microseconds_to_float_seconds : int () {
+    
+    my $float_seconds = 1.5;
+    
+    my $microseconds = Sys::Time::Util->float_seconds_to_microseconds($float_seconds);
+    
+    my $float_seconds_again = Sys::Time::Util->microseconds_to_float_seconds($microseconds);
+    
+    unless ($float_seconds_again == 1.5) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method timeval_interval : int () {
+    
+    my $a_tv = Sys::Time::Util->microseconds_to_timeval(1_500_000);
+    
+    my $b_tv = Sys::Time::Util->microseconds_to_timeval(2_000_000);
+    
+    my $interval = Sys::Time::Util->timeval_interval($a_tv, $b_tv);
+    
+    unless ($interval == 0.5) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method timespec_interval : int () {
+    
+    my $a_ts = Sys::Time::Util->nanoseconds_to_timespec(1_500_000_000);
+    
+    my $b_ts = Sys::Time::Util->nanoseconds_to_timespec(2_000_000_000);
+    
+    my $interval = Sys::Time::Util->timespec_interval($a_ts, $b_ts);
+    
+    unless ($interval == 0.5) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method add_timespec : int () {
+    
+    {
+      my $ts = Sys::Time::Timespec->new(1, 999_999_998);
+      
+      my $ts_diff = Sys::Time::Timespec->new(2, 1);
+      
+      my $ts_add = Sys::Time::Util->add_timespec($ts, $ts_diff);
+      
+      unless ($ts_add->tv_sec == 3) {
+        return 0;
+      }
+      
+      unless ($ts_add->tv_nsec == 999_999_999) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ts = Sys::Time::Timespec->new(1, 999_999_999);
+      
+      my $ts_diff = Sys::Time::Timespec->new(2, 1);
+      
+      my $ts_add = Sys::Time::Util->add_timespec($ts, $ts_diff);
+      
+      unless ($ts_add->tv_sec == 4) {
+        return 0;
+      }
+      
+      unless ($ts_add->tv_nsec == 0) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ts = Sys::Time::Timespec->new(2, 0);
+      
+      my $ts_diff = Sys::Time::Timespec->new(-2, -1);
+      
+      my $ts_add = Sys::Time::Util->add_timespec($ts, $ts_diff);
+      
+      unless ($ts_add->tv_sec == -1) {
+        return 0;
+      }
+      
+      unless ($ts_add->tv_nsec == 999_999_999) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ts = Sys::Time::Timespec->new(2, 1);
+      
+      my $ts_diff = Sys::Time::Timespec->new(-2, -1);
+      
+      my $ts_add = Sys::Time::Util->add_timespec($ts, $ts_diff);
+      
+      unless ($ts_add->tv_sec == 0) {
+        return 0;
+      }
+      
+      unless ($ts_add->tv_nsec == 0) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method add_timeval : int () {
+    
+    {
+      my $tv = Sys::Time::Timeval->new(1, 999_998);
+      
+      my $tv_diff = Sys::Time::Timeval->new(2, 1);
+      
+      my $tv_add = Sys::Time::Util->add_timeval($tv, $tv_diff);
+      
+      unless ($tv_add->tv_sec == 3) {
+        return 0;
+      }
+      
+      unless ($tv_add->tv_usec == 999_999) {
+        return 0;
+      }
+    }
+    
+    {
+      my $tv = Sys::Time::Timeval->new(1, 999_999);
+      
+      my $tv_diff = Sys::Time::Timeval->new(2, 1);
+      
+      my $tv_add = Sys::Time::Util->add_timeval($tv, $tv_diff);
+      
+      unless ($tv_add->tv_sec == 4) {
+        return 0;
+      }
+      
+      unless ($tv_add->tv_usec == 0) {
+        return 0;
+      }
+    }
+    
+    {
+      my $tv = Sys::Time::Timeval->new(2, 0);
+      
+      my $tv_diff = Sys::Time::Timeval->new(-2, -1);
+      
+      my $tv_add = Sys::Time::Util->add_timeval($tv, $tv_diff);
+      
+      unless ($tv_add->tv_sec == -1) {
+        return 0;
+      }
+      
+      unless ($tv_add->tv_usec == 999_999) {
+        return 0;
+      }
+    }
+    
+    {
+      my $tv = Sys::Time::Timeval->new(2, 1);
+      
+      my $tv_diff = Sys::Time::Timeval->new(-2, -1);
+      
+      my $tv_add = Sys::Time::Util->add_timeval($tv, $tv_diff);
+      
+      unless ($tv_add->tv_sec == 0) {
+        return 0;
+      }
+      
+      unless ($tv_add->tv_usec == 0) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method subtract_timespec : int () {
+    
+    {
+      my $ts = Sys::Time::Timespec->new(3, 999_999_999);
+      
+      my $ts_diff = Sys::Time::Timespec->new(2, 1);
+      
+      my $ts_subtract = Sys::Time::Util->subtract_timespec($ts, $ts_diff);
+      
+      unless ($ts_subtract->tv_sec == 1) {
+        return 0;
+      }
+      
+      unless ($ts_subtract->tv_nsec == 999_999_998) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ts = Sys::Time::Timespec->new(4, 0);
+      
+      my $ts_diff = Sys::Time::Timespec->new(2, 1);
+      
+      my $ts_subtract = Sys::Time::Util->subtract_timespec($ts, $ts_diff);
+      
+      unless ($ts_subtract->tv_sec == 1) {
+        return 0;
+      }
+      
+      unless ($ts_subtract->tv_nsec == 999_999_999) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ts = Sys::Time::Timespec->new(-1, 999_999_999);
+      
+      my $ts_diff = Sys::Time::Timespec->new(-2, -1);
+      
+      my $ts_subtract = Sys::Time::Util->subtract_timespec($ts, $ts_diff);
+      
+      unless ($ts_subtract->tv_sec == 2) {
+        return 0;
+      }
+      
+      unless ($ts_subtract->tv_nsec == 0) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ts = Sys::Time::Timespec->new(0, 0);
+      
+      my $ts_diff = Sys::Time::Timespec->new(-2, -1);
+      
+      my $ts_subtract = Sys::Time::Util->subtract_timespec($ts, $ts_diff);
+      
+      unless ($ts_subtract->tv_sec == 2) {
+        return 0;
+      }
+      
+      unless ($ts_subtract->tv_nsec == 1) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method subtract_timeval : int () {
+    
+    {
+      my $ts = Sys::Time::Timeval->new(3, 999_999);
+      
+      my $ts_diff = Sys::Time::Timeval->new(2, 1);
+      
+      my $ts_subtract = Sys::Time::Util->subtract_timeval($ts, $ts_diff);
+      
+      unless ($ts_subtract->tv_sec == 1) {
+        return 0;
+      }
+      
+      unless ($ts_subtract->tv_usec == 999_998) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ts = Sys::Time::Timeval->new(4, 0);
+      
+      my $ts_diff = Sys::Time::Timeval->new(2, 1);
+      
+      my $ts_subtract = Sys::Time::Util->subtract_timeval($ts, $ts_diff);
+      
+      unless ($ts_subtract->tv_sec == 1) {
+        return 0;
+      }
+      
+      unless ($ts_subtract->tv_usec == 999_999) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ts = Sys::Time::Timeval->new(-1, 999_999);
+      
+      my $ts_diff = Sys::Time::Timeval->new(-2, -1);
+      
+      my $ts_subtract = Sys::Time::Util->subtract_timeval($ts, $ts_diff);
+      
+      unless ($ts_subtract->tv_sec == 2) {
+        return 0;
+      }
+      
+      unless ($ts_subtract->tv_usec == 0) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ts = Sys::Time::Timeval->new(0, 0);
+      
+      my $ts_diff = Sys::Time::Timeval->new(-2, -1);
+      
+      my $ts_subtract = Sys::Time::Util->subtract_timeval($ts, $ts_diff);
+      
+      unless ($ts_subtract->tv_sec == 2) {
+        return 0;
+      }
+      
+      unless ($ts_subtract->tv_usec == 1) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+}

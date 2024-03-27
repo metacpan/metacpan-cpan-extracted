@@ -1,5 +1,9 @@
 Revision history for Perl script App-ansiecho
 
+1.0702 2024-03-23T01:17:31Z
+
+    - allow "-" in unicode name
+
 1.0701 2023-11-21T17:06:48Z
 
     - update test to work under the doublelong environment

@@ -103,6 +103,8 @@ SKIP:
     is( $name_found->scalar, $usrname, 'user' );
 };
 
+# Refresh
+@finfo = CORE::stat( $file );
 diag( "Checking finfo atime (", $f->atime, ") against file atime (", $finfo[ FINFO_ATIME ], ")." ) if( $DEBUG );
 is( $f->atime, $finfo[ FINFO_ATIME ], 'atime' );
 

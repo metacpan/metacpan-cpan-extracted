@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.20, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,16 +27,16 @@ no_index:
 provides:
   Text::ANSI::Tabs:
     file: lib/Text/ANSI/Tabs.pm
-    version: '1.03'
+    version: '1.0501'
 requires:
   List::Util: '1.45'
-  Text::ANSI::Fold: '2.19'
+  Text::ANSI::Fold: '2.2104'
   perl: v5.14.0
 resources:
   bugtracker: https://github.com/tecolicom/Text-ANSI-Tabs/issues
   homepage: https://github.com/tecolicom/Text-ANSI-Tabs
   repository: https://github.com/tecolicom/Text-ANSI-Tabs.git
-version: '1.03'
+version: '1.0501'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

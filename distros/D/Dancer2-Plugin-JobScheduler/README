@@ -1,5 +1,5 @@
 This archive contains the distribution Dancer2-Plugin-JobScheduler,
-version 0.004:
+version 0.006:
 
   Plugin for Dancer2 web app to send and query jobs in different job schedulers
 

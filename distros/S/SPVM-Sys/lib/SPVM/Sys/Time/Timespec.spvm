@@ -3,13 +3,17 @@
 
 class Sys::Time::Timespec : pointer {
   
-  native static method new : Sys::Time::Timespec ();
-
+  # Class Methods
+  native static method new : Sys::Time::Timespec ($tv_sec : long = 0, $tv_nsec : long = 0);
+  
+  # Instance Methods
   native method DESTROY : void ();
   
   native method tv_sec : long ();
+  
   native method tv_nsec : long ();
-
+  
   native method set_tv_sec : void ($tv_sec : long);
+  
   native method set_tv_nsec : void ($tv_nsec : long);
 }

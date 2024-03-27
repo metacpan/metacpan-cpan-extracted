@@ -44,7 +44,7 @@ use Carp qw(croak);
 use Scalar::Util qw(blessed);
 use overload ();
 
-our $VERSION = '0.09';
+our $VERSION = '0.0901';
 
 method new($class: @rules) {
     my $self = bless {
@@ -920,7 +920,7 @@ And these rules:
 =for highlighter language=perl
 
     [ 'div' => ['replace_inner_text', 'A'], ['replace_inner_text', 'B'] ],
-    [ '.foo' => ['replace_inner_text', 'B'] ],
+    [ '.foo' => ['replace_inner_text', 'C'] ],
 
 All three actions will run and replace the contents of the C<div> element, but
 since their order is unspecified, you may end up with any of the following
@@ -1309,7 +1309,7 @@ attribute, and C<:not(*)> matches nothing.
 Other selectors or pseudo-classes are not currently implemented.
 
 In the following section, a I<variable name> refers to a string that starts
-with a letter or C<_>) (underscore), followed by 0 or more letters, C<_>,
+with a letter or C<_> (underscore), followed by 0 or more letters, C<_>,
 digits, C<.>, or C<->. Template variables identify sections that are filled in
 later when the template is expanded (at runtime, so to speak).
 

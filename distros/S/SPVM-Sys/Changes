@@ -1,3 +1,570 @@
+0.514001 2024-03-27
+  [Bug Fix]
+    * Fix bug that config files cannot be parsed for SPVM version up.
+0.514 2023-12-26
+  [Bug Fix]
+    * Fix the bug that FILE_NAME in native source file does not have the file scope.
+0.513 2023-12-22
+  [Incompatible Changes]
+    * The first argument of the localtime and gmtime method in the Sys class becomes optional argument and allow it minus epoch time by $allow_minus optional argument.
+      
+      method localtime : Time::Piece ($epoch : long = -1, $allow_minus = 0);
+      
+      method gmtime : Time::Piece ($epoch : long = -1, $allow_minus = 0);
+
+0.512 2023-12-08
+  [New Features]
+    * Add the new_with_family method class to the Sys::Socket::Sockaddr class.
+    * Add the upgrade method to the Sys::Socket::Sockaddr class.
+  [Incompatible Changes]
+    * Remove the to_family_sockaddr method from the Sys::Socket class.
+    * Remove deprecated the spvm_socket_errno method and the spvm_socket_strerror method from the Sys::Socket class.
+    * The socket method in the Sys class set FD_CLOEXEC to the created socket file descriptor.
+    * The socketpair method in the Sys class set FD_CLOEXEC to the created socket file descriptor.
+    * The accept method in the Sys class set FD_CLOEXEC to the created socket file descriptor.
+    * The connect method in the Sys class set FD_CLOEXEC to the created socket file descriptor.
+  [Document Fix]
+    * Fix many Sys::Socket documents.
+  [Incompatible Changes]
+    * Remove the Sys::Socket::Error class.
+    * Sys::Socket::Error::InetInvalidNetworkAddress inherits the Error class.
+    * The gai_strerror method in the Sys::Socket class throws an exception in the system call failed.
+0.511 2023-12-07
+  [New Features]
+    * The Sys::Socket::Sockaddr::Un class work well in Windows.
+    * The Sys::Socket::Addrinfo supports Sys::Socket::Sockaddr::Un in Windows.
+0.510 2023-12-07
+  [New Features]
+    * The Sys::Socket::Sockaddr::Un class work well in Windows.
+    * The Sys::Socket::Addrinfo supports Sys::Socket::Sockaddr::Un in Windows.
+  [Deprecations and New Features]
+    * Deprecates the spvm_socket_errno method from the Sys::Socket class and add the errno method to the Sys::Socket::Errno.
+    * Deprecates the spvm_socket_strerror method from the Sys::Socket class and add the strerror method to the Sys::Socket::Errno.
+  [Document Fix]
+    * Add the doc of the Sys::Socket::Error class.
+0.509 2023-12-04
+  [Incompatible Changes]
+    * The getc method in the Sys::IO throw an exception if the return value is C<EOF> and C<ferror(stream)> is non-zero.
+    * The fread method in the Sys::IO throw an exception if the return value is less than $nmemb and C<ferror(stream)> is non-zero.
+    * The fwrite method in the Sys::IO throw an exception if the return value is less than $nmemb and C<ferror(stream)> is non-zero.
+    * The fcntl method can not recieve object type $command_arg. Only Int or Sys::IO::Flock.
+    * The get_readlink_buffer_size method in the Sys::IO is removed.
+    * The FILE stream open by the popen or _popen is closed automatically.
+    * Remove the is_symlink method in the Sys::IO::Windows.
+    * Remove the _get_readlink_buffer_size method in the Sys::IO::Windows.
+  [New Features]
+    * Add the lstat method to the Sys::IO::Windows class.
+  [Bug Fix]
+    * The l method in the Sys class work well in Windows.
+0.508 2023-12-04
+  [Document Fix]
+    * Fix the document of the new method in the Sys::Stat class. This method do not have arguments.
+  [Incompatible Changes]
+    * The cando method in the Sys::Stat class becomes private. 
+    * The no_close field in the Sys::IO::FileStream is renamed to no_destroy.
+    * The utime method in the Sys::IO class is moved to Sys::Time class.
+    * The utimes method in the Sys::IO class is moved to Sys::Time class.
+    
+  [Bug Fix]
+    * Fix the bug that the spvm_stdin, spvm_stdout, spvm_stderr in the Sys::IO class do not return correct values.
+    * Fix the bug that the STDIN, STDOUT, STDERR in the Sys class do not return correct values.
+    
+0.507 2023-12-01
+
+  [New Features]
+    * Add the following user/group methods to the Sys class.
+    
+      real_user_id
+
+      effective_user_id
+
+      real_group_id
+
+      effective_group_id
+
+      set_real_user_id
+
+      set_effective_user_id
+
+      set_real_group_id
+
+      set_effective_group_id
+
+      setpwent
+
+      endpwent
+
+      getpwent
+
+      setgrent
+
+      endgrent
+
+      getgrent
+
+      getgroups
+
+      setgroups
+
+      getpwuid
+
+      getpwnam
+
+      getgrgid
+
+      getgrnam
+
+
+0.506 2023-12-01
+  [Incompatible Changes]
+    * The definition of the localtime method in the Sys::Time is changed.
+      [Before]
+      static method localtime : Sys::Time::Tm ($time : long);
+      [After]
+      static method localtime : Sys::Time::Tm ($time_ref : long*);
+      
+    * The definition of the gmtime method in the Sys::Time is changed.
+      [Before]
+      static method gmtime : Sys::Time::Tm ($time : long);
+      [After]
+      static method gmtime : Sys::Time::Tm ($time_ref : long*);
+    *  close-on-exec flag is set to the file stream opened by the open method in the Sys class.
+  [Changes]
+    * The system method in the Sys::Process class throwns an exception if the system system call fail.
+    * The execv method in the Sys::Process class throwns an exception if the argument contains undef.
+  [New Features]
+    * Add the popen method to the Sys::IO class.
+    * Add the _popen method to the Sys::IO class.
+    * Add the popen method to the Sys class
+    * Add the pclose method to the Sys::IO class.
+    * Add the _pclose method to the Sys::IO class.
+    * Add the pclose method to the Sys class.
+    * Add the fork method to the Sys class.
+    * Add the getpriority method to the Sys class.
+    * Add the setpriority method to the Sys class.
+    * Add the wait method to the Sys class.
+    * Add the waitpid method to the Sys class.
+    * Add the system method to the Sys class.
+    * Add the exit method to the Sys class.
+    * Add the getpgrp method to the Sys class.
+    * Add the setpgrp method to the Sys class.
+    * Add the getppid method to the Sys class.
+    * Add the exec method to the Sys class.
+0.505 2023-11-30
+  [Incompatible Changes]
+    * The timeval_interval method in the Sys::Time::Util do not throw an exception if tv_sec and tv_usec is a negative value.
+    * The timespec_interval method in the Sys::Time::Util do not throw an exception if tv_sec and tv_nsec is a negative value.
+  [New Features]
+    * Add the subtract_timeval method to the Sys::Time::Util.
+    * Add the subtract_timespec method to the Sys::Time::Util.
+    
+0.504 2023-11-28
+  [Incompatible Changes]
+    * Remove the set method in the Sys::Select::Fd_set class.
+  [New Features]
+    * Add Sys::Time::Util class.
+    * Add the clone method to the Sys::Select::Fd_set class.
+0.503 2023-11-28
+  [Bug Fix]
+    * Fix a bug that the compilation of the Sys::IO::Dirent failed becuase cygwin do not have d_reclen in struct dirent.
+  [New Features]
+    * Add the d_off method to the Sys::IO::Dirent class.
+    * Add the d_type method to the Sys::IO::Dirent class.
+    * Add the utimes method to the Sys::IO class.
+    * Add the optional $tv_sec and $tv_usec arguments to the new method in the Sys::Time::Timeval.
+    * Add the optional $tv_sec and $tv_nsec arguments to the new method in the Sys::Time::Timespec.
+  [Incompatible Changes]
+    * The getgroups method in the Sys::User class is changed.
+      [Before]
+      static method getgroups : int[] ();
+      [After]
+      static method getgroups : int ($size : int, $list : int[]);
+    * The definition of the pipe method in the Sys is changed.
+      [Before]
+      static method pipe : void ($pipe_fds : int[]);
+      
+      [After]
+      static method pipe : void ($read_fd_ref : int*, $write_fd_ref : int*);
+      
+    * The definition of the select method in the Sys is changed.
+      [Before]
+      static method select : int ($readfds : Sys::Select::Fd_set, $writefds : Sys::Select::Fd_set, $exceptfds : Sys::Select::Fd_set, $timeout : Sys::Time::Timeval);
+      
+      [After]
+      static method select : int ($readfds : Sys::Select::Fd_set, $writefds : Sys::Select::Fd_set, $exceptfds : Sys::Select::Fd_set, $timeout : double = 0);
+      
+0.502 2023-11-23
+  [New Features]
+    * Add the _putenv_s method to the Sys::Env class.
+    * Add the set_env method to the Sys class.
+    * Add the alarm method to the Sys class.
+    * The kill method in the Sys class can be used in Windows if $pid is equal to the current process id.
+  [Incompatible Changes]
+    * Remove the Sys::FileTest class.
+    * Remove throwing exceptions in the ualarm method in the Sys::Signal class.
+    * Remove the signal_go method in the Sys::Signal class.
+  [Bug Fix with Incompatible Changes]
+    * The S method in the Sys class returns 0 if the file do not exists.
+0.501 2023-11-23
+  [Incompatible Changes]
+     * The return type of the following methods in the Sys become void.
+      chdir
+      chmod
+      mkdir
+      rmdir
+      opendir
+      closedir
+      close
+      unlink
+      rename
+      bind
+      listen
+      connect
+      shutdown
+      socketpair
+      setsockopt
+      truncate
+      flock
+      print
+      say
+      printf
+      seek
+      utime
+      chown
+      open
+      fdopen
+      sysopen
+      say
+      kill
+      pipe
+       
+
+0.500 2023-11-17
+  [New Features and Incompatible Changes]
+    * Rename the SIG_IO method in the Sys::Signal class is renamed to SIG_GO.
+    * Change the signal_io method in the Sys::Signal class is renamed to signal_go.
+      [Before]
+      static method signal_io : Sys::Signal::Handler ($signum : int, $fd : int);
+      [After]
+      static method signal_go : Sys::Signal::Handler ($signum : int);
+      
+    * Add the SET_SIG_GO_WRITE_FD method to the Sys::Signal class.
+  
+  [New Features]
+    * Add the O_BINARY method to the Sys::IO::Constant class.
+    * Add the O_TEXT method to the Sys::IO::Constant class.
+    * Add the _pipe method to the Sys::Process class.
+    * The pipe method in the Sys class calls the _pipe method in the Sys::Process.
+0.499 2023-11-17
+  [New Features and Incompatible Changes]
+    * Add the eq method to the Sys::Signal::Handler.
+0.498 2023-11-16
+  [New Features and Incompatible Changes]
+    * Add the eq method to the Sys::Signal::Handler.
+    * The signal method returns the old signal handler.
+    * Remove the SIG_DFL and SIG_DFL class variables from the Sys::Signal class and add the SIG_DFL and SIG_DFL methods.
+    * Remove the Sys::Signal::Handler::Ignore class.
+    * Remove the Sys::Signal::Handler::Default class.
+    * The signal method in the Sys class returns the old signal handler.
+    * Add the signal_io method to the Sys::Signal class.
+    * Add the SIG_IO method to the Sys::Signal class.
+    * Add the close method to the Sys class.
+    
+      static method close : int ($stream : Sys::IO::FileStream);
+    
+0.497 2023-11-16
+  [New Features and Incompatible Changes]
+    * Add $len argument to the send method in the Sys class and changes argument order.
+      
+      [Before]
+      static method sendto : int ($sockfd : int, $buf : string, $len : int, $flags : int, $addr : Sys::Socket::Sockaddr, $addrlen : int, $buf_offset : int = 0);
+      
+      [After]
+      static method send : int ($sockfd : int, $buf : string, $flags : int, $addr : Sys::Socket::Sockaddr = undef, $len : int = -1, $buf_offset : int = 0);
+      
+0.496 2023-11-16
+  [New Features]
+    * Add $buf_offset argument to the sendto method in the Sys::Socket class.
+      
+      static method sendto : int ($sockfd : int, $buf : string, $len : int, $flags : int, $addr : Sys::Socket::Sockaddr, $addrlen : int, $buf_offset : int = 0);
+
+    * Add $buf_offset argument to the send method in the Sys class.
+      
+      static method sendto : int ($sockfd : int, $buf : string, $len : int, $flags : int, $addr : Sys::Socket::Sockaddr, $addrlen : int, $buf_offset : int = 0);
+  
+0.495001 2023-11-14
+  [Bug Fix]
+    * Fix a bug that the Sys::Socket::Errno class file is not added.
+0.495 2023-11-14
+  [Bug Fix]
+    * Fix the bug that the error handling of the connect method in the Sys::Socket does not work well.
+  [Incompatible Changes]
+    * Remove the connect_raw method in the Sys::Socket class.
+    * Remove the getaddrinfo_raw method in the Sys::Socket class.
+    * Remove the getnameinfo_raw method in the Sys::Socket class.
+    * Remove the access_raw method in the Sys::IO class.
+    * Remove the eaccess_raw method in the Sys::IO class.
+    * Remove the faccessat_raw method in the Sys::IO class.
+    * Remove the fstat_raw method in the Sys::IO::Stat class.
+    * Remove the lstat_raw method in the Sys::IO::Stat class.
+    * Remove the stat_raw method in the Sys::IO::Stat class.
+  [Document Fix]
+    * Add the doc of the faccessat method in the Sys::IO class.
+  [Exception Message Changes]
+    * Add periods to exception messages.
+  [New Features]
+    * Add the Sys::Socket::Errno doc.
+    * Add the say method to the Sys class.
+  [Bug Fix]
+    * Fix the bug that the new method in the Sys::Poll::PollfdArray cannot receive 0.
+0.494 2023-11-12
+  [Prerequirement Changes]
+    * Require SPVM 0.989060.
+  [Test Improvement]
+    * Tests of sockets becomes more relaiable.
+0.493 2023-10-02
+  [Requirement Changes]
+    * Require SPVM 0.989047.
+  [Internal Changes]
+    * Use new native APIs.
+  [Exception Message Changes]
+    * Improve English of exception messages.
+  [Document Changes]
+    * Improve the formats of documents.
+  [New Features]
+    * Add the spvm_stdin method to the Sys::IO class.
+    * Add the spvm_stdout method to the Sys::IO class.
+    * Add the spvm_stderr method to the Sys::IO class.
+  [Incompatible Changes]
+    * The STDIN method in the Sys class retruns the return value of the spvm_stdin method in the Sys::IO class.
+    * The STDOUT method in the Sys class retruns the return value of the spvm_stdout method in the Sys::IO class.
+    * The STDERR method in the Sys class retruns the return value of the spvm_stderr method in the Sys::IO class.
+    * The no_need_free field in the Sys::IO::FileStream class is renamed to no_close.
+    * The fdopen method in the Sys::IO throws an exception.
+    
+      $fd must be greater than or equal to 0. Otherwise an exception is thrown.
+  [Bug Fix]
+    * Fix the test bug that tests of Sys::IO on Windows does not work well.
+0.492 2023-09-18
+  [Incompatibe Changes]
+    * Remove the readline method in the Sys::IO class. Use the readline method in the Sys class.
+0.491 2023-09-13
+  [New Features]
+    * The following methods in the Sys class are added.
+    
+      static method say : int ($stream : Sys::IO::FileStream, $string : string);
+
+      static method STDIN : Sys::IO::FileStream ();
+
+      static method STDOUT : Sys::IO::FileStream ();
+
+      static method STDERR : Sys::IO::FileStream ();
+      
+      static method signal : void ($signum : int, $handler_name : string);
+      
+      static method kill : int ($sig : int, $pid : int);
+      
+  [Incompatible Changes]
+  
+    * The Sys::Signal::Handler::Monitor class is removed.
+    * The Sys::Signal::Handler::Unknown class is removed.
+    
+    * The following methods in the Sys::Signal class are removed.
+      
+      -  static method reset_monitored_signal : void ($signum : int);
+      -  static method check_monitored_signal : int ($signum : int);
+    
+    * The following methods in the Sys::Signal class are changed.
+      
+      - native static method signal : Sys::Signal::Handler ($signum : int, $handler : Sys::Signal::Handler);
+      + native static method signal : void ($signum : int, $handler : Sys::Signal::Handler);
+      
+      $handler must be a Sys::Signal::Handler::Default object or a Sys::Signal::Handler::Ignore object. Otherwise an exception is thrown.
+      
+      User signal handlers are wrong implementation for SPVM differnt from the C language.
+    
+0.490 2023-09-11
+  [Bug Fix]
+    * Fix a bug that the fcntl method in the Sys::IO class does not work well.
+0.489 2023-09-11
+  [New Features]
+    * The following methods in the Sys class are added.
+    
+      + static method fcntl : int ($fd : int, $command : int, $command_arg : object of Int|Sys::IO::Flock|object = undef);
+  [Bug Fix]
+    * Fix a bug that the fcntl method in the Sys::IO class does not work well.
+0.488 2023-09-11
+  [Prerequirement Changes]
+    * Require SPVM 0.989041.
+    
+0.487 2023-09-08
+  [New Features]
+    * The following methods in the Sys class are added.
+    
+      + static method truncate : int ($fd : int, $legnth : long);
+      + static method sysread : int ($fd : int, $buf : mutable string, $count : int, $buf_offset : int = 0);
+      + static method syswrite : int ($fd : int, $buf : string, $count : int = -1, $buf_offset : int = 0);
+      + static method read : int ($stream : Sys::IO::FileStream, $buf : mutable string, $count : int, $buf_offset : int = 0);
+      + static method fileno : int ($stream : Sys::IO::Stream);
+      + static method eof : int ($stream : Sys::IO::Stream);
+      + static method readline : mutable string ($stream : Sys::IO::FileStream);
+      + static method getc : int ($stream : Sys::IO::FileStream);
+      + static method flock : int ($fd : int, $operation : int);
+      + static method print : int ($stream : Sys::IO::FileStream, $string : string);
+      + static method printf : int ($stream, $format : string, $args : object[]);
+      + static method read : int ($stream : Sys::IO::FileStream, $buf : mutable string, $count : int, $buf_offset : int = 0);
+      + static method rewinddir : void ($dirp : Sys::IO::DirStream);
+      + static method readdir : Sys::IO::Dirent ($dirp : Sys::IO::DirStream);
+      + static method seek : int ($stream : Sys::IO::FileStream, $offset : long, $whence : int);
+      + static method sysseek : long ($fd : int, $offset : long, $whence : int);
+      + static method tell : long ($stream : Sys::IO::FileStream);
+      + static method telldir : long ($dirp : Sys::IO::DirStream);
+      + static method lstat : Sys::IO::Stat ($path : string);
+      + static method utime : int ($atime : long, $mtime : long, $filename : string);
+      + static method chown : int ($owner : int, $group : int, $path : string);
+  [Deprecation]
+    * The following methods in the Sys::IO class are deprecated. Use the readline method in the Sys class.
+      
+      static method readline : string ($stream : Sys::IO::FileStream);
+      
+0.486 2023-09-06
+  [Bug Fix]
+    * Some bugs are fixed: The connect, getaddrinfo, and getnameinfo have not return correct return values.
+  [New Features]
+    * The Sys::Socket::Util class is added.
+    * The Sys::Socket::In_addr_base class is added.
+    * The Sys::Socket::In_addr class extends Sys::Socket::In_addr_base.
+    * The Sys::Socket::In6_addr class extends Sys::Socket::In_addr_base.
+  [Incompatible Changes]
+    * The following methods in the Sys::Socket class are changed.
+      
+      -  static method inet_pton : int ($af : int, $src : string, $dst : object of Sys::Socket::In_addr|Sys::Socket::In6_addr);
+      +  static method inet_pton : int ($af : int, $src : string, $dst : Sys::Socket::In_addr_base);
+      
+      -  static method inet_ntop : mutable string ($af : int, $src : object of Sys::Socket::In_addr|Sys::Socket::In6_addr, $dst : mutable string, $size : int);
+      +  static method inet_ntop : mutable string ($af : int, $src : Sys::Socket::In_addr_base, $dst : mutable string, $size : int);
+    
+0.485 2023-09-04
+  
+  [Bug Fix]
+    * A bug fix: the sleep method in the Sys class has been wrong.
+    
+  [Incompatible Changes]
+    * The following methods in the Sys class is changed.
+    
+      -  static method send : int ($sockfd : int, $buf : string, $len : int, $flags : int, $buf_offset : int = 0);
+      +  static method send : int ($sockfd : int, $buf : string, $flags : int, $addr : Sys::Socket::Sockaddr = undef);
+      
+      -  static method select : int ($nfds : int, $readfds : Sys::Select::Fd_set, $writefds : Sys::Select::Fd_set, $exceptfds : Sys::Select::Fd_set, $timeout : Sys::Time::Timeval);          +  static method select : int ($readfds : Sys::Select::Fd_set, $writefds : Sys::Select::Fd_set, $exceptfds : Sys::Select::Fd_set, $timeout : Sys::Time::Timeval);
+  
+  [Exception Message Changes]
+    * Error messages in the Sys::Time::Itimerval class are improved.
+  [New Features]
+    * The following methods are added to Sys::Socket.
+    
+      static method closesocket : int ($fd : int);
+    
+0.484 2023-09-04
+  [New Features]
+    
+    * The following methods are added to the Sys::Socket class.
+    
+      static method to_family_sockaddr : Sys::Socket::Sockaddr ($addr : Sys::Socket::Sockaddr);
+    
+    * The following methods are added to the Sys::Socket::Sockaddr class.
+    
+      +  static method new : Sys::Socket::Sockaddr::In ();
+      +  method DESTROY : void ();
+      +  method set_sa_family : void ($family : int);
+      
+    * The following methods in the Sys::Socket::Sockaddr class is implemented.
+    
+      +  method sa_family : int ();
+    
+    * The following methods are added to the Sys class.
+      + static method closedir : int ($dirp : Sys::IO::DirStream);
+      +  static method opendir : int ($dh_ref : Sys::IO::DirStream[], $dir : string);
+      +  static method bind : int ($sockfd : int, $addr : Sys::Socket::Sockaddr);
+      +  static method listen : int ($sockfd : int, $backlog : int);
+      +  static method accept : Sys::Socket::Sockaddr ($new_sockfd_ref : int*, $sockfd : int);
+      +  static method connect : int ($sockfd : int, $addr : Sys::Socket::Sockaddr)
+      +  static method getpeername : Sys::Socket::Sockaddr ($sockfd : int)
+      +  static method getsockname : Sys::Socket::Sockaddr ($sockfd : int)
+      +  static method recv : int ($sockfd : int, $buf : mutable string, $len : int, $flags : int, $buf_offset : int = 0);
+      +  static method send : int ($sockfd : int, $buf : string, $len : int, $flags : int, $buf_offset : int = 0);
+      +  static method shutdown : int ($sockfd : int, $how : int);
+      +  static method socket : void ($sockfd_ref : int*, $domain : int, $type : int, $protocol : int);
+      +  static method socketpair : int ($sock_fd1_ref : int*, $sock_fd2_ref : int*, $domain : int, $type : int, $protocol : int);
+      +  static method shutdown : int ($sockfd : int, $how : int);
+      +  static method socket : int ($domain : int, $type : int, $protocol : int);
+      +  static method socketpair : int ($domain : int, $type : int, $protocol : int, $pair : int[]);
+      +  static method setsockopt : int ($sockfd : int, $level : int, $optname : int, $optval : object of string|Int);
+
+  [Incompatible Changes]
+    * The setsockopt_int and setsockopt_int is removed from the Sys::Socket class.
+    * The sizeof method in the Sys::Socket::Sockaddr class and its child classes are renamed to the size method.
+    * The Sys::Socket::Sockaddr::Interface interface is removed.
+    * The Sys::Socket::Sockaddr class does not have the Sys::Socket::Sockaddr::Interface interface.
+    * The has_interface method is removed from the Sys::Socket::Sockaddr class.
+    * The following names of methods in clesses are renamed.
+    
+      class Sys::Socket::Addrinfo
+      -  native method copy_ai_addr : Sys::Socket::Sockaddr ();
+      +  native method ai_addr : Sys::Socket::Sockaddr ();
+      -  native method copy_ai_canonname : string ();
+      +  native method ai_canonname : string ();
+      class Sys::Socket::Sockaddr::In extends Sys::Socket::Sockaddr : pointer
+      -  native method copy_sin_addr : Sys::Socket::In_addr ();
+      +  native method sin_addr : Sys::Socket::In_addr ();
+      class Sys::Socket::Sockaddr::In extends Sys::Socket::Sockaddr : pointer
+      -    $clone->set_sin_addr($self->copy_sin_addr);
+      +    $clone->set_sin_addr($self->sin_addr);
+      class Sys::Socket::Sockaddr::In6 extends Sys::Socket::Sockaddr : pointer
+      -  native method copy_sin6_addr : Sys::Socket::In6_addr ();
+      +  native method sin6_addr : Sys::Socket::In6_addr ();
+      class Sys::Socket::Sockaddr::In6 extends Sys::Socket::Sockaddr : pointer
+      -    $clone->set_sin6_addr($self->copy_sin6_addr);
+      +    $clone->set_sin6_addr($self->sin6_addr);
+      class Sys::Socket::Sockaddr::Un extends Sys::Socket::Sockaddr : pointer
+      -  native method copy_sun_path : string ();
+      +  native method sun_path : string ();
+      -    $clone->set_sun_path($self->copy_sun_path);
+      +    $clone->set_sun_path($self->sun_path);
+      class Sys::Time::Itimerval : pointer
+      -  native method copy_it_interval : Sys::Time::Timeval ();
+      -  native method copy_it_value : Sys::Time::Timeval ();
+      +  native method it_interval : Sys::Time::Timeval ();
+      +  native method it_value : Sys::Time::Timeval ();
+
+0.483 2023-08-22
+  [New Features]
+    * The ioctlsocket method is added to the Sys::Ioctl class.
+  [Incompatible Changes]
+    * The ioctl method in the Sys::Ioctl throws an exception in Windows.
+  [Reversion]
+    The following changes are reverted.
+    
+    0.482 2023-08-22
+    [Changes]
+      * The ioctl method is added to the Sys::IO class.
+      * The FIONBIO method is added to the Sys::IO::Contant class.
+      * The ioctlsocket method is added to the Sys::Socket class.
+    [Deprecation]
+      * The Sys::Ioctl class is deprecated.
+      * The Sys::Ioctl::Constant class is deprecated.
+
+0.482 2023-08-22
+  [New Features]
+    * The ioctl method is added to the Sys class.
+  [Changes]
+    * The ioctl method is added to the Sys::IO class.
+    * The FIONBIO method is added to the Sys::IO::Contant class.
+    * The ioctlsocket method is added to the Sys::Socket class.
+  [Deprecation]
+    * The Sys::Ioctl class is deprecated.
+    * The Sys::Ioctl::Constant class is deprecated.
+  [Test Fix]
+    * Tests on Windows are fixed.
 0.481008 2023-07-12
   [Internal Changes]
     * Only internal changes were done.

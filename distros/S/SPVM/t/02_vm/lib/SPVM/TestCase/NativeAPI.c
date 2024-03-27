@@ -211,14 +211,14 @@ int32_t SPVM__TestCase__NativeAPI__check_native_api_ids(SPVM_ENV* env, SPVM_VALU
   if ((void*)&env->strerror_string_nolen != &env_array[191]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->strerror != &env_array[192]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->strerror_nolen != &env_array[193]) { stack[0].ival = 0; return 0; }
-  if ((void*)&env->reserved194 != &env_array[194]) { stack[0].ival = 0; return 0; }
-  if ((void*)&env->reserved195 != &env_array[195]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->is_binary_compatible_object != &env_array[194]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->is_binary_compatible_stack != &env_array[195]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->new_stack != &env_array[196]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->free_stack != &env_array[197]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->get_field_object_defined_and_has_pointer_by_name != &env_array[198]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->get_field_object_ref != &env_array[199]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->get_field_object_ref_by_name != &env_array[200]) { stack[0].ival = 0; return 0; }
-  if ((void*)&env->check_stack_env != &env_array[201]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->check_bootstrap_method != &env_array[201]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->assign_object != &env_array[202]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->new_string_array_no_mortal != &env_array[203]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->new_memory_block != &env_array[204]) { stack[0].ival = 0; return 0; }
@@ -229,9 +229,14 @@ int32_t SPVM__TestCase__NativeAPI__check_native_api_ids(SPVM_ENV* env, SPVM_VALU
   if ((void*)&env->spvm_stdin != &env_array[209]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->spvm_stdout != &env_array[210]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->spvm_stderr != &env_array[211]) { stack[0].ival = 0; return 0; }
-  if ((void*)&env->check_bootstrap_method != &env_array[212]) { stack[0].ival = 0; return 0; }
-  if ((void*)&env->new_array_proto_element_no_mortal != &env_array[213]) { stack[0].ival = 0; return 0; }
-  if ((void*)&env->new_array_proto_element != &env_array[214]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->new_array_proto_element_no_mortal != &env_array[212]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->new_array_proto_element != &env_array[213]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->get_byte_object_value != &env_array[214]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->get_short_object_value != &env_array[215]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->get_int_object_value != &env_array[216]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->get_long_object_value != &env_array[217]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->get_float_object_value != &env_array[218]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->get_double_object_value != &env_array[219]) { stack[0].ival = 0; return 0; }
   
   stack[0].ival = 1;
   
@@ -264,6 +269,7 @@ int32_t SPVM__TestCase__NativeAPI__check_native_api_arg_ids(SPVM_ENV* env, SPVM_
   if ((void*)&env->api->arg->get_type_dimension != &env_array[3]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->api->arg->get_type_flag != &env_array[4]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->api->arg->get_stack_index != &env_array[5]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->arg->get_current_method != &env_array[6]) { stack[0].ival = 0; return 0; }
   
   stack[0].ival = 1;
   
@@ -299,6 +305,7 @@ int32_t SPVM__TestCase__NativeAPI__check_native_api_basic_type_ids(SPVM_ENV* env
   if ((void*)&env->api->basic_type->has_interface != &env_array[20]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->api->basic_type->is_super_class != &env_array[21]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->api->basic_type->get_file != &env_array[22]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->basic_type->get_current_runtime != &env_array[23]) { stack[0].ival = 0; return 0; }
   
   stack[0].ival = 1;
   
@@ -2353,7 +2360,145 @@ int32_t SPVM__TestCase__NativeAPI__get_bool_object_value_native(SPVM_ENV* env, S
   int32_t value = env->get_bool_object_value(env, stack, bool_object);
   
   stack[0].ival = value;
+  
+  return 0;
+}
 
+int32_t SPVM__TestCase__NativeAPI__get_byte_object_value(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  {
+    stack[0].ival = INT8_MIN;
+    env->call_class_method_by_name(env, stack, "Byte", "new", 1, &error_id, __func__, FILE_NAME, __LINE__);
+    void* obj_num = stack[0].oval;
+    if (error_id) { return error_id; }
+    
+    int32_t ret = env->get_byte_object_value(env, stack, obj_num);
+    
+    if (!(ret == INT8_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
+  }
+  
+  stack[0].ival = 1;
+  
+  return 0;
+}
+
+int32_t SPVM__TestCase__NativeAPI__get_short_object_value(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  {
+    stack[0].ival = INT16_MIN;
+    env->call_class_method_by_name(env, stack, "Short", "new", 1, &error_id, __func__, FILE_NAME, __LINE__);
+    void* obj_num = stack[0].oval;
+    if (error_id) { return error_id; }
+    
+    int32_t ret = env->get_short_object_value(env, stack, obj_num);
+    
+    if (!(ret == INT16_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
+  }
+  
+  stack[0].ival = 1;
+  
+  return 0;
+}
+
+int32_t SPVM__TestCase__NativeAPI__get_int_object_value(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  {
+    stack[0].ival = INT32_MIN;
+    env->call_class_method_by_name(env, stack, "Int", "new", 1, &error_id, __func__, FILE_NAME, __LINE__);
+    void* obj_num = stack[0].oval;
+    if (error_id) { return error_id; }
+    
+    int32_t ret = env->get_int_object_value(env, stack, obj_num);
+    
+    if (!(ret == INT32_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
+  }
+  
+  stack[0].ival = 1;
+  
+  return 0;
+}
+
+int32_t SPVM__TestCase__NativeAPI__get_long_object_value(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  {
+    stack[0].lval = INT64_MIN;
+    env->call_class_method_by_name(env, stack, "Long", "new", 1, &error_id, __func__, FILE_NAME, __LINE__);
+    void* obj_num = stack[0].oval;
+    if (error_id) { return error_id; }
+    
+    int64_t ret = env->get_long_object_value(env, stack, obj_num);
+    
+    if (!(ret == INT64_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
+  }
+  
+  stack[0].ival = 1;
+  
+  return 0;
+}
+
+int32_t SPVM__TestCase__NativeAPI__get_float_object_value(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  {
+    stack[0].fval = 1.5;
+    env->call_class_method_by_name(env, stack, "Float", "new", 1, &error_id, __func__, FILE_NAME, __LINE__);
+    void* obj_num = stack[0].oval;
+    if (error_id) { return error_id; }
+    
+    float ret = env->get_float_object_value(env, stack, obj_num);
+    
+    if (!(ret == 1.5)) {
+      stack[0].ival = 0;
+      return 0;
+    }
+  }
+  
+  stack[0].ival = 1;
+  
+  return 0;
+}
+
+int32_t SPVM__TestCase__NativeAPI__get_double_object_value(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  {
+    stack[0].dval = 2147483647.5;
+    env->call_class_method_by_name(env, stack, "Double", "new", 1, &error_id, __func__, FILE_NAME, __LINE__);
+    void* obj_num = stack[0].oval;
+    if (error_id) { return error_id; }
+    
+    double ret = env->get_double_object_value(env, stack, obj_num);
+    
+    if (!(ret == 2147483647.5)) {
+      stack[0].ival = 0;
+      return 0;
+    }
+  }
+  
+  stack[0].ival = 1;
+  
   return 0;
 }
 
@@ -3475,7 +3620,7 @@ int32_t SPVM__TestCase__NativeAPI__freopen_stdout(SPVM_ENV* env, SPVM_VALUE* sta
   void* obj_path = stack[0].oval;
   
   if (!obj_path) {
-    return env->die(env, stack, "$path must be defined.");
+    return env->die(env, stack, "The path $path must be defined.");
   }
   
   const char* path = env->get_chars(env, stack, obj_path);
@@ -3515,7 +3660,7 @@ int32_t SPVM__TestCase__NativeAPI__freopen_stderr(SPVM_ENV* env, SPVM_VALUE* sta
   void* obj_path = stack[0].oval;
   
   if (!obj_path) {
-    return env->die(env, stack, "$path must be defined.");
+    return env->die(env, stack, "The path $path must be defined.");
   }
   
   const char* path = env->get_chars(env, stack, obj_path);

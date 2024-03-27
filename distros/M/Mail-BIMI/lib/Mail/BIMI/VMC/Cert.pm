@@ -1,6 +1,6 @@
 package Mail::BIMI::VMC::Cert;
 # ABSTRACT: Class to model a VMC Cert
-our $VERSION = '3.20240313'; # VERSION
+our $VERSION = '3.20240319'; # VERSION
 use 5.20.0;
 use Moose;
 use Mail::BIMI::Prelude;
@@ -126,6 +126,7 @@ sub has_valid_usage($self) {
   return if !$extended_usage;
   my $extended_usage_string = $extended_usage->to_string;
   return 1 if $extended_usage_string eq USAGE_OID;
+  return 1 if $extended_usage_string eq 'Brand Indicator for Message Identification';
   return 0;
 }
 
@@ -157,7 +158,7 @@ Mail::BIMI::VMC::Cert - Class to model a VMC Cert
 
 =head1 VERSION
 
-version 3.20240313
+version 3.20240319
 
 =head1 DESCRIPTION
 

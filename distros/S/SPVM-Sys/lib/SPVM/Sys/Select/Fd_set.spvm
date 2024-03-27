@@ -2,11 +2,14 @@
 # MIT License
 
 class Sys::Select::Fd_set {
+  
+  interface Cloneable;
+  
   # Class methods
   native static method new : Sys::Select::Fd_set ();
   
   # Instance methods
   native method DESTROY : void ();
-
-  native method set : void ($set : Sys::Select::Fd_set);
+  
+  native method clone : Sys::Select::Fd_set ();
 }

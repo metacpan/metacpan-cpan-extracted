@@ -4,7 +4,11 @@ package SPVM::Sys::IO::DirStream;
 
 =head1 Name
 
-SPVM::Sys::IO::DirStream - the class for the C<DIR> type in C<C language>.
+SPVM::Sys::IO::DirStream - C<DIR> structure in the C language.
+
+=head1 Description
+
+The Sys::IO::DirStream class in L<SPVM> represents the L<DIR|https://linux.die.net/man/3/opendir> structure in the C language.
 
 =head1 Usage
   
@@ -16,23 +20,21 @@ SPVM::Sys::IO::DirStream - the class for the C<DIR> type in C<C language>.
   # Sys::IO::DirStream
   my $dir_stream = Sys::IO->opendir($dir);
 
-=head1 Description
+=head1 Details
 
-C<Sys::IO::DirStream> is the class for the C<DIR> type in C<C language>.
-
-This is a L<pointer class|SPVM::Document::Language/"Pointer Class">.
+This class is a pointer class. The pointer the instance has is set to a C<DIR> object.
 
 =head1 Fields
 
 =head2 closed
 
-  has closed : ro byte;
+C<has closed : ro byte;>
 
 The directory stream is closed.
 
 =head1 Instance Methods
 
-  method DESTROY : void ();
+C<method DESTROY : void ();>
 
 The destructor.
 

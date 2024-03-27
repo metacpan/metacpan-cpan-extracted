@@ -25,7 +25,7 @@ int32_t SPVM__Sys__OS__defined(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_macro_name = stack[0].oval;
   if (!obj_macro_name) {
-    return env->die(env, stack, "The $macro_name must be defined", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "$macro_name must be defined.", __func__, FILE_NAME, __LINE__);
   }
   const char* macro_name = env->get_chars(env, stack, obj_macro_name);
   
@@ -237,12 +237,12 @@ int32_t SPVM__Sys__OS__defined(SPVM_ENV* env, SPVM_VALUE* stack) {
 #   endif
   }
   else {
-    return env->die(env, stack, "The macro name \"%s\" is not supported yet", macro_name, __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The macro name \"%s\" is not supported.", macro_name, __func__, FILE_NAME, __LINE__);
   }
   
   if (obj_value_ref) {
     
-    int32_t e = 0;
+    int32_t error_id = 0;
     
     if (env->is_type(env, stack, obj_value_ref, env->get_basic_type_by_id(env, stack, SPVM_NATIVE_C_BASIC_TYPE_ID_INT), 1)) {
       int32_t* value_ref = env->get_elems_int(env, stack, obj_value_ref);
@@ -257,7 +257,7 @@ int32_t SPVM__Sys__OS__defined(SPVM_ENV* env, SPVM_VALUE* stack) {
       *value_ref = dval;
     }
     else {
-      return env->die(env, stack, "The $value_ref must be the int[], long[], or double[] type", macro_name, __func__, FILE_NAME, __LINE__);
+      return env->die(env, stack, "$value_ref must be the int[], long[], or double[] type.", macro_name, __func__, FILE_NAME, __LINE__);
     }
   }
   

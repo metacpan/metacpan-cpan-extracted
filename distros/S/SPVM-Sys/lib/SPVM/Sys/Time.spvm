@@ -8,12 +8,13 @@ class Sys::Time {
   use Sys::Time::Timezone;
   use Sys::Time::Itimerval;
   use Sys::Time::Timespec;
+  use Sys::Time::Utimbuf;
   
   native static method time : long ();
   
-  native static method localtime : Sys::Time::Tm ($time : long);
+  native static method localtime : Sys::Time::Tm ($time_ref : long*);
   
-  native static method gmtime : Sys::Time::Tm ($time : long);
+  native static method gmtime : Sys::Time::Tm ($time_ref : long*);
   
   native static method gettimeofday : int ($tv : Sys::Time::Timeval, $tz : Sys::Time::Timezone);
   
@@ -32,4 +33,8 @@ class Sys::Time {
   native static method clock_nanosleep : int ($clockid : int, $flags : int, $request : Sys::Time::Timespec, $remain : Sys::Time::Timespec);
   
   native static method nanosleep : int ($rqtp : Sys::Time::Timespec, $rmtp : Sys::Time::Timespec);
+  
+  native static method utime : int ($filename : string, $times : Sys::Time::Utimbuf);
+  
+  native static method utimes : int ($filename : string, $times : Sys::Time::Timeval[]);
 }

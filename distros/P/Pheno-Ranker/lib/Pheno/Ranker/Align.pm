@@ -37,7 +37,7 @@ sub cohort_comparison {
     # Define the subroutine to be used
     my %similarity_function = (
         'hamming' => \&hd_fast,
-        'jaccard' => \&jaccard_similarity
+        'jaccard' => \&jaccard_similarity_formatted
     );
 
     # Define values for diagonal elements depending on metric
@@ -212,18 +212,20 @@ sub compare_and_rank {
 
     # 0/1
     push @dataframe, join ';', qq/T|$tar/,
-      ( split //, $tar_binary_hash->{$tar}{binary_digit_string} );    # Add Target
+      ( split //, $tar_binary_hash->{$tar}{binary_digit_string} );  # Add Target
 
     # Sort %score by value and load results
     my $count = 1;
-    $max_out++;                                                       # to be able to start w/ ONE
+    $max_out++;    # to be able to start w/ ONE
 
     # Start loop
     for my $key (
         sort {
-            $sort_by eq 'jaccard'                                    #
-              ? $score->{$b}{$sort_by} <=> $score->{$a}{$sort_by}    # 1 to 0 (similarity)
-              : $score->{$a}{$sort_by} <=> $score->{$b}{$sort_by}    # 0 to N (distance)
+            $sort_by eq 'jaccard'           #
+              ? $score->{$b}{$sort_by}
+              <=> $score->{$a}{$sort_by}    # 1 to 0 (similarity)
+              : $score->{$a}{$sort_by}
+              <=> $score->{$b}{$sort_by}    # 0 to N (distance)
         } keys %$score
       )
     {
@@ -245,10 +247,10 @@ sub compare_and_rank {
             }
           );
 
-        # *** IMPORTANT ***
-        # The LENGTH of the alignment is based on the #variables in the REF-COHORT
-        # Compute estimated av and dev for binary_string of L = length_align - n_00
-        # Corrected length_align L = length_align - n_00
+     # *** IMPORTANT ***
+     # The LENGTH of the alignment is based on the #variables in the REF-COHORT
+     # Compute estimated av and dev for binary_string of L = length_align - n_00
+     # Corrected length_align L = length_align - n_00
         my $length_align_corrected = $length_align - $n_00;
 
         #$estimated_average, $estimated_std_dev
@@ -428,10 +430,10 @@ qq/$char1 $format{ $char1 . $char2 } $char2 | (w:$val|d:$distance_pretty|cd:$cum
         push @out_csv,
 qq/$ref_key;$char1;$format{ $char1 . $char2 };$char2;$glob_hash->{$key};$distance;$sorted_key;$label/;
 
-        #REF(107:week_0_arm_1);indicator;TAR(125:week_0_arm_1);weight;hamming-distance;json-path
-        #0;;0;1;0;diseases.ageOfOnset.ageRange.end.iso8601duration.P16Y
-        #0;;0;1;0;diseases.ageOfOnset.ageRange.end.iso8601duration.P24Y
-        #1;-----;1;1;0;diseases.ageOfOnset.ageRange.end.iso8601duration.P39Y
+#REF(107:week_0_arm_1);indicator;TAR(125:week_0_arm_1);weight;hamming-distance;json-path
+#0;;0;1;0;diseases.ageOfOnset.ageRange.end.iso8601duration.P16Y
+#0;;0;1;0;diseases.ageOfOnset.ageRange.end.iso8601duration.P24Y
+#1;-----;1;1;0;diseases.ageOfOnset.ageRange.end.iso8601duration.P39Y
     }
     return $n_00, \$out_ascii, \@out_csv;
 }
@@ -455,15 +457,23 @@ sub create_glob_and_ref_hashes {
     my $glob_hash   = {};
     my $ref_hash_flattened;
 
-    for my $i ( @{$array} ) {
+    my $count = 1;
+    for my $element ( @{$array} ) {
 
         # For consistency, we obtain the primary_key for both BFF/PXF
         # from $_->{id} (not from subject.id)
-        my $id = $i->{$primary_key};
+        my $id = $element->{$primary_key};
+
+        # die if an individual does not have primary_key defined
+        die
+"Sorry but the JSON document [$count] does not have the primary_key <$primary_key> defined\n"
+          unless defined $id;
+
+        # Remapping hash
         say "Flattening and remapping <id:$id> ..." if $self->{verbose};
         my $ref_hash = remap_hash(
             {
-                hash   => $i,
+                hash   => $element,
                 weight => $weight,
                 self   => $self
             }
@@ -479,6 +489,9 @@ sub create_glob_and_ref_hashes {
         # The idea is to create a $glob_hash with unique key-values
         # Duplicates will be automatically merged
         $glob_hash = { %$glob_hash, %$ref_hash };
+
+        # To keep track of array element indexes
+        $count++;
     }
     return ( $glob_hash, $ref_hash_flattened );
 }
@@ -597,17 +610,20 @@ sub remap_hash {
         # Discard undefined
         next unless defined $hash->{$key};
 
-        # Discarding lines with 'low quality' keys (Time of regex profiled with :NYTProf: ms time)
-        # Some can be "rescued" by adding the ontology as ($1)
-        # NB1: We discard _labels too!!
-        # NB2: info|metaData are always discarded
+# Discarding lines with 'low quality' keys (Time of regex profiled with :NYTProf: ms time)
+# Some can be "rescued" by adding the ontology as ($1)
+# NB1: We discard _labels too!!
+# NB2: info|metaData are always discarded
 
         my $regex = $self->{exclude_properties_regex};
         next
-          if ( $regex && $key =~ m/$regex/ );    # $regex has to be defined and be != ''
+          if ( $regex && $key =~ m/$regex/ )
+          ;    # $regex has to be defined and be != ''
 
         # The user can turn on age related values
-        next if ( $key =~ m/age(?!nt)|onset/i && !$self->{age} );    # $self->{age} [0|1]
+        next
+          if ( $key =~ m/age(?!nt)|onset/i && !$self->{age} )
+          ;    # $self->{age} [0|1]
 
         # Load values
         my $val = $hash->{$key};
@@ -636,8 +652,8 @@ sub remap_hash {
         # Assign weights #
         ##################
 
-        # NB: mrueda (04-12-23) - it's ok if $weight == undef => NO AUTOVIVIFICATION!
-        # NB: We don't warn if user selection does not exist, just assign 1
+   # NB: mrueda (04-12-23) - it's ok if $weight == undef => NO AUTOVIVIFICATION!
+   # NB: We don't warn if user selection does not exist, just assign 1
 
         my $tmp_key_at_term_level = $tmp_key_at_variable_level;
 
@@ -661,11 +677,11 @@ sub remap_hash {
               # VARIABLE LEVEL
               # NB: exists stringifies the weights
               exists $weight->{$tmp_key_at_variable_level}
-              ? $weight->{$tmp_key_at_variable_level} + 0    # coercing to number
+              ? $weight->{$tmp_key_at_variable_level} + 0   # coercing to number
 
               # TERM LEVEL
               : exists $weight->{$tmp_key_at_term_level}
-              ? $weight->{$tmp_key_at_term_level} + 0        # coercing to number
+              ? $weight->{$tmp_key_at_term_level} + 0       # coercing to number
 
               # NO WEIGHT
               : 1;
@@ -717,20 +733,21 @@ sub add_hpo_ascendants {
         $copy_parent_id = $1;
         $copy_parent_id =~ tr/_/:/;
 
-        # *** IMPORTANT ***
-        # We cannot add any label to the ascendants, otherwise they will
-        # not be matched by an indv down the tree
-        # Myopia
-        # Mild Myopia
-        # We want that 'Mild Myopia' matches 'Myopia', thus we can not add a label from 'Mild Myopia'
-        # Use the labels only for debug
+# *** IMPORTANT ***
+# We cannot add any label to the ascendants, otherwise they will
+# not be matched by an indv down the tree
+# Myopia
+# Mild Myopia
+# We want that 'Mild Myopia' matches 'Myopia', thus we can not add a label from 'Mild Myopia'
+# Use the labels only for debug
         my $asc_key = DEVEL_MODE ? $key . '.HPO_asc_DEBUG_ONLY' : $key;
         $asc_key =~ s/HP:$ontology/$copy_parent_id/g;
         push @ascendants, $asc_key;
 
         # We finally add the label to %nomenclature
-        my $hpo_asc_str = $hpo_url . $copy_parent_id;    # 'http://purl.obolibrary.org/obo/HP_HP:0000539
-        $hpo_asc_str =~ s/HP://;                         # 0000539
+        my $hpo_asc_str = $hpo_url
+          . $copy_parent_id;    # 'http://purl.obolibrary.org/obo/HP_HP:0000539
+        $hpo_asc_str =~ s/HP://;    # 0000539
         $nomenclature{$asc_key} = $nodes->{$hpo_asc_str}{lbl};
     }
     return \@ascendants;
@@ -739,82 +756,87 @@ sub add_hpo_ascendants {
 sub add_id2key {
 
     my ( $key, $hash, $self ) = @_;
-    my $id_correspondence = $self->{id_correspondence}{ $self->{format} };
-    my $array_terms_str   = join '|', @{ $self->{array_terms} };
-    my $array_regex       = $self->{array_regex};
+    my $id_correspondence     = $self->{id_correspondence}{ $self->{format} };
+    my $array_regex           = $self->{array_regex};
+    my $array_terms_regex_str = $self->{array_terms_regex_str};
 
+    #say "HERE -> [$key] /$array_terms_regex_str]/ [$array_regex]";
     #############
     # OBJECTIVE #
     #############
 
-    # This subroutine is important as it replaces the index (numeric) for a given
-    # array element for selected ontology. It's done for all subkeys on that element
+# This subroutine is important as it replaces the index (numeric) for a given
+# array element for selected ontology. It's done for all subkeys on that element
 
-    #"interventionsOrProcedures" : [
-    #     {
-    #        "bodySite" : {
-    #           "id" : "NCIT:C12736",
-    #           "label" : "intestine"
-    #        },
-    #        "procedureCode" : {
-    #           "id" : "NCIT:C157823",
-    #           "label" : "Colon Resection"
-    #        }
-    #     },
-    #   {
-    #        "bodySite" : {
-    #           "id" : "NCIT:C12736",
-    #           "label" : "intestine"
-    #        },
-    #        "procedureCode" : {
-    #           "id" : "NCIT:C86074",
-    #           "label" : "Hemicolectomy"
-    #        }
-    #     },
-    #]
-    #
-    # Will become:
-    #
-    #"interventionsOrProcedures.NCIT:C157823.bodySite.id.NCIT:C12736" : 1,
-    #"interventionsOrProcedures.NCIT:C157823.procedureCode.id.NCIT:C157823" : 1,
-    #"interventionsOrProcedures.NCIT:C86074.bodySite.id.NCIT:C12736" : 1,
-    #"interventionsOrProcedures.NCIT:C86074.procedureCode.id.NCIT:C86074" : 1,
-    #
-    # To make the replecament we use $id_correspondence, after we perform a regex
-    # to fetch the key parts
+   #"interventionsOrProcedures" : [
+   #     {
+   #        "bodySite" : {
+   #           "id" : "NCIT:C12736",
+   #           "label" : "intestine"
+   #        },
+   #        "procedureCode" : {
+   #           "id" : "NCIT:C157823",
+   #           "label" : "Colon Resection"
+   #        }
+   #     },
+   #   {
+   #        "bodySite" : {
+   #           "id" : "NCIT:C12736",
+   #           "label" : "intestine"
+   #        },
+   #        "procedureCode" : {
+   #           "id" : "NCIT:C86074",
+   #           "label" : "Hemicolectomy"
+   #        }
+   #     },
+   #]
+   #
+   # Will become:
+   #
+   #"interventionsOrProcedures.NCIT:C157823.bodySite.id.NCIT:C12736" : 1,
+   #"interventionsOrProcedures.NCIT:C157823.procedureCode.id.NCIT:C157823" : 1,
+   #"interventionsOrProcedures.NCIT:C86074.bodySite.id.NCIT:C12736" : 1,
+   #"interventionsOrProcedures.NCIT:C86074.procedureCode.id.NCIT:C86074" : 1,
+   #
+   # To make the replecament we use $id_correspondence, after we perform a regex
+   # to fetch the key parts
 
     # Only proceed if $key is one of the array_terms
-    if ( $key =~ /$array_terms_str/ ) {
+    if ( $key =~ /$array_terms_regex_str/ ) {
 
         # Now we use $array_regex to capture $1, $2 and $3 for BFF/PXF
         # NB: For others (e.g., MXF) we will have only $1 and $2
         $key =~ m/$array_regex/;
 
-        #say "<$1> <$2> <$3>";
+        #say "[$key] <$1> <$2> <$3>";
 
         my ( $tmp_key, $val );
 
         # Normal behaviour for BFF/PXF
         if ( defined $3 ) {
 
-            # If id_correspondence is an array (e.g., medicalActions) we have to grep the right match
+# If id_correspondence is an array (e.g., medicalActions) we have to grep the right match
             my $correspondence;
             if ( ref $id_correspondence->{$1} eq ref [] ) {
 
                 #       $1         $2                 $3
                 # <medicalActions> <0> <treatment.routeOfAdministration.id>
                 my $subkey = ( split /\./, $3 )[0];    # treatment
-                $correspondence =
-                  first { $_ =~ m/^$subkey/ } @{ $id_correspondence->{$1} };   # treatment.agent.id
+                $correspondence = first { $_ =~ m/^$subkey/ }
+                @{ $id_correspondence->{$1} };         # treatment.agent.id
             }
             else {
                 $correspondence = $id_correspondence->{$1};
             }
 
             # Now that we know which is the term we use to find key-val in $hash
-            $tmp_key = $1 . ':' . $2 . '.' . $correspondence;    # medicalActions.0.treatment.agent.id
-            $val     = $hash->{$tmp_key};                        # DrugCentral:257
-            $key     = join '.', $1, $val, $3;                   # medicalActions.DrugCentral:257.treatment.routeOfAdministration.id
+            $tmp_key =
+                $1 . ':'
+              . $2 . '.'
+              . $correspondence;    # medicalActions.0.treatment.agent.id
+            $val = $hash->{$tmp_key};    # DrugCentral:257
+            $key = join '.', $1, $val, $3
+              ; # medicalActions.DrugCentral:257.treatment.routeOfAdministration.id
         }
 
         # MXF or similar (...we haven't encountered other regex yet)
@@ -871,20 +893,20 @@ sub parse_hpo_json {
 
     my $data = shift;
 
-    # The <hp.json> file is a structured representation of the Human Phenotype Ontology (HPO) in JSON format.
-    # The HPO is structured into a directed acyclic graph (DAG)
-    # Here's a brief overview of the structure of the hpo.json file:
-    # - graphs: This key contains an array of ontology graphs. In the case of HPO, there is only one graph. The graph has two main keys:
-    # - nodes: An array of objects, each representing an HPO term. Each term object has the following keys:
-    # - id: The identifier of the term (e.g., "HP:0000118").
-    # - lbl: The label (name) of the term (e.g., "Phenotypic abnormality").
-    # - meta: Metadata associated with the term, including definition, synonyms, and other information.
-    # - type: The type of the term, usually "CLASS".
-    # - edges: An array of objects, each representing a relationship between two HPO terms. Each edge object has the following keys:
-    # - sub: The subject (child) term ID (e.g., "HP:0000924").
-    # - obj: The object (parent) term ID (e.g., "HP:0000118").
-    # - pred: The predicate that describes the relationship between the subject and object terms, typically "is_a" in HPO.
-    # - meta: This key contains metadata about the HPO ontology as a whole, such as version information, description, and other details.
+# The <hp.json> file is a structured representation of the Human Phenotype Ontology (HPO) in JSON format.
+# The HPO is structured into a directed acyclic graph (DAG)
+# Here's a brief overview of the structure of the hpo.json file:
+# - graphs: This key contains an array of ontology graphs. In the case of HPO, there is only one graph. The graph has two main keys:
+# - nodes: An array of objects, each representing an HPO term. Each term object has the following keys:
+# - id: The identifier of the term (e.g., "HP:0000118").
+# - lbl: The label (name) of the term (e.g., "Phenotypic abnormality").
+# - meta: Metadata associated with the term, including definition, synonyms, and other information.
+# - type: The type of the term, usually "CLASS".
+# - edges: An array of objects, each representing a relationship between two HPO terms. Each edge object has the following keys:
+# - sub: The subject (child) term ID (e.g., "HP:0000924").
+# - obj: The object (parent) term ID (e.g., "HP:0000118").
+# - pred: The predicate that describes the relationship between the subject and object terms, typically "is_a" in HPO.
+# - meta: This key contains metadata about the HPO ontology as a whole, such as version information, description, and other details.
 
     my $graph = $data->{graphs}->[0];
     my %nodes = map { $_->{id} => $_ } @{ $graph->{nodes} };

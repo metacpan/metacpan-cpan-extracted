@@ -1,0 +1,31 @@
+---
+abstract: 'access GCC compiler builtin functions via XS'
+author:
+  - 'Andreas Hadjiprocopis <bliako ta cpan.org / andreashad2 ta gmail.com>'
+build_requires:
+  Benchmark: '0'
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '7.12'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: GCC-Builtins
+no_index:
+  directory:
+    - sbin
+requires:
+  DynaLoader: '0'
+  Exporter: '0'
+  ExtUtils::MakeMaker: '7.12'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/hadjiprocopis/perl-gcc-builtins/issues
+  homepage: https://metacpan.org/module/GCC::Builtins
+  repository: https://github.com/hadjiprocopis/perl-gcc-builtins
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

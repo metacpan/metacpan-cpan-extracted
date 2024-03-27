@@ -1,0 +1,57 @@
+openapi: "3.1.0"
+info:
+  version: 1.0.0
+  title: OpenAPI generator testcases
+  description: Some more testcases that the OpenAPI spec doesn't cover with examples
+  termsOfService: http://swagger.io/terms/
+  contact:
+    name: Max Maischein
+    email: openapi-generator@corion.net
+    url: https://corion.net/
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+servers:
+  - url: https://example.com/v0
+paths:
+  /with-header:
+    get:
+      description: |
+        Example request with a parameter passed in a header
+
+      operationId: withHeader
+      parameters:
+      - name: X-token
+        in: header
+        description: token to be passed as a header
+        required: true
+        schema:
+          type: array
+          items:
+            type: integer
+            format: int64
+        style: simple
+      responses:
+        '200':
+          description: pet response
+        '4xx':
+          description: authentication error
+        default:
+          description: unexpected error
+  /with-cookie:
+    get:
+      description: |
+        Example request with a parameter passed in a cookie
+
+      operationId: withCookie
+      parameters:
+      - name: session-id
+        in: cookie
+        description: token to be passed as a header
+        required: true
+        style: simple
+      responses:
+        '200':
+          description: pet response
+        default:
+          description: unexpected error

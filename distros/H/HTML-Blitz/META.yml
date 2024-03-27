@@ -40,5 +40,5 @@ requires:
   warnings: '0'
 resources:
   repository: git://github.com/mauke/HTML-Blitz
-version: '0.09'
+version: '0.0901'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

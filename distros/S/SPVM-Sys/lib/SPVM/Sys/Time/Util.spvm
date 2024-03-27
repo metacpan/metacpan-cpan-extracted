@@ -1,0 +1,382 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class Sys::Time::Util {
+  use Sys::Time::Timespec;
+  use Sys::Time::Timeval;
+  
+  static method nanoseconds_to_timespec : Sys::Time::Timespec ($nanoseconds : long) {
+    
+    unless ($nanoseconds >= 0) {
+      die "\$nanoseconds must be greater than or equal to 0.";
+    }
+    
+    my $sec = $nanoseconds / 1_000_000_000;
+    
+    my $nsec = $nanoseconds - $sec * 1_000_000_000;
+    
+    my $ts = Sys::Time::Timespec->new;
+    
+    $ts->set_tv_sec($sec);
+    
+    $ts->set_tv_nsec($nsec);
+    
+    return $ts;
+  }
+  
+  static method timespec_to_nanoseconds : long ($ts : Sys::Time::Timespec) {
+    
+    unless ($ts) {
+      die "\$ts must be defined.";
+    }
+    
+    my $tv_sec = $ts->tv_sec;
+    
+    unless ($tv_sec >= 0) {
+      die "\$ts->tv_sec must be greater than or equal to 0.";
+    }
+    
+    my $tv_nsec = $ts->tv_nsec;
+    
+    unless ($tv_nsec >= 0) {
+      die "\$ts->tv_nsec must be greater than or equal to 0.";
+    }
+    
+    my $nanoseconds = $ts->tv_sec * 1_000_000_000 + $ts->tv_nsec;
+    
+    return $nanoseconds;
+  }
+  
+  static method microseconds_to_timeval : Sys::Time::Timeval ($microseconds : long) {
+    
+    unless ($microseconds >= 0) {
+      die "\$microseconds must be greater than or equal to 0.";
+    }
+    
+    my $sec = $microseconds / 1_000_000;
+    
+    my $usec = $microseconds - $sec * 1_000_000;
+    
+    my $ts = Sys::Time::Timeval->new;
+    
+    $ts->set_tv_sec($sec);
+    
+    $ts->set_tv_usec($usec);
+    
+    return $ts;
+  }
+  
+  static method timeval_to_microseconds : double ($tv : Sys::Time::Timeval) {
+    
+    unless ($tv) {
+      die "\$tv must be defined.";
+    }
+    
+    my $tv_sec = $tv->tv_sec;
+    
+    unless ($tv_sec >= 0) {
+      die "\$tv->tv_sec must be greater than or equal to 0.";
+    }
+    
+    my $tv_usec = $tv ->tv_usec;
+    
+    unless ($tv_usec >= 0) {
+      die "\$tv->tv_usec must be greater than or equal to 0.";
+    }
+    
+    my $microseconds = $tv_sec * 1_000_000 + $tv_usec;
+    
+    return $microseconds;
+  }
+  
+  static method float_seconds_to_timespec : Sys::Time::Timespec ($float_seconds : double) {
+    
+    unless ($float_seconds >= 0) {
+      die "\$float_seconds must be greater than or equal to 0.";
+    }
+    
+    my $sec = (long)$float_seconds;
+    
+    my $nsec = (long)(($float_seconds - $sec) * 1_000_000_000);
+    
+    my $ts = Sys::Time::Timespec->new;
+    
+    $ts->set_tv_sec($sec);
+    
+    $ts->set_tv_nsec($nsec);
+    
+    return $ts;
+  }
+  
+  static method timespec_to_float_seconds : double ($ts : Sys::Time::Timespec) {
+    
+    unless ($ts) {
+      die "\$ts must be defined.";
+    }
+    
+    my $tv_sec = $ts->tv_sec;
+    
+    unless ($tv_sec >= 0) {
+      die "\$ts->tv_sec must be greater than or equal to 0.";
+    }
+    
+    my $tv_nsec = $ts->tv_nsec;
+    
+    unless ($tv_nsec >= 0) {
+      die "\$ts->tv_nsec must be greater than or equal to 0.";
+    }
+    
+    my $float_seconds = $tv_sec + (double)$tv_nsec / 1_000_000_000;
+    
+    return $float_seconds;
+  }
+  
+  static method float_seconds_to_timeval : Sys::Time::Timeval ($float_seconds : double) {
+    
+    unless ($float_seconds >= 0) {
+      die "\$float_seconds must be greater than or equal to 0.";
+    }
+    
+    my $sec = (long)$float_seconds;
+    
+    my $usec = (long)(($float_seconds - $sec) * 1_000_000);
+    
+    my $tv = Sys::Time::Timeval->new;
+    
+    $tv->set_tv_sec($sec);
+    
+    $tv->set_tv_usec($usec);
+    
+    return $tv;
+  }
+  
+  static method timeval_to_float_seconds : double ($tv : Sys::Time::Timeval) {
+    
+    unless ($tv) {
+      die "\$tv must be defined.";
+    }
+    
+    my $tv_sec = $tv->tv_sec;
+    
+    unless ($tv_sec >= 0) {
+      die "\$tv->tv_sec must be greater than or equal to 0.";
+    }
+    
+    my $tv_usec = $tv ->tv_usec;
+    
+    unless ($tv_usec >= 0) {
+      die "\$tv->tv_usec must be greater than or equal to 0.";
+    }
+    
+    my $float_seconds = $tv_sec + (double)$tv_usec / 1_000_000;
+    
+    return $float_seconds;
+  }
+  
+  static method float_seconds_to_nanoseconds : long ($float_seconds : double) {
+    
+    unless ($float_seconds >= 0) {
+      die "\$float_seconds must be greater than or equal to 0.";
+    }
+    
+    my $nanoseconds = (long)($float_seconds * 1_000_000_000);
+    
+    return $nanoseconds;
+  }
+  
+  static method nanoseconds_to_float_seconds : double ($nanoseconds : long) {
+    
+    unless ($nanoseconds >= 0) {
+      die "\$nanoseconds must be greater than or equal to 0.";
+    }
+    
+    my $float_seconds = (double)$nanoseconds / 1_000_000_000;
+    
+    return $float_seconds;
+  }
+  
+  static method float_seconds_to_microseconds : long ($float_seconds : double) {
+    
+    unless ($float_seconds >= 0) {
+      die "\$float_seconds must be greater than or equal to 0.";
+    }
+    
+    my $microseconds = (long)($float_seconds * 1_000_000);
+    
+    return $microseconds;
+  }
+  
+  static method microseconds_to_float_seconds : double ($microseconds : long) {
+    
+    unless ($microseconds >= 0) {
+      die "\$microseconds must be greater than or equal to 0.";
+    }
+    
+    my $float_seconds = (double)$microseconds / 1_000_000;
+    
+    return $float_seconds;
+  }
+  
+  static method timeval_interval : double ($tv_a : Sys::Time::Timeval, $tv_b : Sys::Time::Timeval) {
+    
+    unless ($tv_a) {
+      die "\$tv_a must be defined.";
+    }
+    
+    unless ($tv_b) {
+      die "\$tv_b must be defined.";
+    }
+    
+    my $diff_tv = &subtract_timeval($tv_b, $tv_a);
+    
+    my $tv_interval = &timeval_to_float_seconds($diff_tv);
+    
+    return $tv_interval;
+  }
+  
+  static method timespec_interval : double ($ts_a : Sys::Time::Timespec, $ts_b : Sys::Time::Timespec) {
+    
+    unless ($ts_a) {
+      die "\$ts_a must be defined.";
+    }
+    
+    unless ($ts_b) {
+      die "\$ts_b must be defined.";
+    }
+    
+    my $diff_ts = &subtract_timespec($ts_b, $ts_a);
+    
+    my $ts_interval = &timespec_to_float_seconds($diff_ts);
+    
+    return $ts_interval;
+  }
+  
+  static method add_timespec : Sys::Time::Timespec ($ts : Sys::Time::Timespec, $diff_ts : Sys::Time::Timespec) {
+    
+    unless ($ts) {
+      die "\$ts must be defined.";
+    }
+    
+    unless ($diff_ts ) {
+      die "\$diff_ts  must be defined.";
+    }
+    
+    my $ts_sec = $ts->tv_sec;
+    
+    my $ts_nsec = $ts->tv_nsec;
+    
+    my $result_sec = $ts_sec + $diff_ts->tv_sec;
+    
+    my $result_nsec = $ts_nsec + $diff_ts->tv_nsec;
+    
+    if ($result_nsec >= 1_000_000_000) {
+      $result_sec += 1;
+      $result_nsec -= 1_000_000_000;
+    }
+    elsif ($result_nsec < 0) {
+      $result_sec -= 1;
+      $result_nsec = 1_000_000_000 + $result_nsec;
+    }
+    
+    my $result = Sys::Time::Timespec->new($result_sec, $result_nsec);
+    
+    return $result;
+  }
+  
+  static method add_timeval : Sys::Time::Timeval ($tv : Sys::Time::Timeval, $diff_tv : Sys::Time::Timeval) {
+    
+    unless ($tv) {
+      die "\$ts must be defined.";
+    }
+    
+    unless ($diff_tv ) {
+      die "\$diff_tv  must be defined.";
+    }
+    
+    my $tv_sec = $tv->tv_sec;
+    
+    my $tv_usec = $tv->tv_usec;
+    
+    my $result_sec = $tv_sec + $diff_tv->tv_sec;
+    
+    my $result_usec = $tv_usec + $diff_tv->tv_usec;
+    
+    if ($result_usec >= 1_000_000) {
+      $result_sec += 1;
+      $result_usec -= 1_000_000;
+    }
+    elsif ($result_usec < 0) {
+      $result_sec -= 1;
+      $result_usec = 1_000_000 + $result_usec;
+    }
+    
+    my $result = Sys::Time::Timeval->new($result_sec, $result_usec);
+    
+    return $result;
+  }
+  
+  static method subtract_timespec : Sys::Time::Timespec ($ts : Sys::Time::Timespec, $diff_ts : Sys::Time::Timespec) {
+    
+    unless ($ts) {
+      die "\$ts must be defined.";
+    }
+    
+    unless ($diff_ts ) {
+      die "\$diff_ts  must be defined.";
+    }
+    
+    my $ts_sec = $ts->tv_sec;
+    
+    my $ts_nsec = $ts->tv_nsec;
+    
+    my $result_sec = $ts_sec - $diff_ts->tv_sec;
+    
+    my $result_nsec = $ts_nsec - $diff_ts->tv_nsec;
+    
+    if ($result_nsec >= 1_000_000_000) {
+      $result_sec += 1;
+      $result_nsec -= 1_000_000_000;
+    }
+    elsif ($result_nsec < 0) {
+      $result_sec -= 1;
+      $result_nsec = 1_000_000_000 + $result_nsec;
+    }
+    
+    my $result = Sys::Time::Timespec->new($result_sec, $result_nsec);
+    
+    return $result;
+  }
+  
+  static method subtract_timeval : Sys::Time::Timeval ($tv : Sys::Time::Timeval, $diff_tv : Sys::Time::Timeval) {
+    
+    unless ($tv) {
+      die "\$ts must be defined.";
+    }
+    
+    unless ($diff_tv ) {
+      die "\$diff_tv  must be defined.";
+    }
+    
+    my $tv_sec = $tv->tv_sec;
+    
+    my $tv_usec = $tv->tv_usec;
+    
+    my $result_sec = $tv_sec - $diff_tv->tv_sec;
+    
+    my $result_usec = $tv_usec - $diff_tv->tv_usec;
+    
+    if ($result_usec >= 1_000_000) {
+      $result_sec += 1;
+      $result_usec -= 1_000_000;
+    }
+    elsif ($result_usec < 0) {
+      $result_sec -= 1;
+      $result_usec = 1_000_000 + $result_usec;
+    }
+    
+    my $result = Sys::Time::Timeval->new($result_sec, $result_usec);
+    
+    return $result;
+  }
+  
+}

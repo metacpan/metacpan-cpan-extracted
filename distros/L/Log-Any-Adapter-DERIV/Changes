@@ -1,5 +1,9 @@
 
 Revision history for Log-Any-Adapter-DERIV
+0.008     2024-03-20 08:41:56+00:00 UTC
+
+    - fixing of one sensitive regex pattern for log message masking
+
 0.007     2024-03-15 07:29:29+00:00 UTC
     - sensitive information masking in log messages 
 

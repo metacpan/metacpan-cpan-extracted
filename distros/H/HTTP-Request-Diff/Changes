@@ -1,2 +1,27 @@
+0.03 2024-03-25
+    * We need List::Util 1.45+ for uniq(), spotted by the CPAN testers
+
+0.02 2024-03-24
+    * Check query parameter separator for identity in strict mode
+
+    * Warn on newline-separated headers in input
+
+    * Try harder to convert input objects into request strings
+
+    * Properly load prerequisite modules instead of relying on implicit loading
+      of HTTP::Parser
+
+    * Output using Term::Table - Term::Table::Any does not handle newlines
+      in value
+
+    * Ignore Content-Length: 0 header in semantic mode
+
+    * Handle %20 vs + in URL-encoded elements
+
+    * Fix differently-sized multi-part form data due to different boundary
+      strings (semantic , lax modes)
+
+    * Allow lower-case header names
+
 0.01 2023-09-08
     * Released on an unsuspecting world

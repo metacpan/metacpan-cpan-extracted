@@ -1,5 +1,8 @@
 Revision history for Perl extension Form::Tiny.
 
+2.24 Tue Mar 26 2024
+	- fix error when validation fails on deeply nested field (two levels down or more)
+
 2.23 Fri Dec 29 2023
 	- fix incorrect usage of a type library in tests
 

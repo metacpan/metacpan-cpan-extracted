@@ -1,4 +1,4 @@
-our $VERSION = '0.03';
+our $VERSION = '0.07';
 pp_setversion($VERSION);
 $VERSION = eval $VERSION;
 
@@ -153,10 +153,6 @@ param_t T_PARAM_T
 INPUT
 T_PARAM_T
   $var = ($type)SvRV($arg)
-
-OUTPUT
-T_PARAM_T
-  sv_setsv($arg, newRV_inc((SV*) $var));
 
 END_OF_TYPMAP
 EOD

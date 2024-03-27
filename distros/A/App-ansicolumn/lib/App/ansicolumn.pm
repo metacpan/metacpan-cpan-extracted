@@ -1,6 +1,6 @@
 package App::ansicolumn;
 
-our $VERSION = "1.2801";
+our $VERSION = "1.4101";
 
 use v5.14;
 use warnings;
@@ -13,8 +13,7 @@ ExConfigure BASECLASS => [ __PACKAGE__, "Getopt::EX" ];
 Configure qw(bundling);
 
 use Data::Dumper;
-use List::Util qw(max sum);
-use Hash::Util qw(lock_keys lock_keys_plus unlock_keys);
+use List::Util qw(max sum min);
 use Text::ANSI::Fold qw(ansi_fold);
 use Text::ANSI::Fold::Util qw(ansi_width);
 use Text::ANSI::Printf qw(ansi_printf ansi_sprintf);
@@ -25,7 +24,7 @@ use Getopt::EX::RPN qw(rpn_calc);
 my %DEFAULT_COLORMAP = (
     BORDER => '',
     TEXT   => '',
-    );
+);
 
 use Getopt::EX::Hashed 1.05; {
 
@@ -38,15 +37,21 @@ use Getopt::EX::Hashed 1.05; {
     has fillrows            => '    x    ' ;
     has table               => '    t    ' ;
     has table_columns_limit => ' =i l    ' , default => 0 ;
+    has table_align         => ' !  A    ' ;
+    has table_tabs          => ' !  T    ' ;
     has table_right         => ' =s R    ' , default => '' ;
     has separator           => ' =s s    ' , default => ' ' ;
+    has regex_sep           => '    r    ' ;
     has output_separator    => ' =s o    ' , default => '  ' ;
     has document            => '    D    ' ;
     has parallel            => ' !  V    ' ;
+    has filename            => ' !  H    ' ;
+    has filename_format     => ' =s      ' , default => ': %s';
     has pages               => ' !       ' ;
-    has up                  => ' :i U    ' ;
+    has up                  => ' :s U    ' ;
     has page                => ' :i P    ' , min => 0;
     has pane                => ' =s C    ' , default => 0 ;
+    has cell                => ' =s X    ' ;
     has pane_width          => ' =s S pw ' ;
     has widen               => ' !  W    ' ;
     has paragraph           => ' !  p    ' ;
@@ -56,14 +61,14 @@ use Getopt::EX::Hashed 1.05; {
     has tabstop             => ' =i      ' , min => 1, default => 8 ;
     has tabhead             => ' =s      ' ;
     has tabspace            => ' =s      ' ;
-    has tabstyle            => ' =s      ' ;
+    has tabstyle            => ' :s   ts ' ;
     has ignore_space        => ' !    is ' , default => 1 ;
     has linestyle           => ' =s   ls ' , default => '' ;
     has boundary            => ' =s      ' , default => '' ;
     has linebreak           => ' =s   lb ' , default => '' ;
     has runin               => ' =i      ' , min => 0, default => 2 ;
     has runout              => ' =i      ' , min => 0, default => 2 ;
-    has run                 => ' =i      ' ;
+    has runlen              => ' =i      ' ;
     has pagebreak           => ' !       ' , default => 1 ;
     has border              => ' :s      ' ; has B => '' , action => sub { $_->border = '' } ;
     has border_style        => ' =s   bs ' , default => 'box' ;
@@ -106,8 +111,8 @@ use Getopt::EX::Hashed 1.05; {
 	exit;
     };
 
-    ### RPN calc for --height, --width, --pane, --pane-width
-    has [ qw(+height +width +pane +pane_width) ] => sub {
+    ### RPN calc for --height, --width, --pane, --up, --pane-width
+    has [ qw(+height +width +pane +up +pane_width) ] => sub {
 	my $obj = $_;
 	my($name, $val) = @_;
 	$obj->$name = $val !~ /\D/ ? $val : do {
@@ -124,7 +129,12 @@ use Getopt::EX::Hashed 1.05; {
 	}
     };
 
-    ### --run
+    ### --runlen
+    has '+runlen' => sub {
+	$_->runin = $_->runout = $_[1];
+    };
+    # for backward compatibility, would be deplicated
+    has run => '=i';
     has '+run' => sub {
 	$_->runin = $_->runout = $_[1];
     };
@@ -132,6 +142,10 @@ use Getopt::EX::Hashed 1.05; {
     ### --tabstop, --tabstyle
     has [ qw(+tabstop +tabstyle) ] => sub {
 	my($name, $val) = map "$_", @_;
+	if ($val eq '') {
+	    list_tabstyle();
+	    exit;
+	}
 	Text::ANSI::Fold->configure($name => $val);
     };
 
@@ -144,6 +158,18 @@ use Getopt::EX::Hashed 1.05; {
 	Text::ANSI::Fold->configure($name => $c);
     };
 
+    ### -A, -T
+    has '+table_align' => sub {
+	if ($_->table_align = $_[1]) {
+	    $_->table = $_[1];
+	}
+    };
+    has '+table_tabs' => sub {
+	if ($_->table_tabs = $_[1]) {
+	    $_->table = $_->table_align = $_[1];
+	}
+    };
+
     has TERM_SIZE           => ;
     has COLORHASH           => default => { %DEFAULT_COLORMAP };
     has COLORLIST           => default => [];
@@ -151,6 +177,15 @@ use Getopt::EX::Hashed 1.05; {
     has BORDER              => ;
 
 } no Getopt::EX::Hashed;
+
+sub list_tabstyle {
+    my %style = %Text::ANSI::Fold::TABSTYLE;
+    my $max = max map length, keys %style;
+    for my $name (sort keys %style) {
+	my($head, $space) = @{$style{$name}};
+	printf "%*s %s%s\n", $max, $name, $head, $space x 7;
+    }
+}
 
 sub perform {
     my $obj = shift;
@@ -161,7 +196,7 @@ sub perform {
 
     warn Dumper $obj if $obj->debug;
 
-    my @files = $obj->read_files(@ARGV ? @ARGV : '-');
+    my @files = $obj->read_files(@ARGV ? @ARGV : '-') or return 1;
 
     if ($obj->table) {
 	my @lines = map { @{$_->{data}} } @files;
@@ -259,17 +294,51 @@ sub parallel_out {
     my $max_line_length = max map { $_->{length} } @files;
     $obj->pane ||= @files;
     $obj->set_horizontal($max_line_length);
-    $obj->set_contents($_->{data}) for @files;
 
+    # calculate span and set for each file
+    if (my $cell = $obj->cell) {
+	my @spans = split /,+/, $cell;
+	for my $i (keys @files) {
+	    my $span = $spans[$i] // $spans[-1];
+	    if ($span =~ /^[-+]/) {
+		$span += $obj->{span};
+		$span < 0 and die "Invalid number: $cell\n";
+	    }
+	    elsif ($span =~ s/^(<=|[<=])//) {
+		my $length = $files[$i]->{length};
+		$span = $span ? min($length, $span) : $length;
+	    }
+	    elsif ($span !~ /^\d+$/) {
+		die "Invalid number: $cell\n";
+	    }
+	    $files[$i]->{span} = $span;
+	}
+    }
+    $obj->set_contents($_) for @files;
     while (@files) {
 	my @rows = splice @files, 0, $obj->pane;
 	my $max_length = max map { int @{$_->{data}} } @rows;
-	$obj->column_out(map {
-	    my $data = $_->{data};
-	    my $length = @$data;
-	    push @$data, (($obj->fillup_str) x ($max_length - $length));
-	    $data;
-	} @rows);
+	my @span = map { $_->{span} // $obj->span } @rows;
+	if ($obj->filename) {
+	    my $w = $obj->span + $obj->border_width('center');
+	    my $format = join '', (
+		(map {
+		    my $w = $_ + $obj->border_width('center');
+		    "%-${w}.${w}s";
+		} @span[0..$#span-1]),
+		"%s\n");
+	    ansi_printf $format, map {
+		ansi_sprintf $obj->filename_format, $_->{name};
+	    } @rows;
+	}
+	$obj->column_out(
+	    { span => \@span },
+	    map {
+		my $data = $_->{data};
+		my $length = @$data;
+		push @$data, (($obj->fillup_str) x ($max_length - $length));
+		$data;
+	    } @rows);
     }
     return $obj;
 }
@@ -283,7 +352,7 @@ sub nup_out {
     for my $file (@files) {
 	my $data = $file->{data};
 	next if @$data == 0;
-	$obj->set_contents($data)
+	$obj->set_contents($file)
 	    ->set_vertical($data)
 	    ->set_layout($data)
 	    ->page_out(@$data);
@@ -297,17 +366,19 @@ sub read_files {
     my @files;
     for my $file (@_) {
 	open my $fh, $file or die "$file: $!";
-	my $content = do { local $/; <$fh> };
+	my $content = do { local $/; <$fh> } // do {
+	    warn "$file: $!\n" if $!;
+	    next;
+	};
 	my @data = $obj->pages ? split(/\f/, $content) : $content;
 	for my $data (@data) {
 	    my @line = split /\n/, $data;
 	    @line = insert_space @line if $obj->paragraph;
-	    my @length;
 	    my $length = do {
 		if ($obj->table) {
 		    max map length, @line;
 		} else {
-		    $obj->expand_tab(\@line, \@length);
+		    $obj->expand_tab(\@line, \my @length);
 		    max @length;
 		}
 	    };
@@ -325,7 +396,7 @@ sub expand_tab {
     my $obj = shift;
     my($dp, $lp) = @_;
     for (@$dp) {
-	($_, my($dmy, $length)) = ansi_fold($_, -1, expand => 1);
+	($_, my($dmy, $length)) = ansi_fold $_, -1, expand => 1;
 	push @$lp, $length;
     }
 }
@@ -340,14 +411,14 @@ sub set_horizontal {
 
     my $span;
     my $panes;
+    my $claim = sum($max_data_length,
+		    $obj->runin_margin,
+		    $obj->border_width('center') || $obj->margin);
     if ($obj->widen and not $obj->pane_width) {
-	my $min = $max_data_length + ($obj->border_width('center') || 1);
-	$panes = $obj->pane || $width / $min || 1;
+	$panes = $obj->pane || $width / $claim || 1;
 	$span = ($width + $obj->border_width('center')) / $panes;
     } else {
-	$span = $obj->pane_width ||
-	    roundup($max_data_length + ($obj->border_width('center') || $obj->margin),
-		    $unit);
+	$span = $obj->pane_width || roundup($claim, $unit);
 	$panes = $obj->pane || $width / $span || 1;
     }
     $span -= $obj->border_width('center');
@@ -360,12 +431,14 @@ sub set_horizontal {
 
 sub set_contents {
     my $obj = shift;
-    my $dp = shift;
-    (my $cell_width = $obj->span - $obj->margin_width) < 1
+    my $fp = shift;
+    my $dp = $fp->{data};
+    (my $cell_width = $obj->span - $obj->runin_margin) < 1
 	and die "Not enough space.\n";
     # Fold long lines
     if ($obj->linestyle and $obj->linestyle ne 'none') {
-	my $fold = $obj->foldsub($cell_width) or die;
+	my $w = $fp->{span} // $cell_width;
+	my $fold = $obj->foldsub($w) or die;
 	@$dp = map { $fold->($_) } @$dp;
     }
     return $obj;
@@ -406,18 +479,27 @@ sub color_border {
 
 sub column_out {
     my $obj = shift;
-    my($bdr_top, $bdr_btm) = do {
-	map { $obj->color('BORDER', $_) }
-	map { $obj->get_border($_) x $obj->span }
-	qw(top bottom);
-    };
-    map { unshift @$_, $bdr_top } @_ if $bdr_top;
-    map { push    @$_, $bdr_btm } @_ if $bdr_btm;
-    my $max = max(map { int @$_ } @_) - 1;
+    my $opt = ref $_[0] eq 'HASH' ? shift : {};
+
+    # span list is given in parallel view mode
+    my @span = $opt->{span} ? @{$opt->{span}} : (($obj->{span}) x @_);
+    @span == @_ or die;
+
+    # insert top/bottom border
+    my %bd = map { $_ => $obj->get_border($_) } qw(top bottom);
+    if ($bd{top} or $bd{bottom}) {
+	while (my($i, $e) = each @_) {
+	    unshift @$e, $obj->color('BORDER', $bd{top} x $span[$i]) if $bd{top};
+	    push @$e, $obj->color('BORDER', $bd{bottom} x $span[$i]) if $bd{bottom};
+	}
+    }
+
+    my $max = max map $#{$_}, @_;
     for my $i (0 .. $max) {
 	my $pos = $i == 0 ? 0 : $i == $max ? 2 : 1;
+	my @span = @span;
 	my @panes = map {
-	    @$_ ? ansi_sprintf("%-$obj->{span}s", shift @$_) : ();
+	    @$_ ? ansi_sprintf("%-*s", shift @span, shift @$_) : ();
 	} @_;
 	print      $obj->color_border('left',   $pos, $obj->current_page);
 	print join $obj->color_border('center', $pos, $obj->current_page),
@@ -428,30 +510,60 @@ sub column_out {
     return $obj;
 }
 
+sub _numbers {
+    require Getopt::EX::Numbers;
+    Getopt::EX::Numbers->new(min => 1, @_);
+}
+
 sub table_out {
     my $obj = shift;
     return unless @_;
     my $split = do {
 	if ($obj->separator eq ' ') {
-	    $obj->ignore_space ? ' ' : qr/ /;
+	    $obj->ignore_space ? ' ' : qr/\s+/;
+	} elsif ($obj->regex_sep) {
+	    qr($obj->{separator});
 	} else {
 	    qr/[\Q$obj->{separator}\E]/;
 	}
     };
     my @lines  = map { [ split $split, $_, $obj->table_columns_limit ] } @_;
     my @length = map { [ map { ansi_width $_ } @$_ ] } @lines;
-    my @max    = map { max @$_ } xpose @length;
-    my @align  = newlist(count => 0+@max, default => '-',
-			 [ map --$_, split /,/, $obj->table_right ] => '');
-    my @format = map { '%' . $align[$_] . $max[$_] . 's' } 0 .. $#max;
+    my @max = map { max @$_ } xpose @length;
+    if ($obj->table_align) {
+	my @tabs = map { roundup $_, $obj->column_unit, $obj->margin } @max;
+	#
+	# --table-tabs
+	#
+	if ($obj->table_tabs) {
+	    my $cu = $obj->column_unit;
+	    while (my($lx, $l) = each @lines) {
+		while (my($fx, $f) = each @$l) {
+		    print $f;
+		    if ($fx == $#{$l}) {
+			print "\n";
+		    } else {
+			use integer;
+			print "\t" x div($tabs[$fx] - $length[$lx][$fx], $cu);
+		    }
+		}
+	    }
+	    return $obj;
+	}
+	@max = map { $_ - $obj->margin } @tabs;
+	$obj->output_separator = ' ' x $obj->margin;
+    }
+    my @align  = newlist(count => int @max, default => '-',
+			 [ map --$_, map {
+			     _numbers(max => int @max)->parse($_)->sequence
+			 } split /,/, $obj->table_right ] => '');
+    my @format = map "%$align[$_]$max[$_]s", keys @max;
     for my $line (@lines) {
 	next unless @$line;
-	my @fmt = @format[0 .. $#{$line}];
-	$fmt[$#{$line}] = '%s' if $align[$#{$line}] eq '-';
-	my $format = join $obj->output_separator, @fmt;
+	my @fmt = @format[keys @$line];
+	$fmt[$#fmt] = '%s' if $align[$#fmt] eq '-';
+	my $format = join($obj->output_separator, @fmt) . "\n";
 	ansi_printf $format, @$line;
-    } continue {
-	print "\n";
     }
     return $obj;
 }

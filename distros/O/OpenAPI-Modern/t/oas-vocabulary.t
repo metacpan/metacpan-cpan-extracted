@@ -9,6 +9,7 @@ no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use Test::JSON::Schema::Acceptance 1.014;
+use JSON::Schema::Modern 0.578;  # _JSON_BACKEND
 use Path::Tiny;
 use Config;
 
@@ -47,7 +48,7 @@ $accepter->acceptance(
   validate_data => sub ($schema, $instance_data) {
     my $result = $js->evaluate($instance_data, $schema);
 
-    my $encoder = JSON::MaybeXS->new(allow_nonref => 1, utf8 => 0, convert_blessed => 1, canonical => 1, pretty => 1);
+    my $encoder = JSON::Schema::Modern::_JSON_BACKEND()->new->allow_nonref(1)->utf8(0)->convert_blessed(1)->canonical(1)->pretty(1);
     $encoder->indent_length(2) if $encoder->can('indent_length');
     note 'result: ', $encoder->encode($result);
 

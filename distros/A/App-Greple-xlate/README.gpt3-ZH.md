@@ -10,7 +10,7 @@ App::Greple::xlate - greple的翻译支持模块
 
 # VERSION
 
-Version 0.31
+Version 0.3101
 
 # DESCRIPTION
 
@@ -39,6 +39,16 @@ Version 0.31
 </div>
 
 如果您想要翻译整个文本，请使用**--match-all**选项。这是指定模式`(?s).+`（匹配整个文本）的快捷方式。
+
+冲突标记格式数据可以通过`sdif`命令的`-V`选项以并排样式查看。由于逐个字符串比较没有意义，建议使用`--no-cdif`选项。如果不需要对文本着色，请指定`--no-color`或`--cm 'TEXT*='`。
+
+    sdif -V --cm '*TEXT=' --no-cdif data_shishin.deepl-EN-US.cm
+
+<div>
+    <p>
+    <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/sdif-cm-view.png">
+    </p>
+</div>
 
 # OPTIONS
 

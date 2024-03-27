@@ -1,17 +1,18 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::PromptIfStale; # git description: v0.058-5-g4255790
+package Dist::Zilla::Plugin::PromptIfStale; # git description: v0.059-2-g70a5978
 # vim: set ts=8 sts=2 sw=2 tw=115 et :
 # ABSTRACT: Check at build/release time if modules are out of date
 # KEYWORDS: prerequisites upstream dependencies modules metadata update stale
 
-our $VERSION = '0.059';
+our $VERSION = '0.060';
 
 use Moose;
 with 'Dist::Zilla::Role::BeforeBuild',
     'Dist::Zilla::Role::AfterBuild',
     'Dist::Zilla::Role::BeforeRelease';
 
+use Moose::Util::TypeConstraints 'enum';
 use strictures 2;
 use stable 0.031 'postderef';
 use experimental 'signatures';
@@ -19,7 +20,6 @@ use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
-use Moose::Util::TypeConstraints 'enum';
 use List::Util 1.45 qw(none any uniq);
 use version;
 use Moose::Util 'find_meta';
@@ -474,7 +474,7 @@ Dist::Zilla::Plugin::PromptIfStale - Check at build/release time if modules are 
 
 =head1 VERSION
 
-version 0.059
+version 0.060
 
 =head1 SYNOPSIS
 

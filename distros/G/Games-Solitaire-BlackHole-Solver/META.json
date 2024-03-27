@@ -67,7 +67,6 @@
             "Pod::Usage" : "0",
             "perl" : "5.014",
             "strict" : "0",
-            "utf8" : "0",
             "warnings" : "0"
          }
       },
@@ -86,27 +85,27 @@
    "provides" : {
       "Games::Solitaire::BlackHole::Solver" : {
          "file" : "lib/Games/Solitaire/BlackHole/Solver.pm",
-         "version" : "v0.8.0"
+         "version" : "v0.10.0"
       },
       "Games::Solitaire::BlackHole::Solver::App" : {
          "file" : "lib/Games/Solitaire/BlackHole/Solver/App.pm",
-         "version" : "v0.8.0"
+         "version" : "v0.10.0"
       },
       "Games::Solitaire::BlackHole::Solver::App::Base" : {
          "file" : "lib/Games/Solitaire/BlackHole/Solver/App/Base.pm",
-         "version" : "v0.8.0"
+         "version" : "v0.10.0"
       },
       "Games::Solitaire::BlackHole::Solver::App::Base::PreludeItem" : {
          "file" : "lib/Games/Solitaire/BlackHole/Solver/App/Base.pm",
-         "version" : "v0.8.0"
+         "version" : "v0.10.0"
       },
       "Games::Solitaire::BlackHole::Solver::App::Base::Task" : {
          "file" : "lib/Games/Solitaire/BlackHole/Solver/App/Base.pm",
-         "version" : "v0.8.0"
+         "version" : "v0.10.0"
       },
       "Games::Solitaire::BlackHole::Solver::Golf::App" : {
          "file" : "lib/Games/Solitaire/BlackHole/Solver/Golf/App.pm",
-         "version" : "v0.8.0"
+         "version" : "v0.10.0"
       }
    },
    "release_status" : "stable",
@@ -121,7 +120,7 @@
          "web" : "https://github.com/shlomif/black-hole-solitaire"
       }
    },
-   "version" : "0.8.0",
+   "version" : "0.10.0",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038002"

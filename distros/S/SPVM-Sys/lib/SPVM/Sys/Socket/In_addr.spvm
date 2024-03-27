@@ -1,16 +1,15 @@
 # Copyright (c) 2023 Yuki Kimoto
 # MIT License
 
-class Sys::Socket::In_addr : pointer {
+class Sys::Socket::In_addr extends Sys::Socket::In_addr_base : pointer {
   
-  # Class methods
+  # Class Methods
   native static method new : Sys::Socket::In_addr ();
-
-  # Instance methods
+  
+  # Instance Methods
   native method DESTROY : void ();
-
-  # Instance methods
+  
   native method s_addr : int ();
-
+  
   native method set_s_addr : void ($s_addr : int);
 }

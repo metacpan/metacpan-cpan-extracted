@@ -28,43 +28,43 @@ C<Sys::User::Passwd> is the class for an entry of the password database.
 
 =head2 pw_name
 
-  method pw_name : string ();
+C<method pw_name : string ();>
 
 Get the user name.
 
 =head2 pw_passwd
 
-  method pw_passwd : string ();
+C<method pw_passwd : string ();>
 
 Get the user password.
 
 =head2 pw_uid
 
-  method pw_uid : int ();
+C<method pw_uid : int ();>
 
 Get the user id.
 
 =head2 pw_gid
 
-  method pw_gid : int ();
+C<method pw_gid : int ();>
 
 Get the group id.
 
 =head2 pw_gecos
 
-  method pw_gecos : string ();
+C<method pw_gecos : string ();>
 
 Get the user information.
 
 =head2 pw_dir
 
-  method pw_dir : string ();
+C<method pw_dir : string ();>
 
 Get the home directory.
 
 =head2 pw_shell
 
-  method pw_shell : string ();
+C<method pw_shell : string ();>
 
 Get the shell program.
 

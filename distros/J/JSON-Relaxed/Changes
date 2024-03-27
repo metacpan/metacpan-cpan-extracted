@@ -1,2 +1,15 @@
 JSON::Relaxed
-    Version: 0.04
+
+Version: 0.051
+
+IMPORTANT NOTICE: TAKEOVER
+
+    New maintainer will continue development provided it is possible
+    to raise the minimal perl version to 5.26.
+
+    This version if JSON::Relaxed has no functional changes from 0.05
+    but only adds the 5.26 requirement. If users depend on this module
+    to be functional on ancient versions of perl the takeover will be
+    cancelled, the old version requirement restored, and a new module
+    (different name) will be released for future development.
+

@@ -4,43 +4,77 @@ package SPVM::Sys::Env;
 
 =head1 Name
 
-SPVM::Sys::Env - Environemnt Variable
+SPVM::Sys::Env - Environemnt Variables
 
 =head1 Description
 
-C<SPVM::Sys::Env> is the C<Sys::Env> class in L<SPVM> language. It provides system calls for environemnt variables.
+The C<Sys::Env> class in L<SPVM> has methods to manipulate environemnt variables.
 
 =head1 Usage
 
   use Sys::Env;
   
   my $path = Sys::Env->getenv("PATH");
+  
+  Sys::Env->setenv("PATH", "/foo/bar");
 
 =head1 Class Methods
 
 =head2 getenv
 
-  static method getenv : string ($name : string);
+C<static method getenv : string ($name : string);>
 
-The getenv() function searches the environment list to find the environment variable name, and returns a pointer to the corresponding value string.
+Calls the L<getenv|https://linux.die.net/man/3/getenv> function and copy its return value and returns it.
 
-See the detail of the L<getenv|https://linux.die.net/man/3/getenv> function in the case of Linux.
+Exceptions:
+
+$name must be defined. Otherwise an exception is thrown.
 
 =head2 setenv
 
-  static method setenv : int ($name : string, $value : string, $overwrite : int);
+C<static method setenv : int ($name : string, $value : string, $overwrite : int);>
 
-The setenv() function adds the variable name to the environment with the value value, if name does not already exist. If name does exist in the environment, then its value is changed to value if overwrite is nonzero; if overwrite is zero, then the value of name is not changed. This function makes copies of the strings pointed to by name and value (by contrast with putenv(3)).
+Calls the L<setenv|https://linux.die.net/man/3/setenv> function and returns its return value.
 
-See the detail of the L<setenv|https://linux.die.net/man/3/setenv> function in the case of Linux.
+Exceptions:
+
+$name must be defined. Otherwise an exception is thrown.
+
+$value must be defined. Otherwise an exception is thrown.
+
+If setenv failed, an exception is thrown and C<eval_error_id> is set to the basic type ID of the L<Error::System|SPVM::Error::System>.
+
+In Windows the following exception is thrown. setenv is not supported in this system(defined(_WIN32)).
 
 =head2 unsetenv
 
-  static method unsetenv : int ($name : string);
+C<static method unsetenv : int ($name : string);>
 
-The unsetenv() function deletes the variable name from the environment. If name does not exist in the environment, then the function succeeds, and the environment is unchanged.
+Calls the L<unsetenv|https://linux.die.net/man/3/unsetenv> function and returns its return value.
 
-See the detail of the L<unsetenv|https://linux.die.net/man/3/unsetenv> function in the case of Linux.
+Exceptions:
+
+$name must be defined. Otherwise an exception is thrown.
+
+If unsetenv failed, an exception is thrown and C<eval_error_id> is set to the basic type ID of the L<Error::System|SPVM::Error::System>.
+
+In Windows the following exception is thrown. unsetenv is not supported in this system(defined(_WIN32)).
+
+=head2 _putenv_s
+
+C<static method _putenv_s : int ($name : string, $value : string);>
+
+Calls the L<_putenv_s|https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/putenv-s-wputenv-s?view=msvc-170> function and returns its return value.
+
+Exceptions:
+
+$name must be defined. Otherwise an exception is thrown.
+
+$value must be defined. Otherwise an exception is thrown.
+
+If _putenv_s failed, an exception is thrown and C<eval_error_id> is set to the basic type ID of the L<Error::System|SPVM::Error::System>.
+
+In OSs ohter than Windows the following exception is thrown. _putenv_s is not supported in this system(!defined(_WIN32)).
 
 =head1 Copyright & License
 

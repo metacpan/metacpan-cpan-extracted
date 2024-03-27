@@ -55,6 +55,10 @@ my $f2 = $f->move( $tmpdir ) || do
 };
 isa_ok( $f2, 'Module::Generic::File', 'moved object class' );
 my $expected_location = Cwd::abs_path( File::Spec->catpath( $f->volume, $tmpdir, $f->basename ) );
+if( !defined( $expected_location ) )
+{
+    diag( "Error at line " . __LINE__ . " with Cwd::abs_path: $!" );
+}
 is( "$f2", $expected_location, 'moved file new path' );
 if( $expected_location eq "$f2" )
 {

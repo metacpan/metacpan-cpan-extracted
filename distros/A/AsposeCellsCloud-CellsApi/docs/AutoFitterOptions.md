@@ -9,7 +9,6 @@ use AsposeCellsCloud::Object::AutoFitterOptions;
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **AutoFitMergedCellsType** | **string** | Gets and set the type of auto fitting row height of merged cells. |
-**AutoFitMergedCells** | **boolean** | Indicates whether auto fit row height when the cells is merged in a row.                        The default value is false. |
 **IgnoreHidden** | **boolean** | Ignores the hidden rows/columns. |
 **OnlyAuto** | **boolean** | Indicates whether only fit the rows which height are not customed. |
 **DefaultEditLanguage** | **string** | Gets or sets default edit language. |

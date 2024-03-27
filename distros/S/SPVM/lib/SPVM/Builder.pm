@@ -8,7 +8,7 @@ use File::Path 'mkpath';
 
 use SPVM ();
 use SPVM::Builder::CC;
-use SPVM::Builder::Compiler;
+use SPVM::Builder::Native::Compiler;
 use SPVM::Builder::Util::API;
 use SPVM::BlessedObject;
 use SPVM::BlessedObject::Array;
@@ -80,12 +80,15 @@ sub build_dynamic_lib_dist {
   
   $options = {%$options};
   
-  # Create the compiler
-  my $compiler = SPVM::Builder::Compiler->new(
-    include_dirs => $self->include_dirs
-  );
+  my $compiler = SPVM::Builder::Native::Compiler->new;
   
-  my $success = $compiler->compile($class_name, __FILE__, __LINE__);
+  for my $include_dir (@{$self->include_dirs}) {
+    $compiler->add_include_dir($include_dir);
+  }
+  
+  $compiler->set_start_file(__FILE__);
+  $compiler->set_start_line(__LINE__ + 1);
+  my $success = $compiler->compile($class_name);
   unless ($success) {
     $compiler->print_error_messages(*STDERR);
     exit(255);

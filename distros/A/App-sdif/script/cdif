@@ -335,7 +335,7 @@ open(DIFF, $DIFF) || die "$DIFF: $!\n";
 binmode DIFF, ":encoding(utf8)";
 
 my $stdout = App::sdif::Divert->new;
-sub println { print map { s/(?<!\n)\z/\n/r } @_ }
+sub println { print map { s/(?<=[^\n])\z/\n/r } @_ }
 
 while (<DIFF>) {
     my($left, $cmd, $right);
@@ -913,7 +913,7 @@ cdif - word context diff
 
 =head1 VERSION
 
-Version 4.33
+Version 4.3301
 
 =head1 SYNOPSIS
 

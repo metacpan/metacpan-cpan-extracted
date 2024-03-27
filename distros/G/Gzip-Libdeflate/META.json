@@ -1,10 +1,10 @@
 {
    "abstract" : "Libdeflate compression library",
    "author" : [
-      "Ben Bullock <bkb@cpan.org>"
+      "Ben Bullock <benkasminbullock@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -48,6 +48,6 @@
          "web" : "https://github.com/benkasminbullock/gzip-libdeflate"
       }
    },
-   "version" : "0.06",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.07",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

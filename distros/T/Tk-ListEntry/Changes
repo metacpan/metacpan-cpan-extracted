@@ -1,4 +1,10 @@
 Revision history for Perl extension Tk::ListEntry.
 
+0.02  Fri Mar 22 2024
+	added -command option
+	updated and corrected documentation
+
 0.01  Mon Jun 5 2023
 	Initial version
+
+

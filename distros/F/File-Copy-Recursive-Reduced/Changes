@@ -1,8 +1,14 @@
 Revision history for Perl module File::Copy::Recursive::Reduced
 
+0.008 Mon Mar 25 09:59:23 AM EDT 2024
+    - Encoding directive added to POD, contributed by gregor herrmann from
+      Debian.
+    - Corrections in test files to guard against CPANtesters who run tests
+      with PERL_AUTHOR_TESTING turned on.
+
 0.007 Sat Sep 16 07:48:17 AM EDT 2023
-    - Corrections to better accommodate Windows path separators, mostly
-      provided by Håkon Hægland.
+    - Corrections (in test files only) to better accommodate Windows path
+      separators, mostly provided by Håkon Hægland.
 
 0.006 Fri Apr 20 10:21:48 EDT 2018
     - File::Copy::Recursive 0.41 has been released to CPAN and

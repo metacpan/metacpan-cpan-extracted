@@ -9,16 +9,16 @@ class Sys::Socket::Ip_mreq_source {
   
   # Instance methods
   native method DESTROY : void ();
-
+  
   native method imr_multiaddr : Sys::Socket::In_addr ();
-
+  
   native method set_imr_multiaddr : void ($address : Sys::Socket::In_addr);
-
+  
   native method imr_interface : Sys::Socket::In_addr ();
-
+  
   native method set_imr_interface : void ($address : Sys::Socket::In_addr);
-
+  
   native method imr_sourceaddr : Sys::Socket::In_addr ();
-
+  
   native method set_imr_sourceaddr : void ($address : Sys::Socket::In_addr);
 }

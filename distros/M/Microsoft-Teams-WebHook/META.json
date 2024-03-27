@@ -67,7 +67,7 @@
    "provides" : {
       "Microsoft::Teams::WebHook" : {
          "file" : "lib/Microsoft/Teams/WebHook.pm",
-         "version" : "1.01"
+         "version" : "1.02"
       }
    },
    "release_status" : "stable",
@@ -81,7 +81,7 @@
          "web" : "https://github.com/tyrrminal/microsoft-teams-webhook.git"
       }
    },
-   "version" : "1.01",
+   "version" : "1.02",
    "x_generated_by_perl" : "v5.38.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "MIT"

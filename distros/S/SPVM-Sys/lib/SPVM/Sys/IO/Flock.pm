@@ -4,24 +4,26 @@ package SPVM::Sys::IO::Flock;
 
 =head1 Name
 
-SPVM::Sys::IO::Flock - struct flock in C language
+SPVM::Sys::IO::Flock - struct flock in the C language
+
+=head1 Description
+
+The Sys::IO::Flock class in L<SPVM> is the class for C<struct flock> in the C language.
 
 =head1 Usage
 
   use Sys::IO::Flock;
   my $flock = Sys::IO::Flock->new;
 
-=head1 Description
+=head1 Details
 
-C<Sys::IO::Flock> is the class for C<struct flock> in C<C language>.
-
-This is a L<pointer class|SPVM::Document::Language/"Pointer Class">.
+This is a pointer class. The pointer of the instance is set to a C<struct flock> object.
 
 =head1 Class Methods
 
 =head2 new
 
-  native static method new : Sys::IO::Flock ();
+C<native static method new : L<Sys::IO::Flock|SPVM::Sys::IO::Flock> ();>
 
 Create a new C<Sys::IO::Flock> object.
 
@@ -29,69 +31,69 @@ Create a new C<Sys::IO::Flock> object.
 
 =head2 DESTROY
 
-  native method DESTROY : void ();
+C<native method DESTROY : void ();>
 
 The destructor.
 
 =head2 l_type
 
-  native method l_type : int ();
+C<native method l_type : int ();>
 
-Get C<l_type>.
+Returns C<l_type>.
 
 =head2 set_l_type
 
-  native method set_l_type : void ($type : int);
+C<native method set_l_type : void ($type : int);>
 
-Set C<l_type>.
+Sets C<l_type>.
 
 =head2 l_whence
 
-  native method l_whence : int ();
+C<native method l_whence : int ();>
 
-Get C<l_whence>.
+Returns C<l_whence>.
 
 =head2 set_l_whence
 
-  native method set_l_whence : void ($whence : int);
+C<native method set_l_whence : void ($whence : int);>
 
-Set C<l_whence>.
+Sets C<l_whence>.
 
 =head2 l_start
 
-  native method l_start : long ();
+C<native method l_start : long ();>
 
-Get C<l_start>.
+Returns C<l_start>.
 
 =head2 set_l_start
 
-  native method set_l_start : void ($start : long);
+C<native method set_l_start : void ($start : long);>
 
-Set C<l_start>.
+Sets C<l_start>.
 
 =head2 l_len
 
-  native method l_len : long ();
+C<native method l_len : long ();>
 
-Get C<l_len>.
+Returns C<l_len>.
 
 =head2 set_l_len
 
-  native method set_l_len : void ($len : long);
+C<native method set_l_len : void ($len : long);>
 
-Set C<l_len>.
+Sets C<l_len>.
 
 =head2 l_pid
 
-  native method l_pid : int ();
+C<native method l_pid : int ();>
 
-Get C<l_pid>.
+Returns C<l_pid>.
 
 =head2 set_l_pid
 
-  native method set_l_pid : void ($pid : int);
+C<native method set_l_pid : void ($pid : int);>
 
-Set C<l_pid>.
+Sets C<l_pid>.
 
 =head1 Copyright & License
 

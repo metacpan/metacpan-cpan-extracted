@@ -8,7 +8,7 @@ use AsposeCellsCloud::Request::PostCompress;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**file** | **string** | Compress level. The compression ratio 1-100. |
+**file** | **string** | File to upload |
 **compress_level** | **int** | Compress level. The compression ratio 1-100. |
 **password** | **string** | The password needed to open an Excel file. |
 **check_excel_restriction** | **boolean** | Whether check restriction of excel file when user modify cells related objects. |  

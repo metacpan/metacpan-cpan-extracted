@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 use Data::Login::Role;
+use DateTime;
 use English;
 use Error::Pure::Utils qw(clean);
 use Test::More 'tests' => 7;
@@ -10,6 +11,11 @@ use Test::NoWarnings;
 # Test.
 my $obj = Data::Login::Role->new(
 	'role' => 'admin',
+	'valid_from' => DateTime->new(
+		'year' => 2024,
+		'month' => 1,
+		'day' => 1,
+	),
 );
 isa_ok($obj, 'Data::Login::Role');
 
@@ -18,6 +24,16 @@ $obj = Data::Login::Role->new(
 	'active' => 1,
 	'id' => 777,
 	'role' => 'admin',
+	'valid_from' => DateTime->new(
+		'year' => 2024,
+		'month' => 1,
+		'day' => 1,
+	),
+	'valid_from' => DateTime->new(
+		'year' => 2024,
+		'month' => 12,
+		'day' => 31,
+	),
 );
 isa_ok($obj, 'Data::Login::Role');
 
@@ -26,6 +42,11 @@ eval {
 	Data::Login::Role->new(
 		'active' => 'bad',
 		'role' => 'admin',
+		'valid_from' => DateTime->new(
+			'year' => 2024,
+			'month' => 1,
+			'day' => 1,
+		),
 	);
 };
 is($EVAL_ERROR, "Parameter 'active' must be a bool (0/1).\n",
@@ -37,6 +58,11 @@ eval {
 	Data::Login::Role->new(
 		'id' => 'bad',
 		'role' => 'admin',
+		'valid_from' => DateTime->new(
+			'year' => 2024,
+			'month' => 1,
+			'day' => 1,
+		),
 	);
 };
 is($EVAL_ERROR, "Parameter 'id' must be a number.\n",
@@ -55,6 +81,11 @@ clean();
 eval {
 	Data::Login::Role->new(
 		'role' => 'x' x 200,
+		'valid_from' => DateTime->new(
+			'year' => 2024,
+			'month' => 1,
+			'day' => 1,
+		),
 	);
 };
 is($EVAL_ERROR, "Parameter 'role' has length greater than '100'.\n",

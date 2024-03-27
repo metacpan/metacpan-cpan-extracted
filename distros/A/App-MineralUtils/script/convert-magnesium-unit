@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-26'; # DATE
+our $DATE = '2024-03-22'; # DATE
 our $DIST = 'App-MineralUtils'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/MineralUtils/convert_magnesium_unit",
@@ -39,7 +39,7 @@ convert-magnesium-unit - Convert a magnesium quantity from one unit to another
 
 =head1 VERSION
 
-This document describes version 0.010 of convert-magnesium-unit (from Perl distribution App-MineralUtils), released on 2022-11-26.
+This document describes version 0.012 of convert-magnesium-unit (from Perl distribution App-MineralUtils), released on 2024-03-22.
 
 =head1 SYNOPSIS
 
@@ -77,7 +77,7 @@ Can also be specified as the 1st command-line argument.
 
 Valid values:
 
- ["mg","mg-mg-elem","mg-mg-citrate","mg-mg-citrate-ah","mg-mg-citrate-ah-nowfoods","mg-mg-glycinate","mg-mg-bisglycinate","mg-mg-bisglycinate-nowfoods","mg-mg-ascorbate","mg-mg-pidolate","mg-mg-l-threonate","mg-mg-oxide","mg-mg-lactate-dihydrate","mg-mg-chloride-ah","mg-mg-chloride-hexahydrate"]
+ ["mg","mg-mg-elem","mg-mg-citrate","mg-mg-citrate-ah","mg-mg-citrate-ah-nowfoods","mg-mg-glycinate","mg-mg-bisglycinate","mg-mg-bisglycinate-nowfoods","mg-mg-ascorbate","mg-mg-pidolate","mg-mg-l-threonate","mg-mg-oxide","mg-mg-lactate-dihydrate","mg-mg-chloride-ah","mg-mg-chloride-hexahydrate","mg-mg-malate","mg-mg-malate-trihydrate"]
 
 Can also be specified as the 2nd command-line argument.
 
@@ -215,6 +215,8 @@ For fish and zsh, install L<shcompgen> as described above.
  |  9.804 | mg-mg-lactate-dihydrate     | Magnesium lactate dihydrate (C6H14MgO8), in milligrams                                                                |
  |  3.922 | mg-mg-chloride-ah           | Magnesium chloride (anhydrous, MgCl2), in milligrams                                                                  |
  |  8.333 | mg-mg-chloride-hexahydrate  | Magnesium chloride (hexahydrate, H12Cl2MgO6), in milligrams                                                           |
+ |  6.452 | mg-mg-malate                | Magnesium malate (C4H4MgO5), in milligrams                                                                            |
+ |  8.621 | mg-mg-malate-trihydrate     | Magnesium malate (MgC4H4O5.3H2O), in milligrams                                                                       |
  +--------+-----------------------------+-----------------------------------------------------------------------------------------------------------------------+
 
 =head2 Find out how many milligrams of elemental magnesium is in 1000mg of pure magnesium l-threonate (but note that a supplement product might not contain 100%-pure compound)
@@ -252,6 +254,8 @@ For fish and zsh, install L<shcompgen> as described above.
  | 3431.373 | mg-mg-lactate-dihydrate     | Magnesium lactate dihydrate (C6H14MgO8), in milligrams                                                                |
  | 1372.549 | mg-mg-chloride-ah           | Magnesium chloride (anhydrous, MgCl2), in milligrams                                                                  |
  | 2916.667 | mg-mg-chloride-hexahydrate  | Magnesium chloride (hexahydrate, H12Cl2MgO6), in milligrams                                                           |
+ | 2258.065 | mg-mg-malate                | Magnesium malate (C4H4MgO5), in milligrams                                                                            |
+ | 3017.241 | mg-mg-malate-trihydrate     | Magnesium malate (MgC4H4O5.3H2O), in milligrams                                                                       |
  +----------+-----------------------------+-----------------------------------------------------------------------------------------------------------------------+
 
 =head2 How much elemental magnesium is in 1000mg (1g) of magnesium chloride powder in capsule form? The chloride is in the common hexahydrate form
@@ -291,7 +295,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2022, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

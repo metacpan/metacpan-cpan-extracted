@@ -19,6 +19,7 @@
 
 typedef int   int2D;    /* So 2D arrays are handled automagically */
 typedef float float2D;  /* by typemap */
+typedef float *float_packed;
 
 /* Buffers for routines that return strings  */
 
@@ -1414,6 +1415,70 @@ pgwnad(x1,x2,y1,y2)
   float	y2
   CODE:
     cpgwnad(x1,x2,y1,y2);
+
+
+void
+pggapline(n,msgval,xpts,ypts)
+  int	n
+  float msgval
+  float_packed	xpts
+  float_packed	ypts
+  CODE:
+    { int i;
+      int start = 0;
+      while (xpts[start] == msgval) start++;  /* make sure we have a good starting point */
+      cpgmove(xpts[start], ypts[start]);
+      for (i=start+1;i<n;i++) {
+        if (ypts[i] == msgval) {
+           /* check we are not at end of array and we don't move to a missing value */
+           if (i != n-1 && ypts[i+1] != msgval) {
+             cpgmove(xpts[i+1], ypts[i+1]);
+           }
+        }
+        else {
+          cpgdraw(xpts[i], ypts[i]);
+        }
+      }
+    }
+
+
+void
+pgcolorpnts(n,x,y,z,sym)
+  int	n
+  float_packed	x
+  float_packed	y
+  float_packed	z
+  int   sym
+  CODE:
+    {
+      /* find range of color pallette */
+      int icilo, icihi, i, cirange, ci;
+      float minz, maxz, zrange;
+
+      cpgqcir(&icilo, &icihi);
+
+      /* find min and max values of zpts variable */
+      minz =  9.99e30;
+      maxz = -9.99e30;
+      for (i=0;i<n;i++) {
+	if (z[i] < minz) minz = z[i];
+	if (z[i] > maxz) maxz = z[i];
+      }
+
+      /* determine range of available z indices and range of input 'z' values */
+      cirange = icihi - icilo;
+      zrange  = maxz  - minz;
+
+      /* printf ("cilo = %d, cihi = %d\n", icilo, icihi); */
+
+      /* for each input point, compute a scaled color index and plot the point */
+      for (i=0;i<n;i++) {
+	ci = (int)(icilo + (z[i] - minz) * (float)(cirange/zrange));
+	/* printf ("x = %f, y = %f, ci = %d\n", x[i], y[i], ci); */
+	cpgsci(ci);
+	cpgpt1(x[i], y[i], sym);
+      }
+    }
 
 BOOT:
    /* New struct stuff */

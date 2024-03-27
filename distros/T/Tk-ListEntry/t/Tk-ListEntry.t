@@ -14,7 +14,8 @@ createapp(
 my $le;
 if (defined $app) {
 	$le = $app->ListEntry(
-		-values => [qw/Red Green Blue Cyan Magenta Yellow Black White Pink Purple Brown Beige Orange/]
+		-command => sub { my $v = shift; print "selected: $v\n" },
+		-values => [qw/Red Green Blue Cyan Magenta Yellow Black White Pink Purple Brown Beige Orange/],
 	)->pack(-fill => 'x');
 }
 @tests = (
@@ -33,5 +34,6 @@ if (defined $app) {
 );
 
 starttesting
+
 
 

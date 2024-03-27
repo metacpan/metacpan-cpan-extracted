@@ -3,18 +3,29 @@ class TestCase::Sys::Signal {
   use Sys::Signal::Constant as SIGNAL;
   use Sys::Process;
   use Sys;
+  use Sys::Signal::Handler;
   
   static method kill : int () {
     
-    my $status = Sys::Signal->kill(0, 0);
+    {
+      my $process_id = Sys->process_id;
+      
+      my $status = Sys::Signal->kill($process_id, 0);
+      
+      unless ($status == 0) {
+        return 0;
+      }
+    }
     
-    unless ($status == 0) {
-      return 0;
+    {
+      my $process_id = Sys->process_id;
+      
+      Sys->kill(0, $process_id);
     }
     
     return 1;
   }
-
+  
   static method raise : int () {
     
     my $status = Sys::Signal->raise(0);
@@ -29,19 +40,18 @@ class TestCase::Sys::Signal {
   
   static method alarm : int () {
     
-    Sys::Signal->reset_monitored_signal(SIGNAL->SIGALRM);
-    
-    Sys::Signal->signal(SIGNAL->SIGALRM, Sys::Signal->SIG_MONITOR);
-    
-    my $rest = Sys::Signal->alarm(1);
-    
-    unless ($rest == 0) {
-      return 0;
+    # TODO
+    {
+      my $rest_time = Sys::Signal->alarm(1000);
+      unless ($rest_time == 0) {
+        return 0;
+      }
     }
     
-    while (1) {
-      if (Sys::Signal->check_monitored_signal(SIGNAL->SIGALRM)) {
-        last;
+    {
+      my $rest_time = Sys->alarm(1000);
+      unless ($rest_time == 0) {
+        return 0;
       }
     }
     
@@ -49,64 +59,12 @@ class TestCase::Sys::Signal {
   }
   
   static method ualarm : int () {
-
-    Sys::Signal->reset_monitored_signal(SIGNAL->SIGALRM);
-
-    Sys::Signal->signal(SIGNAL->SIGALRM, Sys::Signal->SIG_MONITOR);
     
-    my $rest = Sys::Signal->ualarm(999_999, 0);
-    
-    unless ($rest == 0) {
-      return 0;
-    }
-    
-    my $try_count = 0;
-    while (1) {
-      if (Sys::Signal->check_monitored_signal(SIGNAL->SIGALRM)) {
-        last;
-      }
-      $try_count++;
-    }
-    
-    return 1;
-  }
-
-  static method signal_handler : int () {
-    unless (Sys::Signal->SIG_DFL == Sys::Signal->SIG_DFL) {
-      return 0;
-    }
-    
-    unless (Sys::Signal->SIG_IGN == Sys::Signal->SIG_IGN) {
-      return 0;
-    }
-    
-    unless (Sys::Signal->SIG_MONITOR == Sys::Signal->SIG_MONITOR) {
-      return 0;
-    }
-    
-    return 1;
-  }
-
-  static method signal_return : int () {
-    # Return value
+    # TODO
     {
-      {
-        Sys::Signal->signal(SIGNAL->SIGINT, Sys::Signal->SIG_DFL);
-      }
-      
-      {
-        my $old_handler = Sys::Signal->signal(SIGNAL->SIGINT, Sys::Signal->SIG_IGN);
-        
-        unless ($old_handler == Sys::Signal->SIG_DFL) {
-          return 0;
-        }
-      }
-      {
-        my $old_handler = Sys::Signal->signal(SIGNAL->SIGINT, Sys::Signal->SIG_MONITOR);
-        
-        unless ($old_handler == Sys::Signal->SIG_IGN) {
-          return 0;
-        }
+      my $rest_time = Sys::Signal->ualarm(100000, 0);
+      unless ($rest_time == 0) {
+        return 0;
       }
     }
     
@@ -114,28 +72,82 @@ class TestCase::Sys::Signal {
   }
   
   static method signal : int () {
-    # signal
+    
     {
-      {
-        unless (Sys::Signal->check_monitored_signal(SIGNAL->SIGTERM) == 0) {
-          return 0;
-        }
-        
-        Sys::Signal->signal(SIGNAL->SIGTERM, Sys::Signal->SIG_MONITOR);
-        
-        Sys::Signal->raise(SIGNAL->SIGTERM);
-        
-        while (1) {
-          if (Sys::Signal->check_monitored_signal(SIGNAL->SIGTERM)) {
-            last;
-          }
-        }
-        
-        Sys::Signal->reset_monitored_signal(SIGNAL->SIGTERM);
-        
-        unless (Sys::Signal->check_monitored_signal(SIGNAL->SIGTERM) == 0) {
-          return 0;
-        }
+      Sys::Signal->signal(SIGNAL->SIGTERM, Sys::Signal->SIG_DFL);
+      
+      my $old_signal_handler = Sys::Signal->signal(SIGNAL->SIGTERM, Sys::Signal->SIG_IGN);
+      
+      unless (Sys::Signal::Handler->eq($old_signal_handler, Sys::Signal->SIG_DFL)) {
+        return 0;
+      }
+      
+      if (Sys::Signal::Handler->eq($old_signal_handler, Sys::Signal->SIG_IGN)) {
+        return 0;
+      }
+    }
+    
+    {
+      Sys->signal(SIGNAL->SIGTERM, "DEFAULT");
+      
+      Sys->signal(SIGNAL->SIGTERM, "IGNORE");
+    }
+    
+    return 1;
+  }
+  
+  static method signal_go : int ($tmp_dir : string) {
+    
+    my $signal_output_file = "$tmp_dir/signal_output.txt";
+    
+    {
+      Sys::Signal->signal(SIGNAL->SIGTERM, Sys::Signal->SIG_DFL);
+      
+      my $stream_ref = [(Sys::IO::FileStream)undef];
+      Sys->open($stream_ref, ">", $signal_output_file);
+      
+      Fn->defer([$stream_ref : Sys::IO::FileStream[]] method : void () {
+        Sys->close($stream_ref->[0]);
+      });
+      
+      my $fd = Sys->fileno($stream_ref->[0]);
+      
+      Sys::Signal->SET_SIG_GO_WRITE_FD($fd);
+      
+      my $old_signal_handler = Sys::Signal->signal(SIGNAL->SIGTERM, Sys::Signal->SIG_GO);
+      
+      unless (Sys::Signal::Handler->eq($old_signal_handler, Sys::Signal->SIG_DFL)) {
+        return 0;
+      }
+      
+      $old_signal_handler = Sys::Signal->signal(SIGNAL->SIGTERM, Sys::Signal->SIG_GO);
+      
+      unless (Sys::Signal::Handler->eq($old_signal_handler, Sys::Signal->SIG_GO)) {
+        return 0;
+      }
+      
+      unless (Sys::OS->is_windows) {
+        Sys->kill(SIGNAL->SIGTERM, Sys->process_id);
+      }
+    }
+    
+    unless (Sys::OS->is_windows) {
+      my $stream_ref = [(Sys::IO::FileStream)undef];
+      Sys->open($stream_ref, "<", $signal_output_file);
+      
+      Fn->defer([$stream_ref : Sys::IO::FileStream[]] method : void () {
+        Sys->close($stream_ref->[0]);
+      });
+      
+      my $buffer = (mutable string)new_string_len 4;
+      Sys->read($stream_ref->[0], $buffer, 4);
+      
+      my $numbers = new int [1];
+      
+      Fn->memcpy($numbers, 0, $buffer, 0, 4);
+      
+      unless ($numbers->[0] == SIGNAL->SIGTERM) {
+        return 0;
       }
     }
     

@@ -15,6 +15,7 @@ package PDL::Graphics::Simple::PGPLOT;
 
 use File::Temp qw/tempfile/;
 use PDL::Options q/iparse/;
+use IPC::Open2;
 
 use PDL;
 
@@ -23,7 +24,7 @@ our $mod = {
     module=>'PDL::Graphics::Simple::PGPLOT',
     engine => 'PDL::Graphics::PGPLOT::Window',
     synopsis=> 'PGPLOT (venerable but trusted)',
-    pgs_version=> '1.009',
+    pgs_version=> '1.010',
 };
 eval { require PDL::Graphics::PGPLOT::Window; 1; } and
   PDL::Graphics::Simple::register( 'PDL::Graphics::Simple::PGPLOT' );
@@ -36,31 +37,26 @@ print $@;
 sub check {
     my $force = shift;
     $force = 0 unless(defined($force));
-
     return $mod->{ok} unless( $force or !defined($mod->{ok}) );
-    
     eval 'use PDL::Graphics::PGPLOT::Window;';
-    if($@) {
+    if ($@) {
 	$mod->{ok} = 0;
 	$mod->{msg} = $@;
 	return 0;
     }
-    
     # Module loaded OK, now try to extract valid devices from it
-    my ($fh,$tf) = tempfile('pgg_pgplot_XXXX');
-    close $fh;
-
-    my $cmd = qq{|perl -e "use PGPLOT; open STDOUT,q[>$tf] or die; open STDERR,STDOUT or die; pgopen(q[?])"};
-    open FOO,$cmd;
-    print FOO "?\n";
-    close FOO;
-    open FOO,"<$tf";
-    my @lines = grep /^\s+\//, (<FOO>) ;
-    close FOO;
-    unlink $tf;
-    
+    my @lines = eval {
+      open2(my $chld_out, my $chld_in, $^X, qw(-MPGPLOT -e pgopen(q[?])));
+      print $chld_in "?\n";
+      close $chld_in;
+      grep /^\s+\//, <$chld_out>;
+    };
+    if ($@) {
+	$mod->{ok} = 0;
+	$mod->{msg} = $@;
+	return 0;
+    }
     $mod->{devices} = { map { chomp; s/^\s*\///; s/\s.*//; ($_,1) } @lines };
-
     delete $mod->{disp_dev};
     TRY:for my $try(qw/XWINDOW XSERVE CGW GW/){
 	if($mod->{devices}->{$try}) { 
@@ -73,13 +69,11 @@ sub check {
 	$mod->{msg} = "Couldn't identify a PGPLOT display device -- giving up.\n";
 	return 0;
     }
-
     unless( $mod->{devices}->{'VCPS'} ) {
 	$mod->{ok} = 0;
 	$mod->{msg} = "Couldn't find the VCPS file-output device -- giving up.\n";
 	return 0;
     }
-
     $mod->{ok} = 1;
     return 1;
 }

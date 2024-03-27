@@ -40,7 +40,7 @@ my %WriteMakefileArgs = (
     "Spreadsheet::ParseExcel::Utility" => 0,
     "Test::More" => "0.88"
   },
-  "VERSION" => "0.34",
+  "VERSION" => "0.35",
   "test" => {
     "TESTS" => "t/*.t"
   }

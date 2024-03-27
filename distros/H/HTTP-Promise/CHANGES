@@ -1,5 +1,9 @@
 Revision history for Perl module HTTP::Promise
 
+v0.5.1 2024-03-27T16:53:48+0900
+    - Minor correction of undefined variable in HTTP::Promise
+    - Correcting minor bug in _read_body() in HTTP::Promise
+
 v0.5.0 2024-02-12T21:30:05+0900
     - Added method prepare() in HTTP::Promise
     - Added method host() in HTTP::Promise::Request

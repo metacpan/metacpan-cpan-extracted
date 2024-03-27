@@ -1,4 +1,4 @@
 # Copyright (c) 2023 Yuki Kimoto
 # MIT License
 
-class Sys::Socket::Error::InetInvalidNetworkAddress;
+class Sys::Socket::Error::InetInvalidNetworkAddress extends Error;

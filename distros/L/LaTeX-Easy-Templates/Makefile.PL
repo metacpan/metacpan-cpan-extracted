@@ -46,6 +46,7 @@ my %WriteMakefileArgs = (
 	'File::Spec' => '0',
 	'File::Temp' => '0',
 	'File::Path' => '0',
+	'File::Which' => '0',
 	'Data::Roundtrip' => '0.18',
 	'Cwd' => '0',
 	'File::Copy::Recursive' => '0',
@@ -55,6 +56,9 @@ my %WriteMakefileArgs = (
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'LaTeX-Easy-Templates-*' },
+    postamble => {
+        AUTHOR_TEST_FILES => 'xt/*.t',
+    },
     # see https://perlmonks.org/?displaytype=displaycode;node_id=359256;part=1;abspart=1
     META_MERGE => {
           'meta-spec' => { version => 2 },
@@ -94,3 +98,16 @@ delete $WriteMakefileArgs{LICENSE}
     unless eval { ExtUtils::MakeMaker->VERSION('6.31'); 1 };
 
 WriteMakefile(%WriteMakefileArgs);
+
+sub MY::postamble {
+    my (undef,%h) = @_;
+    # require Data::Dumper; print STDERR Data::Dumper->Dump([\%h], [qw(mm_args{postamble})]);
+    return "AUTHOR_TEST_FILES=$h{AUTHOR_TEST_FILES}\n"
+	. <<'POSTAMBLE';
+TEST_D = $(ABSPERLRUN) -MExtUtils::Command -e test_d --
+
+authortest :: $(AUTHOR_TEST_FILES)
+	prove --blib $(INST_LIB) --blib $(INST_ARCHLIB) --verbose $^
+POSTAMBLE
+}
+

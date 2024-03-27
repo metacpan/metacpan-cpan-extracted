@@ -10,7 +10,7 @@ App::Greple::xlate - Übersetzungsunterstützungsmodul für Greple
 
 # VERSION
 
-Version 0.31
+Version 0.3101
 
 # DESCRIPTION
 
@@ -39,6 +39,16 @@ Standardmäßig werden der ursprüngliche und der übersetzte Text im Format "co
 </div>
 
 Wenn Sie den gesamten Text übersetzen wollen, verwenden Sie die Option **--match-all**. Dies ist eine Abkürzung zur Angabe des Musters `(?s).+`, das auf den gesamten Text passt.
+
+Daten im Konfliktmarkierungsformat können mit dem Befehl `sdif` mit der Option `-V` nebeneinander angezeigt werden. Da es keinen Sinn macht, die Daten pro Zeichenfolge zu vergleichen, wird die Option `--no-cdif` empfohlen. Wenn Sie den Text nicht einfärben wollen, geben Sie `--no-color` oder `--cm 'TEXT*='` an.
+
+    sdif -V --cm '*TEXT=' --no-cdif data_shishin.deepl-EN-US.cm
+
+<div>
+    <p>
+    <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/sdif-cm-view.png">
+    </p>
+</div>
 
 # OPTIONS
 

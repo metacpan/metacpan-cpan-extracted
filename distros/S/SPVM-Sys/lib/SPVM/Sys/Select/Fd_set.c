@@ -21,15 +21,13 @@
 static const char* FILE_NAME = "Sys/Select/Fd_set.c";
 
 int32_t SPVM__Sys__Select__Fd_set__new(SPVM_ENV* env, SPVM_VALUE* stack) {
-  (void)env;
-  (void)stack;
-
-  int32_t e;
-
-  fd_set* type_fd_set = env->new_memory_stack(env, stack, sizeof(fd_set));
   
-  void* obj_fd_set = env->new_pointer_object_by_name(env, stack, "Sys::Select::Fd_set", type_fd_set, &e, __func__, FILE_NAME, __LINE__);
-  if (e) { return e; }
+  int32_t error_id = 0;
+  
+  fd_set* type_fd_set = env->new_memory_block(env, stack, sizeof(fd_set));
+  
+  void* obj_fd_set = env->new_pointer_object_by_name(env, stack, "Sys::Select::Fd_set", type_fd_set, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
   
   stack[0].oval = obj_fd_set;
   
@@ -37,8 +35,6 @@ int32_t SPVM__Sys__Select__Fd_set__new(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Sys__Select__Fd_set__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
-  (void)env;
-  (void)stack;
   
   // File handle
   void* obj_fd_set = stack[0].oval;
@@ -47,28 +43,27 @@ int32_t SPVM__Sys__Select__Fd_set__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   assert(type_fd_set);
   
-  env->free_memory_stack(env, stack, type_fd_set);
+  env->free_memory_block(env, stack, type_fd_set);
   env->set_pointer(env, stack, obj_fd_set, NULL);
   
   return 0;
 }
 
-int32_t SPVM__Sys__Select__Fd_set__set(SPVM_ENV* env, SPVM_VALUE* stack) {
-  (void)env;
-  (void)stack;
+int32_t SPVM__Sys__Select__Fd_set__clone(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
   
   void* obj_fd_set = stack[0].oval;
   fd_set* type_fd_set = env->get_pointer(env, stack, obj_fd_set);
   
-  void* obj_fd_set_arg = stack[1].oval;
-  if (!obj_fd_set_arg) {
-    return env->die(env, stack, "The $set must be defined", __func__, FILE_NAME, __LINE__);
-  }
-  fd_set* type_fd_set_arg = env->get_pointer(env, stack, obj_fd_set_arg);
+  fd_set* type_fd_set_clone = env->new_memory_block(env, stack, sizeof(fd_set));
   
-  assert(type_fd_set);
+  void* obj_fd_set_clone = env->new_pointer_object_by_name(env, stack, "Sys::Select::Fd_set", type_fd_set_clone, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
   
-  memcpy(type_fd_set, type_fd_set_arg, sizeof(fd_set));
+  memcpy(type_fd_set_clone, type_fd_set, sizeof(fd_set));
+  
+  stack[0].oval = obj_fd_set_clone;
   
   return 0;
 }

@@ -1,0 +1,109 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class Sys::Socket::Util {
+  use Sys::Socket;
+  use Sys::Socket::Constant as SOCKET;
+  use Sys::Socket::In_addr;
+  use Sys::Socket::In6_addr;
+  use Sys::Socket::Sockaddr;
+  use Sys::Socket::Sockaddr::In;
+  use Sys::Socket::Sockaddr::In6;
+  use Sys::Socket::Sockaddr::Storage;
+  use Sys::Socket::Sockaddr::Un;
+  
+  static method inet_aton : Sys::Socket::In_addr ($address : string) {
+    
+    my $in_addr = Sys::Socket::In_addr->new;
+    
+    Sys::Socket->inet_aton($address, $in_addr);
+    
+    return $in_addr;
+  }
+  
+  static method inet_ntoa : string ($in_addr : Sys::Socket::In_addr) {
+    
+    my $address = Sys::Socket->inet_ntoa($in_addr);
+    
+    return $address;
+  }
+  
+  static method inet_pton : Sys::Socket::In_addr_base ($family : int, $address : string) {
+    
+    my $in_addr = (Sys::Socket::In_addr_base)undef;
+    
+    if ($family == SOCKET->AF_INET) {
+      $in_addr = Sys::Socket::In_addr->new;
+    }
+    elsif ($family == SOCKET->AF_INET6) {
+      $in_addr = Sys::Socket::In6_addr->new;
+    }
+    else {
+      die "The address family $family is not available.";
+    }
+    
+    Sys::Socket->inet_pton($family, $address, $in_addr);
+    
+    return $in_addr;
+  }
+  
+  static method inet_ntop : string ($family : int, $in_addr : Sys::Socket::In_addr_base) {
+    
+    my $address = (mutable string)new_string_len SOCKET->INET6_ADDRSTRLEN;
+    
+    Sys::Socket->inet_ntop($family, $in_addr, $address, SOCKET->INET6_ADDRSTRLEN);
+    
+    Fn->shorten_null_char($address);
+    
+    return $address;
+  }
+  
+  static method sockaddr_in : Sys::Socket::Sockaddr::In ($port : int, $in_addr : Sys::Socket::In_addr) {
+    
+    unless ($in_addr) {
+      die "\$in_addr must be defined.";
+    }
+    
+    my $sockaddr_in = Sys::Socket::Sockaddr::In->new;
+    
+    $sockaddr_in->set_sin_family(SOCKET->AF_INET);
+    
+    $sockaddr_in->set_sin_addr($in_addr);
+    
+    my $port_network_byte_order = Sys::Socket->htons((short)$port);
+    $sockaddr_in->set_sin_port($port_network_byte_order);
+    
+    return $sockaddr_in;
+  }
+  
+  static method sockaddr_in6 : Sys::Socket::Sockaddr::In6 ($port : int, $in6_addr : Sys::Socket::In6_addr) {
+    
+    unless ($in6_addr) {
+      die "\$in6_addr must be defined.";
+    }
+    
+    my $sockaddr_in6 = Sys::Socket::Sockaddr::In6->new;
+    
+    $sockaddr_in6->set_sin6_family(SOCKET->AF_INET6);
+    
+    $sockaddr_in6->set_sin6_addr($in6_addr);
+    
+    my $port_network_byte_order = Sys::Socket->htons((short)$port);
+    $sockaddr_in6->set_sin6_port($port_network_byte_order);
+    
+    return $sockaddr_in6;
+  }
+  
+  static method sockaddr_un : Sys::Socket::Sockaddr::Un ($path : string) {
+    
+    unless ($path) {
+      die "\$path must be defined.";
+    }
+    
+    my $sockaddr_un = Sys::Socket::Sockaddr::Un->new;
+    $sockaddr_un->set_sun_family(SOCKET->AF_UNIX);
+    $sockaddr_un->set_sun_path($path);
+    
+    return $sockaddr_un;
+  }
+}

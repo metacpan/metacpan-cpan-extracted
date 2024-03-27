@@ -46,30 +46,48 @@ BEGIN
     SKIP:
     {
         eval{ require DBD::SQLite; };
-        skip( "SQLite or DBD::SQLite is not installed.", 4 ) if( $@ );
-        use_ok( 'DB::Object::SQLite' );
-        use_ok( 'DB::Object::SQLite::Query' );
-        use_ok( 'DB::Object::SQLite::Statement' );
-        use_ok( 'DB::Object::SQLite::Tables' );
+        if( $@ )
+        {
+            skip( "SQLite or DBD::SQLite is not installed.", 4 );
+        }
+        else
+        {
+            use_ok( 'DB::Object::SQLite' );
+            use_ok( 'DB::Object::SQLite::Query' );
+            use_ok( 'DB::Object::SQLite::Statement' );
+            use_ok( 'DB::Object::SQLite::Tables' );
+        }
     };
     SKIP:
     {
         eval{ require DBD::Pg; };
-        skip( "PostgresSQL or DBD::Pg is not installed.", 5 ) if( $@ );
-        use_ok( 'DB::Object::Postgres' );
-        use_ok( 'DB::Object::Postgres::Lo' );
-        use_ok( 'DB::Object::Postgres::Query' );
-        use_ok( 'DB::Object::Postgres::Statement' );
-        use_ok( 'DB::Object::Postgres::Tables' );
+        if( $@ )
+        {
+            skip( "PostgresSQL or DBD::Pg is not installed.", 5 );
+        }
+        else
+        {
+            use_ok( 'DB::Object::Postgres' );
+            use_ok( 'DB::Object::Postgres::Lo' );
+            use_ok( 'DB::Object::Postgres::Query' );
+            use_ok( 'DB::Object::Postgres::Statement' );
+            use_ok( 'DB::Object::Postgres::Tables' );
+        }
     };
     SKIP:
     {
         eval{ require DBD::mysql; };
-        skip( "MySQL or DBD::mysql is not installed.", 4 ) if( $@ );
-        use_ok( 'DB::Object::Mysql' );
-        use_ok( 'DB::Object::Mysql::Query' );
-        use_ok( 'DB::Object::Mysql::Statement' );
-        use_ok( 'DB::Object::Mysql::Tables' );
+        if( $@ )
+        {
+            skip( "MySQL or DBD::mysql is not installed.", 4 );
+        }
+        else
+        {
+            use_ok( 'DB::Object::Mysql' );
+            use_ok( 'DB::Object::Mysql::Query' );
+            use_ok( 'DB::Object::Mysql::Statement' );
+            use_ok( 'DB::Object::Mysql::Tables' );
+        }
     }
 };
 

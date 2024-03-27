@@ -1,6 +1,6 @@
 use utf8;
 package Date::Holidays::CW;
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 use strict;
 use warnings;
 
@@ -289,7 +289,7 @@ Date::Holidays::CW - Curaçao's official holidays
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -301,7 +301,7 @@ version 0.002
 
 =head1 DESCRIPTION
 
-A L<Date::Holidays> family member from Bonaire
+A L<Date::Holidays> family member from Curaçao
 
 =head1 METHODS
 
@@ -346,7 +346,7 @@ Wesley Schwengle <waterkip@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Wesley Schwengle.
+This software is Copyright (c) 2024 by Wesley Schwengle.
 
 This is free software, licensed under:
 

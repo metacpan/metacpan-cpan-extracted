@@ -21,7 +21,6 @@ along with Octave; see the file COPYING.  If not, see
 
 */
 
-#include <limits.h>
 #include <stdio.h>
 #include <time.h>
 #include <glpk.h>
@@ -47,6 +46,9 @@ glpk (int sense, int n, int m, double *c, int nz, int *rn, int *cn,
   clock_t t_start = clock ();
 
   glp_prob *lp = glp_create_prob ();
+  char prob_name[32];
+  snprintf(prob_name, 32, "#%d", seq + 1);
+  glp_set_prob_name(lp, prob_name);
 
   //-- Set the sense of optimization
   glp_set_obj_dir (lp, sense);
@@ -104,8 +106,8 @@ glpk (int sense, int n, int m, double *c, int nz, int *rn, int *cn,
 
   if (par->save_pb)
     {
-	  char buf[PATH_MAX];
-	  snprintf(buf, PATH_MAX, par->save_fn, seq);
+	  char buf[FILENAME_MAX];
+	  snprintf(buf, FILENAME_MAX, par->save_fn, seq);
       if (glp_write_lp (lp, NULL, buf) != 0)
         {
           glpk_warn("__glpk__: unable to write problem");

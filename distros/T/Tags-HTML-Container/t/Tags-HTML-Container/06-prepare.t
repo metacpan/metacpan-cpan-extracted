@@ -8,7 +8,7 @@ use Test::NoWarnings;
 # Test.
 my $obj = Tags::HTML::Container->new;
 my $ret = $obj->prepare;
-is($ret, undef, 'Run of prepare (without cleanup).');
+is($ret, undef, 'Run of prepare (without callback).');
 
 # Test.
 $obj = Tags::HTML::Container->new;

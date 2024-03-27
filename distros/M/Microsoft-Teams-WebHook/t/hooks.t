@@ -436,7 +436,7 @@ check_posted_values(
               inlines => [
                 {
                   type   => 'TextRun',
-                  text   => 'run time: 3 seconds',
+                  text   => qr/run time: \d+ seconds/,
                   italic => 1
                 }
               ]
@@ -462,7 +462,7 @@ sub check_posted_values($expect, $msg = 'check_posted_values') {
 
   my $content = eval {JSON::XS->new->utf8(0)->decode($posted->[1]->{content})};
   diag 'Error: ', $@ if $@;
-  is($content, $expect, $msg) or diag explain $content, explain $posted->[1]->{content};
+  like($content, $expect, $msg) or diag explain $content, explain $posted->[1]->{content};
 
   $posted = undef;
 }

@@ -1,11 +1,15 @@
   use strict;
   use warnings;
   package Alien::SeqAlignment::last;
-$Alien::SeqAlignment::last::VERSION = '0.01';
+$Alien::SeqAlignment::last::VERSION = '0.02';
 use parent qw( Alien::Base );
 =head1 NAME
 
 Alien::SeqAlignment::edlib - find, build and install the last tools
+
+=head1 VERSION
+
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -17,7 +21,7 @@ To execute the last set of tools, you can use the following code:
 
 Now you can run the last tools as:
 
- system Alien::SeqAlignment::last->exe (options);    
+ system Alien::SeqAlignment::last->lastal (options);    
  system Alien::SeqAlignment::last->lastdb (options); 
  system Alien::SeqAlignment::last->maf_convert (options); 
  system Alien::SeqAlignment::last->train (options); 
@@ -41,9 +45,9 @@ re-attempt installation of this Alien.
 
 =head1 METHODS
 
-=head2 exe
+=head2 lastal
 
- Alien::SeqAlignment::last->exe
+ Alien::SeqAlignment::last->lastal
 
 Returns the command name for running the CLI version of the last aligner.
 The latter finds local alignments between query sequences, and
@@ -51,9 +55,9 @@ reference sequences that have been collected into a database using lastdb.
 
 =cut
 
-sub exe {
+sub lastal {
     my ($class) = @_;
-  $class->runtime_prop->{command}->{exe} ;
+  $class->runtime_prop->{command}->{lastal} ;
 }
 
 =head2 dbbuild
@@ -194,6 +198,11 @@ the static and the dynamic edlib library in your code.
 
 Detailed manual for users of Alien classes.
 
+=item * L<Bio::SeqAlignment|https://metacpan.org/pod/Bio::SeqAlignment>
+
+A collection of tools and libraries for aligning biological sequences 
+from within Perl. 
+
 =back
 
 =head1 AUTHOR
@@ -210,4 +219,3 @@ the same terms as the Perl 5 programming language system itself.
 =cut
 
 1;
-

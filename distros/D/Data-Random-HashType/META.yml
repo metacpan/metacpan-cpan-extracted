@@ -6,6 +6,7 @@ build_requires:
   English: 0
   Error::Pure::Utils: 0
   ExtUtils::MakeMaker: 6.59
+  Test::MockObject: 0
   Test::More: 0
   Test::NoWarnings: 0
 configure_requires:
@@ -26,8 +27,10 @@ no_index:
     - xt
 requires:
   Class::Utils: 0
-  Data::HashType: 0
+  Data::HashType: 0.05
+  DateTime: 0
   Mo::utils: 0.25
+  Random::Day::InThePast: 0
   Readonly: 0
   perl: 5.8.0
 resources:
@@ -35,4 +38,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Data-Random-HashType
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Data-Random-HashType
-version: '0.02'
+version: '0.05'

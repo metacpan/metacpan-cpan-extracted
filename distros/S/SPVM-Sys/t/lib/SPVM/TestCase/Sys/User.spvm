@@ -1,5 +1,6 @@
 class TestCase::Sys::User {
   use Sys::User;
+  use Array;
   
   static method getuid_value : int () {
     
@@ -7,28 +8,28 @@ class TestCase::Sys::User {
     
     return $getuid;
   }
-
+  
   static method geteuid_value : int () {
     
     my $geteuid = Sys::User->geteuid;
     
     return $geteuid;
   }
-
+  
   static method getgid_value : int () {
     
     my $getgid = Sys::User->getgid;
     
     return $getgid;
   }
-
+  
   static method getegid_value : int () {
     
     my $getegid = Sys::User->getegid;
     
     return $getegid;
   }
-
+  
   static method setuid : int () {
     
     my $error_code = Sys::User->setuid(Sys::User->getuid);
@@ -39,7 +40,7 @@ class TestCase::Sys::User {
     
     return 1;
   }
-
+  
   static method seteuid : int () {
     
     my $error_code = Sys::User->seteuid(Sys::User->geteuid);
@@ -50,7 +51,7 @@ class TestCase::Sys::User {
     
     return 1;
   }
-
+  
   static method setgid : int () {
     
     my $error_code = Sys::User->setgid(Sys::User->getgid);
@@ -61,7 +62,7 @@ class TestCase::Sys::User {
     
     return 1;
   }
-
+  
   static method setegid : int () {
     
     my $error_code = Sys::User->setegid(Sys::User->getegid);
@@ -72,14 +73,14 @@ class TestCase::Sys::User {
     
     return 1;
   }
-
+  
   static method setpwent : int () {
     
     Sys::User->setpwent;
     
     return 1;
   }
-
+  
   static method endpwent : int () {
     
     Sys::User->endpwent;
@@ -101,17 +102,33 @@ class TestCase::Sys::User {
     return 1;
   }
   
-  static method getgroups_value : int[] () {
+  static method getgroups : int ($expected_groups : int[]) {
     
-    my $groups = Sys::User->getgroups;
+    my $groups_length = Sys::User->getgroups(0, undef);
     
-    return $groups;
+    my $groups = new int [$groups_length];
+    
+    Sys::User->getgroups($groups_length, $groups);
+    
+    warn "[Test Output]Sys::User|getgroups|" . dump $groups;
+    
+    unless (Array->equals_int($groups, $expected_groups)) {
+      return 0;
+    }
+    
+    return 1;
   }
 
   static method setgroups : int () {
     
     # TODO
-    Sys::User->setgroups(Sys::User->getgroups);
+    my $groups_length = Sys::User->getgroups(0, undef);
+    
+    my $groups = new int [$groups_length];
+    
+    Sys::User->getgroups($groups_length, $groups);
+    
+    Sys::User->setgroups($groups);
     
     return 1;
   }

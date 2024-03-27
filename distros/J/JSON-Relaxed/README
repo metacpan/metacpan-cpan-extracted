@@ -3,6 +3,20 @@ NAME
     JSON::Relaxed -- An extension of JSON that allows for better
     human-readability.
 
+IMPORTANT NOTICE: TAKEOVER
+
+    New maintainer will continue development provided it is possible
+    to raise the minimal perl version to 5.26.
+
+    This version if JSON::Relaxed has no functional changes from 0.05
+    but only adds the 5.26 requirement. If users depend on this module
+    to be functional on ancient versions of perl the takeover will be
+    cancelled, the old version requirement restored, and a new module
+    (different name) will be released for future development.
+
+    For a look at the future, see:
+    https://github.com/sciurius/perl-JSON-Relaxed .
+
 SYNOPSIS
 
      my ($rjson, $hash, $parser);
@@ -710,7 +724,7 @@ AUTHOR
 
 VERSION
 
-    Version: 0.04
+    Version: 0.051
 
 HISTORY
 
@@ -748,3 +762,11 @@ HISTORY
       Fixed bug: Test::Most was not added to the prerequisite list. No
       changes to the functionality of the module itself.
 
+    Version 0.051 2024-03-19
+
+      Takeover by new maintainer.
+
+      Raised minimal perl requirement to 5.26 for future features. If
+      this fails the takeover will be cancelled and new features will
+      be implemented in a different module.
+      

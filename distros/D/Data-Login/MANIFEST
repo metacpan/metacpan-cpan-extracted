@@ -27,6 +27,8 @@ t/Data-Login-Role/03-new.t
 t/Data-Login-Role/04-active.t
 t/Data-Login-Role/05-id.t
 t/Data-Login-Role/06-role.t
+t/Data-Login-Role/07-valid_from.t
+t/Data-Login-Role/08-valid_to.t
 t/Data-Login/01-use.t
 t/Data-Login/02-version.t
 t/Data-Login/03-new.t
@@ -35,6 +37,8 @@ t/Data-Login/05-id.t
 t/Data-Login/06-login_name.t
 t/Data-Login/07-password_hash.t
 t/Data-Login/08-roles.t
+t/Data-Login/09-valid_from.t
+t/Data-Login/10-valid_to.t
 xt/Data-Login-Role/01-pod_coverage.t
 xt/Data-Login-Role/02-pod.t
 xt/Data-Login/01-pod_coverage.t

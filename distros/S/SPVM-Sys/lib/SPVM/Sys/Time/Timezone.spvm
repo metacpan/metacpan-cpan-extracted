@@ -3,13 +3,17 @@
 
 class Sys::Time::Timezone : pointer {
   
+  # Class Methods
   native static method new : Sys::Time::Timezone ();
-
+  
+  # Instance Methods
   native method DESTROY : void ();
   
   native method tz_minuteswest : int ();
+  
   native method tz_dsttime : int ();
-
+  
   native method set_tz_minuteswest : void ($tz_minuteswest : int);
+  
   native method set_tz_dsttime : void ($tz_dsttime : int);
 }

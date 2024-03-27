@@ -1,7 +1,6 @@
 package Games::Solitaire::BlackHole::Solver::App::Base;
-$Games::Solitaire::BlackHole::Solver::App::Base::VERSION = '0.8.0';
+$Games::Solitaire::BlackHole::Solver::App::Base::VERSION = '0.10.0';
 use Moo;
-use utf8;
 use Getopt::Long     qw/ GetOptions /;
 use Pod::Usage       qw/ pod2usage /;
 use Math::Random::MT ();
@@ -122,7 +121,7 @@ LOOP:
                     foreach my $x ( $c[-1] )
                     {
                         $foundation_str = $x;
-                        $x              = "[ $x → ]";
+                        $x              = "[ $x -> ]";
                     }
                 }
                 $ret .= join( " ", ":", @c ) . "\n";
@@ -187,7 +186,7 @@ LOOP:
             my @shown = @foundation_cards;
             foreach my $x ( $shown[$i] )
             {
-                $x = "[ $x → $new ]";
+                $x = "[ $x -> $new ]";
             }
             $str = "";
             $str .= "\n";
@@ -721,7 +720,7 @@ sub _set_up_solver
 }
 
 package Games::Solitaire::BlackHole::Solver::App::Base::Task;
-$Games::Solitaire::BlackHole::Solver::App::Base::Task::VERSION = '0.8.0';
+$Games::Solitaire::BlackHole::Solver::App::Base::Task::VERSION = '0.10.0';
 use Moo;
 
 has '_queue'        => ( is => 'ro', default => sub { return []; }, );
@@ -746,7 +745,7 @@ sub _push_to_queue
 }
 
 package Games::Solitaire::BlackHole::Solver::App::Base::PreludeItem;
-$Games::Solitaire::BlackHole::Solver::App::Base::PreludeItem::VERSION = '0.8.0';
+$Games::Solitaire::BlackHole::Solver::App::Base::PreludeItem::VERSION = '0.10.0';
 use Moo;
 
 has [ '_quota', '_task', '_task_idx', '_task_name', ] => ( is => 'rw' );
@@ -765,7 +764,7 @@ Games::Solitaire::BlackHole::Solver::App::Base - base class.
 
 =head1 VERSION
 
-version 0.8.0
+version 0.10.0
 
 =head1 METHODS
 

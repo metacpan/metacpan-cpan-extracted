@@ -11,7 +11,7 @@ use lib 'blib/lib';
 
 #use utf8;
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 use Test::More;
 use Test::More::UTF8;
@@ -65,9 +65,9 @@ my $latte = LaTeX::Easy::Templates->new({
       'logfile' => File::Spec->catfile($tmpdir, 'xyz', 'abc.log'),
       'latex' => {
         'latex-driver-parameters' => {
-           'format' => 'pdf(xelatex)',
+           'format' => 'pdf(pdflatex)',
            'paths' => {
-              #'xelatex' => '/usr/local/xyz/xelatex'
+              #'pdflatex' => '/usr/local/xyz/pdflatex'
            }
         }
       },

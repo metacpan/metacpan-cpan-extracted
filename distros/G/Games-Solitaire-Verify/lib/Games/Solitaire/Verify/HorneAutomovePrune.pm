@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::HorneAutomovePrune;
-$Games::Solitaire::Verify::HorneAutomovePrune::VERSION = '0.2500';
+$Games::Solitaire::Verify::HorneAutomovePrune::VERSION = '0.2600';
 use strict;
 use warnings;
 
@@ -137,7 +137,7 @@ on a Freecell layout
 
 =head1 VERSION
 
-version 0.2500
+version 0.2600
 
 =head1 DESCRIPTION
 

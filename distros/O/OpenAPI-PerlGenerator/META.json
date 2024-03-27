@@ -1,0 +1,81 @@
+{
+   "abstract" : "create Perl client SDKs from OpenAPI specs",
+   "author" : [
+      "Max Maischein <corion@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "OpenAPI-PerlGenerator",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "5",
+            "File::Basename" : "0",
+            "File::Path" : "0",
+            "Getopt::Long" : "0",
+            "HTTP::Request::Diff" : "0",
+            "JSON::Pointer" : "0",
+            "Mojo::File" : "0",
+            "Mojo::Template" : "0",
+            "Mojolicious" : "0",
+            "Moo" : "2",
+            "OpenAPI::Modern" : "0",
+            "Perl::Tidy" : "0",
+            "YAML::PP" : "0",
+            "experimental" : "0",
+            "perl" : "5.020",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Future::Mojo" : "1.03",
+            "Future::Queue" : "0",
+            "HTTP::Request::Diff" : "0",
+            "Mojolicious" : "1.03",
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Corion/OpenAPI-PerlGenerator/issues"
+      },
+      "license" : [
+         "https://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Corion/OpenAPI-PerlGenerator.git",
+         "web" : "https://github.com/Corion/OpenAPI-PerlGenerator"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.07",
+   "x_static_install" : 1
+}

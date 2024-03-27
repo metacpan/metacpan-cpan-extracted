@@ -1,5 +1,8 @@
 Release history for Catalyst-ActionRole-Methods
 
+0.104 - 2024-03-21
+  - Support for HTTP::Request::Common < 6.21
+
 0.103 - 2024-02-25
   - Correct content type for the default 405 response
   - Minor code cleanups and speedups

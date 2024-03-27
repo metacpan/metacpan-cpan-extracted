@@ -25,7 +25,7 @@ Name | Type | Description | Notes
 **Is3D** | **boolean** | Indicates whether the chart is a 3d chart. |
 **IsRectangularCornered** | **boolean** | Gets or sets a value indicating whether the chart area is rectangular cornered.                        Default is true. |
 **Legend** | **LinkElement** | Gets the chart legend. |
-**Name** | **string** | Gets and sets the name of the chart. |
+**Name** | **string** |  |
 **NSeries** | **LinkElement** | Gets a  collection representing the data series in the chart. |
 **PageSetup** | **LinkElement** | Represents the page setup description in this chart. |
 **Perspective** | **int** | Returns or sets the perspective for the 3-D chart view. Must be between 0 and 100.                        This property is ignored if the RightAngleAxes property is True. |
@@ -46,8 +46,8 @@ Name | Type | Description | Notes
 **SideWall** | **LinkElement** | Returns a  object that represents the side wall of a 3-D chart. |
 **SizeWithWindow** | **boolean** | True if Microsoft Excel resizes the chart to match the size of the chart sheet window. |
 **Style** | **int** | Gets and sets the builtin style. |
-**Title** | **LinkElement** | Gets the chart's title. |
-**Type** | **string** | Gets or sets a chart's type. |
+**Title** | **LinkElement** |  |
+**Type** | **string** |  |
 **ValueAxis** | **LinkElement** | Gets the chart's Y axis. |
 **Walls** | **LinkElement** | Returns a  object that represents the walls of a 3-D chart. |
 **WallsAndGridlines2D** | **boolean** | True if gridlines are drawn two-dimensionally on a 3-D chart. |

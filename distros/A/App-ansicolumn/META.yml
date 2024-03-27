@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.20, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,20 +29,21 @@ no_index:
 provides:
   App::ansicolumn:
     file: lib/App/ansicolumn.pm
-    version: '1.2801'
+    version: '1.4101'
   App::ansicolumn::Border:
     file: lib/App/ansicolumn/Border.pm
   App::ansicolumn::default:
     file: lib/App/ansicolumn/default.pm
 requires:
   Clone: '0'
-  Getopt::EX: v2.1.1
+  Getopt::EX: v2.1.4
   Getopt::EX::Hashed: '1.05'
   Getopt::EX::RPN: '0.01'
   List::Util: '1.56'
   Math::RPN: '0'
+  Term::ANSIColor::Concise: '2.05'
   Term::ReadKey: '0'
-  Text::ANSI::Fold: '2.15'
+  Text::ANSI::Fold: '2.19'
   Text::ANSI::Fold::Util: '1.01'
   Text::ANSI::Printf: '2.01'
   perl: v5.16.0
@@ -50,7 +51,7 @@ resources:
   bugtracker: https://github.com/tecolicom/App-ansicolumn/issues
   homepage: https://github.com/tecolicom/App-ansicolumn
   repository: https://github.com/tecolicom/App-ansicolumn.git
-version: '1.2801'
+version: '1.4101'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

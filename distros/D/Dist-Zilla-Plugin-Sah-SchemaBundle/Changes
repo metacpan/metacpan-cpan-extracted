@@ -1,0 +1,199 @@
+0.034   2024-02-13  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename module/dist Dist-Zilla-Plugin-Sah-Schema{s,Bundle}.
+
+
+0.033   2024-01-09  Released-By: PERLANCAR; Urgency: medium
+
+        - Instead of adding modules required by schema manually, compile
+          the schema using Data::Sah and get the list of required modules
+          from the compilation result.
+
+
+0.032   2024-01-09  Released-By: PERLANCAR; Urgency: medium
+
+        - Add dependency to Sah filter and value rule modules.
+
+
+0.031   2023-09-03  Released-By: PERLANCAR; Urgency: medium
+
+        - Bump generated prereq's version: Test::Sah::Schema 0.010 ->
+          0.016.
+
+
+0.030   2022-12-16  Released-By: PERLANCAR; Urgency: medium
+
+        - Add configuration: preamble & postamble.
+
+
+0.029   2021-09-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Add perlcritic exclude directive to generated Sah::SchemaR::*
+	  files.
+
+
+0.028   2021-09-29  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Fix one instance where we still assumed old
+	  Data::Sah::Resolve (0.009-) return structure.
+
+
+0.027   2021-07-30  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Add description for exclude_module configuration.
+
+
+0.026   2021-07-29  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Still assume old Data::Sah::Resolve (0.009-) return
+	  structure.
+
+
+0.025   2021-07-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Bump prereq version Data::Sah::Util::Subschema to 0.005.
+
+
+0.024   2021-07-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Update to Data::Sah::Resolve 0.010.
+
+
+0.023   2021-07-20  Released-By: PERLANCAR; Urgency: medium
+
+	- Bump Test::Sah::Schema to 0.010.
+
+
+0.022   2020-11-13  Released-By: PERLANCAR; Urgency: medium
+
+	- Update prereq's new name: Require::Hook::DzilBuild ->
+	  Require::Hook::Source::DzilBuild.
+
+
+0.021   2020-06-13  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Derp, didn't bump prereq version of Test::Sah::Schema
+	  correctly.
+
+
+0.020   2020-06-13  Released-By: PERLANCAR; Urgency: medium
+
+	- Bump prereq version of Test::Sah::Schema.
+
+
+0.019   2020-05-27  Released-By: PERLANCAR; Urgency: medium
+
+	- Add configuration: exclude_module.
+
+
+0.018   2020-05-08  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Handle value of 'x.completion' attribute correctly,
+	  either 'modname' or [modname=>\%args].
+
+
+0.017   2020-03-02  Released-By: PERLANCAR; Urgency: medium
+
+	- Add xt/release/sah-schema.t. Remove code that checks for normalized
+          schema, because that logic is now moved to Test::Sah::Schema which is
+          used by this generated test script.
+
+
+0.016   2019-11-28  Released-By: PERLANCAR; Urgency: medium
+
+	- Update naming of Sah coerce rule module from
+	  Data::Sah::Coerce::<TARGET_TYPE>::<RULE_NAME> to
+	  Data::Sah::Coerce::To_<TARGET_TYPE>::<RULE_NAME>
+	  (Data::Sah::Coerce 0.034+).
+
+
+0.015   2019-05-07  Released-By: PERLANCAR
+
+	- [bugfix] Fix adding prereq to coerce rule modules, should be
+	  using resolved/base type name.
+
+
+0.014   2018-06-26  Released-By: PERLANCAR
+
+	- [Bugfix] Avoid adding prereqs for packages defined by self.
+
+
+0.013   2018-06-07  Released-By: PERLANCAR
+
+	- Use minimum version from pmversions.ini.
+
+
+0.012   2018-05-31  Released-By: PERLANCAR
+
+	- Generate prereq to Data::Sah::Coerce::perl::* modules.
+
+
+0.011   2018-04-06  Released-By: PERLANCAR
+
+	- [Bugfix] Force reload Sah::Schema module from build version; it
+	  might have already been loaded by other plugin.
+
+
+0.010   2018-01-14  Released-By: PERLANCAR
+
+	- [Bugfix] Handle cases where x.completion is an arrayref or
+	  coderef.
+
+
+0.009   2018-01-14  Released-By: PERLANCAR
+
+	- Add prereq to Perinci::Sub::XCompletion::* modules.
+
+
+0.008   2017-01-31  Released-By: PERLANCAR
+
+	- Replace Data::Dump with Data::Dmp so we can deparse coderefs.
+
+
+0.007   2017-01-15  Released-By: PERLANCAR
+
+	- [Bugfix] Fix regression bug when introducing use of
+	  Dist::Zilla::Role::RequireFromBuild.
+
+	- Use Require::Hook::DzilBuild instead of DZR:RequireFromBuild.
+
+
+0.006   2017-01-09  Released-By: PERLANCAR
+
+	- UPDATE 2017-01-15: this release is broken, don't use.
+
+        - Use Dist::Zilla::Role::RequireFromBuild.
+
+
+0.005   2016-12-26  Released-By: PERLANCAR
+
+	- Fix typo in generated text [RT#119466].
+
+
+0.004   2016-08-04  Released-By: PERLANCAR
+
+	- Add some description in generated Sah::SchemaR::* about what the
+	  module is for.
+
+	- Handle (skip) when schema cannot be resolved, e.g. recursive.
+
+
+0.003   2016-07-22  Released-By: PERLANCAR
+
+	- Produce Sah::SchemaR::* modules (pre-resolved edition of
+	  schemas).
+
+
+0.002   2016-07-20  Released-By: PERLANCAR
+
+	- Add prereq to other Sah::Schema::* modules used by each
+	  Sah::Schema::* module in the distribution.
+
+	- Tweak error message to make it clearer.
+
+
+0.001   2016-05-08  Released-By: PERLANCAR
+
+        - First release.

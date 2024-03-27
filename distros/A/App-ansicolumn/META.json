@@ -4,7 +4,7 @@
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.20",
+   "generated_by" : "Minilla/v3.1.23",
    "license" : [
       "perl_5"
    ],
@@ -43,13 +43,14 @@
       "runtime" : {
          "requires" : {
             "Clone" : "0",
-            "Getopt::EX" : "v2.1.1",
+            "Getopt::EX" : "v2.1.4",
             "Getopt::EX::Hashed" : "1.05",
             "Getopt::EX::RPN" : "0.01",
             "List::Util" : "1.56",
             "Math::RPN" : "0",
+            "Term::ANSIColor::Concise" : "2.05",
             "Term::ReadKey" : "0",
-            "Text::ANSI::Fold" : "2.15",
+            "Text::ANSI::Fold" : "2.19",
             "Text::ANSI::Fold::Util" : "1.01",
             "Text::ANSI::Printf" : "2.01",
             "perl" : "v5.16.0"
@@ -67,7 +68,7 @@
    "provides" : {
       "App::ansicolumn" : {
          "file" : "lib/App/ansicolumn.pm",
-         "version" : "1.2801"
+         "version" : "1.4101"
       },
       "App::ansicolumn::Border" : {
          "file" : "lib/App/ansicolumn/Border.pm"
@@ -88,7 +89,7 @@
          "web" : "https://github.com/tecolicom/App-ansicolumn"
       }
    },
-   "version" : "1.2801",
+   "version" : "1.4101",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

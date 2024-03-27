@@ -2,20 +2,22 @@ package HTTP::Request::Diff;
 use 5.020;
 use Moo 2;
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 use feature 'signatures';
 no warnings 'experimental::signatures';
 use Algorithm::Diff;
-use Carp 'croak';
+use Carp 'croak', 'cluck';
 use List::Util 'pairs', 'uniq', 'max';
 use CGI::Tiny::Multipart 'parse_multipart_form_data';
+use HTTP::Request;
+require overload; # for checking whether inputs are overloaded
 
 =encoding utf-8
 
 =head1 NAME
 
-HTTP::Request::Diff - create diffs between HTTP request
+HTTP::Request::Diff - create diffs between HTTP requests
 
 =head1 SYNOPSIS
 
@@ -69,6 +71,8 @@ differences insignificant:
 =item * The order of query parameters
 
 =item * The order of form parameters
+
+=item * A C<Content-Length: 0> header is equivalent to a missing C<Content-Length> header
 
 =back
 
@@ -137,8 +141,6 @@ has 'canonicalize' => (
 
 Arrayref of things to compare.
 
-=back
-
 =cut
 
 has 'compare' => (
@@ -151,6 +153,23 @@ has 'compare' => (
             uri     => 'path',
         ];
     },
+);
+
+=item * C<warn_on_newlines>
+
+(optional) If we should output warnings when we receive C< \n > delimited input
+instead of C< \r\n >. This mostly happens when input is read from text files
+for regression test.
+
+Default is true.
+
+=back
+
+=cut
+
+has 'warn_on_newlines' => (
+    is => 'rw',
+    default => 1
 );
 
 sub fetch_value($self, $req, $item, $req_params=undef) {
@@ -188,7 +207,11 @@ sub get_form_parameters( $self, $req ) {
     $boundary =~ s!^boundary=!!;
 
     my %res;
-    for my $p (parse_multipart_form_data( \$str, length($str), $boundary)->@*) {
+    my $res = parse_multipart_form_data( \$str, length($str), $boundary);
+    if( ! $res ) {
+        croak "Malformed form data";
+    }
+    for my $p ($res->@*) {
         $res{ $p->{name} } //= [];
         push $res{ $p->{name}}->@*, $p->{content};
     };
@@ -197,9 +220,9 @@ sub get_form_parameters( $self, $req ) {
 
 sub get_request_header_names( $self, $req ) {
     if( $req =~ /\n/ ) {
-        my( $header ) = $req =~ m/^(.*?)\r\n\r\n/ms
+        my( $header ) = $req =~ m/^(.*?)\r?\n\r?\n/ms
             or croak "No header in request <$req>";
-        my @headers = ($header =~ /^([A-Z][A-Za-z\d-]+):/mg);
+        my @headers = ($header =~ /^([A-Za-z][A-Za-z\d-]+):/mg);
         return @headers;
     } else {
         return
@@ -208,14 +231,16 @@ sub get_request_header_names( $self, $req ) {
 
 =head2 C<< ->diff >>
 
-  my @diff = $diff->diff( $reference, $actual );
-  my @diff = $diff->diff( $actual );
+  my @diff = $diff->diff( $reference, $actual, %options );
+  my @diff = $diff->diff( $actual, %options );
 
 Performs the diff and returns an array of hashrefs with differences.
 
 =cut
 
-sub diff( $self, $actual_or_reference, $actual=undef ) {
+sub diff( $self, $actual_or_reference, $actual=undef, %options ) {
+    $options{ warn_on_newlines } //= $self->warn_on_newlines;
+    $options{ mode } //= $self->mode;
 
     # Downconvert things to strings, unless we have strings already
     # reparse into HTTP::Request for easy structural checks
@@ -236,8 +261,6 @@ sub diff( $self, $actual_or_reference, $actual=undef ) {
             or croak "Need an actual request to diff";
     }
 
-    # [ ] get query parameter separator, and check these (strict)
-
     if( my $c = $self->canonicalize ) {
         $ref = $c->( $ref )
             or croak "Request canonicalizer returned no request";
@@ -251,14 +274,52 @@ sub diff( $self, $actual_or_reference, $actual=undef ) {
     # maybe cache that in our builder?!
     my %skip_header = map { $_ => 1 } $self->skip_headers->@*;
 
-    if( ref $ref ) {
-        $ref = $ref->as_string("\r\n");
+    for ($ref, $actual) {
+        if( ref $_ ) {
+            if( $_->can( 'as_string' )) {
+                $_ = $_->as_string("\r\n");
+
+            } elsif( $_->can('to_string' )) {
+                $_ = $_->to_string("\r\n");
+
+            } elsif( overload::Method($_, '""')) {
+                $_ = "$_";
+            } else {
+                croak "Don't know how to convert $_ to a string";
+            }
+        }
     };
-    if( ref $actual ) {
-        $actual = $actual->as_string("\r\n");
+
+    if( $options{ warn_on_newlines }) {
+        cluck 'Reference input has bare newlines in header, not crlf'
+            if $ref =~ /\A(.*?)[\r]?\n[\r]?\n/ and $1 =~ /[^\r]\n/;
+        cluck 'Actual input has bare newlines in header, not crlf'
+            if $actual =~ /\A(.*?)[\r]?\n[\r]?\n/ and $1 =~ /[^\r]\n/;
     };
+
     my $r_ref = HTTP::Request->parse( $ref );
     my $r_actual = HTTP::Request->parse( $actual );
+
+    my @diff;
+
+    # get query parameter separator, and check these (strict)
+    if( $options{ mode } eq 'strict' and my $q = $r_ref->uri->query ) {
+        if( $q =~ /([&;])/ ) {
+            my $query_separator = $1;
+            if( my $q2 = $r_actual->uri->query ) {
+                if( $q2 =~ /([&;])/ ) {
+                    if( $1 ne $query_separator ) {
+                        push @diff, {
+                            reference => $q,
+                            actual => $q2,
+                            type => 'meta.query_separator',
+                            kind => 'value',
+                        };
+                    }
+                }
+            }
+        }
+    };
 
     my @ref_header_order = $self->get_request_header_names( $ref );
     my @actual_header_order = $self->get_request_header_names( $actual );
@@ -279,11 +340,15 @@ sub diff( $self, $actual_or_reference, $actual=undef ) {
         or $self->mode eq 'lax' ) {
 
         if(     $r_ref->headers->content_type eq 'multipart/form-data'
-            and $r_actual->headers->content_type eq 'multipart/form-data' ) {
-
+            and $r_actual->headers->content_type eq 'multipart/form-data'
+        ) {
             # We've checked the content type already, we can ignore the boundary
             # value for semantic checks
             $ignore_diff{ 'headers.Content-Type' } = 1;
+
+            # The content length will likely also differ, as we use different
+            # sizes for the boundary
+            $ignore_diff{ 'headers.Content-Length' } = 1;
 
             $ref_params = $self->get_form_parameters( $r_ref );
             $actual_params = $self->get_form_parameters( $r_actual );
@@ -292,7 +357,28 @@ sub diff( $self, $actual_or_reference, $actual=undef ) {
                     uniq( keys( $ref_params->%* ),
                           keys( $actual_params->%*),
                     );
-        };
+
+        } elsif( $r_actual->headers->content_type eq 'application/x-www-form-urlencoded'
+             and $r_actual->headers->content_type eq 'application/x-www-form-urlencoded'
+        ) {
+            # We've checked the content type already, we can ignore the boundary
+            # value for semantic checks
+            $ignore_diff{ 'headers.Content-Type' } = 1;
+
+            # Handle %20 vs +
+            my $force_percent_encoding = ($r_ref->headers->content_length != $r_actual->headers->content_length);
+
+            if( $force_percent_encoding ) {
+                for my $req ($r_ref, $r_actual) {
+                    my $body = $req->content();
+                    if( $body =~ s!\+!%20!g ) {
+                        $ignore_diff{ 'header.Content-Length' } = 1;
+                        $req->content( $body );
+                    }
+                };
+            };
+
+        }
     };
     my @check = ($self->compare->@*, @headers, @query_params, @form_params);
 
@@ -306,7 +392,6 @@ sub diff( $self, $actual_or_reference, $actual=undef ) {
 
     # also, we should check for cookies
 
-    my @diff;
     for my $p (pairs @check) {
 
         my $ref_v;
@@ -321,14 +406,26 @@ sub diff( $self, $actual_or_reference, $actual=undef ) {
             $actual_v = $self->fetch_value( $r_actual, $p, $actual_params );
         }
 
+        my $type = sprintf( '%s.%s', @$p );
+
         if( (defined $ref_v xor defined $actual_v)) {
             # One is missing
 
-            push @diff, {
-                reference => $ref_v,
-                actual => $actual_v,
-                type => sprintf( '%s.%s', @$p ),
-                kind => 'missing',
+            # semantic/lax: If Content-Length is missing, it is equivalent
+            #               to Content-Length: 0
+
+            if(     ($self->mode eq 'lax' or $self->mode eq 'semantic')
+                and $type eq 'headers.Content-Length'
+                and ($ref_v // 0 )== 0 and ($actual_v // 0) == 0) {
+                    # ignore
+            } else {
+
+                push @diff, {
+                    reference => $ref_v,
+                    actual => $actual_v,
+                    type => $type,
+                    kind => 'missing',
+                };
             };
 
         } elsif( ref $ref_v ) {
@@ -410,27 +507,60 @@ sub diff( $self, $actual_or_reference, $actual=undef ) {
   print $diff->as_table( @diff );
   # +-----------------+-----------+--------+
   # | Type            | Reference | Actual |
+  # +-----------------+-----------+--------+
   # | request.content | Ümloud    | Umloud |
   # +-----------------+-----------+--------+
 
-Renders a diff as a table, using L<Text::Table::Any>.
+Renders a diff as a table, using L<Term::Table>.
 
 =cut
 
 sub as_table($self,@diff) {
-    require Text::Table::Any;
+    require Term::Table;
 
     if( @diff ) {
-        Text::Table::Any::generate_table(
+        my $t = Term::Table->new(
+            allow_overflow => 1,
+            header => ['Type', 'Reference', 'Actual'],
             rows => [
-                ['Type', 'Reference', 'Actual'],
                 map {[ $_->{type},
                        ref $_->{reference} ? join "\n", map { $_ // '<missing>' } $_->{reference}->@* : $_->{reference} // '<missing>',
                        ref $_->{actual} ? join "\n", map { $_ // '<missing>' } $_->{actual}->@* : $_->{actual} // '<missing>',
                     ]} @diff
             ],
         );
+        return join "\n", $t->render;
     };
 }
 
 1;
+
+__END__
+
+=head1 REPOSITORY
+
+The public repository of this module is
+L<https://github.com/Corion/HTTP-Request-Diff>.
+
+=head1 SUPPORT
+
+The public support forum of this module is L<https://perlmonks.org/>.
+
+=head1 BUG TRACKER
+
+Please report bugs in this module via the Github bug queue at
+L<https://github.com/Corion/HTTP-Request-Diff/issues>
+
+=head1 AUTHOR
+
+Max Maischein C<corion@cpan.org>
+
+=head1 COPYRIGHT (c)
+
+Copyright 2023- by Max Maischein C<corion@cpan.org>.
+
+=head1 LICENSE
+
+This module is released under the Artistic License 2.0.
+
+=cut

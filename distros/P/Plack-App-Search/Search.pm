@@ -4,11 +4,11 @@ use base qw(Plack::Component::Tags::HTML);
 use strict;
 use warnings;
 
-use Plack::Util::Accessor qw(generator image_height image_link search_method
-	search_placeholder search_title search_url title);
+use Plack::Util::Accessor qw(generator image_height image_link image_radius
+	search_method search_placeholder search_title search_url title);
 use Tags::HTML::Container;
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 sub _prepare_app {
 	my $self = shift;
@@ -59,6 +59,9 @@ sub _css {
 			['d', 'margin-bottom', '20px'],
 			['d', 'margin-left', 'auto'],
 			['d', 'margin-right', 'auto'],
+			defined $self->image_radius ? (
+				['d', 'border-radius', $self->image_radius],
+			) : (),
 			defined $self->image_height ? (
 				['d', 'height', $self->image_height],
 			) : (),
@@ -118,6 +121,7 @@ sub _tags_middle {
 				defined $self->search_placeholder ? (
 					['a', 'placeholder', $self->search_placeholder],
 				) : (),
+				['a', 'name', 'search'],
 				['e', 'input'],
 				['b', 'button'],
 				['a', 'type', 'submit'],
@@ -175,11 +179,23 @@ HTML generator string.
 
 Default value is 'Plack::App::Search; Version: __VERSION__'
 
+=item * C<image_height>
+
+Image height.
+
+Default value is undef, this mean real height of image.
+
 =item * C<image_link>
 
 URL to image above form. Image is centered.
 
 Default value is undef.
+
+=item * C<image_radius>
+
+CSS radius of image.
+
+Default value is 0.
 
 =item * C<search_method>
 
@@ -434,6 +450,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

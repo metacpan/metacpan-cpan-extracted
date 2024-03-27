@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise.pm
-## Version v0.5.0
+## Version v0.5.1
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/06
-## Modified 2024/02/07
+## Modified 2024/02/27
 ## All rights reserved.
 ## 
 ## 
@@ -59,7 +59,7 @@ BEGIN
     our $EXTENSION_VARY = 1;
     our $DEFAULT_MIME_TYPE = 'application/octet-stream';
     our $SERIALISER = $Promise::Me::SERIALISER;
-    our $VERSION = 'v0.5.0';
+    our $VERSION = 'v0.5.1';
 };
 
 use strict;
@@ -1412,7 +1412,7 @@ sub send
     if( defined( $connection_header ) && 
         lc( $connection_header ) eq 'keep-alive' )
     {
-        my $connection = $headers->connection->lc;
+        my $connection = $headers->connection->lc // '';
         if( ( $def->{version} > 1.0
              ? $connection ne 'close'      # HTTP/1.1 can keep alive by default
              : $connection eq 'keep-alive' # HTTP/1.0 needs explicit keep-alive
@@ -1802,7 +1802,7 @@ sub _make_request_data
 
     # Set Content-Type if needed
     $req->headers->content_type( "$obj" ) if( defined( $obj ) && !$orig_ct );
-    if( defined( $content ) )
+    if( defined( $content ) && length( $content ) )
     {
         # Make sure the content is encoded, if applicable, so we can get the proper content length.
         if( my $encodings = $req->headers->content_encoding )
@@ -2085,6 +2085,7 @@ sub _read_body
         
         $body = $ent->new_body( file => $file ) ||
             return( $self->pass_error( $ent->error ) );
+        $self->file( $file );
     }
     # in memory
     else
@@ -2304,7 +2305,7 @@ HTTP::Promise - Asynchronous HTTP Request and Promise
 
 =head1 VERSION
 
-    v0.5.0
+    v0.5.1
 
 =head1 DESCRIPTION
 

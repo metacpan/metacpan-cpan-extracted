@@ -25,7 +25,7 @@ no_index:
 provides:
   Mojolicious::Plugin::WebComponent:
     file: lib/Mojolicious/Plugin/WebComponent.pm
-    version: '0.06'
+    version: '0.07'
 requires:
   Mojolicious: '0'
   perl: v5.20.0
@@ -33,7 +33,7 @@ resources:
   bugtracker: https://github.com/rshingleton/Mojolicious-Plugin-WebComponent/issues
   homepage: https://github.com/rshingleton/Mojolicious-Plugin-WebComponent
   repository: https://github.com/rshingleton/Mojolicious-Plugin-WebComponent.git
-version: '0.06'
+version: '0.07'
 x_contributors:
   - 'shingler <shingler@oclc.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

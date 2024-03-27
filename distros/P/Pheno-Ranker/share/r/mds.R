@@ -4,17 +4,19 @@ library(ggrepel)
 # Read in the input file as a matrix 
 data <- as.matrix(read.table("matrix.txt", header = TRUE, row.names = 1))
 
-#calculate distance matrix
-d <- dist(data)
+# Calculate distance matrix
+#d <- dist(data)
+#d <- 1 - data  # J-similarity to J-distance
 
-#perform multidimensional scaling
-fit <- cmdscale(d, eig=TRUE, k=2)
+# Perform multidimensional scaling
+#fit <- cmdscale(d, eig=TRUE, k=2)
+fit <- cmdscale(data, eig=TRUE, k=2)
 
-#extract (x, y) coordinates of multidimensional scaling
+# Extract (x, y) coordinates of multidimensional scaling
 x <- fit$points[,1]
 y <- fit$points[,2]
 
-# Create example data frame
+# Create data frame
 df <- data.frame(x, y, label=row.names(data))
 
 # Save image

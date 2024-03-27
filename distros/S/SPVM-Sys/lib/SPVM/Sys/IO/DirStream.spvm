@@ -2,6 +2,10 @@
 # MIT License
 
 class Sys::IO::DirStream : pointer {
+  
+  # Fields
   has closed : ro byte;
+  
+  # Instance Methods
   native method DESTROY : void ();
 }

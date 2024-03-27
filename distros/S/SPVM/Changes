@@ -1,3 +1,214 @@
+0.989096 2023-03-27
+  [Incompatible Changes]
+    * Change the definition of the value field in the Bool class.
+      [Before]
+        has value : ro int;
+      [After]
+        has value : ro byte;
+    * Remove the new_env method from the Native::Runtime.
+  [New Features]
+    * Add the following native APIs.
+    
+      int32_t (*get_byte_object_value)(SPVM_ENV* env, SPVM_VALUE* stack, void* byte_object);
+      int32_t (*get_short_object_value)(SPVM_ENV* env, SPVM_VALUE* stack, void* short_object);
+      int32_t (*get_int_object_value)(SPVM_ENV* env, SPVM_VALUE* stack, void* int_object);
+      int64_t (*get_long_object_value)(SPVM_ENV* env, SPVM_VALUE* stack, void* long_object);
+      float (*get_float_object_value)(SPVM_ENV* env, SPVM_VALUE* stack, void* float_object);
+      double (*get_double_object_value)(SPVM_ENV* env, SPVM_VALUE* stack, void* double_object);
+    * Add the following native runtime APIs.
+      SPVM_ENV* (*get_env)(void* runtime);
+    * Add the get_env method to the Native::Rutnime.
+  [Internal Changes]
+    * A runtiem has its runtime environment.
+  [Breaking Binary Compatibility]
+    Native API IDs are changed after 195
+    [Before]
+    
+      195 reserved195,
+      196 new_stack,
+      197 free_stack,
+      198 get_field_object_defined_and_has_pointer_by_name,
+      199 get_field_object_ref,
+      200 get_field_object_ref_by_name,
+      201 is_binary_compatible_stack,
+      202 assign_object,
+      203 new_string_array_no_mortal,
+      204 new_memory_block,
+      205 free_memory_block,
+      206 get_memory_blocks_count,
+      207 say,
+      208 warn,
+      209 spvm_stdin,
+      210 spvm_stdout,
+      211 spvm_stderr,
+      212 check_bootstrap_method
+      213 new_array_proto_element_no_mortal
+      214 new_array_proto_element
+    [After]
+      195 is_binary_compatible_stack,
+      196 new_stack,
+      197 free_stack,
+      198 get_field_object_defined_and_has_pointer_by_name,
+      199 get_field_object_ref,
+      200 get_field_object_ref_by_name,
+      201 check_bootstrap_method
+      202 assign_object,
+      203 new_string_array_no_mortal,
+      204 new_memory_block,
+      205 free_memory_block,
+      206 get_memory_blocks_count,
+      207 say,
+      208 warn,
+      209 spvm_stdin,
+      210 spvm_stdout,
+      211 spvm_stderr,
+      212 new_array_proto_element_no_mortal
+      213 new_array_proto_element
+      214 get_byte_object_value
+      215 get_short_object_value
+      216 get_int_object_value
+      217 get_long_object_value
+      218 get_float_object_value
+      219 get_double_object_value
+    
+0.989095 2023-03-26
+  [Bug Fix]
+    * Fix the bug that second compilation use freed op field information.
+    
+      https://github.com/yuki-kimoto/SPVM/issues/507
+    
+    * Fix the bug that second compilation use freed op class variable information.
+    
+0.989094 2023-03-26
+  [Internal Changes]
+    * SPVM::Builder::Config::Info does not depend on the SPVM::Native::Compiler.
+  [Bug Fix]
+    * Fix the bug that the spvmcc command does not compile precompilation anon methods.
+  [Incompatible Changes]
+    * Precompilation methods are no more fallback if is_precompile_fallback is set to a true value.
+0.989093 2023-03-25
+  [Bug Fix]
+    * Fix the bug that the logical OR operator set the internal condition flag where it should not be changed.
+    * Fix the bug that the logical AND operator set the internal condition flag where it should not be changed.
+  [Internal Changes]
+    * Remove REFCNT operation in syntax parsing.
+    * Operations are reorder and renamed in syntax parsing.
+  [Test Cleanup]
+    * Cleanup tests for operators
+    * Cleanup tests for statements
+0.989092 2023-03-23
+  [New Features]
+    * Add the get_basic_types method to the Native::Runtime class.
+    * Add the get_methods method to the Native::BasicType class.
+    * Add the get_fields method to the Native::BasicType class.
+    * Add the get_class_vars method to the Native::BasicType class.
+  [Incompatible Changes]
+    * Add the Native::Constant class.
+    * Remove the get_class_names in the Native::Runtime class.
+    * Remove the get_basic_type_names in the Native::Runtime class.
+    * Remove the get_method_names in the Native::Runtime class.
+    * Remove the get_field_names in the Native::Runtime class.
+    * Remove the get_class_var_names in the Native::Runtime class.
+    * Remove the  in the Native::Runtime class.
+    * Change the return values of the get_class_names method in the SPVM::Builder::Config::Info.
+      [Before]
+      This method is the same as the L<get_class_names|Native::Runtime/"get_class_names"> method in the C<Native::Runtime>, but the return value is converted to an array reference of strings.
+      
+      [After]
+      Returns the all class and interface names except for anon classes loaded by the runtime.
+  [Bug Fix]
+    * Fix the bug that the is_read_only operator set the internal condition flag.
+    * Fix the bug that the isweak operator set the internal condition flag.
+    * Fix the bug that the can operator set the internal condition flag.
+    * Fix the bug that the string comparison operators and the numeric comparison operators set the internal condition flag.
+    * Fix the bug that the isa, isa_error, is_type, is_error, is_compile_type operators set the internal condition flag.
+    * Fix the bug that the logical NOT operator set the internal condition flag where it should not be changed.
+
+  [Internal Changes]
+    * Runtime precompilation can be detected in easy way that update blib/lib/SPVM/Builder/include/spvm_version.h in Makefile.PL.
+    * The can operator receive the constant string ID for method name.
+0.989091 2023-03-21
+  [Incompatible Changes]
+    * The check_stack_env native API is renamed to is_binary_compatible_stack.
+    * Remove the call_class_method_for_env method in the Native::MethodCall class.
+    * Remove the call_callback method in the Native::MethodCall class.
+    * Change the set_exception method in the Native::MethodCall class.
+      [Before]
+        static method set_exception : void ($exception : string, $);
+      [After]
+        static method set_exception : void ($exception : string, $stack : Native::Stack = undef, $env : Native::Env = undef);
+    * Change the get_exception method in the Native::MethodCall class.
+      [Before]
+        static method get_exception : string ($stack : Native::Stack = undef, $env : Native::Env = undef);
+      [After]
+        method get_exception : string ();
+  [New Features]
+    * Add the get_current_method argument native API.
+    * Add the get_current_runtime basic type native API.
+    * Add the new_class_method_with_env_stack, new_instance_method_static_with_env_stack, new_instance_method_with_env_stack methods to the Native::MethodCall class.
+    * Add the Native::MethodCall::Error::ExceptionThrown class.
+    * Add the optional argument $error_id_ref to the call, call_class_method, call_instance_method_static, call_instance_method.
+  [New Features]
+    * Add the get_current_method argument native API.
+    * Add the get_current_runtime basic type native API.
+    * Add the new_class_method_with_env_stack, new_instance_method_static_with_env_stack, new_instance_method_with_env_stack methods to the Native::MethodCall class.
+    * Add the Native::MethodCall::Error::ExceptionThrown class.
+    * Add the optional argument $error_id_ref to the call, call_class_method, call_instance_method_static, call_instance_method.
+0.989090 2023-03-20
+  [Exception Message Improvement]
+    * Improve exception messages in Modules.
+      [Before]
+      $length must be greater than or equal to 0.
+      [After]
+      The length $length must be greater than or equal to 0.
+  [Compilation Error Message Improvement]
+    * Improve compilation error messages.
+      [Before]
+      The operand of the type_name operator must be an object type.
+      [After]
+      The type of the operand of the type_name operator must be an object type.
+  [New Features with Incompatible Changes]
+    * The warn operator output undef if the operand is an object type and the value in runtime is undef.
+    * The warn operator output the type and the address if the operand is an object type that is not the string type.
+    * The warn operator output the empty string if the operand is an empty string.
+0.989089 2023-03-20
+  [Incompatible Changes]
+    * Rename the get_method, get_field, get_class_var methods from the Native::Runtime::Info class to get_method_by_name, get_field_by_name, get_class_var_by_name.
+    * Remove the Native::Runtime::Info class and its methods are moved to the Native::Runtime::Class.
+    * Remove the info method in the Native class.
+  [Internal Changes]
+    * Remove the SPVM::Builder::Native::Runtime::Info module.
+  
+0.989088 2023-03-19
+  [New Features]
+    * Add the Native::API class.
+  [Internal Changes]
+    * Add the SPVM::Builder::Native::BasicType module.
+    * Add the SPVM::Builder::Native::Method module.
+    * Add the SPVM::Builder::Native::ClassFile module.
+    * Add the SPVM::Builder::Native::API module.
+    * Add the SPVM::Builder::Native::Runtime::Info module.
+    * Rename SPVM::Builder::Compiler to SPVM::Builder::Native::Compiler
+    * Rename SPVM::Builder::Runtime to SPVM::Builder::Native::Runtime
+    * Rename SPVM::Builder::Env to SPVM::Builder::Native::Env
+    * Rename SPVM::Builder::Stack to SPVM::Builder::Native::Stack
+
+  [Incompatible Changes]
+    * Remove the new method in the Native::Env and add the new_env method to the Native::Runtime class.
+      [Removed]Native::Env
+      static method new : Native::Env ($compiler : Native::Compiler = undef);
+      
+      [Added]Native::Runtime
+      static method new_env : Native::Env ();
+    * Remove the set_command_info_program_name method in the Native::Env and add the set_command_info_program_name method to the Native::API class.
+    * Remove the set_command_info_argv in the Native::Env and add the set_command_info_argv method to the Native::API class.
+    * Remove the set_command_info_base_time in the Native::Env and add the set_command_info_base_time method to the Native::API class.
+    * Remove the call_init_methods in the Native::Env and add the call_init_methods method to the Native::API class.
+    * Remove the destroy_class_vars in the Native::Env and add the destroy_class_vars method to the Native::API class.
+    * Remove the get_exception in the Native::Env and add the get_exception method to the Native::API class.
+    * Remove the set_exception in the Native::Env and add the set_exception method to the Native::API class.
+  [Bug Fix]
+    * Fix bug that the SPVM language is not build by only Perl and the C language.
 0.989087 2023-03-14
   [Document Improvement and Changes]
     * The heading "Type Assignability" to "Assignment Requirement".

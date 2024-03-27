@@ -20,7 +20,7 @@ get-azure-token.pl - Get JWT tokens from Azure
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

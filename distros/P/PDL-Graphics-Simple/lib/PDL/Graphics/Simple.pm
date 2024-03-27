@@ -256,8 +256,8 @@ use PDL::Options q/iparse/;
 use File::Temp qw/tempfile tempdir/;
 use Scalar::Util q/looks_like_number/;
 
-our $VERSION = '1.009';
-$VERSION = eval $VERSION;
+our $VERSION = '1.010';
+$VERSION =~ s/_//g;
 
 ##############################
 # Exporting
@@ -1393,7 +1393,7 @@ sub register {
 	    unless( defined($mod->{$_}));
     }
 
-    warn "PDL::Graphics::Simple::register: $module is out of date - winging it"
+    warn "PDL::Graphics::Simple::register: $module is out of date (mod='$mod->{pgs_version}' PGS='$VERSION') - winging it"
 	unless($mod->{pgs_version} eq $VERSION);
 
     $mods->{$mod->{shortname}} = $mod;

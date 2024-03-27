@@ -2,18 +2,35 @@ class TestCase::Sys::Process {
   use Sys::Process;
   use Sys::Process::Constant as PROCESS;
   use Sys::Time;
+  use Sys;
+  use Sys::IO::Constant as IO;
   
   static method fork : int () {
     
-    my $child_process_id = Sys::Process->fork;
-    
-    # The child process
-    if ($child_process_id == 0) {
-      Sys::Process->exit(0);
+    {
+      my $child_process_id = Sys::Process->fork;
+      
+      # The child process
+      if ($child_process_id == 0) {
+        Sys::Process->exit(0);
+      }
+      
+      unless ($child_process_id > 0) {
+        return 0;
+      }
     }
     
-    unless ($child_process_id > 0) {
-      return 0;
+    {
+      my $child_process_id = Sys->fork;
+      
+      # The child process
+      if ($child_process_id == 0) {
+        Sys::Process->exit(0);
+      }
+      
+      unless ($child_process_id > 0) {
+        return 0;
+      }
     }
     
     return 1;
@@ -21,12 +38,20 @@ class TestCase::Sys::Process {
 
   static method getpriority : int () {
     
-    my $start = Sys::Time->time;
+    {
+      my $nice = Sys::Process->getpriority(PROCESS->PRIO_PROCESS, 0);
+      
+      unless ($nice >= -20 && $nice <= 19) {
+        return 0;
+      }
+    }
     
-    my $nice = Sys::Process->getpriority(PROCESS->PRIO_PROCESS, 0);
-    
-    unless ($nice >= -20 && $nice <= 19) {
-      return 0;
+    {
+      my $nice = Sys->getpriority(PROCESS->PRIO_PROCESS, 0);
+      
+      unless ($nice >= -20 && $nice <= 19) {
+        return 0;
+      }
     }
     
     # The constant values
@@ -41,20 +66,27 @@ class TestCase::Sys::Process {
 
   static method setpriority : int () {
     
-    my $start = Sys::Time->time;
-    
-    my $status = -1;
-    eval { $status = Sys::Process->setpriority(PROCESS->PRIO_PROCESS, 0, 0); };
-    
-    if ($@ && eval_error_id == basic_type_id Error::System) {
-      warn "\n[Test Output]setpriority:setpriority failed on this environment";
-    }
-    else {
-      unless ($status == 0) {
-        return 0;
+    {
+      my $status = -1;
+      eval { $status = Sys::Process->setpriority(PROCESS->PRIO_PROCESS, 0, 0); };
+      
+      if ($@ && eval_error_id == basic_type_id Error::System) {
+        warn "\n[Test Output]setpriority:setpriority failed on this environment";
+      }
+      else {
+        unless ($status == 0) {
+          return 0;
+        }
       }
     }
     
+    {
+      Sys->setpriority(PROCESS->PRIO_PROCESS, 0, 0);
+      
+      if ($@ && eval_error_id == basic_type_id Error::System) {
+        warn "\n[Test Output]setpriority:setpriority failed on this environment";
+      }
+    }
     return 1;
   }
   
@@ -77,25 +109,50 @@ class TestCase::Sys::Process {
 
   static method wait : int () {
     
-    my $child_process_id = Sys::Process->fork;
-    
-    # The child process
-    if ($child_process_id == 0) {
-      Sys::Process->exit(0);
+    {
+      my $child_process_id = Sys::Process->fork;
+      
+      # The child process
+      if ($child_process_id == 0) {
+        Sys::Process->exit(0);
+      }
+      
+      unless ($child_process_id > 0) {
+        return 0;
+      }
+      
+      my $status = -1;
+      my $ret_child_process_id = Sys::Process->wait(\$status);
+      
+      unless ($status == 0) {
+        return 0;
+      }
+      unless ($ret_child_process_id > 0) {
+        return 0;
+      }
     }
     
-    unless ($child_process_id > 0) {
-      return 0;
-    }
-    
-    my $status = -1;
-    my $ret_child_process_id = Sys::Process->wait(\$status);
-    
-    unless ($status == 0) {
-      return 0;
-    }
-    unless ($ret_child_process_id > 0) {
-      return 0;
+    {
+      my $child_process_id = Sys::Process->fork;
+      
+      # The child process
+      if ($child_process_id == 0) {
+        Sys::Process->exit(0);
+      }
+      
+      unless ($child_process_id > 0) {
+        return 0;
+      }
+      
+      my $status = -1;
+      my $ret_child_process_id = Sys->wait(\$status);
+      
+      unless ($status == 0) {
+        return 0;
+      }
+      unless ($ret_child_process_id > 0) {
+        return 0;
+      }
     }
     
     return 1;
@@ -103,30 +160,60 @@ class TestCase::Sys::Process {
 
   static method waitpid : int () {
     
-    my $child_process_id = Sys::Process->fork;
-    
-    # The child process
-    if ($child_process_id == 0) {
-      Sys::Process->exit(0);
-    }
-    
-    unless ($child_process_id > 0) {
-      return 0;
-    }
-    
-    my $status = -1;
-
-    my $ret_child_process_id = -1;
-    while (1) {
-      $ret_child_process_id = Sys::Process->waitpid(-1, \$status, PROCESS->WNOHANG);
+    {
+      my $child_process_id = Sys::Process->fork;
       
-      if (Sys::Process->WIFEXITED($status)) {
-        last;
+      # The child process
+      if ($child_process_id == 0) {
+        Sys::Process->exit(0);
+      }
+      
+      unless ($child_process_id > 0) {
+        return 0;
+      }
+      
+      my $status = -1;
+      
+      my $ret_child_process_id = -1;
+      while (1) {
+        $ret_child_process_id = Sys::Process->waitpid(-1, \$status, PROCESS->WNOHANG);
+        
+        if (Sys::Process->WIFEXITED($status)) {
+          last;
+        }
+      }
+      
+      unless ($ret_child_process_id >= 0) {
+        return 0;
       }
     }
-
-    unless ($ret_child_process_id >= 0) {
-      return 0;
+    
+    {
+      my $child_process_id = Sys::Process->fork;
+      
+      # The child process
+      if ($child_process_id == 0) {
+        Sys::Process->exit(0);
+      }
+      
+      unless ($child_process_id > 0) {
+        return 0;
+      }
+      
+      my $status = -1;
+      
+      my $ret_child_process_id = -1;
+      while (1) {
+        $ret_child_process_id = Sys->waitpid(-1, PROCESS->WNOHANG, \$status);
+        
+        if (Sys::Process->WIFEXITED($status)) {
+          last;
+        }
+      }
+      
+      unless ($ret_child_process_id >= 0) {
+        return 0;
+      }
     }
     
     # The status cheking methods
@@ -146,52 +233,126 @@ class TestCase::Sys::Process {
 
   static method system : int () {
     
-    my $cmd = "perl -e \"warn qq(\\n[Test Output]system);\"";
-    my $status = Sys::Process->system($cmd);
+    {
+      my $cmd = "perl -e \"warn qq(\\n[Test Output]system);\"";
+      my $status = Sys::Process->system($cmd);
+      
+      unless ($status == 0) {
+        return 0;
+      }
+    }
     
-    unless ($status == 0) {
-      return 0;
+    {
+      my $cmd = "perl -e \"warn qq(\\n[Test Output]system);\"";
+      my $status = Sys->system($cmd);
+      
+      unless ($status == 0) {
+        return 0;
+      }
     }
     
     return 1;
   }
-
+  
   static method exit_success : void () {
     
     Sys::Process->exit(PROCESS->EXIT_SUCCESS);
   }
-
+  
   static method exit_failure : void () {
     
     Sys::Process->exit(PROCESS->EXIT_FAILURE);
   }
-
+  
+  static method sys_exit_success : void () {
+    
+    Sys->exit(PROCESS->EXIT_SUCCESS);
+  }
+  
   static method pipe : int () {
     
-    my $fds = new int [2];
-    my $status = Sys::Process->pipe($fds);
-    
-    unless ($status == 0) {
-      return 0;
+    {
+      if (Sys::OS->is_windows) {
+         my $fds = new int [2];
+        my $status = Sys::Process->_pipe($fds, 0, IO->O_BINARY);
+        
+        unless ($status == 0) {
+          return 0;
+        }
+        
+        unless ($fds->[0] > 0) {
+          return 0;
+        }
+        
+        unless ($fds->[1] > 0) {
+          return 0;
+        }
+     }
+      else {
+        my $fds = new int [2];
+        my $status = Sys::Process->pipe($fds);
+        
+        unless ($status == 0) {
+          return 0;
+        }
+        
+        unless ($fds->[0] > 0) {
+          return 0;
+        }
+        
+        unless ($fds->[1] > 0) {
+          return 0;
+        }
+      }
     }
     
-    unless ($fds->[0] > 0) {
-      return 0;
-    }
-
-    unless ($fds->[1] > 0) {
-      return 0;
+    {
+      my $write_fd = -1;
+      my $read_fd = -1;
+      Sys->pipe(\$write_fd, \$read_fd);
+      
+      unless ($write_fd > 0) {
+        return 0;
+      }
+      
+      unless ($read_fd > 0) {
+        return 0;
+      }
+      
+      unless (Sys::OS->is_windows) {
+        my $flag0 = Sys->fcntl($write_fd, IO->F_GETFD);
+        
+        unless ($flag0 & IO->FD_CLOEXEC) {
+          return 0;
+        }
+        
+        my $flag1 = Sys->fcntl($read_fd, IO->F_GETFD);
+        
+        unless ($flag1 & IO->FD_CLOEXEC) {
+          return 0;
+        }
+      }
     }
     
     return 1;
   }
-
+  
   static method getpgid : int () {
     
-    my $process_group = Sys::Process->getpgid(0);
+    {
+      my $process_group = Sys::Process->getpgid(0);
+      
+      unless ($process_group >= 0) {
+        return 0;
+      }
+    }
     
-    unless ($process_group >= 0) {
-      return 0;
+    {
+      my $process_group = Sys->getpgrp(0);
+      
+      unless ($process_group >= 0) {
+        return 0;
+      }
     }
     
     return 1;
@@ -199,16 +360,21 @@ class TestCase::Sys::Process {
 
   static method setpgid : int () {
     
-    my $status = Sys::Process->setpgid(0, 0);
+    {
+      my $status = Sys::Process->setpgid(0, 0);
+      
+      unless ($status == 0) {
+        return 0;
+      }
+    }
     
-    unless ($status == 0) {
-      return 0;
+    {
+      Sys->setpgrp(0, 0);
     }
     
     return 1;
   }
-
-
+  
   static method getpid : int () {
     
     my $process_id = Sys::Process->getpid;
@@ -219,23 +385,38 @@ class TestCase::Sys::Process {
     
     return 1;
   }
-
+  
   static method getppid : int () {
     
-    my $process_id = Sys::Process->getppid;
+    {
+      my $process_id = Sys::Process->getppid;
+      
+      unless ($process_id >= 0) {
+        return 0;
+      }
+    }
     
-    unless ($process_id >= 0) {
-      return 0;
+    {
+      my $process_id = Sys->getppid;
+      
+      unless ($process_id >= 0) {
+        return 0;
+      }
     }
     
     return 1;
   }
-
+  
   static method execv_success : int ($perl_path : string, $program_file : string) {
     my $args = [$perl_path, $program_file, "abc"];
     Sys::Process->execv($perl_path, $args);
   }
-
+  
+  static method exec_sys : int ($perl_path : string, $program_file : string) {
+    my $args = [$program_file, "abc"];
+    Sys->exec($perl_path, $args);
+  }
+  
   static method usleep : int () {
     
     my $start = Sys::Time->time;

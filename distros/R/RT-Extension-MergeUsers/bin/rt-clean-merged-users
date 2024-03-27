@@ -1,11 +1,11 @@
-#!/Users/sunnavy/perl5/perlbrew/perls/perl-5.36.1/bin/perl
+#!/Users/jason/perl5/perlbrew/perls/rt-5.36.1/bin/perl
 ### before: #!@PERL@
 
 use strict;
 use warnings;
 
 ### after: use lib qw(@RT_LIB_PATH@);
-use lib qw(/Users/sunnavy/bps/git/rt/local/lib /Users/sunnavy/bps/git/rt/lib);
+use lib qw(/opt/rt5/local/lib /opt/rt5/lib);
 use RT;
 RT::LoadConfig();
 RT::Init();

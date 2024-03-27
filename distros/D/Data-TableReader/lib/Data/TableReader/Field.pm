@@ -3,7 +3,7 @@ use Moo 2;
 use Carp ();
 
 # ABSTRACT: Field specification for Data::TableReader
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 
 has name     => ( is => 'ro', required => 1 );
@@ -74,7 +74,7 @@ Data::TableReader::Field - Field specification for Data::TableReader
 
 =head1 VERSION
 
-version 0.012
+version 0.014
 
 =head1 DESCRIPTION
 

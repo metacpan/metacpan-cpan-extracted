@@ -3,7 +3,7 @@ package Spreadsheet::ParseXLSX::Cell;
 use strict;
 use warnings;
 
-our $VERSION = '0.34'; # VERSION
+our $VERSION = '0.35'; # VERSION
 
 # ABSTRACT: wrapper class around L<Spreadsheet::ParseExcel::Cell>
 
@@ -40,7 +40,7 @@ Spreadsheet::ParseXLSX::Cell - wrapper class around L<Spreadsheet::ParseExcel::C
 
 =head1 VERSION
 
-version 0.34
+version 0.35
 
 =head1 SYNOPSIS
 

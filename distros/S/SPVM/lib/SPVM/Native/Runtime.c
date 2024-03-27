@@ -413,3 +413,4 @@ int32_t SPVM__Native__Runtime__get_compiler(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   return 0;
 }
+

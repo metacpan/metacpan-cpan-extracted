@@ -178,7 +178,7 @@ share {
 
     gather sub {
     my ($build) = @_;
-    $build->runtime_prop->{command}->{exe}                = 'lastal';
+    $build->runtime_prop->{command}->{lastal}             = 'lastal';
     $build->runtime_prop->{command}->{dbbuild}            = 'lastadb';
     $build->runtime_prop->{command}->{maf_convert}        = 'maf-convert';
     $build->runtime_prop->{command}->{train}              = 'last-train';

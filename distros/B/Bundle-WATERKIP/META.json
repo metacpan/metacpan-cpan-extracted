@@ -97,6 +97,7 @@
             "Moose" : "0",
             "Net::SMTP" : "0",
             "Net::SMTP::SSL" : "0",
+            "Number::Phone" : "0",
             "Object::Pad" : "0.66",
             "POSIX" : "0",
             "Pod::Usage" : "0",
@@ -110,7 +111,7 @@
             "WebService::KvKAPI" : "0.106",
             "XML::Compile::Schema" : "0",
             "XML::LibXML" : "0",
-            "YA::CLI" : "0.004",
+            "YA::CLI" : "0.006",
             "YA::CLI::ActionRole" : "0",
             "namespace::autoclean" : "0",
             "perl" : "5.010"
@@ -129,23 +130,23 @@
    "provides" : {
       "Bundle::WATERKIP" : {
          "file" : "lib/Bundle/WATERKIP.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Bundle::WATERKIP::CLI::Azure" : {
          "file" : "lib/Bundle/WATERKIP/CLI/Azure.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Bundle::WATERKIP::CLI::Azure::Password" : {
          "file" : "lib/Bundle/WATERKIP/CLI/Azure/Password.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Bundle::WATERKIP::CLI::JWT" : {
          "file" : "lib/Bundle/WATERKIP/CLI/JWT.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Bundle::WATERKIP::CLI::JWT::Validate" : {
          "file" : "lib/Bundle/WATERKIP/CLI/JWT/Validate.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -156,7 +157,7 @@
          "web" : "https://gitlab.com/waterkip/bundle-waterkip"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_contributors" : [
       "Wesley Schwengle <waterkip@cpan.org>"
    ],

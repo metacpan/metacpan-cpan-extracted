@@ -1,5 +1,9 @@
 Revision history for PDL::NDBin
 
+0.027     2024-03-26 15:40:26+00:00 Europe/London
+
+ - stop distributing pp-*.c
+
 0.026     2022-02-21 03:54:13+00:00 Europe/London
 
  - stop calling null->long etc in tests as also invalid in PDL 2.073+

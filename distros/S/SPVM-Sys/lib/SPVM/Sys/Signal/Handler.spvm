@@ -1,4 +1,7 @@
 # Copyright (c) 2023 Yuki Kimoto
 # MIT License
 
-class Sys::Signal::Handler;
+class Sys::Signal::Handler {
+  
+  native static method eq : int ($handler1 : Sys::Signal::Handler, $handler2 : Sys::Signal::Handler);
+}

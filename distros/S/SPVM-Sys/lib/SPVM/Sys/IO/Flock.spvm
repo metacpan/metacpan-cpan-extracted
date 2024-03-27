@@ -1,7 +1,7 @@
 # Copyright (c) 2023 Yuki Kimoto
 # MIT License
 
-class Sys::IO::Flock {
+class Sys::IO::Flock : pointer {
   # Class methods
   native static method new : Sys::IO::Flock ();
   

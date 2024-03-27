@@ -1,6 +1,6 @@
 package Mail::BIMI::Trait::Cacheable;
 # ABSTRACT: Cacheable attribute trait
-our $VERSION = '3.20240313'; # VERSION
+our $VERSION = '3.20240319'; # VERSION
 use 5.20.0;
 use Moose::Role;
 Moose::Util::meta_attribute_alias('Cacheable');
@@ -19,7 +19,7 @@ Mail::BIMI::Trait::Cacheable - Cacheable attribute trait
 
 =head1 VERSION
 
-version 3.20240313
+version 3.20240319
 
 =head1 REQUIRES
 

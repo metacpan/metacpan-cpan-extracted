@@ -5,6 +5,8 @@ SYNOPSIS
      use Mo::utils::Language qw(check_language);
 
      check_language($self, $key);
+     check_language_639_1($self, $key);
+     check_language_639_2($self, $key);
 
 DESCRIPTION
     Mo language utilities for checking of data objects.
@@ -18,9 +20,35 @@ SUBROUTINES
 
     Returns undef.
 
+  "check_language_639_1"
+     check_language_639_1($self, $key);
+
+    Check parameter defined by $key if it's ISO 639-1 language code and if
+    language code exists. Value could be undefined.
+
+    Returns undef.
+
+  "check_language_639_2"
+     check_language_639_2($self, $key);
+
+    Check parameter defined by $key if it's ISO 639-2 language code and if
+    language code exists. Value could be undefined.
+
+    Returns undef.
+
 ERRORS
      check_language():
              Parameter '%s' doesn't contain valid ISO 639-1 code.
+                     Value: %s
+
+     check_language_639_1():
+             Parameter '%s' doesn't contain valid ISO 639-1 code.
+                     Codeset: %s
+                     Value: %s
+
+     check_language_639_2():
+             Parameter '%s' doesn't contain valid ISO 639-2 code.
+                     Codeset: %s
                      Value: %s
 
 EXAMPLE1
@@ -58,7 +86,81 @@ EXAMPLE2
      print "ok\n";
 
      # Output like:
-     # #Error [...utils.pm:?] Language code 'xx' isn't ISO 639-1 code.
+     # #Error [...utils.pm:?] Parameter 'key' doesn't contain valid ISO 639-1 code.
+
+EXAMPLE3
+     use strict;
+     use warnings;
+
+     use Mo::utils::Language qw(check_language_639_1);
+
+     my $self = {
+             'key' => 'en',
+     };
+     check_language_639_1($self, 'en');
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE4
+     use strict;
+     use warnings;
+
+     use Error::Pure;
+     use Mo::utils::Language qw(check_language_639_1);
+
+     $Error::Pure::TYPE = 'Error';
+
+     my $self = {
+             'key' => 'xx',
+     };
+     check_language_639_1($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [...utils.pm:?] Parameter 'key' doesn't contain valid ISO 639-1 code.
+
+EXAMPLE5
+     use strict;
+     use warnings;
+
+     use Mo::utils::Language qw(check_language_639_2);
+
+     my $self = {
+             'key' => 'eng',
+     };
+     check_language_639_2($self, 'eng');
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE6
+     use strict;
+     use warnings;
+
+     use Error::Pure;
+     use Mo::utils::Language qw(check_language_639_2);
+
+     $Error::Pure::TYPE = 'Error';
+
+     my $self = {
+             'key' => 'xxx',
+     };
+     check_language_639_2($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [...utils.pm:?] Parameter 'key' doesn't contain valid ISO 639-2 code.
 
 DEPENDENCIES
     Error::Pure, Exporter, List::Util, Locale::Language, Readonly.
@@ -86,5 +188,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

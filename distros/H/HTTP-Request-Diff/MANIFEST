@@ -12,6 +12,7 @@ README.mkdn
 t/00-load.t
 t/01-simple.t
 t/02-headers.t
+t/03-params.t
 t/03-table.t
 testrules.yml
 xt/99-changes.t

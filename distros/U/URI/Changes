@@ -1,5 +1,9 @@
 Revision history for URI
 
+5.28      2024-03-27 01:49:44Z
+    - Using Scalar::Util::reftype instead of just ref(), but mindful this time
+      about definedness to avoid warnings (GH#140) (Jacques Deguest)
+
 5.27      2024-02-09 15:01:24Z
     - Add missing NAME section to POD of URI::geo (GH#142) (gregor herrmann)
 

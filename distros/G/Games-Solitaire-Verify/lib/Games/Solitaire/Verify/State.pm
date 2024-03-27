@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::State;
-$Games::Solitaire::Verify::State::VERSION = '0.2500';
+$Games::Solitaire::Verify::State::VERSION = '0.2600';
 use warnings;
 use strict;
 
@@ -825,7 +825,7 @@ states (or positions) of the entire board.
 
 =head1 VERSION
 
-version 0.2500
+version 0.2600
 
 =head1 SYNOPSIS
 

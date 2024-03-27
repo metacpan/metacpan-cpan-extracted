@@ -9,16 +9,17 @@ ansiexpand \[ option \] file ...
 
 ansiunexpand \[ option \] file ...
 
-    -u  --unexpand               convert spaces to tabs
-    -t# --tabstop=#              tab stop width
-        --tabhead=char           tab head character
-        --tabspace=char          tab space character
-        --tabstyle=style         tab style
-        --ambiguous=wide|narrow  width of Unicode ambiguous character
+    -u --unexpand               convert spaces to tabs
+    -x --minimum=[#]            minimum space count to be converted
+    -t --tabstop=#              tab stop width
+       --tabhead=char           tab head character
+       --tabspace=char          tab space character
+       --tabstyle=style         tab style
+       --ambiguous=wide|narrow  width of Unicode ambiguous character
 
 # VERSION
 
-Version 1.04
+Version 1.05
 
 # DESCRIPTION
 
@@ -33,9 +34,23 @@ implementation detail.
 
 # OPTIONS
 
-- **--unexpand**, **-u**
+- **-u**, **--unexpand**
 
     Behave as unexpand command.
+
+- **-a**
+
+    This option exists only for compatibility with the `unexpand`
+    command.  It can be used but has no effect on the behavior of the
+    command.
+
+- **-x**\[#\], **--minimum**=\[#\]
+
+    By default, two or more consecutive whitespace characters are
+    converted by the **-u** option or `ansiunexpand` command.  This option
+    sets the minimum number of whitespace characters to be converted.  If
+    no value is given, a value of 1 is assumed, and all possible
+    whitespace is converted to tabs.
 
 - **--tabstop**=#, **-t**#
 
@@ -65,12 +80,10 @@ implementation detail.
 
 # INCOMPATIBILITY
 
-There is no `-a` option for `ansiunexpand` and it always convert all
-spaces not only leading ones.  Use normal [unexpand(1)](http://man.he.net/man1/unexpand) to convert
-just leading spaces.
-
-`ansiexpand -u` or `ansiunexpand` convert all spaces whenever possible
-including single space even if it does not reduce total data length.
+`ansiunexpand`, with or without the `-a` option, always converts all
+possible spaces, not just leading ones.  Because there is no point in
+using the `ansiunexpand` command to convert only leading spaces, so
+please use the normal [unexpand(1)](http://man.he.net/man1/unexpand) in that case.
 
 # FILES
 
@@ -100,7 +113,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright 2021-2023 Kazumasa Utashiro
+Copyright ©︎ 2021-2024 Kazumasa Utashiro
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

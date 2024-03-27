@@ -95,7 +95,7 @@
 
 
 
-/* Operation id */
+/* Operation IDs */
 enum {
   SPVM_OP_C_ID_GRAMMAR,
   SPVM_OP_C_ID_LIST,
@@ -108,6 +108,7 @@ enum {
   SPVM_OP_C_ID_EXTENDS,
   SPVM_OP_C_ID_CLASS_BLOCK,
   SPVM_OP_C_ID_END_OF_FILE,
+  SPVM_OP_C_ID_VERSION_DECL,
   SPVM_OP_C_ID_IF,
   SPVM_OP_C_ID_UNLESS,
   SPVM_OP_C_ID_ELSIF,
@@ -153,25 +154,31 @@ enum {
   SPVM_OP_C_ID_IF_REQUIRE,
   SPVM_OP_C_ID_INIT,
   SPVM_OP_C_ID_INTERFACE,
+  SPVM_OP_C_ID_ALLOW,
+  SPVM_OP_C_ID_DIE,
   SPVM_OP_C_ID_RETURN,
   SPVM_OP_C_ID_CONSTANT,
+  SPVM_OP_C_ID_MINUS,
+  SPVM_OP_C_ID_PLUS,
   SPVM_OP_C_ID_INC,
   SPVM_OP_C_ID_DEC,
   SPVM_OP_C_ID_PRE_INC,
   SPVM_OP_C_ID_POST_INC,
   SPVM_OP_C_ID_PRE_DEC,
   SPVM_OP_C_ID_POST_DEC,
-  SPVM_OP_C_ID_MINUS,
-  SPVM_OP_C_ID_PLUS,
   SPVM_OP_C_ID_ADD,
   SPVM_OP_C_ID_SUBTRACT,
   SPVM_OP_C_ID_MULTIPLY,
   SPVM_OP_C_ID_DIVIDE,
+  SPVM_OP_C_ID_DIVIDE_UNSIGNED_INT,
+  SPVM_OP_C_ID_DIVIDE_UNSIGNED_LONG,
   SPVM_OP_C_ID_BIT_AND,
   SPVM_OP_C_ID_BIT_OR,
   SPVM_OP_C_ID_BIT_XOR,
   SPVM_OP_C_ID_BIT_NOT,
   SPVM_OP_C_ID_MODULO,
+  SPVM_OP_C_ID_MODULO_UNSIGNED_INT,
+  SPVM_OP_C_ID_MODULO_UNSIGNED_LONG,
   SPVM_OP_C_ID_LEFT_SHIFT,
   SPVM_OP_C_ID_RIGHT_ARITHMETIC_SHIFT,
   SPVM_OP_C_ID_RIGHT_LOGICAL_SHIFT,
@@ -180,76 +187,68 @@ enum {
   SPVM_OP_C_ID_LOGICAL_NOT,
   SPVM_OP_C_ID_ARRAY_ACCESS,
   SPVM_OP_C_ID_ASSIGN,
-  SPVM_OP_C_ID_CALL_METHOD,
   SPVM_OP_C_ID_FIELD_ACCESS,
   SPVM_OP_C_ID_VAR,
-  SPVM_OP_C_ID_TYPE_CAST,
   SPVM_OP_C_ID_UNDEF,
   SPVM_OP_C_ID_ARRAY_LENGTH,
-  SPVM_OP_C_ID_DIE,
+  SPVM_OP_C_ID_SCALAR,
   SPVM_OP_C_ID_EXCEPTION_VAR,
+  SPVM_OP_C_ID_SPECIAL_ASSIGN,
+  SPVM_OP_C_ID_STRING_LENGTH,
+  SPVM_OP_C_ID_STRING_CONCAT,
+  SPVM_OP_C_ID_CLASS_VAR,
+  SPVM_OP_C_ID_CLASS_VAR_ACCESS,
+  SPVM_OP_C_ID_NUMERIC_COMPARISON_EQ,
+  SPVM_OP_C_ID_NUMERIC_COMPARISON_NE,
+  SPVM_OP_C_ID_NUMERIC_COMPARISON_LT,
+  SPVM_OP_C_ID_NUMERIC_COMPARISON_LE,
+  SPVM_OP_C_ID_NUMERIC_COMPARISON_GT,
+  SPVM_OP_C_ID_NUMERIC_COMPARISON_GE,
+  SPVM_OP_C_ID_NUMERIC_COMPARISON_CMP,
+  SPVM_OP_C_ID_STRING_COMPARISON_EQ,
+  SPVM_OP_C_ID_STRING_COMPARISON_NE,
+  SPVM_OP_C_ID_STRING_COMPARISON_GT,
+  SPVM_OP_C_ID_STRING_COMPARISON_GE,
+  SPVM_OP_C_ID_STRING_COMPARISON_LT,
+  SPVM_OP_C_ID_STRING_COMPARISON_LE,
+  SPVM_OP_C_ID_STRING_COMPARISON_CMP,
+  SPVM_OP_C_ID_ARRAY_FIELD_ACCESS,
   SPVM_OP_C_ID_NEW,
+  SPVM_OP_C_ID_ARRAY_INIT,
+  SPVM_OP_C_ID_WARN,
+  SPVM_OP_C_ID_PRINT,
+  SPVM_OP_C_ID_SAY,
+  SPVM_OP_C_ID_DUMP,
+  SPVM_OP_C_ID_TRUE,
+  SPVM_OP_C_ID_FALSE,
+  SPVM_OP_C_ID_NEW_STRING_LEN,
+  SPVM_OP_C_ID_IS_READ_ONLY,
+  SPVM_OP_C_ID_MAKE_READ_ONLY,
+  SPVM_OP_C_ID_COPY,
+  SPVM_OP_C_ID_TYPE_CAST,
+  SPVM_OP_C_ID_BOOL,
+  SPVM_OP_C_ID_ISA,
+  SPVM_OP_C_ID_ISA_ERROR,
+  SPVM_OP_C_ID_IS_TYPE,
+  SPVM_OP_C_ID_IS_ERROR,
+  SPVM_OP_C_ID_IS_COMPILE_TYPE,
+  SPVM_OP_C_ID_CAN,
+  SPVM_OP_C_ID_BASIC_TYPE_ID,
+  SPVM_OP_C_ID_TYPE_NAME,
+  SPVM_OP_C_ID_COMPILE_TYPE_NAME,
+  SPVM_OP_C_ID_CURRENT_CLASS_NAME,
+  SPVM_OP_C_ID_ARGS_WIDTH,
+  SPVM_OP_C_ID_CALL_METHOD,
   SPVM_OP_C_ID_WEAKEN,
   SPVM_OP_C_ID_WEAKEN_FIELD,
   SPVM_OP_C_ID_UNWEAKEN,
   SPVM_OP_C_ID_UNWEAKEN_FIELD,
   SPVM_OP_C_ID_ISWEAK,
   SPVM_OP_C_ID_ISWEAK_FIELD,
-  SPVM_OP_C_ID_SPECIAL_ASSIGN,
-  SPVM_OP_C_ID_CONCAT,
-  SPVM_OP_C_ID_CLASS_VAR,
-  SPVM_OP_C_ID_CLASS_VAR_ACCESS,
-  SPVM_OP_C_ID_ARRAY_INIT,
-  SPVM_OP_C_ID_BOOL,
-  SPVM_OP_C_ID_CHECK_CONVERT,
-  SPVM_OP_C_ID_NUMERIC_EQ,
-  SPVM_OP_C_ID_NUMERIC_NE,
-  SPVM_OP_C_ID_NUMERIC_LT,
-  SPVM_OP_C_ID_NUMERIC_LE,
-  SPVM_OP_C_ID_NUMERIC_GT,
-  SPVM_OP_C_ID_NUMERIC_GE,
-  SPVM_OP_C_ID_NUMERIC_CMP,
-  SPVM_OP_C_ID_STRING_EQ,
-  SPVM_OP_C_ID_STRING_NE,
-  SPVM_OP_C_ID_STRING_GT,
-  SPVM_OP_C_ID_STRING_GE,
-  SPVM_OP_C_ID_STRING_LT,
-  SPVM_OP_C_ID_STRING_LE,
-  SPVM_OP_C_ID_STRING_CMP,
-  SPVM_OP_C_ID_ISA,
-  SPVM_OP_C_ID_ISA_ERROR,
-  SPVM_OP_C_ID_IS_TYPE,
-  SPVM_OP_C_ID_IS_ERROR,
-  SPVM_OP_C_ID_IS_COMPILE_TYPE,
-  SPVM_OP_C_ID_SEQUENCE,
-  SPVM_OP_C_ID_SCALAR,
-  SPVM_OP_C_ID_ARRAY_FIELD_ACCESS,
-  SPVM_OP_C_ID_CREATE_REF,
-  SPVM_OP_C_ID_DEREF,
-  SPVM_OP_C_ID_STRING_LENGTH,
-  SPVM_OP_C_ID_CURRENT_CLASS_NAME,
-  SPVM_OP_C_ID_ALLOW,
-  SPVM_OP_C_ID_WARN,
-  SPVM_OP_C_ID_PRINT,
-  SPVM_OP_C_ID_SAY,
-  SPVM_OP_C_ID_TYPE_NAME,
-  SPVM_OP_C_ID_COMPILE_TYPE_NAME,
-  SPVM_OP_C_ID_DUMP,
-  SPVM_OP_C_ID_TRUE,
-  SPVM_OP_C_ID_FALSE,
-  SPVM_OP_C_ID_DIVIDE_UNSIGNED_INT,
-  SPVM_OP_C_ID_DIVIDE_UNSIGNED_LONG,
-  SPVM_OP_C_ID_MODULO_UNSIGNED_INT,
-  SPVM_OP_C_ID_MODULO_UNSIGNED_LONG,
-  SPVM_OP_C_ID_NEW_STRING_LEN,
-  SPVM_OP_C_ID_IS_READ_ONLY,
-  SPVM_OP_C_ID_MAKE_READ_ONLY,
-  SPVM_OP_C_ID_COPY,
-  SPVM_OP_C_ID_CAN,
-  SPVM_OP_C_ID_BASIC_TYPE_ID,
+  SPVM_OP_C_ID_REFERENCE,
+  SPVM_OP_C_ID_DEREFERENCE,
   SPVM_OP_C_ID_EVAL_ERROR_ID,
-  SPVM_OP_C_ID_ARGS_WIDTH,
-  SPVM_OP_C_ID_VERSION_DECL,
+  SPVM_OP_C_ID_SEQUENCE,
 };
 
 const char* const* SPVM_OP_C_ID_NAMES(void);
@@ -273,7 +272,7 @@ enum {
   SPVM_OP_C_FLAG_SPECIAL_ASSIGN_BIT_XOR,
   SPVM_OP_C_FLAG_SPECIAL_ASSIGN_BIT_OR,
   SPVM_OP_C_FLAG_SPECIAL_ASSIGN_BIT_AND,
-  SPVM_OP_C_FLAG_SPECIAL_ASSIGN_CONCAT,
+  SPVM_OP_C_FLAG_SPECIAL_ASSIGN_STRING_CONCAT,
 };
 
 enum {
@@ -337,23 +336,13 @@ SPVM_OP* SPVM_OP_build_enumeration_value(SPVM_COMPILER* compiler, SPVM_OP* op_na
 
 SPVM_OP* SPVM_OP_build_new(SPVM_COMPILER* compiler, SPVM_OP* op_new, SPVM_OP* op_type, SPVM_OP* op_length);
 
-SPVM_OP* SPVM_OP_build_logical_and(SPVM_COMPILER* compiler, SPVM_OP* op_and, SPVM_OP* op_first, SPVM_OP* op_last);
+SPVM_OP* SPVM_OP_build_logical_and(SPVM_COMPILER* compiler, SPVM_OP* op_and, SPVM_OP* op_left_operand, SPVM_OP* op_right_operand);
 
-SPVM_OP* SPVM_OP_build_logical_or(SPVM_COMPILER* compiler, SPVM_OP* op_or, SPVM_OP* op_first, SPVM_OP* op_last);
+SPVM_OP* SPVM_OP_build_logical_or(SPVM_COMPILER* compiler, SPVM_OP* op_or, SPVM_OP* op_left_operand, SPVM_OP* op_right_operand);
 
-SPVM_OP* SPVM_OP_build_logical_not(SPVM_COMPILER* compiler, SPVM_OP* op_not, SPVM_OP* op_first);
+SPVM_OP* SPVM_OP_build_logical_not(SPVM_COMPILER* compiler, SPVM_OP* op_not, SPVM_OP* op_operand);
 
-SPVM_OP* SPVM_OP_build_binary_is(SPVM_COMPILER* compiler, SPVM_OP* op_is, SPVM_OP* op_first, SPVM_OP* op_last);
-
-SPVM_OP* SPVM_OP_build_isa(SPVM_COMPILER* compiler, SPVM_OP* op_isa, SPVM_OP* op_operand, SPVM_OP* op_type);
-
-SPVM_OP* SPVM_OP_build_isa_error(SPVM_COMPILER* compiler, SPVM_OP* op_isa_error, SPVM_OP* op_operand, SPVM_OP* op_type);
-
-SPVM_OP* SPVM_OP_build_is_type(SPVM_COMPILER* compiler, SPVM_OP* op_is_type, SPVM_OP* op_operand, SPVM_OP* op_type);
-
-SPVM_OP* SPVM_OP_build_is_error(SPVM_COMPILER* compiler, SPVM_OP* op_is_error, SPVM_OP* op_operand, SPVM_OP* op_type);
-
-SPVM_OP* SPVM_OP_build_is_compile_type(SPVM_COMPILER* compiler, SPVM_OP* op_is_compile_type, SPVM_OP* op_operand, SPVM_OP* op_compile_type);
+SPVM_OP* SPVM_OP_build_type_check(SPVM_COMPILER* compiler, SPVM_OP* op_is, SPVM_OP* op_left_operand, SPVM_OP* op_right_operand);
 
 SPVM_OP* SPVM_OP_build_return(SPVM_COMPILER* compiler, SPVM_OP* op_return, SPVM_OP* op_operand);
 
@@ -373,7 +362,7 @@ SPVM_OP* SPVM_OP_build_default_statement(SPVM_COMPILER* compiler, SPVM_OP* op_de
 
 SPVM_OP* SPVM_OP_build_case_statement(SPVM_COMPILER* compiler, SPVM_OP* op_case, SPVM_OP* op_operand, SPVM_OP* op_block);
 
-SPVM_OP* SPVM_OP_build_logical_op(SPVM_COMPILER* compiler, SPVM_OP* op_logical_op, SPVM_OP* op_first, SPVM_OP* op_last);
+SPVM_OP* SPVM_OP_build_logical_op(SPVM_COMPILER* compiler, SPVM_OP* op_logical_op, SPVM_OP* op_left_operand, SPVM_OP* op_right_operand);
 
 SPVM_OP* SPVM_OP_build_for_statement(SPVM_COMPILER* compiler, SPVM_OP* op_for, SPVM_OP* op_loop_var, SPVM_OP* op_condition, SPVM_OP* op_next_value, SPVM_OP* op_block);
 
@@ -387,9 +376,7 @@ SPVM_OP* SPVM_OP_build_array_length(SPVM_COMPILER* compiler, SPVM_OP* op_array_l
 
 SPVM_OP* SPVM_OP_build_malloc_object(SPVM_COMPILER* compiler, SPVM_OP* op_malloc, SPVM_OP* op_type);
 
-SPVM_OP* SPVM_OP_build_comparison_op(SPVM_COMPILER* compiler, SPVM_OP* op_comparison, SPVM_OP* op_first, SPVM_OP* op_last);
-
-SPVM_OP* SPVM_OP_build_binary_op(SPVM_COMPILER* compiler, SPVM_OP* op_call_op, SPVM_OP* op_first, SPVM_OP* op_last);
+SPVM_OP* SPVM_OP_build_binary_op(SPVM_COMPILER* compiler, SPVM_OP* op_call_op, SPVM_OP* op_left_operand, SPVM_OP* op_right_operand);
 
 SPVM_OP* SPVM_OP_build_basic_type(SPVM_COMPILER* compiler, SPVM_OP* op_type_name);
 
@@ -433,13 +420,13 @@ SPVM_OP* SPVM_OP_build_type_cast(SPVM_COMPILER* compiler, SPVM_OP* op_convert, S
 
 SPVM_OP* SPVM_OP_build_enumeration_definition(SPVM_COMPILER* compiler, SPVM_OP* op_enumeration, SPVM_OP* op_enumeration_block, SPVM_OP* op_descripters);
 
-SPVM_OP* SPVM_OP_build_unary_op(SPVM_COMPILER* compiler, SPVM_OP* op_unary, SPVM_OP* op_first);
+SPVM_OP* SPVM_OP_build_unary_op(SPVM_COMPILER* compiler, SPVM_OP* op_unary, SPVM_OP* op_operand);
 
-SPVM_OP* SPVM_OP_build_unary_op_var(SPVM_COMPILER* compiler, SPVM_OP* op_unary, SPVM_OP* op_first);
+SPVM_OP* SPVM_OP_build_unary_op_var(SPVM_COMPILER* compiler, SPVM_OP* op_unary, SPVM_OP* op_operand);
 
 SPVM_OP* SPVM_OP_build_array_access(SPVM_COMPILER* compiler, SPVM_OP* op_array_access, SPVM_OP* op_var, SPVM_OP* op_operand);
 
-SPVM_OP* SPVM_OP_build_assign(SPVM_COMPILER* compiler, SPVM_OP* op_assign, SPVM_OP* op_first, SPVM_OP* op_last);
+SPVM_OP* SPVM_OP_build_assign(SPVM_COMPILER* compiler, SPVM_OP* op_assign, SPVM_OP* op_left_operand, SPVM_OP* op_right_operand);
 
 SPVM_OP* SPVM_OP_build_weaken_field(SPVM_COMPILER* compiler, SPVM_OP* op_weaken, SPVM_OP* op_field_access);
 
@@ -449,15 +436,13 @@ SPVM_OP* SPVM_OP_build_isweak_field(SPVM_COMPILER* compiler, SPVM_OP* op_isweak,
 
 SPVM_OP* SPVM_OP_build_array_init(SPVM_COMPILER* compiler, SPVM_OP* op_array_init, SPVM_OP* op_list_elements, int32_t is_key_values);
 
-SPVM_OP* SPVM_OP_build_inc(SPVM_COMPILER* compiler, SPVM_OP* op_inc, SPVM_OP* op_first);
+SPVM_OP* SPVM_OP_build_inc(SPVM_COMPILER* compiler, SPVM_OP* op_inc, SPVM_OP* op_operand);
 
-SPVM_OP* SPVM_OP_build_dec(SPVM_COMPILER* compiler, SPVM_OP* op_dec, SPVM_OP* op_first);
+SPVM_OP* SPVM_OP_build_dec(SPVM_COMPILER* compiler, SPVM_OP* op_dec, SPVM_OP* op_operand);
 
 SPVM_OP* SPVM_OP_build_special_assign(SPVM_COMPILER* compiler, SPVM_OP* op_special_assign, SPVM_OP* op_dist, SPVM_OP* op_src);
 
 SPVM_OP* SPVM_OP_build_make_read_only(SPVM_COMPILER* compiler, SPVM_OP* op_make_read_only, SPVM_OP* op_operand);
-
-SPVM_OP* SPVM_OP_build_is_read_only(SPVM_COMPILER* compiler, SPVM_OP* op_has_interface, SPVM_OP* op_operand);
 
 SPVM_OP* SPVM_OP_build_can(SPVM_COMPILER* compiler, SPVM_OP* op_has_interface, SPVM_OP* op_var, SPVM_OP* op_name);
 
@@ -469,7 +454,7 @@ SPVM_OP* SPVM_OP_build_basic_type_id(SPVM_COMPILER* compiler, SPVM_OP* op_basic_
 
 SPVM_OP* SPVM_OP_build_extends(SPVM_COMPILER* compiler, SPVM_OP* op_extends, SPVM_OP* op_name_parent_class);
 
-SPVM_OP* SPVM_OP_new_op_assign_bool(SPVM_COMPILER* compiler, SPVM_OP* op_operand, const char* file, int32_t line);
+SPVM_OP* SPVM_OP_new_op_bool(SPVM_COMPILER* compiler, SPVM_OP* op_operand, const char* file, int32_t line);
 
 SPVM_OP* SPVM_OP_new_op_var_decl(SPVM_COMPILER* compiler, const char* file, int32_t line);
 
@@ -478,6 +463,8 @@ SPVM_OP* SPVM_OP_new_op_block(SPVM_COMPILER* compiler, const char* file, int32_t
 SPVM_OP* SPVM_OP_new_op_name(SPVM_COMPILER* compiler, const char* name, const char* file, int32_t line);
 
 SPVM_OP* SPVM_OP_new_op_var(SPVM_COMPILER* compiler, SPVM_OP* op_name);
+
+SPVM_OP* SPVM_OP_new_op_var_condition_flag(SPVM_COMPILER* compiler, const char* file, int32_t line);
 
 SPVM_OP* SPVM_OP_new_op_class_var_access(SPVM_COMPILER* compiler, SPVM_OP* op_name);
 
@@ -580,8 +567,6 @@ SPVM_OP* SPVM_OP_new_op_var_decl_arg(SPVM_COMPILER* compiler, const char* file, 
 SPVM_OP* SPVM_OP_new_op_name_tmp_var(SPVM_COMPILER* compiler, const char* file, int32_t line);
 
 int32_t SPVM_OP_is_allowed(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE* basic_type_current, SPVM_BASIC_TYPE* basic_type_dist, int32_t is_parent_field);
-
-int32_t SPVM_OP_is_comparison_op(SPVM_COMPILER* compiler, SPVM_OP* op);
 
 int32_t SPVM_OP_is_mutable(SPVM_COMPILER* compiler, SPVM_OP* op);
 

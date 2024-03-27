@@ -53,10 +53,10 @@ my %module = (
         'Moo' => '2',
         'Carp' => 0,
         'Algorithm::Diff' => 0,
-        'List::Util' => 0,
+        'List::Util' => 1.45, # uniq() enters List::Util
         'HTTP::Request' => 0,
         'CGI::Tiny::Multipart' => 0,
-        'Text::Table::Any' => 0,
+        'Term::Table' => 0,
     },
     TEST_REQUIRES => {
         'Test2::V0'             => 0,

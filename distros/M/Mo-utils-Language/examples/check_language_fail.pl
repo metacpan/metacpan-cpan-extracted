@@ -17,4 +17,4 @@ check_language($self, 'key');
 print "ok\n";
 
 # Output like:
-# #Error [...utils.pm:?] Language code 'xx' isn't ISO 639-1 code.
+# #Error [...utils.pm:?] Parameter 'key' doesn't contain valid ISO 639-1 code.

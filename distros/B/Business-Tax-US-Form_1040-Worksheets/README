@@ -1,0 +1,33 @@
+README for Perl extension Business-Tax-US-Form_1040-Worksheets
+
+This library exports, on demand only, functions which
+implement calculations used in various worksheets found in
+U.S. IRS Form 1040 instructions.
+
+The current version of this library supports the Social
+Security Benefits Worksheet and most of the Qualified
+Dividends and Capital Gain Tax Worksheet for filing years
+2022 and 2023.  Future versions may extend the support of
+those worksheets forwards and backwords; may offer more
+complete support for the Qualified worksheet; and may offer
+support for other worksheets found within the Form 1040
+instructions.
+
+The accuracy of the calculations in these functions has not
+been reviewed by the Internal Revenue Service, any other tax
+authority, any accountant or any attorney.  Use at your own
+risk!
+
+To install:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+If you are on a windows box you should use 'nmake' rather
+than 'make'.
+
+Once installed, read the documentation via:
+
+    perldoc Business::Tax::US::Form_1040::Worksheets

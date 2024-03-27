@@ -1,6 +1,6 @@
 # DESCRIPTION
 
-A [Date::Holidays](https://metacpan.org/pod/Date%3A%3AHolidays) family member from Bonaire
+A [Date::Holidays](https://metacpan.org/pod/Date%3A%3AHolidays) family member from Curaçao
 
 # SYNOPSIS
 

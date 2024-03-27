@@ -1,5 +1,14 @@
 Revision history for CXC-Types-Astro-Coords
 
+0.12      2024-03-21 16:23:34-04:00 America/New_York
+
+  [BUGFIX]
+
+    * parser accepted illegal input, e.g. 22.3s was turned into [2, 2, .3]
+
+    * coercions only did partial validity checks
+
+
 0.11      2023-12-18 15:36:24-05:00 America/New_York
 
   [SPLIT]

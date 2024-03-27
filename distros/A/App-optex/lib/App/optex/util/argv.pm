@@ -190,8 +190,8 @@ should be invoked for each argument.
     % optex diff -Mutil::argv::filter=command='cat -n' foo bar
 
 In this example, C<foo> and C<bar> are replaced by the result output
-of C<cat -n < foo> and C<cat -n < bar>. The replacement only occurs
-when the file corresponding to the argument exists.
+of C<< cat -n < foo >> and C<< cat -n < bar >>. The replacement only
+occurs when the file corresponding to the argument exists.
 
 =cut
 

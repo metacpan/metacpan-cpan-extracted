@@ -5,28 +5,52 @@ class Sys::Process {
   
   use Sys::Process::Constant;
   
+  # Class Methods
   native static method fork : int ();
+  
   native static method getpriority : int ($which : int, $who : int);
+  
   native static method setpriority : int ($which : int, $who : int, $prio : int);
+  
   native static method sleep : int ($seconds : int);
-  native static method wait : int ($wstatus_ref : int*);
-  native static method waitpid : int ($pid : int, $wstatus_ref : int*, $options : int);
-  native static method system : int ($command : string);
-  native static method exit : int ($status : int);
-  native static method pipe : int ($pipe_fds : int[]);
-  native static method getpgid : int ($pid : int);
-  native static method setpgid : int ($pid : int, $pgid : int);
-  native static method getpid : int ();
-  native static method getppid : int ();
-  native static method execv : int ($path : string, $args : string[]);
+  
   native static method usleep : int ($usec : long);
-
+  
+  native static method wait : int ($wstatus_ref : int*);
+  
+  native static method waitpid : int ($pid : int, $wstatus_ref : int*, $options : int);
+  
+  native static method system : int ($command : string);
+  
+  native static method exit : int ($status : int);
+  
+  native static method pipe : int ($pipe_fds : int[]);
+  
+  native static method _pipe : int ($pipe_fds : int[], $psize : int, $textmode : int);
+  
+  native static method getpgid : int ($pid : int);
+  
+  native static method setpgid : int ($pid : int, $pgid : int);
+  
+  native static method getpid : int ();
+  
+  native static method getppid : int ();
+  
+  native static method execv : int ($path : string, $args : string[]);
+  
   native static method WIFEXITED : int ($wstatus : int);
+  
   native static method WEXITSTATUS : int ($wstatus : int);
+  
   native static method WIFSIGNALED : int ($wstatus : int);
+  
   native static method WTERMSIG : int ($wstatus : int);
+  
   native static method WCOREDUMP : int ($wstatus : int);
+  
   native static method WIFSTOPPED : int ($wstatus : int);
+  
   native static method WSTOPSIG : int ($wstatus : int);
+  
   native static method WIFCONTINUED : int ($wstatus : int);
 }

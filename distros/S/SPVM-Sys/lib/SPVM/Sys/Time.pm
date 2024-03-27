@@ -8,12 +8,12 @@ SPVM::Sys::Time - System Calls for Time Manipulation
 
 =head1 Description
 
-The Sys::Process class of L<SPVM> has methods to call system calls for time manipulation.
+The Sys::Process class in L<SPVM> has methods to call system calls for time manipulation.
 
 =head1 Usage
   
   use Sys::Time;
-
+  
   my $epoch = Sys::Time->time;
   
   my $time_info_local = Sys::Time->localtime($epoch);
@@ -24,123 +24,155 @@ The Sys::Process class of L<SPVM> has methods to call system calls for time mani
 
 =head2 time
 
-  static method time : long ();
+C<static method time : long ();>
 
-Gets the current epoch time. 
-
-This method is the same as C<time> function of C<Linux>.
-
-  my $epoch = Sys::Time->time;
+Calls the L<time|https://linux.die.net/man/2/time> function and returns its return value.
 
 =head2 localtime
 
-  static method localtime : Sys::Time::Tm ($time : long);
+C<static method localtime : L<Sys::Time::Tm|SPVM::Sys::Time::Tm> ($time_ref : long*);>
 
-Converts an epoch $time to the L<Sys::Time::Tm|SPVM::Sys::Time::Tm> object that is local time.
-
-This method is the same as C<localtime> function of C<Linux>.
-
-  my $time_info = Sys::Time->localtime($epoch);
+Calls the L<localtime|https://linux.die.net/man/3/localtime> function and creates a L<Sys::Time::Tm|SPVM::Sys::Time::Tm> object given its return value, and returns it.
 
 =head2 gmtime
 
-  static method gmtime : Sys::Time::Tm ($time : long);
+C<static method gmtime : L<Sys::Time::Tm|SPVM::Sys::Time::Tm> ($time_ref : long*);>
 
-Converts an epoch $time to the L<Sys::Time::Tm|SPVM::Sys::Time::Tm> object that is C<UTC>.
-
-This method is the same as C<gmtime> function of C<Linux>.
-
-  my $time_info = Sys::Time->gmtime($epoch);
+Calls the L<gmtime|https://linux.die.net/man/3/gmtime> function and creates a L<Sys::Time::Tm|SPVM::Sys::Time::Tm> object given its return value, and returns it.
 
 =head2 gettimeofday
 
-  static method gettimeofday : int ($tv : Sys::Time::Timeval, $tz : Sys::Time::Timezone);
+C<static method gettimeofday : int ($tv : L<Sys::Time::Timeval|SPVM::Sys::Time::Timeval>, $tz : L<Sys::Time::Timezone|SPVM::Sys::Time::Timezone>);>
 
-The functions gettimeofday() can get the time as well as a timezone. The tv argument is a struct timeval (as specified in <sys/time.h>):
+Calls the L<gmtime|https://linux.die.net/man/2/gettimeofday> function and creates a L<Sys::Time::Timeval|SPVM::Sys::Time::Timeval> object given its return value, and returns it.
 
-See L<gettimeofday(2) - Linux man page|https://linux.die.net/man/2/gettimeofday> in Linux.
+Exceptions:
+
+If the gettimeofday function failed, an exception is thrown with C<eval_error_id> set to the basic type ID of the L<Error::System|SPVM::Error::System>.
 
 =head2 clock
 
-  static method clock : long ()
+C<static method clock : long ()>
 
-The value returned is the CPU time used so far as a clock_t; to get the number of seconds used, divide by CLOCKS_PER_SEC.
+Calls the L<clock|https://linux.die.net/man/3/clock> function, and returns its return value.
 
-See L<clock(3) - Linux man page|https://linux.die.net/man/3/clock> in Linux.
+Exceptions:
+
+If the clock function failed, an exception is thrown with C<eval_error_id> set to the basic type ID of the L<Error::System|SPVM::Error::System>.
 
 =head2 clock_gettime
 
-  static method clock_gettime : int ($clk_id : int, $tp : Sys::Time::Timespec);
+C<static method clock_gettime : int ($clk_id : int, $tp : L<Sys::Time::Timespec|SPVM::Sys::Time::Timespec>);>
 
-The functions clock_gettime() retrieves the time of the specified clock clk_id.
+Calls the L<clock_gettime|https://linux.die.net/man/3/clock_gettime> function, and returns its return value.
 
-See L<clock_gettime(3) - Linux man page|https://linux.die.net/man/3/clock_gettime> in Linux.
+See L<Sys::Time::Constant|SPVM::Sys::Time::Constant> about constant values given to $clk_id.
 
-The C<$tp> is a L<Sys::Time::Timespec|SPVM::Sys::Time::Timespec> object.
+Exceptions:
+
+$tp must be defined. Otherwise an exception is thrown.
+
+If the clock_gettime function failed, an exception is thrown with C<eval_error_id> set to the basic type ID of the L<Error::System|SPVM::Error::System>.
 
 =head2 clock_getres
 
-  static method clock_getres : int ($clk_id : int, $res : Sys::Time::Timespec);
+C<static method clock_getres : int ($clk_id : int, $res : L<Sys::Time::Timespec|SPVM::Sys::Time::Timespec>);>
 
-The functions clock_getres() retrieves the time of the specified clock clk_id.
+Calls the L<clock_getres|https://linux.die.net/man/3/clock_getres> function, and returns its return value.
 
-See L<clock_getres(3) - Linux man page|https://linux.die.net/man/3/clock_getres> in Linux.
+See L<Sys::Time::Constant|SPVM::Sys::Time::Constant> about constant values given to $clk_id.
 
-The C<$res> is a L<Sys::Time::Timespec|SPVM::Sys::Time::Timespec> object.
+Exceptions:
+
+$res must be defined. Otherwise an exception is thrown.
+
+If the clock_getres function failed, an exception is thrown with C<eval_error_id> set to the basic type ID of the L<Error::System|SPVM::Error::System>.
 
 =head2 setitimer
 
-  static method setitimer : int ($which : int, $new_value : Sys::Time::Itimerval, $old_value : Sys::Time::Itimerval)
+C<static method setitimer : int ($which : int, $new_value : L<Sys::Time::Itimerval|SPVM::Sys::Time::Itimerval>, $old_value : L<Sys::Time::Itimerval|SPVM::Sys::Time::Itimerval>)>
 
-The function setitimer() sets the specified timer to the value in new_value. If old_value is non-NULL, the old value of the timer is stored there.
+Calls the L<setitimer|https://linux.die.net/man/2/setitimer> function, and returns its return value.
 
-See L<setitimer(2) - Linux man page|https://linux.die.net/man/2/setitimer> in Linux.
+See L<Sys::Time::Constant|SPVM::Sys::Time::Constant> about constant values given to $which.
 
-The C<$new_value> is a L<Sys::Time::Itimerval|SPVM::Sys::Time::Itimerval> object.
+Exceptions:
 
-The C<$old_value> is a L<Sys::Time::Itimerval|SPVM::Sys::Time::Itimerval> object.
+$new_value must be defined. Otherwise an exception is thrown.
+
+If the clock_getres function failed, an exception is thrown with C<eval_error_id> set to the basic type ID of the L<Error::System|SPVM::Error::System>.
+
+In Windows the following exception is thrown with C<eval_error_id> set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class. setitimer is not supported in this system(defined(_WIN32)).
 
 =head2 getitimer
 
-  static method getitimer : int ($which : int, $curr_value : Sys::Time::Itimerval);
+C<static method getitimer : int ($which : int, $curr_value : L<Sys::Time::Itimerval|SPVM::Sys::Time::Itimerval>);>
 
-The function getitimer() fills the structure pointed to by curr_value with the current setting for the timer specified by which (one of ITIMER_REAL, ITIMER_VIRTUAL, or ITIMER_PROF).
+Calls the L<getitimer|https://linux.die.net/man/2/getitimer> function, and returns its return value.
 
-See L<getitimer(2) - Linux man page|https://linux.die.net/man/2/getitimer> in Linux.
+See L<Sys::Time::Constant|SPVM::Sys::Time::Constant> about constant values given to $which.
 
-The C<$curr_value> is a L<Sys::Time::Itimerval|SPVM::Sys::Time::Itimerval> object.
+Exceptions:
+
+$curr_value must be defined. Otherwise an exception is thrown.
+
+If the getitimer function failed, an exception is thrown with C<eval_error_id> set to the basic type ID of the L<Error::System|SPVM::Error::System>.
+
+In Windows the following exception is thrown with C<eval_error_id> set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class. getitimer is not supported in this system(defined(_WIN32)).
 
 =head2 times
 
-  static method times : long ($buffer : Sys::Time::Tms);
+C<static method times : long ($buffer : L<Sys::Time::Tms|SPVM::Sys::Time::Tms>);>
 
-times() stores the current process times in the struct tms that buf points to. The struct tms is as defined in <sys/times.h>:
+Calls the L<times|https://linux.die.net/man/2/times> function, and returns its return value.
 
-See the detail of the L<times|https://linux.die.net/man/2/times> function in the case of Linux.
+Exceptions:
+
+$tms must be defined. Otherwise an exception is thrown.
+
+If the times function failed, an exception is thrown with C<eval_error_id> set to the basic type ID of the L<Error::System|SPVM::Error::System>.
+
+In Windows the following exception is thrown with C<eval_error_id> set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class. times is not supported in this system(defined(_WIN32)).
 
 =head2 clock_nanosleep
 
-  static method clock_nanosleep : int ($clockid : int, $flags : int, $request : Sys::Time::Timespec, $remain : Sys::Time::Timespec);
+C<static method clock_nanosleep : int ($clockid : int, $flags : int, $request : L<Sys::Time::Timespec|SPVM::Sys::Time::Timespec>, $remain : L<Sys::Time::Timespec|SPVM::Sys::Time::Timespec>);>
 
-Like nanosleep(2), clock_nanosleep() allows the calling thread to sleep for an interval specified with nanosecond precision. It differs in allowing the caller to select the clock against which the sleep interval is to be measured, and in allowing the sleep interval to be specified as either an absolute or a relative value.
+Calls the L<clock_nanosleep|https://linux.die.net/man/2/clock_nanosleep> function, and returns its return value.
 
-See the detail of the L<clock_nanosleep(2) - Linux man page|https://linux.die.net/man/2/clock_nanosleep> function in the case of Linux.
+See L<Sys::Time::Constant|SPVM::Sys::Time::Constant> about constant values given to $clockid and $flags.
 
-The C<$request> is a L<Sys::Time::Timespec|SPVM::Sys::Time::Timespec> object.
+Exceptions:
 
-The C<$remain> is a L<Sys::Time::Timespec|SPVM::Sys::Time::Timespec> object.
+$request must be defined. Otherwise an exception is thrown.
+
+In Mac the following exception is thrown with C<eval_error_id> set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class. clock_nanosleep is not supported in this system(__APPLE__).
 
 =head2 nanosleep
 
-  static method nanosleep : int ($rqtp : Sys::Time::Timespec, $rmtp : Sys::Time::Timespec);
+C<static method nanosleep : int ($rqtp : L<Sys::Time::Timespec|SPVM::Sys::Time::Timespec>, $rmtp : L<Sys::Time::Timespec|SPVM::Sys::Time::Timespec>);>
 
-The nanosleep() function shall cause the current thread to be suspended from execution until either the time interval specified by the rqtp argument has elapsed or a signal is delivered to the calling thread, and its action is to invoke a signal-catching function or to terminate the process.
+Calls the L<nanosleep|https://linux.die.net/man/3/nanosleep> function, and returns its return value.
 
-See the detail of the L<nanosleep|https://linux.die.net/man/3/nanosleep> function in the case of Linux.
+Exceptions:
 
-The rqtp is a L<Sys::Time::Timespec> object.
+$rqtp must be defined. Otherwise an exception is thrown.
 
-The rmtp is a L<Sys::Time::Timespec> object.
+If the nanosleep function failed, an exception is thrown with C<eval_error_id> set to the basic type ID of the L<Error::System|SPVM::Error::System>.
+
+=head2 utime
+
+C<static method utime : int ($filename : string, $times : L<Sys::Time::Utimbuf|SPVM::Sys::Time::Utimbuf>);>
+
+Calls the L<utime|https://linux.die.net/man/2/utime> function, and returns its return value.
+
+=head2 utimes
+
+C<static method utimes : int ($filename : string, $times : L<Sys::Time::Timeval|SPVM::Sys::Time::Timeval>[]);>
+
+Calls the L<utimes|https://linux.die.net/man/2/utimes> function, and returns its return value.
+
+The utime() system call changes the access and modification times of the inode specified by filename to the actime and modtime fields of times respectively.
 
 =head1 Copyright & License
 

@@ -4,75 +4,65 @@ package SPVM::Sys::Time::Timespec;
 
 =head1 Name
 
-SPVM::Sys::Time::Timespec - struct timespec in C language
+SPVM::Sys::Time::Timespec - struct timespec in the C language
+
+=head1 Description
+
+The Sys::Time::Timespec class in L<SPVM> represents L<struct timespec|https://linux.die.net/man/2/clock_gettime> in the C language.
 
 =head1 Usage
   
   use Sys::Time::Timespec;
   
-  my $tv = Sys::Time::Timespec->new;
+  my $ts = Sys::Time::Timespec->new;
   
-  my $tv_sec = $tv->tv_sec;
-  $tv->set_tv_sec(12);
+  my $ts = Sys::Time::Timespec->new(5, 300_000_000);
   
-  my $tv_nsec = $tv->tv_nsec;
-  $tv->set_tv_nsec(34);
-
-=head1 Description
-
-C<Sys::Time::Timespec> represents C<struct timespec> in C<C language>.
-
-See L<gettimeofday(2) - Linux man page|https://linux.die.net/man/2/gettimeofday> about C<struct timespec> in Linux.
+  my $ts_sec = $ts->tv_sec;
+  $ts->set_tv_sec(12);
+  
+  my $ts_nsec = $ts->tv_nsec;
+  $ts->set_tv_nsec(34);
 
 =head1 Class Methods
 
 =head2 new
 
-  static method new : Sys::Time::Timespec ()
+C<static method new : L<Sys::Time::Timespec|SPVM::Sys::Time::Timespec> ($tv_sec : long = 0, $tv_nsec : long = 0);>
 
-Creates a new C<Sys::Time::Timespec> object.
-
-  my $tv = Sys::Time::Timespec->new;
+Creates a new L<Sys::Time::Timespec|SPVM::Sys::Time::Timespec> object.
 
 =head1 Instance Methods
 
 =head2 DESTROY
 
-  native method DESTROY : void ();
+C<native method DESTROY : void ();>
 
 The destructor.
 
 =head2 tv_sec
 
-  method tv_sec : long ()
+C<method tv_sec : long ()>
 
-Gets C<tv_sec>.
-
-  my $tv_sec = $tv->tv_sec;
+Returns C<tv_sec>.
 
 =head2 set_tv_sec
 
-  method set_tv_sec : void ($tv_sec : long)
+C<method set_tv_sec : void ($ts_sec : long);>
 
 Sets C<tv_sec>.
 
-  $tv->set_tv_sec(12);
-
 =head2 tv_nsec
   
-  method tv_nsec : long ()
+C<method tv_nsec : long ()>
 
-Gets C<tv_nsec>.
-
-  my $tv_nsec = $tv->tv_nsec;
+Returns C<tv_nsec>.
 
 =head2 set_tv_nsec
 
-  method set_tv_nsec : void ($tv_nsec : long)
+C<method set_tv_nsec : void ($ts_nsec : long);>
 
 Sets C<tv_nsec>.
-
-  $tv->set_tv_nsec(34);
 
 =head1 Copyright & License
 

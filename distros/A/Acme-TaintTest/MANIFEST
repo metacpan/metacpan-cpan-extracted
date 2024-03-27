@@ -1,0 +1,13 @@
+Makefile.PL
+Changes
+LICENSE
+README.md
+lib/Acme/TaintTest.pm
+t/00_tainttests.t
+t/01_relative_inc.t
+t/02_sa_t_init.t
+t/SATest.pm
+t/test_dir
+MANIFEST
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

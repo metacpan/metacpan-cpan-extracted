@@ -4,7 +4,7 @@ use warnings;
 
 use parent qw( Exporter );
 our @EXPORT_OK = qw( dircopy fcopy rcopy );
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 
 use File::Copy;
 use File::Find;
@@ -15,6 +15,7 @@ our $Link       = eval { local $SIG{'__DIE__'}; link    '', ''; 1 } || 0;
 our $CopyLink   = eval { local $SIG{'__DIE__'}; symlink '', ''; 1 } || 0;
 our $DirPerms   = 0777;
 
+=encoding UTF-8
 
 =head1 NAME
 

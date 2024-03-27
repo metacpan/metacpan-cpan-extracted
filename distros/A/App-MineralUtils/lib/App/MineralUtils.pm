@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-26'; # DATE
+our $DATE = '2024-03-22'; # DATE
 our $DIST = 'App-MineralUtils'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 our %SPEC;
 
@@ -96,6 +96,16 @@ my @magnesium_forms = (
         magnesium_ratio => 24.305/203.31, # 12.0%
         summary => 'Magnesium chloride (hexahydrate, H12Cl2MgO6), in milligrams',
     },
+    {
+        name=>'mg-mg-malate',
+        magnesium_ratio => 24.305/156.376, # 15.5%
+        summary => 'Magnesium malate (C4H4MgO5), in milligrams',
+    },
+    {
+        name=>'mg-mg-malate-trihydrate',
+        magnesium_ratio => 24.305/210.40, # 11.6%
+        summary => 'Magnesium malate (MgC4H4O5.3H2O), in milligrams',
+    },
 );
 
 # XXX share with App::VitaminUtils
@@ -151,7 +161,7 @@ our @potassium_forms = (
     },
     {
         name => 'mg-k-citrate',
-        potassium_ratio => 39.0983/306.395, # 12.76%
+        potassium_ratio => 3*39.0983/306.395, # 12.76%
         summary => 'Potassium citrate (K3C6H5O7), in milligrams',
     },
 );
@@ -457,7 +467,7 @@ App::MineralUtils - Utilities related to mineral supplements
 
 =head1 VERSION
 
-This document describes version 0.010 of App::MineralUtils (from Perl distribution App-MineralUtils), released on 2022-11-26.
+This document describes version 0.012 of App::MineralUtils (from Perl distribution App-MineralUtils), released on 2024-03-22.
 
 =head1 DESCRIPTION
 
@@ -568,12 +578,22 @@ Result:
        unit    => "mg-mg-chloride-hexahydrate",
        summary => "Magnesium chloride (hexahydrate, H12Cl2MgO6), in milligrams",
      },
+     {
+       amount  => 6.45161290322581,
+       unit    => "mg-mg-malate",
+       summary => "Magnesium malate (C4H4MgO5), in milligrams",
+     },
+     {
+       amount  => 8.62068965517241,
+       unit    => "mg-mg-malate-trihydrate",
+       summary => "Magnesium malate (MgC4H4O5.3H2O), in milligrams",
+     },
    ],
    {
      "table.field_aligns"  => ["number", "left", "left"],
      "table.fields"        => ["amount", "unit", "summary"],
      "table.field_formats" => [
-                                ["number", { thousands_sep => "", precision => 3 }],
+                                ["number", { precision => 3, thousands_sep => "" }],
                                 undef,
                                 undef,
                               ],
@@ -690,15 +710,25 @@ Result:
        unit    => "mg-mg-chloride-hexahydrate",
        summary => "Magnesium chloride (hexahydrate, H12Cl2MgO6), in milligrams",
      },
+     {
+       amount  => 2258.06451612903,
+       unit    => "mg-mg-malate",
+       summary => "Magnesium malate (C4H4MgO5), in milligrams",
+     },
+     {
+       amount  => 3017.24137931034,
+       unit    => "mg-mg-malate-trihydrate",
+       summary => "Magnesium malate (MgC4H4O5.3H2O), in milligrams",
+     },
    ],
    {
+     "table.field_aligns"  => ["number", "left", "left"],
+     "table.fields"        => ["amount", "unit", "summary"],
      "table.field_formats" => [
-                                ["number", { thousands_sep => "", precision => 3 }],
+                                ["number", { precision => 3, thousands_sep => "" }],
                                 undef,
                                 undef,
                               ],
-     "table.fields"        => ["amount", "unit", "summary"],
-     "table.field_aligns"  => ["number", "left", "left"],
    },
  ]
 
@@ -785,18 +815,18 @@ Result:
        summary => "Potassium chloride (KCl), in milligrams",
      },
      {
-       amount  => 7.8125,
+       amount  => 2.61096605744125,
        unit    => "mg-k-citrate",
        summary => "Potassium citrate (K3C6H5O7), in milligrams",
      },
    ],
    {
-     "table.fields"        => ["amount", "unit", "summary"],
      "table.field_formats" => [
                                 ["number", { precision => 3, thousands_sep => "" }],
                                 undef,
                                 undef,
                               ],
+     "table.fields"        => ["amount", "unit", "summary"],
      "table.field_aligns"  => ["number", "left", "left"],
    },
  ]
@@ -907,13 +937,13 @@ Result:
      },
    ],
    {
+     "table.field_aligns"  => ["number", "left", "left"],
      "table.fields"        => ["amount", "unit", "summary"],
      "table.field_formats" => [
                                 ["number", { thousands_sep => "", precision => 3 }],
                                 undef,
                                 undef,
                               ],
-     "table.field_aligns"  => ["number", "left", "left"],
    },
  ]
 
@@ -995,7 +1025,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2022, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -4,7 +4,11 @@ package SPVM::Sys::Select::Fd_set;
 
 =head1 Name
 
-SPVM::Sys::Select::Fd_set - fd_set Type in C Language
+SPVM::Sys::Select::Fd_set - fd_set structure in C Language
+
+=head1 Description
+
+The Sys::Select::Fd_set class in L<SPVM> represents L<fd_set|https://linux.die.net/man/2/select> structure in the C language.
 
 =head1 Usage
 
@@ -12,21 +16,21 @@ SPVM::Sys::Select::Fd_set - fd_set Type in C Language
   
   my $fd_set = Sys::Select::Fd_set->new;
 
-=head1 Description
+=head1 Interfaces
 
-C<Sys::Select::Fd_set> is the class for the C<fd_set> type in C<C language>.
+=over 2
 
-See L<select(2) - Linux man page|https://linux.die.net/man/2/select> in Linux.
+=item * L<Cloneable|SPVM::Cloneable>
 
-This is a L<pointer class|SPVM::Document::Language/"Pointer Class">.
+=back
 
 =head1 Class Methods
 
 =head2 new
 
-  static method new : Sys::Select::Fd_set ();
+C<static method new : L<Sys::Select::Fd_set|SPVM::Sys::Select::Fd_set> ();>
 
-Create a new C<Sys::Select::Fd_set> object.
+Create a new L<Sys::Select::Fd_set|SPVM::Sys::Select::Fd_set> object.
 
 =head1 Instance Methods
 
@@ -36,11 +40,11 @@ Create a new C<Sys::Select::Fd_set> object.
 
 The destructor.
 
-=head2 set
+=head2 clone
 
-  method set : void ($set : Sys::Select::Fd_set);
+  method clone : Sys::Select::Fd_set ();
 
-Sets the value of this object by copying the C<$set>.
+Clones this object and returns it.
 
 =head1 Copyright & License
 

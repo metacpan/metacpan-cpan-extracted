@@ -1,7 +1,7 @@
 ##############################################################################
 #
 #  Data::Tools perl module
-#  Copyright (c) 2013-2022 Vladi Belperchinov-Shabanski "Cade" 
+#  Copyright (c) 2013-2024 Vladi Belperchinov-Shabanski "Cade" 
 #        <cade@noxrun.com> <cade@bis.bg> <cade@cpan.org>
 #  http://cade.noxrun.com/  
 #
@@ -21,7 +21,7 @@ use MIME::Base64;
 use File::Glob;
 use Hash::Util qw( lock_hashref unlock_hashref lock_ref_keys );
 
-our $VERSION = '1.42';
+our $VERSION = '1.43';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(
@@ -38,6 +38,7 @@ our @EXPORT = qw(
               file_bin_load
 
               file_text_save
+              file_text_append
               file_text_load
               file_text_load_ar
 
@@ -126,8 +127,6 @@ our @EXPORT = qw(
               
               ref_freeze
               ref_thaw
-
-              fork_exec_cmd
             );
 
 our %EXPORT_TAGS = (
@@ -310,6 +309,21 @@ sub file_text_save
   return 1;
 }
 
+sub file_text_append
+{
+  my $fn = shift; # file name
+  
+  my $o;
+  my $enc = ":encoding($TEXT_IO_ENCODING)" if $TEXT_IO_ENCODING;
+  open( $o, ">>$enc", $fn ) or return 0;
+  binmode( $o ) unless $TEXT_IO_ENCODING;
+  print $o @_;
+  close $o;
+  return 1;
+}
+
+
+
 ##############################################################################
 
 sub cmd_read_from
@@ -401,8 +415,8 @@ sub dir_path_make
   for my $p ( @path )
     {
     $path .= "$p/";
-    next if -d $path;
-    mkdir( $path, $mask ) or return 0;
+    mkdir( $path, $mask ); # should check if EEXISTS but still the same outcome
+    return 0 unless -d $path;
     }
   return 1;
 }
@@ -471,28 +485,28 @@ sub str_url_unescape
 }
 
 my %HTML_ESCAPES = (
-                   '>'  => '&gt;',
-                   '<'  => '&lt;',
-                   "'"  => '&rsquo;',
-                   "`"  => '&lsquo;',
-                   "&"  => '&amp;',
-                   '"'  => '&quot;',
-                   '\\' => '&#134;',
+                   '"'  => '&#34;',
+                   "&"  => '&#38;',
+                   "'"  => '&#39;',
+                   '<'  => '&#60;',
                    '='  => '&#61;',
+                   '>'  => '&#62;',
+                   "`"  => '&#96;',
+                   '\\' => '&#134;',
                    );
 
 my %HTML_ESCAPES_TEXT = (
-                   '>'  => '&gt;',
-                   '<'  => '&lt;',
+                   '<'  => '&#60;',
+                   '>'  => '&#62;',
                    );
 
 my %HTML_ESCAPES_ATTR = (
-                   '>'  => '&gt;',
-                   '<'  => '&lt;',
-                   "'"  => '&rsquo;',
-                   "`"  => '&lsquo;',
-                   '"'  => '&quot;',
+                   '"'  => '&#34;',
+                   "'"  => '&#39;',
+                   '<'  => '&#60;',
                    '='  => '&#61;',
+                   '>'  => '&#62;',
+                   "`"  => '&#96;',
                    );
 
 sub str_html_escape
@@ -1171,19 +1185,6 @@ sub ref_thaw
                                                                                                                                 
   return ref( $ref ) ? $ref : undef;                                                                                            
 };                                                                                                                              
-
-##############################################################################
-
-sub fork_exec_cmd
-{
-  my $cmd = shift;
-  
-  my $pid = fork();
-  return undef if ! defined $pid; # fork failed
-  return $pid if $pid;            # master process here
-  exec $cmd;                      # sub process here  
-  exit;                           # if sub exec fails...
-}
 
 ##############################################################################
 

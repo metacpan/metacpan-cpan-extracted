@@ -36,7 +36,7 @@
             "Config" : "0",
             "Errno" : "0",
             "Filter::Util::Call" : "1.59",
-            "Module::Generic" : "v0.28.4",
+            "Module::Generic" : "v0.35.1",
             "Nice::Try" : "v1.3.1",
             "POSIX" : "0",
             "PPI" : "1.276",
@@ -53,7 +53,7 @@
       },
       "test" : {
          "requires" : {
-            "Module::Generic::File" : "v0.5.3",
+            "Module::Generic::File" : "v0.8.1",
             "Test2::IPC" : "1.302190",
             "Test2::V0" : "0.000145",
             "Test::More" : "1.302162",
@@ -72,6 +72,6 @@
          "web" : "https://gitlab.com/jackdeguest/Promise-Me"
       }
    },
-   "version" : "v0.4.8",
+   "version" : "v0.4.10",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

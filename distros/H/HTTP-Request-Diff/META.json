@@ -1,5 +1,5 @@
 {
-   "abstract" : "create diffs between HTTP request",
+   "abstract" : "create diffs between HTTP requests",
    "author" : [
       "Max Maischein <corion@cpan.org>"
    ],
@@ -36,9 +36,9 @@
             "CGI::Tiny::Multipart" : "0",
             "Carp" : "0",
             "HTTP::Request" : "0",
-            "List::Util" : "0",
+            "List::Util" : "1.45",
             "Moo" : "2",
-            "Text::Table::Any" : "0",
+            "Term::Table" : "0",
             "perl" : "5.020"
          }
       },
@@ -65,7 +65,7 @@
          "web" : "https://github.com/Corion/HTTP-Request-Diff"
       }
    },
-   "version" : "0.01",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.07",
    "x_static_install" : 1
 }

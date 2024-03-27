@@ -20,7 +20,7 @@ int32_t SPVM__Sys__Poll__Constant__POLLERR(SPVM_ENV* env, SPVM_VALUE* stack) {
   stack[0].ival = POLLERR;
   return 0;
 #else
-  env->die(env, stack, "POLLERR is not defined on this system", __func__, FILE_NAME, __LINE__);
+  env->die(env, stack, "POLLERR is not defined in this system.", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
 
@@ -32,7 +32,7 @@ int32_t SPVM__Sys__Poll__Constant__POLLHUP(SPVM_ENV* env, SPVM_VALUE* stack) {
   stack[0].ival = POLLHUP;
   return 0;
 #else
-  env->die(env, stack, "POLLHUP is not defined on this system", __func__, FILE_NAME, __LINE__);
+  env->die(env, stack, "POLLHUP is not defined in this system.", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
 
@@ -44,7 +44,7 @@ int32_t SPVM__Sys__Poll__Constant__POLLIN(SPVM_ENV* env, SPVM_VALUE* stack) {
   stack[0].ival = POLLIN;
   return 0;
 #else
-  env->die(env, stack, "POLLIN is not defined on this system", __func__, FILE_NAME, __LINE__);
+  env->die(env, stack, "POLLIN is not defined in this system.", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
 
@@ -56,7 +56,7 @@ int32_t SPVM__Sys__Poll__Constant__POLLNORM(SPVM_ENV* env, SPVM_VALUE* stack) {
   stack[0].ival = POLLNORM;
   return 0;
 #else
-  env->die(env, stack, "POLLNORM is not defined on this system", __func__, FILE_NAME, __LINE__);
+  env->die(env, stack, "POLLNORM is not defined in this system.", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
 
@@ -68,7 +68,7 @@ int32_t SPVM__Sys__Poll__Constant__POLLNVAL(SPVM_ENV* env, SPVM_VALUE* stack) {
   stack[0].ival = POLLNVAL;
   return 0;
 #else
-  env->die(env, stack, "POLLNVAL is not defined on this system", __func__, FILE_NAME, __LINE__);
+  env->die(env, stack, "POLLNVAL is not defined in this system.", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
 
@@ -80,7 +80,7 @@ int32_t SPVM__Sys__Poll__Constant__POLLOUT(SPVM_ENV* env, SPVM_VALUE* stack) {
   stack[0].ival = POLLOUT;
   return 0;
 #else
-  env->die(env, stack, "POLLOUT is not defined on this system", __func__, FILE_NAME, __LINE__);
+  env->die(env, stack, "POLLOUT is not defined in this system.", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
 
@@ -92,7 +92,7 @@ int32_t SPVM__Sys__Poll__Constant__POLLPRI(SPVM_ENV* env, SPVM_VALUE* stack) {
   stack[0].ival = POLLPRI;
   return 0;
 #else
-  env->die(env, stack, "POLLPRI is not defined on this system", __func__, FILE_NAME, __LINE__);
+  env->die(env, stack, "POLLPRI is not defined in this system.", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
 
@@ -104,7 +104,7 @@ int32_t SPVM__Sys__Poll__Constant__POLLRDBAND(SPVM_ENV* env, SPVM_VALUE* stack) 
   stack[0].ival = POLLRDBAND;
   return 0;
 #else
-  env->die(env, stack, "POLLRDBAND is not defined on this system", __func__, FILE_NAME, __LINE__);
+  env->die(env, stack, "POLLRDBAND is not defined in this system.", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
 
@@ -116,7 +116,7 @@ int32_t SPVM__Sys__Poll__Constant__POLLRDNORM(SPVM_ENV* env, SPVM_VALUE* stack) 
   stack[0].ival = POLLRDNORM;
   return 0;
 #else
-  env->die(env, stack, "POLLRDNORM is not defined on this system", __func__, FILE_NAME, __LINE__);
+  env->die(env, stack, "POLLRDNORM is not defined in this system.", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
 
@@ -128,7 +128,7 @@ int32_t SPVM__Sys__Poll__Constant__POLLWRBAND(SPVM_ENV* env, SPVM_VALUE* stack) 
   stack[0].ival = POLLWRBAND;
   return 0;
 #else
-  env->die(env, stack, "POLLWRBAND is not defined on this system", __func__, FILE_NAME, __LINE__);
+  env->die(env, stack, "POLLWRBAND is not defined in this system.", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
 
@@ -140,7 +140,7 @@ int32_t SPVM__Sys__Poll__Constant__POLLWRNORM(SPVM_ENV* env, SPVM_VALUE* stack) 
   stack[0].ival = POLLWRNORM;
   return 0;
 #else
-  env->die(env, stack, "POLLWRNORM is not defined on this system", __func__, FILE_NAME, __LINE__);
+  env->die(env, stack, "POLLWRNORM is not defined in this system.", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
 

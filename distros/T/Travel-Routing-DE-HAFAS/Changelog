@@ -1,3 +1,10 @@
+Travel::Routing::DE::HAFAS 0.05 - Sun Mar 24 2024
+
+    * hafas: Add -c / --max-change option
+    * hafas: Add optional via arguments
+    * HAFAS: Add max_change option
+    * HAFAS: Add via_stops option
+
 Travel::Routing::DE::HAFAS 0.04 - Mon Feb 26 2024
 
     * hafas: Add --raw-json option

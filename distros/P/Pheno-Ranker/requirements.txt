@@ -1,0 +1,7 @@
+qrcode[pil]
+Pillow
+pyzbar
+pandas
+reportlab
+matplotlib
+PyYAML

@@ -18,7 +18,7 @@ use Travel::Routing::DE::HAFAS::Connection;
 use Travel::Status::DE::HAFAS::Location;
 use Travel::Status::DE::HAFAS::Message;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 # {{{ Endpoint Definition
 
@@ -218,6 +218,7 @@ sub new {
 		messages       => [],
 		results        => [],
 		from_stop      => $conf{from_stop},
+		via_stops      => $conf{via_stops} // [],
 		to_stop        => $conf{to_stop},
 		ua             => $ua,
 		now            => $now,
@@ -231,33 +232,23 @@ sub new {
 	my $time    = ( $conf{datetime} // $now )->strftime('%H%M%S');
 	my $outFrwd = $conf{arrival} ? \0 : undef;
 
-	my ( $from_lid, $to_lid );
-	if ( $self->{from_stop} =~ m{ ^ [0-9]+ $ }x ) {
-		$from_lid = 'A=1@L=' . $self->{from_stop} . '@';
-	}
-	else {
-		$from_lid = 'A=1@O=' . $self->{from_stop} . '@';
-	}
-	if ( $self->{to_stop} =~ m{ ^ [0-9]+ $ }x ) {
-		$to_lid = 'A=1@L=' . $self->{to_stop} . '@';
-	}
-	else {
-		$to_lid = 'A=1@O=' . $self->{to_stop} . '@';
-	}
+	my @via_locs = map { $self->stop_to_hafas($_) } @{ $self->{via_stops} };
 
 	$req = {
 		svcReqL => [
 			{
 				meth => 'TripSearch',
 				req  => {
-					depLocL    => [ { lid => $from_lid } ],
-					arrLocL    => [ { lid => $to_lid } ],
-					numF       => 6,
-					maxChg     => undef,
+					depLocL => [ $self->stop_to_hafas( $self->{from_stop} ) ],
+					arrLocL => [ $self->stop_to_hafas( $self->{to_stop} ) ],
+					numF    => 6,
+					maxChg  => $conf{max_change},
 					minChgTime => undef,
 					outFrwd    => $outFrwd,
-					viaLocL    => undef,
-					trfReq     => {
+					viaLocL    => @via_locs
+					? [ map { { loc => $_ } } @via_locs ]
+					: undef,
+					trfReq => {
 						cType    => 'PK',
 						tvlrProf => [ { type => 'E' } ],
 					},
@@ -412,6 +403,17 @@ sub mot_mask {
 	}
 
 	return $mot_mask;
+}
+
+sub stop_to_hafas {
+	my ( $self, $stop ) = @_;
+
+	if ( $stop =~ m{ ^ [0-9]+ $ }x ) {
+		return { lid => 'A=1@L=' . $stop . '@' };
+	}
+	else {
+		return { lid => 'A=1@O=' . $stop . '@' };
+	}
 }
 
 sub post_with_cache {
@@ -678,7 +680,7 @@ Travel::Routing::DE::HAFAS - Interface to HAFAS itinerary services
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 DESCRIPTION
 
@@ -709,6 +711,11 @@ must be specified either by name or by EVA ID (e.g. 8000080 for Dortmund Hbf).
 Destination stop, e.g. "Essen HBf" or "Alfredusbad, Essen (Ruhr)". The stop
 must be specified either by name or by EVA ID (e.g. 8000080 for Dortmund Hbf).
 
+=item B<via_stops> => [I<stop1>, I<stop2>, ...]
+
+Only return connections that pass all specified stops. Individual stops are
+identified by name or by EVA ID (e.g. 8000080 for Dortmund Hbf).
+
 =item B<arrival> => I<bool>
 
 If true: request connections that arrive at the destination before the
@@ -721,18 +728,18 @@ Store HAFAS replies in the provided cache object.  This module works with
 real-time data, so the object should be configured for an expiry of one to two
 minutes.
 
-=item B<datetime> => I<DateTime object> (station)
+=item B<datetime> => I<DateTime object>
 
 Date and time for itinerary request.  Defaults to now.
 
-=item B<excluded_mots> => [I<mot1>, I<mot2>, ...] (geoSearch, station)
+=item B<excluded_mots> => [I<mot1>, I<mot2>, ...]
 
 By default, all modes of transport (trains, trams, buses etc.) are considered.
 If this option is set, all modes appearing in I<mot1>, I<mot2>, ... will
 be excluded. The supported modes depend on B<service>, use
 B<get_services> or B<get_service> to get the supported values.
 
-=item B<exclusive_mots> => [I<mot1>, I<mot2>, ...] (geoSearch, station)
+=item B<exclusive_mots> => [I<mot1>, I<mot2>, ...]
 
 If this option is set, only the modes of transport appearing in I<mot1>,
 I<mot2>, ...  will be considered.  The supported modes depend on B<service>,
@@ -748,6 +755,10 @@ values. Providing an unsupported or invalid value may lead to garbage output.
 
 Passed on to C<< LWP::UserAgent->new >>. Defaults to C<< { timeout => 10 } >>,
 pass an empty hashref to call the LWP::UserAgent constructor without arguments.
+
+=item B<max_change> => I<count>
+
+Request connections with no more than I<count> changeovers.
 
 =item B<service> => I<service>
 

@@ -4,9 +4,9 @@ WriteMakefile(
 	NAME					=> 'Tk::ListEntry',
 	VERSION_FROM		=> 'lib/Tk/ListEntry.pm',
 	PREREQ_PM			=> {
-		'Test::Tk'		=> '0.03',
+		'Test::Tk'		=> '3.02',
 		'Tk'				=> '804.033',
-		'Tk::PopList'	=> '0.05',
+		'Tk::PopList'	=> '0.06',
 	},
 	ABSTRACT_FROM		=> 'lib/Tk/ListEntry.pm',
 	AUTHOR				=> 'Hans Jeuken <hanje at cpan dot org>',
@@ -22,4 +22,5 @@ WriteMakefile(
 		}}) : ()
 	),
 );
+
 

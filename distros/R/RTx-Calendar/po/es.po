@@ -1,0 +1,117 @@
+msgid ""
+msgstr ""
+"PO-Revision-Date: 2024-01-24 12:17+0200\n"
+"Last-Translator: Eduardo Domínguez Vázquez <eduardo.dominguez@uib.es>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. (qq{<a href="$RT::WebPath/Search/Build.html">} . loc("Query Builder") . '</a>')
+#: html/Elements/CalendarFooter:21
+msgid ""
+"\n"
+"By default, RTx::Calendar displays Due and Starts dates. You can select other\n"
+"date fields with the Display Columns section in the %1.\n"
+"The following format will display the two additional date fields, LastUpdated and a\n"
+"custom field called Maintenance Date:\n"
+msgstr ""
+"\n"
+"Por defecto, RTx::Calendar muestra las fechas de Inicio y Finalización. Se pueden\n"
+"seleccionar otras fechas con la sección de Visualizar Columnas en «%1».\n"
+"El siguiente formato visualizará los campos «LastUpdated» y un campo personalizado\n"
+"llamado «Maintenance Date»:\n"
+
+
+#. (qq{<a href="$RT::WebPath/Search/Edit.html">} . loc("Advanced") . '</a>')
+#: html/Elements/CalendarFooter:8
+msgid ""
+"\n"
+"If you want to see reminders on the calendar, you need to go to the %1 tab\n"
+"of your query and explicitly add the following clause to it:\n"
+msgstr ""
+"\n"
+"Si quiere ver los recordatorios en el calendario, debe ir a la pestaña %1\n"
+"de su búsqueda y añadirle de forma explícita la siguiente cláusula::\n"
+"\n"
+
+
+#. (qq{<a href="$RT::WebPath/Search/Build.html">} . loc("Query Builder") . '</a>')
+#: html/Elements/CalendarFooter:35
+msgid ""
+"\n"
+"You can change the default query used by Calendar.html and the MyCalendar\n"
+"portlet by saving a query with the name <code>calendar</code> in the %1.\n"
+msgstr ""
+"\n"
+"Puede cambiar la búsqueda por defecto que emplea Calendar.html y el portlet\n"
+"MyCalendar guardando la búsqueda con el nombre <code>calendar</code> en «%1» .\n"
+
+
+#: html/Helpers/CalendarEventInfo:81
+msgid "<% $label_of{$attr} %>"
+msgstr ""
+
+#: html/Elements/CalendarFooter:5
+msgid "Advanced"
+msgstr "Avanzado"
+
+#: html/Callbacks/RTx-Calendar/Elements/Tabs/Privileged:52 html/Elements/Calendar:233 html/Elements/MyCalendar:2 html/Elements/MyCalendar:90 html/Search/Calendar.html:1
+msgid "Calendar"
+msgstr "Calendario"
+
+#. ($rtdate->GetMonth($Month), $Year)
+#: html/Elements/Calendar:23
+msgid "Calendar for %1 %2"
+msgstr "Calendario para %1 %2"
+
+#: html/Elements/CalendarFooter:30
+msgid "Changing the default query"
+msgstr "Modificando la búsqueda por defecto"
+
+#: html/Elements/CalendarSidebar:28
+msgid "Clear Filter"
+msgstr "Limpiar el filtro"
+
+#: html/Elements/CalendarFooter:14
+msgid "Displaying other kind of dates"
+msgstr "Visualizando otro tipo de fechas"
+
+#: html/Elements/CalendarFooter:3
+msgid "Displaying reminders"
+msgstr "Visualizando recordatorios"
+
+#: html/Elements/Calendar:25
+msgid "Download Spreadsheet"
+msgstr "Descargar hoja de cálculo"
+
+#: etc/tabs_privileged_callback.patch:25
+msgid "Edit"
+msgstr "Editar"
+
+#: html/Elements/CalendarSidebar:34
+msgid "Event Types"
+msgstr "Tipos de eventos"
+
+#: html/Elements/CalendarSidebar:26
+msgid "Filter"
+msgstr "Filtro"
+
+#: html/Elements/CalendarSidebar:9
+msgid "Filter on Status"
+msgstr "Filtrar por estado"
+
+#: html/Elements/CalendarFooter:1
+msgid "Help"
+msgstr "Ayuda"
+
+#: html/Elements/CalendarFooter:16 html/Elements/CalendarFooter:32
+msgid "Query Builder"
+msgstr "Constructor de consultas"
+
+#: html/Elements/CalendarSidebar:51
+msgid "Status Colors"
+msgstr "Colores de los estados"
+
+#: html/Elements/Calendar:177
+msgid "Submit"
+msgstr "Enviar"

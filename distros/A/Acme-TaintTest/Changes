@@ -1,0 +1,9 @@
+Revision history for Perl extension Acme-TaintTest
+
+0.0.3 Try even more of SA's conditions
+
+0.0.2 Add more test conditions to get it closer to failure shown by SpamAssassin
+
+0.0.1 2024-03-25T03:15:44Z
+
+    - original version

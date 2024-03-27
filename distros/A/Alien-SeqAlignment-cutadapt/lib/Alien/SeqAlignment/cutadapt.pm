@@ -1,13 +1,17 @@
 use strict;
 use warnings;
 package Alien::SeqAlignment::cutadapt;
-$Alien::SeqAlignment::cutadapt::VERSION = '0.04';
+$Alien::SeqAlignment::cutadapt::VERSION = '0.05';
 
 use parent qw( Alien::Base );
 
 =head1 NAME
 
 Alien::SeqAlignment::cutadapt - Find or install cutadapt
+
+=head1 VERSION
+
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -18,7 +22,7 @@ Command line tool:
  
 or you can even do this to maintain compatibility with the Alien tool API
 
- system Alien::SeqAlignment::cutadapt->exe (list of arguments and options)
+ system Alien::SeqAlignment::cutadapt->cutadapt (list of arguments and options)
 
 =head1 DESCRIPTION
 
@@ -40,15 +44,15 @@ respectively to use this Perl Alien module.
 
 =head1 METHODS
 
-=head2 exe
+=head2 cutadapt
 
- Alien::SeqAlignment::cutadapt->exe
+ Alien::SeqAlignment::cutadapt->cutadapt
 
 Returns the command name for running the CLI version of the cutadapt CLI. 
 
 =cut
 
-sub exe {
+sub cutadapt {
     my ($class) = @_;
     $class->runtime_prop->{command};
 }
@@ -122,6 +126,11 @@ The base class for this Alien.
 =item * L<Alien::Build::Manual::AlienUser>
 
 Detailed manual for users of Alien classes.
+
+=item * L<Bio::SeqAlignment|https://metacpan.org/pod/Bio::SeqAlignment>
+
+A collection of tools and libraries for aligning biological sequences 
+from within Perl. 
 
 =back
 

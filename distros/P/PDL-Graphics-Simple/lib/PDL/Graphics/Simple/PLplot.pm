@@ -25,7 +25,7 @@ our $mod = {
     module=>'PDL::Graphics::Simple::PLplot',
     engine => 'PDL::Graphics::PLplot',
     synopsis=> 'PLplot (nice plotting, sloooow images)',
-    pgs_version=> '1.009',
+    pgs_version=> '1.010',
 };
 eval { require PDL::Graphics::PLplot; 1; } and
   PDL::Graphics::Simple::register( 'PDL::Graphics::Simple::PLplot' );

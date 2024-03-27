@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
         'Config'        => 0,
         'Errno'         => 0,
     	'Filter::Util::Call' => '1.59',
-        'Module::Generic' => 'v0.28.4',
+        'Module::Generic' => 'v0.35.1',
         'Nice::Try'     => 'v1.3.1',
         'PPI'           => '1.276',
         'POSIX'         => 0,
@@ -41,7 +41,7 @@ my %WriteMakefileArgs = (
     },
     TEST_REQUIRES =>
     {
-        'Module::Generic::File' => 'v0.5.3',
+        'Module::Generic::File' => 'v0.8.1',
         'Test2::IPC'    => '1.302190',
         'Test2::V0'     => '0.000145',
         'Test::More'    => '1.302162',

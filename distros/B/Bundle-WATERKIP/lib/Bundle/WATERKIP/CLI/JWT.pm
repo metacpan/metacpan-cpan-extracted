@@ -1,5 +1,5 @@
 package Bundle::WATERKIP::CLI::JWT;
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 use Moo;
 use namespace::autoclean;
 
@@ -21,7 +21,7 @@ Bundle::WATERKIP::CLI::JWT - Bundle::WATERKIP::Azure get Azure JWT tokens
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

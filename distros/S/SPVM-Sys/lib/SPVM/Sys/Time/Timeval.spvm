@@ -3,7 +3,7 @@
 
 class Sys::Time::Timeval : pointer {
   
-  native static method new : Sys::Time::Timeval ();
+  native static method new : Sys::Time::Timeval ($tv_sec : long = 0, $tv_usec : long = 0);
 
   native method DESTROY : void ();
   

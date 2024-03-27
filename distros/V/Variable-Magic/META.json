@@ -68,6 +68,6 @@
          "web" : "http://git.vpit.fr/?p=perl%2Fmodules%2FVariable-Magic.git"
       }
    },
-   "version" : "0.63",
+   "version" : "0.64",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

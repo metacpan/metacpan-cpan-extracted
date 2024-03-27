@@ -19,7 +19,7 @@ use warnings;
 use Net::Upwork::API::Config;
 use Net::Upwork::API::Client;
 
-our $VERSION = '2.2.0';
+our $VERSION = '2.2.1';
 
 use constant TOKEN_TYPE_BEARER => 'Bearer';
 
@@ -170,10 +170,11 @@ B<Return value>
 
 sub set_access_token_session() {
     my $self = shift;
+    my $auto_refresh = shift;
 
     $self->{client}{access_token_session} = Net::OAuth2::AccessToken->new(
         profile      => $self->{client}->get_oauth_client,
-        auto_refresh => 0,
+        auto_refresh => $auto_refresh ? 1 : 0,
 	(
 	    access_token  => $self->{config}{access_token},
 	    refresh_token => $self->{config}{refresh_token},
@@ -187,6 +188,8 @@ sub set_access_token_session() {
     if ($self->{config}{expires_at} < time()) {
         $self->{client}{access_token_session}->refresh();
     }
+
+    return $self->{client}{access_token_session};
 }
 
 =item client()

@@ -75,7 +75,7 @@
          "web" : "https://github.com/nrdvana/perl-Data-TableReader"
       }
    },
-   "version" : "0.012",
+   "version" : "0.014",
    "x_contributors" : [
       "Christian Walde <walde.christian@gmail.com>"
    ],

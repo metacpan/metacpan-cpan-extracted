@@ -22,5 +22,5 @@ requires:
 resources:
   bugtracker: https://github.com/mpeppler/DBD-Sybase/issues
   repository: https://github.com/mpeppler/DBD-Sybase.git
-version: '1.23'
+version: '1.24'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

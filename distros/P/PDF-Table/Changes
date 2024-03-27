@@ -1,5 +1,33 @@
 Change history for Perl extension PDF::Table.
 
+=== Version 1.006 (2024-03-20)
+
+    examples/*.pl
+     Add ability to read an ENV environmental variable 'PDF_prefLib' to get
+      the preferred library to use (API2 or Builder). Checks for command line
+      A or B (or -A -B), ENV{PDF_prefLib} A or B, PDF::API2 or PDF::Builder,
+      examples/PDFpref file A or B, PDF::API2 or PDF::Builder. This is of
+      real interest only when BOTH libraries are installed, and you need to
+      pick one or the other to run with.
+
+      Note that util/3_examples.pl also has the ability to give 'A' or 'B' 
+      on the command line to indicate a preference for API2 or Builder (if
+      both are installed).
+
+      Note that the t-tests use a dummy library PDFAPI2Mock, that provides
+      enough of the interface to let the tests be run, regardless of whether
+      you already have API2 or Builder installed! However, you will still need
+      to have at least one of the two installed in order to run the examples
+      or otherwise use PDF::Table.
+
+    lib/PDF/Table.pm, examples/no_repeat.pl (new), util/3_examples
+     Was incorrectly defaulting undefined header repeat switch, in a manner 
+      that did not allow the switch to be '0': no repeating the header (#77).
+      Add new example of multipage table without repeating header.
+
+    README.md  update to point to new Home Page structure on catskilltech.com
+      including both full documentation and examples
+
 === Version 1.005 (2023-01-28)
 
   lib/PDF/Table.pm
