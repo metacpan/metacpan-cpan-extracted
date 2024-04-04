@@ -39,6 +39,7 @@ in the path
 
 ## Version history
 
+- v0.0.6 fixes test bugs created by previous version, improves documentation.
 - v0.0.5 fixes some bugs, and reduces binary dependency. Theoretically, it could
   run in Windows too.
 

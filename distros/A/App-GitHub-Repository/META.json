@@ -24,6 +24,7 @@
             "File::Slurper" : "0",
             "Git" : "0",
             "JSON" : "0",
+            "Module::Build" : "0",
             "Test::More" : "0",
             "version" : "0"
          }
@@ -37,10 +38,15 @@
    "provides" : {
       "App::GitHub::Repository" : {
          "file" : "lib/App/GitHub/Repository.pm",
-         "version" : "v0.0.5"
+         "version" : "v0.0.6"
       }
    },
    "release_status" : "stable",
-   "version" : "v0.0.5",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/artistic-license-2.0.php"
+      ]
+   },
+   "version" : "v0.0.6",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }
